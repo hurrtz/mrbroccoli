@@ -157,8 +157,7 @@ export const en: TranslationDictionary = {
   responseTone: "Response Tone",
   homeStyleChipLabel: ({ tone, length }) => `Style — ${tone} · ${length}`,
   styleSheetTitle: "Conversation settings",
-  styleSheetSubtitle:
-    "Shape replies and speech for this conversation only.",
+  styleSheetSubtitle: "Shape replies and speech for this conversation only.",
   openStyleSheet: "Open conversation settings",
   conversationThinkingInstructions: "Thinking instructions",
   conversationThinkingInstructionsDescription:
@@ -177,18 +176,14 @@ export const en: TranslationDictionary = {
   conversationVoiceDescription: ({ route }) =>
     `Choose the voice used by ${route} in this conversation.`,
   scrollToLatest: "Scroll to latest message",
-  conversationTitle: "Conversation Title",
-  conversationTitleGenerationDescription:
-    "Run the selected model once to create a short title from the current conversation.",
-  conversationTitleGenerate: "Generate title",
+  conversationTitleGenerate: "Auto-generate title",
   conversationTitleGenerating: "Generating title…",
   conversationTitleGenerated: "Conversation renamed.",
   conversationTitleNeedsContent:
     "Start a conversation before generating a title.",
   conversationTitleNeedsProvider:
     "Configure the selected model before generating a title.",
-  conversationTitleGenerationFailed:
-    "Couldn’t generate a conversation title.",
+  conversationTitleGenerationFailed: "Couldn’t generate a conversation title.",
   conversationTitleGenerationTimedOut:
     "Title generation took too long. Please try again.",
   inputMode: "Input Mode",

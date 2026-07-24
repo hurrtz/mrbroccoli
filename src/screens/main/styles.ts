@@ -456,23 +456,6 @@ export const styles = StyleSheet.create({
   styleSheetVoicePicker: {
     marginBottom: 0,
   },
-  styleSheetAutoRenameCard: {
-    borderRadius: 12,
-    borderWidth: 1,
-    padding: 12,
-    gap: 10,
-  },
-  styleSheetAutoRenameCardLandscape: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    gap: 16,
-  },
-  styleSheetAutoRenameCopy: {
-    flex: 1,
-    minWidth: 0,
-    gap: 5,
-  },
   styleSheetAutoRenameButton: {
     minHeight: 38,
     alignSelf: "flex-start",

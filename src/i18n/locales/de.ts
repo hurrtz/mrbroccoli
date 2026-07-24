@@ -181,10 +181,7 @@ export const de: TranslationDictionary = {
   conversationVoiceDescription: ({ route }) =>
     `Wähle die Stimme von ${route} für dieses Gespräch.`,
   scrollToLatest: "Zur neuesten Nachricht scrollen",
-  conversationTitle: "Gesprächstitel",
-  conversationTitleGenerationDescription:
-    "Nutze das ausgewählte Modell einmalig, um aus dem aktuellen Gespräch einen kurzen Titel zu erzeugen.",
-  conversationTitleGenerate: "Titel erzeugen",
+  conversationTitleGenerate: "Titel automatisch erzeugen",
   conversationTitleGenerating: "Titel wird erzeugt …",
   conversationTitleGenerated: "Gespräch umbenannt.",
   conversationTitleNeedsContent:

@@ -74,13 +74,38 @@ describe("StyleSheetModal", () => {
   });
 
   it("offers a one-off title generation action", () => {
-    const { getByTestId, getByText, onAutoRenameConversation } = setup();
+    const { getByTestId, getByText, queryByText, onAutoRenameConversation } =
+      setup();
 
-    expect(getByText("Conversation Title")).toBeTruthy();
-    expect(getByText("Generate title")).toBeTruthy();
+    expect(getByText("Auto-generate title")).toBeTruthy();
+    expect(queryByText("Conversation Title")).toBeNull();
+    expect(
+      queryByText(
+        "Run the selected model once to create a short title from the current conversation.",
+      ),
+    ).toBeNull();
     fireEvent.press(getByTestId("auto-rename-conversation"));
 
     expect(onAutoRenameConversation).toHaveBeenCalledTimes(1);
+  });
+
+  it("orders settings from response controls through title generation", () => {
+    const { UNSAFE_root } = setup();
+    const expectedOrder = [
+      "conversation-settings-length",
+      "conversation-settings-tone",
+      "conversation-settings-voice",
+      "conversation-settings-tts-instructions",
+      "conversation-settings-thinking-instructions",
+      "auto-rename-conversation",
+    ];
+    const renderedOrder = UNSAFE_root.findAll((node) =>
+      expectedOrder.includes(node.props.testID),
+    )
+      .map((node) => node.props.testID)
+      .filter((testID, index, testIDs) => testID !== testIDs[index - 1]);
+
+    expect(renderedOrder).toEqual(expectedOrder);
   });
 
   it("disables title generation without conversation content", () => {
@@ -156,9 +181,9 @@ describe("StyleSheetModal", () => {
       ttsInstructionsSupported: false,
     });
 
-    expect(
-      getByTestId("conversation-tts-instructions").props.editable,
-    ).toBe(false);
+    expect(getByTestId("conversation-tts-instructions").props.editable).toBe(
+      false,
+    );
     expect(
       getByText(
         "The current speech route does not support delivery instructions.",

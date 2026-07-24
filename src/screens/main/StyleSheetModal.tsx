@@ -73,10 +73,7 @@ export function StyleSheetModal({
   const { t } = useLocalization();
   const { height, width } = useWindowDimensions();
   const isLandscape = width > height;
-  const drawerMaxHeight = Math.max(
-    280,
-    height - (isLandscape ? 12 : 44),
-  );
+  const drawerMaxHeight = Math.max(280, height - (isLandscape ? 12 : 44));
 
   const lengthOptions = React.useMemo(() => getResponseLengthOptions(t), [t]);
   const toneOptions = React.useMemo(() => getResponseToneOptions(t), [t]);
@@ -160,147 +157,12 @@ export function StyleSheetModal({
             <View
               style={
                 isLandscape
-                  ? styles.styleSheetInstructionRowLandscape
-                  : styles.styleSheetOptionsColumn
-              }
-            >
-              <View
-                style={[
-                  styles.styleSheetGroup,
-                  isLandscape ? styles.styleSheetGroupLandscape : null,
-                ]}
-              >
-                <Text
-                  style={[
-                    styles.styleSheetGroupLabel,
-                    { color: colors.textMuted },
-                  ]}
-                >
-                  {t("conversationThinkingInstructions")}
-                </Text>
-                <Text
-                  style={[
-                    styles.styleSheetDescription,
-                    { color: colors.textSecondary },
-                  ]}
-                >
-                  {t("conversationThinkingInstructionsDescription")}
-                </Text>
-                <TextInput
-                  testID="conversation-llm-instructions"
-                  value={llmInstructions}
-                  onChangeText={onLlmInstructionsChange}
-                  multiline
-                  placeholder={t(
-                    "conversationThinkingInstructionsPlaceholder",
-                  )}
-                  placeholderTextColor={colors.textMuted}
-                  selectionColor={colors.accent}
-                  textAlignVertical="top"
-                  style={[
-                    styles.styleSheetInstructionInput,
-                    {
-                      backgroundColor: colors.surfaceElevated,
-                      borderColor: colors.border,
-                      color: colors.text,
-                    },
-                  ]}
-                />
-              </View>
-
-              <View
-                style={[
-                  styles.styleSheetGroup,
-                  isLandscape ? styles.styleSheetGroupLandscape : null,
-                ]}
-              >
-                <Text
-                  style={[
-                    styles.styleSheetGroupLabel,
-                    { color: colors.textMuted },
-                  ]}
-                >
-                  {t("ttsInstructions")}
-                </Text>
-                <Text
-                  style={[
-                    styles.styleSheetDescription,
-                    {
-                      color: ttsInstructionsSupported
-                        ? colors.textSecondary
-                        : colors.textMuted,
-                    },
-                  ]}
-                >
-                  {t(
-                    ttsInstructionsSupported
-                      ? "conversationTtsInstructionsDescription"
-                      : "ttsInstructionsUnsupported",
-                  )}
-                </Text>
-                <TextInput
-                  testID="conversation-tts-instructions"
-                  value={ttsInstructions}
-                  onChangeText={onTtsInstructionsChange}
-                  editable={ttsInstructionsSupported}
-                  multiline
-                  placeholder={t("ttsInstructionsPlaceholder")}
-                  placeholderTextColor={colors.textMuted}
-                  selectionColor={colors.accent}
-                  textAlignVertical="top"
-                  style={[
-                    styles.styleSheetInstructionInput,
-                    {
-                      backgroundColor: colors.surfaceElevated,
-                      borderColor: colors.border,
-                      color: colors.text,
-                      opacity: ttsInstructionsSupported ? 1 : 0.55,
-                    },
-                  ]}
-                />
-              </View>
-            </View>
-
-            {ttsRouteLabel && ttsVoiceOptions.length > 0 ? (
-              <View style={styles.styleSheetGroup}>
-                <Text
-                  style={[
-                    styles.styleSheetGroupLabel,
-                    { color: colors.textMuted },
-                  ]}
-                >
-                  {t("ttsVoice")}
-                </Text>
-                <Text
-                  style={[
-                    styles.styleSheetDescription,
-                    { color: colors.textSecondary },
-                  ]}
-                >
-                  {t("conversationVoiceDescription", {
-                    route: ttsRouteLabel,
-                  })}
-                </Text>
-                <Picker
-                  label={t("ttsVoice")}
-                  value={ttsVoice}
-                  options={ttsVoiceOptions}
-                  onChange={onTtsVoiceChange}
-                  dropdownLabel={ttsRouteLabel}
-                  hideLabel
-                  containerStyle={styles.styleSheetVoicePicker}
-                />
-              </View>
-            ) : null}
-
-            <View
-              style={
-                isLandscape
                   ? styles.styleSheetOptionsRowLandscape
                   : styles.styleSheetOptionsColumn
               }
             >
               <View
+                testID="conversation-settings-length"
                 style={[
                   styles.styleSheetGroup,
                   isLandscape ? styles.styleSheetGroupLandscape : null,
@@ -364,6 +226,7 @@ export function StyleSheetModal({
               </View>
 
               <View
+                testID="conversation-settings-tone"
                 style={[
                   styles.styleSheetGroup,
                   isLandscape ? styles.styleSheetGroupLandscape : null,
@@ -425,24 +288,18 @@ export function StyleSheetModal({
               </View>
             </View>
 
-            <View
-              style={[
-                styles.styleSheetAutoRenameCard,
-                isLandscape ? styles.styleSheetAutoRenameCardLandscape : null,
-                {
-                  backgroundColor: colors.surfaceElevated,
-                  borderColor: colors.border,
-                },
-              ]}
-            >
-              <View style={styles.styleSheetAutoRenameCopy}>
+            {ttsRouteLabel && ttsVoiceOptions.length > 0 ? (
+              <View
+                testID="conversation-settings-voice"
+                style={styles.styleSheetGroup}
+              >
                 <Text
                   style={[
                     styles.styleSheetGroupLabel,
                     { color: colors.textMuted },
                   ]}
                 >
-                  {t("conversationTitle")}
+                  {t("ttsVoice")}
                 </Text>
                 <Text
                   style={[
@@ -450,64 +307,167 @@ export function StyleSheetModal({
                     { color: colors.textSecondary },
                   ]}
                 >
-                  {t("conversationTitleGenerationDescription")}
+                  {t("conversationVoiceDescription", {
+                    route: ttsRouteLabel,
+                  })}
                 </Text>
+                <Picker
+                  label={t("ttsVoice")}
+                  value={ttsVoice}
+                  options={ttsVoiceOptions}
+                  onChange={onTtsVoiceChange}
+                  dropdownLabel={ttsRouteLabel}
+                  hideLabel
+                  containerStyle={styles.styleSheetVoicePicker}
+                />
               </View>
-              <TouchableOpacity
-                testID="auto-rename-conversation"
+            ) : null}
+
+            <View
+              style={
+                isLandscape
+                  ? styles.styleSheetInstructionRowLandscape
+                  : styles.styleSheetOptionsColumn
+              }
+            >
+              <View
+                testID="conversation-settings-tts-instructions"
                 style={[
-                  styles.styleSheetAutoRenameButton,
-                  {
-                    backgroundColor: canAutoRenameConversation
-                      ? colors.accentSoft
-                      : colors.surfaceAlt,
-                    borderColor: canAutoRenameConversation
-                      ? colors.borderStrong
-                      : colors.border,
-                  },
+                  styles.styleSheetGroup,
+                  isLandscape ? styles.styleSheetGroupLandscape : null,
                 ]}
-                disabled={!canAutoRenameConversation}
-                onPress={onAutoRenameConversation}
-                activeOpacity={0.82}
-                accessibilityRole="button"
-                accessibilityState={{ disabled: !canAutoRenameConversation }}
               >
-                {isAutoRenamingConversation ? (
-                  <ActivityIndicator size="small" color={colors.accent} />
-                ) : (
-                  <Feather
-                    name="edit-3"
-                    size={14}
-                    color={
-                      canAutoRenameConversation
-                        ? colors.accent
-                        : colors.textMuted
-                    }
-                  />
-                )}
                 <Text
                   style={[
-                    styles.styleSheetAutoRenameButtonText,
+                    styles.styleSheetGroupLabel,
+                    { color: colors.textMuted },
+                  ]}
+                >
+                  {t("ttsInstructions")}
+                </Text>
+                <Text
+                  style={[
+                    styles.styleSheetDescription,
                     {
-                      color: canAutoRenameConversation
-                        ? colors.accent
+                      color: ttsInstructionsSupported
+                        ? colors.textSecondary
                         : colors.textMuted,
                     },
                   ]}
                 >
-                  {isAutoRenamingConversation
-                    ? t("conversationTitleGenerating")
-                    : t("conversationTitleGenerate")}
+                  {t(
+                    ttsInstructionsSupported
+                      ? "conversationTtsInstructionsDescription"
+                      : "ttsInstructionsUnsupported",
+                  )}
                 </Text>
-              </TouchableOpacity>
+                <TextInput
+                  testID="conversation-tts-instructions"
+                  value={ttsInstructions}
+                  onChangeText={onTtsInstructionsChange}
+                  editable={ttsInstructionsSupported}
+                  multiline
+                  placeholder={t("ttsInstructionsPlaceholder")}
+                  placeholderTextColor={colors.textMuted}
+                  selectionColor={colors.accent}
+                  textAlignVertical="top"
+                  style={[
+                    styles.styleSheetInstructionInput,
+                    {
+                      backgroundColor: colors.surfaceElevated,
+                      borderColor: colors.border,
+                      color: colors.text,
+                      opacity: ttsInstructionsSupported ? 1 : 0.55,
+                    },
+                  ]}
+                />
+              </View>
+
+              <View
+                testID="conversation-settings-thinking-instructions"
+                style={[
+                  styles.styleSheetGroup,
+                  isLandscape ? styles.styleSheetGroupLandscape : null,
+                ]}
+              >
+                <Text
+                  style={[
+                    styles.styleSheetGroupLabel,
+                    { color: colors.textMuted },
+                  ]}
+                >
+                  {t("conversationThinkingInstructions")}
+                </Text>
+                <Text
+                  style={[
+                    styles.styleSheetDescription,
+                    { color: colors.textSecondary },
+                  ]}
+                >
+                  {t("conversationThinkingInstructionsDescription")}
+                </Text>
+                <TextInput
+                  testID="conversation-llm-instructions"
+                  value={llmInstructions}
+                  onChangeText={onLlmInstructionsChange}
+                  multiline
+                  placeholder={t("conversationThinkingInstructionsPlaceholder")}
+                  placeholderTextColor={colors.textMuted}
+                  selectionColor={colors.accent}
+                  textAlignVertical="top"
+                  style={[
+                    styles.styleSheetInstructionInput,
+                    {
+                      backgroundColor: colors.surfaceElevated,
+                      borderColor: colors.border,
+                      color: colors.text,
+                    },
+                  ]}
+                />
+              </View>
             </View>
+
+            <TouchableOpacity
+              testID="auto-rename-conversation"
+              style={[
+                styles.styleSheetAutoRenameButton,
+                {
+                  backgroundColor: canAutoRenameConversation
+                    ? colors.accentSoft
+                    : colors.surfaceAlt,
+                  borderColor: canAutoRenameConversation
+                    ? colors.borderStrong
+                    : colors.border,
+                },
+              ]}
+              disabled={!canAutoRenameConversation}
+              onPress={onAutoRenameConversation}
+              activeOpacity={0.82}
+              accessibilityRole="button"
+              accessibilityState={{ disabled: !canAutoRenameConversation }}
+            >
+              {isAutoRenamingConversation ? (
+                <ActivityIndicator size="small" color={colors.accent} />
+              ) : null}
+              <Text
+                style={[
+                  styles.styleSheetAutoRenameButtonText,
+                  {
+                    color: canAutoRenameConversation
+                      ? colors.accent
+                      : colors.textMuted,
+                  },
+                ]}
+              >
+                {isAutoRenamingConversation
+                  ? t("conversationTitleGenerating")
+                  : t("conversationTitleGenerate")}
+              </Text>
+            </TouchableOpacity>
           </ScrollView>
 
           <View
-            style={[
-              styles.styleSheetFooter,
-              { borderTopColor: colors.border },
-            ]}
+            style={[styles.styleSheetFooter, { borderTopColor: colors.border }]}
           >
             <TouchableOpacity
               style={[
