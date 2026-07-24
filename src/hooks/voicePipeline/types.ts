@@ -33,6 +33,12 @@ export type PipelinePhase =
 
 export type ReplayPhase = "idle" | "preparing" | "speaking";
 
+export interface VoiceCaptureRequest {
+  audioUri?: string;
+  existingUserMessageId?: string;
+  transcriptionOverride?: string;
+}
+
 export type AudioPlayer = ReturnType<typeof useAudioPlayer>;
 
 export interface UseVoicePipelineParams {
@@ -111,9 +117,5 @@ export interface UseVoicePipelineResult {
     messageId?: string,
   ) => Promise<void>;
   stopReplay: () => Promise<void>;
-  handleVoiceCaptureDone: (params: {
-    audioUri?: string;
-    existingUserMessageId?: string;
-    transcriptionOverride?: string;
-  }) => Promise<void>;
+  handleVoiceCaptureDone: (params: VoiceCaptureRequest) => Promise<void>;
 }

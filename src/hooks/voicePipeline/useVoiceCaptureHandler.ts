@@ -1,24 +1,23 @@
 import { useCallback, useRef, type Dispatch, type SetStateAction } from "react";
 
-import { recordDebugLogEvent } from "../../services/debugLogCapture";
 import { setBackgroundVoiceTurnActive } from "../../services/backgroundVoiceTurn";
-import type { LatencyRouteDescriptor } from "../../services/latencyStats";
+import { recordDebugLogEvent } from "../../services/debugLogCapture";
 import { runVoicePipeline } from "../../services/voicePipeline";
+import type { VoicePhaseProgress } from "../../types";
+import { createVoicePipelineEventAdapter } from "./createVoicePipelineEventAdapter";
+import {
+  createVoicePipelineErrorHandlers,
+  type VoiceTurnRunState,
+} from "./createVoicePipelineErrorHandlers";
 import type {
-  MessageMetadata,
-  MessagePipelineNotice,
-  UsageEstimate,
-  VoicePhaseProgress,
-} from "../../types";
-import type { PipelinePhase, UseVoicePipelineParams } from "./types";
+  PipelinePhase,
+  UseVoicePipelineParams,
+  VoiceCaptureRequest,
+} from "./types";
 import { useLatencyProgressController } from "./useLatencyProgressController";
 import { useRetryableVoiceCapture } from "./useRetryableVoiceCapture";
 import { useStreamingTextScheduler } from "./useStreamingTextScheduler";
-import {
-  formatNoticeToast,
-  getUnexpectedIssueDetail,
-  useVoiceTurnMessageState,
-} from "./useVoiceTurnMessageState";
+import { useVoiceTurnMessageState } from "./useVoiceTurnMessageState";
 
 type VoiceCaptureHandlerParams = Omit<UseVoicePipelineParams, "isRecording"> & {
   abortRef: React.MutableRefObject<AbortController | null>;
@@ -107,11 +106,7 @@ export function useVoiceCaptureHandler({
       audioUri,
       existingUserMessageId,
       transcriptionOverride,
-    }: {
-      audioUri?: string;
-      existingUserMessageId?: string;
-      transcriptionOverride?: string;
-    }) => {
+    }: VoiceCaptureRequest) => {
       const previousAbortController = abortRef.current;
       const runId = activeCaptureRunRef.current + 1;
       activeCaptureRunRef.current = runId;
@@ -155,101 +150,106 @@ export function useVoiceCaptureHandler({
           available: backgroundGraceAvailable,
         },
       });
-      const turnLatencyDescriptor: Omit<LatencyRouteDescriptor, "phase"> = {
-        provider,
+
+      const state: VoiceTurnRunState = {
+        llmStarted: false,
+        replyCompleted: false,
+        transcriptionReady: false,
+        turnFailed: false,
+      };
+      const retryCapture = (request: VoiceCaptureRequest) => {
+        void handleVoiceCaptureDone(request);
+      };
+      const errorHandlers = createVoicePipelineErrorHandlers({
+        activeConversation,
+        addMessage,
+        audioUri,
+        handleRepeatLastReply,
+        isActiveRun,
+        lastCompletedReplyRef,
+        latency: {
+          clearLatencyProgress,
+        },
+        messageState: {
+          lastAssistantMessageIdRef,
+          lastUserMessageIdRef,
+          markReplyFailure,
+          persistPendingNoticesForUser,
+          recordAssistantNotice,
+        },
+        player,
+        playbackStartedRef,
+        producedAudioRef,
+        retryCapture,
+        retryableCapture: {
+          discardRetainedCapture,
+          retainCaptureForRetry,
+        },
+        setPipelinePhase,
+        showToast,
+        state,
+        streaming: {
+          cancelStreamingRender,
+        },
+        streamingRenderRunId,
+        t,
+        transcriptionOverride,
+      });
+      const eventAdapter = createVoicePipelineEventAdapter({
+        activeConversation,
+        addMessage,
+        createConversation,
+        existingUserMessageId,
+        initialConversationSettings,
+        isActiveRun,
+        lastCompletedReplyRef,
+        latency: {
+          clearLatencyProgress,
+          finishLatencyProgress,
+          finishSpeechStartProgress,
+          startLatencyProgress,
+        },
+        messageState: {
+          consumeAssistantMetadata,
+          lastAssistantMessageIdRef,
+          lastUserMessageIdRef,
+          queueAssistantNotice,
+          recordTtsFallbackNotice,
+        },
         model,
-        effort: modelEffort,
+        modelEffort,
+        onError: errorHandlers.handlePipelineError,
+        player,
+        playbackStartedRef,
+        producedAudioRef,
+        provider,
+        replyPlayback,
         responseLength,
         responseTone,
-        inputSource: transcriptionOverride ? "text" : "voice",
+        selectedSttModel,
+        selectedTtsModel,
+        setPipelinePhase,
+        setStreamingText,
+        showToast,
+        spokenRepliesEnabled,
+        state,
         sttMode,
         sttProvider,
-        sttModel: selectedSttModel,
-        spokenRepliesEnabled,
+        streaming: {
+          beginStreamingRender,
+          cancelStreamingRender,
+          queueStreamingRender,
+        },
+        streamingRenderRunId,
+        t,
+        transcriptionOverride,
         ttsMode,
         ttsProvider,
-        ttsModel: selectedTtsModel,
-        replyPlayback,
+        updateConversationContextSummary,
         webSearchMode,
         webSearchProvider,
-      };
-      if (spokenRepliesEnabled) {
-        startLatencyProgress("turn", {
-          ...turnLatencyDescriptor,
-          phase: "turn-to-first-speech",
-        });
-      }
-      startLatencyProgress("turn", {
-        ...turnLatencyDescriptor,
-        phase: "turn-to-completion",
       });
-      const startBriefThinkingLatency = () =>
-        startLatencyProgress("thinking-briefly", {
-          phase: "request-preparation",
-          provider,
-          model,
-          inputSource: transcriptionOverride ? "text" : "voice",
-          webSearchMode,
-          webSearchProvider,
-        });
-      const startThinkingLatency = () =>
-        startLatencyProgress("thinking", {
-          phase: "llm-response",
-          provider,
-          model,
-          effort: modelEffort,
-          responseLength,
-          responseTone,
-          webSearchMode,
-          webSearchProvider,
-        });
-      const startSynthesisLatency = () =>
-        startLatencyProgress("synthesizing", {
-          phase: "tts-synthesis",
-          provider: ttsProvider,
-          ttsMode,
-          ttsModel: selectedTtsModel,
-          responseLength,
-          replyPlayback,
-        });
-      const handleFirstPlaybackStartedForRun = () => {
-        if (!isActiveRun() || playbackStartedRef.current) {
-          return;
-        }
-
-        playbackStartedRef.current = true;
-        recordDebugLogEvent({
-          event: "voice-pipeline-first-playback-started",
-        });
-        finishLatencyProgress("synthesizing");
-        finishSpeechStartProgress();
-        setPipelinePhase("speaking");
-      };
-      let llmStarted = false;
-      let replyCompleted = false;
-      let transcriptionReady = false;
-      let turnFailed = false;
-      const handleLlmStarted = () => {
-        if (!isActiveRun() || llmStarted) {
-          return;
-        }
-
-        llmStarted = true;
-        finishLatencyProgress("thinking-briefly");
-        startThinkingLatency();
-        setPipelinePhase(playbackStartedRef.current ? "speaking" : "thinking");
-      };
-
-      if (transcriptionOverride) {
-        startBriefThinkingLatency();
-      } else {
-        startLatencyProgress("transcribing", {
-          phase: "stt-transcription",
-          provider: sttProvider,
-          sttMode,
-          sttModel: selectedSttModel,
-        });
-      }
+      eventAdapter.startLatencyTracking();
 
       try {
         const transcription = await runVoicePipeline({
@@ -284,354 +284,11 @@ export function useVoiceCaptureHandler({
           webSearchApiKey,
           webSearchOptions,
           abortSignal: abortController.signal,
-          callbacks: {
-            onTranscription: (text) => {
-              if (!isActiveRun()) {
-                return;
-              }
-
-              transcriptionReady = true;
-              recordDebugLogEvent({
-                event: "voice-pipeline-transcription-ready",
-                payload: {
-                  textLength: text.trim().length,
-                },
-              });
-              if (!transcriptionOverride) {
-                finishLatencyProgress("transcribing");
-                startBriefThinkingLatency();
-              }
-              setPipelinePhase("thinking-briefly");
-              if (existingUserMessageId) {
-                return;
-              }
-              if (!activeConversation) {
-                if (initialConversationSettings) {
-                  createConversation(
-                    text,
-                    model,
-                    provider,
-                    initialConversationSettings,
-                  );
-                } else {
-                  createConversation(text, model, provider);
-                }
-              }
-              const userMessage = addMessage({
-                role: "user",
-                content: text,
-                model: null,
-                provider: null,
-              });
-              lastUserMessageIdRef.current = userMessage?.id ?? null;
-            },
-            onContextSummary: (summary, summarizedCount, usage) => {
-              if (!isActiveRun()) {
-                return;
-              }
-
-              recordDebugLogEvent({
-                event: "voice-pipeline-context-summary-updated",
-                payload: {
-                  summarizedCount,
-                  summaryLength: summary.trim().length,
-                  totalTokens: usage?.totalTokens ?? null,
-                },
-              });
-              updateConversationContextSummary(
-                summary,
-                summarizedCount,
-                usage,
-                model,
-                provider,
-              );
-            },
-            onWebSearchStart: () => {
-              if (!isActiveRun()) {
-                return;
-              }
-
-              recordDebugLogEvent({
-                event: "voice-pipeline-web-search-start",
-              });
-              finishLatencyProgress("thinking-briefly");
-              startLatencyProgress("searching", {
-                phase: "web-search",
-                provider: webSearchProvider ?? null,
-                webSearchMode,
-              });
-              setPipelinePhase("searching");
-            },
-            onWebSearchComplete: () => {
-              if (!isActiveRun()) {
-                return;
-              }
-
-              recordDebugLogEvent({
-                event: "voice-pipeline-web-search-complete",
-              });
-              finishLatencyProgress("searching");
-            },
-            onWebSearchFallback: (error) => {
-              if (!isActiveRun()) {
-                return;
-              }
-
-              const notice: MessagePipelineNotice = {
-                stage: "web-search",
-                level: "warning",
-                message: t("webSearchFallback"),
-                detail: getUnexpectedIssueDetail(error, t("webSearchFallback")),
-              };
-              recordDebugLogEvent({
-                event: "voice-pipeline-web-search-fallback",
-                level: "warn",
-                payload: {
-                  message: error.message,
-                },
-              });
-              queueAssistantNotice(notice);
-              showToast(formatNoticeToast(notice), undefined, "danger");
-            },
-            onLlmStart: handleLlmStarted,
-            onChunk: (text) => {
-              if (!isActiveRun()) {
-                return;
-              }
-
-              handleLlmStarted();
-              recordDebugLogEvent({
-                event: "voice-pipeline-stream-chunk",
-                payload: {
-                  chunkLength: text.length,
-                },
-              });
-              setPipelinePhase(
-                playbackStartedRef.current ? "speaking" : "thinking",
-              );
-              queueStreamingRender(text, streamingRenderRunId);
-            },
-            onResponseDone: (
-              fullText,
-              usage?: UsageEstimate,
-              metadata?: MessageMetadata,
-            ) => {
-              if (!isActiveRun()) {
-                return;
-              }
-
-              replyCompleted = true;
-              handleLlmStarted();
-              recordDebugLogEvent({
-                event: "voice-pipeline-response-done",
-                payload: {
-                  textLength: fullText.trim().length,
-                  totalTokens: usage?.totalTokens ?? null,
-                },
-              });
-              finishLatencyProgress("thinking");
-              if (!spokenRepliesEnabled) {
-                finishLatencyProgress("turn");
-              } else if (!playbackStartedRef.current) {
-                startSynthesisLatency();
-              }
-              cancelStreamingRender(streamingRenderRunId);
-              setStreamingText("");
-              setPipelinePhase(
-                playbackStartedRef.current
-                  ? "speaking"
-                  : spokenRepliesEnabled
-                    ? "synthesizing"
-                    : "thinking",
-              );
-              lastCompletedReplyRef.current = fullText;
-              const assistantMessage = addMessage({
-                role: "assistant",
-                content: fullText,
-                model,
-                provider,
-                usage,
-                metadata: consumeAssistantMetadata(metadata),
-              });
-              lastAssistantMessageIdRef.current = assistantMessage?.id ?? null;
-            },
-            onAudioReady: (audioData, diagnostics) => {
-              if (!isActiveRun()) {
-                return;
-              }
-
-              recordDebugLogEvent({
-                event: "voice-pipeline-audio-ready",
-                payload: {
-                  requestId: diagnostics?.requestId ?? null,
-                  uri: audioData,
-                },
-              });
-              producedAudioRef.current = true;
-              if (!playbackStartedRef.current) {
-                setPipelinePhase("synthesizing");
-              }
-              player.enqueueAudio(
-                audioData,
-                diagnostics,
-                handleFirstPlaybackStartedForRun,
-              );
-            },
-            onSpeechTextReady: (text, _voice, diagnostics) => {
-              if (!isActiveRun()) {
-                return;
-              }
-
-              recordDebugLogEvent({
-                event: "voice-pipeline-speech-text-ready",
-                payload: {
-                  requestId: diagnostics?.requestId ?? null,
-                  textLength: text.trim().length,
-                },
-              });
-              producedAudioRef.current = true;
-              if (!playbackStartedRef.current) {
-                setPipelinePhase("synthesizing");
-              }
-              player.speakText(text, {
-                diagnostics,
-                onPlaybackStarted: handleFirstPlaybackStartedForRun,
-              });
-            },
-            onTtsFallback: (error) => {
-              if (!isActiveRun()) {
-                return;
-              }
-
-              const noticeMessage = t("providerVoiceFallback");
-              const notice: MessagePipelineNotice = {
-                stage: "tts",
-                level: "warning",
-                message: noticeMessage,
-                detail: getUnexpectedIssueDetail(error, noticeMessage),
-              };
-              recordDebugLogEvent({
-                event: "voice-pipeline-tts-fallback",
-                level: "warn",
-                payload: {
-                  message: error.message,
-                  ttsMode,
-                },
-              });
-              if (!recordTtsFallbackNotice(notice)) {
-                return;
-              }
-
-              showToast(formatNoticeToast(notice), undefined, "danger");
-            },
-            onError: async (error) => {
-              if (!isActiveRun()) {
-                return;
-              }
-
-              turnFailed = true;
-              const preserveProducedAudio =
-                producedAudioRef.current &&
-                (player.isPlaying || player.hasPendingPlaybackNow());
-              recordDebugLogEvent({
-                event: "voice-pipeline-error",
-                level: "error",
-                payload: {
-                  hasAudioUri: !!audioUri,
-                  hasTranscriptionOverride: !!transcriptionOverride,
-                  message: error.message,
-                  preservedProducedAudio: preserveProducedAudio,
-                },
-              });
-              if (!preserveProducedAudio) {
-                await player.stopPlayback();
-                if (!isActiveRun()) {
-                  return;
-                }
-                clearLatencyProgress();
-              }
-              cancelStreamingRender(streamingRenderRunId);
-              setPipelinePhase(
-                preserveProducedAudio
-                  ? playbackStartedRef.current
-                    ? "speaking"
-                    : "synthesizing"
-                  : "idle",
-              );
-              const retryAction =
-                lastAssistantMessageIdRef.current &&
-                lastCompletedReplyRef.current.trim()
-                  ? () => {
-                      void handleRepeatLastReply(lastCompletedReplyRef.current);
-                    }
-                  : () => {
-                      void handleVoiceCaptureDone({
-                        audioUri,
-                        existingUserMessageId:
-                          lastUserMessageIdRef.current ?? undefined,
-                        transcriptionOverride,
-                      });
-                    };
-
-              const spokenReplyFailureNotice = lastAssistantMessageIdRef.current
-                ? {
-                    stage: "tts" as const,
-                    level: "error" as const,
-                    message: t("spokenReplyFailed"),
-                    detail: getUnexpectedIssueDetail(
-                      error,
-                      t("spokenReplyFailed"),
-                    ),
-                  }
-                : null;
-
-              if (
-                spokenReplyFailureNotice &&
-                lastAssistantMessageIdRef.current
-              ) {
-                recordAssistantNotice(spokenReplyFailureNotice);
-                return;
-              }
-
-              if (
-                !lastAssistantMessageIdRef.current &&
-                lastUserMessageIdRef.current
-              ) {
-                markReplyFailure(lastUserMessageIdRef.current, error);
-                return;
-              }
-
-              showToast(
-                spokenReplyFailureNotice
-                  ? formatNoticeToast(spokenReplyFailureNotice)
-                  : error.message,
-                retryAction,
-                "danger",
-              );
-            },
-          },
+          callbacks: eventAdapter.callbacks,
         });
 
         if (!transcription && isActiveRun()) {
-          retainCaptureForRetry(audioUri);
-          recordDebugLogEvent({
-            event: "voice-pipeline-no-transcription",
-            level: "warn",
-          });
-          showToast(
-            t("couldntCatchThatTryAgain"),
-            audioUri
-              ? () => {
-                  void handleVoiceCaptureDone({ audioUri });
-                }
-              : undefined,
-            "danger",
-            audioUri
-              ? () => {
-                  discardRetainedCapture(audioUri);
-                }
-              : undefined,
-          );
+          errorHandlers.handleNoTranscription();
         }
       } catch (error) {
         if (abortController.signal.aborted || !isCurrentRun()) {
@@ -648,79 +305,7 @@ export function useVoiceCaptureHandler({
           return;
         }
 
-        turnFailed = true;
-        recordDebugLogEvent({
-          event: "voice-pipeline-catch-error",
-          level: "error",
-          payload: {
-            message:
-              error instanceof Error
-                ? error.message
-                : t("couldntProcessVoiceInput"),
-          },
-        });
-        const errorMessage =
-          error instanceof Error
-            ? error.message
-            : t("couldntProcessVoiceInput");
-        const normalizedError =
-          error instanceof Error ? error : new Error(errorMessage);
-        const retryableAudioUri =
-          !transcriptionReady && audioUri ? audioUri : undefined;
-        const retryAction = retryableAudioUri
-          ? () => {
-              void handleVoiceCaptureDone({ audioUri: retryableAudioUri });
-            }
-          : undefined;
-
-        retainCaptureForRetry(retryableAudioUri);
-
-        let persistedError = false;
-
-        if (
-          !lastAssistantMessageIdRef.current &&
-          lastUserMessageIdRef.current
-        ) {
-          markReplyFailure(lastUserMessageIdRef.current, normalizedError);
-          persistedError = true;
-          persistPendingNoticesForUser();
-        }
-
-        if (
-          !transcriptionOverride &&
-          !lastUserMessageIdRef.current &&
-          activeConversation
-        ) {
-          addMessage({
-            role: "assistant",
-            content: "",
-            model: null,
-            provider: null,
-            metadata: {
-              notices: [
-                {
-                  stage: "stt",
-                  level: "error",
-                  message: errorMessage,
-                },
-              ],
-            },
-          });
-          persistedError = true;
-        }
-
-        if (!persistedError || retryAction) {
-          showToast(
-            errorMessage,
-            retryAction,
-            "danger",
-            retryableAudioUri
-              ? () => {
-                  discardRetainedCapture(retryableAudioUri);
-                }
-              : undefined,
-          );
-        }
+        errorHandlers.handleCaughtException(error);
       } finally {
         if (!isCurrentRun()) {
           recordDebugLogEvent({
@@ -753,8 +338,8 @@ export function useVoiceCaptureHandler({
         }
         const completedSuccessfully =
           !abortController.signal.aborted &&
-          replyCompleted &&
-          !turnFailed &&
+          state.replyCompleted &&
+          !state.turnFailed &&
           (!spokenRepliesEnabled || playbackStartedRef.current);
         if (completedSuccessfully) {
           finishLatencyProgress("turn");
@@ -764,9 +349,9 @@ export function useVoiceCaptureHandler({
             payload: {
               aborted: abortController.signal.aborted,
               playbackStarted: playbackStartedRef.current,
-              replyCompleted,
+              replyCompleted: state.replyCompleted,
               spokenRepliesEnabled,
-              turnFailed,
+              turnFailed: state.turnFailed,
             },
           });
         }
@@ -810,12 +395,12 @@ export function useVoiceCaptureHandler({
       provider,
       providerApiKey,
       prepareCaptureForTurn,
-      queueStreamingRender,
       queueAssistantNotice,
+      queueStreamingRender,
       recordAssistantNotice,
       recordTtsFallbackNotice,
-      resetTurnMessageState,
       replyPlayback,
+      resetTurnMessageState,
       responseLength,
       responseTone,
       retainCaptureForRetry,
@@ -825,8 +410,8 @@ export function useVoiceCaptureHandler({
       setPipelinePhase,
       setStreamingText,
       showToast,
-      startLatencyProgress,
       spokenRepliesEnabled,
+      startLatencyProgress,
       sttApiKey,
       sttMode,
       sttProvider,
