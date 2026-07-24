@@ -839,8 +839,16 @@ export const RUNTIME_PROVIDER_MANIFEST: Record<
       defaultModel: "gemini-2.5-flash",
       models: [
         withEffort(
+          model("gemini-3.6-flash"),
+          geminiThinkingEffort("medium", ["minimal", "low", "medium", "high"]),
+        ),
+        withEffort(
           model("gemini-3.5-flash"),
           geminiThinkingEffort("medium", ["minimal", "low", "medium", "high"]),
+        ),
+        withEffort(
+          model("gemini-3.5-flash-lite"),
+          geminiThinkingEffort("minimal", ["minimal", "low", "medium", "high"]),
         ),
         withEffort(
           namedModel("gemini-3.1-pro-preview", "Gemini 3.1 Pro Preview"),

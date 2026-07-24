@@ -122,13 +122,18 @@ describe("response mode selectors", () => {
 
     expect(modes[0].route).toEqual({
       provider: "gemini",
-      model: "gemini-3.5-flash",
+      model: "gemini-3.6-flash",
       effort: "medium",
     });
     expect(modes[1].route).toEqual({
       provider: "gemini",
-      model: "gemini-3.1-pro-preview",
-      effort: "high",
+      model: "gemini-3.5-flash",
+      effort: "medium",
+    });
+    expect(modes[2].route).toEqual({
+      provider: "gemini",
+      model: "gemini-3.5-flash-lite",
+      effort: "minimal",
     });
   });
 });

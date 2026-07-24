@@ -55,9 +55,18 @@ describe("provider metadata constants", () => {
 
   it("surfaces stable Gemini 3 picker models from the runtime manifest", () => {
     expect(
+      PROVIDER_MODELS.gemini.find((model) => model.id === "gemini-3.6-flash")
+        ?.name,
+    ).toBe("Gemini 3.6 Flash");
+    expect(
       PROVIDER_MODELS.gemini.find((model) => model.id === "gemini-3.5-flash")
         ?.name,
     ).toBe("Gemini 3.5 Flash");
+    expect(
+      PROVIDER_MODELS.gemini.find(
+        (model) => model.id === "gemini-3.5-flash-lite",
+      )?.name,
+    ).toBe("Gemini 3.5 Flash-Lite");
     expect(
       PROVIDER_MODELS.gemini.find((model) => model.id === "gemini-3.1-flash-lite")
         ?.name,

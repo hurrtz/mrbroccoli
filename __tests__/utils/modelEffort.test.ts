@@ -14,7 +14,11 @@ describe("model effort metadata", () => {
     expect(getDefaultModelEffort("anthropic", "claude-sonnet-5")).toBe("high");
     expect(getDefaultModelEffort("xai", "grok-4.3")).toBe("low");
     expect(getDefaultModelEffort("xai", "grok-4.5")).toBe("high");
+    expect(getDefaultModelEffort("gemini", "gemini-3.6-flash")).toBe("medium");
     expect(getDefaultModelEffort("gemini", "gemini-3.5-flash")).toBe("medium");
+    expect(getDefaultModelEffort("gemini", "gemini-3.5-flash-lite")).toBe(
+      "minimal",
+    );
     expect(getDefaultModelEffort("gemini", "gemini-3.1-pro-preview")).toBe(
       "high",
     );
@@ -51,7 +55,19 @@ describe("model effort metadata", () => {
 
   it("exposes the documented Gemini thinking levels per model", () => {
     expect(
+      getModelEffortOptions("gemini", "gemini-3.6-flash").map(
+        (option) => option.id,
+      ),
+    ).toEqual(["minimal", "low", "medium", "high"]);
+
+    expect(
       getModelEffortOptions("gemini", "gemini-3.5-flash").map(
+        (option) => option.id,
+      ),
+    ).toEqual(["minimal", "low", "medium", "high"]);
+
+    expect(
+      getModelEffortOptions("gemini", "gemini-3.5-flash-lite").map(
         (option) => option.id,
       ),
     ).toEqual(["minimal", "low", "medium", "high"]);
@@ -193,6 +209,9 @@ describe("model effort metadata", () => {
   });
 
   it("maps stored effort ids to provider transport values", () => {
+    expect(
+      getModelEffortTransportValue("gemini", "gemini-3.6-flash", "high"),
+    ).toBe("HIGH");
     expect(
       getModelEffortTransportValue("gemini", "gemini-3.5-flash", "high"),
     ).toBe("HIGH");

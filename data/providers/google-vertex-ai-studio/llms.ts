@@ -6,6 +6,61 @@ export const llms = providerContext.defineLlms([
       "providerId": "google-vertex-ai-studio",
       "providerName": "Google Vertex AI Studio",
       "service": "llm",
+      "modelId": "gemini-3.6-flash",
+      "publicName": "Gemini 3.6 Flash",
+      "aliases": [],
+      "status": "Documented active/current",
+      "catalogScope": "Dynamic/non-exhaustive",
+      "pricingSummary": "See Gemini API pricing for current token rates; Gemini 3.6 Flash is a stable, production-ready model optimized for agentic and multimodal tasks.",
+      "limitsSummary": "1,048,576 max input tokens; 65,536 max output tokens.",
+      "regionSummary": "Available through Gemini API model endpoints; use configured regional routing where required.",
+      "languagesSummary": "Multimodal general-purpose LLM; no fixed language list published on the model page.",
+      "notes": "Current stable Gemini Flash picker entry. Supports the existing generateContent path for text output and defaults to medium thinking.",
+      "officialSources": [
+        "https://ai.google.dev/gemini-api/docs/models/gemini-3.6-flash",
+        "https://ai.google.dev/gemini-api/docs/latest-model",
+        "https://ai.google.dev/gemini-api/docs/models"
+      ],
+      "openAiCompatible": true,
+      "supportsRealtime": false,
+      "supportsBatch": true,
+      "priceMeasurements": [],
+      "constraints": [
+        {
+          "metric": "context_tokens",
+          "comparator": "=",
+          "value": 1048576,
+          "unit": "tokens",
+          "scope": "model",
+          "sourceText": "Input token limit 1,048,576"
+        },
+        {
+          "metric": "other",
+          "comparator": "=",
+          "value": 65536,
+          "unit": "tokens",
+          "scope": "model",
+          "sourceText": "Output token limit 65,536"
+        }
+      ],
+      "languageSupport": {
+        "rawText": "General multimodal Gemini model; no fixed language count published on the model page.",
+        "isMultilingual": true,
+        "languageCount": 0,
+        "voiceCount": 0,
+        "listedLanguages": [],
+        "notes": [
+          "model-dependent",
+          "multimodal-input"
+        ]
+      }
+    }
+  ),
+  providerContext.llm(
+    {
+      "providerId": "google-vertex-ai-studio",
+      "providerName": "Google Vertex AI Studio",
+      "service": "llm",
       "modelId": "gemini-3.5-flash",
       "publicName": "Gemini 3.5 Flash",
       "aliases": [
@@ -22,6 +77,61 @@ export const llms = providerContext.defineLlms([
         "https://ai.google.dev/gemini-api/docs/models/gemini-3.5-flash",
         "https://ai.google.dev/gemini-api/docs/models",
         "https://ai.google.dev/gemini-api/docs/interactions-overview"
+      ],
+      "openAiCompatible": true,
+      "supportsRealtime": false,
+      "supportsBatch": true,
+      "priceMeasurements": [],
+      "constraints": [
+        {
+          "metric": "context_tokens",
+          "comparator": "=",
+          "value": 1048576,
+          "unit": "tokens",
+          "scope": "model",
+          "sourceText": "Input token limit 1,048,576"
+        },
+        {
+          "metric": "other",
+          "comparator": "=",
+          "value": 65536,
+          "unit": "tokens",
+          "scope": "model",
+          "sourceText": "Output token limit 65,536"
+        }
+      ],
+      "languageSupport": {
+        "rawText": "General multimodal Gemini model; no fixed language count published on the model page.",
+        "isMultilingual": true,
+        "languageCount": 0,
+        "voiceCount": 0,
+        "listedLanguages": [],
+        "notes": [
+          "model-dependent",
+          "multimodal-input"
+        ]
+      }
+    }
+  ),
+  providerContext.llm(
+    {
+      "providerId": "google-vertex-ai-studio",
+      "providerName": "Google Vertex AI Studio",
+      "service": "llm",
+      "modelId": "gemini-3.5-flash-lite",
+      "publicName": "Gemini 3.5 Flash-Lite",
+      "aliases": [],
+      "status": "Documented active/current",
+      "catalogScope": "Dynamic/non-exhaustive",
+      "pricingSummary": "See Gemini API pricing for current token rates; Gemini 3.5 Flash-Lite is a stable, production-ready model for high-throughput and low-latency work.",
+      "limitsSummary": "1,048,576 max input tokens; 65,536 max output tokens.",
+      "regionSummary": "Available through Gemini API model endpoints; use configured regional routing where required.",
+      "languagesSummary": "Multimodal general-purpose LLM; no fixed language list published on the model page.",
+      "notes": "Current stable Gemini Flash-Lite picker entry. Supports the existing generateContent path for text output and defaults to minimal thinking.",
+      "officialSources": [
+        "https://ai.google.dev/gemini-api/docs/models/gemini-3.5-flash-lite",
+        "https://ai.google.dev/gemini-api/docs/latest-model",
+        "https://ai.google.dev/gemini-api/docs/models"
       ],
       "openAiCompatible": true,
       "supportsRealtime": false,
