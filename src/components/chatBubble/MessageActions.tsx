@@ -1,5 +1,13 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Animated, TouchableOpacity, View } from "react-native";
+import { TouchableOpacity, View } from "react-native";
+import Animated, {
+  cancelAnimation,
+  Easing,
+  useAnimatedStyle,
+  useSharedValue,
+  withRepeat,
+  withTiming,
+} from "react-native-reanimated";
 
 import Feather from "@expo/vector-icons/Feather";
 
@@ -19,31 +27,31 @@ function RepeatActionIcon({
   state: RepeatState;
   color: string;
 }) {
-  const rotation = useRef(new Animated.Value(0)).current;
+  const rotation = useSharedValue(0);
   const reducedMotion = useReducedMotion();
 
   useEffect(() => {
+    cancelAnimation(rotation);
+
     if (state !== "preparing" || reducedMotion) {
-      rotation.stopAnimation();
-      rotation.setValue(0);
-      return;
+      rotation.value = 0;
+    } else {
+      rotation.value = withRepeat(
+        withTiming(360, {
+          duration: 1100,
+          easing: Easing.linear,
+        }),
+        -1,
+        false,
+      );
     }
 
-    const animation = Animated.loop(
-      Animated.timing(rotation, {
-        toValue: 1,
-        duration: 1100,
-        useNativeDriver: true,
-      }),
-    );
-    animation.start();
-
-    return () => {
-      animation.stop();
-      rotation.stopAnimation();
-      rotation.setValue(0);
-    };
+    return () => cancelAnimation(rotation);
   }, [reducedMotion, rotation, state]);
+
+  const rotationStyle = useAnimatedStyle(() => ({
+    transform: [{ rotate: `${rotation.value}deg` }],
+  }));
 
   if (state === "speaking") {
     return <Feather name="square" size={14} color={color} />;
@@ -51,18 +59,7 @@ function RepeatActionIcon({
 
   if (state === "preparing") {
     return (
-      <Animated.View
-        style={{
-          transform: [
-            {
-              rotate: rotation.interpolate({
-                inputRange: [0, 1],
-                outputRange: ["0deg", "360deg"],
-              }),
-            },
-          ],
-        }}
-      >
+      <Animated.View style={rotationStyle}>
         <Feather name="loader" size={14} color={color} />
       </Animated.View>
     );

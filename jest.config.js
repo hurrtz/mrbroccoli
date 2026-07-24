@@ -9,6 +9,8 @@ module.exports = {
   moduleNameMapper: {
     "\\.svg$": "<rootDir>/__mocks__/svgMock.js",
     "^@expo/vector-icons/Feather$": "<rootDir>/__mocks__/FeatherIcon.js",
+    "^react-native-reanimated$":
+      "<rootDir>/__mocks__/reactNativeReanimated.js",
   },
   moduleFileExtensions: ["ts", "tsx", "js", "jsx", "json", "svg"],
   testMatch: ["**/__tests__/**/*.test.(ts|tsx|js)"],
