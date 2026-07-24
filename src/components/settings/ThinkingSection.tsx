@@ -12,7 +12,7 @@ import type {
 } from "../../types";
 import { useTheme } from "../../theme/ThemeContext";
 
-import { ResponseModesSection } from "./ProvidersSections";
+import { ResponseModesSection } from "./ResponseModesSection";
 import { styles } from "./styles";
 
 export function ThinkingSection({

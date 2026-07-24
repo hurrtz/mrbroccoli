@@ -68,10 +68,6 @@ export const de: TranslationDictionary = {
     "Speichere Zugangsdaten für externe Dienste auf dem Gerät und konfiguriere die Antwortmodi, die du verwenden möchtest.",
   webSearchTabDescription:
     "Konfiguriere optionalen frischen Web-Kontext vor Antworten.",
-  catalogOnlyProvidersHint: ({ count }) =>
-    `Hier werden ${count} zusätzliche Anbieter nur aus dem Katalog für die UI-Prüfung angezeigt. Konfigurierbar und wirklich aufrufbar sind aktuell nur die verdrahteten Anbieter.`,
-  openProviderCatalogDetails: ({ provider }) =>
-    `Katalogdetails für ${provider} öffnen`,
   responseModes: "Antwortmodi",
   responseModeItemTitle: ({ index }) => `Antwortmodus ${index}`,
   addResponseMode: "Antwortmodus hinzufügen",
@@ -110,9 +106,6 @@ export const de: TranslationDictionary = {
   eli5: "Einfach erklärt",
   eli5Description:
     "Erkläre alles so einfach wie möglich. Nutze Analogien, Alltagssprache und verzichte auf Fachjargon. Setze bei keinem Thema Vorwissen voraus.",
-  openProviderSettings: ({ provider }) => `${provider}-Einstellungen öffnen`,
-  createProviderApiKey: ({ provider }) =>
-    `Zugangsdaten für ${provider} bearbeiten`,
   useProvider: ({ provider }) => `${provider} verwenden`,
   createApiKey: "Zugangsdaten",
   aboutThisProvider: "Über diesen Anbieter",
@@ -124,30 +117,11 @@ export const de: TranslationDictionary = {
   providerValidationUnavailable:
     "Für diesen Anbieter ist noch kein Live-Test verdrahtet. Speichere den Key hier und prüfe ihn bei der echten Nutzung.",
   providerNeedsAttention: "braucht Aufmerksamkeit",
-  catalogProviderReadOnlyHint:
-    "Dieser Anbieter ist zur Ansicht im zentralen Katalog vorhanden, aber noch nicht in die App-Laufzeit integriert.",
-  catalogProviderReferenceHint: "Katalogreferenz für diesen Anbieter:",
-  catalogProviderModelCounts: ({ llm, stt, tts }) =>
-    `Katalogmodelle: ${llm} LLM, ${stt} STT, ${tts} TTS.`,
-  catalogProviderSupportSummary: ({ llm, stt, tts }) =>
-    `Verifizierte Unterstützung: LLM ${llm}, STT ${stt}, TTS ${tts}.`,
-  catalogProviderLiveDiscoveryHint:
-    "Dieser Anbieter hat einen dynamischen Katalog. Für eine echte Integration wird voraussichtlich eine Live-Modellerkennung nötig sein.",
   catalogProviderLimitsSummary: ({ summary }) => `Limits: ${summary}`,
   catalogProviderRegionSummary: ({ summary }) => `Regionen: ${summary}`,
-  catalogProviderSttLanguagesSummary: ({ summary }) =>
-    `STT-Sprachen: ${summary}`,
-  catalogProviderTtsLanguagesSummary: ({ summary }) =>
-    `TTS-Sprachen: ${summary}`,
-  catalogProviderIntegrationNotesSummary: ({ summary }) =>
-    `Integrationshinweise: ${summary}`,
-  catalogProviderNoModels: "Keine dokumentierten Modelle.",
-  validateKey: "Schlüssel prüfen",
   validatingKey: "Prüfe …",
   showKey: "API-Key anzeigen",
   hideKey: "API-Key ausblenden",
-  apiKeyProtectedHint:
-    "Gespeicherte API-Keys bleiben standardmäßig verborgen. Zeige sie nur an, wenn du einen Wert prüfen oder ändern musst.",
   assistantInstructions: "Assistent-Anweisungen",
   systemPrompt: "Systemprompt",
   assistantInstructionsIntro:
@@ -690,11 +664,6 @@ export const de: TranslationDictionary = {
     `${provider} hat eine Antwort zurückgegeben, ohne die Websuche auszuführen.`,
   providerValidationSuccess: ({ provider }) => `${provider} ist einsatzbereit.`,
   providerValidationFailed: "Anbieter-Prüfung fehlgeschlagen.",
-  providerHealthSummaryReady: ({ count }) => `Bereit ${count}`,
-  providerHealthSummaryConfigured: ({ count }) => `Konfiguriert ${count}`,
-  providerHealthSummaryChecking: ({ count }) => `Prüft ${count}`,
-  providerHealthSummaryFailing: ({ count }) => `Fehler ${count}`,
-  providerHealthSummaryMissing: ({ count }) => `Fehlt ${count}`,
   webSearchFallback:
     "Die Websuche war nicht verfügbar. Die Antwort lief ohne frischen Web-Kontext weiter.",
   noBase64EncoderAvailable: "Kein Base64-Encoder verfügbar.",

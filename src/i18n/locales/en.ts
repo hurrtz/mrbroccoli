@@ -66,10 +66,6 @@ export const en: TranslationDictionary = {
     "Store external-service credentials on-device and configure the response modes you want to use.",
   webSearchTabDescription:
     "Configure optional live web context before replies.",
-  catalogOnlyProvidersHint: ({ count }) =>
-    `Showing ${count} extra catalog-only providers here for UI inspection. Only the wired providers can be configured and called right now.`,
-  openProviderCatalogDetails: ({ provider }) =>
-    `Open ${provider} catalog details`,
   responseModes: "Response Modes",
   responseModeItemTitle: ({ index }) => `Response mode ${index}`,
   addResponseMode: "Add response mode",
@@ -108,8 +104,6 @@ export const en: TranslationDictionary = {
   eli5: "ELI5",
   eli5Description:
     "Explain everything as simply as possible. Use analogies, everyday language, zero jargon. Assume no prior knowledge on any topic.",
-  openProviderSettings: ({ provider }) => `Open ${provider} settings`,
-  createProviderApiKey: ({ provider }) => `Edit ${provider} credentials`,
   useProvider: ({ provider }) => `Use ${provider}`,
   createApiKey: "Credentials",
   aboutThisProvider: "About this provider",
@@ -121,30 +115,11 @@ export const en: TranslationDictionary = {
   providerValidationUnavailable:
     "Live validation is not wired for this provider yet. Save the key here and verify it during actual use.",
   providerNeedsAttention: "needs attention",
-  catalogProviderReadOnlyHint:
-    "This provider is present in the central catalog for inspection, but it is not wired into the app runtime yet.",
-  catalogProviderReferenceHint: "Catalog reference for this provider:",
-  catalogProviderModelCounts: ({ llm, stt, tts }) =>
-    `Catalog models: ${llm} LLM, ${stt} STT, ${tts} TTS.`,
-  catalogProviderSupportSummary: ({ llm, stt, tts }) =>
-    `Verified support: LLM ${llm}, STT ${stt}, TTS ${tts}.`,
-  catalogProviderLiveDiscoveryHint:
-    "This provider has a dynamic catalog, so a real integration will likely need live model discovery.",
   catalogProviderLimitsSummary: ({ summary }) => `Limits: ${summary}`,
   catalogProviderRegionSummary: ({ summary }) => `Region: ${summary}`,
-  catalogProviderSttLanguagesSummary: ({ summary }) =>
-    `STT languages: ${summary}`,
-  catalogProviderTtsLanguagesSummary: ({ summary }) =>
-    `TTS languages: ${summary}`,
-  catalogProviderIntegrationNotesSummary: ({ summary }) =>
-    `Integration notes: ${summary}`,
-  catalogProviderNoModels: "No documented models.",
-  validateKey: "Validate key",
   validatingKey: "Validating...",
   showKey: "Show key",
   hideKey: "Hide key",
-  apiKeyProtectedHint:
-    "Stored keys stay hidden by default. Reveal them only when you need to verify or edit a value.",
   assistantInstructions: "Assistant Instructions",
   systemPrompt: "System Prompt",
   assistantInstructionsIntro:
@@ -672,11 +647,6 @@ export const en: TranslationDictionary = {
     `${provider} returned a response without running web search.`,
   providerValidationSuccess: ({ provider }) => `${provider} is ready to use.`,
   providerValidationFailed: "Provider validation failed.",
-  providerHealthSummaryReady: ({ count }) => `Ready ${count}`,
-  providerHealthSummaryConfigured: ({ count }) => `Configured ${count}`,
-  providerHealthSummaryChecking: ({ count }) => `Checking ${count}`,
-  providerHealthSummaryFailing: ({ count }) => `Failing ${count}`,
-  providerHealthSummaryMissing: ({ count }) => `Missing ${count}`,
   webSearchFallback:
     "Web search was unavailable, so the reply continued without live web context.",
   noBase64EncoderAvailable: "No base64 encoder available.",

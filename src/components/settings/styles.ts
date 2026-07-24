@@ -176,12 +176,6 @@ export const styles = StyleSheet.create({
   responseModePickerLast: {
     marginBottom: 0,
   },
-  providerButtonGrid: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 8,
-    marginBottom: 12,
-  },
   filterChipRow: {
     flexDirection: "row",
     flexWrap: "wrap",
@@ -399,46 +393,6 @@ export const styles = StyleSheet.create({
   setupChecklistState: {
     ...textStyles.controlLabel,
   },
-  providerButton: {
-    width: 48,
-    height: 48,
-    borderRadius: 16,
-    borderWidth: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.1,
-    shadowRadius: 18,
-    elevation: 4,
-  },
-  providerButtonBadge: {
-    position: "absolute",
-    top: -4,
-    right: -4,
-    width: 18,
-    height: 18,
-    borderRadius: 9,
-    borderWidth: 1,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  providerHealthSummary: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 8,
-    marginBottom: 12,
-  },
-  providerHealthPill: {
-    borderRadius: 999,
-    borderWidth: 1,
-    paddingHorizontal: 10,
-    paddingVertical: 7,
-  },
-  providerHealthPillText: {
-    ...textStyles.controlLabel,
-    fontSize: 10,
-    lineHeight: 14,
-  },
   readinessCard: {
     borderRadius: 18,
     borderWidth: 1,
@@ -527,52 +481,6 @@ export const styles = StyleSheet.create({
   drillInSummary: {
     ...textStyles.supporting,
   },
-  apiKeyCard: {
-    borderRadius: 18,
-    borderWidth: 1,
-    padding: 14,
-  },
-  apiKeyHeader: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    gap: 12,
-  },
-  apiKeyTitle: {
-    ...textStyles.subsectionTitle,
-  },
-  apiKeyPortalLink: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 6,
-  },
-  apiKeyPortalLinkText: {
-    ...textStyles.compactAction,
-  },
-  apiKeyHint: {
-    ...textStyles.supporting,
-    marginTop: 6,
-    marginBottom: 10,
-  },
-  catalogModelGroups: {
-    marginTop: 12,
-    gap: 12,
-  },
-  catalogModelGroup: {
-    gap: 6,
-  },
-  catalogModelGroupTitle: {
-    ...textStyles.controlLabel,
-  },
-  catalogModelItem: {
-    gap: 2,
-  },
-  catalogModelName: {
-    ...textStyles.compactAction,
-  },
-  catalogModelMeta: {
-    ...textStyles.metadata,
-  },
   apiKeyInputRow: {
     position: "relative",
     justifyContent: "center",
@@ -596,22 +504,6 @@ export const styles = StyleSheet.create({
     borderRadius: 10,
     alignItems: "center",
     justifyContent: "center",
-  },
-  apiKeyMetaRow: {
-    marginTop: 10,
-    minHeight: 18,
-    justifyContent: "center",
-  },
-  apiKeyValidateLink: {
-    flexDirection: "row",
-    alignItems: "center",
-    alignSelf: "flex-start",
-  },
-  apiKeyValidateLinkDisabled: {
-    opacity: 0.6,
-  },
-  apiKeyValidateText: {
-    ...textStyles.compactAction,
   },
   validationCard: {
     marginTop: 10,
