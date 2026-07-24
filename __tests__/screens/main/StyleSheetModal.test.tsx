@@ -1,4 +1,5 @@
 import React from "react";
+import { Modal, StyleSheet } from "react-native";
 import { fireEvent } from "@testing-library/react-native";
 
 import { StyleSheetModal } from "../../../src/screens/main/StyleSheetModal";
@@ -53,6 +54,23 @@ describe("StyleSheetModal", () => {
     expect(getByText(/Keep the answer tight/)).toBeTruthy();
     // casual description
     expect(getByText(/Speak like a smart friend/)).toBeTruthy();
+  });
+
+  it("renders as a full-width bottom drawer", () => {
+    const { getByTestId, UNSAFE_getByType } = setup();
+    const drawer = getByTestId("conversation-settings-drawer");
+    const drawerStyle = StyleSheet.flatten(drawer.props.style);
+
+    expect(UNSAFE_getByType(Modal).props.animationType).toBe("slide");
+    expect(drawerStyle.width).toBe("100%");
+    expect(drawerStyle.borderTopLeftRadius).toBe(24);
+    expect(drawerStyle.borderTopRightRadius).toBe(24);
+    expect(drawer.props.edges).toEqual({
+      top: "off",
+      bottom: "additive",
+      left: "additive",
+      right: "additive",
+    });
   });
 
   it("offers a one-off title generation action", () => {
@@ -154,9 +172,17 @@ describe("StyleSheetModal", () => {
     expect(onClose).toHaveBeenCalledTimes(1);
   });
 
+  it("calls onClose from the fixed drawer header", () => {
+    const { getByTestId, onClose } = setup();
+    fireEvent.press(getByTestId("conversation-settings-close"));
+    expect(onClose).toHaveBeenCalledTimes(1);
+  });
+
   it("calls onClose when the backdrop is tapped", () => {
     const { getByTestId, onClose } = setup();
-    fireEvent.press(getByTestId("styleSheetBackdrop"));
+    fireEvent.press(
+      getByTestId("styleSheetBackdrop", { includeHiddenElements: true }),
+    );
     expect(onClose).toHaveBeenCalledTimes(1);
   });
 });

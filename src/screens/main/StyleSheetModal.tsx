@@ -73,7 +73,10 @@ export function StyleSheetModal({
   const { t } = useLocalization();
   const { height, width } = useWindowDimensions();
   const isLandscape = width > height;
-  const cardMaxWidth = isLandscape ? Math.min(width - 40, 760) : 520;
+  const drawerMaxHeight = Math.max(
+    280,
+    height - (isLandscape ? 12 : 44),
+  );
 
   const lengthOptions = React.useMemo(() => getResponseLengthOptions(t), [t]);
   const toneOptions = React.useMemo(() => getResponseToneOptions(t), [t]);
@@ -84,22 +87,25 @@ export function StyleSheetModal({
     <Modal
       visible={visible}
       transparent
-      animationType="fade"
+      animationType="slide"
       onRequestClose={onClose}
       supportedOrientations={APP_MODAL_ORIENTATIONS}
+      statusBarTranslucent
     >
-      <SafeAreaView style={styles.styleSheetOverlay}>
+      <View style={styles.styleSheetOverlay}>
         <TouchableOpacity
           testID="styleSheetBackdrop"
           style={StyleSheet.absoluteFill}
           onPress={onClose}
           activeOpacity={1}
         />
-        <View
+        <SafeAreaView
+          testID="conversation-settings-drawer"
+          edges={["bottom", "left", "right"]}
+          accessibilityViewIsModal
           style={[
             styles.styleSheetCard,
-            { maxWidth: cardMaxWidth },
-            { maxHeight: Math.max(280, height - 32) },
+            { maxHeight: drawerMaxHeight },
             {
               backgroundColor: colors.surface,
               borderColor: colors.border,
@@ -107,18 +113,13 @@ export function StyleSheetModal({
             },
           ]}
         >
-          <ScrollView
-            style={styles.styleSheetScroll}
-            automaticallyAdjustKeyboardInsets
-            contentContainerStyle={[
-              styles.styleSheetScrollContent,
-              isLandscape ? styles.styleSheetScrollContentLandscape : null,
+          <View
+            style={[
+              styles.styleSheetHeader,
+              { borderBottomColor: colors.border },
             ]}
-            keyboardDismissMode={isLandscape ? "on-drag" : "interactive"}
-            showsVerticalScrollIndicator={false}
-            keyboardShouldPersistTaps="handled"
           >
-            <View style={styles.styleSheetHeader}>
+            <View style={styles.styleSheetHeaderCopy}>
               <Text style={[styles.styleSheetTitle, { color: colors.text }]}>
                 {t("styleSheetTitle")}
               </Text>
@@ -131,7 +132,31 @@ export function StyleSheetModal({
                 {t("styleSheetSubtitle")}
               </Text>
             </View>
+            <TouchableOpacity
+              testID="conversation-settings-close"
+              style={[
+                styles.styleSheetCloseButton,
+                { backgroundColor: colors.surfaceElevated },
+              ]}
+              onPress={onClose}
+              accessibilityRole="button"
+              accessibilityLabel={t("dismiss")}
+            >
+              <Feather name="x" size={20} color={colors.textSecondary} />
+            </TouchableOpacity>
+          </View>
 
+          <ScrollView
+            style={styles.styleSheetScroll}
+            automaticallyAdjustKeyboardInsets
+            contentContainerStyle={[
+              styles.styleSheetScrollContent,
+              isLandscape ? styles.styleSheetScrollContentLandscape : null,
+            ]}
+            keyboardDismissMode={isLandscape ? "on-drag" : "interactive"}
+            showsVerticalScrollIndicator={false}
+            keyboardShouldPersistTaps="handled"
+          >
             <View
               style={
                 isLandscape
@@ -478,25 +503,32 @@ export function StyleSheetModal({
             </View>
           </ScrollView>
 
-          <TouchableOpacity
+          <View
             style={[
-              styles.styleSheetDoneButton,
-              { backgroundColor: colors.bubbleUser },
+              styles.styleSheetFooter,
+              { borderTopColor: colors.border },
             ]}
-            onPress={onClose}
-            accessibilityRole="button"
           >
-            <Text
+            <TouchableOpacity
               style={[
-                styles.styleSheetDoneButtonText,
-                { color: colors.onPrimary },
+                styles.styleSheetDoneButton,
+                { backgroundColor: colors.bubbleUser },
               ]}
+              onPress={onClose}
+              accessibilityRole="button"
             >
-              {t("setupGuideFinish")}
-            </Text>
-          </TouchableOpacity>
-        </View>
-      </SafeAreaView>
+              <Text
+                style={[
+                  styles.styleSheetDoneButtonText,
+                  { color: colors.onPrimary },
+                ]}
+              >
+                {t("setupGuideFinish")}
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </SafeAreaView>
+      </View>
     </Modal>
   );
 }
