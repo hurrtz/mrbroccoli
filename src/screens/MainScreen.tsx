@@ -2,7 +2,6 @@ import React, { useState, useCallback, useEffect } from "react";
 import {
   KeyboardAvoidingView,
   Platform,
-  View,
   useWindowDimensions,
 } from "react-native";
 import { StatusBar } from "expo-status-bar";
@@ -42,13 +41,9 @@ import {
   getAvailableResponseModes,
   getResponseModeRoute,
 } from "../utils/responseModes";
-import { MainScreenTopBar } from "./main/MainScreenTopBar";
-import { MainScreenRouteCard } from "./main/MainScreenRouteCard";
-import { MainScreenRouteControls } from "./main/MainScreenRouteControls";
+import { MainScreenWorkspace } from "./main/MainScreenWorkspace";
 import { StyleSheetModal } from "./main/StyleSheetModal";
-import { MainScreenVoiceStage } from "./main/MainScreenVoiceStage";
 import { StatusDetailsModal } from "./main/StatusDetailsModal";
-import { TranscriptPreviewCard } from "./main/TranscriptPreviewCard";
 import { getMainScreenViewModel } from "./main/mainScreenViewModel";
 import { styles } from "./main/styles";
 import { useConversationActions } from "./main/useConversationActions";
@@ -699,226 +694,87 @@ export function MainScreen() {
           isLandscape ? styles.defaultLayoutLandscape : null,
         ]}
       >
-        {isLandscape ? (
-          <View style={styles.landscapeShell}>
-            <View
-              testID="landscape-left-pane"
-              style={styles.landscapeLeftColumn}
-            >
-              <MainScreenTopBar
-                colors={colors}
-                drawerLabel={t("conversations")}
-                onOpenDrawer={() => setDrawerVisible(true)}
-                onOpenSettings={() => openSettings()}
-                settingsLabel={t("settings")}
-              />
-
-              <MainScreenRouteCard
-                activeResponseMode={activeResponseMode}
-                availableResponseModes={loaded ? availableResponseModes : []}
-                colors={colors}
-                compact
-                onOpenSetupGuide={() => openSettings(undefined, "providers")}
-                onSelectResponseMode={handleResponseModeChange}
-                responseModes={settings.responseModes}
-                style={styles.heroCardLandscape}
-                t={t}
-              />
-
-              <MainScreenRouteControls
-                colors={colors}
-                layout="landscape"
-                onToggleWebSearchEnabled={() => {
-                  updateSettings({
-                    webSearchMode: webSearchActive ? "off" : "on",
-                  });
-                }}
-                t={t}
-                webSearchEnabled={webSearchActive}
-                webSearchReady={webSearchReady}
-              />
-
-              <View style={styles.landscapeStageArea}>
-                <MainScreenVoiceStage
-                  colors={colors}
-                  disabled={voiceInputDisabled}
-                  initialInputSurface={inputSurfaceRef.current}
-                  initialTextMessage={textMessageDraftRef.current}
-                  inputMode={settings.inputMode}
-                  isActive={isActive && mainSurfaceVisible}
-                  layout="landscape"
-                  onInputSurfaceChange={handleInputSurfaceChange}
-                  onOpenStatusDetails={openStatusDetails}
-                  onPress={handleTogglePress}
-                  onPressIn={handlePressIn}
-                  onPressOut={handlePressOut}
-                  onStopPlayback={handleStopInteraction}
-                  onSubmitTextMessage={handleSubmitTextMessage}
-                  onTextMessageChange={handleTextMessageChange}
-                  phaseLabel={statusDisplay.statusTitle}
-                  phaseProgress={phaseProgress}
-                  playbackActive={player.isPlaying}
-                  playbackPaused={player.isPlaybackPaused}
-                  recordingMaxMs={maxRecordingMs}
-                  statusTitle={statusDisplay.actionLabel}
-                  stopPlaybackLabel={t("stop")}
-                  t={t}
-                  visualPhase={visualPhase}
-                />
-              </View>
-            </View>
-
-            <View
-              testID="landscape-pane-divider"
-              style={[
-                styles.landscapePaneDivider,
-                { backgroundColor: colors.border },
-              ]}
-            />
-
-            <View
-              testID="landscape-right-pane"
-              style={styles.landscapeRightColumn}
-            >
-              <TranscriptPreviewCard
-                activeConversationId={activeConversation?.id ?? null}
-                activeConversationTitle={activeConversationTitle}
-                colors={colors}
-                layout="landscape"
-                messages={messages}
-                activeReplayMessageId={activeReplayMessageId}
-                onCopyMessage={(message) =>
-                  handleCopyMessage(message.content)
-                }
-                onRepeatMessage={(message) => {
-                  void handleRepeatMessage(message);
-                }}
-                onRetryMessage={handleRetryMessage}
-                onOpenStyleSheet={() => setStyleSheetVisible(true)}
-                onOpenSpeakingSettings={() => openSettings(undefined, "tts")}
-                onShareMessage={(message) => {
-                  void handleShareMessage(message.content);
-                }}
-                replayPhase={replayPhase}
-                scrollEnabled
-                showUsageStats={settings.showUsageStats}
-                showStyleControl={showStyleChip}
-                showWhenEmpty
-                style={styles.landscapeTranscriptCard}
-                t={t}
-              />
-            </View>
-          </View>
-        ) : (
-          <>
-            <MainScreenTopBar
-              colors={colors}
-              debugLogActive={debugLogCaptureState.active}
-              debugLogLabel={t("debugLogLabel")}
-              drawerLabel={t("conversations")}
-              onOpenDrawer={() => setDrawerVisible(true)}
-              onOpenSettings={() => openSettings()}
-              onToggleDebugLog={
-                settings.showDebugLogButton || debugLogCaptureState.active
-                  ? handleToggleDebugLog
-                  : undefined
-              }
-              settingsLabel={t("settings")}
-            />
-
-            <View style={styles.workspaceBody}>
-              <MainScreenRouteCard
-                activeResponseMode={activeResponseMode}
-                availableResponseModes={loaded ? availableResponseModes : []}
-                colors={colors}
-                onOpenSetupGuide={() => openSettings(undefined, "providers")}
-                onSelectResponseMode={handleResponseModeChange}
-                responseModes={settings.responseModes}
-                t={t}
-              />
-
-              <MainScreenRouteControls
-                colors={colors}
-                onToggleWebSearchEnabled={() => {
-                  updateSettings({
-                    webSearchMode: webSearchActive ? "off" : "on",
-                  });
-                }}
-                t={t}
-                webSearchEnabled={webSearchActive}
-                webSearchReady={webSearchReady}
-              />
-
-              <View
-                testID="portrait-conversation-stack"
-                style={styles.portraitConversationStack}
-              >
-                <View testID="portrait-input-section">
-                  <MainScreenVoiceStage
-                    colors={colors}
-                    disabled={voiceInputDisabled}
-                    initialInputSurface={inputSurfaceRef.current}
-                    initialTextMessage={textMessageDraftRef.current}
-                    inputMode={settings.inputMode}
-                    isActive={isActive && mainSurfaceVisible}
-                    onInputSurfaceChange={handleInputSurfaceChange}
-                    onOpenStatusDetails={openStatusDetails}
-                    onPress={handleTogglePress}
-                    onPressIn={handlePressIn}
-                    onPressOut={handlePressOut}
-                    onStopPlayback={handleStopInteraction}
-                    onSubmitTextMessage={handleSubmitTextMessage}
-                    onTextMessageChange={handleTextMessageChange}
-                    phaseLabel={statusDisplay.statusTitle}
-                    phaseProgress={phaseProgress}
-                    playbackActive={player.isPlaying}
-                    playbackPaused={player.isPlaybackPaused}
-                    recordingMaxMs={maxRecordingMs}
-                    statusTitle={statusDisplay.actionLabel}
-                    stopPlaybackLabel={t("stop")}
-                    t={t}
-                    visualPhase={visualPhase}
-                  />
-                </View>
-
-                <View
-                  testID="portrait-transcript-pane"
-                  style={styles.portraitTranscriptPane}
-                >
-                  <TranscriptPreviewCard
-                    activeConversationId={activeConversation?.id ?? null}
-                    activeConversationTitle={activeConversationTitle}
-                    colors={colors}
-                    messages={messages}
-                    activeReplayMessageId={activeReplayMessageId}
-                    onCopyMessage={(message) =>
-                      handleCopyMessage(message.content)
-                    }
-                    onRepeatMessage={(message) => {
-                      void handleRepeatMessage(message);
-                    }}
-                    onRetryMessage={handleRetryMessage}
-                    onOpenStyleSheet={() => setStyleSheetVisible(true)}
-                    onOpenSpeakingSettings={() =>
-                      openSettings(undefined, "tts")
-                    }
-                    onShareMessage={(message) => {
-                      void handleShareMessage(message.content);
-                    }}
-                    presentation="canvas"
-                    replayPhase={replayPhase}
-                    scrollEnabled
-                    showWhenEmpty
-                    showStyleControl={showStyleChip}
-                    showUsageStats={settings.showUsageStats}
-                    style={styles.workspaceTranscript}
-                    t={t}
-                  />
-                </View>
-              </View>
-            </View>
-          </>
-        )}
+        <MainScreenWorkspace
+          colors={colors}
+          isLandscape={isLandscape}
+          topBar={{
+            debugLogActive: debugLogCaptureState.active,
+            debugLogLabel: t("debugLogLabel"),
+            drawerLabel: t("conversations"),
+            onOpenDrawer: () => setDrawerVisible(true),
+            onOpenSettings: () => openSettings(),
+            onToggleDebugLog:
+              settings.showDebugLogButton || debugLogCaptureState.active
+                ? handleToggleDebugLog
+                : undefined,
+            settingsLabel: t("settings"),
+          }}
+          routeCard={{
+            activeResponseMode,
+            availableResponseModes: loaded ? availableResponseModes : [],
+            onOpenSetupGuide: () => openSettings(undefined, "providers"),
+            onSelectResponseMode: handleResponseModeChange,
+            responseModes: settings.responseModes,
+            t,
+          }}
+          routeControls={{
+            onToggleWebSearchEnabled: () => {
+              updateSettings({
+                webSearchMode: webSearchActive ? "off" : "on",
+              });
+            },
+            t,
+            webSearchEnabled: webSearchActive,
+            webSearchReady,
+          }}
+          voiceStage={{
+            disabled: voiceInputDisabled,
+            initialInputSurface: inputSurfaceRef.current,
+            initialTextMessage: textMessageDraftRef.current,
+            inputMode: settings.inputMode,
+            isActive: isActive && mainSurfaceVisible,
+            onInputSurfaceChange: handleInputSurfaceChange,
+            onOpenStatusDetails: openStatusDetails,
+            onPress: handleTogglePress,
+            onPressIn: handlePressIn,
+            onPressOut: handlePressOut,
+            onStopPlayback: handleStopInteraction,
+            onSubmitTextMessage: handleSubmitTextMessage,
+            onTextMessageChange: handleTextMessageChange,
+            phaseLabel: statusDisplay.statusTitle,
+            phaseProgress,
+            playbackActive: player.isPlaying,
+            playbackPaused: player.isPlaybackPaused,
+            recordingMaxMs: maxRecordingMs,
+            statusTitle: statusDisplay.actionLabel,
+            stopPlaybackLabel: t("stop"),
+            t,
+            visualPhase,
+          }}
+          transcript={{
+            activeConversationId: activeConversation?.id ?? null,
+            activeConversationTitle,
+            activeReplayMessageId,
+            messages,
+            onCopyMessage: (message) =>
+              handleCopyMessage(message.content),
+            onOpenSpeakingSettings: () => openSettings(undefined, "tts"),
+            onOpenStyleSheet: () => setStyleSheetVisible(true),
+            onRepeatMessage: (message) => {
+              void handleRepeatMessage(message);
+            },
+            onRetryMessage: handleRetryMessage,
+            onShareMessage: (message) => {
+              void handleShareMessage(message.content);
+            },
+            replayPhase,
+            scrollEnabled: true,
+            showStyleControl: showStyleChip,
+            showUsageStats: settings.showUsageStats,
+            showWhenEmpty: true,
+            t,
+          }}
+        />
       </KeyboardAvoidingView>
 
       <StyleSheetModal
