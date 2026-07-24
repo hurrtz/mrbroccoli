@@ -247,9 +247,7 @@ export function PhaseAwareVoiceAction({
           <Feather
             name={getPhaseIcon(visualPhase, playbackPaused)}
             size={21}
-            color={
-              visualPhase === "recording" ? colors.phaseRecording : phaseColor
-            }
+            color={phaseColor}
           />
         </View>
       </TouchableOpacity>

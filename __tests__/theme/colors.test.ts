@@ -32,31 +32,31 @@ function contrastRatio(firstColor: string, secondColor: string) {
 describe("theme colors", () => {
   it("uses the dedicated light palette", () => {
     expect(lightColors).toMatchObject({
-      accent: "#1C64F2",
-      success: "#0E9F6E",
-      danger: "#E02424",
-      phaseRecordingTrack: "#1C64F2",
-      phaseTranscribing: "#4F46E5",
-      phaseThinkingBriefly: "#A855F7",
-      phaseSearching: "#D946EF",
-      phaseThinking: "#7E22CE",
-      phaseSynthesizing: "#06B6D4",
-      phaseSpeaking: "#0E9F6E",
+      accent: "#32894D",
+      success: "#059669",
+      danger: "#DC2626",
+      phaseRecordingTrack: "#32894D",
+      phaseTranscribing: "#0F766E",
+      phaseThinkingBriefly: "#2563EB",
+      phaseSearching: "#7C3AED",
+      phaseThinking: "#C026D3",
+      phaseSynthesizing: "#65A30D",
+      phaseSpeaking: "#059669",
     });
   });
 
   it("uses the dedicated dark palette", () => {
     expect(darkColors).toMatchObject({
-      accent: "#76A9FA",
-      success: "#31C48D",
-      danger: "#F98080",
-      phaseRecordingTrack: "#76A9FA",
-      phaseTranscribing: "#818CF8",
-      phaseThinkingBriefly: "#C084FC",
-      phaseSearching: "#E879F9",
-      phaseThinking: "#A855F7",
-      phaseSynthesizing: "#22D3EE",
-      phaseSpeaking: "#31C48D",
+      accent: "#5DC17D",
+      success: "#10B981",
+      danger: "#F87171",
+      phaseRecordingTrack: "#5DC17D",
+      phaseTranscribing: "#2DD4BF",
+      phaseThinkingBriefly: "#60A5FA",
+      phaseSearching: "#A78BFA",
+      phaseThinking: "#E879F9",
+      phaseSynthesizing: "#A3E635",
+      phaseSpeaking: "#10B981",
     });
   });
 
