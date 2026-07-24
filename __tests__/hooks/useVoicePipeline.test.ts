@@ -609,7 +609,7 @@ describe("useVoicePipeline", () => {
     });
   });
 
-  it("keeps one progress estimate through every phase until playback starts", async () => {
+  it("keeps the total progress estimate through playback completion", async () => {
     let onPlaybackStarted: (() => void) | undefined;
     let resolveRun: (() => void) | null = null;
     const player = createPlayer({
@@ -677,7 +677,10 @@ describe("useVoicePipeline", () => {
     });
 
     expect(result.current.pipelinePhase).toBe("speaking");
-    expect(result.current.phaseProgress).toBeNull();
+    expect(result.current.phaseProgress).toMatchObject({
+      phase: "turn",
+      startedAt: expect.any(Number),
+    });
 
     await waitFor(() => {
       expect(AsyncStorage.setItem).toHaveBeenCalledWith(
@@ -687,9 +690,83 @@ describe("useVoicePipeline", () => {
     });
 
     await act(async () => {
+      jest.advanceTimersByTime(3_000);
       resolveRun?.();
       await pending;
     });
+
+    expect(result.current.phaseProgress).toBeNull();
+    await waitFor(() => {
+      const completionPayload = (AsyncStorage.setItem as jest.Mock).mock.calls
+        .map(
+          ([, value]) =>
+            JSON.parse(value) as Record<string, { samples?: number[] }>,
+        )
+        .find((value) =>
+          Object.keys(value).some((key) =>
+            key.startsWith("turn-to-completion-v1"),
+          ),
+        );
+      const completionKey = Object.keys(completionPayload ?? {}).find((key) =>
+        key.startsWith("turn-to-completion-v1"),
+      );
+
+      expect(
+        completionKey
+          ? completionPayload?.[completionKey]?.samples?.[0]
+          : undefined,
+      ).toBeGreaterThanOrEqual(10_000);
+    });
+  });
+
+  it("does not learn a shortened completion time when playback is cancelled", async () => {
+    let resolveDrain: (() => void) | null = null;
+    const player = createPlayer({
+      hasPendingPlaybackNow: jest.fn(() => true),
+      waitForDrain: jest.fn(
+        () =>
+          new Promise<void>((resolve) => {
+            resolveDrain = resolve;
+          }),
+      ),
+    });
+    const params = createParams({ player });
+
+    (runVoicePipeline as jest.Mock).mockResolvedValue(
+      "Hello from the microphone",
+    );
+
+    const { result } = renderHook(() => useVoicePipeline(params));
+    let pending: Promise<void> | null = null;
+
+    await act(async () => {
+      pending = result.current.handleVoiceCaptureDone({
+        transcriptionOverride: "Hello from the microphone",
+      });
+      await Promise.resolve();
+    });
+
+    act(() => {
+      result.current.abortRef.current?.abort();
+      resolveDrain?.();
+    });
+
+    await act(async () => {
+      await pending;
+    });
+
+    const persistedPayloads = (AsyncStorage.setItem as jest.Mock).mock.calls.map(
+      ([, value]) => JSON.parse(value) as Record<string, unknown>,
+    );
+
+    expect(
+      persistedPayloads.some((payload) =>
+        Object.keys(payload).some((key) =>
+          key.startsWith("turn-to-completion-v1"),
+        ),
+      ),
+    ).toBe(false);
+    expect(result.current.phaseProgress).toBeNull();
   });
 
   it("shows the retry toast when no transcription is produced", async () => {

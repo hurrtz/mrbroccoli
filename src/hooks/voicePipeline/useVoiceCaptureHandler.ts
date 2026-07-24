@@ -7,6 +7,7 @@ import {
 
 import { recordDebugLogEvent } from "../../services/debugLogCapture";
 import { setBackgroundVoiceTurnActive } from "../../services/backgroundVoiceTurn";
+import type { LatencyRouteDescriptor } from "../../services/latencyStats";
 import { runVoicePipeline } from "../../services/voicePipeline";
 import type {
   MessageMetadata,
@@ -102,6 +103,7 @@ export function useVoiceCaptureHandler({
   const {
     clearLatencyProgress,
     finishLatencyProgress,
+    finishSpeechStartProgress,
     startLatencyProgress,
   } = useLatencyProgressController({ setPhaseProgress });
   const {
@@ -178,9 +180,13 @@ export function useVoiceCaptureHandler({
       event: "voice-pipeline-first-playback-started",
     });
     finishLatencyProgress("synthesizing");
-    finishLatencyProgress("turn");
+    finishSpeechStartProgress();
     setPipelinePhase("speaking");
-  }, [finishLatencyProgress, setPipelinePhase]);
+  }, [
+    finishLatencyProgress,
+    finishSpeechStartProgress,
+    setPipelinePhase,
+  ]);
 
   const handleVoiceCaptureDone = useCallback(
     async ({
@@ -222,8 +228,7 @@ export function useVoiceCaptureHandler({
           available: backgroundGraceAvailable,
         },
       });
-      startLatencyProgress("turn", {
-        phase: "turn-to-first-speech",
+      const turnLatencyDescriptor: Omit<LatencyRouteDescriptor, "phase"> = {
         provider,
         model,
         effort: modelEffort,
@@ -240,6 +245,16 @@ export function useVoiceCaptureHandler({
         replyPlayback,
         webSearchMode,
         webSearchProvider,
+      };
+      if (spokenRepliesEnabled) {
+        startLatencyProgress("turn", {
+          ...turnLatencyDescriptor,
+          phase: "turn-to-first-speech",
+        });
+      }
+      startLatencyProgress("turn", {
+        ...turnLatencyDescriptor,
+        phase: "turn-to-completion",
       });
       const startBriefThinkingLatency = () =>
         startLatencyProgress("thinking-briefly", {
@@ -745,6 +760,9 @@ export function useVoiceCaptureHandler({
 
         if (player.hasPendingPlaybackNow()) {
           await player.waitForDrain();
+        }
+        if (!abortRef.current?.signal.aborted) {
+          finishLatencyProgress("turn");
         }
         clearLatencyProgress();
         cancelStreamingRender(streamingRenderRunId);

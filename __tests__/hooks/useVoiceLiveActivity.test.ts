@@ -115,6 +115,34 @@ describe("useVoiceLiveActivity", () => {
     unmount();
   });
 
+  it("keeps the Live Activity ETA tied to playback start, not full turn completion", () => {
+    const { unmount } = renderHook(() =>
+      useVoiceLiveActivity({
+        isRecording: false,
+        phaseProgress: {
+          ...progress,
+          speechStart: {
+            progress: 0.5,
+            elapsedMs: 10_000,
+            startedAt: 100_000,
+            estimatedMs: 30_000,
+            sampleCount: 2,
+            learned: true,
+            overEstimate: false,
+          },
+        },
+        pipelinePhase: "thinking",
+        spokenRepliesEnabled: true,
+      }),
+    );
+
+    expect(setVoiceLiveActivityState).toHaveBeenCalledWith({
+      phase: "thinking",
+      expectedSpeechAtMs: 130_000,
+    });
+    unmount();
+  });
+
   it("does not show an ETA to speech when spoken replies are disabled", () => {
     const { unmount } = renderHook(() =>
       useVoiceLiveActivity({

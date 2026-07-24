@@ -113,6 +113,7 @@ export interface VoiceTimingProgress {
 export interface VoicePhaseProgress extends VoiceTimingProgress {
   phase: VoicePhaseProgressPhase;
   overall?: VoiceTimingProgress;
+  speechStart?: VoiceTimingProgress;
 }
 
 export interface Settings {

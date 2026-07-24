@@ -112,6 +112,32 @@ describe("latencyStats", () => {
     expect(getDefaultLatencyEstimateMs(descriptor)).toBe(53_000);
   });
 
+  it("keys and estimates the full turn through playback completion", () => {
+    const descriptor = {
+      phase: "turn-to-completion" as const,
+      provider: "anthropic" as const,
+      model: "claude-fable-5",
+      effort: "max",
+      responseLength: "thorough" as const,
+      responseTone: "professional" as const,
+      inputSource: "voice" as const,
+      sttMode: "provider" as const,
+      sttProvider: "gemini" as const,
+      sttModel: "gemini-3.5-flash",
+      spokenRepliesEnabled: true,
+      ttsMode: "provider" as const,
+      ttsProvider: "gemini" as const,
+      ttsModel: "gemini-2.5-flash-preview-tts",
+      replyPlayback: "wait" as const,
+      webSearchMode: "off" as const,
+    };
+
+    expect(createLatencyRouteKey(descriptor)).toBe(
+      "turn-to-completion-v1:anthropic:claude-fable-5:max:thorough:professional:voice:provider:gemini:gemini-3.5-flash:spoken:provider:gemini:gemini-2.5-flash-preview-tts:wait:off:none",
+    );
+    expect(getDefaultLatencyEstimateMs(descriptor)).toBe(95_000);
+  });
+
   it("learns transcription and speech synthesis as distinct phases", () => {
     expect(
       createLatencyRouteKey({
@@ -166,6 +192,22 @@ describe("latencyStats", () => {
         webSearchMode: "off",
       }),
     ).toBe(11_500);
+    expect(
+      getDefaultLatencyEstimateMs({
+        phase: "turn-to-completion",
+        provider: "xai",
+        model: "grok-4.5",
+        effort: "high",
+        responseLength: "normal",
+        responseTone: "professional",
+        inputSource: "text",
+        spokenRepliesEnabled: true,
+        ttsMode: "provider",
+        ttsProvider: "xai",
+        replyPlayback: "stream",
+        webSearchMode: "off",
+      }),
+    ).toBe(24_500);
   });
 
   it("derives learned estimates from recent upper-percentile samples", () => {

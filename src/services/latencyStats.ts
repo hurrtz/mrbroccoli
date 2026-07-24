@@ -24,7 +24,8 @@ export type LatencyStatsPhase =
   | "llm-response"
   | "web-search"
   | "tts-synthesis"
-  | "turn-to-first-speech";
+  | "turn-to-first-speech"
+  | "turn-to-completion";
 
 export interface LatencyRouteDescriptor {
   phase: LatencyStatsPhase;
@@ -99,9 +100,17 @@ export function createLatencyRouteKey(descriptor: LatencyRouteDescriptor) {
     ].join(":");
   }
 
-  if (descriptor.phase === "turn-to-first-speech") {
+  if (
+    descriptor.phase === "turn-to-first-speech" ||
+    descriptor.phase === "turn-to-completion"
+  ) {
+    const versionedPrefix =
+      descriptor.phase === "turn-to-completion"
+        ? "turn-to-completion-v1"
+        : "turn-to-first-speech-v1";
+
     return [
-      "turn-to-first-speech-v1",
+      versionedPrefix,
       normalizeKeyPart(descriptor.provider),
       normalizeKeyPart(descriptor.model),
       normalizeKeyPart(descriptor.effort),
@@ -150,12 +159,19 @@ export function createLatencyRouteKey(descriptor: LatencyRouteDescriptor) {
 export function createLatencyRouteKeys(descriptor: LatencyRouteDescriptor) {
   const exactKey = createLatencyRouteKey(descriptor);
 
-  if (descriptor.phase !== "turn-to-first-speech") {
+  if (
+    descriptor.phase !== "turn-to-first-speech" &&
+    descriptor.phase !== "turn-to-completion"
+  ) {
     return [exactKey];
   }
 
+  const familyPrefix =
+    descriptor.phase === "turn-to-completion"
+      ? "turn-to-completion-family-v1"
+      : "turn-to-first-speech-family-v1";
   const familyKey = [
-    "turn-to-first-speech-family-v1",
+    familyPrefix,
     normalizeKeyPart(descriptor.provider),
     normalizeKeyPart(descriptor.model),
     normalizeKeyPart(descriptor.effort),
@@ -247,7 +263,10 @@ export function getDefaultLatencyEstimateMs(
     estimateMs += descriptor.sttMode === "provider" ? 4_000 : 2_000;
   }
 
-  if (descriptor.spokenRepliesEnabled) {
+  if (
+    descriptor.spokenRepliesEnabled &&
+    descriptor.phase === "turn-to-first-speech"
+  ) {
     if (descriptor.ttsMode === "provider") {
       const streamingSpeechMs =
         descriptor.ttsProvider === "xai"
@@ -270,6 +289,37 @@ export function getDefaultLatencyEstimateMs(
     } else {
       estimateMs += descriptor.replyPlayback === "wait" ? 2_500 : 1_000;
     }
+  }
+
+  if (
+    descriptor.spokenRepliesEnabled &&
+    descriptor.phase === "turn-to-completion"
+  ) {
+    const playbackMs =
+      descriptor.responseLength === "thorough"
+        ? 45_000
+        : descriptor.responseLength === "brief"
+          ? 7_000
+          : 20_000;
+    const synthesisMs =
+      descriptor.ttsMode === "provider"
+        ? descriptor.replyPlayback === "wait"
+          ? 6_000
+          : descriptor.ttsProvider === "xai"
+            ? 2_500
+            : 3_500
+        : descriptor.replyPlayback === "wait"
+          ? 2_500
+          : 1_000;
+
+    // Streamed speech overlaps with response generation. Only the residual
+    // playback tail belongs on top of the full-response estimate; wait mode
+    // begins playback after generation and therefore adds the full duration.
+    estimateMs +=
+      synthesisMs +
+      (descriptor.replyPlayback === "wait"
+        ? playbackMs
+        : Math.round(playbackMs * 0.65));
   }
 
   return Math.max(5_000, estimateMs);

@@ -56,13 +56,16 @@ export function useLatencyProgressController({
   setPhaseProgress: Dispatch<SetStateAction<VoicePhaseProgress | null>>;
 }) {
   const activeTurnProgressRef = useRef<ActiveLatencyProgress | null>(null);
+  const activeSpeechStartProgressRef =
+    useRef<ActiveLatencyProgress | null>(null);
   const activePhaseProgressRef = useRef<ActiveLatencyProgress | null>(null);
   const latencyRunIdRef = useRef(0);
 
   const publishLatencyProgress = useCallback(() => {
     const activePhase = activePhaseProgressRef.current;
     const activeTurn = activeTurnProgressRef.current;
-    const active = activePhase ?? activeTurn;
+    const activeSpeechStart = activeSpeechStartProgressRef.current;
+    const active = activePhase ?? activeTurn ?? activeSpeechStart;
 
     if (!active) {
       setPhaseProgress(null);
@@ -74,11 +77,15 @@ export function useLatencyProgressController({
       ...snapshotProgress(active),
       overall:
         activePhase && activeTurn ? snapshotProgress(activeTurn) : undefined,
+      speechStart: activeSpeechStart
+        ? snapshotProgress(activeSpeechStart)
+        : undefined,
     });
   }, [setPhaseProgress]);
 
   const clearLatencyProgress = useCallback(() => {
     activeTurnProgressRef.current = null;
+    activeSpeechStartProgressRef.current = null;
     activePhaseProgressRef.current = null;
     setPhaseProgress(null);
   }, [setPhaseProgress]);
@@ -105,8 +112,13 @@ export function useLatencyProgressController({
         progress: 0,
         runId,
       };
+      const isSpeechStartProgress =
+        phase === "turn" && descriptor.phase === "turn-to-first-speech";
 
-      if (phase === "turn") {
+      if (isSpeechStartProgress) {
+        activeSpeechStartProgressRef.current = active;
+        activePhaseProgressRef.current = null;
+      } else if (phase === "turn") {
         activeTurnProgressRef.current = active;
         activePhaseProgressRef.current = null;
       } else {
@@ -117,9 +129,11 @@ export function useLatencyProgressController({
       void loadLatencyEstimate(descriptor)
         .then((estimate) => {
           const current =
-            phase === "turn"
-              ? activeTurnProgressRef.current
-              : activePhaseProgressRef.current;
+            isSpeechStartProgress
+              ? activeSpeechStartProgressRef.current
+              : phase === "turn"
+                ? activeTurnProgressRef.current
+                : activePhaseProgressRef.current;
 
           if (current?.runId !== runId) {
             return;
@@ -211,9 +225,22 @@ export function useLatencyProgressController({
     [publishLatencyProgress, recordLatencyProgressSample],
   );
 
+  const finishSpeechStartProgress = useCallback(() => {
+    const active = activeSpeechStartProgressRef.current;
+
+    if (!active) {
+      return;
+    }
+
+    recordLatencyProgressSample(active);
+    activeSpeechStartProgressRef.current = null;
+    publishLatencyProgress();
+  }, [publishLatencyProgress, recordLatencyProgressSample]);
+
   useEffect(
     () => () => {
       activeTurnProgressRef.current = null;
+      activeSpeechStartProgressRef.current = null;
       activePhaseProgressRef.current = null;
     },
     [],
@@ -222,6 +249,7 @@ export function useLatencyProgressController({
   return {
     clearLatencyProgress,
     finishLatencyProgress,
+    finishSpeechStartProgress,
     startLatencyProgress,
   };
 }
