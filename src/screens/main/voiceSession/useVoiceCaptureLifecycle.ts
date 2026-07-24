@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef } from "react";
 import { recordDebugLogEvent } from "../../../services/debugLogCapture";
+import { cleanupCapturedAudio } from "../../../services/voicePipeline/cleanup";
 
 import type { ShowToastFn, TranslateFn } from "../shared";
 import type {
@@ -45,8 +46,10 @@ export function useVoiceCaptureLifecycle({
   sttMode,
   t,
 }: UseVoiceCaptureLifecycleParams) {
-  const recordingStartedRef = useRef<Promise<void> | null>(null);
+  const recordingStartedRef = useRef<Promise<boolean> | null>(null);
   const captureActiveRef = useRef(false);
+  const captureGenerationRef = useRef(0);
+  const cancelInFlightRef = useRef<Promise<void> | null>(null);
   const stopInFlightRef = useRef<Promise<void> | null>(null);
   const maxDurationTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   // The auto-stop timer fires the latest stopVoiceCapture; keep a ref so the
@@ -61,6 +64,8 @@ export function useVoiceCaptureLifecycle({
   }, []);
 
   const startVoiceCapture = useCallback(async () => {
+    const captureGeneration = captureGenerationRef.current + 1;
+    captureGenerationRef.current = captureGeneration;
     recordDebugLogEvent({
       event: "voice-capture-start-requested",
       payload: {
@@ -68,23 +73,38 @@ export function useVoiceCaptureLifecycle({
       },
     });
 
-    await player.waitForPlaybackRouteSettle();
-    recordDebugLogEvent({
-      event: "voice-capture-route-settled",
-      payload: {
-        sttMode,
-      },
-    });
+    const startPromise = (async () => {
+      await player.waitForPlaybackRouteSettle();
+      if (captureGenerationRef.current !== captureGeneration) {
+        return false;
+      }
+      recordDebugLogEvent({
+        event: "voice-capture-route-settled",
+        payload: {
+          sttMode,
+        },
+      });
 
-    const startPromise =
-      sttMode === "native"
-        ? nativeStt.startRecognition()
-        : recorder.startRecording();
-
+      if (sttMode === "native") {
+        await nativeStt.startRecognition();
+      } else {
+        await recorder.startRecording();
+      }
+      return true;
+    })();
     recordingStartedRef.current = startPromise;
 
     try {
-      await startPromise;
+      const started = await startPromise;
+      if (!started || captureGenerationRef.current !== captureGeneration) {
+        recordDebugLogEvent({
+          event: "voice-capture-start-superseded",
+          payload: {
+            sttMode,
+          },
+        });
+        return;
+      }
       captureActiveRef.current = true;
       recordDebugLogEvent({
         event: "voice-capture-started",
@@ -125,6 +145,9 @@ export function useVoiceCaptureLifecycle({
   ]);
 
   const performStopVoiceCapture = useCallback(async () => {
+    const captureGeneration = captureGenerationRef.current;
+    const captureWasCancelled = () =>
+      captureGenerationRef.current !== captureGeneration;
     clearMaxDurationTimer();
 
     recordDebugLogEvent({
@@ -138,7 +161,10 @@ export function useVoiceCaptureLifecycle({
 
     if (startPromise) {
       try {
-        await startPromise;
+        const started = await startPromise;
+        if (!started) {
+          return;
+        }
       } catch {
         recordDebugLogEvent({
           event: "voice-capture-stop-aborted",
@@ -156,7 +182,11 @@ export function useVoiceCaptureLifecycle({
       }
     }
 
-    if (!captureActiveRef.current && !isRecording) {
+    if (
+      !captureActiveRef.current &&
+      !isRecording &&
+      !captureWasCancelled()
+    ) {
       recordDebugLogEvent({
         event: "voice-capture-stop-ignored",
         payload: {
@@ -168,11 +198,23 @@ export function useVoiceCaptureLifecycle({
     }
 
     captureActiveRef.current = false;
-    onCaptureStopStarted?.();
+    if (!captureWasCancelled()) {
+      onCaptureStopStarted?.();
+    }
 
     try {
       if (sttMode === "native") {
         const transcription = await nativeStt.stopRecognition();
+
+        if (captureWasCancelled()) {
+          recordDebugLogEvent({
+            event: "voice-capture-stop-superseded",
+            payload: {
+              sttMode,
+            },
+          });
+          return;
+        }
 
         if (transcription) {
           recordDebugLogEvent({
@@ -202,6 +244,18 @@ export function useVoiceCaptureLifecycle({
 
       const uri = await recorder.stopRecording();
 
+      if (captureWasCancelled()) {
+        await cleanupCapturedAudio(uri ?? undefined);
+        recordDebugLogEvent({
+          event: "voice-capture-stop-superseded",
+          payload: {
+            hadAudioUri: Boolean(uri),
+            sttMode,
+          },
+        });
+        return;
+      }
+
       if (uri) {
         recordDebugLogEvent({
           event: "voice-capture-audio-ready",
@@ -223,6 +277,9 @@ export function useVoiceCaptureLifecycle({
         showToast(t("couldntCatchThatTryAgain"));
       }
     } catch (error) {
+      if (captureWasCancelled()) {
+        return;
+      }
       onCaptureStopAbandoned?.();
       throw error;
     }
@@ -254,12 +311,89 @@ export function useVoiceCaptureLifecycle({
     return stopPromise;
   }, [performStopVoiceCapture]);
 
+  const cancelVoiceCapture = useCallback(() => {
+    if (cancelInFlightRef.current) {
+      return cancelInFlightRef.current;
+    }
+
+    const startPromise = recordingStartedRef.current;
+    const shouldCancel =
+      Boolean(startPromise) ||
+      captureActiveRef.current ||
+      isRecording ||
+      Boolean(stopInFlightRef.current);
+
+    clearMaxDurationTimer();
+    if (!shouldCancel) {
+      return Promise.resolve();
+    }
+
+    captureGenerationRef.current += 1;
+    const cancelPromise = (async () => {
+      recordDebugLogEvent({
+        event: "voice-capture-cancel-requested",
+        payload: {
+          sttMode,
+        },
+      });
+
+      if (startPromise) {
+        try {
+          const started = await startPromise;
+          if (!started) {
+            captureActiveRef.current = false;
+            return;
+          }
+        } catch {
+          captureActiveRef.current = false;
+          return;
+        }
+      }
+
+      const stopPromise = stopInFlightRef.current;
+      if (stopPromise) {
+        await stopPromise.catch(() => undefined);
+        captureActiveRef.current = false;
+        return;
+      }
+
+      captureActiveRef.current = false;
+      if (sttMode === "native") {
+        await nativeStt.abortRecognition();
+      } else {
+        const uri = await recorder.stopRecording();
+        await cleanupCapturedAudio(uri ?? undefined);
+      }
+
+      recordDebugLogEvent({
+        event: "voice-capture-cancelled",
+        payload: {
+          sttMode,
+        },
+      });
+    })().finally(() => {
+      if (cancelInFlightRef.current === cancelPromise) {
+        cancelInFlightRef.current = null;
+      }
+    });
+
+    cancelInFlightRef.current = cancelPromise;
+    return cancelPromise;
+  }, [
+    clearMaxDurationTimer,
+    isRecording,
+    nativeStt,
+    recorder,
+    sttMode,
+  ]);
+
   stopVoiceCaptureRef.current = stopVoiceCapture;
 
   // Defensively clear the timer if the component unmounts mid-recording.
   useEffect(() => clearMaxDurationTimer, [clearMaxDurationTimer]);
 
   return {
+    cancelVoiceCapture,
     startVoiceCapture,
     stopVoiceCapture,
   };

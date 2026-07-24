@@ -9,6 +9,12 @@ jest.mock("../../../src/services/debugLogCapture", () => ({
   recordDebugLogEvent: jest.fn(),
 }));
 
+jest.mock("../../../src/services/voicePipeline/cleanup", () => ({
+  cleanupCapturedAudio: jest.fn(async () => undefined),
+}));
+
+import { cleanupCapturedAudio } from "../../../src/services/voicePipeline/cleanup";
+
 function buildParams(overrides: Record<string, unknown> = {}) {
   const player = {
     isPlaybackPaused: false,
@@ -54,6 +60,7 @@ function buildParams(overrides: Record<string, unknown> = {}) {
 
 describe("useVoiceCaptureLifecycle auto-stop", () => {
   beforeEach(() => {
+    jest.clearAllMocks();
     jest.useFakeTimers();
   });
 
@@ -110,6 +117,108 @@ describe("useVoiceCaptureLifecycle auto-stop", () => {
     });
 
     expect(params.recorder.stopRecording).toHaveBeenCalledTimes(1);
+    expect(params.showToast).not.toHaveBeenCalled();
+  });
+
+  it("cancels provider recording without submitting it or leaving the timer armed", async () => {
+    const params = buildParams();
+    const { result } = renderHook(() => useVoiceCaptureLifecycle(params));
+
+    await act(async () => {
+      await result.current.startVoiceCapture();
+      await result.current.cancelVoiceCapture();
+    });
+
+    await act(async () => {
+      jest.advanceTimersByTime(MAX_RECORDING_MS * 2);
+      await Promise.resolve();
+    });
+
+    expect(params.recorder.stopRecording).toHaveBeenCalledTimes(1);
+    expect(cleanupCapturedAudio).toHaveBeenCalledWith(
+      "file:///tmp/recording.wav",
+    );
+    expect(params.processCapturedVoiceTurn).not.toHaveBeenCalled();
+    expect(params.onCaptureStopStarted).not.toHaveBeenCalled();
+    expect(params.showToast).not.toHaveBeenCalled();
+  });
+
+  it("aborts native recognition without submitting a transcript", async () => {
+    const params = buildParams({
+      sttMode: "native" as const,
+    });
+    const { result } = renderHook(() => useVoiceCaptureLifecycle(params));
+
+    await act(async () => {
+      await result.current.startVoiceCapture();
+      await result.current.cancelVoiceCapture();
+    });
+
+    expect(params.nativeStt.abortRecognition).toHaveBeenCalledTimes(1);
+    expect(params.nativeStt.stopRecognition).not.toHaveBeenCalled();
+    expect(params.processCapturedVoiceTurn).not.toHaveBeenCalled();
+    expect(params.onCaptureStopStarted).not.toHaveBeenCalled();
+  });
+
+  it("cancels while the playback route is settling without starting capture", async () => {
+    let finishRouteSettle: (() => void) | null = null;
+    const player = {
+      ...buildParams().player,
+      waitForPlaybackRouteSettle: jest.fn(
+        () =>
+          new Promise<void>((resolve) => {
+            finishRouteSettle = resolve;
+          }),
+      ),
+    };
+    const params = buildParams({ player });
+    const { result } = renderHook(() => useVoiceCaptureLifecycle(params));
+    let start: Promise<void> | null = null;
+    let cancel: Promise<void> | null = null;
+
+    await act(async () => {
+      start = result.current.startVoiceCapture();
+      await Promise.resolve();
+      cancel = result.current.cancelVoiceCapture();
+      finishRouteSettle?.();
+      await Promise.all([start, cancel]);
+    });
+
+    expect(params.recorder.startRecording).not.toHaveBeenCalled();
+    expect(params.recorder.stopRecording).not.toHaveBeenCalled();
+    expect(params.processCapturedVoiceTurn).not.toHaveBeenCalled();
+  });
+
+  it("suppresses and cleans a capture cancelled while stop is in flight", async () => {
+    let finishStopping: ((uri: string) => void) | null = null;
+    const recorder = {
+      ...buildParams().recorder,
+      stopRecording: jest.fn(
+        () =>
+          new Promise<string>((resolve) => {
+            finishStopping = resolve;
+          }),
+      ),
+    };
+    const params = buildParams({ recorder });
+    const { result } = renderHook(() => useVoiceCaptureLifecycle(params));
+    let stop: Promise<void> | null = null;
+    let cancel: Promise<void> | null = null;
+
+    await act(async () => {
+      await result.current.startVoiceCapture();
+      stop = result.current.stopVoiceCapture();
+      await Promise.resolve();
+      cancel = result.current.cancelVoiceCapture();
+      finishStopping?.("file:///tmp/cancelled.wav");
+      await Promise.all([stop, cancel]);
+    });
+
+    expect(recorder.stopRecording).toHaveBeenCalledTimes(1);
+    expect(cleanupCapturedAudio).toHaveBeenCalledWith(
+      "file:///tmp/cancelled.wav",
+    );
+    expect(params.processCapturedVoiceTurn).not.toHaveBeenCalled();
     expect(params.showToast).not.toHaveBeenCalled();
   });
 

@@ -72,19 +72,20 @@ export function useVoiceSessionController({
     });
   }, [settings.sttMode, settings.providerSttModels, sttProvider]);
 
-  const { startVoiceCapture, stopVoiceCapture } = useVoiceCaptureLifecycle({
-    isRecording,
-    maxRecordingMs,
-    nativeStt,
-    onCaptureStopAbandoned: () => setPipelinePhase("idle"),
-    onCaptureStopStarted: () => setPipelinePhase("transcribing"),
-    player,
-    processCapturedVoiceTurn: handleVoiceCaptureDone,
-    recorder,
-    showToast,
-    sttMode: settings.sttMode,
-    t,
-  });
+  const { cancelVoiceCapture, startVoiceCapture, stopVoiceCapture } =
+    useVoiceCaptureLifecycle({
+      isRecording,
+      maxRecordingMs,
+      nativeStt,
+      onCaptureStopAbandoned: () => setPipelinePhase("idle"),
+      onCaptureStopStarted: () => setPipelinePhase("transcribing"),
+      player,
+      processCapturedVoiceTurn: handleVoiceCaptureDone,
+      recorder,
+      showToast,
+      sttMode: settings.sttMode,
+      t,
+    });
 
   useVoiceSessionAppState({
     isRecording,
@@ -300,26 +301,16 @@ export function useVoiceSessionController({
     resetPipelineState();
     lastCompletedReplyRef.current = "";
     await player.stopPlayback();
-
-    if (!isRecording) {
-      return;
-    }
-
     try {
-      if (settings.sttMode === "native") {
-        await nativeStt.abortRecognition();
-      } else {
-        await recorder.stopRecording();
-      }
+      await cancelVoiceCapture();
     } catch {
       // Ignore recorder cleanup failures while switching conversations.
     }
   }, [
+    cancelVoiceCapture,
     isRecording,
     lastCompletedReplyRef,
-    nativeStt,
     player,
-    recorder,
     resetPipelineState,
     settings.sttMode,
   ]);

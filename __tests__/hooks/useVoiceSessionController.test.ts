@@ -7,6 +7,10 @@ jest.mock("../../src/services/debugLogCapture", () => ({
   recordDebugLogEvent: jest.fn(),
 }));
 
+jest.mock("../../src/services/voicePipeline/cleanup", () => ({
+  cleanupCapturedAudio: jest.fn(async () => undefined),
+}));
+
 describe("useVoiceSessionController", () => {
   beforeEach(() => {
     jest.clearAllMocks();
@@ -197,6 +201,18 @@ describe("useVoiceSessionController", () => {
     });
 
     expect(player.stopPlayback).toHaveBeenCalledTimes(1);
+  });
+
+  it("discards an active provider recording while resetting the conversation", async () => {
+    const { result, params } = renderController({ isRecording: true });
+
+    await act(async () => {
+      await result.current.resetVoiceSessionState();
+    });
+
+    expect(params.recorder.stopRecording).toHaveBeenCalledTimes(1);
+    expect(params.handleVoiceCaptureDone).not.toHaveBeenCalled();
+    expect(params.setPipelinePhase).toHaveBeenCalledWith("idle");
   });
 
   it("stops the complete interaction from the explicit speaking stop control", async () => {
