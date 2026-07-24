@@ -94,4 +94,85 @@ describe("useNativeAudioQueueSubscription", () => {
     expect(nativeAudioQueuePendingCountRef.current).toBe(0);
     expect(nativeAudioQueueContextsRef.current.size).toBe(0);
   });
+
+  it("recovers from a failed native item and drains after the next item", () => {
+    const finalizeDrainedState = jest.fn();
+    const playNextNative = jest.fn(async () => undefined);
+    const nativeAudioQueueContextsRef = {
+      current: new Map([
+        [
+          "broken",
+          {
+            uri: "file:///tmp/broken.m4a",
+            diagnostics: {
+              requestId: "request-broken",
+              source: "llm" as const,
+            },
+          },
+        ],
+        [
+          "next",
+          {
+            uri: "file:///tmp/next.m4a",
+            diagnostics: {
+              requestId: "request-next",
+              source: "llm" as const,
+            },
+          },
+        ],
+      ]),
+    };
+    const nativeAudioQueuePendingCountRef = { current: 2 };
+    const nativeAudioQueuePlayingRef = { current: false };
+    const currentAudioRef = { current: null };
+
+    renderHook(() =>
+      useNativeAudioQueueSubscription({
+        usingNativeAudioQueue: true,
+        playNextNative,
+        finalizeDrainedState,
+        updatePendingPlaybackState: jest.fn(),
+        setNativeAudioQueuePlaying: jest.fn(),
+        currentAudioRef,
+        cancelledRef: { current: false },
+        playingRef: { current: false },
+        hasSeenAudioPlayingRef: { current: false },
+        nativeAudioQueueContextsRef,
+        nativeAudioQueuePendingCountRef,
+        nativeAudioQueuePlayingRef,
+        nativeQueueRef: { current: [] },
+      }),
+    );
+
+    act(() => {
+      nativeAudioQueueListener?.({
+        type: "started",
+        itemId: "broken",
+        uri: "file:///tmp/broken.m4a",
+      });
+      nativeAudioQueueListener?.({
+        type: "failed",
+        itemId: "broken",
+        uri: "file:///tmp/broken.m4a",
+        message: "Unsupported audio.",
+      });
+      nativeAudioQueueListener?.({
+        type: "started",
+        itemId: "next",
+        uri: "file:///tmp/next.m4a",
+      });
+      nativeAudioQueueListener?.({
+        type: "finished",
+        itemId: "next",
+        uri: "file:///tmp/next.m4a",
+      });
+      nativeAudioQueueListener?.({ type: "drained" });
+    });
+
+    expect(nativeAudioQueueContextsRef.current.size).toBe(0);
+    expect(nativeAudioQueuePendingCountRef.current).toBe(0);
+    expect(nativeAudioQueuePlayingRef.current).toBe(false);
+    expect(finalizeDrainedState).toHaveBeenCalledTimes(1);
+    expect(playNextNative).not.toHaveBeenCalled();
+  });
 });

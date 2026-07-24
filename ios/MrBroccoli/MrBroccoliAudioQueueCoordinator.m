@@ -8,6 +8,7 @@
 
 - (void)handleItemDidPlayToEnd:(NSNotification *)notification;
 - (void)handleItemFailedToPlayToEnd:(NSNotification *)notification;
+- (void)handleItemFailure:(AVPlayerItem *)item error:(nullable NSError *)error;
 - (void)armItemEndBoundaryForCurrentItem;
 - (void)disarmItemEndBoundaryObserver;
 
@@ -16,19 +17,23 @@
 @implementation MrBroccoliAudioQueueCoordinator {
   AVQueuePlayer *_player;
   NSMutableDictionary<NSString *, NSDictionary *> *_contextsByItemKey;
+  NSMutableDictionary<NSString *, AVPlayerItem *> *_itemsByItemKey;
   NSMutableSet<NSString *> *_startedItemKeys;
   NSString *_currentItemKey;
   id _itemEndBoundaryObserver;
   NSString *_itemEndBoundaryItemKey;
   NSString *_pendingBoundaryItemKey;
   BOOL _observingPlayer;
+  BOOL _queueIsDrained;
 }
 
 - (instancetype)init
 {
   if ((self = [super init])) {
     _contextsByItemKey = [NSMutableDictionary new];
+    _itemsByItemKey = [NSMutableDictionary new];
     _startedItemKeys = [NSMutableSet new];
+    _queueIsDrained = YES;
   }
   return self;
 }
@@ -50,11 +55,13 @@
             source:(NSString *)source
              error:(NSError **)error
 {
+  AVPlayerItem *item = nil;
+
   @try {
     [self ensurePlayer];
 
     NSURL *url = [self resolvedURLForUri:uri];
-    AVPlayerItem *item = [AVPlayerItem playerItemWithURL:url];
+    item = [AVPlayerItem playerItemWithURL:url];
     NSString *itemKey = [self itemKey:item];
 
     _contextsByItemKey[itemKey] = @{
@@ -63,6 +70,8 @@
       @"requestId": requestId ?: [NSNull null],
       @"source": source ?: [NSNull null],
     };
+    _itemsByItemKey[itemKey] = item;
+    _queueIsDrained = NO;
 
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(handleItemDidPlayToEnd:)
@@ -72,10 +81,20 @@
                                              selector:@selector(handleItemFailedToPlayToEnd:)
                                                  name:AVPlayerItemFailedToPlayToEndTimeNotification
                                                object:item];
+    [item addObserver:self
+           forKeyPath:@"status"
+              options:NSKeyValueObservingOptionInitial | NSKeyValueObservingOptionNew
+              context:nil];
 
     [_player insertItem:item afterItem:nil];
     return YES;
   } @catch (NSException *exception) {
+    if (item != nil) {
+      [self cleanupItem:item];
+    }
+    if (_contextsByItemKey.count == 0 && _player.items.count == 0) {
+      _queueIsDrained = YES;
+    }
     if (error != nil) {
       *error = [NSError errorWithDomain:@"MrBroccoliAudioQueue"
                                    code:1
@@ -166,6 +185,9 @@
     if (_player != nil) {
       [self disarmItemEndBoundaryObserver];
       [_player pause];
+      for (AVPlayerItem *item in _itemsByItemKey.allValues.copy) {
+        [self removeObserversForItem:item];
+      }
       [_player removeAllItems];
     }
 
@@ -182,6 +204,7 @@
     }
 
     [_contextsByItemKey removeAllObjects];
+    [_itemsByItemKey removeAllObjects];
     [_startedItemKeys removeAllObjects];
     _currentItemKey = nil;
     [self emitDrainedIfNeeded];
@@ -205,13 +228,18 @@
   [[NSNotificationCenter defaultCenter] removeObserver:self];
   [self disarmItemEndBoundaryObserver];
   [self detachPlayerObserversIfNeeded];
+  for (AVPlayerItem *item in _itemsByItemKey.allValues.copy) {
+    [self removeObserversForItem:item];
+  }
   [_player pause];
   [_player removeAllItems];
   [MrBroccoliAudioQueueSession deactivatePlaybackSessionIfIdleForPlayer:_player];
   _player = nil;
   [_contextsByItemKey removeAllObjects];
+  [_itemsByItemKey removeAllObjects];
   [_startedItemKeys removeAllObjects];
   _currentItemKey = nil;
+  _queueIsDrained = YES;
 }
 
 - (void)ensurePlayer
@@ -276,7 +304,8 @@
 - (void)emitStartedForCurrentItemIfNeeded
 {
   AVPlayerItem *item = _player.currentItem;
-  if (item == nil || _player.timeControlStatus != AVPlayerTimeControlStatusPlaying) {
+  if (item == nil || item.status != AVPlayerItemStatusReadyToPlay ||
+      _player.timeControlStatus != AVPlayerTimeControlStatusPlaying) {
     return;
   }
 
@@ -313,6 +342,10 @@
   AVPlayerItem *item = _player.currentItem;
   if (item == nil) {
     [self disarmItemEndBoundaryObserver];
+    return;
+  }
+
+  if (item.status != AVPlayerItemStatusReadyToPlay) {
     return;
   }
 
@@ -382,14 +415,16 @@
 
 - (void)emitDrainedIfNeeded
 {
-  if (_player == nil) {
+  if (_player == nil || _queueIsDrained) {
     return;
   }
 
-  if (_player.currentItem != nil || _player.items.count > 0) {
+  if (_player.currentItem != nil || _player.items.count > 0 ||
+      _contextsByItemKey.count > 0) {
     return;
   }
 
+  _queueIsDrained = YES;
   _currentItemKey = nil;
   [_startedItemKeys removeAllObjects];
   [self emitEvent:@{ @"type": @"drained" }];
@@ -403,6 +438,10 @@
   [[NSNotificationCenter defaultCenter] removeObserver:self
                                                   name:AVPlayerItemFailedToPlayToEndTimeNotification
                                                 object:item];
+  @try {
+    [item removeObserver:self forKeyPath:@"status"];
+  } @catch (__unused NSException *exception) {
+  }
 }
 
 - (void)cleanupItem:(AVPlayerItem *)item
@@ -410,12 +449,14 @@
   NSString *itemKey = [self itemKey:item];
   [self removeObserversForItem:item];
   [_contextsByItemKey removeObjectForKey:itemKey];
+  [_itemsByItemKey removeObjectForKey:itemKey];
   [_startedItemKeys removeObject:itemKey];
   if ([_currentItemKey isEqualToString:itemKey]) {
     _currentItemKey = nil;
   }
 
-  if ([_itemEndBoundaryItemKey isEqualToString:itemKey]) {
+  if ([_itemEndBoundaryItemKey isEqualToString:itemKey] ||
+      [_pendingBoundaryItemKey isEqualToString:itemKey]) {
     [self disarmItemEndBoundaryObserver];
   }
 }
@@ -437,21 +478,20 @@
     return;
   }
 
-  NSString *itemKey = [self itemKey:item];
-  NSDictionary *context = _contextsByItemKey[itemKey];
-  if (context != nil) {
-    [self emitEvent:@{
-      @"type": @"finished",
-      @"itemId": context[@"itemId"] ?: @"",
-      @"uri": context[@"uri"] ?: @"",
-      @"requestId": context[@"requestId"] ?: [NSNull null],
-      @"source": context[@"source"] ?: [NSNull null],
-    }];
-  }
-
-  [self cleanupItem:item];
-
   dispatch_async(dispatch_get_main_queue(), ^{
+    NSString *itemKey = [self itemKey:item];
+    NSDictionary *context = self->_contextsByItemKey[itemKey];
+    if (context != nil) {
+      [self emitEvent:@{
+        @"type": @"finished",
+        @"itemId": context[@"itemId"] ?: @"",
+        @"uri": context[@"uri"] ?: @"",
+        @"requestId": context[@"requestId"] ?: [NSNull null],
+        @"source": context[@"source"] ?: [NSNull null],
+      }];
+    }
+
+    [self cleanupItem:item];
     [self armItemEndBoundaryForCurrentItem];
     [self emitStartedForCurrentItemIfNeeded];
     [self emitDrainedIfNeeded];
@@ -466,24 +506,33 @@
     return;
   }
 
-  NSString *itemKey = [self itemKey:item];
-  NSDictionary *context = _contextsByItemKey[itemKey];
   NSError *error = notification.userInfo[AVPlayerItemFailedToPlayToEndTimeErrorKey];
+  [self handleItemFailure:item error:error];
+}
 
-  if (context != nil) {
-    [self emitEvent:@{
-      @"type": @"failed",
-      @"itemId": context[@"itemId"] ?: @"",
-      @"uri": context[@"uri"] ?: @"",
-      @"requestId": context[@"requestId"] ?: [NSNull null],
-      @"source": context[@"source"] ?: [NSNull null],
-      @"message": error.localizedDescription ?: @"Audio playback failed.",
-    }];
-  }
-
-  [self cleanupItem:item];
-
+- (void)handleItemFailure:(AVPlayerItem *)item error:(NSError *)error
+{
   dispatch_async(dispatch_get_main_queue(), ^{
+    NSString *itemKey = [self itemKey:item];
+    NSDictionary *context = self->_contextsByItemKey[itemKey];
+    if (context != nil) {
+      [self emitEvent:@{
+        @"type": @"failed",
+        @"itemId": context[@"itemId"] ?: @"",
+        @"uri": context[@"uri"] ?: @"",
+        @"requestId": context[@"requestId"] ?: [NSNull null],
+        @"source": context[@"source"] ?: [NSNull null],
+        @"message": error.localizedDescription ?: @"Audio playback failed.",
+      }];
+
+      [self cleanupItem:item];
+      if (self->_player.currentItem == item) {
+        [self->_player advanceToNextItem];
+      } else if ([self->_player.items containsObject:item]) {
+        [self->_player removeItem:item];
+      }
+    }
+
     [self armItemEndBoundaryForCurrentItem];
     [self emitStartedForCurrentItemIfNeeded];
     [self emitDrainedIfNeeded];
@@ -496,6 +545,22 @@
                         change:(NSDictionary<NSKeyValueChangeKey, id> *)change
                        context:(void *)context
 {
+  if ([object isKindOfClass:[AVPlayerItem class]] &&
+      [keyPath isEqualToString:@"status"]) {
+    AVPlayerItem *item = (AVPlayerItem *)object;
+    if (item.status == AVPlayerItemStatusFailed) {
+      [self handleItemFailure:item error:item.error];
+    } else if (item.status == AVPlayerItemStatusReadyToPlay) {
+      dispatch_async(dispatch_get_main_queue(), ^{
+        if (self->_player.currentItem == item) {
+          [self armItemEndBoundaryForCurrentItem];
+          [self emitStartedForCurrentItemIfNeeded];
+        }
+      });
+    }
+    return;
+  }
+
   if (object != _player) {
     [super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
     return;
