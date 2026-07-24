@@ -352,7 +352,12 @@ export function getLearnedLatencyEstimateMs(samples: number[]) {
     return Math.round((p50 + p75) / 2);
   }
 
-  return Math.round(p75 * 0.72 + p90 * 0.28);
+  // A single network stall must not teach the CTA to count down for minutes.
+  // Once slower observations become representative they also lift p50/p75,
+  // so sustained route changes still replace the prior naturally.
+  const robustP90 = Math.min(p90, Math.max(p75 * 2, p50 * 3));
+
+  return Math.round(p75 * 0.72 + robustP90 * 0.28);
 }
 
 export function getLatencyProgress(
@@ -401,7 +406,7 @@ function getStoredSamples(
 
   const updatedAtMs = Date.parse(stats.updatedAt);
   if (
-    Number.isFinite(updatedAtMs) &&
+    !Number.isFinite(updatedAtMs) ||
     nowMs - updatedAtMs > MAX_SAMPLE_AGE_MS
   ) {
     return [];
@@ -465,6 +470,14 @@ export async function loadLatencyEstimate(
     : familySamples.length;
 
   if (earlyEstimateMs > 0) {
+    // Until a route has enough observations to establish its own distribution,
+    // keep a lone fast response or transient stall from replacing the prior.
+    // At four samples the exact/family branches above use observed timings
+    // without this cold-start bound.
+    const boundedEarlyEstimateMs = Math.min(
+      fallbackMs * 3,
+      Math.max(fallbackMs * 0.45, earlyEstimateMs),
+    );
     // One real route observation is more useful than a generic provider prior,
     // while the remaining default weight still cushions cold-start outliers.
     const learnedWeight =
@@ -473,7 +486,8 @@ export async function loadLatencyEstimate(
       key,
       keys,
       estimatedMs: Math.round(
-        fallbackMs * (1 - learnedWeight) + earlyEstimateMs * learnedWeight,
+        fallbackMs * (1 - learnedWeight) +
+          boundedEarlyEstimateMs * learnedWeight,
       ),
       sampleCount: earlySampleCount,
       learned: true,

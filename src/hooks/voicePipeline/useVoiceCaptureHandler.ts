@@ -227,6 +227,8 @@ export function useVoiceCaptureHandler({
         setPipelinePhase("speaking");
       };
       let llmStarted = false;
+      let replyCompleted = false;
+      let turnFailed = false;
       const handleLlmStarted = () => {
         if (!isActiveRun() || llmStarted) {
           return;
@@ -419,6 +421,7 @@ export function useVoiceCaptureHandler({
                 return;
               }
 
+              replyCompleted = true;
               handleLlmStarted();
               recordDebugLogEvent({
                 event: "voice-pipeline-response-done",
@@ -527,6 +530,7 @@ export function useVoiceCaptureHandler({
                 return;
               }
 
+              turnFailed = true;
               const preserveProducedAudio =
                 producedAudioRef.current &&
                 (player.isPlaying || player.hasPendingPlaybackNow());
@@ -632,6 +636,7 @@ export function useVoiceCaptureHandler({
           return;
         }
 
+        turnFailed = true;
         recordDebugLogEvent({
           event: "voice-pipeline-catch-error",
           level: "error",
@@ -709,8 +714,24 @@ export function useVoiceCaptureHandler({
         if (!isCurrentRun()) {
           return;
         }
-        if (!abortController.signal.aborted) {
+        const completedSuccessfully =
+          !abortController.signal.aborted &&
+          replyCompleted &&
+          !turnFailed &&
+          (!spokenRepliesEnabled || playbackStartedRef.current);
+        if (completedSuccessfully) {
           finishLatencyProgress("turn");
+        } else {
+          recordDebugLogEvent({
+            event: "adaptive-latency-turn-sample-discarded",
+            payload: {
+              aborted: abortController.signal.aborted,
+              playbackStarted: playbackStartedRef.current,
+              replyCompleted,
+              spokenRepliesEnabled,
+              turnFailed,
+            },
+          });
         }
         clearLatencyProgress();
         cancelStreamingRender(streamingRenderRunId);

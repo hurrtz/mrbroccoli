@@ -223,6 +223,12 @@ describe("latencyStats", () => {
     ).toBeGreaterThan(18_000);
   });
 
+  it("does not let one extreme stall dominate an established route", () => {
+    expect(
+      getLearnedLatencyEstimateMs([10_000, 11_000, 12_000, 600_000]),
+    ).toBeLessThan(20_000);
+  });
+
   it("caps visual progress below complete when estimates are exceeded", () => {
     expect(getLatencyProgress(5_000, 10_000)).toMatchObject({
       overEstimate: false,
@@ -306,6 +312,36 @@ describe("latencyStats", () => {
     });
   });
 
+  it("bounds a lone cold-start outlier until the route has enough evidence", async () => {
+    const descriptor = {
+      phase: "turn-to-completion" as const,
+      provider: "openai" as const,
+      model: "gpt-5.4",
+      effort: "medium",
+      responseLength: "normal" as const,
+      responseTone: "professional" as const,
+      inputSource: "text" as const,
+      spokenRepliesEnabled: false,
+      ttsMode: "native" as const,
+      replyPlayback: "stream" as const,
+      webSearchMode: "off" as const,
+    };
+    const fallbackMs = getDefaultLatencyEstimateMs(descriptor);
+
+    await recordLatencySamples(
+      createLatencyRouteKeys(descriptor),
+      10 * 60_000,
+    );
+
+    await expect(loadLatencyEstimate(descriptor)).resolves.toMatchObject({
+      learned: true,
+      sampleCount: 1,
+      estimatedMs: expect.any(Number),
+    });
+    const estimate = await loadLatencyEstimate(descriptor);
+    expect(estimate.estimatedMs).toBeLessThan(fallbackMs * 2);
+  });
+
   it("serializes concurrent samples so neither observation is lost", async () => {
     await Promise.all([
       recordLatencySample("llm-response-v2:concurrent", 1_000),
@@ -329,6 +365,28 @@ describe("latencyStats", () => {
       [key]: {
         samples: "not-an-array",
         updatedAt: new Date().toISOString(),
+      },
+    });
+
+    await expect(loadLatencyEstimate(descriptor)).resolves.toMatchObject({
+      learned: false,
+      sampleCount: 0,
+      source: "default",
+    });
+  });
+
+  it("ignores samples whose persistence timestamp is malformed", async () => {
+    const descriptor = {
+      phase: "llm-response" as const,
+      provider: "xai" as const,
+      model: "grok-4.5",
+      effort: "high",
+    };
+    const key = createLatencyRouteKey(descriptor);
+    mockStoredValue = JSON.stringify({
+      [key]: {
+        samples: [40_000, 45_000, 50_000, 55_000],
+        updatedAt: "not-a-date",
       },
     });
 

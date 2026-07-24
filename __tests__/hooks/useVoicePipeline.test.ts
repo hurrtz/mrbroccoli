@@ -771,7 +771,10 @@ describe("useVoicePipeline", () => {
 
   it("shows the retry toast when no transcription is produced", async () => {
     const params = createParams();
-    (runVoicePipeline as jest.Mock).mockResolvedValue(null);
+    (runVoicePipeline as jest.Mock).mockImplementation(async () => {
+      jest.advanceTimersByTime(1_000);
+      return null;
+    });
 
     const { result } = renderHook(() => useVoicePipeline(params));
 
@@ -786,7 +789,84 @@ describe("useVoicePipeline", () => {
       undefined,
       "danger",
     );
+    expect(
+      (AsyncStorage.setItem as jest.Mock).mock.calls.some(([, value]) =>
+        Object.keys(JSON.parse(value) as Record<string, unknown>).some((key) =>
+          key.startsWith("turn-to-completion-v1"),
+        ),
+      ),
+    ).toBe(false);
     expect(result.current.pipelinePhase).toBe("idle");
+  });
+
+  it("does not learn turn completion from a failed request", async () => {
+    const params = createParams();
+    (runVoicePipeline as jest.Mock).mockImplementation(async () => {
+      jest.advanceTimersByTime(1_000);
+      throw new Error("Speech transcription failed.");
+    });
+
+    const { result } = renderHook(() => useVoicePipeline(params));
+
+    await act(async () => {
+      await result.current.handleVoiceCaptureDone({
+        audioUri: "file://capture.wav",
+      });
+    });
+
+    expect(
+      (AsyncStorage.setItem as jest.Mock).mock.calls.some(([, value]) =>
+        Object.keys(JSON.parse(value) as Record<string, unknown>).some((key) =>
+          key.startsWith("turn-to-completion-v1"),
+        ),
+      ),
+    ).toBe(false);
+    expect(result.current.phaseProgress).toBeNull();
+  });
+
+  it("does not learn spoken completion after a late TTS failure", async () => {
+    const player = createPlayer({
+      isPlaying: true,
+      enqueueAudio: jest.fn(
+        (
+          _uri: string,
+          _diagnostics: unknown,
+          onPlaybackStarted?: () => void,
+        ) => onPlaybackStarted?.(),
+      ),
+    });
+    const params = createParams({ player });
+
+    (runVoicePipeline as jest.Mock).mockImplementation(
+      async ({ callbacks }: any) => {
+        jest.advanceTimersByTime(1_000);
+        callbacks.onResponseDone("The reply was generated.");
+        callbacks.onAudioReady("file://partial-reply.wav");
+        jest.advanceTimersByTime(1_000);
+        await callbacks.onError(new Error("Later speech chunk failed."));
+        return "Hello from the microphone";
+      },
+    );
+
+    const { result } = renderHook(() => useVoicePipeline(params));
+
+    await act(async () => {
+      await result.current.handleVoiceCaptureDone({
+        transcriptionOverride: "Hello from the microphone",
+      });
+    });
+
+    await waitFor(() => {
+      expect(AsyncStorage.setItem).toHaveBeenCalled();
+    });
+    expect(
+      (AsyncStorage.setItem as jest.Mock).mock.calls.some(([, value]) =>
+        Object.keys(JSON.parse(value) as Record<string, unknown>).some((key) =>
+          key.startsWith("turn-to-completion-v1"),
+        ),
+      ),
+    ).toBe(false);
+    expect(result.current.phaseProgress).toBeNull();
   });
 
   it("stores a durable assistant notice when provider TTS falls back", async () => {
