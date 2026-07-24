@@ -206,7 +206,6 @@ export function MainScreen() {
       webSearchApiKey,
       "search",
     );
-  const webSearchOn = webSearchMode === "on";
   const webSearchActive = webSearchMode !== "off" && webSearchReady;
   const isLandscape = width > height;
   const showStyleChip = loaded && availableResponseModes.length > 0;
@@ -761,7 +760,7 @@ export function MainScreen() {
                 layout="landscape"
                 onToggleWebSearchEnabled={() => {
                   updateSettings({
-                    webSearchMode: webSearchOn ? "off" : "on",
+                    webSearchMode: webSearchActive ? "off" : "on",
                   });
                 }}
                 t={t}
@@ -872,7 +871,7 @@ export function MainScreen() {
                 colors={colors}
                 onToggleWebSearchEnabled={() => {
                   updateSettings({
-                    webSearchMode: webSearchOn ? "off" : "on",
+                    webSearchMode: webSearchActive ? "off" : "on",
                   });
                 }}
                 t={t}

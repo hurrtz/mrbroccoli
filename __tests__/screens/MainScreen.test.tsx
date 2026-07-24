@@ -468,6 +468,27 @@ describe("MainScreen", () => {
     );
   });
 
+  it("turns an active automatic web-search route off from the main switch", () => {
+    const sharedSettings = createSharedSettingsValue({
+      apiKeys: {
+        ...DEFAULT_SETTINGS.apiKeys,
+        openai: "provider-key",
+      },
+      webSearchMode: "auto",
+      webSearchProvider: "openai",
+    });
+    useSharedSettings.mockReturnValue(sharedSettings);
+    const screen = renderWithProviders(<MainScreen />);
+    const searchSwitch = screen.getByTestId("route-web-search-control");
+
+    expect(searchSwitch.props.value).toBe(true);
+    fireEvent(searchSwitch, "valueChange", false);
+
+    expect(sharedSettings.updateSettings).toHaveBeenCalledWith({
+      webSearchMode: "off",
+    });
+  });
+
   it("enables the voice stage when the active reply provider is configured", () => {
     useSharedSettings.mockReturnValue(
       createSharedSettingsValue({
