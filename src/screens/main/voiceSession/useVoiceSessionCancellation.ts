@@ -27,11 +27,10 @@ export function useVoiceSessionCancellation({
   const cancelCurrentInteraction = useCallback(
     async () => {
       resetPipelineState();
-
-      if (player.isPlaying) {
-        await player.stopPlayback();
-      }
-
+      // `isPlaying` is rendered state and can lag the queue/native refs by a
+      // frame while playback is starting or stopping. The stop controller is
+      // idempotent, so always dispatch native teardown for an explicit cancel.
+      await player.stopPlayback();
     },
     [player, resetPipelineState],
   );

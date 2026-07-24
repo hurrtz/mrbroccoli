@@ -299,10 +299,7 @@ export function useVoiceSessionController({
 
     resetPipelineState();
     lastCompletedReplyRef.current = "";
-
-    if (player.isPlaying) {
-      await player.stopPlayback();
-    }
+    await player.stopPlayback();
 
     if (!isRecording) {
       return;
@@ -330,6 +327,7 @@ export function useVoiceSessionController({
   return {
     handlePressIn,
     handlePressOut,
+    handleStopInteraction: cancelCurrentInteraction,
     handleTogglePress,
     maxRecordingMs,
     resetVoiceSessionState,

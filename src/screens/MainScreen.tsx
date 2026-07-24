@@ -409,10 +409,6 @@ export function MainScreen() {
       isBusy,
     });
 
-  const handleStopPlayback = useCallback(async () => {
-    await player.stopPlayback();
-  }, [player]);
-
   useProviderAvailabilityGuards({
     activeResponseMode,
     availableResponseModes,
@@ -464,6 +460,7 @@ export function MainScreen() {
   const {
     handlePressIn,
     handlePressOut,
+    handleStopInteraction,
     handleTogglePress,
     maxRecordingMs,
     resetVoiceSessionState,
@@ -787,7 +784,7 @@ export function MainScreen() {
                   onPress={handleTogglePress}
                   onPressIn={handlePressIn}
                   onPressOut={handlePressOut}
-                  onStopPlayback={handleStopPlayback}
+                  onStopPlayback={handleStopInteraction}
                   onSubmitTextMessage={handleSubmitTextMessage}
                   onTextMessageChange={handleTextMessageChange}
                   phaseLabel={statusDisplay.statusTitle}
@@ -901,7 +898,7 @@ export function MainScreen() {
                     onPress={handleTogglePress}
                     onPressIn={handlePressIn}
                     onPressOut={handlePressOut}
-                    onStopPlayback={handleStopPlayback}
+                    onStopPlayback={handleStopInteraction}
                     onSubmitTextMessage={handleSubmitTextMessage}
                     onTextMessageChange={handleTextMessageChange}
                     phaseLabel={statusDisplay.statusTitle}

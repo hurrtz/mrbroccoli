@@ -295,6 +295,41 @@ describe("useVoicePipeline", () => {
     expect(synthesizeSpeechSequence).not.toHaveBeenCalled();
   });
 
+  it("clears stale pending playback before starting a replay even when rendered state lags", async () => {
+    const player = createPlayer({
+      isPlaying: false,
+    });
+    const params = createParams({
+      player,
+      ttsMode: "native",
+    });
+    const { result } = renderHook(() => useVoicePipeline(params));
+
+    await act(async () => {
+      await result.current.playReplyText("Replay this", "message-1");
+    });
+
+    expect(player.stopPlayback).toHaveBeenCalledTimes(1);
+    expect(player.stopPlayback.mock.invocationCallOrder[0]).toBeLessThan(
+      player.resetCancellation.mock.invocationCallOrder[0],
+    );
+  });
+
+  it("stops replay playback without relying on rendered playback state", async () => {
+    const player = createPlayer({
+      isPlaying: false,
+    });
+    const params = createParams({ player });
+    const { result } = renderHook(() => useVoicePipeline(params));
+
+    await act(async () => {
+      await result.current.stopReplay();
+    });
+
+    expect(player.stopPlayback).toHaveBeenCalledTimes(1);
+    expect(player.resetCancellation).not.toHaveBeenCalled();
+  });
+
   it("replays long Gemini replies in reliable provider-sized chunks", async () => {
     const reply = Array.from(
       { length: 50 },

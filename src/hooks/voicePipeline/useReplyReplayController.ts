@@ -75,10 +75,9 @@ export function useReplyReplayController({
       setReplayPhase("preparing");
 
       try {
-        if (player.isPlaying) {
-          await player.stopPlayback();
-        }
-
+        // Clear native or queued playback even when the rendered `isPlaying`
+        // flag has not caught up with the underlying player yet.
+        await player.stopPlayback();
         player.resetCancellation();
         const speechDiagnostics = {
           requestId: createSpeechRequestId("repeat"),
@@ -197,11 +196,7 @@ export function useReplyReplayController({
     replayAbortRef.current = null;
     setReplayPhase("idle");
     setActiveReplayMessageId(null);
-    player.resetCancellation();
-
-    if (player.isPlaying) {
-      await player.stopPlayback();
-    }
+    await player.stopPlayback();
   }, [player]);
 
   const handleRepeatLastReply = useCallback(

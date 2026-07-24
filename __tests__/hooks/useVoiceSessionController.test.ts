@@ -178,5 +178,41 @@ describe("useVoiceSessionController", () => {
 
     expect(abortController.signal.aborted).toBe(true);
     expect(params.setPipelinePhase).toHaveBeenCalledWith("idle");
+    expect(params.player.stopPlayback).toHaveBeenCalledTimes(1);
+  });
+
+  it("clears pending playback while resetting even when rendered playback state lags", async () => {
+    const player = {
+      isPlaybackPaused: false,
+      isPlaying: false,
+      pausePlayback: jest.fn(async () => true),
+      resumePlayback: jest.fn(async () => true),
+      stopPlayback: jest.fn(async () => undefined),
+      waitForPlaybackRouteSettle: jest.fn(async () => undefined),
+    };
+    const { result } = renderController({ player });
+
+    await act(async () => {
+      await result.current.resetVoiceSessionState();
+    });
+
+    expect(player.stopPlayback).toHaveBeenCalledTimes(1);
+  });
+
+  it("stops the complete interaction from the explicit speaking stop control", async () => {
+    const abortController = new AbortController();
+    const { result, params } = renderController({
+      abortRef: { current: abortController },
+      isBusy: true,
+    });
+
+    await act(async () => {
+      await result.current.handleStopInteraction();
+    });
+
+    expect(abortController.signal.aborted).toBe(true);
+    expect(params.setPipelinePhase).toHaveBeenCalledWith("idle");
+    expect(params.setStreamingText).toHaveBeenCalledWith("");
+    expect(params.player.stopPlayback).toHaveBeenCalledTimes(1);
   });
 });
