@@ -77,6 +77,7 @@ export interface RuntimeVoiceOption {
   id: string;
   label: string;
   localizedLabels?: Partial<Record<"de", string>>;
+  modelIds?: string[];
 }
 
 interface RuntimeLlmProviderManifest {
@@ -181,6 +182,14 @@ function voice(
   localizedLabels?: RuntimeVoiceOption["localizedLabels"],
 ): RuntimeVoiceOption {
   return localizedLabels ? { id, label, localizedLabels } : { id, label };
+}
+
+function voiceForModels(
+  id: string,
+  label: string,
+  modelIds: string[],
+): RuntimeVoiceOption {
+  return { id, label, modelIds };
 }
 
 const GEMINI_THINKING_LEVEL_OPTIONS: RuntimeModelEffortOption[] = [
@@ -719,9 +728,76 @@ export const RUNTIME_PROVIDER_MANIFEST: Record<
           ),
         ),
       ],
-      voiceOptions: [voice("Cherry", "Cherry")],
+      voiceOptions: [
+        voice("Cherry", "Cherry · Bright and friendly"),
+        voice("Serena", "Serena · Gentle"),
+        voice("Ethan", "Ethan · Warm and energetic"),
+        voice("Chelsie", "Chelsie · Animated"),
+        voice("Momo", "Momo · Playful"),
+        voice("Vivian", "Vivian · Confident"),
+        voice("Moon", "Moon · Bold"),
+        voice("Maia", "Maia · Gentle and thoughtful"),
+        voice("Kai", "Kai · Soothing"),
+        voice("Nofish", "Nofish · Casual"),
+        voice("Bella", "Bella · Bubbly"),
+        voice("Eldric Sage", "Eldric Sage · Wise and calm"),
+        voice("Mia", "Mia · Soft"),
+        voice("Mochi", "Mochi · Clever and youthful"),
+        voice("Bellona", "Bellona · Powerful and clear"),
+        voice("Vincent", "Vincent · Raspy and smoky"),
+        voice("Bunny", "Bunny · Childlike"),
+        voice("Neil", "Neil · Professional"),
+        voice("Elias", "Elias · Educational"),
+        voice("Arthur", "Arthur · Earthy storyteller"),
+        voice("Nini", "Nini · Sweet"),
+        voice("Seren", "Seren · Soothing"),
+        voice("Pip", "Pip · Mischievous"),
+        voice("Stella", "Stella · Dramatic"),
+        voiceForModels("Jennifer", "Jennifer · Cinematic American", [
+          "qwen3-tts-flash",
+        ]),
+        voiceForModels("Ryan", "Ryan · Dramatic", ["qwen3-tts-flash"]),
+        voiceForModels("Katerina", "Katerina · Mature", ["qwen3-tts-flash"]),
+        voiceForModels("Aiden", "Aiden · American", ["qwen3-tts-flash"]),
+        voiceForModels("Bodega", "Bodega · Passionate Spanish", [
+          "qwen3-tts-flash",
+        ]),
+        voiceForModels("Sonrisa", "Sonrisa · Cheerful Latin American", [
+          "qwen3-tts-flash",
+        ]),
+        voiceForModels("Alek", "Alek · Warm Russian", ["qwen3-tts-flash"]),
+        voiceForModels("Dolce", "Dolce · Laid-back Italian", [
+          "qwen3-tts-flash",
+        ]),
+        voiceForModels("Sohee", "Sohee · Expressive Korean", [
+          "qwen3-tts-flash",
+        ]),
+        voiceForModels("Ono Anna", "Ono Anna · Spirited Japanese", [
+          "qwen3-tts-flash",
+        ]),
+        voiceForModels("Lenn", "Lenn · Rebellious German", ["qwen3-tts-flash"]),
+        voiceForModels("Emilien", "Emilien · Romantic French", [
+          "qwen3-tts-flash",
+        ]),
+        voiceForModels("Andre", "Andre · Natural and steady", [
+          "qwen3-tts-flash",
+        ]),
+        voiceForModels("Radio Gol", "Radio Gol · Sports commentator", [
+          "qwen3-tts-flash",
+        ]),
+        voiceForModels("Jada", "Jada · Shanghainese", ["qwen3-tts-flash"]),
+        voiceForModels("Dylan", "Dylan · Beijing", ["qwen3-tts-flash"]),
+        voiceForModels("Li", "Li · Nanjing", ["qwen3-tts-flash"]),
+        voiceForModels("Marcus", "Marcus · Shaanxi", ["qwen3-tts-flash"]),
+        voiceForModels("Roy", "Roy · Southern Min", ["qwen3-tts-flash"]),
+        voiceForModels("Peter", "Peter · Tianjin", ["qwen3-tts-flash"]),
+        voiceForModels("Sunny", "Sunny · Sichuan", ["qwen3-tts-flash"]),
+        voiceForModels("Eric", "Eric · Sichuan", ["qwen3-tts-flash"]),
+        voiceForModels("Rocky", "Rocky · Cantonese", ["qwen3-tts-flash"]),
+        voiceForModels("Kiki", "Kiki · Cantonese", ["qwen3-tts-flash"]),
+      ],
       languageNote:
-        "DashScope TTS is limited to the standard non-realtime Qwen3-TTS-Flash families with the default Cherry voice. Realtime TTS rows stay catalog-only to keep the app on straightforward BYOK flows.",
+        "DashScope TTS is limited to the standard non-realtime Qwen3-TTS-Flash families. Mr Broccoli filters the official system voice library to the selected model; realtime and custom-voice rows stay catalog-only to keep the app on straightforward BYOK flows.",
     },
   },
   "bytedance-doubao-seed": {

@@ -124,9 +124,16 @@ function localizeVoiceOptions(
 export function getProviderTtsVoiceOptions(
   provider: Provider,
   language: AppLanguage,
+  modelId?: string,
 ) {
+  const voiceOptions = RUNTIME_PROVIDER_MANIFEST[provider].tts.voiceOptions;
+
   return localizeVoiceOptions(
-    RUNTIME_PROVIDER_MANIFEST[provider].tts.voiceOptions,
+    modelId
+      ? voiceOptions.filter(
+          (voice) => !voice.modelIds || voice.modelIds.includes(modelId),
+        )
+      : voiceOptions,
     language,
   );
 }

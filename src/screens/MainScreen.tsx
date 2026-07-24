@@ -296,7 +296,11 @@ export function MainScreen() {
         ? (
             providerVoiceDirectories[ttsProvider]?.voices.length
               ? providerVoiceDirectories[ttsProvider]?.voices ?? []
-              : getProviderTtsVoiceOptions(ttsProvider, language)
+              : getProviderTtsVoiceOptions(
+                  ttsProvider,
+                  language,
+                  selectedTtsModel,
+                )
           ).map((voice) => ({
             value:
               "value" in voice && typeof voice.value === "string"
@@ -304,7 +308,11 @@ export function MainScreen() {
                 : voice.id,
             label: voice.label,
           }))
-        : getProviderTtsVoiceOptions(ttsProvider, language).map((voice) => ({
+        : getProviderTtsVoiceOptions(
+            ttsProvider,
+            language,
+            selectedTtsModel,
+          ).map((voice) => ({
             value: voice.id,
             label: voice.label,
           }))

@@ -171,7 +171,12 @@ export function getNormalizedProviderTtsVoices(
   let changed = false;
 
   for (const provider of enabledTtsProviders) {
-    const supportedVoices = getProviderTtsVoiceOptions(provider, language);
+    const supportedVoices = getProviderTtsVoiceOptions(
+      provider,
+      language,
+      settings.providerTtsModels[provider] ||
+        PROVIDER_DEFAULT_TTS_MODELS[provider],
+    );
     const defaultVoice =
       PROVIDER_DEFAULT_TTS_VOICES[provider] || supportedVoices[0]?.id;
 

@@ -3,6 +3,7 @@ import {
   PROVIDER_DEFAULT_TTS_MODELS,
   getProviderSttModelOptions,
   getProviderTtsModelOptions,
+  getProviderTtsVoiceOptions,
   getSttModelLabel,
   getTtsModelLabel,
   getTtsVoiceLabel,
@@ -88,5 +89,28 @@ describe("speech provider constants", () => {
 
   it("surfaces catalog-backed TTS voice labels", () => {
     expect(getTtsVoiceLabel("openai", "alloy", "en")).toBe("Alloy");
+  });
+
+  it("filters the official Qwen system voices to the selected TTS model", () => {
+    const flashVoices = getProviderTtsVoiceOptions(
+      "alibaba-qwen-dashscope",
+      "en",
+      "qwen3-tts-flash",
+    );
+    const instructVoices = getProviderTtsVoiceOptions(
+      "alibaba-qwen-dashscope",
+      "en",
+      "qwen3-tts-instruct-flash",
+    );
+
+    expect(flashVoices).toHaveLength(48);
+    expect(flashVoices.map((voice) => voice.id)).toEqual(
+      expect.arrayContaining(["Cherry", "Jennifer", "Kiki"]),
+    );
+    expect(instructVoices).toHaveLength(24);
+    expect(instructVoices.map((voice) => voice.id)).toEqual(
+      expect.arrayContaining(["Cherry", "Eldric Sage", "Stella"]),
+    );
+    expect(instructVoices.map((voice) => voice.id)).not.toContain("Jennifer");
   });
 });

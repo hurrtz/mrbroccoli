@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 
 import {
+  PROVIDER_DEFAULT_TTS_MODELS,
   PROVIDER_DEFAULT_TTS_VOICES,
   getProviderTtsVoiceOptions,
 } from "../../constants/models";
@@ -95,7 +96,12 @@ export function useVoicePreviewState(params: {
       const selectedVoice =
         settings.providerTtsVoices[provider] ||
         PROVIDER_DEFAULT_TTS_VOICES[provider] ||
-        getProviderTtsVoiceOptions(provider, language)[0]?.id ||
+        getProviderTtsVoiceOptions(
+          provider,
+          language,
+          settings.providerTtsModels[provider] ||
+            PROVIDER_DEFAULT_TTS_MODELS[provider],
+        )[0]?.id ||
         "";
 
       await handleExactPreview(`provider:${provider}:${previewLanguage}`, {
@@ -112,6 +118,7 @@ export function useVoicePreviewState(params: {
       language,
       providerPreviewTexts,
       settings.providerTtsVoices,
+      settings.providerTtsModels,
       settings.ttsInstructions,
     ],
   );

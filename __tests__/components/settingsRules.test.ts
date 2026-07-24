@@ -125,4 +125,26 @@ describe("settingsRules", () => {
 
     expect(nextProviderVoices).toBeNull();
   });
+
+  it("repairs a Qwen voice that is unavailable on the selected TTS model", () => {
+    const settings = {
+      ...DEFAULT_SETTINGS,
+      providerTtsModels: {
+        ...DEFAULT_SETTINGS.providerTtsModels,
+        "alibaba-qwen-dashscope": "qwen3-tts-instruct-flash",
+      },
+      providerTtsVoices: {
+        ...DEFAULT_SETTINGS.providerTtsVoices,
+        "alibaba-qwen-dashscope": "Jennifer",
+      },
+    };
+
+    const nextProviderVoices = getNormalizedProviderTtsVoices(
+      settings,
+      ["alibaba-qwen-dashscope"],
+      "en",
+    );
+
+    expect(nextProviderVoices?.["alibaba-qwen-dashscope"]).toBe("Cherry");
+  });
 });

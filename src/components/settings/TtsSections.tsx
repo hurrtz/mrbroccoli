@@ -10,6 +10,7 @@ import Feather from "@expo/vector-icons/Feather";
 
 import { getTtsListenLanguageLabel } from "../../constants/localTts";
 import {
+  PROVIDER_DEFAULT_TTS_MODELS,
   PROVIDER_DEFAULT_TTS_VOICES,
   PROVIDER_LABELS,
   getProviderTtsVoiceOptions,
@@ -71,12 +72,16 @@ export function ProviderVoicePreviewSection({
 
   const voiceDirectory = providerVoiceDirectories[provider];
   const hasVoiceDirectory = providerUsesTtsVoiceDirectory(provider);
+  const selectedModel =
+    settings.providerTtsModels[provider] ||
+    PROVIDER_DEFAULT_TTS_MODELS[provider] ||
+    "";
   const voiceOptions =
     hasVoiceDirectory
       ? (
           voiceDirectory?.voices.length
             ? voiceDirectory.voices
-            : getProviderTtsVoiceOptions(provider, language)
+            : getProviderTtsVoiceOptions(provider, language, selectedModel)
         ).map((voice) => ({
           value:
             "value" in voice && typeof voice.value === "string"
@@ -84,7 +89,11 @@ export function ProviderVoicePreviewSection({
               : voice.id,
           label: voice.label,
         }))
-      : getProviderTtsVoiceOptions(provider, language).map((voice) => ({
+      : getProviderTtsVoiceOptions(
+          provider,
+          language,
+          selectedModel,
+        ).map((voice) => ({
           value: voice.id,
           label: voice.label,
         }));
