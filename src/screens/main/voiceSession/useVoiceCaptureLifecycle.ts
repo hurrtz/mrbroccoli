@@ -311,6 +311,15 @@ export function useVoiceCaptureLifecycle({
     return stopPromise;
   }, [performStopVoiceCapture]);
 
+  const hasActiveVoiceCaptureNow = useCallback(
+    () =>
+      Boolean(recordingStartedRef.current) ||
+      captureActiveRef.current ||
+      isRecording ||
+      Boolean(stopInFlightRef.current),
+    [isRecording],
+  );
+
   const cancelVoiceCapture = useCallback(() => {
     if (cancelInFlightRef.current) {
       return cancelInFlightRef.current;
@@ -394,6 +403,7 @@ export function useVoiceCaptureLifecycle({
 
   return {
     cancelVoiceCapture,
+    hasActiveVoiceCaptureNow,
     startVoiceCapture,
     stopVoiceCapture,
   };

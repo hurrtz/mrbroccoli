@@ -179,11 +179,13 @@ describe("useVoiceCaptureLifecycle auto-stop", () => {
     await act(async () => {
       start = result.current.startVoiceCapture();
       await Promise.resolve();
+      expect(result.current.hasActiveVoiceCaptureNow()).toBe(true);
       cancel = result.current.cancelVoiceCapture();
       finishRouteSettle?.();
       await Promise.all([start, cancel]);
     });
 
+    expect(result.current.hasActiveVoiceCaptureNow()).toBe(false);
     expect(params.recorder.startRecording).not.toHaveBeenCalled();
     expect(params.recorder.stopRecording).not.toHaveBeenCalled();
     expect(params.processCapturedVoiceTurn).not.toHaveBeenCalled();

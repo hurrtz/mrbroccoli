@@ -4,13 +4,13 @@ import { AppState } from "react-native";
 import { recordDebugLogEvent } from "../../../services/debugLogCapture";
 
 interface UseVoiceSessionAppStateParams {
-  isRecording: boolean;
+  hasActiveVoiceCaptureNow: () => boolean;
   onBackgroundSubmitError: (error: unknown) => void;
   stopVoiceCapture: () => Promise<void>;
 }
 
 export function useVoiceSessionAppState({
-  isRecording,
+  hasActiveVoiceCaptureNow,
   onBackgroundSubmitError,
   stopVoiceCapture,
 }: UseVoiceSessionAppStateParams) {
@@ -20,7 +20,7 @@ export function useVoiceSessionAppState({
         return;
       }
 
-      if (!isRecording) {
+      if (!hasActiveVoiceCaptureNow()) {
         return;
       }
 
@@ -49,7 +49,7 @@ export function useVoiceSessionAppState({
       subscription.remove();
     };
   }, [
-    isRecording,
+    hasActiveVoiceCaptureNow,
     onBackgroundSubmitError,
     stopVoiceCapture,
   ]);

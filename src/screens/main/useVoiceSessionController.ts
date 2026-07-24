@@ -72,8 +72,12 @@ export function useVoiceSessionController({
     });
   }, [settings.sttMode, settings.providerSttModels, sttProvider]);
 
-  const { cancelVoiceCapture, startVoiceCapture, stopVoiceCapture } =
-    useVoiceCaptureLifecycle({
+  const {
+    cancelVoiceCapture,
+    hasActiveVoiceCaptureNow,
+    startVoiceCapture,
+    stopVoiceCapture,
+  } = useVoiceCaptureLifecycle({
       isRecording,
       maxRecordingMs,
       nativeStt,
@@ -88,7 +92,7 @@ export function useVoiceSessionController({
     });
 
   useVoiceSessionAppState({
-    isRecording,
+    hasActiveVoiceCaptureNow,
     onBackgroundSubmitError: (error) => {
       showToast(
         error instanceof Error ? error.message : t("couldntProcessVoiceInput"),

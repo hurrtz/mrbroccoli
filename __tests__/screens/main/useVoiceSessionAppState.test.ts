@@ -24,18 +24,22 @@ describe("useVoiceSessionAppState", () => {
     jest.restoreAllMocks();
   });
 
-  it("stops and submits an active capture when the app backgrounds", async () => {
+  it("reads the live capture state when the app backgrounds", async () => {
     const stopVoiceCapture = jest.fn(async () => undefined);
     const onBackgroundSubmitError = jest.fn();
+    let captureActive = false;
     renderHook(() =>
       useVoiceSessionAppState({
-        isRecording: true,
+        hasActiveVoiceCaptureNow: () => captureActive,
         onBackgroundSubmitError,
         stopVoiceCapture,
       }),
     );
 
     await act(async () => {
+      // Capture can start between React renders while the iOS audio route is
+      // settling. The AppState callback must read lifecycle refs at event time.
+      captureActive = true;
       appStateListener?.("background");
       await Promise.resolve();
     });
@@ -48,7 +52,7 @@ describe("useVoiceSessionAppState", () => {
     const stopVoiceCapture = jest.fn(async () => undefined);
     renderHook(() =>
       useVoiceSessionAppState({
-        isRecording: false,
+        hasActiveVoiceCaptureNow: () => false,
         onBackgroundSubmitError: jest.fn(),
         stopVoiceCapture,
       }),
@@ -60,5 +64,28 @@ describe("useVoiceSessionAppState", () => {
     });
 
     expect(stopVoiceCapture).not.toHaveBeenCalled();
+  });
+
+  it("reports a background capture stop failure", async () => {
+    const failure = new Error("Recorder stop failed");
+    const stopVoiceCapture = jest.fn(async () => {
+      throw failure;
+    });
+    const onBackgroundSubmitError = jest.fn();
+    renderHook(() =>
+      useVoiceSessionAppState({
+        hasActiveVoiceCaptureNow: () => true,
+        onBackgroundSubmitError,
+        stopVoiceCapture,
+      }),
+    );
+
+    await act(async () => {
+      appStateListener?.("background");
+      await Promise.resolve();
+      await Promise.resolve();
+    });
+
+    expect(onBackgroundSubmitError).toHaveBeenCalledWith(failure);
   });
 });
