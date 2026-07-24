@@ -57,6 +57,7 @@ export function useVoiceCaptureHandler({
   addMessage,
   assistantInstructions,
   createConversation,
+  initialConversationSettings,
   handleRepeatLastReply,
   language,
   lastCompletedReplyRef,
@@ -71,6 +72,7 @@ export function useVoiceCaptureHandler({
   selectedSttModel,
   selectedTtsModel,
   selectedTtsVoice,
+  ttsInstructions,
   setPhaseProgress,
   setPipelinePhase,
   setStreamingText,
@@ -313,6 +315,7 @@ export function useVoiceCaptureHandler({
           ttsApiKey,
           ttsModel: selectedTtsModel,
           ttsVoice: selectedTtsVoice,
+          ttsInstructions,
           ttsListenLanguages,
           replyPlayback,
           spokenRepliesEnabled,
@@ -342,7 +345,16 @@ export function useVoiceCaptureHandler({
                 return;
               }
               if (!activeConversation) {
-                createConversation(text, model, provider);
+                if (initialConversationSettings) {
+                  createConversation(
+                    text,
+                    model,
+                    provider,
+                    initialConversationSettings,
+                  );
+                } else {
+                  createConversation(text, model, provider);
+                }
               }
               const userMessage = addMessage({
                 role: "user",

@@ -14,6 +14,7 @@ type ReplayControllerParams = Pick<
   | "language"
   | "selectedTtsModel"
   | "selectedTtsVoice"
+  | "ttsInstructions"
   | "showToast"
   | "t"
   | "ttsApiKey"
@@ -35,6 +36,7 @@ export function useReplyReplayController({
   player,
   selectedTtsModel,
   selectedTtsVoice,
+  ttsInstructions,
   showToast,
   t,
   ttsApiKey,
@@ -150,6 +152,7 @@ export function useReplyReplayController({
           ttsModel: selectedTtsModel,
           ttsProvider,
           ttsVoice: selectedTtsVoice,
+          ttsInstructions,
         });
 
         await replayQueue.handleResponseDone(trimmed);
@@ -176,6 +179,7 @@ export function useReplyReplayController({
       player,
       selectedTtsModel,
       selectedTtsVoice,
+      ttsInstructions,
       showToast,
       t,
       ttsApiKey,

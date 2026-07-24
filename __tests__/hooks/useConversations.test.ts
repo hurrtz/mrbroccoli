@@ -210,6 +210,58 @@ describe("useConversations", () => {
     expect(result.current.activeConversation!.messages).toHaveLength(1);
   });
 
+  it("persists settings on one conversation without leaking into another", async () => {
+    const stored = new Map<string, string>();
+    (AsyncStorage.getItem as jest.Mock).mockImplementation(
+      async (key: string) => stored.get(key) ?? null,
+    );
+    (AsyncStorage.setItem as jest.Mock).mockImplementation(
+      async (key: string, value: string) => {
+        stored.set(key, value);
+      },
+    );
+    const { result } = renderHook(() => useConversations());
+
+    await act(async () => {
+      result.current.createConversation("First");
+      result.current.updateConversationSettings({
+        responseLength: "thorough",
+        llmInstructions: "Focus on architecture trade-offs.",
+        ttsVoice: {
+          provider: "openai",
+          model: "gpt-4o-mini-tts",
+          voice: "nova",
+        },
+      });
+    });
+    const firstId = result.current.activeConversation!.id;
+
+    await act(async () => {
+      result.current.clearActiveConversation();
+      result.current.createConversation("Second");
+    });
+
+    expect(result.current.activeConversation?.settings).toBeUndefined();
+
+    await act(async () => {
+      await result.current.selectConversation(firstId);
+    });
+
+    expect(result.current.activeConversation?.settings).toEqual({
+      responseLength: "thorough",
+      llmInstructions: "Focus on architecture trade-offs.",
+      ttsVoice: {
+        provider: "openai",
+        model: "gpt-4o-mini-tts",
+        voice: "nova",
+      },
+    });
+    expect(AsyncStorage.setItem).toHaveBeenCalledWith(
+      `@mrbroccoli/conversation/${firstId}`,
+      expect.stringContaining('"responseLength":"thorough"'),
+    );
+  });
+
   it("updates a stored message in place", async () => {
     const { result } = renderHook(() => useConversations());
 

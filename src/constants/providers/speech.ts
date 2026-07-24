@@ -135,6 +135,17 @@ export function getProviderTtsModelOptions(provider: Provider) {
   return PROVIDER_TTS_MODEL_OPTIONS[provider] ?? [];
 }
 
+export function providerTtsModelSupportsInstructions(
+  provider: Provider,
+  modelId: string,
+) {
+  return (
+    RUNTIME_PROVIDER_MANIFEST[provider].tts.models.find(
+      (model) => model.id === modelId,
+    )?.supportsInstructions === true
+  );
+}
+
 export function getTtsModelLabel(provider: Provider, modelId: string) {
   const option = getProviderTtsModelOptions(provider).find(
     (model) => model.id === modelId,

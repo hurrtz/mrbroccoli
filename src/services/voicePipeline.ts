@@ -28,6 +28,7 @@ export async function runVoicePipeline(
     ttsApiKey,
     ttsModel,
     ttsVoice,
+    ttsInstructions,
     ttsListenLanguages,
     replyPlayback,
     spokenRepliesEnabled = true,
@@ -207,6 +208,7 @@ export async function runVoicePipeline(
       ttsModel,
       ttsProvider,
       ttsVoice,
+      ttsInstructions,
     });
 
     recordDebugLogEvent({

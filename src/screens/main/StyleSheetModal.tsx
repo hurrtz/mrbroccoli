@@ -6,6 +6,7 @@ import {
   ScrollView,
   StyleSheet,
   Text,
+  TextInput,
   TouchableOpacity,
   View,
   useWindowDimensions,
@@ -14,6 +15,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import Feather from "@expo/vector-icons/Feather";
 
 import { APP_MODAL_ORIENTATIONS } from "../../constants/layout";
+import { Picker } from "../../components/Picker";
 import {
   getResponseLengthOptions,
   getResponseToneOptions,
@@ -28,13 +30,22 @@ interface StyleSheetModalProps {
   canAutoRenameConversation: boolean;
   isAutoRenamingConversation: boolean;
   visible: boolean;
+  llmInstructions: string;
   responseLength: AssistantResponseLength;
   responseTone: AssistantResponseTone;
+  ttsInstructions: string;
+  ttsInstructionsSupported: boolean;
+  ttsRouteLabel: string | null;
+  ttsVoice: string;
+  ttsVoiceOptions: { value: string; label: string }[];
   onChange: (
     partial:
       | { responseLength: AssistantResponseLength }
       | { responseTone: AssistantResponseTone },
   ) => void;
+  onLlmInstructionsChange: (instructions: string) => void;
+  onTtsInstructionsChange: (instructions: string) => void;
+  onTtsVoiceChange: (voice: string) => void;
   onAutoRenameConversation: () => void;
   onClose: () => void;
 }
@@ -43,9 +54,18 @@ export function StyleSheetModal({
   canAutoRenameConversation,
   isAutoRenamingConversation,
   visible,
+  llmInstructions,
   responseLength,
   responseTone,
+  ttsInstructions,
+  ttsInstructionsSupported,
+  ttsRouteLabel,
+  ttsVoice,
+  ttsVoiceOptions,
   onChange,
+  onLlmInstructionsChange,
+  onTtsInstructionsChange,
+  onTtsVoiceChange,
   onAutoRenameConversation,
   onClose,
 }: StyleSheetModalProps) {
@@ -89,10 +109,12 @@ export function StyleSheetModal({
         >
           <ScrollView
             style={styles.styleSheetScroll}
+            automaticallyAdjustKeyboardInsets
             contentContainerStyle={[
               styles.styleSheetScrollContent,
               isLandscape ? styles.styleSheetScrollContentLandscape : null,
             ]}
+            keyboardDismissMode={isLandscape ? "on-drag" : "interactive"}
             showsVerticalScrollIndicator={false}
             keyboardShouldPersistTaps="handled"
           >
@@ -109,6 +131,142 @@ export function StyleSheetModal({
                 {t("styleSheetSubtitle")}
               </Text>
             </View>
+
+            <View
+              style={
+                isLandscape
+                  ? styles.styleSheetInstructionRowLandscape
+                  : styles.styleSheetOptionsColumn
+              }
+            >
+              <View
+                style={[
+                  styles.styleSheetGroup,
+                  isLandscape ? styles.styleSheetGroupLandscape : null,
+                ]}
+              >
+                <Text
+                  style={[
+                    styles.styleSheetGroupLabel,
+                    { color: colors.textMuted },
+                  ]}
+                >
+                  {t("conversationThinkingInstructions")}
+                </Text>
+                <Text
+                  style={[
+                    styles.styleSheetDescription,
+                    { color: colors.textSecondary },
+                  ]}
+                >
+                  {t("conversationThinkingInstructionsDescription")}
+                </Text>
+                <TextInput
+                  testID="conversation-llm-instructions"
+                  value={llmInstructions}
+                  onChangeText={onLlmInstructionsChange}
+                  multiline
+                  placeholder={t(
+                    "conversationThinkingInstructionsPlaceholder",
+                  )}
+                  placeholderTextColor={colors.textMuted}
+                  selectionColor={colors.accent}
+                  textAlignVertical="top"
+                  style={[
+                    styles.styleSheetInstructionInput,
+                    {
+                      backgroundColor: colors.surfaceElevated,
+                      borderColor: colors.border,
+                      color: colors.text,
+                    },
+                  ]}
+                />
+              </View>
+
+              <View
+                style={[
+                  styles.styleSheetGroup,
+                  isLandscape ? styles.styleSheetGroupLandscape : null,
+                ]}
+              >
+                <Text
+                  style={[
+                    styles.styleSheetGroupLabel,
+                    { color: colors.textMuted },
+                  ]}
+                >
+                  {t("ttsInstructions")}
+                </Text>
+                <Text
+                  style={[
+                    styles.styleSheetDescription,
+                    {
+                      color: ttsInstructionsSupported
+                        ? colors.textSecondary
+                        : colors.textMuted,
+                    },
+                  ]}
+                >
+                  {t(
+                    ttsInstructionsSupported
+                      ? "conversationTtsInstructionsDescription"
+                      : "ttsInstructionsUnsupported",
+                  )}
+                </Text>
+                <TextInput
+                  testID="conversation-tts-instructions"
+                  value={ttsInstructions}
+                  onChangeText={onTtsInstructionsChange}
+                  editable={ttsInstructionsSupported}
+                  multiline
+                  placeholder={t("ttsInstructionsPlaceholder")}
+                  placeholderTextColor={colors.textMuted}
+                  selectionColor={colors.accent}
+                  textAlignVertical="top"
+                  style={[
+                    styles.styleSheetInstructionInput,
+                    {
+                      backgroundColor: colors.surfaceElevated,
+                      borderColor: colors.border,
+                      color: colors.text,
+                      opacity: ttsInstructionsSupported ? 1 : 0.55,
+                    },
+                  ]}
+                />
+              </View>
+            </View>
+
+            {ttsRouteLabel && ttsVoiceOptions.length > 0 ? (
+              <View style={styles.styleSheetGroup}>
+                <Text
+                  style={[
+                    styles.styleSheetGroupLabel,
+                    { color: colors.textMuted },
+                  ]}
+                >
+                  {t("ttsVoice")}
+                </Text>
+                <Text
+                  style={[
+                    styles.styleSheetDescription,
+                    { color: colors.textSecondary },
+                  ]}
+                >
+                  {t("conversationVoiceDescription", {
+                    route: ttsRouteLabel,
+                  })}
+                </Text>
+                <Picker
+                  label={t("ttsVoice")}
+                  value={ttsVoice}
+                  options={ttsVoiceOptions}
+                  onChange={onTtsVoiceChange}
+                  dropdownLabel={ttsRouteLabel}
+                  hideLabel
+                  containerStyle={styles.styleSheetVoicePicker}
+                />
+              </View>
+            ) : null}
 
             <View
               style={

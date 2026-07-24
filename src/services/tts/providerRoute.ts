@@ -1,4 +1,7 @@
-import { PROVIDER_LABELS } from "../../constants/models";
+import {
+  PROVIDER_LABELS,
+  providerTtsModelSupportsInstructions,
+} from "../../constants/models";
 import { RuntimeTtsBinaryRequestFormat } from "../../constants/providers/runtimeManifest";
 import { translate } from "../../i18n";
 import { AppLanguage, Provider } from "../../types";
@@ -116,6 +119,7 @@ async function fetchTtsWithRetries(params: {
 }
 
 function buildBinaryTtsRequestBody(params: {
+  instructions: string;
   requestFormat: RuntimeTtsBinaryRequestFormat;
   selectedModel: string;
   selectedVoice: string;
@@ -141,9 +145,23 @@ function buildBinaryTtsRequestBody(params: {
         model: params.selectedModel,
         voice: params.selectedVoice,
         input: params.text,
+        ...(params.instructions
+          ? { instructions: params.instructions }
+          : {}),
         response_format: "mp3",
       };
   }
+}
+
+function buildGeminiTtsPrompt(text: string, instructions: string) {
+  return [
+    "Synthesize speech for the transcript below.",
+    instructions ? `Performance instructions:\n${instructions}` : "",
+    "Read the transcript exactly as written without adding or removing words.",
+    `Transcript:\n${text}`,
+  ]
+    .filter(Boolean)
+    .join("\n\n");
 }
 
 function getBinaryTtsFileExtension(
@@ -174,6 +192,7 @@ export async function synthesizeProviderSpeech(params: {
   providerModel?: string;
   apiKey?: string;
   language: AppLanguage;
+  instructions?: string;
   abortSignal?: AbortSignal;
 }) {
   const {
@@ -183,6 +202,7 @@ export async function synthesizeProviderSpeech(params: {
     providerModel,
     apiKey,
     language,
+    instructions,
     abortSignal,
   } = params;
   const config = TTS_PROVIDER_CONFIGS[provider];
@@ -222,6 +242,11 @@ export async function synthesizeProviderSpeech(params: {
     providerModel,
     config,
   });
+  const selectedInstructions =
+    instructions?.trim() &&
+    providerTtsModelSupportsInstructions(provider, selectedModel)
+      ? instructions.trim()
+      : "";
 
   if (config.kind === "gemini") {
     const response = await fetchTtsWithRetries({
@@ -237,7 +262,7 @@ export async function synthesizeProviderSpeech(params: {
             {
               parts: [
                 {
-                  text: `Read the following text aloud exactly as written without adding or removing words:\n\n${text}`,
+                  text: buildGeminiTtsPrompt(text, selectedInstructions),
                 },
               ],
             },
@@ -298,6 +323,9 @@ export async function synthesizeProviderSpeech(params: {
           input: {
             text,
             voice: selectedVoice,
+            ...(selectedInstructions
+              ? { instructions: selectedInstructions }
+              : {}),
           },
         }),
       },
@@ -341,6 +369,7 @@ export async function synthesizeProviderSpeech(params: {
   });
 
   const requestBody = buildBinaryTtsRequestBody({
+    instructions: selectedInstructions,
     requestFormat: config.requestFormat,
     selectedModel,
     selectedVoice: resolvedVoice,

@@ -157,8 +157,25 @@ export const en: TranslationDictionary = {
   responseTone: "Response Tone",
   homeStyleChipLabel: ({ tone, length }) => `Style — ${tone} · ${length}`,
   styleSheetTitle: "Conversation settings",
-  styleSheetSubtitle: "Shape replies and manage this conversation.",
+  styleSheetSubtitle:
+    "Shape replies and speech for this conversation only.",
   openStyleSheet: "Open conversation settings",
+  conversationThinkingInstructions: "Thinking instructions",
+  conversationThinkingInstructionsDescription:
+    "Add instructions after the global system prompt for this conversation.",
+  conversationThinkingInstructionsPlaceholder:
+    "For example: Challenge my assumptions and use concrete examples.",
+  ttsInstructions: "Speech delivery instructions",
+  ttsInstructionsDescription:
+    "Guide the tone, pace, accent, or delivery used by compatible speech models.",
+  conversationTtsInstructionsDescription:
+    "Add delivery instructions after the global speech instructions for this conversation.",
+  ttsInstructionsPlaceholder:
+    "For example: Speak warmly, clearly, and at a relaxed pace.",
+  ttsInstructionsUnsupported:
+    "The current speech route does not support delivery instructions.",
+  conversationVoiceDescription: ({ route }) =>
+    `Choose the voice used by ${route} in this conversation.`,
   scrollToLatest: "Scroll to latest message",
   conversationTitle: "Conversation Title",
   conversationTitleGenerationDescription:

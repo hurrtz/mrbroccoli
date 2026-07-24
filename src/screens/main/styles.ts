@@ -387,6 +387,11 @@ export const styles = StyleSheet.create({
     alignItems: "flex-start",
     gap: 16,
   },
+  styleSheetInstructionRowLandscape: {
+    flexDirection: "row",
+    alignItems: "stretch",
+    gap: 16,
+  },
   styleSheetGroupLabel: {
     fontSize: 11,
     letterSpacing: 1,
@@ -414,6 +419,19 @@ export const styles = StyleSheet.create({
     lineHeight: 18,
     fontFamily: fonts.body,
     paddingHorizontal: 4,
+  },
+  styleSheetInstructionInput: {
+    minHeight: 88,
+    borderRadius: 12,
+    borderWidth: 1,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    fontSize: 13,
+    lineHeight: 19,
+    fontFamily: fonts.body,
+  },
+  styleSheetVoicePicker: {
+    marginBottom: 0,
   },
   styleSheetAutoRenameCard: {
     borderRadius: 12,

@@ -82,6 +82,7 @@ export type VoicePreviewRequest =
       mode: "provider";
       provider: Provider;
       voice: string;
+      instructions?: string;
       previewLanguage: TtsListenLanguage;
     };
 export type VoiceVisualPhase =
@@ -135,6 +136,7 @@ export interface Settings {
   ttsMode: TtsBackendMode;
   ttsProvider: Provider | null;
   ttsListenLanguages: TtsListenLanguage[];
+  ttsInstructions: string;
   assistantInstructions: string;
   responseLength: AssistantResponseLength;
   responseTone: AssistantResponseTone;
@@ -259,6 +261,7 @@ export const DEFAULT_SETTINGS: Settings = {
   ttsMode: "native",
   ttsProvider: null,
   ttsListenLanguages: getDefaultTtsListenLanguages("en"),
+  ttsInstructions: "",
   assistantInstructions: getDefaultAssistantInstructions("en"),
   responseLength: "normal",
   responseTone: "professional",
@@ -290,12 +293,27 @@ export interface ConversationUsageEvent {
   usage: UsageEstimate;
 }
 
+export interface ConversationTtsVoiceSetting {
+  provider: Provider;
+  model: string;
+  voice: string;
+}
+
+export interface ConversationSettings {
+  responseLength?: AssistantResponseLength;
+  responseTone?: AssistantResponseTone;
+  llmInstructions?: string;
+  ttsInstructions?: string;
+  ttsVoice?: ConversationTtsVoiceSetting;
+}
+
 export interface Conversation {
   id: string;
   title: string;
   createdAt: string;
   updatedAt: string;
   messages: Message[];
+  settings?: ConversationSettings;
   usageEvents?: ConversationUsageEvent[];
   contextSummary?: string;
   summarizedMessageCount?: number;

@@ -112,6 +112,7 @@ export async function synthesizeSpeech(params: {
   provider?: Provider | null;
   providerModel?: string;
   apiKey?: string;
+  instructions?: string;
   language: AppLanguage;
   listenLanguages?: TtsListenLanguage[];
   diagnostics?: SpeechDiagnosticsContext;
@@ -125,6 +126,7 @@ export async function synthesizeSpeech(params: {
     provider,
     providerModel,
     apiKey,
+    instructions,
     language,
     listenLanguages,
     diagnostics,
@@ -189,6 +191,7 @@ export async function synthesizeSpeech(params: {
       provider,
       providerModel,
       apiKey,
+      instructions,
       language,
       abortSignal,
     });
@@ -234,6 +237,7 @@ export async function synthesizeSpeechSequence(params: {
   provider?: Provider | null;
   providerModel?: string;
   apiKey?: string;
+  instructions?: string;
   language: AppLanguage;
   listenLanguages?: TtsListenLanguage[];
   diagnostics?: SpeechDiagnosticsContext;

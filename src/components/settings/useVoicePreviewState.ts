@@ -103,6 +103,7 @@ export function useVoicePreviewState(params: {
         mode: "provider",
         provider,
         voice: selectedVoice,
+        instructions: settings.ttsInstructions,
         previewLanguage,
       });
     },
@@ -111,6 +112,7 @@ export function useVoicePreviewState(params: {
       language,
       providerPreviewTexts,
       settings.providerTtsVoices,
+      settings.ttsInstructions,
     ],
   );
 

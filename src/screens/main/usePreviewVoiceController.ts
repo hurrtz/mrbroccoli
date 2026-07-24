@@ -147,6 +147,7 @@ export function usePreviewVoiceController({
             provider: request.provider,
             providerModel,
             apiKey: providerApiKey,
+            instructions: request.instructions,
             language,
             listenLanguages: [request.previewLanguage],
             diagnostics: providerSpeechDiagnostics,

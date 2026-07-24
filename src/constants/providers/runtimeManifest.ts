@@ -45,6 +45,7 @@ export interface RuntimeModelSpec {
   fallbackName?: string;
   releaseDate?: string;
   effort?: RuntimeModelEffortConfig;
+  supportsInstructions?: boolean;
 }
 
 export type RuntimeModelEffortTransportParam =
@@ -159,6 +160,13 @@ function withEffort(
   return {
     ...modelSpec,
     effort,
+  };
+}
+
+function withInstructions(modelSpec: RuntimeModelSpec): RuntimeModelSpec {
+  return {
+    ...modelSpec,
+    supportsInstructions: true,
   };
 }
 
@@ -552,7 +560,7 @@ export const RUNTIME_PROVIDER_MANIFEST: Record<
       defaultVoice: "alloy",
       voiceFallback: "alloy",
       models: [
-        namedModel("gpt-4o-mini-tts", "GPT-4o Mini TTS"),
+        withInstructions(namedModel("gpt-4o-mini-tts", "GPT-4o Mini TTS")),
         namedModel("tts-1", "tts-1"),
         namedModel("tts-1-hd", "tts-1-hd"),
       ],
@@ -698,7 +706,12 @@ export const RUNTIME_PROVIDER_MANIFEST: Record<
       voiceFallback: "Cherry",
       models: [
         namedModel("qwen3-tts-flash", "Qwen3-TTS-Flash"),
-        namedModel("qwen3-tts-instruct-flash", "Qwen3-TTS-Instruct-Flash"),
+        withInstructions(
+          namedModel(
+            "qwen3-tts-instruct-flash",
+            "Qwen3-TTS-Instruct-Flash",
+          ),
+        ),
       ],
       voiceOptions: [voice("Cherry", "Cherry")],
       languageNote:
@@ -841,17 +854,23 @@ export const RUNTIME_PROVIDER_MANIFEST: Record<
       defaultVoice: "Kore",
       voiceFallback: "Kore",
       models: [
-        namedModel(
-          "gemini-3.1-flash-tts-preview",
-          "Gemini 3.1 Flash TTS Preview",
+        withInstructions(
+          namedModel(
+            "gemini-3.1-flash-tts-preview",
+            "Gemini 3.1 Flash TTS Preview",
+          ),
         ),
-        namedModel(
-          "gemini-2.5-flash-preview-tts",
-          "Gemini 2.5 Flash Preview TTS",
+        withInstructions(
+          namedModel(
+            "gemini-2.5-flash-preview-tts",
+            "Gemini 2.5 Flash Preview TTS",
+          ),
         ),
-        namedModel(
-          "gemini-2.5-pro-preview-tts",
-          "Gemini 2.5 Pro Preview TTS",
+        withInstructions(
+          namedModel(
+            "gemini-2.5-pro-preview-tts",
+            "Gemini 2.5 Pro Preview TTS",
+          ),
         ),
       ],
       voiceOptions: [

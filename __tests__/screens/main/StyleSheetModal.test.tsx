@@ -20,10 +20,22 @@ describe("StyleSheetModal", () => {
         canAutoRenameConversation
         isAutoRenamingConversation={false}
         visible
+        llmInstructions=""
         responseLength="brief"
         responseTone="casual"
+        ttsInstructions=""
+        ttsInstructionsSupported
+        ttsRouteLabel="OpenAI · GPT-4o Mini TTS"
+        ttsVoice="alloy"
+        ttsVoiceOptions={[
+          { value: "alloy", label: "Alloy" },
+          { value: "nova", label: "Nova" },
+        ]}
         onAutoRenameConversation={onAutoRenameConversation}
         onChange={onChange}
+        onLlmInstructionsChange={jest.fn()}
+        onTtsInstructionsChange={jest.fn()}
+        onTtsVoiceChange={jest.fn()}
         onClose={onClose}
         {...overrides}
       />,
@@ -35,7 +47,7 @@ describe("StyleSheetModal", () => {
     const { getByText } = setup();
     expect(getByText("Conversation settings")).toBeTruthy();
     expect(
-      getByText("Shape replies and manage this conversation."),
+      getByText("Shape replies and speech for this conversation only."),
     ).toBeTruthy();
     // brief description
     expect(getByText(/Keep the answer tight/)).toBeTruthy();
@@ -84,6 +96,56 @@ describe("StyleSheetModal", () => {
     const { getByText, onChange } = setup();
     fireEvent.press(getByText("Nerdy"));
     expect(onChange).toHaveBeenCalledWith({ responseTone: "nerdy" });
+  });
+
+  it("edits conversation-specific LLM and TTS instructions", () => {
+    const onLlmInstructionsChange = jest.fn();
+    const onTtsInstructionsChange = jest.fn();
+    const { getByTestId } = setup({
+      onLlmInstructionsChange,
+      onTtsInstructionsChange,
+    });
+
+    fireEvent.changeText(
+      getByTestId("conversation-llm-instructions"),
+      "Challenge my assumptions.",
+    );
+    fireEvent.changeText(
+      getByTestId("conversation-tts-instructions"),
+      "Speak slowly and warmly.",
+    );
+
+    expect(onLlmInstructionsChange).toHaveBeenCalledWith(
+      "Challenge my assumptions.",
+    );
+    expect(onTtsInstructionsChange).toHaveBeenCalledWith(
+      "Speak slowly and warmly.",
+    );
+  });
+
+  it("offers quick voice switching for the active TTS route", () => {
+    const onTtsVoiceChange = jest.fn();
+    const { getByText } = setup({ onTtsVoiceChange });
+
+    fireEvent.press(getByText("Alloy"));
+    fireEvent.press(getByText("Nova"));
+
+    expect(onTtsVoiceChange).toHaveBeenCalledWith("nova");
+  });
+
+  it("disables TTS instructions for unsupported speech models", () => {
+    const { getByTestId, getByText } = setup({
+      ttsInstructionsSupported: false,
+    });
+
+    expect(
+      getByTestId("conversation-tts-instructions").props.editable,
+    ).toBe(false);
+    expect(
+      getByText(
+        "The current speech route does not support delivery instructions.",
+      ),
+    ).toBeTruthy();
   });
 
   it("calls onClose when Done button is pressed", () => {

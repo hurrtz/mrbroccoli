@@ -17,6 +17,9 @@ import {
   PROVIDER_DEFAULT_TTS_MODELS,
   PROVIDER_DEFAULT_TTS_VOICES,
   PROVIDER_LABELS,
+  getProviderTtsVoiceOptions,
+  getTtsModelLabel,
+  providerTtsModelSupportsInstructions,
 } from "../constants/models";
 import { useSharedSettings } from "../context/SettingsContext";
 import { useAudioPlayer } from "../hooks/useAudioPlayer";
@@ -49,6 +52,7 @@ import { getMainScreenViewModel } from "./main/mainScreenViewModel";
 import { styles } from "./main/styles";
 import { useConversationActions } from "./main/useConversationActions";
 import { useConversationTitleGenerator } from "./main/useConversationTitleGenerator";
+import { useConversationSettings } from "./main/useConversationSettings";
 import { useDebugLogCaptureController } from "./main/useDebugLogCaptureController";
 import { useMainScreenUiState } from "./main/useMainScreenUiState";
 import { useMainScreenDiagnostics } from "./main/useMainScreenDiagnostics";
@@ -86,6 +90,7 @@ export function MainScreen() {
     addMessage,
     updateMessage,
     updateConversationContextSummary,
+    updateConversationSettings,
     clearConversationMemory,
     renameConversation,
     toggleConversationPinned,
@@ -188,7 +193,7 @@ export function MainScreen() {
       PROVIDER_DEFAULT_STT_MODELS[sttProvider] ||
       ""
     : "";
-  const selectedTtsVoice = ttsProvider
+  const globalSelectedTtsVoice = ttsProvider
     ? settings.providerTtsVoices[ttsProvider] ||
       PROVIDER_DEFAULT_TTS_VOICES[ttsProvider] ||
       ""
@@ -198,6 +203,48 @@ export function MainScreen() {
       PROVIDER_DEFAULT_TTS_MODELS[ttsProvider] ||
       ""
     : "";
+  const {
+    assistantInstructions,
+    effectiveTtsInstructions,
+    initialConversationSettings,
+    llmInstructions,
+    responseLength,
+    responseTone,
+    selectedTtsVoice,
+    ttsInstructions,
+    updateLlmInstructions,
+    updateResponseSettings,
+    updateTtsInstructions,
+    updateTtsVoice,
+  } = useConversationSettings({
+    activeConversation,
+    globalAssistantInstructions: settings.assistantInstructions,
+    globalResponseLength: settings.responseLength,
+    globalResponseTone: settings.responseTone,
+    globalTtsInstructions: settings.ttsInstructions,
+    globalTtsVoice: globalSelectedTtsVoice,
+    ttsModel: selectedTtsModel,
+    ttsProvider,
+    updateConversationSettings,
+  });
+  const conversationTtsVoiceOptions =
+    settings.ttsMode === "provider" && ttsProvider
+      ? getProviderTtsVoiceOptions(ttsProvider, language).map((voice) => ({
+          value: voice.id,
+          label: voice.label,
+        }))
+      : [];
+  const conversationTtsRouteLabel =
+    settings.ttsMode === "provider" && ttsProvider && selectedTtsModel
+      ? `${PROVIDER_LABELS[ttsProvider]} · ${getTtsModelLabel(
+          ttsProvider,
+          selectedTtsModel,
+        )}`
+      : null;
+  const ttsInstructionsSupported =
+    settings.ttsMode === "provider" && ttsProvider
+      ? providerTtsModelSupportsInstructions(ttsProvider, selectedTtsModel)
+      : false;
   const providerLabel = PROVIDER_LABELS[provider];
   const isRecording =
     settings.sttMode === "native"
@@ -236,6 +283,7 @@ export function MainScreen() {
     activeConversation,
     addMessage,
     createConversation,
+    initialConversationSettings,
     updateMessage,
     updateConversationContextSummary,
     player,
@@ -255,9 +303,10 @@ export function MainScreen() {
     ttsListenLanguages: settings.ttsListenLanguages,
     replyPlayback: settings.replyPlayback,
     spokenRepliesEnabled: settings.spokenRepliesEnabled,
-    assistantInstructions: settings.assistantInstructions,
-    responseLength: settings.responseLength,
-    responseTone: settings.responseTone,
+    assistantInstructions,
+    responseLength,
+    responseTone,
+    ttsInstructions: effectiveTtsInstructions,
     language,
     webSearchMode,
     webSearchProvider,
@@ -585,8 +634,8 @@ export function MainScreen() {
     provider,
     replayPhase,
     replyPlayback: settings.replyPlayback,
-    responseLength: settings.responseLength,
-    responseTone: settings.responseTone,
+    responseLength,
+    responseTone,
     settingsFocusCatalogProviderId: settingsFocusCatalogProviderId ?? null,
     settingsVisible,
     setupGuideVisible,
@@ -852,12 +901,21 @@ export function MainScreen() {
         canAutoRenameConversation={canGenerateTitle}
         isAutoRenamingConversation={isGeneratingTitle}
         visible={styleSheetVisible}
-        responseLength={settings.responseLength}
-        responseTone={settings.responseTone}
+        llmInstructions={llmInstructions}
+        responseLength={responseLength}
+        responseTone={responseTone}
+        ttsInstructions={ttsInstructions}
+        ttsInstructionsSupported={ttsInstructionsSupported}
+        ttsRouteLabel={conversationTtsRouteLabel}
+        ttsVoice={selectedTtsVoice}
+        ttsVoiceOptions={conversationTtsVoiceOptions}
         onAutoRenameConversation={() => {
           void handleGenerateTitle();
         }}
-        onChange={(partial) => updateSettings(partial)}
+        onChange={updateResponseSettings}
+        onLlmInstructionsChange={updateLlmInstructions}
+        onTtsInstructionsChange={updateTtsInstructions}
+        onTtsVoiceChange={updateTtsVoice}
         onClose={() => setStyleSheetVisible(false)}
       />
 

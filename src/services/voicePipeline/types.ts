@@ -65,6 +65,7 @@ export interface RunVoicePipelineParams {
   ttsApiKey?: string;
   ttsModel?: string;
   ttsVoice: string;
+  ttsInstructions?: string;
   ttsListenLanguages?: TtsListenLanguage[];
   replyPlayback: ReplyPlayback;
   spokenRepliesEnabled?: boolean;

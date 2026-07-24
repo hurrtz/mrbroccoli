@@ -161,8 +161,25 @@ export const de: TranslationDictionary = {
   responseTone: "Antwortstil",
   homeStyleChipLabel: ({ tone, length }) => `Stil — ${tone} · ${length}`,
   styleSheetTitle: "Gesprächseinstellungen",
-  styleSheetSubtitle: "Passe Antworten an und verwalte dieses Gespräch.",
+  styleSheetSubtitle:
+    "Passe Antworten und Sprachausgabe nur für dieses Gespräch an.",
   openStyleSheet: "Gesprächseinstellungen öffnen",
+  conversationThinkingInstructions: "Anweisungen zum Nachdenken",
+  conversationThinkingInstructionsDescription:
+    "Ergänze den globalen Systemprompt um Anweisungen für dieses Gespräch.",
+  conversationThinkingInstructionsPlaceholder:
+    "Zum Beispiel: Hinterfrage meine Annahmen und nutze konkrete Beispiele.",
+  ttsInstructions: "Anweisungen zur Sprachausgabe",
+  ttsInstructionsDescription:
+    "Steuere Ton, Tempo, Akzent oder Ausdruck kompatibler Sprachmodelle.",
+  conversationTtsInstructionsDescription:
+    "Ergänze die globalen Sprachanweisungen für dieses Gespräch.",
+  ttsInstructionsPlaceholder:
+    "Zum Beispiel: Sprich freundlich, klar und in ruhigem Tempo.",
+  ttsInstructionsUnsupported:
+    "Die aktuelle Sprachausgabe unterstützt keine Ausführungsanweisungen.",
+  conversationVoiceDescription: ({ route }) =>
+    `Wähle die Stimme von ${route} für dieses Gespräch.`,
   scrollToLatest: "Zur neuesten Nachricht scrollen",
   conversationTitle: "Gesprächstitel",
   conversationTitleGenerationDescription:

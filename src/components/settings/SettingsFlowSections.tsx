@@ -24,6 +24,7 @@ import {
   PROVIDER_LABELS,
   getProviderApiKeyHint,
   getProviderApiKeyPlaceholder,
+  providerTtsModelSupportsInstructions,
 } from "../../constants/models";
 import {
   WEB_SEARCH_DEPTH_VALUES,
@@ -1220,6 +1221,12 @@ export function SpeakingSection({
     settings.ttsProvider,
     t("providerNeedsAttention"),
   );
+  const ttsInstructionsSupported =
+    selectedPreviewProvider !== null &&
+    providerTtsModelSupportsInstructions(
+      selectedPreviewProvider,
+      selectedPreviewProviderModel,
+    );
 
   return (
     <View style={styles.tabPane}>
@@ -1337,6 +1344,39 @@ export function SpeakingSection({
                 </Text>
               ) : null}
             </PickerSection>
+
+            <View style={styles.settingsSubsectionStack}>
+              <Text style={[styles.groupLabel, { color: colors.text }]}>
+                {t("ttsInstructions")}
+              </Text>
+              <Text style={[styles.sectionHint, { color: colors.textMuted }]}>
+                {t(
+                  ttsInstructionsSupported
+                    ? "ttsInstructionsDescription"
+                    : "ttsInstructionsUnsupported",
+                )}
+              </Text>
+              <TextInput
+                value={settings.ttsInstructions}
+                onChangeText={(value) => onUpdate({ ttsInstructions: value })}
+                editable={ttsInstructionsSupported}
+                multiline
+                placeholder={t("ttsInstructionsPlaceholder")}
+                placeholderTextColor={colors.textMuted}
+                selectionColor={colors.accent}
+                textAlignVertical="top"
+                onFocus={onTextInputFocus}
+                style={[
+                  styles.promptInput,
+                  {
+                    backgroundColor: colors.surfaceElevated,
+                    borderColor: colors.border,
+                    color: colors.text,
+                    opacity: ttsInstructionsSupported ? 1 : 0.55,
+                  },
+                ]}
+              />
+            </View>
 
             <ProviderVoicePreviewSection
               provider={selectedPreviewProvider}

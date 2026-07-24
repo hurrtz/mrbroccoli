@@ -605,6 +605,27 @@ describe("useSettings", () => {
     );
   });
 
+  it("persists global TTS delivery instructions", async () => {
+    const { result } = renderHook(() => useSettings());
+    await flushSettingsLoad();
+
+    await act(async () => {
+      result.current.updateSettings({
+        ttsInstructions: "Use a calm pace and pronounce numbers carefully.",
+      });
+    });
+
+    expect(result.current.settings.ttsInstructions).toBe(
+      "Use a calm pace and pronounce numbers carefully.",
+    );
+    expect(AsyncStorage.setItem).toHaveBeenCalledWith(
+      "@mrbroccoli/settings",
+      expect.stringContaining(
+        '"ttsInstructions":"Use a calm pace and pronounce numbers carefully."',
+      ),
+    );
+  });
+
   it("persists provider model selections", async () => {
     const { result } = renderHook(() => useSettings());
     await flushSettingsLoad();

@@ -8,6 +8,7 @@ import uuid from "react-native-uuid";
 import {
   Conversation,
   ConversationMeta,
+  ConversationSettings,
   Message,
   Provider,
   UsageEstimate,
@@ -37,6 +38,7 @@ export function useConversationMutations(params: {
       firstMessage: string,
       initialModel: string | null = null,
       initialProvider: Provider | null = null,
+      initialSettings?: ConversationSettings,
     ) => {
       const now = new Date().toISOString();
       const conversation: Conversation = {
@@ -45,6 +47,9 @@ export function useConversationMutations(params: {
         createdAt: now,
         updatedAt: now,
         messages: [],
+        ...(initialSettings && Object.keys(initialSettings).length > 0
+          ? { settings: initialSettings }
+          : {}),
       };
       const meta: ConversationMeta = {
         id: conversation.id,
@@ -244,6 +249,29 @@ export function useConversationMutations(params: {
     [activeConversationRef, setActiveConversationValue],
   );
 
+  const updateConversationSettings = useCallback(
+    (partial: Partial<ConversationSettings>) => {
+      const currentConversation = activeConversationRef.current;
+
+      if (!currentConversation) {
+        return null;
+      }
+
+      const updatedConversation: Conversation = {
+        ...currentConversation,
+        settings: {
+          ...currentConversation.settings,
+          ...partial,
+        },
+      };
+
+      setActiveConversationValue(updatedConversation);
+      saveConversation(updatedConversation);
+      return updatedConversation;
+    },
+    [activeConversationRef, setActiveConversationValue],
+  );
+
   const clearConversationMemory = useCallback(
     async (id: string) => {
       const currentConversation =
@@ -368,5 +396,6 @@ export function useConversationMutations(params: {
     toggleConversationPinned,
     updateMessage,
     updateConversationContextSummary,
+    updateConversationSettings,
   };
 }

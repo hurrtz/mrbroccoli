@@ -9,6 +9,7 @@ import type {
   AssistantResponseLength,
   AssistantResponseTone,
   Conversation,
+  ConversationSettings,
   Message,
   Provider,
   ReplyPlayback,
@@ -41,7 +42,9 @@ export interface UseVoicePipelineParams {
     firstMessage: string,
     initialModel?: string | null,
     initialProvider?: Provider | null,
+    initialSettings?: ConversationSettings,
   ) => void;
+  initialConversationSettings?: ConversationSettings;
   updateMessage: (
     messageId: string,
     updater: (message: Message) => Message,
@@ -67,6 +70,7 @@ export interface UseVoicePipelineParams {
   ttsApiKey: string;
   selectedTtsModel: string;
   selectedTtsVoice: string;
+  ttsInstructions?: string;
   ttsListenLanguages: TtsListenLanguage[];
   replyPlayback: ReplyPlayback;
   spokenRepliesEnabled: boolean;

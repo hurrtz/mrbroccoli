@@ -199,6 +199,48 @@ describe("synthesizeSpeech", () => {
     expect(body.input).toBe("Hello world");
   });
 
+  it("sends delivery instructions to instruction-capable OpenAI TTS models", async () => {
+    (fetch as jest.Mock).mockResolvedValueOnce({
+      ok: true,
+      blob: () => Promise.resolve(new Blob(["fake-audio"])),
+    });
+
+    await synthesizeSpeech({
+      text: "Hello world",
+      voice: "alloy",
+      mode: "provider",
+      provider: "openai",
+      providerModel: "gpt-4o-mini-tts",
+      apiKey: "sk-test",
+      instructions: "Speak warmly and with a relaxed pace.",
+      language: "en",
+    });
+
+    const body = JSON.parse((fetch as jest.Mock).mock.calls[0][1].body);
+    expect(body.instructions).toBe("Speak warmly and with a relaxed pace.");
+  });
+
+  it("does not send unsupported instructions to legacy OpenAI TTS models", async () => {
+    (fetch as jest.Mock).mockResolvedValueOnce({
+      ok: true,
+      blob: () => Promise.resolve(new Blob(["fake-audio"])),
+    });
+
+    await synthesizeSpeech({
+      text: "Hello world",
+      voice: "alloy",
+      mode: "provider",
+      provider: "openai",
+      providerModel: "tts-1",
+      apiKey: "sk-test",
+      instructions: "Speak warmly.",
+      language: "en",
+    });
+
+    const body = JSON.parse((fetch as jest.Mock).mock.calls[0][1].body);
+    expect(body.instructions).toBeUndefined();
+  });
+
   it("throws when provider mode is selected without a provider", async () => {
     await expect(
       synthesizeSpeech({
@@ -254,6 +296,46 @@ describe("synthesizeSpeech", () => {
     ).toBe("Aoede");
   });
 
+  it("adds delivery instructions to Gemini's performance prompt", async () => {
+    (fetch as jest.Mock).mockResolvedValueOnce({
+      ok: true,
+      json: () =>
+        Promise.resolve({
+          candidates: [
+            {
+              content: {
+                parts: [
+                  {
+                    inlineData: {
+                      mimeType: "audio/L16;rate=24000",
+                      data: "AQACAAMABAA=",
+                    },
+                  },
+                ],
+              },
+            },
+          ],
+        }),
+    });
+
+    await synthesizeSpeech({
+      text: "Hallo Welt",
+      voice: "Aoede",
+      mode: "provider",
+      provider: "gemini",
+      apiKey: "gemini-test-key",
+      instructions: "Use a calm, reassuring delivery.",
+      language: "de",
+    });
+
+    const body = JSON.parse((fetch as jest.Mock).mock.calls[0][1].body);
+    const prompt = body.contents[0].parts[0].text;
+    expect(prompt).toContain(
+      "Performance instructions:\nUse a calm, reassuring delivery.",
+    );
+    expect(prompt).toContain("Transcript:\nHallo Welt");
+  });
+
   it("uses DashScope TTS and downloads the generated wav file", async () => {
     (fetch as jest.Mock)
       .mockResolvedValueOnce({
@@ -293,6 +375,39 @@ describe("synthesizeSpeech", () => {
     expect((fetch as jest.Mock).mock.calls[1][0]).toBe(
       "https://dashscope.example/audio.wav",
     );
+  });
+
+  it("sends instructions only to Qwen's instruct TTS model", async () => {
+    (fetch as jest.Mock)
+      .mockResolvedValueOnce({
+        ok: true,
+        json: () =>
+          Promise.resolve({
+            output: {
+              audio: {
+                url: "https://dashscope.example/audio.wav",
+              },
+            },
+          }),
+      })
+      .mockResolvedValueOnce({
+        ok: true,
+        blob: () => Promise.resolve(new Blob(["fake-audio"])),
+      });
+
+    await synthesizeSpeech({
+      text: "Hello world",
+      voice: "Cherry",
+      mode: "provider",
+      provider: "alibaba-qwen-dashscope",
+      providerModel: "qwen3-tts-instruct-flash",
+      apiKey: "dashscope-test|beijing",
+      instructions: "Sound optimistic and energetic.",
+      language: "en",
+    });
+
+    const body = JSON.parse((fetch as jest.Mock).mock.calls[0][1].body);
+    expect(body.input.instructions).toBe("Sound optimistic and energetic.");
   });
 
   it("rejects Qwen TTS when the credential belongs to the US region", async () => {

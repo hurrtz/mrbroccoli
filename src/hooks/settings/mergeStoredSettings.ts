@@ -473,6 +473,10 @@ export function mergeSettings(
     storedSettings.assistantInstructions.trim()
       ? storedSettings.assistantInstructions
       : getDefaultAssistantInstructions(language);
+  const ttsInstructions =
+    typeof storedSettings?.ttsInstructions === "string"
+      ? storedSettings.ttsInstructions
+      : DEFAULT_SETTINGS.ttsInstructions;
   const mergedApiKeys = {
     ...createRuntimeProviderStringRecord(
       "",
@@ -601,6 +605,7 @@ export function mergeSettings(
         ? storedSettings.showSetupGuideShortcut
         : DEFAULT_SETTINGS.showSetupGuideShortcut,
     assistantInstructions,
+    ttsInstructions,
     webSearchMode: isWebSearchMode(rawWebSearchMode)
       ? rawWebSearchMode
       : typeof storedSettings?.webSearchEnabled === "boolean"

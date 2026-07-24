@@ -23,6 +23,7 @@ interface CreateVoicePipelineTtsQueueParams {
   ttsModel?: string;
   ttsProvider?: RunVoicePipelineParams["ttsProvider"];
   ttsVoice: string;
+  ttsInstructions?: string;
 }
 
 const PROVIDER_TTS_PREFETCH_CONCURRENCY = 2;
@@ -46,6 +47,7 @@ export function createVoicePipelineTtsQueue({
   ttsModel,
   ttsProvider,
   ttsVoice,
+  ttsInstructions,
 }: CreateVoicePipelineTtsQueueParams) {
   let sentenceBuffer = "";
   let ttsChain = Promise.resolve();
@@ -104,6 +106,7 @@ export function createVoicePipelineTtsQueue({
             provider: ttsProvider,
             providerModel: ttsModel,
             apiKey: ttsApiKey,
+            instructions: ttsInstructions,
             language,
             listenLanguages: ttsListenLanguages,
             diagnostics: speechDiagnostics,
