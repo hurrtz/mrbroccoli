@@ -519,6 +519,7 @@ export function MainScreen() {
     handleShareMessage,
     handleRenameThread,
     handleTogglePinned,
+    handleDeleteConversation,
     handleSelectConversation,
     handleStartNewSession,
     openMemory,
@@ -531,6 +532,7 @@ export function MainScreen() {
     renameConversation,
     toggleConversationPinned,
     clearConversationMemory,
+    deleteConversation,
     selectConversation,
     clearActiveConversation,
     resetVoiceSessionState,
@@ -1116,7 +1118,7 @@ export function MainScreen() {
         }}
         onTogglePinned={handleTogglePinned}
         onNewSession={handleStartNewSession}
-        onDelete={deleteConversation}
+        onDelete={handleDeleteConversation}
         onClose={() => setDrawerVisible(false)}
         onDismiss={handleDrawerDismiss}
       />

@@ -38,6 +38,7 @@ describe("useConversationActions", () => {
         renameConversation: jest.fn(),
         toggleConversationPinned: jest.fn(),
         clearConversationMemory: jest.fn(),
+        deleteConversation: jest.fn(),
         selectConversation: jest.fn(),
         clearActiveConversation,
         resetVoiceSessionState,
@@ -75,6 +76,7 @@ describe("useConversationActions", () => {
         renameConversation: jest.fn(),
         toggleConversationPinned: jest.fn(),
         clearConversationMemory: jest.fn(),
+        deleteConversation: jest.fn(),
         selectConversation,
         clearActiveConversation: jest.fn(),
         resetVoiceSessionState,
@@ -92,6 +94,56 @@ describe("useConversationActions", () => {
 
     expect(selectConversation).toHaveBeenCalledWith("conversation-1");
     expect(callOrder).toEqual(["reset", "select"]);
+  });
+
+  it("cancels only the active conversation's voice session before deletion", async () => {
+    const callOrder: string[] = [];
+    const resetVoiceSessionState = jest.fn(async () => {
+      callOrder.push("reset");
+    });
+    const deleteConversation = jest.fn((conversationId: string) => {
+      callOrder.push(`delete:${conversationId}`);
+    });
+    const activeConversation = {
+      id: "conversation-1",
+      title: "Active conversation",
+      createdAt: "2026-03-22T10:00:00.000Z",
+      updatedAt: "2026-03-22T10:00:00.000Z",
+      messages: [],
+    };
+    const { result } = renderHook(() =>
+      useConversationActions({
+        activeConversation,
+        memoryConversation: null,
+        getConversationById: jest.fn(),
+        renameConversation: jest.fn(),
+        toggleConversationPinned: jest.fn(),
+        clearConversationMemory: jest.fn(),
+        deleteConversation,
+        selectConversation: jest.fn(),
+        clearActiveConversation: jest.fn(),
+        resetVoiceSessionState,
+        openMemoryConversation: jest.fn(),
+        setMemoryConversation: jest.fn(),
+        showToast: jest.fn(),
+        language: "en",
+        t: (key) => key,
+      }),
+    );
+
+    await act(async () => {
+      await result.current.handleDeleteConversation("conversation-1");
+      await result.current.handleDeleteConversation("conversation-2");
+    });
+
+    expect(resetVoiceSessionState).toHaveBeenCalledTimes(1);
+    expect(deleteConversation).toHaveBeenNthCalledWith(1, "conversation-1");
+    expect(deleteConversation).toHaveBeenNthCalledWith(2, "conversation-2");
+    expect(callOrder).toEqual([
+      "reset",
+      "delete:conversation-1",
+      "delete:conversation-2",
+    ]);
   });
 
   it("copies the active conversation transcript to the clipboard", async () => {
@@ -121,6 +173,7 @@ describe("useConversationActions", () => {
         renameConversation: jest.fn(),
         toggleConversationPinned: jest.fn(),
         clearConversationMemory: jest.fn(),
+        deleteConversation: jest.fn(),
         selectConversation: jest.fn(),
         clearActiveConversation: jest.fn(),
         resetVoiceSessionState: jest.fn(),
@@ -178,6 +231,7 @@ describe("useConversationActions", () => {
         renameConversation: jest.fn(),
         toggleConversationPinned: jest.fn(),
         clearConversationMemory,
+        deleteConversation: jest.fn(),
         selectConversation: jest.fn(),
         clearActiveConversation: jest.fn(),
         resetVoiceSessionState: jest.fn(),

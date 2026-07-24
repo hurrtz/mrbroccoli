@@ -23,6 +23,7 @@ interface UseConversationActionsParams {
   renameConversation: ConversationsApi["renameConversation"];
   toggleConversationPinned: ConversationsApi["toggleConversationPinned"];
   clearConversationMemory: ConversationsApi["clearConversationMemory"];
+  deleteConversation: ConversationsApi["deleteConversation"];
   selectConversation: ConversationsApi["selectConversation"];
   clearActiveConversation: ConversationsApi["clearActiveConversation"];
   resetVoiceSessionState: () => Promise<void>;
@@ -40,6 +41,7 @@ export function useConversationActions({
   renameConversation,
   toggleConversationPinned,
   clearConversationMemory,
+  deleteConversation,
   selectConversation,
   clearActiveConversation,
   resetVoiceSessionState,
@@ -181,6 +183,17 @@ export function useConversationActions({
     clearActiveConversation();
   }, [clearActiveConversation, resetVoiceSessionState]);
 
+  const handleDeleteConversation = useCallback(
+    async (conversationId: string) => {
+      if (activeConversation?.id === conversationId) {
+        await resetVoiceSessionState();
+      }
+
+      deleteConversation(conversationId);
+    },
+    [activeConversation?.id, deleteConversation, resetVoiceSessionState],
+  );
+
   const openMemory = useCallback(
     async (conversationId?: string) => {
       const conversation = await resolveConversation(conversationId);
@@ -229,6 +242,7 @@ export function useConversationActions({
     handleTogglePinned,
     handleSelectConversation,
     handleStartNewSession,
+    handleDeleteConversation,
     openMemory,
     handleCopyMemory,
     handleClearMemory,
