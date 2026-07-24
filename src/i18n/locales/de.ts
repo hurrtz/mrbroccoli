@@ -288,12 +288,21 @@ export const de: TranslationDictionary = {
   localTtsLanguageCoverageHint:
     "Lokale Sprachpakete decken derzeit Englisch, Deutsch, vereinfachtes Chinesisch, Spanisch, Portugiesisch, Hindi, Französisch und Italienisch ab. Japanisch fällt weiterhin automatisch zurück.",
   ttsVoice: "TTS-Stimme",
-  mistralVoiceId: "Mistral-Stimmen-ID",
-  mistralVoiceIdPlaceholder: "ID einer Standard- oder eigenen Stimme",
-  mistralVoiceIdHint:
-    "Wähle in Mistral Studio eine Standardstimme oder erstelle eine eigene Stimme und füge deren ID hier ein.",
+  refresh: "Aktualisieren",
+  mistralVoiceDirectory: "Mistral-Stimmenbibliothek",
+  refreshMistralVoices: "Mistral-Stimmen aktualisieren",
+  mistralVoicesAvailable: ({ count }) =>
+    `${count} ${Number(count) === 1 ? "Stimme" : "Stimmen"} von Mistral verfügbar.`,
+  mistralVoicesLoadFailed:
+    "Die Stimmen konnten nicht aktualisiert werden. Die aktuelle Auswahl bleibt erhalten; alternativ kannst du einen Slug manuell eingeben.",
+  mistralVoicesLoadingHint:
+    "Mr Broccoli lädt Standard- und eigene Stimmen automatisch von Mistral.",
+  mistralVoiceId: "Mistral-Stimmen-Slug",
+  mistralVoiceIdPlaceholder: "Slug einer Standard- oder eigenen Stimme",
+  mistralVoiceSlugFallbackHint:
+    "Die manuelle Eingabe bleibt verfügbar, wenn Mistrals Stimmenliste nicht geladen werden kann.",
   mistralVoiceIdRequired:
-    "Gib vor der Sprachausgabe die ID einer Standard- oder eigenen Mistral-Stimme ein.",
+    "Aktualisiere die Mistral-Stimmenliste oder gib vor der Sprachausgabe einen Standard- oder eigenen Stimmen-Slug ein.",
   qwenSpeechUnavailableInUs:
     "Mr Broccolis aktuelle Qwen-Sprachrouten sind in der US-Region nicht verfügbar. Wähle für Qwen-Spracherkennung und -ausgabe Singapur oder Peking.",
   qwenApiRegion: "Qwen-API-Region",

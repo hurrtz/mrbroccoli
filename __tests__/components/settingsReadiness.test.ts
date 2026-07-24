@@ -73,7 +73,7 @@ describe("settings readiness", () => {
     expectStatus(readiness.speak, "off");
   });
 
-  it("marks Mistral speech broken until a saved voice ID is configured", () => {
+  it("marks Mistral speech broken until a saved voice slug is configured", () => {
     const settings = withSettings({
       ttsMode: "provider",
       ttsProvider: "mistral",

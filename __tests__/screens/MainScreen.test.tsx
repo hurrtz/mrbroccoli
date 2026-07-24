@@ -1,6 +1,6 @@
 import React from "react";
 import { StyleSheet, useWindowDimensions } from "react-native";
-import { fireEvent, within } from "@testing-library/react-native";
+import { fireEvent, waitFor, within } from "@testing-library/react-native";
 
 import { MainScreen } from "../../src/screens/MainScreen";
 import { DEFAULT_SETTINGS, type Settings } from "../../src/types";
@@ -101,6 +101,15 @@ jest.mock("../../src/hooks/useConversations", () => ({
     clearActiveConversation: jest.fn(),
     captureActiveConversationSnapshot: jest.fn(),
     restoreActiveConversationSnapshot: jest.fn(),
+  })),
+}));
+
+jest.mock("../../src/hooks/useMistralVoices", () => ({
+  useMistralVoices: jest.fn(() => ({
+    voices: [],
+    status: "idle",
+    error: null,
+    refresh: jest.fn(async () => []),
   })),
 }));
 
@@ -377,6 +386,11 @@ const { useSharedSettings } = jest.requireMock(
 ) as {
   useSharedSettings: jest.Mock;
 };
+const { useMistralVoices } = jest.requireMock(
+  "../../src/hooks/useMistralVoices",
+) as {
+  useMistralVoices: jest.Mock;
+};
 
 function createSharedSettingsValue(settingsOverrides: Partial<Settings> = {}) {
   return {
@@ -405,6 +419,12 @@ describe("MainScreen", () => {
       width: 430,
     });
     useSharedSettings.mockReturnValue(createSharedSettingsValue());
+    useMistralVoices.mockReturnValue({
+      voices: [],
+      status: "idle",
+      error: null,
+      refresh: jest.fn(async () => []),
+    });
   });
 
   it("renders the shell with the route card", () => {
@@ -461,6 +481,50 @@ describe("MainScreen", () => {
     const screen = renderWithProviders(<MainScreen />);
 
     expect(screen.getByText("voice-stage:enabled")).toBeTruthy();
+  });
+
+  it("loads Mistral voices from its configured key and selects a default slug", async () => {
+    const sharedSettings = createSharedSettingsValue({
+      apiKeys: {
+        ...DEFAULT_SETTINGS.apiKeys,
+        mistral: "mistral-key",
+      },
+      providerTtsVoices: {
+        ...DEFAULT_SETTINGS.providerTtsVoices,
+        mistral: "",
+      },
+    });
+    useSharedSettings.mockReturnValue(sharedSettings);
+    useMistralVoices.mockReturnValue({
+      voices: [
+        {
+          id: "voice-1",
+          name: "Calm Guide",
+          slug: "calm-guide",
+          value: "calm-guide",
+          label: "Calm Guide · calm-guide",
+          languages: ["en"],
+          gender: null,
+          isCustom: false,
+        },
+      ],
+      status: "ready",
+      error: null,
+      refresh: jest.fn(async () => []),
+    });
+
+    renderWithProviders(<MainScreen />);
+
+    expect(useMistralVoices).toHaveBeenCalledWith({
+      apiKey: "mistral-key",
+      enabled: true,
+    });
+    await waitFor(() => {
+      expect(sharedSettings.updateProviderTtsVoice).toHaveBeenCalledWith(
+        "mistral",
+        "calm-guide",
+      );
+    });
   });
 
   it("opens settings and the session drawer from the top bar", () => {

@@ -26,6 +26,7 @@ import { useAudioPlayer } from "../hooks/useAudioPlayer";
 import { useAudioRecorder } from "../hooks/useAudioRecorder";
 import { useNativeSpeechRecognizer } from "../hooks/useNativeSpeechRecognizer";
 import { useConversations } from "../hooks/useConversations";
+import { useMistralVoices } from "../hooks/useMistralVoices";
 import { useVoicePipeline } from "../hooks/useVoicePipeline";
 import { useBatteryDiagnostics } from "../hooks/useBatteryDiagnostics";
 import { useLocalization } from "../i18n";
@@ -81,6 +82,10 @@ export function MainScreen() {
     updateApiKey,
     loaded,
   } = useSharedSettings();
+  const mistralVoiceDirectory = useMistralVoices({
+    apiKey: settings.apiKeys.mistral,
+    enabled: loaded && Boolean(settings.apiKeys.mistral.trim()),
+  });
   const {
     conversations,
     activeConversation,
@@ -198,6 +203,22 @@ export function MainScreen() {
       PROVIDER_DEFAULT_TTS_VOICES[ttsProvider] ||
       ""
     : "";
+  useEffect(() => {
+    const firstMistralVoice = mistralVoiceDirectory.voices[0]?.value;
+
+    if (
+      loaded &&
+      firstMistralVoice &&
+      !settings.providerTtsVoices.mistral?.trim()
+    ) {
+      updateProviderTtsVoice("mistral", firstMistralVoice);
+    }
+  }, [
+    loaded,
+    mistralVoiceDirectory.voices,
+    settings.providerTtsVoices.mistral,
+    updateProviderTtsVoice,
+  ]);
   const selectedTtsModel = ttsProvider
     ? settings.providerTtsModels[ttsProvider] ||
       PROVIDER_DEFAULT_TTS_MODELS[ttsProvider] ||
@@ -229,10 +250,15 @@ export function MainScreen() {
   });
   const conversationTtsVoiceOptions =
     settings.ttsMode === "provider" && ttsProvider
-      ? getProviderTtsVoiceOptions(ttsProvider, language).map((voice) => ({
-          value: voice.id,
-          label: voice.label,
-        }))
+      ? ttsProvider === "mistral"
+        ? mistralVoiceDirectory.voices.map((voice) => ({
+            value: voice.value,
+            label: voice.label,
+          }))
+        : getProviderTtsVoiceOptions(ttsProvider, language).map((voice) => ({
+            value: voice.id,
+            label: voice.label,
+          }))
       : [];
   const conversationTtsRouteLabel =
     settings.ttsMode === "provider" && ttsProvider && selectedTtsModel
@@ -937,6 +963,9 @@ export function MainScreen() {
       <SettingsModal
         visible={settingsVisible}
         settings={settings}
+        mistralVoices={mistralVoiceDirectory.voices}
+        mistralVoiceStatus={mistralVoiceDirectory.status}
+        mistralVoiceError={mistralVoiceDirectory.error}
         focusCatalogProviderId={settingsFocusCatalogProviderId}
         focusTab={settingsFocusTab}
         onUpdate={updateSettings}
@@ -946,6 +975,7 @@ export function MainScreen() {
         onUpdateProviderSttModel={updateProviderSttModel}
         onUpdateProviderTtsModel={updateProviderTtsModel}
         onUpdateProviderTtsVoice={updateProviderTtsVoice}
+        onRefreshMistralVoices={mistralVoiceDirectory.refresh}
         onUpdateApiKey={updateApiKey}
         onPreviewVoice={handlePreviewVoice}
         onStopPreviewVoice={stopPreviewVoice}

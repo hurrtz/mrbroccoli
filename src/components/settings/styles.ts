@@ -727,6 +727,30 @@ export const styles = StyleSheet.create({
     ...textStyles.sectionTitle,
     marginBottom: 16,
   },
+  mistralVoiceDirectoryHeader: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    justifyContent: "space-between",
+    gap: 12,
+    marginBottom: 12,
+  },
+  mistralVoiceDirectoryCopy: {
+    flex: 1,
+    minWidth: 0,
+  },
+  mistralVoiceRefreshButton: {
+    minHeight: 34,
+    borderRadius: 10,
+    borderWidth: 1,
+    paddingHorizontal: 10,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 6,
+  },
+  mistralVoiceRefreshLabel: {
+    ...textStyles.compactAction,
+  },
   previewLanguageBlock: {
     borderTopWidth: 1,
     marginTop: 4,

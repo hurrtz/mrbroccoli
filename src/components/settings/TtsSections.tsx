@@ -1,5 +1,12 @@
 import React from "react";
-import { Text, TextInput, View } from "react-native";
+import {
+  ActivityIndicator,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import Feather from "@expo/vector-icons/Feather";
 
 import { getTtsListenLanguageLabel } from "../../constants/localTts";
 import {
@@ -10,6 +17,10 @@ import {
 import { useLocalization } from "../../i18n";
 import { Provider, Settings, TtsListenLanguage } from "../../types";
 import { useTheme } from "../../theme/ThemeContext";
+import type {
+  MistralVoice,
+  MistralVoiceDirectoryStatus,
+} from "../../services/mistralVoices";
 import { Picker } from "../Picker";
 
 import { PreviewComposer } from "./shared";
@@ -30,6 +41,10 @@ export function ProviderVoicePreviewSection({
   onPreviewProvider,
   onStopPreview,
   onUpdateProviderTtsVoice,
+  mistralVoices,
+  mistralVoiceStatus,
+  mistralVoiceError,
+  onRefreshMistralVoices,
   onTextInputFocus,
 }: {
   provider: Provider | null;
@@ -48,6 +63,10 @@ export function ProviderVoicePreviewSection({
   ) => Promise<void>;
   onStopPreview: () => Promise<void>;
   onUpdateProviderTtsVoice: (provider: Provider, voice: string) => void;
+  mistralVoices: MistralVoice[];
+  mistralVoiceStatus: MistralVoiceDirectoryStatus;
+  mistralVoiceError: Error | null;
+  onRefreshMistralVoices: () => Promise<MistralVoice[]>;
   onTextInputFocus: TextInputFocusHandler;
 }) {
   const { colors } = useTheme();
@@ -57,17 +76,24 @@ export function ProviderVoicePreviewSection({
     return null;
   }
 
-  const voiceOptions = getProviderTtsVoiceOptions(provider, language).map(
-    (voice) => ({
-      value: voice.id,
-      label: voice.label,
-    }),
-  );
+  const voiceOptions =
+    provider === "mistral"
+      ? mistralVoices.map((voice) => ({
+          value: voice.value,
+          label: voice.label,
+        }))
+      : getProviderTtsVoiceOptions(provider, language).map((voice) => ({
+          value: voice.id,
+          label: voice.label,
+        }));
   const selectedVoice =
     settings.providerTtsVoices[provider] ||
     PROVIDER_DEFAULT_TTS_VOICES[provider] ||
     voiceOptions[0]?.value ||
     "";
+  const mistralVoicesBusy =
+    mistralVoiceStatus === "loading" ||
+    mistralVoiceStatus === "refreshing";
 
   return (
     <View
@@ -101,6 +127,58 @@ export function ProviderVoicePreviewSection({
         >
           {PROVIDER_LABELS[provider]}
         </Text>
+        {provider === "mistral" ? (
+          <View style={styles.mistralVoiceDirectoryHeader}>
+            <View style={styles.mistralVoiceDirectoryCopy}>
+              <Text
+                style={[styles.previewLabel, { color: colors.textSecondary }]}
+              >
+                {t("mistralVoiceDirectory")}
+              </Text>
+              <Text style={[styles.previewHint, { color: colors.textMuted }]}>
+                {mistralVoiceStatus === "ready"
+                  ? t("mistralVoicesAvailable", {
+                      count: mistralVoices.length,
+                    })
+                  : mistralVoiceStatus === "error" && mistralVoiceError
+                    ? t("mistralVoicesLoadFailed")
+                    : t("mistralVoicesLoadingHint")}
+              </Text>
+            </View>
+            <TouchableOpacity
+              testID="mistral-voices-refresh"
+              accessibilityRole="button"
+              accessibilityLabel={t("refreshMistralVoices")}
+              disabled={mistralVoicesBusy}
+              onPress={() => {
+                void onRefreshMistralVoices();
+              }}
+              style={[
+                styles.mistralVoiceRefreshButton,
+                {
+                  backgroundColor: colors.surfaceElevated,
+                  borderColor: colors.border,
+                  opacity: mistralVoicesBusy ? 0.6 : 1,
+                },
+              ]}
+            >
+              {mistralVoicesBusy ? (
+                <ActivityIndicator size="small" color={colors.accent} />
+              ) : (
+                <Feather name="refresh-cw" size={15} color={colors.accent} />
+              )}
+              <Text
+                style={[
+                  styles.mistralVoiceRefreshLabel,
+                  { color: colors.accent },
+                ]}
+              >
+                {t("refresh")}
+              </Text>
+            </TouchableOpacity>
+          </View>
+        ) : null}
+
         {voiceOptions.length > 0 ? (
           <Picker
             label={t("ttsVoice")}
@@ -108,7 +186,7 @@ export function ProviderVoicePreviewSection({
             options={voiceOptions}
             onChange={(value) => onUpdateProviderTtsVoice(provider, value)}
           />
-        ) : provider === "mistral" ? (
+        ) : provider === "mistral" && !mistralVoicesBusy ? (
           <View style={styles.settingsSubsectionStack}>
             <Text
               style={[styles.previewLabel, { color: colors.textSecondary }]}
@@ -143,11 +221,13 @@ export function ProviderVoicePreviewSection({
               ]}
             >
               {t(
-                selectedVoice ? "mistralVoiceIdHint" : "mistralVoiceIdRequired",
+                selectedVoice
+                  ? "mistralVoiceSlugFallbackHint"
+                  : "mistralVoiceIdRequired",
               )}
             </Text>
           </View>
-        ) : (
+        ) : provider === "mistral" ? null : (
           <Text
             style={[
               styles.previewHint,

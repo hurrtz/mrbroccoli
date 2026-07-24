@@ -283,12 +283,21 @@ export const en: TranslationDictionary = {
   localTtsLanguageCoverageHint:
     "Local packs currently cover English, German, Simplified Chinese, Spanish, Portuguese, Hindi, French, and Italian. Japanese still falls back automatically.",
   ttsVoice: "TTS Voice",
-  mistralVoiceId: "Mistral Voice ID",
-  mistralVoiceIdPlaceholder: "Preset or custom voice ID",
-  mistralVoiceIdHint:
-    "Choose a preset voice or create a voice in Mistral Studio, then paste its voice ID here.",
+  refresh: "Refresh",
+  mistralVoiceDirectory: "Mistral voice library",
+  refreshMistralVoices: "Refresh Mistral voices",
+  mistralVoicesAvailable: ({ count }) =>
+    `${count} ${Number(count) === 1 ? "voice" : "voices"} available from Mistral.`,
+  mistralVoicesLoadFailed:
+    "Voices could not be refreshed. Your current selection is unchanged; you can still enter a slug manually.",
+  mistralVoicesLoadingHint:
+    "Mr Broccoli loads preset and custom voices automatically from Mistral.",
+  mistralVoiceId: "Mistral voice slug",
+  mistralVoiceIdPlaceholder: "Preset or custom voice slug",
+  mistralVoiceSlugFallbackHint:
+    "Manual entry remains available when Mistral's voice list cannot be loaded.",
   mistralVoiceIdRequired:
-    "Enter a Mistral preset or custom voice ID before using speech output.",
+    "Refresh the Mistral voice list or enter a preset or custom voice slug before using speech output.",
   qwenSpeechUnavailableInUs:
     "Mr Broccoli's current Qwen speech routes are not available in the US region. Choose Singapore or Beijing for Qwen speech.",
   qwenApiRegion: "Qwen API Region",

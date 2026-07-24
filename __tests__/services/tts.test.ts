@@ -503,7 +503,7 @@ describe("synthesizeSpeech", () => {
     expect(body.output_format).toBeUndefined();
   });
 
-  it("calls Mistral Voxtral TTS with a saved voice ID", async () => {
+  it("calls Mistral Voxtral TTS with a saved voice slug", async () => {
     (fetch as jest.Mock).mockResolvedValueOnce({
       ok: true,
       json: () => Promise.resolve({ audio_data: "ZmFrZQ==" }),
@@ -531,7 +531,7 @@ describe("synthesizeSpeech", () => {
     });
   });
 
-  it("rejects Mistral speech locally when no voice ID is saved", async () => {
+  it("rejects Mistral speech locally when no voice slug is saved", async () => {
     await expect(
       synthesizeSpeech({
         text: "Hallo Welt",
@@ -542,7 +542,7 @@ describe("synthesizeSpeech", () => {
         language: "en",
       }),
     ).rejects.toThrow(
-      "Enter a Mistral preset or custom voice ID before using speech output.",
+      "Refresh the Mistral voice list or enter a preset or custom voice slug before using speech output.",
     );
     expect(fetch).not.toHaveBeenCalled();
   });

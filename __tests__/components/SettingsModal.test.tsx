@@ -80,11 +80,15 @@ function renderSettingsModal(overrideProps: Partial<React.ComponentProps<typeof 
         <SettingsModal
           visible
           settings={DEFAULT_SETTINGS}
+          mistralVoices={[]}
+          mistralVoiceStatus="idle"
+          mistralVoiceError={null}
           onUpdate={jest.fn()}
           onUpdateResponseModeRoute={jest.fn()}
           onUpdateProviderSttModel={jest.fn()}
           onUpdateProviderTtsModel={jest.fn()}
           onUpdateProviderTtsVoice={jest.fn()}
+          onRefreshMistralVoices={jest.fn(async () => [])}
           onUpdateApiKey={jest.fn()}
           onPreviewVoice={jest.fn(async () => undefined)}
           onStopPreviewVoice={jest.fn(async () => undefined)}
@@ -447,6 +451,111 @@ describe("SettingsModal", () => {
       expect(screen.getByText("Recent Speech Activity")).toBeTruthy();
       expect(screen.queryByText("Web Search Provider")).toBeNull();
     });
+  });
+
+  it("offers discovered Mistral voice slugs and refreshes the directory", async () => {
+    const onRefreshMistralVoices = jest.fn(async () => []);
+    const onUpdateProviderTtsVoice = jest.fn();
+    const screen = renderSettingsModal({
+      focusTab: "tts",
+      settings: {
+        ...DEFAULT_SETTINGS,
+        apiKeys: {
+          ...DEFAULT_SETTINGS.apiKeys,
+          mistral: "configured-mistral-key",
+        },
+        ttsMode: "provider",
+        ttsProvider: "mistral",
+        providerTtsVoices: {
+          ...DEFAULT_SETTINGS.providerTtsVoices,
+          mistral: "calm-guide",
+        },
+      },
+      mistralVoices: [
+        {
+          id: "voice-1",
+          name: "Calm Guide",
+          slug: "calm-guide",
+          value: "calm-guide",
+          label: "Calm Guide · calm-guide",
+          languages: ["en"],
+          gender: null,
+          isCustom: false,
+        },
+        {
+          id: "voice-2",
+          name: "Studio Voice",
+          slug: "studio-voice",
+          value: "studio-voice",
+          label: "Studio Voice · studio-voice",
+          languages: ["en", "de"],
+          gender: null,
+          isCustom: true,
+        },
+      ],
+      mistralVoiceStatus: "ready",
+      onRefreshMistralVoices,
+      onUpdateProviderTtsVoice,
+    });
+
+    await waitFor(() => {
+      expect(screen.getByText("Mistral voice library")).toBeTruthy();
+      expect(
+        screen.getByText("2 voices available from Mistral."),
+      ).toBeTruthy();
+      expect(screen.getByText("Calm Guide · calm-guide")).toBeTruthy();
+    });
+
+    fireEvent.press(screen.getByTestId("mistral-voices-refresh"));
+    expect(onRefreshMistralVoices).toHaveBeenCalledTimes(1);
+
+    fireEvent.press(screen.getByText("Calm Guide · calm-guide"));
+    fireEvent.press(screen.getByText("Studio Voice · studio-voice"));
+
+    expect(onUpdateProviderTtsVoice).toHaveBeenCalledWith(
+      "mistral",
+      "studio-voice",
+    );
+  });
+
+  it("keeps manual Mistral slug entry available after directory errors", async () => {
+    const onUpdateProviderTtsVoice = jest.fn();
+    const screen = renderSettingsModal({
+      focusTab: "tts",
+      settings: {
+        ...DEFAULT_SETTINGS,
+        apiKeys: {
+          ...DEFAULT_SETTINGS.apiKeys,
+          mistral: "configured-mistral-key",
+        },
+        ttsMode: "provider",
+        ttsProvider: "mistral",
+      },
+      mistralVoiceStatus: "error",
+      mistralVoiceError: new Error("Network unavailable"),
+      onUpdateProviderTtsVoice,
+    });
+
+    await waitFor(() => {
+      expect(
+        screen.getByText(
+          "Voices could not be refreshed. Your current selection is unchanged; you can still enter a slug manually.",
+        ),
+      ).toBeTruthy();
+      expect(
+        screen.getByPlaceholderText("Preset or custom voice slug"),
+      ).toBeTruthy();
+    });
+
+    fireEvent.changeText(
+      screen.getByPlaceholderText("Preset or custom voice slug"),
+      " custom-voice ",
+    );
+
+    expect(onUpdateProviderTtsVoice).toHaveBeenCalledWith(
+      "mistral",
+      "custom-voice",
+    );
   });
 
   it("styles speech diagnostics clearing as destructive and requires confirmation", async () => {

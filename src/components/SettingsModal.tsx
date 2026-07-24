@@ -88,6 +88,10 @@ export function SettingsModal(props: SettingsModalProps) {
     onUpdateProviderSttModel,
     onUpdateProviderTtsModel,
     onUpdateProviderTtsVoice,
+    mistralVoices,
+    mistralVoiceStatus,
+    mistralVoiceError,
+    onRefreshMistralVoices,
     onUpdateApiKey,
     onPreviewVoice,
     onStopPreviewVoice,
@@ -349,6 +353,10 @@ export function SettingsModal(props: SettingsModalProps) {
             onUpdate={onUpdate}
             onUpdateProviderTtsModel={onUpdateProviderTtsModel}
             onUpdateProviderTtsVoice={onUpdateProviderTtsVoice}
+            mistralVoices={mistralVoices}
+            mistralVoiceStatus={mistralVoiceStatus}
+            mistralVoiceError={mistralVoiceError}
+            onRefreshMistralVoices={onRefreshMistralVoices}
             onStopPreviewVoice={onStopPreviewVoice}
             onSetProviderPreviewText={(
               provider: Provider,

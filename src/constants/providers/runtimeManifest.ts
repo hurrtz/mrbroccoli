@@ -1043,7 +1043,7 @@ export const RUNTIME_PROVIDER_MANIFEST: Record<
       ],
       voiceOptions: [],
       languageNote:
-        "Voxtral TTS supports English, French, Spanish, Portuguese, Italian, Dutch, German, Hindi, and Arabic. Enter a preset or custom Mistral voice ID before using it.",
+        "Voxtral TTS supports English, French, Spanish, Portuguese, Italian, Dutch, German, Hindi, and Arabic. Mr Broccoli loads preset and custom voices from Mistral automatically.",
     },
   },
   "moonshot-ai-kimi": {
