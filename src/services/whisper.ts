@@ -22,7 +22,6 @@ import {
   transcribeWithOpenAiAudioInputProvider,
   transcribeWithXaiRestSttProvider,
 } from "./whisper/providers";
-import { transcribeWithXaiRealtimeProvider } from "./whisper/realtimeProviders";
 
 function isRemoteAudioSource(fileUri: string) {
   return /^(https?:\/\/|oss:\/\/)/i.test(fileUri);
@@ -172,18 +171,6 @@ export async function transcribeAudio(params: {
 
   if (config.kind === "google-speech") {
     return transcribeWithGoogleSpeechProvider({
-      abortSignal,
-      apiKey,
-      config,
-      fileUri,
-      language,
-      provider,
-      providerModel: resolvedModel,
-    });
-  }
-
-  if (config.kind === "xai-realtime") {
-    return transcribeWithXaiRealtimeProvider({
       abortSignal,
       apiKey,
       config,

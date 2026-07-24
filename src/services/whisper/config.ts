@@ -36,12 +36,6 @@ export type GoogleSpeechTranscriptionConfig = {
   cloudDefaultModel: string;
 };
 
-export type XaiRealtimeTranscriptionConfig = {
-  kind: "xai-realtime";
-  endpoint: string;
-  defaultModel: string;
-};
-
 export type XaiRestSttTranscriptionConfig = {
   kind: "xai-stt-rest";
   endpoint: string;
@@ -54,8 +48,7 @@ export type ProviderSttConfig =
   | BytedanceBigmodelFlashTranscriptionConfig
   | GoogleSpeechTranscriptionConfig
   | GoogleCloudSpeechV2TranscriptionConfig
-  | XaiRestSttTranscriptionConfig
-  | XaiRealtimeTranscriptionConfig;
+  | XaiRestSttTranscriptionConfig;
 
 export const STT_TIMEOUT_MS = 60000;
 export const OPENAI_STT_TIMEOUT_MS = 45000;
@@ -130,14 +123,6 @@ function buildConfigForTransport(params: {
             defaultModel: params.defaultModel,
           }
         : null;
-    case "xai-realtime":
-      return params.endpoint
-        ? {
-            kind: "xai-realtime",
-            endpoint: params.endpoint,
-            defaultModel: params.defaultModel,
-          }
-        : null;
     case "xai-stt-rest":
       return params.endpoint
         ? {
@@ -161,21 +146,10 @@ export function getProviderSttConfig(
     return null;
   }
 
-  const isRealtimeModel = manifest.stt.realtimeModelIds?.includes(model) ?? false;
-  const transport = isRealtimeModel
-    ? manifest.stt.realtimeTransport ?? manifest.stt.transport
-    : manifest.stt.transport;
-  const defaultModel = isRealtimeModel
-    ? model
-    : manifest.stt.defaultModel ?? model;
-  const endpoint = isRealtimeModel
-    ? manifest.stt.realtimeEndpointByModel?.[model] ??
-      manifest.stt.realtimeEndpoint ??
-      manifest.stt.endpoint
-    : manifest.stt.endpoint;
-  const endpointBase = isRealtimeModel
-    ? manifest.stt.realtimeEndpointBase ?? manifest.stt.endpointBase
-    : manifest.stt.endpointBase;
+  const transport = manifest.stt.transport;
+  const defaultModel = manifest.stt.defaultModel ?? model;
+  const endpoint = manifest.stt.endpoint;
+  const endpointBase = manifest.stt.endpointBase;
 
   if (!defaultModel) {
     return null;

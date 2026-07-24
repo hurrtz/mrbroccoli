@@ -28,8 +28,7 @@ export type RuntimeSttTransport =
   | "google-speech"
   | "google-cloud-speech-v2"
   | "openai-audio-input"
-  | "xai-stt-rest"
-  | "xai-realtime";
+  | "xai-stt-rest";
 export type RuntimeTtsTransport =
   | "none"
   | "binary"
@@ -106,11 +105,6 @@ interface RuntimeSttManifest {
   endpointBase?: string;
   defaultModel?: string;
   models: RuntimeModelSpec[];
-  realtimeTransport?: Exclude<RuntimeSttTransport, "none">;
-  realtimeEndpoint?: string;
-  realtimeEndpointBase?: string;
-  realtimeEndpointByModel?: Partial<Record<string, string>>;
-  realtimeModelIds?: string[];
   languageHintKey?: RuntimeLanguageHintKey;
   languageNote?: string;
 }
