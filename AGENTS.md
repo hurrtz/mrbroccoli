@@ -15,7 +15,7 @@ These notes are specific to this repository and supplement any parent-level inst
 - `src/components/SettingsModal.tsx` is the central configuration UI and owns most provider, response mode, STT, TTS, and UI settings controls.
 - `src/components/ResponseModeToggle.tsx` is the home-screen selector for `quick`, `normal`, and `deep`.
 - `src/components/ProviderToggle.tsx` still exists, but the primary home-screen switching model is response-mode based, not provider-based.
-- `src/constants/models.ts` is the source of truth for provider order, provider metadata, model lists, API key hints, STT/TTS support flags, and provider voice defaults.
+- `src/constants/providers/runtimeManifest.ts` is the runtime source of truth for provider order, transports, model routes, API key hints, STT/TTS capabilities, and provider voice defaults. `src/constants/models.ts` exposes user-facing helpers on top of it.
 - `src/types.ts` is the source of truth for settings types and `DEFAULT_SETTINGS`.
 - `src/utils/responseModes.ts` contains the response-mode routing helpers and provider model validation logic.
 - `src/hooks/useSettings.ts` handles settings persistence, migrations, SecureStore API key loading, and response-mode migration logic.
@@ -48,7 +48,7 @@ These notes are specific to this repository and supplement any parent-level inst
 
 ## Provider And Model Maintenance
 
-- The app ships nine core LLM providers: `openai`, `anthropic`, `gemini`, `xai`, `mistral`, `bytedance-doubao-seed`, `deepseek`, `alibaba-qwen-dashscope`, and `moonshot-ai-kimi`. Dedicated web-search providers (`perplexity`, `tavily`, `brave`, `exa`, `firecrawl`, `serpapi`) are additionally wired for web search.
+- The app ships ten LLM-capable provider routes: `openai`, `anthropic`, `gemini`, `xai`, `mistral`, `bytedance-doubao-seed`, `deepseek`, `alibaba-qwen-dashscope`, `moonshot-ai-kimi`, and `perplexity`. `elevenlabs` is additionally available as a TTS-only provider. Dedicated web-search routes (`perplexity`, `tavily`, `brave`, `exa`, `firecrawl`, `serpapi`) are wired separately.
 - The runtime provider set, transports, models, and STT/TTS capabilities are driven from `src/constants/providers/runtimeManifest.ts`. `src/constants/models.ts` re-exposes provider order, labels, and picker helpers on top of it.
 - Pricing has been removed: there is no `src/constants/usagePricing.ts`, and usage is reported in tokens only.
 - When adding or changing a provider, audit all of:
@@ -86,7 +86,8 @@ These notes are specific to this repository and supplement any parent-level inst
 - STT provider support is currently wired in `src/services/whisper.ts`.
 - TTS provider support is currently wired in `src/services/tts.ts`.
 - Speech-to-text prefers the device's native system recognizer (`src/services/speech/`); provider STT is capability-gated. OpenAI, Gemini (Google Cloud Speech), Mistral, xAI, ByteDance Doubao, and Alibaba Qwen currently have provider STT routes in code.
-- Text-to-speech uses the device's native voices by default; provider TTS is capability-gated. OpenAI, Gemini, xAI, and Alibaba Qwen currently have provider TTS routes in code.
+- Text-to-speech uses the device's native voices by default; provider TTS is capability-gated. OpenAI, Gemini, xAI, Alibaba Qwen, Mistral, and ElevenLabs currently have provider TTS routes in code.
+- Mistral, ElevenLabs, and xAI load account-visible voices through provider voice-directory services. Keep those integrations, their fallback voice lists, and `src/services/providerVoiceDirectory.ts` in sync.
 - Local/on-device TTS has been removed. There are no more `react-native-sherpa-onnx` / `onnxruntime-react-native` ONNX/Sherpa dependencies in the voice pipeline.
 - The capability source of truth for which provider supports STT/TTS is `src/constants/providers/runtimeManifest.ts`.
 - Native speech changes often require `npx pod-install` and a fresh native rebuild, especially on iOS.
