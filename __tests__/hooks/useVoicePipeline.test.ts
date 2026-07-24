@@ -444,6 +444,68 @@ describe("useVoicePipeline", () => {
     expect(result.current.lastCompletedReplyRef.current).toBe("Completed reply");
   });
 
+  it("uses the latest per-conversation settings for the next turn", async () => {
+    const initialParams = createParams({
+      modelEffort: "low",
+      spokenRepliesEnabled: false,
+      ttsInstructions: "Use the old delivery.",
+      initialConversationSettings: {
+        responseLength: "brief",
+        responseTone: "casual",
+        ttsVoice: "alloy",
+        ttsInstructions: "Use the old delivery.",
+        assistantInstructions: "Use the old thinking instructions.",
+      },
+    });
+    const updatedConversationSettings = {
+      responseLength: "thorough" as const,
+      responseTone: "socratic" as const,
+      ttsVoice: "nova",
+      ttsInstructions: "Use the new delivery.",
+      assistantInstructions: "Use the new thinking instructions.",
+    };
+    const updatedParams = {
+      ...initialParams,
+      modelEffort: "high",
+      ttsInstructions: "Use the new delivery.",
+      initialConversationSettings: updatedConversationSettings,
+    };
+
+    (runVoicePipeline as jest.Mock).mockImplementation(
+      async ({ callbacks }: any) => {
+        callbacks.onTranscription("A new conversation");
+        callbacks.onResponseDone("A current reply");
+        return "A new conversation";
+      },
+    );
+
+    const { result, rerender } = renderHook(
+      ({ params }) => useVoicePipeline(params),
+      { initialProps: { params: initialParams } },
+    );
+
+    rerender({ params: updatedParams });
+
+    await act(async () => {
+      await result.current.handleVoiceCaptureDone({
+        audioUri: "file://capture.wav",
+      });
+    });
+
+    expect(runVoicePipeline).toHaveBeenCalledWith(
+      expect.objectContaining({
+        modelEffort: "high",
+        ttsInstructions: "Use the new delivery.",
+      }),
+    );
+    expect(initialParams.createConversation).toHaveBeenCalledWith(
+      "A new conversation",
+      "gpt-5.4",
+      "openai",
+      updatedConversationSettings,
+    );
+  });
+
   it("does not stop produced audio when a later speech chunk fails", async () => {
     const player = createPlayer({
       isPlaying: true,
