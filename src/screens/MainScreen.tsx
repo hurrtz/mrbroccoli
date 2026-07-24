@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from "react";
+import React, { useEffect } from "react";
 import {
   KeyboardAvoidingView,
   Platform,
@@ -11,7 +11,6 @@ import { ConversationMemoryModal } from "../components/ConversationMemoryModal";
 import { SettingsModal } from "../components/SettingsModal";
 import { SetupGuideModal } from "../components/SetupGuideModal";
 import { Toast } from "../components/Toast";
-import { PROVIDER_LABELS } from "../constants/models";
 import { useSharedSettings } from "../context/SettingsContext";
 import { useAudioPlayer } from "../hooks/useAudioPlayer";
 import { useAudioRecorder } from "../hooks/useAudioRecorder";
@@ -20,11 +19,7 @@ import { useConversations } from "../hooks/useConversations";
 import { useVoicePipeline } from "../hooks/useVoicePipeline";
 import { useBatteryDiagnostics } from "../hooks/useBatteryDiagnostics";
 import { useLocalization } from "../i18n";
-import { recordDebugLogEvent } from "../services/debugLogCapture";
 import { useTheme } from "../theme/ThemeContext";
-import { ResponseMode, ToastTone } from "../types";
-import { hasProviderCredentialForCapability } from "../utils/providerCredentials";
-import { getResponseModeRoute } from "../utils/responseModes";
 import { MainScreenWorkspace } from "./main/MainScreenWorkspace";
 import { StyleSheetModal } from "./main/StyleSheetModal";
 import { StatusDetailsModal } from "./main/StatusDetailsModal";
@@ -39,6 +34,10 @@ import { useConversationTitleGenerator } from "./main/useConversationTitleGenera
 import { useConversationSettings } from "./main/useConversationSettings";
 import { useDebugLogCaptureController } from "./main/useDebugLogCaptureController";
 import { useMainScreenUiState } from "./main/useMainScreenUiState";
+import { useMainScreenComposerDraft } from "./main/useMainScreenComposerDraft";
+import { useMainScreenReplyReplay } from "./main/useMainScreenReplyReplay";
+import { useMainScreenResponseModeSelection } from "./main/useMainScreenResponseModeSelection";
+import { useMainScreenToastController } from "./main/useMainScreenToastController";
 import { useMainScreenVoiceDirectories } from "./main/useMainScreenVoiceDirectories";
 import { useMainScreenDiagnostics } from "./main/useMainScreenDiagnostics";
 import { useMainScreenSurfaceActions } from "./main/useMainScreenSurfaceActions";
@@ -99,21 +98,13 @@ export function MainScreen() {
   const nativeStt = useNativeSpeechRecognizer();
   const player = useAudioPlayer();
 
-  const [toast, setToast] = useState<{
-    message: string;
-    onRetry?: () => void;
-    tone?: ToastTone;
-  } | null>(null);
-  const toastDismissRef = React.useRef<(() => void) | null>(null);
-  const [styleSheetVisible, setStyleSheetVisible] = useState(false);
-  const inputSurfaceRef = React.useRef<"voice" | "text">("voice");
-  const textMessageDraftRef = React.useRef("");
-  const handleInputSurfaceChange = useCallback((surface: "voice" | "text") => {
-    inputSurfaceRef.current = surface;
-  }, []);
-  const handleTextMessageChange = useCallback((text: string) => {
-    textMessageDraftRef.current = text;
-  }, []);
+  const [styleSheetVisible, setStyleSheetVisible] = React.useState(false);
+  const {
+    handleInputSurfaceChange,
+    handleTextMessageChange,
+    inputSurfaceRef,
+    textMessageDraftRef,
+  } = useMainScreenComposerDraft();
   const {
     settingsVisible,
     settingsFocusCatalogProviderId,
@@ -221,40 +212,8 @@ export function MainScreen() {
     settings.sttMode === "native"
       ? nativeStt.isRecording
       : recorder.isRecording;
-  const showToast = useCallback(
-    (
-      message: string,
-      onRetry?: () => void,
-      tone: ToastTone = "info",
-      onDismiss?: () => void,
-    ) => {
-      recordDebugLogEvent({
-        event: "toast-shown",
-        payload: {
-          hasRetry: Boolean(onRetry),
-          message,
-          tone,
-        },
-      });
-      toastDismissRef.current?.();
-      toastDismissRef.current = onDismiss ?? null;
-      setToast({ message, onRetry, tone });
-    },
-    [],
-  );
-  const dismissToast = useCallback(() => {
-    const onDismiss = toastDismissRef.current;
-    toastDismissRef.current = null;
-    onDismiss?.();
-    setToast(null);
-  }, []);
-  React.useEffect(
-    () => () => {
-      toastDismissRef.current?.();
-      toastDismissRef.current = null;
-    },
-    [],
-  );
+  const { dismissToast, showToast, toast } =
+    useMainScreenToastController();
   usePersistenceFailureAlert(showToast, t);
 
   const {
@@ -310,30 +269,11 @@ export function MainScreen() {
 
   const isBusy = pipelinePhase !== "idle";
 
-  const handleRepeatMessage = useCallback(
-    async (message: { id: string; content: string }) => {
-      if (activeReplayMessageId === message.id) {
-        recordDebugLogEvent({
-          event: "reply-repeat-stop-requested",
-          payload: {
-            messageId: message.id,
-          },
-        });
-        await stopReplay();
-        return;
-      }
-
-      recordDebugLogEvent({
-        event: "reply-repeat-requested",
-        payload: {
-          contentLength: message.content.length,
-          messageId: message.id,
-        },
-      });
-      await handleRepeatLastReply(message.content, message.id);
-    },
-    [activeReplayMessageId, handleRepeatLastReply, stopReplay],
-  );
+  const handleRepeatMessage = useMainScreenReplyReplay({
+    activeReplayMessageId,
+    handleRepeatLastReply,
+    stopReplay,
+  });
 
   const { handleRetryMessage, handleSubmitTextMessage } =
     useTextTurnSubmitController({
@@ -465,61 +405,13 @@ export function MainScreen() {
       t,
     });
 
-  const handleResponseModeChange = useCallback(
-    (nextMode: ResponseMode) => {
-      const nextRoute = getResponseModeRoute(settings, nextMode);
-      const nextProvider = nextRoute.provider;
-
-      recordDebugLogEvent({
-        event: "response-mode-change-requested",
-        payload: {
-          currentMode: activeResponseMode,
-          nextMode,
-          nextProvider,
-        },
-      });
-
-      if (
-        !hasProviderCredentialForCapability(
-          nextProvider,
-          settings.apiKeys[nextProvider],
-          "llm",
-        )
-      ) {
-        recordDebugLogEvent({
-          event: "response-mode-change-blocked",
-          level: "warn",
-          payload: {
-            missingProviderKey: nextProvider,
-            nextMode,
-          },
-        });
-        showToast(
-          t("addProviderKeyToEnableProvider", {
-            provider: PROVIDER_LABELS[nextProvider],
-          }),
-        );
-        return;
-      }
-
-      recordDebugLogEvent({
-        event: "response-mode-change-applied",
-        payload: {
-          nextMode,
-          nextProvider,
-        },
-      });
-      updateActiveResponseMode(nextMode);
-    },
-    [
-      activeResponseMode,
-      settings.apiKeys,
-      settings.responseModes,
-      showToast,
-      t,
-      updateActiveResponseMode,
-    ],
-  );
+  const handleResponseModeChange = useMainScreenResponseModeSelection({
+    activeResponseMode,
+    settings,
+    showToast,
+    t,
+    updateActiveResponseMode,
+  });
 
   const { handlePreviewVoice, stopPreviewVoice } = usePreviewVoiceController({
     isBusy,
