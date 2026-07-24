@@ -109,9 +109,18 @@ export async function requestRealtimeChatViaWebSocket(params: {
       }
     };
 
-    const handleAbort = () => {
+    const finishAndClose = (text: string) => {
+      finish(text);
       closeSocket();
-      fail(new Error("The request was aborted."));
+    };
+
+    const failAndClose = (error: unknown) => {
+      fail(error);
+      closeSocket();
+    };
+
+    const handleAbort = () => {
+      failAndClose(new Error("The request was aborted."));
     };
 
     try {
@@ -152,8 +161,7 @@ export async function requestRealtimeChatViaWebSocket(params: {
           }),
         );
       } catch (error) {
-        closeSocket();
-        fail(error);
+        failAndClose(error);
       }
     };
 
@@ -171,8 +179,7 @@ export async function requestRealtimeChatViaWebSocket(params: {
       }
 
       if (payload?.type === "error") {
-        closeSocket();
-        reject(
+        failAndClose(
           buildProviderHttpError({
             provider: params.provider,
             language: params.language,
@@ -184,8 +191,6 @@ export async function requestRealtimeChatViaWebSocket(params: {
             action: "reply",
           }),
         );
-        settled = true;
-        cleanup();
         return;
       }
 
@@ -218,13 +223,12 @@ export async function requestRealtimeChatViaWebSocket(params: {
 
       if (payload?.type === "response.done") {
         completed = true;
-        closeSocket();
-        finish(fullText.trim());
+        finishAndClose(fullText.trim());
       }
     };
 
     socket.onerror = (event: { message?: string }) => {
-      fail(new Error(event?.message || "Realtime socket error."));
+      failAndClose(new Error(event?.message || "Realtime socket error."));
     };
 
     socket.onclose = (event: { code?: number; reason?: string }) => {

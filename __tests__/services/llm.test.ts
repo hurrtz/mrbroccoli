@@ -3,6 +3,7 @@ import {
   streamChat,
   validateProviderConnection,
 } from "../../src/services/llm";
+import { requestRealtimeChatViaWebSocket } from "../../src/services/llm/providers/openaiRealtime";
 import { Message } from "../../src/types";
 global.fetch = jest.fn();
 
@@ -748,6 +749,46 @@ describe("streamChat", () => {
     await promise;
     expect(chunks).toEqual(["Hi"]);
     expect(fetch).not.toHaveBeenCalled();
+  });
+
+  it("preserves a realtime provider error when closing emits synchronously", async () => {
+    const promise = requestRealtimeChatViaWebSocket({
+      provider: "openai",
+      model: "gpt-realtime-2.1",
+      language: "en",
+      systemPrompt: "Be concise.",
+      messages: mockMessages,
+      url: "wss://api.openai.com/v1/realtime?model=gpt-realtime-2.1",
+      headers: { Authorization: "Bearer sk-test-key" },
+    });
+    const socket = MockWebSocket.instances[0];
+
+    socket.emitMessage({
+      type: "error",
+      error: { message: "Incorrect API key provided." },
+    });
+
+    await expect(promise).rejects.toThrow(
+      "OpenAI rejected the credentials for reply generation. Check the API key and permissions.",
+    );
+  });
+
+  it("preserves an abort reason when closing emits synchronously", async () => {
+    const abortController = new AbortController();
+    const promise = requestRealtimeChatViaWebSocket({
+      provider: "openai",
+      model: "gpt-realtime-2.1",
+      language: "en",
+      systemPrompt: "Be concise.",
+      messages: mockMessages,
+      url: "wss://api.openai.com/v1/realtime?model=gpt-realtime-2.1",
+      headers: { Authorization: "Bearer sk-test-key" },
+      abortSignal: abortController.signal,
+    });
+
+    abortController.abort();
+
+    await expect(promise).rejects.toThrow("The request was aborted.");
   });
 
   it("uses Gemini native streaming with Google API key auth", async () => {
