@@ -11,9 +11,7 @@ import { ConversationMemoryModal } from "../components/ConversationMemoryModal";
 import { SettingsModal } from "../components/SettingsModal";
 import { SetupGuideModal } from "../components/SetupGuideModal";
 import { Toast } from "../components/Toast";
-import {
-  PROVIDER_LABELS,
-} from "../constants/models";
+import { PROVIDER_LABELS } from "../constants/models";
 import { useSharedSettings } from "../context/SettingsContext";
 import { useAudioPlayer } from "../hooks/useAudioPlayer";
 import { useAudioRecorder } from "../hooks/useAudioRecorder";
@@ -43,6 +41,7 @@ import { useDebugLogCaptureController } from "./main/useDebugLogCaptureControlle
 import { useMainScreenUiState } from "./main/useMainScreenUiState";
 import { useMainScreenVoiceDirectories } from "./main/useMainScreenVoiceDirectories";
 import { useMainScreenDiagnostics } from "./main/useMainScreenDiagnostics";
+import { useMainScreenSurfaceActions } from "./main/useMainScreenSurfaceActions";
 import { usePreviewVoiceController } from "./main/usePreviewVoiceController";
 import { usePersistenceFailureAlert } from "./main/usePersistenceFailureAlert";
 import { useProviderAvailabilityGuards } from "./main/useProviderAvailabilityGuards";
@@ -91,6 +90,10 @@ export function MainScreen() {
     clearActiveConversation,
     loaded: conversationsLoaded = true,
   } = useConversations();
+  const routeConfiguration = React.useMemo(
+    () => getMainScreenRouteConfiguration(settings, conversationsLoaded),
+    [conversationsLoaded, settings],
+  );
 
   const recorder = useAudioRecorder();
   const nativeStt = useNativeSpeechRecognizer();
@@ -104,12 +107,9 @@ export function MainScreen() {
   const [styleSheetVisible, setStyleSheetVisible] = useState(false);
   const inputSurfaceRef = React.useRef<"voice" | "text">("voice");
   const textMessageDraftRef = React.useRef("");
-  const handleInputSurfaceChange = useCallback(
-    (surface: "voice" | "text") => {
-      inputSurfaceRef.current = surface;
-    },
-    [],
-  );
+  const handleInputSurfaceChange = useCallback((surface: "voice" | "text") => {
+    inputSurfaceRef.current = surface;
+  }, []);
   const handleTextMessageChange = useCallback((text: string) => {
     textMessageDraftRef.current = text;
   }, []);
@@ -159,7 +159,7 @@ export function MainScreen() {
     webSearchOptions,
     webSearchProvider,
     webSearchReady,
-  } = getMainScreenRouteConfiguration(settings, conversationsLoaded);
+  } = routeConfiguration;
   const isLandscape = width > height;
   const showStyleChip = loaded && availableResponseModes.length > 0;
   const mainSurfaceVisible = !(
@@ -194,17 +194,28 @@ export function MainScreen() {
     ttsProvider,
     updateConversationSettings,
   });
+  const conversationTtsControlState = React.useMemo(
+    () =>
+      getConversationTtsControlState({
+        language,
+        providerVoiceDirectories,
+        selectedTtsModel,
+        settings,
+        ttsProvider,
+      }),
+    [
+      language,
+      providerVoiceDirectories,
+      selectedTtsModel,
+      settings,
+      ttsProvider,
+    ],
+  );
   const {
     conversationTtsRouteLabel,
     conversationTtsVoiceOptions,
     ttsInstructionsSupported,
-  } = getConversationTtsControlState({
-    language,
-    providerVoiceDirectories,
-    selectedTtsModel,
-    settings,
-    ttsProvider,
-  });
+  } = conversationTtsControlState;
   const isRecording =
     settings.sttMode === "native"
       ? nativeStt.isRecording
@@ -419,22 +430,19 @@ export function MainScreen() {
     t,
   });
 
-  const {
-    canGenerateTitle,
-    handleGenerateTitle,
-    isGeneratingTitle,
-  } = useConversationTitleGenerator({
-    activeConversation,
-    apiKey: providerApiKey,
-    language,
-    model,
-    modelEffort,
-    provider,
-    providerReady: !voiceInputDisabled,
-    renameConversation,
-    showToast,
-    t,
-  });
+  const { canGenerateTitle, handleGenerateTitle, isGeneratingTitle } =
+    useConversationTitleGenerator({
+      activeConversation,
+      apiKey: providerApiKey,
+      language,
+      model,
+      modelEffort,
+      provider,
+      providerReady: !voiceInputDisabled,
+      renameConversation,
+      showToast,
+      t,
+    });
 
   const handleResponseModeChange = useCallback(
     (nextMode: ResponseMode) => {
@@ -536,6 +544,50 @@ export function MainScreen() {
     t,
     ttsApiKey,
     ttsProvider,
+  });
+  const {
+    handleAutoRenameConversation,
+    handleClearMemoryPress,
+    handleCloseConversationSettings,
+    handleCloseDrawer,
+    handleCopyDrawerThread,
+    handleCopyMemoryPress,
+    handleFinishSetupGuidePress,
+    handleManageDrawerMemory,
+    handleOpenConversationSettings,
+    handleOpenDrawer,
+    handleOpenMainSettings,
+    handleOpenProviderSettings,
+    handleOpenSettingsFromSetupGuide,
+    handleOpenSetupGuideFromSettings,
+    handleOpenSpeakingSettings,
+    handleRenameDrawerThread,
+    handleResetSetupGuideVoiceTest,
+    handleSetupGuideShortcutVisibilityChange,
+    handleSetupGuideVoiceTestAction,
+    handleShareDrawerThread,
+    handleToggleWebSearch,
+    handleValidateSetupGuideProviderKey,
+  } = useMainScreenSurfaceActions({
+    closeSettings,
+    handleClearMemory,
+    handleCopyMemory,
+    handleCopyThread,
+    handleFinishSetupGuide,
+    handleGenerateTitle,
+    handleOpenSettingsFromSummary,
+    handleOpenSetupGuide,
+    handleRenameThread,
+    handleShareThread,
+    handleValidateProviderKey,
+    openMemory,
+    openSettings,
+    runAfterDrawerDismiss,
+    setDrawerVisible,
+    setStyleSheetVisible,
+    setupGuideVoiceTest,
+    updateSettings,
+    webSearchActive,
   });
 
   useBatteryDiagnostics({
@@ -640,8 +692,8 @@ export function MainScreen() {
             debugLogActive: debugLogCaptureState.active,
             debugLogLabel: t("debugLogLabel"),
             drawerLabel: t("conversations"),
-            onOpenDrawer: () => setDrawerVisible(true),
-            onOpenSettings: () => openSettings(),
+            onOpenDrawer: handleOpenDrawer,
+            onOpenSettings: handleOpenMainSettings,
             onToggleDebugLog:
               settings.showDebugLogButton || debugLogCaptureState.active
                 ? handleToggleDebugLog
@@ -651,17 +703,13 @@ export function MainScreen() {
           routeCard={{
             activeResponseMode,
             availableResponseModes: loaded ? availableResponseModes : [],
-            onOpenSetupGuide: () => openSettings(undefined, "providers"),
+            onOpenSetupGuide: handleOpenProviderSettings,
             onSelectResponseMode: handleResponseModeChange,
             responseModes: settings.responseModes,
             t,
           }}
           routeControls={{
-            onToggleWebSearchEnabled: () => {
-              updateSettings({
-                webSearchMode: webSearchActive ? "off" : "on",
-              });
-            },
+            onToggleWebSearchEnabled: handleToggleWebSearch,
             t,
             webSearchEnabled: webSearchActive,
             webSearchReady,
@@ -695,10 +743,9 @@ export function MainScreen() {
             activeConversationTitle,
             activeReplayMessageId,
             messages,
-            onCopyMessage: (message) =>
-              handleCopyMessage(message.content),
-            onOpenSpeakingSettings: () => openSettings(undefined, "tts"),
-            onOpenStyleSheet: () => setStyleSheetVisible(true),
+            onCopyMessage: (message) => handleCopyMessage(message.content),
+            onOpenSpeakingSettings: handleOpenSpeakingSettings,
+            onOpenStyleSheet: handleOpenConversationSettings,
             onRepeatMessage: (message) => {
               void handleRepeatMessage(message);
             },
@@ -728,14 +775,12 @@ export function MainScreen() {
         ttsRouteLabel={conversationTtsRouteLabel}
         ttsVoice={selectedTtsVoice}
         ttsVoiceOptions={conversationTtsVoiceOptions}
-        onAutoRenameConversation={() => {
-          void handleGenerateTitle();
-        }}
+        onAutoRenameConversation={handleAutoRenameConversation}
         onChange={updateResponseSettings}
         onLlmInstructionsChange={updateLlmInstructions}
         onTtsInstructionsChange={updateTtsInstructions}
         onTtsVoiceChange={updateTtsVoice}
-        onClose={() => setStyleSheetVisible(false)}
+        onClose={handleCloseConversationSettings}
       />
 
       <StatusDetailsModal
@@ -773,10 +818,7 @@ export function MainScreen() {
         onValidateWebSearchProvider={handleValidateWebSearchProvider}
         onOpenSetupGuide={
           settings.showSetupGuideShortcut
-            ? () => {
-                closeSettings();
-                handleOpenSetupGuide("intro", "settings");
-              }
+            ? handleOpenSetupGuideFromSettings
             : undefined
         }
         onClose={closeSettings}
@@ -795,40 +837,26 @@ export function MainScreen() {
         onDismiss={handleDismissSetupGuide}
         onBack={handleBack}
         onContinueFromIntro={handleContinueFromIntro}
-        onValidateProviderKey={() => {
-          void handleValidateProviderKey();
-        }}
+        onValidateProviderKey={handleValidateSetupGuideProviderKey}
         onContinueFromProvider={handleContinueFromProvider}
-        onVoiceTestAction={() => {
-          void setupGuideVoiceTest.handleAction();
-        }}
-        onResetVoiceTest={() => {
-          void setupGuideVoiceTest.reset(true);
-        }}
+        onVoiceTestAction={handleSetupGuideVoiceTestAction}
+        onResetVoiceTest={handleResetSetupGuideVoiceTest}
         onContinueFromVoiceTest={handleContinueFromVoiceTest}
-        onFinish={() => {
-          void handleFinishSetupGuide();
-        }}
-        onOpenSettings={() => {
-          void handleOpenSettingsFromSummary();
-        }}
+        onFinish={handleFinishSetupGuidePress}
+        onOpenSettings={handleOpenSettingsFromSetupGuide}
         showSettingsShortcutOption={setupGuideOpenedFromSettings}
         settingsShortcutVisible={settings.showSetupGuideShortcut}
-        onChangeSettingsShortcutVisible={(visible) => {
-          updateSettings({ showSetupGuideShortcut: visible });
-        }}
+        onChangeSettingsShortcutVisible={
+          handleSetupGuideShortcutVisibilityChange
+        }
       />
       <ConversationMemoryModal
         visible={memoryVisible}
         title={memoryConversation?.title ?? t("freshSession")}
         summary={memoryConversation?.contextSummary}
         summarizedMessageCount={memoryConversation?.summarizedMessageCount}
-        onCopy={() => {
-          void handleCopyMemory();
-        }}
-        onClear={() => {
-          void handleClearMemory();
-        }}
+        onCopy={handleCopyMemoryPress}
+        onClear={handleClearMemoryPress}
         onClose={closeMemory}
       />
       <ConversationDrawer
@@ -837,26 +865,14 @@ export function MainScreen() {
         activeId={activeConversation?.id || null}
         onSearchConversations={searchConversations}
         onSelect={handleSelectConversation}
-        onCopyThread={(id) => {
-          void handleCopyThread(id);
-        }}
-        onShareThread={(id) => {
-          runAfterDrawerDismiss(() => {
-            void handleShareThread(id);
-          });
-        }}
-        onManageMemory={(id) => {
-          runAfterDrawerDismiss(() => {
-            void openMemory(id);
-          });
-        }}
-        onRenameThread={(id, title) => {
-          void handleRenameThread(id, title);
-        }}
+        onCopyThread={handleCopyDrawerThread}
+        onShareThread={handleShareDrawerThread}
+        onManageMemory={handleManageDrawerMemory}
+        onRenameThread={handleRenameDrawerThread}
         onTogglePinned={handleTogglePinned}
         onNewSession={handleStartNewSession}
         onDelete={handleDeleteConversation}
-        onClose={() => setDrawerVisible(false)}
+        onClose={handleCloseDrawer}
         onDismiss={handleDrawerDismiss}
       />
     </SafeAreaView>

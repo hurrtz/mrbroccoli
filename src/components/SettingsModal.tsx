@@ -74,7 +74,9 @@ function getInitialSettingsPage(params: {
   return "overview";
 }
 
-export function SettingsModal(props: SettingsModalProps) {
+export const SettingsModal = React.memo(function SettingsModal(
+  props: SettingsModalProps,
+) {
   const {
     visible,
     settings,
@@ -110,8 +112,9 @@ export function SettingsModal(props: SettingsModalProps) {
       focusTab,
     }),
   );
-  const [validationToastMessage, setValidationToastMessage] =
-    React.useState<string | null>(null);
+  const [validationToastMessage, setValidationToastMessage] = React.useState<
+    string | null
+  >(null);
   const handleProviderValidationResult = React.useCallback(
     (provider: Provider, result: ProviderValidationResult) => {
       onUpdate({
@@ -448,7 +451,11 @@ export function SettingsModal(props: SettingsModalProps) {
                   accessibilityRole="button"
                   accessibilityLabel={t("settingsBackToOverview")}
                 >
-                  <Feather name="chevron-left" size={20} color={colors.accent} />
+                  <Feather
+                    name="chevron-left"
+                    size={20}
+                    color={colors.accent}
+                  />
                 </TouchableOpacity>
               ) : null}
               <View style={styles.headerCopy}>
@@ -485,10 +492,7 @@ export function SettingsModal(props: SettingsModalProps) {
               styles.content,
               isLandscape ? styles.contentLandscape : null,
               {
-                paddingBottom: Math.max(
-                  insets.bottom + 20,
-                  keyboardInset + 20,
-                ),
+                paddingBottom: Math.max(insets.bottom + 20, keyboardInset + 20),
               },
             ]}
             scrollIndicatorInsets={{ bottom: keyboardInset }}
@@ -508,4 +512,4 @@ export function SettingsModal(props: SettingsModalProps) {
       </View>
     </Modal>
   );
-}
+});

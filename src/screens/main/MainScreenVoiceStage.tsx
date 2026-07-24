@@ -6,10 +6,7 @@ import { InputMode, VoicePhaseProgress, VoiceVisualPhase } from "../../types";
 
 import { TranslateFn } from "./shared";
 import { styles } from "./styles";
-import {
-  InputSurface,
-  VoiceTextInputPager,
-} from "./VoiceTextInputPager";
+import { InputSurface, VoiceTextInputPager } from "./VoiceTextInputPager";
 
 interface MainScreenVoiceStageProps {
   colors: Colors;
@@ -38,7 +35,7 @@ interface MainScreenVoiceStageProps {
   visualPhase: VoiceVisualPhase;
 }
 
-export function MainScreenVoiceStage({
+export const MainScreenVoiceStage = React.memo(function MainScreenVoiceStage({
   colors,
   disabled = false,
   initialInputSurface,
@@ -108,4 +105,4 @@ export function MainScreenVoiceStage({
       </View>
     </View>
   );
-}
+});

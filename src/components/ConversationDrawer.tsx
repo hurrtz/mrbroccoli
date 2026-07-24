@@ -17,7 +17,7 @@ import { styles } from "./conversationDrawer/styles";
 import { ConversationDrawerProps } from "./conversationDrawer/types";
 import { useConversationDrawerController } from "./conversationDrawer/useConversationDrawerController";
 
-export function ConversationDrawer({
+export const ConversationDrawer = React.memo(function ConversationDrawer({
   visible,
   conversations,
   activeId,
@@ -146,4 +146,4 @@ export function ConversationDrawer({
       />
     </Modal>
   );
-}
+});

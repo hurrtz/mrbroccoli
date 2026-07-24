@@ -18,7 +18,7 @@ interface MainScreenTopBarProps {
   settingsLabel: string;
 }
 
-export function MainScreenTopBar({
+export const MainScreenTopBar = React.memo(function MainScreenTopBar({
   colors,
   compact = false,
   debugLogActive = false,
@@ -61,9 +61,7 @@ export function MainScreenTopBar({
               },
             ]}
           >
-            <Text
-              style={[styles.compactBrandText, { color: colors.text }]}
-            >
+            <Text style={[styles.compactBrandText, { color: colors.text }]}>
               Mr Broccoli
             </Text>
           </View>
@@ -95,7 +93,9 @@ export function MainScreenTopBar({
             <Text
               style={[
                 styles.logButtonText,
-                { color: debugLogActive ? colors.accent : colors.textSecondary },
+                {
+                  color: debugLogActive ? colors.accent : colors.textSecondary,
+                },
               ]}
             >
               {debugLogLabel}
@@ -120,7 +120,7 @@ export function MainScreenTopBar({
       </View>
     </View>
   );
-}
+});
 
 const styles = StyleSheet.create({
   topBar: {

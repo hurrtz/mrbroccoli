@@ -50,7 +50,7 @@ interface StyleSheetModalProps {
   onClose: () => void;
 }
 
-export function StyleSheetModal({
+export const StyleSheetModal = React.memo(function StyleSheetModal({
   canAutoRenameConversation,
   isAutoRenamingConversation,
   visible,
@@ -491,4 +491,4 @@ export function StyleSheetModal({
       </View>
     </Modal>
   );
-}
+});

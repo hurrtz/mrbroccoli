@@ -24,149 +24,153 @@ interface ConversationMemoryModalProps {
   onClose: () => void;
 }
 
-export function ConversationMemoryModal({
-  visible,
-  title,
-  summary,
-  summarizedMessageCount,
-  onCopy,
-  onClear,
-  onClose,
-}: ConversationMemoryModalProps) {
-  const { colors } = useTheme();
-  const { t } = useLocalization();
-  const insets = useSafeAreaInsets();
-  const { height, width } = useWindowDimensions();
-  const isLandscape = width > height;
-  const cardMaxWidth = isLandscape ? Math.min(width - 40, 720) : 440;
-  const trimmedSummary = summary?.trim() ?? "";
-  const hasSummary = trimmedSummary.length > 0;
+export const ConversationMemoryModal = React.memo(
+  function ConversationMemoryModal({
+    visible,
+    title,
+    summary,
+    summarizedMessageCount,
+    onCopy,
+    onClear,
+    onClose,
+  }: ConversationMemoryModalProps) {
+    const { colors } = useTheme();
+    const { t } = useLocalization();
+    const insets = useSafeAreaInsets();
+    const { height, width } = useWindowDimensions();
+    const isLandscape = width > height;
+    const cardMaxWidth = isLandscape ? Math.min(width - 40, 720) : 440;
+    const trimmedSummary = summary?.trim() ?? "";
+    const hasSummary = trimmedSummary.length > 0;
 
-  return (
-    <Modal
-      visible={visible}
-      transparent
-      animationType="fade"
-      supportedOrientations={APP_MODAL_ORIENTATIONS}
-    >
-      <View
-        style={[
-          styles.overlay,
-          {
-            paddingTop: Math.max(insets.top + 24, 36),
-            paddingBottom: Math.max(insets.bottom + 24, 36),
-          },
-        ]}
+    return (
+      <Modal
+        visible={visible}
+        transparent
+        animationType="fade"
+        supportedOrientations={APP_MODAL_ORIENTATIONS}
       >
-        <TouchableOpacity
-          style={[styles.backdrop, { backgroundColor: colors.overlay }]}
-          activeOpacity={1}
-          onPress={onClose}
-        />
         <View
           style={[
-            styles.card,
-            { maxWidth: cardMaxWidth },
+            styles.overlay,
             {
-              backgroundColor: colors.surface,
-              borderColor: colors.border,
-              shadowColor: colors.glow,
+              paddingTop: Math.max(insets.top + 24, 36),
+              paddingBottom: Math.max(insets.bottom + 24, 36),
             },
           ]}
         >
-          <View style={styles.header}>
-            <View style={styles.headerCopy}>
-              <Text style={[styles.eyebrow, { color: colors.accent }]}>
-                {t("memory")}
-              </Text>
-              <Text style={[styles.title, { color: colors.text }]}>
-                {t("memoryModalTitle")}
-              </Text>
-              <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
-                {title}
-              </Text>
-            </View>
-            <TouchableOpacity
-              onPress={onClose}
-              style={[
-                styles.closeButton,
-                {
-                  backgroundColor: colors.surfaceElevated,
-                  borderColor: colors.border,
-                },
-              ]}
-              activeOpacity={0.85}
-            >
-              <Feather name="x" size={18} color={colors.textSecondary} />
-            </TouchableOpacity>
-          </View>
-
-          <Text style={[styles.description, { color: colors.textSecondary }]}>
-            {t("memoryModalDescription")}
-          </Text>
-
+          <TouchableOpacity
+            style={[styles.backdrop, { backgroundColor: colors.overlay }]}
+            activeOpacity={1}
+            onPress={onClose}
+          />
           <View
             style={[
-              styles.summaryCard,
+              styles.card,
+              { maxWidth: cardMaxWidth },
               {
-                backgroundColor: colors.surfaceElevated,
+                backgroundColor: colors.surface,
                 borderColor: colors.border,
+                shadowColor: colors.glow,
               },
             ]}
           >
-            <Text style={[styles.summaryLabel, { color: colors.textMuted }]}>
-              {hasSummary
-                ? t("summarizedTurnsCount", {
-                    count: summarizedMessageCount ?? 0,
-                  })
-                : t("memorySummary")}
-            </Text>
-            <Text style={[styles.summaryText, { color: colors.text }]}>
-              {hasSummary ? trimmedSummary : t("memorySummaryEmpty")}
-            </Text>
-          </View>
+            <View style={styles.header}>
+              <View style={styles.headerCopy}>
+                <Text style={[styles.eyebrow, { color: colors.accent }]}>
+                  {t("memory")}
+                </Text>
+                <Text style={[styles.title, { color: colors.text }]}>
+                  {t("memoryModalTitle")}
+                </Text>
+                <Text
+                  style={[styles.subtitle, { color: colors.textSecondary }]}
+                >
+                  {title}
+                </Text>
+              </View>
+              <TouchableOpacity
+                onPress={onClose}
+                style={[
+                  styles.closeButton,
+                  {
+                    backgroundColor: colors.surfaceElevated,
+                    borderColor: colors.border,
+                  },
+                ]}
+                activeOpacity={0.85}
+              >
+                <Feather name="x" size={18} color={colors.textSecondary} />
+              </TouchableOpacity>
+            </View>
 
-          <View style={styles.actions}>
-            <TouchableOpacity
+            <Text style={[styles.description, { color: colors.textSecondary }]}>
+              {t("memoryModalDescription")}
+            </Text>
+
+            <View
               style={[
-                styles.actionButton,
+                styles.summaryCard,
                 {
                   backgroundColor: colors.surfaceElevated,
                   borderColor: colors.border,
-                  opacity: hasSummary ? 1 : 0.45,
                 },
               ]}
-              onPress={onCopy}
-              activeOpacity={0.88}
-              disabled={!hasSummary}
             >
-              <Text style={[styles.actionText, { color: colors.text }]}>
-                {t("copyMemory")}
+              <Text style={[styles.summaryLabel, { color: colors.textMuted }]}>
+                {hasSummary
+                  ? t("summarizedTurnsCount", {
+                      count: summarizedMessageCount ?? 0,
+                    })
+                  : t("memorySummary")}
               </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[
-                styles.actionButton,
-                {
-                  backgroundColor: colors.surfaceElevated,
-                  borderColor: colors.border,
-                  opacity: hasSummary ? 1 : 0.45,
-                },
-              ]}
-              onPress={onClear}
-              activeOpacity={0.88}
-              disabled={!hasSummary}
-            >
-              <Text style={[styles.actionText, { color: colors.danger }]}>
-                {t("forgetMemory")}
+              <Text style={[styles.summaryText, { color: colors.text }]}>
+                {hasSummary ? trimmedSummary : t("memorySummaryEmpty")}
               </Text>
-            </TouchableOpacity>
+            </View>
+
+            <View style={styles.actions}>
+              <TouchableOpacity
+                style={[
+                  styles.actionButton,
+                  {
+                    backgroundColor: colors.surfaceElevated,
+                    borderColor: colors.border,
+                    opacity: hasSummary ? 1 : 0.45,
+                  },
+                ]}
+                onPress={onCopy}
+                activeOpacity={0.88}
+                disabled={!hasSummary}
+              >
+                <Text style={[styles.actionText, { color: colors.text }]}>
+                  {t("copyMemory")}
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[
+                  styles.actionButton,
+                  {
+                    backgroundColor: colors.surfaceElevated,
+                    borderColor: colors.border,
+                    opacity: hasSummary ? 1 : 0.45,
+                  },
+                ]}
+                onPress={onClear}
+                activeOpacity={0.88}
+                disabled={!hasSummary}
+              >
+                <Text style={[styles.actionText, { color: colors.danger }]}>
+                  {t("forgetMemory")}
+                </Text>
+              </TouchableOpacity>
+            </View>
           </View>
         </View>
-      </View>
-    </Modal>
-  );
-}
+      </Modal>
+    );
+  },
+);
 
 const styles = StyleSheet.create({
   overlay: {

@@ -31,7 +31,7 @@ interface StatusDetailsModalProps {
   visible: boolean;
 }
 
-export function StatusDetailsModal({
+export const StatusDetailsModal = React.memo(function StatusDetailsModal({
   colors,
   fallbackTtsStatusLabel,
   isActive,
@@ -233,4 +233,4 @@ export function StatusDetailsModal({
       </SafeAreaView>
     </Modal>
   );
-}
+});

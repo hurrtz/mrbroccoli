@@ -28,7 +28,7 @@ interface MainScreenRouteCardProps {
   t: TranslateFn;
 }
 
-export function MainScreenRouteCard({
+export const MainScreenRouteCard = React.memo(function MainScreenRouteCard({
   activeResponseMode,
   availableResponseModes,
   colors,
@@ -99,4 +99,4 @@ export function MainScreenRouteCard({
       )}
     </View>
   );
-}
+});

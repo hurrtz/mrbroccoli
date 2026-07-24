@@ -29,7 +29,7 @@ const STEP_ORDER: SetupGuideStep[] = [
   "summary",
 ];
 
-export function SetupGuideModal({
+export const SetupGuideModal = React.memo(function SetupGuideModal({
   visible,
   step,
   providerOptions,
@@ -221,4 +221,4 @@ export function SetupGuideModal({
       </View>
     </Modal>
   );
-}
+});

@@ -14,71 +14,73 @@ interface MainScreenRouteControlsProps {
   webSearchReady?: boolean;
 }
 
-export function MainScreenRouteControls({
-  colors,
-  layout = "portrait",
-  onToggleWebSearchEnabled,
-  t,
-  webSearchEnabled = false,
-  webSearchReady = false,
-}: MainScreenRouteControlsProps) {
-  const webSearchAvailable =
-    webSearchReady && Boolean(onToggleWebSearchEnabled);
-  const webSearchValue = webSearchAvailable && webSearchEnabled;
+export const MainScreenRouteControls = React.memo(
+  function MainScreenRouteControls({
+    colors,
+    layout = "portrait",
+    onToggleWebSearchEnabled,
+    t,
+    webSearchEnabled = false,
+    webSearchReady = false,
+  }: MainScreenRouteControlsProps) {
+    const webSearchAvailable =
+      webSearchReady && Boolean(onToggleWebSearchEnabled);
+    const webSearchValue = webSearchAvailable && webSearchEnabled;
 
-  return (
-    <View
-      testID="route-controls-row"
-      style={[
-        styles.row,
-        layout === "landscape" ? styles.rowLandscape : null,
-      ]}
-    >
+    return (
       <View
-        testID="route-web-search-container"
+        testID="route-controls-row"
         style={[
-          styles.searchControl,
-          !webSearchAvailable ? styles.searchControlDisabled : null,
+          styles.row,
+          layout === "landscape" ? styles.rowLandscape : null,
         ]}
       >
-        <Text
-          testID="route-web-search-label"
+        <View
+          testID="route-web-search-container"
           style={[
-            styles.searchLabel,
-            {
-              color: webSearchAvailable
-                ? colors.textSecondary
-                : colors.textMuted,
-            },
+            styles.searchControl,
+            !webSearchAvailable ? styles.searchControlDisabled : null,
           ]}
         >
-          {t("webSearch")}
-        </Text>
-        <Switch
-          testID="route-web-search-control"
-          style={styles.searchSwitch}
-          value={webSearchValue}
-          disabled={!webSearchAvailable}
-          trackColor={{
-            false: colors.borderStrong,
-            true: colors.accent,
-          }}
-          thumbColor={colors.onAccent}
-          ios_backgroundColor={colors.borderStrong}
-          onValueChange={
-            webSearchAvailable ? onToggleWebSearchEnabled : undefined
-          }
-          accessibilityRole="switch"
-          accessibilityLabel={t("webSearch")}
-          accessibilityState={{
-            checked: webSearchValue,
-            disabled: !webSearchAvailable,
-          }}
-        />
+          <Text
+            testID="route-web-search-label"
+            style={[
+              styles.searchLabel,
+              {
+                color: webSearchAvailable
+                  ? colors.textSecondary
+                  : colors.textMuted,
+              },
+            ]}
+          >
+            {t("webSearch")}
+          </Text>
+          <Switch
+            testID="route-web-search-control"
+            style={styles.searchSwitch}
+            value={webSearchValue}
+            disabled={!webSearchAvailable}
+            trackColor={{
+              false: colors.borderStrong,
+              true: colors.accent,
+            }}
+            thumbColor={colors.onAccent}
+            ios_backgroundColor={colors.borderStrong}
+            onValueChange={
+              webSearchAvailable ? onToggleWebSearchEnabled : undefined
+            }
+            accessibilityRole="switch"
+            accessibilityLabel={t("webSearch")}
+            accessibilityState={{
+              checked: webSearchValue,
+              disabled: !webSearchAvailable,
+            }}
+          />
+        </View>
       </View>
-    </View>
-  );
-}
+    );
+  },
+);
 
 const styles = StyleSheet.create({
   row: {

@@ -342,10 +342,28 @@ jest.mock("../../src/screens/main/useProviderAvailabilityGuards", () => ({
 
 jest.mock("../../src/screens/main/useSetupGuideController", () => ({
   useSetupGuideController: jest.fn(() => ({
+    currentValidationState: { status: "idle" },
+    handleBack: jest.fn(),
+    handleContinueFromIntro: jest.fn(),
+    handleContinueFromProvider: jest.fn(),
+    handleContinueFromVoiceTest: jest.fn(),
     handleDismissSetupGuide: jest.fn(),
-    handleChooseSetupPreset: jest.fn(),
+    handleFinishSetupGuide: jest.fn(),
     handleOpenSetupGuide: jest.fn(),
+    handleOpenSettingsFromSummary: jest.fn(),
+    handleProviderApiKeyChange: jest.fn(),
+    handleSelectProvider: jest.fn(),
+    handleValidateProviderKey: jest.fn(),
     openedFromSettings: false,
+    providerOptions: [],
+    resolvedRoutes: {},
+    selectedProvider: null,
+    selectedProviderApiKey: "",
+    step: "intro",
+    voiceTest: {
+      handleAction: jest.fn(),
+      reset: jest.fn(),
+    },
   })),
 }));
 
@@ -658,9 +676,8 @@ describe("MainScreen", () => {
 
     expect(screen.getByTestId("main-safe-area").props.edges).toEqual(["top"]);
     expect(
-      StyleSheet.flatten(
-        screen.getByTestId("landscape-left-pane").props.style,
-      ).flex,
+      StyleSheet.flatten(screen.getByTestId("landscape-left-pane").props.style)
+        .flex,
     ).toBe(0.42);
     expect(screen.getByTestId("landscape-pane-divider")).toBeTruthy();
     expect(screen.getByTestId("route-web-search-control").props.disabled).toBe(
