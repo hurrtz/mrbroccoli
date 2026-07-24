@@ -35,10 +35,13 @@ describe("useConversations", () => {
     );
   });
 
-  it("starts with empty conversation list", () => {
+  it("starts with empty conversation list", async () => {
     const { result } = renderHook(() => useConversations());
     expect(result.current.conversations).toEqual([]);
     expect(result.current.activeConversation).toBeNull();
+    await waitFor(() => {
+      expect(result.current.loaded).toBe(true);
+    });
   });
 
   it("restores the conversation that was active before app reload", async () => {
@@ -153,6 +156,157 @@ describe("useConversations", () => {
       expect(result.current.activeConversation?.title).toBe(fullTitle);
     });
     expect(result.current.conversations[0]?.title).toBe(fullTitle);
+  });
+
+  it("merges a conversation created while launch hydration is still reading storage", async () => {
+    const storedConversation: Conversation = {
+      id: "stored-before-launch",
+      title: "Stored before launch",
+      createdAt: "2026-07-21T08:00:00.000Z",
+      updatedAt: "2026-07-21T08:01:00.000Z",
+      messages: [
+        {
+          id: "stored-message",
+          role: "user",
+          content: "Keep this stored conversation",
+          model: null,
+          provider: null,
+          timestamp: "2026-07-21T08:01:00.000Z",
+        },
+      ],
+    };
+    const storedMeta = {
+      id: storedConversation.id,
+      title: storedConversation.title,
+      createdAt: storedConversation.createdAt,
+      updatedAt: storedConversation.updatedAt,
+      messageCount: 1,
+      providers: [],
+      providerModels: {},
+      lastModel: null,
+      lastProvider: null,
+      pinned: false,
+    };
+    const stored = new Map<string, string>([
+      [
+        "@mrbroccoli/conversation/stored-before-launch",
+        JSON.stringify(storedConversation),
+      ],
+    ]);
+    let releaseMetaRead: (value: string) => void = () => undefined;
+    let metaReadCount = 0;
+    (AsyncStorage.getItem as jest.Mock).mockImplementation(
+      (key: string) => {
+        if (key === "@mrbroccoli/conversations") {
+          metaReadCount += 1;
+          if (metaReadCount === 1) {
+            return new Promise<string>((resolve) => {
+              releaseMetaRead = resolve;
+            });
+          }
+        }
+
+        return Promise.resolve(stored.get(key) ?? null);
+      },
+    );
+    (AsyncStorage.setItem as jest.Mock).mockImplementation(
+      async (key: string, value: string) => {
+        stored.set(key, value);
+      },
+    );
+
+    const { result } = renderHook(() => useConversations());
+
+    expect(result.current.loaded).toBe(false);
+    await act(async () => {
+      result.current.createConversation("Created during launch");
+    });
+    const createdConversationId = result.current.activeConversation?.id;
+
+    await act(async () => {
+      releaseMetaRead(JSON.stringify([storedMeta]));
+    });
+
+    await waitFor(() => {
+      expect(result.current.conversations).toHaveLength(2);
+    });
+    expect(result.current.loaded).toBe(true);
+    expect(result.current.activeConversation?.id).toBe(createdConversationId);
+    expect(result.current.conversations.map(({ id }) => id)).toEqual(
+      expect.arrayContaining([
+        "stored-before-launch",
+        createdConversationId,
+      ]),
+    );
+
+    await waitFor(() => {
+      const persistedMetas = JSON.parse(
+        stored.get("@mrbroccoli/conversations") ?? "[]",
+      );
+      expect(persistedMetas.map(({ id }: { id: string }) => id)).toEqual(
+        expect.arrayContaining([
+          "stored-before-launch",
+          createdConversationId,
+        ]),
+      );
+    });
+  });
+
+  it("keeps the most recently requested conversation when storage reads resolve out of order", async () => {
+    const firstConversation: Conversation = {
+      id: "first-selection",
+      title: "First",
+      createdAt: "2026-07-21T08:00:00.000Z",
+      updatedAt: "2026-07-21T08:00:00.000Z",
+      messages: [],
+    };
+    const secondConversation: Conversation = {
+      ...firstConversation,
+      id: "second-selection",
+      title: "Second",
+    };
+    let releaseFirstRead: (value: string) => void = () => undefined;
+    let releaseSecondRead: (value: string) => void = () => undefined;
+    (AsyncStorage.getItem as jest.Mock).mockImplementation((key: string) => {
+      if (key === "@mrbroccoli/conversation/first-selection") {
+        return new Promise<string>((resolve) => {
+          releaseFirstRead = resolve;
+        });
+      }
+      if (key === "@mrbroccoli/conversation/second-selection") {
+        return new Promise<string>((resolve) => {
+          releaseSecondRead = resolve;
+        });
+      }
+      return Promise.resolve(null);
+    });
+    const { result } = renderHook(() => useConversations());
+
+    let firstSelection = Promise.resolve();
+    let secondSelection = Promise.resolve();
+    act(() => {
+      firstSelection = result.current.selectConversation("first-selection");
+      secondSelection = result.current.selectConversation("second-selection");
+    });
+
+    await waitFor(() => {
+      expect(AsyncStorage.getItem).toHaveBeenCalledWith(
+        "@mrbroccoli/conversation/first-selection",
+      );
+      expect(AsyncStorage.getItem).toHaveBeenCalledWith(
+        "@mrbroccoli/conversation/second-selection",
+      );
+    });
+    await act(async () => {
+      releaseSecondRead(JSON.stringify(secondConversation));
+      await secondSelection;
+    });
+    await act(async () => {
+      releaseFirstRead(JSON.stringify(firstConversation));
+      await firstSelection;
+    });
+
+    expect(result.current.activeConversation?.id).toBe("second-selection");
   });
 
   it("creates a new conversation", async () => {

@@ -1,5 +1,6 @@
 import {
   useCallback,
+  useRef,
   type Dispatch,
   type MutableRefObject,
   type SetStateAction,
@@ -32,6 +33,7 @@ export function useConversationMutations(params: {
     setActiveConversationValue,
     setConversations,
   } = params;
+  const selectionRequestRef = useRef(0);
 
   const createConversation = useCallback(
     (
@@ -40,6 +42,7 @@ export function useConversationMutations(params: {
       initialProvider: Provider | null = null,
       initialSettings?: ConversationSettings,
     ) => {
+      selectionRequestRef.current += 1;
       const now = new Date().toISOString();
       const conversation: Conversation = {
         id: uuid.v4() as string,
@@ -76,9 +79,11 @@ export function useConversationMutations(params: {
 
   const selectConversation = useCallback(
     async (id: string) => {
+      const requestId = selectionRequestRef.current + 1;
+      selectionRequestRef.current = requestId;
       const conversation = await readConversation(id);
 
-      if (conversation) {
+      if (conversation && selectionRequestRef.current === requestId) {
         setActiveConversationValue(conversation);
       }
     },
@@ -307,6 +312,7 @@ export function useConversationMutations(params: {
       setConversations((previous) => persistMetas(previous.filter((entry) => entry.id !== id)));
 
       if (activeConversationRef.current?.id === id) {
+        selectionRequestRef.current += 1;
         setActiveConversationValue(null);
       }
     },
@@ -381,6 +387,7 @@ export function useConversationMutations(params: {
   );
 
   const clearActiveConversation = useCallback(() => {
+    selectionRequestRef.current += 1;
     setActiveConversationValue(null);
   }, [setActiveConversationValue]);
 

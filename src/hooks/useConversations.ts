@@ -12,6 +12,7 @@ export function useConversations() {
   const [conversations, setConversations] = useState<ConversationMeta[]>([]);
   const [activeConversation, setActiveConversation] =
     useState<Conversation | null>(null);
+  const [loaded, setLoaded] = useState(false);
   const activeConversationRef = useRef<Conversation | null>(null);
   const setActiveConversationValue = useCallback(
     (conversation: Conversation | null) => {
@@ -24,10 +25,14 @@ export function useConversations() {
   const persistMetas = useCallback((metas: ConversationMeta[]) => {
     return persistConversationMeta(metas);
   }, []);
+  const handleHydrated = useCallback(() => {
+    setLoaded(true);
+  }, []);
 
   useConversationHydration({
     activeConversationRef,
     conversations,
+    onHydrated: handleHydrated,
     setActiveConversationValue,
     setConversations,
   });
@@ -72,6 +77,7 @@ export function useConversations() {
   return {
     conversations,
     activeConversation,
+    loaded,
     createConversation,
     selectConversation,
     getConversationById,

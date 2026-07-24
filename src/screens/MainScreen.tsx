@@ -128,6 +128,7 @@ export function MainScreen() {
     searchConversations,
     deleteConversation,
     clearActiveConversation,
+    loaded: conversationsLoaded = true,
   } = useConversations();
 
   const recorder = useAudioRecorder();
@@ -177,11 +178,9 @@ export function MainScreen() {
   const activeResponseRoute = getResponseModeRoute(settings);
   const provider = activeResponseRoute.provider;
   const providerApiKey = settings.apiKeys[provider].trim();
-  const voiceInputDisabled = !hasProviderCredentialForCapability(
-    provider,
-    providerApiKey,
-    "llm",
-  );
+  const voiceInputDisabled =
+    !conversationsLoaded ||
+    !hasProviderCredentialForCapability(provider, providerApiKey, "llm");
   const model = activeResponseRoute.model;
   const modelEffort = activeResponseRoute.effort;
   const availableResponseModes = getAvailableResponseModes(settings);

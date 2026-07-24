@@ -45,15 +45,34 @@ async function hydrateConversationMetas(metas: ConversationMeta[]) {
   );
 }
 
+function mergeConversationMetas(
+  storedMetas: ConversationMeta[],
+  currentMetas: ConversationMeta[],
+) {
+  const mergedById = new Map(
+    storedMetas.map((meta) => [meta.id, meta] as const),
+  );
+
+  // In-memory entries were created or changed after the storage read began,
+  // so they are the authoritative version when the same ID exists in both.
+  for (const meta of currentMetas) {
+    mergedById.set(meta.id, meta);
+  }
+
+  return sortConversationMeta([...mergedById.values()]);
+}
+
 export function useConversationHydration(params: {
   activeConversationRef: MutableRefObject<Conversation | null>;
   conversations: ConversationMeta[];
+  onHydrated: () => void;
   setActiveConversationValue: (conversation: Conversation | null) => void;
   setConversations: Dispatch<SetStateAction<ConversationMeta[]>>;
 }) {
   const {
     activeConversationRef,
     conversations,
+    onHydrated,
     setActiveConversationValue,
     setConversations,
   } = params;
@@ -67,90 +86,104 @@ export function useConversationHydration(params: {
     let cancelled = false;
 
     void (async () => {
-      const [storedMetas, storedActiveConversationId] = await Promise.all([
-        readStoredConversationMetas(),
-        readActiveConversationId(),
-      ]);
+      try {
+        const [storedMetas, storedActiveConversationId] = await Promise.all([
+          readStoredConversationMetas(),
+          readActiveConversationId(),
+        ]);
 
-      if (cancelled) {
-        return;
-      }
-
-      if (storedMetas.length === 0) {
-        if (storedActiveConversationId && !activeConversationRef.current) {
-          setActiveConversationValue(null);
+        if (cancelled) {
+          return;
         }
-        return;
-      }
 
-      const normalizedMetas = await Promise.all(
-        storedMetas.map(async (meta) => {
-          const needsHydration = conversationMetaNeedsHydration(meta);
-          const normalizedMeta = normalizeConversationMeta(meta);
-          const mayHaveLegacyTitle =
-            normalizedMeta.title.endsWith("...") &&
-            normalizedMeta.title.length <= 43;
-
-          if (!needsHydration && !mayHaveLegacyTitle) {
-            return normalizedMeta;
+        if (storedMetas.length === 0) {
+          if (storedActiveConversationId && !activeConversationRef.current) {
+            setActiveConversationValue(null);
           }
+          return;
+        }
 
-          const conversation = await readConversation(meta.id);
+        const normalizedMetas = await Promise.all(
+          storedMetas.map(async (meta) => {
+            const needsHydration = conversationMetaNeedsHydration(meta);
+            const normalizedMeta = normalizeConversationMeta(meta);
+            const mayHaveLegacyTitle =
+              normalizedMeta.title.endsWith("...") &&
+              normalizedMeta.title.length <= 43;
 
-          if (!conversation) {
-            return normalizedMeta;
-          }
+            if (!needsHydration && !mayHaveLegacyTitle) {
+              return normalizedMeta;
+            }
 
-          const restoredConversation =
-            restoreLegacyConversationTitle(conversation);
-          if (restoredConversation !== conversation) {
-            void saveConversation(restoredConversation);
-          }
+            const conversation = await readConversation(meta.id);
 
-          return buildConversationMetaFromConversation(
-            restoredConversation,
-            normalizedMeta,
+            if (!conversation) {
+              return normalizedMeta;
+            }
+
+            const restoredConversation =
+              restoreLegacyConversationTitle(conversation);
+            if (restoredConversation !== conversation) {
+              void saveConversation(restoredConversation);
+            }
+
+            return buildConversationMetaFromConversation(
+              restoredConversation,
+              normalizedMeta,
+            );
+          }),
+        );
+
+        const hydratedMetas =
+          await hydrateConversationMetasCallback(normalizedMetas);
+
+        if (cancelled) {
+          return;
+        }
+
+        const sortedStoredMetas = sortConversationMeta(hydratedMetas);
+        setConversations((currentMetas) => {
+          const mergedMetas = mergeConversationMetas(
+            sortedStoredMetas,
+            currentMetas,
           );
-        }),
-      );
 
-      const hydratedMetas = await hydrateConversationMetasCallback(normalizedMetas);
+          if (JSON.stringify(mergedMetas) !== JSON.stringify(storedMetas)) {
+            persistConversationMeta(mergedMetas);
+          }
 
-      if (cancelled) {
-        return;
-      }
+          return mergedMetas;
+        });
 
-      const sortedMetas = sortConversationMeta(hydratedMetas);
-      setConversations(sortedMetas);
+        if (!storedActiveConversationId) {
+          return;
+        }
 
-      if (JSON.stringify(sortedMetas) !== JSON.stringify(storedMetas)) {
-        persistConversationMeta(sortedMetas);
-      }
+        const activeConversationStillExists = sortedStoredMetas.some(
+          (conversation) => conversation.id === storedActiveConversationId,
+        );
+        const storedActiveConversation = activeConversationStillExists
+          ? await readConversation(storedActiveConversationId)
+          : null;
+        const restoredActiveConversation = storedActiveConversation
+          ? restoreLegacyConversationTitle(storedActiveConversation)
+          : null;
 
-      if (!storedActiveConversationId) {
-        return;
-      }
+        if (
+          storedActiveConversation &&
+          restoredActiveConversation &&
+          restoredActiveConversation !== storedActiveConversation
+        ) {
+          void saveConversation(restoredActiveConversation);
+        }
 
-      const activeConversationStillExists = sortedMetas.some(
-        (conversation) => conversation.id === storedActiveConversationId,
-      );
-      const storedActiveConversation = activeConversationStillExists
-        ? await readConversation(storedActiveConversationId)
-        : null;
-      const restoredActiveConversation = storedActiveConversation
-        ? restoreLegacyConversationTitle(storedActiveConversation)
-        : null;
-
-      if (
-        storedActiveConversation &&
-        restoredActiveConversation &&
-        restoredActiveConversation !== storedActiveConversation
-      ) {
-        void saveConversation(restoredActiveConversation);
-      }
-
-      if (!cancelled && !activeConversationRef.current) {
-        setActiveConversationValue(restoredActiveConversation);
+        if (!cancelled && !activeConversationRef.current) {
+          setActiveConversationValue(restoredActiveConversation);
+        }
+      } finally {
+        if (!cancelled) {
+          onHydrated();
+        }
       }
     })();
 
@@ -160,6 +193,7 @@ export function useConversationHydration(params: {
   }, [
     activeConversationRef,
     hydrateConversationMetasCallback,
+    onHydrated,
     setActiveConversationValue,
     setConversations,
   ]);
