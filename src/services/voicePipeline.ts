@@ -48,6 +48,7 @@ export async function runVoicePipeline(
   } = params;
 
   let transcription: string | null = null;
+  let retainCapturedAudio = false;
 
   try {
     recordDebugLogEvent({
@@ -61,21 +62,30 @@ export async function runVoicePipeline(
       },
     });
 
-    transcription = await resolvePipelineTranscription({
-      abortSignal,
-      audioUri,
-      language,
-      sttApiKey,
-      sttMode,
-      sttModel,
-      sttProvider,
-      transcriptionOverride,
-    });
+    try {
+      transcription = await resolvePipelineTranscription({
+        abortSignal,
+        audioUri,
+        language,
+        sttApiKey,
+        sttMode,
+        sttModel,
+        sttProvider,
+        transcriptionOverride,
+      });
+    } catch (error) {
+      retainCapturedAudio = Boolean(audioUri && !abortSignal?.aborted);
+      throw error;
+    }
 
     if (!transcription) {
+      retainCapturedAudio = Boolean(audioUri && !abortSignal?.aborted);
       recordDebugLogEvent({
         event: "voice-pipeline-run-empty-transcription",
         level: "warn",
+        payload: {
+          retainedCapturedAudio: retainCapturedAudio,
+        },
       });
       return null;
     }
@@ -287,8 +297,11 @@ export async function runVoicePipeline(
       event: "voice-pipeline-run-cleanup",
       payload: {
         hadAudioUri: !!audioUri,
+        retainedCapturedAudio: retainCapturedAudio,
       },
     });
-    await cleanupCapturedAudio(audioUri);
+    if (!retainCapturedAudio) {
+      await cleanupCapturedAudio(audioUri);
+    }
   }
 }

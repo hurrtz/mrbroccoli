@@ -87,6 +87,7 @@ export interface UseVoicePipelineParams {
     message: string,
     onRetry?: () => void,
     tone?: ToastTone,
+    onDismiss?: () => void,
   ) => void;
   t: (
     key: TranslationKey,

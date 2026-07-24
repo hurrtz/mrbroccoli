@@ -1,9 +1,4 @@
-import {
-  useCallback,
-  useRef,
-  type Dispatch,
-  type SetStateAction,
-} from "react";
+import { useCallback, useRef, type Dispatch, type SetStateAction } from "react";
 
 import { recordDebugLogEvent } from "../../services/debugLogCapture";
 import { setBackgroundVoiceTurnActive } from "../../services/backgroundVoiceTurn";
@@ -17,6 +12,7 @@ import type {
 } from "../../types";
 import type { PipelinePhase, UseVoicePipelineParams } from "./types";
 import { useLatencyProgressController } from "./useLatencyProgressController";
+import { useRetryableVoiceCapture } from "./useRetryableVoiceCapture";
 import { useStreamingTextScheduler } from "./useStreamingTextScheduler";
 import {
   formatNoticeToast,
@@ -87,11 +83,8 @@ export function useVoiceCaptureHandler({
     finishSpeechStartProgress,
     startLatencyProgress,
   } = useLatencyProgressController({ setPhaseProgress });
-  const {
-    beginStreamingRender,
-    cancelStreamingRender,
-    queueStreamingRender,
-  } = useStreamingTextScheduler({ abortRef, setStreamingText });
+  const { beginStreamingRender, cancelStreamingRender, queueStreamingRender } =
+    useStreamingTextScheduler({ abortRef, setStreamingText });
   const {
     consumeAssistantMetadata,
     lastAssistantMessageIdRef,
@@ -103,6 +96,11 @@ export function useVoiceCaptureHandler({
     recordTtsFallbackNotice,
     resetTurnMessageState,
   } = useVoiceTurnMessageState(updateMessage);
+  const {
+    discardRetainedCapture,
+    prepareCaptureForTurn,
+    retainCaptureForRetry,
+  } = useRetryableVoiceCapture();
 
   const handleVoiceCaptureDone = useCallback(
     async ({
@@ -126,6 +124,7 @@ export function useVoiceCaptureHandler({
       const isActiveRun = () =>
         isCurrentRun() && !abortController.signal.aborted;
 
+      prepareCaptureForTurn(audioUri);
       if (previousAbortController) {
         await player.stopPlayback();
         if (!isActiveRun()) {
@@ -228,6 +227,7 @@ export function useVoiceCaptureHandler({
       };
       let llmStarted = false;
       let replyCompleted = false;
+      let transcriptionReady = false;
       let turnFailed = false;
       const handleLlmStarted = () => {
         if (!isActiveRun() || llmStarted) {
@@ -237,9 +237,7 @@ export function useVoiceCaptureHandler({
         llmStarted = true;
         finishLatencyProgress("thinking-briefly");
         startThinkingLatency();
-        setPipelinePhase(
-          playbackStartedRef.current ? "speaking" : "thinking",
-        );
+        setPipelinePhase(playbackStartedRef.current ? "speaking" : "thinking");
       };
 
       if (transcriptionOverride) {
@@ -292,6 +290,7 @@ export function useVoiceCaptureHandler({
                 return;
               }
 
+              transcriptionReady = true;
               recordDebugLogEvent({
                 event: "voice-pipeline-transcription-ready",
                 payload: {
@@ -562,30 +561,29 @@ export function useVoiceCaptureHandler({
               const retryAction =
                 lastAssistantMessageIdRef.current &&
                 lastCompletedReplyRef.current.trim()
-                ? () => {
-                    void handleRepeatLastReply(lastCompletedReplyRef.current);
-                  }
-                : () => {
-                    void handleVoiceCaptureDone({
-                      audioUri,
-                      existingUserMessageId:
-                        lastUserMessageIdRef.current ?? undefined,
-                      transcriptionOverride,
-                    });
-                  };
-
-              const spokenReplyFailureNotice =
-                lastAssistantMessageIdRef.current
-                  ? {
-                      stage: "tts" as const,
-                      level: "error" as const,
-                      message: t("spokenReplyFailed"),
-                      detail: getUnexpectedIssueDetail(
-                        error,
-                        t("spokenReplyFailed"),
-                      ),
+                  ? () => {
+                      void handleRepeatLastReply(lastCompletedReplyRef.current);
                     }
-                  : null;
+                  : () => {
+                      void handleVoiceCaptureDone({
+                        audioUri,
+                        existingUserMessageId:
+                          lastUserMessageIdRef.current ?? undefined,
+                        transcriptionOverride,
+                      });
+                    };
+
+              const spokenReplyFailureNotice = lastAssistantMessageIdRef.current
+                ? {
+                    stage: "tts" as const,
+                    level: "error" as const,
+                    message: t("spokenReplyFailed"),
+                    detail: getUnexpectedIssueDetail(
+                      error,
+                      t("spokenReplyFailed"),
+                    ),
+                  }
+                : null;
 
               if (
                 spokenReplyFailureNotice &&
@@ -615,11 +613,25 @@ export function useVoiceCaptureHandler({
         });
 
         if (!transcription && isActiveRun()) {
+          retainCaptureForRetry(audioUri);
           recordDebugLogEvent({
             event: "voice-pipeline-no-transcription",
             level: "warn",
           });
-          showToast(t("couldntCatchThatTryAgain"), undefined, "danger");
+          showToast(
+            t("couldntCatchThatTryAgain"),
+            audioUri
+              ? () => {
+                  void handleVoiceCaptureDone({ audioUri });
+                }
+              : undefined,
+            "danger",
+            audioUri
+              ? () => {
+                  discardRetainedCapture(audioUri);
+                }
+              : undefined,
+          );
         }
       } catch (error) {
         if (abortController.signal.aborted || !isCurrentRun()) {
@@ -642,17 +654,33 @@ export function useVoiceCaptureHandler({
           level: "error",
           payload: {
             message:
-              error instanceof Error ? error.message : t("couldntProcessVoiceInput"),
+              error instanceof Error
+                ? error.message
+                : t("couldntProcessVoiceInput"),
           },
         });
         const errorMessage =
-          error instanceof Error ? error.message : t("couldntProcessVoiceInput");
+          error instanceof Error
+            ? error.message
+            : t("couldntProcessVoiceInput");
         const normalizedError =
           error instanceof Error ? error : new Error(errorMessage);
+        const retryableAudioUri =
+          !transcriptionReady && audioUri ? audioUri : undefined;
+        const retryAction = retryableAudioUri
+          ? () => {
+              void handleVoiceCaptureDone({ audioUri: retryableAudioUri });
+            }
+          : undefined;
+
+        retainCaptureForRetry(retryableAudioUri);
 
         let persistedError = false;
 
-        if (!lastAssistantMessageIdRef.current && lastUserMessageIdRef.current) {
+        if (
+          !lastAssistantMessageIdRef.current &&
+          lastUserMessageIdRef.current
+        ) {
           markReplyFailure(lastUserMessageIdRef.current, normalizedError);
           persistedError = true;
           persistPendingNoticesForUser();
@@ -681,8 +709,17 @@ export function useVoiceCaptureHandler({
           persistedError = true;
         }
 
-        if (!persistedError) {
-          showToast(errorMessage, undefined, "danger");
+        if (!persistedError || retryAction) {
+          showToast(
+            errorMessage,
+            retryAction,
+            "danger",
+            retryableAudioUri
+              ? () => {
+                  discardRetainedCapture(retryableAudioUri);
+                }
+              : undefined,
+          );
         }
       } finally {
         if (!isCurrentRun()) {
@@ -758,6 +795,7 @@ export function useVoiceCaptureHandler({
       cancelStreamingRender,
       consumeAssistantMetadata,
       createConversation,
+      discardRetainedCapture,
       finishLatencyProgress,
       finishSpeechStartProgress,
       handleRepeatLastReply,
@@ -771,6 +809,7 @@ export function useVoiceCaptureHandler({
       player,
       provider,
       providerApiKey,
+      prepareCaptureForTurn,
       queueStreamingRender,
       queueAssistantNotice,
       recordAssistantNotice,
@@ -779,6 +818,7 @@ export function useVoiceCaptureHandler({
       replyPlayback,
       responseLength,
       responseTone,
+      retainCaptureForRetry,
       selectedSttModel,
       selectedTtsModel,
       selectedTtsVoice,

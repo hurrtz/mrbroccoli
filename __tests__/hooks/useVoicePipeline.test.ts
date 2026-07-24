@@ -89,9 +89,14 @@ jest.mock("../../src/services/speech/diagnostics", () => ({
 }));
 
 import { runVoicePipeline } from "../../src/services/voicePipeline";
-import { synthesizeSpeech, synthesizeSpeechSequence } from "../../src/services/tts";
+import {
+  synthesizeSpeech,
+  synthesizeSpeechSequence,
+} from "../../src/services/tts";
 
-function createPlayer(overrides: Partial<ReturnType<typeof createPlayerBase>> = {}) {
+function createPlayer(
+  overrides: Partial<ReturnType<typeof createPlayerBase>> = {},
+) {
   return {
     ...createPlayerBase(),
     ...overrides,
@@ -441,7 +446,9 @@ describe("useVoicePipeline", () => {
     );
     expect(result.current.pipelinePhase).toBe("idle");
     expect(result.current.streamingText).toBe("");
-    expect(result.current.lastCompletedReplyRef.current).toBe("Completed reply");
+    expect(result.current.lastCompletedReplyRef.current).toBe(
+      "Completed reply",
+    );
   });
 
   it("uses the latest per-conversation settings for the next turn", async () => {
@@ -523,7 +530,9 @@ describe("useVoicePipeline", () => {
           requestId: "speech-request-1",
           source: "conversation",
         });
-        await callbacks.onError(new Error("Gemini speech output took too long."));
+        await callbacks.onError(
+          new Error("Gemini speech output took too long."),
+        );
         return "Hello from the microphone";
       },
     );
@@ -539,7 +548,8 @@ describe("useVoicePipeline", () => {
     expect(player.stopPlayback).not.toHaveBeenCalled();
     expect(player.waitForDrain).toHaveBeenCalled();
     expect(params.showToast).not.toHaveBeenCalled();
-    const updateAssistant = (params.updateMessage as jest.Mock).mock.calls[0][1];
+    const updateAssistant = (params.updateMessage as jest.Mock).mock
+      .calls[0][1];
     const updatedAssistant = updateAssistant({
       id: "assistant-1",
       role: "assistant",
@@ -676,11 +686,7 @@ describe("useVoicePipeline", () => {
     let resolveRun: (() => void) | null = null;
     const player = createPlayer({
       enqueueAudio: jest.fn(
-        (
-          _uri: string,
-          _diagnostics: unknown,
-          callback?: () => void,
-        ) => {
+        (_uri: string, _diagnostics: unknown, callback?: () => void) => {
           onPlaybackStarted = callback;
         },
       ),
@@ -817,7 +823,9 @@ describe("useVoicePipeline", () => {
       await pending;
     });
 
-    const persistedPayloads = (AsyncStorage.setItem as jest.Mock).mock.calls.map(
+    const persistedPayloads = (
+      AsyncStorage.setItem as jest.Mock
+    ).mock.calls.map(
       ([, value]) => JSON.parse(value) as Record<string, unknown>,
     );
 
@@ -848,8 +856,23 @@ describe("useVoicePipeline", () => {
 
     expect(params.showToast).toHaveBeenCalledWith(
       translate("en", "couldntCatchThatTryAgain"),
-      undefined,
+      expect.any(Function),
       "danger",
+      expect.any(Function),
+    );
+    const retry = (params.showToast as jest.Mock).mock
+      .calls[0][1] as () => void;
+
+    await act(async () => {
+      retry();
+    });
+    await waitFor(() => {
+      expect(runVoicePipeline).toHaveBeenCalledTimes(2);
+    });
+    expect(runVoicePipeline).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        audioUri: "file://capture.wav",
+      }),
     );
     expect(
       (AsyncStorage.setItem as jest.Mock).mock.calls.some(([, value]) =>
@@ -876,6 +899,12 @@ describe("useVoicePipeline", () => {
       });
     });
 
+    expect(params.showToast).toHaveBeenCalledWith(
+      "Speech transcription failed.",
+      expect.any(Function),
+      "danger",
+      expect.any(Function),
+    );
     expect(
       (AsyncStorage.setItem as jest.Mock).mock.calls.some(([, value]) =>
         Object.keys(JSON.parse(value) as Record<string, unknown>).some((key) =>
@@ -890,11 +919,8 @@ describe("useVoicePipeline", () => {
     const player = createPlayer({
       isPlaying: true,
       enqueueAudio: jest.fn(
-        (
-          _uri: string,
-          _diagnostics: unknown,
-          onPlaybackStarted?: () => void,
-        ) => onPlaybackStarted?.(),
+        (_uri: string, _diagnostics: unknown, onPlaybackStarted?: () => void) =>
+          onPlaybackStarted?.(),
       ),
     });
     const params = createParams({ player });

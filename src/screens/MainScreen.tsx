@@ -104,6 +104,7 @@ export function MainScreen() {
     onRetry?: () => void;
     tone?: ToastTone;
   } | null>(null);
+  const toastDismissRef = React.useRef<(() => void) | null>(null);
   const [styleSheetVisible, setStyleSheetVisible] = useState(false);
   const inputSurfaceRef = React.useRef<"voice" | "text">("voice");
   const textMessageDraftRef = React.useRef("");
@@ -221,7 +222,12 @@ export function MainScreen() {
       ? nativeStt.isRecording
       : recorder.isRecording;
   const showToast = useCallback(
-    (message: string, onRetry?: () => void, tone: ToastTone = "info") => {
+    (
+      message: string,
+      onRetry?: () => void,
+      tone: ToastTone = "info",
+      onDismiss?: () => void,
+    ) => {
       recordDebugLogEvent({
         event: "toast-shown",
         payload: {
@@ -230,7 +236,22 @@ export function MainScreen() {
           tone,
         },
       });
+      toastDismissRef.current?.();
+      toastDismissRef.current = onDismiss ?? null;
       setToast({ message, onRetry, tone });
+    },
+    [],
+  );
+  const dismissToast = useCallback(() => {
+    const onDismiss = toastDismissRef.current;
+    toastDismissRef.current = null;
+    onDismiss?.();
+    setToast(null);
+  }, []);
+  React.useEffect(
+    () => () => {
+      toastDismissRef.current?.();
+      toastDismissRef.current = null;
     },
     [],
   );
@@ -672,7 +693,7 @@ export function MainScreen() {
       <Toast
         message={toast?.message || ""}
         visible={!!toast}
-        onDismiss={() => setToast(null)}
+        onDismiss={dismissToast}
         onRetry={toast?.onRetry}
         tone={toast?.tone}
       />

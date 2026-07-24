@@ -10,4 +10,5 @@ export type ShowToastFn = (
   message: string,
   onRetry?: () => void,
   tone?: ToastTone,
+  onDismiss?: () => void,
 ) => void;

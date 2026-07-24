@@ -356,6 +356,128 @@ describe("runVoicePipeline", () => {
     });
   });
 
+  it("retains captured audio when provider STT fails before transcription", async () => {
+    const { deleteAsync } = jest.requireMock("expo-file-system/legacy") as {
+      deleteAsync: jest.Mock;
+    };
+    const transcriptionError = new Error("Speech provider unavailable.");
+
+    (transcribeAudio as jest.Mock).mockRejectedValueOnce(transcriptionError);
+
+    await expect(
+      runVoicePipeline({
+        audioUri: "file:///tmp/retryable-recording.wav",
+        messages: [],
+        model: "gpt-5.4",
+        provider: "openai",
+        providerApiKey: "sk-test",
+        sttMode: "provider",
+        sttProvider: "openai",
+        sttApiKey: "sk-test",
+        sttModel: "gpt-4o-mini-transcribe",
+        ttsMode: "native",
+        ttsVoice: "alloy",
+        replyPlayback: "wait",
+        assistantInstructions: "You are a voice assistant.",
+        responseLength: "normal",
+        responseTone: "professional",
+        language: "en",
+        callbacks: {
+          onTranscription: jest.fn(),
+          onChunk: jest.fn(),
+          onResponseDone: jest.fn(),
+          onAudioReady: jest.fn(),
+          onSpeechTextReady: jest.fn(),
+          onError: jest.fn(),
+        },
+      }),
+    ).rejects.toBe(transcriptionError);
+
+    expect(deleteAsync).not.toHaveBeenCalled();
+  });
+
+  it("retains captured audio when provider STT returns no transcription", async () => {
+    const { deleteAsync } = jest.requireMock("expo-file-system/legacy") as {
+      deleteAsync: jest.Mock;
+    };
+
+    (transcribeAudio as jest.Mock).mockResolvedValueOnce(null);
+
+    await expect(
+      runVoicePipeline({
+        audioUri: "file:///tmp/empty-recording.wav",
+        messages: [],
+        model: "gpt-5.4",
+        provider: "openai",
+        providerApiKey: "sk-test",
+        sttMode: "provider",
+        sttProvider: "openai",
+        sttApiKey: "sk-test",
+        sttModel: "gpt-4o-mini-transcribe",
+        ttsMode: "native",
+        ttsVoice: "alloy",
+        replyPlayback: "wait",
+        assistantInstructions: "You are a voice assistant.",
+        responseLength: "normal",
+        responseTone: "professional",
+        language: "en",
+        callbacks: {
+          onTranscription: jest.fn(),
+          onChunk: jest.fn(),
+          onResponseDone: jest.fn(),
+          onAudioReady: jest.fn(),
+          onSpeechTextReady: jest.fn(),
+          onError: jest.fn(),
+        },
+      }),
+    ).resolves.toBeNull();
+
+    expect(deleteAsync).not.toHaveBeenCalled();
+  });
+
+  it("deletes captured audio when the transcription turn was cancelled", async () => {
+    const { deleteAsync } = jest.requireMock("expo-file-system/legacy") as {
+      deleteAsync: jest.Mock;
+    };
+    const abortController = new AbortController();
+    abortController.abort();
+
+    await expect(
+      runVoicePipeline({
+        audioUri: "file:///tmp/cancelled-recording.wav",
+        messages: [],
+        model: "gpt-5.4",
+        provider: "openai",
+        providerApiKey: "sk-test",
+        sttMode: "provider",
+        sttProvider: "openai",
+        sttApiKey: "sk-test",
+        sttModel: "gpt-4o-mini-transcribe",
+        ttsMode: "native",
+        ttsVoice: "alloy",
+        replyPlayback: "wait",
+        assistantInstructions: "You are a voice assistant.",
+        responseLength: "normal",
+        responseTone: "professional",
+        language: "en",
+        abortSignal: abortController.signal,
+        callbacks: {
+          onTranscription: jest.fn(),
+          onChunk: jest.fn(),
+          onResponseDone: jest.fn(),
+          onAudioReady: jest.fn(),
+          onSpeechTextReady: jest.fn(),
+          onError: jest.fn(),
+        },
+      }),
+    ).resolves.toBeNull();
+
+    expect(deleteAsync).toHaveBeenCalledWith(
+      "file:///tmp/cancelled-recording.wav",
+      { idempotent: true },
+    );
+  });
+
   it("speaks a completed sentence immediately in stream mode", async () => {
     (streamChat as jest.Mock).mockImplementation(
       async ({
@@ -919,9 +1041,7 @@ describe("runVoicePipeline", () => {
         previousText: synthesisCalls[0].text,
       }),
     );
-    expect(callbacks.onAudioReady).toHaveBeenCalledTimes(
-      synthesisCalls.length,
-    );
+    expect(callbacks.onAudioReady).toHaveBeenCalledTimes(synthesisCalls.length);
   });
 
   it("buffers wait-mode provider audio until every chunk is ready", async () => {
@@ -978,10 +1098,7 @@ describe("runVoicePipeline", () => {
       },
     });
 
-    expect(audioEvents).toEqual([
-      "/tmp/provider-1.wav",
-      "/tmp/provider-2.wav",
-    ]);
+    expect(audioEvents).toEqual(["/tmp/provider-1.wav", "/tmp/provider-2.wav"]);
   });
 
   it("keeps long Gemini TTS replies within a practical request budget", async () => {
@@ -1280,9 +1397,9 @@ describe("runVoicePipeline", () => {
         query: "Explain wind.",
       }),
     );
-    expect((streamChat as jest.Mock).mock.calls[0][0].webSearchContext).toContain(
-      "Wind is moving air.",
-    );
+    expect(
+      (streamChat as jest.Mock).mock.calls[0][0].webSearchContext,
+    ).toContain("Wind is moving air.");
     expect(callbacks.onResponseDone).toHaveBeenCalledWith(
       "Wind is moving air.",
       undefined,
@@ -1304,13 +1421,11 @@ describe("runVoicePipeline", () => {
   });
 
   it("continues without web search context when the search step fails", async () => {
-    (searchWeb as jest.Mock).mockRejectedValueOnce(new Error("Search unavailable."));
+    (searchWeb as jest.Mock).mockRejectedValueOnce(
+      new Error("Search unavailable."),
+    );
     (streamChat as jest.Mock).mockImplementation(
-      async ({
-        onDone,
-      }: {
-        onDone: (text: string) => Promise<void>;
-      }) => {
+      async ({ onDone }: { onDone: (text: string) => Promise<void> }) => {
         await onDone("Wind is moving air.");
       },
     );
@@ -1355,7 +1470,9 @@ describe("runVoicePipeline", () => {
       }),
     );
     expect(callbacks.onError).not.toHaveBeenCalled();
-    expect((streamChat as jest.Mock).mock.calls[0][0].webSearchContext).toBeUndefined();
+    expect(
+      (streamChat as jest.Mock).mock.calls[0][0].webSearchContext,
+    ).toBeUndefined();
   });
 
   it("runs web search whenever the mode is on and a provider is ready", async () => {

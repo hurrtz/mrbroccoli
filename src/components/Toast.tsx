@@ -43,7 +43,7 @@ export function Toast({
         opacity.value = withDelay(duration, withTiming(0, { duration: 200 }));
         translateY.value = withDelay(
           duration,
-          withTiming(-20, { duration: 200 })
+          withTiming(-20, { duration: 200 }),
         );
         const timer = setTimeout(onDismiss, duration + 200);
         return () => clearTimeout(timer);
@@ -86,9 +86,7 @@ export function Toast({
         animatedStyle,
       ]}
     >
-      <View
-        style={[styles.accentStripe, { backgroundColor: toneColor }]}
-      />
+      <View style={[styles.accentStripe, { backgroundColor: toneColor }]} />
       <View
         style={[
           styles.iconWrap,
@@ -109,7 +107,10 @@ export function Toast({
               styles.retryButton,
               { backgroundColor: toneBackground, borderColor: toneColor },
             ]}
-            onPress={onRetry}
+            onPress={() => {
+              onRetry();
+              onDismiss();
+            }}
           >
             <Text style={[styles.retry, { color: toneColor }]}>
               {t("retry")}
