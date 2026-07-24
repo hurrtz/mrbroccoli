@@ -992,6 +992,115 @@ describe("useVoicePipeline", () => {
     });
   });
 
+  it("prevents a cancelled stale turn from mutating a newer turn", async () => {
+    type PendingRun = {
+      abortSignal: AbortSignal;
+      callbacks: Record<string, (...args: any[]) => any>;
+      reject: (reason?: unknown) => void;
+      resolve: (value: string | null) => void;
+    };
+    const runs: PendingRun[] = [];
+    let stalePlaybackStarted: (() => void) | undefined;
+    const player = createPlayer({
+      enqueueAudio: jest.fn(
+        (
+          _uri: string,
+          _diagnostics: unknown,
+          onPlaybackStarted?: () => void,
+        ) => {
+          stalePlaybackStarted = onPlaybackStarted;
+        },
+      ),
+    });
+    const params = createParams({
+      player,
+      spokenRepliesEnabled: false,
+    });
+
+    (runVoicePipeline as jest.Mock).mockImplementation(
+      ({ abortSignal, callbacks }: any) =>
+        new Promise<string | null>((resolve, reject) => {
+          runs.push({
+            abortSignal,
+            callbacks,
+            reject,
+            resolve,
+          });
+        }),
+    );
+
+    const { result } = renderHook(() => useVoicePipeline(params));
+    let firstTurn: Promise<void> | null = null;
+    let secondTurn: Promise<void> | null = null;
+
+    await act(async () => {
+      firstTurn = result.current.handleVoiceCaptureDone({
+        transcriptionOverride: "First turn",
+      });
+      await Promise.resolve();
+    });
+
+    act(() => {
+      runs[0].callbacks.onAudioReady("file://stale-reply.wav");
+    });
+
+    expect(result.current.pipelinePhase).toBe("synthesizing");
+
+    await act(async () => {
+      secondTurn = result.current.handleVoiceCaptureDone({
+        transcriptionOverride: "Second turn",
+      });
+      await Promise.resolve();
+    });
+
+    expect(runs).toHaveLength(2);
+    expect(runs[0].abortSignal.aborted).toBe(true);
+    expect(runs[1].abortSignal.aborted).toBe(false);
+    expect(player.stopPlayback).toHaveBeenCalledTimes(1);
+    expect(result.current.pipelinePhase).toBe("thinking-briefly");
+
+    act(() => {
+      stalePlaybackStarted?.();
+    });
+
+    expect(result.current.pipelinePhase).toBe("thinking-briefly");
+
+    await act(async () => {
+      runs[0].callbacks.onResponseDone("Stale reply");
+      await runs[0].callbacks.onError(new Error("Stale failure"));
+      runs[0].reject(new Error("Cancelled first turn"));
+      await firstTurn;
+    });
+
+    expect(params.addMessage).not.toHaveBeenCalled();
+    expect(params.showToast).not.toHaveBeenCalled();
+    expect(result.current.pipelinePhase).toBe("thinking-briefly");
+
+    act(() => {
+      runs[1].callbacks.onLlmStart();
+      runs[1].callbacks.onChunk("Fresh reply");
+      jest.advanceTimersByTime(17);
+    });
+
+    expect(result.current.pipelinePhase).toBe("thinking");
+    expect(result.current.streamingText).toBe("Fresh reply");
+
+    await act(async () => {
+      runs[1].callbacks.onResponseDone("Fresh reply");
+      runs[1].resolve("Second turn");
+      await secondTurn;
+    });
+
+    expect(params.addMessage).toHaveBeenCalledTimes(1);
+    expect(params.addMessage).toHaveBeenCalledWith(
+      expect.objectContaining({
+        content: "Fresh reply",
+        role: "assistant",
+      }),
+    );
+    expect(result.current.pipelinePhase).toBe("idle");
+  });
+
   it("coalesces rapid stream chunks into one visual frame without losing text", async () => {
     const params = createParams();
     let resolveRun: (() => void) | null = null;

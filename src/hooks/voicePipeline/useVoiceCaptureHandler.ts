@@ -100,6 +100,7 @@ export function useVoiceCaptureHandler({
   const lastUserMessageIdRef = useRef<string | null>(null);
   const lastAssistantMessageIdRef = useRef<string | null>(null);
   const pendingAssistantNoticesRef = useRef<MessagePipelineNotice[]>([]);
+  const activeCaptureRunRef = useRef(0);
   const {
     clearLatencyProgress,
     finishLatencyProgress,
@@ -170,24 +171,6 @@ export function useVoiceCaptureHandler({
     [updateMessage],
   );
 
-  const handleFirstPlaybackStarted = useCallback(() => {
-    if (playbackStartedRef.current) {
-      return;
-    }
-
-    playbackStartedRef.current = true;
-    recordDebugLogEvent({
-      event: "voice-pipeline-first-playback-started",
-    });
-    finishLatencyProgress("synthesizing");
-    finishSpeechStartProgress();
-    setPipelinePhase("speaking");
-  }, [
-    finishLatencyProgress,
-    finishSpeechStartProgress,
-    setPipelinePhase,
-  ]);
-
   const handleVoiceCaptureDone = useCallback(
     async ({
       audioUri,
@@ -198,6 +181,25 @@ export function useVoiceCaptureHandler({
       existingUserMessageId?: string;
       transcriptionOverride?: string;
     }) => {
+      const previousAbortController = abortRef.current;
+      const runId = activeCaptureRunRef.current + 1;
+      activeCaptureRunRef.current = runId;
+      previousAbortController?.abort();
+      const abortController = new AbortController();
+      abortRef.current = abortController;
+      const isCurrentRun = () =>
+        activeCaptureRunRef.current === runId &&
+        abortRef.current === abortController;
+      const isActiveRun = () =>
+        isCurrentRun() && !abortController.signal.aborted;
+
+      if (previousAbortController) {
+        await player.stopPlayback();
+        if (!isActiveRun()) {
+          return;
+        }
+      }
+
       recordDebugLogEvent({
         event: "voice-pipeline-handle-capture-start",
         payload: {
@@ -219,7 +221,6 @@ export function useVoiceCaptureHandler({
       if (existingUserMessageId) {
         clearReplyFailure(existingUserMessageId);
       }
-      abortRef.current = new AbortController();
       player.resetCancellation();
       const backgroundGraceAvailable = setBackgroundVoiceTurnActive(true);
       recordDebugLogEvent({
@@ -285,9 +286,22 @@ export function useVoiceCaptureHandler({
           responseLength,
           replyPlayback,
         });
+      const handleFirstPlaybackStartedForRun = () => {
+        if (!isActiveRun() || playbackStartedRef.current) {
+          return;
+        }
+
+        playbackStartedRef.current = true;
+        recordDebugLogEvent({
+          event: "voice-pipeline-first-playback-started",
+        });
+        finishLatencyProgress("synthesizing");
+        finishSpeechStartProgress();
+        setPipelinePhase("speaking");
+      };
       let llmStarted = false;
       const handleLlmStarted = () => {
-        if (llmStarted) {
+        if (!isActiveRun() || llmStarted) {
           return;
         }
 
@@ -342,9 +356,13 @@ export function useVoiceCaptureHandler({
           webSearchProvider,
           webSearchApiKey,
           webSearchOptions,
-          abortSignal: abortRef.current!.signal,
+          abortSignal: abortController.signal,
           callbacks: {
             onTranscription: (text) => {
+              if (!isActiveRun()) {
+                return;
+              }
+
               recordDebugLogEvent({
                 event: "voice-pipeline-transcription-ready",
                 payload: {
@@ -380,6 +398,10 @@ export function useVoiceCaptureHandler({
               lastUserMessageIdRef.current = userMessage?.id ?? null;
             },
             onContextSummary: (summary, summarizedCount, usage) => {
+              if (!isActiveRun()) {
+                return;
+              }
+
               recordDebugLogEvent({
                 event: "voice-pipeline-context-summary-updated",
                 payload: {
@@ -397,6 +419,10 @@ export function useVoiceCaptureHandler({
               );
             },
             onWebSearchStart: () => {
+              if (!isActiveRun()) {
+                return;
+              }
+
               recordDebugLogEvent({
                 event: "voice-pipeline-web-search-start",
               });
@@ -409,12 +435,20 @@ export function useVoiceCaptureHandler({
               setPipelinePhase("searching");
             },
             onWebSearchComplete: () => {
+              if (!isActiveRun()) {
+                return;
+              }
+
               recordDebugLogEvent({
                 event: "voice-pipeline-web-search-complete",
               });
               finishLatencyProgress("searching");
             },
             onWebSearchFallback: (error) => {
+              if (!isActiveRun()) {
+                return;
+              }
+
               const notice: MessagePipelineNotice = {
                 stage: "web-search",
                 level: "warning",
@@ -436,6 +470,10 @@ export function useVoiceCaptureHandler({
             },
             onLlmStart: handleLlmStarted,
             onChunk: (text) => {
+              if (!isActiveRun()) {
+                return;
+              }
+
               handleLlmStarted();
               recordDebugLogEvent({
                 event: "voice-pipeline-stream-chunk",
@@ -453,6 +491,10 @@ export function useVoiceCaptureHandler({
               usage?: UsageEstimate,
               metadata?: MessageMetadata,
             ) => {
+              if (!isActiveRun()) {
+                return;
+              }
+
               handleLlmStarted();
               recordDebugLogEvent({
                 event: "voice-pipeline-response-done",
@@ -503,6 +545,10 @@ export function useVoiceCaptureHandler({
               pendingAssistantNoticesRef.current = [];
             },
             onAudioReady: (audioData, diagnostics) => {
+              if (!isActiveRun()) {
+                return;
+              }
+
               recordDebugLogEvent({
                 event: "voice-pipeline-audio-ready",
                 payload: {
@@ -517,10 +563,14 @@ export function useVoiceCaptureHandler({
               player.enqueueAudio(
                 audioData,
                 diagnostics,
-                handleFirstPlaybackStarted,
+                handleFirstPlaybackStartedForRun,
               );
             },
             onSpeechTextReady: (text, _voice, diagnostics) => {
+              if (!isActiveRun()) {
+                return;
+              }
+
               recordDebugLogEvent({
                 event: "voice-pipeline-speech-text-ready",
                 payload: {
@@ -534,10 +584,14 @@ export function useVoiceCaptureHandler({
               }
               player.speakText(text, {
                 diagnostics,
-                onPlaybackStarted: handleFirstPlaybackStarted,
+                onPlaybackStarted: handleFirstPlaybackStartedForRun,
               });
             },
             onTtsFallback: (error) => {
+              if (!isActiveRun()) {
+                return;
+              }
+
               const noticeMessage = t("providerVoiceFallback");
               const notice: MessagePipelineNotice = {
                 stage: "tts",
@@ -573,6 +627,10 @@ export function useVoiceCaptureHandler({
               showToast(formatNoticeToast(notice), undefined, "danger");
             },
             onError: async (error) => {
+              if (!isActiveRun()) {
+                return;
+              }
+
               const preserveProducedAudio =
                 producedAudioRef.current &&
                 (player.isPlaying || player.hasPendingPlaybackNow());
@@ -588,6 +646,9 @@ export function useVoiceCaptureHandler({
               });
               if (!preserveProducedAudio) {
                 await player.stopPlayback();
+                if (!isActiveRun()) {
+                  return;
+                }
                 clearLatencyProgress();
               }
               cancelStreamingRender(streamingRenderRunId);
@@ -659,7 +720,7 @@ export function useVoiceCaptureHandler({
           },
         });
 
-        if (!transcription) {
+        if (!transcription && isActiveRun()) {
           recordDebugLogEvent({
             event: "voice-pipeline-no-transcription",
             level: "warn",
@@ -667,8 +728,10 @@ export function useVoiceCaptureHandler({
           showToast(t("couldntCatchThatTryAgain"), undefined, "danger");
         }
       } catch (error) {
-        if (abortRef.current?.signal.aborted) {
-          clearLatencyProgress();
+        if (abortController.signal.aborted || !isCurrentRun()) {
+          if (isCurrentRun()) {
+            clearLatencyProgress();
+          }
           recordDebugLogEvent({
             event: "voice-pipeline-aborted",
             payload: {
@@ -745,6 +808,16 @@ export function useVoiceCaptureHandler({
           showToast(errorMessage, undefined, "danger");
         }
       } finally {
+        if (!isCurrentRun()) {
+          recordDebugLogEvent({
+            event: "voice-pipeline-stale-run-finished",
+            payload: {
+              runId,
+            },
+          });
+          return;
+        }
+
         setBackgroundVoiceTurnActive(false);
         recordDebugLogEvent({
           event: "voice-pipeline-finalizing",
@@ -761,7 +834,10 @@ export function useVoiceCaptureHandler({
         if (player.hasPendingPlaybackNow()) {
           await player.waitForDrain();
         }
-        if (!abortRef.current?.signal.aborted) {
+        if (!isCurrentRun()) {
+          return;
+        }
+        if (!abortController.signal.aborted) {
           finishLatencyProgress("turn");
         }
         clearLatencyProgress();
@@ -774,6 +850,9 @@ export function useVoiceCaptureHandler({
             finalPhase: "idle",
           },
         });
+        if (abortRef.current === abortController) {
+          abortRef.current = null;
+        }
       }
     },
     [
@@ -788,7 +867,6 @@ export function useVoiceCaptureHandler({
       cancelStreamingRender,
       createConversation,
       finishLatencyProgress,
-      handleFirstPlaybackStarted,
       handleRepeatLastReply,
       language,
       lastCompletedReplyRef,
