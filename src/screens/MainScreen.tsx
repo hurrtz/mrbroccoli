@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect, useMemo } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import {
   KeyboardAvoidingView,
   Platform,
@@ -26,15 +26,11 @@ import { useAudioPlayer } from "../hooks/useAudioPlayer";
 import { useAudioRecorder } from "../hooks/useAudioRecorder";
 import { useNativeSpeechRecognizer } from "../hooks/useNativeSpeechRecognizer";
 import { useConversations } from "../hooks/useConversations";
-import { useProviderVoiceDirectory } from "../hooks/useProviderVoiceDirectory";
 import { useVoicePipeline } from "../hooks/useVoicePipeline";
 import { useBatteryDiagnostics } from "../hooks/useBatteryDiagnostics";
 import { useLocalization } from "../i18n";
 import { recordDebugLogEvent } from "../services/debugLogCapture";
-import {
-  PROVIDER_VOICE_DIRECTORY_PROVIDERS,
-  providerHasVoiceDirectory,
-} from "../services/providerVoiceDirectory";
+import { providerHasVoiceDirectory } from "../services/providerVoiceDirectory";
 import { useTheme } from "../theme/ThemeContext";
 import { Provider, ResponseMode, ToastTone } from "../types";
 import {
@@ -60,6 +56,7 @@ import { useConversationTitleGenerator } from "./main/useConversationTitleGenera
 import { useConversationSettings } from "./main/useConversationSettings";
 import { useDebugLogCaptureController } from "./main/useDebugLogCaptureController";
 import { useMainScreenUiState } from "./main/useMainScreenUiState";
+import { useMainScreenVoiceDirectories } from "./main/useMainScreenVoiceDirectories";
 import { useMainScreenDiagnostics } from "./main/useMainScreenDiagnostics";
 import { usePreviewVoiceController } from "./main/usePreviewVoiceController";
 import { usePersistenceFailureAlert } from "./main/usePersistenceFailureAlert";
@@ -86,42 +83,11 @@ export function MainScreen() {
     updateApiKey,
     loaded,
   } = useSharedSettings();
-  const xaiVoiceDirectory = useProviderVoiceDirectory({
-    provider: "xai",
-    apiKey: settings.apiKeys.xai,
-    enabled: loaded && Boolean(settings.apiKeys.xai.trim()),
+  const providerVoiceDirectories = useMainScreenVoiceDirectories({
+    loaded,
+    settings,
+    updateProviderTtsVoice,
   });
-  const mistralVoiceDirectory = useProviderVoiceDirectory({
-    provider: "mistral",
-    apiKey: settings.apiKeys.mistral,
-    enabled: loaded && Boolean(settings.apiKeys.mistral.trim()),
-  });
-  const elevenLabsVoiceDirectory = useProviderVoiceDirectory({
-    provider: "elevenlabs",
-    apiKey: settings.apiKeys.elevenlabs,
-    enabled: loaded && Boolean(settings.apiKeys.elevenlabs.trim()),
-  });
-  const providerVoiceDirectories = useMemo(
-    () => ({
-      xai: xaiVoiceDirectory,
-      mistral: mistralVoiceDirectory,
-      elevenlabs: elevenLabsVoiceDirectory,
-    }),
-    [
-      elevenLabsVoiceDirectory.error,
-      elevenLabsVoiceDirectory.refresh,
-      elevenLabsVoiceDirectory.status,
-      elevenLabsVoiceDirectory.voices,
-      mistralVoiceDirectory.error,
-      mistralVoiceDirectory.refresh,
-      mistralVoiceDirectory.status,
-      mistralVoiceDirectory.voices,
-      xaiVoiceDirectory.error,
-      xaiVoiceDirectory.refresh,
-      xaiVoiceDirectory.status,
-      xaiVoiceDirectory.voices,
-    ],
-  );
   const {
     conversations,
     activeConversation,
@@ -237,30 +203,6 @@ export function MainScreen() {
       PROVIDER_DEFAULT_TTS_VOICES[ttsProvider] ||
       ""
     : "";
-  useEffect(() => {
-    if (!loaded) {
-      return;
-    }
-
-    for (const directoryProvider of PROVIDER_VOICE_DIRECTORY_PROVIDERS) {
-      const firstVoice =
-        providerVoiceDirectories[directoryProvider]?.voices[0]?.value;
-
-      if (
-        firstVoice &&
-        !settings.providerTtsVoices[directoryProvider]?.trim()
-      ) {
-        updateProviderTtsVoice(directoryProvider, firstVoice);
-      }
-    }
-  }, [
-    loaded,
-    providerVoiceDirectories,
-    settings.providerTtsVoices.elevenlabs,
-    settings.providerTtsVoices.mistral,
-    settings.providerTtsVoices.xai,
-    updateProviderTtsVoice,
-  ]);
   const selectedTtsModel = ttsProvider
     ? settings.providerTtsModels[ttsProvider] ||
       PROVIDER_DEFAULT_TTS_MODELS[ttsProvider] ||
