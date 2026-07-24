@@ -197,20 +197,30 @@ export function ChatTranscript({
       const previousDistanceFromBottom = distanceFromBottomRef.current;
       distanceFromBottomRef.current = distanceFromBottom;
       const isAtTail = distanceFromBottom <= AT_TAIL_THRESHOLD_PX;
+
+      // Programmatic tail jumps can emit intermediate scroll positions on
+      // iOS. They must not re-show the jump control after `scrollToTail`
+      // already declared the transcript followed. Only a user interaction may
+      // move the public tail state away from the end.
+      if (!userScrollingRef.current) {
+        if (isAtTail) {
+          setTailState(true);
+        }
+        return;
+      }
+
       setTailState(isAtTail);
 
-      if (userScrollingRef.current) {
-        const movingAwayFromTail =
-          distanceFromBottom >
-          previousDistanceFromBottom + SCROLL_AWAY_DELTA_PX;
+      const movingAwayFromTail =
+        distanceFromBottom >
+        previousDistanceFromBottom + SCROLL_AWAY_DELTA_PX;
 
-        if (movingAwayFromTail) {
-          userMovedAwayFromTailRef.current = true;
-          followTailRef.current = false;
-        } else if (isAtTail) {
-          userMovedAwayFromTailRef.current = false;
-          followTailRef.current = true;
-        }
+      if (movingAwayFromTail) {
+        userMovedAwayFromTailRef.current = true;
+        followTailRef.current = false;
+      } else if (isAtTail) {
+        userMovedAwayFromTailRef.current = false;
+        followTailRef.current = true;
       }
     },
     [setTailState],
@@ -234,6 +244,20 @@ export function ChatTranscript({
     userMovedAwayFromTailRef.current = false;
     setTailState(isAtTail);
   }, [setTailState]);
+
+  const handleTouchStart = useCallback(() => {
+    if (tailScrollFrameRef.current !== null) {
+      cancelAnimationFrame(tailScrollFrameRef.current);
+      tailScrollFrameRef.current = null;
+    }
+
+    // iOS does not report `onScrollBeginDrag` until the finger has already
+    // moved. Pause auto-follow on touch-down so a streaming content-size
+    // update cannot pull the list back to the tail during that dead zone.
+    userScrollingRef.current = true;
+    userMovedAwayFromTailRef.current = false;
+    onTap?.();
+  }, [onTap]);
 
   return (
     <FlatList
@@ -295,7 +319,9 @@ export function ChatTranscript({
       onScrollEndDrag={handleScrollInteractionEnd}
       onMomentumScrollBegin={handleScrollBeginDrag}
       onMomentumScrollEnd={handleScrollInteractionEnd}
-      onTouchStart={onTap}
+      onTouchStart={handleTouchStart}
+      onTouchEnd={handleScrollInteractionEnd}
+      onTouchCancel={handleScrollInteractionEnd}
     />
   );
 }
