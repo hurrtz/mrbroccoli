@@ -86,6 +86,11 @@ export function MainScreen() {
     updateApiKey,
     loaded,
   } = useSharedSettings();
+  const xaiVoiceDirectory = useProviderVoiceDirectory({
+    provider: "xai",
+    apiKey: settings.apiKeys.xai,
+    enabled: loaded && Boolean(settings.apiKeys.xai.trim()),
+  });
   const mistralVoiceDirectory = useProviderVoiceDirectory({
     provider: "mistral",
     apiKey: settings.apiKeys.mistral,
@@ -98,6 +103,7 @@ export function MainScreen() {
   });
   const providerVoiceDirectories = useMemo(
     () => ({
+      xai: xaiVoiceDirectory,
       mistral: mistralVoiceDirectory,
       elevenlabs: elevenLabsVoiceDirectory,
     }),
@@ -110,6 +116,10 @@ export function MainScreen() {
       mistralVoiceDirectory.refresh,
       mistralVoiceDirectory.status,
       mistralVoiceDirectory.voices,
+      xaiVoiceDirectory.error,
+      xaiVoiceDirectory.refresh,
+      xaiVoiceDirectory.status,
+      xaiVoiceDirectory.voices,
     ],
   );
   const {
@@ -248,6 +258,7 @@ export function MainScreen() {
     providerVoiceDirectories,
     settings.providerTtsVoices.elevenlabs,
     settings.providerTtsVoices.mistral,
+    settings.providerTtsVoices.xai,
     updateProviderTtsVoice,
   ]);
   const selectedTtsModel = ttsProvider
@@ -282,8 +293,15 @@ export function MainScreen() {
   const conversationTtsVoiceOptions =
     settings.ttsMode === "provider" && ttsProvider
       ? providerHasVoiceDirectory(ttsProvider)
-        ? (providerVoiceDirectories[ttsProvider]?.voices ?? []).map((voice) => ({
-            value: voice.value,
+        ? (
+            providerVoiceDirectories[ttsProvider]?.voices.length
+              ? providerVoiceDirectories[ttsProvider]?.voices ?? []
+              : getProviderTtsVoiceOptions(ttsProvider, language)
+          ).map((voice) => ({
+            value:
+              "value" in voice && typeof voice.value === "string"
+                ? voice.value
+                : voice.id,
             label: voice.label,
           }))
         : getProviderTtsVoiceOptions(ttsProvider, language).map((voice) => ({

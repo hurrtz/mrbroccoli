@@ -5,8 +5,9 @@ import {
   type ElevenLabsVoice,
 } from "./elevenLabsVoices";
 import { fetchMistralVoices, type MistralVoice } from "./mistralVoices";
+import { fetchXaiVoices, type XaiVoice } from "./xaiVoices";
 
-export type ProviderVoice = ElevenLabsVoice | MistralVoice;
+export type ProviderVoice = ElevenLabsVoice | MistralVoice | XaiVoice;
 export type ProviderVoiceDirectoryStatus =
   | "idle"
   | "loading"
@@ -15,6 +16,7 @@ export type ProviderVoiceDirectoryStatus =
   | "error";
 
 export const PROVIDER_VOICE_DIRECTORY_PROVIDERS = [
+  "xai",
   "mistral",
   "elevenlabs",
 ] as const satisfies readonly Provider[];
@@ -33,6 +35,8 @@ export async function fetchProviderVoices(params: {
   signal?: AbortSignal;
 }): Promise<ProviderVoice[]> {
   switch (params.provider) {
+    case "xai":
+      return fetchXaiVoices(params);
     case "mistral":
       return fetchMistralVoices(params);
     case "elevenlabs":

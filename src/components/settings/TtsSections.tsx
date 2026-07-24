@@ -73,8 +73,15 @@ export function ProviderVoicePreviewSection({
   const hasVoiceDirectory = providerUsesTtsVoiceDirectory(provider);
   const voiceOptions =
     hasVoiceDirectory
-      ? (voiceDirectory?.voices ?? []).map((voice) => ({
-          value: voice.value,
+      ? (
+          voiceDirectory?.voices.length
+            ? voiceDirectory.voices
+            : getProviderTtsVoiceOptions(provider, language)
+        ).map((voice) => ({
+          value:
+            "value" in voice && typeof voice.value === "string"
+              ? voice.value
+              : voice.id,
           label: voice.label,
         }))
       : getProviderTtsVoiceOptions(provider, language).map((voice) => ({

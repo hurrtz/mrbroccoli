@@ -40,7 +40,7 @@ export type RuntimeTtsBinaryRequestFormat =
   | "openai-speech"
   | "grok-speech"
   | "mistral-speech";
-export type RuntimeTtsVoiceDirectory = "elevenlabs" | "mistral";
+export type RuntimeTtsVoiceDirectory = "elevenlabs" | "mistral" | "xai";
 export type RuntimeLanguageHintKey = "mistral-stt-language-code";
 
 export interface RuntimeModelSpec {
@@ -958,8 +958,9 @@ export const RUNTIME_PROVIDER_MANIFEST: Record<
         voice("rex", "Rex · Bold", { de: "Rex · Kraeftig" }),
         voice("sal", "Sal · Smooth", { de: "Sal · Sanft" }),
       ],
+      voiceDirectory: "xai",
       languageNote:
-        "xAI TTS supports auto-detect plus 20 languages/locale variants including English, Arabic (EG/SA/AE), Bengali, Simplified Chinese, French, German, Hindi, Indonesian, Italian, Japanese, Korean, Portuguese (BR/PT), Russian, Spanish (MX/ES), Turkish, and Vietnamese. Inline expressive tags are supported: [laugh], [sigh], [pause], <whisper>.",
+        "xAI TTS supports auto-detect plus 20 languages/locale variants including English, Arabic (EG/SA/AE), Bengali, Simplified Chinese, French, German, Hindi, Indonesian, Italian, Japanese, Korean, Portuguese (BR/PT), Russian, Spanish (MX/ES), Turkish, and Vietnamese. Mr Broccoli loads built-in and account custom voices automatically. Inline expressive tags are supported: [laugh], [sigh], [pause], <whisper>.",
     },
   },
   deepseek: {

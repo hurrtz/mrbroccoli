@@ -6,6 +6,7 @@ import {
   getSttModelLabel,
   getTtsModelLabel,
   getTtsVoiceLabel,
+  providerUsesTtsVoiceDirectory,
 } from "../../../src/constants/providers/speech";
 
 describe("speech provider constants", () => {
@@ -82,6 +83,7 @@ describe("speech provider constants", () => {
     ]);
     expect(PROVIDER_DEFAULT_TTS_MODELS.xai).toBe("text-to-speech");
     expect(getTtsModelLabel("xai", "text-to-speech")).toBe("Text to Speech API");
+    expect(providerUsesTtsVoiceDirectory("xai")).toBe(true);
   });
 
   it("surfaces catalog-backed TTS voice labels", () => {
