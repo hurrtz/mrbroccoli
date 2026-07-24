@@ -102,10 +102,6 @@ export function useProviderValidationState(params: {
         return { status: "idle" };
       }
 
-      if (candidate.status === "error") {
-        return candidate;
-      }
-
       const currentApiKey = settings.apiKeys[provider].trim();
       const stateMatchesCurrentConfig =
         (!candidate.apiKey || candidate.apiKey === currentApiKey) &&

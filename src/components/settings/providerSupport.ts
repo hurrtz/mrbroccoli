@@ -134,10 +134,6 @@ export function getProviderHealthState(params: {
     return "configured";
   }
 
-  if (validationState.status === "error") {
-    return "failing";
-  }
-
   const target = getProviderValidationTarget(settings, provider);
 
   if (!target.kind) {
@@ -152,6 +148,10 @@ export function getProviderHealthState(params: {
 
   if (!stateMatchesCurrentConfig) {
     return "configured";
+  }
+
+  if (validationState.status === "error") {
+    return "failing";
   }
 
   if (validationState.status === "validating") {
@@ -193,12 +193,19 @@ export function getConfiguredProvidersForCapability(params: {
       return false;
     }
 
-    return isProviderSelectableForConfiguredFlow(
-      getProviderHealthState({
-        provider,
-        settings,
-        validationStateByProvider,
-      }),
-    );
+    const healthState = getProviderHealthState({
+      provider,
+      settings,
+      validationStateByProvider,
+    });
+
+    if (healthState !== "failing") {
+      return isProviderSelectableForConfiguredFlow(healthState);
+    }
+
+    // A provider-level connection check targets one concrete capability. A
+    // failed LLM model must not disable independently usable STT/TTS routes
+    // that share the same credential, and vice versa.
+    return getProviderValidationTarget(settings, provider).kind !== capability;
   });
 }

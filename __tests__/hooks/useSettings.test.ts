@@ -764,7 +764,7 @@ describe("useSettings", () => {
     expect(persisted.apiKeys).toBeUndefined();
   });
 
-  it("keeps a failed validation across key edits until the key is deleted", async () => {
+  it("invalidates a failed validation when its key changes", async () => {
     (AsyncStorage.getItem as jest.Mock).mockResolvedValueOnce(
       JSON.stringify({
         ...DEFAULT_SETTINGS,
@@ -787,14 +787,6 @@ describe("useSettings", () => {
 
     act(() => {
       result.current.updateApiKey("openai", "replacement-key");
-    });
-
-    expect(result.current.settings.providerValidationResults.openai?.status).toBe(
-      "error",
-    );
-
-    act(() => {
-      result.current.updateApiKey("openai", "");
     });
 
     expect(result.current.settings.providerValidationResults.openai).toBeUndefined();

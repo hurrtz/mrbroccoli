@@ -163,14 +163,7 @@ export function createApiKeyUpdater(setSettings: SetSettings) {
       const nextProviderValidationResults = {
         ...prev.providerValidationResults,
       };
-      const previousValidationResult =
-        nextProviderValidationResults[provider];
-
-      if (
-        !nextValue ||
-        (previousValue !== nextValue &&
-          previousValidationResult?.status === "success")
-      ) {
+      if (!nextValue || previousValue !== nextValue) {
         delete nextProviderValidationResults[provider];
       }
 

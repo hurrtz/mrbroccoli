@@ -85,12 +85,39 @@ describe("getProviderHealthState", () => {
     ).toBe("configured");
   });
 
-  it("restores a persisted validation failure independently of model changes", () => {
+  it("ignores a persisted validation failure after its model changes", () => {
     const validationStateByProvider = {
       openai: {
         status: "error" as const,
         message: "Rejected credentials",
         model: "previous-model",
+      },
+    };
+
+    expect(
+      getProviderHealthState({
+        provider: "openai",
+        settings,
+        validationStateByProvider,
+      }),
+    ).toBe("configured");
+    expect(
+      getConfiguredProvidersForCapability({
+        capability: "llm",
+        settings,
+        validationStateByProvider,
+      }),
+    ).toContain("openai");
+  });
+
+  it("limits a matching validation failure to the capability that was tested", () => {
+    const target = getProviderValidationTarget(settings, "openai");
+    const validationStateByProvider = {
+      openai: {
+        status: "error" as const,
+        message: "Model access rejected",
+        model: target.model,
+        configKey: target.configKey,
       },
     };
 
@@ -108,6 +135,20 @@ describe("getProviderHealthState", () => {
         validationStateByProvider,
       }),
     ).not.toContain("openai");
+    expect(
+      getConfiguredProvidersForCapability({
+        capability: "stt",
+        settings,
+        validationStateByProvider,
+      }),
+    ).toContain("openai");
+    expect(
+      getConfiguredProvidersForCapability({
+        capability: "tts",
+        settings,
+        validationStateByProvider,
+      }),
+    ).toContain("openai");
   });
 
   it("restores a successful validation only for the tested configuration", () => {
