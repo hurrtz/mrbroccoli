@@ -1,6 +1,6 @@
 # Provider Runtime Reference
 
-Last updated: 2026-07-21
+Last updated: 2026-07-24
 
 This document tracks the providers that are present in Mr Broccoli's runtime
 manifest. The source of truth is `src/constants/providers/runtimeManifest.ts`;
@@ -43,6 +43,7 @@ validation, API-key storage, setup-guide routing, and web-search dispatch:
 | `xai` | enabled | enabled | enabled | enabled | Grok chat/Responses search plus standalone xAI STT/TTS routes. |
 | `deepseek` | none | enabled | none | none | DeepSeek chat completions only. |
 | `mistral` | enabled | enabled | enabled | enabled | Chat completions, Conversations web search, Voxtral Mini Transcribe 2, and Voxtral TTS. |
+| `elevenlabs` | none | none | none | enabled | TTS-only route with automatic account-voice discovery. |
 | `moonshot-ai-kimi` | enabled | enabled | none | none | Kimi OpenAI-compatible chat plus built-in web search. |
 | `perplexity` | enabled | enabled | none | none | Sonar chat completions are used for grounded answers. |
 
@@ -129,7 +130,25 @@ validation, API-key storage, setup-guide routing, and web-search dispatch:
   values for Mistral Medium 3.5 and Mistral Small 4; `high` is the default.
 - Web search: Mistral Conversations API with the built-in `web_search` tool.
 - STT picker: `voxtral-mini-2602` (Voxtral Mini Transcribe 2).
-- TTS picker: `voxtral-mini-tts-2603` with a user-supplied Mistral voice ID.
+- TTS picker: `voxtral-mini-tts-2603`.
+- Voice directory: preset and custom account voices are loaded from
+  `/v1/audio/voices`; the voice slug is sent as `voice_id`. A manual voice ID
+  remains available if discovery is unavailable.
+
+### ElevenLabs (`elevenlabs`)
+
+- Runtime role: TTS-only provider. It does not appear as an LLM response card
+  and is not offered for STT or web search.
+- TTS picker: `eleven_flash_v2_5`, `eleven_multilingual_v2`, and `eleven_v3`.
+- Voice directory: all account-visible voices are loaded from paginated
+  `GET /v2/voices`, deduplicated, sorted, and selectable globally or per
+  conversation.
+- Speech transport: `POST /v1/text-to-speech/{voice_id}` with `xi-api-key`
+  authentication and MP3 output.
+- Runtime behavior: voice discovery and speech requests are abortable and
+  timeout-bounded. Provider speech uses the shared retry, diagnostics,
+  sentence-chunk prefetch, playback, and recovery pipeline.
+- Restricted keys need Text to Speech permission and Voices read permission.
 
 ### Moonshot / Kimi (`moonshot-ai-kimi`)
 

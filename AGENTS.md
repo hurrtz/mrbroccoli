@@ -85,7 +85,7 @@ These notes are specific to this repository and supplement any parent-level inst
 
 - STT provider support is currently wired in `src/services/whisper.ts`.
 - TTS provider support is currently wired in `src/services/tts.ts`.
-- Speech-to-text prefers the device's native system recognizer (`src/services/speech/`); provider STT is capability-gated. OpenAI, Gemini (Google Cloud Speech), Mistral, xAI, ByteDance Doubao, and Alibaba Qwen currently have provider STT routes in code.
+- Speech-to-text prefers the device's native system recognizer (`src/services/speech/`); provider STT is capability-gated. OpenAI, Gemini (Google Cloud Speech), Mistral, xAI, and Alibaba Qwen currently have provider STT routes in code.
 - Text-to-speech uses the device's native voices by default; provider TTS is capability-gated. OpenAI, Gemini, xAI, Alibaba Qwen, Mistral, and ElevenLabs currently have provider TTS routes in code.
 - Mistral, ElevenLabs, and xAI load account-visible voices through provider voice-directory services. Keep those integrations, their fallback voice lists, and `src/services/providerVoiceDirectory.ts` in sync.
 - Local/on-device TTS has been removed. There are no more `react-native-sherpa-onnx` / `onnxruntime-react-native` ONNX/Sherpa dependencies in the voice pipeline.

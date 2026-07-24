@@ -16,7 +16,7 @@ The app is intentionally user-key driven. No provider API keys are shipped in th
 
 ## Supported Providers
 
-Nine core LLM providers:
+Ten LLM-capable providers:
 
 - OpenAI
 - Anthropic
@@ -27,13 +27,16 @@ Nine core LLM providers:
 - DeepSeek
 - Alibaba Qwen (DashScope)
 - Moonshot AI Kimi
+- Perplexity
 
-Plus dedicated web-search providers: Perplexity, Tavily, Brave, Exa, Firecrawl, and SerpApi.
+ElevenLabs is available as a dedicated TTS provider. Dedicated web-search
+providers include Tavily, Brave, Exa, Firecrawl, and SerpApi.
 
 Voice input and spoken replies are not tied to any single provider:
 
-- Speech-to-text prefers the device's native system recognizer, with capability-gated provider STT (for example OpenAI, Gemini/Google Cloud Speech, Mistral, xAI, ByteDance, Qwen) as alternatives.
-- Text-to-speech uses the device's native voices, with capability-gated provider TTS (for example OpenAI, Gemini, xAI, Qwen) as alternatives.
+- Speech-to-text prefers the device's native system recognizer, with capability-gated provider STT from OpenAI, Gemini/Google Cloud Speech, Mistral, xAI, and Qwen as alternatives.
+- Text-to-speech uses the device's native voices, with capability-gated provider TTS from OpenAI, Gemini, xAI, Qwen, Mistral, and ElevenLabs as alternatives.
+- Mistral, xAI, and ElevenLabs account voices are discovered automatically and can be refreshed from Speaking settings.
 
 Each provider stays disabled until its key is configured, and STT/TTS routes only appear when a provider that supports them is set up.
 
