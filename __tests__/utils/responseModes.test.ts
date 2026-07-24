@@ -120,12 +120,12 @@ describe("response mode selectors", () => {
   it("derives effort defaults for effort-capable Gemini response routes", () => {
     const modes = deriveResponseModesForProvider("gemini");
 
-    expect(modes[1].route).toEqual({
+    expect(modes[0].route).toEqual({
       provider: "gemini",
       model: "gemini-3.5-flash",
       effort: "medium",
     });
-    expect(modes[2].route).toEqual({
+    expect(modes[1].route).toEqual({
       provider: "gemini",
       model: "gemini-3.1-pro-preview",
       effort: "high",

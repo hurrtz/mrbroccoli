@@ -42,6 +42,9 @@ const PROVIDER_MODEL_ALIAS_MIGRATIONS: Partial<
     "qwen-plus": "qwen-plus-2025-12-01",
     "qwen-flash": "qwen-flash-2025-07-28",
   },
+  gemini: {
+    "gemini-3.1-flash-live-preview": "gemini-2.5-flash",
+  },
   "moonshot-ai-kimi": {
     "kimi-k2.5": "kimi-k3",
   },
@@ -51,7 +54,9 @@ export function migrateProviderModelAlias(provider: Provider, model: string) {
   return PROVIDER_MODEL_ALIAS_MIGRATIONS[provider]?.[model] ?? model;
 }
 
-export function getResponseModeIds(modes: ResponseModeSelections): ResponseMode[] {
+export function getResponseModeIds(
+  modes: ResponseModeSelections,
+): ResponseMode[] {
   return modes.map((mode) => mode.id);
 }
 

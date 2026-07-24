@@ -96,6 +96,7 @@ describe("useSettings", () => {
           ...DEFAULT_SETTINGS.providerModels,
           openai: "gpt-5.4",
           "alibaba-qwen-dashscope": "qwen3.7-plus",
+          gemini: "gemini-3.1-flash-live-preview",
           "moonshot-ai-kimi": "kimi-k2.5",
         },
         responseModes: [
@@ -118,6 +119,13 @@ describe("useSettings", () => {
           {
             id: "mode-3",
             route: {
+              provider: "gemini",
+              model: "gemini-3.1-flash-live-preview",
+            },
+          },
+          {
+            id: "mode-4",
+            route: {
               provider: "moonshot-ai-kimi",
               model: "kimi-k2.5",
               effort: "enabled",
@@ -136,16 +144,24 @@ describe("useSettings", () => {
     expect(
       result.current.settings.providerModels["alibaba-qwen-dashscope"],
     ).toBe("qwen3.7-plus-2026-05-26");
+    expect(result.current.settings.providerModels.gemini).toBe(
+      "gemini-2.5-flash",
+    );
     expect(result.current.settings.responseModes[0]?.route.model).toBe(
       "gpt-5.4-2026-03-05",
     );
     expect(result.current.settings.responseModes[1]?.route.model).toBe(
       "qwen3.7-plus-2026-05-26",
     );
-    expect(
-      result.current.settings.providerModels["moonshot-ai-kimi"],
-    ).toBe("kimi-k3");
+    expect(result.current.settings.providerModels["moonshot-ai-kimi"]).toBe(
+      "kimi-k3",
+    );
     expect(result.current.settings.responseModes[2]?.route).toEqual({
+      provider: "gemini",
+      model: "gemini-2.5-flash",
+      effort: "dynamic",
+    });
+    expect(result.current.settings.responseModes[3]?.route).toEqual({
       provider: "moonshot-ai-kimi",
       model: "kimi-k3",
       effort: "max",
@@ -350,9 +366,9 @@ describe("useSettings", () => {
 
     expect(result.current.settings.webSearchMode).toBe("on");
     expect(result.current.settings.webSearchProvider).toBe("openai");
-    expect(result.current.settings.webSearchProviderSettings.openai.searchMode).toBe(
-      "deep",
-    );
+    expect(
+      result.current.settings.webSearchProviderSettings.openai.searchMode,
+    ).toBe("deep");
     expect(AsyncStorage.setItem).toHaveBeenCalledWith(
       "@mrbroccoli/settings",
       expect.stringContaining('"webSearchMode":"on"'),
@@ -396,7 +412,8 @@ describe("useSettings", () => {
     expect(firstRender.result.current.settings.replyPlayback).toBe("wait");
     expect(AsyncStorage.setItem).toHaveBeenCalledTimes(1);
 
-    const serializedSettings = (AsyncStorage.setItem as jest.Mock).mock.calls[0][1];
+    const serializedSettings = (AsyncStorage.setItem as jest.Mock).mock
+      .calls[0][1];
     const persistedSettings = JSON.parse(serializedSettings) as Record<
       string,
       unknown
@@ -411,7 +428,9 @@ describe("useSettings", () => {
 
     firstRender.unmount();
     jest.clearAllMocks();
-    (AsyncStorage.getItem as jest.Mock).mockResolvedValueOnce(serializedSettings);
+    (AsyncStorage.getItem as jest.Mock).mockResolvedValueOnce(
+      serializedSettings,
+    );
     (SecureStore.getItemAsync as jest.Mock).mockResolvedValue(null);
 
     renderHook(() => useSettings());
@@ -434,13 +453,15 @@ describe("useSettings", () => {
     (AsyncStorage.getItem as jest.Mock).mockResolvedValueOnce(
       JSON.stringify(legacyStored),
     );
-    (SecureStore.getItemAsync as jest.Mock).mockImplementation((key: string) => {
-      const values: Record<string, string | null> = {
-        "mrbroccoli.provider_key.grok": "xai-legacy-key",
-      };
+    (SecureStore.getItemAsync as jest.Mock).mockImplementation(
+      (key: string) => {
+        const values: Record<string, string | null> = {
+          "mrbroccoli.provider_key.grok": "xai-legacy-key",
+        };
 
-      return Promise.resolve(values[key] ?? null);
-    });
+        return Promise.resolve(values[key] ?? null);
+      },
+    );
 
     const { result } = renderHook(() => useSettings());
     await flushSettingsLoad();
@@ -449,7 +470,8 @@ describe("useSettings", () => {
     expect(result.current.settings.sttProvider).toBe("xai");
     expect(result.current.settings.providerTtsVoices.xai).toBe("ara");
     expect(
-      (result.current.settings.providerTtsVoices as Record<string, unknown>).grok,
+      (result.current.settings.providerTtsVoices as Record<string, unknown>)
+        .grok,
     ).toBeUndefined();
     expect(result.current.settings.apiKeys.xai).toBe("xai-legacy-key");
   });
@@ -547,7 +569,9 @@ describe("useSettings", () => {
     await flushSettingsLoad();
 
     expect(result.current.settings.webSearchProvider).toBeNull();
-    expect(Object.keys(result.current.settings.webSearchProviderSettings)).toEqual([
+    expect(
+      Object.keys(result.current.settings.webSearchProviderSettings),
+    ).toEqual([
       "openai",
       "anthropic",
       "alibaba-qwen-dashscope",
@@ -751,9 +775,9 @@ describe("useSettings", () => {
       });
     });
 
-    expect(result.current.settings.providerValidationResults.openai?.status).toBe(
-      "error",
-    );
+    expect(
+      result.current.settings.providerValidationResults.openai?.status,
+    ).toBe("error");
     const setItemCalls = (AsyncStorage.setItem as jest.Mock).mock.calls;
     const persisted = JSON.parse(
       setItemCalls[setItemCalls.length - 1][1],
@@ -789,7 +813,9 @@ describe("useSettings", () => {
       result.current.updateApiKey("openai", "replacement-key");
     });
 
-    expect(result.current.settings.providerValidationResults.openai).toBeUndefined();
+    expect(
+      result.current.settings.providerValidationResults.openai,
+    ).toBeUndefined();
   });
 
   it("invalidates a successful validation when its key changes", async () => {
@@ -816,7 +842,9 @@ describe("useSettings", () => {
       result.current.updateApiKey("openai", "different-key");
     });
 
-    expect(result.current.settings.providerValidationResults.openai).toBeUndefined();
+    expect(
+      result.current.settings.providerValidationResults.openai,
+    ).toBeUndefined();
   });
 
   it("exposes no usable response mode on a fresh install without keys", async () => {

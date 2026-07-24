@@ -53,10 +53,9 @@ describe("provider model accuracy", () => {
   });
 
   it("keeps curated defaults valid for the visible runtime picker", () => {
-    for (const [provider, modelId] of Object.entries(PROVIDER_DEFAULT_MODELS) as [
-      Provider,
-      string,
-    ][]) {
+    for (const [provider, modelId] of Object.entries(
+      PROVIDER_DEFAULT_MODELS,
+    ) as [Provider, string][]) {
       if (!modelId) {
         continue;
       }
@@ -96,6 +95,13 @@ describe("provider model accuracy", () => {
     expect(PROVIDER_DEFAULT_MODELS.deepseek).toBe("deepseek-v4-flash");
   });
 
+  it("keeps Gemini Live out of the text-chat picker", () => {
+    expect(providerModelIds("gemini")).not.toContain(
+      "gemini-3.1-flash-live-preview",
+    );
+    expect(PROVIDER_DEFAULT_MODELS.gemini).toBe("gemini-2.5-flash");
+  });
+
   it("uses current Mistral models and avoids deprecated model rows", () => {
     expect(providerModelIds("mistral")).toEqual(
       expect.arrayContaining([
@@ -115,9 +121,9 @@ describe("provider model accuracy", () => {
     );
     expect(PROVIDER_DEFAULT_MODELS.mistral).toBe("mistral-medium-3-5");
     expect(DEFAULT_PROVIDER_STT_MODELS.mistral).toBe("voxtral-mini-2602");
-    expect(PROVIDER_STT_MODEL_OPTIONS.mistral?.map((model) => model.id)).toEqual([
-      "voxtral-mini-2602",
-    ]);
+    expect(
+      PROVIDER_STT_MODEL_OPTIONS.mistral?.map((model) => model.id),
+    ).toEqual(["voxtral-mini-2602"]);
   });
 
   it("surfaces current Qwen and Doubao picker models", () => {
@@ -186,26 +192,18 @@ describe("provider model accuracy", () => {
   });
 
   it("exposes Mistral's current Voxtral speech model", () => {
-    expect(DEFAULT_PROVIDER_TTS_MODELS.mistral).toBe(
-      "voxtral-mini-tts-2603",
-    );
-    expect(PROVIDER_TTS_MODEL_OPTIONS.mistral?.map((model) => model.id)).toEqual([
-      "voxtral-mini-tts-2603",
-    ]);
+    expect(DEFAULT_PROVIDER_TTS_MODELS.mistral).toBe("voxtral-mini-tts-2603");
+    expect(
+      PROVIDER_TTS_MODEL_OPTIONS.mistral?.map((model) => model.id),
+    ).toEqual(["voxtral-mini-tts-2603"]);
   });
 
   it("exposes current ElevenLabs conversational TTS models", () => {
     expect(PROVIDER_DEFAULT_MODELS.elevenlabs).toBe("");
-    expect(DEFAULT_PROVIDER_TTS_MODELS.elevenlabs).toBe(
-      "eleven_flash_v2_5",
-    );
+    expect(DEFAULT_PROVIDER_TTS_MODELS.elevenlabs).toBe("eleven_flash_v2_5");
     expect(
       PROVIDER_TTS_MODEL_OPTIONS.elevenlabs?.map((model) => model.id),
-    ).toEqual([
-      "eleven_flash_v2_5",
-      "eleven_multilingual_v2",
-      "eleven_v3",
-    ]);
+    ).toEqual(["eleven_flash_v2_5", "eleven_multilingual_v2", "eleven_v3"]);
   });
 
   it("keeps OpenAI and Perplexity pickers aligned with their current callable endpoints", () => {
@@ -223,10 +221,7 @@ describe("provider model accuracy", () => {
     expect(providerModelIds("openai")).not.toContain("gpt-5.5-pro");
     expect(providerModelIds("openai")).not.toContain("gpt-5.5");
     expect(providerModelIds("openai")).toEqual(
-      expect.arrayContaining([
-        "gpt-5.5-2026-04-23",
-        "gpt-5.4-2026-03-05",
-      ]),
+      expect.arrayContaining(["gpt-5.5-2026-04-23", "gpt-5.4-2026-03-05"]),
     );
     expect(providerModelIds("openai")).not.toContain("gpt-realtime-1.5");
     expect(providerModelIds("perplexity")).toEqual([

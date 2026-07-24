@@ -25,10 +25,6 @@ type GeminiGenerateContentLlmConfig = {
   endpoint: string;
 };
 
-type GeminiLiveLlmConfig = {
-  transport: "gemini-live";
-};
-
 type AnthropicLlmConfig = {
   transport: "anthropic";
 };
@@ -37,7 +33,6 @@ export type ProviderLlmConfig =
   | OpenAiCompatibleLlmConfig
   | OpenAiRealtimeLlmConfig
   | GeminiGenerateContentLlmConfig
-  | GeminiLiveLlmConfig
   | AnthropicLlmConfig;
 
 export function getProviderLlmConfig(
@@ -50,16 +45,11 @@ export function getProviderLlmConfig(
     return null;
   }
 
-  const isRealtimeModel = manifest.llm.realtimeModelIds?.includes(model) ?? false;
+  const isRealtimeModel =
+    manifest.llm.realtimeModelIds?.includes(model) ?? false;
   const realtimeTransport = manifest.llm.realtimeTransport;
 
-  if (isRealtimeModel) {
-    if (realtimeTransport === "gemini-live") {
-      return {
-        transport: "gemini-live",
-      };
-    }
-
+  if (isRealtimeModel && realtimeTransport === "openai-realtime") {
     return {
       transport: "openai-realtime",
     };
@@ -121,9 +111,7 @@ export function toOpenAICompatibleMessages(
       return {
         role: message.role,
         content: message.content,
-        ...(reasoningContent
-          ? { reasoning_content: reasoningContent }
-          : {}),
+        ...(reasoningContent ? { reasoning_content: reasoningContent } : {}),
       };
     }
 

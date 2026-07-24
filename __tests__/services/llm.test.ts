@@ -50,7 +50,16 @@ class MockWebSocket {
   }
 }
 
-const mockMessages: Message[] = [{ id: "1", role: "user", content: "Hello", model: null, provider: null, timestamp: "2026-01-01T00:00:00Z" }];
+const mockMessages: Message[] = [
+  {
+    id: "1",
+    role: "user",
+    content: "Hello",
+    model: null,
+    provider: null,
+    timestamp: "2026-01-01T00:00:00Z",
+  },
+];
 
 describe("streamChat", () => {
   beforeAll(() => {
@@ -70,16 +79,32 @@ describe("streamChat", () => {
     const encoder = new TextEncoder();
     const stream = new ReadableStream({
       start(controller) {
-        controller.enqueue(encoder.encode('data: {"choices":[{"delta":{"content":"Hi"}}]}\n\n'));
+        controller.enqueue(
+          encoder.encode('data: {"choices":[{"delta":{"content":"Hi"}}]}\n\n'),
+        );
         controller.enqueue(encoder.encode("data: [DONE]\n\n"));
         controller.close();
       },
     });
     (fetch as jest.Mock).mockResolvedValueOnce({ ok: true, body: stream });
     const chunks: string[] = [];
-    await streamChat({ messages: mockMessages, model: "gpt-4o", provider: "openai", apiKey: "sk-test-key", assistantInstructions: "", responseLength: "normal", responseTone: "professional", language: "en", onChunk: (text) => chunks.push(text), onDone: () => {}, onError: () => {} });
+    await streamChat({
+      messages: mockMessages,
+      model: "gpt-4o",
+      provider: "openai",
+      apiKey: "sk-test-key",
+      assistantInstructions: "",
+      responseLength: "normal",
+      responseTone: "professional",
+      language: "en",
+      onChunk: (text) => chunks.push(text),
+      onDone: () => {},
+      onError: () => {},
+    });
     expect(chunks).toEqual(["Hi"]);
-    expect((fetch as jest.Mock).mock.calls[0][0]).toBe("https://api.openai.com/v1/chat/completions");
+    expect((fetch as jest.Mock).mock.calls[0][0]).toBe(
+      "https://api.openai.com/v1/chat/completions",
+    );
   });
 
   it("does not expose or speak a provider marker echoed by the model", async () => {
@@ -119,10 +144,7 @@ describe("streamChat", () => {
     });
 
     expect(chunks.join("")).toBe("Clean answer.");
-    expect(onDone).toHaveBeenCalledWith(
-      "Clean answer.",
-      expect.any(Object),
-    );
+    expect(onDone).toHaveBeenCalledWith("Clean answer.", expect.any(Object));
   });
 
   it("rejects an OpenAI-compatible stream that reaches its output limit", async () => {
@@ -245,20 +267,44 @@ describe("streamChat", () => {
     const encoder = new TextEncoder();
     const stream = new ReadableStream({
       start(controller) {
-        controller.enqueue(encoder.encode('event: content_block_delta\ndata: {"type":"content_block_delta","delta":{"type":"text_delta","text":"Hi"}}\n\n'));
-        controller.enqueue(encoder.encode('event: message_stop\ndata: {"type":"message_stop"}\n\n'));
+        controller.enqueue(
+          encoder.encode(
+            'event: content_block_delta\ndata: {"type":"content_block_delta","delta":{"type":"text_delta","text":"Hi"}}\n\n',
+          ),
+        );
+        controller.enqueue(
+          encoder.encode(
+            'event: message_stop\ndata: {"type":"message_stop"}\n\n',
+          ),
+        );
         controller.close();
       },
     });
     (fetch as jest.Mock).mockResolvedValueOnce({ ok: true, body: stream });
     const chunks: string[] = [];
-    await streamChat({ messages: mockMessages, model: "claude-opus-4-7", provider: "anthropic", apiKey: "sk-ant-test-key", assistantInstructions: "", responseLength: "normal", responseTone: "professional", language: "en", onChunk: (text) => chunks.push(text), onDone: () => {}, onError: () => {} });
+    await streamChat({
+      messages: mockMessages,
+      model: "claude-opus-4-7",
+      provider: "anthropic",
+      apiKey: "sk-ant-test-key",
+      assistantInstructions: "",
+      responseLength: "normal",
+      responseTone: "professional",
+      language: "en",
+      onChunk: (text) => chunks.push(text),
+      onDone: () => {},
+      onError: () => {},
+    });
     expect(chunks).toEqual(["Hi"]);
-    expect((fetch as jest.Mock).mock.calls[0][0]).toBe("https://api.anthropic.com/v1/messages");
-    expect(JSON.parse((fetch as jest.Mock).mock.calls[0][1].body).max_tokens).toBe(
-      16_384,
+    expect((fetch as jest.Mock).mock.calls[0][0]).toBe(
+      "https://api.anthropic.com/v1/messages",
     );
-    expect(JSON.parse((fetch as jest.Mock).mock.calls[0][1].body).thinking).toEqual({
+    expect(
+      JSON.parse((fetch as jest.Mock).mock.calls[0][1].body).max_tokens,
+    ).toBe(16_384);
+    expect(
+      JSON.parse((fetch as jest.Mock).mock.calls[0][1].body).thinking,
+    ).toEqual({
       type: "adaptive",
     });
   });
@@ -278,7 +324,9 @@ describe("streamChat", () => {
           ),
         );
         controller.enqueue(
-          encoder.encode('event: message_stop\ndata: {"type":"message_stop"}\n\n'),
+          encoder.encode(
+            'event: message_stop\ndata: {"type":"message_stop"}\n\n',
+          ),
         );
         controller.close();
       },
@@ -296,7 +344,9 @@ describe("streamChat", () => {
           ),
         );
         controller.enqueue(
-          encoder.encode('event: message_stop\ndata: {"type":"message_stop"}\n\n'),
+          encoder.encode(
+            'event: message_stop\ndata: {"type":"message_stop"}\n\n',
+          ),
         );
         controller.close();
       },
@@ -323,9 +373,9 @@ describe("streamChat", () => {
     });
 
     expect(chunks).toEqual(["First half", " continued."]);
-    expect(JSON.parse((fetch as jest.Mock).mock.calls[0][1].body).max_tokens).toBe(
-      65_536,
-    );
+    expect(
+      JSON.parse((fetch as jest.Mock).mock.calls[0][1].body).max_tokens,
+    ).toBe(65_536);
     expect(onDone).toHaveBeenCalledWith(
       "First half continued.",
       expect.any(Object),
@@ -362,7 +412,9 @@ describe("streamChat", () => {
           ),
         );
         controller.enqueue(
-          encoder.encode('event: message_stop\ndata: {"type":"message_stop"}\n\n'),
+          encoder.encode(
+            'event: message_stop\ndata: {"type":"message_stop"}\n\n',
+          ),
         );
         controller.close();
       },
@@ -397,7 +449,9 @@ describe("streamChat", () => {
     const stream = new ReadableStream({
       start(controller) {
         controller.enqueue(
-          encoder.encode('event: message_stop\ndata: {"type":"message_stop"}\n\n'),
+          encoder.encode(
+            'event: message_stop\ndata: {"type":"message_stop"}\n\n',
+          ),
         );
         controller.close();
       },
@@ -656,9 +710,6 @@ describe("streamChat", () => {
     );
   });
 
-
-
-
   it("uses the OpenAI realtime socket for realtime models", async () => {
     const chunks: string[] = [];
     const promise = streamChat({
@@ -696,70 +747,6 @@ describe("streamChat", () => {
 
     await promise;
     expect(chunks).toEqual(["Hi"]);
-    expect(fetch).not.toHaveBeenCalled();
-  });
-
-
-  it("waits for Gemini Live setup before sending the conversation", async () => {
-    const chunks: string[] = [];
-    const promise = streamChat({
-      messages: mockMessages,
-      model: "gemini-3.1-flash-live-preview",
-      provider: "gemini",
-      apiKey: "gemini-test-key",
-      assistantInstructions: "",
-      responseLength: "normal",
-      responseTone: "professional",
-      language: "en",
-      onChunk: (text) => chunks.push(text),
-      onDone: () => {},
-      onError: () => {},
-    });
-
-    const socket = MockWebSocket.instances[0];
-    expect(socket.url).toBe(
-      "wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1beta.GenerativeService.BidiGenerateContent?key=gemini-test-key",
-    );
-    expect(socket.options).toBeUndefined();
-
-    socket.emitOpen();
-    expect(JSON.parse(socket.sent[0])).toMatchObject({
-      setup: {
-        model: "models/gemini-3.1-flash-live-preview",
-        generationConfig: { responseModalities: ["TEXT"] },
-      },
-    });
-    expect(socket.sent).toHaveLength(1);
-
-    socket.emitMessage({ setupComplete: {} });
-    expect(JSON.parse(socket.sent[1])).toMatchObject({
-      realtimeInput: {
-        text: expect.stringContaining("User: Hello"),
-      },
-    });
-
-    socket.emitMessage({
-      serverContent: {
-        modelTurn: {
-          parts: [{ text: "Hi from " }],
-        },
-      },
-    });
-    socket.emitMessage({
-      serverContent: {
-        modelTurn: {
-          parts: [{ text: "Gemini Live" }],
-        },
-      },
-    });
-    socket.emitMessage({
-      serverContent: {
-        turnComplete: true,
-      },
-    });
-
-    await promise;
-    expect(chunks).toEqual(["Hi from ", "Gemini Live"]);
     expect(fetch).not.toHaveBeenCalled();
   });
 
@@ -1157,7 +1144,9 @@ describe("streamChat", () => {
           ),
         );
         controller.enqueue(
-          encoder.encode('event: message_stop\ndata: {"type":"message_stop"}\n\n'),
+          encoder.encode(
+            'event: message_stop\ndata: {"type":"message_stop"}\n\n',
+          ),
         );
         controller.close();
       },
@@ -1184,7 +1173,6 @@ describe("streamChat", () => {
       effort: "medium",
     });
   });
-
 
   it("uses the configured routed endpoint for a hyphenated OpenAI-compatible provider", async () => {
     const encoder = new TextEncoder();
@@ -1219,7 +1207,6 @@ describe("streamChat", () => {
     expect(url).toBe("https://api.moonshot.ai/v1/chat/completions");
     expect(JSON.parse(options.body).model).toBe("kimi-k2.5");
   });
-
 
   it("uses the Sonar chat-completions compatibility endpoint for Perplexity", async () => {
     const encoder = new TextEncoder();
@@ -1489,14 +1476,11 @@ describe("streamChat", () => {
 
     expect(chunks).toEqual(["Hi"]);
     const [url, options] = (fetch as jest.Mock).mock.calls[0];
-    expect(url).toBe("https://ark.cn-beijing.volces.com/api/v3/chat/completions");
+    expect(url).toBe(
+      "https://ark.cn-beijing.volces.com/api/v3/chat/completions",
+    );
     expect(JSON.parse(options.body).model).toBe("doubao-seed-2-0-lite-260215");
   });
-
-
-
-
-
 
   it("emits a chunk when openai-compatible streaming falls back to a full response", async () => {
     (fetch as jest.Mock).mockResolvedValueOnce({
@@ -1533,7 +1517,6 @@ describe("streamChat", () => {
 
     expect(chunks).toEqual(["Hi there."]);
   });
-
 
   it("waits for async onDone work before resolving", async () => {
     const encoder = new TextEncoder();
@@ -1599,7 +1582,7 @@ describe("generateConversationTitle", () => {
         choices: [
           {
             message: {
-              content: 'Title: **Provider Routing Cleanup.**\nExtra text',
+              content: "Title: **Provider Routing Cleanup.**\nExtra text",
             },
           },
         ],
@@ -1733,9 +1716,9 @@ describe("validateProviderConnection", () => {
         model: "gpt-5.4-2026-03-05",
         apiKey: "sk-test-key",
         language: "en",
-      })
+      }),
     ).rejects.toThrow(
-      "OpenAI rejected the credentials for reply generation. Check the API key and permissions."
+      "OpenAI rejected the credentials for reply generation. Check the API key and permissions.",
     );
   });
 });

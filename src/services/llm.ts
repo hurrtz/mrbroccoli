@@ -24,7 +24,10 @@ import {
   buildConversationContextPlan,
   getConversationSummaryBody,
 } from "./conversationContext";
-import { requestAnthropicChat, requestAnthropicChatStream } from "./llm/providers/anthropic";
+import {
+  requestAnthropicChat,
+  requestAnthropicChatStream,
+} from "./llm/providers/anthropic";
 import {
   requestOpenAICompatibleChat,
   requestOpenAICompatibleChatStream,
@@ -37,10 +40,6 @@ import {
   requestOpenAiRealtimeChat,
   requestOpenAiRealtimeChatStream,
 } from "./llm/providers/openaiRealtime";
-import {
-  requestGeminiLiveChat,
-  requestGeminiLiveChatStream,
-} from "./llm/providers/geminiLive";
 import {
   ChatMessage,
   getProviderLlmConfig,
@@ -93,16 +92,15 @@ interface LlmRequestParams {
 interface StreamingLlmRequestParams extends LlmRequestParams {
   onChunk: (text: string) => void;
   onStreamActivity?: () => void;
-  onGeminiAssistantContent?: (
-    content: GeminiAssistantContentPart[],
-  ) => void;
-  onMistralAssistantContent?: (
-    content: MistralAssistantContentChunk[],
-  ) => void;
+  onGeminiAssistantContent?: (content: GeminiAssistantContentPart[]) => void;
+  onMistralAssistantContent?: (content: MistralAssistantContentChunk[]) => void;
   onKimiReasoningContent?: (content: string) => void;
 }
 
-function buildProviderNotWiredUpError(provider: Provider, language: AppLanguage) {
+function buildProviderNotWiredUpError(
+  provider: Provider,
+  language: AppLanguage,
+) {
   return new Error(
     translate(language, "providerNotWiredUpYet", {
       provider: PROVIDER_LABELS[provider],
@@ -122,7 +120,10 @@ function buildProviderReplyTimeoutError(
   );
 }
 
-function buildProviderEmptyReplyError(provider: Provider, language: AppLanguage) {
+function buildProviderEmptyReplyError(
+  provider: Provider,
+  language: AppLanguage,
+) {
   return new Error(
     translate(language, "providerEmptyReplyError", {
       provider: PROVIDER_LABELS[provider],
@@ -184,7 +185,10 @@ const LLM_TEXT_REQUESTERS = {
     }),
   "gemini-generate-content": async (
     params: LlmRequestParams,
-    config: Extract<ProviderLlmConfig, { transport: "gemini-generate-content" }>,
+    config: Extract<
+      ProviderLlmConfig,
+      { transport: "gemini-generate-content" }
+    >,
   ) =>
     requestGeminiGenerateContentChat({
       endpoint: config.endpoint,
@@ -199,16 +203,6 @@ const LLM_TEXT_REQUESTERS = {
     }),
   "openai-realtime": async (params: LlmRequestParams) =>
     requestOpenAiRealtimeChat({
-      provider: params.provider,
-      model: params.model,
-      messages: params.messages,
-      apiKey: params.apiKey,
-      language: params.language,
-      systemPrompt: params.systemPrompt,
-      abortSignal: params.abortSignal,
-    }),
-  "gemini-live": async (params: LlmRequestParams) =>
-    requestGeminiLiveChat({
       provider: params.provider,
       model: params.model,
       messages: params.messages,
@@ -254,7 +248,10 @@ const LLM_STREAM_REQUESTERS = {
     }),
   "gemini-generate-content": async (
     params: StreamingLlmRequestParams,
-    config: Extract<ProviderLlmConfig, { transport: "gemini-generate-content" }>,
+    config: Extract<
+      ProviderLlmConfig,
+      { transport: "gemini-generate-content" }
+    >,
   ) =>
     requestGeminiGenerateContentChatStream({
       endpoint: config.endpoint,
@@ -271,17 +268,6 @@ const LLM_STREAM_REQUESTERS = {
     }),
   "openai-realtime": async (params: StreamingLlmRequestParams) =>
     requestOpenAiRealtimeChatStream({
-      provider: params.provider,
-      model: params.model,
-      messages: params.messages,
-      apiKey: params.apiKey,
-      language: params.language,
-      systemPrompt: params.systemPrompt,
-      onChunk: params.onChunk,
-      abortSignal: params.abortSignal,
-    }),
-  "gemini-live": async (params: StreamingLlmRequestParams) =>
-    requestGeminiLiveChatStream({
       provider: params.provider,
       model: params.model,
       messages: params.messages,
@@ -327,8 +313,6 @@ async function requestChatText(params: {
       return LLM_TEXT_REQUESTERS["gemini-generate-content"](params, config);
     case "openai-realtime":
       return LLM_TEXT_REQUESTERS["openai-realtime"](params);
-    case "gemini-live":
-      return LLM_TEXT_REQUESTERS["gemini-live"](params);
     case "anthropic":
       return LLM_TEXT_REQUESTERS.anthropic(params);
     default:
@@ -567,7 +551,8 @@ export async function streamChat({
     const config = getLlmProviderConfigOrThrow(provider, model, language);
     const timeoutError = buildProviderReplyTimeoutError(provider, language);
     const requestAbortController = new AbortController();
-    const provenanceStreamFilter = createResponseProvenanceStreamFilter(onChunk);
+    const provenanceStreamFilter =
+      createResponseProvenanceStreamFilter(onChunk);
 
     if (abortSignal?.aborted) {
       requestAbortController.abort();
@@ -676,18 +661,6 @@ export async function streamChat({
             messages: requestMessages,
             model,
             modelEffort,
-            provider,
-            apiKey,
-            language,
-            systemPrompt,
-            onChunk: onChunkWithTimeout,
-            abortSignal: requestAbortController.signal,
-          });
-          break;
-        case "gemini-live":
-          fullText = await LLM_STREAM_REQUESTERS["gemini-live"]({
-            messages: requestMessages,
-            model,
             provider,
             apiKey,
             language,

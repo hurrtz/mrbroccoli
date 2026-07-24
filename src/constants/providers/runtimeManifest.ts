@@ -19,7 +19,6 @@ export type RuntimeLlmTransport =
   | "openai-compatible"
   | "openai-realtime"
   | "gemini-generate-content"
-  | "gemini-live"
   | "anthropic";
 export type RuntimeSttTransport =
   | "none"
@@ -29,16 +28,9 @@ export type RuntimeSttTransport =
   | "google-cloud-speech-v2"
   | "openai-audio-input"
   | "xai-stt-rest";
-export type RuntimeTtsTransport =
-  | "none"
-  | "binary"
-  | "gemini"
-  | "dashscope";
+export type RuntimeTtsTransport = "none" | "binary" | "gemini" | "dashscope";
 export type RuntimeTtsBinaryRequestFormat =
-  | "elevenlabs-speech"
-  | "openai-speech"
-  | "grok-speech"
-  | "mistral-speech";
+  "elevenlabs-speech" | "openai-speech" | "grok-speech" | "mistral-speech";
 export type RuntimeTtsVoiceDirectory = "elevenlabs" | "mistral" | "xai";
 export type RuntimeLanguageHintKey = "mistral-stt-language-code";
 
@@ -96,7 +88,8 @@ interface RuntimeLlmDisabledManifest {
   defaultModel?: string;
 }
 
-type RuntimeLlmManifest = RuntimeLlmProviderManifest | RuntimeLlmDisabledManifest;
+type RuntimeLlmManifest =
+  RuntimeLlmProviderManifest | RuntimeLlmDisabledManifest;
 
 interface RuntimeSttManifest {
   support: "none" | "provider";
@@ -517,6 +510,7 @@ export const RUNTIME_PROVIDER_MANIFEST: Record<
       endpoint: "https://api.openai.com/v1/chat/completions",
       defaultModel: "gpt-5.6-sol",
       realtimeModelIds: ["gpt-realtime-2.1", "gpt-realtime-2.1-mini"],
+      realtimeTransport: "openai-realtime",
       models: [
         withEffort(
           namedModel("gpt-5.6-sol", "GPT-5.6 Sol"),
@@ -613,23 +607,14 @@ export const RUNTIME_PROVIDER_MANIFEST: Record<
           namedModel("claude-fable-5", "Claude Fable 5"),
           ANTHROPIC_EXTENDED_OUTPUT_EFFORT,
         ),
-        withEffort(
-          model("claude-opus-4-8"),
-          ANTHROPIC_EXTENDED_OUTPUT_EFFORT,
-        ),
+        withEffort(model("claude-opus-4-8"), ANTHROPIC_EXTENDED_OUTPUT_EFFORT),
         model("claude-haiku-4-5-20251001"),
         withEffort(
           model("claude-sonnet-4-6"),
           ANTHROPIC_STANDARD_OUTPUT_EFFORT,
         ),
-        withEffort(
-          model("claude-opus-4-7"),
-          ANTHROPIC_EXTENDED_OUTPUT_EFFORT,
-        ),
-        withEffort(
-          model("claude-opus-4-6"),
-          ANTHROPIC_STANDARD_OUTPUT_EFFORT,
-        ),
+        withEffort(model("claude-opus-4-7"), ANTHROPIC_EXTENDED_OUTPUT_EFFORT),
+        withEffort(model("claude-opus-4-6"), ANTHROPIC_STANDARD_OUTPUT_EFFORT),
       ],
     },
     stt: {
@@ -716,10 +701,7 @@ export const RUNTIME_PROVIDER_MANIFEST: Record<
       models: [
         namedModel("qwen3-tts-flash", "Qwen3-TTS-Flash"),
         withInstructions(
-          namedModel(
-            "qwen3-tts-instruct-flash",
-            "Qwen3-TTS-Instruct-Flash",
-          ),
+          namedModel("qwen3-tts-instruct-flash", "Qwen3-TTS-Instruct-Flash"),
         ),
       ],
       voiceOptions: [
@@ -855,21 +837,10 @@ export const RUNTIME_PROVIDER_MANIFEST: Record<
       transport: "gemini-generate-content",
       endpoint: "https://generativelanguage.googleapis.com/v1beta",
       defaultModel: "gemini-2.5-flash",
-      realtimeModelIds: ["gemini-3.1-flash-live-preview"],
-      realtimeTransport: "gemini-live",
       models: [
-        namedModel(
-          "gemini-3.1-flash-live-preview",
-          "Gemini 3.1 Flash Live Preview",
-        ),
         withEffort(
           model("gemini-3.5-flash"),
-          geminiThinkingEffort("medium", [
-            "minimal",
-            "low",
-            "medium",
-            "high",
-          ]),
+          geminiThinkingEffort("medium", ["minimal", "low", "medium", "high"]),
         ),
         withEffort(
           namedModel("gemini-3.1-pro-preview", "Gemini 3.1 Pro Preview"),
@@ -877,12 +848,7 @@ export const RUNTIME_PROVIDER_MANIFEST: Record<
         ),
         withEffort(
           model("gemini-3.1-flash-lite"),
-          geminiThinkingEffort("minimal", [
-            "minimal",
-            "low",
-            "medium",
-            "high",
-          ]),
+          geminiThinkingEffort("minimal", ["minimal", "low", "medium", "high"]),
         ),
         withEffort(
           model("gemini-2.5-pro"),
@@ -954,31 +920,49 @@ export const RUNTIME_PROVIDER_MANIFEST: Record<
         voice("Puck", "Puck · Upbeat", { de: "Puck · Schwungvoll" }),
         voice("Charon", "Charon · Informative", { de: "Charon · Informativ" }),
         voice("Kore", "Kore · Firm", { de: "Kore · Bestimmt" }),
-        voice("Fenrir", "Fenrir · Excitable", { de: "Fenrir · Temperamentvoll" }),
+        voice("Fenrir", "Fenrir · Excitable", {
+          de: "Fenrir · Temperamentvoll",
+        }),
         voice("Leda", "Leda · Youthful", { de: "Leda · Jugendlich" }),
         voice("Orus", "Orus · Firm", { de: "Orus · Bestimmt" }),
         voice("Aoede", "Aoede · Breezy", { de: "Aoede · Leicht" }),
-        voice("Callirrhoe", "Callirrhoe · Easy-going", { de: "Callirrhoe · Gelassen" }),
+        voice("Callirrhoe", "Callirrhoe · Easy-going", {
+          de: "Callirrhoe · Gelassen",
+        }),
         voice("Autonoe", "Autonoe · Bright", { de: "Autonoe · Klar" }),
-        voice("Enceladus", "Enceladus · Breathy", { de: "Enceladus · Hauchig" }),
+        voice("Enceladus", "Enceladus · Breathy", {
+          de: "Enceladus · Hauchig",
+        }),
         voice("Iapetus", "Iapetus · Clear", { de: "Iapetus · Klar" }),
         voice("Umbriel", "Umbriel · Easy-going", { de: "Umbriel · Gelassen" }),
         voice("Algieba", "Algieba · Smooth", { de: "Algieba · Sanft" }),
         voice("Despina", "Despina · Smooth", { de: "Despina · Sanft" }),
         voice("Erinome", "Erinome · Clear", { de: "Erinome · Klar" }),
         voice("Algenib", "Algenib · Gravelly", { de: "Algenib · Rau" }),
-        voice("Rasalgethi", "Rasalgethi · Informative", { de: "Rasalgethi · Informativ" }),
-        voice("Laomedeia", "Laomedeia · Upbeat", { de: "Laomedeia · Schwungvoll" }),
+        voice("Rasalgethi", "Rasalgethi · Informative", {
+          de: "Rasalgethi · Informativ",
+        }),
+        voice("Laomedeia", "Laomedeia · Upbeat", {
+          de: "Laomedeia · Schwungvoll",
+        }),
         voice("Achernar", "Achernar · Soft", { de: "Achernar · Weich" }),
         voice("Alnilam", "Alnilam · Firm", { de: "Alnilam · Bestimmt" }),
         voice("Schedar", "Schedar · Even", { de: "Schedar · Gleichmaessig" }),
         voice("Gacrux", "Gacrux · Mature", { de: "Gacrux · Reif" }),
-        voice("Pulcherrima", "Pulcherrima · Forward", { de: "Pulcherrima · Direkt" }),
+        voice("Pulcherrima", "Pulcherrima · Forward", {
+          de: "Pulcherrima · Direkt",
+        }),
         voice("Achird", "Achird · Friendly", { de: "Achird · Freundlich" }),
-        voice("Zubenelgenubi", "Zubenelgenubi · Casual", { de: "Zubenelgenubi · Locker" }),
-        voice("Vindemiatrix", "Vindemiatrix · Gentle", { de: "Vindemiatrix · Sanft" }),
+        voice("Zubenelgenubi", "Zubenelgenubi · Casual", {
+          de: "Zubenelgenubi · Locker",
+        }),
+        voice("Vindemiatrix", "Vindemiatrix · Gentle", {
+          de: "Vindemiatrix · Sanft",
+        }),
         voice("Sadachbia", "Sadachbia · Lively", { de: "Sadachbia · Lebhaft" }),
-        voice("Sadaltager", "Sadaltager · Knowledgeable", { de: "Sadaltager · Kenntnisreich" }),
+        voice("Sadaltager", "Sadaltager · Knowledgeable", {
+          de: "Sadaltager · Kenntnisreich",
+        }),
         voice("Sulafat", "Sulafat · Warm", { de: "Sulafat · Warm" }),
       ],
       languageNote:
@@ -1103,9 +1087,7 @@ export const RUNTIME_PROVIDER_MANIFEST: Record<
       endpoint: "https://api.mistral.ai/v1/audio/transcriptions",
       defaultModel: "voxtral-mini-2602",
       languageHintKey: "mistral-stt-language-code",
-      models: [
-        namedModel("voxtral-mini-2602", "Voxtral Mini Transcribe 2"),
-      ],
+      models: [namedModel("voxtral-mini-2602", "Voxtral Mini Transcribe 2")],
       languageNote:
         "The current Voxtral Mini Transcribe 2 route supports English, Chinese, Hindi, Spanish, Arabic, French, Portuguese, Russian, German, Japanese, Korean, Italian, and Dutch.",
     },
@@ -1115,9 +1097,7 @@ export const RUNTIME_PROVIDER_MANIFEST: Record<
       endpoint: "https://api.mistral.ai/v1/audio/speech",
       requestFormat: "mistral-speech",
       defaultModel: "voxtral-mini-tts-2603",
-      models: [
-        namedModel("voxtral-mini-tts-2603", "Voxtral Mini TTS 26.03"),
-      ],
+      models: [namedModel("voxtral-mini-tts-2603", "Voxtral Mini TTS 26.03")],
       voiceOptions: [],
       voiceDirectory: "mistral",
       requiresVoice: true,
@@ -1168,8 +1148,7 @@ export const RUNTIME_PROVIDER_MANIFEST: Record<
     label: "Moonshot",
     shortLabel: "MOONSHOT",
     apiKeyPlaceholder: "Enter API key",
-    apiKeyHint:
-      "Unlocks Kimi models through Moonshot's OpenAI-compatible API.",
+    apiKeyHint: "Unlocks Kimi models through Moonshot's OpenAI-compatible API.",
     apiKeyUrl: "https://platform.kimi.ai/console/api-keys",
     llm: {
       support: "provider",

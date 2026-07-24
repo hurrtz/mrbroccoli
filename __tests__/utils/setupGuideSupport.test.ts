@@ -26,21 +26,7 @@ describe("setupGuideSupport", () => {
   });
 
   it("validates Gemini onboarding with the stable REST default", () => {
-    const settings = createSettings();
-    settings.responseModes = [
-      {
-        id: "mode-1",
-        route: {
-          provider: "gemini",
-          model: "gemini-3.1-flash-live-preview",
-        },
-      },
-    ];
-    settings.activeResponseMode = "mode-1";
-
-    expect(getSetupGuideValidationModel("gemini")).toBe(
-      "gemini-2.5-flash",
-    );
+    expect(getSetupGuideValidationModel("gemini")).toBe("gemini-2.5-flash");
   });
 
   it("prefers selected-provider STT over system recognition", () => {

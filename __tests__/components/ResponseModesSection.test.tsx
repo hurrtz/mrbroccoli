@@ -27,7 +27,7 @@ describe("ResponseModesSection", () => {
                   id: "mode-1",
                   route: {
                     provider: "gemini",
-                    model: "gemini-3.1-flash-live-preview",
+                    model: "gemini-2.5-flash-lite",
                   },
                 },
                 {
