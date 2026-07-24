@@ -6,6 +6,7 @@ import AlibabaQwenDashscopeDocument from "./alibaba-qwen-dashscope";
 import AnthropicDocument from "./anthropic";
 import BytedanceDoubaoSeedDocument from "./bytedance-doubao-seed";
 import DeepseekDocument from "./deepseek";
+import ElevenlabsDocument from "./elevenlabs";
 import GoogleVertexAiStudioDocument from "./google-vertex-ai-studio";
 import MistralAiDocument from "./mistral-ai";
 import MoonshotAiKimiDocument from "./moonshot-ai-kimi";
@@ -18,6 +19,7 @@ export const PROVIDER_DOCUMENTS = defineProviderDocuments([
   AnthropicDocument,
   BytedanceDoubaoSeedDocument,
   DeepseekDocument,
+  ElevenlabsDocument,
   GoogleVertexAiStudioDocument,
   MistralAiDocument,
   MoonshotAiKimiDocument,
@@ -26,4 +28,4 @@ export const PROVIDER_DOCUMENTS = defineProviderDocuments([
   XaiDocument,
 ]);
 
-export const PROVIDER_CATALOG_UPDATED_AT = "2026-05-30";
+export const PROVIDER_CATALOG_UPDATED_AT = "2026-07-24";

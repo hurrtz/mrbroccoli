@@ -80,15 +80,12 @@ function renderSettingsModal(overrideProps: Partial<React.ComponentProps<typeof 
         <SettingsModal
           visible
           settings={DEFAULT_SETTINGS}
-          mistralVoices={[]}
-          mistralVoiceStatus="idle"
-          mistralVoiceError={null}
+          providerVoiceDirectories={{}}
           onUpdate={jest.fn()}
           onUpdateResponseModeRoute={jest.fn()}
           onUpdateProviderSttModel={jest.fn()}
           onUpdateProviderTtsModel={jest.fn()}
           onUpdateProviderTtsVoice={jest.fn()}
-          onRefreshMistralVoices={jest.fn(async () => [])}
           onUpdateApiKey={jest.fn()}
           onPreviewVoice={jest.fn(async () => undefined)}
           onStopPreviewVoice={jest.fn(async () => undefined)}
@@ -471,30 +468,35 @@ describe("SettingsModal", () => {
           mistral: "calm-guide",
         },
       },
-      mistralVoices: [
-        {
-          id: "voice-1",
-          name: "Calm Guide",
-          slug: "calm-guide",
-          value: "calm-guide",
-          label: "Calm Guide · calm-guide",
-          languages: ["en"],
-          gender: null,
-          isCustom: false,
+      providerVoiceDirectories: {
+        mistral: {
+          voices: [
+            {
+              id: "voice-1",
+              name: "Calm Guide",
+              slug: "calm-guide",
+              value: "calm-guide",
+              label: "Calm Guide · calm-guide",
+              languages: ["en"],
+              gender: null,
+              isCustom: false,
+            },
+            {
+              id: "voice-2",
+              name: "Studio Voice",
+              slug: "studio-voice",
+              value: "studio-voice",
+              label: "Studio Voice · studio-voice",
+              languages: ["en", "de"],
+              gender: null,
+              isCustom: true,
+            },
+          ],
+          status: "ready",
+          error: null,
+          refresh: onRefreshMistralVoices,
         },
-        {
-          id: "voice-2",
-          name: "Studio Voice",
-          slug: "studio-voice",
-          value: "studio-voice",
-          label: "Studio Voice · studio-voice",
-          languages: ["en", "de"],
-          gender: null,
-          isCustom: true,
-        },
-      ],
-      mistralVoiceStatus: "ready",
-      onRefreshMistralVoices,
+      },
       onUpdateProviderTtsVoice,
     });
 
@@ -531,30 +533,108 @@ describe("SettingsModal", () => {
         ttsMode: "provider",
         ttsProvider: "mistral",
       },
-      mistralVoiceStatus: "error",
-      mistralVoiceError: new Error("Network unavailable"),
+      providerVoiceDirectories: {
+        mistral: {
+          voices: [],
+          status: "error",
+          error: new Error("Network unavailable"),
+          refresh: jest.fn(async () => []),
+        },
+      },
       onUpdateProviderTtsVoice,
     });
 
     await waitFor(() => {
       expect(
         screen.getByText(
-          "Voices could not be refreshed. Your current selection is unchanged; you can still enter a slug manually.",
+          "Voices could not be refreshed. Your current selection is unchanged; you can still enter a voice ID manually.",
         ),
       ).toBeTruthy();
       expect(
-        screen.getByPlaceholderText("Preset or custom voice slug"),
+        screen.getByPlaceholderText("Enter a voice ID"),
       ).toBeTruthy();
     });
 
     fireEvent.changeText(
-      screen.getByPlaceholderText("Preset or custom voice slug"),
+      screen.getByPlaceholderText("Enter a voice ID"),
       " custom-voice ",
     );
 
     expect(onUpdateProviderTtsVoice).toHaveBeenCalledWith(
       "mistral",
       "custom-voice",
+    );
+  });
+
+  it("offers discovered ElevenLabs account voices and refreshes them", async () => {
+    const refresh = jest.fn(async () => []);
+    const onUpdateProviderTtsVoice = jest.fn();
+    const screen = renderSettingsModal({
+      focusTab: "tts",
+      settings: {
+        ...DEFAULT_SETTINGS,
+        apiKeys: {
+          ...DEFAULT_SETTINGS.apiKeys,
+          elevenlabs: "configured-elevenlabs-key",
+        },
+        ttsMode: "provider",
+        ttsProvider: "elevenlabs",
+        providerTtsVoices: {
+          ...DEFAULT_SETTINGS.providerTtsVoices,
+          elevenlabs: "voice-1",
+        },
+      },
+      providerVoiceDirectories: {
+        elevenlabs: {
+          voices: [
+            {
+              id: "voice-1",
+              name: "Alex",
+              value: "voice-1",
+              label: "Alex · British · male",
+              category: "premade",
+              accent: "British",
+              gender: "male",
+              description: null,
+              previewUrl: null,
+            },
+            {
+              id: "voice-2",
+              name: "Sam",
+              value: "voice-2",
+              label: "Sam · American",
+              category: "cloned",
+              accent: "American",
+              gender: null,
+              description: null,
+              previewUrl: null,
+            },
+          ],
+          status: "ready",
+          error: null,
+          refresh,
+        },
+      },
+      onUpdateProviderTtsVoice,
+    });
+
+    await waitFor(() => {
+      expect(screen.getByText("ElevenLabs voice library")).toBeTruthy();
+      expect(
+        screen.getByText("2 voices available from ElevenLabs."),
+      ).toBeTruthy();
+      expect(screen.getByText("Alex · British · male")).toBeTruthy();
+    });
+
+    fireEvent.press(screen.getByTestId("elevenlabs-voices-refresh"));
+    expect(refresh).toHaveBeenCalledTimes(1);
+
+    fireEvent.press(screen.getByText("Alex · British · male"));
+    fireEvent.press(screen.getByText("Sam · American"));
+
+    expect(onUpdateProviderTtsVoice).toHaveBeenCalledWith(
+      "elevenlabs",
+      "voice-2",
     );
   });
 

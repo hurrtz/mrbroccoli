@@ -31,6 +31,14 @@ export function extractProviderErrorMessage(errorText: string) {
     return parsed.message.trim();
   }
 
+  if (typeof parsed?.detail?.message === "string") {
+    return parsed.detail.message.trim();
+  }
+
+  if (typeof parsed?.detail === "string") {
+    return parsed.detail.trim();
+  }
+
   if (Array.isArray(parsed?.errors)) {
     const firstMessage = parsed.errors.find(
       (entry: any) => typeof entry?.message === "string"

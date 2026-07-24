@@ -6,7 +6,7 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).resolve().parents[2]
 PROVIDERS_DIR = REPO_ROOT / "data" / "providers"
 INDEX_PATH = PROVIDERS_DIR / "index.ts"
-CATALOG_UPDATED_AT = "2026-05-30"
+CATALOG_UPDATED_AT = "2026-07-24"
 
 
 def to_identifier(slug: str) -> str:

@@ -104,8 +104,8 @@ jest.mock("../../src/hooks/useConversations", () => ({
   })),
 }));
 
-jest.mock("../../src/hooks/useMistralVoices", () => ({
-  useMistralVoices: jest.fn(() => ({
+jest.mock("../../src/hooks/useProviderVoiceDirectory", () => ({
+  useProviderVoiceDirectory: jest.fn(() => ({
     voices: [],
     status: "idle",
     error: null,
@@ -386,10 +386,10 @@ const { useSharedSettings } = jest.requireMock(
 ) as {
   useSharedSettings: jest.Mock;
 };
-const { useMistralVoices } = jest.requireMock(
-  "../../src/hooks/useMistralVoices",
+const { useProviderVoiceDirectory } = jest.requireMock(
+  "../../src/hooks/useProviderVoiceDirectory",
 ) as {
-  useMistralVoices: jest.Mock;
+  useProviderVoiceDirectory: jest.Mock;
 };
 
 function createSharedSettingsValue(settingsOverrides: Partial<Settings> = {}) {
@@ -419,7 +419,7 @@ describe("MainScreen", () => {
       width: 430,
     });
     useSharedSettings.mockReturnValue(createSharedSettingsValue());
-    useMistralVoices.mockReturnValue({
+    useProviderVoiceDirectory.mockReturnValue({
       voices: [],
       status: "idle",
       error: null,
@@ -495,27 +495,38 @@ describe("MainScreen", () => {
       },
     });
     useSharedSettings.mockReturnValue(sharedSettings);
-    useMistralVoices.mockReturnValue({
-      voices: [
-        {
-          id: "voice-1",
-          name: "Calm Guide",
-          slug: "calm-guide",
-          value: "calm-guide",
-          label: "Calm Guide · calm-guide",
-          languages: ["en"],
-          gender: null,
-          isCustom: false,
-        },
-      ],
-      status: "ready",
-      error: null,
-      refresh: jest.fn(async () => []),
-    });
+    useProviderVoiceDirectory.mockImplementation(
+      ({ provider }: { provider: string }) =>
+        provider === "mistral"
+          ? {
+              voices: [
+                {
+                  id: "voice-1",
+                  name: "Calm Guide",
+                  slug: "calm-guide",
+                  value: "calm-guide",
+                  label: "Calm Guide · calm-guide",
+                  languages: ["en"],
+                  gender: null,
+                  isCustom: false,
+                },
+              ],
+              status: "ready",
+              error: null,
+              refresh: jest.fn(async () => []),
+            }
+          : {
+              voices: [],
+              status: "idle",
+              error: null,
+              refresh: jest.fn(async () => []),
+            },
+    );
 
     renderWithProviders(<MainScreen />);
 
-    expect(useMistralVoices).toHaveBeenCalledWith({
+    expect(useProviderVoiceDirectory).toHaveBeenCalledWith({
+      provider: "mistral",
       apiKey: "mistral-key",
       enabled: true,
     });

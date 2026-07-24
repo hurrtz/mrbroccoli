@@ -286,20 +286,20 @@ export const de: TranslationDictionary = {
     "Lokale Sprachpakete decken derzeit Englisch, Deutsch, vereinfachtes Chinesisch, Spanisch, Portugiesisch, Hindi, Französisch und Italienisch ab. Japanisch fällt weiterhin automatisch zurück.",
   ttsVoice: "TTS-Stimme",
   refresh: "Aktualisieren",
-  mistralVoiceDirectory: "Mistral-Stimmenbibliothek",
-  refreshMistralVoices: "Mistral-Stimmen aktualisieren",
-  mistralVoicesAvailable: ({ count }) =>
-    `${count} ${Number(count) === 1 ? "Stimme" : "Stimmen"} von Mistral verfügbar.`,
-  mistralVoicesLoadFailed:
-    "Die Stimmen konnten nicht aktualisiert werden. Die aktuelle Auswahl bleibt erhalten; alternativ kannst du einen Slug manuell eingeben.",
-  mistralVoicesLoadingHint:
-    "Mr Broccoli lädt Standard- und eigene Stimmen automatisch von Mistral.",
-  mistralVoiceId: "Mistral-Stimmen-Slug",
-  mistralVoiceIdPlaceholder: "Slug einer Standard- oder eigenen Stimme",
-  mistralVoiceSlugFallbackHint:
-    "Die manuelle Eingabe bleibt verfügbar, wenn Mistrals Stimmenliste nicht geladen werden kann.",
-  mistralVoiceIdRequired:
-    "Aktualisiere die Mistral-Stimmenliste oder gib vor der Sprachausgabe einen Standard- oder eigenen Stimmen-Slug ein.",
+  providerVoiceDirectory: ({ provider }) => `${provider}-Stimmenbibliothek`,
+  refreshProviderVoices: ({ provider }) => `${provider}-Stimmen aktualisieren`,
+  providerVoicesAvailable: ({ count, provider }) =>
+    `${count} ${Number(count) === 1 ? "Stimme" : "Stimmen"} von ${provider} verfügbar.`,
+  providerVoicesLoadFailed:
+    "Die Stimmen konnten nicht aktualisiert werden. Die aktuelle Auswahl bleibt erhalten; alternativ kannst du eine Stimmen-ID manuell eingeben.",
+  providerVoicesLoadingHint: ({ provider }) =>
+    `Mr Broccoli lädt verfügbare Stimmen automatisch von ${provider}.`,
+  providerVoiceId: "Stimmen-ID",
+  providerVoiceIdPlaceholder: "Stimmen-ID eingeben",
+  providerVoiceIdFallbackHint:
+    "Die manuelle Eingabe bleibt verfügbar, wenn die Stimmenbibliothek nicht geladen werden kann.",
+  providerVoiceIdRequired: ({ provider }) =>
+    `Aktualisiere die ${provider}-Stimmenbibliothek oder gib vor der Sprachausgabe eine Stimmen-ID ein.`,
   qwenSpeechUnavailableInUs:
     "Mr Broccolis aktuelle Qwen-Sprachrouten sind in der US-Region nicht verfügbar. Wähle für Qwen-Spracherkennung und -ausgabe Singapur oder Peking.",
   qwenApiRegion: "Qwen-API-Region",

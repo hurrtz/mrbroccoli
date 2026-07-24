@@ -67,9 +67,11 @@ const PROVIDER_API_KEY_HINT_OVERRIDES: Partial<
   Record<AppLanguage, Partial<Record<Provider, string>>>
 > = {
   en: {
+    elevenlabs: `${GENERIC_PROVIDER_API_KEY_HINTS.en} Restricted ElevenLabs keys need Text to Speech and Voices read access.`,
     "moonshot-ai-kimi": `${GENERIC_PROVIDER_API_KEY_HINTS.en} Kimi K3 requires at least one successful $1 account top-up before Moonshot unlocks access.`,
   },
   de: {
+    elevenlabs: `${GENERIC_PROVIDER_API_KEY_HINTS.de} Eingeschraenkte ElevenLabs-Keys benoetigen Zugriff auf Text to Speech und das Lesen von Stimmen.`,
     "moonshot-ai-kimi": `${GENERIC_PROVIDER_API_KEY_HINTS.de} Moonshot schaltet Kimi K3 erst nach einer erfolgreichen Kontoaufladung von mindestens 1 USD frei.`,
   },
 };

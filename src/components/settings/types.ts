@@ -4,10 +4,7 @@ import { TextInput } from "react-native";
 
 import type { CatalogProviderId } from "../../catalog/types";
 import type { WebSearchProvider } from "../../constants/webSearch";
-import type {
-  MistralVoice,
-  MistralVoiceDirectoryStatus,
-} from "../../services/mistralVoices";
+import type { ProviderVoiceDirectories } from "../../services/providerVoiceDirectory";
 import {
   Provider,
   ResponseMode,
@@ -35,10 +32,7 @@ export interface SettingsModalProps {
   onUpdateProviderSttModel: (provider: Provider, model: string) => void;
   onUpdateProviderTtsModel: (provider: Provider, model: string) => void;
   onUpdateProviderTtsVoice: (provider: Provider, voice: string) => void;
-  mistralVoices: MistralVoice[];
-  mistralVoiceStatus: MistralVoiceDirectoryStatus;
-  mistralVoiceError: Error | null;
-  onRefreshMistralVoices: () => Promise<MistralVoice[]>;
+  providerVoiceDirectories: ProviderVoiceDirectories;
   onUpdateApiKey: (provider: Provider, apiKey: string) => void;
   onPreviewVoice: (
     request: VoicePreviewRequest,

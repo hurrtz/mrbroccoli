@@ -97,6 +97,30 @@ describe("settings readiness", () => {
     expectStatus(readiness.speak, "broken");
   });
 
+  it("marks ElevenLabs speech broken until an account voice is selected", () => {
+    const settings = withSettings({
+      ttsMode: "provider",
+      ttsProvider: "elevenlabs",
+      apiKeys: {
+        ...DEFAULT_SETTINGS.apiKeys,
+        elevenlabs: "elevenlabs-test-key",
+      },
+      providerTtsVoices: {
+        ...DEFAULT_SETTINGS.providerTtsVoices,
+        elevenlabs: "",
+      },
+    });
+
+    const readiness = getSettingsReadiness(settings, {
+      llmProviders: [],
+      sttProviders: [],
+      ttsProviders: ["elevenlabs"],
+      searchProviders: [],
+    });
+
+    expectStatus(readiness.speak, "broken");
+  });
+
   it("marks search ready when a selected search-capable provider has credentials even if search is disabled", () => {
     const settings = withSettings({
       webSearchMode: "off",

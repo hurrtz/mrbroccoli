@@ -26,6 +26,7 @@ describe("provider model accuracy", () => {
       "xai",
       "deepseek",
       "mistral",
+      "elevenlabs",
       "moonshot-ai-kimi",
       "perplexity",
     ]);
@@ -190,6 +191,20 @@ describe("provider model accuracy", () => {
     );
     expect(PROVIDER_TTS_MODEL_OPTIONS.mistral?.map((model) => model.id)).toEqual([
       "voxtral-mini-tts-2603",
+    ]);
+  });
+
+  it("exposes current ElevenLabs conversational TTS models", () => {
+    expect(PROVIDER_DEFAULT_MODELS.elevenlabs).toBe("");
+    expect(DEFAULT_PROVIDER_TTS_MODELS.elevenlabs).toBe(
+      "eleven_flash_v2_5",
+    );
+    expect(
+      PROVIDER_TTS_MODEL_OPTIONS.elevenlabs?.map((model) => model.id),
+    ).toEqual([
+      "eleven_flash_v2_5",
+      "eleven_multilingual_v2",
+      "eleven_v3",
     ]);
   });
 

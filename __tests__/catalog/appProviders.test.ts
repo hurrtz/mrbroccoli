@@ -28,6 +28,7 @@ describe("app provider catalog bridge", () => {
       "bytedance-doubao-seed": "bytedance-doubao-seed",
       gemini: "google-vertex-ai-studio",
       deepseek: "deepseek",
+      elevenlabs: "elevenlabs",
       mistral: "mistral-ai",
       "moonshot-ai-kimi": "moonshot-ai-kimi",
       perplexity: "perplexity",
@@ -44,6 +45,9 @@ describe("app provider catalog bridge", () => {
       "gemini",
     );
     expect(getAppProviderForCatalogProviderId("mistral-ai")).toBe("mistral");
+    expect(getAppProviderForCatalogProviderId("elevenlabs")).toBe(
+      "elevenlabs",
+    );
     expect(getAppProviderForCatalogProviderId("deepseek")).toBe("deepseek");
     expect(getAppProviderForCatalogProviderId("xai")).toBe("xai");
     expect(isCatalogProviderId("google-vertex-ai-studio")).toBe(true);
@@ -52,6 +56,7 @@ describe("app provider catalog bridge", () => {
     expect(listCatalogProviderIds()).toContain("anthropic");
     expect(listCatalogProviderIds()).toContain("mistral-ai");
     expect(listCatalogProviderIds()).toContain("perplexity");
+    expect(listCatalogProviderIds()).toContain("elevenlabs");
   });
 
   it("reads verified support states from the catalog without changing runtime support flags", () => {

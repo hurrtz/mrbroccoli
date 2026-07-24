@@ -13,14 +13,13 @@ import {
   PROVIDER_DEFAULT_TTS_VOICES,
   PROVIDER_LABELS,
   getProviderTtsVoiceOptions,
+  providerRequiresTtsVoice,
+  providerUsesTtsVoiceDirectory,
 } from "../../constants/models";
 import { useLocalization } from "../../i18n";
 import { Provider, Settings, TtsListenLanguage } from "../../types";
 import { useTheme } from "../../theme/ThemeContext";
-import type {
-  MistralVoice,
-  MistralVoiceDirectoryStatus,
-} from "../../services/mistralVoices";
+import type { ProviderVoiceDirectories } from "../../services/providerVoiceDirectory";
 import { Picker } from "../Picker";
 
 import { PreviewComposer } from "./shared";
@@ -41,10 +40,7 @@ export function ProviderVoicePreviewSection({
   onPreviewProvider,
   onStopPreview,
   onUpdateProviderTtsVoice,
-  mistralVoices,
-  mistralVoiceStatus,
-  mistralVoiceError,
-  onRefreshMistralVoices,
+  providerVoiceDirectories,
   onTextInputFocus,
 }: {
   provider: Provider | null;
@@ -63,10 +59,7 @@ export function ProviderVoicePreviewSection({
   ) => Promise<void>;
   onStopPreview: () => Promise<void>;
   onUpdateProviderTtsVoice: (provider: Provider, voice: string) => void;
-  mistralVoices: MistralVoice[];
-  mistralVoiceStatus: MistralVoiceDirectoryStatus;
-  mistralVoiceError: Error | null;
-  onRefreshMistralVoices: () => Promise<MistralVoice[]>;
+  providerVoiceDirectories: ProviderVoiceDirectories;
   onTextInputFocus: TextInputFocusHandler;
 }) {
   const { colors } = useTheme();
@@ -76,9 +69,11 @@ export function ProviderVoicePreviewSection({
     return null;
   }
 
+  const voiceDirectory = providerVoiceDirectories[provider];
+  const hasVoiceDirectory = providerUsesTtsVoiceDirectory(provider);
   const voiceOptions =
-    provider === "mistral"
-      ? mistralVoices.map((voice) => ({
+    hasVoiceDirectory
+      ? (voiceDirectory?.voices ?? []).map((voice) => ({
           value: voice.value,
           label: voice.label,
         }))
@@ -91,9 +86,9 @@ export function ProviderVoicePreviewSection({
     PROVIDER_DEFAULT_TTS_VOICES[provider] ||
     voiceOptions[0]?.value ||
     "";
-  const mistralVoicesBusy =
-    mistralVoiceStatus === "loading" ||
-    mistralVoiceStatus === "refreshing";
+  const voiceDirectoryBusy =
+    voiceDirectory?.status === "loading" ||
+    voiceDirectory?.status === "refreshing";
 
   return (
     <View
@@ -127,49 +122,56 @@ export function ProviderVoicePreviewSection({
         >
           {PROVIDER_LABELS[provider]}
         </Text>
-        {provider === "mistral" ? (
-          <View style={styles.mistralVoiceDirectoryHeader}>
-            <View style={styles.mistralVoiceDirectoryCopy}>
+        {hasVoiceDirectory && voiceDirectory ? (
+          <View style={styles.providerVoiceDirectoryHeader}>
+            <View style={styles.providerVoiceDirectoryCopy}>
               <Text
                 style={[styles.previewLabel, { color: colors.textSecondary }]}
               >
-                {t("mistralVoiceDirectory")}
+                {t("providerVoiceDirectory", {
+                  provider: PROVIDER_LABELS[provider],
+                })}
               </Text>
               <Text style={[styles.previewHint, { color: colors.textMuted }]}>
-                {mistralVoiceStatus === "ready"
-                  ? t("mistralVoicesAvailable", {
-                      count: mistralVoices.length,
+                {voiceDirectory.status === "ready"
+                  ? t("providerVoicesAvailable", {
+                      count: voiceDirectory.voices.length,
+                      provider: PROVIDER_LABELS[provider],
                     })
-                  : mistralVoiceStatus === "error" && mistralVoiceError
-                    ? t("mistralVoicesLoadFailed")
-                    : t("mistralVoicesLoadingHint")}
+                  : voiceDirectory.status === "error" && voiceDirectory.error
+                    ? t("providerVoicesLoadFailed")
+                    : t("providerVoicesLoadingHint", {
+                        provider: PROVIDER_LABELS[provider],
+                      })}
               </Text>
             </View>
             <TouchableOpacity
-              testID="mistral-voices-refresh"
+              testID={`${provider}-voices-refresh`}
               accessibilityRole="button"
-              accessibilityLabel={t("refreshMistralVoices")}
-              disabled={mistralVoicesBusy}
+              accessibilityLabel={t("refreshProviderVoices", {
+                provider: PROVIDER_LABELS[provider],
+              })}
+              disabled={voiceDirectoryBusy}
               onPress={() => {
-                void onRefreshMistralVoices();
+                void voiceDirectory.refresh();
               }}
               style={[
-                styles.mistralVoiceRefreshButton,
+                styles.providerVoiceRefreshButton,
                 {
                   backgroundColor: colors.surfaceElevated,
                   borderColor: colors.border,
-                  opacity: mistralVoicesBusy ? 0.6 : 1,
+                  opacity: voiceDirectoryBusy ? 0.6 : 1,
                 },
               ]}
             >
-              {mistralVoicesBusy ? (
+              {voiceDirectoryBusy ? (
                 <ActivityIndicator size="small" color={colors.accent} />
               ) : (
                 <Feather name="refresh-cw" size={15} color={colors.accent} />
               )}
               <Text
                 style={[
-                  styles.mistralVoiceRefreshLabel,
+                  styles.providerVoiceRefreshLabel,
                   { color: colors.accent },
                 ]}
               >
@@ -186,12 +188,12 @@ export function ProviderVoicePreviewSection({
             options={voiceOptions}
             onChange={(value) => onUpdateProviderTtsVoice(provider, value)}
           />
-        ) : provider === "mistral" && !mistralVoicesBusy ? (
+        ) : hasVoiceDirectory && !voiceDirectoryBusy ? (
           <View style={styles.settingsSubsectionStack}>
             <Text
               style={[styles.previewLabel, { color: colors.textSecondary }]}
             >
-              {t("mistralVoiceId")}
+              {t("providerVoiceId")}
             </Text>
             <TextInput
               value={selectedVoice}
@@ -199,7 +201,7 @@ export function ProviderVoicePreviewSection({
                 onUpdateProviderTtsVoice(provider, value.trim())
               }
               onFocus={onTextInputFocus}
-              placeholder={t("mistralVoiceIdPlaceholder")}
+              placeholder={t("providerVoiceIdPlaceholder")}
               placeholderTextColor={colors.textMuted}
               selectionColor={colors.accent}
               autoCapitalize="none"
@@ -222,12 +224,13 @@ export function ProviderVoicePreviewSection({
             >
               {t(
                 selectedVoice
-                  ? "mistralVoiceSlugFallbackHint"
-                  : "mistralVoiceIdRequired",
+                  ? "providerVoiceIdFallbackHint"
+                  : "providerVoiceIdRequired",
+                { provider: PROVIDER_LABELS[provider] },
               )}
             </Text>
           </View>
-        ) : provider === "mistral" ? null : (
+        ) : hasVoiceDirectory ? null : (
           <Text
             style={[
               styles.previewHint,
@@ -261,7 +264,9 @@ export function ProviderVoicePreviewSection({
                   activePreview?.id === previewId ? activePreview.phase : "idle"
                 }
                 interactionDisabled={
-                  activePreview !== null && activePreview.id !== previewId
+                  (activePreview !== null &&
+                    activePreview.id !== previewId) ||
+                  (providerRequiresTtsVoice(provider) && !selectedVoice)
                 }
                 onPreview={() => onPreviewProvider(provider, entry)}
                 onStop={onStopPreview}

@@ -1,4 +1,5 @@
 import type { WebSearchProvider } from "../../constants/webSearch";
+import { providerRequiresTtsVoice } from "../../constants/models";
 import type { Provider, Settings } from "../../types";
 import { hasProviderCredentialForCapability } from "../../utils/providerCredentials";
 
@@ -109,7 +110,10 @@ function getSpeakReadiness(
     return status("broken");
   }
 
-  if (provider === "mistral" && !settings.providerTtsVoices.mistral?.trim()) {
+  if (
+    providerRequiresTtsVoice(provider) &&
+    !settings.providerTtsVoices[provider]?.trim()
+  ) {
     return status("broken");
   }
 

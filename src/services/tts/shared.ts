@@ -34,6 +34,7 @@ const PROVIDER_TTS_TIMEOUT_POLICIES: Partial<
 > = {
   openai: { baseMs: 20000, maxMs: 60000, perCharacterMs: 20 },
   mistral: { baseMs: 20000, maxMs: 60000, perCharacterMs: 20 },
+  elevenlabs: { baseMs: 20000, maxMs: 60000, perCharacterMs: 20 },
   gemini: { baseMs: 30000, maxMs: 90000, perCharacterMs: 50 },
   xai: { baseMs: 30000, maxMs: 120000, perCharacterMs: 30 },
   "alibaba-qwen-dashscope": {

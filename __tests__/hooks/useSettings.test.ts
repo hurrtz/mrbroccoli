@@ -457,7 +457,7 @@ describe("useSettings", () => {
   it("resets stored stt/tts providers that are no longer supported and keeps key access safe", async () => {
     const stored = {
       ...DEFAULT_SETTINGS,
-      ttsProvider: "elevenlabs",
+      ttsProvider: "playht",
       sttProvider: "azure",
       sttMode: "provider",
     };

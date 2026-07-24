@@ -8,6 +8,7 @@ export type RuntimeAppProviderId =
   | "bytedance-doubao-seed"
   | "gemini"
   | "deepseek"
+  | "elevenlabs"
   | "mistral"
   | "moonshot-ai-kimi"
   | "perplexity"
@@ -35,9 +36,11 @@ export type RuntimeTtsTransport =
   | "gemini"
   | "dashscope";
 export type RuntimeTtsBinaryRequestFormat =
+  | "elevenlabs-speech"
   | "openai-speech"
   | "grok-speech"
   | "mistral-speech";
+export type RuntimeTtsVoiceDirectory = "elevenlabs" | "mistral";
 export type RuntimeLanguageHintKey = "mistral-stt-language-code";
 
 export interface RuntimeModelSpec {
@@ -122,6 +125,8 @@ interface RuntimeTtsManifest {
   defaultVoice?: string;
   voiceFallback?: string;
   voiceOptions: RuntimeVoiceOption[];
+  voiceDirectory?: RuntimeTtsVoiceDirectory;
+  requiresVoice?: boolean;
   languageNote?: string;
 }
 
@@ -485,6 +490,7 @@ export const RUNTIME_PROVIDER_ORDER = [
   "xai",
   "deepseek",
   "mistral",
+  "elevenlabs",
   "moonshot-ai-kimi",
   "perplexity",
 ] as const satisfies readonly RuntimeAppProviderId[];
@@ -1042,8 +1048,47 @@ export const RUNTIME_PROVIDER_MANIFEST: Record<
         namedModel("voxtral-mini-tts-2603", "Voxtral Mini TTS 26.03"),
       ],
       voiceOptions: [],
+      voiceDirectory: "mistral",
+      requiresVoice: true,
       languageNote:
         "Voxtral TTS supports English, French, Spanish, Portuguese, Italian, Dutch, German, Hindi, and Arabic. Mr Broccoli loads preset and custom voices from Mistral automatically.",
+    },
+  },
+  elevenlabs: {
+    appProvider: "elevenlabs",
+    catalogProviderId: "elevenlabs",
+    label: "ElevenLabs",
+    shortLabel: "ELEVENLABS",
+    apiKeyPlaceholder: "Enter API key",
+    apiKeyHint:
+      "Unlocks ElevenLabs text-to-speech models and account voices. Restricted keys need text-to-speech and voice read access.",
+    apiKeyUrl: "https://elevenlabs.io/app/settings/api-keys",
+    llm: {
+      support: "none",
+      transport: "none",
+      models: [],
+    },
+    stt: {
+      support: "none",
+      transport: "none",
+      models: [],
+    },
+    tts: {
+      support: "provider",
+      transport: "binary",
+      endpoint: "https://api.elevenlabs.io/v1/text-to-speech",
+      requestFormat: "elevenlabs-speech",
+      defaultModel: "eleven_flash_v2_5",
+      models: [
+        namedModel("eleven_flash_v2_5", "Eleven Flash v2.5"),
+        namedModel("eleven_multilingual_v2", "Eleven Multilingual v2"),
+        namedModel("eleven_v3", "Eleven v3"),
+      ],
+      voiceOptions: [],
+      voiceDirectory: "elevenlabs",
+      requiresVoice: true,
+      languageNote:
+        "ElevenLabs Flash v2.5 supports 32 languages, Multilingual v2 supports 29, and Eleven v3 supports more than 70. Mr Broccoli automatically loads the voices available to the configured account.",
     },
   },
   "moonshot-ai-kimi": {

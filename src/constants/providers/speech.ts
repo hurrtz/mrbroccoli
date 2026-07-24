@@ -135,6 +135,14 @@ export function getProviderTtsModelOptions(provider: Provider) {
   return PROVIDER_TTS_MODEL_OPTIONS[provider] ?? [];
 }
 
+export function providerUsesTtsVoiceDirectory(provider: Provider) {
+  return Boolean(RUNTIME_PROVIDER_MANIFEST[provider].tts.voiceDirectory);
+}
+
+export function providerRequiresTtsVoice(provider: Provider) {
+  return RUNTIME_PROVIDER_MANIFEST[provider].tts.requiresVoice === true;
+}
+
 export function providerTtsModelSupportsInstructions(
   provider: Provider,
   modelId: string,

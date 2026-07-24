@@ -1,5 +1,6 @@
 import {
   PROVIDER_LABELS,
+  providerRequiresTtsVoice,
   providerTtsModelSupportsInstructions,
 } from "../../constants/models";
 import { RuntimeTtsBinaryRequestFormat } from "../../constants/providers/runtimeManifest";
@@ -126,6 +127,11 @@ function buildBinaryTtsRequestBody(params: {
   text: string;
 }) {
   switch (params.requestFormat) {
+    case "elevenlabs-speech":
+      return {
+        text: params.text,
+        model_id: params.selectedModel,
+      };
     case "grok-speech":
       return {
         text: params.text,
@@ -168,6 +174,35 @@ function getBinaryTtsFileExtension(
   _requestFormat: RuntimeTtsBinaryRequestFormat,
 ): "mp3" | "wav" {
   return "mp3";
+}
+
+function getBinaryTtsEndpoint(params: {
+  endpoint: string;
+  requestFormat: RuntimeTtsBinaryRequestFormat;
+  selectedVoice: string;
+}) {
+  if (params.requestFormat !== "elevenlabs-speech") {
+    return params.endpoint;
+  }
+
+  return `${params.endpoint}/${encodeURIComponent(
+    params.selectedVoice,
+  )}?output_format=mp3_44100_128`;
+}
+
+function getBinaryTtsHeaders(params: {
+  apiKey: string;
+  requestFormat: RuntimeTtsBinaryRequestFormat;
+}): Record<string, string> {
+  return params.requestFormat === "elevenlabs-speech"
+    ? {
+        "Content-Type": "application/json",
+        "xi-api-key": params.apiKey,
+      }
+    : {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${params.apiKey}`,
+      };
 }
 
 function getDashScopeAudioUrl(data: any) {
@@ -229,12 +264,12 @@ export async function synthesizeProviderSpeech(params: {
     config,
   });
 
-  if (
-    config.kind === "binary" &&
-    config.requestFormat === "mistral-speech" &&
-    !selectedVoice
-  ) {
-    throw new Error(translate(language, "mistralVoiceIdRequired"));
+  if (providerRequiresTtsVoice(provider) && !selectedVoice) {
+    throw new Error(
+      translate(language, "providerVoiceIdRequired", {
+        provider: PROVIDER_LABELS[provider],
+      }),
+    );
   }
 
   const selectedModel = getSelectedProviderModel({
@@ -360,7 +395,6 @@ export async function synthesizeProviderSpeech(params: {
     return writeBlobAudioFile(await audioResponse.blob(), "wav");
   }
 
-  const endpoint = config.endpoint;
   const authorizationKey = requireProviderKey(provider, apiKey, language);
   const resolvedVoice = getBinaryTtsVoice({
     requestFormat: config.requestFormat,
@@ -377,13 +411,17 @@ export async function synthesizeProviderSpeech(params: {
   });
 
   const response = await fetchTtsWithRetries({
-    input: endpoint,
+    input: getBinaryTtsEndpoint({
+      endpoint: config.endpoint,
+      requestFormat: config.requestFormat,
+      selectedVoice: resolvedVoice,
+    }),
     init: {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${authorizationKey}`,
-      },
+      headers: getBinaryTtsHeaders({
+        apiKey: authorizationKey,
+        requestFormat: config.requestFormat,
+      }),
       body: JSON.stringify(requestBody),
     },
     timeoutMs,

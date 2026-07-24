@@ -50,6 +50,20 @@ describe("provider capability selectors", () => {
     expect(getEnabledTtsProviders(settings)).toEqual(["openai"]);
   });
 
+  it("exposes ElevenLabs only in the TTS provider flow", () => {
+    const settings = {
+      ...DEFAULT_SETTINGS,
+      apiKeys: {
+        ...DEFAULT_SETTINGS.apiKeys,
+        elevenlabs: "elevenlabs-test-key",
+      },
+    };
+
+    expect(getEnabledProviders(settings)).toEqual([]);
+    expect(getEnabledSttProviders(settings)).toEqual([]);
+    expect(getEnabledTtsProviders(settings)).toEqual(["elevenlabs"]);
+  });
+
   it("does not treat ByteDance speech-only credentials as runtime readiness", () => {
     const settings = {
       ...DEFAULT_SETTINGS,

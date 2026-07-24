@@ -40,6 +40,30 @@ describe("getProviderValidationTarget", () => {
       model: "gemini-2.5-flash",
     });
   });
+
+  it("uses the selected ElevenLabs model and voice for TTS validation", () => {
+    const settings = {
+      ...DEFAULT_SETTINGS,
+      apiKeys: {
+        ...DEFAULT_SETTINGS.apiKeys,
+        elevenlabs: "elevenlabs-test-key",
+      },
+      providerTtsModels: {
+        ...DEFAULT_SETTINGS.providerTtsModels,
+        elevenlabs: "eleven_multilingual_v2",
+      },
+      providerTtsVoices: {
+        ...DEFAULT_SETTINGS.providerTtsVoices,
+        elevenlabs: "voice-123",
+      },
+    };
+
+    expect(getProviderValidationTarget(settings, "elevenlabs")).toEqual({
+      kind: "tts",
+      model: "eleven_multilingual_v2",
+      configKey: JSON.stringify({ voice: "voice-123" }),
+    });
+  });
 });
 
 describe("getProviderHealthState", () => {

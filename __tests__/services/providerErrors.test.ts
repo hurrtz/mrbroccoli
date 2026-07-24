@@ -42,10 +42,20 @@ describe("extractProviderErrorMessage", () => {
     );
   });
 
-  it("returns trimmed input when JSON has no recognized message fields", () => {
+  it("extracts a string detail field used by speech providers", () => {
     const json = JSON.stringify({ code: 400, detail: "bad request" });
+    expect(extractProviderErrorMessage(json)).toBe("bad request");
+  });
+
+  it("extracts a nested detail message used by ElevenLabs", () => {
+    const json = JSON.stringify({
+      detail: {
+        status: "voice_not_found",
+        message: "The selected voice was not found.",
+      },
+    });
     expect(extractProviderErrorMessage(json)).toBe(
-      '{"code":400,"detail":"bad request"}',
+      "The selected voice was not found.",
     );
   });
 

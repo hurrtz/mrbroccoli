@@ -26,11 +26,15 @@ import { useAudioPlayer } from "../hooks/useAudioPlayer";
 import { useAudioRecorder } from "../hooks/useAudioRecorder";
 import { useNativeSpeechRecognizer } from "../hooks/useNativeSpeechRecognizer";
 import { useConversations } from "../hooks/useConversations";
-import { useMistralVoices } from "../hooks/useMistralVoices";
+import { useProviderVoiceDirectory } from "../hooks/useProviderVoiceDirectory";
 import { useVoicePipeline } from "../hooks/useVoicePipeline";
 import { useBatteryDiagnostics } from "../hooks/useBatteryDiagnostics";
 import { useLocalization } from "../i18n";
 import { recordDebugLogEvent } from "../services/debugLogCapture";
+import {
+  PROVIDER_VOICE_DIRECTORY_PROVIDERS,
+  providerHasVoiceDirectory,
+} from "../services/providerVoiceDirectory";
 import { useTheme } from "../theme/ThemeContext";
 import { Provider, ResponseMode, ToastTone } from "../types";
 import {
@@ -82,10 +86,32 @@ export function MainScreen() {
     updateApiKey,
     loaded,
   } = useSharedSettings();
-  const mistralVoiceDirectory = useMistralVoices({
+  const mistralVoiceDirectory = useProviderVoiceDirectory({
+    provider: "mistral",
     apiKey: settings.apiKeys.mistral,
     enabled: loaded && Boolean(settings.apiKeys.mistral.trim()),
   });
+  const elevenLabsVoiceDirectory = useProviderVoiceDirectory({
+    provider: "elevenlabs",
+    apiKey: settings.apiKeys.elevenlabs,
+    enabled: loaded && Boolean(settings.apiKeys.elevenlabs.trim()),
+  });
+  const providerVoiceDirectories = useMemo(
+    () => ({
+      mistral: mistralVoiceDirectory,
+      elevenlabs: elevenLabsVoiceDirectory,
+    }),
+    [
+      elevenLabsVoiceDirectory.error,
+      elevenLabsVoiceDirectory.refresh,
+      elevenLabsVoiceDirectory.status,
+      elevenLabsVoiceDirectory.voices,
+      mistralVoiceDirectory.error,
+      mistralVoiceDirectory.refresh,
+      mistralVoiceDirectory.status,
+      mistralVoiceDirectory.voices,
+    ],
+  );
   const {
     conversations,
     activeConversation,
@@ -204,18 +230,25 @@ export function MainScreen() {
       ""
     : "";
   useEffect(() => {
-    const firstMistralVoice = mistralVoiceDirectory.voices[0]?.value;
+    if (!loaded) {
+      return;
+    }
 
-    if (
-      loaded &&
-      firstMistralVoice &&
-      !settings.providerTtsVoices.mistral?.trim()
-    ) {
-      updateProviderTtsVoice("mistral", firstMistralVoice);
+    for (const directoryProvider of PROVIDER_VOICE_DIRECTORY_PROVIDERS) {
+      const firstVoice =
+        providerVoiceDirectories[directoryProvider]?.voices[0]?.value;
+
+      if (
+        firstVoice &&
+        !settings.providerTtsVoices[directoryProvider]?.trim()
+      ) {
+        updateProviderTtsVoice(directoryProvider, firstVoice);
+      }
     }
   }, [
     loaded,
-    mistralVoiceDirectory.voices,
+    providerVoiceDirectories,
+    settings.providerTtsVoices.elevenlabs,
     settings.providerTtsVoices.mistral,
     updateProviderTtsVoice,
   ]);
@@ -250,8 +283,8 @@ export function MainScreen() {
   });
   const conversationTtsVoiceOptions =
     settings.ttsMode === "provider" && ttsProvider
-      ? ttsProvider === "mistral"
-        ? mistralVoiceDirectory.voices.map((voice) => ({
+      ? providerHasVoiceDirectory(ttsProvider)
+        ? (providerVoiceDirectories[ttsProvider]?.voices ?? []).map((voice) => ({
             value: voice.value,
             label: voice.label,
           }))
@@ -963,9 +996,7 @@ export function MainScreen() {
       <SettingsModal
         visible={settingsVisible}
         settings={settings}
-        mistralVoices={mistralVoiceDirectory.voices}
-        mistralVoiceStatus={mistralVoiceDirectory.status}
-        mistralVoiceError={mistralVoiceDirectory.error}
+        providerVoiceDirectories={providerVoiceDirectories}
         focusCatalogProviderId={settingsFocusCatalogProviderId}
         focusTab={settingsFocusTab}
         onUpdate={updateSettings}
@@ -975,7 +1006,6 @@ export function MainScreen() {
         onUpdateProviderSttModel={updateProviderSttModel}
         onUpdateProviderTtsModel={updateProviderTtsModel}
         onUpdateProviderTtsVoice={updateProviderTtsVoice}
-        onRefreshMistralVoices={mistralVoiceDirectory.refresh}
         onUpdateApiKey={updateApiKey}
         onPreviewVoice={handlePreviewVoice}
         onStopPreviewVoice={stopPreviewVoice}

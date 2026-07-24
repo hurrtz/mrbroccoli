@@ -5,6 +5,7 @@ import AlibabaQwenIcon from "../../assets/providers/alibaba-qwen-dashscope.svg";
 import AnthropicIcon from "../../assets/providers/anthropic.svg";
 import ByteDanceIcon from "../../assets/providers/bytedance-doubao-seed.svg";
 import DeepSeekIcon from "../../assets/providers/deepseek.svg";
+import ElevenLabsIcon from "../../assets/providers/elevenlabs.svg";
 import GoogleIcon from "../../assets/providers/google-vertex-ai-studio.svg";
 import MistralIcon from "../../assets/providers/mistral-ai.svg";
 import MoonshotIcon from "../../assets/providers/moonshot-ai-kimi.svg";
@@ -21,6 +22,7 @@ const PROVIDER_ICON_COMPONENTS: Record<
   anthropic: AnthropicIcon,
   "bytedance-doubao-seed": ByteDanceIcon,
   deepseek: DeepSeekIcon,
+  elevenlabs: ElevenLabsIcon,
   gemini: GoogleIcon,
   "google-vertex-ai-studio": GoogleIcon,
   mistral: MistralIcon,
@@ -37,6 +39,7 @@ const PROVIDER_ICON_SIZES: Record<string, { width: number; height: number }> = {
   gemini: { width: 24, height: 24 },
   "google-vertex-ai-studio": { width: 24, height: 24 },
   deepseek: { width: 24, height: 24 },
+  elevenlabs: { width: 24, height: 24 },
   mistral: { width: 24, height: 24 },
   "mistral-ai": { width: 24, height: 24 },
   xai: { width: 24, height: 24 },

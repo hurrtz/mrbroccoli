@@ -47,10 +47,7 @@ import type {
   TtsBackendMode,
   TtsListenLanguage,
 } from "../../types";
-import type {
-  MistralVoice,
-  MistralVoiceDirectoryStatus,
-} from "../../services/mistralVoices";
+import type { ProviderVoiceDirectories } from "../../services/providerVoiceDirectory";
 import { useTheme } from "../../theme/ThemeContext";
 import {
   formatQwenApiCredential,
@@ -1177,10 +1174,7 @@ export function SpeakingSection({
   onUpdate,
   onUpdateProviderTtsModel,
   onUpdateProviderTtsVoice,
-  mistralVoices,
-  mistralVoiceStatus,
-  mistralVoiceError,
-  onRefreshMistralVoices,
+  providerVoiceDirectories,
   onStopPreviewVoice,
   onSetProviderPreviewText,
   onSetNativePreviewText,
@@ -1206,10 +1200,7 @@ export function SpeakingSection({
   ) => void;
   onUpdateProviderTtsModel: (provider: Provider, model: string) => void;
   onUpdateProviderTtsVoice: (provider: Provider, voice: string) => void;
-  mistralVoices: MistralVoice[];
-  mistralVoiceStatus: MistralVoiceDirectoryStatus;
-  mistralVoiceError: Error | null;
-  onRefreshMistralVoices: () => Promise<MistralVoice[]>;
+  providerVoiceDirectories: ProviderVoiceDirectories;
   onStopPreviewVoice: () => Promise<void>;
   onSetProviderPreviewText: (
     provider: Provider,
@@ -1400,10 +1391,7 @@ export function SpeakingSection({
               onPreviewProvider={onPreviewProviderVoice}
               onStopPreview={onStopPreviewVoice}
               onUpdateProviderTtsVoice={onUpdateProviderTtsVoice}
-              mistralVoices={mistralVoices}
-              mistralVoiceStatus={mistralVoiceStatus}
-              mistralVoiceError={mistralVoiceError}
-              onRefreshMistralVoices={onRefreshMistralVoices}
+              providerVoiceDirectories={providerVoiceDirectories}
               onTextInputFocus={onTextInputFocus}
             />
           </>

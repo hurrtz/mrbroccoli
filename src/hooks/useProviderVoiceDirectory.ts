@@ -1,23 +1,26 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import {
-  fetchMistralVoices,
-  type MistralVoice,
-  type MistralVoiceDirectoryStatus,
-} from "../services/mistralVoices";
+  fetchProviderVoices,
+  type ProviderVoice,
+  type ProviderVoiceDirectoryStatus,
+} from "../services/providerVoiceDirectory";
+import { recordDebugLogEvent } from "../services/debugLogCapture";
+import type { Provider } from "../types";
 
-export function useMistralVoices(params: {
+export function useProviderVoiceDirectory(params: {
+  provider: Provider;
   apiKey: string;
   enabled: boolean;
 }) {
-  const { apiKey, enabled } = params;
-  const [voices, setVoices] = useState<MistralVoice[]>([]);
+  const { provider, apiKey, enabled } = params;
+  const [voices, setVoices] = useState<ProviderVoice[]>([]);
   const [status, setStatus] =
-    useState<MistralVoiceDirectoryStatus>("idle");
+    useState<ProviderVoiceDirectoryStatus>("idle");
   const [error, setError] = useState<Error | null>(null);
   const abortRef = useRef<AbortController | null>(null);
   const requestIdRef = useRef(0);
-  const voicesRef = useRef<MistralVoice[]>([]);
+  const voicesRef = useRef<ProviderVoice[]>([]);
   const apiKeyRef = useRef("");
 
   const refresh = useCallback(async () => {
@@ -56,7 +59,8 @@ export function useMistralVoices(params: {
     setError(null);
 
     try {
-      const nextVoices = await fetchMistralVoices({
+      const nextVoices = await fetchProviderVoices({
+        provider,
         apiKey: selectedApiKey,
         signal: controller.signal,
       });
@@ -81,10 +85,14 @@ export function useMistralVoices(params: {
         nextError instanceof Error ? nextError : new Error(String(nextError));
 
       if (requestIdRef.current === requestId) {
-        console.error(
-          "[mistral-voices] failed to load voice directory",
-          normalizedError,
-        );
+        recordDebugLogEvent({
+          event: "provider-voice-directory-load-failed",
+          level: "error",
+          payload: {
+            message: normalizedError.message,
+            provider,
+          },
+        });
         setStatus("error");
         setError(normalizedError);
       }
@@ -95,15 +103,25 @@ export function useMistralVoices(params: {
         abortRef.current = null;
       }
     }
-  }, [apiKey, enabled]);
+  }, [apiKey, enabled, provider]);
 
   useEffect(() => {
-    void refresh();
+    if (!enabled || !apiKey.trim()) {
+      void refresh();
+      return () => {
+        abortRef.current?.abort();
+      };
+    }
+
+    const refreshTimer = setTimeout(() => {
+      void refresh();
+    }, 400);
 
     return () => {
+      clearTimeout(refreshTimer);
       abortRef.current?.abort();
     };
-  }, [refresh]);
+  }, [apiKey, enabled, refresh]);
 
   return {
     voices,

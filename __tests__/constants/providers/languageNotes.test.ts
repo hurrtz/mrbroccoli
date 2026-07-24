@@ -15,6 +15,15 @@ describe("provider language notes", () => {
     );
   });
 
+  it("explains the permissions needed by restricted ElevenLabs keys", () => {
+    expect(getProviderApiKeyHint("elevenlabs", "en")).toContain(
+      "Text to Speech and Voices read access",
+    );
+    expect(getProviderApiKeyHint("elevenlabs", "de")).toContain(
+      "Text to Speech und das Lesen von Stimmen",
+    );
+  });
+
   it("derives an STT language note from exact catalog model metadata", () => {
     expect(
       getProviderSttLanguageNoteForModel(

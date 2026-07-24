@@ -542,7 +542,54 @@ describe("synthesizeSpeech", () => {
         language: "en",
       }),
     ).rejects.toThrow(
-      "Refresh the Mistral voice list or enter a preset or custom voice slug before using speech output.",
+      "Refresh the Mistral voice library or enter a voice ID before using speech output.",
+    );
+    expect(fetch).not.toHaveBeenCalled();
+  });
+
+  it("calls ElevenLabs TTS with its account voice and API-key header", async () => {
+    (fetch as jest.Mock).mockResolvedValueOnce({
+      ok: true,
+      blob: () => Promise.resolve(new Blob(["fake-audio"])),
+    });
+
+    const result = await synthesizeSpeech({
+      text: "Hello ElevenLabs",
+      voice: "voice/account id",
+      mode: "provider",
+      provider: "elevenlabs",
+      providerModel: "eleven_flash_v2_5",
+      apiKey: "elevenlabs-test-key",
+      language: "en",
+    });
+
+    expect(result).toMatch(/^\/tmp\/tts-.*\.mp3$/);
+    const [url, options] = (fetch as jest.Mock).mock.calls[0];
+    expect(url).toBe(
+      "https://api.elevenlabs.io/v1/text-to-speech/voice%2Faccount%20id?output_format=mp3_44100_128",
+    );
+    expect(options.headers).toEqual({
+      "Content-Type": "application/json",
+      "xi-api-key": "elevenlabs-test-key",
+    });
+    expect(JSON.parse(options.body)).toEqual({
+      text: "Hello ElevenLabs",
+      model_id: "eleven_flash_v2_5",
+    });
+  });
+
+  it("rejects ElevenLabs speech locally until a voice is selected", async () => {
+    await expect(
+      synthesizeSpeech({
+        text: "Hello ElevenLabs",
+        voice: "",
+        mode: "provider",
+        provider: "elevenlabs",
+        apiKey: "elevenlabs-test-key",
+        language: "en",
+      }),
+    ).rejects.toThrow(
+      "Refresh the ElevenLabs voice library or enter a voice ID before using speech output.",
     );
     expect(fetch).not.toHaveBeenCalled();
   });

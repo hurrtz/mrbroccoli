@@ -279,20 +279,20 @@ export const en: TranslationDictionary = {
     "Local packs currently cover English, German, Simplified Chinese, Spanish, Portuguese, Hindi, French, and Italian. Japanese still falls back automatically.",
   ttsVoice: "TTS Voice",
   refresh: "Refresh",
-  mistralVoiceDirectory: "Mistral voice library",
-  refreshMistralVoices: "Refresh Mistral voices",
-  mistralVoicesAvailable: ({ count }) =>
-    `${count} ${Number(count) === 1 ? "voice" : "voices"} available from Mistral.`,
-  mistralVoicesLoadFailed:
-    "Voices could not be refreshed. Your current selection is unchanged; you can still enter a slug manually.",
-  mistralVoicesLoadingHint:
-    "Mr Broccoli loads preset and custom voices automatically from Mistral.",
-  mistralVoiceId: "Mistral voice slug",
-  mistralVoiceIdPlaceholder: "Preset or custom voice slug",
-  mistralVoiceSlugFallbackHint:
-    "Manual entry remains available when Mistral's voice list cannot be loaded.",
-  mistralVoiceIdRequired:
-    "Refresh the Mistral voice list or enter a preset or custom voice slug before using speech output.",
+  providerVoiceDirectory: ({ provider }) => `${provider} voice library`,
+  refreshProviderVoices: ({ provider }) => `Refresh ${provider} voices`,
+  providerVoicesAvailable: ({ count, provider }) =>
+    `${count} ${Number(count) === 1 ? "voice" : "voices"} available from ${provider}.`,
+  providerVoicesLoadFailed:
+    "Voices could not be refreshed. Your current selection is unchanged; you can still enter a voice ID manually.",
+  providerVoicesLoadingHint: ({ provider }) =>
+    `Mr Broccoli loads available voices automatically from ${provider}.`,
+  providerVoiceId: "Voice ID",
+  providerVoiceIdPlaceholder: "Enter a voice ID",
+  providerVoiceIdFallbackHint:
+    "Manual entry remains available when the voice library cannot be loaded.",
+  providerVoiceIdRequired: ({ provider }) =>
+    `Refresh the ${provider} voice library or enter a voice ID before using speech output.`,
   qwenSpeechUnavailableInUs:
     "Mr Broccoli's current Qwen speech routes are not available in the US region. Choose Singapore or Beijing for Qwen speech.",
   qwenApiRegion: "Qwen API Region",
