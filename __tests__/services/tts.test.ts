@@ -578,6 +578,56 @@ describe("synthesizeSpeech", () => {
     });
   });
 
+  it("gives split ElevenLabs generations adjacent prosody context", async () => {
+    (fetch as jest.Mock).mockResolvedValueOnce({
+      ok: true,
+      blob: () => Promise.resolve(new Blob(["fake-audio"])),
+    });
+
+    await synthesizeSpeech({
+      text: "This is the current segment.",
+      previousText: "This came immediately before.",
+      nextText: "This follows immediately after.",
+      voice: "voice-123",
+      mode: "provider",
+      provider: "elevenlabs",
+      providerModel: "eleven_flash_v2_5",
+      apiKey: "elevenlabs-test-key",
+      language: "en",
+    });
+
+    expect(JSON.parse((fetch as jest.Mock).mock.calls[0][1].body)).toEqual({
+      text: "This is the current segment.",
+      model_id: "eleven_flash_v2_5",
+      previous_text: "This came immediately before.",
+      next_text: "This follows immediately after.",
+    });
+  });
+
+  it("does not send unsupported request-stitching context to Eleven v3", async () => {
+    (fetch as jest.Mock).mockResolvedValueOnce({
+      ok: true,
+      blob: () => Promise.resolve(new Blob(["fake-audio"])),
+    });
+
+    await synthesizeSpeech({
+      text: "An expressive current segment.",
+      previousText: "Earlier context.",
+      nextText: "Later context.",
+      voice: "voice-123",
+      mode: "provider",
+      provider: "elevenlabs",
+      providerModel: "eleven_v3",
+      apiKey: "elevenlabs-test-key",
+      language: "en",
+    });
+
+    expect(JSON.parse((fetch as jest.Mock).mock.calls[0][1].body)).toEqual({
+      text: "An expressive current segment.",
+      model_id: "eleven_v3",
+    });
+  });
+
   it("rejects ElevenLabs speech locally until a voice is selected", async () => {
     await expect(
       synthesizeSpeech({

@@ -57,6 +57,7 @@ export function createVoicePipelineTtsQueue({
     () => Promise.resolve(),
   );
   let nextProviderSynthesisSlot = 0;
+  let previousProviderText = "";
   let fallbackNotified = false;
   let fatalProviderError = false;
   let fatalProviderErrorNotified = false;
@@ -83,7 +84,10 @@ export function createVoicePipelineTtsQueue({
     callbacks.onTtsFallback?.(error);
   };
 
-  const startProviderSynthesis = (text: string) => {
+  const startProviderSynthesis = (
+    text: string,
+    context?: { previousText?: string; nextText?: string },
+  ) => {
     const slotIndex = nextProviderSynthesisSlot;
     nextProviderSynthesisSlot =
       (nextProviderSynthesisSlot + 1) % PROVIDER_TTS_PREFETCH_CONCURRENCY;
@@ -107,6 +111,12 @@ export function createVoicePipelineTtsQueue({
             providerModel: ttsModel,
             apiKey: ttsApiKey,
             instructions: ttsInstructions,
+            ...(ttsProvider === "elevenlabs"
+              ? {
+                  previousText: context?.previousText,
+                  nextText: context?.nextText,
+                }
+              : {}),
             language,
             listenLanguages: ttsListenLanguages,
             diagnostics: speechDiagnostics,
@@ -125,7 +135,10 @@ export function createVoicePipelineTtsQueue({
     return synthesisTask;
   };
 
-  const enqueueTtsChunk = (text: string) => {
+  const enqueueTtsChunk = (
+    text: string,
+    context?: { previousText?: string; nextText?: string },
+  ) => {
     const trimmed = text.trim();
 
     if (!trimmed) {
@@ -137,7 +150,9 @@ export function createVoicePipelineTtsQueue({
     }
 
     const providerSynthesis =
-      ttsMode === "provider" ? startProviderSynthesis(trimmed) : null;
+      ttsMode === "provider"
+        ? startProviderSynthesis(trimmed, context)
+        : null;
     const task = ttsChain.then(async () => {
       if (abortSignal?.aborted) {
         return;
@@ -226,7 +241,12 @@ export function createVoicePipelineTtsQueue({
       return;
     }
 
-    segments.forEach(enqueueTtsChunk);
+    segments.forEach((segment, index) => {
+      const previousText = previousProviderText || undefined;
+      const nextText = segments[index + 1];
+      previousProviderText = segment;
+      enqueueTtsChunk(segment, { previousText, nextText });
+    });
   };
 
   const handleStreamChunk = (text: string) => {

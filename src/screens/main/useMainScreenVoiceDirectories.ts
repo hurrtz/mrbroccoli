@@ -57,9 +57,14 @@ export function useMainScreenVoiceDirectories({
     }
 
     for (const provider of PROVIDER_VOICE_DIRECTORY_PROVIDERS) {
-      const firstVoice = directories[provider]?.voices[0]?.value;
+      const voices = directories[provider]?.voices ?? [];
+      const firstVoice = voices[0]?.value;
+      const selectedVoice = settings.providerTtsVoices[provider]?.trim();
+      const selectionAvailable = voices.some(
+        (voice) => voice.value === selectedVoice,
+      );
 
-      if (firstVoice && !settings.providerTtsVoices[provider]?.trim()) {
+      if (firstVoice && !selectionAvailable) {
         updateProviderTtsVoice(provider, firstVoice);
       }
     }

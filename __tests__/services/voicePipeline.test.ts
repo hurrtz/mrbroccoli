@@ -861,6 +861,69 @@ describe("runVoicePipeline", () => {
     expect(callbacks.onError).not.toHaveBeenCalled();
   });
 
+  it("stitches adjacent ElevenLabs chunks without delaying playback order", async () => {
+    const longReply = Array.from(
+      { length: 40 },
+      () => "A deliberately paced ElevenLabs sentence.",
+    ).join(" ");
+
+    (streamChat as jest.Mock).mockImplementation(
+      async ({ onDone }: { onDone: (text: string) => Promise<void> }) => {
+        await onDone(longReply);
+      },
+    );
+    (synthesizeSpeech as jest.Mock).mockImplementation(
+      async ({ text }: { text: string }) => `/tmp/tts-${text.length}.mp3`,
+    );
+    const callbacks = {
+      onTranscription: jest.fn(),
+      onChunk: jest.fn(),
+      onResponseDone: jest.fn(),
+      onAudioReady: jest.fn(),
+      onSpeechTextReady: jest.fn(),
+      onError: jest.fn(),
+    };
+
+    await runVoicePipeline({
+      transcriptionOverride: "Read this naturally.",
+      messages: [],
+      model: "gpt-5.4",
+      provider: "openai",
+      providerApiKey: "sk-test",
+      sttMode: "native",
+      ttsMode: "provider",
+      ttsProvider: "elevenlabs",
+      ttsApiKey: "elevenlabs-test-key",
+      ttsModel: "eleven_flash_v2_5",
+      ttsVoice: "voice-123",
+      replyPlayback: "wait",
+      assistantInstructions: "You are a voice assistant.",
+      responseLength: "normal",
+      responseTone: "professional",
+      language: "en",
+      callbacks,
+    });
+
+    const synthesisCalls = (synthesizeSpeech as jest.Mock).mock.calls.map(
+      ([params]) => params,
+    );
+    expect(synthesisCalls.length).toBeGreaterThan(1);
+    expect(synthesisCalls[0]).toEqual(
+      expect.objectContaining({
+        previousText: undefined,
+        nextText: synthesisCalls[1].text,
+      }),
+    );
+    expect(synthesisCalls[1]).toEqual(
+      expect.objectContaining({
+        previousText: synthesisCalls[0].text,
+      }),
+    );
+    expect(callbacks.onAudioReady).toHaveBeenCalledTimes(
+      synthesisCalls.length,
+    );
+  });
+
   it("buffers wait-mode provider audio until every chunk is ready", async () => {
     const sentenceOne = `First ${"carefully buffered word ".repeat(22)}.`;
     const sentenceTwo = `Second ${"carefully buffered word ".repeat(22)}.`;

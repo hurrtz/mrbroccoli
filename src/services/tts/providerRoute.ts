@@ -125,13 +125,24 @@ function buildBinaryTtsRequestBody(params: {
   selectedModel: string;
   selectedVoice: string;
   text: string;
+  previousText?: string;
+  nextText?: string;
 }) {
   switch (params.requestFormat) {
-    case "elevenlabs-speech":
+    case "elevenlabs-speech": {
+      const supportsRequestStitching =
+        params.selectedModel !== "eleven_v3";
       return {
         text: params.text,
         model_id: params.selectedModel,
+        ...(supportsRequestStitching && params.previousText?.trim()
+          ? { previous_text: params.previousText.trim() }
+          : {}),
+        ...(supportsRequestStitching && params.nextText?.trim()
+          ? { next_text: params.nextText.trim() }
+          : {}),
       };
+    }
     case "grok-speech":
       return {
         text: params.text,
@@ -228,6 +239,8 @@ export async function synthesizeProviderSpeech(params: {
   apiKey?: string;
   language: AppLanguage;
   instructions?: string;
+  previousText?: string;
+  nextText?: string;
   abortSignal?: AbortSignal;
 }) {
   const {
@@ -238,6 +251,8 @@ export async function synthesizeProviderSpeech(params: {
     apiKey,
     language,
     instructions,
+    previousText,
+    nextText,
     abortSignal,
   } = params;
   const config = TTS_PROVIDER_CONFIGS[provider];
@@ -408,6 +423,8 @@ export async function synthesizeProviderSpeech(params: {
     selectedModel,
     selectedVoice: resolvedVoice,
     text,
+    previousText,
+    nextText,
   });
 
   const response = await fetchTtsWithRetries({

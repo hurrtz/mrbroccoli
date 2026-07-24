@@ -113,6 +113,8 @@ export async function synthesizeSpeech(params: {
   providerModel?: string;
   apiKey?: string;
   instructions?: string;
+  previousText?: string;
+  nextText?: string;
   language: AppLanguage;
   listenLanguages?: TtsListenLanguage[];
   diagnostics?: SpeechDiagnosticsContext;
@@ -127,6 +129,8 @@ export async function synthesizeSpeech(params: {
     providerModel,
     apiKey,
     instructions,
+    previousText,
+    nextText,
     language,
     listenLanguages,
     diagnostics,
@@ -192,6 +196,8 @@ export async function synthesizeSpeech(params: {
       providerModel,
       apiKey,
       instructions,
+      previousText,
+      nextText,
       language,
       abortSignal,
     });
@@ -238,6 +244,8 @@ export async function synthesizeSpeechSequence(params: {
   providerModel?: string;
   apiKey?: string;
   instructions?: string;
+  previousText?: string;
+  nextText?: string;
   language: AppLanguage;
   listenLanguages?: TtsListenLanguage[];
   diagnostics?: SpeechDiagnosticsContext;
@@ -257,11 +265,19 @@ export async function synthesizeSpeechSequence(params: {
 
   const audioFiles: string[] = [];
 
-  for (const segment of segments) {
+  for (const [index, segment] of segments.entries()) {
     audioFiles.push(
       await synthesizeSpeech({
         ...params,
         text: segment,
+        previousText:
+          params.provider === "elevenlabs"
+            ? segments[index - 1] ?? params.previousText
+            : params.previousText,
+        nextText:
+          params.provider === "elevenlabs"
+            ? segments[index + 1] ?? params.nextText
+            : params.nextText,
       }),
     );
   }

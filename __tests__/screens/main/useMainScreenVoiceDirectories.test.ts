@@ -45,7 +45,7 @@ describe("useMainScreenVoiceDirectories", () => {
       },
       providerTtsVoices: {
         ...DEFAULT_SETTINGS.providerTtsVoices,
-        mistral: "already-selected",
+        mistral: "mistral-voice-1",
         xai: "",
       },
     };
@@ -78,6 +78,34 @@ describe("useMainScreenVoiceDirectories", () => {
     expect(updateProviderTtsVoice).toHaveBeenCalledWith(
       "xai",
       "xai-voice-1",
+    );
+  });
+
+  it("replaces a stale voice after a different provider account is loaded", () => {
+    const updateProviderTtsVoice = jest.fn();
+    const settings = {
+      ...DEFAULT_SETTINGS,
+      apiKeys: {
+        ...DEFAULT_SETTINGS.apiKeys,
+        elevenlabs: "new-elevenlabs-account-key",
+      },
+      providerTtsVoices: {
+        ...DEFAULT_SETTINGS.providerTtsVoices,
+        elevenlabs: "voice-from-old-account",
+      },
+    };
+
+    renderHook(() =>
+      useMainScreenVoiceDirectories({
+        loaded: true,
+        settings,
+        updateProviderTtsVoice,
+      }),
+    );
+
+    expect(updateProviderTtsVoice).toHaveBeenCalledWith(
+      "elevenlabs",
+      "elevenlabs-voice-1",
     );
   });
 });
