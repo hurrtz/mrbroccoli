@@ -6,6 +6,8 @@
     "start": "expo start",
     "android": "expo run:android",
     "ios": "expo run:ios",
+    "config:verify": "node scripts/verify-native-config-sync.mjs",
+    "pretest": "npm run config:verify",
     "test": "jest",
     "typecheck": "tsc --noEmit",
     "catalog:generate-index": "python3 scripts/provider_catalog/generate_provider_index.py",

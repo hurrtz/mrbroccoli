@@ -1,0 +1,156 @@
+import { createHash } from "node:crypto";
+import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
+
+const root = process.cwd();
+const readText = (path) => readFileSync(resolve(root, path), "utf8");
+const readBytes = (path) => readFileSync(resolve(root, path));
+const appConfig = JSON.parse(readText("app.json")).expo;
+const iosInfo = readText("ios/MrBroccoli/Info.plist");
+const iosProject = readText("ios/MrBroccoli.xcodeproj/project.pbxproj");
+const androidBuild = readText("android/app/build.gradle");
+const androidManifest = readText(
+  "android/app/src/main/AndroidManifest.xml",
+);
+const androidStrings = readText(
+  "android/app/src/main/res/values/strings.xml",
+);
+const androidColors = readText("android/app/src/main/res/values/colors.xml");
+const androidAdaptiveIcon = readText(
+  "android/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml",
+);
+const iosAppIconContents = readText(
+  "ios/MrBroccoli/Images.xcassets/AppIcon.appiconset/Contents.json",
+);
+
+const failures = [];
+let checkCount = 0;
+
+function assertIncludes(label, source, expected) {
+  checkCount += 1;
+  if (!source.includes(expected)) {
+    failures.push(`${label}: expected ${JSON.stringify(expected)}`);
+  }
+}
+
+function assertEqual(label, actual, expected) {
+  checkCount += 1;
+  if (actual !== expected) {
+    failures.push(
+      `${label}: expected ${JSON.stringify(expected)}, received ${JSON.stringify(actual)}`,
+    );
+  }
+}
+
+function sha256(bytes) {
+  return createHash("sha256").update(bytes).digest("hex");
+}
+
+const iosBundleIdentifier = appConfig.ios?.bundleIdentifier;
+const androidPackage = appConfig.android?.package;
+const scheme = appConfig.scheme;
+const iconPath = appConfig.icon?.replace(/^\.\//, "");
+const iosIconPath = appConfig.ios?.icon?.replace(/^\.\//, "");
+const adaptiveBackground = appConfig.android?.adaptiveIcon?.backgroundColor;
+
+assertEqual(
+  "supported platforms",
+  JSON.stringify(appConfig.platforms),
+  JSON.stringify(["ios", "android"]),
+);
+assertIncludes(
+  "iOS display name",
+  iosInfo,
+  `<string>${appConfig.name}</string>`,
+);
+assertIncludes(
+  "Android display name",
+  androidStrings,
+  `>${appConfig.name}</string>`,
+);
+assertIncludes("iOS URL scheme", iosInfo, `<string>${scheme}</string>`);
+assertIncludes(
+  "Android URL scheme",
+  androidManifest,
+  `android:scheme="${scheme}"`,
+);
+assertIncludes(
+  "iOS bundle identifier",
+  iosProject,
+  `PRODUCT_BUNDLE_IDENTIFIER = ${iosBundleIdentifier};`,
+);
+assertIncludes(
+  "iOS Live Activity bundle identifier",
+  iosProject,
+  `PRODUCT_BUNDLE_IDENTIFIER = ${iosBundleIdentifier}.liveactivity;`,
+);
+assertIncludes(
+  "Android namespace",
+  androidBuild,
+  `namespace '${androidPackage}'`,
+);
+assertIncludes(
+  "Android application ID",
+  androidBuild,
+  `applicationId '${androidPackage}'`,
+);
+assertIncludes(
+  "iOS marketing version",
+  iosProject,
+  `MARKETING_VERSION = ${appConfig.version};`,
+);
+assertIncludes(
+  "iOS short version",
+  iosInfo,
+  `<string>${appConfig.version}</string>`,
+);
+assertIncludes(
+  "Android version",
+  androidBuild,
+  `versionName "${appConfig.version}"`,
+);
+assertEqual("shared and iOS icon path", iosIconPath, iconPath);
+assertEqual(
+  "shared and Android icon path",
+  appConfig.android?.icon?.replace(/^\.\//, ""),
+  iconPath,
+);
+assertEqual(
+  "shared and adaptive icon path",
+  appConfig.android?.adaptiveIcon?.foregroundImage?.replace(/^\.\//, ""),
+  iconPath,
+);
+assertIncludes(
+  "Android adaptive icon color",
+  androidColors,
+  `>${adaptiveBackground}</color>`,
+);
+assertIncludes(
+  "Android adaptive icon resource",
+  androidAdaptiveIcon,
+  '@color/iconBackground',
+);
+assertIncludes(
+  "iOS app icon asset",
+  iosAppIconContents,
+  '"filename" : "App-Icon-1024x1024@1x.png"',
+);
+assertEqual(
+  "iOS app icon content",
+  sha256(readBytes(iconPath)),
+  sha256(
+    readBytes(
+      "ios/MrBroccoli/Images.xcassets/AppIcon.appiconset/App-Icon-1024x1024@1x.png",
+    ),
+  ),
+);
+
+if (failures.length > 0) {
+  console.error("Native configuration is out of sync with app.json:");
+  failures.forEach((failure) => console.error(`- ${failure}`));
+  process.exitCode = 1;
+} else {
+  console.log(
+    `Native configuration matches app.json across ${checkCount} checks.`,
+  );
+}
