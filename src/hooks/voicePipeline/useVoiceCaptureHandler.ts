@@ -18,27 +18,11 @@ import type {
 import type { PipelinePhase, UseVoicePipelineParams } from "./types";
 import { useLatencyProgressController } from "./useLatencyProgressController";
 import { useStreamingTextScheduler } from "./useStreamingTextScheduler";
-
-function getUnexpectedIssueDetail(
-  error: unknown,
-  fallbackMessage: string,
-): string | undefined {
-  if (!(error instanceof Error)) {
-    return undefined;
-  }
-
-  const detail = error.message.trim();
-
-  if (!detail) {
-    return undefined;
-  }
-
-  return detail === fallbackMessage ? undefined : detail;
-}
-
-function formatNoticeToast(notice: MessagePipelineNotice) {
-  return notice.detail ? `${notice.message} ${notice.detail}` : notice.message;
-}
+import {
+  formatNoticeToast,
+  getUnexpectedIssueDetail,
+  useVoiceTurnMessageState,
+} from "./useVoiceTurnMessageState";
 
 type VoiceCaptureHandlerParams = Omit<UseVoicePipelineParams, "isRecording"> & {
   abortRef: React.MutableRefObject<AbortController | null>;
@@ -94,12 +78,8 @@ export function useVoiceCaptureHandler({
   webSearchOptions,
   webSearchProvider,
 }: VoiceCaptureHandlerParams) {
-  const ttsFallbackToastShownRef = useRef(false);
   const producedAudioRef = useRef(false);
   const playbackStartedRef = useRef(false);
-  const lastUserMessageIdRef = useRef<string | null>(null);
-  const lastAssistantMessageIdRef = useRef<string | null>(null);
-  const pendingAssistantNoticesRef = useRef<MessagePipelineNotice[]>([]);
   const activeCaptureRunRef = useRef(0);
   const {
     clearLatencyProgress,
@@ -112,64 +92,17 @@ export function useVoiceCaptureHandler({
     cancelStreamingRender,
     queueStreamingRender,
   } = useStreamingTextScheduler({ abortRef, setStreamingText });
-
-  const appendNoticeMetadata = useCallback(
-    (
-      metadata: MessageMetadata | undefined,
-      notice: MessagePipelineNotice,
-    ): MessageMetadata => {
-      const notices = metadata?.notices ?? [];
-      const alreadyPresent = notices.some(
-        (entry) =>
-          entry.stage === notice.stage &&
-          entry.message === notice.message &&
-          entry.detail === notice.detail,
-      );
-
-      return {
-        ...metadata,
-        notices: alreadyPresent ? notices : [...notices, notice],
-      };
-    },
-    [],
-  );
-
-  const clearReplyFailure = useCallback(
-    (messageId: string) => {
-      updateMessage(messageId, (message) => {
-        if (!message.metadata?.replyFailure) {
-          return message;
-        }
-
-        const { replyFailure: _replyFailure, ...remainingMetadata } =
-          message.metadata;
-
-        return {
-          ...message,
-          metadata:
-            Object.keys(remainingMetadata).length > 0
-              ? remainingMetadata
-              : undefined,
-        };
-      });
-    },
-    [updateMessage],
-  );
-
-  const markReplyFailure = useCallback(
-    (messageId: string, error: Error) => {
-      updateMessage(messageId, (message) => ({
-        ...message,
-        metadata: {
-          ...message.metadata,
-          replyFailure: {
-            message: error.message,
-          },
-        },
-      }));
-    },
-    [updateMessage],
-  );
+  const {
+    consumeAssistantMetadata,
+    lastAssistantMessageIdRef,
+    lastUserMessageIdRef,
+    markReplyFailure,
+    persistPendingNoticesForUser,
+    queueAssistantNotice,
+    recordAssistantNotice,
+    recordTtsFallbackNotice,
+    resetTurnMessageState,
+  } = useVoiceTurnMessageState(updateMessage);
 
   const handleVoiceCaptureDone = useCallback(
     async ({
@@ -212,15 +145,9 @@ export function useVoiceCaptureHandler({
         transcriptionOverride ? "thinking-briefly" : "transcribing",
       );
       const streamingRenderRunId = beginStreamingRender();
-      ttsFallbackToastShownRef.current = false;
       producedAudioRef.current = false;
       playbackStartedRef.current = false;
-      lastUserMessageIdRef.current = existingUserMessageId ?? null;
-      lastAssistantMessageIdRef.current = null;
-      pendingAssistantNoticesRef.current = [];
-      if (existingUserMessageId) {
-        clearReplyFailure(existingUserMessageId);
-      }
+      resetTurnMessageState(existingUserMessageId);
       player.resetCancellation();
       const backgroundGraceAvailable = setBackgroundVoiceTurnActive(true);
       recordDebugLogEvent({
@@ -462,10 +389,7 @@ export function useVoiceCaptureHandler({
                   message: error.message,
                 },
               });
-              pendingAssistantNoticesRef.current = [
-                ...pendingAssistantNoticesRef.current,
-                notice,
-              ];
+              queueAssistantNotice(notice);
               showToast(formatNoticeToast(notice), undefined, "danger");
             },
             onLlmStart: handleLlmStarted,
@@ -519,30 +443,15 @@ export function useVoiceCaptureHandler({
                     : "thinking",
               );
               lastCompletedReplyRef.current = fullText;
-              const assistantNotices = pendingAssistantNoticesRef.current;
               const assistantMessage = addMessage({
                 role: "assistant",
                 content: fullText,
                 model,
                 provider,
                 usage,
-                metadata:
-                  assistantNotices.length > 0
-                    ? {
-                        ...metadata,
-                        notices: assistantNotices.reduce(
-                          (allNotices, notice) =>
-                            appendNoticeMetadata(
-                              { notices: allNotices },
-                              notice,
-                            ).notices ?? allNotices,
-                          metadata?.notices ?? [],
-                        ),
-                      }
-                    : metadata,
+                metadata: consumeAssistantMetadata(metadata),
               });
               lastAssistantMessageIdRef.current = assistantMessage?.id ?? null;
-              pendingAssistantNoticesRef.current = [];
             },
             onAudioReady: (audioData, diagnostics) => {
               if (!isActiveRun()) {
@@ -607,23 +516,10 @@ export function useVoiceCaptureHandler({
                   ttsMode,
                 },
               });
-              if (ttsFallbackToastShownRef.current) {
+              if (!recordTtsFallbackNotice(notice)) {
                 return;
               }
 
-              if (lastAssistantMessageIdRef.current) {
-                updateMessage(lastAssistantMessageIdRef.current, (message) => ({
-                  ...message,
-                  metadata: appendNoticeMetadata(message.metadata, notice),
-                }));
-              } else {
-                pendingAssistantNoticesRef.current = [
-                  ...pendingAssistantNoticesRef.current,
-                  notice,
-                ];
-              }
-
-              ttsFallbackToastShownRef.current = true;
               showToast(formatNoticeToast(notice), undefined, "danger");
             },
             onError: async (error) => {
@@ -691,13 +587,7 @@ export function useVoiceCaptureHandler({
                 spokenReplyFailureNotice &&
                 lastAssistantMessageIdRef.current
               ) {
-                updateMessage(lastAssistantMessageIdRef.current, (message) => ({
-                  ...message,
-                  metadata: appendNoticeMetadata(
-                    message.metadata,
-                    spokenReplyFailureNotice,
-                  ),
-                }));
+                recordAssistantNotice(spokenReplyFailureNotice);
                 return;
               }
 
@@ -760,25 +650,7 @@ export function useVoiceCaptureHandler({
         if (!lastAssistantMessageIdRef.current && lastUserMessageIdRef.current) {
           markReplyFailure(lastUserMessageIdRef.current, normalizedError);
           persistedError = true;
-          const pendingNotices = pendingAssistantNoticesRef.current;
-
-          if (pendingNotices.length > 0) {
-            updateMessage(lastUserMessageIdRef.current, (message) => ({
-              ...message,
-              metadata: {
-                ...message.metadata,
-                notices: pendingNotices.reduce(
-                  (allNotices, notice) =>
-                    appendNoticeMetadata(
-                      { notices: allNotices },
-                      notice,
-                    ).notices ?? allNotices,
-                  message.metadata?.notices ?? [],
-                ),
-              },
-            }));
-            pendingAssistantNoticesRef.current = [];
-          }
+          persistPendingNoticesForUser();
         }
 
         if (
@@ -859,12 +731,11 @@ export function useVoiceCaptureHandler({
       abortRef,
       activeConversation,
       addMessage,
-      appendNoticeMetadata,
       assistantInstructions,
       beginStreamingRender,
       clearLatencyProgress,
-      clearReplyFailure,
       cancelStreamingRender,
+      consumeAssistantMetadata,
       createConversation,
       finishLatencyProgress,
       handleRepeatLastReply,
@@ -872,10 +743,15 @@ export function useVoiceCaptureHandler({
       lastCompletedReplyRef,
       markReplyFailure,
       model,
+      persistPendingNoticesForUser,
       player,
       provider,
       providerApiKey,
       queueStreamingRender,
+      queueAssistantNotice,
+      recordAssistantNotice,
+      recordTtsFallbackNotice,
+      resetTurnMessageState,
       replyPlayback,
       responseLength,
       responseTone,
@@ -896,7 +772,6 @@ export function useVoiceCaptureHandler({
       ttsMode,
       ttsProvider,
       updateConversationContextSummary,
-      updateMessage,
       webSearchApiKey,
       webSearchMode,
       webSearchOptions,
