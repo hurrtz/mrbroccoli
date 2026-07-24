@@ -12,13 +12,7 @@ import { SettingsModal } from "../components/SettingsModal";
 import { SetupGuideModal } from "../components/SetupGuideModal";
 import { Toast } from "../components/Toast";
 import {
-  PROVIDER_DEFAULT_STT_MODELS,
-  PROVIDER_DEFAULT_TTS_MODELS,
-  PROVIDER_DEFAULT_TTS_VOICES,
   PROVIDER_LABELS,
-  getProviderTtsVoiceOptions,
-  getTtsModelLabel,
-  providerTtsModelSupportsInstructions,
 } from "../constants/models";
 import { useSharedSettings } from "../context/SettingsContext";
 import { useAudioPlayer } from "../hooks/useAudioPlayer";
@@ -29,22 +23,18 @@ import { useVoicePipeline } from "../hooks/useVoicePipeline";
 import { useBatteryDiagnostics } from "../hooks/useBatteryDiagnostics";
 import { useLocalization } from "../i18n";
 import { recordDebugLogEvent } from "../services/debugLogCapture";
-import { providerHasVoiceDirectory } from "../services/providerVoiceDirectory";
 import { useTheme } from "../theme/ThemeContext";
-import { Provider, ResponseMode, ToastTone } from "../types";
-import {
-  getEnabledSttProviders,
-  getEnabledTtsProviders,
-} from "../utils/providerCapabilities";
+import { ResponseMode, ToastTone } from "../types";
 import { hasProviderCredentialForCapability } from "../utils/providerCredentials";
-import {
-  getAvailableResponseModes,
-  getResponseModeRoute,
-} from "../utils/responseModes";
+import { getResponseModeRoute } from "../utils/responseModes";
 import { MainScreenWorkspace } from "./main/MainScreenWorkspace";
 import { StyleSheetModal } from "./main/StyleSheetModal";
 import { StatusDetailsModal } from "./main/StatusDetailsModal";
 import { getMainScreenViewModel } from "./main/mainScreenViewModel";
+import {
+  getConversationTtsControlState,
+  getMainScreenRouteConfiguration,
+} from "./main/mainScreenRouteConfiguration";
 import { styles } from "./main/styles";
 import { useConversationActions } from "./main/useConversationActions";
 import { useConversationTitleGenerator } from "./main/useConversationTitleGenerator";
@@ -145,39 +135,31 @@ export function MainScreen() {
     handleDrawerDismiss,
   } = useMainScreenUiState();
 
-  const activeResponseMode = settings.activeResponseMode;
-  const activeResponseRoute = getResponseModeRoute(settings);
-  const provider = activeResponseRoute.provider;
-  const providerApiKey = settings.apiKeys[provider].trim();
-  const voiceInputDisabled =
-    !conversationsLoaded ||
-    !hasProviderCredentialForCapability(provider, providerApiKey, "llm");
-  const model = activeResponseRoute.model;
-  const modelEffort = activeResponseRoute.effort;
-  const availableResponseModes = getAvailableResponseModes(settings);
-  const availableSttProviders = getEnabledSttProviders(settings);
-  const availableTtsProviders = getEnabledTtsProviders(settings);
-  const sttProvider =
-    settings.sttMode === "provider" ? settings.sttProvider : null;
-  const ttsProvider = settings.ttsProvider;
-  const webSearchProvider = settings.webSearchProvider;
-  const webSearchMode = settings.webSearchMode;
-  const sttApiKey = sttProvider ? settings.apiKeys[sttProvider].trim() : "";
-  const ttsApiKey = ttsProvider ? settings.apiKeys[ttsProvider].trim() : "";
-  const webSearchApiKey = webSearchProvider
-    ? settings.apiKeys[webSearchProvider].trim()
-    : "";
-  const webSearchOptions = webSearchProvider
-    ? settings.webSearchProviderSettings[webSearchProvider]
-    : undefined;
-  const webSearchReady =
-    !!webSearchProvider &&
-    hasProviderCredentialForCapability(
-      webSearchProvider,
-      webSearchApiKey,
-      "search",
-    );
-  const webSearchActive = webSearchMode !== "off" && webSearchReady;
+  const {
+    activeResponseMode,
+    availableResponseModes,
+    availableSttProviders,
+    availableTtsProviders,
+    globalSelectedTtsVoice,
+    model,
+    modelEffort,
+    provider,
+    providerApiKey,
+    providerLabel,
+    selectedSttModel,
+    selectedTtsModel,
+    sttApiKey,
+    sttProvider,
+    ttsApiKey,
+    ttsProvider,
+    voiceInputDisabled,
+    webSearchActive,
+    webSearchApiKey,
+    webSearchMode,
+    webSearchOptions,
+    webSearchProvider,
+    webSearchReady,
+  } = getMainScreenRouteConfiguration(settings, conversationsLoaded);
   const isLandscape = width > height;
   const showStyleChip = loaded && availableResponseModes.length > 0;
   const mainSurfaceVisible = !(
@@ -188,21 +170,6 @@ export function MainScreen() {
     statusDetailsVisible ||
     styleSheetVisible
   );
-  const selectedSttModel = sttProvider
-    ? settings.providerSttModels[sttProvider] ||
-      PROVIDER_DEFAULT_STT_MODELS[sttProvider] ||
-      ""
-    : "";
-  const globalSelectedTtsVoice = ttsProvider
-    ? settings.providerTtsVoices[ttsProvider] ||
-      PROVIDER_DEFAULT_TTS_VOICES[ttsProvider] ||
-      ""
-    : "";
-  const selectedTtsModel = ttsProvider
-    ? settings.providerTtsModels[ttsProvider] ||
-      PROVIDER_DEFAULT_TTS_MODELS[ttsProvider] ||
-      ""
-    : "";
   const {
     assistantInstructions,
     effectiveTtsInstructions,
@@ -227,45 +194,17 @@ export function MainScreen() {
     ttsProvider,
     updateConversationSettings,
   });
-  const conversationTtsVoiceOptions =
-    settings.ttsMode === "provider" && ttsProvider
-      ? providerHasVoiceDirectory(ttsProvider)
-        ? (
-            providerVoiceDirectories[ttsProvider]?.voices.length
-              ? providerVoiceDirectories[ttsProvider]?.voices ?? []
-              : getProviderTtsVoiceOptions(
-                  ttsProvider,
-                  language,
-                  selectedTtsModel,
-                )
-          ).map((voice) => ({
-            value:
-              "value" in voice && typeof voice.value === "string"
-                ? voice.value
-                : voice.id,
-            label: voice.label,
-          }))
-        : getProviderTtsVoiceOptions(
-            ttsProvider,
-            language,
-            selectedTtsModel,
-          ).map((voice) => ({
-            value: voice.id,
-            label: voice.label,
-          }))
-      : [];
-  const conversationTtsRouteLabel =
-    settings.ttsMode === "provider" && ttsProvider && selectedTtsModel
-      ? `${PROVIDER_LABELS[ttsProvider]} · ${getTtsModelLabel(
-          ttsProvider,
-          selectedTtsModel,
-        )}`
-      : null;
-  const ttsInstructionsSupported =
-    settings.ttsMode === "provider" && ttsProvider
-      ? providerTtsModelSupportsInstructions(ttsProvider, selectedTtsModel)
-      : false;
-  const providerLabel = PROVIDER_LABELS[provider];
+  const {
+    conversationTtsRouteLabel,
+    conversationTtsVoiceOptions,
+    ttsInstructionsSupported,
+  } = getConversationTtsControlState({
+    language,
+    providerVoiceDirectories,
+    selectedTtsModel,
+    settings,
+    ttsProvider,
+  });
   const isRecording =
     settings.sttMode === "native"
       ? nativeStt.isRecording
