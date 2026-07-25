@@ -81,6 +81,7 @@ export const SettingsModal = React.memo(function SettingsModal(
   const {
     visible,
     settings,
+    kokoroModel,
     focusProvider,
     focusCatalogProviderId,
     focusTab,
@@ -136,7 +137,9 @@ export const SettingsModal = React.memo(function SettingsModal(
   const {
     contentScrollRef,
     providerPreviewTexts,
+    kokoroPreviewTexts,
     setProviderPreviewText,
+    setKokoroPreviewText,
     nativePreviewText,
     setNativePreviewText,
     activePreview,
@@ -146,6 +149,7 @@ export const SettingsModal = React.memo(function SettingsModal(
     handleTextInputFocus,
     handlePreviewProviderVoice,
     handlePreviewNativeVoice,
+    handlePreviewKokoroVoice,
     selectedSttProviderModelOptions,
     selectedSttProviderModel,
     sttLanguageNote,
@@ -203,9 +207,11 @@ export const SettingsModal = React.memo(function SettingsModal(
         sttProviders: selectableSttProviders,
         ttsProviders: selectableTtsProviders,
         searchProviders: selectableSearchProviders,
+        kokoroInstalled: kokoroModel.installed,
       }),
     [
       selectableLlmProviders,
+      kokoroModel.installed,
       selectableSearchProviders,
       selectableSttProviders,
       selectableTtsProviders,
@@ -357,6 +363,7 @@ export const SettingsModal = React.memo(function SettingsModal(
           "speaking",
           <SpeakingSection
             settings={settings}
+            kokoroModel={kokoroModel}
             selectableTtsProviders={selectableTtsProviders}
             ttsLanguageNote={ttsLanguageNote}
             selectedPreviewProvider={selectedPreviewProvider}
@@ -369,6 +376,7 @@ export const SettingsModal = React.memo(function SettingsModal(
             nativeVoiceOptions={nativeVoiceOptions}
             selectedNativeVoice={selectedNativeVoice}
             nativePreviewText={nativePreviewText}
+            kokoroPreviewTexts={kokoroPreviewTexts}
             onUpdate={onUpdate}
             onUpdateProviderTtsModel={onUpdateProviderTtsModel}
             onUpdateProviderTtsVoice={onUpdateProviderTtsVoice}
@@ -380,8 +388,10 @@ export const SettingsModal = React.memo(function SettingsModal(
               text: string,
             ) => setProviderPreviewText(provider, language, text)}
             onSetNativePreviewText={setNativePreviewText}
+            onSetKokoroPreviewText={setKokoroPreviewText}
             onPreviewProviderVoice={handlePreviewProviderVoice}
             onPreviewNativeVoice={handlePreviewNativeVoice}
+            onPreviewKokoroVoice={handlePreviewKokoroVoice}
             onSelectNativeVoice={setSelectedNativeVoice}
             onTextInputFocus={handleTextInputFocus}
             onToggleListenLanguage={toggleListenLanguage}

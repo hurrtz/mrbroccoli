@@ -1,7 +1,13 @@
 import { useCallback, useEffect, useState } from "react";
 
 import { TTS_LISTEN_LANGUAGE_OPTIONS } from "../../constants/localTts";
-import { AppLanguage, Provider, Settings, TtsListenLanguage } from "../../types";
+import {
+  AppLanguage,
+  KokoroLanguage,
+  Provider,
+  Settings,
+  TtsListenLanguage,
+} from "../../types";
 
 import {
   getNativePreviewSampleText,
@@ -33,6 +39,12 @@ export function usePreviewTextState(params: {
   const [nativePreviewText, setNativePreviewText] = useState(() =>
     getNativePreviewSampleText(language),
   );
+  const [kokoroPreviewTexts, setKokoroPreviewTexts] = useState<
+    Record<KokoroLanguage, string>
+  >(() => ({
+    en: getProviderPreviewSampleText("en"),
+    zh: getProviderPreviewSampleText("zh"),
+  }));
 
   useEffect(() => {
     const localizedSample = getNativePreviewSampleText(language);
@@ -58,10 +70,22 @@ export function usePreviewTextState(params: {
     [],
   );
 
+  const setKokoroPreviewText = useCallback(
+    (previewLanguage: KokoroLanguage, text: string) => {
+      setKokoroPreviewTexts((previous) => ({
+        ...previous,
+        [previewLanguage]: text,
+      }));
+    },
+    [],
+  );
+
   return {
     providerPreviewTexts,
+    kokoroPreviewTexts,
     nativePreviewText,
     setProviderPreviewText,
+    setKokoroPreviewText,
     setNativePreviewText,
   };
 }

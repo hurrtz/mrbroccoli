@@ -20,13 +20,20 @@ export type SpeechDiagnosticStage =
   | "playback-stopped"
   | "playback-drained";
 
-export type SpeechDiagnosticRoute = "local" | "provider" | "native";
+export type SpeechDiagnosticRoute =
+  | "kokoro"
+  | "local"
+  | "provider"
+  | "native";
 
 export interface SpeechDiagnosticsContext {
   requestId?: string;
   source?: SpeechDiagnosticSource;
+  mode?: TtsBackendMode;
   provider?: string | null;
   providerModel?: string | null;
+  language?: TtsListenLanguage | "app";
+  voice?: string | null;
 }
 
 export interface SpeechDiagnosticEvent {

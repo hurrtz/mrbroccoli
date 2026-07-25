@@ -7,6 +7,7 @@ The app is intentionally user-key driven. No provider API keys are shipped in th
 ## Highlights
 
 - Voice-first interaction with live recording and playback states
+- Optional Kokoro neural speech synthesis running entirely on-device
 - User-managed API keys stored securely on device with `expo-secure-store`
 - Multi-provider support with branded provider selection
 - Optional OpenRouter gateway onboarding alongside direct provider keys
@@ -40,8 +41,12 @@ providers include Tavily, Brave, Exa, Firecrawl, and SerpApi.
 Voice input and spoken replies are not tied to any single provider:
 
 - Speech-to-text prefers the device's native system recognizer, with capability-gated provider STT from OpenAI, Gemini/Google Cloud Speech, Mistral, xAI, Qwen, and ElevenLabs as alternatives.
-- Text-to-speech uses the device's native voices, with capability-gated provider TTS from OpenAI, Gemini, xAI, Qwen, Mistral, and ElevenLabs as alternatives.
+- Text-to-speech uses the device's native voices by default. An optional Kokoro model provides substantially more natural on-device English and Simplified Chinese speech, while capability-gated provider TTS from OpenAI, Gemini, xAI, Qwen, Mistral, and ElevenLabs remains available.
 - Mistral, xAI, and ElevenLabs account voices are discovered automatically and can be refreshed from Speaking settings. ElevenLabs falls back to a built-in premade voice when a restricted key cannot read account voices.
+
+The Kokoro model is downloaded only when the user opts in (about 140 MiB
+downloaded and 211 MiB installed). It is not bundled in the initial app
+download. Unsupported selected reply languages fall back to the system voice.
 
 OpenRouter is an optional LLM gateway: one key exposes a curated cross-provider model set while direct provider connections remain available. Requests routed through it are labeled separately from direct routes.
 
@@ -122,6 +127,7 @@ __tests__/              Focused hook and service tests
 ## Notes
 
 - Home screen icons and launcher assets require a new native build. OTA updates alone will not change them.
+- Kokoro and its Sherpa/ONNX runtime require a native rebuild; adding only an OTA update is not sufficient.
 - The iOS bundle identifier is `com.tobiaswinkler.app.mrbroccoli`.
 - The Android application ID and namespace are `com.tobiaswinkler.app.mrbroccoli`.
 - The Expo slug and on-device persistence keys use the `mrbroccoli` namespace.
@@ -129,3 +135,8 @@ __tests__/              Focused hook and service tests
 ## License
 
 No license file is currently included in this repository.
+
+The optional `kokoro-int8-multi-lang-v1_1` model is Apache-2.0 licensed and
+includes its license in the downloaded archive. The React Native wrapper is
+MIT licensed; its Sherpa/ONNX native dependencies retain their respective
+third-party licenses.

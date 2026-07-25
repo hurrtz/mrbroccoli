@@ -10,6 +10,7 @@ import type {
   AssistantResponseTone,
   Conversation,
   ConversationSettings,
+  KokoroVoiceSelections,
   Message,
   Provider,
   ReplyPlayback,
@@ -76,6 +77,7 @@ export interface UseVoicePipelineParams {
   ttsApiKey: string;
   selectedTtsModel: string;
   selectedTtsVoice: string;
+  kokoroVoices: KokoroVoiceSelections;
   ttsInstructions?: string;
   ttsListenLanguages: TtsListenLanguage[];
   replyPlayback: ReplyPlayback;

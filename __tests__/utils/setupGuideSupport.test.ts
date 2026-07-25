@@ -90,6 +90,25 @@ describe("setupGuideSupport", () => {
     );
   });
 
+  it("prefers an opted-in Kokoro route over provider speech", () => {
+    const settings = createSettings();
+    settings.apiKeys.gemini = "test-gemini-key";
+    settings.kokoroVoices.en = "af_sol";
+
+    const routes = resolveSetupGuideRoutes({
+      provider: "gemini",
+      settings,
+      systemSttAvailable: true,
+      useKokoro: true,
+    });
+
+    expect(routes.tts).toEqual({
+      enabled: true,
+      kind: "kokoro",
+      voice: "af_sol",
+    });
+  });
+
   it("resets validation state when the current provider config no longer matches", () => {
     const currentValidationState = getCurrentSetupGuideValidationState({
       provider: "openai",

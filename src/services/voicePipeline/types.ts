@@ -7,6 +7,7 @@ import type {
   AppLanguage,
   AssistantResponseLength,
   AssistantResponseTone,
+  KokoroVoiceSelections,
   Message,
   MessageMetadata,
   Provider,
@@ -66,6 +67,7 @@ export interface RunVoicePipelineParams {
   ttsApiKey?: string;
   ttsModel?: string;
   ttsVoice: string;
+  kokoroVoices?: KokoroVoiceSelections;
   ttsInstructions?: string;
   ttsListenLanguages?: TtsListenLanguage[];
   replyPlayback: ReplyPlayback;

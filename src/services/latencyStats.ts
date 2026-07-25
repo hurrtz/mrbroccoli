@@ -206,6 +206,10 @@ export function getDefaultLatencyEstimateMs(
   }
 
   if (descriptor.phase === "tts-synthesis") {
+    if (descriptor.ttsMode === "kokoro") {
+      return descriptor.replyPlayback === "wait" ? 5_000 : 2_500;
+    }
+
     if (descriptor.ttsMode !== "provider") {
       return 1_500;
     }
@@ -286,6 +290,8 @@ export function getDefaultLatencyEstimateMs(
       } else {
         estimateMs += streamingSpeechMs;
       }
+    } else if (descriptor.ttsMode === "kokoro") {
+      estimateMs += descriptor.replyPlayback === "wait" ? 5_000 : 2_500;
     } else {
       estimateMs += descriptor.replyPlayback === "wait" ? 2_500 : 1_000;
     }
@@ -308,9 +314,13 @@ export function getDefaultLatencyEstimateMs(
           : descriptor.ttsProvider === "xai"
             ? 2_500
             : 3_500
-        : descriptor.replyPlayback === "wait"
-          ? 2_500
-          : 1_000;
+        : descriptor.ttsMode === "kokoro"
+          ? descriptor.replyPlayback === "wait"
+            ? 5_000
+            : 2_500
+          : descriptor.replyPlayback === "wait"
+            ? 2_500
+            : 1_000;
 
     // Streamed speech overlaps with response generation. Only the residual
     // playback tail belongs on top of the full-response estimate; wait mode

@@ -750,7 +750,7 @@ describe("useSettings", () => {
     expect(result.current.settings.providerTtsVoices.gemini).toBe("Aoede");
   });
 
-  it("migrates a stored local TTS mode to native and drops local voices", async () => {
+  it("migrates a stored local TTS mode to Kokoro and drops old voice packs", async () => {
     const stored = {
       ...DEFAULT_SETTINGS,
       ttsMode: "local",
@@ -767,7 +767,7 @@ describe("useSettings", () => {
     const { result } = renderHook(() => useSettings());
     await flushSettingsLoad();
 
-    expect(result.current.settings.ttsMode).toBe("native");
+    expect(result.current.settings.ttsMode).toBe("kokoro");
     expect(
       (result.current.settings as Record<string, unknown>).localTtsVoices,
     ).toBeUndefined();

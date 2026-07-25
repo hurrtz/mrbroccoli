@@ -6,6 +6,7 @@
     "icon": "./assets/appIcon.png",
     "version": "2.4.0",
     "platforms": ["ios", "android"],
+    "plugins": ["./plugins/withKokoroBackgroundDownload"],
     "ios": {
       "icon": "./assets/appIcon.png",
       "bundleIdentifier": "com.tobiaswinkler.app.mrbroccoli"

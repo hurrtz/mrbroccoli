@@ -2,7 +2,8 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { createSpeechRequestId } from "../../services/speech/diagnostics";
 import { streamChat } from "../../services/llm";
-import { synthesizeProviderSpeech } from "../../services/tts/providerRoute";
+import { synthesizeSpeech } from "../../services/tts";
+import { resolveKokoroLanguage } from "../../constants/kokoro";
 import { transcribeAudio } from "../../services/whisper";
 import type { Settings } from "../../types";
 import { useAudioPlayer } from "../../hooks/useAudioPlayer";
@@ -263,13 +264,48 @@ export function useSetupGuideVoiceTest(params: {
 
     setPhase("synthesizing");
 
-    const audioUri = await synthesizeProviderSpeech({
+    const diagnostics = {
+      requestId: createSpeechRequestId("setup"),
+      source: "preview" as const,
+      mode: routes.tts.kind === "kokoro" ? "kokoro" as const : "provider" as const,
+      provider:
+        routes.tts.kind === "provider" ? routes.tts.provider : null,
+      providerModel:
+        routes.tts.kind === "provider" ? routes.tts.model : null,
+    };
+
+    if (
+      routes.tts.kind === "kokoro" &&
+      !resolveKokoroLanguage({
+        text: trimmedReply,
+        listenLanguages: settings.ttsListenLanguages,
+      })
+    ) {
+      player.resetCancellation();
+      player.speakText(trimmedReply, { diagnostics });
+      setPhase("speaking");
+      await player.waitForDrain();
+      abortControllerRef.current = null;
+      setPhase("success");
+      return;
+    }
+
+    const audioUri = await synthesizeSpeech({
       text: trimmedReply,
       voice: routes.tts.voice,
-      provider: routes.tts.provider,
-      providerModel: routes.tts.model,
-      apiKey: settings.apiKeys[routes.tts.provider].trim(),
+      mode: routes.tts.kind,
+      provider:
+        routes.tts.kind === "provider" ? routes.tts.provider : null,
+      providerModel:
+        routes.tts.kind === "provider" ? routes.tts.model : undefined,
+      apiKey:
+        routes.tts.kind === "provider"
+          ? settings.apiKeys[routes.tts.provider].trim()
+          : undefined,
       language: settings.language,
+      listenLanguages: settings.ttsListenLanguages,
+      kokoroVoices: settings.kokoroVoices,
+      diagnostics,
       abortSignal: abortController.signal,
     });
 
@@ -278,12 +314,7 @@ export function useSetupGuideVoiceTest(params: {
     }
 
     player.resetCancellation();
-    player.enqueueAudio(audioUri, {
-      requestId: createSpeechRequestId("setup"),
-      source: "preview",
-      provider: routes.tts.provider,
-      providerModel: routes.tts.model,
-    });
+    player.enqueueAudio(audioUri, diagnostics);
     setPhase("speaking");
     await player.waitForDrain();
     abortControllerRef.current = null;

@@ -53,8 +53,10 @@ export function useSettingsModalController({
   const speechDiagnostics = useSpeechDiagnostics(6);
   const {
     providerPreviewTexts,
+    kokoroPreviewTexts,
     nativePreviewText,
     setProviderPreviewText,
+    setKokoroPreviewText,
     setNativePreviewText,
   } = usePreviewTextState({
     settings,
@@ -134,11 +136,13 @@ export function useSettingsModalController({
     activePreview,
     handlePreviewProviderVoice,
     handlePreviewNativeVoice,
+    handlePreviewKokoroVoice,
   } = useVoicePreviewState({
     visible,
     settings,
     language,
     providerPreviewTexts,
+    kokoroPreviewTexts,
     nativePreviewText,
     selectedNativeVoice,
     onPreviewVoice,
@@ -148,7 +152,7 @@ export function useSettingsModalController({
   const providerPickerDisabled =
     settings.sttMode !== "provider" || enabledSttProviders.length === 0;
   const ttsProviderPickerDisabled =
-    settings.ttsMode === "native" || enabledTtsProviders.length === 0;
+    settings.ttsMode !== "provider" || enabledTtsProviders.length === 0;
   const selectedSttProviderModelOptions =
     settings.sttProvider &&
     enabledSttProviders.includes(settings.sttProvider)
@@ -198,7 +202,9 @@ export function useSettingsModalController({
   const ttsLanguageNote =
     settings.ttsMode === "native"
       ? getNativeTtsLanguageNote(language)
-      : selectedPreviewProvider && selectedPreviewProviderModel
+      : settings.ttsMode === "provider" &&
+          selectedPreviewProvider &&
+          selectedPreviewProviderModel
         ? getProviderTtsLanguageNoteForModel(
             selectedPreviewProvider,
             selectedPreviewProviderModel,
@@ -222,7 +228,9 @@ export function useSettingsModalController({
   return {
     contentScrollRef,
     providerPreviewTexts,
+    kokoroPreviewTexts,
     setProviderPreviewText,
+    setKokoroPreviewText,
     nativePreviewText,
     setNativePreviewText,
     activePreview,
@@ -235,6 +243,7 @@ export function useSettingsModalController({
     handleTextInputFocus,
     handlePreviewProviderVoice,
     handlePreviewNativeVoice,
+    handlePreviewKokoroVoice,
     providerPickerDisabled,
     ttsProviderPickerDisabled,
     selectedSttProviderModelOptions,

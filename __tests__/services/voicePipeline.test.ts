@@ -626,6 +626,73 @@ describe("runVoicePipeline", () => {
     expect(callbacks.onSpeechTextReady).not.toHaveBeenCalled();
   });
 
+  it("routes spoken replies through Kokoro without provider credentials", async () => {
+    (streamChat as jest.Mock).mockImplementation(
+      async ({
+        onChunk,
+        onDone,
+      }: {
+        onChunk: (text: string) => void;
+        onDone: (text: string) => Promise<void>;
+      }) => {
+        onChunk("A private on-device reply.");
+        await onDone("A private on-device reply.");
+      },
+    );
+    (synthesizeSpeech as jest.Mock).mockResolvedValueOnce(
+      "file:///tmp/kokoro.wav",
+    );
+    const callbacks = {
+      onTranscription: jest.fn(),
+      onChunk: jest.fn(),
+      onResponseDone: jest.fn(),
+      onAudioReady: jest.fn(),
+      onSpeechTextReady: jest.fn(),
+      onError: jest.fn(),
+    };
+    const kokoroVoices = { en: "af_sol", zh: "zf_001" };
+
+    await runVoicePipeline({
+      transcriptionOverride: "Reply locally.",
+      messages: [],
+      model: "gpt-5.4",
+      provider: "openai",
+      providerApiKey: "sk-test",
+      sttMode: "native",
+      ttsMode: "kokoro",
+      ttsVoice: "af_sol",
+      kokoroVoices,
+      ttsListenLanguages: ["en"],
+      replyPlayback: "stream",
+      assistantInstructions: "You are a voice assistant.",
+      responseLength: "normal",
+      responseTone: "professional",
+      language: "en",
+      callbacks,
+    });
+
+    expect(synthesizeSpeech).toHaveBeenCalledWith(
+      expect.objectContaining({
+        text: "A private on-device reply.",
+        mode: "kokoro",
+        voice: "af_sol",
+        kokoroVoices,
+        apiKey: undefined,
+        provider: undefined,
+      }),
+    );
+    expect(callbacks.onAudioReady).toHaveBeenCalledWith(
+      "file:///tmp/kokoro.wav",
+      expect.objectContaining({
+        mode: "kokoro",
+        provider: null,
+        language: "en",
+        voice: "af_sol",
+      }),
+    );
+    expect(callbacks.onSpeechTextReady).not.toHaveBeenCalled();
+  });
+
   it("speaks each provider TTS chunk in stream mode", async () => {
     (streamChat as jest.Mock).mockImplementation(
       async ({

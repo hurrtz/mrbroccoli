@@ -92,7 +92,7 @@ export function getNormalizedTtsProvider(
   settings: Settings,
   enabledTtsProviders: Provider[],
 ) {
-  if (settings.ttsMode === "native") {
+  if (settings.ttsMode !== "provider") {
     return null;
   }
 

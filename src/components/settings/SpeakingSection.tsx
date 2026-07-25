@@ -9,12 +9,14 @@ import { providerTtsModelSupportsInstructions } from "../../constants/models";
 import { useLocalization } from "../../i18n";
 import type { ProviderVoiceDirectories } from "../../services/providerVoiceDirectory";
 import type {
+  KokoroLanguage,
   Provider,
   ReplyPlayback,
   Settings,
   TtsBackendMode,
   TtsListenLanguage,
 } from "../../types";
+import type { KokoroModelController } from "../../hooks/useKokoroModel";
 import { useTheme } from "../../theme/ThemeContext";
 import { Picker } from "../Picker";
 
@@ -26,6 +28,7 @@ import {
 } from "./shared";
 import { styles } from "./styles";
 import {
+  KokoroVoiceSection,
   NativeVoicePreviewSection,
   ProviderVoicePreviewSection,
 } from "./TtsSections";
@@ -47,6 +50,8 @@ export function SpeakingSection({
   nativeVoiceOptions,
   selectedNativeVoice,
   nativePreviewText,
+  kokoroModel,
+  kokoroPreviewTexts,
   onUpdate,
   onUpdateProviderTtsModel,
   onUpdateProviderTtsVoice,
@@ -54,8 +59,10 @@ export function SpeakingSection({
   onStopPreviewVoice,
   onSetProviderPreviewText,
   onSetNativePreviewText,
+  onSetKokoroPreviewText,
   onPreviewProviderVoice,
   onPreviewNativeVoice,
+  onPreviewKokoroVoice,
   onSelectNativeVoice,
   onTextInputFocus,
   onToggleListenLanguage,
@@ -71,6 +78,8 @@ export function SpeakingSection({
   nativeVoiceOptions: { value: string; label: string }[];
   selectedNativeVoice: string;
   nativePreviewText: string;
+  kokoroModel: KokoroModelController;
+  kokoroPreviewTexts: Record<KokoroLanguage, string>;
   onUpdate: (
     partial: Partial<Omit<Settings, "apiKeys" | "providerModels">>,
   ) => void;
@@ -84,11 +93,16 @@ export function SpeakingSection({
     text: string,
   ) => void;
   onSetNativePreviewText: (text: string) => void;
+  onSetKokoroPreviewText: (
+    language: KokoroLanguage,
+    text: string,
+  ) => void;
   onPreviewProviderVoice: (
     provider: Provider,
     previewLanguage: TtsListenLanguage,
   ) => Promise<void>;
   onPreviewNativeVoice: () => Promise<void>;
+  onPreviewKokoroVoice: (language: KokoroLanguage) => Promise<void>;
   onSelectNativeVoice: (voiceId: string) => void;
   onTextInputFocus: TextInputFocusHandler;
   onToggleListenLanguage: (language: TtsListenLanguage) => void;
@@ -182,6 +196,11 @@ export function SpeakingSection({
               value: "native",
               label: t("systemVoice"),
               description: t("nativeTtsDescription"),
+            },
+            {
+              value: "kokoro",
+              label: "Kokoro",
+              description: t("kokoroTtsDescription"),
             },
             {
               value: "provider",
@@ -282,6 +301,27 @@ export function SpeakingSection({
             onSelectVoice={onSelectNativeVoice}
             onSetPreviewText={onSetNativePreviewText}
             onPreview={onPreviewNativeVoice}
+            onStopPreview={onStopPreviewVoice}
+            onTextInputFocus={onTextInputFocus}
+          />
+        ) : null}
+
+        {settings.ttsMode === "kokoro" ? (
+          <KokoroVoiceSection
+            settings={settings}
+            model={kokoroModel}
+            previewTexts={kokoroPreviewTexts}
+            activePreview={activePreview}
+            onUpdateVoice={(language, voice) =>
+              onUpdate({
+                kokoroVoices: {
+                  ...settings.kokoroVoices,
+                  [language]: voice,
+                },
+              })
+            }
+            onSetPreviewText={onSetKokoroPreviewText}
+            onPreview={onPreviewKokoroVoice}
             onStopPreview={onStopPreviewVoice}
             onTextInputFocus={onTextInputFocus}
           />

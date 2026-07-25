@@ -17,6 +17,7 @@ import {
   type WebSearchProviderSettings,
 } from "./constants/webSearch";
 import type { RuntimeAppProviderId } from "./constants/providers/runtimeManifest";
+import { DEFAULT_KOKORO_VOICES } from "./constants/kokoro";
 
 export type Provider = RuntimeAppProviderId;
 export type InputMode =
@@ -40,7 +41,9 @@ export type TtsListenLanguage =
   | "it"
   | "ja";
 export type SttBackendMode = "native" | "provider";
-export type TtsBackendMode = "native" | "provider";
+export type TtsBackendMode = "native" | "kokoro" | "provider";
+export type KokoroLanguage = "en" | "zh";
+export type KokoroVoiceSelections = Record<KokoroLanguage, string>;
 export type ProviderCapability =
   | "llm"
   | "stt"
@@ -91,6 +94,12 @@ export type VoicePreviewRequest =
     }
   | {
       text: string;
+      mode: "kokoro";
+      language: KokoroLanguage;
+      voice: string;
+    }
+  | {
+      text: string;
       mode: "provider";
       provider: Provider;
       voice: string;
@@ -138,6 +147,7 @@ export interface Settings {
   providerSttModels: ProviderSttModelSelections;
   providerTtsModels: ProviderTtsModelSelections;
   providerTtsVoices: ProviderTtsVoiceSelections;
+  kokoroVoices: KokoroVoiceSelections;
   providerValidationResults: ProviderValidationResults;
   language: AppLanguage;
   theme: ThemeMode;
@@ -356,6 +366,7 @@ export const DEFAULT_SETTINGS: Settings = {
   providerSttModels: DEFAULT_PROVIDER_STT_MODELS,
   providerTtsModels: DEFAULT_PROVIDER_TTS_MODELS,
   providerTtsVoices: DEFAULT_PROVIDER_TTS_VOICES,
+  kokoroVoices: DEFAULT_KOKORO_VOICES,
   providerValidationResults: {},
   language: "en",
   theme: "system",

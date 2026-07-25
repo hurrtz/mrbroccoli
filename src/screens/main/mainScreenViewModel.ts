@@ -95,6 +95,8 @@ export function getMainScreenViewModel({
       ? t("spokenRepliesOff")
       : settings.ttsMode === "native"
         ? t("systemVoice")
+        : settings.ttsMode === "kokoro"
+          ? `Kokoro · ${settings.kokoroVoices.en}`
         : ttsProvider
           ? `${PROVIDER_LABELS[ttsProvider]}${
               getProviderTtsModelOptions(ttsProvider).length > 1 &&
@@ -107,7 +109,7 @@ export function getMainScreenViewModel({
   const fallbackTtsStatusLabel =
     !settings.spokenRepliesEnabled
       ? null
-      : settings.ttsMode === "provider"
+      : settings.ttsMode === "provider" || settings.ttsMode === "kokoro"
         ? t("systemVoice")
         : null;
 

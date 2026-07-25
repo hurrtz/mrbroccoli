@@ -389,14 +389,18 @@ export function createVoicePipelineEventAdapter({
         },
       });
       producedAudioRef.current = true;
+      const actualMode =
+        diagnostics?.mode === "kokoro" || ttsMode === "kokoro"
+          ? "kokoro"
+          : "provider";
       messageState.updateAssistantTurnReceipt((receipt) => ({
         ...receipt,
         speechOutput: {
           ...receipt.speechOutput,
-          actualMode: "provider",
-          provider: ttsProvider,
-          model: selectedTtsModel,
-          voice: selectedTtsVoice,
+          actualMode,
+          provider: actualMode === "provider" ? ttsProvider : null,
+          model: actualMode === "provider" ? selectedTtsModel : undefined,
+          voice: diagnostics?.voice ?? selectedTtsVoice,
         },
       }));
       if (!playbackStartedRef.current) {

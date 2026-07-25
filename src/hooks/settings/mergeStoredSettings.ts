@@ -18,6 +18,7 @@ import {
   isWebSearchProvider,
   normalizeWebSearchProviderSettings,
 } from "../../constants/webSearch";
+import { normalizeKokoroVoiceSelections } from "../../constants/kokoro";
 import {
   type Provider,
   type ProviderApiKeys,
@@ -626,7 +627,12 @@ export function mergeSettings(
     (apiKey) => apiKey.trim().length > 0,
   );
   const ttsMode: Settings["ttsMode"] =
-    storedSettings?.ttsMode === "provider" ? "provider" : "native";
+    storedSettings?.ttsMode === "provider"
+      ? "provider"
+      : storedSettings?.ttsMode === "kokoro" ||
+          storedSettings?.ttsMode === "local"
+        ? "kokoro"
+        : "native";
   // "auto" was a legacy enabled state; coerce it to "on".
   const rawWebSearchMode =
     storedSettings?.webSearchMode === "auto"
@@ -697,6 +703,9 @@ export function mergeSettings(
       ...DEFAULT_SETTINGS.providerTtsVoices,
       ...extractStoredProviderTtsVoices(storedSettings),
     },
+    kokoroVoices: normalizeKokoroVoiceSelections(
+      storedSettings?.kokoroVoices,
+    ),
     providerValidationResults:
       extractStoredProviderValidationResults(storedSettings),
     apiKeys: mergedApiKeys,

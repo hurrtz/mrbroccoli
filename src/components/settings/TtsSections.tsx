@@ -1,6 +1,7 @@
 import React from "react";
 import {
   ActivityIndicator,
+  Alert,
   Text,
   TextInput,
   TouchableOpacity,
@@ -10,6 +11,11 @@ import Feather from "@expo/vector-icons/Feather";
 
 import { getTtsListenLanguageLabel } from "../../constants/localTts";
 import {
+  KOKORO_MODEL_DOWNLOAD_BYTES,
+  KOKORO_MODEL_INSTALLED_BYTES,
+  getKokoroVoiceOptions,
+} from "../../constants/kokoro";
+import {
   PROVIDER_DEFAULT_TTS_MODELS,
   PROVIDER_DEFAULT_TTS_VOICES,
   PROVIDER_LABELS,
@@ -18,7 +24,13 @@ import {
   providerUsesTtsVoiceDirectory,
 } from "../../constants/models";
 import { useLocalization } from "../../i18n";
-import { Provider, Settings, TtsListenLanguage } from "../../types";
+import {
+  KokoroLanguage,
+  Provider,
+  Settings,
+  TtsListenLanguage,
+} from "../../types";
+import type { KokoroModelController } from "../../hooks/useKokoroModel";
 import { useTheme } from "../../theme/ThemeContext";
 import type { ProviderVoiceDirectories } from "../../services/providerVoiceDirectory";
 import { Picker } from "../Picker";
@@ -393,6 +405,226 @@ export function NativeVoicePreviewSection({
           </Text>
         )}
       </View>
+    </View>
+  );
+}
+
+export function KokoroVoiceSection({
+  settings,
+  model,
+  previewTexts,
+  activePreview,
+  onUpdateVoice,
+  onSetPreviewText,
+  onPreview,
+  onStopPreview,
+  onTextInputFocus,
+}: {
+  settings: Settings;
+  model: KokoroModelController;
+  previewTexts: Record<KokoroLanguage, string>;
+  activePreview: { id: string; phase: PreviewButtonPhase } | null;
+  onUpdateVoice: (language: KokoroLanguage, voice: string) => void;
+  onSetPreviewText: (language: KokoroLanguage, text: string) => void;
+  onPreview: (language: KokoroLanguage) => Promise<void>;
+  onStopPreview: () => Promise<void>;
+  onTextInputFocus: TextInputFocusHandler;
+}) {
+  const { colors } = useTheme();
+  const { t, language: appLanguage } = useLocalization();
+  const previewLanguages: KokoroLanguage[] = ["en", "zh"];
+  const progressPercent = Math.round(model.progress * 100);
+  const downloadSize = Math.round(KOKORO_MODEL_DOWNLOAD_BYTES / 1024 / 1024);
+  const installedSize = Math.round(
+    KOKORO_MODEL_INSTALLED_BYTES / 1024 / 1024,
+  );
+  const statusText = model.error
+    ? model.error
+    : model.busy === "downloading"
+      ? t(
+          model.phase === "extracting"
+            ? "kokoroExtracting"
+            : "kokoroDownloading",
+          { progress: progressPercent },
+        )
+      : model.busy === "verifying"
+        ? t("kokoroVerifying")
+        : model.busy === "checking"
+          ? t("kokoroChecking")
+          : model.installed
+            ? t("kokoroInstalled")
+            : t("kokoroNotInstalled");
+
+  const handleRemove = () => {
+    Alert.alert(
+      t("kokoroRemoveTitle"),
+      t("kokoroRemoveBody", { installedSize }),
+      [
+        { text: t("cancel"), style: "cancel" },
+        {
+          text: t("remove"),
+          style: "destructive",
+          onPress: () => {
+            void model.remove();
+          },
+        },
+      ],
+    );
+  };
+
+  return (
+    <View
+      style={[
+        styles.voicePreviewSection,
+        { borderTopColor: colors.border },
+      ]}
+    >
+      <View style={styles.voicePreviewHeader}>
+        <Text
+          accessibilityRole="header"
+          style={[styles.groupLabel, { color: colors.text }]}
+        >
+          {t("kokoroVoices")}
+        </Text>
+        <Text
+          style={[
+            styles.sectionHint,
+            styles.voicePreviewHeaderHint,
+            { color: colors.textMuted },
+          ]}
+        >
+          {t("kokoroVoicesHint", {
+            size: downloadSize,
+            installedSize,
+          })}
+        </Text>
+      </View>
+
+      <View
+        style={[
+          styles.localPackCard,
+          {
+            backgroundColor: colors.surfaceElevated,
+            borderColor: model.error ? colors.danger : colors.border,
+          },
+        ]}
+      >
+        <View style={styles.localPackHeader}>
+          <View style={styles.localPackCopy}>
+            <Text style={[styles.previewLabel, { color: colors.text }]}>
+              {t("kokoroModel")}
+            </Text>
+            <Text
+              style={[
+                styles.previewHint,
+                {
+                  color: model.error
+                    ? colors.danger
+                    : model.installed
+                      ? colors.success
+                      : colors.textMuted,
+                },
+              ]}
+            >
+              {statusText}
+            </Text>
+          </View>
+          <TouchableOpacity
+            accessibilityRole="button"
+            disabled={model.busy !== null}
+            onPress={() => {
+              if (model.installed) {
+                handleRemove();
+              } else {
+                void model.download();
+              }
+            }}
+            style={[
+              styles.providerVoiceRefreshButton,
+              {
+                backgroundColor: colors.surface,
+                borderColor: colors.border,
+                opacity: model.busy !== null ? 0.6 : 1,
+              },
+            ]}
+          >
+            {model.busy ? (
+              <ActivityIndicator size="small" color={colors.accent} />
+            ) : (
+              <Feather
+                name={model.installed ? "trash-2" : "download"}
+                size={15}
+                color={model.installed ? colors.danger : colors.accent}
+              />
+            )}
+            <Text
+              style={[
+                styles.providerVoiceRefreshLabel,
+                {
+                  color: model.installed ? colors.danger : colors.accent,
+                },
+              ]}
+            >
+              {t(model.installed ? "remove" : "download")}
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+
+      <Text
+        style={[
+          styles.sectionHint,
+          { color: colors.textMuted, marginTop: 12 },
+        ]}
+      >
+        {t("kokoroLanguageFallback")}
+      </Text>
+
+      {previewLanguages.map((previewLanguage) => {
+        const previewId = `kokoro:${previewLanguage}`;
+        const voiceOptions = getKokoroVoiceOptions(
+          previewLanguage,
+          appLanguage,
+        );
+
+        return (
+          <View
+            key={previewLanguage}
+            style={[
+              styles.previewLanguageBlock,
+              { borderTopColor: colors.border },
+            ]}
+          >
+            <Text
+              style={[styles.previewLabel, { color: colors.textSecondary }]}
+            >
+              {getTtsListenLanguageLabel(previewLanguage, appLanguage)}
+            </Text>
+            <Picker
+              label={t("ttsVoice")}
+              value={settings.kokoroVoices[previewLanguage]}
+              options={voiceOptions}
+              onChange={(voice) => onUpdateVoice(previewLanguage, voice)}
+            />
+            <PreviewComposer
+              text={previewTexts[previewLanguage]}
+              setText={(text) => onSetPreviewText(previewLanguage, text)}
+              phase={
+                activePreview?.id === previewId
+                  ? activePreview.phase
+                  : "idle"
+              }
+              interactionDisabled={
+                !model.installed ||
+                (activePreview !== null && activePreview.id !== previewId)
+              }
+              onPreview={() => onPreview(previewLanguage)}
+              onStop={onStopPreview}
+              onTextInputFocus={onTextInputFocus}
+            />
+          </View>
+        );
+      })}
     </View>
   );
 }

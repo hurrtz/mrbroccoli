@@ -6,10 +6,17 @@ import {
 } from "./speech/diagnostics";
 import {
   AppLanguage,
+  KokoroVoiceSelections,
   Provider,
   TtsBackendMode,
   TtsListenLanguage,
 } from "../types";
+import {
+  DEFAULT_KOKORO_VOICES,
+  KOKORO_TTS_TARGET_CHUNK_CHARS,
+  resolveKokoroLanguage,
+} from "../constants/kokoro";
+import { synthesizeKokoroSpeech } from "./kokoroTts";
 import {
   splitIntoSentences,
   splitTextForTts,
@@ -117,6 +124,7 @@ export async function synthesizeSpeech(params: {
   nextText?: string;
   language: AppLanguage;
   listenLanguages?: TtsListenLanguage[];
+  kokoroVoices?: KokoroVoiceSelections;
   diagnostics?: SpeechDiagnosticsContext;
   abortSignal?: AbortSignal;
   onProviderFallback?: (error: Error) => void;
@@ -159,6 +167,62 @@ export async function synthesizeSpeech(params: {
     throw new Error(
       translate(language, "nativeTtsDoesNotSynthesizeAudioFiles"),
     );
+  }
+
+  if (mode === "kokoro") {
+    try {
+      const kokoroLanguage = resolveKokoroLanguage({
+        text,
+        listenLanguages,
+      });
+      const kokoroVoices = params.kokoroVoices
+        ? params.kokoroVoices
+        : kokoroLanguage
+          ? {
+              ...DEFAULT_KOKORO_VOICES,
+              [kokoroLanguage]: voice || DEFAULT_KOKORO_VOICES[kokoroLanguage],
+            }
+          : DEFAULT_KOKORO_VOICES;
+      const result = await synthesizeKokoroSpeech({
+        text,
+        listenLanguages,
+        voices: kokoroVoices,
+        abortSignal,
+      });
+
+      recordSpeechDiagnostic({
+        requestId,
+        source: diagnostics?.source ?? "unknown",
+        stage: "tts-succeeded",
+        requestedRoute: "kokoro",
+        actualRoute: "kokoro",
+        provider: null,
+        providerModel: null,
+        voice: result.voice,
+        language: result.language,
+        textLength: text.trim().length,
+      });
+      return result.fileUri;
+    } catch (kokoroError) {
+      const normalizedKokoroError =
+        kokoroError instanceof Error
+          ? kokoroError
+          : new Error(String(kokoroError));
+
+      recordSpeechDiagnostic({
+        requestId,
+        source: diagnostics?.source ?? "unknown",
+        stage: "tts-failed",
+        requestedRoute: "kokoro",
+        actualRoute: "kokoro",
+        provider: null,
+        providerModel: null,
+        voice: voice || null,
+        textLength: text.trim().length,
+        message: normalizedKokoroError.message,
+      });
+      throw normalizedKokoroError;
+    }
   }
 
   if (!provider) {
@@ -248,15 +312,18 @@ export async function synthesizeSpeechSequence(params: {
   nextText?: string;
   language: AppLanguage;
   listenLanguages?: TtsListenLanguage[];
+  kokoroVoices?: KokoroVoiceSelections;
   diagnostics?: SpeechDiagnosticsContext;
   abortSignal?: AbortSignal;
 }) {
   const segments = splitTextForTts(
     params.text,
-    Math.min(
-      PROVIDER_TTS_MAX_INPUT_CHARS,
-      getProviderTtsTargetChunkChars(params.provider),
-    ),
+    params.mode === "kokoro"
+      ? KOKORO_TTS_TARGET_CHUNK_CHARS
+      : Math.min(
+          PROVIDER_TTS_MAX_INPUT_CHARS,
+          getProviderTtsTargetChunkChars(params.provider),
+        ),
   );
 
   if (segments.length === 0) {

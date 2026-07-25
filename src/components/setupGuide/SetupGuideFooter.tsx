@@ -9,6 +9,7 @@ import type {
 } from "../../screens/main/setupGuideSupport";
 import { useTheme } from "../../theme/ThemeContext";
 import type { Provider } from "../../types";
+import type { KokoroModelController } from "../../hooks/useKokoroModel";
 import { getVoiceTestActionLabel } from "./shared";
 import { styles } from "./styles";
 import type { SetupGuideVoiceTestState } from "./types";
@@ -20,15 +21,45 @@ interface SetupGuideFooterProps {
   currentValidationState: SetupGuideValidationState;
   resolvedRoutes: SetupGuideResolvedRoutes;
   voiceTest: SetupGuideVoiceTestState;
+  kokoroModel: KokoroModelController;
+  useKokoro: boolean;
   onDismiss: () => void;
   onBack: () => void;
   onContinueFromIntro: () => void;
   onValidateProviderKey: () => void;
   onContinueFromProvider: () => void;
+  onContinueFromKokoro: () => void;
   onVoiceTestAction: () => void;
   onContinueFromVoiceTest: () => void;
   onFinish: () => void;
   onOpenSettings: () => void;
+}
+
+function KokoroFooter({
+  kokoroModel,
+  useKokoro,
+  onBack,
+  onContinueFromKokoro,
+}: Pick<
+  SetupGuideFooterProps,
+  "kokoroModel" | "useKokoro" | "onBack" | "onContinueFromKokoro"
+>) {
+  const { t } = useLocalization();
+
+  return (
+    <>
+      <SecondaryButton label={t("setupGuideBack")} onPress={onBack} />
+      <PrimaryButton
+        label={
+          useKokoro
+            ? t("setupGuideContinue")
+            : t("setupGuideSkipKokoro")
+        }
+        disabled={kokoroModel.busy !== null}
+        onPress={onContinueFromKokoro}
+      />
+    </>
+  );
 }
 
 function SecondaryButton({
@@ -243,6 +274,7 @@ export function SetupGuideFooter(props: SetupGuideFooterProps) {
     <View style={styles.footer}>
       {props.step === "intro" ? <IntroFooter {...props} /> : null}
       {props.step === "provider" ? <ProviderFooter {...props} /> : null}
+      {props.step === "kokoro" ? <KokoroFooter {...props} /> : null}
       {props.step === "voice-test" ? <VoiceTestFooter {...props} /> : null}
       {props.step === "summary" ? <SummaryFooter {...props} /> : null}
     </View>

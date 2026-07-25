@@ -68,6 +68,20 @@ jest.mock("expo-file-system/legacy", () => ({
   writeAsStringAsync: jest.fn(async () => undefined),
 }));
 
+jest.mock("../../src/hooks/useKokoroModel", () => ({
+  useKokoroModel: () => ({
+    installed: false,
+    verified: false,
+    busy: null,
+    phase: null,
+    progress: 0,
+    error: null,
+    download: jest.fn(async () => true),
+    refresh: jest.fn(async () => undefined),
+    remove: jest.fn(async () => true),
+  }),
+}));
+
 jest.mock("../../src/context/SettingsContext", () => ({
   useSharedSettings: jest.fn(() => ({
     settings: require("../../src/types").DEFAULT_SETTINGS,

@@ -6,6 +6,7 @@ import type {
   SetupGuideValidationState,
 } from "../../screens/main/setupGuideSupport";
 import type { SetupGuideVoiceTestPhase } from "../../screens/main/useSetupGuideVoiceTest";
+import type { KokoroModelController } from "../../hooks/useKokoroModel";
 
 export interface SetupGuideVoiceTestState {
   phase: SetupGuideVoiceTestPhase;
@@ -26,6 +27,8 @@ export interface SetupGuideModalProps {
   currentValidationState: SetupGuideValidationState;
   resolvedRoutes: SetupGuideResolvedRoutes;
   voiceTest: SetupGuideVoiceTestState;
+  kokoroModel: KokoroModelController;
+  useKokoro: boolean;
   onSelectProvider: (provider: Provider | null) => void;
   onChangeProviderApiKey: (value: string) => void;
   onDismiss: () => void;
@@ -33,6 +36,9 @@ export interface SetupGuideModalProps {
   onContinueFromIntro: () => void;
   onValidateProviderKey: () => void;
   onContinueFromProvider: () => void;
+  onToggleKokoro: (enabled: boolean) => void;
+  onDownloadKokoro: () => void;
+  onContinueFromKokoro: () => void;
   onVoiceTestAction: () => void;
   onResetVoiceTest: () => void;
   onContinueFromVoiceTest: () => void;

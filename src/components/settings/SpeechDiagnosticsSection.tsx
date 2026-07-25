@@ -7,6 +7,7 @@ import {
 import { useLocalization } from "../../i18n";
 import {
   clearSpeechDiagnostics,
+  type SpeechDiagnosticRoute,
   type SpeechDiagnosticRequestSummary,
 } from "../../services/speech/diagnostics";
 import { useTheme } from "../../theme/ThemeContext";
@@ -15,10 +16,10 @@ import { PickerSection } from "./SettingsSectionPrimitives";
 import { styles } from "./styles";
 
 function getSpeechRouteLabel(
-  route: "local" | "provider" | "native" | null,
+  route: SpeechDiagnosticRoute | null,
   t: ReturnType<typeof useLocalization>["t"],
 ) {
-  if (route === "local") {
+  if (route === "local" || route === "kokoro") {
     return t("localTts");
   }
 

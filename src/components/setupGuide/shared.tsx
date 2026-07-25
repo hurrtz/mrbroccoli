@@ -67,6 +67,10 @@ export function getTtsRouteCopy(
   t: Translate,
   routes: SetupGuideResolvedRoutes,
 ) {
+  if (routes.tts.kind === "kokoro") {
+    return t("setupGuideRouteKokoroTts");
+  }
+
   if (routes.tts.kind === "provider") {
     return t("setupGuideRouteProviderTts", {
       provider: PROVIDER_LABELS[routes.tts.provider],

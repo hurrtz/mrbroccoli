@@ -22,7 +22,12 @@ import {
 } from "../../utils/responseModes";
 import { hasProviderCredentialForCapability } from "../../utils/providerCredentials";
 
-export type SetupGuideStep = "intro" | "provider" | "voice-test" | "summary";
+export type SetupGuideStep =
+  | "intro"
+  | "provider"
+  | "kokoro"
+  | "voice-test"
+  | "summary";
 
 export type SetupGuideValidationState = {
   status: "idle" | "validating" | "success" | "error";
@@ -59,6 +64,11 @@ export interface SetupGuideResolvedRoutes {
         kind: "disabled";
       };
   tts:
+    | {
+        enabled: true;
+        kind: "kokoro";
+        voice: string;
+      }
     | {
         enabled: true;
         kind: "provider";
@@ -144,8 +154,9 @@ export function resolveSetupGuideRoutes(params: {
   provider: Provider;
   settings: Settings;
   systemSttAvailable: boolean;
+  useKokoro?: boolean;
 }): SetupGuideResolvedRoutes {
-  const { provider, settings, systemSttAvailable } = params;
+  const { provider, settings, systemSttAvailable, useKokoro = false } = params;
   const apiKey = settings.apiKeys[provider].trim();
   const llmModel = getSetupGuideValidationModel(provider);
   const providerSttModel = settings.providerSttModels[provider]?.trim() || "";
@@ -193,7 +204,13 @@ export function resolveSetupGuideRoutes(params: {
             enabled: false,
             kind: "disabled",
           },
-    tts: providerTtsEnabled
+    tts: useKokoro
+      ? {
+          enabled: true,
+          kind: "kokoro",
+          voice: settings.kokoroVoices.en,
+        }
+      : providerTtsEnabled
       ? {
           enabled: true,
           kind: "provider",

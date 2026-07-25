@@ -5,7 +5,13 @@ import {
   PROVIDER_DEFAULT_TTS_VOICES,
   getProviderTtsVoiceOptions,
 } from "../../constants/models";
-import { AppLanguage, Provider, Settings, TtsListenLanguage } from "../../types";
+import {
+  AppLanguage,
+  KokoroLanguage,
+  Provider,
+  Settings,
+  TtsListenLanguage,
+} from "../../types";
 
 import {
   PreviewButtonPhase,
@@ -18,6 +24,7 @@ export function useVoicePreviewState(params: {
   settings: Settings;
   language: AppLanguage;
   providerPreviewTexts: ProviderPreviewTexts;
+  kokoroPreviewTexts: Record<KokoroLanguage, string>;
   nativePreviewText: string;
   selectedNativeVoice: string;
   onPreviewVoice: SettingsModalProps["onPreviewVoice"];
@@ -28,6 +35,7 @@ export function useVoicePreviewState(params: {
     settings,
     language,
     providerPreviewTexts,
+    kokoroPreviewTexts,
     nativePreviewText,
     selectedNativeVoice,
     onPreviewVoice,
@@ -131,9 +139,22 @@ export function useVoicePreviewState(params: {
     });
   }, [handleExactPreview, nativePreviewText, selectedNativeVoice]);
 
+  const handlePreviewKokoroVoice = useCallback(
+    async (previewLanguage: KokoroLanguage) => {
+      await handleExactPreview(`kokoro:${previewLanguage}`, {
+        text: kokoroPreviewTexts[previewLanguage],
+        mode: "kokoro",
+        language: previewLanguage,
+        voice: settings.kokoroVoices[previewLanguage],
+      });
+    },
+    [handleExactPreview, kokoroPreviewTexts, settings.kokoroVoices],
+  );
+
   return {
     activePreview,
     handlePreviewProviderVoice,
     handlePreviewNativeVoice,
+    handlePreviewKokoroVoice,
   };
 }

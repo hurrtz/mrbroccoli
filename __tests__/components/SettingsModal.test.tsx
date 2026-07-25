@@ -74,12 +74,25 @@ jest.mock("../../src/components/ProviderIcon", () => ({
 }));
 
 function renderSettingsModal(overrideProps: Partial<React.ComponentProps<typeof SettingsModal>> = {}) {
+  const kokoroModel = {
+    installed: false,
+    verified: false,
+    busy: null,
+    phase: null,
+    progress: 0,
+    error: null,
+    download: jest.fn(async () => true),
+    refresh: jest.fn(async () => undefined),
+    remove: jest.fn(async () => true),
+  } as const;
+
   return render(
     <ThemeProvider mode="light">
       <LocalizationProvider language="en">
         <SettingsModal
           visible
           settings={DEFAULT_SETTINGS}
+          kokoroModel={kokoroModel}
           providerVoiceDirectories={{}}
           onUpdate={jest.fn()}
           onUpdateResponseModeRoute={jest.fn()}
@@ -156,6 +169,43 @@ describe("SettingsModal", () => {
       expect(screen.queryByText("Runtime Readiness")).toBeNull();
       expect(screen.queryByPlaceholderText("Search services")).toBeNull();
     });
+  });
+
+  it("offers the optional Kokoro model and downloads it from Speaking settings", async () => {
+    const download = jest.fn(async () => true);
+    const screen = renderSettingsModal({
+      focusTab: "tts",
+      settings: {
+        ...DEFAULT_SETTINGS,
+        ttsMode: "kokoro",
+      },
+      kokoroModel: {
+        installed: false,
+        verified: false,
+        busy: null,
+        phase: null,
+        progress: 0,
+        error: null,
+        download,
+        refresh: jest.fn(async () => undefined),
+        remove: jest.fn(async () => true),
+      },
+    });
+
+    await waitFor(() => {
+      expect(screen.getByText("Kokoro On-device Voices")).toBeTruthy();
+      expect(
+        screen.getByText(
+          "The multilingual model downloads about 140 MB and occupies about 211 MB after installation.",
+        ),
+      ).toBeTruthy();
+      expect(
+        screen.getByText("Optional download. No provider key required."),
+      ).toBeTruthy();
+    });
+
+    fireEvent.press(screen.getByText("Download"));
+    expect(download).toHaveBeenCalledTimes(1);
   });
 
   it("sorts provider connections alphabetically", async () => {

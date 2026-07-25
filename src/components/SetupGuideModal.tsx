@@ -25,6 +25,7 @@ import type { SetupGuideModalProps } from "./setupGuide/types";
 const STEP_ORDER: SetupGuideStep[] = [
   "intro",
   "provider",
+  "kokoro",
   "voice-test",
   "summary",
 ];
@@ -38,6 +39,8 @@ export const SetupGuideModal = React.memo(function SetupGuideModal({
   currentValidationState,
   resolvedRoutes,
   voiceTest,
+  kokoroModel,
+  useKokoro,
   onSelectProvider,
   onChangeProviderApiKey,
   onDismiss,
@@ -45,6 +48,9 @@ export const SetupGuideModal = React.memo(function SetupGuideModal({
   onContinueFromIntro,
   onValidateProviderKey,
   onContinueFromProvider,
+  onToggleKokoro,
+  onDownloadKokoro,
+  onContinueFromKokoro,
   onVoiceTestAction,
   onResetVoiceTest,
   onContinueFromVoiceTest,
@@ -66,6 +72,8 @@ export const SetupGuideModal = React.memo(function SetupGuideModal({
       ? t("setupGuideIntroTitle")
       : step === "provider"
         ? t("setupGuideProviderTitle")
+        : step === "kokoro"
+          ? t("setupGuideKokoroTitle")
         : step === "voice-test"
           ? t("setupGuideVoiceTestTitle")
           : t("setupGuideSummaryTitle");
@@ -188,8 +196,12 @@ export const SetupGuideModal = React.memo(function SetupGuideModal({
                 currentValidationState={currentValidationState}
                 resolvedRoutes={resolvedRoutes}
                 voiceTest={voiceTest}
+                kokoroModel={kokoroModel}
+                useKokoro={useKokoro}
                 onSelectProvider={onSelectProvider}
                 onChangeProviderApiKey={onChangeProviderApiKey}
+                onToggleKokoro={onToggleKokoro}
+                onDownloadKokoro={onDownloadKokoro}
                 onResetVoiceTest={onResetVoiceTest}
                 showSettingsShortcutOption={showSettingsShortcutOption}
                 settingsShortcutVisible={settingsShortcutVisible}
@@ -206,11 +218,14 @@ export const SetupGuideModal = React.memo(function SetupGuideModal({
               currentValidationState={currentValidationState}
               resolvedRoutes={resolvedRoutes}
               voiceTest={voiceTest}
+              kokoroModel={kokoroModel}
+              useKokoro={useKokoro}
               onDismiss={onDismiss}
               onBack={onBack}
               onContinueFromIntro={onContinueFromIntro}
               onValidateProviderKey={onValidateProviderKey}
               onContinueFromProvider={onContinueFromProvider}
+              onContinueFromKokoro={onContinueFromKokoro}
               onVoiceTestAction={onVoiceTestAction}
               onContinueFromVoiceTest={onContinueFromVoiceTest}
               onFinish={onFinish}

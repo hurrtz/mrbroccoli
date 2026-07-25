@@ -49,6 +49,7 @@ export function useVoicePipeline(
     player: params.player,
     selectedTtsModel: params.selectedTtsModel,
     selectedTtsVoice: params.selectedTtsVoice,
+    kokoroVoices: params.kokoroVoices,
     ttsInstructions: params.ttsInstructions,
     showToast: params.showToast,
     t: params.t,

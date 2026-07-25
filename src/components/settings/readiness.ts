@@ -4,6 +4,7 @@ import {
   providerRequiresTtsVoice,
 } from "../../constants/models";
 import type { Provider, Settings } from "../../types";
+import { isKokoroLanguage } from "../../constants/kokoro";
 import { hasProviderCredentialForCapability } from "../../utils/providerCredentials";
 
 export type SettingsReadinessState = "ready" | "attention" | "broken" | "off";
@@ -29,6 +30,7 @@ export interface SettingsReadinessContext {
   sttProviders: Provider[];
   ttsProviders: Provider[];
   searchProviders: WebSearchProvider[];
+  kokoroInstalled?: boolean;
 }
 
 function status(state: SettingsReadinessState): SettingsReadinessStatus {
@@ -102,6 +104,16 @@ function getSpeakReadiness(
 
   if (settings.ttsMode === "native") {
     return status("ready");
+  }
+
+  if (settings.ttsMode === "kokoro") {
+    if (!context.kokoroInstalled) {
+      return status("broken");
+    }
+
+    return settings.ttsListenLanguages.every(isKokoroLanguage)
+      ? status("ready")
+      : status("attention");
   }
 
   const provider = settings.ttsProvider;

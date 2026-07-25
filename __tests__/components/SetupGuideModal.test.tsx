@@ -52,6 +52,18 @@ const defaultProps = {
     isBusy: false,
     hasCompleted: false,
   },
+  kokoroModel: {
+    installed: false,
+    verified: false,
+    busy: null,
+    phase: null,
+    progress: 0,
+    error: null,
+    download: jest.fn(async () => true),
+    refresh: jest.fn(async () => undefined),
+    remove: jest.fn(async () => true),
+  },
+  useKokoro: false,
   onSelectProvider: jest.fn(),
   onChangeProviderApiKey: jest.fn(),
   onDismiss: jest.fn(),
@@ -59,6 +71,9 @@ const defaultProps = {
   onContinueFromIntro: jest.fn(),
   onValidateProviderKey: jest.fn(),
   onContinueFromProvider: jest.fn(),
+  onToggleKokoro: jest.fn(),
+  onDownloadKokoro: jest.fn(),
+  onContinueFromKokoro: jest.fn(),
   onVoiceTestAction: jest.fn(),
   onResetVoiceTest: jest.fn(),
   onContinueFromVoiceTest: jest.fn(),
@@ -192,5 +207,24 @@ describe("SetupGuideModal", () => {
 
     fireEvent(shortcutSwitch, "valueChange", false);
     expect(onChangeSettingsShortcutVisible).toHaveBeenCalledWith(false);
+  });
+
+  it("offers Kokoro as an optional downloadable wizard step", () => {
+    const onDownloadKokoro = jest.fn();
+    const onContinueFromKokoro = jest.fn();
+    const screen = renderWithProviders(
+      <SetupGuideModal
+        {...defaultProps}
+        step="kokoro"
+        onDownloadKokoro={onDownloadKokoro}
+        onContinueFromKokoro={onContinueFromKokoro}
+      />,
+    );
+
+    expect(screen.getByText("Add a Natural On-device Voice")).toBeTruthy();
+    fireEvent.press(screen.getByText("Download Kokoro"));
+    expect(onDownloadKokoro).toHaveBeenCalledTimes(1);
+    fireEvent.press(screen.getByText("Skip for now"));
+    expect(onContinueFromKokoro).toHaveBeenCalledTimes(1);
   });
 });

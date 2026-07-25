@@ -55,6 +55,17 @@ const wrapper = ({ children }: { children: React.ReactNode }) =>
 
 function createControllerParams() {
   return {
+    kokoroModel: {
+      installed: false,
+      verified: false,
+      busy: null,
+      phase: null,
+      progress: 0,
+      error: null,
+      download: jest.fn().mockResolvedValue(true),
+      refresh: jest.fn().mockResolvedValue(undefined),
+      remove: jest.fn().mockResolvedValue(true),
+    },
     loaded: true,
     openSettings: jest.fn(),
     setSetupGuideVisible: jest.fn(),
@@ -125,6 +136,36 @@ describe("useSetupGuideController", () => {
       setupGuideDismissed: true,
     });
     expect(params.openSettings).not.toHaveBeenCalled();
+  });
+
+  it("inserts the optional Kokoro step before the voice test", async () => {
+    const params = createControllerParams();
+    params.kokoroModel.installed = true;
+    const { result } = renderHook(() => useSetupGuideController(params), {
+      wrapper,
+    });
+
+    act(() => {
+      result.current.handleOpenSetupGuide("provider");
+      result.current.handleSelectProvider("openai");
+    });
+    await act(async () => {
+      await result.current.handleValidateProviderKey();
+    });
+    act(() => {
+      result.current.handleContinueFromProvider();
+    });
+    expect(result.current.step).toBe("kokoro");
+
+    act(() => {
+      result.current.handleToggleKokoro(true);
+    });
+    expect(result.current.resolvedRoutes.tts.kind).toBe("kokoro");
+
+    act(() => {
+      result.current.handleContinueFromKokoro();
+    });
+    expect(result.current.step).toBe("voice-test");
   });
 
   it("only exposes the Settings shortcut option for a Settings launch", () => {

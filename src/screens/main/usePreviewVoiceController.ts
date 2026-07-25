@@ -66,7 +66,11 @@ export function usePreviewVoiceController({
       }
 
       const previewLanguage =
-        request.mode === "provider" ? request.previewLanguage : null;
+        request.mode === "provider"
+          ? request.previewLanguage
+          : request.mode === "kokoro"
+            ? request.language
+            : null;
 
       recordDebugLogEvent({
         event: "voice-preview-requested",
@@ -122,6 +126,35 @@ export function usePreviewVoiceController({
           return;
         }
 
+        if (request.mode === "kokoro") {
+          const kokoroSpeechDiagnostics = {
+            ...speechDiagnostics,
+            mode: "kokoro" as const,
+          };
+          const audioUri = await synthesizeSpeech({
+            text: trimmed,
+            voice: request.voice,
+            mode: "kokoro",
+            language,
+            listenLanguages: [request.language],
+            diagnostics: kokoroSpeechDiagnostics,
+            abortSignal: previewAbortController.signal,
+          });
+
+          ensurePreviewActive();
+          player.enqueueAudio(audioUri, kokoroSpeechDiagnostics);
+          callbacks?.onPlaybackStarted?.();
+          await player.waitForDrain();
+          recordDebugLogEvent({
+            event: "voice-preview-finished",
+            payload: {
+              mode: request.mode,
+              route: "kokoro-audio",
+            },
+          });
+          return;
+        }
+
         if (request.mode === "provider") {
           const providerApiKey =
             settings.apiKeys[request.provider]?.trim() ?? "";
@@ -131,6 +164,7 @@ export function usePreviewVoiceController({
             "";
           const providerSpeechDiagnostics = {
             ...speechDiagnostics,
+            mode: "provider" as const,
             provider: request.provider,
             providerModel: providerModel || null,
           };

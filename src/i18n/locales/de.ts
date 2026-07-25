@@ -269,6 +269,24 @@ export const de: TranslationDictionary = {
     "Halte Antworten vorerst textbasiert. Deine bevorzugte TTS-Route bleibt für später gespeichert.",
   nativeTtsDescription:
     "Verwende die Sprachausgabe des Geräts für die Sprachausgabe.",
+  kokoroTtsDescription:
+    "Nutze eine deutlich natürlichere neuronale Stimme vollständig auf diesem Gerät. Der Antworttext wird lokal vertont – ohne API-Key oder Nutzungskosten für einen Sprachanbieter.",
+  kokoroVoices: "Kokoro-Stimmen auf dem Gerät",
+  kokoroVoicesHint: ({ size, installedSize }) =>
+    `Das mehrsprachige Modell lädt etwa ${size} MB herunter und belegt nach der Installation ungefähr ${installedSize} MB.`,
+  kokoroModel: "Mehrsprachiges Kokoro-Modell",
+  kokoroChecking: "Prüfe das lokale Modell…",
+  kokoroDownloading: ({ progress }) => `Download läuft… ${progress} %`,
+  kokoroExtracting: ({ progress }) => `Installation läuft… ${progress} %`,
+  kokoroVerifying: "Prüfe die Sprachengine…",
+  kokoroInstalled: "Auf diesem Gerät installiert und einsatzbereit.",
+  kokoroNotInstalled: "Optionaler Download. Kein API-Key erforderlich.",
+  kokoroLanguageFallback:
+    "Kokoro spricht hier derzeit Englisch und vereinfachtes Chinesisch. Antworten in ausgewählten, noch nicht unterstützten Sprachen nutzen automatisch die Systemstimme.",
+  kokoroRemoveTitle: "Kokoro-Modell entfernen?",
+  kokoroRemoveBody: ({ installedSize }) =>
+    `Dadurch werden etwa ${installedSize} MB freigegeben. Du kannst das Modell jederzeit erneut herunterladen.`,
+  remove: "Entfernen",
   voiceOutputDescription:
     "Wähle Sprachengine, Zielsprachen und Stimmvorschauen für die Sprachausgabe.",
   localTts: "Lokal",
@@ -618,6 +636,16 @@ export const de: TranslationDictionary = {
     "Wähle einen Anbieter aus und gib einen API-Key ein, um fortzufahren, oder brich den Einrichtungsassistenten ab.",
   setupGuideProviderKeyNeedsLlmAccess: ({ provider }) =>
     `Diese Zugangsdaten für ${provider} erlauben keine Antwortanfragen.`,
+  setupGuideKokoroTitle: "Natürliche Stimme auf dem Gerät",
+  setupGuideKokoroBody: ({ size }) =>
+    `Optional: Lade Kokoro (etwa ${size} MB) herunter, um deutlich natürlichere gesprochene Antworten ohne Sprachanbieter oder Nutzungskosten zu erhalten.`,
+  setupGuideKokoroLanguageNote:
+    "Dieses Modell spricht derzeit Englisch und vereinfachtes Chinesisch. Andere ausgewählte Antwortsprachen nutzen automatisch weiterhin die Systemstimme.",
+  setupGuideKokoroDownload: "Kokoro herunterladen",
+  setupGuideUseKokoro: "Kokoro für gesprochene Antworten nutzen",
+  setupGuideUseKokoroSummary:
+    "Die Sprachsynthese bleibt auf dem Smartphone, sobald die Antwortsprache unterstützt wird.",
+  setupGuideSkipKokoro: "Vorerst überspringen",
   setupGuideVoiceTestTitle: "Setup testen",
   setupGuideVoiceTestBody:
     "Sprich einen kurzen Satz. Mr Broccoli testet Mikrofonzugriff, Transkription, die konfigurierte Antwortroute und gesprochene Ausgabe, wenn eine brauchbare Sprachroute verfügbar ist.",
@@ -650,6 +678,8 @@ export const de: TranslationDictionary = {
   setupGuideRouteProviderStt: ({ provider }) =>
     `Aktiv über ${provider}-Transkription`,
   setupGuideRouteProviderTts: ({ provider }) => `Aktiv über ${provider}-Stimme`,
+  setupGuideRouteKokoroTts:
+    "Aktiv über Kokoro auf dem Gerät, mit Systemstimme als Fallback",
   setupGuideRouteLocalTts: "Aktiv über lokales Sprachpaket",
   setupGuideRouteUnavailable: "Nicht verfügbar",
   setupGuideRouteOff: "Aus",

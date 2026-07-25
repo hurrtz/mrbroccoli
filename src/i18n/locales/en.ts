@@ -263,6 +263,24 @@ export const en: TranslationDictionary = {
     "Keep replies text-only for now. Your preferred TTS route stays saved for later.",
   nativeTtsDescription:
     "Use the device speech engine for spoken replies and voice preview.",
+  kokoroTtsDescription:
+    "Use a much more natural neural voice entirely on this device. Spoken-reply text is synthesized locally, with no speech-provider key or usage charge.",
+  kokoroVoices: "Kokoro On-device Voices",
+  kokoroVoicesHint: ({ size, installedSize }) =>
+    `The multilingual model downloads about ${size} MB and occupies about ${installedSize} MB after installation.`,
+  kokoroModel: "Kokoro multilingual model",
+  kokoroChecking: "Checking the on-device model…",
+  kokoroDownloading: ({ progress }) => `Downloading… ${progress}%`,
+  kokoroExtracting: ({ progress }) => `Installing… ${progress}%`,
+  kokoroVerifying: "Verifying the voice engine…",
+  kokoroInstalled: "Installed and ready on this device.",
+  kokoroNotInstalled: "Optional download. No provider key required.",
+  kokoroLanguageFallback:
+    "Kokoro currently speaks English and Simplified Chinese here. Replies in selected unsupported languages automatically use the system voice.",
+  kokoroRemoveTitle: "Remove the Kokoro model?",
+  kokoroRemoveBody: ({ installedSize }) =>
+    `This frees about ${installedSize} MB. You can download the model again at any time.`,
+  remove: "Remove",
   voiceOutputDescription:
     "Pick the speech engine, listening languages, and voice previews for spoken replies.",
   localTts: "Local",
@@ -605,6 +623,16 @@ export const en: TranslationDictionary = {
     "Choose a provider and add an API key to continue, or cancel the setup guide.",
   setupGuideProviderKeyNeedsLlmAccess: ({ provider }) =>
     `These ${provider} credentials do not allow reply requests.`,
+  setupGuideKokoroTitle: "Add a Natural On-device Voice",
+  setupGuideKokoroBody: ({ size }) =>
+    `Optional: download Kokoro (about ${size} MB) for far more natural spoken replies without a speech provider or usage charges.`,
+  setupGuideKokoroLanguageNote:
+    "This model currently speaks English and Simplified Chinese. Other selected reply languages continue through the system voice automatically.",
+  setupGuideKokoroDownload: "Download Kokoro",
+  setupGuideUseKokoro: "Use Kokoro for spoken replies",
+  setupGuideUseKokoroSummary:
+    "Keep synthesis on the phone whenever the reply language is supported.",
+  setupGuideSkipKokoro: "Skip for now",
   setupGuideVoiceTestTitle: "Test Your Setup",
   setupGuideVoiceTestBody:
     "Say a short sentence. Mr Broccoli will test microphone access, transcription, the configured reply route, and spoken output when an acceptable voice route is available.",
@@ -636,6 +664,8 @@ export const en: TranslationDictionary = {
   setupGuideRouteProviderStt: ({ provider }) =>
     `Enabled via ${provider} speech transcription`,
   setupGuideRouteProviderTts: ({ provider }) => `Enabled via ${provider} voice`,
+  setupGuideRouteKokoroTts:
+    "Enabled via Kokoro on-device voice, with system fallback",
   setupGuideRouteLocalTts: "Enabled via local voice pack",
   setupGuideRouteUnavailable: "Not available",
   setupGuideRouteOff: "Off",

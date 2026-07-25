@@ -18,6 +18,7 @@ import { useNativeSpeechRecognizer } from "../hooks/useNativeSpeechRecognizer";
 import { useConversations } from "../hooks/useConversations";
 import { useVoicePipeline } from "../hooks/useVoicePipeline";
 import { useBatteryDiagnostics } from "../hooks/useBatteryDiagnostics";
+import { useKokoroModel } from "../hooks/useKokoroModel";
 import { useLocalization } from "../i18n";
 import { useTheme } from "../theme/ThemeContext";
 import { MainScreenWorkspace } from "./main/MainScreenWorkspace";
@@ -97,6 +98,7 @@ export function MainScreen() {
   const recorder = useAudioRecorder();
   const nativeStt = useNativeSpeechRecognizer();
   const player = useAudioPlayer();
+  const kokoroModel = useKokoroModel();
 
   const [styleSheetVisible, setStyleSheetVisible] = React.useState(false);
   const {
@@ -250,7 +252,11 @@ export function MainScreen() {
     ttsMode: settings.ttsMode,
     ttsProvider,
     ttsApiKey,
-    selectedTtsVoice,
+    selectedTtsVoice:
+      settings.ttsMode === "kokoro"
+        ? settings.kokoroVoices.en
+        : selectedTtsVoice,
+    kokoroVoices: settings.kokoroVoices,
     ttsListenLanguages: settings.ttsListenLanguages,
     replyPlayback: settings.replyPlayback,
     spokenRepliesEnabled: settings.spokenRepliesEnabled,
@@ -304,6 +310,9 @@ export function MainScreen() {
     handleProviderApiKeyChange,
     handleValidateProviderKey,
     handleContinueFromProvider,
+    handleToggleKokoro,
+    handleDownloadKokoro,
+    handleContinueFromKokoro,
     handleContinueFromVoiceTest,
     handleFinishSetupGuide,
     handleOpenSettingsFromSummary,
@@ -316,7 +325,9 @@ export function MainScreen() {
     currentValidationState: setupGuideValidationState,
     resolvedRoutes: setupGuideResolvedRoutes,
     voiceTest: setupGuideVoiceTest,
+    useKokoro: setupGuideUseKokoro,
   } = useSetupGuideController({
+    kokoroModel,
     loaded,
     nativeStt,
     openSettings,
@@ -732,6 +743,7 @@ export function MainScreen() {
       <SettingsModal
         visible={settingsVisible}
         settings={settings}
+        kokoroModel={kokoroModel}
         providerVoiceDirectories={providerVoiceDirectories}
         focusCatalogProviderId={settingsFocusCatalogProviderId}
         focusTab={settingsFocusTab}
@@ -762,6 +774,8 @@ export function MainScreen() {
         currentValidationState={setupGuideValidationState}
         resolvedRoutes={setupGuideResolvedRoutes}
         voiceTest={setupGuideVoiceTest}
+        kokoroModel={kokoroModel}
+        useKokoro={setupGuideUseKokoro}
         onSelectProvider={handleSelectProvider}
         onChangeProviderApiKey={handleProviderApiKeyChange}
         onDismiss={handleDismissSetupGuide}
@@ -769,6 +783,9 @@ export function MainScreen() {
         onContinueFromIntro={handleContinueFromIntro}
         onValidateProviderKey={handleValidateSetupGuideProviderKey}
         onContinueFromProvider={handleContinueFromProvider}
+        onToggleKokoro={handleToggleKokoro}
+        onDownloadKokoro={handleDownloadKokoro}
+        onContinueFromKokoro={handleContinueFromKokoro}
         onVoiceTestAction={handleSetupGuideVoiceTestAction}
         onResetVoiceTest={handleResetSetupGuideVoiceTest}
         onContinueFromVoiceTest={handleContinueFromVoiceTest}

@@ -6,6 +6,12 @@ import {
   splitTextForTts,
   synthesizeSpeech,
 } from "../tts";
+import {
+  DEFAULT_KOKORO_VOICES,
+  KOKORO_TTS_TARGET_CHUNK_CHARS,
+  getKokoroVoiceConfig,
+  resolveKokoroLanguage,
+} from "../../constants/kokoro";
 import { extractCompleteSentences } from "./streaming";
 import type { RunVoicePipelineParams } from "./types";
 
@@ -18,6 +24,7 @@ interface CreateVoicePipelineTtsQueueParams {
   replyPlayback: RunVoicePipelineParams["replyPlayback"];
   spokenRepliesEnabled?: RunVoicePipelineParams["spokenRepliesEnabled"];
   ttsApiKey?: string;
+  kokoroVoices?: RunVoicePipelineParams["kokoroVoices"];
   ttsListenLanguages?: RunVoicePipelineParams["ttsListenLanguages"];
   ttsMode: RunVoicePipelineParams["ttsMode"];
   ttsModel?: string;
@@ -28,8 +35,16 @@ interface CreateVoicePipelineTtsQueueParams {
 
 const PROVIDER_TTS_PREFETCH_CONCURRENCY = 2;
 
+type AudioDiagnostics = NonNullable<
+  Parameters<RunVoicePipelineParams["callbacks"]["onAudioReady"]>[1]
+>;
+
 type ProviderSynthesisResult =
-  | { kind: "audio"; audio: string }
+  | {
+      kind: "audio";
+      audio: string;
+      diagnostics: AudioDiagnostics;
+    }
   | { kind: "error"; error: Error }
   | null;
 
@@ -42,6 +57,7 @@ export function createVoicePipelineTtsQueue({
   replyPlayback,
   spokenRepliesEnabled = true,
   ttsApiKey,
+  kokoroVoices,
   ttsListenLanguages,
   ttsMode,
   ttsModel,
@@ -61,16 +77,19 @@ export function createVoicePipelineTtsQueue({
   let fallbackNotified = false;
   let fatalProviderError = false;
   let fatalProviderErrorNotified = false;
-  let playbackRoute: "native" | "provider" | null =
+  let playbackRoute: "native" | "kokoro" | "provider" | null =
     ttsMode === "native" ? "native" : null;
   const effectiveReplyPlayback = replyPlayback;
   const bufferProviderAudioUntilComplete =
-    ttsMode === "provider" && effectiveReplyPlayback === "wait";
-  const bufferedProviderAudio: string[] = [];
+    ttsMode !== "native" && effectiveReplyPlayback === "wait";
+  const bufferedProviderAudio: Array<
+    Extract<ProviderSynthesisResult, { kind: "audio" }>
+  > = [];
   const bufferedTtsTexts: string[] = [];
   const speechDiagnostics = {
     requestId: createSpeechRequestId(diagnosticsSource),
     source: diagnosticsSource,
+    mode: ttsMode,
     provider: ttsProvider ?? null,
     providerModel: ttsModel || null,
   };
@@ -103,10 +122,29 @@ export function createVoicePipelineTtsQueue({
         }
 
         try {
+          const kokoroLanguage =
+            ttsMode === "kokoro"
+              ? resolveKokoroLanguage({
+                  text,
+                  listenLanguages: ttsListenLanguages,
+                })
+              : null;
+          const kokoroVoice = kokoroLanguage
+            ? getKokoroVoiceConfig(
+                kokoroLanguage,
+                kokoroVoices?.[kokoroLanguage] ??
+                  DEFAULT_KOKORO_VOICES[kokoroLanguage],
+              ).id
+            : null;
+          const synthesisDiagnostics: AudioDiagnostics = {
+            ...speechDiagnostics,
+            language: kokoroLanguage ?? ttsListenLanguages?.[0] ?? "app",
+            voice: kokoroVoice ?? (ttsVoice || null),
+          };
           const audio = await synthesizeSpeech({
             text,
             voice: ttsVoice,
-            mode: "provider",
+            mode: ttsMode,
             provider: ttsProvider,
             providerModel: ttsModel,
             apiKey: ttsApiKey,
@@ -119,10 +157,15 @@ export function createVoicePipelineTtsQueue({
               : {}),
             language,
             listenLanguages: ttsListenLanguages,
-            diagnostics: speechDiagnostics,
+            kokoroVoices,
+            diagnostics: synthesisDiagnostics,
             abortSignal,
           });
-          return { kind: "audio", audio };
+          return {
+            kind: "audio",
+            audio,
+            diagnostics: synthesisDiagnostics,
+          };
         } catch (error) {
           return {
             kind: "error",
@@ -150,7 +193,7 @@ export function createVoicePipelineTtsQueue({
     }
 
     const providerSynthesis =
-      ttsMode === "provider"
+      ttsMode !== "native"
         ? startProviderSynthesis(trimmed, context)
         : null;
     const task = ttsChain.then(async () => {
@@ -181,18 +224,21 @@ export function createVoicePipelineTtsQueue({
 
       if (synthesisResult.kind === "audio") {
         if (bufferProviderAudioUntilComplete) {
-          bufferedProviderAudio.push(synthesisResult.audio);
+          bufferedProviderAudio.push(synthesisResult);
           return;
         }
 
-        playbackRoute = "provider";
-        callbacks.onAudioReady(synthesisResult.audio, speechDiagnostics);
+        playbackRoute = ttsMode;
+        callbacks.onAudioReady(
+          synthesisResult.audio,
+          synthesisResult.diagnostics,
+        );
         return;
       }
 
       if (
         fallbackToNativeOnProviderError &&
-        playbackRoute !== "provider"
+        playbackRoute !== ttsMode
       ) {
         playbackRoute = "native";
         notifyTtsFallback(synthesisResult.error);
@@ -231,10 +277,12 @@ export function createVoicePipelineTtsQueue({
 
     const segments = splitTextForTts(
       text,
-      Math.min(
-        PROVIDER_TTS_MAX_INPUT_CHARS,
-        getProviderTtsTargetChunkChars(ttsProvider),
-      ),
+      ttsMode === "kokoro"
+        ? KOKORO_TTS_TARGET_CHUNK_CHARS
+        : Math.min(
+            PROVIDER_TTS_MAX_INPUT_CHARS,
+            getProviderTtsTargetChunkChars(ttsProvider),
+          ),
     );
 
     if (segments.length === 0) {
@@ -293,9 +341,9 @@ export function createVoicePipelineTtsQueue({
       return;
     }
 
-    playbackRoute = "provider";
-    bufferedProviderAudio.forEach((audio) => {
-      callbacks.onAudioReady(audio, speechDiagnostics);
+    playbackRoute = ttsMode;
+    bufferedProviderAudio.forEach((result) => {
+      callbacks.onAudioReady(result.audio, result.diagnostics);
     });
   };
 

@@ -4,6 +4,7 @@ import { TextInput } from "react-native";
 
 import type { CatalogProviderId } from "../../catalog/types";
 import type { ProviderVoiceDirectories } from "../../services/providerVoiceDirectory";
+import type { KokoroModelController } from "../../hooks/useKokoroModel";
 import {
   Provider,
   ProviderCapability,
@@ -17,6 +18,7 @@ import {
 export interface SettingsModalProps {
   visible: boolean;
   settings: Settings;
+  kokoroModel: KokoroModelController;
   focusProvider?: Provider;
   focusCatalogProviderId?: CatalogProviderId;
   focusTab?: SettingsTab;

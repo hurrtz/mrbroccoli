@@ -141,6 +141,9 @@ function formatSpeech(
       ? t("turnReceiptSystemVoiceFallback")
       : `${t("turnReceiptSystemVoice")} · ${speech.voice ?? "—"}`;
   }
+  if (speech.actualMode === "kokoro") {
+    return ["Kokoro", speech.voice].filter(Boolean).join(" · ");
+  }
 
   return [
     speech.provider ? PROVIDER_LABELS[speech.provider] : undefined,

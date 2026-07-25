@@ -14,6 +14,7 @@ type ReplayControllerParams = Pick<
   | "language"
   | "selectedTtsModel"
   | "selectedTtsVoice"
+  | "kokoroVoices"
   | "ttsInstructions"
   | "showToast"
   | "t"
@@ -36,6 +37,7 @@ export function useReplyReplayController({
   player,
   selectedTtsModel,
   selectedTtsVoice,
+  kokoroVoices,
   ttsInstructions,
   showToast,
   t,
@@ -146,6 +148,7 @@ export function useReplyReplayController({
           // response instead of feeding it back through the live-stream buffer.
           replyPlayback: "wait",
           ttsApiKey,
+          kokoroVoices,
           ttsListenLanguages,
           ttsMode,
           ttsModel: selectedTtsModel,
@@ -178,6 +181,7 @@ export function useReplyReplayController({
       player,
       selectedTtsModel,
       selectedTtsVoice,
+      kokoroVoices,
       ttsInstructions,
       showToast,
       t,

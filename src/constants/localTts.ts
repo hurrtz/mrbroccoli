@@ -22,7 +22,7 @@ const LANGUAGE_LABELS: Record<
   es: { en: "Spanish", de: "Spanisch" },
   pt: { en: "Portuguese", de: "Portugiesisch" },
   hi: { en: "Hindi", de: "Hindi" },
-  fr: { en: "French", de: "Franzoesisch" },
+  fr: { en: "French", de: "Französisch" },
   it: { en: "Italian", de: "Italienisch" },
   ja: { en: "Japanese", de: "Japanisch" },
 };

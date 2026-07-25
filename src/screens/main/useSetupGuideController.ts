@@ -5,6 +5,7 @@ import { PROVIDER_LABELS } from "../../constants/models";
 import type { useAudioPlayer } from "../../hooks/useAudioPlayer";
 import type { useAudioRecorder } from "../../hooks/useAudioRecorder";
 import type { useNativeSpeechRecognizer } from "../../hooks/useNativeSpeechRecognizer";
+import type { KokoroModelController } from "../../hooks/useKokoroModel";
 import { useLocalization } from "../../i18n";
 import { validateProviderConnection } from "../../services/llm";
 import type {
@@ -38,9 +39,11 @@ interface UseSetupGuideControllerParams {
   player: ReturnType<typeof useAudioPlayer>;
   recorder: ReturnType<typeof useAudioRecorder>;
   nativeStt: ReturnType<typeof useNativeSpeechRecognizer>;
+  kokoroModel: KokoroModelController;
 }
 
 export function useSetupGuideController({
+  kokoroModel,
   loaded,
   nativeStt,
   openSettings,
@@ -65,6 +68,7 @@ export function useSetupGuideController({
       status: "idle",
     },
   );
+  const [useKokoro, setUseKokoro] = useState(false);
 
   useEffect(() => {
     if (!loaded || setupGuideDismissed) {
@@ -74,6 +78,7 @@ export function useSetupGuideController({
     setSelectedProvider(null);
     setStep("intro");
     setOpenedFromSettings(false);
+    setUseKokoro(false);
     setSetupGuideVisible(true);
   }, [loaded, setSetupGuideVisible, setupGuideDismissed]);
 
@@ -109,8 +114,15 @@ export function useSetupGuideController({
         provider: routeProvider,
         settings,
         systemSttAvailable: nativeStt.isAvailable,
+        useKokoro: useKokoro && kokoroModel.installed,
       }),
-    [nativeStt.isAvailable, routeProvider, settings],
+    [
+      kokoroModel.installed,
+      nativeStt.isAvailable,
+      routeProvider,
+      settings,
+      useKokoro,
+    ],
   );
 
   const voiceTest = useSetupGuideVoiceTest({
@@ -131,6 +143,7 @@ export function useSetupGuideController({
       setStep("intro");
       setSelectedProvider(null);
       setOpenedFromSettings(false);
+      setUseKokoro(false);
 
       if (markDismissed) {
         updateSettings({ setupGuideDismissed: true });
@@ -148,10 +161,16 @@ export function useSetupGuideController({
       setSelectedProvider(null);
       setStep(nextStep);
       setOpenedFromSettings(source === "settings");
+      setUseKokoro(settings.ttsMode === "kokoro" && kokoroModel.installed);
       setSetupGuideVisible(true);
       void voiceTest.reset(true);
     },
-    [setSetupGuideVisible, voiceTest],
+    [
+      kokoroModel.installed,
+      setSetupGuideVisible,
+      settings.ttsMode,
+      voiceTest,
+    ],
   );
 
   const handleDismissSetupGuide = useCallback(() => {
@@ -166,6 +185,11 @@ export function useSetupGuideController({
 
     if (step === "voice-test") {
       void voiceTest.reset(false);
+      setStep("kokoro");
+      return;
+    }
+
+    if (step === "kokoro") {
       setStep("provider");
       return;
     }
@@ -319,8 +343,24 @@ export function useSetupGuideController({
       return;
     }
 
-    setStep("voice-test");
+    setStep("kokoro");
   }, [currentValidationState.status]);
+
+  const handleToggleKokoro = useCallback((enabled: boolean) => {
+    setUseKokoro(enabled);
+  }, []);
+
+  const handleDownloadKokoro = useCallback(async () => {
+    const installed = await kokoroModel.download();
+
+    if (installed) {
+      setUseKokoro(true);
+    }
+  }, [kokoroModel]);
+
+  const handleContinueFromKokoro = useCallback(() => {
+    setStep("voice-test");
+  }, []);
 
   const handleContinueFromVoiceTest = useCallback(() => {
     setStep("summary");
@@ -342,12 +382,14 @@ export function useSetupGuideController({
       sttMode: resolvedRoutes.stt.kind === "provider" ? "provider" : "native",
       sttProvider:
         resolvedRoutes.stt.kind === "provider" ? selectedProvider : null,
-      ...(resolvedRoutes.tts.kind === "provider"
-        ? {
-            ttsMode: "provider" as const,
-            ttsProvider: selectedProvider,
-          }
-        : {}),
+      ttsMode:
+        resolvedRoutes.tts.kind === "kokoro"
+          ? "kokoro"
+          : resolvedRoutes.tts.kind === "provider"
+            ? "provider"
+            : "native",
+      ttsProvider:
+        resolvedRoutes.tts.kind === "provider" ? selectedProvider : null,
       webSearchMode: "off",
       webSearchProvider: resolvedRoutes.webSearch.provider,
     });
@@ -380,6 +422,7 @@ export function useSetupGuideController({
     currentValidationState,
     resolvedRoutes,
     voiceTest,
+    useKokoro,
     handleOpenSetupGuide,
     handleDismissSetupGuide,
     handleBack,
@@ -388,6 +431,9 @@ export function useSetupGuideController({
     handleProviderApiKeyChange,
     handleValidateProviderKey,
     handleContinueFromProvider,
+    handleToggleKokoro,
+    handleDownloadKokoro,
+    handleContinueFromKokoro,
     handleContinueFromVoiceTest,
     handleFinishSetupGuide,
     handleOpenSettingsFromSummary,

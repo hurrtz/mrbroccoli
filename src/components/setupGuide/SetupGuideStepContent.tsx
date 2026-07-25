@@ -1,5 +1,12 @@
 import React from "react";
-import { Switch, Text, TextInput, TouchableOpacity, View } from "react-native";
+import {
+  ActivityIndicator,
+  Switch,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
 import Feather from "@expo/vector-icons/Feather";
 
@@ -9,6 +16,8 @@ import {
   PROVIDER_LABELS,
 } from "../../constants/models";
 import { useLocalization } from "../../i18n";
+import { KOKORO_MODEL_DOWNLOAD_BYTES } from "../../constants/kokoro";
+import type { KokoroModelController } from "../../hooks/useKokoroModel";
 import type {
   SetupGuideProviderOption,
   SetupGuideResolvedRoutes,
@@ -39,12 +48,139 @@ interface SetupGuideStepContentProps {
   currentValidationState: SetupGuideValidationState;
   resolvedRoutes: SetupGuideResolvedRoutes;
   voiceTest: SetupGuideVoiceTestState;
+  kokoroModel: KokoroModelController;
+  useKokoro: boolean;
   onSelectProvider: (provider: Provider | null) => void;
   onChangeProviderApiKey: (value: string) => void;
+  onToggleKokoro: (enabled: boolean) => void;
+  onDownloadKokoro: () => void;
   onResetVoiceTest: () => void;
   showSettingsShortcutOption: boolean;
   settingsShortcutVisible: boolean;
   onChangeSettingsShortcutVisible?: (visible: boolean) => void;
+}
+
+function KokoroStep({
+  kokoroModel,
+  useKokoro,
+  onToggleKokoro,
+  onDownloadKokoro,
+}: Pick<
+  SetupGuideStepContentProps,
+  | "kokoroModel"
+  | "useKokoro"
+  | "onToggleKokoro"
+  | "onDownloadKokoro"
+>) {
+  const { colors } = useTheme();
+  const { t } = useLocalization();
+  const progress = Math.round(kokoroModel.progress * 100);
+  const status = kokoroModel.error
+    ? kokoroModel.error
+    : kokoroModel.busy === "downloading"
+      ? t(
+          kokoroModel.phase === "extracting"
+            ? "kokoroExtracting"
+            : "kokoroDownloading",
+          { progress },
+        )
+      : kokoroModel.busy === "verifying"
+        ? t("kokoroVerifying")
+        : kokoroModel.busy === "checking"
+          ? t("kokoroChecking")
+          : kokoroModel.installed
+            ? t("kokoroInstalled")
+            : t("kokoroNotInstalled");
+
+  return (
+    <>
+      <Text style={[styles.body, { color: colors.textSecondary }]}>
+        {t("setupGuideKokoroBody", {
+          size: Math.round(KOKORO_MODEL_DOWNLOAD_BYTES / 1024 / 1024),
+        })}
+      </Text>
+      <Text style={[styles.note, { color: colors.textMuted }]}>
+        {t("setupGuideKokoroLanguageNote")}
+      </Text>
+      <View
+        style={[
+          styles.statusCard,
+          {
+            backgroundColor: colors.surfaceElevated,
+            borderColor: kokoroModel.error ? colors.danger : colors.border,
+          },
+        ]}
+      >
+        <Text
+          style={[
+            styles.statusText,
+            {
+              color: kokoroModel.error ? colors.danger : colors.text,
+            },
+          ]}
+        >
+          {status}
+        </Text>
+      </View>
+      {!kokoroModel.installed ? (
+        <TouchableOpacity
+          onPress={onDownloadKokoro}
+          disabled={kokoroModel.busy !== null}
+          activeOpacity={0.8}
+          style={styles.inlineLink}
+          accessibilityRole="button"
+          accessibilityLabel={t("setupGuideKokoroDownload")}
+        >
+          <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
+            {kokoroModel.busy ? (
+              <ActivityIndicator size="small" color={colors.accent} />
+            ) : (
+              <Feather name="download" size={16} color={colors.accent} />
+            )}
+            <Text style={[styles.inlineLinkText, { color: colors.accent }]}>
+              {t("setupGuideKokoroDownload")}
+            </Text>
+          </View>
+        </TouchableOpacity>
+      ) : (
+        <View
+          style={[
+            styles.settingsShortcutRow,
+            {
+              backgroundColor: colors.surfaceElevated,
+              borderColor: colors.border,
+            },
+          ]}
+        >
+          <View style={styles.settingsShortcutCopy}>
+            <Text
+              style={[styles.settingsShortcutTitle, { color: colors.text }]}
+            >
+              {t("setupGuideUseKokoro")}
+            </Text>
+            <Text
+              style={[
+                styles.settingsShortcutSummary,
+                { color: colors.textMuted },
+              ]}
+            >
+              {t("setupGuideUseKokoroSummary")}
+            </Text>
+          </View>
+          <Switch
+            value={useKokoro}
+            onValueChange={onToggleKokoro}
+            trackColor={{
+              false: colors.borderStrong,
+              true: colors.accentSoft,
+            }}
+            thumbColor={useKokoro ? colors.accent : colors.textMuted}
+            accessibilityLabel={t("setupGuideUseKokoro")}
+          />
+        </View>
+      )}
+    </>
+  );
 }
 
 function IntroStep({
@@ -479,6 +615,8 @@ export function SetupGuideStepContent(props: SetupGuideStepContentProps) {
       return <IntroStep {...props} />;
     case "provider":
       return <ProviderStep {...props} />;
+    case "kokoro":
+      return <KokoroStep {...props} />;
     case "voice-test":
       return <VoiceTestStep {...props} />;
     case "summary":
