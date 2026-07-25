@@ -11,6 +11,7 @@ import GoogleVertexAiStudioDocument from "./google-vertex-ai-studio";
 import MistralAiDocument from "./mistral-ai";
 import MoonshotAiKimiDocument from "./moonshot-ai-kimi";
 import OpenaiDocument from "./openai";
+import OpenrouterDocument from "./openrouter";
 import PerplexityDocument from "./perplexity";
 import XaiDocument from "./xai";
 
@@ -24,6 +25,7 @@ export const PROVIDER_DOCUMENTS = defineProviderDocuments([
   MistralAiDocument,
   MoonshotAiKimiDocument,
   OpenaiDocument,
+  OpenrouterDocument,
   PerplexityDocument,
   XaiDocument,
 ]);

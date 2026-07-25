@@ -18,7 +18,7 @@ import {
   getProviderApiKeyPlaceholder,
 } from "../../constants/models";
 import { useLocalization } from "../../i18n";
-import type { Provider } from "../../types";
+import type { Provider, ProviderCapability } from "../../types";
 import { useTheme } from "../../theme/ThemeContext";
 import {
   formatQwenApiCredential,
@@ -32,7 +32,6 @@ import { ProviderIcon } from "../ProviderIcon";
 import { styles } from "./styles";
 import {
   getProviderCapabilities,
-  type ProviderCapability,
 } from "./providerSupport";
 import type {
   ProviderHealthState,
@@ -53,6 +52,8 @@ function getCapabilityLabel(
       return "STT";
     case "search":
       return t("webSearch");
+    case "voices":
+      return t("providerCapability_voices");
   }
 }
 
@@ -80,7 +81,7 @@ function getStatusMeta(
       };
     case "healthy":
       return {
-        label: t("providerStatusConfigured"),
+        label: t("providerStatusWorking"),
         backgroundColor: `${colors.success}22`,
         borderColor: `${colors.success}99`,
         textColor: colors.success,
@@ -88,7 +89,7 @@ function getStatusMeta(
       };
     case "configured":
       return {
-        label: t("providerStatusConfigured"),
+        label: t("providerStatusNotTested"),
         backgroundColor: colors.surface,
         borderColor: colors.borderStrong,
         textColor: colors.textSecondary,
@@ -204,28 +205,36 @@ export function ProviderVaultRow({
   provider,
   expanded,
   visibleApiKey,
-  validationState,
   healthState,
-  canValidate,
+  getCapabilityHealthState,
+  getValidationState,
+  canValidateCapability,
   apiKey,
   onToggleExpanded,
   onToggleApiKeyVisibility,
   onUpdateApiKey,
   onTextInputFocus,
-  onValidate,
+  onValidateCapability,
+  onValidateAll,
 }: {
   provider: Provider;
   expanded: boolean;
   visibleApiKey: boolean;
-  validationState: ProviderValidationState;
   healthState: ProviderHealthState;
-  canValidate: boolean;
+  getCapabilityHealthState: (
+    capability: ProviderCapability,
+  ) => ProviderHealthState;
+  getValidationState: (
+    capability: ProviderCapability,
+  ) => ProviderValidationState;
+  canValidateCapability: (capability: ProviderCapability) => boolean;
   apiKey: string;
   onToggleExpanded: () => void;
   onToggleApiKeyVisibility: () => void;
   onUpdateApiKey: (provider: Provider, apiKey: string) => void;
   onTextInputFocus: TextInputFocusHandler;
-  onValidate: (provider: Provider) => Promise<void>;
+  onValidateCapability: (capability: ProviderCapability) => Promise<void>;
+  onValidateAll: () => Promise<void>;
 }) {
   const { colors } = useTheme();
   const { t, language } = useLocalization();
@@ -236,8 +245,10 @@ export function ProviderVaultRow({
   const showStatusPill = healthState === "validating";
   const showStatusIcon = healthState === "healthy" || healthState === "failing";
   const secureApiKey = !!apiKey.trim() && !visibleApiKey;
-  const showValidationMessage =
-    validationState.status === "success" || validationState.status === "error";
+  const canValidateAnyCapability = capabilities.some(canValidateCapability);
+  const isValidatingAnyCapability = capabilities.some(
+    (capability) => getValidationState(capability).status === "validating",
+  );
   const qwenCredentials =
     provider === "alibaba-qwen-dashscope"
       ? parseQwenApiCredential(apiKey)
@@ -296,27 +307,46 @@ export function ProviderVaultRow({
                 {PROVIDER_LABELS[provider]}
               </Text>
               <View style={styles.providerCapabilityRow}>
-                {capabilities.map((capability) => (
-                  <View
-                    key={`${provider}:${capability}`}
-                    style={[
-                      styles.providerCapabilityPill,
-                      {
-                        backgroundColor: colors.surface,
-                        borderColor: colors.border,
-                      },
-                    ]}
-                  >
-                    <Text
+                {capabilities.map((capability) => {
+                  const capabilityStatus = getStatusMeta(
+                    getCapabilityHealthState(capability),
+                    t,
+                    colors,
+                  );
+
+                  return (
+                    <View
+                      key={`${provider}:${capability}`}
+                      testID={`provider-capability-pill-${provider}-${capability}`}
                       style={[
-                        styles.providerCapabilityPillText,
-                        { color: colors.textSecondary },
+                        styles.providerCapabilityPill,
+                        {
+                          backgroundColor: capabilityStatus.backgroundColor,
+                          borderColor: capabilityStatus.borderColor,
+                        },
                       ]}
+                      accessibilityLabel={`${getCapabilityLabel(
+                        capability,
+                        t,
+                      )}: ${capabilityStatus.label}`}
                     >
-                      {getCapabilityLabel(capability, t)}
-                    </Text>
-                  </View>
-                ))}
+                      <View
+                        style={[
+                          styles.providerCapabilityDot,
+                          { backgroundColor: capabilityStatus.textColor },
+                        ]}
+                      />
+                      <Text
+                        style={[
+                          styles.providerCapabilityPillText,
+                          { color: capabilityStatus.textColor },
+                        ]}
+                      >
+                        {getCapabilityLabel(capability, t)}
+                      </Text>
+                    </View>
+                  );
+                })}
               </View>
             </View>
           </View>
@@ -364,6 +394,45 @@ export function ProviderVaultRow({
 
       {expanded ? (
         <View style={styles.providerVaultExpanded}>
+          {provider === "openrouter" ? (
+            <View
+              style={[
+                styles.openRouterOnboardingCard,
+                {
+                  backgroundColor: colors.accentSoft,
+                  borderColor: colors.accent,
+                },
+              ]}
+            >
+              <View style={styles.openRouterOnboardingTitleRow}>
+                <Feather name="shuffle" size={15} color={colors.accent} />
+                <Text
+                  style={[
+                    styles.openRouterOnboardingTitle,
+                    { color: colors.text },
+                  ]}
+                >
+                  {t("openRouterOnboardingTitle")}
+                </Text>
+              </View>
+              <Text
+                style={[
+                  styles.openRouterOnboardingText,
+                  { color: colors.textSecondary },
+                ]}
+              >
+                {t("openRouterOnboardingDescription")}
+              </Text>
+              <Text
+                style={[
+                  styles.openRouterOnboardingRoute,
+                  { color: colors.textMuted },
+                ]}
+              >
+                {t("openRouterOnboardingRoute")}
+              </Text>
+            </View>
+          ) : null}
           <Text style={[styles.sectionHint, { color: colors.textMuted }]}>
             {getProviderApiKeyHint(provider, language)}
           </Text>
@@ -450,16 +519,21 @@ export function ProviderVaultRow({
                   backgroundColor: colors.surface,
                   borderColor: colors.border,
                 },
-                (!apiKey.trim() || !canValidate) && styles.previewButtonDisabled,
+                (!apiKey.trim() || !canValidateAnyCapability) &&
+                  styles.previewButtonDisabled,
               ]}
               activeOpacity={0.85}
-              disabled={!apiKey.trim() || !canValidate}
+              disabled={
+                !apiKey.trim() ||
+                !canValidateAnyCapability ||
+                isValidatingAnyCapability
+              }
               onPress={() => {
-                void onValidate(provider);
+                void onValidateAll();
               }}
             >
               <Feather
-                name={validationState.status === "validating" ? "loader" : "check"}
+                name={isValidatingAnyCapability ? "loader" : "check-circle"}
                 size={14}
                 color={colors.accent}
               />
@@ -469,7 +543,7 @@ export function ProviderVaultRow({
                   { color: colors.text },
                 ]}
               >
-                {t("testProviderKey")}
+                {t("testAllCapabilities")}
               </Text>
             </TouchableOpacity>
 
@@ -493,48 +567,131 @@ export function ProviderVaultRow({
                   { color: colors.text },
                 ]}
               >
-                {t("createApiKey")}
+                {provider === "openrouter"
+                  ? t("openRouterKeys")
+                  : t("createApiKey")}
               </Text>
             </TouchableOpacity>
           </View>
 
-          {apiKey.trim() && !canValidate ? (
+          {apiKey.trim() && !canValidateAnyCapability ? (
             <Text style={[styles.sectionHint, { color: colors.textMuted }]}>
               {t("providerValidationUnavailable")}
             </Text>
           ) : null}
 
-          {showValidationMessage ? (
-            <View
-              style={[
-                styles.validationCard,
-                {
-                  backgroundColor:
-                    validationState.status === "success"
-                      ? `${colors.success}22`
-                      : `${colors.danger}12`,
-                  borderColor:
-                    validationState.status === "success"
-                      ? `${colors.success}99`
-                      : `${colors.danger}55`,
-                },
-              ]}
-            >
-              <Text
-                style={[
-                  styles.validationText,
-                  {
-                    color:
-                      validationState.status === "success"
-                        ? colors.success
-                        : colors.danger,
-                  },
-                ]}
-              >
-                {validationState.message}
-              </Text>
-            </View>
-          ) : null}
+          <View style={styles.providerCapabilityMatrix}>
+            {capabilities.map((capability) => {
+              const validationState = getValidationState(capability);
+              const capabilityHealth = getCapabilityHealthState(capability);
+              const capabilityStatus = getStatusMeta(
+                capabilityHealth,
+                t,
+                colors,
+              );
+              const canValidate = canValidateCapability(capability);
+              const isValidating = validationState.status === "validating";
+              const message =
+                validationState.status === "success" ||
+                validationState.status === "error"
+                  ? validationState.message
+                  : null;
+
+              return (
+                <View
+                  key={`${provider}:check:${capability}`}
+                  testID={`provider-capability-row-${provider}-${capability}`}
+                  style={[
+                    styles.providerCapabilityCheckRow,
+                    {
+                      backgroundColor: capabilityStatus.backgroundColor,
+                      borderColor: capabilityStatus.borderColor,
+                    },
+                  ]}
+                >
+                  <View style={styles.providerCapabilityCheckCopy}>
+                    <View style={styles.providerCapabilityCheckHeader}>
+                      <Text
+                        style={[
+                          styles.providerCapabilityCheckLabel,
+                          { color: colors.text },
+                        ]}
+                      >
+                        {getCapabilityLabel(capability, t)}
+                      </Text>
+                      {capability === "voices" ? (
+                        <Text
+                          style={[
+                            styles.providerCapabilityOptional,
+                            { color: colors.textMuted },
+                          ]}
+                        >
+                          {t("optional")}
+                        </Text>
+                      ) : null}
+                    </View>
+                    <Text
+                      style={[
+                        styles.providerCapabilityCheckStatus,
+                        { color: capabilityStatus.textColor },
+                      ]}
+                    >
+                      {capabilityStatus.label}
+                    </Text>
+                    {message ? (
+                      <Text
+                        style={[
+                          styles.providerCapabilityCheckMessage,
+                          {
+                            color:
+                              validationState.status === "error"
+                                ? colors.danger
+                                : colors.textMuted,
+                          },
+                        ]}
+                      >
+                        {message}
+                      </Text>
+                    ) : null}
+                  </View>
+                  <TouchableOpacity
+                    style={[
+                      styles.providerCapabilityTestButton,
+                      {
+                        backgroundColor: colors.surface,
+                        borderColor: colors.border,
+                      },
+                      (!canValidate || isValidating) &&
+                        styles.previewButtonDisabled,
+                    ]}
+                    activeOpacity={0.85}
+                    disabled={!canValidate || isValidating}
+                    onPress={() => {
+                      void onValidateCapability(capability);
+                    }}
+                    accessibilityRole="button"
+                    accessibilityLabel={t("testProviderCapability", {
+                      capability: getCapabilityLabel(capability, t),
+                    })}
+                  >
+                    <Feather
+                      name={isValidating ? "loader" : "play"}
+                      size={13}
+                      color={colors.accent}
+                    />
+                    <Text
+                      style={[
+                        styles.providerCapabilityTestText,
+                        { color: colors.accent },
+                      ]}
+                    >
+                      {t("test")}
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+              );
+            })}
+          </View>
 
           <ProviderAboutAccordion provider={provider} />
         </View>
@@ -542,4 +699,3 @@ export function ProviderVaultRow({
     </View>
   );
 }
-

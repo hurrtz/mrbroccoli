@@ -8,11 +8,13 @@ import { resolvePipelineTranscription } from "./voicePipeline/transcription";
 import type { RunVoicePipelineParams } from "./voicePipeline/types";
 import { searchWeb } from "./webSearch";
 import { getWebSearchDecision } from "./webSearchHeuristics";
+import { createTurnReceipt } from "./turnReceipt";
 
 export async function runVoicePipeline(
   params: RunVoicePipelineParams,
 ): Promise<string | null> {
   const {
+    turnStartedAtMs = Date.now(),
     audioUri,
     transcriptionOverride,
     messages,
@@ -49,6 +51,25 @@ export async function runVoicePipeline(
 
   let transcription: string | null = null;
   let retainCapturedAudio = false;
+  const effectiveWebSearchMode = webSearchMode ?? "off";
+  const turnReceipt = createTurnReceipt({
+    startedAtMs: turnStartedAtMs,
+    inputSource: transcriptionOverride ? "text" : "voice",
+    sttMode,
+    sttProvider,
+    sttModel,
+    provider,
+    model,
+    modelEffort,
+    language,
+    spokenRepliesEnabled,
+    ttsMode,
+    ttsProvider,
+    ttsModel,
+    ttsVoice,
+    webSearchMode: effectiveWebSearchMode,
+    webSearchProvider,
+  });
 
   try {
     recordDebugLogEvent({
@@ -62,6 +83,7 @@ export async function runVoicePipeline(
       },
     });
 
+    const transcriptionStartedAtMs = Date.now();
     try {
       transcription = await resolvePipelineTranscription({
         abortSignal,
@@ -76,6 +98,9 @@ export async function runVoicePipeline(
     } catch (error) {
       retainCapturedAudio = Boolean(audioUri && !abortSignal?.aborted);
       throw error;
+    } finally {
+      turnReceipt.timing.transcriptionMs =
+        Date.now() - transcriptionStartedAtMs;
     }
 
     if (!transcription) {
@@ -104,6 +129,7 @@ export async function runVoicePipeline(
       return transcription;
     }
 
+    const contextStartedAtMs = Date.now();
     const contextResult = await resolveContextualMessages({
       abortSignal,
       callbacks,
@@ -115,6 +141,8 @@ export async function runVoicePipeline(
       providerApiKey,
       summarizedMessageCount,
     });
+    turnReceipt.timing.contextMs = Date.now() - contextStartedAtMs;
+    turnReceipt.context = contextResult.receipt;
 
     if (contextResult.aborted) {
       recordDebugLogEvent({
@@ -124,9 +152,10 @@ export async function runVoicePipeline(
     }
 
     let webSearchContext: string | undefined;
-    let responseMetadata: MessageMetadata | undefined;
+    let responseMetadata: MessageMetadata = {
+      turnReceipt,
+    };
     const normalizedWebSearchApiKey = webSearchApiKey?.trim();
-    const effectiveWebSearchMode = webSearchMode ?? "off";
     const webSearchDecision = getWebSearchDecision({
       enabled: effectiveWebSearchMode !== "off",
       mode: effectiveWebSearchMode,
@@ -135,6 +164,15 @@ export async function runVoicePipeline(
       query: transcription,
       messages,
     });
+    turnReceipt.webSearch = {
+      mode: effectiveWebSearchMode,
+      provider: webSearchProvider,
+      requested: webSearchDecision.shouldSearch,
+      ready: Boolean(webSearchProvider && normalizedWebSearchApiKey),
+      used: false,
+      fellBack: false,
+      decisionReason: webSearchDecision.reason,
+    };
 
     recordDebugLogEvent({
       event: "web-search-decision",
@@ -154,6 +192,7 @@ export async function runVoicePipeline(
       normalizedWebSearchApiKey
     ) {
       callbacks.onWebSearchStart?.();
+      const webSearchStartedAtMs = Date.now();
 
       try {
         const webSearchResult = await searchWeb({
@@ -172,7 +211,11 @@ export async function runVoicePipeline(
 
         webSearchContext = webSearchResult?.context;
         if (webSearchResult) {
+          turnReceipt.webSearch.used = Boolean(webSearchResult.context);
+          turnReceipt.webSearch.provider = webSearchResult.provider;
+          turnReceipt.webSearch.model = webSearchResult.model;
           responseMetadata = {
+            ...responseMetadata,
             webSearch: {
               provider: webSearchResult.provider,
               model: webSearchResult.model,
@@ -188,9 +231,11 @@ export async function runVoicePipeline(
         }
 
         if (error instanceof Error) {
+          turnReceipt.webSearch.fellBack = true;
           callbacks.onWebSearchFallback?.(error);
         }
       } finally {
+        turnReceipt.timing.webSearchMs = Date.now() - webSearchStartedAtMs;
         callbacks.onWebSearchComplete?.();
       }
     }
@@ -234,6 +279,7 @@ export async function runVoicePipeline(
     callbacks.onLlmStart?.();
 
     let llmCompleted = false;
+    const llmStartedAtMs = Date.now();
     await streamChat({
       messages: allMessages,
       model,
@@ -253,13 +299,36 @@ export async function runVoicePipeline(
       },
       onDone: async (fullText, usage, llmMetadata) => {
         if (abortSignal?.aborted) return;
-        const completedMetadata =
-          responseMetadata || llmMetadata
-            ? {
-                ...responseMetadata,
-                ...llmMetadata,
-              }
-            : undefined;
+        const llmCompletedAtMs = Date.now();
+        turnReceipt.timing.modelMs = llmCompletedAtMs - llmStartedAtMs;
+        turnReceipt.timing.replyReadyMs =
+          llmCompletedAtMs - turnStartedAtMs;
+        if (!spokenRepliesEnabled) {
+          turnReceipt.timing.totalMs =
+            llmCompletedAtMs - turnStartedAtMs;
+        }
+        if (llmMetadata?.router) {
+          turnReceipt.actualRoute = {
+            provider,
+            model: llmMetadata.router.actualModel ?? model,
+            gateway: llmMetadata.router.gateway,
+            upstreamProvider: llmMetadata.router.upstreamProvider,
+            strategy: llmMetadata.router.strategy,
+            attempts: llmMetadata.router.attempts,
+          };
+          if (llmMetadata.router.contextCompression) {
+            turnReceipt.context.gatewayCompression =
+              llmMetadata.router.contextCompression;
+          }
+        }
+        const completedMetadata = {
+          ...responseMetadata,
+          ...llmMetadata,
+          turnReceipt: {
+            ...turnReceipt,
+            ...llmMetadata?.turnReceipt,
+          },
+        };
         callbacks.onResponseDone(fullText, usage, completedMetadata);
         await ttsQueue.handleResponseDone(fullText);
         llmCompleted = true;

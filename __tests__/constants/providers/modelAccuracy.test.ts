@@ -19,6 +19,7 @@ describe("provider model accuracy", () => {
   it("does not expose dedicated web-search providers as runtime providers", () => {
     expect(PROVIDER_ORDER).toEqual([
       "openai",
+      "openrouter",
       "anthropic",
       "alibaba-qwen-dashscope",
       "bytedance-doubao-seed",
@@ -48,6 +49,29 @@ describe("provider model accuracy", () => {
         "firecrawl",
         "serpapi",
         "tavily",
+      ]),
+    );
+  });
+
+  it("offers OpenRouter as an optional snapshot-backed gateway", () => {
+    expect(PROVIDER_DEFAULT_MODELS.openrouter).toBe(
+      "openai/gpt-5.6-sol-20260709",
+    );
+    expect(providerModelIds("openrouter")).toEqual(
+      expect.arrayContaining([
+        "openai/gpt-5.6-sol-20260709",
+        "anthropic/claude-sonnet-5-20260630",
+        "google/gemini-3.6-flash-20260721",
+        "x-ai/grok-4.5-20260708",
+        "deepseek/deepseek-v4-pro-20260423",
+        "moonshotai/kimi-k3-20260715",
+      ]),
+    );
+    expect(providerModelIds("openrouter")).not.toEqual(
+      expect.arrayContaining([
+        "openai/gpt-5.6-sol",
+        "anthropic/claude-sonnet-5",
+        "google/gemini-3.6-flash",
       ]),
     );
   });
@@ -200,6 +224,10 @@ describe("provider model accuracy", () => {
 
   it("exposes current ElevenLabs conversational TTS models", () => {
     expect(PROVIDER_DEFAULT_MODELS.elevenlabs).toBe("");
+    expect(DEFAULT_PROVIDER_STT_MODELS.elevenlabs).toBe("scribe_v2");
+    expect(
+      PROVIDER_STT_MODEL_OPTIONS.elevenlabs?.map((model) => model.id),
+    ).toEqual(["scribe_v2"]);
     expect(DEFAULT_PROVIDER_TTS_MODELS.elevenlabs).toBe("eleven_flash_v2_5");
     expect(
       PROVIDER_TTS_MODEL_OPTIONS.elevenlabs?.map((model) => model.id),

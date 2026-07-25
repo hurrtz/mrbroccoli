@@ -1,6 +1,7 @@
 import { DEFAULT_SETTINGS } from "../../../src/types";
 import {
   getConfiguredProvidersForCapability,
+  getProviderCapabilityHealthState,
   getProviderHealthState,
   getProviderValidationTarget,
 } from "../../../src/components/settings/providerSupport";
@@ -15,7 +16,7 @@ describe("getProviderValidationTarget", () => {
       },
     };
 
-    expect(getProviderValidationTarget(settings, "xai")).toEqual({
+    expect(getProviderValidationTarget(settings, "xai", "llm")).toEqual({
       kind: "llm",
       model: expect.any(String),
       configKey: undefined,
@@ -35,7 +36,7 @@ describe("getProviderValidationTarget", () => {
       },
     };
 
-    expect(getProviderValidationTarget(settings, "gemini")).toEqual({
+    expect(getProviderValidationTarget(settings, "gemini", "llm")).toEqual({
       kind: "llm",
       model: "gemini-2.5-flash",
     });
@@ -58,10 +59,34 @@ describe("getProviderValidationTarget", () => {
       },
     };
 
-    expect(getProviderValidationTarget(settings, "elevenlabs")).toEqual({
+    expect(
+      getProviderValidationTarget(settings, "elevenlabs", "tts"),
+    ).toEqual({
       kind: "tts",
       model: "eleven_multilingual_v2",
       configKey: JSON.stringify({ voice: "voice-123" }),
+    });
+  });
+
+  it("validates ElevenLabs TTS with its built-in voice when voice discovery is restricted", () => {
+    const settings = {
+      ...DEFAULT_SETTINGS,
+      apiKeys: {
+        ...DEFAULT_SETTINGS.apiKeys,
+        elevenlabs: "restricted-elevenlabs-key",
+      },
+      providerTtsVoices: {
+        ...DEFAULT_SETTINGS.providerTtsVoices,
+        elevenlabs: "",
+      },
+    };
+
+    expect(
+      getProviderValidationTarget(settings, "elevenlabs", "tts"),
+    ).toEqual({
+      kind: "tts",
+      model: "eleven_flash_v2_5",
+      configKey: JSON.stringify({ voice: "21m00Tcm4TlvDq8ikWAM" }),
     });
   });
 });
@@ -88,9 +113,11 @@ describe("getProviderHealthState", () => {
   it("ignores a persisted validation failure after its model changes", () => {
     const validationStateByProvider = {
       openai: {
-        status: "error" as const,
-        message: "Rejected credentials",
-        model: "previous-model",
+        llm: {
+          status: "error" as const,
+          message: "Rejected credentials",
+          model: "previous-model",
+        },
       },
     };
 
@@ -111,18 +138,21 @@ describe("getProviderHealthState", () => {
   });
 
   it("limits a matching validation failure to the capability that was tested", () => {
-    const target = getProviderValidationTarget(settings, "openai");
+    const target = getProviderValidationTarget(settings, "openai", "llm");
     const validationStateByProvider = {
       openai: {
-        status: "error" as const,
-        message: "Model access rejected",
-        model: target.model,
-        configKey: target.configKey,
+        llm: {
+          status: "error" as const,
+          message: "Model access rejected",
+          model: target.model,
+          configKey: target.configKey,
+        },
       },
     };
 
     expect(
-      getProviderHealthState({
+      getProviderCapabilityHealthState({
+        capability: "llm",
         provider: "openai",
         settings,
         validationStateByProvider,
@@ -152,33 +182,90 @@ describe("getProviderHealthState", () => {
   });
 
   it("restores a successful validation only for the tested configuration", () => {
-    const target = getProviderValidationTarget(settings, "openai");
+    const target = getProviderValidationTarget(settings, "openai", "llm");
 
     expect(
-      getProviderHealthState({
+      getProviderCapabilityHealthState({
+        capability: "llm",
         provider: "openai",
         settings,
         validationStateByProvider: {
           openai: {
-            status: "success",
-            model: target.model,
-            configKey: target.configKey,
+            llm: {
+              status: "success",
+              model: target.model,
+              configKey: target.configKey,
+            },
           },
         },
       }),
     ).toBe("healthy");
 
     expect(
-      getProviderHealthState({
+      getProviderCapabilityHealthState({
+        capability: "llm",
         provider: "openai",
         settings,
         validationStateByProvider: {
           openai: {
-            status: "success",
-            model: "different-model",
+            llm: {
+              status: "success",
+              model: "different-model",
+            },
           },
         },
       }),
     ).toBe("configured");
+  });
+
+  it("keeps each capability independent when one shared key has partial permissions", () => {
+    const llmTarget = getProviderValidationTarget(settings, "openai", "llm");
+    const sttTarget = getProviderValidationTarget(settings, "openai", "stt");
+    const validationStateByProvider = {
+      openai: {
+        llm: {
+          status: "error" as const,
+          message: "Model access rejected",
+          model: llmTarget.model,
+          configKey: llmTarget.configKey,
+        },
+        stt: {
+          status: "success" as const,
+          model: sttTarget.model,
+          configKey: sttTarget.configKey,
+        },
+      },
+    };
+
+    expect(
+      getProviderCapabilityHealthState({
+        capability: "llm",
+        provider: "openai",
+        settings,
+        validationStateByProvider,
+      }),
+    ).toBe("failing");
+    expect(
+      getProviderCapabilityHealthState({
+        capability: "stt",
+        provider: "openai",
+        settings,
+        validationStateByProvider,
+      }),
+    ).toBe("healthy");
+    expect(
+      getConfiguredProvidersForCapability({
+        capability: "llm",
+        settings,
+        validationStateByProvider,
+      }),
+    ).not.toContain("openai");
+    expect(
+      getConfiguredProvidersForCapability({
+        capability: "stt",
+        settings,
+        validationStateByProvider,
+      }),
+    ).toContain("openai");
   });
 });

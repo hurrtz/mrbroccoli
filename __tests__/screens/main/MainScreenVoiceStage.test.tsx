@@ -77,6 +77,9 @@ const t = ((key: string) => {
     totalTimeRemaining: "Total",
     speechEtaCountdown: "About",
     speechEtaOvertime: "Still working",
+    stopDriveSession: "Stop",
+    repeatDriveReply: "Repeat",
+    continueDriveSession: "Continue",
   };
   return copy[key] ?? key;
 }) as TranslateFn;
@@ -214,6 +217,40 @@ describe("MainScreenVoiceStage composer", () => {
     fireEvent(action, "pressOut");
     expect(onPressIn).toHaveBeenCalledTimes(1);
     expect(onPressOut).toHaveBeenCalledTimes(1);
+  });
+
+  it("shows large Drive Session controls and wires the primary action", () => {
+    const onPress = jest.fn();
+    const onDriveStop = jest.fn();
+    const onDriveRepeat = jest.fn();
+    const onDriveContinue = jest.fn();
+    const screen = render(
+      <MainScreenVoiceStage
+        {...createProps({
+          driveSessionActive: true,
+          driveSessionCanContinue: true,
+          driveSessionCanRepeat: true,
+          inputMode: "drive-session",
+          onDriveContinue,
+          onDriveRepeat,
+          onDriveStop,
+          onPress,
+        })}
+      />,
+    );
+
+    fireEvent.press(screen.getByTestId("voice-input-surface"));
+    fireEvent.press(screen.getByTestId("drive-session-stop"));
+    fireEvent.press(screen.getByTestId("drive-session-repeat"));
+    fireEvent.press(screen.getByTestId("drive-session-continue"));
+
+    expect(onPress).toHaveBeenCalledTimes(1);
+    expect(onDriveStop).toHaveBeenCalledTimes(1);
+    expect(onDriveRepeat).toHaveBeenCalledTimes(1);
+    expect(onDriveContinue).toHaveBeenCalledTimes(1);
+    expect(
+      StyleSheet.flatten(screen.getByTestId("drive-session-stop").props.style),
+    ).toEqual(expect.objectContaining({ minHeight: 48 }));
   });
 
   it("preserves an unfinished text draft while the pipeline is active", () => {

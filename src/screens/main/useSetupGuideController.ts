@@ -270,7 +270,10 @@ export function useSetupGuideController({
       updateSettings({
         providerValidationResults: {
           ...settings.providerValidationResults,
-          [selectedProvider]: result,
+          [selectedProvider]: {
+            ...settings.providerValidationResults[selectedProvider],
+            llm: result,
+          },
         },
       });
       return true;
@@ -293,7 +296,10 @@ export function useSetupGuideController({
       updateSettings({
         providerValidationResults: {
           ...settings.providerValidationResults,
-          [selectedProvider]: result,
+          [selectedProvider]: {
+            ...settings.providerValidationResults[selectedProvider],
+            llm: result,
+          },
         },
       });
       return false;

@@ -218,7 +218,33 @@ describe("runVoicePipeline", () => {
     expect(callbacks.onResponseDone).toHaveBeenCalledWith(
       "Wind is moving air.",
       undefined,
-      undefined,
+      expect.objectContaining({
+        turnReceipt: expect.objectContaining({
+          input: expect.objectContaining({
+            source: "text",
+            mode: "native",
+          }),
+          requestedRoute: {
+            provider: "groq",
+            model: "llama-3.3-70b-versatile",
+          },
+          actualRoute: {
+            provider: "groq",
+            model: "llama-3.3-70b-versatile",
+          },
+          speechOutput: expect.objectContaining({
+            enabled: false,
+            requestedMode: "off",
+            actualMode: "off",
+          }),
+          timing: expect.objectContaining({
+            transcriptionMs: expect.any(Number),
+            modelMs: expect.any(Number),
+            replyReadyMs: expect.any(Number),
+            totalMs: expect.any(Number),
+          }),
+        }),
+      }),
     );
     expect(callbacks.onSpeechTextReady).not.toHaveBeenCalled();
     expect(callbacks.onAudioReady).not.toHaveBeenCalled();
@@ -1416,6 +1442,16 @@ describe("runVoicePipeline", () => {
             { type: "text", text: "Wind is moving air." },
           ],
         },
+        turnReceipt: expect.objectContaining({
+          webSearch: expect.objectContaining({
+            requested: true,
+            ready: true,
+            used: true,
+            fellBack: false,
+            provider: "openai",
+            model: "gpt-4.1-mini",
+          }),
+        }),
       }),
     );
   });
@@ -1473,6 +1509,20 @@ describe("runVoicePipeline", () => {
     expect(
       (streamChat as jest.Mock).mock.calls[0][0].webSearchContext,
     ).toBeUndefined();
+    expect(callbacks.onResponseDone).toHaveBeenCalledWith(
+      "Wind is moving air.",
+      undefined,
+      expect.objectContaining({
+        turnReceipt: expect.objectContaining({
+          webSearch: expect.objectContaining({
+            requested: true,
+            ready: true,
+            used: false,
+            fellBack: true,
+          }),
+        }),
+      }),
+    );
   });
 
   it("runs web search whenever the mode is on and a provider is ready", async () => {

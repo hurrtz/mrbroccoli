@@ -11,12 +11,33 @@ export interface StatusDisplayData {
 }
 
 export function getVisualPhaseActionLabel(params: {
+  driveSessionActive?: boolean;
   inputMode: InputMode;
   playbackPaused?: boolean;
   t: TranslateFn;
   visualPhase: VoiceVisualPhase;
 }) {
-  const { inputMode, playbackPaused = false, t, visualPhase } = params;
+  const {
+    driveSessionActive = false,
+    inputMode,
+    playbackPaused = false,
+    t,
+    visualPhase,
+  } = params;
+
+  if (inputMode === "drive-session") {
+    if (visualPhase === "recording") {
+      return t("tapToSendDriveTurn");
+    }
+
+    if (visualPhase !== "idle") {
+      return t("tapToInterruptDriveReply");
+    }
+
+    return driveSessionActive
+      ? t("continueDriveSession")
+      : t("startDriveSession");
+  }
 
   return playbackPaused && visualPhase === "speaking"
     ? t("paused")
@@ -42,6 +63,7 @@ export function getVisualPhaseActionLabel(params: {
 }
 
 export function getStatusDisplayData(params: {
+  driveSessionActive?: boolean;
   inputMode: InputMode;
   messageCount: number;
   playbackPaused?: boolean;
@@ -52,6 +74,7 @@ export function getStatusDisplayData(params: {
   visualPhase: VoiceVisualPhase;
 }): StatusDisplayData {
   const {
+    driveSessionActive = false,
     inputMode,
     messageCount,
     playbackPaused = false,
@@ -65,6 +88,7 @@ export function getStatusDisplayData(params: {
   const messageCountLabel =
     messageCount > 0 ? t("messageCount", { count: messageCount }) : null;
   const actionLabel = getVisualPhaseActionLabel({
+    driveSessionActive,
     inputMode,
     playbackPaused,
     t,
@@ -87,7 +111,9 @@ export function getStatusDisplayData(params: {
                   ? t("thinking")
                   : visualPhase === "thinking"
                     ? t("thinking")
-                    : t("idle");
+                    : inputMode === "drive-session" && driveSessionActive
+                      ? t("driveSessionReady")
+                      : t("idle");
   const statusDetail =
     playbackPaused && visualPhase === "speaking"
       ? t("speechPaused")
@@ -107,7 +133,9 @@ export function getStatusDisplayData(params: {
                   ? t("preparingRequest")
                   : visualPhase === "thinking"
                     ? t("waitingForProvider", { provider: providerLabel })
-                    : (messageCountLabel ?? t("freshSession"));
+                    : inputMode === "drive-session" && driveSessionActive
+                      ? t("driveSessionReadyDescription")
+                      : (messageCountLabel ?? t("freshSession"));
 
   return {
     actionLabel,

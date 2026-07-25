@@ -49,6 +49,7 @@ export interface PipelineCallbacks {
 }
 
 export interface RunVoicePipelineParams {
+  turnStartedAtMs?: number;
   audioUri?: string;
   transcriptionOverride?: string;
   messages: Message[];

@@ -83,6 +83,40 @@ describe("statusSelectors", () => {
     expect(status.actionLabel).toBe("Listening");
   });
 
+  it("uses interrupt and send labels for an active Drive Session", () => {
+    const t = (key: string) =>
+      ({
+        tapToInterruptDriveReply: "Tap to interrupt",
+        tapToSendDriveTurn: "Tap to send",
+      })[key] ?? key;
+
+    expect(
+      getStatusDisplayData({
+        driveSessionActive: true,
+        inputMode: "drive-session",
+        messageCount: 0,
+        pipelinePhase: "speaking",
+        providerLabel: "OpenAI",
+        t,
+        ttsProviderLabel: "OpenAI",
+        visualPhase: "speaking",
+      }).actionLabel,
+    ).toBe("Tap to interrupt");
+
+    expect(
+      getStatusDisplayData({
+        driveSessionActive: true,
+        inputMode: "drive-session",
+        messageCount: 0,
+        pipelinePhase: "idle",
+        providerLabel: "OpenAI",
+        t,
+        ttsProviderLabel: "OpenAI",
+        visualPhase: "recording",
+      }).actionLabel,
+    ).toBe("Tap to send");
+  });
+
   it("distinguishes request preparation from provider thinking", () => {
     const status = getStatusDisplayData({
       inputMode: "toggle-to-talk",

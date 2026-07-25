@@ -7,6 +7,7 @@ import {
   GeminiAssistantContentPart,
   Message,
   MessageMetadata,
+  MessageRouterMetadata,
   MistralAssistantContentChunk,
   Provider,
   UsageEstimate,
@@ -95,6 +96,7 @@ interface StreamingLlmRequestParams extends LlmRequestParams {
   onGeminiAssistantContent?: (content: GeminiAssistantContentPart[]) => void;
   onMistralAssistantContent?: (content: MistralAssistantContentChunk[]) => void;
   onKimiReasoningContent?: (content: string) => void;
+  onOpenRouterMetadata?: (metadata: MessageRouterMetadata) => void;
 }
 
 function buildProviderNotWiredUpError(
@@ -244,6 +246,7 @@ const LLM_STREAM_REQUESTERS = {
       onStreamActivity: params.onStreamActivity,
       onMistralAssistantContent: params.onMistralAssistantContent,
       onKimiReasoningContent: params.onKimiReasoningContent,
+      onOpenRouterMetadata: params.onOpenRouterMetadata,
       abortSignal: params.abortSignal,
     }),
   "gemini-generate-content": async (
@@ -624,6 +627,12 @@ export async function streamChat({
                     ...replyMetadata?.providerState,
                     kimiReasoningContent: content,
                   },
+                };
+              },
+              onOpenRouterMetadata: (metadata) => {
+                replyMetadata = {
+                  ...replyMetadata,
+                  router: metadata,
                 };
               },
               abortSignal: requestAbortController.signal,

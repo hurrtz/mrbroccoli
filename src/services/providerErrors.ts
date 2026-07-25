@@ -152,6 +152,15 @@ export function buildProviderHttpError(params: {
     );
   }
 
+  if (params.status === 402) {
+    return new Error(
+      translate(params.language, "providerCreditsRequired", {
+        provider: providerLabel,
+        action: actionLabel,
+      }),
+    );
+  }
+
   if (params.action === "reply" && isContextTooLongFailure(detail)) {
     return new Error(
       translate(params.language, "providerContextTooLong", {

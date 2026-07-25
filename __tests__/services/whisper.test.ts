@@ -188,6 +188,33 @@ describe("transcribeAudio", () => {
     expect(url).toBe("https://api.mistral.ai/v1/audio/transcriptions");
   });
 
+  it("uses ElevenLabs Scribe v2 with its multipart field and API-key header", async () => {
+    (fetch as jest.Mock).mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({
+        text: "Hello from ElevenLabs",
+      }),
+    });
+
+    const result = await transcribeAudio({
+      fileUri: "/tmp/recording.m4a",
+      mode: "provider",
+      provider: "elevenlabs",
+      apiKey: "elevenlabs-test",
+      language: "en",
+    });
+
+    expect(result).toBe("Hello from ElevenLabs");
+    const [url, options] = (fetch as jest.Mock).mock.calls[0];
+    expect(url).toBe("https://api.elevenlabs.io/v1/speech-to-text");
+    expect(options.headers).toEqual({
+      "xi-api-key": "elevenlabs-test",
+    });
+    expect(Array.from((options.body as FormData).entries())).toEqual(
+      expect.arrayContaining([["model_id", "scribe_v2"]]),
+    );
+  });
+
   it("enables diarized output and automatic chunking for OpenAI diarization", async () => {
     (fetch as jest.Mock).mockResolvedValueOnce({
       ok: true,

@@ -76,6 +76,11 @@ export function ListeningSection({
               label: t("toggleToTalk"),
               description: t("toggleToTalkDescription"),
             },
+            {
+              value: "drive-session",
+              label: t("driveSession"),
+              description: t("driveSessionDescription"),
+            },
           ]}
           value={settings.inputMode}
           onChange={(value) => onUpdate({ inputMode: value })}

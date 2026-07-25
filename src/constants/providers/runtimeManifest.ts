@@ -3,6 +3,7 @@ import { PROVIDER_DOCUMENTS } from "../../../data/providers";
 
 export type RuntimeAppProviderId =
   | "openai"
+  | "openrouter"
   | "anthropic"
   | "alibaba-qwen-dashscope"
   | "bytedance-doubao-seed"
@@ -418,6 +419,37 @@ const PERPLEXITY_DEEP_RESEARCH_EFFORT = effortConfig(
   ["low", "medium", "high"],
 );
 
+const OPENROUTER_FULL_REASONING_EFFORT = effortConfig(
+  "reasoning-effort",
+  "medium",
+  ["none", "minimal", "low", "medium", "high", "xhigh", "max"],
+);
+const OPENROUTER_HIGH_REASONING_EFFORT = effortConfig(
+  "reasoning-effort",
+  "high",
+  ["low", "medium", "high", "xhigh", "max"],
+);
+const OPENROUTER_GEMINI_REASONING_EFFORT = effortConfig(
+  "reasoning-effort",
+  "medium",
+  ["minimal", "low", "medium", "high"],
+);
+const OPENROUTER_GROK_REASONING_EFFORT = effortConfig(
+  "reasoning-effort",
+  "high",
+  ["low", "medium", "high"],
+);
+const OPENROUTER_DEEPSEEK_REASONING_EFFORT = effortConfig(
+  "reasoning-effort",
+  "high",
+  ["high", "xhigh"],
+);
+const OPENROUTER_MISTRAL_REASONING_EFFORT = effortConfig(
+  "reasoning-effort",
+  "high",
+  ["none", "high"],
+);
+
 const QWEN_THINKING_EFFORT = effortConfig(
   "qwen-enable-thinking",
   "enabled",
@@ -479,6 +511,7 @@ function catalogModelSpecs(
 
 export const RUNTIME_PROVIDER_ORDER = [
   "openai",
+  "openrouter",
   "anthropic",
   "alibaba-qwen-dashscope",
   "bytedance-doubao-seed",
@@ -584,6 +617,99 @@ export const RUNTIME_PROVIDER_MANIFEST: Record<
       ],
       languageNote:
         "OpenAI currently exposes gpt-4o-mini-tts, tts-1, and tts-1-hd. OpenAI does not publish a compact well-supported language list for TTS in the same way it does for STT, and notes that the voices are optimized for English.",
+    },
+  },
+  openrouter: {
+    appProvider: "openrouter",
+    catalogProviderId: "openrouter",
+    label: "OpenRouter",
+    shortLabel: "OPENROUTER",
+    apiKeyPlaceholder: "sk-or-v1-...",
+    apiKeyHint:
+      "One OpenRouter key unlocks a curated set of provider models. Requests pass through OpenRouter to the selected upstream provider; direct provider connections remain available separately.",
+    apiKeyUrl: "https://openrouter.ai/settings/keys",
+    llm: {
+      support: "provider",
+      transport: "openai-compatible",
+      endpoint: "https://openrouter.ai/api/v1/chat/completions",
+      defaultModel: "openai/gpt-5.6-sol-20260709",
+      models: [
+        withEffort(
+          namedModel(
+            "openai/gpt-5.6-sol-20260709",
+            "OpenAI · GPT-5.6 Sol",
+          ),
+          OPENROUTER_FULL_REASONING_EFFORT,
+        ),
+        withEffort(
+          namedModel(
+            "anthropic/claude-sonnet-5-20260630",
+            "Anthropic · Claude Sonnet 5",
+          ),
+          OPENROUTER_HIGH_REASONING_EFFORT,
+        ),
+        withEffort(
+          namedModel(
+            "anthropic/claude-5-fable-20260609",
+            "Anthropic · Claude Fable 5",
+          ),
+          OPENROUTER_HIGH_REASONING_EFFORT,
+        ),
+        withEffort(
+          namedModel(
+            "google/gemini-3.6-flash-20260721",
+            "Google · Gemini 3.6 Flash",
+          ),
+          OPENROUTER_GEMINI_REASONING_EFFORT,
+        ),
+        withEffort(
+          namedModel(
+            "google/gemini-3.5-flash-lite-20260721",
+            "Google · Gemini 3.5 Flash Lite",
+          ),
+          OPENROUTER_GEMINI_REASONING_EFFORT,
+        ),
+        withEffort(
+          namedModel("x-ai/grok-4.5-20260708", "xAI · Grok 4.5"),
+          OPENROUTER_GROK_REASONING_EFFORT,
+        ),
+        withEffort(
+          namedModel(
+            "deepseek/deepseek-v4-pro-20260423",
+            "DeepSeek · DeepSeek V4 Pro",
+          ),
+          OPENROUTER_DEEPSEEK_REASONING_EFFORT,
+        ),
+        withEffort(
+          namedModel(
+            "moonshotai/kimi-k3-20260715",
+            "Moonshot · Kimi K3",
+          ),
+          effortConfig("reasoning-effort", "high", ["low", "high", "max"]),
+        ),
+        withEffort(
+          namedModel(
+            "mistralai/mistral-medium-3.5-20260430",
+            "Mistral · Mistral Medium 3.5",
+          ),
+          OPENROUTER_MISTRAL_REASONING_EFFORT,
+        ),
+        namedModel(
+          "qwen/qwen3.7-max-20260520",
+          "Qwen · Qwen3.7 Max",
+        ),
+      ],
+    },
+    stt: {
+      support: "none",
+      transport: "none",
+      models: [],
+    },
+    tts: {
+      support: "none",
+      transport: "none",
+      models: [],
+      voiceOptions: [],
     },
   },
   anthropic: {
@@ -1120,7 +1246,7 @@ export const RUNTIME_PROVIDER_MANIFEST: Record<
     shortLabel: "ELEVENLABS",
     apiKeyPlaceholder: "Enter API key",
     apiKeyHint:
-      "Unlocks ElevenLabs text-to-speech models and account voices. Restricted keys need text-to-speech and voice read access.",
+      "Unlocks ElevenLabs text-to-speech and Scribe speech-to-text. Voice read access is optional and only needed to load the account voice library.",
     apiKeyUrl: "https://elevenlabs.io/app/settings/api-keys",
     llm: {
       support: "none",
@@ -1128,9 +1254,13 @@ export const RUNTIME_PROVIDER_MANIFEST: Record<
       models: [],
     },
     stt: {
-      support: "none",
-      transport: "none",
-      models: [],
+      support: "provider",
+      transport: "multipart",
+      endpoint: "https://api.elevenlabs.io/v1/speech-to-text",
+      defaultModel: "scribe_v2",
+      models: [namedModel("scribe_v2", "Scribe v2")],
+      languageNote:
+        "Scribe v2 automatically detects and transcribes more than 90 languages.",
     },
     tts: {
       support: "provider",
@@ -1138,16 +1268,22 @@ export const RUNTIME_PROVIDER_MANIFEST: Record<
       endpoint: "https://api.elevenlabs.io/v1/text-to-speech",
       requestFormat: "elevenlabs-speech",
       defaultModel: "eleven_flash_v2_5",
+      defaultVoice: "21m00Tcm4TlvDq8ikWAM",
+      voiceFallback: "21m00Tcm4TlvDq8ikWAM",
       models: [
         namedModel("eleven_flash_v2_5", "Eleven Flash v2.5"),
         namedModel("eleven_multilingual_v2", "Eleven Multilingual v2"),
         namedModel("eleven_v3", "Eleven v3"),
       ],
-      voiceOptions: [],
+      voiceOptions: [
+        voice("21m00Tcm4TlvDq8ikWAM", "Rachel (built-in)", {
+          de: "Rachel (integriert)",
+        }),
+      ],
       voiceDirectory: "elevenlabs",
       requiresVoice: true,
       languageNote:
-        "ElevenLabs Flash v2.5 supports 32 languages, Multilingual v2 supports 29, and Eleven v3 supports more than 70. Mr Broccoli automatically loads the voices available to the configured account.",
+        "ElevenLabs Flash v2.5 supports 32 languages, Multilingual v2 supports 29, and Eleven v3 supports more than 70. Mr Broccoli uses a built-in premade voice when the configured key cannot read the account voice library.",
     },
   },
   "moonshot-ai-kimi": {

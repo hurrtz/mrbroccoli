@@ -1,6 +1,7 @@
 import { MutableRefObject } from "react";
 
 import { PipelinePhase } from "../../../hooks/useVoicePipeline";
+import type { ReplayPhase } from "../../../hooks/useVoicePipeline";
 import { Provider, Settings } from "../../../types";
 
 import { ShowToastFn, TranslateFn } from "../shared";
@@ -10,8 +11,11 @@ export interface AudioPlayerController {
   isPlaybackPaused: boolean;
   isPlaying: boolean;
   pausePlayback: () => Promise<boolean>;
+  resetCancellation: () => void;
   resumePlayback: () => Promise<boolean>;
+  speakText: (text: string) => void;
   stopPlayback: () => Promise<void>;
+  waitForDrain: () => Promise<void>;
   waitForPlaybackRouteSettle: () => Promise<void>;
 }
 
@@ -42,16 +46,23 @@ export interface UseVoiceSessionControllerParams {
   isBusy: boolean;
   isRecording: boolean;
   lastCompletedReplyRef: MutableRefObject<string>;
+  mainSurfaceVisible: boolean;
   nativeStt: NativeSpeechRecognizerController;
+  playReplyText: (text: string) => Promise<void>;
   player: AudioPlayerController;
   providerApiKey: string;
   providerLabel: string;
   recorder: AudioRecorderController;
+  replayPhase: ReplayPhase;
   setPipelinePhase: (phase: PipelinePhase) => void;
   setStreamingText: (text: string) => void;
   settings: Pick<
     Settings,
-    "spokenRepliesEnabled" | "sttMode" | "ttsMode" | "providerSttModels"
+    | "inputMode"
+    | "spokenRepliesEnabled"
+    | "sttMode"
+    | "ttsMode"
+    | "providerSttModels"
   >;
   showToast: ShowToastFn;
   sttApiKey: string;
@@ -59,4 +70,5 @@ export interface UseVoiceSessionControllerParams {
   t: TranslateFn;
   ttsApiKey: string;
   ttsProvider: Provider | null;
+  stopReplay: () => Promise<void>;
 }

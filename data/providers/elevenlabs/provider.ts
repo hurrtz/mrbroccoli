@@ -7,13 +7,14 @@ export const providerDefinition = defineProviderDefinition({
   hq: null,
   verifiedSupport: {
     llm: "unsupported",
-    stt: "unsupported",
+    stt: "native",
     tts: "native",
   },
   officialSources: [
     "https://elevenlabs.io/docs/overview/models",
     "https://elevenlabs.io/docs/api-reference/authentication",
     "https://elevenlabs.io/docs/api-reference/text-to-speech/convert",
+    "https://elevenlabs.io/docs/api-reference/speech-to-text/convert",
     "https://elevenlabs.io/docs/api-reference/voices/search",
     "https://elevenlabs.io/docs/api-reference/models/list",
   ],
@@ -36,13 +37,13 @@ export const providerDefinition = defineProviderDefinition({
     region:
       "Mr Broccoli uses the standard ElevenLabs API endpoint. Account-specific data residency and zero-retention features depend on the ElevenLabs plan.",
     sttLanguages:
-      "Not integrated. ElevenLabs offers separate Scribe speech-to-text APIs, but this provider entry is intentionally TTS-only.",
+      "Scribe v2 supports automatic transcription across more than 90 languages.",
     ttsLanguages:
       "Eleven v3 supports more than 70 languages; Flash v2.5 supports 32; Multilingual v2 supports 29.",
     freeTier:
       "Plan availability and quotas are account-specific and should be checked in ElevenLabs.",
     integrationNotes:
-      "Authenticate with xi-api-key. Discover account voices through paginated GET /v2/voices and synthesize MP3 through POST /v1/text-to-speech/{voice_id}.",
+      "Authenticate with xi-api-key. Transcribe recorded audio through POST /v1/speech-to-text, discover account voices through paginated GET /v2/voices, and synthesize MP3 through POST /v1/text-to-speech/{voice_id}.",
   },
   sources: [
     {
@@ -65,6 +66,13 @@ export const providerDefinition = defineProviderDefinition({
       type: "official",
       lastUpdated: null,
       usedFor: ["tts", "integration"],
+    },
+    {
+      url: "https://elevenlabs.io/docs/api-reference/speech-to-text/convert",
+      title: "Create transcript",
+      type: "official",
+      lastUpdated: null,
+      usedFor: ["stt", "limits", "languages", "integration"],
     },
     {
       url: "https://elevenlabs.io/docs/api-reference/voices/search",

@@ -183,6 +183,64 @@ export const styles = StyleSheet.create({
     lineHeight: 16,
     fontFamily: fonts.mono,
   },
+  turnReceiptCard: {
+    alignSelf: "stretch",
+    marginTop: 12,
+    borderRadius: 16,
+    borderWidth: 1,
+    paddingHorizontal: 10,
+    paddingVertical: 9,
+    gap: 8,
+  },
+  turnReceiptToggle: {
+    minHeight: 34,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: 10,
+  },
+  turnReceiptTitleRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 7,
+  },
+  turnReceiptTitle: {
+    fontSize: 12,
+    fontFamily: fonts.display,
+  },
+  turnReceiptToggleMeta: {
+    flexShrink: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "flex-end",
+    gap: 5,
+  },
+  turnReceiptSummary: {
+    flexShrink: 1,
+    fontSize: 10,
+    fontFamily: fonts.mono,
+  },
+  turnReceiptContent: {
+    gap: 9,
+    paddingTop: 4,
+  },
+  turnReceiptRow: {
+    gap: 3,
+  },
+  turnReceiptLabel: {
+    fontSize: 9,
+    letterSpacing: 0.9,
+    textTransform: "uppercase",
+    fontFamily: fonts.mono,
+  },
+  turnReceiptValue: {
+    fontSize: 11,
+    lineHeight: 16,
+    fontFamily: fonts.body,
+  },
+  turnReceiptValueMono: {
+    fontFamily: fonts.mono,
+  },
   referenceCard: {
     alignSelf: "stretch",
     marginTop: 14,

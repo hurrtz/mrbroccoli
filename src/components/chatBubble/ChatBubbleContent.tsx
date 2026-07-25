@@ -5,6 +5,7 @@ import { MessageHeader } from "./MessageHeader";
 import { MessageText } from "./MessageText";
 import { PipelineNotices } from "./PipelineNotices";
 import { ReplyFailureCard } from "./ReplyFailureCard";
+import { TurnReceiptCard } from "./TurnReceiptCard";
 import { UsageCard } from "./UsageCard";
 import { WebSearchReferences } from "./WebSearchReferences";
 import type { ChatBubbleProps } from "./types";
@@ -30,6 +31,7 @@ export function ChatBubbleContent({
         onRepeat={onRepeat}
         onOpenSpeakingSettings={onOpenSpeakingSettings}
       />
+      <TurnReceiptCard message={message} />
       <WebSearchReferences message={message} />
       <UsageCard message={message} showUsageStats={showUsageStats} />
       {selectable && message.role === "assistant" ? (

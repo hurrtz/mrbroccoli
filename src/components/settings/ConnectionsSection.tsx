@@ -5,14 +5,17 @@ import { getAppProviderForCatalogProviderId } from "../../catalog/appProviders";
 import type { CatalogProviderId } from "../../catalog";
 import { PROVIDER_LABELS } from "../../constants/models";
 import { useLocalization } from "../../i18n";
-import type { Provider, Settings } from "../../types";
+import type {
+  Provider,
+  ProviderCapability,
+  Settings,
+} from "../../types";
 import { useTheme } from "../../theme/ThemeContext";
 
 import { ProviderVaultRow } from "./ProviderVaultRow";
 import { styles } from "./styles";
 import {
   getProviderCapabilities,
-  type ProviderCapability,
 } from "./providerSupport";
 import type {
   ProviderHealthState,
@@ -27,9 +30,11 @@ export function ApiKeysSection({
   focusProvider,
   focusCatalogProviderId,
   getProviderHealthState,
+  getProviderCapabilityHealthState,
   getProviderValidationState,
-  canValidateProvider,
-  onValidateProvider,
+  canValidateCapability,
+  onValidateCapability,
+  onValidateAll,
   onUpdateApiKey,
   onTextInputFocus,
 }: {
@@ -37,9 +42,23 @@ export function ApiKeysSection({
   focusProvider?: Provider;
   focusCatalogProviderId?: CatalogProviderId;
   getProviderHealthState: (provider: Provider) => ProviderHealthState;
-  getProviderValidationState: (provider: Provider) => ProviderValidationState;
-  canValidateProvider: (provider: Provider) => boolean;
-  onValidateProvider: (provider: Provider) => Promise<void>;
+  getProviderCapabilityHealthState: (
+    provider: Provider,
+    capability: ProviderCapability,
+  ) => ProviderHealthState;
+  getProviderValidationState: (
+    provider: Provider,
+    capability: ProviderCapability,
+  ) => ProviderValidationState;
+  canValidateCapability: (
+    provider: Provider,
+    capability: ProviderCapability,
+  ) => boolean;
+  onValidateCapability: (
+    provider: Provider,
+    capability: ProviderCapability,
+  ) => Promise<void>;
+  onValidateAll: (provider: Provider) => Promise<void>;
   onUpdateApiKey: (provider: Provider, apiKey: string) => void;
   onTextInputFocus: TextInputFocusHandler;
 }) {
@@ -88,6 +107,7 @@ export function ApiKeysSection({
     { value: "tts", label: "TTS" },
     { value: "stt", label: "STT" },
     { value: "search", label: t("webSearch") },
+    { value: "voices", label: t("providerCapability_voices") },
   ];
 
   return (
@@ -128,9 +148,16 @@ export function ApiKeysSection({
             provider={provider}
             expanded={expandedProvider === provider}
             visibleApiKey={!!visibleApiKeys[provider]}
-            validationState={getProviderValidationState(provider)}
             healthState={getProviderHealthState(provider)}
-            canValidate={canValidateProvider(provider)}
+            getCapabilityHealthState={(capability) =>
+              getProviderCapabilityHealthState(provider, capability)
+            }
+            getValidationState={(capability) =>
+              getProviderValidationState(provider, capability)
+            }
+            canValidateCapability={(capability) =>
+              canValidateCapability(provider, capability)
+            }
             apiKey={settings.apiKeys[provider]}
             onToggleExpanded={() =>
               setExpandedProvider((previous) =>
@@ -145,7 +172,10 @@ export function ApiKeysSection({
             }
             onUpdateApiKey={onUpdateApiKey}
             onTextInputFocus={onTextInputFocus}
-            onValidate={onValidateProvider}
+            onValidateCapability={(capability) =>
+              onValidateCapability(provider, capability)
+            }
+            onValidateAll={() => onValidateAll(provider)}
           />
         ))}
       </View>

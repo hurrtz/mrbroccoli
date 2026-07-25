@@ -5,6 +5,7 @@ import {
 } from "../../providerErrors";
 import {
   AppLanguage,
+  MessageRouterMetadata,
   MistralAssistantContentChunk,
   Provider,
 } from "../../../types";
@@ -110,6 +111,120 @@ function isSuccessfulFinishReason(finishReason: unknown) {
   );
 }
 
+function getOpenRouterRequestHeaders(
+  provider: Provider,
+): Record<string, string> {
+  return provider === "openrouter"
+    ? {
+        "X-OpenRouter-Metadata": "enabled",
+        "X-Title": "Mr Broccoli",
+      }
+    : {};
+}
+
+function getOpenRouterRoutingPreferences(
+  provider: Provider,
+  modelEffort?: string,
+) {
+  return provider === "openrouter"
+    ? {
+        provider: {
+          data_collection: "deny",
+          require_parameters: Boolean(modelEffort),
+        },
+      }
+    : {};
+}
+
+function extractOpenRouterRoutingMetadata(
+  payload: unknown,
+  requestedModel: string,
+): MessageRouterMetadata | undefined {
+  if (typeof payload !== "object" || payload === null) {
+    return undefined;
+  }
+
+  const record = payload as Record<string, unknown>;
+  const metadata =
+    typeof record.openrouter_metadata === "object" &&
+    record.openrouter_metadata !== null
+      ? (record.openrouter_metadata as Record<string, unknown>)
+      : undefined;
+
+  if (!metadata) {
+    return undefined;
+  }
+
+  const endpoints =
+    typeof metadata.endpoints === "object" && metadata.endpoints !== null
+      ? (metadata.endpoints as Record<string, unknown>)
+      : undefined;
+  const availableEndpoints = Array.isArray(endpoints?.available)
+    ? endpoints.available
+    : [];
+  const selectedEndpoint = availableEndpoints.find(
+    (endpoint) =>
+      typeof endpoint === "object" &&
+      endpoint !== null &&
+      (endpoint as Record<string, unknown>).selected === true,
+  ) as Record<string, unknown> | undefined;
+  const responseModel =
+    typeof record.model === "string" ? record.model : undefined;
+  const actualModel =
+    typeof selectedEndpoint?.model === "string"
+      ? selectedEndpoint.model
+      : responseModel;
+  const responseProvider =
+    typeof record.provider === "string" ? record.provider : undefined;
+  const upstreamProvider =
+    typeof selectedEndpoint?.provider === "string"
+      ? selectedEndpoint.provider
+      : responseProvider;
+  const attempt =
+    typeof metadata.attempt === "number" ? metadata.attempt : undefined;
+  const pipeline = Array.isArray(metadata.pipeline)
+    ? metadata.pipeline
+    : [];
+  const compressionStage = pipeline.find(
+    (stage) =>
+      typeof stage === "object" &&
+      stage !== null &&
+      (stage as Record<string, unknown>).type === "context_compression",
+  ) as Record<string, unknown> | undefined;
+  const compressionData =
+    typeof compressionStage?.data === "object" &&
+    compressionStage.data !== null
+      ? (compressionStage.data as Record<string, unknown>)
+      : undefined;
+
+  return {
+    gateway: "OpenRouter",
+    requestedModel:
+      typeof metadata.requested === "string"
+        ? metadata.requested
+        : requestedModel,
+    actualModel,
+    upstreamProvider,
+    strategy:
+      typeof metadata.strategy === "string"
+        ? metadata.strategy
+        : undefined,
+    attempts: attempt,
+    contextCompression: compressionData
+      ? {
+          originalCount:
+            typeof compressionData.original_count === "number"
+              ? compressionData.original_count
+              : undefined,
+          compressedCount:
+            typeof compressionData.compressed_count === "number"
+              ? compressionData.compressed_count
+              : undefined,
+        }
+      : undefined,
+  };
+}
+
 export async function requestChatWithOpenAiCompatibleTransport(params: {
   endpoint: string;
   headers: Record<string, string>;
@@ -123,6 +238,7 @@ export async function requestChatWithOpenAiCompatibleTransport(params: {
     content: MistralAssistantContentChunk[],
   ) => void;
   onKimiReasoningContent?: (content: string) => void;
+  onOpenRouterMetadata?: (metadata: MessageRouterMetadata) => void;
   abortSignal?: AbortSignal;
 }) {
   const {
@@ -136,6 +252,7 @@ export async function requestChatWithOpenAiCompatibleTransport(params: {
     systemPrompt,
     onMistralAssistantContent,
     onKimiReasoningContent,
+    onOpenRouterMetadata,
     abortSignal,
   } = params;
   let response: Awaited<ReturnType<typeof networkFetch>>;
@@ -150,6 +267,7 @@ export async function requestChatWithOpenAiCompatibleTransport(params: {
       body: JSON.stringify({
         model,
         ...getModelEffortRequestBody(provider, model, modelEffort),
+        ...getOpenRouterRoutingPreferences(provider, modelEffort),
         messages: [
           { role: "system", content: systemPrompt },
           ...toOpenAICompatibleMessages(provider, messages),
@@ -178,6 +296,12 @@ export async function requestChatWithOpenAiCompatibleTransport(params: {
   }
 
   const data = await response.json();
+  if (provider === "openrouter") {
+    const routingMetadata = extractOpenRouterRoutingMetadata(data, model);
+    if (routingMetadata) {
+      onOpenRouterMetadata?.(routingMetadata);
+    }
+  }
   const finishReason = data.choices?.[0]?.finish_reason;
   if (!isSuccessfulFinishReason(finishReason)) {
     throw buildIncompleteReplyError(provider, language);
@@ -217,6 +341,7 @@ export async function requestChatStreamWithOpenAiCompatibleTransport(params: {
     content: MistralAssistantContentChunk[],
   ) => void;
   onKimiReasoningContent?: (content: string) => void;
+  onOpenRouterMetadata?: (metadata: MessageRouterMetadata) => void;
   abortSignal?: AbortSignal;
 }) {
   const {
@@ -232,6 +357,7 @@ export async function requestChatStreamWithOpenAiCompatibleTransport(params: {
     onStreamActivity,
     onMistralAssistantContent,
     onKimiReasoningContent,
+    onOpenRouterMetadata,
     abortSignal,
   } = params;
   let response: Awaited<ReturnType<typeof networkFetch>>;
@@ -246,6 +372,7 @@ export async function requestChatStreamWithOpenAiCompatibleTransport(params: {
       body: JSON.stringify({
         model,
         ...getModelEffortRequestBody(provider, model, modelEffort),
+        ...getOpenRouterRoutingPreferences(provider, modelEffort),
         stream: true,
         messages: [
           { role: "system", content: systemPrompt },
@@ -286,6 +413,7 @@ export async function requestChatStreamWithOpenAiCompatibleTransport(params: {
       systemPrompt,
       onMistralAssistantContent,
       onKimiReasoningContent,
+      onOpenRouterMetadata,
       abortSignal,
     });
 
@@ -324,6 +452,12 @@ export async function requestChatStreamWithOpenAiCompatibleTransport(params: {
     }
 
     onStreamActivity?.();
+    if (provider === "openrouter") {
+      const routingMetadata = extractOpenRouterRoutingMetadata(payload, model);
+      if (routingMetadata) {
+        onOpenRouterMetadata?.(routingMetadata);
+      }
+    }
 
     const nextFinishReason = payload.choices?.[0]?.finish_reason;
     if (nextFinishReason !== null && nextFinishReason !== undefined) {
@@ -390,6 +524,7 @@ export async function requestOpenAICompatibleChat(params: {
         params.apiKey,
         params.language,
       )}`,
+      ...getOpenRouterRequestHeaders(params.provider),
     },
     provider: params.provider,
     model: params.model,
@@ -416,6 +551,7 @@ export async function requestOpenAICompatibleChatStream(params: {
     content: MistralAssistantContentChunk[],
   ) => void;
   onKimiReasoningContent?: (content: string) => void;
+  onOpenRouterMetadata?: (metadata: MessageRouterMetadata) => void;
   abortSignal?: AbortSignal;
 }) {
   return requestChatStreamWithOpenAiCompatibleTransport({
@@ -426,6 +562,7 @@ export async function requestOpenAICompatibleChatStream(params: {
         params.apiKey,
         params.language,
       )}`,
+      ...getOpenRouterRequestHeaders(params.provider),
     },
     provider: params.provider,
     model: params.model,
@@ -437,6 +574,7 @@ export async function requestOpenAICompatibleChatStream(params: {
     onStreamActivity: params.onStreamActivity,
     onMistralAssistantContent: params.onMistralAssistantContent,
     onKimiReasoningContent: params.onKimiReasoningContent,
+    onOpenRouterMetadata: params.onOpenRouterMetadata,
     abortSignal: params.abortSignal,
   });
 }

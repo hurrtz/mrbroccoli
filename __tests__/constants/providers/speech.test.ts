@@ -39,6 +39,10 @@ describe("speech provider constants", () => {
     expect(getProviderSttModelOptions("mistral")).toEqual(
       [{ id: "voxtral-mini-2602", name: "Voxtral Mini Transcribe 2" }],
     );
+    expect(getProviderSttModelOptions("elevenlabs")).toEqual([
+      { id: "scribe_v2", name: "Scribe v2" },
+    ]);
+    expect(PROVIDER_DEFAULT_STT_MODELS.elevenlabs).toBe("scribe_v2");
   });
 
   it("surfaces newly wired catalog-backed STT providers through the runtime manifest", () => {
@@ -89,6 +93,12 @@ describe("speech provider constants", () => {
 
   it("surfaces catalog-backed TTS voice labels", () => {
     expect(getTtsVoiceLabel("openai", "alloy", "en")).toBe("Alloy");
+    expect(
+      getTtsVoiceLabel("elevenlabs", "21m00Tcm4TlvDq8ikWAM", "en"),
+    ).toBe("Rachel (built-in)");
+    expect(
+      getTtsVoiceLabel("elevenlabs", "21m00Tcm4TlvDq8ikWAM", "de"),
+    ).toBe("Rachel (integriert)");
   });
 
   it("filters the official Qwen system voices to the selected TTS model", () => {

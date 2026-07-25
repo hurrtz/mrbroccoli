@@ -109,11 +109,28 @@ export const de: TranslationDictionary = {
   useProvider: ({ provider }) => `${provider} verwenden`,
   createApiKey: "Zugangsdaten",
   aboutThisProvider: "Über diesen Anbieter",
+  openRouterOnboardingTitle: "Ein Key, mehrere Anbieter",
+  openRouterOnboardingDescription:
+    "Erstelle einen eigenen OpenRouter-Key, füge ihn unten ein und nutze Snapshot-Modelle mehrerer Anbieter, ohne direkte Verbindungen zu ersetzen.",
+  openRouterOnboardingRoute:
+    "Anfrageweg: dieses Gerät → OpenRouter → ausgewählter Upstream-Anbieter",
+  openRouterKeys: "OpenRouter-Keys",
   providerStatusInvalid: "Ungültig",
   providerStatusTesting: "Prüfe",
   providerStatusConfigured: "Konfiguriert",
+  providerStatusWorking: "Funktioniert",
+  providerStatusNotTested: "Nicht geprüft",
   providerStatusNotSetup: "Nicht eingerichtet",
   testProviderKey: "Key testen",
+  testAllCapabilities: "Alle prüfen",
+  testProviderCapability: ({ capability }) => `${capability} prüfen`,
+  test: "Prüfen",
+  optional: "Optional",
+  providerCapability_llm: "Antworten",
+  providerCapability_stt: "Spracheingabe",
+  providerCapability_tts: "Sprachausgabe",
+  providerCapability_search: "Websuche",
+  providerCapability_voices: "Stimmbibliothek",
   providerValidationUnavailable:
     "Für diesen Anbieter ist noch kein Live-Test verdrahtet. Speichere den Key hier und prüfe ihn bei der echten Nutzung.",
   providerNeedsAttention: "braucht Aufmerksamkeit",
@@ -176,6 +193,20 @@ export const de: TranslationDictionary = {
   toggleToTalk: "Toggle to talk",
   toggleToTalkDescription:
     "Button einmal drücken, um loszusprechen, und dann noch einmal, wenn du fertig bist.",
+  driveSession: "Fahrmodus",
+  driveSessionDescription:
+    "Aktiviert das Mikrofon nach jeder Antwort erneut. Du entscheidest, wann ein Gedanke vollständig ist, damit Sprechpausen nicht abgeschnitten werden.",
+  startDriveSession: "Fahrmodus starten",
+  stopDriveSession: "Beenden",
+  repeatDriveReply: "Wiederholen",
+  continueDriveSession: "Weiter",
+  driveSessionListeningCue: "Ich höre zu.",
+  driveSessionStoppedCue: "Fahrmodus beendet.",
+  driveSessionReady: "Fahrmodus",
+  driveSessionReadyDescription:
+    "Der Fahrmodus ist bereit. Tippe auf Weiter, um erneut zuzuhören.",
+  tapToSendDriveTurn: "Zum Senden tippen",
+  tapToInterruptDriveReply: "Zum Unterbrechen tippen",
   speechToText: "Sprache zu Text",
   appNative: "Systemerkennung",
   nativeSttDescription:
@@ -266,6 +297,8 @@ export const de: TranslationDictionary = {
     `${count} ${Number(count) === 1 ? "Stimme" : "Stimmen"} von ${provider} verfügbar.`,
   providerVoicesLoadFailed:
     "Die Stimmen konnten nicht aktualisiert werden. Die aktuelle Auswahl bleibt erhalten; alternativ kannst du eine Stimmen-ID manuell eingeben.",
+  providerVoicesLoadFailedWithFallback:
+    "Die persönlichen Stimmen konnten nicht geladen werden. Die integrierte Stimme bleibt verfügbar.",
   providerVoicesLoadingHint: ({ provider }) =>
     `Mr Broccoli lädt verfügbare Stimmen automatisch von ${provider}.`,
   providerVoiceId: "Stimmen-ID",
@@ -367,7 +400,7 @@ export const de: TranslationDictionary = {
   configureCredentialsBeforeVoiceSession:
     "Füge in den Einstellungen Zugangsdaten hinzu, bevor du eine Sprachsitzung startest.",
   endpointCredentialFormatInvalid: ({ provider }) =>
-    `Gib für ${provider} die Basis-URL des Anbieters und den API-Schlüssel als https://dein-endpunkt.example.com|dein-api-schluessel ein.`,
+    `Gib für ${provider} die Basis-URL des Anbieters und den API-Schlüssel als https://dein-endpunkt.example.com|dein-api-schlüssel ein.`,
   speechRecognitionUnavailableOnDevice:
     "Spracherkennung ist auf diesem Gerät nicht verfügbar.",
   debugLogLabel: "LOG",
@@ -493,6 +526,42 @@ export const de: TranslationDictionary = {
     `${count} ${Number(count) === 1 ? "Quelle" : "Quellen"}`,
   sources: "Quellen",
   openSourceLink: ({ source }) => `Quelle öffnen: ${source}`,
+  turnReceipt: "Details zum Beitrag",
+  expandTurnReceipt: "Details zum Beitrag anzeigen",
+  collapseTurnReceipt: "Details zum Beitrag ausblenden",
+  turnReceiptDirect: "Direkt",
+  turnReceiptRequested: "Angeforderte Antwortroute",
+  turnReceiptActual: "Tatsächliche Antwortroute",
+  turnReceiptEffort: "Reasoning-Steuerung",
+  turnReceiptProviderNative: "anbietereigen",
+  turnReceiptInput: "Eingaberoute",
+  turnReceiptSearch: "Websuche",
+  turnReceiptVoice: "Sprachausgabe",
+  turnReceiptContext: "Kontext",
+  turnReceiptTiming: "Zeiten",
+  turnReceiptFallback: "Grund für Rückfall",
+  turnReceiptVoiceInput: "Sprache",
+  turnReceiptTypedInput: "Getippt",
+  turnReceiptSystemSpeech: "System-Spracherkennung",
+  turnReceiptSystemVoice: "Systemstimme",
+  turnReceiptSystemVoiceFallback: "Systemstimme · Anbieter-Rückfall",
+  turnReceiptOff: "Aus",
+  turnReceiptNotConfigured: "An · nicht konfiguriert",
+  turnReceiptFallbackWithoutSearch: "Ohne aktuelle Websuche fortgesetzt",
+  turnReceiptNotUsed: "Nicht verwendet",
+  turnReceiptSummaryReused: "gespeicherte Zusammenfassung verwendet",
+  turnReceiptSummaryUpdated: "Zusammenfassung aktualisiert",
+  turnReceiptContextFallback: "Rückfall auf aktuelle Beiträge",
+  turnReceiptGatewayCompression: ({ original, compressed }) =>
+    `Gateway komprimierte ${original} auf ${compressed} Beiträge`,
+  turnReceiptContextValue: ({ sent, total, summarized, state }) =>
+    `${sent}/${total} frühere Beiträge gesendet · ${summarized} neu zusammengefasst${state}`,
+  turnReceiptTimingStt: "STT",
+  turnReceiptTimingContext: "Kontext",
+  turnReceiptTimingSearch: "Suche",
+  turnReceiptTimingModel: "Modell",
+  turnReceiptTimingFirstSpeech: "erste Sprachausgabe",
+  turnReceiptTimingTotal: "gesamt",
   estimatedRouteUsageTokensOnly: ({ tokens }) => `${tokens} Token`,
   unknownUsageRoute: "Unbekannte Route",
   setupGuideConnectProviderTitle: "Zugangsdaten konfigurieren",
@@ -646,6 +715,8 @@ export const de: TranslationDictionary = {
     `${provider} hat die Zugangsdaten für ${action} abgelehnt. Prüfe API-Schlüssel und Berechtigungen.`,
   providerRateLimitError: ({ provider, action }) =>
     `${provider} drosselt ${action} gerade. Versuch es gleich noch einmal.`,
+  providerCreditsRequired: ({ provider, action }) =>
+    `${provider} benötigt ausreichend API-Guthaben für ${action}. Prüfe den Kontostand und das Ausgabenlimit des Keys.`,
   providerTimeoutError: ({ provider, action }) =>
     `${provider} hat für ${action} zu lange gebraucht. Versuch es erneut.`,
   providerTemporaryError: ({ provider, action }) =>
@@ -663,6 +734,8 @@ export const de: TranslationDictionary = {
   providerWebSearchNotRun: ({ provider }) =>
     `${provider} hat eine Antwort zurückgegeben, ohne die Websuche auszuführen.`,
   providerValidationSuccess: ({ provider }) => `${provider} ist einsatzbereit.`,
+  providerCapabilityValidationSuccess: ({ provider, capability }) =>
+    `${provider}: ${capability} funktioniert.`,
   providerValidationFailed: "Anbieter-Prüfung fehlgeschlagen.",
   webSearchFallback:
     "Die Websuche war nicht verfügbar. Die Antwort lief ohne frischen Web-Kontext weiter.",
@@ -671,7 +744,7 @@ export const de: TranslationDictionary = {
   azureSpeechApiKeyFormat:
     "Microsoft Azure TTS benötigt Azure-Speech-Zugangsdaten im Format <Schlüssel>|<Region>, zum Beispiel abc123|westeurope, oder das kombinierte Azure-Format <Endpunkt>|<API-Schlüssel>|<Schlüssel>|<Region>.",
   googleCloudSpeechCredentialFormat: ({ provider }) =>
-    `${provider} STT benötigt Google-Cloud-Speech-Zugangsdaten im Format <Projekt-ID>|<Access-Token>|<Location>, oder das kombinierte Gemini-Format <Gemini-API-Schluessel>|<Projekt-ID>|<Access-Token>|<Location>.`,
+    `${provider} STT benötigt Google-Cloud-Speech-Zugangsdaten im Format <Projekt-ID>|<Access-Token>|<Location>, oder das kombinierte Gemini-Format <Gemini-API-Schlüssel>|<Projekt-ID>|<Access-Token>|<Location>.`,
   bytedanceSpeechCredentialFormat: ({ provider }) =>
     `${provider} STT benötigt Doubao-Speech-Zugangsdaten im Format <App-Key>|<Access-Key>, optional <App-Key>|<Access-Key>|<Resource-Id>, oder im kombinierten Format <Ark-API-Key>|<App-Key>|<Access-Key>|<Resource-Id>.`,
   nativeTtsDoesNotSynthesizeAudioFiles:

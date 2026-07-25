@@ -166,10 +166,12 @@ describe("useSetupGuideController", () => {
     expect(result.current.currentValidationState.status).toBe("success");
     expect(params.updateSettings).toHaveBeenCalledWith({
       providerValidationResults: {
-        openai: expect.objectContaining({
-          status: "success",
-          model: expect.any(String),
-        }),
+        openai: {
+          llm: expect.objectContaining({
+            status: "success",
+            model: expect.any(String),
+          }),
+        },
       },
     });
 
@@ -258,11 +260,13 @@ describe("useSetupGuideController", () => {
 
     expect(params.updateSettings).toHaveBeenCalledWith({
       providerValidationResults: {
-        openai: expect.objectContaining({
-          status: "error",
-          message: errorMessage,
-          model: expect.any(String),
-        }),
+        openai: {
+          llm: expect.objectContaining({
+            status: "error",
+            message: errorMessage,
+            model: expect.any(String),
+          }),
+        },
       },
     });
   });

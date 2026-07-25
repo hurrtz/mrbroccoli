@@ -1,6 +1,6 @@
 # Mr Broccoli
 
-Mr Broccoli is a voice-first mobile chat app built with Expo and React Native. It is designed around fast spoken interaction: hold or tap to record, transcribe speech, send the result to the selected LLM provider, and play the reply back as audio.
+Mr Broccoli is a voice-first mobile chat app built with Expo and React Native. It supports push-to-talk, toggle-to-talk, and an opt-in Drive Session that re-arms voice capture after each completed reply.
 
 The app is intentionally user-key driven. No provider API keys are shipped in the app bundle. Each user adds their own keys in Settings, and providers stay disabled until configured.
 
@@ -9,16 +9,21 @@ The app is intentionally user-key driven. No provider API keys are shipped in th
 - Voice-first interaction with live recording and playback states
 - User-managed API keys stored securely on device with `expo-secure-store`
 - Multi-provider support with branded provider selection
+- Optional OpenRouter gateway onboarding alongside direct provider keys
 - Per-provider model selection in Settings
+- Per-capability connection checks for thinking, listening, speaking, search, and voice discovery
+- Expandable turn receipts showing the requested and actual routes, effort mapping, context handling, search, speech route, fallbacks, and timings
+- Drive Session with audible state cues, explicit pause-safe turn endings, reply interruption, and large stop/repeat/continue controls
 - Configurable assistant instructions, response length, and response tone
 - Rolling conversation compaction for long sessions to reduce token cost
 - Premium, animated mobile UI tuned for spoken conversation
 
 ## Supported Providers
 
-Ten LLM-capable providers:
+Eleven LLM-capable provider routes:
 
 - OpenAI
+- OpenRouter
 - Anthropic
 - Google Gemini
 - xAI
@@ -29,16 +34,18 @@ Ten LLM-capable providers:
 - Moonshot AI Kimi
 - Perplexity
 
-ElevenLabs is available as a dedicated TTS provider. Dedicated web-search
+ElevenLabs is available as a dedicated speech provider. Dedicated web-search
 providers include Tavily, Brave, Exa, Firecrawl, and SerpApi.
 
 Voice input and spoken replies are not tied to any single provider:
 
-- Speech-to-text prefers the device's native system recognizer, with capability-gated provider STT from OpenAI, Gemini/Google Cloud Speech, Mistral, xAI, and Qwen as alternatives.
+- Speech-to-text prefers the device's native system recognizer, with capability-gated provider STT from OpenAI, Gemini/Google Cloud Speech, Mistral, xAI, Qwen, and ElevenLabs as alternatives.
 - Text-to-speech uses the device's native voices, with capability-gated provider TTS from OpenAI, Gemini, xAI, Qwen, Mistral, and ElevenLabs as alternatives.
-- Mistral, xAI, and ElevenLabs account voices are discovered automatically and can be refreshed from Speaking settings.
+- Mistral, xAI, and ElevenLabs account voices are discovered automatically and can be refreshed from Speaking settings. ElevenLabs falls back to a built-in premade voice when a restricted key cannot read account voices.
 
-Each provider stays disabled until its key is configured, and STT/TTS routes only appear when a provider that supports them is set up.
+OpenRouter is an optional LLM gateway: one key exposes a curated cross-provider model set while direct provider connections remain available. Requests routed through it are labeled separately from direct routes.
+
+Each provider stays disabled until its key is configured, and STT/TTS routes only appear when a provider that supports them is set up. Connection health is tracked independently for each capability, so a restricted key can work for speech even when it cannot list account voices.
 
 ## Stack
 
@@ -95,6 +102,7 @@ The app runtime is centered around user-supplied keys in Settings rather than sh
 - Long conversations are compacted automatically.
 - Older turns are summarized into a rolling `contextSummary`.
 - Only a bounded recent window is sent verbatim once the thread grows large.
+- Assistant turns can expose a transparent receipt of the requested route, actual route, context transformation, web search decision, speech route, fallback, and latency.
 
 This keeps cost and latency more stable during long voice sessions.
 

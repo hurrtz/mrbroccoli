@@ -23,6 +23,7 @@ describe("app provider catalog bridge", () => {
   it("maps every runtime provider to a catalog provider", () => {
     expect(PROVIDER_CATALOG_IDS).toEqual({
       openai: "openai",
+      openrouter: "openrouter",
       anthropic: "anthropic",
       "alibaba-qwen-dashscope": "alibaba-qwen-dashscope",
       "bytedance-doubao-seed": "bytedance-doubao-seed",

@@ -4,6 +4,7 @@ import {
   Keyboard,
   LayoutChangeEvent,
   StyleSheet,
+  Text,
   TextInput,
   TouchableOpacity,
   useWindowDimensions,
@@ -39,11 +40,17 @@ export type InputSurface = "voice" | "text";
 interface VoiceTextInputPagerProps {
   colors: Colors;
   disabled: boolean;
+  driveSessionActive?: boolean;
+  driveSessionCanContinue?: boolean;
+  driveSessionCanRepeat?: boolean;
   initialSurface?: InputSurface;
   initialTextMessage?: string;
   inputMode: InputMode;
   isActive: boolean;
   onInputSurfaceChange?: (surface: InputSurface) => void;
+  onDriveContinue?: () => void | Promise<void>;
+  onDriveRepeat?: () => void | Promise<void>;
+  onDriveStop?: () => void | Promise<void>;
   onOpenStatusDetails: () => void;
   onPress: () => void;
   onPressIn: () => void;
@@ -73,11 +80,17 @@ const PAGE_GAP = 32;
 export function VoiceTextInputPager({
   colors,
   disabled,
+  driveSessionActive = false,
+  driveSessionCanContinue = false,
+  driveSessionCanRepeat = false,
   initialSurface = "voice",
   initialTextMessage = "",
   inputMode,
   isActive,
   onInputSurfaceChange,
+  onDriveContinue,
+  onDriveRepeat,
+  onDriveStop,
   onOpenStatusDetails,
   onPress,
   onPressIn,
@@ -314,7 +327,9 @@ export function VoiceTextInputPager({
                 accessibilityState={{ disabled }}
                 activeOpacity={0.84}
                 disabled={disabled}
-                onPress={inputMode === "toggle-to-talk" ? onPress : undefined}
+                onPress={
+                  inputMode === "push-to-talk" ? undefined : onPress
+                }
                 onPressIn={
                   inputMode === "push-to-talk" ? onPressIn : undefined
                 }
@@ -443,6 +458,93 @@ export function VoiceTextInputPager({
         ) : null}
       </View>
 
+      {inputMode === "drive-session" ? (
+        <View testID="drive-session-controls" style={localStyles.driveControls}>
+          <TouchableOpacity
+            testID="drive-session-stop"
+            accessibilityLabel={t("stopDriveSession")}
+            accessibilityRole="button"
+            accessibilityState={{ disabled: !driveSessionActive }}
+            activeOpacity={0.76}
+            disabled={!driveSessionActive}
+            onPress={() => {
+              void onDriveStop?.();
+            }}
+            style={[
+              localStyles.driveControl,
+              {
+                backgroundColor: colors.surfaceElevated,
+                borderColor: colors.border,
+                opacity: driveSessionActive ? 1 : 0.45,
+              },
+            ]}
+          >
+            <Feather name="square" size={16} color={colors.text} />
+            <Text style={[localStyles.driveControlLabel, { color: colors.text }]}>
+              {t("stopDriveSession")}
+            </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            testID="drive-session-repeat"
+            accessibilityLabel={t("repeatDriveReply")}
+            accessibilityRole="button"
+            accessibilityState={{ disabled: !driveSessionCanRepeat }}
+            activeOpacity={0.76}
+            disabled={!driveSessionCanRepeat}
+            onPress={() => {
+              void onDriveRepeat?.();
+            }}
+            style={[
+              localStyles.driveControl,
+              {
+                backgroundColor: colors.surfaceElevated,
+                borderColor: colors.border,
+                opacity: driveSessionCanRepeat ? 1 : 0.45,
+              },
+            ]}
+          >
+            <Feather name="repeat" size={17} color={colors.text} />
+            <Text style={[localStyles.driveControlLabel, { color: colors.text }]}>
+              {t("repeatDriveReply")}
+            </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            testID="drive-session-continue"
+            accessibilityLabel={t("continueDriveSession")}
+            accessibilityRole="button"
+            accessibilityState={{
+              disabled: disabled || !driveSessionCanContinue,
+            }}
+            activeOpacity={0.76}
+            disabled={disabled || !driveSessionCanContinue}
+            onPress={() => {
+              void onDriveContinue?.();
+            }}
+            style={[
+              localStyles.driveControl,
+              {
+                backgroundColor: colors.bubbleUser,
+                borderColor: colors.bubbleUser,
+                opacity:
+                  disabled || !driveSessionCanContinue ? 0.45 : 1,
+              },
+            ]}
+          >
+            <Feather name="play" size={17} color={colors.onPrimary} />
+            <Text
+              style={[
+                localStyles.driveControlLabel,
+                { color: colors.onPrimary },
+              ]}
+            >
+              {t("continueDriveSession")}
+            </Text>
+          </TouchableOpacity>
+        </View>
+      ) : null}
+
       <View style={localStyles.pageIndicators}>
         {(["voice", "text"] as const).map((surface) => {
           const selected = activeSurface === surface;
@@ -565,6 +667,29 @@ const localStyles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     gap: 0,
+  },
+  driveControls: {
+    flexDirection: "row",
+    gap: 8,
+    paddingTop: 6,
+  },
+  driveControl: {
+    flex: 1,
+    minHeight: 48,
+    borderRadius: 14,
+    borderWidth: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 4,
+    paddingHorizontal: 6,
+    paddingVertical: 6,
+  },
+  driveControlLabel: {
+    fontFamily: textStyles.body.fontFamily,
+    fontSize: 12,
+    lineHeight: 15,
+    fontWeight: "600",
+    textAlign: "center",
   },
   pageIndicatorTarget: {
     width: 28,

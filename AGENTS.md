@@ -48,7 +48,7 @@ These notes are specific to this repository and supplement any parent-level inst
 
 ## Provider And Model Maintenance
 
-- The app ships ten LLM-capable provider routes: `openai`, `anthropic`, `gemini`, `xai`, `mistral`, `bytedance-doubao-seed`, `deepseek`, `alibaba-qwen-dashscope`, `moonshot-ai-kimi`, and `perplexity`. `elevenlabs` is additionally available as a TTS-only provider. Dedicated web-search routes (`perplexity`, `tavily`, `brave`, `exa`, `firecrawl`, `serpapi`) are wired separately.
+- The app ships eleven LLM-capable provider routes: `openai`, `openrouter`, `anthropic`, `gemini`, `xai`, `mistral`, `bytedance-doubao-seed`, `deepseek`, `alibaba-qwen-dashscope`, `moonshot-ai-kimi`, and `perplexity`. `elevenlabs` is additionally available as an STT/TTS speech provider. Dedicated web-search routes (`perplexity`, `tavily`, `brave`, `exa`, `firecrawl`, `serpapi`) are wired separately.
 - The runtime provider set, transports, models, and STT/TTS capabilities are driven from `src/constants/providers/runtimeManifest.ts`. `src/constants/models.ts` re-exposes provider order, labels, and picker helpers on top of it.
 - Pricing has been removed: there is no `src/constants/usagePricing.ts`, and usage is reported in tokens only.
 - When adding or changing a provider, audit all of:
@@ -85,9 +85,9 @@ These notes are specific to this repository and supplement any parent-level inst
 
 - STT provider support is currently wired in `src/services/whisper.ts`.
 - TTS provider support is currently wired in `src/services/tts.ts`.
-- Speech-to-text prefers the device's native system recognizer (`src/services/speech/`); provider STT is capability-gated. OpenAI, Gemini (Google Cloud Speech), Mistral, xAI, and Alibaba Qwen currently have provider STT routes in code.
+- Speech-to-text prefers the device's native system recognizer (`src/services/speech/`); provider STT is capability-gated. OpenAI, Gemini (Google Cloud Speech), Mistral, xAI, Alibaba Qwen, and ElevenLabs currently have provider STT routes in code.
 - Text-to-speech uses the device's native voices by default; provider TTS is capability-gated. OpenAI, Gemini, xAI, Alibaba Qwen, Mistral, and ElevenLabs currently have provider TTS routes in code.
-- Mistral, ElevenLabs, and xAI load account-visible voices through provider voice-directory services. Keep those integrations, their fallback voice lists, and `src/services/providerVoiceDirectory.ts` in sync.
+- Mistral, ElevenLabs, and xAI load account-visible voices through provider voice-directory services. Keep those integrations, their fallback voice lists, and `src/services/providerVoiceDirectory.ts` in sync. ElevenLabs must retain a built-in premade fallback because restricted TTS/STT keys do not necessarily include `voices_read`.
 - Local/on-device TTS has been removed. There are no more `react-native-sherpa-onnx` / `onnxruntime-react-native` ONNX/Sherpa dependencies in the voice pipeline.
 - The capability source of truth for which provider supports STT/TTS is `src/constants/providers/runtimeManifest.ts`.
 - Native speech changes often require `npx pod-install` and a fresh native rebuild, especially on iOS.

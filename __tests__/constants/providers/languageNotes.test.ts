@@ -17,10 +17,16 @@ describe("provider language notes", () => {
 
   it("explains the permissions needed by restricted ElevenLabs keys", () => {
     expect(getProviderApiKeyHint("elevenlabs", "en")).toContain(
-      "Text to Speech and Voices read access",
+      "Text to Speech permission for TTS",
+    );
+    expect(getProviderApiKeyHint("elevenlabs", "en")).toContain(
+      "Voices read is optional",
     );
     expect(getProviderApiKeyHint("elevenlabs", "de")).toContain(
-      "Text to Speech und das Lesen von Stimmen",
+      "für TTS die Berechtigung „Text to Speech“",
+    );
+    expect(getProviderApiKeyHint("elevenlabs", "de")).toContain(
+      "„Voices read“ ist optional",
     );
   });
 

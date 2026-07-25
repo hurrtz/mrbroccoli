@@ -1,6 +1,7 @@
 import {
   PROVIDER_DEFAULT_STT_MODELS,
   PROVIDER_DEFAULT_TTS_MODELS,
+  PROVIDER_LLM_SUPPORT,
   PROVIDER_ORDER,
   getProviderSttModelOptions,
   getProviderTtsModelOptions,
@@ -20,6 +21,8 @@ import {
 import {
   type Provider,
   type ProviderApiKeys,
+  type ProviderCapability,
+  type ProviderValidationResult,
   type ProviderModelSelections,
   type ProviderSttModelSelections,
   type ProviderTtsModelSelections,
@@ -33,6 +36,7 @@ import {
   DEFAULT_SETTINGS,
   getDefaultAssistantInstructions,
   getDefaultTtsListenLanguages,
+  isDefaultAssistantInstructions,
 } from "../../types";
 import {
   getDefaultModelForProvider,
@@ -285,11 +289,16 @@ function extractStoredProviderValidationResults(
     return {};
   }
 
-  return PROVIDER_ORDER.reduce((results, provider) => {
-    const candidate = storedResults[provider] as unknown;
-
+  const capabilities: ProviderCapability[] = [
+    "llm",
+    "stt",
+    "tts",
+    "search",
+    "voices",
+  ];
+  const parseResult = (candidate: unknown): ProviderValidationResult | null => {
     if (!candidate || typeof candidate !== "object") {
-      return results;
+      return null;
     }
 
     const value = candidate as Record<string, unknown>;
@@ -298,10 +307,10 @@ function extractStoredProviderValidationResults(
       (value.status !== "success" && value.status !== "error") ||
       typeof value.model !== "string"
     ) {
-      return results;
+      return null;
     }
 
-    results[provider] = {
+    return {
       status: value.status,
       model: value.model,
       ...(typeof value.message === "string"
@@ -311,6 +320,40 @@ function extractStoredProviderValidationResults(
         ? { configKey: value.configKey }
         : {}),
     };
+  };
+
+  return PROVIDER_ORDER.reduce((results, provider) => {
+    const candidate = storedResults[provider] as unknown;
+
+    if (!candidate || typeof candidate !== "object") {
+      return results;
+    }
+
+    const legacyResult = parseResult(candidate);
+
+    if (legacyResult) {
+      const legacyCapability: ProviderCapability =
+        PROVIDER_LLM_SUPPORT[provider] === "provider" ? "llm" : "tts";
+      results[provider] = {
+        [legacyCapability]: legacyResult,
+      };
+      return results;
+    }
+
+    const value = candidate as Record<string, unknown>;
+    const capabilityResults = capabilities.reduce<
+      NonNullable<ProviderValidationResults[Provider]>
+    >((providerResults, capability) => {
+      const parsed = parseResult(value[capability]);
+      if (parsed) {
+        providerResults[capability] = parsed;
+      }
+      return providerResults;
+    }, {});
+
+    if (Object.keys(capabilityResults).length > 0) {
+      results[provider] = capabilityResults;
+    }
 
     return results;
   }, {} as ProviderValidationResults);
@@ -471,7 +514,9 @@ export function mergeSettings(
   const assistantInstructions =
     typeof storedSettings?.assistantInstructions === "string" &&
     storedSettings.assistantInstructions.trim()
-      ? storedSettings.assistantInstructions
+      ? isDefaultAssistantInstructions(storedSettings.assistantInstructions)
+        ? getDefaultAssistantInstructions(language)
+        : storedSettings.assistantInstructions
       : getDefaultAssistantInstructions(language);
   const ttsInstructions =
     typeof storedSettings?.ttsInstructions === "string"
@@ -571,6 +616,12 @@ export function mergeSettings(
     typeof storedSettings?.spokenRepliesEnabled === "boolean"
       ? storedSettings.spokenRepliesEnabled
       : DEFAULT_SETTINGS.spokenRepliesEnabled;
+  const inputMode: Settings["inputMode"] =
+    storedSettings?.inputMode === "push-to-talk" ||
+    storedSettings?.inputMode === "toggle-to-talk" ||
+    storedSettings?.inputMode === "drive-session"
+      ? storedSettings.inputMode
+      : DEFAULT_SETTINGS.inputMode;
   const hasConfiguredKeys = Object.values(mergedApiKeys).some(
     (apiKey) => apiKey.trim().length > 0,
   );
@@ -588,6 +639,7 @@ export function mergeSettings(
   return {
     ...DEFAULT_SETTINGS,
     ...sanitizedStoredSettings,
+    inputMode,
     ttsMode,
     language,
     replyPlayback,

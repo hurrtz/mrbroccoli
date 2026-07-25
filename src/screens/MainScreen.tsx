@@ -227,6 +227,7 @@ export function MainScreen() {
     replayPhase,
     activeReplayMessageId,
     handleRepeatLastReply,
+    playReplyText,
     stopReplay,
     handleVoiceCaptureDone,
   } = useVoicePipeline({
@@ -330,8 +331,14 @@ export function MainScreen() {
   });
 
   const {
+    driveSessionActive,
+    driveSessionCanContinue,
+    driveSessionCanRepeat,
+    handleContinueDriveSession,
     handlePressIn,
     handlePressOut,
+    handleRepeatDriveReply,
+    handleStopDriveSession,
     handleStopInteraction,
     handleTogglePress,
     maxRecordingMs,
@@ -344,11 +351,14 @@ export function MainScreen() {
     isBusy,
     isRecording,
     lastCompletedReplyRef,
+    mainSurfaceVisible,
     nativeStt,
+    playReplyText,
     player,
     providerApiKey,
     providerLabel,
     recorder,
+    replayPhase,
     setPipelinePhase,
     setStreamingText,
     settings,
@@ -358,6 +368,7 @@ export function MainScreen() {
     t,
     ttsApiKey,
     ttsProvider,
+    stopReplay,
   });
 
   const {
@@ -425,7 +436,7 @@ export function MainScreen() {
 
   const {
     validateProvider: handleValidateProvider,
-    validateWebSearchProvider: handleValidateWebSearchProvider,
+    validateProviderCapability: handleValidateProviderCapability,
   } = useProviderConnectionValidation({ language, settings });
 
   const {
@@ -442,6 +453,7 @@ export function MainScreen() {
   } = getMainScreenViewModel({
     activeConversation,
     availableTtsProviders,
+    driveSessionActive,
     isRecording,
     language,
     model,
@@ -629,11 +641,17 @@ export function MainScreen() {
           }}
           voiceStage={{
             disabled: voiceInputDisabled,
+            driveSessionActive,
+            driveSessionCanContinue,
+            driveSessionCanRepeat,
             initialInputSurface: inputSurfaceRef.current,
             initialTextMessage: textMessageDraftRef.current,
             inputMode: settings.inputMode,
             isActive: isActive && mainSurfaceVisible,
             onInputSurfaceChange: handleInputSurfaceChange,
+            onDriveContinue: handleContinueDriveSession,
+            onDriveRepeat: handleRepeatDriveReply,
+            onDriveStop: handleStopDriveSession,
             onOpenStatusDetails: openStatusDetails,
             onPress: handleTogglePress,
             onPressIn: handlePressIn,
@@ -727,8 +745,7 @@ export function MainScreen() {
         onUpdateApiKey={updateApiKey}
         onPreviewVoice={handlePreviewVoice}
         onStopPreviewVoice={stopPreviewVoice}
-        onValidateProvider={handleValidateProvider}
-        onValidateWebSearchProvider={handleValidateWebSearchProvider}
+        onValidateProviderCapability={handleValidateProviderCapability}
         onOpenSetupGuide={
           settings.showSetupGuideShortcut
             ? handleOpenSetupGuideFromSettings

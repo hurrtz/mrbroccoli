@@ -148,6 +148,7 @@ jest.mock("../../src/hooks/useVoicePipeline", () => ({
     replayPhase: "idle",
     activeReplayMessageId: null,
     handleRepeatLastReply: jest.fn(async () => undefined),
+    playReplyText: jest.fn(async () => undefined),
     stopReplay: jest.fn(async () => undefined),
     handleVoiceCaptureDone: jest.fn(async () => undefined),
   })),

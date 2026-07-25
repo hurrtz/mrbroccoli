@@ -1,5 +1,8 @@
 import type { WebSearchProvider } from "../../constants/webSearch";
-import { providerRequiresTtsVoice } from "../../constants/models";
+import {
+  PROVIDER_DEFAULT_TTS_VOICES,
+  providerRequiresTtsVoice,
+} from "../../constants/models";
 import type { Provider, Settings } from "../../types";
 import { hasProviderCredentialForCapability } from "../../utils/providerCredentials";
 
@@ -112,7 +115,10 @@ function getSpeakReadiness(
 
   if (
     providerRequiresTtsVoice(provider) &&
-    !settings.providerTtsVoices[provider]?.trim()
+    !(
+      settings.providerTtsVoices[provider]?.trim() ||
+      PROVIDER_DEFAULT_TTS_VOICES[provider]?.trim()
+    )
   ) {
     return status("broken");
   }

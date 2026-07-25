@@ -36,6 +36,7 @@ describe("useVoiceSessionController", () => {
       isBusy: false,
       isRecording: false,
       lastCompletedReplyRef: { current: "" },
+      mainSurfaceVisible: true,
       nativeStt: {
         abortRecognition: jest.fn(async () => undefined),
         clearLastError: jest.fn(),
@@ -48,10 +49,14 @@ describe("useVoiceSessionController", () => {
         isPlaybackPaused: false,
         isPlaying: false,
         pausePlayback: jest.fn(async () => true),
+        resetCancellation: jest.fn(),
         resumePlayback: jest.fn(async () => true),
+        speakText: jest.fn(),
         stopPlayback: jest.fn(async () => undefined),
+        waitForDrain: jest.fn(async () => undefined),
         waitForPlaybackRouteSettle: jest.fn(async () => undefined),
       },
+      playReplyText: jest.fn(async () => undefined),
       providerApiKey: "provider-key",
       providerLabel: "OpenAI",
       recorder: {
@@ -60,9 +65,11 @@ describe("useVoiceSessionController", () => {
         startRecording: jest.fn(async () => undefined),
         stopRecording: jest.fn(async () => "file://voice.m4a"),
       },
+      replayPhase: "idle" as const,
       setPipelinePhase: jest.fn(),
       setStreamingText: jest.fn(),
       settings: {
+        inputMode: "toggle-to-talk" as const,
         spokenRepliesEnabled: true,
         sttMode: "provider" as const,
         ttsMode: "provider" as const,
@@ -81,6 +88,7 @@ describe("useVoiceSessionController", () => {
         }[key] ?? key),
       ttsApiKey: "tts-key",
       ttsProvider: "openai" as const,
+      stopReplay: jest.fn(async () => undefined),
       ...overrides,
     };
 
@@ -119,8 +127,11 @@ describe("useVoiceSessionController", () => {
       isPlaybackPaused: false,
       isPlaying: true,
       pausePlayback: jest.fn(async () => true),
+      resetCancellation: jest.fn(),
       resumePlayback: jest.fn(async () => true),
+      speakText: jest.fn(),
       stopPlayback: jest.fn(async () => undefined),
+      waitForDrain: jest.fn(async () => undefined),
       waitForPlaybackRouteSettle: jest.fn(async () => undefined),
     };
     const { result, params } = renderController({ player });
@@ -139,8 +150,11 @@ describe("useVoiceSessionController", () => {
       isPlaybackPaused: true,
       isPlaying: true,
       pausePlayback: jest.fn(async () => true),
+      resetCancellation: jest.fn(),
       resumePlayback: jest.fn(async () => true),
+      speakText: jest.fn(),
       stopPlayback: jest.fn(async () => undefined),
+      waitForDrain: jest.fn(async () => undefined),
       waitForPlaybackRouteSettle: jest.fn(async () => undefined),
     };
     const { result } = renderController({ player });
@@ -190,8 +204,11 @@ describe("useVoiceSessionController", () => {
       isPlaybackPaused: false,
       isPlaying: false,
       pausePlayback: jest.fn(async () => true),
+      resetCancellation: jest.fn(),
       resumePlayback: jest.fn(async () => true),
+      speakText: jest.fn(),
       stopPlayback: jest.fn(async () => undefined),
+      waitForDrain: jest.fn(async () => undefined),
       waitForPlaybackRouteSettle: jest.fn(async () => undefined),
     };
     const { result } = renderController({ player });
@@ -230,5 +247,113 @@ describe("useVoiceSessionController", () => {
     expect(params.setPipelinePhase).toHaveBeenCalledWith("idle");
     expect(params.setStreamingText).toHaveBeenCalledWith("");
     expect(params.player.stopPlayback).toHaveBeenCalledTimes(1);
+  });
+
+  it("starts Drive Session with an audible cue and arms recording", async () => {
+    const { result, params } = renderController({
+      settings: {
+        inputMode: "drive-session",
+        spokenRepliesEnabled: true,
+        sttMode: "provider",
+        ttsMode: "provider",
+        providerSttModels: {},
+      },
+    });
+
+    await act(async () => {
+      await result.current.handleTogglePress();
+    });
+
+    await waitFor(() => {
+      expect(result.current.driveSessionActive).toBe(true);
+      expect(params.player.speakText).toHaveBeenCalledWith(
+        "driveSessionListeningCue",
+      );
+      expect(params.recorder.startRecording).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  it("uses the Drive Session primary action to interrupt and re-arm", async () => {
+    const abortController = new AbortController();
+    const { result, params } = renderController({
+      abortRef: { current: abortController },
+      isBusy: true,
+      settings: {
+        inputMode: "drive-session",
+        spokenRepliesEnabled: true,
+        sttMode: "provider",
+        ttsMode: "provider",
+        providerSttModels: {},
+      },
+    });
+
+    await act(async () => {
+      await result.current.handleContinueDriveSession();
+    });
+    expect(result.current.driveSessionActive).toBe(true);
+
+    await act(async () => {
+      await result.current.handleTogglePress();
+    });
+
+    expect(abortController.signal.aborted).toBe(true);
+    expect(params.stopReplay).toHaveBeenCalledTimes(1);
+    expect(params.player.stopPlayback).toHaveBeenCalledTimes(1);
+  });
+
+  it("stops Drive Session, cancels capture, and announces the stop", async () => {
+    const { result, params } = renderController({
+      settings: {
+        inputMode: "drive-session",
+        spokenRepliesEnabled: true,
+        sttMode: "provider",
+        ttsMode: "provider",
+        providerSttModels: {},
+      },
+    });
+
+    await act(async () => {
+      await result.current.handleContinueDriveSession();
+    });
+    await waitFor(() =>
+      expect(params.recorder.startRecording).toHaveBeenCalledTimes(1),
+    );
+
+    await act(async () => {
+      await result.current.handleStopDriveSession();
+    });
+
+    expect(result.current.driveSessionActive).toBe(false);
+    expect(params.recorder.stopRecording).toHaveBeenCalledTimes(1);
+    expect(params.player.speakText).toHaveBeenLastCalledWith(
+      "driveSessionStoppedCue",
+    );
+  });
+
+  it("repeats the last reply and resumes an active Drive Session", async () => {
+    const { result, params } = renderController({
+      lastCompletedReplyRef: { current: "Last answer" },
+      settings: {
+        inputMode: "drive-session",
+        spokenRepliesEnabled: true,
+        sttMode: "provider",
+        ttsMode: "provider",
+        providerSttModels: {},
+      },
+    });
+
+    await act(async () => {
+      await result.current.handleContinueDriveSession();
+    });
+    await waitFor(() =>
+      expect(params.recorder.startRecording).toHaveBeenCalledTimes(1),
+    );
+
+    await act(async () => {
+      await result.current.handleRepeatDriveReply();
+    });
+
+    expect(params.playReplyText).toHaveBeenCalledWith("Last answer");
+    expect(result.current.driveSessionActive).toBe(true);
   });
 });

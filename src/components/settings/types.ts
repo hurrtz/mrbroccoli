@@ -3,10 +3,10 @@ import * as Speech from "expo-speech";
 import { TextInput } from "react-native";
 
 import type { CatalogProviderId } from "../../catalog/types";
-import type { WebSearchProvider } from "../../constants/webSearch";
 import type { ProviderVoiceDirectories } from "../../services/providerVoiceDirectory";
 import {
   Provider,
+  ProviderCapability,
   ResponseMode,
   ResponseModeRoute,
   Settings,
@@ -41,9 +41,9 @@ export interface SettingsModalProps {
     },
   ) => Promise<void>;
   onStopPreviewVoice: () => Promise<void>;
-  onValidateProvider: (provider: Provider) => Promise<void>;
-  onValidateWebSearchProvider: (
-    provider: WebSearchProvider,
+  onValidateProviderCapability: (
+    provider: Provider,
+    capability: ProviderCapability,
   ) => Promise<void>;
   onOpenSetupGuide?: () => void;
   onClose: () => void;
@@ -77,6 +77,14 @@ export type ProviderValidationState = {
   configKey?: string;
   model?: string;
 };
+
+export type ProviderCapabilityValidationStates = Partial<
+  Record<ProviderCapability, ProviderValidationState>
+>;
+
+export type ProviderValidationStates = Partial<
+  Record<Provider, ProviderCapabilityValidationStates>
+>;
 
 export type ProviderHealthState =
   | "unconfigured"

@@ -50,7 +50,7 @@ describe("provider capability selectors", () => {
     expect(getEnabledTtsProviders(settings)).toEqual(["openai"]);
   });
 
-  it("exposes ElevenLabs only in the TTS provider flow", () => {
+  it("exposes ElevenLabs in both speech provider flows", () => {
     const settings = {
       ...DEFAULT_SETTINGS,
       apiKeys: {
@@ -60,7 +60,7 @@ describe("provider capability selectors", () => {
     };
 
     expect(getEnabledProviders(settings)).toEqual([]);
-    expect(getEnabledSttProviders(settings)).toEqual([]);
+    expect(getEnabledSttProviders(settings)).toEqual(["elevenlabs"]);
     expect(getEnabledTtsProviders(settings)).toEqual(["elevenlabs"]);
   });
 

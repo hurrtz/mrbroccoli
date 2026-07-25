@@ -1,4 +1,4 @@
-import type { Provider } from "../types";
+import type { Provider, ProviderCapability } from "../types";
 import {
   parseBytedanceArkCredentials,
   parseBytedanceSpeechCredentials,
@@ -12,7 +12,10 @@ import {
   qwenRegionSupportsAppSpeech,
 } from "./qwenRegion";
 
-export type ProviderCredentialCapability = "llm" | "stt" | "tts" | "search";
+export type ProviderCredentialCapability = Exclude<
+  ProviderCapability,
+  "voices"
+>;
 
 export function hasAnyProviderCredential(provider: Provider, apiKey: string) {
   const trimmedApiKey = apiKey.trim();

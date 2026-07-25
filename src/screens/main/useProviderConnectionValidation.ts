@@ -1,12 +1,23 @@
 import { useCallback } from "react";
 
-import { getProviderValidationTarget } from "../../components/settings/providerSupport";
-import type { WebSearchProvider } from "../../constants/webSearch";
+import {
+  getProviderValidationTarget,
+  isWebSearchCapableProvider,
+} from "../../components/settings/providerSupport";
 import { recordDebugLogEvent } from "../../services/debugLogCapture";
 import { validateProviderConnection } from "../../services/llm";
-import { validateTtsProviderConnection } from "../../services/providerValidation";
+import {
+  validateSttProviderConnection,
+  validateTtsProviderConnection,
+} from "../../services/providerValidation";
+import { fetchProviderVoices } from "../../services/providerVoiceDirectory";
 import { validateWebSearchConnection } from "../../services/webSearch";
-import type { AppLanguage, Provider, Settings } from "../../types";
+import type {
+  AppLanguage,
+  Provider,
+  ProviderCapability,
+  Settings,
+} from "../../types";
 import { getProviderValidationModel } from "../../utils/responseModes";
 
 export function useProviderConnectionValidation(params: {
@@ -15,14 +26,18 @@ export function useProviderConnectionValidation(params: {
 }) {
   const { language, settings } = params;
 
-  const validateProvider = useCallback(
-    async (provider: Provider) => {
+  const validateProviderCapability = useCallback(
+    async (provider: Provider, capability: ProviderCapability) => {
       const apiKey = settings.apiKeys[provider].trim();
-      const target = getProviderValidationTarget(settings, provider);
+      const target = getProviderValidationTarget(
+        settings,
+        provider,
+        capability,
+      );
 
       recordDebugLogEvent({
-        event: "provider-validation-requested",
-        payload: { provider, target: target.kind },
+        event: "provider-capability-validation-requested",
+        payload: { capability, provider, target: target.kind },
       });
 
       try {
@@ -30,6 +45,13 @@ export function useProviderConnectionValidation(params: {
           await validateProviderConnection({
             provider,
             model: getProviderValidationModel(settings, provider),
+            apiKey,
+            language,
+          });
+        } else if (target.kind === "stt") {
+          await validateSttProviderConnection({
+            provider,
+            model: target.model,
             apiKey,
             language,
           });
@@ -49,17 +71,35 @@ export function useProviderConnectionValidation(params: {
             apiKey,
             language,
           });
+        } else if (
+          target.kind === "search" &&
+          isWebSearchCapableProvider(provider)
+        ) {
+          await validateWebSearchConnection({
+            provider,
+            apiKey,
+            language,
+            options: settings.webSearchProviderSettings[provider],
+          });
+        } else if (target.kind === "voices") {
+          await fetchProviderVoices({
+            provider,
+            apiKey,
+          });
+        } else {
+          throw new Error("This provider capability cannot be tested.");
         }
 
         recordDebugLogEvent({
-          event: "provider-validation-succeeded",
-          payload: { provider, target: target.kind },
+          event: "provider-capability-validation-succeeded",
+          payload: { capability, provider, target: target.kind },
         });
       } catch (error) {
         recordDebugLogEvent({
-          event: "provider-validation-failed",
+          event: "provider-capability-validation-failed",
           level: "error",
           payload: {
+            capability,
             message: error instanceof Error ? error.message : String(error),
             provider,
             target: target.kind,
@@ -71,39 +111,20 @@ export function useProviderConnectionValidation(params: {
     [language, settings],
   );
 
-  const validateWebSearchProvider = useCallback(
-    async (provider: WebSearchProvider) => {
-      const apiKey = settings.apiKeys[provider].trim();
-      recordDebugLogEvent({
-        event: "web-search-validation-requested",
-        payload: { provider },
-      });
-
-      try {
-        await validateWebSearchConnection({
-          provider,
-          apiKey,
-          language,
-          options: settings.webSearchProviderSettings[provider],
-        });
-        recordDebugLogEvent({
-          event: "web-search-validation-succeeded",
-          payload: { provider },
-        });
-      } catch (error) {
-        recordDebugLogEvent({
-          event: "web-search-validation-failed",
-          level: "error",
-          payload: {
-            message: error instanceof Error ? error.message : String(error),
-            provider,
-          },
-        });
-        throw error;
-      }
-    },
-    [language, settings.apiKeys, settings.webSearchProviderSettings],
+  // The guided setup validates only the reply-generation route.
+  const validateProvider = useCallback(
+    (provider: Provider) => validateProviderCapability(provider, "llm"),
+    [validateProviderCapability],
   );
 
-  return { validateProvider, validateWebSearchProvider };
+  const validateWebSearchProvider = useCallback(
+    (provider: Provider) => validateProviderCapability(provider, "search"),
+    [validateProviderCapability],
+  );
+
+  return {
+    validateProvider,
+    validateProviderCapability,
+    validateWebSearchProvider,
+  };
 }

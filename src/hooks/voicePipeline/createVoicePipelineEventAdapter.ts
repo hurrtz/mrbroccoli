@@ -29,6 +29,7 @@ type EventAdapterParams = Pick<
   | "responseTone"
   | "selectedSttModel"
   | "selectedTtsModel"
+  | "selectedTtsVoice"
   | "showToast"
   | "spokenRepliesEnabled"
   | "sttMode"
@@ -51,6 +52,7 @@ type EventAdapterParams = Pick<
     | "lastUserMessageIdRef"
     | "queueAssistantNotice"
     | "recordTtsFallbackNotice"
+    | "updateAssistantTurnReceipt"
   >;
   onError: PipelineCallbacks["onError"];
   playbackStartedRef: MutableRefObject<boolean>;
@@ -61,6 +63,7 @@ type EventAdapterParams = Pick<
   streaming: ReturnType<typeof useStreamingTextScheduler>;
   streamingRenderRunId: number;
   transcriptionOverride?: string;
+  turnStartedAtMs: number;
 };
 
 export function createVoicePipelineEventAdapter({
@@ -85,6 +88,7 @@ export function createVoicePipelineEventAdapter({
   responseTone,
   selectedSttModel,
   selectedTtsModel,
+  selectedTtsVoice,
   setPipelinePhase,
   setStreamingText,
   showToast,
@@ -98,6 +102,7 @@ export function createVoicePipelineEventAdapter({
   transcriptionOverride,
   ttsMode,
   ttsProvider,
+  turnStartedAtMs,
   updateConversationContextSummary,
   webSearchMode,
   webSearchProvider,
@@ -137,6 +142,13 @@ export function createVoicePipelineEventAdapter({
     }
 
     playbackStartedRef.current = true;
+    messageState.updateAssistantTurnReceipt((receipt) => ({
+      ...receipt,
+      timing: {
+        ...receipt.timing,
+        firstSpeechMs: Date.now() - turnStartedAtMs,
+      },
+    }));
     recordDebugLogEvent({
       event: "voice-pipeline-first-playback-started",
     });
@@ -377,6 +389,16 @@ export function createVoicePipelineEventAdapter({
         },
       });
       producedAudioRef.current = true;
+      messageState.updateAssistantTurnReceipt((receipt) => ({
+        ...receipt,
+        speechOutput: {
+          ...receipt.speechOutput,
+          actualMode: "provider",
+          provider: ttsProvider,
+          model: selectedTtsModel,
+          voice: selectedTtsVoice,
+        },
+      }));
       if (!playbackStartedRef.current) {
         setPipelinePhase("synthesizing");
       }
@@ -399,6 +421,13 @@ export function createVoicePipelineEventAdapter({
         },
       });
       producedAudioRef.current = true;
+      messageState.updateAssistantTurnReceipt((receipt) => ({
+        ...receipt,
+        speechOutput: {
+          ...receipt.speechOutput,
+          actualMode: "native",
+        },
+      }));
       if (!playbackStartedRef.current) {
         setPipelinePhase("synthesizing");
       }
@@ -431,6 +460,15 @@ export function createVoicePipelineEventAdapter({
         return;
       }
 
+      messageState.updateAssistantTurnReceipt((receipt) => ({
+        ...receipt,
+        speechOutput: {
+          ...receipt.speechOutput,
+          actualMode: "native",
+          fellBack: true,
+          fallbackReason: notice.detail ?? notice.message,
+        },
+      }));
       showToast(formatNoticeToast(notice), undefined, "danger");
     },
     onError,
@@ -438,6 +476,15 @@ export function createVoicePipelineEventAdapter({
 
   return {
     callbacks,
+    finishTurnReceipt: () => {
+      messageState.updateAssistantTurnReceipt((receipt) => ({
+        ...receipt,
+        timing: {
+          ...receipt.timing,
+          totalMs: Date.now() - turnStartedAtMs,
+        },
+      }));
+    },
     startLatencyTracking,
   };
 }

@@ -1,6 +1,6 @@
 # Provider Runtime Reference
 
-Last updated: 2026-07-24
+Last updated: 2026-07-25
 
 This document tracks the providers that are present in Mr Broccoli's runtime
 manifest. The source of truth is `src/constants/providers/runtimeManifest.ts`;
@@ -36,6 +36,7 @@ validation, API-key storage, setup-guide routing, and web-search dispatch:
 | Provider | Web search | LLM | STT | TTS | Notes |
 | --- | --- | --- | --- | --- | --- |
 | `openai` | enabled | enabled | enabled | enabled | Uses Responses web search and OpenAI speech routes. |
+| `openrouter` | none | enabled | none | none | Optional multi-provider gateway with route metadata and privacy-constrained routing. |
 | `anthropic` | enabled | enabled | none | none | Claude Messages plus Anthropic web search. |
 | `alibaba-qwen-dashscope` | enabled | enabled | enabled | enabled | OpenAI-compatible chat plus Qwen Responses search and simple DashScope ASR/TTS routes. |
 | `bytedance-doubao-seed` | enabled | enabled | none | none | Ark chat plus Ark Responses web search; Doubao Speech is not runtime-exposed. |
@@ -43,7 +44,7 @@ validation, API-key storage, setup-guide routing, and web-search dispatch:
 | `xai` | enabled | enabled | enabled | enabled | Grok chat/Responses search plus standalone xAI STT/TTS routes. |
 | `deepseek` | none | enabled | none | none | DeepSeek chat completions only. |
 | `mistral` | enabled | enabled | enabled | enabled | Chat completions, Conversations web search, Voxtral Mini Transcribe 2, and Voxtral TTS. |
-| `elevenlabs` | none | none | none | enabled | TTS-only route with automatic account-voice discovery. |
+| `elevenlabs` | none | none | enabled | enabled | Scribe STT plus TTS; account voice discovery is optional. |
 | `moonshot-ai-kimi` | enabled | enabled | none | none | Kimi OpenAI-compatible chat plus built-in web search. |
 | `perplexity` | enabled | enabled | none | none | Sonar chat completions are used for grounded answers. |
 
@@ -58,6 +59,26 @@ validation, API-key storage, setup-guide routing, and web-search dispatch:
 - Effort: `reasoning_effort` on the supported GPT-5.x rows.
 - STT picker: catalog-backed OpenAI transcription models.
 - TTS picker: `gpt-4o-mini-tts`, `tts-1`, `tts-1-hd`.
+
+### OpenRouter (`openrouter`)
+
+- Runtime role: optional LLM gateway. Direct provider connections remain
+  available and are never replaced automatically.
+- Onboarding: users create a dedicated OpenRouter key in the system browser and
+  paste it into the device-local credential vault. OAuth is not used because
+  OpenRouter's documented PKCE flow covers site and localhost callbacks but
+  does not document a verified mobile deep-link callback, and the app has no
+  hosted callback bridge.
+- Transport: OpenAI-compatible streaming chat completions at
+  `https://openrouter.ai/api/v1/chat/completions`.
+- LLM picker: a curated canonical-snapshot selection spanning OpenAI,
+  Anthropic, Google, xAI, DeepSeek, Moonshot, Mistral, and Qwen.
+- Routing: requests deny data-collection routes and require upstream parameter
+  support whenever reasoning effort is selected.
+- Transparency: final-stream router metadata records the selected upstream,
+  routed model, attempts, strategy, and any OpenRouter context compression in
+  the turn receipt.
+- STT/TTS/web search: not runtime-exposed through this gateway.
 
 ### Anthropic (`anthropic`)
 
@@ -137,18 +158,23 @@ validation, API-key storage, setup-guide routing, and web-search dispatch:
 
 ### ElevenLabs (`elevenlabs`)
 
-- Runtime role: TTS-only provider. It does not appear as an LLM response card
-  and is not offered for STT or web search.
+- Runtime role: STT/TTS speech provider. It does not appear as an LLM response
+  card and is not offered for web search.
+- STT picker: `scribe_v2`, sent to `POST /v1/speech-to-text` as multipart
+  recorded audio with `xi-api-key` authentication.
 - TTS picker: `eleven_flash_v2_5`, `eleven_multilingual_v2`, and `eleven_v3`.
 - Voice directory: all account-visible voices are loaded from paginated
   `GET /v2/voices`, deduplicated, sorted, and selectable globally or per
-  conversation.
+  conversation. Rachel remains available as a built-in premade fallback when a
+  restricted key does not include voice-read access.
 - Speech transport: `POST /v1/text-to-speech/{voice_id}` with `xi-api-key`
   authentication and MP3 output.
 - Runtime behavior: voice discovery and speech requests are abortable and
   timeout-bounded. Provider speech uses the shared retry, diagnostics,
   sentence-chunk prefetch, playback, and recovery pipeline.
-- Restricted keys need Text to Speech permission and Voices read permission.
+- Restricted keys need Text to Speech permission for TTS and Speech to Text
+  permission for STT. Voices read is optional and only enables account voice
+  discovery.
 
 ### Moonshot / Kimi (`moonshot-ai-kimi`)
 

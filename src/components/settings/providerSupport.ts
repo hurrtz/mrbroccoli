@@ -11,22 +11,32 @@ import {
   getWebSearchProviderModel,
   type WebSearchProvider,
 } from "../../constants/webSearch";
-import type { Provider, Settings } from "../../types";
+import { providerHasVoiceDirectory } from "../../services/providerVoiceDirectory";
+import type {
+  Provider,
+  ProviderCapability,
+  Settings,
+} from "../../types";
 import {
   hasAnyProviderCredential,
   hasProviderCredentialForCapability,
 } from "../../utils/providerCredentials";
 import { getProviderValidationModel } from "../../utils/responseModes";
 
-import type { ProviderHealthState, ProviderValidationState } from "./types";
+import type {
+  ProviderHealthState,
+  ProviderValidationState,
+  ProviderValidationStates,
+} from "./types";
 
-export type ProviderCapability = "llm" | "tts" | "stt" | "search";
+export type { ProviderCapability } from "../../types";
 
 export const PROVIDER_CAPABILITY_ORDER: ProviderCapability[] = [
   "llm",
-  "tts",
   "stt",
+  "tts",
   "search",
+  "voices",
 ];
 
 function hasApiKey(settings: Settings, provider: Provider) {
@@ -52,6 +62,8 @@ export function providerSupportsCapability(
       return PROVIDER_STT_SUPPORT[provider] === "provider";
     case "search":
       return isWebSearchCapableProvider(provider);
+    case "voices":
+      return providerHasVoiceDirectory(provider);
   }
 }
 
@@ -61,92 +73,129 @@ export function getProviderCapabilities(provider: Provider) {
   );
 }
 
-export function getProviderValidationTarget(settings: Settings, provider: Provider) {
+function hasCapabilityCredential(
+  settings: Settings,
+  provider: Provider,
+  capability: ProviderCapability,
+) {
   const apiKey = settings.apiKeys[provider];
 
+  return capability === "voices"
+    ? hasAnyProviderCredential(provider, apiKey)
+    : hasProviderCredentialForCapability(provider, apiKey, capability);
+}
+
+export function getProviderValidationTarget(
+  settings: Settings,
+  provider: Provider,
+  capability: ProviderCapability,
+) {
   if (
-    providerSupportsCapability(provider, "llm") &&
-    hasProviderCredentialForCapability(provider, apiKey, "llm")
+    !providerSupportsCapability(provider, capability) ||
+    !hasCapabilityCredential(settings, provider, capability)
   ) {
     return {
-      kind: "llm" as const,
-      model: getProviderValidationModel(settings, provider),
+      kind: null,
+      model: "",
       configKey: undefined,
     };
   }
 
-  if (
-    providerSupportsCapability(provider, "search") &&
-    hasProviderCredentialForCapability(provider, apiKey, "search")
-  ) {
-    const webSearchProvider = provider as WebSearchProvider;
+  switch (capability) {
+    case "llm":
+      return {
+        kind: "llm" as const,
+        model: getProviderValidationModel(settings, provider),
+        configKey: undefined,
+      };
+    case "stt":
+      return {
+        kind: "stt" as const,
+        model: settings.providerSttModels[provider] ?? "",
+        configKey: undefined,
+      };
+    case "search": {
+      const webSearchProvider = provider as WebSearchProvider;
 
-    return {
-      kind: "search" as const,
-      model: getWebSearchProviderModel(webSearchProvider),
-      configKey: JSON.stringify(
-        settings.webSearchProviderSettings[webSearchProvider],
-      ),
-    };
+      return {
+        kind: "search" as const,
+        model: getWebSearchProviderModel(webSearchProvider),
+        configKey: JSON.stringify(
+          settings.webSearchProviderSettings[webSearchProvider],
+        ),
+      };
+    }
+    case "tts": {
+      const model =
+        settings.providerTtsModels[provider] ||
+        PROVIDER_DEFAULT_TTS_MODELS[provider] ||
+        "";
+      const voice =
+        settings.providerTtsVoices[provider] ||
+        PROVIDER_DEFAULT_TTS_VOICES[provider] ||
+        "";
+
+      return {
+        kind: "tts" as const,
+        model,
+        configKey: JSON.stringify({ voice }),
+      };
+    }
+    case "voices":
+      return {
+        kind: "voices" as const,
+        model: "",
+        configKey: undefined,
+      };
   }
-
-  if (
-    providerSupportsCapability(provider, "tts") &&
-    hasProviderCredentialForCapability(provider, apiKey, "tts")
-  ) {
-    const model =
-      settings.providerTtsModels[provider] ||
-      PROVIDER_DEFAULT_TTS_MODELS[provider] ||
-      "";
-    const voice =
-      settings.providerTtsVoices[provider] ||
-      PROVIDER_DEFAULT_TTS_VOICES[provider] ||
-      "";
-
-    return {
-      kind: "tts" as const,
-      model,
-      configKey: JSON.stringify({ voice }),
-    };
-  }
-
-  return {
-    kind: null,
-    model: "",
-    configKey: undefined,
-  };
 }
 
-export function getProviderHealthState(params: {
+function validationMatchesTarget(params: {
+  state: ProviderValidationState;
+  target: ReturnType<typeof getProviderValidationTarget>;
+  apiKey: string;
+}) {
+  return (
+    (!params.state.apiKey || params.state.apiKey === params.apiKey.trim()) &&
+    params.state.model === params.target.model &&
+    params.state.configKey === params.target.configKey
+  );
+}
+
+export function getProviderCapabilityHealthState(params: {
+  capability: ProviderCapability;
   provider: Provider;
   settings: Settings;
-  validationStateByProvider: Partial<Record<Provider, ProviderValidationState>>;
+  validationStateByProvider: ProviderValidationStates;
 }): ProviderHealthState {
-  const { provider, settings, validationStateByProvider } = params;
+  const { capability, provider, settings, validationStateByProvider } = params;
 
-  if (!hasApiKey(settings, provider)) {
+  if (
+    !providerSupportsCapability(provider, capability) ||
+    !hasCapabilityCredential(settings, provider, capability)
+  ) {
     return "unconfigured";
   }
 
-  const validationState = validationStateByProvider[provider];
+  const validationState = validationStateByProvider[provider]?.[capability];
 
   if (!validationState) {
     return "configured";
   }
 
-  const target = getProviderValidationTarget(settings, provider);
+  const target = getProviderValidationTarget(settings, provider, capability);
 
   if (!target.kind) {
     return "configured";
   }
 
-  const stateMatchesCurrentConfig =
-    (!validationState.apiKey ||
-      validationState.apiKey === settings.apiKeys[provider].trim()) &&
-    validationState.model === target.model &&
-    validationState.configKey === target.configKey;
-
-  if (!stateMatchesCurrentConfig) {
+  if (
+    !validationMatchesTarget({
+      state: validationState,
+      target,
+      apiKey: settings.apiKeys[provider],
+    })
+  ) {
     return "configured";
   }
 
@@ -165,6 +214,47 @@ export function getProviderHealthState(params: {
   return "configured";
 }
 
+export function getProviderHealthState(params: {
+  provider: Provider;
+  settings: Settings;
+  validationStateByProvider: ProviderValidationStates;
+}): ProviderHealthState {
+  const { provider, settings, validationStateByProvider } = params;
+
+  if (!hasApiKey(settings, provider)) {
+    return "unconfigured";
+  }
+
+  const operationalCapabilities = getProviderCapabilities(provider).filter(
+    (capability) => capability !== "voices",
+  );
+  const states = operationalCapabilities.map((capability) =>
+    getProviderCapabilityHealthState({
+      capability,
+      provider,
+      settings,
+      validationStateByProvider,
+    }),
+  );
+
+  if (states.includes("validating")) {
+    return "validating";
+  }
+
+  if (states.length > 0 && states.every((state) => state === "healthy")) {
+    return "healthy";
+  }
+
+  if (
+    states.includes("failing") &&
+    !states.includes("healthy")
+  ) {
+    return "failing";
+  }
+
+  return "configured";
+}
+
 export function isProviderSelectableForConfiguredFlow(
   healthState: ProviderHealthState,
 ) {
@@ -172,9 +262,9 @@ export function isProviderSelectableForConfiguredFlow(
 }
 
 export function getConfiguredProvidersForCapability(params: {
-  capability: ProviderCapability;
+  capability: Exclude<ProviderCapability, "voices">;
   settings: Settings;
-  validationStateByProvider: Partial<Record<Provider, ProviderValidationState>>;
+  validationStateByProvider: ProviderValidationStates;
 }) {
   const { capability, settings, validationStateByProvider } = params;
 
@@ -193,7 +283,8 @@ export function getConfiguredProvidersForCapability(params: {
       return false;
     }
 
-    const healthState = getProviderHealthState({
+    const healthState = getProviderCapabilityHealthState({
+      capability,
       provider,
       settings,
       validationStateByProvider,
@@ -203,9 +294,6 @@ export function getConfiguredProvidersForCapability(params: {
       return isProviderSelectableForConfiguredFlow(healthState);
     }
 
-    // A provider-level connection check targets one concrete capability. A
-    // failed LLM model must not disable independently usable STT/TTS routes
-    // that share the same credential, and vice versa.
-    return getProviderValidationTarget(settings, provider).kind !== capability;
+    return false;
   });
 }

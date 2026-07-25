@@ -27,45 +27,46 @@ function RepeatActionIcon({
   state: RepeatState;
   color: string;
 }) {
-  const rotation = useSharedValue(0);
-  const reducedMotion = useReducedMotion();
-
-  useEffect(() => {
-    cancelAnimation(rotation);
-
-    if (state !== "preparing" || reducedMotion) {
-      rotation.value = 0;
-    } else {
-      rotation.value = withRepeat(
-        withTiming(360, {
-          duration: 1100,
-          easing: Easing.linear,
-        }),
-        -1,
-        false,
-      );
-    }
-
-    return () => cancelAnimation(rotation);
-  }, [reducedMotion, rotation, state]);
-
-  const rotationStyle = useAnimatedStyle(() => ({
-    transform: [{ rotate: `${rotation.value}deg` }],
-  }));
-
   if (state === "speaking") {
     return <Feather name="square" size={14} color={color} />;
   }
 
   if (state === "preparing") {
-    return (
-      <Animated.View style={rotationStyle}>
-        <Feather name="loader" size={14} color={color} />
-      </Animated.View>
-    );
+    return <PreparingRepeatIcon color={color} />;
   }
 
   return <Feather name="volume-2" size={14} color={color} />;
+}
+
+function PreparingRepeatIcon({ color }: { color: string }) {
+  const rotation = useSharedValue(0);
+  const reducedMotion = useReducedMotion();
+
+  useEffect(() => {
+    cancelAnimation(rotation);
+    rotation.value = reducedMotion
+      ? 0
+      : withRepeat(
+          withTiming(360, {
+            duration: 1100,
+            easing: Easing.linear,
+          }),
+          -1,
+          false,
+        );
+
+    return () => cancelAnimation(rotation);
+  }, [reducedMotion, rotation]);
+
+  const rotationStyle = useAnimatedStyle(() => ({
+    transform: [{ rotate: `${rotation.value}deg` }],
+  }));
+
+  return (
+    <Animated.View style={rotationStyle}>
+      <Feather name="loader" size={14} color={color} />
+    </Animated.View>
+  );
 }
 
 function useTimedConfirmation(resetKey: string) {

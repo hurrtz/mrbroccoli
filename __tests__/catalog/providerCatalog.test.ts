@@ -13,18 +13,18 @@ import {
 describe("provider catalog", () => {
   it("matches the normalized provider and model counts in the flattened catalog", () => {
     expect(getCatalogStats()).toEqual({
-      providerCount: 11,
-      modelCount: 129,
+      providerCount: 12,
+      modelCount: 130,
       serviceCounts: {
         llm: 97,
-        stt: 15,
+        stt: 16,
         tts: 17,
       },
     });
   });
 
   it("exposes one typed provider document per provider with grouped model arrays", () => {
-    expect(PROVIDER_CATALOG.providerDocuments).toHaveLength(11);
+    expect(PROVIDER_CATALOG.providerDocuments).toHaveLength(12);
     expect(
       PROVIDER_CATALOG.providerDocuments.every(
         (document) =>
@@ -55,7 +55,7 @@ describe("provider catalog", () => {
       );
     });
 
-    expect(providerEntries).toHaveLength(11);
+    expect(providerEntries).toHaveLength(12);
     expect(
       fs.existsSync(
         path.join(process.cwd(), "data", "providers", "definitions.ts"),

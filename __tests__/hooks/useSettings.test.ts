@@ -55,6 +55,33 @@ describe("useSettings", () => {
     expect(result.current.settings.showSetupGuideShortcut).toBe(true);
   });
 
+  it("loads Drive Session and rejects unknown input modes", async () => {
+    (AsyncStorage.getItem as jest.Mock).mockResolvedValueOnce(
+      JSON.stringify({
+        ...DEFAULT_SETTINGS,
+        inputMode: "drive-session",
+      }),
+    );
+    const driveSettings = renderHook(() => useSettings());
+    await flushSettingsLoad();
+    expect(driveSettings.result.current.settings.inputMode).toBe(
+      "drive-session",
+    );
+    driveSettings.unmount();
+
+    (AsyncStorage.getItem as jest.Mock).mockResolvedValueOnce(
+      JSON.stringify({
+        ...DEFAULT_SETTINGS,
+        inputMode: "unknown-mode",
+      }),
+    );
+    const invalidSettings = renderHook(() => useSettings());
+    await flushSettingsLoad();
+    expect(invalidSettings.result.current.settings.inputMode).toBe(
+      DEFAULT_SETTINGS.inputMode,
+    );
+  });
+
   it("loads saved settings from AsyncStorage", async () => {
     const saved = { ...DEFAULT_SETTINGS, lastProvider: "anthropic" as const };
     delete (saved as Partial<typeof saved>).setupGuideDismissed;
@@ -192,9 +219,11 @@ describe("useSettings", () => {
     await flushSettingsLoad();
 
     expect(result.current.settings.providerValidationResults.openai).toEqual({
-      status: "error",
-      message: errorMessage,
-      model: DEFAULT_SETTINGS.providerModels.openai,
+      llm: {
+        status: "error",
+        message: errorMessage,
+        model: DEFAULT_SETTINGS.providerModels.openai,
+      },
     });
   });
 
@@ -767,23 +796,27 @@ describe("useSettings", () => {
       result.current.updateSettings({
         providerValidationResults: {
           openai: {
-            status: "error",
-            message: "Rejected credentials",
-            model: DEFAULT_SETTINGS.providerModels.openai,
+            llm: {
+              status: "error",
+              message: "Rejected credentials",
+              model: DEFAULT_SETTINGS.providerModels.openai,
+            },
           },
         },
       });
     });
 
     expect(
-      result.current.settings.providerValidationResults.openai?.status,
+      result.current.settings.providerValidationResults.openai?.llm?.status,
     ).toBe("error");
     const setItemCalls = (AsyncStorage.setItem as jest.Mock).mock.calls;
     const persisted = JSON.parse(
       setItemCalls[setItemCalls.length - 1][1],
     ) as Record<string, unknown>;
     expect(persisted.providerValidationResults).toEqual({
-      openai: expect.objectContaining({ status: "error" }),
+      openai: {
+        llm: expect.objectContaining({ status: "error" }),
+      },
     });
     expect(persisted.apiKeys).toBeUndefined();
   });

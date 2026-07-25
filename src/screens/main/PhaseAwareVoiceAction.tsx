@@ -238,7 +238,7 @@ export function PhaseAwareVoiceAction({
         accessibilityLabel={statusLabel}
         accessibilityRole="button"
         activeOpacity={0.84}
-        onPress={inputMode === "toggle-to-talk" ? onPress : undefined}
+        onPress={inputMode === "push-to-talk" ? undefined : onPress}
         onPressIn={inputMode === "push-to-talk" ? onPressIn : undefined}
         onPressOut={inputMode === "push-to-talk" ? onPressOut : undefined}
         style={styles.primaryAction}

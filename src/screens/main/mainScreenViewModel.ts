@@ -31,6 +31,7 @@ interface AudioSignalState {
 interface GetMainScreenViewModelParams {
   activeConversation: Conversation | null;
   availableTtsProviders: Provider[];
+  driveSessionActive?: boolean;
   isRecording: boolean;
   language: AppLanguage;
   model: string;
@@ -51,6 +52,7 @@ interface GetMainScreenViewModelParams {
 export function getMainScreenViewModel({
   activeConversation,
   availableTtsProviders,
+  driveSessionActive = false,
   isRecording,
   language,
   model,
@@ -150,6 +152,7 @@ export function getMainScreenViewModel({
     : baseMessages;
 
   const statusDisplay = getStatusDisplayData({
+    driveSessionActive,
     inputMode: settings.inputMode,
     messageCount: messages.length,
     playbackPaused: player.isPlaybackPaused,

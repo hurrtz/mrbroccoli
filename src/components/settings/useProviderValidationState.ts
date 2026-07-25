@@ -1,53 +1,78 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { PROVIDER_LABELS } from "../../constants/models";
-import type { WebSearchProvider } from "../../constants/webSearch";
 import { useLocalization } from "../../i18n";
 import type {
   Provider,
+  ProviderCapability,
   ProviderValidationResult,
   Settings,
 } from "../../types";
-import { hasProviderCredentialForCapability } from "../../utils/providerCredentials";
 
 import {
   getConfiguredProvidersForCapability,
+  getProviderCapabilities,
+  getProviderCapabilityHealthState,
   getProviderHealthState,
   getProviderValidationTarget,
   isWebSearchCapableProvider,
   providerSupportsCapability,
-  type ProviderCapability,
 } from "./providerSupport";
-import type { ProviderHealthState, ProviderValidationState } from "./types";
+import type {
+  ProviderHealthState,
+  ProviderValidationState,
+  ProviderValidationStates,
+} from "./types";
+
+function mergeValidationStates(
+  persisted: Settings["providerValidationResults"],
+  transient: ProviderValidationStates,
+): ProviderValidationStates {
+  const providers = new Set<Provider>([
+    ...(Object.keys(persisted) as Provider[]),
+    ...(Object.keys(transient) as Provider[]),
+  ]);
+
+  return [...providers].reduce<ProviderValidationStates>(
+    (result, provider) => {
+      result[provider] = {
+        ...persisted[provider],
+        ...transient[provider],
+      };
+      return result;
+    },
+    {},
+  );
+}
 
 export function useProviderValidationState(params: {
   settings: Settings;
-  onValidateProvider: (provider: Provider) => Promise<void>;
-  onValidateWebSearchProvider: (provider: WebSearchProvider) => Promise<void>;
+  onValidateProviderCapability: (
+    provider: Provider,
+    capability: ProviderCapability,
+  ) => Promise<void>;
   onValidationError?: (message: string) => void;
   onValidationResult: (
     provider: Provider,
+    capability: ProviderCapability,
     result: ProviderValidationResult,
   ) => void;
 }) {
   const {
     settings,
-    onValidateProvider,
-    onValidateWebSearchProvider,
+    onValidateProviderCapability,
     onValidationError,
     onValidationResult,
   } = params;
   const { t } = useLocalization();
-  const [validationStateByProvider, setValidationStateByProvider] = useState<
-    Partial<Record<Provider, ProviderValidationState>>
-  >({});
-  const effectiveValidationStateByProvider = useMemo<
-    Partial<Record<Provider, ProviderValidationState>>
-  >(
-    () => ({
-      ...settings.providerValidationResults,
-      ...validationStateByProvider,
-    }),
+  const [validationStateByProvider, setValidationStateByProvider] =
+    useState<ProviderValidationStates>({});
+  const effectiveValidationStateByProvider = useMemo(
+    () =>
+      mergeValidationStates(
+        settings.providerValidationResults,
+        validationStateByProvider,
+      ),
     [settings.providerValidationResults, validationStateByProvider],
   );
 
@@ -77,28 +102,40 @@ export function useProviderValidationState(params: {
     [effectiveValidationStateByProvider, settings],
   );
 
-  const canValidateProvider = useCallback(
-    (provider: Provider) => {
-      const target = getProviderValidationTarget(settings, provider);
+  const getCapabilityHealthState = useCallback(
+    (
+      provider: Provider,
+      capability: ProviderCapability,
+    ): ProviderHealthState =>
+      getProviderCapabilityHealthState({
+        provider,
+        capability,
+        settings,
+        validationStateByProvider: effectiveValidationStateByProvider,
+      }),
+    [effectiveValidationStateByProvider, settings],
+  );
 
-      return (
-        target.kind !== null &&
-        hasProviderCredentialForCapability(
-          provider,
-          settings.apiKeys[provider],
-          target.kind,
-        )
-      );
-    },
+  const canValidateCapability = useCallback(
+    (provider: Provider, capability: ProviderCapability) =>
+      getProviderValidationTarget(settings, provider, capability).kind !== null,
     [settings],
   );
 
   const getValidationState = useCallback(
-    (provider: Provider): ProviderValidationState => {
-      const target = getProviderValidationTarget(settings, provider);
-      const candidate = effectiveValidationStateByProvider[provider];
+    (
+      provider: Provider,
+      capability: ProviderCapability,
+    ): ProviderValidationState => {
+      const target = getProviderValidationTarget(
+        settings,
+        provider,
+        capability,
+      );
+      const candidate =
+        effectiveValidationStateByProvider[provider]?.[capability];
 
-      if (!settings.apiKeys[provider].trim() || !candidate) {
+      if (!settings.apiKeys[provider].trim() || !target.kind || !candidate) {
         return { status: "idle" };
       }
 
@@ -113,42 +150,38 @@ export function useProviderValidationState(params: {
     [effectiveValidationStateByProvider, settings],
   );
 
-  const validateProviderForSettings = useCallback(
-    async (provider: Provider) => {
-      const target = getProviderValidationTarget(settings, provider);
+  const validateProviderCapabilityForSettings = useCallback(
+    async (provider: Provider, capability: ProviderCapability) => {
+      const target = getProviderValidationTarget(
+        settings,
+        provider,
+        capability,
+      );
       const trimmedApiKey = settings.apiKeys[provider].trim();
 
-      if (
-        !trimmedApiKey ||
-        !target.kind ||
-        !hasProviderCredentialForCapability(provider, trimmedApiKey, target.kind)
-      ) {
+      if (!trimmedApiKey || !target.kind) {
         return;
       }
 
+      const validatingState: ProviderValidationState = {
+        status: "validating",
+        apiKey: trimmedApiKey,
+        model: target.model,
+        configKey: target.configKey,
+      };
       setValidationStateByProvider((previous) => ({
         ...previous,
         [provider]: {
-          status: "validating",
-          apiKey: trimmedApiKey,
-          model: target.model,
-          configKey: target.configKey,
+          ...previous[provider],
+          [capability]: validatingState,
         },
       }));
 
       try {
-        if (target.kind === "llm") {
-          await onValidateProvider(provider);
-        } else if (target.kind === "tts") {
-          await onValidateProvider(provider);
-        } else if (
-          target.kind === "search" &&
-          isWebSearchCapableProvider(provider)
-        ) {
-          await onValidateWebSearchProvider(provider);
-        }
+        await onValidateProviderCapability(provider, capability);
 
-        const message = t("providerValidationSuccess", {
+        const message = t("providerCapabilityValidationSuccess", {
+          capability: t(`providerCapability_${capability}`),
           provider: PROVIDER_LABELS[provider],
         });
         const result: ProviderValidationResult = {
@@ -161,11 +194,14 @@ export function useProviderValidationState(params: {
         setValidationStateByProvider((previous) => ({
           ...previous,
           [provider]: {
-            ...result,
-            apiKey: trimmedApiKey,
+            ...previous[provider],
+            [capability]: {
+              ...result,
+              apiKey: trimmedApiKey,
+            },
           },
         }));
-        onValidationResult(provider, result);
+        onValidationResult(provider, capability, result);
       } catch (error) {
         const message =
           error instanceof Error ? error.message : t("providerValidationFailed");
@@ -179,17 +215,19 @@ export function useProviderValidationState(params: {
         setValidationStateByProvider((previous) => ({
           ...previous,
           [provider]: {
-            ...result,
-            apiKey: trimmedApiKey,
+            ...previous[provider],
+            [capability]: {
+              ...result,
+              apiKey: trimmedApiKey,
+            },
           },
         }));
-        onValidationResult(provider, result);
+        onValidationResult(provider, capability, result);
         onValidationError?.(message);
       }
     },
     [
-      onValidateProvider,
-      onValidateWebSearchProvider,
+      onValidateProviderCapability,
       onValidationError,
       onValidationResult,
       settings,
@@ -197,8 +235,19 @@ export function useProviderValidationState(params: {
     ],
   );
 
+  const validateAllProviderCapabilities = useCallback(
+    async (provider: Provider) => {
+      for (const capability of getProviderCapabilities(provider)) {
+        if (canValidateCapability(provider, capability)) {
+          await validateProviderCapabilityForSettings(provider, capability);
+        }
+      }
+    },
+    [canValidateCapability, validateProviderCapabilityForSettings],
+  );
+
   const getConfiguredProviders = useCallback(
-    (capability: ProviderCapability) =>
+    (capability: "llm" | "stt" | "tts" | "search") =>
       getConfiguredProvidersForCapability({
         capability,
         settings,
@@ -227,9 +276,11 @@ export function useProviderValidationState(params: {
   return {
     validationStateByProvider: effectiveValidationStateByProvider,
     getHealthState,
+    getCapabilityHealthState,
     getValidationState,
-    canValidateProvider,
-    validateProviderForSettings,
+    canValidateCapability,
+    validateProviderCapabilityForSettings,
+    validateAllProviderCapabilities,
     selectableLlmProviders,
     selectableSttProviders,
     selectableTtsProviders,

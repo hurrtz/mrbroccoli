@@ -628,20 +628,24 @@ describe("synthesizeSpeech", () => {
     });
   });
 
-  it("rejects ElevenLabs speech locally until a voice is selected", async () => {
-    await expect(
-      synthesizeSpeech({
-        text: "Hello ElevenLabs",
-        voice: "",
-        mode: "provider",
-        provider: "elevenlabs",
-        apiKey: "elevenlabs-test-key",
-        language: "en",
-      }),
-    ).rejects.toThrow(
-      "Refresh the ElevenLabs voice library or enter a voice ID before using speech output.",
+  it("uses a built-in ElevenLabs voice when account voice access is unavailable", async () => {
+    (fetch as jest.Mock).mockResolvedValueOnce({
+      ok: true,
+      blob: () => Promise.resolve(new Blob(["fake-audio"])),
+    });
+
+    await synthesizeSpeech({
+      text: "Hello ElevenLabs",
+      voice: "",
+      mode: "provider",
+      provider: "elevenlabs",
+      apiKey: "elevenlabs-test-key",
+      language: "en",
+    });
+
+    expect((fetch as jest.Mock).mock.calls[0][0]).toBe(
+      "https://api.elevenlabs.io/v1/text-to-speech/21m00Tcm4TlvDq8ikWAM?output_format=mp3_44100_128",
     );
-    expect(fetch).not.toHaveBeenCalled();
   });
 
   it("splits long provider speech into multiple synthesis requests", async () => {

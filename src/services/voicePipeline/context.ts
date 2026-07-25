@@ -48,6 +48,8 @@ export async function resolveContextualMessages({
     ? markConversationSummaryProvenance(existingSummaryBody)
     : "";
   let contextualMessages = contextPlan.recentMessages;
+  let summaryUpdated = false;
+  let fallbackUsed = false;
 
   if (contextPlan.needsSummaryUpdate) {
     try {
@@ -67,11 +69,21 @@ export async function resolveContextualMessages({
           aborted: true,
           contextualMessages,
           effectiveSummary,
+          receipt: {
+            existingSummaryReused: Boolean(existingSummaryBody),
+            summaryUpdateRequested: contextPlan.needsSummaryUpdate,
+            summaryUpdated,
+            fallbackUsed,
+            messagesAvailable: messages.length,
+            messagesSent: contextualMessages.length,
+            messagesSummarized: contextPlan.messagesToSummarize.length,
+          },
         } as const;
       }
 
       if (updatedSummary) {
         effectiveSummary = markConversationSummaryProvenance(updatedSummary);
+        summaryUpdated = true;
         callbacks.onContextSummary?.(
           effectiveSummary,
           contextPlan.targetSummarizedCount,
@@ -79,6 +91,7 @@ export async function resolveContextualMessages({
         );
       } else if (!effectiveSummary) {
         contextualMessages = contextPlan.fallbackRecentMessages;
+        fallbackUsed = true;
       }
     } catch {
       if (abortSignal?.aborted) {
@@ -86,10 +99,20 @@ export async function resolveContextualMessages({
           aborted: true,
           contextualMessages,
           effectiveSummary,
+          receipt: {
+            existingSummaryReused: Boolean(existingSummaryBody),
+            summaryUpdateRequested: contextPlan.needsSummaryUpdate,
+            summaryUpdated,
+            fallbackUsed,
+            messagesAvailable: messages.length,
+            messagesSent: contextualMessages.length,
+            messagesSummarized: contextPlan.messagesToSummarize.length,
+          },
         } as const;
       }
 
       contextualMessages = contextPlan.fallbackRecentMessages;
+      fallbackUsed = true;
     }
   }
 
@@ -97,5 +120,14 @@ export async function resolveContextualMessages({
     aborted: false,
     contextualMessages,
     effectiveSummary,
+    receipt: {
+      existingSummaryReused: Boolean(existingSummaryBody),
+      summaryUpdateRequested: contextPlan.needsSummaryUpdate,
+      summaryUpdated,
+      fallbackUsed,
+      messagesAvailable: messages.length,
+      messagesSent: contextualMessages.length,
+      messagesSummarized: contextPlan.messagesToSummarize.length,
+    },
   } as const;
 }

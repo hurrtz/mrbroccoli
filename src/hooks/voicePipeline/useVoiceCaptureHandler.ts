@@ -94,6 +94,7 @@ export function useVoiceCaptureHandler({
     recordAssistantNotice,
     recordTtsFallbackNotice,
     resetTurnMessageState,
+    updateAssistantTurnReceipt,
   } = useVoiceTurnMessageState(updateMessage);
   const {
     discardRetainedCapture,
@@ -112,6 +113,7 @@ export function useVoiceCaptureHandler({
       activeCaptureRunRef.current = runId;
       previousAbortController?.abort();
       const abortController = new AbortController();
+      const turnStartedAtMs = Date.now();
       abortRef.current = abortController;
       const isCurrentRun = () =>
         activeCaptureRunRef.current === runId &&
@@ -215,6 +217,7 @@ export function useVoiceCaptureHandler({
           lastUserMessageIdRef,
           queueAssistantNotice,
           recordTtsFallbackNotice,
+          updateAssistantTurnReceipt,
         },
         model,
         modelEffort,
@@ -228,6 +231,7 @@ export function useVoiceCaptureHandler({
         responseTone,
         selectedSttModel,
         selectedTtsModel,
+        selectedTtsVoice,
         setPipelinePhase,
         setStreamingText,
         showToast,
@@ -245,6 +249,7 @@ export function useVoiceCaptureHandler({
         transcriptionOverride,
         ttsMode,
         ttsProvider,
+        turnStartedAtMs,
         updateConversationContextSummary,
         webSearchMode,
         webSearchProvider,
@@ -253,6 +258,7 @@ export function useVoiceCaptureHandler({
 
       try {
         const transcription = await runVoicePipeline({
+          turnStartedAtMs,
           audioUri,
           transcriptionOverride,
           messages: activeConversation?.messages || [],
@@ -355,6 +361,9 @@ export function useVoiceCaptureHandler({
             },
           });
         }
+        if (state.replyCompleted) {
+          eventAdapter.finishTurnReceipt();
+        }
         clearLatencyProgress();
         cancelStreamingRender(streamingRenderRunId);
         setStreamingText("");
@@ -422,6 +431,7 @@ export function useVoiceCaptureHandler({
       ttsMode,
       ttsProvider,
       updateConversationContextSummary,
+      updateAssistantTurnReceipt,
       webSearchApiKey,
       webSearchMode,
       webSearchOptions,

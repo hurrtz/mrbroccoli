@@ -14,7 +14,7 @@ export function getModelEffortConfig(
   provider: Provider,
   model: string,
 ): ModelEffortConfig | undefined {
-  return PROVIDER_MODELS[provider].find((entry) => entry.id === model)?.effort;
+  return PROVIDER_MODELS[provider]?.find((entry) => entry.id === model)?.effort;
 }
 
 export function getModelEffortOptions(

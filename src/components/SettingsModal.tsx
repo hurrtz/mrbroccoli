@@ -16,6 +16,7 @@ import { APP_MODAL_ORIENTATIONS } from "../constants/layout";
 import { useLocalization } from "../i18n";
 import {
   Provider,
+  ProviderCapability,
   ProviderValidationResult,
   TtsListenLanguage,
 } from "../types";
@@ -94,8 +95,7 @@ export const SettingsModal = React.memo(function SettingsModal(
     onUpdateApiKey,
     onPreviewVoice,
     onStopPreviewVoice,
-    onValidateProvider,
-    onValidateWebSearchProvider,
+    onValidateProviderCapability,
     onOpenSetupGuide,
     onClose,
   } = props;
@@ -116,11 +116,18 @@ export const SettingsModal = React.memo(function SettingsModal(
     string | null
   >(null);
   const handleProviderValidationResult = React.useCallback(
-    (provider: Provider, result: ProviderValidationResult) => {
+    (
+      provider: Provider,
+      capability: ProviderCapability,
+      result: ProviderValidationResult,
+    ) => {
       onUpdate({
         providerValidationResults: {
           ...settings.providerValidationResults,
-          [provider]: result,
+          [provider]: {
+            ...settings.providerValidationResults[provider],
+            [capability]: result,
+          },
         },
       });
     },
@@ -160,26 +167,34 @@ export const SettingsModal = React.memo(function SettingsModal(
   });
   const {
     getHealthState,
+    getCapabilityHealthState,
     getValidationState,
-    canValidateProvider,
-    validateProviderForSettings,
+    canValidateCapability,
+    validateProviderCapabilityForSettings,
+    validateAllProviderCapabilities,
     selectableLlmProviders,
     selectableSttProviders,
     selectableTtsProviders,
     selectableSearchProviders,
   } = useProviderValidationState({
     settings,
-    onValidateProvider,
-    onValidateWebSearchProvider,
+    onValidateProviderCapability,
     onValidationError: setValidationToastMessage,
     onValidationResult: handleProviderValidationResult,
   });
-  const handleValidateProviderForSettings = React.useCallback(
+  const handleValidateProviderCapabilityForSettings = React.useCallback(
+    async (provider: Provider, capability: ProviderCapability) => {
+      setValidationToastMessage(null);
+      await validateProviderCapabilityForSettings(provider, capability);
+    },
+    [validateProviderCapabilityForSettings],
+  );
+  const handleValidateAllProviderCapabilities = React.useCallback(
     async (provider: Provider) => {
       setValidationToastMessage(null);
-      await validateProviderForSettings(provider);
+      await validateAllProviderCapabilities(provider);
     },
-    [validateProviderForSettings],
+    [validateAllProviderCapabilities],
   );
   const readiness = React.useMemo(
     () =>
@@ -300,9 +315,13 @@ export const SettingsModal = React.memo(function SettingsModal(
             focusProvider={focusProvider}
             focusCatalogProviderId={focusCatalogProviderId}
             getProviderHealthState={getHealthState}
+            getProviderCapabilityHealthState={getCapabilityHealthState}
             getProviderValidationState={getValidationState}
-            canValidateProvider={canValidateProvider}
-            onValidateProvider={handleValidateProviderForSettings}
+            canValidateCapability={canValidateCapability}
+            onValidateCapability={
+              handleValidateProviderCapabilityForSettings
+            }
+            onValidateAll={handleValidateAllProviderCapabilities}
             onUpdateApiKey={onUpdateApiKey}
             onTextInputFocus={handleTextInputFocus}
           />,
@@ -436,7 +455,7 @@ export const SettingsModal = React.memo(function SettingsModal(
               },
             ]}
           >
-            <View style={styles.headerLeading}>
+            <View style={styles.headerControlSlot}>
               {showsBackButton ? (
                 <TouchableOpacity
                   style={[
@@ -458,15 +477,15 @@ export const SettingsModal = React.memo(function SettingsModal(
                   />
                 </TouchableOpacity>
               ) : null}
-              <View style={styles.headerCopy}>
-                <Text
-                  testID="settings-modal-title"
-                  accessibilityRole="header"
-                  style={[styles.title, { color: colors.text }]}
-                >
-                  {modalTitle}
-                </Text>
-              </View>
+            </View>
+            <View style={styles.headerCopy}>
+              <Text
+                testID="settings-modal-title"
+                accessibilityRole="header"
+                style={[styles.title, { color: colors.text }]}
+              >
+                {modalTitle}
+              </Text>
             </View>
             <TouchableOpacity
               style={[

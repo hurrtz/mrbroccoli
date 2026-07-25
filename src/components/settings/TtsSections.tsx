@@ -76,12 +76,17 @@ export function ProviderVoicePreviewSection({
     settings.providerTtsModels[provider] ||
     PROVIDER_DEFAULT_TTS_MODELS[provider] ||
     "";
+  const fallbackVoiceOptions = getProviderTtsVoiceOptions(
+    provider,
+    language,
+    selectedModel,
+  );
   const voiceOptions =
     hasVoiceDirectory
       ? (
           voiceDirectory?.voices.length
             ? voiceDirectory.voices
-            : getProviderTtsVoiceOptions(provider, language, selectedModel)
+            : fallbackVoiceOptions
         ).map((voice) => ({
           value:
             "value" in voice && typeof voice.value === "string"
@@ -89,11 +94,7 @@ export function ProviderVoicePreviewSection({
               : voice.id,
           label: voice.label,
         }))
-      : getProviderTtsVoiceOptions(
-          provider,
-          language,
-          selectedModel,
-        ).map((voice) => ({
+      : fallbackVoiceOptions.map((voice) => ({
           value: voice.id,
           label: voice.label,
         }));
@@ -155,7 +156,11 @@ export function ProviderVoicePreviewSection({
                       provider: PROVIDER_LABELS[provider],
                     })
                   : voiceDirectory.status === "error" && voiceDirectory.error
-                    ? t("providerVoicesLoadFailed")
+                    ? t(
+                        fallbackVoiceOptions.length > 0
+                          ? "providerVoicesLoadFailedWithFallback"
+                          : "providerVoicesLoadFailed",
+                      )
                     : t("providerVoicesLoadingHint", {
                         provider: PROVIDER_LABELS[provider],
                       })}

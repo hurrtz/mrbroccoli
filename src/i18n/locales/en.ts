@@ -107,11 +107,28 @@ export const en: TranslationDictionary = {
   useProvider: ({ provider }) => `Use ${provider}`,
   createApiKey: "Credentials",
   aboutThisProvider: "About this provider",
+  openRouterOnboardingTitle: "One key, multiple providers",
+  openRouterOnboardingDescription:
+    "Create a dedicated OpenRouter key, paste it below, and use snapshot-backed models from several providers without replacing any direct connection.",
+  openRouterOnboardingRoute:
+    "Request path: this device → OpenRouter → selected upstream provider",
+  openRouterKeys: "OpenRouter keys",
   providerStatusInvalid: "Invalid",
   providerStatusTesting: "Testing",
   providerStatusConfigured: "Configured",
+  providerStatusWorking: "Working",
+  providerStatusNotTested: "Not tested",
   providerStatusNotSetup: "Not set up",
   testProviderKey: "Test key",
+  testAllCapabilities: "Test all",
+  testProviderCapability: ({ capability }) => `Test ${capability}`,
+  test: "Test",
+  optional: "Optional",
+  providerCapability_llm: "Replies",
+  providerCapability_stt: "Speech input",
+  providerCapability_tts: "Voice output",
+  providerCapability_search: "Web search",
+  providerCapability_voices: "Voice library",
   providerValidationUnavailable:
     "Live validation is not wired for this provider yet. Save the key here and verify it during actual use.",
   providerNeedsAttention: "needs attention",
@@ -171,6 +188,20 @@ export const en: TranslationDictionary = {
   toggleToTalk: "Toggle to Talk",
   toggleToTalkDescription:
     "Tap once to start recording and tap again when you are done.",
+  driveSession: "Drive Session",
+  driveSessionDescription:
+    "Re-arm the microphone after each reply. You decide when a thought is complete, so pauses are never cut short.",
+  startDriveSession: "Start Drive Session",
+  stopDriveSession: "Stop",
+  repeatDriveReply: "Repeat",
+  continueDriveSession: "Continue",
+  driveSessionListeningCue: "Listening.",
+  driveSessionStoppedCue: "Drive session stopped.",
+  driveSessionReady: "Drive Session",
+  driveSessionReadyDescription:
+    "The session is ready. Tap Continue to listen again.",
+  tapToSendDriveTurn: "Tap to send",
+  tapToInterruptDriveReply: "Tap to interrupt",
   speechToText: "Speech to Text",
   appNative: "System Recognition",
   nativeSttDescription:
@@ -260,6 +291,8 @@ export const en: TranslationDictionary = {
     `${count} ${Number(count) === 1 ? "voice" : "voices"} available from ${provider}.`,
   providerVoicesLoadFailed:
     "Voices could not be refreshed. Your current selection is unchanged; you can still enter a voice ID manually.",
+  providerVoicesLoadFailedWithFallback:
+    "Account voices could not be loaded. The built-in voice remains available.",
   providerVoicesLoadingHint: ({ provider }) =>
     `Mr Broccoli loads available voices automatically from ${provider}.`,
   providerVoiceId: "Voice ID",
@@ -481,6 +514,42 @@ export const en: TranslationDictionary = {
     `${count} ${Number(count) === 1 ? "source" : "sources"}`,
   sources: "Sources",
   openSourceLink: ({ source }) => `Open source: ${source}`,
+  turnReceipt: "Turn details",
+  expandTurnReceipt: "Show turn details",
+  collapseTurnReceipt: "Hide turn details",
+  turnReceiptDirect: "Direct",
+  turnReceiptRequested: "Requested reply route",
+  turnReceiptActual: "Actual reply route",
+  turnReceiptEffort: "Reasoning control",
+  turnReceiptProviderNative: "provider-native",
+  turnReceiptInput: "Input route",
+  turnReceiptSearch: "Web search",
+  turnReceiptVoice: "Voice output",
+  turnReceiptContext: "Context",
+  turnReceiptTiming: "Timing",
+  turnReceiptFallback: "Fallback reason",
+  turnReceiptVoiceInput: "Voice",
+  turnReceiptTypedInput: "Typed",
+  turnReceiptSystemSpeech: "System speech recognition",
+  turnReceiptSystemVoice: "System voice",
+  turnReceiptSystemVoiceFallback: "System voice · provider fallback",
+  turnReceiptOff: "Off",
+  turnReceiptNotConfigured: "On · not configured",
+  turnReceiptFallbackWithoutSearch: "Continued without live search",
+  turnReceiptNotUsed: "Not used",
+  turnReceiptSummaryReused: "saved summary reused",
+  turnReceiptSummaryUpdated: "summary updated",
+  turnReceiptContextFallback: "recent-message fallback",
+  turnReceiptGatewayCompression: ({ original, compressed }) =>
+    `gateway compressed ${original} to ${compressed} messages`,
+  turnReceiptContextValue: ({ sent, total, summarized, state }) =>
+    `${sent}/${total} prior messages sent · ${summarized} newly summarized${state}`,
+  turnReceiptTimingStt: "STT",
+  turnReceiptTimingContext: "context",
+  turnReceiptTimingSearch: "search",
+  turnReceiptTimingModel: "model",
+  turnReceiptTimingFirstSpeech: "first speech",
+  turnReceiptTimingTotal: "total",
   estimatedRouteUsageTokensOnly: ({ tokens }) => `${tokens} tokens`,
   unknownUsageRoute: "Unknown route",
   setupGuideConnectProviderTitle: "Configure credentials",
@@ -629,6 +698,8 @@ export const en: TranslationDictionary = {
     `${provider} rejected the credentials for ${action}. Check the API key and permissions.`,
   providerRateLimitError: ({ provider, action }) =>
     `${provider} is rate limiting ${action} right now. Try again in a moment.`,
+  providerCreditsRequired: ({ provider, action }) =>
+    `${provider} needs sufficient API credit for ${action}. Check the account balance and the key's spending limit.`,
   providerTimeoutError: ({ provider, action }) =>
     `${provider} took too long during ${action}. Try again.`,
   providerTemporaryError: ({ provider, action }) =>
@@ -646,6 +717,8 @@ export const en: TranslationDictionary = {
   providerWebSearchNotRun: ({ provider }) =>
     `${provider} returned a response without running web search.`,
   providerValidationSuccess: ({ provider }) => `${provider} is ready to use.`,
+  providerCapabilityValidationSuccess: ({ provider, capability }) =>
+    `${provider} ${capability} is working.`,
   providerValidationFailed: "Provider validation failed.",
   webSearchFallback:
     "Web search was unavailable, so the reply continued without live web context.",

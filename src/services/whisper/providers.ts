@@ -79,7 +79,10 @@ export async function transcribeWithMultipartProvider(
     } as any,
   );
   const resolvedModel = providerModel || config.defaultModel;
-  formData.append("model", resolvedModel);
+  formData.append(
+    provider === "elevenlabs" ? "model_id" : "model",
+    resolvedModel,
+  );
   if (provider === "openai" && resolvedModel === "gpt-4o-transcribe-diarize") {
     formData.append("response_format", "diarized_json");
     formData.append("chunking_strategy", "auto");
@@ -92,13 +95,15 @@ export async function transcribeWithMultipartProvider(
   let response: Awaited<ReturnType<typeof fetch>>;
 
   try {
+    const resolvedApiKey = requireProviderKey(provider, apiKey, language);
     response = await fetchWithTimeout(
       config.endpoint,
       {
         method: "POST",
-        headers: {
-          Authorization: `Bearer ${requireProviderKey(provider, apiKey, language)}`,
-        },
+        headers:
+          provider === "elevenlabs"
+            ? { "xi-api-key": resolvedApiKey }
+            : { Authorization: `Bearer ${resolvedApiKey}` },
         body: formData,
       },
       getProviderSttTimeoutMs(provider),

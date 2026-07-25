@@ -89,8 +89,7 @@ function renderSettingsModal(overrideProps: Partial<React.ComponentProps<typeof 
           onUpdateApiKey={jest.fn()}
           onPreviewVoice={jest.fn(async () => undefined)}
           onStopPreviewVoice={jest.fn(async () => undefined)}
-          onValidateProvider={jest.fn(async () => undefined)}
-          onValidateWebSearchProvider={jest.fn(async () => undefined)}
+          onValidateProviderCapability={jest.fn(async () => undefined)}
           onClose={jest.fn()}
           {...overrideProps}
         />
@@ -112,6 +111,11 @@ describe("SettingsModal", () => {
       expect(screen.getByTestId("settings-modal-title").props.children).toBe(
         "Settings",
       );
+      expect(
+        StyleSheet.flatten(
+          screen.getByTestId("settings-modal-title").props.style,
+        ).textAlign,
+      ).toBe("center");
       expect(screen.queryByTestId("settings-header-gradient")).toBeNull();
       expect(screen.queryByTestId("settings-modal-gradient")).toBeNull();
       expect(screen.queryByText("Runtime Readiness")).toBeNull();
@@ -187,7 +191,8 @@ describe("SettingsModal", () => {
         "Connections",
       );
       expect(screen.getByText("OpenAI")).toBeTruthy();
-      expect(screen.getByText("Test key")).toBeTruthy();
+      expect(screen.getByText("Test all")).toBeTruthy();
+      expect(screen.getByLabelText("Test LLM")).toBeTruthy();
       expect(
         screen.queryByText(
           "Live validation is not wired for this provider yet. Save the key here and verify it during actual use.",
@@ -197,10 +202,26 @@ describe("SettingsModal", () => {
     });
   });
 
+  it("explains the optional OpenRouter one-key route without hiding direct providers", async () => {
+    const screen = renderSettingsModal({ focusProvider: "openrouter" });
+
+    await waitFor(() => {
+      expect(screen.getByText("One key, multiple providers")).toBeTruthy();
+      expect(
+        screen.getByText(
+          "Request path: this device → OpenRouter → selected upstream provider",
+        ),
+      ).toBeTruthy();
+      expect(screen.getByText("OpenRouter keys")).toBeTruthy();
+      expect(screen.getByTestId("provider-vault-row-openai")).toBeTruthy();
+      expect(screen.getByTestId("provider-vault-row-anthropic")).toBeTruthy();
+    });
+  });
+
   it("shows provider validation failures in a toast inside the modal", async () => {
     const errorMessage =
       "OpenAI rejected the credentials for reply generation. Check the API key and permissions.";
-    const onValidateProvider = jest.fn(async () => {
+    const onValidateProviderCapability = jest.fn(async () => {
       throw new Error(errorMessage);
     });
     const onUpdate = jest.fn();
@@ -214,26 +235,31 @@ describe("SettingsModal", () => {
         },
       },
       onUpdate,
-      onValidateProvider,
+      onValidateProviderCapability,
     });
 
     await waitFor(() => {
-      expect(screen.getByText("Test key")).toBeTruthy();
+      expect(screen.getByLabelText("Test LLM")).toBeTruthy();
     });
 
-    fireEvent.press(screen.getByText("Test key"));
+    fireEvent.press(screen.getByLabelText("Test LLM"));
 
     await waitFor(() => {
-      expect(onValidateProvider).toHaveBeenCalledWith("openai");
+      expect(onValidateProviderCapability).toHaveBeenCalledWith(
+        "openai",
+        "llm",
+      );
       expect(
         within(screen.getByTestId("toast")).getByText(errorMessage),
       ).toBeTruthy();
       expect(onUpdate).toHaveBeenCalledWith({
         providerValidationResults: {
           openai: expect.objectContaining({
-            status: "error",
-            message: errorMessage,
-            model: expect.any(String),
+            llm: expect.objectContaining({
+              status: "error",
+              message: errorMessage,
+              model: expect.any(String),
+            }),
           }),
         },
       });
@@ -289,8 +315,10 @@ describe("SettingsModal", () => {
         },
         providerValidationResults: {
           openai: {
-            status: "success",
-            model: DEFAULT_SETTINGS.providerModels.openai,
+            llm: {
+              status: "success",
+              model: DEFAULT_SETTINGS.providerModels.openai,
+            },
           },
         },
       },
@@ -299,8 +327,10 @@ describe("SettingsModal", () => {
     fireEvent.press(screen.getByText("Connections"));
 
     await waitFor(() => {
-      const openAiRow = screen.getByTestId("provider-vault-row-openai");
-      expect(StyleSheet.flatten(openAiRow.props.style).backgroundColor).toBe(
+      const llmPill = screen.getByTestId(
+        "provider-capability-pill-openai-llm",
+      );
+      expect(StyleSheet.flatten(llmPill.props.style).backgroundColor).toBe(
         `${lightColors.success}22`,
       );
     });
@@ -318,20 +348,24 @@ describe("SettingsModal", () => {
         },
         providerValidationResults: {
           openai: {
-            status: "error",
-            message: errorMessage,
-            model: DEFAULT_SETTINGS.providerModels.openai,
+            llm: {
+              status: "error",
+              message: errorMessage,
+              model: DEFAULT_SETTINGS.providerModels.openai,
+            },
           },
         },
       },
     });
 
     await waitFor(() => {
-      expect(screen.queryByText("Invalid")).toBeNull();
+      expect(screen.getByText("Invalid")).toBeTruthy();
       expect(screen.getByText(errorMessage)).toBeTruthy();
-      const openAiRow = screen.getByTestId("provider-vault-row-openai");
-      expect(StyleSheet.flatten(openAiRow.props.style).backgroundColor).toBe(
-        `${lightColors.danger}12`,
+      const llmPill = screen.getByTestId(
+        "provider-capability-pill-openai-llm",
+      );
+      expect(StyleSheet.flatten(llmPill.props.style).backgroundColor).toBe(
+        `${lightColors.danger}18`,
       );
     });
   });
@@ -348,9 +382,11 @@ describe("SettingsModal", () => {
         },
         providerValidationResults: {
           openai: {
-            status: "error",
-            message: "Rejected credentials",
-            model: DEFAULT_SETTINGS.providerModels.openai,
+            llm: {
+              status: "error",
+              message: "Rejected credentials",
+              model: DEFAULT_SETTINGS.providerModels.openai,
+            },
           },
         },
       },
@@ -358,22 +394,26 @@ describe("SettingsModal", () => {
     });
 
     await waitFor(() => {
-      expect(screen.getByText("Test key")).toBeTruthy();
+      expect(screen.getByLabelText("Test LLM")).toBeTruthy();
     });
 
-    fireEvent.press(screen.getByText("Test key"));
+    fireEvent.press(screen.getByLabelText("Test LLM"));
 
     await waitFor(() => {
       expect(onUpdate).toHaveBeenCalledWith({
         providerValidationResults: {
           openai: expect.objectContaining({
-            status: "success",
-            model: expect.any(String),
+            llm: expect.objectContaining({
+              status: "success",
+              model: expect.any(String),
+            }),
           }),
         },
       });
-      const openAiRow = screen.getByTestId("provider-vault-row-openai");
-      expect(StyleSheet.flatten(openAiRow.props.style).backgroundColor).toBe(
+      const llmPill = screen.getByTestId(
+        "provider-capability-pill-openai-llm",
+      );
+      expect(StyleSheet.flatten(llmPill.props.style).backgroundColor).toBe(
         `${lightColors.success}22`,
       );
       expect(screen.queryByText("Invalid")).toBeNull();
@@ -636,6 +676,103 @@ describe("SettingsModal", () => {
       "elevenlabs",
       "voice-2",
     );
+  });
+
+  it("keeps ElevenLabs TTS usable when a restricted key cannot list voices", async () => {
+    const screen = renderSettingsModal({
+      focusTab: "tts",
+      settings: {
+        ...DEFAULT_SETTINGS,
+        apiKeys: {
+          ...DEFAULT_SETTINGS.apiKeys,
+          elevenlabs: "restricted-elevenlabs-key",
+        },
+        ttsMode: "provider",
+        ttsProvider: "elevenlabs",
+        providerTtsVoices: {
+          ...DEFAULT_SETTINGS.providerTtsVoices,
+          elevenlabs: "",
+        },
+      },
+      providerVoiceDirectories: {
+        elevenlabs: {
+          voices: [],
+          status: "error",
+          error: new Error("Missing voices_read permission"),
+          refresh: jest.fn(async () => []),
+        },
+      },
+    });
+
+    await waitFor(() => {
+      expect(screen.getByText("Rachel (built-in)")).toBeTruthy();
+      expect(
+        screen.getByText(
+          "Account voices could not be loaded. The built-in voice remains available.",
+        ),
+      ).toBeTruthy();
+      expect(screen.queryByPlaceholderText("Enter a voice ID")).toBeNull();
+    });
+  });
+
+  it("shows partial ElevenLabs permissions per capability without failing usable speech", async () => {
+    const screen = renderSettingsModal({
+      focusProvider: "elevenlabs",
+      settings: {
+        ...DEFAULT_SETTINGS,
+        apiKeys: {
+          ...DEFAULT_SETTINGS.apiKeys,
+          elevenlabs: "restricted-elevenlabs-key",
+        },
+        providerValidationResults: {
+          elevenlabs: {
+            stt: {
+              status: "success",
+              model: DEFAULT_SETTINGS.providerSttModels.elevenlabs,
+            },
+            tts: {
+              status: "success",
+              model: DEFAULT_SETTINGS.providerTtsModels.elevenlabs,
+              configKey: JSON.stringify({
+                voice: DEFAULT_SETTINGS.providerTtsVoices.elevenlabs,
+              }),
+            },
+            voices: {
+              status: "error",
+              message: "Missing voices_read permission",
+              model: "",
+            },
+          },
+        },
+      },
+    });
+
+    await waitFor(() => {
+      expect(
+        StyleSheet.flatten(
+          screen.getByTestId(
+            "provider-capability-pill-elevenlabs-stt",
+          ).props.style,
+        ).backgroundColor,
+      ).toBe(`${lightColors.success}22`);
+      expect(
+        StyleSheet.flatten(
+          screen.getByTestId(
+            "provider-capability-pill-elevenlabs-tts",
+          ).props.style,
+        ).backgroundColor,
+      ).toBe(`${lightColors.success}22`);
+      expect(
+        StyleSheet.flatten(
+          screen.getByTestId(
+            "provider-capability-pill-elevenlabs-voices",
+          ).props.style,
+        ).backgroundColor,
+      ).toBe(`${lightColors.danger}18`);
+      expect(screen.getByText("Missing voices_read permission")).toBeTruthy();
+      expect(screen.getAllByText("Working")).toHaveLength(2);
+      expect(screen.getByText("Invalid")).toBeTruthy();
+    });
   });
 
   it("styles speech diagnostics clearing as destructive and requires confirmation", async () => {

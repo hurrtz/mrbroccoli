@@ -4,15 +4,15 @@ export const PROVIDER_PREVIEW_SAMPLE_TEXT_BY_LANGUAGE: Record<
   TtsListenLanguage,
   string
 > = {
-  en: "Hello. This is a longer voice preview for Mr Broccoli, spoken at a calm and steady pace so you can judge clarity, tone, and whether this voice feels pleasant enough for full replies. If you listen for a few seconds, you should get a realistic sense of how this provider voice will sound during everyday conversations.",
-  de: "Hallo. Dies ist eine laengere Stimmprobe fuer Mr Broccoli, damit du hoeren kannst, wie klar die Aussprache ist und ob die Stimme auch ueber mehrere Saetze hinweg angenehm klingt. Wenn sie hier ruhig und natuerlich wirkt, passt sie in der Regel auch gut fuer laengere Antworten im Alltag.",
-  zh: "你好。这是一段较长的语音预览，用来帮助你判断这条声音是否清晰、自然，并且适合在日常对话里连续收听更长的回答。如果这两句话听起来稳定又舒服，那么它通常也适合让应用朗读完整回复。",
-  es: "Hola. Esta es una muestra de voz mas larga para que puedas escuchar con calma si la pronunciacion es clara y si el ritmo suena natural durante varias frases seguidas. Si esta voz te parece agradable en estas dos oraciones, normalmente tambien funcionara bien para respuestas mas largas dentro de la aplicacion.",
-  pt: "Ola. Esta e uma amostra de voz mais longa para que voce possa perceber com calma se a pronuncia esta clara e se o ritmo parece natural ao longo de varias frases. Se esta voz soar agradavel nestas duas frases, normalmente tambem sera uma boa escolha para respostas mais longas no aplicativo.",
-  hi: "नमस्ते। यह आवाज़ का थोड़ा लंबा पूर्वावलोकन है, ताकि आप सुन सकें कि उच्चारण कितना साफ़ है और क्या यह आवाज़ कई वाक्यों तक स्वाभाविक और आरामदायक लगती है। अगर यह आवाज़ इन दो वाक्यों में संतुलित और सुखद लगे, तो आम तौर पर यह ऐप के लंबे उत्तर सुनने के लिए भी अच्छी रहेगी।",
-  fr: "Bonjour. Voici un apercu de voix un peu plus long afin que vous puissiez entendre si la prononciation reste claire et si le rythme parait naturel sur plusieurs phrases d'affilee. Si cette voix vous semble agreable sur ces deux phrases, elle conviendra en general aussi pour des reponses plus longues dans l'application.",
-  it: "Ciao. Questa e una prova della voce un po' piu lunga, cosi puoi capire se la pronuncia e chiara e se il ritmo rimane naturale anche per piu frasi consecutive. Se questa voce ti sembra piacevole in queste due frasi, di solito sara una buona scelta anche per risposte piu lunghe nell'app.",
-  ja: "こんにちは。これは少し長めの音声プレビューで、発音の明瞭さや、複数の文を続けて聞いたときに自然に感じられるかどうかを確かめるためのものです。ここで落ち着いて聞こえる声であれば、アプリが長めの返答を読み上げる場合にもたいてい快適に使えます。",
+  en: "Good morning! Beyond the quiet station, rain taps softly on the windows while the city wakes. At 7:45, Mr Broccoli calmly explains why bright ideas, curious questions, and the occasional ridiculous joke make a long conversation worth hearing.",
+  de: "Guten Morgen! Zwischen grünen Hügeln fährt die Straßenbahn pünktlich über die große Brücke. Während draußen Vögel zwitschern, erklärt Mr Broccoli ruhig und präzise, warum zwölf frische Brötchen besser klingen als ein nüchterner Testton.",
+  zh: "早上好！清晨的雨轻轻敲着窗户，城市慢慢醒来。七点四十五分，Mr Broccoli 平静地聊起明亮的想法、好奇的问题，还有偶尔冒出来的荒唐笑话，让你听听这段声音在长句中的节奏和温度。",
+  es: "¡Buenos días! La lluvia golpea suavemente las ventanas mientras la ciudad despierta. A las siete y cuarenta y cinco, Mr Broccoli explica con calma por qué las ideas brillantes, las preguntas curiosas y algún chiste absurdo hacen que una conversación larga merezca la pena.",
+  pt: "Bom dia! A chuva toca de leve nas janelas enquanto a cidade desperta. Às sete e quarenta e cinco, Mr Broccoli explica com calma por que ideias brilhantes, perguntas curiosas e uma piada inesperada tornam uma conversa longa mais agradável de ouvir.",
+  hi: "सुप्रभात! सुबह की हल्की बारिश खिड़कियों पर दस्तक दे रही है और शहर धीरे-धीरे जाग रहा है। सात बजकर पैंतालीस मिनट पर, Mr Broccoli शांत आवाज़ में बताता है कि अच्छे विचार, जिज्ञासु सवाल और कभी-कभी कोई मज़ेदार बात लंबी बातचीत को सुनने लायक क्यों बनाते हैं।",
+  fr: "Bonjour ! La pluie tambourine doucement aux fenêtres pendant que la ville s’éveille. À sept heures quarante-cinq, Mr Broccoli explique calmement pourquoi les idées lumineuses, les questions curieuses et une plaisanterie inattendue rendent une longue conversation agréable à écouter.",
+  it: "Buongiorno! La pioggia picchietta piano sui vetri mentre la città si sveglia. Alle sette e quarantacinque, Mr Broccoli spiega con calma perché le idee brillanti, le domande curiose e una battuta inaspettata rendono piacevole anche una lunga conversazione.",
+  ja: "おはようございます。静かな雨が窓をたたき、街がゆっくり目を覚まします。7時45分、Mr Broccoliは、ひらめきや素朴な疑問、ときどき交じる意外な冗談が、長い会話を楽しくする理由を落ち着いて話します。",
 };
 
 export const LOCAL_PREVIEW_SAMPLE_TEXT_BY_LANGUAGE: Record<
@@ -32,6 +32,6 @@ export const LOCAL_PREVIEW_SAMPLE_TEXT_BY_LANGUAGE: Record<
 
 export function getNativePreviewSampleText(language: AppLanguage) {
   return language === "de"
-    ? "Hallo. Das ist eine kurze Sprachprobe der Systemstimme auf diesem Geraet, damit du sofort hoeren kannst, wie natuerlich oder kuenstlich sie fuer laengere Antworten wirkt. Wenn dir Tempo, Klang oder Betonung nicht gefallen, ist das ein guter Hinweis darauf, lieber eine lokale oder Cloud-Stimme zu verwenden."
-    : "Hello. This is a short sample of the system voice on this device, so you can quickly hear how natural or artificial it feels for longer replies. If you dislike the pacing, tone, or pronunciation here, that is a good sign you will probably prefer a local or cloud voice instead.";
+    ? "Guten Abend! Über den Dächern von Düsseldorf färbt die Sonne den Himmel orange. Später schließen wir die Bürotür, gönnen uns heißen Tee und prüfen, ob diese Stimme Zahlen, Umlaute und längere Sätze natürlich betont."
+    : "Here’s a fresh voice check: warm coffee, a crisp breeze, and three blue bicycles waiting by the river. If every word sounds clear—from whispering leaves to numbers like forty-two—this voice should feel comfortable during a longer reply.";
 }

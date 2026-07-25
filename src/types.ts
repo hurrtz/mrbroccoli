@@ -19,7 +19,10 @@ import {
 import type { RuntimeAppProviderId } from "./constants/providers/runtimeManifest";
 
 export type Provider = RuntimeAppProviderId;
-export type InputMode = "push-to-talk" | "toggle-to-talk";
+export type InputMode =
+  | "push-to-talk"
+  | "toggle-to-talk"
+  | "drive-session";
 export type ReplyPlayback = "stream" | "wait";
 export type TtsPlayback = ReplyPlayback;
 export type ThemeMode = "light" | "dark" | "system";
@@ -38,6 +41,12 @@ export type TtsListenLanguage =
   | "ja";
 export type SttBackendMode = "native" | "provider";
 export type TtsBackendMode = "native" | "provider";
+export type ProviderCapability =
+  | "llm"
+  | "stt"
+  | "tts"
+  | "search"
+  | "voices";
 export type AssistantResponseLength = "brief" | "normal" | "thorough";
 export type AssistantResponseTone =
   | "professional"
@@ -62,8 +71,11 @@ export interface ProviderValidationResult {
   model: string;
   configKey?: string;
 }
+export type ProviderCapabilityValidationResults = Partial<
+  Record<ProviderCapability, ProviderValidationResult>
+>;
 export type ProviderValidationResults = Partial<
-  Record<Provider, ProviderValidationResult>
+  Record<Provider, ProviderCapabilityValidationResults>
 >;
 export type ProviderModelSelections = Record<Provider, string>;
 export type ProviderSttModelSelections = Record<Provider, string>;
@@ -207,11 +219,97 @@ export interface MessageReplyFailureMetadata {
   message: string;
 }
 
+export interface MessageTurnReceiptRoute {
+  provider: Provider;
+  model: string;
+  gateway?: string;
+  upstreamProvider?: string;
+  strategy?: string;
+  attempts?: number;
+}
+
+export interface MessageRouterMetadata {
+  gateway: "OpenRouter";
+  requestedModel: string;
+  actualModel?: string;
+  upstreamProvider?: string;
+  strategy?: string;
+  attempts?: number;
+  contextCompression?: {
+    originalCount?: number;
+    compressedCount?: number;
+  };
+}
+
+export interface MessageTurnReceipt {
+  version: 1;
+  startedAt: string;
+  input: {
+    source: "voice" | "text";
+    mode: SttBackendMode;
+    provider?: Provider | null;
+    model?: string;
+  };
+  requestedRoute: MessageTurnReceiptRoute;
+  actualRoute: MessageTurnReceiptRoute;
+  effort?: {
+    selected: string;
+    label: string;
+    transportParameter?: string;
+    transportValue?: string;
+    semantics: "provider-native";
+  };
+  webSearch: {
+    mode: WebSearchMode;
+    provider?: WebSearchProvider | null;
+    requested: boolean;
+    ready: boolean;
+    used: boolean;
+    fellBack: boolean;
+    decisionReason: string;
+    model?: string;
+  };
+  speechOutput: {
+    enabled: boolean;
+    requestedMode: TtsBackendMode | "off";
+    actualMode: TtsBackendMode | "off";
+    provider?: Provider | null;
+    model?: string;
+    voice?: string;
+    fellBack: boolean;
+    fallbackReason?: string;
+  };
+  context: {
+    existingSummaryReused: boolean;
+    summaryUpdateRequested: boolean;
+    summaryUpdated: boolean;
+    fallbackUsed: boolean;
+    messagesAvailable: number;
+    messagesSent: number;
+    messagesSummarized: number;
+    gatewayCompression?: {
+      originalCount?: number;
+      compressedCount?: number;
+    };
+  };
+  timing: {
+    transcriptionMs?: number;
+    contextMs?: number;
+    webSearchMs?: number;
+    modelMs?: number;
+    replyReadyMs?: number;
+    firstSpeechMs?: number;
+    totalMs?: number;
+  };
+}
+
 export interface MessageMetadata {
   webSearch?: MessageWebSearchMetadata;
   notices?: MessagePipelineNotice[];
   providerState?: MessageProviderState;
   replyFailure?: MessageReplyFailureMetadata;
+  router?: MessageRouterMetadata;
+  turnReceipt?: MessageTurnReceipt;
 }
 
 export const DEFAULT_ASSISTANT_INSTRUCTIONS_BY_LANGUAGE: Record<
@@ -219,8 +317,12 @@ export const DEFAULT_ASSISTANT_INSTRUCTIONS_BY_LANGUAGE: Record<
   string
 > = {
   en: "You are a voice assistant. The user is speaking to you and will hear your response read aloud. Respond naturally and conversationally as if talking. Never use markdown, bullet points, numbered lists, headers, or any formatting. Keep responses concise and spoken-friendly.",
-  de: "Du bist ein Sprachassistent. Die Nutzerin oder der Nutzer spricht mit dir und wird deine Antwort vorgelesen bekommen. Antworte natuerlich und gespraechsnah, als waerest du in einem echten Gespraech. Verwende niemals Markdown, Aufzaehlungen, nummerierte Listen, Ueberschriften oder sonstige Formatierung. Halte Antworten knapp und gut vorlesbar.",
+  de: "Du bist ein Sprachassistent. Die Nutzerin oder der Nutzer spricht mit dir und wird deine Antwort vorgelesen bekommen. Antworte natürlich und gesprächsnah, als wärest du in einem echten Gespräch. Verwende niemals Markdown, Aufzählungen, nummerierte Listen, Überschriften oder sonstige Formatierung. Halte Antworten knapp und gut vorlesbar.",
 };
+
+const LEGACY_DEFAULT_ASSISTANT_INSTRUCTIONS = [
+  "Du bist ein Sprachassistent. Die Nutzerin oder der Nutzer spricht mit dir und wird deine Antwort vorgelesen bekommen. Antworte natuerlich und gespraechsnah, als waerest du in einem echten Gespraech. Verwende niemals Markdown, Aufzaehlungen, nummerierte Listen, Ueberschriften oder sonstige Formatierung. Halte Antworten knapp und gut vorlesbar.",
+] as const;
 
 export const DEFAULT_ASSISTANT_INSTRUCTIONS =
   DEFAULT_ASSISTANT_INSTRUCTIONS_BY_LANGUAGE.en;
@@ -230,8 +332,11 @@ export function getDefaultAssistantInstructions(language: AppLanguage) {
 }
 
 export function isDefaultAssistantInstructions(value: string) {
-  return Object.values(DEFAULT_ASSISTANT_INSTRUCTIONS_BY_LANGUAGE).includes(
-    value,
+  return (
+    Object.values(DEFAULT_ASSISTANT_INSTRUCTIONS_BY_LANGUAGE).includes(value) ||
+    LEGACY_DEFAULT_ASSISTANT_INSTRUCTIONS.includes(
+      value as (typeof LEGACY_DEFAULT_ASSISTANT_INSTRUCTIONS)[number],
+    )
   );
 }
 

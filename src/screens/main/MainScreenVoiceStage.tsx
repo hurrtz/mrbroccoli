@@ -11,12 +11,18 @@ import { InputSurface, VoiceTextInputPager } from "./VoiceTextInputPager";
 interface MainScreenVoiceStageProps {
   colors: Colors;
   disabled?: boolean;
+  driveSessionActive?: boolean;
+  driveSessionCanContinue?: boolean;
+  driveSessionCanRepeat?: boolean;
   initialInputSurface?: InputSurface;
   initialTextMessage?: string;
   inputMode: InputMode;
   isActive: boolean;
   layout?: "portrait" | "landscape";
   onInputSurfaceChange?: (surface: InputSurface) => void;
+  onDriveContinue?: () => void | Promise<void>;
+  onDriveRepeat?: () => void | Promise<void>;
+  onDriveStop?: () => void | Promise<void>;
   onOpenStatusDetails: () => void;
   onPress: () => void;
   onPressIn: () => void;
@@ -38,12 +44,18 @@ interface MainScreenVoiceStageProps {
 export const MainScreenVoiceStage = React.memo(function MainScreenVoiceStage({
   colors,
   disabled = false,
+  driveSessionActive = false,
+  driveSessionCanContinue = false,
+  driveSessionCanRepeat = false,
   initialInputSurface,
   initialTextMessage,
   inputMode,
   isActive,
   layout = "portrait",
   onInputSurfaceChange,
+  onDriveContinue,
+  onDriveRepeat,
+  onDriveStop,
   onOpenStatusDetails,
   onPress,
   onPressIn,
@@ -80,11 +92,17 @@ export const MainScreenVoiceStage = React.memo(function MainScreenVoiceStage({
         <VoiceTextInputPager
           colors={colors}
           disabled={disabled}
+          driveSessionActive={driveSessionActive}
+          driveSessionCanContinue={driveSessionCanContinue}
+          driveSessionCanRepeat={driveSessionCanRepeat}
           initialSurface={initialInputSurface}
           initialTextMessage={initialTextMessage}
           inputMode={inputMode}
           isActive={isActive}
           onInputSurfaceChange={onInputSurfaceChange}
+          onDriveContinue={onDriveContinue}
+          onDriveRepeat={onDriveRepeat}
+          onDriveStop={onDriveStop}
           onOpenStatusDetails={onOpenStatusDetails}
           onPress={onPress}
           onPressIn={onPressIn}

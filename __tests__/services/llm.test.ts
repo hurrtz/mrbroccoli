@@ -108,6 +108,83 @@ describe("streamChat", () => {
     );
   });
 
+  it("routes OpenRouter models with privacy constraints and exposes router metadata", async () => {
+    const encoder = new TextEncoder();
+    const stream = new ReadableStream({
+      start(controller) {
+        controller.enqueue(
+          encoder.encode(
+            'data: {"choices":[{"delta":{"content":"Hi"}}]}\n\n',
+          ),
+        );
+        controller.enqueue(
+          encoder.encode(
+            'data: {"model":"openai/gpt-5.6-sol-20260709","choices":[{"delta":{},"finish_reason":"stop"}],"openrouter_metadata":{"requested":"openai/gpt-5.6-sol-20260709","strategy":"direct","attempt":2,"endpoints":{"available":[{"provider":"OpenAI","model":"openai/gpt-5.6-sol-20260709","selected":true}]},"pipeline":[{"type":"context_compression","data":{"original_count":20,"compressed_count":12}}]}}\n\n',
+          ),
+        );
+        controller.enqueue(encoder.encode("data: [DONE]\n\n"));
+        controller.close();
+      },
+    });
+    (fetch as jest.Mock).mockResolvedValueOnce({ ok: true, body: stream });
+    const onDone = jest.fn();
+
+    await streamChat({
+      messages: mockMessages,
+      model: "openai/gpt-5.6-sol-20260709",
+      modelEffort: "high",
+      provider: "openrouter",
+      apiKey: "sk-or-v1-test",
+      assistantInstructions: "",
+      responseLength: "normal",
+      responseTone: "professional",
+      language: "en",
+      onChunk: jest.fn(),
+      onDone,
+      onError: jest.fn(),
+    });
+
+    const [endpoint, request] = (fetch as jest.Mock).mock.calls[0];
+    expect(endpoint).toBe(
+      "https://openrouter.ai/api/v1/chat/completions",
+    );
+    expect(request.headers).toEqual(
+      expect.objectContaining({
+        Authorization: "Bearer sk-or-v1-test",
+        "X-OpenRouter-Metadata": "enabled",
+        "X-Title": "Mr Broccoli",
+      }),
+    );
+    expect(JSON.parse(request.body)).toEqual(
+      expect.objectContaining({
+        model: "openai/gpt-5.6-sol-20260709",
+        reasoning_effort: "high",
+        provider: {
+          data_collection: "deny",
+          require_parameters: true,
+        },
+      }),
+    );
+    expect(onDone).toHaveBeenCalledWith(
+      "Hi",
+      expect.any(Object),
+      {
+        router: {
+          gateway: "OpenRouter",
+          requestedModel: "openai/gpt-5.6-sol-20260709",
+          actualModel: "openai/gpt-5.6-sol-20260709",
+          upstreamProvider: "OpenAI",
+          strategy: "direct",
+          attempts: 2,
+          contextCompression: {
+            originalCount: 20,
+            compressedCount: 12,
+          },
+        },
+      },
+    );
+  });
+
   it("does not expose or speak a provider marker echoed by the model", async () => {
     const encoder = new TextEncoder();
     const stream = new ReadableStream({

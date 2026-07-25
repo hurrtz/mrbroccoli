@@ -34,19 +34,17 @@ export const styles = StyleSheet.create({
     overflow: "hidden",
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "space-between",
-    gap: 16,
+    gap: 10,
     paddingHorizontal: 18,
     paddingTop: SETTINGS_HEADER_TOP_PADDING,
     paddingBottom: SETTINGS_HEADER_BOTTOM_PADDING,
     borderBottomWidth: 1,
   },
-  headerLeading: {
-    flex: 1,
-    minWidth: 0,
-    flexDirection: "row",
+  headerControlSlot: {
+    width: SETTINGS_HEADER_CONTROL_SIZE,
+    height: SETTINGS_HEADER_CONTROL_SIZE,
     alignItems: "center",
-    gap: 10,
+    justifyContent: "center",
   },
   headerBackButton: {
     width: 44,
@@ -63,6 +61,7 @@ export const styles = StyleSheet.create({
   },
   title: {
     ...textStyles.screenTitle,
+    textAlign: "center",
   },
   closeButton: {
     width: SETTINGS_HEADER_CONTROL_SIZE,
@@ -201,6 +200,27 @@ export const styles = StyleSheet.create({
     borderWidth: 1,
     overflow: "hidden",
   },
+  openRouterOnboardingCard: {
+    borderRadius: 12,
+    borderWidth: 1,
+    paddingHorizontal: 12,
+    paddingVertical: 11,
+    gap: 6,
+  },
+  openRouterOnboardingTitleRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 7,
+  },
+  openRouterOnboardingTitle: {
+    ...textStyles.subsectionTitle,
+  },
+  openRouterOnboardingText: {
+    ...textStyles.body,
+  },
+  openRouterOnboardingRoute: {
+    ...textStyles.metadata,
+  },
   providerVaultHeader: {
     paddingHorizontal: 14,
     paddingVertical: 14,
@@ -238,6 +258,9 @@ export const styles = StyleSheet.create({
     gap: 6,
   },
   providerCapabilityPill: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 5,
     borderRadius: 999,
     borderWidth: 1,
     paddingHorizontal: 8,
@@ -247,6 +270,11 @@ export const styles = StyleSheet.create({
     ...textStyles.controlLabel,
     fontSize: 10,
     lineHeight: 14,
+  },
+  providerCapabilityDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
   },
   providerVaultHeaderMeta: {
     alignItems: "flex-end",
@@ -294,6 +322,54 @@ export const styles = StyleSheet.create({
     gap: 8,
   },
   providerVaultActionButtonText: {
+    ...textStyles.compactAction,
+  },
+  providerCapabilityMatrix: {
+    gap: 8,
+  },
+  providerCapabilityCheckRow: {
+    minHeight: 62,
+    borderRadius: 12,
+    borderWidth: 1,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+  },
+  providerCapabilityCheckCopy: {
+    flex: 1,
+    gap: 2,
+  },
+  providerCapabilityCheckHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    flexWrap: "wrap",
+    gap: 7,
+  },
+  providerCapabilityCheckLabel: {
+    ...textStyles.controlLabel,
+  },
+  providerCapabilityOptional: {
+    ...textStyles.caption,
+  },
+  providerCapabilityCheckStatus: {
+    ...textStyles.supporting,
+  },
+  providerCapabilityCheckMessage: {
+    ...textStyles.caption,
+  },
+  providerCapabilityTestButton: {
+    minHeight: 36,
+    borderRadius: 10,
+    borderWidth: 1,
+    paddingHorizontal: 10,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 6,
+  },
+  providerCapabilityTestText: {
     ...textStyles.compactAction,
   },
   inlineAccordion: {

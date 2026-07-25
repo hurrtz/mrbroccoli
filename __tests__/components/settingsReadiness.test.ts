@@ -97,7 +97,7 @@ describe("settings readiness", () => {
     expectStatus(readiness.speak, "broken");
   });
 
-  it("marks ElevenLabs speech broken until an account voice is selected", () => {
+  it("uses the built-in ElevenLabs voice when account voices are unavailable", () => {
     const settings = withSettings({
       ttsMode: "provider",
       ttsProvider: "elevenlabs",
@@ -118,7 +118,7 @@ describe("settings readiness", () => {
       searchProviders: [],
     });
 
-    expectStatus(readiness.speak, "broken");
+    expectStatus(readiness.speak, "ready");
   });
 
   it("marks search ready when a selected search-capable provider has credentials even if search is disabled", () => {

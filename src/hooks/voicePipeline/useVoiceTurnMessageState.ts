@@ -3,6 +3,7 @@ import { useCallback, useRef } from "react";
 import type {
   MessageMetadata,
   MessagePipelineNotice,
+  MessageTurnReceipt,
 } from "../../types";
 import type { UseVoicePipelineParams } from "./types";
 
@@ -46,7 +47,11 @@ export function useVoiceTurnMessageState(updateMessage: UpdateMessage) {
   const ttsFallbackToastShownRef = useRef(false);
   const lastUserMessageIdRef = useRef<string | null>(null);
   const lastAssistantMessageIdRef = useRef<string | null>(null);
+  const assistantHasTurnReceiptRef = useRef(false);
   const pendingAssistantNoticesRef = useRef<MessagePipelineNotice[]>([]);
+  const pendingTurnReceiptUpdatesRef = useRef<
+    Array<(receipt: MessageTurnReceipt) => MessageTurnReceipt>
+  >([]);
 
   const clearReplyFailure = useCallback(
     (messageId: string) => {
@@ -90,7 +95,9 @@ export function useVoiceTurnMessageState(updateMessage: UpdateMessage) {
       ttsFallbackToastShownRef.current = false;
       lastUserMessageIdRef.current = existingUserMessageId ?? null;
       lastAssistantMessageIdRef.current = null;
+      assistantHasTurnReceiptRef.current = false;
       pendingAssistantNoticesRef.current = [];
+      pendingTurnReceiptUpdatesRef.current = [];
 
       if (existingUserMessageId) {
         clearReplyFailure(existingUserMessageId);
@@ -112,15 +119,65 @@ export function useVoiceTurnMessageState(updateMessage: UpdateMessage) {
   const consumeAssistantMetadata = useCallback(
     (metadata?: MessageMetadata) => {
       const pendingNotices = pendingAssistantNoticesRef.current;
+      const pendingReceiptUpdates = pendingTurnReceiptUpdatesRef.current;
       pendingAssistantNoticesRef.current = [];
+      pendingTurnReceiptUpdatesRef.current = [];
 
-      return pendingNotices.reduce(
+      const metadataWithNotices = pendingNotices.reduce(
         (currentMetadata, notice) =>
           appendNoticeMetadata(currentMetadata, notice),
         metadata,
       );
+
+      if (!metadataWithNotices?.turnReceipt) {
+        assistantHasTurnReceiptRef.current = false;
+        return metadataWithNotices;
+      }
+
+      assistantHasTurnReceiptRef.current = true;
+      return {
+        ...metadataWithNotices,
+        turnReceipt: pendingReceiptUpdates.reduce(
+          (receipt, update) => update(receipt),
+          metadataWithNotices.turnReceipt,
+        ),
+      };
     },
     [],
+  );
+
+  const updateAssistantTurnReceipt = useCallback(
+    (
+      update: (receipt: MessageTurnReceipt) => MessageTurnReceipt,
+    ) => {
+      const assistantMessageId = lastAssistantMessageIdRef.current;
+      if (!assistantMessageId) {
+        pendingTurnReceiptUpdatesRef.current = [
+          ...pendingTurnReceiptUpdatesRef.current,
+          update,
+        ];
+        return;
+      }
+      if (!assistantHasTurnReceiptRef.current) {
+        return;
+      }
+
+      updateMessage(assistantMessageId, (message) => {
+        const receipt = message.metadata?.turnReceipt;
+        if (!receipt) {
+          return message;
+        }
+
+        return {
+          ...message,
+          metadata: {
+            ...message.metadata,
+            turnReceipt: update(receipt),
+          },
+        };
+      });
+    },
+    [updateMessage],
   );
 
   const recordAssistantNotice = useCallback(
@@ -180,5 +237,6 @@ export function useVoiceTurnMessageState(updateMessage: UpdateMessage) {
     recordAssistantNotice,
     recordTtsFallbackNotice,
     resetTurnMessageState,
+    updateAssistantTurnReceipt,
   };
 }

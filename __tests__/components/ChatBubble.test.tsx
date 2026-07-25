@@ -103,6 +103,102 @@ describe("ChatBubble", () => {
     expect(queryByText("Sources")).toBeNull();
   });
 
+  it("keeps the execution receipt collapsed and reveals exact routes on demand", () => {
+    const { getByLabelText, getByText, queryByText } = renderWithProviders(
+      <ChatBubble
+        message={{
+          id: "assistant-receipt",
+          role: "assistant",
+          content: "A transparent answer.",
+          model: "gpt-5.6",
+          provider: "openai",
+          timestamp: "2026-07-25T10:00:00.000Z",
+          metadata: {
+            turnReceipt: {
+              version: 1,
+              startedAt: "2026-07-25T09:59:55.000Z",
+              input: {
+                source: "voice",
+                mode: "provider",
+                provider: "openai",
+                model: "gpt-4o-transcribe",
+              },
+              requestedRoute: {
+                provider: "openai",
+                model: "gpt-5.6",
+              },
+              actualRoute: {
+                provider: "openai",
+                model: "gpt-5.6",
+              },
+              effort: {
+                selected: "xhigh",
+                label: "Extra high",
+                transportParameter: "reasoning_effort",
+                transportValue: "xhigh",
+                semantics: "provider-native",
+              },
+              webSearch: {
+                mode: "on",
+                provider: "openai",
+                requested: true,
+                ready: true,
+                used: true,
+                fellBack: false,
+                decisionReason: "manual-on",
+                model: "gpt-5.6-sol",
+              },
+              speechOutput: {
+                enabled: true,
+                requestedMode: "provider",
+                actualMode: "native",
+                provider: "elevenlabs",
+                model: "eleven_multilingual_v2",
+                voice: "Rachel",
+                fellBack: true,
+                fallbackReason: "The provider voice timed out.",
+              },
+              context: {
+                existingSummaryReused: true,
+                summaryUpdateRequested: true,
+                summaryUpdated: true,
+                fallbackUsed: false,
+                messagesAvailable: 14,
+                messagesSent: 6,
+                messagesSummarized: 8,
+              },
+              timing: {
+                transcriptionMs: 800,
+                contextMs: 120,
+                webSearchMs: 900,
+                modelMs: 2_500,
+                firstSpeechMs: 4_500,
+                totalMs: 7_200,
+              },
+            },
+          },
+        }}
+      />,
+    );
+
+    expect(getByText("Turn details")).toBeTruthy();
+    expect(queryByText("Requested reply route")).toBeNull();
+
+    fireEvent.press(getByLabelText("Show turn details"));
+
+    expect(getByLabelText("Hide turn details")).toBeTruthy();
+    expect(getByText("Requested reply route")).toBeTruthy();
+    expect(getByText("Actual reply route")).toBeTruthy();
+    expect(getByText(/reasoning_effort=xhigh/)).toBeTruthy();
+    expect(getByText("The provider voice timed out.")).toBeTruthy();
+    expect(
+      getByText(
+        "6/14 prior messages sent · 8 newly summarized · saved summary reused · summary updated",
+      ),
+    ).toBeTruthy();
+    expect(getByText(/total 7.2 s/)).toBeTruthy();
+  });
+
   it("renders user messages as full-width rows with a right-side role cue", () => {
     const { getByTestId, getByText } = renderWithProviders(
       <ChatBubble

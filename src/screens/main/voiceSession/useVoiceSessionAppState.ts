@@ -5,12 +5,14 @@ import { recordDebugLogEvent } from "../../../services/debugLogCapture";
 
 interface UseVoiceSessionAppStateParams {
   hasActiveVoiceCaptureNow: () => boolean;
+  onBackground?: () => void;
   onBackgroundSubmitError: (error: unknown) => void;
   stopVoiceCapture: () => Promise<void>;
 }
 
 export function useVoiceSessionAppState({
   hasActiveVoiceCaptureNow,
+  onBackground,
   onBackgroundSubmitError,
   stopVoiceCapture,
 }: UseVoiceSessionAppStateParams) {
@@ -19,6 +21,8 @@ export function useVoiceSessionAppState({
       if (nextAppState !== "background") {
         return;
       }
+
+      onBackground?.();
 
       if (!hasActiveVoiceCaptureNow()) {
         return;
@@ -50,6 +54,7 @@ export function useVoiceSessionAppState({
     };
   }, [
     hasActiveVoiceCaptureNow,
+    onBackground,
     onBackgroundSubmitError,
     stopVoiceCapture,
   ]);

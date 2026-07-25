@@ -17,13 +17,13 @@ import {
 const NATIVE_STT_LANGUAGE_NOTES_BY_LANGUAGE: Record<AppLanguage, string> = {
   en: NATIVE_STT_LANGUAGE_NOTE,
   de:
-    "Die Sprachunterstuetzung haengt vom Betriebssystem des Geraets, installierten Sprachpaketen und der Verfuegbarkeit der Erkennung ab. Die genaue Liste variiert je nach Geraet.",
+    "Die Sprachunterstützung hängt vom Betriebssystem des Geräts, installierten Sprachpaketen und der Verfügbarkeit der Erkennung ab. Die genaue Liste variiert je nach Gerät.",
 };
 
 const NATIVE_TTS_LANGUAGE_NOTES_BY_LANGUAGE: Record<AppLanguage, string> = {
   en: NATIVE_TTS_LANGUAGE_NOTE,
   de:
-    "Die Sprachunterstuetzung haengt von den auf dem Geraet installierten Systemstimmen ab. Die genaue Liste, Aussprachequalitaet und Offline-Verfuegbarkeit variieren je nach Betriebssystem und Geraet.",
+    "Die Sprachunterstützung hängt von den auf dem Gerät installierten Systemstimmen ab. Die genaue Liste, Aussprachequalität und Offline-Verfügbarkeit variieren je nach Betriebssystem und Gerät.",
 };
 
 const GERMAN_PROVIDER_API_KEY_PLACEHOLDER_OVERRIDES: Partial<
@@ -34,7 +34,7 @@ const GERMAN_PROVIDER_API_KEY_PLACEHOLDER_OVERRIDES: Partial<
   gemini: "Gemini API key|project-id|access-token|us",
   xai: "xai-...",
   deepseek: "sk-...",
-  mistral: "API-Schluessel eingeben",
+  mistral: "API-Schlüssel eingeben",
 };
 
 const PROVIDER_API_KEY_PLACEHOLDERS_BY_LANGUAGE: Record<
@@ -60,18 +60,20 @@ const GENERIC_PROVIDER_API_KEY_HINTS: Record<AppLanguage, string> = {
   en:
     "Paste credentials for an external service you already use. Keys stay on this device and are used only for requests you start in the app.",
   de:
-    "Füge Zugangsdaten fuer einen externen Dienst ein, den du bereits nutzt. Keys bleiben auf diesem Geraet und werden nur fuer Anfragen verwendet, die du in der App startest.",
+    "Füge Zugangsdaten für einen externen Dienst ein, den du bereits nutzt. Keys bleiben auf diesem Gerät und werden nur für Anfragen verwendet, die du in der App startest.",
 };
 
 const PROVIDER_API_KEY_HINT_OVERRIDES: Partial<
   Record<AppLanguage, Partial<Record<Provider, string>>>
 > = {
   en: {
-    elevenlabs: `${GENERIC_PROVIDER_API_KEY_HINTS.en} Restricted ElevenLabs keys need Text to Speech and Voices read access.`,
+    openrouter: `${GENERIC_PROVIDER_API_KEY_HINTS.en} One OpenRouter key unlocks the curated gateway models below. Requests pass through OpenRouter to the selected upstream provider; direct provider keys remain separate.`,
+    elevenlabs: `${GENERIC_PROVIDER_API_KEY_HINTS.en} Restricted ElevenLabs keys need Text to Speech permission for TTS and Speech to Text permission for STT. Voices read is optional and only unlocks the account voice library.`,
     "moonshot-ai-kimi": `${GENERIC_PROVIDER_API_KEY_HINTS.en} Kimi K3 requires at least one successful $1 account top-up before Moonshot unlocks access.`,
   },
   de: {
-    elevenlabs: `${GENERIC_PROVIDER_API_KEY_HINTS.de} Eingeschraenkte ElevenLabs-Keys benoetigen Zugriff auf Text to Speech und das Lesen von Stimmen.`,
+    openrouter: `${GENERIC_PROVIDER_API_KEY_HINTS.de} Ein OpenRouter-Key schaltet die kuratierten Gateway-Modelle frei. Anfragen laufen über OpenRouter zum ausgewählten Upstream-Anbieter; direkte Anbieter-Keys bleiben getrennt.`,
+    elevenlabs: `${GENERIC_PROVIDER_API_KEY_HINTS.de} Eingeschränkte ElevenLabs-Keys benötigen für TTS die Berechtigung „Text to Speech“ und für STT „Speech to Text“. „Voices read“ ist optional und schaltet nur die persönliche Stimmenbibliothek frei.`,
     "moonshot-ai-kimi": `${GENERIC_PROVIDER_API_KEY_HINTS.de} Moonshot schaltet Kimi K3 erst nach einer erfolgreichen Kontoaufladung von mindestens 1 USD frei.`,
   },
 };
@@ -88,9 +90,9 @@ const PROVIDER_STT_LANGUAGE_NOTES_BY_LANGUAGE: Partial<
   ) as Partial<Record<Provider, string>>,
   de: {
     openai:
-      `OpenAI bietet aktuell gpt-4o-transcribe, gpt-4o-mini-transcribe und whisper-1 fuer Speech-to-Text an. Der von OpenAI veroeffentlichte Satz gut unterstuetzter Sprachen lautet: ${WHISPER_WELL_SUPPORTED_LANGUAGES}`,
+      `OpenAI bietet aktuell gpt-4o-transcribe, gpt-4o-mini-transcribe und whisper-1 für Speech-to-Text an. Der von OpenAI veröffentlichte Satz gut unterstützter Sprachen lautet: ${WHISPER_WELL_SUPPORTED_LANGUAGES}`,
     mistral:
-      "Die aktuelle Voxtral-Transkriptionsroute ist fuer Englisch, Spanisch, Franzoesisch, Portugiesisch, Hindi, Deutsch, Niederlaendisch und Italienisch dokumentiert.",
+      "Die aktuelle Voxtral-Transkriptionsroute ist für Englisch, Spanisch, Französisch, Portugiesisch, Hindi, Deutsch, Niederländisch und Italienisch dokumentiert.",
   },
 };
 
@@ -106,11 +108,11 @@ const PROVIDER_TTS_LANGUAGE_NOTES_BY_LANGUAGE: Partial<
   ) as Partial<Record<Provider, string>>,
   de: {
     openai:
-      "OpenAI bietet aktuell gpt-4o-mini-tts, tts-1 und tts-1-hd fuer Text-to-Speech an. OpenAI veroeffentlicht fuer TTS keine so kompakte Liste gut unterstuetzter Sprachen wie fuer STT und weist darauf hin, dass die Stimmen fuer Englisch optimiert sind.",
+      "OpenAI bietet aktuell gpt-4o-mini-tts, tts-1 und tts-1-hd für Text-to-Speech an. OpenAI veröffentlicht für TTS keine so kompakte Liste gut unterstützter Sprachen wie für STT und weist darauf hin, dass die Stimmen für Englisch optimiert sind.",
     gemini:
-      "Gemini TTS unterstuetzt aktuell Arabisch, Bengalisch, Niederlaendisch, Englisch, Franzoesisch, Deutsch, Hindi, Indonesisch, Italienisch, Japanisch, Koreanisch, Mandarin, Polnisch, Portugiesisch, Rumaenisch, Russisch, Spanisch, Tamil, Telugu, Thai, Tuerkisch, Ukrainisch, Urdu und Vietnamesisch.",
+      "Gemini TTS unterstützt aktuell Arabisch, Bengalisch, Niederländisch, Englisch, Französisch, Deutsch, Hindi, Indonesisch, Italienisch, Japanisch, Koreanisch, Mandarin, Polnisch, Portugiesisch, Rumänisch, Russisch, Spanisch, Tamil, Telugu, Thai, Türkisch, Ukrainisch, Urdu und Vietnamesisch.",
     xai:
-      "xAI TTS unterstuetzt aktuell Arabisch, Niederlaendisch, Englisch, Franzoesisch, Deutsch, Hindi, Indonesisch, Italienisch, Japanisch, Koreanisch, Polnisch, Portugiesisch, Russisch, Spanisch, Thai, Tuerkisch, Vietnamesisch und Chinesisch.",
+      "xAI TTS unterstützt aktuell Arabisch, Niederländisch, Englisch, Französisch, Deutsch, Hindi, Indonesisch, Italienisch, Japanisch, Koreanisch, Polnisch, Portugiesisch, Russisch, Spanisch, Thai, Türkisch, Vietnamesisch und Chinesisch.",
   },
 };
 
@@ -197,7 +199,7 @@ function buildCatalogSpeechLanguageNote(params: {
 
     parts.push(
       params.language === "de"
-        ? `Unterstuetzt ${languageCount} Sprachen`
+        ? `Unterstützt ${languageCount} Sprachen`
         : `Supports ${languageCount} languages`,
     );
   } else if (
@@ -210,7 +212,7 @@ function buildCatalogSpeechLanguageNote(params: {
   if (languageSupport.notes.includes("english-optimized")) {
     parts.push(
       params.language === "de"
-        ? "Stimmen sind fuer Englisch optimiert"
+        ? "Stimmen sind für Englisch optimiert"
         : "Voices are optimized for English",
     );
   }
@@ -313,7 +315,7 @@ export function getProviderSttLimitNote(
   } else if (approximateFileSizeLimits.length === 1) {
     parts.push(
       language === "de"
-        ? `Ungefaehrer Datei-Upload bis ${formatByteLimit(
+        ? `Ungefährer Datei-Upload bis ${formatByteLimit(
             approximateFileSizeLimits[0].value,
           )}`
         : `Approximate file upload limit ${formatByteLimit(
@@ -323,7 +325,7 @@ export function getProviderSttLimitNote(
   } else if (approximateFileSizeLimits.length > 1) {
     parts.push(
       language === "de"
-        ? `Ungefaehrer Datei-Upload zwischen ${formatByteLimit(
+        ? `Ungefährer Datei-Upload zwischen ${formatByteLimit(
             approximateFileSizeLimits[0].value,
           )} und ${formatByteLimit(
             approximateFileSizeLimits[approximateFileSizeLimits.length - 1].value,

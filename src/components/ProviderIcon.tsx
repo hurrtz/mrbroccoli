@@ -10,6 +10,7 @@ import GoogleIcon from "../../assets/providers/google-vertex-ai-studio.svg";
 import MistralIcon from "../../assets/providers/mistral-ai.svg";
 import MoonshotIcon from "../../assets/providers/moonshot-ai-kimi.svg";
 import OpenAIIcon from "../../assets/providers/openai.svg";
+import OpenRouterIcon from "../../assets/providers/openrouter.svg";
 import PerplexityIcon from "../../assets/providers/perplexity.svg";
 import XaiIcon from "../../assets/providers/xai.svg";
 import { Provider } from "../types";
@@ -29,12 +30,14 @@ const PROVIDER_ICON_COMPONENTS: Record<
   "mistral-ai": MistralIcon,
   "moonshot-ai-kimi": MoonshotIcon,
   openai: OpenAIIcon,
+  openrouter: OpenRouterIcon,
   perplexity: PerplexityIcon,
   xai: XaiIcon,
 };
 
 const PROVIDER_ICON_SIZES: Record<string, { width: number; height: number }> = {
   openai: { width: 24, height: 24 },
+  openrouter: { width: 27, height: 20 },
   anthropic: { width: 24, height: 24 },
   gemini: { width: 24, height: 24 },
   "google-vertex-ai-studio": { width: 24, height: 24 },
