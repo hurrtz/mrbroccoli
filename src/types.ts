@@ -18,6 +18,7 @@ import {
 } from "./constants/webSearch";
 import type { RuntimeAppProviderId } from "./constants/providers/runtimeManifest";
 import { DEFAULT_KOKORO_VOICES } from "./constants/kokoro";
+import { DEFAULT_TTS_FALLBACK_POLICY } from "./constants/ttsFallback";
 
 export type Provider = RuntimeAppProviderId;
 export type InputMode =
@@ -42,6 +43,15 @@ export type TtsListenLanguage =
   | "ja";
 export type SttBackendMode = "native" | "provider";
 export type TtsBackendMode = "native" | "kokoro" | "provider";
+export type ProviderTtsFallbackRoute = "kokoro" | "native";
+export type KokoroTtsFallbackRoute = "provider" | "native";
+export type TtsFallbackRoute =
+  | ProviderTtsFallbackRoute
+  | KokoroTtsFallbackRoute;
+export interface TtsFallbackPolicy {
+  provider: ProviderTtsFallbackRoute[];
+  kokoro: KokoroTtsFallbackRoute[];
+}
 export type KokoroLanguage = "en" | "zh";
 export type KokoroVoiceSelections = Record<KokoroLanguage, string>;
 export type ProviderCapability =
@@ -148,6 +158,7 @@ export interface Settings {
   providerTtsModels: ProviderTtsModelSelections;
   providerTtsVoices: ProviderTtsVoiceSelections;
   kokoroVoices: KokoroVoiceSelections;
+  ttsFallbackPolicy: TtsFallbackPolicy;
   providerValidationResults: ProviderValidationResults;
   language: AppLanguage;
   theme: ThemeMode;
@@ -367,6 +378,7 @@ export const DEFAULT_SETTINGS: Settings = {
   providerTtsModels: DEFAULT_PROVIDER_TTS_MODELS,
   providerTtsVoices: DEFAULT_PROVIDER_TTS_VOICES,
   kokoroVoices: DEFAULT_KOKORO_VOICES,
+  ttsFallbackPolicy: DEFAULT_TTS_FALLBACK_POLICY,
   providerValidationResults: {},
   language: "en",
   theme: "system",

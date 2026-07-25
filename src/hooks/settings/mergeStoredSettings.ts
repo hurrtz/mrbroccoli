@@ -19,6 +19,7 @@ import {
   normalizeWebSearchProviderSettings,
 } from "../../constants/webSearch";
 import { normalizeKokoroVoiceSelections } from "../../constants/kokoro";
+import { normalizeTtsFallbackPolicy } from "../../constants/ttsFallback";
 import {
   type Provider,
   type ProviderApiKeys,
@@ -705,6 +706,9 @@ export function mergeSettings(
     },
     kokoroVoices: normalizeKokoroVoiceSelections(
       storedSettings?.kokoroVoices,
+    ),
+    ttsFallbackPolicy: normalizeTtsFallbackPolicy(
+      storedSettings?.ttsFallbackPolicy,
     ),
     providerValidationResults:
       extractStoredProviderValidationResults(storedSettings),

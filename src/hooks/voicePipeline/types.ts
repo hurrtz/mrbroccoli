@@ -16,6 +16,7 @@ import type {
   ReplyPlayback,
   SttBackendMode,
   TtsBackendMode,
+  TtsFallbackRoute,
   TtsListenLanguage,
   ToastTone,
   UsageEstimate,
@@ -78,6 +79,7 @@ export interface UseVoicePipelineParams {
   selectedTtsModel: string;
   selectedTtsVoice: string;
   kokoroVoices: KokoroVoiceSelections;
+  ttsFallbackRoutes: TtsFallbackRoute[];
   ttsInstructions?: string;
   ttsListenLanguages: TtsListenLanguage[];
   replyPlayback: ReplyPlayback;

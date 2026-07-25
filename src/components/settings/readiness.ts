@@ -5,6 +5,7 @@ import {
 } from "../../constants/models";
 import type { Provider, Settings } from "../../types";
 import { isKokoroLanguage } from "../../constants/kokoro";
+import { getTtsFallbackRoutes } from "../../constants/ttsFallback";
 import { hasProviderCredentialForCapability } from "../../utils/providerCredentials";
 
 export type SettingsReadinessState = "ready" | "attention" | "broken" | "off";
@@ -106,36 +107,48 @@ function getSpeakReadiness(
     return status("ready");
   }
 
+  const provider = settings.ttsProvider;
+  const providerReady =
+    !!provider &&
+    context.ttsProviders.includes(provider) &&
+    hasConfiguredKey(settings, provider) &&
+    (!providerRequiresTtsVoice(provider) ||
+      !!(
+        settings.providerTtsVoices[provider]?.trim() ||
+        PROVIDER_DEFAULT_TTS_VOICES[provider]?.trim()
+      ));
+  const fallbackRoutes = getTtsFallbackRoutes(
+    settings.ttsFallbackPolicy,
+    settings.ttsMode,
+  );
+  const hasUnavailableFallback = fallbackRoutes.some((route) => {
+    if (route === "provider") {
+      return !providerReady;
+    }
+
+    if (route === "kokoro") {
+      return !context.kokoroInstalled;
+    }
+
+    return false;
+  });
+
   if (settings.ttsMode === "kokoro") {
     if (!context.kokoroInstalled) {
       return status("broken");
     }
 
-    return settings.ttsListenLanguages.every(isKokoroLanguage)
+    return settings.ttsListenLanguages.every(isKokoroLanguage) &&
+      !hasUnavailableFallback
       ? status("ready")
       : status("attention");
   }
 
-  const provider = settings.ttsProvider;
-  if (
-    !provider ||
-    !context.ttsProviders.includes(provider) ||
-    !hasConfiguredKey(settings, provider)
-  ) {
+  if (!providerReady) {
     return status("broken");
   }
 
-  if (
-    providerRequiresTtsVoice(provider) &&
-    !(
-      settings.providerTtsVoices[provider]?.trim() ||
-      PROVIDER_DEFAULT_TTS_VOICES[provider]?.trim()
-    )
-  ) {
-    return status("broken");
-  }
-
-  return status("ready");
+  return hasUnavailableFallback ? status("attention") : status("ready");
 }
 
 function getSearchReadiness(

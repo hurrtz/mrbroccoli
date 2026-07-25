@@ -282,7 +282,7 @@ export const de: TranslationDictionary = {
   kokoroInstalled: "Auf diesem Gerät installiert und einsatzbereit.",
   kokoroNotInstalled: "Optionaler Download. Kein API-Key erforderlich.",
   kokoroLanguageFallback:
-    "Kokoro spricht hier derzeit Englisch und vereinfachtes Chinesisch. Antworten in ausgewählten, noch nicht unterstützten Sprachen nutzen automatisch die Systemstimme.",
+    "Kokoro spricht hier derzeit Englisch und vereinfachtes Chinesisch. Füge für andere ausgewählte Antwortsprachen ausdrücklich eine Ausweichroute hinzu, sonst endet die Sprachausgabe mit einem Fehler.",
   kokoroRemoveTitle: "Kokoro-Modell entfernen?",
   kokoroRemoveBody: ({ installedSize }) =>
     `Dadurch werden etwa ${installedSize} MB freigegeben. Du kannst das Modell jederzeit erneut herunterladen.`,
@@ -291,22 +291,32 @@ export const de: TranslationDictionary = {
     "Wähle Sprachengine, Zielsprachen und Stimmvorschauen für die Sprachausgabe.",
   localTts: "Lokal",
   localTtsDescription:
-    "Nutze zuerst eine passende heruntergeladene lokale Stimme, dann falls verfügbar den konfigurierten Dienst und danach die Systemstimme.",
+    "Nutze eine passende heruntergeladene lokale Stimme für die Sprachausgabe.",
   providerTtsDescription:
-    "Nutze zuerst den ausgewählten konfigurierten Dienst. Kann er die Antwort nicht starten, wechselt Mr Broccoli zur Systemstimme.",
+    "Nutze den ausgewählten konfigurierten Dienst für die Sprachausgabe.",
+  ttsFallbackRoutes: "Ausweichrouten",
+  ttsFallbackRoutesHint:
+    "Optional. Füge nur gewünschte Routen hinzu und ordne sie in der gewünschten Reihenfolge. Sobald eine Route spricht, bleibt Mr Broccoli für den Rest der Antwort bei ihr.",
+  ttsFallbackNone:
+    "Keine Ausweichroute konfiguriert. Ein Stimmfehler wird stattdessen angezeigt.",
+  ttsFallbackPosition: ({ position, route }) => `${position}. ${route}`,
+  addFallbackRoute: ({ route }) => `${route} als Ausweichroute hinzufügen`,
+  removeFallbackRoute: ({ route }) => `${route}-Ausweichroute entfernen`,
+  moveFallbackEarlier: ({ route }) => `${route} nach vorne verschieben`,
+  moveFallbackLater: ({ route }) => `${route} nach hinten verschieben`,
   ttsProvider: "TTS-Anbieter",
   ttsProviderEnabledHint:
     "Hier erscheinen nur aktivierte Anbieter mit Sprachausgabe-Unterstützung.",
   ttsProviderMissingHint:
     "Füge Zugangsdaten für einen Dienst mit TTS-Unterstützung hinzu, um ihn hier auszuwählen.",
   localTtsOrderHint:
-    "Reihenfolge: passende lokale Stimme zuerst, dann der ausgewählte konfigurierte Dienst (falls vorhanden), dann die Systemstimme.",
+    "Nur ausdrücklich konfigurierte Ausweichrouten werden versucht.",
   providerTtsOrderHint:
-    "Reihenfolge: ausgewählter Anbieter zuerst, dann die Systemstimme, wenn die Anbieterwiedergabe nicht starten kann.",
+    "Nur ausdrücklich konfigurierte Ausweichrouten werden versucht.",
   nativeTtsHint:
     "Native TTS nutzt die Systemstimmen des Geräts und benötigt keinen API-Key.",
   localTtsLanguageCoverageHint:
-    "Lokale Sprachpakete decken derzeit Englisch, Deutsch, vereinfachtes Chinesisch, Spanisch, Portugiesisch, Hindi, Französisch und Italienisch ab. Japanisch fällt weiterhin automatisch zurück.",
+    "Lokale Sprachpakete decken derzeit Englisch, Deutsch, vereinfachtes Chinesisch, Spanisch, Portugiesisch, Hindi, Französisch und Italienisch ab.",
   ttsVoice: "TTS-Stimme",
   refresh: "Aktualisieren",
   providerVoiceDirectory: ({ provider }) => `${provider}-Stimmenbibliothek`,
@@ -565,7 +575,7 @@ export const de: TranslationDictionary = {
   turnReceiptTypedInput: "Getippt",
   turnReceiptSystemSpeech: "System-Spracherkennung",
   turnReceiptSystemVoice: "Systemstimme",
-  turnReceiptSystemVoiceFallback: "Systemstimme · Anbieter-Rückfall",
+  turnReceiptSystemVoiceFallback: "Systemstimme · Ausweichroute",
   turnReceiptOff: "Aus",
   turnReceiptNotConfigured: "An · nicht konfiguriert",
   turnReceiptFallbackWithoutSearch: "Ohne aktuelle Websuche fortgesetzt",
@@ -643,7 +653,7 @@ export const de: TranslationDictionary = {
   setupGuideKokoroBody: ({ size }) =>
     `Optional: Lade Kokoro (etwa ${size} MB) herunter, um deutlich natürlichere gesprochene Antworten ohne Sprachanbieter oder Nutzungskosten zu erhalten.`,
   setupGuideKokoroLanguageNote:
-    "Dieses Modell spricht derzeit Englisch und vereinfachtes Chinesisch. Andere ausgewählte Antwortsprachen nutzen automatisch weiterhin die Systemstimme.",
+    "Dieses Modell spricht derzeit Englisch und vereinfachtes Chinesisch. Gewünschte Ausweichrouten kannst du später in den Sprachausgabe-Einstellungen konfigurieren.",
   setupGuideKokoroDownload: "Kokoro herunterladen",
   setupGuideUseKokoro: "Kokoro für gesprochene Antworten nutzen",
   setupGuideUseKokoroSummary:
@@ -681,8 +691,7 @@ export const de: TranslationDictionary = {
   setupGuideRouteProviderStt: ({ provider }) =>
     `Aktiv über ${provider}-Transkription`,
   setupGuideRouteProviderTts: ({ provider }) => `Aktiv über ${provider}-Stimme`,
-  setupGuideRouteKokoroTts:
-    "Aktiv über Kokoro auf dem Gerät, mit Systemstimme als Fallback",
+  setupGuideRouteKokoroTts: "Aktiv über Kokoro auf dem Gerät",
   setupGuideRouteLocalTts: "Aktiv über lokales Sprachpaket",
   setupGuideRouteUnavailable: "Nicht verfügbar",
   setupGuideRouteOff: "Aus",

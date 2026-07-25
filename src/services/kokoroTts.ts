@@ -366,7 +366,7 @@ export async function synthesizeKokoroSpeech(params: {
 
   if (!language) {
     throw new Error(
-      "Kokoro supports English and Simplified Chinese. The system voice is required for the selected reply languages.",
+      "Kokoro supports English and Simplified Chinese and cannot speak the selected reply languages.",
     );
   }
 

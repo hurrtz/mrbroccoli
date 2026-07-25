@@ -390,9 +390,12 @@ export function createVoicePipelineEventAdapter({
       });
       producedAudioRef.current = true;
       const actualMode =
-        diagnostics?.mode === "kokoro" || ttsMode === "kokoro"
-          ? "kokoro"
-          : "provider";
+        diagnostics?.mode === "kokoro" ||
+        diagnostics?.mode === "provider"
+          ? diagnostics.mode
+          : ttsMode === "kokoro"
+            ? "kokoro"
+            : "provider";
       messageState.updateAssistantTurnReceipt((receipt) => ({
         ...receipt,
         speechOutput: {
@@ -412,7 +415,7 @@ export function createVoicePipelineEventAdapter({
         handleFirstPlaybackStartedForRun,
       );
     },
-    onSpeechTextReady: (text, _voice, diagnostics) => {
+    onSpeechTextReady: (text, voice, diagnostics) => {
       if (!isActiveRun()) {
         return;
       }
@@ -436,11 +439,12 @@ export function createVoicePipelineEventAdapter({
         setPipelinePhase("synthesizing");
       }
       player.speakText(text, {
+        voice,
         diagnostics,
         onPlaybackStarted: handleFirstPlaybackStartedForRun,
       });
     },
-    onTtsFallback: (error) => {
+    onTtsFallback: (error, route) => {
       if (!isActiveRun()) {
         return;
       }
@@ -468,7 +472,12 @@ export function createVoicePipelineEventAdapter({
         ...receipt,
         speechOutput: {
           ...receipt.speechOutput,
-          actualMode: "native",
+          actualMode: route,
+          provider: route === "provider" ? ttsProvider : null,
+          model:
+            route === "provider" ? selectedTtsModel : undefined,
+          voice:
+            route === "provider" ? selectedTtsVoice : undefined,
           fellBack: true,
           fallbackReason: notice.detail ?? notice.message,
         },

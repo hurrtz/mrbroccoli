@@ -4,6 +4,7 @@ import {
   getNormalizedProviderTtsVoices,
   getNormalizedResponseModes,
   getNormalizedSttProvider,
+  getNormalizedTtsProvider,
 } from "../../src/components/settings/settingsRules";
 
 describe("settingsRules", () => {
@@ -15,6 +16,20 @@ describe("settingsRules", () => {
     };
 
     expect(getNormalizedSttProvider(settings, ["xai"])).toBe("xai");
+  });
+
+  it("repairs the provider selection when provider speech is a Kokoro fallback", () => {
+    const settings = {
+      ...DEFAULT_SETTINGS,
+      ttsMode: "kokoro" as const,
+      ttsProvider: "openai" as const,
+      ttsFallbackPolicy: {
+        provider: [],
+        kokoro: ["provider" as const],
+      },
+    };
+
+    expect(getNormalizedTtsProvider(settings, ["xai"])).toBe("xai");
   });
 
   it("repairs response modes that point to disabled providers", () => {

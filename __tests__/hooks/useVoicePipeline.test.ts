@@ -86,6 +86,7 @@ jest.mock("../../src/services/tts", () => ({
 
 jest.mock("../../src/services/speech/diagnostics", () => ({
   createSpeechRequestId: jest.fn(() => "speech-request-1"),
+  recordSpeechDiagnostic: jest.fn(),
 }));
 
 import { runVoicePipeline } from "../../src/services/voicePipeline";
@@ -141,6 +142,8 @@ function createParams(
     ttsApiKey: "sk-tts",
     selectedTtsModel: "gpt-4o-mini-tts",
     selectedTtsVoice: "alloy",
+    kokoroVoices: DEFAULT_SETTINGS.kokoroVoices,
+    ttsFallbackRoutes: [],
     ttsListenLanguages: DEFAULT_SETTINGS.ttsListenLanguages,
     replyPlayback: DEFAULT_SETTINGS.replyPlayback,
     spokenRepliesEnabled: true,
@@ -223,6 +226,35 @@ describe("useVoicePipeline", () => {
     );
     expect(result.current.replayPhase).toBe("idle");
     expect(result.current.activeReplayMessageId).toBeNull();
+  });
+
+  it("uses an explicitly configured native fallback for reply replay", async () => {
+    const params = createParams({
+      ttsMode: "provider",
+      ttsFallbackRoutes: ["native"],
+      player: createPlayer(),
+    });
+    (synthesizeSpeech as jest.Mock).mockRejectedValue(
+      new Error("Provider TTS unavailable"),
+    );
+
+    const { result } = renderHook(() => useVoicePipeline(params));
+
+    await act(async () => {
+      await result.current.playReplyText("Replay this", "message-1");
+    });
+
+    expect(params.player.speakText).toHaveBeenCalledWith(
+      "Replay this",
+      expect.objectContaining({
+        diagnostics: expect.objectContaining({ mode: "native" }),
+      }),
+    );
+    expect(params.showToast).not.toHaveBeenCalledWith(
+      "Provider TTS unavailable",
+      undefined,
+      "danger",
+    );
   });
 
   it("does not start a long replay when a later provider chunk fails", async () => {
@@ -980,7 +1012,7 @@ describe("useVoicePipeline", () => {
       async ({ callbacks }: any) => {
         callbacks.onTranscription("Hello from the microphone");
         callbacks.onResponseDone("Completed reply");
-        callbacks.onTtsFallback(new Error("Provider fallback"));
+        callbacks.onTtsFallback(new Error("Provider fallback"), "native");
         return "Hello from the microphone";
       },
     );

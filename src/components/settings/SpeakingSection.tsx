@@ -6,6 +6,7 @@ import {
 } from "react-native";
 
 import { providerTtsModelSupportsInstructions } from "../../constants/models";
+import { getTtsFallbackRoutes } from "../../constants/ttsFallback";
 import { useLocalization } from "../../i18n";
 import type { ProviderVoiceDirectories } from "../../services/providerVoiceDirectory";
 import type {
@@ -31,6 +32,7 @@ import {
   KokoroVoiceSection,
   NativeVoicePreviewSection,
   ProviderVoicePreviewSection,
+  TtsFallbackSection,
 } from "./TtsSections";
 import type {
   PreviewButtonPhase,
@@ -120,6 +122,19 @@ export function SpeakingSection({
       selectedPreviewProvider,
       selectedPreviewProviderModel,
     );
+  const fallbackRoutes = getTtsFallbackRoutes(
+    settings.ttsFallbackPolicy,
+    settings.ttsMode,
+  );
+  const providerRouteActive =
+    settings.ttsMode === "provider" ||
+    fallbackRoutes.includes("provider");
+  const nativeRouteActive =
+    settings.ttsMode === "native" ||
+    fallbackRoutes.includes("native");
+  const kokoroRouteActive =
+    settings.ttsMode === "kokoro" ||
+    fallbackRoutes.includes("kokoro");
 
   return (
     <View style={styles.tabPane}>
@@ -212,7 +227,9 @@ export function SpeakingSection({
           onChange={(value) => onUpdate({ ttsMode: value })}
         />
 
-        {settings.ttsMode === "provider" ? (
+        <TtsFallbackSection settings={settings} onUpdate={onUpdate} />
+
+        {providerRouteActive ? (
           <>
             <PickerSection>
               <Picker
@@ -292,7 +309,7 @@ export function SpeakingSection({
           </>
         ) : null}
 
-        {settings.ttsMode === "native" ? (
+        {nativeRouteActive ? (
           <NativeVoicePreviewSection
             voiceOptions={nativeVoiceOptions}
             selectedVoice={selectedNativeVoice}
@@ -306,7 +323,7 @@ export function SpeakingSection({
           />
         ) : null}
 
-        {settings.ttsMode === "kokoro" ? (
+        {kokoroRouteActive ? (
           <KokoroVoiceSection
             settings={settings}
             model={kokoroModel}

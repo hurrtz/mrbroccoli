@@ -21,7 +21,7 @@ describe("Kokoro configuration", () => {
     ).toBe("zh");
   });
 
-  it("requires the system fallback when an unsupported language is selected", () => {
+  it("reports unsupported selected languages without choosing a fallback", () => {
     expect(
       resolveKokoroLanguage({
         text: "Guten Morgen.",

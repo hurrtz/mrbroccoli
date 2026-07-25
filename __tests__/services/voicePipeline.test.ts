@@ -1282,6 +1282,7 @@ describe("runVoicePipeline", () => {
       ttsProvider: "gemini",
       ttsApiKey: "gemini-test",
       ttsVoice: "Kore",
+      ttsFallbackRoutes: ["native"],
       replyPlayback: "wait",
       assistantInstructions: "You are a voice assistant.",
       responseLength: "normal",
@@ -1293,7 +1294,7 @@ describe("runVoicePipeline", () => {
     const nativeSegments = callbacks.onSpeechTextReady.mock.calls.map(
       ([text]: [string]) => text,
     );
-    expect(synthesizeSpeech).toHaveBeenCalledTimes(2);
+    expect(synthesizeSpeech).toHaveBeenCalledTimes(1);
     expect(callbacks.onTtsFallback).toHaveBeenCalledTimes(1);
     expect(callbacks.onAudioReady).not.toHaveBeenCalled();
     expect(nativeSegments.length).toBeGreaterThan(1);
@@ -1342,6 +1343,7 @@ describe("runVoicePipeline", () => {
       ttsProvider: "gemini",
       ttsApiKey: "gemini-test",
       ttsVoice: "Kore",
+      ttsFallbackRoutes: ["native"],
       replyPlayback: "stream",
       assistantInstructions: "You are a voice assistant.",
       responseLength: "normal",
@@ -1396,6 +1398,7 @@ describe("runVoicePipeline", () => {
       ttsProvider: "openai",
       ttsApiKey: "sk-test",
       ttsVoice: "alloy",
+      ttsFallbackRoutes: ["native"],
       replyPlayback: "wait",
       assistantInstructions: "You are a voice assistant.",
       responseLength: "normal",
@@ -1408,6 +1411,7 @@ describe("runVoicePipeline", () => {
       expect.objectContaining({
         message: "Provider TTS unavailable",
       }),
+      "native",
     );
     expect(callbacks.onSpeechTextReady).toHaveBeenCalledWith(
       "A complete answer.",
@@ -1418,6 +1422,264 @@ describe("runVoicePipeline", () => {
       }),
     );
     expect(callbacks.onAudioReady).not.toHaveBeenCalled();
+    expect(callbacks.onError).not.toHaveBeenCalled();
+  });
+
+  it("does not use a fallback route unless one is explicitly configured", async () => {
+    (streamChat as jest.Mock).mockImplementation(
+      async ({ onDone }: { onDone: (text: string) => Promise<void> }) => {
+        await onDone("A complete answer.");
+      },
+    );
+    (synthesizeSpeech as jest.Mock).mockRejectedValueOnce(
+      new Error("Provider TTS unavailable"),
+    );
+    const callbacks = {
+      onTranscription: jest.fn(),
+      onChunk: jest.fn(),
+      onResponseDone: jest.fn(),
+      onAudioReady: jest.fn(),
+      onSpeechTextReady: jest.fn(),
+      onTtsFallback: jest.fn(),
+      onError: jest.fn(),
+    };
+
+    await runVoicePipeline({
+      transcriptionOverride: "Explain the issue.",
+      messages: [],
+      model: "gpt-5.4",
+      provider: "openai",
+      providerApiKey: "sk-test",
+      sttMode: "native",
+      ttsMode: "provider",
+      ttsProvider: "openai",
+      ttsApiKey: "sk-test",
+      ttsVoice: "alloy",
+      replyPlayback: "wait",
+      assistantInstructions: "You are a voice assistant.",
+      responseLength: "normal",
+      responseTone: "professional",
+      language: "en",
+      callbacks,
+    });
+
+    expect(callbacks.onTtsFallback).not.toHaveBeenCalled();
+    expect(callbacks.onSpeechTextReady).not.toHaveBeenCalled();
+    expect(callbacks.onAudioReady).not.toHaveBeenCalled();
+    expect(callbacks.onError).toHaveBeenCalledWith(
+      expect.objectContaining({ message: "Provider TTS unavailable" }),
+    );
+  });
+
+  it("tries provider fallbacks in the configured Kokoro then native order", async () => {
+    (streamChat as jest.Mock).mockImplementation(
+      async ({ onDone }: { onDone: (text: string) => Promise<void> }) => {
+        await onDone("A complete answer.");
+      },
+    );
+    (synthesizeSpeech as jest.Mock)
+      .mockRejectedValueOnce(new Error("Provider TTS unavailable"))
+      .mockRejectedValueOnce(new Error("Kokoro unavailable"));
+    const callbacks = {
+      onTranscription: jest.fn(),
+      onChunk: jest.fn(),
+      onResponseDone: jest.fn(),
+      onAudioReady: jest.fn(),
+      onSpeechTextReady: jest.fn(),
+      onTtsFallback: jest.fn(),
+      onError: jest.fn(),
+    };
+
+    await runVoicePipeline({
+      transcriptionOverride: "Explain the issue.",
+      messages: [],
+      model: "gpt-5.4",
+      provider: "openai",
+      providerApiKey: "sk-test",
+      sttMode: "native",
+      ttsMode: "provider",
+      ttsProvider: "openai",
+      ttsApiKey: "sk-test",
+      ttsVoice: "alloy",
+      kokoroVoices: { en: "af_maple", zh: "zf_001" },
+      ttsFallbackRoutes: ["kokoro", "native"],
+      ttsListenLanguages: ["en"],
+      replyPlayback: "wait",
+      assistantInstructions: "You are a voice assistant.",
+      responseLength: "normal",
+      responseTone: "professional",
+      language: "en",
+      callbacks,
+    });
+
+    expect(
+      (synthesizeSpeech as jest.Mock).mock.calls.map(
+        ([params]: [{ mode: string }]) => params.mode,
+      ),
+    ).toEqual(["provider", "kokoro"]);
+    expect(callbacks.onTtsFallback).toHaveBeenCalledWith(
+      expect.objectContaining({ message: "Provider TTS unavailable" }),
+      "native",
+    );
+    expect(callbacks.onSpeechTextReady).toHaveBeenCalledTimes(1);
+    expect(callbacks.onAudioReady).not.toHaveBeenCalled();
+    expect(callbacks.onError).not.toHaveBeenCalled();
+  });
+
+  it("stops at the first configured provider fallback that succeeds", async () => {
+    (streamChat as jest.Mock).mockImplementation(
+      async ({ onDone }: { onDone: (text: string) => Promise<void> }) => {
+        await onDone("A complete answer.");
+      },
+    );
+    (synthesizeSpeech as jest.Mock)
+      .mockRejectedValueOnce(new Error("Provider TTS unavailable"))
+      .mockResolvedValueOnce("/tmp/kokoro.wav");
+    const callbacks = {
+      onTranscription: jest.fn(),
+      onChunk: jest.fn(),
+      onResponseDone: jest.fn(),
+      onAudioReady: jest.fn(),
+      onSpeechTextReady: jest.fn(),
+      onTtsFallback: jest.fn(),
+      onError: jest.fn(),
+    };
+
+    await runVoicePipeline({
+      transcriptionOverride: "Explain the issue.",
+      messages: [],
+      model: "gpt-5.4",
+      provider: "openai",
+      providerApiKey: "sk-test",
+      sttMode: "native",
+      ttsMode: "provider",
+      ttsProvider: "openai",
+      ttsApiKey: "sk-test",
+      ttsVoice: "alloy",
+      kokoroVoices: { en: "af_maple", zh: "zf_001" },
+      ttsFallbackRoutes: ["kokoro", "native"],
+      ttsListenLanguages: ["en"],
+      replyPlayback: "wait",
+      assistantInstructions: "You are a voice assistant.",
+      responseLength: "normal",
+      responseTone: "professional",
+      language: "en",
+      callbacks,
+    });
+
+    expect(callbacks.onTtsFallback).toHaveBeenCalledWith(
+      expect.objectContaining({ message: "Provider TTS unavailable" }),
+      "kokoro",
+    );
+    expect(callbacks.onAudioReady).toHaveBeenCalledWith(
+      "/tmp/kokoro.wav",
+      expect.objectContaining({ mode: "kokoro" }),
+    );
+    expect(callbacks.onSpeechTextReady).not.toHaveBeenCalled();
+    expect(callbacks.onError).not.toHaveBeenCalled();
+  });
+
+  it("uses the configured provider before native when Kokoro is primary", async () => {
+    (streamChat as jest.Mock).mockImplementation(
+      async ({ onDone }: { onDone: (text: string) => Promise<void> }) => {
+        await onDone("A complete answer.");
+      },
+    );
+    (synthesizeSpeech as jest.Mock)
+      .mockRejectedValueOnce(new Error("Kokoro unavailable"))
+      .mockResolvedValueOnce("/tmp/provider.wav");
+    const callbacks = {
+      onTranscription: jest.fn(),
+      onChunk: jest.fn(),
+      onResponseDone: jest.fn(),
+      onAudioReady: jest.fn(),
+      onSpeechTextReady: jest.fn(),
+      onTtsFallback: jest.fn(),
+      onError: jest.fn(),
+    };
+
+    await runVoicePipeline({
+      transcriptionOverride: "Explain the issue.",
+      messages: [],
+      model: "gpt-5.4",
+      provider: "openai",
+      providerApiKey: "sk-test",
+      sttMode: "native",
+      ttsMode: "kokoro",
+      ttsProvider: "openai",
+      ttsApiKey: "sk-test",
+      ttsModel: "gpt-4o-mini-tts",
+      ttsVoice: "alloy",
+      kokoroVoices: { en: "af_maple", zh: "zf_001" },
+      ttsFallbackRoutes: ["provider", "native"],
+      ttsListenLanguages: ["en"],
+      replyPlayback: "wait",
+      assistantInstructions: "You are a voice assistant.",
+      responseLength: "normal",
+      responseTone: "professional",
+      language: "en",
+      callbacks,
+    });
+
+    expect(
+      (synthesizeSpeech as jest.Mock).mock.calls.map(
+        ([params]: [{ mode: string }]) => params.mode,
+      ),
+    ).toEqual(["kokoro", "provider"]);
+    expect(callbacks.onTtsFallback).toHaveBeenCalledWith(
+      expect.objectContaining({ message: "Kokoro unavailable" }),
+      "provider",
+    );
+    expect(callbacks.onAudioReady).toHaveBeenCalledWith(
+      "/tmp/provider.wav",
+      expect.objectContaining({
+        mode: "provider",
+        provider: "openai",
+      }),
+    );
+    expect(callbacks.onSpeechTextReady).not.toHaveBeenCalled();
+    expect(callbacks.onError).not.toHaveBeenCalled();
+  });
+
+  it("does not consult fallback routes when native speech is primary", async () => {
+    (streamChat as jest.Mock).mockImplementation(
+      async ({ onDone }: { onDone: (text: string) => Promise<void> }) => {
+        await onDone("A complete answer.");
+      },
+    );
+    const callbacks = {
+      onTranscription: jest.fn(),
+      onChunk: jest.fn(),
+      onResponseDone: jest.fn(),
+      onAudioReady: jest.fn(),
+      onSpeechTextReady: jest.fn(),
+      onTtsFallback: jest.fn(),
+      onError: jest.fn(),
+    };
+
+    await runVoicePipeline({
+      transcriptionOverride: "Explain the issue.",
+      messages: [],
+      model: "gpt-5.4",
+      provider: "openai",
+      providerApiKey: "sk-test",
+      sttMode: "native",
+      ttsMode: "native",
+      ttsProvider: "openai",
+      ttsApiKey: "sk-test",
+      ttsVoice: "alloy",
+      ttsFallbackRoutes: ["provider", "kokoro"],
+      replyPlayback: "wait",
+      assistantInstructions: "You are a voice assistant.",
+      responseLength: "normal",
+      responseTone: "professional",
+      language: "en",
+      callbacks,
+    });
+
+    expect(synthesizeSpeech).not.toHaveBeenCalled();
+    expect(callbacks.onSpeechTextReady).toHaveBeenCalledTimes(1);
+    expect(callbacks.onTtsFallback).not.toHaveBeenCalled();
     expect(callbacks.onError).not.toHaveBeenCalled();
   });
 

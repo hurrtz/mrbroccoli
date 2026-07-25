@@ -35,6 +35,10 @@ describe("getMainScreenViewModel", () => {
         openai: "gpt-4o-mini-transcribe",
       },
       ttsMode: "provider",
+      ttsFallbackPolicy: {
+        provider: ["kokoro", "native"],
+        kokoro: [],
+      },
       spokenRepliesEnabled: true,
       ttsProvider: "openai",
       providerTtsModels: {
@@ -99,7 +103,7 @@ describe("getMainScreenViewModel", () => {
     expect(viewModel.lastAssistantReply).toBe("Stored reply");
     expect(viewModel.sttStatusLabel).toContain("OpenAI");
     expect(viewModel.ttsStatusLabel).toContain("OpenAI");
-    expect(viewModel.fallbackTtsStatusLabel).toBe("systemVoice");
+    expect(viewModel.fallbackTtsStatusLabel).toBe("Kokoro → systemVoice");
     expect(viewModel.routeModelLabel).toContain("GPT-5.4");
     expect(viewModel.activeConversationTitle).toBe("Planning");
   });

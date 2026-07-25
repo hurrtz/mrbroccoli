@@ -16,6 +16,10 @@ import {
   getKokoroVoiceOptions,
 } from "../../constants/kokoro";
 import {
+  TTS_FALLBACK_OPTIONS,
+  getTtsFallbackRoutes,
+} from "../../constants/ttsFallback";
+import {
   PROVIDER_DEFAULT_TTS_MODELS,
   PROVIDER_DEFAULT_TTS_VOICES,
   PROVIDER_LABELS,
@@ -26,8 +30,11 @@ import {
 import { useLocalization } from "../../i18n";
 import {
   KokoroLanguage,
+  KokoroTtsFallbackRoute,
   Provider,
+  ProviderTtsFallbackRoute,
   Settings,
+  TtsFallbackRoute,
   TtsListenLanguage,
 } from "../../types";
 import type { KokoroModelController } from "../../hooks/useKokoroModel";
@@ -49,6 +56,211 @@ function isElevenLabsVoiceReadPermissionError(error: Error) {
   return (
     normalizedMessage.includes("voices_read") ||
     normalizedMessage.includes("voice read")
+  );
+}
+
+function getFallbackRouteLabel(
+  route: TtsFallbackRoute,
+  t: ReturnType<typeof useLocalization>["t"],
+) {
+  if (route === "provider") {
+    return t("provider");
+  }
+
+  if (route === "kokoro") {
+    return "Kokoro";
+  }
+
+  return t("systemVoice");
+}
+
+export function TtsFallbackSection({
+  settings,
+  onUpdate,
+}: {
+  settings: Settings;
+  onUpdate: (
+    partial: Partial<Omit<Settings, "apiKeys" | "providerModels">>,
+  ) => void;
+}) {
+  const { colors } = useTheme();
+  const { t } = useLocalization();
+  const primaryMode = settings.ttsMode;
+
+  if (primaryMode === "native") {
+    return null;
+  }
+
+  const routes = getTtsFallbackRoutes(
+    settings.ttsFallbackPolicy,
+    primaryMode,
+  );
+  const availableRoutes = TTS_FALLBACK_OPTIONS[primaryMode];
+  const addableRoutes = availableRoutes.filter(
+    (route) => !routes.includes(route),
+  );
+  const updateRoutes = (nextRoutes: TtsFallbackRoute[]) => {
+    onUpdate({
+      ttsFallbackPolicy:
+        primaryMode === "provider"
+          ? {
+              ...settings.ttsFallbackPolicy,
+              provider: nextRoutes as ProviderTtsFallbackRoute[],
+            }
+          : {
+              ...settings.ttsFallbackPolicy,
+              kokoro: nextRoutes as KokoroTtsFallbackRoute[],
+            },
+    });
+  };
+
+  return (
+    <View
+      style={[
+        styles.sectionCard,
+        {
+          backgroundColor: colors.surfaceElevated,
+          borderColor: colors.border,
+        },
+      ]}
+    >
+      <Text
+        accessibilityRole="header"
+        style={[styles.sectionLabel, { color: colors.text }]}
+      >
+        {t("ttsFallbackRoutes")}
+      </Text>
+      <Text style={[styles.fallbackRouteHint, { color: colors.textMuted }]}>
+        {t("ttsFallbackRoutesHint")}
+      </Text>
+
+      {routes.length === 0 ? (
+        <Text
+          testID="tts-fallback-empty"
+          style={[styles.fallbackRouteEmpty, { color: colors.textSecondary }]}
+        >
+          {t("ttsFallbackNone")}
+        </Text>
+      ) : (
+        <View style={styles.fallbackRouteList}>
+          {routes.map((route, index) => (
+            <View
+              key={route}
+              testID={`tts-fallback-route-${route}`}
+              style={[
+                styles.fallbackRouteRow,
+                {
+                  backgroundColor: colors.surface,
+                  borderColor: colors.border,
+                },
+              ]}
+            >
+              <Text
+                style={[styles.fallbackRouteLabel, { color: colors.text }]}
+              >
+                {t("ttsFallbackPosition", {
+                  position: index + 1,
+                  route: getFallbackRouteLabel(route, t),
+                })}
+              </Text>
+              <View style={styles.fallbackRouteActions}>
+                <TouchableOpacity
+                  accessibilityRole="button"
+                  accessibilityLabel={t("moveFallbackEarlier", {
+                    route: getFallbackRouteLabel(route, t),
+                  })}
+                  disabled={index === 0}
+                  onPress={() => {
+                    const nextRoutes = [...routes];
+                    [nextRoutes[index - 1], nextRoutes[index]] = [
+                      nextRoutes[index],
+                      nextRoutes[index - 1],
+                    ];
+                    updateRoutes(nextRoutes);
+                  }}
+                  style={[
+                    styles.fallbackRouteAction,
+                    { opacity: index === 0 ? 0.35 : 1 },
+                  ]}
+                >
+                  <Feather name="arrow-up" size={18} color={colors.accent} />
+                </TouchableOpacity>
+                <TouchableOpacity
+                  accessibilityRole="button"
+                  accessibilityLabel={t("moveFallbackLater", {
+                    route: getFallbackRouteLabel(route, t),
+                  })}
+                  disabled={index === routes.length - 1}
+                  onPress={() => {
+                    const nextRoutes = [...routes];
+                    [nextRoutes[index], nextRoutes[index + 1]] = [
+                      nextRoutes[index + 1],
+                      nextRoutes[index],
+                    ];
+                    updateRoutes(nextRoutes);
+                  }}
+                  style={[
+                    styles.fallbackRouteAction,
+                    {
+                      opacity:
+                        index === routes.length - 1 ? 0.35 : 1,
+                    },
+                  ]}
+                >
+                  <Feather name="arrow-down" size={18} color={colors.accent} />
+                </TouchableOpacity>
+                <TouchableOpacity
+                  accessibilityRole="button"
+                  accessibilityLabel={t("removeFallbackRoute", {
+                    route: getFallbackRouteLabel(route, t),
+                  })}
+                  onPress={() =>
+                    updateRoutes(
+                      routes.filter((candidate) => candidate !== route),
+                    )
+                  }
+                  style={styles.fallbackRouteAction}
+                >
+                  <Feather name="x" size={18} color={colors.danger} />
+                </TouchableOpacity>
+              </View>
+            </View>
+          ))}
+        </View>
+      )}
+
+      {addableRoutes.length > 0 ? (
+        <View style={styles.fallbackRouteAddRow}>
+          {addableRoutes.map((route) => (
+            <TouchableOpacity
+              key={route}
+              accessibilityRole="button"
+              accessibilityLabel={t("addFallbackRoute", {
+                route: getFallbackRouteLabel(route, t),
+              })}
+              onPress={() => updateRoutes([...routes, route])}
+              style={[
+                styles.fallbackRouteAddButton,
+                {
+                  backgroundColor: colors.surface,
+                  borderColor: colors.border,
+                },
+              ]}
+            >
+              <Feather name="plus" size={16} color={colors.accent} />
+              <Text
+                style={[
+                  styles.fallbackRouteAddLabel,
+                  { color: colors.accent },
+                ]}
+              >
+                {getFallbackRouteLabel(route, t)}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+      ) : null}
+    </View>
   );
 }
 

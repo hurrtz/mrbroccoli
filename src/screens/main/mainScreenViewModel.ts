@@ -21,6 +21,7 @@ import { getStatusDisplayData } from "./statusSelectors";
 import { TranslateFn } from "./shared";
 import { getConversationUsageDisplayData } from "./usageSelectors";
 import { hasProviderCredentialForCapability } from "../../utils/providerCredentials";
+import { getTtsFallbackRoutes } from "../../constants/ttsFallback";
 
 interface AudioSignalState {
   isActivelyPlaying: boolean;
@@ -106,12 +107,24 @@ export function getMainScreenViewModel({
             } · ${getTtsVoiceLabel(ttsProvider, selectedTtsVoice, language)}`
           : t("noTtsProvider");
 
+  const fallbackTtsRoutes = getTtsFallbackRoutes(
+    settings.ttsFallbackPolicy,
+    settings.ttsMode,
+  );
   const fallbackTtsStatusLabel =
-    !settings.spokenRepliesEnabled
+    !settings.spokenRepliesEnabled || fallbackTtsRoutes.length === 0
       ? null
-      : settings.ttsMode === "provider" || settings.ttsMode === "kokoro"
-        ? t("systemVoice")
-        : null;
+      : fallbackTtsRoutes
+          .map((route) =>
+            route === "kokoro"
+              ? "Kokoro"
+              : route === "provider"
+                ? ttsProvider
+                  ? PROVIDER_LABELS[ttsProvider]
+                  : t("provider")
+                : t("systemVoice"),
+          )
+          .join(" → ");
 
   const visualPhase: VoiceVisualPhase = isRecording
     ? "recording"

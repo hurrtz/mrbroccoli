@@ -127,7 +127,6 @@ export async function synthesizeSpeech(params: {
   kokoroVoices?: KokoroVoiceSelections;
   diagnostics?: SpeechDiagnosticsContext;
   abortSignal?: AbortSignal;
-  onProviderFallback?: (error: Error) => void;
 }): Promise<string> {
   const {
     text,

@@ -19,6 +19,7 @@ import { useConversations } from "../hooks/useConversations";
 import { useVoicePipeline } from "../hooks/useVoicePipeline";
 import { useBatteryDiagnostics } from "../hooks/useBatteryDiagnostics";
 import { useKokoroModel } from "../hooks/useKokoroModel";
+import { getTtsFallbackRoutes } from "../constants/ttsFallback";
 import { useLocalization } from "../i18n";
 import { useTheme } from "../theme/ThemeContext";
 import { MainScreenWorkspace } from "./main/MainScreenWorkspace";
@@ -257,6 +258,10 @@ export function MainScreen() {
         ? settings.kokoroVoices.en
         : selectedTtsVoice,
     kokoroVoices: settings.kokoroVoices,
+    ttsFallbackRoutes: getTtsFallbackRoutes(
+      settings.ttsFallbackPolicy,
+      settings.ttsMode,
+    ),
     ttsListenLanguages: settings.ttsListenLanguages,
     replyPlayback: settings.replyPlayback,
     spokenRepliesEnabled: settings.spokenRepliesEnabled,

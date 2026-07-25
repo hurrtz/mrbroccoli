@@ -46,7 +46,10 @@ Voice input and spoken replies are not tied to any single provider:
 
 The Kokoro model is downloaded only when the user opts in (about 140 MiB
 downloaded and 211 MiB installed). It is not bundled in the initial app
-download. Unsupported selected reply languages fall back to the system voice.
+download. TTS fallbacks are opt-in: provider speech can fall back to Kokoro,
+the system voice, or both in the chosen order; Kokoro can likewise fall back
+to a configured provider, the system voice, or both. System speech has no
+fallback route.
 
 OpenRouter is an optional LLM gateway: one key exposes a curated cross-provider model set while direct provider connections remain available. Requests routed through it are labeled separately from direct routes.
 

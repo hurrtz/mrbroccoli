@@ -773,6 +773,45 @@ describe("useSettings", () => {
     ).toBeUndefined();
   });
 
+  it("migrates legacy settings to no implicit TTS fallbacks", async () => {
+    const stored = { ...DEFAULT_SETTINGS };
+    delete (
+      stored as Partial<typeof DEFAULT_SETTINGS>
+    ).ttsFallbackPolicy;
+
+    (AsyncStorage.getItem as jest.Mock).mockResolvedValueOnce(
+      JSON.stringify(stored),
+    );
+
+    const { result } = renderHook(() => useSettings());
+    await flushSettingsLoad();
+
+    expect(result.current.settings.ttsFallbackPolicy).toEqual({
+      provider: [],
+      kokoro: [],
+    });
+  });
+
+  it("preserves explicit TTS fallback order while dropping invalid routes", async () => {
+    (AsyncStorage.getItem as jest.Mock).mockResolvedValueOnce(
+      JSON.stringify({
+        ...DEFAULT_SETTINGS,
+        ttsFallbackPolicy: {
+          provider: ["native", "kokoro", "native", "provider"],
+          kokoro: ["provider", "native", "kokoro"],
+        },
+      }),
+    );
+
+    const { result } = renderHook(() => useSettings());
+    await flushSettingsLoad();
+
+    expect(result.current.settings.ttsFallbackPolicy).toEqual({
+      provider: ["native", "kokoro"],
+      kokoro: ["provider", "native"],
+    });
+  });
+
   it("persists provider api keys in SecureStore", async () => {
     const { result } = renderHook(() => useSettings());
     await flushSettingsLoad();

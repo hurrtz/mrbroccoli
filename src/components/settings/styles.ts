@@ -419,6 +419,61 @@ export const styles = StyleSheet.create({
     gap: 12,
     marginBottom: 18,
   },
+  fallbackRouteHint: {
+    ...textStyles.supporting,
+    marginTop: -4,
+  },
+  fallbackRouteEmpty: {
+    ...textStyles.body,
+    marginTop: 14,
+  },
+  fallbackRouteList: {
+    gap: 8,
+    marginTop: 14,
+  },
+  fallbackRouteRow: {
+    minHeight: 48,
+    borderRadius: 12,
+    borderWidth: 1,
+    paddingLeft: 12,
+    paddingRight: 6,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: 10,
+  },
+  fallbackRouteLabel: {
+    ...textStyles.body,
+    flex: 1,
+  },
+  fallbackRouteActions: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  fallbackRouteAction: {
+    width: 38,
+    height: 38,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  fallbackRouteAddRow: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 8,
+    marginTop: 12,
+  },
+  fallbackRouteAddButton: {
+    minHeight: 40,
+    borderRadius: 10,
+    borderWidth: 1,
+    paddingHorizontal: 11,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+  },
+  fallbackRouteAddLabel: {
+    ...textStyles.compactAction,
+  },
   settingsSubsectionCard: {
     borderRadius: 14,
     borderWidth: 1,

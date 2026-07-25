@@ -21,6 +21,7 @@ import {
   getEnabledSttProviders,
   getEnabledTtsProviders,
 } from "../../utils/providerCapabilities";
+import { getTtsFallbackRoutes } from "../../constants/ttsFallback";
 
 import {
   SettingsModalProps,
@@ -152,7 +153,13 @@ export function useSettingsModalController({
   const providerPickerDisabled =
     settings.sttMode !== "provider" || enabledSttProviders.length === 0;
   const ttsProviderPickerDisabled =
-    settings.ttsMode !== "provider" || enabledTtsProviders.length === 0;
+    !(
+      settings.ttsMode === "provider" ||
+      getTtsFallbackRoutes(
+        settings.ttsFallbackPolicy,
+        settings.ttsMode,
+      ).includes("provider")
+    ) || enabledTtsProviders.length === 0;
   const selectedSttProviderModelOptions =
     settings.sttProvider &&
     enabledSttProviders.includes(settings.sttProvider)
@@ -199,10 +206,16 @@ export function useSettingsModalController({
         selectedPreviewProviderModelOptions[0]?.id ||
         ""
       : "";
+  const providerRouteActive =
+    settings.ttsMode === "provider" ||
+    getTtsFallbackRoutes(
+      settings.ttsFallbackPolicy,
+      settings.ttsMode,
+    ).includes("provider");
   const ttsLanguageNote =
     settings.ttsMode === "native"
       ? getNativeTtsLanguageNote(language)
-      : settings.ttsMode === "provider" &&
+      : providerRouteActive &&
           selectedPreviewProvider &&
           selectedPreviewProviderModel
         ? getProviderTtsLanguageNoteForModel(

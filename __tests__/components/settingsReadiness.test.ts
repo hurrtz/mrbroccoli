@@ -121,6 +121,51 @@ describe("settings readiness", () => {
     expectStatus(readiness.speak, "ready");
   });
 
+  it("marks an unavailable configured fallback as needing attention", () => {
+    const settings = withSettings({
+      ttsMode: "provider",
+      ttsProvider: "openai",
+      ttsFallbackPolicy: {
+        provider: ["kokoro"],
+        kokoro: [],
+      },
+      apiKeys: {
+        ...DEFAULT_SETTINGS.apiKeys,
+        openai: "sk-test",
+      },
+    });
+
+    const readiness = getSettingsReadiness(settings, {
+      llmProviders: ["openai"],
+      sttProviders: [],
+      ttsProviders: ["openai"],
+      searchProviders: [],
+      kokoroInstalled: false,
+    });
+
+    expectStatus(readiness.speak, "attention");
+  });
+
+  it("ignores fallback policy when native speech is selected", () => {
+    const settings = withSettings({
+      ttsMode: "native",
+      ttsFallbackPolicy: {
+        provider: ["kokoro", "native"],
+        kokoro: ["provider", "native"],
+      },
+    });
+
+    const readiness = getSettingsReadiness(settings, {
+      llmProviders: [],
+      sttProviders: [],
+      ttsProviders: [],
+      searchProviders: [],
+      kokoroInstalled: false,
+    });
+
+    expectStatus(readiness.speak, "ready");
+  });
+
   it("marks search ready when a selected search-capable provider has credentials even if search is disabled", () => {
     const settings = withSettings({
       webSearchMode: "off",

@@ -1,17 +1,27 @@
-import { createSpeechRequestId } from "../speech/diagnostics";
-import type { SpeechDiagnosticSource } from "../speech/diagnostics";
-import {
-  getProviderTtsTargetChunkChars,
-  PROVIDER_TTS_MAX_INPUT_CHARS,
-  splitTextForTts,
-  synthesizeSpeech,
-} from "../tts";
 import {
   DEFAULT_KOKORO_VOICES,
   KOKORO_TTS_TARGET_CHUNK_CHARS,
   getKokoroVoiceConfig,
   resolveKokoroLanguage,
 } from "../../constants/kokoro";
+import type {
+  TtsBackendMode,
+  TtsFallbackRoute,
+} from "../../types";
+import {
+  createSpeechRequestId,
+  recordSpeechDiagnostic,
+} from "../speech/diagnostics";
+import type {
+  SpeechDiagnosticSource,
+  SpeechDiagnosticsContext,
+} from "../speech/diagnostics";
+import {
+  getProviderTtsTargetChunkChars,
+  PROVIDER_TTS_MAX_INPUT_CHARS,
+  splitTextForTts,
+  synthesizeSpeech,
+} from "../tts";
 import { extractCompleteSentences } from "./streaming";
 import type { RunVoicePipelineParams } from "./types";
 
@@ -19,12 +29,12 @@ interface CreateVoicePipelineTtsQueueParams {
   abortSignal?: AbortSignal;
   callbacks: RunVoicePipelineParams["callbacks"];
   diagnosticsSource?: SpeechDiagnosticSource;
-  fallbackToNativeOnProviderError?: boolean;
   language: RunVoicePipelineParams["language"];
   replyPlayback: RunVoicePipelineParams["replyPlayback"];
   spokenRepliesEnabled?: RunVoicePipelineParams["spokenRepliesEnabled"];
   ttsApiKey?: string;
   kokoroVoices?: RunVoicePipelineParams["kokoroVoices"];
+  ttsFallbackRoutes?: RunVoicePipelineParams["ttsFallbackRoutes"];
   ttsListenLanguages?: RunVoicePipelineParams["ttsListenLanguages"];
   ttsMode: RunVoicePipelineParams["ttsMode"];
   ttsModel?: string;
@@ -33,31 +43,89 @@ interface CreateVoicePipelineTtsQueueParams {
   ttsInstructions?: string;
 }
 
-const PROVIDER_TTS_PREFETCH_CONCURRENCY = 2;
+const TTS_PREFETCH_CONCURRENCY = 2;
 
 type AudioDiagnostics = NonNullable<
   Parameters<RunVoicePipelineParams["callbacks"]["onAudioReady"]>[1]
 >;
 
-type ProviderSynthesisResult =
+type TtsSynthesisResult =
   | {
       kind: "audio";
+      route: "kokoro" | "provider";
       audio: string;
       diagnostics: AudioDiagnostics;
     }
-  | { kind: "error"; error: Error }
-  | null;
+  | {
+      kind: "native";
+      route: "native";
+      diagnostics: SpeechDiagnosticsContext;
+      voice?: string;
+    };
+
+type RouteAttemptResult =
+  | { kind: "success"; result: TtsSynthesisResult }
+  | { kind: "error"; error: Error };
+
+function normalizeFallbackRoutes(
+  primaryMode: TtsBackendMode,
+  fallbackRoutes?: TtsFallbackRoute[],
+) {
+  if (primaryMode === "native") {
+    return [];
+  }
+
+  const allowedRoutes =
+    primaryMode === "provider"
+      ? new Set<TtsBackendMode>(["kokoro", "native"])
+      : new Set<TtsBackendMode>(["provider", "native"]);
+  const normalized: TtsBackendMode[] = [];
+
+  for (const route of fallbackRoutes ?? []) {
+    if (allowedRoutes.has(route) && !normalized.includes(route)) {
+      normalized.push(route);
+    }
+  }
+
+  return normalized;
+}
+
+function getTtsChunkTargetChars(
+  routes: TtsBackendMode[],
+  provider: RunVoicePipelineParams["ttsProvider"],
+) {
+  const targetSizes = routes.flatMap((route) => {
+    if (route === "kokoro") {
+      return [KOKORO_TTS_TARGET_CHUNK_CHARS];
+    }
+
+    if (route === "provider") {
+      return [
+        Math.min(
+          PROVIDER_TTS_MAX_INPUT_CHARS,
+          getProviderTtsTargetChunkChars(provider),
+        ),
+      ];
+    }
+
+    return [];
+  });
+
+  return targetSizes.length > 0
+    ? Math.min(...targetSizes)
+    : PROVIDER_TTS_MAX_INPUT_CHARS;
+}
 
 export function createVoicePipelineTtsQueue({
   abortSignal,
   callbacks,
   diagnosticsSource = "conversation",
-  fallbackToNativeOnProviderError = true,
   language,
   replyPlayback,
   spokenRepliesEnabled = true,
   ttsApiKey,
   kokoroVoices,
+  ttsFallbackRoutes,
   ttsListenLanguages,
   ttsMode,
   ttsModel,
@@ -65,117 +133,279 @@ export function createVoicePipelineTtsQueue({
   ttsVoice,
   ttsInstructions,
 }: CreateVoicePipelineTtsQueueParams) {
-  let sentenceBuffer = "";
-  let ttsChain = Promise.resolve();
-  const ttsQueue: Promise<void>[] = [];
-  const providerSynthesisSlots = Array.from(
-    { length: PROVIDER_TTS_PREFETCH_CONCURRENCY },
-    () => Promise.resolve(),
+  const fallbackRoutes = normalizeFallbackRoutes(
+    ttsMode,
+    ttsFallbackRoutes,
   );
-  let nextProviderSynthesisSlot = 0;
-  let previousProviderText = "";
-  let fallbackNotified = false;
-  let fatalProviderError = false;
-  let fatalProviderErrorNotified = false;
-  let playbackRoute: "native" | "kokoro" | "provider" | null =
-    ttsMode === "native" ? "native" : null;
-  const effectiveReplyPlayback = replyPlayback;
-  const bufferProviderAudioUntilComplete =
-    ttsMode !== "native" && effectiveReplyPlayback === "wait";
-  const bufferedProviderAudio: Array<
-    Extract<ProviderSynthesisResult, { kind: "audio" }>
-  > = [];
-  const bufferedTtsTexts: string[] = [];
-  const speechDiagnostics = {
-    requestId: createSpeechRequestId(diagnosticsSource),
+  const routeOrder: TtsBackendMode[] = [ttsMode, ...fallbackRoutes];
+  const requestId = createSpeechRequestId(diagnosticsSource);
+  const baseDiagnostics: SpeechDiagnosticsContext = {
+    requestId,
     source: diagnosticsSource,
     mode: ttsMode,
     provider: ttsProvider ?? null,
     providerModel: ttsModel || null,
   };
+  const bufferUntilComplete =
+    ttsMode !== "native" && replyPlayback === "wait";
+  const synthesisSlots = Array.from(
+    { length: TTS_PREFETCH_CONCURRENCY },
+    () => Promise.resolve(),
+  );
+  const queuedTasks: Promise<void>[] = [];
+  const bufferedAudio: Array<
+    Extract<TtsSynthesisResult, { kind: "audio" }>
+  > = [];
+  const bufferedNativeTexts: Array<{
+    text: string;
+    result: Extract<TtsSynthesisResult, { kind: "native" }>;
+  }> = [];
 
-  const notifyTtsFallback = (error: Error) => {
+  let sentenceBuffer = "";
+  let outputChain = Promise.resolve();
+  let nextSynthesisSlot = 0;
+  let previousProviderText = "";
+  let fallbackNotified = false;
+  let fatalTtsError = false;
+  let fatalTtsErrorNotified = false;
+  let selectedRoute: TtsBackendMode | null =
+    ttsMode === "native" ? "native" : null;
+  let routeSelectionPromise: Promise<TtsSynthesisResult> | null = null;
+
+  const diagnosticsForRoute = (
+    route: TtsBackendMode,
+    text: string,
+  ): SpeechDiagnosticsContext => {
+    const kokoroLanguage =
+      route === "kokoro"
+        ? resolveKokoroLanguage({
+            text,
+            listenLanguages: ttsListenLanguages,
+          })
+        : null;
+    const kokoroVoice = kokoroLanguage
+      ? getKokoroVoiceConfig(
+          kokoroLanguage,
+          kokoroVoices?.[kokoroLanguage] ??
+            DEFAULT_KOKORO_VOICES[kokoroLanguage],
+        ).id
+      : null;
+
+    return {
+      ...baseDiagnostics,
+      mode: route,
+      provider: route === "provider" ? (ttsProvider ?? null) : null,
+      providerModel: route === "provider" ? (ttsModel || null) : null,
+      language: kokoroLanguage ?? ttsListenLanguages?.[0] ?? "app",
+      voice:
+        route === "provider"
+          ? ttsVoice || null
+          : route === "kokoro"
+            ? kokoroVoice
+            : null,
+    };
+  };
+
+  const attemptRoute = async (
+    route: TtsBackendMode,
+    text: string,
+    context?: { previousText?: string; nextText?: string },
+  ): Promise<RouteAttemptResult> => {
+    const diagnostics = diagnosticsForRoute(route, text);
+
+    if (route === "native") {
+      return {
+        kind: "success",
+        result: {
+          kind: "native",
+          route,
+          diagnostics,
+        },
+      };
+    }
+
+    try {
+      const audio = await synthesizeSpeech({
+        text,
+        voice:
+          route === "kokoro"
+            ? diagnostics.voice ?? ""
+            : ttsVoice,
+        mode: route,
+        provider: route === "provider" ? ttsProvider : undefined,
+        providerModel: route === "provider" ? ttsModel : undefined,
+        apiKey: route === "provider" ? ttsApiKey : undefined,
+        instructions: route === "provider" ? ttsInstructions : undefined,
+        ...(route === "provider" && ttsProvider === "elevenlabs"
+          ? {
+              previousText: context?.previousText,
+              nextText: context?.nextText,
+            }
+          : {}),
+        language,
+        listenLanguages: ttsListenLanguages,
+        kokoroVoices,
+        diagnostics,
+        abortSignal,
+      });
+
+      return {
+        kind: "success",
+        result: {
+          kind: "audio",
+          route,
+          audio,
+          diagnostics,
+        },
+      };
+    } catch (error) {
+      return {
+        kind: "error",
+        error: error instanceof Error ? error : new Error(String(error)),
+      };
+    }
+  };
+
+  const notifyFallback = (
+    error: Error,
+    route: TtsFallbackRoute,
+    text: string,
+  ) => {
     if (fallbackNotified) {
       return;
     }
 
     fallbackNotified = true;
-    callbacks.onTtsFallback?.(error);
+    recordSpeechDiagnostic({
+      requestId,
+      source: diagnosticsSource,
+      stage: "tts-fallback",
+      requestedRoute: ttsMode,
+      actualRoute: route,
+      mode: route,
+      provider: route === "provider" ? (ttsProvider ?? null) : null,
+      providerModel: route === "provider" ? (ttsModel || null) : null,
+      language: ttsListenLanguages?.[0] ?? "app",
+      voice: route === "provider" ? ttsVoice || null : null,
+      fallbackReason: error.message,
+      textLength: text.trim().length,
+    });
+    callbacks.onTtsFallback?.(error, route);
   };
 
-  const startProviderSynthesis = (
+  const selectRoute = async (
     text: string,
     context?: { previousText?: string; nextText?: string },
   ) => {
-    const slotIndex = nextProviderSynthesisSlot;
-    nextProviderSynthesisSlot =
-      (nextProviderSynthesisSlot + 1) % PROVIDER_TTS_PREFETCH_CONCURRENCY;
+    let firstError: Error | null = null;
+    let latestError: Error | null = null;
 
-    const synthesisTask: Promise<ProviderSynthesisResult> =
-      providerSynthesisSlots[slotIndex].then(async () => {
-        if (
-          abortSignal?.aborted ||
-          fatalProviderError ||
-          playbackRoute === "native"
-        ) {
-          return null;
+    for (const route of routeOrder) {
+      if (abortSignal?.aborted) {
+        const abortError = new Error("Speech generation was cancelled.");
+        abortError.name = "AbortError";
+        throw abortError;
+      }
+
+      const attempt = await attemptRoute(route, text, context);
+
+      if (attempt.kind === "success") {
+        selectedRoute = route;
+
+        if (route !== ttsMode && firstError) {
+          notifyFallback(firstError, route as TtsFallbackRoute, text);
         }
 
-        try {
-          const kokoroLanguage =
-            ttsMode === "kokoro"
-              ? resolveKokoroLanguage({
-                  text,
-                  listenLanguages: ttsListenLanguages,
-                })
-              : null;
-          const kokoroVoice = kokoroLanguage
-            ? getKokoroVoiceConfig(
-                kokoroLanguage,
-                kokoroVoices?.[kokoroLanguage] ??
-                  DEFAULT_KOKORO_VOICES[kokoroLanguage],
-              ).id
-            : null;
-          const synthesisDiagnostics: AudioDiagnostics = {
-            ...speechDiagnostics,
-            language: kokoroLanguage ?? ttsListenLanguages?.[0] ?? "app",
-            voice: kokoroVoice ?? (ttsVoice || null),
-          };
-          const audio = await synthesizeSpeech({
-            text,
-            voice: ttsVoice,
-            mode: ttsMode,
-            provider: ttsProvider,
-            providerModel: ttsModel,
-            apiKey: ttsApiKey,
-            instructions: ttsInstructions,
-            ...(ttsProvider === "elevenlabs"
-              ? {
-                  previousText: context?.previousText,
-                  nextText: context?.nextText,
-                }
-              : {}),
-            language,
-            listenLanguages: ttsListenLanguages,
-            kokoroVoices,
-            diagnostics: synthesisDiagnostics,
-            abortSignal,
-          });
-          return {
-            kind: "audio",
-            audio,
-            diagnostics: synthesisDiagnostics,
-          };
-        } catch (error) {
-          return {
-            kind: "error",
-            error: error instanceof Error ? error : new Error(String(error)),
-          };
-        }
-      });
+        return attempt.result;
+      }
 
-    providerSynthesisSlots[slotIndex] = synthesisTask.then(() => undefined);
-    return synthesisTask;
+      firstError ??= attempt.error;
+      latestError = attempt.error;
+    }
+
+    throw latestError ?? new Error("No text-to-speech route is available.");
+  };
+
+  const synthesizeOnSelectedRoute = async (
+    text: string,
+    context?: { previousText?: string; nextText?: string },
+  ) => {
+    if (abortSignal?.aborted || fatalTtsError) {
+      return null;
+    }
+
+    if (selectedRoute === "native") {
+      return {
+        kind: "native",
+        route: "native",
+        diagnostics: diagnosticsForRoute("native", text),
+      } satisfies TtsSynthesisResult;
+    }
+
+    if (fallbackRoutes.length === 0) {
+      selectedRoute = ttsMode;
+      const attempt = await attemptRoute(ttsMode, text, context);
+
+      if (attempt.kind === "error") {
+        throw attempt.error;
+      }
+
+      return attempt.result;
+    }
+
+    if (!routeSelectionPromise) {
+      routeSelectionPromise = selectRoute(text, context);
+      return routeSelectionPromise;
+    }
+
+    const routeSelection = await routeSelectionPromise;
+
+    if (routeSelection.route === "native") {
+      return {
+        kind: "native",
+        route: "native",
+        diagnostics: diagnosticsForRoute("native", text),
+      } satisfies TtsSynthesisResult;
+    }
+
+    const attempt = await attemptRoute(routeSelection.route, text, context);
+
+    if (attempt.kind === "error") {
+      throw attempt.error;
+    }
+
+    return attempt.result;
+  };
+
+  const scheduleSynthesis = (
+    text: string,
+    context?: { previousText?: string; nextText?: string },
+  ) => {
+    const slotIndex = nextSynthesisSlot;
+    nextSynthesisSlot =
+      (nextSynthesisSlot + 1) % TTS_PREFETCH_CONCURRENCY;
+    const task = synthesisSlots[slotIndex].then(() =>
+      synthesizeOnSelectedRoute(text, context),
+    );
+
+    synthesisSlots[slotIndex] = task.then(
+      () => undefined,
+      () => undefined,
+    );
+    return task;
+  };
+
+  const emitResult = (text: string, result: TtsSynthesisResult) => {
+    if (result.kind === "native") {
+      callbacks.onSpeechTextReady(
+        text,
+        result.voice,
+        result.diagnostics,
+      );
+      return;
+    }
+
+    callbacks.onAudioReady(result.audio, result.diagnostics);
   };
 
   const enqueueTtsChunk = (
@@ -188,81 +418,56 @@ export function createVoicePipelineTtsQueue({
       return;
     }
 
-    if (bufferProviderAudioUntilComplete) {
-      bufferedTtsTexts.push(trimmed);
+    if (ttsMode === "native") {
+      emitResult(trimmed, {
+        kind: "native",
+        route: "native",
+        diagnostics: diagnosticsForRoute("native", trimmed),
+      });
+      return;
     }
 
-    const providerSynthesis =
-      ttsMode !== "native"
-        ? startProviderSynthesis(trimmed, context)
-        : null;
-    const task = ttsChain.then(async () => {
-      if (abortSignal?.aborted) {
-        return;
-      }
-
-      if (fatalProviderError) {
-        return;
-      }
-
-      if (!spokenRepliesEnabled) {
-        return;
-      }
-
-      if (playbackRoute === "native") {
-        if (!bufferProviderAudioUntilComplete) {
-          callbacks.onSpeechTextReady(trimmed, undefined, speechDiagnostics);
-        }
-        return;
-      }
-
-      const synthesisResult = await providerSynthesis;
-
-      if (!synthesisResult || abortSignal?.aborted) {
-        return;
-      }
-
-      if (synthesisResult.kind === "audio") {
-        if (bufferProviderAudioUntilComplete) {
-          bufferedProviderAudio.push(synthesisResult);
-          return;
-        }
-
-        playbackRoute = ttsMode;
-        callbacks.onAudioReady(
-          synthesisResult.audio,
-          synthesisResult.diagnostics,
-        );
-        return;
-      }
-
+    const synthesis = scheduleSynthesis(trimmed, context);
+    const task = outputChain.then(async () => {
       if (
-        fallbackToNativeOnProviderError &&
-        playbackRoute !== ttsMode
+        abortSignal?.aborted ||
+        fatalTtsError ||
+        !spokenRepliesEnabled
       ) {
-        playbackRoute = "native";
-        notifyTtsFallback(synthesisResult.error);
-        if (!bufferProviderAudioUntilComplete) {
-          callbacks.onSpeechTextReady(trimmed, undefined, speechDiagnostics);
+        return;
+      }
+
+      const result = await synthesis;
+
+      if (!result || abortSignal?.aborted) {
+        return;
+      }
+
+      if (bufferUntilComplete) {
+        if (result.kind === "audio") {
+          bufferedAudio.push(result);
+        } else {
+          bufferedNativeTexts.push({ text: trimmed, result });
         }
         return;
       }
 
-      fatalProviderError = true;
-      throw synthesisResult.error;
+      emitResult(trimmed, result);
     });
 
-    ttsChain = task.catch(async (error) => {
-      if (fatalProviderErrorNotified) {
+    outputChain = task.catch(async (error) => {
+      fatalTtsError = true;
+
+      if (fatalTtsErrorNotified) {
         return;
       }
 
-      fatalProviderErrorNotified = true;
+      fatalTtsErrorNotified = true;
       await callbacks.onError(
         error instanceof Error ? error : new Error(String(error)),
       );
     });
-    ttsQueue.push(task.catch(() => undefined));
+    queuedTasks.push(task.catch(() => undefined));
   };
 
   const enqueueTts = (text: string) => {
@@ -277,17 +482,8 @@ export function createVoicePipelineTtsQueue({
 
     const segments = splitTextForTts(
       text,
-      ttsMode === "kokoro"
-        ? KOKORO_TTS_TARGET_CHUNK_CHARS
-        : Math.min(
-            PROVIDER_TTS_MAX_INPUT_CHARS,
-            getProviderTtsTargetChunkChars(ttsProvider),
-          ),
+      getTtsChunkTargetChars(routeOrder, ttsProvider),
     );
-
-    if (segments.length === 0) {
-      return;
-    }
 
     segments.forEach((segment, index) => {
       const previousText = previousProviderText || undefined;
@@ -300,7 +496,7 @@ export function createVoicePipelineTtsQueue({
   const handleStreamChunk = (text: string) => {
     callbacks.onChunk(text);
 
-    if (effectiveReplyPlayback !== "stream") {
+    if (replyPlayback !== "stream") {
       return;
     }
 
@@ -315,7 +511,7 @@ export function createVoicePipelineTtsQueue({
   };
 
   const handleResponseDone = async (fullText: string) => {
-    if (effectiveReplyPlayback === "stream") {
+    if (replyPlayback === "stream") {
       if (sentenceBuffer.trim()) {
         enqueueTts(sentenceBuffer);
       }
@@ -323,27 +519,26 @@ export function createVoicePipelineTtsQueue({
       enqueueTts(fullText);
     }
 
-    await Promise.all(ttsQueue);
-    await Promise.all(providerSynthesisSlots);
+    await Promise.all(queuedTasks);
+    await Promise.all(synthesisSlots);
 
     if (
-      !bufferProviderAudioUntilComplete ||
-      fatalProviderError ||
+      !bufferUntilComplete ||
+      fatalTtsError ||
       abortSignal?.aborted
     ) {
       return;
     }
 
-    if (playbackRoute === "native") {
-      bufferedTtsTexts.forEach((text) => {
-        callbacks.onSpeechTextReady(text, undefined, speechDiagnostics);
+    if (selectedRoute === "native") {
+      bufferedNativeTexts.forEach(({ text, result }) => {
+        emitResult(text, result);
       });
       return;
     }
 
-    playbackRoute = ttsMode;
-    bufferedProviderAudio.forEach((result) => {
-      callbacks.onAudioReady(result.audio, result.diagnostics);
+    bufferedAudio.forEach((result) => {
+      emitResult("", result);
     });
   };
 

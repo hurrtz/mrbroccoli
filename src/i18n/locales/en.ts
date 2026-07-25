@@ -276,7 +276,7 @@ export const en: TranslationDictionary = {
   kokoroInstalled: "Installed and ready on this device.",
   kokoroNotInstalled: "Optional download. No provider key required.",
   kokoroLanguageFallback:
-    "Kokoro currently speaks English and Simplified Chinese here. Replies in selected unsupported languages automatically use the system voice.",
+    "Kokoro currently speaks English and Simplified Chinese here. For other selected reply languages, add an explicit fallback route or speech will stop with an error.",
   kokoroRemoveTitle: "Remove the Kokoro model?",
   kokoroRemoveBody: ({ installedSize }) =>
     `This frees about ${installedSize} MB. You can download the model again at any time.`,
@@ -285,22 +285,32 @@ export const en: TranslationDictionary = {
     "Pick the speech engine, listening languages, and voice previews for spoken replies.",
   localTts: "Local",
   localTtsDescription:
-    "Try a matching downloaded local voice first, then the selected configured service if available, then the system voice.",
+    "Use a matching downloaded local voice for spoken replies.",
   providerTtsDescription:
-    "Use the selected configured service first. If it cannot start the reply, Mr Broccoli falls back to the system voice.",
+    "Use the selected configured service for spoken replies.",
+  ttsFallbackRoutes: "Fallback routes",
+  ttsFallbackRoutesHint:
+    "Optional. Add only the routes you want, in the order they should be tried. Once a route starts speaking, Mr Broccoli stays on it for the rest of the reply.",
+  ttsFallbackNone:
+    "No fallback is configured. A voice failure will be shown instead.",
+  ttsFallbackPosition: ({ position, route }) => `${position}. ${route}`,
+  addFallbackRoute: ({ route }) => `Add ${route} fallback`,
+  removeFallbackRoute: ({ route }) => `Remove ${route} fallback`,
+  moveFallbackEarlier: ({ route }) => `Move ${route} earlier`,
+  moveFallbackLater: ({ route }) => `Move ${route} later`,
   ttsProvider: "TTS Provider",
   ttsProviderEnabledHint:
     "Only enabled providers with spoken-reply support appear here.",
   ttsProviderMissingHint:
     "Add credentials for a service with TTS support to choose it here.",
   localTtsOrderHint:
-    "Playback order: matching local voice first, then the selected provider if configured, then the system voice.",
+    "Only explicitly configured fallback routes are attempted.",
   providerTtsOrderHint:
-    "Playback order: selected provider first, then the system voice when a provider reply cannot start.",
+    "Only explicitly configured fallback routes are attempted.",
   nativeTtsHint:
     "Native TTS uses the system voice stack and does not require a provider key.",
   localTtsLanguageCoverageHint:
-    "Local packs currently cover English, German, Simplified Chinese, Spanish, Portuguese, Hindi, French, and Italian. Japanese still falls back automatically.",
+    "Local packs currently cover English, German, Simplified Chinese, Spanish, Portuguese, Hindi, French, and Italian.",
   ttsVoice: "TTS Voice",
   refresh: "Refresh",
   providerVoiceDirectory: ({ provider }) => `${provider} voice library`,
@@ -553,7 +563,7 @@ export const en: TranslationDictionary = {
   turnReceiptTypedInput: "Typed",
   turnReceiptSystemSpeech: "System speech recognition",
   turnReceiptSystemVoice: "System voice",
-  turnReceiptSystemVoiceFallback: "System voice · provider fallback",
+  turnReceiptSystemVoiceFallback: "System voice · fallback",
   turnReceiptOff: "Off",
   turnReceiptNotConfigured: "On · not configured",
   turnReceiptFallbackWithoutSearch: "Continued without live search",
@@ -630,7 +640,7 @@ export const en: TranslationDictionary = {
   setupGuideKokoroBody: ({ size }) =>
     `Optional: download Kokoro (about ${size} MB) for far more natural spoken replies without a speech provider or usage charges.`,
   setupGuideKokoroLanguageNote:
-    "This model currently speaks English and Simplified Chinese. Other selected reply languages continue through the system voice automatically.",
+    "This model currently speaks English and Simplified Chinese. Configure any fallback routes you want later in Speaking settings.",
   setupGuideKokoroDownload: "Download Kokoro",
   setupGuideUseKokoro: "Use Kokoro for spoken replies",
   setupGuideUseKokoroSummary:
@@ -667,8 +677,7 @@ export const en: TranslationDictionary = {
   setupGuideRouteProviderStt: ({ provider }) =>
     `Enabled via ${provider} speech transcription`,
   setupGuideRouteProviderTts: ({ provider }) => `Enabled via ${provider} voice`,
-  setupGuideRouteKokoroTts:
-    "Enabled via Kokoro on-device voice, with system fallback",
+  setupGuideRouteKokoroTts: "Enabled via Kokoro on-device voice",
   setupGuideRouteLocalTts: "Enabled via local voice pack",
   setupGuideRouteUnavailable: "Not available",
   setupGuideRouteOff: "Off",

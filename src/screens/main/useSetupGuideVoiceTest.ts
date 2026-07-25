@@ -3,7 +3,6 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createSpeechRequestId } from "../../services/speech/diagnostics";
 import { streamChat } from "../../services/llm";
 import { synthesizeSpeech } from "../../services/tts";
-import { resolveKokoroLanguage } from "../../constants/kokoro";
 import { transcribeAudio } from "../../services/whisper";
 import type { Settings } from "../../types";
 import { useAudioPlayer } from "../../hooks/useAudioPlayer";
@@ -273,22 +272,6 @@ export function useSetupGuideVoiceTest(params: {
       providerModel:
         routes.tts.kind === "provider" ? routes.tts.model : null,
     };
-
-    if (
-      routes.tts.kind === "kokoro" &&
-      !resolveKokoroLanguage({
-        text: trimmedReply,
-        listenLanguages: settings.ttsListenLanguages,
-      })
-    ) {
-      player.resetCancellation();
-      player.speakText(trimmedReply, { diagnostics });
-      setPhase("speaking");
-      await player.waitForDrain();
-      abortControllerRef.current = null;
-      setPhase("success");
-      return;
-    }
 
     const audioUri = await synthesizeSpeech({
       text: trimmedReply,

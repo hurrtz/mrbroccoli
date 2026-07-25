@@ -14,6 +14,7 @@ import type {
   ReplyPlayback,
   SttBackendMode,
   TtsBackendMode,
+  TtsFallbackRoute,
   TtsListenLanguage,
   UsageEstimate,
 } from "../../types";
@@ -45,7 +46,7 @@ export interface PipelineCallbacks {
     voice?: string,
     diagnostics?: SpeechDiagnosticsContext,
   ) => void;
-  onTtsFallback?: (error: Error) => void;
+  onTtsFallback?: (error: Error, route: TtsFallbackRoute) => void;
   onError: (error: Error) => void | Promise<void>;
 }
 
@@ -68,6 +69,7 @@ export interface RunVoicePipelineParams {
   ttsModel?: string;
   ttsVoice: string;
   kokoroVoices?: KokoroVoiceSelections;
+  ttsFallbackRoutes?: TtsFallbackRoute[];
   ttsInstructions?: string;
   ttsListenLanguages?: TtsListenLanguage[];
   replyPlayback: ReplyPlayback;

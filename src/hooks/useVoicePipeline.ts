@@ -50,6 +50,7 @@ export function useVoicePipeline(
     selectedTtsModel: params.selectedTtsModel,
     selectedTtsVoice: params.selectedTtsVoice,
     kokoroVoices: params.kokoroVoices,
+    ttsFallbackRoutes: params.ttsFallbackRoutes,
     ttsInstructions: params.ttsInstructions,
     showToast: params.showToast,
     t: params.t,

@@ -15,6 +15,7 @@ type ReplayControllerParams = Pick<
   | "selectedTtsModel"
   | "selectedTtsVoice"
   | "kokoroVoices"
+  | "ttsFallbackRoutes"
   | "ttsInstructions"
   | "showToast"
   | "t"
@@ -38,6 +39,7 @@ export function useReplyReplayController({
   selectedTtsModel,
   selectedTtsVoice,
   kokoroVoices,
+  ttsFallbackRoutes,
   ttsInstructions,
   showToast,
   t,
@@ -101,11 +103,6 @@ export function useReplyReplayController({
           return;
         }
 
-        if (ttsMode === "provider" && (!ttsProvider || !ttsApiKey)) {
-          showToast(t("chooseTtsBeforeSpokenReplies"));
-          return;
-        }
-
         const replayQueue = createVoicePipelineTtsQueue({
           abortSignal: replayAbortRef.current.signal,
           callbacks: {
@@ -120,13 +117,14 @@ export function useReplyReplayController({
               setReplayPhase("speaking");
               player.enqueueAudio(audioUri, diagnostics);
             },
-            onSpeechTextReady: (segmentText, _voice, diagnostics) => {
+            onSpeechTextReady: (segmentText, voice, diagnostics) => {
               if (replaySessionRef.current !== replaySession) {
                 return;
               }
 
               setReplayPhase("speaking");
               player.speakText(segmentText, {
+                voice,
                 diagnostics,
               });
             },
@@ -142,13 +140,13 @@ export function useReplyReplayController({
             },
           },
           diagnosticsSource: "repeat",
-          fallbackToNativeOnProviderError: false,
           language,
           // A replay already has the complete text. Treat it as a completed
           // response instead of feeding it back through the live-stream buffer.
           replyPlayback: "wait",
           ttsApiKey,
           kokoroVoices,
+          ttsFallbackRoutes,
           ttsListenLanguages,
           ttsMode,
           ttsModel: selectedTtsModel,
@@ -182,6 +180,7 @@ export function useReplyReplayController({
       selectedTtsModel,
       selectedTtsVoice,
       kokoroVoices,
+      ttsFallbackRoutes,
       ttsInstructions,
       showToast,
       t,

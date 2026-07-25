@@ -6,6 +6,7 @@ import {
   getProviderTtsVoiceOptions,
   providerUsesTtsVoiceDirectory,
 } from "../../constants/models";
+import { getTtsFallbackRoutes } from "../../constants/ttsFallback";
 import {
   Provider,
   ProviderSttModelSelections,
@@ -92,7 +93,14 @@ export function getNormalizedTtsProvider(
   settings: Settings,
   enabledTtsProviders: Provider[],
 ) {
-  if (settings.ttsMode !== "provider") {
+  const providerRouteActive =
+    settings.ttsMode === "provider" ||
+    getTtsFallbackRoutes(
+      settings.ttsFallbackPolicy,
+      settings.ttsMode,
+    ).includes("provider");
+
+  if (!providerRouteActive) {
     return null;
   }
 

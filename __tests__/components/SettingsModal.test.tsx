@@ -208,6 +208,100 @@ describe("SettingsModal", () => {
     expect(download).toHaveBeenCalledTimes(1);
   });
 
+  it("keeps provider fallbacks empty until the user adds one", async () => {
+    const onUpdate = jest.fn();
+    const screen = renderSettingsModal({
+      focusTab: "tts",
+      settings: {
+        ...DEFAULT_SETTINGS,
+        ttsMode: "provider",
+      },
+      onUpdate,
+    });
+
+    await waitFor(() => {
+      expect(screen.getByText("Fallback routes")).toBeTruthy();
+      expect(
+        screen.getByText(
+          "No fallback is configured. A voice failure will be shown instead.",
+        ),
+      ).toBeTruthy();
+    });
+
+    fireEvent.press(screen.getByLabelText("Add Kokoro fallback"));
+
+    expect(onUpdate).toHaveBeenCalledWith({
+      ttsFallbackPolicy: {
+        provider: ["kokoro"],
+        kokoro: [],
+      },
+    });
+  });
+
+  it("shows and reorders both explicit provider fallback routes", async () => {
+    const onUpdate = jest.fn();
+    const screen = renderSettingsModal({
+      focusTab: "tts",
+      settings: {
+        ...DEFAULT_SETTINGS,
+        ttsMode: "provider",
+        ttsFallbackPolicy: {
+          provider: ["kokoro", "native"],
+          kokoro: [],
+        },
+      },
+      onUpdate,
+    });
+
+    await waitFor(() => {
+      expect(screen.getByText("1. Kokoro")).toBeTruthy();
+      expect(screen.getByText("2. System voice")).toBeTruthy();
+    });
+
+    fireEvent.press(
+      screen.getByLabelText("Move System voice earlier"),
+    );
+
+    expect(onUpdate).toHaveBeenCalledWith({
+      ttsFallbackPolicy: {
+        provider: ["native", "kokoro"],
+        kokoro: [],
+      },
+    });
+  });
+
+  it("offers provider and native fallbacks for Kokoro but none for native speech", async () => {
+    const kokoroScreen = renderSettingsModal({
+      focusTab: "tts",
+      settings: {
+        ...DEFAULT_SETTINGS,
+        ttsMode: "kokoro",
+      },
+    });
+
+    await waitFor(() => {
+      expect(
+        kokoroScreen.getByLabelText("Add Provider fallback"),
+      ).toBeTruthy();
+      expect(
+        kokoroScreen.getByLabelText("Add System voice fallback"),
+      ).toBeTruthy();
+    });
+    kokoroScreen.unmount();
+
+    const nativeScreen = renderSettingsModal({
+      focusTab: "tts",
+      settings: {
+        ...DEFAULT_SETTINGS,
+        ttsMode: "native",
+      },
+    });
+
+    await waitFor(() => {
+      expect(nativeScreen.queryByText("Fallback routes")).toBeNull();
+    });
+  });
+
   it("sorts provider connections alphabetically", async () => {
     const screen = renderSettingsModal();
 
