@@ -126,6 +126,42 @@ describe("settingsRules", () => {
     expect(nextProviderVoices).toBeNull();
   });
 
+  it("preserves an account voice selected from a dynamic provider directory", () => {
+    const settings = {
+      ...DEFAULT_SETTINGS,
+      providerTtsVoices: {
+        ...DEFAULT_SETTINGS.providerTtsVoices,
+        elevenlabs: "account-voice-id",
+      },
+    };
+
+    const nextProviderVoices = getNormalizedProviderTtsVoices(
+      settings,
+      ["elevenlabs"],
+      "en",
+    );
+
+    expect(nextProviderVoices).toBeNull();
+  });
+
+  it("repairs an empty dynamic voice selection to its built-in fallback", () => {
+    const settings = {
+      ...DEFAULT_SETTINGS,
+      providerTtsVoices: {
+        ...DEFAULT_SETTINGS.providerTtsVoices,
+        elevenlabs: "",
+      },
+    };
+
+    const nextProviderVoices = getNormalizedProviderTtsVoices(
+      settings,
+      ["elevenlabs"],
+      "en",
+    );
+
+    expect(nextProviderVoices?.elevenlabs).toBe("21m00Tcm4TlvDq8ikWAM");
+  });
+
   it("repairs a Qwen voice that is unavailable on the selected TTS model", () => {
     const settings = {
       ...DEFAULT_SETTINGS,

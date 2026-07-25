@@ -4,6 +4,7 @@ import {
   getProviderSttModelOptions,
   getProviderTtsModelOptions,
   getProviderTtsVoiceOptions,
+  providerUsesTtsVoiceDirectory,
 } from "../../constants/models";
 import {
   Provider,
@@ -171,6 +172,12 @@ export function getNormalizedProviderTtsVoices(
   let changed = false;
 
   for (const provider of enabledTtsProviders) {
+    const currentVoice = nextProviderTtsVoices[provider];
+
+    if (providerUsesTtsVoiceDirectory(provider) && currentVoice?.trim()) {
+      continue;
+    }
+
     const supportedVoices = getProviderTtsVoiceOptions(
       provider,
       language,
@@ -184,7 +191,6 @@ export function getNormalizedProviderTtsVoices(
       continue;
     }
 
-    const currentVoice = nextProviderTtsVoices[provider];
     const isValid = supportedVoices.some((voice) => voice.id === currentVoice);
 
     if (!isValid) {
