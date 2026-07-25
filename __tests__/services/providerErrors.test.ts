@@ -1,6 +1,7 @@
 import {
   buildProviderHttpError,
   extractProviderErrorMessage,
+  readSafeProviderErrorMessage,
 } from "../../src/services/providerErrors";
 
 describe("extractProviderErrorMessage", () => {
@@ -87,6 +88,30 @@ describe("extractProviderErrorMessage", () => {
     expect(extractProviderErrorMessage(json)).toBe(
       '{"errors":[{"code":"ERR"}]}',
     );
+  });
+});
+
+describe("readSafeProviderErrorMessage", () => {
+  it("extracts a concise nested provider error", async () => {
+    await expect(
+      readSafeProviderErrorMessage({
+        text: async () =>
+          JSON.stringify({
+            detail: {
+              status: "insufficient_permissions",
+              message: "Missing voices_read permission",
+            },
+          }),
+      } as Response),
+    ).resolves.toBe("Missing voices_read permission");
+  });
+
+  it("suppresses unstructured response bodies", async () => {
+    await expect(
+      readSafeProviderErrorMessage({
+        text: async () => "<html>Service unavailable</html>",
+      } as Response),
+    ).resolves.toBe("");
   });
 });
 

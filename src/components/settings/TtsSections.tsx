@@ -43,6 +43,15 @@ import {
   TextInputFocusHandler,
 } from "./types";
 
+function isElevenLabsVoiceReadPermissionError(error: Error) {
+  const normalizedMessage = error.message.toLowerCase();
+
+  return (
+    normalizedMessage.includes("voices_read") ||
+    normalizedMessage.includes("voice read")
+  );
+}
+
 export function ProviderVoicePreviewSection({
   provider,
   selectedLanguages,
@@ -177,6 +186,25 @@ export function ProviderVoicePreviewSection({
                         provider: PROVIDER_LABELS[provider],
                       })}
               </Text>
+              {voiceDirectory.status === "error" && voiceDirectory.error ? (
+                <>
+                  <Text style={[styles.previewHint, { color: colors.danger }]}>
+                    {t("providerVoicesErrorDetail", {
+                      detail: voiceDirectory.error.message,
+                    })}
+                  </Text>
+                  {provider === "elevenlabs" &&
+                  isElevenLabsVoiceReadPermissionError(
+                    voiceDirectory.error,
+                  ) ? (
+                    <Text
+                      style={[styles.previewHint, { color: colors.textMuted }]}
+                    >
+                      {t("elevenLabsVoicesReadPermissionHint")}
+                    </Text>
+                  ) : null}
+                </>
+              ) : null}
             </View>
             <TouchableOpacity
               testID={`${provider}-voices-refresh`}

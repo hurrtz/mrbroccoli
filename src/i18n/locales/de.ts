@@ -317,6 +317,9 @@ export const de: TranslationDictionary = {
     "Die Stimmen konnten nicht aktualisiert werden. Die aktuelle Auswahl bleibt erhalten; alternativ kannst du eine Stimmen-ID manuell eingeben.",
   providerVoicesLoadFailedWithFallback:
     "Die persönlichen Stimmen konnten nicht geladen werden. Die integrierte Stimme bleibt verfügbar.",
+  providerVoicesErrorDetail: ({ detail }) => `Grund: ${detail}`,
+  elevenLabsVoicesReadPermissionHint:
+    "Aktiviere für diesen API-Key in ElevenLabs „Voices → Read“ und aktualisiere die Stimmen anschließend hier.",
   providerVoicesLoadingHint: ({ provider }) =>
     `Mr Broccoli lädt verfügbare Stimmen automatisch von ${provider}.`,
   providerVoiceId: "Stimmen-ID",

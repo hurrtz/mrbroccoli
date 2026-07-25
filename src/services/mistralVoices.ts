@@ -1,3 +1,5 @@
+import { readSafeProviderErrorMessage } from "./providerErrors";
+
 const MISTRAL_VOICES_ENDPOINT = "https://api.mistral.ai/v1/audio/voices";
 const MISTRAL_VOICES_PAGE_SIZE = 10;
 const MISTRAL_VOICES_MAX_PAGES = 10;
@@ -112,8 +114,11 @@ async function fetchMistralVoicePage(params: {
     });
 
     if (!response.ok) {
+      const detail = await readSafeProviderErrorMessage(response);
+
       throw new MistralVoiceDirectoryError(
-        `Mistral voice directory request failed with status ${response.status}.`,
+        detail ||
+          `Mistral voice directory request failed with status ${response.status}.`,
         response.status,
       );
     }

@@ -1,3 +1,5 @@
+import { readSafeProviderErrorMessage } from "./providerErrors";
+
 const ELEVENLABS_VOICES_ENDPOINT = "https://api.elevenlabs.io/v2/voices";
 const ELEVENLABS_VOICES_PAGE_SIZE = 100;
 const ELEVENLABS_VOICES_MAX_PAGES = 20;
@@ -108,8 +110,11 @@ async function fetchElevenLabsVoicePage(params: {
     });
 
     if (!response.ok) {
+      const detail = await readSafeProviderErrorMessage(response);
+
       throw new ElevenLabsVoiceDirectoryError(
-        `ElevenLabs voice directory request failed with status ${response.status}.`,
+        detail ||
+          `ElevenLabs voice directory request failed with status ${response.status}.`,
         response.status,
       );
     }

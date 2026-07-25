@@ -110,6 +110,14 @@ describe("fetchElevenLabsVoices", () => {
     fetchMock.mockResolvedValue({
       ok: false,
       status: 401,
+      text: async () =>
+        JSON.stringify({
+          detail: {
+            status: "insufficient_permissions",
+            message:
+              "The API key is missing the permission voices_read to execute this operation.",
+          },
+        }),
     });
 
     await expect(
@@ -117,6 +125,8 @@ describe("fetchElevenLabsVoices", () => {
     ).rejects.toEqual(
       expect.objectContaining<ElevenLabsVoiceDirectoryError>({
         name: "ElevenLabsVoiceDirectoryError",
+        message:
+          "The API key is missing the permission voices_read to execute this operation.",
         status: 401,
       }),
     );

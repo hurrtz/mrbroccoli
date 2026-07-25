@@ -311,6 +311,9 @@ export const en: TranslationDictionary = {
     "Voices could not be refreshed. Your current selection is unchanged; you can still enter a voice ID manually.",
   providerVoicesLoadFailedWithFallback:
     "Account voices could not be loaded. The built-in voice remains available.",
+  providerVoicesErrorDetail: ({ detail }) => `Reason: ${detail}`,
+  elevenLabsVoicesReadPermissionHint:
+    "In ElevenLabs, edit this API key and enable Voices → Read, then refresh here.",
   providerVoicesLoadingHint: ({ provider }) =>
     `Mr Broccoli loads available voices automatically from ${provider}.`,
   providerVoiceId: "Voice ID",

@@ -52,6 +52,32 @@ export function extractProviderErrorMessage(errorText: string) {
   return errorText.replace(/\s+/g, " ").trim();
 }
 
+export async function readSafeProviderErrorMessage(response: Response) {
+  if (typeof response.text !== "function") {
+    return "";
+  }
+
+  try {
+    const detail = extractProviderErrorMessage(await response.text())
+      .replace(/[\u0000-\u001f\u007f]/g, " ")
+      .replace(/\s+/g, " ")
+      .trim();
+
+    if (
+      !detail ||
+      detail.startsWith("<") ||
+      detail.startsWith("{") ||
+      detail.startsWith("[")
+    ) {
+      return "";
+    }
+
+    return detail.length > 280 ? `${detail.slice(0, 279)}…` : detail;
+  } catch {
+    return "";
+  }
+}
+
 function getActionLabel(language: AppLanguage, action: ProviderAction) {
   if (action === "reply") {
     return translate(language, "replyGenerationAction");

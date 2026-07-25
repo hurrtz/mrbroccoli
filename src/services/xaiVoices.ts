@@ -1,3 +1,5 @@
+import { readSafeProviderErrorMessage } from "./providerErrors";
+
 const XAI_BUILT_IN_VOICES_ENDPOINT = "https://api.x.ai/v1/tts/voices";
 const XAI_CUSTOM_VOICES_ENDPOINT = "https://api.x.ai/v1/custom-voices";
 const XAI_CUSTOM_VOICES_PAGE_SIZE = 1000;
@@ -100,8 +102,11 @@ async function fetchXaiVoicePayload(params: {
     });
 
     if (!response.ok) {
+      const detail = await readSafeProviderErrorMessage(response);
+
       throw new XaiVoiceDirectoryError(
-        `xAI voice directory request failed with status ${response.status}.`,
+        detail ||
+          `xAI voice directory request failed with status ${response.status}.`,
         response.status,
       );
     }

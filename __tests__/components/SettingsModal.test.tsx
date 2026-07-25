@@ -761,6 +761,14 @@ describe("SettingsModal", () => {
           "Account voices could not be loaded. The built-in voice remains available.",
         ),
       ).toBeTruthy();
+      expect(
+        screen.getByText("Reason: Missing voices_read permission"),
+      ).toBeTruthy();
+      expect(
+        screen.getByText(
+          "In ElevenLabs, edit this API key and enable Voices → Read, then refresh here.",
+        ),
+      ).toBeTruthy();
       expect(screen.queryByPlaceholderText("Enter a voice ID")).toBeNull();
     });
   });

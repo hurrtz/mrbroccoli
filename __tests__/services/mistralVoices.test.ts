@@ -123,6 +123,8 @@ describe("fetchMistralVoices", () => {
     fetchMock.mockResolvedValue({
       ok: false,
       status: 401,
+      text: async () =>
+        JSON.stringify({ message: "The supplied API key is invalid." }),
     });
 
     await expect(
@@ -130,6 +132,7 @@ describe("fetchMistralVoices", () => {
     ).rejects.toEqual(
       expect.objectContaining<MistralVoiceDirectoryError>({
         name: "MistralVoiceDirectoryError",
+        message: "The supplied API key is invalid.",
         status: 401,
       }),
     );

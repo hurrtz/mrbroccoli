@@ -92,11 +92,14 @@ describe("fetchXaiVoices", () => {
     jest.spyOn(global, "fetch").mockResolvedValue({
       ok: false,
       status: 401,
+      text: async () =>
+        JSON.stringify({ error: { message: "Incorrect API key." } }),
     } as Response);
 
     await expect(fetchXaiVoices({ apiKey: "invalid" })).rejects.toEqual(
       expect.objectContaining<XaiVoiceDirectoryError>({
         name: "XaiVoiceDirectoryError",
+        message: "Incorrect API key.",
         status: 401,
       }),
     );
