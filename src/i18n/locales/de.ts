@@ -77,6 +77,8 @@ export const de: TranslationDictionary = {
   responseModesNoConfiguredProviders:
     "Füge zuerst Zugangsdaten hinzu. Routen bleiben ausgeblendet, bis mindestens ein kompatibler Dienst konfiguriert ist.",
   useResponseMode: ({ mode }) => `${mode} verwenden`,
+  chooseResponseModel: "Modell auswählen",
+  responseModelCount: ({ count }) => `${count} Modelle verfügbar`,
   sttTabDescription:
     "Steuere, wie Sprache aufgenommen wird und welches Backend Audio in Text umwandelt, bevor es das Modell erreicht.",
   ttsTabDescription:

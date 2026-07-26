@@ -1,6 +1,6 @@
 import React from "react";
-import { Pressable, StyleSheet } from "react-native";
-import { fireEvent } from "@testing-library/react-native";
+import { Modal, Pressable, StyleSheet } from "react-native";
+import { fireEvent, waitFor } from "@testing-library/react-native";
 
 import {
   getResponseModeCardModelLabels,
@@ -145,15 +145,15 @@ describe("ResponseModeToggle", () => {
       StyleSheet.flatten(
         screen.getByTestId("response-mode-option-content-mode-1").props.style,
       ).justifyContent,
-    ).toBe("center");
+    ).toBe("flex-start");
     expect(
       StyleSheet.flatten(
         screen.getByTestId("response-mode-details-mode-1").props.style,
       ),
     ).toEqual(
       expect.objectContaining({
-        alignItems: "center",
-        flex: 0,
+        alignItems: "flex-start",
+        flex: 1,
         flexShrink: 1,
         maxWidth: 240,
       }),
@@ -164,10 +164,9 @@ describe("ResponseModeToggle", () => {
       ),
     ).toEqual(
       expect.objectContaining({
-        bottom: 0,
-        left: 0,
-        position: "absolute",
-        top: 0,
+        flexShrink: 0,
+        minHeight: 42,
+        width: 48,
       }),
     );
     expect(
@@ -178,7 +177,7 @@ describe("ResponseModeToggle", () => {
       expect.objectContaining({
         fontSize: 16,
         lineHeight: 21,
-        textAlign: "center",
+        textAlign: "left",
       }),
     );
     expect(
@@ -187,10 +186,10 @@ describe("ResponseModeToggle", () => {
       ),
     ).toEqual(
       expect.objectContaining({
-        bottom: 0,
-        right: 3,
-        position: "absolute",
-        top: 0,
+        alignSelf: "stretch",
+        marginLeft: 6,
+        marginRight: 3,
+        width: 64,
       }),
     );
     expect(
@@ -242,7 +241,7 @@ describe("ResponseModeToggle", () => {
       StyleSheet.flatten(
         screen.getByTestId("response-mode-details-mode-1").props.style,
       ).alignItems,
-    ).toBe("center");
+    ).toBe("flex-start");
   });
 
   it("reuses the detailed two-card hierarchy in compact landscape", () => {
@@ -573,10 +572,111 @@ describe("ResponseModeToggle", () => {
     ).toBe("#2A2F37");
   });
 
-  it("keeps four portrait model cards visible in one non-scrolling row", () => {
+  it.each([false, true])(
+    "collapses four modes into an interactive selector when compact is %s",
+    async (compact) => {
+      const onSelect = jest.fn();
+      const modes = [
+        {
+          id: "mode-1",
+          route: { provider: "openai" as const, model: "gpt-5.6-sol" },
+        },
+        {
+          id: "mode-2",
+          route: {
+            provider: "gemini" as const,
+            model: "gemini-3.5-flash",
+          },
+        },
+        {
+          id: "mode-3",
+          route: { provider: "xai" as const, model: "grok-4.5" },
+        },
+        {
+          id: "mode-4",
+          route: {
+            provider: "mistral" as const,
+            model: "mistral-medium-3-5",
+          },
+        },
+      ];
+
+      const screen = renderWithProviders(
+        <ResponseModeToggle
+          compact={compact}
+          selected="mode-4"
+          onSelect={onSelect}
+          modes={modes}
+        />,
+      );
+
+      expect(screen.queryByTestId("response-mode-list")).toBeNull();
+      expect(screen.queryByTestId("response-mode-option-mode-4")).toBeNull();
+      expect(screen.getByTestId("response-mode-overflow-selector")).toBeTruthy();
+      expect(screen.getByText(`mistral:${compact ? 36 : 42}`)).toBeTruthy();
+      expect(screen.getByText("Medium 3.5")).toBeTruthy();
+
+      fireEvent.press(screen.getByTestId("response-mode-overflow-selector"));
+
+      expect(screen.UNSAFE_getByType(Modal).props.animationType).toBe("none");
+      expect(
+        screen.getByTestId("response-mode-overflow-backdrop-motion"),
+      ).toBeTruthy();
+      expect(
+        screen.getByTestId("response-mode-overflow-sheet-motion"),
+      ).toBeTruthy();
+      expect(screen.getByTestId("response-mode-overflow-sheet")).toBeTruthy();
+      expect(
+        StyleSheet.flatten(
+          screen.getByTestId("response-mode-overflow-sheet-motion").props.style,
+        ).maxHeight,
+      ).toBe(compact ? "88%" : "78%");
+      expect(
+        StyleSheet.flatten(
+          screen.getByTestId("response-mode-overflow-sheet").props.style,
+        ).maxHeight,
+      ).toBeUndefined();
+      expect(
+        StyleSheet.flatten(
+          screen.getByTestId("response-mode-overflow-list").props.style,
+        ),
+      ).toEqual(
+        expect.objectContaining({
+          flexGrow: 0,
+          flexShrink: 1,
+        }),
+      );
+      expect(screen.getByText("Choose a model")).toBeTruthy();
+      expect(screen.getByText("4 models available")).toBeTruthy();
+      expect(screen.getByText("GPT-5.6 Sol")).toBeTruthy();
+      expect(screen.getByText("Gemini 3.5 Flash")).toBeTruthy();
+      expect(screen.getByText("Grok 4.5")).toBeTruthy();
+      expect(screen.getByText("Mistral Medium 3.5")).toBeTruthy();
+      expect(
+        screen.getByTestId("response-mode-overflow-option-mode-4").props
+          .accessibilityState,
+      ).toEqual({
+        disabled: false,
+        selected: true,
+      });
+
+      fireEvent.press(
+        screen.getByTestId("response-mode-overflow-option-mode-2"),
+      );
+
+      expect(onSelect).toHaveBeenCalledWith("mode-2");
+      await waitFor(() =>
+        expect(
+          screen.queryByTestId("response-mode-overflow-sheet"),
+        ).toBeNull(),
+      );
+    },
+  );
+
+  it("keeps the full selector list available when more than four modes exist", () => {
     const screen = renderWithProviders(
       <ResponseModeToggle
-        selected="mode-1"
+        selected="mode-5"
         onSelect={jest.fn()}
         modes={[
           {
@@ -595,26 +695,23 @@ describe("ResponseModeToggle", () => {
             id: "mode-4",
             route: { provider: "mistral", model: "mistral-medium-3-5" },
           },
+          {
+            id: "mode-5",
+            route: {
+              provider: "deepseek",
+              model: "deepseek-v4-flash",
+            },
+          },
         ]}
       />,
     );
 
-    const listStyle = StyleSheet.flatten(
-      screen.getByTestId("response-mode-list").props.style,
-    );
+    fireEvent.press(screen.getByTestId("response-mode-overflow-selector"));
 
-    expect(listStyle.flexDirection).toBe("row");
-    expect(listStyle.flexWrap).toBeUndefined();
+    expect(screen.getByText("5 models available")).toBeTruthy();
     expect(
-      StyleSheet.flatten(
-        screen.getByTestId("response-mode-option-mode-1").props.style,
-      ).flex,
-    ).toBe(1);
-    expect(
-      StyleSheet.flatten(
-        screen.getByTestId("response-mode-option-mode-1").props.style,
-      ).minWidth,
-    ).toBe(0);
+      screen.getByTestId("response-mode-overflow-option-mode-5"),
+    ).toBeTruthy();
   });
 
   it("stacks compact landscape cards one per row", () => {
@@ -667,62 +764,6 @@ describe("ResponseModeToggle", () => {
         flex: 1,
         height: 30,
         width: "auto",
-      }),
-    );
-  });
-
-  it("keeps all four compact landscape cards in the vertical stack", () => {
-    const screen = renderWithProviders(
-      <ResponseModeToggle
-        compact
-        selected="mode-1"
-        onSelect={jest.fn()}
-        modes={[
-          {
-            id: "mode-1",
-            route: { provider: "openai", model: "gpt-5.6-sol" },
-          },
-          {
-            id: "mode-2",
-            route: { provider: "gemini", model: "gemini-3.5-flash" },
-          },
-          {
-            id: "mode-3",
-            route: { provider: "xai", model: "grok-4.5" },
-          },
-          {
-            id: "mode-4",
-            route: { provider: "mistral", model: "mistral-medium-3-5" },
-          },
-        ]}
-      />,
-    );
-
-    const listStyle = StyleSheet.flatten(
-      screen.getByTestId("response-mode-list").props.style,
-    );
-    const optionStyle = StyleSheet.flatten(
-      screen.getByTestId("response-mode-option-mode-1").props.style,
-    );
-
-    expect(listStyle.flexDirection).toBe("column");
-    expect(listStyle.flexWrap).toBeUndefined();
-    expect(optionStyle.flex).toBeUndefined();
-    expect(optionStyle.width).toBe("100%");
-    expect(optionStyle.flexGrow).toBeUndefined();
-    expect(optionStyle.flexShrink).toBe(0);
-    expect(optionStyle.minHeight).toBe(40);
-    expect(listStyle.gap).toBe(4);
-    expect(screen.getByText("openai:22")).toBeTruthy();
-    expect(
-      StyleSheet.flatten(
-        screen.getByTestId("response-mode-option-inner-mode-1").props.style,
-      ),
-    ).toEqual(
-      expect.objectContaining({
-        minHeight: 40,
-        paddingHorizontal: 8,
-        paddingVertical: 3,
       }),
     );
   });

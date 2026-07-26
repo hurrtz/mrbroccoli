@@ -48,7 +48,7 @@ export const DEFAULT_PROVIDER_TTS_VOICES: ProviderTtsVoiceSelections =
  * `updateApiKey`, so this placeholder is replaced before it is ever relied on.
  */
 export const MIN_RESPONSE_MODES = 1;
-export const MAX_RESPONSE_MODES = 4;
+export const MAX_RESPONSE_MODES = 10;
 export const DEFAULT_RESPONSE_MODE_COUNT = 3;
 
 const NEUTRAL_RESPONSE_MODE_ROUTE = {

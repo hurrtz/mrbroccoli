@@ -1,6 +1,7 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as SecureStore from "expo-secure-store";
 import { renderHook, act } from "@testing-library/react-native";
+import { MAX_RESPONSE_MODES } from "../../src/constants/providers/defaults";
 import { useSettings } from "../../src/hooks/useSettings";
 import {
   DEFAULT_SETTINGS,
@@ -956,20 +957,21 @@ describe("useSettings", () => {
     expect(result.current.settings.webSearchMode).toBe("off");
   });
 
-  it("adds response modes up to four and selects the new mode", async () => {
+  it("adds response modes up to ten and selects the new mode", async () => {
     const { result } = renderHook(() => useSettings());
     await flushSettingsLoad();
 
-    await act(async () => {
-      result.current.addResponseMode();
-    });
-    await act(async () => {
-      result.current.addResponseMode();
-    });
+    for (let index = 0; index <= MAX_RESPONSE_MODES; index += 1) {
+      await act(async () => {
+        result.current.addResponseMode();
+      });
+    }
 
-    expect(result.current.settings.responseModes).toHaveLength(4);
-    expect(result.current.settings.responseModes[3].id).toBe("mode-4");
-    expect(result.current.settings.activeResponseMode).toBe("mode-4");
+    expect(result.current.settings.responseModes).toHaveLength(
+      MAX_RESPONSE_MODES,
+    );
+    expect(result.current.settings.responseModes[9].id).toBe("mode-10");
+    expect(result.current.settings.activeResponseMode).toBe("mode-10");
   });
 
   it("suggests a distinct configured provider when adding a response mode", async () => {

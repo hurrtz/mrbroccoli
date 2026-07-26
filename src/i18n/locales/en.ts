@@ -75,6 +75,8 @@ export const en: TranslationDictionary = {
   responseModesNoConfiguredProviders:
     "Add credentials first. Route controls stay hidden until at least one compatible service is configured.",
   useResponseMode: ({ mode }) => `Use ${mode}`,
+  chooseResponseModel: "Choose a model",
+  responseModelCount: ({ count }) => `${count} models available`,
   sttTabDescription:
     "Control how speech is captured and which backend turns audio into text before it reaches the model.",
   ttsTabDescription:

@@ -1,5 +1,18 @@
 import React from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import Feather from "@expo/vector-icons/Feather";
+import {
+  Animated,
+  Easing,
+  FlatList,
+  Modal,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+  useWindowDimensions,
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { APP_MODAL_ORIENTATIONS } from "../constants/layout";
 import { PROVIDER_LABELS, getProviderModelName } from "../constants/models";
 import { useLocalization } from "../i18n";
 import { useTheme } from "../theme/ThemeContext";
@@ -86,7 +99,6 @@ export function ResponseModeToggle({
   const { colors } = useTheme();
   const { language, t } = useLocalization();
   const singleMode = modes.length === 1;
-  const denseCompact = compact && modes.length === 4;
   const detailedLayout = modes.length <= 2;
   const denseLayout = modes.length >= 3;
   const threeCardPortrait = !compact && modes.length === 3;
@@ -122,13 +134,24 @@ export function ResponseModeToggle({
     [],
   );
 
+  if (modes.length >= 4) {
+    return (
+      <ResponseModeOverflowSelector
+        compact={compact}
+        modes={modes}
+        onSelect={onSelect}
+        readyModes={readyModes}
+        selected={selected}
+      />
+    );
+  }
+
   return (
     <View
       testID="response-mode-list"
       style={[
         styles.container,
         compact ? styles.containerCompact : null,
-        denseCompact ? styles.containerCompactDense : null,
       ]}
     >
       {modes.map(({ id, route }) => {
@@ -158,7 +181,6 @@ export function ResponseModeToggle({
               compact ? styles.optionCompactStack : styles.optionRow,
               compact ? styles.optionCompact : null,
               detailedLayout ? styles.optionDetailedPortrait : null,
-              denseCompact ? styles.optionCompactDense : null,
               singleMode ? styles.optionSingle : null,
               compact && singleMode ? styles.optionSingleCompact : null,
               !ready ? styles.optionDisabled : null,
@@ -189,7 +211,6 @@ export function ResponseModeToggle({
                 styles.optionInner,
                 compact ? styles.optionInnerCompact : null,
                 detailedLayout ? styles.optionInnerDetailedPortrait : null,
-                denseCompact ? styles.optionInnerCompactDense : null,
                 singleMode ? styles.optionInnerSingle : null,
                 compact && singleMode ? styles.optionInnerSingleCompact : null,
                 threeCardPortraitOneLine
@@ -227,7 +248,6 @@ export function ResponseModeToggle({
                     detailedLayout && singleMode
                       ? styles.providerRowDetailedPortraitSingle
                       : null,
-                    denseCompact ? styles.providerRowCompactDense : null,
                   ]}
                 >
                   <ProviderIcon
@@ -236,15 +256,13 @@ export function ResponseModeToggle({
                       highlighted ? activeForeground : colors.textSecondary
                     }
                     size={
-                      denseCompact
-                        ? 22
-                        : detailedLayout
-                          ? detailedPortraitIconSize
-                          : enlargeThreeCardIcons
-                            ? 32
-                            : compact
-                              ? 26
-                              : 24
+                      detailedLayout
+                        ? detailedPortraitIconSize
+                        : enlargeThreeCardIcons
+                          ? 32
+                          : compact
+                            ? 26
+                            : 24
                     }
                   />
                 </View>
@@ -377,14 +395,7 @@ export function ResponseModeToggle({
                   </View>
                 ) : null}
                 {compact && !detailedLayout ? (
-                  <View
-                    style={[
-                      styles.optionTrailingSpacerCompact,
-                      denseCompact
-                        ? styles.optionTrailingSpacerCompactDense
-                        : null,
-                    ]}
-                  />
+                  <View style={styles.optionTrailingSpacerCompact} />
                 ) : null}
               </View>
             </View>
@@ -392,6 +403,385 @@ export function ResponseModeToggle({
         );
       })}
     </View>
+  );
+}
+
+function ResponseModeOverflowSelector({
+  compact,
+  modes,
+  onSelect,
+  readyModes,
+  selected,
+}: {
+  compact: boolean;
+  modes: ResponseModeSelections;
+  onSelect: (mode: ResponseMode) => void;
+  readyModes: ResponseMode[];
+  selected: ResponseMode;
+}) {
+  const { colors } = useTheme();
+  const { language, t } = useLocalization();
+  const { height } = useWindowDimensions();
+  const [open, setOpen] = React.useState(false);
+  const backdropOpacity = React.useRef(new Animated.Value(0)).current;
+  const sheetTranslateY = React.useRef(new Animated.Value(height)).current;
+  const activeMode =
+    modes.find(({ id }) => id === selected) ?? modes[0];
+
+  React.useEffect(() => {
+    if (!open) {
+      return;
+    }
+
+    const entranceAnimation = Animated.parallel([
+      Animated.timing(backdropOpacity, {
+        toValue: 1,
+        duration: 180,
+        easing: Easing.out(Easing.cubic),
+        useNativeDriver: true,
+      }),
+      Animated.timing(sheetTranslateY, {
+        toValue: 0,
+        duration: 260,
+        easing: Easing.out(Easing.cubic),
+        useNativeDriver: true,
+      }),
+    ]);
+
+    entranceAnimation.start();
+
+    return () => entranceAnimation.stop();
+  }, [backdropOpacity, open, sheetTranslateY]);
+
+  const openSheet = React.useCallback(() => {
+    backdropOpacity.stopAnimation();
+    sheetTranslateY.stopAnimation();
+    backdropOpacity.setValue(0);
+    sheetTranslateY.setValue(height);
+    setOpen(true);
+  }, [backdropOpacity, height, sheetTranslateY]);
+
+  const closeSheet = React.useCallback(() => {
+    backdropOpacity.stopAnimation();
+    sheetTranslateY.stopAnimation();
+
+    Animated.parallel([
+      Animated.timing(backdropOpacity, {
+        toValue: 0,
+        duration: 140,
+        easing: Easing.in(Easing.cubic),
+        useNativeDriver: true,
+      }),
+      Animated.timing(sheetTranslateY, {
+        toValue: height,
+        duration: 220,
+        easing: Easing.in(Easing.cubic),
+        useNativeDriver: true,
+      }),
+    ]).start(({ finished }) => {
+      if (finished) {
+        setOpen(false);
+      }
+    });
+  }, [backdropOpacity, height, sheetTranslateY]);
+
+  if (!activeMode) {
+    return null;
+  }
+
+  const activeModelLabel = getProviderModelName(
+    activeMode.route.provider,
+    activeMode.route.model,
+  );
+  const activeCompactLabel = getResponseModeCardModelLabels(
+    activeMode.route.provider,
+    activeModelLabel,
+  );
+  const activeEffortLabel =
+    getResponseModeRouteEffortLabel(activeMode.route, language) ?? t("fixed");
+
+  return (
+    <>
+      <Pressable
+        testID="response-mode-overflow-selector"
+        accessibilityLabel={`${t("chooseResponseModel")}. ${activeModelLabel}`}
+        accessibilityRole="button"
+        onPress={openSheet}
+        style={[
+          styles.overflowSelector,
+          compact ? styles.overflowSelectorCompact : null,
+          {
+            backgroundColor: colors.surfaceElevated,
+            borderColor: colors.inactiveControlBorder,
+          },
+        ]}
+      >
+        <View
+          style={[
+            styles.overflowSelectorProvider,
+            compact ? styles.overflowSelectorProviderCompact : null,
+          ]}
+        >
+          <ProviderIcon
+            provider={activeMode.route.provider}
+            color={colors.textSecondary}
+            size={compact ? 36 : 42}
+          />
+        </View>
+        <View style={styles.overflowSelectorModel}>
+          <Text
+            style={[
+              styles.modelFamily,
+              styles.modelFamilySingle,
+              { color: colors.textSecondary },
+            ]}
+            numberOfLines={1}
+            ellipsizeMode="tail"
+          >
+            {activeCompactLabel.family}
+          </Text>
+          <Text
+            style={[
+              styles.modelText,
+              styles.modelTextDetailedPortraitSingle,
+              styles.overflowSelectorModelName,
+              compact ? styles.overflowSelectorModelNameCompact : null,
+              { color: colors.text },
+            ]}
+            numberOfLines={1}
+            ellipsizeMode="tail"
+          >
+            {activeCompactLabel.name}
+          </Text>
+        </View>
+        <View
+          style={[
+            styles.overflowSelectorEffort,
+            compact ? styles.overflowSelectorEffortCompact : null,
+          ]}
+        >
+          <Text
+            style={[
+              styles.modelEffortSingleLabel,
+              { color: colors.textSecondary },
+            ]}
+            numberOfLines={1}
+          >
+            {t("effort")}
+          </Text>
+          <Text
+            style={[
+              styles.modelEffortSingleValue,
+              { color: colors.textSecondary },
+            ]}
+            numberOfLines={1}
+            ellipsizeMode="tail"
+          >
+            {activeEffortLabel}
+          </Text>
+        </View>
+        <Feather
+          name="chevron-down"
+          size={compact ? 17 : 18}
+          color={colors.textSecondary}
+        />
+      </Pressable>
+
+      <Modal
+        visible={open}
+        transparent
+        animationType="none"
+        supportedOrientations={APP_MODAL_ORIENTATIONS}
+        statusBarTranslucent
+        onRequestClose={closeSheet}
+      >
+        <View style={styles.overflowModalRoot}>
+          <Animated.View
+            testID="response-mode-overflow-backdrop-motion"
+            style={[
+              styles.overflowBackdrop,
+              {
+                backgroundColor: colors.overlay,
+                opacity: backdropOpacity,
+              },
+            ]}
+          >
+            <Pressable
+              testID="response-mode-overflow-backdrop"
+              accessibilityLabel={t("dismiss")}
+              accessibilityRole="button"
+              onPress={closeSheet}
+              style={StyleSheet.absoluteFill}
+            />
+          </Animated.View>
+          <Animated.View
+            testID="response-mode-overflow-sheet-motion"
+            style={[
+              styles.overflowSheetMotion,
+              compact ? styles.overflowSheetMotionCompact : null,
+              {
+                transform: [{ translateY: sheetTranslateY }],
+              },
+            ]}
+          >
+            <SafeAreaView
+              testID="response-mode-overflow-sheet"
+              edges={["bottom"]}
+              accessibilityViewIsModal
+              style={[
+                styles.overflowSheet,
+                {
+                  backgroundColor: colors.surface,
+                  borderColor: colors.border,
+                  shadowColor: colors.glow,
+                },
+              ]}
+            >
+              <View
+                style={[
+                  styles.overflowSheetHandle,
+                  { backgroundColor: colors.borderStrong },
+                ]}
+              />
+              <View style={styles.overflowSheetHeader}>
+                <View style={styles.overflowSheetHeaderCopy}>
+                  <Text
+                    accessibilityRole="header"
+                    style={[styles.overflowSheetTitle, { color: colors.text }]}
+                  >
+                    {t("chooseResponseModel")}
+                  </Text>
+                  <Text
+                    style={[
+                      styles.overflowSheetSubtitle,
+                      { color: colors.textSecondary },
+                    ]}
+                  >
+                    {t("responseModelCount", { count: modes.length })}
+                  </Text>
+                </View>
+                <Pressable
+                  testID="response-mode-overflow-close"
+                  accessibilityLabel={t("dismiss")}
+                  accessibilityRole="button"
+                  hitSlop={10}
+                  onPress={closeSheet}
+                  style={styles.overflowSheetClose}
+                >
+                  <Feather name="x" size={20} color={colors.textSecondary} />
+                </Pressable>
+              </View>
+
+              <FlatList
+                testID="response-mode-overflow-list"
+                data={modes}
+                keyExtractor={({ id }) => id}
+                style={styles.overflowList}
+                contentContainerStyle={styles.overflowListContent}
+                showsVerticalScrollIndicator={false}
+                renderItem={({ item }) => {
+                  const active = item.id === selected;
+                  const ready = readyModes.includes(item.id);
+                  const modelLabel = getProviderModelName(
+                    item.route.provider,
+                    item.route.model,
+                  );
+                  const effortLabel =
+                    getResponseModeRouteEffortLabel(item.route, language) ??
+                    t("fixed");
+
+                  return (
+                    <Pressable
+                      testID={`response-mode-overflow-option-${item.id}`}
+                      accessibilityLabel={`${t("useResponseMode", {
+                        mode: `${PROVIDER_LABELS[item.route.provider]}. ${modelLabel}`,
+                      })}`}
+                      accessibilityRole="button"
+                      accessibilityState={{
+                        disabled: !ready,
+                        selected: active,
+                      }}
+                      disabled={!ready}
+                      onPress={() => {
+                        onSelect(item.id);
+                        closeSheet();
+                      }}
+                      style={[
+                        styles.overflowOption,
+                        {
+                          backgroundColor: active
+                            ? colors.accentSoft
+                            : colors.surfaceElevated,
+                          borderColor: active
+                            ? colors.accent
+                            : colors.border,
+                          opacity: ready ? 1 : 0.5,
+                        },
+                      ]}
+                    >
+                      <View style={styles.overflowOptionProvider}>
+                        <ProviderIcon
+                          provider={item.route.provider}
+                          color={
+                            active ? colors.accent : colors.textSecondary
+                          }
+                          size={30}
+                        />
+                      </View>
+                      <View style={styles.overflowOptionModel}>
+                        <Text
+                          style={[
+                            styles.overflowOptionProviderLabel,
+                            { color: colors.textSecondary },
+                          ]}
+                        >
+                          {PROVIDER_LABELS[item.route.provider]}
+                        </Text>
+                        <Text
+                          style={[
+                            styles.overflowOptionModelName,
+                            { color: colors.text },
+                          ]}
+                        >
+                          {modelLabel}
+                        </Text>
+                      </View>
+                      <View style={styles.overflowOptionEffort}>
+                        <Text
+                          style={[
+                            styles.modelEffortSingleLabel,
+                            { color: colors.textSecondary },
+                          ]}
+                        >
+                          {t("effort")}
+                        </Text>
+                        <Text
+                          style={[
+                            styles.modelEffortSingleValue,
+                            { color: colors.textSecondary },
+                          ]}
+                        >
+                          {effortLabel}
+                        </Text>
+                      </View>
+                      <View style={styles.overflowOptionCheck}>
+                        {active ? (
+                          <Feather
+                            name="check"
+                            size={19}
+                            color={colors.accent}
+                          />
+                        ) : null}
+                      </View>
+                    </Pressable>
+                  );
+                }}
+              />
+            </SafeAreaView>
+          </Animated.View>
+        </View>
+      </Modal>
+    </>
   );
 }
 
@@ -403,9 +793,6 @@ const styles = StyleSheet.create({
   containerCompact: {
     flexDirection: "column",
     gap: 5,
-  },
-  containerCompactDense: {
-    gap: 4,
   },
   option: {
     minHeight: 82,
@@ -423,9 +810,6 @@ const styles = StyleSheet.create({
   },
   optionDetailedPortrait: {
     minHeight: 82,
-  },
-  optionCompactDense: {
-    minHeight: 40,
   },
   optionCompactStack: {
     width: "100%",
@@ -457,11 +841,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 9,
   },
-  optionInnerCompactDense: {
-    minHeight: 40,
-    paddingHorizontal: 8,
-    paddingVertical: 3,
-  },
   optionInnerSingle: {
     minHeight: 80,
   },
@@ -487,7 +866,7 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   optionContentDetailedPortraitSingle: {
-    justifyContent: "center",
+    justifyContent: "flex-start",
   },
   optionContentThreeCardOneLine: {
     justifyContent: "space-evenly",
@@ -513,17 +892,10 @@ const styles = StyleSheet.create({
   providerRowDetailedPortraitSingle: {
     width: 48,
     minHeight: 42,
-    position: "absolute",
-    left: 0,
-    top: 0,
-    bottom: 0,
+    flexShrink: 0,
   },
   providerRowThreeCardOneLine: {
     minHeight: 32,
-  },
-  providerRowCompactDense: {
-    width: 28,
-    minHeight: 22,
   },
   modelTextSlot: {
     height: 30,
@@ -562,10 +934,10 @@ const styles = StyleSheet.create({
     gap: 1,
   },
   modelDetailsSingle: {
-    flex: 0,
+    flex: 1,
     flexShrink: 1,
     maxWidth: 240,
-    alignItems: "center",
+    alignItems: "flex-start",
   },
   modelFamily: {
     fontSize: 10,
@@ -587,12 +959,12 @@ const styles = StyleSheet.create({
     textAlign: "left",
   },
   modelTextDetailedPortraitSingle: {
-    width: "auto",
+    width: "100%",
     maxWidth: "100%",
     fontSize: 16,
     lineHeight: 21,
     fontFamily: fonts.displayHeavy,
-    textAlign: "center",
+    textAlign: "left",
   },
   modelEffort: {
     fontSize: 10,
@@ -600,11 +972,11 @@ const styles = StyleSheet.create({
     fontFamily: fonts.body,
   },
   modelEffortSingleSlot: {
-    position: "absolute",
-    right: 3,
-    top: 0,
-    bottom: 0,
-    width: 112,
+    width: 64,
+    flexShrink: 0,
+    alignSelf: "stretch",
+    marginLeft: 6,
+    marginRight: 3,
     alignItems: "flex-end",
     justifyContent: "center",
   },
@@ -634,7 +1006,179 @@ const styles = StyleSheet.create({
     width: 32,
     flexShrink: 0,
   },
-  optionTrailingSpacerCompactDense: {
-    width: 28,
+  overflowSelector: {
+    width: "100%",
+    minHeight: 80,
+    borderRadius: 12,
+    borderWidth: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+    paddingHorizontal: 12,
+    paddingVertical: 9,
+    overflow: "hidden",
+  },
+  overflowSelectorCompact: {
+    minHeight: 68,
+    gap: 6,
+    paddingHorizontal: 10,
+    paddingVertical: 8,
+  },
+  overflowSelectorProvider: {
+    width: 48,
+    minHeight: 42,
+    flexShrink: 0,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  overflowSelectorProviderCompact: {
+    width: 40,
+    minHeight: 36,
+  },
+  overflowSelectorModel: {
+    flex: 1,
+    minWidth: 0,
+    alignItems: "flex-start",
+    justifyContent: "center",
+  },
+  overflowSelectorModelName: {
+    width: "100%",
+  },
+  overflowSelectorModelNameCompact: {
+    fontSize: 15,
+    lineHeight: 20,
+  },
+  overflowSelectorEffort: {
+    width: 56,
+    flexShrink: 0,
+    alignItems: "flex-end",
+    justifyContent: "center",
+  },
+  overflowSelectorEffortCompact: {
+    width: 48,
+  },
+  overflowModalRoot: {
+    flex: 1,
+    justifyContent: "flex-end",
+  },
+  overflowBackdrop: {
+    ...StyleSheet.absoluteFillObject,
+  },
+  overflowSheetMotion: {
+    width: "100%",
+    maxWidth: 680,
+    maxHeight: "78%",
+    alignSelf: "center",
+  },
+  overflowSheetMotionCompact: {
+    maxHeight: "88%",
+  },
+  overflowSheet: {
+    width: "100%",
+    flexShrink: 1,
+    borderTopLeftRadius: 22,
+    borderTopRightRadius: 22,
+    borderWidth: 1,
+    borderBottomWidth: 0,
+    paddingTop: 8,
+    shadowOffset: { width: 0, height: -10 },
+    shadowOpacity: 0.14,
+    shadowRadius: 24,
+    elevation: 18,
+    overflow: "hidden",
+  },
+  overflowSheetHandle: {
+    width: 38,
+    height: 4,
+    borderRadius: 2,
+    alignSelf: "center",
+    opacity: 0.72,
+  },
+  overflowSheetHeader: {
+    minHeight: 70,
+    paddingHorizontal: 18,
+    paddingVertical: 12,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: 16,
+  },
+  overflowSheetHeaderCopy: {
+    flex: 1,
+    minWidth: 0,
+    gap: 2,
+  },
+  overflowSheetTitle: {
+    fontSize: 19,
+    lineHeight: 24,
+    fontFamily: fonts.displayHeavy,
+  },
+  overflowSheetSubtitle: {
+    fontSize: 12,
+    lineHeight: 16,
+    fontFamily: fonts.body,
+  },
+  overflowSheetClose: {
+    width: 40,
+    height: 40,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  overflowList: {
+    flexGrow: 0,
+    flexShrink: 1,
+  },
+  overflowListContent: {
+    gap: 8,
+    paddingHorizontal: 12,
+    paddingBottom: 24,
+  },
+  overflowOption: {
+    width: "100%",
+    minHeight: 72,
+    borderRadius: 14,
+    borderWidth: 1,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+  },
+  overflowOptionProvider: {
+    width: 34,
+    minHeight: 30,
+    flexShrink: 0,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  overflowOptionModel: {
+    flex: 1,
+    minWidth: 0,
+    gap: 1,
+  },
+  overflowOptionProviderLabel: {
+    fontSize: 9,
+    lineHeight: 12,
+    fontFamily: fonts.body,
+    fontWeight: "600",
+    letterSpacing: 0.7,
+    textTransform: "uppercase",
+  },
+  overflowOptionModelName: {
+    fontSize: 14,
+    lineHeight: 19,
+    fontFamily: fonts.display,
+  },
+  overflowOptionEffort: {
+    width: 68,
+    flexShrink: 0,
+    alignItems: "flex-end",
+    justifyContent: "center",
+  },
+  overflowOptionCheck: {
+    width: 20,
+    flexShrink: 0,
+    alignItems: "center",
+    justifyContent: "center",
   },
 });
