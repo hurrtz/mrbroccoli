@@ -52,6 +52,7 @@ export const en: TranslationDictionary = {
   model: "Model",
   effort: "Effort",
   effortValue: ({ effort }) => `Effort: ${effort}`,
+  fixed: "Fixed",
   english: "English",
   german: "German",
   light: "Light",
