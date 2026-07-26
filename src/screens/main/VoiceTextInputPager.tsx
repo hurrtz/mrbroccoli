@@ -692,7 +692,7 @@ const localStyles = StyleSheet.create({
     textAlign: "center",
   },
   pageIndicatorTarget: {
-    width: 28,
+    width: 18,
     height: 18,
     alignItems: "center",
     justifyContent: "center",

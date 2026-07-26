@@ -145,6 +145,12 @@ describe("MainScreenVoiceStage composer", () => {
     expect(
       screen.getByLabelText("Show voice input").props.accessibilityState,
     ).toEqual({ disabled: false, selected: true });
+    expect(
+      StyleSheet.flatten(screen.getByLabelText("Show voice input").props.style),
+    ).toEqual(expect.objectContaining({ width: 18 }));
+    expect(
+      StyleSheet.flatten(screen.getByLabelText("Show text input").props.style),
+    ).toEqual(expect.objectContaining({ width: 18 }));
 
     fireEvent.press(screen.getByTestId("voice-input-surface"));
     expect(onPress).toHaveBeenCalledTimes(1);
