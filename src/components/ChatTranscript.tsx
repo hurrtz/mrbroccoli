@@ -288,17 +288,12 @@ export function ChatTranscript({
       ]}
       ListEmptyComponent={
         <View style={styles.emptyCard}>
-          <View
-            style={[
-              styles.emptyIcon,
-              {
-                backgroundColor: colors.accentSoft,
-                borderColor: colors.border,
-              },
-            ]}
-          >
-            <Feather name="mic" size={18} color={colors.accent} />
-          </View>
+          <Feather
+            testID="empty-transcript-icon"
+            name="info"
+            size={22}
+            color={colors.textSecondary}
+          />
           <Text style={[styles.emptyTitle, { color: colors.text }]}>
             {resolvedEmptyTitle}
           </Text>
@@ -344,14 +339,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: 12,
     marginVertical: 8,
-  },
-  emptyIcon: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    alignItems: "center",
-    justifyContent: "center",
-    borderWidth: 1,
   },
   emptyTitle: {
     fontSize: 17,

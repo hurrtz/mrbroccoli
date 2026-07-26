@@ -1,6 +1,6 @@
 import React from "react";
 import { fireEvent, render } from "@testing-library/react-native";
-import { FlatList } from "react-native";
+import { FlatList, StyleSheet } from "react-native";
 
 import {
   ChatTranscript,
@@ -9,10 +9,7 @@ import {
 import { Message } from "../../src/types";
 import { LocalizationProvider } from "../../src/i18n";
 import { ThemeProvider } from "../../src/theme/ThemeContext";
-
-jest.mock("@expo/vector-icons", () => ({
-  Feather: () => null,
-}));
+import { lightColors } from "../../src/theme/colors";
 
 jest.mock("../../src/components/ChatBubble", () => ({
   ChatBubble: ({ message }: { message: Message }) => {
@@ -38,6 +35,28 @@ const scrollEvent = (offsetY: number) => ({
 });
 
 describe("ChatTranscript follow-tail scrolling", () => {
+  it("renders a passive information icon for an empty transcript", () => {
+    const screen = render(
+      <ThemeProvider mode="light">
+        <LocalizationProvider language="en">
+          <ChatTranscript messages={[]} />
+        </LocalizationProvider>
+      </ThemeProvider>,
+    );
+
+    expect(
+      StyleSheet.flatten(
+        screen.getByTestId("empty-transcript-icon").props.style,
+      ),
+    ).toEqual({
+      color: lightColors.textSecondary,
+      fontSize: 22,
+    });
+    expect(screen.getByTestId("empty-transcript-icon").props.children).toBe(
+      "icon:info",
+    );
+  });
+
   it("calculates the distance from the visible viewport to the tail", () => {
     expect(getTranscriptDistanceFromBottom(scrollEvent(250).nativeEvent)).toBe(
       350,

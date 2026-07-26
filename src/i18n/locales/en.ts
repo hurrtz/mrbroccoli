@@ -509,10 +509,10 @@ export const en: TranslationDictionary = {
   threadTitle: "Thread title",
   noTranscriptYet: "No transcript yet",
   previewTranscriptEmptyDescription:
-    "Speak or type below. Your conversation will appear here.",
+    "Use voice or text to begin. Your conversation will appear here.",
   noConversationYet: "No conversation yet",
   expandedTranscriptEmptyDescription:
-    "Speak with the control above, or type below. Close this screen when you want to return to the main stage.",
+    "Use voice or text to begin. Close this screen when you want to return to the main stage.",
   transcriptSelectionHint:
     "Select any message text directly, or share and copy individual messages below.",
   textMessagePlaceholder: "Type a message",
@@ -590,7 +590,7 @@ export const en: TranslationDictionary = {
   idle: "Idle",
   yourConversationAppearsHere: "Your conversation appears here",
   defaultTranscriptEmptyDescription:
-    "Speak or type below. Mr Broccoli will keep the thread and respond here.",
+    "Use voice or text to begin. Mr Broccoli will keep the thread and respond here.",
   delete: "Delete",
   deleteConversationConfirmationTitle: ({ title }) => `Delete “${title}”?`,
   deleteConversationConfirmationMessage:
