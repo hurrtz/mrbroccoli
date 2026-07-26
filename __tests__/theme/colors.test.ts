@@ -32,21 +32,31 @@ function contrastRatio(firstColor: string, secondColor: string) {
 describe("theme colors", () => {
   it("uses the dedicated light palette", () => {
     expect(lightColors).toMatchObject({
-      accent: "#32894D",
+      background: "#FCFBF8",
+      surface: "#FFFFFF",
+      text: "#1A1D24",
+      textSecondary: "#5D6B7A",
+      accent: "#44A055",
+      bubbleUser: "#44A055",
       success: "#059669",
       danger: "#DC2626",
-      phaseRecordingTrack: "#32894D",
-      phaseTranscribing: "#0F766E",
-      phaseThinkingBriefly: "#2563EB",
-      phaseSearching: "#7C3AED",
-      phaseThinking: "#C026D3",
-      phaseSynthesizing: "#65A30D",
+      dangerFill: "#DC2626",
+      phaseRecordingTrack: "#44A055",
+      phaseTranscribing: "#47BD9A",
+      phaseThinkingBriefly: "#4DA6FF",
+      phaseSearching: "#8B5CF6",
+      phaseThinking: "#6D28D9",
+      phaseSynthesizing: "#B5E61D",
       phaseSpeaking: "#059669",
     });
   });
 
   it("uses the dedicated dark palette", () => {
     expect(darkColors).toMatchObject({
+      background: "#16181D",
+      surface: "#1D2025",
+      text: "#EDF1F5",
+      textSecondary: "#8B97A8",
       accent: "#5DC17D",
       success: "#10B981",
       danger: "#F87171",
@@ -59,6 +69,36 @@ describe("theme colors", () => {
       phaseSpeaking: "#10B981",
     });
   });
+
+  it.each([
+    [
+      "light primary text",
+      lightColors.background,
+      lightColors.text,
+    ],
+    [
+      "light secondary text",
+      lightColors.background,
+      lightColors.textSecondary,
+    ],
+    [
+      "dark primary text",
+      darkColors.background,
+      darkColors.text,
+    ],
+    [
+      "dark secondary text",
+      darkColors.background,
+      darkColors.textSecondary,
+    ],
+  ])(
+    "keeps %s readable against the main background",
+    (_role, background, foreground) => {
+      expect(contrastRatio(background, foreground)).toBeGreaterThanOrEqual(
+        4.5,
+      );
+    },
+  );
 
   it.each([
     ["light", lightColors],
