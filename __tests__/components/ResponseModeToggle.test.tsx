@@ -54,7 +54,22 @@ describe("ResponseModeToggle", () => {
       StyleSheet.flatten(
         screen.getByTestId("response-mode-option-mode-2").props.style,
       ).backgroundColor,
-    ).toBe(lightColors.bubbleUser);
+    ).toBe(lightColors.activeControl);
+    expect(
+      StyleSheet.flatten(
+        screen.getByTestId("response-mode-model-mode-2").props.style,
+      ).color,
+    ).toBe(lightColors.onActiveControl);
+    expect(
+      StyleSheet.flatten(
+        screen.getByTestId("response-mode-option-mode-3").props.style,
+      ).backgroundColor,
+    ).toBe(lightColors.surfaceElevated);
+    expect(
+      StyleSheet.flatten(
+        screen.getByTestId("response-mode-model-mode-3").props.style,
+      ).color,
+    ).toBe(lightColors.textSecondary);
     expect(
       screen.queryByTestId("response-mode-option-gradient-mode-2"),
     ).toBeNull();
@@ -105,6 +120,37 @@ describe("ResponseModeToggle", () => {
     expect(wrapperStyle.padding).toBeUndefined();
     expect(wrapperStyle.shadowOpacity).toBeUndefined();
     expect(wrapperStyle.elevation).toBeUndefined();
+  });
+
+  it("uses harmonious dark active content and a quiet inactive border", () => {
+    const screen = renderWithProviders(
+      <ResponseModeToggle
+        selected="mode-1"
+        onSelect={jest.fn()}
+        modes={[
+          {
+            id: "mode-1",
+            route: { provider: "gemini", model: "gemini-3.6-flash" },
+          },
+          {
+            id: "mode-2",
+            route: { provider: "gemini", model: "gemini-3.1-pro-preview" },
+          },
+        ]}
+      />,
+      { themeMode: "dark" },
+    );
+
+    expect(
+      StyleSheet.flatten(
+        screen.getByTestId("response-mode-model-mode-1").props.style,
+      ).color,
+    ).toBe("#16181D");
+    expect(
+      StyleSheet.flatten(
+        screen.getByTestId("response-mode-option-mode-2").props.style,
+      ).borderColor,
+    ).toBe("#2A2F37");
   });
 
   it("keeps four portrait model cards visible in one non-scrolling row", () => {

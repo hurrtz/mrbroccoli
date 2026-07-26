@@ -341,25 +341,28 @@ export function VoiceTextInputPager({
                   {
                     backgroundColor: disabled
                       ? colors.surfaceAlt
-                      : colors.bubbleUser,
-                    borderColor: disabled ? colors.border : colors.bubbleUser,
+                      : colors.activeControl,
+                    borderColor: disabled ? colors.border : colors.activeControl,
                   },
                 ]}
               >
                 <View
+                  testID="voice-input-icon"
                   style={[
                     localStyles.voiceIcon,
                     {
                       backgroundColor: disabled
                         ? colors.surfaceElevated
-                        : colors.onPrimary,
+                        : colors.activeControlIconBackground,
                     },
                   ]}
                 >
                   <Feather
                     name="mic"
                     size={22}
-                    color={disabled ? colors.textMuted : colors.accent}
+                    color={
+                      disabled ? colors.textMuted : colors.activeControlIcon
+                    }
                   />
                 </View>
               </GestureTouchableOpacity>

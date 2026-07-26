@@ -4,13 +4,13 @@ import { Keyboard, StyleSheet } from "react-native";
 
 import { MainScreenVoiceStage } from "../../../src/screens/main/MainScreenVoiceStage";
 import { TranslateFn } from "../../../src/screens/main/shared";
-import { lightColors } from "../../../src/theme/colors";
+import { darkColors, lightColors } from "../../../src/theme/colors";
 
 jest.mock("@expo/vector-icons", () => ({
-  Feather: ({ name }: { name: string }) => {
+  Feather: ({ color, name }: { color?: string; name: string }) => {
     const React = require("react");
     const { Text } = require("react-native");
-    return React.createElement(Text, null, `icon:${name}`);
+    return React.createElement(Text, { style: { color } }, `icon:${name}`);
   },
 }));
 
@@ -137,11 +137,18 @@ describe("MainScreenVoiceStage composer", () => {
       StyleSheet.flatten(screen.getByTestId("voice-input-surface").props.style),
     ).toEqual(
       expect.objectContaining({
-        backgroundColor: lightColors.bubbleUser,
+        backgroundColor: lightColors.activeControl,
         minHeight: 68,
         width: "100%",
       }),
     );
+    expect(
+      StyleSheet.flatten(screen.getByText("icon:mic").props.style).color,
+    ).toBe(lightColors.activeControlIcon);
+    expect(
+      StyleSheet.flatten(screen.getByTestId("voice-input-icon").props.style)
+        .backgroundColor,
+    ).toBe(lightColors.activeControlIconBackground);
     expect(
       screen.getByLabelText("Show voice input").props.accessibilityState,
     ).toEqual({ disabled: false, selected: true });
@@ -154,6 +161,24 @@ describe("MainScreenVoiceStage composer", () => {
 
     fireEvent.press(screen.getByTestId("voice-input-surface"));
     expect(onPress).toHaveBeenCalledTimes(1);
+  });
+
+  it("preserves the dark-mode voice control treatment", () => {
+    const screen = render(
+      <MainScreenVoiceStage {...createProps({ colors: darkColors })} />,
+    );
+
+    expect(
+      StyleSheet.flatten(screen.getByTestId("voice-input-surface").props.style)
+        .backgroundColor,
+    ).toBe(darkColors.activeControl);
+    expect(
+      StyleSheet.flatten(screen.getByText("icon:mic").props.style).color,
+    ).toBe(darkColors.activeControlIcon);
+    expect(
+      StyleSheet.flatten(screen.getByTestId("voice-input-icon").props.style)
+        .backgroundColor,
+    ).toBe(darkColors.activeControlIconBackground);
   });
 
   it("moves to a visually separate full-width text composer", () => {

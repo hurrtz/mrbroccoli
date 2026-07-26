@@ -37,6 +37,11 @@ describe("theme colors", () => {
       text: "#1A1D24",
       textSecondary: "#5D6B7A",
       accent: "#44A055",
+      activeControl: "#378445",
+      onActiveControl: "#FFFFFF",
+      activeControlIcon: "#FFFFFF",
+      activeControlIconBackground: "#FFFFFF1F",
+      inactiveControlBorder: "#D9D7D1",
       bubbleUser: "#44A055",
       success: "#059669",
       danger: "#DC2626",
@@ -58,6 +63,11 @@ describe("theme colors", () => {
       text: "#EDF1F5",
       textSecondary: "#8B97A8",
       accent: "#5DC17D",
+      activeControl: "#5DC17D",
+      onActiveControl: "#16181D",
+      activeControlIcon: "#16181D",
+      activeControlIconBackground: "#16181D1F",
+      inactiveControlBorder: "#2A2F37",
       success: "#10B981",
       danger: "#F87171",
       phaseRecordingTrack: "#5DC17D",
@@ -125,6 +135,8 @@ describe("theme colors", () => {
   });
 
   it.each([
+    [lightColors.activeControl, lightColors.onActiveControl],
+    [darkColors.activeControl, darkColors.onActiveControl],
     [lightColors.bubbleUser, lightColors.onPrimary],
     [darkColors.bubbleUser, darkColors.onPrimary],
     [lightColors.dangerFill, lightColors.onDanger],

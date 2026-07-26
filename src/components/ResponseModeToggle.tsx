@@ -41,7 +41,7 @@ export function ResponseModeToggle({
         const active = id === selected;
         const highlighted = active && !singleMode;
         const ready = readyModes.includes(id);
-        const activeForeground = colors.onPrimary;
+        const activeForeground = colors.onActiveControl;
         const providerLabel = PROVIDER_LABELS[route.provider];
         const modelLabel = getProviderModelName(route.provider, route.model);
         const accessibilityRouteLabel = `${providerLabel}. ${modelLabel}`;
@@ -59,12 +59,12 @@ export function ResponseModeToggle({
               !ready ? styles.optionDisabled : null,
               highlighted
                 ? {
-                    backgroundColor: colors.bubbleUser,
-                    borderColor: colors.bubbleUser,
+                    backgroundColor: colors.activeControl,
+                    borderColor: colors.activeControl,
                   }
                 : {
                     backgroundColor: colors.surfaceElevated,
-                    borderColor: colors.border,
+                    borderColor: colors.inactiveControlBorder,
                   },
             ]}
             disabled={!ready || singleMode}
