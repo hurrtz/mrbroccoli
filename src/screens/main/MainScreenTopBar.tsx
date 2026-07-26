@@ -7,6 +7,7 @@ import { Colors } from "../../theme/colors";
 import { fonts } from "../../theme/typography";
 
 interface MainScreenTopBarProps {
+  brandName: string;
   colors: Colors;
   compact?: boolean;
   debugLogActive?: boolean;
@@ -19,6 +20,7 @@ interface MainScreenTopBarProps {
 }
 
 export const MainScreenTopBar = React.memo(function MainScreenTopBar({
+  brandName,
   colors,
   compact = false,
   debugLogActive = false,
@@ -62,13 +64,13 @@ export const MainScreenTopBar = React.memo(function MainScreenTopBar({
             ]}
           >
             <Text style={[styles.compactBrandText, { color: colors.text }]}>
-              Mr Broccoli
+              {brandName}
             </Text>
           </View>
         ) : (
           <View style={styles.wordmark}>
             <Text style={[styles.wordmarkText, { color: colors.text }]}>
-              Mr Broccoli
+              {brandName}
             </Text>
           </View>
         )}

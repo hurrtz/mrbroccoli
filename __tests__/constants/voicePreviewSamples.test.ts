@@ -1,4 +1,5 @@
 import {
+  LOCAL_PREVIEW_SAMPLE_TEXT_BY_LANGUAGE,
   PROVIDER_PREVIEW_SAMPLE_TEXT_BY_LANGUAGE,
   getNativePreviewSampleText,
 } from "../../src/constants/voicePreviewSamples";
@@ -11,6 +12,10 @@ describe("voice preview samples", () => {
     expect(PROVIDER_PREVIEW_SAMPLE_TEXT_BY_LANGUAGE.de).toContain(
       "zwölf frische Brötchen",
     );
+    expect(PROVIDER_PREVIEW_SAMPLE_TEXT_BY_LANGUAGE.de).toContain(
+      "Mr. Brokkoli",
+    );
+    expect(LOCAL_PREVIEW_SAMPLE_TEXT_BY_LANGUAGE.de).toContain("Mr. Brokkoli");
   });
 
   it("uses proper German umlauts and eszett in every German preview", () => {

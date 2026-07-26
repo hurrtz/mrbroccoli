@@ -109,6 +109,7 @@ function getStatusMeta(
 function ProviderAboutAccordion({ provider }: { provider: Provider }) {
   const { colors } = useTheme();
   const { t } = useLocalization();
+  const appName = t("appName");
   const [open, setOpen] = React.useState(false);
   const catalogEntry = getCatalogProviderEntry(
     getCatalogProviderIdForAppProvider(provider),
@@ -135,7 +136,9 @@ function ProviderAboutAccordion({ provider }: { provider: Provider }) {
           summary: catalogEntry.provider.summaries.region,
         })
       : null,
-  ].filter(Boolean) as string[];
+  ]
+    .filter(Boolean)
+    .map((line) => String(line).replaceAll("Mr Broccoli", appName));
   const activeModels = [
     catalogEntry.provider.summaries.activeModels.llm
       ? `LLM: ${catalogEntry.provider.summaries.activeModels.llm}`

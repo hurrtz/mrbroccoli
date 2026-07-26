@@ -1,6 +1,7 @@
 import type { TranslationDictionary } from "../types";
 
 export const de: TranslationDictionary = {
+  appName: "Mr. Brokkoli",
   retry: "Noch mal",
   dismiss: "Schließen",
   unavailable: "Gibt's nich",
@@ -296,7 +297,7 @@ export const de: TranslationDictionary = {
     "Nutze den ausgewählten konfigurierten Dienst für die Sprachausgabe.",
   ttsFallbackRoutes: "Ausweichrouten",
   ttsFallbackRoutesHint:
-    "Optional. Füge nur gewünschte Routen hinzu und ordne sie in der gewünschten Reihenfolge. Sobald eine Route spricht, bleibt Mr Broccoli für den Rest der Antwort bei ihr.",
+    "Optional. Füge nur gewünschte Routen hinzu und ordne sie in der gewünschten Reihenfolge. Sobald eine Route spricht, bleibt Mr. Brokkoli für den Rest der Antwort bei ihr.",
   ttsFallbackNone:
     "Keine Ausweichroute konfiguriert. Ein Stimmfehler wird stattdessen angezeigt.",
   ttsFallbackPosition: ({ position, route }) => `${position}. ${route}`,
@@ -331,7 +332,7 @@ export const de: TranslationDictionary = {
   elevenLabsVoicesReadPermissionHint:
     "Aktiviere für diesen API-Key in ElevenLabs „Voices → Read“ und aktualisiere die Stimmen anschließend hier.",
   providerVoicesLoadingHint: ({ provider }) =>
-    `Mr Broccoli lädt verfügbare Stimmen automatisch von ${provider}.`,
+    `Mr. Brokkoli lädt verfügbare Stimmen automatisch von ${provider}.`,
   providerVoiceId: "Stimmen-ID",
   providerVoiceIdPlaceholder: "Stimmen-ID eingeben",
   providerVoiceIdFallbackHint:
@@ -339,7 +340,7 @@ export const de: TranslationDictionary = {
   providerVoiceIdRequired: ({ provider }) =>
     `Aktualisiere die ${provider}-Stimmenbibliothek oder gib vor der Sprachausgabe eine Stimmen-ID ein.`,
   qwenSpeechUnavailableInUs:
-    "Mr Broccolis aktuelle Qwen-Sprachrouten sind in der US-Region nicht verfügbar. Wähle für Qwen-Spracherkennung und -ausgabe Singapur oder Peking.",
+    "Mr. Brokkolis aktuelle Qwen-Sprachrouten sind in der US-Region nicht verfügbar. Wähle für Qwen-Spracherkennung und -ausgabe Singapur oder Peking.",
   qwenApiRegion: "Qwen-API-Region",
   qwenRegionSingapore: "Singapur",
   qwenRegionUs: "USA (Virginia)",
@@ -347,12 +348,12 @@ export const de: TranslationDictionary = {
   qwenRegionHint:
     "Die ausgewählte Region muss der Region entsprechen, in der dieser API-Key erstellt wurde.",
   qwenRegionUsSpeechHint:
-    "Keys aus der US-Region unterstützen hier Chat und Websuche. Mr Broccolis aktuelle Qwen-Routen für Spracherkennung und -ausgabe benötigen einen Key aus Singapur oder Peking.",
+    "Keys aus der US-Region unterstützen hier Chat und Websuche. Mr. Brokkolis aktuelle Qwen-Routen für Spracherkennung und -ausgabe benötigen einen Key aus Singapur oder Peking.",
   providerDefaultVoiceHint:
     "Dieser Anbieter nutzt aktuell seine Standardstimme für Vorschau und Sprachausgabe.",
   listenLanguages: "Sprachen",
   listenLanguagesHint:
-    "Wähle die Sprachen aus, die gut klingen sollen. Mr Broccoli probiert sie in dieser Reihenfolge für die Sprachausgabe.",
+    "Wähle die Sprachen aus, die gut klingen sollen. Mr. Brokkoli probiert sie in dieser Reihenfolge für die Sprachausgabe.",
   localVoicePacks: "Lokale Sprachpakete",
   localVoicePacksHint:
     "Jede Sprache bringt eigene Stimmen mit. Wähle zuerst eine Stimme pro Sprache aus und lade dann die Pakete herunter, die du brauchst.",
@@ -507,7 +508,7 @@ export const de: TranslationDictionary = {
   conversationActions: "Gesprächsaktionen",
   statusDetails: "Statusdetails",
   persistenceFailure:
-    "Mr Broccoli konnte Daten auf diesem Gerät nicht speichern. Lass die App offen und versuch es erneut; Änderungen könnten nach einem Neustart verloren sein.",
+    "Mr. Brokkoli konnte Daten auf diesem Gerät nicht speichern. Lass die App offen und versuch es erneut; Änderungen könnten nach einem Neustart verloren sein.",
   show: "Anzeigen",
   showTranscript: "Gespräch anzeigen",
   hide: "Ausblenden",
@@ -601,7 +602,7 @@ export const de: TranslationDictionary = {
   idle: "Bereit",
   yourConversationAppearsHere: "Hier entsteht dein Gespräch",
   defaultTranscriptEmptyDescription:
-    "Sprich oder schreibe unten. Mr Broccoli behält den Verlauf und antwortet hier.",
+    "Sprich oder schreibe unten. Mr. Brokkoli behält den Verlauf und antwortet hier.",
   delete: "Löschen",
   deleteConversationConfirmationTitle: ({ title }) => `„${title}“ löschen?`,
   deleteConversationConfirmationMessage:
@@ -612,7 +613,7 @@ export const de: TranslationDictionary = {
   newSession: "Neue Sitzung",
   noSavedConversationsYet: "Noch keine gespeicherten Gespräche",
   drawerEmptyDescription:
-    "Sprich in der Hauptansicht los. Mr Broccoli erstellt automatisch ein neues Gespräch.",
+    "Sprich in der Hauptansicht los. Mr. Brokkoli erstellt automatisch ein neues Gespräch.",
   setupGuideTitle: "App konfigurieren",
   setupGuideSubtitle:
     "Füge Zugangsdaten hinzu und wähle Routen in den Einstellungen.",
@@ -626,9 +627,9 @@ export const de: TranslationDictionary = {
     "Danach öffnen wir die Einstellungen, damit du Zugangsdaten einfügen und prüfen kannst.",
   useThisSetup: "Dieses Setup nutzen",
   notNow: "Jetzt nicht",
-  setupGuideIntroTitle: "So funktioniert Mr Broccoli",
+  setupGuideIntroTitle: "So funktioniert Mr. Brokkoli",
   setupGuideIntroBody:
-    "Mr Broccoli startet leer. Füge Zugangsdaten für externe Dienste ein, die du bereits nutzt, und wähle danach aus, wie Antworten, Spracheingabe, Sprachausgabe und optionaler Web-Kontext geroutet werden.",
+    "Mr. Brokkoli startet leer. Füge Zugangsdaten für externe Dienste ein, die du bereits nutzt, und wähle danach aus, wie Antworten, Spracheingabe, Sprachausgabe und optionaler Web-Kontext geroutet werden.",
   setupGuideIntroNote:
     "Nach der Einrichtung startest und stoppst du Gespräche über die Sprachsteuerung auf der Hauptseite. Das aktuelle Gespräch bleibt dort sichtbar, und jede Route lässt sich später in den Einstellungen ändern.",
   setupGuideProviderTitle: "Zugangsdaten hinzufügen",
@@ -661,7 +662,7 @@ export const de: TranslationDictionary = {
   setupGuideSkipKokoro: "Vorerst überspringen",
   setupGuideVoiceTestTitle: "Setup testen",
   setupGuideVoiceTestBody:
-    "Sprich einen kurzen Satz. Mr Broccoli testet Mikrofonzugriff, Transkription, die konfigurierte Antwortroute und gesprochene Ausgabe, wenn eine brauchbare Sprachroute verfügbar ist.",
+    "Sprich einen kurzen Satz. Mr. Brokkoli testet Mikrofonzugriff, Transkription, die konfigurierte Antwortroute und gesprochene Ausgabe, wenn eine brauchbare Sprachroute verfügbar ist.",
   setupGuideVoiceTestNoInputBody:
     "Spracheingabe ist mit diesem Setup nicht verfügbar. Fahr fort, um die erkannten Routen zu prüfen, und passe die Spracheinstellungen später bei Bedarf an.",
   setupGuideVoiceTestTextOnlyNote:
@@ -680,7 +681,7 @@ export const de: TranslationDictionary = {
     "Spracheingabe ist für dieses Setup auf diesem Gerät nicht verfügbar.",
   setupGuideSummaryTitle: "Setup abgeschlossen",
   setupGuideSummaryBody:
-    "Das ist die Route, die Mr Broccoli mit deiner aktuellen Konfiguration verwendet.",
+    "Das ist die Route, die Mr. Brokkoli mit deiner aktuellen Konfiguration verwendet.",
   setupGuideSummaryLlm: "LLM",
   setupGuideSummaryStt: "Sprache zu Text",
   setupGuideSummaryTts: "Text zu Sprache",
@@ -707,7 +708,7 @@ export const de: TranslationDictionary = {
     "Versuch es mit einem anderen Titel, einer anderen Route, einem Modell oder einem Satz aus dem Transkript.",
   memoryModalTitle: "Gesprächsspeicher",
   memoryModalDescription:
-    "Das ist die kompakte Zusammenfassung, die Mr Broccoli weiterträgt, sobald ein Gespräch lang genug wird und ältere Beiträge zusammengefasst werden.",
+    "Das ist die kompakte Zusammenfassung, die Mr. Brokkoli weiterträgt, sobald ein Gespräch lang genug wird und ältere Beiträge zusammengefasst werden.",
   memorySummary: "Gespeicherte Zusammenfassung",
   memorySummaryEmpty:
     "Noch kein kompakter Speicher. Sobald dieses Gespräch länger wird, werden ältere Beiträge hier zusammengefasst.",

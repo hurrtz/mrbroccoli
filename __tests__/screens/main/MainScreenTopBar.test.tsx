@@ -14,9 +14,10 @@ jest.mock("@expo/vector-icons", () => ({
 }));
 
 describe("MainScreenTopBar", () => {
-  it.each([false, true])("shows the Mr Broccoli brand when compact is %s", (compact) => {
+  it.each([false, true])("shows the localized brand when compact is %s", (compact) => {
     const screen = render(
       <MainScreenTopBar
+        brandName="Mr. Brokkoli"
         colors={lightColors}
         compact={compact}
         drawerLabel="Conversations"
@@ -27,7 +28,7 @@ describe("MainScreenTopBar", () => {
       />,
     );
 
-    expect(screen.getByText("Mr Broccoli")).toBeTruthy();
+    expect(screen.getByText("Mr. Brokkoli")).toBeTruthy();
     expect(screen.getByLabelText("Conversations")).toBeTruthy();
     expect(screen.getByLabelText("Settings")).toBeTruthy();
     expect(screen.getByText("icon:sidebar")).toBeTruthy();

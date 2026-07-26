@@ -8,8 +8,9 @@ describe("translations", () => {
   });
 
   it("uses the current app name in localized UI copy", () => {
-    expect(JSON.stringify(translations.en)).toContain("Mr Broccoli");
-    expect(JSON.stringify(translations.de)).toContain("Mr Broccoli");
+    expect(translations.en.appName).toBe("Mr Broccoli");
+    expect(translations.de.appName).toBe("Mr. Brokkoli");
+    expect(JSON.stringify(translations.de)).not.toContain("Mr Broccoli");
   });
 
   describe("home-screen style chip keys", () => {

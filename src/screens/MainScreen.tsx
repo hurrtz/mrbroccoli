@@ -630,6 +630,7 @@ export function MainScreen() {
           colors={colors}
           isLandscape={isLandscape}
           topBar={{
+            brandName: t("appName"),
             debugLogActive: debugLogCaptureState.active,
             debugLogLabel: t("debugLogLabel"),
             drawerLabel: t("conversations"),

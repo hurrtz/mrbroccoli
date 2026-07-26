@@ -80,6 +80,7 @@ describe("MainScreenWorkspace streaming isolation", () => {
       colors: lightColors,
       isLandscape: false,
       topBar: {
+        brandName: "Mr Broccoli",
         drawerLabel: "Conversations",
         onOpenDrawer,
         onOpenSettings,

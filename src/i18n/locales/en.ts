@@ -1,6 +1,7 @@
 import type { TranslationDictionary } from "../types";
 
 export const en: TranslationDictionary = {
+  appName: "Mr Broccoli",
   retry: "Retry",
   dismiss: "Dismiss",
   unavailable: "Unavailable",
