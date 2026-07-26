@@ -19,6 +19,7 @@ import { LocalizationProvider } from "../../src/i18n";
 import { ThemeProvider } from "../../src/theme/ThemeContext";
 import { lightColors } from "../../src/theme/colors";
 import { DEFAULT_SETTINGS, type Provider } from "../../src/types";
+import { useSpeechDiagnostics } from "../../src/hooks/useSpeechDiagnostics";
 import { clearSpeechDiagnostics } from "../../src/services/speech/diagnostics";
 
 jest.mock("react-native-safe-area-context", () => ({
@@ -127,6 +128,7 @@ function renderSettingsModal(overrideProps: Partial<React.ComponentProps<typeof 
 
 describe("SettingsModal", () => {
   afterEach(() => {
+    jest.mocked(useSpeechDiagnostics).mockReturnValue([]);
     jest.restoreAllMocks();
   });
 
@@ -948,6 +950,24 @@ describe("SettingsModal", () => {
 
   it("styles speech diagnostics clearing as destructive and requires confirmation", async () => {
     const clearSpeechDiagnosticsMock = jest.mocked(clearSpeechDiagnostics);
+    jest.mocked(useSpeechDiagnostics).mockReturnValue([
+      {
+        id: "preview-1",
+        requestId: "preview-1",
+        createdAt: "2026-07-27T10:00:00.000Z",
+        source: "preview",
+        latestStage: "tts-succeeded",
+        requestedRoute: "native",
+        actualRoute: "native",
+        language: "en",
+        provider: null,
+        providerModel: null,
+        voice: null,
+        fallbackReason: null,
+        message: null,
+        textLength: 12,
+      },
+    ]);
     const screen = renderSettingsModal();
 
     fireEvent.press(screen.getByLabelText("Open App & diagnostics"));

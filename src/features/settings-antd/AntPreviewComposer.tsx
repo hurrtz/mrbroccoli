@@ -3,7 +3,6 @@ import { Text, View } from "react-native";
 
 import {
   Button,
-  Icon,
   Input,
 } from "@ant-design/react-native";
 
@@ -16,6 +15,7 @@ import type {
   TextInputFocusHandler,
 } from "../settings-core/types";
 
+import { AntButtonLabel } from "./AntSettingsPrimitives";
 import { styles } from "./styles";
 
 export function AntPreviewComposer({
@@ -56,11 +56,13 @@ export function AntPreviewComposer({
         placeholderTextColor={colors.textMuted}
         selectionColor={colors.accent}
         autoSize={{ minRows: 3, maxRows: 6 }}
+        style={styles.previewTextArea}
         inputStyle={{
           color: colors.text,
           fontFamily: fonts.body,
           fontSize: 14,
           lineHeight: 20,
+          textAlignVertical: "top",
         }}
         styles={{
           container: {
@@ -84,14 +86,12 @@ export function AntPreviewComposer({
           void (isBusy ? onStop() : onPreview());
         }}
       >
-        {!isGenerating ? (
-          <Icon
-            name={isPlaying ? "stop" : "sound"}
-            size={16}
-            color={colors.onActiveControl}
-          />
-        ) : null}
-        {` ${isBusy ? t("stop") : t("previewVoice")}`}
+        <AntButtonLabel
+          color={colors.onActiveControl}
+          icon={isPlaying ? "stop" : "sound"}
+          iconSize={16}
+          label={isBusy ? t("stop") : t("previewVoice")}
+        />
       </Button>
     </View>
   );

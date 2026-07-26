@@ -7,6 +7,7 @@ import {
 } from "react-native";
 
 import {
+  Icon,
   Card,
   Input,
   List,
@@ -14,6 +15,7 @@ import {
   Radio,
   Switch,
 } from "@ant-design/react-native";
+import type { IconNames } from "@ant-design/react-native/lib/icon";
 
 import { useTheme } from "../../theme/ThemeContext";
 import { fonts } from "../../theme/typography";
@@ -28,9 +30,11 @@ export type AntPickerOption = {
 
 export function AntSettingsCard({
   children,
+  contentStyle,
   style,
 }: {
   children: React.ReactNode;
+  contentStyle?: ViewStyle;
   style?: ViewStyle;
 }) {
   const { colors } = useTheme();
@@ -46,8 +50,27 @@ export function AntSettingsCard({
         style,
       ])}
     >
-      <View style={styles.cardContent}>{children}</View>
+      <View style={[styles.cardContent, contentStyle]}>{children}</View>
     </Card>
+  );
+}
+
+export function AntButtonLabel({
+  color,
+  icon,
+  iconSize = 15,
+  label,
+}: {
+  color: string;
+  icon: IconNames;
+  iconSize?: number;
+  label: string;
+}) {
+  return (
+    <View style={styles.buttonLabelRow}>
+      <Icon name={icon} size={iconSize} color={color} />
+      <Text style={[styles.buttonLabelText, { color }]}>{label}</Text>
+    </View>
   );
 }
 
@@ -111,38 +134,44 @@ export function AntRadioSection<T extends string>({
       >
         {label}
       </Text>
-      <Radio.Group
-        value={value}
-        onChange={(event) => onChange(event.target.value as T)}
-      >
-        {options.map((option) => (
-          <Radio.RadioItem
-            key={option.value}
-            value={option.value}
-            disabled={option.disabled}
-            styles={{
-              Item: {
-                backgroundColor: colors.surfaceElevated,
-                minHeight: 46,
-              },
-              Content: {
-                color: colors.text,
-                fontSize: 15,
-              },
-              radioItemContent: {
-                color: colors.text,
-                fontFamily: fonts.body,
-                fontSize: 15,
-              },
-              radioItemContentDisable: {
-                color: colors.textMuted,
-              },
-            }}
-          >
-            {option.label}
-          </Radio.RadioItem>
-        ))}
-      </Radio.Group>
+      <View style={styles.radioList}>
+        <Radio.Group
+          value={value}
+          onChange={(event) => onChange(event.target.value as T)}
+        >
+          {options.map((option, index) => (
+            <Radio.RadioItem
+              key={option.value}
+              value={option.value}
+              disabled={option.disabled}
+              styles={{
+                Item: {
+                  backgroundColor: colors.surfaceElevated,
+                  minHeight: 46,
+                },
+                Line: {
+                  borderBottomWidth:
+                    index === options.length - 1 ? 0 : StyleSheet.hairlineWidth,
+                },
+                Content: {
+                  color: colors.text,
+                  fontSize: 15,
+                },
+                radioItemContent: {
+                  color: colors.text,
+                  fontFamily: fonts.body,
+                  fontSize: 15,
+                },
+                radioItemContentDisable: {
+                  color: colors.textMuted,
+                },
+              }}
+            >
+              {option.label}
+            </Radio.RadioItem>
+          ))}
+        </Radio.Group>
+      </View>
       {activeOption?.description ? (
         <Text style={[styles.helperText, { color: colors.textSecondary }]}>
           {activeOption.description}
@@ -163,12 +192,14 @@ export function AntPickerRow({
   options,
   onChange,
   disabled = false,
+  hideDivider = false,
 }: {
   label: string;
   value: string;
   options: AntPickerOption[];
   onChange: (value: string) => void;
   disabled?: boolean;
+  hideDivider?: boolean;
 }) {
   const { colors } = useTheme();
   const selectedLabel =
@@ -218,6 +249,9 @@ export function AntPickerRow({
           Item: {
             backgroundColor: colors.surfaceElevated,
           },
+          Line: {
+            borderBottomWidth: hideDivider ? 0 : StyleSheet.hairlineWidth,
+          },
           Content: {
             color: colors.text,
             fontFamily: fonts.body,
@@ -247,9 +281,12 @@ export function AntPickerSection({
   helperText?: React.ReactNode;
 }) {
   const { colors } = useTheme();
+  const pickerRows = React.Children.toArray(children).filter(
+    React.isValidElement,
+  ) as React.ReactElement<{ hideDivider?: boolean }>[];
 
   return (
-    <AntSettingsCard>
+    <AntSettingsCard contentStyle={styles.fullBleedCardContent}>
       <List
         style={styles.pickerList}
         styles={{
@@ -264,12 +301,29 @@ export function AntPickerSection({
           },
         }}
       >
-        {children as React.ReactElement | React.ReactElement[]}
+        {pickerRows.map((child, index) =>
+          React.cloneElement(child, {
+            hideDivider:
+              helperText === undefined &&
+              index === pickerRows.length - 1,
+          }),
+        )}
       </List>
       {helperText ? (
-        <Text style={[styles.helperText, { color: colors.textSecondary }]}>
-          {helperText}
-        </Text>
+        <View
+          style={[
+            styles.pickerHelper,
+            { borderTopColor: colors.border },
+          ]}
+        >
+          {typeof helperText === "string" ? (
+            <Text style={[styles.helperText, { color: colors.textSecondary }]}>
+              {helperText}
+            </Text>
+          ) : (
+            helperText
+          )}
+        </View>
       ) : null}
     </AntSettingsCard>
   );
@@ -289,38 +343,23 @@ export function AntSwitchRow({
   const { colors } = useTheme();
 
   return (
-    <List.Item
-      multipleLine={!!description}
-      extra={
-        <Switch
-          checked={value}
-          color={colors.accent}
-          onChange={onChange}
-        />
-      }
-      styles={{
-        Item: {
-          backgroundColor: colors.surfaceElevated,
-        },
-        Content: {
-          color: colors.text,
-          fontFamily: fonts.body,
-          fontSize: 15,
-        },
-      }}
-    >
-      {label}
-      {description ? (
-        <List.Item.Brief
-          style={{
-            color: colors.textSecondary,
-            fontFamily: fonts.body,
-          }}
-        >
-          {description}
-        </List.Item.Brief>
-      ) : null}
-    </List.Item>
+    <View style={styles.switchRow}>
+      <View style={styles.switchCopy}>
+        <Text style={[styles.switchLabel, { color: colors.text }]}>
+          {label}
+        </Text>
+        {description ? (
+          <Text style={[styles.helperText, { color: colors.textSecondary }]}>
+            {description}
+          </Text>
+        ) : null}
+      </View>
+      <Switch
+        checked={value}
+        color={colors.accent}
+        onChange={onChange}
+      />
+    </View>
   );
 }
 

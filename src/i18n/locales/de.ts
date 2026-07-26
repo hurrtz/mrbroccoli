@@ -112,6 +112,7 @@ export const de: TranslationDictionary = {
     "Erkläre alles so einfach wie möglich. Nutze Analogien, Alltagssprache und verzichte auf Fachjargon. Setze bei keinem Thema Vorwissen voraus.",
   useProvider: ({ provider }) => `${provider} verwenden`,
   createApiKey: "Zugangsdaten",
+  apiKey: "API-Schlüssel",
   aboutThisProvider: "Über diesen Anbieter",
   openRouterOnboardingTitle: "Ein Key, mehrere Anbieter",
   openRouterOnboardingDescription:

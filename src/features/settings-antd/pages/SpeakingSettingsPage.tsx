@@ -1,9 +1,8 @@
 import React from "react";
-import { Text, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 
 import {
   Checkbox,
-  List,
 } from "@ant-design/react-native";
 
 import {
@@ -151,20 +150,18 @@ export function SpeakingSettingsPage({
       />
 
       <AntSettingsCard>
-        <List style={styles.languageList}>
-          <AntSwitchRow
-            label={t("spokenReplies")}
-            description={
-              settings.spokenRepliesEnabled
-                ? t("spokenRepliesEnabledDescription")
-                : t("spokenRepliesDisabledDescription")
-            }
-            value={settings.spokenRepliesEnabled}
-            onChange={(value) =>
-              onUpdate({ spokenRepliesEnabled: value })
-            }
-          />
-        </List>
+        <AntSwitchRow
+          label={t("spokenReplies")}
+          description={
+            settings.spokenRepliesEnabled
+              ? t("spokenRepliesEnabledDescription")
+              : t("spokenRepliesDisabledDescription")
+          }
+          value={settings.spokenRepliesEnabled}
+          onChange={(value) =>
+            onUpdate({ spokenRepliesEnabled: value })
+          }
+        />
       </AntSettingsCard>
 
       <AntSettingsCard>
@@ -178,16 +175,25 @@ export function SpeakingSettingsPage({
           {t("listenLanguagesHint")}
         </Text>
         <View style={styles.languageList}>
-          {TTS_LISTEN_LANGUAGE_OPTIONS.map((entry) => {
+          {TTS_LISTEN_LANGUAGE_OPTIONS.map((entry, index) => {
             const checked = settings.ttsListenLanguages.includes(entry);
             return (
               <Checkbox.CheckboxItem
                 key={entry}
                 checked={checked}
+                right
                 onPress={() => onToggleListenLanguage(entry)}
                 styles={{
                   Item: {
                     backgroundColor: colors.surfaceElevated,
+                    minHeight: 46,
+                  },
+                  Line: {
+                    borderBottomWidth:
+                      index === TTS_LISTEN_LANGUAGE_OPTIONS.length - 1
+                        ? 0
+                        : StyleSheet.hairlineWidth,
+                    borderBottomColor: colors.border,
                   },
                   Content: {
                     color: colors.text,

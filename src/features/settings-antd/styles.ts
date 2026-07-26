@@ -97,15 +97,14 @@ export const styles = StyleSheet.create({
   },
   readinessGrid: {
     flexDirection: "row",
-    flexWrap: "wrap",
     gap: 8,
   },
   readinessButton: {
-    flexBasis: "48%",
-    flexGrow: 1,
-    minWidth: 132,
-    height: 38,
-    borderRadius: 19,
+    flex: 1,
+    minWidth: 0,
+    height: 36,
+    paddingHorizontal: 2,
+    borderRadius: 18,
   },
   sectionList: {
     overflow: "hidden",
@@ -127,6 +126,11 @@ export const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 14,
     gap: 10,
+  },
+  fullBleedCardContent: {
+    paddingHorizontal: 0,
+    paddingVertical: 0,
+    gap: 0,
   },
   sectionIntro: {
     paddingHorizontal: 4,
@@ -155,11 +159,33 @@ export const styles = StyleSheet.create({
     lineHeight: 19,
   },
   pickerList: {
-    marginHorizontal: -16,
-    marginVertical: -8,
+    overflow: "hidden",
+  },
+  pickerHelper: {
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderTopWidth: StyleSheet.hairlineWidth,
   },
   pickerItem: {
     minHeight: 52,
+  },
+  radioList: {
+    marginHorizontal: -16,
+  },
+  switchRow: {
+    minHeight: 58,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 14,
+  },
+  switchCopy: {
+    flex: 1,
+    gap: 3,
+  },
+  switchLabel: {
+    fontFamily: fonts.body,
+    fontSize: 15,
+    lineHeight: 21,
   },
   accordionHeader: {
     minHeight: 52,
@@ -197,6 +223,18 @@ export const styles = StyleSheet.create({
     minHeight: 34,
     borderRadius: 9,
     paddingHorizontal: 10,
+  },
+  buttonLabelRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 6,
+  },
+  buttonLabelText: {
+    fontFamily: fonts.bodyMedium,
+    fontSize: 14,
+    lineHeight: 18,
+    fontWeight: "500",
   },
   textArea: {
     minHeight: 128,
@@ -259,6 +297,9 @@ export const styles = StyleSheet.create({
   previewButton: {
     minHeight: 42,
     borderRadius: 10,
+  },
+  previewTextArea: {
+    minHeight: 84,
   },
   statusRow: {
     flexDirection: "row",

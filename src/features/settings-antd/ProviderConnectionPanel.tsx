@@ -48,6 +48,7 @@ import type {
 } from "../settings-core/types";
 
 import {
+  AntButtonLabel,
   AntPickerRow,
   AntPickerSection,
 } from "./AntSettingsPrimitives";
@@ -373,14 +374,11 @@ export function ProviderConnectionPanel({
             void onValidateAll();
           }}
         >
-          {!isValidatingAny ? (
-            <Icon
-              name="check-circle"
-              size={15}
-              color={colors.onActiveControl}
-            />
-          ) : null}
-          {` ${t("testAllCapabilities")}`}
+          <AntButtonLabel
+            color={colors.onActiveControl}
+            icon="check-circle"
+            label={t("testAllCapabilities")}
+          />
         </Button>
         <Button
           type="ghost"
@@ -394,12 +392,15 @@ export function ProviderConnectionPanel({
             void Linking.openURL(PROVIDER_API_KEY_URLS[provider]);
           }}
         >
-          <Icon name="export" size={15} color={colors.accent} />
-          {` ${
+          <AntButtonLabel
+            color={colors.accent}
+            icon="export"
+            label={
             provider === "openrouter"
               ? t("openRouterKeys")
               : t("createApiKey")
-          }`}
+            }
+          />
         </Button>
       </View>
 
@@ -453,10 +454,12 @@ export function ProviderConnectionPanel({
                     capability: getCapabilityLabel(capability, t),
                   })}
                 >
-                  {!isValidating ? (
-                    <Icon name="play-circle" size={14} color={colors.accent} />
-                  ) : null}
-                  {` ${t("test")}`}
+                  <AntButtonLabel
+                    color={colors.accent}
+                    icon="play-circle"
+                    iconSize={14}
+                    label={t("test")}
+                  />
                 </Button>
               }
               styles={{

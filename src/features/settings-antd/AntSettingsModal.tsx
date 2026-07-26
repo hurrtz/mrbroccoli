@@ -508,7 +508,6 @@ export const AntSettingsModal = React.memo(function AntSettingsModal(
             {showsBackButton ? (
               <AntIconButton
                 icon="left"
-                iconColor={colors.accent}
                 iconSize={23}
                 style={styles.headerControl}
                 onPress={() => setActivePage("overview")}

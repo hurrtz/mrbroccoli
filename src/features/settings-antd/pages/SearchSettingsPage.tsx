@@ -138,7 +138,7 @@ export function SearchSettingsPage({
       </AntPickerSection>
 
       {hasAdvancedControls && selectedProviderSettings ? (
-        <AntSettingsCard>
+        <AntSettingsCard contentStyle={styles.fullBleedCardContent}>
           <Collapse
             accordion
             styles={{

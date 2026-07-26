@@ -158,15 +158,17 @@ export function AppSettingsPage({
               {t("speechDiagnosticsHint")}
             </Text>
           </View>
-          <Button
-            size="small"
-            type="warning"
-            style={styles.compactButton}
-            styles={antButtonTypography}
-            onPress={handleClear}
-          >
-            {t("clear")}
-          </Button>
+          {speechDiagnostics.length > 0 ? (
+            <Button
+              size="small"
+              type="warning"
+              style={styles.compactButton}
+              styles={antButtonTypography}
+              onPress={handleClear}
+            >
+              {t("clear")}
+            </Button>
+          ) : null}
         </View>
 
         {speechDiagnostics.length === 0 ? (

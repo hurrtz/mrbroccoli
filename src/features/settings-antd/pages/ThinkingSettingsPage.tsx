@@ -38,6 +38,7 @@ import {
 import { renderProviderPickerOptions } from "../../settings-core/helpers";
 
 import {
+  AntButtonLabel,
   AntPickerRow,
   AntSettingsCard,
   AntTextArea,
@@ -91,8 +92,11 @@ export function ThinkingSettingsPage({
               accessibilityLabel={t("addResponseMode")}
               styles={antButtonTypography}
             >
-              <Icon name="plus" size={14} color={colors.accent} />
-              {` ${t("addResponseMode")}`}
+              <AntButtonLabel
+                color={colors.accent}
+                icon="plus"
+                label={t("addResponseMode")}
+              />
             </Button>
           ) : null}
         </View>
@@ -210,7 +214,7 @@ export function ThinkingSettingsPage({
         )}
       </AntSettingsCard>
 
-      <AntSettingsCard>
+      <AntSettingsCard contentStyle={styles.fullBleedCardContent}>
         <Collapse
           accordion
           styles={{

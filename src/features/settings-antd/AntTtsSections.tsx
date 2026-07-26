@@ -53,6 +53,7 @@ import type {
 
 import { AntPreviewComposer } from "./AntPreviewComposer";
 import {
+  AntButtonLabel,
   AntPickerRow,
   AntPickerSection,
   AntSettingsCard,
@@ -237,8 +238,12 @@ export function AntTtsFallbackSection({
                 route: getFallbackRouteLabel(route, t),
               })}
             >
-              <Icon name="plus" size={14} color={colors.accent} />
-              {` ${getFallbackRouteLabel(route, t)}`}
+              <AntButtonLabel
+                color={colors.accent}
+                icon="plus"
+                iconSize={14}
+                label={getFallbackRouteLabel(route, t)}
+              />
             </Button>
           ))}
         </View>
@@ -402,10 +407,11 @@ export function AntProviderVoiceSection({
               provider: PROVIDER_LABELS[provider],
             })}
           >
-            {!voiceDirectoryBusy ? (
-              <Icon name="reload" size={15} color={colors.accent} />
-            ) : null}
-            {` ${t("refresh")}`}
+            <AntButtonLabel
+              color={colors.accent}
+              icon="reload"
+              label={t("refresh")}
+            />
           </Button>
         </View>
       ) : null}
@@ -689,18 +695,15 @@ export function AntKokoroVoiceSection({
             }
           }}
         >
-          {!model.busy ? (
-            <Icon
-              name={model.installed ? "delete" : "download"}
-              size={15}
-              color={
-                model.installed
-                  ? colors.onDanger
-                  : colors.onActiveControl
-              }
-            />
-          ) : null}
-          {` ${t(model.installed ? "remove" : "download")}`}
+          <AntButtonLabel
+            color={
+              model.installed
+                ? colors.onDanger
+                : colors.onActiveControl
+            }
+            icon={model.installed ? "delete" : "download"}
+            label={t(model.installed ? "remove" : "download")}
+          />
         </Button>
       </View>
 

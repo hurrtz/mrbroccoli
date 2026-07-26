@@ -110,6 +110,7 @@ export const en: TranslationDictionary = {
     "Explain everything as simply as possible. Use analogies, everyday language, zero jargon. Assume no prior knowledge on any topic.",
   useProvider: ({ provider }) => `Use ${provider}`,
   createApiKey: "Credentials",
+  apiKey: "API key",
   aboutThisProvider: "About this provider",
   openRouterOnboardingTitle: "One key, multiple providers",
   openRouterOnboardingDescription:
