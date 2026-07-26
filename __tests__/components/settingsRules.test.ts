@@ -5,7 +5,7 @@ import {
   getNormalizedResponseModes,
   getNormalizedSttProvider,
   getNormalizedTtsProvider,
-} from "../../src/components/settings/settingsRules";
+} from "../../src/features/settings-core/settingsRules";
 
 describe("settingsRules", () => {
   it("repairs an invalid provider STT selection", () => {

@@ -1,7 +1,7 @@
 import { act, renderHook } from "@testing-library/react-native";
 
 import { TTS_LISTEN_LANGUAGE_OPTIONS } from "../../src/constants/localTts";
-import { useVoicePreviewState } from "../../src/components/settings/useVoicePreviewState";
+import { useVoicePreviewState } from "../../src/features/settings-core/useVoicePreviewState";
 import { DEFAULT_SETTINGS, Provider, TtsListenLanguage } from "../../src/types";
 
 function buildProviderPreviewTexts() {

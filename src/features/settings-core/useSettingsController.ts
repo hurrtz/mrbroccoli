@@ -30,11 +30,10 @@ import {
 import { useNativeVoiceOptions } from "./useNativeVoiceOptions";
 import { usePreviewTextState } from "./usePreviewTextState";
 import { useSettingsKeyboardInset } from "./useSettingsKeyboardInset";
-import { useSettingsModalAnimation } from "./useSettingsModalAnimation";
 import { useSettingsNormalization } from "./useSettingsNormalization";
 import { useVoicePreviewState } from "./useVoicePreviewState";
 
-export function useSettingsModalController({
+export function useSettingsController({
   visible,
   settings,
   onUpdate,
@@ -73,7 +72,6 @@ export function useSettingsModalController({
     () => getEnabledTtsProviders(settings),
     [settings],
   );
-  const modalAnimStyle = useSettingsModalAnimation(visible);
   const keyboardInset = useSettingsKeyboardInset({
     visible,
     bottomInset: insets.bottom,
@@ -252,7 +250,6 @@ export function useSettingsModalController({
     enabledProviders,
     enabledSttProviders,
     enabledTtsProviders,
-    modalAnimStyle,
     handleTextInputFocus,
     handlePreviewProviderVoice,
     handlePreviewNativeVoice,

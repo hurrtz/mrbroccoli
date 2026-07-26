@@ -1,6 +1,6 @@
 import { renderHook, waitFor } from "@testing-library/react-native";
 
-import { useSettingsNormalization } from "../../src/components/settings/useSettingsNormalization";
+import { useSettingsNormalization } from "../../src/features/settings-core/useSettingsNormalization";
 import { DEFAULT_SETTINGS } from "../../src/types";
 
 describe("useSettingsNormalization", () => {

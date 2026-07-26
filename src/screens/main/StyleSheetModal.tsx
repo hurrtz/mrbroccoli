@@ -12,14 +12,14 @@ import {
   useWindowDimensions,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import Feather from "@expo/vector-icons/Feather";
 
 import { APP_MODAL_ORIENTATIONS } from "../../constants/layout";
 import { Picker } from "../../components/Picker";
+import { AntIconButton } from "../../design-system/AntIconButton";
 import {
   getResponseLengthOptions,
   getResponseToneOptions,
-} from "../../components/settings/helpers";
+} from "../../features/settings-core/helpers";
 import { useLocalization } from "../../i18n";
 import { useTheme } from "../../theme/ThemeContext";
 import { AssistantResponseLength, AssistantResponseTone } from "../../types";
@@ -129,18 +129,16 @@ export const StyleSheetModal = React.memo(function StyleSheetModal({
                 {t("styleSheetSubtitle")}
               </Text>
             </View>
-            <TouchableOpacity
+            <AntIconButton
               testID="conversation-settings-close"
+              icon="close"
               style={[
                 styles.styleSheetCloseButton,
                 { backgroundColor: colors.surfaceElevated },
               ]}
               onPress={onClose}
-              accessibilityRole="button"
               accessibilityLabel={t("dismiss")}
-            >
-              <Feather name="x" size={20} color={colors.textSecondary} />
-            </TouchableOpacity>
+            />
           </View>
 
           <ScrollView

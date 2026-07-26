@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 
-import type { SettingsTab } from "../../components/settings/types";
+import type { SettingsTab } from "../../features/settings-core/types";
 import { PROVIDER_LABELS } from "../../constants/models";
 import type { useAudioPlayer } from "../../hooks/useAudioPlayer";
 import type { useAudioRecorder } from "../../hooks/useAudioRecorder";

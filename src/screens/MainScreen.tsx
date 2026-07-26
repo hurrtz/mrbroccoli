@@ -8,7 +8,7 @@ import { StatusBar } from "expo-status-bar";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ConversationDrawer } from "../components/ConversationDrawer";
 import { ConversationMemoryModal } from "../components/ConversationMemoryModal";
-import { SettingsModal } from "../components/SettingsModal";
+import { AntSettingsModal } from "../features/settings-antd/AntSettingsModal";
 import { SetupGuideModal } from "../components/SetupGuideModal";
 import { Toast } from "../components/Toast";
 import { useSharedSettings } from "../context/SettingsContext";
@@ -746,7 +746,7 @@ export function MainScreen() {
         ttsStatusLabel={ttsStatusLabel}
       />
 
-      <SettingsModal
+      <AntSettingsModal
         visible={settingsVisible}
         settings={settings}
         kokoroModel={kokoroModel}

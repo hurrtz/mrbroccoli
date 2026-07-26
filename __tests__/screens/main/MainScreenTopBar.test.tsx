@@ -5,14 +5,6 @@ import { render } from "@testing-library/react-native";
 import { MainScreenTopBar } from "../../../src/screens/main/MainScreenTopBar";
 import { lightColors } from "../../../src/theme/colors";
 
-jest.mock("@expo/vector-icons", () => ({
-  Feather: ({ name }: { name: string }) => {
-    const React = require("react");
-    const { Text } = require("react-native");
-    return React.createElement(Text, null, `icon:${name}`);
-  },
-}));
-
 describe("MainScreenTopBar", () => {
   it.each([false, true])("shows the localized brand when compact is %s", (compact) => {
     const screen = render(
@@ -29,12 +21,13 @@ describe("MainScreenTopBar", () => {
     );
 
     expect(screen.getByText("Mr. Brokkoli")).toBeTruthy();
-    expect(screen.getByLabelText("Conversations")).toBeTruthy();
-    expect(screen.getByLabelText("Settings")).toBeTruthy();
-    expect(screen.getByText("icon:sidebar")).toBeTruthy();
-    expect(screen.getByText("icon:settings")).toBeTruthy();
+    expect(
+      screen.getByLabelText("Conversations").props.accessibilityRole,
+    ).toBe("button");
+    expect(screen.getByLabelText("Settings").props.accessibilityRole).toBe(
+      "button",
+    );
     expect(screen.getByText("LOG")).toBeTruthy();
-    expect(screen.queryByText("icon:sliders")).toBeNull();
 
     expect(
       StyleSheet.flatten(

@@ -1,6 +1,6 @@
 import { useCallback } from "react";
 
-import type { SettingsTab } from "../../components/settings/types";
+import type { SettingsTab } from "../../features/settings-core/types";
 import type { Provider, Settings } from "../../types";
 import type { SetupGuideStep } from "./setupGuideSupport";
 

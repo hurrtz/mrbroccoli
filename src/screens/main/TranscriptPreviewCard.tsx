@@ -2,14 +2,12 @@ import React, { useEffect, useState } from "react";
 import {
   StyleProp,
   Text,
-  TouchableOpacity,
   View,
   ViewStyle,
 } from "react-native";
 
-import Feather from "@expo/vector-icons/Feather";
-
 import { ChatTranscript } from "../../components/ChatTranscript";
+import { AntIconButton } from "../../design-system/AntIconButton";
 import { Colors } from "../../theme/colors";
 import { Message } from "../../types";
 
@@ -128,39 +126,27 @@ export function TranscriptPreviewCard({
         {showHeaderControls ? (
           <View style={styles.transcriptHeaderControls}>
             {showStyleControl && onOpenStyleSheet ? (
-              <TouchableOpacity
+              <AntIconButton
                 testID="conversation-style-control"
+                icon="control"
+                iconSize={19}
                 style={styles.transcriptStyleControl}
                 onPress={onOpenStyleSheet}
-                activeOpacity={0.7}
-                accessibilityRole="button"
                 accessibilityLabel={t("openStyleSheet")}
-              >
-                <Feather
-                  name="sliders"
-                  size={19}
-                  color={colors.textSecondary}
-                />
-              </TouchableOpacity>
+              />
             ) : null}
             {showScrollToLatest ? (
-              <TouchableOpacity
+              <AntIconButton
                 testID="scroll-to-latest-control"
+                icon="down"
+                iconSize={19}
                 style={styles.transcriptStyleControl}
                 onPress={() => {
                   setIsAtTranscriptTail(true);
                   setScrollToLatestRequest((request) => request + 1);
                 }}
-                activeOpacity={0.7}
-                accessibilityRole="button"
                 accessibilityLabel={t("scrollToLatest")}
-              >
-                <Feather
-                  name="arrow-down"
-                  size={19}
-                  color={colors.textSecondary}
-                />
-              </TouchableOpacity>
+              />
             ) : null}
           </View>
         ) : null}

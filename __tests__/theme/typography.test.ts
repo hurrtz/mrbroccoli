@@ -1,4 +1,4 @@
-import { textStyles } from "../../src/theme/typography";
+import { fonts, textStyles } from "../../src/theme/typography";
 
 describe("semantic typography", () => {
   it("keeps headings visually ordered", () => {
@@ -8,10 +8,9 @@ describe("semantic typography", () => {
     expect(textStyles.sectionTitle.fontSize).toBeGreaterThan(
       textStyles.subsectionTitle.fontSize,
     );
-    expect(Number(textStyles.screenTitle.fontWeight)).toBeGreaterThanOrEqual(
-      Number(textStyles.sectionTitle.fontWeight),
-    );
-    expect(Number(textStyles.sectionTitle.fontWeight)).toBeGreaterThan(
+    expect(textStyles.screenTitle.fontFamily).toBe(fonts.headline);
+    expect(textStyles.sectionTitle.fontFamily).toBe(fonts.headline);
+    expect(Number(textStyles.subsectionTitle.fontWeight)).toBeGreaterThan(
       Number(textStyles.body.fontWeight),
     );
   });

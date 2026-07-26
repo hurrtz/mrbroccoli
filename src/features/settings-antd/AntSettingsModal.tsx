@@ -1,81 +1,75 @@
 import React from "react";
 import {
-  Modal,
+  Animated,
+  BackHandler,
+  Pressable,
   ScrollView,
   Text,
-  TouchableOpacity,
   View,
   useWindowDimensions,
 } from "react-native";
 
-import Feather from "@expo/vector-icons/Feather";
-import Animated from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import { APP_MODAL_ORIENTATIONS } from "../constants/layout";
-import { useLocalization } from "../i18n";
+import { getSettingsReadiness } from "../settings-core/readiness";
+import type {
+  SettingsModalProps,
+  SettingsPage,
+} from "../settings-core/types";
+import { useProviderValidationState } from "../settings-core/useProviderValidationState";
+import { useSettingsController } from "../settings-core/useSettingsController";
+import { Toast } from "../../components/Toast";
+import { AntIconButton } from "../../design-system/AntIconButton";
+import { useLocalization } from "../../i18n";
+import { useTheme } from "../../theme/ThemeContext";
 import {
   Provider,
   ProviderCapability,
   ProviderValidationResult,
   TtsListenLanguage,
-} from "../types";
-import { useTheme } from "../theme/ThemeContext";
+} from "../../types";
 
-import {
-  ApiKeysSection,
-  ListeningSection,
-  SearchSection,
-  SpeakingSection,
-  ThinkingSection,
-} from "./settings/SettingsFlowSections";
-import { SettingsOverview } from "./settings/SettingsOverview";
-import { Toast } from "./Toast";
-import { getSettingsReadiness } from "./settings/readiness";
-import { SpeechDiagnosticsSection } from "./settings/shared";
-import { styles } from "./settings/styles";
-import { SettingsModalProps, SettingsPage } from "./settings/types";
-import { UiTab } from "./settings/UiTab";
-import { useProviderValidationState } from "./settings/useProviderValidationState";
-import { useSettingsModalController } from "./settings/useSettingsModalController";
+import { AntSettingsOverview } from "./AntSettingsOverview";
+import { AppSettingsPage } from "./pages/AppSettingsPage";
+import { ConnectionsSettingsPage } from "./pages/ConnectionsSettingsPage";
+import { ListeningSettingsPage } from "./pages/ListeningSettingsPage";
+import { SearchSettingsPage } from "./pages/SearchSettingsPage";
+import { SpeakingSettingsPage } from "./pages/SpeakingSettingsPage";
+import { ThinkingSettingsPage } from "./pages/ThinkingSettingsPage";
+import { styles } from "./styles";
 
 type DrillInSettingsPage = Exclude<SettingsPage, "overview">;
 
-function getInitialSettingsPage(params: {
-  focusProvider?: SettingsModalProps["focusProvider"];
-  focusCatalogProviderId?: SettingsModalProps["focusCatalogProviderId"];
-  focusTab?: SettingsModalProps["focusTab"];
-}): SettingsPage {
-  const { focusProvider, focusCatalogProviderId, focusTab } = params;
-
+function getInitialSettingsPage({
+  focusProvider,
+  focusCatalogProviderId,
+  focusTab,
+}: Pick<
+  SettingsModalProps,
+  "focusProvider" | "focusCatalogProviderId" | "focusTab"
+>): SettingsPage {
   if (focusProvider || focusCatalogProviderId || focusTab === "providers") {
     return "connections";
   }
-
   if (focusTab === "instructions") {
     return "thinking";
   }
-
   if (focusTab === "stt") {
     return "listening";
   }
-
   if (focusTab === "tts") {
     return "speaking";
   }
-
   if (focusTab === "web") {
     return "search";
   }
-
   if (focusTab === "ui") {
     return "app";
   }
-
   return "overview";
 }
 
-export const SettingsModal = React.memo(function SettingsModal(
+export const AntSettingsModal = React.memo(function AntSettingsModal(
   props: SettingsModalProps,
 ) {
   const {
@@ -106,6 +100,7 @@ export const SettingsModal = React.memo(function SettingsModal(
   const { height, width } = useWindowDimensions();
   const isLandscape = width > height;
   const modalMaxWidth = isLandscape ? Math.min(width - 24, 980) : width;
+  const entrance = React.useRef(new Animated.Value(0)).current;
   const [activePage, setActivePage] = React.useState<SettingsPage>(() =>
     getInitialSettingsPage({
       focusProvider,
@@ -116,6 +111,40 @@ export const SettingsModal = React.memo(function SettingsModal(
   const [validationToastMessage, setValidationToastMessage] = React.useState<
     string | null
   >(null);
+  const {
+    contentScrollRef,
+    providerPreviewTexts,
+    kokoroPreviewTexts,
+    setProviderPreviewText,
+    setKokoroPreviewText,
+    nativePreviewText,
+    setNativePreviewText,
+    activePreview,
+    keyboardInset,
+    speechDiagnostics,
+    handleTextInputFocus,
+    handlePreviewProviderVoice,
+    handlePreviewNativeVoice,
+    handlePreviewKokoroVoice,
+    selectedSttProviderModelOptions,
+    selectedSttProviderModel,
+    sttLanguageNote,
+    sttLimitNote,
+    ttsLanguageNote,
+    selectedPreviewProvider,
+    selectedPreviewProviderModelOptions,
+    selectedPreviewProviderModel,
+    nativeVoiceOptions,
+    selectedNativeVoice,
+    setSelectedNativeVoice,
+    toggleListenLanguage,
+  } = useSettingsController({
+    visible,
+    settings,
+    onUpdate,
+    onPreviewVoice,
+    onStopPreviewVoice,
+  });
   const handleProviderValidationResult = React.useCallback(
     (
       provider: Provider,
@@ -135,41 +164,6 @@ export const SettingsModal = React.memo(function SettingsModal(
     [onUpdate, settings.providerValidationResults],
   );
   const {
-    contentScrollRef,
-    providerPreviewTexts,
-    kokoroPreviewTexts,
-    setProviderPreviewText,
-    setKokoroPreviewText,
-    nativePreviewText,
-    setNativePreviewText,
-    activePreview,
-    keyboardInset,
-    speechDiagnostics,
-    modalAnimStyle,
-    handleTextInputFocus,
-    handlePreviewProviderVoice,
-    handlePreviewNativeVoice,
-    handlePreviewKokoroVoice,
-    selectedSttProviderModelOptions,
-    selectedSttProviderModel,
-    sttLanguageNote,
-    sttLimitNote,
-    ttsLanguageNote,
-    selectedPreviewProvider,
-    selectedPreviewProviderModelOptions,
-    selectedPreviewProviderModel,
-    nativeVoiceOptions,
-    selectedNativeVoice,
-    setSelectedNativeVoice,
-    toggleListenLanguage,
-  } = useSettingsModalController({
-    visible,
-    settings,
-    onUpdate,
-    onPreviewVoice,
-    onStopPreviewVoice,
-  });
-  const {
     getHealthState,
     getCapabilityHealthState,
     getValidationState,
@@ -186,20 +180,6 @@ export const SettingsModal = React.memo(function SettingsModal(
     onValidationError: setValidationToastMessage,
     onValidationResult: handleProviderValidationResult,
   });
-  const handleValidateProviderCapabilityForSettings = React.useCallback(
-    async (provider: Provider, capability: ProviderCapability) => {
-      setValidationToastMessage(null);
-      await validateProviderCapabilityForSettings(provider, capability);
-    },
-    [validateProviderCapabilityForSettings],
-  );
-  const handleValidateAllProviderCapabilities = React.useCallback(
-    async (provider: Provider) => {
-      setValidationToastMessage(null);
-      await validateAllProviderCapabilities(provider);
-    },
-    [validateAllProviderCapabilities],
-  );
   const readiness = React.useMemo(
     () =>
       getSettingsReadiness(settings, {
@@ -210,18 +190,18 @@ export const SettingsModal = React.memo(function SettingsModal(
         kokoroInstalled: kokoroModel.installed,
       }),
     [
-      selectableLlmProviders,
       kokoroModel.installed,
+      selectableLlmProviders,
       selectableSearchProviders,
       selectableSttProviders,
       selectableTtsProviders,
       settings,
     ],
   );
-  const showsBackButton = activePage !== "overview";
 
   React.useEffect(() => {
     if (!visible) {
+      entrance.setValue(0);
       return;
     }
 
@@ -232,17 +212,26 @@ export const SettingsModal = React.memo(function SettingsModal(
         focusTab,
       }),
     );
-  }, [focusCatalogProviderId, focusProvider, focusTab, visible]);
+    Animated.timing(entrance, {
+      toValue: 1,
+      duration: 190,
+      useNativeDriver: true,
+    }).start();
+  }, [
+    entrance,
+    focusCatalogProviderId,
+    focusProvider,
+    focusTab,
+    visible,
+  ]);
 
   React.useEffect(() => {
-    if (!visible) {
-      return;
+    if (visible) {
+      requestAnimationFrame(() => {
+        contentScrollRef.current?.scrollTo({ y: 0, animated: false });
+      });
     }
-
-    requestAnimationFrame(() => {
-      contentScrollRef.current?.scrollTo({ y: 0, animated: false });
-    });
-  }, [activePage, contentScrollRef, visible]);
+  }, [activePage, visible]);
 
   const getPageTitle = React.useCallback(
     (page: DrillInSettingsPage) => {
@@ -284,39 +273,37 @@ export const SettingsModal = React.memo(function SettingsModal(
     [t],
   );
 
-  const modalTitle =
-    activePage === "overview" ? t("settings") : getPageTitle(activePage);
-
   const renderDrillInPage = React.useCallback(
     (page: DrillInSettingsPage, children: React.ReactNode) => (
-      <View style={styles.tabPane}>
-        <View style={styles.drillInHeader}>
-          <Text
-            style={[styles.drillInSummary, { color: colors.textSecondary }]}
-          >
-            {getPageSummary(page)}
-          </Text>
-        </View>
+      <View style={styles.drillInPage}>
+        <Text
+          style={[
+            styles.drillInSummary,
+            { color: colors.textSecondary },
+          ]}
+        >
+          {getPageSummary(page)}
+        </Text>
         {children}
       </View>
     ),
-    [colors.textMuted, getPageSummary],
+    [colors.textSecondary, getPageSummary],
   );
 
   const activeContent = (() => {
     switch (activePage) {
       case "overview":
         return (
-          <SettingsOverview
+          <AntSettingsOverview
             readiness={readiness}
-            onOpenPage={(page) => setActivePage(page)}
+            onOpenPage={setActivePage}
             onOpenSetupGuide={onOpenSetupGuide}
           />
         );
       case "connections":
         return renderDrillInPage(
           "connections",
-          <ApiKeysSection
+          <ConnectionsSettingsPage
             settings={settings}
             focusProvider={focusProvider}
             focusCatalogProviderId={focusCatalogProviderId}
@@ -324,10 +311,17 @@ export const SettingsModal = React.memo(function SettingsModal(
             getProviderCapabilityHealthState={getCapabilityHealthState}
             getProviderValidationState={getValidationState}
             canValidateCapability={canValidateCapability}
-            onValidateCapability={
-              handleValidateProviderCapabilityForSettings
-            }
-            onValidateAll={handleValidateAllProviderCapabilities}
+            onValidateCapability={async (provider, capability) => {
+              setValidationToastMessage(null);
+              await validateProviderCapabilityForSettings(
+                provider,
+                capability,
+              );
+            }}
+            onValidateAll={async (provider) => {
+              setValidationToastMessage(null);
+              await validateAllProviderCapabilities(provider);
+            }}
             onUpdateApiKey={onUpdateApiKey}
             onTextInputFocus={handleTextInputFocus}
           />,
@@ -335,7 +329,7 @@ export const SettingsModal = React.memo(function SettingsModal(
       case "thinking":
         return renderDrillInPage(
           "thinking",
-          <ThinkingSection
+          <ThinkingSettingsPage
             settings={settings}
             llmProviders={selectableLlmProviders}
             onUpdate={onUpdate}
@@ -347,7 +341,7 @@ export const SettingsModal = React.memo(function SettingsModal(
       case "listening":
         return renderDrillInPage(
           "listening",
-          <ListeningSection
+          <ListeningSettingsPage
             settings={settings}
             selectableSttProviders={selectableSttProviders}
             selectedSttProviderModelOptions={selectedSttProviderModelOptions}
@@ -361,7 +355,7 @@ export const SettingsModal = React.memo(function SettingsModal(
       case "speaking":
         return renderDrillInPage(
           "speaking",
-          <SpeakingSection
+          <SpeakingSettingsPage
             settings={settings}
             kokoroModel={kokoroModel}
             selectableTtsProviders={selectableTtsProviders}
@@ -397,62 +391,108 @@ export const SettingsModal = React.memo(function SettingsModal(
             onToggleListenLanguage={toggleListenLanguage}
           />,
         );
-      case "app":
-        return renderDrillInPage(
-          "app",
-          <>
-            <UiTab settings={settings} onUpdate={onUpdate} />
-            <SpeechDiagnosticsSection summaries={speechDiagnostics} />
-          </>,
-        );
       case "search":
         return renderDrillInPage(
           "search",
-          <SearchSection
+          <SearchSettingsPage
             settings={settings}
             searchProviders={selectableSearchProviders}
+            onUpdate={onUpdate}
+          />,
+        );
+      case "app":
+        return renderDrillInPage(
+          "app",
+          <AppSettingsPage
+            settings={settings}
+            speechDiagnostics={speechDiagnostics}
             onUpdate={onUpdate}
           />,
         );
     }
   })();
 
+  const showsBackButton = activePage !== "overview";
+  const title =
+    activePage === "overview" ? t("settings") : getPageTitle(activePage);
+  const animatedModalStyle = {
+    opacity: entrance,
+    transform: [
+      {
+        translateY: entrance.interpolate({
+          inputRange: [0, 1],
+          outputRange: [16, 0],
+        }),
+      },
+    ],
+  };
+
+  React.useEffect(() => {
+    if (!visible) {
+      return;
+    }
+
+    const subscription = BackHandler.addEventListener(
+      "hardwareBackPress",
+      () => {
+        if (activePage !== "overview") {
+          setActivePage("overview");
+        } else {
+          onClose();
+        }
+        return true;
+      },
+    );
+
+    return () => subscription.remove();
+  }, [activePage, onClose, visible]);
+
+  if (!visible) {
+    return null;
+  }
+
   return (
-    <Modal
-      visible={visible}
-      transparent
-      animationType="none"
-      supportedOrientations={APP_MODAL_ORIENTATIONS}
+    <View
+      accessibilityViewIsModal
+      style={[
+        styles.overlay,
+        {
+          paddingTop: isLandscape ? Math.max(insets.top + 8, 16) : 0,
+          paddingBottom: isLandscape
+            ? Math.max(insets.bottom + 8, 16)
+            : 0,
+          paddingHorizontal: isLandscape ? 12 : 0,
+        },
+      ]}
     >
-      <View
-        accessibilityViewIsModal
-        style={[
-          styles.overlay,
-          {
-            paddingTop: isLandscape ? Math.max(insets.top + 8, 16) : 0,
-            paddingBottom: 0,
-            paddingHorizontal: isLandscape ? 12 : 0,
-          },
-        ]}
-      >
-        <TouchableOpacity
-          style={[styles.backdrop, { backgroundColor: colors.overlay }]}
-          activeOpacity={1}
+        <Animated.View
+          pointerEvents="none"
+          style={[
+            styles.backdrop,
+            {
+              backgroundColor: colors.overlay,
+              opacity: entrance,
+            },
+          ]}
+        />
+        <Pressable
+          style={styles.backdrop}
           onPress={onClose}
           accessible={false}
         />
         <Animated.View
           style={[
             styles.modal,
+            isLandscape ? styles.modalLandscape : null,
             {
               backgroundColor: colors.surface,
               borderColor: colors.border,
-              maxWidth: modalMaxWidth,
-              shadowColor: colors.glow,
               borderRadius: isLandscape ? 22 : 0,
               borderWidth: isLandscape ? 1 : 0,
+              maxWidth: modalMaxWidth,
+              shadowColor: colors.glow,
             },
-            modalAnimStyle,
+            animatedModalStyle,
           ]}
         >
           <View
@@ -461,70 +501,49 @@ export const SettingsModal = React.memo(function SettingsModal(
               {
                 backgroundColor: colors.surface,
                 borderBottomColor: colors.border,
-                paddingTop: isLandscape ? 18 : insets.top + 14,
+                paddingTop: isLandscape ? 14 : insets.top + 12,
               },
             ]}
           >
-            <View style={styles.headerControlSlot}>
-              {showsBackButton ? (
-                <TouchableOpacity
-                  style={[
-                    styles.headerBackButton,
-                    {
-                      backgroundColor: colors.surfaceElevated,
-                      borderColor: colors.border,
-                    },
-                  ]}
-                  activeOpacity={0.85}
-                  onPress={() => setActivePage("overview")}
-                  accessibilityRole="button"
-                  accessibilityLabel={t("settingsBackToOverview")}
-                >
-                  <Feather
-                    name="chevron-left"
-                    size={20}
-                    color={colors.accent}
-                  />
-                </TouchableOpacity>
-              ) : null}
-            </View>
-            <View style={styles.headerCopy}>
+            {showsBackButton ? (
+              <AntIconButton
+                icon="left"
+                iconColor={colors.accent}
+                iconSize={23}
+                style={styles.headerControl}
+                onPress={() => setActivePage("overview")}
+                accessibilityLabel={t("settingsBackToOverview")}
+              />
+            ) : (
+              <View style={styles.headerControl} />
+            )}
+            <View style={styles.headerTitleWrap}>
               <Text
                 testID="settings-modal-title"
                 accessibilityRole="header"
-                style={[styles.title, { color: colors.text }]}
+                style={[styles.headerTitle, { color: colors.text }]}
               >
-                {modalTitle}
+                {title}
               </Text>
             </View>
-            <TouchableOpacity
-              style={[
-                styles.closeButton,
-                {
-                  backgroundColor: colors.surfaceElevated,
-                  borderColor: colors.border,
-                },
-              ]}
+            <AntIconButton
+              icon="close"
+              style={styles.headerControl}
               onPress={onClose}
-              accessibilityRole="button"
               accessibilityLabel={t("dismiss")}
-            >
-              <Feather name="x" size={18} color={colors.textSecondary} />
-            </TouchableOpacity>
+            />
           </View>
 
           <ScrollView
             ref={contentScrollRef}
-            style={styles.contentScroll}
-            showsVerticalScrollIndicator={false}
+            style={styles.scroll}
             contentContainerStyle={[
               styles.content,
-              isLandscape ? styles.contentLandscape : null,
               {
                 paddingBottom: Math.max(insets.bottom + 20, keyboardInset + 20),
               },
             ]}
-            scrollIndicatorInsets={{ bottom: keyboardInset }}
+            showsVerticalScrollIndicator={false}
             keyboardShouldPersistTaps="always"
             keyboardDismissMode="interactive"
             nestedScrollEnabled
@@ -538,7 +557,6 @@ export const SettingsModal = React.memo(function SettingsModal(
           onDismiss={() => setValidationToastMessage(null)}
           tone="danger"
         />
-      </View>
-    </Modal>
+    </View>
   );
 });

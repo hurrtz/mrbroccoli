@@ -4,7 +4,7 @@ import {
   getProviderCapabilityHealthState,
   getProviderHealthState,
   getProviderValidationTarget,
-} from "../../../src/components/settings/providerSupport";
+} from "../../../src/features/settings-core/providerSupport";
 
 describe("getProviderValidationTarget", () => {
   it("prefers llm validation for xAI once a key unlocks chat plus voice", () => {

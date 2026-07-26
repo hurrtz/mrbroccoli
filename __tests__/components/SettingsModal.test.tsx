@@ -1,13 +1,19 @@
 import React from "react";
-import { Alert, StyleSheet } from "react-native";
+import { StyleSheet } from "react-native";
 import {
+  act,
   fireEvent,
   render,
   waitFor,
   within,
 } from "@testing-library/react-native";
+import {
+  Modal as AntModal,
+  Picker as AntPicker,
+  Provider as AntProvider,
+} from "@ant-design/react-native";
 
-import { SettingsModal } from "../../src/components/SettingsModal";
+import { AntSettingsModal as SettingsModal } from "../../src/features/settings-antd/AntSettingsModal";
 import { PROVIDER_LABELS } from "../../src/constants/models";
 import { LocalizationProvider } from "../../src/i18n";
 import { ThemeProvider } from "../../src/theme/ThemeContext";
@@ -35,11 +41,17 @@ jest.mock("react-native-reanimated", () => {
     __esModule: true,
     default: {
       View,
+      createAnimatedComponent: (component: unknown) => component,
     },
+    createAnimatedComponent: (component: unknown) => component,
     useSharedValue: (value: number) => ({ value }),
+    useDerivedValue: (factory: () => unknown) => ({
+      value: factory(),
+    }),
     useAnimatedStyle: (factory: () => unknown) => factory(),
     withDelay: (_delay: number, value: unknown) => value,
     withTiming: (value: number) => value,
+    withSpring: (value: number) => value,
     Easing: {
       out: (value: unknown) => value,
       ease: "ease",
@@ -89,23 +101,25 @@ function renderSettingsModal(overrideProps: Partial<React.ComponentProps<typeof 
   return render(
     <ThemeProvider mode="light">
       <LocalizationProvider language="en">
-        <SettingsModal
-          visible
-          settings={DEFAULT_SETTINGS}
-          kokoroModel={kokoroModel}
-          providerVoiceDirectories={{}}
-          onUpdate={jest.fn()}
-          onUpdateResponseModeRoute={jest.fn()}
-          onUpdateProviderSttModel={jest.fn()}
-          onUpdateProviderTtsModel={jest.fn()}
-          onUpdateProviderTtsVoice={jest.fn()}
-          onUpdateApiKey={jest.fn()}
-          onPreviewVoice={jest.fn(async () => undefined)}
-          onStopPreviewVoice={jest.fn(async () => undefined)}
-          onValidateProviderCapability={jest.fn(async () => undefined)}
-          onClose={jest.fn()}
-          {...overrideProps}
-        />
+        <AntProvider>
+          <SettingsModal
+            visible
+            settings={DEFAULT_SETTINGS}
+            kokoroModel={kokoroModel}
+            providerVoiceDirectories={{}}
+            onUpdate={jest.fn()}
+            onUpdateResponseModeRoute={jest.fn()}
+            onUpdateProviderSttModel={jest.fn()}
+            onUpdateProviderTtsModel={jest.fn()}
+            onUpdateProviderTtsVoice={jest.fn()}
+            onUpdateApiKey={jest.fn()}
+            onPreviewVoice={jest.fn(async () => undefined)}
+            onStopPreviewVoice={jest.fn(async () => undefined)}
+            onValidateProviderCapability={jest.fn(async () => undefined)}
+            onClose={jest.fn()}
+            {...overrideProps}
+          />
+        </AntProvider>
       </LocalizationProvider>
     </ThemeProvider>,
   );
@@ -438,9 +452,7 @@ describe("SettingsModal", () => {
     await waitFor(() => {
       expect(screen.getByText("OpenAI")).toBeTruthy();
       const openAiRow = screen.getByTestId("provider-vault-row-openai");
-      expect(StyleSheet.flatten(openAiRow.props.style).backgroundColor).toBe(
-        lightColors.surfaceElevated,
-      );
+      expect(openAiRow.props.accessibilityLabel).toContain("Not tested");
       expect(screen.queryByText("Configured")).toBeNull();
       expect(screen.queryByText("Configured 1")).toBeNull();
       expect(screen.queryByText("check")).toBeNull();
@@ -474,9 +486,7 @@ describe("SettingsModal", () => {
       const llmPill = screen.getByTestId(
         "provider-capability-pill-openai-llm",
       );
-      expect(StyleSheet.flatten(llmPill.props.style).backgroundColor).toBe(
-        `${lightColors.success}22`,
-      );
+      expect(llmPill.props.accessibilityLabel).toBe("LLM: Working");
     });
   });
 
@@ -504,13 +514,11 @@ describe("SettingsModal", () => {
 
     await waitFor(() => {
       expect(screen.getByText("Invalid")).toBeTruthy();
-      expect(screen.getByText(errorMessage)).toBeTruthy();
+      expect(screen.getByText(new RegExp(errorMessage))).toBeTruthy();
       const llmPill = screen.getByTestId(
         "provider-capability-pill-openai-llm",
       );
-      expect(StyleSheet.flatten(llmPill.props.style).backgroundColor).toBe(
-        `${lightColors.danger}18`,
-      );
+      expect(llmPill.props.accessibilityLabel).toBe("LLM: Invalid");
     });
   });
 
@@ -557,9 +565,7 @@ describe("SettingsModal", () => {
       const llmPill = screen.getByTestId(
         "provider-capability-pill-openai-llm",
       );
-      expect(StyleSheet.flatten(llmPill.props.style).backgroundColor).toBe(
-        `${lightColors.success}22`,
-      );
+      expect(llmPill.props.accessibilityLabel).toBe("LLM: Working");
       expect(screen.queryByText("Invalid")).toBeNull();
     });
   });
@@ -695,8 +701,17 @@ describe("SettingsModal", () => {
     fireEvent.press(screen.getByTestId("mistral-voices-refresh"));
     expect(onRefreshMistralVoices).toHaveBeenCalledTimes(1);
 
-    fireEvent.press(screen.getByText("Calm Guide · calm-guide"));
-    fireEvent.press(screen.getByText("Studio Voice · studio-voice"));
+    const voicePicker = screen
+      .UNSAFE_getAllByType(AntPicker)
+      .find((picker) =>
+        picker.props.data.some(
+          (option: { value: string }) => option.value === "studio-voice",
+        ),
+      );
+    expect(voicePicker).toBeTruthy();
+    act(() => {
+      voicePicker?.props.onOk?.(["studio-voice"]);
+    });
 
     expect(onUpdateProviderTtsVoice).toHaveBeenCalledWith(
       "mistral",
@@ -813,8 +828,17 @@ describe("SettingsModal", () => {
     fireEvent.press(screen.getByTestId("elevenlabs-voices-refresh"));
     expect(refresh).toHaveBeenCalledTimes(1);
 
-    fireEvent.press(screen.getByText("Alex · British · male"));
-    fireEvent.press(screen.getByText("Sam · American"));
+    const voicePicker = screen
+      .UNSAFE_getAllByType(AntPicker)
+      .find((picker) =>
+        picker.props.data.some(
+          (option: { value: string }) => option.value === "voice-2",
+        ),
+      );
+    expect(voicePicker).toBeTruthy();
+    act(() => {
+      voicePicker?.props.onOk?.(["voice-2"]);
+    });
 
     expect(onUpdateProviderTtsVoice).toHaveBeenCalledWith(
       "elevenlabs",
@@ -901,36 +925,28 @@ describe("SettingsModal", () => {
 
     await waitFor(() => {
       expect(
-        StyleSheet.flatten(
-          screen.getByTestId(
-            "provider-capability-pill-elevenlabs-stt",
-          ).props.style,
-        ).backgroundColor,
-      ).toBe(`${lightColors.success}22`);
+        screen.getByTestId("provider-capability-pill-elevenlabs-stt")
+          .props.accessibilityLabel,
+      ).toBe("STT: Working");
       expect(
-        StyleSheet.flatten(
-          screen.getByTestId(
-            "provider-capability-pill-elevenlabs-tts",
-          ).props.style,
-        ).backgroundColor,
-      ).toBe(`${lightColors.success}22`);
+        screen.getByTestId("provider-capability-pill-elevenlabs-tts")
+          .props.accessibilityLabel,
+      ).toBe("TTS: Working");
       expect(
-        StyleSheet.flatten(
-          screen.getByTestId(
-            "provider-capability-pill-elevenlabs-voices",
-          ).props.style,
-        ).backgroundColor,
-      ).toBe(`${lightColors.danger}18`);
-      expect(screen.getByText("Missing voices_read permission")).toBeTruthy();
-      expect(screen.getAllByText("Working")).toHaveLength(2);
-      expect(screen.getByText("Invalid")).toBeTruthy();
+        screen.getByTestId("provider-capability-pill-elevenlabs-voices")
+          .props.accessibilityLabel,
+      ).toBe("Voice library: Invalid");
+      expect(
+        screen.getByText(/Missing voices_read permission/),
+      ).toBeTruthy();
+      expect(screen.getAllByText("Working").length).toBeGreaterThanOrEqual(2);
+      expect(
+        screen.getByText(/Invalid · Missing voices_read permission/),
+      ).toBeTruthy();
     });
   });
 
   it("styles speech diagnostics clearing as destructive and requires confirmation", async () => {
-    const alertSpy = jest
-      .spyOn(Alert, "alert")
-      .mockImplementation(() => undefined);
     const clearSpeechDiagnosticsMock = jest.mocked(clearSpeechDiagnostics);
     const screen = renderSettingsModal();
 
@@ -941,33 +957,41 @@ describe("SettingsModal", () => {
     });
 
     const clearLabel = screen.getByText("Clear");
-    expect(StyleSheet.flatten(clearLabel.props.style).color).toBe(
+    expect(StyleSheet.flatten(clearLabel.props.style).color).toBe("#ffffff");
+
+    fireEvent.press(clearLabel);
+
+    expect(clearSpeechDiagnosticsMock).not.toHaveBeenCalled();
+    let confirmation = screen.UNSAFE_getByType(AntModal);
+    expect(confirmation.props.visible).toBe(true);
+    expect(confirmation.props.title).toBe("Clear recent speech activity?");
+    expect(
+      confirmation.props.children.props.children,
+    ).toBe(
+      "This removes all captured speech-routing diagnostics. This action cannot be undone.",
+    );
+
+    const cancelAction = confirmation.props.footer.find(
+      (action: { text: string }) => action.text === "Cancel",
+    );
+    act(() => {
+      cancelAction.onPress();
+    });
+    confirmation = screen.UNSAFE_getByType(AntModal);
+    expect(confirmation.props.visible).toBe(false);
+    expect(clearSpeechDiagnosticsMock).not.toHaveBeenCalled();
+
+    fireEvent.press(clearLabel);
+    confirmation = screen.UNSAFE_getByType(AntModal);
+    const destructiveAction = confirmation.props.footer.find(
+      (action: { text: string }) => action.text === "Clear",
+    );
+    expect(StyleSheet.flatten(destructiveAction.style).color).toBe(
       lightColors.danger,
     );
-
-    fireEvent.press(clearLabel);
-
-    expect(clearSpeechDiagnosticsMock).not.toHaveBeenCalled();
-    expect(alertSpy).toHaveBeenCalledWith(
-      "Clear recent speech activity?",
-      "This removes all captured speech-routing diagnostics. This action cannot be undone.",
-      expect.arrayContaining([
-        expect.objectContaining({ text: "Cancel", style: "cancel" }),
-        expect.objectContaining({ text: "Clear", style: "destructive" }),
-      ]),
-    );
-
-    const cancelAction = alertSpy.mock.calls[0]?.[2]?.find(
-      (action) => action.style === "cancel",
-    );
-    cancelAction?.onPress?.();
-    expect(clearSpeechDiagnosticsMock).not.toHaveBeenCalled();
-
-    fireEvent.press(clearLabel);
-    const destructiveAction = alertSpy.mock.calls[1]?.[2]?.find(
-      (action) => action.style === "destructive",
-    );
-    destructiveAction?.onPress?.();
+    act(() => {
+      destructiveAction.onPress();
+    });
     expect(clearSpeechDiagnosticsMock).toHaveBeenCalledTimes(1);
   });
 });

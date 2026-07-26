@@ -21,6 +21,7 @@ module.exports = {
     View,
     createAnimatedComponent: identity,
   },
+  createAnimatedComponent: identity,
   cancelAnimation: () => undefined,
   Easing: {
     ease: identity,
@@ -29,6 +30,11 @@ module.exports = {
   },
   runOnJS: identity,
   useAnimatedStyle: (factory) => factory(),
+  useDerivedValue: (factory) => {
+    const derivedValue = React.useRef({ value: factory() });
+    derivedValue.current.value = factory();
+    return derivedValue.current;
+  },
   useSharedValue: (initialValue) => {
     const sharedValue = React.useRef({ value: initialValue });
     return sharedValue.current;

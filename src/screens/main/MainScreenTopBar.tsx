@@ -1,8 +1,9 @@
 import React from "react";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 
-import Feather from "@expo/vector-icons/Feather";
+import { Button } from "@ant-design/react-native";
 
+import { AntIconButton } from "../../design-system/AntIconButton";
 import { Colors } from "../../theme/colors";
 import { fonts } from "../../theme/typography";
 
@@ -33,20 +34,11 @@ export const MainScreenTopBar = React.memo(function MainScreenTopBar({
 }: MainScreenTopBarProps) {
   return (
     <View style={styles.topBar}>
-      <TouchableOpacity
-        style={[
-          styles.iconButton,
-          {
-            backgroundColor: "transparent",
-            borderColor: "transparent",
-          },
-        ]}
+      <AntIconButton
+        icon="menu"
         onPress={onOpenDrawer}
-        accessibilityRole="button"
         accessibilityLabel={drawerLabel}
-      >
-        <Feather name="sidebar" size={20} color={colors.textSecondary} />
-      </TouchableOpacity>
+      />
 
       <View
         testID="main-screen-title-slot"
@@ -78,8 +70,10 @@ export const MainScreenTopBar = React.memo(function MainScreenTopBar({
 
       <View style={styles.actions}>
         {onToggleDebugLog ? (
-          <TouchableOpacity
-            style={[
+          <Button
+            type="ghost"
+            size="small"
+            style={StyleSheet.flatten([
               styles.iconButton,
               {
                 backgroundColor: debugLogActive
@@ -87,9 +81,9 @@ export const MainScreenTopBar = React.memo(function MainScreenTopBar({
                   : "transparent",
                 borderColor: debugLogActive ? colors.accent : "transparent",
               },
-            ]}
+            ])}
+            activeStyle={{ backgroundColor: colors.surfaceAlt }}
             onPress={onToggleDebugLog}
-            accessibilityRole="button"
             accessibilityLabel={debugLogLabel}
           >
             <Text
@@ -102,23 +96,14 @@ export const MainScreenTopBar = React.memo(function MainScreenTopBar({
             >
               {debugLogLabel}
             </Text>
-          </TouchableOpacity>
+          </Button>
         ) : null}
 
-        <TouchableOpacity
-          style={[
-            styles.iconButton,
-            {
-              backgroundColor: "transparent",
-              borderColor: "transparent",
-            },
-          ]}
+        <AntIconButton
+          icon="setting"
           onPress={onOpenSettings}
-          accessibilityRole="button"
           accessibilityLabel={settingsLabel}
-        >
-          <Feather name="settings" size={20} color={colors.textSecondary} />
-        </TouchableOpacity>
+        />
       </View>
     </View>
   );
@@ -145,9 +130,10 @@ const styles = StyleSheet.create({
   iconButton: {
     width: 44,
     height: 44,
+    minWidth: 44,
+    minHeight: 44,
     borderRadius: 12,
-    alignItems: "center",
-    justifyContent: "center",
+    paddingHorizontal: 0,
     borderWidth: 1,
   },
   actions: {
@@ -168,7 +154,7 @@ const styles = StyleSheet.create({
   wordmarkText: {
     fontSize: 20,
     letterSpacing: 0.3,
-    fontFamily: fonts.displayHeavy,
+    fontFamily: fonts.headline,
   },
   compactBrand: {
     flexDirection: "row",
@@ -182,6 +168,6 @@ const styles = StyleSheet.create({
   compactBrandText: {
     fontSize: 14,
     letterSpacing: 0.6,
-    fontFamily: fonts.displayHeavy,
+    fontFamily: fonts.headline,
   },
 });

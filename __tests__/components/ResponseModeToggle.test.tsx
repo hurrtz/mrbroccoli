@@ -189,7 +189,7 @@ describe("ResponseModeToggle", () => {
         alignSelf: "stretch",
         marginLeft: 6,
         marginRight: 3,
-        width: 64,
+        width: 80,
       }),
     );
     expect(

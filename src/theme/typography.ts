@@ -1,21 +1,11 @@
 import { Platform, type TextStyle } from "react-native";
 
 export const fonts = {
-  display: Platform.select({
-    ios: "System",
-    android: "sans-serif-medium",
-    default: undefined,
-  }),
-  displayHeavy: Platform.select({
-    ios: "System",
-    android: "sans-serif-medium",
-    default: undefined,
-  }),
-  body: Platform.select({
-    ios: "System",
-    android: "sans-serif",
-    default: undefined,
-  }),
+  headline: "UnicaOne_400Regular",
+  display: "Outfit_600SemiBold",
+  displayHeavy: "Outfit_700Bold",
+  body: "Outfit_400Regular",
+  bodyMedium: "Outfit_500Medium",
   mono: Platform.select({
     ios: "Menlo",
     android: "monospace",
@@ -32,17 +22,17 @@ export const fonts = {
  */
 export const textStyles = {
   screenTitle: {
-    fontFamily: fonts.displayHeavy,
+    fontFamily: fonts.headline,
     fontSize: 26,
     lineHeight: 32,
-    fontWeight: "700",
+    fontWeight: "400",
     letterSpacing: -0.25,
   },
   sectionTitle: {
-    fontFamily: fonts.displayHeavy,
+    fontFamily: fonts.headline,
     fontSize: 18,
     lineHeight: 24,
-    fontWeight: "700",
+    fontWeight: "400",
     letterSpacing: -0.1,
   },
   subsectionTitle: {

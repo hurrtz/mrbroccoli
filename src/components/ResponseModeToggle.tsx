@@ -972,7 +972,7 @@ const styles = StyleSheet.create({
     fontFamily: fonts.body,
   },
   modelEffortSingleSlot: {
-    width: 64,
+    width: 80,
     flexShrink: 0,
     alignSelf: "stretch",
     marginLeft: 6,

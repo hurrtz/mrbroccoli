@@ -3,7 +3,7 @@ import { useCallback } from "react";
 import {
   getProviderValidationTarget,
   isWebSearchCapableProvider,
-} from "../../components/settings/providerSupport";
+} from "../../features/settings-core/providerSupport";
 import { recordDebugLogEvent } from "../../services/debugLogCapture";
 import { validateProviderConnection } from "../../services/llm";
 import {

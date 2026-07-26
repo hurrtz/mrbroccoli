@@ -282,8 +282,8 @@ jest.mock("../../src/screens/main/StatusDetailsModal", () => ({
   },
 }));
 
-jest.mock("../../src/components/SettingsModal", () => ({
-  SettingsModal: ({
+jest.mock("../../src/features/settings-antd/AntSettingsModal", () => ({
+  AntSettingsModal: ({
     visible,
     onOpenSetupGuide,
   }: {
@@ -468,9 +468,10 @@ describe("MainScreen", () => {
     );
 
     expect(screen.getByText("route-card")).toBeTruthy();
-    expect(screen.getByTestId("route-web-search-control").props.disabled).toBe(
-      true,
-    );
+    expect(
+      screen.getByTestId("route-web-search-control").props
+        .accessibilityState,
+    ).toEqual({ checked: false, disabled: true });
     expect(inputSection.getByText("voice-stage:disabled")).toBeTruthy();
     expect(
       StyleSheet.flatten(
@@ -496,9 +497,10 @@ describe("MainScreen", () => {
     const screen = renderWithProviders(<MainScreen />);
 
     expect(screen.getByTestId("route-web-search-control")).toBeTruthy();
-    expect(screen.getByTestId("route-web-search-control").props.disabled).toBe(
-      true,
-    );
+    expect(
+      screen.getByTestId("route-web-search-control").props
+        .accessibilityState,
+    ).toEqual({ checked: false, disabled: true });
   });
 
   it("turns an active automatic web-search route off from the main switch", () => {
@@ -514,8 +516,8 @@ describe("MainScreen", () => {
     const screen = renderWithProviders(<MainScreen />);
     const searchSwitch = screen.getByTestId("route-web-search-control");
 
-    expect(searchSwitch.props.value).toBe(true);
-    fireEvent(searchSwitch, "valueChange", false);
+    expect(searchSwitch.props.accessibilityState.checked).toBe(true);
+    fireEvent.press(searchSwitch);
 
     expect(sharedSettings.updateSettings).toHaveBeenCalledWith({
       webSearchMode: "off",
@@ -695,9 +697,10 @@ describe("MainScreen", () => {
         .flex,
     ).toBe(0.42);
     expect(screen.getByTestId("landscape-pane-divider")).toBeTruthy();
-    expect(screen.getByTestId("route-web-search-control").props.disabled).toBe(
-      false,
-    );
+    expect(
+      screen.getByTestId("route-web-search-control").props
+        .accessibilityState,
+    ).toEqual({ checked: false, disabled: false });
     expect(leftPane.queryByTestId("route-style-control")).toBeNull();
     expect(leftPane.queryByText("status-strip")).toBeNull();
     expect(leftPane.queryByText("toggle-debug-log")).toBeNull();

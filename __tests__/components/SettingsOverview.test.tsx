@@ -2,19 +2,11 @@ import React from "react";
 import { StyleSheet, Text } from "react-native";
 import { render } from "@testing-library/react-native";
 
-import { SettingsOverview } from "../../src/components/settings/SettingsOverview";
+import { AntSettingsOverview } from "../../src/features/settings-antd/AntSettingsOverview";
+import type { SettingsReadiness } from "../../src/features/settings-core/readiness";
 import { LocalizationProvider } from "../../src/i18n";
 import { ThemeProvider } from "../../src/theme/ThemeContext";
 import { lightColors } from "../../src/theme/colors";
-import type { SettingsReadiness } from "../../src/components/settings/readiness";
-
-jest.mock("@expo/vector-icons", () => ({
-  Feather: ({ name }: { name: string }) => {
-    const React = require("react");
-    const { Text } = require("react-native");
-    return React.createElement(Text, null, name);
-  },
-}));
 
 const readiness: SettingsReadiness = {
   think: { state: "ready", summaryKey: "settingsReadinessReady" },
@@ -23,12 +15,15 @@ const readiness: SettingsReadiness = {
   search: { state: "attention", summaryKey: "settingsReadinessNeedsAttention" },
 };
 
-describe("SettingsOverview", () => {
-  it("renders readiness success as a color-coded one-line chip without success copy", () => {
+describe("AntSettingsOverview", () => {
+  it("renders readiness as concise, accessible Ant buttons", () => {
     const screen = render(
       <ThemeProvider mode="light">
         <LocalizationProvider language="en">
-          <SettingsOverview readiness={readiness} onOpenPage={jest.fn()} />
+          <AntSettingsOverview
+            readiness={readiness}
+            onOpenPage={jest.fn()}
+          />
         </LocalizationProvider>
       </ThemeProvider>,
     );
@@ -37,9 +32,8 @@ describe("SettingsOverview", () => {
     const speakChip = screen.getByLabelText("Speak: Off");
 
     expect(StyleSheet.flatten(thinkChip.props.style).backgroundColor).toBe(
-      `${lightColors.success}22`,
+      `${lightColors.success}18`,
     );
-    expect(screen.getByText("Think").props.numberOfLines).toBe(1);
     expect(thinkChip.findAllByType(Text)).toHaveLength(1);
     expect(speakChip.findAllByType(Text)).toHaveLength(1);
     expect(screen.queryByText("Runtime Readiness")).toBeNull();
@@ -49,11 +43,11 @@ describe("SettingsOverview", () => {
     expect(screen.queryByText("Broken")).toBeNull();
   });
 
-  it("shows one guided-setup icon and no trailing launch icon", () => {
+  it("exposes guided setup as one clear action", () => {
     const screen = render(
       <ThemeProvider mode="light">
         <LocalizationProvider language="en">
-          <SettingsOverview
+          <AntSettingsOverview
             readiness={readiness}
             onOpenPage={jest.fn()}
             onOpenSetupGuide={jest.fn()}
@@ -62,29 +56,33 @@ describe("SettingsOverview", () => {
       </ThemeProvider>,
     );
 
-    expect(screen.getAllByText("icon:compass")).toHaveLength(1);
-    expect(screen.queryByText("icon:arrow-up-right")).toBeNull();
+    expect(screen.getByLabelText("Guided setup")).toBeTruthy();
+    expect(screen.getAllByText("Guided setup")).toHaveLength(1);
   });
 
   it("shows larger section icons without bordered icon containers", () => {
     const screen = render(
       <ThemeProvider mode="light">
         <LocalizationProvider language="en">
-          <SettingsOverview readiness={readiness} onOpenPage={jest.fn()} />
+          <AntSettingsOverview
+            readiness={readiness}
+            onOpenPage={jest.fn()}
+          />
         </LocalizationProvider>
       </ThemeProvider>,
     );
 
-    expect(
-      StyleSheet.flatten(
-        screen.getByTestId("settings-overview-icon-connections").props.style,
-      ),
-    ).toEqual(expect.objectContaining({ borderWidth: 0 }));
-    expect(
-      StyleSheet.flatten(screen.getByTestId("icon-key").props.style).fontSize,
-    ).toBe(24);
-    expect(
-      StyleSheet.flatten(screen.getByTestId("icon-key").props.style).color,
-    ).toBe(lightColors.text);
+    const iconContainer = screen.getByTestId(
+      "settings-overview-icon-connections",
+    );
+    const containerStyle = StyleSheet.flatten(iconContainer.props.style);
+    const iconStyle = StyleSheet.flatten(
+      iconContainer.findByType(Text).props.style,
+    );
+
+    expect(containerStyle.width).toBe(34);
+    expect(containerStyle.borderWidth).toBeUndefined();
+    expect(iconStyle.fontSize).toBe(27);
+    expect(iconStyle.color).toBe(lightColors.text);
   });
 });

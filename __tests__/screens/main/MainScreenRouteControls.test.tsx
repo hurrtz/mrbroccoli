@@ -2,6 +2,7 @@ import React from "react";
 import { StyleSheet } from "react-native";
 import { fireEvent, render } from "@testing-library/react-native";
 
+import { AntSwitch } from "../../../src/design-system/AntSwitch";
 import { MainScreenRouteControls } from "../../../src/screens/main/MainScreenRouteControls";
 import { lightColors } from "../../../src/theme/colors";
 
@@ -19,7 +20,7 @@ const t = (key: string) =>
   })[key] ?? key;
 
 describe("MainScreenRouteControls", () => {
-  it("right-aligns and optically centers the native web-search control", () => {
+  it("right-aligns and optically centers the Ant web-search control", () => {
     const onToggleWebSearchEnabled = jest.fn();
     const screen = render(
       <MainScreenRouteControls
@@ -35,6 +36,7 @@ describe("MainScreenRouteControls", () => {
       screen.getByTestId("route-controls-row").props.style,
     );
     const searchSwitch = screen.getByTestId("route-web-search-control");
+    const antSwitch = screen.UNSAFE_getByType(AntSwitch);
     const searchLabelStyle = StyleSheet.flatten(
       screen.getByTestId("route-web-search-label").props.style,
     );
@@ -53,16 +55,16 @@ describe("MainScreenRouteControls", () => {
       checked: true,
       disabled: false,
     });
-    expect(searchSwitch.props.disabled).toBe(false);
-    expect(searchSwitch.props.value).toBe(true);
-    expect(searchSwitch.props.tintColor).toBe(lightColors.borderStrong);
-    expect(searchSwitch.props.onTintColor).toBe(lightColors.accent);
-    expect(searchSwitch.props.thumbTintColor).toBe(lightColors.onAccent);
-    expect(StyleSheet.flatten(searchSwitch.props.style).backgroundColor).toBe(
-      lightColors.borderStrong,
-    );
+    expect(antSwitch.props.disabled).toBe(false);
+    expect(antSwitch.props.checked).toBe(true);
+    expect(antSwitch.props.trackColor).toEqual({
+      false: lightColors.borderStrong,
+      true: lightColors.accent,
+    });
+    expect(antSwitch.props.thumbColor).toBe(lightColors.onAccent);
+    expect(antSwitch.props.thumbTintColor).toBe(lightColors.onAccent);
 
-    fireEvent(searchSwitch, "valueChange", false);
+    fireEvent.press(searchSwitch);
     expect(onToggleWebSearchEnabled).toHaveBeenCalledTimes(1);
   });
 
@@ -78,6 +80,7 @@ describe("MainScreenRouteControls", () => {
     );
 
     const searchSwitch = screen.getByTestId("route-web-search-control");
+    const antSwitch = screen.UNSAFE_getByType(AntSwitch);
     const containerStyle = StyleSheet.flatten(
       screen.getByTestId("route-web-search-container").props.style,
     );
@@ -88,11 +91,11 @@ describe("MainScreenRouteControls", () => {
       checked: false,
       disabled: true,
     });
-    expect(searchSwitch.props.disabled).toBe(true);
-    expect(searchSwitch.props.onValueChange).toBeUndefined();
-    expect(searchSwitch.props.value).toBe(false);
+    expect(antSwitch.props.disabled).toBe(true);
+    expect(antSwitch.props.onChange).toBeUndefined();
+    expect(antSwitch.props.checked).toBe(false);
 
-    fireEvent(searchSwitch, "valueChange", true);
+    fireEvent.press(searchSwitch);
     expect(onToggleWebSearchEnabled).not.toHaveBeenCalled();
   });
 

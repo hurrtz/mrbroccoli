@@ -2,7 +2,7 @@ import { DEFAULT_SETTINGS, Settings } from "../../src/types";
 import {
   getSettingsReadiness,
   type SettingsReadinessStatus,
-} from "../../src/components/settings/readiness";
+} from "../../src/features/settings-core/readiness";
 
 function withSettings(partial: Partial<Settings>): Settings {
   return {

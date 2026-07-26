@@ -1,10 +1,11 @@
 module.exports = {
   preset: "react-native",
+  setupFiles: ["react-native-gesture-handler/jestSetup"],
   transform: {
     "^.+\\.(js|jsx|ts|tsx)$": "babel-jest",
   },
   transformIgnorePatterns: [
-    "node_modules/(?!(jest-)?react-native|@react-native(-community)?|@react-native-async-storage|react-native-uuid|@testing-library)",
+    "node_modules/(?!(jest-)?react-native|@react-native(-community)?|@react-native-async-storage|react-native-uuid|@testing-library|@ant-design|@bang88|@expo-google-fonts|rc-util)",
   ],
   moduleNameMapper: {
     "\\.svg$": "<rootDir>/__mocks__/svgMock.js",

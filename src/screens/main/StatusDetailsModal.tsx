@@ -7,10 +7,10 @@ import {
   View,
   useWindowDimensions,
 } from "react-native";
-import Feather from "@expo/vector-icons/Feather";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { APP_MODAL_ORIENTATIONS } from "../../constants/layout";
+import { AntIconButton } from "../../design-system/AntIconButton";
 import { Colors } from "../../theme/colors";
 
 import { TranslateFn } from "./shared";
@@ -88,7 +88,9 @@ export const StatusDetailsModal = React.memo(function StatusDetailsModal({
                 {statusDetail}
               </Text>
             </View>
-            <TouchableOpacity
+            <AntIconButton
+              icon="close"
+              iconSize={18}
               style={[
                 styles.menuIconButton,
                 {
@@ -97,10 +99,8 @@ export const StatusDetailsModal = React.memo(function StatusDetailsModal({
                 },
               ]}
               onPress={onClose}
-              activeOpacity={0.85}
-            >
-              <Feather name="x" size={18} color={colors.textSecondary} />
-            </TouchableOpacity>
+              accessibilityLabel={t("dismiss")}
+            />
           </View>
 
           <View style={styles.statusDetailsBadges}>

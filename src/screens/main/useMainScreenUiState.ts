@@ -2,7 +2,7 @@ import { useCallback, useRef, useState } from "react";
 
 import { getCatalogProviderIdForAppProvider } from "../../catalog/appProviders";
 import type { CatalogProviderId } from "../../catalog/types";
-import type { SettingsTab } from "../../components/settings/types";
+import type { SettingsTab } from "../../features/settings-core/types";
 import { Conversation, Provider } from "../../types";
 
 export function useMainScreenUiState() {

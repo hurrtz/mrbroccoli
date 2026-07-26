@@ -1,25 +1,17 @@
 import React from "react";
 import { render } from "@testing-library/react-native";
 
-import { ResponseModesSection } from "../../src/components/settings/ResponseModesSection";
+import { ThinkingSettingsPage } from "../../src/features/settings-antd/pages/ThinkingSettingsPage";
 import { LocalizationProvider } from "../../src/i18n";
 import { ThemeProvider } from "../../src/theme/ThemeContext";
 import { DEFAULT_SETTINGS } from "../../src/types";
 
-jest.mock("@expo/vector-icons", () => ({
-  Feather: ({ name }: { name: string }) => {
-    const React = require("react");
-    const { Text } = require("react-native");
-    return React.createElement(Text, null, name);
-  },
-}));
-
-describe("ResponseModesSection", () => {
+describe("ThinkingSettingsPage response modes", () => {
   it("shows an effort picker for Gemini models with thinking levels", () => {
     const screen = render(
       <ThemeProvider mode="light">
         <LocalizationProvider language="en">
-          <ResponseModesSection
+          <ThinkingSettingsPage
             settings={{
               ...DEFAULT_SETTINGS,
               responseModes: [
@@ -48,7 +40,8 @@ describe("ResponseModesSection", () => {
                 },
               ],
             }}
-            enabledProviders={["gemini"]}
+            llmProviders={["gemini"]}
+            onUpdate={jest.fn()}
             onUpdateResponseModeRoute={jest.fn()}
             onAddResponseMode={jest.fn()}
             onRemoveResponseMode={jest.fn()}
@@ -65,7 +58,7 @@ describe("ResponseModesSection", () => {
     const screen = render(
       <ThemeProvider mode="light">
         <LocalizationProvider language="en">
-          <ResponseModesSection
+          <ThinkingSettingsPage
             settings={{
               ...DEFAULT_SETTINGS,
               responseModes: [
@@ -79,7 +72,8 @@ describe("ResponseModesSection", () => {
                 },
               ],
             }}
-            enabledProviders={["gemini"]}
+            llmProviders={["gemini"]}
+            onUpdate={jest.fn()}
             onUpdateResponseModeRoute={jest.fn()}
             onAddResponseMode={jest.fn()}
             onRemoveResponseMode={jest.fn()}
