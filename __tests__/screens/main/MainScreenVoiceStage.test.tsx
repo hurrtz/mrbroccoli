@@ -20,19 +20,38 @@ jest.mock("../../../src/hooks/useReducedMotion", () => ({
 
 jest.mock("react-native-gesture-handler", () => {
   const React = require("react");
-  const chain = {
-    activeOffsetX: () => chain,
-    disallowInterruption: () => chain,
-    failOffsetY: () => chain,
-    onEnd: () => chain,
-    onFinalize: () => chain,
-    onStart: () => chain,
-    onUpdate: () => chain,
-    simultaneousWithExternalGesture: () => chain,
+  const { View } = require("react-native");
+  const createGesture = (kind: "native" | "pan") => {
+    const gesture = {
+      kind,
+      activeOffsetX: () => gesture,
+      disallowInterruption: () => gesture,
+      failOffsetY: () => gesture,
+      onEnd: () => gesture,
+      onFinalize: () => gesture,
+      onStart: () => gesture,
+      onUpdate: () => gesture,
+      simultaneousWithExternalGesture: () => gesture,
+    };
+    return gesture;
   };
   return {
-    Gesture: { Native: () => chain, Pan: () => chain },
-    GestureDetector: ({ children }: { children: React.ReactNode }) => children,
+    Gesture: {
+      Native: () => createGesture("native"),
+      Pan: () => createGesture("pan"),
+    },
+    GestureDetector: ({
+      children,
+      gesture,
+    }: {
+      children: React.ReactNode;
+      gesture: { kind: "native" | "pan" };
+    }) =>
+      React.createElement(
+        View,
+        { testID: `${gesture.kind}-gesture-detector` },
+        children,
+      ),
     TouchableOpacity: require("react-native").TouchableOpacity,
   };
 });
@@ -155,6 +174,17 @@ describe("MainScreenVoiceStage composer", () => {
         minHeight: 68,
         width: "100%",
       }),
+    );
+  });
+
+  it("attaches the native gesture directly to the text input", () => {
+    const screen = render(<MainScreenVoiceStage {...createProps()} />);
+    const textInput = screen.getByTestId("voice-text-input", {
+      includeHiddenElements: true,
+    });
+
+    expect(textInput.parent?.parent?.props.testID).toBe(
+      "native-gesture-detector",
     );
   });
 

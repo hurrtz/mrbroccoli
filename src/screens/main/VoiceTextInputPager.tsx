@@ -385,8 +385,8 @@ export function VoiceTextInputPager({
                   },
                 ]}
               >
-                <GestureDetector gesture={textInputGesture}>
-                  <Animated.View style={localStyles.textInputWrap}>
+                <View style={localStyles.textInputWrap}>
+                  <GestureDetector gesture={textInputGesture}>
                     <TextInput
                       ref={textInputRef}
                       testID="voice-text-input"
@@ -403,8 +403,8 @@ export function VoiceTextInputPager({
                       onSubmitEditing={handleSubmitTextMessage}
                       style={[localStyles.textInput, { color: colors.text }]}
                     />
-                  </Animated.View>
-                </GestureDetector>
+                  </GestureDetector>
+                </View>
                 <TouchableOpacity
                   testID="voice-text-primary-action"
                   accessibilityLabel={t("sendTextMessage")}
