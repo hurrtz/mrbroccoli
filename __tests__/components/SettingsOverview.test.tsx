@@ -65,4 +65,26 @@ describe("SettingsOverview", () => {
     expect(screen.getAllByText("icon:compass")).toHaveLength(1);
     expect(screen.queryByText("icon:arrow-up-right")).toBeNull();
   });
+
+  it("shows larger section icons without bordered icon containers", () => {
+    const screen = render(
+      <ThemeProvider mode="light">
+        <LocalizationProvider language="en">
+          <SettingsOverview readiness={readiness} onOpenPage={jest.fn()} />
+        </LocalizationProvider>
+      </ThemeProvider>,
+    );
+
+    expect(
+      StyleSheet.flatten(
+        screen.getByTestId("settings-overview-icon-connections").props.style,
+      ),
+    ).toEqual(expect.objectContaining({ borderWidth: 0 }));
+    expect(
+      StyleSheet.flatten(screen.getByTestId("icon-key").props.style).fontSize,
+    ).toBe(24);
+    expect(
+      StyleSheet.flatten(screen.getByTestId("icon-key").props.style).color,
+    ).toBe(lightColors.text);
+  });
 });

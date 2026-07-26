@@ -226,12 +226,10 @@ export function SettingsOverview({
             })}
           >
             <View
-              style={[
-                styles.overviewRowIcon,
-                { backgroundColor: colors.surface, borderColor: colors.border },
-              ]}
+              testID={`settings-overview-icon-${row.page}`}
+              style={styles.overviewRowIcon}
             >
-              <Feather name={row.icon} size={17} color={colors.accent} />
+              <Feather name={row.icon} size={24} color={colors.text} />
             </View>
             <View style={styles.overviewRowCopy}>
               <Text style={[styles.overviewRowTitle, { color: colors.text }]}>

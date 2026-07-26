@@ -581,8 +581,7 @@ export const styles = StyleSheet.create({
   overviewRowIcon: {
     width: 40,
     height: 40,
-    borderRadius: 10,
-    borderWidth: 1,
+    borderWidth: 0,
     alignItems: "center",
     justifyContent: "center",
   },

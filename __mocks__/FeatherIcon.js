@@ -1,10 +1,10 @@
 const React = require("react");
 const { Text } = require("react-native");
 
-function FeatherIcon({ name, color, testID }) {
+function FeatherIcon({ name, color, size, testID }) {
   return React.createElement(
     Text,
-    { style: { color }, testID: testID ?? `icon-${name}` },
+    { style: { color, fontSize: size }, testID: testID ?? `icon-${name}` },
     `icon:${name}`,
   );
 }
