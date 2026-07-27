@@ -1,6 +1,6 @@
 # Provider Runtime Reference
 
-Last updated: 2026-07-25
+Last updated: 2026-07-27
 
 This document tracks the providers that are present in Mr Broccoli's runtime
 manifest. The source of truth is `src/constants/providers/runtimeManifest.ts`;
@@ -121,7 +121,9 @@ validation, API-key storage, setup-guide routing, and web-search dispatch:
 - Effort: `generationConfig.thinkingConfig.thinkingLevel` for Gemini 3.x rows
   that expose thinking levels.
 - Web search: Gemini Interactions API with `google_search` grounding.
-- STT picker: Google Cloud Speech V2 catalog rows, default `chirp_3`.
+- STT picker: `gemini-3.5-flash` for AI Studio credentials. Existing Google
+  Cloud Speech credentials continue to use `chirp_3` through the compatibility
+  route.
 - TTS picker: Gemini TTS preview rows.
 
 ### xAI (`xai`)
@@ -132,7 +134,8 @@ validation, API-key storage, setup-guide routing, and web-search dispatch:
 - Web search: xAI Responses API with `web_search`; search mode maps to
   `max_turns`.
 - STT picker: standalone xAI `grok-stt` route.
-- TTS picker: standalone xAI `grok-tts` route.
+- TTS picker: standalone xAI `text-to-speech` route, backed by the Grok TTS
+  service catalog entry.
 
 ### DeepSeek (`deepseek`)
 

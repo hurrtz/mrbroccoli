@@ -85,6 +85,8 @@ legacy hand-built UI with `@ant-design/react-native`.
 - [x] Model-selection guidance in an info modal
 - [x] Always-visible full-width system prompt and multiline editing
 - [x] System-prompt guidance in an info modal
+- [x] Shared, scrollable information modal behavior with standard icon-button
+      affordances
 
 ### Listening
 
@@ -106,6 +108,7 @@ legacy hand-built UI with `@ant-design/react-native`.
 - [x] Provider, native, and Kokoro voice selection and preview controls
 - [x] Dynamic voice-directory refresh and manual fallback entry
 - [x] Kokoro download, progress, delete, voice selection, and preview behavior
+- [x] Global provider voice defaults plus compact per-language override cards
 
 ### Search
 
@@ -129,6 +132,8 @@ legacy hand-built UI with `@ant-design/react-native`.
 - [x] Web Search switch
 - [x] Standard text fields and supporting actions evaluated
 - [x] Toast, confirmation, and generic status surfaces evaluated
+- [x] Explicit pressed feedback for visible Settings and response-route
+      `Pressable` controls
 
 ## Intentional exceptions
 
@@ -146,14 +151,18 @@ legacy hand-built UI with `@ant-design/react-native`.
 
 ## Verification
 
-- `npx tsc --noEmit`
-- `npm test -- --runInBand --watchman=false --silent`: 110 suites and 811 tests
+- `npm test -- --runInBand --watchman=false --silent`: 111 suites and 856 tests
   passed
 - `npm run config:verify`: native configuration matched `app.json` across 19 checks
 - `npx expo-doctor`: 18/18 checks passed
+- `npm run typecheck`: passed
 - Production Android export completed with Outfit 400/500/600/700 and Unica
   One 400 assets
 - Android debug APK assembled successfully
 - Android emulator interaction checks covered Settings navigation, pickers,
   confirmations, light/dark themes, English/German, portrait/landscape, the
   home controls, and the final font-metric layout
+- The Settings entry point, responsive frame, page routing, and individual
+  pages are separate components; home response-route layouts, voice/text
+  input faces, conversation settings, and voice-session controllers are also
+  split by responsibility.

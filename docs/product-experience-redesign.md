@@ -315,3 +315,38 @@ Evidence reviewed: all 38 supplied screenshots in `~/Desktop/mrbroccoli`, coveri
 - Added a six-point landscape margin above the native Web Search switch. Portrait retains its tighter existing placement and its four-card horizontal row.
 - Live simulator QA covered the populated four-route landscape stack and the unchanged portrait row. Web Search remained off, the `Testee` conversation and configured providers were preserved, and the simulator was restored to portrait.
 - Verification: all 89 Jest suites / 598 tests, `npx tsc --noEmit`, and `git diff --check` pass.
+
+## 17. Adaptive route selector and Settings completion
+
+This section supersedes the earlier four-card home-screen layout described in
+sections 10, 12, and 16.
+
+- One visible response route uses a spacious full-width card with a large
+  provider mark, centered model identity, and restrained effort metadata. Two
+  routes use a balanced compact layout; three routes use centered vertical
+  cards. Portrait and landscape preserve the same hierarchy while adapting
+  spacing to their available width.
+- Four or more visible routes collapse into one full-width selector card for
+  the active route. Tapping it opens a scrollable bottom sheet with the full
+  route list, active-state feedback, effort metadata, a uniformly fading
+  backdrop, and safe bottom spacing.
+- Settings now uses the Ant Design Native surface under
+  `src/features/settings-antd/`, with separate responsive frame, navigation,
+  page-routing, and page components. Provider cards use distinct header, body,
+  and capability-footer regions; help content opens in standard scrollable
+  information modals.
+- Outfit is the copy and control typeface. Unica One is limited to the product
+  wordmark and major Settings page titles.
+- Speaking settings now cover native, provider, and downloaded Kokoro routes;
+  global and per-language voice choices; voice previews; and explicitly
+  ordered opt-in fallbacks. Native speech remains the terminal route without a
+  fallback.
+- Home Web Search and Android Settings toggles use platform-native switches
+  with theme-aligned colors. Visible custom pressables expose pressed feedback,
+  while icon-only actions use standard vector icons and accessibility labels.
+- The underlying architecture now separates response-route layouts,
+  voice/text input faces, conversation-setting sections, Settings navigation
+  and presentation, standard versus Drive Session voice control, persisted
+  setting normalization, and voice-pipeline lifecycle stages.
+- Verification: 111 Jest suites / 856 tests, `npm run typecheck`, 19 native
+  configuration checks, and all 18 Expo Doctor checks pass.
