@@ -199,6 +199,9 @@ export const styles = StyleSheet.create({
     paddingBottom: 14,
     gap: 10,
   },
+  accordionPickerBody: {
+    paddingHorizontal: 0,
+  },
   buttonRow: {
     flexDirection: "row",
     flexWrap: "wrap",

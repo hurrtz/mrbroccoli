@@ -165,7 +165,12 @@ export function SearchSettingsPage({
               title={t("webSearchAdvanced")}
             >
               <View>
-                <View style={styles.accordionBody}>
+                <View
+                  style={[
+                    styles.accordionBody,
+                    styles.accordionPickerBody,
+                  ]}
+                >
                   <View>
                     {controlSupport.resultLimit ? (
                       <AntPickerRow

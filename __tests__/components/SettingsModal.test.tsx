@@ -442,6 +442,7 @@ describe("SettingsModal", () => {
           ...DEFAULT_SETTINGS.apiKeys,
           openai: "test-key",
         },
+        webSearchProvider: "openai",
       },
     });
 
@@ -612,6 +613,16 @@ describe("SettingsModal", () => {
       expect(screen.queryByText("Response Tone")).toBeNull();
     });
 
+    fireEvent.press(screen.getByText("System Prompt"));
+
+    await waitFor(() => {
+      expect(
+        screen.getByText(
+          "Shape the hidden guidance the model receives before every reply.",
+        ),
+      ).toBeTruthy();
+    });
+
     fireEvent.press(screen.getByLabelText("Back to overview"));
     fireEvent.press(screen.getByLabelText("Open Search"));
 
@@ -620,7 +631,14 @@ describe("SettingsModal", () => {
         "Search",
       );
       expect(screen.getByText("Web Search Provider")).toBeTruthy();
+      expect(screen.getByText("Advanced Search Controls")).toBeTruthy();
       expect(screen.queryByText("Response Modes")).toBeNull();
+    });
+
+    fireEvent.press(screen.getByText("Advanced Search Controls"));
+
+    await waitFor(() => {
+      expect(screen.getByText("Search Mode")).toBeTruthy();
     });
 
     fireEvent.press(screen.getByLabelText("Back to overview"));
