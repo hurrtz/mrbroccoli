@@ -2,15 +2,10 @@ import React from "react";
 import {
   Animated,
   BackHandler,
-  Pressable,
-  ScrollView,
-  Text,
-  View,
   useWindowDimensions,
 } from "react-native";
 
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import Feather from "@expo/vector-icons/Feather";
 
 import { getSettingsReadiness } from "../settings-core/readiness";
 import type {
@@ -19,25 +14,15 @@ import type {
 } from "../settings-core/types";
 import { useProviderValidationState } from "../settings-core/useProviderValidationState";
 import { useSettingsController } from "../settings-core/useSettingsController";
-import { Toast } from "../../components/Toast";
-import { AntIconButton } from "../../design-system/AntIconButton";
 import { useLocalization } from "../../i18n";
-import { useTheme } from "../../theme/ThemeContext";
 import {
   Provider,
   ProviderCapability,
   ProviderValidationResult,
-  TtsListenLanguage,
 } from "../../types";
 
-import { AntSettingsOverview } from "./AntSettingsOverview";
-import { AppSettingsPage } from "./pages/AppSettingsPage";
-import { ConnectionsSettingsPage } from "./pages/ConnectionsSettingsPage";
-import { ListeningSettingsPage } from "./pages/ListeningSettingsPage";
-import { SearchSettingsPage } from "./pages/SearchSettingsPage";
-import { SpeakingSettingsPage } from "./pages/SpeakingSettingsPage";
-import { ThinkingSettingsPage } from "./pages/ThinkingSettingsPage";
-import { styles } from "./styles";
+import { AntSettingsPageContent } from "./AntSettingsPageContent";
+import { AntSettingsFrame } from "./AntSettingsFrame";
 
 type DrillInSettingsPage = Exclude<SettingsPage, "overview">;
 
@@ -81,21 +66,11 @@ export const AntSettingsModal = React.memo(function AntSettingsModal(
     focusCatalogProviderId,
     focusTab,
     onUpdate,
-    onUpdateResponseModeRoute,
-    onAddResponseMode,
-    onRemoveResponseMode,
-    onUpdateProviderSttModel,
-    onUpdateProviderTtsModel,
-    onUpdateProviderTtsVoice,
-    providerVoiceDirectories,
-    onUpdateApiKey,
     onPreviewVoice,
     onStopPreviewVoice,
     onValidateProviderCapability,
-    onOpenSetupGuide,
     onClose,
   } = props;
-  const { colors } = useTheme();
   const { t } = useLocalization();
   const insets = useSafeAreaInsets();
   const { height, width } = useWindowDimensions();
@@ -112,34 +87,7 @@ export const AntSettingsModal = React.memo(function AntSettingsModal(
   const [validationToastMessage, setValidationToastMessage] = React.useState<
     string | null
   >(null);
-  const {
-    contentScrollRef,
-    providerPreviewTexts,
-    kokoroPreviewTexts,
-    setProviderPreviewText,
-    setKokoroPreviewText,
-    nativePreviewText,
-    setNativePreviewText,
-    activePreview,
-    keyboardInset,
-    speechDiagnostics,
-    handleTextInputFocus,
-    handlePreviewProviderVoice,
-    handlePreviewNativeVoice,
-    handlePreviewKokoroVoice,
-    selectedSttProviderModelOptions,
-    selectedSttProviderModel,
-    sttLanguageNote,
-    sttLimitNote,
-    ttsLanguageNote,
-    selectedPreviewProvider,
-    selectedPreviewProviderModelOptions,
-    selectedPreviewProviderModel,
-    nativeVoiceOptions,
-    selectedNativeVoice,
-    setSelectedNativeVoice,
-    toggleListenLanguage,
-  } = useSettingsController({
+  const controller = useSettingsController({
     visible,
     settings,
     onUpdate,
@@ -164,18 +112,7 @@ export const AntSettingsModal = React.memo(function AntSettingsModal(
     },
     [onUpdate, settings.providerValidationResults],
   );
-  const {
-    getHealthState,
-    getCapabilityHealthState,
-    getValidationState,
-    canValidateCapability,
-    validateProviderCapabilityForSettings,
-    validateAllProviderCapabilities,
-    selectableLlmProviders,
-    selectableSttProviders,
-    selectableTtsProviders,
-    selectableSearchProviders,
-  } = useProviderValidationState({
+  const validation = useProviderValidationState({
     settings,
     onValidateProviderCapability,
     onValidationError: setValidationToastMessage,
@@ -184,18 +121,18 @@ export const AntSettingsModal = React.memo(function AntSettingsModal(
   const readiness = React.useMemo(
     () =>
       getSettingsReadiness(settings, {
-        llmProviders: selectableLlmProviders,
-        sttProviders: selectableSttProviders,
-        ttsProviders: selectableTtsProviders,
-        searchProviders: selectableSearchProviders,
+        llmProviders: validation.selectableLlmProviders,
+        sttProviders: validation.selectableSttProviders,
+        ttsProviders: validation.selectableTtsProviders,
+        searchProviders: validation.selectableSearchProviders,
         kokoroInstalled: kokoroModel.installed,
       }),
     [
       kokoroModel.installed,
-      selectableLlmProviders,
-      selectableSearchProviders,
-      selectableSttProviders,
-      selectableTtsProviders,
+      validation.selectableLlmProviders,
+      validation.selectableSearchProviders,
+      validation.selectableSttProviders,
+      validation.selectableTtsProviders,
       settings,
     ],
   );
@@ -229,10 +166,13 @@ export const AntSettingsModal = React.memo(function AntSettingsModal(
   React.useEffect(() => {
     if (visible) {
       requestAnimationFrame(() => {
-        contentScrollRef.current?.scrollTo({ y: 0, animated: false });
+        controller.contentScrollRef.current?.scrollTo({
+          y: 0,
+          animated: false,
+        });
       });
     }
-  }, [activePage, visible]);
+  }, [activePage, controller.contentScrollRef, visible]);
 
   const getPageTitle = React.useCallback(
     (page: DrillInSettingsPage) => {
@@ -254,149 +194,20 @@ export const AntSettingsModal = React.memo(function AntSettingsModal(
     [t],
   );
 
-  const renderDrillInPage = React.useCallback(
-    (_page: DrillInSettingsPage, children: React.ReactNode) => (
-      <View style={styles.drillInPage}>{children}</View>
-    ),
-    [],
+  const activeContent = (
+    <AntSettingsPageContent
+      activePage={activePage}
+      controller={controller}
+      onOpenPage={setActivePage}
+      onValidationStart={() => setValidationToastMessage(null)}
+      props={props}
+      readiness={readiness}
+      validation={validation}
+    />
   );
 
-  const activeContent = (() => {
-    switch (activePage) {
-      case "overview":
-        return (
-          <AntSettingsOverview
-            readiness={readiness}
-            onOpenPage={setActivePage}
-            onOpenSetupGuide={onOpenSetupGuide}
-          />
-        );
-      case "connections":
-        return renderDrillInPage(
-          "connections",
-          <ConnectionsSettingsPage
-            settings={settings}
-            focusProvider={focusProvider}
-            focusCatalogProviderId={focusCatalogProviderId}
-            getProviderHealthState={getHealthState}
-            getProviderCapabilityHealthState={getCapabilityHealthState}
-            getProviderValidationState={getValidationState}
-            canValidateCapability={canValidateCapability}
-            onValidateCapability={async (provider, capability) => {
-              setValidationToastMessage(null);
-              await validateProviderCapabilityForSettings(
-                provider,
-                capability,
-              );
-            }}
-            onValidateAll={async (provider) => {
-              setValidationToastMessage(null);
-              await validateAllProviderCapabilities(provider);
-            }}
-            onUpdateApiKey={onUpdateApiKey}
-            onTextInputFocus={handleTextInputFocus}
-          />,
-        );
-      case "thinking":
-        return renderDrillInPage(
-          "thinking",
-          <ThinkingSettingsPage
-            settings={settings}
-            llmProviders={selectableLlmProviders}
-            onUpdate={onUpdate}
-            onUpdateResponseModeRoute={onUpdateResponseModeRoute}
-            onAddResponseMode={onAddResponseMode}
-            onRemoveResponseMode={onRemoveResponseMode}
-          />,
-        );
-      case "listening":
-        return renderDrillInPage(
-          "listening",
-          <ListeningSettingsPage
-            settings={settings}
-            selectableSttProviders={selectableSttProviders}
-            selectedSttProviderModelOptions={selectedSttProviderModelOptions}
-            selectedSttProviderModel={selectedSttProviderModel}
-            sttLanguageNote={sttLanguageNote}
-            sttLimitNote={sttLimitNote}
-            onUpdate={onUpdate}
-            onUpdateProviderSttModel={onUpdateProviderSttModel}
-          />,
-        );
-      case "speaking":
-        return renderDrillInPage(
-          "speaking",
-          <SpeakingSettingsPage
-            settings={settings}
-            kokoroModel={kokoroModel}
-            selectableTtsProviders={selectableTtsProviders}
-            ttsLanguageNote={ttsLanguageNote}
-            selectedPreviewProvider={selectedPreviewProvider}
-            selectedPreviewProviderModelOptions={
-              selectedPreviewProviderModelOptions
-            }
-            selectedPreviewProviderModel={selectedPreviewProviderModel}
-            providerPreviewTexts={providerPreviewTexts}
-            activePreview={activePreview}
-            nativeVoiceOptions={nativeVoiceOptions}
-            selectedNativeVoice={selectedNativeVoice}
-            nativePreviewText={nativePreviewText}
-            kokoroPreviewTexts={kokoroPreviewTexts}
-            onUpdate={onUpdate}
-            onUpdateProviderTtsModel={onUpdateProviderTtsModel}
-            onUpdateProviderTtsVoice={onUpdateProviderTtsVoice}
-            providerVoiceDirectories={providerVoiceDirectories}
-            onStopPreviewVoice={onStopPreviewVoice}
-            onSetProviderPreviewText={(
-              provider: Provider,
-              language: TtsListenLanguage,
-              text: string,
-            ) => setProviderPreviewText(provider, language, text)}
-            onSetNativePreviewText={setNativePreviewText}
-            onSetKokoroPreviewText={setKokoroPreviewText}
-            onPreviewProviderVoice={handlePreviewProviderVoice}
-            onPreviewNativeVoice={handlePreviewNativeVoice}
-            onPreviewKokoroVoice={handlePreviewKokoroVoice}
-            onSelectNativeVoice={setSelectedNativeVoice}
-            onTextInputFocus={handleTextInputFocus}
-            onToggleListenLanguage={toggleListenLanguage}
-          />,
-        );
-      case "search":
-        return renderDrillInPage(
-          "search",
-          <SearchSettingsPage
-            settings={settings}
-            searchProviders={selectableSearchProviders}
-            onUpdate={onUpdate}
-          />,
-        );
-      case "app":
-        return renderDrillInPage(
-          "app",
-          <AppSettingsPage
-            settings={settings}
-            speechDiagnostics={speechDiagnostics}
-            onUpdate={onUpdate}
-          />,
-        );
-    }
-  })();
-
-  const showsBackButton = activePage !== "overview";
   const title =
     activePage === "overview" ? t("settings") : getPageTitle(activePage);
-  const animatedModalStyle = {
-    opacity: entrance,
-    transform: [
-      {
-        translateY: entrance.interpolate({
-          inputRange: [0, 1],
-          outputRange: [16, 0],
-        }),
-      },
-    ],
-  };
 
   React.useEffect(() => {
     if (!visible) {
@@ -423,121 +234,21 @@ export const AntSettingsModal = React.memo(function AntSettingsModal(
   }
 
   return (
-    <View
-      accessibilityViewIsModal
-      style={[
-        styles.overlay,
-        {
-          paddingTop: isLandscape ? Math.max(insets.top + 8, 16) : 0,
-          paddingBottom: isLandscape
-            ? Math.max(insets.bottom + 8, 16)
-            : 0,
-          paddingHorizontal: isLandscape ? 12 : 0,
-        },
-      ]}
+    <AntSettingsFrame
+      activePage={activePage}
+      contentScrollRef={controller.contentScrollRef}
+      entrance={entrance}
+      insets={insets}
+      isLandscape={isLandscape}
+      keyboardInset={controller.keyboardInset}
+      modalMaxWidth={modalMaxWidth}
+      onBack={() => setActivePage("overview")}
+      onClose={onClose}
+      onDismissValidationToast={() => setValidationToastMessage(null)}
+      title={title}
+      validationToastMessage={validationToastMessage}
     >
-        <Animated.View
-          pointerEvents="none"
-          style={[
-            styles.backdrop,
-            {
-              backgroundColor: colors.overlay,
-              opacity: entrance,
-            },
-          ]}
-        />
-        <Pressable
-          style={styles.backdrop}
-          onPress={onClose}
-          accessible={false}
-        />
-        <Animated.View
-          style={[
-            styles.modal,
-            isLandscape ? styles.modalLandscape : null,
-            {
-              backgroundColor: colors.surface,
-              borderColor: colors.border,
-              borderRadius: isLandscape ? 22 : 0,
-              borderWidth: isLandscape ? 1 : 0,
-              maxWidth: modalMaxWidth,
-              shadowColor: colors.glow,
-            },
-            animatedModalStyle,
-          ]}
-        >
-          <View
-            style={[
-              styles.header,
-              {
-                backgroundColor: colors.surface,
-                borderBottomColor: colors.border,
-                paddingTop: isLandscape ? 14 : insets.top + 12,
-              },
-            ]}
-          >
-            {showsBackButton ? (
-              <AntIconButton
-                iconNode={
-                  <Feather
-                    name="arrow-left"
-                    size={22}
-                    color={colors.textSecondary}
-                  />
-                }
-                style={styles.headerControl}
-                onPress={() => setActivePage("overview")}
-                accessibilityLabel={t("settingsBackToOverview")}
-              />
-            ) : (
-              <View style={styles.headerControl} />
-            )}
-            <View style={styles.headerTitleWrap}>
-              <Text
-                testID="settings-modal-title"
-                accessibilityRole="header"
-                style={[styles.headerTitle, { color: colors.text }]}
-              >
-                {title}
-              </Text>
-            </View>
-            <AntIconButton
-              iconNode={
-                <Feather
-                  name="x"
-                  size={22}
-                  color={colors.textSecondary}
-                />
-              }
-              style={styles.headerControl}
-              onPress={onClose}
-              accessibilityLabel={t("dismiss")}
-            />
-          </View>
-
-          <ScrollView
-            ref={contentScrollRef}
-            style={styles.scroll}
-            contentContainerStyle={[
-              styles.content,
-              {
-                paddingBottom: Math.max(insets.bottom + 20, keyboardInset + 20),
-              },
-            ]}
-            showsVerticalScrollIndicator={false}
-            keyboardShouldPersistTaps="always"
-            keyboardDismissMode="interactive"
-            nestedScrollEnabled
-          >
-            {activeContent}
-          </ScrollView>
-        </Animated.View>
-        <Toast
-          message={validationToastMessage ?? ""}
-          visible={validationToastMessage !== null}
-          onDismiss={() => setValidationToastMessage(null)}
-          tone="danger"
-        />
-    </View>
+      {activeContent}
+    </AntSettingsFrame>
   );
 });
