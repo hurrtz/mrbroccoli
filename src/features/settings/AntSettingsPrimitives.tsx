@@ -430,6 +430,7 @@ export function AntPickerRow({
     options.find((option) => option.value === value)?.label ??
     (options.length === 1 ? options[0].label : value);
   const hasSingleOption = options.length === 1;
+  const showStaticValueOnly = hasSingleOption && label === undefined;
   const disclosureIcon =
     !disabled && !hasSingleOption ? (
       <Feather name="chevron-down" size={17} color={colors.textMuted} />
@@ -439,9 +440,10 @@ export function AntPickerRow({
     <List.Item
       testID={testID}
       extra={
-        label ? (
+        label || showStaticValueOnly ? (
           <View style={styles.pickerValueRow}>
             <Text
+              testID={testID ? `${testID}-value` : undefined}
               numberOfLines={1}
               style={[
                 styles.pickerValue,
@@ -491,7 +493,7 @@ export function AntPickerRow({
         },
       }}
     >
-      {label ?? selectedLabel}
+      {showStaticValueOnly ? null : label ?? selectedLabel}
     </List.Item>
   );
 

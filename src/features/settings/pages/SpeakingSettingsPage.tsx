@@ -227,6 +227,7 @@ export function SpeakingSettingsPage({
             }
           >
             <AntPickerRow
+              testID="tts-provider-picker"
               label={
                 ttsProviderOptions.length > 1
                   ? t("ttsProvider")

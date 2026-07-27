@@ -30,7 +30,6 @@ import {
   AntButtonLabel,
   AntDisclosureCard,
   AntPickerRow,
-  AntPickerRows,
   AntSectionIntro,
   AntSettingsCard,
 } from "./AntSettingsPrimitives";
@@ -117,6 +116,78 @@ export function AntProviderVoiceSection({
   const voiceDirectoryBusy =
     voiceDirectory?.status === "loading" ||
     voiceDirectory?.status === "refreshing";
+  const voiceDirectoryStatus =
+    hasVoiceDirectory && voiceDirectory ? (
+      <View style={styles.statusRow}>
+        <View style={styles.statusCopy}>
+          <Text style={[styles.helperText, { color: colors.textSecondary }]}>
+            {t("providerVoiceDirectory", {
+              provider: PROVIDER_LABELS[provider],
+            })}
+          </Text>
+          <Text style={[styles.helperText, { color: colors.textMuted }]}>
+            {voiceDirectory.status === "ready"
+              ? t("providerVoicesAvailable", {
+                  count: voiceDirectory.voices.length,
+                  provider: PROVIDER_LABELS[provider],
+                })
+              : voiceDirectory.status === "error"
+                ? t(
+                    fallbackVoiceOptions.length > 0
+                      ? "providerVoicesLoadFailedWithFallback"
+                      : "providerVoicesLoadFailed",
+                  )
+                : t("providerVoicesLoadingHint", {
+                    provider: PROVIDER_LABELS[provider],
+                  })}
+          </Text>
+          {voiceDirectory.status === "error" && voiceDirectory.error ? (
+            <>
+              <Text style={[styles.helperText, { color: colors.danger }]}>
+                {t("providerVoicesErrorDetail", {
+                  detail: voiceDirectory.error.message,
+                })}
+              </Text>
+              {provider === "elevenlabs" &&
+              isElevenLabsVoiceReadPermissionError(voiceDirectory.error) ? (
+                <Text
+                  style={[
+                    styles.helperText,
+                    { color: colors.textSecondary },
+                  ]}
+                >
+                  {t("elevenLabsVoicesReadPermissionHint")}
+                </Text>
+              ) : null}
+            </>
+          ) : null}
+        </View>
+        <Button
+          testID={`${provider}-voices-refresh`}
+          size="small"
+          type="ghost"
+          loading={voiceDirectoryBusy}
+          disabled={voiceDirectoryBusy}
+          style={StyleSheet.flatten([
+            styles.compactButton,
+            { borderColor: colors.border },
+          ])}
+          styles={antButtonTypography}
+          onPress={() => {
+            void voiceDirectory.refresh();
+          }}
+          accessibilityLabel={t("refreshProviderVoices", {
+            provider: PROVIDER_LABELS[provider],
+          })}
+        >
+          <AntButtonLabel
+            color={colors.accent}
+            icon="reload"
+            label={t("refresh")}
+          />
+        </Button>
+      </View>
+    ) : null;
 
   return (
     <View style={styles.sectionGroup}>
@@ -134,91 +205,23 @@ export function AntProviderVoiceSection({
         }
       />
 
-      <AntSettingsCard title={PROVIDER_LABELS[provider]}>
-        {hasVoiceDirectory && voiceDirectory ? (
-          <View style={styles.statusRow}>
-            <View style={styles.statusCopy}>
-              <Text
-                style={[styles.helperText, { color: colors.textSecondary }]}
-              >
-                {t("providerVoiceDirectory", {
-                  provider: PROVIDER_LABELS[provider],
-                })}
-              </Text>
-              <Text style={[styles.helperText, { color: colors.textMuted }]}>
-                {voiceDirectory.status === "ready"
-                  ? t("providerVoicesAvailable", {
-                      count: voiceDirectory.voices.length,
-                      provider: PROVIDER_LABELS[provider],
-                    })
-                  : voiceDirectory.status === "error"
-                    ? t(
-                        fallbackVoiceOptions.length > 0
-                          ? "providerVoicesLoadFailedWithFallback"
-                          : "providerVoicesLoadFailed",
-                      )
-                    : t("providerVoicesLoadingHint", {
-                        provider: PROVIDER_LABELS[provider],
-                      })}
-              </Text>
-              {voiceDirectory.status === "error" && voiceDirectory.error ? (
-                <>
-                  <Text style={[styles.helperText, { color: colors.danger }]}>
-                    {t("providerVoicesErrorDetail", {
-                      detail: voiceDirectory.error.message,
-                    })}
-                  </Text>
-                  {provider === "elevenlabs" &&
-                  isElevenLabsVoiceReadPermissionError(voiceDirectory.error) ? (
-                    <Text
-                      style={[
-                        styles.helperText,
-                        { color: colors.textSecondary },
-                      ]}
-                    >
-                      {t("elevenLabsVoicesReadPermissionHint")}
-                    </Text>
-                  ) : null}
-                </>
-              ) : null}
-            </View>
-            <Button
-              testID={`${provider}-voices-refresh`}
-              size="small"
-              type="ghost"
-              loading={voiceDirectoryBusy}
-              disabled={voiceDirectoryBusy}
-              style={StyleSheet.flatten([
-                styles.compactButton,
-                { borderColor: colors.border },
-              ])}
-              styles={antButtonTypography}
-              onPress={() => {
-                void voiceDirectory.refresh();
-              }}
-              accessibilityLabel={t("refreshProviderVoices", {
-                provider: PROVIDER_LABELS[provider],
-              })}
-            >
-              <AntButtonLabel
-                color={colors.accent}
-                icon="reload"
-                label={t("refresh")}
-              />
-            </Button>
-          </View>
-        ) : null}
+      {voiceDirectoryStatus ? (
+        <AntSettingsCard title={PROVIDER_LABELS[provider]}>
+          {voiceDirectoryStatus}
+        </AntSettingsCard>
+      ) : null}
 
-        {voiceOptions.length > 0 ? (
-          <AntPickerRows>
-            <AntPickerRow
-              label={t("ttsVoice")}
-              value={selectedVoice}
-              options={voiceOptions}
-              onChange={(value) => onUpdateProviderTtsVoice(provider, value)}
-            />
-          </AntPickerRows>
-        ) : hasVoiceDirectory && !voiceDirectoryBusy ? (
+      {voiceOptions.length > 0 ? (
+        <AntPickerRow
+          testID={`provider-tts-voice-picker-${provider}`}
+          standalone
+          label={t("ttsVoice")}
+          value={selectedVoice}
+          options={voiceOptions}
+          onChange={(value) => onUpdateProviderTtsVoice(provider, value)}
+        />
+      ) : hasVoiceDirectory && !voiceDirectoryBusy ? (
+        <AntSettingsCard title={PROVIDER_LABELS[provider]}>
           <View style={{ gap: 8 }}>
             <Text style={[styles.fieldLabel, { color: colors.textSecondary }]}>
               {t("providerVoiceId")}
@@ -266,12 +269,14 @@ export function AntProviderVoiceSection({
               )}
             </Text>
           </View>
-        ) : hasVoiceDirectory ? null : (
+        </AntSettingsCard>
+      ) : hasVoiceDirectory ? null : (
+        <AntSettingsCard title={PROVIDER_LABELS[provider]}>
           <Text style={[styles.helperText, { color: colors.textSecondary }]}>
             {t("providerDefaultVoiceHint")}
           </Text>
-        )}
-      </AntSettingsCard>
+        </AntSettingsCard>
+      )}
 
       <View style={styles.kokoroVoiceCards}>
         {selectedLanguages.map((previewLanguage) => {

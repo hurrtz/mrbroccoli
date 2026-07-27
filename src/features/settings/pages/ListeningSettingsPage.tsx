@@ -137,7 +137,12 @@ export function ListeningSettingsPage({
           }
         >
           <AntPickerRow
-            label={t("provider")}
+            testID="stt-provider-picker"
+            label={
+              sttProviderOptions.length > 1
+                ? t("provider")
+                : undefined
+            }
             value={settings.sttProvider ?? ""}
             options={sttProviderOptions}
             disabled={sttProviderOptions.length === 0}

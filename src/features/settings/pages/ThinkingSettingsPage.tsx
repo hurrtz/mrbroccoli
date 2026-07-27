@@ -120,6 +120,7 @@ export function ThinkingSettingsPage({
               >
                 <AntPickerRows>
                   <AntPickerRow
+                    testID={`settings-model-provider-${mode.id}`}
                     label={
                       llmProviders.length > 1 ? t("provider") : undefined
                     }

@@ -852,6 +852,11 @@ describe("SettingsModal", () => {
 
     expect(
       StyleSheet.flatten(
+        screen.getByTestId("settings-model-provider-mode-1-value").props.style,
+      ).textAlign,
+    ).toBe("right");
+    expect(
+      StyleSheet.flatten(
         screen.getByTestId("thinking-settings-page").props.style,
       ).gap,
     ).toBe(24);
@@ -960,7 +965,18 @@ describe("SettingsModal", () => {
   });
 
   it("keeps Voice Input free of a redundant heading info action", async () => {
-    const screen = renderSettingsModal({ focusTab: "stt" });
+    const screen = renderSettingsModal({
+      focusTab: "stt",
+      settings: {
+        ...DEFAULT_SETTINGS,
+        apiKeys: {
+          ...DEFAULT_SETTINGS.apiKeys,
+          gemini: "configured-google-key",
+        },
+        sttMode: "provider",
+        sttProvider: "gemini",
+      },
+    });
 
     await waitFor(() => {
       expect(screen.getByTestId("settings-modal-title").props.children).toBe(
@@ -970,7 +986,16 @@ describe("SettingsModal", () => {
       expect(screen.queryByLabelText("About Voice Input")).toBeNull();
       expect(screen.getByLabelText("About Input Mode")).toBeTruthy();
       expect(screen.getByLabelText("About Speech to Text")).toBeTruthy();
+      expect(
+        screen.getByTestId("stt-provider-picker-value").props.children,
+      ).toBe("Google");
     });
+
+    expect(
+      StyleSheet.flatten(
+        screen.getByTestId("stt-provider-picker-value").props.style,
+      ).textAlign,
+    ).toBe("right");
   });
 
   it("offers discovered Mistral voice slugs and refreshes the directory", async () => {
@@ -1029,6 +1054,29 @@ describe("SettingsModal", () => {
       expect(screen.getByText("2 voices available from Mistral.")).toBeTruthy();
       expect(screen.getByText("Calm Guide · calm-guide")).toBeTruthy();
     });
+
+    expect(
+      StyleSheet.flatten(
+        screen.getByTestId("tts-provider-picker-value").props.style,
+      ).textAlign,
+    ).toBe("right");
+    const providerVoicePicker = screen
+      .UNSAFE_getAllByType(List.Item)
+      .find(
+        (item) =>
+          item.props.testID === "provider-tts-voice-picker-mistral",
+      );
+    expect(providerVoicePicker).toBeDefined();
+    expect(
+      StyleSheet.flatten(providerVoicePicker!.props.style).marginHorizontal,
+    ).toBe(0);
+    expect(
+      screen
+        .UNSAFE_getAllByType(AntCard)
+        .some((card) =>
+          within(card).queryByTestId("provider-tts-voice-picker-mistral"),
+        ),
+    ).toBe(false);
 
     fireEvent.press(screen.getByLabelText("Expand English voice settings"));
     expect(

@@ -41,6 +41,28 @@ describe("AntPickerRow", () => {
     expect(itemStyle.borderWidth).toBeUndefined();
   });
 
+  it("keeps an unlabeled sole option in the right-hand value column", () => {
+    const screen = render(
+      <ThemeProvider mode="light">
+        <AntPickerRow
+          testID="single-provider"
+          value="gemini"
+          options={[{ value: "gemini", label: "Google" }]}
+          onChange={jest.fn()}
+        />
+      </ThemeProvider>,
+    );
+
+    expect(screen.UNSAFE_getByType(List.Item).props.children).toBeNull();
+    expect(screen.getByTestId("single-provider-value").props.children).toBe(
+      "Google",
+    );
+    expect(
+      StyleSheet.flatten(screen.getByTestId("single-provider-value").props.style)
+        .textAlign,
+    ).toBe("right");
+  });
+
   it("preserves the selected label when Ant Picker wraps the row", () => {
     const screen = renderPickerRow(2);
 
