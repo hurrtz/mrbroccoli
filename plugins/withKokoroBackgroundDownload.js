@@ -6,7 +6,15 @@ const {
 } = require("@expo/config-plugins");
 
 const BACKGROUND_HANDLER_MARKER =
-  "RNBackgroundDownloader.setCompletionHandlerWithIdentifier";
+  "MrBroccoliSetBackgroundDownloadCompletionHandler";
+const LEGACY_BACKGROUND_HANDLER_CALL = `RNBackgroundDownloader.setCompletionHandlerWithIdentifier(
+      identifier,
+      completionHandler: completionHandler
+    )`;
+const BACKGROUND_HANDLER_CALL = `MrBroccoliSetBackgroundDownloadCompletionHandler(
+      identifier,
+      completionHandler
+    )`;
 const BACKGROUND_HANDLER = `
 
   public override func application(
@@ -14,13 +22,21 @@ const BACKGROUND_HANDLER = `
     handleEventsForBackgroundURLSession identifier: String,
     completionHandler: @escaping () -> Void
   ) {
-    RNBackgroundDownloader.setCompletionHandlerWithIdentifier(
-      identifier,
-      completionHandler: completionHandler
-    )
+    ${BACKGROUND_HANDLER_CALL}
   }`;
+const LEGACY_BRIDGING_IMPORT = "#import <RNBackgroundDownloader.h>";
+const BRIDGING_DECLARATION = `FOUNDATION_EXPORT void MrBroccoliSetBackgroundDownloadCompletionHandler(
+    NSString *identifier,
+    void (^completionHandler)(void));`;
 
 function addBackgroundHandler(contents) {
+  if (contents.includes(LEGACY_BACKGROUND_HANDLER_CALL)) {
+    return contents.replace(
+      LEGACY_BACKGROUND_HANDLER_CALL,
+      BACKGROUND_HANDLER_CALL,
+    );
+  }
+
   if (contents.includes(BACKGROUND_HANDLER_MARKER)) {
     return contents;
   }
@@ -36,6 +52,19 @@ function addBackgroundHandler(contents) {
     delegateEnd,
     `${BACKGROUND_HANDLER}${delegateEnd}`,
   );
+}
+
+function configureBridgingHeader(contents) {
+  const withoutLegacyImport = contents
+    .replace(`${LEGACY_BRIDGING_IMPORT}\n`, "")
+    .replace(LEGACY_BRIDGING_IMPORT, "");
+  if (withoutLegacyImport.includes(BACKGROUND_HANDLER_MARKER)) {
+    return withoutLegacyImport;
+  }
+
+  const separator =
+    withoutLegacyImport && !withoutLegacyImport.endsWith("\n") ? "\n" : "";
+  return `${withoutLegacyImport}${separator}${BRIDGING_DECLARATION}\n`;
 }
 
 function withKokoroBackgroundDownload(config) {
@@ -59,17 +88,13 @@ function withKokoroBackgroundDownload(config) {
         projectName,
         `${projectName}-Bridging-Header.h`,
       );
-      const importLine = "#import <RNBackgroundDownloader.h>";
       const current = fs.existsSync(bridgingHeaderPath)
         ? fs.readFileSync(bridgingHeaderPath, "utf8")
         : "";
+      const configured = configureBridgingHeader(current);
 
-      if (!current.includes(importLine)) {
-        const separator = current && !current.endsWith("\n") ? "\n" : "";
-        fs.writeFileSync(
-          bridgingHeaderPath,
-          `${current}${separator}${importLine}\n`,
-        );
+      if (configured !== current) {
+        fs.writeFileSync(bridgingHeaderPath, configured);
       }
 
       return nextConfig;
@@ -79,3 +104,4 @@ function withKokoroBackgroundDownload(config) {
 
 module.exports = withKokoroBackgroundDownload;
 module.exports.addBackgroundHandler = addBackgroundHandler;
+module.exports.configureBridgingHeader = configureBridgingHeader;

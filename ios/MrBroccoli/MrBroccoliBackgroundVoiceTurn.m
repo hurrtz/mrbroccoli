@@ -1,6 +1,16 @@
+#import <RNBackgroundDownloader.h>
 #import <React/RCTBridgeModule.h>
 #import <React/RCTLog.h>
 #import <UIKit/UIKit.h>
+
+void MrBroccoliSetBackgroundDownloadCompletionHandler(
+    NSString *identifier,
+    void (^completionHandler)(void))
+{
+  [RNBackgroundDownloader
+      setCompletionHandlerWithIdentifier:identifier
+                       completionHandler:completionHandler];
+}
 
 @interface MrBroccoliBackgroundVoiceTurn : NSObject <RCTBridgeModule>
 @end
