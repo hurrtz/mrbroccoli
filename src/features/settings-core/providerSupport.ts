@@ -12,11 +12,7 @@ import {
   type WebSearchProvider,
 } from "../../constants/webSearch";
 import { providerHasVoiceDirectory } from "../../services/providerVoiceDirectory";
-import type {
-  Provider,
-  ProviderCapability,
-  Settings,
-} from "../../types";
+import type { Provider, ProviderCapability, Settings } from "../../types";
 import {
   hasAnyProviderCredential,
   hasProviderCredentialForCapability,
@@ -151,13 +147,18 @@ export function getProviderValidationTarget(
 }
 
 function validationMatchesTarget(params: {
+  capability: ProviderCapability;
   state: ProviderValidationState;
   target: ReturnType<typeof getProviderValidationTarget>;
   apiKey: string;
 }) {
+  const modelMatches =
+    params.state.model === params.target.model ||
+    (params.capability === "llm" && params.state.status === "success");
+
   return (
     (!params.state.apiKey || params.state.apiKey === params.apiKey.trim()) &&
-    params.state.model === params.target.model &&
+    modelMatches &&
     params.state.configKey === params.target.configKey
   );
 }
@@ -191,6 +192,7 @@ export function getProviderCapabilityHealthState(params: {
 
   if (
     !validationMatchesTarget({
+      capability,
       state: validationState,
       target,
       apiKey: settings.apiKeys[provider],
@@ -245,10 +247,7 @@ export function getProviderHealthState(params: {
     return "healthy";
   }
 
-  if (
-    states.includes("failing") &&
-    !states.includes("healthy")
-  ) {
+  if (states.includes("failing") && !states.includes("healthy")) {
     return "failing";
   }
 

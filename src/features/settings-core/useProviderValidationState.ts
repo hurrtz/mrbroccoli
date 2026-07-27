@@ -33,16 +33,13 @@ function mergeValidationStates(
     ...(Object.keys(transient) as Provider[]),
   ]);
 
-  return [...providers].reduce<ProviderValidationStates>(
-    (result, provider) => {
-      result[provider] = {
-        ...persisted[provider],
-        ...transient[provider],
-      };
-      return result;
-    },
-    {},
-  );
+  return [...providers].reduce<ProviderValidationStates>((result, provider) => {
+    result[provider] = {
+      ...persisted[provider],
+      ...transient[provider],
+    };
+    return result;
+  }, {});
 }
 
 export function useProviderValidationState(params: {
@@ -103,10 +100,7 @@ export function useProviderValidationState(params: {
   );
 
   const getCapabilityHealthState = useCallback(
-    (
-      provider: Provider,
-      capability: ProviderCapability,
-    ): ProviderHealthState =>
+    (provider: Provider, capability: ProviderCapability): ProviderHealthState =>
       getProviderCapabilityHealthState({
         provider,
         capability,
@@ -140,9 +134,12 @@ export function useProviderValidationState(params: {
       }
 
       const currentApiKey = settings.apiKeys[provider].trim();
+      const modelMatches =
+        candidate.model === target.model ||
+        (capability === "llm" && candidate.status === "success");
       const stateMatchesCurrentConfig =
         (!candidate.apiKey || candidate.apiKey === currentApiKey) &&
-        candidate.model === target.model &&
+        modelMatches &&
         candidate.configKey === target.configKey;
 
       return stateMatchesCurrentConfig ? candidate : { status: "idle" };
@@ -204,7 +201,9 @@ export function useProviderValidationState(params: {
         onValidationResult(provider, capability, result);
       } catch (error) {
         const message =
-          error instanceof Error ? error.message : t("providerValidationFailed");
+          error instanceof Error
+            ? error.message
+            : t("providerValidationFailed");
         const result: ProviderValidationResult = {
           status: "error",
           message,

@@ -59,9 +59,7 @@ describe("getProviderValidationTarget", () => {
       },
     };
 
-    expect(
-      getProviderValidationTarget(settings, "elevenlabs", "tts"),
-    ).toEqual({
+    expect(getProviderValidationTarget(settings, "elevenlabs", "tts")).toEqual({
       kind: "tts",
       model: "eleven_multilingual_v2",
       configKey: JSON.stringify({ voice: "voice-123" }),
@@ -81,9 +79,7 @@ describe("getProviderValidationTarget", () => {
       },
     };
 
-    expect(
-      getProviderValidationTarget(settings, "elevenlabs", "tts"),
-    ).toEqual({
+    expect(getProviderValidationTarget(settings, "elevenlabs", "tts")).toEqual({
       kind: "tts",
       model: "eleven_flash_v2_5",
       configKey: JSON.stringify({ voice: "21m00Tcm4TlvDq8ikWAM" }),
@@ -181,7 +177,7 @@ describe("getProviderHealthState", () => {
     ).toContain("openai");
   });
 
-  it("restores a successful validation only for the tested configuration", () => {
+  it("keeps a successful LLM validation after the selected model changes", () => {
     const target = getProviderValidationTarget(settings, "openai", "llm");
 
     expect(
@@ -215,7 +211,7 @@ describe("getProviderHealthState", () => {
           },
         },
       }),
-    ).toBe("configured");
+    ).toBe("healthy");
   });
 
   it("keeps each capability independent when one shared key has partial permissions", () => {
