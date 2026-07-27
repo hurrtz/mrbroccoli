@@ -1,13 +1,12 @@
 import { streamChat } from "./llm";
-import type { Message, MessageMetadata } from "../types";
+import type { Message } from "../types";
 import { recordDebugLogEvent } from "./debugLogCapture";
 import { cleanupCapturedAudio } from "./voicePipeline/cleanup";
 import { resolveContextualMessages } from "./voicePipeline/context";
 import { createVoicePipelineTtsQueue } from "./voicePipeline/ttsQueue";
 import { resolvePipelineTranscription } from "./voicePipeline/transcription";
 import type { RunVoicePipelineParams } from "./voicePipeline/types";
-import { searchWeb } from "./webSearch";
-import { getWebSearchDecision } from "./webSearchHeuristics";
+import { resolvePipelineWebSearch } from "./voicePipeline/webSearch";
 import { createTurnReceipt } from "./turnReceipt";
 
 export async function runVoicePipeline(
@@ -153,93 +152,22 @@ export async function runVoicePipeline(
       return transcription;
     }
 
-    let webSearchContext: string | undefined;
-    let responseMetadata: MessageMetadata = {
-      turnReceipt,
-    };
-    const normalizedWebSearchApiKey = webSearchApiKey?.trim();
-    const webSearchDecision = getWebSearchDecision({
-      enabled: effectiveWebSearchMode !== "off",
-      mode: effectiveWebSearchMode,
-      ready: Boolean(webSearchProvider && normalizedWebSearchApiKey),
+    const webSearchResult = await resolvePipelineWebSearch({
+      abortSignal,
+      callbacks,
+      conversationSummary: contextResult.effectiveSummary || undefined,
       language,
-      query: transcription,
       messages,
-    });
-    turnReceipt.webSearch = {
       mode: effectiveWebSearchMode,
       provider: webSearchProvider,
-      requested: webSearchDecision.shouldSearch,
-      ready: Boolean(webSearchProvider && normalizedWebSearchApiKey),
-      used: false,
-      fellBack: false,
-      decisionReason: webSearchDecision.reason,
-    };
-
-    recordDebugLogEvent({
-      event: "web-search-decision",
-      payload: {
-        mode: effectiveWebSearchMode,
-        provider: webSearchProvider ?? null,
-        ready: Boolean(webSearchProvider && normalizedWebSearchApiKey),
-        reason: webSearchDecision.reason,
-        shouldSearch: webSearchDecision.shouldSearch,
-        signals: webSearchDecision.matchedSignals,
-      },
+      apiKey: webSearchApiKey,
+      options: webSearchOptions,
+      transcription,
+      turnReceipt,
     });
 
-    if (
-      webSearchDecision.shouldSearch &&
-      webSearchProvider &&
-      normalizedWebSearchApiKey
-    ) {
-      callbacks.onWebSearchStart?.();
-      const webSearchStartedAtMs = Date.now();
-
-      try {
-        const webSearchResult = await searchWeb({
-          provider: webSearchProvider,
-          apiKey: normalizedWebSearchApiKey,
-          language,
-          query: transcription,
-          conversationSummary: contextResult.effectiveSummary || undefined,
-          options: webSearchOptions,
-          abortSignal,
-        });
-
-        if (abortSignal?.aborted) {
-          return transcription;
-        }
-
-        webSearchContext = webSearchResult?.context;
-        if (webSearchResult) {
-          turnReceipt.webSearch.used = Boolean(webSearchResult.context);
-          turnReceipt.webSearch.provider = webSearchResult.provider;
-          turnReceipt.webSearch.model = webSearchResult.model;
-          responseMetadata = {
-            ...responseMetadata,
-            webSearch: {
-              provider: webSearchResult.provider,
-              model: webSearchResult.model,
-              query: transcription,
-              summary: webSearchResult.summary,
-              sources: webSearchResult.sources,
-            },
-          };
-        }
-      } catch (error) {
-        if (abortSignal?.aborted) {
-          return transcription;
-        }
-
-        if (error instanceof Error) {
-          turnReceipt.webSearch.fellBack = true;
-          callbacks.onWebSearchFallback?.(error);
-        }
-      } finally {
-        turnReceipt.timing.webSearchMs = Date.now() - webSearchStartedAtMs;
-        callbacks.onWebSearchComplete?.();
-      }
+    if (webSearchResult.aborted) {
+      return transcription;
     }
 
     const allMessages: Message[] = [
@@ -276,8 +204,8 @@ export async function runVoicePipeline(
         model,
         modelEffort: modelEffort ?? null,
         provider,
-        hasWebSearchContext: !!webSearchContext,
-        webSearchContextLength: webSearchContext?.length ?? 0,
+        hasWebSearchContext: !!webSearchResult.context,
+        webSearchContextLength: webSearchResult.context?.length ?? 0,
       },
     });
     callbacks.onLlmStart?.();
@@ -295,7 +223,7 @@ export async function runVoicePipeline(
       responseTone,
       language,
       conversationSummary: contextResult.effectiveSummary || undefined,
-      webSearchContext,
+      webSearchContext: webSearchResult.context,
       abortSignal,
       onChunk: (text) => {
         if (abortSignal?.aborted) return;
@@ -326,7 +254,7 @@ export async function runVoicePipeline(
           }
         }
         const completedMetadata = {
-          ...responseMetadata,
+          ...webSearchResult.responseMetadata,
           ...llmMetadata,
           turnReceipt: {
             ...turnReceipt,
