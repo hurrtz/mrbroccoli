@@ -60,4 +60,18 @@ describe("resolveTtsListenLanguage", () => {
       })
     ).toBe("pt");
   });
+
+  it.each([
+    ["es", "¿Dónde está la estación? No encuentro la entrada."],
+    ["fr", "Je ne sais pas où est la bonne entrée."],
+    ["it", "Perché non troviamo una soluzione insieme?"],
+  ] as const)("recognizes %s from Latin-language markers", (language, text) => {
+    expect(
+      resolveTtsListenLanguage({
+        text,
+        preferredLanguages: ["en", "es", "fr", "it"],
+        appLanguage: "en",
+      })
+    ).toBe(language);
+  });
 });
