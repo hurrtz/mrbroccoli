@@ -134,6 +134,9 @@ function ProviderAbout({
 }) {
   const { colors } = useTheme();
   const { t } = useLocalization();
+  const [expandedSection, setExpandedSection] = React.useState<string | null>(
+    null,
+  );
   const appName = t("appName");
   const catalogEntry = getCatalogProviderEntry(
     getCatalogProviderIdForAppProvider(provider),
@@ -178,6 +181,10 @@ function ProviderAbout({
   return (
     <Collapse
       accordion
+      activeKey={expandedSection}
+      onChange={(key) =>
+        setExpandedSection((key as string | null) ?? null)
+      }
       styles={{
         Item: {
           backgroundColor: colors.surface,
@@ -191,15 +198,17 @@ function ProviderAbout({
       }}
     >
       <Collapse.Panel key="about" title={t("aboutThisProvider")}>
-        <View style={styles.accordionBody}>
-          {[...summaryLines, ...activeModels].map((line) => (
-            <Text
-              key={line}
-              style={[styles.helperText, { color: colors.textSecondary }]}
-            >
-              {line}
-            </Text>
-          ))}
+        <View>
+          <View style={styles.accordionBody}>
+            {[...summaryLines, ...activeModels].map((line) => (
+              <Text
+                key={line}
+                style={[styles.helperText, { color: colors.textSecondary }]}
+              >
+                {line}
+              </Text>
+            ))}
+          </View>
         </View>
       </Collapse.Panel>
     </Collapse>

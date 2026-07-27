@@ -165,6 +165,7 @@ export const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 12,
     borderTopWidth: StyleSheet.hairlineWidth,
+    gap: 4,
   },
   pickerItem: {
     minHeight: 52,
@@ -191,8 +192,12 @@ export const styles = StyleSheet.create({
     minHeight: 52,
   },
   accordionBody: {
+    flex: 0,
+    width: "100%",
     paddingHorizontal: 14,
+    paddingTop: 12,
     paddingBottom: 14,
+    gap: 10,
   },
   buttonRow: {
     flexDirection: "row",
@@ -235,9 +240,6 @@ export const styles = StyleSheet.create({
     fontSize: 14,
     lineHeight: 18,
     fontWeight: "500",
-  },
-  textArea: {
-    minHeight: 128,
   },
   diagnosticHeader: {
     flexDirection: "row",
@@ -297,9 +299,6 @@ export const styles = StyleSheet.create({
   previewButton: {
     minHeight: 42,
     borderRadius: 10,
-  },
-  previewTextArea: {
-    minHeight: 84,
   },
   statusRow: {
     flexDirection: "row",

@@ -302,11 +302,13 @@ export function AntPickerSection({
         }}
       >
         {pickerRows.map((child, index) =>
-          React.cloneElement(child, {
-            hideDivider:
-              helperText === undefined &&
-              index === pickerRows.length - 1,
-          }),
+          child.type === AntPickerRow
+            ? React.cloneElement(child, {
+                hideDivider:
+                  helperText === undefined &&
+                  index === pickerRows.length - 1,
+              })
+            : child,
         )}
       </List>
       {helperText ? (
@@ -385,11 +387,9 @@ export function AntTextArea({
       placeholderTextColor={colors.textMuted}
       selectionColor={colors.accent}
       rows={5}
-      autoSize={{ minRows: 4, maxRows: 8 }}
       disabled={disabled}
       onChangeText={onChange}
       onFocus={onFocus}
-      style={styles.textArea}
       inputStyle={{
         color: colors.text,
         fontFamily: fonts.body,
@@ -402,6 +402,8 @@ export function AntTextArea({
           borderWidth: StyleSheet.hairlineWidth,
           borderColor: colors.border,
           borderRadius: 10,
+          minHeight: 128,
+          maxHeight: 128,
         },
       }}
     />

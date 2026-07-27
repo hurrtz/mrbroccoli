@@ -55,8 +55,7 @@ export function AntPreviewComposer({
         placeholder={t("voicePreviewPlaceholder")}
         placeholderTextColor={colors.textMuted}
         selectionColor={colors.accent}
-        autoSize={{ minRows: 3, maxRows: 6 }}
-        style={styles.previewTextArea}
+        rows={3}
         inputStyle={{
           color: colors.text,
           fontFamily: fonts.body,
@@ -70,6 +69,8 @@ export function AntPreviewComposer({
             borderWidth: 1,
             borderColor: colors.border,
             borderRadius: 10,
+            minHeight: 84,
+            maxHeight: 84,
           },
         }}
       />

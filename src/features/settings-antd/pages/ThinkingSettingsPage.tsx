@@ -67,6 +67,9 @@ export function ThinkingSettingsPage({
 }) {
   const { colors } = useTheme();
   const { language, t } = useLocalization();
+  const [expandedSection, setExpandedSection] = React.useState<string | null>(
+    null,
+  );
   const canAdd = settings.responseModes.length < MAX_RESPONSE_MODES;
   const canRemove = settings.responseModes.length > MIN_RESPONSE_MODES;
 
@@ -217,6 +220,10 @@ export function ThinkingSettingsPage({
       <AntSettingsCard contentStyle={styles.fullBleedCardContent}>
         <Collapse
           accordion
+          activeKey={expandedSection}
+          onChange={(key) =>
+            setExpandedSection((key as string | null) ?? null)
+          }
           styles={{
             Item: {
               backgroundColor: colors.surfaceElevated,
@@ -230,19 +237,21 @@ export function ThinkingSettingsPage({
           }}
         >
           <Collapse.Panel key="system-prompt" title={t("systemPrompt")}>
-            <View style={styles.accordionBody}>
-              <Text
-                style={[styles.helperText, { color: colors.textSecondary }]}
-              >
-                {t("assistantInstructionsIntro")}
-              </Text>
-              <AntTextArea
-                value={settings.assistantInstructions}
-                placeholder={t("assistantInstructionsPlaceholder")}
-                onChange={(value) =>
-                  onUpdate({ assistantInstructions: value })
-                }
-              />
+            <View>
+              <View style={styles.accordionBody}>
+                <Text
+                  style={[styles.helperText, { color: colors.textSecondary }]}
+                >
+                  {t("assistantInstructionsIntro")}
+                </Text>
+                <AntTextArea
+                  value={settings.assistantInstructions}
+                  placeholder={t("assistantInstructionsPlaceholder")}
+                  onChange={(value) =>
+                    onUpdate({ assistantInstructions: value })
+                  }
+                />
+              </View>
             </View>
           </Collapse.Panel>
         </Collapse>

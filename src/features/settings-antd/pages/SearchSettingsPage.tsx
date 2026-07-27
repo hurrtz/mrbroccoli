@@ -39,6 +39,9 @@ export function SearchSettingsPage({
 }) {
   const { colors } = useTheme();
   const { t } = useLocalization();
+  const [expandedSection, setExpandedSection] = React.useState<string | null>(
+    null,
+  );
   const selectedWebSearchProvider =
     settings.webSearchProvider ?? searchProviders[0] ?? null;
   const pickerOptions = buildProviderPickerOptions(
@@ -141,6 +144,10 @@ export function SearchSettingsPage({
         <AntSettingsCard contentStyle={styles.fullBleedCardContent}>
           <Collapse
             accordion
+            activeKey={expandedSection}
+            onChange={(key) =>
+              setExpandedSection((key as string | null) ?? null)
+            }
             styles={{
               Item: {
                 backgroundColor: colors.surfaceElevated,
@@ -157,62 +164,64 @@ export function SearchSettingsPage({
               key="advanced"
               title={t("webSearchAdvanced")}
             >
-              <View style={styles.accordionBody}>
-                <View>
-                  {controlSupport.resultLimit ? (
-                    <AntPickerRow
-                      label={t("webSearchResultCount")}
-                      value={String(selectedProviderSettings.resultLimit)}
-                      options={WEB_SEARCH_RESULT_LIMIT_VALUES.map((value) => ({
-                        value: String(value),
-                        label: String(value),
-                      }))}
-                      onChange={(value) =>
-                        updateProviderSettings({
-                          resultLimit: Number(value) as 3 | 5 | 8,
-                        })
-                      }
-                    />
-                  ) : null}
-                  {controlSupport.depth ? (
-                    <AntPickerRow
-                      label={t("webSearchDepth")}
-                      value={selectedProviderSettings.depth}
-                      options={WEB_SEARCH_DEPTH_VALUES.map((value) => ({
-                        value,
-                        label:
-                          value === "deep"
-                            ? t("webSearchDepthDeep")
-                            : t("webSearchDepthStandard"),
-                      }))}
-                      onChange={(value) =>
-                        updateProviderSettings({
-                          depth: value as WebSearchProviderSettings["depth"],
-                        })
-                      }
-                    />
-                  ) : null}
-                  {controlSupport.searchMode ? (
-                    <AntPickerRow
-                      label={t("webSearchSearchMode")}
-                      value={selectedProviderSettings.searchMode}
-                      options={WEB_SEARCH_SEARCH_MODE_VALUES.map((value) => ({
-                        value,
-                        label:
-                          value === "quick"
-                            ? t("webSearchSearchModeQuick")
-                            : value === "deep"
-                              ? t("webSearchSearchModeDeep")
-                              : t("webSearchSearchModeBalanced"),
-                      }))}
-                      onChange={(value) =>
-                        updateProviderSettings({
-                          searchMode:
-                            value as WebSearchProviderSettings["searchMode"],
-                        })
-                      }
-                    />
-                  ) : null}
+              <View>
+                <View style={styles.accordionBody}>
+                  <View>
+                    {controlSupport.resultLimit ? (
+                      <AntPickerRow
+                        label={t("webSearchResultCount")}
+                        value={String(selectedProviderSettings.resultLimit)}
+                        options={WEB_SEARCH_RESULT_LIMIT_VALUES.map((value) => ({
+                          value: String(value),
+                          label: String(value),
+                        }))}
+                        onChange={(value) =>
+                          updateProviderSettings({
+                            resultLimit: Number(value) as 3 | 5 | 8,
+                          })
+                        }
+                      />
+                    ) : null}
+                    {controlSupport.depth ? (
+                      <AntPickerRow
+                        label={t("webSearchDepth")}
+                        value={selectedProviderSettings.depth}
+                        options={WEB_SEARCH_DEPTH_VALUES.map((value) => ({
+                          value,
+                          label:
+                            value === "deep"
+                              ? t("webSearchDepthDeep")
+                              : t("webSearchDepthStandard"),
+                        }))}
+                        onChange={(value) =>
+                          updateProviderSettings({
+                            depth: value as WebSearchProviderSettings["depth"],
+                          })
+                        }
+                      />
+                    ) : null}
+                    {controlSupport.searchMode ? (
+                      <AntPickerRow
+                        label={t("webSearchSearchMode")}
+                        value={selectedProviderSettings.searchMode}
+                        options={WEB_SEARCH_SEARCH_MODE_VALUES.map((value) => ({
+                          value,
+                          label:
+                            value === "quick"
+                              ? t("webSearchSearchModeQuick")
+                              : value === "deep"
+                                ? t("webSearchSearchModeDeep")
+                                : t("webSearchSearchModeBalanced"),
+                        }))}
+                        onChange={(value) =>
+                          updateProviderSettings({
+                            searchMode:
+                              value as WebSearchProviderSettings["searchMode"],
+                          })
+                        }
+                      />
+                    ) : null}
+                  </View>
                 </View>
               </View>
             </Collapse.Panel>
