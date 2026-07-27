@@ -240,12 +240,6 @@ export const styles = StyleSheet.create({
   pickerList: {
     overflow: "hidden",
   },
-  pickerIntro: {
-    paddingHorizontal: 16,
-    paddingTop: 14,
-    paddingBottom: 8,
-    gap: 3,
-  },
   pickerHelper: {
     paddingHorizontal: 16,
     paddingTop: 2,
@@ -364,7 +358,6 @@ export const styles = StyleSheet.create({
     alignItems: "center",
     gap: 8,
     paddingVertical: 6,
-    borderTopWidth: StyleSheet.hairlineWidth,
   },
   fallbackLabel: {
     flex: 1,
@@ -388,12 +381,16 @@ export const styles = StyleSheet.create({
     paddingTop: 0,
     borderTopWidth: 0,
   },
-  previewHeader: {
-    gap: 3,
-  },
   previewButton: {
     minHeight: 42,
     borderRadius: 10,
+  },
+  previewFieldHeader: {
+    minHeight: 44,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: 12,
   },
   statusRow: {
     flexDirection: "row",
@@ -404,6 +401,36 @@ export const styles = StyleSheet.create({
   statusCopy: {
     flex: 1,
     gap: 2,
+  },
+  kokoroDownloadButton: {
+    alignSelf: "flex-start",
+    minHeight: 40,
+    borderRadius: 10,
+    paddingHorizontal: 14,
+  },
+  kokoroFallbackNotice: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    gap: 9,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderRadius: 10,
+  },
+  kokoroFallbackCopy: {
+    flex: 1,
+  },
+  kokoroVoiceCards: {
+    gap: 10,
+  },
+  voiceDisclosureHeader: {
+    flex: 1,
+    gap: 2,
+  },
+  disclosurePreview: {
+    paddingHorizontal: 16,
+    paddingTop: 8,
+    paddingBottom: 14,
   },
   filterRow: {
     flexDirection: "row",

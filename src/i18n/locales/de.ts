@@ -300,6 +300,16 @@ export const de: TranslationDictionary = {
   kokoroRemoveTitle: "Kokoro-Modell entfernen?",
   kokoroRemoveBody: ({ installedSize }) =>
     `Dadurch werden etwa ${installedSize} MB freigegeben. Du kannst das Modell jederzeit erneut herunterladen.`,
+  removeKokoroModel: "Kokoro-Modell entfernen",
+  downloadKokoroModel: "Kokoro-Modell herunterladen",
+  kokoroFallbackNeeded: ({ languages }) =>
+    `Für folgende Sprachen ist eine ausdrückliche Ausweichroute erforderlich: ${languages}.`,
+  kokoroNoSelectedLanguages:
+    "Wähle unter Sprachen Englisch oder vereinfachtes Chinesisch aus, um eine Kokoro-Stimme zu konfigurieren.",
+  expandVoiceSettings: ({ language }) =>
+    `${language}-Stimmeneinstellungen ausklappen`,
+  collapseVoiceSettings: ({ language }) =>
+    `${language}-Stimmeneinstellungen einklappen`,
   remove: "Entfernen",
   voiceOutputDescription:
     "Wähle Sprachengine, Zielsprachen und Stimmvorschauen für die Sprachausgabe.",

@@ -1,24 +1,12 @@
 import React from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { Text, View } from "react-native";
 
-import {
-  Checkbox,
-  List,
-  Modal,
-} from "@ant-design/react-native";
-import Feather from "@expo/vector-icons/Feather";
-
-import {
-  getTtsListenLanguageLabel,
-  TTS_LISTEN_LANGUAGE_OPTIONS,
-} from "../../../constants/localTts";
 import { providerTtsModelSupportsInstructions } from "../../../constants/models";
 import { getTtsFallbackRoutes } from "../../../constants/ttsFallback";
 import type { KokoroModelController } from "../../../hooks/useKokoroModel";
 import { useLocalization } from "../../../i18n";
 import type { ProviderVoiceDirectories } from "../../../services/providerVoiceDirectory";
 import { useTheme } from "../../../theme/ThemeContext";
-import { fonts } from "../../../theme/typography";
 import type {
   KokoroLanguage,
   Provider,
@@ -34,8 +22,10 @@ import type {
   TextInputFocusHandler,
 } from "../../settings-core/types";
 
+import { AntKokoroVoiceSection } from "../AntKokoroVoiceSection";
+import { AntListenLanguageSelector } from "../AntListenLanguageSelector";
+import { AntSettingsInfoButton } from "../AntSettingsInfoButton";
 import {
-  AntKokoroVoiceSection,
   AntNativeVoiceSection,
   AntProviderVoiceSection,
   AntTtsFallbackSection,
@@ -50,134 +40,6 @@ import {
   AntTextArea,
 } from "../AntSettingsPrimitives";
 import { styles } from "../styles";
-
-function ListenLanguageSelector({
-  selectedLanguages,
-  onToggleLanguage,
-}: {
-  selectedLanguages: TtsListenLanguage[];
-  onToggleLanguage: (language: TtsListenLanguage) => void;
-}) {
-  const { colors } = useTheme();
-  const { language, t } = useLocalization();
-  const [visible, setVisible] = React.useState(false);
-
-  return (
-    <>
-      <AntSettingsCard contentStyle={styles.fullBleedCardContent}>
-        <View style={styles.pickerIntro}>
-          <Text style={[styles.fieldLabel, { color: colors.text }]}>
-            {t("listenLanguages")}
-          </Text>
-          <Text style={[styles.helperText, { color: colors.textSecondary }]}>
-            {t("listenLanguagesHint")}
-          </Text>
-        </View>
-        <List.Item
-          extra={
-            <View style={styles.pickerValueRow}>
-              <Text
-                style={[
-                  styles.pickerValue,
-                  { color: colors.textSecondary },
-                ]}
-              >
-                {t("listenLanguagesSelected", {
-                  count: selectedLanguages.length,
-                })}
-              </Text>
-              <Feather
-                name="chevron-down"
-                size={17}
-                color={colors.textMuted}
-              />
-            </View>
-          }
-          onPress={() => setVisible(true)}
-          accessibilityRole="button"
-          accessibilityLabel={t("listenLanguages")}
-          styles={{
-            Item: {
-              backgroundColor: colors.surfaceElevated,
-            },
-            Line: {
-              borderBottomWidth: 0,
-            },
-            Content: {
-              color: colors.text,
-              fontFamily: fonts.body,
-              fontSize: 15,
-            },
-            Extra: {
-              maxWidth: "68%",
-              paddingLeft: 8,
-            },
-          }}
-        >
-          {t("selection")}
-        </List.Item>
-      </AntSettingsCard>
-
-      <Modal
-        visible={visible}
-        transparent
-        maskClosable
-        title={t("listenLanguages")}
-        onClose={() => setVisible(false)}
-        footer={[
-          {
-            text: t("done"),
-            style: {
-              color: colors.accent,
-              fontFamily: fonts.bodyMedium,
-            },
-            onPress: () => setVisible(false),
-          },
-        ]}
-        styles={{
-          header: {
-            color: colors.text,
-            fontFamily: fonts.bodyMedium,
-          },
-          buttonText: {
-            fontFamily: fonts.bodyMedium,
-          },
-        }}
-      >
-        <View>
-          {TTS_LISTEN_LANGUAGE_OPTIONS.map((entry, index) => (
-            <Checkbox.CheckboxItem
-              key={entry}
-              checked={selectedLanguages.includes(entry)}
-              right
-              onPress={() => onToggleLanguage(entry)}
-              styles={{
-                Item: {
-                  backgroundColor: colors.surface,
-                  minHeight: 46,
-                },
-                Line: {
-                  borderBottomWidth:
-                    index === TTS_LISTEN_LANGUAGE_OPTIONS.length - 1
-                      ? 0
-                      : StyleSheet.hairlineWidth,
-                  borderBottomColor: colors.border,
-                },
-                Content: {
-                  color: colors.text,
-                  fontFamily: fonts.body,
-                  fontSize: 15,
-                },
-              }}
-            >
-              {getTtsListenLanguageLabel(entry, language)}
-            </Checkbox.CheckboxItem>
-          ))}
-        </View>
-      </Modal>
-    </>
-  );
-}
 
 export function SpeakingSettingsPage({
   settings,
@@ -234,10 +96,7 @@ export function SpeakingSettingsPage({
     text: string,
   ) => void;
   onSetNativePreviewText: (text: string) => void;
-  onSetKokoroPreviewText: (
-    language: KokoroLanguage,
-    text: string,
-  ) => void;
+  onSetKokoroPreviewText: (language: KokoroLanguage, text: string) => void;
   onPreviewProviderVoice: (
     provider: Provider,
     previewLanguage: TtsListenLanguage,
@@ -266,35 +125,37 @@ export function SpeakingSettingsPage({
     settings.ttsMode,
   );
   const providerRouteActive =
-    settings.ttsMode === "provider" ||
-    fallbackRoutes.includes("provider");
+    settings.ttsMode === "provider" || fallbackRoutes.includes("provider");
   const nativeRouteActive =
     settings.ttsMode === "native" || fallbackRoutes.includes("native");
   const kokoroRouteActive =
     settings.ttsMode === "kokoro" || fallbackRoutes.includes("kokoro");
 
   return (
-    <View style={styles.pageStack}>
+    <View style={styles.sectionPageStack}>
       <AntSectionIntro
         title={t("voiceOutput")}
+        extra={
+          <AntSettingsInfoButton
+            accessibilityLabel={t("aboutSetting", {
+              setting: t("voiceOutput"),
+            })}
+            title={t("voiceOutput")}
+          >
+            {t("voiceOutputDescription")}
+          </AntSettingsInfoButton>
+        }
       />
 
       <AntSettingsCard>
         <AntSwitchRow
           label={t("spokenReplies")}
-          description={
-            settings.spokenRepliesEnabled
-              ? t("spokenRepliesEnabledDescription")
-              : t("spokenRepliesDisabledDescription")
-          }
           value={settings.spokenRepliesEnabled}
-          onChange={(value) =>
-            onUpdate({ spokenRepliesEnabled: value })
-          }
+          onChange={(value) => onUpdate({ spokenRepliesEnabled: value })}
         />
       </AntSettingsCard>
 
-      <ListenLanguageSelector
+      <AntListenLanguageSelector
         selectedLanguages={settings.ttsListenLanguages}
         onToggleLanguage={onToggleListenLanguage}
       />
@@ -345,6 +206,8 @@ export function SpeakingSettingsPage({
       {providerRouteActive ? (
         <>
           <AntPickerSection
+            title={t("ttsProvider")}
+            description={t("ttsProviderEnabledHint")}
             helperText={
               ttsLanguageNote
                 ? t("languageCoverage", { note: ttsLanguageNote })
@@ -356,9 +219,7 @@ export function SpeakingSettingsPage({
               value={settings.ttsProvider ?? ""}
               options={ttsProviderOptions}
               disabled={ttsProviderOptions.length === 0}
-              onChange={(value) =>
-                onUpdate({ ttsProvider: value as Provider })
-              }
+              onChange={(value) => onUpdate({ ttsProvider: value as Provider })}
             />
             {selectedPreviewProvider &&
             selectedPreviewProviderModelOptions.length > 0 ? (
@@ -370,28 +231,32 @@ export function SpeakingSettingsPage({
                   label: model.name,
                 }))}
                 onChange={(value) =>
-                  onUpdateProviderTtsModel(
-                    selectedPreviewProvider,
-                    value,
-                  )
+                  onUpdateProviderTtsModel(selectedPreviewProvider, value)
                 }
               />
             ) : null}
           </AntPickerSection>
 
-          <AntSettingsCard>
-            <Text style={[styles.fieldLabel, { color: colors.text }]}>
-              {t("ttsInstructions")}
-            </Text>
-            <Text
-              style={[styles.helperText, { color: colors.textSecondary }]}
-            >
-              {t(
-                instructionsSupported
-                  ? "ttsInstructionsDescription"
-                  : "ttsInstructionsUnsupported",
-              )}
-            </Text>
+          <AntSettingsCard
+            title={t("ttsInstructions")}
+            headerExtra={
+              <AntSettingsInfoButton
+                accessibilityLabel={t("aboutSetting", {
+                  setting: t("ttsInstructions"),
+                })}
+                title={t("ttsInstructions")}
+              >
+                {t("ttsInstructionsDescription")}
+              </AntSettingsInfoButton>
+            }
+          >
+            {!instructionsSupported ? (
+              <Text
+                style={[styles.helperText, { color: colors.textSecondary }]}
+              >
+                {t("ttsInstructionsUnsupported")}
+              </Text>
+            ) : null}
             <AntTextArea
               value={settings.ttsInstructions}
               placeholder={t("ttsInstructionsPlaceholder")}

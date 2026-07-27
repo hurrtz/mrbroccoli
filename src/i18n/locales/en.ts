@@ -294,6 +294,15 @@ export const en: TranslationDictionary = {
   kokoroRemoveTitle: "Remove the Kokoro model?",
   kokoroRemoveBody: ({ installedSize }) =>
     `This frees about ${installedSize} MB. You can download the model again at any time.`,
+  removeKokoroModel: "Remove the Kokoro model",
+  downloadKokoroModel: "Download the Kokoro model",
+  kokoroFallbackNeeded: ({ languages }) =>
+    `An explicit fallback route is required for: ${languages}.`,
+  kokoroNoSelectedLanguages:
+    "Select English or Simplified Chinese under Listen Languages to configure a Kokoro voice.",
+  expandVoiceSettings: ({ language }) => `Expand ${language} voice settings`,
+  collapseVoiceSettings: ({ language }) =>
+    `Collapse ${language} voice settings`,
   remove: "Remove",
   voiceOutputDescription:
     "Pick the speech engine, listening languages, and voice previews for spoken replies.",

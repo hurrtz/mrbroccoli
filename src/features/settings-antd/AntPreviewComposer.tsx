@@ -1,10 +1,7 @@
 import React from "react";
 import { Text, View } from "react-native";
 
-import {
-  Button,
-  Input,
-} from "@ant-design/react-native";
+import { Button, Input } from "@ant-design/react-native";
 
 import { antButtonTypography } from "../../design-system/antTypography";
 import { useLocalization } from "../../i18n";
@@ -15,6 +12,7 @@ import type {
   TextInputFocusHandler,
 } from "../settings-core/types";
 
+import { AntSettingsInfoButton } from "./AntSettingsInfoButton";
 import { AntButtonLabel } from "./AntSettingsPrimitives";
 import { styles } from "./styles";
 
@@ -40,14 +38,23 @@ export function AntPreviewComposer({
   const isGenerating = phase === "generating";
   const isPlaying = phase === "playing";
   const isBusy = isGenerating || isPlaying;
-  const disabled =
-    interactionDisabled || (!isBusy && text.trim().length === 0);
+  const disabled = interactionDisabled || (!isBusy && text.trim().length === 0);
 
   return (
     <View style={{ gap: 8 }}>
-      <Text style={[styles.fieldLabel, { color: colors.textSecondary }]}>
-        {t("voicePreviewText")}
-      </Text>
+      <View style={styles.previewFieldHeader}>
+        <Text style={[styles.fieldLabel, { color: colors.textSecondary }]}>
+          {t("voicePreviewText")}
+        </Text>
+        <AntSettingsInfoButton
+          accessibilityLabel={t("aboutSetting", {
+            setting: t("voicePreviewText"),
+          })}
+          title={t("voicePreviewText")}
+        >
+          {t("voicePreviewHint")}
+        </AntSettingsInfoButton>
+      </View>
       <Input.TextArea
         value={text}
         onChangeText={setText}
@@ -75,9 +82,6 @@ export function AntPreviewComposer({
           },
         }}
       />
-      <Text style={[styles.helperText, { color: colors.textSecondary }]}>
-        {t("voicePreviewHint")}
-      </Text>
       <Button
         type="primary"
         loading={isGenerating}

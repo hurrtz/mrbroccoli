@@ -1,23 +1,9 @@
 import React from "react";
-import {
-  StyleSheet,
-  Text,
-  View,
-} from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 
-import {
-  Button,
-  Icon,
-  Input,
-  Modal,
-} from "@ant-design/react-native";
+import { Button, Icon, Input } from "@ant-design/react-native";
 
 import { antButtonTypography } from "../../design-system/antTypography";
-import {
-  KOKORO_MODEL_DOWNLOAD_BYTES,
-  KOKORO_MODEL_INSTALLED_BYTES,
-  getKokoroVoiceOptions,
-} from "../../constants/kokoro";
 import { getTtsListenLanguageLabel } from "../../constants/localTts";
 import {
   PROVIDER_DEFAULT_TTS_MODELS,
@@ -31,13 +17,11 @@ import {
   TTS_FALLBACK_OPTIONS,
   getTtsFallbackRoutes,
 } from "../../constants/ttsFallback";
-import type { KokoroModelController } from "../../hooks/useKokoroModel";
 import { useLocalization } from "../../i18n";
 import type { ProviderVoiceDirectories } from "../../services/providerVoiceDirectory";
 import { useTheme } from "../../theme/ThemeContext";
 import { fonts } from "../../theme/typography";
 import type {
-  KokoroLanguage,
   KokoroTtsFallbackRoute,
   Provider,
   ProviderTtsFallbackRoute,
@@ -52,10 +36,12 @@ import type {
 } from "../settings-core/types";
 
 import { AntPreviewComposer } from "./AntPreviewComposer";
+import { AntSettingsInfoButton } from "./AntSettingsInfoButton";
 import {
   AntButtonLabel,
   AntPickerRow,
   AntPickerRows,
+  AntSectionIntro,
   AntSettingsCard,
 } from "./AntSettingsPrimitives";
 import { styles } from "./styles";
@@ -98,10 +84,7 @@ export function AntTtsFallbackSection({
     return null;
   }
 
-  const routes = getTtsFallbackRoutes(
-    settings.ttsFallbackPolicy,
-    primaryMode,
-  );
+  const routes = getTtsFallbackRoutes(settings.ttsFallbackPolicy, primaryMode);
   const addableRoutes = TTS_FALLBACK_OPTIONS[primaryMode].filter(
     (route) => !routes.includes(route),
   );
@@ -121,17 +104,19 @@ export function AntTtsFallbackSection({
   };
 
   return (
-    <AntSettingsCard>
-      <Text
-        accessibilityRole="header"
-        style={[styles.fieldLabel, { color: colors.text }]}
-      >
-        {t("ttsFallbackRoutes")}
-      </Text>
-      <Text style={[styles.helperText, { color: colors.textSecondary }]}>
-        {t("ttsFallbackRoutesHint")}
-      </Text>
-
+    <AntSettingsCard
+      title={t("ttsFallbackRoutes")}
+      headerExtra={
+        <AntSettingsInfoButton
+          accessibilityLabel={t("aboutSetting", {
+            setting: t("ttsFallbackRoutes"),
+          })}
+          title={t("ttsFallbackRoutes")}
+        >
+          {t("ttsFallbackRoutesHint")}
+        </AntSettingsInfoButton>
+      }
+    >
       {routes.length === 0 ? (
         <Text
           testID="tts-fallback-empty"
@@ -144,10 +129,7 @@ export function AntTtsFallbackSection({
           <View
             key={route}
             testID={`tts-fallback-route-${route}`}
-            style={[
-              styles.fallbackRow,
-              { borderTopColor: colors.border },
-            ]}
+            style={styles.fallbackRow}
           >
             <Text style={[styles.fallbackLabel, { color: colors.text }]}>
               {t("ttsFallbackPosition", {
@@ -207,9 +189,7 @@ export function AntTtsFallbackSection({
               style={styles.iconButton}
               styles={antButtonTypography}
               onPress={() =>
-                updateRoutes(
-                  routes.filter((candidate) => candidate !== route),
-                )
+                updateRoutes(routes.filter((candidate) => candidate !== route))
               }
               accessibilityLabel={t("removeFallbackRoute", {
                 route: getFallbackRouteLabel(route, t),
@@ -325,196 +305,193 @@ export function AntProviderVoiceSection({
     voiceDirectory?.status === "refreshing";
 
   return (
-    <AntSettingsCard>
-      <View style={styles.previewHeader}>
-        <Text
-          accessibilityRole="header"
-          style={[styles.sectionTitle, { color: colors.text }]}
-        >
-          {t("providerVoicePreviews")}
-        </Text>
-        <Text style={[styles.helperText, { color: colors.textSecondary }]}>
-          {t("providerVoicePreviewsHint")}
-        </Text>
-      </View>
-
-      <Text style={[styles.fieldLabel, { color: colors.text }]}>
-        {PROVIDER_LABELS[provider]}
-      </Text>
-
-      {hasVoiceDirectory && voiceDirectory ? (
-        <View style={styles.statusRow}>
-          <View style={styles.statusCopy}>
-            <Text style={[styles.helperText, { color: colors.textSecondary }]}>
-              {t("providerVoiceDirectory", {
+    <View style={styles.sectionGroup}>
+      <AntSectionIntro
+        title={t("providerVoicePreviews")}
+        extra={
+          <AntSettingsInfoButton
+            accessibilityLabel={t("aboutSetting", {
+              setting: t("providerVoicePreviews"),
+            })}
+            title={t("providerVoicePreviews")}
+          >
+            {t("providerVoicePreviewsHint")}
+          </AntSettingsInfoButton>
+        }
+      />
+      <AntSettingsCard title={PROVIDER_LABELS[provider]}>
+        {hasVoiceDirectory && voiceDirectory ? (
+          <View style={styles.statusRow}>
+            <View style={styles.statusCopy}>
+              <Text
+                style={[styles.helperText, { color: colors.textSecondary }]}
+              >
+                {t("providerVoiceDirectory", {
+                  provider: PROVIDER_LABELS[provider],
+                })}
+              </Text>
+              <Text style={[styles.helperText, { color: colors.textMuted }]}>
+                {voiceDirectory.status === "ready"
+                  ? t("providerVoicesAvailable", {
+                      count: voiceDirectory.voices.length,
+                      provider: PROVIDER_LABELS[provider],
+                    })
+                  : voiceDirectory.status === "error"
+                    ? t(
+                        fallbackVoiceOptions.length > 0
+                          ? "providerVoicesLoadFailedWithFallback"
+                          : "providerVoicesLoadFailed",
+                      )
+                    : t("providerVoicesLoadingHint", {
+                        provider: PROVIDER_LABELS[provider],
+                      })}
+              </Text>
+              {voiceDirectory.status === "error" && voiceDirectory.error ? (
+                <>
+                  <Text style={[styles.helperText, { color: colors.danger }]}>
+                    {t("providerVoicesErrorDetail", {
+                      detail: voiceDirectory.error.message,
+                    })}
+                  </Text>
+                  {provider === "elevenlabs" &&
+                  isElevenLabsVoiceReadPermissionError(voiceDirectory.error) ? (
+                    <Text
+                      style={[
+                        styles.helperText,
+                        { color: colors.textSecondary },
+                      ]}
+                    >
+                      {t("elevenLabsVoicesReadPermissionHint")}
+                    </Text>
+                  ) : null}
+                </>
+              ) : null}
+            </View>
+            <Button
+              testID={`${provider}-voices-refresh`}
+              size="small"
+              type="ghost"
+              loading={voiceDirectoryBusy}
+              disabled={voiceDirectoryBusy}
+              style={StyleSheet.flatten([
+                styles.compactButton,
+                { borderColor: colors.border },
+              ])}
+              styles={antButtonTypography}
+              onPress={() => {
+                void voiceDirectory.refresh();
+              }}
+              accessibilityLabel={t("refreshProviderVoices", {
                 provider: PROVIDER_LABELS[provider],
               })}
-            </Text>
-            <Text style={[styles.helperText, { color: colors.textMuted }]}>
-              {voiceDirectory.status === "ready"
-                ? t("providerVoicesAvailable", {
-                    count: voiceDirectory.voices.length,
-                    provider: PROVIDER_LABELS[provider],
-                  })
-                : voiceDirectory.status === "error"
-                  ? t(
-                      fallbackVoiceOptions.length > 0
-                        ? "providerVoicesLoadFailedWithFallback"
-                        : "providerVoicesLoadFailed",
-                    )
-                  : t("providerVoicesLoadingHint", {
-                      provider: PROVIDER_LABELS[provider],
-                    })}
-            </Text>
-            {voiceDirectory.status === "error" && voiceDirectory.error ? (
-              <>
-                <Text style={[styles.helperText, { color: colors.danger }]}>
-                  {t("providerVoicesErrorDetail", {
-                    detail: voiceDirectory.error.message,
-                  })}
-                </Text>
-                {provider === "elevenlabs" &&
-                isElevenLabsVoiceReadPermissionError(
-                  voiceDirectory.error,
-                ) ? (
-                  <Text
-                    style={[
-                      styles.helperText,
-                      { color: colors.textSecondary },
-                    ]}
-                  >
-                    {t("elevenLabsVoicesReadPermissionHint")}
-                  </Text>
-                ) : null}
-              </>
-            ) : null}
+            >
+              <AntButtonLabel
+                color={colors.accent}
+                icon="reload"
+                label={t("refresh")}
+              />
+            </Button>
           </View>
-          <Button
-            testID={`${provider}-voices-refresh`}
-            size="small"
-            type="ghost"
-            loading={voiceDirectoryBusy}
-            disabled={voiceDirectoryBusy}
-            style={StyleSheet.flatten([
-              styles.compactButton,
-              { borderColor: colors.border },
-            ])}
-            styles={antButtonTypography}
-            onPress={() => {
-              void voiceDirectory.refresh();
-            }}
-            accessibilityLabel={t("refreshProviderVoices", {
-              provider: PROVIDER_LABELS[provider],
-            })}
-          >
-            <AntButtonLabel
-              color={colors.accent}
-              icon="reload"
-              label={t("refresh")}
+        ) : null}
+
+        {voiceOptions.length > 0 ? (
+          <AntPickerRows>
+            <AntPickerRow
+              label={t("ttsVoice")}
+              value={selectedVoice}
+              options={voiceOptions}
+              onChange={(value) => onUpdateProviderTtsVoice(provider, value)}
             />
-          </Button>
-        </View>
-      ) : null}
-
-      {voiceOptions.length > 0 ? (
-        <AntPickerRows>
-          <AntPickerRow
-            label={t("ttsVoice")}
-            value={selectedVoice}
-            options={voiceOptions}
-            onChange={(value) =>
-              onUpdateProviderTtsVoice(provider, value)
-            }
-          />
-        </AntPickerRows>
-      ) : hasVoiceDirectory && !voiceDirectoryBusy ? (
-        <View style={{ gap: 8 }}>
-          <Text style={[styles.fieldLabel, { color: colors.textSecondary }]}>
-            {t("providerVoiceId")}
-          </Text>
-          <Input
-            value={selectedVoice}
-            onChangeText={(value) =>
-              onUpdateProviderTtsVoice(provider, value.trim())
-            }
-            onFocus={onTextInputFocus}
-            placeholder={t("providerVoiceIdPlaceholder")}
-            placeholderTextColor={colors.textMuted}
-            selectionColor={colors.accent}
-            autoCapitalize="none"
-            autoCorrect={false}
-            allowClear
-            inputStyle={{
-              color: colors.text,
-              fontFamily: fonts.body,
-              fontSize: 15,
-              lineHeight: 21,
-              paddingHorizontal: 12,
-            }}
-            styles={{
-              container: {
-                backgroundColor: colors.surface,
-                borderWidth: 1,
-                borderColor: colors.border,
-                borderRadius: 10,
-                minHeight: 46,
-              },
-            }}
-          />
-          <Text
-            style={[
-              styles.helperText,
-              { color: selectedVoice ? colors.textSecondary : colors.danger },
-            ]}
-          >
-            {t(
-              selectedVoice
-                ? "providerVoiceIdFallbackHint"
-                : "providerVoiceIdRequired",
-              { provider: PROVIDER_LABELS[provider] },
-            )}
-          </Text>
-        </View>
-      ) : hasVoiceDirectory ? null : (
-        <Text style={[styles.helperText, { color: colors.textSecondary }]}>
-          {t("providerDefaultVoiceHint")}
-        </Text>
-      )}
-
-      {selectedLanguages.map((entry, index) => {
-        const previewId = `provider:${provider}:${entry}`;
-        return (
-          <View
-            key={`${provider}:${entry}`}
-            style={[
-              styles.previewBlock,
-              index === 0 ? styles.previewBlockFirst : null,
-              { borderTopColor: colors.border },
-            ]}
-          >
+          </AntPickerRows>
+        ) : hasVoiceDirectory && !voiceDirectoryBusy ? (
+          <View style={{ gap: 8 }}>
             <Text style={[styles.fieldLabel, { color: colors.textSecondary }]}>
-              {getTtsListenLanguageLabel(entry, language)}
+              {t("providerVoiceId")}
             </Text>
-            <AntPreviewComposer
-              text={previewTexts[provider][entry]}
-              setText={(text) => onSetPreviewText(provider, entry, text)}
-              phase={
-                activePreview?.id === previewId
-                  ? activePreview.phase
-                  : "idle"
+            <Input
+              value={selectedVoice}
+              onChangeText={(value) =>
+                onUpdateProviderTtsVoice(provider, value.trim())
               }
-              interactionDisabled={
-                (activePreview !== null && activePreview.id !== previewId) ||
-                (providerRequiresTtsVoice(provider) && !selectedVoice)
-              }
-              onPreview={() => onPreviewProvider(provider, entry)}
-              onStop={onStopPreview}
-              onTextInputFocus={onTextInputFocus}
+              onFocus={onTextInputFocus}
+              placeholder={t("providerVoiceIdPlaceholder")}
+              placeholderTextColor={colors.textMuted}
+              selectionColor={colors.accent}
+              autoCapitalize="none"
+              autoCorrect={false}
+              allowClear
+              inputStyle={{
+                color: colors.text,
+                fontFamily: fonts.body,
+                fontSize: 15,
+                lineHeight: 21,
+                paddingHorizontal: 12,
+              }}
+              styles={{
+                container: {
+                  backgroundColor: colors.surface,
+                  borderWidth: 1,
+                  borderColor: colors.border,
+                  borderRadius: 10,
+                  minHeight: 46,
+                },
+              }}
             />
+            <Text
+              style={[
+                styles.helperText,
+                { color: selectedVoice ? colors.textSecondary : colors.danger },
+              ]}
+            >
+              {t(
+                selectedVoice
+                  ? "providerVoiceIdFallbackHint"
+                  : "providerVoiceIdRequired",
+                { provider: PROVIDER_LABELS[provider] },
+              )}
+            </Text>
           </View>
-        );
-      })}
-    </AntSettingsCard>
+        ) : hasVoiceDirectory ? null : (
+          <Text style={[styles.helperText, { color: colors.textSecondary }]}>
+            {t("providerDefaultVoiceHint")}
+          </Text>
+        )}
+
+        {selectedLanguages.map((entry, index) => {
+          const previewId = `provider:${provider}:${entry}`;
+          return (
+            <View
+              key={`${provider}:${entry}`}
+              style={[
+                styles.previewBlock,
+                index === 0 ? styles.previewBlockFirst : null,
+                { borderTopColor: colors.border },
+              ]}
+            >
+              <Text
+                style={[styles.fieldLabel, { color: colors.textSecondary }]}
+              >
+                {getTtsListenLanguageLabel(entry, language)}
+              </Text>
+              <AntPreviewComposer
+                text={previewTexts[provider][entry]}
+                setText={(text) => onSetPreviewText(provider, entry, text)}
+                phase={
+                  activePreview?.id === previewId ? activePreview.phase : "idle"
+                }
+                interactionDisabled={
+                  (activePreview !== null && activePreview.id !== previewId) ||
+                  (providerRequiresTtsVoice(provider) && !selectedVoice)
+                }
+                onPreview={() => onPreviewProvider(provider, entry)}
+                onStop={onStopPreview}
+                onTextInputFocus={onTextInputFocus}
+              />
+            </View>
+          );
+        })}
+      </AntSettingsCard>
+    </View>
   );
 }
 
@@ -543,229 +520,51 @@ export function AntNativeVoiceSection({
   const { t } = useLocalization();
 
   return (
-    <AntSettingsCard>
-      <View style={styles.previewHeader}>
-        <Text
-          accessibilityRole="header"
-          style={[styles.sectionTitle, { color: colors.text }]}
-        >
-          {t("nativeVoicePreviewSection")}
-        </Text>
-        <Text style={[styles.helperText, { color: colors.textSecondary }]}>
-          {t("nativeVoicePreviewSectionHint")}
-        </Text>
-      </View>
-      {voiceOptions.length > 0 ? (
-        <>
-          <AntPickerRows>
-            <AntPickerRow
-              label={t("ttsVoice")}
-              value={selectedVoice}
-              options={voiceOptions}
-              onChange={onSelectVoice}
-            />
-          </AntPickerRows>
-          <AntPreviewComposer
-            text={previewText}
-            setText={onSetPreviewText}
-            phase={
-              activePreview?.id === "native"
-                ? activePreview.phase
-                : "idle"
-            }
-            interactionDisabled={
-              activePreview !== null && activePreview.id !== "native"
-            }
-            onPreview={onPreview}
-            onStop={onStopPreview}
-            onTextInputFocus={onTextInputFocus}
-          />
-        </>
-      ) : (
-        <Text style={[styles.helperText, { color: colors.textSecondary }]}>
-          {t("nativeVoiceUnavailable")}
-        </Text>
-      )}
-    </AntSettingsCard>
-  );
-}
-
-export function AntKokoroVoiceSection({
-  settings,
-  model,
-  previewTexts,
-  activePreview,
-  onUpdateVoice,
-  onSetPreviewText,
-  onPreview,
-  onStopPreview,
-  onTextInputFocus,
-}: {
-  settings: Settings;
-  model: KokoroModelController;
-  previewTexts: Record<KokoroLanguage, string>;
-  activePreview: { id: string; phase: PreviewButtonPhase } | null;
-  onUpdateVoice: (language: KokoroLanguage, voice: string) => void;
-  onSetPreviewText: (language: KokoroLanguage, text: string) => void;
-  onPreview: (language: KokoroLanguage) => Promise<void>;
-  onStopPreview: () => Promise<void>;
-  onTextInputFocus: TextInputFocusHandler;
-}) {
-  const { colors } = useTheme();
-  const { language: appLanguage, t } = useLocalization();
-  const previewLanguages: KokoroLanguage[] = ["en", "zh"];
-  const progressPercent = Math.round(model.progress * 100);
-  const downloadSize = Math.round(KOKORO_MODEL_DOWNLOAD_BYTES / 1024 / 1024);
-  const installedSize = Math.round(
-    KOKORO_MODEL_INSTALLED_BYTES / 1024 / 1024,
-  );
-  const statusText = model.error
-    ? model.error
-    : model.busy === "downloading"
-      ? t(
-          model.phase === "extracting"
-            ? "kokoroExtracting"
-            : "kokoroDownloading",
-          { progress: progressPercent },
-        )
-      : model.busy === "verifying"
-        ? t("kokoroVerifying")
-        : model.busy === "checking"
-          ? t("kokoroChecking")
-          : model.installed
-            ? t("kokoroInstalled")
-            : t("kokoroNotInstalled");
-
-  const handleRemove = () => {
-    Modal.alert(
-      t("kokoroRemoveTitle"),
-      t("kokoroRemoveBody", { installedSize }),
-      [
-        { text: t("cancel") },
-        {
-          text: t("remove"),
-          style: { color: colors.danger },
-          onPress: () => {
-            void model.remove();
-          },
-        },
-      ],
-    );
-  };
-
-  return (
-    <AntSettingsCard>
-      <View style={styles.previewHeader}>
-        <Text
-          accessibilityRole="header"
-          style={[styles.sectionTitle, { color: colors.text }]}
-        >
-          {t("kokoroVoices")}
-        </Text>
-        <Text style={[styles.helperText, { color: colors.textSecondary }]}>
-          {t("kokoroVoicesHint", { size: downloadSize, installedSize })}
-        </Text>
-      </View>
-
-      <View style={styles.statusRow}>
-        <View style={styles.statusCopy}>
-          <Text style={[styles.fieldLabel, { color: colors.text }]}>
-            {t("kokoroModel")}
-          </Text>
-          <Text
-            style={[
-              styles.helperText,
-              {
-                color: model.error
-                  ? colors.danger
-                  : model.installed
-                    ? colors.success
-                    : colors.textSecondary,
-              },
-            ]}
+    <View style={styles.sectionGroup}>
+      <AntSectionIntro
+        title={t("nativeVoicePreviewSection")}
+        extra={
+          <AntSettingsInfoButton
+            accessibilityLabel={t("aboutSetting", {
+              setting: t("nativeVoicePreviewSection"),
+            })}
+            title={t("nativeVoicePreviewSection")}
           >
-            {statusText}
-          </Text>
-        </View>
-        <Button
-          size="small"
-          type={model.installed ? "warning" : "primary"}
-          loading={model.busy !== null}
-          disabled={model.busy !== null}
-          style={styles.compactButton}
-          styles={antButtonTypography}
-          onPress={() => {
-            if (model.installed) {
-              handleRemove();
-            } else {
-              void model.download();
-            }
-          }}
-        >
-          <AntButtonLabel
-            color={
-              model.installed
-                ? colors.onDanger
-                : colors.onActiveControl
-            }
-            icon={model.installed ? "delete" : "download"}
-            label={t(model.installed ? "remove" : "download")}
-          />
-        </Button>
-      </View>
-
-      <Text style={[styles.helperText, { color: colors.textSecondary }]}>
-        {t("kokoroLanguageFallback")}
-      </Text>
-
-      {previewLanguages.map((previewLanguage, index) => {
-        const previewId = `kokoro:${previewLanguage}`;
-        return (
-          <View
-            key={previewLanguage}
-            style={[
-              styles.previewBlock,
-              index === 0 ? styles.previewBlockFirst : null,
-              { borderTopColor: colors.border },
-            ]}
-          >
-            <Text style={[styles.fieldLabel, { color: colors.textSecondary }]}>
-              {getTtsListenLanguageLabel(previewLanguage, appLanguage)}
-            </Text>
+            {t("nativeVoicePreviewSectionHint")}
+          </AntSettingsInfoButton>
+        }
+      />
+      <AntSettingsCard>
+        {voiceOptions.length > 0 ? (
+          <>
             <AntPickerRows>
               <AntPickerRow
                 label={t("ttsVoice")}
-                value={settings.kokoroVoices[previewLanguage]}
-                options={getKokoroVoiceOptions(
-                  previewLanguage,
-                  appLanguage,
-                )}
-                onChange={(voice) =>
-                  onUpdateVoice(previewLanguage, voice)
-                }
+                value={selectedVoice}
+                options={voiceOptions}
+                onChange={onSelectVoice}
               />
             </AntPickerRows>
             <AntPreviewComposer
-              text={previewTexts[previewLanguage]}
-              setText={(text) =>
-                onSetPreviewText(previewLanguage, text)
-              }
+              text={previewText}
+              setText={onSetPreviewText}
               phase={
-                activePreview?.id === previewId
-                  ? activePreview.phase
-                  : "idle"
+                activePreview?.id === "native" ? activePreview.phase : "idle"
               }
               interactionDisabled={
-                !model.installed ||
-                (activePreview !== null && activePreview.id !== previewId)
+                activePreview !== null && activePreview.id !== "native"
               }
-              onPreview={() => onPreview(previewLanguage)}
+              onPreview={onPreview}
               onStop={onStopPreview}
               onTextInputFocus={onTextInputFocus}
             />
-          </View>
-        );
-      })}
-    </AntSettingsCard>
+          </>
+        ) : (
+          <Text style={[styles.helperText, { color: colors.textSecondary }]}>
+            {t("nativeVoiceUnavailable")}
+          </Text>
+        )}
+      </AntSettingsCard>
+    </View>
   );
 }

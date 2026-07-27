@@ -224,16 +224,29 @@ describe("SettingsModal", () => {
     await waitFor(() => {
       expect(screen.getByText("Kokoro On-device Voices")).toBeTruthy();
       expect(
-        screen.getByText(
+        screen.queryByText(
           "The multilingual model downloads about 140 MB and occupies about 211 MB after installation.",
         ),
-      ).toBeTruthy();
+      ).toBeNull();
       expect(
         screen.getByText("Optional download. No provider key required."),
       ).toBeTruthy();
+      expect(screen.getByTestId("kokoro-language-card-en")).toBeTruthy();
+      expect(screen.queryByText("TTS Voice")).toBeNull();
     });
 
-    fireEvent.press(screen.getByText("Download"));
+    fireEvent.press(screen.getByLabelText("About Kokoro On-device Voices"));
+    expect(
+      screen.getByText(
+        "The multilingual model downloads about 140 MB and occupies about 211 MB after installation.",
+      ),
+    ).toBeTruthy();
+    act(() => screen.UNSAFE_getByType(AntModal).props.footer[0].onPress());
+
+    fireEvent.press(screen.getByLabelText("Expand English voice settings"));
+    expect(screen.getByText("TTS Voice")).toBeTruthy();
+
+    fireEvent.press(screen.getByLabelText("Download the Kokoro model"));
     expect(download).toHaveBeenCalledTimes(1);
   });
 
