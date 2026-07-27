@@ -469,8 +469,7 @@ describe("MainScreen", () => {
 
     expect(screen.getByText("route-card")).toBeTruthy();
     expect(
-      screen.getByTestId("route-web-search-control").props
-        .accessibilityState,
+      screen.getByTestId("route-web-search-control").props.accessibilityState,
     ).toEqual({ checked: false, disabled: true });
     expect(inputSection.getByText("voice-stage:disabled")).toBeTruthy();
     expect(
@@ -498,8 +497,7 @@ describe("MainScreen", () => {
 
     expect(screen.getByTestId("route-web-search-control")).toBeTruthy();
     expect(
-      screen.getByTestId("route-web-search-control").props
-        .accessibilityState,
+      screen.getByTestId("route-web-search-control").props.accessibilityState,
     ).toEqual({ checked: false, disabled: true });
   });
 
@@ -517,7 +515,7 @@ describe("MainScreen", () => {
     const searchSwitch = screen.getByTestId("route-web-search-control");
 
     expect(searchSwitch.props.accessibilityState.checked).toBe(true);
-    fireEvent.press(searchSwitch);
+    fireEvent(searchSwitch, "valueChange", false);
 
     expect(sharedSettings.updateSettings).toHaveBeenCalledWith({
       webSearchMode: "off",
@@ -698,8 +696,7 @@ describe("MainScreen", () => {
     ).toBe(0.42);
     expect(screen.getByTestId("landscape-pane-divider")).toBeTruthy();
     expect(
-      screen.getByTestId("route-web-search-control").props
-        .accessibilityState,
+      screen.getByTestId("route-web-search-control").props.accessibilityState,
     ).toEqual({ checked: false, disabled: false });
     expect(leftPane.queryByTestId("route-style-control")).toBeNull();
     expect(leftPane.queryByText("status-strip")).toBeNull();

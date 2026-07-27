@@ -1,7 +1,12 @@
 import React from "react";
-import { StyleSheet, Text, View } from "react-native";
+import {
+  Platform,
+  StyleSheet,
+  Switch as NativeSwitch,
+  Text,
+  View,
+} from "react-native";
 
-import { AntSwitch } from "../../design-system/AntSwitch";
 import type { Colors } from "../../theme/colors";
 import { fonts } from "../../theme/typography";
 import type { TranslateFn } from "./shared";
@@ -56,18 +61,25 @@ export const MainScreenRouteControls = React.memo(
           >
             {t("webSearch")}
           </Text>
-          <AntSwitch
+          <NativeSwitch
             testID="route-web-search-control"
             style={styles.searchSwitch}
-            checked={webSearchValue}
+            value={webSearchValue}
             disabled={!webSearchAvailable}
             trackColor={{
               false: colors.borderStrong,
-              true: colors.accent,
+              true:
+                Platform.OS === "android" ? colors.accentSoft : colors.accent,
             }}
-            thumbColor={colors.onAccent}
-            thumbTintColor={colors.onAccent}
-            onChange={
+            thumbColor={
+              Platform.OS === "android"
+                ? webSearchValue
+                  ? colors.accent
+                  : colors.surface
+                : undefined
+            }
+            ios_backgroundColor={colors.borderStrong}
+            onValueChange={
               webSearchAvailable
                 ? () => onToggleWebSearchEnabled?.()
                 : undefined
