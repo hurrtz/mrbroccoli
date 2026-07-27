@@ -11,7 +11,7 @@ export const KOKORO_MODEL_INSTALLED_BYTES = 221_000_000;
 export const KOKORO_IDLE_RELEASE_MS = 12_000;
 export const KOKORO_TTS_TARGET_CHUNK_CHARS = 240;
 
-export const KOKORO_SUPPORTED_LANGUAGES = [
+const KOKORO_SUPPORTED_LANGUAGES = [
   "en",
   "zh",
 ] as const satisfies readonly TtsListenLanguage[];

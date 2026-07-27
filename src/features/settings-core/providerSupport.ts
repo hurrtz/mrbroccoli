@@ -254,7 +254,7 @@ export function getProviderHealthState(params: {
   return "configured";
 }
 
-export function isProviderSelectableForConfiguredFlow(
+function isProviderSelectableForConfiguredFlow(
   healthState: ProviderHealthState,
 ) {
   return healthState !== "unconfigured" && healthState !== "failing";

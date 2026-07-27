@@ -15,7 +15,7 @@ export function isRuntimeProviderId(
   );
 }
 
-export function createRuntimeProviderRecord<T>(
+function createRuntimeProviderRecord<T>(
   factory: (provider: RuntimeAppProviderId) => T,
 ): Record<RuntimeAppProviderId, T> {
   return Object.fromEntries(

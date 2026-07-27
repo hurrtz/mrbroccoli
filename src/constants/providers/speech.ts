@@ -66,15 +66,6 @@ export function getSttModelLabel(provider: Provider, modelId: string) {
   return option?.name ?? modelId;
 }
 
-export const PROVIDER_TTS_VOICE_OPTIONS: Partial<Record<Provider, TtsVoiceOption[]>> =
-  Object.fromEntries(
-    Object.entries(RUNTIME_PROVIDER_MANIFEST).flatMap(([provider, manifest]) =>
-      manifest.tts.voiceOptions.length > 0
-        ? [[provider, toVoiceOptions(manifest.tts.voiceOptions)]]
-        : [],
-    ),
-  ) as Partial<Record<Provider, TtsVoiceOption[]>>;
-
 export const PROVIDER_DEFAULT_TTS_VOICES: Partial<Record<Provider, string>> =
   Object.fromEntries(
     Object.entries(RUNTIME_PROVIDER_MANIFEST).flatMap(([provider, manifest]) =>

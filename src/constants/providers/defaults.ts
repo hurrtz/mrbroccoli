@@ -60,7 +60,7 @@ export function createResponseModeId(index: number) {
   return `mode-${index + 1}`;
 }
 
-export function createNeutralResponseMode(index: number): ResponseModeConfig {
+function createNeutralResponseMode(index: number): ResponseModeConfig {
   return {
     id: createResponseModeId(index),
     route: { ...NEUTRAL_RESPONSE_MODE_ROUTE },

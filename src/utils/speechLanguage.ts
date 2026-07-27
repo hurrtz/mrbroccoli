@@ -1,16 +1,3 @@
-const TOGETHER_TTS_LANGUAGE_CODES = [
-  "en",
-  "es",
-  "fr",
-  "de",
-  "it",
-  "pt",
-  "hi",
-  "ja",
-  "ko",
-  "zh",
-] as const;
-
 const MISTRAL_STT_LANGUAGE_CODES = [
   "en",
   "es",
@@ -60,10 +47,6 @@ function pickSupportedLanguageCode(
   }
 
   return fallback;
-}
-
-export function getTogetherTtsLanguageCode(text: string) {
-  return pickSupportedLanguageCode(text, TOGETHER_TTS_LANGUAGE_CODES);
 }
 
 export function getMistralSttLanguageCode() {

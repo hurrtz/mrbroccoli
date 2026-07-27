@@ -8,52 +8,11 @@ import {
   TtsListenLanguage,
 } from "../../types";
 import {
-  LOCAL_PREVIEW_SAMPLE_TEXT_BY_LANGUAGE,
   PROVIDER_PREVIEW_SAMPLE_TEXT_BY_LANGUAGE,
   getNativePreviewSampleText,
 } from "../../constants/voicePreviewSamples";
 
-import { NativeSpeechVoice, SettingsTab } from "./types";
-
-export function getTabLabel(
-  tab: SettingsTab,
-  t: ReturnType<typeof useLocalization>["t"],
-) {
-  switch (tab) {
-    case "instructions":
-      return t("instructions");
-    case "providers":
-      return t("providers");
-    case "web":
-      return t("webSearch");
-    case "stt":
-      return t("stt");
-    case "tts":
-      return t("tts");
-    case "ui":
-      return t("ui");
-  }
-}
-
-export function getTabDescription(
-  tab: SettingsTab,
-  t: ReturnType<typeof useLocalization>["t"],
-) {
-  switch (tab) {
-    case "instructions":
-      return t("instructionsTabDescription");
-    case "providers":
-      return t("providersTabDescription");
-    case "web":
-      return t("webSearchTabDescription");
-    case "stt":
-      return t("sttTabDescription");
-    case "tts":
-      return t("ttsTabDescription");
-    default:
-      return null;
-  }
-}
+import { NativeSpeechVoice } from "./types";
 
 export function getResponseLengthOptions(
   t: ReturnType<typeof useLocalization>["t"],
@@ -120,10 +79,6 @@ export function getResponseToneOptions(
       description: t("eli5Description"),
     },
   ];
-}
-
-export function getLocalPreviewSampleText(language: TtsListenLanguage) {
-  return LOCAL_PREVIEW_SAMPLE_TEXT_BY_LANGUAGE[language];
 }
 
 export function getProviderPreviewSampleText(language: TtsListenLanguage) {

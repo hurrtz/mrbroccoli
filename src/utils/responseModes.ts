@@ -74,7 +74,7 @@ export function getNextResponseModeId(modes: ResponseModeSelections) {
   return createResponseModeId(modes.length);
 }
 
-export function getResponseModeRouteIdentity(route: ResponseModeRoute) {
+function getResponseModeRouteIdentity(route: ResponseModeRoute) {
   return `${route.provider}\u0000${route.model}\u0000${route.effort ?? ""}`;
 }
 
@@ -154,7 +154,7 @@ export function deriveResponseModesForProvider(
   }));
 }
 
-export function getResponseModeEntry(
+function getResponseModeEntry(
   modes: ResponseModeSelections,
   mode: ResponseMode,
 ): ResponseModeConfig | undefined {

@@ -10,7 +10,7 @@ export interface StatusDisplayData {
   messageCountLabel: string | null;
 }
 
-export function getVisualPhaseActionLabel(params: {
+function getVisualPhaseActionLabel(params: {
   driveSessionActive?: boolean;
   inputMode: InputMode;
   playbackPaused?: boolean;

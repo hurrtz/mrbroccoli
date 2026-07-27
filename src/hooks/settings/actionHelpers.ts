@@ -24,7 +24,7 @@ function persistAndReturn(next: Settings) {
   return next;
 }
 
-export function updateNestedSettingsRecord<K extends keyof Settings>(
+function updateNestedSettingsRecord<K extends keyof Settings>(
   setSettings: SetSettings,
   key: K,
   entry: keyof Settings[K] & (string | number | symbol),

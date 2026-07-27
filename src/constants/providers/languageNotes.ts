@@ -138,7 +138,7 @@ export function getProviderApiKeyPlaceholder(
   return PROVIDER_API_KEY_PLACEHOLDERS_BY_LANGUAGE[language][provider];
 }
 
-export function getProviderSttLanguageNote(
+function getProviderSttLanguageNote(
   provider: Provider,
   language: AppLanguage,
 ) {
@@ -360,7 +360,7 @@ export function getProviderSttLimitNote(
   return `${parts.join(". ")}.`;
 }
 
-export function getProviderTtsLanguageNote(
+function getProviderTtsLanguageNote(
   provider: Provider,
   language: AppLanguage,
 ) {
