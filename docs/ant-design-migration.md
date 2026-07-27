@@ -151,7 +151,7 @@ legacy hand-built UI with `@ant-design/react-native`.
 
 ## Verification
 
-- `npm test -- --runInBand --watchman=false --silent`: 111 suites and 856 tests
+- `npm test -- --runInBand`: 112 suites and 860 tests
   passed
 - `npm run config:verify`: native configuration matched `app.json` across 19 checks
 - `npx expo-doctor`: 18/18 checks passed
@@ -159,6 +159,9 @@ legacy hand-built UI with `@ant-design/react-native`.
 - Production Android export completed with Outfit 400/500/600/700 and Unica
   One 400 assets
 - Android debug APK assembled successfully
+- Clean iOS Release simulator build completed with 0 errors; the generated
+  app installed, launched, and passed portrait Settings and accessibility
+  inspection
 - Android emulator interaction checks covered Settings navigation, pickers,
   confirmations, light/dark themes, English/German, portrait/landscape, the
   home controls, and the final font-metric layout
