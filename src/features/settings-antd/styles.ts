@@ -215,6 +215,11 @@ export const styles = StyleSheet.create({
   sectionIntroTitle: {
     flex: 1,
   },
+  sectionIntroActions: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 2,
+  },
   sectionTitle: {
     fontFamily: fonts.display,
     fontSize: 17,
@@ -333,19 +338,8 @@ export const styles = StyleSheet.create({
     lineHeight: 18,
     fontWeight: "500",
   },
-  diagnosticHeader: {
-    flexDirection: "row",
-    alignItems: "flex-start",
-    justifyContent: "space-between",
-    gap: 12,
-  },
   diagnosticCard: {
-    paddingVertical: 12,
-    borderTopWidth: StyleSheet.hairlineWidth,
     gap: 3,
-  },
-  diagnosticCardFirst: {
-    borderTopWidth: 0,
   },
   diagnosticMetaRow: {
     flexDirection: "row",

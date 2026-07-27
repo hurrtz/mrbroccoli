@@ -39,10 +39,10 @@ jest.mock("react-native-safe-area-context", () => ({
 }));
 
 jest.mock("@expo/vector-icons", () => ({
-  Feather: ({ name }: { name: string }) => {
+  Feather: ({ color, name }: { color?: string; name: string }) => {
     const React = require("react");
     const { Text } = require("react-native");
-    return React.createElement(Text, null, name);
+    return React.createElement(Text, { style: { color } }, name);
   },
 }));
 
@@ -1260,10 +1260,12 @@ describe("SettingsModal", () => {
       expect(screen.getByText("Recent Speech Activity")).toBeTruthy();
     });
 
-    const clearLabel = screen.getByText("Clear");
-    expect(StyleSheet.flatten(clearLabel.props.style).color).toBe("#ffffff");
+    const clearAction = screen.getByLabelText("Clear recent speech activity");
+    expect(
+      StyleSheet.flatten(screen.getByTestId("icon-trash-2").props.style).color,
+    ).toBe("#DC2626");
 
-    fireEvent.press(clearLabel);
+    fireEvent.press(clearAction);
 
     expect(clearSpeechDiagnosticsMock).not.toHaveBeenCalled();
     let confirmation = screen.UNSAFE_getByType(AntModal);
@@ -1283,7 +1285,7 @@ describe("SettingsModal", () => {
     expect(confirmation.props.visible).toBe(false);
     expect(clearSpeechDiagnosticsMock).not.toHaveBeenCalled();
 
-    fireEvent.press(clearLabel);
+    fireEvent.press(clearAction);
     confirmation = screen.UNSAFE_getByType(AntModal);
     const destructiveAction = confirmation.props.footer.find(
       (action: { text: string }) => action.text === "Clear",

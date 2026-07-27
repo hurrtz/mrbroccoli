@@ -238,6 +238,8 @@ export const de: TranslationDictionary = {
   settingsWebSearchCompactHint:
     "Optional wird vor der eigentlichen Antwort frischer Web-Kontext eingefügt.",
   webSearchAdvanced: "Erweiterte Suchregler",
+  expandAdvancedSearch: "Erweiterte Suchregler ausklappen",
+  collapseAdvancedSearch: "Erweiterte Suchregler einklappen",
   webSearchSetupNeeded:
     "Hinterlege Zugangsdaten, um die Live-Websuche zu nutzen.",
   webSearchEnabledDescription:
@@ -394,6 +396,7 @@ export const de: TranslationDictionary = {
   speechDiagnostics: "Letzte Aktivität",
   speechDiagnosticsHint:
     "Zeigt die letzten Sprachanfragen, die angefragte Route, die tatsächlich genutzte Route und den Grund für einen Fallback.",
+  clearSpeechDiagnostics: "Letzte Sprachaktivität leeren",
   speechDiagnosticsEmpty:
     "Noch keine aktuellen Aktivitäten. Teste eine Stimme oder spiele eine Antwort ab, um hier Routing-Details zu sehen.",
   clearSpeechDiagnosticsConfirmationTitle: "Letzte Aktivität leeren?",

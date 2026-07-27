@@ -26,6 +26,7 @@ import {
   AntSectionIntro,
   AntSettingsCard,
 } from "../AntSettingsPrimitives";
+import { AntSettingsInfoButton } from "../AntSettingsInfoButton";
 import { styles } from "../styles";
 
 export function SearchSettingsPage({
@@ -49,6 +50,9 @@ export function SearchSettingsPage({
     selectedWebSearchProvider,
     t("providerNeedsAttention"),
   );
+  const selectedProviderLabel =
+    pickerOptions.find((option) => option.value === selectedWebSearchProvider)
+      ?.label ?? selectedWebSearchProvider;
   const selectedProviderSettings = selectedWebSearchProvider
     ? normalizeWebSearchProviderSettings(
         selectedWebSearchProvider,
@@ -85,7 +89,19 @@ export function SearchSettingsPage({
   if (searchProviders.length === 0) {
     return (
       <View style={styles.pageStack}>
-        <AntSectionIntro title={t("webSearch")} />
+        <AntSectionIntro
+          title={t("webSearch")}
+          extra={
+            <AntSettingsInfoButton
+              accessibilityLabel={t("aboutSetting", {
+                setting: t("webSearch"),
+              })}
+              title={t("webSearch")}
+            >
+              {t("settingsWebSearchCompactHint")}
+            </AntSettingsInfoButton>
+          }
+        />
         <AntSettingsCard>
           <Text style={[styles.helperText, { color: colors.textSecondary }]}>
             {t("webSearchSetupNeeded")}
@@ -102,8 +118,33 @@ export function SearchSettingsPage({
 
   return (
     <View style={styles.pageStack}>
-      <AntSectionIntro title={t("webSearch")} />
+      <AntSectionIntro
+        title={t("webSearch")}
+        extra={
+          <AntSettingsInfoButton
+            accessibilityLabel={t("aboutSetting", {
+              setting: t("webSearch"),
+            })}
+            title={t("webSearch")}
+          >
+            <View style={styles.infoModalContent}>
+              <Text
+                style={[styles.helperText, { color: colors.textSecondary }]}
+              >
+                {t("settingsWebSearchCompactHint")}
+              </Text>
+              <Text
+                style={[styles.helperText, { color: colors.textSecondary }]}
+              >
+                {t("webSearchHomeHint")}
+              </Text>
+            </View>
+          </AntSettingsInfoButton>
+        }
+      />
       <AntPickerSection
+        title={t("webSearchProvider")}
+        description={t("webSearchProviderHint")}
         helperText={
           pickerOptions.length === 0
             ? t("webSearchProviderMissingHint")
@@ -112,7 +153,7 @@ export function SearchSettingsPage({
       >
         {selectedWebSearchProvider ? (
           <AntPickerRow
-            label={t("webSearchProvider")}
+            label={t("provider")}
             value={selectedWebSearchProvider}
             options={pickerOptions}
             disabled={pickerOptions.length === 0}
@@ -147,6 +188,23 @@ export function SearchSettingsPage({
               {t("webSearchAdvanced")}
             </Text>
           }
+          headerExtra={
+            <AntSettingsInfoButton
+              accessibilityLabel={t("aboutSetting", {
+                setting: t("webSearchAdvanced"),
+              })}
+              title={t("webSearchAdvanced")}
+            >
+              {t("webSearchQualityHint", {
+                provider: selectedProviderLabel,
+              })}
+            </AntSettingsInfoButton>
+          }
+          toggleAccessibilityLabel={t(
+            advancedExpanded
+              ? "collapseAdvancedSearch"
+              : "expandAdvancedSearch",
+          )}
           contentStyle={styles.fullBleedCardContent}
         >
           <AntPickerRows>

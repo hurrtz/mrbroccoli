@@ -18,6 +18,7 @@ import {
   AntRadioSection,
   AntSectionIntro,
 } from "../AntSettingsPrimitives";
+import { AntSettingsInfoButton } from "../AntSettingsInfoButton";
 import { styles } from "../styles";
 
 export function ListeningSettingsPage({
@@ -53,6 +54,16 @@ export function ListeningSettingsPage({
     <View style={styles.pageStack}>
       <AntSectionIntro
         title={t("voiceInput")}
+        extra={
+          <AntSettingsInfoButton
+            accessibilityLabel={t("aboutSetting", {
+              setting: t("voiceInput"),
+            })}
+            title={t("voiceInput")}
+          >
+            {t("voiceInputDescription")}
+          </AntSettingsInfoButton>
+        }
       />
 
       <AntRadioSection<InputMode>
@@ -89,6 +100,7 @@ export function ListeningSettingsPage({
           {
             value: "provider",
             label: t("provider"),
+            description: t("providerSttDescription"),
           },
         ]}
         value={settings.sttMode}
@@ -98,9 +110,18 @@ export function ListeningSettingsPage({
       {settings.sttMode === "provider" ? (
         <AntPickerSection
           title={t("sttProvider")}
-          description={t("providerSttDescription")}
-          helperText={
-            <>
+          description={
+            <View style={styles.infoModalContent}>
+              <Text
+                style={{
+                  color: colors.textSecondary,
+                  fontFamily: fonts.body,
+                  fontSize: 14,
+                  lineHeight: 20,
+                }}
+              >
+                {t("providerSttDescription")}
+              </Text>
               {sttLanguageNote ? (
                 <Text
                   style={{
@@ -125,7 +146,7 @@ export function ListeningSettingsPage({
                   {t("recordingLimits", { note: sttLimitNote })}
                 </Text>
               ) : null}
-            </>
+            </View>
           }
         >
           <AntPickerRow

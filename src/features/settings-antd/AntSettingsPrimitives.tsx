@@ -260,7 +260,7 @@ export function AntSectionIntro({
   extra,
 }: {
   title: string;
-  description?: string;
+  description?: React.ReactNode;
   extra?: React.ReactNode;
 }) {
   const { colors } = useTheme();
@@ -581,7 +581,7 @@ export function AntPickerSection({
   title,
 }: {
   children: React.ReactNode;
-  description?: string;
+  description?: React.ReactNode;
   helperText?: React.ReactNode;
   title?: string;
 }) {

@@ -233,6 +233,8 @@ export const en: TranslationDictionary = {
   settingsWebSearchCompactHint:
     "Optionally prepend fresh web context before the main model replies.",
   webSearchAdvanced: "Advanced Search Controls",
+  expandAdvancedSearch: "Expand advanced search controls",
+  collapseAdvancedSearch: "Collapse advanced search controls",
   webSearchSetupNeeded: "Add credentials to use live web search.",
   webSearchEnabledDescription:
     "Fresh web context is added before the model replies.",
@@ -387,6 +389,7 @@ export const en: TranslationDictionary = {
   speechDiagnostics: "Recent Speech Activity",
   speechDiagnosticsHint:
     "Shows the latest speech requests, the route they asked for, the route they actually used, and any fallback reason.",
+  clearSpeechDiagnostics: "Clear recent speech activity",
   speechDiagnosticsEmpty:
     "No recent speech requests yet. Preview a voice or play a reply to see routing details here.",
   clearSpeechDiagnosticsConfirmationTitle: "Clear recent speech activity?",

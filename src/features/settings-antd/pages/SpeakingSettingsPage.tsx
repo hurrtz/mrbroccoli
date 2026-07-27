@@ -133,85 +133,97 @@ export function SpeakingSettingsPage({
 
   return (
     <View style={styles.sectionPageStack}>
-      <AntSectionIntro
-        title={t("voiceOutput")}
-        extra={
-          <AntSettingsInfoButton
-            accessibilityLabel={t("aboutSetting", {
-              setting: t("voiceOutput"),
-            })}
-            title={t("voiceOutput")}
-          >
-            {t("voiceOutputDescription")}
-          </AntSettingsInfoButton>
-        }
-      />
-
-      <AntSettingsCard>
-        <AntSwitchRow
-          label={t("spokenReplies")}
-          value={settings.spokenRepliesEnabled}
-          onChange={(value) => onUpdate({ spokenRepliesEnabled: value })}
+      <View style={styles.sectionGroup}>
+        <AntSectionIntro
+          title={t("voiceOutput")}
+          extra={
+            <AntSettingsInfoButton
+              accessibilityLabel={t("aboutSetting", {
+                setting: t("voiceOutput"),
+              })}
+              title={t("voiceOutput")}
+            >
+              {t("voiceOutputDescription")}
+            </AntSettingsInfoButton>
+          }
         />
-      </AntSettingsCard>
 
-      <AntListenLanguageSelector
-        selectedLanguages={settings.ttsListenLanguages}
-        onToggleLanguage={onToggleListenLanguage}
-      />
+        <AntSettingsCard>
+          <AntSwitchRow
+            label={t("spokenReplies")}
+            value={settings.spokenRepliesEnabled}
+            onChange={(value) => onUpdate({ spokenRepliesEnabled: value })}
+          />
+        </AntSettingsCard>
 
-      <AntRadioSection<ReplyPlayback>
-        label={t("replyPlayback")}
-        options={[
-          {
-            value: "stream",
-            label: t("sentencesArrive"),
-            description: t("sentencesArriveDescription"),
-          },
-          {
-            value: "wait",
-            label: t("fullReplyFirst"),
-            description: t("fullReplyFirstDescription"),
-          },
-        ]}
-        value={settings.replyPlayback}
-        onChange={(value) => onUpdate({ replyPlayback: value })}
-      />
+        <AntListenLanguageSelector
+          selectedLanguages={settings.ttsListenLanguages}
+          onToggleLanguage={onToggleListenLanguage}
+        />
 
-      <AntRadioSection<TtsBackendMode>
-        label={t("textToSpeech")}
-        options={[
-          {
-            value: "native",
-            label: t("systemVoice"),
-            description: t("nativeTtsDescription"),
-          },
-          {
-            value: "kokoro",
-            label: "Kokoro",
-            description: t("kokoroTtsDescription"),
-          },
-          {
-            value: "provider",
-            label: t("provider"),
-            description: t("providerTtsDescription"),
-          },
-        ]}
-        value={settings.ttsMode}
-        onChange={(value) => onUpdate({ ttsMode: value })}
-      />
+        <AntRadioSection<ReplyPlayback>
+          label={t("replyPlayback")}
+          options={[
+            {
+              value: "stream",
+              label: t("sentencesArrive"),
+              description: t("sentencesArriveDescription"),
+            },
+            {
+              value: "wait",
+              label: t("fullReplyFirst"),
+              description: t("fullReplyFirstDescription"),
+            },
+          ]}
+          value={settings.replyPlayback}
+          onChange={(value) => onUpdate({ replyPlayback: value })}
+        />
 
-      <AntTtsFallbackSection settings={settings} onUpdate={onUpdate} />
+        <AntRadioSection<TtsBackendMode>
+          label={t("textToSpeech")}
+          options={[
+            {
+              value: "native",
+              label: t("systemVoice"),
+              description: t("nativeTtsDescription"),
+            },
+            {
+              value: "kokoro",
+              label: "Kokoro",
+              description: t("kokoroTtsDescription"),
+            },
+            {
+              value: "provider",
+              label: t("provider"),
+              description: t("providerTtsDescription"),
+            },
+          ]}
+          value={settings.ttsMode}
+          onChange={(value) => onUpdate({ ttsMode: value })}
+        />
+
+        <AntTtsFallbackSection settings={settings} onUpdate={onUpdate} />
+      </View>
 
       {providerRouteActive ? (
         <>
           <AntPickerSection
             title={t("ttsProvider")}
-            description={t("ttsProviderEnabledHint")}
-            helperText={
-              ttsLanguageNote
-                ? t("languageCoverage", { note: ttsLanguageNote })
-                : undefined
+            description={
+              <View style={styles.infoModalContent}>
+                <Text
+                  style={[styles.helperText, { color: colors.textSecondary }]}
+                >
+                  {t("ttsProviderEnabledHint")}
+                </Text>
+                {ttsLanguageNote ? (
+                  <Text
+                    style={[styles.helperText, { color: colors.textSecondary }]}
+                  >
+                    {t("languageCoverage", { note: ttsLanguageNote })}
+                  </Text>
+                ) : null}
+              </View>
             }
           >
             <AntPickerRow
