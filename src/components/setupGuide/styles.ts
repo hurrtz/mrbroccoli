@@ -73,6 +73,7 @@ export const styles = StyleSheet.create({
   },
   content: {},
   contentLandscape: {
+    flexShrink: 1,
     maxHeight: 430,
   },
   contentPortrait: {

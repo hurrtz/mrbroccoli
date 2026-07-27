@@ -66,6 +66,11 @@ export const SetupGuideModal = React.memo(function SetupGuideModal({
   const { height, width } = useWindowDimensions();
   const isLandscape = width > height;
   const cardMaxWidth = isLandscape ? Math.min(width - 40, 760) : width;
+  const landscapeTopPadding = Math.max(insets.top + 16, 24);
+  const landscapeBottomPadding = Math.max(insets.bottom + 16, 24);
+  const cardMaxHeight = isLandscape
+    ? height - landscapeTopPadding - landscapeBottomPadding
+    : undefined;
   const stepIndex = STEP_ORDER.indexOf(step);
   const title =
     step === "intro"
@@ -90,8 +95,8 @@ export const SetupGuideModal = React.memo(function SetupGuideModal({
         style={[
           styles.overlay,
           {
-            paddingTop: isLandscape ? Math.max(insets.top + 16, 24) : 0,
-            paddingBottom: isLandscape ? Math.max(insets.bottom + 16, 24) : 0,
+            paddingTop: isLandscape ? landscapeTopPadding : 0,
+            paddingBottom: isLandscape ? landscapeBottomPadding : 0,
             paddingHorizontal: isLandscape ? 18 : 0,
           },
         ]}
@@ -109,9 +114,10 @@ export const SetupGuideModal = React.memo(function SetupGuideModal({
           style={styles.keyboardAvoider}
         >
           <View
+            testID="setup-guide-card"
             style={[
               styles.card,
-              { maxWidth: cardMaxWidth },
+              { maxWidth: cardMaxWidth, maxHeight: cardMaxHeight },
               {
                 backgroundColor: colors.surface,
                 borderColor: colors.border,

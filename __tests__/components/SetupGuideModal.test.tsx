@@ -1,9 +1,25 @@
 import React from "react";
+import { StyleSheet } from "react-native";
 
 import { fireEvent } from "@testing-library/react-native";
 
 import { SetupGuideModal } from "../../src/components/SetupGuideModal";
 import { renderWithProviders } from "../test-utils/renderWithProviders";
+
+const mockUseWindowDimensions = jest.fn(() => ({
+  width: 390,
+  height: 844,
+  scale: 3,
+  fontScale: 1,
+}));
+
+jest.mock(
+  "react-native/Libraries/Utilities/useWindowDimensions",
+  () => ({
+    __esModule: true,
+    default: () => mockUseWindowDimensions(),
+  }),
+);
 
 jest.mock("react-native-safe-area-context", () => ({
   useSafeAreaInsets: () => ({ top: 0, bottom: 0, left: 0, right: 0 }),
@@ -82,6 +98,40 @@ const defaultProps = {
 };
 
 describe("SetupGuideModal", () => {
+  beforeEach(() => {
+    mockUseWindowDimensions.mockReturnValue({
+      width: 390,
+      height: 844,
+      scale: 3,
+      fontScale: 1,
+    });
+  });
+
+  it("keeps the landscape card inside the available safe height", () => {
+    mockUseWindowDimensions.mockReturnValue({
+      width: 800,
+      height: 360,
+      scale: 3,
+      fontScale: 1,
+    });
+
+    const screen = renderWithProviders(
+      <SetupGuideModal
+        {...defaultProps}
+        step="intro"
+        showSettingsShortcutOption
+      />,
+    );
+    const cardStyle = StyleSheet.flatten(
+      screen.getByTestId("setup-guide-card").props.style,
+    );
+
+    expect(cardStyle).toMatchObject({
+      maxWidth: 760,
+      maxHeight: 312,
+    });
+  });
+
   it("uses an eye button to reveal and hide the API key", () => {
     const screen = renderWithProviders(
       <SetupGuideModal
