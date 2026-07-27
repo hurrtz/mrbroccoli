@@ -1,12 +1,9 @@
 import React from "react";
 import {
-  ActivityIndicator,
   Modal,
-  Pressable,
   ScrollView,
   StyleSheet,
   Text,
-  TextInput,
   TouchableOpacity,
   View,
   useWindowDimensions,
@@ -14,7 +11,6 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { APP_MODAL_ORIENTATIONS } from "../../constants/layout";
-import { Picker } from "../../components/Picker";
 import { AntIconButton } from "../../design-system/AntIconButton";
 import {
   getResponseLengthOptions,
@@ -25,6 +21,10 @@ import { useTheme } from "../../theme/ThemeContext";
 import { AssistantResponseLength, AssistantResponseTone } from "../../types";
 
 import { styles } from "./styles";
+import { AutoRenameConversationButton } from "./styleSheetModal/AutoRenameConversationButton";
+import { ConversationVoiceSection } from "./styleSheetModal/ConversationVoiceSection";
+import { InstructionSection } from "./styleSheetModal/InstructionSection";
+import { StyleChoiceGroup } from "./styleSheetModal/StyleChoiceGroup";
 
 interface StyleSheetModalProps {
   canAutoRenameConversation: boolean;
@@ -77,9 +77,6 @@ export const StyleSheetModal = React.memo(function StyleSheetModal({
 
   const lengthOptions = React.useMemo(() => getResponseLengthOptions(t), [t]);
   const toneOptions = React.useMemo(() => getResponseToneOptions(t), [t]);
-  const activeLength = lengthOptions.find((o) => o.value === responseLength);
-  const activeTone = toneOptions.find((o) => o.value === responseTone);
-
   return (
     <Modal
       visible={visible}
@@ -159,166 +156,31 @@ export const StyleSheetModal = React.memo(function StyleSheetModal({
                   : styles.styleSheetOptionsColumn
               }
             >
-              <View
+              <StyleChoiceGroup
                 testID="conversation-settings-length"
-                style={[
-                  styles.styleSheetGroup,
-                  isLandscape ? styles.styleSheetGroupLandscape : null,
-                ]}
-              >
-                <Text
-                  style={[
-                    styles.styleSheetGroupLabel,
-                    { color: colors.textMuted },
-                  ]}
-                >
-                  {t("adaptiveLength")}
-                </Text>
-                <View style={styles.styleSheetPillRow}>
-                  {lengthOptions.map((option) => {
-                    const active = option.value === responseLength;
-                    return (
-                      <Pressable
-                        key={option.value}
-                        style={[
-                          styles.styleSheetPill,
-                          {
-                            backgroundColor: active
-                              ? colors.accentSoft
-                              : colors.surfaceElevated,
-                            borderColor: active ? colors.accent : colors.border,
-                          },
-                        ]}
-                        onPress={() =>
-                          onChange({ responseLength: option.value })
-                        }
-                        accessibilityRole="button"
-                        accessibilityState={{ selected: active }}
-                      >
-                        <Text
-                          style={[
-                            styles.styleSheetPillText,
-                            {
-                              color: active
-                                ? colors.text
-                                : colors.textSecondary,
-                            },
-                          ]}
-                        >
-                          {option.label}
-                        </Text>
-                      </Pressable>
-                    );
-                  })}
-                </View>
-                {activeLength ? (
-                  <Text
-                    style={[
-                      styles.styleSheetDescription,
-                      { color: colors.textMuted },
-                    ]}
-                  >
-                    {activeLength.description}
-                  </Text>
-                ) : null}
-              </View>
-
-              <View
+                label={t("adaptiveLength")}
+                landscape={isLandscape}
+                onChange={(value) => onChange({ responseLength: value })}
+                options={lengthOptions}
+                value={responseLength}
+              />
+              <StyleChoiceGroup
                 testID="conversation-settings-tone"
-                style={[
-                  styles.styleSheetGroup,
-                  isLandscape ? styles.styleSheetGroupLandscape : null,
-                ]}
-              >
-                <Text
-                  style={[
-                    styles.styleSheetGroupLabel,
-                    { color: colors.textMuted },
-                  ]}
-                >
-                  {t("responseTone")}
-                </Text>
-                <View style={styles.styleSheetPillRow}>
-                  {toneOptions.map((option) => {
-                    const active = option.value === responseTone;
-                    return (
-                      <Pressable
-                        key={option.value}
-                        style={[
-                          styles.styleSheetPill,
-                          {
-                            backgroundColor: active
-                              ? colors.accentSoft
-                              : colors.surfaceElevated,
-                            borderColor: active ? colors.accent : colors.border,
-                          },
-                        ]}
-                        onPress={() => onChange({ responseTone: option.value })}
-                        accessibilityRole="button"
-                        accessibilityState={{ selected: active }}
-                      >
-                        <Text
-                          style={[
-                            styles.styleSheetPillText,
-                            {
-                              color: active
-                                ? colors.text
-                                : colors.textSecondary,
-                            },
-                          ]}
-                        >
-                          {option.label}
-                        </Text>
-                      </Pressable>
-                    );
-                  })}
-                </View>
-                {activeTone ? (
-                  <Text
-                    style={[
-                      styles.styleSheetDescription,
-                      { color: colors.textMuted },
-                    ]}
-                  >
-                    {activeTone.description}
-                  </Text>
-                ) : null}
-              </View>
+                label={t("responseTone")}
+                landscape={isLandscape}
+                onChange={(value) => onChange({ responseTone: value })}
+                options={toneOptions}
+                value={responseTone}
+              />
             </View>
 
             {ttsRouteLabel && ttsVoiceOptions.length > 0 ? (
-              <View
-                testID="conversation-settings-voice"
-                style={styles.styleSheetGroup}
-              >
-                <Text
-                  style={[
-                    styles.styleSheetGroupLabel,
-                    { color: colors.textMuted },
-                  ]}
-                >
-                  {t("ttsVoice")}
-                </Text>
-                <Text
-                  style={[
-                    styles.styleSheetDescription,
-                    { color: colors.textSecondary },
-                  ]}
-                >
-                  {t("conversationVoiceDescription", {
-                    route: ttsRouteLabel,
-                  })}
-                </Text>
-                <Picker
-                  label={t("ttsVoice")}
-                  value={ttsVoice}
-                  options={ttsVoiceOptions}
-                  onChange={onTtsVoiceChange}
-                  dropdownLabel={ttsRouteLabel}
-                  hideLabel
-                  containerStyle={styles.styleSheetVoicePicker}
-                />
-              </View>
+              <ConversationVoiceSection
+                onChange={onTtsVoiceChange}
+                routeLabel={ttsRouteLabel}
+                value={ttsVoice}
+                voiceOptions={ttsVoiceOptions}
+              />
             ) : null}
 
             <View
@@ -328,140 +190,38 @@ export const StyleSheetModal = React.memo(function StyleSheetModal({
                   : styles.styleSheetOptionsColumn
               }
             >
-              <View
-                testID="conversation-settings-tts-instructions"
-                style={[
-                  styles.styleSheetGroup,
-                  isLandscape ? styles.styleSheetGroupLandscape : null,
-                ]}
-              >
-                <Text
-                  style={[
-                    styles.styleSheetGroupLabel,
-                    { color: colors.textMuted },
-                  ]}
-                >
-                  {t("ttsInstructions")}
-                </Text>
-                <Text
-                  style={[
-                    styles.styleSheetDescription,
-                    {
-                      color: ttsInstructionsSupported
-                        ? colors.textSecondary
-                        : colors.textMuted,
-                    },
-                  ]}
-                >
-                  {t(
-                    ttsInstructionsSupported
-                      ? "conversationTtsInstructionsDescription"
-                      : "ttsInstructionsUnsupported",
-                  )}
-                </Text>
-                <TextInput
-                  testID="conversation-tts-instructions"
-                  value={ttsInstructions}
-                  onChangeText={onTtsInstructionsChange}
-                  editable={ttsInstructionsSupported}
-                  multiline
-                  placeholder={t("ttsInstructionsPlaceholder")}
-                  placeholderTextColor={colors.textMuted}
-                  selectionColor={colors.accent}
-                  textAlignVertical="top"
-                  style={[
-                    styles.styleSheetInstructionInput,
-                    {
-                      backgroundColor: colors.surfaceElevated,
-                      borderColor: colors.border,
-                      color: colors.text,
-                      opacity: ttsInstructionsSupported ? 1 : 0.55,
-                    },
-                  ]}
-                />
-              </View>
-
-              <View
-                testID="conversation-settings-thinking-instructions"
-                style={[
-                  styles.styleSheetGroup,
-                  isLandscape ? styles.styleSheetGroupLandscape : null,
-                ]}
-              >
-                <Text
-                  style={[
-                    styles.styleSheetGroupLabel,
-                    { color: colors.textMuted },
-                  ]}
-                >
-                  {t("conversationThinkingInstructions")}
-                </Text>
-                <Text
-                  style={[
-                    styles.styleSheetDescription,
-                    { color: colors.textSecondary },
-                  ]}
-                >
-                  {t("conversationThinkingInstructionsDescription")}
-                </Text>
-                <TextInput
-                  testID="conversation-llm-instructions"
-                  value={llmInstructions}
-                  onChangeText={onLlmInstructionsChange}
-                  multiline
-                  placeholder={t("conversationThinkingInstructionsPlaceholder")}
-                  placeholderTextColor={colors.textMuted}
-                  selectionColor={colors.accent}
-                  textAlignVertical="top"
-                  style={[
-                    styles.styleSheetInstructionInput,
-                    {
-                      backgroundColor: colors.surfaceElevated,
-                      borderColor: colors.border,
-                      color: colors.text,
-                    },
-                  ]}
-                />
-              </View>
+              <InstructionSection
+                description={t(
+                  ttsInstructionsSupported
+                    ? "conversationTtsInstructionsDescription"
+                    : "ttsInstructionsUnsupported",
+                )}
+                editable={ttsInstructionsSupported}
+                inputTestID="conversation-tts-instructions"
+                label={t("ttsInstructions")}
+                landscape={isLandscape}
+                onChange={onTtsInstructionsChange}
+                placeholder={t("ttsInstructionsPlaceholder")}
+                sectionTestID="conversation-settings-tts-instructions"
+                value={ttsInstructions}
+              />
+              <InstructionSection
+                description={t("conversationThinkingInstructionsDescription")}
+                inputTestID="conversation-llm-instructions"
+                label={t("conversationThinkingInstructions")}
+                landscape={isLandscape}
+                onChange={onLlmInstructionsChange}
+                placeholder={t("conversationThinkingInstructionsPlaceholder")}
+                sectionTestID="conversation-settings-thinking-instructions"
+                value={llmInstructions}
+              />
             </View>
 
-            <TouchableOpacity
-              testID="auto-rename-conversation"
-              style={[
-                styles.styleSheetAutoRenameButton,
-                {
-                  backgroundColor: canAutoRenameConversation
-                    ? colors.accentSoft
-                    : colors.surfaceAlt,
-                  borderColor: canAutoRenameConversation
-                    ? colors.borderStrong
-                    : colors.border,
-                },
-              ]}
-              disabled={!canAutoRenameConversation}
+            <AutoRenameConversationButton
+              canRename={canAutoRenameConversation}
               onPress={onAutoRenameConversation}
-              activeOpacity={0.82}
-              accessibilityRole="button"
-              accessibilityState={{ disabled: !canAutoRenameConversation }}
-            >
-              {isAutoRenamingConversation ? (
-                <ActivityIndicator size="small" color={colors.accent} />
-              ) : null}
-              <Text
-                style={[
-                  styles.styleSheetAutoRenameButtonText,
-                  {
-                    color: canAutoRenameConversation
-                      ? colors.accent
-                      : colors.textMuted,
-                  },
-                ]}
-              >
-                {isAutoRenamingConversation
-                  ? t("conversationTitleGenerating")
-                  : t("conversationTitleGenerate")}
-              </Text>
-            </TouchableOpacity>
+              renaming={isAutoRenamingConversation}
+            />
           </ScrollView>
 
           <View

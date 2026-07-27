@@ -432,6 +432,10 @@ export const styles = StyleSheet.create({
     borderRadius: 999,
     borderWidth: 1,
   },
+  styleSheetControlPressed: {
+    opacity: 0.68,
+    transform: [{ scale: 0.97 }],
+  },
   styleSheetPillText: {
     fontSize: 13,
     lineHeight: 18,
