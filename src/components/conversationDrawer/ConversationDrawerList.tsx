@@ -13,6 +13,7 @@ import { styles } from "./styles";
 
 interface ConversationDrawerListProps {
   activeId: string | null;
+  compact?: boolean;
   conversations: ConversationMeta[];
   searchQuery: string;
   onDeleteConversation: (conversationId: string) => void;
@@ -22,6 +23,7 @@ interface ConversationDrawerListProps {
 
 export function ConversationDrawerList({
   activeId,
+  compact = false,
   conversations,
   searchQuery,
   onDeleteConversation,
@@ -41,6 +43,7 @@ export function ConversationDrawerList({
           testID="conversation-drawer-empty-state"
           style={[
             styles.emptyState,
+            compact ? styles.emptyStateCompact : null,
             {
               backgroundColor: colors.surfaceElevated,
               borderColor: colors.border,
@@ -50,7 +53,11 @@ export function ConversationDrawerList({
           <View
             style={[
               styles.emptyIcon,
-              { backgroundColor: colors.accentSoft, borderColor: colors.border },
+              compact ? styles.emptyIconCompact : null,
+              {
+                backgroundColor: colors.accentSoft,
+                borderColor: colors.border,
+              },
             ]}
           >
             <Feather
@@ -60,13 +67,23 @@ export function ConversationDrawerList({
               accessible={false}
             />
           </View>
-          <Text style={[styles.emptyTitle, { color: colors.text }]}>
+          <Text
+            style={[
+              styles.emptyTitle,
+              compact ? styles.emptyTitleCompact : null,
+              { color: colors.text },
+            ]}
+          >
             {searchQuery.trim()
               ? t("noMatchingConversations")
               : t("noSavedConversationsYet")}
           </Text>
           <Text
-            style={[styles.emptyDescription, { color: colors.textSecondary }]}
+            style={[
+              styles.emptyDescription,
+              compact ? styles.emptyDescriptionCompact : null,
+              { color: colors.textSecondary },
+            ]}
           >
             {searchQuery.trim()
               ? t("noMatchingConversationsDescription")

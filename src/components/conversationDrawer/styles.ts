@@ -201,6 +201,11 @@ export const styles = StyleSheet.create({
     marginTop: 28,
     marginHorizontal: 18,
   },
+  emptyStateCompact: {
+    paddingVertical: 12,
+    gap: 7,
+    marginTop: 4,
+  },
   emptyIcon: {
     width: 46,
     height: 46,
@@ -209,16 +214,29 @@ export const styles = StyleSheet.create({
     justifyContent: "center",
     borderWidth: 1,
   },
+  emptyIconCompact: {
+    width: 38,
+    height: 38,
+    borderRadius: 19,
+  },
   emptyTitle: {
     fontSize: 18,
     textAlign: "center",
     fontFamily: fonts.display,
+  },
+  emptyTitleCompact: {
+    fontSize: 16,
+    lineHeight: 20,
   },
   emptyDescription: {
     fontSize: 14,
     lineHeight: 21,
     textAlign: "center",
     fontFamily: fonts.body,
+  },
+  emptyDescriptionCompact: {
+    fontSize: 12,
+    lineHeight: 17,
   },
   itemFrame: {
     borderRadius: 0,

@@ -1,8 +1,9 @@
 import React from "react";
-import { Alert, Modal } from "react-native";
+import { Alert, Modal, StyleSheet } from "react-native";
 import { fireEvent, waitFor } from "@testing-library/react-native";
 
 import { ConversationDrawer } from "../../src/components/ConversationDrawer";
+import { ConversationDrawerList } from "../../src/components/conversationDrawer/ConversationDrawerList";
 import { ConversationMeta } from "../../src/types";
 import { renderWithProviders } from "../test-utils/renderWithProviders";
 
@@ -154,6 +155,32 @@ describe("ConversationDrawer", () => {
       expect(screen.getByText("Travel planning")).toBeTruthy();
       expect(screen.queryByText("Morning briefing")).toBeNull();
     });
+  });
+
+  it("tightens the empty state for a landscape drawer", () => {
+    const screen = renderWithProviders(
+      <ConversationDrawerList
+        activeId={null}
+        compact
+        conversations={[]}
+        searchQuery=""
+        onDeleteConversation={jest.fn()}
+        onOpenActionConversation={jest.fn()}
+        onSelectConversation={jest.fn()}
+      />,
+    );
+
+    expect(
+      StyleSheet.flatten(
+        screen.getByTestId("conversation-drawer-empty-state").props.style,
+      ),
+    ).toEqual(
+      expect.objectContaining({
+        gap: 7,
+        marginTop: 4,
+        paddingVertical: 12,
+      }),
+    );
   });
 
   it("opens the rename modal from the action sheet and saves the new title", async () => {
