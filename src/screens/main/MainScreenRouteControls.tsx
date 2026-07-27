@@ -42,47 +42,48 @@ export const MainScreenRouteControls = React.memo(
           layout === "landscape" ? styles.rowLandscape : null,
         ]}
       >
-        <View
+        <Pressable
           testID="route-web-search-container"
-          style={[
+          accessibilityLabel={t("webSearch")}
+          accessibilityRole="switch"
+          accessibilityState={{
+            checked: webSearchValue,
+            disabled: !webSearchAvailable,
+          }}
+          disabled={!webSearchAvailable}
+          onPress={
+            webSearchAvailable
+              ? () => onToggleWebSearchEnabled?.()
+              : undefined
+          }
+          style={({ pressed }) => [
             styles.searchControl,
             !webSearchAvailable ? styles.searchControlDisabled : null,
+            pressed && webSearchAvailable
+              ? styles.searchControlPressed
+              : null,
           ]}
         >
-          <Pressable
-            testID="route-web-search-label-control"
+          <Text
+            testID="route-web-search-label"
             accessible={false}
-            disabled={!webSearchAvailable}
-            hitSlop={4}
-            onPress={
-              webSearchAvailable
-                ? () => onToggleWebSearchEnabled?.()
-                : undefined
-            }
-            style={({ pressed }) => [
-              styles.searchLabelControl,
-              pressed && webSearchAvailable
-                ? styles.searchLabelPressed
-                : null,
+            style={[
+              styles.searchLabel,
+              {
+                color: webSearchAvailable
+                  ? colors.textSecondary
+                  : colors.textMuted,
+              },
             ]}
           >
-            <Text
-              testID="route-web-search-label"
-              accessible={false}
-              style={[
-                styles.searchLabel,
-                {
-                  color: webSearchAvailable
-                    ? colors.textSecondary
-                    : colors.textMuted,
-                },
-              ]}
-            >
-              {t("webSearch")}
-            </Text>
-          </Pressable>
+            {t("webSearch")}
+          </Text>
           <NativeSwitch
             testID="route-web-search-control"
+            accessible={false}
+            focusable={false}
+            importantForAccessibility="no-hide-descendants"
+            pointerEvents="none"
             style={styles.searchSwitch}
             value={webSearchValue}
             disabled={!webSearchAvailable}
@@ -99,18 +100,8 @@ export const MainScreenRouteControls = React.memo(
                 : undefined
             }
             ios_backgroundColor={colors.borderStrong}
-            onValueChange={
-              webSearchAvailable
-                ? () => onToggleWebSearchEnabled?.()
-                : undefined
-            }
-            accessibilityLabel={t("webSearch")}
-            accessibilityState={{
-              checked: webSearchValue,
-              disabled: !webSearchAvailable,
-            }}
           />
-        </View>
+        </Pressable>
       </View>
     );
   },
@@ -137,12 +128,8 @@ const styles = StyleSheet.create({
   searchControlDisabled: {
     opacity: 0.52,
   },
-  searchLabelControl: {
-    minHeight: 44,
-    justifyContent: "center",
-  },
-  searchLabelPressed: {
-    opacity: 0.62,
+  searchControlPressed: {
+    opacity: 0.72,
   },
   searchLabel: {
     minWidth: 78,

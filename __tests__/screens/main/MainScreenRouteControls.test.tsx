@@ -34,7 +34,7 @@ describe("MainScreenRouteControls", () => {
     const rowStyle = StyleSheet.flatten(
       screen.getByTestId("route-controls-row").props.style,
     );
-    const searchSwitch = screen.getByTestId("route-web-search-control");
+    const searchControl = screen.getByTestId("route-web-search-container");
     const nativeSwitch = screen.UNSAFE_getByType(NativeSwitch);
     const searchLabelStyle = StyleSheet.flatten(
       screen.getByTestId("route-web-search-label").props.style,
@@ -49,8 +49,8 @@ describe("MainScreenRouteControls", () => {
       }),
     );
     expect(searchLabelStyle.transform).toBeUndefined();
-    expect(searchSwitch.props.accessibilityRole).toBe("switch");
-    expect(searchSwitch.props.accessibilityState).toEqual({
+    expect(searchControl.props.accessibilityRole).toBe("switch");
+    expect(searchControl.props.accessibilityState).toEqual({
       checked: true,
       disabled: false,
     });
@@ -67,11 +67,14 @@ describe("MainScreenRouteControls", () => {
     expect(nativeSwitch.props.ios_backgroundColor).toBe(
       lightColors.borderStrong,
     );
+    expect(nativeSwitch.props.accessible).toBe(false);
+    expect(nativeSwitch.props.pointerEvents).toBe("none");
+    expect(nativeSwitch.props.onValueChange).toBeUndefined();
 
-    fireEvent(searchSwitch, "valueChange", false);
+    fireEvent.press(screen.getByTestId("route-web-search-label"));
     expect(onToggleWebSearchEnabled).toHaveBeenCalledTimes(1);
 
-    fireEvent.press(screen.getByTestId("route-web-search-label-control"));
+    fireEvent.press(nativeSwitch);
     expect(onToggleWebSearchEnabled).toHaveBeenCalledTimes(2);
   });
 
@@ -86,7 +89,7 @@ describe("MainScreenRouteControls", () => {
       />,
     );
 
-    const searchSwitch = screen.getByTestId("route-web-search-control");
+    const searchControl = screen.getByTestId("route-web-search-container");
     const nativeSwitch = screen.UNSAFE_getByType(NativeSwitch);
     const containerStyle = StyleSheet.flatten(
       screen.getByTestId("route-web-search-container").props.style,
@@ -94,7 +97,7 @@ describe("MainScreenRouteControls", () => {
 
     expect(screen.getByText("Web Search")).toBeTruthy();
     expect(containerStyle.opacity).toBe(0.52);
-    expect(searchSwitch.props.accessibilityState).toEqual({
+    expect(searchControl.props.accessibilityState).toEqual({
       checked: false,
       disabled: true,
     });
@@ -102,8 +105,8 @@ describe("MainScreenRouteControls", () => {
     expect(nativeSwitch.props.onValueChange).toBeUndefined();
     expect(nativeSwitch.props.value).toBe(false);
 
-    fireEvent(searchSwitch, "valueChange", true);
-    fireEvent.press(screen.getByTestId("route-web-search-label-control"));
+    fireEvent.press(screen.getByTestId("route-web-search-label"));
+    fireEvent.press(nativeSwitch);
     expect(onToggleWebSearchEnabled).not.toHaveBeenCalled();
   });
 
