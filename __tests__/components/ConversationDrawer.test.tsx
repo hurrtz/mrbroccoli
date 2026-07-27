@@ -1,5 +1,5 @@
 import React from "react";
-import { Alert } from "react-native";
+import { Alert, Modal } from "react-native";
 import { fireEvent, waitFor } from "@testing-library/react-native";
 
 import { ConversationDrawer } from "../../src/components/ConversationDrawer";
@@ -102,6 +102,12 @@ function renderConversationDrawer(
 describe("ConversationDrawer", () => {
   afterEach(() => {
     jest.restoreAllMocks();
+  });
+
+  it("does not mount the native modal while the drawer is hidden", () => {
+    const screen = renderConversationDrawer({ visible: false });
+
+    expect(screen.UNSAFE_queryByType(Modal)).toBeNull();
   });
 
   it("renders the drawer shell and existing conversations", () => {

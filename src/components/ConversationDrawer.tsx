@@ -78,6 +78,10 @@ export const ConversationDrawer = React.memo(function ConversationDrawer({
     [conversations, onDelete, t],
   );
 
+  if (!visible) {
+    return null;
+  }
+
   return (
     <Modal
       visible={visible}
