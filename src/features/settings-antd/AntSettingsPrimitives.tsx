@@ -1,5 +1,6 @@
 import React from "react";
 import {
+  Platform,
   Pressable,
   StyleSheet,
   Switch as NativeSwitch,
@@ -636,8 +637,15 @@ export function AntSwitchRow({
         value={value}
         trackColor={{
           false: colors.borderStrong,
-          true: colors.accent,
+          true: Platform.OS === "android" ? colors.accentSoft : colors.accent,
         }}
+        thumbColor={
+          Platform.OS === "android"
+            ? value
+              ? colors.accent
+              : colors.surface
+            : undefined
+        }
         ios_backgroundColor={colors.borderStrong}
         onValueChange={onChange}
       />
