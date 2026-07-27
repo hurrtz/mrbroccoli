@@ -28,7 +28,11 @@ import {
   ProviderAboutModal,
   ProviderConnectionPanel,
 } from "../ProviderConnectionPanel";
-import { AntDisclosureCard } from "../AntSettingsPrimitives";
+import {
+  AntDisclosureCard,
+  AntSettingsCard,
+  AntSwitchRow,
+} from "../AntSettingsPrimitives";
 import { styles } from "../styles";
 
 type CapabilityFilter = "all" | ProviderCapability;
@@ -44,6 +48,7 @@ export function ConnectionsSettingsPage({
   onValidateCapability,
   onValidateAll,
   onUpdateApiKey,
+  onChangeSetupGuideShortcut,
   onTextInputFocus,
 }: {
   settings: Settings;
@@ -68,6 +73,7 @@ export function ConnectionsSettingsPage({
   ) => Promise<void>;
   onValidateAll: (provider: Provider) => Promise<void>;
   onUpdateApiKey: (provider: Provider, apiKey: string) => void;
+  onChangeSetupGuideShortcut: (visible: boolean) => void;
   onTextInputFocus: TextInputFocusHandler;
 }) {
   const { colors } = useTheme();
@@ -342,6 +348,17 @@ export function ConnectionsSettingsPage({
             </AntDisclosureCard>
           );
         })}
+      </View>
+
+      <View testID="setup-guide-shortcut-setting">
+        <AntSettingsCard>
+          <AntSwitchRow
+            label={t("setupGuideShowInSettings")}
+            description={t("setupGuideShowInSettingsSummary")}
+            value={settings.showSetupGuideShortcut}
+            onChange={onChangeSetupGuideShortcut}
+          />
+        </AntSettingsCard>
       </View>
 
       <ProviderAboutModal

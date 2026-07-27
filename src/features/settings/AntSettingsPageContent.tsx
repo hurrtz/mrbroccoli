@@ -92,6 +92,9 @@ export function AntSettingsPageContent({
               await validation.validateAllProviderCapabilities(provider);
             }}
             onUpdateApiKey={onUpdateApiKey}
+            onChangeSetupGuideShortcut={(visible) =>
+              onUpdate({ showSetupGuideShortcut: visible })
+            }
             onTextInputFocus={controller.handleTextInputFocus}
           />
         </DrillInPage>

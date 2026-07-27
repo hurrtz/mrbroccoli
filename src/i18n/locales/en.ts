@@ -38,7 +38,7 @@ export const en: TranslationDictionary = {
     "Review connections and test the complete voice route.",
   setupGuideShowInSettings: "Show guided setup in Settings",
   setupGuideShowInSettingsSummary:
-    "Turn this off to remove the shortcut after you close this guide.",
+    "Show or hide the guided setup shortcut on the Settings overview.",
   settingsConnectionsSummary: "Provider keys, validation, and capabilities.",
   settingsThinkingSummary: "Home cards, models, effort, and system prompt.",
   settingsListeningSummary: "Input mode and speech-to-text routing.",

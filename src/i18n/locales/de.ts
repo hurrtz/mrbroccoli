@@ -38,7 +38,7 @@ export const de: TranslationDictionary = {
     "Verbindungen prüfen und die komplette Sprachroute testen.",
   setupGuideShowInSettings: "Geführte Einrichtung anzeigen",
   setupGuideShowInSettingsSummary:
-    "Schalte dies aus, um den Eintrag nach dem Schließen auszublenden.",
+    "Blendet die geführte Einrichtung in der Einstellungsübersicht ein oder aus.",
   settingsConnectionsSummary: "Provider-Keys, Prüfung und Fähigkeiten.",
   settingsThinkingSummary:
     "Homescreen-Karten, Modelle, Aufwand und Systemprompt.",

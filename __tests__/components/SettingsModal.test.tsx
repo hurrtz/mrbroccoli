@@ -364,6 +364,34 @@ describe("SettingsModal", () => {
     expect(renderedProviders).toEqual(expectedProviders);
   });
 
+  it("can restore the guided setup shortcut from Connections", async () => {
+    const onUpdate = jest.fn();
+    const screen = renderSettingsModal({
+      settings: {
+        ...DEFAULT_SETTINGS,
+        showSetupGuideShortcut: false,
+      },
+      onUpdate,
+    });
+
+    expect(screen.queryByLabelText("Guided setup")).toBeNull();
+    fireEvent.press(screen.getByText("Connections"));
+
+    await waitFor(() => {
+      expect(screen.getByTestId("setup-guide-shortcut-setting")).toBeTruthy();
+    });
+
+    fireEvent(
+      screen.getByLabelText("Show guided setup in Settings"),
+      "valueChange",
+      true,
+    );
+
+    expect(onUpdate).toHaveBeenCalledWith({
+      showSetupGuideShortcut: true,
+    });
+  });
+
   it("opens Connections when a focus provider is supplied", async () => {
     const screen = renderSettingsModal({ focusProvider: "openai" });
 
