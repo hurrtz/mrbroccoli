@@ -1,6 +1,6 @@
 import { StyleSheet } from "react-native";
 
-import { fonts } from "../../theme/typography";
+import { fonts, textStyles } from "../../theme/typography";
 
 export const styles = StyleSheet.create({
   overlay: {
@@ -62,12 +62,6 @@ export const styles = StyleSheet.create({
   drillInPage: {
     gap: 18,
   },
-  drillInSummary: {
-    fontFamily: fonts.body,
-    fontSize: 15,
-    lineHeight: 22,
-    paddingHorizontal: 4,
-  },
   overview: {
     gap: 16,
   },
@@ -77,8 +71,7 @@ export const styles = StyleSheet.create({
   setupCardBody: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 14,
-    paddingVertical: 4,
+    gap: 12,
   },
   setupCopy: {
     flex: 1,
@@ -97,35 +90,111 @@ export const styles = StyleSheet.create({
   },
   readinessGrid: {
     flexDirection: "row",
-    gap: 8,
   },
-  readinessButton: {
+  readinessStepLabel: {
+    fontFamily: fonts.bodyMedium,
+    fontSize: 12,
+    lineHeight: 16,
+    fontWeight: "500",
+    textAlign: "center",
+  },
+  readinessStep: {
     flex: 1,
-    minWidth: 0,
-    height: 36,
-    paddingHorizontal: 2,
-    borderRadius: 18,
+    alignItems: "center",
+    gap: 6,
   },
-  sectionList: {
-    overflow: "hidden",
-    borderWidth: StyleSheet.hairlineWidth,
-    borderRadius: 14,
+  readinessStepTrack: {
+    width: "100%",
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  readinessStepLine: {
+    flex: 1,
+    height: 2,
+  },
+  readinessStepCircle: {
+    width: 22,
+    height: 22,
+    borderRadius: 11,
+    borderWidth: 2,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  sectionCards: {
+    gap: 10,
   },
   sectionIcon: {
     width: 34,
     alignItems: "center",
     justifyContent: "center",
+    marginRight: 15,
   },
   pageStack: {
     gap: 16,
   },
+  sectionPageStack: {
+    gap: 24,
+  },
+  sectionGroup: {
+    gap: 10,
+  },
   card: {
     overflow: "hidden",
+    paddingBottom: 0,
   },
   cardContent: {
     paddingHorizontal: 16,
     paddingVertical: 14,
     gap: 10,
+  },
+  cardHeader: {
+    minHeight: 50,
+    marginLeft: 0,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+  },
+  cardHeaderContent: {
+    flex: 1,
+  },
+  cardHeaderExtra: {
+    flex: 0,
+  },
+  cardTitle: {
+    fontFamily: fonts.display,
+    fontSize: 15,
+    lineHeight: 21,
+    fontWeight: "600",
+  },
+  cardFooter: {
+    paddingVertical: 8,
+    borderTopWidth: StyleSheet.hairlineWidth,
+  },
+  cardFooterWrap: {
+    paddingHorizontal: 16,
+  },
+  cardFooterActions: {
+    alignItems: "flex-end",
+  },
+  disclosureHeader: {
+    flex: 1,
+    minHeight: 34,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+  },
+  disclosureHeaderContent: {
+    flex: 1,
+  },
+  disclosureHeaderActions: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 2,
+  },
+  disclosureToggle: {
+    width: 34,
+    height: 34,
+    alignItems: "center",
+    justifyContent: "center",
   },
   fullBleedCardContent: {
     paddingHorizontal: 0,
@@ -136,11 +205,21 @@ export const styles = StyleSheet.create({
     paddingHorizontal: 4,
     gap: 4,
   },
+  sectionIntroHeader: {
+    minHeight: 44,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: 12,
+  },
+  sectionIntroTitle: {
+    flex: 1,
+  },
   sectionTitle: {
-    fontFamily: fonts.headline,
+    fontFamily: fonts.display,
     fontSize: 17,
     lineHeight: 23,
-    fontWeight: "400",
+    fontWeight: "600",
   },
   sectionDescription: {
     fontFamily: fonts.body,
@@ -161,14 +240,41 @@ export const styles = StyleSheet.create({
   pickerList: {
     overflow: "hidden",
   },
+  pickerIntro: {
+    paddingHorizontal: 16,
+    paddingTop: 14,
+    paddingBottom: 8,
+    gap: 3,
+  },
   pickerHelper: {
     paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderTopWidth: StyleSheet.hairlineWidth,
+    paddingTop: 2,
+    paddingBottom: 12,
     gap: 4,
   },
   pickerItem: {
+    minHeight: 46,
+    marginHorizontal: 16,
+    borderWidth: 1,
+    borderRadius: 10,
+    overflow: "hidden",
+  },
+  pickerStaticItem: {
     minHeight: 52,
+  },
+  pickerValueRow: {
+    minWidth: 0,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "flex-end",
+    gap: 6,
+  },
+  pickerValue: {
+    flexShrink: 1,
+    fontFamily: fonts.body,
+    fontSize: 15,
+    lineHeight: 21,
+    textAlign: "right",
   },
   radioList: {
     marginHorizontal: -16,
@@ -188,49 +294,22 @@ export const styles = StyleSheet.create({
     fontSize: 15,
     lineHeight: 21,
   },
-  accordionHeader: {
-    minHeight: 52,
-  },
-  accordionBody: {
-    flex: 0,
-    width: "100%",
-    paddingHorizontal: 14,
-    paddingTop: 12,
-    paddingBottom: 14,
-    gap: 10,
-  },
-  accordionPickerBody: {
-    paddingHorizontal: 0,
-  },
   buttonRow: {
     flexDirection: "row",
     flexWrap: "wrap",
     gap: 8,
   },
-  responseModeHeader: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    gap: 12,
-  },
-  responseModeItem: {
-    gap: 4,
-    paddingVertical: 10,
-    borderTopWidth: StyleSheet.hairlineWidth,
-  },
-  responseModeItemFirst: {
-    borderTopWidth: 0,
-  },
-  responseModeTitleRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    gap: 12,
-  },
   compactButton: {
     minHeight: 34,
     borderRadius: 9,
     paddingHorizontal: 10,
+  },
+  addModelButton: {
+    alignSelf: "flex-start",
+    marginTop: 2,
+  },
+  fullWidthField: {
+    width: "100%",
   },
   buttonLabelRow: {
     flexDirection: "row",
@@ -262,9 +341,6 @@ export const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     gap: 12,
-  },
-  languageList: {
-    marginHorizontal: -16,
   },
   fallbackRow: {
     minHeight: 48,
@@ -315,15 +391,14 @@ export const styles = StyleSheet.create({
   },
   filterRow: {
     flexDirection: "row",
-    flexWrap: "wrap",
     gap: 8,
+    paddingRight: 16,
   },
   providerHeader: {
     flex: 1,
     flexDirection: "row",
     alignItems: "center",
-    gap: 12,
-    paddingVertical: 4,
+    gap: 14,
   },
   providerIcon: {
     width: 38,
@@ -332,16 +407,8 @@ export const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  providerHeaderCopy: {
-    flex: 1,
-    gap: 5,
-  },
-  providerNameRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 8,
-  },
   providerName: {
+    flex: 1,
     flexShrink: 1,
     fontFamily: fonts.display,
     fontSize: 16,
@@ -351,24 +418,69 @@ export const styles = StyleSheet.create({
   capabilityRow: {
     flexDirection: "row",
     flexWrap: "wrap",
-    gap: 5,
+    gap: 7,
+  },
+  capabilityTag: {
+    position: "relative",
+    flexDirection: "row",
+    overflow: "visible",
+  },
+  capabilityTagBody: {
+    height: 25,
+    justifyContent: "center",
+    borderRadius: 3,
+    borderWidth: 0.5,
+    paddingHorizontal: 15,
+  },
+  capabilityTagText: {
+    fontFamily: fonts.body,
+    fontSize: 12,
+    textAlign: "center",
+  },
+  providerCards: {
+    gap: 12,
+  },
+  providerHeaderActions: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 2,
+  },
+  providerHeaderAction: {
+    width: 34,
+    height: 34,
+    alignItems: "center",
+    justifyContent: "center",
   },
   connectionPanel: {
-    gap: 14,
-    paddingHorizontal: 14,
-    paddingBottom: 16,
+    gap: 20,
   },
-  onboardingCard: {
-    padding: 12,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderRadius: 10,
-    gap: 5,
+  connectionSection: {
+    gap: 8,
   },
-  inputLabel: {
-    fontFamily: fonts.bodyMedium,
-    fontSize: 13,
-    lineHeight: 18,
-    fontWeight: "500",
+  connectionSectionHeader: {
+    minHeight: 34,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: 12,
+  },
+  connectionSectionTitle: {
+    fontFamily: fonts.display,
+    fontSize: 16,
+    lineHeight: 22,
+    fontWeight: "600",
+  },
+  connectionBodyText: {
+    fontFamily: fonts.body,
+    fontSize: 15,
+    lineHeight: 21,
+    fontWeight: "400",
+  },
+  connectionImprintText: {
+    ...textStyles.caption,
+  },
+  connectionFullBleed: {
+    marginHorizontal: -16,
   },
   inputSuffix: {
     width: 34,
@@ -378,7 +490,43 @@ export const styles = StyleSheet.create({
   },
   validationList: {
     overflow: "hidden",
-    borderWidth: StyleSheet.hairlineWidth,
-    borderRadius: 10,
+  },
+  validationAction: {
+    width: 36,
+    height: 36,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  providerAboutModal: {
+    flex: 1,
+  },
+  providerAboutHeader: {
+    minHeight: 64,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+    paddingHorizontal: 16,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+  },
+  providerAboutTitle: {
+    flex: 1,
+    fontFamily: fonts.display,
+    fontSize: 18,
+    lineHeight: 24,
+    fontWeight: "600",
+  },
+  providerAboutScroll: {
+    flex: 1,
+  },
+  providerAboutContent: {
+    paddingHorizontal: 20,
+    paddingTop: 20,
+    paddingBottom: 36,
+    gap: 14,
+  },
+  providerAboutText: {
+    fontFamily: fonts.body,
+    fontSize: 15,
+    lineHeight: 22,
   },
 });

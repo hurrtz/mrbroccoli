@@ -1,29 +1,22 @@
 import React from "react";
 import {
   Pressable,
-  StyleSheet,
   Text,
   View,
 } from "react-native";
 
 import {
-  Button,
-  Card,
-  Icon,
   List,
 } from "@ant-design/react-native";
-import type { IconNames } from "@ant-design/react-native/lib/icon";
+import Feather from "@expo/vector-icons/Feather";
 
-import { antButtonTypography } from "../../design-system/antTypography";
 import { useLocalization } from "../../i18n";
 import { useTheme } from "../../theme/ThemeContext";
 import { fonts } from "../../theme/typography";
-import type {
-  SettingsReadiness,
-  SettingsReadinessStatus,
-} from "../settings-core/readiness";
+import type { SettingsReadiness } from "../settings-core/readiness";
 import type { SettingsPage } from "../settings-core/types";
 
+import { AntSettingsCard } from "./AntSettingsPrimitives";
 import { styles } from "./styles";
 
 type DrillInSettingsPage = Exclude<SettingsPage, "overview">;
@@ -44,7 +37,7 @@ type OverviewRow = {
     | "settingsSpeakingSummary"
     | "settingsSearchSummary"
     | "settingsAppDiagnosticsSummary";
-  icon: IconNames;
+  icon: React.ComponentProps<typeof Feather>["name"];
 };
 
 const overviewRows: OverviewRow[] = [
@@ -58,19 +51,19 @@ const overviewRows: OverviewRow[] = [
     page: "thinking",
     titleKey: "settingsThinking",
     summaryKey: "settingsThinkingSummary",
-    icon: "bulb",
+    icon: "cpu",
   },
   {
     page: "listening",
     titleKey: "settingsListening",
     summaryKey: "settingsListeningSummary",
-    icon: "audio",
+    icon: "mic",
   },
   {
     page: "speaking",
     titleKey: "settingsSpeaking",
     summaryKey: "settingsSpeakingSummary",
-    icon: "sound",
+    icon: "volume-2",
   },
   {
     page: "search",
@@ -82,82 +75,9 @@ const overviewRows: OverviewRow[] = [
     page: "app",
     titleKey: "settingsAppDiagnostics",
     summaryKey: "settingsAppDiagnosticsSummary",
-    icon: "control",
+    icon: "sliders",
   },
 ];
-
-function getReadinessMeta(
-  status: SettingsReadinessStatus,
-  colors: ReturnType<typeof useTheme>["colors"],
-) {
-  switch (status.state) {
-    case "ready":
-      return {
-        backgroundColor: `${colors.success}18`,
-        borderColor: `${colors.success}88`,
-        textColor: colors.success,
-      };
-    case "attention":
-      return {
-        backgroundColor: colors.accentSoft,
-        borderColor: colors.accent,
-        textColor: colors.accent,
-      };
-    case "broken":
-      return {
-        backgroundColor: `${colors.danger}12`,
-        borderColor: `${colors.danger}66`,
-        textColor: colors.danger,
-      };
-    case "off":
-      return {
-        backgroundColor: colors.surfaceAlt,
-        borderColor: colors.border,
-        textColor: colors.textMuted,
-      };
-  }
-}
-
-function ReadinessButton({
-  label,
-  status,
-  onPress,
-}: {
-  label: string;
-  status: SettingsReadinessStatus;
-  onPress: () => void;
-}) {
-  const { colors } = useTheme();
-  const { t } = useLocalization();
-  const meta = getReadinessMeta(status, colors);
-
-  return (
-    <Button
-      size="small"
-      type="ghost"
-      style={StyleSheet.flatten([
-        styles.readinessButton,
-        {
-          backgroundColor: meta.backgroundColor,
-          borderColor: meta.borderColor,
-        },
-      ])}
-      styles={{
-        ...antButtonTypography,
-        ghostRawText: {
-          color: meta.textColor,
-          fontFamily: fonts.bodyMedium,
-          fontSize: 14,
-          fontWeight: "600",
-        },
-      }}
-      onPress={onPress}
-      accessibilityLabel={`${label}: ${t(status.summaryKey)}`}
-    >
-      {label}
-    </Button>
-  );
-}
 
 export function AntSettingsOverview({
   readiness,
@@ -170,6 +90,32 @@ export function AntSettingsOverview({
 }) {
   const { colors } = useTheme();
   const { t } = useLocalization();
+  const readinessItems = [
+    {
+      key: "thinking",
+      label: t("settingsReadinessThink"),
+      status: readiness.think,
+      onPress: () => onOpenPage("thinking"),
+    },
+    {
+      key: "listening",
+      label: t("settingsReadinessListen"),
+      status: readiness.listen,
+      onPress: () => onOpenPage("listening"),
+    },
+    {
+      key: "speaking",
+      label: t("settingsReadinessSpeak"),
+      status: readiness.speak,
+      onPress: () => onOpenPage("speaking"),
+    },
+    {
+      key: "search",
+      label: t("settingsReadinessSearch"),
+      status: readiness.search,
+      onPress: () => onOpenPage("search"),
+    },
+  ] as const;
 
   return (
     <View style={styles.overview}>
@@ -179,7 +125,7 @@ export function AntSettingsOverview({
           accessibilityRole="button"
           accessibilityLabel={t("settingsGuidedSetup")}
         >
-          <Card
+          <AntSettingsCard
             style={[
               styles.setupCard,
               {
@@ -189,7 +135,6 @@ export function AntSettingsOverview({
             ]}
           >
             <View style={styles.setupCardBody}>
-              <Icon name="compass" size={25} color={colors.accent} />
               <View style={styles.setupCopy}>
                 <Text style={[styles.setupTitle, { color: colors.text }]}>
                   {t("settingsGuidedSetup")}
@@ -203,92 +148,170 @@ export function AntSettingsOverview({
                   {t("settingsGuidedSetupSummary")}
                 </Text>
               </View>
-              <Icon name="right" size={18} color={colors.textMuted} />
+              <Feather
+                name="chevron-right"
+                size={20}
+                color={colors.textMuted}
+              />
             </View>
-          </Card>
+          </AntSettingsCard>
         </Pressable>
       ) : null}
 
       <View style={styles.readinessGrid}>
-        <ReadinessButton
-          label={t("settingsReadinessThink")}
-          status={readiness.think}
-          onPress={() => onOpenPage("thinking")}
-        />
-        <ReadinessButton
-          label={t("settingsReadinessListen")}
-          status={readiness.listen}
-          onPress={() => onOpenPage("listening")}
-        />
-        <ReadinessButton
-          label={t("settingsReadinessSpeak")}
-          status={readiness.speak}
-          onPress={() => onOpenPage("speaking")}
-        />
-        <ReadinessButton
-          label={t("settingsReadinessSearch")}
-          status={readiness.search}
-          onPress={() => onOpenPage("search")}
-        />
+        {readinessItems.map((item, index) => {
+          const previousReady =
+            index > 0 && readinessItems[index - 1].status.state === "ready";
+          const nextReady =
+            index < readinessItems.length - 1 &&
+            readinessItems[index + 1].status.state === "ready";
+          const ready = item.status.state === "ready";
+          const broken = item.status.state === "broken";
+          const statusColor = broken
+            ? colors.danger
+            : ready
+              ? colors.success
+              : colors.borderStrong;
+
+          return (
+            <Pressable
+              key={item.key}
+              style={styles.readinessStep}
+              onPress={item.onPress}
+              accessibilityRole="button"
+              accessibilityLabel={`${item.label}: ${t(
+                item.status.summaryKey,
+              )}`}
+            >
+              <View style={styles.readinessStepTrack}>
+                <View
+                  style={[
+                    styles.readinessStepLine,
+                    {
+                      backgroundColor:
+                        previousReady && ready
+                          ? colors.success
+                          : colors.border,
+                      opacity: index === 0 ? 0 : 1,
+                    },
+                  ]}
+                />
+                <View
+                  style={[
+                    styles.readinessStepCircle,
+                    {
+                      backgroundColor: colors.surface,
+                      borderColor: statusColor,
+                    },
+                  ]}
+                >
+                  {ready ? (
+                    <Feather name="check" size={13} color={colors.success} />
+                  ) : broken ? (
+                    <Feather
+                      name="alert-circle"
+                      size={12}
+                      color={colors.danger}
+                    />
+                  ) : null}
+                </View>
+                <View
+                  style={[
+                    styles.readinessStepLine,
+                    {
+                      backgroundColor:
+                        ready && nextReady
+                          ? colors.success
+                          : colors.border,
+                      opacity:
+                        index === readinessItems.length - 1 ? 0 : 1,
+                    },
+                  ]}
+                />
+              </View>
+              <Text
+                style={[
+                  styles.readinessStepLabel,
+                  {
+                    color: broken
+                      ? colors.danger
+                      : ready
+                        ? colors.success
+                        : colors.textSecondary,
+                  },
+                ]}
+              >
+                {item.label}
+              </Text>
+            </Pressable>
+          );
+        })}
       </View>
 
-      <List
-        style={[
-          styles.sectionList,
-          {
-            backgroundColor: colors.surfaceElevated,
-            borderColor: colors.border,
-          },
-        ]}
-      >
+      <View style={styles.sectionCards}>
         {overviewRows.map((row) => (
-          <List.Item
+          <AntSettingsCard
             key={row.page}
-            arrow="horizontal"
-            multipleLine
-            wrap
-            thumb={
-              <View
-                testID={`settings-overview-icon-${row.page}`}
-                style={styles.sectionIcon}
-              >
-                <Icon name={row.icon} size={27} color={colors.text} />
-              </View>
-            }
-            onPress={() => onOpenPage(row.page)}
-            accessibilityRole="button"
-            accessibilityLabel={t("settingsOpenSection", {
-              section: t(row.titleKey),
-            })}
-            styles={{
-              Item: {
-                backgroundColor: colors.surfaceElevated,
-              },
-              Content: {
-                color: colors.text,
-                fontFamily: fonts.bodyMedium,
-                fontSize: 16,
-                fontWeight: "600",
-              },
-              Arrow: {
-                color: colors.textMuted,
-              },
-            }}
+            contentStyle={styles.fullBleedCardContent}
           >
-            {t(row.titleKey)}
-            <List.Item.Brief
+            <List.Item
+              multipleLine
               wrap
-              style={{
-                color: colors.textSecondary,
-                fontFamily: fonts.body,
-                lineHeight: 20,
+              thumb={
+                <View
+                  testID={`settings-overview-icon-${row.page}`}
+                  style={styles.sectionIcon}
+                >
+                  <Feather name={row.icon} size={27} color={colors.text} />
+                </View>
+              }
+              extra={
+                <Feather
+                  name="chevron-right"
+                  size={20}
+                  color={colors.textMuted}
+                />
+              }
+              onPress={() => onOpenPage(row.page)}
+              accessibilityRole="button"
+              accessibilityLabel={t("settingsOpenSection", {
+                section: t(row.titleKey),
+              })}
+              styles={{
+                Item: {
+                  backgroundColor: colors.surfaceElevated,
+                },
+                Line: {
+                  borderBottomWidth: 0,
+                  paddingVertical: 12,
+                },
+                Content: {
+                  color: colors.text,
+                  fontFamily: fonts.bodyMedium,
+                  fontSize: 16,
+                  fontWeight: "600",
+                },
+                Extra: {
+                  paddingLeft: 10,
+                },
               }}
             >
-              {t(row.summaryKey)}
-            </List.Item.Brief>
-          </List.Item>
+              {t(row.titleKey)}
+              <List.Item.Brief
+                wrap
+                style={{
+                  color: colors.textSecondary,
+                  fontFamily: fonts.body,
+                  fontSize: 13,
+                  lineHeight: 19,
+                }}
+              >
+                {t(row.summaryKey)}
+              </List.Item.Brief>
+            </List.Item>
+          </AntSettingsCard>
         ))}
-      </List>
+      </View>
     </View>
   );
 }

@@ -1,22 +1,16 @@
 import React from "react";
-import {
-  StyleSheet,
-  Text,
-  View,
-} from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 
-import {
-  Button,
-  Collapse,
-  Icon,
-} from "@ant-design/react-native";
+import { Button, Modal } from "@ant-design/react-native";
+import Feather from "@expo/vector-icons/Feather";
 
-import { antButtonTypography } from "../../../design-system/antTypography";
 import { PROVIDER_MODELS } from "../../../constants/models";
 import {
   MAX_RESPONSE_MODES,
   MIN_RESPONSE_MODES,
 } from "../../../constants/providers/defaults";
+import { antButtonTypography } from "../../../design-system/antTypography";
+import { AntIconButton } from "../../../design-system/AntIconButton";
 import { useLocalization } from "../../../i18n";
 import { useTheme } from "../../../theme/ThemeContext";
 import { fonts } from "../../../theme/typography";
@@ -40,6 +34,8 @@ import { renderProviderPickerOptions } from "../../settings-core/helpers";
 import {
   AntButtonLabel,
   AntPickerRow,
+  AntPickerRows,
+  AntSectionIntro,
   AntSettingsCard,
   AntTextArea,
 } from "../AntSettingsPrimitives";
@@ -67,47 +63,46 @@ export function ThinkingSettingsPage({
 }) {
   const { colors } = useTheme();
   const { language, t } = useLocalization();
-  const [expandedSection, setExpandedSection] = React.useState<string | null>(
-    null,
-  );
   const canAdd = settings.responseModes.length < MAX_RESPONSE_MODES;
   const canRemove = settings.responseModes.length > MIN_RESPONSE_MODES;
+  const [infoTopic, setInfoTopic] = React.useState<
+    "model-selection" | "system-prompt" | null
+  >(null);
+  const infoTitle =
+    infoTopic === "model-selection"
+      ? t("responseModes")
+      : infoTopic === "system-prompt"
+        ? t("systemPrompt")
+        : "";
+  const infoCopy =
+    infoTopic === "model-selection"
+      ? t("modelSelectionInfo")
+      : infoTopic === "system-prompt"
+        ? t("assistantInstructionsIntro")
+        : "";
 
   return (
-    <View style={styles.pageStack}>
-      <AntSettingsCard>
-        <View style={styles.responseModeHeader}>
-          <Text
-            accessibilityRole="header"
-            style={[styles.sectionTitle, { color: colors.text }]}
-          >
-            {t("responseModes")}
-          </Text>
-          {canAdd ? (
-            <Button
-              size="small"
-              type="ghost"
-              style={StyleSheet.flatten([
-                styles.compactButton,
-                { borderColor: colors.border },
-              ])}
-              onPress={onAddResponseMode}
-              accessibilityLabel={t("addResponseMode")}
-              styles={antButtonTypography}
-            >
-              <AntButtonLabel
-                color={colors.accent}
-                icon="plus"
-                label={t("addResponseMode")}
-              />
-            </Button>
-          ) : null}
-        </View>
+    <View testID="thinking-settings-page" style={styles.sectionPageStack}>
+      <View testID="model-selection-section" style={styles.sectionGroup}>
+        <AntSectionIntro
+          title={t("responseModes")}
+          extra={
+            <AntIconButton
+              accessibilityLabel={t("aboutModelSelection")}
+              iconNode={
+                <Feather name="info" size={19} color={colors.textSecondary} />
+              }
+              onPress={() => setInfoTopic("model-selection")}
+            />
+          }
+        />
 
         {llmProviders.length === 0 ? (
-          <Text style={[styles.helperText, { color: colors.textSecondary }]}>
-            {t("responseModesNoConfiguredProviders")}
-          </Text>
+          <AntSettingsCard>
+            <Text style={[styles.helperText, { color: colors.textSecondary }]}>
+              {t("responseModesNoConfiguredProviders")}
+            </Text>
+          </AntSettingsCard>
         ) : (
           settings.responseModes.map((mode, index) => {
             const route = normalizeResponseModeRouteEffort(mode.route);
@@ -119,143 +114,167 @@ export function ThinkingSettingsPage({
               effortOptions.length > 0 && route.effort !== undefined;
 
             return (
-              <View
+              <AntSettingsCard
                 key={mode.id}
-                style={[
-                  styles.responseModeItem,
-                  index === 0 ? styles.responseModeItemFirst : null,
-                  { borderTopColor: colors.border },
-                ]}
-              >
-                <View style={styles.responseModeTitleRow}>
-                  <Text style={[styles.fieldLabel, { color: colors.text }]}>
-                    {t("responseModeItemTitle", { index: index + 1 })}
-                  </Text>
-                  {canRemove ? (
-                    <Button
-                      size="small"
-                      type="ghost"
-                      style={StyleSheet.flatten([
-                        styles.compactButton,
-                        { borderColor: colors.border },
-                      ])}
-                      onPress={() => onRemoveResponseMode(mode.id)}
+                title={t("responseModeItemTitle", { index: index + 1 })}
+                headerExtra={
+                  canRemove ? (
+                    <AntIconButton
                       accessibilityLabel={t("removeResponseMode")}
-                      styles={antButtonTypography}
-                    >
-                      <Icon
-                        name="delete"
-                        size={15}
-                        color={colors.textSecondary}
-                      />
-                    </Button>
-                  ) : null}
-                </View>
-                <AntPickerRow
-                  label={t("provider")}
-                  value={route.provider}
-                  options={renderProviderPickerOptions(llmProviders)}
-                  onChange={(value) => {
-                    const nextProvider = value as Provider;
-                    const preferredModel =
-                      settings.providerModels[nextProvider];
-                    const nextModel = isValidModelForProvider(
-                      nextProvider,
-                      preferredModel,
-                    )
-                      ? preferredModel
-                      : getDefaultModelForProvider(nextProvider);
-
-                    onUpdateResponseModeRoute(
-                      mode.id,
-                      normalizeResponseModeRouteEffort({
-                        provider: nextProvider,
-                        model: nextModel,
-                      }),
-                    );
-                  }}
-                />
-                <AntPickerRow
-                  label={t("model")}
-                  value={route.model}
-                  options={PROVIDER_MODELS[route.provider].map((model) => ({
-                    value: model.id,
-                    label: model.name,
-                  }))}
-                  onChange={(value) =>
-                    onUpdateResponseModeRoute(
-                      mode.id,
-                      normalizeResponseModeRouteEffort({
-                        ...route,
-                        model: value,
-                      }),
-                    )
-                  }
-                />
-                {showEffort ? (
+                      iconNode={
+                        <Feather
+                          name="trash-2"
+                          size={18}
+                          color={colors.danger}
+                        />
+                      }
+                      onPress={() => onRemoveResponseMode(mode.id)}
+                    />
+                  ) : null
+                }
+                contentStyle={styles.fullBleedCardContent}
+              >
+                <AntPickerRows>
                   <AntPickerRow
-                    label={t("effort")}
-                    value={route.effort ?? ""}
-                    options={effortOptions.map((option) => ({
-                      value: option.id,
-                      label: getModelEffortOptionLabel(option, language),
+                    label={t("provider")}
+                    value={route.provider}
+                    options={renderProviderPickerOptions(llmProviders)}
+                    onChange={(value) => {
+                      const nextProvider = value as Provider;
+                      const preferredModel =
+                        settings.providerModels[nextProvider];
+                      const nextModel = isValidModelForProvider(
+                        nextProvider,
+                        preferredModel,
+                      )
+                        ? preferredModel
+                        : getDefaultModelForProvider(nextProvider);
+
+                      onUpdateResponseModeRoute(
+                        mode.id,
+                        normalizeResponseModeRouteEffort({
+                          provider: nextProvider,
+                          model: nextModel,
+                        }),
+                      );
+                    }}
+                  />
+                  <AntPickerRow
+                    label={t("model")}
+                    value={route.model}
+                    options={PROVIDER_MODELS[route.provider].map((model) => ({
+                      value: model.id,
+                      label: model.name,
                     }))}
                     onChange={(value) =>
                       onUpdateResponseModeRoute(
                         mode.id,
                         normalizeResponseModeRouteEffort({
                           ...route,
-                          effort: value,
+                          model: value,
                         }),
                       )
                     }
                   />
-                ) : null}
-              </View>
+                  {showEffort ? (
+                    <AntPickerRow
+                      label={t("effort")}
+                      value={route.effort ?? ""}
+                      options={effortOptions.map((option) => ({
+                        value: option.id,
+                        label: getModelEffortOptionLabel(option, language),
+                      }))}
+                      onChange={(value) =>
+                        onUpdateResponseModeRoute(
+                          mode.id,
+                          normalizeResponseModeRouteEffort({
+                            ...route,
+                            effort: value,
+                          }),
+                        )
+                      }
+                    />
+                  ) : null}
+                </AntPickerRows>
+              </AntSettingsCard>
             );
           })
         )}
-      </AntSettingsCard>
 
-      <AntSettingsCard contentStyle={styles.fullBleedCardContent}>
-        <Collapse
-          accordion
-          activeKey={expandedSection}
-          onChange={(key) =>
-            setExpandedSection((key as string | null) ?? null)
+        {canAdd ? (
+          <Button
+            size="small"
+            type="ghost"
+            style={StyleSheet.flatten([
+              styles.compactButton,
+              styles.addModelButton,
+              { borderColor: colors.border },
+            ])}
+            onPress={onAddResponseMode}
+            accessibilityLabel={t("addResponseMode")}
+            styles={antButtonTypography}
+          >
+            <AntButtonLabel
+              color={colors.accent}
+              icon="plus"
+              label={t("addResponseMode")}
+            />
+          </Button>
+        ) : null}
+      </View>
+
+      <View testID="system-prompt-section" style={styles.sectionGroup}>
+        <AntSectionIntro
+          title={t("systemPrompt")}
+          extra={
+            <AntIconButton
+              accessibilityLabel={t("aboutSystemPrompt")}
+              iconNode={
+                <Feather name="info" size={19} color={colors.textSecondary} />
+              }
+              onPress={() => setInfoTopic("system-prompt")}
+            />
           }
-          styles={{
-            Item: {
-              backgroundColor: colors.surfaceElevated,
-            },
-            Content: {
-              color: colors.text,
+        />
+        <View testID="system-prompt-editor" style={styles.fullWidthField}>
+          <AntTextArea
+            value={settings.assistantInstructions}
+            placeholder={t("assistantInstructionsPlaceholder")}
+            onChange={(value) => onUpdate({ assistantInstructions: value })}
+          />
+        </View>
+      </View>
+
+      <Modal
+        visible={infoTopic !== null}
+        transparent
+        maskClosable
+        title={infoTitle}
+        onClose={() => setInfoTopic(null)}
+        footer={[
+          {
+            text: t("done"),
+            style: {
+              color: colors.accent,
               fontFamily: fonts.bodyMedium,
-              fontSize: 15,
-              fontWeight: "600",
             },
-          }}
-        >
-          <Collapse.Panel key="system-prompt" title={t("systemPrompt")}>
-            <View>
-              <View style={styles.accordionBody}>
-                <Text
-                  style={[styles.helperText, { color: colors.textSecondary }]}
-                >
-                  {t("assistantInstructionsIntro")}
-                </Text>
-                <AntTextArea
-                  value={settings.assistantInstructions}
-                  placeholder={t("assistantInstructionsPlaceholder")}
-                  onChange={(value) =>
-                    onUpdate({ assistantInstructions: value })
-                  }
-                />
-              </View>
-            </View>
-          </Collapse.Panel>
-        </Collapse>
-      </AntSettingsCard>
+            onPress: () => setInfoTopic(null),
+          },
+        ]}
+        styles={{
+          header: {
+            color: colors.text,
+            fontFamily: fonts.bodyMedium,
+          },
+          buttonText: {
+            fontFamily: fonts.bodyMedium,
+          },
+        }}
+      >
+        <Text style={[styles.helperText, { color: colors.textSecondary }]}>
+          {infoCopy}
+        </Text>
+      </Modal>
     </View>
   );
 }

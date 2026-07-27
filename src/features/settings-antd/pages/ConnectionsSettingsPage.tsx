@@ -1,25 +1,20 @@
 import React from "react";
-import { Text, View } from "react-native";
+import { Linking, Pressable, ScrollView, Text, View } from "react-native";
 
-import {
-  ActivityIndicator,
-  Collapse,
-  Icon,
-  Tag,
-} from "@ant-design/react-native";
+import { Tag } from "@ant-design/react-native";
+import Feather from "@expo/vector-icons/Feather";
 
 import { getAppProviderForCatalogProviderId } from "../../../catalog/appProviders";
 import type { CatalogProviderId } from "../../../catalog";
-import { PROVIDER_LABELS } from "../../../constants/models";
+import { ProviderIcon } from "../../../components/ProviderIcon";
+import {
+  PROVIDER_API_KEY_URLS,
+  PROVIDER_LABELS,
+} from "../../../constants/models";
 import { useLocalization } from "../../../i18n";
 import { useTheme } from "../../../theme/ThemeContext";
 import { fonts } from "../../../theme/typography";
-import type {
-  Provider,
-  ProviderCapability,
-  Settings,
-} from "../../../types";
-import { ProviderIcon } from "../../../components/ProviderIcon";
+import type { Provider, ProviderCapability, Settings } from "../../../types";
 import { getProviderCapabilities } from "../../settings-core/providerSupport";
 import type {
   ProviderHealthState,
@@ -30,8 +25,10 @@ import type {
 import {
   getCapabilityLabel,
   getStatusMeta,
+  ProviderAboutModal,
   ProviderConnectionPanel,
 } from "../ProviderConnectionPanel";
+import { AntDisclosureCard } from "../AntSettingsPrimitives";
 import { styles } from "../styles";
 
 type CapabilityFilter = "all" | ProviderCapability;
@@ -81,9 +78,11 @@ export function ConnectionsSettingsPage({
       ? getAppProviderForCatalogProviderId(focusCatalogProviderId)
       : null);
   const [filter, setFilter] = React.useState<CapabilityFilter>("all");
-  const [expandedProvider, setExpandedProvider] = React.useState<
-    Provider | null
-  >(preferredFocusProvider);
+  const [expandedProvider, setExpandedProvider] =
+    React.useState<Provider | null>(preferredFocusProvider);
+  const [aboutProvider, setAboutProvider] = React.useState<Provider | null>(
+    null,
+  );
   const [visibleApiKeys, setVisibleApiKeys] = React.useState<
     Partial<Record<Provider, boolean>>
   >({});
@@ -116,10 +115,13 @@ export function ConnectionsSettingsPage({
     { value: "search", label: t("webSearch") },
     { value: "voices", label: t("providerCapability_voices") },
   ];
-
   return (
     <View style={styles.pageStack}>
-      <View style={styles.filterRow}>
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={styles.filterRow}
+      >
         {filters.map((option) => {
           const selected = filter === option.value;
           return (
@@ -150,46 +152,55 @@ export function ConnectionsSettingsPage({
             </Tag>
           );
         })}
-      </View>
+      </ScrollView>
 
-      <Collapse
-        accordion
-        activeKey={expandedProvider}
-        onChange={(key) =>
-          setExpandedProvider((key as Provider | null) ?? null)
-        }
-        styles={{
-          List: {
-            backgroundColor: colors.surfaceElevated,
-          },
-          Item: {
-            backgroundColor: colors.surfaceElevated,
-          },
-          Content: {
-            color: colors.text,
-            fontFamily: fonts.bodyMedium,
-          },
-          Arrow: {
-            color: colors.textSecondary,
-          },
-        }}
-      >
+      <View style={styles.providerCards}>
         {providers.map((provider) => {
           const capabilities = getProviderCapabilities(provider);
           const healthState = getProviderHealthState(provider);
           const status = getStatusMeta(healthState, t, colors);
+          const expanded = expandedProvider === provider;
+          const allCapabilitiesHealthy =
+            capabilities.length > 0 &&
+            capabilities.every(
+              (capability) =>
+                getProviderCapabilityHealthState(provider, capability) ===
+                "healthy",
+            );
 
           return (
-            <Collapse.Panel
+            <AntDisclosureCard
               key={provider}
-              title={
+              testID={`provider-card-${provider}`}
+              expanded={expanded}
+              style={
+                allCapabilitiesHealthy
+                  ? {
+                      backgroundColor: `${colors.success}1F`,
+                      borderColor: `${colors.success}88`,
+                    }
+                  : undefined
+              }
+              toggleAccessibilityLabel={
+                expanded
+                  ? t("collapseProvider", {
+                      provider: PROVIDER_LABELS[provider],
+                    })
+                  : t("expandProvider", {
+                      provider: PROVIDER_LABELS[provider],
+                    })
+              }
+              onToggle={() =>
+                setExpandedProvider((current) =>
+                  current === provider ? null : provider,
+                )
+              }
+              header={
                 <View
                   testID={`provider-vault-row-${provider}`}
                   style={styles.providerHeader}
                   accessibilityLabel={`${PROVIDER_LABELS[provider]}, ${capabilities
-                    .map((capability) =>
-                      getCapabilityLabel(capability, t),
-                    )
+                    .map((capability) => getCapabilityLabel(capability, t))
                     .join(", ")}, ${status.label}`}
                 >
                   <View
@@ -203,81 +214,95 @@ export function ConnectionsSettingsPage({
                   >
                     <ProviderIcon provider={provider} color={colors.text} />
                   </View>
-                  <View style={styles.providerHeaderCopy}>
-                    <View style={styles.providerNameRow}>
-                      <Text
-                        style={[
-                          styles.providerName,
-                          { color: colors.text },
-                        ]}
-                      >
-                        {PROVIDER_LABELS[provider]}
-                      </Text>
-                      {healthState === "validating" ? (
-                        <ActivityIndicator
-                          size="small"
-                          color={colors.accent}
-                        />
-                      ) : status.icon ? (
-                        <Icon
-                          name={status.icon}
-                          size={15}
-                          color={status.textColor}
-                        />
-                      ) : null}
-                      {healthState !== "unconfigured" ? (
-                        <Text
-                          style={[
-                            styles.helperText,
-                            { color: status.textColor },
-                          ]}
-                        >
-                          {status.label}
-                        </Text>
-                      ) : null}
-                    </View>
-                    <View style={styles.capabilityRow}>
-                      {capabilities.map((capability) => {
-                        const capabilityStatus = getStatusMeta(
-                          getProviderCapabilityHealthState(
-                            provider,
+                  <Text style={[styles.providerName, { color: colors.text }]}>
+                    {PROVIDER_LABELS[provider]}
+                  </Text>
+                </View>
+              }
+              headerExtra={
+                <View style={styles.providerHeaderActions}>
+                  <Pressable
+                    style={styles.providerHeaderAction}
+                    onPress={() => {
+                      void Linking.openURL(PROVIDER_API_KEY_URLS[provider]);
+                    }}
+                    accessibilityRole="button"
+                    accessibilityLabel={`${t(
+                      provider === "openrouter"
+                        ? "openRouterKeys"
+                        : "createApiKey",
+                    )}: ${PROVIDER_LABELS[provider]}`}
+                  >
+                    <Feather
+                      name="key"
+                      size={18}
+                      color={colors.textSecondary}
+                    />
+                  </Pressable>
+                  <Pressable
+                    style={styles.providerHeaderAction}
+                    onPress={() => setAboutProvider(provider)}
+                    accessibilityRole="button"
+                    accessibilityLabel={`${t("aboutThisProvider")}: ${
+                      PROVIDER_LABELS[provider]
+                    }`}
+                  >
+                    <Feather
+                      name="info"
+                      size={19}
+                      color={colors.textSecondary}
+                    />
+                  </Pressable>
+                </View>
+              }
+              footer={
+                allCapabilitiesHealthy ? undefined : (
+                  <View
+                    testID={`provider-capability-footer-${provider}`}
+                    style={styles.capabilityRow}
+                  >
+                    {capabilities.map((capability) => {
+                      const capabilityStatus = getStatusMeta(
+                        getProviderCapabilityHealthState(provider, capability),
+                        t,
+                        colors,
+                      );
+                      return (
+                        <View
+                          key={`${provider}:${capability}`}
+                          testID={`provider-capability-pill-${provider}-${capability}`}
+                          accessible
+                          accessibilityRole="text"
+                          accessibilityLabel={`${getCapabilityLabel(
                             capability,
-                          ),
-                          t,
-                          colors,
-                        );
-                        return (
+                            t,
+                          )}: ${capabilityStatus.label}`}
+                          style={styles.capabilityTag}
+                        >
                           <View
-                            key={`${provider}:${capability}`}
-                            testID={`provider-capability-pill-${provider}-${capability}`}
-                            accessibilityLabel={`${getCapabilityLabel(
-                              capability,
-                              t,
-                            )}: ${capabilityStatus.label}`}
+                            style={[
+                              styles.capabilityTagBody,
+                              {
+                                backgroundColor:
+                                  capabilityStatus.backgroundColor,
+                                borderColor: capabilityStatus.borderColor,
+                              },
+                            ]}
                           >
-                            <Tag
-                              small
-                              styles={{
-                                normalWrap: {
-                                  backgroundColor:
-                                    capabilityStatus.backgroundColor,
-                                  borderColor:
-                                    capabilityStatus.borderColor,
-                                },
-                                normalText: {
-                                  color: capabilityStatus.textColor,
-                                  fontFamily: fonts.body,
-                                },
-                              }}
+                            <Text
+                              style={[
+                                styles.capabilityTagText,
+                                { color: capabilityStatus.textColor },
+                              ]}
                             >
                               {getCapabilityLabel(capability, t)}
-                            </Tag>
+                            </Text>
                           </View>
-                        );
-                      })}
-                    </View>
+                        </View>
+                      );
+                    })}
                   </View>
-                </View>
+                )
               }
             >
               <ProviderConnectionPanel
@@ -307,10 +332,16 @@ export function ConnectionsSettingsPage({
                 }
                 onValidateAll={() => onValidateAll(provider)}
               />
-            </Collapse.Panel>
+            </AntDisclosureCard>
           );
         })}
-      </Collapse>
+      </View>
+
+      <ProviderAboutModal
+        provider={aboutProvider}
+        visible={aboutProvider !== null}
+        onClose={() => setAboutProvider(null)}
+      />
     </View>
   );
 }

@@ -55,7 +55,7 @@ import { AntPreviewComposer } from "./AntPreviewComposer";
 import {
   AntButtonLabel,
   AntPickerRow,
-  AntPickerSection,
+  AntPickerRows,
   AntSettingsCard,
 } from "./AntSettingsPrimitives";
 import { styles } from "./styles";
@@ -417,7 +417,7 @@ export function AntProviderVoiceSection({
       ) : null}
 
       {voiceOptions.length > 0 ? (
-        <AntPickerSection>
+        <AntPickerRows>
           <AntPickerRow
             label={t("ttsVoice")}
             value={selectedVoice}
@@ -426,7 +426,7 @@ export function AntProviderVoiceSection({
               onUpdateProviderTtsVoice(provider, value)
             }
           />
-        </AntPickerSection>
+        </AntPickerRows>
       ) : hasVoiceDirectory && !voiceDirectoryBusy ? (
         <View style={{ gap: 8 }}>
           <Text style={[styles.fieldLabel, { color: colors.textSecondary }]}>
@@ -444,13 +444,20 @@ export function AntProviderVoiceSection({
             autoCapitalize="none"
             autoCorrect={false}
             allowClear
-            inputStyle={{ color: colors.text, fontFamily: fonts.body }}
+            inputStyle={{
+              color: colors.text,
+              fontFamily: fonts.body,
+              fontSize: 15,
+              lineHeight: 21,
+              paddingHorizontal: 12,
+            }}
             styles={{
               container: {
                 backgroundColor: colors.surface,
                 borderWidth: 1,
                 borderColor: colors.border,
                 borderRadius: 10,
+                minHeight: 46,
               },
             }}
           />
@@ -550,14 +557,14 @@ export function AntNativeVoiceSection({
       </View>
       {voiceOptions.length > 0 ? (
         <>
-          <AntPickerSection>
+          <AntPickerRows>
             <AntPickerRow
               label={t("ttsVoice")}
               value={selectedVoice}
               options={voiceOptions}
               onChange={onSelectVoice}
             />
-          </AntPickerSection>
+          </AntPickerRows>
           <AntPreviewComposer
             text={previewText}
             setText={onSetPreviewText}
@@ -725,7 +732,7 @@ export function AntKokoroVoiceSection({
             <Text style={[styles.fieldLabel, { color: colors.textSecondary }]}>
               {getTtsListenLanguageLabel(previewLanguage, appLanguage)}
             </Text>
-            <AntPickerSection>
+            <AntPickerRows>
               <AntPickerRow
                 label={t("ttsVoice")}
                 value={settings.kokoroVoices[previewLanguage]}
@@ -737,7 +744,7 @@ export function AntKokoroVoiceSection({
                   onUpdateVoice(previewLanguage, voice)
                 }
               />
-            </AntPickerSection>
+            </AntPickerRows>
             <AntPreviewComposer
               text={previewTexts[previewLanguage]}
               setText={(text) =>

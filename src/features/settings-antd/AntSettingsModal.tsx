@@ -10,6 +10,7 @@ import {
 } from "react-native";
 
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import Feather from "@expo/vector-icons/Feather";
 
 import { getSettingsReadiness } from "../settings-core/readiness";
 import type {
@@ -253,41 +254,11 @@ export const AntSettingsModal = React.memo(function AntSettingsModal(
     [t],
   );
 
-  const getPageSummary = React.useCallback(
-    (page: DrillInSettingsPage) => {
-      switch (page) {
-        case "connections":
-          return t("settingsConnectionsSummary");
-        case "thinking":
-          return t("settingsThinkingSummary");
-        case "listening":
-          return t("settingsListeningSummary");
-        case "speaking":
-          return t("settingsSpeakingSummary");
-        case "search":
-          return t("settingsSearchSummary");
-        case "app":
-          return t("settingsAppDiagnosticsSummary");
-      }
-    },
-    [t],
-  );
-
   const renderDrillInPage = React.useCallback(
-    (page: DrillInSettingsPage, children: React.ReactNode) => (
-      <View style={styles.drillInPage}>
-        <Text
-          style={[
-            styles.drillInSummary,
-            { color: colors.textSecondary },
-          ]}
-        >
-          {getPageSummary(page)}
-        </Text>
-        {children}
-      </View>
+    (_page: DrillInSettingsPage, children: React.ReactNode) => (
+      <View style={styles.drillInPage}>{children}</View>
     ),
-    [colors.textSecondary, getPageSummary],
+    [],
   );
 
   const activeContent = (() => {
@@ -507,8 +478,13 @@ export const AntSettingsModal = React.memo(function AntSettingsModal(
           >
             {showsBackButton ? (
               <AntIconButton
-                icon="left"
-                iconSize={23}
+                iconNode={
+                  <Feather
+                    name="arrow-left"
+                    size={22}
+                    color={colors.textSecondary}
+                  />
+                }
                 style={styles.headerControl}
                 onPress={() => setActivePage("overview")}
                 accessibilityLabel={t("settingsBackToOverview")}
@@ -526,7 +502,13 @@ export const AntSettingsModal = React.memo(function AntSettingsModal(
               </Text>
             </View>
             <AntIconButton
-              icon="close"
+              iconNode={
+                <Feather
+                  name="x"
+                  size={22}
+                  color={colors.textSecondary}
+                />
+              }
               style={styles.headerControl}
               onPress={onClose}
               accessibilityLabel={t("dismiss")}

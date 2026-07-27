@@ -53,7 +53,6 @@ export function ListeningSettingsPage({
     <View style={styles.pageStack}>
       <AntSectionIntro
         title={t("voiceInput")}
-        description={t("voiceInputDescription")}
       />
 
       <AntRadioSection<InputMode>
@@ -90,7 +89,6 @@ export function ListeningSettingsPage({
           {
             value: "provider",
             label: t("provider"),
-            description: t("providerSttDescription"),
           },
         ]}
         value={settings.sttMode}
@@ -99,6 +97,8 @@ export function ListeningSettingsPage({
 
       {settings.sttMode === "provider" ? (
         <AntPickerSection
+          title={t("sttProvider")}
+          description={t("providerSttDescription")}
           helperText={
             <>
               {sttLanguageNote ? (
@@ -106,6 +106,8 @@ export function ListeningSettingsPage({
                   style={{
                     color: colors.textSecondary,
                     fontFamily: fonts.body,
+                    fontSize: 13,
+                    lineHeight: 19,
                   }}
                 >
                   {t("languageCoverage", { note: sttLanguageNote })}
@@ -116,6 +118,8 @@ export function ListeningSettingsPage({
                   style={{
                     color: colors.textSecondary,
                     fontFamily: fonts.body,
+                    fontSize: 13,
+                    lineHeight: 19,
                   }}
                 >
                   {t("recordingLimits", { note: sttLimitNote })}
@@ -125,14 +129,14 @@ export function ListeningSettingsPage({
           }
         >
           <AntPickerRow
-            label={t("sttProvider")}
+            label={t("provider")}
             value={settings.sttProvider ?? ""}
             options={sttProviderOptions}
             disabled={sttProviderOptions.length === 0}
             onChange={(value) => onUpdate({ sttProvider: value as Provider })}
           />
           {settings.sttProvider &&
-          selectedSttProviderModelOptions.length > 1 ? (
+          selectedSttProviderModelOptions.length > 0 ? (
             <AntPickerRow
               label={t("model")}
               value={selectedSttProviderModel}

@@ -1,26 +1,36 @@
 import React from "react";
 import {
+  Pressable,
   StyleSheet,
+  Switch as NativeSwitch,
   Text,
   View,
+  type StyleProp,
+  type TextStyle,
   type ViewStyle,
 } from "react-native";
 
 import {
-  Icon,
   Card,
+  Icon,
   Input,
   List,
   Picker,
   Radio,
-  Switch,
 } from "@ant-design/react-native";
+import Feather from "@expo/vector-icons/Feather";
 import type { IconNames } from "@ant-design/react-native/lib/icon";
 
 import { useTheme } from "../../theme/ThemeContext";
 import { fonts } from "../../theme/typography";
 
 import { styles } from "./styles";
+
+const AntCardBody = Card.Body as React.ComponentType<
+  React.ComponentProps<typeof Card.Body> & {
+    children?: React.ReactNode;
+  }
+>;
 
 export type AntPickerOption = {
   value: string;
@@ -31,13 +41,69 @@ export type AntPickerOption = {
 export function AntSettingsCard({
   children,
   contentStyle,
+  footer,
+  headerExtra,
   style,
+  title,
 }: {
   children: React.ReactNode;
-  contentStyle?: ViewStyle;
-  style?: ViewStyle;
+  contentStyle?: StyleProp<ViewStyle>;
+  footer?: React.ReactNode;
+  headerExtra?: React.ReactNode;
+  style?: StyleProp<ViewStyle>;
+  title?: React.ReactNode;
 }) {
   const { colors } = useTheme();
+  const titleNode =
+    typeof title === "string" ? (
+      <Text style={[styles.cardTitle, { color: colors.text }]}>{title}</Text>
+    ) : (
+      title
+    );
+  const cardChildren: React.ReactElement[] = [];
+
+  if (titleNode) {
+    cardChildren.push(
+      <Card.Header
+        key="header"
+        title={titleNode}
+        extra={headerExtra}
+        styles={{
+          headerWrap: styles.cardHeader,
+          headerContentWrap: styles.cardHeaderContent,
+          headerExtraWrap: styles.cardHeaderExtra,
+        }}
+      />,
+    );
+  }
+  cardChildren.push(
+    <AntCardBody
+      key="body"
+      style={[styles.cardContent, contentStyle]}
+      styles={{
+        body: {
+          backgroundColor: "transparent",
+          borderColor: colors.border,
+          borderTopWidth: titleNode ? StyleSheet.hairlineWidth : 0,
+        },
+      }}
+    >
+      {children}
+    </AntCardBody>,
+  );
+  if (footer) {
+    cardChildren.push(
+      <Card.Footer
+        key="footer"
+        content={<View />}
+        extra={<View style={styles.cardFooterActions}>{footer}</View>}
+        style={[styles.cardFooter, { borderTopColor: colors.border }]}
+        styles={{
+          footerWrap: styles.cardFooterWrap,
+        }}
+      />,
+    );
+  }
 
   return (
     <Card
@@ -50,8 +116,120 @@ export function AntSettingsCard({
         style,
       ])}
     >
-      <View style={[styles.cardContent, contentStyle]}>{children}</View>
+      {cardChildren}
     </Card>
+  );
+}
+
+export function AntDisclosureCard({
+  children,
+  contentStyle,
+  expanded,
+  footer,
+  header,
+  headerExtra,
+  onToggle,
+  style,
+  testID,
+  toggleAccessibilityLabel,
+}: {
+  children: React.ReactNode;
+  contentStyle?: StyleProp<ViewStyle>;
+  expanded: boolean;
+  footer?: React.ReactNode;
+  header: React.ReactNode;
+  headerExtra?: React.ReactNode;
+  onToggle: () => void;
+  style?: StyleProp<ViewStyle>;
+  testID?: string;
+  toggleAccessibilityLabel?: string;
+}) {
+  const { colors } = useTheme();
+  const cardChildren: React.ReactElement[] = [
+    <Card.Header
+      key="header"
+      title={
+        <Pressable
+          accessibilityRole="button"
+          accessibilityState={{ expanded }}
+          style={styles.disclosureHeader}
+          onPress={onToggle}
+        >
+          <View style={styles.disclosureHeaderContent}>{header}</View>
+        </Pressable>
+      }
+      extra={
+        <View style={styles.disclosureHeaderActions}>
+          {headerExtra}
+          <Pressable
+            accessibilityLabel={toggleAccessibilityLabel}
+            accessibilityRole="button"
+            accessibilityState={{ expanded }}
+            hitSlop={8}
+            onPress={onToggle}
+            style={styles.disclosureToggle}
+          >
+            <Feather
+              name={expanded ? "chevron-up" : "chevron-down"}
+              size={20}
+              color={colors.textSecondary}
+            />
+          </Pressable>
+        </View>
+      }
+      styles={{
+        headerWrap: styles.cardHeader,
+        headerContentWrap: styles.cardHeaderContent,
+        headerExtraWrap: styles.cardHeaderExtra,
+      }}
+    />,
+  ];
+
+  if (expanded) {
+    cardChildren.push(
+      <AntCardBody
+        key="body"
+        style={[styles.cardContent, contentStyle]}
+        styles={{
+          body: {
+            backgroundColor: "transparent",
+            borderColor: colors.border,
+            borderTopWidth: StyleSheet.hairlineWidth,
+          },
+        }}
+      >
+        {children}
+      </AntCardBody>,
+    );
+  }
+  if (footer) {
+    cardChildren.push(
+      <Card.Footer
+        key="footer"
+        content={footer}
+        style={[styles.cardFooter, { borderTopColor: colors.border }]}
+        styles={{
+          footerWrap: styles.cardFooterWrap,
+        }}
+      />,
+    );
+  }
+
+  return (
+    <View testID={testID}>
+      <Card
+        style={StyleSheet.flatten([
+          styles.card,
+          {
+            backgroundColor: colors.surfaceElevated,
+            borderColor: colors.border,
+          },
+          style,
+        ])}
+      >
+        {cardChildren}
+      </Card>
+    </View>
   );
 }
 
@@ -77,26 +255,32 @@ export function AntButtonLabel({
 export function AntSectionIntro({
   title,
   description,
+  extra,
 }: {
   title: string;
   description?: string;
+  extra?: React.ReactNode;
 }) {
   const { colors } = useTheme();
 
   return (
     <View style={styles.sectionIntro}>
-      <Text
-        accessibilityRole="header"
-        style={[styles.sectionTitle, { color: colors.text }]}
-      >
-        {title}
-      </Text>
+      <View style={styles.sectionIntroHeader}>
+        <Text
+          accessibilityRole="header"
+          style={[
+            styles.sectionTitle,
+            styles.sectionIntroTitle,
+            { color: colors.text },
+          ]}
+        >
+          {title}
+        </Text>
+        {extra}
+      </View>
       {description ? (
         <Text
-          style={[
-            styles.sectionDescription,
-            { color: colors.textSecondary },
-          ]}
+          style={[styles.sectionDescription, { color: colors.textSecondary }]}
         >
           {description}
         </Text>
@@ -192,18 +376,81 @@ export function AntPickerRow({
   options,
   onChange,
   disabled = false,
-  hideDivider = false,
 }: {
-  label: string;
+  label?: string;
   value: string;
   options: AntPickerOption[];
   onChange: (value: string) => void;
   disabled?: boolean;
-  hideDivider?: boolean;
 }) {
   const { colors } = useTheme();
   const selectedLabel =
-    options.find((option) => option.value === value)?.label ?? value;
+    options.find((option) => option.value === value)?.label ??
+    (options.length === 1 ? options[0].label : value);
+  const hasSingleOption = options.length === 1;
+  const disclosureIcon =
+    !disabled && !hasSingleOption ? (
+      <Feather name="chevron-down" size={17} color={colors.textMuted} />
+    ) : null;
+  const pickerIsInteractive = !hasSingleOption;
+  const renderRow = (onPress?: () => void) => (
+    <List.Item
+      extra={
+        label ? (
+          <View style={styles.pickerValueRow}>
+            <Text
+              numberOfLines={1}
+              style={[
+                styles.pickerValue,
+                {
+                  color: disabled ? colors.textMuted : colors.textSecondary,
+                },
+              ]}
+            >
+              {selectedLabel}
+            </Text>
+            {disclosureIcon}
+          </View>
+        ) : (
+          disclosureIcon
+        )
+      }
+      disabled={disabled || hasSingleOption}
+      onPress={onPress}
+      style={
+        pickerIsInteractive
+          ? [styles.pickerItem, { borderColor: colors.border }]
+          : styles.pickerStaticItem
+      }
+      styles={{
+        Item: {
+          backgroundColor: pickerIsInteractive
+            ? colors.surface
+            : colors.surfaceElevated,
+        },
+        Line: {
+          borderBottomWidth: 0,
+          minHeight: 46,
+          paddingVertical: 10,
+        },
+        Content: {
+          color: colors.text,
+          fontFamily: fonts.body,
+          fontSize: 15,
+        },
+        Extra: {
+          maxWidth: "68%",
+          paddingLeft: 8,
+        },
+      }}
+    >
+      {label ?? selectedLabel}
+    </List.Item>
+  );
+
+  if (hasSingleOption) {
+    return renderRow();
+  }
 
   return (
     <Picker
@@ -240,53 +487,27 @@ export function AntPickerRow({
         }
       }}
     >
-      <List.Item
-        arrow="horizontal"
-        extra={selectedLabel}
-        disabled={disabled}
-        style={styles.pickerItem}
-        styles={{
-          Item: {
-            backgroundColor: colors.surfaceElevated,
-          },
-          Line: {
-            borderBottomWidth: hideDivider ? 0 : StyleSheet.hairlineWidth,
-          },
-          Content: {
-            color: colors.text,
-            fontFamily: fonts.body,
-            fontSize: 15,
-          },
-          Extra: {
-            color: disabled ? colors.textMuted : colors.textSecondary,
-            fontFamily: fonts.body,
-            fontSize: 14,
-          },
-          Arrow: {
-            color: colors.textMuted,
-          },
-        }}
-      >
-        {label}
-      </List.Item>
+      {({ toggle }) => renderRow(toggle)}
     </Picker>
   );
 }
 
-export function AntPickerSection({
+export function AntPickerRows({
   children,
   helperText,
+  helperTextStyle,
 }: {
   children: React.ReactNode;
   helperText?: React.ReactNode;
+  helperTextStyle?: StyleProp<TextStyle>;
 }) {
   const { colors } = useTheme();
   const pickerRows = React.Children.toArray(children).filter(
     React.isValidElement,
-  ) as React.ReactElement<{ hideDivider?: boolean }>[];
+  );
 
   return (
-    <AntSettingsCard contentStyle={styles.fullBleedCardContent}>
+    <>
       <List
         style={styles.pickerList}
         styles={{
@@ -295,31 +516,27 @@ export function AntPickerSection({
           },
           Body: {
             borderTopWidth: 0,
+            gap: 8,
+            paddingVertical: 8,
           },
           BodyBottomLine: {
-            borderBottomWidth: 0,
+            height: 0,
+            backgroundColor: "transparent",
           },
         }}
       >
-        {pickerRows.map((child, index) =>
-          child.type === AntPickerRow
-            ? React.cloneElement(child, {
-                hideDivider:
-                  helperText === undefined &&
-                  index === pickerRows.length - 1,
-              })
-            : child,
-        )}
+        {pickerRows}
       </List>
       {helperText ? (
-        <View
-          style={[
-            styles.pickerHelper,
-            { borderTopColor: colors.border },
-          ]}
-        >
+        <View style={styles.pickerHelper}>
           {typeof helperText === "string" ? (
-            <Text style={[styles.helperText, { color: colors.textSecondary }]}>
+            <Text
+              style={[
+                styles.helperText,
+                helperTextStyle,
+                { color: colors.textSecondary },
+              ]}
+            >
               {helperText}
             </Text>
           ) : (
@@ -327,6 +544,40 @@ export function AntPickerSection({
           )}
         </View>
       ) : null}
+    </>
+  );
+}
+
+export function AntPickerSection({
+  children,
+  description,
+  helperText,
+  title,
+}: {
+  children: React.ReactNode;
+  description?: string;
+  helperText?: React.ReactNode;
+  title?: string;
+}) {
+  const { colors } = useTheme();
+
+  return (
+    <AntSettingsCard contentStyle={styles.fullBleedCardContent}>
+      {title || description ? (
+        <View style={styles.pickerIntro}>
+          {title ? (
+            <Text style={[styles.fieldLabel, { color: colors.text }]}>
+              {title}
+            </Text>
+          ) : null}
+          {description ? (
+            <Text style={[styles.helperText, { color: colors.textSecondary }]}>
+              {description}
+            </Text>
+          ) : null}
+        </View>
+      ) : null}
+      <AntPickerRows helperText={helperText}>{children}</AntPickerRows>
     </AntSettingsCard>
   );
 }
@@ -356,10 +607,14 @@ export function AntSwitchRow({
           </Text>
         ) : null}
       </View>
-      <Switch
-        checked={value}
-        color={colors.accent}
-        onChange={onChange}
+      <NativeSwitch
+        value={value}
+        trackColor={{
+          false: colors.borderStrong,
+          true: colors.accent,
+        }}
+        ios_backgroundColor={colors.borderStrong}
+        onValueChange={onChange}
       />
     </View>
   );
@@ -395,6 +650,7 @@ export function AntTextArea({
         fontFamily: fonts.body,
         fontSize: 15,
         lineHeight: 21,
+        paddingHorizontal: 12,
       }}
       styles={{
         container: {

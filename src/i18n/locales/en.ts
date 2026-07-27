@@ -4,6 +4,7 @@ export const en: TranslationDictionary = {
   appName: "Mr Broccoli",
   retry: "Retry",
   dismiss: "Dismiss",
+  done: "Done",
   unavailable: "Unavailable",
   selection: "Selection",
   chooseCompatibleProviderFirst: "Choose a compatible provider first",
@@ -68,10 +69,13 @@ export const en: TranslationDictionary = {
     "Store external-service credentials on-device and configure the response modes you want to use.",
   webSearchTabDescription:
     "Configure optional live web context before replies.",
-  responseModes: "Response Modes",
-  responseModeItemTitle: ({ index }) => `Response mode ${index}`,
-  addResponseMode: "Add response mode",
-  removeResponseMode: "Remove response mode",
+  responseModes: "Model Selection",
+  aboutModelSelection: "About model selection",
+  modelSelectionInfo:
+    "Each model card becomes a choice on the home screen. Configure its provider, model, and optional effort level, then switch cards to choose which model answers next.",
+  responseModeItemTitle: ({ index }) => `Model ${index}`,
+  addResponseMode: "Add model",
+  removeResponseMode: "Remove model",
   responseModesNoConfiguredProviders:
     "Add credentials first. Route controls stay hidden until at least one compatible service is configured.",
   useResponseMode: ({ mode }) => `Use ${mode}`,
@@ -124,8 +128,11 @@ export const en: TranslationDictionary = {
   providerStatusWorking: "Working",
   providerStatusNotTested: "Not tested",
   providerStatusNotSetup: "Not set up",
+  expandProvider: ({ provider }) => `Expand ${provider}`,
+  collapseProvider: ({ provider }) => `Collapse ${provider}`,
   testProviderKey: "Test key",
   testAllCapabilities: "Test all",
+  apiTest: "API test",
   testProviderCapability: ({ capability }) => `Test ${capability}`,
   test: "Test",
   optional: "Optional",
@@ -144,6 +151,7 @@ export const en: TranslationDictionary = {
   hideKey: "Hide key",
   assistantInstructions: "Assistant Instructions",
   systemPrompt: "System Prompt",
+  aboutSystemPrompt: "About the system prompt",
   assistantInstructionsIntro:
     "Shape the hidden guidance the model receives before every reply.",
   baseInstructions: "Base Instructions",
@@ -352,6 +360,8 @@ export const en: TranslationDictionary = {
   listenLanguages: "Listen Languages",
   listenLanguagesHint:
     "Pick the reply languages you want to sound good. Mr Broccoli tries them in this order when routing speech output.",
+  listenLanguagesSelected: ({ count }) =>
+    count === 1 ? "1 language selected" : `${count} languages selected`,
   localVoicePacks: "Local Voice Packs",
   localVoicePacksHint:
     "Each language keeps its own local voice. Choose the voice you want for that language, then download only the packs you actually care about.",

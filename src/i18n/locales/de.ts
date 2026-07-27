@@ -4,6 +4,7 @@ export const de: TranslationDictionary = {
   appName: "Mr. Brokkoli",
   retry: "Noch mal",
   dismiss: "Schließen",
+  done: "Fertig",
   unavailable: "Gibt's nich",
   selection: "Auswahl",
   chooseCompatibleProviderFirst: "Wähle zuerst nen geeigneten Anbieter",
@@ -70,10 +71,13 @@ export const de: TranslationDictionary = {
     "Speichere Zugangsdaten für externe Dienste auf dem Gerät und konfiguriere die Antwortmodi, die du verwenden möchtest.",
   webSearchTabDescription:
     "Konfiguriere optionalen frischen Web-Kontext vor Antworten.",
-  responseModes: "Antwortmodi",
-  responseModeItemTitle: ({ index }) => `Antwortmodus ${index}`,
-  addResponseMode: "Antwortmodus hinzufügen",
-  removeResponseMode: "Antwortmodus entfernen",
+  responseModes: "Modellauswahl",
+  aboutModelSelection: "Über die Modellauswahl",
+  modelSelectionInfo:
+    "Jede Modellkarte wird zu einer Auswahl auf dem Startbildschirm. Lege Anbieter, Modell und optional den Denkaufwand fest und wechsle zwischen den Karten, um das Modell für die nächste Antwort zu wählen.",
+  responseModeItemTitle: ({ index }) => `Modell ${index}`,
+  addResponseMode: "Modell hinzufügen",
+  removeResponseMode: "Modell entfernen",
   responseModesNoConfiguredProviders:
     "Füge zuerst Zugangsdaten hinzu. Routen bleiben ausgeblendet, bis mindestens ein kompatibler Dienst konfiguriert ist.",
   useResponseMode: ({ mode }) => `${mode} verwenden`,
@@ -126,8 +130,11 @@ export const de: TranslationDictionary = {
   providerStatusWorking: "Funktioniert",
   providerStatusNotTested: "Nicht geprüft",
   providerStatusNotSetup: "Nicht eingerichtet",
+  expandProvider: ({ provider }) => `${provider} ausklappen`,
+  collapseProvider: ({ provider }) => `${provider} einklappen`,
   testProviderKey: "Key testen",
   testAllCapabilities: "Alle prüfen",
+  apiTest: "API-Test",
   testProviderCapability: ({ capability }) => `${capability} prüfen`,
   test: "Prüfen",
   optional: "Optional",
@@ -146,6 +153,7 @@ export const de: TranslationDictionary = {
   hideKey: "API-Key ausblenden",
   assistantInstructions: "Assistent-Anweisungen",
   systemPrompt: "Systemprompt",
+  aboutSystemPrompt: "Über den Systemprompt",
   assistantInstructionsIntro:
     "Forme die versteckte Anleitung, die das Modell vor jeder Antwort erhält.",
   baseInstructions: "Grundanweisungen",
@@ -358,6 +366,8 @@ export const de: TranslationDictionary = {
   listenLanguages: "Sprachen",
   listenLanguagesHint:
     "Wähle die Sprachen aus, die gut klingen sollen. Mr. Brokkoli probiert sie in dieser Reihenfolge für die Sprachausgabe.",
+  listenLanguagesSelected: ({ count }) =>
+    count === 1 ? "1 Sprache ausgewählt" : `${count} Sprachen ausgewählt`,
   localVoicePacks: "Lokale Sprachpakete",
   localVoicePacksHint:
     "Jede Sprache bringt eigene Stimmen mit. Wähle zuerst eine Stimme pro Sprache aus und lade dann die Pakete herunter, die du brauchst.",

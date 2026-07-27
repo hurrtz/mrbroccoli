@@ -3,7 +3,10 @@ import { StyleSheet, Text, View } from "react-native";
 
 import {
   Checkbox,
+  List,
+  Modal,
 } from "@ant-design/react-native";
+import Feather from "@expo/vector-icons/Feather";
 
 import {
   getTtsListenLanguageLabel,
@@ -47,6 +50,134 @@ import {
   AntTextArea,
 } from "../AntSettingsPrimitives";
 import { styles } from "../styles";
+
+function ListenLanguageSelector({
+  selectedLanguages,
+  onToggleLanguage,
+}: {
+  selectedLanguages: TtsListenLanguage[];
+  onToggleLanguage: (language: TtsListenLanguage) => void;
+}) {
+  const { colors } = useTheme();
+  const { language, t } = useLocalization();
+  const [visible, setVisible] = React.useState(false);
+
+  return (
+    <>
+      <AntSettingsCard contentStyle={styles.fullBleedCardContent}>
+        <View style={styles.pickerIntro}>
+          <Text style={[styles.fieldLabel, { color: colors.text }]}>
+            {t("listenLanguages")}
+          </Text>
+          <Text style={[styles.helperText, { color: colors.textSecondary }]}>
+            {t("listenLanguagesHint")}
+          </Text>
+        </View>
+        <List.Item
+          extra={
+            <View style={styles.pickerValueRow}>
+              <Text
+                style={[
+                  styles.pickerValue,
+                  { color: colors.textSecondary },
+                ]}
+              >
+                {t("listenLanguagesSelected", {
+                  count: selectedLanguages.length,
+                })}
+              </Text>
+              <Feather
+                name="chevron-down"
+                size={17}
+                color={colors.textMuted}
+              />
+            </View>
+          }
+          onPress={() => setVisible(true)}
+          accessibilityRole="button"
+          accessibilityLabel={t("listenLanguages")}
+          styles={{
+            Item: {
+              backgroundColor: colors.surfaceElevated,
+            },
+            Line: {
+              borderBottomWidth: 0,
+            },
+            Content: {
+              color: colors.text,
+              fontFamily: fonts.body,
+              fontSize: 15,
+            },
+            Extra: {
+              maxWidth: "68%",
+              paddingLeft: 8,
+            },
+          }}
+        >
+          {t("selection")}
+        </List.Item>
+      </AntSettingsCard>
+
+      <Modal
+        visible={visible}
+        transparent
+        maskClosable
+        title={t("listenLanguages")}
+        onClose={() => setVisible(false)}
+        footer={[
+          {
+            text: t("done"),
+            style: {
+              color: colors.accent,
+              fontFamily: fonts.bodyMedium,
+            },
+            onPress: () => setVisible(false),
+          },
+        ]}
+        styles={{
+          header: {
+            color: colors.text,
+            fontFamily: fonts.bodyMedium,
+          },
+          buttonText: {
+            fontFamily: fonts.bodyMedium,
+          },
+        }}
+      >
+        <View>
+          {TTS_LISTEN_LANGUAGE_OPTIONS.map((entry, index) => (
+            <Checkbox.CheckboxItem
+              key={entry}
+              checked={selectedLanguages.includes(entry)}
+              right
+              onPress={() => onToggleLanguage(entry)}
+              styles={{
+                Item: {
+                  backgroundColor: colors.surface,
+                  minHeight: 46,
+                },
+                Line: {
+                  borderBottomWidth:
+                    index === TTS_LISTEN_LANGUAGE_OPTIONS.length - 1
+                      ? 0
+                      : StyleSheet.hairlineWidth,
+                  borderBottomColor: colors.border,
+                },
+                Content: {
+                  color: colors.text,
+                  fontFamily: fonts.body,
+                  fontSize: 15,
+                },
+              }}
+            >
+              {getTtsListenLanguageLabel(entry, language)}
+            </Checkbox.CheckboxItem>
+          ))}
+        </View>
+      </Modal>
+    </>
+  );
+}
 
 export function SpeakingSettingsPage({
   settings,
@@ -118,7 +249,7 @@ export function SpeakingSettingsPage({
   onToggleListenLanguage: (language: TtsListenLanguage) => void;
 }) {
   const { colors } = useTheme();
-  const { language, t } = useLocalization();
+  const { t } = useLocalization();
   const ttsProviderOptions = buildProviderPickerOptions(
     selectableTtsProviders,
     settings.ttsProvider,
@@ -146,7 +277,6 @@ export function SpeakingSettingsPage({
     <View style={styles.pageStack}>
       <AntSectionIntro
         title={t("voiceOutput")}
-        description={t("voiceOutputDescription")}
       />
 
       <AntSettingsCard>
@@ -164,50 +294,10 @@ export function SpeakingSettingsPage({
         />
       </AntSettingsCard>
 
-      <AntSettingsCard>
-        <Text
-          accessibilityRole="header"
-          style={[styles.fieldLabel, { color: colors.text }]}
-        >
-          {t("listenLanguages")}
-        </Text>
-        <Text style={[styles.helperText, { color: colors.textSecondary }]}>
-          {t("listenLanguagesHint")}
-        </Text>
-        <View style={styles.languageList}>
-          {TTS_LISTEN_LANGUAGE_OPTIONS.map((entry, index) => {
-            const checked = settings.ttsListenLanguages.includes(entry);
-            return (
-              <Checkbox.CheckboxItem
-                key={entry}
-                checked={checked}
-                right
-                onPress={() => onToggleListenLanguage(entry)}
-                styles={{
-                  Item: {
-                    backgroundColor: colors.surfaceElevated,
-                    minHeight: 46,
-                  },
-                  Line: {
-                    borderBottomWidth:
-                      index === TTS_LISTEN_LANGUAGE_OPTIONS.length - 1
-                        ? 0
-                        : StyleSheet.hairlineWidth,
-                    borderBottomColor: colors.border,
-                  },
-                  Content: {
-                    color: colors.text,
-                    fontFamily: fonts.body,
-                    fontSize: 15,
-                  },
-                }}
-              >
-                {getTtsListenLanguageLabel(entry, language)}
-              </Checkbox.CheckboxItem>
-            );
-          })}
-        </View>
-      </AntSettingsCard>
+      <ListenLanguageSelector
+        selectedLanguages={settings.ttsListenLanguages}
+        onToggleLanguage={onToggleListenLanguage}
+      />
 
       <AntRadioSection<ReplyPlayback>
         label={t("replyPlayback")}
@@ -271,7 +361,7 @@ export function SpeakingSettingsPage({
               }
             />
             {selectedPreviewProvider &&
-            selectedPreviewProviderModelOptions.length > 1 ? (
+            selectedPreviewProviderModelOptions.length > 0 ? (
               <AntPickerRow
                 label={t("model")}
                 value={selectedPreviewProviderModel}

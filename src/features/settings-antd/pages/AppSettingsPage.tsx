@@ -278,7 +278,7 @@ export function AppSettingsPage({
         styles={{
           header: {
             color: colors.text,
-            fontFamily: fonts.headline,
+            fontFamily: fonts.bodyMedium,
           },
           buttonText: {
             fontFamily: fonts.bodyMedium,

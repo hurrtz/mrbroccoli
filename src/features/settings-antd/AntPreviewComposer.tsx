@@ -59,8 +59,9 @@ export function AntPreviewComposer({
         inputStyle={{
           color: colors.text,
           fontFamily: fonts.body,
-          fontSize: 14,
-          lineHeight: 20,
+          fontSize: 15,
+          lineHeight: 21,
+          paddingHorizontal: 12,
           textAlignVertical: "top",
         }}
         styles={{

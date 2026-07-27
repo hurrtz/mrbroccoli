@@ -14,6 +14,7 @@ export function AntIconButton({
   accessibilityLabel,
   active = false,
   icon,
+  iconNode,
   iconColor,
   iconSize = 20,
   onPress,
@@ -22,7 +23,8 @@ export function AntIconButton({
 }: {
   accessibilityLabel: string;
   active?: boolean;
-  icon: IconNames;
+  icon?: IconNames;
+  iconNode?: React.ReactNode;
   iconColor?: string;
   iconSize?: number;
   onPress: () => void;
@@ -48,14 +50,17 @@ export function AntIconButton({
       accessibilityLabel={accessibilityLabel}
       onPress={onPress}
     >
-      <Icon
-        name={icon}
-        size={iconSize}
-        color={
-          iconColor ??
-          (active ? colors.accent : colors.textSecondary)
-        }
-      />
+      {iconNode ??
+        (icon ? (
+          <Icon
+            name={icon}
+            size={iconSize}
+            color={
+              iconColor ??
+              (active ? colors.accent : colors.textSecondary)
+            }
+          />
+        ) : null)}
     </Button>
   );
 }
