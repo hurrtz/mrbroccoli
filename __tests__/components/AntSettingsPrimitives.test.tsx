@@ -7,6 +7,7 @@ import {
   AntPickerRow,
   AntPickerRows,
   AntRadioSection,
+  AntSwitchRow,
 } from "../../src/features/settings-antd/AntSettingsPrimitives";
 import { styles } from "../../src/features/settings-antd/styles";
 import { LocalizationProvider } from "../../src/i18n";
@@ -148,6 +149,22 @@ describe("AntRadioSection", () => {
       screen.getByText("Start speaking as sentences are ready."),
     ).toBeTruthy();
     expect(screen.getByText("Wait for the complete answer.")).toBeTruthy();
+  });
+});
+
+describe("AntSwitchRow", () => {
+  it("associates the visible label with the native switch", () => {
+    const screen = render(
+      <ThemeProvider mode="light">
+        <AntSwitchRow
+          label="Spoken Replies"
+          value
+          onChange={jest.fn()}
+        />
+      </ThemeProvider>,
+    );
+
+    expect(screen.getByLabelText("Spoken Replies").props.value).toBe(true);
   });
 });
 

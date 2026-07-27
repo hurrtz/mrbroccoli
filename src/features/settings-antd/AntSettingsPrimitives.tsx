@@ -640,6 +640,7 @@ export function AntSwitchRow({
         ) : null}
       </View>
       <NativeSwitch
+        accessibilityLabel={label}
         value={value}
         trackColor={{
           false: colors.borderStrong,
