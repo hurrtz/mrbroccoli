@@ -14,17 +14,11 @@ import {
 import {
   WEB_SEARCH_PROVIDER_IDS,
   createDefaultWebSearchProviderSettings,
-  isWebSearchMode,
-  isWebSearchProvider,
   normalizeWebSearchProviderSettings,
 } from "../../constants/webSearch";
 import { normalizeKokoroVoiceSelections } from "../../constants/kokoro";
 import { normalizeTtsFallbackPolicy } from "../../constants/ttsFallback";
 import {
-  type AppLanguage,
-  type AssistantResponseLength,
-  type AssistantResponseTone,
-  type InputMode,
   type Provider,
   type ProviderApiKeys,
   type ProviderCapability,
@@ -38,15 +32,8 @@ import {
   type ResponseMode,
   type ResponseModeRoute,
   type ResponseModeSelections,
-  type ReplyPlayback,
   type Settings,
-  type SttBackendMode,
-  type ThemeMode,
-  type TtsListenLanguage,
   DEFAULT_SETTINGS,
-  getDefaultAssistantInstructions,
-  getDefaultTtsListenLanguages,
-  isDefaultAssistantInstructions,
 } from "../../types";
 import {
   getDefaultModelForProvider,
@@ -65,102 +52,10 @@ import {
   type LegacyStoredSettings,
   type StoredProviderModels,
 } from "./types";
+import { normalizeStoredScalarSettings } from "./normalizeStoredScalars";
 
 function isProvider(value: unknown): value is Provider {
   return isRuntimeProviderId(value);
-}
-
-function validateStoredProvider(
-  value: unknown,
-  fallback: Provider | null,
-): Provider | null {
-  return isProvider(value) ? value : fallback;
-}
-
-function isAllowedValue<T extends string>(
-  value: unknown,
-  allowedValues: readonly T[],
-): value is T {
-  return (
-    typeof value === "string" && allowedValues.includes(value as T)
-  );
-}
-
-function getAllowedValue<T extends string>(
-  value: unknown,
-  allowedValues: readonly T[],
-  fallback: T,
-): T {
-  return isAllowedValue(value, allowedValues) ? value : fallback;
-}
-
-const APP_LANGUAGES = ["en", "de"] as const satisfies readonly AppLanguage[];
-const INPUT_MODES = [
-  "push-to-talk",
-  "toggle-to-talk",
-  "drive-session",
-] as const satisfies readonly InputMode[];
-const REPLY_PLAYBACK_OPTIONS = [
-  "stream",
-  "wait",
-] as const satisfies readonly ReplyPlayback[];
-const STT_MODES = [
-  "native",
-  "provider",
-] as const satisfies readonly SttBackendMode[];
-const THEME_MODES = [
-  "light",
-  "dark",
-  "system",
-] as const satisfies readonly ThemeMode[];
-const RESPONSE_LENGTHS = [
-  "brief",
-  "normal",
-  "thorough",
-] as const satisfies readonly AssistantResponseLength[];
-const RESPONSE_TONES = [
-  "professional",
-  "casual",
-  "nerdy",
-  "concise",
-  "socratic",
-  "eli5",
-] as const satisfies readonly AssistantResponseTone[];
-const TTS_LISTEN_LANGUAGES = [
-  "en",
-  "de",
-  "zh",
-  "es",
-  "pt",
-  "hi",
-  "fr",
-  "it",
-  "ja",
-] as const satisfies readonly TtsListenLanguage[];
-
-function getStoredBoolean(value: unknown, fallback: boolean) {
-  return typeof value === "boolean" ? value : fallback;
-}
-
-function getStoredTtsListenLanguages(
-  value: unknown,
-  language: AppLanguage,
-): TtsListenLanguage[] {
-  if (!Array.isArray(value)) {
-    return getDefaultTtsListenLanguages(language);
-  }
-
-  const languages = Array.from(
-    new Set(
-      value.filter((candidate): candidate is TtsListenLanguage =>
-        isAllowedValue(candidate, TTS_LISTEN_LANGUAGES),
-      ),
-    ),
-  );
-
-  return languages.length > 0
-    ? languages
-    : getDefaultTtsListenLanguages(language);
 }
 
 const LEGACY_PROVIDER_ALIASES: Record<string, Provider> = {
@@ -596,32 +491,6 @@ export function mergeSettings(
     rawStoredSettings,
     rawStoredApiKeys,
   );
-  const replyPlayback = getAllowedValue(
-    storedSettings?.replyPlayback ??
-      storedSettings?.ttsPlayback,
-    REPLY_PLAYBACK_OPTIONS,
-    DEFAULT_SETTINGS.replyPlayback,
-  );
-  const language = getAllowedValue(
-    storedSettings?.language,
-    APP_LANGUAGES,
-    DEFAULT_SETTINGS.language,
-  );
-  const ttsListenLanguages = getStoredTtsListenLanguages(
-    storedSettings?.ttsListenLanguages,
-    language,
-  );
-  const assistantInstructions =
-    typeof storedSettings?.assistantInstructions === "string" &&
-    storedSettings.assistantInstructions.trim()
-      ? isDefaultAssistantInstructions(storedSettings.assistantInstructions)
-        ? getDefaultAssistantInstructions(language)
-        : storedSettings.assistantInstructions
-      : getDefaultAssistantInstructions(language);
-  const ttsInstructions =
-    typeof storedSettings?.ttsInstructions === "string"
-      ? storedSettings.ttsInstructions
-      : DEFAULT_SETTINGS.ttsInstructions;
   const mergedApiKeys = {
     ...createRuntimeProviderStringRecord(
       "",
@@ -712,54 +581,13 @@ export function mergeSettings(
       DEFAULT_SETTINGS.activeResponseMode
     );
   })();
-  const spokenRepliesEnabled = getStoredBoolean(
-    storedSettings?.spokenRepliesEnabled,
-    DEFAULT_SETTINGS.spokenRepliesEnabled,
-  );
-  const inputMode = getAllowedValue(
-    storedSettings?.inputMode,
-    INPUT_MODES,
-    DEFAULT_SETTINGS.inputMode,
-  );
-  const sttMode = getAllowedValue(
-    storedSettings?.sttMode,
-    STT_MODES,
-    DEFAULT_SETTINGS.sttMode,
-  );
-  const theme = getAllowedValue(
-    storedSettings?.theme,
-    THEME_MODES,
-    DEFAULT_SETTINGS.theme,
-  );
-  const responseLength = getAllowedValue(
-    storedSettings?.responseLength,
-    RESPONSE_LENGTHS,
-    DEFAULT_SETTINGS.responseLength,
-  );
-  const responseTone = getAllowedValue(
-    storedSettings?.responseTone,
-    RESPONSE_TONES,
-    DEFAULT_SETTINGS.responseTone,
-  );
-  const lastProvider = validateStoredProvider(
-    storedSettings?.lastProvider,
-    DEFAULT_SETTINGS.lastProvider,
-  ) as Provider;
   const hasConfiguredKeys = Object.values(mergedApiKeys).some(
     (apiKey) => apiKey.trim().length > 0,
   );
-  const ttsMode: Settings["ttsMode"] =
-    storedSettings?.ttsMode === "provider"
-      ? "provider"
-      : storedSettings?.ttsMode === "kokoro" ||
-          storedSettings?.ttsMode === "local"
-        ? "kokoro"
-        : "native";
-  // "auto" was a legacy enabled state; coerce it to "on".
-  const rawWebSearchMode =
-    storedSettings?.webSearchMode === "auto"
-      ? "on"
-      : storedSettings?.webSearchMode;
+  const scalarSettings = normalizeStoredScalarSettings(
+    storedSettings,
+    hasConfiguredKeys,
+  );
   const sanitizedStoredSettings = storedSettings
     ? stripLegacySettingsFields(storedSettings)
     : storedSettings;
@@ -767,53 +595,7 @@ export function mergeSettings(
   return {
     ...DEFAULT_SETTINGS,
     ...sanitizedStoredSettings,
-    inputMode,
-    ttsMode,
-    language,
-    theme,
-    sttMode,
-    lastProvider,
-    responseLength,
-    responseTone,
-    replyPlayback,
-    spokenRepliesEnabled,
-    ttsListenLanguages,
-    setupGuideDismissed: getStoredBoolean(
-      storedSettings?.setupGuideDismissed,
-      hasConfiguredKeys,
-    ),
-    showSetupGuideShortcut: getStoredBoolean(
-      storedSettings?.showSetupGuideShortcut,
-      DEFAULT_SETTINGS.showSetupGuideShortcut,
-    ),
-    showUsageStats: getStoredBoolean(
-      storedSettings?.showUsageStats,
-      DEFAULT_SETTINGS.showUsageStats,
-    ),
-    showDebugLogButton: getStoredBoolean(
-      storedSettings?.showDebugLogButton,
-      DEFAULT_SETTINGS.showDebugLogButton,
-    ),
-    assistantInstructions,
-    ttsInstructions,
-    webSearchMode: isWebSearchMode(rawWebSearchMode)
-      ? rawWebSearchMode
-      : typeof storedSettings?.webSearchEnabled === "boolean"
-        ? storedSettings.webSearchEnabled
-          ? "on"
-          : "off"
-        : DEFAULT_SETTINGS.webSearchMode,
-    sttProvider: validateStoredProvider(
-      storedSettings?.sttProvider,
-      DEFAULT_SETTINGS.sttProvider,
-    ),
-    ttsProvider: validateStoredProvider(
-      storedSettings?.ttsProvider,
-      DEFAULT_SETTINGS.ttsProvider,
-    ),
-    webSearchProvider: isWebSearchProvider(storedSettings?.webSearchProvider)
-      ? storedSettings.webSearchProvider
-      : DEFAULT_SETTINGS.webSearchProvider,
+    ...scalarSettings,
     webSearchProviderSettings,
     activeResponseMode,
     responseModes:
