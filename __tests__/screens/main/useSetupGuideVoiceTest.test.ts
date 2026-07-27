@@ -84,6 +84,7 @@ describe("useSetupGuideVoiceTest", () => {
         stopRecording: jest.fn(async () => "file://voice.m4a"),
       } as any,
       nativeStt: {
+        ensurePermissions: jest.fn(async () => undefined),
         isRecording: false,
         startRecognition: jest.fn(async () => undefined),
         stopRecognition: jest.fn(async () => null),

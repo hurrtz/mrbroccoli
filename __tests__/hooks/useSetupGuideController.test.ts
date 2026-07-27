@@ -90,6 +90,7 @@ function createControllerParams() {
       stopRecording: jest.fn().mockResolvedValue(null),
     } as never,
     nativeStt: {
+      ensurePermissions: jest.fn().mockResolvedValue(undefined),
       isAvailable: true,
       isRecording: false,
       startRecognition: jest.fn().mockResolvedValue(undefined),

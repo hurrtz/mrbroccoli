@@ -33,6 +33,7 @@ function buildParams(overrides: Record<string, unknown> = {}) {
   const nativeStt = {
     abortRecognition: jest.fn(async () => undefined),
     clearLastError: jest.fn(),
+    ensurePermissions: jest.fn(async () => undefined),
     isAvailable: true,
     lastError: null,
     startRecognition: jest.fn(async () => undefined),
@@ -158,6 +159,75 @@ describe("useVoiceCaptureLifecycle auto-stop", () => {
     expect(params.nativeStt.stopRecognition).not.toHaveBeenCalled();
     expect(params.processCapturedVoiceTurn).not.toHaveBeenCalled();
     expect(params.onCaptureStopStarted).not.toHaveBeenCalled();
+  });
+
+  it("does not expose native permission preparation as an active capture", async () => {
+    let finishPermissionCheck: (() => void) | null = null;
+    const nativeStt = {
+      ...buildParams().nativeStt,
+      ensurePermissions: jest.fn(
+        () =>
+          new Promise<void>((resolve) => {
+            finishPermissionCheck = resolve;
+          }),
+      ),
+    };
+    const params = buildParams({
+      nativeStt,
+      sttMode: "native" as const,
+    });
+    const { result } = renderHook(() => useVoiceCaptureLifecycle(params));
+    let start: Promise<void> | null = null;
+
+    await act(async () => {
+      start = result.current.startVoiceCapture();
+      await Promise.resolve();
+    });
+
+    expect(result.current.hasActiveVoiceCaptureNow()).toBe(false);
+    expect(nativeStt.startRecognition).not.toHaveBeenCalled();
+
+    await act(async () => {
+      finishPermissionCheck?.();
+      await start;
+    });
+
+    expect(nativeStt.startRecognition).toHaveBeenCalledTimes(1);
+    expect(result.current.hasActiveVoiceCaptureNow()).toBe(true);
+  });
+
+  it("honors a manual stop requested during native permission preparation", async () => {
+    let finishPermissionCheck: (() => void) | null = null;
+    const nativeStt = {
+      ...buildParams().nativeStt,
+      ensurePermissions: jest.fn(
+        () =>
+          new Promise<void>((resolve) => {
+            finishPermissionCheck = resolve;
+          }),
+      ),
+    };
+    const params = buildParams({
+      nativeStt,
+      sttMode: "native" as const,
+    });
+    const { result } = renderHook(() => useVoiceCaptureLifecycle(params));
+    let start: Promise<void> | null = null;
+    let stop: Promise<void> | null = null;
+
+    await act(async () => {
+      start = result.current.startVoiceCapture();
+      await Promise.resolve();
+      stop = result.current.stopVoiceCapture();
+      finishPermissionCheck?.();
+      await Promise.all([start, stop]);
+    });
+
+    expect(nativeStt.startRecognition).toHaveBeenCalledTimes(1);
+    expect(nativeStt.stopRecognition).toHaveBeenCalledTimes(1);
+    expect(params.processCapturedVoiceTurn).toHaveBeenCalledWith({
+      transcriptionOverride: "hello",
+    });
   });
 
   it("cancels while the playback route is settling without starting capture", async () => {

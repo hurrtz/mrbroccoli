@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef } from "react";
+import { AppState } from "react-native";
 import { recordDebugLogEvent } from "../../../services/debugLogCapture";
 import { cleanupCapturedAudio } from "../../../services/voicePipeline/cleanup";
 
@@ -46,6 +47,7 @@ export function useVoiceCaptureLifecycle({
   sttMode,
   t,
 }: UseVoiceCaptureLifecycleParams) {
+  const capturePreparationRef = useRef<Promise<boolean> | null>(null);
   const recordingStartedRef = useRef<Promise<boolean> | null>(null);
   const captureActiveRef = useRef(false);
   const captureGenerationRef = useRef(0);
@@ -64,6 +66,19 @@ export function useVoiceCaptureLifecycle({
   }, []);
 
   const startVoiceCapture = useCallback(async () => {
+    const existingPreparation = capturePreparationRef.current;
+    if (existingPreparation) {
+      await existingPreparation;
+      return;
+    }
+    if (
+      recordingStartedRef.current ||
+      captureActiveRef.current ||
+      isRecording
+    ) {
+      return;
+    }
+
     const captureGeneration = captureGenerationRef.current + 1;
     captureGenerationRef.current = captureGeneration;
     recordDebugLogEvent({
@@ -72,6 +87,36 @@ export function useVoiceCaptureLifecycle({
         sttMode,
       },
     });
+
+    if (sttMode === "native") {
+      const preparationPromise = (async () => {
+        await nativeStt.ensurePermissions();
+        return captureGenerationRef.current === captureGeneration;
+      })();
+      capturePreparationRef.current = preparationPromise;
+
+      try {
+        const prepared = await preparationPromise;
+        const currentAppState = AppState.currentState;
+        const appIsKnownInactive =
+          typeof currentAppState === "string" &&
+          currentAppState !== "active";
+        if (!prepared || appIsKnownInactive) {
+          recordDebugLogEvent({
+            event: "voice-capture-start-superseded",
+            payload: {
+              reason: prepared ? "app-not-active" : "preparation-cancelled",
+              sttMode,
+            },
+          });
+          return;
+        }
+      } finally {
+        if (capturePreparationRef.current === preparationPromise) {
+          capturePreparationRef.current = null;
+        }
+      }
+    }
 
     const startPromise = (async () => {
       await player.waitForPlaybackRouteSettle();
@@ -135,6 +180,7 @@ export function useVoiceCaptureLifecycle({
     }
   }, [
     clearMaxDurationTimer,
+    isRecording,
     maxRecordingMs,
     nativeStt,
     player,
@@ -156,6 +202,22 @@ export function useVoiceCaptureLifecycle({
         sttMode,
       },
     });
+
+    const preparationPromise = capturePreparationRef.current;
+
+    if (preparationPromise) {
+      try {
+        const prepared = await preparationPromise;
+        if (!prepared) {
+          return;
+        }
+        // Let startVoiceCapture publish the recorder-start promise before a
+        // press-out stop tries to consume it.
+        await Promise.resolve();
+      } catch {
+        return;
+      }
+    }
 
     const startPromise = recordingStartedRef.current;
 
@@ -325,8 +387,10 @@ export function useVoiceCaptureLifecycle({
       return cancelInFlightRef.current;
     }
 
+    const preparationPromise = capturePreparationRef.current;
     const startPromise = recordingStartedRef.current;
     const shouldCancel =
+      Boolean(preparationPromise) ||
       Boolean(startPromise) ||
       captureActiveRef.current ||
       isRecording ||
@@ -345,6 +409,15 @@ export function useVoiceCaptureLifecycle({
           sttMode,
         },
       });
+
+      if (preparationPromise) {
+        try {
+          await preparationPromise;
+        } catch {
+          captureActiveRef.current = false;
+          return;
+        }
+      }
 
       if (startPromise) {
         try {

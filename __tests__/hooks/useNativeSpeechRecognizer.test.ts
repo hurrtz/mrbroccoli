@@ -26,6 +26,7 @@ function emitNativeWaveformEvent(event: any) {
 jest.mock("expo-speech-recognition", () => ({
   ExpoSpeechRecognitionModule: {
     addListener: jest.fn(),
+    getPermissionsAsync: jest.fn(),
     isRecognitionAvailable: jest.fn(),
     requestPermissionsAsync: jest.fn(),
     start: jest.fn(),
@@ -68,6 +69,9 @@ describe("useNativeSpeechRecognizer", () => {
     (ExpoSpeechRecognitionModule.isRecognitionAvailable as jest.Mock).mockReturnValue(
       true,
     );
+    (ExpoSpeechRecognitionModule.getPermissionsAsync as jest.Mock).mockResolvedValue(
+      { granted: true },
+    );
     (ExpoSpeechRecognitionModule.requestPermissionsAsync as jest.Mock).mockResolvedValue(
       { granted: true },
     );
@@ -105,12 +109,35 @@ describe("useNativeSpeechRecognizer", () => {
       await result.current.startRecognition();
     });
 
-    expect(ExpoSpeechRecognitionModule.requestPermissionsAsync).toHaveBeenCalled();
+    expect(ExpoSpeechRecognitionModule.getPermissionsAsync).toHaveBeenCalled();
+    expect(
+      ExpoSpeechRecognitionModule.requestPermissionsAsync,
+    ).not.toHaveBeenCalled();
     expect(startNativeWaveformRecording).toHaveBeenCalledWith(
       expect.objectContaining({
         sessionId: expect.stringMatching(/^native-stt-/),
       }),
     );
+    expect(result.current.isRecording).toBe(true);
+  });
+
+  it("requests speech permission only when it is not already granted", async () => {
+    (
+      ExpoSpeechRecognitionModule.getPermissionsAsync as jest.Mock
+    ).mockResolvedValue({ granted: false });
+
+    const { result } = renderHook(() => useNativeSpeechRecognizer(), {
+      wrapper,
+    });
+
+    await act(async () => {
+      await result.current.startRecognition();
+    });
+
+    expect(
+      ExpoSpeechRecognitionModule.requestPermissionsAsync,
+    ).toHaveBeenCalledTimes(1);
+    expect(startNativeWaveformRecording).toHaveBeenCalledTimes(1);
     expect(result.current.isRecording).toBe(true);
   });
 

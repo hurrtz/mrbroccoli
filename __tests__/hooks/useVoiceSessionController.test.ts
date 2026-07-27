@@ -40,6 +40,7 @@ describe("useVoiceSessionController", () => {
       nativeStt: {
         abortRecognition: jest.fn(async () => undefined),
         clearLastError: jest.fn(),
+        ensurePermissions: jest.fn(async () => undefined),
         isAvailable: true,
         lastError: null,
         startRecognition: jest.fn(async () => undefined),

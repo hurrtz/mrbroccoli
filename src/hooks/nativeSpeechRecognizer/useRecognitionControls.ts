@@ -43,20 +43,30 @@ export function useRecognitionControls({
     stopResolverRef,
   } = session;
 
+  const ensurePermissions = useCallback(async () => {
+    if (!ExpoSpeechRecognitionModule.isRecognitionAvailable()) {
+      throw new Error(t("speechRecognitionUnavailableOnDevice"));
+    }
+
+    let permissions =
+      await ExpoSpeechRecognitionModule.getPermissionsAsync();
+
+    if (!permissions.granted) {
+      permissions =
+        await ExpoSpeechRecognitionModule.requestPermissionsAsync();
+    }
+
+    if (!permissions.granted) {
+      throw new Error(t("speechRecognitionPermissionNotGranted"));
+    }
+  }, [t]);
+
   const startRecognition = useCallback(async () => {
     if (isRecordingRef.current) {
       return;
     }
 
-    if (!ExpoSpeechRecognitionModule.isRecognitionAvailable()) {
-      throw new Error(t("speechRecognitionUnavailableOnDevice"));
-    }
-
-    const permissions = await ExpoSpeechRecognitionModule.requestPermissionsAsync();
-
-    if (!permissions.granted) {
-      throw new Error(t("speechRecognitionPermissionNotGranted"));
-    }
+    await ensurePermissions();
 
     setLastError(null);
     latestTranscriptRef.current = "";
@@ -109,6 +119,7 @@ export function useRecognitionControls({
     }
   }, [
     clearPendingResolution,
+    ensurePermissions,
     finalTranscriptRef,
     isRecordingRef,
     latestTranscriptRef,
@@ -227,6 +238,7 @@ export function useRecognitionControls({
   ]);
 
   return {
+    ensurePermissions,
     startRecognition,
     abortRecognition,
     stopRecognition,

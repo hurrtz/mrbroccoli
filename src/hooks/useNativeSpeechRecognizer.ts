@@ -28,7 +28,12 @@ export function useNativeSpeechRecognizer() {
     usingNativeRecorder,
   });
 
-  const { startRecognition, stopRecognition, abortRecognition } =
+  const {
+    ensurePermissions,
+    startRecognition,
+    stopRecognition,
+    abortRecognition,
+  } =
     useRecognitionControls({
       session,
       t,
@@ -39,6 +44,7 @@ export function useNativeSpeechRecognizer() {
     isAvailable: ExpoSpeechRecognitionModule.isRecognitionAvailable(),
     isRecording: session.isRecording,
     lastError: session.lastError,
+    ensurePermissions,
     startRecognition,
     stopRecognition,
     abortRecognition,

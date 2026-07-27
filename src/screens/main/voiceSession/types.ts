@@ -29,6 +29,7 @@ export interface AudioRecorderController {
 export interface NativeSpeechRecognizerController {
   abortRecognition: () => Promise<void>;
   clearLastError: () => void;
+  ensurePermissions: () => Promise<void>;
   isAvailable: boolean;
   lastError: string | null;
   startRecognition: () => Promise<void>;
