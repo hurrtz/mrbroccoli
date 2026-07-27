@@ -190,48 +190,31 @@ export function createLatencyRouteKeys(descriptor: LatencyRouteDescriptor) {
   return [exactKey, familyKey];
 }
 
-export function getDefaultLatencyEstimateMs(
-  descriptor: LatencyRouteDescriptor,
-) {
-  if (descriptor.phase === "stt-transcription") {
-    return descriptor.sttMode === "provider" ? 4_000 : 2_000;
+const EFFORT_ESTIMATE_MS: Record<string, number> = {
+  low: 6_000,
+  medium: 9_000,
+  high: 14_000,
+  xhigh: 20_000,
+  max: 24_000,
+};
+
+function getTtsSynthesisEstimateMs(descriptor: LatencyRouteDescriptor) {
+  if (descriptor.ttsMode === "kokoro") {
+    return descriptor.replyPlayback === "wait" ? 5_000 : 2_500;
   }
 
-  if (descriptor.phase === "request-preparation") {
-    return 2_000;
+  if (descriptor.ttsMode !== "provider") {
+    return 1_500;
   }
 
-  if (descriptor.phase === "web-search") {
-    return 6_000;
-  }
+  return descriptor.replyPlayback === "wait" ? 6_000 : 3_500;
+}
 
-  if (descriptor.phase === "tts-synthesis") {
-    if (descriptor.ttsMode === "kokoro") {
-      return descriptor.replyPlayback === "wait" ? 5_000 : 2_500;
-    }
-
-    if (descriptor.ttsMode !== "provider") {
-      return 1_500;
-    }
-
-    return descriptor.replyPlayback === "wait" ? 6_000 : 3_500;
-  }
-
+function getLlmResponseEstimateMs(descriptor: LatencyRouteDescriptor) {
   const effort = normalizeKeyPart(descriptor.effort);
   const model = normalizeKeyPart(descriptor.model);
   const provider = normalizeKeyPart(descriptor.provider);
-  let estimateMs =
-    effort === "max"
-      ? 24_000
-      : effort === "xhigh"
-        ? 20_000
-        : effort === "high"
-          ? 14_000
-          : effort === "medium"
-            ? 9_000
-            : effort === "low"
-              ? 6_000
-              : 8_000;
+  let estimateMs = EFFORT_ESTIMATE_MS[effort] ?? 8_000;
 
   // xAI's current chat-completions routes usually reach a complete first
   // sentence quickly even with high reasoning effort. Keep cold-start UI
@@ -259,78 +242,108 @@ export function getDefaultLatencyEstimateMs(
     estimateMs += 4_000;
   }
 
+  return estimateMs;
+}
+
+function getInputEstimateMs(descriptor: LatencyRouteDescriptor) {
+  if (descriptor.inputSource !== "voice") {
+    return 0;
+  }
+
+  return descriptor.sttMode === "provider" ? 4_000 : 2_000;
+}
+
+function getFirstSpeechEstimateMs(descriptor: LatencyRouteDescriptor) {
+  if (!descriptor.spokenRepliesEnabled) {
+    return 0;
+  }
+
+  if (descriptor.ttsMode === "provider") {
+    if (descriptor.replyPlayback !== "wait") {
+      return descriptor.ttsProvider === "xai" ? 2_500 : 3_500;
+    }
+
+    return descriptor.responseLength === "thorough"
+      ? 9_000
+      : descriptor.responseLength === "brief"
+        ? 3_500
+        : 6_500;
+  }
+
+  if (descriptor.ttsMode === "kokoro") {
+    return descriptor.replyPlayback === "wait" ? 5_000 : 2_500;
+  }
+
+  return descriptor.replyPlayback === "wait" ? 2_500 : 1_000;
+}
+
+function getCompletionSpeechEstimateMs(descriptor: LatencyRouteDescriptor) {
+  if (!descriptor.spokenRepliesEnabled) {
+    return 0;
+  }
+
+  const playbackMs =
+    descriptor.responseLength === "thorough"
+      ? 45_000
+      : descriptor.responseLength === "brief"
+        ? 7_000
+        : 20_000;
+  const synthesisMs =
+    descriptor.ttsMode === "provider"
+      ? descriptor.replyPlayback === "wait"
+        ? 6_000
+        : descriptor.ttsProvider === "xai"
+          ? 2_500
+          : 3_500
+      : descriptor.ttsMode === "kokoro"
+        ? descriptor.replyPlayback === "wait"
+          ? 5_000
+          : 2_500
+        : descriptor.replyPlayback === "wait"
+          ? 2_500
+          : 1_000;
+
+  // Streamed speech overlaps with response generation. Only the residual
+  // playback tail belongs on top of the full-response estimate; wait mode
+  // begins playback after generation and therefore adds the full duration.
+  return (
+    synthesisMs +
+    (descriptor.replyPlayback === "wait"
+      ? playbackMs
+      : Math.round(playbackMs * 0.65))
+  );
+}
+
+export function getDefaultLatencyEstimateMs(
+  descriptor: LatencyRouteDescriptor,
+) {
+  if (descriptor.phase === "stt-transcription") {
+    return descriptor.sttMode === "provider" ? 4_000 : 2_000;
+  }
+
+  if (descriptor.phase === "request-preparation") {
+    return 2_000;
+  }
+
+  if (descriptor.phase === "web-search") {
+    return 6_000;
+  }
+
+  if (descriptor.phase === "tts-synthesis") {
+    return getTtsSynthesisEstimateMs(descriptor);
+  }
+
+  let estimateMs = getLlmResponseEstimateMs(descriptor);
+
   if (descriptor.phase === "llm-response") {
     return Math.max(4_000, estimateMs);
   }
 
-  if (descriptor.inputSource === "voice") {
-    estimateMs += descriptor.sttMode === "provider" ? 4_000 : 2_000;
-  }
-
-  if (
-    descriptor.spokenRepliesEnabled &&
+  estimateMs += getInputEstimateMs(descriptor);
+  estimateMs +=
     descriptor.phase === "turn-to-first-speech"
-  ) {
-    if (descriptor.ttsMode === "provider") {
-      const streamingSpeechMs =
-        descriptor.ttsProvider === "xai"
-          ? 2_500
-          : descriptor.ttsProvider === "gemini"
-            ? 3_500
-            : 3_500;
-
-      if (descriptor.replyPlayback === "wait") {
-        const fullReplySpeechMs =
-          descriptor.responseLength === "thorough"
-            ? 9_000
-            : descriptor.responseLength === "brief"
-              ? 3_500
-              : 6_500;
-        estimateMs += fullReplySpeechMs;
-      } else {
-        estimateMs += streamingSpeechMs;
-      }
-    } else if (descriptor.ttsMode === "kokoro") {
-      estimateMs += descriptor.replyPlayback === "wait" ? 5_000 : 2_500;
-    } else {
-      estimateMs += descriptor.replyPlayback === "wait" ? 2_500 : 1_000;
-    }
-  }
-
-  if (
-    descriptor.spokenRepliesEnabled &&
-    descriptor.phase === "turn-to-completion"
-  ) {
-    const playbackMs =
-      descriptor.responseLength === "thorough"
-        ? 45_000
-        : descriptor.responseLength === "brief"
-          ? 7_000
-          : 20_000;
-    const synthesisMs =
-      descriptor.ttsMode === "provider"
-        ? descriptor.replyPlayback === "wait"
-          ? 6_000
-          : descriptor.ttsProvider === "xai"
-            ? 2_500
-            : 3_500
-        : descriptor.ttsMode === "kokoro"
-          ? descriptor.replyPlayback === "wait"
-            ? 5_000
-            : 2_500
-          : descriptor.replyPlayback === "wait"
-            ? 2_500
-            : 1_000;
-
-    // Streamed speech overlaps with response generation. Only the residual
-    // playback tail belongs on top of the full-response estimate; wait mode
-    // begins playback after generation and therefore adds the full duration.
-    estimateMs +=
-      synthesisMs +
-      (descriptor.replyPlayback === "wait"
-        ? playbackMs
-        : Math.round(playbackMs * 0.65));
-  }
+      ? getFirstSpeechEstimateMs(descriptor)
+      : getCompletionSpeechEstimateMs(descriptor);
 
   return Math.max(5_000, estimateMs);
 }
