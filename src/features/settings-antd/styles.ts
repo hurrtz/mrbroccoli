@@ -3,6 +3,10 @@ import { StyleSheet } from "react-native";
 import { fonts, textStyles } from "../../theme/typography";
 
 export const styles = StyleSheet.create({
+  pressedControl: {
+    opacity: 0.68,
+    transform: [{ scale: 0.985 }],
+  },
   overlay: {
     ...StyleSheet.absoluteFillObject,
     flex: 1,

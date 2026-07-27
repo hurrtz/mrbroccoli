@@ -345,7 +345,10 @@ export function ProviderConnectionPanel({
           }}
           suffix={
             <Pressable
-              style={styles.inputSuffix}
+              style={({ pressed }) => [
+                styles.inputSuffix,
+                pressed ? styles.pressedControl : null,
+              ]}
               onPress={onToggleApiKeyVisibility}
               accessibilityRole="button"
               accessibilityLabel={secureApiKey ? t("showKey") : t("hideKey")}

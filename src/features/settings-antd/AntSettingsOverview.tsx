@@ -124,6 +124,9 @@ export function AntSettingsOverview({
           onPress={onOpenSetupGuide}
           accessibilityRole="button"
           accessibilityLabel={t("settingsGuidedSetup")}
+          style={({ pressed }) =>
+            pressed ? styles.pressedControl : undefined
+          }
         >
           <AntSettingsCard
             style={[
@@ -176,7 +179,10 @@ export function AntSettingsOverview({
           return (
             <Pressable
               key={item.key}
-              style={styles.readinessStep}
+              style={({ pressed }) => [
+                styles.readinessStep,
+                pressed ? styles.pressedControl : null,
+              ]}
               onPress={item.onPress}
               accessibilityRole="button"
               accessibilityLabel={`${item.label}: ${t(

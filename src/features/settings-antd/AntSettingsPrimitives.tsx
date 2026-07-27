@@ -155,7 +155,10 @@ export function AntDisclosureCard({
         <Pressable
           accessibilityRole="button"
           accessibilityState={{ expanded }}
-          style={styles.disclosureHeader}
+          style={({ pressed }) => [
+            styles.disclosureHeader,
+            pressed ? styles.pressedControl : null,
+          ]}
           onPress={onToggle}
         >
           <View style={styles.disclosureHeaderContent}>{header}</View>
@@ -170,7 +173,10 @@ export function AntDisclosureCard({
             accessibilityState={{ expanded }}
             hitSlop={8}
             onPress={onToggle}
-            style={styles.disclosureToggle}
+            style={({ pressed }) => [
+              styles.disclosureToggle,
+              pressed ? styles.pressedControl : null,
+            ]}
           >
             <Feather
               name={expanded ? "chevron-up" : "chevron-down"}

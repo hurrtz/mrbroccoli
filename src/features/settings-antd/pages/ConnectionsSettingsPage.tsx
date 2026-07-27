@@ -222,7 +222,10 @@ export function ConnectionsSettingsPage({
               headerExtra={
                 <View style={styles.providerHeaderActions}>
                   <Pressable
-                    style={styles.providerHeaderAction}
+                    style={({ pressed }) => [
+                      styles.providerHeaderAction,
+                      pressed ? styles.pressedControl : null,
+                    ]}
                     onPress={() => {
                       void Linking.openURL(PROVIDER_API_KEY_URLS[provider]);
                     }}
@@ -240,7 +243,10 @@ export function ConnectionsSettingsPage({
                     />
                   </Pressable>
                   <Pressable
-                    style={styles.providerHeaderAction}
+                    style={({ pressed }) => [
+                      styles.providerHeaderAction,
+                      pressed ? styles.pressedControl : null,
+                    ]}
                     onPress={() => setAboutProvider(provider)}
                     accessibilityRole="button"
                     accessibilityLabel={`${t("aboutThisProvider")}: ${
