@@ -83,6 +83,46 @@ describe("useSettings", () => {
     );
   });
 
+  it("sanitizes invalid persisted scalar settings and listen languages", async () => {
+    const invalidStored: Record<string, unknown> = {
+      ...DEFAULT_SETTINGS,
+      inputMode: "unknown-input",
+      replyPlayback: "unknown-playback",
+      language: "unknown-language",
+      theme: "unknown-theme",
+      sttMode: "unknown-stt",
+      lastProvider: "unknown-provider",
+      responseLength: "unknown-length",
+      responseTone: "unknown-tone",
+      spokenRepliesEnabled: "yes",
+      showUsageStats: 1,
+      showDebugLogButton: "true",
+      ttsListenLanguages: ["fr", "unknown-language", "fr"],
+    };
+
+    (AsyncStorage.getItem as jest.Mock).mockResolvedValueOnce(
+      JSON.stringify(invalidStored),
+    );
+
+    const { result } = renderHook(() => useSettings());
+    await flushSettingsLoad();
+
+    expect(result.current.settings).toMatchObject({
+      inputMode: DEFAULT_SETTINGS.inputMode,
+      replyPlayback: DEFAULT_SETTINGS.replyPlayback,
+      language: DEFAULT_SETTINGS.language,
+      theme: DEFAULT_SETTINGS.theme,
+      sttMode: DEFAULT_SETTINGS.sttMode,
+      lastProvider: DEFAULT_SETTINGS.lastProvider,
+      responseLength: DEFAULT_SETTINGS.responseLength,
+      responseTone: DEFAULT_SETTINGS.responseTone,
+      spokenRepliesEnabled: DEFAULT_SETTINGS.spokenRepliesEnabled,
+      showUsageStats: DEFAULT_SETTINGS.showUsageStats,
+      showDebugLogButton: DEFAULT_SETTINGS.showDebugLogButton,
+      ttsListenLanguages: ["fr"],
+    });
+  });
+
   it("loads saved settings from AsyncStorage", async () => {
     const saved = { ...DEFAULT_SETTINGS, lastProvider: "anthropic" as const };
     delete (saved as Partial<typeof saved>).setupGuideDismissed;
