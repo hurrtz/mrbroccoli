@@ -28,12 +28,7 @@ jest.mock("react-native-gesture-handler", () => ({
   }) => {
     const React = require("react");
     const { View } = require("react-native");
-    return React.createElement(
-      View,
-      null,
-      children,
-      renderRightActions?.(),
-    );
+    return React.createElement(View, null, children, renderRightActions?.());
   },
 }));
 
@@ -116,6 +111,33 @@ describe("ConversationDrawer", () => {
     expect(screen.getByText("Conversations")).toBeTruthy();
     expect(screen.getByText("Morning briefing")).toBeTruthy();
     expect(screen.getByText("Travel planning")).toBeTruthy();
+    expect(
+      screen.getByLabelText("Morning briefing").props.accessibilityState,
+    ).toEqual({ selected: true });
+    expect(screen.getAllByLabelText("Conversation actions")).toHaveLength(2);
+  });
+
+  it("exposes every conversation action as a labeled button", async () => {
+    const screen = renderConversationDrawer();
+
+    fireEvent.press(screen.getByTestId("conversation-drawer-menu-one"));
+
+    await waitFor(() => {
+      for (const label of [
+        "Pin",
+        "Rename",
+        "Memory",
+        "Share",
+        "Copy",
+        "Delete",
+      ]) {
+        expect(
+          screen
+            .getAllByLabelText(label)
+            .every((control) => control.props.accessibilityRole === "button"),
+        ).toBe(true);
+      }
+    });
   });
 
   it("filters conversations through async search", async () => {

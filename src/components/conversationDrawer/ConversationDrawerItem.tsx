@@ -75,6 +75,8 @@ export function ConversationDrawerItem({
         ]}
         onPress={() => onOpenActionConversation(conversation.id)}
         activeOpacity={0.88}
+        accessibilityRole="button"
+        accessibilityLabel={t("conversationActions")}
       >
         <Feather
           name="more-horizontal"
@@ -87,6 +89,9 @@ export function ConversationDrawerItem({
         style={styles.itemPressArea}
         onPress={() => onSelectConversation(conversation.id)}
         activeOpacity={0.9}
+        accessibilityRole="button"
+        accessibilityLabel={conversation.title}
+        accessibilityState={{ selected: active }}
       >
         <View style={styles.itemHeader}>
           <View style={styles.itemTitleRow}>
@@ -140,7 +145,12 @@ export function ConversationDrawerItem({
             >
               {formatDateTime(conversation.updatedAt)}
             </Text>
-            <View style={[styles.itemFooterDot, { backgroundColor: colors.borderStrong }]} />
+            <View
+              style={[
+                styles.itemFooterDot,
+                { backgroundColor: colors.borderStrong },
+              ]}
+            />
             <View style={styles.itemFooterMessages}>
               <Feather
                 name="message-square"

@@ -40,9 +40,13 @@ export function ConversationActionSheet({
   return (
     <View style={styles.inlineActionOverlay} pointerEvents="box-none">
       <TouchableOpacity
-        style={[styles.inlineActionBackdrop, { backgroundColor: colors.overlay }]}
+        style={[
+          styles.inlineActionBackdrop,
+          { backgroundColor: colors.overlay },
+        ]}
         activeOpacity={1}
         onPress={onClose}
+        accessible={false}
       />
       <View
         style={[
@@ -57,9 +61,7 @@ export function ConversationActionSheet({
         <Text style={[styles.actionSheetTitle, { color: colors.text }]}>
           {conversation.title}
         </Text>
-        <Text
-          style={[styles.actionSheetMeta, { color: colors.textSecondary }]}
-        >
+        <Text style={[styles.actionSheetMeta, { color: colors.textSecondary }]}>
           {t("messageCount", {
             count: conversation.messageCount ?? 0,
           })}
@@ -79,6 +81,8 @@ export function ConversationActionSheet({
             onClose();
           }}
           activeOpacity={0.88}
+          accessibilityRole="button"
+          accessibilityLabel={conversation.pinned ? t("unpin") : t("pin")}
         >
           <Feather name="bookmark" size={16} color={colors.textSecondary} />
           <Text
@@ -99,6 +103,8 @@ export function ConversationActionSheet({
           ]}
           onPress={() => onOpenRenameModal(conversation)}
           activeOpacity={0.88}
+          accessibilityRole="button"
+          accessibilityLabel={t("rename")}
         >
           <Feather name="edit-3" size={16} color={colors.textSecondary} />
           <Text
@@ -121,6 +127,8 @@ export function ConversationActionSheet({
             onClose();
           }}
           activeOpacity={0.88}
+          accessibilityRole="button"
+          accessibilityLabel={t("memory")}
         >
           <Feather name="archive" size={16} color={colors.textSecondary} />
           <Text
@@ -143,6 +151,8 @@ export function ConversationActionSheet({
             onClose();
           }}
           activeOpacity={0.88}
+          accessibilityRole="button"
+          accessibilityLabel={t("share")}
         >
           <Feather name="share" size={16} color={colors.textSecondary} />
           <Text
@@ -165,6 +175,8 @@ export function ConversationActionSheet({
             onClose();
           }}
           activeOpacity={0.88}
+          accessibilityRole="button"
+          accessibilityLabel={t("copy")}
         >
           <Feather name="copy" size={16} color={colors.textSecondary} />
           <Text
@@ -189,6 +201,8 @@ export function ConversationActionSheet({
             onClose();
           }}
           activeOpacity={0.88}
+          accessibilityRole="button"
+          accessibilityLabel={t("delete")}
         >
           <Feather name="trash-2" size={16} color={colors.danger} />
           <Text style={[styles.actionSheetRowText, { color: colors.danger }]}>

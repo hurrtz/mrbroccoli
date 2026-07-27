@@ -31,9 +31,13 @@ export function ConversationRenameModal({
   return (
     <View style={styles.inlineRenameOverlay} pointerEvents="box-none">
       <TouchableOpacity
-        style={[styles.inlineRenameBackdrop, { backgroundColor: colors.overlay }]}
+        style={[
+          styles.inlineRenameBackdrop,
+          { backgroundColor: colors.overlay },
+        ]}
         activeOpacity={1}
         onPress={onClose}
+        accessible={false}
       />
       <View
         style={[
@@ -82,6 +86,8 @@ export function ConversationRenameModal({
             ]}
             onPress={onClose}
             activeOpacity={0.88}
+            accessibilityRole="button"
+            accessibilityLabel={t("cancel")}
           >
             <Text
               style={[styles.renameActionText, { color: colors.textSecondary }]}
@@ -102,6 +108,9 @@ export function ConversationRenameModal({
             onPress={onSubmit}
             activeOpacity={0.88}
             disabled={!editingTitle.trim()}
+            accessibilityRole="button"
+            accessibilityLabel={t("save")}
+            accessibilityState={{ disabled: !editingTitle.trim() }}
           >
             <Text style={[styles.renameActionText, { color: colors.accent }]}>
               {t("save")}
