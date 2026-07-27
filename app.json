@@ -3,7 +3,7 @@
     "name": "Mr Broccoli",
     "slug": "mrbroccoli",
     "scheme": "mrbroccoli",
-    "icon": "./assets/appIcon.png",
+    "icon": "./assets/appIcon/ios.png",
     "version": "2.4.0",
     "platforms": [
       "ios",
@@ -14,14 +14,15 @@
       "expo-font"
     ],
     "ios": {
-      "icon": "./assets/appIcon.png",
+      "icon": "./assets/appIcon/ios.png",
       "bundleIdentifier": "com.tobiaswinkler.app.mrbroccoli"
     },
     "android": {
-      "icon": "./assets/appIcon.png",
+      "icon": "./assets/appIcon/ios.png",
       "adaptiveIcon": {
-        "foregroundImage": "./assets/appIcon.png",
-        "backgroundColor": "#202438"
+        "foregroundImage": "./assets/appIcon/android_foreground.png",
+        "backgroundImage": "./assets/appIcon/android_background.png",
+        "monochromeImage": "./assets/appIcon/android_monochrome.png"
       },
       "package": "com.tobiaswinkler.app.mrbroccoli"
     },

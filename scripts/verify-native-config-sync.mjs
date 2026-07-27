@@ -15,12 +15,11 @@ const androidManifest = readText(
 const androidStrings = readText(
   "android/app/src/main/res/values/strings.xml",
 );
-const androidColors = readText("android/app/src/main/res/values/colors.xml");
 const androidAdaptiveIcon = readText(
   "android/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml",
 );
-const iosAppIconContents = readText(
-  "ios/MrBroccoli/Images.xcassets/AppIcon.appiconset/Contents.json",
+const iosAppIconContents = JSON.parse(
+  readText("ios/MrBroccoli/Images.xcassets/AppIcon.appiconset/Contents.json"),
 );
 
 const failures = [];
@@ -51,7 +50,13 @@ const androidPackage = appConfig.android?.package;
 const scheme = appConfig.scheme;
 const iconPath = appConfig.icon?.replace(/^\.\//, "");
 const iosIconPath = appConfig.ios?.icon?.replace(/^\.\//, "");
-const adaptiveBackground = appConfig.android?.adaptiveIcon?.backgroundColor;
+const androidIconPath = appConfig.android?.icon?.replace(/^\.\//, "");
+const adaptiveForegroundPath =
+  appConfig.android?.adaptiveIcon?.foregroundImage?.replace(/^\.\//, "");
+const adaptiveBackgroundPath =
+  appConfig.android?.adaptiveIcon?.backgroundImage?.replace(/^\.\//, "");
+const adaptiveMonochromePath =
+  appConfig.android?.adaptiveIcon?.monochromeImage?.replace(/^\.\//, "");
 
 assertEqual(
   "supported platforms",
@@ -110,30 +115,43 @@ assertIncludes(
   `versionName "${appConfig.version}"`,
 );
 assertEqual("shared and iOS icon path", iosIconPath, iconPath);
+assertEqual("shared and Android legacy icon path", androidIconPath, iconPath);
 assertEqual(
-  "shared and Android icon path",
-  appConfig.android?.icon?.replace(/^\.\//, ""),
-  iconPath,
+  "Android adaptive foreground path",
+  adaptiveForegroundPath,
+  "assets/appIcon/android_foreground.png",
 );
 assertEqual(
-  "shared and adaptive icon path",
-  appConfig.android?.adaptiveIcon?.foregroundImage?.replace(/^\.\//, ""),
-  iconPath,
+  "Android adaptive background path",
+  adaptiveBackgroundPath,
+  "assets/appIcon/android_background.png",
+);
+assertEqual(
+  "Android adaptive monochrome path",
+  adaptiveMonochromePath,
+  "assets/appIcon/android_monochrome.png",
 );
 assertIncludes(
-  "Android adaptive icon color",
-  androidColors,
-  `>${adaptiveBackground}</color>`,
-);
-assertIncludes(
-  "Android adaptive icon resource",
+  "Android adaptive background resource",
   androidAdaptiveIcon,
-  '@color/iconBackground',
+  '@mipmap/ic_launcher_background',
 );
 assertIncludes(
+  "Android adaptive foreground resource",
+  androidAdaptiveIcon,
+  '@mipmap/ic_launcher_foreground',
+);
+assertIncludes(
+  "Android adaptive monochrome resource",
+  androidAdaptiveIcon,
+  '@mipmap/ic_launcher_monochrome',
+);
+assertEqual(
   "iOS app icon asset",
-  iosAppIconContents,
-  '"filename" : "App-Icon-1024x1024@1x.png"',
+  iosAppIconContents.images?.some(
+    (image) => image.filename === "App-Icon-1024x1024@1x.png",
+  ),
+  true,
 );
 assertEqual(
   "iOS app icon content",
