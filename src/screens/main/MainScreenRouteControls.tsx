@@ -1,6 +1,7 @@
 import React from "react";
 import {
   Platform,
+  Pressable,
   StyleSheet,
   Switch as NativeSwitch,
   Text,
@@ -48,19 +49,38 @@ export const MainScreenRouteControls = React.memo(
             !webSearchAvailable ? styles.searchControlDisabled : null,
           ]}
         >
-          <Text
-            testID="route-web-search-label"
-            style={[
-              styles.searchLabel,
-              {
-                color: webSearchAvailable
-                  ? colors.textSecondary
-                  : colors.textMuted,
-              },
+          <Pressable
+            testID="route-web-search-label-control"
+            accessible={false}
+            disabled={!webSearchAvailable}
+            hitSlop={4}
+            onPress={
+              webSearchAvailable
+                ? () => onToggleWebSearchEnabled?.()
+                : undefined
+            }
+            style={({ pressed }) => [
+              styles.searchLabelControl,
+              pressed && webSearchAvailable
+                ? styles.searchLabelPressed
+                : null,
             ]}
           >
-            {t("webSearch")}
-          </Text>
+            <Text
+              testID="route-web-search-label"
+              accessible={false}
+              style={[
+                styles.searchLabel,
+                {
+                  color: webSearchAvailable
+                    ? colors.textSecondary
+                    : colors.textMuted,
+                },
+              ]}
+            >
+              {t("webSearch")}
+            </Text>
+          </Pressable>
           <NativeSwitch
             testID="route-web-search-control"
             style={styles.searchSwitch}
@@ -116,6 +136,13 @@ const styles = StyleSheet.create({
   },
   searchControlDisabled: {
     opacity: 0.52,
+  },
+  searchLabelControl: {
+    minHeight: 44,
+    justifyContent: "center",
+  },
+  searchLabelPressed: {
+    opacity: 0.62,
   },
   searchLabel: {
     minWidth: 78,

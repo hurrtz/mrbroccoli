@@ -70,6 +70,9 @@ describe("MainScreenRouteControls", () => {
 
     fireEvent(searchSwitch, "valueChange", false);
     expect(onToggleWebSearchEnabled).toHaveBeenCalledTimes(1);
+
+    fireEvent.press(screen.getByTestId("route-web-search-label-control"));
+    expect(onToggleWebSearchEnabled).toHaveBeenCalledTimes(2);
   });
 
   it("stays visible but is visually and functionally disabled when search is not configured", () => {
@@ -100,6 +103,7 @@ describe("MainScreenRouteControls", () => {
     expect(nativeSwitch.props.value).toBe(false);
 
     fireEvent(searchSwitch, "valueChange", true);
+    fireEvent.press(screen.getByTestId("route-web-search-label-control"));
     expect(onToggleWebSearchEnabled).not.toHaveBeenCalled();
   });
 

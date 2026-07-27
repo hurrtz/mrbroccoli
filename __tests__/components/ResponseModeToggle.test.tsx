@@ -6,6 +6,7 @@ import {
   getResponseModeCardModelLabels,
   ResponseModeToggle,
 } from "../../src/components/ResponseModeToggle";
+import { responseModeToggleStyles } from "../../src/components/responseModeToggle/styles";
 import { lightColors } from "../../src/theme/colors";
 import { renderWithProviders } from "../test-utils/renderWithProviders";
 
@@ -320,6 +321,14 @@ describe("ResponseModeToggle", () => {
         screen.getByTestId("response-mode-option-mode-2").props.style,
       ).backgroundColor,
     ).toBe(lightColors.activeControl);
+    expect(
+      StyleSheet.flatten(
+        screen.getByTestId("response-mode-option-mode-2").props.style,
+      ).borderColor,
+    ).toBe(lightColors.activeControl);
+    expect(
+      StyleSheet.flatten(responseModeToggleStyles.optionPressed).transform,
+    ).toBeUndefined();
     expect(
       StyleSheet.flatten(
         screen.getByTestId("response-mode-model-mode-2").props.style,

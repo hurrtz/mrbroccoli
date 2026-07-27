@@ -42,7 +42,6 @@ export const responseModeToggleStyles = StyleSheet.create({
   },
   optionPressed: {
     opacity: 0.82,
-    transform: [{ scale: 0.985 }],
   },
   optionInner: {
     flex: 1,
