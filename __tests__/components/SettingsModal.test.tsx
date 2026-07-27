@@ -854,12 +854,13 @@ describe("SettingsModal", () => {
     let infoModal = screen.UNSAFE_getByType(AntModal);
     expect(infoModal.props.visible).toBe(true);
     expect(infoModal.props.title).toBe("Model Selection");
-    expect(infoModal.props.children.props.children).toBe(
-      "Each model card becomes a choice on the home screen. Configure its provider, model, and optional effort level, then switch cards to choose which model answers next.",
-    );
+    expect(
+      screen.getByText(
+        "Each model card becomes a choice on the home screen. Configure its provider, model, and optional effort level, then switch cards to choose which model answers next.",
+      ),
+    ).toBeTruthy();
     act(() => infoModal.props.footer[0].onPress());
-    infoModal = screen.UNSAFE_getByType(AntModal);
-    expect(infoModal.props.visible).toBe(false);
+    expect(screen.UNSAFE_queryByType(AntModal)).toBeNull();
 
     const systemPromptInfoButton = screen
       .UNSAFE_getAllByType(AntButton)
@@ -872,12 +873,13 @@ describe("SettingsModal", () => {
     infoModal = screen.UNSAFE_getByType(AntModal);
     expect(infoModal.props.visible).toBe(true);
     expect(infoModal.props.title).toBe("System Prompt");
-    expect(infoModal.props.children.props.children).toBe(
-      "Shape the hidden guidance the model receives before every reply.",
-    );
+    expect(
+      screen.getByText(
+        "Shape the hidden guidance the model receives before every reply.",
+      ),
+    ).toBeTruthy();
     act(() => infoModal.props.footer[0].onPress());
-    infoModal = screen.UNSAFE_getByType(AntModal);
-    expect(infoModal.props.visible).toBe(false);
+    expect(screen.UNSAFE_queryByType(AntModal)).toBeNull();
 
     fireEvent.press(screen.getByLabelText("Back to overview"));
     fireEvent.press(screen.getByLabelText("Open Search"));
@@ -906,11 +908,12 @@ describe("SettingsModal", () => {
       );
       expect(screen.getByText("Theme")).toBeTruthy();
       expect(screen.getByText("Usage Stats")).toBeTruthy();
+      expect(screen.getByLabelText("About Debug Log Button")).toBeTruthy();
       expect(
-        screen.getByText(
+        screen.queryByText(
           "How to use the button: toggling it on will start capturing logs. Toggling it off will stop capturing logs and move the captured ones into the clipboard.",
         ),
-      ).toBeTruthy();
+      ).toBeNull();
       expect(screen.getByText("Recent Speech Activity")).toBeTruthy();
       expect(screen.queryByText("Web Search Provider")).toBeNull();
     });

@@ -277,7 +277,7 @@ export const styles = StyleSheet.create({
     textAlign: "right",
   },
   radioList: {
-    marginHorizontal: -16,
+    overflow: "hidden",
   },
   switchRow: {
     minHeight: 58,
@@ -310,6 +310,22 @@ export const styles = StyleSheet.create({
   },
   fullWidthField: {
     width: "100%",
+  },
+  infoModalScroll: {
+    maxHeight: 360,
+  },
+  infoModalContent: {
+    paddingBottom: 2,
+    gap: 12,
+  },
+  infoModalOption: {
+    gap: 3,
+  },
+  infoModalOptionLabel: {
+    fontFamily: fonts.bodyMedium,
+    fontSize: 14,
+    lineHeight: 20,
+    fontWeight: "500",
   },
   buttonLabelRow: {
     flexDirection: "row",

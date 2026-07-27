@@ -1,7 +1,7 @@
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
 
-import { Button, Modal } from "@ant-design/react-native";
+import { Button } from "@ant-design/react-native";
 import Feather from "@expo/vector-icons/Feather";
 
 import { PROVIDER_MODELS } from "../../../constants/models";
@@ -13,7 +13,6 @@ import { antButtonTypography } from "../../../design-system/antTypography";
 import { AntIconButton } from "../../../design-system/AntIconButton";
 import { useLocalization } from "../../../i18n";
 import { useTheme } from "../../../theme/ThemeContext";
-import { fonts } from "../../../theme/typography";
 import type {
   Provider,
   ResponseMode,
@@ -39,6 +38,7 @@ import {
   AntSettingsCard,
   AntTextArea,
 } from "../AntSettingsPrimitives";
+import { AntSettingsInfoButton } from "../AntSettingsInfoButton";
 import { styles } from "../styles";
 
 export function ThinkingSettingsPage({
@@ -65,21 +65,6 @@ export function ThinkingSettingsPage({
   const { language, t } = useLocalization();
   const canAdd = settings.responseModes.length < MAX_RESPONSE_MODES;
   const canRemove = settings.responseModes.length > MIN_RESPONSE_MODES;
-  const [infoTopic, setInfoTopic] = React.useState<
-    "model-selection" | "system-prompt" | null
-  >(null);
-  const infoTitle =
-    infoTopic === "model-selection"
-      ? t("responseModes")
-      : infoTopic === "system-prompt"
-        ? t("systemPrompt")
-        : "";
-  const infoCopy =
-    infoTopic === "model-selection"
-      ? t("modelSelectionInfo")
-      : infoTopic === "system-prompt"
-        ? t("assistantInstructionsIntro")
-        : "";
 
   return (
     <View testID="thinking-settings-page" style={styles.sectionPageStack}>
@@ -87,13 +72,12 @@ export function ThinkingSettingsPage({
         <AntSectionIntro
           title={t("responseModes")}
           extra={
-            <AntIconButton
+            <AntSettingsInfoButton
               accessibilityLabel={t("aboutModelSelection")}
-              iconNode={
-                <Feather name="info" size={19} color={colors.textSecondary} />
-              }
-              onPress={() => setInfoTopic("model-selection")}
-            />
+              title={t("responseModes")}
+            >
+              {t("modelSelectionInfo")}
+            </AntSettingsInfoButton>
           }
         />
 
@@ -227,13 +211,12 @@ export function ThinkingSettingsPage({
         <AntSectionIntro
           title={t("systemPrompt")}
           extra={
-            <AntIconButton
+            <AntSettingsInfoButton
               accessibilityLabel={t("aboutSystemPrompt")}
-              iconNode={
-                <Feather name="info" size={19} color={colors.textSecondary} />
-              }
-              onPress={() => setInfoTopic("system-prompt")}
-            />
+              title={t("systemPrompt")}
+            >
+              {t("assistantInstructionsIntro")}
+            </AntSettingsInfoButton>
           }
         />
         <View testID="system-prompt-editor" style={styles.fullWidthField}>
@@ -244,37 +227,6 @@ export function ThinkingSettingsPage({
           />
         </View>
       </View>
-
-      <Modal
-        visible={infoTopic !== null}
-        transparent
-        maskClosable
-        title={infoTitle}
-        onClose={() => setInfoTopic(null)}
-        footer={[
-          {
-            text: t("done"),
-            style: {
-              color: colors.accent,
-              fontFamily: fonts.bodyMedium,
-            },
-            onPress: () => setInfoTopic(null),
-          },
-        ]}
-        styles={{
-          header: {
-            color: colors.text,
-            fontFamily: fonts.bodyMedium,
-          },
-          buttonText: {
-            fontFamily: fonts.bodyMedium,
-          },
-        }}
-      >
-        <Text style={[styles.helperText, { color: colors.textSecondary }]}>
-          {infoCopy}
-        </Text>
-      </Modal>
     </View>
   );
 }

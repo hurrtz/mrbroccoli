@@ -21,9 +21,11 @@ import {
 import Feather from "@expo/vector-icons/Feather";
 import type { IconNames } from "@ant-design/react-native/lib/icon";
 
+import { useLocalization } from "../../i18n";
 import { useTheme } from "../../theme/ThemeContext";
 import { fonts } from "../../theme/typography";
 
+import { AntSettingsInfoButton } from "./AntSettingsInfoButton";
 import { styles } from "./styles";
 
 const AntCardBody = Card.Body as React.ComponentType<
@@ -308,16 +310,50 @@ export function AntRadioSection<T extends string>({
   helperText?: string;
 }) {
   const { colors } = useTheme();
-  const activeOption = options.find((option) => option.value === value);
+  const { t } = useLocalization();
+  const describedOptions = options.filter((option) => option.description);
+  const hasInfo = describedOptions.length > 0 || Boolean(helperText);
 
   return (
-    <AntSettingsCard>
-      <Text
-        accessibilityRole="header"
-        style={[styles.fieldLabel, { color: colors.text }]}
-      >
-        {label}
-      </Text>
+    <AntSettingsCard
+      title={label}
+      headerExtra={
+        hasInfo ? (
+          <AntSettingsInfoButton
+            accessibilityLabel={t("aboutSetting", { setting: label })}
+            title={label}
+          >
+            <View style={styles.infoModalContent}>
+              {describedOptions.map((option) => (
+                <View key={option.value} style={styles.infoModalOption}>
+                  <Text
+                    style={[
+                      styles.infoModalOptionLabel,
+                      { color: colors.text },
+                    ]}
+                  >
+                    {option.label}
+                  </Text>
+                  <Text
+                    style={[styles.helperText, { color: colors.textSecondary }]}
+                  >
+                    {option.description}
+                  </Text>
+                </View>
+              ))}
+              {helperText ? (
+                <Text
+                  style={[styles.helperText, { color: colors.textSecondary }]}
+                >
+                  {helperText}
+                </Text>
+              ) : null}
+            </View>
+          </AntSettingsInfoButton>
+        ) : null
+      }
+      contentStyle={styles.fullBleedCardContent}
+    >
       <View style={styles.radioList}>
         <Radio.Group
           value={value}
@@ -356,16 +392,6 @@ export function AntRadioSection<T extends string>({
           ))}
         </Radio.Group>
       </View>
-      {activeOption?.description ? (
-        <Text style={[styles.helperText, { color: colors.textSecondary }]}>
-          {activeOption.description}
-        </Text>
-      ) : null}
-      {helperText ? (
-        <Text style={[styles.helperText, { color: colors.textSecondary }]}>
-          {helperText}
-        </Text>
-      ) : null}
     </AntSettingsCard>
   );
 }
@@ -559,24 +585,23 @@ export function AntPickerSection({
   helperText?: React.ReactNode;
   title?: string;
 }) {
-  const { colors } = useTheme();
+  const { t } = useLocalization();
 
   return (
-    <AntSettingsCard contentStyle={styles.fullBleedCardContent}>
-      {title || description ? (
-        <View style={styles.pickerIntro}>
-          {title ? (
-            <Text style={[styles.fieldLabel, { color: colors.text }]}>
-              {title}
-            </Text>
-          ) : null}
-          {description ? (
-            <Text style={[styles.helperText, { color: colors.textSecondary }]}>
-              {description}
-            </Text>
-          ) : null}
-        </View>
-      ) : null}
+    <AntSettingsCard
+      title={title}
+      headerExtra={
+        title && description ? (
+          <AntSettingsInfoButton
+            accessibilityLabel={t("aboutSetting", { setting: title })}
+            title={title}
+          >
+            {description}
+          </AntSettingsInfoButton>
+        ) : null
+      }
+      contentStyle={styles.fullBleedCardContent}
+    >
       <AntPickerRows helperText={helperText}>{children}</AntPickerRows>
     </AntSettingsCard>
   );

@@ -5,6 +5,7 @@ export const en: TranslationDictionary = {
   retry: "Retry",
   dismiss: "Dismiss",
   done: "Done",
+  aboutSetting: ({ setting }) => `About ${setting}`,
   unavailable: "Unavailable",
   selection: "Selection",
   chooseCompatibleProviderFirst: "Choose a compatible provider first",

@@ -1,13 +1,15 @@
 import React from "react";
 import { StyleSheet } from "react-native";
-import { render } from "@testing-library/react-native";
-import { List } from "@ant-design/react-native";
+import { fireEvent, render } from "@testing-library/react-native";
+import { List, Modal, Provider as AntProvider } from "@ant-design/react-native";
 
 import {
   AntPickerRow,
   AntPickerRows,
+  AntRadioSection,
 } from "../../src/features/settings-antd/AntSettingsPrimitives";
 import { styles } from "../../src/features/settings-antd/styles";
+import { LocalizationProvider } from "../../src/i18n";
 import { ThemeProvider } from "../../src/theme/ThemeContext";
 
 function renderPickerRow(optionCount: 1 | 2) {
@@ -105,6 +107,47 @@ describe("AntPickerRow", () => {
     expect(
       screen.UNSAFE_getByType(List.Item).props.styles.Line.borderBottomWidth,
     ).toBe(0);
+  });
+});
+
+describe("AntRadioSection", () => {
+  it("keeps explanatory option copy behind a working info action", () => {
+    const screen = render(
+      <LocalizationProvider language="en">
+        <ThemeProvider mode="light">
+          <AntProvider>
+            <AntRadioSection
+              label="Reply Playback"
+              options={[
+                {
+                  value: "stream",
+                  label: "Sentences Arrive",
+                  description: "Start speaking as sentences are ready.",
+                },
+                {
+                  value: "wait",
+                  label: "Full Reply First",
+                  description: "Wait for the complete answer.",
+                },
+              ]}
+              value="stream"
+              onChange={jest.fn()}
+            />
+          </AntProvider>
+        </ThemeProvider>
+      </LocalizationProvider>,
+    );
+
+    expect(
+      screen.queryByText("Start speaking as sentences are ready."),
+    ).toBeNull();
+    fireEvent.press(screen.getByLabelText("About Reply Playback"));
+
+    expect(screen.UNSAFE_getByType(Modal).props.title).toBe("Reply Playback");
+    expect(
+      screen.getByText("Start speaking as sentences are ready."),
+    ).toBeTruthy();
+    expect(screen.getByText("Wait for the complete answer.")).toBeTruthy();
   });
 });
 
