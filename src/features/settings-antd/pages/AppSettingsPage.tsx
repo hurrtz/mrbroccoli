@@ -18,7 +18,6 @@ import type { AppLanguage, Settings, ThemeMode } from "../../../types";
 
 import {
   AntPickerRow,
-  AntPickerSection,
   AntRadioSection,
   AntSectionIntro,
   AntSettingsCard,
@@ -97,17 +96,17 @@ export function AppSettingsPage({
           value={settings.theme}
           onChange={(value) => onUpdate({ theme: value })}
         />
-        <AntPickerSection>
-          <AntPickerRow
-            label={t("language")}
-            value={settings.language}
-            options={[
-              { value: "en", label: t("english") },
-              { value: "de", label: t("german") },
-            ]}
-            onChange={(value) => onUpdate({ language: value as AppLanguage })}
-          />
-        </AntPickerSection>
+        <AntPickerRow
+          testID="app-language-picker"
+          standalone
+          label={t("language")}
+          value={settings.language}
+          options={[
+            { value: "en", label: t("english") },
+            { value: "de", label: t("german") },
+          ]}
+          onChange={(value) => onUpdate({ language: value as AppLanguage })}
+        />
         <AntRadioSection<"show" | "hide">
           label={t("usageStats")}
           options={[

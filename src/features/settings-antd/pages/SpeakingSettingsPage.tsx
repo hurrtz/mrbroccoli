@@ -227,7 +227,11 @@ export function SpeakingSettingsPage({
             }
           >
             <AntPickerRow
-              label={t("ttsProvider")}
+              label={
+                ttsProviderOptions.length > 1
+                  ? t("ttsProvider")
+                  : undefined
+              }
               value={settings.ttsProvider ?? ""}
               options={ttsProviderOptions}
               disabled={ttsProviderOptions.length === 0}

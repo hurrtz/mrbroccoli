@@ -173,6 +173,7 @@ export function ConnectionsSettingsPage({
               key={provider}
               testID={`provider-card-${provider}`}
               expanded={expanded}
+              headerPressFeedback={false}
               style={
                 allCapabilitiesHealthy
                   ? {

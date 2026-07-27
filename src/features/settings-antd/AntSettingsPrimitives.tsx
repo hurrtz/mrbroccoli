@@ -130,6 +130,7 @@ export function AntDisclosureCard({
   expanded,
   footer,
   header,
+  headerPressFeedback = true,
   headerExtra,
   onToggle,
   style,
@@ -141,6 +142,7 @@ export function AntDisclosureCard({
   expanded: boolean;
   footer?: React.ReactNode;
   header: React.ReactNode;
+  headerPressFeedback?: boolean;
   headerExtra?: React.ReactNode;
   onToggle: () => void;
   style?: StyleProp<ViewStyle>;
@@ -153,11 +155,14 @@ export function AntDisclosureCard({
       key="header"
       title={
         <Pressable
+          testID={testID ? `${testID}-header-control` : undefined}
           accessibilityRole="button"
           accessibilityState={{ expanded }}
           style={({ pressed }) => [
             styles.disclosureHeader,
-            pressed ? styles.pressedControl : null,
+            pressed && headerPressFeedback
+              ? styles.pressedControl
+              : null,
           ]}
           onPress={onToggle}
         >
@@ -409,12 +414,16 @@ export function AntPickerRow({
   options,
   onChange,
   disabled = false,
+  standalone = false,
+  testID,
 }: {
   label?: string;
   value: string;
   options: AntPickerOption[];
   onChange: (value: string) => void;
   disabled?: boolean;
+  standalone?: boolean;
+  testID?: string;
 }) {
   const { colors } = useTheme();
   const selectedLabel =
@@ -428,6 +437,7 @@ export function AntPickerRow({
   const pickerIsInteractive = !hasSingleOption;
   const renderRow = (onPress?: () => void) => (
     <List.Item
+      testID={testID}
       extra={
         label ? (
           <View style={styles.pickerValueRow}>
@@ -452,7 +462,11 @@ export function AntPickerRow({
       onPress={onPress}
       style={
         pickerIsInteractive
-          ? [styles.pickerItem, { borderColor: colors.border }]
+          ? [
+              styles.pickerItem,
+              standalone ? styles.pickerItemStandalone : null,
+              { borderColor: colors.border },
+            ]
           : styles.pickerStaticItem
       }
       styles={{

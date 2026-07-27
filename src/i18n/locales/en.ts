@@ -194,8 +194,6 @@ export const en: TranslationDictionary = {
     "Title generation took too long. Please try again.",
   inputMode: "Input Mode",
   voiceInput: "Voice Input",
-  voiceInputDescription:
-    "Control how your speech is captured before it reaches the model.",
   pushToTalk: "Push to Talk",
   pushToTalkDescription:
     "Hold the main button while speaking, then release to send.",
@@ -222,8 +220,6 @@ export const en: TranslationDictionary = {
     "Use the operating system's speech recognizer. Depending on device settings, recognition may run on-device or through the system service. No provider key is required.",
   provider: "Provider",
   webSearchProvider: "Web Search Provider",
-  webSearchProviderHint:
-    "Choose the configured service that performs live web lookups. Its credentials are stored on-device.",
   webSearchProviderMissingHint:
     "Configure at least one search-capable service in Credentials to enable web grounding here.",
   webSearchModelHint: ({ model }) =>

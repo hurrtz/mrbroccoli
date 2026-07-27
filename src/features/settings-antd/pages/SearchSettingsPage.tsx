@@ -144,7 +144,6 @@ export function SearchSettingsPage({
       />
       <AntPickerSection
         title={t("webSearchProvider")}
-        description={t("webSearchProviderHint")}
         helperText={
           pickerOptions.length === 0
             ? t("webSearchProviderMissingHint")

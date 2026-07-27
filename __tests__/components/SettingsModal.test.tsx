@@ -9,6 +9,7 @@ import {
 } from "@testing-library/react-native";
 import {
   Button as AntButton,
+  Card as AntCard,
   List,
   Modal as AntModal,
   Picker as AntPicker,
@@ -392,7 +393,14 @@ describe("SettingsModal", () => {
     });
 
     const header = screen.getByTestId("provider-vault-row-openai");
+    const headerControl = screen.getByTestId(
+      "provider-card-openai-header-control",
+    );
     const footer = screen.getByTestId("provider-capability-footer-openai");
+
+    fireEvent(headerControl, "pressIn");
+    expect(StyleSheet.flatten(headerControl.props.style).transform).toBeUndefined();
+    fireEvent(headerControl, "pressOut");
 
     expect(
       within(header).queryByTestId("provider-capability-pill-openai-llm"),
@@ -836,6 +844,8 @@ describe("SettingsModal", () => {
       );
       expect(screen.getByText("Model Selection")).toBeTruthy();
       expect(screen.getByText("System Prompt")).toBeTruthy();
+      expect(screen.queryByText("Provider")).toBeNull();
+      expect(screen.getAllByText("OpenAI").length).toBeGreaterThan(0);
       expect(screen.queryByText("Adaptive Length")).toBeNull();
       expect(screen.queryByText("Response Tone")).toBeNull();
     });
@@ -903,6 +913,9 @@ describe("SettingsModal", () => {
       );
       expect(screen.getByText("Web Search Provider")).toBeTruthy();
       expect(screen.getByText("Advanced Search Controls")).toBeTruthy();
+      expect(
+        screen.queryByLabelText("About Web Search Provider"),
+      ).toBeNull();
       expect(screen.queryByText("Model Selection")).toBeNull();
     });
 
@@ -920,6 +933,7 @@ describe("SettingsModal", () => {
         "App & diagnostics",
       );
       expect(screen.getByText("Theme")).toBeTruthy();
+      expect(screen.getByTestId("app-language-picker")).toBeTruthy();
       expect(screen.getByText("Usage Stats")).toBeTruthy();
       expect(screen.getByLabelText("About Debug Log Button")).toBeTruthy();
       expect(
@@ -929,6 +943,33 @@ describe("SettingsModal", () => {
       ).toBeNull();
       expect(screen.getByText("Recent Speech Activity")).toBeTruthy();
       expect(screen.queryByText("Web Search Provider")).toBeNull();
+    });
+
+    const languagePicker = screen
+      .UNSAFE_getAllByType(List.Item)
+      .find((item) => item.props.testID === "app-language-picker");
+    expect(languagePicker).toBeDefined();
+    expect(StyleSheet.flatten(languagePicker!.props.style).marginHorizontal).toBe(
+      0,
+    );
+    expect(
+      screen
+        .UNSAFE_getAllByType(AntCard)
+        .some((card) => within(card).queryByTestId("app-language-picker")),
+    ).toBe(false);
+  });
+
+  it("keeps Voice Input free of a redundant heading info action", async () => {
+    const screen = renderSettingsModal({ focusTab: "stt" });
+
+    await waitFor(() => {
+      expect(screen.getByTestId("settings-modal-title").props.children).toBe(
+        "Listening",
+      );
+      expect(screen.getByText("Voice Input")).toBeTruthy();
+      expect(screen.queryByLabelText("About Voice Input")).toBeNull();
+      expect(screen.getByLabelText("About Input Mode")).toBeTruthy();
+      expect(screen.getByLabelText("About Speech to Text")).toBeTruthy();
     });
   });
 
@@ -983,6 +1024,7 @@ describe("SettingsModal", () => {
     });
 
     await waitFor(() => {
+      expect(screen.getAllByText("TTS Provider")).toHaveLength(1);
       expect(screen.getByText("Mistral voice library")).toBeTruthy();
       expect(screen.getByText("2 voices available from Mistral.")).toBeTruthy();
       expect(screen.getByText("Calm Guide · calm-guide")).toBeTruthy();

@@ -86,6 +86,29 @@ describe("AntPickerRow", () => {
     expect(screen.getByTestId("icon-chevron-down")).toBeTruthy();
   });
 
+  it("lets a standalone dropdown align with surrounding cards", () => {
+    const screen = render(
+      <ThemeProvider mode="light">
+        <AntPickerRow
+          testID="standalone-picker"
+          standalone
+          label="Language"
+          value="en"
+          options={[
+            { value: "en", label: "English" },
+            { value: "de", label: "German" },
+          ]}
+          onChange={jest.fn()}
+        />
+      </ThemeProvider>,
+    );
+
+    expect(
+      StyleSheet.flatten(screen.UNSAFE_getByType(List.Item).props.style)
+        .marginHorizontal,
+    ).toBe(0);
+  });
+
   it("does not render an Ant list boundary below picker rows", () => {
     const screen = render(
       <ThemeProvider mode="light">

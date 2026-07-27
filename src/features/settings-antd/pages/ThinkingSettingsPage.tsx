@@ -120,7 +120,9 @@ export function ThinkingSettingsPage({
               >
                 <AntPickerRows>
                   <AntPickerRow
-                    label={t("provider")}
+                    label={
+                      llmProviders.length > 1 ? t("provider") : undefined
+                    }
                     value={route.provider}
                     options={renderProviderPickerOptions(llmProviders)}
                     onChange={(value) => {

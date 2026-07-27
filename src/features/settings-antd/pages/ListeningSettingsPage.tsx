@@ -18,7 +18,6 @@ import {
   AntRadioSection,
   AntSectionIntro,
 } from "../AntSettingsPrimitives";
-import { AntSettingsInfoButton } from "../AntSettingsInfoButton";
 import { styles } from "../styles";
 
 export function ListeningSettingsPage({
@@ -52,19 +51,7 @@ export function ListeningSettingsPage({
 
   return (
     <View style={styles.pageStack}>
-      <AntSectionIntro
-        title={t("voiceInput")}
-        extra={
-          <AntSettingsInfoButton
-            accessibilityLabel={t("aboutSetting", {
-              setting: t("voiceInput"),
-            })}
-            title={t("voiceInput")}
-          >
-            {t("voiceInputDescription")}
-          </AntSettingsInfoButton>
-        }
-      />
+      <AntSectionIntro title={t("voiceInput")} />
 
       <AntRadioSection<InputMode>
         label={t("inputMode")}

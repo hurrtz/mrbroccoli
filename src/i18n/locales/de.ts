@@ -199,8 +199,6 @@ export const de: TranslationDictionary = {
     "Das Erzeugen des Titels hat zu lange gedauert. Bitte versuche es erneut.",
   inputMode: "Eingabemodus",
   voiceInput: "Spracheingabe",
-  voiceInputDescription:
-    "Steuere, wie deine Sprache aufgenommen wird, bevor sie das Modell erreicht.",
   pushToTalk: "Push to talk",
   pushToTalkDescription:
     "Lass den Button während des Sprechens gedrückt und lass ihn los, wenn du fertig bist.",
@@ -227,8 +225,6 @@ export const de: TranslationDictionary = {
     "Verwende die Spracherkennung des Betriebssystems. Je nach Geräteeinstellung läuft sie lokal oder über den Systemdienst. Kein API-Key nötig.",
   provider: "Anbieter",
   webSearchProvider: "Websuche-Anbieter",
-  webSearchProviderHint:
-    "Wähle den konfigurierten Dienst für Live-Websuchen. Die Zugangsdaten werden lokal auf dem Gerät gespeichert.",
   webSearchProviderMissingHint:
     "Richte unter Zugangsdaten mindestens einen suchfähigen Dienst ein, damit Web-Grundierung hier verfügbar ist.",
   webSearchModelHint: ({ model }) =>

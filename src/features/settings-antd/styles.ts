@@ -262,6 +262,9 @@ export const styles = StyleSheet.create({
     borderRadius: 10,
     overflow: "hidden",
   },
+  pickerItemStandalone: {
+    marginHorizontal: 0,
+  },
   pickerStaticItem: {
     minHeight: 52,
   },
