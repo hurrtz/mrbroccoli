@@ -11,19 +11,20 @@ These notes are specific to this repository and supplement any parent-level inst
 
 ## Main Architecture
 
-- `src/screens/MainScreen.tsx` is the main application surface and orchestrates recording, transcription, LLM requests, playback, setup flow, and settings modal state.
-- `src/components/SettingsModal.tsx` is the central configuration UI and owns most provider, response mode, STT, TTS, and UI settings controls.
-- `src/components/ResponseModeToggle.tsx` is the home-screen selector for `quick`, `normal`, and `deep`.
-- `src/components/ProviderToggle.tsx` still exists, but the primary home-screen switching model is response-mode based, not provider-based.
+- `src/screens/MainScreen.tsx` is the main composition root. It wires focused hooks and services into the workspace and secondary surfaces; recording, transcription, LLM, playback, setup, and persistence behavior live outside the screen component.
+- `src/features/settings-antd/AntSettingsModal.tsx` is the configuration entry point. Navigation/frame concerns live in `AntSettingsFrame.tsx`; page routing lives in `AntSettingsPageContent.tsx`; reusable non-visual settings logic lives in `src/features/settings-core/`.
+- `src/components/ResponseModeToggle.tsx` is the home-screen response-route selector. Its one-, two-, three-, and overflow-route layouts live under `src/components/responseModeToggle/`.
+- Direct provider switching has been removed from the home screen; the app routes through configurable response modes.
 - `src/constants/providers/runtimeManifest.ts` is the runtime source of truth for provider order, transports, model routes, API key hints, STT/TTS capabilities, and provider voice defaults. `src/constants/models.ts` exposes user-facing helpers on top of it.
 - `src/types.ts` is the source of truth for settings types and `DEFAULT_SETTINGS`.
 - `src/utils/responseModes.ts` contains the response-mode routing helpers and provider model validation logic.
-- `src/hooks/useSettings.ts` handles settings persistence, migrations, SecureStore API key loading, and response-mode migration logic.
-- `src/hooks/useConversations.ts` handles conversation persistence and conversation metadata.
+- `src/hooks/useSettings.ts` is the public settings hook. Persistence, migrations, normalization, and mutations live under `src/hooks/settings/`.
+- `src/hooks/useConversations.ts` is the public conversation hook. Hydration, metadata, storage, search, and mutations live under `src/hooks/conversations/`.
 - `src/services/llm.ts` contains provider request routing for text generation.
 - `src/services/whisper.ts` contains provider speech-to-text integrations.
 - `src/services/tts.ts` contains text-to-speech routing across native system voices, optional on-device Kokoro speech, and capability-gated provider TTS routes.
-- `src/services/speech/` contains native speech recognition and diagnostics support. Local/on-device TTS has been removed.
+- `src/services/voicePipeline.ts` coordinates focused transcription, context, web-search, LLM-response, TTS-queue, and cleanup stages under `src/services/voicePipeline/`.
+- `src/services/speech/` contains native speech recognition and diagnostics support.
 
 ## State And Persistence
 
@@ -43,7 +44,7 @@ These notes are specific to this repository and supplement any parent-level inst
   - `src/utils/responseModes.ts`
   - `src/hooks/useSettings.ts`
   - `src/components/ResponseModeToggle.tsx`
-  - `src/components/SettingsModal.tsx`
+  - `src/features/settings-antd/pages/ThinkingSettingsPage.tsx`
   - `src/screens/MainScreen.tsx`
 
 ## Provider And Model Maintenance
@@ -57,7 +58,8 @@ These notes are specific to this repository and supplement any parent-level inst
   - `src/utils/providerCapabilities.ts`
   - `src/types.ts`
   - `src/hooks/useSettings.ts`
-  - `src/components/SettingsModal.tsx`
+  - `src/features/settings-antd/`
+  - `src/features/settings-core/`
   - `src/screens/MainScreen.tsx`
   - `src/services/llm.ts`
   - `src/services/whisper.ts`
@@ -97,7 +99,7 @@ These notes are specific to this repository and supplement any parent-level inst
 
 - User-visible strings live in `src/i18n/locales/en.ts` and `src/i18n/locales/de.ts`. When changing visible copy, update both English and German entries and keep the two locales structurally in sync.
 - Theme and color behavior live in `src/theme/`.
-- Settings UI work usually belongs in `src/components/SettingsModal.tsx`.
+- Settings UI work usually belongs in `src/features/settings-antd/`; shared settings behavior belongs in `src/features/settings-core/`.
 - Home-screen interaction changes usually belong in `src/screens/MainScreen.tsx` and `src/components/ResponseModeToggle.tsx`.
 
 ## Testing And Verification
