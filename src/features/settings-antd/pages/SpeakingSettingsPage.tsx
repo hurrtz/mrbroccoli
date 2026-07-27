@@ -24,10 +24,10 @@ import type {
 
 import { AntKokoroVoiceSection } from "../AntKokoroVoiceSection";
 import { AntListenLanguageSelector } from "../AntListenLanguageSelector";
+import { AntProviderVoiceSection } from "../AntProviderVoiceSection";
 import { AntSettingsInfoButton } from "../AntSettingsInfoButton";
 import {
   AntNativeVoiceSection,
-  AntProviderVoiceSection,
   AntTtsFallbackSection,
 } from "../AntTtsSections";
 import {

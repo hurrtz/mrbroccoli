@@ -988,6 +988,11 @@ describe("SettingsModal", () => {
       expect(screen.getByText("Calm Guide · calm-guide")).toBeTruthy();
     });
 
+    fireEvent.press(screen.getByLabelText("Expand English voice settings"));
+    expect(
+      screen.getByLabelText("Collapse English voice settings"),
+    ).toBeTruthy();
+
     fireEvent.press(screen.getByTestId("mistral-voices-refresh"));
     expect(onRefreshMistralVoices).toHaveBeenCalledTimes(1);
 
