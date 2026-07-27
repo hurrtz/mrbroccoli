@@ -1,7 +1,7 @@
 import React from "react";
 import { render } from "@testing-library/react-native";
 
-import { ThinkingSettingsPage } from "../../src/features/settings-antd/pages/ThinkingSettingsPage";
+import { ThinkingSettingsPage } from "../../src/features/settings/pages/ThinkingSettingsPage";
 import { LocalizationProvider } from "../../src/i18n";
 import { ThemeProvider } from "../../src/theme/ThemeContext";
 import { DEFAULT_SETTINGS } from "../../src/types";

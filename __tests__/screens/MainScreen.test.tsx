@@ -282,7 +282,7 @@ jest.mock("../../src/screens/main/StatusDetailsModal", () => ({
   },
 }));
 
-jest.mock("../../src/features/settings-antd/AntSettingsModal", () => ({
+jest.mock("../../src/features/settings/AntSettingsModal", () => ({
   AntSettingsModal: ({
     visible,
     onOpenSetupGuide,

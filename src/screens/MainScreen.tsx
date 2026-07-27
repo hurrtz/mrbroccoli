@@ -8,7 +8,7 @@ import { StatusBar } from "expo-status-bar";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ConversationDrawer } from "../components/ConversationDrawer";
 import { ConversationMemoryModal } from "../components/ConversationMemoryModal";
-import { AntSettingsModal } from "../features/settings-antd/AntSettingsModal";
+import { AntSettingsModal } from "../features/settings/AntSettingsModal";
 import { SetupGuideModal } from "../components/SetupGuideModal";
 import { Toast } from "../components/Toast";
 import { useSharedSettings } from "../context/SettingsContext";

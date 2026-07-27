@@ -16,7 +16,7 @@ import {
   Provider as AntProvider,
 } from "@ant-design/react-native";
 
-import { AntSettingsModal as SettingsModal } from "../../src/features/settings-antd/AntSettingsModal";
+import { AntSettingsModal as SettingsModal } from "../../src/features/settings/AntSettingsModal";
 import { PROVIDER_LABELS } from "../../src/constants/models";
 import { LocalizationProvider } from "../../src/i18n";
 import { ThemeProvider } from "../../src/theme/ThemeContext";

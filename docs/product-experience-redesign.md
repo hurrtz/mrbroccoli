@@ -331,7 +331,7 @@ sections 10, 12, and 16.
   route list, active-state feedback, effort metadata, a uniformly fading
   backdrop, and safe bottom spacing.
 - Settings now uses the Ant Design Native surface under
-  `src/features/settings-antd/`, with separate responsive frame, navigation,
+  `src/features/settings/`, with separate responsive frame, navigation,
   page-routing, and page components. Provider cards use distinct header, body,
   and capability-footer regions; help content opens in standard scrollable
   information modals.

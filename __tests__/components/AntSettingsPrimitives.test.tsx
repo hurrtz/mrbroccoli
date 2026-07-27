@@ -8,8 +8,8 @@ import {
   AntPickerRows,
   AntRadioSection,
   AntSwitchRow,
-} from "../../src/features/settings-antd/AntSettingsPrimitives";
-import { styles } from "../../src/features/settings-antd/styles";
+} from "../../src/features/settings/AntSettingsPrimitives";
+import { styles } from "../../src/features/settings/styles";
 import { LocalizationProvider } from "../../src/i18n";
 import { ThemeProvider } from "../../src/theme/ThemeContext";
 

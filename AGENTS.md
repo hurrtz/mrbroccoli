@@ -12,7 +12,7 @@ These notes are specific to this repository and supplement any parent-level inst
 ## Main Architecture
 
 - `src/screens/MainScreen.tsx` is the main composition root. It wires focused hooks and services into the workspace and secondary surfaces; recording, transcription, LLM, playback, setup, and persistence behavior live outside the screen component.
-- `src/features/settings-antd/AntSettingsModal.tsx` is the configuration entry point. Navigation/frame concerns live in `AntSettingsFrame.tsx`; page routing lives in `AntSettingsPageContent.tsx`; reusable non-visual settings logic lives in `src/features/settings-core/`.
+- `src/features/settings/AntSettingsModal.tsx` is the configuration entry point. Navigation/frame concerns live in `AntSettingsFrame.tsx`; page routing lives in `AntSettingsPageContent.tsx`; reusable non-visual settings logic lives in `src/features/settings-core/`.
 - `src/components/ResponseModeToggle.tsx` is the home-screen response-route selector. Its one-, two-, three-, and overflow-route layouts live under `src/components/responseModeToggle/`.
 - Direct provider switching has been removed from the home screen; the app routes through configurable response modes.
 - `src/constants/providers/runtimeManifest.ts` is the runtime source of truth for provider order, transports, model routes, API key hints, STT/TTS capabilities, and provider voice defaults. `src/constants/models.ts` exposes user-facing helpers on top of it.
@@ -44,7 +44,7 @@ These notes are specific to this repository and supplement any parent-level inst
   - `src/utils/responseModes.ts`
   - `src/hooks/useSettings.ts`
   - `src/components/ResponseModeToggle.tsx`
-  - `src/features/settings-antd/pages/ThinkingSettingsPage.tsx`
+  - `src/features/settings/pages/ThinkingSettingsPage.tsx`
   - `src/screens/MainScreen.tsx`
 
 ## Provider And Model Maintenance
@@ -58,7 +58,7 @@ These notes are specific to this repository and supplement any parent-level inst
   - `src/utils/providerCapabilities.ts`
   - `src/types.ts`
   - `src/hooks/useSettings.ts`
-  - `src/features/settings-antd/`
+  - `src/features/settings/`
   - `src/features/settings-core/`
   - `src/screens/MainScreen.tsx`
   - `src/services/llm.ts`
@@ -99,7 +99,7 @@ These notes are specific to this repository and supplement any parent-level inst
 
 - User-visible strings live in `src/i18n/locales/en.ts` and `src/i18n/locales/de.ts`. When changing visible copy, update both English and German entries and keep the two locales structurally in sync.
 - Theme and color behavior live in `src/theme/`.
-- Settings UI work usually belongs in `src/features/settings-antd/`; shared settings behavior belongs in `src/features/settings-core/`.
+- Settings UI work usually belongs in `src/features/settings/`; shared settings behavior belongs in `src/features/settings-core/`.
 - Home-screen interaction changes usually belong in `src/screens/MainScreen.tsx` and `src/components/ResponseModeToggle.tsx`.
 
 ## Testing And Verification

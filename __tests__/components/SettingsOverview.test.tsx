@@ -2,7 +2,7 @@ import React from "react";
 import { StyleSheet, Text } from "react-native";
 import { render } from "@testing-library/react-native";
 
-import { AntSettingsOverview } from "../../src/features/settings-antd/AntSettingsOverview";
+import { AntSettingsOverview } from "../../src/features/settings/AntSettingsOverview";
 import type { SettingsReadiness } from "../../src/features/settings-core/readiness";
 import { LocalizationProvider } from "../../src/i18n";
 import { ThemeProvider } from "../../src/theme/ThemeContext";

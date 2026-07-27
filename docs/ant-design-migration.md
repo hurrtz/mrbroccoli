@@ -5,7 +5,7 @@ legacy hand-built UI with `@ant-design/react-native`.
 
 ## Strategy
 
-1. The replacement lives in `src/features/settings-antd/`; reusable behavior
+1. The replacement lives in `src/features/settings/`; reusable behavior
    that is not UI-specific lives in `src/features/settings-core/`.
 2. Settings was reimplemented as a clean surface rather than progressively
    restyling the old component tree.
