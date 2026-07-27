@@ -1,0 +1,123 @@
+import React from "react";
+import { StyleSheet } from "react-native";
+import { render } from "@testing-library/react-native";
+import { List } from "@ant-design/react-native";
+
+import {
+  AntPickerRow,
+  AntPickerRows,
+} from "../../src/features/settings-antd/AntSettingsPrimitives";
+import { styles } from "../../src/features/settings-antd/styles";
+import { ThemeProvider } from "../../src/theme/ThemeContext";
+
+function renderPickerRow(optionCount: 1 | 2) {
+  return render(
+    <ThemeProvider mode="light">
+      <AntPickerRow
+        label="Provider"
+        value="openai"
+        options={[
+          { value: "openai", label: "OpenAI" },
+          ...(optionCount === 2 ? [{ value: "gemini", label: "Gemini" }] : []),
+        ]}
+        onChange={jest.fn()}
+      />
+    </ThemeProvider>,
+  );
+}
+
+describe("AntPickerRow", () => {
+  it("renders a sole option as a static value without a disclosure icon", () => {
+    const screen = renderPickerRow(1);
+    const itemStyle = StyleSheet.flatten(
+      screen.UNSAFE_getByType(List.Item).props.style,
+    );
+
+    expect(screen.getByText("OpenAI")).toBeTruthy();
+    expect(screen.queryByTestId("icon-chevron-down")).toBeNull();
+    expect(itemStyle.borderWidth).toBeUndefined();
+  });
+
+  it("preserves the selected label when Ant Picker wraps the row", () => {
+    const screen = renderPickerRow(2);
+
+    expect(screen.getByText("OpenAI")).toBeTruthy();
+    expect(screen.queryByText("请选择")).toBeNull();
+    expect(screen.getByTestId("icon-chevron-down")).toBeTruthy();
+  });
+
+  it("renders dropdowns as bordered, padded form controls", () => {
+    const screen = renderPickerRow(2);
+    const item = screen.UNSAFE_getByType(List.Item);
+    const itemStyle = StyleSheet.flatten(item.props.style);
+
+    expect(itemStyle).toMatchObject({
+      minHeight: 46,
+      marginHorizontal: 16,
+      borderWidth: 1,
+      borderRadius: 10,
+      overflow: "hidden",
+    });
+    expect(item.props.styles.Line).toMatchObject({
+      minHeight: 46,
+      paddingVertical: 10,
+    });
+  });
+
+  it("renders an unlabeled picker as a compact value selector", () => {
+    const screen = render(
+      <ThemeProvider mode="light">
+        <AntPickerRow
+          value="singapore"
+          options={[
+            { value: "singapore", label: "Singapore" },
+            { value: "us", label: "US (Virginia)" },
+          ]}
+          onChange={jest.fn()}
+        />
+      </ThemeProvider>,
+    );
+
+    expect(screen.getByText("Singapore")).toBeTruthy();
+    expect(screen.queryByText("Region")).toBeNull();
+    expect(screen.getByTestId("icon-chevron-down")).toBeTruthy();
+  });
+
+  it("does not render an Ant list boundary below picker rows", () => {
+    const screen = render(
+      <ThemeProvider mode="light">
+        <AntPickerRows>
+          <AntPickerRow
+            label="Region"
+            value="us"
+            options={[{ value: "us", label: "United States" }]}
+            onChange={jest.fn()}
+          />
+        </AntPickerRows>
+      </ThemeProvider>,
+    );
+    const list = screen.UNSAFE_getByType(List);
+
+    expect(list.props.styles.BodyBottomLine).toEqual({
+      height: 0,
+      backgroundColor: "transparent",
+    });
+    expect(
+      screen.UNSAFE_getByType(List.Item).props.styles.Line.borderBottomWidth,
+    ).toBe(0);
+  });
+});
+
+describe("provider card layout roles", () => {
+  it("lets a one-row footer size itself without changing wrapped footers", () => {
+    expect(StyleSheet.flatten(styles.cardFooter).minHeight).toBeUndefined();
+    expect(StyleSheet.flatten(styles.cardFooter).paddingVertical).toBe(8);
+    expect(StyleSheet.flatten(styles.capabilityRow).flexWrap).toBe("wrap");
+  });
+
+  it("uses one heading size and one body size inside provider cards", () => {
+    expect(StyleSheet.flatten(styles.connectionSectionTitle).fontSize).toBe(16);
+    expect(StyleSheet.flatten(styles.connectionBodyText).fontSize).toBe(15);
+    expect(StyleSheet.flatten(styles.connectionImprintText).fontSize).toBe(12);
+  });
+});

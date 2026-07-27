@@ -16,7 +16,7 @@ const readiness: SettingsReadiness = {
 };
 
 describe("AntSettingsOverview", () => {
-  it("renders readiness as concise, accessible Ant buttons", () => {
+  it("renders readiness as a concise, accessible progression", () => {
     const screen = render(
       <ThemeProvider mode="light">
         <LocalizationProvider language="en">
@@ -31,11 +31,14 @@ describe("AntSettingsOverview", () => {
     const thinkChip = screen.getByLabelText("Think: Ready");
     const speakChip = screen.getByLabelText("Speak: Off");
 
-    expect(StyleSheet.flatten(thinkChip.props.style).backgroundColor).toBe(
-      `${lightColors.success}18`,
-    );
-    expect(thinkChip.findAllByType(Text)).toHaveLength(1);
-    expect(speakChip.findAllByType(Text)).toHaveLength(1);
+    expect(screen.getAllByTestId("icon-check")).toHaveLength(2);
+    expect(
+      StyleSheet.flatten(
+        screen.getByText("Think").props.style,
+      ).fontSize,
+    ).toBe(12);
+    expect(thinkChip).toBeTruthy();
+    expect(speakChip).toBeTruthy();
     expect(screen.queryByText("Runtime Readiness")).toBeNull();
     expect(screen.queryByText("Ready")).toBeNull();
     expect(screen.queryByText("Off")).toBeNull();

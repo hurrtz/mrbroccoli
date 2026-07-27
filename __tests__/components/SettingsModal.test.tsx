@@ -8,6 +8,8 @@ import {
   within,
 } from "@testing-library/react-native";
 import {
+  Button as AntButton,
+  List,
   Modal as AntModal,
   Picker as AntPicker,
   Provider as AntProvider,
@@ -18,11 +20,21 @@ import { PROVIDER_LABELS } from "../../src/constants/models";
 import { LocalizationProvider } from "../../src/i18n";
 import { ThemeProvider } from "../../src/theme/ThemeContext";
 import { lightColors } from "../../src/theme/colors";
-import { DEFAULT_SETTINGS, type Provider } from "../../src/types";
+import {
+  DEFAULT_SETTINGS,
+  type Provider,
+  type Settings,
+} from "../../src/types";
 import { useSpeechDiagnostics } from "../../src/hooks/useSpeechDiagnostics";
 import { clearSpeechDiagnostics } from "../../src/services/speech/diagnostics";
+import { getProviderValidationTarget } from "../../src/features/settings-core/providerSupport";
 
 jest.mock("react-native-safe-area-context", () => ({
+  SafeAreaView: ({ children, ...props }: React.PropsWithChildren) => {
+    const React = require("react");
+    const { View } = require("react-native");
+    return React.createElement(View, props, children);
+  },
   useSafeAreaInsets: () => ({ top: 0, bottom: 0, left: 0, right: 0 }),
 }));
 
@@ -73,20 +85,16 @@ jest.mock("../../src/services/speech/diagnostics", () => ({
 }));
 
 jest.mock("../../src/components/ProviderIcon", () => ({
-  ProviderIcon: ({
-    label,
-    provider,
-  }: {
-    label?: string;
-    provider: string;
-  }) => {
+  ProviderIcon: ({ label, provider }: { label?: string; provider: string }) => {
     const React = require("react");
     const { Text } = require("react-native");
     return React.createElement(Text, null, label ?? provider);
   },
 }));
 
-function renderSettingsModal(overrideProps: Partial<React.ComponentProps<typeof SettingsModal>> = {}) {
+function renderSettingsModal(
+  overrideProps: Partial<React.ComponentProps<typeof SettingsModal>> = {},
+) {
   const kokoroModel = {
     installed: false,
     verified: false,
@@ -147,6 +155,10 @@ describe("SettingsModal", () => {
       ).toBe("center");
       expect(screen.queryByTestId("settings-header-gradient")).toBeNull();
       expect(screen.queryByTestId("settings-modal-gradient")).toBeNull();
+      expect(screen.getByTestId("icon-x")).toBeTruthy();
+      expect(
+        screen.getAllByTestId("icon-chevron-right").length,
+      ).toBeGreaterThan(0);
       expect(screen.queryByText("Runtime Readiness")).toBeNull();
       expect(screen.getByText("Connections")).toBeTruthy();
       expect(screen.getByText("Thinking")).toBeTruthy();
@@ -165,13 +177,14 @@ describe("SettingsModal", () => {
     await waitFor(() => {
       expect(screen.queryByText("Back to overview")).toBeNull();
       expect(screen.getByLabelText("Back to overview")).toBeTruthy();
+      expect(screen.getByTestId("icon-arrow-left")).toBeTruthy();
       expect(screen.getByTestId("settings-modal-title").props.children).toBe(
         "Connections",
       );
       expect(screen.getAllByText("Connections")).toHaveLength(1);
       expect(
-        screen.getByText("Provider keys, validation, and capabilities."),
-      ).toBeTruthy();
+        screen.queryByText("Provider keys, validation, and capabilities."),
+      ).toBeNull();
       expect(screen.queryByPlaceholderText("Search services")).toBeNull();
       expect(screen.queryByText("System Prompt")).toBeNull();
     });
@@ -274,9 +287,7 @@ describe("SettingsModal", () => {
       expect(screen.getByText("2. System voice")).toBeTruthy();
     });
 
-    fireEvent.press(
-      screen.getByLabelText("Move System voice earlier"),
-    );
+    fireEvent.press(screen.getByLabelText("Move System voice earlier"));
 
     expect(onUpdate).toHaveBeenCalledWith({
       ttsFallbackPolicy: {
@@ -296,9 +307,7 @@ describe("SettingsModal", () => {
     });
 
     await waitFor(() => {
-      expect(
-        kokoroScreen.getByLabelText("Add Provider fallback"),
-      ).toBeTruthy();
+      expect(kokoroScreen.getByLabelText("Add Provider fallback")).toBeTruthy();
       expect(
         kokoroScreen.getByLabelText("Add System voice fallback"),
       ).toBeTruthy();
@@ -362,6 +371,218 @@ describe("SettingsModal", () => {
     });
   });
 
+  it("keeps provider capabilities in the card footer", async () => {
+    const screen = renderSettingsModal({ focusProvider: "openai" });
+
+    await waitFor(() => {
+      expect(screen.getByTestId("provider-vault-row-openai")).toBeTruthy();
+    });
+
+    const header = screen.getByTestId("provider-vault-row-openai");
+    const footer = screen.getByTestId("provider-capability-footer-openai");
+
+    expect(
+      within(header).queryByTestId("provider-capability-pill-openai-llm"),
+    ).toBeNull();
+    expect(
+      within(footer).getByTestId("provider-capability-pill-openai-llm"),
+    ).toBeTruthy();
+    const capabilityPill = within(footer).getByTestId(
+      "provider-capability-pill-openai-llm",
+    );
+    expect(capabilityPill.props.accessibilityRole).toBe("text");
+    expect(
+      capabilityPill.findAll(
+        (node) => typeof node.props.onPress === "function",
+      ),
+    ).toHaveLength(0);
+  });
+
+  it("opens provider details from the card header info action", async () => {
+    const screen = renderSettingsModal({ focusProvider: "openai" });
+
+    await waitFor(() => {
+      expect(screen.getByLabelText("About this provider: OpenAI")).toBeTruthy();
+    });
+
+    fireEvent.press(screen.getByLabelText("About this provider: OpenAI"));
+
+    await waitFor(() => {
+      expect(screen.getByText("OpenAI · About this provider")).toBeTruthy();
+      const modal = screen.getByTestId("provider-about-modal");
+      expect(modal).toBeTruthy();
+      expect(within(modal).getByTestId("provider-about-scroll")).toBeTruthy();
+      expect(within(modal).getByLabelText("Dismiss")).toBeTruthy();
+    });
+  });
+
+  it("orders provider actions and sections around the disclosure content", async () => {
+    const provider = "alibaba-qwen-dashscope";
+    const screen = renderSettingsModal({ focusProvider: provider });
+
+    await waitFor(() => {
+      expect(screen.getByText("API key")).toBeTruthy();
+      expect(screen.getByText("API test")).toBeTruthy();
+    });
+    expect(screen.queryByText("API region")).toBeNull();
+    expect(screen.queryByText("Region")).toBeNull();
+    expect(screen.getByText("Singapore")).toBeTruthy();
+
+    const apiKeySection = screen.getByTestId(
+      `provider-api-key-section-${provider}`,
+    );
+    expect(within(apiKeySection).getByText("Singapore")).toBeTruthy();
+    const regionHint = within(apiKeySection).getByText(
+      "The selected region must match the region in which this API key was created.",
+    );
+    expect(StyleSheet.flatten(regionHint.props.style).fontSize).toBe(12);
+
+    const card = screen.getByTestId(`provider-card-${provider}`);
+    const expectedActionLabels = [
+      "Credentials: Alibaba / Qwen",
+      "About this provider: Alibaba / Qwen",
+      "Collapse Alibaba / Qwen",
+    ];
+    const actionLabels = [
+      ...new Set(
+        card
+          .findAll(
+            (node) =>
+              typeof node.props.accessibilityLabel === "string" &&
+              expectedActionLabels.includes(node.props.accessibilityLabel),
+          )
+          .map((node) => node.props.accessibilityLabel),
+      ),
+    ];
+
+    expect(actionLabels).toEqual(expectedActionLabels);
+
+    const apiTestHeader = screen.getByTestId(
+      `provider-api-test-header-${provider}`,
+    );
+    expect(within(apiTestHeader).getByText("API test")).toBeTruthy();
+    expect(
+      within(apiTestHeader).getByTestId(`provider-test-all-${provider}`),
+    ).toBeTruthy();
+    expect(StyleSheet.flatten(apiTestHeader.props.style).justifyContent).toBe(
+      "space-between",
+    );
+
+    const apiTestSection = screen.getByTestId(
+      `provider-api-test-section-${provider}`,
+    );
+    const orderedTestControls = [
+      ...new Set(
+        apiTestSection
+          .findAll(
+            (node) =>
+              node.props.testID === `provider-capability-list-${provider}` ||
+              node.props.testID === `provider-test-all-${provider}`,
+          )
+          .map((node) => node.props.testID),
+      ),
+    ];
+
+    expect(orderedTestControls).toEqual([
+      `provider-test-all-${provider}`,
+      `provider-capability-list-${provider}`,
+    ]);
+
+    const capabilityRows = screen
+      .UNSAFE_getAllByType(List.Item)
+      .filter(
+        (item) =>
+          typeof item.props.testID === "string" &&
+          item.props.testID.startsWith(`provider-capability-row-${provider}-`),
+      );
+    expect(capabilityRows).not.toHaveLength(0);
+    for (const row of capabilityRows) {
+      expect(row.props.styles.Line.borderBottomWidth).toBe(0);
+    }
+    for (const statusText of within(apiTestSection).getAllByText(
+      "Not set up",
+    )) {
+      expect(StyleSheet.flatten(statusText.props.style).fontSize).toBe(12);
+    }
+  });
+
+  it("keeps a fully validated Google card healthy across model switches", async () => {
+    const activeMode = DEFAULT_SETTINGS.responseModes[0];
+    const baseSettings: Settings = {
+      ...DEFAULT_SETTINGS,
+      activeResponseMode: activeMode.id,
+      responseModes: [
+        {
+          ...activeMode,
+          route: {
+            provider: "gemini",
+            model: "gemini-2.5-flash-lite",
+            effort: "disabled",
+          },
+        },
+      ],
+      apiKeys: {
+        ...DEFAULT_SETTINGS.apiKeys,
+        gemini: "working-google-key",
+      },
+    };
+    const sttTarget = getProviderValidationTarget(
+      baseSettings,
+      "gemini",
+      "stt",
+    );
+    const ttsTarget = getProviderValidationTarget(
+      baseSettings,
+      "gemini",
+      "tts",
+    );
+    const searchTarget = getProviderValidationTarget(
+      baseSettings,
+      "gemini",
+      "search",
+    );
+    const settings: Settings = {
+      ...baseSettings,
+      providerValidationResults: {
+        gemini: {
+          llm: {
+            status: "success",
+            model: "gemini-2.5-flash",
+          },
+          stt: {
+            status: "success",
+            model: sttTarget.model,
+            configKey: sttTarget.configKey,
+          },
+          tts: {
+            status: "success",
+            model: ttsTarget.model,
+            configKey: ttsTarget.configKey,
+          },
+          search: {
+            status: "success",
+            model: searchTarget.model,
+            configKey: searchTarget.configKey,
+          },
+        },
+      },
+    };
+    const screen = renderSettingsModal({
+      focusProvider: "gemini",
+      settings,
+    });
+
+    await waitFor(() => {
+      expect(
+        screen.getByTestId("provider-vault-row-gemini").props
+          .accessibilityLabel,
+      ).toContain("Working");
+      expect(
+        screen.queryByTestId("provider-capability-footer-gemini"),
+      ).toBeNull();
+    });
+  });
+
   it("explains the optional OpenRouter one-key route without hiding direct providers", async () => {
     const screen = renderSettingsModal({ focusProvider: "openrouter" });
 
@@ -372,7 +593,7 @@ describe("SettingsModal", () => {
           "Request path: this device → OpenRouter → selected upstream provider",
         ),
       ).toBeTruthy();
-      expect(screen.getByText("OpenRouter keys")).toBeTruthy();
+      expect(screen.getByLabelText("OpenRouter keys: OpenRouter")).toBeTruthy();
       expect(screen.getByTestId("provider-vault-row-openai")).toBeTruthy();
       expect(screen.getByTestId("provider-vault-row-anthropic")).toBeTruthy();
     });
@@ -486,9 +707,7 @@ describe("SettingsModal", () => {
     fireEvent.press(screen.getByText("Connections"));
 
     await waitFor(() => {
-      const llmPill = screen.getByTestId(
-        "provider-capability-pill-openai-llm",
-      );
+      const llmPill = screen.getByTestId("provider-capability-pill-openai-llm");
       expect(llmPill.props.accessibilityLabel).toBe("LLM: Working");
     });
   });
@@ -516,11 +735,8 @@ describe("SettingsModal", () => {
     });
 
     await waitFor(() => {
-      expect(screen.getByText("Invalid")).toBeTruthy();
       expect(screen.getByText(new RegExp(errorMessage))).toBeTruthy();
-      const llmPill = screen.getByTestId(
-        "provider-capability-pill-openai-llm",
-      );
+      const llmPill = screen.getByTestId("provider-capability-pill-openai-llm");
       expect(llmPill.props.accessibilityLabel).toBe("LLM: Invalid");
     });
   });
@@ -565,9 +781,7 @@ describe("SettingsModal", () => {
           }),
         },
       });
-      const llmPill = screen.getByTestId(
-        "provider-capability-pill-openai-llm",
-      );
+      const llmPill = screen.getByTestId("provider-capability-pill-openai-llm");
       expect(llmPill.props.accessibilityLabel).toBe("LLM: Working");
       expect(screen.queryByText("Invalid")).toBeNull();
     });
@@ -607,21 +821,63 @@ describe("SettingsModal", () => {
       expect(screen.getByTestId("settings-modal-title").props.children).toBe(
         "Thinking",
       );
-      expect(screen.getByText("Response Modes")).toBeTruthy();
+      expect(screen.getByText("Model Selection")).toBeTruthy();
       expect(screen.getByText("System Prompt")).toBeTruthy();
       expect(screen.queryByText("Adaptive Length")).toBeNull();
       expect(screen.queryByText("Response Tone")).toBeNull();
     });
 
-    fireEvent.press(screen.getByText("System Prompt"));
+    expect(
+      StyleSheet.flatten(
+        screen.getByTestId("thinking-settings-page").props.style,
+      ).gap,
+    ).toBe(24);
+    expect(
+      StyleSheet.flatten(screen.getByTestId("system-prompt-editor").props.style)
+        .width,
+    ).toBe("100%");
+    expect(screen.queryByText("Remove model")).toBeNull();
+    expect(screen.getAllByLabelText("Remove model").length).toBeGreaterThan(0);
+    expect(
+      screen.queryByText(
+        "Shape the hidden guidance the model receives before every reply.",
+      ),
+    ).toBeNull();
 
-    await waitFor(() => {
-      expect(
-        screen.getByText(
-          "Shape the hidden guidance the model receives before every reply.",
-        ),
-      ).toBeTruthy();
-    });
+    const modelSelectionInfoButton = screen
+      .UNSAFE_getAllByType(AntButton)
+      .find(
+        (button) => button.props.accessibilityLabel === "About model selection",
+      );
+    expect(modelSelectionInfoButton).toBeDefined();
+    act(() => modelSelectionInfoButton!.props.onPress());
+    let infoModal = screen.UNSAFE_getByType(AntModal);
+    expect(infoModal.props.visible).toBe(true);
+    expect(infoModal.props.title).toBe("Model Selection");
+    expect(infoModal.props.children.props.children).toBe(
+      "Each model card becomes a choice on the home screen. Configure its provider, model, and optional effort level, then switch cards to choose which model answers next.",
+    );
+    act(() => infoModal.props.footer[0].onPress());
+    infoModal = screen.UNSAFE_getByType(AntModal);
+    expect(infoModal.props.visible).toBe(false);
+
+    const systemPromptInfoButton = screen
+      .UNSAFE_getAllByType(AntButton)
+      .find(
+        (button) =>
+          button.props.accessibilityLabel === "About the system prompt",
+      );
+    expect(systemPromptInfoButton).toBeDefined();
+    act(() => systemPromptInfoButton!.props.onPress());
+    infoModal = screen.UNSAFE_getByType(AntModal);
+    expect(infoModal.props.visible).toBe(true);
+    expect(infoModal.props.title).toBe("System Prompt");
+    expect(infoModal.props.children.props.children).toBe(
+      "Shape the hidden guidance the model receives before every reply.",
+    );
+    act(() => infoModal.props.footer[0].onPress());
+    infoModal = screen.UNSAFE_getByType(AntModal);
+    expect(infoModal.props.visible).toBe(false);
 
     fireEvent.press(screen.getByLabelText("Back to overview"));
     fireEvent.press(screen.getByLabelText("Open Search"));
@@ -632,7 +888,7 @@ describe("SettingsModal", () => {
       );
       expect(screen.getByText("Web Search Provider")).toBeTruthy();
       expect(screen.getByText("Advanced Search Controls")).toBeTruthy();
-      expect(screen.queryByText("Response Modes")).toBeNull();
+      expect(screen.queryByText("Model Selection")).toBeNull();
     });
 
     fireEvent.press(screen.getByText("Advanced Search Controls"));
@@ -712,9 +968,7 @@ describe("SettingsModal", () => {
 
     await waitFor(() => {
       expect(screen.getByText("Mistral voice library")).toBeTruthy();
-      expect(
-        screen.getByText("2 voices available from Mistral."),
-      ).toBeTruthy();
+      expect(screen.getByText("2 voices available from Mistral.")).toBeTruthy();
       expect(screen.getByText("Calm Guide · calm-guide")).toBeTruthy();
     });
 
@@ -769,9 +1023,7 @@ describe("SettingsModal", () => {
           "Voices could not be refreshed. Your current selection is unchanged; you can still enter a voice ID manually.",
         ),
       ).toBeTruthy();
-      expect(
-        screen.getByPlaceholderText("Enter a voice ID"),
-      ).toBeTruthy();
+      expect(screen.getByPlaceholderText("Enter a voice ID")).toBeTruthy();
     });
 
     fireEvent.changeText(
@@ -945,20 +1197,18 @@ describe("SettingsModal", () => {
 
     await waitFor(() => {
       expect(
-        screen.getByTestId("provider-capability-pill-elevenlabs-stt")
-          .props.accessibilityLabel,
+        screen.getByTestId("provider-capability-pill-elevenlabs-stt").props
+          .accessibilityLabel,
       ).toBe("STT: Working");
       expect(
-        screen.getByTestId("provider-capability-pill-elevenlabs-tts")
-          .props.accessibilityLabel,
+        screen.getByTestId("provider-capability-pill-elevenlabs-tts").props
+          .accessibilityLabel,
       ).toBe("TTS: Working");
       expect(
-        screen.getByTestId("provider-capability-pill-elevenlabs-voices")
-          .props.accessibilityLabel,
+        screen.getByTestId("provider-capability-pill-elevenlabs-voices").props
+          .accessibilityLabel,
       ).toBe("Voice library: Invalid");
-      expect(
-        screen.getByText(/Missing voices_read permission/),
-      ).toBeTruthy();
+      expect(screen.getByText(/Missing voices_read permission/)).toBeTruthy();
       expect(screen.getAllByText("Working").length).toBeGreaterThanOrEqual(2);
       expect(
         screen.getByText(/Invalid · Missing voices_read permission/),
@@ -1003,9 +1253,7 @@ describe("SettingsModal", () => {
     let confirmation = screen.UNSAFE_getByType(AntModal);
     expect(confirmation.props.visible).toBe(true);
     expect(confirmation.props.title).toBe("Clear recent speech activity?");
-    expect(
-      confirmation.props.children.props.children,
-    ).toBe(
+    expect(confirmation.props.children.props.children).toBe(
       "This removes all captured speech-routing diagnostics. This action cannot be undone.",
     );
 
