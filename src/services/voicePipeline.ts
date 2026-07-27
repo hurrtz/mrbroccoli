@@ -1,8 +1,8 @@
-import { streamChat } from "./llm";
 import type { Message } from "../types";
 import { recordDebugLogEvent } from "./debugLogCapture";
 import { cleanupCapturedAudio } from "./voicePipeline/cleanup";
 import { resolveContextualMessages } from "./voicePipeline/context";
+import { runPipelineResponse } from "./voicePipeline/response";
 import { createVoicePipelineTtsQueue } from "./voicePipeline/ttsQueue";
 import { resolvePipelineTranscription } from "./voicePipeline/transcription";
 import type { RunVoicePipelineParams } from "./voicePipeline/types";
@@ -198,74 +198,25 @@ export async function runVoicePipeline(
       ttsInstructions,
     });
 
-    recordDebugLogEvent({
-      event: "voice-pipeline-llm-requested",
-      payload: {
-        model,
-        modelEffort: modelEffort ?? null,
-        provider,
-        hasWebSearchContext: !!webSearchResult.context,
-        webSearchContextLength: webSearchResult.context?.length ?? 0,
-      },
-    });
-    callbacks.onLlmStart?.();
-
-    let llmCompleted = false;
-    const llmStartedAtMs = Date.now();
-    await streamChat({
+    const llmCompleted = await runPipelineResponse({
+      abortSignal,
+      assistantInstructions,
+      callbacks,
+      conversationSummary: contextResult.effectiveSummary || undefined,
+      language,
       messages: allMessages,
       model,
       modelEffort,
       provider,
-      apiKey: providerApiKey,
-      assistantInstructions,
+      providerApiKey,
       responseLength,
+      responseMetadata: webSearchResult.responseMetadata,
       responseTone,
-      language,
-      conversationSummary: contextResult.effectiveSummary || undefined,
+      spokenRepliesEnabled,
+      ttsQueue,
+      turnReceipt,
+      turnStartedAtMs,
       webSearchContext: webSearchResult.context,
-      abortSignal,
-      onChunk: (text) => {
-        if (abortSignal?.aborted) return;
-        ttsQueue.handleStreamChunk(text);
-      },
-      onDone: async (fullText, usage, llmMetadata) => {
-        if (abortSignal?.aborted) return;
-        const llmCompletedAtMs = Date.now();
-        turnReceipt.timing.modelMs = llmCompletedAtMs - llmStartedAtMs;
-        turnReceipt.timing.replyReadyMs =
-          llmCompletedAtMs - turnStartedAtMs;
-        if (!spokenRepliesEnabled) {
-          turnReceipt.timing.totalMs =
-            llmCompletedAtMs - turnStartedAtMs;
-        }
-        if (llmMetadata?.router) {
-          turnReceipt.actualRoute = {
-            provider,
-            model: llmMetadata.router.actualModel ?? model,
-            gateway: llmMetadata.router.gateway,
-            upstreamProvider: llmMetadata.router.upstreamProvider,
-            strategy: llmMetadata.router.strategy,
-            attempts: llmMetadata.router.attempts,
-          };
-          if (llmMetadata.router.contextCompression) {
-            turnReceipt.context.gatewayCompression =
-              llmMetadata.router.contextCompression;
-          }
-        }
-        const completedMetadata = {
-          ...webSearchResult.responseMetadata,
-          ...llmMetadata,
-          turnReceipt: {
-            ...turnReceipt,
-            ...llmMetadata?.turnReceipt,
-          },
-        };
-        callbacks.onResponseDone(fullText, usage, completedMetadata);
-        await ttsQueue.handleResponseDone(fullText);
-        llmCompleted = true;
-      },
-      onError: callbacks.onError,
     });
     if (!llmCompleted) {
       recordDebugLogEvent({
