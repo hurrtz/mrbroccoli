@@ -53,7 +53,9 @@ export function useVoiceCaptureLifecycle({
   const captureGenerationRef = useRef(0);
   const cancelInFlightRef = useRef<Promise<void> | null>(null);
   const stopInFlightRef = useRef<Promise<void> | null>(null);
-  const maxDurationTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const maxDurationTimerRef = useRef<ReturnType<typeof setTimeout> | null>(
+    null,
+  );
   // The auto-stop timer fires the latest stopVoiceCapture; keep a ref so the
   // timer callback never closes over a stale handler.
   const stopVoiceCaptureRef = useRef<() => Promise<void>>(async () => {});
@@ -88,33 +90,34 @@ export function useVoiceCaptureLifecycle({
       },
     });
 
-    if (sttMode === "native") {
-      const preparationPromise = (async () => {
+    const preparationPromise = (async () => {
+      if (sttMode === "native") {
         await nativeStt.ensurePermissions();
-        return captureGenerationRef.current === captureGeneration;
-      })();
-      capturePreparationRef.current = preparationPromise;
+      } else {
+        await recorder.ensurePermissions();
+      }
+      return captureGenerationRef.current === captureGeneration;
+    })();
+    capturePreparationRef.current = preparationPromise;
 
-      try {
-        const prepared = await preparationPromise;
-        const currentAppState = AppState.currentState;
-        const appIsKnownInactive =
-          typeof currentAppState === "string" &&
-          currentAppState !== "active";
-        if (!prepared || appIsKnownInactive) {
-          recordDebugLogEvent({
-            event: "voice-capture-start-superseded",
-            payload: {
-              reason: prepared ? "app-not-active" : "preparation-cancelled",
-              sttMode,
-            },
-          });
-          return;
-        }
-      } finally {
-        if (capturePreparationRef.current === preparationPromise) {
-          capturePreparationRef.current = null;
-        }
+    try {
+      const prepared = await preparationPromise;
+      const currentAppState = AppState.currentState;
+      const appIsKnownInactive =
+        typeof currentAppState === "string" && currentAppState !== "active";
+      if (!prepared || appIsKnownInactive) {
+        recordDebugLogEvent({
+          event: "voice-capture-start-superseded",
+          payload: {
+            reason: prepared ? "app-not-active" : "preparation-cancelled",
+            sttMode,
+          },
+        });
+        return;
+      }
+    } finally {
+      if (capturePreparationRef.current === preparationPromise) {
+        capturePreparationRef.current = null;
       }
     }
 
@@ -244,11 +247,7 @@ export function useVoiceCaptureLifecycle({
       }
     }
 
-    if (
-      !captureActiveRef.current &&
-      !isRecording &&
-      !captureWasCancelled()
-    ) {
+    if (!captureActiveRef.current && !isRecording && !captureWasCancelled()) {
       recordDebugLogEvent({
         event: "voice-capture-stop-ignored",
         payload: {
@@ -461,13 +460,7 @@ export function useVoiceCaptureLifecycle({
 
     cancelInFlightRef.current = cancelPromise;
     return cancelPromise;
-  }, [
-    clearMaxDurationTimer,
-    isRecording,
-    nativeStt,
-    recorder,
-    sttMode,
-  ]);
+  }, [clearMaxDurationTimer, isRecording, nativeStt, recorder, sttMode]);
 
   stopVoiceCaptureRef.current = stopVoiceCapture;
 

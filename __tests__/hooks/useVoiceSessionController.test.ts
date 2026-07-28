@@ -62,6 +62,7 @@ describe("useVoiceSessionController", () => {
       providerLabel: "OpenAI",
       recorder: {
         clearLastError: jest.fn(),
+        ensurePermissions: jest.fn(async () => undefined),
         lastError: null,
         startRecording: jest.fn(async () => undefined),
         stopRecording: jest.fn(async () => "file://voice.m4a"),

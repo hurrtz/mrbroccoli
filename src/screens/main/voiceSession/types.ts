@@ -21,6 +21,7 @@ export interface AudioPlayerController {
 
 export interface AudioRecorderController {
   clearLastError: () => void;
+  ensurePermissions: () => Promise<void>;
   lastError: string | null;
   startRecording: () => Promise<void>;
   stopRecording: () => Promise<string | null>;

@@ -1,5 +1,6 @@
 import { useEffect, useRef, useCallback, useState } from "react";
 import {
+  getRecordingPermissionsAsync,
   RecordingPresets,
   requestRecordingPermissionsAsync,
   useAudioRecorder as useExpoAudioRecorder,
@@ -45,14 +46,33 @@ export function useAudioRecorder() {
   const { t } = useLocalization();
   const usingNativeRecorder = isNativeWaveformAvailable();
   const recorder = useExpoAudioRecorder(RECORDING_OPTIONS);
-  const recorderState = useAudioRecorderState(recorder, RECORDER_STATUS_INTERVAL_MS);
+  const recorderState = useAudioRecorderState(
+    recorder,
+    RECORDER_STATUS_INTERVAL_MS,
+  );
   const startTimeRef = useRef<number>(0);
   const nativeSessionIdRef = useRef<string | null>(null);
   const [nativeRecording, setNativeRecording] = useState(false);
   const [lastError, setLastError] = useState<string | null>(null);
 
+  const ensurePermissions = useCallback(async () => {
+    let permission = await getRecordingPermissionsAsync();
+
+    if (!permission.granted) {
+      permission = await requestRecordingPermissionsAsync();
+    }
+
+    if (!permission.granted) {
+      throw new Error(t("microphonePermissionNotGranted"));
+    }
+  }, [t]);
+
   const resolveStoppedRecordingUri = useCallback(async () => {
-    for (let attempt = 0; attempt < STOPPED_RECORDING_URI_ATTEMPTS; attempt += 1) {
+    for (
+      let attempt = 0;
+      attempt < STOPPED_RECORDING_URI_ATTEMPTS;
+      attempt += 1
+    ) {
       const status = recorder.getStatus();
       const resolvedUri = recorder.uri ?? status.url ?? recorderState.url;
 
@@ -114,10 +134,7 @@ export function useAudioRecorder() {
         return;
       }
 
-      const permission = await requestRecordingPermissionsAsync();
-      if (!permission.granted) {
-        throw new Error(t("microphonePermissionNotGranted"));
-      }
+      await ensurePermissions();
 
       setLastError(null);
       const sessionId = `native-recorder-${Date.now()}-${Math.random()
@@ -164,10 +181,7 @@ export function useAudioRecorder() {
       return;
     }
 
-    const permission = await requestRecordingPermissionsAsync();
-    if (!permission.granted) {
-      throw new Error(t("microphonePermissionNotGranted"));
-    }
+    await ensurePermissions();
 
     setLastError(null);
     await recorder.prepareToRecordAsync(RECORDING_OPTIONS);
@@ -179,7 +193,13 @@ export function useAudioRecorder() {
         recorderRoute: "expo-audio",
       },
     });
-  }, [nativeRecording, recorder, recorderState.isRecording, t, usingNativeRecorder]);
+  }, [
+    ensurePermissions,
+    nativeRecording,
+    recorder,
+    recorderState.isRecording,
+    usingNativeRecorder,
+  ]);
 
   const stopRecording = useCallback(async (): Promise<string | null> => {
     recordDebugLogEvent({
@@ -335,9 +355,12 @@ export function useAudioRecorder() {
   }, []);
 
   return {
-    isRecording: usingNativeRecorder ? nativeRecording : recorderState.isRecording,
+    isRecording: usingNativeRecorder
+      ? nativeRecording
+      : recorderState.isRecording,
     lastError,
     clearLastError,
+    ensurePermissions,
     startRecording,
     stopRecording,
   };
