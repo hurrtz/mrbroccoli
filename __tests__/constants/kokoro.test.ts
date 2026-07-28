@@ -1,9 +1,11 @@
 import {
   DEFAULT_KOKORO_VOICES,
   getKokoroVoiceConfig,
+  getKokoroVoiceOptions,
   normalizeKokoroVoiceSelections,
   resolveKokoroLanguage,
 } from "../../src/constants/kokoro";
+import { APP_LANGUAGES } from "../../src/i18n/localeRegistry";
 
 describe("Kokoro configuration", () => {
   it("selects English and Chinese from supported reply languages", () => {
@@ -52,4 +54,18 @@ describe("Kokoro configuration", () => {
     expect(getKokoroVoiceConfig("en", "af_sol").sid).toBe(1);
     expect(getKokoroVoiceConfig("zh", "zm_100").sid).toBe(102);
   });
+
+  it.each(APP_LANGUAGES)(
+    "provides localized voice labels for registered app language %s",
+    (appLanguage) => {
+      (["en", "zh"] as const).forEach((voiceLanguage) => {
+        const options = getKokoroVoiceOptions(voiceLanguage, appLanguage);
+
+        expect(options.length).toBeGreaterThan(0);
+        options.forEach((option) => {
+          expect(option.label.trim().length).toBeGreaterThan(0);
+        });
+      });
+    },
+  );
 });

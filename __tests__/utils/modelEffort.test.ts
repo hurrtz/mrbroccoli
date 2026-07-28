@@ -6,6 +6,7 @@ import {
   getModelEffortTransportValue,
   normalizeResponseModeRouteEffort,
 } from "../../src/utils/modelEffort";
+import { APP_LANGUAGES } from "../../src/i18n/localeRegistry";
 
 describe("model effort metadata", () => {
   it("localizes effort labels for the Ukrainian interface", () => {
@@ -18,6 +19,19 @@ describe("model effort metadata", () => {
       ),
     ).toBe("Високий");
   });
+
+  it.each(APP_LANGUAGES)(
+    "provides localized effort labels for registered app language %s",
+    (language) => {
+      const options = getModelEffortOptions("gemini", "gemini-3.6-flash");
+
+      options.forEach((option) => {
+        expect(
+          getModelEffortOptionLabel(option, language).trim().length,
+        ).toBeGreaterThan(0);
+      });
+    },
+  );
 
   it("uses provider-documented defaults before the generic medium fallback", () => {
     expect(getDefaultModelEffort("openai", "gpt-5.6-sol")).toBe("medium");

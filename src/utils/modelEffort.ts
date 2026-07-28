@@ -1,5 +1,6 @@
 import { PROVIDER_MODELS } from "../constants/models";
 import type { ModelEffortConfig, ModelEffortOption } from "../constants/models";
+import { translate, type TranslationKey } from "../i18n";
 import type { AppLanguage, Provider, ResponseModeRoute } from "../types";
 
 const GENERIC_DEFAULT_EFFORT_IDS = ["medium", "normal"];
@@ -9,113 +10,17 @@ const ANTHROPIC_ADAPTIVE_THINKING_MODELS = new Set([
   "claude-opus-4-6",
   "claude-sonnet-4-6",
 ]);
-const UKRAINIAN_EFFORT_LABELS: Record<string, string> = {
-  none: "Немає",
-  minimal: "Мінімальний",
-  low: "Низький",
-  medium: "Середній",
-  high: "Високий",
-  xhigh: "Дуже високий",
-  max: "Максимальний",
-  dynamic: "Динамічний",
-  disabled: "Вимкнено",
-  enabled: "Увімкнено",
-};
-const HINDI_EFFORT_LABELS: Record<string, string> = {
-  none: "कोई नहीं",
-  minimal: "न्यूनतम",
-  low: "कम",
-  medium: "मध्यम",
-  high: "उच्च",
-  xhigh: "बहुत उच्च",
-  max: "अधिकतम",
-  dynamic: "गतिशील",
-  disabled: "बंद",
-  enabled: "चालू",
-};
-const SPANISH_EFFORT_LABELS: Record<string, string> = {
-  none: "Ninguno",
-  minimal: "Mínimo",
-  low: "Bajo",
-  medium: "Medio",
-  high: "Alto",
-  xhigh: "Muy alto",
-  max: "Máximo",
-  dynamic: "Dinámico",
-  disabled: "Desactivado",
-  enabled: "Activado",
-};
-const FRENCH_EFFORT_LABELS: Record<string, string> = {
-  none: "Aucun",
-  minimal: "Minimal",
-  low: "Faible",
-  medium: "Moyen",
-  high: "Élevé",
-  xhigh: "Très élevé",
-  max: "Maximum",
-  dynamic: "Dynamique",
-  disabled: "Désactivé",
-  enabled: "Activé",
-};
-const ITALIAN_EFFORT_LABELS: Record<string, string> = {
-  none: "Nessuno",
-  minimal: "Minimo",
-  low: "Basso",
-  medium: "Medio",
-  high: "Alto",
-  xhigh: "Molto alto",
-  max: "Massimo",
-  dynamic: "Dinamico",
-  disabled: "Disattivato",
-  enabled: "Attivato",
-};
-const PORTUGUESE_EFFORT_LABELS: Record<string, string> = {
-  none: "Nenhum",
-  minimal: "Mínimo",
-  low: "Baixo",
-  medium: "Médio",
-  high: "Alto",
-  xhigh: "Muito alto",
-  max: "Máximo",
-  dynamic: "Dinâmico",
-  disabled: "Desativado",
-  enabled: "Ativado",
-};
-const RUSSIAN_EFFORT_LABELS: Record<string, string> = {
-  none: "Нет",
-  minimal: "Минимальный",
-  low: "Низкий",
-  medium: "Средний",
-  high: "Высокий",
-  xhigh: "Очень высокий",
-  max: "Максимальный",
-  dynamic: "Динамический",
-  disabled: "Выключено",
-  enabled: "Включено",
-};
-const SIMPLIFIED_CHINESE_EFFORT_LABELS: Record<string, string> = {
-  none: "无",
-  minimal: "最低",
-  low: "低",
-  medium: "中",
-  high: "高",
-  xhigh: "很高",
-  max: "最高",
-  dynamic: "动态",
-  disabled: "已关闭",
-  enabled: "已开启",
-};
-const ARABIC_EFFORT_LABELS: Record<string, string> = {
-  none: "بلا",
-  minimal: "أدنى",
-  low: "منخفض",
-  medium: "متوسط",
-  high: "مرتفع",
-  xhigh: "مرتفع جدًا",
-  max: "أقصى",
-  dynamic: "ديناميكي",
-  disabled: "متوقف",
-  enabled: "مفعّل",
+const MODEL_EFFORT_TRANSLATION_KEYS: Record<string, TranslationKey> = {
+  none: "modelEffortNone",
+  minimal: "modelEffortMinimal",
+  low: "modelEffortLow",
+  medium: "modelEffortMedium",
+  high: "modelEffortHigh",
+  xhigh: "modelEffortExtraHigh",
+  max: "modelEffortMax",
+  dynamic: "modelEffortDynamic",
+  disabled: "modelEffortDisabled",
+  enabled: "modelEffortEnabled",
 };
 
 export function getModelEffortConfig(
@@ -218,37 +123,8 @@ export function getModelEffortOptionLabel(
   option: ModelEffortOption,
   language: AppLanguage,
 ) {
-  if (language === "de") {
-    return option.localizedLabels?.de ?? option.label;
-  }
-  if (language === "uk") {
-    return UKRAINIAN_EFFORT_LABELS[option.id] ?? option.label;
-  }
-  if (language === "hi") {
-    return HINDI_EFFORT_LABELS[option.id] ?? option.label;
-  }
-  if (language === "es") {
-    return SPANISH_EFFORT_LABELS[option.id] ?? option.label;
-  }
-  if (language === "fr") {
-    return FRENCH_EFFORT_LABELS[option.id] ?? option.label;
-  }
-  if (language === "it") {
-    return ITALIAN_EFFORT_LABELS[option.id] ?? option.label;
-  }
-  if (language === "pt" || language === "pt-BR") {
-    return PORTUGUESE_EFFORT_LABELS[option.id] ?? option.label;
-  }
-  if (language === "ru") {
-    return RUSSIAN_EFFORT_LABELS[option.id] ?? option.label;
-  }
-  if (language === "zh-CN") {
-    return SIMPLIFIED_CHINESE_EFFORT_LABELS[option.id] ?? option.label;
-  }
-  if (language === "ar") {
-    return ARABIC_EFFORT_LABELS[option.id] ?? option.label;
-  }
-  return option.label;
+  const translationKey = MODEL_EFFORT_TRANSLATION_KEYS[option.id];
+  return translationKey ? translate(language, translationKey) : option.label;
 }
 
 export function getResponseModeRouteEffortLabel(

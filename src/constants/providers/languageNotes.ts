@@ -1,5 +1,9 @@
 import type { AppLanguage, Provider } from "../../types";
 import {
+  getLocalizedResource,
+  type LocalizedResource,
+} from "../../i18n/localeRegistry";
+import {
   getCatalogConstraintsForAppProvider,
   getCatalogModelForAppProvider,
 } from "../../catalog/appProviders";
@@ -14,7 +18,7 @@ import {
   WHISPER_WELL_SUPPORTED_LANGUAGES,
 } from "./catalogData";
 
-const NATIVE_STT_LANGUAGE_NOTES_BY_LANGUAGE: Record<AppLanguage, string> = {
+const NATIVE_STT_LANGUAGE_NOTES_BY_LANGUAGE: LocalizedResource<string> = {
   en: NATIVE_STT_LANGUAGE_NOTE,
   de:
     "Die Sprachunterstützung hängt vom Betriebssystem des Geräts, installierten Sprachpaketen und der Verfügbarkeit der Erkennung ab. Die genaue Liste variiert je nach Gerät.",
@@ -40,7 +44,7 @@ const NATIVE_STT_LANGUAGE_NOTES_BY_LANGUAGE: Record<AppLanguage, string> = {
     "يعتمد دعم اللغات على نظام تشغيل الجهاز وحزم اللغات المثبتة وتوفر ميزة التعرّف. تختلف القائمة الدقيقة باختلاف الجهاز.",
 };
 
-const NATIVE_TTS_LANGUAGE_NOTES_BY_LANGUAGE: Record<AppLanguage, string> = {
+const NATIVE_TTS_LANGUAGE_NOTES_BY_LANGUAGE: LocalizedResource<string> = {
   en: NATIVE_TTS_LANGUAGE_NOTE,
   de:
     "Die Sprachunterstützung hängt von den auf dem Gerät installierten Systemstimmen ab. Die genaue Liste, Aussprachequalität und Offline-Verfügbarkeit variieren je nach Betriebssystem und Gerät.",
@@ -137,8 +141,7 @@ const ARABIC_PROVIDER_API_KEY_PLACEHOLDER_OVERRIDES: Partial<
   mistral: "أدخل مفتاح API",
 };
 
-const PROVIDER_API_KEY_PLACEHOLDERS_BY_LANGUAGE: Record<
-  AppLanguage,
+const PROVIDER_API_KEY_PLACEHOLDERS_BY_LANGUAGE: LocalizedResource<
   Record<Provider, string>
 > = {
   en: Object.fromEntries(
@@ -226,7 +229,7 @@ const PROVIDER_API_KEY_PLACEHOLDERS_BY_LANGUAGE: Record<
   ) as Record<Provider, string>,
 };
 
-const GENERIC_PROVIDER_API_KEY_HINTS: Record<AppLanguage, string> = {
+const GENERIC_PROVIDER_API_KEY_HINTS: LocalizedResource<string> = {
   en:
     "Paste credentials for an external service you already use. Keys stay on this device and are used only for requests you start in the app.",
   de:
@@ -253,8 +256,8 @@ const GENERIC_PROVIDER_API_KEY_HINTS: Record<AppLanguage, string> = {
     "الصق بيانات اعتماد خدمة خارجية تستخدمها بالفعل. تبقى المفاتيح على هذا الجهاز ولا تُستخدم إلا للطلبات التي تبدأها في التطبيق.",
 };
 
-const PROVIDER_API_KEY_HINT_OVERRIDES: Partial<
-  Record<AppLanguage, Partial<Record<Provider, string>>>
+const PROVIDER_API_KEY_HINT_OVERRIDES: LocalizedResource<
+  Partial<Record<Provider, string>>
 > = {
   en: {
     openrouter: `${GENERIC_PROVIDER_API_KEY_HINTS.en} One OpenRouter key unlocks the curated gateway models below. Requests pass through OpenRouter to the selected upstream provider; direct provider keys remain separate.`,
@@ -318,8 +321,8 @@ const PROVIDER_API_KEY_HINT_OVERRIDES: Partial<
   },
 };
 
-const PROVIDER_STT_LANGUAGE_NOTES_BY_LANGUAGE: Partial<
-  Record<AppLanguage, Partial<Record<Provider, string>>>
+const PROVIDER_STT_LANGUAGE_NOTES_BY_LANGUAGE: LocalizedResource<
+  Partial<Record<Provider, string>>
 > = {
   en: Object.fromEntries(
     PROVIDER_ORDER.flatMap((provider) =>
@@ -396,8 +399,8 @@ const PROVIDER_STT_LANGUAGE_NOTES_BY_LANGUAGE: Partial<
   },
 };
 
-const PROVIDER_TTS_LANGUAGE_NOTES_BY_LANGUAGE: Partial<
-  Record<AppLanguage, Partial<Record<Provider, string>>>
+const PROVIDER_TTS_LANGUAGE_NOTES_BY_LANGUAGE: LocalizedResource<
+  Partial<Record<Provider, string>>
 > = {
   en: Object.fromEntries(
     PROVIDER_ORDER.flatMap((provider) =>
@@ -508,7 +511,7 @@ type SpeechNoteFormatter = {
   audioUpTo: (limit: string) => string;
 };
 
-const SPEECH_NOTE_FORMATTERS: Record<AppLanguage, SpeechNoteFormatter> = {
+const SPEECH_NOTE_FORMATTERS: LocalizedResource<SpeechNoteFormatter> = {
   en: {
     voicesAcross: (voices, languages) =>
       `${voices} voices across ${languages} languages`,
@@ -732,17 +735,21 @@ const SPEECH_NOTE_FORMATTERS: Record<AppLanguage, SpeechNoteFormatter> = {
 };
 
 export function getNativeSttLanguageNote(language: AppLanguage) {
-  return NATIVE_STT_LANGUAGE_NOTES_BY_LANGUAGE[language];
+  return getLocalizedResource(NATIVE_STT_LANGUAGE_NOTES_BY_LANGUAGE, language);
 }
 
 export function getNativeTtsLanguageNote(language: AppLanguage) {
-  return NATIVE_TTS_LANGUAGE_NOTES_BY_LANGUAGE[language];
+  return getLocalizedResource(NATIVE_TTS_LANGUAGE_NOTES_BY_LANGUAGE, language);
 }
 
 export function getProviderApiKeyHint(provider: Provider, language: AppLanguage) {
+  const localizedOverrides = getLocalizedResource(
+    PROVIDER_API_KEY_HINT_OVERRIDES,
+    language,
+  );
   return (
-    PROVIDER_API_KEY_HINT_OVERRIDES[language]?.[provider] ??
-    GENERIC_PROVIDER_API_KEY_HINTS[language]
+    localizedOverrides[provider] ??
+    getLocalizedResource(GENERIC_PROVIDER_API_KEY_HINTS, language)
   );
 }
 
@@ -750,14 +757,22 @@ export function getProviderApiKeyPlaceholder(
   provider: Provider,
   language: AppLanguage,
 ) {
-  return PROVIDER_API_KEY_PLACEHOLDERS_BY_LANGUAGE[language][provider];
+  return getLocalizedResource(
+    PROVIDER_API_KEY_PLACEHOLDERS_BY_LANGUAGE,
+    language,
+  )[provider];
 }
 
 function getProviderSttLanguageNote(
   provider: Provider,
   language: AppLanguage,
 ) {
-  return PROVIDER_STT_LANGUAGE_NOTES_BY_LANGUAGE[language]?.[provider] ?? null;
+  return (
+    getLocalizedResource(
+      PROVIDER_STT_LANGUAGE_NOTES_BY_LANGUAGE,
+      language,
+    )[provider] ?? null
+  );
 }
 
 function formatApproximateCount(
@@ -790,6 +805,10 @@ function buildCatalogSpeechLanguageNote(params: {
   }
 
   const parts: string[] = [];
+  const formatter = getLocalizedResource(
+    SPEECH_NOTE_FORMATTERS,
+    params.language,
+  );
 
   if (languageSupport.voiceCount && languageSupport.languageCount) {
     const voiceCount = formatApproximateCount(
@@ -802,7 +821,7 @@ function buildCatalogSpeechLanguageNote(params: {
     );
 
     parts.push(
-      SPEECH_NOTE_FORMATTERS[params.language].voicesAcross(
+      formatter.voicesAcross(
         voiceCount,
         languageCount,
       ),
@@ -814,17 +833,17 @@ function buildCatalogSpeechLanguageNote(params: {
     );
 
     parts.push(
-      SPEECH_NOTE_FORMATTERS[params.language].supportsLanguages(languageCount),
+      formatter.supportsLanguages(languageCount),
     );
   } else if (
     languageSupport.isMultilingual &&
     languageSupport.notes.includes("english-optimized")
   ) {
-    parts.push(SPEECH_NOTE_FORMATTERS[params.language].multilingual);
+    parts.push(formatter.multilingual);
   }
 
   if (languageSupport.notes.includes("english-optimized")) {
-    parts.push(SPEECH_NOTE_FORMATTERS[params.language].englishOptimized);
+    parts.push(formatter.englishOptimized);
   }
 
   if (!parts.length) {
@@ -874,7 +893,7 @@ function formatByteLimit(bytes: number) {
 }
 
 function formatDurationLimit(seconds: number, language: AppLanguage) {
-  const formatter = SPEECH_NOTE_FORMATTERS[language];
+  const formatter = getLocalizedResource(SPEECH_NOTE_FORMATTERS, language);
   if (seconds % 3600 === 0) {
     const hours = seconds / 3600;
     return formatter.duration(hours, "hour");
@@ -899,6 +918,7 @@ export function getProviderSttLimitNote(
     "stt",
   );
   const parts: string[] = [];
+  const formatter = getLocalizedResource(SPEECH_NOTE_FORMATTERS, language);
 
   const exactFileSizeLimit = getStrictestCatalogMaxConstraint(
     constraints,
@@ -913,19 +933,19 @@ export function getProviderSttLimitNote(
 
   if (exactFileSizeLimit) {
     parts.push(
-      SPEECH_NOTE_FORMATTERS[language].fileUploadUpTo(
+      formatter.fileUploadUpTo(
         formatByteLimit(exactFileSizeLimit.value),
       ),
     );
   } else if (approximateFileSizeLimits.length === 1) {
     parts.push(
-      SPEECH_NOTE_FORMATTERS[language].approximateFileUpload(
+      formatter.approximateFileUpload(
         formatByteLimit(approximateFileSizeLimits[0].value),
       ),
     );
   } else if (approximateFileSizeLimits.length > 1) {
     parts.push(
-      SPEECH_NOTE_FORMATTERS[language].approximateFileUploadRange(
+      formatter.approximateFileUploadRange(
         formatByteLimit(approximateFileSizeLimits[0].value),
         formatByteLimit(
           approximateFileSizeLimits[approximateFileSizeLimits.length - 1].value,
@@ -943,7 +963,7 @@ export function getProviderSttLimitNote(
 
   if (durationLimit) {
     parts.push(
-      SPEECH_NOTE_FORMATTERS[language].audioUpTo(
+      formatter.audioUpTo(
         formatDurationLimit(durationLimit.value, language),
       ),
     );
@@ -960,7 +980,12 @@ function getProviderTtsLanguageNote(
   provider: Provider,
   language: AppLanguage,
 ) {
-  return PROVIDER_TTS_LANGUAGE_NOTES_BY_LANGUAGE[language]?.[provider] ?? null;
+  return (
+    getLocalizedResource(
+      PROVIDER_TTS_LANGUAGE_NOTES_BY_LANGUAGE,
+      language,
+    )[provider] ?? null
+  );
 }
 
 export function getProviderTtsLanguageNoteForModel(
