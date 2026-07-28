@@ -66,6 +66,7 @@ export const uk: TranslationDictionary = {
   ukrainian: "Українська",
   hindi: "Гінді",
   spanish: "Іспанська",
+  french: "Французька",
   light: "Світла",
   dark: "Темна",
   system: "Системна",

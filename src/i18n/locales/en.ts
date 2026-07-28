@@ -60,6 +60,7 @@ export const en: TranslationDictionary = {
   ukrainian: "Ukrainian",
   hindi: "Hindi",
   spanish: "Spanish",
+  french: "French",
   light: "Light",
   dark: "Dark",
   system: "System",
