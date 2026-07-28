@@ -8,6 +8,10 @@ import {
   DEFAULT_ASSISTANT_INSTRUCTIONS_BY_LANGUAGE,
 } from "../../src/types";
 import {
+  APP_LANGUAGES,
+  getAppLocale,
+} from "../../src/i18n/localeRegistry";
+import {
   deriveResponseModesForProvider,
   getAvailableResponseModes,
 } from "../../src/utils/responseModes";
@@ -661,168 +665,32 @@ describe("useSettings", () => {
     expect(result.current.settings.setupGuideDismissed).toBe(false);
   });
 
-  it("switches built-in assistant instructions when the language changes", async () => {
-    const { result } = renderHook(() => useSettings());
-    await flushSettingsLoad();
+  it.each(APP_LANGUAGES)(
+    "persists registered app language %s with its registry defaults",
+    async (language) => {
+      const { result } = renderHook(() => useSettings());
+      await flushSettingsLoad();
 
-    await act(async () => {
-      result.current.updateSettings({ language: "de" });
-    });
+      await act(async () => {
+        result.current.updateSettings({ language });
+      });
 
-    expect(result.current.settings.language).toBe("de");
-    expect(result.current.settings.assistantInstructions).toBe(
-      DEFAULT_ASSISTANT_INSTRUCTIONS_BY_LANGUAGE.de,
-    );
-    expect(AsyncStorage.setItem).toHaveBeenCalledWith(
-      "@mrbroccoli/settings",
-      expect.stringContaining('"language":"de"'),
-    );
-  });
+      const locale = getAppLocale(language);
+      expect(result.current.settings.language).toBe(language);
+      expect(result.current.settings.assistantInstructions).toBe(
+        locale.defaultAssistantInstructions,
+      );
+      expect(result.current.settings.ttsListenLanguages).toEqual([
+        locale.defaultTtsListenLanguage,
+      ]);
+      expect(AsyncStorage.setItem).toHaveBeenCalledWith(
+        "@mrbroccoli/settings",
+        expect.stringContaining(`"language":"${language}"`),
+      );
+    },
+  );
 
-  it("persists Ukrainian as a UI-only language", async () => {
-    const { result } = renderHook(() => useSettings());
-    await flushSettingsLoad();
-
-    await act(async () => {
-      result.current.updateSettings({ language: "uk" });
-    });
-
-    expect(result.current.settings.language).toBe("uk");
-    expect(result.current.settings.assistantInstructions).toBe(
-      DEFAULT_ASSISTANT_INSTRUCTIONS_BY_LANGUAGE.en,
-    );
-    expect(result.current.settings.ttsListenLanguages).toEqual(["en"]);
-    expect(AsyncStorage.setItem).toHaveBeenCalledWith(
-      "@mrbroccoli/settings",
-      expect.stringContaining('"language":"uk"'),
-    );
-  });
-
-  it("persists Hindi as a UI-only language", async () => {
-    const { result } = renderHook(() => useSettings());
-    await flushSettingsLoad();
-
-    await act(async () => {
-      result.current.updateSettings({ language: "hi" });
-    });
-
-    expect(result.current.settings.language).toBe("hi");
-    expect(result.current.settings.assistantInstructions).toBe(
-      DEFAULT_ASSISTANT_INSTRUCTIONS_BY_LANGUAGE.en,
-    );
-    expect(result.current.settings.ttsListenLanguages).toEqual(["en"]);
-    expect(AsyncStorage.setItem).toHaveBeenCalledWith(
-      "@mrbroccoli/settings",
-      expect.stringContaining('"language":"hi"'),
-    );
-  });
-
-  it("persists Spanish as a UI-only language", async () => {
-    const { result } = renderHook(() => useSettings());
-    await flushSettingsLoad();
-
-    await act(async () => {
-      result.current.updateSettings({ language: "es" });
-    });
-
-    expect(result.current.settings.language).toBe("es");
-    expect(result.current.settings.assistantInstructions).toBe(
-      DEFAULT_ASSISTANT_INSTRUCTIONS_BY_LANGUAGE.en,
-    );
-    expect(result.current.settings.ttsListenLanguages).toEqual(["en"]);
-  });
-
-  it("persists French as a UI-only language", async () => {
-    const { result } = renderHook(() => useSettings());
-    await flushSettingsLoad();
-
-    await act(async () => {
-      result.current.updateSettings({ language: "fr" });
-    });
-
-    expect(result.current.settings.language).toBe("fr");
-    expect(result.current.settings.assistantInstructions).toBe(
-      DEFAULT_ASSISTANT_INSTRUCTIONS_BY_LANGUAGE.en,
-    );
-    expect(result.current.settings.ttsListenLanguages).toEqual(["en"]);
-  });
-
-  it("persists Italian as a UI-only language", async () => {
-    const { result } = renderHook(() => useSettings());
-    await flushSettingsLoad();
-
-    await act(async () => {
-      result.current.updateSettings({ language: "it" });
-    });
-
-    expect(result.current.settings.language).toBe("it");
-    expect(result.current.settings.assistantInstructions).toBe(
-      DEFAULT_ASSISTANT_INSTRUCTIONS_BY_LANGUAGE.en,
-    );
-    expect(result.current.settings.ttsListenLanguages).toEqual(["en"]);
-  });
-
-  it("persists Portuguese as a UI-only language", async () => {
-    const { result } = renderHook(() => useSettings());
-    await flushSettingsLoad();
-
-    await act(async () => {
-      result.current.updateSettings({ language: "pt" });
-    });
-
-    expect(result.current.settings.language).toBe("pt");
-    expect(result.current.settings.assistantInstructions).toBe(
-      DEFAULT_ASSISTANT_INSTRUCTIONS_BY_LANGUAGE.en,
-    );
-    expect(result.current.settings.ttsListenLanguages).toEqual(["en"]);
-  });
-
-  it("persists Brazilian Portuguese as a UI-only language", async () => {
-    const { result } = renderHook(() => useSettings());
-    await flushSettingsLoad();
-
-    await act(async () => {
-      result.current.updateSettings({ language: "pt-BR" });
-    });
-
-    expect(result.current.settings.language).toBe("pt-BR");
-    expect(result.current.settings.assistantInstructions).toBe(
-      DEFAULT_ASSISTANT_INSTRUCTIONS_BY_LANGUAGE.en,
-    );
-    expect(result.current.settings.ttsListenLanguages).toEqual(["en"]);
-  });
-
-  it("persists Russian as a UI-only language", async () => {
-    const { result } = renderHook(() => useSettings());
-    await flushSettingsLoad();
-
-    await act(async () => {
-      result.current.updateSettings({ language: "ru" });
-    });
-
-    expect(result.current.settings.language).toBe("ru");
-    expect(result.current.settings.assistantInstructions).toBe(
-      DEFAULT_ASSISTANT_INSTRUCTIONS_BY_LANGUAGE.en,
-    );
-    expect(result.current.settings.ttsListenLanguages).toEqual(["en"]);
-  });
-
-  it("persists Simplified Chinese as a UI-only language", async () => {
-    const { result } = renderHook(() => useSettings());
-    await flushSettingsLoad();
-
-    await act(async () => {
-      result.current.updateSettings({ language: "zh-CN" });
-    });
-
-    expect(result.current.settings.language).toBe("zh-CN");
-    expect(result.current.settings.assistantInstructions).toBe(
-      DEFAULT_ASSISTANT_INSTRUCTIONS_BY_LANGUAGE.en,
-    );
-    expect(result.current.settings.ttsListenLanguages).toEqual(["en"]);
-  });
-
-  it("persists Arabic as a UI-only language", async () => {
+  it("keeps UI-only Arabic on English speech defaults", async () => {
     const { result } = renderHook(() => useSettings());
     await flushSettingsLoad();
 

@@ -89,7 +89,8 @@ export function AntSettingsOverview({
   onOpenSetupGuide?: () => void;
 }) {
   const { colors } = useTheme();
-  const { t } = useLocalization();
+  const { isRtl, t } = useLocalization();
+  const drillInIcon = isRtl ? "chevron-left" : "chevron-right";
   const readinessItems = [
     {
       key: "thinking",
@@ -152,7 +153,7 @@ export function AntSettingsOverview({
                 </Text>
               </View>
               <Feather
-                name="chevron-right"
+                name={drillInIcon}
                 size={20}
                 color={colors.textMuted}
               />
@@ -273,7 +274,7 @@ export function AntSettingsOverview({
               }
               extra={
                 <Feather
-                  name="chevron-right"
+                  name={drillInIcon}
                   size={20}
                   color={colors.textMuted}
                 />
@@ -298,7 +299,7 @@ export function AntSettingsOverview({
                   fontWeight: "600",
                 },
                 Extra: {
-                  paddingLeft: 10,
+                  paddingStart: 10,
                 },
               }}
             >

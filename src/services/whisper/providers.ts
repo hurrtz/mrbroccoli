@@ -12,6 +12,7 @@ import {
   requireGoogleCloudSpeechCredentials,
 } from "../google";
 import { getDeviceLocale, getFileAudioMimeType } from "../../utils/speechLanguage";
+import { getDefaultContentLanguageForLocale } from "../../i18n/localeRegistry";
 import { fetchWithTimeout } from "./abort";
 import { getProviderSttTimeoutMs } from "./config";
 import type {
@@ -40,7 +41,7 @@ interface SharedProviderParams {
 function getGoogleCloudSpeechLanguageCode(language: AppLanguage) {
   const deviceLocale = getDeviceLocale();
 
-  if (language === "de") {
+  if (getDefaultContentLanguageForLocale(language) === "de") {
     return deviceLocale.toLowerCase().startsWith("de-") ? deviceLocale : "de-DE";
   }
 
@@ -557,5 +558,5 @@ export async function transcribeWithXaiRestSttProvider(
 }
 
 function normalizeXaiSttLanguage(language: AppLanguage) {
-  return language === "de" ? "de" : "en";
+  return getDefaultContentLanguageForLocale(language);
 }

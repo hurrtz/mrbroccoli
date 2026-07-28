@@ -10,6 +10,7 @@ import {
 import { PROVIDER_LABELS } from "../constants/models";
 import { translate } from "../i18n";
 import type { AppLanguage, WebSearchSource } from "../types";
+import { getDefaultContentLanguageForLocale } from "../i18n/localeRegistry";
 import { requireProviderKey } from "./llm/shared";
 import { resolveQwenApiEndpoint } from "../utils/qwenRegion";
 import { recordDebugLogEvent } from "./debugLogCapture";
@@ -78,7 +79,7 @@ function buildWebSearchPrompt(params: {
 }
 
 function getValidationQuery(language: AppLanguage) {
-  return language === "de"
+  return getDefaultContentLanguageForLocale(language) === "de"
     ? "Wie spät ist es aktuell in UTC? Nutze eine verlässliche Webseite und antworte in einem kurzen Satz."
     : "What is the current UTC time? Use a reliable website and reply in one short sentence.";
 }

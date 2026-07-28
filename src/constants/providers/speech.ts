@@ -1,4 +1,5 @@
 import { getCatalogModelForAppProvider } from "../../catalog/appProviders";
+import { getDefaultContentLanguageForLocale } from "../../i18n/localeRegistry";
 import type { AppLanguage, Provider } from "../../types";
 import {
   RUNTIME_PROVIDER_MANIFEST,
@@ -102,7 +103,7 @@ function localizeVoiceOptions(
   options: RuntimeVoiceOption[],
   language: AppLanguage,
 ): TtsVoiceOption[] {
-  if (language !== "de") {
+  if (getDefaultContentLanguageForLocale(language) !== "de") {
     return toVoiceOptions(options);
   }
 

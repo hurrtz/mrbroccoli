@@ -15,6 +15,7 @@ import {
 import { useTheme } from "../../../theme/ThemeContext";
 import { fonts } from "../../../theme/typography";
 import type { AppLanguage, Settings, ThemeMode } from "../../../types";
+import { APP_LANGUAGE_OPTIONS } from "../../../i18n/localeRegistry";
 
 import {
   AntPickerRow,
@@ -101,20 +102,7 @@ export function AppSettingsPage({
           standalone
           label={t("language")}
           value={settings.language}
-          options={[
-            { value: "en", label: t("english") },
-            { value: "de", label: t("german") },
-            { value: "uk", label: t("ukrainian") },
-            { value: "hi", label: t("hindi") },
-            { value: "es", label: t("spanish") },
-            { value: "fr", label: t("french") },
-            { value: "it", label: t("italian") },
-            { value: "pt", label: t("portuguese") },
-            { value: "pt-BR", label: t("portugueseBrazil") },
-            { value: "ru", label: t("russian") },
-            { value: "zh-CN", label: t("simplifiedChinese") },
-            { value: "ar", label: t("arabic") },
-          ]}
+          options={APP_LANGUAGE_OPTIONS}
           onChange={(value) => onUpdate({ language: value as AppLanguage })}
         />
         <AntRadioSection<"show" | "hide">

@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import * as Speech from "expo-speech";
 
 import { AppLanguage } from "../../types";
+import { getDefaultContentLanguageForLocale } from "../../i18n/localeRegistry";
 
 import { getNativeVoiceOptionLabel, normalizeNativeVoices } from "./helpers";
 import { NativeSpeechVoice } from "./types";
@@ -22,7 +23,8 @@ export function useNativeVoiceOptions(params: {
     }
 
     let cancelled = false;
-    const preferredLanguagePrefix = language === "de" ? "de" : "en";
+    const preferredLanguagePrefix =
+      getDefaultContentLanguageForLocale(language);
 
     void Speech.getAvailableVoicesAsync()
       .then((voices) => {

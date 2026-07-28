@@ -19,6 +19,7 @@ import {
   getDefaultTtsListenLanguages,
   isDefaultAssistantInstructions,
 } from "../../types";
+import { isAppLanguage } from "../../i18n/localeRegistry";
 import type { LegacyStoredSettings } from "./types";
 
 function isAllowedValue<T extends string>(
@@ -36,20 +37,6 @@ function getAllowedValue<T extends string>(
   return isAllowedValue(value, allowedValues) ? value : fallback;
 }
 
-const APP_LANGUAGES = [
-  "en",
-  "de",
-  "uk",
-  "hi",
-  "es",
-  "fr",
-  "it",
-  "pt",
-  "pt-BR",
-  "ru",
-  "zh-CN",
-  "ar",
-] as const satisfies readonly AppLanguage[];
 const INPUT_MODES = [
   "push-to-talk",
   "toggle-to-talk",
@@ -152,11 +139,9 @@ export function normalizeStoredScalarSettings(
   | "ttsProvider"
   | "webSearchProvider"
 > {
-  const language = getAllowedValue(
-    storedSettings?.language,
-    APP_LANGUAGES,
-    DEFAULT_SETTINGS.language,
-  );
+  const language = isAppLanguage(storedSettings?.language)
+    ? storedSettings.language
+    : DEFAULT_SETTINGS.language;
   const storedAssistantInstructions = storedSettings?.assistantInstructions;
   const assistantInstructions =
     typeof storedAssistantInstructions === "string" &&

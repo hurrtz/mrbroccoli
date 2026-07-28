@@ -419,7 +419,7 @@ export function AntPickerRow({
 }: {
   label?: string;
   value: string;
-  options: AntPickerOption[];
+  options: readonly AntPickerOption[];
   onChange: (value: string) => void;
   disabled?: boolean;
   standalone?: boolean;

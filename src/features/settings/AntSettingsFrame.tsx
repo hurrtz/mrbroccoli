@@ -47,7 +47,7 @@ export function AntSettingsFrame({
   validationToastMessage,
 }: AntSettingsFrameProps) {
   const { colors } = useTheme();
-  const { t } = useLocalization();
+  const { isRtl, t } = useLocalization();
   const showsBackButton = activePage !== "overview";
   const animatedModalStyle = {
     opacity: entrance,
@@ -119,7 +119,7 @@ export function AntSettingsFrame({
             <AntIconButton
               iconNode={
                 <Feather
-                  name="arrow-left"
+                  name={isRtl ? "arrow-right" : "arrow-left"}
                   size={22}
                   color={colors.textSecondary}
                 />

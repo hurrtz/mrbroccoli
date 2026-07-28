@@ -1,4 +1,5 @@
 import { AppLanguage, TtsListenLanguage } from "../types";
+import { getDefaultContentLanguageForLocale } from "../i18n/localeRegistry";
 
 export const PROVIDER_PREVIEW_SAMPLE_TEXT_BY_LANGUAGE: Record<
   TtsListenLanguage,
@@ -31,7 +32,7 @@ export const LOCAL_PREVIEW_SAMPLE_TEXT_BY_LANGUAGE: Record<
 };
 
 export function getNativePreviewSampleText(language: AppLanguage) {
-  return language === "de"
+  return getDefaultContentLanguageForLocale(language) === "de"
     ? "Guten Abend! Über den Dächern von Düsseldorf färbt die Sonne den Himmel orange. Später schließen wir die Bürotür, gönnen uns heißen Tee und prüfen, ob diese Stimme Zahlen, Umlaute und längere Sätze natürlich betont."
     : "Here’s a fresh voice check: warm coffee, a crisp breeze, and three blue bicycles waiting by the river. If every word sounds clear—from whispering leaves to numbers like forty-two—this voice should feel comfortable during a longer reply.";
 }

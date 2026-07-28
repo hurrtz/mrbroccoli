@@ -18,7 +18,7 @@ import {
 
 import { AntSettingsModal as SettingsModal } from "../../src/features/settings/AntSettingsModal";
 import { PROVIDER_LABELS } from "../../src/constants/models";
-import { LocalizationProvider } from "../../src/i18n";
+import { LocalizationProvider, translate } from "../../src/i18n";
 import { ThemeProvider } from "../../src/theme/ThemeContext";
 import { lightColors } from "../../src/theme/colors";
 import {
@@ -30,6 +30,7 @@ import {
 import { useSpeechDiagnostics } from "../../src/hooks/useSpeechDiagnostics";
 import { clearSpeechDiagnostics } from "../../src/services/speech/diagnostics";
 import { getProviderValidationTarget } from "../../src/features/settings-core/providerSupport";
+import { APP_LANGUAGE_OPTIONS } from "../../src/i18n/localeRegistry";
 
 jest.mock("react-native-safe-area-context", () => ({
   SafeAreaView: ({ children, ...props }: React.PropsWithChildren) => {
@@ -222,6 +223,32 @@ describe("SettingsModal", () => {
       expect(screen.getByText("Тема")).toBeTruthy();
       expect(screen.getByText("Українська")).toBeTruthy();
       expect(screen.queryByText("Theme")).toBeNull();
+    });
+  });
+
+  it("mirrors settings navigation icons for Arabic", async () => {
+    const screen = renderSettingsModal(
+      {
+        settings: {
+          ...DEFAULT_SETTINGS,
+          language: "ar",
+        },
+      },
+      "ar",
+    );
+
+    await waitFor(() => {
+      expect(
+        screen.getAllByTestId("icon-chevron-left").length,
+      ).toBeGreaterThan(0);
+      expect(screen.queryByTestId("icon-chevron-right")).toBeNull();
+    });
+
+    fireEvent.press(screen.getByText(translate("ar", "settingsConnections")));
+
+    await waitFor(() => {
+      expect(screen.getByTestId("icon-arrow-right")).toBeTruthy();
+      expect(screen.queryByTestId("icon-arrow-left")).toBeNull();
     });
   });
 
@@ -1014,22 +1041,7 @@ describe("SettingsModal", () => {
             (option: { value: string }) => option.value === "uk",
           ),
         )?.props.data,
-    ).toEqual(
-      expect.arrayContaining([
-        { label: "English", value: "en" },
-        { label: "German", value: "de" },
-        { label: "Ukrainian", value: "uk" },
-        { label: "Hindi", value: "hi" },
-        { label: "Spanish", value: "es" },
-        { label: "French", value: "fr" },
-        { label: "Italian", value: "it" },
-        { label: "Portuguese", value: "pt" },
-        { label: "Portuguese (Brazil)", value: "pt-BR" },
-        { label: "Russian", value: "ru" },
-        { label: "Simplified Chinese", value: "zh-CN" },
-        { label: "Arabic", value: "ar" },
-      ]),
-    );
+    ).toEqual(APP_LANGUAGE_OPTIONS);
     expect(StyleSheet.flatten(languagePicker!.props.style).marginHorizontal).toBe(
       0,
     );
