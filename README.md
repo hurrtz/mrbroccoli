@@ -4,6 +4,9 @@ Mr Broccoli is a voice-first mobile chat app built with Expo and React Native. I
 
 The app is intentionally user-key driven. No provider API keys are shipped in the app bundle. Each user adds their own keys in Settings, and providers stay disabled until configured.
 
+See the [changelog](CHANGELOG.md) for user-facing release history and localized
+store notes.
+
 ## Highlights
 
 - Voice-first interaction with live recording and playback states
