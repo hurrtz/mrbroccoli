@@ -93,6 +93,18 @@ const RUSSIAN_EFFORT_LABELS: Record<string, string> = {
   disabled: "Выключено",
   enabled: "Включено",
 };
+const SIMPLIFIED_CHINESE_EFFORT_LABELS: Record<string, string> = {
+  none: "无",
+  minimal: "最低",
+  low: "低",
+  medium: "中",
+  high: "高",
+  xhigh: "很高",
+  max: "最高",
+  dynamic: "动态",
+  disabled: "已关闭",
+  enabled: "已开启",
+};
 
 export function getModelEffortConfig(
   provider: Provider,
@@ -217,6 +229,9 @@ export function getModelEffortOptionLabel(
   }
   if (language === "ru") {
     return RUSSIAN_EFFORT_LABELS[option.id] ?? option.label;
+  }
+  if (language === "zh-CN") {
+    return SIMPLIFIED_CHINESE_EFFORT_LABELS[option.id] ?? option.label;
   }
   return option.label;
 }

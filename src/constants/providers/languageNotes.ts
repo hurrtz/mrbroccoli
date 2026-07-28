@@ -34,6 +34,8 @@ const NATIVE_STT_LANGUAGE_NOTES_BY_LANGUAGE: Record<AppLanguage, string> = {
     "O suporte a idiomas depende do sistema operacional do dispositivo, dos pacotes de idioma instalados e da disponibilidade do reconhecimento. A lista exata varia de acordo com o dispositivo.",
   ru:
     "Поддержка языков зависит от операционной системы устройства, установленных языковых пакетов и доступности распознавания. Точный список различается в зависимости от устройства.",
+  "zh-CN":
+    "语言支持取决于设备操作系统、已安装的语言包和语音识别可用性。确切列表因设备而异。",
 };
 
 const NATIVE_TTS_LANGUAGE_NOTES_BY_LANGUAGE: Record<AppLanguage, string> = {
@@ -56,6 +58,8 @@ const NATIVE_TTS_LANGUAGE_NOTES_BY_LANGUAGE: Record<AppLanguage, string> = {
     "O suporte a idiomas depende das vozes do sistema instaladas no dispositivo. A lista exata, a qualidade da pronúncia e a disponibilidade offline variam de acordo com o sistema operacional e o dispositivo.",
   ru:
     "Поддержка языков зависит от системных голосов, установленных на устройстве. Точный список, качество произношения и доступность без подключения зависят от операционной системы и устройства.",
+  "zh-CN":
+    "语言支持取决于设备上安装的系统语音。确切列表、发音质量和离线可用性因操作系统和设备而异。",
 };
 
 const GERMAN_PROVIDER_API_KEY_PLACEHOLDER_OVERRIDES: Partial<
@@ -115,6 +119,12 @@ const RUSSIAN_PROVIDER_API_KEY_PLACEHOLDER_OVERRIDES: Partial<
   Record<Provider, string>
 > = {
   mistral: "Введите ключ API",
+};
+
+const SIMPLIFIED_CHINESE_PROVIDER_API_KEY_PLACEHOLDER_OVERRIDES: Partial<
+  Record<Provider, string>
+> = {
+  mistral: "输入 API 密钥",
 };
 
 const PROVIDER_API_KEY_PLACEHOLDERS_BY_LANGUAGE: Record<
@@ -190,6 +200,13 @@ const PROVIDER_API_KEY_PLACEHOLDERS_BY_LANGUAGE: Record<
         PROVIDER_CONFIGS[provider].apiKeyPlaceholder,
     ]),
   ) as Record<Provider, string>,
+  "zh-CN": Object.fromEntries(
+    PROVIDER_ORDER.map((provider) => [
+      provider,
+      SIMPLIFIED_CHINESE_PROVIDER_API_KEY_PLACEHOLDER_OVERRIDES[provider] ??
+        PROVIDER_CONFIGS[provider].apiKeyPlaceholder,
+    ]),
+  ) as Record<Provider, string>,
 };
 
 const GENERIC_PROVIDER_API_KEY_HINTS: Record<AppLanguage, string> = {
@@ -213,6 +230,8 @@ const GENERIC_PROVIDER_API_KEY_HINTS: Record<AppLanguage, string> = {
     "Cole as credenciais de um serviço externo que você já usa. As chaves permanecem neste dispositivo e são usadas apenas nas solicitações iniciadas por você no aplicativo.",
   ru:
     "Вставьте учётные данные внешнего сервиса, которым вы уже пользуетесь. Ключи остаются на этом устройстве и используются только для запросов, которые вы запускаете в приложении.",
+  "zh-CN":
+    "粘贴你已在使用的外部服务凭据。密钥仅保存在此设备上，并只用于你在应用中发起的请求。",
 };
 
 const PROVIDER_API_KEY_HINT_OVERRIDES: Partial<
@@ -267,6 +286,11 @@ const PROVIDER_API_KEY_HINT_OVERRIDES: Partial<
     openrouter: `${GENERIC_PROVIDER_API_KEY_HINTS.ru} Один ключ OpenRouter открывает доступ к выбранным моделям шлюза ниже. Запросы проходят через OpenRouter к выбранному исходному провайдеру; прямые ключи провайдеров остаются отдельными.`,
     elevenlabs: `${GENERIC_PROVIDER_API_KEY_HINTS.ru} Ограниченным ключам ElevenLabs требуется разрешение Text to Speech для TTS и Speech to Text для STT. Voices read необязательно и открывает только библиотеку голосов аккаунта.`,
     "moonshot-ai-kimi": `${GENERIC_PROVIDER_API_KEY_HINTS.ru} Moonshot открывает доступ к Kimi K3 после как минимум одного успешного пополнения счёта на 1 доллар США.`,
+  },
+  "zh-CN": {
+    openrouter: `${GENERIC_PROVIDER_API_KEY_HINTS["zh-CN"]} 一个 OpenRouter 密钥可解锁下方精选的网关模型。请求会经由 OpenRouter 发送到所选的上游提供商；各提供商的直接密钥仍保持独立。`,
+    elevenlabs: `${GENERIC_PROVIDER_API_KEY_HINTS["zh-CN"]} 受限的 ElevenLabs 密钥需要 Text to Speech 权限才能使用 TTS，需要 Speech to Text 权限才能使用 STT。Voices read 为可选权限，仅用于解锁账户语音库。`,
+    "moonshot-ai-kimi": `${GENERIC_PROVIDER_API_KEY_HINTS["zh-CN"]} Moonshot 会在账户至少成功充值 1 美元后解锁 Kimi K3。`,
   },
 };
 
@@ -333,6 +357,12 @@ const PROVIDER_STT_LANGUAGE_NOTES_BY_LANGUAGE: Partial<
       `OpenAI сейчас предлагает gpt-4o-transcribe, gpt-4o-mini-transcribe и whisper-1 для распознавания речи. Опубликованный OpenAI список хорошо поддерживаемых языков: ${WHISPER_WELL_SUPPORTED_LANGUAGES}`,
     mistral:
       "Текущий маршрут транскрипции Voxtral документирован для английского, испанского, французского, португальского, хинди, немецкого, нидерландского и итальянского языков.",
+  },
+  "zh-CN": {
+    openai:
+      `OpenAI 目前提供 gpt-4o-transcribe、gpt-4o-mini-transcribe 和 whisper-1 用于语音转文字。OpenAI 公布的良好支持语言列表为：${WHISPER_WELL_SUPPORTED_LANGUAGES}`,
+    mistral:
+      "当前 Voxtral 转录路线已记录支持英语、西班牙语、法语、葡萄牙语、印地语、德语、荷兰语和意大利语。",
   },
 };
 
@@ -417,6 +447,14 @@ const PROVIDER_TTS_LANGUAGE_NOTES_BY_LANGUAGE: Partial<
       "Gemini TTS сейчас поддерживает арабский, бенгальский, нидерландский, английский, французский, немецкий, хинди, индонезийский, итальянский, японский, корейский, китайский мандарин, польский, португальский, румынский, русский, испанский, тамильский, телугу, тайский, турецкий, украинский, урду и вьетнамский языки.",
     xai:
       "xAI TTS сейчас поддерживает арабский, нидерландский, английский, французский, немецкий, хинди, индонезийский, итальянский, японский, корейский, польский, португальский, русский, испанский, тайский, турецкий, вьетнамский и китайский языки.",
+  },
+  "zh-CN": {
+    openai:
+      "OpenAI 目前提供 gpt-4o-mini-tts、tts-1 和 tts-1-hd 用于文字转语音。OpenAI 没有像 STT 那样公布简明的良好支持语言列表，并说明这些语音针对英语进行了优化。",
+    gemini:
+      "Gemini TTS 目前支持阿拉伯语、孟加拉语、荷兰语、英语、法语、德语、印地语、印度尼西亚语、意大利语、日语、韩语、普通话、波兰语、葡萄牙语、罗马尼亚语、俄语、西班牙语、泰米尔语、泰卢固语、泰语、土耳其语、乌克兰语、乌尔都语和越南语。",
+    xai:
+      "xAI TTS 目前支持阿拉伯语、荷兰语、英语、法语、德语、印地语、印度尼西亚语、意大利语、日语、韩语、波兰语、葡萄牙语、俄语、西班牙语、泰语、土耳其语、越南语和中文。",
   },
 };
 
@@ -617,6 +655,20 @@ const SPEECH_NOTE_FORMATTERS: Record<AppLanguage, SpeechNoteFormatter> = {
     approximateFileUploadRange: (minimum, maximum) =>
       `Примерный предел размера файла от ${minimum} до ${maximum} в зависимости от тарифа`,
     audioUpTo: (limit) => `Аудио до ${limit}`,
+  },
+  "zh-CN": {
+    voicesAcross: (voices, languages) =>
+      `${languages} 种语言，共 ${voices} 个语音`,
+    supportsLanguages: (languages) => `支持 ${languages} 种语言`,
+    multilingual: "多语言",
+    englishOptimized: "语音针对英语进行了优化",
+    duration: (value, unit) =>
+      `${value} ${{ hour: "小时", minute: "分钟", second: "秒" }[unit]}`,
+    fileUploadUpTo: (limit) => `文件上传上限为 ${limit}`,
+    approximateFileUpload: (limit) => `文件上传估算上限为 ${limit}`,
+    approximateFileUploadRange: (minimum, maximum) =>
+      `文件上传估算上限因套餐而异，为 ${minimum} 至 ${maximum}`,
+    audioUpTo: (limit) => `音频最长 ${limit}`,
   },
 };
 

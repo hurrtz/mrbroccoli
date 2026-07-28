@@ -71,6 +71,7 @@ export const uk: TranslationDictionary = {
   portuguese: "Португальська",
   portugueseBrazil: "Португальська (Бразилія)",
   russian: "Російська",
+  simplifiedChinese: "Спрощена китайська",
   light: "Світла",
   dark: "Темна",
   system: "Системна",

@@ -178,6 +178,22 @@ const antLocales: Record<AppLanguage, AntLocale> = {
       cancelText: "Отмена",
     },
   },
+  "zh-CN": {
+    locale: "zh-CN",
+    Modal: {
+      okText: "确定",
+      cancelText: "取消",
+      buttonText: "按钮",
+    },
+    Picker: {
+      okText: "确定",
+      dismissText: "取消",
+      extra: "请选择",
+    },
+    SearchBar: {
+      cancelText: "取消",
+    },
+  },
 };
 
 export function AntDesignAppProvider({

@@ -65,6 +65,7 @@ export const hi: TranslationDictionary = {
   portuguese: "पुर्तगाली",
   portugueseBrazil: "पुर्तगाली (ब्राज़ील)",
   russian: "रूसी",
+  simplifiedChinese: "सरलीकृत चीनी",
   light: "लाइट",
   dark: "डार्क",
   system: "सिस्टम",
