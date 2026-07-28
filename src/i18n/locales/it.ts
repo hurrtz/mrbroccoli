@@ -62,6 +62,7 @@ export const it: TranslationDictionary = {
   spanish: "spagnolo",
   french: "francese",
   italian: "Italiano",
+  portuguese: "Portoghese",
   light: "Chiaro",
   dark: "Scuro",
   system: "Sistema",

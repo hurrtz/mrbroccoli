@@ -5,6 +5,7 @@ import { es } from "./locales/es";
 import { fr } from "./locales/fr";
 import { hi } from "./locales/hi";
 import { it } from "./locales/it";
+import { pt } from "./locales/pt";
 import { uk } from "./locales/uk";
 import type { TranslationDictionary, TranslationParams, TranslationValue } from "./types";
 
@@ -18,4 +19,5 @@ export const translations = {
   es,
   fr,
   it,
+  pt,
 } satisfies Record<AppLanguage, TranslationDictionary>;

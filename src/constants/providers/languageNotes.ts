@@ -28,6 +28,8 @@ const NATIVE_STT_LANGUAGE_NOTES_BY_LANGUAGE: Record<AppLanguage, string> = {
     "La prise en charge des langues dépend du système d’exploitation de l’appareil, des packs linguistiques installés et de la disponibilité de la reconnaissance. La liste exacte varie selon l’appareil.",
   it:
     "Il supporto linguistico dipende dal sistema operativo del dispositivo, dai pacchetti di lingua installati e dalla disponibilità del riconoscimento. L’elenco esatto varia in base al dispositivo.",
+  pt:
+    "O suporte de idiomas depende do sistema operativo do dispositivo, dos pacotes de idiomas instalados e da disponibilidade do reconhecimento. A lista exata varia consoante o dispositivo.",
 };
 
 const NATIVE_TTS_LANGUAGE_NOTES_BY_LANGUAGE: Record<AppLanguage, string> = {
@@ -44,6 +46,8 @@ const NATIVE_TTS_LANGUAGE_NOTES_BY_LANGUAGE: Record<AppLanguage, string> = {
     "La prise en charge des langues dépend des voix système installées sur l’appareil. La liste exacte, la qualité de prononciation et la disponibilité hors ligne varient selon le système d’exploitation et l’appareil.",
   it:
     "Il supporto linguistico dipende dalle voci di sistema installate sul dispositivo. L’elenco esatto, la qualità della pronuncia e la disponibilità offline variano in base al sistema operativo e al dispositivo.",
+  pt:
+    "O suporte de idiomas depende das vozes do sistema instaladas no dispositivo. A lista exata, a qualidade da pronúncia e a disponibilidade offline variam consoante o sistema operativo e o dispositivo.",
 };
 
 const GERMAN_PROVIDER_API_KEY_PLACEHOLDER_OVERRIDES: Partial<
@@ -85,6 +89,12 @@ const ITALIAN_PROVIDER_API_KEY_PLACEHOLDER_OVERRIDES: Partial<
   Record<Provider, string>
 > = {
   mistral: "Inserisci la chiave API",
+};
+
+const PORTUGUESE_PROVIDER_API_KEY_PLACEHOLDER_OVERRIDES: Partial<
+  Record<Provider, string>
+> = {
+  mistral: "Introduza a chave API",
 };
 
 const PROVIDER_API_KEY_PLACEHOLDERS_BY_LANGUAGE: Record<
@@ -139,6 +149,13 @@ const PROVIDER_API_KEY_PLACEHOLDERS_BY_LANGUAGE: Record<
         PROVIDER_CONFIGS[provider].apiKeyPlaceholder,
     ]),
   ) as Record<Provider, string>,
+  pt: Object.fromEntries(
+    PROVIDER_ORDER.map((provider) => [
+      provider,
+      PORTUGUESE_PROVIDER_API_KEY_PLACEHOLDER_OVERRIDES[provider] ??
+        PROVIDER_CONFIGS[provider].apiKeyPlaceholder,
+    ]),
+  ) as Record<Provider, string>,
 };
 
 const GENERIC_PROVIDER_API_KEY_HINTS: Record<AppLanguage, string> = {
@@ -156,6 +173,8 @@ const GENERIC_PROVIDER_API_KEY_HINTS: Record<AppLanguage, string> = {
     "Collez les identifiants d’un service externe que vous utilisez déjà. Les clés restent sur cet appareil et ne servent qu’aux requêtes que vous lancez dans l’app.",
   it:
     "Incolla le credenziali di un servizio esterno che utilizzi già. Le chiavi restano su questo dispositivo e vengono usate solo per le richieste che avvii nell’app.",
+  pt:
+    "Cole as credenciais de um serviço externo que já utiliza. As chaves permanecem neste dispositivo e são usadas apenas nos pedidos que inicia na aplicação.",
 };
 
 const PROVIDER_API_KEY_HINT_OVERRIDES: Partial<
@@ -195,6 +214,11 @@ const PROVIDER_API_KEY_HINT_OVERRIDES: Partial<
     openrouter: `${GENERIC_PROVIDER_API_KEY_HINTS.it} Una chiave OpenRouter sblocca i modelli gateway selezionati qui sotto. Le richieste passano tramite OpenRouter al provider a monte scelto; le chiavi dirette dei provider restano separate.`,
     elevenlabs: `${GENERIC_PROVIDER_API_KEY_HINTS.it} Le chiavi ElevenLabs con restrizioni richiedono l’autorizzazione Text to Speech per il TTS e Speech to Text per lo STT. Voices read è facoltativo e sblocca solo la libreria vocale dell’account.`,
     "moonshot-ai-kimi": `${GENERIC_PROVIDER_API_KEY_HINTS.it} Moonshot sblocca l’accesso a Kimi K3 dopo almeno una ricarica riuscita di 1 USD.`,
+  },
+  pt: {
+    openrouter: `${GENERIC_PROVIDER_API_KEY_HINTS.pt} Uma chave OpenRouter desbloqueia os modelos de gateway selecionados abaixo. Os pedidos passam pelo OpenRouter para o fornecedor de origem escolhido; as chaves diretas dos fornecedores permanecem separadas.`,
+    elevenlabs: `${GENERIC_PROVIDER_API_KEY_HINTS.pt} As chaves ElevenLabs restritas precisam da permissão Text to Speech para TTS e Speech to Text para STT. Voices read é opcional e apenas desbloqueia a biblioteca de vozes da conta.`,
+    "moonshot-ai-kimi": `${GENERIC_PROVIDER_API_KEY_HINTS.pt} A Moonshot desbloqueia o acesso ao Kimi K3 depois de pelo menos um carregamento bem-sucedido de 1 USD.`,
   },
 };
 
@@ -243,6 +267,12 @@ const PROVIDER_STT_LANGUAGE_NOTES_BY_LANGUAGE: Partial<
       `OpenAI offre attualmente gpt-4o-transcribe, gpt-4o-mini-transcribe e whisper-1 per la trascrizione vocale. L’elenco delle lingue ben supportate pubblicato da OpenAI è: ${WHISPER_WELL_SUPPORTED_LANGUAGES}`,
     mistral:
       "L’attuale percorso di trascrizione Voxtral è documentato per inglese, spagnolo, francese, portoghese, hindi, tedesco, olandese e italiano.",
+  },
+  pt: {
+    openai:
+      `A OpenAI disponibiliza atualmente gpt-4o-transcribe, gpt-4o-mini-transcribe e whisper-1 para conversão de voz em texto. A lista de idiomas bem suportados publicada pela OpenAI é: ${WHISPER_WELL_SUPPORTED_LANGUAGES}`,
+    mistral:
+      "A rota de transcrição Voxtral atual está documentada para inglês, espanhol, francês, português, hindi, alemão, neerlandês e italiano.",
   },
 };
 
@@ -303,6 +333,14 @@ const PROVIDER_TTS_LANGUAGE_NOTES_BY_LANGUAGE: Partial<
       "Gemini TTS supporta attualmente arabo, bengalese, olandese, inglese, francese, tedesco, hindi, indonesiano, italiano, giapponese, coreano, cinese mandarino, polacco, portoghese, rumeno, russo, spagnolo, tamil, telugu, thailandese, turco, ucraino, urdu e vietnamita.",
     xai:
       "xAI TTS supporta attualmente arabo, olandese, inglese, francese, tedesco, hindi, indonesiano, italiano, giapponese, coreano, polacco, portoghese, russo, spagnolo, thailandese, turco, vietnamita e cinese.",
+  },
+  pt: {
+    openai:
+      "A OpenAI disponibiliza atualmente gpt-4o-mini-tts, tts-1 e tts-1-hd para síntese de voz. A OpenAI não publica para TTS uma lista compacta de idiomas bem suportados como para STT e indica que as vozes estão otimizadas para inglês.",
+    gemini:
+      "O Gemini TTS suporta atualmente árabe, bengali, neerlandês, inglês, francês, alemão, hindi, indonésio, italiano, japonês, coreano, chinês mandarim, polaco, português, romeno, russo, espanhol, tâmil, telugu, tailandês, turco, ucraniano, urdu e vietnamita.",
+    xai:
+      "O xAI TTS suporta atualmente árabe, neerlandês, inglês, francês, alemão, hindi, indonésio, italiano, japonês, coreano, polaco, português, russo, espanhol, tailandês, turco, vietnamita e chinês.",
   },
 };
 
@@ -446,6 +484,27 @@ const SPEECH_NOTE_FORMATTERS: Record<AppLanguage, SpeechNoteFormatter> = {
     approximateFileUploadRange: (minimum, maximum) =>
       `Limite approssimativo di caricamento da ${minimum} a ${maximum}, in base al piano`,
     audioUpTo: (limit) => `Audio fino a ${limit}`,
+  },
+  pt: {
+    voicesAcross: (voices, languages) =>
+      `${voices} vozes em ${languages} idiomas`,
+    supportsLanguages: (languages) => `Suporta ${languages} idiomas`,
+    multilingual: "Multilingue",
+    englishOptimized: "As vozes estão otimizadas para inglês",
+    duration: (value, unit) => {
+      const units = {
+        hour: value === 1 ? "hora" : "horas",
+        minute: value === 1 ? "minuto" : "minutos",
+        second: value === 1 ? "segundo" : "segundos",
+      };
+      return `${value} ${units[unit]}`;
+    },
+    fileUploadUpTo: (limit) => `Carregamento de ficheiros até ${limit}`,
+    approximateFileUpload: (limit) =>
+      `Limite aproximado de carregamento de ficheiros: ${limit}`,
+    approximateFileUploadRange: (minimum, maximum) =>
+      `Limite aproximado de carregamento de ficheiros de ${minimum} a ${maximum}, consoante o plano`,
+    audioUpTo: (limit) => `Áudio até ${limit}`,
   },
 };
 

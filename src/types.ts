@@ -29,7 +29,15 @@ export type ReplyPlayback = "stream" | "wait";
 export type TtsPlayback = ReplyPlayback;
 export type ThemeMode = "light" | "dark" | "system";
 export type ToastTone = "info" | "success" | "danger";
-export type AppLanguage = "en" | "de" | "uk" | "hi" | "es" | "fr" | "it";
+export type AppLanguage =
+  | "en"
+  | "de"
+  | "uk"
+  | "hi"
+  | "es"
+  | "fr"
+  | "it"
+  | "pt";
 export type ResponseMode = string;
 export type TtsListenLanguage =
   | "en"
@@ -349,6 +357,7 @@ export const DEFAULT_ASSISTANT_INSTRUCTIONS_BY_LANGUAGE: Record<
   es: DEFAULT_ENGLISH_ASSISTANT_INSTRUCTIONS,
   fr: DEFAULT_ENGLISH_ASSISTANT_INSTRUCTIONS,
   it: DEFAULT_ENGLISH_ASSISTANT_INSTRUCTIONS,
+  pt: DEFAULT_ENGLISH_ASSISTANT_INSTRUCTIONS,
 };
 
 const LEGACY_DEFAULT_ASSISTANT_INSTRUCTIONS = [

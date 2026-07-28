@@ -69,6 +69,18 @@ const ITALIAN_EFFORT_LABELS: Record<string, string> = {
   disabled: "Disattivato",
   enabled: "Attivato",
 };
+const PORTUGUESE_EFFORT_LABELS: Record<string, string> = {
+  none: "Nenhum",
+  minimal: "Mínimo",
+  low: "Baixo",
+  medium: "Médio",
+  high: "Alto",
+  xhigh: "Muito alto",
+  max: "Máximo",
+  dynamic: "Dinâmico",
+  disabled: "Desativado",
+  enabled: "Ativado",
+};
 
 export function getModelEffortConfig(
   provider: Provider,
@@ -187,6 +199,9 @@ export function getModelEffortOptionLabel(
   }
   if (language === "it") {
     return ITALIAN_EFFORT_LABELS[option.id] ?? option.label;
+  }
+  if (language === "pt") {
+    return PORTUGUESE_EFFORT_LABELS[option.id] ?? option.label;
   }
   return option.label;
 }
