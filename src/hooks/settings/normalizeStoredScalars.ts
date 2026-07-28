@@ -43,6 +43,7 @@ const APP_LANGUAGES = [
   "hi",
   "es",
   "fr",
+  "it",
 ] as const satisfies readonly AppLanguage[];
 const INPUT_MODES = [
   "push-to-talk",

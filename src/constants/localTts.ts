@@ -16,8 +16,8 @@ const LANGUAGE_LABELS: Record<
   TtsListenLanguage,
   Record<AppLanguage, string>
 > = {
-  en: { en: "English", de: "Englisch", uk: "Англійська", hi: "अंग्रेज़ी", es: "Inglés", fr: "Anglais" },
-  de: { en: "German", de: "Deutsch", uk: "Німецька", hi: "जर्मन", es: "Alemán", fr: "Allemand" },
+  en: { en: "English", de: "Englisch", uk: "Англійська", hi: "अंग्रेज़ी", es: "Inglés", fr: "Anglais", it: "Inglese" },
+  de: { en: "German", de: "Deutsch", uk: "Німецька", hi: "जर्मन", es: "Alemán", fr: "Allemand", it: "Tedesco" },
   zh: {
     en: "Simplified Chinese",
     de: "Vereinfachtes Chinesisch",
@@ -25,13 +25,14 @@ const LANGUAGE_LABELS: Record<
     hi: "सरलीकृत चीनी",
     es: "Chino simplificado",
     fr: "Chinois simplifié",
+    it: "Cinese semplificato",
   },
-  es: { en: "Spanish", de: "Spanisch", uk: "Іспанська", hi: "स्पेनिश", es: "Español", fr: "Espagnol" },
-  pt: { en: "Portuguese", de: "Portugiesisch", uk: "Португальська", hi: "पुर्तगाली", es: "Portugués", fr: "Portugais" },
-  hi: { en: "Hindi", de: "Hindi", uk: "Гінді", hi: "हिन्दी", es: "Hindi", fr: "Hindi" },
-  fr: { en: "French", de: "Französisch", uk: "Французька", hi: "फ़्रेंच", es: "Francés", fr: "Français" },
-  it: { en: "Italian", de: "Italienisch", uk: "Італійська", hi: "इतालवी", es: "Italiano", fr: "Italien" },
-  ja: { en: "Japanese", de: "Japanisch", uk: "Японська", hi: "जापानी", es: "Japonés", fr: "Japonais" },
+  es: { en: "Spanish", de: "Spanisch", uk: "Іспанська", hi: "स्पेनिश", es: "Español", fr: "Espagnol", it: "Spagnolo" },
+  pt: { en: "Portuguese", de: "Portugiesisch", uk: "Португальська", hi: "पुर्तगाली", es: "Portugués", fr: "Portugais", it: "Portoghese" },
+  hi: { en: "Hindi", de: "Hindi", uk: "Гінді", hi: "हिन्दी", es: "Hindi", fr: "Hindi", it: "Hindi" },
+  fr: { en: "French", de: "Französisch", uk: "Французька", hi: "फ़्रेंच", es: "Francés", fr: "Français", it: "Francese" },
+  it: { en: "Italian", de: "Italienisch", uk: "Італійська", hi: "इतालवी", es: "Italiano", fr: "Italien", it: "Italiano" },
+  ja: { en: "Japanese", de: "Japanisch", uk: "Японська", hi: "जापानी", es: "Japonés", fr: "Japonais", it: "Giapponese" },
 };
 
 export function getTtsListenLanguageLabel(

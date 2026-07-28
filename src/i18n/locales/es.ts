@@ -61,6 +61,7 @@ export const es: TranslationDictionary = {
   hindi: "hindi",
   spanish: "Español",
   french: "Francés",
+  italian: "Italiano",
   light: "Luz",
   dark: "Oscuro",
   system: "Sistema",

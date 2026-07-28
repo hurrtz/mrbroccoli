@@ -67,6 +67,7 @@ export const uk: TranslationDictionary = {
   hindi: "Гінді",
   spanish: "Іспанська",
   french: "Французька",
+  italian: "Італійська",
   light: "Світла",
   dark: "Темна",
   system: "Системна",

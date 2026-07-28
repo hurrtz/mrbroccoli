@@ -114,6 +114,22 @@ const antLocales: Record<AppLanguage, AntLocale> = {
       cancelText: "Annuler",
     },
   },
+  it: {
+    locale: "it",
+    Modal: {
+      okText: "OK",
+      cancelText: "Annulla",
+      buttonText: "Pulsante",
+    },
+    Picker: {
+      okText: "OK",
+      dismissText: "Annulla",
+      extra: "Seleziona",
+    },
+    SearchBar: {
+      cancelText: "Annulla",
+    },
+  },
 };
 
 export function AntDesignAppProvider({

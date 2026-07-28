@@ -32,6 +32,9 @@ export function getLocaleForLanguage(language: AppLanguage) {
   if (language === "fr") {
     return "fr-FR";
   }
+  if (language === "it") {
+    return "it-IT";
+  }
   return "en-US";
 }
 

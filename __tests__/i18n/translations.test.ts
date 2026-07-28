@@ -17,11 +17,13 @@ describe("translations", () => {
     expect(translations.hi.appName).toBe("मिस्टर ब्रोकली");
     expect(translations.es.appName).toBe("Sr. Brócoli");
     expect(translations.fr.appName).toBe("M. Brocoli");
+    expect(translations.it.appName).toBe("Sig. Broccoli");
     expect(JSON.stringify(translations.de)).not.toContain("Mr Broccoli");
     expect(JSON.stringify(translations.uk)).not.toContain("Mr Broccoli");
     expect(JSON.stringify(translations.hi)).not.toContain("Mr Broccoli");
     expect(JSON.stringify(translations.es)).not.toContain("Mr Broccoli");
     expect(JSON.stringify(translations.fr)).not.toContain("Mr Broccoli");
+    expect(JSON.stringify(translations.it)).not.toContain("Mr Broccoli");
   });
 
   it("resolves Ukrainian UI copy and regional formatting", () => {
@@ -42,6 +44,11 @@ describe("translations", () => {
   it("resolves French UI copy and regional formatting", () => {
     expect(translate("fr", "settings")).toBe("Paramètres");
     expect(getLocaleForLanguage("fr")).toBe("fr-FR");
+  });
+
+  it("resolves Italian UI copy and regional formatting", () => {
+    expect(translate("it", "settings")).toBe("Impostazioni");
+    expect(getLocaleForLanguage("it")).toBe("it-IT");
   });
 
   describe("home-screen style chip keys", () => {

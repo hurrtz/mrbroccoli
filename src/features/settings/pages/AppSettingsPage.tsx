@@ -108,6 +108,7 @@ export function AppSettingsPage({
             { value: "hi", label: t("hindi") },
             { value: "es", label: t("spanish") },
             { value: "fr", label: t("french") },
+            { value: "it", label: t("italian") },
           ]}
           onChange={(value) => onUpdate({ language: value as AppLanguage })}
         />
