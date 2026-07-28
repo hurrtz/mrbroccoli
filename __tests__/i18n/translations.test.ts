@@ -20,6 +20,7 @@ describe("translations", () => {
     expect(translations.it.appName).toBe("Sig. Broccoli");
     expect(translations.pt.appName).toBe("Sr. Brócolo");
     expect(translations["pt-BR"].appName).toBe("Sr. Brócolis");
+    expect(translations.ru.appName).toBe("Мистер Брокколи");
     expect(JSON.stringify(translations.de)).not.toContain("Mr Broccoli");
     expect(JSON.stringify(translations.uk)).not.toContain("Mr Broccoli");
     expect(JSON.stringify(translations.hi)).not.toContain("Mr Broccoli");
@@ -28,6 +29,7 @@ describe("translations", () => {
     expect(JSON.stringify(translations.it)).not.toContain("Mr Broccoli");
     expect(JSON.stringify(translations.pt)).not.toContain("Mr Broccoli");
     expect(JSON.stringify(translations["pt-BR"])).not.toContain("Mr Broccoli");
+    expect(JSON.stringify(translations.ru)).not.toContain("Mr Broccoli");
   });
 
   it("resolves Ukrainian UI copy and regional formatting", () => {
@@ -63,6 +65,11 @@ describe("translations", () => {
   it("resolves Brazilian Portuguese UI copy and regional formatting", () => {
     expect(translate("pt-BR", "settings")).toBe("Configurações");
     expect(getLocaleForLanguage("pt-BR")).toBe("pt-BR");
+  });
+
+  it("resolves Russian UI copy and regional formatting", () => {
+    expect(translate("ru", "settings")).toBe("Настройки");
+    expect(getLocaleForLanguage("ru")).toBe("ru-RU");
   });
 
   describe("home-screen style chip keys", () => {

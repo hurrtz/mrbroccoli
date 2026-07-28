@@ -64,6 +64,7 @@ export const ptBR: TranslationDictionary = {
   italian: "italiano",
   portuguese: "Português",
   portugueseBrazil: "Português (Brasil)",
+  russian: "Russo",
   light: "Claro",
   dark: "Escuro",
   system: "Sistema",

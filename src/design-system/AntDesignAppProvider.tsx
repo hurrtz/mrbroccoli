@@ -162,6 +162,22 @@ const antLocales: Record<AppLanguage, AntLocale> = {
       cancelText: "Cancelar",
     },
   },
+  ru: {
+    locale: "ru",
+    Modal: {
+      okText: "ОК",
+      cancelText: "Отмена",
+      buttonText: "Кнопка",
+    },
+    Picker: {
+      okText: "ОК",
+      dismissText: "Отмена",
+      extra: "Выбрать",
+    },
+    SearchBar: {
+      cancelText: "Отмена",
+    },
+  },
 };
 
 export function AntDesignAppProvider({

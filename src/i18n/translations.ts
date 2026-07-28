@@ -7,6 +7,7 @@ import { hi } from "./locales/hi";
 import { it } from "./locales/it";
 import { pt } from "./locales/pt";
 import { ptBR } from "./locales/ptBR";
+import { ru } from "./locales/ru";
 import { uk } from "./locales/uk";
 import type { TranslationDictionary, TranslationParams, TranslationValue } from "./types";
 
@@ -22,4 +23,5 @@ export const translations = {
   it,
   pt,
   "pt-BR": ptBR,
+  ru,
 } satisfies Record<AppLanguage, TranslationDictionary>;

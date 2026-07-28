@@ -70,6 +70,7 @@ export const uk: TranslationDictionary = {
   italian: "Італійська",
   portuguese: "Португальська",
   portugueseBrazil: "Португальська (Бразилія)",
+  russian: "Російська",
   light: "Світла",
   dark: "Темна",
   system: "Системна",

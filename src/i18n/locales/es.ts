@@ -64,6 +64,7 @@ export const es: TranslationDictionary = {
   italian: "Italiano",
   portuguese: "Portugués",
   portugueseBrazil: "Portugués (Brasil)",
+  russian: "Ruso",
   light: "Luz",
   dark: "Oscuro",
   system: "Sistema",
