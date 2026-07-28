@@ -822,6 +822,21 @@ describe("useSettings", () => {
     expect(result.current.settings.ttsListenLanguages).toEqual(["en"]);
   });
 
+  it("persists Arabic as a UI-only language", async () => {
+    const { result } = renderHook(() => useSettings());
+    await flushSettingsLoad();
+
+    await act(async () => {
+      result.current.updateSettings({ language: "ar" });
+    });
+
+    expect(result.current.settings.language).toBe("ar");
+    expect(result.current.settings.assistantInstructions).toBe(
+      DEFAULT_ASSISTANT_INSTRUCTIONS_BY_LANGUAGE.en,
+    );
+    expect(result.current.settings.ttsListenLanguages).toEqual(["en"]);
+  });
+
   it("does not overwrite custom assistant instructions on language change", async () => {
     const { result } = renderHook(() => useSettings());
     await flushSettingsLoad();

@@ -42,6 +42,7 @@ const KOKORO_VOICE_OPTIONS: Record<
         "pt-BR": "Maple · inglês americano, voz feminina",
         ru: "Maple · американский английский, женский голос",
         "zh-CN": "Maple · 美式英语，女声",
+        ar: "Maple · إنجليزية أمريكية، صوت أنثوي",
       },
     },
     {
@@ -59,6 +60,7 @@ const KOKORO_VOICE_OPTIONS: Record<
         "pt-BR": "Sol · inglês americano, voz feminina",
         ru: "Sol · американский английский, женский голос",
         "zh-CN": "Sol · 美式英语，女声",
+        ar: "Sol · إنجليزية أمريكية، صوت أنثوي",
       },
     },
     {
@@ -76,6 +78,7 @@ const KOKORO_VOICE_OPTIONS: Record<
         "pt-BR": "Vale · inglês britânico, voz feminina",
         ru: "Vale · британский английский, женский голос",
         "zh-CN": "Vale · 英式英语，女声",
+        ar: "Vale · إنجليزية بريطانية، صوت أنثوي",
       },
     },
   ],
@@ -95,6 +98,7 @@ const KOKORO_VOICE_OPTIONS: Record<
         "pt-BR": "Chinês, voz feminina 1",
         ru: "Китайский, женский голос 1",
         "zh-CN": "中文女声 1",
+        ar: "صينية، صوت أنثوي 1",
       },
     },
     {
@@ -112,6 +116,7 @@ const KOKORO_VOICE_OPTIONS: Record<
         "pt-BR": "Chinês, voz feminina 2",
         ru: "Китайский, женский голос 2",
         "zh-CN": "中文女声 2",
+        ar: "صينية، صوت أنثوي 2",
       },
     },
     {
@@ -129,6 +134,7 @@ const KOKORO_VOICE_OPTIONS: Record<
         "pt-BR": "Chinês, voz feminina 3",
         ru: "Китайский, женский голос 3",
         "zh-CN": "中文女声 3",
+        ar: "صينية، صوت أنثوي 3",
       },
     },
     {
@@ -146,6 +152,7 @@ const KOKORO_VOICE_OPTIONS: Record<
         "pt-BR": "Chinês, voz masculina 1",
         ru: "Китайский, мужской голос 1",
         "zh-CN": "中文男声 1",
+        ar: "صينية، صوت ذكوري 1",
       },
     },
     {
@@ -163,6 +170,7 @@ const KOKORO_VOICE_OPTIONS: Record<
         "pt-BR": "Chinês, voz masculina 2",
         ru: "Китайский, мужской голос 2",
         "zh-CN": "中文男声 2",
+        ar: "صينية، صوت ذكوري 2",
       },
     },
     {
@@ -180,6 +188,7 @@ const KOKORO_VOICE_OPTIONS: Record<
         "pt-BR": "Chinês, voz masculina 3",
         ru: "Китайский, мужской голос 3",
         "zh-CN": "中文男声 3",
+        ar: "صينية، صوت ذكوري 3",
       },
     },
   ],

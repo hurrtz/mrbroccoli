@@ -105,6 +105,18 @@ const SIMPLIFIED_CHINESE_EFFORT_LABELS: Record<string, string> = {
   disabled: "已关闭",
   enabled: "已开启",
 };
+const ARABIC_EFFORT_LABELS: Record<string, string> = {
+  none: "بلا",
+  minimal: "أدنى",
+  low: "منخفض",
+  medium: "متوسط",
+  high: "مرتفع",
+  xhigh: "مرتفع جدًا",
+  max: "أقصى",
+  dynamic: "ديناميكي",
+  disabled: "متوقف",
+  enabled: "مفعّل",
+};
 
 export function getModelEffortConfig(
   provider: Provider,
@@ -232,6 +244,9 @@ export function getModelEffortOptionLabel(
   }
   if (language === "zh-CN") {
     return SIMPLIFIED_CHINESE_EFFORT_LABELS[option.id] ?? option.label;
+  }
+  if (language === "ar") {
+    return ARABIC_EFFORT_LABELS[option.id] ?? option.label;
   }
   return option.label;
 }

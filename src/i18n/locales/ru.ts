@@ -66,6 +66,7 @@ export const ru: TranslationDictionary = {
   portugueseBrazil: "Португальский (Бразилия)",
   russian: "Русский",
   simplifiedChinese: "Упрощённый китайский",
+  arabic: "Арабский",
   light: "Светлая",
   dark: "Тёмная",
   system: "Система",

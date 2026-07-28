@@ -194,6 +194,22 @@ const antLocales: Record<AppLanguage, AntLocale> = {
       cancelText: "取消",
     },
   },
+  ar: {
+    locale: "ar",
+    Modal: {
+      okText: "موافق",
+      cancelText: "إلغاء",
+      buttonText: "زر",
+    },
+    Picker: {
+      okText: "موافق",
+      dismissText: "إلغاء",
+      extra: "اختر",
+    },
+    SearchBar: {
+      cancelText: "إلغاء",
+    },
+  },
 };
 
 export function AntDesignAppProvider({

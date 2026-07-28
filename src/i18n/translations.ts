@@ -1,4 +1,5 @@
 import type { AppLanguage } from "../types";
+import { ar } from "./locales/ar";
 import { de } from "./locales/de";
 import { en } from "./locales/en";
 import { es } from "./locales/es";
@@ -26,4 +27,5 @@ export const translations = {
   "pt-BR": ptBR,
   ru,
   "zh-CN": zhCN,
+  ar,
 } satisfies Record<AppLanguage, TranslationDictionary>;

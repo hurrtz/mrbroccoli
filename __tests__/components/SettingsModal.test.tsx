@@ -1027,6 +1027,7 @@ describe("SettingsModal", () => {
         { label: "Portuguese (Brazil)", value: "pt-BR" },
         { label: "Russian", value: "ru" },
         { label: "Simplified Chinese", value: "zh-CN" },
+        { label: "Arabic", value: "ar" },
       ]),
     );
     expect(StyleSheet.flatten(languagePicker!.props.style).marginHorizontal).toBe(

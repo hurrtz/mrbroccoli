@@ -66,6 +66,7 @@ export const zhCN: TranslationDictionary = {
   portugueseBrazil: "葡萄牙语（巴西）",
   russian: "俄语",
   simplifiedChinese: "简体中文",
+  arabic: "阿拉伯语",
   light: "浅色",
   dark: "深色",
   system: "系统",
