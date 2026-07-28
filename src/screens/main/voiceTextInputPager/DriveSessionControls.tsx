@@ -6,8 +6,7 @@ import { TranslateFn } from "../shared";
 import { voiceTextInputPagerStyles as styles } from "./styles";
 
 interface DriveSessionControlsProps {
-  active: boolean;
-  canContinue: boolean;
+  autoContinueEnabled: boolean;
   canRepeat: boolean;
   colors: Colors;
   disabled: boolean;
@@ -18,8 +17,7 @@ interface DriveSessionControlsProps {
 }
 
 export function DriveSessionControls({
-  active,
-  canContinue,
+  autoContinueEnabled,
   canRepeat,
   colors,
   disabled,
@@ -28,7 +26,8 @@ export function DriveSessionControls({
   onStop,
   t,
 }: DriveSessionControlsProps) {
-  const continueDisabled = disabled || !canContinue;
+  const stopDisabled = disabled || !autoContinueEnabled;
+  const continueDisabled = disabled || autoContinueEnabled;
 
   return (
     <View testID="drive-session-controls" style={styles.driveControls}>
@@ -36,9 +35,9 @@ export function DriveSessionControls({
         testID="drive-session-stop"
         accessibilityLabel={t("stopDriveSession")}
         accessibilityRole="button"
-        accessibilityState={{ disabled: !active }}
+        accessibilityState={{ disabled: stopDisabled }}
         activeOpacity={0.76}
-        disabled={!active}
+        disabled={stopDisabled}
         onPress={() => {
           void onStop?.();
         }}
@@ -47,11 +46,11 @@ export function DriveSessionControls({
           {
             backgroundColor: colors.surfaceElevated,
             borderColor: colors.border,
-            opacity: active ? 1 : 0.45,
+            opacity: stopDisabled ? 0.45 : 1,
           },
         ]}
       >
-        <Feather name="square" size={16} color={colors.text} />
+        <Feather name="pause" size={17} color={colors.text} />
         <Text style={[styles.driveControlLabel, { color: colors.text }]}>
           {t("stopDriveSession")}
         </Text>
@@ -61,9 +60,9 @@ export function DriveSessionControls({
         testID="drive-session-repeat"
         accessibilityLabel={t("repeatDriveReply")}
         accessibilityRole="button"
-        accessibilityState={{ disabled: !canRepeat }}
+        accessibilityState={{ disabled: disabled || !canRepeat }}
         activeOpacity={0.76}
-        disabled={!canRepeat}
+        disabled={disabled || !canRepeat}
         onPress={() => {
           void onRepeat?.();
         }}
@@ -72,7 +71,7 @@ export function DriveSessionControls({
           {
             backgroundColor: colors.surfaceElevated,
             borderColor: colors.border,
-            opacity: canRepeat ? 1 : 0.45,
+            opacity: disabled || !canRepeat ? 0.45 : 1,
           },
         ]}
       >

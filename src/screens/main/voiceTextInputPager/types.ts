@@ -1,6 +1,6 @@
 import {
   InputMode,
-  VoicePhaseProgress,
+  VoiceTimingProgress,
   VoiceVisualPhase,
 } from "../../../types";
 import { Colors } from "../../../theme/colors";
@@ -11,31 +11,27 @@ export type InputSurface = "voice" | "text";
 export interface VoiceTextInputPagerProps {
   colors: Colors;
   disabled: boolean;
-  driveSessionActive?: boolean;
-  driveSessionCanContinue?: boolean;
+  driveAutoContinueEnabled?: boolean;
   driveSessionCanRepeat?: boolean;
   initialSurface?: InputSurface;
   initialTextMessage?: string;
   inputMode: InputMode;
   isActive: boolean;
+  layout: "portrait" | "landscape";
   onInputSurfaceChange?: (surface: InputSurface) => void;
   onDriveContinue?: () => void | Promise<void>;
   onDriveRepeat?: () => void | Promise<void>;
   onDriveStop?: () => void | Promise<void>;
-  onOpenStatusDetails: () => void;
   onPress: () => void;
   onPressIn: () => void;
   onPressOut: () => void;
-  onStopPlayback?: () => void | Promise<void>;
   onSubmitTextMessage: (text: string) => void;
   onTextMessageChange?: (text: string) => void;
-  phaseLabel: string;
-  phaseProgress?: VoicePhaseProgress | null;
-  playbackActive?: boolean;
   playbackPaused?: boolean;
   recordingMaxMs: number;
+  recordingStartedAtMs?: number | null;
+  speechStartProgress?: VoiceTimingProgress | null;
   statusLabel: string;
-  stopPlaybackLabel: string;
   t: TranslateFn;
   visualPhase: VoiceVisualPhase;
 }

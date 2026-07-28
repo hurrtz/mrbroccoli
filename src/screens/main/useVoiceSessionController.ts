@@ -14,6 +14,7 @@ export function useVoiceSessionController({
   abortRef,
   availableSttProviders,
   availableTtsProviders,
+  completedReplyVersion,
   handleVoiceCaptureDone,
   isBusy,
   isRecording,
@@ -115,6 +116,7 @@ export function useVoiceSessionController({
   const driveSession = useDriveSessionController({
     cancelCurrentInteraction,
     cancelVoiceCapture,
+    completedReplyVersion,
     ensureVoiceSessionReady,
     hasActiveVoiceCaptureNow,
     isBusy,
@@ -128,13 +130,12 @@ export function useVoiceSessionController({
     showToast,
     startVoiceCapture,
     stopReplay,
-    stopVoiceCapture,
     t,
   });
 
   useVoiceSessionAppState({
     hasActiveVoiceCaptureNow,
-    onBackground: driveSession.deactivate,
+    onBackground: driveSession.suspend,
     onBackgroundSubmitError: (error) => {
       showToast(
         error instanceof Error ? error.message : t("couldntProcessVoiceInput"),
@@ -162,12 +163,30 @@ export function useVoiceSessionController({
   }, [recorder, showToast]);
 
   const handleTogglePress = useCallback(
-    () =>
-      settings.inputMode === "drive-session"
-        ? driveSession.handleTogglePress()
-        : standardPressHandlers.handleTogglePress(),
+    async () => {
+      if (settings.inputMode === "drive-session") {
+        const playbackActive =
+          playbackCanPause ||
+          player.isPlaybackPaused ||
+          player.isPlaying;
+
+        if (!isRecording && isBusy && !playbackActive) {
+          driveSession.suspend();
+        } else if (!isRecording && !isBusy && !playbackActive) {
+          driveSession.engage();
+        }
+      }
+
+      await standardPressHandlers.handleTogglePress();
+    },
     [
-      driveSession.handleTogglePress,
+      driveSession.engage,
+      driveSession.suspend,
+      isBusy,
+      isRecording,
+      playbackCanPause,
+      player.isPlaybackPaused,
+      player.isPlaying,
       settings.inputMode,
       standardPressHandlers.handleTogglePress,
     ],
@@ -203,15 +222,13 @@ export function useVoiceSessionController({
   ]);
 
   return {
-    driveSessionActive: driveSession.active,
-    driveSessionCanContinue: driveSession.canContinue,
+    driveAutoContinueEnabled: driveSession.autoContinueEnabled,
     driveSessionCanRepeat: driveSession.canRepeat,
     handleContinueDriveSession: driveSession.handleContinue,
     handlePressIn: standardPressHandlers.handlePressIn,
     handlePressOut: standardPressHandlers.handlePressOut,
     handleRepeatDriveReply: driveSession.handleRepeat,
     handleStopDriveSession: driveSession.handleStop,
-    handleStopInteraction: cancelCurrentInteraction,
     handleTogglePress,
     maxRecordingMs,
     resetVoiceSessionState,

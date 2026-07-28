@@ -65,7 +65,7 @@ describe("statusSelectors", () => {
     expect(status.statusDetail).toBe("Listening to your voice");
   });
 
-  it("keeps listening wording while push-to-talk is held", () => {
+  it("tells push-to-talk users to keep pressing while recording", () => {
     const status = getStatusDisplayData({
       inputMode: "push-to-talk",
       messageCount: 0,
@@ -73,6 +73,7 @@ describe("statusSelectors", () => {
       providerLabel: "OpenAI",
       t: (key) =>
         ({
+          keepPressing: "Keep pressing",
           listening: "Listening",
           listeningToYourVoice: "Listening to your voice",
         }[key] ?? key),
@@ -80,19 +81,18 @@ describe("statusSelectors", () => {
       visualPhase: "recording",
     });
 
-    expect(status.actionLabel).toBe("Listening");
+    expect(status.actionLabel).toBe("Keep pressing");
   });
 
-  it("uses interrupt and send labels for an active Drive Session", () => {
+  it("uses the same simple pause and send actions in Drive Session", () => {
     const t = (key: string) =>
       ({
-        tapToInterruptDriveReply: "Tap to interrupt",
-        tapToSendDriveTurn: "Tap to send",
+        pause: "Pause",
+        tapAgainToSend: "Tap again to send",
       })[key] ?? key;
 
     expect(
       getStatusDisplayData({
-        driveSessionActive: true,
         inputMode: "drive-session",
         messageCount: 0,
         pipelinePhase: "speaking",
@@ -101,11 +101,10 @@ describe("statusSelectors", () => {
         ttsProviderLabel: "OpenAI",
         visualPhase: "speaking",
       }).actionLabel,
-    ).toBe("Tap to interrupt");
+    ).toBe("Pause");
 
     expect(
       getStatusDisplayData({
-        driveSessionActive: true,
         inputMode: "drive-session",
         messageCount: 0,
         pipelinePhase: "idle",
@@ -114,7 +113,7 @@ describe("statusSelectors", () => {
         ttsProviderLabel: "OpenAI",
         visualPhase: "recording",
       }).actionLabel,
-    ).toBe("Tap to send");
+    ).toBe("Tap again to send");
   });
 
   it("distinguishes request preparation from provider thinking", () => {
@@ -126,6 +125,7 @@ describe("statusSelectors", () => {
       t: (key) =>
         ({
           thinking: "Thinking",
+          stop: "Stop",
           preparingRequest: "Preparing your request",
           messageCount: "1 message",
         })[key] ?? key,
@@ -133,7 +133,7 @@ describe("statusSelectors", () => {
       visualPhase: "thinking-briefly",
     });
 
-    expect(status.actionLabel).toBe("Thinking");
+    expect(status.actionLabel).toBe("Stop");
     expect(status.statusTitle).toBe("Thinking");
     expect(status.statusDetail).toBe("Preparing your request");
   });

@@ -32,6 +32,7 @@ describe("useVoiceSessionController", () => {
       abortRef: { current: null as AbortController | null },
       availableSttProviders: ["openai"],
       availableTtsProviders: ["openai"],
+      completedReplyVersion: 0,
       handleVoiceCaptureDone: jest.fn(async () => undefined),
       isBusy: false,
       isRecording: false,
@@ -234,24 +235,7 @@ describe("useVoiceSessionController", () => {
     expect(params.setPipelinePhase).toHaveBeenCalledWith("idle");
   });
 
-  it("stops the complete interaction from the explicit speaking stop control", async () => {
-    const abortController = new AbortController();
-    const { result, params } = renderController({
-      abortRef: { current: abortController },
-      isBusy: true,
-    });
-
-    await act(async () => {
-      await result.current.handleStopInteraction();
-    });
-
-    expect(abortController.signal.aborted).toBe(true);
-    expect(params.setPipelinePhase).toHaveBeenCalledWith("idle");
-    expect(params.setStreamingText).toHaveBeenCalledWith("");
-    expect(params.player.stopPlayback).toHaveBeenCalledTimes(1);
-  });
-
-  it("starts Drive Session with an audible cue and arms recording", async () => {
+  it("starts Drive Session without a synthetic cue and arms recording", async () => {
     const { result, params } = renderController({
       settings: {
         inputMode: "drive-session",
@@ -267,15 +251,73 @@ describe("useVoiceSessionController", () => {
     });
 
     await waitFor(() => {
-      expect(result.current.driveSessionActive).toBe(true);
-      expect(params.player.speakText).toHaveBeenCalledWith(
-        "driveSessionListeningCue",
-      );
+      expect(result.current.driveAutoContinueEnabled).toBe(true);
       expect(params.recorder.startRecording).toHaveBeenCalledTimes(1);
     });
+    expect(params.player.speakText).not.toHaveBeenCalled();
   });
 
-  it("uses the Drive Session primary action to interrupt and re-arm", async () => {
+  it("does not auto-arm again when a Drive turn ends without a reply", async () => {
+    const { result, params, rerender } = renderController({
+      settings: {
+        inputMode: "drive-session",
+        spokenRepliesEnabled: true,
+        sttMode: "provider",
+        ttsMode: "provider",
+        providerSttModels: {},
+      },
+    });
+
+    await act(async () => {
+      await result.current.handleTogglePress();
+    });
+    params.isRecording = true;
+    act(() => rerender());
+    await act(async () => {
+      await result.current.handleTogglePress();
+    });
+    params.isRecording = false;
+    act(() => rerender());
+
+    expect(params.recorder.startRecording).toHaveBeenCalledTimes(1);
+    expect(params.recorder.stopRecording).toHaveBeenCalledTimes(1);
+  });
+
+  it("auto-arms after a completed Drive reply returns to idle", async () => {
+    const { result, params, rerender } = renderController({
+      settings: {
+        inputMode: "drive-session",
+        spokenRepliesEnabled: true,
+        sttMode: "provider",
+        ttsMode: "provider",
+        providerSttModels: {},
+      },
+    });
+
+    await act(async () => {
+      await result.current.handleTogglePress();
+    });
+    params.isRecording = true;
+    act(() => rerender());
+    await act(async () => {
+      await result.current.handleTogglePress();
+    });
+
+    params.isRecording = false;
+    params.isBusy = true;
+    params.completedReplyVersion = 1;
+    act(() => rerender());
+    expect(params.recorder.startRecording).toHaveBeenCalledTimes(1);
+
+    params.isBusy = false;
+    act(() => rerender());
+
+    await waitFor(() =>
+      expect(params.recorder.startRecording).toHaveBeenCalledTimes(2),
+    );
+  });
+
+  it("uses the Drive Session primary action to cancel processing without immediately re-arming", async () => {
     const abortController = new AbortController();
     const { result, params } = renderController({
       abortRef: { current: abortController },
@@ -290,20 +332,16 @@ describe("useVoiceSessionController", () => {
     });
 
     await act(async () => {
-      await result.current.handleContinueDriveSession();
-    });
-    expect(result.current.driveSessionActive).toBe(true);
-
-    await act(async () => {
       await result.current.handleTogglePress();
     });
 
     expect(abortController.signal.aborted).toBe(true);
-    expect(params.stopReplay).toHaveBeenCalledTimes(1);
     expect(params.player.stopPlayback).toHaveBeenCalledTimes(1);
+    expect(params.recorder.startRecording).not.toHaveBeenCalled();
+    expect(result.current.driveAutoContinueEnabled).toBe(true);
   });
 
-  it("stops Drive Session, cancels capture, and announces the stop", async () => {
+  it("pauses automatic continuation without cancelling the current turn", async () => {
     const { result, params } = renderController({
       settings: {
         inputMode: "drive-session",
@@ -315,24 +353,42 @@ describe("useVoiceSessionController", () => {
     });
 
     await act(async () => {
-      await result.current.handleContinueDriveSession();
-    });
-    await waitFor(() =>
-      expect(params.recorder.startRecording).toHaveBeenCalledTimes(1),
-    );
-
-    await act(async () => {
       await result.current.handleStopDriveSession();
     });
 
-    expect(result.current.driveSessionActive).toBe(false);
-    expect(params.recorder.stopRecording).toHaveBeenCalledTimes(1);
-    expect(params.player.speakText).toHaveBeenLastCalledWith(
-      "driveSessionStoppedCue",
-    );
+    expect(result.current.driveAutoContinueEnabled).toBe(false);
+    expect(params.recorder.stopRecording).not.toHaveBeenCalled();
+    expect(params.player.stopPlayback).not.toHaveBeenCalled();
+    expect(params.player.speakText).not.toHaveBeenCalled();
   });
 
-  it("repeats the last reply and resumes an active Drive Session", async () => {
+  it("resumes automatic continuation and arms recording when idle", async () => {
+    const { result, params } = renderController({
+      settings: {
+        inputMode: "drive-session",
+        spokenRepliesEnabled: true,
+        sttMode: "provider",
+        ttsMode: "provider",
+        providerSttModels: {},
+      },
+    });
+
+    act(() => {
+      result.current.handleStopDriveSession();
+    });
+    expect(result.current.driveAutoContinueEnabled).toBe(false);
+
+    await act(async () => {
+      result.current.handleContinueDriveSession();
+    });
+
+    await waitFor(() => {
+      expect(result.current.driveAutoContinueEnabled).toBe(true);
+      expect(params.recorder.startRecording).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  it("repeats the last reply and resumes listening only while auto continuation is enabled", async () => {
     const { result, params } = renderController({
       lastCompletedReplyRef: { current: "Last answer" },
       settings: {
@@ -345,17 +401,25 @@ describe("useVoiceSessionController", () => {
     });
 
     await act(async () => {
-      await result.current.handleContinueDriveSession();
+      await result.current.handleRepeatDriveReply();
     });
+
+    expect(params.playReplyText).toHaveBeenCalledWith("Last answer");
+    expect(result.current.driveAutoContinueEnabled).toBe(true);
     await waitFor(() =>
       expect(params.recorder.startRecording).toHaveBeenCalledTimes(1),
     );
+
+    act(() => {
+      result.current.handleStopDriveSession();
+    });
+    jest.clearAllMocks();
 
     await act(async () => {
       await result.current.handleRepeatDriveReply();
     });
 
     expect(params.playReplyText).toHaveBeenCalledWith("Last answer");
-    expect(result.current.driveSessionActive).toBe(true);
+    expect(params.recorder.startRecording).not.toHaveBeenCalled();
   });
 });

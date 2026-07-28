@@ -24,6 +24,7 @@ export function useVoicePipeline(
   const [phaseProgress, setPhaseProgress] = useState<VoicePhaseProgress | null>(
     null,
   );
+  const [completedReplyVersion, setCompletedReplyVersion] = useState(0);
   const abortRef = useRef<AbortController | null>(null);
   const lastCompletedReplyRef = useRef("");
   const isBusy = pipelinePhase !== "idle";
@@ -66,6 +67,8 @@ export function useVoicePipeline(
     abortRef,
     handleRepeatLastReply,
     lastCompletedReplyRef,
+    onReplyCompleted: () =>
+      setCompletedReplyVersion((version) => version + 1),
     setPhaseProgress,
     setPipelinePhase,
     setStreamingText,
@@ -77,6 +80,7 @@ export function useVoicePipeline(
     streamingText,
     setStreamingText,
     phaseProgress,
+    completedReplyVersion,
     abortRef,
     lastCompletedReplyRef,
     replayPhase,

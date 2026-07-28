@@ -111,6 +111,7 @@ export interface UseVoicePipelineResult {
   streamingText: string;
   setStreamingText: (text: string) => void;
   phaseProgress: VoicePhaseProgress | null;
+  completedReplyVersion: number;
   abortRef: React.MutableRefObject<AbortController | null>;
   lastCompletedReplyRef: React.MutableRefObject<string>;
   replayPhase: ReplayPhase;

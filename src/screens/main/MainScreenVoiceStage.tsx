@@ -2,7 +2,11 @@ import React from "react";
 import { View } from "react-native";
 
 import { Colors } from "../../theme/colors";
-import { InputMode, VoicePhaseProgress, VoiceVisualPhase } from "../../types";
+import {
+  InputMode,
+  VoiceTimingProgress,
+  VoiceVisualPhase,
+} from "../../types";
 
 import { TranslateFn } from "./shared";
 import { styles } from "./styles";
@@ -11,8 +15,7 @@ import { InputSurface, VoiceTextInputPager } from "./VoiceTextInputPager";
 interface MainScreenVoiceStageProps {
   colors: Colors;
   disabled?: boolean;
-  driveSessionActive?: boolean;
-  driveSessionCanContinue?: boolean;
+  driveAutoContinueEnabled?: boolean;
   driveSessionCanRepeat?: boolean;
   initialInputSurface?: InputSurface;
   initialTextMessage?: string;
@@ -23,20 +26,16 @@ interface MainScreenVoiceStageProps {
   onDriveContinue?: () => void | Promise<void>;
   onDriveRepeat?: () => void | Promise<void>;
   onDriveStop?: () => void | Promise<void>;
-  onOpenStatusDetails: () => void;
   onPress: () => void;
   onPressIn: () => void;
   onPressOut: () => void;
-  onStopPlayback?: () => void | Promise<void>;
   onSubmitTextMessage: (text: string) => void;
   onTextMessageChange?: (text: string) => void;
-  phaseLabel: string;
-  phaseProgress?: VoicePhaseProgress | null;
-  playbackActive?: boolean;
   playbackPaused?: boolean;
   recordingMaxMs: number;
+  recordingStartedAtMs?: number | null;
+  speechStartProgress?: VoiceTimingProgress | null;
   statusTitle: string;
-  stopPlaybackLabel?: string;
   t: TranslateFn;
   visualPhase: VoiceVisualPhase;
 }
@@ -44,8 +43,7 @@ interface MainScreenVoiceStageProps {
 export const MainScreenVoiceStage = React.memo(function MainScreenVoiceStage({
   colors,
   disabled = false,
-  driveSessionActive = false,
-  driveSessionCanContinue = false,
+  driveAutoContinueEnabled = false,
   driveSessionCanRepeat = false,
   initialInputSurface,
   initialTextMessage,
@@ -56,20 +54,16 @@ export const MainScreenVoiceStage = React.memo(function MainScreenVoiceStage({
   onDriveContinue,
   onDriveRepeat,
   onDriveStop,
-  onOpenStatusDetails,
   onPress,
   onPressIn,
   onPressOut,
-  onStopPlayback,
   onSubmitTextMessage,
   onTextMessageChange,
-  phaseLabel,
-  phaseProgress,
-  playbackActive = false,
   playbackPaused = false,
   recordingMaxMs,
+  recordingStartedAtMs = null,
+  speechStartProgress = null,
   statusTitle,
-  stopPlaybackLabel = "Stop",
   t,
   visualPhase,
 }: MainScreenVoiceStageProps) {
@@ -92,31 +86,27 @@ export const MainScreenVoiceStage = React.memo(function MainScreenVoiceStage({
         <VoiceTextInputPager
           colors={colors}
           disabled={disabled}
-          driveSessionActive={driveSessionActive}
-          driveSessionCanContinue={driveSessionCanContinue}
+          driveAutoContinueEnabled={driveAutoContinueEnabled}
           driveSessionCanRepeat={driveSessionCanRepeat}
           initialSurface={initialInputSurface}
           initialTextMessage={initialTextMessage}
           inputMode={inputMode}
           isActive={isActive}
+          layout={layout}
           onInputSurfaceChange={onInputSurfaceChange}
           onDriveContinue={onDriveContinue}
           onDriveRepeat={onDriveRepeat}
           onDriveStop={onDriveStop}
-          onOpenStatusDetails={onOpenStatusDetails}
           onPress={onPress}
           onPressIn={onPressIn}
           onPressOut={onPressOut}
-          onStopPlayback={onStopPlayback}
           onSubmitTextMessage={onSubmitTextMessage}
           onTextMessageChange={onTextMessageChange}
-          phaseLabel={phaseLabel}
-          phaseProgress={phaseProgress}
-          playbackActive={playbackActive}
           playbackPaused={playbackPaused}
           recordingMaxMs={recordingMaxMs}
+          recordingStartedAtMs={recordingStartedAtMs}
+          speechStartProgress={speechStartProgress}
           statusLabel={statusTitle}
-          stopPlaybackLabel={stopPlaybackLabel}
           t={t}
           visualPhase={visualPhase}
         />

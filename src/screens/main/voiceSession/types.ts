@@ -41,6 +41,7 @@ export interface UseVoiceSessionControllerParams {
   abortRef: MutableRefObject<AbortController | null>;
   availableSttProviders: Provider[];
   availableTtsProviders: Provider[];
+  completedReplyVersion: number;
   handleVoiceCaptureDone: (params: {
     audioUri?: string;
     transcriptionOverride?: string;

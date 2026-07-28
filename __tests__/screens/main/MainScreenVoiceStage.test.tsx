@@ -1,6 +1,6 @@
 import React from "react";
 import { fireEvent, render } from "@testing-library/react-native";
-import { Keyboard, StyleSheet } from "react-native";
+import { Keyboard, processColor, StyleSheet } from "react-native";
 
 import { MainScreenVoiceStage } from "../../../src/screens/main/MainScreenVoiceStage";
 import { TranslateFn } from "../../../src/screens/main/shared";
@@ -60,12 +60,19 @@ jest.mock("react-native-reanimated", () => {
   const { View } = require("react-native");
   return {
     __esModule: true,
-    default: { View },
+    default: {
+      View,
+      createAnimatedComponent: (component: unknown) => component,
+    },
     cancelAnimation: jest.fn(),
     Easing: { linear: jest.fn() },
     runOnJS: (callback: (...args: unknown[]) => unknown) => callback,
+    useAnimatedProps: (factory: () => unknown) => factory(),
     useAnimatedStyle: (factory: () => unknown) => factory(),
     useSharedValue: (value: unknown) => ({ value }),
+    withDelay: jest.fn(
+      (_delay: number, animation: unknown) => animation,
+    ),
     withSpring: (
       value: unknown,
       _configuration: unknown,
@@ -74,14 +81,16 @@ jest.mock("react-native-reanimated", () => {
       callback?.(true);
       return value;
     },
-    withTiming: (
-      value: unknown,
-      _configuration: unknown,
-      callback?: (finished: boolean) => void,
-    ) => {
-      callback?.(true);
-      return value;
-    },
+    withTiming: jest.fn(
+      (
+        value: unknown,
+        _configuration: unknown,
+        callback?: (finished: boolean) => void,
+      ) => {
+        callback?.(true);
+        return value;
+      },
+    ),
   };
 });
 
@@ -91,14 +100,22 @@ const t = ((key: string) => {
     sendTextMessage: "Send message",
     showVoiceInput: "Show voice input",
     showTextInput: "Show text input",
-    statusDetails: "Status details",
-    phaseTimeRemaining: "Phase",
-    totalTimeRemaining: "Total",
-    speechEtaCountdown: "About",
-    speechEtaOvertime: "Still working",
-    stopDriveSession: "Stop",
-    repeatDriveReply: "Repeat",
-    continueDriveSession: "Continue",
+    pleaseWait: "Please wait",
+    yourTurn: "Your turn",
+    keepPressing: "Keep pressing",
+    tapWhenDone: "Tap when done",
+    pushToTalk: "Push to Talk",
+    toggleToTalk: "Toggle to Talk",
+    driveSession: "Drive Session",
+    parsing: "Transcribing",
+    searching: "Searching",
+    converting: "Converting",
+    thinking: "Thinking",
+    speaking: "Speaking",
+    paused: "Paused",
+    stopDriveSession: "Pause auto",
+    repeatDriveReply: "Repeat last",
+    continueDriveSession: "Resume auto",
   };
   return copy[key] ?? key;
 }) as TranslateFn;
@@ -108,12 +125,10 @@ function createProps(overrides: Record<string, unknown> = {}) {
     colors: lightColors,
     inputMode: "toggle-to-talk" as const,
     isActive: false,
-    onOpenStatusDetails: jest.fn(),
     onPress: jest.fn(),
     onPressIn: jest.fn(),
     onPressOut: jest.fn(),
     onSubmitTextMessage: jest.fn(),
-    phaseLabel: "Idle",
     recordingMaxMs: 150_000,
     statusTitle: "Tap to speak",
     t,
@@ -280,7 +295,7 @@ describe("MainScreenVoiceStage composer", () => {
     expect(onPressOut).toHaveBeenCalledTimes(1);
   });
 
-  it("shows large Drive Session controls and wires the primary action", () => {
+  it("uses Drive controls only for automatic continuation", () => {
     const onPress = jest.fn();
     const onDriveStop = jest.fn();
     const onDriveRepeat = jest.fn();
@@ -288,8 +303,7 @@ describe("MainScreenVoiceStage composer", () => {
     const screen = render(
       <MainScreenVoiceStage
         {...createProps({
-          driveSessionActive: true,
-          driveSessionCanContinue: true,
+          driveAutoContinueEnabled: true,
           driveSessionCanRepeat: true,
           inputMode: "drive-session",
           onDriveContinue,
@@ -308,10 +322,38 @@ describe("MainScreenVoiceStage composer", () => {
     expect(onPress).toHaveBeenCalledTimes(1);
     expect(onDriveStop).toHaveBeenCalledTimes(1);
     expect(onDriveRepeat).toHaveBeenCalledTimes(1);
-    expect(onDriveContinue).toHaveBeenCalledTimes(1);
+    expect(onDriveContinue).not.toHaveBeenCalled();
+    expect(
+      screen.getByTestId("drive-session-stop").props.accessibilityState,
+    ).toEqual({ disabled: false });
+    expect(
+      screen.getByTestId("drive-session-continue").props.accessibilityState,
+    ).toEqual({ disabled: true });
     expect(
       StyleSheet.flatten(screen.getByTestId("drive-session-stop").props.style),
     ).toEqual(expect.objectContaining({ minHeight: 48 }));
+
+    screen.rerender(
+      <MainScreenVoiceStage
+        {...createProps({
+          driveAutoContinueEnabled: false,
+          driveSessionCanRepeat: true,
+          inputMode: "drive-session",
+          onDriveContinue,
+          onDriveRepeat,
+          onDriveStop,
+          onPress,
+        })}
+      />,
+    );
+    fireEvent.press(screen.getByTestId("drive-session-continue"));
+    expect(onDriveContinue).toHaveBeenCalledTimes(1);
+    expect(
+      screen.getByTestId("drive-session-stop").props.accessibilityState,
+    ).toEqual({ disabled: true });
+    expect(
+      screen.getByTestId("drive-session-continue").props.accessibilityState,
+    ).toEqual({ disabled: false });
   });
 
   it("preserves an unfinished text draft while the pipeline is active", () => {
@@ -327,7 +369,6 @@ describe("MainScreenVoiceStage composer", () => {
       <MainScreenVoiceStage
         {...props}
         isActive
-        phaseLabel="Thinking"
         visualPhase="thinking"
       />,
     );
@@ -391,7 +432,6 @@ describe("MainScreenVoiceStage composer", () => {
       <MainScreenVoiceStage
         {...createProps({
           isActive: true,
-          phaseLabel: "Listening",
           visualPhase: "recording",
         })}
       />,
@@ -405,10 +445,73 @@ describe("MainScreenVoiceStage composer", () => {
     expect(screen.getByTestId("voice-stage-action-surface")).toBeTruthy();
     expect(screen.getByTestId("voice-stage-recording-fill")).toBeTruthy();
     expect(screen.getByText("icon:square")).toBeTruthy();
+    expect(screen.getByText("Your turn")).toBeTruthy();
+    expect(screen.getByText("Toggle to Talk")).toBeTruthy();
+    expect(screen.getByText("Tap when done")).toBeTruthy();
     expect(screen.queryByTestId("active-waveform")).toBeNull();
     expect(
       screen.getByLabelText("Show voice input").props.accessibilityState,
     ).toEqual({ disabled: true, selected: true });
+  });
+
+  it("continues the recording-capacity fill from the actual recording start", () => {
+    const now = jest.spyOn(Date, "now").mockReturnValue(20_000);
+    const { withTiming } = require("react-native-reanimated") as {
+      withTiming: jest.Mock;
+    };
+    withTiming.mockClear();
+
+    render(
+      <MainScreenVoiceStage
+        {...createProps({
+          isActive: true,
+          recordingMaxMs: 10_000,
+          recordingStartedAtMs: 15_000,
+          visualPhase: "recording",
+        })}
+      />,
+    );
+
+    expect(withTiming).toHaveBeenCalledWith(
+      1,
+      expect.objectContaining({ duration: 5_000 }),
+    );
+    now.mockRestore();
+  });
+
+  it("draws the adaptive speech timeline and its red overtime layer", () => {
+    const now = jest.spyOn(Date, "now").mockReturnValue(15_000);
+    const screen = render(
+      <MainScreenVoiceStage
+        {...createProps({
+          isActive: true,
+          speechStartProgress: {
+            elapsedMs: 5_000,
+            estimatedMs: 10_000,
+            learned: true,
+            overEstimate: false,
+            progress: 0.5,
+            sampleCount: 4,
+            startedAt: 10_000,
+          },
+          visualPhase: "thinking",
+        })}
+      />,
+    );
+
+    fireEvent(screen.getByTestId("voice-stage-action-surface"), "layout", {
+      nativeEvent: { layout: { height: 68, width: 320 } },
+    });
+
+    expect(
+      screen.getByTestId("voice-stage-speech-timeline").props.stroke
+        .payload,
+    ).toEqual(processColor("#FFFFFF"));
+    expect(
+      screen.getByTestId("voice-stage-speech-overtime").props.stroke
+        .payload,
+    ).toEqual(processColor(lightColors.danger));
+    now.mockRestore();
   });
 
   it("changes phase color and icon without mounting a second status element", () => {
@@ -416,7 +519,6 @@ describe("MainScreenVoiceStage composer", () => {
       <MainScreenVoiceStage
         {...createProps({
           isActive: true,
-          phaseLabel: "Thinking",
           visualPhase: "thinking",
         })}
       />,
@@ -429,10 +531,11 @@ describe("MainScreenVoiceStage composer", () => {
     ).toBe(lightColors.phaseThinking);
     expect(screen.getByText("icon:cpu")).toBeTruthy();
     expect(screen.queryByText("icon:info")).toBeNull();
+    expect(screen.getByText("Please wait")).toBeTruthy();
     expect(screen.getByText("Thinking")).toBeTruthy();
-    expect(screen.getByTestId("voice-stage-phase-time")).toBeTruthy();
-    expect(screen.getByText("Phase")).toBeTruthy();
-    expect(screen.getByText("Total")).toBeTruthy();
+    expect(screen.queryByTestId("voice-stage-phase-time")).toBeNull();
+    expect(screen.queryByTestId("voice-stage-status-details")).toBeNull();
+    expect(screen.queryByTestId("voice-stage-stop-playback")).toBeNull();
     expect(screen.queryByTestId("main-screen-status-strip")).toBeNull();
   });
 
@@ -441,7 +544,6 @@ describe("MainScreenVoiceStage composer", () => {
       <MainScreenVoiceStage
         {...createProps({
           isActive: true,
-          phaseLabel: "Thinking",
           visualPhase: "thinking-briefly",
         })}
       />,
@@ -455,61 +557,57 @@ describe("MainScreenVoiceStage composer", () => {
     expect(screen.getByText("icon:zap")).toBeTruthy();
   });
 
-  it("shows separate countdowns for the current phase and the whole turn", () => {
-    const now = Date.now();
+  it("uses the phase verb as the main landscape label", () => {
     const screen = render(
       <MainScreenVoiceStage
         {...createProps({
           isActive: true,
-          phaseLabel: "Thinking",
-          phaseProgress: {
-            phase: "thinking",
-            progress: 0.4,
-            elapsedMs: 5_000,
-            startedAt: now - 5_000,
-            estimatedMs: 12_000,
-            sampleCount: 3,
-            learned: true,
-            overEstimate: false,
-            overall: {
-              progress: 0.3,
-              elapsedMs: 8_000,
-              startedAt: now - 8_000,
-              estimatedMs: 24_000,
-              sampleCount: 5,
-              learned: true,
-              overEstimate: false,
-            },
-          },
-          visualPhase: "thinking",
+          layout: "landscape",
+          visualPhase: "searching",
         })}
       />,
     );
 
-    expect(screen.getByTestId("voice-stage-current-time")).toHaveTextContent(
-      "0:07",
-    );
-    expect(screen.getByTestId("voice-stage-total-time")).toHaveTextContent(
-      "0:16",
+    expect(screen.getByText("Searching")).toBeTruthy();
+    expect(screen.queryByText("Please wait")).toBeNull();
+    expect(
+      StyleSheet.flatten(screen.getByText("Searching").props.style),
+    ).toEqual(
+      expect.objectContaining({
+        fontSize: 18,
+        textAlign: "left",
+      }),
     );
   });
 
-  it("keeps playback controls inside the stable speaking CTA", () => {
-    const onStopPlayback = jest.fn();
+  it("uses the primary CTA itself to pause and resume speaking", () => {
+    const onPress = jest.fn();
     const screen = render(
       <MainScreenVoiceStage
         {...createProps({
           isActive: true,
-          onStopPlayback,
-          phaseLabel: "Speaking",
-          playbackActive: true,
+          onPress,
           visualPhase: "speaking",
         })}
       />,
     );
 
     expect(screen.getByText("icon:pause")).toBeTruthy();
-    fireEvent.press(screen.getByTestId("voice-stage-stop-playback"));
-    expect(onStopPlayback).toHaveBeenCalledTimes(1);
+    expect(screen.getByText("Speaking")).toBeTruthy();
+    fireEvent.press(screen.getByTestId("voice-stage-primary-action"));
+    expect(onPress).toHaveBeenCalledTimes(1);
+
+    screen.rerender(
+      <MainScreenVoiceStage
+        {...createProps({
+          isActive: true,
+          onPress,
+          playbackPaused: true,
+          visualPhase: "speaking",
+        })}
+      />,
+    );
+    expect(screen.getByText("icon:play")).toBeTruthy();
+    expect(screen.getByText("Paused")).toBeTruthy();
   });
 });

@@ -55,7 +55,6 @@ describe("MainScreenWorkspace streaming isolation", () => {
     const onOpenSetupGuide = jest.fn();
     const onSelectResponseMode = jest.fn();
     const onToggleWebSearchEnabled = jest.fn();
-    const onOpenStatusDetails = jest.fn();
     const onPress = jest.fn();
     const onPressIn = jest.fn();
     const onPressOut = jest.fn();
@@ -103,12 +102,10 @@ describe("MainScreenWorkspace streaming isolation", () => {
       voiceStage: {
         inputMode: DEFAULT_SETTINGS.inputMode,
         isActive: true,
-        onOpenStatusDetails,
         onPress,
         onPressIn,
         onPressOut,
         onSubmitTextMessage,
-        phaseLabel: "Thinking",
         recordingMaxMs: 60_000,
         statusTitle: "Thinking",
         t,

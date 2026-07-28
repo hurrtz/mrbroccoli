@@ -124,7 +124,6 @@ export function MainScreen() {
     closeSettings,
     openMemoryConversation,
     closeMemory,
-    openStatusDetails,
     closeStatusDetails,
     runAfterDrawerDismiss,
     handleDrawerDismiss,
@@ -215,18 +214,23 @@ export function MainScreen() {
     settings.sttMode === "native"
       ? nativeStt.isRecording
       : recorder.isRecording;
+  const recordingStartedAtMs = React.useMemo(
+    () => (isRecording ? Date.now() : null),
+    [isRecording],
+  );
   const { dismissToast, showToast, toast } =
     useMainScreenToastController();
   usePersistenceFailureAlert(showToast, t);
 
   const {
+    completedReplyVersion,
+    phaseProgress,
     pipelinePhase,
     setPipelinePhase,
     streamingText,
     setStreamingText,
     abortRef,
     lastCompletedReplyRef,
-    phaseProgress,
     replayPhase,
     activeReplayMessageId,
     handleRepeatLastReply,
@@ -347,15 +351,13 @@ export function MainScreen() {
   });
 
   const {
-    driveSessionActive,
-    driveSessionCanContinue,
+    driveAutoContinueEnabled,
     driveSessionCanRepeat,
     handleContinueDriveSession,
     handlePressIn,
     handlePressOut,
     handleRepeatDriveReply,
     handleStopDriveSession,
-    handleStopInteraction,
     handleTogglePress,
     maxRecordingMs,
     resetVoiceSessionState,
@@ -363,6 +365,7 @@ export function MainScreen() {
     abortRef,
     availableSttProviders,
     availableTtsProviders,
+    completedReplyVersion,
     handleVoiceCaptureDone,
     isBusy,
     isRecording,
@@ -469,7 +472,6 @@ export function MainScreen() {
   } = getMainScreenViewModel({
     activeConversation,
     availableTtsProviders,
-    driveSessionActive,
     isRecording,
     language,
     model,
@@ -658,8 +660,7 @@ export function MainScreen() {
           }}
           voiceStage={{
             disabled: voiceInputDisabled,
-            driveSessionActive,
-            driveSessionCanContinue,
+            driveAutoContinueEnabled,
             driveSessionCanRepeat,
             initialInputSurface: inputSurfaceRef.current,
             initialTextMessage: textMessageDraftRef.current,
@@ -669,20 +670,16 @@ export function MainScreen() {
             onDriveContinue: handleContinueDriveSession,
             onDriveRepeat: handleRepeatDriveReply,
             onDriveStop: handleStopDriveSession,
-            onOpenStatusDetails: openStatusDetails,
             onPress: handleTogglePress,
             onPressIn: handlePressIn,
             onPressOut: handlePressOut,
-            onStopPlayback: handleStopInteraction,
             onSubmitTextMessage: handleSubmitTextMessage,
             onTextMessageChange: handleTextMessageChange,
-            phaseLabel: statusDisplay.statusTitle,
-            phaseProgress,
-            playbackActive: player.isPlaying,
             playbackPaused: player.isPlaybackPaused,
             recordingMaxMs: maxRecordingMs,
+            recordingStartedAtMs,
+            speechStartProgress: phaseProgress?.speechStart ?? null,
             statusTitle: statusDisplay.actionLabel,
-            stopPlaybackLabel: t("stop"),
             t,
             visualPhase,
           }}

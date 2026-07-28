@@ -18,31 +18,27 @@ export type { InputSurface } from "./voiceTextInputPager/types";
 export function VoiceTextInputPager({
   colors,
   disabled,
-  driveSessionActive = false,
-  driveSessionCanContinue = false,
+  driveAutoContinueEnabled = false,
   driveSessionCanRepeat = false,
   initialSurface = "voice",
   initialTextMessage = "",
   inputMode,
   isActive,
+  layout,
   onInputSurfaceChange,
   onDriveContinue,
   onDriveRepeat,
   onDriveStop,
-  onOpenStatusDetails,
   onPress,
   onPressIn,
   onPressOut,
-  onStopPlayback,
   onSubmitTextMessage,
   onTextMessageChange,
-  phaseLabel,
-  phaseProgress,
-  playbackActive,
   playbackPaused,
   recordingMaxMs,
+  recordingStartedAtMs,
+  speechStartProgress,
   statusLabel,
-  stopPlaybackLabel,
   t,
   visualPhase,
 }: VoiceTextInputPagerProps) {
@@ -91,18 +87,15 @@ export function VoiceTextInputPager({
             <PhaseAwareVoiceAction
               colors={colors}
               inputMode={inputMode}
-              onOpenStatusDetails={onOpenStatusDetails}
+              layout={layout}
               onPress={onPress}
               onPressIn={onPressIn}
               onPressOut={onPressOut}
-              onStopPlayback={onStopPlayback}
-              phaseLabel={phaseLabel}
-              phaseProgress={phaseProgress}
-              playbackActive={playbackActive}
               playbackPaused={playbackPaused}
               recordingMaxMs={recordingMaxMs}
+              recordingStartedAtMs={recordingStartedAtMs}
+              speechStartProgress={speechStartProgress}
               statusLabel={statusLabel}
-              stopPlaybackLabel={stopPlaybackLabel}
               t={t}
               visualPhase={visualPhase}
             />
@@ -112,8 +105,7 @@ export function VoiceTextInputPager({
 
       {inputMode === "drive-session" ? (
         <DriveSessionControls
-          active={driveSessionActive}
-          canContinue={driveSessionCanContinue}
+          autoContinueEnabled={driveAutoContinueEnabled}
           canRepeat={driveSessionCanRepeat}
           colors={colors}
           disabled={disabled}

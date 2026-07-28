@@ -1,13 +1,22 @@
 import Feather from "@expo/vector-icons/Feather";
 import React from "react";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import {
+  LayoutChangeEvent,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import Animated, {
   cancelAnimation,
   Easing,
+  useAnimatedProps,
   useAnimatedStyle,
   useSharedValue,
+  withDelay,
   withTiming,
 } from "react-native-reanimated";
+import Svg, { Rect } from "react-native-svg";
 
 import { useReducedMotion } from "../../hooks/useReducedMotion";
 import {
@@ -17,44 +26,26 @@ import {
 import { fonts } from "../../theme/typography";
 import {
   InputMode,
-  VoicePhaseProgress,
+  VoiceTimingProgress,
   VoiceVisualPhase,
 } from "../../types";
-import { formatLatencyCountdown } from "../../utils/latencyDisplay";
 
 import { TranslateFn } from "./shared";
 
 interface PhaseAwareVoiceActionProps {
   colors: Colors;
   inputMode: InputMode;
-  onOpenStatusDetails: () => void;
+  layout: "portrait" | "landscape";
   onPress: () => void;
   onPressIn: () => void;
   onPressOut: () => void;
-  onStopPlayback?: () => void | Promise<void>;
-  phaseLabel: string;
-  phaseProgress?: VoicePhaseProgress | null;
-  playbackActive?: boolean;
   playbackPaused?: boolean;
   recordingMaxMs: number;
+  recordingStartedAtMs?: number | null;
+  speechStartProgress?: VoiceTimingProgress | null;
   statusLabel: string;
-  stopPlaybackLabel: string;
   t: TranslateFn;
   visualPhase: VoiceVisualPhase;
-}
-
-function formatClock(milliseconds: number) {
-  const totalSeconds = Math.max(0, Math.ceil(milliseconds / 1000));
-  const minutes = Math.floor(totalSeconds / 60);
-  const seconds = totalSeconds % 60;
-
-  if (minutes >= 60) {
-    const hours = Math.floor(minutes / 60);
-    const remainingMinutes = minutes % 60;
-    return `${hours}h ${remainingMinutes.toString().padStart(2, "0")}m`;
-  }
-
-  return `${minutes}:${seconds.toString().padStart(2, "0")}`;
 }
 
 function getPhaseIcon(
@@ -102,89 +93,248 @@ function getPhaseColor(visualPhase: VoiceVisualPhase, colors: Colors) {
   }
 }
 
-function usePhaseTimeLabels(
+function getPhaseCopy(
   visualPhase: VoiceVisualPhase,
-  recordingMaxMs: number,
-  phaseProgress?: VoicePhaseProgress | null,
+  inputMode: InputMode,
+  playbackPaused: boolean,
+  t: TranslateFn,
 ) {
-  const [phaseStartedAt, setPhaseStartedAt] = React.useState(Date.now());
-  const [now, setNow] = React.useState(Date.now());
-
-  React.useEffect(() => {
-    const startedAt = phaseProgress?.startedAt ?? Date.now();
-    setPhaseStartedAt(startedAt);
-    setNow(Date.now());
-
-    const interval = setInterval(() => setNow(Date.now()), 1000);
-    return () => clearInterval(interval);
-  }, [phaseProgress?.startedAt, visualPhase]);
-
   if (visualPhase === "recording") {
     return {
-      current: formatClock(recordingMaxMs - (now - phaseStartedAt)),
-      overall: "—",
+      prompt: t("yourTurn"),
+      title:
+        inputMode === "push-to-talk"
+          ? t("pushToTalk")
+          : inputMode === "drive-session"
+            ? t("driveSession")
+            : t("toggleToTalk"),
+      detail:
+        inputMode === "push-to-talk"
+          ? t("keepPressing")
+          : t("tapWhenDone"),
     };
   }
 
-  if (phaseProgress) {
-    const currentProgress =
-      phaseProgress.phase === visualPhase || phaseProgress.phase === "turn"
-        ? phaseProgress
-        : null;
-    const overallProgress =
-      phaseProgress.overall ??
-      (phaseProgress.phase === "turn" ? phaseProgress : null);
-
-    return {
-      current: currentProgress
-        ? formatLatencyCountdown(
-            now - currentProgress.startedAt,
-            currentProgress.estimatedMs,
-          ).text
-        : "—",
-      overall: overallProgress
-        ? formatLatencyCountdown(
-            now - overallProgress.startedAt,
-            overallProgress.estimatedMs,
-          ).text
-        : "—",
-    };
-  }
+  const title =
+    visualPhase === "transcribing"
+      ? t("parsing")
+      : visualPhase === "searching"
+        ? t("searching")
+        : visualPhase === "synthesizing"
+          ? t("converting")
+          : visualPhase === "speaking"
+            ? playbackPaused
+              ? t("paused")
+              : t("speaking")
+            : t("thinking");
 
   return {
-    current: `+${formatClock(now - phaseStartedAt)}`,
-    overall: "—",
+    prompt: t("pleaseWait"),
+    title,
+    detail: null,
   };
+}
+
+const PHASE_ICON_SIZE = 42;
+const LANDSCAPE_ICON_RIGHT = 12;
+const TIMELINE_BORDER_WIDTH = 3;
+const TIMELINE_BORDER_INSET = TIMELINE_BORDER_WIDTH / 2;
+const AnimatedRect = Animated.createAnimatedComponent(Rect);
+
+function getRoundedRectPerimeter(
+  width: number,
+  height: number,
+  radius: number,
+) {
+  const safeRadius = Math.max(
+    0,
+    Math.min(radius, width / 2, height / 2),
+  );
+
+  return (
+    2 * (width + height - 4 * safeRadius) +
+    2 * Math.PI * safeRadius
+  );
+}
+
+function getLandscapeIconOffset(surfaceWidth: number) {
+  if (surfaceWidth <= 0) {
+    return 0;
+  }
+
+  return (
+    surfaceWidth / 2 -
+    PHASE_ICON_SIZE / 2 -
+    LANDSCAPE_ICON_RIGHT
+  );
+}
+
+function SpeechStartTimelineBorder({
+  colors,
+  height,
+  phaseForeground,
+  progress,
+  width,
+}: {
+  colors: Colors;
+  height: number;
+  phaseForeground: string;
+  progress: VoiceTimingProgress | null | undefined;
+  width: number;
+}) {
+  const expectedProgress = useSharedValue(0);
+  const overtimeProgress = useSharedValue(0);
+  const rectWidth = Math.max(0, width - TIMELINE_BORDER_WIDTH);
+  const rectHeight = Math.max(0, height - TIMELINE_BORDER_WIDTH);
+  const radius = Math.max(0, 17 - TIMELINE_BORDER_INSET);
+  const perimeter = getRoundedRectPerimeter(
+    rectWidth,
+    rectHeight,
+    radius,
+  );
+
+  React.useEffect(() => {
+    cancelAnimation(expectedProgress);
+    cancelAnimation(overtimeProgress);
+    expectedProgress.value = 0;
+    overtimeProgress.value = 0;
+
+    if (!progress) {
+      return;
+    }
+
+    const estimatedMs = Math.max(1000, progress.estimatedMs);
+    const elapsedMs = Math.max(0, Date.now() - progress.startedAt);
+    const expectedElapsedMs = Math.min(elapsedMs, estimatedMs);
+    const overtimeElapsedMs = Math.max(0, elapsedMs - estimatedMs);
+    const expectedFraction = expectedElapsedMs / estimatedMs;
+    const overtimeFraction = Math.min(
+      1,
+      overtimeElapsedMs / estimatedMs,
+    );
+    const expectedRemainingMs = Math.max(0, estimatedMs - elapsedMs);
+    const overtimeRemainingMs = Math.max(
+      0,
+      estimatedMs - overtimeElapsedMs,
+    );
+
+    expectedProgress.value = expectedFraction;
+    overtimeProgress.value = overtimeFraction;
+
+    if (expectedFraction < 1) {
+      expectedProgress.value = withTiming(1, {
+        duration: expectedRemainingMs,
+        easing: Easing.linear,
+      });
+      overtimeProgress.value = withDelay(
+        expectedRemainingMs,
+        withTiming(1, {
+          duration: estimatedMs,
+          easing: Easing.linear,
+        }),
+      );
+    } else if (overtimeFraction < 1) {
+      overtimeProgress.value = withTiming(1, {
+        duration: overtimeRemainingMs,
+        easing: Easing.linear,
+      });
+    }
+
+    return () => {
+      cancelAnimation(expectedProgress);
+      cancelAnimation(overtimeProgress);
+    };
+  }, [
+    expectedProgress,
+    overtimeProgress,
+    progress?.estimatedMs,
+    progress?.startedAt,
+  ]);
+
+  const expectedAnimatedProps = useAnimatedProps(() => ({
+    strokeDashoffset:
+      perimeter * (1 - expectedProgress.value),
+  }));
+  const overtimeAnimatedProps = useAnimatedProps(() => ({
+    strokeDashoffset:
+      perimeter * (1 - overtimeProgress.value),
+  }));
+
+  if (!progress || width <= 0 || height <= 0 || perimeter <= 0) {
+    return null;
+  }
+
+  return (
+    <Svg
+      pointerEvents="none"
+      style={styles.timelineOverlay}
+      width={width}
+      height={height}
+    >
+      <AnimatedRect
+        testID="voice-stage-speech-timeline"
+        animatedProps={expectedAnimatedProps}
+        x={TIMELINE_BORDER_INSET}
+        y={TIMELINE_BORDER_INSET}
+        width={rectWidth}
+        height={rectHeight}
+        rx={radius}
+        fill="none"
+        stroke={phaseForeground}
+        strokeWidth={TIMELINE_BORDER_WIDTH}
+        strokeDasharray={[perimeter, perimeter]}
+        strokeLinecap="round"
+      />
+      <AnimatedRect
+        testID="voice-stage-speech-overtime"
+        animatedProps={overtimeAnimatedProps}
+        x={TIMELINE_BORDER_INSET}
+        y={TIMELINE_BORDER_INSET}
+        width={rectWidth}
+        height={rectHeight}
+        rx={radius}
+        fill="none"
+        stroke={colors.danger}
+        strokeWidth={TIMELINE_BORDER_WIDTH}
+        strokeDasharray={[perimeter, perimeter]}
+        strokeLinecap="round"
+      />
+    </Svg>
+  );
 }
 
 export function PhaseAwareVoiceAction({
   colors,
   inputMode,
-  onOpenStatusDetails,
+  layout,
   onPress,
   onPressIn,
   onPressOut,
-  onStopPlayback,
-  phaseLabel,
-  phaseProgress,
-  playbackActive = false,
   playbackPaused = false,
   recordingMaxMs,
+  recordingStartedAtMs = null,
+  speechStartProgress = null,
   statusLabel,
-  stopPlaybackLabel,
   t,
   visualPhase,
 }: PhaseAwareVoiceActionProps) {
   const reducedMotion = useReducedMotion();
+  const [surfaceSize, setSurfaceSize] = React.useState({
+    height: 0,
+    width: 0,
+  });
   const recordingProgress = useSharedValue(0);
   const phaseColor = getPhaseColor(visualPhase, colors);
   const phaseForeground = getAccessibleForeground(phaseColor);
   const animatedPhaseColor = useSharedValue(phaseColor);
-  const timeLabels = usePhaseTimeLabels(
+  const iconOffset = useSharedValue(0);
+  const phaseCopy = getPhaseCopy(
     visualPhase,
-    recordingMaxMs,
-    phaseProgress,
+    inputMode,
+    playbackPaused,
+    t,
   );
+  const isLandscape = layout === "landscape";
 
   React.useEffect(() => {
     cancelAnimation(animatedPhaseColor);
@@ -200,14 +350,47 @@ export function PhaseAwareVoiceAction({
     recordingProgress.value = 0;
 
     if (visualPhase === "recording") {
-      recordingProgress.value = withTiming(1, {
-        duration: Math.max(1000, recordingMaxMs),
-        easing: Easing.linear,
-      });
+      const safeRecordingMaxMs = Math.max(1000, recordingMaxMs);
+      const startedAtMs = recordingStartedAtMs ?? Date.now();
+      const elapsedMs = Math.max(0, Date.now() - startedAtMs);
+      const elapsedFraction = Math.min(
+        1,
+        elapsedMs / safeRecordingMaxMs,
+      );
+      recordingProgress.value = elapsedFraction;
+
+      if (elapsedFraction < 1) {
+        recordingProgress.value = withTiming(1, {
+          duration: Math.max(0, safeRecordingMaxMs - elapsedMs),
+          easing: Easing.linear,
+        });
+      }
     }
 
     return () => cancelAnimation(recordingProgress);
-  }, [recordingMaxMs, recordingProgress, visualPhase]);
+  }, [
+    recordingMaxMs,
+    recordingProgress,
+    recordingStartedAtMs,
+    visualPhase,
+  ]);
+
+  React.useEffect(() => {
+    const nextOffset = isLandscape
+      ? getLandscapeIconOffset(surfaceSize.width)
+      : 0;
+    cancelAnimation(iconOffset);
+    iconOffset.value = reducedMotion
+      ? nextOffset
+      : withTiming(nextOffset, { duration: 240 });
+
+    return () => cancelAnimation(iconOffset);
+  }, [
+    iconOffset,
+    isLandscape,
+    reducedMotion,
+    surfaceSize.width,
+  ]);
 
   const recordingFillStyle = useAnimatedStyle(() => ({
     width: `${recordingProgress.value * 100}%`,
@@ -216,10 +399,25 @@ export function PhaseAwareVoiceAction({
     backgroundColor: animatedPhaseColor.value,
     borderColor: animatedPhaseColor.value,
   }));
+  const iconPositionStyle = useAnimatedStyle(() => ({
+    transform: [{ translateX: iconOffset.value }],
+  }));
+  const handleSurfaceLayout = React.useCallback(
+    (event: LayoutChangeEvent) => {
+      const { height, width } = event.nativeEvent.layout;
+      setSurfaceSize((current) =>
+        current.height === height && current.width === width
+          ? current
+          : { height, width },
+      );
+    },
+    [],
+  );
 
   return (
     <Animated.View
       testID="voice-stage-action-surface"
+      onLayout={handleSurfaceLayout}
       style={[styles.surface, surfaceColorStyle]}
     >
       {visualPhase === "recording" ? (
@@ -243,89 +441,85 @@ export function PhaseAwareVoiceAction({
         onPressOut={inputMode === "push-to-talk" ? onPressOut : undefined}
         style={styles.primaryAction}
       >
-        <View style={[styles.phaseIcon, { backgroundColor: phaseForeground }]}>
+        <Animated.View
+          testID="voice-stage-phase-icon"
+          style={[
+            styles.phaseIcon,
+            { backgroundColor: phaseForeground },
+            iconPositionStyle,
+          ]}
+        >
           <Feather
             name={getPhaseIcon(visualPhase, playbackPaused)}
             size={21}
             color={phaseColor}
           />
-        </View>
+        </Animated.View>
       </TouchableOpacity>
 
-      <TouchableOpacity
-        testID="voice-stage-status-details"
-        accessibilityLabel={t("statusDetails")}
-        accessibilityRole="button"
-        activeOpacity={0.76}
-        onPress={onOpenStatusDetails}
-        style={styles.phaseLabelButton}
+      <View
+        pointerEvents="none"
+        style={
+          isLandscape
+            ? styles.landscapePhaseCopy
+            : styles.portraitPhaseCopy
+        }
       >
-        <Text
-          adjustsFontSizeToFit
-          minimumFontScale={0.84}
-          numberOfLines={1}
-          style={[styles.phaseLabel, { color: phaseForeground }]}
-        >
-          {phaseLabel}
-        </Text>
-      </TouchableOpacity>
+        {!isLandscape ? (
+          <View style={styles.phasePrompt}>
+            <Text
+              adjustsFontSizeToFit
+              minimumFontScale={0.84}
+              numberOfLines={1}
+              style={[styles.phasePromptText, { color: phaseForeground }]}
+            >
+              {phaseCopy.prompt}
+            </Text>
+          </View>
+        ) : null}
 
-      {playbackActive ? (
-        <TouchableOpacity
-          testID="voice-stage-stop-playback"
-          accessibilityLabel={stopPlaybackLabel}
-          accessibilityRole="button"
-          activeOpacity={0.76}
-          onPress={() => {
-            void onStopPlayback?.();
-          }}
-          style={[
-            styles.stopButton,
-            {
-              backgroundColor: `${phaseForeground}1F`,
-              borderColor: `${phaseForeground}7A`,
-            },
-          ]}
-        >
-          <Feather name="square" size={13} color={phaseForeground} />
-        </TouchableOpacity>
-      ) : (
         <View
-          testID="voice-stage-phase-time"
-          style={styles.phaseTimes}
+          testID="voice-stage-phase-copy"
+          style={
+            isLandscape
+              ? styles.landscapePhaseMessage
+              : styles.portraitPhaseMessage
+          }
         >
           <Text
+            adjustsFontSizeToFit
+            minimumFontScale={0.76}
             numberOfLines={1}
-            style={[styles.phaseTimeLine, { color: phaseForeground }]}
+            style={[
+              isLandscape
+                ? styles.landscapePhaseTitle
+                : styles.phaseTitle,
+              { color: phaseForeground },
+            ]}
           >
-            <Text style={styles.phaseTimeScope}>
-              {t("phaseTimeRemaining")}
-              {"  "}
-            </Text>
-            <Text
-              testID="voice-stage-current-time"
-              style={styles.phaseTimeValue}
-            >
-              {timeLabels.current}
-            </Text>
+            {phaseCopy.title}
           </Text>
-          <Text
-            numberOfLines={1}
-            style={[styles.phaseTimeLine, { color: phaseForeground }]}
-          >
-            <Text style={styles.phaseTimeScope}>
-              {t("totalTimeRemaining")}
-              {"  "}
-            </Text>
+          {phaseCopy.detail ? (
             <Text
-              testID="voice-stage-total-time"
-              style={styles.phaseTimeValue}
+              numberOfLines={1}
+              style={[styles.phaseDetail, { color: phaseForeground }]}
             >
-              {timeLabels.overall}
+              {phaseCopy.detail}
             </Text>
-          </Text>
+          ) : null}
         </View>
-      )}
+      </View>
+
+      {visualPhase !== "recording" &&
+      visualPhase !== "speaking" ? (
+        <SpeechStartTimelineBorder
+          colors={colors}
+          height={surfaceSize.height}
+          phaseForeground={phaseForeground}
+          progress={speechStartProgress}
+          width={surfaceSize.width}
+        />
+      ) : null}
     </Animated.View>
   );
 }
@@ -346,38 +540,47 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
   },
+  timelineOverlay: {
+    ...StyleSheet.absoluteFillObject,
+  },
   primaryAction: {
     ...StyleSheet.absoluteFillObject,
     alignItems: "center",
     justifyContent: "center",
   },
   phaseIcon: {
-    width: 42,
-    height: 42,
-    borderRadius: 21,
+    width: PHASE_ICON_SIZE,
+    height: PHASE_ICON_SIZE,
+    borderRadius: PHASE_ICON_SIZE / 2,
     alignItems: "center",
     justifyContent: "center",
   },
-  phaseLabelButton: {
-    position: "absolute",
-    left: 8,
-    top: 0,
-    bottom: 0,
-    width: "34%",
+  portraitPhaseCopy: {
+    ...StyleSheet.absoluteFillObject,
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "center",
   },
-  phaseLabel: {
-    flexShrink: 1,
-    fontSize: 14,
-    lineHeight: 17,
+  landscapePhaseCopy: {
+    ...StyleSheet.absoluteFillObject,
+    right: PHASE_ICON_SIZE + LANDSCAPE_ICON_RIGHT + 12,
+    justifyContent: "center",
+    paddingLeft: 16,
+  },
+  phasePrompt: {
+    width: "34%",
+    alignItems: "center",
+    justifyContent: "center",
+    paddingHorizontal: 8,
+  },
+  phasePromptText: {
+    fontSize: 13,
+    lineHeight: 16,
     fontFamily: fonts.body,
     fontWeight: "400",
     letterSpacing: 0.1,
     textAlign: "center",
   },
-  phaseTimes: {
+  portraitPhaseMessage: {
     position: "absolute",
     right: 8,
     top: 0,
@@ -385,39 +588,35 @@ const styles = StyleSheet.create({
     width: "34%",
     alignItems: "center",
     justifyContent: "center",
-    gap: 1,
+    paddingHorizontal: 4,
   },
-  phaseTimeLine: {
-    width: "100%",
+  landscapePhaseMessage: {
+    alignItems: "flex-start",
+    justifyContent: "center",
+  },
+  phaseTitle: {
+    fontSize: 14,
+    lineHeight: 17,
     fontFamily: fonts.body,
-    fontSize: 11.5,
-    lineHeight: 15,
-    fontWeight: "400",
+    fontWeight: "600",
+    letterSpacing: 0.1,
     textAlign: "center",
   },
-  phaseTimeScope: {
+  landscapePhaseTitle: {
     fontFamily: fonts.body,
-    fontSize: 10.5,
-    lineHeight: 15,
+    fontSize: 18,
+    lineHeight: 22,
+    fontWeight: "600",
+    letterSpacing: -0.1,
+    textAlign: "left",
+  },
+  phaseDetail: {
+    fontFamily: fonts.body,
+    fontSize: 11,
+    lineHeight: 14,
     fontWeight: "400",
     letterSpacing: 0.1,
-    opacity: 0.82,
-  },
-  phaseTimeValue: {
-    fontFamily: fonts.body,
-    fontSize: 11.5,
-    lineHeight: 15,
-    fontWeight: "400",
-    fontVariant: ["tabular-nums"],
-  },
-  stopButton: {
-    position: "absolute",
-    right: 10,
-    width: 38,
-    height: 38,
-    borderRadius: 19,
-    borderWidth: StyleSheet.hairlineWidth,
-    alignItems: "center",
-    justifyContent: "center",
+    textAlign: "center",
+    opacity: 0.84,
   },
 });

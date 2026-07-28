@@ -54,6 +54,7 @@ type EventAdapterParams = Pick<
     | "recordTtsFallbackNotice"
     | "updateAssistantTurnReceipt"
   >;
+  onReplyCompleted: () => void;
   onError: PipelineCallbacks["onError"];
   playbackStartedRef: MutableRefObject<boolean>;
   producedAudioRef: MutableRefObject<boolean>;
@@ -78,6 +79,7 @@ export function createVoicePipelineEventAdapter({
   messageState,
   model,
   modelEffort,
+  onReplyCompleted,
   onError,
   player,
   playbackStartedRef,
@@ -365,6 +367,7 @@ export function createVoicePipelineEventAdapter({
             : "thinking",
       );
       lastCompletedReplyRef.current = fullText;
+      onReplyCompleted();
       const assistantMessage = addMessage({
         role: "assistant",
         content: fullText,

@@ -26,6 +26,7 @@ type VoiceCaptureHandlerParams = Omit<UseVoicePipelineParams, "isRecording"> & {
     messageId?: string,
   ) => Promise<void>;
   lastCompletedReplyRef: React.MutableRefObject<string>;
+  onReplyCompleted: () => void;
   setPhaseProgress: Dispatch<SetStateAction<VoicePhaseProgress | null>>;
   setPipelinePhase: (phase: PipelinePhase) => void;
   setStreamingText: (text: string | ((prev: string) => string)) => void;
@@ -43,6 +44,7 @@ export function useVoiceCaptureHandler({
   lastCompletedReplyRef,
   model,
   modelEffort,
+  onReplyCompleted,
   player,
   provider,
   providerApiKey,
@@ -223,6 +225,7 @@ export function useVoiceCaptureHandler({
         },
         model,
         modelEffort,
+        onReplyCompleted,
         onError: errorHandlers.handlePipelineError,
         player,
         playbackStartedRef,
