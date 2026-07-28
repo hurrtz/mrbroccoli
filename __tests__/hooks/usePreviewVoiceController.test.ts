@@ -101,6 +101,7 @@ describe("usePreviewVoiceController", () => {
         {
           mode: "native",
           nativeVoice: "Samantha",
+          previewLanguage: "en",
           text: "Hello there",
         },
         { onPlaybackStarted },
@@ -109,7 +110,10 @@ describe("usePreviewVoiceController", () => {
 
     expect(player.speakText).toHaveBeenCalledWith(
       "Hello there",
-      expect.objectContaining({ voice: "Samantha" }),
+      expect.objectContaining({
+        language: "en-US",
+        voice: "Samantha",
+      }),
     );
     expect(onPlaybackStarted).toHaveBeenCalledTimes(1);
   });

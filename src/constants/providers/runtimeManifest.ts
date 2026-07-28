@@ -111,6 +111,7 @@ interface RuntimeTtsManifest {
   requestFormat?: RuntimeTtsBinaryRequestFormat;
   defaultModel?: string;
   models: RuntimeModelSpec[];
+  languages?: readonly SpeechLanguage[];
   defaultVoice?: string;
   voiceFallback?: string;
   voiceOptions: RuntimeVoiceOption[];
@@ -615,6 +616,21 @@ export const RUNTIME_PROVIDER_MANIFEST: Record<
         namedModel("tts-1", "tts-1"),
         namedModel("tts-1-hd", "tts-1-hd"),
       ],
+      languages: [
+        "en",
+        "de",
+        "uk",
+        "hi",
+        "es",
+        "fr",
+        "it",
+        "pt",
+        "pt-BR",
+        "ru",
+        "zh-CN",
+        "ar",
+        "ja",
+      ],
       voiceOptions: [
         voice("alloy", "Alloy"),
         voice("ash", "Ash"),
@@ -860,6 +876,18 @@ export const RUNTIME_PROVIDER_MANIFEST: Record<
           namedModel("qwen3-tts-instruct-flash", "Qwen3-TTS-Instruct-Flash"),
         ),
       ],
+      languages: [
+        "en",
+        "de",
+        "es",
+        "fr",
+        "it",
+        "pt",
+        "pt-BR",
+        "ru",
+        "zh-CN",
+        "ja",
+      ],
       voiceOptions: [
         voice("Cherry", "Cherry · Bright and friendly"),
         voice("Serena", "Serena · Gentle"),
@@ -1094,6 +1122,21 @@ export const RUNTIME_PROVIDER_MANIFEST: Record<
           ),
         ),
       ],
+      languages: [
+        "en",
+        "de",
+        "uk",
+        "hi",
+        "es",
+        "fr",
+        "it",
+        "pt",
+        "pt-BR",
+        "ru",
+        "zh-CN",
+        "ar",
+        "ja",
+      ],
       voiceOptions: [
         voice("Zephyr", "Zephyr · Bright", { de: "Zephyr · Klar" }),
         voice("Puck", "Puck · Upbeat", { de: "Puck · Schwungvoll" }),
@@ -1197,6 +1240,20 @@ export const RUNTIME_PROVIDER_MANIFEST: Record<
       defaultVoice: "ara",
       voiceFallback: "ara",
       models: catalogModelSpecs("xai", "tts", ["grok-tts"]),
+      languages: [
+        "en",
+        "de",
+        "hi",
+        "es",
+        "fr",
+        "it",
+        "pt",
+        "pt-BR",
+        "ru",
+        "zh-CN",
+        "ar",
+        "ja",
+      ],
       voiceOptions: [
         voice("ara", "Ara · Warm", { de: "Ara · Warm" }),
         voice("eve", "Eve · Energetic", { de: "Eve · Energetisch" }),
@@ -1303,6 +1360,17 @@ export const RUNTIME_PROVIDER_MANIFEST: Record<
       requestFormat: "mistral-speech",
       defaultModel: "voxtral-mini-tts-2603",
       models: [namedModel("voxtral-mini-tts-2603", "Voxtral Mini TTS 26.03")],
+      languages: [
+        "en",
+        "de",
+        "hi",
+        "es",
+        "fr",
+        "it",
+        "pt",
+        "pt-BR",
+        "ar",
+      ],
       voiceOptions: [],
       voiceDirectory: "mistral",
       requiresVoice: true,
@@ -1360,6 +1428,21 @@ export const RUNTIME_PROVIDER_MANIFEST: Record<
         namedModel("eleven_flash_v2_5", "Eleven Flash v2.5"),
         namedModel("eleven_multilingual_v2", "Eleven Multilingual v2"),
         namedModel("eleven_v3", "Eleven v3"),
+      ],
+      languages: [
+        "en",
+        "de",
+        "uk",
+        "hi",
+        "es",
+        "fr",
+        "it",
+        "pt",
+        "pt-BR",
+        "ru",
+        "zh-CN",
+        "ar",
+        "ja",
       ],
       voiceOptions: [
         voice("21m00Tcm4TlvDq8ikWAM", "Rachel (built-in)", {

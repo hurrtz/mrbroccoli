@@ -214,7 +214,10 @@ describe("useAudioPlayer", () => {
     const { result } = renderHook(() => useAudioPlayer());
 
     await act(async () => {
-      result.current.speakText("Hello there", { onPlaybackStarted });
+      result.current.speakText("Hello there", {
+        language: "uk-UA",
+        onPlaybackStarted,
+      });
       await Promise.resolve();
     });
 
@@ -222,6 +225,7 @@ describe("useAudioPlayer", () => {
     expect(result.current.isActivelyPlaying).toBe(false);
 
     const speechOptions = (Speech.speak as jest.Mock).mock.calls[0][1];
+    expect(speechOptions.language).toBe("uk-UA");
     act(() => {
       speechOptions.onStart();
     });

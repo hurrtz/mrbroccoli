@@ -21,6 +21,7 @@ export async function validateTtsProviderConnection(params: {
     providerModel: params.model,
     apiKey: params.apiKey,
     language: params.language,
+    speechLanguage: "en",
     abortSignal: params.abortSignal,
   });
 

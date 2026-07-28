@@ -10,6 +10,7 @@ import {
   Provider,
   TtsBackendMode,
   TtsListenLanguage,
+  SpeechLanguage,
 } from "../types";
 import {
   DEFAULT_KOKORO_VOICES,
@@ -23,6 +24,7 @@ import {
   splitTextForTts,
 } from "./tts/chunking";
 import { synthesizeProviderSpeech } from "./tts/providerRoute";
+import { resolveTtsListenLanguage } from "../utils/ttsRouting";
 import {
   getProviderTtsTimeoutMs,
   getProviderTtsTargetChunkChars,
@@ -125,6 +127,7 @@ export async function synthesizeSpeech(params: {
   nextText?: string;
   language: AppLanguage;
   listenLanguages?: TtsListenLanguage[];
+  speechLanguage?: SpeechLanguage;
   kokoroVoices?: KokoroVoiceSelections;
   diagnostics?: SpeechDiagnosticsContext;
   abortSignal?: AbortSignal;
@@ -141,10 +144,18 @@ export async function synthesizeSpeech(params: {
     nextText,
     language,
     listenLanguages,
+    speechLanguage,
     diagnostics,
     abortSignal,
   } = params;
   const requestId = diagnostics?.requestId ?? createSpeechRequestId("tts");
+  const resolvedSpeechLanguage =
+    speechLanguage ??
+    resolveTtsListenLanguage({
+      text,
+      preferredLanguages: listenLanguages,
+      appLanguage: language,
+    });
   const resolvedProviderModel = resolveProviderTtsModel({
     provider,
     providerModel,
@@ -159,7 +170,7 @@ export async function synthesizeSpeech(params: {
     provider: provider ?? null,
     providerModel: resolvedProviderModel,
     voice: voice || null,
-    language: listenLanguages?.[0] ?? "app",
+    language: resolvedSpeechLanguage,
     textLength: text.trim().length,
   });
 
@@ -173,7 +184,7 @@ export async function synthesizeSpeech(params: {
     try {
       const kokoroLanguage = resolveKokoroLanguage({
         text,
-        listenLanguages,
+        listenLanguages: [resolvedSpeechLanguage],
       });
       const kokoroVoices = params.kokoroVoices
         ? params.kokoroVoices
@@ -185,7 +196,7 @@ export async function synthesizeSpeech(params: {
           : DEFAULT_KOKORO_VOICES;
       const result = await synthesizeKokoroSpeech({
         text,
-        listenLanguages,
+        listenLanguages: [resolvedSpeechLanguage],
         voices: kokoroVoices,
         abortSignal,
       });
@@ -263,6 +274,7 @@ export async function synthesizeSpeech(params: {
       previousText,
       nextText,
       language,
+      speechLanguage: resolvedSpeechLanguage,
       abortSignal,
     });
     recordSpeechDiagnostic({

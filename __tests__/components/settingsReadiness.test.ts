@@ -167,6 +167,63 @@ describe("settings readiness", () => {
     expectStatus(readiness.speak, "attention");
   });
 
+  it("requires an explicit compatible fallback for unsupported provider languages", () => {
+    const baseSettings = withSettings({
+      ttsMode: "provider",
+      ttsProvider: "mistral",
+      ttsListenLanguages: ["uk"],
+      apiKeys: {
+        ...DEFAULT_SETTINGS.apiKeys,
+        mistral: "mistral-test-key",
+      },
+      providerTtsVoices: {
+        ...DEFAULT_SETTINGS.providerTtsVoices,
+        mistral: "preset-voice",
+      },
+    });
+    const context = {
+      llmProviders: [],
+      sttProviders: [],
+      ttsProviders: ["mistral" as const],
+      searchProviders: [],
+    };
+
+    expectStatus(
+      getSettingsReadiness(baseSettings, context).speak,
+      "broken",
+    );
+    expectStatus(
+      getSettingsReadiness(
+        {
+          ...baseSettings,
+          ttsFallbackPolicy: {
+            ...baseSettings.ttsFallbackPolicy,
+            provider: ["native"],
+          },
+        },
+        context,
+      ).speak,
+      "attention",
+    );
+  });
+
+  it("marks unsupported Kokoro languages broken without an explicit fallback", () => {
+    const settings = withSettings({
+      ttsMode: "kokoro",
+      ttsListenLanguages: ["de"],
+    });
+
+    const readiness = getSettingsReadiness(settings, {
+      llmProviders: [],
+      sttProviders: [],
+      ttsProviders: [],
+      searchProviders: [],
+      kokoroInstalled: true,
+    });
+
+    expectStatus(readiness.speak, "broken");
+  });
+
   it("ignores fallback policy when native speech is selected", () => {
     const settings = withSettings({
       ttsMode: "native",

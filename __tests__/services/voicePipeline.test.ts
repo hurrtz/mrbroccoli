@@ -1533,6 +1533,186 @@ describe("runVoicePipeline", () => {
     );
   });
 
+  it("rejects an unsupported provider output language without an implicit fallback", async () => {
+    (streamChat as jest.Mock).mockImplementation(
+      async ({ onDone }: { onDone: (text: string) => Promise<void> }) => {
+        await onDone("Привіт з України.");
+      },
+    );
+    const callbacks = {
+      onTranscription: jest.fn(),
+      onChunk: jest.fn(),
+      onResponseDone: jest.fn(),
+      onAudioReady: jest.fn(),
+      onSpeechTextReady: jest.fn(),
+      onTtsFallback: jest.fn(),
+      onError: jest.fn(),
+    };
+
+    await runVoicePipeline({
+      transcriptionOverride: "Speak Ukrainian.",
+      messages: [],
+      model: "gpt-5.4",
+      provider: "openai",
+      providerApiKey: "sk-test",
+      sttMode: "native",
+      ttsMode: "provider",
+      ttsProvider: "mistral",
+      ttsApiKey: "mistral-test",
+      ttsVoice: "voice-123",
+      ttsListenLanguages: ["uk"],
+      replyPlayback: "wait",
+      assistantInstructions: "You are a voice assistant.",
+      responseLength: "normal",
+      responseTone: "professional",
+      language: "en",
+      callbacks,
+    });
+
+    expect(synthesizeSpeech).not.toHaveBeenCalled();
+    expect(callbacks.onTtsFallback).not.toHaveBeenCalled();
+    expect(callbacks.onAudioReady).not.toHaveBeenCalled();
+    expect(callbacks.onSpeechTextReady).not.toHaveBeenCalled();
+    expect(callbacks.onError).toHaveBeenCalledWith(
+      expect.objectContaining({
+        message:
+          "Mistral does not officially support Ukrainian for this speech route.",
+      }),
+    );
+  });
+
+  it("uses an explicitly configured native fallback for an unsupported output language", async () => {
+    (streamChat as jest.Mock).mockImplementation(
+      async ({ onDone }: { onDone: (text: string) => Promise<void> }) => {
+        await onDone("Привіт з України.");
+      },
+    );
+    const callbacks = {
+      onTranscription: jest.fn(),
+      onChunk: jest.fn(),
+      onResponseDone: jest.fn(),
+      onAudioReady: jest.fn(),
+      onSpeechTextReady: jest.fn(),
+      onTtsFallback: jest.fn(),
+      onError: jest.fn(),
+    };
+
+    await runVoicePipeline({
+      transcriptionOverride: "Speak Ukrainian.",
+      messages: [],
+      model: "gpt-5.4",
+      provider: "openai",
+      providerApiKey: "sk-test",
+      sttMode: "native",
+      ttsMode: "provider",
+      ttsProvider: "mistral",
+      ttsApiKey: "mistral-test",
+      ttsVoice: "voice-123",
+      ttsFallbackRoutes: ["native"],
+      ttsListenLanguages: ["uk"],
+      replyPlayback: "wait",
+      assistantInstructions: "You are a voice assistant.",
+      responseLength: "normal",
+      responseTone: "professional",
+      language: "en",
+      callbacks,
+    });
+
+    expect(synthesizeSpeech).not.toHaveBeenCalled();
+    expect(callbacks.onTtsFallback).toHaveBeenCalledWith(
+      expect.objectContaining({
+        message:
+          "Mistral does not officially support Ukrainian for this speech route.",
+      }),
+      "native",
+    );
+    expect(callbacks.onSpeechTextReady).toHaveBeenCalledWith(
+      "Привіт з України.",
+      undefined,
+      expect.objectContaining({
+        language: "uk",
+        mode: "native",
+      }),
+    );
+    expect(callbacks.onAudioReady).not.toHaveBeenCalled();
+    expect(callbacks.onError).not.toHaveBeenCalled();
+  });
+
+  it("chooses a compatible route independently for each streamed language", async () => {
+    (streamChat as jest.Mock).mockImplementation(
+      async ({
+        onChunk,
+        onDone,
+      }: {
+        onChunk: (text: string) => void;
+        onDone: (text: string) => Promise<void>;
+      }) => {
+        onChunk("This is the English answer.\n\n");
+        onChunk("Це українська відповідь.");
+        await onDone(
+          "This is the English answer.\n\nЦе українська відповідь.",
+        );
+      },
+    );
+    (synthesizeSpeech as jest.Mock).mockResolvedValueOnce(
+      "/tmp/english.wav",
+    );
+    const callbacks = {
+      onTranscription: jest.fn(),
+      onChunk: jest.fn(),
+      onResponseDone: jest.fn(),
+      onAudioReady: jest.fn(),
+      onAudioPauseReady: jest.fn(),
+      onSpeechTextReady: jest.fn(),
+      onSpeechPauseReady: jest.fn(),
+      onTtsFallback: jest.fn(),
+      onError: jest.fn(),
+    };
+
+    await runVoicePipeline({
+      transcriptionOverride: "Reply bilingually.",
+      messages: [],
+      model: "gpt-5.4",
+      provider: "openai",
+      providerApiKey: "sk-test",
+      sttMode: "native",
+      ttsMode: "provider",
+      ttsProvider: "mistral",
+      ttsApiKey: "mistral-test",
+      ttsVoice: "voice-123",
+      ttsFallbackRoutes: ["native"],
+      ttsListenLanguages: ["en", "uk"],
+      replyPlayback: "stream",
+      assistantInstructions: "You are a voice assistant.",
+      responseLength: "normal",
+      responseTone: "professional",
+      language: "en",
+      callbacks,
+    });
+
+    expect(synthesizeSpeech).toHaveBeenCalledTimes(1);
+    expect(synthesizeSpeech).toHaveBeenCalledWith(
+      expect.objectContaining({
+        speechLanguage: "en",
+        text: "This is the English answer.",
+      }),
+    );
+    expect(callbacks.onAudioReady).toHaveBeenCalledWith(
+      "/tmp/english.wav",
+      expect.objectContaining({ language: "en", mode: "provider" }),
+    );
+    expect(callbacks.onSpeechTextReady).toHaveBeenCalledWith(
+      "Це українська відповідь.",
+      undefined,
+      expect.objectContaining({ language: "uk", mode: "native" }),
+    );
+    expect(callbacks.onTtsFallback).toHaveBeenCalledWith(
+      expect.any(Error),
+      "native",
+    );
+    expect(callbacks.onError).not.toHaveBeenCalled();
+  });
+
   it("tries provider fallbacks in the configured Kokoro then native order", async () => {
     (streamChat as jest.Mock).mockImplementation(
       async ({ onDone }: { onDone: (text: string) => Promise<void> }) => {

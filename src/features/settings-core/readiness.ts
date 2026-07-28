@@ -7,7 +7,10 @@ import type { Provider, Settings } from "../../types";
 import { isKokoroLanguage } from "../../constants/kokoro";
 import { getTtsFallbackRoutes } from "../../constants/ttsFallback";
 import { hasProviderCredentialForCapability } from "../../utils/providerCredentials";
-import { providerSupportsSttLanguage } from "../../constants/providerSpeechLanguages";
+import {
+  providerSupportsSttLanguage,
+  providerSupportsTtsLanguage,
+} from "../../constants/providerSpeechLanguages";
 
 export type SettingsReadinessState = "ready" | "attention" | "broken" | "off";
 
@@ -135,22 +138,50 @@ function getSpeakReadiness(
     return false;
   });
 
-  if (settings.ttsMode === "kokoro") {
-    if (!context.kokoroInstalled) {
-      return status("broken");
-    }
+  const primaryReady =
+    settings.ttsMode === "kokoro"
+      ? !!context.kokoroInstalled
+      : providerReady;
 
-    return settings.ttsListenLanguages.every(isKokoroLanguage) &&
-      !hasUnavailableFallback
-      ? status("ready")
-      : status("attention");
-  }
-
-  if (!providerReady) {
+  if (!primaryReady) {
     return status("broken");
   }
 
-  return hasUnavailableFallback ? status("attention") : status("ready");
+  const routeOrder = [settings.ttsMode, ...fallbackRoutes];
+  const everyLanguageHasRoute = settings.ttsListenLanguages.every(
+    (language) =>
+      routeOrder.some((route) => {
+        if (route === "native") {
+          return true;
+        }
+
+        if (route === "kokoro") {
+          return !!context.kokoroInstalled && isKokoroLanguage(language);
+        }
+
+        return (
+          providerReady &&
+          !!provider &&
+          providerSupportsTtsLanguage(provider, language)
+        );
+      }),
+  );
+
+  if (!everyLanguageHasRoute) {
+    return status("broken");
+  }
+
+  const primarySupportsEveryLanguage =
+    settings.ttsMode === "kokoro"
+      ? settings.ttsListenLanguages.every(isKokoroLanguage)
+      : !!provider &&
+        settings.ttsListenLanguages.every((language) =>
+          providerSupportsTtsLanguage(provider, language),
+        );
+
+  return hasUnavailableFallback || !primarySupportsEveryLanguage
+    ? status("attention")
+    : status("ready");
 }
 
 function getSearchReadiness(

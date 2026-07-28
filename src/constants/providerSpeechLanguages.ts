@@ -17,3 +17,17 @@ export function providerSupportsSttLanguage(
     getProviderSttLanguages(provider).includes(language)
   );
 }
+
+export function getProviderTtsLanguages(
+  provider: Provider,
+): readonly SpeechLanguage[] {
+  const tts = RUNTIME_PROVIDER_MANIFEST[provider].tts;
+  return tts.support === "provider" ? (tts.languages ?? []) : [];
+}
+
+export function providerSupportsTtsLanguage(
+  provider: Provider,
+  language: SpeechLanguage,
+) {
+  return getProviderTtsLanguages(provider).includes(language);
+}

@@ -83,7 +83,7 @@ export function useSettingsController({
   } = useNativeVoiceOptions({
     visible,
     shouldLoad: visible,
-    language,
+    listenLanguages: settings.ttsListenLanguages,
   });
 
   useSettingsNormalization({

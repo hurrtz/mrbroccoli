@@ -7,6 +7,8 @@ import type {
   ReplayPhase,
   UseVoicePipelineParams,
 } from "./types";
+import { resolveTtsListenLanguage } from "../../utils/ttsRouting";
+import { getSpeechLanguageDefinition } from "../../constants/speechLanguages";
 
 type ReplayControllerParams = Pick<
   UseVoicePipelineParams,
@@ -96,7 +98,14 @@ export function useReplyReplayController({
           }
 
           setReplayPhase("speaking");
+          const speechLanguage = resolveTtsListenLanguage({
+            text: trimmed,
+            preferredLanguages: ttsListenLanguages,
+            appLanguage: language,
+          });
           player.speakText(trimmed, {
+            language:
+              getSpeechLanguageDefinition(speechLanguage).nativeLocale,
             diagnostics: speechDiagnostics,
           });
           await player.waitForDrain();
@@ -132,6 +141,14 @@ export function useReplyReplayController({
               setReplayPhase("speaking");
               player.speakText(segmentText, {
                 voice,
+                ...(diagnostics?.language &&
+                diagnostics.language !== "app"
+                  ? {
+                      language:
+                        getSpeechLanguageDefinition(diagnostics.language)
+                          .nativeLocale,
+                    }
+                  : {}),
                 diagnostics,
               });
             },

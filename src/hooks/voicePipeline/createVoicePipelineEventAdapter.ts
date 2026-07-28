@@ -4,6 +4,7 @@ import { recordDebugLogEvent } from "../../services/debugLogCapture";
 import type { LatencyRouteDescriptor } from "../../services/latencyStats";
 import type { PipelineCallbacks } from "../../services/voicePipeline/types";
 import type { MessagePipelineNotice } from "../../types";
+import { getSpeechLanguageDefinition } from "../../constants/speechLanguages";
 import type { VoiceTurnRunState } from "./createVoicePipelineErrorHandlers";
 import type { PipelinePhase, UseVoicePipelineParams } from "./types";
 import type { useLatencyProgressController } from "./useLatencyProgressController";
@@ -447,6 +448,13 @@ export function createVoicePipelineEventAdapter({
       }
       player.speakText(text, {
         voice,
+        ...(diagnostics?.language && diagnostics.language !== "app"
+          ? {
+              language:
+                getSpeechLanguageDefinition(diagnostics.language)
+                  .nativeLocale,
+            }
+          : {}),
         diagnostics,
         onPlaybackStarted: handleFirstPlaybackStartedForRun,
       });

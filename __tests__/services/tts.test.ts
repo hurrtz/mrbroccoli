@@ -372,6 +372,7 @@ describe("synthesizeSpeech", () => {
     expect(body.model).toBe("qwen3-tts-flash");
     expect(body.input.voice).toBe("Cherry");
     expect(body.input.text).toBe("Hello world");
+    expect(body.input.language_type).toBe("English");
     expect((fetch as jest.Mock).mock.calls[1][0]).toBe(
       "https://dashscope.example/audio.wav",
     );
@@ -499,7 +500,7 @@ describe("synthesizeSpeech", () => {
     const body = JSON.parse(options.body);
     expect(body.text).toBe("Hello world");
     expect(body.voice_id).toBe("leo");
-    expect(body.language).toBe("auto");
+    expect(body.language).toBe("en");
     expect(body.output_format).toBeUndefined();
   });
 
@@ -575,6 +576,7 @@ describe("synthesizeSpeech", () => {
     expect(JSON.parse(options.body)).toEqual({
       text: "Hello ElevenLabs",
       model_id: "eleven_flash_v2_5",
+      language_code: "en",
     });
   });
 
@@ -599,6 +601,7 @@ describe("synthesizeSpeech", () => {
     expect(JSON.parse((fetch as jest.Mock).mock.calls[0][1].body)).toEqual({
       text: "This is the current segment.",
       model_id: "eleven_flash_v2_5",
+      language_code: "en",
       previous_text: "This came immediately before.",
       next_text: "This follows immediately after.",
     });
@@ -625,6 +628,7 @@ describe("synthesizeSpeech", () => {
     expect(JSON.parse((fetch as jest.Mock).mock.calls[0][1].body)).toEqual({
       text: "An expressive current segment.",
       model_id: "eleven_v3",
+      language_code: "en",
     });
   });
 

@@ -22,7 +22,7 @@ export const SPEECH_LANGUAGE_REGISTRY = {
     nativeLocale: "en-US",
     providerCode: "en",
     googleCloudLocale: "en-US",
-    xaiTtsLocale: "en-US",
+    xaiTtsLocale: "en",
     qwenTtsLanguage: "English",
   },
   de: {
@@ -30,7 +30,7 @@ export const SPEECH_LANGUAGE_REGISTRY = {
     nativeLocale: "de-DE",
     providerCode: "de",
     googleCloudLocale: "de-DE",
-    xaiTtsLocale: "de-DE",
+    xaiTtsLocale: "de",
     qwenTtsLanguage: "German",
   },
   uk: {
@@ -46,7 +46,7 @@ export const SPEECH_LANGUAGE_REGISTRY = {
     nativeLocale: "hi-IN",
     providerCode: "hi",
     googleCloudLocale: "hi-IN",
-    xaiTtsLocale: "hi-IN",
+    xaiTtsLocale: "hi",
     qwenTtsLanguage: null,
   },
   es: {
@@ -62,7 +62,7 @@ export const SPEECH_LANGUAGE_REGISTRY = {
     nativeLocale: "fr-FR",
     providerCode: "fr",
     googleCloudLocale: "fr-FR",
-    xaiTtsLocale: "fr-FR",
+    xaiTtsLocale: "fr",
     qwenTtsLanguage: "French",
   },
   it: {
@@ -70,7 +70,7 @@ export const SPEECH_LANGUAGE_REGISTRY = {
     nativeLocale: "it-IT",
     providerCode: "it",
     googleCloudLocale: "it-IT",
-    xaiTtsLocale: "it-IT",
+    xaiTtsLocale: "it",
     qwenTtsLanguage: "Italian",
   },
   pt: {
@@ -94,7 +94,7 @@ export const SPEECH_LANGUAGE_REGISTRY = {
     nativeLocale: "ru-RU",
     providerCode: "ru",
     googleCloudLocale: "ru-RU",
-    xaiTtsLocale: "ru-RU",
+    xaiTtsLocale: "ru",
     qwenTtsLanguage: "Russian",
   },
   "zh-CN": {
@@ -118,7 +118,7 @@ export const SPEECH_LANGUAGE_REGISTRY = {
     nativeLocale: "ja-JP",
     providerCode: "ja",
     googleCloudLocale: "ja-JP",
-    xaiTtsLocale: "ja-JP",
+    xaiTtsLocale: "ja",
     qwenTtsLanguage: "Japanese",
   },
 } as const satisfies Record<string, SpeechLanguageDefinition>;

@@ -292,6 +292,7 @@ export function useNativeSpeechPlayback(params: {
 
       Speech.speak(next.text, {
         voice: next.voice,
+        language: next.language,
         rate: 0.96,
         useApplicationAudioSession: true,
         onStart: () => {
@@ -384,6 +385,7 @@ export function useNativeSpeechPlayback(params: {
       text: string,
       options?: {
         voice?: string;
+        language?: string;
         diagnostics?: SpeechDiagnosticsContext;
         onPlaybackStarted?: () => void;
       },
@@ -398,6 +400,7 @@ export function useNativeSpeechPlayback(params: {
         kind: "speech",
         text,
         voice: options?.voice,
+        language: options?.language,
         diagnostics: options?.diagnostics,
         onPlaybackStarted: options?.onPlaybackStarted,
       });

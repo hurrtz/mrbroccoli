@@ -6,6 +6,11 @@ import {
 import { RuntimeTtsBinaryRequestFormat } from "../../constants/providers/runtimeManifest";
 import { translate } from "../../i18n";
 import { AppLanguage, Provider } from "../../types";
+import type { SpeechLanguage } from "../../types";
+import { providerSupportsTtsLanguage } from "../../constants/providerSpeechLanguages";
+import { getTtsListenLanguageLabel } from "../../constants/localTts";
+import { getSpeechLanguageDefinition } from "../../constants/speechLanguages";
+import { getDefaultTtsListenLanguageForLocale } from "../../i18n/localeRegistry";
 import {
   parseQwenApiCredential,
   qwenRegionSupportsAppSpeech,
@@ -127,14 +132,24 @@ function buildBinaryTtsRequestBody(params: {
   text: string;
   previousText?: string;
   nextText?: string;
+  speechLanguage: SpeechLanguage;
 }) {
   switch (params.requestFormat) {
     case "elevenlabs-speech": {
       const supportsRequestStitching =
         params.selectedModel !== "eleven_v3";
+      const supportsLanguageCode =
+        params.selectedModel !== "eleven_multilingual_v2";
       return {
         text: params.text,
         model_id: params.selectedModel,
+        ...(supportsLanguageCode
+          ? {
+              language_code:
+                getSpeechLanguageDefinition(params.speechLanguage)
+                  .providerCode,
+            }
+          : {}),
         ...(supportsRequestStitching && params.previousText?.trim()
           ? { previous_text: params.previousText.trim() }
           : {}),
@@ -147,7 +162,8 @@ function buildBinaryTtsRequestBody(params: {
       return {
         text: params.text,
         voice_id: params.selectedVoice,
-        language: "auto",
+        language:
+          getSpeechLanguageDefinition(params.speechLanguage).xaiTtsLocale,
       };
     case "mistral-speech":
       return {
@@ -170,9 +186,14 @@ function buildBinaryTtsRequestBody(params: {
   }
 }
 
-function buildGeminiTtsPrompt(text: string, instructions: string) {
+function buildGeminiTtsPrompt(
+  text: string,
+  instructions: string,
+  speechLanguage: SpeechLanguage,
+) {
   return [
     "Synthesize speech for the transcript below.",
+    `Speech language: ${getSpeechLanguageDefinition(speechLanguage).nativeLocale}.`,
     instructions ? `Performance instructions:\n${instructions}` : "",
     "Read the transcript exactly as written without adding or removing words.",
     `Transcript:\n${text}`,
@@ -238,6 +259,7 @@ export async function synthesizeProviderSpeech(params: {
   providerModel?: string;
   apiKey?: string;
   language: AppLanguage;
+  speechLanguage?: SpeechLanguage;
   instructions?: string;
   previousText?: string;
   nextText?: string;
@@ -250,6 +272,8 @@ export async function synthesizeProviderSpeech(params: {
     providerModel,
     apiKey,
     language,
+    speechLanguage =
+      getDefaultTtsListenLanguageForLocale(language),
     instructions,
     previousText,
     nextText,
@@ -262,6 +286,15 @@ export async function synthesizeProviderSpeech(params: {
     throw new Error(
       translate(language, "ttsNotSupportedYet", {
         provider: PROVIDER_LABELS[provider],
+      }),
+    );
+  }
+
+  if (!providerSupportsTtsLanguage(provider, speechLanguage)) {
+    throw new Error(
+      translate(language, "speechLanguageUnsupportedByProvider", {
+        provider: PROVIDER_LABELS[provider],
+        language: getTtsListenLanguageLabel(speechLanguage, language),
       }),
     );
   }
@@ -312,7 +345,11 @@ export async function synthesizeProviderSpeech(params: {
             {
               parts: [
                 {
-                  text: buildGeminiTtsPrompt(text, selectedInstructions),
+                  text: buildGeminiTtsPrompt(
+                    text,
+                    selectedInstructions,
+                    speechLanguage,
+                  ),
                 },
               ],
             },
@@ -373,6 +410,13 @@ export async function synthesizeProviderSpeech(params: {
           input: {
             text,
             voice: selectedVoice,
+            ...(getSpeechLanguageDefinition(speechLanguage).qwenTtsLanguage
+              ? {
+                  language_type:
+                    getSpeechLanguageDefinition(speechLanguage)
+                      .qwenTtsLanguage,
+                }
+              : {}),
             ...(selectedInstructions
               ? { instructions: selectedInstructions }
               : {}),
@@ -425,6 +469,7 @@ export async function synthesizeProviderSpeech(params: {
     text,
     previousText,
     nextText,
+    speechLanguage,
   });
 
   const response = await fetchTtsWithRetries({

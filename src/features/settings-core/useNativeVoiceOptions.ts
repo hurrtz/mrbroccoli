@@ -2,8 +2,8 @@ import { useEffect, useMemo, useState } from "react";
 
 import * as Speech from "expo-speech";
 
-import { AppLanguage } from "../../types";
-import { getDefaultContentLanguageForLocale } from "../../i18n/localeRegistry";
+import type { TtsListenLanguage } from "../../types";
+import { getSpeechLanguageDefinition } from "../../constants/speechLanguages";
 
 import { getNativeVoiceOptionLabel, normalizeNativeVoices } from "./helpers";
 import { NativeSpeechVoice } from "./types";
@@ -11,9 +11,9 @@ import { NativeSpeechVoice } from "./types";
 export function useNativeVoiceOptions(params: {
   visible: boolean;
   shouldLoad: boolean;
-  language: AppLanguage;
+  listenLanguages: TtsListenLanguage[];
 }) {
-  const { visible, shouldLoad, language } = params;
+  const { visible, shouldLoad, listenLanguages } = params;
   const [nativeVoices, setNativeVoices] = useState<NativeSpeechVoice[]>([]);
   const [selectedNativeVoice, setSelectedNativeVoice] = useState("");
 
@@ -24,7 +24,8 @@ export function useNativeVoiceOptions(params: {
 
     let cancelled = false;
     const preferredLanguagePrefix =
-      getDefaultContentLanguageForLocale(language);
+      getSpeechLanguageDefinition(listenLanguages[0] ?? "en")
+        .providerCode;
 
     void Speech.getAvailableVoicesAsync()
       .then((voices) => {
@@ -87,7 +88,7 @@ export function useNativeVoiceOptions(params: {
     return () => {
       cancelled = true;
     };
-  }, [language, shouldLoad, visible]);
+  }, [listenLanguages, shouldLoad, visible]);
 
   const nativeVoiceOptions = useMemo(
     () =>

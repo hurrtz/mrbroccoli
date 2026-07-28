@@ -18,6 +18,7 @@ export type NativeSpeechQueueItem =
       kind: "speech";
       text: string;
       voice?: string;
+      language?: string;
       diagnostics?: SpeechDiagnosticsContext;
       onPlaybackStarted?: () => void;
     })

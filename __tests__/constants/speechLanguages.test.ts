@@ -64,4 +64,15 @@ describe("speech language registry", () => {
       ).toBe(true);
     });
   });
+
+  it("covers every app-interface locale with at least one provider TTS route", () => {
+    APP_LANGUAGES.forEach((language) => {
+      expect(
+        RUNTIME_PROVIDER_ORDER.some((provider) => {
+          const tts = RUNTIME_PROVIDER_MANIFEST[provider].tts;
+          return tts.support === "provider" && tts.languages?.includes(language);
+        }),
+      ).toBe(true);
+    });
+  });
 });

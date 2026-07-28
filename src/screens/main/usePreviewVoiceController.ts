@@ -11,6 +11,7 @@ import {
 } from "../../types";
 import { PROVIDER_DEFAULT_TTS_MODELS } from "../../constants/models";
 import { getTtsListenLanguageForKokoro } from "../../constants/kokoro";
+import { getSpeechLanguageDefinition } from "../../constants/speechLanguages";
 
 import { ShowToastFn, TranslateFn } from "./shared";
 
@@ -20,7 +21,11 @@ interface PreviewPlayer {
   resetCancellation: () => void;
   speakText: (
     text: string,
-    options?: { diagnostics?: SpeechDiagnosticsContext; voice?: string },
+    options?: {
+      diagnostics?: SpeechDiagnosticsContext;
+      language?: string;
+      voice?: string;
+    },
   ) => void;
   stopPlayback: () => Promise<void>;
   waitForDrain: () => Promise<void>;
@@ -114,6 +119,9 @@ export function usePreviewVoiceController({
           ensurePreviewActive();
           player.speakText(trimmed, {
             voice: request.nativeVoice,
+            language:
+              getSpeechLanguageDefinition(request.previewLanguage)
+                .nativeLocale,
             diagnostics: speechDiagnostics,
           });
           callbacks?.onPlaybackStarted?.();
@@ -140,6 +148,8 @@ export function usePreviewVoiceController({
             listenLanguages: [
               getTtsListenLanguageForKokoro(request.language),
             ],
+            speechLanguage:
+              getTtsListenLanguageForKokoro(request.language),
             diagnostics: kokoroSpeechDiagnostics,
             abortSignal: previewAbortController.signal,
           });
@@ -187,6 +197,7 @@ export function usePreviewVoiceController({
             instructions: request.instructions,
             language,
             listenLanguages: [request.previewLanguage],
+            speechLanguage: request.previewLanguage,
             diagnostics: providerSpeechDiagnostics,
             abortSignal: previewAbortController.signal,
           });

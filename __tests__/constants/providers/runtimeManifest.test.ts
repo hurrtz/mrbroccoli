@@ -73,6 +73,7 @@ describe("runtime provider manifest integrity", () => {
       expect(tts.endpoint ?? tts.endpointBase).toBeTruthy();
       expect(tts.defaultModel).toBeTruthy();
       expect(modelIds(tts.models)).toContain(tts.defaultModel);
+      expect(tts.languages?.length).toBeGreaterThan(0);
 
       if (tts.transport === "binary") {
         expect(tts.requestFormat).toBeTruthy();
