@@ -11,6 +11,7 @@
     "pretest": "npm run config:verify",
     "test": "jest",
     "typecheck": "tsc --noEmit",
+    "i18n:verify": "npm run typecheck && jest __tests__/i18n/translations.test.ts __tests__/constants/localTts.test.ts __tests__/constants/kokoro.test.ts __tests__/constants/providers/languageNotes.test.ts __tests__/hooks/useSettings.test.ts __tests__/hooks/useSettingsNormalization.test.ts __tests__/utils/modelEffort.test.ts --runInBand --watchman=false",
     "catalog:generate-index": "python3 scripts/provider_catalog/generate_provider_index.py",
     "catalog:import-research-provider": "python3 scripts/provider_catalog/import_research_provider.py",
     "catalog:test": "jest __tests__/catalog --runInBand --watchman=false"
