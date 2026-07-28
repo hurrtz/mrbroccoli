@@ -29,7 +29,7 @@ export type ReplyPlayback = "stream" | "wait";
 export type TtsPlayback = ReplyPlayback;
 export type ThemeMode = "light" | "dark" | "system";
 export type ToastTone = "info" | "success" | "danger";
-export type AppLanguage = "en" | "de" | "uk";
+export type AppLanguage = "en" | "de" | "uk" | "hi";
 export type ResponseMode = string;
 export type TtsListenLanguage =
   | "en"
@@ -345,6 +345,7 @@ export const DEFAULT_ASSISTANT_INSTRUCTIONS_BY_LANGUAGE: Record<
   // Ukrainian currently localizes the app UI only. Keep assistant behavior and
   // speech-language defaults unchanged when the interface language changes.
   uk: DEFAULT_ENGLISH_ASSISTANT_INSTRUCTIONS,
+  hi: DEFAULT_ENGLISH_ASSISTANT_INSTRUCTIONS,
 };
 
 const LEGACY_DEFAULT_ASSISTANT_INSTRUCTIONS = [
@@ -370,7 +371,7 @@ export function isDefaultAssistantInstructions(value: string) {
 export function getDefaultTtsListenLanguages(
   language: AppLanguage,
 ): TtsListenLanguage[] {
-  return [language === "uk" ? "en" : language];
+  return [language === "en" || language === "de" ? language : "en"];
 }
 
 export const DEFAULT_SETTINGS: Settings = {

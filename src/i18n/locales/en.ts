@@ -58,6 +58,7 @@ export const en: TranslationDictionary = {
   english: "English",
   german: "German",
   ukrainian: "Ukrainian",
+  hindi: "Hindi",
   light: "Light",
   dark: "Dark",
   system: "System",

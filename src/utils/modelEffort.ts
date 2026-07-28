@@ -21,6 +21,18 @@ const UKRAINIAN_EFFORT_LABELS: Record<string, string> = {
   disabled: "Вимкнено",
   enabled: "Увімкнено",
 };
+const HINDI_EFFORT_LABELS: Record<string, string> = {
+  none: "कोई नहीं",
+  minimal: "न्यूनतम",
+  low: "कम",
+  medium: "मध्यम",
+  high: "उच्च",
+  xhigh: "बहुत उच्च",
+  max: "अधिकतम",
+  dynamic: "गतिशील",
+  disabled: "बंद",
+  enabled: "चालू",
+};
 
 export function getModelEffortConfig(
   provider: Provider,
@@ -127,6 +139,9 @@ export function getModelEffortOptionLabel(
   }
   if (language === "uk") {
     return UKRAINIAN_EFFORT_LABELS[option.id] ?? option.label;
+  }
+  if (language === "hi") {
+    return HINDI_EFFORT_LABELS[option.id] ?? option.label;
   }
   return option.label;
 }

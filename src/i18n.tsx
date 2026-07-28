@@ -23,6 +23,9 @@ export function getLocaleForLanguage(language: AppLanguage) {
   if (language === "uk") {
     return "uk-UA";
   }
+  if (language === "hi") {
+    return "hi-IN";
+  }
   return "en-US";
 }
 

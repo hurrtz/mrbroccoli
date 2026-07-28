@@ -3,20 +3,21 @@ import { getLocaleForLanguage, translate } from "../../src/i18n";
 
 describe("translations", () => {
   it("keeps all translation keys in sync", () => {
-    expect(Object.keys(translations.de).sort()).toEqual(
-      Object.keys(translations.en).sort(),
-    );
-    expect(Object.keys(translations.uk).sort()).toEqual(
-      Object.keys(translations.en).sort(),
-    );
+    Object.values(translations).forEach((dictionary) => {
+      expect(Object.keys(dictionary).sort()).toEqual(
+        Object.keys(translations.en).sort(),
+      );
+    });
   });
 
   it("uses the current app name in localized UI copy", () => {
     expect(translations.en.appName).toBe("Mr Broccoli");
     expect(translations.de.appName).toBe("Mr. Brokkoli");
     expect(translations.uk.appName).toBe("Пан Броколі");
+    expect(translations.hi.appName).toBe("मिस्टर ब्रोकली");
     expect(JSON.stringify(translations.de)).not.toContain("Mr Broccoli");
     expect(JSON.stringify(translations.uk)).not.toContain("Mr Broccoli");
+    expect(JSON.stringify(translations.hi)).not.toContain("Mr Broccoli");
   });
 
   it("resolves Ukrainian UI copy and regional formatting", () => {
@@ -24,8 +25,13 @@ describe("translations", () => {
     expect(getLocaleForLanguage("uk")).toBe("uk-UA");
   });
 
+  it("resolves Hindi UI copy and regional formatting", () => {
+    expect(translate("hi", "settings")).toBe("सेटिंग्स");
+    expect(getLocaleForLanguage("hi")).toBe("hi-IN");
+  });
+
   describe("home-screen style chip keys", () => {
-    it.each(["en", "de", "uk"] as const)(
+    it.each(Object.keys(translations) as (keyof typeof translations)[])(
       "%s defines homeStyleChipLabel as a formatter",
       (lang) => {
         const value = translations[lang].homeStyleChipLabel;
@@ -39,7 +45,7 @@ describe("translations", () => {
       },
     );
 
-    it.each(["en", "de", "uk"] as const)(
+    it.each(Object.keys(translations) as (keyof typeof translations)[])(
       "%s defines styleSheetTitle as a non-empty string",
       (lang) => {
         const value = translations[lang].styleSheetTitle;
@@ -48,7 +54,7 @@ describe("translations", () => {
       },
     );
 
-    it.each(["en", "de", "uk"] as const)(
+    it.each(Object.keys(translations) as (keyof typeof translations)[])(
       "%s defines styleSheetSubtitle as a non-empty string",
       (lang) => {
         const value = translations[lang].styleSheetSubtitle;
@@ -57,7 +63,7 @@ describe("translations", () => {
       },
     );
 
-    it.each(["en", "de", "uk"] as const)(
+    it.each(Object.keys(translations) as (keyof typeof translations)[])(
       "%s defines openStyleSheet as a non-empty string",
       (lang) => {
         const value = translations[lang].openStyleSheet;

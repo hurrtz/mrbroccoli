@@ -20,6 +20,8 @@ const NATIVE_STT_LANGUAGE_NOTES_BY_LANGUAGE: Record<AppLanguage, string> = {
     "Die Sprachunterstützung hängt vom Betriebssystem des Geräts, installierten Sprachpaketen und der Verfügbarkeit der Erkennung ab. Die genaue Liste variiert je nach Gerät.",
   uk:
     "Підтримка мов залежить від операційної системи пристрою, встановлених мовних пакетів і доступності розпізнавання. Точний перелік відрізняється залежно від пристрою.",
+  hi:
+    "भाषा समर्थन डिवाइस के ऑपरेटिंग सिस्टम, इंस्टॉल किए गए भाषा पैक और पहचान की उपलब्धता पर निर्भर करता है। सटीक सूची हर डिवाइस पर अलग हो सकती है।",
 };
 
 const NATIVE_TTS_LANGUAGE_NOTES_BY_LANGUAGE: Record<AppLanguage, string> = {
@@ -28,6 +30,8 @@ const NATIVE_TTS_LANGUAGE_NOTES_BY_LANGUAGE: Record<AppLanguage, string> = {
     "Die Sprachunterstützung hängt von den auf dem Gerät installierten Systemstimmen ab. Die genaue Liste, Aussprachequalität und Offline-Verfügbarkeit variieren je nach Betriebssystem und Gerät.",
   uk:
     "Підтримка мов залежить від системних голосів, установлених на пристрої. Точний перелік, якість вимови та доступність офлайн відрізняються залежно від операційної системи й пристрою.",
+  hi:
+    "भाषा समर्थन डिवाइस पर इंस्टॉल सिस्टम आवाज़ों पर निर्भर करता है। सटीक सूची, उच्चारण की गुणवत्ता और ऑफलाइन उपलब्धता ऑपरेटिंग सिस्टम और डिवाइस के अनुसार अलग होती है।",
 };
 
 const GERMAN_PROVIDER_API_KEY_PLACEHOLDER_OVERRIDES: Partial<
@@ -45,6 +49,12 @@ const UKRAINIAN_PROVIDER_API_KEY_PLACEHOLDER_OVERRIDES: Partial<
   Record<Provider, string>
 > = {
   mistral: "Введіть ключ API",
+};
+
+const HINDI_PROVIDER_API_KEY_PLACEHOLDER_OVERRIDES: Partial<
+  Record<Provider, string>
+> = {
+  mistral: "API कुंजी दर्ज करें",
 };
 
 const PROVIDER_API_KEY_PLACEHOLDERS_BY_LANGUAGE: Record<
@@ -71,6 +81,13 @@ const PROVIDER_API_KEY_PLACEHOLDERS_BY_LANGUAGE: Record<
         PROVIDER_CONFIGS[provider].apiKeyPlaceholder,
     ]),
   ) as Record<Provider, string>,
+  hi: Object.fromEntries(
+    PROVIDER_ORDER.map((provider) => [
+      provider,
+      HINDI_PROVIDER_API_KEY_PLACEHOLDER_OVERRIDES[provider] ??
+        PROVIDER_CONFIGS[provider].apiKeyPlaceholder,
+    ]),
+  ) as Record<Provider, string>,
 };
 
 const GENERIC_PROVIDER_API_KEY_HINTS: Record<AppLanguage, string> = {
@@ -80,6 +97,8 @@ const GENERIC_PROVIDER_API_KEY_HINTS: Record<AppLanguage, string> = {
     "Füge Zugangsdaten für einen externen Dienst ein, den du bereits nutzt. Keys bleiben auf diesem Gerät und werden nur für Anfragen verwendet, die du in der App startest.",
   uk:
     "Вставте облікові дані зовнішнього сервісу, яким уже користуєтеся. Ключі зберігаються на цьому пристрої та використовуються лише для запитів, які ви запускаєте в застосунку.",
+  hi:
+    "जिस बाहरी सेवा का आप पहले से उपयोग करते हैं, उसके क्रेडेंशियल यहाँ पेस्ट करें। कुंजियाँ इसी डिवाइस पर रहती हैं और केवल ऐप में आपके शुरू किए गए अनुरोधों के लिए उपयोग होती हैं।",
 };
 
 const PROVIDER_API_KEY_HINT_OVERRIDES: Partial<
@@ -99,6 +118,11 @@ const PROVIDER_API_KEY_HINT_OVERRIDES: Partial<
     openrouter: `${GENERIC_PROVIDER_API_KEY_HINTS.uk} Один ключ OpenRouter відкриває доступ до наведених нижче моделей шлюзу. Запити проходять через OpenRouter до вибраного кінцевого провайдера; прямі ключі провайдерів залишаються окремими.`,
     elevenlabs: `${GENERIC_PROVIDER_API_KEY_HINTS.uk} Обмеженим ключам ElevenLabs потрібен дозвіл Text to Speech для TTS і Speech to Text для STT. Дозвіл Voices read необов’язковий і лише відкриває бібліотеку голосів облікового запису.`,
     "moonshot-ai-kimi": `${GENERIC_PROVIDER_API_KEY_HINTS.uk} Moonshot відкриває доступ до Kimi K3 після щонайменше одного успішного поповнення рахунку на 1 долар США.`,
+  },
+  hi: {
+    openrouter: `${GENERIC_PROVIDER_API_KEY_HINTS.hi} एक OpenRouter कुंजी नीचे दिए गए चुने हुए गेटवे मॉडल खोलती है। अनुरोध OpenRouter से चुने गए मूल प्रदाता तक जाते हैं; सीधे प्रदाता की कुंजियाँ अलग रहती हैं।`,
+    elevenlabs: `${GENERIC_PROVIDER_API_KEY_HINTS.hi} सीमित ElevenLabs कुंजियों को TTS के लिए Text to Speech और STT के लिए Speech to Text अनुमति चाहिए। Voices read वैकल्पिक है और केवल खाते की आवाज़ लाइब्रेरी खोलता है।`,
+    "moonshot-ai-kimi": `${GENERIC_PROVIDER_API_KEY_HINTS.hi} Moonshot, Kimi K3 की पहुँच कम से कम 1 अमेरिकी डॉलर के एक सफल खाते के टॉप-अप के बाद खोलता है।`,
   },
 };
 
@@ -123,6 +147,12 @@ const PROVIDER_STT_LANGUAGE_NOTES_BY_LANGUAGE: Partial<
       `OpenAI зараз пропонує gpt-4o-transcribe, gpt-4o-mini-transcribe і whisper-1 для розпізнавання мовлення. Оприлюднений OpenAI перелік мов із належною підтримкою: ${WHISPER_WELL_SUPPORTED_LANGUAGES}`,
     mistral:
       "Поточний маршрут розпізнавання Voxtral документовано для англійської, іспанської, французької, португальської, гінді, німецької, нідерландської та італійської мов.",
+  },
+  hi: {
+    openai:
+      `OpenAI अभी स्पीच-टू-टेक्स्ट के लिए gpt-4o-transcribe, gpt-4o-mini-transcribe और whisper-1 देता है। OpenAI की प्रकाशित अच्छी तरह समर्थित भाषाओं की सूची: ${WHISPER_WELL_SUPPORTED_LANGUAGES}`,
+    mistral:
+      "मौजूदा Voxtral ट्रांसक्रिप्शन मार्ग अंग्रेज़ी, स्पेनिश, फ़्रेंच, पुर्तगाली, हिन्दी, जर्मन, डच और इतालवी के लिए प्रलेखित है।",
   },
 };
 
@@ -151,6 +181,94 @@ const PROVIDER_TTS_LANGUAGE_NOTES_BY_LANGUAGE: Partial<
       "Gemini TTS зараз підтримує арабську, бенгальську, нідерландську, англійську, французьку, німецьку, гінді, індонезійську, італійську, японську, корейську, мандаринську китайську, польську, португальську, румунську, російську, іспанську, тамільську, телугу, тайську, турецьку, українську, урду та в’єтнамську.",
     xai:
       "xAI TTS зараз підтримує арабську, нідерландську, англійську, французьку, німецьку, гінді, індонезійську, італійську, японську, корейську, польську, португальську, російську, іспанську, тайську, турецьку, в’єтнамську та китайську.",
+  },
+  hi: {
+    openai:
+      "OpenAI अभी टेक्स्ट-टू-स्पीच के लिए gpt-4o-mini-tts, tts-1 और tts-1-hd देता है। OpenAI, STT जैसी छोटी समर्थित भाषा सूची TTS के लिए प्रकाशित नहीं करता और बताता है कि आवाज़ें अंग्रेज़ी के लिए अनुकूलित हैं।",
+    gemini:
+      "Gemini TTS अभी अरबी, बंगाली, डच, अंग्रेज़ी, फ़्रेंच, जर्मन, हिन्दी, इंडोनेशियाई, इतालवी, जापानी, कोरियाई, मंदारिन चीनी, पोलिश, पुर्तगाली, रोमानियाई, रूसी, स्पेनिश, तमिल, तेलुगु, थाई, तुर्की, यूक्रेनी, उर्दू और वियतनामी का समर्थन करता है।",
+    xai:
+      "xAI TTS अभी अरबी, डच, अंग्रेज़ी, फ़्रेंच, जर्मन, हिन्दी, इंडोनेशियाई, इतालवी, जापानी, कोरियाई, पोलिश, पुर्तगाली, रूसी, स्पेनिश, थाई, तुर्की, वियतनामी और चीनी का समर्थन करता है।",
+  },
+};
+
+type SpeechNoteFormatter = {
+  voicesAcross: (voices: string, languages: string) => string;
+  supportsLanguages: (languages: string) => string;
+  multilingual: string;
+  englishOptimized: string;
+  duration: (value: number, unit: "hour" | "minute" | "second") => string;
+  fileUploadUpTo: (limit: string) => string;
+  approximateFileUpload: (limit: string) => string;
+  approximateFileUploadRange: (minimum: string, maximum: string) => string;
+  audioUpTo: (limit: string) => string;
+};
+
+const SPEECH_NOTE_FORMATTERS: Record<AppLanguage, SpeechNoteFormatter> = {
+  en: {
+    voicesAcross: (voices, languages) =>
+      `${voices} voices across ${languages} languages`,
+    supportsLanguages: (languages) => `Supports ${languages} languages`,
+    multilingual: "Multilingual",
+    englishOptimized: "Voices are optimized for English",
+    duration: (value, unit) =>
+      `${value} ${unit}${value === 1 ? "" : "s"}`,
+    fileUploadUpTo: (limit) => `File upload up to ${limit}`,
+    approximateFileUpload: (limit) =>
+      `Approximate file upload limit ${limit}`,
+    approximateFileUploadRange: (minimum, maximum) =>
+      `Approximate file upload limit ${minimum} to ${maximum} depending on tier`,
+    audioUpTo: (limit) => `Audio up to ${limit}`,
+  },
+  de: {
+    voicesAcross: (voices, languages) =>
+      `${voices} Stimmen in ${languages} Sprachen`,
+    supportsLanguages: (languages) => `Unterstützt ${languages} Sprachen`,
+    multilingual: "Mehrsprachig",
+    englishOptimized: "Stimmen sind für Englisch optimiert",
+    duration: (value, unit) => {
+      const units = {
+        hour: value === 1 ? "Stunde" : "Stunden",
+        minute: value === 1 ? "Minute" : "Minuten",
+        second: value === 1 ? "Sekunde" : "Sekunden",
+      };
+      return `${value} ${units[unit]}`;
+    },
+    fileUploadUpTo: (limit) => `Datei-Upload bis ${limit}`,
+    approximateFileUpload: (limit) =>
+      `Ungefährer Datei-Upload bis ${limit}`,
+    approximateFileUploadRange: (minimum, maximum) =>
+      `Ungefährer Datei-Upload zwischen ${minimum} und ${maximum} je nach Tarif`,
+    audioUpTo: (limit) => `Audio bis ${limit}`,
+  },
+  uk: {
+    voicesAcross: (voices, languages) =>
+      `${voices} голосів для ${languages} мов`,
+    supportsLanguages: (languages) => `Підтримує мов: ${languages}`,
+    multilingual: "Багатомовний",
+    englishOptimized: "Голоси оптимізовано для англійської",
+    duration: (value, unit) =>
+      `${value} ${{ hour: "год", minute: "хв", second: "с" }[unit]}`,
+    fileUploadUpTo: (limit) => `Завантаження файлів до ${limit}`,
+    approximateFileUpload: (limit) => `Орієнтовний ліміт файлу: ${limit}`,
+    approximateFileUploadRange: (minimum, maximum) =>
+      `Орієнтовний ліміт файлу від ${minimum} до ${maximum} залежно від тарифу`,
+    audioUpTo: (limit) => `Аудіо до ${limit}`,
+  },
+  hi: {
+    voicesAcross: (voices, languages) =>
+      `${languages} भाषाओं में ${voices} आवाज़ें`,
+    supportsLanguages: (languages) => `${languages} भाषाओं का समर्थन`,
+    multilingual: "बहुभाषी",
+    englishOptimized: "आवाज़ें अंग्रेज़ी के लिए अनुकूलित हैं",
+    duration: (value, unit) =>
+      `${value} ${{ hour: "घंटे", minute: "मिनट", second: "सेकंड" }[unit]}`,
+    fileUploadUpTo: (limit) => `${limit} तक फ़ाइल अपलोड`,
+    approximateFileUpload: (limit) =>
+      `फ़ाइल अपलोड की अनुमानित सीमा ${limit}`,
+    approximateFileUploadRange: (minimum, maximum) =>
+      `प्लान के अनुसार फ़ाइल अपलोड की अनुमानित सीमा ${minimum} से ${maximum}`,
+    audioUpTo: (limit) => `${limit} तक ऑडियो`,
   },
 };
 
@@ -225,11 +343,10 @@ function buildCatalogSpeechLanguageNote(params: {
     );
 
     parts.push(
-      params.language === "de"
-        ? `${voiceCount} Stimmen in ${languageCount} Sprachen`
-        : params.language === "uk"
-          ? `${voiceCount} голосів для ${languageCount} мов`
-          : `${voiceCount} voices across ${languageCount} languages`,
+      SPEECH_NOTE_FORMATTERS[params.language].voicesAcross(
+        voiceCount,
+        languageCount,
+      ),
     );
   } else if (languageSupport.languageCount) {
     const languageCount = formatApproximateCount(
@@ -238,33 +355,17 @@ function buildCatalogSpeechLanguageNote(params: {
     );
 
     parts.push(
-      params.language === "de"
-        ? `Unterstützt ${languageCount} Sprachen`
-        : params.language === "uk"
-          ? `Підтримує мов: ${languageCount}`
-          : `Supports ${languageCount} languages`,
+      SPEECH_NOTE_FORMATTERS[params.language].supportsLanguages(languageCount),
     );
   } else if (
     languageSupport.isMultilingual &&
     languageSupport.notes.includes("english-optimized")
   ) {
-    parts.push(
-      params.language === "de"
-        ? "Mehrsprachig"
-        : params.language === "uk"
-          ? "Багатомовний"
-          : "Multilingual",
-    );
+    parts.push(SPEECH_NOTE_FORMATTERS[params.language].multilingual);
   }
 
   if (languageSupport.notes.includes("english-optimized")) {
-    parts.push(
-      params.language === "de"
-        ? "Stimmen sind für Englisch optimiert"
-        : params.language === "uk"
-          ? "Голоси оптимізовано для англійської"
-          : "Voices are optimized for English",
-    );
+    parts.push(SPEECH_NOTE_FORMATTERS[params.language].englishOptimized);
   }
 
   if (!parts.length) {
@@ -314,29 +415,18 @@ function formatByteLimit(bytes: number) {
 }
 
 function formatDurationLimit(seconds: number, language: AppLanguage) {
+  const formatter = SPEECH_NOTE_FORMATTERS[language];
   if (seconds % 3600 === 0) {
     const hours = seconds / 3600;
-    return language === "de"
-      ? `${hours} ${hours === 1 ? "Stunde" : "Stunden"}`
-      : language === "uk"
-        ? `${hours} год`
-        : `${hours} ${hours === 1 ? "hour" : "hours"}`;
+    return formatter.duration(hours, "hour");
   }
 
   if (seconds % 60 === 0) {
     const minutes = seconds / 60;
-    return language === "de"
-      ? `${minutes} ${minutes === 1 ? "Minute" : "Minuten"}`
-      : language === "uk"
-        ? `${minutes} хв`
-        : `${minutes} ${minutes === 1 ? "minute" : "minutes"}`;
+    return formatter.duration(minutes, "minute");
   }
 
-  return language === "de"
-    ? `${seconds} ${seconds === 1 ? "Sekunde" : "Sekunden"}`
-    : language === "uk"
-      ? `${seconds} с`
-      : `${seconds} ${seconds === 1 ? "second" : "seconds"}`;
+  return formatter.duration(seconds, "second");
 }
 
 export function getProviderSttLimitNote(
@@ -364,45 +454,24 @@ export function getProviderSttLimitNote(
 
   if (exactFileSizeLimit) {
     parts.push(
-      language === "de"
-        ? `Datei-Upload bis ${formatByteLimit(exactFileSizeLimit.value)}`
-        : language === "uk"
-          ? `Завантаження файлів до ${formatByteLimit(exactFileSizeLimit.value)}`
-          : `File upload up to ${formatByteLimit(exactFileSizeLimit.value)}`,
+      SPEECH_NOTE_FORMATTERS[language].fileUploadUpTo(
+        formatByteLimit(exactFileSizeLimit.value),
+      ),
     );
   } else if (approximateFileSizeLimits.length === 1) {
     parts.push(
-      language === "de"
-        ? `Ungefährer Datei-Upload bis ${formatByteLimit(
-            approximateFileSizeLimits[0].value,
-          )}`
-        : language === "uk"
-          ? `Орієнтовний ліміт файлу: ${formatByteLimit(
-              approximateFileSizeLimits[0].value,
-            )}`
-          : `Approximate file upload limit ${formatByteLimit(
-              approximateFileSizeLimits[0].value,
-            )}`,
+      SPEECH_NOTE_FORMATTERS[language].approximateFileUpload(
+        formatByteLimit(approximateFileSizeLimits[0].value),
+      ),
     );
   } else if (approximateFileSizeLimits.length > 1) {
     parts.push(
-      language === "de"
-        ? `Ungefährer Datei-Upload zwischen ${formatByteLimit(
-            approximateFileSizeLimits[0].value,
-          )} und ${formatByteLimit(
-            approximateFileSizeLimits[approximateFileSizeLimits.length - 1].value,
-          )} je nach Tarif`
-        : language === "uk"
-          ? `Орієнтовний ліміт файлу від ${formatByteLimit(
-              approximateFileSizeLimits[0].value,
-            )} до ${formatByteLimit(
-              approximateFileSizeLimits[approximateFileSizeLimits.length - 1].value,
-            )} залежно від тарифу`
-          : `Approximate file upload limit ${formatByteLimit(
-              approximateFileSizeLimits[0].value,
-            )} to ${formatByteLimit(
-              approximateFileSizeLimits[approximateFileSizeLimits.length - 1].value,
-            )} depending on tier`,
+      SPEECH_NOTE_FORMATTERS[language].approximateFileUploadRange(
+        formatByteLimit(approximateFileSizeLimits[0].value),
+        formatByteLimit(
+          approximateFileSizeLimits[approximateFileSizeLimits.length - 1].value,
+        ),
+      ),
     );
   }
 
@@ -415,11 +484,9 @@ export function getProviderSttLimitNote(
 
   if (durationLimit) {
     parts.push(
-      language === "de"
-        ? `Audio bis ${formatDurationLimit(durationLimit.value, language)}`
-        : language === "uk"
-          ? `Аудіо до ${formatDurationLimit(durationLimit.value, language)}`
-          : `Audio up to ${formatDurationLimit(durationLimit.value, language)}`,
+      SPEECH_NOTE_FORMATTERS[language].audioUpTo(
+        formatDurationLimit(durationLimit.value, language),
+      ),
     );
   }
 

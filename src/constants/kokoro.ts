@@ -34,6 +34,7 @@ const KOKORO_VOICE_OPTIONS: Record<
         en: "Maple · American female",
         de: "Maple · US-Englisch, weiblich",
         uk: "Maple · американська англійська, жіночий голос",
+        hi: "Maple · अमेरिकी अंग्रेज़ी, महिला आवाज़",
       },
     },
     {
@@ -43,6 +44,7 @@ const KOKORO_VOICE_OPTIONS: Record<
         en: "Sol · American female",
         de: "Sol · US-Englisch, weiblich",
         uk: "Sol · американська англійська, жіночий голос",
+        hi: "Sol · अमेरिकी अंग्रेज़ी, महिला आवाज़",
       },
     },
     {
@@ -52,6 +54,7 @@ const KOKORO_VOICE_OPTIONS: Record<
         en: "Vale · British female",
         de: "Vale · britisches Englisch, weiblich",
         uk: "Vale · британська англійська, жіночий голос",
+        hi: "Vale · ब्रिटिश अंग्रेज़ी, महिला आवाज़",
       },
     },
   ],
@@ -63,6 +66,7 @@ const KOKORO_VOICE_OPTIONS: Record<
         en: "Chinese female 1",
         de: "Chinesisch, weiblich 1",
         uk: "Китайська, жіночий голос 1",
+        hi: "चीनी, महिला आवाज़ 1",
       },
     },
     {
@@ -72,6 +76,7 @@ const KOKORO_VOICE_OPTIONS: Record<
         en: "Chinese female 2",
         de: "Chinesisch, weiblich 2",
         uk: "Китайська, жіночий голос 2",
+        hi: "चीनी, महिला आवाज़ 2",
       },
     },
     {
@@ -81,6 +86,7 @@ const KOKORO_VOICE_OPTIONS: Record<
         en: "Chinese female 3",
         de: "Chinesisch, weiblich 3",
         uk: "Китайська, жіночий голос 3",
+        hi: "चीनी, महिला आवाज़ 3",
       },
     },
     {
@@ -90,6 +96,7 @@ const KOKORO_VOICE_OPTIONS: Record<
         en: "Chinese male 1",
         de: "Chinesisch, männlich 1",
         uk: "Китайська, чоловічий голос 1",
+        hi: "चीनी, पुरुष आवाज़ 1",
       },
     },
     {
@@ -99,6 +106,7 @@ const KOKORO_VOICE_OPTIONS: Record<
         en: "Chinese male 2",
         de: "Chinesisch, männlich 2",
         uk: "Китайська, чоловічий голос 2",
+        hi: "चीनी, पुरुष आवाज़ 2",
       },
     },
     {
@@ -108,6 +116,7 @@ const KOKORO_VOICE_OPTIONS: Record<
         en: "Chinese male 3",
         de: "Chinesisch, männlich 3",
         uk: "Китайська, чоловічий голос 3",
+        hi: "चीनी, पुरुष आवाज़ 3",
       },
     },
   ],
