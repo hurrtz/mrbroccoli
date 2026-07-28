@@ -10,6 +10,7 @@ import {
   pauseNativeAudioQueue,
   prepareNativeAudioQueue,
   resumeNativeAudioQueue,
+  startNativeAudioQueue,
 } from "../services/nativeAudioQueue";
 import { PLAYER_STATUS_INTERVAL_MS } from "./audioPlayer/shared";
 import { useAudioClipPlayback } from "./audioPlayer/useAudioClipPlayback";
@@ -101,6 +102,7 @@ export function useAudioPlayer() {
     nativeAudioQueuePendingCountRef,
     nativeQueueRef,
     nativeSpeakingRef,
+    playbackPausedRef,
     playbackGenerationRef,
     updatePendingPlaybackState,
   });
@@ -117,6 +119,7 @@ export function useAudioPlayer() {
       nativeAudioQueueContextsRef,
       nativeAudioQueuePendingCountRef,
       nativeSpeakingRef,
+      playbackPausedRef,
       playNativeAudio,
       playbackGenerationRef,
       playingRef,
@@ -144,23 +147,25 @@ export function useAudioPlayer() {
 
   finalizeDrainedStateRef.current = finalizeDrainedState;
 
-  const { playNextNative, speakText } = useNativeSpeechPlayback({
-    nativeSpeaking,
-    setNativeSpeaking,
-    setNativeSpeechPlaying,
-    nativeQueueRef,
-    queueRef,
-    currentAudioRef,
-    nativeSpeakingRef,
-    playingRef,
-    playbackGenerationRef,
-    startingRef,
-    cancelledRef,
-    ensurePlaybackSession,
-    finalizeDrainedState,
-    playNextAudio,
-    updatePendingPlaybackState,
-  });
+  const { enqueueSpeechPause, playNextNative, speakText } =
+    useNativeSpeechPlayback({
+      nativeSpeaking,
+      setNativeSpeaking,
+      setNativeSpeechPlaying,
+      nativeQueueRef,
+      queueRef,
+      currentAudioRef,
+      nativeSpeakingRef,
+      playingRef,
+      playbackGenerationRef,
+      playbackPausedRef,
+      startingRef,
+      cancelledRef,
+      ensurePlaybackSession,
+      finalizeDrainedState,
+      playNextAudio,
+      updatePendingPlaybackState,
+    });
 
   useNativeAudioQueueSubscription({
     usingNativeAudioQueue,
@@ -175,6 +180,7 @@ export function useAudioPlayer() {
     nativeAudioQueueContextsRef,
     nativeAudioQueuePendingCountRef,
     nativeAudioQueuePlayingRef,
+    playbackPausedRef,
     nativeQueueRef,
   });
 
@@ -281,9 +287,14 @@ export function useAudioPlayer() {
         await ensurePlaybackSession();
         await Speech.resume();
         setNativeSpeechPlaying(true);
-      } else if (usingNativeAudioQueue && currentAudioRef.current) {
+      } else if (
+        usingNativeAudioQueue &&
+        nativeAudioQueuePendingCountRef.current > 0
+      ) {
         await ensureAudioQueuePlaybackSession();
-        const resumed = await resumeNativeAudioQueue();
+        const resumed = currentAudioRef.current
+          ? await resumeNativeAudioQueue()
+          : await startNativeAudioQueue();
 
         if (!resumed) {
           return false;
@@ -327,6 +338,7 @@ export function useAudioPlayer() {
     ensureAudioQueuePlaybackSession,
     ensurePlaybackSession,
     nativeAudioQueuePlayingRef,
+    nativeAudioQueuePendingCountRef,
     nativeQueueRef,
     nativeSpeakingRef,
     playNextAudio,
@@ -356,6 +368,7 @@ export function useAudioPlayer() {
     hasPendingPlayback,
     isPlaybackPaused,
     enqueueAudio,
+    enqueueSpeechPause,
     speakText,
     pausePlayback,
     resumePlayback,

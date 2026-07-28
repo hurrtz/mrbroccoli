@@ -41,11 +41,13 @@ export interface PipelineCallbacks {
     audioUri: string,
     diagnostics?: SpeechDiagnosticsContext,
   ) => void;
+  onAudioPauseReady?: (audioUri: string) => void;
   onSpeechTextReady: (
     text: string,
     voice?: string,
     diagnostics?: SpeechDiagnosticsContext,
   ) => void;
+  onSpeechPauseReady?: (durationMs: number) => void;
   onTtsFallback?: (error: Error, route: TtsFallbackRoute) => void;
   onError: (error: Error) => void | Promise<void>;
 }

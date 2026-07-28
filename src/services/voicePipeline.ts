@@ -212,6 +212,7 @@ export async function runVoicePipeline(
       responseLength,
       responseMetadata: webSearchResult.responseMetadata,
       responseTone,
+      replyPlayback,
       spokenRepliesEnabled,
       ttsQueue,
       turnReceipt,

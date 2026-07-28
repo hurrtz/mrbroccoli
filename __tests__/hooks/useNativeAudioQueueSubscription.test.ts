@@ -62,6 +62,7 @@ describe("useNativeAudioQueueSubscription", () => {
         nativeAudioQueueContextsRef,
         nativeAudioQueuePendingCountRef,
         nativeAudioQueuePlayingRef,
+        playbackPausedRef: { current: false },
         nativeQueueRef: { current: [] },
       }),
     );
@@ -140,6 +141,7 @@ describe("useNativeAudioQueueSubscription", () => {
         nativeAudioQueueContextsRef,
         nativeAudioQueuePendingCountRef,
         nativeAudioQueuePlayingRef,
+        playbackPausedRef: { current: false },
         nativeQueueRef: { current: [] },
       }),
     );

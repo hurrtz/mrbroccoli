@@ -117,6 +117,13 @@ export function useReplyReplayController({
               setReplayPhase("speaking");
               player.enqueueAudio(audioUri, diagnostics);
             },
+            onAudioPauseReady: (audioUri) => {
+              if (replaySessionRef.current !== replaySession) {
+                return;
+              }
+
+              player.enqueueAudio(audioUri);
+            },
             onSpeechTextReady: (segmentText, voice, diagnostics) => {
               if (replaySessionRef.current !== replaySession) {
                 return;
@@ -127,6 +134,13 @@ export function useReplyReplayController({
                 voice,
                 diagnostics,
               });
+            },
+            onSpeechPauseReady: (durationMs) => {
+              if (replaySessionRef.current !== replaySession) {
+                return;
+              }
+
+              player.enqueueSpeechPause(durationMs);
             },
             onError: (error) => {
               if (

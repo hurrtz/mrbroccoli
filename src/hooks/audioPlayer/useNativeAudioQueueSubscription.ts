@@ -34,6 +34,7 @@ export function useNativeAudioQueueSubscription(params: {
   >;
   nativeAudioQueuePendingCountRef: MutableRefObject<number>;
   nativeAudioQueuePlayingRef: MutableRefObject<boolean>;
+  playbackPausedRef: MutableRefObject<boolean>;
   nativeQueueRef: MutableRefObject<
     NativeSpeechQueueItem[]
   >;
@@ -51,6 +52,7 @@ export function useNativeAudioQueueSubscription(params: {
     nativeAudioQueueContextsRef,
     nativeAudioQueuePendingCountRef,
     nativeAudioQueuePlayingRef,
+    playbackPausedRef,
     nativeQueueRef,
   } = params;
 
@@ -132,6 +134,7 @@ export function useNativeAudioQueueSubscription(params: {
           updatePendingPlaybackState();
           if (
             !cancelledRef.current &&
+            !playbackPausedRef.current &&
             nativeAudioQueuePendingCountRef.current === 0 &&
             nativeQueueRef.current.length > 0
           ) {
@@ -152,9 +155,13 @@ export function useNativeAudioQueueSubscription(params: {
           nativeAudioQueueContextsRef.current.clear();
           updatePendingPlaybackState();
 
-          if (!cancelledRef.current && nativeQueueRef.current.length > 0) {
+          if (
+            !cancelledRef.current &&
+            !playbackPausedRef.current &&
+            nativeQueueRef.current.length > 0
+          ) {
             void playNextNative();
-          } else {
+          } else if (!playbackPausedRef.current) {
             finalizeDrainedState();
           }
           break;
@@ -171,6 +178,7 @@ export function useNativeAudioQueueSubscription(params: {
     nativeAudioQueueContextsRef,
     nativeAudioQueuePendingCountRef,
     nativeAudioQueuePlayingRef,
+    playbackPausedRef,
     nativeQueueRef,
     playNextNative,
     playingRef,

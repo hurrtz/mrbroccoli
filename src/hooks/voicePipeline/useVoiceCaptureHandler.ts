@@ -225,7 +225,6 @@ export function useVoiceCaptureHandler({
         },
         model,
         modelEffort,
-        onReplyCompleted,
         onError: errorHandlers.handlePipelineError,
         player,
         playbackStartedRef,
@@ -375,6 +374,9 @@ export function useVoiceCaptureHandler({
         cancelStreamingRender(streamingRenderRunId);
         setStreamingText("");
         setPipelinePhase("idle");
+        if (completedSuccessfully) {
+          onReplyCompleted();
+        }
         recordDebugLogEvent({
           event: "voice-pipeline-finished",
           payload: {

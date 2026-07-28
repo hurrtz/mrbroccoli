@@ -8,14 +8,23 @@ export type AudioQueueItem = {
   onPlaybackStarted?: () => void;
 };
 
-export type NativeSpeechQueueItem = {
+type NativeSpeechQueueItemBase = {
   generation: number;
   id: string;
-  text: string;
-  voice?: string;
-  diagnostics?: SpeechDiagnosticsContext;
-  onPlaybackStarted?: () => void;
 };
+
+export type NativeSpeechQueueItem =
+  | (NativeSpeechQueueItemBase & {
+      kind: "speech";
+      text: string;
+      voice?: string;
+      diagnostics?: SpeechDiagnosticsContext;
+      onPlaybackStarted?: () => void;
+    })
+  | (NativeSpeechQueueItemBase & {
+      kind: "pause";
+      durationMs: number;
+    });
 
 export type NativeAudioQueueContext = {
   generation: number;

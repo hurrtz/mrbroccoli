@@ -78,6 +78,23 @@ describe("buildSystemPrompt", () => {
     );
   });
 
+  it("requests meaningful paragraph boundaries for streamed spoken replies", () => {
+    const prompt = buildSystemPrompt({
+      assistantInstructions: "Be accurate.",
+      responseLength: "normal",
+      responseTone: "professional",
+      language: "en",
+      spokenParagraphStreaming: true,
+    });
+
+    expect(prompt).toContain(
+      "short, meaningful paragraphs separated by a blank line",
+    );
+    expect(prompt).toContain(
+      "Do not split every sentence into its own paragraph",
+    );
+  });
+
   it("retains response provenance in conversation-summary input", () => {
     expect(
       formatMessagesForSummary([

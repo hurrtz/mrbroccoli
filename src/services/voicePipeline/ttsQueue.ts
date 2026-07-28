@@ -16,13 +16,14 @@ import type {
   SpeechDiagnosticSource,
   SpeechDiagnosticsContext,
 } from "../speech/diagnostics";
+import { getInterParagraphPauseAudioUri } from "../playbackCues";
 import {
   getProviderTtsTargetChunkChars,
   PROVIDER_TTS_MAX_INPUT_CHARS,
   splitTextForTts,
   synthesizeSpeech,
 } from "../tts";
-import { extractCompleteSentences } from "./streaming";
+import { extractCompleteParagraphs } from "./streaming";
 import type { RunVoicePipelineParams } from "./types";
 
 interface CreateVoicePipelineTtsQueueParams {
@@ -161,7 +162,8 @@ export function createVoicePipelineTtsQueue({
     result: Extract<TtsSynthesisResult, { kind: "native" }>;
   }> = [];
 
-  let sentenceBuffer = "";
+  let paragraphBuffer = "";
+  let paragraphCount = 0;
   let outputChain = Promise.resolve();
   let nextSynthesisSlot = 0;
   let previousProviderText = "";
@@ -395,6 +397,17 @@ export function createVoicePipelineTtsQueue({
     return task;
   };
 
+  const emitParagraphPause = async (result: TtsSynthesisResult) => {
+    if (result.kind === "native") {
+      callbacks.onSpeechPauseReady?.(1_000);
+      return;
+    }
+
+    callbacks.onAudioPauseReady?.(
+      await getInterParagraphPauseAudioUri(),
+    );
+  };
+
   const emitResult = (text: string, result: TtsSynthesisResult) => {
     if (result.kind === "native") {
       callbacks.onSpeechTextReady(
@@ -411,6 +424,7 @@ export function createVoicePipelineTtsQueue({
   const enqueueTtsChunk = (
     text: string,
     context?: { previousText?: string; nextText?: string },
+    startsParagraph = false,
   ) => {
     const trimmed = text.trim();
 
@@ -419,6 +433,9 @@ export function createVoicePipelineTtsQueue({
     }
 
     if (ttsMode === "native") {
+      if (startsParagraph) {
+        callbacks.onSpeechPauseReady?.(1_000);
+      }
       emitResult(trimmed, {
         kind: "native",
         route: "native",
@@ -452,6 +469,9 @@ export function createVoicePipelineTtsQueue({
         return;
       }
 
+      if (startsParagraph) {
+        await emitParagraphPause(result);
+      }
       emitResult(trimmed, result);
     });
 
@@ -470,13 +490,13 @@ export function createVoicePipelineTtsQueue({
     queuedTasks.push(task.catch(() => undefined));
   };
 
-  const enqueueTts = (text: string) => {
+  const enqueueTts = (text: string, startsParagraph = false) => {
     if (!spokenRepliesEnabled) {
       return;
     }
 
     if (ttsMode === "native") {
-      enqueueTtsChunk(text);
+      enqueueTtsChunk(text, undefined, startsParagraph);
       return;
     }
 
@@ -489,8 +509,18 @@ export function createVoicePipelineTtsQueue({
       const previousText = previousProviderText || undefined;
       const nextText = segments[index + 1];
       previousProviderText = segment;
-      enqueueTtsChunk(segment, { previousText, nextText });
+      enqueueTtsChunk(
+        segment,
+        { previousText, nextText },
+        startsParagraph && index === 0,
+      );
     });
+  };
+
+  const enqueueParagraph = (text: string) => {
+    const startsParagraph = paragraphCount > 0;
+    paragraphCount += 1;
+    enqueueTts(text, startsParagraph);
   };
 
   const handleStreamChunk = (text: string) => {
@@ -500,20 +530,18 @@ export function createVoicePipelineTtsQueue({
       return;
     }
 
-    sentenceBuffer += text;
-    const { completeSentences, remainder } =
-      extractCompleteSentences(sentenceBuffer);
+    paragraphBuffer += text;
+    const { completeParagraphs, remainder } =
+      extractCompleteParagraphs(paragraphBuffer);
 
-    if (completeSentences.length > 0) {
-      enqueueTts(completeSentences.join(""));
-    }
-    sentenceBuffer = remainder;
+    completeParagraphs.forEach(enqueueParagraph);
+    paragraphBuffer = remainder;
   };
 
   const handleResponseDone = async (fullText: string) => {
     if (replyPlayback === "stream") {
-      if (sentenceBuffer.trim()) {
-        enqueueTts(sentenceBuffer);
+      if (paragraphBuffer.trim()) {
+        enqueueParagraph(paragraphBuffer);
       }
     } else {
       enqueueTts(fullText);

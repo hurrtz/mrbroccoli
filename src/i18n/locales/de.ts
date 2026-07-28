@@ -260,9 +260,9 @@ export const de: TranslationDictionary = {
   nativeSttHint:
     "Die Systemerkennung funktioniert unabhängig von deinen API-Keys und kann lokal oder über den Spracherkennungsdienst des Betriebssystems laufen.",
   replyPlayback: "Wiedergabe",
-  sentencesArrive: "Satzweise",
+  sentencesArrive: "Absatzweise",
   sentencesArriveDescription:
-    "Fange an Vorzulesen, sobald die ersten Daten angekommen sind.",
+    "Fange mit dem Vorlesen an, sobald ein vollständiger Absatz bereit ist.",
   fullReplyFirst: "Komplette Antwort zuerst",
   fullReplyFirstDescription:
     "Warte erst ab, bis die Antwort komplett eingegangen ist, und lies sie dann am Stück vor.",

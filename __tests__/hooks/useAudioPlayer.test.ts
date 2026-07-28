@@ -479,4 +479,42 @@ describe("useAudioPlayer", () => {
     expect(mockPlayer.play).toHaveBeenCalledTimes(2);
     expect(result.current.isPlaybackPaused).toBe(false);
   });
+
+  it("does not let a newly prefetched clip restart a paused stream", async () => {
+    const { result, rerender } = renderHook(() => useAudioPlayer());
+
+    await act(async () => {
+      result.current.enqueueAudio("paragraph-one.mp3");
+      await Promise.resolve();
+    });
+
+    await act(async () => {
+      mockStatus = {
+        ...mockStatus,
+        playing: true,
+        playbackState: "playing",
+        timeControlStatus: "playing",
+      };
+      rerender(undefined);
+      await Promise.resolve();
+      await result.current.pausePlayback();
+    });
+
+    await act(async () => {
+      mockStatus = {
+        ...mockStatus,
+        playing: false,
+        playbackState: "paused",
+        timeControlStatus: "paused",
+      };
+      rerender(undefined);
+      result.current.enqueueAudio("paragraph-two.mp3");
+      await Promise.resolve();
+    });
+
+    expect(mockPlayer.replace).toHaveBeenCalledTimes(1);
+    expect(mockPlayer.play).toHaveBeenCalledTimes(1);
+    expect(result.current.isPlaybackPaused).toBe(true);
+    expect(result.current.isPlaying).toBe(true);
+  });
 });

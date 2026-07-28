@@ -29,6 +29,12 @@ jest.mock("../../src/services/webSearch", () => ({
   searchWeb: jest.fn(),
 }));
 
+jest.mock("../../src/services/playbackCues", () => ({
+  getInterParagraphPauseAudioUri: jest.fn(async () =>
+    "file:///tmp/paragraph-pause.wav"
+  ),
+}));
+
 jest.mock("../../src/services/tts", () => ({
   splitIntoSentences: (text: string): string[] => {
     const result: string[] = [];
@@ -504,7 +510,7 @@ describe("runVoicePipeline", () => {
     );
   });
 
-  it("speaks a completed sentence immediately in stream mode", async () => {
+  it("speaks a completed paragraph immediately in stream mode", async () => {
     (streamChat as jest.Mock).mockImplementation(
       async ({
         onChunk,
@@ -513,10 +519,10 @@ describe("runVoicePipeline", () => {
         onChunk: (text: string) => void;
         onDone: (text: string) => Promise<void>;
       }) => {
-        onChunk("Wind is moving air.");
+        onChunk("Wind is moving air.\n\n");
         await Promise.resolve();
         expect(events).toEqual(["speak:Wind is moving air."]);
-        await onDone("Wind is moving air.");
+        await onDone("Wind is moving air.\n\n");
       },
     );
 
@@ -559,7 +565,59 @@ describe("runVoicePipeline", () => {
         source: "conversation",
       }),
     );
+    expect(streamChat).toHaveBeenCalledWith(
+      expect.objectContaining({
+        spokenParagraphStreaming: true,
+      }),
+    );
     expect(events).toEqual(["speak:Wind is moving air.", "response-done"]);
+  });
+
+  it("queues a one-second native speech pause between paragraphs", async () => {
+    (streamChat as jest.Mock).mockImplementation(
+      async ({
+        onChunk,
+        onDone,
+      }: {
+        onChunk: (text: string) => void;
+        onDone: (text: string) => Promise<void>;
+      }) => {
+        onChunk("First paragraph.\n\n");
+        onChunk("Second paragraph.\n\n");
+        await onDone("First paragraph.\n\nSecond paragraph.");
+      },
+    );
+
+    const callbacks = {
+      onTranscription: jest.fn(),
+      onChunk: jest.fn(),
+      onResponseDone: jest.fn(),
+      onAudioReady: jest.fn(),
+      onSpeechTextReady: jest.fn(),
+      onSpeechPauseReady: jest.fn(),
+      onError: jest.fn(),
+    };
+
+    await runVoicePipeline({
+      transcriptionOverride: "Explain it.",
+      messages: [],
+      model: "gpt-5.4",
+      provider: "openai",
+      providerApiKey: "sk-test",
+      sttMode: "native",
+      ttsMode: "native",
+      ttsVoice: "",
+      replyPlayback: "stream",
+      assistantInstructions: "You are a voice assistant.",
+      responseLength: "normal",
+      responseTone: "professional",
+      language: "en",
+      callbacks,
+    });
+
+    expect(callbacks.onSpeechTextReady).toHaveBeenCalledTimes(2);
+    expect(callbacks.onSpeechPauseReady).toHaveBeenCalledTimes(1);
+    expect(callbacks.onSpeechPauseReady).toHaveBeenCalledWith(1_000);
   });
 
   it("keeps complete stream text together when multiple sentences arrive in one chunk", async () => {
@@ -571,7 +629,7 @@ describe("runVoicePipeline", () => {
         onChunk: (text: string) => void;
         onDone: (text: string) => Promise<void>;
       }) => {
-        onChunk("Sentence one. Sentence two.");
+        onChunk("Sentence one. Sentence two.\n\n");
         await onDone("Sentence one. Sentence two.");
       },
     );
@@ -693,7 +751,7 @@ describe("runVoicePipeline", () => {
     expect(callbacks.onSpeechTextReady).not.toHaveBeenCalled();
   });
 
-  it("speaks each provider TTS chunk in stream mode", async () => {
+  it("speaks each paragraph in stream mode with a pause between them", async () => {
     (streamChat as jest.Mock).mockImplementation(
       async ({
         onChunk,
@@ -702,9 +760,9 @@ describe("runVoicePipeline", () => {
         onChunk: (text: string) => void;
         onDone: (text: string) => Promise<void>;
       }) => {
-        onChunk("Sentence one.");
-        onChunk(" Sentence two.");
-        await onDone("Sentence one. Sentence two.");
+        onChunk("Paragraph one.\n\n");
+        onChunk("Paragraph two.\n\n");
+        await onDone("Paragraph one.\n\nParagraph two.");
       },
     );
 
@@ -717,6 +775,7 @@ describe("runVoicePipeline", () => {
       onChunk: jest.fn(),
       onResponseDone: jest.fn(),
       onAudioReady: jest.fn(),
+      onAudioPauseReady: jest.fn(),
       onSpeechTextReady: jest.fn(),
       onTtsFallback: jest.fn(),
       onError: jest.fn(),
@@ -745,7 +804,7 @@ describe("runVoicePipeline", () => {
     expect(synthesizeSpeech).toHaveBeenNthCalledWith(
       1,
       expect.objectContaining({
-        text: "Sentence one.",
+        text: "Paragraph one.",
         mode: "provider",
         provider: "gemini",
         providerModel: "gemini-2.5-flash-preview-tts",
@@ -755,7 +814,7 @@ describe("runVoicePipeline", () => {
     expect(synthesizeSpeech).toHaveBeenNthCalledWith(
       2,
       expect.objectContaining({
-        text: "Sentence two.",
+        text: "Paragraph two.",
         mode: "provider",
         provider: "gemini",
         providerModel: "gemini-2.5-flash-preview-tts",
@@ -764,19 +823,22 @@ describe("runVoicePipeline", () => {
     );
     expect(callbacks.onTtsFallback).not.toHaveBeenCalled();
     expect(callbacks.onAudioReady).toHaveBeenCalledTimes(2);
+    expect(callbacks.onAudioPauseReady).toHaveBeenCalledWith(
+      "file:///tmp/paragraph-pause.wav",
+    );
     expect(callbacks.onSpeechTextReady).not.toHaveBeenCalled();
   });
 
-  it("starts synthesizing each completed follow-up sentence before the reply ends", async () => {
+  it("starts synthesizing each completed follow-up paragraph before the reply ends", async () => {
     (synthesizeSpeech as jest.Mock).mockResolvedValue("/tmp/tts.wav");
     (streamChat as jest.Mock).mockImplementation(
       async ({ onChunk }: { onChunk: (text: string) => void }) => {
-        onChunk("Sentence one.");
+        onChunk("Paragraph one.\n\n");
         await Promise.resolve();
         await Promise.resolve();
         expect(synthesizeSpeech).toHaveBeenCalledTimes(1);
 
-        onChunk(" Sentence two.");
+        onChunk("Paragraph two.\n\n");
         await Promise.resolve();
         await Promise.resolve();
         await Promise.resolve();
@@ -811,7 +873,7 @@ describe("runVoicePipeline", () => {
     });
   });
 
-  it("prefetches provider speech while preserving sentence playback order", async () => {
+  it("prefetches provider speech while preserving paragraph playback order", async () => {
     let resolveFirst: (value: string) => void = () => undefined;
     let resolveSecond: (value: string) => void = () => undefined;
     const audioEvents: string[] = [];
@@ -837,8 +899,8 @@ describe("runVoicePipeline", () => {
         onChunk: (text: string) => void;
         onDone: (text: string) => Promise<void>;
       }) => {
-        onChunk("Sentence one.");
-        onChunk(" Sentence two.");
+        onChunk("Paragraph one.\n\n");
+        onChunk("Paragraph two.\n\n");
         await Promise.resolve();
         await Promise.resolve();
 
@@ -849,7 +911,7 @@ describe("runVoicePipeline", () => {
         expect(audioEvents).toEqual([]);
 
         resolveFirst("/tmp/tts-1.wav");
-        await onDone("Sentence one. Sentence two.");
+        await onDone("Paragraph one.\n\nParagraph two.");
       },
     );
 
@@ -882,7 +944,7 @@ describe("runVoicePipeline", () => {
     expect(audioEvents).toEqual(["/tmp/tts-1.wav", "/tmp/tts-2.wav"]);
   });
 
-  it("flushes a trailing partial sentence for provider TTS when the stream finishes", async () => {
+  it("flushes a trailing partial paragraph for provider TTS when the stream finishes", async () => {
     (streamChat as jest.Mock).mockImplementation(
       async ({
         onChunk,
@@ -891,8 +953,8 @@ describe("runVoicePipeline", () => {
         onChunk: (text: string) => void;
         onDone: (text: string) => Promise<void>;
       }) => {
-        onChunk("One. Two");
-        await onDone("One. Two");
+        onChunk("One.\n\nTwo");
+        await onDone("One.\n\nTwo");
       },
     );
 

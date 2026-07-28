@@ -8,6 +8,7 @@ import {
 
 import { ReplayPhase } from "../../../hooks/useVoicePipeline";
 import { recordDebugLogEvent } from "../../../services/debugLogCapture";
+import { getDriveReadyCueAudioUri } from "../../../services/playbackCues";
 import { Settings } from "../../../types";
 import { ShowToastFn, TranslateFn } from "../shared";
 import { AudioPlayerController } from "./types";
@@ -59,6 +60,7 @@ export function useDriveSessionController({
   const autoContinueEnabledRef = useRef(autoContinueEnabled);
   const engagedRef = useRef(false);
   const armRequestedRef = useRef(false);
+  const pendingAutoRearmCueRef = useRef(false);
   const completedReplyVersionRef = useRef(completedReplyVersion);
   const previousInputModeRef = useRef(settings.inputMode);
   const generationRef = useRef(0);
@@ -117,13 +119,56 @@ export function useDriveSessionController({
 
     const generation = generationRef.current;
     armInFlightRef.current = true;
-    updateArmRequested(false);
     recordDebugLogEvent({
       event: "drive-session-arm-requested",
-      payload: { generation },
+      payload: {
+        generation,
+        withReadyCue: pendingAutoRearmCueRef.current,
+      },
     });
 
     try {
+      if (pendingAutoRearmCueRef.current) {
+        pendingAutoRearmCueRef.current = false;
+
+        try {
+          const cueUri = await getDriveReadyCueAudioUri();
+
+          if (
+            autoContinueEnabledRef.current &&
+            engagedRef.current &&
+            generationRef.current === generation
+          ) {
+            player.enqueueAudio(cueUri);
+            await player.waitForDrain();
+          }
+        } catch (error) {
+          recordDebugLogEvent({
+            event: "drive-session-ready-cue-failed",
+            level: "warn",
+            payload: {
+              message:
+                error instanceof Error ? error.message : String(error),
+            },
+          });
+        }
+      }
+
+      if (
+        !autoContinueEnabledRef.current ||
+        !engagedRef.current ||
+        generationRef.current !== generation ||
+        !mainSurfaceVisibleRef.current ||
+        isBusyRef.current ||
+        isRecordingRef.current ||
+        replayPhaseRef.current !== "idle" ||
+        playerIsPlaybackPausedRef.current ||
+        hasActiveVoiceCaptureNow()
+      ) {
+        return;
+      }
+
+      updateArmRequested(false);
       await startVoiceCapture();
       if (
         !autoContinueEnabledRef.current ||
@@ -155,6 +200,7 @@ export function useDriveSessionController({
   }, [
     ensureVoiceSessionReady,
     hasActiveVoiceCaptureNow,
+    player,
     settings.inputMode,
     showToast,
     startVoiceCapture,
@@ -172,6 +218,7 @@ export function useDriveSessionController({
     }
 
     generationRef.current += 1;
+    pendingAutoRearmCueRef.current = false;
     updateEngaged(true);
     recordDebugLogEvent({ event: "drive-session-engaged" });
   }, [settings.inputMode, updateEngaged]);
@@ -182,6 +229,7 @@ export function useDriveSessionController({
     }
 
     generationRef.current += 1;
+    pendingAutoRearmCueRef.current = false;
     updateArmRequested(false);
     updateEngaged(false);
     recordDebugLogEvent({ event: "drive-session-suspended" });
@@ -232,6 +280,7 @@ export function useDriveSessionController({
     }
 
     updateArmRequested(true);
+    pendingAutoRearmCueRef.current = true;
     recordDebugLogEvent({
       event: "drive-session-reply-completed",
       payload: { completedReplyVersion },
@@ -278,6 +327,7 @@ export function useDriveSessionController({
     }
 
     generationRef.current += 1;
+    pendingAutoRearmCueRef.current = false;
     updateArmRequested(false);
     updateAutoContinueEnabled(false);
     recordDebugLogEvent({ event: "drive-session-auto-paused" });
@@ -289,6 +339,7 @@ export function useDriveSessionController({
     }
 
     generationRef.current += 1;
+    pendingAutoRearmCueRef.current = false;
     updateAutoContinueEnabled(true);
     updateEngaged(true);
     updateArmRequested(true);
@@ -335,6 +386,7 @@ export function useDriveSessionController({
         mainSurfaceVisibleRef.current
       ) {
         generationRef.current += 1;
+        pendingAutoRearmCueRef.current = true;
         updateEngaged(true);
         updateArmRequested(true);
       }
@@ -354,6 +406,7 @@ export function useDriveSessionController({
 
   const reset = useCallback(() => {
     generationRef.current += 1;
+    pendingAutoRearmCueRef.current = false;
     updateArmRequested(false);
     updateEngaged(false);
   }, [updateArmRequested, updateEngaged]);

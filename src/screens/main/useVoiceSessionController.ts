@@ -38,7 +38,8 @@ export function useVoiceSessionController({
   ttsProvider,
   stopReplay,
 }: UseVoiceSessionControllerParams) {
-  const playbackCanPause = player.isActivelyPlaying ?? player.isPlaying;
+  const playbackCanPause =
+    Boolean(player.isActivelyPlaying) || player.isPlaying;
   const { cancelCurrentInteraction, resetPipelineState } =
     useVoiceSessionCancellation({
       abortRef,

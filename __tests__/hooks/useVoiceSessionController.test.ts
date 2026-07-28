@@ -11,6 +11,12 @@ jest.mock("../../src/services/voicePipeline/cleanup", () => ({
   cleanupCapturedAudio: jest.fn(async () => undefined),
 }));
 
+jest.mock("../../src/services/playbackCues", () => ({
+  getDriveReadyCueAudioUri: jest.fn(async () =>
+    "file:///tmp/drive-ready.wav"
+  ),
+}));
+
 describe("useVoiceSessionController", () => {
   beforeEach(() => {
     jest.clearAllMocks();
@@ -48,6 +54,7 @@ describe("useVoiceSessionController", () => {
         stopRecognition: jest.fn(async () => null),
       },
       player: {
+        enqueueAudio: jest.fn(),
         isPlaybackPaused: false,
         isPlaying: false,
         pausePlayback: jest.fn(async () => true),
@@ -255,6 +262,7 @@ describe("useVoiceSessionController", () => {
       expect(params.recorder.startRecording).toHaveBeenCalledTimes(1);
     });
     expect(params.player.speakText).not.toHaveBeenCalled();
+    expect(params.player.enqueueAudio).not.toHaveBeenCalled();
   });
 
   it("does not auto-arm again when a Drive turn ends without a reply", async () => {
@@ -293,6 +301,13 @@ describe("useVoiceSessionController", () => {
         providerSttModels: {},
       },
     });
+    let finishReadyCue: () => void = () => undefined;
+    params.player.waitForDrain.mockImplementationOnce(
+      () =>
+        new Promise<void>((resolve) => {
+          finishReadyCue = resolve;
+        }),
+    );
 
     await act(async () => {
       await result.current.handleTogglePress();
@@ -313,8 +328,21 @@ describe("useVoiceSessionController", () => {
     act(() => rerender());
 
     await waitFor(() =>
+      expect(params.player.enqueueAudio).toHaveBeenCalledWith(
+        "file:///tmp/drive-ready.wav",
+      ),
+    );
+    expect(params.recorder.startRecording).toHaveBeenCalledTimes(1);
+
+    await act(async () => {
+      finishReadyCue();
+      await Promise.resolve();
+    });
+
+    await waitFor(() =>
       expect(params.recorder.startRecording).toHaveBeenCalledTimes(2),
     );
+    expect(params.player.waitForDrain).toHaveBeenCalledTimes(1);
   });
 
   it("uses the Drive Session primary action to cancel processing without immediately re-arming", async () => {

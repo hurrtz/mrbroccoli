@@ -254,9 +254,9 @@ export const en: TranslationDictionary = {
   nativeSttHint:
     "System recognition works independently of your provider keys and may be processed on-device or by the operating system's speech service.",
   replyPlayback: "Reply Playback",
-  sentencesArrive: "Sentences Arrive",
+  sentencesArrive: "Paragraphs Arrive",
   sentencesArriveDescription:
-    "Start speaking as soon as complete sentences are ready.",
+    "Start speaking as soon as a complete paragraph is ready.",
   fullReplyFirst: "Full Reply First",
   fullReplyFirstDescription:
     "Generate the entire answer first, then play it in one pass.",

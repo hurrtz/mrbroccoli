@@ -22,6 +22,7 @@ interface RunPipelineResponseParams {
   responseLength: RunVoicePipelineParams["responseLength"];
   responseMetadata: MessageMetadata;
   responseTone: RunVoicePipelineParams["responseTone"];
+  replyPlayback: RunVoicePipelineParams["replyPlayback"];
   spokenRepliesEnabled: boolean;
   ttsQueue: ReturnType<typeof createVoicePipelineTtsQueue>;
   turnReceipt: MessageTurnReceipt;
@@ -43,6 +44,7 @@ export async function runPipelineResponse({
   responseLength,
   responseMetadata,
   responseTone,
+  replyPlayback,
   spokenRepliesEnabled,
   ttsQueue,
   turnReceipt,
@@ -75,6 +77,8 @@ export async function runPipelineResponse({
     responseTone,
     language,
     conversationSummary,
+    spokenParagraphStreaming:
+      spokenRepliesEnabled && replyPlayback === "stream",
     webSearchContext,
     abortSignal,
     onChunk: (text) => {

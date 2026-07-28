@@ -43,6 +43,7 @@ export function useNativeSpeechPlayback(params: {
   nativeSpeakingRef: MutableRefObject<boolean>;
   playingRef: MutableRefObject<boolean>;
   playbackGenerationRef: MutableRefObject<number>;
+  playbackPausedRef: MutableRefObject<boolean>;
   startingRef: MutableRefObject<boolean>;
   cancelledRef: MutableRefObject<boolean>;
   ensurePlaybackSession: () => Promise<void>;
@@ -60,6 +61,7 @@ export function useNativeSpeechPlayback(params: {
     nativeSpeakingRef,
     playingRef,
     playbackGenerationRef,
+    playbackPausedRef,
     startingRef,
     cancelledRef,
     ensurePlaybackSession,
@@ -73,6 +75,7 @@ export function useNativeSpeechPlayback(params: {
       nativeSpeakingRef.current ||
       playingRef.current ||
       startingRef.current ||
+      playbackPausedRef.current ||
       cancelledRef.current
     ) {
       return;
@@ -103,6 +106,31 @@ export function useNativeSpeechPlayback(params: {
       setNativeSpeaking(true);
       updatePendingPlaybackState();
 
+      const continuePlayback = () => {
+        updatePendingPlaybackState();
+        if (cancelledRef.current) {
+          finalizeDrainedState();
+        } else if (queueRef.current.length > 0) {
+          void playNextAudio();
+        } else {
+          void playNextNative();
+        }
+      };
+
+      if (next.kind === "pause") {
+        setNativeSpeechPlaying(false);
+        setTimeout(() => {
+          if (next.generation !== playbackGenerationRef.current) {
+            return;
+          }
+
+          nativeSpeakingRef.current = false;
+          setNativeSpeaking(false);
+          continuePlayback();
+        }, next.durationMs);
+        return;
+      }
+
       let completionHandled = false;
       let speechStateTimer: ReturnType<typeof setTimeout> | null = null;
       let speechStartTimer: ReturnType<typeof setTimeout> | null = null;
@@ -125,16 +153,6 @@ export function useNativeSpeechPlayback(params: {
         if (speechRuntimeTimer) {
           clearTimeout(speechRuntimeTimer);
           speechRuntimeTimer = null;
-        }
-      };
-      const continuePlayback = () => {
-        updatePendingPlaybackState();
-        if (cancelledRef.current) {
-          finalizeDrainedState();
-        } else if (queueRef.current.length > 0) {
-          void playNextAudio();
-        } else {
-          void playNextNative();
         }
       };
       const completeSpeech = (
@@ -311,14 +329,27 @@ export function useNativeSpeechPlayback(params: {
       nativeSpeakingRef.current = false;
       setNativeSpeaking(false);
       recordSpeechDiagnostic({
-        requestId: next.diagnostics?.requestId,
-        source: next.diagnostics?.source ?? "unknown",
+        requestId:
+          next.kind === "speech"
+            ? next.diagnostics?.requestId
+            : undefined,
+        source:
+          next.kind === "speech"
+            ? next.diagnostics?.source ?? "unknown"
+            : "unknown",
         stage: "playback-stopped",
         actualRoute: "native",
-        provider: next.diagnostics?.provider ?? null,
-        providerModel: next.diagnostics?.providerModel ?? null,
-        voice: next.voice ?? null,
-        textLength: next.text.trim().length,
+        provider:
+          next.kind === "speech"
+            ? next.diagnostics?.provider ?? null
+            : null,
+        providerModel:
+          next.kind === "speech"
+            ? next.diagnostics?.providerModel ?? null
+            : null,
+        voice: next.kind === "speech" ? next.voice ?? null : null,
+        textLength:
+          next.kind === "speech" ? next.text.trim().length : undefined,
         message:
           error instanceof Error
             ? error.message
@@ -339,6 +370,7 @@ export function useNativeSpeechPlayback(params: {
     nativeQueueRef,
     nativeSpeakingRef,
     playbackGenerationRef,
+    playbackPausedRef,
     playNextAudio,
     playingRef,
     queueRef,
@@ -363,6 +395,7 @@ export function useNativeSpeechPlayback(params: {
       nativeQueueRef.current.push({
         generation: playbackGenerationRef.current,
         id: nextPlaybackJobId("native"),
+        kind: "speech",
         text,
         voice: options?.voice,
         diagnostics: options?.diagnostics,
@@ -382,7 +415,8 @@ export function useNativeSpeechPlayback(params: {
       if (
         !nativeSpeakingRef.current &&
         !playingRef.current &&
-        !startingRef.current
+        !startingRef.current &&
+        !playbackPausedRef.current
       ) {
         void playNextNative();
       }
@@ -392,6 +426,43 @@ export function useNativeSpeechPlayback(params: {
       nativeQueueRef,
       nativeSpeakingRef,
       playbackGenerationRef,
+      playbackPausedRef,
+      playNextNative,
+      playingRef,
+      startingRef,
+      updatePendingPlaybackState,
+    ],
+  );
+
+  const enqueueSpeechPause = useCallback(
+    (durationMs: number) => {
+      if (cancelledRef.current || durationMs <= 0) {
+        return;
+      }
+
+      nativeQueueRef.current.push({
+        generation: playbackGenerationRef.current,
+        id: nextPlaybackJobId("native"),
+        kind: "pause",
+        durationMs,
+      });
+      updatePendingPlaybackState();
+
+      if (
+        !nativeSpeakingRef.current &&
+        !playingRef.current &&
+        !startingRef.current &&
+        !playbackPausedRef.current
+      ) {
+        void playNextNative();
+      }
+    },
+    [
+      cancelledRef,
+      nativeQueueRef,
+      nativeSpeakingRef,
+      playbackGenerationRef,
+      playbackPausedRef,
       playNextNative,
       playingRef,
       startingRef,
@@ -400,6 +471,7 @@ export function useNativeSpeechPlayback(params: {
   );
 
   return {
+    enqueueSpeechPause,
     playNextNative,
     speakText,
   };

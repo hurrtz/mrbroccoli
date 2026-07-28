@@ -17,6 +17,7 @@ export function useNativeAudioQueuePlayback(params: {
   nativeAudioQueuePendingCountRef: MutableRefObject<number>;
   nativeQueueRef: MutableRefObject<NativeSpeechQueueItem[]>;
   nativeSpeakingRef: MutableRefObject<boolean>;
+  playbackPausedRef: MutableRefObject<boolean>;
   playbackGenerationRef: MutableRefObject<number>;
   updatePendingPlaybackState: () => void;
 }) {
@@ -28,6 +29,7 @@ export function useNativeAudioQueuePlayback(params: {
     nativeAudioQueuePendingCountRef,
     nativeQueueRef,
     nativeSpeakingRef,
+    playbackPausedRef,
     playbackGenerationRef,
     updatePendingPlaybackState,
   } = params;
@@ -61,7 +63,9 @@ export function useNativeAudioQueuePlayback(params: {
           requestId: diagnostics?.requestId,
           source: diagnostics?.source ?? "unknown",
         });
-        await startNativeAudioQueue();
+        if (!playbackPausedRef.current) {
+          await startNativeAudioQueue();
+        }
       } catch (error) {
         nativeAudioQueueContextsRef.current.delete(itemId);
         nativeAudioQueuePendingCountRef.current = Math.max(
@@ -98,6 +102,7 @@ export function useNativeAudioQueuePlayback(params: {
       nativeAudioQueuePendingCountRef,
       nativeQueueRef,
       nativeSpeakingRef,
+      playbackPausedRef,
       playbackGenerationRef,
       updatePendingPlaybackState,
     ],

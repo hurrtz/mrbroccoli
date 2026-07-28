@@ -1,29 +1,30 @@
-import { splitIntoSentences } from "../tts";
-
-export function extractCompleteSentences(text: string): {
-  completeSentences: string[];
+export function extractCompleteParagraphs(text: string): {
+  completeParagraphs: string[];
   remainder: string;
 } {
   if (!text) {
     return {
-      completeSentences: [],
+      completeParagraphs: [],
       remainder: "",
     };
   }
 
-  const segments = splitIntoSentences(text);
-  const endsWithSentenceBoundary = /[.!?\n]\s*$/.test(text);
-  const endsWithAmbiguousSingleCharacterPeriod =
-    /(?:^|\s)[A-Za-z0-9]\.\s*$/.test(text);
-  const completeCount =
-    endsWithSentenceBoundary && !endsWithAmbiguousSingleCharacterPeriod
-    ? segments.length
-    : Math.max(segments.length - 1, 0);
+  const completeParagraphs: string[] = [];
+  const paragraphBoundary = /\r?\n[ \t]*\r?\n+/g;
+  let remainderStart = 0;
+  let match: RegExpExecArray | null = null;
+
+  while ((match = paragraphBoundary.exec(text)) !== null) {
+    const paragraph = text.slice(remainderStart, match.index).trim();
+
+    if (paragraph) {
+      completeParagraphs.push(paragraph);
+    }
+    remainderStart = match.index + match[0].length;
+  }
 
   return {
-    completeSentences: segments
-      .slice(0, completeCount)
-      .filter((segment) => segment.trim()),
-    remainder: segments.slice(completeCount).join(""),
+    completeParagraphs,
+    remainder: text.slice(remainderStart),
   };
 }

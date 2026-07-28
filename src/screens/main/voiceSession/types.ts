@@ -3,6 +3,7 @@ import { MutableRefObject } from "react";
 import { PipelinePhase } from "../../../hooks/useVoicePipeline";
 import type { ReplayPhase } from "../../../hooks/useVoicePipeline";
 import { Provider, Settings } from "../../../types";
+import type { SpeechDiagnosticsContext } from "../../../services/speech/diagnostics";
 
 import { ShowToastFn, TranslateFn } from "../shared";
 
@@ -10,6 +11,10 @@ export interface AudioPlayerController {
   isActivelyPlaying?: boolean;
   isPlaybackPaused: boolean;
   isPlaying: boolean;
+  enqueueAudio: (
+    uri: string,
+    diagnostics?: SpeechDiagnosticsContext,
+  ) => void;
   pausePlayback: () => Promise<boolean>;
   resetCancellation: () => void;
   resumePlayback: () => Promise<boolean>;

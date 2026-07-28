@@ -68,6 +68,7 @@ interface StreamChatParams {
   responseTone: AssistantResponseTone;
   language: AppLanguage;
   conversationSummary?: string;
+  spokenParagraphStreaming?: boolean;
   webSearchContext?: string;
   onChunk: (text: string) => void;
   onDone: (
@@ -510,6 +511,7 @@ export async function streamChat({
   responseTone,
   language,
   conversationSummary,
+  spokenParagraphStreaming,
   webSearchContext,
   onChunk,
   onDone,
@@ -530,6 +532,7 @@ export async function streamChat({
       currentModel: model,
       currentProvider: provider,
       conversationSummary,
+      spokenParagraphStreaming,
       webSearchContext,
     });
 

@@ -18,6 +18,7 @@ export function useAudioClipPlayback(params: {
   nativeAudioQueueContextsRef: MutableRefObject<Map<string, NativeAudioQueueContext>>;
   nativeAudioQueuePendingCountRef: MutableRefObject<number>;
   nativeSpeakingRef: MutableRefObject<boolean>;
+  playbackPausedRef: MutableRefObject<boolean>;
   playNativeAudio: (
     itemId: string,
     uri: string,
@@ -42,6 +43,7 @@ export function useAudioClipPlayback(params: {
     nativeAudioQueueContextsRef,
     nativeAudioQueuePendingCountRef,
     nativeSpeakingRef,
+    playbackPausedRef,
     playNativeAudio,
     playbackGenerationRef,
     playingRef,
@@ -71,6 +73,7 @@ export function useAudioClipPlayback(params: {
       playingRef.current ||
       startingRef.current ||
       nativeSpeakingRef.current ||
+      playbackPausedRef.current ||
       cancelledRef.current
     ) {
       return;
@@ -136,6 +139,7 @@ export function useAudioClipPlayback(params: {
     ensurePlaybackSession,
     finalizeDrainedStateRef,
     nativeSpeakingRef,
+    playbackPausedRef,
     player,
     playingRef,
     playbackGenerationRef,
@@ -195,7 +199,8 @@ export function useAudioClipPlayback(params: {
       if (
         !playingRef.current &&
         !startingRef.current &&
-        !nativeSpeakingRef.current
+        !nativeSpeakingRef.current &&
+        !playbackPausedRef.current
       ) {
         void playNextAudio();
       }
@@ -205,6 +210,7 @@ export function useAudioClipPlayback(params: {
       nativeAudioQueueContextsRef,
       nativeAudioQueuePendingCountRef,
       nativeSpeakingRef,
+      playbackPausedRef,
       playNativeAudio,
       playNextAudio,
       playbackGenerationRef,
