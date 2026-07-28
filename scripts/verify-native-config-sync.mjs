@@ -77,6 +77,13 @@ const adaptiveMonochromePath =
 const iosMarketingVersions = [
   ...iosProject.matchAll(/MARKETING_VERSION = ([^;]+);/g),
 ].map((match) => match[1]);
+const iosBundleVersion =
+  iosInfo.match(
+    /<key>CFBundleVersion<\/key>\s*<string>([^<]+)<\/string>/,
+  )?.[1] ?? null;
+const iosProjectVersions = [
+  ...iosProject.matchAll(/CURRENT_PROJECT_VERSION = ([^;]+);/g),
+].map((match) => match[1]);
 
 assertEqual("package.json version", packageJson.version, appConfig.version);
 assertEqual("package-lock.json version", packageLock.version, appConfig.version);
@@ -140,6 +147,16 @@ assertIncludes(
   "Android version",
   androidBuild,
   `versionName "${appConfig.version}"`,
+);
+assertEqual(
+  "iOS bundle version format",
+  /^\d+$/.test(iosBundleVersion ?? ""),
+  true,
+);
+assertAllEqual(
+  "iOS project build version",
+  iosProjectVersions,
+  iosBundleVersion,
 );
 assertEqual("shared and iOS icon path", iosIconPath, iconPath);
 assertEqual("shared and Android legacy icon path", androidIconPath, iconPath);

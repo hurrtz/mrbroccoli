@@ -88,6 +88,16 @@ const currentVersion = appConfig.expo?.version;
 const versionCodeMatches = [
   ...original.androidBuild.matchAll(/^\s*versionCode\s+(\d+)\s*$/gm),
 ];
+const iosBundleVersionMatches = [
+  ...original.iosInfo.matchAll(
+    /<key>CFBundleVersion<\/key>\s*<string>(\d+)<\/string>/g,
+  ),
+];
+const iosProjectVersionMatches = [
+  ...original.iosProject.matchAll(
+    /CURRENT_PROJECT_VERSION = (\d+);/g,
+  ),
+];
 
 if (!versionPattern.test(currentVersion ?? "")) {
   abort(`app.json has an invalid Expo version: ${JSON.stringify(currentVersion)}`);
@@ -102,9 +112,28 @@ if (versionCodeMatches.length !== 1) {
     `Android versionCode must occur exactly once; found ${versionCodeMatches.length}`,
   );
 }
+if (iosBundleVersionMatches.length !== 1) {
+  abort(
+    `iOS CFBundleVersion must occur exactly once; found ${iosBundleVersionMatches.length}`,
+  );
+}
+if (iosProjectVersionMatches.length === 0) {
+  abort("iOS CURRENT_PROJECT_VERSION was not found");
+}
 
 const androidVersionCode = Number(versionCodeMatches[0][1]);
 const nextAndroidVersionCode = androidVersionCode + 1;
+const iosBuildNumber = Number(iosBundleVersionMatches[0][1]);
+if (
+  iosProjectVersionMatches.some(
+    (match) => Number(match[1]) !== iosBuildNumber,
+  )
+) {
+  abort(
+    "iOS CURRENT_PROJECT_VERSION values must match CFBundleVersion",
+  );
+}
+const nextIosBuildNumber = iosBuildNumber + 1;
 appConfig.expo.version = targetVersion;
 packageJson.version = targetVersion;
 packageLock.version = targetVersion;
@@ -126,20 +155,30 @@ const updated = {
     `$1"${targetVersion}"$2`,
   ),
   iosInfo: replaceExactlyOnce(
-    "iOS CFBundleShortVersionString",
-    original.iosInfo,
-    /(<key>CFBundleShortVersionString<\/key>\s*<string>)[^<]+(<\/string>)/g,
-    `$1${targetVersion}$2`,
+    "iOS CFBundleVersion",
+    replaceExactlyOnce(
+      "iOS CFBundleShortVersionString",
+      original.iosInfo,
+      /(<key>CFBundleShortVersionString<\/key>\s*<string>)[^<]+(<\/string>)/g,
+      `$1${targetVersion}$2`,
+    ),
+    /(<key>CFBundleVersion<\/key>\s*<string>)\d+(<\/string>)/g,
+    `$1${nextIosBuildNumber}$2`,
   ),
-  iosProject: original.iosProject.replace(
-    /MARKETING_VERSION = [^;]+;/g,
-    `MARKETING_VERSION = ${targetVersion};`,
-  ),
+  iosProject: original.iosProject
+    .replace(
+      /MARKETING_VERSION = [^;]+;/g,
+      `MARKETING_VERSION = ${targetVersion};`,
+    )
+    .replace(
+      /CURRENT_PROJECT_VERSION = \d+;/g,
+      `CURRENT_PROJECT_VERSION = ${nextIosBuildNumber};`,
+    ),
 };
 
 if (dryRun) {
   console.log(
-    `Would bump ${currentVersion} -> ${targetVersion} and Android versionCode ${androidVersionCode} -> ${nextAndroidVersionCode}.`,
+    `Would bump ${currentVersion} -> ${targetVersion}, Android versionCode ${androidVersionCode} -> ${nextAndroidVersionCode}, and iOS build ${iosBuildNumber} -> ${nextIosBuildNumber}.`,
   );
   process.exit(0);
 }
@@ -156,5 +195,5 @@ if (!verifyNativeConfig()) {
 }
 
 console.log(
-  `Bumped ${currentVersion} -> ${targetVersion} and Android versionCode ${androidVersionCode} -> ${nextAndroidVersionCode}.`,
+  `Bumped ${currentVersion} -> ${targetVersion}, Android versionCode ${androidVersionCode} -> ${nextAndroidVersionCode}, and iOS build ${iosBuildNumber} -> ${nextIosBuildNumber}.`,
 );
