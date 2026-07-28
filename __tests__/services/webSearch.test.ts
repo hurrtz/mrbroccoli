@@ -104,6 +104,7 @@ describe("webSearch", () => {
         body: expect.stringContaining('"search_context_size":"high"'),
       }),
     );
+    expect(fetchBody().tool_choice).toBe("required");
     expect(result).toEqual(
       expect.objectContaining({
         model: "gpt-5.6-sol",
@@ -310,6 +311,7 @@ describe("webSearch", () => {
       },
       assertBody: (body: Record<string, unknown>) => {
         expect(body.tools).toEqual([{ type: "web_search" }]);
+        expect(body.tool_choice).toBe("required");
         expect(body.model).toBe("grok-4.3");
       },
       expectedSummary: "xAI web search found the current answer.",
@@ -587,6 +589,42 @@ describe("webSearch", () => {
       "Alibaba / Qwen returned a response without running web search.",
     );
   });
+
+  it.each([
+    ["openai", "sk-test"],
+    ["xai", "xai-test"],
+  ] as const)(
+    "rejects an ungrounded %s response",
+    async (provider, apiKey) => {
+      (fetch as jest.Mock).mockResolvedValueOnce({
+        ok: true,
+        json: () =>
+          Promise.resolve({
+            output_text: "An answer from model memory.",
+            output: [
+              {
+                type: "message",
+                content: [
+                  {
+                    type: "output_text",
+                    text: "An answer from model memory.",
+                  },
+                ],
+              },
+            ],
+          }),
+      });
+
+      await expect(
+        searchWeb({
+          provider,
+          apiKey,
+          language: "en",
+          query: "What happened today?",
+        }),
+      ).rejects.toThrow("returned a response without running web search");
+    },
+  );
 
   it("validates Qwen only after a completed web search call", async () => {
     (fetch as jest.Mock).mockResolvedValueOnce({

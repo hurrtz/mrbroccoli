@@ -277,7 +277,7 @@ function extractGenericSources(data: unknown) {
   return dedupeSources(sources);
 }
 
-function hasCompletedWebSearchCall(data: unknown) {
+function hasSuccessfulWebSearchCall(data: unknown) {
   if (!data || typeof data !== "object" || !("output" in data)) {
     return false;
   }
@@ -286,15 +286,18 @@ function hasCompletedWebSearchCall(data: unknown) {
     return false;
   }
 
-  return data.output.some(
-    (item) =>
-      item &&
-      typeof item === "object" &&
-      "type" in item &&
-      item.type === "web_search_call" &&
-      "status" in item &&
-      item.status === "completed",
-  );
+  return data.output.some((item) => {
+    if (
+      !item ||
+      typeof item !== "object" ||
+      !("type" in item) ||
+      item.type !== "web_search_call"
+    ) {
+      return false;
+    }
+
+    return !("status" in item) || item.status === "completed";
+  });
 }
 
 function extractChatCompletionOutputText(data: unknown): string {
@@ -632,6 +635,7 @@ async function searchWithOpenAi(params: WebSearchRequestParams) {
             search_context_size: searchContextSize,
           },
         ],
+        tool_choice: "required",
         include: ["web_search_call.action.sources"],
         max_output_tokens: maxOutputTokens,
       }),
@@ -652,8 +656,18 @@ async function searchWithOpenAi(params: WebSearchRequestParams) {
     });
   }
 
+  const data = await response.json();
+
+  if (!hasSuccessfulWebSearchCall(data)) {
+    throw new Error(
+      translate(params.language, "providerWebSearchNotRun", {
+        provider: PROVIDER_LABELS[params.provider],
+      }),
+    );
+  }
+
   return {
-    data: await response.json(),
+    data,
     model,
     provider: params.provider,
   } satisfies RawWebSearchResponse;
@@ -777,7 +791,7 @@ async function searchWithQwen(params: WebSearchRequestParams) {
     },
   });
 
-  if (!hasCompletedWebSearchCall(response.data)) {
+  if (!hasSuccessfulWebSearchCall(response.data)) {
     throw new Error(
       translate(params.language, "providerWebSearchNotRun", {
         provider: PROVIDER_LABELS[params.provider],
@@ -852,7 +866,7 @@ async function searchWithXai(params: WebSearchRequestParams) {
   const model = getWebSearchProviderModel(params.provider);
   const maxOutputTokens = params.maxOutputTokens ?? 420;
 
-  return fetchJsonWebSearch(params, {
+  const response = await fetchJsonWebSearch(params, {
     url: "https://api.x.ai/v1/responses",
     model,
     headers: buildBearerHeaders(params),
@@ -865,10 +879,21 @@ async function searchWithXai(params: WebSearchRequestParams) {
         },
       ],
       tools: [{ type: "web_search" }],
+      tool_choice: "required",
       max_output_tokens: maxOutputTokens,
       max_turns: getXaiMaxTurns(params),
     },
   });
+
+  if (!hasSuccessfulWebSearchCall(response.data)) {
+    throw new Error(
+      translate(params.language, "providerWebSearchNotRun", {
+        provider: PROVIDER_LABELS[params.provider],
+      }),
+    );
+  }
+
+  return response;
 }
 
 async function searchWithMistral(params: WebSearchRequestParams) {
@@ -1217,7 +1242,11 @@ export async function searchWeb(
         provider: params.provider,
       },
     });
-    return null;
+    throw new Error(
+      translate(params.language, "providerWebSearchNotRun", {
+        provider: PROVIDER_LABELS[params.provider],
+      }),
+    );
   }
 
   recordDebugLogEvent({

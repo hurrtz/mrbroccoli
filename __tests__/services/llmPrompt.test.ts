@@ -95,6 +95,21 @@ describe("buildSystemPrompt", () => {
     );
   });
 
+  it("treats fresh web context as current evidence instead of model memory", () => {
+    const prompt = buildSystemPrompt({
+      assistantInstructions: "Be accurate.",
+      responseLength: "normal",
+      responseTone: "professional",
+      language: "en",
+      webSearchContext: "The requested current fact.",
+    });
+
+    expect(prompt).toContain("primary evidence for relevant current facts");
+    expect(prompt).toContain(
+      "Do not claim that your knowledge cutoff prevents an answer",
+    );
+  });
+
   it("retains response provenance in conversation-summary input", () => {
     expect(
       formatMessagesForSummary([
