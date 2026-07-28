@@ -37,7 +37,8 @@ export type AppLanguage =
   | "es"
   | "fr"
   | "it"
-  | "pt";
+  | "pt"
+  | "pt-BR";
 export type ResponseMode = string;
 export type TtsListenLanguage =
   | "en"
@@ -358,6 +359,7 @@ export const DEFAULT_ASSISTANT_INSTRUCTIONS_BY_LANGUAGE: Record<
   fr: DEFAULT_ENGLISH_ASSISTANT_INSTRUCTIONS,
   it: DEFAULT_ENGLISH_ASSISTANT_INSTRUCTIONS,
   pt: DEFAULT_ENGLISH_ASSISTANT_INSTRUCTIONS,
+  "pt-BR": DEFAULT_ENGLISH_ASSISTANT_INSTRUCTIONS,
 };
 
 const LEGACY_DEFAULT_ASSISTANT_INSTRUCTIONS = [

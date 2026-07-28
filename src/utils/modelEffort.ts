@@ -200,7 +200,7 @@ export function getModelEffortOptionLabel(
   if (language === "it") {
     return ITALIAN_EFFORT_LABELS[option.id] ?? option.label;
   }
-  if (language === "pt") {
+  if (language === "pt" || language === "pt-BR") {
     return PORTUGUESE_EFFORT_LABELS[option.id] ?? option.label;
   }
   return option.label;

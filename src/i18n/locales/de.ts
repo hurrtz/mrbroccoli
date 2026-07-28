@@ -65,6 +65,7 @@ export const de: TranslationDictionary = {
   french: "Französisch",
   italian: "Italienisch",
   portuguese: "Portugiesisch",
+  portugueseBrazil: "Portugiesisch (Brasilien)",
   light: "Hell",
   dark: "Dunkel",
   system: "System",
