@@ -133,3 +133,4 @@ provider-research/
 
 # local native build artifacts
 .xcode-derived/
+/artifacts/
