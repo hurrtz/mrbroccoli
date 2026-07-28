@@ -22,6 +22,7 @@ import { LocalizationProvider } from "../../src/i18n";
 import { ThemeProvider } from "../../src/theme/ThemeContext";
 import { lightColors } from "../../src/theme/colors";
 import {
+  type AppLanguage,
   DEFAULT_SETTINGS,
   type Provider,
   type Settings,
@@ -95,6 +96,7 @@ jest.mock("../../src/components/ProviderIcon", () => ({
 
 function renderSettingsModal(
   overrideProps: Partial<React.ComponentProps<typeof SettingsModal>> = {},
+  language: AppLanguage = "en",
 ) {
   const kokoroModel = {
     installed: false,
@@ -110,7 +112,7 @@ function renderSettingsModal(
 
   return render(
     <ThemeProvider mode="light">
-      <LocalizationProvider language="en">
+      <LocalizationProvider language={language}>
         <AntProvider>
           <SettingsModal
             visible
@@ -198,6 +200,28 @@ describe("SettingsModal", () => {
       );
       expect(screen.queryByText("Runtime Readiness")).toBeNull();
       expect(screen.queryByPlaceholderText("Search services")).toBeNull();
+    });
+  });
+
+  it("renders App settings in Ukrainian", async () => {
+    const screen = renderSettingsModal(
+      {
+        focusTab: "ui",
+        settings: {
+          ...DEFAULT_SETTINGS,
+          language: "uk",
+        },
+      },
+      "uk",
+    );
+
+    await waitFor(() => {
+      expect(screen.getByTestId("settings-modal-title").props.children).toBe(
+        "Застосунок і діагностика",
+      );
+      expect(screen.getByText("Тема")).toBeTruthy();
+      expect(screen.getByText("Українська")).toBeTruthy();
+      expect(screen.queryByText("Theme")).toBeNull();
     });
   });
 
@@ -982,6 +1006,21 @@ describe("SettingsModal", () => {
       .UNSAFE_getAllByType(List.Item)
       .find((item) => item.props.testID === "app-language-picker");
     expect(languagePicker).toBeDefined();
+    expect(
+      screen
+        .UNSAFE_getAllByType(AntPicker)
+        .find((picker) =>
+          picker.props.data?.some(
+            (option: { value: string }) => option.value === "uk",
+          ),
+        )?.props.data,
+    ).toEqual(
+      expect.arrayContaining([
+        { label: "English", value: "en" },
+        { label: "German", value: "de" },
+        { label: "Ukrainian", value: "uk" },
+      ]),
+    );
     expect(StyleSheet.flatten(languagePicker!.props.style).marginHorizontal).toBe(
       0,
     );

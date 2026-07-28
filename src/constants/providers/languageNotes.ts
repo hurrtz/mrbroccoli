@@ -18,12 +18,16 @@ const NATIVE_STT_LANGUAGE_NOTES_BY_LANGUAGE: Record<AppLanguage, string> = {
   en: NATIVE_STT_LANGUAGE_NOTE,
   de:
     "Die Sprachunterstützung hängt vom Betriebssystem des Geräts, installierten Sprachpaketen und der Verfügbarkeit der Erkennung ab. Die genaue Liste variiert je nach Gerät.",
+  uk:
+    "Підтримка мов залежить від операційної системи пристрою, встановлених мовних пакетів і доступності розпізнавання. Точний перелік відрізняється залежно від пристрою.",
 };
 
 const NATIVE_TTS_LANGUAGE_NOTES_BY_LANGUAGE: Record<AppLanguage, string> = {
   en: NATIVE_TTS_LANGUAGE_NOTE,
   de:
     "Die Sprachunterstützung hängt von den auf dem Gerät installierten Systemstimmen ab. Die genaue Liste, Aussprachequalität und Offline-Verfügbarkeit variieren je nach Betriebssystem und Gerät.",
+  uk:
+    "Підтримка мов залежить від системних голосів, установлених на пристрої. Точний перелік, якість вимови та доступність офлайн відрізняються залежно від операційної системи й пристрою.",
 };
 
 const GERMAN_PROVIDER_API_KEY_PLACEHOLDER_OVERRIDES: Partial<
@@ -35,6 +39,12 @@ const GERMAN_PROVIDER_API_KEY_PLACEHOLDER_OVERRIDES: Partial<
   xai: "xai-...",
   deepseek: "sk-...",
   mistral: "API-Schlüssel eingeben",
+};
+
+const UKRAINIAN_PROVIDER_API_KEY_PLACEHOLDER_OVERRIDES: Partial<
+  Record<Provider, string>
+> = {
+  mistral: "Введіть ключ API",
 };
 
 const PROVIDER_API_KEY_PLACEHOLDERS_BY_LANGUAGE: Record<
@@ -54,6 +64,13 @@ const PROVIDER_API_KEY_PLACEHOLDERS_BY_LANGUAGE: Record<
         PROVIDER_CONFIGS[provider].apiKeyPlaceholder,
     ]),
   ) as Record<Provider, string>,
+  uk: Object.fromEntries(
+    PROVIDER_ORDER.map((provider) => [
+      provider,
+      UKRAINIAN_PROVIDER_API_KEY_PLACEHOLDER_OVERRIDES[provider] ??
+        PROVIDER_CONFIGS[provider].apiKeyPlaceholder,
+    ]),
+  ) as Record<Provider, string>,
 };
 
 const GENERIC_PROVIDER_API_KEY_HINTS: Record<AppLanguage, string> = {
@@ -61,6 +78,8 @@ const GENERIC_PROVIDER_API_KEY_HINTS: Record<AppLanguage, string> = {
     "Paste credentials for an external service you already use. Keys stay on this device and are used only for requests you start in the app.",
   de:
     "Füge Zugangsdaten für einen externen Dienst ein, den du bereits nutzt. Keys bleiben auf diesem Gerät und werden nur für Anfragen verwendet, die du in der App startest.",
+  uk:
+    "Вставте облікові дані зовнішнього сервісу, яким уже користуєтеся. Ключі зберігаються на цьому пристрої та використовуються лише для запитів, які ви запускаєте в застосунку.",
 };
 
 const PROVIDER_API_KEY_HINT_OVERRIDES: Partial<
@@ -75,6 +94,11 @@ const PROVIDER_API_KEY_HINT_OVERRIDES: Partial<
     openrouter: `${GENERIC_PROVIDER_API_KEY_HINTS.de} Ein OpenRouter-Key schaltet die kuratierten Gateway-Modelle frei. Anfragen laufen über OpenRouter zum ausgewählten Upstream-Anbieter; direkte Anbieter-Keys bleiben getrennt.`,
     elevenlabs: `${GENERIC_PROVIDER_API_KEY_HINTS.de} Eingeschränkte ElevenLabs-Keys benötigen für TTS die Berechtigung „Text to Speech“ und für STT „Speech to Text“. „Voices read“ ist optional und schaltet nur die persönliche Stimmenbibliothek frei.`,
     "moonshot-ai-kimi": `${GENERIC_PROVIDER_API_KEY_HINTS.de} Moonshot schaltet Kimi K3 erst nach einer erfolgreichen Kontoaufladung von mindestens 1 USD frei.`,
+  },
+  uk: {
+    openrouter: `${GENERIC_PROVIDER_API_KEY_HINTS.uk} Один ключ OpenRouter відкриває доступ до наведених нижче моделей шлюзу. Запити проходять через OpenRouter до вибраного кінцевого провайдера; прямі ключі провайдерів залишаються окремими.`,
+    elevenlabs: `${GENERIC_PROVIDER_API_KEY_HINTS.uk} Обмеженим ключам ElevenLabs потрібен дозвіл Text to Speech для TTS і Speech to Text для STT. Дозвіл Voices read необов’язковий і лише відкриває бібліотеку голосів облікового запису.`,
+    "moonshot-ai-kimi": `${GENERIC_PROVIDER_API_KEY_HINTS.uk} Moonshot відкриває доступ до Kimi K3 після щонайменше одного успішного поповнення рахунку на 1 долар США.`,
   },
 };
 
@@ -93,6 +117,12 @@ const PROVIDER_STT_LANGUAGE_NOTES_BY_LANGUAGE: Partial<
       `OpenAI bietet aktuell gpt-4o-transcribe, gpt-4o-mini-transcribe und whisper-1 für Speech-to-Text an. Der von OpenAI veröffentlichte Satz gut unterstützter Sprachen lautet: ${WHISPER_WELL_SUPPORTED_LANGUAGES}`,
     mistral:
       "Die aktuelle Voxtral-Transkriptionsroute ist für Englisch, Spanisch, Französisch, Portugiesisch, Hindi, Deutsch, Niederländisch und Italienisch dokumentiert.",
+  },
+  uk: {
+    openai:
+      `OpenAI зараз пропонує gpt-4o-transcribe, gpt-4o-mini-transcribe і whisper-1 для розпізнавання мовлення. Оприлюднений OpenAI перелік мов із належною підтримкою: ${WHISPER_WELL_SUPPORTED_LANGUAGES}`,
+    mistral:
+      "Поточний маршрут розпізнавання Voxtral документовано для англійської, іспанської, французької, португальської, гінді, німецької, нідерландської та італійської мов.",
   },
 };
 
@@ -113,6 +143,14 @@ const PROVIDER_TTS_LANGUAGE_NOTES_BY_LANGUAGE: Partial<
       "Gemini TTS unterstützt aktuell Arabisch, Bengalisch, Niederländisch, Englisch, Französisch, Deutsch, Hindi, Indonesisch, Italienisch, Japanisch, Koreanisch, Mandarin, Polnisch, Portugiesisch, Rumänisch, Russisch, Spanisch, Tamil, Telugu, Thai, Türkisch, Ukrainisch, Urdu und Vietnamesisch.",
     xai:
       "xAI TTS unterstützt aktuell Arabisch, Niederländisch, Englisch, Französisch, Deutsch, Hindi, Indonesisch, Italienisch, Japanisch, Koreanisch, Polnisch, Portugiesisch, Russisch, Spanisch, Thai, Türkisch, Vietnamesisch und Chinesisch.",
+  },
+  uk: {
+    openai:
+      "OpenAI зараз пропонує gpt-4o-mini-tts, tts-1 і tts-1-hd для синтезу мовлення. OpenAI не публікує такого ж стислого переліку мов із належною підтримкою, як для STT, і зазначає, що голоси оптимізовано для англійської.",
+    gemini:
+      "Gemini TTS зараз підтримує арабську, бенгальську, нідерландську, англійську, французьку, німецьку, гінді, індонезійську, італійську, японську, корейську, мандаринську китайську, польську, португальську, румунську, російську, іспанську, тамільську, телугу, тайську, турецьку, українську, урду та в’єтнамську.",
+    xai:
+      "xAI TTS зараз підтримує арабську, нідерландську, англійську, французьку, німецьку, гінді, індонезійську, італійську, японську, корейську, польську, португальську, російську, іспанську, тайську, турецьку, в’єтнамську та китайську.",
   },
 };
 
@@ -189,7 +227,9 @@ function buildCatalogSpeechLanguageNote(params: {
     parts.push(
       params.language === "de"
         ? `${voiceCount} Stimmen in ${languageCount} Sprachen`
-        : `${voiceCount} voices across ${languageCount} languages`,
+        : params.language === "uk"
+          ? `${voiceCount} голосів для ${languageCount} мов`
+          : `${voiceCount} voices across ${languageCount} languages`,
     );
   } else if (languageSupport.languageCount) {
     const languageCount = formatApproximateCount(
@@ -200,20 +240,30 @@ function buildCatalogSpeechLanguageNote(params: {
     parts.push(
       params.language === "de"
         ? `Unterstützt ${languageCount} Sprachen`
-        : `Supports ${languageCount} languages`,
+        : params.language === "uk"
+          ? `Підтримує мов: ${languageCount}`
+          : `Supports ${languageCount} languages`,
     );
   } else if (
     languageSupport.isMultilingual &&
     languageSupport.notes.includes("english-optimized")
   ) {
-    parts.push(params.language === "de" ? "Mehrsprachig" : "Multilingual");
+    parts.push(
+      params.language === "de"
+        ? "Mehrsprachig"
+        : params.language === "uk"
+          ? "Багатомовний"
+          : "Multilingual",
+    );
   }
 
   if (languageSupport.notes.includes("english-optimized")) {
     parts.push(
       params.language === "de"
         ? "Stimmen sind für Englisch optimiert"
-        : "Voices are optimized for English",
+        : params.language === "uk"
+          ? "Голоси оптимізовано для англійської"
+          : "Voices are optimized for English",
     );
   }
 
@@ -268,19 +318,25 @@ function formatDurationLimit(seconds: number, language: AppLanguage) {
     const hours = seconds / 3600;
     return language === "de"
       ? `${hours} ${hours === 1 ? "Stunde" : "Stunden"}`
-      : `${hours} ${hours === 1 ? "hour" : "hours"}`;
+      : language === "uk"
+        ? `${hours} год`
+        : `${hours} ${hours === 1 ? "hour" : "hours"}`;
   }
 
   if (seconds % 60 === 0) {
     const minutes = seconds / 60;
     return language === "de"
       ? `${minutes} ${minutes === 1 ? "Minute" : "Minuten"}`
-      : `${minutes} ${minutes === 1 ? "minute" : "minutes"}`;
+      : language === "uk"
+        ? `${minutes} хв`
+        : `${minutes} ${minutes === 1 ? "minute" : "minutes"}`;
   }
 
   return language === "de"
     ? `${seconds} ${seconds === 1 ? "Sekunde" : "Sekunden"}`
-    : `${seconds} ${seconds === 1 ? "second" : "seconds"}`;
+    : language === "uk"
+      ? `${seconds} с`
+      : `${seconds} ${seconds === 1 ? "second" : "seconds"}`;
 }
 
 export function getProviderSttLimitNote(
@@ -310,7 +366,9 @@ export function getProviderSttLimitNote(
     parts.push(
       language === "de"
         ? `Datei-Upload bis ${formatByteLimit(exactFileSizeLimit.value)}`
-        : `File upload up to ${formatByteLimit(exactFileSizeLimit.value)}`,
+        : language === "uk"
+          ? `Завантаження файлів до ${formatByteLimit(exactFileSizeLimit.value)}`
+          : `File upload up to ${formatByteLimit(exactFileSizeLimit.value)}`,
     );
   } else if (approximateFileSizeLimits.length === 1) {
     parts.push(
@@ -318,9 +376,13 @@ export function getProviderSttLimitNote(
         ? `Ungefährer Datei-Upload bis ${formatByteLimit(
             approximateFileSizeLimits[0].value,
           )}`
-        : `Approximate file upload limit ${formatByteLimit(
-            approximateFileSizeLimits[0].value,
-          )}`,
+        : language === "uk"
+          ? `Орієнтовний ліміт файлу: ${formatByteLimit(
+              approximateFileSizeLimits[0].value,
+            )}`
+          : `Approximate file upload limit ${formatByteLimit(
+              approximateFileSizeLimits[0].value,
+            )}`,
     );
   } else if (approximateFileSizeLimits.length > 1) {
     parts.push(
@@ -330,11 +392,17 @@ export function getProviderSttLimitNote(
           )} und ${formatByteLimit(
             approximateFileSizeLimits[approximateFileSizeLimits.length - 1].value,
           )} je nach Tarif`
-        : `Approximate file upload limit ${formatByteLimit(
-            approximateFileSizeLimits[0].value,
-          )} to ${formatByteLimit(
-            approximateFileSizeLimits[approximateFileSizeLimits.length - 1].value,
-          )} depending on tier`,
+        : language === "uk"
+          ? `Орієнтовний ліміт файлу від ${formatByteLimit(
+              approximateFileSizeLimits[0].value,
+            )} до ${formatByteLimit(
+              approximateFileSizeLimits[approximateFileSizeLimits.length - 1].value,
+            )} залежно від тарифу`
+          : `Approximate file upload limit ${formatByteLimit(
+              approximateFileSizeLimits[0].value,
+            )} to ${formatByteLimit(
+              approximateFileSizeLimits[approximateFileSizeLimits.length - 1].value,
+            )} depending on tier`,
     );
   }
 
@@ -349,7 +417,9 @@ export function getProviderSttLimitNote(
     parts.push(
       language === "de"
         ? `Audio bis ${formatDurationLimit(durationLimit.value, language)}`
-        : `Audio up to ${formatDurationLimit(durationLimit.value, language)}`,
+        : language === "uk"
+          ? `Аудіо до ${formatDurationLimit(durationLimit.value, language)}`
+          : `Audio up to ${formatDurationLimit(durationLimit.value, language)}`,
     );
   }
 

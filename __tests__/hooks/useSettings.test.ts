@@ -679,6 +679,25 @@ describe("useSettings", () => {
     );
   });
 
+  it("persists Ukrainian as a UI-only language", async () => {
+    const { result } = renderHook(() => useSettings());
+    await flushSettingsLoad();
+
+    await act(async () => {
+      result.current.updateSettings({ language: "uk" });
+    });
+
+    expect(result.current.settings.language).toBe("uk");
+    expect(result.current.settings.assistantInstructions).toBe(
+      DEFAULT_ASSISTANT_INSTRUCTIONS_BY_LANGUAGE.en,
+    );
+    expect(result.current.settings.ttsListenLanguages).toEqual(["en"]);
+    expect(AsyncStorage.setItem).toHaveBeenCalledWith(
+      "@mrbroccoli/settings",
+      expect.stringContaining('"language":"uk"'),
+    );
+  });
+
   it("does not overwrite custom assistant instructions on language change", async () => {
     const { result } = renderHook(() => useSettings());
     await flushSettingsLoad();

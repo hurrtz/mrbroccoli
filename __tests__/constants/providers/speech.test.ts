@@ -99,6 +99,9 @@ describe("speech provider constants", () => {
     expect(
       getTtsVoiceLabel("elevenlabs", "21m00Tcm4TlvDq8ikWAM", "de"),
     ).toBe("Rachel (integriert)");
+    expect(
+      getTtsVoiceLabel("elevenlabs", "21m00Tcm4TlvDq8ikWAM", "uk"),
+    ).toBe("Rachel (built-in)");
   });
 
   it("filters the official Qwen system voices to the selected TTS model", () => {

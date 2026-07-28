@@ -1,5 +1,6 @@
 import {
   getDefaultModelEffort,
+  getModelEffortOptionLabel,
   getModelEffortOptions,
   getModelEffortRequestBody,
   getModelEffortTransportValue,
@@ -7,6 +8,17 @@ import {
 } from "../../src/utils/modelEffort";
 
 describe("model effort metadata", () => {
+  it("localizes effort labels for the Ukrainian interface", () => {
+    expect(
+      getModelEffortOptionLabel(
+        getModelEffortOptions("gemini", "gemini-3.6-flash").find(
+          (option) => option.id === "high",
+        )!,
+        "uk",
+      ),
+    ).toBe("Високий");
+  });
+
   it("uses provider-documented defaults before the generic medium fallback", () => {
     expect(getDefaultModelEffort("openai", "gpt-5.6-sol")).toBe("medium");
     expect(getDefaultModelEffort("openai", "gpt-5.5-2026-04-23")).toBe("medium");

@@ -36,7 +36,11 @@ function getAllowedValue<T extends string>(
   return isAllowedValue(value, allowedValues) ? value : fallback;
 }
 
-const APP_LANGUAGES = ["en", "de"] as const satisfies readonly AppLanguage[];
+const APP_LANGUAGES = [
+  "en",
+  "de",
+  "uk",
+] as const satisfies readonly AppLanguage[];
 const INPUT_MODES = [
   "push-to-talk",
   "toggle-to-talk",

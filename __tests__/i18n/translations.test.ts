@@ -1,8 +1,12 @@
 import { translations } from "../../src/i18n/translations";
+import { getLocaleForLanguage, translate } from "../../src/i18n";
 
 describe("translations", () => {
-  it("keeps English and German translation keys in sync", () => {
+  it("keeps all translation keys in sync", () => {
     expect(Object.keys(translations.de).sort()).toEqual(
+      Object.keys(translations.en).sort(),
+    );
+    expect(Object.keys(translations.uk).sort()).toEqual(
       Object.keys(translations.en).sort(),
     );
   });
@@ -10,11 +14,18 @@ describe("translations", () => {
   it("uses the current app name in localized UI copy", () => {
     expect(translations.en.appName).toBe("Mr Broccoli");
     expect(translations.de.appName).toBe("Mr. Brokkoli");
+    expect(translations.uk.appName).toBe("Пан Броколі");
     expect(JSON.stringify(translations.de)).not.toContain("Mr Broccoli");
+    expect(JSON.stringify(translations.uk)).not.toContain("Mr Broccoli");
+  });
+
+  it("resolves Ukrainian UI copy and regional formatting", () => {
+    expect(translate("uk", "settings")).toBe("Налаштування");
+    expect(getLocaleForLanguage("uk")).toBe("uk-UA");
   });
 
   describe("home-screen style chip keys", () => {
-    it.each(["en", "de"] as const)(
+    it.each(["en", "de", "uk"] as const)(
       "%s defines homeStyleChipLabel as a formatter",
       (lang) => {
         const value = translations[lang].homeStyleChipLabel;
@@ -28,7 +39,7 @@ describe("translations", () => {
       },
     );
 
-    it.each(["en", "de"] as const)(
+    it.each(["en", "de", "uk"] as const)(
       "%s defines styleSheetTitle as a non-empty string",
       (lang) => {
         const value = translations[lang].styleSheetTitle;
@@ -37,7 +48,7 @@ describe("translations", () => {
       },
     );
 
-    it.each(["en", "de"] as const)(
+    it.each(["en", "de", "uk"] as const)(
       "%s defines styleSheetSubtitle as a non-empty string",
       (lang) => {
         const value = translations[lang].styleSheetSubtitle;
@@ -46,7 +57,7 @@ describe("translations", () => {
       },
     );
 
-    it.each(["en", "de"] as const)(
+    it.each(["en", "de", "uk"] as const)(
       "%s defines openStyleSheet as a non-empty string",
       (lang) => {
         const value = translations[lang].openStyleSheet;

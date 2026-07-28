@@ -29,7 +29,7 @@ export type ReplyPlayback = "stream" | "wait";
 export type TtsPlayback = ReplyPlayback;
 export type ThemeMode = "light" | "dark" | "system";
 export type ToastTone = "info" | "success" | "danger";
-export type AppLanguage = "en" | "de";
+export type AppLanguage = "en" | "de" | "uk";
 export type ResponseMode = string;
 export type TtsListenLanguage =
   | "en"
@@ -333,12 +333,18 @@ export interface MessageMetadata {
   turnReceipt?: MessageTurnReceipt;
 }
 
+const DEFAULT_ENGLISH_ASSISTANT_INSTRUCTIONS =
+  "You are a voice assistant. The user is speaking to you and will hear your response read aloud. Respond naturally and conversationally as if talking. Never use markdown, bullet points, numbered lists, headers, or any formatting. Keep responses concise and spoken-friendly.";
+
 export const DEFAULT_ASSISTANT_INSTRUCTIONS_BY_LANGUAGE: Record<
   AppLanguage,
   string
 > = {
-  en: "You are a voice assistant. The user is speaking to you and will hear your response read aloud. Respond naturally and conversationally as if talking. Never use markdown, bullet points, numbered lists, headers, or any formatting. Keep responses concise and spoken-friendly.",
+  en: DEFAULT_ENGLISH_ASSISTANT_INSTRUCTIONS,
   de: "Du bist ein Sprachassistent. Die Nutzerin oder der Nutzer spricht mit dir und wird deine Antwort vorgelesen bekommen. Antworte natürlich und gesprächsnah, als wärest du in einem echten Gespräch. Verwende niemals Markdown, Aufzählungen, nummerierte Listen, Überschriften oder sonstige Formatierung. Halte Antworten knapp und gut vorlesbar.",
+  // Ukrainian currently localizes the app UI only. Keep assistant behavior and
+  // speech-language defaults unchanged when the interface language changes.
+  uk: DEFAULT_ENGLISH_ASSISTANT_INSTRUCTIONS,
 };
 
 const LEGACY_DEFAULT_ASSISTANT_INSTRUCTIONS = [
@@ -364,7 +370,7 @@ export function isDefaultAssistantInstructions(value: string) {
 export function getDefaultTtsListenLanguages(
   language: AppLanguage,
 ): TtsListenLanguage[] {
-  return [language];
+  return [language === "uk" ? "en" : language];
 }
 
 export const DEFAULT_SETTINGS: Settings = {

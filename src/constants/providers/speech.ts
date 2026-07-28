@@ -102,7 +102,7 @@ function localizeVoiceOptions(
   options: RuntimeVoiceOption[],
   language: AppLanguage,
 ): TtsVoiceOption[] {
-  if (language === "en") {
+  if (language !== "de") {
     return toVoiceOptions(options);
   }
 

@@ -98,10 +98,12 @@ export function resolveTtsListenLanguage(params: {
   preferredLanguages?: TtsListenLanguage[];
   appLanguage: AppLanguage;
 }) {
+  const appVoiceLanguage: TtsListenLanguage =
+    params.appLanguage === "de" ? "de" : "en";
   const preferredLanguages =
     params.preferredLanguages && params.preferredLanguages.length > 0
       ? params.preferredLanguages
-      : [params.appLanguage];
+      : [appVoiceLanguage];
 
   if (preferredLanguages.length === 1) {
     return preferredLanguages[0];

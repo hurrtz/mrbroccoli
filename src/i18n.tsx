@@ -17,7 +17,13 @@ export function translate(
 }
 
 export function getLocaleForLanguage(language: AppLanguage) {
-  return language === "de" ? "de-DE" : "en-US";
+  if (language === "de") {
+    return "de-DE";
+  }
+  if (language === "uk") {
+    return "uk-UA";
+  }
+  return "en-US";
 }
 
 interface LocalizationContextValue {

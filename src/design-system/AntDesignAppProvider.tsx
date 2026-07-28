@@ -16,7 +16,7 @@ type AntLocale = NonNullable<
   React.ComponentProps<typeof AntProvider>["locale"]
 >;
 
-const antLocales: Record<"en" | "de", AntLocale> = {
+const antLocales: Record<"en" | "de" | "uk", AntLocale> = {
   en: {
     locale: "en",
     Modal: {
@@ -47,6 +47,22 @@ const antLocales: Record<"en" | "de", AntLocale> = {
     },
     SearchBar: {
       cancelText: "Abbrechen",
+    },
+  },
+  uk: {
+    locale: "uk",
+    Modal: {
+      okText: "Гаразд",
+      cancelText: "Скасувати",
+      buttonText: "Кнопка",
+    },
+    Picker: {
+      okText: "Гаразд",
+      dismissText: "Скасувати",
+      extra: "Вибрати",
+    },
+    SearchBar: {
+      cancelText: "Скасувати",
     },
   },
 };

@@ -9,6 +9,18 @@ const ANTHROPIC_ADAPTIVE_THINKING_MODELS = new Set([
   "claude-opus-4-6",
   "claude-sonnet-4-6",
 ]);
+const UKRAINIAN_EFFORT_LABELS: Record<string, string> = {
+  none: "Немає",
+  minimal: "Мінімальний",
+  low: "Низький",
+  medium: "Середній",
+  high: "Високий",
+  xhigh: "Дуже високий",
+  max: "Максимальний",
+  dynamic: "Динамічний",
+  disabled: "Вимкнено",
+  enabled: "Увімкнено",
+};
 
 export function getModelEffortConfig(
   provider: Provider,
@@ -110,9 +122,13 @@ export function getModelEffortOptionLabel(
   option: ModelEffortOption,
   language: AppLanguage,
 ) {
-  return language === "de"
-    ? option.localizedLabels?.de ?? option.label
-    : option.label;
+  if (language === "de") {
+    return option.localizedLabels?.de ?? option.label;
+  }
+  if (language === "uk") {
+    return UKRAINIAN_EFFORT_LABELS[option.id] ?? option.label;
+  }
+  return option.label;
 }
 
 export function getResponseModeRouteEffortLabel(

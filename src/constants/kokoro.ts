@@ -30,49 +30,85 @@ const KOKORO_VOICE_OPTIONS: Record<
     {
       id: "af_maple",
       sid: 0,
-      labels: { en: "Maple · American female", de: "Maple · US-Englisch, weiblich" },
+      labels: {
+        en: "Maple · American female",
+        de: "Maple · US-Englisch, weiblich",
+        uk: "Maple · американська англійська, жіночий голос",
+      },
     },
     {
       id: "af_sol",
       sid: 1,
-      labels: { en: "Sol · American female", de: "Sol · US-Englisch, weiblich" },
+      labels: {
+        en: "Sol · American female",
+        de: "Sol · US-Englisch, weiblich",
+        uk: "Sol · американська англійська, жіночий голос",
+      },
     },
     {
       id: "bf_vale",
       sid: 2,
-      labels: { en: "Vale · British female", de: "Vale · britisches Englisch, weiblich" },
+      labels: {
+        en: "Vale · British female",
+        de: "Vale · britisches Englisch, weiblich",
+        uk: "Vale · британська англійська, жіночий голос",
+      },
     },
   ],
   zh: [
     {
       id: "zf_001",
       sid: 3,
-      labels: { en: "Chinese female 1", de: "Chinesisch, weiblich 1" },
+      labels: {
+        en: "Chinese female 1",
+        de: "Chinesisch, weiblich 1",
+        uk: "Китайська, жіночий голос 1",
+      },
     },
     {
       id: "zf_017",
       sid: 11,
-      labels: { en: "Chinese female 2", de: "Chinesisch, weiblich 2" },
+      labels: {
+        en: "Chinese female 2",
+        de: "Chinesisch, weiblich 2",
+        uk: "Китайська, жіночий голос 2",
+      },
     },
     {
       id: "zf_099",
       sid: 57,
-      labels: { en: "Chinese female 3", de: "Chinesisch, weiblich 3" },
+      labels: {
+        en: "Chinese female 3",
+        de: "Chinesisch, weiblich 3",
+        uk: "Китайська, жіночий голос 3",
+      },
     },
     {
       id: "zm_009",
       sid: 58,
-      labels: { en: "Chinese male 1", de: "Chinesisch, männlich 1" },
+      labels: {
+        en: "Chinese male 1",
+        de: "Chinesisch, männlich 1",
+        uk: "Китайська, чоловічий голос 1",
+      },
     },
     {
       id: "zm_050",
       sid: 77,
-      labels: { en: "Chinese male 2", de: "Chinesisch, männlich 2" },
+      labels: {
+        en: "Chinese male 2",
+        de: "Chinesisch, männlich 2",
+        uk: "Китайська, чоловічий голос 2",
+      },
     },
     {
       id: "zm_100",
       sid: 102,
-      labels: { en: "Chinese male 3", de: "Chinesisch, männlich 3" },
+      labels: {
+        en: "Chinese male 3",
+        de: "Chinesisch, männlich 3",
+        uk: "Китайська, чоловічий голос 3",
+      },
     },
   ],
 };
