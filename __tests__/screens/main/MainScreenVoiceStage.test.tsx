@@ -511,6 +511,17 @@ describe("MainScreenVoiceStage composer", () => {
       screen.getByTestId("voice-stage-speech-overtime").props.stroke
         .payload,
     ).toEqual(processColor(lightColors.danger));
+    expect(
+      StyleSheet.flatten(
+        screen.getByTestId("voice-stage-action-surface").props.style,
+      ).borderWidth,
+    ).toBe(3);
+    expect(
+      screen.getByTestId("voice-stage-speech-timeline").props.d,
+    ).toMatch(/^M 160 1\.5 /);
+    expect(
+      screen.getByTestId("voice-stage-speech-timeline").props.strokeWidth,
+    ).toBe(3);
     now.mockRestore();
   });
 

@@ -16,7 +16,7 @@ import Animated, {
   withDelay,
   withTiming,
 } from "react-native-reanimated";
-import Svg, { Rect } from "react-native-svg";
+import Svg, { Path } from "react-native-svg";
 
 import { useReducedMotion } from "../../hooks/useReducedMotion";
 import {
@@ -139,7 +139,7 @@ const PHASE_ICON_SIZE = 42;
 const LANDSCAPE_ICON_RIGHT = 12;
 const TIMELINE_BORDER_WIDTH = 3;
 const TIMELINE_BORDER_INSET = TIMELINE_BORDER_WIDTH / 2;
-const AnimatedRect = Animated.createAnimatedComponent(Rect);
+const AnimatedPath = Animated.createAnimatedComponent(Path);
 
 function getRoundedRectPerimeter(
   width: number,
@@ -155,6 +155,35 @@ function getRoundedRectPerimeter(
     2 * (width + height - 4 * safeRadius) +
     2 * Math.PI * safeRadius
   );
+}
+
+function getTopCenterRoundedRectPath(
+  width: number,
+  height: number,
+  radius: number,
+) {
+  const left = TIMELINE_BORDER_INSET;
+  const top = TIMELINE_BORDER_INSET;
+  const right = width - TIMELINE_BORDER_INSET;
+  const bottom = height - TIMELINE_BORDER_INSET;
+  const safeRadius = Math.max(
+    0,
+    Math.min(radius, (right - left) / 2, (bottom - top) / 2),
+  );
+  const centerX = width / 2;
+
+  return [
+    `M ${centerX} ${top}`,
+    `H ${right - safeRadius}`,
+    `A ${safeRadius} ${safeRadius} 0 0 1 ${right} ${top + safeRadius}`,
+    `V ${bottom - safeRadius}`,
+    `A ${safeRadius} ${safeRadius} 0 0 1 ${right - safeRadius} ${bottom}`,
+    `H ${left + safeRadius}`,
+    `A ${safeRadius} ${safeRadius} 0 0 1 ${left} ${bottom - safeRadius}`,
+    `V ${top + safeRadius}`,
+    `A ${safeRadius} ${safeRadius} 0 0 1 ${left + safeRadius} ${top}`,
+    `H ${centerX}`,
+  ].join(" ");
 }
 
 function getLandscapeIconOffset(surfaceWidth: number) {
@@ -192,6 +221,7 @@ function SpeechStartTimelineBorder({
     rectHeight,
     radius,
   );
+  const path = getTopCenterRoundedRectPath(width, height, radius);
 
   React.useEffect(() => {
     cancelAnimation(expectedProgress);
@@ -271,28 +301,20 @@ function SpeechStartTimelineBorder({
       width={width}
       height={height}
     >
-      <AnimatedRect
+      <AnimatedPath
         testID="voice-stage-speech-timeline"
         animatedProps={expectedAnimatedProps}
-        x={TIMELINE_BORDER_INSET}
-        y={TIMELINE_BORDER_INSET}
-        width={rectWidth}
-        height={rectHeight}
-        rx={radius}
+        d={path}
         fill="none"
         stroke={phaseForeground}
         strokeWidth={TIMELINE_BORDER_WIDTH}
         strokeDasharray={[perimeter, perimeter]}
         strokeLinecap="round"
       />
-      <AnimatedRect
+      <AnimatedPath
         testID="voice-stage-speech-overtime"
         animatedProps={overtimeAnimatedProps}
-        x={TIMELINE_BORDER_INSET}
-        y={TIMELINE_BORDER_INSET}
-        width={rectWidth}
-        height={rectHeight}
-        rx={radius}
+        d={path}
         fill="none"
         stroke={colors.danger}
         strokeWidth={TIMELINE_BORDER_WIDTH}
@@ -529,7 +551,7 @@ const styles = StyleSheet.create({
     width: "100%",
     minHeight: 68,
     borderRadius: 17,
-    borderWidth: 1,
+    borderWidth: TIMELINE_BORDER_WIDTH,
     justifyContent: "center",
     overflow: "hidden",
     position: "relative",
