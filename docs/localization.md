@@ -28,6 +28,42 @@ formatting, root direction, and Ant Design locale data are all derived from
 this registry. Do not add a second language allowlist or a chain of
 `language === "..."` checks.
 
+## Speech-language contract
+
+Interface, recognition, and spoken-reply languages are independent settings:
+
+- `settings.language` controls only the app interface and regional formatting.
+- `settings.sttLanguage` controls speech recognition. `auto` delegates language
+  detection to the device or provider; an explicit language supplies the
+  provider code or native BCP-47 locale declared by the speech registry.
+- `settings.ttsListenLanguages` controls the languages the app may speak.
+  Language detection happens for each reply chunk, so a multilingual reply can
+  use different compatible routes without changing the interface language.
+
+`src/constants/speechLanguages.ts` is the single registry for these speech
+languages and their native/provider locale codes. It contains every interface
+locale (English, German, Ukrainian, Hindi, Spanish, French, Italian, European
+Portuguese, Brazilian Portuguese, Russian, Simplified Chinese, and Arabic)
+plus Japanese as a speech-only option.
+
+Provider STT and TTS language support belongs in
+`src/constants/providers/runtimeManifest.ts`. Settings readiness and runtime
+routing use those declarations consistently:
+
+- an unsupported provider language is rejected before a request is sent;
+- native recognition and speech receive the selected BCP-47 locale;
+- provider payloads receive the language field expected by that provider;
+- every language has localized preview text;
+- provider and Kokoro fallbacks are used only when the user explicitly enables
+  and orders them;
+- native speech remains terminal and never gains an implicit fallback.
+
+“Supported” means Mr Broccoli has a complete app route and at least one
+provider route for that interface locale. Native recognition and native voice
+quality still depend on the recognizers and voices installed by the operating
+system. Individual provider support varies and is surfaced by readiness rather
+than silently falling back.
+
 ## Translation contract
 
 English is the source dictionary and defines `TranslationKey`.
@@ -74,6 +110,7 @@ Run the focused contract:
 
 ```sh
 npm run i18n:verify
+npm run speech:verify
 ```
 
 Before release, also run:

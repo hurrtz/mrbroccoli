@@ -47,6 +47,14 @@ Voice input and spoken replies are not tied to any single provider:
 - Text-to-speech uses the device's native voices by default. An optional Kokoro model provides substantially more natural on-device English and Simplified Chinese speech, while capability-gated provider TTS from OpenAI, Gemini, xAI, Qwen, Mistral, and ElevenLabs remains available.
 - Mistral, xAI, and ElevenLabs account voices are discovered automatically and can be refreshed from Speaking settings. ElevenLabs falls back to a built-in premade voice when a restricted key cannot read account voices.
 
+Every interface locale is also an official speech language: English, German,
+Ukrainian, Hindi, Spanish, French, Italian, European and Brazilian Portuguese,
+Russian, Simplified Chinese, and Arabic. Interface, recognition, and
+spoken-reply languages are configured independently. Japanese is additionally
+available for recognition and speech. Provider compatibility is checked before
+each route is used; native availability depends on the voices and recognizers
+installed by the operating system.
+
 The Kokoro model is downloaded only when the user opts in (about 140 MiB
 downloaded and 211 MiB installed). It is not bundled in the initial app
 download. TTS fallbacks are opt-in: provider speech can fall back to Kokoro,

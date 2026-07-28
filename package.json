@@ -12,6 +12,7 @@
     "test": "jest",
     "typecheck": "tsc --noEmit",
     "i18n:verify": "npm run typecheck && jest __tests__/i18n/translations.test.ts __tests__/constants/localTts.test.ts __tests__/constants/kokoro.test.ts __tests__/constants/providers/languageNotes.test.ts __tests__/hooks/useSettings.test.ts __tests__/hooks/useSettingsNormalization.test.ts __tests__/utils/modelEffort.test.ts --runInBand --watchman=false",
+    "speech:verify": "npm run typecheck && jest __tests__/constants/speechLanguages.test.ts __tests__/constants/providers/runtimeManifest.test.ts __tests__/components/settingsReadiness.test.ts __tests__/hooks/useAudioPlayer.test.ts __tests__/hooks/useSettings.test.ts __tests__/hooks/usePreviewVoiceController.test.ts __tests__/services/providerTtsRoute.test.ts __tests__/services/tts.test.ts __tests__/services/voicePipeline.test.ts __tests__/services/whisper.test.ts --runInBand --watchman=false",
     "catalog:generate-index": "python3 scripts/provider_catalog/generate_provider_index.py",
     "catalog:import-research-provider": "python3 scripts/provider_catalog/import_research_provider.py",
     "catalog:test": "jest __tests__/catalog --runInBand --watchman=false"
