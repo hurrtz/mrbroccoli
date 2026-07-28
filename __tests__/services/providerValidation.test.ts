@@ -45,6 +45,7 @@ describe("validateTtsProviderConnection", () => {
       providerModel: "azure-ai-speech-neural",
       apiKey: "azure-speech-key|westeurope",
       language: "en",
+      speechLanguage: "en",
       abortSignal: undefined,
     });
     expect(FileSystem.deleteAsync).toHaveBeenCalledWith("/tmp/tts-ok.mp3", {

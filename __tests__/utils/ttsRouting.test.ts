@@ -35,10 +35,10 @@ describe("resolveTtsListenLanguage", () => {
     expect(
       resolveTtsListenLanguage({
         text: "你好，这是一个本地语音测试。",
-        preferredLanguages: ["en", "zh"],
+        preferredLanguages: ["en", "zh-CN"],
         appLanguage: "en",
       })
-    ).toBe("zh");
+    ).toBe("zh-CN");
   });
 
   it("prefers Hindi when Devanagari text is present", () => {
