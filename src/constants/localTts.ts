@@ -16,20 +16,21 @@ const LANGUAGE_LABELS: Record<
   TtsListenLanguage,
   Record<AppLanguage, string>
 > = {
-  en: { en: "English", de: "Englisch", uk: "Англійська", hi: "अंग्रेज़ी" },
-  de: { en: "German", de: "Deutsch", uk: "Німецька", hi: "जर्मन" },
+  en: { en: "English", de: "Englisch", uk: "Англійська", hi: "अंग्रेज़ी", es: "Inglés" },
+  de: { en: "German", de: "Deutsch", uk: "Німецька", hi: "जर्मन", es: "Alemán" },
   zh: {
     en: "Simplified Chinese",
     de: "Vereinfachtes Chinesisch",
     uk: "Спрощена китайська",
     hi: "सरलीकृत चीनी",
+    es: "Chino simplificado",
   },
-  es: { en: "Spanish", de: "Spanisch", uk: "Іспанська", hi: "स्पेनिश" },
-  pt: { en: "Portuguese", de: "Portugiesisch", uk: "Португальська", hi: "पुर्तगाली" },
-  hi: { en: "Hindi", de: "Hindi", uk: "Гінді", hi: "हिन्दी" },
-  fr: { en: "French", de: "Französisch", uk: "Французька", hi: "फ़्रेंच" },
-  it: { en: "Italian", de: "Italienisch", uk: "Італійська", hi: "इतालवी" },
-  ja: { en: "Japanese", de: "Japanisch", uk: "Японська", hi: "जापानी" },
+  es: { en: "Spanish", de: "Spanisch", uk: "Іспанська", hi: "स्पेनिश", es: "Español" },
+  pt: { en: "Portuguese", de: "Portugiesisch", uk: "Португальська", hi: "पुर्तगाली", es: "Portugués" },
+  hi: { en: "Hindi", de: "Hindi", uk: "Гінді", hi: "हिन्दी", es: "Hindi" },
+  fr: { en: "French", de: "Französisch", uk: "Французька", hi: "फ़्रेंच", es: "Francés" },
+  it: { en: "Italian", de: "Italienisch", uk: "Італійська", hi: "इतालवी", es: "Italiano" },
+  ja: { en: "Japanese", de: "Japanisch", uk: "Японська", hi: "जापानी", es: "Japonés" },
 };
 
 export function getTtsListenLanguageLabel(

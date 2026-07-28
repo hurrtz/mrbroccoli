@@ -1020,6 +1020,7 @@ describe("SettingsModal", () => {
         { label: "German", value: "de" },
         { label: "Ukrainian", value: "uk" },
         { label: "Hindi", value: "hi" },
+        { label: "Spanish", value: "es" },
       ]),
     );
     expect(StyleSheet.flatten(languagePicker!.props.style).marginHorizontal).toBe(

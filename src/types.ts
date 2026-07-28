@@ -29,7 +29,7 @@ export type ReplyPlayback = "stream" | "wait";
 export type TtsPlayback = ReplyPlayback;
 export type ThemeMode = "light" | "dark" | "system";
 export type ToastTone = "info" | "success" | "danger";
-export type AppLanguage = "en" | "de" | "uk" | "hi";
+export type AppLanguage = "en" | "de" | "uk" | "hi" | "es";
 export type ResponseMode = string;
 export type TtsListenLanguage =
   | "en"
@@ -346,6 +346,7 @@ export const DEFAULT_ASSISTANT_INSTRUCTIONS_BY_LANGUAGE: Record<
   // speech-language defaults unchanged when the interface language changes.
   uk: DEFAULT_ENGLISH_ASSISTANT_INSTRUCTIONS,
   hi: DEFAULT_ENGLISH_ASSISTANT_INSTRUCTIONS,
+  es: DEFAULT_ENGLISH_ASSISTANT_INSTRUCTIONS,
 };
 
 const LEGACY_DEFAULT_ASSISTANT_INSTRUCTIONS = [

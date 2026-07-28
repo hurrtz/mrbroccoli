@@ -22,6 +22,8 @@ const NATIVE_STT_LANGUAGE_NOTES_BY_LANGUAGE: Record<AppLanguage, string> = {
     "Підтримка мов залежить від операційної системи пристрою, встановлених мовних пакетів і доступності розпізнавання. Точний перелік відрізняється залежно від пристрою.",
   hi:
     "भाषा समर्थन डिवाइस के ऑपरेटिंग सिस्टम, इंस्टॉल किए गए भाषा पैक और पहचान की उपलब्धता पर निर्भर करता है। सटीक सूची हर डिवाइस पर अलग हो सकती है।",
+  es:
+    "La compatibilidad con idiomas depende del sistema operativo del dispositivo, los paquetes de idioma instalados y la disponibilidad del reconocimiento. La lista exacta varía según el dispositivo.",
 };
 
 const NATIVE_TTS_LANGUAGE_NOTES_BY_LANGUAGE: Record<AppLanguage, string> = {
@@ -32,6 +34,8 @@ const NATIVE_TTS_LANGUAGE_NOTES_BY_LANGUAGE: Record<AppLanguage, string> = {
     "Підтримка мов залежить від системних голосів, установлених на пристрої. Точний перелік, якість вимови та доступність офлайн відрізняються залежно від операційної системи й пристрою.",
   hi:
     "भाषा समर्थन डिवाइस पर इंस्टॉल सिस्टम आवाज़ों पर निर्भर करता है। सटीक सूची, उच्चारण की गुणवत्ता और ऑफलाइन उपलब्धता ऑपरेटिंग सिस्टम और डिवाइस के अनुसार अलग होती है।",
+  es:
+    "La compatibilidad con idiomas depende de las voces del sistema instaladas en el dispositivo. La lista exacta, la calidad de pronunciación y la disponibilidad sin conexión varían según el sistema operativo y el dispositivo.",
 };
 
 const GERMAN_PROVIDER_API_KEY_PLACEHOLDER_OVERRIDES: Partial<
@@ -55,6 +59,12 @@ const HINDI_PROVIDER_API_KEY_PLACEHOLDER_OVERRIDES: Partial<
   Record<Provider, string>
 > = {
   mistral: "API कुंजी दर्ज करें",
+};
+
+const SPANISH_PROVIDER_API_KEY_PLACEHOLDER_OVERRIDES: Partial<
+  Record<Provider, string>
+> = {
+  mistral: "Introduce la clave de API",
 };
 
 const PROVIDER_API_KEY_PLACEHOLDERS_BY_LANGUAGE: Record<
@@ -88,6 +98,13 @@ const PROVIDER_API_KEY_PLACEHOLDERS_BY_LANGUAGE: Record<
         PROVIDER_CONFIGS[provider].apiKeyPlaceholder,
     ]),
   ) as Record<Provider, string>,
+  es: Object.fromEntries(
+    PROVIDER_ORDER.map((provider) => [
+      provider,
+      SPANISH_PROVIDER_API_KEY_PLACEHOLDER_OVERRIDES[provider] ??
+        PROVIDER_CONFIGS[provider].apiKeyPlaceholder,
+    ]),
+  ) as Record<Provider, string>,
 };
 
 const GENERIC_PROVIDER_API_KEY_HINTS: Record<AppLanguage, string> = {
@@ -99,6 +116,8 @@ const GENERIC_PROVIDER_API_KEY_HINTS: Record<AppLanguage, string> = {
     "Вставте облікові дані зовнішнього сервісу, яким уже користуєтеся. Ключі зберігаються на цьому пристрої та використовуються лише для запитів, які ви запускаєте в застосунку.",
   hi:
     "जिस बाहरी सेवा का आप पहले से उपयोग करते हैं, उसके क्रेडेंशियल यहाँ पेस्ट करें। कुंजियाँ इसी डिवाइस पर रहती हैं और केवल ऐप में आपके शुरू किए गए अनुरोधों के लिए उपयोग होती हैं।",
+  es:
+    "Pega las credenciales de un servicio externo que ya utilices. Las claves permanecen en este dispositivo y solo se usan para las solicitudes que inicies en la app.",
 };
 
 const PROVIDER_API_KEY_HINT_OVERRIDES: Partial<
@@ -123,6 +142,11 @@ const PROVIDER_API_KEY_HINT_OVERRIDES: Partial<
     openrouter: `${GENERIC_PROVIDER_API_KEY_HINTS.hi} एक OpenRouter कुंजी नीचे दिए गए चुने हुए गेटवे मॉडल खोलती है। अनुरोध OpenRouter से चुने गए मूल प्रदाता तक जाते हैं; सीधे प्रदाता की कुंजियाँ अलग रहती हैं।`,
     elevenlabs: `${GENERIC_PROVIDER_API_KEY_HINTS.hi} सीमित ElevenLabs कुंजियों को TTS के लिए Text to Speech और STT के लिए Speech to Text अनुमति चाहिए। Voices read वैकल्पिक है और केवल खाते की आवाज़ लाइब्रेरी खोलता है।`,
     "moonshot-ai-kimi": `${GENERIC_PROVIDER_API_KEY_HINTS.hi} Moonshot, Kimi K3 की पहुँच कम से कम 1 अमेरिकी डॉलर के एक सफल खाते के टॉप-अप के बाद खोलता है।`,
+  },
+  es: {
+    openrouter: `${GENERIC_PROVIDER_API_KEY_HINTS.es} Una clave de OpenRouter desbloquea los modelos de pasarela seleccionados que aparecen abajo. Las solicitudes pasan por OpenRouter hasta el proveedor de origen elegido; las claves directas de los proveedores siguen separadas.`,
+    elevenlabs: `${GENERIC_PROVIDER_API_KEY_HINTS.es} Las claves restringidas de ElevenLabs necesitan el permiso Text to Speech para TTS y Speech to Text para STT. Voices read es opcional y solo desbloquea la biblioteca de voces de la cuenta.`,
+    "moonshot-ai-kimi": `${GENERIC_PROVIDER_API_KEY_HINTS.es} Moonshot desbloquea el acceso a Kimi K3 después de una recarga correcta de al menos 1 USD.`,
   },
 };
 
@@ -153,6 +177,12 @@ const PROVIDER_STT_LANGUAGE_NOTES_BY_LANGUAGE: Partial<
       `OpenAI अभी स्पीच-टू-टेक्स्ट के लिए gpt-4o-transcribe, gpt-4o-mini-transcribe और whisper-1 देता है। OpenAI की प्रकाशित अच्छी तरह समर्थित भाषाओं की सूची: ${WHISPER_WELL_SUPPORTED_LANGUAGES}`,
     mistral:
       "मौजूदा Voxtral ट्रांसक्रिप्शन मार्ग अंग्रेज़ी, स्पेनिश, फ़्रेंच, पुर्तगाली, हिन्दी, जर्मन, डच और इतालवी के लिए प्रलेखित है।",
+  },
+  es: {
+    openai:
+      `OpenAI ofrece actualmente gpt-4o-transcribe, gpt-4o-mini-transcribe y whisper-1 para convertir voz en texto. La lista publicada por OpenAI de idiomas con buena compatibilidad es: ${WHISPER_WELL_SUPPORTED_LANGUAGES}`,
+    mistral:
+      "La ruta de transcripción actual de Voxtral está documentada para inglés, español, francés, portugués, hindi, alemán, neerlandés e italiano.",
   },
 };
 
@@ -189,6 +219,14 @@ const PROVIDER_TTS_LANGUAGE_NOTES_BY_LANGUAGE: Partial<
       "Gemini TTS अभी अरबी, बंगाली, डच, अंग्रेज़ी, फ़्रेंच, जर्मन, हिन्दी, इंडोनेशियाई, इतालवी, जापानी, कोरियाई, मंदारिन चीनी, पोलिश, पुर्तगाली, रोमानियाई, रूसी, स्पेनिश, तमिल, तेलुगु, थाई, तुर्की, यूक्रेनी, उर्दू और वियतनामी का समर्थन करता है।",
     xai:
       "xAI TTS अभी अरबी, डच, अंग्रेज़ी, फ़्रेंच, जर्मन, हिन्दी, इंडोनेशियाई, इतालवी, जापानी, कोरियाई, पोलिश, पुर्तगाली, रूसी, स्पेनिश, थाई, तुर्की, वियतनामी और चीनी का समर्थन करता है।",
+  },
+  es: {
+    openai:
+      "OpenAI ofrece actualmente gpt-4o-mini-tts, tts-1 y tts-1-hd para texto a voz. OpenAI no publica para TTS una lista compacta de idiomas con buena compatibilidad como la de STT e indica que las voces están optimizadas para el inglés.",
+    gemini:
+      "Gemini TTS admite actualmente árabe, bengalí, neerlandés, inglés, francés, alemán, hindi, indonesio, italiano, japonés, coreano, chino mandarín, polaco, portugués, rumano, ruso, español, tamil, telugu, tailandés, turco, ucraniano, urdu y vietnamita.",
+    xai:
+      "xAI TTS admite actualmente árabe, neerlandés, inglés, francés, alemán, hindi, indonesio, italiano, japonés, coreano, polaco, portugués, ruso, español, tailandés, turco, vietnamita y chino.",
   },
 };
 
@@ -269,6 +307,27 @@ const SPEECH_NOTE_FORMATTERS: Record<AppLanguage, SpeechNoteFormatter> = {
     approximateFileUploadRange: (minimum, maximum) =>
       `प्लान के अनुसार फ़ाइल अपलोड की अनुमानित सीमा ${minimum} से ${maximum}`,
     audioUpTo: (limit) => `${limit} तक ऑडियो`,
+  },
+  es: {
+    voicesAcross: (voices, languages) =>
+      `${voices} voces en ${languages} idiomas`,
+    supportsLanguages: (languages) => `Admite ${languages} idiomas`,
+    multilingual: "Multilingüe",
+    englishOptimized: "Las voces están optimizadas para el inglés",
+    duration: (value, unit) => {
+      const units = {
+        hour: value === 1 ? "hora" : "horas",
+        minute: value === 1 ? "minuto" : "minutos",
+        second: value === 1 ? "segundo" : "segundos",
+      };
+      return `${value} ${units[unit]}`;
+    },
+    fileUploadUpTo: (limit) => `Carga de archivos de hasta ${limit}`,
+    approximateFileUpload: (limit) =>
+      `Límite aproximado de carga de archivos: ${limit}`,
+    approximateFileUploadRange: (minimum, maximum) =>
+      `Límite aproximado de carga de archivos de ${minimum} a ${maximum}, según el plan`,
+    audioUpTo: (limit) => `Audio de hasta ${limit}`,
   },
 };
 

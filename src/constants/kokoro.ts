@@ -35,6 +35,7 @@ const KOKORO_VOICE_OPTIONS: Record<
         de: "Maple · US-Englisch, weiblich",
         uk: "Maple · американська англійська, жіночий голос",
         hi: "Maple · अमेरिकी अंग्रेज़ी, महिला आवाज़",
+        es: "Maple · inglés estadounidense, voz femenina",
       },
     },
     {
@@ -45,6 +46,7 @@ const KOKORO_VOICE_OPTIONS: Record<
         de: "Sol · US-Englisch, weiblich",
         uk: "Sol · американська англійська, жіночий голос",
         hi: "Sol · अमेरिकी अंग्रेज़ी, महिला आवाज़",
+        es: "Sol · inglés estadounidense, voz femenina",
       },
     },
     {
@@ -55,6 +57,7 @@ const KOKORO_VOICE_OPTIONS: Record<
         de: "Vale · britisches Englisch, weiblich",
         uk: "Vale · британська англійська, жіночий голос",
         hi: "Vale · ब्रिटिश अंग्रेज़ी, महिला आवाज़",
+        es: "Vale · inglés británico, voz femenina",
       },
     },
   ],
@@ -67,6 +70,7 @@ const KOKORO_VOICE_OPTIONS: Record<
         de: "Chinesisch, weiblich 1",
         uk: "Китайська, жіночий голос 1",
         hi: "चीनी, महिला आवाज़ 1",
+        es: "Chino, voz femenina 1",
       },
     },
     {
@@ -77,6 +81,7 @@ const KOKORO_VOICE_OPTIONS: Record<
         de: "Chinesisch, weiblich 2",
         uk: "Китайська, жіночий голос 2",
         hi: "चीनी, महिला आवाज़ 2",
+        es: "Chino, voz femenina 2",
       },
     },
     {
@@ -87,6 +92,7 @@ const KOKORO_VOICE_OPTIONS: Record<
         de: "Chinesisch, weiblich 3",
         uk: "Китайська, жіночий голос 3",
         hi: "चीनी, महिला आवाज़ 3",
+        es: "Chino, voz femenina 3",
       },
     },
     {
@@ -97,6 +103,7 @@ const KOKORO_VOICE_OPTIONS: Record<
         de: "Chinesisch, männlich 1",
         uk: "Китайська, чоловічий голос 1",
         hi: "चीनी, पुरुष आवाज़ 1",
+        es: "Chino, voz masculina 1",
       },
     },
     {
@@ -107,6 +114,7 @@ const KOKORO_VOICE_OPTIONS: Record<
         de: "Chinesisch, männlich 2",
         uk: "Китайська, чоловічий голос 2",
         hi: "चीनी, पुरुष आवाज़ 2",
+        es: "Chino, voz masculina 2",
       },
     },
     {
@@ -117,6 +125,7 @@ const KOKORO_VOICE_OPTIONS: Record<
         de: "Chinesisch, männlich 3",
         uk: "Китайська, чоловічий голос 3",
         hi: "चीनी, पुरुष आवाज़ 3",
+        es: "Chino, voz masculina 3",
       },
     },
   ],

@@ -10,13 +10,14 @@ import { useFonts } from "expo-font";
 
 import { useLocalization } from "../i18n";
 import { useTheme } from "../theme/ThemeContext";
+import type { AppLanguage } from "../types";
 import { createAntTheme } from "./antTheme";
 
 type AntLocale = NonNullable<
   React.ComponentProps<typeof AntProvider>["locale"]
 >;
 
-const antLocales: Record<"en" | "de" | "uk" | "hi", AntLocale> = {
+const antLocales: Record<AppLanguage, AntLocale> = {
   en: {
     locale: "en",
     Modal: {
@@ -79,6 +80,22 @@ const antLocales: Record<"en" | "de" | "uk" | "hi", AntLocale> = {
     },
     SearchBar: {
       cancelText: "रद्द करें",
+    },
+  },
+  es: {
+    locale: "es",
+    Modal: {
+      okText: "Aceptar",
+      cancelText: "Cancelar",
+      buttonText: "Botón",
+    },
+    Picker: {
+      okText: "Aceptar",
+      dismissText: "Cancelar",
+      extra: "Seleccionar",
+    },
+    SearchBar: {
+      cancelText: "Cancelar",
     },
   },
 };

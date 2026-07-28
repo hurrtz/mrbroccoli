@@ -33,6 +33,18 @@ const HINDI_EFFORT_LABELS: Record<string, string> = {
   disabled: "बंद",
   enabled: "चालू",
 };
+const SPANISH_EFFORT_LABELS: Record<string, string> = {
+  none: "Ninguno",
+  minimal: "Mínimo",
+  low: "Bajo",
+  medium: "Medio",
+  high: "Alto",
+  xhigh: "Muy alto",
+  max: "Máximo",
+  dynamic: "Dinámico",
+  disabled: "Desactivado",
+  enabled: "Activado",
+};
 
 export function getModelEffortConfig(
   provider: Provider,
@@ -142,6 +154,9 @@ export function getModelEffortOptionLabel(
   }
   if (language === "hi") {
     return HINDI_EFFORT_LABELS[option.id] ?? option.label;
+  }
+  if (language === "es") {
+    return SPANISH_EFFORT_LABELS[option.id] ?? option.label;
   }
   return option.label;
 }
