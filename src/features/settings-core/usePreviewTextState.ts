@@ -37,25 +37,27 @@ export function usePreviewTextState(params: {
   const [providerPreviewTexts, setProviderPreviewTexts] =
     useState<ProviderPreviewTexts>(() => buildProviderPreviewTexts(settings));
   const [nativePreviewText, setNativePreviewText] = useState(() =>
-    getNativePreviewSampleText(language),
+    getNativePreviewSampleText(settings.ttsListenLanguages[0] ?? "en"),
   );
   const [kokoroPreviewTexts, setKokoroPreviewTexts] = useState<
     Record<KokoroLanguage, string>
   >(() => ({
     en: getProviderPreviewSampleText("en"),
-    zh: getProviderPreviewSampleText("zh"),
+    zh: getProviderPreviewSampleText("zh-CN"),
   }));
 
   useEffect(() => {
-    const localizedSample = getNativePreviewSampleText(language);
+    const previewLanguage = settings.ttsListenLanguages[0] ?? "en";
+    const localizedSample = getNativePreviewSampleText(previewLanguage);
 
     setNativePreviewText((previous) =>
-      previous === getNativePreviewSampleText("en") ||
-      previous === getNativePreviewSampleText("de")
+      TTS_LISTEN_LANGUAGE_OPTIONS.some(
+        (candidate) => previous === getNativePreviewSampleText(candidate),
+      )
         ? localizedSample
         : previous,
     );
-  }, [language]);
+  }, [settings.ttsListenLanguages]);
 
   const setProviderPreviewText = useCallback(
     (provider: Provider, previewLanguage: TtsListenLanguage, text: string) => {

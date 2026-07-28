@@ -14,6 +14,7 @@ import {
 import {
   DEFAULT_KOKORO_VOICES,
   KOKORO_TTS_TARGET_CHUNK_CHARS,
+  getTtsListenLanguageForKokoro,
   resolveKokoroLanguage,
 } from "../constants/kokoro";
 import { synthesizeKokoroSpeech } from "./kokoroTts";
@@ -198,7 +199,7 @@ export async function synthesizeSpeech(params: {
         provider: null,
         providerModel: null,
         voice: result.voice,
-        language: result.language,
+        language: getTtsListenLanguageForKokoro(result.language),
         textLength: text.trim().length,
       });
       return result.fileUri;

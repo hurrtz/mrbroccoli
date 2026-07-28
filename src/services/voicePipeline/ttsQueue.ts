@@ -2,6 +2,7 @@ import {
   DEFAULT_KOKORO_VOICES,
   KOKORO_TTS_TARGET_CHUNK_CHARS,
   getKokoroVoiceConfig,
+  getTtsListenLanguageForKokoro,
   resolveKokoroLanguage,
 } from "../../constants/kokoro";
 import type {
@@ -198,7 +199,10 @@ export function createVoicePipelineTtsQueue({
       mode: route,
       provider: route === "provider" ? (ttsProvider ?? null) : null,
       providerModel: route === "provider" ? (ttsModel || null) : null,
-      language: kokoroLanguage ?? ttsListenLanguages?.[0] ?? "app",
+      language:
+        (kokoroLanguage
+          ? getTtsListenLanguageForKokoro(kokoroLanguage)
+          : ttsListenLanguages?.[0]) ?? "app",
       voice:
         route === "provider"
           ? ttsVoice || null

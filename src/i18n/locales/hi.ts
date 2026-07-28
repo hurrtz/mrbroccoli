@@ -50,6 +50,10 @@ export const hi = {
   settingsOpenSection: ({ section }) => `${section} खोलें`,
   theme: "थीम",
   language: "भाषा",
+  recognitionLanguage: "पहचान की भाषा",
+  recognitionLanguageHint:
+    "बेहतर पहचान के लिए भाषा चुनें, या डिवाइस अथवा प्रदाता को अपने आप पहचानने दें।",
+  automaticLanguage: "स्वचालित",
   usageStats: "उपयोग आँकड़े",
   model: "मॉडल",
   effort: "सोचने का स्तर",

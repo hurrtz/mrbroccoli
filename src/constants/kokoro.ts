@@ -15,7 +15,7 @@ export const KOKORO_TTS_TARGET_CHUNK_CHARS = 240;
 
 const KOKORO_SUPPORTED_LANGUAGES = [
   "en",
-  "zh",
+  "zh-CN",
 ] as const satisfies readonly TtsListenLanguage[];
 
 type KokoroVoiceOption = {
@@ -96,8 +96,26 @@ export const DEFAULT_KOKORO_VOICES: KokoroVoiceSelections = {
 
 export function isKokoroLanguage(
   language: TtsListenLanguage,
-): language is KokoroLanguage {
-  return KOKORO_SUPPORTED_LANGUAGES.includes(language as KokoroLanguage);
+): boolean {
+  return KOKORO_SUPPORTED_LANGUAGES.includes(
+    language as (typeof KOKORO_SUPPORTED_LANGUAGES)[number],
+  );
+}
+
+export function getKokoroLanguage(
+  language: TtsListenLanguage,
+): KokoroLanguage | null {
+  if (language === "en") {
+    return "en";
+  }
+
+  return language === "zh-CN" ? "zh" : null;
+}
+
+export function getTtsListenLanguageForKokoro(
+  language: KokoroLanguage,
+): TtsListenLanguage {
+  return language === "zh" ? "zh-CN" : "en";
 }
 
 export function getKokoroVoiceOptions(
@@ -162,7 +180,7 @@ export function resolveKokoroLanguage(params: {
     params.text,
   );
 
-  if (containsHanCharacters && listenLanguages.includes("zh")) {
+  if (containsHanCharacters && listenLanguages.includes("zh-CN")) {
     return "zh";
   }
 
@@ -170,5 +188,5 @@ export function resolveKokoroLanguage(params: {
     return "en";
   }
 
-  return listenLanguages.includes("zh") ? "zh" : null;
+  return listenLanguages.includes("zh-CN") ? "zh" : null;
 }

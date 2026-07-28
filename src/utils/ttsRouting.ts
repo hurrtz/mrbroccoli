@@ -1,4 +1,5 @@
 import { AppLanguage, TtsListenLanguage } from "../types";
+import { getDefaultTtsListenLanguageForLocale } from "../i18n/localeRegistry";
 
 function detectScriptLanguage(text: string): TtsListenLanguage | null {
   if (/[\u3040-\u30ff]/.test(text)) {
@@ -10,7 +11,19 @@ function detectScriptLanguage(text: string): TtsListenLanguage | null {
   }
 
   if (/[\u4e00-\u9fff]/.test(text)) {
-    return "zh";
+    return "zh-CN";
+  }
+
+  if (/[\u0600-\u06ff]/.test(text)) {
+    return "ar";
+  }
+
+  if (/[іїєґ]/iu.test(text)) {
+    return "uk";
+  }
+
+  if (/[ыэъё]/iu.test(text)) {
+    return "ru";
   }
 
   return null;
@@ -34,7 +47,7 @@ const LANGUAGE_HEURISTICS: Record<
   en: {
     tokens: [" the ", " and ", " you ", " is ", " are ", " this "],
   },
-  zh: {
+  "zh-CN": {
     marker: /[\u4e00-\u9fff]/,
     markerScore: 2,
     tokens: ["的", "了", "是", "我", "你", "不"],
@@ -68,6 +81,20 @@ const LANGUAGE_HEURISTICS: Record<
       " para ",
     ],
   },
+  "pt-BR": {
+    marker: /[ãõçáéíóú]/i,
+    markerScore: 2,
+    tokens: [
+      " você ",
+      " vocês ",
+      " ônibus ",
+      " legal ",
+      " que ",
+      " de ",
+      " uma ",
+      " para ",
+    ],
+  },
   fr: {
     marker: /[àâçéèêëîïôùûüÿœæ]/i,
     markerScore: 2,
@@ -78,13 +105,28 @@ const LANGUAGE_HEURISTICS: Record<
     markerScore: 1,
     tokens: [" il ", " che ", " non ", " una ", " per ", " con "],
   },
+  uk: {
+    marker: /[іїєґ]/iu,
+    markerScore: 4,
+    tokens: [" і ", " та ", " що ", " це ", " не ", " для "],
+  },
+  ru: {
+    marker: /[ыэъё]/iu,
+    markerScore: 4,
+    tokens: [" и ", " что ", " это ", " не ", " для ", " как "],
+  },
+  ar: {
+    marker: /[\u0600-\u06ff]/u,
+    markerScore: 3,
+    tokens: [" في ", " من ", " على ", " هذا ", " التي ", " لا "],
+  },
 };
 
 function scoreLanguage(text: string, language: TtsListenLanguage) {
   const normalized = ` ${text.toLowerCase()} `;
   const heuristic = LANGUAGE_HEURISTICS[language];
   const tokenSource =
-    language === "zh" || language === "ja" ? text : normalized;
+    language === "zh-CN" || language === "ja" ? text : normalized;
   const markerScore =
     heuristic.marker?.test(text) ? (heuristic.markerScore ?? 0) : 0;
   return heuristic.tokens.reduce(
@@ -99,7 +141,7 @@ export function resolveTtsListenLanguage(params: {
   appLanguage: AppLanguage;
 }) {
   const appVoiceLanguage: TtsListenLanguage =
-    params.appLanguage === "de" ? "de" : "en";
+    getDefaultTtsListenLanguageForLocale(params.appLanguage);
   const preferredLanguages =
     params.preferredLanguages && params.preferredLanguages.length > 0
       ? params.preferredLanguages

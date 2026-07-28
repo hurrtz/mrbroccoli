@@ -136,8 +136,14 @@ export function useVoicePreviewState(params: {
       text: nativePreviewText,
       mode: "native",
       nativeVoice: selectedNativeVoice || undefined,
+      previewLanguage: settings.ttsListenLanguages[0] ?? "en",
     });
-  }, [handleExactPreview, nativePreviewText, selectedNativeVoice]);
+  }, [
+    handleExactPreview,
+    nativePreviewText,
+    selectedNativeVoice,
+    settings.ttsListenLanguages,
+  ]);
 
   const handlePreviewKokoroVoice = useCallback(
     async (previewLanguage: KokoroLanguage) => {

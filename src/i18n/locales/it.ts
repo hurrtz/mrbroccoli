@@ -50,6 +50,10 @@ export const it = {
   settingsOpenSection: ({ section }) => `Apri ${section}`,
   theme: "Tema",
   language: "Lingua",
+  recognitionLanguage: "Lingua di riconoscimento",
+  recognitionLanguageHint:
+    "Scegli una lingua per migliorare il riconoscimento oppure lascia che il dispositivo o il fornitore la rilevi automaticamente.",
+  automaticLanguage: "Automatica",
   usageStats: "Statistiche di utilizzo",
   model: "Modello",
   effort: "Sforzo",

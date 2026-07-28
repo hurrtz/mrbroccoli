@@ -20,6 +20,11 @@ import {
   isDefaultAssistantInstructions,
 } from "../../types";
 import { isAppLanguage } from "../../i18n/localeRegistry";
+import {
+  SPEECH_LANGUAGE_OPTIONS,
+  normalizeSpeechLanguage,
+  normalizeSttLanguage,
+} from "../../constants/speechLanguages";
 import type { LegacyStoredSettings } from "./types";
 
 function isAllowedValue<T extends string>(
@@ -68,18 +73,6 @@ const RESPONSE_TONES = [
   "socratic",
   "eli5",
 ] as const satisfies readonly AssistantResponseTone[];
-const TTS_LISTEN_LANGUAGES = [
-  "en",
-  "de",
-  "zh",
-  "es",
-  "pt",
-  "hi",
-  "fr",
-  "it",
-  "ja",
-] as const satisfies readonly TtsListenLanguage[];
-
 function getStoredBoolean(value: unknown, fallback: boolean) {
   return typeof value === "boolean" ? value : fallback;
 }
@@ -101,9 +94,12 @@ function getStoredTtsListenLanguages(
 
   const languages = Array.from(
     new Set(
-      value.filter((candidate): candidate is TtsListenLanguage =>
-        isAllowedValue(candidate, TTS_LISTEN_LANGUAGES),
-      ),
+      value
+        .map(normalizeSpeechLanguage)
+        .filter((candidate): candidate is TtsListenLanguage =>
+          candidate !== null &&
+          SPEECH_LANGUAGE_OPTIONS.includes(candidate),
+        ),
     ),
   );
 
@@ -122,6 +118,7 @@ export function normalizeStoredScalarSettings(
   | "language"
   | "theme"
   | "sttMode"
+  | "sttLanguage"
   | "lastProvider"
   | "responseLength"
   | "responseTone"
@@ -178,6 +175,10 @@ export function normalizeStoredScalarSettings(
       storedSettings?.sttMode,
       STT_MODES,
       DEFAULT_SETTINGS.sttMode,
+    ),
+    sttLanguage: normalizeSttLanguage(
+      storedSettings?.sttLanguage,
+      DEFAULT_SETTINGS.sttLanguage,
     ),
     lastProvider: getStoredProvider(
       storedSettings?.lastProvider,

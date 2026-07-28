@@ -50,6 +50,10 @@ export const zhCN = {
   settingsOpenSection: ({ section }) => `打开${section}`,
   theme: "主题",
   language: "语言",
+  recognitionLanguage: "识别语言",
+  recognitionLanguageHint:
+    "选择语言以提高识别准确度，或让设备或提供商自动检测。",
+  automaticLanguage: "自动",
   usageStats: "使用统计",
   model: "模型",
   effort: "努力",

@@ -10,6 +10,7 @@ import {
   VoicePreviewRequest,
 } from "../../types";
 import { PROVIDER_DEFAULT_TTS_MODELS } from "../../constants/models";
+import { getTtsListenLanguageForKokoro } from "../../constants/kokoro";
 
 import { ShowToastFn, TranslateFn } from "./shared";
 
@@ -136,7 +137,9 @@ export function usePreviewVoiceController({
             voice: request.voice,
             mode: "kokoro",
             language,
-            listenLanguages: [request.language],
+            listenLanguages: [
+              getTtsListenLanguageForKokoro(request.language),
+            ],
             diagnostics: kokoroSpeechDiagnostics,
             abortSignal: previewAbortController.signal,
           });

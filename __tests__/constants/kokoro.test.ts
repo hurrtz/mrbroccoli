@@ -12,13 +12,13 @@ describe("Kokoro configuration", () => {
     expect(
       resolveKokoroLanguage({
         text: "A natural local voice.",
-        listenLanguages: ["en", "zh"],
+        listenLanguages: ["en", "zh-CN"],
       }),
     ).toBe("en");
     expect(
       resolveKokoroLanguage({
         text: "你好，欢迎回来。",
-        listenLanguages: ["en", "zh"],
+        listenLanguages: ["en", "zh-CN"],
       }),
     ).toBe("zh");
   });

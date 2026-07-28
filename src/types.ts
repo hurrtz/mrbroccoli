@@ -17,6 +17,10 @@ import {
   type WebSearchProviderSettings,
 } from "./constants/webSearch";
 import type { RuntimeAppProviderId } from "./constants/providers/runtimeManifest";
+import type {
+  SpeechLanguage,
+  SttLanguage,
+} from "./constants/speechLanguages";
 import { DEFAULT_KOKORO_VOICES } from "./constants/kokoro";
 import { DEFAULT_TTS_FALLBACK_POLICY } from "./constants/ttsFallback";
 import {
@@ -27,6 +31,10 @@ import {
 import type { AppLanguage } from "./i18n/localeRegistry";
 
 export type { AppLanguage } from "./i18n/localeRegistry";
+export type {
+  SpeechLanguage,
+  SttLanguage,
+} from "./constants/speechLanguages";
 
 export type Provider = RuntimeAppProviderId;
 export type InputMode =
@@ -38,16 +46,7 @@ export type TtsPlayback = ReplyPlayback;
 export type ThemeMode = "light" | "dark" | "system";
 export type ToastTone = "info" | "success" | "danger";
 export type ResponseMode = string;
-export type TtsListenLanguage =
-  | "en"
-  | "de"
-  | "zh"
-  | "es"
-  | "pt"
-  | "hi"
-  | "fr"
-  | "it"
-  | "ja";
+export type TtsListenLanguage = SpeechLanguage;
 export type SttBackendMode = "native" | "provider";
 export type TtsBackendMode = "native" | "kokoro" | "provider";
 export type ProviderTtsFallbackRoute = "kokoro" | "native";
@@ -108,6 +107,7 @@ export type VoicePreviewRequest =
       text: string;
       mode: "native";
       nativeVoice?: string;
+      previewLanguage: TtsListenLanguage;
     }
   | {
       text: string;
@@ -173,6 +173,7 @@ export interface Settings {
   showSetupGuideShortcut: boolean;
   lastProvider: Provider;
   sttMode: SttBackendMode;
+  sttLanguage: SttLanguage;
   sttProvider: Provider | null;
   ttsMode: TtsBackendMode;
   ttsProvider: Provider | null;
@@ -394,6 +395,7 @@ export const DEFAULT_SETTINGS: Settings = {
   showSetupGuideShortcut: true,
   lastProvider: DEFAULT_RUNTIME_PROVIDER_ID,
   sttMode: "native",
+  sttLanguage: "auto",
   sttProvider: null,
   ttsMode: "native",
   ttsProvider: null,

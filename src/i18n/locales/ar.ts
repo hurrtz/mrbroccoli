@@ -50,6 +50,10 @@ export const ar = {
   settingsOpenSection: ({ section }) => `افتح ${section}`,
   theme: "سمة",
   language: "لغة",
+  recognitionLanguage: "لغة التعرّف",
+  recognitionLanguageHint:
+    "اختر لغة لتحسين التعرّف، أو اترك للجهاز أو المزوّد اكتشافها تلقائياً.",
+  automaticLanguage: "تلقائي",
   usageStats: "إحصائيات الاستخدام",
   model: "نموذج",
   effort: "جهد",

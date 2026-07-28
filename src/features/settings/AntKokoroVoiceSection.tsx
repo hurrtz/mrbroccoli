@@ -8,6 +8,7 @@ import {
   KOKORO_MODEL_DOWNLOAD_BYTES,
   KOKORO_MODEL_INSTALLED_BYTES,
   getKokoroVoiceOptions,
+  getTtsListenLanguageForKokoro,
 } from "../../constants/kokoro";
 import { getTtsListenLanguageLabel } from "../../constants/localTts";
 import { antButtonTypography } from "../../design-system/antTypography";
@@ -64,7 +65,9 @@ export function AntKokoroVoiceSection({
   const downloadSize = Math.round(KOKORO_MODEL_DOWNLOAD_BYTES / 1024 / 1024);
   const installedSize = Math.round(KOKORO_MODEL_INSTALLED_BYTES / 1024 / 1024);
   const selectedKokoroLanguages = KOKORO_LANGUAGES.filter((language) =>
-    settings.ttsListenLanguages.includes(language),
+    settings.ttsListenLanguages.includes(
+      getTtsListenLanguageForKokoro(language),
+    ),
   );
   const unsupportedLanguageLabels = settings.ttsListenLanguages
     .filter(
@@ -212,7 +215,7 @@ export function AntKokoroVoiceSection({
         <View style={styles.kokoroVoiceCards}>
           {selectedKokoroLanguages.map((previewLanguage) => {
             const languageLabel = getTtsListenLanguageLabel(
-              previewLanguage,
+              getTtsListenLanguageForKokoro(previewLanguage),
               appLanguage,
             );
             const voiceOptions = getKokoroVoiceOptions(

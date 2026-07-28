@@ -50,6 +50,10 @@ export const ptBR = {
   settingsOpenSection: ({ section }) => `Abra ${section}`,
   theme: "Tema",
   language: "Linguagem",
+  recognitionLanguage: "Idioma de reconhecimento",
+  recognitionLanguageHint:
+    "Escolha um idioma para melhorar o reconhecimento ou deixe o dispositivo ou provedor detectá-lo automaticamente.",
+  automaticLanguage: "Automático",
   usageStats: "Estatísticas de uso",
   model: "Modelo",
   effort: "Esforço",

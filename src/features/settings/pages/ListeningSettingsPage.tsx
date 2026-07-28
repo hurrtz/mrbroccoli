@@ -11,6 +11,8 @@ import type {
   SttBackendMode,
 } from "../../../types";
 import { buildProviderPickerOptions } from "../../settings-core/providerPickerOptions";
+import { SPEECH_LANGUAGE_OPTIONS } from "../../../constants/speechLanguages";
+import { getTtsListenLanguageLabel } from "../../../constants/localTts";
 
 import {
   AntPickerRow,
@@ -75,6 +77,26 @@ export function ListeningSettingsPage({
         value={settings.inputMode}
         onChange={(value) => onUpdate({ inputMode: value })}
       />
+
+      <AntPickerSection
+        title={t("recognitionLanguage")}
+        helperText={t("recognitionLanguageHint")}
+      >
+        <AntPickerRow
+          testID="stt-language-picker"
+          value={settings.sttLanguage}
+          options={[
+            { value: "auto", label: t("automaticLanguage") },
+            ...SPEECH_LANGUAGE_OPTIONS.map((value) => ({
+              value,
+              label: getTtsListenLanguageLabel(value, settings.language),
+            })),
+          ]}
+          onChange={(value) =>
+            onUpdate({ sttLanguage: value as Settings["sttLanguage"] })
+          }
+        />
+      </AntPickerSection>
 
       <AntRadioSection<SttBackendMode>
         label={t("speechToText")}

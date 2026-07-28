@@ -56,6 +56,10 @@ export const uk = {
   settingsOpenSection: ({ section }) => `Відкрити розділ «${section}»`,
   theme: "Тема",
   language: "Мова",
+  recognitionLanguage: "Мова розпізнавання",
+  recognitionLanguageHint:
+    "Виберіть мову для точнішого розпізнавання або залиште автоматичне визначення пристроєм чи провайдером.",
+  automaticLanguage: "Автоматично",
   usageStats: "Статистика використання",
   model: "Модель",
   effort: "Рівень міркування",

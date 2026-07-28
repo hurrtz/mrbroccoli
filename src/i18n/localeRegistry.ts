@@ -11,6 +11,7 @@ import { ru } from "./locales/ru";
 import { uk } from "./locales/uk";
 import { zhCN } from "./locales/zhCN";
 import type { TranslationDictionary } from "./types";
+import type { SpeechLanguage } from "../constants/speechLanguages";
 
 export type AppTextDirection = "ltr" | "rtl";
 
@@ -38,7 +39,7 @@ export interface AppLocaleDefinition {
   antDesign: AntDesignLocaleCopy;
   defaultContentLanguage: "en" | "de";
   defaultAssistantInstructions: string;
-  defaultTtsListenLanguage: "en" | "de";
+  defaultTtsListenLanguage: SpeechLanguage;
 }
 
 const DEFAULT_ENGLISH_ASSISTANT_INSTRUCTIONS =
@@ -114,6 +115,7 @@ export const APP_LOCALES = {
       picker: { ok: "Гаразд", cancel: "Скасувати", select: "Вибрати" },
       search: { cancel: "Скасувати" },
     },
+    defaultTtsListenLanguage: "uk",
   }),
   hi: defineAppLocale({
     nativeName: "हिन्दी",
@@ -124,6 +126,7 @@ export const APP_LOCALES = {
       picker: { ok: "ठीक है", cancel: "रद्द करें", select: "चुनें" },
       search: { cancel: "रद्द करें" },
     },
+    defaultTtsListenLanguage: "hi",
   }),
   es: defineAppLocale({
     nativeName: "Español",
@@ -134,6 +137,7 @@ export const APP_LOCALES = {
       picker: { ok: "Aceptar", cancel: "Cancelar", select: "Seleccionar" },
       search: { cancel: "Cancelar" },
     },
+    defaultTtsListenLanguage: "es",
   }),
   fr: defineAppLocale({
     nativeName: "Français",
@@ -144,6 +148,7 @@ export const APP_LOCALES = {
       picker: { ok: "OK", cancel: "Annuler", select: "Sélectionner" },
       search: { cancel: "Annuler" },
     },
+    defaultTtsListenLanguage: "fr",
   }),
   it: defineAppLocale({
     nativeName: "Italiano",
@@ -154,6 +159,7 @@ export const APP_LOCALES = {
       picker: { ok: "OK", cancel: "Annulla", select: "Seleziona" },
       search: { cancel: "Annulla" },
     },
+    defaultTtsListenLanguage: "it",
   }),
   pt: defineAppLocale({
     nativeName: "Português",
@@ -164,6 +170,7 @@ export const APP_LOCALES = {
       picker: { ok: "OK", cancel: "Cancelar", select: "Selecionar" },
       search: { cancel: "Cancelar" },
     },
+    defaultTtsListenLanguage: "pt",
   }),
   "pt-BR": defineAppLocale({
     nativeName: "Português (Brasil)",
@@ -174,6 +181,7 @@ export const APP_LOCALES = {
       picker: { ok: "OK", cancel: "Cancelar", select: "Selecionar" },
       search: { cancel: "Cancelar" },
     },
+    defaultTtsListenLanguage: "pt-BR",
   }),
   ru: defineAppLocale({
     nativeName: "Русский",
@@ -184,6 +192,7 @@ export const APP_LOCALES = {
       picker: { ok: "ОК", cancel: "Отмена", select: "Выбрать" },
       search: { cancel: "Отмена" },
     },
+    defaultTtsListenLanguage: "ru",
   }),
   "zh-CN": defineAppLocale({
     nativeName: "简体中文",
@@ -194,6 +203,7 @@ export const APP_LOCALES = {
       picker: { ok: "确定", cancel: "取消", select: "请选择" },
       search: { cancel: "取消" },
     },
+    defaultTtsListenLanguage: "zh-CN",
   }),
   ar: defineAppLocale({
     nativeName: "العربية",
@@ -205,6 +215,7 @@ export const APP_LOCALES = {
       picker: { ok: "موافق", cancel: "إلغاء", select: "اختر" },
       search: { cancel: "إلغاء" },
     },
+    defaultTtsListenLanguage: "ar",
   }),
 } as const;
 

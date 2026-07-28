@@ -52,6 +52,10 @@ export const de = {
   settingsOpenSection: ({ section }) => `${section} öffnen`,
   theme: "Design",
   language: "Sprache",
+  recognitionLanguage: "Erkennungssprache",
+  recognitionLanguageHint:
+    "Wähle eine Sprache für eine bessere Erkennung oder lasse die Geräte- beziehungsweise Anbietererkennung automatisch arbeiten.",
+  automaticLanguage: "Automatisch",
   usageStats: "Nutzungsdaten",
   model: "Modell",
   effort: "Aufwand",

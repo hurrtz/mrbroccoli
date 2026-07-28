@@ -95,6 +95,7 @@ describe("useSettings", () => {
       language: "unknown-language",
       theme: "unknown-theme",
       sttMode: "unknown-stt",
+      sttLanguage: "unknown-speech-language",
       lastProvider: "unknown-provider",
       responseLength: "unknown-length",
       responseTone: "unknown-tone",
@@ -117,6 +118,7 @@ describe("useSettings", () => {
       language: DEFAULT_SETTINGS.language,
       theme: DEFAULT_SETTINGS.theme,
       sttMode: DEFAULT_SETTINGS.sttMode,
+      sttLanguage: DEFAULT_SETTINGS.sttLanguage,
       lastProvider: DEFAULT_SETTINGS.lastProvider,
       responseLength: DEFAULT_SETTINGS.responseLength,
       responseTone: DEFAULT_SETTINGS.responseTone,
@@ -690,7 +692,7 @@ describe("useSettings", () => {
     },
   );
 
-  it("keeps UI-only Arabic on English speech defaults", async () => {
+  it("keeps recognition automatic while adopting the Arabic speech default", async () => {
     const { result } = renderHook(() => useSettings());
     await flushSettingsLoad();
 
@@ -702,7 +704,24 @@ describe("useSettings", () => {
     expect(result.current.settings.assistantInstructions).toBe(
       DEFAULT_ASSISTANT_INSTRUCTIONS_BY_LANGUAGE.en,
     );
-    expect(result.current.settings.ttsListenLanguages).toEqual(["en"]);
+    expect(result.current.settings.sttLanguage).toBe("auto");
+    expect(result.current.settings.ttsListenLanguages).toEqual(["ar"]);
+  });
+
+  it("migrates the legacy Chinese speech language ID", async () => {
+    (AsyncStorage.getItem as jest.Mock).mockResolvedValueOnce(
+      JSON.stringify({
+        ...DEFAULT_SETTINGS,
+        sttLanguage: "zh",
+        ttsListenLanguages: ["zh"],
+      }),
+    );
+
+    const { result } = renderHook(() => useSettings());
+    await flushSettingsLoad();
+
+    expect(result.current.settings.sttLanguage).toBe("zh-CN");
+    expect(result.current.settings.ttsListenLanguages).toEqual(["zh-CN"]);
   });
 
   it("does not overwrite custom assistant instructions on language change", async () => {
