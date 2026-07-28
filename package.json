@@ -7,6 +7,7 @@
     "android": "expo run:android",
     "ios": "expo run:ios",
     "config:verify": "node scripts/verify-native-config-sync.mjs",
+    "version:bump": "node scripts/bump-version.mjs",
     "pretest": "npm run config:verify",
     "test": "jest",
     "typecheck": "tsc --noEmit",

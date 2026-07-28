@@ -6,6 +6,8 @@ const root = process.cwd();
 const readText = (path) => readFileSync(resolve(root, path), "utf8");
 const readBytes = (path) => readFileSync(resolve(root, path));
 const appConfig = JSON.parse(readText("app.json")).expo;
+const packageJson = JSON.parse(readText("package.json"));
+const packageLock = JSON.parse(readText("package-lock.json"));
 const iosInfo = readText("ios/MrBroccoli/Info.plist");
 const iosProject = readText("ios/MrBroccoli.xcodeproj/project.pbxproj");
 const androidBuild = readText("android/app/build.gradle");
@@ -41,6 +43,21 @@ function assertEqual(label, actual, expected) {
   }
 }
 
+function assertAllEqual(label, actual, expected) {
+  checkCount += 1;
+  if (actual.length === 0) {
+    failures.push(`${label}: no values found`);
+    return;
+  }
+
+  const mismatches = actual.filter((value) => value !== expected);
+  if (mismatches.length > 0) {
+    failures.push(
+      `${label}: expected every value to be ${JSON.stringify(expected)}, received ${JSON.stringify(actual)}`,
+    );
+  }
+}
+
 function sha256(bytes) {
   return createHash("sha256").update(bytes).digest("hex");
 }
@@ -57,7 +74,17 @@ const adaptiveBackgroundPath =
   appConfig.android?.adaptiveIcon?.backgroundImage?.replace(/^\.\//, "");
 const adaptiveMonochromePath =
   appConfig.android?.adaptiveIcon?.monochromeImage?.replace(/^\.\//, "");
+const iosMarketingVersions = [
+  ...iosProject.matchAll(/MARKETING_VERSION = ([^;]+);/g),
+].map((match) => match[1]);
 
+assertEqual("package.json version", packageJson.version, appConfig.version);
+assertEqual("package-lock.json version", packageLock.version, appConfig.version);
+assertEqual(
+  'package-lock.json packages[""] version',
+  packageLock.packages?.[""]?.version,
+  appConfig.version,
+);
 assertEqual(
   "supported platforms",
   JSON.stringify(appConfig.platforms),
@@ -99,10 +126,10 @@ assertIncludes(
   androidBuild,
   `applicationId '${androidPackage}'`,
 );
-assertIncludes(
+assertAllEqual(
   "iOS marketing version",
-  iosProject,
-  `MARKETING_VERSION = ${appConfig.version};`,
+  iosMarketingVersions,
+  appConfig.version,
 );
 assertIncludes(
   "iOS short version",
