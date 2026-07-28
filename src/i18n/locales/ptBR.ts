@@ -1,6 +1,6 @@
 import type { TranslationDictionary } from "../types";
 
-export const ptBR: TranslationDictionary = {
+export const ptBR = {
   appName: "Sr. Brócolis",
   retry: "Tentar novamente",
   dismiss: "Fechar",
@@ -54,6 +54,16 @@ export const ptBR: TranslationDictionary = {
   model: "Modelo",
   effort: "Esforço",
   effortValue: ({ effort }) => `Esforço: ${effort}`,
+  modelEffortNone: "Nenhum",
+  modelEffortMinimal: "Mínimo",
+  modelEffortLow: "Baixo",
+  modelEffortMedium: "Médio",
+  modelEffortHigh: "Alto",
+  modelEffortExtraHigh: "Muito alto",
+  modelEffortMax: "Máximo",
+  modelEffortDynamic: "Dinâmico",
+  modelEffortDisabled: "Desativado",
+  modelEffortEnabled: "Ativado",
   fixed: "Fixo",
   english: "Inglês",
   german: "Alemão",
@@ -67,11 +77,19 @@ export const ptBR: TranslationDictionary = {
   russian: "Russo",
   simplifiedChinese: "Chinês simplificado",
   arabic: "Árabe",
+  japanese: "Japonês",
+  kokoroAmericanFemaleVoice: ({ name }) =>
+    `${name} · inglês americano, voz feminina`,
+  kokoroBritishFemaleVoice: ({ name }) =>
+    `${name} · inglês britânico, voz feminina`,
+  kokoroChineseFemaleVoice: ({ index }) => `Chinês, voz feminina ${index}`,
+  kokoroChineseMaleVoice: ({ index }) => `Chinês, voz masculina ${index}`,
   light: "Claro",
   dark: "Escuro",
   system: "Sistema",
   languageCoverage: ({ note }) => `Cobertura de idioma: ${note}`,
   recordingLimits: ({ note }) => `Limites de gravação: ${note}`,
+  catalogProviderPricingSummary: ({ summary }) => `Preços: ${summary}`,
   replyGenerationAction: "geração de resposta",
   speechTranscriptionAction: "transcrição de fala",
   instructionsTabDescription:
@@ -840,4 +858,4 @@ export const ptBR: TranslationDictionary = {
   couldntStartNativeSpeechRecognition:
     "Não foi possível iniciar o reconhecimento de fala nativa.",
   microphonePermissionNotGranted: "Permissão de microfone não concedida",
-};
+} satisfies TranslationDictionary;

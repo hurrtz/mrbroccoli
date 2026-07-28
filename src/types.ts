@@ -19,6 +19,14 @@ import {
 import type { RuntimeAppProviderId } from "./constants/providers/runtimeManifest";
 import { DEFAULT_KOKORO_VOICES } from "./constants/kokoro";
 import { DEFAULT_TTS_FALLBACK_POLICY } from "./constants/ttsFallback";
+import {
+  APP_LANGUAGES,
+  getDefaultAssistantInstructionsForLocale,
+  getDefaultTtsListenLanguageForLocale,
+} from "./i18n/localeRegistry";
+import type { AppLanguage } from "./i18n/localeRegistry";
+
+export type { AppLanguage } from "./i18n/localeRegistry";
 
 export type Provider = RuntimeAppProviderId;
 export type InputMode =
@@ -29,19 +37,6 @@ export type ReplyPlayback = "stream" | "wait";
 export type TtsPlayback = ReplyPlayback;
 export type ThemeMode = "light" | "dark" | "system";
 export type ToastTone = "info" | "success" | "danger";
-export type AppLanguage =
-  | "en"
-  | "de"
-  | "uk"
-  | "hi"
-  | "es"
-  | "fr"
-  | "it"
-  | "pt"
-  | "pt-BR"
-  | "ru"
-  | "zh-CN"
-  | "ar";
 export type ResponseMode = string;
 export type TtsListenLanguage =
   | "en"
@@ -345,28 +340,14 @@ export interface MessageMetadata {
   turnReceipt?: MessageTurnReceipt;
 }
 
-const DEFAULT_ENGLISH_ASSISTANT_INSTRUCTIONS =
-  "You are a voice assistant. The user is speaking to you and will hear your response read aloud. Respond naturally and conversationally as if talking. Never use markdown, bullet points, numbered lists, headers, or any formatting. Keep responses concise and spoken-friendly.";
-
-export const DEFAULT_ASSISTANT_INSTRUCTIONS_BY_LANGUAGE: Record<
-  AppLanguage,
-  string
-> = {
-  en: DEFAULT_ENGLISH_ASSISTANT_INSTRUCTIONS,
-  de: "Du bist ein Sprachassistent. Die Nutzerin oder der Nutzer spricht mit dir und wird deine Antwort vorgelesen bekommen. Antworte natürlich und gesprächsnah, als wärest du in einem echten Gespräch. Verwende niemals Markdown, Aufzählungen, nummerierte Listen, Überschriften oder sonstige Formatierung. Halte Antworten knapp und gut vorlesbar.",
-  // Ukrainian currently localizes the app UI only. Keep assistant behavior and
-  // speech-language defaults unchanged when the interface language changes.
-  uk: DEFAULT_ENGLISH_ASSISTANT_INSTRUCTIONS,
-  hi: DEFAULT_ENGLISH_ASSISTANT_INSTRUCTIONS,
-  es: DEFAULT_ENGLISH_ASSISTANT_INSTRUCTIONS,
-  fr: DEFAULT_ENGLISH_ASSISTANT_INSTRUCTIONS,
-  it: DEFAULT_ENGLISH_ASSISTANT_INSTRUCTIONS,
-  pt: DEFAULT_ENGLISH_ASSISTANT_INSTRUCTIONS,
-  "pt-BR": DEFAULT_ENGLISH_ASSISTANT_INSTRUCTIONS,
-  ru: DEFAULT_ENGLISH_ASSISTANT_INSTRUCTIONS,
-  "zh-CN": DEFAULT_ENGLISH_ASSISTANT_INSTRUCTIONS,
-  ar: DEFAULT_ENGLISH_ASSISTANT_INSTRUCTIONS,
-};
+export const DEFAULT_ASSISTANT_INSTRUCTIONS_BY_LANGUAGE = Object.freeze(
+  Object.fromEntries(
+    APP_LANGUAGES.map((language) => [
+      language,
+      getDefaultAssistantInstructionsForLocale(language),
+    ]),
+  ) as Record<AppLanguage, string>,
+);
 
 const LEGACY_DEFAULT_ASSISTANT_INSTRUCTIONS = [
   "Du bist ein Sprachassistent. Die Nutzerin oder der Nutzer spricht mit dir und wird deine Antwort vorgelesen bekommen. Antworte natuerlich und gespraechsnah, als waerest du in einem echten Gespraech. Verwende niemals Markdown, Aufzaehlungen, nummerierte Listen, Ueberschriften oder sonstige Formatierung. Halte Antworten knapp und gut vorlesbar.",
@@ -376,7 +357,7 @@ export const DEFAULT_ASSISTANT_INSTRUCTIONS =
   DEFAULT_ASSISTANT_INSTRUCTIONS_BY_LANGUAGE.en;
 
 export function getDefaultAssistantInstructions(language: AppLanguage) {
-  return DEFAULT_ASSISTANT_INSTRUCTIONS_BY_LANGUAGE[language];
+  return getDefaultAssistantInstructionsForLocale(language);
 }
 
 export function isDefaultAssistantInstructions(value: string) {
@@ -391,7 +372,7 @@ export function isDefaultAssistantInstructions(value: string) {
 export function getDefaultTtsListenLanguages(
   language: AppLanguage,
 ): TtsListenLanguage[] {
-  return [language === "en" || language === "de" ? language : "en"];
+  return [getDefaultTtsListenLanguageForLocale(language)];
 }
 
 export const DEFAULT_SETTINGS: Settings = {

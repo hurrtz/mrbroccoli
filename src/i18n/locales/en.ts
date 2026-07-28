@@ -1,6 +1,6 @@
-import type { TranslationDictionary } from "../types";
+import type { TranslationValue } from "../types";
 
-export const en: TranslationDictionary = {
+export const en = {
   appName: "Mr Broccoli",
   retry: "Retry",
   dismiss: "Dismiss",
@@ -54,6 +54,16 @@ export const en: TranslationDictionary = {
   model: "Model",
   effort: "Effort",
   effortValue: ({ effort }) => `Effort: ${effort}`,
+  modelEffortNone: "None",
+  modelEffortMinimal: "Minimal",
+  modelEffortLow: "Low",
+  modelEffortMedium: "Medium",
+  modelEffortHigh: "High",
+  modelEffortExtraHigh: "Extra high",
+  modelEffortMax: "Max",
+  modelEffortDynamic: "Dynamic",
+  modelEffortDisabled: "Disabled",
+  modelEffortEnabled: "Enabled",
   fixed: "Fixed",
   english: "English",
   german: "German",
@@ -67,11 +77,17 @@ export const en: TranslationDictionary = {
   russian: "Russian",
   simplifiedChinese: "Simplified Chinese",
   arabic: "Arabic",
+  japanese: "Japanese",
+  kokoroAmericanFemaleVoice: ({ name }) => `${name} · American female`,
+  kokoroBritishFemaleVoice: ({ name }) => `${name} · British female`,
+  kokoroChineseFemaleVoice: ({ index }) => `Chinese female ${index}`,
+  kokoroChineseMaleVoice: ({ index }) => `Chinese male ${index}`,
   light: "Light",
   dark: "Dark",
   system: "System",
   languageCoverage: ({ note }) => `Language coverage: ${note}`,
   recordingLimits: ({ note }) => `Recording limits: ${note}`,
+  catalogProviderPricingSummary: ({ summary }) => `Pricing: ${summary}`,
   replyGenerationAction: "reply generation",
   speechTranscriptionAction: "speech transcription",
   instructionsTabDescription:
@@ -840,4 +856,4 @@ export const en: TranslationDictionary = {
   couldntStartNativeSpeechRecognition:
     "Couldn't start native speech recognition.",
   microphonePermissionNotGranted: "Microphone permission not granted",
-};
+} as const satisfies Record<string, TranslationValue>;

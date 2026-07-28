@@ -1,11 +1,85 @@
+import fs from "node:fs";
+import path from "node:path";
+
 import { translations } from "../../src/i18n/translations";
 import { getLocaleForLanguage, translate } from "../../src/i18n";
+import {
+  APP_LANGUAGE_OPTIONS,
+  APP_LANGUAGES,
+  APP_LOCALES,
+  getAppLocale,
+  getLocalizedResource,
+  isAppLanguage,
+} from "../../src/i18n/localeRegistry";
 
 describe("translations", () => {
-  it("keeps all translation keys in sync", () => {
+  it("derives every public language collection from the locale registry", () => {
+    expect(Object.keys(APP_LOCALES)).toEqual(APP_LANGUAGES);
+    expect(Object.keys(translations)).toEqual(APP_LANGUAGES);
+    expect(APP_LANGUAGE_OPTIONS).toEqual(
+      APP_LANGUAGES.map((language) => ({
+        value: language,
+        label: APP_LOCALES[language].nativeName,
+      })),
+    );
+  });
+
+  it("registers every locale dictionary exactly once", () => {
+    const localeFiles = fs
+      .readdirSync(path.resolve(__dirname, "../../src/i18n/locales"))
+      .filter((fileName) => fileName.endsWith(".ts"));
+    const registeredDictionaries = APP_LANGUAGES.map(
+      (language) => APP_LOCALES[language].messages,
+    );
+
+    expect(localeFiles).toHaveLength(APP_LANGUAGES.length);
+    expect(new Set(registeredDictionaries).size).toBe(APP_LANGUAGES.length);
+  });
+
+  it("keeps all translation keys and value kinds in sync", () => {
     Object.values(translations).forEach((dictionary) => {
       expect(Object.keys(dictionary).sort()).toEqual(
         Object.keys(translations.en).sort(),
+      );
+
+      Object.entries(translations.en).forEach(([key, baseValue]) => {
+        const localizedValue =
+          dictionary[key as keyof typeof translations.en];
+        expect(typeof localizedValue).toBe(typeof baseValue);
+
+        if (typeof localizedValue === "string") {
+          expect(localizedValue.trim().length).toBeGreaterThan(0);
+        }
+      });
+    });
+  });
+
+  it("validates language IDs and falls back only for optional resources", () => {
+    APP_LANGUAGES.forEach((language) => {
+      expect(isAppLanguage(language)).toBe(true);
+      expect(getLocaleForLanguage(language)).toBe(
+        getAppLocale(language).intlLocale,
+      );
+    });
+    expect(isAppLanguage("not-a-language")).toBe(false);
+    expect(isAppLanguage(null)).toBe(false);
+    expect(getLocalizedResource({ en: "English", de: "Deutsch" }, "ar")).toBe(
+      "English",
+    );
+  });
+
+  it("renders formatter keys through the same exact dictionary contract", () => {
+    expect(
+      translate("en", "catalogProviderPricingSummary", {
+        summary: "$1 per request",
+      }),
+    ).toBe("Pricing: $1 per request");
+  });
+
+  it("keeps text direction in locale metadata", () => {
+    APP_LANGUAGES.forEach((language) => {
+      expect(getAppLocale(language).direction).toBe(
+        language === "ar" ? "rtl" : "ltr",
       );
     });
   });

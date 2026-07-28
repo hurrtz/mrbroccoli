@@ -5,6 +5,7 @@ import { streamChat } from "../../services/llm";
 import { synthesizeSpeech } from "../../services/tts";
 import { transcribeAudio } from "../../services/whisper";
 import type { Settings } from "../../types";
+import type { useLocalization } from "../../i18n";
 import { useAudioPlayer } from "../../hooks/useAudioPlayer";
 import { useAudioRecorder } from "../../hooks/useAudioRecorder";
 import { useNativeSpeechRecognizer } from "../../hooks/useNativeSpeechRecognizer";
@@ -98,10 +99,7 @@ export function useSetupGuideVoiceTest(params: {
   player: ReturnType<typeof useAudioPlayer>;
   recorder: ReturnType<typeof useAudioRecorder>;
   nativeStt: ReturnType<typeof useNativeSpeechRecognizer>;
-  t: (
-    key: string,
-    params?: Record<string, string | number | undefined>,
-  ) => string;
+  t: ReturnType<typeof useLocalization>["t"];
 }) {
   const {
     nativeStt,

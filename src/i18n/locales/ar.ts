@@ -1,6 +1,6 @@
 import type { TranslationDictionary } from "../types";
 
-export const ar: TranslationDictionary = {
+export const ar = {
   appName: "السيد بروكلي",
   retry: "أعد المحاولة",
   dismiss: "إغلاق",
@@ -54,6 +54,16 @@ export const ar: TranslationDictionary = {
   model: "نموذج",
   effort: "جهد",
   effortValue: ({ effort }) => `الجهد: ${effort}`,
+  modelEffortNone: "بلا",
+  modelEffortMinimal: "أدنى",
+  modelEffortLow: "منخفض",
+  modelEffortMedium: "متوسط",
+  modelEffortHigh: "مرتفع",
+  modelEffortExtraHigh: "مرتفع جدًا",
+  modelEffortMax: "أقصى",
+  modelEffortDynamic: "ديناميكي",
+  modelEffortDisabled: "متوقف",
+  modelEffortEnabled: "مفعّل",
   fixed: "مُثَبَّت",
   english: "إنجليزي",
   german: "الألمانية",
@@ -67,11 +77,19 @@ export const ar: TranslationDictionary = {
   russian: "الروسية",
   simplifiedChinese: "الصينية المبسطة",
   arabic: "العربية",
+  japanese: "اليابانية",
+  kokoroAmericanFemaleVoice: ({ name }) =>
+    `${name} · إنجليزية أمريكية، صوت أنثوي`,
+  kokoroBritishFemaleVoice: ({ name }) =>
+    `${name} · إنجليزية بريطانية، صوت أنثوي`,
+  kokoroChineseFemaleVoice: ({ index }) => `صينية، صوت أنثوي ${index}`,
+  kokoroChineseMaleVoice: ({ index }) => `صينية، صوت ذكوري ${index}`,
   light: "فاتح",
   dark: "داكن",
   system: "النظام",
   languageCoverage: ({ note }) => `التغطية اللغوية: ${note}`,
   recordingLimits: ({ note }) => `حدود التسجيل: ${note}`,
+  catalogProviderPricingSummary: ({ summary }) => `الأسعار: ${summary}`,
   replyGenerationAction: "جيل الرد",
   speechTranscriptionAction: "نسخ الكلام",
   instructionsTabDescription:
@@ -840,4 +858,4 @@ export const ar: TranslationDictionary = {
   couldntStartNativeSpeechRecognition:
     "تعذر بدء التعرف على الكلام الأصلي.",
   microphonePermissionNotGranted: "لم يتم منح إذن الميكروفون",
-};
+} satisfies TranslationDictionary;

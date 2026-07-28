@@ -1,6 +1,6 @@
 import type { TranslationDictionary } from "../types";
 
-export const ru: TranslationDictionary = {
+export const ru = {
   appName: "Мистер Брокколи",
   retry: "Повторить попытку",
   dismiss: "Закрыть",
@@ -54,6 +54,16 @@ export const ru: TranslationDictionary = {
   model: "Модель",
   effort: "Усилие",
   effortValue: ({ effort }) => `Усилие: ${effort}`,
+  modelEffortNone: "Нет",
+  modelEffortMinimal: "Минимальный",
+  modelEffortLow: "Низкий",
+  modelEffortMedium: "Средний",
+  modelEffortHigh: "Высокий",
+  modelEffortExtraHigh: "Очень высокий",
+  modelEffortMax: "Максимальный",
+  modelEffortDynamic: "Динамический",
+  modelEffortDisabled: "Выключено",
+  modelEffortEnabled: "Включено",
   fixed: "Зафиксированный",
   english: "Английский",
   german: "немецкий",
@@ -67,11 +77,20 @@ export const ru: TranslationDictionary = {
   russian: "Русский",
   simplifiedChinese: "Упрощённый китайский",
   arabic: "Арабский",
+  japanese: "Японский",
+  kokoroAmericanFemaleVoice: ({ name }) =>
+    `${name} · американский английский, женский голос`,
+  kokoroBritishFemaleVoice: ({ name }) =>
+    `${name} · британский английский, женский голос`,
+  kokoroChineseFemaleVoice: ({ index }) =>
+    `Китайский, женский голос ${index}`,
+  kokoroChineseMaleVoice: ({ index }) => `Китайский, мужской голос ${index}`,
   light: "Светлая",
   dark: "Тёмная",
   system: "Система",
   languageCoverage: ({ note }) => `Языковой охват: ${note}`,
   recordingLimits: ({ note }) => `Ограничения записи: ${note}`,
+  catalogProviderPricingSummary: ({ summary }) => `Цены: ${summary}`,
   replyGenerationAction: "генерация ответа",
   speechTranscriptionAction: "транскрипция речи",
   instructionsTabDescription:
@@ -840,4 +859,4 @@ export const ru: TranslationDictionary = {
   couldntStartNativeSpeechRecognition:
     "Не удалось запустить распознавание родной речи.",
   microphonePermissionNotGranted: "Разрешение на использование микрофона не предоставлено",
-};
+} satisfies TranslationDictionary;

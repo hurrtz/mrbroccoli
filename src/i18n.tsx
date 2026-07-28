@@ -1,11 +1,13 @@
 import React, { createContext, useContext, useMemo } from "react";
-import { AppLanguage } from "./types";
+import type { AppLanguage, AppTextDirection } from "./i18n/localeRegistry";
+import { getAppLocale } from "./i18n/localeRegistry";
 import {
   translations,
   type TranslationParams,
 } from "./i18n/translations";
+import type { TranslationKey } from "./i18n/types";
 
-export type TranslationKey = keyof typeof translations.en;
+export type { TranslationKey } from "./i18n/types";
 
 export function translate(
   language: AppLanguage,
@@ -17,46 +19,15 @@ export function translate(
 }
 
 export function getLocaleForLanguage(language: AppLanguage) {
-  if (language === "de") {
-    return "de-DE";
-  }
-  if (language === "uk") {
-    return "uk-UA";
-  }
-  if (language === "hi") {
-    return "hi-IN";
-  }
-  if (language === "es") {
-    return "es-ES";
-  }
-  if (language === "fr") {
-    return "fr-FR";
-  }
-  if (language === "it") {
-    return "it-IT";
-  }
-  if (language === "pt") {
-    return "pt-PT";
-  }
-  if (language === "pt-BR") {
-    return "pt-BR";
-  }
-  if (language === "ru") {
-    return "ru-RU";
-  }
-  if (language === "zh-CN") {
-    return "zh-CN";
-  }
-  if (language === "ar") {
-    return "ar";
-  }
-  return "en-US";
+  return getAppLocale(language).intlLocale;
 }
 
 interface LocalizationContextValue {
   language: AppLanguage;
   t: (key: TranslationKey, params?: TranslationParams) => string;
   locale: string;
+  direction: AppTextDirection;
+  isRtl: boolean;
 }
 
 const LocalizationContext = createContext<LocalizationContextValue | null>(
@@ -71,11 +42,17 @@ export function LocalizationProvider({
   children: React.ReactNode;
 }) {
   const value = useMemo<LocalizationContextValue>(
-    () => ({
-      language,
-      locale: getLocaleForLanguage(language),
-      t: (key, params) => translate(language, key, params),
-    }),
+    () => {
+      const locale = getAppLocale(language);
+
+      return {
+        language,
+        locale: locale.intlLocale,
+        direction: locale.direction,
+        isRtl: locale.direction === "rtl",
+        t: (key, params) => translate(language, key, params),
+      };
+    },
     [language],
   );
 

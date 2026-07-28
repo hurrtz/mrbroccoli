@@ -1,6 +1,6 @@
 import type { TranslationDictionary } from "../types";
 
-export const uk: TranslationDictionary = {
+export const uk = {
   appName: "Пан Броколі",
   retry: "Повторити",
   dismiss: "Закрити",
@@ -60,6 +60,16 @@ export const uk: TranslationDictionary = {
   model: "Модель",
   effort: "Рівень міркування",
   effortValue: ({ effort }) => `Рівень: ${effort}`,
+  modelEffortNone: "Немає",
+  modelEffortMinimal: "Мінімальний",
+  modelEffortLow: "Низький",
+  modelEffortMedium: "Середній",
+  modelEffortHigh: "Високий",
+  modelEffortExtraHigh: "Дуже високий",
+  modelEffortMax: "Максимальний",
+  modelEffortDynamic: "Динамічний",
+  modelEffortDisabled: "Вимкнено",
+  modelEffortEnabled: "Увімкнено",
   fixed: "Фіксований",
   english: "Англійська",
   german: "Німецька",
@@ -73,11 +83,21 @@ export const uk: TranslationDictionary = {
   russian: "Російська",
   simplifiedChinese: "Спрощена китайська",
   arabic: "Арабська",
+  japanese: "Японська",
+  kokoroAmericanFemaleVoice: ({ name }) =>
+    `${name} · американська англійська, жіночий голос`,
+  kokoroBritishFemaleVoice: ({ name }) =>
+    `${name} · британська англійська, жіночий голос`,
+  kokoroChineseFemaleVoice: ({ index }) =>
+    `Китайська, жіночий голос ${index}`,
+  kokoroChineseMaleVoice: ({ index }) =>
+    `Китайська, чоловічий голос ${index}`,
   light: "Світла",
   dark: "Темна",
   system: "Системна",
   languageCoverage: ({ note }) => `Підтримка мов: ${note}`,
   recordingLimits: ({ note }) => `Обмеження запису: ${note}`,
+  catalogProviderPricingSummary: ({ summary }) => `Вартість: ${summary}`,
   replyGenerationAction: "створення відповіді",
   speechTranscriptionAction: "розпізнавання мовлення",
   instructionsTabDescription:
@@ -873,4 +893,4 @@ export const uk: TranslationDictionary = {
   couldntStartNativeSpeechRecognition:
     "Не вдалося запустити системне розпізнавання мовлення.",
   microphonePermissionNotGranted: "Дозвіл на мікрофон не надано",
-};
+} satisfies TranslationDictionary;

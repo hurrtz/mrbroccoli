@@ -1,6 +1,6 @@
 import type { TranslationDictionary } from "../types";
 
-export const hi: TranslationDictionary = {
+export const hi = {
   appName: "मिस्टर ब्रोकली",
   retry: "पुन: प्रयास करें",
   dismiss: "बंद करें",
@@ -54,6 +54,16 @@ export const hi: TranslationDictionary = {
   model: "मॉडल",
   effort: "सोचने का स्तर",
   effortValue: ({ effort }) => `स्तर: ${effort}`,
+  modelEffortNone: "कोई नहीं",
+  modelEffortMinimal: "न्यूनतम",
+  modelEffortLow: "कम",
+  modelEffortMedium: "मध्यम",
+  modelEffortHigh: "उच्च",
+  modelEffortExtraHigh: "बहुत उच्च",
+  modelEffortMax: "अधिकतम",
+  modelEffortDynamic: "गतिशील",
+  modelEffortDisabled: "बंद",
+  modelEffortEnabled: "चालू",
   fixed: "तय",
   english: "अंग्रेज़ी",
   german: "जर्मन",
@@ -67,11 +77,19 @@ export const hi: TranslationDictionary = {
   russian: "रूसी",
   simplifiedChinese: "सरलीकृत चीनी",
   arabic: "अरबी",
+  japanese: "जापानी",
+  kokoroAmericanFemaleVoice: ({ name }) =>
+    `${name} · अमेरिकी अंग्रेज़ी, महिला आवाज़`,
+  kokoroBritishFemaleVoice: ({ name }) =>
+    `${name} · ब्रिटिश अंग्रेज़ी, महिला आवाज़`,
+  kokoroChineseFemaleVoice: ({ index }) => `चीनी, महिला आवाज़ ${index}`,
+  kokoroChineseMaleVoice: ({ index }) => `चीनी, पुरुष आवाज़ ${index}`,
   light: "लाइट",
   dark: "डार्क",
   system: "सिस्टम",
   languageCoverage: ({ note }) => `भाषा कवरेज: ${note}`,
   recordingLimits: ({ note }) => `रिकॉर्डिंग सीमाएँ: ${note}`,
+  catalogProviderPricingSummary: ({ summary }) => `मूल्य: ${summary}`,
   replyGenerationAction: "उत्तर पीढ़ी",
   speechTranscriptionAction: "भाषण प्रतिलेखन",
   instructionsTabDescription:
@@ -840,4 +858,4 @@ export const hi: TranslationDictionary = {
   couldntStartNativeSpeechRecognition:
     "मूल वाक् पहचान प्रारंभ नहीं की जा सकी.",
   microphonePermissionNotGranted: "माइक्रोफ़ोन की अनुमति नहीं दी गई",
-};
+} satisfies TranslationDictionary;

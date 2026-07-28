@@ -1,6 +1,6 @@
 import type { TranslationDictionary } from "../types";
 
-export const zhCN: TranslationDictionary = {
+export const zhCN = {
   appName: "西兰花先生",
   retry: "重试",
   dismiss: "关闭",
@@ -54,6 +54,16 @@ export const zhCN: TranslationDictionary = {
   model: "模型",
   effort: "努力",
   effortValue: ({ effort }) => `努力：${effort}`,
+  modelEffortNone: "无",
+  modelEffortMinimal: "最低",
+  modelEffortLow: "低",
+  modelEffortMedium: "中",
+  modelEffortHigh: "高",
+  modelEffortExtraHigh: "很高",
+  modelEffortMax: "最高",
+  modelEffortDynamic: "动态",
+  modelEffortDisabled: "已关闭",
+  modelEffortEnabled: "已开启",
   fixed: "固定的",
   english: "英语",
   german: "德语",
@@ -67,11 +77,17 @@ export const zhCN: TranslationDictionary = {
   russian: "俄语",
   simplifiedChinese: "简体中文",
   arabic: "阿拉伯语",
+  japanese: "日语",
+  kokoroAmericanFemaleVoice: ({ name }) => `${name} · 美式英语，女声`,
+  kokoroBritishFemaleVoice: ({ name }) => `${name} · 英式英语，女声`,
+  kokoroChineseFemaleVoice: ({ index }) => `中文女声 ${index}`,
+  kokoroChineseMaleVoice: ({ index }) => `中文男声 ${index}`,
   light: "浅色",
   dark: "深色",
   system: "系统",
   languageCoverage: ({ note }) => `语言覆盖范围：${note}`,
   recordingLimits: ({ note }) => `记录限制：${note}`,
+  catalogProviderPricingSummary: ({ summary }) => `价格：${summary}`,
   replyGenerationAction: "回复生成",
   speechTranscriptionAction: "语音转录",
   instructionsTabDescription:
@@ -840,4 +856,4 @@ export const zhCN: TranslationDictionary = {
   couldntStartNativeSpeechRecognition:
     "无法启动本机语音识别。",
   microphonePermissionNotGranted: "未授予麦克风权限",
-};
+} satisfies TranslationDictionary;
