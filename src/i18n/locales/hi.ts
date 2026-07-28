@@ -54,6 +54,8 @@ export const hi = {
   recognitionLanguageHint:
     "बेहतर पहचान के लिए भाषा चुनें, या डिवाइस अथवा प्रदाता को अपने आप पहचानने दें।",
   automaticLanguage: "स्वचालित",
+  speechLanguageUnsupportedByProvider: ({ provider, language }) =>
+    `${provider} इस वॉइस रूट के लिए ${language} का आधिकारिक समर्थन नहीं करता।`,
   usageStats: "उपयोग आँकड़े",
   model: "मॉडल",
   effort: "सोचने का स्तर",

@@ -223,6 +223,7 @@ export function useSetupGuideVoiceTest(params: {
           providerModel: routes.stt.model,
           apiKey: settings.apiKeys[routes.stt.provider].trim(),
           language: settings.language,
+          speechLanguage: settings.sttLanguage,
         }))?.trim() ?? "";
     }
 

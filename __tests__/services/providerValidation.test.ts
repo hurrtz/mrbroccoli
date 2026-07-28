@@ -83,6 +83,7 @@ describe("validateSttProviderConnection", () => {
       providerModel: "scribe_v2",
       apiKey: "restricted-key",
       language: "en",
+      speechLanguage: "en",
       abortSignal: undefined,
     });
     expect(FileSystem.deleteAsync).toHaveBeenCalledWith(audioPath, {

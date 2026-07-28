@@ -3,13 +3,11 @@ import {
   RUNTIME_PROVIDER_MANIFEST,
   RuntimeSttTransport,
 } from "../../constants/providers/runtimeManifest";
-import { getMistralSttLanguageCode } from "../../utils/speechLanguage";
 
 export type MultipartTranscriptionConfig = {
   kind: "multipart";
   endpoint: string;
   defaultModel: string;
-  languageHint?: () => string | undefined;
 };
 
 export type OpenAiAudioInputTranscriptionConfig = {
@@ -62,24 +60,12 @@ export function getProviderSttTimeoutMs(provider: Provider) {
   }
 }
 
-function getLanguageHint(
-  key: string | undefined,
-): MultipartTranscriptionConfig["languageHint"] {
-  switch (key) {
-    case "mistral-stt-language-code":
-      return getMistralSttLanguageCode;
-    default:
-      return undefined;
-  }
-}
-
 function buildConfigForTransport(params: {
   provider: Provider;
   transport: RuntimeSttTransport;
   endpoint?: string;
   endpointBase?: string;
   defaultModel: string;
-  languageHintKey?: string;
 }): ProviderSttConfig | null {
   switch (params.transport) {
     case "multipart":
@@ -88,9 +74,6 @@ function buildConfigForTransport(params: {
             kind: "multipart",
             endpoint: params.endpoint,
             defaultModel: params.defaultModel,
-            ...(params.languageHintKey
-              ? { languageHint: getLanguageHint(params.languageHintKey) }
-              : {}),
           }
         : null;
     case "bytedance-bigmodel-flash":
@@ -161,6 +144,5 @@ export function getProviderSttConfig(
     endpoint,
     endpointBase,
     defaultModel,
-    languageHintKey: manifest.stt.languageHintKey,
   });
 }

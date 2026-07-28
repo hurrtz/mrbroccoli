@@ -54,6 +54,8 @@ export const es = {
   recognitionLanguageHint:
     "Elige un idioma para mejorar el reconocimiento o deja que el dispositivo o proveedor lo detecte automáticamente.",
   automaticLanguage: "Automático",
+  speechLanguageUnsupportedByProvider: ({ provider, language }) =>
+    `${provider} no admite oficialmente ${language} en esta ruta de voz.`,
   usageStats: "Estadísticas de uso",
   model: "Modelo",
   effort: "Esfuerzo",

@@ -1,11 +1,13 @@
 import { ExpoSpeechRecognitionModule } from "expo-speech-recognition";
 import type { TranslationKey } from "../../i18n";
 import { buildErrorMessage, getRecognitionLocale } from "./shared";
+import type { SttLanguage } from "../../types";
 
 interface TranscribeRecordedFileParams {
   fileUri: string;
   finalTranscriptRef: React.MutableRefObject<string>;
   latestTranscriptRef: React.MutableRefObject<string>;
+  sttLanguage: SttLanguage;
   t: (
     key: TranslationKey,
     params?: Record<string, string | number | undefined>,
@@ -16,6 +18,7 @@ export function transcribeRecordedFile({
   fileUri,
   finalTranscriptRef,
   latestTranscriptRef,
+  sttLanguage,
   t,
 }: TranscribeRecordedFileParams) {
   return new Promise<string | null>((resolve, reject) => {
@@ -73,7 +76,7 @@ export function transcribeRecordedFile({
 
     try {
       ExpoSpeechRecognitionModule.start({
-        lang: getRecognitionLocale(),
+        lang: getRecognitionLocale(sttLanguage),
         interimResults: true,
         continuous: false,
         addsPunctuation: true,

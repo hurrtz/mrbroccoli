@@ -15,6 +15,7 @@ import type {
   Provider,
   ReplyPlayback,
   SttBackendMode,
+  SttLanguage,
   TtsBackendMode,
   TtsFallbackRoute,
   TtsListenLanguage,
@@ -70,6 +71,7 @@ export interface UseVoicePipelineParams {
   model: string;
   modelEffort?: string;
   sttMode: SttBackendMode;
+  sttLanguage: SttLanguage;
   sttProvider: Provider | null;
   sttApiKey: string;
   selectedSttModel: string;

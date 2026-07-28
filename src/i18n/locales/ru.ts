@@ -54,6 +54,8 @@ export const ru = {
   recognitionLanguageHint:
     "Выберите язык для более точного распознавания или оставьте автоматическое определение устройством либо поставщиком.",
   automaticLanguage: "Автоматически",
+  speechLanguageUnsupportedByProvider: ({ provider, language }) =>
+    `${provider} официально не поддерживает ${language} для этого голосового маршрута.`,
   usageStats: "Статистика использования",
   model: "Модель",
   effort: "Усилие",

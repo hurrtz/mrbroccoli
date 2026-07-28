@@ -54,6 +54,8 @@ export const ptBR = {
   recognitionLanguageHint:
     "Escolha um idioma para melhorar o reconhecimento ou deixe o dispositivo ou provedor detectá-lo automaticamente.",
   automaticLanguage: "Automático",
+  speechLanguageUnsupportedByProvider: ({ provider, language }) =>
+    `${provider} não oferece suporte oficial a ${language} nesta rota de voz.`,
   usageStats: "Estatísticas de uso",
   model: "Modelo",
   effort: "Esforço",

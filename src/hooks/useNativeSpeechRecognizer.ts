@@ -5,6 +5,7 @@ import { isNativeWaveformAvailable } from "../services/nativeWaveform";
 import { useRecognitionControls } from "./nativeSpeechRecognizer/useRecognitionControls";
 import { useRecognitionSession } from "./nativeSpeechRecognizer/useRecognitionSession";
 import { useRecognitionSubscriptions } from "./nativeSpeechRecognizer/useRecognitionSubscriptions";
+import type { SttLanguage } from "../types";
 
 function canUseNativeWaveformRecorderForRecognition() {
   if (!isNativeWaveformAvailable()) {
@@ -18,7 +19,7 @@ function canUseNativeWaveformRecorderForRecognition() {
   return typeof Platform.Version === "number" && Platform.Version >= 33;
 }
 
-export function useNativeSpeechRecognizer() {
+export function useNativeSpeechRecognizer(sttLanguage: SttLanguage = "auto") {
   const { t } = useLocalization();
   const usingNativeRecorder = canUseNativeWaveformRecorderForRecognition();
   const session = useRecognitionSession({ t });
@@ -37,6 +38,7 @@ export function useNativeSpeechRecognizer() {
     useRecognitionControls({
       session,
       t,
+      sttLanguage,
       usingNativeRecorder,
     });
 

@@ -4,6 +4,7 @@ interface ResolvePipelineTranscriptionParams {
   abortSignal?: AbortSignal;
   audioUri?: string;
   language: Parameters<typeof transcribeAudio>[0]["language"];
+  speechLanguage: Parameters<typeof transcribeAudio>[0]["speechLanguage"];
   sttApiKey?: string;
   sttMode: Parameters<typeof transcribeAudio>[0]["mode"];
   sttModel?: string;
@@ -15,6 +16,7 @@ export async function resolvePipelineTranscription({
   abortSignal,
   audioUri,
   language,
+  speechLanguage,
   sttApiKey,
   sttMode,
   sttModel,
@@ -40,6 +42,7 @@ export async function resolvePipelineTranscription({
     providerModel: sttModel,
     apiKey: sttApiKey,
     language,
+    speechLanguage,
     abortSignal,
   });
 }

@@ -164,7 +164,7 @@ describe("useNativeSpeechRecognizer", () => {
   });
 
   it("stops native recording and returns the recorded transcript", async () => {
-    const { result } = renderHook(() => useNativeSpeechRecognizer(), {
+    const { result } = renderHook(() => useNativeSpeechRecognizer("uk"), {
       wrapper,
     });
 
@@ -192,6 +192,7 @@ describe("useNativeSpeechRecognizer", () => {
     );
     expect(ExpoSpeechRecognitionModule.start).toHaveBeenCalledWith(
       expect.objectContaining({
+        lang: "uk-UA",
         audioSource: {
           uri: "file://capture.wav",
         },

@@ -58,6 +58,27 @@ describe("settings readiness", () => {
     expectStatus(readiness.listen, "broken");
   });
 
+  it("marks provider STT broken when the explicit language is unsupported", () => {
+    const settings = withSettings({
+      sttMode: "provider",
+      sttProvider: "mistral",
+      sttLanguage: "uk",
+      apiKeys: {
+        ...DEFAULT_SETTINGS.apiKeys,
+        mistral: "mistral-test-key",
+      },
+    });
+
+    const readiness = getSettingsReadiness(settings, {
+      llmProviders: [],
+      sttProviders: ["mistral"],
+      ttsProviders: [],
+      searchProviders: [],
+    });
+
+    expectStatus(readiness.listen, "broken");
+  });
+
   it("marks spoken replies off when spoken replies are disabled", () => {
     const settings = withSettings({
       spokenRepliesEnabled: false,

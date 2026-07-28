@@ -54,6 +54,8 @@ export const zhCN = {
   recognitionLanguageHint:
     "选择语言以提高识别准确度，或让设备或提供商自动检测。",
   automaticLanguage: "自动",
+  speechLanguageUnsupportedByProvider: ({ provider, language }) =>
+    `${provider} 未正式支持此语音路由使用${language}。`,
   usageStats: "使用统计",
   model: "模型",
   effort: "努力",

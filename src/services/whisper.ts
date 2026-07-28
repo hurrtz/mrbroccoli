@@ -6,6 +6,9 @@ import {
 import { PROVIDER_LABELS, getSttModelLabel } from "../constants/models";
 import { translate } from "../i18n";
 import { AppLanguage, Provider, SttBackendMode } from "../types";
+import type { SttLanguage } from "../types";
+import { providerSupportsSttLanguage } from "../constants/providerSpeechLanguages";
+import { getTtsListenLanguageLabel } from "../constants/localTts";
 import {
   parseQwenApiCredential,
   qwenRegionSupportsAppSpeech,
@@ -32,6 +35,7 @@ async function assertSttUploadFitsCatalogLimits(params: {
   provider: Provider;
   modelId: string;
   language: AppLanguage;
+  speechLanguage?: SttLanguage;
 }) {
   const constraints = getCatalogConstraintsForAppProvider(
     params.provider,
@@ -70,6 +74,7 @@ export async function transcribeAudio(params: {
   providerModel?: string;
   apiKey?: string;
   language: AppLanguage;
+  speechLanguage?: SttLanguage;
   abortSignal?: AbortSignal;
 }): Promise<string | null> {
   const {
@@ -79,6 +84,7 @@ export async function transcribeAudio(params: {
     providerModel,
     apiKey,
     language,
+    speechLanguage = "auto",
     abortSignal,
   } = params;
 
@@ -88,6 +94,18 @@ export async function transcribeAudio(params: {
 
   if (!provider) {
     throw new Error(translate(language, "chooseSpeechToTextProviderInSettings"));
+  }
+
+  if (
+    speechLanguage !== "auto" &&
+    !providerSupportsSttLanguage(provider, speechLanguage)
+  ) {
+    throw new Error(
+      translate(language, "speechLanguageUnsupportedByProvider", {
+        provider: PROVIDER_LABELS[provider],
+        language: getTtsListenLanguageLabel(speechLanguage, language),
+      }),
+    );
   }
 
   const remoteAudioSource = isRemoteAudioSource(fileUri);
@@ -140,6 +158,7 @@ export async function transcribeAudio(params: {
       config,
       fileUri,
       language,
+      speechLanguage,
       provider,
       providerModel: resolvedModel,
     });
@@ -152,6 +171,7 @@ export async function transcribeAudio(params: {
       config,
       fileUri,
       language,
+      speechLanguage,
       provider,
       providerModel: resolvedModel,
     });
@@ -164,6 +184,7 @@ export async function transcribeAudio(params: {
       config,
       fileUri,
       language,
+      speechLanguage,
       provider,
       providerModel: resolvedModel,
     });
@@ -176,6 +197,7 @@ export async function transcribeAudio(params: {
       config,
       fileUri,
       language,
+      speechLanguage,
       provider,
       providerModel: resolvedModel,
     });
@@ -188,6 +210,7 @@ export async function transcribeAudio(params: {
       config,
       fileUri,
       language,
+      speechLanguage,
       provider,
       providerModel: resolvedModel,
     });
@@ -199,6 +222,7 @@ export async function transcribeAudio(params: {
     config,
     fileUri,
     language,
+    speechLanguage,
     provider,
     providerModel: resolvedModel,
   });

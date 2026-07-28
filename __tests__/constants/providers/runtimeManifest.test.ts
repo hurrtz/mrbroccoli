@@ -54,6 +54,7 @@ describe("runtime provider manifest integrity", () => {
       expect(stt.endpoint ?? stt.endpointBase).toBeTruthy();
       expect(stt.defaultModel).toBeTruthy();
       expect(modelIds(stt.models)).toContain(stt.defaultModel);
+      expect(stt.languages?.length).toBeGreaterThan(0);
     },
   );
 

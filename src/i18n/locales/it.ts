@@ -54,6 +54,8 @@ export const it = {
   recognitionLanguageHint:
     "Scegli una lingua per migliorare il riconoscimento oppure lascia che il dispositivo o il fornitore la rilevi automaticamente.",
   automaticLanguage: "Automatica",
+  speechLanguageUnsupportedByProvider: ({ provider, language }) =>
+    `${provider} non supporta ufficialmente ${language} per questo percorso vocale.`,
   usageStats: "Statistiche di utilizzo",
   model: "Modello",
   effort: "Sforzo",

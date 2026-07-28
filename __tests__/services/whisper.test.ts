@@ -181,11 +181,16 @@ describe("transcribeAudio", () => {
       provider: "mistral",
       apiKey: "mistral-test",
       language: "en",
+      speechLanguage: "de",
     });
 
     expect(result).toBe("Hallo Welt");
     const [url] = (fetch as jest.Mock).mock.calls[0];
     expect(url).toBe("https://api.mistral.ai/v1/audio/transcriptions");
+    const [, options] = (fetch as jest.Mock).mock.calls[0];
+    expect(Array.from((options.body as FormData).entries())).toEqual(
+      expect.arrayContaining([["language", "de"]]),
+    );
   });
 
   it("uses ElevenLabs Scribe v2 with its multipart field and API-key header", async () => {
@@ -324,6 +329,7 @@ describe("transcribeAudio", () => {
       providerModel: "gemini-3.5-flash",
       apiKey: "my-project|ya29.test-token|us",
       language: "de",
+      speechLanguage: "uk",
     });
 
     expect(result).toBe("Hello from Cloud Speech");
@@ -333,6 +339,7 @@ describe("transcribeAudio", () => {
     );
     expect(options.headers.Authorization).toBe("Bearer ya29.test-token");
     expect(JSON.parse(options.body).config.model).toBe("chirp_3");
+    expect(JSON.parse(options.body).config.languageCodes).toEqual(["uk-UA"]);
   });
 
   it("uses the xAI standalone REST STT endpoint for recorded audio", async () => {
@@ -348,6 +355,7 @@ describe("transcribeAudio", () => {
       providerModel: "grok-stt",
       apiKey: "xai-test",
       language: "en",
+      speechLanguage: "en",
     });
 
     expect(result).toBe("Hello from xAI STT");
@@ -363,6 +371,45 @@ describe("transcribeAudio", () => {
       ["language", "en"],
     ]);
     expect(parts[2][0]).toBe("file");
+  });
+
+  it("lets xAI auto-detect STT without forcing formatting or a language", async () => {
+    (fetch as jest.Mock).mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({ text: "Auto-detected speech" }),
+    });
+
+    await transcribeAudio({
+      fileUri: "/tmp/recording.m4a",
+      mode: "provider",
+      provider: "xai",
+      providerModel: "grok-stt",
+      apiKey: "xai-test",
+      language: "en",
+      speechLanguage: "auto",
+    });
+
+    const [, options] = (fetch as jest.Mock).mock.calls[0];
+    const parts = Array.from((options.body as FormData).entries());
+    expect(parts.map(([key]) => key)).toEqual(["file"]);
+  });
+
+  it("rejects an explicitly unsupported provider STT language before upload", async () => {
+    await expect(
+      transcribeAudio({
+        fileUri: "/tmp/recording.m4a",
+        mode: "provider",
+        provider: "xai",
+        providerModel: "grok-stt",
+        apiKey: "xai-test",
+        language: "en",
+        speechLanguage: "uk",
+      }),
+    ).rejects.toThrow(
+      "xAI does not officially support Ukrainian for this speech route.",
+    );
+
+    expect(fetch).not.toHaveBeenCalled();
   });
 
 
@@ -395,6 +442,7 @@ describe("transcribeAudio", () => {
       provider: "alibaba-qwen-dashscope",
       apiKey: "dashscope-test|beijing",
       language: "en",
+      speechLanguage: "uk",
     });
 
     expect(result).toBe("Hello world");
@@ -408,6 +456,10 @@ describe("transcribeAudio", () => {
     expect(body.messages[0].content[0].input_audio.data).toMatch(
       /^data:audio\/m4a;base64,/,
     );
+    expect(body.asr_options).toEqual({
+      language: "uk",
+      enable_itn: false,
+    });
   });
 
   it("rejects Qwen STT when the credential belongs to the US region", async () => {

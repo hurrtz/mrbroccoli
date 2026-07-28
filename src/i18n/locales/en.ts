@@ -54,6 +54,8 @@ export const en = {
   recognitionLanguageHint:
     "Choose a language to improve recognition, or leave it automatic for device or provider detection.",
   automaticLanguage: "Automatic",
+  speechLanguageUnsupportedByProvider: ({ provider, language }) =>
+    `${provider} does not officially support ${language} for this speech route.`,
   usageStats: "Usage Stats",
   model: "Model",
   effort: "Effort",

@@ -54,6 +54,8 @@ export const ar = {
   recognitionLanguageHint:
     "اختر لغة لتحسين التعرّف، أو اترك للجهاز أو المزوّد اكتشافها تلقائياً.",
   automaticLanguage: "تلقائي",
+  speechLanguageUnsupportedByProvider: ({ provider, language }) =>
+    `${provider} لا يدعم ${language} رسمياً في مسار الصوت هذا.`,
   usageStats: "إحصائيات الاستخدام",
   model: "نموذج",
   effort: "جهد",

@@ -13,6 +13,7 @@ import {
 } from "./shared";
 import { transcribeRecordedFile } from "./transcribeRecordedFile";
 import type { RecognitionSession } from "./useRecognitionSession";
+import type { SttLanguage } from "../../types";
 
 interface UseRecognitionControlsParams {
   session: RecognitionSession;
@@ -21,12 +22,14 @@ interface UseRecognitionControlsParams {
     params?: Record<string, string | number | undefined>,
   ) => string;
   usingNativeRecorder: boolean;
+  sttLanguage: SttLanguage;
 }
 
 export function useRecognitionControls({
   session,
   t,
   usingNativeRecorder,
+  sttLanguage,
 }: UseRecognitionControlsParams) {
   const {
     abortRequestedRef,
@@ -98,7 +101,7 @@ export function useRecognitionControls({
 
     try {
       ExpoSpeechRecognitionModule.start({
-        lang: getRecognitionLocale(),
+        lang: getRecognitionLocale(sttLanguage),
         interimResults: true,
         continuous: false,
         addsPunctuation: true,
@@ -127,6 +130,7 @@ export function useRecognitionControls({
     setIsRecording,
     setLastError,
     startedAtRef,
+    sttLanguage,
     t,
     usingNativeRecorder,
   ]);
@@ -203,6 +207,7 @@ export function useRecognitionControls({
         fileUri,
         finalTranscriptRef,
         latestTranscriptRef,
+        sttLanguage,
         t,
       });
 
@@ -233,6 +238,7 @@ export function useRecognitionControls({
     stopRejectRef,
     stopRequestedRef,
     stopResolverRef,
+    sttLanguage,
     t,
     usingNativeRecorder,
   ]);

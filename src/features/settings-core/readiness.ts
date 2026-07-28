@@ -7,6 +7,7 @@ import type { Provider, Settings } from "../../types";
 import { isKokoroLanguage } from "../../constants/kokoro";
 import { getTtsFallbackRoutes } from "../../constants/ttsFallback";
 import { hasProviderCredentialForCapability } from "../../utils/providerCredentials";
+import { providerSupportsSttLanguage } from "../../constants/providerSpeechLanguages";
 
 export type SettingsReadinessState = "ready" | "attention" | "broken" | "off";
 
@@ -87,7 +88,8 @@ function getListenReadiness(
   if (
     !provider ||
     !context.sttProviders.includes(provider) ||
-    !hasConfiguredKey(settings, provider)
+    !hasConfiguredKey(settings, provider) ||
+    !providerSupportsSttLanguage(provider, settings.sttLanguage)
   ) {
     return status("broken");
   }

@@ -56,6 +56,8 @@ export const de = {
   recognitionLanguageHint:
     "Wähle eine Sprache für eine bessere Erkennung oder lasse die Geräte- beziehungsweise Anbietererkennung automatisch arbeiten.",
   automaticLanguage: "Automatisch",
+  speechLanguageUnsupportedByProvider: ({ provider, language }) =>
+    `${provider} unterstützt ${language} für diese Sprachroute nicht offiziell.`,
   usageStats: "Nutzungsdaten",
   model: "Modell",
   effort: "Aufwand",

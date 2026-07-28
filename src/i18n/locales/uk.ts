@@ -60,6 +60,8 @@ export const uk = {
   recognitionLanguageHint:
     "Виберіть мову для точнішого розпізнавання або залиште автоматичне визначення пристроєм чи провайдером.",
   automaticLanguage: "Автоматично",
+  speechLanguageUnsupportedByProvider: ({ provider, language }) =>
+    `${provider} офіційно не підтримує ${language} для цього голосового маршруту.`,
   usageStats: "Статистика використання",
   model: "Модель",
   effort: "Рівень міркування",

@@ -13,6 +13,10 @@ import {
   APP_LANGUAGES,
   getAppLocale,
 } from "../../src/i18n/localeRegistry";
+import {
+  RUNTIME_PROVIDER_MANIFEST,
+  RUNTIME_PROVIDER_ORDER,
+} from "../../src/constants/providers/runtimeManifest";
 
 describe("speech language registry", () => {
   it("officially represents every app-interface locale", () => {
@@ -48,5 +52,16 @@ describe("speech language registry", () => {
     expect(normalizeSttLanguage("zh")).toBe("zh-CN");
     expect(normalizeSttLanguage("not-a-language")).toBe("auto");
     expect(normalizeSpeechLanguage("not-a-language")).toBeNull();
+  });
+
+  it("covers every app-interface locale with at least one provider STT route", () => {
+    APP_LANGUAGES.forEach((language) => {
+      expect(
+        RUNTIME_PROVIDER_ORDER.some((provider) => {
+          const stt = RUNTIME_PROVIDER_MANIFEST[provider].stt;
+          return stt.support === "provider" && stt.languages?.includes(language);
+        }),
+      ).toBe(true);
+    });
   });
 });

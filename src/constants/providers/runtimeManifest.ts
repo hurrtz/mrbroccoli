@@ -1,5 +1,6 @@
 import type { CatalogProviderId } from "../../catalog/types";
 import { PROVIDER_DOCUMENTS } from "../../../data/providers";
+import type { SpeechLanguage } from "../speechLanguages";
 
 export type RuntimeAppProviderId =
   | "openai"
@@ -33,7 +34,6 @@ export type RuntimeTtsTransport = "none" | "binary" | "gemini" | "dashscope";
 export type RuntimeTtsBinaryRequestFormat =
   "elevenlabs-speech" | "openai-speech" | "grok-speech" | "mistral-speech";
 export type RuntimeTtsVoiceDirectory = "elevenlabs" | "mistral" | "xai";
-export type RuntimeLanguageHintKey = "mistral-stt-language-code";
 
 export interface RuntimeModelSpec {
   id: string;
@@ -99,7 +99,7 @@ interface RuntimeSttManifest {
   endpointBase?: string;
   defaultModel?: string;
   models: RuntimeModelSpec[];
-  languageHintKey?: RuntimeLanguageHintKey;
+  languages?: readonly SpeechLanguage[];
   languageNote?: string;
 }
 
@@ -585,6 +585,21 @@ export const RUNTIME_PROVIDER_MANIFEST: Record<
       endpoint: "https://api.openai.com/v1/audio/transcriptions",
       defaultModel: "gpt-4o-mini-transcribe",
       models: catalogModelSpecs("openai", "stt"),
+      languages: [
+        "en",
+        "de",
+        "uk",
+        "hi",
+        "es",
+        "fr",
+        "it",
+        "pt",
+        "pt-BR",
+        "ru",
+        "zh-CN",
+        "ar",
+        "ja",
+      ],
       languageNote: `OpenAI currently exposes gpt-4o-transcribe, gpt-4o-mini-transcribe, and whisper-1 for speech-to-text. OpenAI's published well-supported language set is: ${WHISPER_WELL_SUPPORTED_LANGUAGES}`,
     },
     tts: {
@@ -813,6 +828,21 @@ export const RUNTIME_PROVIDER_MANIFEST: Record<
         "https://dashscope-intl.aliyuncs.com/compatible-mode/v1/chat/completions",
       defaultModel: "qwen3-asr-flash",
       models: [model("qwen3-asr-flash")],
+      languages: [
+        "en",
+        "de",
+        "uk",
+        "hi",
+        "es",
+        "fr",
+        "it",
+        "pt",
+        "pt-BR",
+        "ru",
+        "zh-CN",
+        "ar",
+        "ja",
+      ],
       languageNote:
         "DashScope STT is limited to the simple Qwen3-ASR-Flash short-file transcription route. Long-file async transcription and realtime WebSocket ASR stay catalog-only to keep the app on straightforward BYOK flows.",
     },
@@ -1019,6 +1049,21 @@ export const RUNTIME_PROVIDER_MANIFEST: Record<
       endpointBase: "https://generativelanguage.googleapis.com/v1beta/models",
       defaultModel: "gemini-3.5-flash",
       models: [namedModel("gemini-3.5-flash", "Gemini 3.5 Flash")],
+      languages: [
+        "en",
+        "de",
+        "uk",
+        "hi",
+        "es",
+        "fr",
+        "it",
+        "pt",
+        "pt-BR",
+        "ru",
+        "zh-CN",
+        "ar",
+        "ja",
+      ],
       languageNote:
         "AI Studio keys transcribe recorded speech with Gemini. Existing Cloud Speech-only credentials continue to use Chirp 3.",
     },
@@ -1127,6 +1172,19 @@ export const RUNTIME_PROVIDER_MANIFEST: Record<
       endpoint: "https://api.x.ai/v1/stt",
       defaultModel: "grok-stt",
       models: catalogModelSpecs("xai", "stt", ["voice-agent-api"]),
+      languages: [
+        "en",
+        "de",
+        "hi",
+        "es",
+        "fr",
+        "it",
+        "pt",
+        "pt-BR",
+        "ru",
+        "ar",
+        "ja",
+      ],
       languageNote:
         "xAI speech input uses the standalone Grok Speech-to-Text endpoint for recorded audio.",
     },
@@ -1220,8 +1278,21 @@ export const RUNTIME_PROVIDER_MANIFEST: Record<
       transport: "multipart",
       endpoint: "https://api.mistral.ai/v1/audio/transcriptions",
       defaultModel: "voxtral-mini-2602",
-      languageHintKey: "mistral-stt-language-code",
       models: [namedModel("voxtral-mini-2602", "Voxtral Mini Transcribe 2")],
+      languages: [
+        "en",
+        "de",
+        "hi",
+        "es",
+        "fr",
+        "it",
+        "pt",
+        "pt-BR",
+        "ru",
+        "zh-CN",
+        "ar",
+        "ja",
+      ],
       languageNote:
         "The current Voxtral Mini Transcribe 2 route supports English, Chinese, Hindi, Spanish, Arabic, French, Portuguese, Russian, German, Japanese, Korean, Italian, and Dutch.",
     },
@@ -1259,6 +1330,21 @@ export const RUNTIME_PROVIDER_MANIFEST: Record<
       endpoint: "https://api.elevenlabs.io/v1/speech-to-text",
       defaultModel: "scribe_v2",
       models: [namedModel("scribe_v2", "Scribe v2")],
+      languages: [
+        "en",
+        "de",
+        "uk",
+        "hi",
+        "es",
+        "fr",
+        "it",
+        "pt",
+        "pt-BR",
+        "ru",
+        "zh-CN",
+        "ar",
+        "ja",
+      ],
       languageNote:
         "Scribe v2 automatically detects and transcribes more than 90 languages.",
     },

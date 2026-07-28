@@ -97,7 +97,7 @@ export function MainScreen() {
   );
 
   const recorder = useAudioRecorder();
-  const nativeStt = useNativeSpeechRecognizer();
+  const nativeStt = useNativeSpeechRecognizer(settings.sttLanguage);
   const player = useAudioPlayer();
   const kokoroModel = useKokoroModel();
 
@@ -250,6 +250,7 @@ export function MainScreen() {
     model,
     modelEffort,
     sttMode: settings.sttMode,
+    sttLanguage: settings.sttLanguage,
     sttProvider,
     sttApiKey,
     selectedSttModel,

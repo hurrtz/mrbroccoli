@@ -1,7 +1,7 @@
 import * as FileSystem from "expo-file-system/legacy";
 
 import { buildProviderHttpError, normalizeProviderTransportError } from "../providerErrors";
-import type { AppLanguage, Provider } from "../../types";
+import type { AppLanguage, Provider, SttLanguage } from "../../types";
 import {
   createBytedanceRequestId,
   requireBytedanceSpeechCredentials,
@@ -11,8 +11,12 @@ import {
   parseGoogleAiStudioCredentials,
   requireGoogleCloudSpeechCredentials,
 } from "../google";
-import { getDeviceLocale, getFileAudioMimeType } from "../../utils/speechLanguage";
-import { getDefaultContentLanguageForLocale } from "../../i18n/localeRegistry";
+import {
+  getFileAudioMimeType,
+  getGoogleCloudSpeechLanguageCode,
+  getProviderSpeechLanguageCode,
+} from "../../utils/speechLanguage";
+import { getSpeechLanguageDefinition } from "../../constants/speechLanguages";
 import { fetchWithTimeout } from "./abort";
 import { getProviderSttTimeoutMs } from "./config";
 import type {
@@ -34,18 +38,9 @@ interface SharedProviderParams {
   apiKey?: string;
   fileUri: string;
   language: AppLanguage;
+  speechLanguage: SttLanguage;
   provider: Provider;
   providerModel?: string;
-}
-
-function getGoogleCloudSpeechLanguageCode(language: AppLanguage) {
-  const deviceLocale = getDeviceLocale();
-
-  if (getDefaultContentLanguageForLocale(language) === "de") {
-    return deviceLocale.toLowerCase().startsWith("de-") ? deviceLocale : "de-DE";
-  }
-
-  return deviceLocale.toLowerCase().startsWith("en-") ? deviceLocale : "en-US";
 }
 
 function extractGeminiTranscription(data: any) {
@@ -68,8 +63,16 @@ export async function transcribeWithMultipartProvider(
     config: MultipartTranscriptionConfig;
   },
 ) {
-  const { abortSignal, apiKey, config, fileUri, language, provider, providerModel } =
-    params;
+  const {
+    abortSignal,
+    apiKey,
+    config,
+    fileUri,
+    language,
+    provider,
+    providerModel,
+    speechLanguage,
+  } = params;
   const formData = new FormData();
   formData.append(
     "file",
@@ -88,9 +91,11 @@ export async function transcribeWithMultipartProvider(
     formData.append("response_format", "diarized_json");
     formData.append("chunking_strategy", "auto");
   }
-  const languageHint = config.languageHint?.();
-  if (languageHint) {
-    formData.append("language", languageHint);
+  if (speechLanguage !== "auto") {
+    formData.append(
+      provider === "elevenlabs" ? "language_code" : "language",
+      getProviderSpeechLanguageCode(speechLanguage),
+    );
   }
 
   let response: Awaited<ReturnType<typeof fetch>>;
@@ -161,8 +166,16 @@ async function transcribeWithOpenAiStyleAudioInputProvider(
     config: OpenAiAudioInputTranscriptionConfig;
   },
 ) {
-  const { abortSignal, apiKey, config, fileUri, language, provider, providerModel } =
-    params;
+  const {
+    abortSignal,
+    apiKey,
+    config,
+    fileUri,
+    language,
+    provider,
+    providerModel,
+    speechLanguage,
+  } = params;
   const base64 = await FileSystem.readAsStringAsync(fileUri, {
     encoding: "base64",
   });
@@ -195,6 +208,14 @@ async function transcribeWithOpenAiStyleAudioInputProvider(
               ],
             },
           ],
+          ...(speechLanguage === "auto"
+            ? {}
+            : {
+                asr_options: {
+                  language: getProviderSpeechLanguageCode(speechLanguage),
+                  enable_itn: false,
+                },
+              }),
           stream: false,
         }),
       },
@@ -232,8 +253,16 @@ export async function transcribeWithBytedanceBigmodelFlashProvider(
     config: BytedanceBigmodelFlashTranscriptionConfig;
   },
 ) {
-  const { abortSignal, apiKey, config, fileUri, language, provider, providerModel } =
-    params;
+  const {
+    abortSignal,
+    apiKey,
+    config,
+    fileUri,
+    language,
+    provider,
+    providerModel,
+    speechLanguage,
+  } = params;
   const selectedModel = providerModel || config.defaultModel;
   const credentials = requireBytedanceSpeechCredentials(apiKey, language);
   const audioData = await FileSystem.readAsStringAsync(fileUri, {
@@ -333,8 +362,16 @@ export async function transcribeWithGoogleCloudSpeechV2Provider(
     config: GoogleCloudSpeechV2TranscriptionConfig;
   },
 ) {
-  const { abortSignal, apiKey, config, fileUri, language, provider, providerModel } =
-    params;
+  const {
+    abortSignal,
+    apiKey,
+    config,
+    fileUri,
+    language,
+    provider,
+    providerModel,
+    speechLanguage,
+  } = params;
   const selectedModel = providerModel || config.defaultModel;
   const credentials = requireGoogleCloudSpeechCredentials(apiKey, language);
   const audioData = await FileSystem.readAsStringAsync(fileUri, {
@@ -359,7 +396,9 @@ export async function transcribeWithGoogleCloudSpeechV2Provider(
         body: JSON.stringify({
           config: {
             autoDecodingConfig: {},
-            languageCodes: [getGoogleCloudSpeechLanguageCode(language)],
+            languageCodes: [
+              getGoogleCloudSpeechLanguageCode(speechLanguage),
+            ],
             model: selectedModel,
           },
           content: audioData,
@@ -415,8 +454,16 @@ export async function transcribeWithGoogleSpeechProvider(
     config: GoogleSpeechTranscriptionConfig;
   },
 ) {
-  const { abortSignal, apiKey, config, fileUri, language, provider, providerModel } =
-    params;
+  const {
+    abortSignal,
+    apiKey,
+    config,
+    fileUri,
+    language,
+    provider,
+    providerModel,
+    speechLanguage,
+  } = params;
   const aiStudioCredentials = parseGoogleAiStudioCredentials(apiKey);
 
   if (!aiStudioCredentials) {
@@ -454,7 +501,10 @@ export async function transcribeWithGoogleSpeechProvider(
               role: "user",
               parts: [
                 {
-                  text: "Transcribe the speech in this audio exactly. Return only the transcript in the spoken language and do not translate or add commentary.",
+                  text:
+                    speechLanguage === "auto"
+                      ? "Transcribe the speech in this audio exactly. Return only the transcript in the spoken language and do not translate or add commentary."
+                      : `Transcribe the speech in this audio exactly. The expected language is ${getSpeechLanguageDefinition(speechLanguage).nativeLocale}. Return only the transcript in that language and do not translate or add commentary.`,
                 },
                 {
                   inlineData: {
@@ -503,10 +553,23 @@ export async function transcribeWithXaiRestSttProvider(
     config: XaiRestSttTranscriptionConfig;
   },
 ) {
-  const { abortSignal, apiKey, config, fileUri, language, provider } = params;
+  const {
+    abortSignal,
+    apiKey,
+    config,
+    fileUri,
+    language,
+    provider,
+    speechLanguage,
+  } = params;
   const formData = new FormData();
-  formData.append("format", "true");
-  formData.append("language", normalizeXaiSttLanguage(language));
+  if (speechLanguage !== "auto") {
+    formData.append("format", "true");
+    formData.append(
+      "language",
+      getProviderSpeechLanguageCode(speechLanguage),
+    );
+  }
   formData.append(
     "file",
     {
@@ -555,8 +618,4 @@ export async function transcribeWithXaiRestSttProvider(
   const data = await response.json();
   const text = typeof data?.text === "string" ? data.text.trim() : "";
   return text ? text : null;
-}
-
-function normalizeXaiSttLanguage(language: AppLanguage) {
-  return getDefaultContentLanguageForLocale(language);
 }
