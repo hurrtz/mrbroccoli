@@ -123,7 +123,7 @@ describe("provider model accuracy", () => {
     expect(providerModelIds("gemini")).not.toContain(
       "gemini-3.1-flash-live-preview",
     );
-    expect(PROVIDER_DEFAULT_MODELS.gemini).toBe("gemini-2.5-flash");
+    expect(PROVIDER_DEFAULT_MODELS.gemini).toBe("gemini-3.6-flash");
   });
 
   it("uses current Mistral models and avoids deprecated model rows", () => {
