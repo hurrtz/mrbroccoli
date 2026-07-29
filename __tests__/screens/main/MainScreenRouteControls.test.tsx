@@ -149,6 +149,16 @@ describe("MainScreenRouteControls", () => {
     expect(
       screen.getByTestId("route-ulra-mode-container").props.accessibilityState,
     ).toEqual({ checked: true });
+    expect(
+      screen.getByTestId("route-ulra-mode-container").children[0],
+    ).toMatchObject({
+      props: { testID: "route-ulra-mode-control" },
+    });
+    expect(
+      StyleSheet.flatten(
+        screen.getByTestId("route-ulra-mode-label").props.style,
+      ).textAlign,
+    ).toBe("left");
 
     fireEvent.press(screen.getByTestId("route-ulra-mode-label"));
     expect(onToggleUlraMode).toHaveBeenCalledTimes(1);

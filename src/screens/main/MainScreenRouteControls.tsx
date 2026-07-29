@@ -152,13 +152,6 @@ function RouteSwitchControl({
         pressed ? styles.searchControlPressed : null,
       ]}
     >
-      <Text
-        testID={`${testIDPrefix}-label`}
-        accessible={false}
-        style={[styles.searchLabel, { color: colors.textSecondary }]}
-      >
-        {label}
-      </Text>
       <NativeSwitch
         testID={`${testIDPrefix}-control`}
         accessible={false}
@@ -181,6 +174,17 @@ function RouteSwitchControl({
         }
         ios_backgroundColor={colors.borderStrong}
       />
+      <Text
+        testID={`${testIDPrefix}-label`}
+        accessible={false}
+        style={[
+          styles.searchLabel,
+          styles.routeSwitchLabel,
+          { color: colors.textSecondary },
+        ]}
+      >
+        {label}
+      </Text>
     </Pressable>
   );
 }
@@ -220,6 +224,9 @@ const styles = StyleSheet.create({
     includeFontPadding: false,
     textAlign: "right",
     textAlignVertical: "center",
+  },
+  routeSwitchLabel: {
+    textAlign: "left",
   },
   searchSwitch: {
     alignSelf: "center",
