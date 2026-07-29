@@ -1,6 +1,7 @@
 import { createHash } from "node:crypto";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
+import parsePng from "parse-png";
 
 const root = process.cwd();
 const readText = (path) => readFileSync(resolve(root, path), "utf8");
@@ -60,6 +61,11 @@ function assertAllEqual(label, actual, expected) {
 
 function sha256(bytes) {
   return createHash("sha256").update(bytes).digest("hex");
+}
+
+async function pngFingerprint(path) {
+  const image = await parsePng(readBytes(path));
+  return `${image.width}x${image.height}:${sha256(image.data)}`;
 }
 
 const iosBundleIdentifier = appConfig.ios?.bundleIdentifier;
@@ -163,17 +169,39 @@ assertEqual("shared and Android legacy icon path", androidIconPath, iconPath);
 assertEqual(
   "Android adaptive foreground path",
   adaptiveForegroundPath,
-  "assets/appIcon/android_foreground.png",
+  "assets/appIcon/android-adaptive-foreground.png",
 );
 assertEqual(
   "Android adaptive background path",
   adaptiveBackgroundPath,
-  "assets/appIcon/android_background.png",
+  "assets/appIcon/android-background.png",
 );
 assertEqual(
   "Android adaptive monochrome path",
   adaptiveMonochromePath,
-  "assets/appIcon/android_monochrome.png",
+  "assets/appIcon/android-adaptive-monochrome.png",
+);
+const adaptiveForeground = await parsePng(readBytes(adaptiveForegroundPath));
+const adaptiveBackground = await parsePng(readBytes(adaptiveBackgroundPath));
+const adaptiveMonochrome = await parsePng(readBytes(adaptiveMonochromePath));
+assertEqual(
+  "Android adaptive icon dimensions",
+  JSON.stringify([
+    adaptiveForeground.width,
+    adaptiveForeground.height,
+    adaptiveBackground.width,
+    adaptiveBackground.height,
+    adaptiveMonochrome.width,
+    adaptiveMonochrome.height,
+  ]),
+  JSON.stringify([1024, 1024, 1024, 1024, 1024, 1024]),
+);
+assertEqual(
+  "Android adaptive monochrome transparency",
+  adaptiveMonochrome.data.some(
+    (value, index) => index % 4 === 3 && value < 255,
+  ),
+  true,
 );
 assertIncludes(
   "Android adaptive background resource",
@@ -199,11 +227,9 @@ assertEqual(
 );
 assertEqual(
   "iOS app icon content",
-  sha256(readBytes(iconPath)),
-  sha256(
-    readBytes(
-      "ios/MrBroccoli/Images.xcassets/AppIcon.appiconset/App-Icon-1024x1024@1x.png",
-    ),
+  await pngFingerprint(iconPath),
+  await pngFingerprint(
+    "ios/MrBroccoli/Images.xcassets/AppIcon.appiconset/App-Icon-1024x1024@1x.png",
   ),
 );
 

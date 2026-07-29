@@ -20,9 +20,9 @@
     "android": {
       "icon": "./assets/appIcon/ios.png",
       "adaptiveIcon": {
-        "foregroundImage": "./assets/appIcon/android_foreground.png",
-        "backgroundImage": "./assets/appIcon/android_background.png",
-        "monochromeImage": "./assets/appIcon/android_monochrome.png"
+        "foregroundImage": "./assets/appIcon/android-adaptive-foreground.png",
+        "backgroundImage": "./assets/appIcon/android-background.png",
+        "monochromeImage": "./assets/appIcon/android-adaptive-monochrome.png"
       },
       "package": "com.tobiaswinkler.app.mrbroccoli"
     },
