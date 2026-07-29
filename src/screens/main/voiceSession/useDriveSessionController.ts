@@ -20,6 +20,7 @@ import {
   DriveVoiceActivityState,
   getDriveCountdownSeconds,
   getDriveSilenceRemainingMs,
+  getDriveVoiceActivityDiagnostics,
   updateDriveVoiceActivity,
 } from "./driveVoiceActivity";
 import { AudioPlayerController } from "./types";
@@ -334,6 +335,28 @@ export function useDriveSessionController({
     );
     voiceActivityRef.current = updated;
 
+    if (
+      !current.voiceActive &&
+      current.aboveThresholdSamples > 0 &&
+      !updated.voiceActive &&
+      updated.aboveThresholdSamples === 0
+    ) {
+      recordDebugLogEvent({
+        event: "drive-session-speech-candidate-rejected",
+        payload: {
+          ...getDriveVoiceActivityDiagnostics(updated),
+          candidateDurationMs:
+            current.candidateStartedAtMs === null
+              ? 0
+              : Math.max(0, Date.now() - current.candidateStartedAtMs),
+          candidatePeakDb: current.candidatePeakDb,
+          candidateSamples: current.aboveThresholdSamples,
+          candidateTroughDb: current.candidateTroughDb,
+          meteringDb: inputMetering,
+        },
+      });
+    }
+
     if (updated.voiceActive !== current.voiceActive) {
       setVoiceActive(updated.voiceActive);
       if (updated.voiceActive) {
@@ -345,6 +368,8 @@ export function useDriveSessionController({
           : "drive-session-speech-ended",
         payload: {
           hasDetectedSpeech: updated.hasDetectedSpeech,
+          meteringDb: inputMetering,
+          ...getDriveVoiceActivityDiagnostics(updated),
         },
       });
     }
@@ -640,6 +665,7 @@ export function useDriveSessionController({
   return {
     autoContinueEnabled,
     canRepeat: Boolean(lastCompletedReplyRef.current.trim()),
+    engaged,
     silenceCountdownSeconds,
     voiceActive,
     engage,

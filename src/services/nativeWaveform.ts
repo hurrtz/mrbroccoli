@@ -5,6 +5,7 @@ type NativeWaveformEvent =
       type: "started" | "stopped" | "cancelled";
       sessionId: string;
       uri?: string;
+      audioRoute?: string;
     }
   | {
       type: "levels";
@@ -15,6 +16,18 @@ type NativeWaveformEvent =
       type: "error";
       sessionId: string;
       message: string;
+    }
+  | {
+      type: "routeChanged";
+      sessionId: string;
+      audioRoute: string;
+      reason?: number | string;
+    }
+  | {
+      type: "interruption";
+      sessionId: string;
+      state: "began" | "ended";
+      resumed?: boolean;
     };
 
 type NativeWaveformModule = {

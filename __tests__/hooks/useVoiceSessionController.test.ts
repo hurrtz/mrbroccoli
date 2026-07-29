@@ -587,6 +587,61 @@ describe("useVoiceSessionController", () => {
     }
   });
 
+  it("does not let brief background chatter keep a Drive turn open", async () => {
+    jest.useFakeTimers();
+    try {
+      const { result, params, rerender } = renderController({
+        settings: {
+          inputMode: "drive-session",
+          spokenRepliesEnabled: true,
+          sttMode: "provider",
+          ttsMode: "provider",
+          providerSttModels: {},
+        },
+      });
+
+      await act(async () => {
+        await result.current.handleTogglePress();
+      });
+      params.isRecording = true;
+      act(() => rerender());
+
+      const advanceWithLevel = (durationMs: number, metering: number) => {
+        act(() => {
+          jest.advanceTimersByTime(durationMs);
+          params.recorder.inputMetering = metering;
+          rerender();
+        });
+      };
+
+      advanceWithLevel(700, -20);
+      advanceWithLevel(150, -19);
+      advanceWithLevel(150, -70);
+      advanceWithLevel(150, -71);
+      advanceWithLevel(150, -72);
+
+      for (const quietBeforeBurstMs of [1_800, 2_550, 2_550]) {
+        advanceWithLevel(quietBeforeBurstMs, -36);
+        advanceWithLevel(150, -35);
+        advanceWithLevel(150, -52);
+      }
+
+      expect(params.recorder.stopRecording).not.toHaveBeenCalled();
+
+      await act(async () => {
+        jest.advanceTimersByTime(2_100);
+        await Promise.resolve();
+      });
+
+      expect(params.recorder.stopRecording).toHaveBeenCalledTimes(1);
+      expect(params.handleVoiceCaptureDone).toHaveBeenCalledWith({
+        audioUri: "file://voice.m4a",
+      });
+    } finally {
+      jest.useRealTimers();
+    }
+  });
+
   it("plays soft recording-safe cues for the final Drive countdown", async () => {
     jest.useFakeTimers();
     try {

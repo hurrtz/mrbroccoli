@@ -18,4 +18,23 @@ enum MrBroccoliWaveformAudioSession {
       options: [.notifyOthersOnDeactivation]
     )
   }
+
+  static func currentInputRouteLabel() -> String {
+    switch AVAudioSession.sharedInstance().currentRoute.inputs.first?.portType {
+    case .bluetoothHFP:
+      return "bluetooth-hfp"
+    case .bluetoothLE:
+      return "bluetooth-le-headset"
+    case .headsetMic:
+      return "wired-headset"
+    case .usbAudio:
+      return "usb-headset"
+    case .builtInMic:
+      return "built-in"
+    case .none:
+      return "system-default"
+    default:
+      return "other"
+    }
+  }
 }

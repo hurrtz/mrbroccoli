@@ -1,6 +1,7 @@
 package com.tobiaswinkler.app.mrbroccoli
 
 import android.content.Context
+import android.media.AudioAttributes
 import android.media.MediaPlayer
 import android.net.Uri
 import java.io.File
@@ -13,6 +14,12 @@ internal class MrBroccoliAndroidAudioQueuePlayer(
   private val mediaPlayer = MediaPlayer()
 
   init {
+    mediaPlayer.setAudioAttributes(
+      AudioAttributes.Builder()
+        .setUsage(AudioAttributes.USAGE_ASSISTANCE_ACCESSIBILITY)
+        .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
+        .build(),
+    )
     mediaPlayer.setOnCompletionListener {
       callbacks.onCompletion()
     }

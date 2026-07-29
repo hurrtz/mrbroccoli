@@ -21,6 +21,8 @@ final class MrBroccoliWaveformRecorder {
   private var outputURL: URL?
   private var pendingRecordingErrorSessionId: String?
   private var lastMeteringEmissionAt: TimeInterval = 0
+  private var routeChangeObserver: NSObjectProtocol?
+  private var interruptionObserver: NSObjectProtocol?
 
   func startRecording(
     sessionId: String,
@@ -132,10 +134,12 @@ final class MrBroccoliWaveformRecorder {
     self.fileFormat = fileFormat
     activeSessionId = sessionId
     self.outputURL = outputURL
+    observeAudioSession(sessionId: sessionId)
     emitEvent([
       "type": "started",
       "sessionId": sessionId,
       "uri": outputURL.absoluteString,
+      "audioRoute": MrBroccoliWaveformAudioSession.currentInputRouteLabel(),
     ])
 
     return outputURL
@@ -185,6 +189,7 @@ final class MrBroccoliWaveformRecorder {
   }
 
   private func cleanupRecording(deleteOutput: Bool) {
+    stopObservingAudioSession()
     if let inputNode = audioEngine?.inputNode {
       inputNode.removeTap(onBus: 0)
     }
@@ -207,6 +212,97 @@ final class MrBroccoliWaveformRecorder {
 
     if deleteOutput, let outputURL {
       try? FileManager.default.removeItem(at: outputURL)
+    }
+  }
+
+  private func observeAudioSession(sessionId: String) {
+    stopObservingAudioSession()
+
+    routeChangeObserver = NotificationCenter.default.addObserver(
+      forName: AVAudioSession.routeChangeNotification,
+      object: AVAudioSession.sharedInstance(),
+      queue: .main
+    ) { [weak self] notification in
+      guard let self, self.activeSessionId == sessionId else {
+        return
+      }
+
+      let rawReason = notification.userInfo?[
+        AVAudioSessionRouteChangeReasonKey
+      ] as? UInt
+      self.emitEvent([
+        "type": "routeChanged",
+        "sessionId": sessionId,
+        "audioRoute": MrBroccoliWaveformAudioSession.currentInputRouteLabel(),
+        "reason": rawReason ?? 0,
+      ])
+    }
+
+    interruptionObserver = NotificationCenter.default.addObserver(
+      forName: AVAudioSession.interruptionNotification,
+      object: AVAudioSession.sharedInstance(),
+      queue: .main
+    ) { [weak self] notification in
+      guard let self, self.activeSessionId == sessionId else {
+        return
+      }
+
+      let rawType = notification.userInfo?[
+        AVAudioSessionInterruptionTypeKey
+      ] as? UInt
+      let interruptionType = rawType.flatMap(
+        AVAudioSession.InterruptionType.init(rawValue:)
+      )
+
+      if interruptionType == .began {
+        self.emitEvent([
+          "type": "interruption",
+          "sessionId": sessionId,
+          "state": "began",
+        ])
+        return
+      }
+
+      let rawOptions = notification.userInfo?[
+        AVAudioSessionInterruptionOptionKey
+      ] as? UInt ?? 0
+      let shouldResume = AVAudioSession.InterruptionOptions(
+        rawValue: rawOptions
+      ).contains(.shouldResume)
+      var resumed = false
+
+      if shouldResume, let engine = self.audioEngine {
+        do {
+          try AVAudioSession.sharedInstance().setActive(true)
+          if !engine.isRunning {
+            try engine.start()
+          }
+          resumed = engine.isRunning
+        } catch {
+          self.handleRecordingWriteError(
+            sessionId: sessionId,
+            message: error.localizedDescription
+          )
+        }
+      }
+
+      self.emitEvent([
+        "type": "interruption",
+        "sessionId": sessionId,
+        "state": "ended",
+        "resumed": resumed,
+      ])
+    }
+  }
+
+  private func stopObservingAudioSession() {
+    if let routeChangeObserver {
+      NotificationCenter.default.removeObserver(routeChangeObserver)
+      self.routeChangeObserver = nil
+    }
+    if let interruptionObserver {
+      NotificationCenter.default.removeObserver(interruptionObserver)
+      self.interruptionObserver = nil
     }
   }
 

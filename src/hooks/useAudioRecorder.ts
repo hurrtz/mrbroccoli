@@ -107,6 +107,42 @@ export function useAudioRecorder() {
         return;
       }
 
+      if (event.type === "started") {
+        recordDebugLogEvent({
+          event: "native-recorder-route-selected",
+          payload: {
+            audioRoute: event.audioRoute ?? "unknown",
+            sessionId: event.sessionId,
+          },
+        });
+        return;
+      }
+
+      if (event.type === "routeChanged") {
+        recordDebugLogEvent({
+          event: "native-recorder-route-changed",
+          payload: {
+            audioRoute: event.audioRoute,
+            reason: event.reason,
+            sessionId: event.sessionId,
+          },
+        });
+        return;
+      }
+
+      if (event.type === "interruption") {
+        recordDebugLogEvent({
+          event: "native-recorder-interruption",
+          level: event.state === "began" ? "warn" : "info",
+          payload: {
+            resumed: event.resumed,
+            sessionId: event.sessionId,
+            state: event.state,
+          },
+        });
+        return;
+      }
+
       if (
         event.type === "error" &&
         nativeSessionIdRef.current &&

@@ -1,5 +1,10 @@
 package com.tobiaswinkler.app.mrbroccoli
 
+import android.content.Context
+import android.media.AudioAttributes
+import android.media.AudioDeviceCallback
+import android.media.AudioDeviceInfo
+import android.media.AudioManager
 import android.media.MediaPlayer
 import android.media.MediaRecorder
 import android.net.Uri
@@ -26,11 +31,19 @@ class MrBroccoliNativeWaveformModule(
 
   private val lock = Any()
   private val mainHandler = Handler(Looper.getMainLooper())
+  private val audioManager by lazy {
+    reactApplicationContext.getSystemService(Context.AUDIO_SERVICE) as AudioManager
+  }
 
   private var recorder: MediaRecorder? = null
   private var activeSessionId: String? = null
   private var activeOutputFile: File? = null
   private var levelRunnable: Runnable? = null
+  private var audioDeviceCallback: AudioDeviceCallback? = null
+  private var previousAudioMode: Int? = null
+  private var previousSpeakerphoneOn: Boolean? = null
+  private var legacyBluetoothScoStarted = false
+  private var communicationRouteConfigured = false
 
   override fun getName(): String = NAME
 
@@ -62,6 +75,7 @@ class MrBroccoliNativeWaveformModule(
       try {
         val outputFile = resolveOutputFile(outputUri)
         outputFile.parentFile?.mkdirs()
+        configureCommunicationRouteLocked()
 
         val nextRecorder =
           if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
@@ -78,6 +92,7 @@ class MrBroccoliNativeWaveformModule(
         recorder = nextRecorder
         activeSessionId = sessionId
         activeOutputFile = outputFile
+        startAudioRouteUpdatesLocked(sessionId)
         startLevelUpdatesLocked(sessionId, nextRecorder)
         emitLifecycleEvent(
           type = "started",
@@ -129,6 +144,9 @@ class MrBroccoliNativeWaveformModule(
         recorder = null
         activeSessionId = null
         activeOutputFile = null
+        stopAudioRouteUpdatesLocked()
+        stopLevelUpdatesLocked()
+        restoreCommunicationRouteLocked()
         emitLifecycleEvent(
           type = "stopped",
           sessionId = sessionId,
@@ -187,6 +205,12 @@ class MrBroccoliNativeWaveformModule(
         }
 
         val player = MediaPlayer()
+        player.setAudioAttributes(
+          AudioAttributes.Builder()
+            .setUsage(AudioAttributes.USAGE_VOICE_COMMUNICATION)
+            .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+            .build(),
+        )
         player.setDataSource(path)
         player.setVolume(1f, 1f)
         player.setOnCompletionListener { completed ->
@@ -217,7 +241,11 @@ class MrBroccoliNativeWaveformModule(
   }
 
   private fun configureRecorder(recorder: MediaRecorder, outputFile: File) {
-    recorder.setAudioSource(MediaRecorder.AudioSource.MIC)
+    // VOICE_RECOGNITION follows Android's active communication input route
+    // without applying the stronger call processing used by
+    // VOICE_COMMUNICATION. This keeps AirPods/headset microphones usable for
+    // transcription while preserving speech quality.
+    recorder.setAudioSource(MediaRecorder.AudioSource.VOICE_RECOGNITION)
     recorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4)
     recorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC)
     recorder.setAudioChannels(1)
@@ -252,6 +280,7 @@ class MrBroccoliNativeWaveformModule(
     recorder = null
     activeSessionId = null
     activeOutputFile = null
+    stopAudioRouteUpdatesLocked()
     stopLevelUpdatesLocked()
 
     if (currentRecorder != null) {
@@ -276,6 +305,84 @@ class MrBroccoliNativeWaveformModule(
     if (deleteOutput) {
       outputFile?.delete()
     }
+
+    restoreCommunicationRouteLocked()
+  }
+
+  private fun configureCommunicationRouteLocked() {
+    if (communicationRouteConfigured) {
+      return
+    }
+
+    previousAudioMode = audioManager.mode
+    @Suppress("DEPRECATION")
+    previousSpeakerphoneOn = audioManager.isSpeakerphoneOn
+    audioManager.mode = AudioManager.MODE_IN_COMMUNICATION
+
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+      val preferredTypes = listOf(
+        AudioDeviceInfo.TYPE_BLUETOOTH_SCO,
+        AudioDeviceInfo.TYPE_BLE_HEADSET,
+        AudioDeviceInfo.TYPE_WIRED_HEADSET,
+        AudioDeviceInfo.TYPE_USB_HEADSET,
+      )
+      val preferredDevice = preferredTypes.firstNotNullOfOrNull { type ->
+        audioManager.availableCommunicationDevices.firstOrNull {
+          it.type == type
+        }
+      }
+      if (preferredDevice != null) {
+        runCatching {
+          audioManager.setCommunicationDevice(preferredDevice)
+        }
+      }
+    } else {
+      val hasConnectedBluetoothInput = audioManager
+        .getDevices(AudioManager.GET_DEVICES_INPUTS)
+        .any { it.type == AudioDeviceInfo.TYPE_BLUETOOTH_SCO }
+      @Suppress("DEPRECATION")
+      if (
+        hasConnectedBluetoothInput &&
+        audioManager.isBluetoothScoAvailableOffCall
+      ) {
+        @Suppress("DEPRECATION")
+        runCatching {
+          audioManager.startBluetoothSco()
+          @Suppress("DEPRECATION")
+          audioManager.isBluetoothScoOn = true
+          legacyBluetoothScoStarted = true
+        }
+      }
+    }
+
+    communicationRouteConfigured = true
+  }
+
+  private fun restoreCommunicationRouteLocked() {
+    if (!communicationRouteConfigured && previousAudioMode == null) {
+      return
+    }
+
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+      runCatching { audioManager.clearCommunicationDevice() }
+    } else if (legacyBluetoothScoStarted) {
+      @Suppress("DEPRECATION")
+      runCatching {
+        audioManager.isBluetoothScoOn = false
+        @Suppress("DEPRECATION")
+        audioManager.stopBluetoothSco()
+      }
+    }
+
+    @Suppress("DEPRECATION")
+    previousSpeakerphoneOn?.let {
+      runCatching { audioManager.isSpeakerphoneOn = it }
+    }
+    previousAudioMode?.let { runCatching { audioManager.mode = it } }
+    previousAudioMode = null
+    previousSpeakerphoneOn = null
+    legacyBluetoothScoStarted = false
+    communicationRouteConfigured = false
   }
 
   private fun startLevelUpdatesLocked(
@@ -320,6 +427,45 @@ class MrBroccoliNativeWaveformModule(
     mainHandler.post(runnable)
   }
 
+  private fun startAudioRouteUpdatesLocked(sessionId: String) {
+    stopAudioRouteUpdatesLocked()
+    val callback = object : AudioDeviceCallback() {
+      override fun onAudioDevicesAdded(addedDevices: Array<out AudioDeviceInfo>) {
+        emitRouteChangeIfActive(sessionId, "added")
+      }
+
+      override fun onAudioDevicesRemoved(
+        removedDevices: Array<out AudioDeviceInfo>,
+      ) {
+        emitRouteChangeIfActive(sessionId, "removed")
+      }
+    }
+    audioDeviceCallback = callback
+    audioManager.registerAudioDeviceCallback(callback, mainHandler)
+  }
+
+  private fun stopAudioRouteUpdatesLocked() {
+    audioDeviceCallback?.let {
+      runCatching { audioManager.unregisterAudioDeviceCallback(it) }
+    }
+    audioDeviceCallback = null
+  }
+
+  private fun emitRouteChangeIfActive(sessionId: String, reason: String) {
+    synchronized(lock) {
+      if (activeSessionId != sessionId || recorder == null) {
+        return
+      }
+      val payload = Arguments.createMap().apply {
+        putString("type", "routeChanged")
+        putString("sessionId", sessionId)
+        putString("audioRoute", currentAudioRouteLabel())
+        putString("reason", reason)
+      }
+      emitEvent(payload)
+    }
+  }
+
   private fun stopLevelUpdatesLocked() {
     levelRunnable?.let(mainHandler::removeCallbacks)
     levelRunnable = null
@@ -334,9 +480,38 @@ class MrBroccoliNativeWaveformModule(
       } else {
         putNull("uri")
       }
+      putString("audioRoute", currentAudioRouteLabel())
     }
 
     emitEvent(payload)
+  }
+
+  private fun currentAudioRouteLabel(): String {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+      return when (audioManager.communicationDevice?.type) {
+        AudioDeviceInfo.TYPE_BLUETOOTH_SCO -> "bluetooth-hfp"
+        AudioDeviceInfo.TYPE_BLE_HEADSET -> "bluetooth-le-headset"
+        AudioDeviceInfo.TYPE_WIRED_HEADSET -> "wired-headset"
+        AudioDeviceInfo.TYPE_USB_HEADSET -> "usb-headset"
+        AudioDeviceInfo.TYPE_BUILTIN_MIC -> "built-in"
+        null -> "system-default"
+        else -> "other"
+      }
+    }
+
+    @Suppress("DEPRECATION")
+    return if (audioManager.isBluetoothScoOn) {
+      "bluetooth-hfp"
+    } else {
+      val inputTypes = audioManager
+        .getDevices(AudioManager.GET_DEVICES_INPUTS)
+        .map(AudioDeviceInfo::getType)
+      when {
+        AudioDeviceInfo.TYPE_WIRED_HEADSET in inputTypes -> "wired-headset"
+        AudioDeviceInfo.TYPE_USB_HEADSET in inputTypes -> "usb-headset"
+        else -> "built-in"
+      }
+    }
   }
 
   private fun emitErrorEvent(sessionId: String, message: String) {

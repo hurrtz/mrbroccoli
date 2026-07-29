@@ -75,4 +75,88 @@ describe("driveVoiceActivity", () => {
     expect(state.hasDetectedSpeech).toBe(false);
     expect(state.voiceActive).toBe(false);
   });
+
+  it("does not let intermittent background chatter reset the silence window", () => {
+    let state = createDriveVoiceActivityState(0);
+
+    state = updateDriveVoiceActivity(state, -20, 1_000);
+    state = updateDriveVoiceActivity(state, -18, 1_150);
+    state = updateDriveVoiceActivity(state, -70, 1_300);
+    state = updateDriveVoiceActivity(state, -70, 1_450);
+    state = updateDriveVoiceActivity(state, -70, 1_600);
+    const lastSpeechAtMs = state.lastSpeechAtMs;
+    let pausedForCandidate = false;
+
+    for (const burstStartedAtMs of [3_000, 6_000, 9_000]) {
+      state = updateDriveVoiceActivity(
+        state,
+        -36,
+        burstStartedAtMs,
+      );
+      pausedForCandidate ||= getDriveCountdownSeconds(
+        state,
+        burstStartedAtMs,
+      ) === null;
+
+      state = updateDriveVoiceActivity(
+        state,
+        -35,
+        burstStartedAtMs + 150,
+      );
+      state = updateDriveVoiceActivity(
+        state,
+        -52,
+        burstStartedAtMs + 300,
+      );
+
+      expect(state.voiceActive).toBe(false);
+      expect(state.lastSpeechAtMs).toBe(lastSpeechAtMs);
+    }
+
+    expect(pausedForCandidate).toBe(true);
+    expect(getDriveSilenceRemainingMs(state, 11_150)).toBe(0);
+  });
+
+  it("adapts to steady chatter that begins after real speech", () => {
+    let state = createDriveVoiceActivityState(0);
+
+    state = updateDriveVoiceActivity(state, -20, 1_000);
+    state = updateDriveVoiceActivity(state, -18, 1_150);
+    state = updateDriveVoiceActivity(state, -70, 1_300);
+    state = updateDriveVoiceActivity(state, -70, 1_450);
+    state = updateDriveVoiceActivity(state, -70, 1_600);
+    const lastSpeechAtMs = state.lastSpeechAtMs;
+
+    for (let index = 0; index < 30; index += 1) {
+      state = updateDriveVoiceActivity(
+        state,
+        -42,
+        2_000 + index * 150,
+      );
+    }
+
+    expect(state.voiceActive).toBe(false);
+    expect(state.lastSpeechAtMs).toBe(lastSpeechAtMs);
+    expect(getDriveSilenceRemainingMs(state, 11_150)).toBe(0);
+  });
+
+  it("still confirms a real near-field utterance after ambient adaptation", () => {
+    let state = createDriveVoiceActivityState(0);
+
+    for (let index = 0; index < 20; index += 1) {
+      state = updateDriveVoiceActivity(state, -44, index * 150);
+    }
+
+    for (const [index, levelDb] of [-24, -22].entries()) {
+      state = updateDriveVoiceActivity(
+        state,
+        levelDb,
+        3_000 + index * 150,
+      );
+    }
+
+    expect(state.hasDetectedSpeech).toBe(true);
+    expect(state.voiceActive).toBe(true);
+    expect(state.lastSpeechAtMs).toBe(3_150);
+  });
 });

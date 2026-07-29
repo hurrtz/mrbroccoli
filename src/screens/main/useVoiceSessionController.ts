@@ -8,6 +8,7 @@ import { useVoiceInputPressHandlers } from "./voiceSession/useVoiceInputPressHan
 import { useVoiceSessionAppState } from "./voiceSession/useVoiceSessionAppState";
 import { useVoiceSessionCancellation } from "./voiceSession/useVoiceSessionCancellation";
 import { useVoiceSessionGuards } from "./voiceSession/useVoiceSessionGuards";
+import { useVoiceSessionKeepAwake } from "./voiceSession/useVoiceSessionKeepAwake";
 import type { UseVoiceSessionControllerParams } from "./voiceSession/types";
 
 export function useVoiceSessionController({
@@ -138,6 +139,10 @@ export function useVoiceSessionController({
     stopReplay,
     t,
   });
+  useVoiceSessionKeepAwake(
+    isRecording ||
+      (driveSession.autoContinueEnabled && driveSession.engaged),
+  );
 
   useVoiceSessionAppState({
     hasActiveVoiceCaptureNow,
