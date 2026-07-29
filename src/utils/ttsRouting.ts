@@ -130,6 +130,11 @@ const LANGUAGE_HEURISTICS: Record<
     markerScore: 4,
     tokens: [" a ", " že ", " se ", " je ", " není ", " pro "],
   },
+  pl: {
+    marker: /[ąćęłńśźż]/i,
+    markerScore: 4,
+    tokens: [" i ", " że ", " nie ", " jest ", " się ", " dla "],
+  },
 };
 
 function scoreLanguage(text: string, language: TtsListenLanguage) {

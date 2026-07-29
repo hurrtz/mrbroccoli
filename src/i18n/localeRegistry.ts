@@ -8,6 +8,7 @@ import { hi } from "./locales/hi";
 import { hu } from "./locales/hu";
 import { it } from "./locales/it";
 import { ja } from "./locales/ja";
+import { pl } from "./locales/pl";
 import { pt } from "./locales/pt";
 import { ptBR } from "./locales/ptBR";
 import { ru } from "./locales/ru";
@@ -252,6 +253,17 @@ export const APP_LOCALES = {
       search: { cancel: "Zrušit" },
     },
     defaultTtsListenLanguage: "cs",
+  }),
+  pl: defineAppLocale({
+    nativeName: "Polski",
+    intlLocale: "pl-PL",
+    messages: pl,
+    antDesign: {
+      modal: { ok: "OK", cancel: "Anuluj", button: "Przycisk" },
+      picker: { ok: "OK", cancel: "Anuluj", select: "Wybierz" },
+      search: { cancel: "Anuluj" },
+    },
+    defaultTtsListenLanguage: "pl",
   }),
 } as const;
 

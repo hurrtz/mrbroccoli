@@ -136,6 +136,14 @@ export const SPEECH_LANGUAGE_REGISTRY = {
     xaiTtsLocale: null,
     qwenTtsLanguage: null,
   },
+  pl: {
+    labelKey: "polish",
+    nativeLocale: "pl-PL",
+    providerCode: "pl",
+    googleCloudLocale: "pl-PL",
+    xaiTtsLocale: null,
+    qwenTtsLanguage: null,
+  },
 } as const satisfies Record<string, SpeechLanguageDefinition>;
 
 export type SpeechLanguage = keyof typeof SPEECH_LANGUAGE_REGISTRY;

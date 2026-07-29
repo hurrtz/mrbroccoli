@@ -602,6 +602,7 @@ export const RUNTIME_PROVIDER_MANIFEST: Record<
         "ja",
         "hu",
         "cs",
+        "pl",
       ],
       languageNote: `OpenAI currently exposes gpt-4o-transcribe, gpt-4o-mini-transcribe, and whisper-1 for speech-to-text. OpenAI's published well-supported language set is: ${WHISPER_WELL_SUPPORTED_LANGUAGES}`,
     },
@@ -634,6 +635,7 @@ export const RUNTIME_PROVIDER_MANIFEST: Record<
         "ja",
         "hu",
         "cs",
+        "pl",
       ],
       voiceOptions: [
         voice("alloy", "Alloy"),
@@ -1142,6 +1144,7 @@ export const RUNTIME_PROVIDER_MANIFEST: Record<
         "ja",
         "hu",
         "cs",
+        "pl",
       ],
       voiceOptions: [
         voice("Zephyr", "Zephyr · Bright", { de: "Zephyr · Klar" }),
@@ -1420,6 +1423,7 @@ export const RUNTIME_PROVIDER_MANIFEST: Record<
         "ja",
         "hu",
         "cs",
+        "pl",
       ],
       languageNote:
         "Scribe v2 automatically detects and transcribes more than 90 languages.",
@@ -1452,6 +1456,7 @@ export const RUNTIME_PROVIDER_MANIFEST: Record<
         "ar",
         "ja",
         "cs",
+        "pl",
       ],
       voiceOptions: [
         voice("21m00Tcm4TlvDq8ikWAM", "Rachel (built-in)", {

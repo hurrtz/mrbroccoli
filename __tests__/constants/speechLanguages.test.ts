@@ -43,6 +43,12 @@ describe("speech language registry", () => {
     expect(SPEECH_LANGUAGE_REGISTRY.cs.nativeLocale).toBe("cs-CZ");
   });
 
+  it("registers Polish as an interface and speech language", () => {
+    expect(SPEECH_LANGUAGE_OPTIONS).toContain("pl");
+    expect(APP_LANGUAGES).toContain("pl");
+    expect(SPEECH_LANGUAGE_REGISTRY.pl.nativeLocale).toBe("pl-PL");
+  });
+
   it("provides routing metadata and previews for every language", () => {
     SPEECH_LANGUAGE_OPTIONS.forEach((language) => {
       const definition = SPEECH_LANGUAGE_REGISTRY[language];

@@ -81,6 +81,16 @@ describe("resolveTtsListenLanguage", () => {
     ).toBe("cs");
   });
 
+  it("prefers Polish when distinctive markers are present", () => {
+    expect(
+      resolveTtsListenLanguage({
+        text: "Zażółć gęślą jaźń, ponieważ to świetny test.",
+        preferredLanguages: ["en", "pl"],
+        appLanguage: "en",
+      }),
+    ).toBe("pl");
+  });
+
   it.each([
     ["es", "¿Dónde está la estación? No encuentro la entrada."],
     ["fr", "Je ne sais pas où est la bonne entrée."],
