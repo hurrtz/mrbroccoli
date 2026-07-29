@@ -94,6 +94,7 @@ export const uk = {
   czech: "Чеська",
   polish: "Польська",
   turkish: "Турецька",
+  swedish: "Шведська",
   kokoroAmericanFemaleVoice: ({ name }) =>
     `${name} · американська англійська, жіночий голос`,
   kokoroBritishFemaleVoice: ({ name }) =>

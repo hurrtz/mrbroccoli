@@ -604,6 +604,7 @@ export const RUNTIME_PROVIDER_MANIFEST: Record<
         "cs",
         "pl",
         "tr",
+        "sv",
       ],
       languageNote: `OpenAI currently exposes gpt-4o-transcribe, gpt-4o-mini-transcribe, and whisper-1 for speech-to-text. OpenAI's published well-supported language set is: ${WHISPER_WELL_SUPPORTED_LANGUAGES}`,
     },
@@ -638,6 +639,7 @@ export const RUNTIME_PROVIDER_MANIFEST: Record<
         "cs",
         "pl",
         "tr",
+        "sv",
       ],
       voiceOptions: [
         voice("alloy", "Alloy"),
@@ -1148,6 +1150,7 @@ export const RUNTIME_PROVIDER_MANIFEST: Record<
         "cs",
         "pl",
         "tr",
+        "sv",
       ],
       voiceOptions: [
         voice("Zephyr", "Zephyr · Bright", { de: "Zephyr · Klar" }),
@@ -1200,7 +1203,7 @@ export const RUNTIME_PROVIDER_MANIFEST: Record<
         voice("Sulafat", "Sulafat · Warm", { de: "Sulafat · Warm" }),
       ],
       languageNote:
-        "Gemini TTS currently supports Arabic, Bengali, Dutch, English, French, German, Hindi, Hungarian, Indonesian, Italian, Japanese, Korean, Mandarin Chinese, Polish, Portuguese, Romanian, Russian, Spanish, Tamil, Telugu, Thai, Turkish, Ukrainian, Urdu, and Vietnamese.",
+        "Gemini TTS currently supports Arabic, Bengali, Czech, Dutch, English, French, German, Hindi, Hungarian, Indonesian, Italian, Japanese, Korean, Mandarin Chinese, Polish, Portuguese, Romanian, Russian, Spanish, Swedish, Tamil, Telugu, Thai, Turkish, Ukrainian, Urdu, and Vietnamese.",
     },
   },
   xai: {
@@ -1429,6 +1432,7 @@ export const RUNTIME_PROVIDER_MANIFEST: Record<
         "cs",
         "pl",
         "tr",
+        "sv",
       ],
       languageNote:
         "Scribe v2 automatically detects and transcribes more than 90 languages.",
@@ -1463,6 +1467,7 @@ export const RUNTIME_PROVIDER_MANIFEST: Record<
         "cs",
         "pl",
         "tr",
+        "sv",
       ],
       voiceOptions: [
         voice("21m00Tcm4TlvDq8ikWAM", "Rachel (built-in)", {

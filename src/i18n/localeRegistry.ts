@@ -12,6 +12,7 @@ import { pl } from "./locales/pl";
 import { pt } from "./locales/pt";
 import { ptBR } from "./locales/ptBR";
 import { ru } from "./locales/ru";
+import { sv } from "./locales/sv";
 import { tr } from "./locales/tr";
 import { uk } from "./locales/uk";
 import { zhCN } from "./locales/zhCN";
@@ -276,6 +277,17 @@ export const APP_LOCALES = {
       search: { cancel: "İptal" },
     },
     defaultTtsListenLanguage: "tr",
+  }),
+  sv: defineAppLocale({
+    nativeName: "Svenska",
+    intlLocale: "sv-SE",
+    messages: sv,
+    antDesign: {
+      modal: { ok: "OK", cancel: "Avbryt", button: "Knapp" },
+      picker: { ok: "OK", cancel: "Avbryt", select: "Välj" },
+      search: { cancel: "Avbryt" },
+    },
+    defaultTtsListenLanguage: "sv",
   }),
 } as const;
 

@@ -49,11 +49,11 @@ Voice input and spoken replies are not tied to any single provider:
 
 Every interface locale is also an official speech language: English, German,
 Ukrainian, Hindi, Spanish, French, Italian, European and Brazilian Portuguese,
-Russian, Simplified Chinese, Arabic, Japanese, Hungarian, Czech, Polish, and
-Turkish. Interface, recognition, and spoken-reply languages are configured
-independently. Provider compatibility is checked before each route is used;
-native availability depends on the voices and recognizers installed by the
-operating system.
+Russian, Simplified Chinese, Arabic, Japanese, Hungarian, Czech, Polish,
+Turkish, and Swedish. Interface, recognition, and spoken-reply languages are
+configured independently. Provider compatibility is checked before each route
+is used; native availability depends on the voices and recognizers installed by
+the operating system.
 
 The Kokoro model is downloaded only when the user opts in (about 140 MiB
 downloaded and 211 MiB installed). It is not bundled in the initial app

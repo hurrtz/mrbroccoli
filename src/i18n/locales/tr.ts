@@ -88,6 +88,7 @@ export const tr = {
   czech: "Çekçe",
   polish: "Lehçe",
   turkish: "Türkçe",
+  swedish: "İsveççe",
   kokoroAmericanFemaleVoice: ({ name }) => `${name} · Amerikalı kadın`,
   kokoroBritishFemaleVoice: ({ name }) => `${name} · İngiliz kadın`,
   kokoroChineseFemaleVoice: ({ index }) => `Çinli kadın ${index}`,

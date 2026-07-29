@@ -140,6 +140,11 @@ const LANGUAGE_HEURISTICS: Record<
     markerScore: 4,
     tokens: [" ve ", " bir ", " bu ", " için ", " değil ", " ile "],
   },
+  sv: {
+    marker: /å/i,
+    markerScore: 4,
+    tokens: [" och ", " att ", " det ", " inte ", " som ", " för "],
+  },
 };
 
 function scoreLanguage(text: string, language: TtsListenLanguage) {

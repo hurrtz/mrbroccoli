@@ -88,6 +88,7 @@ export const zhCN = {
   czech: "捷克语",
   polish: "波兰语",
   turkish: "土耳其语",
+  swedish: "瑞典语",
   kokoroAmericanFemaleVoice: ({ name }) => `${name} · 美式英语，女声`,
   kokoroBritishFemaleVoice: ({ name }) => `${name} · 英式英语，女声`,
   kokoroChineseFemaleVoice: ({ index }) => `中文女声 ${index}`,

@@ -21,6 +21,7 @@ export const PROVIDER_PREVIEW_SAMPLE_TEXT_BY_LANGUAGE: Record<
   cs: "Dobré ráno! Tichý déšť jemně bubnuje do oken, zatímco se město probouzí. Ve tři čtvrtě na osm Pan Brokolice klidně vysvětluje, proč díky skvělým nápadům, zvídavým otázkám a občasnému nečekanému vtipu stojí za to poslouchat i delší rozhovor.",
   pl: "Dzień dobry! Cichy deszcz delikatnie stuka w okna, gdy miasto się budzi. O siódmej czterdzieści pięć Pan Brokuł spokojnie wyjaśnia, dlaczego świetne pomysły, ciekawe pytania i niespodziewany żart sprawiają, że warto słuchać nawet dłuższej rozmowy.",
   tr: "Günaydın! Şehir uyanırken sakin yağmur pencerelere usulca vuruyor. Saat yedi kırk beşte Bay Brokoli, parlak fikirlerin, meraklı soruların ve beklenmedik bir şakanın uzun bir sohbeti neden dinlemeye değer kıldığını sakince anlatıyor.",
+  sv: "God morgon! Det stilla regnet trummar mjukt mot fönstren medan staden vaknar. Klockan kvart i åtta förklarar Herr Broccoli lugnt varför kloka idéer, nyfikna frågor och ett oväntat skämt gör ett långt samtal värt att lyssna på.",
 };
 
 export const LOCAL_PREVIEW_SAMPLE_TEXT_BY_LANGUAGE: Record<
@@ -44,6 +45,7 @@ export const LOCAL_PREVIEW_SAMPLE_TEXT_BY_LANGUAGE: Record<
   cs: "Dobrý den. Toto je delší ukázka místního hlasu pro Pana Brokolici, na které můžete posoudit srozumitelnost výslovnosti a přirozenost rytmu v několika větách za sebou. Pokud zde hlas zní klidně a příjemně, obvykle se hodí i pro předčítání delších odpovědí.",
   pl: "Dzień dobry. To dłuższy podgląd lokalnego głosu Pana Brokuła, który pozwala ocenić wyrazistość wymowy i naturalność rytmu w kilku kolejnych zdaniach. Jeśli głos brzmi tutaj spokojnie i przyjemnie, zwykle dobrze sprawdzi się także podczas czytania dłuższych odpowiedzi.",
   tr: "Merhaba. Bu, Bay Brokoli için daha uzun bir yerel ses önizlemesidir; telaffuzun ne kadar anlaşılır olduğunu ve ritmin birkaç cümle boyunca doğal kalıp kalmadığını duymanızı sağlar. Bu ses burada sakin ve hoş geliyorsa, uzun yanıtların okunmasında da genellikle rahat bir seçimdir.",
+  sv: "Hej. Det här är en längre lokal röstförhandsvisning för Herr Broccoli, så att du kan höra hur tydligt uttalet är och om rytmen känns naturlig genom flera meningar. Om rösten låter lugn och behaglig här brukar den också passa bra för att läsa upp längre svar.",
 };
 
 export function getNativePreviewSampleText(language: TtsListenLanguage) {

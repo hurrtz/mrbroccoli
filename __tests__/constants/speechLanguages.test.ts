@@ -55,6 +55,12 @@ describe("speech language registry", () => {
     expect(SPEECH_LANGUAGE_REGISTRY.tr.nativeLocale).toBe("tr-TR");
   });
 
+  it("registers Swedish as an interface and speech language", () => {
+    expect(SPEECH_LANGUAGE_OPTIONS).toContain("sv");
+    expect(APP_LANGUAGES).toContain("sv");
+    expect(SPEECH_LANGUAGE_REGISTRY.sv.nativeLocale).toBe("sv-SE");
+  });
+
   it("provides routing metadata and previews for every language", () => {
     SPEECH_LANGUAGE_OPTIONS.forEach((language) => {
       const definition = SPEECH_LANGUAGE_REGISTRY[language];

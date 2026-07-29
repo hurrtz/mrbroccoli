@@ -101,6 +101,16 @@ describe("resolveTtsListenLanguage", () => {
     ).toBe("tr");
   });
 
+  it("prefers Swedish when distinctive markers are present", () => {
+    expect(
+      resolveTtsListenLanguage({
+        text: "Jag förstår att det här är en bra lösning.",
+        preferredLanguages: ["en", "sv"],
+        appLanguage: "en",
+      }),
+    ).toBe("sv");
+  });
+
   it.each([
     ["es", "¿Dónde está la estación? No encuentro la entrada."],
     ["fr", "Je ne sais pas où est la bonne entrée."],

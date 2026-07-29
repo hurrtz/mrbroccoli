@@ -44,7 +44,7 @@ Interface, recognition, and spoken-reply languages are independent settings:
 languages and their native/provider locale codes. It contains every interface
 locale (English, German, Ukrainian, Hindi, Spanish, French, Italian, European
 Portuguese, Brazilian Portuguese, Russian, Simplified Chinese, Arabic, and
-  Japanese, Hungarian, Czech, Polish, and Turkish).
+  Japanese, Hungarian, Czech, Polish, Turkish, and Swedish).
 
 Provider STT and TTS language support belongs in
 `src/constants/providers/runtimeManifest.ts`. Settings readiness and runtime

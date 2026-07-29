@@ -102,6 +102,7 @@ describe("translations", () => {
     expect(translations.cs.appName).toBe("Pan Brokolice");
     expect(translations.pl.appName).toBe("Pan Brokuł");
     expect(translations.tr.appName).toBe("Bay Brokoli");
+    expect(translations.sv.appName).toBe("Herr Broccoli");
     expect(JSON.stringify(translations.de)).not.toContain("Mr Broccoli");
     expect(JSON.stringify(translations.uk)).not.toContain("Mr Broccoli");
     expect(JSON.stringify(translations.hi)).not.toContain("Mr Broccoli");
@@ -118,6 +119,7 @@ describe("translations", () => {
     expect(JSON.stringify(translations.cs)).not.toContain("Mr Broccoli");
     expect(JSON.stringify(translations.pl)).not.toContain("Mr Broccoli");
     expect(JSON.stringify(translations.tr)).not.toContain("Mr Broccoli");
+    expect(JSON.stringify(translations.sv)).not.toContain("Mr Broccoli");
   });
 
   it("resolves Ukrainian UI copy and regional formatting", () => {
@@ -193,6 +195,11 @@ describe("translations", () => {
   it("resolves Turkish UI copy and regional formatting", () => {
     expect(translate("tr", "settings")).toBe("Ayarlar");
     expect(getLocaleForLanguage("tr")).toBe("tr-TR");
+  });
+
+  it("resolves Swedish UI copy and regional formatting", () => {
+    expect(translate("sv", "settings")).toBe("Inställningar");
+    expect(getLocaleForLanguage("sv")).toBe("sv-SE");
   });
 
   describe("home-screen style chip keys", () => {

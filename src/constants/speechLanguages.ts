@@ -152,6 +152,14 @@ export const SPEECH_LANGUAGE_REGISTRY = {
     xaiTtsLocale: "tr-TR",
     qwenTtsLanguage: null,
   },
+  sv: {
+    labelKey: "swedish",
+    nativeLocale: "sv-SE",
+    providerCode: "sv",
+    googleCloudLocale: "sv-SE",
+    xaiTtsLocale: null,
+    qwenTtsLanguage: null,
+  },
 } as const satisfies Record<string, SpeechLanguageDefinition>;
 
 export type SpeechLanguage = keyof typeof SPEECH_LANGUAGE_REGISTRY;
