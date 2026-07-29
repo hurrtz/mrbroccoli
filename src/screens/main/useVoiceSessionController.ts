@@ -122,6 +122,10 @@ export function useVoiceSessionController({
     hasActiveVoiceCaptureNow,
     isBusy,
     isRecording,
+    inputMetering:
+      settings.sttMode === "native"
+        ? nativeStt.inputMetering
+        : recorder.inputMetering,
     lastCompletedReplyRef,
     mainSurfaceVisible,
     playReplyText,
@@ -130,6 +134,7 @@ export function useVoiceSessionController({
     settings,
     showToast,
     startVoiceCapture,
+    stopVoiceCapture,
     stopReplay,
     t,
   });
@@ -225,6 +230,9 @@ export function useVoiceSessionController({
   return {
     driveAutoContinueEnabled: driveSession.autoContinueEnabled,
     driveSessionCanRepeat: driveSession.canRepeat,
+    driveSilenceCountdownSeconds:
+      driveSession.silenceCountdownSeconds,
+    driveVoiceActive: driveSession.voiceActive,
     handleContinueDriveSession: driveSession.handleContinue,
     handlePressIn: standardPressHandlers.handlePressIn,
     handlePressOut: standardPressHandlers.handlePressOut,

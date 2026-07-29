@@ -353,7 +353,9 @@ export function MainScreen() {
 
   const {
     driveAutoContinueEnabled,
+    driveSilenceCountdownSeconds,
     driveSessionCanRepeat,
+    driveVoiceActive,
     handleContinueDriveSession,
     handlePressIn,
     handlePressOut,
@@ -662,7 +664,9 @@ export function MainScreen() {
           voiceStage={{
             disabled: voiceInputDisabled,
             driveAutoContinueEnabled,
+            driveSilenceCountdownSeconds,
             driveSessionCanRepeat,
+            driveVoiceActive,
             initialInputSurface: inputSurfaceRef.current,
             initialTextMessage: textMessageDraftRef.current,
             inputMode: settings.inputMode,

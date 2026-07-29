@@ -34,6 +34,8 @@ import { TranslateFn } from "./shared";
 
 interface PhaseAwareVoiceActionProps {
   colors: Colors;
+  driveSilenceCountdownSeconds?: number | null;
+  driveVoiceActive?: boolean;
   inputMode: InputMode;
   layout: "portrait" | "landscape";
   onPress: () => void;
@@ -111,7 +113,9 @@ function getPhaseCopy(
       detail:
         inputMode === "push-to-talk"
           ? t("keepPressing")
-          : t("tapWhenDone"),
+          : inputMode === "drive-session"
+            ? t("listening")
+            : t("tapWhenDone"),
     };
   }
 
@@ -327,6 +331,8 @@ function SpeechStartTimelineBorder({
 
 export function PhaseAwareVoiceAction({
   colors,
+  driveSilenceCountdownSeconds = null,
+  driveVoiceActive = false,
   inputMode,
   layout,
   onPress,
@@ -357,6 +363,23 @@ export function PhaseAwareVoiceAction({
     t,
   );
   const isLandscape = layout === "landscape";
+  const showDriveCountdown =
+    inputMode === "drive-session" &&
+    visualPhase === "recording" &&
+    !driveVoiceActive &&
+    driveSilenceCountdownSeconds !== null;
+  const countdownUrgency = showDriveCountdown
+    ? Math.max(0, 10 - driveSilenceCountdownSeconds)
+    : 0;
+  const countdownFontSize = 20 + countdownUrgency * 1.5;
+  const countdownColor =
+    driveSilenceCountdownSeconds !== null &&
+    driveSilenceCountdownSeconds <= 3
+      ? colors.danger
+      : phaseColor;
+  const accessibilityLabel = showDriveCountdown
+    ? `${statusLabel}. ${driveSilenceCountdownSeconds}s`
+    : statusLabel;
 
   React.useEffect(() => {
     cancelAnimation(animatedPhaseColor);
@@ -455,7 +478,7 @@ export function PhaseAwareVoiceAction({
 
       <TouchableOpacity
         testID="voice-stage-primary-action"
-        accessibilityLabel={statusLabel}
+        accessibilityLabel={accessibilityLabel}
         accessibilityRole="button"
         activeOpacity={0.84}
         onPress={inputMode === "push-to-talk" ? undefined : onPress}
@@ -471,11 +494,27 @@ export function PhaseAwareVoiceAction({
             iconPositionStyle,
           ]}
         >
-          <Feather
-            name={getPhaseIcon(visualPhase, playbackPaused)}
-            size={21}
-            color={phaseColor}
-          />
+          {showDriveCountdown ? (
+            <Text
+              testID="voice-stage-drive-countdown"
+              accessibilityLiveRegion="polite"
+              style={[
+                styles.driveCountdown,
+                {
+                  color: countdownColor,
+                  fontSize: countdownFontSize,
+                },
+              ]}
+            >
+              {driveSilenceCountdownSeconds}
+            </Text>
+          ) : (
+            <Feather
+              name={getPhaseIcon(visualPhase, playbackPaused)}
+              size={21}
+              color={phaseColor}
+            />
+          )}
         </Animated.View>
       </TouchableOpacity>
 
@@ -576,6 +615,12 @@ const styles = StyleSheet.create({
     borderRadius: PHASE_ICON_SIZE / 2,
     alignItems: "center",
     justifyContent: "center",
+  },
+  driveCountdown: {
+    fontFamily: fonts.body,
+    fontWeight: "700",
+    lineHeight: 38,
+    textAlign: "center",
   },
   portraitPhaseCopy: {
     ...StyleSheet.absoluteFillObject,

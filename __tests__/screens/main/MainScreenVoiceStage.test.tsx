@@ -356,6 +356,37 @@ describe("MainScreenVoiceStage composer", () => {
     ).toEqual({ disabled: false });
   });
 
+  it("shows an increasingly urgent Drive silence countdown in the CTA", () => {
+    const props = createProps({
+      driveAutoContinueEnabled: true,
+      driveSilenceCountdownSeconds: 3,
+      driveVoiceActive: false,
+      inputMode: "drive-session",
+      isActive: true,
+      visualPhase: "recording",
+    });
+    const screen = render(<MainScreenVoiceStage {...props} />);
+    const countdown = screen.getByTestId("voice-stage-drive-countdown");
+
+    expect(countdown.props.children).toBe(3);
+    expect(StyleSheet.flatten(countdown.props.style)).toEqual(
+      expect.objectContaining({
+        color: lightColors.danger,
+        fontSize: 30.5,
+      }),
+    );
+    expect(screen.queryByText("icon:square")).toBeNull();
+
+    screen.rerender(
+      <MainScreenVoiceStage {...props} driveVoiceActive />,
+    );
+
+    expect(
+      screen.queryByTestId("voice-stage-drive-countdown"),
+    ).toBeNull();
+    expect(screen.getByText("icon:square")).toBeTruthy();
+  });
+
   it("preserves an unfinished text draft while the pipeline is active", () => {
     const props = createProps();
     const screen = render(<MainScreenVoiceStage {...props} />);

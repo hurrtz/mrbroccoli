@@ -19,7 +19,9 @@ export function VoiceTextInputPager({
   colors,
   disabled,
   driveAutoContinueEnabled = false,
+  driveSilenceCountdownSeconds = null,
   driveSessionCanRepeat = false,
+  driveVoiceActive = false,
   initialSurface = "voice",
   initialTextMessage = "",
   inputMode,
@@ -86,6 +88,10 @@ export function VoiceTextInputPager({
           <View style={styles.activeActionOverlay}>
             <PhaseAwareVoiceAction
               colors={colors}
+              driveSilenceCountdownSeconds={
+                driveSilenceCountdownSeconds
+              }
+              driveVoiceActive={driveVoiceActive}
               inputMode={inputMode}
               layout={layout}
               onPress={onPress}

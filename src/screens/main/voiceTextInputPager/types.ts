@@ -12,7 +12,9 @@ export interface VoiceTextInputPagerProps {
   colors: Colors;
   disabled: boolean;
   driveAutoContinueEnabled?: boolean;
+  driveSilenceCountdownSeconds?: number | null;
   driveSessionCanRepeat?: boolean;
+  driveVoiceActive?: boolean;
   initialSurface?: InputSurface;
   initialTextMessage?: string;
   inputMode: InputMode;

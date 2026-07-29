@@ -16,7 +16,9 @@ interface MainScreenVoiceStageProps {
   colors: Colors;
   disabled?: boolean;
   driveAutoContinueEnabled?: boolean;
+  driveSilenceCountdownSeconds?: number | null;
   driveSessionCanRepeat?: boolean;
+  driveVoiceActive?: boolean;
   initialInputSurface?: InputSurface;
   initialTextMessage?: string;
   inputMode: InputMode;
@@ -44,7 +46,9 @@ export const MainScreenVoiceStage = React.memo(function MainScreenVoiceStage({
   colors,
   disabled = false,
   driveAutoContinueEnabled = false,
+  driveSilenceCountdownSeconds = null,
   driveSessionCanRepeat = false,
+  driveVoiceActive = false,
   initialInputSurface,
   initialTextMessage,
   inputMode,
@@ -87,7 +91,11 @@ export const MainScreenVoiceStage = React.memo(function MainScreenVoiceStage({
           colors={colors}
           disabled={disabled}
           driveAutoContinueEnabled={driveAutoContinueEnabled}
+          driveSilenceCountdownSeconds={
+            driveSilenceCountdownSeconds
+          }
           driveSessionCanRepeat={driveSessionCanRepeat}
+          driveVoiceActive={driveVoiceActive}
           initialSurface={initialInputSurface}
           initialTextMessage={initialTextMessage}
           inputMode={inputMode}

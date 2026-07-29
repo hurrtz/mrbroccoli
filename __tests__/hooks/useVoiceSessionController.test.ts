@@ -12,9 +12,19 @@ jest.mock("../../src/services/voicePipeline/cleanup", () => ({
 }));
 
 jest.mock("../../src/services/playbackCues", () => ({
+  getDriveCountdownCueAudioUri: jest.fn(async (urgency: number) =>
+    `file:///tmp/drive-countdown-${urgency}.wav`
+  ),
   getDriveReadyCueAudioUri: jest.fn(async () =>
     "file:///tmp/drive-ready.wav"
   ),
+}));
+
+const mockPlayNativeRecordingCue = jest.fn(async () => true);
+
+jest.mock("../../src/services/nativeWaveform", () => ({
+  playNativeRecordingCue: (...args: unknown[]) =>
+    mockPlayNativeRecordingCue(...args),
 }));
 
 describe("useVoiceSessionController", () => {
@@ -71,6 +81,7 @@ describe("useVoiceSessionController", () => {
       recorder: {
         clearLastError: jest.fn(),
         ensurePermissions: jest.fn(async () => undefined),
+        inputMetering: null as number | null,
         lastError: null,
         startRecording: jest.fn(async () => undefined),
         stopRecording: jest.fn(async () => "file://voice.m4a"),
@@ -345,6 +356,38 @@ describe("useVoiceSessionController", () => {
     expect(params.player.waitForDrain).toHaveBeenCalledTimes(1);
   });
 
+  it("auto-arms again when a failed Drive turn returns to idle", async () => {
+    const { result, params, rerender } = renderController({
+      settings: {
+        inputMode: "drive-session",
+        spokenRepliesEnabled: true,
+        sttMode: "provider",
+        ttsMode: "provider",
+        providerSttModels: {},
+      },
+    });
+
+    await act(async () => {
+      await result.current.handleTogglePress();
+    });
+    params.isRecording = true;
+    act(() => rerender());
+    await act(async () => {
+      await result.current.handleTogglePress();
+    });
+
+    params.isRecording = false;
+    params.isBusy = true;
+    act(() => rerender());
+    params.isBusy = false;
+    act(() => rerender());
+
+    await waitFor(() =>
+      expect(params.recorder.startRecording).toHaveBeenCalledTimes(2),
+    );
+    expect(params.completedReplyVersion).toBe(0);
+  });
+
   it("uses the Drive Session primary action to cancel processing without immediately re-arming", async () => {
     const abortController = new AbortController();
     const { result, params } = renderController({
@@ -449,5 +492,137 @@ describe("useVoiceSessionController", () => {
 
     expect(params.playReplyText).toHaveBeenCalledWith("Last answer");
     expect(params.recorder.startRecording).not.toHaveBeenCalled();
+  });
+
+  it("auto-submits a Drive recording after ten seconds of silence", async () => {
+    jest.useFakeTimers();
+    try {
+      const { result, params, rerender } = renderController({
+        settings: {
+          inputMode: "drive-session",
+          spokenRepliesEnabled: true,
+          sttMode: "provider",
+          ttsMode: "provider",
+          providerSttModels: {},
+        },
+      });
+
+      await act(async () => {
+        await result.current.handleTogglePress();
+      });
+      params.isRecording = true;
+      act(() => rerender());
+
+      await act(async () => {
+        jest.advanceTimersByTime(10_200);
+        await Promise.resolve();
+      });
+
+      expect(params.recorder.stopRecording).toHaveBeenCalledTimes(1);
+      expect(params.handleVoiceCaptureDone).toHaveBeenCalledWith({
+        audioUri: "file://voice.m4a",
+      });
+    } finally {
+      jest.useRealTimers();
+    }
+  });
+
+  it("restarts the full Drive silence window after detected speech", async () => {
+    jest.useFakeTimers();
+    try {
+      const { result, params, rerender } = renderController({
+        settings: {
+          inputMode: "drive-session",
+          spokenRepliesEnabled: true,
+          sttMode: "provider",
+          ttsMode: "provider",
+          providerSttModels: {},
+        },
+      });
+
+      await act(async () => {
+        await result.current.handleTogglePress();
+      });
+      params.isRecording = true;
+      act(() => rerender());
+
+      act(() => {
+        jest.advanceTimersByTime(700);
+        params.recorder.inputMetering = -20;
+        rerender();
+      });
+      act(() => {
+        jest.advanceTimersByTime(150);
+        params.recorder.inputMetering = -19;
+        rerender();
+      });
+      act(() => {
+        params.recorder.inputMetering = -70;
+        rerender();
+      });
+      act(() => {
+        jest.advanceTimersByTime(150);
+        params.recorder.inputMetering = -71;
+        rerender();
+      });
+      act(() => {
+        jest.advanceTimersByTime(150);
+        params.recorder.inputMetering = -72;
+        rerender();
+      });
+      act(() => {
+        jest.advanceTimersByTime(9_300);
+      });
+
+      expect(params.recorder.stopRecording).not.toHaveBeenCalled();
+
+      await act(async () => {
+        jest.advanceTimersByTime(900);
+        await Promise.resolve();
+      });
+
+      expect(params.recorder.stopRecording).toHaveBeenCalledTimes(1);
+    } finally {
+      jest.useRealTimers();
+    }
+  });
+
+  it("plays soft recording-safe cues for the final Drive countdown", async () => {
+    jest.useFakeTimers();
+    try {
+      const { result, params, rerender } = renderController({
+        settings: {
+          inputMode: "drive-session",
+          spokenRepliesEnabled: true,
+          sttMode: "provider",
+          ttsMode: "provider",
+          providerSttModels: {},
+        },
+      });
+
+      await act(async () => {
+        await result.current.handleTogglePress();
+      });
+      params.isRecording = true;
+      act(() => rerender());
+
+      await act(async () => {
+        jest.advanceTimersByTime(9_200);
+        await Promise.resolve();
+        await Promise.resolve();
+      });
+
+      expect(mockPlayNativeRecordingCue).toHaveBeenCalledTimes(3);
+      expect(mockPlayNativeRecordingCue).toHaveBeenNthCalledWith(
+        1,
+        "file:///tmp/drive-countdown-1.wav",
+      );
+      expect(mockPlayNativeRecordingCue).toHaveBeenNthCalledWith(
+        3,
+        "file:///tmp/drive-countdown-3.wav",
+      );
+    } finally {
+      jest.useRealTimers();
+    }
   });
 });
