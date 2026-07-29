@@ -1,6 +1,6 @@
 {
   "name": "mrbroccoli",
-  "version": "2.5.1",
+  "version": "2.5.2",
   "main": "expo-router/entry",
   "scripts": {
     "start": "expo start",
