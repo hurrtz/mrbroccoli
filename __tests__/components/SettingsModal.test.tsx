@@ -1,5 +1,9 @@
 import React from "react";
-import { StyleSheet } from "react-native";
+import {
+  Modal as NativeModal,
+  Platform,
+  StyleSheet,
+} from "react-native";
 import {
   act,
   fireEvent,
@@ -202,6 +206,33 @@ describe("SettingsModal", () => {
       expect(screen.queryByText("Runtime Readiness")).toBeNull();
       expect(screen.queryByPlaceholderText("Search services")).toBeNull();
     });
+  });
+
+  it("routes Android system back through settings navigation before closing", async () => {
+    jest.replaceProperty(Platform, "OS", "android");
+    const onClose = jest.fn();
+    const screen = renderSettingsModal({ onClose });
+
+    fireEvent.press(screen.getByText("Connections"));
+
+    await waitFor(() => {
+      expect(screen.getByTestId("settings-modal-title").props.children).toBe(
+        "Connections",
+      );
+    });
+
+    act(() => screen.UNSAFE_getByType(NativeModal).props.onRequestClose());
+
+    await waitFor(() => {
+      expect(screen.getByTestId("settings-modal-title").props.children).toBe(
+        "Settings",
+      );
+    });
+    expect(onClose).not.toHaveBeenCalled();
+
+    act(() => screen.UNSAFE_getByType(NativeModal).props.onRequestClose());
+
+    expect(onClose).toHaveBeenCalledTimes(1);
   });
 
   it("renders App settings in Ukrainian", async () => {

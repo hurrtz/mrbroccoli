@@ -1,7 +1,8 @@
 import React from "react";
 import {
   Animated,
-  BackHandler,
+  Modal,
+  Platform,
   useWindowDimensions,
 } from "react-native";
 
@@ -209,31 +210,19 @@ export const AntSettingsModal = React.memo(function AntSettingsModal(
   const title =
     activePage === "overview" ? t("settings") : getPageTitle(activePage);
 
-  React.useEffect(() => {
-    if (!visible) {
+  const handleBack = React.useCallback(() => {
+    if (activePage !== "overview") {
+      setActivePage("overview");
       return;
     }
-
-    const subscription = BackHandler.addEventListener(
-      "hardwareBackPress",
-      () => {
-        if (activePage !== "overview") {
-          setActivePage("overview");
-        } else {
-          onClose();
-        }
-        return true;
-      },
-    );
-
-    return () => subscription.remove();
-  }, [activePage, onClose, visible]);
+    onClose();
+  }, [activePage, onClose]);
 
   if (!visible) {
     return null;
   }
 
-  return (
+  const frame = (
     <AntSettingsFrame
       activePage={activePage}
       contentScrollRef={controller.contentScrollRef}
@@ -242,7 +231,7 @@ export const AntSettingsModal = React.memo(function AntSettingsModal(
       isLandscape={isLandscape}
       keyboardInset={controller.keyboardInset}
       modalMaxWidth={modalMaxWidth}
-      onBack={() => setActivePage("overview")}
+      onBack={handleBack}
       onClose={onClose}
       onDismissValidationToast={() => setValidationToastMessage(null)}
       title={title}
@@ -250,5 +239,23 @@ export const AntSettingsModal = React.memo(function AntSettingsModal(
     >
       {activeContent}
     </AntSettingsFrame>
+  );
+
+  if (Platform.OS !== "android") {
+    return frame;
+  }
+
+  return (
+    <Modal
+      animationType="none"
+      hardwareAccelerated
+      navigationBarTranslucent
+      onRequestClose={handleBack}
+      statusBarTranslucent
+      transparent
+      visible
+    >
+      {frame}
+    </Modal>
   );
 });
