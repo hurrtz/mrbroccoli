@@ -175,6 +175,10 @@ export function createVoicePipelineEventAdapter({
   };
 
   const startLatencyTracking = () => {
+    // Learn the route the user selected. Provider retries and model/TTS
+    // fallback are part of that route's observed latency; attributing the
+    // result to the eventual fallback route would make direct use of that
+    // fallback model look artificially slow.
     const turnLatencyDescriptor: Omit<LatencyRouteDescriptor, "phase"> = {
       provider,
       model,
@@ -349,13 +353,25 @@ export function createVoicePipelineEventAdapter({
         return;
       }
 
+      const actualModel =
+        metadata?.modelFailover?.actualModel ??
+        metadata?.router?.actualModel ??
+        model;
       state.replyCompleted = true;
       handleLlmStarted();
       recordDebugLogEvent({
         event: "voice-pipeline-response-done",
         payload: {
+          actualModel,
+          attempts:
+            metadata?.modelFailover?.attempts ??
+            metadata?.router?.attempts ??
+            1,
+          latencySampleAttribution: "requested-route",
+          requestedModel: model,
           textLength: fullText.trim().length,
           totalTokens: usage?.totalTokens ?? null,
+          usedFallback: actualModel !== model,
         },
       });
       latency.finishLatencyProgress("thinking");
@@ -377,7 +393,7 @@ export function createVoicePipelineEventAdapter({
       const assistantMessage = addMessage({
         role: "assistant",
         content: fullText,
-        model: metadata?.modelFailover?.actualModel ?? model,
+        model: actualModel,
         provider,
         usage,
         metadata: messageState.consumeAssistantMetadata(metadata),
@@ -490,8 +506,10 @@ export function createVoicePipelineEventAdapter({
         event: "voice-pipeline-tts-fallback",
         level: "warn",
         payload: {
+          fallbackRoute: route,
+          latencySampleAttribution: "requested-route",
           message: error.message,
-          ttsMode,
+          requestedRoute: ttsMode,
         },
       });
       if (!messageState.recordTtsFallbackNotice(notice)) {

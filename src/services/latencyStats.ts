@@ -258,12 +258,22 @@ function getLlmResponseEstimateMs(descriptor: LatencyRouteDescriptor) {
     estimateMs += 4_000;
   }
   if (descriptor.ulraModelCount && descriptor.ulraRounds) {
-    // Each Uber stage runs its participants concurrently, while the initial
-    // assessment, review rounds, and final synthesis remain sequential.
-    estimateMs *= descriptor.ulraRounds + 2;
+    // Participants run concurrently, but every review round carries a larger
+    // shared deliberation and completes at the pace of its slowest route. The
+    // selected model then performs one final synthesis. Keep this cold-start
+    // prior deliberately conservative; route-specific observations replace it
+    // after the first successful Uber turns.
+    const sequentialStages = descriptor.ulraRounds + 2;
+    const participantTailFactor = Math.min(
+      2.05,
+      1 + (descriptor.ulraModelCount - 1) * 0.35,
+    );
+    const reviewContextFactor = 1 + descriptor.ulraRounds * 0.12;
+    estimateMs *=
+      sequentialStages * participantTailFactor * reviewContextFactor;
   }
 
-  return estimateMs;
+  return Math.round(estimateMs);
 }
 
 function getInputEstimateMs(descriptor: LatencyRouteDescriptor) {

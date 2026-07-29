@@ -1,5 +1,5 @@
 import React from "react";
-import { fireEvent, render } from "@testing-library/react-native";
+import { fireEvent, render, within } from "@testing-library/react-native";
 import { Keyboard, processColor, StyleSheet } from "react-native";
 
 import { MainScreenVoiceStage } from "../../../src/screens/main/MainScreenVoiceStage";
@@ -546,13 +546,24 @@ describe("MainScreenVoiceStage composer", () => {
       StyleSheet.flatten(
         screen.getByTestId("voice-stage-action-surface").props.style,
       ).borderWidth,
-    ).toBe(3);
+    ).toBeUndefined();
+    expect(
+      screen.getByTestId("voice-stage-speech-timeline-track"),
+    ).toBeTruthy();
     expect(
       screen.getByTestId("voice-stage-speech-timeline").props.d,
     ).toMatch(/^M 160 1\.5 /);
     expect(
       screen.getByTestId("voice-stage-speech-timeline").props.strokeWidth,
     ).toBe(3);
+    expect(screen.getByTestId("voice-stage-speech-eta").props.children).toBe(
+      "~ 5 s",
+    );
+    expect(
+      within(screen.getByTestId("voice-stage-left-copy")).getByText(
+        "Thinking",
+      ),
+    ).toBeTruthy();
     now.mockRestore();
   });
 
@@ -599,27 +610,39 @@ describe("MainScreenVoiceStage composer", () => {
     expect(screen.getByText("icon:zap")).toBeTruthy();
   });
 
-  it("uses the phase verb as the main landscape label", () => {
+  it("keeps phase, wait copy, icon, and ETA symmetric in landscape", () => {
+    const now = jest.spyOn(Date, "now").mockReturnValue(15_000);
     const screen = render(
       <MainScreenVoiceStage
         {...createProps({
           isActive: true,
           layout: "landscape",
+          speechStartProgress: {
+            elapsedMs: 5_000,
+            estimatedMs: 10_000,
+            learned: true,
+            overEstimate: false,
+            progress: 0.5,
+            sampleCount: 4,
+            startedAt: 10_000,
+          },
           visualPhase: "searching",
         })}
       />,
     );
 
     expect(screen.getByText("Searching")).toBeTruthy();
-    expect(screen.queryByText("Please wait")).toBeNull();
+    expect(screen.getByText("Please wait")).toBeTruthy();
+    expect(screen.getByText("~ 5 s")).toBeTruthy();
     expect(
       StyleSheet.flatten(screen.getByText("Searching").props.style),
     ).toEqual(
       expect.objectContaining({
         fontSize: 18,
-        textAlign: "left",
+        textAlign: "center",
       }),
     );
+    now.mockRestore();
   });
 
   it("uses the primary CTA itself to pause and resume speaking", () => {

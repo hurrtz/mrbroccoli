@@ -713,6 +713,117 @@ describe("useVoicePipeline", () => {
     });
   });
 
+  it("keeps Uber dimensions in the ETA and learned latency route", async () => {
+    const ulraMode = {
+      rounds: 2,
+      routes: [
+        {
+          apiKey: "key-1",
+          modeId: "mode-1",
+          model: "gpt-5.6-sol",
+          provider: "openai" as const,
+        },
+        {
+          apiKey: "key-2",
+          modeId: "mode-2",
+          model: "gemini-3.1-pro-preview",
+          provider: "gemini" as const,
+        },
+        {
+          apiKey: "key-3",
+          modeId: "mode-3",
+          model: "deepseek-v4-pro",
+          provider: "deepseek" as const,
+        },
+      ],
+    };
+    const params = createParams({
+      spokenRepliesEnabled: false,
+      ulraMode,
+    });
+    (runVoicePipeline as jest.Mock).mockImplementation(
+      async ({ callbacks }: any) => {
+        jest.advanceTimersByTime(1_000);
+        callbacks.onLlmStart();
+        jest.advanceTimersByTime(4_000);
+        callbacks.onResponseDone("Uber reply");
+        return "Run Uber Mode";
+      },
+    );
+
+    const { result } = renderHook(() => useVoicePipeline(params));
+
+    await act(async () => {
+      await result.current.handleVoiceCaptureDone({
+        transcriptionOverride: "Run Uber Mode",
+      });
+    });
+
+    expect(runVoicePipeline).toHaveBeenCalledWith(
+      expect.objectContaining({ ulraMode }),
+    );
+    await waitFor(() => {
+      expect(
+        (AsyncStorage.setItem as jest.Mock).mock.calls.some(
+          ([, value]) =>
+            typeof value === "string" && value.includes(":ulra:3:2"),
+        ),
+      ).toBe(true);
+    });
+  });
+
+  it("attributes fallback overhead to the selected latency route", async () => {
+    const params = createParams({
+      spokenRepliesEnabled: false,
+    });
+    (runVoicePipeline as jest.Mock).mockImplementation(
+      async ({ callbacks }: any) => {
+        jest.advanceTimersByTime(1_000);
+        callbacks.onLlmStart();
+        jest.advanceTimersByTime(4_000);
+        callbacks.onResponseDone("Recovered reply", undefined, {
+          modelFailover: {
+            actualModel: "gpt-5.4-mini",
+            attempts: 2,
+            requestedModel: "gpt-5.4",
+          },
+        });
+        return "Use the selected route";
+      },
+    );
+
+    const { result } = renderHook(() => useVoicePipeline(params));
+
+    await act(async () => {
+      await result.current.handleVoiceCaptureDone({
+        transcriptionOverride: "Use the selected route",
+      });
+    });
+
+    expect(params.addMessage).toHaveBeenCalledWith(
+      expect.objectContaining({
+        content: "Recovered reply",
+        model: "gpt-5.4-mini",
+      }),
+    );
+    await waitFor(() => {
+      const persistedStores = (AsyncStorage.setItem as jest.Mock).mock.calls
+        .filter(([key]) => key === "@mrbroccoli/latency_stats")
+        .map(([, value]) => String(value));
+
+      expect(
+        persistedStores.some((value) =>
+          value.includes("llm-response-v2:openai:gpt-5.4:"),
+        ),
+      ).toBe(true);
+      expect(
+        persistedStores.some((value) =>
+          value.includes("llm-response-v2:openai:gpt-5.4-mini:"),
+        ),
+      ).toBe(false);
+    });
+  });
+
   it("keeps the total progress estimate through playback completion", async () => {
     let onPlaybackStarted: (() => void) | undefined;
     let resolveRun: (() => void) | null = null;

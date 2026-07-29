@@ -17,6 +17,11 @@ function createNativeModule() {
 }
 
 describe("voiceLiveActivity", () => {
+  const labels = {
+    phaseLabel: "Thinking",
+    statusLabel: "Please wait",
+  };
+
   beforeEach(() => {
     jest.useFakeTimers();
     endVoiceLiveActivity({ platform: "android" });
@@ -36,12 +41,18 @@ describe("voiceLiveActivity", () => {
         {
           phase: "thinking",
           expectedSpeechAtMs: 123_456,
+          ...labels,
         },
         { nativeModule, platform: "ios" },
       ),
     ).toBe(true);
 
-    expect(nativeModule.setState).toHaveBeenCalledWith("thinking", 123_456);
+    expect(nativeModule.setState).toHaveBeenCalledWith(
+      "thinking",
+      123_456,
+      "Thinking",
+      "Please wait",
+    );
   });
 
   it("uses the same local bridge on Android and requests notification permission after capture", async () => {
@@ -55,19 +66,29 @@ describe("voiceLiveActivity", () => {
     };
 
     setVoiceLiveActivityState(
-      { phase: "listening", expectedSpeechAtMs: null },
+      {
+        phase: "listening",
+        expectedSpeechAtMs: null,
+        phaseLabel: "Listening",
+        statusLabel: "Your turn",
+      },
       dependencies,
     );
     expect(requestNotificationPermission).not.toHaveBeenCalled();
 
     setVoiceLiveActivityState(
-      { phase: "thinking", expectedSpeechAtMs: 222_333 },
+      { phase: "thinking", expectedSpeechAtMs: 222_333, ...labels },
       dependencies,
     );
     await Promise.resolve();
 
     expect(requestNotificationPermission).toHaveBeenCalledTimes(1);
-    expect(nativeModule.setState).toHaveBeenLastCalledWith("thinking", 222_333);
+    expect(nativeModule.setState).toHaveBeenLastCalledWith(
+      "thinking",
+      222_333,
+      "Thinking",
+      "Please wait",
+    );
   });
 
   it("deduplicates unchanged phases but refreshes the stale date by heartbeat", () => {
@@ -76,6 +97,8 @@ describe("voiceLiveActivity", () => {
     const state = {
       phase: "searching" as const,
       expectedSpeechAtMs: 234_567,
+      phaseLabel: "Searching",
+      statusLabel: "Please wait",
     };
 
     setVoiceLiveActivityState(state, dependencies);
@@ -93,12 +116,22 @@ describe("voiceLiveActivity", () => {
     const dependencies = { nativeModule, platform: "ios" };
 
     setVoiceLiveActivityState(
-      { phase: "listening", expectedSpeechAtMs: null },
+      {
+        phase: "listening",
+        expectedSpeechAtMs: null,
+        phaseLabel: "Listening",
+        statusLabel: "Your turn",
+      },
       dependencies,
     );
     scheduleVoiceLiveActivityEnd(750, dependencies);
     setVoiceLiveActivityState(
-      { phase: "transcribing", expectedSpeechAtMs: 345_678 },
+      {
+        phase: "transcribing",
+        expectedSpeechAtMs: 345_678,
+        phaseLabel: "Transcribing",
+        statusLabel: "Please wait",
+      },
       dependencies,
     );
     jest.advanceTimersByTime(750);
@@ -107,6 +140,8 @@ describe("voiceLiveActivity", () => {
     expect(nativeModule.setState).toHaveBeenLastCalledWith(
       "transcribing",
       345_678,
+      "Transcribing",
+      "Please wait",
     );
   });
 
@@ -115,7 +150,7 @@ describe("voiceLiveActivity", () => {
     const dependencies = { nativeModule, platform: "ios" };
 
     setVoiceLiveActivityState(
-      { phase: "thinking", expectedSpeechAtMs: 456_789 },
+      { phase: "thinking", expectedSpeechAtMs: 456_789, ...labels },
       dependencies,
     );
     scheduleVoiceLiveActivityEnd(750, dependencies);
@@ -132,7 +167,7 @@ describe("voiceLiveActivity", () => {
 
     expect(
       setVoiceLiveActivityState(
-        { phase: "thinking", expectedSpeechAtMs: null },
+        { phase: "thinking", expectedSpeechAtMs: null, ...labels },
         { nativeModule, platform: "web" },
       ),
     ).toBe(false);

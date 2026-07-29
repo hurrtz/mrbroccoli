@@ -8,12 +8,16 @@ export type VoiceLiveActivityPhase =
 export interface VoiceLiveActivityState {
   phase: VoiceLiveActivityPhase;
   expectedSpeechAtMs: number | null;
+  phaseLabel: string;
+  statusLabel: string;
 }
 
 type VoiceLiveActivityModule = {
   setState(
     phase: VoiceLiveActivityPhase,
     expectedSpeechAtMs: number | null,
+    phaseLabel: string,
+    statusLabel: string,
   ): Promise<boolean>;
   endActivity(): Promise<boolean>;
 };
@@ -121,16 +125,23 @@ function sendState(
   state: VoiceLiveActivityState,
   module: VoiceLiveActivityModule,
 ) {
-  void module.setState(state.phase, state.expectedSpeechAtMs).catch((error) => {
-    recordDebugLogEvent({
-      event: "voice-live-activity-update-failed",
-      level: "warn",
-      payload: {
-        message: error instanceof Error ? error.message : String(error),
-        phase: state.phase,
-      },
+  void module
+    .setState(
+      state.phase,
+      state.expectedSpeechAtMs,
+      state.phaseLabel,
+      state.statusLabel,
+    )
+    .catch((error) => {
+      recordDebugLogEvent({
+        event: "voice-live-activity-update-failed",
+        level: "warn",
+        payload: {
+          message: error instanceof Error ? error.message : String(error),
+          phase: state.phase,
+        },
+      });
     });
-  });
 }
 
 function ensureHeartbeat(module: VoiceLiveActivityModule) {
@@ -171,9 +182,16 @@ export function setVoiceLiveActivityState(
       Number.isFinite(state.expectedSpeechAtMs)
         ? state.expectedSpeechAtMs
         : null,
+    phaseLabel: state.phaseLabel.trim(),
+    statusLabel: state.statusLabel.trim(),
   };
 
-  const signature = `${currentState.phase}:${currentState.expectedSpeechAtMs ?? "unknown"}`;
+  const signature = [
+    currentState.phase,
+    currentState.expectedSpeechAtMs ?? "unknown",
+    currentState.phaseLabel,
+    currentState.statusLabel,
+  ].join(":");
 
   if (signature !== lastSentSignature) {
     lastSentSignature = signature;

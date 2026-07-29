@@ -7,6 +7,7 @@ import {
   type VoiceLiveActivityPhase,
 } from "../../services/voiceLiveActivity";
 import type { VoicePhaseProgress } from "../../types";
+import type { TranslationKey } from "../../i18n";
 import type { PipelinePhase } from "./types";
 
 interface UseVoiceLiveActivityParams {
@@ -14,6 +15,10 @@ interface UseVoiceLiveActivityParams {
   phaseProgress: VoicePhaseProgress | null;
   pipelinePhase: PipelinePhase;
   spokenRepliesEnabled: boolean;
+  t: (
+    key: TranslationKey,
+    params?: Record<string, string | number | undefined>,
+  ) => string;
 }
 
 function toLiveActivityPhase(
@@ -37,6 +42,7 @@ export function useVoiceLiveActivity({
   phaseProgress,
   pipelinePhase,
   spokenRepliesEnabled,
+  t,
 }: UseVoiceLiveActivityParams) {
   const speechStartProgress =
     phaseProgress?.speechStart ?? phaseProgress?.overall ?? phaseProgress;
@@ -54,6 +60,8 @@ export function useVoiceLiveActivity({
       setVoiceLiveActivityState({
         phase: "listening",
         expectedSpeechAtMs: null,
+        phaseLabel: t("listening"),
+        statusLabel: t("yourTurn"),
       });
       return;
     }
@@ -61,9 +69,19 @@ export function useVoiceLiveActivity({
     const liveActivityPhase = toLiveActivityPhase(pipelinePhase);
 
     if (liveActivityPhase) {
+      const phaseLabel =
+        liveActivityPhase === "transcribing"
+          ? t("parsing")
+          : liveActivityPhase === "searching"
+            ? t("searching")
+            : liveActivityPhase === "synthesizing"
+              ? t("converting")
+              : t("thinking");
       setVoiceLiveActivityState({
         phase: liveActivityPhase,
         expectedSpeechAtMs,
+        phaseLabel,
+        statusLabel: t("pleaseWait"),
       });
       return;
     }
@@ -77,7 +95,13 @@ export function useVoiceLiveActivity({
     // begins. The small grace period keeps one continuous Live Activity across
     // that hand-off and is cancelled as soon as the next phase arrives.
     scheduleVoiceLiveActivityEnd();
-  }, [expectedSpeechAtMs, isRecording, pipelinePhase, spokenRepliesEnabled]);
+  }, [
+    expectedSpeechAtMs,
+    isRecording,
+    pipelinePhase,
+    spokenRepliesEnabled,
+    t,
+  ]);
 
   useEffect(
     () => () => {

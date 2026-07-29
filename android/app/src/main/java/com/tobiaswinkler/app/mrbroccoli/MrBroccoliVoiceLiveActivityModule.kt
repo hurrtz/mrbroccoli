@@ -18,6 +18,8 @@ class MrBroccoliVoiceLiveActivityModule(
   fun setState(
     phase: String,
     expectedSpeechAtMs: Double?,
+    phaseLabel: String,
+    statusLabel: String,
     promise: Promise,
   ) {
     if (!MrBroccoliVoiceTurnState.isSupportedPhase(phase)) {
@@ -35,6 +37,8 @@ class MrBroccoliVoiceLiveActivityModule(
         expectedSpeechAtMs = expectedSpeechAtMs
           ?.takeIf(Double::isFinite)
           ?.toLong(),
+        phaseLabel = phaseLabel.trim(),
+        statusLabel = statusLabel.trim(),
       )
       promise.resolve(true)
     } catch (error: Exception) {

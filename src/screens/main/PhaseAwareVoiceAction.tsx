@@ -29,6 +29,7 @@ import {
   VoiceTimingProgress,
   VoiceVisualPhase,
 } from "../../types";
+import { getVoiceEta } from "../../utils/voiceEta";
 
 import { TranslateFn } from "./shared";
 
@@ -140,7 +141,6 @@ function getPhaseCopy(
 }
 
 const PHASE_ICON_SIZE = 42;
-const LANDSCAPE_ICON_RIGHT = 12;
 const TIMELINE_BORDER_WIDTH = 3;
 const TIMELINE_BORDER_INSET = TIMELINE_BORDER_WIDTH / 2;
 const AnimatedPath = Animated.createAnimatedComponent(Path);
@@ -188,18 +188,6 @@ function getTopCenterRoundedRectPath(
     `A ${safeRadius} ${safeRadius} 0 0 1 ${left + safeRadius} ${top}`,
     `H ${centerX}`,
   ].join(" ");
-}
-
-function getLandscapeIconOffset(surfaceWidth: number) {
-  if (surfaceWidth <= 0) {
-    return 0;
-  }
-
-  return (
-    surfaceWidth / 2 -
-    PHASE_ICON_SIZE / 2 -
-    LANDSCAPE_ICON_RIGHT
-  );
 }
 
 function SpeechStartTimelineBorder({
@@ -286,8 +274,9 @@ function SpeechStartTimelineBorder({
   ]);
 
   const expectedAnimatedProps = useAnimatedProps(() => ({
-    strokeDashoffset:
-      perimeter * (1 - expectedProgress.value),
+    // The bright outline represents time remaining: it starts complete and
+    // recedes toward the top centre as the learned ETA approaches.
+    strokeDashoffset: perimeter * expectedProgress.value,
   }));
   const overtimeAnimatedProps = useAnimatedProps(() => ({
     strokeDashoffset:
@@ -305,6 +294,14 @@ function SpeechStartTimelineBorder({
       width={width}
       height={height}
     >
+      <Path
+        testID="voice-stage-speech-timeline-track"
+        d={path}
+        fill="none"
+        opacity={0.32}
+        stroke={phaseForeground}
+        strokeWidth={TIMELINE_BORDER_WIDTH}
+      />
       <AnimatedPath
         testID="voice-stage-speech-timeline"
         animatedProps={expectedAnimatedProps}
@@ -351,11 +348,11 @@ export function PhaseAwareVoiceAction({
     height: 0,
     width: 0,
   });
+  const [etaNowMs, setEtaNowMs] = React.useState(Date.now);
   const recordingProgress = useSharedValue(0);
   const phaseColor = getPhaseColor(visualPhase, colors);
   const phaseForeground = getAccessibleForeground(phaseColor);
   const animatedPhaseColor = useSharedValue(phaseColor);
-  const iconOffset = useSharedValue(0);
   const phaseCopy = getPhaseCopy(
     visualPhase,
     inputMode,
@@ -363,6 +360,11 @@ export function PhaseAwareVoiceAction({
     t,
   );
   const isLandscape = layout === "landscape";
+  const showSpeechEta =
+    visualPhase !== "recording" &&
+    visualPhase !== "speaking" &&
+    Boolean(speechStartProgress);
+  const speechEta = getVoiceEta(speechStartProgress, etaNowMs);
   const showDriveCountdown =
     inputMode === "drive-session" &&
     visualPhase === "recording" &&
@@ -377,9 +379,12 @@ export function PhaseAwareVoiceAction({
     driveSilenceCountdownSeconds <= 3
       ? colors.danger
       : phaseColor;
+  const accessibilityLabelBase = showSpeechEta && speechEta
+    ? `${phaseCopy.title}. ${phaseCopy.prompt}. ${speechEta.label}`
+    : statusLabel;
   const accessibilityLabel = showDriveCountdown
     ? `${statusLabel}. ${driveSilenceCountdownSeconds}s`
-    : statusLabel;
+    : accessibilityLabelBase;
 
   React.useEffect(() => {
     cancelAnimation(animatedPhaseColor);
@@ -421,20 +426,17 @@ export function PhaseAwareVoiceAction({
   ]);
 
   React.useEffect(() => {
-    const nextOffset = isLandscape
-      ? getLandscapeIconOffset(surfaceSize.width)
-      : 0;
-    cancelAnimation(iconOffset);
-    iconOffset.value = reducedMotion
-      ? nextOffset
-      : withTiming(nextOffset, { duration: 240 });
+    if (!showSpeechEta) {
+      return;
+    }
 
-    return () => cancelAnimation(iconOffset);
+    setEtaNowMs(Date.now());
+    const timer = setInterval(() => setEtaNowMs(Date.now()), 1_000);
+    return () => clearInterval(timer);
   }, [
-    iconOffset,
-    isLandscape,
-    reducedMotion,
-    surfaceSize.width,
+    showSpeechEta,
+    speechStartProgress?.estimatedMs,
+    speechStartProgress?.startedAt,
   ]);
 
   const recordingFillStyle = useAnimatedStyle(() => ({
@@ -442,10 +444,6 @@ export function PhaseAwareVoiceAction({
   }));
   const surfaceColorStyle = useAnimatedStyle(() => ({
     backgroundColor: animatedPhaseColor.value,
-    borderColor: animatedPhaseColor.value,
-  }));
-  const iconPositionStyle = useAnimatedStyle(() => ({
-    transform: [{ translateX: iconOffset.value }],
   }));
   const handleSurfaceLayout = React.useCallback(
     (event: LayoutChangeEvent) => {
@@ -491,13 +489,11 @@ export function PhaseAwareVoiceAction({
           style={[
             styles.phaseIcon,
             { backgroundColor: phaseForeground },
-            iconPositionStyle,
           ]}
         >
           {showDriveCountdown ? (
             <Text
               testID="voice-stage-drive-countdown"
-              accessibilityLiveRegion="polite"
               style={[
                 styles.driveCountdown,
                 {
@@ -520,14 +516,37 @@ export function PhaseAwareVoiceAction({
 
       <View
         pointerEvents="none"
-        style={
-          isLandscape
-            ? styles.landscapePhaseCopy
-            : styles.portraitPhaseCopy
-        }
+        style={styles.phaseCopy}
       >
-        {!isLandscape ? (
-          <View style={styles.phasePrompt}>
+        <View
+          testID="voice-stage-left-copy"
+          style={styles.sideCopy}
+        >
+          {showSpeechEta ? (
+            <>
+              <Text
+                adjustsFontSizeToFit
+                minimumFontScale={0.72}
+                numberOfLines={1}
+                style={[
+                  isLandscape
+                    ? styles.landscapePhaseTitle
+                    : styles.phaseTitle,
+                  { color: phaseForeground },
+                ]}
+              >
+                {phaseCopy.title}
+              </Text>
+              <Text
+                adjustsFontSizeToFit
+                minimumFontScale={0.8}
+                numberOfLines={1}
+                style={[styles.phaseDetail, { color: phaseForeground }]}
+              >
+                {phaseCopy.prompt}
+              </Text>
+            </>
+          ) : (
             <Text
               adjustsFontSizeToFit
               minimumFontScale={0.84}
@@ -536,38 +555,55 @@ export function PhaseAwareVoiceAction({
             >
               {phaseCopy.prompt}
             </Text>
-          </View>
-        ) : null}
+          )}
+        </View>
 
         <View
           testID="voice-stage-phase-copy"
-          style={
-            isLandscape
-              ? styles.landscapePhaseMessage
-              : styles.portraitPhaseMessage
-          }
+          style={styles.sideCopy}
         >
-          <Text
-            adjustsFontSizeToFit
-            minimumFontScale={0.76}
-            numberOfLines={1}
-            style={[
-              isLandscape
-                ? styles.landscapePhaseTitle
-                : styles.phaseTitle,
-              { color: phaseForeground },
-            ]}
-          >
-            {phaseCopy.title}
-          </Text>
-          {phaseCopy.detail ? (
+          {showSpeechEta && speechEta ? (
             <Text
+              testID="voice-stage-speech-eta"
+              adjustsFontSizeToFit
+              minimumFontScale={0.72}
               numberOfLines={1}
-              style={[styles.phaseDetail, { color: phaseForeground }]}
+              style={[
+                styles.etaText,
+                {
+                  color: speechEta.overEstimate
+                    ? colors.danger
+                    : phaseForeground,
+                },
+              ]}
             >
-              {phaseCopy.detail}
+              {speechEta.label}
             </Text>
-          ) : null}
+          ) : (
+            <>
+              <Text
+                adjustsFontSizeToFit
+                minimumFontScale={0.76}
+                numberOfLines={1}
+                style={[
+                  isLandscape
+                    ? styles.landscapePhaseTitle
+                    : styles.phaseTitle,
+                  { color: phaseForeground },
+                ]}
+              >
+                {phaseCopy.title}
+              </Text>
+              {phaseCopy.detail ? (
+                <Text
+                  numberOfLines={1}
+                  style={[styles.phaseDetail, { color: phaseForeground }]}
+                >
+                  {phaseCopy.detail}
+                </Text>
+              ) : null}
+            </>
+          )}
         </View>
       </View>
 
@@ -590,7 +626,6 @@ const styles = StyleSheet.create({
     width: "100%",
     minHeight: 68,
     borderRadius: 17,
-    borderWidth: TIMELINE_BORDER_WIDTH,
     justifyContent: "center",
     overflow: "hidden",
     position: "relative",
@@ -622,18 +657,13 @@ const styles = StyleSheet.create({
     lineHeight: 38,
     textAlign: "center",
   },
-  portraitPhaseCopy: {
+  phaseCopy: {
     ...StyleSheet.absoluteFillObject,
     flexDirection: "row",
     alignItems: "center",
+    justifyContent: "space-between",
   },
-  landscapePhaseCopy: {
-    ...StyleSheet.absoluteFillObject,
-    right: PHASE_ICON_SIZE + LANDSCAPE_ICON_RIGHT + 12,
-    justifyContent: "center",
-    paddingLeft: 16,
-  },
-  phasePrompt: {
+  sideCopy: {
     width: "34%",
     alignItems: "center",
     justifyContent: "center",
@@ -646,20 +676,6 @@ const styles = StyleSheet.create({
     fontWeight: "400",
     letterSpacing: 0.1,
     textAlign: "center",
-  },
-  portraitPhaseMessage: {
-    position: "absolute",
-    right: 8,
-    top: 0,
-    bottom: 0,
-    width: "34%",
-    alignItems: "center",
-    justifyContent: "center",
-    paddingHorizontal: 4,
-  },
-  landscapePhaseMessage: {
-    alignItems: "flex-start",
-    justifyContent: "center",
   },
   phaseTitle: {
     fontSize: 14,
@@ -675,7 +691,7 @@ const styles = StyleSheet.create({
     lineHeight: 22,
     fontWeight: "600",
     letterSpacing: -0.1,
-    textAlign: "left",
+    textAlign: "center",
   },
   phaseDetail: {
     fontFamily: fonts.body,
@@ -685,5 +701,13 @@ const styles = StyleSheet.create({
     letterSpacing: 0.1,
     textAlign: "center",
     opacity: 0.84,
+  },
+  etaText: {
+    fontFamily: fonts.body,
+    fontSize: 18,
+    lineHeight: 22,
+    fontWeight: "700",
+    letterSpacing: 0.1,
+    textAlign: "center",
   },
 });

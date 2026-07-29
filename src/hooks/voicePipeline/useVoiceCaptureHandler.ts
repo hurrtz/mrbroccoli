@@ -256,6 +256,7 @@ export function useVoiceCaptureHandler({
         ttsMode,
         ttsProvider,
         turnStartedAtMs,
+        ulraMode,
         updateConversationContextSummary,
         webSearchMode,
         webSearchProvider,

@@ -34,6 +34,17 @@ const progress: VoicePhaseProgress = {
   },
 };
 
+const copy: Record<string, string> = {
+  listening: "Listening",
+  yourTurn: "Your turn",
+  parsing: "Transcribing",
+  searching: "Searching",
+  converting: "Converting",
+  thinking: "Thinking",
+  pleaseWait: "Please wait",
+};
+const t = (key: string) => copy[key] ?? key;
+
 describe("useVoiceLiveActivity", () => {
   beforeEach(() => {
     jest.clearAllMocks();
@@ -49,6 +60,7 @@ describe("useVoiceLiveActivity", () => {
           phaseProgress: null,
           pipelinePhase: "idle" as const,
           spokenRepliesEnabled: true,
+          t,
         },
       },
     );
@@ -56,6 +68,8 @@ describe("useVoiceLiveActivity", () => {
     expect(setVoiceLiveActivityState).toHaveBeenCalledWith({
       phase: "listening",
       expectedSpeechAtMs: null,
+      phaseLabel: "Listening",
+      statusLabel: "Your turn",
     });
 
     rerender({
@@ -63,11 +77,14 @@ describe("useVoiceLiveActivity", () => {
       phaseProgress: progress,
       pipelinePhase: "thinking",
       spokenRepliesEnabled: true,
+      t,
     });
 
     expect(setVoiceLiveActivityState).toHaveBeenLastCalledWith({
       phase: "thinking",
       expectedSpeechAtMs: 220_000,
+      phaseLabel: "Thinking",
+      statusLabel: "Please wait",
     });
 
     rerender({
@@ -75,6 +92,7 @@ describe("useVoiceLiveActivity", () => {
       phaseProgress: null,
       pipelinePhase: "speaking",
       spokenRepliesEnabled: true,
+      t,
     });
 
     expect(endVoiceLiveActivity).toHaveBeenCalledTimes(1);
@@ -88,6 +106,7 @@ describe("useVoiceLiveActivity", () => {
         phaseProgress: null,
         pipelinePhase: "idle",
         spokenRepliesEnabled: true,
+        t,
       }),
     );
 
@@ -105,12 +124,15 @@ describe("useVoiceLiveActivity", () => {
         },
         pipelinePhase: "thinking-briefly",
         spokenRepliesEnabled: true,
+        t,
       }),
     );
 
     expect(setVoiceLiveActivityState).toHaveBeenCalledWith({
       phase: "thinking",
       expectedSpeechAtMs: 220_000,
+      phaseLabel: "Thinking",
+      statusLabel: "Please wait",
     });
     unmount();
   });
@@ -133,12 +155,15 @@ describe("useVoiceLiveActivity", () => {
         },
         pipelinePhase: "thinking",
         spokenRepliesEnabled: true,
+        t,
       }),
     );
 
     expect(setVoiceLiveActivityState).toHaveBeenCalledWith({
       phase: "thinking",
       expectedSpeechAtMs: 130_000,
+      phaseLabel: "Thinking",
+      statusLabel: "Please wait",
     });
     unmount();
   });
@@ -150,6 +175,7 @@ describe("useVoiceLiveActivity", () => {
         phaseProgress: progress,
         pipelinePhase: "thinking",
         spokenRepliesEnabled: false,
+        t,
       }),
     );
 

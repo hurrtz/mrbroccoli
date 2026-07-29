@@ -9,10 +9,12 @@ final class MrBroccoliVoiceLiveActivity: NSObject {
     true
   }
 
-  @objc(setState:expectedSpeechAtMs:resolver:rejecter:)
+  @objc(setState:expectedSpeechAtMs:phaseLabel:statusLabel:resolver:rejecter:)
   func setState(
     _ phase: String,
     expectedSpeechAtMs: NSNumber?,
+    phaseLabel: String,
+    statusLabel: String,
     resolver resolve: @escaping RCTPromiseResolveBlock,
     rejecter reject: @escaping RCTPromiseRejectBlock
   ) {
@@ -26,7 +28,9 @@ final class MrBroccoliVoiceLiveActivity: NSObject {
         resolve(
           try await MrBroccoliVoiceLiveActivityStore.setState(
             phase: phase,
-            expectedSpeechAtMs: expectedSpeechAtMs
+            expectedSpeechAtMs: expectedSpeechAtMs,
+            phaseLabel: phaseLabel,
+            statusLabel: statusLabel
           )
         )
       } catch {
@@ -55,12 +59,14 @@ final class MrBroccoliVoiceLiveActivity: NSObject {
 @available(iOS 16.2, *)
 @MainActor
 private enum MrBroccoliVoiceLiveActivityStore {
-  private static let freshnessWindow: TimeInterval = 45
+  private static let freshnessWindow: TimeInterval = 12 * 60
   private static var currentActivity: Activity<MrBroccoliVoiceActivityAttributes>?
 
   static func setState(
     phase: String,
-    expectedSpeechAtMs: NSNumber?
+    expectedSpeechAtMs: NSNumber?,
+    phaseLabel: String,
+    statusLabel: String
   ) async throws -> Bool {
     guard ActivityAuthorizationInfo().areActivitiesEnabled else {
       return false
@@ -71,7 +77,9 @@ private enum MrBroccoliVoiceLiveActivityStore {
     }
     let state = MrBroccoliVoiceActivityAttributes.ContentState(
       phase: phase,
-      expectedSpeechAt: expectedSpeechAt
+      expectedSpeechAt: expectedSpeechAt,
+      phaseLabel: phaseLabel,
+      statusLabel: statusLabel
     )
     let content = ActivityContent(
       state: state,

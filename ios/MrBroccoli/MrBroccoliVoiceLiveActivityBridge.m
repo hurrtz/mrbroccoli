@@ -4,6 +4,8 @@
 
 RCT_EXTERN_METHOD(setState:(NSString *)phase
                   expectedSpeechAtMs:(NSNumber * _Nullable)expectedSpeechAtMs
+                  phaseLabel:(NSString *)phaseLabel
+                  statusLabel:(NSString *)statusLabel
                   resolver:(RCTPromiseResolveBlock)resolve
                   rejecter:(RCTPromiseRejectBlock)reject)
 

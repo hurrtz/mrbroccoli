@@ -102,62 +102,57 @@ private struct MrBroccoliActivityTimer: View {
     if context.isStale {
       Image(systemName: "pause.fill")
         .foregroundStyle(.orange)
-        .accessibilityLabel(MrBroccoliActivityCopy.possiblyPaused)
+        .accessibilityLabel(context.state.statusLabel)
     } else if let expectedSpeechAt = context.state.expectedSpeechAt {
-      Text(expectedSpeechAt, style: .timer)
-        .monospacedDigit()
-        .contentTransition(.numericText())
-        .accessibilityLabel(MrBroccoliActivityCopy.estimatedTime)
+      TimelineView(.periodic(from: .now, by: 1)) { timeline in
+        let timingLabel = MrBroccoliActivityCopy.timingLabel(
+          expectedSpeechAt: expectedSpeechAt,
+          now: timeline.date
+        )
+        Text(timingLabel)
+          .monospacedDigit()
+          .contentTransition(.numericText())
+          .accessibilityLabel("\(context.state.statusLabel), \(timingLabel)")
+      }
     } else {
       ProgressView()
         .tint(.cyan)
-        .accessibilityLabel(MrBroccoliActivityCopy.working)
+        .accessibilityLabel(context.state.statusLabel)
     }
   }
 }
 
 private enum MrBroccoliActivityCopy {
-  private static var isGerman: Bool {
-    Locale.current.language.languageCode?.identifier == "de"
-  }
-
-  static var estimatedTime: String {
-    isGerman ? "Geschätzte Zeit bis zur Wiedergabe" : "Estimated time until playback"
-  }
-
-  static var possiblyPaused: String {
-    isGerman ? "Möglicherweise pausiert" : "Possibly paused"
-  }
-
-  static var working: String {
-    isGerman ? "In Arbeit" : "Working"
-  }
-
   static func phaseLabel(
     for context: ActivityViewContext<MrBroccoliVoiceActivityAttributes>
   ) -> String {
-    if context.isStale {
-      return isGerman ? "Mr Broccoli öffnen, um fortzufahren" : "Open Mr Broccoli to continue"
-    }
-
-    switch context.state.phase {
-    case "listening":
-      return isGerman ? "Hört zu" : "Listening"
-    case "transcribing":
-      return isGerman ? "Verarbeitet Sprache" : "Processing speech"
-    case "searching":
-      return isGerman ? "Sucht" : "Searching"
-    case "synthesizing":
-      return isGerman ? "Bereitet Stimme vor" : "Preparing voice"
-    default:
-      return isGerman ? "Denkt nach" : "Thinking"
-    }
+    return context.state.phaseLabel
   }
 
   static func statusLabel(
     for context: ActivityViewContext<MrBroccoliVoiceActivityAttributes>
   ) -> String {
-    context.isStale ? possiblyPaused : working
+    context.state.statusLabel
+  }
+
+  static func timingLabel(expectedSpeechAt: Date, now: Date) -> String {
+    let remainingSeconds = expectedSpeechAt.timeIntervalSince(now)
+
+    if remainingSeconds >= 0 {
+      return formatDuration(Int(ceil(remainingSeconds)))
+    }
+
+    return "+ \(formatDuration(max(1, Int(floor(-remainingSeconds)))))"
+  }
+
+  private static func formatDuration(_ totalSeconds: Int) -> String {
+    if totalSeconds < 60 {
+      return "\(totalSeconds) s"
+    }
+
+    let minutes = totalSeconds / 60
+    let seconds = totalSeconds % 60
+    return String(format: "%d:%02d", minutes, seconds)
   }
 
   static func symbolName(

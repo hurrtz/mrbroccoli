@@ -34,6 +34,7 @@ export function useVoicePipeline(
     phaseProgress,
     pipelinePhase,
     spokenRepliesEnabled: params.spokenRepliesEnabled,
+    t: params.t,
   });
 
   const {

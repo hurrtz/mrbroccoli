@@ -20,6 +20,8 @@ import androidx.core.content.ContextCompat
 internal data class MrBroccoliVoiceTurnState(
   val phase: String,
   val expectedSpeechAtMs: Long?,
+  val phaseLabel: String,
+  val statusLabel: String,
 ) {
   companion object {
     private val supportedPhases = setOf(
@@ -40,6 +42,8 @@ class MrBroccoliVoiceTurnService : Service() {
       "com.tobiaswinkler.app.mrbroccoli.action.SET_VOICE_TURN_STATE"
     private const val EXTRA_PHASE = "phase"
     private const val EXTRA_EXPECTED_SPEECH_AT_MS = "expectedSpeechAtMs"
+    private const val EXTRA_PHASE_LABEL = "phaseLabel"
+    private const val EXTRA_STATUS_LABEL = "statusLabel"
     private const val CHANNEL_ID = "mrbroccoli_voice_turn"
     private const val NOTIFICATION_ID = 2404
 
@@ -50,8 +54,15 @@ class MrBroccoliVoiceTurnService : Service() {
       context: Context,
       phase: String,
       expectedSpeechAtMs: Long?,
+      phaseLabel: String,
+      statusLabel: String,
     ) {
-      val state = MrBroccoliVoiceTurnState(phase, expectedSpeechAtMs)
+      val state = MrBroccoliVoiceTurnState(
+        phase,
+        expectedSpeechAtMs,
+        phaseLabel,
+        statusLabel,
+      )
       activeService?.let { service ->
         service.handler.post {
           service.updateState(state)
@@ -63,6 +74,8 @@ class MrBroccoliVoiceTurnService : Service() {
           if (expectedSpeechAtMs != null) {
             putExtra(EXTRA_EXPECTED_SPEECH_AT_MS, expectedSpeechAtMs)
           }
+          putExtra(EXTRA_PHASE_LABEL, phaseLabel)
+          putExtra(EXTRA_STATUS_LABEL, statusLabel)
         }
         ContextCompat.startForegroundService(context, intent)
       }
@@ -112,7 +125,18 @@ class MrBroccoliVoiceTurnService : Service() {
       null
     }
 
-    updateState(MrBroccoliVoiceTurnState(phase, expectedSpeechAtMs))
+    updateState(
+      MrBroccoliVoiceTurnState(
+        phase = phase,
+        expectedSpeechAtMs = expectedSpeechAtMs,
+        phaseLabel = intent.getStringExtra(EXTRA_PHASE_LABEL)
+          ?.takeIf(String::isNotBlank)
+          ?: getString(phaseLabel(phase)),
+        statusLabel = intent.getStringExtra(EXTRA_STATUS_LABEL)
+          ?.takeIf(String::isNotBlank)
+          ?: getString(R.string.voice_turn_notification_title),
+      ),
+    )
     return START_NOT_STICKY
   }
 
@@ -150,11 +174,16 @@ class MrBroccoliVoiceTurnService : Service() {
     )
 
     state.expectedSpeechAtMs
-      ?.takeIf { it > System.currentTimeMillis() }
       ?.let { deadline ->
+        val now = System.currentTimeMillis()
+        val delayMs = if (deadline > now) {
+          deadline - now
+        } else {
+          1_000L
+        }
         handler.postDelayed(
           overtimeUpdate,
-          (deadline - System.currentTimeMillis()).coerceAtLeast(1L),
+          delayMs.coerceAtLeast(1L),
         )
       }
   }
@@ -172,8 +201,8 @@ class MrBroccoliVoiceTurnService : Service() {
 
     val builder = NotificationCompat.Builder(this, CHANNEL_ID)
       .setSmallIcon(R.drawable.ic_mrbroccoli_voice_turn)
-      .setContentTitle(getString(R.string.voice_turn_notification_title))
-      .setContentText(getString(phaseLabel(state.phase)))
+      .setContentTitle("Mr Broccoli")
+      .setContentText(notificationStatus(state))
       .setContentIntent(contentIntent)
       .setCategory(NotificationCompat.CATEGORY_PROGRESS)
       .setColor(Color.rgb(35, 205, 225))
@@ -187,11 +216,17 @@ class MrBroccoliVoiceTurnService : Service() {
     val deadline = state.expectedSpeechAtMs
     if (deadline != null) {
       val countingDown = deadline > System.currentTimeMillis()
-      builder
-        .setWhen(deadline)
-        .setShowWhen(true)
-        .setUsesChronometer(true)
-        .setChronometerCountDown(countingDown)
+      if (countingDown) {
+        builder
+          .setWhen(deadline)
+          .setShowWhen(true)
+          .setUsesChronometer(true)
+          .setChronometerCountDown(true)
+      } else {
+        builder
+          .setShowWhen(false)
+          .setUsesChronometer(false)
+      }
     } else {
       builder
         .setShowWhen(false)
@@ -199,6 +234,27 @@ class MrBroccoliVoiceTurnService : Service() {
     }
 
     return builder.build()
+  }
+
+  private fun notificationStatus(state: MrBroccoliVoiceTurnState): String {
+    val deadline = state.expectedSpeechAtMs
+    val overtimeMs = deadline?.let { System.currentTimeMillis() - it } ?: 0L
+    return if (overtimeMs >= 0L && deadline != null) {
+      "${state.phaseLabel} · + ${formatDuration(overtimeMs)}"
+    } else {
+      "${state.phaseLabel} · ${state.statusLabel}"
+    }
+  }
+
+  private fun formatDuration(durationMs: Long): String {
+    val totalSeconds = (durationMs / 1_000L).coerceAtLeast(0L)
+    return if (totalSeconds < 60L) {
+      "$totalSeconds s"
+    } else {
+      val minutes = totalSeconds / 60L
+      val seconds = totalSeconds % 60L
+      "$minutes:${seconds.toString().padStart(2, '0')}"
+    }
   }
 
   private fun phaseLabel(phase: String): Int = when (phase) {

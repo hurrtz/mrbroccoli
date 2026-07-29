@@ -92,8 +92,8 @@ describe("latencyStats", () => {
     expect(createLatencyRouteKey(ulraDescriptor)).toBe(
       `${createLatencyRouteKey(standardDescriptor)}:ulra:3:2`,
     );
-    expect(getDefaultLatencyEstimateMs(ulraDescriptor)).toBe(
-      standardEstimate * 4,
+    expect(getDefaultLatencyEstimateMs(ulraDescriptor)).toBeGreaterThan(
+      standardEstimate * 8,
     );
   });
 
