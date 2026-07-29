@@ -228,6 +228,43 @@ describe("useVoicePipeline", () => {
     expect(result.current.activeReplayMessageId).toBeNull();
   });
 
+  it("shows a localized credit toast for replay quota failures", async () => {
+    const params = createParams({
+      ttsMode: "provider",
+      ttsProvider: "elevenlabs",
+      selectedTtsModel: "eleven_v3",
+      selectedTtsVoice: "voice-123",
+      player: createPlayer(),
+    });
+    const quotaError = Object.assign(
+      new Error(
+        "TTS error (401): 102 credits remaining, 139 credits required.",
+      ),
+      { failureKind: "credits" as const },
+    );
+    (synthesizeSpeech as jest.Mock).mockRejectedValue(quotaError);
+
+    const { result } = renderHook(() => useVoicePipeline(params));
+
+    await act(async () => {
+      await result.current.playReplyText("Replay this", "message-1");
+    });
+
+    expect(params.showToast).toHaveBeenCalledWith(
+      translate("en", "providerCreditsRequired", {
+        provider: "ElevenLabs",
+        action: translate("en", "speechSynthesisAction"),
+      }),
+      undefined,
+      "danger",
+    );
+    expect(params.showToast).not.toHaveBeenCalledWith(
+      quotaError.message,
+      undefined,
+      "danger",
+    );
+  });
+
   it("uses an explicitly configured native fallback for reply replay", async () => {
     const params = createParams({
       ttsMode: "provider",
@@ -283,6 +320,63 @@ describe("useVoicePipeline", () => {
       "Provider TTS unavailable",
       undefined,
       "danger",
+    );
+  });
+
+  it("stops scheduling replay chunks after the first terminal TTS failure", async () => {
+    const longReply = Array.from(
+      { length: 80 },
+      () => "This sentence should be synthesized only after earlier chunks succeed.",
+    ).join(" ");
+    const params = createParams({
+      ttsMode: "provider",
+      player: createPlayer(),
+    });
+    (synthesizeSpeech as jest.Mock).mockRejectedValue(
+      new Error("Provider TTS unavailable"),
+    );
+
+    const { result } = renderHook(() => useVoicePipeline(params));
+
+    await act(async () => {
+      await result.current.playReplyText(longReply, "message-1");
+    });
+
+    expect(synthesizeSpeech).toHaveBeenCalledTimes(1);
+    expect(params.showToast).toHaveBeenCalledTimes(1);
+    expect(params.player.enqueueAudio).not.toHaveBeenCalled();
+  });
+
+  it("preserves reply paragraphs so live TTS audio can be reused", async () => {
+    const params = createParams({
+      ttsMode: "provider",
+      player: createPlayer(),
+    });
+    (synthesizeSpeech as jest.Mock)
+      .mockResolvedValueOnce("file://reply-1.wav")
+      .mockResolvedValueOnce("file://reply-2.wav");
+
+    const { result } = renderHook(() => useVoicePipeline(params));
+
+    await act(async () => {
+      await result.current.playReplyText(
+        "Paragraph one.\n\nParagraph two.",
+        "message-1",
+      );
+    });
+
+    expect(synthesizeSpeech).toHaveBeenCalledTimes(2);
+    expect(synthesizeSpeech).toHaveBeenNthCalledWith(
+      1,
+      expect.objectContaining({
+        text: "Paragraph one.",
+      }),
+    );
+    expect(synthesizeSpeech).toHaveBeenNthCalledWith(
+      2,
+      expect.objectContaining({
+        text: "Paragraph two.",
+      }),
     );
   });
 

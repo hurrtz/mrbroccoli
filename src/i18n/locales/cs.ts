@@ -103,6 +103,7 @@ export const cs = {
   catalogProviderPricingSummary: ({ summary }) => `Cena: ${summary}`,
   replyGenerationAction: "generování odpovědi",
   speechTranscriptionAction: "přepis řeči",
+  speechSynthesisAction: "syntéza řeči",
   instructionsTabDescription:
     "Vytvářejte skryté pokyny, které řídí asistenta dříve, než jakýkoli poskytovatel uvidí požadavek.",
   providersTabDescription:

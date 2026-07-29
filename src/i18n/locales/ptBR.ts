@@ -104,6 +104,7 @@ export const ptBR = {
   catalogProviderPricingSummary: ({ summary }) => `Preços: ${summary}`,
   replyGenerationAction: "geração de resposta",
   speechTranscriptionAction: "transcrição de fala",
+  speechSynthesisAction: "síntese de voz",
   instructionsTabDescription:
     "Molde a orientação oculta que orienta o assistente antes que qualquer provedor veja a solicitação.",
   providersTabDescription:

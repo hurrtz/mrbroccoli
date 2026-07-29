@@ -104,6 +104,7 @@ export const fr = {
   catalogProviderPricingSummary: ({ summary }) => `Tarification : ${summary}`,
   replyGenerationAction: "génération de réponse",
   speechTranscriptionAction: "transcription du discours",
+  speechSynthesisAction: "synthèse vocale",
   instructionsTabDescription:
     "Façonnez les conseils cachés qui orientent l’assistant avant qu’un fournisseur ne voie la demande.",
   providersTabDescription:

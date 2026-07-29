@@ -152,6 +152,19 @@ function isAuthenticationFailure(status: number, detail: string) {
   );
 }
 
+function isCreditsFailure(status: number, detail: string) {
+  const normalized = detail.toLowerCase();
+
+  return (
+    status === 402 ||
+    normalized.includes("credits remaining") ||
+    normalized.includes("credits are required") ||
+    normalized.includes("insufficient credits") ||
+    normalized.includes("not enough credits") ||
+    normalized.includes("credit balance")
+  );
+}
+
 function isRateLimitFailure(status: number, detail: string) {
   const normalized = detail.toLowerCase();
 
@@ -165,17 +178,21 @@ function isRateLimitFailure(status: number, detail: string) {
 
 function isQuotaFailure(status: number, detail: string) {
   const normalized = detail.toLowerCase();
+  const explicitQuotaFailure =
+    normalized.includes("current quota") ||
+    normalized.includes("insufficient_quota") ||
+    normalized.includes("quota exhausted") ||
+    normalized.includes("quota exceeded") ||
+    normalized.includes("exceeded your quota") ||
+    normalized.includes("exceeds your quota") ||
+    normalized.includes("resource_exhausted") ||
+    normalized.includes("spending limit");
 
   return (
-    status === 429 &&
-    (normalized.includes("billing") ||
-      normalized.includes("check your plan") ||
-      normalized.includes("current quota") ||
-      normalized.includes("insufficient_quota") ||
-      normalized.includes("quota exhausted") ||
-      normalized.includes("quota exceeded") ||
-      normalized.includes("resource_exhausted") ||
-      normalized.includes("spending limit"))
+    explicitQuotaFailure ||
+    (status === 429 &&
+      (normalized.includes("billing") ||
+        normalized.includes("check your plan")))
   );
 }
 
@@ -253,6 +270,14 @@ function classifyProviderFailure(params: {
 }): ProviderFailureKind {
   const { action, detail, status } = params;
 
+  if (isCreditsFailure(status, detail)) {
+    return "credits";
+  }
+
+  if (isQuotaFailure(status, detail)) {
+    return "quota";
+  }
+
   if (isAuthenticationFailure(status, detail)) {
     return "authentication";
   }
@@ -261,16 +286,8 @@ function classifyProviderFailure(params: {
     return "model-unavailable";
   }
 
-  if (isQuotaFailure(status, detail)) {
-    return "quota";
-  }
-
   if (isRateLimitFailure(status, detail)) {
     return "rate-limit";
-  }
-
-  if (status === 402) {
-    return "credits";
   }
 
   if (action === "reply" && isContextTooLongFailure(detail)) {

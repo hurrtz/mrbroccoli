@@ -102,6 +102,7 @@ export const tr = {
   catalogProviderPricingSummary: ({ summary }) => `Fiyatlandırma: ${summary}`,
   replyGenerationAction: "yanıt oluşturma",
   speechTranscriptionAction: "konuşma transkripsiyonu",
+  speechSynthesisAction: "konuşma sentezi",
   instructionsTabDescription:
     "Herhangi bir sağlayıcı talebi görmeden önce asistanı yönlendiren gizli kılavuzu şekillendirin.",
   providersTabDescription:

@@ -112,6 +112,7 @@ export const uk = {
   catalogProviderPricingSummary: ({ summary }) => `Вартість: ${summary}`,
   replyGenerationAction: "створення відповіді",
   speechTranscriptionAction: "розпізнавання мовлення",
+  speechSynthesisAction: "синтез мовлення",
   instructionsTabDescription:
     "Налаштуйте приховані інструкції, які спрямовують асистента до того, як запит потрапить до провайдера.",
   providersTabDescription:

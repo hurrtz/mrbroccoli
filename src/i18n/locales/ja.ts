@@ -103,6 +103,7 @@ export const ja = {
   catalogProviderPricingSummary: ({ summary }) => `価格: ${summary}`,
   replyGenerationAction: "応答の生成",
   speechTranscriptionAction: "音声文字起こし",
+  speechSynthesisAction: "音声合成",
   instructionsTabDescription:
     "プロバイダーがリクエストを確認する前に、アシスタントを操作する隠れたガイダンスを作成します。",
   providersTabDescription:

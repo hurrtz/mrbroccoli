@@ -104,6 +104,7 @@ export const ar = {
   catalogProviderPricingSummary: ({ summary }) => `الأسعار: ${summary}`,
   replyGenerationAction: "جيل الرد",
   speechTranscriptionAction: "نسخ الكلام",
+  speechSynthesisAction: "توليد الكلام",
   instructionsTabDescription:
     "قم بتشكيل التوجيه المخفي الذي يوجه المساعد قبل أن يرى أي مزود الطلب.",
   providersTabDescription:

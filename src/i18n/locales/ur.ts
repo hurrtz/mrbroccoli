@@ -102,6 +102,7 @@ export const ur = {
   catalogProviderPricingSummary: ({ summary }) => `قیمت کا تعین: ${summary}`,
   replyGenerationAction: "جواب تیار کرنا",
   speechTranscriptionAction: "تقریر کی نقل",
+  speechSynthesisAction: "تقریر کی ترکیب",
   instructionsTabDescription:
     "کسی بھی فراہم کنندہ کی درخواست کو دیکھنے سے پہلے اس پوشیدہ رہنمائی کو شکل دیں جو اسسٹنٹ کو چلاتا ہے۔",
   providersTabDescription:

@@ -155,8 +155,10 @@ export function createVoicePipelineTtsQueue({
   };
   const bufferUntilComplete =
     ttsMode !== "native" && replyPlayback === "wait";
+  const synthesisConcurrency =
+    diagnosticsSource === "repeat" ? 1 : TTS_PREFETCH_CONCURRENCY;
   const synthesisSlots = Array.from(
-    { length: TTS_PREFETCH_CONCURRENCY },
+    { length: synthesisConcurrency },
     () => Promise.resolve(),
   );
   const queuedTasks: Promise<void>[] = [];
@@ -172,7 +174,9 @@ export function createVoicePipelineTtsQueue({
   let previousProviderText = "";
   let fallbackNotified = false;
   let fatalTtsError = false;
+  let fatalTtsSequence: number | null = null;
   let fatalTtsErrorNotified = false;
+  let nextSynthesisSequence = 0;
   const selectedRoutes = new Map<SpeechLanguage, TtsBackendMode>();
   const routeSelectionPromises = new Map<
     SpeechLanguage,
@@ -466,6 +470,8 @@ export function createVoicePipelineTtsQueue({
     text: string,
     context?: { previousText?: string; nextText?: string },
   ) => {
+    const sequence = nextSynthesisSequence;
+    nextSynthesisSequence += 1;
     const speechLanguage = resolveTtsListenLanguage({
       text,
       preferredLanguages: ttsListenLanguages,
@@ -473,16 +479,33 @@ export function createVoicePipelineTtsQueue({
     });
     const slotIndex = nextSynthesisSlot;
     nextSynthesisSlot =
-      (nextSynthesisSlot + 1) % TTS_PREFETCH_CONCURRENCY;
-    const task = synthesisSlots[slotIndex].then(() =>
-      synthesizeOnSelectedRoute(text, speechLanguage, context),
-    );
+      (nextSynthesisSlot + 1) % synthesisSlots.length;
+    const task = synthesisSlots[slotIndex].then(async () => {
+      if (abortSignal?.aborted || fatalTtsError) {
+        return null;
+      }
+
+      try {
+        return await synthesizeOnSelectedRoute(
+          text,
+          speechLanguage,
+          context,
+        );
+      } catch (error) {
+        fatalTtsError = true;
+        fatalTtsSequence =
+          fatalTtsSequence === null
+            ? sequence
+            : Math.min(fatalTtsSequence, sequence);
+        throw error;
+      }
+    });
 
     synthesisSlots[slotIndex] = task.then(
       () => undefined,
       () => undefined,
     );
-    return task;
+    return { sequence, task };
   };
 
   const emitParagraphPause = async (result: TtsSynthesisResult) => {
@@ -543,17 +566,18 @@ export function createVoicePipelineTtsQueue({
 
     const synthesis = scheduleSynthesis(trimmed, context);
     const task = outputChain.then(async () => {
-      if (
-        abortSignal?.aborted ||
-        fatalTtsError ||
-        !spokenRepliesEnabled
-      ) {
+      if (abortSignal?.aborted || !spokenRepliesEnabled) {
         return;
       }
 
-      const result = await synthesis;
+      const result = await synthesis.task;
 
-      if (!result || abortSignal?.aborted) {
+      if (
+        !result ||
+        abortSignal?.aborted ||
+        (fatalTtsSequence !== null &&
+          synthesis.sequence > fatalTtsSequence)
+      ) {
         return;
       }
 
@@ -635,6 +659,13 @@ export function createVoicePipelineTtsQueue({
     if (replyPlayback === "stream") {
       if (paragraphBuffer.trim()) {
         enqueueParagraph(paragraphBuffer);
+      }
+    } else if (diagnosticsSource === "repeat") {
+      const { completeParagraphs, remainder } =
+        extractCompleteParagraphs(`${fullText.trim()}\n\n`);
+      completeParagraphs.forEach(enqueueParagraph);
+      if (remainder.trim()) {
+        enqueueParagraph(remainder);
       }
     } else {
       enqueueTts(fullText);

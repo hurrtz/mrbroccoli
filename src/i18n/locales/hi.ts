@@ -104,6 +104,7 @@ export const hi = {
   catalogProviderPricingSummary: ({ summary }) => `मूल्य: ${summary}`,
   replyGenerationAction: "उत्तर पीढ़ी",
   speechTranscriptionAction: "भाषण प्रतिलेखन",
+  speechSynthesisAction: "वाक् संश्लेषण",
   instructionsTabDescription:
     "किसी भी प्रदाता के अनुरोध को देखने से पहले सहायक को संचालित करने वाले छिपे हुए मार्गदर्शन को आकार दें।",
   providersTabDescription:

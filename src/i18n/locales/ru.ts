@@ -105,6 +105,7 @@ export const ru = {
   catalogProviderPricingSummary: ({ summary }) => `Цены: ${summary}`,
   replyGenerationAction: "генерация ответа",
   speechTranscriptionAction: "транскрипция речи",
+  speechSynthesisAction: "синтез речи",
   instructionsTabDescription:
     "Сформируйте скрытое руководство, которое будет управлять помощником до того, как какой-либо поставщик увидит запрос.",
   providersTabDescription:

@@ -106,6 +106,7 @@ export const hu = {
   catalogProviderPricingSummary: ({ summary }) => `Árképzés: ${summary}`,
   replyGenerationAction: "válasz generálása",
   speechTranscriptionAction: "beszéd átírása",
+  speechSynthesisAction: "beszédszintézis",
   instructionsTabDescription:
     "Alakítsa ki a rejtett útmutatást, amely az asszisztenst irányítja, mielőtt bármely szolgáltató látná a kérést.",
   providersTabDescription:

@@ -1,3 +1,5 @@
+import * as FileSystem from "expo-file-system/legacy";
+
 import { translate } from "../i18n";
 import {
   createSpeechRequestId,
@@ -53,6 +55,104 @@ export {
 };
 
 const LOCAL_ANDROID_DEV_API_KEY = "sk-test-android-local-dev";
+const MAX_PROVIDER_TTS_AUDIO_CACHE_ENTRIES = 64;
+
+interface ProviderTtsAudioCacheEntry {
+  audioPath: string;
+  providerModel: string | null;
+}
+
+const providerTtsAudioCache = new Map<
+  string,
+  ProviderTtsAudioCacheEntry
+>();
+
+function hashTtsCacheValue(value: string) {
+  let first = 2166136261;
+  let second = 5381;
+
+  for (let index = 0; index < value.length; index += 1) {
+    const code = value.charCodeAt(index);
+    first ^= code;
+    first = Math.imul(first, 16777619);
+    second = Math.imul(second, 33) ^ code;
+  }
+
+  return `${value.length}:${(first >>> 0).toString(36)}:${(
+    second >>> 0
+  ).toString(36)}`;
+}
+
+function getProviderTtsAudioCacheKey(params: {
+  apiKey?: string;
+  instructions?: string;
+  nextText?: string;
+  previousText?: string;
+  provider: Provider;
+  providerModel: string | null;
+  speechLanguage: SpeechLanguage;
+  text: string;
+  voice: string;
+}) {
+  return hashTtsCacheValue(
+    JSON.stringify({
+      apiKeyIdentity: hashTtsCacheValue(params.apiKey?.trim() ?? ""),
+      instructions: params.instructions?.trim() ?? "",
+      nextText: params.nextText?.trim() ?? "",
+      previousText: params.previousText?.trim() ?? "",
+      provider: params.provider,
+      providerModel: params.providerModel,
+      speechLanguage: params.speechLanguage,
+      text: params.text.trim(),
+      voice: params.voice,
+    }),
+  );
+}
+
+async function getCachedProviderTtsAudio(cacheKey: string) {
+  const cached = providerTtsAudioCache.get(cacheKey);
+
+  if (!cached) {
+    return null;
+  }
+
+  try {
+    const info = await FileSystem.getInfoAsync(cached.audioPath);
+    if (!info.exists) {
+      providerTtsAudioCache.delete(cacheKey);
+      return null;
+    }
+  } catch {
+    providerTtsAudioCache.delete(cacheKey);
+    return null;
+  }
+
+  providerTtsAudioCache.delete(cacheKey);
+  providerTtsAudioCache.set(cacheKey, cached);
+  return cached;
+}
+
+function cacheProviderTtsAudio(
+  cacheKey: string,
+  entry: ProviderTtsAudioCacheEntry,
+) {
+  providerTtsAudioCache.delete(cacheKey);
+  providerTtsAudioCache.set(cacheKey, entry);
+
+  while (
+    providerTtsAudioCache.size > MAX_PROVIDER_TTS_AUDIO_CACHE_ENTRIES
+  ) {
+    const oldestKey = providerTtsAudioCache.keys().next().value;
+    if (typeof oldestKey !== "string") {
+      break;
+    }
+    providerTtsAudioCache.delete(oldestKey);
+  }
+}
+
+export function clearProviderTtsAudioCacheForTests() {
+  providerTtsAudioCache.clear();
+}
 
 function isLocalAndroidDevTtsEnabled(apiKey: string | undefined) {
   return (
@@ -243,6 +343,24 @@ export async function synthesizeSpeech(params: {
     );
   }
 
+  if (abortSignal?.aborted) {
+    const abortError = new Error("Speech generation was cancelled.");
+    abortError.name = "AbortError";
+    throw abortError;
+  }
+
+  const providerAudioCacheKey = getProviderTtsAudioCacheKey({
+    apiKey,
+    instructions,
+    nextText,
+    previousText,
+    provider,
+    providerModel: resolvedProviderModel,
+    speechLanguage: resolvedSpeechLanguage,
+    text,
+    voice,
+  });
+
   if (isLocalAndroidDevTtsEnabled(apiKey)) {
     const audioPath = await writeBytesAudioFile({
       bytes: buildLocalAndroidDevWavBytes(text),
@@ -262,6 +380,30 @@ export async function synthesizeSpeech(params: {
       message: "Generated local Android dev TTS audio.",
     });
     return audioPath;
+  }
+
+  const cachedAudio = await getCachedProviderTtsAudio(
+    providerAudioCacheKey,
+  );
+  if (cachedAudio) {
+    actualProviderModel = cachedAudio.providerModel;
+    if (diagnostics) {
+      diagnostics.providerModel = cachedAudio.providerModel;
+    }
+    recordSpeechDiagnostic({
+      requestId,
+      source: diagnostics?.source ?? "unknown",
+      stage: "tts-succeeded",
+      requestedRoute: "provider",
+      actualRoute: "provider",
+      provider,
+      providerModel: cachedAudio.providerModel,
+      voice: voice || null,
+      language: resolvedSpeechLanguage,
+      textLength: text.trim().length,
+      message: "Reused cached speech audio.",
+    });
+    return cachedAudio.audioPath;
   }
 
   try {
@@ -294,6 +436,10 @@ export async function synthesizeSpeech(params: {
       providerModel: actualProviderModel,
       voice: voice || null,
       textLength: text.trim().length,
+    });
+    cacheProviderTtsAudio(providerAudioCacheKey, {
+      audioPath,
+      providerModel: actualProviderModel,
     });
     return audioPath;
   } catch (providerError) {

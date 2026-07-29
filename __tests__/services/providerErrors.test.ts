@@ -1,5 +1,6 @@
 import {
   buildProviderHttpError,
+  classifyProviderHttpFailure,
   extractProviderErrorMessage,
   ProviderRequestError,
   readSafeProviderErrorMessage,
@@ -159,6 +160,20 @@ describe("buildProviderHttpError", () => {
       }),
     );
     expect(error.message).toContain("sufficient API credit");
+  });
+
+  it("classifies ElevenLabs credit exhaustion before status-only authentication", () => {
+    const failureKind = classifyProviderHttpFailure({
+      status: 401,
+      errorText: JSON.stringify({
+        detail: {
+          message:
+            "This request exceeds your quota of 64945. You have 102 credits remaining, while 139 credits are required for this request.",
+        },
+      }),
+    });
+
+    expect(failureKind).toBe("credits");
   });
 
   it("marks retired model responses as safe for model failover", () => {

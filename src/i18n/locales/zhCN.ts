@@ -102,6 +102,7 @@ export const zhCN = {
   catalogProviderPricingSummary: ({ summary }) => `价格：${summary}`,
   replyGenerationAction: "回复生成",
   speechTranscriptionAction: "语音转录",
+  speechSynthesisAction: "语音合成",
   instructionsTabDescription:
     "在任何提供者看到请求之前，制定隐藏的指导来指导助理。",
   providersTabDescription:

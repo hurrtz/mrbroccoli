@@ -21,6 +21,7 @@ import {
   PROVIDER_TTS_MAX_INPUT_CHARS,
   splitIntoSentences,
   splitTextForTts,
+  clearProviderTtsAudioCacheForTests,
   synthesizeSpeech,
   synthesizeSpeechSequence,
   TtsRequestError,
@@ -31,6 +32,7 @@ global.fetch = jest.fn();
 
 jest.mock("expo-file-system/legacy", () => ({
   cacheDirectory: "/tmp/",
+  getInfoAsync: jest.fn(async () => ({ exists: false, isDirectory: false })),
   writeAsStringAsync: jest.fn(() => Promise.resolve()),
 }));
 
@@ -155,6 +157,7 @@ describe("splitTextForTts", () => {
 describe("synthesizeSpeech", () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    clearProviderTtsAudioCacheForTests();
     resetProviderModelHealthForTests();
   });
 
@@ -199,6 +202,34 @@ describe("synthesizeSpeech", () => {
     expect(body.model).toBe("gpt-4o-mini-tts");
     expect(body.voice).toBe("alloy");
     expect(body.input).toBe("Hello world");
+  });
+
+  it("reuses successful provider audio for an identical synthesis request", async () => {
+    (fetch as jest.Mock).mockResolvedValueOnce({
+      ok: true,
+      blob: () => Promise.resolve(new Blob(["fake-audio"])),
+    });
+    (FileSystem.getInfoAsync as jest.Mock).mockResolvedValueOnce({
+      exists: true,
+      isDirectory: false,
+    });
+    const request = {
+      text: "Cache this spoken reply.",
+      voice: "alloy",
+      mode: "provider" as const,
+      provider: "openai" as const,
+      providerModel: "gpt-4o-mini-tts",
+      apiKey: "sk-test",
+      instructions: "Speak clearly.",
+      language: "en" as const,
+    };
+
+    const first = await synthesizeSpeech(request);
+    const second = await synthesizeSpeech(request);
+
+    expect(second).toBe(first);
+    expect(fetch).toHaveBeenCalledTimes(1);
+    expect(FileSystem.getInfoAsync).toHaveBeenCalledWith(first);
   });
 
   it("uses another model from the same TTS provider when the selected model is unavailable", async () => {

@@ -103,6 +103,7 @@ export const sv = {
   catalogProviderPricingSummary: ({ summary }) => `Pris: ${summary}`,
   replyGenerationAction: "svarsgenerering",
   speechTranscriptionAction: "taltranskription",
+  speechSynthesisAction: "talsyntes",
   instructionsTabDescription:
     "Forma den dolda vägledningen som styr assistenten innan någon leverantör ser förfrågan.",
   providersTabDescription:

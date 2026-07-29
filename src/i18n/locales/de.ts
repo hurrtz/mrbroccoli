@@ -106,6 +106,7 @@ export const de = {
   catalogProviderPricingSummary: ({ summary }) => `Preise: ${summary}`,
   replyGenerationAction: "Antworterstellung",
   speechTranscriptionAction: "Sprachtranskription",
+  speechSynthesisAction: "Sprachausgabe",
   instructionsTabDescription:
     "Definiere die versteckte Anleitung, die den Assistenten steuert, bevor ein Anbieter die Anfrage sieht.",
   providersTabDescription:

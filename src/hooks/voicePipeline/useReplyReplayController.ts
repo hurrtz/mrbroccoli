@@ -9,6 +9,8 @@ import type {
 } from "./types";
 import { resolveTtsListenLanguage } from "../../utils/ttsRouting";
 import { getSpeechLanguageDefinition } from "../../constants/speechLanguages";
+import { PROVIDER_LABELS } from "../../constants/models";
+import { getProviderFailureKind } from "../../services/providerResilience";
 
 type ReplayControllerParams = Pick<
   UseVoicePipelineParams,
@@ -164,6 +166,22 @@ export function useReplyReplayController({
                 replaySessionRef.current !== replaySession ||
                 error.name === "AbortError"
               ) {
+                return;
+              }
+
+              const failureKind = getProviderFailureKind(error);
+              if (
+                ttsProvider &&
+                (failureKind === "credits" || failureKind === "quota")
+              ) {
+                showToast(
+                  t("providerCreditsRequired", {
+                    provider: PROVIDER_LABELS[ttsProvider],
+                    action: t("speechSynthesisAction"),
+                  }),
+                  undefined,
+                  "danger",
+                );
                 return;
               }
 
