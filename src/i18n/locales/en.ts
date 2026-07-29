@@ -120,28 +120,28 @@ export const en = {
   useResponseMode: ({ mode }) => `Use ${mode}`,
   chooseResponseModel: "Choose a model",
   responseModelCount: ({ count }) => `${count} models available`,
-  ulraMode: "Ultra Mode",
-  ulraModeHomeLabel: "Show Ultra Mode on the home screen",
+  ulraMode: "Uber Mode",
+  ulraModeHomeLabel: "Show Uber Mode on the home screen",
   ulraModeSettingsDescription:
     "Allow multi-model deliberation when at least two home-screen models are ready.",
   ulraModeInfo:
-    "Ultra Mode asks every ready home-screen model independently, then lets each model review all earlier answers for every round. The selected model synthesizes the final response. The deliberation is shared with every provider involved.",
+    "Uber Mode asks every ready home-screen model independently, then lets each model review all earlier answers for every round. The selected model synthesizes the final response. The deliberation is shared with every provider involved.",
   ulraModeRounds: "Review rounds",
   ulraModeCallEstimate: ({ count }) =>
     `About ${count} model calls per message with the current setup.`,
   ulraModeThresholdWarning:
     "More than 4 models or 3 rounds can take a long time, consume many tokens, and hit provider context or rate limits. This is a warning only.",
-  ulraModeFirstUseTitle: "Enable Ultra Mode?",
+  ulraModeFirstUseTitle: "Enable Uber Mode?",
   ulraModeFirstUseMessage: ({ calls, models, rounds }) =>
     `With ${models} models and ${rounds} review rounds, one message can make about ${calls} model calls. It may take much longer, cost significantly more, and share the deliberation with every provider involved.`,
-  ulraModeHighRiskTitle: "Large Ultra Mode run",
+  ulraModeHighRiskTitle: "Large Uber Mode run",
   ulraModeHighRiskMessage: ({ calls, models, rounds }) =>
     `${models} models and ${rounds} review rounds can make about ${calls} model calls. This may take a very long time, use many tokens, and hit provider limits. Continue anyway?`,
   ulraModeEnableAction: "Enable",
   ulraModeNeedsTwoModels:
-    "Ultra Mode needs at least two ready home-screen models.",
+    "Uber Mode needs at least two ready home-screen models.",
   ulraModeAllModelsFailed:
-    "Every Ultra Mode model failed before a response could be synthesized.",
+    "Every Uber Mode model failed before a response could be synthesized.",
   ulraModePartialFailureNotice: ({ failed, succeeded }) =>
     `${failed} private model calls failed; the final answer used ${succeeded} successful contributions.`,
   sttTabDescription:

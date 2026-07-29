@@ -89,7 +89,7 @@ describe("mainScreenRouteConfiguration", () => {
     ).toBe(true);
   });
 
-  it("builds Ultra routes only from ready home-screen models", () => {
+  it("builds Uber routes only from ready home-screen models", () => {
     const settings = {
       ...DEFAULT_SETTINGS,
       activeResponseMode: "mode-1",

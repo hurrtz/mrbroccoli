@@ -258,7 +258,7 @@ function getLlmResponseEstimateMs(descriptor: LatencyRouteDescriptor) {
     estimateMs += 4_000;
   }
   if (descriptor.ulraModelCount && descriptor.ulraRounds) {
-    // Each Ultra stage runs its participants concurrently, while the initial
+    // Each Uber stage runs its participants concurrently, while the initial
     // assessment, review rounds, and final synthesis remain sequential.
     estimateMs *= descriptor.ulraRounds + 2;
   }

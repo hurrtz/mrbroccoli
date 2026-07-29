@@ -86,7 +86,7 @@ describe("ThinkingSettingsPage response modes", () => {
     expect(screen.getAllByText("Dynamic")).toHaveLength(2);
   });
 
-  it("warns without capping a large Ultra Mode configuration", () => {
+  it("warns without capping a large Uber Mode configuration", () => {
     const onUpdate = jest.fn();
     const responseModes = Array.from({ length: 5 }, (_, index) => ({
       id: `mode-${index + 1}`,

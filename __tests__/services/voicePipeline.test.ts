@@ -2185,7 +2185,7 @@ describe("runVoicePipeline", () => {
     expect(searchWeb).not.toHaveBeenCalled();
   });
 
-  it("reuses one web result for private Ultra deliberation and the selected final model", async () => {
+  it("reuses one web result for private Uber deliberation and the selected final model", async () => {
     (searchWeb as jest.Mock).mockResolvedValueOnce({
       context: "Fresh shared evidence",
       model: "gpt-4.1-mini",
@@ -2244,7 +2244,7 @@ describe("runVoicePipeline", () => {
         },
       ],
       roundsCompleted: 1,
-      synthesisPrompt: "Private Ultra synthesis evidence",
+      synthesisPrompt: "Private Uber synthesis evidence",
     });
     (streamChat as jest.Mock).mockImplementation(
       async ({
@@ -2330,7 +2330,7 @@ describe("runVoicePipeline", () => {
       expect.objectContaining({
         model: "gpt-test",
         provider: "openai",
-        synthesisContext: "Private Ultra synthesis evidence",
+        synthesisContext: "Private Uber synthesis evidence",
         webSearchContext: "Fresh shared evidence",
       }),
     );

@@ -122,28 +122,28 @@ export const pt = {
   useResponseMode: ({ mode }) => `Utilizar ${mode}`,
   chooseResponseModel: "Escolha um modelo",
   responseModelCount: ({ count }) => `Modelos ${count} disponíveis`,
-  ulraMode: "Modo Ultra",
-  ulraModeHomeLabel: "Mostrar o modo Ultra no ecrã inicial",
+  ulraMode: "Modo Supremo",
+  ulraModeHomeLabel: "Mostrar o modo Supremo no ecrã inicial",
   ulraModeSettingsDescription:
     "Permite a deliberação entre vários modelos quando pelo menos dois modelos do ecrã inicial estão prontos.",
   ulraModeInfo:
-    "O modo Ultra consulta separadamente cada modelo pronto no ecrã inicial. Em cada ronda, todos os modelos analisam depois todas as respostas anteriores. O modelo selecionado sintetiza a resposta final. A deliberação é partilhada com todos os fornecedores envolvidos.",
+    "O modo Supremo consulta separadamente cada modelo pronto no ecrã inicial. Em cada ronda, todos os modelos analisam depois todas as respostas anteriores. O modelo selecionado sintetiza a resposta final. A deliberação é partilhada com todos os fornecedores envolvidos.",
   ulraModeRounds: "Rondas de revisão",
   ulraModeCallEstimate: ({ count }) =>
     `Cerca de ${count} chamadas a modelos por mensagem com a configuração atual.`,
   ulraModeThresholdWarning:
     "Mais de 4 modelos ou 3 rondas podem demorar muito, consumir muitos tokens e atingir limites de contexto ou de pedidos dos fornecedores. Isto é apenas um aviso.",
-  ulraModeFirstUseTitle: "Ativar o modo Ultra?",
+  ulraModeFirstUseTitle: "Ativar o modo Supremo?",
   ulraModeFirstUseMessage: ({ calls, models, rounds }) =>
     `Com ${models} modelos e ${rounds} rondas de revisão, uma mensagem pode fazer cerca de ${calls} chamadas a modelos. Pode demorar muito mais, custar bastante mais e partilhar a deliberação com todos os fornecedores envolvidos.`,
-  ulraModeHighRiskTitle: "Execução Ultra extensa",
+  ulraModeHighRiskTitle: "Execução extensa do modo Supremo",
   ulraModeHighRiskMessage: ({ calls, models, rounds }) =>
     `${models} modelos e ${rounds} rondas de revisão podem fazer cerca de ${calls} chamadas a modelos. Isto pode demorar muito, usar muitos tokens e atingir limites dos fornecedores. Continuar mesmo assim?`,
   ulraModeEnableAction: "Ativar",
   ulraModeNeedsTwoModels:
-    "O modo Ultra precisa de pelo menos dois modelos prontos no ecrã inicial.",
+    "O modo Supremo precisa de pelo menos dois modelos prontos no ecrã inicial.",
   ulraModeAllModelsFailed:
-    "Todos os modelos do modo Ultra falharam antes de ser possível sintetizar uma resposta.",
+    "Todos os modelos do modo Supremo falharam antes de ser possível sintetizar uma resposta.",
   ulraModePartialFailureNotice: ({ failed, succeeded }) =>
     `${failed} chamadas internas a modelos falharam; a resposta final usou ${succeeded} contributos bem-sucedidos.`,
   sttTabDescription:

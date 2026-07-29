@@ -141,7 +141,7 @@ describe("useSettings", () => {
     });
   });
 
-  it("preserves large Ultra Mode rounds without imposing a product cap", async () => {
+  it("preserves large Uber Mode rounds without imposing a product cap", async () => {
     (AsyncStorage.getItem as jest.Mock).mockResolvedValueOnce(
       JSON.stringify({
         ...DEFAULT_SETTINGS,
@@ -160,7 +160,7 @@ describe("useSettings", () => {
     expect(result.current.settings.ulraModeWarningAcknowledged).toBe(true);
   });
 
-  it("deactivates Ultra Mode when the feature is disabled", async () => {
+  it("deactivates Uber Mode when the feature is disabled", async () => {
     (AsyncStorage.getItem as jest.Mock).mockResolvedValueOnce(
       JSON.stringify({
         ...DEFAULT_SETTINGS,

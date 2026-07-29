@@ -122,28 +122,28 @@ export const es = {
   useResponseMode: ({ mode }) => `Utilice ${mode}`,
   chooseResponseModel: "Elige un modelo",
   responseModelCount: ({ count }) => `${count} modelos disponibles`,
-  ulraMode: "Modo Ultra",
-  ulraModeHomeLabel: "Mostrar el modo Ultra en la pantalla de inicio",
+  ulraMode: "Modo supremo",
+  ulraModeHomeLabel: "Mostrar el modo supremo en la pantalla de inicio",
   ulraModeSettingsDescription:
     "Permite la deliberación entre varios modelos cuando hay al menos dos modelos de inicio listos.",
   ulraModeInfo:
-    "El modo Ultra consulta por separado a cada modelo listo de la pantalla de inicio. Después, en cada ronda, cada modelo revisa todas las respuestas anteriores. El modelo seleccionado sintetiza la respuesta final. La deliberación se comparte con todos los proveedores implicados.",
+    "El modo supremo consulta por separado a cada modelo listo de la pantalla de inicio. Después, en cada ronda, cada modelo revisa todas las respuestas anteriores. El modelo seleccionado sintetiza la respuesta final. La deliberación se comparte con todos los proveedores implicados.",
   ulraModeRounds: "Rondas de revisión",
   ulraModeCallEstimate: ({ count }) =>
     `Aproximadamente ${count} llamadas a modelos por mensaje con la configuración actual.`,
   ulraModeThresholdWarning:
     "Más de 4 modelos o 3 rondas pueden tardar mucho, consumir muchos tokens y alcanzar los límites de contexto o de solicitudes del proveedor. Esto es solo una advertencia.",
-  ulraModeFirstUseTitle: "¿Activar el modo Ultra?",
+  ulraModeFirstUseTitle: "¿Activar el modo supremo?",
   ulraModeFirstUseMessage: ({ calls, models, rounds }) =>
     `Con ${models} modelos y ${rounds} rondas de revisión, un mensaje puede realizar unas ${calls} llamadas a modelos. Puede tardar mucho más, costar bastante más y compartir la deliberación con todos los proveedores implicados.`,
-  ulraModeHighRiskTitle: "Ejecución grande del modo Ultra",
+  ulraModeHighRiskTitle: "Ejecución extensa del modo supremo",
   ulraModeHighRiskMessage: ({ calls, models, rounds }) =>
     `${models} modelos y ${rounds} rondas de revisión pueden realizar unas ${calls} llamadas a modelos. Puede tardar mucho, usar muchos tokens y alcanzar límites del proveedor. ¿Continuar de todos modos?`,
   ulraModeEnableAction: "Activar",
   ulraModeNeedsTwoModels:
-    "El modo Ultra necesita al menos dos modelos listos en la pantalla de inicio.",
+    "El modo supremo necesita al menos dos modelos listos en la pantalla de inicio.",
   ulraModeAllModelsFailed:
-    "Todos los modelos del modo Ultra fallaron antes de poder sintetizar una respuesta.",
+    "Todos los modelos del modo supremo fallaron antes de poder sintetizar una respuesta.",
   ulraModePartialFailureNotice: ({ failed, succeeded }) =>
     `Fallaron ${failed} llamadas internas a modelos; la respuesta final utilizó ${succeeded} contribuciones correctas.`,
   sttTabDescription:

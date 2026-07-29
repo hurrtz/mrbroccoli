@@ -15,7 +15,7 @@ jest.mock("@expo/vector-icons", () => ({
 
 const t = (key: string) =>
   ({
-    ulraMode: "Ultra Mode",
+    ulraMode: "Uber Mode",
     webSearch: "Web Search",
   })[key] ?? key;
 
@@ -128,7 +128,7 @@ describe("MainScreenRouteControls", () => {
     ).toBe(6);
   });
 
-  it("shows the Ultra Mode switch on the portrait left side only", () => {
+  it("shows the Uber Mode switch on the portrait left side only", () => {
     const onToggleUlraMode = jest.fn();
     const screen = render(
       <MainScreenRouteControls

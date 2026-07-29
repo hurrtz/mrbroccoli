@@ -54,13 +54,14 @@ describe("translations", () => {
     });
   });
 
-  it("uses localized Ultra Mode naming in every interface language", () => {
+  it("uses localized Uber Mode naming in every interface language", () => {
     Object.values(translations).forEach((dictionary) => {
       expect(dictionary.ulraMode).not.toContain("Ulra");
       expect(JSON.stringify(dictionary)).not.toContain("Ulra");
+      expect(JSON.stringify(dictionary)).not.toContain("Ultra");
     });
-    expect(translations.en.ulraMode).toBe("Ultra Mode");
-    expect(translations.de.ulraMode).toBe("Ultramodus");
+    expect(translations.en.ulraMode).toBe("Uber Mode");
+    expect(translations.de.ulraMode).toBe("Übermodus");
   });
 
   it("validates language IDs and falls back only for optional resources", () => {
