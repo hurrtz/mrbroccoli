@@ -4,7 +4,7 @@
     "slug": "mrbroccoli",
     "scheme": "mrbroccoli",
     "icon": "./assets/appIcon/ios.png",
-    "version": "2.5.4",
+    "version": "2.5.5",
     "platforms": [
       "ios",
       "android"

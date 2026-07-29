@@ -552,7 +552,21 @@ describe("MainScreenVoiceStage composer", () => {
     ).toBeTruthy();
     expect(
       screen.getByTestId("voice-stage-speech-timeline").props.d,
-    ).toMatch(/^M 160 1\.5 /);
+    ).toMatch(/^M 160 1\.5 H 303 /);
+    expect(
+      screen.getByTestId("voice-stage-speech-timeline-counterclockwise")
+        .props.d,
+    ).toMatch(/^M 160 1\.5 H 17 /);
+    expect(
+      screen.getByTestId("voice-stage-speech-timeline").props.d,
+    ).toMatch(/H 160$/);
+    expect(
+      screen.getByTestId("voice-stage-speech-timeline-counterclockwise")
+        .props.d,
+    ).toMatch(/H 160$/);
+    expect(
+      screen.getByTestId("voice-stage-speech-overtime-counterclockwise"),
+    ).toBeTruthy();
     expect(
       screen.getByTestId("voice-stage-speech-timeline").props.strokeWidth,
     ).toBe(3);

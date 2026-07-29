@@ -161,7 +161,7 @@ function getRoundedRectPerimeter(
   );
 }
 
-function getTopCenterRoundedRectPath(
+function getTopCenterRoundedRectHalfPaths(
   width: number,
   height: number,
   radius: number,
@@ -176,18 +176,24 @@ function getTopCenterRoundedRectPath(
   );
   const centerX = width / 2;
 
-  return [
-    `M ${centerX} ${top}`,
-    `H ${right - safeRadius}`,
-    `A ${safeRadius} ${safeRadius} 0 0 1 ${right} ${top + safeRadius}`,
-    `V ${bottom - safeRadius}`,
-    `A ${safeRadius} ${safeRadius} 0 0 1 ${right - safeRadius} ${bottom}`,
-    `H ${left + safeRadius}`,
-    `A ${safeRadius} ${safeRadius} 0 0 1 ${left} ${bottom - safeRadius}`,
-    `V ${top + safeRadius}`,
-    `A ${safeRadius} ${safeRadius} 0 0 1 ${left + safeRadius} ${top}`,
-    `H ${centerX}`,
-  ].join(" ");
+  return {
+    clockwise: [
+      `M ${centerX} ${top}`,
+      `H ${right - safeRadius}`,
+      `A ${safeRadius} ${safeRadius} 0 0 1 ${right} ${top + safeRadius}`,
+      `V ${bottom - safeRadius}`,
+      `A ${safeRadius} ${safeRadius} 0 0 1 ${right - safeRadius} ${bottom}`,
+      `H ${centerX}`,
+    ].join(" "),
+    counterclockwise: [
+      `M ${centerX} ${top}`,
+      `H ${left + safeRadius}`,
+      `A ${safeRadius} ${safeRadius} 0 0 0 ${left} ${top + safeRadius}`,
+      `V ${bottom - safeRadius}`,
+      `A ${safeRadius} ${safeRadius} 0 0 0 ${left + safeRadius} ${bottom}`,
+      `H ${centerX}`,
+    ].join(" "),
+  };
 }
 
 function SpeechStartTimelineBorder({
@@ -213,7 +219,12 @@ function SpeechStartTimelineBorder({
     rectHeight,
     radius,
   );
-  const path = getTopCenterRoundedRectPath(width, height, radius);
+  const halfPerimeter = perimeter / 2;
+  const paths = getTopCenterRoundedRectHalfPaths(
+    width,
+    height,
+    radius,
+  );
 
   React.useEffect(() => {
     cancelAnimation(expectedProgress);
@@ -274,13 +285,13 @@ function SpeechStartTimelineBorder({
   ]);
 
   const expectedAnimatedProps = useAnimatedProps(() => ({
-    // The bright outline represents time remaining: it starts complete and
-    // recedes toward the top centre as the learned ETA approaches.
-    strokeDashoffset: perimeter * expectedProgress.value,
+    // Both halves cover half the perimeter over the full ETA, so the two
+    // leading edges move symmetrically at half the former one-way speed.
+    strokeDashoffset: halfPerimeter * expectedProgress.value,
   }));
   const overtimeAnimatedProps = useAnimatedProps(() => ({
     strokeDashoffset:
-      perimeter * (1 - overtimeProgress.value),
+      halfPerimeter * (1 - overtimeProgress.value),
   }));
 
   if (!progress || width <= 0 || height <= 0 || perimeter <= 0) {
@@ -296,7 +307,15 @@ function SpeechStartTimelineBorder({
     >
       <Path
         testID="voice-stage-speech-timeline-track"
-        d={path}
+        d={paths.clockwise}
+        fill="none"
+        opacity={0.32}
+        stroke={phaseForeground}
+        strokeWidth={TIMELINE_BORDER_WIDTH}
+      />
+      <Path
+        testID="voice-stage-speech-timeline-track-counterclockwise"
+        d={paths.counterclockwise}
         fill="none"
         opacity={0.32}
         stroke={phaseForeground}
@@ -305,21 +324,41 @@ function SpeechStartTimelineBorder({
       <AnimatedPath
         testID="voice-stage-speech-timeline"
         animatedProps={expectedAnimatedProps}
-        d={path}
+        d={paths.clockwise}
         fill="none"
         stroke={phaseForeground}
         strokeWidth={TIMELINE_BORDER_WIDTH}
-        strokeDasharray={[perimeter, perimeter]}
+        strokeDasharray={[halfPerimeter, halfPerimeter]}
+        strokeLinecap="round"
+      />
+      <AnimatedPath
+        testID="voice-stage-speech-timeline-counterclockwise"
+        animatedProps={expectedAnimatedProps}
+        d={paths.counterclockwise}
+        fill="none"
+        stroke={phaseForeground}
+        strokeWidth={TIMELINE_BORDER_WIDTH}
+        strokeDasharray={[halfPerimeter, halfPerimeter]}
         strokeLinecap="round"
       />
       <AnimatedPath
         testID="voice-stage-speech-overtime"
         animatedProps={overtimeAnimatedProps}
-        d={path}
+        d={paths.clockwise}
         fill="none"
         stroke={colors.danger}
         strokeWidth={TIMELINE_BORDER_WIDTH}
-        strokeDasharray={[perimeter, perimeter]}
+        strokeDasharray={[halfPerimeter, halfPerimeter]}
+        strokeLinecap="round"
+      />
+      <AnimatedPath
+        testID="voice-stage-speech-overtime-counterclockwise"
+        animatedProps={overtimeAnimatedProps}
+        d={paths.counterclockwise}
+        fill="none"
+        stroke={colors.danger}
+        strokeWidth={TIMELINE_BORDER_WIDTH}
+        strokeDasharray={[halfPerimeter, halfPerimeter]}
         strokeLinecap="round"
       />
     </Svg>
