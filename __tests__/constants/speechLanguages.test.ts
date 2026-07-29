@@ -49,6 +49,12 @@ describe("speech language registry", () => {
     expect(SPEECH_LANGUAGE_REGISTRY.pl.nativeLocale).toBe("pl-PL");
   });
 
+  it("registers Turkish as an interface and speech language", () => {
+    expect(SPEECH_LANGUAGE_OPTIONS).toContain("tr");
+    expect(APP_LANGUAGES).toContain("tr");
+    expect(SPEECH_LANGUAGE_REGISTRY.tr.nativeLocale).toBe("tr-TR");
+  });
+
   it("provides routing metadata and previews for every language", () => {
     SPEECH_LANGUAGE_OPTIONS.forEach((language) => {
       const definition = SPEECH_LANGUAGE_REGISTRY[language];

@@ -12,6 +12,7 @@ import { pl } from "./locales/pl";
 import { pt } from "./locales/pt";
 import { ptBR } from "./locales/ptBR";
 import { ru } from "./locales/ru";
+import { tr } from "./locales/tr";
 import { uk } from "./locales/uk";
 import { zhCN } from "./locales/zhCN";
 import type { TranslationDictionary } from "./types";
@@ -264,6 +265,17 @@ export const APP_LOCALES = {
       search: { cancel: "Anuluj" },
     },
     defaultTtsListenLanguage: "pl",
+  }),
+  tr: defineAppLocale({
+    nativeName: "Türkçe",
+    intlLocale: "tr-TR",
+    messages: tr,
+    antDesign: {
+      modal: { ok: "Tamam", cancel: "İptal", button: "Düğme" },
+      picker: { ok: "Tamam", cancel: "İptal", select: "Seç" },
+      search: { cancel: "İptal" },
+    },
+    defaultTtsListenLanguage: "tr",
   }),
 } as const;
 

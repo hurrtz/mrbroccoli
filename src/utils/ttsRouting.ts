@@ -135,6 +135,11 @@ const LANGUAGE_HEURISTICS: Record<
     markerScore: 4,
     tokens: [" i ", " że ", " nie ", " jest ", " się ", " dla "],
   },
+  tr: {
+    marker: /[çğıöşüİı]/i,
+    markerScore: 4,
+    tokens: [" ve ", " bir ", " bu ", " için ", " değil ", " ile "],
+  },
 };
 
 function scoreLanguage(text: string, language: TtsListenLanguage) {

@@ -91,6 +91,16 @@ describe("resolveTtsListenLanguage", () => {
     ).toBe("pl");
   });
 
+  it("prefers Turkish when distinctive markers are present", () => {
+    expect(
+      resolveTtsListenLanguage({
+        text: "Bugün güzel bir gün ve birlikte çalışıyoruz.",
+        preferredLanguages: ["en", "tr"],
+        appLanguage: "en",
+      }),
+    ).toBe("tr");
+  });
+
   it.each([
     ["es", "¿Dónde está la estación? No encuentro la entrada."],
     ["fr", "Je ne sais pas où est la bonne entrée."],

@@ -87,6 +87,7 @@ export const ar = {
   hungarian: "المجرية",
   czech: "التشيكية",
   polish: "البولندية",
+  turkish: "التركية",
   kokoroAmericanFemaleVoice: ({ name }) =>
     `${name} · إنجليزية أمريكية، صوت أنثوي`,
   kokoroBritishFemaleVoice: ({ name }) =>

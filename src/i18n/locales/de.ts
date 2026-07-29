@@ -89,6 +89,7 @@ export const de = {
   hungarian: "Ungarisch",
   czech: "Tschechisch",
   polish: "Polnisch",
+  turkish: "Türkisch",
   kokoroAmericanFemaleVoice: ({ name }) =>
     `${name} · US-Englisch, weiblich`,
   kokoroBritishFemaleVoice: ({ name }) =>

@@ -87,6 +87,7 @@ export const ru = {
   hungarian: "Венгерский",
   czech: "Чешский",
   polish: "Польский",
+  turkish: "Турецкий",
   kokoroAmericanFemaleVoice: ({ name }) =>
     `${name} · американский английский, женский голос`,
   kokoroBritishFemaleVoice: ({ name }) =>
