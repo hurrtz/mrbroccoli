@@ -85,6 +85,7 @@ export const ar = {
   arabic: "العربية",
   japanese: "اليابانية",
   hungarian: "المجرية",
+  czech: "التشيكية",
   kokoroAmericanFemaleVoice: ({ name }) =>
     `${name} · إنجليزية أمريكية، صوت أنثوي`,
   kokoroBritishFemaleVoice: ({ name }) =>

@@ -89,6 +89,7 @@ export const hu = {
   arabic: "arab",
   japanese: "japán",
   hungarian: "magyar",
+  czech: "cseh",
   kokoroAmericanFemaleVoice: ({ name }) => `${name} · amerikai angol, női hang`,
   kokoroBritishFemaleVoice: ({ name }) => `${name} · brit angol, női hang`,
   kokoroChineseFemaleVoice: ({ index }) => `Kínai női hang ${index}`,

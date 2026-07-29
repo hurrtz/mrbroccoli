@@ -85,6 +85,7 @@ export const zhCN = {
   arabic: "阿拉伯语",
   japanese: "日语",
   hungarian: "匈牙利语",
+  czech: "捷克语",
   kokoroAmericanFemaleVoice: ({ name }) => `${name} · 美式英语，女声`,
   kokoroBritishFemaleVoice: ({ name }) => `${name} · 英式英语，女声`,
   kokoroChineseFemaleVoice: ({ index }) => `中文女声 ${index}`,

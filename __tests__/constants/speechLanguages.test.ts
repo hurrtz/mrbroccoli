@@ -37,6 +37,12 @@ describe("speech language registry", () => {
     expect(SPEECH_LANGUAGE_REGISTRY.hu.nativeLocale).toBe("hu-HU");
   });
 
+  it("registers Czech as an interface and speech language", () => {
+    expect(SPEECH_LANGUAGE_OPTIONS).toContain("cs");
+    expect(APP_LANGUAGES).toContain("cs");
+    expect(SPEECH_LANGUAGE_REGISTRY.cs.nativeLocale).toBe("cs-CZ");
+  });
+
   it("provides routing metadata and previews for every language", () => {
     SPEECH_LANGUAGE_OPTIONS.forEach((language) => {
       const definition = SPEECH_LANGUAGE_REGISTRY[language];

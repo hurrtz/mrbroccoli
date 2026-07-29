@@ -71,6 +71,16 @@ describe("resolveTtsListenLanguage", () => {
     ).toBe("hu");
   });
 
+  it("prefers Czech when distinctive markers are present", () => {
+    expect(
+      resolveTtsListenLanguage({
+        text: "Příliš žluťoučký kůň úpěl ďábelské ódy.",
+        preferredLanguages: ["en", "cs"],
+        appLanguage: "en",
+      }),
+    ).toBe("cs");
+  });
+
   it.each([
     ["es", "¿Dónde está la estación? No encuentro la entrada."],
     ["fr", "Je ne sais pas où est la bonne entrée."],

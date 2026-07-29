@@ -125,6 +125,11 @@ const LANGUAGE_HEURISTICS: Record<
     markerScore: 4,
     tokens: [" az ", " és ", " hogy ", " nem ", " egy ", " van "],
   },
+  cs: {
+    marker: /[čďěňřšťůž]/i,
+    markerScore: 4,
+    tokens: [" a ", " že ", " se ", " je ", " není ", " pro "],
+  },
 };
 
 function scoreLanguage(text: string, language: TtsListenLanguage) {

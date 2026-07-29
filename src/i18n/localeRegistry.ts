@@ -1,4 +1,5 @@
 import { ar } from "./locales/ar";
+import { cs } from "./locales/cs";
 import { de } from "./locales/de";
 import { en } from "./locales/en";
 import { es } from "./locales/es";
@@ -240,6 +241,17 @@ export const APP_LOCALES = {
       search: { cancel: "Mégse" },
     },
     defaultTtsListenLanguage: "hu",
+  }),
+  cs: defineAppLocale({
+    nativeName: "Čeština",
+    intlLocale: "cs-CZ",
+    messages: cs,
+    antDesign: {
+      modal: { ok: "OK", cancel: "Zrušit", button: "Tlačítko" },
+      picker: { ok: "OK", cancel: "Zrušit", select: "Vybrat" },
+      search: { cancel: "Zrušit" },
+    },
+    defaultTtsListenLanguage: "cs",
   }),
 } as const;
 

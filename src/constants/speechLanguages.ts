@@ -128,6 +128,14 @@ export const SPEECH_LANGUAGE_REGISTRY = {
     xaiTtsLocale: null,
     qwenTtsLanguage: null,
   },
+  cs: {
+    labelKey: "czech",
+    nativeLocale: "cs-CZ",
+    providerCode: "cs",
+    googleCloudLocale: "cs-CZ",
+    xaiTtsLocale: null,
+    qwenTtsLanguage: null,
+  },
 } as const satisfies Record<string, SpeechLanguageDefinition>;
 
 export type SpeechLanguage = keyof typeof SPEECH_LANGUAGE_REGISTRY;
