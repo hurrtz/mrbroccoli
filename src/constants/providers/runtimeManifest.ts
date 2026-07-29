@@ -1032,7 +1032,7 @@ export const RUNTIME_PROVIDER_MANIFEST: Record<
       support: "provider",
       transport: "gemini-generate-content",
       endpoint: "https://generativelanguage.googleapis.com/v1beta",
-      defaultModel: "gemini-2.5-flash",
+      defaultModel: "gemini-3.6-flash",
       models: [
         withEffort(
           model("gemini-3.6-flash"),

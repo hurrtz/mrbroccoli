@@ -26,7 +26,7 @@ describe("setupGuideSupport", () => {
   });
 
   it("validates Gemini onboarding with the stable REST default", () => {
-    expect(getSetupGuideValidationModel("gemini")).toBe("gemini-2.5-flash");
+    expect(getSetupGuideValidationModel("gemini")).toBe("gemini-3.6-flash");
   });
 
   it("prefers selected-provider STT over system recognition", () => {
