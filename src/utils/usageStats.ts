@@ -27,6 +27,77 @@ export interface ConversationUsageRouteTotals {
   entryCount: number;
 }
 
+interface UsageRouteEntry {
+  provider: Provider | null;
+  model: string | null;
+  usage: UsageEstimate;
+}
+
+function getMessageUsageRouteEntries(message: Message): UsageRouteEntry[] {
+  if (!message.usage) {
+    return [];
+  }
+
+  const contributions = message.metadata?.ulraMode?.contributions;
+  if (!contributions?.length) {
+    return [
+      {
+        provider: message.provider,
+        model: message.model,
+        usage: message.usage,
+      },
+    ];
+  }
+
+  const intermediateUsage = contributions.reduce(
+    (total, contribution) => ({
+      promptTokens:
+        total.promptTokens + contribution.usage.promptTokens,
+      completionTokens:
+        total.completionTokens + contribution.usage.completionTokens,
+      totalTokens: total.totalTokens + contribution.usage.totalTokens,
+    }),
+    {
+      promptTokens: 0,
+      completionTokens: 0,
+      totalTokens: 0,
+    },
+  );
+  const finalUsage: UsageEstimate = {
+    kind: "reply",
+    source: "estimated",
+    promptTokens: Math.max(
+      0,
+      message.usage.promptTokens - intermediateUsage.promptTokens,
+    ),
+    completionTokens: Math.max(
+      0,
+      message.usage.completionTokens - intermediateUsage.completionTokens,
+    ),
+    totalTokens: Math.max(
+      0,
+      message.usage.totalTokens - intermediateUsage.totalTokens,
+    ),
+  };
+
+  return [
+    ...(finalUsage.totalTokens > 0
+      ? [
+          {
+            provider: message.provider,
+            model: message.model,
+            usage: finalUsage,
+          },
+        ]
+      : []),
+    ...contributions.map(({ model, provider, usage }) => ({
+      provider,
+      model,
+      usage,
+    })),
+  ];
+}
+
 export function estimateChatUsage(params: {
   provider: Provider;
   model: string;
@@ -115,16 +186,7 @@ export function aggregateConversationUsageByRoute(
   }
 
   const entries = [
-    ...conversation.messages
-      .filter(
-        (message): message is Message & { usage: UsageEstimate } =>
-          !!message.usage,
-      )
-      .map((message) => ({
-        provider: message.provider,
-        model: message.model,
-        usage: message.usage,
-      })),
+    ...conversation.messages.flatMap(getMessageUsageRouteEntries),
     ...(conversation.usageEvents ?? []).map((event) => ({
       provider: event.provider,
       model: event.model,

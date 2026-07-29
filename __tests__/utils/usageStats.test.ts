@@ -127,6 +127,85 @@ describe("usageStats", () => {
     );
   });
 
+  it("attributes Ulra contributions to their actual model routes", () => {
+    const routes = aggregateConversationUsageByRoute({
+      messages: [
+        {
+          id: "m1",
+          role: "assistant",
+          content: "Synthesized reply",
+          model: "gpt-final",
+          provider: "openai",
+          timestamp: "2026-03-17T12:00:00.000Z",
+          usage: {
+            kind: "reply",
+            source: "estimated",
+            promptTokens: 240,
+            completionTokens: 60,
+            totalTokens: 300,
+          },
+          metadata: {
+            ulraMode: {
+              contributions: [
+                {
+                  modeId: "mode-1",
+                  model: "gpt-alt",
+                  provider: "openai",
+                  round: 0,
+                  usage: {
+                    kind: "reply",
+                    source: "estimated",
+                    promptTokens: 80,
+                    completionTokens: 20,
+                    totalTokens: 100,
+                  },
+                },
+                {
+                  modeId: "mode-2",
+                  model: "claude-test",
+                  provider: "anthropic",
+                  round: 0,
+                  usage: {
+                    kind: "reply",
+                    source: "estimated",
+                    promptTokens: 80,
+                    completionTokens: 20,
+                    totalTokens: 100,
+                  },
+                },
+              ],
+              estimatedIntermediateTokens: 200,
+              failedCalls: 0,
+              failures: [],
+              roundsCompleted: 0,
+              roundsRequested: 1,
+              successfulCalls: 2,
+            },
+          },
+        },
+      ],
+      usageEvents: [],
+    });
+
+    expect(routes).toEqual([
+      expect.objectContaining({
+        provider: "openai",
+        model: "gpt-final",
+        totalTokens: 100,
+      }),
+      expect.objectContaining({
+        provider: "openai",
+        model: "gpt-alt",
+        totalTokens: 100,
+      }),
+      expect.objectContaining({
+        provider: "anthropic",
+        model: "claude-test",
+        totalTokens: 100,
+      }),
+    ]);
+  });
+
   it("formats token counts for display", () => {
     expect(formatTokenCount(12345)).toBe("12,345");
   });
