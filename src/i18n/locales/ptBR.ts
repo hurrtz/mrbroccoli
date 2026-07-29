@@ -84,6 +84,7 @@ export const ptBR = {
   simplifiedChinese: "Chinês simplificado",
   arabic: "Árabe",
   japanese: "Japonês",
+  hungarian: "Húngaro",
   kokoroAmericanFemaleVoice: ({ name }) =>
     `${name} · inglês americano, voz feminina`,
   kokoroBritishFemaleVoice: ({ name }) =>

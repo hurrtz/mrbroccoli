@@ -61,6 +61,16 @@ describe("resolveTtsListenLanguage", () => {
     ).toBe("pt");
   });
 
+  it("prefers Hungarian when distinctive markers are present", () => {
+    expect(
+      resolveTtsListenLanguage({
+        text: "Nagyszerű ötlet, és örülök, hogy együtt dolgozunk rajta.",
+        preferredLanguages: ["en", "hu"],
+        appLanguage: "en",
+      }),
+    ).toBe("hu");
+  });
+
   it.each([
     ["es", "¿Dónde está la estación? No encuentro la entrada."],
     ["fr", "Je ne sais pas où est la bonne entrée."],

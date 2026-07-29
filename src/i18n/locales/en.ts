@@ -84,6 +84,7 @@ export const en = {
   simplifiedChinese: "Simplified Chinese",
   arabic: "Arabic",
   japanese: "Japanese",
+  hungarian: "Hungarian",
   kokoroAmericanFemaleVoice: ({ name }) => `${name} · American female`,
   kokoroBritishFemaleVoice: ({ name }) => `${name} · British female`,
   kokoroChineseFemaleVoice: ({ index }) => `Chinese female ${index}`,

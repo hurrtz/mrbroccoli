@@ -16,6 +16,8 @@ describe("voice preview samples", () => {
       "Mr. Brokkoli",
     );
     expect(LOCAL_PREVIEW_SAMPLE_TEXT_BY_LANGUAGE.de).toContain("Mr. Brokkoli");
+    expect(PROVIDER_PREVIEW_SAMPLE_TEXT_BY_LANGUAGE.hu).toContain("Brokkoli úr");
+    expect(LOCAL_PREVIEW_SAMPLE_TEXT_BY_LANGUAGE.hu).toContain("Brokkoli úr");
   });
 
   it("uses proper German umlauts and eszett in every German preview", () => {

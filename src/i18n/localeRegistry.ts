@@ -4,6 +4,7 @@ import { en } from "./locales/en";
 import { es } from "./locales/es";
 import { fr } from "./locales/fr";
 import { hi } from "./locales/hi";
+import { hu } from "./locales/hu";
 import { it } from "./locales/it";
 import { ja } from "./locales/ja";
 import { pt } from "./locales/pt";
@@ -228,6 +229,17 @@ export const APP_LOCALES = {
       search: { cancel: "キャンセル" },
     },
     defaultTtsListenLanguage: "ja",
+  }),
+  hu: defineAppLocale({
+    nativeName: "Magyar",
+    intlLocale: "hu-HU",
+    messages: hu,
+    antDesign: {
+      modal: { ok: "OK", cancel: "Mégse", button: "Gomb" },
+      picker: { ok: "OK", cancel: "Mégse", select: "Kiválasztás" },
+      search: { cancel: "Mégse" },
+    },
+    defaultTtsListenLanguage: "hu",
   }),
 } as const;
 

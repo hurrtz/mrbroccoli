@@ -85,6 +85,7 @@ export const ja = {
   simplifiedChinese: "簡体字中国語",
   arabic: "アラビア語",
   japanese: "日本語",
+  hungarian: "ハンガリー語",
   kokoroAmericanFemaleVoice: ({ name }) => `${name} · アメリカ英語・女性`,
   kokoroBritishFemaleVoice: ({ name }) => `${name} · イギリス英語・女性`,
   kokoroChineseFemaleVoice: ({ index }) => `中国語・女性 ${index}`,

@@ -90,6 +90,7 @@ export const uk = {
   simplifiedChinese: "Спрощена китайська",
   arabic: "Арабська",
   japanese: "Японська",
+  hungarian: "Угорська",
   kokoroAmericanFemaleVoice: ({ name }) =>
     `${name} · американська англійська, жіночий голос`,
   kokoroBritishFemaleVoice: ({ name }) =>

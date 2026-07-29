@@ -120,6 +120,11 @@ const LANGUAGE_HEURISTICS: Record<
     markerScore: 3,
     tokens: [" في ", " من ", " على ", " هذا ", " التي ", " لا "],
   },
+  hu: {
+    marker: /[őű]/i,
+    markerScore: 4,
+    tokens: [" az ", " és ", " hogy ", " nem ", " egy ", " van "],
+  },
 };
 
 function scoreLanguage(text: string, language: TtsListenLanguage) {

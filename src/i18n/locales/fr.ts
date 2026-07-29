@@ -84,6 +84,7 @@ export const fr = {
   simplifiedChinese: "Chinois simplifié",
   arabic: "Arabe",
   japanese: "Japonais",
+  hungarian: "Hongrois",
   kokoroAmericanFemaleVoice: ({ name }) =>
     `${name} · anglais américain, voix féminine`,
   kokoroBritishFemaleVoice: ({ name }) =>

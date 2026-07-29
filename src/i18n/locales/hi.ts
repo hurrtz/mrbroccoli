@@ -84,6 +84,7 @@ export const hi = {
   simplifiedChinese: "सरलीकृत चीनी",
   arabic: "अरबी",
   japanese: "जापानी",
+  hungarian: "हंगेरियाई",
   kokoroAmericanFemaleVoice: ({ name }) =>
     `${name} · अमेरिकी अंग्रेज़ी, महिला आवाज़`,
   kokoroBritishFemaleVoice: ({ name }) =>

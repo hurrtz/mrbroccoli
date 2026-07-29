@@ -17,6 +17,7 @@ export const PROVIDER_PREVIEW_SAMPLE_TEXT_BY_LANGUAGE: Record<
   ru: "Доброе утро! Тихий дождь мягко стучит по окнам, пока город просыпается. В семь сорок пять Мистер Брокколи спокойно объясняет, почему яркие идеи, любопытные вопросы и неожиданная шутка делают долгий разговор приятным для слуха.",
   ar: "صباح الخير! يطرق المطر الهادئ النوافذ برفق بينما تستيقظ المدينة. عند السابعة وخمس وأربعين دقيقة يشرح السيد بروكلي بهدوء لماذا تجعل الأفكار المضيئة والأسئلة الفضولية والمزحة المفاجئة المحادثة الطويلة ممتعة للاستماع.",
   ja: "おはようございます。静かな雨が窓をたたき、街がゆっくり目を覚まします。7時45分、Mr Broccoliは、ひらめきや素朴な疑問、ときどき交じる意外な冗談が、長い会話を楽しくする理由を落ち着いて話します。",
+  hu: "Jó reggelt! A csendes eső finoman kopog az ablakon, miközben a város lassan felébred. Háromnegyed nyolckor Brokkoli úr nyugodtan elmeséli, miért teszik élvezetessé a hosszú beszélgetést a ragyogó ötletek, a kíváncsi kérdések és egy váratlan tréfa.",
 };
 
 export const LOCAL_PREVIEW_SAMPLE_TEXT_BY_LANGUAGE: Record<
@@ -36,6 +37,7 @@ export const LOCAL_PREVIEW_SAMPLE_TEXT_BY_LANGUAGE: Record<
   ru: "Здравствуйте. Это более длинный локальный пример голоса для Мистера Брокколи, чтобы вы могли оценить чёткость произношения и естественность ритма в нескольких предложениях подряд. Если этот голос звучит спокойно и приятно, он обычно хорошо подходит и для более длинных ответов.",
   ar: "مرحباً. هذه معاينة محلية أطول لصوت السيد بروكلي، حتى تتمكن من سماع مدى وضوح النطق وما إذا كان الإيقاع طبيعياً عبر عدة جمل متتالية. إذا بدا هذا الصوت هادئاً ومريحاً هنا، فعادةً ما يكون مناسباً أيضاً لقراءة الردود الأطول.",
   ja: "こんにちは。これは少し長めのローカル音声プレビューで、発音の明瞭さや、複数の文を続けて聞いたときに自然に感じられるかどうかを確かめるためのものです。ここで落ち着いて聞こえる声であれば、アプリが長めの返答を読み上げる場合にもたいてい快適に使えます。",
+  hu: "Üdvözlöm. Ez egy hosszabb helyi hangminta Brokkoli úrhoz, amelyen meghallgathatja, mennyire tiszta a kiejtés, és természetes marad-e a ritmus több mondaton keresztül. Ha ez a hang itt nyugodtnak és kellemesnek tűnik, általában a hosszabb válaszok felolvasásához is kényelmes választás.",
 };
 
 export function getNativePreviewSampleText(language: TtsListenLanguage) {
