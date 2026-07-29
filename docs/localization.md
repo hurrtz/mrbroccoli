@@ -43,8 +43,8 @@ Interface, recognition, and spoken-reply languages are independent settings:
 `src/constants/speechLanguages.ts` is the single registry for these speech
 languages and their native/provider locale codes. It contains every interface
 locale (English, German, Ukrainian, Hindi, Spanish, French, Italian, European
-Portuguese, Brazilian Portuguese, Russian, Simplified Chinese, and Arabic)
-plus Japanese as a speech-only option.
+Portuguese, Brazilian Portuguese, Russian, Simplified Chinese, Arabic, and
+Japanese).
 
 Provider STT and TTS language support belongs in
 `src/constants/providers/runtimeManifest.ts`. Settings readiness and runtime

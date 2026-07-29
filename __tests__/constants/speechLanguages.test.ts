@@ -26,9 +26,9 @@ describe("speech language registry", () => {
     });
   });
 
-  it("keeps Japanese as an additional speech-only language", () => {
+  it("registers Japanese as an interface and speech language", () => {
     expect(SPEECH_LANGUAGE_OPTIONS).toContain("ja");
-    expect(APP_LANGUAGES).not.toContain("ja");
+    expect(APP_LANGUAGES).toContain("ja");
   });
 
   it("provides routing metadata and previews for every language", () => {

@@ -5,6 +5,7 @@ import { es } from "./locales/es";
 import { fr } from "./locales/fr";
 import { hi } from "./locales/hi";
 import { it } from "./locales/it";
+import { ja } from "./locales/ja";
 import { pt } from "./locales/pt";
 import { ptBR } from "./locales/ptBR";
 import { ru } from "./locales/ru";
@@ -216,6 +217,17 @@ export const APP_LOCALES = {
       search: { cancel: "إلغاء" },
     },
     defaultTtsListenLanguage: "ar",
+  }),
+  ja: defineAppLocale({
+    nativeName: "日本語",
+    intlLocale: "ja-JP",
+    messages: ja,
+    antDesign: {
+      modal: { ok: "OK", cancel: "キャンセル", button: "ボタン" },
+      picker: { ok: "OK", cancel: "キャンセル", select: "選択" },
+      search: { cancel: "キャンセル" },
+    },
+    defaultTtsListenLanguage: "ja",
   }),
 } as const;
 

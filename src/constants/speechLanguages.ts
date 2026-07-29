@@ -12,9 +12,8 @@ export interface SpeechLanguageDefinition {
 /**
  * Every language Mr Broccoli can intentionally recognize or speak.
  *
- * App-interface locales must be represented here. Japanese remains available
- * as a speech-only language. Provider capability declarations decide which
- * configured route can handle each language.
+ * App-interface locales must be represented here. Provider capability
+ * declarations decide which configured route can handle each language.
  */
 export const SPEECH_LANGUAGE_REGISTRY = {
   en: {
