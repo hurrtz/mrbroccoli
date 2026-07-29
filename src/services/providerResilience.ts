@@ -137,15 +137,14 @@ function isModelScopedQuotaFailure(error: unknown, model: string) {
   );
 }
 
-function canFailOverToAnotherModel(
-  kind: ProviderFailureKind | null,
-  error: unknown,
-  model: string,
-) {
+function canFailOverToAnotherModel(kind: ProviderFailureKind | null) {
+  // Providers may return generic quota messages even when only one model is
+  // exhausted. The candidate chain is bounded, so probe its curated fallbacks
+  // instead of assuming the entire provider is unavailable.
   return (
     kind === "capacity" ||
     kind === "model-unavailable" ||
-    (kind === "quota" && isModelScopedQuotaFailure(error, model)) ||
+    kind === "quota" ||
     kind === "rate-limit" ||
     kind === "server"
   );
@@ -331,7 +330,7 @@ export async function executeProviderModelRequest<T>(
           kind === "quota"
             ? isModelScopedQuotaFailure(error, model)
               ? "model"
-              : "provider"
+              : "unspecified"
             : undefined;
         const callerAllowsRetry = params.canRetry?.() ?? true;
         const shouldRetrySameModel =
@@ -362,9 +361,7 @@ export async function executeProviderModelRequest<T>(
 
         const hasFallback = modelIndex < candidates.length - 1;
         const shouldFailOver =
-          callerAllowsRetry &&
-          hasFallback &&
-          canFailOverToAnotherModel(kind, error, model);
+          callerAllowsRetry && hasFallback && canFailOverToAnotherModel(kind);
 
         if (!shouldFailOver) {
           throw error;

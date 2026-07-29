@@ -177,29 +177,54 @@ describe("webSearch", () => {
     expect(result?.model).toBe("gemini-3.5-flash");
   });
 
-  it("does not hide exhausted search quota by rotating models", async () => {
-    (fetch as jest.Mock).mockResolvedValueOnce({
-      ok: false,
-      status: 429,
-      text: async () =>
-        JSON.stringify({
-          error: {
-            message:
-              "You exceeded your current quota. Check your plan and billing details.",
-          },
+  it("tries another search-capable model after generic quota exhaustion", async () => {
+    (fetch as jest.Mock)
+      .mockResolvedValueOnce({
+        ok: false,
+        status: 429,
+        text: async () =>
+          JSON.stringify({
+            error: {
+              message:
+                "You exceeded your current quota. Check your plan and billing details.",
+            },
+          }),
+      })
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          output: [
+            {
+              type: "model_output",
+              content: [
+                {
+                  text: "Recovered current answer.",
+                  annotations: [
+                    {
+                      title: "Recovered source",
+                      url: "https://example.com/recovered",
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
         }),
+      });
+
+    const result = await searchWeb({
+      provider: "gemini",
+      apiKey: "gemini-test",
+      language: "en",
+      query: "What changed today?",
     });
 
-    await expect(
-      searchWeb({
-        provider: "gemini",
-        apiKey: "gemini-test",
-        language: "en",
-        query: "What changed today?",
-      }),
-    ).rejects.toThrow("sufficient API credit");
-
-    expect(fetch).toHaveBeenCalledTimes(1);
+    expect(
+      (fetch as jest.Mock).mock.calls.map(
+        ([, options]) => JSON.parse(options.body).model,
+      ),
+    ).toEqual(["gemini-3.6-flash", "gemini-3.5-flash"]);
+    expect(result?.model).toBe("gemini-3.5-flash");
   });
 
   it("uses a readable hostname when a provider only returns a citation URL", async () => {

@@ -80,7 +80,7 @@ describe("executeProviderModelRequest", () => {
     expect(result.actualModel).toBe("stable-model");
   });
 
-  it.each(["authentication", "credits", "quota", "rejected"] as const)(
+  it.each(["authentication", "credits", "rejected"] as const)(
     "does not retry or hide a terminal %s failure",
     async (failureKind) => {
       const error = providerError(failureKind);
@@ -123,14 +123,11 @@ describe("executeProviderModelRequest", () => {
     expect(result.actualModel).toBe("model-b");
   });
 
-  it("moves past model-scoped quota without retrying the exhausted model", async () => {
+  it("moves past generic quota without retrying the exhausted model", async () => {
     const request = jest
       .fn()
       .mockRejectedValueOnce(
-        providerError(
-          "quota",
-          "Quota exceeded for metric generate_content_requests, model: model-a",
-        ),
+        providerError("quota", "Quota exceeded for generate content requests."),
       )
       .mockResolvedValueOnce("OK");
 
