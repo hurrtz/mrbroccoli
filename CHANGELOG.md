@@ -10,6 +10,120 @@ for Apple's **What's New in This Version** field.
 
 No user-visible changes yet.
 
+## 2.5.2 - 2026-07-29
+
+### Added
+
+- Added complete Japanese and Hungarian interfaces, including settings,
+  provider guidance, accessibility labels, and localized app names.
+- Added Hungarian as an independently selectable language for speech
+  recognition and spoken replies on providers that support it.
+
+### Changed
+
+- Refreshed the app icon with clearer Mr Broccoli artwork on iOS and Android.
+- Improved Android launcher presentation with adaptive safe-zone artwork and a
+  dedicated themed-icon layer.
+
+### Store release notes
+
+#### English
+
+Mr Broccoli now offers complete Japanese and Hungarian interfaces. Hungarian
+can also be selected for speech recognition and spoken replies where supported.
+The refreshed app icon gives Mr Broccoli a clearer new look and properly adapts
+to Android launcher shapes and themed icons.
+
+#### Deutsch
+
+Mr. Brokkoli bietet jetzt vollständige Oberflächen auf Japanisch und Ungarisch.
+Ungarisch kann, sofern unterstützt, auch für Spracherkennung und gesprochene
+Antworten gewählt werden. Das neue App-Symbol sorgt für einen klareren Auftritt
+und passt sich unter Android an Symbolformen und Farbschemata an.
+
+#### Українська
+
+Пан Броколі тепер має повні інтерфейси японською та угорською. Угорську також
+можна вибрати для розпізнавання мовлення й озвучених відповідей, якщо
+постачальник її підтримує. Оновлена іконка краще відображає характер Пана
+Броколі та адаптується до форм і тем Android.
+
+#### हिन्दी
+
+मिस्टर ब्रोकली में अब पूर्ण जापानी और हंगेरियाई इंटरफ़ेस हैं। जहाँ प्रदाता
+समर्थन करता है, हंगेरियाई को वाक् पहचान और बोले गए जवाबों के लिए भी चुना जा
+सकता है। नया ऐप आइकन अधिक स्पष्ट रूप देता है और Android के अलग-अलग आइकन आकारों
+व थीम के अनुसार ढलता है।
+
+#### Español
+
+Mr. Brócoli ya ofrece interfaces completas en japonés y húngaro. Cuando el
+proveedor lo admite, el húngaro también puede elegirse para el reconocimiento
+de voz y las respuestas habladas. El nuevo icono muestra mejor su personalidad
+y se adapta a las formas y los temas de Android.
+
+#### Français
+
+M. Brocoli propose désormais des interfaces complètes en japonais et en
+hongrois. Lorsque le fournisseur le permet, le hongrois peut aussi être choisi
+pour la reconnaissance vocale et les réponses parlées. La nouvelle icône
+affirme mieux son identité et s’adapte aux formes et thèmes Android.
+
+#### Italiano
+
+Sig. Broccoli ora offre interfacce complete in giapponese e ungherese. Dove
+supportato dal provider, l’ungherese può essere scelto anche per il
+riconoscimento vocale e le risposte parlate. La nuova icona rende l’identità più
+chiara e si adatta alle forme e ai temi di Android.
+
+#### Português
+
+O Sr. Brócolo dispõe agora de interfaces completas em japonês e húngaro. Quando
+o fornecedor o permite, o húngaro também pode ser escolhido para o
+reconhecimento de voz e as respostas faladas. O novo ícone reforça a identidade
+da aplicação e adapta-se às formas e aos temas do Android.
+
+#### Português (Brasil)
+
+O Sr. Brócolis agora oferece interfaces completas em japonês e húngaro. Quando
+houver suporte do provedor, o húngaro também pode ser usado no reconhecimento
+de voz e nas respostas faladas. O novo ícone destaca melhor a identidade do app
+e se adapta aos formatos e temas do Android.
+
+#### Русский
+
+Мистер Брокколи теперь предлагает полноценный интерфейс на японском и венгерском
+языках. Если провайдер поддерживает венгерский, его также можно выбрать для
+распознавания речи и озвучивания ответов. Новая иконка лучше передаёт характер
+приложения и адаптируется к формам и темам Android.
+
+#### 简体中文
+
+西兰花先生现已提供完整的日语和匈牙利语界面。服务提供商支持时，匈牙利语也可用于
+语音识别和语音回复。全新的应用图标更鲜明地展现了西兰花先生，并可适配 Android
+的不同图标形状和主题色。
+
+#### العربية
+
+يوفر السيد بروكلي الآن واجهتين كاملتين باليابانية والمجرية. ويمكن اختيار
+المجرية للتعرّف على الكلام والردود المنطوقة عندما يدعمها المزوّد. يعكس رمز
+التطبيق الجديد شخصية السيد بروكلي بوضوح أكبر ويتكيف مع أشكال الرموز وسمات
+Android.
+
+#### 日本語
+
+ミスター・ブロッコリーに、日本語とハンガリー語の完全なインターフェイスを追加しました。
+対応プロバイダーでは、ハンガリー語を音声認識と読み上げにも選択できます。新しい
+アプリアイコンは個性がより伝わるデザインになり、Android のアイコン形状や
+テーマカラーにも対応します。
+
+#### Magyar
+
+A Brokkoli úr mostantól teljes japán és magyar felülettel is használható. A
+magyar nyelv a beszédfelismeréshez és a felolvasott válaszokhoz is
+kiválasztható, ha a szolgáltató támogatja. Az új alkalmazásikon jobban kifejezi
+Brokkoli úr karakterét, és igazodik az Android ikonformáihoz és témáihoz.
+
 ## 2.5.1 - 2026-07-28
 
 ### Added
