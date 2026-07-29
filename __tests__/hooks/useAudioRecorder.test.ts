@@ -7,6 +7,8 @@ import {
 import { useAudioRecorder } from "../../src/hooks/useAudioRecorder";
 import { startNativeWaveformRecording } from "../../src/services/nativeWaveform";
 
+let nativeWaveformListener: ((event: any) => void) | null = null;
+
 jest.mock("../../src/i18n", () => ({
   useLocalization: () => ({
     t: (key: string) => key,
@@ -26,7 +28,10 @@ jest.mock("../../src/services/nativeWaveform", () => ({
   stopNativeWaveformRecording: jest.fn(async () => ({
     uri: "file:///recording.wav",
   })),
-  subscribeToNativeWaveform: jest.fn(() => jest.fn()),
+  subscribeToNativeWaveform: jest.fn((listener) => {
+    nativeWaveformListener = listener;
+    return jest.fn();
+  }),
 }));
 
 jest.mock("expo-audio", () => ({
@@ -56,6 +61,7 @@ jest.mock("expo-audio", () => ({
 describe("useAudioRecorder permissions", () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    nativeWaveformListener = null;
     (getRecordingPermissionsAsync as jest.Mock).mockResolvedValue({
       granted: true,
     });
@@ -104,5 +110,26 @@ describe("useAudioRecorder permissions", () => {
     );
 
     expect(startNativeWaveformRecording).not.toHaveBeenCalled();
+  });
+
+  it("exposes native recording levels for voice activity detection", async () => {
+    const { result } = renderHook(() => useAudioRecorder());
+
+    await act(async () => {
+      await result.current.startRecording();
+    });
+
+    const sessionId =
+      (startNativeWaveformRecording as jest.Mock).mock.calls[0][0].sessionId;
+
+    act(() => {
+      nativeWaveformListener?.({
+        type: "levels",
+        sessionId,
+        metering: -24,
+      });
+    });
+
+    expect(result.current.inputMetering).toBe(-24);
   });
 });

@@ -18,6 +18,7 @@ import { recordDebugLogEvent } from "../services/debugLogCapture";
 
 export interface RecorderState {
   isRecording: boolean;
+  inputMetering: number | null;
   lastError: string | null;
   clearLastError: () => void;
 }
@@ -53,6 +54,9 @@ export function useAudioRecorder() {
   const startTimeRef = useRef<number>(0);
   const nativeSessionIdRef = useRef<string | null>(null);
   const [nativeRecording, setNativeRecording] = useState(false);
+  const [nativeInputMetering, setNativeInputMetering] = useState<number | null>(
+    null,
+  );
   const [lastError, setLastError] = useState<string | null>(null);
 
   const ensurePermissions = useCallback(async () => {
@@ -95,6 +99,15 @@ export function useAudioRecorder() {
 
     return subscribeToNativeWaveform((event) => {
       if (
+        event.type === "levels" &&
+        nativeSessionIdRef.current &&
+        event.sessionId === nativeSessionIdRef.current
+      ) {
+        setNativeInputMetering(event.metering);
+        return;
+      }
+
+      if (
         event.type === "error" &&
         nativeSessionIdRef.current &&
         event.sessionId === nativeSessionIdRef.current
@@ -102,6 +115,7 @@ export function useAudioRecorder() {
         const sessionId = nativeSessionIdRef.current;
         nativeSessionIdRef.current = null;
         setNativeRecording(false);
+        setNativeInputMetering(null);
         setLastError(event.message);
         recordDebugLogEvent({
           event: "native-recorder-error",
@@ -142,6 +156,7 @@ export function useAudioRecorder() {
         .slice(2, 8)}`;
 
       nativeSessionIdRef.current = sessionId;
+      setNativeInputMetering(null);
 
       try {
         await startNativeWaveformRecording({ sessionId });
@@ -157,6 +172,7 @@ export function useAudioRecorder() {
       } catch (error) {
         nativeSessionIdRef.current = null;
         setNativeRecording(false);
+        setNativeInputMetering(null);
         recordDebugLogEvent({
           event: "recorder-start-failed",
           level: "error",
@@ -223,6 +239,7 @@ export function useAudioRecorder() {
 
       const duration = Date.now() - startTimeRef.current;
       nativeSessionIdRef.current = null;
+      setNativeInputMetering(null);
 
       try {
         if (duration < 300) {
@@ -358,6 +375,9 @@ export function useAudioRecorder() {
     isRecording: usingNativeRecorder
       ? nativeRecording
       : recorderState.isRecording,
+    inputMetering: usingNativeRecorder
+      ? nativeInputMetering
+      : recorderState.metering ?? null,
     lastError,
     clearLastError,
     ensurePermissions,

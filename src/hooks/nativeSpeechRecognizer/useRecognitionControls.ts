@@ -39,6 +39,7 @@ export function useRecognitionControls({
     latestTranscriptRef,
     nativeSessionIdRef,
     setIsRecording,
+    setInputMetering,
     setLastError,
     startedAtRef,
     stopRejectRef,
@@ -72,6 +73,7 @@ export function useRecognitionControls({
     await ensurePermissions();
 
     setLastError(null);
+    setInputMetering(null);
     latestTranscriptRef.current = "";
     finalTranscriptRef.current = "";
     clearPendingResolution();
@@ -92,6 +94,7 @@ export function useRecognitionControls({
         nativeSessionIdRef.current = null;
         isRecordingRef.current = false;
         setIsRecording(false);
+        setInputMetering(null);
         throw error instanceof Error
           ? error
           : new Error(t("couldntStartNativeSpeechRecognition"));
@@ -116,6 +119,7 @@ export function useRecognitionControls({
     } catch (error) {
       isRecordingRef.current = false;
       setIsRecording(false);
+      setInputMetering(null);
       throw error instanceof Error
         ? error
         : new Error(t("couldntStartNativeSpeechRecognition"));
@@ -128,6 +132,7 @@ export function useRecognitionControls({
     latestTranscriptRef,
     nativeSessionIdRef,
     setIsRecording,
+    setInputMetering,
     setLastError,
     startedAtRef,
     sttLanguage,
@@ -146,6 +151,7 @@ export function useRecognitionControls({
       nativeSessionIdRef.current = null;
       isRecordingRef.current = false;
       setIsRecording(false);
+      setInputMetering(null);
       clearPendingResolution();
 
       if (sessionId) {
@@ -168,6 +174,7 @@ export function useRecognitionControls({
     isRecordingRef,
     nativeSessionIdRef,
     setIsRecording,
+    setInputMetering,
     stopRejectRef,
     stopRequestedRef,
     stopResolverRef,
@@ -189,12 +196,14 @@ export function useRecognitionControls({
       if (!sessionId) {
         isRecordingRef.current = false;
         setIsRecording(false);
+        setInputMetering(null);
         return null;
       }
 
       nativeSessionIdRef.current = null;
       isRecordingRef.current = false;
       setIsRecording(false);
+      setInputMetering(null);
 
       const recording = await stopNativeWaveformRecording(sessionId);
       const fileUri = recording.uri ?? null;
@@ -234,6 +243,7 @@ export function useRecognitionControls({
     latestTranscriptRef,
     nativeSessionIdRef,
     setIsRecording,
+    setInputMetering,
     startedAtRef,
     stopRejectRef,
     stopRequestedRef,

@@ -7,6 +7,11 @@ type NativeWaveformEvent =
       uri?: string;
     }
   | {
+      type: "levels";
+      sessionId: string;
+      metering: number;
+    }
+  | {
       type: "error";
       sessionId: string;
       message: string;
@@ -19,6 +24,7 @@ type NativeWaveformModule = {
   ): Promise<{ uri: string }>;
   stopRecording(sessionId: string): Promise<{ uri: string }>;
   cancelRecording(sessionId: string): Promise<boolean>;
+  playRecordingCue(uri: string): Promise<boolean>;
 };
 
 const nativeModule = NativeModules.MrBroccoliNativeWaveform as
@@ -75,6 +81,14 @@ export async function cancelNativeWaveformRecording(sessionId: string) {
   }
 
   return nativeModule.cancelRecording(sessionId);
+}
+
+export async function playNativeRecordingCue(uri: string) {
+  if (!nativeModule) {
+    return false;
+  }
+
+  return nativeModule.playRecordingCue(uri);
 }
 
 export type { NativeWaveformEvent };

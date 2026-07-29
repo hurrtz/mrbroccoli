@@ -2,6 +2,43 @@ import AVFoundation
 import Foundation
 
 enum MrBroccoliWaveformAudioAnalysis {
+  static func meteringDecibels(from buffer: AVAudioPCMBuffer) -> Double {
+    let frameCount = Int(buffer.frameLength)
+    let channelCount = Int(buffer.format.channelCount)
+
+    guard frameCount > 0, channelCount > 0 else {
+      return -160
+    }
+
+    var energySum: Double = 0
+    var sampleCount = 0
+
+    for frameIndex in 0..<frameCount {
+      for channelIndex in 0..<channelCount {
+        let sample = Double(
+          sampleValue(
+            in: buffer,
+            channel: channelIndex,
+            frame: frameIndex
+          )
+        )
+        energySum += sample * sample
+        sampleCount += 1
+      }
+    }
+
+    guard sampleCount > 0 else {
+      return -160
+    }
+
+    let rms = sqrt(energySum / Double(sampleCount))
+    guard rms > 0.000_000_01 else {
+      return -160
+    }
+
+    return min(0, max(-160, 20 * log10(rms)))
+  }
+
   static func extractPeakSamples(
     from buffer: AVAudioPCMBuffer,
     targetCount: Int

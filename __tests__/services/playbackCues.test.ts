@@ -1,5 +1,6 @@
 import { writeBytesAudioFile } from "../../src/services/tts/shared";
 import {
+  getDriveCountdownCueAudioUri,
   getDriveReadyCueAudioUri,
   getInterParagraphPauseAudioUri,
 } from "../../src/services/playbackCues";
@@ -33,6 +34,24 @@ describe("playback cues", () => {
     expect(cueBytes.length).toBe(44 + 11_520 * 2);
     expect(
       Array.from(cueBytes.slice(44)).some((sample) => sample !== 0),
+    ).toBe(true);
+  });
+
+  it("builds and caches soft countdown cues by urgency", async () => {
+    const first = await getDriveCountdownCueAudioUri(1);
+    const firstAgain = await getDriveCountdownCueAudioUri(1);
+    const urgent = await getDriveCountdownCueAudioUri(3);
+    const firstCall = (writeBytesAudioFile as jest.Mock).mock.calls[2][0];
+    const urgentCall = (writeBytesAudioFile as jest.Mock).mock.calls[3][0];
+
+    expect(first).toBe(firstAgain);
+    expect(urgent).toBeTruthy();
+    expect((firstCall.bytes as Uint8Array).length).toBe(44 + 2_880 * 2);
+    expect((urgentCall.bytes as Uint8Array).length).toBe(44 + 2_880 * 2);
+    expect(
+      Array.from((firstCall.bytes as Uint8Array).slice(44)).some(
+        (sample) => sample !== 0,
+      ),
     ).toBe(true);
   });
 });

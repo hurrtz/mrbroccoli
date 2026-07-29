@@ -1,8 +1,11 @@
 package com.tobiaswinkler.app.mrbroccoli
 
+import android.media.MediaPlayer
 import android.media.MediaRecorder
 import android.net.Uri
 import android.os.Build
+import android.os.Handler
+import android.os.Looper
 import com.facebook.react.bridge.Arguments
 import com.facebook.react.bridge.Promise
 import com.facebook.react.bridge.ReactApplicationContext
@@ -11,6 +14,7 @@ import com.facebook.react.bridge.ReactMethod
 import com.facebook.react.bridge.WritableMap
 import com.facebook.react.modules.core.DeviceEventManagerModule
 import java.io.File
+import kotlin.math.log10
 
 class MrBroccoliNativeWaveformModule(
   reactContext: ReactApplicationContext,
@@ -21,10 +25,12 @@ class MrBroccoliNativeWaveformModule(
   }
 
   private val lock = Any()
+  private val mainHandler = Handler(Looper.getMainLooper())
 
   private var recorder: MediaRecorder? = null
   private var activeSessionId: String? = null
   private var activeOutputFile: File? = null
+  private var levelRunnable: Runnable? = null
 
   override fun getName(): String = NAME
 
@@ -72,6 +78,7 @@ class MrBroccoliNativeWaveformModule(
         recorder = nextRecorder
         activeSessionId = sessionId
         activeOutputFile = outputFile
+        startLevelUpdatesLocked(sessionId, nextRecorder)
         emitLifecycleEvent(
           type = "started",
           sessionId = sessionId,
@@ -169,6 +176,39 @@ class MrBroccoliNativeWaveformModule(
     }
   }
 
+  @ReactMethod
+  fun playRecordingCue(uri: String, promise: Promise) {
+    mainHandler.post {
+      try {
+        val parsed = Uri.parse(uri)
+        val path = if (parsed.scheme == "file") parsed.path else uri
+        require(!path.isNullOrBlank()) {
+          "The recording cue URI is invalid."
+        }
+
+        val player = MediaPlayer()
+        player.setDataSource(path)
+        player.setVolume(1f, 1f)
+        player.setOnCompletionListener { completed ->
+          completed.release()
+        }
+        player.setOnErrorListener { failed, _, _ ->
+          failed.release()
+          true
+        }
+        player.prepare()
+        player.start()
+        promise.resolve(true)
+      } catch (error: Exception) {
+        promise.reject(
+          "native_waveform_cue_error",
+          error.message ?: "The recording cue could not be played.",
+          error,
+        )
+      }
+    }
+  }
+
   override fun invalidate() {
     synchronized(lock) {
       cleanupRecorderLocked(deleteOutput = true)
@@ -212,6 +252,7 @@ class MrBroccoliNativeWaveformModule(
     recorder = null
     activeSessionId = null
     activeOutputFile = null
+    stopLevelUpdatesLocked()
 
     if (currentRecorder != null) {
       try {
@@ -237,6 +278,53 @@ class MrBroccoliNativeWaveformModule(
     }
   }
 
+  private fun startLevelUpdatesLocked(
+    sessionId: String,
+    activeRecorder: MediaRecorder,
+  ) {
+    stopLevelUpdatesLocked()
+
+    val runnable = object : Runnable {
+      override fun run() {
+        val metering = synchronized(lock) {
+          if (
+            recorder !== activeRecorder ||
+            activeSessionId != sessionId
+          ) {
+            null
+          } else {
+            val amplitude =
+              try {
+                activeRecorder.maxAmplitude
+              } catch (_: RuntimeException) {
+                0
+              }
+
+            if (amplitude <= 0) {
+              -160.0
+            } else {
+              (20.0 * log10(amplitude.toDouble() / 32_767.0))
+                .coerceIn(-160.0, 0.0)
+            }
+          }
+        }
+
+        if (metering != null) {
+          emitLevelEvent(sessionId, metering)
+          mainHandler.postDelayed(this, 150)
+        }
+      }
+    }
+
+    levelRunnable = runnable
+    mainHandler.post(runnable)
+  }
+
+  private fun stopLevelUpdatesLocked() {
+    levelRunnable?.let(mainHandler::removeCallbacks)
+    levelRunnable = null
+  }
+
   private fun emitLifecycleEvent(type: String, sessionId: String, file: File? = null) {
     val payload = Arguments.createMap().apply {
       putString("type", type)
@@ -256,6 +344,16 @@ class MrBroccoliNativeWaveformModule(
       putString("type", "error")
       putString("sessionId", sessionId)
       putString("message", message)
+    }
+
+    emitEvent(payload)
+  }
+
+  private fun emitLevelEvent(sessionId: String, metering: Double) {
+    val payload = Arguments.createMap().apply {
+      putString("type", "levels")
+      putString("sessionId", sessionId)
+      putDouble("metering", metering)
     }
 
     emitEvent(payload)

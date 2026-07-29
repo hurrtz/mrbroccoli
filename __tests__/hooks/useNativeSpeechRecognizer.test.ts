@@ -227,4 +227,27 @@ describe("useNativeSpeechRecognizer", () => {
     expect(result.current.lastError).toBe("Recorder write failed");
     expect(result.current.isRecording).toBe(false);
   });
+
+  it("exposes native microphone levels while recognizing speech", async () => {
+    const { result } = renderHook(() => useNativeSpeechRecognizer(), {
+      wrapper,
+    });
+
+    await act(async () => {
+      await result.current.startRecognition();
+    });
+
+    const sessionId =
+      (startNativeWaveformRecording as jest.Mock).mock.calls[0][0].sessionId;
+
+    act(() => {
+      emitNativeWaveformEvent({
+        type: "levels",
+        sessionId,
+        metering: -21,
+      });
+    });
+
+    expect(result.current.inputMetering).toBe(-21);
+  });
 });

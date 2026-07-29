@@ -4,6 +4,7 @@ import {
   cancelNativeWaveformRecording,
   subscribeToNativeWaveform,
 } from "../../services/nativeWaveform";
+import { volumeToMetering } from "./shared";
 import type { RecognitionSession } from "./useRecognitionSession";
 
 interface UseRecognitionSubscriptionsParams {
@@ -26,6 +27,7 @@ export function useRecognitionSubscriptions({
     rejectPendingStop,
     resolvePendingStop,
     setIsRecording,
+    setInputMetering,
     stopRequestedRef,
     stopResolverRef,
   } = session;
@@ -36,6 +38,15 @@ export function useRecognitionSubscriptions({
     }
 
     return subscribeToNativeWaveform((event) => {
+      if (
+        event.type === "levels" &&
+        nativeSessionIdRef.current &&
+        event.sessionId === nativeSessionIdRef.current
+      ) {
+        setInputMetering(event.metering);
+        return;
+      }
+
       if (
         event.type === "error" &&
         nativeSessionIdRef.current &&
@@ -54,6 +65,7 @@ export function useRecognitionSubscriptions({
   }, [
     nativeSessionIdRef,
     rejectPendingStop,
+    setInputMetering,
     usingNativeRecorder,
   ]);
 
@@ -70,6 +82,12 @@ export function useRecognitionSubscriptions({
     const resultSubscription = ExpoSpeechRecognitionModule.addListener(
       "result",
       handleResult,
+    );
+    const volumeSubscription = ExpoSpeechRecognitionModule.addListener(
+      "volumechange",
+      (event) => {
+        setInputMetering(volumeToMetering(event.value));
+      },
     );
 
     const errorSubscription = ExpoSpeechRecognitionModule.addListener(
@@ -94,11 +112,13 @@ export function useRecognitionSubscriptions({
 
       isRecordingRef.current = false;
       setIsRecording(false);
+      setInputMetering(null);
     });
 
     return () => {
       startSubscription.remove();
       resultSubscription.remove();
+      volumeSubscription.remove();
       errorSubscription.remove();
       endSubscription.remove();
 
@@ -115,6 +135,7 @@ export function useRecognitionSubscriptions({
     latestTranscriptRef,
     resolvePendingStop,
     setIsRecording,
+    setInputMetering,
     stopRequestedRef,
     stopResolverRef,
     usingNativeRecorder,

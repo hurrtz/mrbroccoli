@@ -3,6 +3,7 @@ import Foundation
 
 final class MrBroccoliWaveformRecorder {
   private static let inputTapBufferSize: AVAudioFrameCount = 512
+  private static let meteringIntervalSeconds: TimeInterval = 0.15
   // Speech-grade recording target. STT models downsample to 16 kHz anyway, so
   // recording mono 16-bit PCM at 16 kHz keeps the uploaded WAV ~4-6x smaller
   // than the hardware-rate 32-bit float capture used previously.
@@ -19,6 +20,7 @@ final class MrBroccoliWaveformRecorder {
   private var activeSessionId: String?
   private var outputURL: URL?
   private var pendingRecordingErrorSessionId: String?
+  private var lastMeteringEmissionAt: TimeInterval = 0
 
   func startRecording(
     sessionId: String,
@@ -108,6 +110,10 @@ final class MrBroccoliWaveformRecorder {
         if let converted {
           try file.write(from: converted)
         }
+        self.emitMeteringIfNeeded(
+          from: buffer,
+          sessionId: sessionId
+        )
       } catch {
         self.handleRecordingWriteError(
           sessionId: sessionId,
@@ -190,6 +196,9 @@ final class MrBroccoliWaveformRecorder {
     fileFormat = nil
     activeSessionId = nil
     pendingRecordingErrorSessionId = nil
+    stateLock.lock()
+    lastMeteringEmissionAt = 0
+    stateLock.unlock()
 
     let outputURL = self.outputURL
     self.outputURL = nil
@@ -199,6 +208,32 @@ final class MrBroccoliWaveformRecorder {
     if deleteOutput, let outputURL {
       try? FileManager.default.removeItem(at: outputURL)
     }
+  }
+
+  private func emitMeteringIfNeeded(
+    from buffer: AVAudioPCMBuffer,
+    sessionId: String
+  ) {
+    let now = ProcessInfo.processInfo.systemUptime
+    stateLock.lock()
+    let shouldEmit =
+      now - lastMeteringEmissionAt >= Self.meteringIntervalSeconds
+    if shouldEmit {
+      lastMeteringEmissionAt = now
+    }
+    stateLock.unlock()
+
+    guard shouldEmit else {
+      return
+    }
+
+    emitEvent([
+      "type": "levels",
+      "sessionId": sessionId,
+      "metering": MrBroccoliWaveformAudioAnalysis.meteringDecibels(
+        from: buffer
+      ),
+    ])
   }
 
   private func convertToFileFormat(

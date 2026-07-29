@@ -45,6 +45,7 @@ export function useNativeSpeechRecognizer(sttLanguage: SttLanguage = "auto") {
   return {
     isAvailable: ExpoSpeechRecognitionModule.isRecognitionAvailable(),
     isRecording: session.isRecording,
+    inputMetering: session.inputMetering,
     lastError: session.lastError,
     ensurePermissions,
     startRecognition,

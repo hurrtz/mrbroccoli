@@ -3,9 +3,11 @@ import { writeBytesAudioFile } from "./tts/shared";
 const SAMPLE_RATE = 16_000;
 const INTER_PARAGRAPH_PAUSE_MS = 1_000;
 const DRIVE_READY_CUE_MS = 720;
+const DRIVE_COUNTDOWN_CUE_MS = 180;
 
 let interParagraphPauseUriPromise: Promise<string> | null = null;
 let driveReadyCueUriPromise: Promise<string> | null = null;
+const driveCountdownCueUriPromises = new Map<number, Promise<string>>();
 
 function buildMonoPcmWavBytes(
   durationMs: number,
@@ -84,4 +86,32 @@ export function getDriveReadyCueAudioUri() {
   }
 
   return driveReadyCueUriPromise;
+}
+
+export function getDriveCountdownCueAudioUri(urgency: number) {
+  const normalizedUrgency = Math.max(1, Math.min(3, Math.round(urgency)));
+  const existing = driveCountdownCueUriPromises.get(normalizedUrgency);
+
+  if (existing) {
+    return existing;
+  }
+
+  const cuePromise = writeCue(
+    buildMonoPcmWavBytes(DRIVE_COUNTDOWN_CUE_MS, (time, progress) => {
+      const attack = Math.min(1, progress / 0.12);
+      const decay = Math.pow(1 - progress, 2.8);
+      const frequency = 392 + normalizedUrgency * 72;
+      const fundamental = Math.sin(2 * Math.PI * frequency * time);
+      const overtone = Math.sin(2 * Math.PI * frequency * 1.5 * time);
+      const volume = 0.026 + normalizedUrgency * 0.008;
+
+      return attack * decay * volume * (fundamental + overtone * 0.22);
+    }),
+  ).catch((error) => {
+    driveCountdownCueUriPromises.delete(normalizedUrgency);
+    throw error;
+  });
+
+  driveCountdownCueUriPromises.set(normalizedUrgency, cuePromise);
+  return cuePromise;
 }

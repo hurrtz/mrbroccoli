@@ -11,6 +11,7 @@ type StopRejecter = (error: Error) => void;
 
 export interface RecognitionSession {
   isRecording: boolean;
+  inputMetering: number | null;
   lastError: string | null;
   isRecordingRef: React.MutableRefObject<boolean>;
   startedAtRef: React.MutableRefObject<number>;
@@ -22,6 +23,7 @@ export interface RecognitionSession {
   abortRequestedRef: React.MutableRefObject<boolean>;
   nativeSessionIdRef: React.MutableRefObject<string | null>;
   setIsRecording: React.Dispatch<React.SetStateAction<boolean>>;
+  setInputMetering: React.Dispatch<React.SetStateAction<number | null>>;
   setLastError: React.Dispatch<React.SetStateAction<string | null>>;
   clearPendingResolution: () => void;
   resolvePendingStop: (value: string | null) => void;
@@ -42,6 +44,7 @@ export function useRecognitionSession({
   t,
 }: UseRecognitionSessionParams): RecognitionSession {
   const [isRecording, setIsRecording] = useState(false);
+  const [inputMetering, setInputMetering] = useState<number | null>(null);
   const [lastError, setLastError] = useState<string | null>(null);
   const isRecordingRef = useRef(false);
   const startedAtRef = useRef(0);
@@ -66,6 +69,7 @@ export function useRecognitionSession({
       clearPendingResolution();
       isRecordingRef.current = false;
       setIsRecording(false);
+      setInputMetering(null);
       resolve?.(value);
     },
     [clearPendingResolution],
@@ -77,6 +81,7 @@ export function useRecognitionSession({
       clearPendingResolution();
       isRecordingRef.current = false;
       setIsRecording(false);
+      setInputMetering(null);
       if (reject) {
         reject(error);
         return;
@@ -124,6 +129,7 @@ export function useRecognitionSession({
 
   return {
     isRecording,
+    inputMetering,
     lastError,
     isRecordingRef,
     startedAtRef,
@@ -135,6 +141,7 @@ export function useRecognitionSession({
     abortRequestedRef,
     nativeSessionIdRef,
     setIsRecording,
+    setInputMetering,
     setLastError,
     clearPendingResolution,
     resolvePendingStop,

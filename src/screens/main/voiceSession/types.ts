@@ -27,6 +27,7 @@ export interface AudioPlayerController {
 export interface AudioRecorderController {
   clearLastError: () => void;
   ensurePermissions: () => Promise<void>;
+  inputMetering?: number | null;
   lastError: string | null;
   startRecording: () => Promise<void>;
   stopRecording: () => Promise<string | null>;
@@ -37,6 +38,7 @@ export interface NativeSpeechRecognizerController {
   clearLastError: () => void;
   ensurePermissions: () => Promise<void>;
   isAvailable: boolean;
+  inputMetering?: number | null;
   lastError: string | null;
   startRecognition: () => Promise<void>;
   stopRecognition: () => Promise<string | null>;
