@@ -122,28 +122,28 @@ export const pl = {
   useResponseMode: ({ mode }) => `Użyj ${mode}`,
   chooseResponseModel: "Wybierz model",
   responseModelCount: ({ count }) => `Dostępnych modeli: ${count}`,
-  ulraMode: "Tryb Ulra",
-  ulraModeHomeLabel: "Pokaż tryb Ulra na ekranie głównym",
+  ulraMode: "Tryb Ultra",
+  ulraModeHomeLabel: "Pokaż tryb Ultra na ekranie głównym",
   ulraModeSettingsDescription:
     "Pozwala wielu modelom wspólnie rozważyć odpowiedź, gdy gotowe są co najmniej dwa modele z ekranu głównego.",
   ulraModeInfo:
-    "Tryb Ulra najpierw pyta osobno każdy gotowy model z ekranu głównego. W każdej rundzie wszystkie modele analizują następnie wszystkie wcześniejsze odpowiedzi. Wybrany model tworzy końcową syntezę. Treść rozważań jest udostępniana wszystkim zaangażowanym dostawcom.",
+    "Tryb Ultra najpierw pyta osobno każdy gotowy model z ekranu głównego. W każdej rundzie wszystkie modele analizują następnie wszystkie wcześniejsze odpowiedzi. Wybrany model tworzy końcową syntezę. Treść rozważań jest udostępniana wszystkim zaangażowanym dostawcom.",
   ulraModeRounds: "Rundy przeglądu",
   ulraModeCallEstimate: ({ count }) =>
     `Przy bieżącej konfiguracji około ${count} wywołań modeli na wiadomość.`,
   ulraModeThresholdWarning:
     "Więcej niż 4 modele lub 3 rundy może trwać bardzo długo, zużyć wiele tokenów i osiągnąć limity kontekstu lub częstotliwości dostawców. To tylko ostrzeżenie.",
-  ulraModeFirstUseTitle: "Włączyć tryb Ulra?",
+  ulraModeFirstUseTitle: "Włączyć tryb Ultra?",
   ulraModeFirstUseMessage: ({ calls, models, rounds }) =>
     `Przy ${models} modelach i ${rounds} rundach przeglądu jedna wiadomość może wykonać około ${calls} wywołań modeli. Może to potrwać znacznie dłużej, kosztować dużo więcej i udostępnić rozważania wszystkim zaangażowanym dostawcom.`,
-  ulraModeHighRiskTitle: "Duże uruchomienie trybu Ulra",
+  ulraModeHighRiskTitle: "Duże uruchomienie trybu Ultra",
   ulraModeHighRiskMessage: ({ calls, models, rounds }) =>
     `${models} modeli i ${rounds} rund przeglądu może wykonać około ${calls} wywołań modeli. Może to trwać bardzo długo, zużyć wiele tokenów i osiągnąć limity dostawców. Kontynuować mimo to?`,
   ulraModeEnableAction: "Włącz",
   ulraModeNeedsTwoModels:
-    "Tryb Ulra wymaga co najmniej dwóch gotowych modeli na ekranie głównym.",
+    "Tryb Ultra wymaga co najmniej dwóch gotowych modeli na ekranie głównym.",
   ulraModeAllModelsFailed:
-    "Wszystkie modele trybu Ulra zawiodły, zanim udało się zsyntetyzować odpowiedź.",
+    "Wszystkie modele trybu Ultra zawiodły, zanim udało się zsyntetyzować odpowiedź.",
   ulraModePartialFailureNotice: ({ failed, succeeded }) =>
     `${failed} wewnętrznych wywołań modeli nie powiodło się; odpowiedź końcowa wykorzystała ${succeeded} udanych wypowiedzi.`,
   sttTabDescription:

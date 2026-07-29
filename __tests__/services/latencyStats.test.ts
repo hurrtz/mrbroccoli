@@ -73,7 +73,7 @@ describe("latencyStats", () => {
     ).toBeGreaterThanOrEqual(40_000);
   });
 
-  it("separates and scales Ulra response latency estimates", () => {
+  it("separates and scales Ultra response latency estimates", () => {
     const standardDescriptor = {
       phase: "llm-response" as const,
       provider: "openai" as const,

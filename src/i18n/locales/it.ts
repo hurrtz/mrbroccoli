@@ -122,28 +122,28 @@ export const it = {
   useResponseMode: ({ mode }) => `Utilizzare ${mode}`,
   chooseResponseModel: "Scegli un modello",
   responseModelCount: ({ count }) => `Modelli ${count} disponibili`,
-  ulraMode: "Modalità Ulra",
-  ulraModeHomeLabel: "Mostra la modalità Ulra nella schermata iniziale",
+  ulraMode: "Modalità Ultra",
+  ulraModeHomeLabel: "Mostra la modalità Ultra nella schermata iniziale",
   ulraModeSettingsDescription:
     "Consente il confronto tra più modelli quando almeno due modelli della schermata iniziale sono pronti.",
   ulraModeInfo:
-    "La modalità Ulra interroga separatamente ogni modello pronto nella schermata iniziale. A ogni round, tutti i modelli esaminano poi tutte le risposte precedenti. Il modello selezionato sintetizza la risposta finale. Il confronto viene condiviso con tutti i provider coinvolti.",
+    "La modalità Ultra interroga separatamente ogni modello pronto nella schermata iniziale. A ogni round, tutti i modelli esaminano poi tutte le risposte precedenti. Il modello selezionato sintetizza la risposta finale. Il confronto viene condiviso con tutti i provider coinvolti.",
   ulraModeRounds: "Round di revisione",
   ulraModeCallEstimate: ({ count }) =>
     `Circa ${count} chiamate ai modelli per messaggio con la configurazione attuale.`,
   ulraModeThresholdWarning:
     "Più di 4 modelli o 3 round possono richiedere molto tempo, consumare molti token e raggiungere i limiti di contesto o frequenza dei provider. Questo è solo un avviso.",
-  ulraModeFirstUseTitle: "Attivare la modalità Ulra?",
+  ulraModeFirstUseTitle: "Attivare la modalità Ultra?",
   ulraModeFirstUseMessage: ({ calls, models, rounds }) =>
     `Con ${models} modelli e ${rounds} round di revisione, un messaggio può effettuare circa ${calls} chiamate ai modelli. Potrebbe richiedere molto più tempo, costare sensibilmente di più e condividere il confronto con tutti i provider coinvolti.`,
-  ulraModeHighRiskTitle: "Esecuzione Ulra estesa",
+  ulraModeHighRiskTitle: "Esecuzione Ultra estesa",
   ulraModeHighRiskMessage: ({ calls, models, rounds }) =>
     `${models} modelli e ${rounds} round di revisione possono effettuare circa ${calls} chiamate ai modelli. Potrebbe richiedere molto tempo, usare molti token e raggiungere i limiti dei provider. Continuare comunque?`,
   ulraModeEnableAction: "Attiva",
   ulraModeNeedsTwoModels:
-    "La modalità Ulra richiede almeno due modelli pronti nella schermata iniziale.",
+    "La modalità Ultra richiede almeno due modelli pronti nella schermata iniziale.",
   ulraModeAllModelsFailed:
-    "Tutti i modelli della modalità Ulra hanno fallito prima che fosse possibile sintetizzare una risposta.",
+    "Tutti i modelli della modalità Ultra hanno fallito prima che fosse possibile sintetizzare una risposta.",
   ulraModePartialFailureNotice: ({ failed, succeeded }) =>
     `${failed} chiamate interne ai modelli non sono riuscite; la risposta finale ha usato ${succeeded} contributi riusciti.`,
   sttTabDescription:

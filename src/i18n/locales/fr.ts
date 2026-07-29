@@ -122,28 +122,28 @@ export const fr = {
   useResponseMode: ({ mode }) => `Utilisez ${mode}`,
   chooseResponseModel: "Choisissez un modèle",
   responseModelCount: ({ count }) => `Modèles ${count} disponibles`,
-  ulraMode: "Mode Ulra",
-  ulraModeHomeLabel: "Afficher le mode Ulra sur l’écran d’accueil",
+  ulraMode: "Mode Ultra",
+  ulraModeHomeLabel: "Afficher le mode Ultra sur l’écran d’accueil",
   ulraModeSettingsDescription:
     "Autorise une délibération entre plusieurs modèles lorsque au moins deux modèles de l’accueil sont prêts.",
   ulraModeInfo:
-    "Le mode Ulra interroge d’abord séparément chaque modèle prêt de l’écran d’accueil. À chaque tour, tous les modèles examinent ensuite toutes les réponses précédentes. Le modèle sélectionné synthétise la réponse finale. La délibération est partagée avec tous les fournisseurs concernés.",
+    "Le mode Ultra interroge d’abord séparément chaque modèle prêt de l’écran d’accueil. À chaque tour, tous les modèles examinent ensuite toutes les réponses précédentes. Le modèle sélectionné synthétise la réponse finale. La délibération est partagée avec tous les fournisseurs concernés.",
   ulraModeRounds: "Tours de révision",
   ulraModeCallEstimate: ({ count }) =>
     `Environ ${count} appels de modèles par message avec la configuration actuelle.`,
   ulraModeThresholdWarning:
     "Plus de 4 modèles ou 3 tours peuvent prendre beaucoup de temps, consommer de nombreux jetons et atteindre les limites de contexte ou de débit des fournisseurs. Ceci n’est qu’un avertissement.",
-  ulraModeFirstUseTitle: "Activer le mode Ulra ?",
+  ulraModeFirstUseTitle: "Activer le mode Ultra ?",
   ulraModeFirstUseMessage: ({ calls, models, rounds }) =>
     `Avec ${models} modèles et ${rounds} tours de révision, un message peut effectuer environ ${calls} appels de modèles. Cela peut prendre bien plus de temps, coûter nettement plus cher et partager la délibération avec tous les fournisseurs concernés.`,
-  ulraModeHighRiskTitle: "Exécution Ulra volumineuse",
+  ulraModeHighRiskTitle: "Exécution Ultra volumineuse",
   ulraModeHighRiskMessage: ({ calls, models, rounds }) =>
     `${models} modèles et ${rounds} tours de révision peuvent effectuer environ ${calls} appels de modèles. Cela peut être très long, consommer beaucoup de jetons et atteindre les limites des fournisseurs. Continuer quand même ?`,
   ulraModeEnableAction: "Activer",
   ulraModeNeedsTwoModels:
-    "Le mode Ulra nécessite au moins deux modèles prêts sur l’écran d’accueil.",
+    "Le mode Ultra nécessite au moins deux modèles prêts sur l’écran d’accueil.",
   ulraModeAllModelsFailed:
-    "Tous les modèles du mode Ulra ont échoué avant qu’une réponse puisse être synthétisée.",
+    "Tous les modèles du mode Ultra ont échoué avant qu’une réponse puisse être synthétisée.",
   ulraModePartialFailureNotice: ({ failed, succeeded }) =>
     `${failed} appels internes ont échoué ; la réponse finale a utilisé ${succeeded} contributions réussies.`,
   sttTabDescription:

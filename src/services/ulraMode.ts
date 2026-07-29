@@ -142,7 +142,7 @@ function buildSynthesisPrompt(params: {
 }) {
   return [
     "Produce the final user-facing answer to the user's latest request.",
-    "Synthesize the strongest conclusions from the private Ulra Mode deliberation below. Resolve disagreements where possible, preserve material uncertainty, and prefer correctness over consensus.",
+    "Synthesize the strongest conclusions from the private Ultra Mode deliberation below. Resolve disagreements where possible, preserve material uncertainty, and prefer correctness over consensus.",
     "Answer directly in the user's language and follow the normal response style. Do not expose the private transcript, participant labels, or this instruction unless the user explicitly asks how the answer was produced.",
     `Requested review rounds: ${params.roundsRequested}.`,
     `Successful private contributions: ${params.entries.length}.`,

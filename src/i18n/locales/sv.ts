@@ -120,28 +120,28 @@ export const sv = {
   useResponseMode: ({ mode }) => `Använd ${mode}`,
   chooseResponseModel: "Välj en modell",
   responseModelCount: ({ count }) => `${count}-modeller tillgängliga`,
-  ulraMode: "Ulra-läge",
-  ulraModeHomeLabel: "Visa Ulra-läge på startskärmen",
+  ulraMode: "Ultra-läge",
+  ulraModeHomeLabel: "Visa Ultra-läge på startskärmen",
   ulraModeSettingsDescription:
     "Tillåter överläggning mellan flera modeller när minst två modeller på startskärmen är redo.",
   ulraModeInfo:
-    "Ulra-läget frågar först varje redo modell på startskärmen var för sig. I varje omgång granskar sedan alla modeller alla tidigare svar. Den valda modellen sammanställer slutsvaret. Överläggningen delas med alla berörda leverantörer.",
+    "Ultra-läget frågar först varje redo modell på startskärmen var för sig. I varje omgång granskar sedan alla modeller alla tidigare svar. Den valda modellen sammanställer slutsvaret. Överläggningen delas med alla berörda leverantörer.",
   ulraModeRounds: "Granskningsomgångar",
   ulraModeCallEstimate: ({ count }) =>
     `Cirka ${count} modellanrop per meddelande med den aktuella konfigurationen.`,
   ulraModeThresholdWarning:
     "Fler än 4 modeller eller 3 omgångar kan ta mycket lång tid, använda många token och nå leverantörernas kontext- eller hastighetsgränser. Detta är bara en varning.",
-  ulraModeFirstUseTitle: "Aktivera Ulra-läge?",
+  ulraModeFirstUseTitle: "Aktivera Ultra-läge?",
   ulraModeFirstUseMessage: ({ calls, models, rounds }) =>
     `Med ${models} modeller och ${rounds} granskningsomgångar kan ett meddelande göra cirka ${calls} modellanrop. Det kan ta mycket längre tid, kosta betydligt mer och dela överläggningen med alla berörda leverantörer.`,
-  ulraModeHighRiskTitle: "Stor Ulra-körning",
+  ulraModeHighRiskTitle: "Stor Ultra-körning",
   ulraModeHighRiskMessage: ({ calls, models, rounds }) =>
     `${models} modeller och ${rounds} granskningsomgångar kan göra cirka ${calls} modellanrop. Det kan ta mycket lång tid, använda många token och nå leverantörsgränser. Fortsätta ändå?`,
   ulraModeEnableAction: "Aktivera",
   ulraModeNeedsTwoModels:
-    "Ulra-läget behöver minst två redo modeller på startskärmen.",
+    "Ultra-läget behöver minst två redo modeller på startskärmen.",
   ulraModeAllModelsFailed:
-    "Alla modeller i Ulra-läget misslyckades innan ett svar kunde sammanställas.",
+    "Alla modeller i Ultra-läget misslyckades innan ett svar kunde sammanställas.",
   ulraModePartialFailureNotice: ({ failed, succeeded }) =>
     `${failed} interna modellanrop misslyckades; det slutliga svaret använde ${succeeded} lyckade bidrag.`,
   sttTabDescription:

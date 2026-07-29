@@ -124,28 +124,28 @@ export const hu = {
   useResponseMode: ({ mode }) => `${mode} használata`,
   chooseResponseModel: "Modell kiválasztása",
   responseModelCount: ({ count }) => `${count} modell érhető el`,
-  ulraMode: "Ulra mód",
-  ulraModeHomeLabel: "Ulra mód megjelenítése a kezdőképernyőn",
+  ulraMode: "Ultra mód",
+  ulraModeHomeLabel: "Ultra mód megjelenítése a kezdőképernyőn",
   ulraModeSettingsDescription:
     "Több modell közös mérlegelését engedélyezi, ha legalább két kezdőképernyős modell készen áll.",
   ulraModeInfo:
-    "Az Ulra mód először külön-külön megkérdezi a kezdőképernyő minden elérhető modelljét. Ezután minden körben minden modell átnézi az összes korábbi választ. A kiválasztott modell készíti el a végső összefoglalót. A mérlegelés minden érintett szolgáltatóval megosztásra kerül.",
+    "Az Ultra mód először külön-külön megkérdezi a kezdőképernyő minden elérhető modelljét. Ezután minden körben minden modell átnézi az összes korábbi választ. A kiválasztott modell készíti el a végső összefoglalót. A mérlegelés minden érintett szolgáltatóval megosztásra kerül.",
   ulraModeRounds: "Felülvizsgálati körök",
   ulraModeCallEstimate: ({ count }) =>
     `A jelenlegi beállítással üzenetenként körülbelül ${count} modellhívás.`,
   ulraModeThresholdWarning:
     "4-nél több modell vagy 3-nál több kör sokáig tarthat, sok tokent használhat, és elérheti a szolgáltatók kontextus- vagy sebességkorlátait. Ez csak figyelmeztetés.",
-  ulraModeFirstUseTitle: "Bekapcsolja az Ulra módot?",
+  ulraModeFirstUseTitle: "Bekapcsolja az Ultra módot?",
   ulraModeFirstUseMessage: ({ calls, models, rounds }) =>
     `${models} modell és ${rounds} felülvizsgálati kör esetén egy üzenet körülbelül ${calls} modellhívást indíthat. Ez jóval tovább tarthat, jelentősen többe kerülhet, és megosztja a mérlegelést minden érintett szolgáltatóval.`,
-  ulraModeHighRiskTitle: "Nagy Ulra mód futtatás",
+  ulraModeHighRiskTitle: "Nagy Ultra mód futtatás",
   ulraModeHighRiskMessage: ({ calls, models, rounds }) =>
     `${models} modell és ${rounds} felülvizsgálati kör körülbelül ${calls} modellhívást indíthat. Ez nagyon sokáig tarthat, sok tokent használhat, és elérheti a szolgáltatói korlátokat. Mégis folytatja?`,
   ulraModeEnableAction: "Bekapcsolás",
   ulraModeNeedsTwoModels:
-    "Az Ulra módhoz legalább két használatra kész kezdőképernyős modell szükséges.",
+    "Az Ultra módhoz legalább két használatra kész kezdőképernyős modell szükséges.",
   ulraModeAllModelsFailed:
-    "Az Ulra mód összes modellje meghiúsult, mielőtt elkészülhetett volna az összegzett válasz.",
+    "Az Ultra mód összes modellje meghiúsult, mielőtt elkészülhetett volna az összegzett válasz.",
   ulraModePartialFailureNotice: ({ failed, succeeded }) =>
     `${failed} belső modellhívás meghiúsult; a végső válasz ${succeeded} sikeres hozzájárulást használt fel.`,
   sttTabDescription:

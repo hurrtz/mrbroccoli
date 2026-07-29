@@ -121,28 +121,28 @@ export const cs = {
   useResponseMode: ({ mode }) => `Použijte ${mode}`,
   chooseResponseModel: "Vyberte si model",
   responseModelCount: ({ count }) => `K dispozici: ${count} modelů`,
-  ulraMode: "Režim Ulra",
-  ulraModeHomeLabel: "Zobrazit režim Ulra na domovské obrazovce",
+  ulraMode: "Režim Ultra",
+  ulraModeHomeLabel: "Zobrazit režim Ultra na domovské obrazovce",
   ulraModeSettingsDescription:
     "Povolí společné uvažování více modelů, když jsou připraveny alespoň dva modely z domovské obrazovky.",
   ulraModeInfo:
-    "Režim Ulra nejprve osloví každý připravený model z domovské obrazovky samostatně. V každém kole pak všechny modely posoudí všechny předchozí odpovědi. Vybraný model vytvoří závěrečnou odpověď. Obsah uvažování se sdílí se všemi zapojenými poskytovateli.",
+    "Režim Ultra nejprve osloví každý připravený model z domovské obrazovky samostatně. V každém kole pak všechny modely posoudí všechny předchozí odpovědi. Vybraný model vytvoří závěrečnou odpověď. Obsah uvažování se sdílí se všemi zapojenými poskytovateli.",
   ulraModeRounds: "Kola kontroly",
   ulraModeCallEstimate: ({ count }) =>
     `Při aktuálním nastavení přibližně ${count} volání modelů na zprávu.`,
   ulraModeThresholdWarning:
     "Více než 4 modely nebo 3 kola mohou trvat velmi dlouho, spotřebovat mnoho tokenů a narazit na limity kontextu či frekvence poskytovatelů. Jde pouze o upozornění.",
-  ulraModeFirstUseTitle: "Zapnout režim Ulra?",
+  ulraModeFirstUseTitle: "Zapnout režim Ultra?",
   ulraModeFirstUseMessage: ({ calls, models, rounds }) =>
     `Při ${models} modelech a ${rounds} kolech kontroly může jedna zpráva provést přibližně ${calls} volání modelů. Může trvat výrazně déle, stát podstatně více a sdílet uvažování se všemi zapojenými poskytovateli.`,
-  ulraModeHighRiskTitle: "Rozsáhlý běh režimu Ulra",
+  ulraModeHighRiskTitle: "Rozsáhlý běh režimu Ultra",
   ulraModeHighRiskMessage: ({ calls, models, rounds }) =>
     `${models} modelů a ${rounds} kol kontroly může provést přibližně ${calls} volání modelů. Může to trvat velmi dlouho, spotřebovat mnoho tokenů a narazit na limity poskytovatelů. Přesto pokračovat?`,
   ulraModeEnableAction: "Zapnout",
   ulraModeNeedsTwoModels:
-    "Režim Ulra vyžaduje alespoň dva připravené modely na domovské obrazovce.",
+    "Režim Ultra vyžaduje alespoň dva připravené modely na domovské obrazovce.",
   ulraModeAllModelsFailed:
-    "Všechny modely režimu Ulra selhaly dříve, než bylo možné sestavit odpověď.",
+    "Všechny modely režimu Ultra selhaly dříve, než bylo možné sestavit odpověď.",
   ulraModePartialFailureNotice: ({ failed, succeeded }) =>
     `${failed} interních volání modelů selhalo; konečná odpověď využila ${succeeded} úspěšných příspěvků.`,
   sttTabDescription:

@@ -127,7 +127,7 @@ describe("usageStats", () => {
     );
   });
 
-  it("attributes Ulra contributions to their actual model routes", () => {
+  it("attributes Ultra contributions to their actual model routes", () => {
     const routes = aggregateConversationUsageByRoute({
       messages: [
         {

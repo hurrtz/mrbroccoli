@@ -138,7 +138,7 @@ describe("runUlraModeDeliberation", () => {
         language: "en",
         messages: [{ role: "user", content: "Question" }],
       }),
-    ).rejects.toThrow("Every Ulra Mode model failed");
+    ).rejects.toThrow("Every Ultra Mode model failed");
   });
 
   it("does not start model calls after cancellation", async () => {
