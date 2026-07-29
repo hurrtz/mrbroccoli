@@ -118,9 +118,36 @@ function canRetrySameModel(kind: ProviderFailureKind | null) {
   );
 }
 
-function canFailOverToAnotherModel(kind: ProviderFailureKind | null) {
+function isModelScopedQuotaFailure(error: unknown, model: string) {
+  if (
+    !(error instanceof ProviderRequestError) ||
+    error.failureKind !== "quota"
+  ) {
+    return false;
+  }
+
+  const detail = error.detail.toLowerCase();
+  const normalizedModel = model.trim().toLowerCase();
+
   return (
-    kind === "capacity" || kind === "model-unavailable" || kind === "server"
+    (normalizedModel.length > 0 && detail.includes(normalizedModel)) ||
+    detail.includes("model quota") ||
+    detail.includes("quota per model") ||
+    detail.includes("per-model quota")
+  );
+}
+
+function canFailOverToAnotherModel(
+  kind: ProviderFailureKind | null,
+  error: unknown,
+  model: string,
+) {
+  return (
+    kind === "capacity" ||
+    kind === "model-unavailable" ||
+    (kind === "quota" && isModelScopedQuotaFailure(error, model)) ||
+    kind === "rate-limit" ||
+    kind === "server"
   );
 }
 
@@ -300,6 +327,12 @@ export async function executeProviderModelRequest<T>(
         }
 
         const kind = getProviderFailureKind(error);
+        const failureScope =
+          kind === "quota"
+            ? isModelScopedQuotaFailure(error, model)
+              ? "model"
+              : "provider"
+            : undefined;
         const callerAllowsRetry = params.canRetry?.() ?? true;
         const shouldRetrySameModel =
           callerAllowsRetry &&
@@ -315,6 +348,7 @@ export async function executeProviderModelRequest<T>(
             attempt: attempts,
             capability: params.capability,
             failureKind: kind ?? "unknown",
+            ...(failureScope ? { failureScope } : {}),
             message: error instanceof Error ? error.message : String(error),
             model,
             provider: params.provider,
@@ -328,7 +362,9 @@ export async function executeProviderModelRequest<T>(
 
         const hasFallback = modelIndex < candidates.length - 1;
         const shouldFailOver =
-          callerAllowsRetry && hasFallback && canFailOverToAnotherModel(kind);
+          callerAllowsRetry &&
+          hasFallback &&
+          canFailOverToAnotherModel(kind, error, model);
 
         if (!shouldFailOver) {
           throw error;
@@ -347,6 +383,7 @@ export async function executeProviderModelRequest<T>(
             capability: params.capability,
             failedModel: model,
             failureKind: kind ?? "unknown",
+            ...(failureScope ? { failureScope } : {}),
             nextModel: candidates[modelIndex + 1],
             provider: params.provider,
             requestedModel,

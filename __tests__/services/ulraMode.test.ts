@@ -1,5 +1,7 @@
 import { generateInternalChat } from "../../src/services/llm";
+import { ProviderRequestError } from "../../src/services/providerErrors";
 import {
+  getUlraModeFailureParticipants,
   runUlraModeDeliberation,
   UlraModeConfig,
 } from "../../src/services/ulraMode";
@@ -12,8 +14,9 @@ jest.mock("../../src/services/llm", () => ({
   generateInternalChat: jest.fn(),
 }));
 
-const generateInternalChatMock =
-  generateInternalChat as jest.MockedFunction<typeof generateInternalChat>;
+const generateInternalChatMock = generateInternalChat as jest.MockedFunction<
+  typeof generateInternalChat
+>;
 
 const config: UlraModeConfig = {
   rounds: 2,
@@ -71,28 +74,26 @@ describe("runUlraModeDeliberation", () => {
     const firstRoundPrompts = generateInternalChatMock.mock.calls
       .slice(3, 6)
       .map(
-        ([request]) =>
-          request.messages[request.messages.length - 1]?.content,
+        ([request]) => request.messages[request.messages.length - 1]?.content,
       );
-    expect(firstRoundPrompts.every((prompt) =>
-      prompt?.includes('"round":0'),
-    )).toBe(true);
-    expect(firstRoundPrompts.some((prompt) =>
-      prompt?.includes('"round":1'),
-    )).toBe(false);
+    expect(
+      firstRoundPrompts.every((prompt) => prompt?.includes('"round":0')),
+    ).toBe(true);
+    expect(
+      firstRoundPrompts.some((prompt) => prompt?.includes('"round":1')),
+    ).toBe(false);
 
     const secondRoundPrompts = generateInternalChatMock.mock.calls
       .slice(6, 9)
       .map(
-        ([request]) =>
-          request.messages[request.messages.length - 1]?.content,
+        ([request]) => request.messages[request.messages.length - 1]?.content,
       );
-    expect(secondRoundPrompts.every((prompt) =>
-      prompt?.includes('"round":1'),
-    )).toBe(true);
-    expect(secondRoundPrompts.some((prompt) =>
-      prompt?.includes('"round":2'),
-    )).toBe(false);
+    expect(
+      secondRoundPrompts.every((prompt) => prompt?.includes('"round":1')),
+    ).toBe(true);
+    expect(
+      secondRoundPrompts.some((prompt) => prompt?.includes('"round":2')),
+    ).toBe(false);
     expect(result.synthesisPrompt).toContain(
       "Successful private contributions: 9.",
     );
@@ -128,6 +129,53 @@ describe("runUlraModeDeliberation", () => {
     expect(result.synthesisPrompt).toContain("Failed private calls: 2.");
   });
 
+  it("does not call a terminally failed participant in later rounds", async () => {
+    generateInternalChatMock.mockImplementation(async (params) => {
+      if (params.provider === "anthropic") {
+        throw new ProviderRequestError({
+          action: "reply",
+          failureKind: "quota",
+          message: "Quota exhausted",
+          provider: "anthropic",
+          status: 429,
+        });
+      }
+      return {
+        text: `${params.provider} contribution`,
+        usage: {
+          kind: "reply",
+          source: "estimated",
+          promptTokens: 4,
+          completionTokens: 2,
+          totalTokens: 6,
+        },
+      };
+    });
+
+    const result = await runUlraModeDeliberation({
+      assistantInstructions: "",
+      config: { ...config, rounds: 2 },
+      language: "en",
+      messages: [{ role: "user", content: "Question" }],
+    });
+
+    expect(
+      generateInternalChatMock.mock.calls.filter(
+        ([request]) => request.provider === "anthropic",
+      ),
+    ).toHaveLength(1);
+    expect(generateInternalChatMock).toHaveBeenCalledTimes(7);
+    expect(result.entries).toHaveLength(6);
+    expect(result.failures).toEqual([
+      expect.objectContaining({
+        failureKind: "quota",
+        participant: 2,
+        round: 0,
+      }),
+    ]);
+    expect(result.roundsCompleted).toBe(2);
+  });
+
   it("fails clearly when every initial participant fails", async () => {
     generateInternalChatMock.mockRejectedValue(new Error("offline"));
 
@@ -139,6 +187,29 @@ describe("runUlraModeDeliberation", () => {
         messages: [{ role: "user", content: "Question" }],
       }),
     ).rejects.toThrow("Every Uber Mode model failed");
+  });
+
+  it("summarizes repeated failures as calls from one participant", () => {
+    expect(
+      getUlraModeFailureParticipants([
+        {
+          message: "rate limited",
+          modeId: "mode-3",
+          model: "gemini-3.1-pro-preview",
+          participant: 3,
+          provider: "gemini",
+          round: 0,
+        },
+        {
+          message: "rate limited",
+          modeId: "mode-3",
+          model: "gemini-3.1-pro-preview",
+          participant: 3,
+          provider: "gemini",
+          round: 1,
+        },
+      ]),
+    ).toEqual(["#3 · Google / gemini-3.1-pro-preview · ×2"]);
   });
 
   it("does not start model calls after cancellation", async () => {

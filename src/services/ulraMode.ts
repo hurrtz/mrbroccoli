@@ -1,13 +1,10 @@
 import { PROVIDER_LABELS } from "../constants/models";
 import { translate } from "../i18n";
-import type {
-  AppLanguage,
-  Message,
-  Provider,
-  UsageEstimate,
-} from "../types";
+import type { AppLanguage, Message, Provider, UsageEstimate } from "../types";
 import { recordDebugLogEvent } from "./debugLogCapture";
 import { generateInternalChat } from "./llm";
+import { getProviderFailureKind } from "./providerResilience";
+import type { ProviderFailureKind } from "./providerErrors";
 
 export interface UlraModeRoute {
   apiKey: string;
@@ -33,6 +30,7 @@ export interface UlraModeEntry {
 }
 
 export interface UlraModeFailure {
+  failureKind?: ProviderFailureKind;
   message: string;
   modeId: string;
   model: string;
@@ -47,6 +45,19 @@ export interface UlraModeResult {
   failures: UlraModeFailure[];
   roundsCompleted: number;
   synthesisPrompt: string;
+}
+
+const TERMINAL_PARTICIPANT_FAILURES = new Set<ProviderFailureKind>([
+  "authentication",
+  "context",
+  "credits",
+  "model-unavailable",
+  "quota",
+  "rejected",
+]);
+
+function isTerminalParticipantFailure(failureKind: ProviderFailureKind | null) {
+  return failureKind ? TERMINAL_PARTICIPANT_FAILURES.has(failureKind) : false;
 }
 
 function getParticipantLabel(
@@ -103,16 +114,14 @@ function buildReviewPrompt(params: {
 
 function serializeEntries(entries: UlraModeEntry[]) {
   return JSON.stringify(
-    entries.map(
-      ({ modeId, model, participant, provider, round, text }) => ({
-        modeId,
-        model,
-        participant,
-        provider,
-        round,
-        text,
-      }),
-    ),
+    entries.map(({ modeId, model, participant, provider, round, text }) => ({
+      modeId,
+      model,
+      participant,
+      provider,
+      round,
+      text,
+    })),
   );
 }
 
@@ -121,8 +130,7 @@ function sumUsage(usages: UsageEstimate[]): UsageEstimate {
     (total, usage) => ({
       ...total,
       promptTokens: total.promptTokens + usage.promptTokens,
-      completionTokens:
-        total.completionTokens + usage.completionTokens,
+      completionTokens: total.completionTokens + usage.completionTokens,
       totalTokens: total.totalTokens + usage.totalTokens,
     }),
     {
@@ -163,6 +171,7 @@ export async function runUlraModeDeliberation(params: {
   const rounds = Math.max(1, Math.floor(params.config.rounds));
   const entries: UlraModeEntry[] = [];
   const failures: UlraModeFailure[] = [];
+  const retiredParticipants = new Set<number>();
   const systemPrompt = buildParticipantSystemPrompt({
     assistantInstructions: params.assistantInstructions,
     webSearchContext: params.webSearchContext,
@@ -186,18 +195,26 @@ export async function runUlraModeDeliberation(params: {
     promptForParticipant: (participant: number) => string,
   ) => {
     const snapshotSize = entries.length;
+    const activeRoutes = routes
+      .map((route, index) => ({
+        participant: index + 1,
+        route,
+      }))
+      .filter(({ participant }) => !retiredParticipants.has(participant));
+
     recordDebugLogEvent({
       event: "ulra-mode-round-started",
       payload: {
-        participants: routes.length,
+        configuredParticipants: routes.length,
+        participants: activeRoutes.length,
+        retiredParticipants: retiredParticipants.size,
         round,
         snapshotSize,
       },
     });
 
     const settled = await Promise.allSettled(
-      routes.map(async (route, index) => {
-        const participant = index + 1;
+      activeRoutes.map(async ({ participant, route }) => {
         recordDebugLogEvent({
           event: "ulra-mode-participant-requested",
           payload: {
@@ -245,8 +262,7 @@ export async function runUlraModeDeliberation(params: {
 
     let successes = 0;
     settled.forEach((result, index) => {
-      const route = routes[index];
-      const participant = index + 1;
+      const { participant, route } = activeRoutes[index];
 
       if (result.status === "fulfilled") {
         successes += 1;
@@ -255,11 +271,13 @@ export async function runUlraModeDeliberation(params: {
           event: "ulra-mode-participant-completed",
           payload: {
             modeId: route.modeId,
-            model: route.model,
+            model: result.value.entry.model,
             participant,
             provider: route.provider,
+            requestedModel: route.model,
             responseLength: result.value.entry.text.length,
             round,
+            usedFallback: result.value.entry.model !== route.model,
           },
         });
         return;
@@ -269,7 +287,9 @@ export async function runUlraModeDeliberation(params: {
         result.reason instanceof Error
           ? result.reason.message
           : String(result.reason);
+      const failureKind = getProviderFailureKind(result.reason);
       failures.push({
+        ...(failureKind ? { failureKind } : {}),
         message,
         modeId: route.modeId,
         model: route.model,
@@ -281,6 +301,7 @@ export async function runUlraModeDeliberation(params: {
         event: "ulra-mode-participant-failed",
         level: "warn",
         payload: {
+          failureKind: failureKind ?? "unknown",
           message,
           modeId: route.modeId,
           model: route.model,
@@ -289,12 +310,29 @@ export async function runUlraModeDeliberation(params: {
           round,
         },
       });
+
+      if (isTerminalParticipantFailure(failureKind)) {
+        retiredParticipants.add(participant);
+        recordDebugLogEvent({
+          event: "ulra-mode-participant-retired",
+          level: "warn",
+          payload: {
+            failureKind,
+            modeId: route.modeId,
+            model: route.model,
+            participant,
+            provider: route.provider,
+            round,
+          },
+        });
+      }
     });
 
     recordDebugLogEvent({
       event: "ulra-mode-round-completed",
       payload: {
-        failures: routes.length - successes,
+        failures: activeRoutes.length - successes,
+        retiredParticipants: retiredParticipants.size,
         round,
         snapshotSize,
         successes,
@@ -314,9 +352,7 @@ export async function runUlraModeDeliberation(params: {
     };
   }
   if (initialSuccesses === 0) {
-    throw new Error(
-      translate(params.language, "ulraModeAllModelsFailed"),
-    );
+    throw new Error(translate(params.language, "ulraModeAllModelsFailed"));
   }
 
   let roundsCompleted = 0;
@@ -351,6 +387,10 @@ export async function runUlraModeDeliberation(params: {
     payload: {
       estimatedTokens: result.estimatedUsage.totalTokens,
       failedCalls: failures.length,
+      failedParticipants: new Set(
+        failures.map(({ participant }) => participant),
+      ).size,
+      retiredParticipants: retiredParticipants.size,
       roundsCompleted,
       roundsRequested: rounds,
       successfulCalls: entries.length,
@@ -359,14 +399,15 @@ export async function runUlraModeDeliberation(params: {
   return result;
 }
 
-export function getUlraModeFailureParticipants(
-  failures: UlraModeFailure[],
-) {
-  return Array.from(
-    new Set(
-      failures.map((failure) =>
-        getParticipantLabel(failure, failure.participant),
-      ),
-    ),
+export function getUlraModeFailureParticipants(failures: UlraModeFailure[]) {
+  const failureCounts = new Map<string, number>();
+
+  failures.forEach((failure) => {
+    const label = getParticipantLabel(failure, failure.participant);
+    failureCounts.set(label, (failureCounts.get(label) ?? 0) + 1);
+  });
+
+  return Array.from(failureCounts, ([label, count]) =>
+    count > 1 ? `${label} · ×${count}` : label,
   );
 }

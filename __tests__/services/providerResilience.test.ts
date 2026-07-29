@@ -8,9 +8,11 @@ function providerError(
   failureKind: ConstructorParameters<
     typeof ProviderRequestError
   >[0]["failureKind"],
+  detail?: string,
 ) {
   return new ProviderRequestError({
     action: "reply",
+    detail,
     failureKind,
     message: failureKind,
     provider: "gemini",
@@ -98,24 +100,53 @@ describe("executeProviderModelRequest", () => {
     },
   );
 
-  it("retries rate limiting on the same model without rotating models", async () => {
-    const error = providerError("rate-limit");
-    const request = jest.fn().mockRejectedValue(error);
+  it("retries rate limiting once before rotating models", async () => {
+    const request = jest
+      .fn()
+      .mockRejectedValueOnce(providerError("rate-limit"))
+      .mockRejectedValueOnce(providerError("rate-limit"))
+      .mockResolvedValueOnce("OK");
 
-    await expect(
-      executeProviderModelRequest({
-        candidateModels: ["model-a", "model-b"],
-        capability: "tts",
-        provider: "gemini",
-        request,
-        retryDelayMs: 0,
-      }),
-    ).rejects.toBe(error);
+    const result = await executeProviderModelRequest({
+      candidateModels: ["model-a", "model-b"],
+      capability: "tts",
+      provider: "gemini",
+      request,
+      retryDelayMs: 0,
+    });
 
     expect(request.mock.calls.map(([model]) => model)).toEqual([
       "model-a",
       "model-a",
+      "model-b",
     ]);
+    expect(result.actualModel).toBe("model-b");
+  });
+
+  it("moves past model-scoped quota without retrying the exhausted model", async () => {
+    const request = jest
+      .fn()
+      .mockRejectedValueOnce(
+        providerError(
+          "quota",
+          "Quota exceeded for metric generate_content_requests, model: model-a",
+        ),
+      )
+      .mockResolvedValueOnce("OK");
+
+    const result = await executeProviderModelRequest({
+      candidateModels: ["model-a", "model-b"],
+      capability: "llm",
+      provider: "gemini",
+      request,
+      retryDelayMs: 0,
+    });
+
+    expect(request.mock.calls.map(([model]) => model)).toEqual([
+      "model-a",
+      "model-b",
+    ]);
+    expect(result.actualModel).toBe("model-b");
   });
 
   it("does not retry a streaming request after response data arrived", async () => {
