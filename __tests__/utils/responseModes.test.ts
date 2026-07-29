@@ -79,6 +79,25 @@ describe("response mode selectors", () => {
     expect(getDefaultModelForProvider("xai")).toBe("grok-4.5");
   });
 
+  it("validates Gemini with its current default instead of a persisted legacy model", () => {
+    const settings = {
+      ...DEFAULT_SETTINGS,
+      responseModes: [
+        {
+          id: "mode-1",
+          route: {
+            provider: "gemini" as const,
+            model: "gemini-2.5-flash",
+          },
+        },
+      ],
+    };
+
+    expect(getProviderValidationModel(settings, "gemini")).toBe(
+      "gemini-3.6-flash",
+    );
+  });
+
   it("does not treat a model-less route as a usable response mode", () => {
     const settings = {
       ...DEFAULT_SETTINGS,

@@ -218,6 +218,13 @@ export function getProviderValidationModel(
   settings: Settings,
   provider: Provider,
 ): string {
+  // Gemini's older models can remain user-selectable for accounts that still
+  // have access, but they must not make a newly entered key look invalid.
+  // Validate the provider connection against the current curated default.
+  if (provider === "gemini") {
+    return getDefaultModelForProvider(provider);
+  }
+
   const activeRoute = getResponseModeRoute(settings);
 
   if (activeRoute?.provider === provider && activeRoute.model.trim()) {

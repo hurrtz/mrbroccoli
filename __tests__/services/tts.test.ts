@@ -286,7 +286,7 @@ describe("synthesizeSpeech", () => {
     expect(result).toMatch(/^\/tmp\/tts-.*\.wav$/);
     const [url, options] = (fetch as jest.Mock).mock.calls[0];
     expect(url).toBe(
-      "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-tts:generateContent",
+      "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-tts-preview:generateContent",
     );
     expect(options.headers["x-goog-api-key"]).toBe("gemini-test-key");
     const body = JSON.parse(options.body);

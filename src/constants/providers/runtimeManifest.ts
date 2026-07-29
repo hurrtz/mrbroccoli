@@ -1111,7 +1111,7 @@ export const RUNTIME_PROVIDER_MANIFEST: Record<
       support: "provider",
       transport: "gemini",
       endpointBase: "https://generativelanguage.googleapis.com/v1beta/models",
-      defaultModel: "gemini-2.5-flash-preview-tts",
+      defaultModel: "gemini-3.1-flash-tts-preview",
       defaultVoice: "Kore",
       voiceFallback: "Kore",
       models: [

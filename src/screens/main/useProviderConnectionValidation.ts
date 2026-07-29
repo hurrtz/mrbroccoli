@@ -18,7 +18,6 @@ import type {
   ProviderCapability,
   Settings,
 } from "../../types";
-import { getProviderValidationModel } from "../../utils/responseModes";
 
 export function useProviderConnectionValidation(params: {
   language: AppLanguage;
@@ -44,7 +43,7 @@ export function useProviderConnectionValidation(params: {
         if (target.kind === "llm") {
           await validateProviderConnection({
             provider,
-            model: getProviderValidationModel(settings, provider),
+            model: target.model,
             apiKey,
             language,
           });

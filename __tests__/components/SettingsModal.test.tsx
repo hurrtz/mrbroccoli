@@ -625,7 +625,16 @@ describe("SettingsModal", () => {
         ...DEFAULT_SETTINGS.apiKeys,
         gemini: "working-google-key",
       },
+      providerTtsModels: {
+        ...DEFAULT_SETTINGS.providerTtsModels,
+        gemini: "gemini-2.5-pro-preview-tts",
+      },
     };
+    const llmTarget = getProviderValidationTarget(
+      baseSettings,
+      "gemini",
+      "llm",
+    );
     const sttTarget = getProviderValidationTarget(
       baseSettings,
       "gemini",
@@ -641,6 +650,9 @@ describe("SettingsModal", () => {
       "gemini",
       "search",
     );
+    expect(llmTarget.model).toBe("gemini-3.6-flash");
+    expect(ttsTarget.model).toBe("gemini-3.1-flash-tts-preview");
+    expect(searchTarget.model).toBe("gemini-3.6-flash");
     const settings: Settings = {
       ...baseSettings,
       providerValidationResults: {

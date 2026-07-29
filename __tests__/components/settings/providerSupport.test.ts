@@ -38,7 +38,8 @@ describe("getProviderValidationTarget", () => {
 
     expect(getProviderValidationTarget(settings, "gemini", "llm")).toEqual({
       kind: "llm",
-      model: "gemini-2.5-flash",
+      model: "gemini-3.6-flash",
+      configKey: undefined,
     });
   });
 

@@ -79,6 +79,9 @@ describe("speech provider constants", () => {
         (option) => option.id === "gemini-3.1-flash-tts-preview",
       )?.name,
     ).toBe("Gemini 3.1 Flash TTS Preview");
+    expect(PROVIDER_DEFAULT_TTS_MODELS.gemini).toBe(
+      "gemini-3.1-flash-tts-preview",
+    );
     expect(getProviderTtsModelOptions("bytedance-doubao-seed")).toEqual([]);
   });
 

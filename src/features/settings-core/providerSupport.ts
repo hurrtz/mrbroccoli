@@ -123,11 +123,15 @@ export function getProviderValidationTarget(
     }
     case "tts": {
       const model =
-        settings.providerTtsModels[provider] ||
+        (provider === "gemini"
+          ? PROVIDER_DEFAULT_TTS_MODELS[provider]
+          : settings.providerTtsModels[provider]) ||
         PROVIDER_DEFAULT_TTS_MODELS[provider] ||
         "";
       const voice =
-        settings.providerTtsVoices[provider] ||
+        (provider === "gemini"
+          ? PROVIDER_DEFAULT_TTS_VOICES[provider]
+          : settings.providerTtsVoices[provider]) ||
         PROVIDER_DEFAULT_TTS_VOICES[provider] ||
         "";
 

@@ -285,7 +285,7 @@ describe("webSearch", () => {
       },
       assertBody: (body: Record<string, unknown>) => {
         expect(body.tools).toEqual([{ type: "google_search" }]);
-        expect(body.model).toBe("gemini-3.5-flash");
+        expect(body.model).toBe("gemini-3.6-flash");
       },
       expectedSummary: "Gemini web search found the current answer.",
       expectedSourceUrl: "https://example.com/gemini-search",
