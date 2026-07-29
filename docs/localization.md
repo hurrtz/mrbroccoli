@@ -44,7 +44,7 @@ Interface, recognition, and spoken-reply languages are independent settings:
 languages and their native/provider locale codes. It contains every interface
 locale (English, German, Ukrainian, Hindi, Spanish, French, Italian, European
 Portuguese, Brazilian Portuguese, Russian, Simplified Chinese, Arabic, and
-  Japanese, Hungarian, Czech, Polish, Turkish, and Swedish).
+  Japanese, Hungarian, Czech, Polish, Turkish, Swedish, and Urdu).
 
 Provider STT and TTS language support belongs in
 `src/constants/providers/runtimeManifest.ts`. Settings readiness and runtime
@@ -100,7 +100,8 @@ where an intentional English fallback is acceptable.
   home screen, every settings page, modal, picker, drawer, and navigation icon
   on both Android and iOS.
 
-Root direction handles normal Yoga layout and text flow. It does not prove
+Arabic and Urdu use right-to-left direction. Root direction handles normal
+Yoga layout and text flow. It does not prove
 that every deliberately positioned element or directional icon is correct;
 RTL additions always require the visual audit above.
 

@@ -79,7 +79,7 @@ describe("translations", () => {
   it("keeps text direction in locale metadata", () => {
     APP_LANGUAGES.forEach((language) => {
       expect(getAppLocale(language).direction).toBe(
-        language === "ar" ? "rtl" : "ltr",
+        language === "ar" || language === "ur" ? "rtl" : "ltr",
       );
     });
   });
@@ -103,6 +103,7 @@ describe("translations", () => {
     expect(translations.pl.appName).toBe("Pan Brokuł");
     expect(translations.tr.appName).toBe("Bay Brokoli");
     expect(translations.sv.appName).toBe("Herr Broccoli");
+    expect(translations.ur.appName).toBe("مسٹر بروکلی");
     expect(JSON.stringify(translations.de)).not.toContain("Mr Broccoli");
     expect(JSON.stringify(translations.uk)).not.toContain("Mr Broccoli");
     expect(JSON.stringify(translations.hi)).not.toContain("Mr Broccoli");
@@ -120,6 +121,7 @@ describe("translations", () => {
     expect(JSON.stringify(translations.pl)).not.toContain("Mr Broccoli");
     expect(JSON.stringify(translations.tr)).not.toContain("Mr Broccoli");
     expect(JSON.stringify(translations.sv)).not.toContain("Mr Broccoli");
+    expect(JSON.stringify(translations.ur)).not.toContain("Mr Broccoli");
   });
 
   it("resolves Ukrainian UI copy and regional formatting", () => {
@@ -200,6 +202,11 @@ describe("translations", () => {
   it("resolves Swedish UI copy and regional formatting", () => {
     expect(translate("sv", "settings")).toBe("Inställningar");
     expect(getLocaleForLanguage("sv")).toBe("sv-SE");
+  });
+
+  it("resolves Urdu UI copy and regional formatting", () => {
+    expect(translate("ur", "settings")).toBe("ترتیبات");
+    expect(getLocaleForLanguage("ur")).toBe("ur-PK");
   });
 
   describe("home-screen style chip keys", () => {

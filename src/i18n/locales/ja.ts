@@ -90,6 +90,7 @@ export const ja = {
   polish: "ポーランド語",
   turkish: "トルコ語",
   swedish: "スウェーデン語",
+  urdu: "ウルドゥー語",
   kokoroAmericanFemaleVoice: ({ name }) => `${name} · アメリカ英語・女性`,
   kokoroBritishFemaleVoice: ({ name }) => `${name} · イギリス英語・女性`,
   kokoroChineseFemaleVoice: ({ index }) => `中国語・女性 ${index}`,

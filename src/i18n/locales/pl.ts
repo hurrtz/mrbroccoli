@@ -91,6 +91,7 @@ export const pl = {
   polish: "Polski",
   turkish: "Turecki",
   swedish: "Szwedzki",
+  urdu: "Urdu",
   kokoroAmericanFemaleVoice: ({ name }) => `${name} · Amerykański głos żeński`,
   kokoroBritishFemaleVoice: ({ name }) => `${name} · Brytyjski głos żeński`,
   kokoroChineseFemaleVoice: ({ index }) => `Chiński głos żeński ${index}`,

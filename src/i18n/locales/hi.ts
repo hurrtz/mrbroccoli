@@ -89,6 +89,7 @@ export const hi = {
   polish: "पोलिश",
   turkish: "तुर्की",
   swedish: "स्वीडिश",
+  urdu: "उर्दू",
   kokoroAmericanFemaleVoice: ({ name }) =>
     `${name} · अमेरिकी अंग्रेज़ी, महिला आवाज़`,
   kokoroBritishFemaleVoice: ({ name }) =>

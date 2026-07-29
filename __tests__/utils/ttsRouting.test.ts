@@ -111,6 +111,26 @@ describe("resolveTtsListenLanguage", () => {
     ).toBe("sv");
   });
 
+  it("prefers Urdu over Arabic for distinctive Urdu script", () => {
+    expect(
+      resolveTtsListenLanguage({
+        text: "یہ ایک اچھی تجویز ہے اور ہمیں اس پر کام کرنا چاہیے۔",
+        preferredLanguages: ["ar", "ur"],
+        appLanguage: "en",
+      }),
+    ).toBe("ur");
+  });
+
+  it("continues to recognize Arabic independently from Urdu", () => {
+    expect(
+      resolveTtsListenLanguage({
+        text: "هذا اقتراح جيد ونحن نعمل عليه الآن.",
+        preferredLanguages: ["ar", "ur"],
+        appLanguage: "en",
+      }),
+    ).toBe("ar");
+  });
+
   it.each([
     ["es", "¿Dónde está la estación? No encuentro la entrada."],
     ["fr", "Je ne sais pas où est la bonne entrée."],

@@ -14,6 +14,10 @@ function detectScriptLanguage(text: string): TtsListenLanguage | null {
     return "zh-CN";
   }
 
+  if (/[\u0679\u067e\u0686\u0688\u0691\u06af\u06ba\u06be\u06c1\u06cc\u06d2]/u.test(text)) {
+    return "ur";
+  }
+
   if (/[\u0600-\u06ff]/.test(text)) {
     return "ar";
   }
@@ -144,6 +148,11 @@ const LANGUAGE_HEURISTICS: Record<
     marker: /å/i,
     markerScore: 4,
     tokens: [" och ", " att ", " det ", " inte ", " som ", " för "],
+  },
+  ur: {
+    marker: /[\u0679\u067e\u0686\u0688\u0691\u06af\u06ba\u06be\u06c1\u06cc\u06d2]/u,
+    markerScore: 4,
+    tokens: [" اور ", " ہے ", " نہیں ", " یہ ", " کے ", " میں "],
   },
 };
 

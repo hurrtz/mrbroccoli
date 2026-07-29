@@ -89,6 +89,7 @@ export const ptBR = {
   polish: "Polonês",
   turkish: "Turco",
   swedish: "Sueco",
+  urdu: "Urdu",
   kokoroAmericanFemaleVoice: ({ name }) =>
     `${name} · inglês americano, voz feminina`,
   kokoroBritishFemaleVoice: ({ name }) =>

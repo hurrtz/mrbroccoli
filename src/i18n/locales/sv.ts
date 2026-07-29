@@ -90,6 +90,7 @@ export const sv = {
   polish: "polska",
   turkish: "turkiska",
   swedish: "svenska",
+  urdu: "urdu",
   kokoroAmericanFemaleVoice: ({ name }) => `${name} · Amerikansk kvinnlig röst`,
   kokoroBritishFemaleVoice: ({ name }) => `${name} · Brittisk kvinnlig röst`,
   kokoroChineseFemaleVoice: ({ index }) => `Kinesisk kvinnlig röst ${index}`,

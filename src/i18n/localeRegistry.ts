@@ -15,6 +15,7 @@ import { ru } from "./locales/ru";
 import { sv } from "./locales/sv";
 import { tr } from "./locales/tr";
 import { uk } from "./locales/uk";
+import { ur } from "./locales/ur";
 import { zhCN } from "./locales/zhCN";
 import type { TranslationDictionary } from "./types";
 import type { SpeechLanguage } from "../constants/speechLanguages";
@@ -288,6 +289,22 @@ export const APP_LOCALES = {
       search: { cancel: "Avbryt" },
     },
     defaultTtsListenLanguage: "sv",
+  }),
+  ur: defineAppLocale({
+    nativeName: "اردو",
+    intlLocale: "ur-PK",
+    direction: "rtl",
+    messages: ur,
+    antDesign: {
+      modal: { ok: "ٹھیک ہے", cancel: "منسوخ کریں", button: "بٹن" },
+      picker: {
+        ok: "ٹھیک ہے",
+        cancel: "منسوخ کریں",
+        select: "منتخب کریں",
+      },
+      search: { cancel: "منسوخ کریں" },
+    },
+    defaultTtsListenLanguage: "ur",
   }),
 } as const;
 

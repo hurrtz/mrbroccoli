@@ -22,6 +22,7 @@ export const PROVIDER_PREVIEW_SAMPLE_TEXT_BY_LANGUAGE: Record<
   pl: "Dzień dobry! Cichy deszcz delikatnie stuka w okna, gdy miasto się budzi. O siódmej czterdzieści pięć Pan Brokuł spokojnie wyjaśnia, dlaczego świetne pomysły, ciekawe pytania i niespodziewany żart sprawiają, że warto słuchać nawet dłuższej rozmowy.",
   tr: "Günaydın! Şehir uyanırken sakin yağmur pencerelere usulca vuruyor. Saat yedi kırk beşte Bay Brokoli, parlak fikirlerin, meraklı soruların ve beklenmedik bir şakanın uzun bir sohbeti neden dinlemeye değer kıldığını sakince anlatıyor.",
   sv: "God morgon! Det stilla regnet trummar mjukt mot fönstren medan staden vaknar. Klockan kvart i åtta förklarar Herr Broccoli lugnt varför kloka idéer, nyfikna frågor och ett oväntat skämt gör ett långt samtal värt att lyssna på.",
+  ur: "صبح بخیر! شہر کے جاگنے کے ساتھ ہلکی بارش کھڑکیوں پر نرمی سے دستک دے رہی ہے۔ سات بج کر پینتالیس منٹ پر مسٹر بروکلی سکون سے بتاتے ہیں کہ اچھے خیالات، دلچسپ سوالات اور کبھی کبھار ایک غیر متوقع مذاق لمبی گفتگو کو سننے کے قابل کیوں بناتے ہیں۔",
 };
 
 export const LOCAL_PREVIEW_SAMPLE_TEXT_BY_LANGUAGE: Record<
@@ -46,6 +47,7 @@ export const LOCAL_PREVIEW_SAMPLE_TEXT_BY_LANGUAGE: Record<
   pl: "Dzień dobry. To dłuższy podgląd lokalnego głosu Pana Brokuła, który pozwala ocenić wyrazistość wymowy i naturalność rytmu w kilku kolejnych zdaniach. Jeśli głos brzmi tutaj spokojnie i przyjemnie, zwykle dobrze sprawdzi się także podczas czytania dłuższych odpowiedzi.",
   tr: "Merhaba. Bu, Bay Brokoli için daha uzun bir yerel ses önizlemesidir; telaffuzun ne kadar anlaşılır olduğunu ve ritmin birkaç cümle boyunca doğal kalıp kalmadığını duymanızı sağlar. Bu ses burada sakin ve hoş geliyorsa, uzun yanıtların okunmasında da genellikle rahat bir seçimdir.",
   sv: "Hej. Det här är en längre lokal röstförhandsvisning för Herr Broccoli, så att du kan höra hur tydligt uttalet är och om rytmen känns naturlig genom flera meningar. Om rösten låter lugn och behaglig här brukar den också passa bra för att läsa upp längre svar.",
+  ur: "السلام علیکم۔ یہ مسٹر بروکلی کے لیے ایک طویل مقامی آواز کا پیش نظارہ ہے، تاکہ آپ سن سکیں کہ تلفظ کتنا واضح ہے اور کئی جملوں میں آہنگ قدرتی محسوس ہوتا ہے یا نہیں۔ اگر یہ آواز یہاں پرسکون اور خوشگوار لگتی ہے تو عموماً طویل جوابات سنانے کے لیے بھی موزوں ہوگی۔",
 };
 
 export function getNativePreviewSampleText(language: TtsListenLanguage) {
