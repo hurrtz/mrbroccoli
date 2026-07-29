@@ -69,6 +69,7 @@ interface StreamChatParams {
   language: AppLanguage;
   conversationSummary?: string;
   spokenParagraphStreaming?: boolean;
+  synthesisContext?: string;
   webSearchContext?: string;
   onChunk: (text: string) => void;
   onDone: (
@@ -324,6 +325,44 @@ async function requestChatText(params: {
   }
 }
 
+export async function generateInternalChat(params: {
+  messages: Pick<Message, "role" | "content">[];
+  model: string;
+  modelEffort?: string;
+  provider: Provider;
+  apiKey: string;
+  language: AppLanguage;
+  systemPrompt: string;
+  abortSignal?: AbortSignal;
+}) {
+  const messages = params.messages.map(({ role, content }) => ({
+    role,
+    content,
+  }));
+  const text = (
+    await requestChatText({
+      ...params,
+      messages,
+    })
+  ).trim();
+
+  if (!text) {
+    throw buildProviderEmptyReplyError(params.provider, params.language);
+  }
+
+  return {
+    text,
+    usage: estimateChatUsage({
+      provider: params.provider,
+      model: params.model,
+      kind: "reply",
+      systemPrompt: params.systemPrompt,
+      messages,
+      completionText: text,
+    }),
+  };
+}
+
 export async function summarizeConversationContext(params: {
   existingSummary?: string;
   messages: Message[];
@@ -512,6 +551,7 @@ export async function streamChat({
   language,
   conversationSummary,
   spokenParagraphStreaming,
+  synthesisContext,
   webSearchContext,
   onChunk,
   onDone,
@@ -533,6 +573,7 @@ export async function streamChat({
       currentProvider: provider,
       conversationSummary,
       spokenParagraphStreaming,
+      synthesisContext,
       webSearchContext,
     });
 

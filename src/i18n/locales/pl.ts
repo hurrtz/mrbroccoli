@@ -140,6 +140,12 @@ export const pl = {
   ulraModeHighRiskMessage: ({ calls, models, rounds }) =>
     `${models} modeli i ${rounds} rund przeglądu może wykonać około ${calls} wywołań modeli. Może to trwać bardzo długo, zużyć wiele tokenów i osiągnąć limity dostawców. Kontynuować mimo to?`,
   ulraModeEnableAction: "Włącz",
+  ulraModeNeedsTwoModels:
+    "Tryb Ulra wymaga co najmniej dwóch gotowych modeli na ekranie głównym.",
+  ulraModeAllModelsFailed:
+    "Wszystkie modele trybu Ulra zawiodły, zanim udało się zsyntetyzować odpowiedź.",
+  ulraModePartialFailureNotice: ({ failed, succeeded }) =>
+    `${failed} wewnętrznych wywołań modeli nie powiodło się; odpowiedź końcowa wykorzystała ${succeeded} udanych wypowiedzi.`,
   sttTabDescription:
     "Kontroluj, w jaki sposób przechwytywana jest mowa i który backend zamienia dźwięk na tekst, zanim dotrze do modelu.",
   ttsTabDescription:

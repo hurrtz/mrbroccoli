@@ -140,6 +140,12 @@ export const es = {
   ulraModeHighRiskMessage: ({ calls, models, rounds }) =>
     `${models} modelos y ${rounds} rondas de revisión pueden realizar unas ${calls} llamadas a modelos. Puede tardar mucho, usar muchos tokens y alcanzar límites del proveedor. ¿Continuar de todos modos?`,
   ulraModeEnableAction: "Activar",
+  ulraModeNeedsTwoModels:
+    "El modo Ulra necesita al menos dos modelos listos en la pantalla de inicio.",
+  ulraModeAllModelsFailed:
+    "Todos los modelos del modo Ulra fallaron antes de poder sintetizar una respuesta.",
+  ulraModePartialFailureNotice: ({ failed, succeeded }) =>
+    `Fallaron ${failed} llamadas internas a modelos; la respuesta final utilizó ${succeeded} contribuciones correctas.`,
   sttTabDescription:
     "Controle cómo se captura la voz y qué backend convierte el audio en texto antes de que llegue al modelo.",
   ttsTabDescription:

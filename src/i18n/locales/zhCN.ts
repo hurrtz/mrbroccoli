@@ -138,6 +138,12 @@ export const zhCN = {
   ulraModeHighRiskMessage: ({ calls, models, rounds }) =>
     `${models} 个模型和 ${rounds} 轮复核可能调用模型约 ${calls} 次。运行可能耗时很长、使用大量令牌并触及提供商限制。仍要继续吗？`,
   ulraModeEnableAction: "启用",
+  ulraModeNeedsTwoModels:
+    "Ulra 模式至少需要两个已就绪的主屏幕模型。",
+  ulraModeAllModelsFailed:
+    "在能够合成回答之前，Ulra 模式的所有模型都失败了。",
+  ulraModePartialFailureNotice: ({ failed, succeeded }) =>
+    `${failed} 次内部模型调用失败；最终回答采用了 ${succeeded} 条成功贡献。`,
   sttTabDescription:
     "控制如何捕获语音以及哪个后端在音频到达模型之前将其转换为文本。",
   ttsTabDescription:

@@ -139,6 +139,12 @@ export const ja = {
   ulraModeHighRiskMessage: ({ calls, models, rounds }) =>
     `${models}件のモデルと${rounds}回のレビューラウンドでは、約${calls}回のモデル呼び出しが行われる可能性があります。非常に時間がかかり、多くのトークンを使用し、プロバイダーの制限に達する場合があります。それでも続行しますか？`,
   ulraModeEnableAction: "有効にする",
+  ulraModeNeedsTwoModels:
+    "Ulraモードには、ホーム画面で使用可能なモデルが2つ以上必要です。",
+  ulraModeAllModelsFailed:
+    "回答を統合する前に、Ulraモードのすべてのモデルが失敗しました。",
+  ulraModePartialFailureNotice: ({ failed, succeeded }) =>
+    `${failed}件の内部モデル呼び出しが失敗しました。最終回答には${succeeded}件の成功した提案を使用しました。`,
   sttTabDescription:
     "音声をキャプチャする方法と、モデルに到達する前に音声をテキストに変換するバックエンドを制御します。",
   ttsTabDescription:

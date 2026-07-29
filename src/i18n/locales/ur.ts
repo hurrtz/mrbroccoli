@@ -138,6 +138,12 @@ export const ur = {
   ulraModeHighRiskMessage: ({ calls, models, rounds }) =>
     `${models} ماڈلز اور ${rounds} جائزہ مراحل تقریباً ${calls} ماڈل کالز کر سکتے ہیں۔ اس میں بہت وقت لگ سکتا ہے، بہت سے ٹوکن استعمال ہو سکتے ہیں اور فراہم کنندہ کی حدود پوری ہو سکتی ہیں۔ پھر بھی جاری رکھیں؟`,
   ulraModeEnableAction: "فعال کریں",
+  ulraModeNeedsTwoModels:
+    "Ulra موڈ کے لیے ہوم اسکرین پر کم از کم دو تیار ماڈلز درکار ہیں۔",
+  ulraModeAllModelsFailed:
+    "جواب تیار ہونے سے پہلے Ulra موڈ کے تمام ماڈلز ناکام ہو گئے۔",
+  ulraModePartialFailureNotice: ({ failed, succeeded }) =>
+    `${failed} اندرونی ماڈل کالز ناکام ہوئیں؛ حتمی جواب میں ${succeeded} کامیاب آرا استعمال ہوئیں۔`,
   sttTabDescription:
     "کنٹرول کریں کہ تقریر کیسے کیپچر کی جاتی ہے اور کون سا بیک اینڈ آڈیو کو ماڈل تک پہنچنے سے پہلے ٹیکسٹ میں بدل دیتا ہے۔",
   ttsTabDescription:

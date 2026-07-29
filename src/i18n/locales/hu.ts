@@ -142,6 +142,12 @@ export const hu = {
   ulraModeHighRiskMessage: ({ calls, models, rounds }) =>
     `${models} modell és ${rounds} felülvizsgálati kör körülbelül ${calls} modellhívást indíthat. Ez nagyon sokáig tarthat, sok tokent használhat, és elérheti a szolgáltatói korlátokat. Mégis folytatja?`,
   ulraModeEnableAction: "Bekapcsolás",
+  ulraModeNeedsTwoModels:
+    "Az Ulra módhoz legalább két használatra kész kezdőképernyős modell szükséges.",
+  ulraModeAllModelsFailed:
+    "Az Ulra mód összes modellje meghiúsult, mielőtt elkészülhetett volna az összegzett válasz.",
+  ulraModePartialFailureNotice: ({ failed, succeeded }) =>
+    `${failed} belső modellhívás meghiúsult; a végső válasz ${succeeded} sikeres hozzájárulást használt fel.`,
   sttTabDescription:
     "Szabályozhatja, hogyan rögzítse a beszédet, és melyik háttérprogram alakítja át a hangot szöveggé, mielőtt az elérné a modellt.",
   ttsTabDescription:

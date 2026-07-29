@@ -138,6 +138,12 @@ export const tr = {
   ulraModeHighRiskMessage: ({ calls, models, rounds }) =>
     `${models} model ve ${rounds} inceleme turu yaklaşık ${calls} model çağrısı yapabilir. Bu çok uzun sürebilir, çok sayıda token kullanabilir ve sağlayıcı sınırlarına ulaşabilir. Yine de devam edilsin mi?`,
   ulraModeEnableAction: "Etkinleştir",
+  ulraModeNeedsTwoModels:
+    "Ulra modu için ana ekranda en az iki hazır model gerekir.",
+  ulraModeAllModelsFailed:
+    "Bir yanıt sentezlenemeden önce tüm Ulra modu modelleri başarısız oldu.",
+  ulraModePartialFailureNotice: ({ failed, succeeded }) =>
+    `${failed} dahili model çağrısı başarısız oldu; son yanıt ${succeeded} başarılı katkıyı kullandı.`,
   sttTabDescription:
     "Konuşmanın nasıl yakalandığını ve modele ulaşmadan önce hangi arka ucun sesi metne dönüştürdüğünü kontrol edin.",
   ttsTabDescription:

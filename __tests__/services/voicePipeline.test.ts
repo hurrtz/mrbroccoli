@@ -7,6 +7,7 @@ import {
   summarizeConversationContext,
 } from "../../src/services/llm";
 import { synthesizeSpeech } from "../../src/services/tts";
+import { runUlraModeDeliberation } from "../../src/services/ulraMode";
 
 jest.mock("expo-file-system/legacy", () => ({
   deleteAsync: jest.fn(() => Promise.resolve()),
@@ -27,6 +28,13 @@ jest.mock("../../src/services/llm", () => ({
 
 jest.mock("../../src/services/webSearch", () => ({
   searchWeb: jest.fn(),
+}));
+
+jest.mock("../../src/services/ulraMode", () => ({
+  getUlraModeFailureParticipants: jest.fn(() => [
+    "#2 · Anthropic / claude-test",
+  ]),
+  runUlraModeDeliberation: jest.fn(),
 }));
 
 jest.mock("../../src/services/playbackCues", () => ({
@@ -2175,5 +2183,186 @@ describe("runVoicePipeline", () => {
     });
 
     expect(searchWeb).not.toHaveBeenCalled();
+  });
+
+  it("reuses one web result for private Ulra deliberation and the selected final model", async () => {
+    (searchWeb as jest.Mock).mockResolvedValueOnce({
+      context: "Fresh shared evidence",
+      model: "gpt-4.1-mini",
+      provider: "openai",
+      sources: [],
+      summary: "Fresh answer",
+    });
+    (runUlraModeDeliberation as jest.Mock).mockResolvedValueOnce({
+      entries: [
+        {
+          modeId: "mode-1",
+          model: "gpt-test",
+          participant: 1,
+          provider: "openai",
+          round: 0,
+          text: "First contribution",
+          usage: {
+            kind: "reply",
+            source: "estimated",
+            promptTokens: 15,
+            completionTokens: 5,
+            totalTokens: 20,
+          },
+        },
+        {
+          modeId: "mode-1",
+          model: "gpt-test",
+          participant: 1,
+          provider: "openai",
+          round: 1,
+          text: "Reviewed contribution",
+          usage: {
+            kind: "reply",
+            source: "estimated",
+            promptTokens: 15,
+            completionTokens: 5,
+            totalTokens: 20,
+          },
+        },
+      ],
+      estimatedUsage: {
+        kind: "reply",
+        source: "estimated",
+        promptTokens: 30,
+        completionTokens: 10,
+        totalTokens: 40,
+      },
+      failures: [
+        {
+          message: "rate limited",
+          modeId: "mode-2",
+          model: "claude-test",
+          participant: 2,
+          provider: "anthropic",
+          round: 1,
+        },
+      ],
+      roundsCompleted: 1,
+      synthesisPrompt: "Private Ulra synthesis evidence",
+    });
+    (streamChat as jest.Mock).mockImplementation(
+      async ({
+        onDone,
+      }: {
+        onDone: (
+          text: string,
+          usage: {
+            kind: "reply";
+            source: "estimated";
+            promptTokens: number;
+            completionTokens: number;
+            totalTokens: number;
+          },
+        ) => Promise<void>;
+      }) => {
+        await onDone("Final answer", {
+          kind: "reply",
+          source: "estimated",
+          promptTokens: 12,
+          completionTokens: 8,
+          totalTokens: 20,
+        });
+      },
+    );
+    const callbacks = {
+      onTranscription: jest.fn(),
+      onLlmStart: jest.fn(),
+      onChunk: jest.fn(),
+      onResponseDone: jest.fn(),
+      onAudioReady: jest.fn(),
+      onSpeechTextReady: jest.fn(),
+      onError: jest.fn(),
+    };
+    const ulraMode = {
+      rounds: 1,
+      routes: [
+        {
+          apiKey: "openai-key",
+          modeId: "mode-1",
+          model: "gpt-test",
+          provider: "openai" as const,
+        },
+        {
+          apiKey: "anthropic-key",
+          modeId: "mode-2",
+          model: "claude-test",
+          provider: "anthropic" as const,
+        },
+      ],
+    };
+
+    await runVoicePipeline({
+      transcriptionOverride: "What is new today?",
+      messages: [],
+      model: "gpt-test",
+      provider: "openai",
+      providerApiKey: "openai-key",
+      sttMode: "native",
+      ttsMode: "native",
+      ttsVoice: "alloy",
+      replyPlayback: "wait",
+      assistantInstructions: "Be accurate.",
+      responseLength: "normal",
+      responseTone: "professional",
+      language: "en",
+      webSearchMode: "on",
+      webSearchProvider: "openai",
+      webSearchApiKey: "search-key",
+      ulraMode,
+      callbacks,
+    });
+
+    expect(searchWeb).toHaveBeenCalledTimes(1);
+    expect(callbacks.onLlmStart).toHaveBeenCalledTimes(1);
+    expect(runUlraModeDeliberation).toHaveBeenCalledWith(
+      expect.objectContaining({
+        config: ulraMode,
+        webSearchContext: "Fresh shared evidence",
+      }),
+    );
+    expect(streamChat).toHaveBeenCalledWith(
+      expect.objectContaining({
+        model: "gpt-test",
+        provider: "openai",
+        synthesisContext: "Private Ulra synthesis evidence",
+        webSearchContext: "Fresh shared evidence",
+      }),
+    );
+    expect(callbacks.onSpeechTextReady).toHaveBeenCalledTimes(1);
+    expect(callbacks.onSpeechTextReady).toHaveBeenCalledWith(
+      "Final answer",
+      undefined,
+      expect.objectContaining({
+        source: "conversation",
+      }),
+    );
+    expect(callbacks.onResponseDone).toHaveBeenCalledWith(
+      "Final answer",
+      expect.objectContaining({
+        promptTokens: 42,
+        completionTokens: 18,
+        totalTokens: 60,
+      }),
+      expect.objectContaining({
+        ulraMode: expect.objectContaining({
+          failedCalls: 1,
+          roundsCompleted: 1,
+          roundsRequested: 1,
+          successfulCalls: 2,
+        }),
+        notices: [
+          expect.objectContaining({
+            stage: "ulra",
+            level: "warning",
+          }),
+        ],
+      }),
+    );
   });
 });

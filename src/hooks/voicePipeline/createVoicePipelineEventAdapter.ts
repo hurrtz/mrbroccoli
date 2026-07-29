@@ -38,6 +38,7 @@ type EventAdapterParams = Pick<
   | "t"
   | "ttsMode"
   | "ttsProvider"
+  | "ulraMode"
   | "updateConversationContextSummary"
   | "webSearchMode"
   | "webSearchProvider"
@@ -103,6 +104,7 @@ export function createVoicePipelineEventAdapter({
   transcriptionOverride,
   ttsMode,
   ttsProvider,
+  ulraMode,
   turnStartedAtMs,
   updateConversationContextSummary,
   webSearchMode,
@@ -116,6 +118,8 @@ export function createVoicePipelineEventAdapter({
       inputSource: transcriptionOverride ? "text" : "voice",
       webSearchMode,
       webSearchProvider,
+      ulraModelCount: ulraMode?.routes.length,
+      ulraRounds: ulraMode?.rounds,
     });
   const startThinkingLatency = () =>
     latency.startLatencyProgress("thinking", {
@@ -127,6 +131,8 @@ export function createVoicePipelineEventAdapter({
       responseTone,
       webSearchMode,
       webSearchProvider,
+      ulraModelCount: ulraMode?.routes.length,
+      ulraRounds: ulraMode?.rounds,
     });
   const startSynthesisLatency = () =>
     latency.startLatencyProgress("synthesizing", {
@@ -186,6 +192,8 @@ export function createVoicePipelineEventAdapter({
       replyPlayback,
       webSearchMode,
       webSearchProvider,
+      ulraModelCount: ulraMode?.routes.length,
+      ulraRounds: ulraMode?.rounds,
     };
 
     if (spokenRepliesEnabled) {

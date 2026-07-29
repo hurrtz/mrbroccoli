@@ -45,6 +45,8 @@ export interface LatencyRouteDescriptor {
   ttsModel?: string | null;
   replyPlayback?: ReplyPlayback;
   spokenRepliesEnabled?: boolean;
+  ulraModelCount?: number;
+  ulraRounds?: number;
 }
 
 export interface LatencyRouteStats {
@@ -72,6 +74,15 @@ function normalizeKeyPart(value: unknown): string {
 }
 
 export function createLatencyRouteKey(descriptor: LatencyRouteDescriptor) {
+  const ulraKeyParts =
+    descriptor.ulraModelCount && descriptor.ulraRounds
+      ? [
+          "ulra",
+          String(descriptor.ulraModelCount),
+          String(descriptor.ulraRounds),
+        ]
+      : [];
+
   if (descriptor.phase === "stt-transcription") {
     return [
       "stt-transcription-v1",
@@ -127,6 +138,7 @@ export function createLatencyRouteKey(descriptor: LatencyRouteDescriptor) {
       normalizeKeyPart(descriptor.replyPlayback),
       normalizeKeyPart(descriptor.webSearchMode),
       normalizeKeyPart(descriptor.webSearchProvider),
+      ...ulraKeyParts,
     ].join(":");
   }
 
@@ -153,6 +165,7 @@ export function createLatencyRouteKey(descriptor: LatencyRouteDescriptor) {
     normalizeKeyPart(descriptor.responseTone),
     normalizeKeyPart(descriptor.webSearchMode),
     normalizeKeyPart(descriptor.webSearchProvider),
+    ...ulraKeyParts,
   ].join(":");
 }
 
@@ -185,6 +198,9 @@ export function createLatencyRouteKeys(descriptor: LatencyRouteDescriptor) {
     descriptor.webSearchMode && descriptor.webSearchMode !== "off"
       ? "search-on"
       : "search-off",
+    ...(descriptor.ulraModelCount && descriptor.ulraRounds
+      ? [`ulra-${descriptor.ulraModelCount}-${descriptor.ulraRounds}`]
+      : []),
   ].join(":");
 
   return [exactKey, familyKey];
@@ -240,6 +256,11 @@ function getLlmResponseEstimateMs(descriptor: LatencyRouteDescriptor) {
     descriptor.webSearchProvider
   ) {
     estimateMs += 4_000;
+  }
+  if (descriptor.ulraModelCount && descriptor.ulraRounds) {
+    // Each Ulra stage runs its participants concurrently, while the initial
+    // assessment, review rounds, and final synthesis remain sequential.
+    estimateMs *= descriptor.ulraRounds + 2;
   }
 
   return estimateMs;

@@ -89,6 +89,65 @@ describe("mainScreenRouteConfiguration", () => {
     ).toBe(true);
   });
 
+  it("builds Ulra routes only from ready home-screen models", () => {
+    const settings = {
+      ...DEFAULT_SETTINGS,
+      activeResponseMode: "mode-1",
+      ulraModeActive: true,
+      ulraModeRounds: 5,
+      responseModes: [
+        {
+          id: "mode-1",
+          route: {
+            provider: "openai" as const,
+            model: "gpt-test",
+            effort: "high",
+          },
+        },
+        {
+          id: "mode-2",
+          route: {
+            provider: "anthropic" as const,
+            model: "claude-test",
+          },
+        },
+        {
+          id: "mode-3",
+          route: {
+            provider: "gemini" as const,
+            model: "gemini-test",
+          },
+        },
+      ],
+      apiKeys: {
+        ...DEFAULT_SETTINGS.apiKeys,
+        openai: " openai-key ",
+        anthropic: " anthropic-key ",
+      },
+    };
+
+    expect(
+      getMainScreenRouteConfiguration(settings, true).ulraMode,
+    ).toEqual({
+      rounds: 5,
+      routes: [
+        {
+          apiKey: "openai-key",
+          modeId: "mode-1",
+          model: "gpt-test",
+          modelEffort: "high",
+          provider: "openai",
+        },
+        {
+          apiKey: "anthropic-key",
+          modeId: "mode-2",
+          model: "claude-test",
+          provider: "anthropic",
+        },
+      ],
+    });
+  });
+
   it("prefers live account voices for a directory-backed TTS provider", () => {
     const selectedTtsModel = PROVIDER_DEFAULT_TTS_MODELS.elevenlabs;
     const settings = {

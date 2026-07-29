@@ -216,10 +216,31 @@ export interface MessageWebSearchMetadata {
 }
 
 export interface MessagePipelineNotice {
-  stage: "stt" | "tts" | "web-search";
+  stage: "stt" | "tts" | "ulra" | "web-search";
   level: "warning" | "error";
   message: string;
   detail?: string;
+}
+
+export interface MessageUlraModeCall {
+  modeId: string;
+  model: string;
+  provider: Provider;
+  round: number;
+}
+
+export interface MessageUlraModeContribution extends MessageUlraModeCall {
+  usage: UsageEstimate;
+}
+
+export interface MessageUlraModeMetadata {
+  contributions: MessageUlraModeContribution[];
+  estimatedIntermediateTokens: number;
+  failedCalls: number;
+  failures: MessageUlraModeCall[];
+  roundsCompleted: number;
+  roundsRequested: number;
+  successfulCalls: number;
 }
 
 export interface MistralTextContentChunk {
@@ -338,6 +359,7 @@ export interface MessageTurnReceipt {
 
 export interface MessageMetadata {
   webSearch?: MessageWebSearchMetadata;
+  ulraMode?: MessageUlraModeMetadata;
   notices?: MessagePipelineNotice[];
   providerState?: MessageProviderState;
   replyFailure?: MessageReplyFailureMetadata;

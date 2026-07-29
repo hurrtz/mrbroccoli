@@ -138,6 +138,12 @@ export const sv = {
   ulraModeHighRiskMessage: ({ calls, models, rounds }) =>
     `${models} modeller och ${rounds} granskningsomgångar kan göra cirka ${calls} modellanrop. Det kan ta mycket lång tid, använda många token och nå leverantörsgränser. Fortsätta ändå?`,
   ulraModeEnableAction: "Aktivera",
+  ulraModeNeedsTwoModels:
+    "Ulra-läget behöver minst två redo modeller på startskärmen.",
+  ulraModeAllModelsFailed:
+    "Alla modeller i Ulra-läget misslyckades innan ett svar kunde sammanställas.",
+  ulraModePartialFailureNotice: ({ failed, succeeded }) =>
+    `${failed} interna modellanrop misslyckades; det slutliga svaret använde ${succeeded} lyckade bidrag.`,
   sttTabDescription:
     "Styr hur tal fångas och vilken backend som förvandlar ljud till text innan det når modellen.",
   ttsTabDescription:

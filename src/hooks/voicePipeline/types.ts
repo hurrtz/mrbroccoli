@@ -24,6 +24,7 @@ import type {
   VoicePhaseProgress,
 } from "../../types";
 import type { useAudioPlayer } from "../useAudioPlayer";
+import type { UlraModeConfig } from "../../services/ulraMode";
 
 export type PipelinePhase =
   | "idle"
@@ -94,6 +95,7 @@ export interface UseVoicePipelineParams {
   webSearchProvider?: WebSearchProvider | null;
   webSearchApiKey?: string;
   webSearchOptions?: WebSearchProviderSettings;
+  ulraMode?: UlraModeConfig;
   isRecording: boolean;
   showToast: (
     message: string,

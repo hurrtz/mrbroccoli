@@ -73,6 +73,30 @@ describe("latencyStats", () => {
     ).toBeGreaterThanOrEqual(40_000);
   });
 
+  it("separates and scales Ulra response latency estimates", () => {
+    const standardDescriptor = {
+      phase: "llm-response" as const,
+      provider: "openai" as const,
+      model: "gpt-5.6-sol",
+      responseLength: "normal" as const,
+      webSearchMode: "off" as const,
+    };
+    const standardEstimate =
+      getDefaultLatencyEstimateMs(standardDescriptor);
+    const ulraDescriptor = {
+      ...standardDescriptor,
+      ulraModelCount: 3,
+      ulraRounds: 2,
+    };
+
+    expect(createLatencyRouteKey(ulraDescriptor)).toBe(
+      `${createLatencyRouteKey(standardDescriptor)}:ulra:3:2`,
+    );
+    expect(getDefaultLatencyEstimateMs(ulraDescriptor)).toBe(
+      standardEstimate * 4,
+    );
+  });
+
   it("gives xhigh effort its own estimate between high and max", () => {
     const estimate = (effort: string) =>
       getDefaultLatencyEstimateMs({

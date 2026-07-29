@@ -71,6 +71,7 @@ export function useVoiceCaptureHandler({
   ttsListenLanguages,
   ttsMode,
   ttsProvider,
+  ulraMode,
   updateConversationContextSummary,
   updateMessage,
   webSearchApiKey,
@@ -297,6 +298,7 @@ export function useVoiceCaptureHandler({
           webSearchProvider,
           webSearchApiKey,
           webSearchOptions,
+          ulraMode,
           abortSignal: abortController.signal,
           callbacks: eventAdapter.callbacks,
         });
@@ -443,6 +445,7 @@ export function useVoiceCaptureHandler({
       ttsListenLanguages,
       ttsMode,
       ttsProvider,
+      ulraMode,
       updateConversationContextSummary,
       updateAssistantTurnReceipt,
       webSearchApiKey,

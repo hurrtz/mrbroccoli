@@ -140,6 +140,12 @@ export const hi = {
   ulraModeHighRiskMessage: ({ calls, models, rounds }) =>
     `${models} मॉडल और ${rounds} समीक्षा दौर लगभग ${calls} मॉडल कॉल कर सकते हैं। इसमें बहुत समय लग सकता है, बहुत से टोकन खर्च हो सकते हैं और प्रदाता सीमाएँ पूरी हो सकती हैं। फिर भी जारी रखें?`,
   ulraModeEnableAction: "चालू करें",
+  ulraModeNeedsTwoModels:
+    "Ulra मोड के लिए होम स्क्रीन पर कम से कम दो तैयार मॉडल चाहिए।",
+  ulraModeAllModelsFailed:
+    "उत्तर तैयार होने से पहले Ulra मोड के सभी मॉडल विफल हो गए।",
+  ulraModePartialFailureNotice: ({ failed, succeeded }) =>
+    `${failed} आंतरिक मॉडल कॉल विफल हुए; अंतिम उत्तर में ${succeeded} सफल योगदान इस्तेमाल हुए।`,
   sttTabDescription:
     "नियंत्रित करें कि भाषण कैसे कैप्चर किया जाता है और कौन सा बैकएंड मॉडल तक पहुंचने से पहले ऑडियो को टेक्स्ट में बदल देता है।",
   ttsTabDescription:

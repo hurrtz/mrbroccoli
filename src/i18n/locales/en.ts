@@ -138,6 +138,12 @@ export const en = {
   ulraModeHighRiskMessage: ({ calls, models, rounds }) =>
     `${models} models and ${rounds} review rounds can make about ${calls} model calls. This may take a very long time, use many tokens, and hit provider limits. Continue anyway?`,
   ulraModeEnableAction: "Enable",
+  ulraModeNeedsTwoModels:
+    "Ulra Mode needs at least two ready home-screen models.",
+  ulraModeAllModelsFailed:
+    "Every Ulra Mode model failed before a response could be synthesized.",
+  ulraModePartialFailureNotice: ({ failed, succeeded }) =>
+    `${failed} private model calls failed; the final answer used ${succeeded} successful contributions.`,
   sttTabDescription:
     "Control how speech is captured and which backend turns audio into text before it reaches the model.",
   ttsTabDescription:

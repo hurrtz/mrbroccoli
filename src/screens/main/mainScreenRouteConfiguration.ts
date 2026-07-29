@@ -9,6 +9,7 @@ import {
 } from "../../constants/models";
 import type { ProviderVoiceDirectories } from "../../services/providerVoiceDirectory";
 import { providerHasVoiceDirectory } from "../../services/providerVoiceDirectory";
+import type { UlraModeConfig } from "../../services/ulraMode";
 import type { AppLanguage, Provider, Settings } from "../../types";
 import {
   getEnabledSttProviders,
@@ -31,6 +32,22 @@ export function getMainScreenRouteConfiguration(
   const model = activeResponseRoute.model;
   const modelEffort = activeResponseRoute.effort;
   const availableResponseModes = getAvailableResponseModes(settings);
+  const availableResponseModeSet = new Set(availableResponseModes);
+  const ulraMode: UlraModeConfig | undefined =
+    settings.ulraModeEnabled && settings.ulraModeActive
+      ? {
+          rounds: settings.ulraModeRounds,
+          routes: settings.responseModes
+            .filter(({ id }) => availableResponseModeSet.has(id))
+            .map(({ id, route }) => ({
+              apiKey: settings.apiKeys[route.provider].trim(),
+              modeId: id,
+              model: route.model,
+              modelEffort: route.effort,
+              provider: route.provider,
+            })),
+        }
+      : undefined;
   const availableSttProviders = getEnabledSttProviders(settings);
   const availableTtsProviders = getEnabledTtsProviders(settings);
   const sttProvider =
@@ -90,6 +107,8 @@ export function getMainScreenRouteConfiguration(
     sttProvider,
     ttsApiKey,
     ttsProvider,
+    ulraMode:
+      ulraMode && ulraMode.routes.length > 1 ? ulraMode : undefined,
     voiceInputDisabled:
       !conversationsLoaded ||
       !hasProviderCredentialForCapability(

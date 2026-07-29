@@ -142,6 +142,12 @@ export const de = {
   ulraModeHighRiskMessage: ({ calls, models, rounds }) =>
     `${models} Modelle und ${rounds} Prüfrunden können etwa ${calls} Modellaufrufe auslösen. Das kann sehr lange dauern, viele Tokens verbrauchen und Anbieterlimits erreichen. Trotzdem fortfahren?`,
   ulraModeEnableAction: "Aktivieren",
+  ulraModeNeedsTwoModels:
+    "Der Ulra-Modus benötigt mindestens zwei einsatzbereite Modelle auf dem Startbildschirm.",
+  ulraModeAllModelsFailed:
+    "Alle Modelle im Ulra-Modus sind fehlgeschlagen, bevor eine Antwort zusammengeführt werden konnte.",
+  ulraModePartialFailureNotice: ({ failed, succeeded }) =>
+    `${failed} interne Modellaufrufe sind fehlgeschlagen; die endgültige Antwort nutzt ${succeeded} erfolgreiche Beiträge.`,
   sttTabDescription:
     "Steuere, wie Sprache aufgenommen wird und welches Backend Audio in Text umwandelt, bevor es das Modell erreicht.",
   ttsTabDescription:

@@ -140,6 +140,12 @@ export const ar = {
   ulraModeHighRiskMessage: ({ calls, models, rounds }) =>
     `قد تنفذ ${models} نماذج و${rounds} جولات مراجعة نحو ${calls} استدعاءً للنماذج. قد يستغرق ذلك وقتًا طويلاً جدًا، ويستخدم رموزًا كثيرة، ويبلغ حدود المزودين. هل تريد المتابعة رغم ذلك؟`,
   ulraModeEnableAction: "تفعيل",
+  ulraModeNeedsTwoModels:
+    "يتطلب وضع Ulra نموذجين جاهزين على الأقل في الشاشة الرئيسية.",
+  ulraModeAllModelsFailed:
+    "فشلت جميع نماذج وضع Ulra قبل أن يمكن توليف رد.",
+  ulraModePartialFailureNotice: ({ failed, succeeded }) =>
+    `فشل ${failed} من استدعاءات النماذج الداخلية؛ استخدم الرد النهائي ${succeeded} مساهمات ناجحة.`,
   sttTabDescription:
     "التحكم في كيفية التقاط الكلام وأي واجهة خلفية تحول الصوت إلى نص قبل أن يصل إلى النموذج.",
   ttsTabDescription:

@@ -68,6 +68,8 @@ export function PipelineNotices({
                 ? t("speechToText")
                 : notice.stage === "tts"
                   ? t("textToSpeech")
+                  : notice.stage === "ulra"
+                    ? t("ulraMode")
                   : t("webSearch")}
             </Text>
             <Text style={[styles.noticeText, { color: colors.textSecondary }]}>

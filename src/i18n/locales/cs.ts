@@ -139,6 +139,12 @@ export const cs = {
   ulraModeHighRiskMessage: ({ calls, models, rounds }) =>
     `${models} modelů a ${rounds} kol kontroly může provést přibližně ${calls} volání modelů. Může to trvat velmi dlouho, spotřebovat mnoho tokenů a narazit na limity poskytovatelů. Přesto pokračovat?`,
   ulraModeEnableAction: "Zapnout",
+  ulraModeNeedsTwoModels:
+    "Režim Ulra vyžaduje alespoň dva připravené modely na domovské obrazovce.",
+  ulraModeAllModelsFailed:
+    "Všechny modely režimu Ulra selhaly dříve, než bylo možné sestavit odpověď.",
+  ulraModePartialFailureNotice: ({ failed, succeeded }) =>
+    `${failed} interních volání modelů selhalo; konečná odpověď využila ${succeeded} úspěšných příspěvků.`,
   sttTabDescription:
     "Kontrolujte, jak je řeč zachycována a který backend převádí zvuk na text, než se dostane do modelu.",
   ttsTabDescription:

@@ -20,6 +20,7 @@ import type {
   UsageEstimate,
 } from "../../types";
 import type { SpeechDiagnosticsContext } from "../speech/diagnostics";
+import type { UlraModeConfig } from "../ulraMode";
 
 export interface PipelineCallbacks {
   onTranscription: (text: string) => void;
@@ -88,6 +89,7 @@ export interface RunVoicePipelineParams {
   webSearchProvider?: WebSearchProvider | null;
   webSearchApiKey?: string;
   webSearchOptions?: WebSearchProviderSettings;
+  ulraMode?: UlraModeConfig;
   callbacks: PipelineCallbacks;
   abortSignal?: AbortSignal;
 }

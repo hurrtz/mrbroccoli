@@ -1,5 +1,10 @@
-import type { Message } from "../types";
+import type { Message, UsageEstimate } from "../types";
+import { translate } from "../i18n";
 import { recordDebugLogEvent } from "./debugLogCapture";
+import {
+  getUlraModeFailureParticipants,
+  runUlraModeDeliberation,
+} from "./ulraMode";
 import { cleanupCapturedAudio } from "./voicePipeline/cleanup";
 import { resolveContextualMessages } from "./voicePipeline/context";
 import { runPipelineResponse } from "./voicePipeline/response";
@@ -47,6 +52,7 @@ export async function runVoicePipeline(
     webSearchProvider,
     webSearchApiKey,
     webSearchOptions,
+    ulraMode,
     callbacks,
     abortSignal,
   } = params;
@@ -183,6 +189,95 @@ export async function runVoicePipeline(
         timestamp: new Date().toISOString(),
       },
     ];
+    const modelStartedAtMs = Date.now();
+    let additionalUsage: UsageEstimate | undefined;
+    let responseMetadata = webSearchResult.responseMetadata;
+    let synthesisContext: string | undefined;
+
+    if (ulraMode) {
+      callbacks.onLlmStart?.();
+      const deliberation = await runUlraModeDeliberation({
+        abortSignal,
+        assistantInstructions,
+        config: ulraMode,
+        language,
+        messages: allMessages,
+        webSearchContext: webSearchResult.context,
+      });
+
+      if (abortSignal?.aborted) {
+        recordDebugLogEvent({
+          event: "voice-pipeline-ulra-mode-aborted",
+        });
+        return transcription;
+      }
+
+      additionalUsage = deliberation.estimatedUsage;
+      synthesisContext = deliberation.synthesisPrompt;
+      const partialFailureNotice =
+        deliberation.failures.length > 0
+          ? {
+              stage: "ulra" as const,
+              level: "warning" as const,
+              message: translate(
+                language,
+                "ulraModePartialFailureNotice",
+                {
+                  failed: deliberation.failures.length,
+                  succeeded: deliberation.entries.length,
+                },
+              ),
+              detail: getUlraModeFailureParticipants(
+                deliberation.failures,
+              ).join(", "),
+            }
+          : null;
+
+      responseMetadata = {
+        ...responseMetadata,
+        notices: [
+          ...(responseMetadata.notices ?? []),
+          ...(partialFailureNotice ? [partialFailureNotice] : []),
+        ],
+        ulraMode: {
+          contributions: deliberation.entries.map(
+            ({
+              modeId,
+              model: entryModel,
+              provider: entryProvider,
+              round,
+              usage,
+            }) => ({
+              modeId,
+              model: entryModel,
+              provider: entryProvider,
+              round,
+              usage,
+            }),
+          ),
+          estimatedIntermediateTokens:
+            deliberation.estimatedUsage.totalTokens,
+          failedCalls: deliberation.failures.length,
+          failures: deliberation.failures.map(
+            ({
+              modeId,
+              model: failedModel,
+              provider: failedProvider,
+              round,
+            }) => ({
+              modeId,
+              model: failedModel,
+              provider: failedProvider,
+              round,
+            }),
+          ),
+          roundsCompleted: deliberation.roundsCompleted,
+          roundsRequested: ulraMode.rounds,
+          successfulCalls: deliberation.entries.length,
+        },
+      };
+    }
+
     const ttsQueue = createVoicePipelineTtsQueue({
       abortSignal,
       callbacks,
@@ -202,20 +297,24 @@ export async function runVoicePipeline(
 
     const llmCompleted = await runPipelineResponse({
       abortSignal,
+      additionalUsage,
       assistantInstructions,
       callbacks,
       conversationSummary: contextResult.effectiveSummary || undefined,
       language,
+      llmAlreadyStarted: Boolean(ulraMode),
       messages: allMessages,
       model,
+      modelStartedAtMs,
       modelEffort,
       provider,
       providerApiKey,
       responseLength,
-      responseMetadata: webSearchResult.responseMetadata,
+      responseMetadata,
       responseTone,
       replyPlayback,
       spokenRepliesEnabled,
+      synthesisContext,
       ttsQueue,
       turnReceipt,
       turnStartedAtMs,
