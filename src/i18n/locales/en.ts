@@ -120,6 +120,24 @@ export const en = {
   useResponseMode: ({ mode }) => `Use ${mode}`,
   chooseResponseModel: "Choose a model",
   responseModelCount: ({ count }) => `${count} models available`,
+  ulraMode: "Ulra Mode",
+  ulraModeHomeLabel: "Show Ulra Mode on the home screen",
+  ulraModeSettingsDescription:
+    "Allow multi-model deliberation when at least two home-screen models are ready.",
+  ulraModeInfo:
+    "Ulra Mode asks every ready home-screen model independently, then lets each model review all earlier answers for every round. The selected model synthesizes the final response. The deliberation is shared with every provider involved.",
+  ulraModeRounds: "Review rounds",
+  ulraModeCallEstimate: ({ count }) =>
+    `About ${count} model calls per message with the current setup.`,
+  ulraModeThresholdWarning:
+    "More than 4 models or 3 rounds can take a long time, consume many tokens, and hit provider context or rate limits. This is a warning only.",
+  ulraModeFirstUseTitle: "Enable Ulra Mode?",
+  ulraModeFirstUseMessage: ({ calls, models, rounds }) =>
+    `With ${models} models and ${rounds} review rounds, one message can make about ${calls} model calls. It may take much longer, cost significantly more, and share the deliberation with every provider involved.`,
+  ulraModeHighRiskTitle: "Large Ulra Mode run",
+  ulraModeHighRiskMessage: ({ calls, models, rounds }) =>
+    `${models} models and ${rounds} review rounds can make about ${calls} model calls. This may take a very long time, use many tokens, and hit provider limits. Continue anyway?`,
+  ulraModeEnableAction: "Enable",
   sttTabDescription:
     "Control how speech is captured and which backend turns audio into text before it reaches the model.",
   ttsTabDescription:

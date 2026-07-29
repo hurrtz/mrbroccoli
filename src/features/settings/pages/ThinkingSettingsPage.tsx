@@ -26,16 +26,19 @@ import {
 } from "../../../utils/modelEffort";
 import {
   getDefaultModelForProvider,
+  getAvailableResponseModes,
   isValidModelForProvider,
 } from "../../../utils/responseModes";
 import { renderProviderPickerOptions } from "../../settings-core/helpers";
 
 import {
   AntButtonLabel,
+  AntNumberInputRow,
   AntPickerRow,
   AntPickerRows,
   AntSectionIntro,
   AntSettingsCard,
+  AntSwitchRow,
   AntTextArea,
 } from "../AntSettingsPrimitives";
 import { AntSettingsInfoButton } from "../AntSettingsInfoButton";
@@ -65,6 +68,7 @@ export function ThinkingSettingsPage({
   const { language, t } = useLocalization();
   const canAdd = settings.responseModes.length < MAX_RESPONSE_MODES;
   const canRemove = settings.responseModes.length > MIN_RESPONSE_MODES;
+  const readyModelCount = getAvailableResponseModes(settings).length;
 
   return (
     <View testID="thinking-settings-page" style={styles.sectionPageStack}>
@@ -208,6 +212,72 @@ export function ThinkingSettingsPage({
             />
           </Button>
         ) : null}
+      </View>
+
+      <View testID="ulra-mode-settings-section" style={styles.sectionGroup}>
+        <AntSectionIntro
+          title={t("ulraMode")}
+          extra={
+            <AntSettingsInfoButton
+              accessibilityLabel={t("aboutSetting", {
+                setting: t("ulraMode"),
+              })}
+              title={t("ulraMode")}
+            >
+              {t("ulraModeInfo")}
+            </AntSettingsInfoButton>
+          }
+        />
+        <AntSettingsCard>
+          <AntSwitchRow
+            label={t("ulraModeHomeLabel")}
+            description={t("ulraModeSettingsDescription")}
+            value={settings.ulraModeEnabled}
+            onChange={(value) =>
+              onUpdate({
+                ulraModeEnabled: value,
+                ...(value ? {} : { ulraModeActive: false }),
+              })
+            }
+          />
+          {settings.ulraModeEnabled ? (
+            <>
+              <AntNumberInputRow
+                label={t("ulraModeRounds")}
+                value={settings.ulraModeRounds}
+                onChange={(value) =>
+                  onUpdate({ ulraModeRounds: value })
+                }
+              />
+              <Text
+                style={[
+                  styles.helperText,
+                  { color: colors.textSecondary },
+                ]}
+              >
+                {t("ulraModeCallEstimate", {
+                  count:
+                    readyModelCount *
+                      (settings.ulraModeRounds + 1) +
+                    1,
+                })}
+              </Text>
+              {readyModelCount > 4 ||
+              settings.ulraModeRounds > 3 ? (
+                <Text
+                  testID="ulra-mode-threshold-warning"
+                  accessibilityRole="alert"
+                  style={[
+                    styles.warningText,
+                    { color: colors.danger },
+                  ]}
+                >
+                  {t("ulraModeThresholdWarning")}
+                </Text>
+              ) : null}
+            </>
+          ) : null}
+        </AntSettingsCard>
       </View>
 
       <View testID="system-prompt-section" style={styles.sectionGroup}>

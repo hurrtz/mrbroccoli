@@ -124,6 +124,24 @@ export const de = {
   useResponseMode: ({ mode }) => `${mode} verwenden`,
   chooseResponseModel: "Modell auswählen",
   responseModelCount: ({ count }) => `${count} Modelle verfügbar`,
+  ulraMode: "Ulra-Modus",
+  ulraModeHomeLabel: "Ulra-Modus auf dem Startbildschirm anzeigen",
+  ulraModeSettingsDescription:
+    "Erlaubt Beratungen mit mehreren Modellen, sobald mindestens zwei Modelle auf dem Startbildschirm bereit sind.",
+  ulraModeInfo:
+    "Der Ulra-Modus fragt jedes bereite Modell auf dem Startbildschirm zunächst unabhängig. In jeder Runde prüfen anschließend alle Modelle sämtliche bisherigen Antworten. Das ausgewählte Modell fasst am Ende zusammen. Die Beratung wird mit allen beteiligten Anbietern geteilt.",
+  ulraModeRounds: "Prüfrunden",
+  ulraModeCallEstimate: ({ count }) =>
+    `Mit der aktuellen Konfiguration etwa ${count} Modellaufrufe pro Nachricht.`,
+  ulraModeThresholdWarning:
+    "Mehr als 4 Modelle oder 3 Runden können sehr lange dauern, viele Tokens verbrauchen und Kontext- oder Ratenlimits der Anbieter erreichen. Dies ist nur eine Warnung.",
+  ulraModeFirstUseTitle: "Ulra-Modus aktivieren?",
+  ulraModeFirstUseMessage: ({ calls, models, rounds }) =>
+    `Mit ${models} Modellen und ${rounds} Prüfrunden kann eine Nachricht etwa ${calls} Modellaufrufe auslösen. Das kann erheblich länger dauern, deutlich mehr kosten und die Beratung mit allen beteiligten Anbietern teilen.`,
+  ulraModeHighRiskTitle: "Großer Ulra-Modus-Durchlauf",
+  ulraModeHighRiskMessage: ({ calls, models, rounds }) =>
+    `${models} Modelle und ${rounds} Prüfrunden können etwa ${calls} Modellaufrufe auslösen. Das kann sehr lange dauern, viele Tokens verbrauchen und Anbieterlimits erreichen. Trotzdem fortfahren?`,
+  ulraModeEnableAction: "Aktivieren",
   sttTabDescription:
     "Steuere, wie Sprache aufgenommen wird und welches Backend Audio in Text umwandelt, bevor es das Modell erreicht.",
   ttsTabDescription:

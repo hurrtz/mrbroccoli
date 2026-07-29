@@ -77,6 +77,14 @@ function getStoredBoolean(value: unknown, fallback: boolean) {
   return typeof value === "boolean" ? value : fallback;
 }
 
+function getStoredPositiveInteger(value: unknown, fallback: number) {
+  return typeof value === "number" &&
+    Number.isSafeInteger(value) &&
+    value >= 1
+    ? value
+    : fallback;
+}
+
 function getStoredProvider(
   value: unknown,
   fallback: Provider | null,
@@ -129,6 +137,10 @@ export function normalizeStoredScalarSettings(
   | "showSetupGuideShortcut"
   | "showUsageStats"
   | "showDebugLogButton"
+  | "ulraModeEnabled"
+  | "ulraModeActive"
+  | "ulraModeRounds"
+  | "ulraModeWarningAcknowledged"
   | "assistantInstructions"
   | "ttsInstructions"
   | "webSearchMode"
@@ -151,6 +163,10 @@ export function normalizeStoredScalarSettings(
     storedSettings?.webSearchMode === "auto"
       ? "on"
       : storedSettings?.webSearchMode;
+  const ulraModeEnabled = getStoredBoolean(
+    storedSettings?.ulraModeEnabled,
+    DEFAULT_SETTINGS.ulraModeEnabled,
+  );
 
   return {
     inputMode: getAllowedValue(
@@ -222,6 +238,21 @@ export function normalizeStoredScalarSettings(
     showDebugLogButton: getStoredBoolean(
       storedSettings?.showDebugLogButton,
       DEFAULT_SETTINGS.showDebugLogButton,
+    ),
+    ulraModeEnabled,
+    ulraModeActive:
+      ulraModeEnabled &&
+      getStoredBoolean(
+        storedSettings?.ulraModeActive,
+        DEFAULT_SETTINGS.ulraModeActive,
+      ),
+    ulraModeRounds: getStoredPositiveInteger(
+      storedSettings?.ulraModeRounds,
+      DEFAULT_SETTINGS.ulraModeRounds,
+    ),
+    ulraModeWarningAcknowledged: getStoredBoolean(
+      storedSettings?.ulraModeWarningAcknowledged,
+      DEFAULT_SETTINGS.ulraModeWarningAcknowledged,
     ),
     assistantInstructions,
     ttsInstructions:

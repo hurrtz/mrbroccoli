@@ -120,6 +120,24 @@ export const sv = {
   useResponseMode: ({ mode }) => `Använd ${mode}`,
   chooseResponseModel: "Välj en modell",
   responseModelCount: ({ count }) => `${count}-modeller tillgängliga`,
+  ulraMode: "Ulra-läge",
+  ulraModeHomeLabel: "Visa Ulra-läge på startskärmen",
+  ulraModeSettingsDescription:
+    "Tillåter överläggning mellan flera modeller när minst två modeller på startskärmen är redo.",
+  ulraModeInfo:
+    "Ulra-läget frågar först varje redo modell på startskärmen var för sig. I varje omgång granskar sedan alla modeller alla tidigare svar. Den valda modellen sammanställer slutsvaret. Överläggningen delas med alla berörda leverantörer.",
+  ulraModeRounds: "Granskningsomgångar",
+  ulraModeCallEstimate: ({ count }) =>
+    `Cirka ${count} modellanrop per meddelande med den aktuella konfigurationen.`,
+  ulraModeThresholdWarning:
+    "Fler än 4 modeller eller 3 omgångar kan ta mycket lång tid, använda många token och nå leverantörernas kontext- eller hastighetsgränser. Detta är bara en varning.",
+  ulraModeFirstUseTitle: "Aktivera Ulra-läge?",
+  ulraModeFirstUseMessage: ({ calls, models, rounds }) =>
+    `Med ${models} modeller och ${rounds} granskningsomgångar kan ett meddelande göra cirka ${calls} modellanrop. Det kan ta mycket längre tid, kosta betydligt mer och dela överläggningen med alla berörda leverantörer.`,
+  ulraModeHighRiskTitle: "Stor Ulra-körning",
+  ulraModeHighRiskMessage: ({ calls, models, rounds }) =>
+    `${models} modeller och ${rounds} granskningsomgångar kan göra cirka ${calls} modellanrop. Det kan ta mycket lång tid, använda många token och nå leverantörsgränser. Fortsätta ändå?`,
+  ulraModeEnableAction: "Aktivera",
   sttTabDescription:
     "Styr hur tal fångas och vilken backend som förvandlar ljud till text innan det når modellen.",
   ttsTabDescription:

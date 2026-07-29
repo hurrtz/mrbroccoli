@@ -1,5 +1,5 @@
 import React from "react";
-import { render } from "@testing-library/react-native";
+import { fireEvent, render } from "@testing-library/react-native";
 
 import { ThinkingSettingsPage } from "../../src/features/settings/pages/ThinkingSettingsPage";
 import { LocalizationProvider } from "../../src/i18n";
@@ -84,5 +84,51 @@ describe("ThinkingSettingsPage response modes", () => {
 
     expect(screen.getAllByText("Effort")).toHaveLength(2);
     expect(screen.getAllByText("Dynamic")).toHaveLength(2);
+  });
+
+  it("warns without capping a large Ulra Mode configuration", () => {
+    const onUpdate = jest.fn();
+    const responseModes = Array.from({ length: 5 }, (_, index) => ({
+      id: `mode-${index + 1}`,
+      route: {
+        provider: "openai" as const,
+        model: "gpt-5.5-2026-04-23",
+        effort: "medium",
+      },
+    }));
+    const screen = render(
+      <ThemeProvider mode="light">
+        <LocalizationProvider language="en">
+          <ThinkingSettingsPage
+            settings={{
+              ...DEFAULT_SETTINGS,
+              apiKeys: {
+                ...DEFAULT_SETTINGS.apiKeys,
+                openai: "test-key",
+              },
+              responseModes,
+              ulraModeRounds: 10,
+            }}
+            llmProviders={["openai"]}
+            onUpdate={onUpdate}
+            onUpdateResponseModeRoute={jest.fn()}
+            onAddResponseMode={jest.fn()}
+            onRemoveResponseMode={jest.fn()}
+          />
+        </LocalizationProvider>
+      </ThemeProvider>,
+    );
+
+    expect(screen.getByTestId("ulra-mode-threshold-warning")).toBeTruthy();
+    expect(
+      screen.getByText(
+        "About 56 model calls per message with the current setup.",
+      ),
+    ).toBeTruthy();
+
+    const roundsInput = screen.getByTestId("settings-number-input");
+    fireEvent.changeText(roundsInput, "7");
+    fireEvent(roundsInput, "blur");
+    expect(onUpdate).toHaveBeenCalledWith({ ulraModeRounds: 7 });
   });
 });

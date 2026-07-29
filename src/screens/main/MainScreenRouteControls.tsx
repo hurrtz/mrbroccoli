@@ -16,7 +16,10 @@ interface MainScreenRouteControlsProps {
   colors: Colors;
   layout?: "portrait" | "landscape";
   onToggleWebSearchEnabled?: () => void;
+  onToggleUlraMode?: () => void;
   t: TranslateFn;
+  ulraModeActive?: boolean;
+  ulraModeAvailable?: boolean;
   webSearchEnabled?: boolean;
   webSearchReady?: boolean;
 }
@@ -26,13 +29,20 @@ export const MainScreenRouteControls = React.memo(
     colors,
     layout = "portrait",
     onToggleWebSearchEnabled,
+    onToggleUlraMode,
     t,
+    ulraModeActive = false,
+    ulraModeAvailable = false,
     webSearchEnabled = false,
     webSearchReady = false,
   }: MainScreenRouteControlsProps) {
     const webSearchAvailable =
       webSearchReady && Boolean(onToggleWebSearchEnabled);
     const webSearchValue = webSearchAvailable && webSearchEnabled;
+    const showUlraMode =
+      layout === "portrait" &&
+      ulraModeAvailable &&
+      Boolean(onToggleUlraMode);
 
     return (
       <View
@@ -40,8 +50,18 @@ export const MainScreenRouteControls = React.memo(
         style={[
           styles.row,
           layout === "landscape" ? styles.rowLandscape : null,
+          showUlraMode ? styles.rowWithUlraMode : null,
         ]}
       >
+        {showUlraMode ? (
+          <RouteSwitchControl
+            colors={colors}
+            label={t("ulraMode")}
+            onPress={onToggleUlraMode}
+            testIDPrefix="route-ulra-mode"
+            value={ulraModeActive}
+          />
+        ) : null}
         <Pressable
           testID="route-web-search-container"
           accessibilityLabel={t("webSearch")}
@@ -107,6 +127,64 @@ export const MainScreenRouteControls = React.memo(
   },
 );
 
+function RouteSwitchControl({
+  colors,
+  label,
+  onPress,
+  testIDPrefix,
+  value,
+}: {
+  colors: Colors;
+  label: string;
+  onPress?: () => void;
+  testIDPrefix: string;
+  value: boolean;
+}) {
+  return (
+    <Pressable
+      testID={`${testIDPrefix}-container`}
+      accessibilityLabel={label}
+      accessibilityRole="switch"
+      accessibilityState={{ checked: value }}
+      onPress={onPress}
+      style={({ pressed }) => [
+        styles.searchControl,
+        pressed ? styles.searchControlPressed : null,
+      ]}
+    >
+      <Text
+        testID={`${testIDPrefix}-label`}
+        accessible={false}
+        style={[styles.searchLabel, { color: colors.textSecondary }]}
+      >
+        {label}
+      </Text>
+      <NativeSwitch
+        testID={`${testIDPrefix}-control`}
+        accessible={false}
+        focusable={false}
+        importantForAccessibility="no-hide-descendants"
+        pointerEvents="none"
+        style={styles.searchSwitch}
+        value={value}
+        trackColor={{
+          false: colors.borderStrong,
+          true:
+            Platform.OS === "android" ? colors.accentSoft : colors.accent,
+        }}
+        thumbColor={
+          Platform.OS === "android"
+            ? value
+              ? colors.accent
+              : colors.surface
+            : undefined
+        }
+        ios_backgroundColor={colors.borderStrong}
+      />
+    </Pressable>
+  );
+}
+
 const styles = StyleSheet.create({
   row: {
     minHeight: 44,
@@ -118,6 +196,9 @@ const styles = StyleSheet.create({
   },
   rowLandscape: {
     marginTop: 6,
+  },
+  rowWithUlraMode: {
+    justifyContent: "space-between",
   },
   searchControl: {
     height: 44,

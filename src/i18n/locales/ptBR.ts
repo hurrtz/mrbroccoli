@@ -122,6 +122,24 @@ export const ptBR = {
   useResponseMode: ({ mode }) => `Usar ${mode}`,
   chooseResponseModel: "Escolha um modelo",
   responseModelCount: ({ count }) => `Modelos ${count} disponíveis`,
+  ulraMode: "Modo Ulra",
+  ulraModeHomeLabel: "Mostrar o modo Ulra na tela inicial",
+  ulraModeSettingsDescription:
+    "Permite a deliberação entre vários modelos quando pelo menos dois modelos da tela inicial estão prontos.",
+  ulraModeInfo:
+    "O modo Ulra consulta separadamente cada modelo pronto na tela inicial. Em cada rodada, todos os modelos analisam todas as respostas anteriores. O modelo selecionado sintetiza a resposta final. A deliberação é compartilhada com todos os provedores envolvidos.",
+  ulraModeRounds: "Rodadas de revisão",
+  ulraModeCallEstimate: ({ count }) =>
+    `Cerca de ${count} chamadas de modelo por mensagem com a configuração atual.`,
+  ulraModeThresholdWarning:
+    "Mais de 4 modelos ou 3 rodadas podem levar muito tempo, consumir muitos tokens e atingir limites de contexto ou taxa dos provedores. Isto é apenas um aviso.",
+  ulraModeFirstUseTitle: "Ativar o modo Ulra?",
+  ulraModeFirstUseMessage: ({ calls, models, rounds }) =>
+    `Com ${models} modelos e ${rounds} rodadas de revisão, uma mensagem pode fazer cerca de ${calls} chamadas de modelo. Pode demorar muito mais, custar bem mais e compartilhar a deliberação com todos os provedores envolvidos.`,
+  ulraModeHighRiskTitle: "Execução Ulra extensa",
+  ulraModeHighRiskMessage: ({ calls, models, rounds }) =>
+    `${models} modelos e ${rounds} rodadas de revisão podem fazer cerca de ${calls} chamadas de modelo. Isso pode levar muito tempo, usar muitos tokens e atingir limites dos provedores. Continuar mesmo assim?`,
+  ulraModeEnableAction: "Ativar",
   sttTabDescription:
     "Controle como a fala é capturada e qual back-end transforma o áudio em texto antes que ele chegue ao modelo.",
   ttsTabDescription:

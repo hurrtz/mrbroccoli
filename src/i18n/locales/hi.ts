@@ -122,6 +122,24 @@ export const hi = {
   useResponseMode: ({ mode }) => `${mode} का प्रयोग करें`,
   chooseResponseModel: "एक मॉडल चुनें",
   responseModelCount: ({ count }) => `${count} मॉडल उपलब्ध हैं`,
+  ulraMode: "Ulra मोड",
+  ulraModeHomeLabel: "होम स्क्रीन पर Ulra मोड दिखाएँ",
+  ulraModeSettingsDescription:
+    "जब होम स्क्रीन के कम से कम दो मॉडल तैयार हों, तब कई मॉडलों के बीच विचार-विमर्श की अनुमति देता है।",
+  ulraModeInfo:
+    "Ulra मोड पहले होम स्क्रीन के हर तैयार मॉडल से अलग-अलग उत्तर माँगता है। फिर हर समीक्षा दौर में सभी मॉडल पिछले सभी उत्तरों को देखते हैं। चुना गया मॉडल अंतिम उत्तर तैयार करता है। विचार-विमर्श सभी शामिल प्रदाताओं के साथ साझा किया जाता है।",
+  ulraModeRounds: "समीक्षा दौर",
+  ulraModeCallEstimate: ({ count }) =>
+    `मौजूदा सेटअप में प्रति संदेश लगभग ${count} मॉडल कॉल।`,
+  ulraModeThresholdWarning:
+    "4 से अधिक मॉडल या 3 से अधिक दौर बहुत समय ले सकते हैं, बहुत से टोकन खर्च कर सकते हैं और प्रदाता की कॉन्टेक्स्ट या दर सीमा तक पहुँच सकते हैं। यह केवल चेतावनी है।",
+  ulraModeFirstUseTitle: "Ulra मोड चालू करें?",
+  ulraModeFirstUseMessage: ({ calls, models, rounds }) =>
+    `${models} मॉडल और ${rounds} समीक्षा दौर के साथ एक संदेश लगभग ${calls} मॉडल कॉल कर सकता है। इसमें बहुत अधिक समय और लागत लग सकती है तथा विचार-विमर्श सभी शामिल प्रदाताओं के साथ साझा होगा।`,
+  ulraModeHighRiskTitle: "बड़ा Ulra मोड रन",
+  ulraModeHighRiskMessage: ({ calls, models, rounds }) =>
+    `${models} मॉडल और ${rounds} समीक्षा दौर लगभग ${calls} मॉडल कॉल कर सकते हैं। इसमें बहुत समय लग सकता है, बहुत से टोकन खर्च हो सकते हैं और प्रदाता सीमाएँ पूरी हो सकती हैं। फिर भी जारी रखें?`,
+  ulraModeEnableAction: "चालू करें",
   sttTabDescription:
     "नियंत्रित करें कि भाषण कैसे कैप्चर किया जाता है और कौन सा बैकएंड मॉडल तक पहुंचने से पहले ऑडियो को टेक्स्ट में बदल देता है।",
   ttsTabDescription:

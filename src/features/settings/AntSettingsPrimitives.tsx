@@ -5,6 +5,7 @@ import {
   StyleSheet,
   Switch as NativeSwitch,
   Text,
+  TextInput,
   View,
   type StyleProp,
   type TextStyle,
@@ -671,6 +672,63 @@ export function AntSwitchRow({
         }
         ios_backgroundColor={colors.borderStrong}
         onValueChange={onChange}
+      />
+    </View>
+  );
+}
+
+export function AntNumberInputRow({
+  label,
+  value,
+  onChange,
+}: {
+  label: string;
+  value: number;
+  onChange: (value: number) => void;
+}) {
+  const { colors } = useTheme();
+  const [draft, setDraft] = React.useState(String(value));
+
+  React.useEffect(() => {
+    setDraft(String(value));
+  }, [value]);
+
+  const commit = () => {
+    const parsed = Number(draft);
+    if (Number.isSafeInteger(parsed) && parsed >= 1) {
+      onChange(parsed);
+      setDraft(String(parsed));
+      return;
+    }
+    setDraft(String(value));
+  };
+
+  return (
+    <View style={styles.numberInputRow}>
+      <Text style={[styles.switchLabel, { color: colors.text }]}>
+        {label}
+      </Text>
+      <TextInput
+        testID="settings-number-input"
+        accessibilityLabel={label}
+        keyboardType="number-pad"
+        inputMode="numeric"
+        returnKeyType="done"
+        selectTextOnFocus
+        value={draft}
+        onBlur={commit}
+        onChangeText={(nextValue) =>
+          setDraft(nextValue.replace(/[^0-9]/g, ""))
+        }
+        onSubmitEditing={commit}
+        style={[
+          styles.numberInput,
+          {
+            backgroundColor: colors.surface,
+            borderColor: colors.border,
+            color: colors.text,
+          },
+        ]}
       />
     </View>
   );

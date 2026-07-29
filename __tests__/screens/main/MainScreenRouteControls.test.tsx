@@ -15,6 +15,7 @@ jest.mock("@expo/vector-icons", () => ({
 
 const t = (key: string) =>
   ({
+    ulraMode: "Ulra Mode",
     webSearch: "Web Search",
   })[key] ?? key;
 
@@ -125,5 +126,47 @@ describe("MainScreenRouteControls", () => {
       StyleSheet.flatten(screen.getByTestId("route-controls-row").props.style)
         .marginTop,
     ).toBe(6);
+  });
+
+  it("shows the Ulra Mode switch on the portrait left side only", () => {
+    const onToggleUlraMode = jest.fn();
+    const screen = render(
+      <MainScreenRouteControls
+        colors={lightColors}
+        onToggleUlraMode={onToggleUlraMode}
+        onToggleWebSearchEnabled={jest.fn()}
+        t={t}
+        ulraModeActive
+        ulraModeAvailable
+        webSearchReady
+      />,
+    );
+
+    expect(
+      StyleSheet.flatten(screen.getByTestId("route-controls-row").props.style)
+        .justifyContent,
+    ).toBe("space-between");
+    expect(
+      screen.getByTestId("route-ulra-mode-container").props.accessibilityState,
+    ).toEqual({ checked: true });
+
+    fireEvent.press(screen.getByTestId("route-ulra-mode-label"));
+    expect(onToggleUlraMode).toHaveBeenCalledTimes(1);
+
+    screen.rerender(
+      <MainScreenRouteControls
+        colors={lightColors}
+        layout="landscape"
+        onToggleUlraMode={onToggleUlraMode}
+        onToggleWebSearchEnabled={jest.fn()}
+        t={t}
+        ulraModeActive
+        ulraModeAvailable
+        webSearchReady
+      />,
+    );
+    expect(
+      screen.queryByTestId("route-ulra-mode-container"),
+    ).toBeNull();
   });
 });

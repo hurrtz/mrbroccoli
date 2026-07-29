@@ -184,6 +184,10 @@ export interface Settings {
   responseTone: AssistantResponseTone;
   showUsageStats: boolean;
   showDebugLogButton: boolean;
+  ulraModeEnabled: boolean;
+  ulraModeActive: boolean;
+  ulraModeRounds: number;
+  ulraModeWarningAcknowledged: boolean;
   webSearchMode: WebSearchMode;
   webSearchProvider: WebSearchProvider | null;
   webSearchProviderSettings: Record<WebSearchProvider, WebSearchProviderSettings>;
@@ -406,6 +410,10 @@ export const DEFAULT_SETTINGS: Settings = {
   responseTone: "professional",
   showUsageStats: false,
   showDebugLogButton: false,
+  ulraModeEnabled: true,
+  ulraModeActive: false,
+  ulraModeRounds: 2,
+  ulraModeWarningAcknowledged: false,
   webSearchMode: DEFAULT_WEB_SEARCH_MODE,
   webSearchProvider: null,
   webSearchProviderSettings: createDefaultWebSearchProviderSettings(),

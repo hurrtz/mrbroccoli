@@ -58,6 +58,9 @@ describe("useSettings", () => {
     expect(result.current.settings.showUsageStats).toBe(false);
     expect(result.current.settings.showDebugLogButton).toBe(false);
     expect(result.current.settings.showSetupGuideShortcut).toBe(true);
+    expect(result.current.settings.ulraModeEnabled).toBe(true);
+    expect(result.current.settings.ulraModeActive).toBe(false);
+    expect(result.current.settings.ulraModeRounds).toBe(2);
   });
 
   it("loads Drive Session and rejects unknown input modes", async () => {
@@ -102,6 +105,10 @@ describe("useSettings", () => {
       spokenRepliesEnabled: "yes",
       showUsageStats: 1,
       showDebugLogButton: "true",
+      ulraModeEnabled: "yes",
+      ulraModeActive: "yes",
+      ulraModeRounds: 0,
+      ulraModeWarningAcknowledged: "yes",
       ttsListenLanguages: ["fr", "unknown-language", "fr"],
     };
 
@@ -125,8 +132,48 @@ describe("useSettings", () => {
       spokenRepliesEnabled: DEFAULT_SETTINGS.spokenRepliesEnabled,
       showUsageStats: DEFAULT_SETTINGS.showUsageStats,
       showDebugLogButton: DEFAULT_SETTINGS.showDebugLogButton,
+      ulraModeEnabled: DEFAULT_SETTINGS.ulraModeEnabled,
+      ulraModeActive: DEFAULT_SETTINGS.ulraModeActive,
+      ulraModeRounds: DEFAULT_SETTINGS.ulraModeRounds,
+      ulraModeWarningAcknowledged:
+        DEFAULT_SETTINGS.ulraModeWarningAcknowledged,
       ttsListenLanguages: ["fr"],
     });
+  });
+
+  it("preserves large Ulra Mode rounds without imposing a product cap", async () => {
+    (AsyncStorage.getItem as jest.Mock).mockResolvedValueOnce(
+      JSON.stringify({
+        ...DEFAULT_SETTINGS,
+        ulraModeActive: true,
+        ulraModeEnabled: true,
+        ulraModeRounds: 10,
+        ulraModeWarningAcknowledged: true,
+      }),
+    );
+
+    const { result } = renderHook(() => useSettings());
+    await flushSettingsLoad();
+
+    expect(result.current.settings.ulraModeActive).toBe(true);
+    expect(result.current.settings.ulraModeRounds).toBe(10);
+    expect(result.current.settings.ulraModeWarningAcknowledged).toBe(true);
+  });
+
+  it("deactivates Ulra Mode when the feature is disabled", async () => {
+    (AsyncStorage.getItem as jest.Mock).mockResolvedValueOnce(
+      JSON.stringify({
+        ...DEFAULT_SETTINGS,
+        ulraModeActive: true,
+        ulraModeEnabled: false,
+      }),
+    );
+
+    const { result } = renderHook(() => useSettings());
+    await flushSettingsLoad();
+
+    expect(result.current.settings.ulraModeEnabled).toBe(false);
+    expect(result.current.settings.ulraModeActive).toBe(false);
   });
 
   it("loads saved settings from AsyncStorage", async () => {

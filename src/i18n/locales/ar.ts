@@ -122,6 +122,24 @@ export const ar = {
   useResponseMode: ({ mode }) => `استخدم ${mode}`,
   chooseResponseModel: "اختر نموذجًا",
   responseModelCount: ({ count }) => `موديلات ${count} متوفرة`,
+  ulraMode: "وضع Ulra",
+  ulraModeHomeLabel: "إظهار وضع Ulra على الشاشة الرئيسية",
+  ulraModeSettingsDescription:
+    "يتيح التشاور بين عدة نماذج عندما يكون نموذجان على الأقل من نماذج الشاشة الرئيسية جاهزين.",
+  ulraModeInfo:
+    "يسأل وضع Ulra أولاً كل نموذج جاهز على الشاشة الرئيسية بشكل مستقل. ثم يراجع كل نموذج جميع الإجابات السابقة في كل جولة. ويجمع النموذج المحدد الإجابة النهائية. تتم مشاركة محتوى التشاور مع جميع مزودي الخدمة المشاركين.",
+  ulraModeRounds: "جولات المراجعة",
+  ulraModeCallEstimate: ({ count }) =>
+    `نحو ${count} استدعاءً للنماذج لكل رسالة بالإعداد الحالي.`,
+  ulraModeThresholdWarning:
+    "قد يستغرق استخدام أكثر من 4 نماذج أو 3 جولات وقتًا طويلاً جدًا، ويستهلك رموزًا كثيرة، ويبلغ حدود السياق أو معدل الطلبات لدى المزودين. هذا تحذير فقط.",
+  ulraModeFirstUseTitle: "هل تريد تفعيل وضع Ulra؟",
+  ulraModeFirstUseMessage: ({ calls, models, rounds }) =>
+    `باستخدام ${models} نماذج و${rounds} جولات مراجعة، قد تنفذ الرسالة الواحدة نحو ${calls} استدعاءً للنماذج. قد تستغرق وقتًا أطول بكثير، وتكلف أكثر، وتشارك التشاور مع جميع المزودين المشاركين.`,
+  ulraModeHighRiskTitle: "تشغيل كبير لوضع Ulra",
+  ulraModeHighRiskMessage: ({ calls, models, rounds }) =>
+    `قد تنفذ ${models} نماذج و${rounds} جولات مراجعة نحو ${calls} استدعاءً للنماذج. قد يستغرق ذلك وقتًا طويلاً جدًا، ويستخدم رموزًا كثيرة، ويبلغ حدود المزودين. هل تريد المتابعة رغم ذلك؟`,
+  ulraModeEnableAction: "تفعيل",
   sttTabDescription:
     "التحكم في كيفية التقاط الكلام وأي واجهة خلفية تحول الصوت إلى نص قبل أن يصل إلى النموذج.",
   ttsTabDescription:

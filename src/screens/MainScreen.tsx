@@ -50,6 +50,7 @@ import { useProviderConnectionValidation } from "./main/useProviderConnectionVal
 import { useSetupGuideController } from "./main/useSetupGuideController";
 import { useTextTurnSubmitController } from "./main/useTextTurnSubmitController";
 import { useVoiceSessionController } from "./main/useVoiceSessionController";
+import { useUlraModeControl } from "./main/useUlraModeControl";
 
 export function MainScreen() {
   const { colors, isDark } = useTheme();
@@ -155,6 +156,12 @@ export function MainScreen() {
     webSearchReady,
   } = routeConfiguration;
   const isLandscape = width > height;
+  const ulraMode = useUlraModeControl({
+    availableModelCount: availableResponseModes.length,
+    settings,
+    t,
+    updateSettings,
+  });
   const showStyleChip = loaded && availableResponseModes.length > 0;
   const mainSurfaceVisible = !(
     drawerVisible ||
@@ -656,8 +663,11 @@ export function MainScreen() {
             t,
           }}
           routeControls={{
+            onToggleUlraMode: ulraMode.handleToggle,
             onToggleWebSearchEnabled: handleToggleWebSearch,
             t,
+            ulraModeActive: ulraMode.active,
+            ulraModeAvailable: ulraMode.available,
             webSearchEnabled: webSearchActive,
             webSearchReady,
           }}

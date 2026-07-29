@@ -121,6 +121,24 @@ export const ja = {
   useResponseMode: ({ mode }) => `${mode}を使用`,
   chooseResponseModel: "モデルを選択",
   responseModelCount: ({ count }) => `${count}件のモデルを利用できます`,
+  ulraMode: "Ulraモード",
+  ulraModeHomeLabel: "ホーム画面にUlraモードを表示",
+  ulraModeSettingsDescription:
+    "ホーム画面のモデルが2件以上使用可能なときに、複数モデルによる検討を有効にします。",
+  ulraModeInfo:
+    "Ulraモードは、まずホーム画面で使用可能な各モデルに個別に回答を求めます。その後、各レビューラウンドで全モデルがそれまでの全回答を確認します。選択中のモデルが最終回答をまとめます。検討内容は関係するすべてのプロバイダーと共有されます。",
+  ulraModeRounds: "レビューラウンド",
+  ulraModeCallEstimate: ({ count }) =>
+    `現在の設定では、1メッセージあたり約${count}回のモデル呼び出しです。`,
+  ulraModeThresholdWarning:
+    "モデルが4件を超える場合、またはラウンドが3回を超える場合、非常に時間がかかり、多くのトークンを消費し、プロバイダーのコンテキストやレート制限に達する可能性があります。これは警告のみです。",
+  ulraModeFirstUseTitle: "Ulraモードを有効にしますか？",
+  ulraModeFirstUseMessage: ({ calls, models, rounds }) =>
+    `${models}件のモデルと${rounds}回のレビューラウンドでは、1メッセージで約${calls}回のモデル呼び出しが行われる可能性があります。大幅に時間と費用が増え、検討内容が関係するすべてのプロバイダーと共有されます。`,
+  ulraModeHighRiskTitle: "大規模なUlraモード実行",
+  ulraModeHighRiskMessage: ({ calls, models, rounds }) =>
+    `${models}件のモデルと${rounds}回のレビューラウンドでは、約${calls}回のモデル呼び出しが行われる可能性があります。非常に時間がかかり、多くのトークンを使用し、プロバイダーの制限に達する場合があります。それでも続行しますか？`,
+  ulraModeEnableAction: "有効にする",
   sttTabDescription:
     "音声をキャプチャする方法と、モデルに到達する前に音声をテキストに変換するバックエンドを制御します。",
   ttsTabDescription:
