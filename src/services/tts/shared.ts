@@ -11,7 +11,11 @@ import {
 } from "../../constants/providers/runtimeManifest";
 import { translate } from "../../i18n";
 import { AppLanguage, Provider } from "../../types";
-import { extractProviderErrorMessage } from "../providerErrors";
+import {
+  classifyProviderHttpFailure,
+  extractProviderErrorMessage,
+  type ProviderFailureKind,
+} from "../providerErrors";
 
 export const PROVIDER_TTS_MAX_INPUT_CHARS = 3500;
 export const PROVIDER_TTS_TARGET_CHUNK_CHARS = 600;
@@ -48,18 +52,21 @@ export class TtsRequestError extends Error {
   readonly provider: Provider;
   readonly status: number;
   readonly inputTooLong: boolean;
+  readonly failureKind: ProviderFailureKind;
 
   constructor(params: {
     message: string;
     provider: Provider;
     status: number;
     inputTooLong: boolean;
+    failureKind: ProviderFailureKind;
   }) {
     super(params.message);
     this.name = "TtsRequestError";
     this.provider = params.provider;
     this.status = params.status;
     this.inputTooLong = params.inputTooLong;
+    this.failureKind = params.failureKind;
   }
 }
 
@@ -318,6 +325,12 @@ export function buildTtsRequestError(params: {
     provider: params.provider,
     status: params.status,
     inputTooLong,
+    failureKind: inputTooLong
+      ? "context"
+      : classifyProviderHttpFailure({
+          errorText: params.errorText,
+          status: params.status,
+        }),
     message: inputTooLong
       ? translate(params.language, "ttsReplyTooLong", {
           provider: PROVIDER_LABELS[params.provider],

@@ -1,6 +1,7 @@
 import {
   buildProviderHttpError,
   extractProviderErrorMessage,
+  ProviderRequestError,
   readSafeProviderErrorMessage,
 } from "../../src/services/providerErrors";
 
@@ -21,9 +22,7 @@ describe("extractProviderErrorMessage", () => {
     const json = JSON.stringify({
       error: { message: "Invalid API key provided" },
     });
-    expect(extractProviderErrorMessage(json)).toBe(
-      "Invalid API key provided",
-    );
+    expect(extractProviderErrorMessage(json)).toBe("Invalid API key provided");
   });
 
   it("extracts a top-level message field from JSON", () => {
@@ -38,9 +37,7 @@ describe("extractProviderErrorMessage", () => {
         { message: "Field 'input' is required" },
       ],
     });
-    expect(extractProviderErrorMessage(json)).toBe(
-      "Field 'model' is required",
-    );
+    expect(extractProviderErrorMessage(json)).toBe("Field 'model' is required");
   });
 
   it("extracts a string detail field used by speech providers", () => {
@@ -132,6 +129,78 @@ describe("buildProviderHttpError", () => {
 
     expect(error.message).toBe(
       "xAI had a temporary problem during reply generation. Try again shortly.",
+    );
+    expect(error).toEqual(
+      expect.objectContaining<Partial<ProviderRequestError>>({
+        failureKind: "capacity",
+        status: 400,
+      }),
+    );
+  });
+
+  it("distinguishes exhausted plan quota from transient rate limiting", () => {
+    const error = buildProviderHttpError({
+      provider: "gemini",
+      language: "en",
+      status: 429,
+      errorText: JSON.stringify({
+        error: {
+          message:
+            "You exceeded your current quota. Please check your plan and billing details.",
+        },
+      }),
+      action: "web-search",
+    });
+
+    expect(error).toEqual(
+      expect.objectContaining<Partial<ProviderRequestError>>({
+        failureKind: "quota",
+        status: 429,
+      }),
+    );
+    expect(error.message).toContain("sufficient API credit");
+  });
+
+  it("marks retired model responses as safe for model failover", () => {
+    const error = buildProviderHttpError({
+      provider: "gemini",
+      language: "en",
+      status: 404,
+      errorText: JSON.stringify({
+        error: {
+          message: "Model gemini-old is not found or is no longer available.",
+        },
+      }),
+      action: "transcription",
+    });
+
+    expect(error).toEqual(
+      expect.objectContaining<Partial<ProviderRequestError>>({
+        failureKind: "model-unavailable",
+        status: 404,
+      }),
+    );
+  });
+
+  it("marks capability-incompatible models as safe for model failover", () => {
+    const error = buildProviderHttpError({
+      provider: "gemini",
+      language: "en",
+      status: 400,
+      errorText: JSON.stringify({
+        error: {
+          message:
+            "Model gemini-example does not support the requested tool.",
+        },
+      }),
+      action: "web-search",
+    });
+
+    expect(error).toEqual(
+      expect.objectContaining<Partial<ProviderRequestError>>({
+        failureKind: "model-unavailable",
+        status: 400,
+      }),
     );
   });
 });

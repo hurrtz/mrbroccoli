@@ -36,6 +36,15 @@ describe("runtime provider manifest integrity", () => {
       expect(llm.transport).not.toBe("none");
       expect(llm.models.length).toBeGreaterThan(0);
       expect(modelIds(llm.models)).toContain(llm.defaultModel);
+      expect(llm.fallbackModelIds.length).toBeGreaterThan(0);
+      expect(llm.fallbackModelIds).toEqual(
+        expect.arrayContaining([llm.defaultModel]),
+      );
+      expect(
+        llm.fallbackModelIds.every((model) =>
+          modelIds(llm.models).includes(model),
+        ),
+      ).toBe(true);
     },
   );
 
@@ -54,6 +63,14 @@ describe("runtime provider manifest integrity", () => {
       expect(stt.endpoint ?? stt.endpointBase).toBeTruthy();
       expect(stt.defaultModel).toBeTruthy();
       expect(modelIds(stt.models)).toContain(stt.defaultModel);
+      expect(stt.fallbackModelIds).toEqual(
+        expect.arrayContaining([stt.defaultModel]),
+      );
+      expect(
+        stt.fallbackModelIds?.every((model) =>
+          modelIds(stt.models).includes(model),
+        ),
+      ).toBe(true);
       expect(stt.languages?.length).toBeGreaterThan(0);
     },
   );
@@ -73,6 +90,14 @@ describe("runtime provider manifest integrity", () => {
       expect(tts.endpoint ?? tts.endpointBase).toBeTruthy();
       expect(tts.defaultModel).toBeTruthy();
       expect(modelIds(tts.models)).toContain(tts.defaultModel);
+      expect(tts.fallbackModelIds).toEqual(
+        expect.arrayContaining([tts.defaultModel]),
+      );
+      expect(
+        tts.fallbackModelIds?.every((model) =>
+          modelIds(tts.models).includes(model),
+        ),
+      ).toBe(true);
       expect(tts.languages?.length).toBeGreaterThan(0);
 
       if (tts.transport === "binary") {

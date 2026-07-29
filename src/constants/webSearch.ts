@@ -87,6 +87,32 @@ export const WEB_SEARCH_PROVIDER_MODELS: Record<WebSearchProvider, string> = {
   "moonshot-ai-kimi": "kimi-k2.6",
   perplexity: "sonar",
 };
+export const WEB_SEARCH_PROVIDER_MODEL_CANDIDATES: Record<
+  WebSearchProvider,
+  readonly string[]
+> = {
+  openai: ["gpt-5.6-sol", "gpt-5.5-2026-04-23", "gpt-4.1-mini-2025-04-14"],
+  anthropic: [
+    "claude-sonnet-5",
+    "claude-haiku-4-5-20251001",
+    "claude-sonnet-4-6",
+  ],
+  "alibaba-qwen-dashscope": [
+    "qwen3.7-plus-2026-05-26",
+    "qwen3.6-flash-2026-04-16",
+    "qwen3.5-flash-2026-02-23",
+  ],
+  "bytedance-doubao-seed": [
+    "doubao-seed-2-1-turbo-260628",
+    "doubao-seed-2-0-lite-260428",
+    "doubao-seed-2-0-mini-260428",
+  ],
+  gemini: ["gemini-3.6-flash", "gemini-3.5-flash", "gemini-3.5-flash-lite"],
+  xai: ["grok-4.3", "grok-4.5"],
+  mistral: ["mistral-medium-3-5", "mistral-small-2603", "mistral-large-2512"],
+  "moonshot-ai-kimi": ["kimi-k2.6", "kimi-k3", "kimi-k2.7-code-highspeed"],
+  perplexity: ["sonar", "sonar-pro", "sonar-reasoning-pro"],
+};
 export const WEB_SEARCH_MAX_SOURCES = 5;
 export const WEB_SEARCH_RESULT_LIMIT = 5;
 export const WEB_SEARCH_TIMEOUT_MS_BY_PROVIDER: Record<
@@ -132,7 +158,9 @@ export function getWebSearchProviderModel(provider: WebSearchProvider) {
   return WEB_SEARCH_PROVIDER_MODELS[provider];
 }
 
-export function isWebSearchProvider(value: unknown): value is WebSearchProvider {
+export function isWebSearchProvider(
+  value: unknown,
+): value is WebSearchProvider {
   return (
     typeof value === "string" &&
     WEB_SEARCH_PROVIDER_IDS.includes(value as WebSearchProvider)

@@ -377,7 +377,7 @@ export function createVoicePipelineEventAdapter({
       const assistantMessage = addMessage({
         role: "assistant",
         content: fullText,
-        model,
+        model: metadata?.modelFailover?.actualModel ?? model,
         provider,
         usage,
         metadata: messageState.consumeAssistantMetadata(metadata),

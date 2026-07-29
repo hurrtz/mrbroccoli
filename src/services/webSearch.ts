@@ -5,6 +5,7 @@ import {
   type WebSearchProviderSettings,
   WEB_SEARCH_MAX_SOURCES,
   WEB_SEARCH_PROVIDER_KIND,
+  WEB_SEARCH_PROVIDER_MODEL_CANDIDATES,
   WEB_SEARCH_TIMEOUT_MS_BY_PROVIDER,
 } from "../constants/webSearch";
 import { PROVIDER_LABELS } from "../constants/models";
@@ -19,7 +20,9 @@ import { networkFetch } from "./networkFetch";
 import {
   buildProviderHttpError,
   normalizeProviderTransportError,
+  ProviderRequestError,
 } from "./providerErrors";
+import { executeProviderModelRequest } from "./providerResilience";
 
 export interface WebSearchResult {
   context: string;
@@ -37,6 +40,7 @@ interface WebSearchRequestParams {
   conversationSummary?: string;
   options?: WebSearchProviderSettings;
   maxOutputTokens?: number;
+  model?: string;
   abortSignal?: AbortSignal;
 }
 
@@ -82,6 +86,10 @@ function getValidationQuery(language: AppLanguage) {
   return getDefaultContentLanguageForLocale(language) === "de"
     ? "Wie spät ist es aktuell in UTC? Nutze eine verlässliche Webseite und antworte in einem kurzen Satz."
     : "What is the current UTC time? Use a reliable website and reply in one short sentence.";
+}
+
+function getRequestWebSearchModel(params: WebSearchRequestParams) {
+  return params.model?.trim() || getWebSearchProviderModel(params.provider);
 }
 
 function dedupeSources(sources: WebSearchSource[]) {
@@ -352,7 +360,8 @@ function extractAnthropicOutputText(data: unknown): string {
     return "";
   }
 
-  const content = "content" in data && Array.isArray(data.content) ? data.content : [];
+  const content =
+    "content" in data && Array.isArray(data.content) ? data.content : [];
 
   return content
     .flatMap((part) => {
@@ -382,7 +391,8 @@ function extractGeminiOutputText(data: unknown): string {
     return data.output_text.trim();
   }
 
-  const output = "output" in data && Array.isArray(data.output) ? data.output : [];
+  const output =
+    "output" in data && Array.isArray(data.output) ? data.output : [];
   const outputParts: string[] = [];
 
   for (const item of output) {
@@ -390,7 +400,8 @@ function extractGeminiOutputText(data: unknown): string {
       continue;
     }
 
-    const content = "content" in item && Array.isArray(item.content) ? item.content : [];
+    const content =
+      "content" in item && Array.isArray(item.content) ? item.content : [];
     for (const part of content) {
       if (
         part &&
@@ -408,7 +419,9 @@ function extractGeminiOutputText(data: unknown): string {
   }
 
   const candidates =
-    "candidates" in data && Array.isArray(data.candidates) ? data.candidates : [];
+    "candidates" in data && Array.isArray(data.candidates)
+      ? data.candidates
+      : [];
   const firstCandidate = candidates[0];
   const content =
     firstCandidate &&
@@ -453,7 +466,9 @@ function extractMistralOutputText(data: unknown): string {
     }
 
     const content =
-      "content" in output && Array.isArray(output.content) ? output.content : [];
+      "content" in output && Array.isArray(output.content)
+        ? output.content
+        : [];
 
     for (const chunk of content) {
       if (
@@ -542,7 +557,11 @@ async function fetchWithTimeout(
   if (abortSignal?.aborted) {
     throw abortSignal.reason instanceof Error
       ? abortSignal.reason
-      : new Error(typeof abortSignal.reason === "string" ? abortSignal.reason : "Aborted");
+      : new Error(
+          typeof abortSignal.reason === "string"
+            ? abortSignal.reason
+            : "Aborted",
+        );
   }
 
   abortSignal?.addEventListener("abort", handleAbort, { once: true });
@@ -564,7 +583,9 @@ async function fetchWithTimeout(
         throw abortSignal.reason instanceof Error
           ? abortSignal.reason
           : new Error(
-              typeof abortSignal.reason === "string" ? abortSignal.reason : "Aborted",
+              typeof abortSignal.reason === "string"
+                ? abortSignal.reason
+                : "Aborted",
             );
       }
     }
@@ -586,16 +607,19 @@ function buildWebSearchTimeoutError(
   provider: WebSearchProvider,
   language: AppLanguage,
 ) {
-  return new Error(
-    translate(language, "providerTemporaryError", {
+  return new ProviderRequestError({
+    action: "web-search",
+    failureKind: "timeout",
+    provider,
+    message: translate(language, "providerTemporaryError", {
       provider: PROVIDER_LABELS[provider],
       action: translate(language, "webSearchAction"),
     }),
-  );
+  });
 }
 
 async function searchWithOpenAi(params: WebSearchRequestParams) {
-  const model = getWebSearchProviderModel(params.provider);
+  const model = getRequestWebSearchModel(params);
   const maxOutputTokens = params.maxOutputTokens ?? 420;
   const normalizedOptions = normalizeWebSearchProviderSettings(
     params.provider,
@@ -743,7 +767,7 @@ function buildChatMessages(params: WebSearchRequestParams) {
 }
 
 async function searchWithAnthropic(params: WebSearchRequestParams) {
-  const model = getWebSearchProviderModel(params.provider);
+  const model = getRequestWebSearchModel(params);
   const maxOutputTokens = params.maxOutputTokens ?? 420;
 
   return fetchJsonWebSearch(params, {
@@ -772,7 +796,7 @@ async function searchWithAnthropic(params: WebSearchRequestParams) {
 }
 
 async function searchWithQwen(params: WebSearchRequestParams) {
-  const model = getWebSearchProviderModel(params.provider);
+  const model = getRequestWebSearchModel(params);
   const maxOutputTokens = params.maxOutputTokens ?? 420;
 
   const response = await fetchJsonWebSearch(params, {
@@ -803,8 +827,11 @@ async function searchWithQwen(params: WebSearchRequestParams) {
   return response;
 }
 
-async function searchWithResponsesTool(params: WebSearchRequestParams, url: string) {
-  const model = getWebSearchProviderModel(params.provider);
+async function searchWithResponsesTool(
+  params: WebSearchRequestParams,
+  url: string,
+) {
+  const model = getRequestWebSearchModel(params);
   const maxOutputTokens = params.maxOutputTokens ?? 420;
 
   return fetchJsonWebSearch(params, {
@@ -826,7 +853,7 @@ async function searchWithResponsesTool(params: WebSearchRequestParams, url: stri
 }
 
 async function searchWithGemini(params: WebSearchRequestParams) {
-  const model = getWebSearchProviderModel(params.provider);
+  const model = getRequestWebSearchModel(params);
 
   return fetchJsonWebSearch(params, {
     url: "https://generativelanguage.googleapis.com/v1beta/interactions",
@@ -864,7 +891,7 @@ function getXaiMaxTurns(params: WebSearchRequestParams) {
 }
 
 async function searchWithXai(params: WebSearchRequestParams) {
-  const model = getWebSearchProviderModel(params.provider);
+  const model = getRequestWebSearchModel(params);
   const maxOutputTokens = params.maxOutputTokens ?? 420;
 
   const response = await fetchJsonWebSearch(params, {
@@ -898,7 +925,7 @@ async function searchWithXai(params: WebSearchRequestParams) {
 }
 
 async function searchWithMistral(params: WebSearchRequestParams) {
-  const model = getWebSearchProviderModel(params.provider);
+  const model = getRequestWebSearchModel(params);
 
   return fetchJsonWebSearch(params, {
     url: "https://api.mistral.ai/v1/conversations",
@@ -952,7 +979,7 @@ async function requestKimiChatCompletion(
   params: WebSearchRequestParams,
   messages: unknown[],
 ) {
-  const model = getWebSearchProviderModel(params.provider);
+  const model = getRequestWebSearchModel(params);
   const maxOutputTokens = params.maxOutputTokens ?? 420;
 
   return fetchJsonWebSearch(params, {
@@ -976,7 +1003,10 @@ async function requestKimiChatCompletion(
 
 async function searchWithKimi(params: WebSearchRequestParams) {
   const initialMessages = buildChatMessages(params);
-  const firstResponse = await requestKimiChatCompletion(params, initialMessages);
+  const firstResponse = await requestKimiChatCompletion(
+    params,
+    initialMessages,
+  );
   const toolCalls = getKimiToolCalls(firstResponse.data);
 
   if (toolCalls.length === 0) {
@@ -1017,7 +1047,7 @@ async function searchWithKimi(params: WebSearchRequestParams) {
 }
 
 async function searchWithPerplexity(params: WebSearchRequestParams) {
-  const model = getWebSearchProviderModel(params.provider);
+  const model = getRequestWebSearchModel(params);
   const maxOutputTokens = params.maxOutputTokens ?? 420;
   const response = await fetchWithTimeout(
     "https://api.perplexity.ai/chat/completions",
@@ -1068,7 +1098,7 @@ async function searchWithPerplexity(params: WebSearchRequestParams) {
   } satisfies RawWebSearchResponse;
 }
 
-async function requestWebSearch(params: WebSearchRequestParams) {
+async function requestWebSearchOnce(params: WebSearchRequestParams) {
   switch (params.provider) {
     case "openai":
       return searchWithOpenAi(params);
@@ -1094,6 +1124,22 @@ async function requestWebSearch(params: WebSearchRequestParams) {
     default:
       throw buildProviderNotWiredUpError(params.provider, params.language);
   }
+}
+
+async function requestWebSearch(params: WebSearchRequestParams) {
+  const result = await executeProviderModelRequest({
+    abortSignal: params.abortSignal,
+    candidateModels: WEB_SEARCH_PROVIDER_MODEL_CANDIDATES[params.provider],
+    capability: "web-search",
+    provider: params.provider,
+    request: (model) =>
+      requestWebSearchOnce({
+        ...params,
+        model,
+      }),
+  });
+
+  return result.value;
 }
 
 function normalizeGroundedAnswerResult(params: {
@@ -1194,7 +1240,10 @@ export async function searchWeb(
     event: "web-search-requested",
     payload: {
       model: getWebSearchProviderModel(params.provider),
-      options: normalizeWebSearchProviderSettings(params.provider, params.options),
+      options: normalizeWebSearchProviderSettings(
+        params.provider,
+        params.options,
+      ),
       provider: params.provider,
       queryLength: query.length,
     },
@@ -1254,7 +1303,10 @@ export async function searchWeb(
     event: "web-search-complete",
     payload: {
       model: result.model,
-      options: normalizeWebSearchProviderSettings(params.provider, params.options),
+      options: normalizeWebSearchProviderSettings(
+        params.provider,
+        params.options,
+      ),
       provider: result.provider,
       sourceCount: result.sources.length,
       summaryLength: result.summary.length,

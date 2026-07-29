@@ -44,7 +44,7 @@ describe("setupGuideSupport", () => {
       enabled: true,
       kind: "provider",
       provider: "gemini",
-      model: "gemini-3.5-flash",
+      model: "gemini-3.6-flash",
     });
     expect(routes.tts).toEqual(
       expect.objectContaining({

@@ -4,6 +4,7 @@ import {
   validateProviderConnection,
 } from "../../src/services/llm";
 import { requestRealtimeChatViaWebSocket } from "../../src/services/llm/providers/openaiRealtime";
+import { resetProviderModelHealthForTests } from "../../src/services/providerResilience";
 import { Message } from "../../src/types";
 global.fetch = jest.fn();
 
@@ -74,6 +75,7 @@ describe("streamChat", () => {
   beforeEach(() => {
     jest.clearAllMocks();
     MockWebSocket.instances = [];
+    resetProviderModelHealthForTests();
   });
 
   it("calls OpenAI chat completions for openai provider", async () => {
@@ -113,9 +115,7 @@ describe("streamChat", () => {
     const stream = new ReadableStream({
       start(controller) {
         controller.enqueue(
-          encoder.encode(
-            'data: {"choices":[{"delta":{"content":"Hi"}}]}\n\n',
-          ),
+          encoder.encode('data: {"choices":[{"delta":{"content":"Hi"}}]}\n\n'),
         );
         controller.enqueue(
           encoder.encode(
@@ -145,9 +145,7 @@ describe("streamChat", () => {
     });
 
     const [endpoint, request] = (fetch as jest.Mock).mock.calls[0];
-    expect(endpoint).toBe(
-      "https://openrouter.ai/api/v1/chat/completions",
-    );
+    expect(endpoint).toBe("https://openrouter.ai/api/v1/chat/completions");
     expect(request.headers).toEqual(
       expect.objectContaining({
         Authorization: "Bearer sk-or-v1-test",
@@ -165,10 +163,7 @@ describe("streamChat", () => {
         },
       }),
     );
-    expect(onDone).toHaveBeenCalledWith(
-      "Hi",
-      expect.any(Object),
-      {
+    expect(onDone).toHaveBeenCalledWith("Hi", expect.any(Object), {
         router: {
           gateway: "OpenRouter",
           requestedModel: "openai/gpt-5.6-sol-20260709",
@@ -181,8 +176,7 @@ describe("streamChat", () => {
             compressedCount: 12,
           },
         },
-      },
-    );
+    });
   });
 
   it("does not expose or speak a provider marker echoed by the model", async () => {
@@ -910,6 +904,66 @@ describe("streamChat", () => {
       role: "user",
       parts: [{ text: "Hello" }],
     });
+  });
+
+  it("fails over before streaming and reports the actual reply model", async () => {
+    const encoder = new TextEncoder();
+    const stream = new ReadableStream({
+      start(controller) {
+        controller.enqueue(
+          encoder.encode(
+            'data: {"candidates":[{"content":{"parts":[{"text":"Recovered"}]},"finishReason":"STOP"}]}\n\n',
+          ),
+        );
+        controller.close();
+      },
+    });
+    (fetch as jest.Mock)
+      .mockResolvedValueOnce({
+        ok: false,
+        status: 404,
+        text: async () =>
+          JSON.stringify({
+            error: {
+              message:
+                "Model gemini-2.5-flash is not found or is no longer available.",
+            },
+          }),
+      })
+      .mockResolvedValueOnce({ ok: true, body: stream });
+    const onDone = jest.fn();
+    const onError = jest.fn();
+
+    await streamChat({
+      messages: mockMessages,
+      model: "gemini-2.5-flash",
+      provider: "gemini",
+      apiKey: "gemini-test-key",
+      assistantInstructions: "",
+      responseLength: "normal",
+      responseTone: "professional",
+      language: "en",
+      onChunk: jest.fn(),
+      onDone,
+      onError,
+    });
+
+    expect((fetch as jest.Mock).mock.calls.map(([url]) => url)).toEqual([
+      "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:streamGenerateContent?alt=sse",
+      "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:streamGenerateContent?alt=sse",
+    ]);
+    expect(onDone).toHaveBeenCalledWith(
+      "Recovered",
+      expect.any(Object),
+      expect.objectContaining({
+        modelFailover: {
+          actualModel: "gemini-3.6-flash",
+          attempts: 2,
+          requestedModel: "gemini-2.5-flash",
+        },
+      }),
+    );
+    expect(onError).not.toHaveBeenCalled();
   });
 
   it("rejects a truncated Gemini stream instead of persisting partial text", async () => {
@@ -1748,6 +1802,7 @@ describe("generateConversationTitle", () => {
 describe("validateProviderConnection", () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    resetProviderModelHealthForTests();
   });
 
   it("checks the selected provider and model with a lightweight chat request", async () => {

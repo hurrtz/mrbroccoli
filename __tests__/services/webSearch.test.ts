@@ -8,9 +8,11 @@ import {
   type WebSearchProvider,
   WEB_SEARCH_PROVIDER_IDS,
   WEB_SEARCH_PROVIDER_KIND,
+  WEB_SEARCH_PROVIDER_MODEL_CANDIDATES,
   WEB_SEARCH_PROVIDER_MODELS,
   WEB_SEARCH_TIMEOUT_MS_BY_PROVIDER,
 } from "../../src/constants/webSearch";
+import { resetProviderModelHealthForTests } from "../../src/services/providerResilience";
 
 jest.mock("../../src/services/debugLogCapture", () => ({
   recordDebugLogEvent: jest.fn(),
@@ -25,6 +27,7 @@ function fetchBody(callIndex = 0) {
 describe("webSearch", () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    resetProviderModelHealthForTests();
   });
 
   it("keeps raw search vendors removed while exposing native search-capable LLM providers", () => {
@@ -51,6 +54,9 @@ describe("webSearch", () => {
 
     for (const provider of WEB_SEARCH_PROVIDER_IDS) {
       expect(WEB_SEARCH_PROVIDER_MODELS[provider]).toBeTruthy();
+      expect(WEB_SEARCH_PROVIDER_MODEL_CANDIDATES[provider][0]).toBe(
+        WEB_SEARCH_PROVIDER_MODELS[provider],
+      );
       expect(WEB_SEARCH_PROVIDER_KIND[provider]).toBe("grounded-answer");
       expect(WEB_SEARCH_TIMEOUT_MS_BY_PROVIDER[provider]).toBeGreaterThan(0);
       expect(DEFAULT_WEB_SEARCH_PROVIDER_SETTINGS[provider]).toEqual(
@@ -119,6 +125,81 @@ describe("webSearch", () => {
       }),
     );
     expect(result?.context).toContain("Does Mars have water ice?");
+  });
+
+  it("fails over to another search-capable model after a model retirement", async () => {
+    (fetch as jest.Mock)
+      .mockResolvedValueOnce({
+        ok: false,
+        status: 404,
+        text: async () =>
+          JSON.stringify({
+            error: {
+              message:
+                "Model gemini-3.6-flash is not found or is no longer available.",
+            },
+          }),
+      })
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          output: [
+            {
+              type: "model_output",
+              content: [
+                {
+                  text: "Recovered current answer.",
+                  annotations: [
+                    {
+                      title: "Recovered source",
+                      url: "https://example.com/recovered",
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        }),
+      });
+
+    const result = await searchWeb({
+      provider: "gemini",
+      apiKey: "gemini-test",
+      language: "en",
+      query: "What changed today?",
+    });
+
+    expect(
+      (fetch as jest.Mock).mock.calls.map(
+        ([, options]) => JSON.parse(options.body).model,
+      ),
+    ).toEqual(["gemini-3.6-flash", "gemini-3.5-flash"]);
+    expect(result?.model).toBe("gemini-3.5-flash");
+  });
+
+  it("does not hide exhausted search quota by rotating models", async () => {
+    (fetch as jest.Mock).mockResolvedValueOnce({
+      ok: false,
+      status: 429,
+      text: async () =>
+        JSON.stringify({
+          error: {
+            message:
+              "You exceeded your current quota. Check your plan and billing details.",
+          },
+        }),
+    });
+
+    await expect(
+      searchWeb({
+        provider: "gemini",
+        apiKey: "gemini-test",
+        language: "en",
+        query: "What changed today?",
+      }),
+    ).rejects.toThrow("sufficient API credit");
+
+    expect(fetch).toHaveBeenCalledTimes(1);
   });
 
   it("uses a readable hostname when a provider only returns a citation URL", async () => {
@@ -231,7 +312,9 @@ describe("webSearch", () => {
         expect(body.tool_choice).toBe("required");
         expect(body.enable_thinking).toBe(false);
         expect(body).not.toHaveProperty("reasoning");
-        expect(body.input).toEqual(expect.stringContaining("What changed today?"));
+        expect(body.input).toEqual(
+          expect.stringContaining("What changed today?"),
+        );
       },
       expectedSummary: "Qwen web search found the current answer.",
       expectedSourceUrl: "https://example.com/qwen-search",
@@ -413,7 +496,7 @@ describe("webSearch", () => {
                       type: "builtin_function",
                       function: {
                         name: "$web_search",
-                        arguments: "{\"query\":\"current answer\"}",
+                        arguments: '{"query":"current answer"}',
                       },
                     },
                   ],
@@ -472,7 +555,7 @@ describe("webSearch", () => {
         expect.objectContaining({
           role: "tool",
           tool_call_id: "call_1",
-          content: "{\"query\":\"current answer\"}",
+          content: '{"query":"current answer"}',
         }),
       ]),
     );
@@ -501,7 +584,8 @@ describe("webSearch", () => {
             {
               message: {
                 role: "assistant",
-                content: "The latest Perseverance update confirms continued sampling activity.",
+                content:
+                  "The latest Perseverance update confirms continued sampling activity.",
               },
             },
           ],
@@ -593,9 +677,7 @@ describe("webSearch", () => {
   it.each([
     ["openai", "sk-test"],
     ["xai", "xai-test"],
-  ] as const)(
-    "rejects an ungrounded %s response",
-    async (provider, apiKey) => {
+  ] as const)("rejects an ungrounded %s response", async (provider, apiKey) => {
       (fetch as jest.Mock).mockResolvedValueOnce({
         ok: true,
         json: () =>
@@ -623,8 +705,7 @@ describe("webSearch", () => {
           query: "What happened today?",
         }),
       ).rejects.toThrow("returned a response without running web search");
-    },
-  );
+  });
 
   it("validates Qwen only after a completed web search call", async () => {
     (fetch as jest.Mock).mockResolvedValueOnce({

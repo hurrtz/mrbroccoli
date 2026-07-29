@@ -77,6 +77,7 @@ interface RuntimeLlmProviderManifest {
   transport: Exclude<RuntimeLlmTransport, "none">;
   endpoint?: string;
   defaultModel: string;
+  fallbackModelIds: string[];
   models: RuntimeModelSpec[];
   realtimeModelIds?: string[];
   realtimeTransport?: Exclude<RuntimeLlmTransport, "none">;
@@ -87,6 +88,7 @@ interface RuntimeLlmDisabledManifest {
   transport: "none";
   models: [];
   defaultModel?: string;
+  fallbackModelIds?: [];
 }
 
 type RuntimeLlmManifest =
@@ -98,6 +100,7 @@ interface RuntimeSttManifest {
   endpoint?: string;
   endpointBase?: string;
   defaultModel?: string;
+  fallbackModelIds?: string[];
   models: RuntimeModelSpec[];
   languages?: readonly SpeechLanguage[];
   languageNote?: string;
@@ -110,6 +113,7 @@ interface RuntimeTtsManifest {
   endpointBase?: string;
   requestFormat?: RuntimeTtsBinaryRequestFormat;
   defaultModel?: string;
+  fallbackModelIds?: string[];
   models: RuntimeModelSpec[];
   languages?: readonly SpeechLanguage[];
   defaultVoice?: string;
@@ -543,6 +547,11 @@ export const RUNTIME_PROVIDER_MANIFEST: Record<
       transport: "openai-compatible",
       endpoint: "https://api.openai.com/v1/chat/completions",
       defaultModel: "gpt-5.6-sol",
+      fallbackModelIds: [
+        "gpt-5.6-sol",
+        "gpt-5.5-2026-04-23",
+        "gpt-4.1-mini-2025-04-14",
+      ],
       realtimeModelIds: ["gpt-realtime-2.1", "gpt-realtime-2.1-mini"],
       realtimeTransport: "openai-realtime",
       models: [
@@ -585,6 +594,11 @@ export const RUNTIME_PROVIDER_MANIFEST: Record<
       transport: "multipart",
       endpoint: "https://api.openai.com/v1/audio/transcriptions",
       defaultModel: "gpt-4o-mini-transcribe",
+      fallbackModelIds: [
+        "gpt-4o-mini-transcribe",
+        "gpt-4o-transcribe",
+        "whisper-1",
+      ],
       models: catalogModelSpecs("openai", "stt"),
       languages: [
         "en",
@@ -615,6 +629,7 @@ export const RUNTIME_PROVIDER_MANIFEST: Record<
       endpoint: "https://api.openai.com/v1/audio/speech",
       requestFormat: "openai-speech",
       defaultModel: "gpt-4o-mini-tts",
+      fallbackModelIds: ["gpt-4o-mini-tts", "tts-1", "tts-1-hd"],
       defaultVoice: "alloy",
       voiceFallback: "alloy",
       models: [
@@ -676,12 +691,14 @@ export const RUNTIME_PROVIDER_MANIFEST: Record<
       transport: "openai-compatible",
       endpoint: "https://openrouter.ai/api/v1/chat/completions",
       defaultModel: "openai/gpt-5.6-sol-20260709",
+      fallbackModelIds: [
+        "openai/gpt-5.6-sol-20260709",
+        "google/gemini-3.6-flash-20260721",
+        "anthropic/claude-sonnet-5-20260630",
+      ],
       models: [
         withEffort(
-          namedModel(
-            "openai/gpt-5.6-sol-20260709",
-            "OpenAI · GPT-5.6 Sol",
-          ),
+          namedModel("openai/gpt-5.6-sol-20260709", "OpenAI · GPT-5.6 Sol"),
           OPENROUTER_FULL_REASONING_EFFORT,
         ),
         withEffort(
@@ -724,10 +741,7 @@ export const RUNTIME_PROVIDER_MANIFEST: Record<
           OPENROUTER_DEEPSEEK_REASONING_EFFORT,
         ),
         withEffort(
-          namedModel(
-            "moonshotai/kimi-k3-20260715",
-            "Moonshot · Kimi K3",
-          ),
+          namedModel("moonshotai/kimi-k3-20260715", "Moonshot · Kimi K3"),
           effortConfig("reasoning-effort", "high", ["low", "high", "max"]),
         ),
         withEffort(
@@ -737,10 +751,7 @@ export const RUNTIME_PROVIDER_MANIFEST: Record<
           ),
           OPENROUTER_MISTRAL_REASONING_EFFORT,
         ),
-        namedModel(
-          "qwen/qwen3.7-max-20260520",
-          "Qwen · Qwen3.7 Max",
-        ),
+        namedModel("qwen/qwen3.7-max-20260520", "Qwen · Qwen3.7 Max"),
       ],
     },
     stt: {
@@ -767,6 +778,11 @@ export const RUNTIME_PROVIDER_MANIFEST: Record<
       support: "provider",
       transport: "anthropic",
       defaultModel: "claude-sonnet-5",
+      fallbackModelIds: [
+        "claude-sonnet-5",
+        "claude-haiku-4-5-20251001",
+        "claude-sonnet-4-6",
+      ],
       models: [
         withEffort(
           namedModel("claude-sonnet-5", "Claude Sonnet 5"),
@@ -814,6 +830,11 @@ export const RUNTIME_PROVIDER_MANIFEST: Record<
       endpoint:
         "https://dashscope-intl.aliyuncs.com/compatible-mode/v1/chat/completions",
       defaultModel: "qwen3.6-flash-2026-04-16",
+      fallbackModelIds: [
+        "qwen3.6-flash-2026-04-16",
+        "qwen3.7-plus-2026-05-26",
+        "qwen3.5-flash-2026-02-23",
+      ],
       models: [
         withEffort(
           namedModel("qwen3.7-plus-2026-05-26", "Qwen3.7-Plus"),
@@ -855,6 +876,7 @@ export const RUNTIME_PROVIDER_MANIFEST: Record<
       endpoint:
         "https://dashscope-intl.aliyuncs.com/compatible-mode/v1/chat/completions",
       defaultModel: "qwen3-asr-flash",
+      fallbackModelIds: ["qwen3-asr-flash"],
       models: [model("qwen3-asr-flash")],
       languages: [
         "en",
@@ -880,6 +902,7 @@ export const RUNTIME_PROVIDER_MANIFEST: Record<
       endpoint:
         "https://dashscope-intl.aliyuncs.com/api/v1/services/aigc/multimodal-generation/generation",
       defaultModel: "qwen3-tts-flash",
+      fallbackModelIds: ["qwen3-tts-flash", "qwen3-tts-instruct-flash"],
       defaultVoice: "Cherry",
       voiceFallback: "Cherry",
       models: [
@@ -985,6 +1008,11 @@ export const RUNTIME_PROVIDER_MANIFEST: Record<
       transport: "openai-compatible",
       endpoint: "https://ark.cn-beijing.volces.com/api/v3/chat/completions",
       defaultModel: "doubao-seed-2-1-turbo-260628",
+      fallbackModelIds: [
+        "doubao-seed-2-1-turbo-260628",
+        "doubao-seed-2-0-lite-260428",
+        "doubao-seed-2-0-mini-260428",
+      ],
       models: [
         withEffort(
           namedModel("doubao-seed-2-1-turbo-260628", "Doubao Seed 2.1 Turbo"),
@@ -1033,6 +1061,11 @@ export const RUNTIME_PROVIDER_MANIFEST: Record<
       transport: "gemini-generate-content",
       endpoint: "https://generativelanguage.googleapis.com/v1beta",
       defaultModel: "gemini-3.6-flash",
+      fallbackModelIds: [
+        "gemini-3.6-flash",
+        "gemini-3.5-flash",
+        "gemini-3.5-flash-lite",
+      ],
       models: [
         withEffort(
           model("gemini-3.6-flash"),
@@ -1087,8 +1120,17 @@ export const RUNTIME_PROVIDER_MANIFEST: Record<
       support: "provider",
       transport: "google-speech",
       endpointBase: "https://generativelanguage.googleapis.com/v1beta/models",
-      defaultModel: "gemini-3.5-flash",
-      models: [namedModel("gemini-3.5-flash", "Gemini 3.5 Flash")],
+      defaultModel: "gemini-3.6-flash",
+      fallbackModelIds: [
+        "gemini-3.6-flash",
+        "gemini-3.5-flash",
+        "gemini-3.5-flash-lite",
+      ],
+      models: [
+        namedModel("gemini-3.6-flash", "Gemini 3.6 Flash"),
+        namedModel("gemini-3.5-flash", "Gemini 3.5 Flash"),
+        namedModel("gemini-3.5-flash-lite", "Gemini 3.5 Flash Lite"),
+      ],
       languages: [
         "en",
         "de",
@@ -1112,6 +1154,11 @@ export const RUNTIME_PROVIDER_MANIFEST: Record<
       transport: "gemini",
       endpointBase: "https://generativelanguage.googleapis.com/v1beta/models",
       defaultModel: "gemini-3.1-flash-tts-preview",
+      fallbackModelIds: [
+        "gemini-3.1-flash-tts-preview",
+        "gemini-2.5-flash-preview-tts",
+        "gemini-2.5-pro-preview-tts",
+      ],
       defaultVoice: "Kore",
       voiceFallback: "Kore",
       models: [
@@ -1222,6 +1269,7 @@ export const RUNTIME_PROVIDER_MANIFEST: Record<
       transport: "openai-compatible",
       endpoint: "https://api.x.ai/v1/chat/completions",
       defaultModel: "grok-4.5",
+      fallbackModelIds: ["grok-4.5", "grok-4.3"],
       models: [
         withEffort(model("grok-4.5"), XAI_GROK_45_EFFORT),
         withEffort(model("grok-4.3"), XAI_GROK_43_EFFORT),
@@ -1232,6 +1280,7 @@ export const RUNTIME_PROVIDER_MANIFEST: Record<
       transport: "xai-stt-rest",
       endpoint: "https://api.x.ai/v1/stt",
       defaultModel: "grok-stt",
+      fallbackModelIds: ["grok-stt"],
       models: catalogModelSpecs("xai", "stt", ["voice-agent-api"]),
       languages: [
         "en",
@@ -1255,6 +1304,7 @@ export const RUNTIME_PROVIDER_MANIFEST: Record<
       endpoint: "https://api.x.ai/v1/tts",
       requestFormat: "grok-speech",
       defaultModel: "text-to-speech",
+      fallbackModelIds: ["text-to-speech"],
       defaultVoice: "ara",
       voiceFallback: "ara",
       models: catalogModelSpecs("xai", "tts", ["grok-tts"]),
@@ -1298,6 +1348,7 @@ export const RUNTIME_PROVIDER_MANIFEST: Record<
       transport: "openai-compatible",
       endpoint: "https://api.deepseek.com/chat/completions",
       defaultModel: "deepseek-v4-flash",
+      fallbackModelIds: ["deepseek-v4-flash", "deepseek-v4-pro"],
       models: [
         withEffort(
           namedModel("deepseek-v4-flash", "DeepSeek V4 Flash"),
@@ -1334,6 +1385,11 @@ export const RUNTIME_PROVIDER_MANIFEST: Record<
       transport: "openai-compatible",
       endpoint: "https://api.mistral.ai/v1/chat/completions",
       defaultModel: "mistral-medium-3-5",
+      fallbackModelIds: [
+        "mistral-medium-3-5",
+        "mistral-small-2603",
+        "mistral-large-2512",
+      ],
       models: [
         withEffort(
           namedModel("mistral-medium-3-5", "Mistral Medium 3.5"),
@@ -1354,6 +1410,7 @@ export const RUNTIME_PROVIDER_MANIFEST: Record<
       transport: "multipart",
       endpoint: "https://api.mistral.ai/v1/audio/transcriptions",
       defaultModel: "voxtral-mini-2602",
+      fallbackModelIds: ["voxtral-mini-2602"],
       models: [namedModel("voxtral-mini-2602", "Voxtral Mini Transcribe 2")],
       languages: [
         "en",
@@ -1378,18 +1435,9 @@ export const RUNTIME_PROVIDER_MANIFEST: Record<
       endpoint: "https://api.mistral.ai/v1/audio/speech",
       requestFormat: "mistral-speech",
       defaultModel: "voxtral-mini-tts-2603",
+      fallbackModelIds: ["voxtral-mini-tts-2603"],
       models: [namedModel("voxtral-mini-tts-2603", "Voxtral Mini TTS 26.03")],
-      languages: [
-        "en",
-        "de",
-        "hi",
-        "es",
-        "fr",
-        "it",
-        "pt",
-        "pt-BR",
-        "ar",
-      ],
+      languages: ["en", "de", "hi", "es", "fr", "it", "pt", "pt-BR", "ar"],
       voiceOptions: [],
       voiceDirectory: "mistral",
       requiresVoice: true,
@@ -1416,6 +1464,7 @@ export const RUNTIME_PROVIDER_MANIFEST: Record<
       transport: "multipart",
       endpoint: "https://api.elevenlabs.io/v1/speech-to-text",
       defaultModel: "scribe_v2",
+      fallbackModelIds: ["scribe_v2"],
       models: [namedModel("scribe_v2", "Scribe v2")],
       languages: [
         "en",
@@ -1447,6 +1496,11 @@ export const RUNTIME_PROVIDER_MANIFEST: Record<
       endpoint: "https://api.elevenlabs.io/v1/text-to-speech",
       requestFormat: "elevenlabs-speech",
       defaultModel: "eleven_flash_v2_5",
+      fallbackModelIds: [
+        "eleven_flash_v2_5",
+        "eleven_multilingual_v2",
+        "eleven_v3",
+      ],
       defaultVoice: "21m00Tcm4TlvDq8ikWAM",
       voiceFallback: "21m00Tcm4TlvDq8ikWAM",
       models: [
@@ -1497,6 +1551,7 @@ export const RUNTIME_PROVIDER_MANIFEST: Record<
       transport: "openai-compatible",
       endpoint: "https://api.moonshot.ai/v1/chat/completions",
       defaultModel: "kimi-k3",
+      fallbackModelIds: ["kimi-k3", "kimi-k2.6", "kimi-k2.7-code-highspeed"],
       models: [
         withEffort(namedModel("kimi-k3", "Kimi K3"), KIMI_K3_EFFORT),
         namedModel("kimi-k2.7-code", "Kimi K2.7 Code"),
@@ -1530,6 +1585,7 @@ export const RUNTIME_PROVIDER_MANIFEST: Record<
       transport: "openai-compatible",
       endpoint: "https://api.perplexity.ai/chat/completions",
       defaultModel: "sonar",
+      fallbackModelIds: ["sonar", "sonar-pro", "sonar-reasoning-pro"],
       models: [
         model("sonar"),
         model("sonar-pro"),

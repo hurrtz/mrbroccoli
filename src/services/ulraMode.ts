@@ -228,7 +228,7 @@ export async function runUlraModeDeliberation(params: {
         return {
           entry: {
             modeId: route.modeId,
-            model: route.model,
+            model: result.model ?? route.model,
             participant,
             provider: route.provider,
             round,

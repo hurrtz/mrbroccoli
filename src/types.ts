@@ -295,6 +295,12 @@ export interface MessageRouterMetadata {
   };
 }
 
+export interface MessageModelFailoverMetadata {
+  actualModel: string;
+  attempts: number;
+  requestedModel: string;
+}
+
 export interface MessageTurnReceipt {
   version: 1;
   startedAt: string;
@@ -363,6 +369,7 @@ export interface MessageMetadata {
   notices?: MessagePipelineNotice[];
   providerState?: MessageProviderState;
   replyFailure?: MessageReplyFailureMetadata;
+  modelFailover?: MessageModelFailoverMetadata;
   router?: MessageRouterMetadata;
   turnReceipt?: MessageTurnReceipt;
 }

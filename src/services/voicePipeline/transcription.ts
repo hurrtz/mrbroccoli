@@ -10,6 +10,7 @@ interface ResolvePipelineTranscriptionParams {
   sttModel?: string;
   sttProvider?: Parameters<typeof transcribeAudio>[0]["provider"];
   transcriptionOverride?: string;
+  onModelResolved?: (model: string) => void;
 }
 
 export async function resolvePipelineTranscription({
@@ -22,6 +23,7 @@ export async function resolvePipelineTranscription({
   sttModel,
   sttProvider,
   transcriptionOverride,
+  onModelResolved,
 }: ResolvePipelineTranscriptionParams) {
   if (abortSignal?.aborted) {
     return null;
@@ -44,5 +46,6 @@ export async function resolvePipelineTranscription({
     language,
     speechLanguage,
     abortSignal,
+    onModelResolved,
   });
 }

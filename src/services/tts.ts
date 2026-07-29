@@ -160,6 +160,7 @@ export async function synthesizeSpeech(params: {
     provider,
     providerModel,
   });
+  let actualProviderModel = resolvedProviderModel;
 
   recordSpeechDiagnostic({
     requestId,
@@ -276,6 +277,12 @@ export async function synthesizeSpeech(params: {
       language,
       speechLanguage: resolvedSpeechLanguage,
       abortSignal,
+      onModelResolved: (model) => {
+        actualProviderModel = model;
+        if (diagnostics) {
+          diagnostics.providerModel = model;
+        }
+      },
     });
     recordSpeechDiagnostic({
       requestId,
@@ -284,7 +291,7 @@ export async function synthesizeSpeech(params: {
       requestedRoute: "provider",
       actualRoute: "provider",
       provider,
-      providerModel: resolvedProviderModel,
+      providerModel: actualProviderModel,
       voice: voice || null,
       textLength: text.trim().length,
     });

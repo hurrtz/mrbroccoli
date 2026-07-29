@@ -124,6 +124,13 @@ export async function runPipelineResponse({
             llmMetadata.router.contextCompression;
         }
       }
+      if (llmMetadata?.modelFailover) {
+        turnReceipt.actualRoute = {
+          ...turnReceipt.actualRoute,
+          model: llmMetadata.modelFailover.actualModel,
+          attempts: llmMetadata.modelFailover.attempts,
+        };
+      }
 
       const combinedUsage =
         usage || additionalUsage

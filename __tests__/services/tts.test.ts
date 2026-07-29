@@ -25,6 +25,7 @@ import {
   synthesizeSpeechSequence,
   TtsRequestError,
 } from "../../src/services/tts";
+import { resetProviderModelHealthForTests } from "../../src/services/providerResilience";
 
 global.fetch = jest.fn();
 
@@ -154,6 +155,7 @@ describe("splitTextForTts", () => {
 describe("synthesizeSpeech", () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    resetProviderModelHealthForTests();
   });
 
   it("generates a local Android dev WAV for the exact fake provider key", async () => {
@@ -197,6 +199,40 @@ describe("synthesizeSpeech", () => {
     expect(body.model).toBe("gpt-4o-mini-tts");
     expect(body.voice).toBe("alloy");
     expect(body.input).toBe("Hello world");
+  });
+
+  it("uses another model from the same TTS provider when the selected model is unavailable", async () => {
+    (fetch as jest.Mock)
+      .mockResolvedValueOnce({
+        ok: false,
+        status: 404,
+        text: async () =>
+          JSON.stringify({
+            error: {
+              message: "The model tts-1-hd is no longer available.",
+            },
+          }),
+      })
+      .mockResolvedValueOnce({
+        ok: true,
+        blob: () => Promise.resolve(new Blob(["fake-audio"])),
+      });
+
+    await synthesizeSpeech({
+      text: "Hello world",
+      voice: "alloy",
+      mode: "provider",
+      provider: "openai",
+      providerModel: "tts-1-hd",
+      apiKey: "sk-test",
+      language: "en",
+    });
+
+    expect(
+      (fetch as jest.Mock).mock.calls.map(
+        ([, options]) => JSON.parse(options.body).model,
+      ),
+    ).toEqual(["tts-1-hd", "gpt-4o-mini-tts"]);
   });
 
   it("sends delivery instructions to instruction-capable OpenAI TTS models", async () => {

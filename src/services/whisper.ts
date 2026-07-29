@@ -1,8 +1,6 @@
 import * as FileSystem from "expo-file-system/legacy";
 import { getCatalogConstraintsForAppProvider } from "../catalog/appProviders";
-import {
-  getStrictestCatalogMaxConstraint,
-} from "../catalog";
+import { getStrictestCatalogMaxConstraint } from "../catalog";
 import { PROVIDER_LABELS, getSttModelLabel } from "../constants/models";
 import { translate } from "../i18n";
 import { AppLanguage, Provider, SttBackendMode } from "../types";
@@ -25,6 +23,8 @@ import {
   transcribeWithOpenAiAudioInputProvider,
   transcribeWithXaiRestSttProvider,
 } from "./whisper/providers";
+import { getProviderModelCandidates } from "./providerModelCandidates";
+import { executeProviderModelRequest } from "./providerResilience";
 
 function isRemoteAudioSource(fileUri: string) {
   return /^(https?:\/\/|oss:\/\/)/i.test(fileUri);
@@ -76,6 +76,7 @@ export async function transcribeAudio(params: {
   language: AppLanguage;
   speechLanguage?: SttLanguage;
   abortSignal?: AbortSignal;
+  onModelResolved?: (model: string) => void;
 }): Promise<string | null> {
   const {
     fileUri,
@@ -86,6 +87,7 @@ export async function transcribeAudio(params: {
     language,
     speechLanguage = "auto",
     abortSignal,
+    onModelResolved,
   } = params;
 
   if (mode === "native") {
@@ -93,7 +95,9 @@ export async function transcribeAudio(params: {
   }
 
   if (!provider) {
-    throw new Error(translate(language, "chooseSpeechToTextProviderInSettings"));
+    throw new Error(
+      translate(language, "chooseSpeechToTextProviderInSettings"),
+    );
   }
 
   if (
@@ -114,116 +118,129 @@ export async function transcribeAudio(params: {
     await waitForRecordedFileReady(fileUri, language, abortSignal);
   }
 
-  const selectedModel = providerModel || "";
-  let config = getProviderSttConfig(provider, selectedModel);
-
-  if (!config) {
-    throw new Error(
-      translate(language, "sttNotSupportedYet", {
-        provider: PROVIDER_LABELS[provider],
-      }),
-    );
-  }
-
-  if (provider === "alibaba-qwen-dashscope") {
-    const region = parseQwenApiCredential(apiKey ?? "").region;
-
-    if (!qwenRegionSupportsAppSpeech(region)) {
-      throw new Error(translate(language, "qwenSpeechUnavailableInUs"));
-    }
-
-    if ("endpoint" in config) {
-      config = {
-        ...config,
-        endpoint: resolveQwenApiEndpoint(config.endpoint, apiKey ?? ""),
-      };
-    }
-  }
-
-  const resolvedModel = providerModel || config.defaultModel;
-
-  if (!remoteAudioSource) {
-    await assertSttUploadFitsCatalogLimits({
-      fileUri,
-      provider,
-      modelId: resolvedModel,
-      language,
-    });
-  }
-
-  if (config.kind === "openai-audio-input") {
-    return transcribeWithOpenAiAudioInputProvider({
-      abortSignal,
-      apiKey,
-      config,
-      fileUri,
-      language,
-      speechLanguage,
-      provider,
-      providerModel: resolvedModel,
-    });
-  }
-
-  if (config.kind === "bytedance-bigmodel-flash") {
-    return transcribeWithBytedanceBigmodelFlashProvider({
-      abortSignal,
-      apiKey,
-      config,
-      fileUri,
-      language,
-      speechLanguage,
-      provider,
-      providerModel: resolvedModel,
-    });
-  }
-
-  if (config.kind === "google-cloud-speech-v2") {
-    return transcribeWithGoogleCloudSpeechV2Provider({
-      abortSignal,
-      apiKey,
-      config,
-      fileUri,
-      language,
-      speechLanguage,
-      provider,
-      providerModel: resolvedModel,
-    });
-  }
-
-  if (config.kind === "google-speech") {
-    return transcribeWithGoogleSpeechProvider({
-      abortSignal,
-      apiKey,
-      config,
-      fileUri,
-      language,
-      speechLanguage,
-      provider,
-      providerModel: resolvedModel,
-    });
-  }
-
-  if (config.kind === "xai-stt-rest") {
-    return transcribeWithXaiRestSttProvider({
-      abortSignal,
-      apiKey,
-      config,
-      fileUri,
-      language,
-      speechLanguage,
-      provider,
-      providerModel: resolvedModel,
-    });
-  }
-
-  return transcribeWithMultipartProvider({
-    abortSignal,
-    apiKey,
-    config,
-    fileUri,
-    language,
-    speechLanguage,
+  const candidateModels = getProviderModelCandidates({
+    capability: "stt",
     provider,
-    providerModel: resolvedModel,
+    requestedModel: providerModel,
   });
+  const result = await executeProviderModelRequest({
+    abortSignal,
+    candidateModels,
+    capability: "stt",
+    provider,
+    request: async (resolvedModel) => {
+      let config = getProviderSttConfig(provider, resolvedModel);
+
+      if (!config) {
+        throw new Error(
+          translate(language, "sttNotSupportedYet", {
+            provider: PROVIDER_LABELS[provider],
+          }),
+        );
+      }
+
+      if (provider === "alibaba-qwen-dashscope") {
+        const region = parseQwenApiCredential(apiKey ?? "").region;
+
+        if (!qwenRegionSupportsAppSpeech(region)) {
+          throw new Error(translate(language, "qwenSpeechUnavailableInUs"));
+        }
+
+        if ("endpoint" in config) {
+          config = {
+            ...config,
+            endpoint: resolveQwenApiEndpoint(config.endpoint, apiKey ?? ""),
+          };
+        }
+      }
+
+      if (!remoteAudioSource) {
+        await assertSttUploadFitsCatalogLimits({
+          fileUri,
+          provider,
+          modelId: resolvedModel,
+          language,
+        });
+      }
+
+      if (config.kind === "openai-audio-input") {
+        return transcribeWithOpenAiAudioInputProvider({
+          abortSignal,
+          apiKey,
+          config,
+          fileUri,
+          language,
+          speechLanguage,
+          provider,
+          providerModel: resolvedModel,
+        });
+      }
+
+      if (config.kind === "bytedance-bigmodel-flash") {
+        return transcribeWithBytedanceBigmodelFlashProvider({
+          abortSignal,
+          apiKey,
+          config,
+          fileUri,
+          language,
+          speechLanguage,
+          provider,
+          providerModel: resolvedModel,
+        });
+      }
+
+      if (config.kind === "google-cloud-speech-v2") {
+        return transcribeWithGoogleCloudSpeechV2Provider({
+          abortSignal,
+          apiKey,
+          config,
+          fileUri,
+          language,
+          speechLanguage,
+          provider,
+          providerModel: resolvedModel,
+        });
+      }
+
+      if (config.kind === "google-speech") {
+        return transcribeWithGoogleSpeechProvider({
+          abortSignal,
+          apiKey,
+          config,
+          fileUri,
+          language,
+          speechLanguage,
+          provider,
+          providerModel: resolvedModel,
+        });
+      }
+
+      if (config.kind === "xai-stt-rest") {
+        return transcribeWithXaiRestSttProvider({
+          abortSignal,
+          apiKey,
+          config,
+          fileUri,
+          language,
+          speechLanguage,
+          provider,
+          providerModel: resolvedModel,
+        });
+      }
+
+      return transcribeWithMultipartProvider({
+        abortSignal,
+        apiKey,
+        config,
+        fileUri,
+        language,
+        speechLanguage,
+        provider,
+        providerModel: resolvedModel,
+      });
+    },
+  });
+
+  onModelResolved?.(result.actualModel);
+  return result.value;
 }

@@ -103,6 +103,9 @@ export async function runVoicePipeline(
         sttModel,
         sttProvider,
         transcriptionOverride,
+        onModelResolved: (actualModel) => {
+          turnReceipt.input.model = actualModel;
+        },
       });
     } catch (error) {
       retainCapturedAudio = Boolean(audioUri && !abortSignal?.aborted);

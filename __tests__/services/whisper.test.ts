@@ -1,6 +1,7 @@
 import * as FileSystem from "expo-file-system/legacy";
 import { transcribeAudio } from "../../src/services/whisper";
 import { getProviderSttTimeoutMs } from "../../src/services/whisper/config";
+import { resetProviderModelHealthForTests } from "../../src/services/providerResilience";
 
 global.fetch = jest.fn();
 
@@ -91,13 +92,13 @@ jest.mock("expo-file-system/legacy", () => ({
   readAsStringAsync: jest.fn((fileUri: string) =>
     Promise.resolve(
       fileUri.endsWith(".wav") ? mockBuildTestWavBase64() : "ZmFrZQ==",
-    )
+    ),
   ),
   getInfoAsync: jest.fn(() =>
     Promise.resolve({
       exists: true,
       size: 8192,
-    })
+    }),
   ),
 }));
 
@@ -112,6 +113,7 @@ describe("transcribeAudio", () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+    resetProviderModelHealthForTests();
     MockWebSocket.instances = [];
     (FileSystem.getInfoAsync as jest.Mock).mockResolvedValue({
       exists: true,
@@ -125,7 +127,7 @@ describe("transcribeAudio", () => {
   });
 
   it("returns a human-readable rate limit error for provider STT", async () => {
-    (fetch as jest.Mock).mockResolvedValueOnce({
+    (fetch as jest.Mock).mockResolvedValue({
       ok: false,
       status: 429,
       text: async () =>
@@ -143,15 +145,15 @@ describe("transcribeAudio", () => {
         provider: "openai",
         apiKey: "sk-test",
         language: "en",
-      })
+      }),
     ).rejects.toThrow(
-      "OpenAI is rate limiting speech transcription right now. Try again in a moment."
+      "OpenAI is rate limiting speech transcription right now. Try again in a moment.",
     );
   });
 
   it("returns a human-readable network error for provider STT", async () => {
-    (fetch as jest.Mock).mockRejectedValueOnce(
-      new TypeError("Network request failed")
+    (fetch as jest.Mock).mockRejectedValue(
+      new TypeError("Network request failed"),
     );
 
     await expect(
@@ -161,9 +163,9 @@ describe("transcribeAudio", () => {
         provider: "mistral",
         apiKey: "mistral-test",
         language: "en",
-      })
+      }),
     ).rejects.toThrow(
-      "Couldn't reach Mistral for speech transcription. Check the connection and try again."
+      "Couldn't reach Mistral for speech transcription. Check the connection and try again.",
     );
   });
 
@@ -247,7 +249,6 @@ describe("transcribeAudio", () => {
     );
   });
 
-
   it("does not expose the ByteDance bigmodel flash route as runtime STT", async () => {
     await expect(
       transcribeAudio({
@@ -308,6 +309,53 @@ describe("transcribeAudio", () => {
         ],
       }),
     );
+  });
+
+  it("retries an overloaded Gemini STT model and falls back to another audio-capable model", async () => {
+    const overloadedResponse = {
+      ok: false,
+      status: 503,
+      text: async () =>
+        JSON.stringify({
+          error: {
+            message: "The model is experiencing high demand.",
+          },
+        }),
+    };
+    (fetch as jest.Mock)
+      .mockResolvedValueOnce(overloadedResponse)
+      .mockResolvedValueOnce(overloadedResponse)
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          candidates: [
+            {
+              content: {
+                parts: [{ text: "Recovered transcription" }],
+              },
+            },
+          ],
+        }),
+      });
+    const onModelResolved = jest.fn();
+
+    const result = await transcribeAudio({
+      fileUri: "/tmp/recording.wav",
+      mode: "provider",
+      provider: "gemini",
+      providerModel: "gemini-3.5-flash",
+      apiKey: "gemini-test-key",
+      language: "en",
+      onModelResolved,
+    });
+
+    expect(result).toBe("Recovered transcription");
+    expect((fetch as jest.Mock).mock.calls.map(([url]) => url)).toEqual([
+      "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent",
+      "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent",
+      "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent",
+    ]);
+    expect(onModelResolved).toHaveBeenCalledWith("gemini-3.6-flash");
   });
 
   it("keeps Google Cloud Speech v2 working for Cloud-only credentials", async () => {
@@ -412,16 +460,6 @@ describe("transcribeAudio", () => {
     expect(fetch).not.toHaveBeenCalled();
   });
 
-
-
-
-
-
-
-
-
-
-
   it("uses the configured audio-input endpoint for DashScope short-file STT", async () => {
     (fetch as jest.Mock).mockResolvedValueOnce({
       ok: true,
@@ -476,15 +514,6 @@ describe("transcribeAudio", () => {
     expect(fetch).not.toHaveBeenCalled();
   });
 
-
-
-
-
-
-
-
-
-
   it("aborts before starting the provider request when the signal is already cancelled", async () => {
     const controller = new AbortController();
     controller.abort();
@@ -497,7 +526,7 @@ describe("transcribeAudio", () => {
         apiKey: "sk-test",
         language: "en",
         abortSignal: controller.signal,
-      })
+      }),
     ).rejects.toMatchObject({
       name: "AbortError",
     });
@@ -518,7 +547,7 @@ describe("transcribeAudio", () => {
         provider: "openai",
         apiKey: "sk-test",
         language: "en",
-      })
+      }),
     ).rejects.toThrow(/too long for .* speech-to-text \(max 25 MB\)/);
 
     expect(fetch).not.toHaveBeenCalled();

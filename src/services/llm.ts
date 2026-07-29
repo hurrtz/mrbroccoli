@@ -51,6 +51,11 @@ import {
   createResponseProvenanceStreamFilter,
   stripLeadingResponseProvenanceMarker,
 } from "./llm/messageProvenance";
+import { getProviderModelCandidates } from "./providerModelCandidates";
+import {
+  executeProviderModelRequest,
+  type ProviderModelRequestResult,
+} from "./providerResilience";
 
 export { buildSystemPrompt } from "./llm/prompts";
 
@@ -295,7 +300,7 @@ const LLM_STREAM_REQUESTERS = {
     }),
 } as const;
 
-async function requestChatText(params: {
+async function requestChatTextResolved(params: {
   messages: ChatMessage[];
   model: string;
   modelEffort?: string;
@@ -304,25 +309,56 @@ async function requestChatText(params: {
   language: AppLanguage;
   systemPrompt: string;
   abortSignal?: AbortSignal;
-}) {
-  const config = getLlmProviderConfigOrThrow(
-    params.provider,
-    params.model,
-    params.language,
-  );
+}): Promise<ProviderModelRequestResult<string>> {
+  return executeProviderModelRequest({
+    abortSignal: params.abortSignal,
+    candidateModels: getProviderModelCandidates({
+      capability: "llm",
+      provider: params.provider,
+      requestedModel: params.model,
+    }),
+    capability: "llm",
+    provider: params.provider,
+    request: async (model) => {
+      const requestParams = {
+        ...params,
+        model,
+      };
+      const config = getLlmProviderConfigOrThrow(
+        params.provider,
+        model,
+        params.language,
+      );
 
-  switch (config.transport) {
-    case "openai-compatible":
-      return LLM_TEXT_REQUESTERS["openai-compatible"](params, config);
-    case "gemini-generate-content":
-      return LLM_TEXT_REQUESTERS["gemini-generate-content"](params, config);
-    case "openai-realtime":
-      return LLM_TEXT_REQUESTERS["openai-realtime"](params);
-    case "anthropic":
-      return LLM_TEXT_REQUESTERS.anthropic(params);
-    default:
-      throw buildProviderNotWiredUpError(params.provider, params.language);
-  }
+      switch (config.transport) {
+        case "openai-compatible":
+          return LLM_TEXT_REQUESTERS["openai-compatible"](
+            requestParams,
+            config,
+          );
+        case "gemini-generate-content":
+          return LLM_TEXT_REQUESTERS["gemini-generate-content"](
+            requestParams,
+            config,
+          );
+        case "openai-realtime":
+          return LLM_TEXT_REQUESTERS["openai-realtime"](requestParams);
+        case "anthropic":
+          return LLM_TEXT_REQUESTERS.anthropic(requestParams);
+        default:
+          throw buildProviderNotWiredUpError(
+            params.provider,
+            params.language,
+          );
+      }
+    },
+  });
+}
+
+async function requestChatText(
+  params: Parameters<typeof requestChatTextResolved>[0],
+) {
+  return (await requestChatTextResolved(params)).value;
 }
 
 export async function generateInternalChat(params: {
@@ -339,12 +375,11 @@ export async function generateInternalChat(params: {
     role,
     content,
   }));
-  const text = (
-    await requestChatText({
-      ...params,
-      messages,
-    })
-  ).trim();
+  const resolved = await requestChatTextResolved({
+    ...params,
+    messages,
+  });
+  const text = resolved.value.trim();
 
   if (!text) {
     throw buildProviderEmptyReplyError(params.provider, params.language);
@@ -352,9 +387,10 @@ export async function generateInternalChat(params: {
 
   return {
     text,
+    model: resolved.actualModel,
     usage: estimateChatUsage({
       provider: params.provider,
-      model: params.model,
+      model: resolved.actualModel,
       kind: "reply",
       systemPrompt: params.systemPrompt,
       messages,
@@ -564,7 +600,7 @@ export async function streamChat({
 
   try {
     const requestMessages = addResponseProvenanceToMessages(messages, provider);
-    const systemPrompt = buildSystemPrompt({
+    const requestedSystemPrompt = buildSystemPrompt({
       assistantInstructions,
       responseLength,
       responseTone,
@@ -587,7 +623,7 @@ export async function streamChat({
           provider,
           model,
           kind: "reply",
-          systemPrompt,
+          systemPrompt: requestedSystemPrompt,
           messages,
           completionText: fullText,
         }),
@@ -595,7 +631,6 @@ export async function streamChat({
       return;
     }
 
-    const config = getLlmProviderConfigOrThrow(provider, model, language);
     const timeoutError = buildProviderReplyTimeoutError(provider, language);
     const requestAbortController = new AbortController();
     const provenanceStreamFilter =
@@ -612,6 +647,7 @@ export async function streamChat({
     }
 
     let rejectTimeout: ((reason?: unknown) => void) | null = null;
+    let receivedStreamData = false;
     const armTimeout = () => {
       if (timeoutId) {
         clearTimeout(timeoutId);
@@ -628,6 +664,7 @@ export async function streamChat({
         return;
       }
 
+      receivedStreamData = true;
       armTimeout();
     };
     const onChunkWithTimeout = (text: string) => {
@@ -639,80 +676,39 @@ export async function streamChat({
       provenanceStreamFilter.push(text);
     };
     const requestPromise = (async () => {
-      let fullText = "";
-      let replyMetadata: MessageMetadata | undefined;
-
-      switch (config.transport) {
-        case "openai-compatible":
-          fullText = await LLM_STREAM_REQUESTERS["openai-compatible"](
-            {
-              messages: requestMessages,
-              model,
-              modelEffort,
-              provider,
-              apiKey,
-              language,
-              systemPrompt,
-              onChunk: onChunkWithTimeout,
-              onStreamActivity,
-              onMistralAssistantContent: (content) => {
-                replyMetadata = {
-                  ...replyMetadata,
-                  providerState: {
-                    ...replyMetadata?.providerState,
-                    mistralAssistantContent: content,
-                  },
-                };
-              },
-              onKimiReasoningContent: (content) => {
-                replyMetadata = {
-                  ...replyMetadata,
-                  providerState: {
-                    ...replyMetadata?.providerState,
-                    kimiReasoningContent: content,
-                  },
-                };
-              },
-              onOpenRouterMetadata: (metadata) => {
-                replyMetadata = {
-                  ...replyMetadata,
-                  router: metadata,
-                };
-              },
-              abortSignal: requestAbortController.signal,
-            },
-            config,
+      return executeProviderModelRequest({
+        abortSignal: requestAbortController.signal,
+        canRetry: () => !receivedStreamData,
+        candidateModels: getProviderModelCandidates({
+          capability: "llm",
+          provider,
+          requestedModel: model,
+        }),
+        capability: "llm",
+        provider,
+        request: async (actualModel) => {
+          let fullText = "";
+          let replyMetadata: MessageMetadata | undefined;
+          const systemPrompt = buildSystemPrompt({
+            assistantInstructions,
+            responseLength,
+            responseTone,
+            language,
+            currentModel: actualModel,
+            currentProvider: provider,
+            conversationSummary,
+            spokenParagraphStreaming,
+            synthesisContext,
+            webSearchContext,
+          });
+          const config = getLlmProviderConfigOrThrow(
+            provider,
+            actualModel,
+            language,
           );
-          break;
-        case "gemini-generate-content":
-          fullText = await LLM_STREAM_REQUESTERS["gemini-generate-content"](
-            {
-              messages: requestMessages,
-              model,
-              modelEffort,
-              provider,
-              apiKey,
-              language,
-              systemPrompt,
-              onChunk: onChunkWithTimeout,
-              onGeminiAssistantContent: (content) => {
-                replyMetadata = {
-                  ...replyMetadata,
-                  providerState: {
-                    ...replyMetadata?.providerState,
-                    geminiAssistantContent: content,
-                  },
-                };
-              },
-              abortSignal: requestAbortController.signal,
-            },
-            config,
-          );
-          break;
-        case "openai-realtime":
-          fullText = await LLM_STREAM_REQUESTERS["openai-realtime"]({
+          const requestParams = {
             messages: requestMessages,
-            model,
+            model: actualModel,
             modelEffort,
             provider,
             apiKey,
@@ -720,42 +716,82 @@ export async function streamChat({
             systemPrompt,
             onChunk: onChunkWithTimeout,
             abortSignal: requestAbortController.signal,
-          });
-          break;
-        case "anthropic":
-          fullText = await LLM_STREAM_REQUESTERS.anthropic({
-            messages: requestMessages,
-            model,
-            modelEffort,
-            provider,
-            apiKey,
-            language,
-            systemPrompt,
-            onChunk: onChunkWithTimeout,
-            abortSignal: requestAbortController.signal,
-          });
-          break;
-        default:
-          fullText = await requestChatText({
-            messages: requestMessages,
-            model,
-            modelEffort,
-            provider,
-            apiKey,
-            language,
-            systemPrompt,
-            abortSignal: requestAbortController.signal,
-          });
+          };
 
-          if (fullText) {
-            onChunkWithTimeout(fullText);
+          switch (config.transport) {
+            case "openai-compatible":
+              fullText = await LLM_STREAM_REQUESTERS["openai-compatible"](
+                {
+                  ...requestParams,
+                  onStreamActivity,
+                  onMistralAssistantContent: (content) => {
+                    replyMetadata = {
+                      ...replyMetadata,
+                      providerState: {
+                        ...replyMetadata?.providerState,
+                        mistralAssistantContent: content,
+                      },
+                    };
+                  },
+                  onKimiReasoningContent: (content) => {
+                    replyMetadata = {
+                      ...replyMetadata,
+                      providerState: {
+                        ...replyMetadata?.providerState,
+                        kimiReasoningContent: content,
+                      },
+                    };
+                  },
+                  onOpenRouterMetadata: (metadata) => {
+                    replyMetadata = {
+                      ...replyMetadata,
+                      router: metadata,
+                    };
+                  },
+                },
+                config,
+              );
+              break;
+            case "gemini-generate-content":
+              fullText = await LLM_STREAM_REQUESTERS[
+                "gemini-generate-content"
+              ](
+                {
+                  ...requestParams,
+                  onGeminiAssistantContent: (content) => {
+                    replyMetadata = {
+                      ...replyMetadata,
+                      providerState: {
+                        ...replyMetadata?.providerState,
+                        geminiAssistantContent: content,
+                      },
+                    };
+                  },
+                },
+                config,
+              );
+              break;
+            case "openai-realtime":
+              fullText =
+                await LLM_STREAM_REQUESTERS["openai-realtime"](requestParams);
+              break;
+            case "anthropic":
+              fullText = await LLM_STREAM_REQUESTERS.anthropic(requestParams);
+              break;
+            default:
+              throw buildProviderNotWiredUpError(provider, language);
           }
-      }
 
-      return { fullText, replyMetadata };
+          return {
+            fullText,
+            replyMetadata,
+            systemPrompt,
+          };
+        },
+      });
     })().catch((error) => {
       if (timedOut) {
-        return { fullText: "", replyMetadata: undefined };
+        return null;
       }
 
       throw error;
@@ -765,15 +801,28 @@ export async function streamChat({
     });
 
     armTimeout();
-    const { fullText, replyMetadata } = await Promise.race([
+    const resolvedRequest = await Promise.race([
       requestPromise,
       timeoutPromise,
     ]);
 
-    if (timedOut) {
+    if (timedOut || !resolvedRequest) {
       return;
     }
 
+    const { actualModel, attempts, requestedModel, value } = resolvedRequest;
+    const { fullText, systemPrompt } = value;
+    let { replyMetadata } = value;
+    if (actualModel !== requestedModel || attempts > 1) {
+      replyMetadata = {
+        ...replyMetadata,
+        modelFailover: {
+          actualModel,
+          attempts,
+          requestedModel,
+        },
+      };
+    }
     const filteredFullText = stripLeadingResponseProvenanceMarker(fullText);
     provenanceStreamFilter.flush();
 
@@ -783,7 +832,7 @@ export async function streamChat({
 
     const usage = estimateChatUsage({
       provider,
-      model,
+      model: actualModel,
       kind: "reply",
       systemPrompt,
       messages: requestMessages,

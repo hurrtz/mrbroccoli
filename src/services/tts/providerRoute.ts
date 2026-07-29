@@ -3,7 +3,10 @@ import {
   providerRequiresTtsVoice,
   providerTtsModelSupportsInstructions,
 } from "../../constants/models";
-import { RuntimeTtsBinaryRequestFormat } from "../../constants/providers/runtimeManifest";
+import {
+  RUNTIME_PROVIDER_MANIFEST,
+  RuntimeTtsBinaryRequestFormat,
+} from "../../constants/providers/runtimeManifest";
 import { translate } from "../../i18n";
 import { AppLanguage, Provider } from "../../types";
 import type { SpeechLanguage } from "../../types";
@@ -33,6 +36,8 @@ import {
   writeBlobAudioFile,
   writeBase64AudioFile,
 } from "./shared";
+import { getProviderModelCandidates } from "../providerModelCandidates";
+import { executeProviderModelRequest } from "../providerResilience";
 
 const TTS_RETRY_DELAYS_MS = [400, 1200];
 
@@ -56,7 +61,11 @@ function isRetryableTtsTransportError(error: unknown) {
   }
 
   if (error instanceof TtsRequestError) {
-    return error.status === 429 || error.status >= 500;
+    return (
+      error.failureKind === "capacity" ||
+      error.failureKind === "rate-limit" ||
+      error.failureKind === "server"
+    );
   }
 
   const normalized = error.message.toLowerCase();
@@ -136,8 +145,7 @@ function buildBinaryTtsRequestBody(params: {
 }) {
   switch (params.requestFormat) {
     case "elevenlabs-speech": {
-      const supportsRequestStitching =
-        params.selectedModel !== "eleven_v3";
+      const supportsRequestStitching = params.selectedModel !== "eleven_v3";
       const supportsLanguageCode =
         params.selectedModel !== "eleven_multilingual_v2";
       return {
@@ -145,8 +153,7 @@ function buildBinaryTtsRequestBody(params: {
         model_id: params.selectedModel,
         ...(supportsLanguageCode
           ? {
-              language_code:
-                getSpeechLanguageDefinition(params.speechLanguage)
+              language_code: getSpeechLanguageDefinition(params.speechLanguage)
                   .providerCode,
             }
           : {}),
@@ -162,8 +169,8 @@ function buildBinaryTtsRequestBody(params: {
       return {
         text: params.text,
         voice_id: params.selectedVoice,
-        language:
-          getSpeechLanguageDefinition(params.speechLanguage).xaiTtsLocale,
+        language: getSpeechLanguageDefinition(params.speechLanguage)
+          .xaiTtsLocale,
       };
     case "mistral-speech":
       return {
@@ -178,9 +185,7 @@ function buildBinaryTtsRequestBody(params: {
         model: params.selectedModel,
         voice: params.selectedVoice,
         input: params.text,
-        ...(params.instructions
-          ? { instructions: params.instructions }
-          : {}),
+        ...(params.instructions ? { instructions: params.instructions } : {}),
         response_format: "mp3",
       };
   }
@@ -252,6 +257,18 @@ function getBinaryTtsVoice(params: {
   return params.selectedVoice;
 }
 
+function ttsVoiceSupportsModel(
+  provider: Provider,
+  voiceId: string,
+  modelId: string,
+) {
+  const voice = RUNTIME_PROVIDER_MANIFEST[provider].tts.voiceOptions.find(
+    (option) => option.id === voiceId,
+  );
+
+  return !voice?.modelIds || voice.modelIds.includes(modelId);
+}
+
 export async function synthesizeProviderSpeech(params: {
   text: string;
   voice: string;
@@ -264,6 +281,7 @@ export async function synthesizeProviderSpeech(params: {
   previousText?: string;
   nextText?: string;
   abortSignal?: AbortSignal;
+  onModelResolved?: (model: string) => void;
 }) {
   const {
     text,
@@ -272,12 +290,12 @@ export async function synthesizeProviderSpeech(params: {
     providerModel,
     apiKey,
     language,
-    speechLanguage =
-      getDefaultTtsListenLanguageForLocale(language),
+    speechLanguage = getDefaultTtsListenLanguageForLocale(language),
     instructions,
     previousText,
     nextText,
     abortSignal,
+    onModelResolved,
   } = params;
   const config = TTS_PROVIDER_CONFIGS[provider];
   const timeoutMs = getProviderTtsTimeoutMs(text, provider);
@@ -320,195 +338,216 @@ export async function synthesizeProviderSpeech(params: {
     );
   }
 
-  const selectedModel = getSelectedProviderModel({
+  const requestedModel = getSelectedProviderModel({
     provider,
     providerModel,
     config,
   });
-  const selectedInstructions =
-    instructions?.trim() &&
-    providerTtsModelSupportsInstructions(provider, selectedModel)
-      ? instructions.trim()
-      : "";
+  const candidateModels = getProviderModelCandidates({
+    capability: "tts",
+    provider,
+    requestedModel,
+    isCompatible: (model) =>
+      ttsVoiceSupportsModel(provider, selectedVoice, model),
+  });
+  const result = await executeProviderModelRequest({
+    abortSignal,
+    candidateModels,
+    capability: "tts",
+    // Each individual HTTP operation already retries transient failures. The
+    // shared layer owns model failover after those retries are exhausted.
+    maxSameModelRetries: 0,
+    provider,
+    request: async (selectedModel) => {
+      const selectedInstructions =
+        instructions?.trim() &&
+        providerTtsModelSupportsInstructions(provider, selectedModel)
+          ? instructions.trim()
+          : "";
 
-  if (config.kind === "gemini") {
-    const response = await fetchTtsWithRetries({
-      input: `${config.endpointBase}/${selectedModel}:generateContent`,
-      init: {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "x-goog-api-key": requireProviderKey(provider, apiKey, language),
-        },
-        body: JSON.stringify({
-          contents: [
-            {
-              parts: [
+      if (config.kind === "gemini") {
+        const response = await fetchTtsWithRetries({
+          input: `${config.endpointBase}/${selectedModel}:generateContent`,
+          init: {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "x-goog-api-key": requireProviderKey(provider, apiKey, language),
+            },
+            body: JSON.stringify({
+              contents: [
                 {
-                  text: buildGeminiTtsPrompt(
-                    text,
-                    selectedInstructions,
-                    speechLanguage,
-                  ),
+                  parts: [
+                    {
+                      text: buildGeminiTtsPrompt(
+                        text,
+                        selectedInstructions,
+                        speechLanguage,
+                      ),
+                    },
+                  ],
                 },
               ],
-            },
-          ],
-          generationConfig: {
-            responseModalities: ["AUDIO"],
-            speechConfig: {
-              voiceConfig: {
-                prebuiltVoiceConfig: {
-                  voiceName: selectedVoice,
+              generationConfig: {
+                responseModalities: ["AUDIO"],
+                speechConfig: {
+                  voiceConfig: {
+                    prebuiltVoiceConfig: {
+                      voiceName: selectedVoice,
+                    },
+                  },
                 },
               },
+            }),
+          },
+          timeoutMs,
+          provider,
+          language,
+          abortSignal,
+        });
+
+        const data = await response.json();
+        const audioPart = getGeminiAudioPart(data);
+        const pcmBase64 = audioPart?.data;
+
+        if (!pcmBase64) {
+          throw new Error(
+            translate(language, "ttsDidNotReturnAudio", {
+              provider: PROVIDER_LABELS[provider],
+            }),
+          );
+        }
+
+        const mimeType = audioPart?.mimeType as string | undefined;
+        const sampleRate = Number(mimeType?.match(/rate=(\d+)/i)?.[1]) || 24000;
+        return buildWavAudioFileFromPcm({
+          pcmBase64,
+          sampleRate,
+          language,
+        });
+      }
+
+      if (config.kind === "dashscope") {
+        const response = await fetchTtsWithRetries({
+          input:
+            provider === "alibaba-qwen-dashscope"
+              ? resolveQwenApiEndpoint(config.endpoint, apiKey ?? "")
+              : config.endpoint,
+          init: {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${requireProviderKey(provider, apiKey, language)}`,
             },
+            body: JSON.stringify({
+              model: selectedModel,
+              input: {
+                text,
+                voice: selectedVoice,
+                ...(getSpeechLanguageDefinition(speechLanguage).qwenTtsLanguage
+                  ? {
+                      language_type:
+                        getSpeechLanguageDefinition(speechLanguage)
+                          .qwenTtsLanguage,
+                    }
+                  : {}),
+                ...(selectedInstructions
+                  ? { instructions: selectedInstructions }
+                  : {}),
+              },
+            }),
           },
-        }),
-      },
-      timeoutMs,
-      provider,
-      language,
-      abortSignal,
-    });
+          timeoutMs,
+          provider,
+          language,
+          abortSignal,
+        });
 
-    const data = await response.json();
-    const audioPart = getGeminiAudioPart(data);
-    const pcmBase64 = audioPart?.data;
+        const data = await response.json();
+        const audioUrl = getDashScopeAudioUrl(data);
 
-    if (!pcmBase64) {
-      throw new Error(
-        translate(language, "ttsDidNotReturnAudio", {
-          provider: PROVIDER_LABELS[provider],
-        }),
-      );
-    }
+        if (!audioUrl) {
+          throw new Error(
+            translate(language, "ttsDidNotReturnAudio", {
+              provider: PROVIDER_LABELS[provider],
+            }),
+          );
+        }
 
-    const mimeType = audioPart?.mimeType as string | undefined;
-    const sampleRate = Number(mimeType?.match(/rate=(\d+)/i)?.[1]) || 24000;
-    return buildWavAudioFileFromPcm({
-      pcmBase64,
-      sampleRate,
-      language,
-    });
-  }
-
-  if (config.kind === "dashscope") {
-    const response = await fetchTtsWithRetries({
-      input:
-        provider === "alibaba-qwen-dashscope"
-          ? resolveQwenApiEndpoint(config.endpoint, apiKey ?? "")
-          : config.endpoint,
-      init: {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${requireProviderKey(provider, apiKey, language)}`,
-        },
-        body: JSON.stringify({
-          model: selectedModel,
-          input: {
-            text,
-            voice: selectedVoice,
-            ...(getSpeechLanguageDefinition(speechLanguage).qwenTtsLanguage
-              ? {
-                  language_type:
-                    getSpeechLanguageDefinition(speechLanguage)
-                      .qwenTtsLanguage,
-                }
-              : {}),
-            ...(selectedInstructions
-              ? { instructions: selectedInstructions }
-              : {}),
+        const audioResponse = await fetchTtsWithRetries({
+          input: audioUrl,
+          init: {
+            method: "GET",
           },
-        }),
-      },
-      timeoutMs,
-      provider,
-      language,
-      abortSignal,
-    });
+          timeoutMs,
+          provider,
+          language,
+          abortSignal,
+        });
 
-    const data = await response.json();
-    const audioUrl = getDashScopeAudioUrl(data);
+        return writeBlobAudioFile(await audioResponse.blob(), "wav");
+      }
 
-    if (!audioUrl) {
-      throw new Error(
-        translate(language, "ttsDidNotReturnAudio", {
-          provider: PROVIDER_LABELS[provider],
-        }),
-      );
-    }
-
-    const audioResponse = await fetchTtsWithRetries({
-      input: audioUrl,
-      init: {
-        method: "GET",
-      },
-      timeoutMs,
-      provider,
-      language,
-      abortSignal,
-    });
-
-    return writeBlobAudioFile(await audioResponse.blob(), "wav");
-  }
-
-  const authorizationKey = requireProviderKey(provider, apiKey, language);
-  const resolvedVoice = getBinaryTtsVoice({
-    requestFormat: config.requestFormat,
-    selectedModel,
-    selectedVoice,
-  });
-
-  const requestBody = buildBinaryTtsRequestBody({
-    instructions: selectedInstructions,
-    requestFormat: config.requestFormat,
-    selectedModel,
-    selectedVoice: resolvedVoice,
-    text,
-    previousText,
-    nextText,
-    speechLanguage,
-  });
-
-  const response = await fetchTtsWithRetries({
-    input: getBinaryTtsEndpoint({
-      endpoint: config.endpoint,
-      requestFormat: config.requestFormat,
-      selectedVoice: resolvedVoice,
-    }),
-    init: {
-      method: "POST",
-      headers: getBinaryTtsHeaders({
-        apiKey: authorizationKey,
+      const authorizationKey = requireProviderKey(provider, apiKey, language);
+      const resolvedVoice = getBinaryTtsVoice({
         requestFormat: config.requestFormat,
-      }),
-      body: JSON.stringify(requestBody),
+        selectedModel,
+        selectedVoice,
+      });
+
+      const requestBody = buildBinaryTtsRequestBody({
+        instructions: selectedInstructions,
+        requestFormat: config.requestFormat,
+        selectedModel,
+        selectedVoice: resolvedVoice,
+        text,
+        previousText,
+        nextText,
+        speechLanguage,
+      });
+
+      const response = await fetchTtsWithRetries({
+        input: getBinaryTtsEndpoint({
+          endpoint: config.endpoint,
+          requestFormat: config.requestFormat,
+          selectedVoice: resolvedVoice,
+        }),
+        init: {
+          method: "POST",
+          headers: getBinaryTtsHeaders({
+            apiKey: authorizationKey,
+            requestFormat: config.requestFormat,
+          }),
+          body: JSON.stringify(requestBody),
+        },
+        timeoutMs,
+        provider,
+        language,
+        abortSignal,
+      });
+
+      if (config.requestFormat === "mistral-speech") {
+        const data = await response.json();
+        const audioData = data?.audio_data;
+
+        if (typeof audioData !== "string" || !audioData) {
+          throw new Error(
+            translate(language, "ttsDidNotReturnAudio", {
+              provider: PROVIDER_LABELS[provider],
+            }),
+          );
+        }
+
+        return writeBase64AudioFile(audioData, "mp3");
+      }
+
+      return writeBlobAudioFile(
+        await response.blob(),
+        getBinaryTtsFileExtension(config.requestFormat),
+      );
     },
-    timeoutMs,
-    provider,
-    language,
-    abortSignal,
   });
 
-  if (config.requestFormat === "mistral-speech") {
-    const data = await response.json();
-    const audioData = data?.audio_data;
-
-    if (typeof audioData !== "string" || !audioData) {
-      throw new Error(
-        translate(language, "ttsDidNotReturnAudio", {
-          provider: PROVIDER_LABELS[provider],
-        }),
-      );
-    }
-
-    return writeBase64AudioFile(audioData, "mp3");
-  }
-
-  return writeBlobAudioFile(
-    await response.blob(),
-    getBinaryTtsFileExtension(config.requestFormat),
-  );
+  onModelResolved?.(result.actualModel);
+  return result.value;
 }

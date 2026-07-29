@@ -441,6 +441,7 @@ export async function requestChatStreamWithOpenAiCompatibleTransport(params: {
     }
 
     const payload = JSON.parse(data);
+    onStreamActivity?.();
     if (payload?.error) {
       throw buildProviderHttpError({
         provider,
@@ -451,7 +452,6 @@ export async function requestChatStreamWithOpenAiCompatibleTransport(params: {
       });
     }
 
-    onStreamActivity?.();
     if (provider === "openrouter") {
       const routingMetadata = extractOpenRouterRoutingMetadata(payload, model);
       if (routingMetadata) {

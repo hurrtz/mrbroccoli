@@ -2,7 +2,44 @@ import { PROVIDER_LABELS } from "../constants/models";
 import { translate } from "../i18n";
 import { AppLanguage, Provider } from "../types";
 
-type ProviderAction = "reply" | "transcription" | "web-search";
+export type ProviderAction = "reply" | "transcription" | "web-search";
+export type ProviderFailureKind =
+  | "authentication"
+  | "capacity"
+  | "context"
+  | "credits"
+  | "model-unavailable"
+  | "network"
+  | "quota"
+  | "rate-limit"
+  | "rejected"
+  | "server"
+  | "timeout";
+
+export class ProviderRequestError extends Error {
+  readonly action: ProviderAction;
+  readonly detail: string;
+  readonly failureKind: ProviderFailureKind;
+  readonly provider: Provider;
+  readonly status?: number;
+
+  constructor(params: {
+    action: ProviderAction;
+    detail?: string;
+    failureKind: ProviderFailureKind;
+    message: string;
+    provider: Provider;
+    status?: number;
+  }) {
+    super(params.message);
+    this.name = "ProviderRequestError";
+    this.action = params.action;
+    this.detail = params.detail ?? "";
+    this.failureKind = params.failureKind;
+    this.provider = params.provider;
+    this.status = params.status;
+  }
+}
 
 function safeJsonParse(text: string) {
   try {
@@ -41,7 +78,7 @@ export function extractProviderErrorMessage(errorText: string) {
 
   if (Array.isArray(parsed?.errors)) {
     const firstMessage = parsed.errors.find(
-      (entry: any) => typeof entry?.message === "string"
+      (entry: any) => typeof entry?.message === "string",
     )?.message;
 
     if (typeof firstMessage === "string") {
@@ -90,7 +127,7 @@ function getActionLabel(language: AppLanguage, action: ProviderAction) {
   return translate(language, "webSearchAction");
 }
 
-function isNetworkFailure(error: Error) {
+export function isProviderNetworkFailure(error: Error) {
   const normalized = error.message.toLowerCase();
 
   return (
@@ -126,6 +163,22 @@ function isRateLimitFailure(status: number, detail: string) {
   );
 }
 
+function isQuotaFailure(status: number, detail: string) {
+  const normalized = detail.toLowerCase();
+
+  return (
+    status === 429 &&
+    (normalized.includes("billing") ||
+      normalized.includes("check your plan") ||
+      normalized.includes("current quota") ||
+      normalized.includes("insufficient_quota") ||
+      normalized.includes("quota exhausted") ||
+      normalized.includes("quota exceeded") ||
+      normalized.includes("resource_exhausted") ||
+      normalized.includes("spending limit"))
+  );
+}
+
 function isCapacityFailure(detail: string) {
   const normalized = detail.toLowerCase();
 
@@ -149,6 +202,92 @@ function isContextTooLongFailure(detail: string) {
   );
 }
 
+function isModelUnavailableFailure(status: number, detail: string) {
+  const normalized = detail.toLowerCase();
+  const mentionsModel =
+    normalized.includes("model") ||
+    normalized.includes("deployment") ||
+    normalized.includes("engine");
+  const unavailable =
+    normalized.includes("not found") ||
+    normalized.includes("not available") ||
+    normalized.includes("unavailable") ||
+    normalized.includes("does not exist") ||
+    normalized.includes("does not support") ||
+    normalized.includes("no longer") ||
+    normalized.includes("not supported") ||
+    normalized.includes("retired") ||
+    normalized.includes("deprecated") ||
+    normalized.includes("unsupported");
+
+  return mentionsModel && unavailable && (status === 400 || status === 404);
+}
+
+function makeProviderRequestError(params: {
+  provider: Provider;
+  action: ProviderAction;
+  detail: string;
+  failureKind: ProviderFailureKind;
+  message: string;
+  status?: number;
+}) {
+  return new ProviderRequestError(params);
+}
+
+export function classifyProviderHttpFailure(params: {
+  action?: ProviderAction;
+  errorText: string;
+  status: number;
+}): ProviderFailureKind {
+  return classifyProviderFailure({
+    action: params.action ?? "reply",
+    detail: extractProviderErrorMessage(params.errorText),
+    status: params.status,
+  });
+}
+
+function classifyProviderFailure(params: {
+  action: ProviderAction;
+  detail: string;
+  status: number;
+}): ProviderFailureKind {
+  const { action, detail, status } = params;
+
+  if (isAuthenticationFailure(status, detail)) {
+    return "authentication";
+  }
+
+  if (isModelUnavailableFailure(status, detail)) {
+    return "model-unavailable";
+  }
+
+  if (isQuotaFailure(status, detail)) {
+    return "quota";
+  }
+
+  if (isRateLimitFailure(status, detail)) {
+    return "rate-limit";
+  }
+
+  if (status === 402) {
+    return "credits";
+  }
+
+  if (action === "reply" && isContextTooLongFailure(detail)) {
+    return "context";
+  }
+
+  if (isCapacityFailure(detail)) {
+    return "capacity";
+  }
+
+  if (status >= 500) {
+    return "server";
+  }
+
+  return "rejected";
+}
+
 export function buildProviderHttpError(params: {
   provider: Provider;
   language: AppLanguage;
@@ -159,58 +298,68 @@ export function buildProviderHttpError(params: {
   const providerLabel = PROVIDER_LABELS[params.provider];
   const actionLabel = getActionLabel(params.language, params.action);
   const detail = extractProviderErrorMessage(params.errorText);
+  const failureKind = classifyProviderFailure({
+    action: params.action,
+    detail,
+    status: params.status,
+  });
+  let message: string;
 
-  if (isAuthenticationFailure(params.status, detail)) {
-    return new Error(
-      translate(params.language, "providerAuthError", {
+  switch (failureKind) {
+    case "authentication":
+      message = translate(params.language, "providerAuthError", {
         provider: providerLabel,
         action: actionLabel,
-      })
-    );
-  }
-
-  if (isRateLimitFailure(params.status, detail)) {
-    return new Error(
-      translate(params.language, "providerRateLimitError", {
+      });
+      break;
+    case "credits":
+    case "quota":
+      message = translate(params.language, "providerCreditsRequired", {
         provider: providerLabel,
         action: actionLabel,
-      })
-    );
-  }
-
-  if (params.status === 402) {
-    return new Error(
-      translate(params.language, "providerCreditsRequired", {
+      });
+      break;
+    case "rate-limit":
+      message = translate(params.language, "providerRateLimitError", {
         provider: providerLabel,
         action: actionLabel,
-      }),
-    );
-  }
-
-  if (params.action === "reply" && isContextTooLongFailure(detail)) {
-    return new Error(
-      translate(params.language, "providerContextTooLong", {
+      });
+      break;
+    case "context":
+      message = translate(params.language, "providerContextTooLong", {
         provider: providerLabel,
-      })
-    );
-  }
-
-  if (params.status >= 500 || isCapacityFailure(detail)) {
-    return new Error(
-      translate(params.language, "providerTemporaryError", {
+      });
+      break;
+    case "capacity":
+    case "model-unavailable":
+    case "server":
+      message = translate(params.language, "providerTemporaryError", {
         provider: providerLabel,
         action: actionLabel,
-      })
-    );
+      });
+      break;
+    case "rejected":
+      message = translate(params.language, "providerRequestRejected", {
+        provider: providerLabel,
+        action: actionLabel,
+        detail,
+      });
+      break;
+    default:
+      message = translate(params.language, "providerTemporaryError", {
+        provider: providerLabel,
+        action: actionLabel,
+      });
   }
 
-  return new Error(
-    translate(params.language, "providerRequestRejected", {
-      provider: providerLabel,
-      action: actionLabel,
-      detail,
-    })
-  );
+  return makeProviderRequestError({
+    provider: params.provider,
+    action: params.action,
+    detail,
+    failureKind,
+    status: params.status,
+    message,
+  });
 }
 
 export function normalizeProviderTransportError(params: {
@@ -220,13 +369,21 @@ export function normalizeProviderTransportError(params: {
   action: ProviderAction;
 }) {
   if (params.error instanceof Error) {
-    if (isNetworkFailure(params.error)) {
-      return new Error(
-        translate(params.language, "providerNetworkError", {
+    if (params.error instanceof ProviderRequestError) {
+      return params.error;
+    }
+
+    if (isProviderNetworkFailure(params.error)) {
+      return new ProviderRequestError({
+        provider: params.provider,
+        action: params.action,
+        detail: params.error.message,
+        failureKind: "network",
+        message: translate(params.language, "providerNetworkError", {
           provider: PROVIDER_LABELS[params.provider],
           action: getActionLabel(params.language, params.action),
-        })
-      );
+        }),
+      });
     }
 
     return params.error;
