@@ -1127,6 +1127,39 @@ describe("SettingsModal", () => {
         screen.getByTestId("stt-provider-picker-value").props.style,
       ).textAlign,
     ).toBe("right");
+
+    fireEvent.press(screen.getByLabelText("About Input Mode"));
+    expect(screen.UNSAFE_getByType(AntModal).props).toMatchObject({
+      modalType: "modal",
+      title: "Input Mode",
+      visible: true,
+    });
+    expect(
+      screen.getByText(
+        "Hold the main button while speaking, then release to send.",
+      ),
+    ).toBeTruthy();
+
+    fireEvent.press(screen.getByText("Done"));
+    await waitFor(() => {
+      expect(
+        screen.queryByText(
+          "Hold the main button while speaking, then release to send.",
+        ),
+      ).toBeNull();
+    });
+
+    fireEvent.press(screen.getByLabelText("About Speech to Text"));
+    expect(screen.UNSAFE_getByType(AntModal).props).toMatchObject({
+      modalType: "modal",
+      title: "Speech to Text",
+      visible: true,
+    });
+    expect(
+      screen.getByText(
+        "Use the operating system's speech recognizer. Depending on device settings, recognition may run on-device or through the system service. No provider key is required.",
+      ),
+    ).toBeTruthy();
   });
 
   it("offers discovered Mistral voice slugs and refreshes the directory", async () => {

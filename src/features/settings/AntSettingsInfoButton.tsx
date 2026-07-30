@@ -39,6 +39,7 @@ export function AntSettingsInfoButton({
           visible
           transparent
           maskClosable
+          modalType="modal"
           title={title}
           onClose={() => setVisible(false)}
           footer={[

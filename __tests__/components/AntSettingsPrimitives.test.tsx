@@ -189,7 +189,11 @@ describe("AntRadioSection", () => {
     ).toBeNull();
     fireEvent.press(screen.getByLabelText("About Reply Playback"));
 
-    expect(screen.UNSAFE_getByType(Modal).props.title).toBe("Reply Playback");
+    expect(screen.UNSAFE_getByType(Modal).props).toMatchObject({
+      modalType: "modal",
+      title: "Reply Playback",
+      visible: true,
+    });
     expect(
       screen.getByText("Start speaking as sentences are ready."),
     ).toBeTruthy();
