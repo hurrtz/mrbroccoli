@@ -4,11 +4,100 @@ This file records user-visible changes to Mr Broccoli.
 
 Each released version also includes localized store notes. These summaries are
 kept within Google Play's 500-character limit per language and can also be used
-for Apple's **What's New in This Version** field.
+for Apple's **What's New in This Version** field. Beginning with version 2.5.3,
+the complete Play Store translations are kept in a dedicated file under
+`docs/`.
 
 ## Unreleased
 
 No user-visible changes yet.
+
+## 2.5.5 - 2026-07-30
+
+### Added
+
+- Added headset media-button and lock-screen controls for recording and spoken
+  replies.
+- Added background continuation for active Drive Sessions so listening can
+  resume while the screen is off.
+- Added a persistent provider-speech cache. Replaying the same answer can reuse
+  previously synthesized audio instead of spending provider quota again.
+
+### Changed
+
+- Made Drive Session endpoint detection continuously adapt to the user's speech
+  level, ambient noise, audio route, and sustained environment changes.
+- Made live response estimates learn separately for Uber Mode routes, provider
+  outcomes, fallbacks, and failures.
+- Added provider circuit breakers so terminal quota, authentication, and
+  permission failures stop repeated calls and expose clearer recovery guidance.
+- Improved long-running voice diagnostics while reducing repetitive debug-log
+  noise.
+- Updated Expo, React Native, Android Material Components, and the native build
+  toolchain for current iOS and Android compatibility.
+- Changed the main action's timing border to fill symmetrically clockwise and
+  counterclockwise from the top center.
+
+### Fixed
+
+- Fixed transcript replay quota failures so one failed speech chunk stops the
+  remaining provider requests and shows a quota-specific message.
+- Fixed the Input Mode and Speech to Text information dialogs being hidden
+  behind the settings window on Android.
+- Preserved provider speech-to-text uploads across the updated Expo networking
+  stack.
+
+### Store release notes
+
+See `docs/google-play-release-notes-2.5.5.md`.
+
+## 2.5.4 - 2026-07-29
+
+### Added
+
+- Added live response-time estimates to the main action, iOS Dynamic Island and
+  Lock Screen, and the Android foreground notification, including overtime.
+- Added screen wake protection during recording and active Drive Sessions.
+
+### Changed
+
+- Improved AirPods, Bluetooth, wired, and USB headset audio routing.
+- Made Drive Session speech endpointing adapt to ambient noise and reject
+  background chatter more reliably.
+- Made Uber Mode response estimates account for its multi-model deliberation.
+- Updated the main action wording and timing border to make the current state
+  and expected wait visible together.
+
+### Store release notes
+
+See `docs/google-play-release-notes-2.5.4.md`.
+
+## 2.5.3 - 2026-07-29
+
+### Added
+
+- Added a fully hands-free Drive Mode with microphone activity feedback, a
+  ten-second silence countdown, and automatic turn submission.
+- Added Uber Mode, where multiple configured models assess and refine a question
+  before the selected model delivers the final answer.
+- Added complete Czech, Polish, Turkish, Swedish, and Urdu interfaces and speech
+  language support.
+
+### Changed
+
+- Improved cross-provider model fallback and recovery from quota and model
+  availability failures.
+- Updated Gemini validation and generation routes to current supported models.
+- Localized Uber Mode naming consistently across every interface language.
+
+### Fixed
+
+- Fixed Android Back navigation inside settings.
+- Correctly attributed Uber Mode usage to each participating provider and model.
+
+### Store release notes
+
+See `docs/google-play-release-notes-2.5.3.md`.
 
 ## 2.5.2 - 2026-07-29
 
