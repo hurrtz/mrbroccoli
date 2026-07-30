@@ -91,4 +91,44 @@ describe("useBatteryDiagnostics", () => {
       }),
     );
   });
+
+  it("labels legitimate long reasoning as long-running rather than stuck", () => {
+    captureActive = true;
+    const thinkingSnapshot = {
+      ...snapshot,
+      isActive: true,
+      pipelinePhase: "thinking" as const,
+    };
+
+    renderHook(() => useBatteryDiagnostics(thinkingSnapshot));
+    act(() => {
+      captureListener?.();
+      jest.advanceTimersByTime(24_000);
+    });
+
+    expect(recordDebugLogEvent).toHaveBeenCalledWith(
+      expect.objectContaining({ event: "diag-heartbeat-LONG", level: "info" }),
+    );
+    expect(recordDebugLogEvent).not.toHaveBeenCalledWith(
+      expect.objectContaining({ event: "diag-heartbeat-STUCK" }),
+    );
+  });
+
+  it("still flags an active idle state with no recording or playback", () => {
+    captureActive = true;
+    const inconsistentSnapshot = {
+      ...snapshot,
+      isActive: true,
+    };
+
+    renderHook(() => useBatteryDiagnostics(inconsistentSnapshot));
+    act(() => {
+      captureListener?.();
+      jest.advanceTimersByTime(24_000);
+    });
+
+    expect(recordDebugLogEvent).toHaveBeenCalledWith(
+      expect.objectContaining({ event: "diag-heartbeat-STUCK", level: "warn" }),
+    );
+  });
 });

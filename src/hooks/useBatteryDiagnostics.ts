@@ -29,6 +29,13 @@ const HEARTBEAT_INTERVAL_MS = 4000;
 // Flag a continuously-active stretch this long with no recording/playback as
 // suspicious (the circle would be animating the whole time for no reason).
 const SUSPICIOUS_ACTIVE_MS = 20000;
+const EXPECTED_LONG_RUNNING_PHASES = new Set<PipelinePhase>([
+  "transcribing",
+  "thinking-briefly",
+  "searching",
+  "thinking",
+  "synthesizing",
+]);
 
 export interface BatteryDiagnosticsSnapshot {
   isActive: boolean;
@@ -130,10 +137,21 @@ export function useBatteryDiagnostics(snapshot: BatteryDiagnosticsSnapshot) {
         s.isActive &&
         !s.isRecording &&
         !s.playerIsPlaying &&
+        !EXPECTED_LONG_RUNNING_PHASES.has(s.pipelinePhase) &&
+        activeMs >= SUSPICIOUS_ACTIVE_MS;
+      const expectedLongRunning =
+        s.isActive &&
+        !s.isRecording &&
+        !s.playerIsPlaying &&
+        EXPECTED_LONG_RUNNING_PHASES.has(s.pipelinePhase) &&
         activeMs >= SUSPICIOUS_ACTIVE_MS;
 
       recordDebugLogEvent({
-        event: suspiciousActive ? "diag-heartbeat-STUCK" : "diag-heartbeat",
+        event: suspiciousActive
+          ? "diag-heartbeat-STUCK"
+          : expectedLongRunning
+            ? "diag-heartbeat-LONG"
+            : "diag-heartbeat",
         level: suspiciousActive ? "warn" : "info",
         payload: {
           phase: s.pipelinePhase,

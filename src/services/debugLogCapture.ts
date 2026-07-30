@@ -22,6 +22,16 @@ interface ActiveDebugLogSession {
   startedAtMs: number;
 }
 
+interface PendingDebugLogAggregate {
+  category: DebugLogCategory;
+  count: number;
+  firstAtMs: number;
+  lastAtMs: number;
+  level: DebugLogLevel;
+  maxChunkLength: number;
+  totalChunkLength: number;
+}
+
 export interface DebugLogCaptureState {
   active: boolean;
   entryCount: number;
@@ -48,6 +58,7 @@ export interface RecoveredDebugLogCaptureResult {
 const listeners = new Set<() => void>();
 const ACTIVE_CAPTURE_FILE_NAME = "debug-log-active.log";
 const FLUSH_DELAY_MS = 250;
+const AGGREGATE_FLUSH_DELAY_MS = 1_000;
 // Per-frame events that would flood a capture (tens of thousands of lines) and,
 // because every recorded entry notifies listeners (re-rendering the screen),
 // would perturb the very re-render/battery signal a capture is meant to measure.
@@ -58,6 +69,8 @@ let activeSession: ActiveDebugLogSession | null = null;
 let lastExportPath: string | null = null;
 let consoleCaptureInstalled = false;
 let flushTimer: ReturnType<typeof setTimeout> | null = null;
+let aggregateFlushTimer: ReturnType<typeof setTimeout> | null = null;
+const pendingAggregates = new Map<string, PendingDebugLogAggregate>();
 let writeQueue = Promise.resolve();
 
 const originalConsole = {
@@ -141,7 +154,9 @@ function formatDebugLogSession(
   return `${lines.join("\n")}\n`;
 }
 
-function recordEntry(entry: Omit<DebugLogEntry, "elapsedMs" | "timestamp">) {
+function appendEntry(
+  entry: Omit<DebugLogEntry, "elapsedMs" | "timestamp">,
+) {
   if (!activeSession) {
     return;
   }
@@ -158,6 +173,89 @@ function recordEntry(entry: Omit<DebugLogEntry, "elapsedMs" | "timestamp">) {
 
   notifyListeners();
   scheduleFlush();
+}
+
+function clearAggregateFlushTimer() {
+  if (aggregateFlushTimer) {
+    clearTimeout(aggregateFlushTimer);
+    aggregateFlushTimer = null;
+  }
+}
+
+function flushAggregatedEntries() {
+  clearAggregateFlushTimer();
+
+  if (!activeSession || pendingAggregates.size === 0) {
+    pendingAggregates.clear();
+    return;
+  }
+
+  const aggregates = [...pendingAggregates.entries()];
+  pendingAggregates.clear();
+
+  for (const [event, aggregate] of aggregates) {
+    appendEntry({
+      category: aggregate.category,
+      event: `${event}s`,
+      level: aggregate.level,
+      payload: {
+        averageChunkLength: Math.round(
+          aggregate.totalChunkLength / Math.max(1, aggregate.count),
+        ),
+        chunks: aggregate.count,
+        maxChunkLength: aggregate.maxChunkLength,
+        totalLength: aggregate.totalChunkLength,
+        windowMs: Math.max(0, aggregate.lastAtMs - aggregate.firstAtMs),
+      },
+    });
+  }
+}
+
+function scheduleAggregateFlush() {
+  if (!activeSession || aggregateFlushTimer) {
+    return;
+  }
+
+  aggregateFlushTimer = setTimeout(() => {
+    aggregateFlushTimer = null;
+    flushAggregatedEntries();
+  }, AGGREGATE_FLUSH_DELAY_MS);
+}
+
+function aggregateStreamChunk(
+  entry: Omit<DebugLogEntry, "elapsedMs" | "timestamp">,
+) {
+  const chunkLength =
+    typeof entry.payload?.chunkLength === "number" &&
+    Number.isFinite(entry.payload.chunkLength)
+      ? Math.max(0, Math.round(entry.payload.chunkLength))
+      : 0;
+  const now = Date.now();
+  const current = pendingAggregates.get(entry.event);
+
+  pendingAggregates.set(entry.event, {
+    category: entry.category,
+    count: (current?.count ?? 0) + 1,
+    firstAtMs: current?.firstAtMs ?? now,
+    lastAtMs: now,
+    level: entry.level,
+    maxChunkLength: Math.max(current?.maxChunkLength ?? 0, chunkLength),
+    totalChunkLength: (current?.totalChunkLength ?? 0) + chunkLength,
+  });
+  scheduleAggregateFlush();
+}
+
+function recordEntry(entry: Omit<DebugLogEntry, "elapsedMs" | "timestamp">) {
+  if (!activeSession) {
+    return;
+  }
+
+  if (entry.event === "voice-pipeline-stream-chunk") {
+    aggregateStreamChunk(entry);
+    return;
+  }
+
+  appendEntry(entry);
 }
 
 function queueWrite(task: () => Promise<void>) {
@@ -283,6 +381,8 @@ export function startDebugLogCapture(payload: Record<string, unknown> = {}) {
     startedAtMs: Date.now(),
   };
 
+  pendingAggregates.clear();
+  clearAggregateFlushTimer();
   activeSession = nextSession;
   recordDebugLogEvent({
     event: "capture-started",
@@ -301,6 +401,7 @@ export async function stopDebugLogCapture(
     return null;
   }
 
+  flushAggregatedEntries();
   recordDebugLogEvent({
     event: "capture-stopping",
     payload,
@@ -335,6 +436,8 @@ export async function stopDebugLogCapture(
   }
 
   activeSession = null;
+  pendingAggregates.clear();
+  clearAggregateFlushTimer();
   lastExportPath = path;
   notifyListeners();
 
