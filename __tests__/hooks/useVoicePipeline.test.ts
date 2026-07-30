@@ -119,6 +119,15 @@ function createPlayerBase() {
   };
 }
 
+function createDeferredVoid() {
+  let resolve!: () => void;
+  const promise = new Promise<void>((nextResolve) => {
+    resolve = nextResolve;
+  });
+
+  return { promise, resolve };
+}
+
 function createParams(
   overrides: Partial<Parameters<typeof useVoicePipeline>[0]> = {},
 ) {
@@ -444,6 +453,44 @@ describe("useVoicePipeline", () => {
     expect(player.stopPlayback.mock.invocationCallOrder[0]).toBeLessThan(
       player.resetCancellation.mock.invocationCallOrder[0],
     );
+  });
+
+  it("stops a replay while stale playback cleanup is still pending", async () => {
+    const pendingInitialStop = createDeferredVoid();
+    const player = createPlayer();
+    player.stopPlayback
+      .mockImplementationOnce(() => pendingInitialStop.promise)
+      .mockResolvedValue(undefined);
+    const params = createParams({ player });
+    const { result } = renderHook(() => useVoicePipeline(params));
+    let replayPromise!: Promise<void>;
+
+    act(() => {
+      replayPromise = result.current.playReplyText(
+        "Replay this",
+        "message-1",
+      );
+    });
+
+    await waitFor(() => {
+      expect(player.stopPlayback).toHaveBeenCalledTimes(1);
+    });
+
+    await act(async () => {
+      await result.current.stopReplay();
+    });
+
+    await act(async () => {
+      pendingInitialStop.resolve();
+      await replayPromise;
+    });
+
+    expect(player.stopPlayback).toHaveBeenCalledTimes(2);
+    expect(player.resetCancellation).not.toHaveBeenCalled();
+    expect(synthesizeSpeech).not.toHaveBeenCalled();
+    expect(params.showToast).not.toHaveBeenCalled();
+    expect(result.current.replayPhase).toBe("idle");
+    expect(result.current.activeReplayMessageId).toBeNull();
   });
 
   it("stops replay playback without relying on rendered playback state", async () => {

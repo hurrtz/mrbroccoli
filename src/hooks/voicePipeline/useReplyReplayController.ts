@@ -78,7 +78,8 @@ export function useReplyReplayController({
       const replaySession = replaySessionRef.current + 1;
       replaySessionRef.current = replaySession;
       replayAbortRef.current?.abort();
-      replayAbortRef.current = new AbortController();
+      const replayAbortController = new AbortController();
+      replayAbortRef.current = replayAbortController;
       setActiveReplayMessageId(messageId ?? null);
       setReplayPhase("preparing");
 
@@ -86,6 +87,13 @@ export function useReplyReplayController({
         // Clear native or queued playback even when the rendered `isPlaying`
         // flag has not caught up with the underlying player yet.
         await player.stopPlayback();
+        if (
+          replaySessionRef.current !== replaySession ||
+          replayAbortController.signal.aborted
+        ) {
+          return;
+        }
+
         player.resetCancellation();
         const speechDiagnostics = {
           requestId: createSpeechRequestId("repeat"),
@@ -115,7 +123,7 @@ export function useReplyReplayController({
         }
 
         const replayQueue = createVoicePipelineTtsQueue({
-          abortSignal: replayAbortRef.current.signal,
+          abortSignal: replayAbortController.signal,
           callbacks: {
             onTranscription: () => undefined,
             onChunk: () => undefined,
