@@ -9,6 +9,12 @@ import {
 import { fetchProviderVoices } from "../../../src/services/providerVoiceDirectory";
 import { validateWebSearchConnection } from "../../../src/services/webSearch";
 import { DEFAULT_SETTINGS } from "../../../src/types";
+import {
+  executeProviderModelRequest,
+  getProviderCircuitState,
+  resetProviderModelHealthForTests,
+} from "../../../src/services/providerResilience";
+import { ProviderRequestError } from "../../../src/services/providerErrors";
 
 jest.mock("../../../src/services/debugLogCapture", () => ({
   recordDebugLogEvent: jest.fn(),
@@ -36,6 +42,7 @@ jest.mock("../../../src/services/webSearch", () => ({
 describe("useProviderConnectionValidation", () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    resetProviderModelHealthForTests();
   });
 
   it("dispatches independent live checks for every provider capability", async () => {
@@ -92,5 +99,47 @@ describe("useProviderConnectionValidation", () => {
       provider: "xai",
       apiKey: "xai-key",
     });
+  });
+
+  it("resets a provider circuit before an explicit capability retry", async () => {
+    await expect(
+      executeProviderModelRequest({
+        candidateModels: ["gpt-test"],
+        capability: "llm",
+        provider: "openai",
+        request: jest.fn().mockRejectedValue(
+          new ProviderRequestError({
+            action: "reply",
+            failureKind: "authentication",
+            message: "Invalid key",
+            provider: "openai",
+            status: 401,
+          }),
+        ),
+        retryDelayMs: 0,
+      }),
+    ).rejects.toThrow("Invalid key");
+    expect(getProviderCircuitState("openai", "llm")).not.toBeNull();
+
+    const settings = {
+      ...DEFAULT_SETTINGS,
+      apiKeys: {
+        ...DEFAULT_SETTINGS.apiKeys,
+        openai: "replacement-key",
+      },
+    };
+    const { result } = renderHook(() =>
+      useProviderConnectionValidation({
+        language: "en",
+        settings,
+      }),
+    );
+
+    await act(async () => {
+      await result.current.validateProviderCapability("openai", "llm");
+    });
+
+    expect(validateProviderConnection).toHaveBeenCalledTimes(1);
+    expect(getProviderCircuitState("openai", "llm")).toBeNull();
   });
 });

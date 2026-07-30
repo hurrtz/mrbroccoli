@@ -8,6 +8,11 @@ import {
 } from "../../src/services/llm";
 import { synthesizeSpeech } from "../../src/services/tts";
 import { runUlraModeDeliberation } from "../../src/services/ulraMode";
+import {
+  executeProviderModelRequest,
+  resetProviderModelHealthForTests,
+} from "../../src/services/providerResilience";
+import { ProviderRequestError } from "../../src/services/providerErrors";
 
 jest.mock("expo-file-system/legacy", () => ({
   deleteAsync: jest.fn(() => Promise.resolve()),
@@ -122,6 +127,7 @@ describe("splitIntoSentences", () => {
 describe("runVoicePipeline", () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    resetProviderModelHealthForTests();
     (summarizeConversationContext as jest.Mock).mockResolvedValue({
       summary: "",
       usage: undefined,
@@ -2371,6 +2377,110 @@ describe("runVoicePipeline", () => {
             level: "warning",
           }),
         ],
+      }),
+    );
+  });
+
+  it("moves Uber synthesis to a successful participant when the selected provider circuit opens", async () => {
+    await expect(
+      executeProviderModelRequest({
+        candidateModels: ["gpt-test"],
+        capability: "llm",
+        provider: "openai",
+        request: jest.fn().mockRejectedValue(
+          new ProviderRequestError({
+            action: "reply",
+            failureKind: "authentication",
+            message: "OpenAI key rejected",
+            provider: "openai",
+            status: 401,
+          }),
+        ),
+        retryDelayMs: 0,
+      }),
+    ).rejects.toThrow("OpenAI key rejected");
+    (runUlraModeDeliberation as jest.Mock).mockResolvedValueOnce({
+      entries: [
+        {
+          modeId: "mode-2",
+          model: "claude-test",
+          participant: 2,
+          provider: "anthropic",
+          round: 0,
+          text: "Fallback contribution",
+          usage: {
+            kind: "reply",
+            source: "estimated",
+            promptTokens: 10,
+            completionTokens: 5,
+            totalTokens: 15,
+          },
+        },
+      ],
+      estimatedUsage: {
+        kind: "reply",
+        source: "estimated",
+        promptTokens: 10,
+        completionTokens: 5,
+        totalTokens: 15,
+      },
+      failures: [],
+      retiredParticipants: 1,
+      roundsCompleted: 0,
+      synthesisPrompt: "Use the surviving contribution.",
+    });
+    (streamChat as jest.Mock).mockImplementation(
+      async ({ onDone }: { onDone: (text: string) => Promise<void> }) => {
+        await onDone("Fallback answer");
+      },
+    );
+
+    await runVoicePipeline({
+      transcriptionOverride: "Please answer.",
+      messages: [],
+      model: "gpt-test",
+      provider: "openai",
+      providerApiKey: "openai-key",
+      sttMode: "native",
+      ttsMode: "native",
+      ttsVoice: "alloy",
+      replyPlayback: "wait",
+      assistantInstructions: "",
+      responseLength: "normal",
+      responseTone: "professional",
+      language: "en",
+      ulraMode: {
+        rounds: 1,
+        routes: [
+          {
+            apiKey: "openai-key",
+            modeId: "mode-1",
+            model: "gpt-test",
+            provider: "openai",
+          },
+          {
+            apiKey: "anthropic-key",
+            modeId: "mode-2",
+            model: "claude-test",
+            provider: "anthropic",
+          },
+        ],
+      },
+      callbacks: {
+        onTranscription: jest.fn(),
+        onChunk: jest.fn(),
+        onResponseDone: jest.fn(),
+        onAudioReady: jest.fn(),
+        onSpeechTextReady: jest.fn(),
+        onError: jest.fn(),
+      },
+    });
+
+    expect(streamChat).toHaveBeenCalledWith(
+      expect.objectContaining({
+        apiKey: "anthropic-key",
+        model: "claude-test",
+        provider: "anthropic",
       }),
     );
   });

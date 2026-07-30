@@ -8,6 +8,11 @@ import type {
   ProviderValidationResult,
   Settings,
 } from "../../types";
+import {
+  getProviderCircuitState,
+  subscribeToProviderCircuitChanges,
+  type ResilientProviderCapability,
+} from "../../services/providerResilience";
 
 import {
   getConfiguredProvidersForCapability,
@@ -64,6 +69,15 @@ export function useProviderValidationState(params: {
   const { t } = useLocalization();
   const [validationStateByProvider, setValidationStateByProvider] =
     useState<ProviderValidationStates>({});
+  const [, setProviderCircuitRevision] = useState(0);
+
+  useEffect(
+    () =>
+      subscribeToProviderCircuitChanges(() => {
+        setProviderCircuitRevision((revision) => revision + 1);
+      }),
+    [],
+  );
   const effectiveValidationStateByProvider = useMemo(
     () =>
       mergeValidationStates(
@@ -145,6 +159,24 @@ export function useProviderValidationState(params: {
       return stateMatchesCurrentConfig ? candidate : { status: "idle" };
     },
     [effectiveValidationStateByProvider, settings],
+  );
+
+  const getCircuitState = useCallback(
+    (provider: Provider, capability: ProviderCapability) => {
+      const resilienceCapability: ResilientProviderCapability | null =
+        capability === "search"
+          ? "web-search"
+          : capability === "llm" ||
+              capability === "stt" ||
+              capability === "tts"
+            ? capability
+            : null;
+
+      return resilienceCapability
+        ? getProviderCircuitState(provider, resilienceCapability)
+        : null;
+    },
+    [],
   );
 
   const validateProviderCapabilityForSettings = useCallback(
@@ -277,6 +309,7 @@ export function useProviderValidationState(params: {
     getHealthState,
     getCapabilityHealthState,
     getValidationState,
+    getCircuitState,
     canValidateCapability,
     validateProviderCapabilityForSettings,
     validateAllProviderCapabilities,

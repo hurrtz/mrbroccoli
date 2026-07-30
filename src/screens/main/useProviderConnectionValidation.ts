@@ -7,6 +7,10 @@ import {
 import { recordDebugLogEvent } from "../../services/debugLogCapture";
 import { validateProviderConnection } from "../../services/llm";
 import {
+  resetProviderCircuit,
+  type ResilientProviderCapability,
+} from "../../services/providerResilience";
+import {
   validateSttProviderConnection,
   validateTtsProviderConnection,
 } from "../../services/providerValidation";
@@ -40,6 +44,19 @@ export function useProviderConnectionValidation(params: {
       });
 
       try {
+        const resilienceCapability: ResilientProviderCapability | null =
+          target.kind === "search"
+            ? "web-search"
+            : target.kind === "llm" ||
+                target.kind === "stt" ||
+                target.kind === "tts"
+              ? target.kind
+              : null;
+
+        if (resilienceCapability) {
+          resetProviderCircuit(provider, resilienceCapability);
+        }
+
         if (target.kind === "llm") {
           await validateProviderConnection({
             provider,

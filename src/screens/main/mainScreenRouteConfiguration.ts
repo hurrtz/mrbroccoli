@@ -9,6 +9,7 @@ import {
 } from "../../constants/models";
 import type { ProviderVoiceDirectories } from "../../services/providerVoiceDirectory";
 import { providerHasVoiceDirectory } from "../../services/providerVoiceDirectory";
+import { getProviderCircuitState } from "../../services/providerResilience";
 import type { UlraModeConfig } from "../../services/ulraMode";
 import type { AppLanguage, Provider, Settings } from "../../types";
 import {
@@ -39,6 +40,10 @@ export function getMainScreenRouteConfiguration(
           rounds: settings.ulraModeRounds,
           routes: settings.responseModes
             .filter(({ id }) => availableResponseModeSet.has(id))
+            .filter(
+              ({ route }) =>
+                !getProviderCircuitState(route.provider, "llm"),
+            )
             .map(({ id, route }) => ({
               apiKey: settings.apiKeys[route.provider].trim(),
               modeId: id,

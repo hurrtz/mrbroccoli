@@ -21,6 +21,7 @@ import type {
   ProviderValidationState,
   TextInputFocusHandler,
 } from "../../settings-core/types";
+import type { ProviderCircuitState } from "../../../services/providerResilience";
 
 import {
   getCapabilityLabel,
@@ -43,6 +44,7 @@ export function ConnectionsSettingsPage({
   focusCatalogProviderId,
   getProviderHealthState,
   getProviderCapabilityHealthState,
+  getProviderCircuitState,
   getProviderValidationState,
   canValidateCapability,
   onValidateCapability,
@@ -59,6 +61,10 @@ export function ConnectionsSettingsPage({
     provider: Provider,
     capability: ProviderCapability,
   ) => ProviderHealthState;
+  getProviderCircuitState: (
+    provider: Provider,
+    capability: ProviderCapability,
+  ) => ProviderCircuitState | null;
   getProviderValidationState: (
     provider: Provider,
     capability: ProviderCapability,
@@ -324,6 +330,9 @@ export function ConnectionsSettingsPage({
                 capabilities={capabilities}
                 getCapabilityHealthState={(capability) =>
                   getProviderCapabilityHealthState(provider, capability)
+                }
+                getCircuitState={(capability) =>
+                  getProviderCircuitState(provider, capability)
                 }
                 getValidationState={(capability) =>
                   getProviderValidationState(provider, capability)

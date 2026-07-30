@@ -78,6 +78,7 @@ export function AntSettingsPageContent({
             getProviderCapabilityHealthState={
               validation.getCapabilityHealthState
             }
+            getProviderCircuitState={validation.getCircuitState}
             getProviderValidationState={validation.getValidationState}
             canValidateCapability={validation.canValidateCapability}
             onValidateCapability={async (provider, capability) => {

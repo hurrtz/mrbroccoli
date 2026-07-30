@@ -5,6 +5,7 @@ import {
   getUlraModeFailureParticipants,
   runUlraModeDeliberation,
 } from "./ulraMode";
+import { getProviderCircuitState } from "./providerResilience";
 import { cleanupCapturedAudio } from "./voicePipeline/cleanup";
 import { resolveContextualMessages } from "./voicePipeline/context";
 import { runPipelineResponse } from "./voicePipeline/response";
@@ -196,6 +197,10 @@ export async function runVoicePipeline(
     let additionalUsage: UsageEstimate | undefined;
     let responseMetadata = webSearchResult.responseMetadata;
     let synthesisContext: string | undefined;
+    let synthesisModel = model;
+    let synthesisModelEffort = modelEffort;
+    let synthesisProvider = provider;
+    let synthesisProviderApiKey = providerApiKey;
 
     if (ulraMode) {
       callbacks.onLlmStart?.();
@@ -217,6 +222,33 @@ export async function runVoicePipeline(
 
       additionalUsage = deliberation.estimatedUsage;
       synthesisContext = deliberation.synthesisPrompt;
+      if (getProviderCircuitState(provider, "llm")) {
+        const successfulModeIds = new Set(
+          deliberation.entries.map(({ modeId }) => modeId),
+        );
+        const fallbackRoute = ulraMode.routes.find(
+          (route) =>
+            successfulModeIds.has(route.modeId) &&
+            !getProviderCircuitState(route.provider, "llm"),
+        );
+
+        if (fallbackRoute) {
+          synthesisModel = fallbackRoute.model;
+          synthesisModelEffort = fallbackRoute.modelEffort;
+          synthesisProvider = fallbackRoute.provider;
+          synthesisProviderApiKey = fallbackRoute.apiKey;
+          recordDebugLogEvent({
+            event: "ulra-mode-synthesis-route-fallback",
+            level: "warn",
+            payload: {
+              fallbackModel: synthesisModel,
+              fallbackProvider: synthesisProvider,
+              requestedModel: model,
+              requestedProvider: provider,
+            },
+          });
+        }
+      }
       const retiredParticipants = deliberation.retiredParticipants ?? 0;
       callbacks.onUlraModeComplete?.({
         failedCalls: deliberation.failures.length,
@@ -320,11 +352,11 @@ export async function runVoicePipeline(
       language,
       llmAlreadyStarted: Boolean(ulraMode),
       messages: allMessages,
-      model,
+      model: synthesisModel,
       modelStartedAtMs,
-      modelEffort,
-      provider,
-      providerApiKey,
+      modelEffort: synthesisModelEffort,
+      provider: synthesisProvider,
+      providerApiKey: synthesisProviderApiKey,
       responseLength,
       responseMetadata,
       responseTone,
@@ -342,8 +374,8 @@ export async function runVoicePipeline(
           ? "voice-pipeline-llm-cancelled"
           : "voice-pipeline-llm-failed",
         payload: {
-          model,
-          provider,
+          model: synthesisModel,
+          provider: synthesisProvider,
         },
       });
       return transcription;
@@ -351,8 +383,8 @@ export async function runVoicePipeline(
     recordDebugLogEvent({
       event: "voice-pipeline-llm-complete",
       payload: {
-        model,
-        provider,
+        model: synthesisModel,
+        provider: synthesisProvider,
       },
     });
     recordDebugLogEvent({

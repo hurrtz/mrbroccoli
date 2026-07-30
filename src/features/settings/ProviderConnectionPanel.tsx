@@ -37,6 +37,7 @@ import type {
   ProviderValidationState,
   TextInputFocusHandler,
 } from "../settings-core/types";
+import type { ProviderCircuitState } from "../../services/providerResilience";
 
 import {
   AntButtonLabel,
@@ -230,6 +231,7 @@ export function ProviderConnectionPanel({
   visibleApiKey,
   capabilities,
   getCapabilityHealthState,
+  getCircuitState,
   getValidationState,
   canValidateCapability,
   apiKey,
@@ -245,6 +247,9 @@ export function ProviderConnectionPanel({
   getCapabilityHealthState: (
     capability: ProviderCapability,
   ) => ProviderHealthState;
+  getCircuitState: (
+    capability: ProviderCapability,
+  ) => ProviderCircuitState | null;
   getValidationState: (
     capability: ProviderCapability,
   ) => ProviderValidationState;
@@ -456,8 +461,11 @@ export function ProviderConnectionPanel({
           >
             {capabilities.map((capability) => {
               const validationState = getValidationState(capability);
+              const circuitState = getCircuitState(capability);
               const status = getStatusMeta(
-                getCapabilityHealthState(capability),
+                circuitState
+                  ? "failing"
+                  : getCapabilityHealthState(capability),
                 t,
                 colors,
               );
@@ -465,10 +473,11 @@ export function ProviderConnectionPanel({
               const isValidating = validationState.status === "validating";
               const disabled = !canValidate || isValidatingAny;
               const message =
-                validationState.status === "success" ||
+                circuitState?.message ??
+                (validationState.status === "success" ||
                 validationState.status === "error"
                   ? validationState.message
-                  : null;
+                  : null);
 
               return (
                 <List.Item
@@ -482,16 +491,20 @@ export function ProviderConnectionPanel({
                     }
                   }}
                   accessibilityRole="button"
-                  accessibilityLabel={t("testProviderCapability", {
-                    capability: getCapabilityLabel(capability, t),
-                  })}
+                  accessibilityLabel={
+                    circuitState
+                      ? t("retry")
+                      : t("testProviderCapability", {
+                          capability: getCapabilityLabel(capability, t),
+                        })
+                  }
                   extra={
                     <View style={styles.validationAction}>
                       {isValidating ? (
                         <ActivityIndicator size="small" color={colors.accent} />
                       ) : (
                         <Feather
-                          name="play-circle"
+                          name={circuitState ? "refresh-cw" : "play-circle"}
                           size={19}
                           color={disabled ? colors.textMuted : colors.accent}
                         />

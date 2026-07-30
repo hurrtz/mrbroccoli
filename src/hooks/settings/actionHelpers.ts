@@ -1,5 +1,6 @@
 import type { Provider, ResponseMode, Settings } from "../../types";
 import { PROVIDER_LLM_SUPPORT } from "../../constants/models";
+import { resetProviderCircuit } from "../../services/providerResilience";
 import {
   deriveResponseModesForProvider,
   getNextResponseModeId,
@@ -153,6 +154,7 @@ function hasUsableResponseMode(settings: Settings): boolean {
 export function createApiKeyUpdater(setSettings: SetSettings) {
   return (provider: Provider, value: string) => {
     const nextValue = value.trim();
+    resetProviderCircuit(provider);
 
     setSettings((prev) => {
       const previousValue = prev.apiKeys[provider].trim();

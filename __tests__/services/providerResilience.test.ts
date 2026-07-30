@@ -1,5 +1,7 @@
 import {
   executeProviderModelRequest,
+  getProviderCircuitState,
+  resetProviderCircuit,
   resetProviderModelHealthForTests,
 } from "../../src/services/providerResilience";
 import { ProviderRequestError } from "../../src/services/providerErrors";
@@ -100,6 +102,70 @@ describe("executeProviderModelRequest", () => {
     },
   );
 
+  it.each(["authentication", "credits"] as const)(
+    "opens a provider circuit after a terminal %s failure",
+    async (failureKind) => {
+      const error = providerError(failureKind);
+      const firstRequest = jest.fn().mockRejectedValue(error);
+
+      await expect(
+        executeProviderModelRequest({
+          candidateModels: ["model-a"],
+          capability: "llm",
+          provider: "gemini",
+          request: firstRequest,
+          retryDelayMs: 0,
+        }),
+      ).rejects.toBe(error);
+
+      const secondRequest = jest.fn().mockResolvedValue("unexpected");
+      await expect(
+        executeProviderModelRequest({
+          candidateModels: ["model-a"],
+          capability: "llm",
+          provider: "gemini",
+          request: secondRequest,
+          retryDelayMs: 0,
+        }),
+      ).rejects.toMatchObject({
+        failureKind,
+        message: failureKind,
+      });
+
+      expect(secondRequest).not.toHaveBeenCalled();
+      expect(getProviderCircuitState("gemini", "llm")).toMatchObject({
+        failureKind,
+        provider: "gemini",
+      });
+    },
+  );
+
+  it("allows an explicit retry after resetting a provider circuit", async () => {
+    await expect(
+      executeProviderModelRequest({
+        candidateModels: ["model-a"],
+        capability: "stt",
+        provider: "gemini",
+        request: jest.fn().mockRejectedValue(providerError("authentication")),
+        retryDelayMs: 0,
+      }),
+    ).rejects.toThrow("authentication");
+
+    resetProviderCircuit("gemini", "stt");
+    const request = jest.fn().mockResolvedValue("OK");
+    const result = await executeProviderModelRequest({
+      candidateModels: ["model-a"],
+      capability: "stt",
+      provider: "gemini",
+      request,
+      retryDelayMs: 0,
+    });
+
+    expect(request).toHaveBeenCalledTimes(1);
+    expect(result.value).toBe("OK");
+    expect(getProviderCircuitState("gemini", "stt")).toBeNull();
+  });
+
   it("retries rate limiting once before rotating models", async () => {
     const request = jest
       .fn()
@@ -144,6 +210,50 @@ describe("executeProviderModelRequest", () => {
       "model-b",
     ]);
     expect(result.actualModel).toBe("model-b");
+  });
+
+  it("opens a provider circuit only after generic quota exhausts the fallback chain", async () => {
+    const request = jest
+      .fn()
+      .mockRejectedValue(
+        providerError("quota", "Quota exceeded for generate content requests."),
+      );
+
+    await expect(
+      executeProviderModelRequest({
+        candidateModels: ["model-a", "model-b"],
+        capability: "llm",
+        provider: "gemini",
+        request,
+        retryDelayMs: 0,
+      }),
+    ).rejects.toThrow("quota");
+
+    expect(request.mock.calls.map(([model]) => model)).toEqual([
+      "model-a",
+      "model-b",
+    ]);
+    expect(getProviderCircuitState("gemini", "llm")).toMatchObject({
+      failureKind: "quota",
+    });
+  });
+
+  it("does not open a provider circuit for model-scoped quota", async () => {
+    await expect(
+      executeProviderModelRequest({
+        candidateModels: ["model-a"],
+        capability: "llm",
+        provider: "gemini",
+        request: jest
+          .fn()
+          .mockRejectedValue(
+            providerError("quota", "Model quota exceeded for model-a."),
+          ),
+        retryDelayMs: 0,
+      }),
+    ).rejects.toThrow("quota");
+
+    expect(getProviderCircuitState("gemini", "llm")).toBeNull();
   });
 
   it("does not retry a streaming request after response data arrived", async () => {

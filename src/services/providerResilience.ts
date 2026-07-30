@@ -26,6 +26,28 @@ interface ProviderModelRequestParams<T> {
   retryDelayMs?: number;
 }
 
+export interface ProviderCircuitState {
+  capability: ResilientProviderCapability;
+  failureKind: ProviderFailureKind;
+  message: string;
+  openedAt: number;
+  provider: Provider;
+}
+
+export class ProviderCircuitOpenError extends Error {
+  readonly capability: ResilientProviderCapability;
+  readonly failureKind: ProviderFailureKind;
+  readonly provider: Provider;
+
+  constructor(state: ProviderCircuitState) {
+    super(state.message);
+    this.name = "ProviderCircuitOpenError";
+    this.capability = state.capability;
+    this.failureKind = state.failureKind;
+    this.provider = state.provider;
+  }
+}
+
 const DEFAULT_RETRY_DELAY_MS = 350;
 const DEFAULT_MAX_SAME_MODEL_RETRIES = 1;
 const MAX_MODEL_CANDIDATES = 3;
@@ -33,6 +55,8 @@ const TEMPORARY_CIRCUIT_MS = 5 * 60_000;
 const UNAVAILABLE_MODEL_CIRCUIT_MS = 30 * 60_000;
 
 const unhealthyModels = new Map<string, number>();
+const providerCircuits = new Map<string, ProviderCircuitState>();
+const providerCircuitListeners = new Set<() => void>();
 
 function recordResilienceEvent(params: {
   event: string;
@@ -54,6 +78,65 @@ function circuitKey(
   model: string,
 ) {
   return `${provider}:${capability}:${model}`;
+}
+
+function providerCircuitKey(
+  provider: Provider,
+  capability: ResilientProviderCapability,
+) {
+  return `${provider}:${capability}`;
+}
+
+function emitProviderCircuitChange() {
+  providerCircuitListeners.forEach((listener) => listener());
+}
+
+function openProviderCircuit(params: {
+  capability: ResilientProviderCapability;
+  error: unknown;
+  failureKind: ProviderFailureKind;
+  provider: Provider;
+}) {
+  const state: ProviderCircuitState = {
+    capability: params.capability,
+    failureKind: params.failureKind,
+    message:
+      params.error instanceof Error
+        ? params.error.message
+        : String(params.error),
+    openedAt: Date.now(),
+    provider: params.provider,
+  };
+  const key = providerCircuitKey(params.provider, params.capability);
+  const previous = providerCircuits.get(key);
+  providerCircuits.set(key, state);
+
+  if (
+    !previous ||
+    previous.failureKind !== state.failureKind ||
+    previous.message !== state.message
+  ) {
+    emitProviderCircuitChange();
+  }
+
+  recordResilienceEvent({
+    event: "provider-circuit-opened",
+    level: "warn",
+    payload: { ...state },
+  });
+}
+
+function clearProviderCircuit(
+  provider: Provider,
+  capability: ResilientProviderCapability,
+) {
+  if (providerCircuits.delete(providerCircuitKey(provider, capability))) {
+    emitProviderCircuitChange();
+    recordResilienceEvent({
+      event: "provider-circuit-closed",
+      payload: { capability, provider },
+    });
+  }
 }
 
 function isAbortError(error: unknown, abortSignal?: AbortSignal) {
@@ -260,6 +343,20 @@ function waitForRetry(delayMs: number, abortSignal?: AbortSignal) {
 export async function executeProviderModelRequest<T>(
   params: ProviderModelRequestParams<T>,
 ): Promise<ProviderModelRequestResult<T>> {
+  const providerCircuit = getProviderCircuitState(
+    params.provider,
+    params.capability,
+  );
+
+  if (providerCircuit) {
+    recordResilienceEvent({
+      event: "provider-circuit-request-blocked",
+      level: "warn",
+      payload: { ...providerCircuit },
+    });
+    throw new ProviderCircuitOpenError(providerCircuit);
+  }
+
   const requestedModel = params.candidateModels[0]?.trim() ?? "";
   const candidates = getAvailableCandidates(params);
   const maxSameModelRetries =
@@ -296,6 +393,7 @@ export async function executeProviderModelRequest<T>(
         unhealthyModels.delete(
           circuitKey(params.provider, params.capability, model),
         );
+        clearProviderCircuit(params.provider, params.capability);
 
         if (attempts > 1 || model !== requestedModel) {
           recordResilienceEvent({
@@ -364,6 +462,21 @@ export async function executeProviderModelRequest<T>(
           callerAllowsRetry && hasFallback && canFailOverToAnotherModel(kind);
 
         if (!shouldFailOver) {
+          const providerWideTerminalFailure =
+            kind === "authentication" ||
+            kind === "credits" ||
+            (kind === "quota" &&
+              failureScope !== "model" &&
+              !hasFallback);
+
+          if (providerWideTerminalFailure && kind) {
+            openProviderCircuit({
+              capability: params.capability,
+              error,
+              failureKind: kind,
+              provider: params.provider,
+            });
+          }
           throw error;
         }
 
@@ -396,6 +509,47 @@ export async function executeProviderModelRequest<T>(
     : new Error(String(lastError ?? "Provider request failed."));
 }
 
+export function getProviderCircuitState(
+  provider: Provider,
+  capability: ResilientProviderCapability,
+) {
+  return providerCircuits.get(providerCircuitKey(provider, capability)) ?? null;
+}
+
+export function subscribeToProviderCircuitChanges(listener: () => void) {
+  providerCircuitListeners.add(listener);
+  return () => {
+    providerCircuitListeners.delete(listener);
+  };
+}
+
+export function resetProviderCircuit(
+  provider: Provider,
+  capability?: ResilientProviderCapability,
+) {
+  if (capability) {
+    clearProviderCircuit(provider, capability);
+    return;
+  }
+
+  let changed = false;
+  for (const key of providerCircuits.keys()) {
+    if (key.startsWith(`${provider}:`)) {
+      providerCircuits.delete(key);
+      changed = true;
+    }
+  }
+
+  if (changed) {
+    emitProviderCircuitChange();
+    recordResilienceEvent({
+      event: "provider-circuits-reset",
+      payload: { provider },
+    });
+  }
+}
+
 export function resetProviderModelHealthForTests() {
   unhealthyModels.clear();
+  providerCircuits.clear();
 }
