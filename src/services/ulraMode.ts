@@ -43,6 +43,7 @@ export interface UlraModeResult {
   entries: UlraModeEntry[];
   estimatedUsage: UsageEstimate;
   failures: UlraModeFailure[];
+  retiredParticipants: number;
   roundsCompleted: number;
   synthesisPrompt: string;
 }
@@ -185,6 +186,7 @@ export async function runUlraModeDeliberation(params: {
       entries,
       estimatedUsage: sumUsage(entries.map(({ usage }) => usage)),
       failures,
+      retiredParticipants: retiredParticipants.size,
       roundsCompleted: 0,
       synthesisPrompt: "",
     };
@@ -347,6 +349,7 @@ export async function runUlraModeDeliberation(params: {
       entries,
       estimatedUsage: sumUsage(entries.map(({ usage }) => usage)),
       failures,
+      retiredParticipants: retiredParticipants.size,
       roundsCompleted: 0,
       synthesisPrompt: "",
     };
@@ -375,6 +378,7 @@ export async function runUlraModeDeliberation(params: {
     entries,
     estimatedUsage: sumUsage(entries.map(({ usage }) => usage)),
     failures,
+    retiredParticipants: retiredParticipants.size,
     roundsCompleted,
     synthesisPrompt: buildSynthesisPrompt({
       entries,

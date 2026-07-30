@@ -15,6 +15,7 @@ import {
   loadLatencyEstimate,
   recordLatencySamples,
   type LatencyRouteDescriptor,
+  type UlraLatencyOutcome,
 } from "../../services/latencyStats";
 import type {
   VoicePhaseProgress,
@@ -23,6 +24,7 @@ import type {
 } from "../../types";
 
 interface ActiveLatencyProgress {
+  descriptor: LatencyRouteDescriptor;
   phase: VoicePhaseProgressPhase;
   key: string;
   keys: string[];
@@ -102,6 +104,7 @@ export function useLatencyProgressController({
       const key = createLatencyRouteKey(descriptor);
       const keys = createLatencyRouteKeys(descriptor);
       const active: ActiveLatencyProgress = {
+        descriptor,
         phase,
         key,
         keys,
@@ -166,6 +169,80 @@ export function useLatencyProgressController({
             },
           });
         });
+    },
+    [publishLatencyProgress],
+  );
+
+  const updateUlraLatencyOutcome = useCallback(
+    (outcome: UlraLatencyOutcome) => {
+      const candidates = [
+        activeTurnProgressRef.current,
+        activeSpeechStartProgressRef.current,
+        activePhaseProgressRef.current,
+      ].filter(
+        (active): active is ActiveLatencyProgress =>
+          Boolean(active?.descriptor.ulraRoutes?.length),
+      );
+
+      candidates.forEach((active) => {
+        const descriptor = {
+          ...active.descriptor,
+          ulraOutcome: outcome,
+        };
+        const runId = latencyRunIdRef.current + 1;
+        latencyRunIdRef.current = runId;
+        active.descriptor = descriptor;
+        active.key = createLatencyRouteKey(descriptor);
+        active.keys = createLatencyRouteKeys(descriptor);
+        active.estimatedMs = getDefaultLatencyEstimateMs(descriptor);
+        active.sampleCount = 0;
+        active.learned = false;
+        active.runId = runId;
+
+        void loadLatencyEstimate(descriptor)
+          .then((estimate) => {
+            const isStillActive =
+              activeTurnProgressRef.current === active ||
+              activeSpeechStartProgressRef.current === active ||
+              activePhaseProgressRef.current === active;
+            if (!isStillActive || active.runId !== runId) {
+              return;
+            }
+
+            active.estimatedMs = estimate.estimatedMs;
+            active.sampleCount = estimate.sampleCount;
+            active.learned = estimate.learned;
+            active.keys = estimate.keys;
+            recordDebugLogEvent({
+              event: "adaptive-latency-ulra-outcome-applied",
+              payload: {
+                estimatedMs: estimate.estimatedMs,
+                key: estimate.key,
+                outcome,
+                phase: active.phase,
+                sampleCount: estimate.sampleCount,
+                source: estimate.source,
+              },
+            });
+            publishLatencyProgress();
+          })
+          .catch((error) => {
+            recordDebugLogEvent({
+              event: "adaptive-latency-estimate-load-failed",
+              level: "warn",
+              payload: {
+                key: active.key,
+                message:
+                  error instanceof Error ? error.message : String(error),
+                phase: active.phase,
+              },
+            });
+          });
+      });
+
+      if (candidates.length > 0) {
+        publishLatencyProgress();
+      }
     },
     [publishLatencyProgress],
   );
@@ -251,5 +328,6 @@ export function useLatencyProgressController({
     finishLatencyProgress,
     finishSpeechStartProgress,
     startLatencyProgress,
+    updateUlraLatencyOutcome,
   };
 }

@@ -238,6 +238,7 @@ export interface MessageUlraModeMetadata {
   estimatedIntermediateTokens: number;
   failedCalls: number;
   failures: MessageUlraModeCall[];
+  retiredParticipants?: number;
   roundsCompleted: number;
   roundsRequested: number;
   successfulCalls: number;

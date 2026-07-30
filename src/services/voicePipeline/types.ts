@@ -33,6 +33,12 @@ export interface PipelineCallbacks {
   onWebSearchComplete?: () => void;
   onWebSearchFallback?: (error: Error) => void;
   onLlmStart?: () => void;
+  onUlraModeComplete?: (summary: {
+    failedCalls: number;
+    outcome: "degraded" | "full" | "retired";
+    retiredParticipants: number;
+    successfulCalls: number;
+  }) => void;
   onChunk: (text: string) => void;
   onResponseDone: (
     fullText: string,

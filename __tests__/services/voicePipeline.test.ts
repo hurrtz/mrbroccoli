@@ -2243,6 +2243,7 @@ describe("runVoicePipeline", () => {
           round: 1,
         },
       ],
+      retiredParticipants: 1,
       roundsCompleted: 1,
       synthesisPrompt: "Private Uber synthesis evidence",
     });
@@ -2273,6 +2274,7 @@ describe("runVoicePipeline", () => {
     const callbacks = {
       onTranscription: jest.fn(),
       onLlmStart: jest.fn(),
+      onUlraModeComplete: jest.fn(),
       onChunk: jest.fn(),
       onResponseDone: jest.fn(),
       onAudioReady: jest.fn(),
@@ -2320,6 +2322,12 @@ describe("runVoicePipeline", () => {
 
     expect(searchWeb).toHaveBeenCalledTimes(1);
     expect(callbacks.onLlmStart).toHaveBeenCalledTimes(1);
+    expect(callbacks.onUlraModeComplete).toHaveBeenCalledWith({
+      failedCalls: 1,
+      outcome: "retired",
+      retiredParticipants: 1,
+      successfulCalls: 2,
+    });
     expect(runUlraModeDeliberation).toHaveBeenCalledWith(
       expect.objectContaining({
         config: ulraMode,
@@ -2352,6 +2360,7 @@ describe("runVoicePipeline", () => {
       expect.objectContaining({
         ulraMode: expect.objectContaining({
           failedCalls: 1,
+          retiredParticipants: 1,
           roundsCompleted: 1,
           roundsRequested: 1,
           successfulCalls: 2,

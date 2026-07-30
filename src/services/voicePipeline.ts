@@ -217,6 +217,18 @@ export async function runVoicePipeline(
 
       additionalUsage = deliberation.estimatedUsage;
       synthesisContext = deliberation.synthesisPrompt;
+      const retiredParticipants = deliberation.retiredParticipants ?? 0;
+      callbacks.onUlraModeComplete?.({
+        failedCalls: deliberation.failures.length,
+        outcome:
+          retiredParticipants > 0
+            ? "retired"
+            : deliberation.failures.length > 0
+              ? "degraded"
+              : "full",
+        retiredParticipants,
+        successfulCalls: deliberation.entries.length,
+      });
       const partialFailureNotice =
         deliberation.failures.length > 0
           ? {
@@ -274,6 +286,7 @@ export async function runVoicePipeline(
               round,
             }),
           ),
+          retiredParticipants,
           roundsCompleted: deliberation.roundsCompleted,
           roundsRequested: ulraMode.rounds,
           successfulCalls: deliberation.entries.length,

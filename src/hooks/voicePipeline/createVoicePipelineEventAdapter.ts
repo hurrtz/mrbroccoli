@@ -110,6 +110,13 @@ export function createVoicePipelineEventAdapter({
   webSearchMode,
   webSearchProvider,
 }: EventAdapterParams) {
+  const ulraLatencyRoutes = ulraMode?.routes.map(
+    ({ model: routeModel, modelEffort: routeEffort, provider: routeProvider }) => ({
+      effort: routeEffort,
+      model: routeModel,
+      provider: routeProvider,
+    }),
+  );
   const startBriefThinkingLatency = () =>
     latency.startLatencyProgress("thinking-briefly", {
       phase: "request-preparation",
@@ -120,6 +127,7 @@ export function createVoicePipelineEventAdapter({
       webSearchProvider,
       ulraModelCount: ulraMode?.routes.length,
       ulraRounds: ulraMode?.rounds,
+      ulraRoutes: ulraLatencyRoutes,
     });
   const startThinkingLatency = () =>
     latency.startLatencyProgress("thinking", {
@@ -133,6 +141,7 @@ export function createVoicePipelineEventAdapter({
       webSearchProvider,
       ulraModelCount: ulraMode?.routes.length,
       ulraRounds: ulraMode?.rounds,
+      ulraRoutes: ulraLatencyRoutes,
     });
   const startSynthesisLatency = () =>
     latency.startLatencyProgress("synthesizing", {
@@ -198,6 +207,7 @@ export function createVoicePipelineEventAdapter({
       webSearchProvider,
       ulraModelCount: ulraMode?.routes.length,
       ulraRounds: ulraMode?.rounds,
+      ulraRoutes: ulraLatencyRoutes,
     };
 
     if (spokenRepliesEnabled) {
@@ -333,6 +343,13 @@ export function createVoicePipelineEventAdapter({
       showToast(formatNoticeToast(notice), undefined, "danger");
     },
     onLlmStart: handleLlmStarted,
+    onUlraModeComplete: ({ outcome }) => {
+      if (!isActiveRun()) {
+        return;
+      }
+
+      latency.updateUlraLatencyOutcome(outcome);
+    },
     onChunk: (text) => {
       if (!isActiveRun()) {
         return;

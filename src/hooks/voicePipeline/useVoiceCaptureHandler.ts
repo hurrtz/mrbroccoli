@@ -87,6 +87,7 @@ export function useVoiceCaptureHandler({
     finishLatencyProgress,
     finishSpeechStartProgress,
     startLatencyProgress,
+    updateUlraLatencyOutcome,
   } = useLatencyProgressController({ setPhaseProgress });
   const { beginStreamingRender, cancelStreamingRender, queueStreamingRender } =
     useStreamingTextScheduler({ abortRef, setStreamingText });
@@ -216,6 +217,7 @@ export function useVoiceCaptureHandler({
           finishLatencyProgress,
           finishSpeechStartProgress,
           startLatencyProgress,
+          updateUlraLatencyOutcome,
         },
         messageState: {
           consumeAssistantMetadata,
@@ -447,6 +449,7 @@ export function useVoiceCaptureHandler({
       ttsMode,
       ttsProvider,
       ulraMode,
+      updateUlraLatencyOutcome,
       updateConversationContextSummary,
       updateAssistantTurnReceipt,
       webSearchApiKey,

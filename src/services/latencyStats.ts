@@ -27,6 +27,14 @@ export type LatencyStatsPhase =
   | "turn-to-first-speech"
   | "turn-to-completion";
 
+export type UlraLatencyOutcome = "degraded" | "full" | "retired";
+
+export interface UlraLatencyRoute {
+  effort?: string | null;
+  model: string;
+  provider: Provider;
+}
+
 export interface LatencyRouteDescriptor {
   phase: LatencyStatsPhase;
   provider: Provider | WebSearchProvider | null;
@@ -46,7 +54,9 @@ export interface LatencyRouteDescriptor {
   replyPlayback?: ReplyPlayback;
   spokenRepliesEnabled?: boolean;
   ulraModelCount?: number;
+  ulraOutcome?: UlraLatencyOutcome;
   ulraRounds?: number;
+  ulraRoutes?: UlraLatencyRoute[];
 }
 
 export interface LatencyRouteStats {
@@ -73,15 +83,58 @@ function normalizeKeyPart(value: unknown): string {
   return value.trim().toLowerCase().replace(/[^a-z0-9._-]+/g, "_");
 }
 
+function hashKeyPart(value: string) {
+  let hash = 2166136261;
+  for (let index = 0; index < value.length; index += 1) {
+    hash ^= value.charCodeAt(index);
+    hash = Math.imul(hash, 16777619);
+  }
+  return (hash >>> 0).toString(36);
+}
+
+export function createUlraLatencyRouteFingerprint(
+  routes: UlraLatencyRoute[] | undefined,
+) {
+  if (!routes?.length) {
+    return null;
+  }
+
+  const routeIdentity = routes
+    .map(
+      ({ effort, model, provider }, index) =>
+        `${index + 1}:${normalizeKeyPart(provider)}:${normalizeKeyPart(model)}:${normalizeKeyPart(effort)}`,
+    )
+    .join("|");
+
+  return `${routes.length}-${hashKeyPart(routeIdentity)}`;
+}
+
+function getUlraKeyParts(descriptor: LatencyRouteDescriptor) {
+  const routeFingerprint = createUlraLatencyRouteFingerprint(
+    descriptor.ulraRoutes,
+  );
+
+  if (routeFingerprint && descriptor.ulraRounds) {
+    return [
+      "ulra-v2",
+      String(descriptor.ulraRoutes?.length ?? descriptor.ulraModelCount ?? 0),
+      String(descriptor.ulraRounds),
+      routeFingerprint,
+      normalizeKeyPart(descriptor.ulraOutcome ?? "full"),
+    ];
+  }
+
+  return descriptor.ulraModelCount && descriptor.ulraRounds
+    ? [
+        "ulra",
+        String(descriptor.ulraModelCount),
+        String(descriptor.ulraRounds),
+      ]
+    : [];
+}
+
 export function createLatencyRouteKey(descriptor: LatencyRouteDescriptor) {
-  const ulraKeyParts =
-    descriptor.ulraModelCount && descriptor.ulraRounds
-      ? [
-          "ulra",
-          String(descriptor.ulraModelCount),
-          String(descriptor.ulraRounds),
-        ]
-      : [];
+  const ulraKeyParts = getUlraKeyParts(descriptor);
 
   if (descriptor.phase === "stt-transcription") {
     return [
@@ -198,8 +251,8 @@ export function createLatencyRouteKeys(descriptor: LatencyRouteDescriptor) {
     descriptor.webSearchMode && descriptor.webSearchMode !== "off"
       ? "search-on"
       : "search-off",
-    ...(descriptor.ulraModelCount && descriptor.ulraRounds
-      ? [`ulra-${descriptor.ulraModelCount}-${descriptor.ulraRounds}`]
+    ...(getUlraKeyParts(descriptor).length > 0
+      ? [getUlraKeyParts(descriptor).join("-")]
       : []),
   ].join(":");
 
@@ -257,7 +310,41 @@ function getLlmResponseEstimateMs(descriptor: LatencyRouteDescriptor) {
   ) {
     estimateMs += 4_000;
   }
-  if (descriptor.ulraModelCount && descriptor.ulraRounds) {
+  if (descriptor.ulraRoutes?.length && descriptor.ulraRounds) {
+    const synthesisEstimateMs = estimateMs;
+    const participantEstimates = descriptor.ulraRoutes.map((route) =>
+      getLlmResponseEstimateMs({
+        ...descriptor,
+        effort: route.effort,
+        model: route.model,
+        provider: route.provider,
+        ulraModelCount: undefined,
+        ulraOutcome: undefined,
+        ulraRounds: undefined,
+        ulraRoutes: undefined,
+      }),
+    );
+    const slowestParticipantMs = Math.max(...participantEstimates);
+    const concurrentTailFactor = Math.min(
+      1.6,
+      1 + (descriptor.ulraRoutes.length - 1) * 0.18,
+    );
+    const reviewContextFactor = 1 + descriptor.ulraRounds * 0.12;
+    const outcomeFactor =
+      descriptor.ulraOutcome === "retired"
+        ? 0.82
+        : descriptor.ulraOutcome === "degraded"
+          ? 0.92
+          : 1;
+
+    estimateMs =
+      synthesisEstimateMs +
+      slowestParticipantMs *
+        (descriptor.ulraRounds + 1) *
+        concurrentTailFactor *
+        reviewContextFactor *
+        outcomeFactor;
+  } else if (descriptor.ulraModelCount && descriptor.ulraRounds) {
     // Participants run concurrently, but every review round carries a larger
     // shared deliberation and completes at the pace of its slowest route. The
     // selected model then performs one final synthesis. Keep this cold-start

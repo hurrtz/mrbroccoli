@@ -97,6 +97,85 @@ describe("latencyStats", () => {
     );
   });
 
+  it("separates Uber learning by participant routes and run outcome", () => {
+    const routes = [
+      {
+        provider: "openai" as const,
+        model: "gpt-5.6-sol",
+        effort: "xhigh",
+      },
+      {
+        provider: "gemini" as const,
+        model: "gemini-3.1-pro-preview",
+      },
+      {
+        provider: "deepseek" as const,
+        model: "deepseek-v4-pro",
+        effort: "max",
+      },
+    ];
+    const descriptor = {
+      phase: "llm-response" as const,
+      provider: "openai" as const,
+      model: "gpt-5.6-sol",
+      effort: "xhigh",
+      responseLength: "thorough" as const,
+      ulraModelCount: routes.length,
+      ulraRounds: 2,
+      ulraRoutes: routes,
+      ulraOutcome: "full" as const,
+    };
+    const fullKey = createLatencyRouteKey(descriptor);
+    const retiredKey = createLatencyRouteKey({
+      ...descriptor,
+      ulraOutcome: "retired",
+    });
+    const changedRouteKey = createLatencyRouteKey({
+      ...descriptor,
+      ulraRoutes: routes.map((route, index) =>
+        index === 1 ? { ...route, model: "gemini-3.5-pro" } : route,
+      ),
+    });
+
+    expect(fullKey).toContain(":ulra-v2:3:2:3-");
+    expect(fullKey).toMatch(/:full$/);
+    expect(retiredKey).toMatch(/:retired$/);
+    expect(retiredKey).not.toBe(fullKey);
+    expect(changedRouteKey).not.toBe(fullKey);
+  });
+
+  it("bases cold Uber estimates on the slowest configured participant", () => {
+    const createDescriptor = (participantModel: string) => ({
+      phase: "llm-response" as const,
+      provider: "xai" as const,
+      model: "grok-4.5",
+      effort: "low",
+      responseLength: "normal" as const,
+      ulraModelCount: 2,
+      ulraRounds: 1,
+      ulraRoutes: [
+        {
+          provider: "xai" as const,
+          model: "grok-4.5",
+          effort: "low",
+        },
+        {
+          provider: "anthropic" as const,
+          model: participantModel,
+          effort: "max",
+        },
+      ],
+    });
+
+    expect(
+      getDefaultLatencyEstimateMs(createDescriptor("claude-fable-5")),
+    ).toBeGreaterThan(
+      getDefaultLatencyEstimateMs(
+        createDescriptor("claude-haiku-4-5-20251001"),
+      ),
+    );
+  });
+
   it("gives xhigh effort its own estimate between high and max", () => {
     const estimate = (effort: string) =>
       getDefaultLatencyEstimateMs({

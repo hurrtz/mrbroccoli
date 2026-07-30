@@ -840,6 +840,12 @@ describe("useVoicePipeline", () => {
         jest.advanceTimersByTime(1_000);
         callbacks.onLlmStart();
         jest.advanceTimersByTime(4_000);
+        callbacks.onUlraModeComplete({
+          failedCalls: 1,
+          outcome: "retired",
+          retiredParticipants: 1,
+          successfulCalls: 6,
+        });
         callbacks.onResponseDone("Uber reply");
         return "Run Uber Mode";
       },
@@ -860,7 +866,9 @@ describe("useVoicePipeline", () => {
       expect(
         (AsyncStorage.setItem as jest.Mock).mock.calls.some(
           ([, value]) =>
-            typeof value === "string" && value.includes(":ulra:3:2"),
+            typeof value === "string" &&
+            value.includes(":ulra-v2:3:2:") &&
+            value.includes(":retired"),
         ),
       ).toBe(true);
     });
