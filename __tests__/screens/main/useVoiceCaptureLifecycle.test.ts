@@ -1,4 +1,5 @@
 import { act, renderHook } from "@testing-library/react-native";
+import { AppState } from "react-native";
 
 import {
   MAX_RECORDING_MS,
@@ -69,6 +70,20 @@ describe("useVoiceCaptureLifecycle auto-stop", () => {
   afterEach(() => {
     jest.runOnlyPendingTimers();
     jest.useRealTimers();
+  });
+
+  it("allows an opted-in Drive session to re-arm in the background", async () => {
+    const previousAppState = AppState.currentState;
+    AppState.currentState = "background";
+    const params = buildParams({ allowBackgroundStart: true });
+    const { result } = renderHook(() => useVoiceCaptureLifecycle(params));
+
+    await act(async () => {
+      await result.current.startVoiceCapture();
+    });
+
+    expect(params.recorder.startRecording).toHaveBeenCalledTimes(1);
+    AppState.currentState = previousAppState;
   });
 
   it("auto-stops at the max duration and still transcribes the captured audio", async () => {

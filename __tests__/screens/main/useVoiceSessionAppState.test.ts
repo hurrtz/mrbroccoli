@@ -66,6 +66,28 @@ describe("useVoiceSessionAppState", () => {
     expect(stopVoiceCapture).not.toHaveBeenCalled();
   });
 
+  it("keeps an opted-in Drive capture running after the screen locks", async () => {
+    const stopVoiceCapture = jest.fn(async () => undefined);
+    const onBackground = jest.fn();
+    renderHook(() =>
+      useVoiceSessionAppState({
+        allowBackgroundCapture: true,
+        hasActiveVoiceCaptureNow: () => true,
+        onBackground,
+        onBackgroundSubmitError: jest.fn(),
+        stopVoiceCapture,
+      }),
+    );
+
+    await act(async () => {
+      appStateListener?.("background");
+      await Promise.resolve();
+    });
+
+    expect(stopVoiceCapture).not.toHaveBeenCalled();
+    expect(onBackground).not.toHaveBeenCalled();
+  });
+
   it("reports a background capture stop failure", async () => {
     const failure = new Error("Recorder stop failed");
     const stopVoiceCapture = jest.fn(async () => {

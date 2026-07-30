@@ -18,6 +18,7 @@ import type {
 export const MAX_RECORDING_MS = 150000;
 
 interface UseVoiceCaptureLifecycleParams {
+  allowBackgroundStart?: boolean;
   isRecording?: boolean;
   maxRecordingMs?: number;
   nativeStt: NativeSpeechRecognizerController;
@@ -35,6 +36,7 @@ interface UseVoiceCaptureLifecycleParams {
 }
 
 export function useVoiceCaptureLifecycle({
+  allowBackgroundStart = false,
   isRecording = false,
   maxRecordingMs = MAX_RECORDING_MS,
   nativeStt,
@@ -104,7 +106,9 @@ export function useVoiceCaptureLifecycle({
       const prepared = await preparationPromise;
       const currentAppState = AppState.currentState;
       const appIsKnownInactive =
-        typeof currentAppState === "string" && currentAppState !== "active";
+        !allowBackgroundStart &&
+        typeof currentAppState === "string" &&
+        currentAppState !== "active";
       if (!prepared || appIsKnownInactive) {
         recordDebugLogEvent({
           event: "voice-capture-start-superseded",
@@ -183,6 +187,7 @@ export function useVoiceCaptureLifecycle({
     }
   }, [
     clearMaxDurationTimer,
+    allowBackgroundStart,
     isRecording,
     maxRecordingMs,
     nativeStt,

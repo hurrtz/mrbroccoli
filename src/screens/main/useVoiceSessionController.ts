@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo } from "react";
 import { PROVIDER_DEFAULT_STT_MODELS } from "../../constants/models";
+import { setBackgroundVoiceTurnActive } from "../../services/backgroundVoiceTurn";
 import { recordDebugLogEvent } from "../../services/debugLogCapture";
 import { getMaxRecordingMs } from "../../utils/recordingLimits";
 import { useDriveSessionController } from "./voiceSession/useDriveSessionController";
@@ -81,6 +82,9 @@ export function useVoiceSessionController({
     startVoiceCapture,
     stopVoiceCapture,
   } = useVoiceCaptureLifecycle({
+    allowBackgroundStart:
+      settings.inputMode === "drive-session" &&
+      settings.sttMode === "provider",
     isRecording,
     maxRecordingMs,
     nativeStt,
@@ -168,7 +172,34 @@ export function useVoiceSessionController({
       (driveSession.autoContinueEnabled && driveSession.engaged),
   );
 
+  const allowBackgroundDriveSession =
+    settings.inputMode === "drive-session" &&
+    settings.sttMode === "provider" &&
+    driveSession.autoContinueEnabled &&
+    driveSession.engaged;
+  const backgroundVoiceSessionActive =
+    isBusy || isRecording || allowBackgroundDriveSession;
+
+  useEffect(() => {
+    const available = setBackgroundVoiceTurnActive(
+      backgroundVoiceSessionActive,
+    );
+    recordDebugLogEvent({
+      event: backgroundVoiceSessionActive
+        ? "voice-session-background-support-armed"
+        : "voice-session-background-support-released",
+      payload: { available },
+    });
+
+    return () => {
+      if (backgroundVoiceSessionActive) {
+        setBackgroundVoiceTurnActive(false);
+      }
+    };
+  }, [backgroundVoiceSessionActive]);
+
   useVoiceSessionAppState({
+    allowBackgroundCapture: allowBackgroundDriveSession,
     hasActiveVoiceCaptureNow,
     onBackground: driveSession.suspend,
     onBackgroundSubmitError: (error) => {

@@ -1,6 +1,5 @@
 import { useCallback, useRef, type Dispatch, type SetStateAction } from "react";
 
-import { setBackgroundVoiceTurnActive } from "../../services/backgroundVoiceTurn";
 import { recordDebugLogEvent } from "../../services/debugLogCapture";
 import { runVoicePipeline } from "../../services/voicePipeline";
 import type { VoicePhaseProgress } from "../../types";
@@ -152,14 +151,6 @@ export function useVoiceCaptureHandler({
       playbackStartedRef.current = false;
       resetTurnMessageState(existingUserMessageId);
       player.resetCancellation();
-      const backgroundGraceAvailable = setBackgroundVoiceTurnActive(true);
-      recordDebugLogEvent({
-        event: "voice-pipeline-background-grace-armed",
-        payload: {
-          available: backgroundGraceAvailable,
-        },
-      });
-
       const state: VoiceTurnRunState = {
         llmStarted: false,
         replyCompleted: false,
@@ -336,7 +327,6 @@ export function useVoiceCaptureHandler({
           return;
         }
 
-        setBackgroundVoiceTurnActive(false);
         recordDebugLogEvent({
           event: "voice-pipeline-finalizing",
           payload: {

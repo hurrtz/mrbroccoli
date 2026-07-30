@@ -580,10 +580,15 @@ class MrBroccoliVoiceTurnService : Service() {
     }
 
     return if (
-      Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE &&
-      phase == "listening"
+      phase == "listening" ||
+      currentControls.mode == "drive-active"
     ) {
-      ServiceInfo.FOREGROUND_SERVICE_TYPE_SHORT_SERVICE
+      ServiceInfo.FOREGROUND_SERVICE_TYPE_MICROPHONE or
+        if (phase == "listening") {
+          0
+        } else {
+          ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC
+        }
     } else {
       ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC
     }

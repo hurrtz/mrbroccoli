@@ -4,6 +4,7 @@ import { AppState } from "react-native";
 import { recordDebugLogEvent } from "../../../services/debugLogCapture";
 
 interface UseVoiceSessionAppStateParams {
+  allowBackgroundCapture?: boolean;
   hasActiveVoiceCaptureNow: () => boolean;
   onBackground?: () => void;
   onBackgroundSubmitError: (error: unknown) => void;
@@ -11,6 +12,7 @@ interface UseVoiceSessionAppStateParams {
 }
 
 export function useVoiceSessionAppState({
+  allowBackgroundCapture = false,
   hasActiveVoiceCaptureNow,
   onBackground,
   onBackgroundSubmitError,
@@ -19,6 +21,13 @@ export function useVoiceSessionAppState({
   useEffect(() => {
     const subscription = AppState.addEventListener("change", (nextAppState) => {
       if (nextAppState !== "background") {
+        return;
+      }
+
+      if (allowBackgroundCapture) {
+        recordDebugLogEvent({
+          event: "voice-session-background-continuing",
+        });
         return;
       }
 
@@ -53,6 +62,7 @@ export function useVoiceSessionAppState({
       subscription.remove();
     };
   }, [
+    allowBackgroundCapture,
     hasActiveVoiceCaptureNow,
     onBackground,
     onBackgroundSubmitError,
