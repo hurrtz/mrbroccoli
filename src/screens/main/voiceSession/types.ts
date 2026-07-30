@@ -20,6 +20,7 @@ export interface AudioPlayerController {
   resumePlayback: () => Promise<boolean>;
   speakText: (text: string) => void;
   stopPlayback: () => Promise<void>;
+  usesNativeAudioQueue?: boolean;
   waitForDrain: () => Promise<void>;
   waitForPlaybackRouteSettle: () => Promise<void>;
 }

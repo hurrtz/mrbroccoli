@@ -9,6 +9,7 @@ import { useVoiceSessionAppState } from "./voiceSession/useVoiceSessionAppState"
 import { useVoiceSessionCancellation } from "./voiceSession/useVoiceSessionCancellation";
 import { useVoiceSessionGuards } from "./voiceSession/useVoiceSessionGuards";
 import { useVoiceSessionKeepAwake } from "./voiceSession/useVoiceSessionKeepAwake";
+import { useVoiceRemoteControls } from "./voiceSession/useVoiceRemoteControls";
 import type { UseVoiceSessionControllerParams } from "./voiceSession/types";
 
 export function useVoiceSessionController({
@@ -146,6 +147,20 @@ export function useVoiceSessionController({
     stopAmbientMonitoring: recorder.stopAmbientMonitoring,
     stopVoiceCapture,
     stopReplay,
+    t,
+  });
+  useVoiceRemoteControls({
+    canRepeat: driveSession.canRepeat,
+    driveActive:
+      driveSession.autoContinueEnabled && driveSession.engaged,
+    driveEnabled:
+      driveSession.autoContinueEnabled && driveSession.engaged,
+    isRecording,
+    onContinueDrive: driveSession.handleContinue,
+    onPauseDrive: driveSession.handleStop,
+    onRepeat: driveSession.handleRepeat,
+    onStopRecording: stopVoiceCapture,
+    player,
     t,
   });
   useVoiceSessionKeepAwake(

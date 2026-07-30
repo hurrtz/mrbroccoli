@@ -506,6 +506,50 @@ describe("useAudioPlayer", () => {
     expect(result.current.isPlaybackPaused).toBe(false);
   });
 
+  it("tracks pause and resume commands issued by lock-screen controls", async () => {
+    const { result, rerender } = renderHook(() => useAudioPlayer());
+
+    await act(async () => {
+      result.current.enqueueAudio("reply.mp3");
+      await Promise.resolve();
+      mockStatus = {
+        ...mockStatus,
+        playing: true,
+        playbackState: "playing",
+        timeControlStatus: "playing",
+      };
+      rerender(undefined);
+      await Promise.resolve();
+    });
+
+    await act(async () => {
+      mockStatus = {
+        ...mockStatus,
+        playing: false,
+        playbackState: "paused",
+        timeControlStatus: "paused",
+      };
+      rerender(undefined);
+      await Promise.resolve();
+    });
+
+    expect(result.current.isPlaybackPaused).toBe(true);
+    expect(result.current.isPlaying).toBe(true);
+
+    await act(async () => {
+      mockStatus = {
+        ...mockStatus,
+        playing: true,
+        playbackState: "playing",
+        timeControlStatus: "playing",
+      };
+      rerender(undefined);
+      await Promise.resolve();
+    });
+
+    expect(result.current.isPlaybackPaused).toBe(false);
+  });
+
   it("does not let a newly prefetched clip restart a paused stream", async () => {
     const { result, rerender } = renderHook(() => useAudioPlayer());
 

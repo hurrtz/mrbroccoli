@@ -9,6 +9,8 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.ServiceInfo
 import android.graphics.Color
+import android.media.session.MediaSession
+import android.media.session.PlaybackState
 import android.os.Build
 import android.os.Handler
 import android.os.IBinder
@@ -36,14 +38,51 @@ internal data class MrBroccoliVoiceTurnState(
   }
 }
 
+internal data class MrBroccoliVoiceTurnControlState(
+  val mode: String = "inactive",
+  val canRepeat: Boolean = false,
+  val phaseLabel: String = "",
+  val pauseLabel: String = "",
+  val continueLabel: String = "",
+  val stopLabel: String = "",
+  val repeatLabel: String = "",
+) {
+  val isActive: Boolean
+    get() = mode != "inactive"
+
+  companion object {
+    private val supportedModes = setOf(
+      "drive-active",
+      "drive-paused",
+      "inactive",
+      "playback-active",
+      "playback-paused",
+      "recording",
+    )
+
+    fun isSupportedMode(mode: String): Boolean = mode in supportedModes
+  }
+}
+
 class MrBroccoliVoiceTurnService : Service() {
   companion object {
     private const val ACTION_SET_STATE =
       "com.tobiaswinkler.app.mrbroccoli.action.SET_VOICE_TURN_STATE"
+    private const val ACTION_SET_CONTROLS =
+      "com.tobiaswinkler.app.mrbroccoli.action.SET_VOICE_TURN_CONTROLS"
+    private const val ACTION_REMOTE_ACTION =
+      "com.tobiaswinkler.app.mrbroccoli.action.VOICE_REMOTE_ACTION"
     private const val EXTRA_PHASE = "phase"
     private const val EXTRA_EXPECTED_SPEECH_AT_MS = "expectedSpeechAtMs"
     private const val EXTRA_PHASE_LABEL = "phaseLabel"
     private const val EXTRA_STATUS_LABEL = "statusLabel"
+    private const val EXTRA_CONTROL_MODE = "controlMode"
+    private const val EXTRA_CAN_REPEAT = "canRepeat"
+    private const val EXTRA_PAUSE_LABEL = "pauseLabel"
+    private const val EXTRA_CONTINUE_LABEL = "continueLabel"
+    private const val EXTRA_STOP_LABEL = "stopLabel"
+    private const val EXTRA_REPEAT_LABEL = "repeatLabel"
+    private const val EXTRA_REMOTE_ACTION = "remoteAction"
     private const val CHANNEL_ID = "mrbroccoli_voice_turn"
     private const val NOTIFICATION_ID = 2404
 
@@ -67,8 +106,9 @@ class MrBroccoliVoiceTurnService : Service() {
         service.handler.post {
           service.updateState(state)
         }
-      } ?: run {
-        val intent = Intent(context, MrBroccoliVoiceTurnService::class.java).apply {
+      } ?: startService(
+        context,
+        Intent(context, MrBroccoliVoiceTurnService::class.java).apply {
           action = ACTION_SET_STATE
           putExtra(EXTRA_PHASE, phase)
           if (expectedSpeechAtMs != null) {
@@ -76,15 +116,75 @@ class MrBroccoliVoiceTurnService : Service() {
           }
           putExtra(EXTRA_PHASE_LABEL, phaseLabel)
           putExtra(EXTRA_STATUS_LABEL, statusLabel)
+        },
+      )
+    }
+
+    fun setControls(
+      context: Context,
+      mode: String,
+      canRepeat: Boolean,
+      phaseLabel: String,
+      pauseLabel: String,
+      continueLabel: String,
+      stopLabel: String,
+      repeatLabel: String,
+    ) {
+      val controls = MrBroccoliVoiceTurnControlState(
+        mode = mode,
+        canRepeat = canRepeat,
+        phaseLabel = phaseLabel,
+        pauseLabel = pauseLabel,
+        continueLabel = continueLabel,
+        stopLabel = stopLabel,
+        repeatLabel = repeatLabel,
+      )
+      val service = activeService
+      if (service != null) {
+        service.handler.post {
+          service.updateControls(controls)
         }
-        ContextCompat.startForegroundService(context, intent)
+      } else if (controls.isActive) {
+        startService(
+          context,
+          Intent(context, MrBroccoliVoiceTurnService::class.java).apply {
+            action = ACTION_SET_CONTROLS
+            putControlExtras(controls)
+          },
+        )
       }
+    }
+
+    fun clearControls(context: Context) {
+      activeService?.let { service ->
+        service.handler.post(service::clearVoiceControls)
+      } ?: context.stopService(
+        Intent(context, MrBroccoliVoiceTurnService::class.java),
+      )
     }
 
     fun end(context: Context) {
       activeService?.let { service ->
-        service.handler.post(service::stopVoiceTurn)
-      } ?: context.stopService(Intent(context, MrBroccoliVoiceTurnService::class.java))
+        service.handler.post(service::endVoiceTurn)
+      } ?: context.stopService(
+        Intent(context, MrBroccoliVoiceTurnService::class.java),
+      )
+    }
+
+    private fun startService(context: Context, intent: Intent) {
+      ContextCompat.startForegroundService(context, intent)
+    }
+
+    private fun Intent.putControlExtras(
+      controls: MrBroccoliVoiceTurnControlState,
+    ) {
+      putExtra(EXTRA_CONTROL_MODE, controls.mode)
+      putExtra(EXTRA_CAN_REPEAT, controls.canRepeat)
+      putExtra(EXTRA_PHASE_LABEL, controls.phaseLabel)
+      putExtra(EXTRA_PAUSE_LABEL, controls.pauseLabel)
+      putExtra(EXTRA_CONTINUE_LABEL, controls.continueLabel)
+      putExtra(EXTRA_STOP_LABEL, controls.stopLabel)
+      putExtra(EXTRA_REPEAT_LABEL, controls.repeatLabel)
     }
   }
 
@@ -93,9 +193,11 @@ class MrBroccoliVoiceTurnService : Service() {
     getSystemService(NotificationManager::class.java)
   }
   private var currentState: MrBroccoliVoiceTurnState? = null
+  private var currentControls = MrBroccoliVoiceTurnControlState()
+  private var mediaSession: MediaSession? = null
 
   private val overtimeUpdate = Runnable {
-    currentState?.let(::publishNotification)
+    publishCurrentNotification()
   }
 
   override fun onCreate() {
@@ -105,15 +207,39 @@ class MrBroccoliVoiceTurnService : Service() {
   }
 
   override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-    if (intent?.action != ACTION_SET_STATE) {
-      stopVoiceTurn()
-      return START_NOT_STICKY
+    when (intent?.action) {
+      ACTION_SET_STATE -> handleSetState(intent)
+      ACTION_SET_CONTROLS -> handleSetControls(intent)
+      ACTION_REMOTE_ACTION -> {
+        intent.getStringExtra(EXTRA_REMOTE_ACTION)
+          ?.takeIf(::isSupportedRemoteAction)
+          ?.let(MrBroccoliVoiceLiveActivityModule::emitRemoteAction)
+      }
+      else -> stopIfInactive()
     }
+    return START_NOT_STICKY
+  }
 
+  override fun onBind(intent: Intent?): IBinder? = null
+
+  override fun onTimeout(startId: Int, fgsType: Int) {
+    stopVoiceTurn()
+  }
+
+  override fun onDestroy() {
+    handler.removeCallbacks(overtimeUpdate)
+    releaseMediaSession()
+    if (activeService === this) {
+      activeService = null
+    }
+    super.onDestroy()
+  }
+
+  private fun handleSetState(intent: Intent) {
     val phase = intent.getStringExtra(EXTRA_PHASE)
     if (phase == null || !MrBroccoliVoiceTurnState.isSupportedPhase(phase)) {
-      stopVoiceTurn()
-      return START_NOT_STICKY
+      stopIfInactive()
+      return
     }
 
     val expectedSpeechAtMs = if (
@@ -137,35 +263,67 @@ class MrBroccoliVoiceTurnService : Service() {
           ?: getString(R.string.voice_turn_notification_title),
       ),
     )
-    return START_NOT_STICKY
   }
 
-  override fun onBind(intent: Intent?): IBinder? = null
-
-  override fun onTimeout(startId: Int, fgsType: Int) {
-    stopVoiceTurn()
-  }
-
-  override fun onDestroy() {
-    handler.removeCallbacks(overtimeUpdate)
-    if (activeService === this) {
-      activeService = null
+  private fun handleSetControls(intent: Intent) {
+    val mode = intent.getStringExtra(EXTRA_CONTROL_MODE)
+    if (
+      mode == null ||
+      !MrBroccoliVoiceTurnControlState.isSupportedMode(mode)
+    ) {
+      stopIfInactive()
+      return
     }
-    super.onDestroy()
+
+    updateControls(
+      MrBroccoliVoiceTurnControlState(
+        mode = mode,
+        canRepeat = intent.getBooleanExtra(EXTRA_CAN_REPEAT, false),
+        phaseLabel = intent.getStringExtra(EXTRA_PHASE_LABEL).orEmpty(),
+        pauseLabel = intent.getStringExtra(EXTRA_PAUSE_LABEL).orEmpty(),
+        continueLabel = intent.getStringExtra(EXTRA_CONTINUE_LABEL).orEmpty(),
+        stopLabel = intent.getStringExtra(EXTRA_STOP_LABEL).orEmpty(),
+        repeatLabel = intent.getStringExtra(EXTRA_REPEAT_LABEL).orEmpty(),
+      ),
+    )
   }
 
   private fun updateState(state: MrBroccoliVoiceTurnState) {
     currentState = state
-    publishNotification(state)
+    publishCurrentNotification()
   }
 
-  private fun publishNotification(state: MrBroccoliVoiceTurnState) {
+  private fun updateControls(controls: MrBroccoliVoiceTurnControlState) {
+    currentControls = controls
+    updateMediaSession()
+    if (currentState != null || controls.isActive) {
+      publishCurrentNotification()
+    } else {
+      stopVoiceTurn()
+    }
+  }
+
+  private fun publishCurrentNotification() {
+    val state = currentState ?: if (currentControls.isActive) {
+      MrBroccoliVoiceTurnState(
+        phase = if (currentControls.mode == "recording") {
+          "listening"
+        } else {
+          "thinking"
+        },
+        expectedSpeechAtMs = null,
+        phaseLabel = currentControls.phaseLabel,
+        statusLabel = currentControls.phaseLabel,
+      )
+    } else {
+      stopVoiceTurn()
+      return
+    }
+
     handler.removeCallbacks(overtimeUpdate)
     val notification = buildNotification(state)
     val foregroundType = foregroundTypeFor(state.phase)
 
-    // Calling startForeground again updates both the notification and the
-    // declared service type when capture becomes network processing.
     ServiceCompat.startForeground(
       this,
       NOTIFICATION_ID,
@@ -204,7 +362,13 @@ class MrBroccoliVoiceTurnService : Service() {
       .setContentTitle("Mr Broccoli")
       .setContentText(notificationStatus(state))
       .setContentIntent(contentIntent)
-      .setCategory(NotificationCompat.CATEGORY_PROGRESS)
+      .setCategory(
+        if (currentControls.isActive) {
+          NotificationCompat.CATEGORY_TRANSPORT
+        } else {
+          NotificationCompat.CATEGORY_PROGRESS
+        },
+      )
       .setColor(Color.rgb(35, 205, 225))
       .setLocalOnly(true)
       .setOngoing(true)
@@ -212,6 +376,8 @@ class MrBroccoliVoiceTurnService : Service() {
       .setPriority(NotificationCompat.PRIORITY_LOW)
       .setSilent(true)
       .setRequestPromotedOngoing(true)
+
+    addControlActions(builder)
 
     val deadline = state.expectedSpeechAtMs
     if (deadline != null) {
@@ -228,12 +394,146 @@ class MrBroccoliVoiceTurnService : Service() {
           .setUsesChronometer(false)
       }
     } else {
-      builder
-        .setShowWhen(false)
-        .setProgress(0, 0, true)
+      builder.setShowWhen(false)
+      if (!currentControls.isActive) {
+        builder.setProgress(0, 0, true)
+      }
     }
 
     return builder.build()
+  }
+
+  private fun addControlActions(builder: NotificationCompat.Builder) {
+    if (!currentControls.isActive) {
+      return
+    }
+
+    val primaryAction = when (currentControls.mode) {
+      "recording" -> "stop"
+      "drive-paused", "playback-paused" -> "continue"
+      else -> "pause"
+    }
+    val primaryLabel = when (primaryAction) {
+      "stop" -> currentControls.stopLabel
+      "continue" -> currentControls.continueLabel
+      else -> currentControls.pauseLabel
+    }
+    val primaryIcon = when (primaryAction) {
+      "stop" -> android.R.drawable.ic_menu_close_clear_cancel
+      "continue" -> android.R.drawable.ic_media_play
+      else -> android.R.drawable.ic_media_pause
+    }
+    builder.addAction(
+      primaryIcon,
+      primaryLabel,
+      remoteActionIntent(primaryAction, requestCode = 1),
+    )
+
+    if (currentControls.canRepeat) {
+      builder.addAction(
+        android.R.drawable.ic_media_next,
+        currentControls.repeatLabel,
+        remoteActionIntent("repeat", requestCode = 2),
+      )
+    }
+  }
+
+  private fun remoteActionIntent(
+    action: String,
+    requestCode: Int,
+  ): PendingIntent {
+    val intent = Intent(this, MrBroccoliVoiceTurnService::class.java).apply {
+      this.action = ACTION_REMOTE_ACTION
+      putExtra(EXTRA_REMOTE_ACTION, action)
+    }
+    return PendingIntent.getService(
+      this,
+      requestCode,
+      intent,
+      PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+    )
+  }
+
+  private fun updateMediaSession() {
+    if (!currentControls.isActive) {
+      releaseMediaSession()
+      return
+    }
+
+    val session = mediaSession ?: MediaSession(
+      this,
+      "MrBroccoliVoiceSession",
+    ).also { created ->
+      created.setCallback(object : MediaSession.Callback() {
+        override fun onPlay() {
+          dispatchMediaAction(
+            if (currentControls.mode == "recording") "stop" else "continue",
+          )
+        }
+
+        override fun onPause() {
+          dispatchMediaAction(
+            if (currentControls.mode == "recording") "stop" else "pause",
+          )
+        }
+
+        override fun onStop() {
+          dispatchMediaAction(
+            if (currentControls.mode == "recording") "stop" else "pause",
+          )
+        }
+
+        override fun onSkipToNext() {
+          if (currentControls.canRepeat) {
+            dispatchMediaAction("repeat")
+          }
+        }
+      })
+      created.setFlags(
+        MediaSession.FLAG_HANDLES_MEDIA_BUTTONS or
+          MediaSession.FLAG_HANDLES_TRANSPORT_CONTROLS,
+      )
+      mediaSession = created
+    }
+
+    val paused = currentControls.mode == "drive-paused" ||
+      currentControls.mode == "playback-paused"
+    var actions = PlaybackState.ACTION_PLAY or
+      PlaybackState.ACTION_PAUSE or
+      PlaybackState.ACTION_PLAY_PAUSE or
+      PlaybackState.ACTION_STOP
+    if (currentControls.canRepeat) {
+      actions = actions or PlaybackState.ACTION_SKIP_TO_NEXT
+    }
+    session.setPlaybackState(
+      PlaybackState.Builder()
+        .setActions(actions)
+        .setState(
+          if (paused) {
+            PlaybackState.STATE_PAUSED
+          } else {
+            PlaybackState.STATE_PLAYING
+          },
+          PlaybackState.PLAYBACK_POSITION_UNKNOWN,
+          if (paused) 0f else 1f,
+        )
+        .build(),
+    )
+    session.isActive = true
+  }
+
+  private fun dispatchMediaAction(action: String) {
+    if (isSupportedRemoteAction(action)) {
+      MrBroccoliVoiceLiveActivityModule.emitRemoteAction(action)
+    }
+  }
+
+  private fun releaseMediaSession() {
+    mediaSession?.run {
+      isActive = false
+      release()
+    }
+    mediaSession = null
   }
 
   private fun notificationStatus(state: MrBroccoliVoiceTurnState): String {
@@ -241,6 +541,8 @@ class MrBroccoliVoiceTurnService : Service() {
     val overtimeMs = deadline?.let { System.currentTimeMillis() - it } ?: 0L
     return if (overtimeMs >= 0L && deadline != null) {
       "${state.phaseLabel} · + ${formatDuration(overtimeMs)}"
+    } else if (currentControls.isActive && deadline == null) {
+      currentControls.phaseLabel
     } else {
       "${state.phaseLabel} · ${state.statusLabel}"
     }
@@ -270,6 +572,13 @@ class MrBroccoliVoiceTurnService : Service() {
       return 0
     }
 
+    if (
+      currentControls.mode == "playback-active" ||
+      currentControls.mode == "playback-paused"
+    ) {
+      return ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK
+    }
+
     return if (
       Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE &&
       phase == "listening"
@@ -297,10 +606,44 @@ class MrBroccoliVoiceTurnService : Service() {
     notificationManager.createNotificationChannel(channel)
   }
 
+  private fun endVoiceTurn() {
+    handler.removeCallbacks(overtimeUpdate)
+    currentState = null
+    if (currentControls.isActive) {
+      publishCurrentNotification()
+    } else {
+      stopVoiceTurn()
+    }
+  }
+
+  private fun clearVoiceControls() {
+    currentControls = MrBroccoliVoiceTurnControlState()
+    releaseMediaSession()
+    if (currentState != null) {
+      publishCurrentNotification()
+    } else {
+      stopVoiceTurn()
+    }
+  }
+
+  private fun stopIfInactive() {
+    if (currentState == null && !currentControls.isActive) {
+      stopVoiceTurn()
+    }
+  }
+
   private fun stopVoiceTurn() {
     handler.removeCallbacks(overtimeUpdate)
     currentState = null
+    currentControls = MrBroccoliVoiceTurnControlState()
+    releaseMediaSession()
     ServiceCompat.stopForeground(this, ServiceCompat.STOP_FOREGROUND_REMOVE)
     stopSelf()
   }
+
+  private fun isSupportedRemoteAction(action: String): Boolean =
+    action == "continue" ||
+      action == "pause" ||
+      action == "repeat" ||
+      action == "stop"
 }

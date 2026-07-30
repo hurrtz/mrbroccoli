@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import { Platform } from "react-native";
 import {
   useAudioPlayer as useExpoAudioPlayer,
@@ -372,6 +372,43 @@ export function useAudioPlayer(
     await waitForPlaybackRouteSettleInternal();
   }, [waitForPlaybackRouteSettleInternal]);
 
+  useEffect(() => {
+    if (
+      usingNativeAudioQueue ||
+      !currentAudioRef.current ||
+      !hasSeenAudioPlayingRef.current
+    ) {
+      return;
+    }
+
+    if (
+      status.playbackState === "paused" &&
+      !playbackPausedRef.current
+    ) {
+      playbackPausedRef.current = true;
+      setPlaybackPaused(true);
+      playingRef.current = false;
+      updatePendingPlaybackState();
+      return;
+    }
+
+    if (status.playing && playbackPausedRef.current) {
+      playbackPausedRef.current = false;
+      setPlaybackPaused(false);
+      playingRef.current = true;
+      updatePendingPlaybackState();
+    }
+  }, [
+    currentAudioRef,
+    hasSeenAudioPlayingRef,
+    playbackPausedRef,
+    playingRef,
+    status.playbackState,
+    status.playing,
+    updatePendingPlaybackState,
+    usingNativeAudioQueue,
+  ]);
+
   return {
     isPlaying: hasPendingPlayback,
     isActivelyPlaying:
@@ -390,5 +427,6 @@ export function useAudioPlayer(
     hasPendingPlaybackNow,
     waitForDrain,
     waitForPlaybackRouteSettle,
+    usesNativeAudioQueue: usingNativeAudioQueue,
   };
 }

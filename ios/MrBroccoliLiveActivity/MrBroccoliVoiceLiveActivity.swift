@@ -26,15 +26,18 @@ struct MrBroccoliVoiceLiveActivity: Widget {
             .font(.system(.body, design: .rounded, weight: .semibold))
         }
         DynamicIslandExpandedRegion(.bottom) {
-          HStack(spacing: 8) {
-            Text(MrBroccoliActivityCopy.phaseLabel(for: context))
-              .font(.subheadline.weight(.medium))
-              .lineLimit(1)
-            Spacer(minLength: 8)
-            Text(MrBroccoliActivityCopy.statusLabel(for: context))
-              .font(.caption)
-              .foregroundStyle(.secondary)
-              .lineLimit(1)
+          VStack(spacing: 10) {
+            HStack(spacing: 8) {
+              Text(MrBroccoliActivityCopy.phaseLabel(for: context))
+                .font(.subheadline.weight(.medium))
+                .lineLimit(1)
+              Spacer(minLength: 8)
+              Text(MrBroccoliActivityCopy.statusLabel(for: context))
+                .font(.caption)
+                .foregroundStyle(.secondary)
+                .lineLimit(1)
+            }
+            MrBroccoliActivityActions(context: context, compact: true)
           }
         }
       } compactLeading: {
@@ -56,30 +59,110 @@ private struct MrBroccoliLockScreenActivityView: View {
   let context: ActivityViewContext<MrBroccoliVoiceActivityAttributes>
 
   var body: some View {
-    HStack(spacing: 12) {
-      MrBroccoliActivityIcon(context: context, size: 22)
+    VStack(spacing: 12) {
+      HStack(spacing: 12) {
+        MrBroccoliActivityIcon(context: context, size: 22)
 
-      VStack(alignment: .leading, spacing: 3) {
-        Text("Mr Broccoli")
-          .font(.headline)
-        Text(MrBroccoliActivityCopy.phaseLabel(for: context))
-          .font(.subheadline)
-          .foregroundStyle(.secondary)
-          .lineLimit(1)
+        VStack(alignment: .leading, spacing: 3) {
+          Text("Mr Broccoli")
+            .font(.headline)
+          Text(MrBroccoliActivityCopy.phaseLabel(for: context))
+            .font(.subheadline)
+            .foregroundStyle(.secondary)
+            .lineLimit(1)
+        }
+
+        Spacer(minLength: 12)
+
+        VStack(alignment: .trailing, spacing: 3) {
+          MrBroccoliActivityTimer(context: context)
+            .font(.system(.headline, design: .rounded, weight: .semibold))
+          Text(MrBroccoliActivityCopy.statusLabel(for: context))
+            .font(.caption2)
+            .foregroundStyle(.secondary)
+            .lineLimit(1)
+        }
       }
-
-      Spacer(minLength: 12)
-
-      VStack(alignment: .trailing, spacing: 3) {
-        MrBroccoliActivityTimer(context: context)
-          .font(.system(.headline, design: .rounded, weight: .semibold))
-        Text(MrBroccoliActivityCopy.statusLabel(for: context))
-          .font(.caption2)
-          .foregroundStyle(.secondary)
-          .lineLimit(1)
-      }
+      MrBroccoliActivityActions(context: context, compact: false)
     }
     .padding(.horizontal, 4)
+  }
+}
+
+private struct MrBroccoliActivityActions: View {
+  let context: ActivityViewContext<MrBroccoliVoiceActivityAttributes>
+  let compact: Bool
+
+  var body: some View {
+    if context.state.controlMode != "inactive" {
+      HStack(spacing: compact ? 14 : 10) {
+        Link(destination: primaryActionUrl) {
+          actionLabel(primaryActionLabel, systemImage: primaryActionSymbol)
+        }
+        .buttonStyle(.bordered)
+        .tint(.cyan)
+
+        if context.state.canRepeat {
+          Link(destination: actionUrl("repeat")) {
+            actionLabel(context.state.repeatLabel, systemImage: "repeat")
+          }
+          .buttonStyle(.bordered)
+        }
+      }
+      .font(.caption.weight(.semibold))
+    }
+  }
+
+  private var primaryAction: String {
+    switch context.state.controlMode {
+    case "recording":
+      return "stop"
+    case "drive-paused", "playback-paused":
+      return "continue"
+    default:
+      return "pause"
+    }
+  }
+
+  private var primaryActionLabel: String {
+    switch primaryAction {
+    case "stop":
+      return context.state.stopLabel
+    case "continue":
+      return context.state.continueLabel
+    default:
+      return context.state.pauseLabel
+    }
+  }
+
+  private var primaryActionSymbol: String {
+    switch primaryAction {
+    case "stop":
+      return "stop.fill"
+    case "continue":
+      return "play.fill"
+    default:
+      return "pause.fill"
+    }
+  }
+
+  private var primaryActionUrl: URL {
+    actionUrl(primaryAction)
+  }
+
+  private func actionUrl(_ action: String) -> URL {
+    URL(string: "mrbroccoli://voice-action/\(action)")!
+  }
+
+  @ViewBuilder
+  private func actionLabel(_ label: String, systemImage: String) -> some View {
+    if compact {
+      Image(systemName: systemImage)
+        .accessibilityLabel(label)
+    } else {
+      Label(label, systemImage: systemImage)
+        .frame(maxWidth: .infinity)
+    }
   }
 }
 
