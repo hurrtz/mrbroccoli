@@ -550,6 +550,12 @@ export const ar = {
   localTtsPackInstallFailed: "تعذر تثبيت حزمة الصوت المحلية.",
   clear: "واضح",
   voiceOutput: "إخراج الصوت",
+  speechReplayCache: "ذاكرة إعادة تشغيل الكلام",
+  speechReplayCacheDescription:
+    "يظل الكلام الذي ينشئه المزوّد على هذا الجهاز لمدة تصل إلى 14 يومًا، لذلك لا تستهلك إعادة الرد رصيدًا صوتيًا مرة أخرى.",
+  clearSpeechReplayCache: "مسح ذاكرة الكلام",
+  speechReplayCacheCleared: "تم حذف ملفات الكلام المخزنة.",
+  speechReplayCacheClearFailed: "تعذر مسح ذاكرة الكلام.",
   currentSetup: "الإعداد الحالي",
   listeningToYourVoice: "الاستماع إلى صوتك",
   parsingYourVoiceInput: "تحويل صوتك إلى نص",

@@ -548,6 +548,12 @@ export const en = {
   localTtsPackInstallFailed: "Couldn't install the local voice pack.",
   clear: "Clear",
   voiceOutput: "Voice Output",
+  speechReplayCache: "Speech replay cache",
+  speechReplayCacheDescription:
+    "Provider-generated speech stays on this device for up to 14 days, so repeating a reply does not spend speech credits again.",
+  clearSpeechReplayCache: "Clear speech cache",
+  speechReplayCacheCleared: "The cached speech files were removed.",
+  speechReplayCacheClearFailed: "The speech cache could not be cleared.",
   currentSetup: "Current Setup",
   listeningToYourVoice: "Listening to your voice",
   parsingYourVoiceInput: "Turning your voice into text",

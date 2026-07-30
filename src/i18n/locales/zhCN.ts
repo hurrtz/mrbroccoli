@@ -548,6 +548,12 @@ export const zhCN = {
   localTtsPackInstallFailed: "无法安装本地语音包。",
   clear: "清除",
   voiceOutput: "语音输出",
+  speechReplayCache: "语音重播缓存",
+  speechReplayCacheDescription:
+    "服务商生成的语音会在此设备上保留最多 14 天，因此重播回复不会再次消耗语音额度。",
+  clearSpeechReplayCache: "清除语音缓存",
+  speechReplayCacheCleared: "已删除缓存的语音文件。",
+  speechReplayCacheClearFailed: "无法清除语音缓存。",
   currentSetup: "当前设置",
   listeningToYourVoice: "聆听你的声音",
   parsingYourVoiceInput: "将你的声音变成文字",

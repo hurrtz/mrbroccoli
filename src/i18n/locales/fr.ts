@@ -550,6 +550,12 @@ export const fr = {
   localTtsPackInstallFailed: "Impossible d'installer le pack vocal local.",
   clear: "Clair",
   voiceOutput: "Sortie vocale",
+  speechReplayCache: "Cache de relecture vocale",
+  speechReplayCacheDescription:
+    "La voix générée par le fournisseur reste sur cet appareil jusqu’à 14 jours. Réécouter une réponse ne consomme donc pas de nouveaux crédits vocaux.",
+  clearSpeechReplayCache: "Vider le cache vocal",
+  speechReplayCacheCleared: "Les fichiers vocaux en cache ont été supprimés.",
+  speechReplayCacheClearFailed: "Impossible de vider le cache vocal.",
   currentSetup: "Configuration actuelle",
   listeningToYourVoice: "Écouter ta voix",
   parsingYourVoiceInput: "Transformer votre voix en texte",

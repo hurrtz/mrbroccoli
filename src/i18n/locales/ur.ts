@@ -548,6 +548,12 @@ export const ur = {
   localTtsPackInstallFailed: "مقامی وائس پیک کو انسٹال نہیں کیا جا سکا۔",
   clear: "صاف",
   voiceOutput: "وائس آؤٹ پٹ",
+  speechReplayCache: "تقریر دوبارہ چلانے کا کیش",
+  speechReplayCacheDescription:
+    "فراہم کنندہ کی بنائی ہوئی آواز اس ڈیوائس پر 14 دن تک رہتی ہے، اس لیے جواب دوبارہ چلانے پر مزید اسپیچ کریڈٹس خرچ نہیں ہوتے۔",
+  clearSpeechReplayCache: "اسپیچ کیش صاف کریں",
+  speechReplayCacheCleared: "کیش شدہ اسپیچ فائلیں حذف کر دی گئیں۔",
+  speechReplayCacheClearFailed: "اسپیچ کیش صاف نہیں ہو سکا۔",
   currentSetup: "موجودہ سیٹ اپ",
   listeningToYourVoice: "آپ کی آواز سننا",
   parsingYourVoiceInput: "اپنی آواز کو متن میں تبدیل کرنا",

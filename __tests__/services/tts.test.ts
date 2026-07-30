@@ -2,6 +2,12 @@ jest.mock("expo-clipboard", () => ({
   setStringAsync: jest.fn(async () => undefined),
 }));
 
+jest.mock("@react-native-async-storage/async-storage", () => ({
+  getItem: jest.fn(async () => null),
+  removeItem: jest.fn(async () => undefined),
+  setItem: jest.fn(async () => undefined),
+}));
+
 jest.mock("expo-file-system/legacy", () => ({
   cacheDirectory: "file:///tmp/",
   documentDirectory: "file:///tmp/",
@@ -32,6 +38,7 @@ global.fetch = jest.fn();
 
 jest.mock("expo-file-system/legacy", () => ({
   cacheDirectory: "/tmp/",
+  deleteAsync: jest.fn(async () => undefined),
   getInfoAsync: jest.fn(async () => ({ exists: false, isDirectory: false })),
   writeAsStringAsync: jest.fn(() => Promise.resolve()),
 }));
@@ -209,9 +216,10 @@ describe("synthesizeSpeech", () => {
       ok: true,
       blob: () => Promise.resolve(new Blob(["fake-audio"])),
     });
-    (FileSystem.getInfoAsync as jest.Mock).mockResolvedValueOnce({
+    (FileSystem.getInfoAsync as jest.Mock).mockResolvedValue({
       exists: true,
       isDirectory: false,
+      size: 10,
     });
     const request = {
       text: "Cache this spoken reply.",

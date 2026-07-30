@@ -551,6 +551,12 @@ export const ja = {
     "ローカル音声パックをインストールできませんでした。",
   clear: "クリア",
   voiceOutput: "音声出力",
+  speechReplayCache: "音声再生キャッシュ",
+  speechReplayCacheDescription:
+    "プロバイダーが生成した音声はこの端末に最大14日間保存されるため、返答を再生しても音声クレジットを再度消費しません。",
+  clearSpeechReplayCache: "音声キャッシュを消去",
+  speechReplayCacheCleared: "キャッシュされた音声ファイルを削除しました。",
+  speechReplayCacheClearFailed: "音声キャッシュを消去できませんでした。",
   currentSetup: "現在のセットアップ",
   listeningToYourVoice: "音声を聞き取っています",
   parsingYourVoiceInput: "音声をテキストに変換しています",

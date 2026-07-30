@@ -563,6 +563,13 @@ export const de = {
     "Das lokale Sprachpaket konnte nicht installiert werden.",
   clear: "Leeren",
   voiceOutput: "Sprachausgabe",
+  speechReplayCache: "Sprach-Wiedergabecache",
+  speechReplayCacheDescription:
+    "Erzeugte Sprachausgabe bleibt bis zu 14 Tage auf diesem Gerät. Beim erneuten Abspielen werden so keine Sprach-Credits mehr verbraucht.",
+  clearSpeechReplayCache: "Sprachcache leeren",
+  speechReplayCacheCleared: "Die gespeicherten Sprachdateien wurden gelöscht.",
+  speechReplayCacheClearFailed:
+    "Der Sprachcache konnte nicht geleert werden.",
   currentSetup: "Aktuelles Setup",
   listeningToYourVoice: "Ich höre dir zu",
   parsingYourVoiceInput: "Wandle deine Stimme in Text um",

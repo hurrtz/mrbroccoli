@@ -562,6 +562,13 @@ export const hu = {
   localTtsPackInstallFailed: "Nem sikerült telepíteni a helyi hangcsomagot.",
   clear: "Törlés",
   voiceOutput: "Hangkimenet",
+  speechReplayCache: "Beszéd-visszajátszási gyorsítótár",
+  speechReplayCacheDescription:
+    "A szolgáltató által létrehozott beszéd legfeljebb 14 napig ezen az eszközön marad, így egy válasz újbóli lejátszása nem használ újabb beszédkreditet.",
+  clearSpeechReplayCache: "Beszéd gyorsítótárának törlése",
+  speechReplayCacheCleared: "A gyorsítótárazott beszédfájlok törölve.",
+  speechReplayCacheClearFailed:
+    "A beszéd gyorsítótárát nem sikerült törölni.",
   currentSetup: "Jelenlegi beállítás",
   listeningToYourVoice: "Hallgatja a hangját",
   parsingYourVoiceInput: "A hangját szöveggé alakítja",

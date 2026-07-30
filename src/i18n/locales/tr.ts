@@ -552,6 +552,12 @@ export const tr = {
   localTtsPackInstallFailed: "Yerel ses paketi yüklenemedi.",
   clear: "Temizle",
   voiceOutput: "Ses Çıkışı",
+  speechReplayCache: "Konuşma yeniden oynatma önbelleği",
+  speechReplayCacheDescription:
+    "Sağlayıcının ürettiği konuşma bu cihazda 14 güne kadar kalır; böylece bir yanıtı tekrar oynatmak yeniden konuşma kredisi harcamaz.",
+  clearSpeechReplayCache: "Konuşma önbelleğini temizle",
+  speechReplayCacheCleared: "Önbellekteki konuşma dosyaları silindi.",
+  speechReplayCacheClearFailed: "Konuşma önbelleği temizlenemedi.",
   currentSetup: "Mevcut Kurulum",
   listeningToYourVoice: "Sesini dinlemek",
   parsingYourVoiceInput: "Sesini metne dönüştürme",

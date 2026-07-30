@@ -550,6 +550,12 @@ export const ptBR = {
   localTtsPackInstallFailed: "Não foi possível instalar o pacote de voz local.",
   clear: "Claro",
   voiceOutput: "Saída de voz",
+  speechReplayCache: "Cache de repetição de voz",
+  speechReplayCacheDescription:
+    "A voz gerada pelo provedor fica neste dispositivo por até 14 dias, então repetir uma resposta não gasta créditos de voz novamente.",
+  clearSpeechReplayCache: "Limpar cache de voz",
+  speechReplayCacheCleared: "Os arquivos de voz em cache foram removidos.",
+  speechReplayCacheClearFailed: "Não foi possível limpar o cache de voz.",
   currentSetup: "Configuração atual",
   listeningToYourVoice: "Ouvindo sua voz",
   parsingYourVoiceInput: "Transformando sua voz em texto",

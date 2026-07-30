@@ -1,10 +1,14 @@
-import React from "react";
-import { Text, View } from "react-native";
+import React, { useState } from "react";
+import { Alert, StyleSheet, Text, View } from "react-native";
+
+import { Button } from "@ant-design/react-native";
 
 import { providerTtsModelSupportsInstructions } from "../../../constants/models";
 import { getTtsFallbackRoutes } from "../../../constants/ttsFallback";
+import { antButtonTypography } from "../../../design-system/antTypography";
 import type { KokoroModelController } from "../../../hooks/useKokoroModel";
 import { useLocalization } from "../../../i18n";
+import { clearProviderTtsAudioCache } from "../../../services/providerTtsAudioCache";
 import type { ProviderVoiceDirectories } from "../../../services/providerVoiceDirectory";
 import { useTheme } from "../../../theme/ThemeContext";
 import type {
@@ -31,6 +35,7 @@ import {
   AntTtsFallbackSection,
 } from "../AntTtsSections";
 import {
+  AntButtonLabel,
   AntPickerRow,
   AntPickerSection,
   AntRadioSection,
@@ -109,6 +114,7 @@ export function SpeakingSettingsPage({
 }) {
   const { colors } = useTheme();
   const { t } = useLocalization();
+  const [isClearingSpeechCache, setIsClearingSpeechCache] = useState(false);
   const ttsProviderOptions = buildProviderPickerOptions(
     selectableTtsProviders,
     settings.ttsProvider,
@@ -130,6 +136,21 @@ export function SpeakingSettingsPage({
     settings.ttsMode === "native" || fallbackRoutes.includes("native");
   const kokoroRouteActive =
     settings.ttsMode === "kokoro" || fallbackRoutes.includes("kokoro");
+  const handleClearSpeechCache = async () => {
+    if (isClearingSpeechCache) {
+      return;
+    }
+
+    setIsClearingSpeechCache(true);
+    try {
+      await clearProviderTtsAudioCache();
+      Alert.alert(t("speechReplayCache"), t("speechReplayCacheCleared"));
+    } catch {
+      Alert.alert(t("speechReplayCache"), t("speechReplayCacheClearFailed"));
+    } finally {
+      setIsClearingSpeechCache(false);
+    }
+  };
 
   return (
     <View style={styles.sectionPageStack}>
@@ -333,6 +354,33 @@ export function SpeakingSettingsPage({
           onTextInputFocus={onTextInputFocus}
         />
       ) : null}
+
+      <AntSettingsCard title={t("speechReplayCache")}>
+        <Text style={[styles.helperText, { color: colors.textSecondary }]}>
+          {t("speechReplayCacheDescription")}
+        </Text>
+        <Button
+          testID="clear-speech-replay-cache"
+          size="small"
+          type="ghost"
+          disabled={isClearingSpeechCache}
+          style={StyleSheet.flatten([
+            styles.compactButton,
+            { alignSelf: "flex-start", borderColor: colors.border },
+          ])}
+          onPress={() => {
+            void handleClearSpeechCache();
+          }}
+          accessibilityLabel={t("clearSpeechReplayCache")}
+          styles={antButtonTypography}
+        >
+          <AntButtonLabel
+            color={colors.accent}
+            icon="delete"
+            label={t("clearSpeechReplayCache")}
+          />
+        </Button>
+      </AntSettingsCard>
     </View>
   );
 }

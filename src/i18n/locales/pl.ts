@@ -556,6 +556,12 @@ export const pl = {
     "Nie można zainstalować lokalnego pakietu głosowego.",
   clear: "Jasne",
   voiceOutput: "Wyjście głosowe",
+  speechReplayCache: "Pamięć ponownego odtwarzania mowy",
+  speechReplayCacheDescription:
+    "Mowa wygenerowana przez dostawcę pozostaje na tym urządzeniu do 14 dni, więc ponowne odtworzenie odpowiedzi nie zużywa kolejnych kredytów głosowych.",
+  clearSpeechReplayCache: "Wyczyść pamięć mowy",
+  speechReplayCacheCleared: "Usunięto zapisane pliki mowy.",
+  speechReplayCacheClearFailed: "Nie udało się wyczyścić pamięci mowy.",
   currentSetup: "Bieżąca konfiguracja",
   listeningToYourVoice: "Słuchanie Twojego głosu",
   parsingYourVoiceInput: "Zamiana głosu na tekst",

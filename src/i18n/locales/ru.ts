@@ -551,6 +551,12 @@ export const ru = {
   localTtsPackInstallFailed: "Не удалось установить локальный голосовой пакет.",
   clear: "Прозрачный",
   voiceOutput: "Голосовой вывод",
+  speechReplayCache: "Кэш повторного воспроизведения",
+  speechReplayCacheDescription:
+    "Созданная провайдером речь хранится на устройстве до 14 дней, поэтому повтор ответа не расходует голосовые кредиты снова.",
+  clearSpeechReplayCache: "Очистить кэш речи",
+  speechReplayCacheCleared: "Сохранённые речевые файлы удалены.",
+  speechReplayCacheClearFailed: "Не удалось очистить кэш речи.",
   currentSetup: "Текущая настройка",
   listeningToYourVoice: "Слушая свой голос",
   parsingYourVoiceInput: "Превратим ваш голос в текст",

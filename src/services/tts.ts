@@ -1,5 +1,3 @@
-import * as FileSystem from "expo-file-system/legacy";
-
 import { translate } from "../i18n";
 import {
   createSpeechRequestId,
@@ -28,6 +26,12 @@ import {
 import { synthesizeProviderSpeech } from "./tts/providerRoute";
 import { resolveTtsListenLanguage } from "../utils/ttsRouting";
 import {
+  getProviderTtsAudioCacheEntry,
+  resetProviderTtsAudioCacheForTests,
+  setProviderTtsAudioCacheEntry,
+} from "./providerTtsAudioCache";
+import { recordDebugLogEvent } from "./debugLogCapture";
+import {
   getProviderTtsTimeoutMs,
   getProviderTtsTargetChunkChars,
   getSelectedProviderModel,
@@ -55,18 +59,6 @@ export {
 };
 
 const LOCAL_ANDROID_DEV_API_KEY = "sk-test-android-local-dev";
-const MAX_PROVIDER_TTS_AUDIO_CACHE_ENTRIES = 64;
-
-interface ProviderTtsAudioCacheEntry {
-  audioPath: string;
-  providerModel: string | null;
-}
-
-const providerTtsAudioCache = new Map<
-  string,
-  ProviderTtsAudioCacheEntry
->();
-
 function hashTtsCacheValue(value: string) {
   let first = 2166136261;
   let second = 5381;
@@ -110,48 +102,42 @@ function getProviderTtsAudioCacheKey(params: {
 }
 
 async function getCachedProviderTtsAudio(cacheKey: string) {
-  const cached = providerTtsAudioCache.get(cacheKey);
-
-  if (!cached) {
-    return null;
-  }
-
   try {
-    const info = await FileSystem.getInfoAsync(cached.audioPath);
-    if (!info.exists) {
-      providerTtsAudioCache.delete(cacheKey);
-      return null;
-    }
-  } catch {
-    providerTtsAudioCache.delete(cacheKey);
+    return await getProviderTtsAudioCacheEntry(cacheKey);
+  } catch (error) {
+    recordDebugLogEvent({
+      event: "provider-tts-cache-read-failed",
+      level: "warn",
+      payload: {
+        message: error instanceof Error ? error.message : String(error),
+      },
+    });
     return null;
   }
-
-  providerTtsAudioCache.delete(cacheKey);
-  providerTtsAudioCache.set(cacheKey, cached);
-  return cached;
 }
 
-function cacheProviderTtsAudio(
+async function cacheProviderTtsAudio(
   cacheKey: string,
-  entry: ProviderTtsAudioCacheEntry,
+  entry: {
+    audioPath: string;
+    providerModel: string | null;
+  },
 ) {
-  providerTtsAudioCache.delete(cacheKey);
-  providerTtsAudioCache.set(cacheKey, entry);
-
-  while (
-    providerTtsAudioCache.size > MAX_PROVIDER_TTS_AUDIO_CACHE_ENTRIES
-  ) {
-    const oldestKey = providerTtsAudioCache.keys().next().value;
-    if (typeof oldestKey !== "string") {
-      break;
-    }
-    providerTtsAudioCache.delete(oldestKey);
+  try {
+    await setProviderTtsAudioCacheEntry(cacheKey, entry);
+  } catch (error) {
+    recordDebugLogEvent({
+      event: "provider-tts-cache-write-failed",
+      level: "warn",
+      payload: {
+        message: error instanceof Error ? error.message : String(error),
+      },
+    });
   }
 }
 
 export function clearProviderTtsAudioCacheForTests() {
-  providerTtsAudioCache.clear();
+  resetProviderTtsAudioCacheForTests();
 }
 
 function isLocalAndroidDevTtsEnabled(apiKey: string | undefined) {
@@ -437,7 +423,7 @@ export async function synthesizeSpeech(params: {
       voice: voice || null,
       textLength: text.trim().length,
     });
-    cacheProviderTtsAudio(providerAudioCacheKey, {
+    await cacheProviderTtsAudio(providerAudioCacheKey, {
       audioPath,
       providerModel: actualProviderModel,
     });

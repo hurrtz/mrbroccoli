@@ -550,6 +550,12 @@ export const hi = {
   localTtsPackInstallFailed: "स्थानीय वॉयस पैक स्थापित नहीं किया जा सका.",
   clear: "स्पष्ट",
   voiceOutput: "आवाज आउटपुट",
+  speechReplayCache: "स्पीच रीप्ले कैश",
+  speechReplayCacheDescription:
+    "प्रदाता द्वारा बनाई गई आवाज़ इस डिवाइस पर 14 दिनों तक रहती है, इसलिए जवाब दोबारा चलाने पर स्पीच क्रेडिट फिर खर्च नहीं होते।",
+  clearSpeechReplayCache: "स्पीच कैश साफ़ करें",
+  speechReplayCacheCleared: "कैश की गई स्पीच फ़ाइलें हटा दी गईं।",
+  speechReplayCacheClearFailed: "स्पीच कैश साफ़ नहीं हो सका।",
   currentSetup: "मौजूदा सेटअप",
   listeningToYourVoice: "आपकी आवाज़ सुन रहा हूँ",
   parsingYourVoiceInput: "अपनी आवाज़ को टेक्स्ट में बदलना",

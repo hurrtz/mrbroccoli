@@ -551,6 +551,12 @@ export const cs = {
   localTtsPackInstallFailed: "Nelze nainstalovat místní hlasový balíček.",
   clear: "Jasný",
   voiceOutput: "Hlasový výstup",
+  speechReplayCache: "Mezipaměť přehrávání řeči",
+  speechReplayCacheDescription:
+    "Řeč vytvořená poskytovatelem zůstává v tomto zařízení až 14 dní, takže opakované přehrání odpovědi znovu nespotřebuje hlasové kredity.",
+  clearSpeechReplayCache: "Vymazat mezipaměť řeči",
+  speechReplayCacheCleared: "Uložené zvukové soubory byly odstraněny.",
+  speechReplayCacheClearFailed: "Mezipaměť řeči se nepodařilo vymazat.",
   currentSetup: "Aktuální nastavení",
   listeningToYourVoice: "Naslouchat svému hlasu",
   parsingYourVoiceInput: "Přeměna vašeho hlasu na text",

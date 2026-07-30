@@ -549,6 +549,12 @@ export const sv = {
     "Det gick inte att installera det lokala röstpaketet.",
   clear: "Rensa",
   voiceOutput: "Röstutgång",
+  speechReplayCache: "Cache för taluppspelning",
+  speechReplayCacheDescription:
+    "Leverantörsgenererat tal sparas på enheten i upp till 14 dagar, så att spela upp ett svar igen förbrukar inga nya talkrediter.",
+  clearSpeechReplayCache: "Rensa talcache",
+  speechReplayCacheCleared: "De cachade talfilerna har tagits bort.",
+  speechReplayCacheClearFailed: "Det gick inte att rensa talcachen.",
   currentSetup: "Aktuell inställning",
   listeningToYourVoice: "Lyssnar på din röst",
   parsingYourVoiceInput: "Förvandla din röst till text",

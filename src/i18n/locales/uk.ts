@@ -571,6 +571,12 @@ export const uk = {
     "Не вдалося встановити локальний голосовий пакет.",
   clear: "Очистити",
   voiceOutput: "Голосовий вихід",
+  speechReplayCache: "Кеш повторного відтворення мовлення",
+  speechReplayCacheDescription:
+    "Створене провайдером мовлення зберігається на цьому пристрої до 14 днів, тому повтор відповіді не витрачає голосові кредити знову.",
+  clearSpeechReplayCache: "Очистити кеш мовлення",
+  speechReplayCacheCleared: "Збережені файли мовлення видалено.",
+  speechReplayCacheClearFailed: "Не вдалося очистити кеш мовлення.",
   currentSetup: "Поточне налаштування",
   listeningToYourVoice: "Слухаю ваш голос",
   parsingYourVoiceInput: "Перетворюю голос на текст",
