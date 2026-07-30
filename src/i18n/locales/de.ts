@@ -349,7 +349,8 @@ export const de = {
   kokoroExtracting: ({ progress }) => `Installation läuft… ${progress} %`,
   kokoroVerifying: "Prüfe die Sprachengine…",
   kokoroInstalled: "Auf diesem Gerät installiert und einsatzbereit.",
-  kokoroNotInstalled: "Optionaler Download. Kein API-Key erforderlich.",
+  kokoroNotInstalled:
+    "Lade das Modell herunter und prüfe es, bevor du Kokoro auswählst oder verwendest. Kein API-Key erforderlich.",
   kokoroLanguageFallback:
     "Kokoro spricht hier derzeit Englisch und vereinfachtes Chinesisch. Füge für andere ausgewählte Antwortsprachen ausdrücklich eine Ausweichroute hinzu, sonst endet die Sprachausgabe mit einem Fehler.",
   kokoroRemoveTitle: "Kokoro-Modell entfernen?",

@@ -1,5 +1,6 @@
 import React from "react";
 import {
+  Alert,
   Modal as NativeModal,
   Platform,
   StyleSheet,
@@ -312,7 +313,9 @@ describe("SettingsModal", () => {
         ),
       ).toBeNull();
       expect(
-        screen.getByText("Optional download. No provider key required."),
+        screen.getByText(
+          "Download and verify the model before selecting or using Kokoro. No provider key is required.",
+        ),
       ).toBeTruthy();
       expect(screen.getByTestId("kokoro-language-card-en")).toBeTruthy();
       expect(screen.queryByText("TTS Voice")).toBeNull();
@@ -331,6 +334,54 @@ describe("SettingsModal", () => {
 
     fireEvent.press(screen.getByLabelText("Download the Kokoro model"));
     expect(download).toHaveBeenCalledTimes(1);
+  });
+
+  it("downloads and verifies Kokoro before selecting it", async () => {
+    const download = jest.fn(async () => true);
+    const onUpdate = jest.fn();
+    const alert = jest.spyOn(Alert, "alert");
+    const screen = renderSettingsModal({
+      focusTab: "tts",
+      settings: {
+        ...DEFAULT_SETTINGS,
+        ttsMode: "native",
+      },
+      kokoroModel: {
+        installed: false,
+        verified: false,
+        busy: null,
+        phase: null,
+        progress: 0,
+        error: null,
+        download,
+        refresh: jest.fn(async () => undefined),
+        remove: jest.fn(async () => true),
+      },
+      onUpdate,
+    });
+
+    await waitFor(() => {
+      expect(screen.getByText("Kokoro")).toBeTruthy();
+    });
+
+    fireEvent.press(screen.getByText("Kokoro"));
+
+    expect(onUpdate).not.toHaveBeenCalled();
+    expect(alert).toHaveBeenCalledWith(
+      "Kokoro",
+      "Download and verify the model before selecting or using Kokoro. No provider key is required.",
+      expect.any(Array),
+    );
+
+    const buttons = alert.mock.calls[0][2];
+    const downloadButton = buttons?.find((button) => button.text === "Download");
+
+    await act(async () => {
+      await downloadButton?.onPress?.();
+    });
+
+    expect(download).toHaveBeenCalledTimes(1);
+    expect(onUpdate).toHaveBeenCalledWith({ ttsMode: "kokoro" });
   });
 
   it("keeps provider fallbacks empty until the user adds one", async () => {

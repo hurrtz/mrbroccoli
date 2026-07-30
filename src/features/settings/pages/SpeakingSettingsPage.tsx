@@ -136,6 +136,34 @@ export function SpeakingSettingsPage({
     settings.ttsMode === "native" || fallbackRoutes.includes("native");
   const kokoroRouteActive =
     settings.ttsMode === "kokoro" || fallbackRoutes.includes("kokoro");
+  const kokoroModelReady =
+    kokoroModel.installed && (kokoroModel.verified || !kokoroModel.error);
+  const showKokoroSection =
+    kokoroRouteActive ||
+    kokoroModel.busy === "downloading" ||
+    kokoroModel.busy === "verifying" ||
+    kokoroModel.error !== null;
+  const handleTtsModeChange = (value: TtsBackendMode) => {
+    if (value !== "kokoro" || kokoroModelReady) {
+      onUpdate({ ttsMode: value });
+      return;
+    }
+
+    Alert.alert("Kokoro", t("kokoroNotInstalled"), [
+      {
+        text: t("cancel"),
+        style: "cancel",
+      },
+      {
+        text: t("download"),
+        onPress: async () => {
+          if (await kokoroModel.download()) {
+            onUpdate({ ttsMode: "kokoro" });
+          }
+        },
+      },
+    ]);
+  };
   const handleClearSpeechCache = async () => {
     if (isClearingSpeechCache) {
       return;
@@ -220,7 +248,7 @@ export function SpeakingSettingsPage({
             },
           ]}
           value={settings.ttsMode}
-          onChange={(value) => onUpdate({ ttsMode: value })}
+          onChange={handleTtsModeChange}
         />
 
         <AntTtsFallbackSection settings={settings} onUpdate={onUpdate} />
@@ -334,7 +362,7 @@ export function SpeakingSettingsPage({
         />
       ) : null}
 
-      {kokoroRouteActive ? (
+      {showKokoroSection ? (
         <AntKokoroVoiceSection
           settings={settings}
           model={kokoroModel}

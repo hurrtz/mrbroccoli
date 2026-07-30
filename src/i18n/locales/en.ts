@@ -341,7 +341,8 @@ export const en = {
   kokoroExtracting: ({ progress }) => `Installing… ${progress}%`,
   kokoroVerifying: "Verifying the voice engine…",
   kokoroInstalled: "Installed and ready on this device.",
-  kokoroNotInstalled: "Optional download. No provider key required.",
+  kokoroNotInstalled:
+    "Download and verify the model before selecting or using Kokoro. No provider key is required.",
   kokoroLanguageFallback:
     "Kokoro currently speaks English and Simplified Chinese here. For other selected reply languages, add an explicit fallback route or speech will stop with an error.",
   kokoroRemoveTitle: "Remove the Kokoro model?",
