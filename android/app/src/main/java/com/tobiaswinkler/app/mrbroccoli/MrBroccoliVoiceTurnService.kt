@@ -64,8 +64,62 @@ internal data class MrBroccoliVoiceTurnControlState(
   }
 }
 
+internal data class MrBroccoliVoiceTurnStartupSnapshot(
+  val state: MrBroccoliVoiceTurnState?,
+  val controls: MrBroccoliVoiceTurnControlState,
+)
+
+internal class MrBroccoliVoiceTurnStartupState {
+  private var startRequested = false
+  private var pendingState: MrBroccoliVoiceTurnState? = null
+  private var pendingControls = MrBroccoliVoiceTurnControlState()
+
+  fun setState(state: MrBroccoliVoiceTurnState): Boolean {
+    pendingState = state
+    return requestStart()
+  }
+
+  fun endState() {
+    pendingState = null
+  }
+
+  fun setControls(controls: MrBroccoliVoiceTurnControlState): Boolean {
+    pendingControls = controls
+    return controls.isActive && requestStart()
+  }
+
+  fun clearControls() {
+    pendingControls = MrBroccoliVoiceTurnControlState()
+  }
+
+  fun consume(): MrBroccoliVoiceTurnStartupSnapshot {
+    val snapshot = MrBroccoliVoiceTurnStartupSnapshot(
+      state = pendingState,
+      controls = pendingControls,
+    )
+    startRequested = false
+    pendingState = null
+    pendingControls = MrBroccoliVoiceTurnControlState()
+    return snapshot
+  }
+
+  fun cancelStartRequest() {
+    startRequested = false
+  }
+
+  private fun requestStart(): Boolean {
+    if (startRequested) {
+      return false
+    }
+    startRequested = true
+    return true
+  }
+}
+
 class MrBroccoliVoiceTurnService : Service() {
   companion object {
+    private const val ACTION_START_PENDING =
+      "com.tobiaswinkler.app.mrbroccoli.action.START_VOICE_TURN"
     private const val ACTION_SET_STATE =
       "com.tobiaswinkler.app.mrbroccoli.action.SET_VOICE_TURN_STATE"
     private const val ACTION_SET_CONTROLS =
@@ -86,6 +140,9 @@ class MrBroccoliVoiceTurnService : Service() {
     private const val CHANNEL_ID = "mrbroccoli_voice_turn"
     private const val NOTIFICATION_ID = 2404
 
+    private val lifecycleLock = Any()
+    private val startupState = MrBroccoliVoiceTurnStartupState()
+
     @Volatile
     private var activeService: MrBroccoliVoiceTurnService? = null
 
@@ -102,22 +159,17 @@ class MrBroccoliVoiceTurnService : Service() {
         phaseLabel,
         statusLabel,
       )
-      activeService?.let { service ->
-        service.handler.post {
-          service.updateState(state)
-        }
-      } ?: startService(
-        context,
-        Intent(context, MrBroccoliVoiceTurnService::class.java).apply {
-          action = ACTION_SET_STATE
-          putExtra(EXTRA_PHASE, phase)
-          if (expectedSpeechAtMs != null) {
-            putExtra(EXTRA_EXPECTED_SPEECH_AT_MS, expectedSpeechAtMs)
+      synchronized(lifecycleLock) {
+        activeService?.let { service ->
+          service.handler.post {
+            service.updateState(state)
           }
-          putExtra(EXTRA_PHASE_LABEL, phaseLabel)
-          putExtra(EXTRA_STATUS_LABEL, statusLabel)
-        },
-      )
+          return
+        }
+        if (startupState.setState(state)) {
+          startPendingService(context)
+        }
+      }
     }
 
     fun setControls(
@@ -139,52 +191,75 @@ class MrBroccoliVoiceTurnService : Service() {
         stopLabel = stopLabel,
         repeatLabel = repeatLabel,
       )
-      val service = activeService
-      if (service != null) {
-        service.handler.post {
-          service.updateControls(controls)
+      synchronized(lifecycleLock) {
+        activeService?.let { service ->
+          service.handler.post {
+            service.updateControls(controls)
+          }
+          return
         }
-      } else if (controls.isActive) {
-        startService(
-          context,
-          Intent(context, MrBroccoliVoiceTurnService::class.java).apply {
-            action = ACTION_SET_CONTROLS
-            putControlExtras(controls)
-          },
-        )
+        if (startupState.setControls(controls)) {
+          startPendingService(context)
+        }
       }
     }
 
     fun clearControls(context: Context) {
-      activeService?.let { service ->
-        service.handler.post(service::clearVoiceControls)
-      } ?: context.stopService(
-        Intent(context, MrBroccoliVoiceTurnService::class.java),
-      )
+      synchronized(lifecycleLock) {
+        activeService?.let { service ->
+          service.handler.post(service::clearVoiceControls)
+          return
+        }
+        // A pending foreground-service launch must be allowed to enter the
+        // foreground before it can be stopped. Remember the latest desired
+        // state instead of racing the launch with Context.stopService().
+        startupState.clearControls()
+      }
     }
 
     fun end(context: Context) {
-      activeService?.let { service ->
-        service.handler.post(service::endVoiceTurn)
-      } ?: context.stopService(
-        Intent(context, MrBroccoliVoiceTurnService::class.java),
-      )
+      synchronized(lifecycleLock) {
+        activeService?.let { service ->
+          service.handler.post(service::endVoiceTurn)
+          return
+        }
+        startupState.endState()
+      }
     }
 
-    private fun startService(context: Context, intent: Intent) {
-      ContextCompat.startForegroundService(context, intent)
+    private fun startPendingService(context: Context) {
+      try {
+        ContextCompat.startForegroundService(
+          context,
+          Intent(context, MrBroccoliVoiceTurnService::class.java).apply {
+            action = ACTION_START_PENDING
+          },
+        )
+      } catch (error: Exception) {
+        startupState.cancelStartRequest()
+        throw error
+      }
     }
 
-    private fun Intent.putControlExtras(
-      controls: MrBroccoliVoiceTurnControlState,
-    ) {
-      putExtra(EXTRA_CONTROL_MODE, controls.mode)
-      putExtra(EXTRA_CAN_REPEAT, controls.canRepeat)
-      putExtra(EXTRA_PHASE_LABEL, controls.phaseLabel)
-      putExtra(EXTRA_PAUSE_LABEL, controls.pauseLabel)
-      putExtra(EXTRA_CONTINUE_LABEL, controls.continueLabel)
-      putExtra(EXTRA_STOP_LABEL, controls.stopLabel)
-      putExtra(EXTRA_REPEAT_LABEL, controls.repeatLabel)
+    private fun activateAndConsumeStartup(
+      service: MrBroccoliVoiceTurnService,
+    ): MrBroccoliVoiceTurnStartupSnapshot = synchronized(lifecycleLock) {
+      activeService = service
+      startupState.consume()
+    }
+
+    private fun activate(service: MrBroccoliVoiceTurnService) {
+      synchronized(lifecycleLock) {
+        activeService = service
+      }
+    }
+
+    private fun deactivate(service: MrBroccoliVoiceTurnService) {
+      synchronized(lifecycleLock) {
+        if (activeService === service) {
+          activeService = null
+        }
+      }
     }
   }
 
@@ -202,20 +277,33 @@ class MrBroccoliVoiceTurnService : Service() {
 
   override fun onCreate() {
     super.onCreate()
-    activeService = this
     createNotificationChannel()
   }
 
   override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
     when (intent?.action) {
-      ACTION_SET_STATE -> handleSetState(intent)
-      ACTION_SET_CONTROLS -> handleSetControls(intent)
+      ACTION_START_PENDING -> {
+        handleStartup(activateAndConsumeStartup(this))
+      }
+      ACTION_SET_STATE -> {
+        activate(this)
+        handleSetState(intent)
+      }
+      ACTION_SET_CONTROLS -> {
+        activate(this)
+        handleSetControls(intent)
+      }
       ACTION_REMOTE_ACTION -> {
+        activate(this)
         intent.getStringExtra(EXTRA_REMOTE_ACTION)
           ?.takeIf(::isSupportedRemoteAction)
           ?.let(MrBroccoliVoiceLiveActivityModule::emitRemoteAction)
+        stopIfInactive()
       }
-      else -> stopIfInactive()
+      else -> {
+        activate(this)
+        stopIfInactive()
+      }
     }
     return START_NOT_STICKY
   }
@@ -229,10 +317,27 @@ class MrBroccoliVoiceTurnService : Service() {
   override fun onDestroy() {
     handler.removeCallbacks(overtimeUpdate)
     releaseMediaSession()
-    if (activeService === this) {
-      activeService = null
-    }
+    deactivate(this)
     super.onDestroy()
+  }
+
+  private fun handleStartup(snapshot: MrBroccoliVoiceTurnStartupSnapshot) {
+    currentState = snapshot.state
+    currentControls = snapshot.controls
+
+    if (currentState == null && !currentControls.isActive) {
+      // The user may cancel during the small interval between requesting the
+      // service and Android creating it. Satisfy the foreground-service
+      // contract first, then stop immediately.
+      publishStartupCancellationNotification()
+      stopVoiceTurn()
+      return
+    }
+
+    // Foreground promotion must happen before MediaSession or any other
+    // potentially blocking service setup.
+    publishCurrentNotification()
+    updateMediaSession()
   }
 
   private fun handleSetState(intent: Intent) {
@@ -295,12 +400,27 @@ class MrBroccoliVoiceTurnService : Service() {
 
   private fun updateControls(controls: MrBroccoliVoiceTurnControlState) {
     currentControls = controls
-    updateMediaSession()
     if (currentState != null || controls.isActive) {
       publishCurrentNotification()
+      updateMediaSession()
     } else {
       stopVoiceTurn()
     }
+  }
+
+  private fun publishStartupCancellationNotification() {
+    val state = MrBroccoliVoiceTurnState(
+      phase = "thinking",
+      expectedSpeechAtMs = null,
+      phaseLabel = getString(R.string.voice_turn_thinking),
+      statusLabel = getString(R.string.voice_turn_notification_title),
+    )
+    ServiceCompat.startForeground(
+      this,
+      NOTIFICATION_ID,
+      buildNotification(state),
+      foregroundTypeFor(state.phase),
+    )
   }
 
   private fun publishCurrentNotification() {
