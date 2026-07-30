@@ -3,7 +3,7 @@ const path = require("node:path");
 const {
   withAppDelegate,
   withDangerousMod,
-} = require("@expo/config-plugins");
+} = require("expo/config-plugins");
 
 const BACKGROUND_HANDLER_MARKER =
   "MrBroccoliSetBackgroundDownloadCompletionHandler";

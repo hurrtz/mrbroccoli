@@ -1,3 +1,4 @@
+import { File } from "expo-file-system";
 import * as FileSystem from "expo-file-system/legacy";
 
 import { buildProviderHttpError, normalizeProviderTransportError } from "../providerErrors";
@@ -43,6 +44,10 @@ interface SharedProviderParams {
   providerModel?: string;
 }
 
+function appendRecordedAudio(formData: FormData, fileUri: string) {
+  formData.append("file", new File(fileUri));
+}
+
 function extractGeminiTranscription(data: any) {
   const parts = data?.candidates?.[0]?.content?.parts;
 
@@ -74,14 +79,7 @@ export async function transcribeWithMultipartProvider(
     speechLanguage,
   } = params;
   const formData = new FormData();
-  formData.append(
-    "file",
-    {
-      uri: fileUri,
-      type: getFileAudioMimeType(fileUri),
-      name: fileUri.split("/").pop() || "recording.m4a",
-    } as any,
-  );
+  appendRecordedAudio(formData, fileUri);
   const resolvedModel = providerModel || config.defaultModel;
   formData.append(
     provider === "elevenlabs" ? "model_id" : "model",
@@ -570,14 +568,7 @@ export async function transcribeWithXaiRestSttProvider(
       getProviderSpeechLanguageCode(speechLanguage),
     );
   }
-  formData.append(
-    "file",
-    {
-      uri: fileUri,
-      type: getFileAudioMimeType(fileUri),
-      name: fileUri.split("/").pop() || "recording.m4a",
-    } as any,
-  );
+  appendRecordedAudio(formData, fileUri);
 
   let response: Awaited<ReturnType<typeof fetch>>;
 

@@ -81,6 +81,28 @@ describe("useAudioPlayer", () => {
     };
   });
 
+  it("releases ambient monitoring before activating playback", async () => {
+    const beforePlayback = jest.fn(async () => undefined);
+    const { result } = renderHook(() =>
+      useAudioPlayer({ beforePlayback }),
+    );
+
+    await act(async () => {
+      result.current.enqueueAudio("reply.mp3");
+      await Promise.resolve();
+    });
+
+    expect(beforePlayback).toHaveBeenCalledTimes(1);
+    expect(Audio.setIsAudioActiveAsync).toHaveBeenCalledWith(true);
+    const activateCallIndex = (
+      Audio.setIsAudioActiveAsync as jest.Mock
+    ).mock.calls.findIndex(([active]) => active === true);
+    expect(beforePlayback.mock.invocationCallOrder[0]).toBeLessThan(
+      (Audio.setIsAudioActiveAsync as jest.Mock).mock
+        .invocationCallOrder[activateCallIndex],
+    );
+  });
+
   it("advances queued clips when playback becomes idle", async () => {
     const { result, rerender } = renderHook(() => useAudioPlayer());
 

@@ -2,7 +2,12 @@ import { NativeEventEmitter, NativeModules } from "react-native";
 
 type NativeWaveformEvent =
   | {
-      type: "started" | "stopped" | "cancelled";
+      type:
+        | "started"
+        | "stopped"
+        | "cancelled"
+        | "monitoringStarted"
+        | "monitoringStopped";
       sessionId: string;
       uri?: string;
       audioRoute?: string;
@@ -38,6 +43,10 @@ type NativeWaveformModule = {
   stopRecording(sessionId: string): Promise<{ uri: string }>;
   cancelRecording(sessionId: string): Promise<boolean>;
   playRecordingCue(uri: string): Promise<boolean>;
+  startAmbientMonitoring?(
+    sessionId: string,
+  ): Promise<{ audioRoute?: string }>;
+  stopAmbientMonitoring?(sessionId: string): Promise<boolean>;
 };
 
 const nativeModule = NativeModules.MrBroccoliNativeWaveform as
@@ -50,6 +59,13 @@ const nativeEmitter = nativeModule
 
 export function isNativeWaveformAvailable() {
   return !!nativeModule;
+}
+
+export function isNativeAmbientMonitoringAvailable() {
+  return (
+    typeof nativeModule?.startAmbientMonitoring === "function" &&
+    typeof nativeModule?.stopAmbientMonitoring === "function"
+  );
 }
 
 export function subscribeToNativeWaveform(
@@ -94,6 +110,22 @@ export async function cancelNativeWaveformRecording(sessionId: string) {
   }
 
   return nativeModule.cancelRecording(sessionId);
+}
+
+export async function startNativeAmbientMonitoring(sessionId: string) {
+  if (!nativeModule?.startAmbientMonitoring) {
+    throw new Error("Native ambient microphone monitoring is not available.");
+  }
+
+  return nativeModule.startAmbientMonitoring(sessionId);
+}
+
+export async function stopNativeAmbientMonitoring(sessionId: string) {
+  if (!nativeModule?.stopAmbientMonitoring) {
+    return false;
+  }
+
+  return nativeModule.stopAmbientMonitoring(sessionId);
 }
 
 export async function playNativeRecordingCue(uri: string) {

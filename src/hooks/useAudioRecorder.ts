@@ -9,14 +9,20 @@ import {
 import { useLocalization } from "../i18n";
 import {
   cancelNativeWaveformRecording,
+  isNativeAmbientMonitoringAvailable,
   isNativeWaveformAvailable,
+  startNativeAmbientMonitoring,
   startNativeWaveformRecording,
+  stopNativeAmbientMonitoring,
   stopNativeWaveformRecording,
   subscribeToNativeWaveform,
 } from "../services/nativeWaveform";
 import { recordDebugLogEvent } from "../services/debugLogCapture";
 
 export interface RecorderState {
+  ambientInputMetering: number | null;
+  ambientMonitoring: boolean;
+  audioRoute: string | null;
   isRecording: boolean;
   inputMetering: number | null;
   lastError: string | null;
@@ -53,8 +59,16 @@ export function useAudioRecorder() {
   );
   const startTimeRef = useRef<number>(0);
   const nativeSessionIdRef = useRef<string | null>(null);
+  const ambientSessionIdRef = useRef<string | null>(null);
   const [nativeRecording, setNativeRecording] = useState(false);
+  const [ambientMonitoring, setAmbientMonitoring] = useState(false);
   const [nativeInputMetering, setNativeInputMetering] = useState<number | null>(
+    null,
+  );
+  const [ambientInputMetering, setAmbientInputMetering] = useState<
+    number | null
+  >(null);
+  const [nativeAudioRoute, setNativeAudioRoute] = useState<string | null>(
     null,
   );
   const [lastError, setLastError] = useState<string | null>(null);
@@ -107,9 +121,27 @@ export function useAudioRecorder() {
         return;
       }
 
-      if (event.type === "started") {
+      if (
+        event.type === "levels" &&
+        ambientSessionIdRef.current &&
+        event.sessionId === ambientSessionIdRef.current
+      ) {
+        setAmbientInputMetering(event.metering);
+        return;
+      }
+
+      if (
+        event.type === "started" ||
+        event.type === "monitoringStarted"
+      ) {
+        if (event.audioRoute) {
+          setNativeAudioRoute(event.audioRoute);
+        }
         recordDebugLogEvent({
-          event: "native-recorder-route-selected",
+          event:
+            event.type === "started"
+              ? "native-recorder-route-selected"
+              : "native-ambient-monitor-route-selected",
           payload: {
             audioRoute: event.audioRoute ?? "unknown",
             sessionId: event.sessionId,
@@ -119,6 +151,12 @@ export function useAudioRecorder() {
       }
 
       if (event.type === "routeChanged") {
+        if (
+          event.sessionId === nativeSessionIdRef.current ||
+          event.sessionId === ambientSessionIdRef.current
+        ) {
+          setNativeAudioRoute(event.audioRoute);
+        }
         recordDebugLogEvent({
           event: "native-recorder-route-changed",
           payload: {
@@ -161,9 +199,133 @@ export function useAudioRecorder() {
         void cancelNativeWaveformRecording(sessionId).catch(() => {
           // The native module may have already cleaned up after the failure.
         });
+        return;
+      }
+
+      if (
+        event.type === "error" &&
+        ambientSessionIdRef.current &&
+        event.sessionId === ambientSessionIdRef.current
+      ) {
+        const sessionId = ambientSessionIdRef.current;
+        ambientSessionIdRef.current = null;
+        setAmbientMonitoring(false);
+        setAmbientInputMetering(null);
+        recordDebugLogEvent({
+          event: "native-ambient-monitor-error",
+          level: "warn",
+          payload: { message: event.message, sessionId },
+        });
+        void stopNativeAmbientMonitoring(sessionId).catch(() => {
+          // The native module may have already cleaned up after the failure.
+        });
       }
     });
   }, [usingNativeRecorder]);
+
+  const stopAmbientMonitoring = useCallback(async () => {
+    const sessionId = ambientSessionIdRef.current;
+    if (!sessionId) {
+      return false;
+    }
+
+    ambientSessionIdRef.current = null;
+    setAmbientMonitoring(false);
+    setAmbientInputMetering(null);
+
+    try {
+      const stopped = await stopNativeAmbientMonitoring(sessionId);
+      recordDebugLogEvent({
+        event: "native-ambient-monitor-stopped",
+        payload: {
+          sessionId,
+          stopped,
+        },
+      });
+      return stopped;
+    } catch (error) {
+      recordDebugLogEvent({
+        event: "native-ambient-monitor-stop-failed",
+        level: "warn",
+        payload: {
+          message: error instanceof Error ? error.message : String(error),
+          sessionId,
+        },
+      });
+      return false;
+    }
+  }, []);
+
+  const startAmbientMonitoring = useCallback(async () => {
+    if (
+      !usingNativeRecorder ||
+      !isNativeAmbientMonitoringAvailable()
+    ) {
+      return false;
+    }
+
+    if (ambientSessionIdRef.current) {
+      return true;
+    }
+
+    if (nativeSessionIdRef.current || nativeRecording) {
+      return false;
+    }
+
+    await ensurePermissions();
+
+    const sessionId = `native-ambient-${Date.now()}-${Math.random()
+      .toString(36)
+      .slice(2, 8)}`;
+    ambientSessionIdRef.current = sessionId;
+    setAmbientInputMetering(null);
+
+    try {
+      const result = await startNativeAmbientMonitoring(sessionId);
+      if (ambientSessionIdRef.current !== sessionId) {
+        await stopNativeAmbientMonitoring(sessionId).catch(() => false);
+        return false;
+      }
+
+      setAmbientMonitoring(true);
+      if (result.audioRoute) {
+        setNativeAudioRoute(result.audioRoute);
+      }
+      recordDebugLogEvent({
+        event: "native-ambient-monitor-started",
+        payload: {
+          audioRoute: result.audioRoute ?? "unknown",
+          sessionId,
+        },
+      });
+      return true;
+    } catch (error) {
+      if (ambientSessionIdRef.current === sessionId) {
+        ambientSessionIdRef.current = null;
+      }
+      setAmbientMonitoring(false);
+      setAmbientInputMetering(null);
+      recordDebugLogEvent({
+        event: "native-ambient-monitor-start-failed",
+        level: "warn",
+        payload: {
+          message: error instanceof Error ? error.message : String(error),
+          sessionId,
+        },
+      });
+      return false;
+    }
+  }, [ensurePermissions, nativeRecording, usingNativeRecorder]);
+
+  useEffect(() => {
+    return () => {
+      const sessionId = ambientSessionIdRef.current;
+      ambientSessionIdRef.current = null;
+      if (sessionId) {
+        void stopNativeAmbientMonitoring(sessionId).catch(() => false);
+      }
+    };
+  }, []);
 
   const startRecording = useCallback(async () => {
     recordDebugLogEvent({
@@ -174,6 +336,8 @@ export function useAudioRecorder() {
     });
 
     if (usingNativeRecorder) {
+      await stopAmbientMonitoring();
+
       if (nativeRecording) {
         recordDebugLogEvent({
           event: "recorder-start-skipped",
@@ -250,6 +414,7 @@ export function useAudioRecorder() {
     nativeRecording,
     recorder,
     recorderState.isRecording,
+    stopAmbientMonitoring,
     usingNativeRecorder,
   ]);
 
@@ -408,6 +573,9 @@ export function useAudioRecorder() {
   }, []);
 
   return {
+    ambientInputMetering,
+    ambientMonitoring,
+    audioRoute: nativeAudioRoute,
     isRecording: usingNativeRecorder
       ? nativeRecording
       : recorderState.isRecording,
@@ -417,7 +585,9 @@ export function useAudioRecorder() {
     lastError,
     clearLastError,
     ensurePermissions,
+    startAmbientMonitoring,
     startRecording,
+    stopAmbientMonitoring,
     stopRecording,
   };
 }

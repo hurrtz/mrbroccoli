@@ -9,7 +9,7 @@ export const styles = StyleSheet.create({
     alignItems: "center",
   },
   backdrop: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
   },
   keyboardAvoider: {
     flex: 1,

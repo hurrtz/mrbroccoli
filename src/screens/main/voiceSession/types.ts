@@ -25,11 +25,16 @@ export interface AudioPlayerController {
 }
 
 export interface AudioRecorderController {
+  ambientInputMetering?: number | null;
+  ambientMonitoring?: boolean;
+  audioRoute?: string | null;
   clearLastError: () => void;
   ensurePermissions: () => Promise<void>;
   inputMetering?: number | null;
   lastError: string | null;
+  startAmbientMonitoring?: () => Promise<boolean>;
   startRecording: () => Promise<void>;
+  stopAmbientMonitoring?: () => Promise<boolean>;
   stopRecording: () => Promise<string | null>;
 }
 

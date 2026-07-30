@@ -1,4 +1,4 @@
-jest.mock("@expo/config-plugins", () => ({
+jest.mock("expo/config-plugins", () => ({
   withAppDelegate: jest.fn(),
   withDangerousMod: jest.fn(),
 }));

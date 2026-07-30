@@ -16,6 +16,13 @@ import {
 import { Settings } from "../../../types";
 import { ShowToastFn, TranslateFn } from "../shared";
 import {
+  createDriveAcousticProfile,
+  getDriveAcousticProfileDiagnostics,
+  updateDriveAcousticProfileFromAmbient,
+  updateDriveAcousticProfileFromRecording,
+  updateDriveAcousticProfileRoute,
+} from "./driveAcousticProfile";
+import {
   createDriveVoiceActivityState,
   DriveVoiceActivityState,
   getDriveCountdownSeconds,
@@ -26,6 +33,9 @@ import {
 import { AudioPlayerController } from "./types";
 
 interface UseDriveSessionControllerParams {
+  ambientInputMetering?: number | null;
+  ambientMonitoring?: boolean;
+  audioRoute?: string | null;
   cancelCurrentInteraction: () => Promise<void>;
   cancelVoiceCapture: () => Promise<void>;
   completedReplyVersion: number;
@@ -41,13 +51,18 @@ interface UseDriveSessionControllerParams {
   replayPhase: ReplayPhase;
   settings: Pick<Settings, "inputMode">;
   showToast: ShowToastFn;
+  startAmbientMonitoring?: () => Promise<boolean>;
   startVoiceCapture: () => Promise<void>;
+  stopAmbientMonitoring?: () => Promise<boolean>;
   stopVoiceCapture: () => Promise<void>;
   stopReplay: () => Promise<void>;
   t: TranslateFn;
 }
 
 export function useDriveSessionController({
+  ambientInputMetering = null,
+  ambientMonitoring = false,
+  audioRoute = null,
   cancelCurrentInteraction,
   cancelVoiceCapture,
   completedReplyVersion,
@@ -63,7 +78,9 @@ export function useDriveSessionController({
   replayPhase,
   settings,
   showToast,
+  startAmbientMonitoring,
   startVoiceCapture,
+  stopAmbientMonitoring,
   stopVoiceCapture,
   stopReplay,
   t,
@@ -93,6 +110,11 @@ export function useDriveSessionController({
   const playerIsPlaybackPausedRef = useRef(player.isPlaybackPaused);
   const voiceActivityRef = useRef<DriveVoiceActivityState | null>(
     null,
+  );
+  const acousticProfileRef = useRef(createDriveAcousticProfile());
+  const lastAcousticProfileLogAtRef = useRef(0);
+  const lastLoggedNoiseFloorDbRef = useRef(
+    acousticProfileRef.current.noiseFloorDb,
   );
   const autoSubmitInFlightRef = useRef(false);
   const lastCountdownCueRef = useRef<number | null>(null);
@@ -265,6 +287,7 @@ export function useDriveSessionController({
     previousInputModeRef.current = settings.inputMode;
 
     if (settings.inputMode !== "drive-session") {
+      acousticProfileRef.current = createDriveAcousticProfile();
       suspend();
       return;
     }
@@ -282,6 +305,48 @@ export function useDriveSessionController({
     updateAutoContinueEnabled,
     updateArmRequested,
     updateEngaged,
+  ]);
+
+  useEffect(() => {
+    const updated = updateDriveAcousticProfileRoute(
+      acousticProfileRef.current,
+      audioRoute,
+    );
+    acousticProfileRef.current = updated.profile;
+
+    if (!updated.reset) {
+      return;
+    }
+
+    const shouldRestartVoiceActivity =
+      settings.inputMode === "drive-session" &&
+      autoContinueEnabled &&
+      engaged &&
+      isRecording &&
+      mainSurfaceVisible;
+    voiceActivityRef.current = shouldRestartVoiceActivity
+      ? createDriveVoiceActivityState(Date.now(), {
+          noiseFloorDb: updated.profile.noiseFloorDb,
+          speechLevelDb: updated.profile.speechLevelDb,
+        })
+      : null;
+    lastLoggedNoiseFloorDbRef.current =
+      updated.profile.noiseFloorDb;
+    setSilenceCountdownSeconds(null);
+    setVoiceActive(false);
+    recordDebugLogEvent({
+      event: "drive-session-acoustic-profile-route-reset",
+      payload: {
+        ...getDriveAcousticProfileDiagnostics(updated.profile),
+      },
+    });
+  }, [
+    audioRoute,
+    autoContinueEnabled,
+    engaged,
+    isRecording,
+    mainSurfaceVisible,
+    settings.inputMode,
   ]);
 
   useEffect(() => {
@@ -304,12 +369,19 @@ export function useDriveSessionController({
     if (!voiceActivityRef.current) {
       const nowMs = Date.now();
       voiceActivityRef.current =
-        createDriveVoiceActivityState(nowMs);
-      setSilenceCountdownSeconds(10);
+        createDriveVoiceActivityState(nowMs, {
+          noiseFloorDb: acousticProfileRef.current.noiseFloorDb,
+          speechLevelDb: acousticProfileRef.current.speechLevelDb,
+        });
+      setSilenceCountdownSeconds(null);
       setVoiceActive(false);
       recordDebugLogEvent({
-        event: "drive-session-silence-window-started",
+        event: "drive-session-voice-activity-monitor-started",
         payload: {
+          ...getDriveAcousticProfileDiagnostics(
+            acousticProfileRef.current,
+          ),
+          countdownStartsAfterSpeech: true,
           silenceWindowMs: 10_000,
         },
       });
@@ -328,12 +400,26 @@ export function useDriveSessionController({
       return;
     }
 
+    const nowMs = Date.now();
     const updated = updateDriveVoiceActivity(
       current,
       inputMetering,
-      Date.now(),
+      nowMs,
     );
     voiceActivityRef.current = updated;
+    acousticProfileRef.current =
+      updateDriveAcousticProfileFromRecording(
+        acousticProfileRef.current,
+        {
+          meteringDb: inputMetering,
+          noiseFloorDb: updated.noiseFloorDb,
+          nowMs,
+          voiceActive: updated.voiceActive,
+        },
+      );
+    setSilenceCountdownSeconds(
+      getDriveCountdownSeconds(updated, nowMs),
+    );
 
     if (
       !current.voiceActive &&
@@ -348,7 +434,7 @@ export function useDriveSessionController({
           candidateDurationMs:
             current.candidateStartedAtMs === null
               ? 0
-              : Math.max(0, Date.now() - current.candidateStartedAtMs),
+              : Math.max(0, nowMs - current.candidateStartedAtMs),
           candidatePeakDb: current.candidatePeakDb,
           candidateSamples: current.aboveThresholdSamples,
           candidateTroughDb: current.candidateTroughDb,
@@ -374,6 +460,114 @@ export function useDriveSessionController({
       });
     }
   }, [inputMetering]);
+
+  useEffect(() => {
+    const shouldMonitorAmbient =
+      settings.inputMode === "drive-session" &&
+      autoContinueEnabled &&
+      engaged &&
+      mainSurfaceVisible &&
+      !isRecording &&
+      isBusy &&
+      replayPhase === "idle" &&
+      !player.isPlaying &&
+      !player.isPlaybackPaused;
+
+    if (shouldMonitorAmbient) {
+      void startAmbientMonitoring?.().catch((error) => {
+        recordDebugLogEvent({
+          event: "drive-session-ambient-monitor-start-failed",
+          level: "warn",
+          payload: {
+            message:
+              error instanceof Error ? error.message : String(error),
+          },
+        });
+      });
+      return;
+    }
+
+    void stopAmbientMonitoring?.().catch((error) => {
+      recordDebugLogEvent({
+        event: "drive-session-ambient-monitor-stop-failed",
+        level: "warn",
+        payload: {
+          message:
+            error instanceof Error ? error.message : String(error),
+        },
+      });
+    });
+  }, [
+    autoContinueEnabled,
+    engaged,
+    isBusy,
+    isRecording,
+    mainSurfaceVisible,
+    player.isPlaybackPaused,
+    player.isPlaying,
+    replayPhase,
+    settings.inputMode,
+    startAmbientMonitoring,
+    stopAmbientMonitoring,
+  ]);
+
+  useEffect(() => {
+    if (
+      !ambientMonitoring ||
+      typeof ambientInputMetering !== "number" ||
+      settings.inputMode !== "drive-session" ||
+      !autoContinueEnabled ||
+      !engaged ||
+      isRecording ||
+      player.isPlaying ||
+      player.isPlaybackPaused
+    ) {
+      return;
+    }
+
+    const nowMs = Date.now();
+    const previousNoiseFloorDb =
+      acousticProfileRef.current.noiseFloorDb;
+    const updated = updateDriveAcousticProfileFromAmbient(
+      acousticProfileRef.current,
+      ambientInputMetering,
+      nowMs,
+    );
+    acousticProfileRef.current = updated;
+
+    const noiseFloorShiftDb = Math.abs(
+      updated.noiseFloorDb -
+        lastLoggedNoiseFloorDbRef.current,
+    );
+    if (
+      noiseFloorShiftDb < 3 &&
+      nowMs - lastAcousticProfileLogAtRef.current < 5_000
+    ) {
+      return;
+    }
+
+    lastAcousticProfileLogAtRef.current = nowMs;
+    lastLoggedNoiseFloorDbRef.current = updated.noiseFloorDb;
+    recordDebugLogEvent({
+      event: "drive-session-acoustic-profile-updated",
+      payload: {
+        ...getDriveAcousticProfileDiagnostics(updated),
+        meteringDb: ambientInputMetering,
+        previousNoiseFloorDb:
+          Math.round(previousNoiseFloorDb * 10) / 10,
+        source: "ambient-monitor",
+      },
+    });
+  }, [
+    ambientInputMetering,
+    ambientMonitoring,
+    autoContinueEnabled,
+    engaged,
+    isRecording,
+    player.isPlaybackPaused,
+    player.isPlaying,
+    settings.inputMode,
+  ]);
 
   useEffect(() => {
     if (
@@ -660,7 +854,15 @@ export function useDriveSessionController({
     pendingAutoRearmCueRef.current = false;
     updateArmRequested(false);
     updateEngaged(false);
-  }, [updateArmRequested, updateEngaged]);
+    acousticProfileRef.current = createDriveAcousticProfile();
+    lastLoggedNoiseFloorDbRef.current =
+      acousticProfileRef.current.noiseFloorDb;
+    void stopAmbientMonitoring?.();
+  }, [
+    stopAmbientMonitoring,
+    updateArmRequested,
+    updateEngaged,
+  ]);
 
   return {
     autoContinueEnabled,

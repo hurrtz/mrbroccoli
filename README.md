@@ -68,8 +68,8 @@ Each provider stays disabled until its key is configured, and STT/TTS routes onl
 
 ## Stack
 
-- Expo SDK 55
-- React Native 0.83
+- Expo SDK 57
+- React Native 0.86
 - React 19
 - Expo Router
 - Expo Audio

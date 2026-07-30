@@ -5,7 +5,11 @@ import {
 } from "expo-audio";
 
 import { useAudioRecorder } from "../../src/hooks/useAudioRecorder";
-import { startNativeWaveformRecording } from "../../src/services/nativeWaveform";
+import {
+  startNativeAmbientMonitoring,
+  startNativeWaveformRecording,
+  stopNativeAmbientMonitoring,
+} from "../../src/services/nativeWaveform";
 
 let nativeWaveformListener: ((event: any) => void) | null = null;
 
@@ -21,10 +25,15 @@ jest.mock("../../src/services/debugLogCapture", () => ({
 
 jest.mock("../../src/services/nativeWaveform", () => ({
   cancelNativeWaveformRecording: jest.fn(async () => undefined),
+  isNativeAmbientMonitoringAvailable: jest.fn(() => true),
   isNativeWaveformAvailable: jest.fn(() => true),
+  startNativeAmbientMonitoring: jest.fn(async () => ({
+    audioRoute: "built-in",
+  })),
   startNativeWaveformRecording: jest.fn(async () => ({
     uri: "file:///recording.wav",
   })),
+  stopNativeAmbientMonitoring: jest.fn(async () => true),
   stopNativeWaveformRecording: jest.fn(async () => ({
     uri: "file:///recording.wav",
   })),
@@ -131,5 +140,38 @@ describe("useAudioRecorder permissions", () => {
     });
 
     expect(result.current.inputMetering).toBe(-24);
+  });
+
+  it("exposes ambient levels and stops monitoring before recording", async () => {
+    const { result } = renderHook(() => useAudioRecorder());
+
+    await act(async () => {
+      await result.current.startAmbientMonitoring();
+    });
+
+    const sessionId =
+      (startNativeAmbientMonitoring as jest.Mock).mock.calls[0][0];
+    act(() => {
+      nativeWaveformListener?.({
+        type: "levels",
+        sessionId,
+        metering: -52,
+      });
+    });
+
+    expect(result.current.ambientMonitoring).toBe(true);
+    expect(result.current.ambientInputMetering).toBe(-52);
+    expect(result.current.audioRoute).toBe("built-in");
+
+    await act(async () => {
+      await result.current.startRecording();
+    });
+
+    expect(stopNativeAmbientMonitoring).toHaveBeenCalledWith(
+      sessionId,
+    );
+    expect(startNativeWaveformRecording).toHaveBeenCalledTimes(1);
+    expect(result.current.ambientMonitoring).toBe(false);
+    expect(result.current.ambientInputMetering).toBeNull();
   });
 });

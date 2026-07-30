@@ -7,7 +7,7 @@ The repo tracks the Android build entrypoints (`build.gradle`, `settings.gradle`
 ## Prerequisites
 
 - Android Studio with the Android SDK installed.
-- A JDK compatible with the Android Gradle Plugin used by Expo SDK 55. Android Studio's bundled JBR works.
+- A JDK compatible with the Android Gradle Plugin used by Expo SDK 57. Android Studio's bundled JBR works.
 - A physical Android device with USB debugging enabled, or a running Android emulator.
 - Project dependencies installed with `npm install`.
 

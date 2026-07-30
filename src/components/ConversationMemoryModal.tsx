@@ -180,7 +180,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 18,
   },
   backdrop: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
   },
   card: {
     width: "100%",

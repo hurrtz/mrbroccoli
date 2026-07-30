@@ -10,6 +10,7 @@ const appConfig = JSON.parse(readText("app.json")).expo;
 const packageJson = JSON.parse(readText("package.json"));
 const packageLock = JSON.parse(readText("package-lock.json"));
 const iosInfo = readText("ios/MrBroccoli/Info.plist");
+const iosPodfile = readText("ios/Podfile");
 const iosProject = readText("ios/MrBroccoli.xcodeproj/project.pbxproj");
 const androidBuild = readText("android/app/build.gradle");
 const androidManifest = readText(
@@ -69,6 +70,7 @@ async function pngFingerprint(path) {
 }
 
 const iosBundleIdentifier = appConfig.ios?.bundleIdentifier;
+const iosDeploymentTarget = appConfig.ios?.deploymentTarget;
 const androidPackage = appConfig.android?.package;
 const scheme = appConfig.scheme;
 const iconPath = appConfig.icon?.replace(/^\.\//, "");
@@ -89,6 +91,9 @@ const iosBundleVersion =
   )?.[1] ?? null;
 const iosProjectVersions = [
   ...iosProject.matchAll(/CURRENT_PROJECT_VERSION = ([^;]+);/g),
+].map((match) => match[1]);
+const iosDeploymentTargets = [
+  ...iosProject.matchAll(/IPHONEOS_DEPLOYMENT_TARGET = ([^;]+);/g),
 ].map((match) => match[1]);
 
 assertEqual("package.json version", packageJson.version, appConfig.version);
@@ -128,6 +133,16 @@ assertIncludes(
   "iOS Live Activity bundle identifier",
   iosProject,
   `PRODUCT_BUNDLE_IDENTIFIER = ${iosBundleIdentifier}.liveactivity;`,
+);
+assertIncludes(
+  "iOS Podfile deployment target",
+  iosPodfile,
+  `platform :ios, podfile_properties['ios.deploymentTarget'] || '${iosDeploymentTarget}'`,
+);
+assertAllEqual(
+  "iOS project deployment target",
+  iosDeploymentTargets,
+  iosDeploymentTarget,
 );
 assertIncludes(
   "Android namespace",

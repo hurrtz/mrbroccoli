@@ -11,14 +11,14 @@ export const styles = StyleSheet.create({
   },
   backdrop: { flex: 1 },
   inlineActionOverlay: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     justifyContent: "flex-end",
     paddingHorizontal: 16,
     paddingBottom: 16,
     zIndex: 10,
   },
   inlineActionBackdrop: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
   },
   actionSheet: {
     borderRadius: 16,
@@ -58,13 +58,13 @@ export const styles = StyleSheet.create({
     fontFamily: fonts.display,
   },
   inlineRenameOverlay: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     justifyContent: "center",
     paddingHorizontal: 20,
     zIndex: 12,
   },
   inlineRenameBackdrop: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
   },
   renameCard: {
     borderRadius: 16,

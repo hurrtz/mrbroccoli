@@ -1,11 +1,9 @@
 import Feather from "@expo/vector-icons/Feather";
 import React from "react";
 import {
-  StyleProp,
   TextInput,
   TouchableOpacity,
   View,
-  ViewStyle,
 } from "react-native";
 import {
   GestureDetector,
@@ -18,6 +16,7 @@ import { InputMode } from "../../../types";
 import { TranslateFn } from "../shared";
 import { PAGE_GAP, voiceTextInputPagerStyles as styles } from "./styles";
 import { InputSurface } from "./types";
+import type { useInputSurfaceGesture } from "./useInputSurfaceGesture";
 
 interface InputSurfacePagesProps {
   activeSurface: InputSurface;
@@ -40,7 +39,9 @@ interface InputSurfacePagesProps {
   textInputRef: React.RefObject<TextInput | null>;
   textMessage: string;
   textSubmitDisabled: boolean;
-  trackAnimatedStyle: StyleProp<ViewStyle>;
+  trackAnimatedStyle: ReturnType<
+    typeof useInputSurfaceGesture
+  >["trackAnimatedStyle"];
 }
 
 function VoiceInputSurface({

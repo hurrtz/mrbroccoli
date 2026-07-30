@@ -90,6 +90,58 @@ final class MrBroccoliNativeWaveform: RCTEventEmitter {
     }
   }
 
+  @objc(startAmbientMonitoring:resolver:rejecter:)
+  func startAmbientMonitoring(
+    _ sessionId: String,
+    resolver resolve: @escaping RCTPromiseResolveBlock,
+    rejecter reject: @escaping RCTPromiseRejectBlock
+  ) {
+    DispatchQueue.main.async {
+      guard !sessionId.isEmpty else {
+        reject(
+          "native_waveform_monitor_error",
+          "sessionId is required.",
+          nil
+        )
+        return
+      }
+
+      do {
+        let audioRoute = try self.recorder.startAmbientMonitoring(
+          sessionId: sessionId
+        )
+        resolve(["audioRoute": audioRoute])
+      } catch {
+        self.recorder.cleanup()
+        reject(
+          "native_waveform_monitor_error",
+          error.localizedDescription,
+          error
+        )
+      }
+    }
+  }
+
+  @objc(stopAmbientMonitoring:resolver:rejecter:)
+  func stopAmbientMonitoring(
+    _ sessionId: String,
+    resolver resolve: @escaping RCTPromiseResolveBlock,
+    rejecter reject: @escaping RCTPromiseRejectBlock
+  ) {
+    DispatchQueue.main.async {
+      do {
+        try self.recorder.stopAmbientMonitoring(sessionId: sessionId)
+        resolve(true)
+      } catch {
+        reject(
+          "native_waveform_monitor_error",
+          error.localizedDescription,
+          error
+        )
+      }
+    }
+  }
+
   @objc(playRecordingCue:resolver:rejecter:)
   func playRecordingCue(
     _ uri: String,

@@ -9,8 +9,9 @@ try {
 }
 
 export function networkFetch(
-  input: Parameters<FetchFunction>[0],
+  input: Parameters<FetchFunction>[0] | URL,
   init?: Parameters<FetchFunction>[1]
 ) {
-  return (expoFetch ?? globalThis.fetch)(input, init);
+  const normalizedInput = input instanceof URL ? input.toString() : input;
+  return (expoFetch ?? globalThis.fetch)(normalizedInput, init);
 }

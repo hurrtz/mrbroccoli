@@ -4,13 +4,17 @@ import android.content.Context
 import android.media.AudioAttributes
 import android.media.AudioDeviceCallback
 import android.media.AudioDeviceInfo
+import android.media.AudioFormat
 import android.media.AudioManager
+import android.media.AudioRecord
 import android.media.MediaPlayer
 import android.media.MediaRecorder
 import android.net.Uri
 import android.os.Build
 import android.os.Handler
 import android.os.Looper
+import android.os.Process
+import android.os.SystemClock
 import com.facebook.react.bridge.Arguments
 import com.facebook.react.bridge.Promise
 import com.facebook.react.bridge.ReactApplicationContext
@@ -19,6 +23,7 @@ import com.facebook.react.bridge.ReactMethod
 import com.facebook.react.bridge.WritableMap
 import com.facebook.react.modules.core.DeviceEventManagerModule
 import java.io.File
+import kotlin.math.abs
 import kotlin.math.log10
 
 class MrBroccoliNativeWaveformModule(
@@ -38,6 +43,10 @@ class MrBroccoliNativeWaveformModule(
   private var recorder: MediaRecorder? = null
   private var activeSessionId: String? = null
   private var activeOutputFile: File? = null
+  @Volatile private var ambientMonitorRunning = false
+  @Volatile private var ambientSessionId: String? = null
+  private var ambientRecorder: AudioRecord? = null
+  private var ambientThread: Thread? = null
   private var levelRunnable: Runnable? = null
   private var audioDeviceCallback: AudioDeviceCallback? = null
   private var previousAudioMode: Int? = null
@@ -64,10 +73,15 @@ class MrBroccoliNativeWaveformModule(
         return
       }
 
-      if (recorder != null || activeSessionId != null) {
+      if (
+        recorder != null ||
+        activeSessionId != null ||
+        ambientRecorder != null ||
+        ambientSessionId != null
+      ) {
         promise.reject(
           "native_waveform_record_error",
-          "Another native waveform recording session is already active.",
+          "Another native waveform or ambient monitoring session is already active.",
         )
         return
       }
@@ -195,6 +209,114 @@ class MrBroccoliNativeWaveformModule(
   }
 
   @ReactMethod
+  fun startAmbientMonitoring(sessionId: String, promise: Promise) {
+    synchronized(lock) {
+      if (sessionId.isBlank()) {
+        promise.reject(
+          "native_waveform_monitor_error",
+          "sessionId is required.",
+        )
+        return
+      }
+
+      if (
+        recorder != null ||
+        activeSessionId != null ||
+        ambientRecorder != null ||
+        ambientSessionId != null
+      ) {
+        promise.reject(
+          "native_waveform_monitor_error",
+          "Another native waveform or ambient monitoring session is already active.",
+        )
+        return
+      }
+
+      try {
+        configureCommunicationRouteLocked()
+
+        val minimumBufferSize = AudioRecord.getMinBufferSize(
+          16_000,
+          AudioFormat.CHANNEL_IN_MONO,
+          AudioFormat.ENCODING_PCM_16BIT,
+        )
+        require(minimumBufferSize > 0) {
+          "Unable to determine an ambient microphone buffer size."
+        }
+        val bufferSize = maxOf(minimumBufferSize, 2_048)
+        val nextRecorder = AudioRecord.Builder()
+          .setAudioSource(MediaRecorder.AudioSource.VOICE_RECOGNITION)
+          .setAudioFormat(
+            AudioFormat.Builder()
+              .setEncoding(AudioFormat.ENCODING_PCM_16BIT)
+              .setSampleRate(16_000)
+              .setChannelMask(AudioFormat.CHANNEL_IN_MONO)
+              .build(),
+          )
+          .setBufferSizeInBytes(bufferSize)
+          .build()
+
+        require(nextRecorder.state == AudioRecord.STATE_INITIALIZED) {
+          "The ambient microphone monitor could not be initialized."
+        }
+
+        nextRecorder.startRecording()
+        ambientRecorder = nextRecorder
+        ambientSessionId = sessionId
+        ambientMonitorRunning = true
+        startAudioRouteUpdatesLocked(sessionId)
+        startAmbientLevelUpdatesLocked(
+          sessionId = sessionId,
+          activeRecorder = nextRecorder,
+          bufferSize = bufferSize,
+        )
+        emitLifecycleEvent(
+          type = "monitoringStarted",
+          sessionId = sessionId,
+        )
+        promise.resolve(
+          Arguments.createMap().apply {
+            putString("audioRoute", currentAudioRouteLabel())
+          },
+        )
+      } catch (error: Exception) {
+        cleanupAmbientMonitorLocked()
+        emitErrorEvent(
+          sessionId = sessionId,
+          message =
+            error.message ?: "Ambient microphone monitoring could not be started.",
+        )
+        promise.reject(
+          "native_waveform_monitor_error",
+          error.message ?: "Ambient microphone monitoring could not be started.",
+          error,
+        )
+      }
+    }
+  }
+
+  @ReactMethod
+  fun stopAmbientMonitoring(sessionId: String, promise: Promise) {
+    synchronized(lock) {
+      if (
+        ambientRecorder == null ||
+        ambientSessionId == null ||
+        ambientSessionId != sessionId
+      ) {
+        promise.resolve(false)
+        return
+      }
+
+      cleanupAmbientMonitorLocked()
+      emitLifecycleEvent(
+        type = "monitoringStopped",
+        sessionId = sessionId,
+      )
+      promise.resolve(true)
+    }
+  }
+
+  @ReactMethod
   fun playRecordingCue(uri: String, promise: Promise) {
     mainHandler.post {
       try {
@@ -236,6 +358,7 @@ class MrBroccoliNativeWaveformModule(
   override fun invalidate() {
     synchronized(lock) {
       cleanupRecorderLocked(deleteOutput = true)
+      cleanupAmbientMonitorLocked()
     }
     super.invalidate()
   }
@@ -306,6 +429,29 @@ class MrBroccoliNativeWaveformModule(
       outputFile?.delete()
     }
 
+    restoreCommunicationRouteLocked()
+  }
+
+  private fun cleanupAmbientMonitorLocked() {
+    ambientMonitorRunning = false
+    val currentRecorder = ambientRecorder
+    val currentThread = ambientThread
+
+    ambientRecorder = null
+    ambientSessionId = null
+    ambientThread = null
+    stopAudioRouteUpdatesLocked()
+
+    if (currentRecorder != null) {
+      try {
+        currentRecorder.stop()
+      } catch (_: IllegalStateException) {
+      }
+
+      currentRecorder.release()
+    }
+
+    currentThread?.interrupt()
     restoreCommunicationRouteLocked()
   }
 
@@ -427,6 +573,79 @@ class MrBroccoliNativeWaveformModule(
     mainHandler.post(runnable)
   }
 
+  private fun startAmbientLevelUpdatesLocked(
+    sessionId: String,
+    activeRecorder: AudioRecord,
+    bufferSize: Int,
+  ) {
+    val sampleBuffer = ShortArray(maxOf(1_024, bufferSize / 2))
+    val thread = Thread(
+      {
+        Process.setThreadPriority(Process.THREAD_PRIORITY_AUDIO)
+        var peakAmplitude = 0
+        var lastEmissionAtMs = SystemClock.elapsedRealtime()
+
+        while (
+          ambientMonitorRunning &&
+          ambientSessionId == sessionId &&
+          ambientRecorder === activeRecorder &&
+          !Thread.currentThread().isInterrupted
+        ) {
+          val samplesRead =
+            try {
+              activeRecorder.read(
+                sampleBuffer,
+                0,
+                sampleBuffer.size,
+                AudioRecord.READ_BLOCKING,
+              )
+            } catch (_: IllegalStateException) {
+              break
+            }
+
+          if (samplesRead <= 0) {
+            continue
+          }
+
+          for (index in 0 until samplesRead) {
+            peakAmplitude = maxOf(
+              peakAmplitude,
+              abs(sampleBuffer[index].toInt()),
+            )
+          }
+
+          val nowMs = SystemClock.elapsedRealtime()
+          if (nowMs - lastEmissionAtMs < 150) {
+            continue
+          }
+
+          val metering =
+            if (peakAmplitude <= 0) {
+              -160.0
+            } else {
+              (20.0 * log10(peakAmplitude.toDouble() / 32_767.0))
+                .coerceIn(-160.0, 0.0)
+            }
+          peakAmplitude = 0
+          lastEmissionAtMs = nowMs
+
+          mainHandler.post {
+            if (
+              ambientMonitorRunning &&
+              ambientSessionId == sessionId &&
+              ambientRecorder === activeRecorder
+            ) {
+              emitLevelEvent(sessionId, metering)
+            }
+          }
+        }
+      },
+      "MrBroccoliAmbientMeter",
+    )
+    ambientThread = thread
+    thread.start()
+  }
+
   private fun startAudioRouteUpdatesLocked(sessionId: String) {
     stopAudioRouteUpdatesLocked()
     val callback = object : AudioDeviceCallback() {
@@ -453,7 +672,11 @@ class MrBroccoliNativeWaveformModule(
 
   private fun emitRouteChangeIfActive(sessionId: String, reason: String) {
     synchronized(lock) {
-      if (activeSessionId != sessionId || recorder == null) {
+      val recordingActive =
+        activeSessionId == sessionId && recorder != null
+      val ambientMonitoringActive =
+        ambientSessionId == sessionId && ambientRecorder != null
+      if (!recordingActive && !ambientMonitoringActive) {
         return
       }
       val payload = Arguments.createMap().apply {

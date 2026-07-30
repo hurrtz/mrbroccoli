@@ -1,5 +1,5 @@
 import React from "react";
-import { Alert, Modal, StyleSheet } from "react-native";
+import { Alert, FlatList, Modal, StyleSheet } from "react-native";
 import { fireEvent, waitFor } from "@testing-library/react-native";
 
 import { ConversationDrawer } from "../../src/components/ConversationDrawer";
@@ -152,8 +152,9 @@ describe("ConversationDrawer", () => {
 
     await waitFor(() => {
       expect(onSearchConversations).toHaveBeenCalledWith("travel");
-      expect(screen.getByText("Travel planning")).toBeTruthy();
-      expect(screen.queryByText("Morning briefing")).toBeNull();
+      expect(screen.UNSAFE_getByType(FlatList).props.data).toEqual([
+        conversations[1],
+      ]);
     });
   });
 

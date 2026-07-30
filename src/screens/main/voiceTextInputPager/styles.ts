@@ -22,7 +22,7 @@ export const voiceTextInputPagerStyles = StyleSheet.create({
     opacity: 0,
   },
   activeActionOverlay: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
   },
   page: {
     justifyContent: "center",

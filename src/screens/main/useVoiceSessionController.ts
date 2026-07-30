@@ -92,6 +92,10 @@ export function useVoiceSessionController({
     sttMode: settings.sttMode,
     t,
   });
+  const startVoiceCaptureAfterAmbientStop = useCallback(async () => {
+    await recorder.stopAmbientMonitoring?.();
+    await startVoiceCapture();
+  }, [recorder, startVoiceCapture]);
 
   const togglePlaybackPause = useCallback(async () => {
     const updated = player.isPlaybackPaused
@@ -110,7 +114,7 @@ export function useVoiceSessionController({
     playbackCanPause,
     player,
     showToast,
-    startVoiceCapture,
+    startVoiceCapture: startVoiceCaptureAfterAmbientStop,
     stopVoiceCapture,
     t,
     togglePlaybackPause,
@@ -123,6 +127,9 @@ export function useVoiceSessionController({
     hasActiveVoiceCaptureNow,
     isBusy,
     isRecording,
+    ambientInputMetering: recorder.ambientInputMetering,
+    ambientMonitoring: recorder.ambientMonitoring ?? false,
+    audioRoute: recorder.audioRoute,
     inputMetering:
       settings.sttMode === "native"
         ? nativeStt.inputMetering
@@ -134,7 +141,9 @@ export function useVoiceSessionController({
     replayPhase,
     settings,
     showToast,
-    startVoiceCapture,
+    startAmbientMonitoring: recorder.startAmbientMonitoring,
+    startVoiceCapture: startVoiceCaptureAfterAmbientStop,
+    stopAmbientMonitoring: recorder.stopAmbientMonitoring,
     stopVoiceCapture,
     stopReplay,
     t,
@@ -216,6 +225,7 @@ export function useVoiceSessionController({
     driveSession.reset();
     resetPipelineState();
     lastCompletedReplyRef.current = "";
+    await recorder.stopAmbientMonitoring?.();
     await player.stopPlayback();
     try {
       await cancelVoiceCapture();
@@ -228,6 +238,7 @@ export function useVoiceSessionController({
     isRecording,
     lastCompletedReplyRef,
     player,
+    recorder,
     resetPipelineState,
     settings.sttMode,
   ]);

@@ -27,7 +27,13 @@ import {
   type NativeSpeechQueueItem,
 } from "./audioPlayer/types";
 
-export function useAudioPlayer() {
+interface UseAudioPlayerOptions {
+  beforePlayback?: () => Promise<unknown>;
+}
+
+export function useAudioPlayer(
+  options: UseAudioPlayerOptions = {},
+) {
   const usingNativeAudioQueue = isNativeAudioQueueAvailable();
   const player = useExpoAudioPlayer(null, {
     updateInterval: PLAYER_STATUS_INTERVAL_MS,
@@ -55,8 +61,15 @@ export function useAudioPlayer() {
   const [nativeSpeaking, setNativeSpeaking] = useState(false);
   const [nativeSpeechPlaying, setNativeSpeechPlaying] = useState(false);
   const [isPlaybackPaused, setPlaybackPaused] = useState(false);
-  const { ensurePlaybackSession, resetPlaybackSession } =
+  const {
+    ensurePlaybackSession: ensurePlaybackSessionInternal,
+    resetPlaybackSession,
+  } =
     usePlaybackSession();
+  const ensurePlaybackSession = useCallback(async () => {
+    await options.beforePlayback?.();
+    await ensurePlaybackSessionInternal();
+  }, [ensurePlaybackSessionInternal, options.beforePlayback]);
   const clearNativeAudioQueueState = useCallback(() => {
     nativeAudioQueueContextsRef.current.clear();
     nativeAudioQueuePendingCountRef.current = 0;

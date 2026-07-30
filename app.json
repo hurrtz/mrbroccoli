@@ -11,11 +11,17 @@
     ],
     "plugins": [
       "./plugins/withKokoroBackgroundDownload",
-      "expo-font"
+      "expo-font",
+      "expo-asset",
+      "expo-audio",
+      "expo-router",
+      "expo-secure-store",
+      "expo-status-bar"
     ],
     "ios": {
       "icon": "./assets/appIcon/ios.png",
-      "bundleIdentifier": "com.tobiaswinkler.app.mrbroccoli"
+      "bundleIdentifier": "com.tobiaswinkler.app.mrbroccoli",
+      "deploymentTarget": "16.4"
     },
     "android": {
       "icon": "./assets/appIcon/ios.png",

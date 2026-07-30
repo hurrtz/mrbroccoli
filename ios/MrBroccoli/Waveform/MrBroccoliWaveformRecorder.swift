@@ -18,6 +18,7 @@ final class MrBroccoliWaveformRecorder {
   private var inputToFileConverter: AVAudioConverter?
   private var fileFormat: AVAudioFormat?
   private var activeSessionId: String?
+  private var meteringOnly = false
   private var outputURL: URL?
   private var pendingRecordingErrorSessionId: String?
   private var lastMeteringEmissionAt: TimeInterval = 0
@@ -133,6 +134,7 @@ final class MrBroccoliWaveformRecorder {
     inputToFileConverter = converter
     self.fileFormat = fileFormat
     activeSessionId = sessionId
+    meteringOnly = false
     self.outputURL = outputURL
     observeAudioSession(sessionId: sessionId)
     emitEvent([
@@ -145,6 +147,69 @@ final class MrBroccoliWaveformRecorder {
     return outputURL
   }
 
+  func startAmbientMonitoring(sessionId: String) throws -> String {
+    guard activeSessionId == nil else {
+      throw NSError(
+        domain: "MrBroccoliNativeWaveform",
+        code: 103,
+        userInfo: [
+          NSLocalizedDescriptionKey:
+            "Another native waveform or ambient monitoring session is already active."
+        ]
+      )
+    }
+
+    try MrBroccoliWaveformAudioSession.activateRecordingSession()
+
+    let engine = AVAudioEngine()
+    let inputNode = engine.inputNode
+    let inputFormat = inputNode.inputFormat(forBus: 0)
+
+    guard inputFormat.channelCount > 0 else {
+      MrBroccoliWaveformAudioSession.deactivate()
+      throw NSError(
+        domain: "MrBroccoliNativeWaveform",
+        code: 104,
+        userInfo: [
+          NSLocalizedDescriptionKey:
+            "No microphone input channels are available for ambient monitoring."
+        ]
+      )
+    }
+
+    inputNode.installTap(
+      onBus: 0,
+      bufferSize: Self.inputTapBufferSize,
+      format: inputFormat
+    ) { [weak self] buffer, _ in
+      self?.emitMeteringIfNeeded(
+        from: buffer,
+        sessionId: sessionId
+      )
+    }
+
+    engine.prepare()
+    try engine.start()
+
+    audioEngine = engine
+    audioFile = nil
+    inputToFileConverter = nil
+    fileFormat = nil
+    activeSessionId = sessionId
+    meteringOnly = true
+    outputURL = nil
+    observeAudioSession(sessionId: sessionId)
+
+    let audioRoute =
+      MrBroccoliWaveformAudioSession.currentInputRouteLabel()
+    emitEvent([
+      "type": "monitoringStarted",
+      "sessionId": sessionId,
+      "audioRoute": audioRoute,
+    ])
+    return audioRoute
+  }
+
   func stopRecording(sessionId: String) throws -> URL {
     let outputURL = try finishRecording(sessionId: sessionId, deleteOutput: false)
     emitEvent([
@@ -153,6 +218,25 @@ final class MrBroccoliWaveformRecorder {
       "uri": outputURL.absoluteString,
     ])
     return outputURL
+  }
+
+  func stopAmbientMonitoring(sessionId: String) throws {
+    guard activeSessionId == sessionId, meteringOnly else {
+      throw NSError(
+        domain: "MrBroccoliNativeWaveform",
+        code: 105,
+        userInfo: [
+          NSLocalizedDescriptionKey:
+            "The native ambient monitor is not active for this session."
+        ]
+      )
+    }
+
+    cleanupRecording(deleteOutput: false)
+    emitEvent([
+      "type": "monitoringStopped",
+      "sessionId": sessionId,
+    ])
   }
 
   func cancelRecording(sessionId: String) throws {
@@ -168,7 +252,7 @@ final class MrBroccoliWaveformRecorder {
   }
 
   private func finishRecording(sessionId: String, deleteOutput: Bool) throws -> URL {
-    guard activeSessionId == sessionId else {
+    guard activeSessionId == sessionId, !meteringOnly else {
       throw NSError(
         domain: "MrBroccoliNativeWaveform",
         code: 1,
@@ -200,6 +284,7 @@ final class MrBroccoliWaveformRecorder {
     inputToFileConverter = nil
     fileFormat = nil
     activeSessionId = nil
+    meteringOnly = false
     pendingRecordingErrorSessionId = nil
     stateLock.lock()
     lastMeteringEmissionAt = 0

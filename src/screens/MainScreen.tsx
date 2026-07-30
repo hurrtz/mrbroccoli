@@ -99,7 +99,9 @@ export function MainScreen() {
 
   const recorder = useAudioRecorder();
   const nativeStt = useNativeSpeechRecognizer(settings.sttLanguage);
-  const player = useAudioPlayer();
+  const player = useAudioPlayer({
+    beforePlayback: recorder.stopAmbientMonitoring,
+  });
   const kokoroModel = useKokoroModel();
 
   const [styleSheetVisible, setStyleSheetVisible] = React.useState(false);

@@ -7,17 +7,17 @@ import {
 } from "../../../src/screens/main/voiceSession/driveVoiceActivity";
 
 describe("driveVoiceActivity", () => {
-  it("counts down a full ten seconds when no speech is detected", () => {
+  it("waits for the first detected utterance before starting a countdown", () => {
     const state = createDriveVoiceActivityState(1_000);
 
-    expect(getDriveCountdownSeconds(state, 1_000)).toBe(10);
-    expect(getDriveCountdownSeconds(state, 5_001)).toBe(6);
+    expect(getDriveCountdownSeconds(state, 1_000)).toBeNull();
+    expect(getDriveCountdownSeconds(state, 5_001)).toBeNull();
     expect(
-      getDriveSilenceRemainingMs(
+      getDriveCountdownSeconds(
         state,
         1_000 + DRIVE_SILENCE_WINDOW_MS,
       ),
-    ).toBe(0);
+    ).toBeNull();
   });
 
   it("pauses the visible countdown while speech is active", () => {
@@ -34,8 +34,61 @@ describe("driveVoiceActivity", () => {
   it("detects someone who starts speaking immediately", () => {
     let state = createDriveVoiceActivityState(0);
 
-    state = updateDriveVoiceActivity(state, -20, 0);
-    state = updateDriveVoiceActivity(state, -18, 150);
+    for (const [index, levelDb] of [
+      -44,
+      -41,
+      -45,
+      -39,
+      -43,
+    ].entries()) {
+      state = updateDriveVoiceActivity(
+        state,
+        levelDb,
+        index * 150,
+      );
+    }
+
+    expect(state.hasDetectedSpeech).toBe(true);
+    expect(state.voiceActive).toBe(true);
+  });
+
+  it("confirms sustained speech with the narrow range measured on a physical iPhone", () => {
+    let state = createDriveVoiceActivityState(0);
+
+    for (const [levelDb, nowMs] of [
+      [-46.88, 0],
+      [-45.9, 201],
+      [-44.7, 402],
+      [-43.8, 603],
+      [-43.18, 1_004],
+    ] as const) {
+      state = updateDriveVoiceActivity(state, levelDb, nowMs);
+    }
+
+    expect(state.hasDetectedSpeech).toBe(true);
+    expect(state.voiceActive).toBe(true);
+    expect(state.lastSpeechAtMs).toBe(1_004);
+  });
+
+  it("uses learned session levels to detect quieter speech on the next turn", () => {
+    let state = createDriveVoiceActivityState(0, {
+      noiseFloorDb: -65,
+      speechLevelDb: -44,
+    });
+
+    for (const [index, levelDb] of [
+      -52,
+      -50,
+      -49,
+      -48,
+      -48.5,
+    ].entries()) {
+      state = updateDriveVoiceActivity(
+        state,
+        levelDb,
+        index * 150,
+      );
+    }
 
     expect(state.hasDetectedSpeech).toBe(true);
     expect(state.voiceActive).toBe(true);
@@ -55,6 +108,37 @@ describe("driveVoiceActivity", () => {
     expect(getDriveCountdownSeconds(state, 11_150)).toBe(0);
   });
 
+  it("confirms moderate speech without letting the learned threshold chase it", () => {
+    let state = createDriveVoiceActivityState(0);
+
+    state = updateDriveVoiceActivity(state, -20, 1_000);
+    state = updateDriveVoiceActivity(state, -18, 1_150);
+    state = updateDriveVoiceActivity(state, -70, 1_300);
+    state = updateDriveVoiceActivity(state, -70, 1_450);
+    state = updateDriveVoiceActivity(state, -70, 1_600);
+
+    expect(getDriveCountdownSeconds(state, 10_000)).toBe(2);
+
+    for (const [index, levelDb] of [
+      -44,
+      -41,
+      -45,
+      -39,
+      -43,
+    ].entries()) {
+      state = updateDriveVoiceActivity(
+        state,
+        levelDb,
+        10_000 + index * 150,
+      );
+    }
+
+    expect(state.hasDetectedSpeech).toBe(true);
+    expect(state.voiceActive).toBe(true);
+    expect(state.lastSpeechAtMs).toBe(10_600);
+    expect(getDriveCountdownSeconds(state, 10_600)).toBeNull();
+  });
+
   it("learns steady background noise without treating it as speech", () => {
     let state = createDriveVoiceActivityState(0);
 
@@ -71,6 +155,27 @@ describe("driveVoiceActivity", () => {
 
     state = updateDriveVoiceActivity(state, -15, 1_000);
     state = updateDriveVoiceActivity(state, -70, 1_150);
+
+    expect(state.hasDetectedSpeech).toBe(false);
+    expect(state.voiceActive).toBe(false);
+  });
+
+  it("does not confirm a brief five-sample background burst", () => {
+    let state = createDriveVoiceActivityState(0);
+
+    for (const [index, levelDb] of [
+      -46.8,
+      -45.8,
+      -44.7,
+      -43.8,
+      -43.2,
+    ].entries()) {
+      state = updateDriveVoiceActivity(
+        state,
+        levelDb,
+        1_000 + index * 75,
+      );
+    }
 
     expect(state.hasDetectedSpeech).toBe(false);
     expect(state.voiceActive).toBe(false);

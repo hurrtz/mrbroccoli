@@ -102,6 +102,27 @@ jest.mock("expo-file-system/legacy", () => ({
   ),
 }));
 
+jest.mock("expo-file-system", () => ({
+  File: class MockFile {
+    static createdUris: string[] = [];
+
+    readonly name: string;
+    readonly type: string;
+    readonly uri: string;
+
+    constructor(fileUri: string) {
+      MockFile.createdUris.push(fileUri);
+      this.uri = fileUri;
+      this.name = fileUri.split("/").pop() || "recording.m4a";
+      this.type = fileUri.endsWith(".wav") ? "audio/wav" : "audio/m4a";
+    }
+
+    bytes() {
+      return Promise.resolve(new Uint8Array([1, 2, 3]));
+    }
+  },
+}));
+
 describe("transcribeAudio", () => {
   beforeAll(() => {
     (globalThis as any).WebSocket = MockWebSocket;
@@ -115,6 +136,7 @@ describe("transcribeAudio", () => {
     jest.clearAllMocks();
     resetProviderModelHealthForTests();
     MockWebSocket.instances = [];
+    require("expo-file-system").File.createdUris.length = 0;
     (FileSystem.getInfoAsync as jest.Mock).mockResolvedValue({
       exists: true,
       size: 8192,
@@ -220,6 +242,9 @@ describe("transcribeAudio", () => {
     expect(Array.from((options.body as FormData).entries())).toEqual(
       expect.arrayContaining([["model_id", "scribe_v2"]]),
     );
+    expect(require("expo-file-system").File.createdUris).toEqual([
+      "/tmp/recording.m4a",
+    ]);
   });
 
   it("enables diarized output and automatic chunking for OpenAI diarization", async () => {

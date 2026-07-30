@@ -281,7 +281,7 @@ export const responseModeToggleStyles = StyleSheet.create({
     justifyContent: "flex-end",
   },
   overflowBackdrop: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
   },
   overflowSheetMotion: {
     width: "100%",

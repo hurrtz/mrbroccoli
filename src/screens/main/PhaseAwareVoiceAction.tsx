@@ -676,10 +676,10 @@ const styles = StyleSheet.create({
     left: 0,
   },
   timelineOverlay: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
   },
   primaryAction: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     alignItems: "center",
     justifyContent: "center",
   },
@@ -697,7 +697,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   phaseCopy: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",

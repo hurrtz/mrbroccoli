@@ -79,11 +79,16 @@ describe("useVoiceSessionController", () => {
       providerApiKey: "provider-key",
       providerLabel: "OpenAI",
       recorder: {
+        ambientInputMetering: null as number | null,
+        ambientMonitoring: false,
+        audioRoute: "built-in",
         clearLastError: jest.fn(),
         ensurePermissions: jest.fn(async () => undefined),
         inputMetering: null as number | null,
         lastError: null,
+        startAmbientMonitoring: jest.fn(async () => true),
         startRecording: jest.fn(async () => undefined),
+        stopAmbientMonitoring: jest.fn(async () => true),
         stopRecording: jest.fn(async () => "file://voice.m4a"),
       },
       replayPhase: "idle" as const,
@@ -388,6 +393,52 @@ describe("useVoiceSessionController", () => {
     expect(params.completedReplyVersion).toBe(0);
   });
 
+  it("measures ambient levels while a Drive turn is processing but not during playback", async () => {
+    const { result, params, rerender } = renderController({
+      settings: {
+        inputMode: "drive-session",
+        spokenRepliesEnabled: true,
+        sttMode: "provider",
+        ttsMode: "provider",
+        providerSttModels: {},
+      },
+    });
+
+    await act(async () => {
+      await result.current.handleTogglePress();
+    });
+    params.isRecording = true;
+    act(() => rerender());
+
+    await act(async () => {
+      await result.current.handleTogglePress();
+    });
+    params.isRecording = false;
+    params.isBusy = true;
+    act(() => rerender());
+
+    await waitFor(() =>
+      expect(
+        params.recorder.startAmbientMonitoring,
+      ).toHaveBeenCalledTimes(1),
+    );
+
+    params.recorder.ambientMonitoring = true;
+    params.recorder.ambientInputMetering = -52;
+    act(() => rerender());
+
+    const stopsBeforePlayback =
+      params.recorder.stopAmbientMonitoring.mock.calls.length;
+    params.player.isPlaying = true;
+    act(() => rerender());
+
+    await waitFor(() =>
+      expect(
+        params.recorder.stopAmbientMonitoring.mock.calls.length,
+      ).toBeGreaterThan(stopsBeforePlayback),
+    );
+  });
+
   it("uses the Drive Session primary action to cancel processing without immediately re-arming", async () => {
     const abortController = new AbortController();
     const { result, params } = renderController({
@@ -494,7 +545,7 @@ describe("useVoiceSessionController", () => {
     expect(params.recorder.startRecording).not.toHaveBeenCalled();
   });
 
-  it("auto-submits a Drive recording after ten seconds of silence", async () => {
+  it("does not count down or auto-submit before the first Drive utterance", async () => {
     jest.useFakeTimers();
     try {
       const { result, params, rerender } = renderController({
@@ -514,14 +565,13 @@ describe("useVoiceSessionController", () => {
       act(() => rerender());
 
       await act(async () => {
-        jest.advanceTimersByTime(10_200);
+        jest.advanceTimersByTime(15_000);
         await Promise.resolve();
       });
 
-      expect(params.recorder.stopRecording).toHaveBeenCalledTimes(1);
-      expect(params.handleVoiceCaptureDone).toHaveBeenCalledWith({
-        audioUri: "file://voice.m4a",
-      });
+      expect(result.current.driveSilenceCountdownSeconds).toBeNull();
+      expect(params.recorder.stopRecording).not.toHaveBeenCalled();
+      expect(params.handleVoiceCaptureDone).not.toHaveBeenCalled();
     } finally {
       jest.useRealTimers();
     }
@@ -581,6 +631,78 @@ describe("useVoiceSessionController", () => {
         await Promise.resolve();
       });
 
+      expect(params.recorder.stopRecording).toHaveBeenCalledTimes(1);
+    } finally {
+      jest.useRealTimers();
+    }
+  });
+
+  it("cancels an expiring Drive countdown when moderate speech resumes", async () => {
+    jest.useFakeTimers();
+    try {
+      const { result, params, rerender } = renderController({
+        settings: {
+          inputMode: "drive-session",
+          spokenRepliesEnabled: true,
+          sttMode: "provider",
+          ttsMode: "provider",
+          providerSttModels: {},
+        },
+      });
+
+      await act(async () => {
+        await result.current.handleTogglePress();
+      });
+      params.isRecording = true;
+      act(() => rerender());
+
+      const advanceWithLevel = (durationMs: number, metering: number) => {
+        act(() => {
+          jest.advanceTimersByTime(durationMs);
+          params.recorder.inputMetering = metering;
+          rerender();
+        });
+      };
+
+      advanceWithLevel(700, -20);
+      advanceWithLevel(150, -19);
+      advanceWithLevel(150, -70);
+      advanceWithLevel(150, -71);
+      advanceWithLevel(150, -72);
+      act(() => {
+        jest.advanceTimersByTime(8_300);
+      });
+
+      expect(result.current.driveSilenceCountdownSeconds).toBe(2);
+
+      advanceWithLevel(150, -44);
+      expect(result.current.driveSilenceCountdownSeconds).toBeNull();
+
+      for (const levelDb of [-41, -45, -39, -43]) {
+        advanceWithLevel(150, levelDb);
+      }
+
+      expect(result.current.driveVoiceActive).toBe(true);
+      expect(result.current.driveSilenceCountdownSeconds).toBeNull();
+
+      for (let index = 0; index < 10; index += 1) {
+        advanceWithLevel(150, index % 2 === 0 ? -42 : -38);
+      }
+      expect(params.recorder.stopRecording).not.toHaveBeenCalled();
+
+      advanceWithLevel(150, -70);
+      advanceWithLevel(150, -71);
+      advanceWithLevel(150, -72);
+
+      act(() => {
+        jest.advanceTimersByTime(9_300);
+      });
+      expect(params.recorder.stopRecording).not.toHaveBeenCalled();
+
+      await act(async () => {
+        jest.advanceTimersByTime(900);
+        await Promise.resolve();
+      });
       expect(params.recorder.stopRecording).toHaveBeenCalledTimes(1);
     } finally {
       jest.useRealTimers();
@@ -660,6 +782,31 @@ describe("useVoiceSessionController", () => {
       });
       params.isRecording = true;
       act(() => rerender());
+
+      act(() => {
+        jest.advanceTimersByTime(700);
+        params.recorder.inputMetering = -20;
+        rerender();
+      });
+      act(() => {
+        jest.advanceTimersByTime(150);
+        params.recorder.inputMetering = -19;
+        rerender();
+      });
+      act(() => {
+        params.recorder.inputMetering = -70;
+        rerender();
+      });
+      act(() => {
+        jest.advanceTimersByTime(150);
+        params.recorder.inputMetering = -71;
+        rerender();
+      });
+      act(() => {
+        jest.advanceTimersByTime(150);
+        params.recorder.inputMetering = -72;
+        rerender();
+      });
 
       await act(async () => {
         jest.advanceTimersByTime(9_200);

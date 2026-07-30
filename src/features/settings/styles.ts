@@ -8,14 +8,14 @@ export const styles = StyleSheet.create({
     transform: [{ scale: 0.985 }],
   },
   overlay: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
     zIndex: 1000,
   },
   backdrop: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
   },
   modal: {
     flex: 1,
