@@ -326,6 +326,70 @@ describe("useConversations", () => {
     expect(result.current.activeConversation).not.toBeNull();
   });
 
+  it("restores conflicting backup conversations as copies without replacing local data", async () => {
+    const stored = new Map<string, string>();
+    (AsyncStorage.getItem as jest.Mock).mockImplementation(
+      async (key: string) => stored.get(key) ?? null,
+    );
+    (AsyncStorage.setItem as jest.Mock).mockImplementation(
+      async (key: string, value: string) => {
+        stored.set(key, value);
+      },
+    );
+    const { result } = renderHook(() => useConversations());
+
+    await waitFor(() => expect(result.current.loaded).toBe(true));
+    await act(async () => {
+      result.current.createConversation("Local conversation");
+    });
+    const localConversation = result.current.activeConversation!;
+    let restoreResult:
+      | Awaited<ReturnType<typeof result.current.restoreConversationBackup>>
+      | undefined;
+
+    await act(async () => {
+      restoreResult = await result.current.restoreConversationBackup(
+        [
+          {
+            conversation: {
+              ...localConversation,
+              title: "Imported conversation",
+              messages: [
+                {
+                  id: "imported-message",
+                  role: "user",
+                  content: "Keep both versions",
+                  model: null,
+                  provider: null,
+                  timestamp: "2026-07-31T08:00:00.000Z",
+                },
+              ],
+            },
+            pinned: true,
+          },
+        ],
+        localConversation.id,
+      );
+    });
+
+    expect(restoreResult).toEqual({
+      conversationsCopied: 1,
+      conversationsRestored: 1,
+      conversationsSkipped: 0,
+    });
+    expect(result.current.conversations).toHaveLength(2);
+    expect(result.current.activeConversation).toMatchObject({
+      id: "test-uuid-2",
+      title: "Imported conversation",
+    });
+    expect(JSON.parse(stored.get(
+      `@mrbroccoli/conversation/${localConversation.id}`,
+    )!)).toMatchObject({
+      id: localConversation.id,
+      title: "Local conversation",
+    });
+  });
+
   it("keeps useful conversation titles beyond the old 40-character limit", async () => {
     const { result } = renderHook(() => useConversations());
     const firstMessage =

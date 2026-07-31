@@ -30,6 +30,7 @@ type OverviewRow = {
     | "settingsListening"
     | "settingsSpeaking"
     | "settingsSearch"
+    | "settingsDataPrivacy"
     | "settingsAppDiagnostics";
   summaryKey:
     | "settingsConnectionsSummary"
@@ -37,6 +38,7 @@ type OverviewRow = {
     | "settingsListeningSummary"
     | "settingsSpeakingSummary"
     | "settingsSearchSummary"
+    | "settingsDataPrivacySummary"
     | "settingsAppDiagnosticsSummary";
   icon: React.ComponentProps<typeof Feather>["name"];
 };
@@ -71,6 +73,12 @@ const overviewRows: OverviewRow[] = [
     titleKey: "settingsSearch",
     summaryKey: "settingsSearchSummary",
     icon: "search",
+  },
+  {
+    page: "data",
+    titleKey: "settingsDataPrivacy",
+    summaryKey: "settingsDataPrivacySummary",
+    icon: "shield",
   },
   {
     page: "app",

@@ -5,6 +5,10 @@ import { TextInput } from "react-native";
 import type { CatalogProviderId } from "../../catalog/types";
 import type { ProviderVoiceDirectories } from "../../services/providerVoiceDirectory";
 import type { KokoroModelController } from "../../hooks/useKokoroModel";
+import type {
+  AppDataBackup,
+  AppDataBackupRestoreResult,
+} from "../../services/appDataBackup";
 import {
   Provider,
   ProviderCapability,
@@ -48,6 +52,10 @@ export interface SettingsModalProps {
     capability: ProviderCapability,
   ) => Promise<void>;
   onOpenSetupGuide?: () => void;
+  onCreateAppDataBackup: () => Promise<AppDataBackup>;
+  onRestoreAppDataBackup: (
+    backup: AppDataBackup,
+  ) => Promise<AppDataBackupRestoreResult>;
   onClose: () => void;
 }
 
@@ -66,6 +74,7 @@ export type SettingsPage =
   | "listening"
   | "speaking"
   | "search"
+  | "data"
   | "app";
 
 export type TextInputFocusHandler = NonNullable<

@@ -10,6 +10,15 @@ the complete Play Store translations are kept in a dedicated file under
 
 ## Unreleased
 
+### Added
+
+- Added readable and passphrase-encrypted app-data backups for portable
+  settings and complete conversation history. Provider API keys, diagnostics,
+  caches, audio, and downloaded models are never included.
+- Added non-destructive backup restore: existing data and API keys remain in
+  place, identical conversations are skipped, and ID conflicts are restored as
+  separate copies.
+
 ### Changed
 
 - Display the current release version on the Settings overview.
@@ -25,6 +34,8 @@ the complete Play Store translations are kept in a dedicated file under
   curated fallback route, remove disabled choices from Settings, and expose a
   local reset under App & diagnostics. Authentication, quota, rate-limit,
   network, and server failures never disable a configuration.
+- Redact credentials and user-authored text from debug captures before logs are
+  written to disk or copied to the clipboard.
 
 ## 2.5.6 - 2026-07-31
 

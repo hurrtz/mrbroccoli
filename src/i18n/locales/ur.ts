@@ -1,6 +1,8 @@
 import type { TranslationDictionary } from "../types";
+import { dataBackupTranslations } from "../dataBackupTranslations";
 
 export const ur = {
+  ...dataBackupTranslations.ur,
   appName: "مسٹر بروکلی",
   retry: "دوبارہ کوشش کریں۔",
   dismiss: "بند کریں",

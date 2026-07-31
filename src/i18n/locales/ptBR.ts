@@ -1,6 +1,8 @@
 import type { TranslationDictionary } from "../types";
+import { dataBackupTranslations } from "../dataBackupTranslations";
 
 export const ptBR = {
+  ...dataBackupTranslations.ptBR,
   appName: "Sr. Brócolis",
   retry: "Tentar novamente",
   dismiss: "Fechar",

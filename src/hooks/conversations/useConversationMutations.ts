@@ -14,7 +14,15 @@ import {
   Provider,
   UsageEstimate,
 } from "../../types";
-import { normalizeConversationTitle, truncateConversationTitle } from "./meta";
+import type {
+  AppDataBackupConversation,
+  AppDataBackupRestoreResult,
+} from "../../services/appDataBackup";
+import {
+  buildConversationMetaFromConversation,
+  normalizeConversationTitle,
+  truncateConversationTitle,
+} from "./meta";
 import {
   readConversation,
   removeConversation,
@@ -23,12 +31,14 @@ import {
 
 export function useConversationMutations(params: {
   activeConversationRef: MutableRefObject<Conversation | null>;
+  conversationMetas: ConversationMeta[];
   persistMetas: (metas: ConversationMeta[]) => ConversationMeta[];
   setActiveConversationValue: (conversation: Conversation | null) => void;
   setConversations: Dispatch<SetStateAction<ConversationMeta[]>>;
 }) {
   const {
     activeConversationRef,
+    conversationMetas,
     persistMetas,
     setActiveConversationValue,
     setConversations,
@@ -319,6 +329,92 @@ export function useConversationMutations(params: {
     [activeConversationRef, persistMetas, setActiveConversationValue, setConversations],
   );
 
+  const restoreConversationBackup = useCallback(
+    async (
+      records: AppDataBackupConversation[],
+      importedActiveConversationId: string | null,
+    ): Promise<Omit<AppDataBackupRestoreResult, "settingsRestored">> => {
+      const existingMetasById = new Map(
+        conversationMetas.map((meta) => [meta.id, meta] as const),
+      );
+
+      const usedIds = new Set(existingMetasById.keys());
+      const restoredMetas: ConversationMeta[] = [];
+      const restoredByOriginalId = new Map<string, Conversation>();
+      let conversationsCopied = 0;
+      let conversationsRestored = 0;
+      let conversationsSkipped = 0;
+
+      for (const record of records) {
+        const originalId = record.conversation.id;
+        const existingMeta = existingMetasById.get(originalId);
+
+        if (existingMeta) {
+          const existingConversation = await readConversation(originalId);
+          if (
+            existingConversation &&
+            JSON.stringify(existingConversation) ===
+              JSON.stringify(record.conversation) &&
+            existingMeta.pinned === record.pinned
+          ) {
+            conversationsSkipped += 1;
+            restoredByOriginalId.set(originalId, existingConversation);
+            continue;
+          }
+        }
+
+        let restoredId = originalId;
+        if (usedIds.has(restoredId)) {
+          do {
+            restoredId = uuid.v4() as string;
+          } while (usedIds.has(restoredId));
+          conversationsCopied += 1;
+        }
+        usedIds.add(restoredId);
+
+        const restoredConversation = {
+          ...record.conversation,
+          id: restoredId,
+        };
+        const restoredMeta = {
+          ...buildConversationMetaFromConversation(restoredConversation),
+          pinned: record.pinned,
+        };
+
+        await saveConversation(restoredConversation);
+        restoredMetas.push(restoredMeta);
+        restoredByOriginalId.set(originalId, restoredConversation);
+        conversationsRestored += 1;
+      }
+
+      if (restoredMetas.length > 0) {
+        setConversations((current) =>
+          persistMetas([...restoredMetas, ...current]),
+        );
+      }
+
+      const importedActiveConversation = importedActiveConversationId
+        ? restoredByOriginalId.get(importedActiveConversationId) ?? null
+        : null;
+      if (importedActiveConversation) {
+        selectionRequestRef.current += 1;
+        setActiveConversationValue(importedActiveConversation);
+      }
+
+      return {
+        conversationsCopied,
+        conversationsRestored,
+        conversationsSkipped,
+      };
+    },
+    [
+      conversationMetas,
+      persistMetas,
+      setActiveConversationValue,
+      setConversations,
+    ],
+  );
+
   const renameConversation = useCallback(
     async (id: string, nextTitle: string) => {
       const currentConversation =
@@ -397,6 +493,7 @@ export function useConversationMutations(params: {
     clearConversationMemory,
     createConversation,
     deleteConversation,
+    restoreConversationBackup,
     getConversationById,
     renameConversation,
     selectConversation,

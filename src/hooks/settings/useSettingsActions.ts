@@ -17,6 +17,7 @@ import {
   createResponseModeUpdater,
   updateTopLevelSettingsValue,
 } from "./actionHelpers";
+import type { PortableSettings } from "../../services/appDataBackup";
 import { mergeSettings } from "./mergeStoredSettings";
 import { persistPublicSettings } from "./storage";
 import type { SettingsUpdate } from "./types";
@@ -104,6 +105,23 @@ export function useSettingsActions({ setSettings }: UseSettingsActionsParams) {
   );
 
   const updateApiKey = useCallback(createApiKeyUpdater(setSettings), [setSettings]);
+  const restorePortableSettings = useCallback(
+    (portableSettings: PortableSettings) => {
+      setSettings((current) => {
+        const next = mergeSettings(
+          {
+            ...portableSettings,
+            providerValidationResults: {},
+            ulraModeActive: false,
+          },
+          current.apiKeys,
+        );
+        void persistPublicSettings(next);
+        return next;
+      });
+    },
+    [setSettings],
+  );
 
   return {
     updateSettings,
@@ -116,5 +134,6 @@ export function useSettingsActions({ setSettings }: UseSettingsActionsParams) {
     updateActiveResponseMode,
     updateProviderTtsVoice,
     updateApiKey,
+    restorePortableSettings,
   };
 }

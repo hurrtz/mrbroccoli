@@ -1,6 +1,8 @@
 import type { TranslationDictionary } from "../types";
+import { dataBackupTranslations } from "../dataBackupTranslations";
 
 export const zhCN = {
+  ...dataBackupTranslations.zhCN,
   appName: "西兰花先生",
   retry: "重试",
   dismiss: "关闭",

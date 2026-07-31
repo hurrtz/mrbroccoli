@@ -1,6 +1,8 @@
 import type { TranslationDictionary } from "../types";
+import { dataBackupTranslations } from "../dataBackupTranslations";
 
 export const fr = {
+  ...dataBackupTranslations.fr,
   appName: "M. Brocoli",
   retry: "Réessayer",
   dismiss: "Fermer",

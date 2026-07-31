@@ -6,6 +6,7 @@ import {
 } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import { SafeAreaView } from "react-native-safe-area-context";
+import appConfig from "../../app.json";
 import { ConversationDrawer } from "../components/ConversationDrawer";
 import { ConversationMemoryModal } from "../components/ConversationMemoryModal";
 import { AntSettingsModal } from "../features/settings/AntSettingsModal";
@@ -52,6 +53,7 @@ import { useSetupGuideController } from "./main/useSetupGuideController";
 import { useTextTurnSubmitController } from "./main/useTextTurnSubmitController";
 import { useVoiceSessionController } from "./main/useVoiceSessionController";
 import { useUlraModeControl } from "./main/useUlraModeControl";
+import { createAppDataBackup } from "../services/appDataBackup";
 
 export function MainScreen() {
   const { colors, isDark } = useTheme();
@@ -68,6 +70,7 @@ export function MainScreen() {
     updateProviderTtsModel,
     updateProviderTtsVoice,
     updateApiKey,
+    restorePortableSettings,
     loaded,
   } = useSharedSettings();
   const providerVoiceDirectories = useMainScreenVoiceDirectories({
@@ -90,12 +93,43 @@ export function MainScreen() {
     toggleConversationPinned,
     searchConversations,
     deleteConversation,
+    restoreConversationBackup,
     clearActiveConversation,
     loaded: conversationsLoaded = true,
   } = useConversations();
   const routeConfiguration = React.useMemo(
     () => getMainScreenRouteConfiguration(settings, conversationsLoaded),
     [conversationsLoaded, settings],
+  );
+  const handleCreateAppDataBackup = React.useCallback(
+    () =>
+      createAppDataBackup({
+        activeConversationId: activeConversation?.id ?? null,
+        appVersion: appConfig.expo.version,
+        conversationMetas: conversations,
+        getConversationById,
+        settings,
+      }),
+    [
+      activeConversation?.id,
+      conversations,
+      getConversationById,
+      settings,
+    ],
+  );
+  const handleRestoreAppDataBackup = React.useCallback(
+    async (backup: Awaited<ReturnType<typeof createAppDataBackup>>) => {
+      const conversationResult = await restoreConversationBackup(
+        backup.data.conversations,
+        backup.data.activeConversationId,
+      );
+      restorePortableSettings(backup.data.settings);
+      return {
+        ...conversationResult,
+        settingsRestored: true,
+      };
+    },
+    [restoreConversationBackup, restorePortableSettings],
   );
 
   const recorder = useAudioRecorder();
@@ -825,6 +859,8 @@ export function MainScreen() {
             ? handleOpenSetupGuideFromSettings
             : undefined
         }
+        onCreateAppDataBackup={handleCreateAppDataBackup}
+        onRestoreAppDataBackup={handleRestoreAppDataBackup}
         onClose={closeSettings}
       />
       <SetupGuideModal

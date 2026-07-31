@@ -140,6 +140,12 @@ function renderSettingsModal(
             onPreviewVoice={jest.fn(async () => undefined)}
             onStopPreviewVoice={jest.fn(async () => undefined)}
             onValidateProviderCapability={jest.fn(async () => undefined)}
+            onCreateAppDataBackup={async () => {
+              throw new Error("Not used in this test.");
+            }}
+            onRestoreAppDataBackup={async () => {
+              throw new Error("Not used in this test.");
+            }}
             onClose={jest.fn()}
             {...overrideProps}
           />
@@ -214,6 +220,22 @@ describe("SettingsModal", () => {
       );
       expect(screen.queryByText("Runtime Readiness")).toBeNull();
       expect(screen.queryByPlaceholderText("Search services")).toBeNull();
+    });
+  });
+
+  it("opens localized data backup controls and explains the API-key exclusion", async () => {
+    const screen = renderSettingsModal();
+
+    fireEvent.press(screen.getByText("Data & privacy"));
+
+    await waitFor(() => {
+      expect(screen.getByText("App data backup")).toBeTruthy();
+      expect(screen.getByTestId("export-readable-backup")).toBeTruthy();
+      expect(screen.getByTestId("export-encrypted-backup")).toBeTruthy();
+      expect(screen.getByTestId("import-app-data-backup")).toBeTruthy();
+      expect(
+        screen.getByText(/Provider API keys are never included/),
+      ).toBeTruthy();
     });
   });
 

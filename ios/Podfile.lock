@@ -41,6 +41,10 @@ PODS:
     - ExpoModulesCore
   - ExpoClipboard (57.0.1):
     - ExpoModulesCore
+  - ExpoCrypto (57.0.1):
+    - ExpoModulesCore
+  - ExpoDocumentPicker (57.0.1):
+    - ExpoModulesCore
   - ExpoDomWebView (57.0.1):
     - ExpoModulesCore
   - ExpoFileSystem (57.0.1):
@@ -100,6 +104,8 @@ PODS:
     - ExpoModulesCore
     - RNScreens
   - ExpoSecureStore (57.0.1):
+    - ExpoModulesCore
+  - ExpoSharing (57.0.8):
     - ExpoModulesCore
   - ExpoSpeech (57.0.1):
     - ExpoModulesCore
@@ -3212,6 +3218,8 @@ DEPENDENCIES:
   - ExpoAsset (from `../node_modules/expo-asset/ios`)
   - ExpoAudio (from `../node_modules/expo-audio/ios`)
   - ExpoClipboard (from `../node_modules/expo-clipboard/ios`)
+  - ExpoCrypto (from `../node_modules/expo-crypto/ios`)
+  - ExpoDocumentPicker (from `../node_modules/expo-document-picker/ios`)
   - "ExpoDomWebView (from `../node_modules/@expo/dom-webview/ios`)"
   - ExpoFileSystem (from `../node_modules/expo-file-system/ios`)
   - ExpoFont (from `../node_modules/expo-font/ios`)
@@ -3225,6 +3233,7 @@ DEPENDENCIES:
   - ExpoModulesWorkletsAdapter (from `../node_modules/expo-modules-core`)
   - ExpoRouter (from `../node_modules/expo-router/ios`)
   - ExpoSecureStore (from `../node_modules/expo-secure-store/ios`)
+  - ExpoSharing (from `../node_modules/expo-sharing/ios`)
   - ExpoSpeech (from `../node_modules/expo-speech/ios`)
   - ExpoSpeechRecognition (from `../node_modules/expo-speech-recognition/ios`)
   - ExpoSymbols (from `../node_modules/expo-symbols/ios`)
@@ -3341,6 +3350,10 @@ EXTERNAL SOURCES:
     :path: "../node_modules/expo-audio/ios"
   ExpoClipboard:
     :path: "../node_modules/expo-clipboard/ios"
+  ExpoCrypto:
+    :path: "../node_modules/expo-crypto/ios"
+  ExpoDocumentPicker:
+    :path: "../node_modules/expo-document-picker/ios"
   ExpoDomWebView:
     :path: "../node_modules/@expo/dom-webview/ios"
   ExpoFileSystem:
@@ -3367,6 +3380,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/expo-router/ios"
   ExpoSecureStore:
     :path: "../node_modules/expo-secure-store/ios"
+  ExpoSharing:
+    :path: "../node_modules/expo-sharing/ios"
   ExpoSpeech:
     :path: "../node_modules/expo-speech/ios"
   ExpoSpeechRecognition:
@@ -3561,6 +3576,8 @@ SPEC CHECKSUMS:
   ExpoAsset: a76534cf7b762978861dd31708308496c676166f
   ExpoAudio: b69f36525132edba8d87a715b3a20c678ef78b30
   ExpoClipboard: 95055b11758f339b61d4d8064dd799df1cf03b7f
+  ExpoCrypto: 366380ffafeb22cc9795438cddcbfa299e1aaf42
+  ExpoDocumentPicker: 6fb67a6f39ba9beb53a4b4a3f2949e0b5e9bc3bf
   ExpoDomWebView: beaec034e51bd028428b98bb1f2633ab79c6d095
   ExpoFileSystem: e441dae0ae671fc451640517550973d9e024fdf0
   ExpoFont: 59e1faf66ba9bcd232ae1e2ce58d202a48b6f65e
@@ -3574,6 +3591,7 @@ SPEC CHECKSUMS:
   ExpoModulesWorkletsAdapter: a350b48bad355963e8eb9f6a284de873fc3d6762
   ExpoRouter: 224087330cc8f5a39700e6f4d7a55f55ecb2f90d
   ExpoSecureStore: 94793113049a2d7478dfe1a13aa15081e9f61755
+  ExpoSharing: dcf5cb459c99f344aabf126b171eb61d2e49276f
   ExpoSpeech: 0e90904e2af5d6f166d4d2ffbdab535686597938
   ExpoSpeechRecognition: 119acf84448579e53f841d040aad76982f945e2d
   ExpoSymbols: 7c7c7bd3c52f0b6dcbba6e8af4088b0dc1ea7d29

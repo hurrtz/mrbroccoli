@@ -16,7 +16,8 @@
       "expo-audio",
       "expo-router",
       "expo-secure-store",
-      "expo-status-bar"
+      "expo-status-bar",
+      "expo-sharing"
     ],
     "ios": {
       "icon": "./assets/appIcon/ios.png",

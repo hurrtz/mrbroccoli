@@ -10,6 +10,7 @@ import { Provider, TtsListenLanguage } from "../../types";
 import { AntSettingsOverview } from "./AntSettingsOverview";
 import { AppSettingsPage } from "./pages/AppSettingsPage";
 import { ConnectionsSettingsPage } from "./pages/ConnectionsSettingsPage";
+import { DataPrivacySettingsPage } from "./pages/DataPrivacySettingsPage";
 import { ListeningSettingsPage } from "./pages/ListeningSettingsPage";
 import { SearchSettingsPage } from "./pages/SearchSettingsPage";
 import { SpeakingSettingsPage } from "./pages/SpeakingSettingsPage";
@@ -191,6 +192,15 @@ export function AntSettingsPageContent({
             settings={settings}
             speechDiagnostics={controller.speechDiagnostics}
             onUpdate={onUpdate}
+          />
+        </DrillInPage>
+      );
+    case "data":
+      return (
+        <DrillInPage>
+          <DataPrivacySettingsPage
+            onCreateAppDataBackup={props.onCreateAppDataBackup}
+            onRestoreAppDataBackup={props.onRestoreAppDataBackup}
           />
         </DrillInPage>
       );

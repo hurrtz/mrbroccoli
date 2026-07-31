@@ -188,6 +188,8 @@ export const AntSettingsModal = React.memo(function AntSettingsModal(
           return t("settingsSpeaking");
         case "search":
           return t("settingsSearch");
+        case "data":
+          return t("settingsDataPrivacy");
         case "app":
           return t("settingsAppDiagnostics");
       }

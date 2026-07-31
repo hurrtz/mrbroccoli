@@ -26,6 +26,7 @@ export function SettingsProvider({
       value.updateActiveResponseMode,
       value.updateProviderTtsVoice,
       value.updateApiKey,
+      value.restorePortableSettings,
     ],
   );
 

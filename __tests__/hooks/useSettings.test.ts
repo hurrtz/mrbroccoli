@@ -63,6 +63,35 @@ describe("useSettings", () => {
     expect(result.current.settings.ulraModeRounds).toBe(2);
   });
 
+  it("restores portable settings without replacing API keys", async () => {
+    const { result } = renderHook(() => useSettings());
+    await flushSettingsLoad();
+
+    await act(async () => {
+      result.current.updateApiKey("openai", "keep-this-key");
+    });
+    const {
+      apiKeys: _apiKeys,
+      providerValidationResults: _providerValidationResults,
+      ...portableSettings
+    } = {
+      ...DEFAULT_SETTINGS,
+      language: "de" as const,
+      theme: "dark" as const,
+      ulraModeActive: true,
+    };
+
+    await act(async () => {
+      result.current.restorePortableSettings(portableSettings);
+    });
+
+    expect(result.current.settings.language).toBe("de");
+    expect(result.current.settings.theme).toBe("dark");
+    expect(result.current.settings.ulraModeActive).toBe(false);
+    expect(result.current.settings.apiKeys.openai).toBe("keep-this-key");
+    expect(result.current.settings.providerValidationResults).toEqual({});
+  });
+
   it("loads Drive Session and rejects unknown input modes", async () => {
     (AsyncStorage.getItem as jest.Mock).mockResolvedValueOnce(
       JSON.stringify({

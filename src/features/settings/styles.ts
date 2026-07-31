@@ -381,6 +381,25 @@ export const styles = StyleSheet.create({
     justifyContent: "space-between",
     gap: 12,
   },
+  dataBackupActions: {
+    gap: 8,
+  },
+  dataBackupButton: {
+    minHeight: 42,
+    borderRadius: 10,
+  },
+  dataBackupModalContent: {
+    gap: 10,
+  },
+  dataBackupTextInput: {
+    minHeight: 44,
+    borderWidth: 1,
+    borderRadius: 10,
+    paddingHorizontal: 12,
+    fontFamily: fonts.body,
+    fontSize: 15,
+    lineHeight: 21,
+  },
   fallbackRow: {
     minHeight: 48,
     flexDirection: "row",

@@ -57,6 +57,7 @@ export function useConversations() {
     clearConversationMemory,
     createConversation,
     deleteConversation,
+    restoreConversationBackup,
     getConversationById,
     renameConversation,
     selectConversation,
@@ -66,6 +67,7 @@ export function useConversations() {
     updateConversationSettings,
   } = useConversationMutations({
     activeConversationRef,
+    conversationMetas: conversations,
     persistMetas,
     setActiveConversationValue,
     setConversations,
@@ -90,6 +92,7 @@ export function useConversations() {
     toggleConversationPinned,
     searchConversations,
     deleteConversation,
+    restoreConversationBackup,
     clearActiveConversation,
   };
 }

@@ -32,6 +32,15 @@ These notes are specific to this repository and supplement any parent-level inst
 - Provider API keys are stored separately in `expo-secure-store` using the `mrbroccoli.provider_key.<provider>` prefix.
 - Conversations are stored under the AsyncStorage key `@mrbroccoli/conversations` plus per-conversation keys `@mrbroccoli/conversation/<id>`.
 - Do not move provider API keys into AsyncStorage or any plain-text project config.
+- App-data backups contain portable public settings and complete conversation
+  records. They must never contain provider API keys, validation diagnostics,
+  debug logs, downloaded models, audio, or caches. Preserve both readable JSON
+  and passphrase-encrypted AES-256-GCM export modes.
+- Backup imports are non-destructive: retain existing API keys and data, skip
+  identical conversations, and add conflicting conversation IDs as copies.
+- Debug capture payloads must be sanitized before persistence or clipboard
+  export so credentials and user-authored prompts, transcripts, queries,
+  summaries, instructions, and message content never appear in a log.
 - When changing settings shape, update `src/types.ts` and `src/hooks/useSettings.ts` together and preserve migration behavior for existing installs.
 
 ## Response Modes
@@ -99,7 +108,9 @@ These notes are specific to this repository and supplement any parent-level inst
 
 ## UI And Copy
 
-- User-visible strings live in `src/i18n/locales/en.ts` and `src/i18n/locales/de.ts`. When changing visible copy, update both English and German entries and keep the two locales structurally in sync.
+- User-visible strings must be translated across every registered dictionary
+  under `src/i18n/locales/` and kept structurally in sync. Shared feature copy
+  may live in a typed module under `src/i18n/` and be spread into every locale.
 - Theme and color behavior live in `src/theme/`.
 - Settings UI work usually belongs in `src/features/settings/`; shared settings behavior belongs in `src/features/settings-core/`.
 - Home-screen interaction changes usually belong in `src/screens/MainScreen.tsx` and `src/components/ResponseModeToggle.tsx`.

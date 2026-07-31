@@ -18,6 +18,10 @@ module.exports = {
     "^expo-file-system$": "<rootDir>/__mocks__/expoFileSystem.js",
     "^expo-file-system/legacy$":
       "<rootDir>/__mocks__/expoFileSystemLegacy.js",
+    "^expo-crypto$": "<rootDir>/__mocks__/expoCrypto.js",
+    "^expo-document-picker$":
+      "<rootDir>/__mocks__/expoDocumentPicker.js",
+    "^expo-sharing$": "<rootDir>/__mocks__/expoSharing.js",
     "^react-native-reanimated$":
       "<rootDir>/__mocks__/reactNativeReanimated.js",
   },
