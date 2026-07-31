@@ -1,7 +1,7 @@
 import React from "react";
-import { Text, View } from "react-native";
+import { Text, TextInput, View } from "react-native";
 
-import { Button, Input } from "@ant-design/react-native";
+import { Button } from "@ant-design/react-native";
 
 import { antButtonTypography } from "../../design-system/antTypography";
 import { useLocalization } from "../../i18n";
@@ -55,31 +55,30 @@ export function AntPreviewComposer({
           {t("voicePreviewHint")}
         </AntSettingsInfoButton>
       </View>
-      <Input.TextArea
+      <TextInput
+        testID="voice-preview-text-input"
+        accessibilityLabel={t("voicePreviewText")}
         value={text}
         onChangeText={setText}
         onFocus={onTextInputFocus}
         placeholder={t("voicePreviewPlaceholder")}
         placeholderTextColor={colors.textMuted}
         selectionColor={colors.accent}
-        rows={3}
-        inputStyle={{
+        multiline
+        scrollEnabled
+        style={{
+          backgroundColor: colors.surface,
+          borderWidth: 1,
+          borderColor: colors.border,
+          borderRadius: 10,
           color: colors.text,
           fontFamily: fonts.body,
           fontSize: 15,
+          height: 126,
           lineHeight: 21,
           paddingHorizontal: 12,
+          paddingVertical: 10,
           textAlignVertical: "top",
-        }}
-        styles={{
-          container: {
-            backgroundColor: colors.surface,
-            borderWidth: 1,
-            borderColor: colors.border,
-            borderRadius: 10,
-            minHeight: 84,
-            maxHeight: 84,
-          },
         }}
       />
       <Button
