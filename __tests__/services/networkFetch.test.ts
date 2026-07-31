@@ -15,7 +15,7 @@ describe("networkFetch diagnostics", () => {
     jest.mocked(expoFetch).mockResolvedValueOnce({
       ok: true,
       status: 200,
-    } as Response);
+    } as never);
 
     await networkFetch("https://api.example.com/v1/messages?api_key=secret", {
       method: "POST",

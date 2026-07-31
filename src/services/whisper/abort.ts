@@ -1,3 +1,4 @@
+import { networkFetch } from "../networkFetch";
 export function createAbortError(reason?: unknown) {
   const error =
     reason instanceof Error
@@ -100,4 +101,3 @@ export async function fetchWithTimeout(
     }
   }
 }
-import { networkFetch } from "../networkFetch";

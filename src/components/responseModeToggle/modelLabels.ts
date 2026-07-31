@@ -1,10 +1,10 @@
 import { PROVIDER_LABELS } from "../../constants/models";
 import { Provider } from "../../types";
 
-const MODEL_FAMILY_PATTERNS: Array<{
+const MODEL_FAMILY_PATTERNS: {
   family: string;
   pattern: RegExp;
-}> = [
+}[] = [
   { family: "Gemini", pattern: /^Gemini\s+(.+)$/i },
   { family: "Claude", pattern: /^Claude\s+(.+)$/i },
   { family: "GPT", pattern: /^GPT[-\s]+(.+)$/i },

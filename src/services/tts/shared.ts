@@ -111,7 +111,7 @@ export type ProviderTtsConfig =
   | GeminiTtsConfig
   | DashScopeTtsConfig;
 
-const ttsProviderConfigEntries: Array<[Provider, ProviderTtsConfig]> = [];
+const ttsProviderConfigEntries: [Provider, ProviderTtsConfig][] = [];
 
 for (const provider of Object.keys(RUNTIME_PROVIDER_MANIFEST) as Provider[]) {
   const manifest = RUNTIME_PROVIDER_MANIFEST[provider];

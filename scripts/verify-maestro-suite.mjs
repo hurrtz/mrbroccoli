@@ -49,6 +49,7 @@ export function readAppLocaleOptions(cwd = process.cwd()) {
     true,
     ts.ScriptKind.TS,
   );
+  /** @type {{value: string, label: string}[] | null} */
   let locales = null;
 
   sourceFile.forEachChild((node) => {

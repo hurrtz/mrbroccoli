@@ -86,7 +86,7 @@ const WEB_SEARCH_RESERVED_USD_BY_PROVIDER: Partial<
   anthropic: 0.06,
 };
 
-function stepId(parts: Array<string | undefined>) {
+function stepId(parts: (string | undefined)[]) {
   return parts.filter(Boolean).join(":");
 }
 

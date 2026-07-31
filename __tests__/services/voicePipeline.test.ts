@@ -1,12 +1,15 @@
-import { runVoicePipeline } from "../../src/services/voicePipeline";
-import { splitIntoSentences } from "../../src/services/tts";
+import { runVoicePipeline as runVoicePipelineImplementation } from "../../src/services/voicePipeline";
+import type { RunVoicePipelineParams } from "../../src/services/voicePipeline/types";
+import {
+  splitIntoSentences,
+  synthesizeSpeech,
+} from "../../src/services/tts";
 import { transcribeAudio } from "../../src/services/whisper";
 import { searchWeb } from "../../src/services/webSearch";
 import {
   streamChat,
   summarizeConversationContext,
 } from "../../src/services/llm";
-import { synthesizeSpeech } from "../../src/services/tts";
 import { runUlraModeDeliberation } from "../../src/services/ulraMode";
 import {
   executeProviderModelRequest,
@@ -104,6 +107,20 @@ jest.mock("../../src/services/tts", () => ({
   synthesizeSpeech: jest.fn(),
 }));
 
+type TestVoicePipelineParams = Omit<
+  RunVoicePipelineParams,
+  "sttLanguage" | "turnId"
+> &
+  Partial<Pick<RunVoicePipelineParams, "sttLanguage" | "turnId">>;
+
+function runVoicePipeline(params: TestVoicePipelineParams) {
+  return runVoicePipelineImplementation({
+    sttLanguage: "en",
+    turnId: "test-turn",
+    ...params,
+  });
+}
+
 describe("splitIntoSentences", () => {
   it("splits on period", () => {
     expect(splitIntoSentences("Hello. World.")).toEqual(["Hello.", " World."]);
@@ -163,8 +180,8 @@ describe("runVoicePipeline", () => {
     const result = await runVoicePipeline({
       transcriptionOverride: "Explain wind.",
       messages: [],
-      model: "llama-3.3-70b-versatile",
-      provider: "groq",
+      model: "gpt-5.4",
+      provider: "openai",
       providerApiKey: "gsk-test",
       sttMode: "native",
       ttsMode: "native",
@@ -221,8 +238,8 @@ describe("runVoicePipeline", () => {
     await runVoicePipeline({
       transcriptionOverride: "Explain wind.",
       messages: [],
-      model: "llama-3.3-70b-versatile",
-      provider: "groq",
+      model: "gpt-5.4",
+      provider: "openai",
       providerApiKey: "gsk-test",
       sttMode: "native",
       ttsMode: "native",
@@ -246,12 +263,12 @@ describe("runVoicePipeline", () => {
             mode: "native",
           }),
           requestedRoute: {
-            provider: "groq",
-            model: "llama-3.3-70b-versatile",
+            provider: "openai",
+            model: "gpt-5.4",
           },
           actualRoute: {
-            provider: "groq",
-            model: "llama-3.3-70b-versatile",
+            provider: "openai",
+            model: "gpt-5.4",
           },
           speechOutput: expect.objectContaining({
             enabled: false,
@@ -558,8 +575,8 @@ describe("runVoicePipeline", () => {
     await runVoicePipeline({
       transcriptionOverride: "Explain wind.",
       messages: [],
-      model: "llama-3.3-70b-versatile",
-      provider: "groq",
+      model: "gpt-5.4",
+      provider: "openai",
       providerApiKey: "gsk-test",
       sttMode: "native",
       ttsMode: "native",
@@ -1437,7 +1454,9 @@ describe("runVoicePipeline", () => {
       callbacks,
     });
 
-    expect(synthesizeSpeech.mock.calls.length).toBeGreaterThanOrEqual(2);
+    expect(
+      (synthesizeSpeech as jest.Mock).mock.calls.length,
+    ).toBeGreaterThanOrEqual(2);
     expect(callbacks.onAudioReady).toHaveBeenCalledTimes(1);
     expect(callbacks.onSpeechTextReady).not.toHaveBeenCalled();
     expect(callbacks.onTtsFallback).not.toHaveBeenCalled();
@@ -1966,7 +1985,7 @@ describe("runVoicePipeline", () => {
           usage?: undefined,
           metadata?: {
             providerState: {
-              mistralAssistantContent: Array<Record<string, unknown>>;
+              mistralAssistantContent: Record<string, unknown>[];
             };
           },
         ) => Promise<void>;

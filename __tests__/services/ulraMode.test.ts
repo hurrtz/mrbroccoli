@@ -46,6 +46,7 @@ describe("runUlraModeDeliberation", () => {
   beforeEach(() => {
     jest.clearAllMocks();
     generateInternalChatMock.mockImplementation(async (params) => ({
+      model: params.model,
       text: `${params.provider} response ${generateInternalChatMock.mock.calls.length}`,
       usage: {
         kind: "reply",
@@ -105,6 +106,7 @@ describe("runUlraModeDeliberation", () => {
         throw new Error("rate limited");
       }
       return {
+        model: params.model,
         text: `${params.provider} contribution`,
         usage: {
           kind: "reply",
@@ -141,6 +143,7 @@ describe("runUlraModeDeliberation", () => {
         });
       }
       return {
+        model: params.model,
         text: `${params.provider} contribution`,
         usage: {
           kind: "reply",

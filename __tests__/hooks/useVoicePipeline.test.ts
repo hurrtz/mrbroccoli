@@ -106,8 +106,11 @@ function createPlayer(
 
 function createPlayerBase() {
   return {
+    isActivelyPlaying: false,
+    hasPendingPlayback: false,
     isPlaybackPaused: false,
     isPlaying: false,
+    enqueueSpeechPause: jest.fn(),
     pausePlayback: jest.fn(async () => true),
     resumePlayback: jest.fn(async () => true),
     stopPlayback: jest.fn(async () => undefined),
@@ -116,6 +119,8 @@ function createPlayerBase() {
     enqueueAudio: jest.fn(),
     speakText: jest.fn(),
     hasPendingPlaybackNow: jest.fn(() => false),
+    usesNativeAudioQueue: false,
+    waitForPlaybackRouteSettle: jest.fn(async () => undefined),
   };
 }
 
@@ -143,6 +148,7 @@ function createParams(
     providerApiKey: "sk-test",
     model: "gpt-5.4",
     sttMode: "native" as const,
+    sttLanguage: "en" as const,
     sttProvider: null,
     sttApiKey: "",
     selectedSttModel: "",
@@ -632,17 +638,25 @@ describe("useVoicePipeline", () => {
       initialConversationSettings: {
         responseLength: "brief",
         responseTone: "casual",
-        ttsVoice: "alloy",
+        ttsVoice: {
+          provider: "openai",
+          model: "gpt-4o-mini-tts",
+          voice: "alloy",
+        },
         ttsInstructions: "Use the old delivery.",
-        assistantInstructions: "Use the old thinking instructions.",
+        llmInstructions: "Use the old thinking instructions.",
       },
     });
     const updatedConversationSettings = {
       responseLength: "thorough" as const,
       responseTone: "socratic" as const,
-      ttsVoice: "nova",
+      ttsVoice: {
+        provider: "openai" as const,
+        model: "gpt-4o-mini-tts",
+        voice: "nova",
+      },
       ttsInstructions: "Use the new delivery.",
-      assistantInstructions: "Use the new thinking instructions.",
+      llmInstructions: "Use the new thinking instructions.",
     };
     const updatedParams = {
       ...initialParams,

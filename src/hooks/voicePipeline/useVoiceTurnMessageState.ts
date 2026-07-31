@@ -50,7 +50,7 @@ export function useVoiceTurnMessageState(updateMessage: UpdateMessage) {
   const assistantHasTurnReceiptRef = useRef(false);
   const pendingAssistantNoticesRef = useRef<MessagePipelineNotice[]>([]);
   const pendingTurnReceiptUpdatesRef = useRef<
-    Array<(receipt: MessageTurnReceipt) => MessageTurnReceipt>
+    ((receipt: MessageTurnReceipt) => MessageTurnReceipt)[]
   >([]);
 
   const clearReplyFailure = useCallback(

@@ -136,21 +136,23 @@ function buildModel<TService extends CatalogService>(
 
 function assertProviderDocument(document: CatalogProviderDocument) {
   const { provider } = document;
-  const modelsByService: Record<CatalogModelDocument["service"], CatalogModelDocument[]> = {
+  const modelsByService: Record<
+    CatalogModelDocument["service"],
+    CatalogModelDocument[]
+  > = {
     llm: document.llms,
     stt: document.stt,
     tts: document.tts,
   };
   const canonicalIds = new Set<string>();
-  for (const [service, models] of Object.entries(modelsByService) as Array<
-    [CatalogModelDocument["service"], CatalogModelDocument[]]
-  >) {
+  for (const [service, models] of Object.entries(modelsByService) as [
+    CatalogModelDocument["service"],
+    CatalogModelDocument[],
+  ][]) {
     const ids = new Set<string>();
     const aliases = new Map<string, string>();
 
     for (const model of models) {
-      const owner = `${service}/${model.modelId}`;
-
       if (model.providerId !== provider.providerId) {
         throw new Error(
           `Catalog provider mismatch for ${provider.providerId}/${service}/${model.modelId}: providerId ${model.providerId}`,

@@ -92,7 +92,7 @@ describe("settingsRules", () => {
         ...DEFAULT_SETTINGS.providerTtsVoices,
         openai: "not-a-real-voice",
       },
-      ttsListenLanguages: ["en"] as const,
+      ttsListenLanguages: ["en" as const],
     };
 
     const nextProviderVoices = getNormalizedProviderTtsVoices(
@@ -129,7 +129,7 @@ describe("settingsRules", () => {
         ...DEFAULT_SETTINGS.providerTtsVoices,
         openai: "alloy",
       },
-      ttsListenLanguages: ["en"] as const,
+      ttsListenLanguages: ["en" as const],
     };
 
     const nextProviderVoices = getNormalizedProviderTtsVoices(

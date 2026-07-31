@@ -20,14 +20,13 @@ describe("live provider pre-release matrix", () => {
         const expectedEfforts = model.effort?.options.map(
           (option) => option.id,
         ) ?? [undefined];
-        const actualEfforts = steps
-          .filter(
-            (step) =>
-              step.kind === "llm" &&
-              step.provider === provider &&
-              step.model === model.id,
-          )
-          .map((step) => step.effort);
+        const actualEfforts = steps.flatMap((step) =>
+          step.kind === "llm" &&
+          step.provider === provider &&
+          step.model === model.id
+            ? [step.effort]
+            : [],
+        );
 
         expect(actualEfforts).toEqual(expectedEfforts);
       }
@@ -39,15 +38,15 @@ describe("live provider pre-release matrix", () => {
       RUNTIME_PROVIDER_MANIFEST,
     )) {
       expect(
-        steps
-          .filter(
-            (step) => step.kind === "stt" && step.provider === provider,
-          )
-          .map((step) => step.model),
+        steps.flatMap((step) =>
+          step.kind === "stt" && step.provider === provider
+            ? [step.model]
+            : [],
+        ),
       ).toEqual(manifest.stt.models.map((model) => model.id));
 
-      const ttsSteps = steps.filter(
-        (step) => step.kind === "tts" && step.provider === provider,
+      const ttsSteps = steps.flatMap((step) =>
+        step.kind === "tts" && step.provider === provider ? [step] : [],
       );
       expect(ttsSteps.map((step) => step.model)).toEqual(
         manifest.tts.models.map((model) => model.id),
@@ -69,12 +68,11 @@ describe("live provider pre-release matrix", () => {
 
   it("covers each search provider and every search mode the UI exposes", () => {
     for (const provider of WEB_SEARCH_PROVIDER_IDS) {
-      const searchModes = steps
-        .filter(
-          (step) =>
-            step.kind === "web-search" && step.provider === provider,
-        )
-        .map((step) => step.searchMode);
+      const searchModes = steps.flatMap((step) =>
+        step.kind === "web-search" && step.provider === provider
+          ? [step.searchMode]
+          : [],
+      );
 
       expect(searchModes).toEqual(
         WEB_SEARCH_PROVIDER_CONTROL_SUPPORT[provider].searchMode

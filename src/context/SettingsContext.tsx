@@ -11,8 +11,23 @@ export function SettingsProvider({
   children: React.ReactNode;
 }) {
   const value = useSettings();
-  const memoised = useMemo<SettingsContextValue>(
-    () => value,
+  const memoizedValue = useMemo<SettingsContextValue>(
+    () => ({
+      settings: value.settings,
+      loaded: value.loaded,
+      updateSettings: value.updateSettings,
+      updateProviderModel: value.updateProviderModel,
+      updateProviderSttModel: value.updateProviderSttModel,
+      updateProviderTtsModel: value.updateProviderTtsModel,
+      updateResponseModeRoute: value.updateResponseModeRoute,
+      addResponseMode: value.addResponseMode,
+      removeResponseMode: value.removeResponseMode,
+      updateActiveResponseMode: value.updateActiveResponseMode,
+      updateProviderTtsVoice: value.updateProviderTtsVoice,
+      updateApiKey: value.updateApiKey,
+      updateProviderValidationResult: value.updateProviderValidationResult,
+      restorePortableSettings: value.restorePortableSettings,
+    }),
     [
       value.settings,
       value.loaded,
@@ -32,7 +47,9 @@ export function SettingsProvider({
   );
 
   return (
-    <SettingsContext.Provider value={memoised}>{children}</SettingsContext.Provider>
+    <SettingsContext.Provider value={memoizedValue}>
+      {children}
+    </SettingsContext.Provider>
   );
 }
 

@@ -155,6 +155,16 @@ export function useVoiceSessionController({
     stopReplay,
     t,
   });
+  const {
+    engage: engageDriveSession,
+    handleStop: stopDriveSession,
+    reset: resetDriveSession,
+    suspend: suspendDriveSession,
+  } = driveSession;
+  const { handleTogglePress: handleStandardTogglePress } =
+    standardPressHandlers;
+  const stopAmbientMonitoring = recorder.stopAmbientMonitoring;
+  const stopPlayback = player.stopPlayback;
   useVoiceRemoteControls({
     canRepeat: driveSession.canRepeat,
     driveActive:
@@ -239,24 +249,24 @@ export function useVoiceSessionController({
           player.isPlaying;
 
         if (!isRecording && isBusy && !playbackActive) {
-          driveSession.suspend();
+          suspendDriveSession();
         } else if (!isRecording && !isBusy && !playbackActive) {
-          driveSession.engage();
+          engageDriveSession();
         }
       }
 
-      await standardPressHandlers.handleTogglePress();
+      await handleStandardTogglePress();
     },
     [
-      driveSession.engage,
-      driveSession.suspend,
+      engageDriveSession,
+      handleStandardTogglePress,
       isBusy,
       isRecording,
       playbackCanPause,
       player.isPlaybackPaused,
       player.isPlaying,
       settings.inputMode,
-      standardPressHandlers.handleTogglePress,
+      suspendDriveSession,
     ],
   );
 
@@ -271,7 +281,7 @@ export function useVoiceSessionController({
     });
 
     if (settings.inputMode === "drive-session") {
-      driveSession.handleStop();
+      stopDriveSession();
     }
     if (replayPhase !== "idle") {
       await stopReplay().catch(() => undefined);
@@ -279,10 +289,10 @@ export function useVoiceSessionController({
     await cancelCurrentInteraction();
   }, [
     cancelCurrentInteraction,
-    driveSession.handleStop,
     player.isPlaybackPaused,
     replayPhase,
     settings.inputMode,
+    stopDriveSession,
     stopReplay,
   ]);
 
@@ -296,11 +306,11 @@ export function useVoiceSessionController({
       },
     });
 
-    driveSession.reset();
+    resetDriveSession();
     resetPipelineState();
     lastCompletedReplyRef.current = "";
-    await recorder.stopAmbientMonitoring?.();
-    await player.stopPlayback();
+    await stopAmbientMonitoring?.();
+    await stopPlayback();
     try {
       await cancelVoiceCapture();
     } catch {
@@ -308,13 +318,14 @@ export function useVoiceSessionController({
     }
   }, [
     cancelVoiceCapture,
-    driveSession.reset,
     isRecording,
     lastCompletedReplyRef,
-    player,
-    recorder,
+    player.isPlaying,
+    resetDriveSession,
     resetPipelineState,
     settings.sttMode,
+    stopAmbientMonitoring,
+    stopPlayback,
   ]);
 
   return {

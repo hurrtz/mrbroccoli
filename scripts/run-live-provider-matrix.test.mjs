@@ -60,12 +60,12 @@ test("does not start Jest when the zero-network preflight fails", () => {
 
     const status = runLiveProviderMatrix({
       cwd: directory,
-      spawn: () => {
+      spawn: /** @type {any} */ (() => {
         spawnCalls += 1;
         return { status: 0 };
-      },
-      stdout: { write: () => undefined },
-      stderr: { write: () => undefined },
+      }),
+      stdout: /** @type {any} */ ({ write: () => undefined }),
+      stderr: /** @type {any} */ ({ write: () => undefined }),
     });
 
     assert.equal(status, 1);
@@ -80,12 +80,12 @@ test("starts only the dedicated live suite with the ignored local values", () =>
 
     const status = runLiveProviderMatrix({
       cwd: directory,
-      spawn: (...args) => {
+      spawn: /** @type {any} */ ((...args) => {
         calls.push(args);
         return { status: 0 };
-      },
-      stdout: { write: () => undefined },
-      stderr: { write: () => undefined },
+      }),
+      stdout: /** @type {any} */ ({ write: () => undefined }),
+      stderr: /** @type {any} */ ({ write: () => undefined }),
     });
 
     assert.equal(status, 0);

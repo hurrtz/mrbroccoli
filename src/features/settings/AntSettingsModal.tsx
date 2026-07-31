@@ -67,7 +67,6 @@ export const AntSettingsModal = React.memo(function AntSettingsModal(
     focusProvider,
     focusCatalogProviderId,
     focusTab,
-    onUpdate,
     onPreviewVoice,
     onStopPreviewVoice,
     onValidateProviderCapability,

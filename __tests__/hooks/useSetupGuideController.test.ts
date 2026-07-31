@@ -51,7 +51,11 @@ function createAnthropicSettings() {
 }
 
 const wrapper = ({ children }: { children: React.ReactNode }) =>
-  React.createElement(LocalizationProvider, { language: "en" }, children);
+  React.createElement(
+    LocalizationProvider as React.ComponentType<any>,
+    { language: "en" },
+    children,
+  );
 
 function createControllerParams() {
   return {
@@ -339,8 +343,10 @@ describe("useSetupGuideController", () => {
   });
 
   it("saves onboarding in text-only mode when no acceptable TTS route is available", async () => {
-    const params = createControllerParams();
-    params.settings = createAnthropicSettings();
+    const params = {
+      ...createControllerParams(),
+      settings: createAnthropicSettings(),
+    };
 
     const { result } = renderHook(() => useSetupGuideController(params), {
       wrapper,

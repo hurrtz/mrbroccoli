@@ -188,7 +188,7 @@ describe("appDataBackup", () => {
     ).resolves.toEqual(backup);
     await expect(
       decryptAppDataBackup(encrypted, "the wrong passphrase"),
-    ).rejects.toMatchObject<AppDataBackupError>({
+    ).rejects.toMatchObject({
       code: "decrypt-failed",
     });
   });

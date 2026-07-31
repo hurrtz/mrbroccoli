@@ -4,12 +4,15 @@ import {
   defineProviderDefinition,
   defineProviderDocuments,
 } from "../../data/providers/definitions";
-import type { CatalogProviderDocument } from "../../src/catalog";
+import type {
+  CatalogProvider,
+  CatalogProviderDocument,
+} from "../../src/catalog";
 
 function createDocument(
   overrides: Partial<CatalogProviderDocument> = {},
 ): CatalogProviderDocument {
-  const provider = {
+  const provider: CatalogProvider = {
     providerId: "provider-a",
     providerName: "Provider A",
     categoryName: "Test",
@@ -134,7 +137,7 @@ describe("catalog definitions", () => {
         llms: [
           {
             ...createDocument().llms[0],
-            service: "stt",
+            service: "stt" as never,
           },
         ],
       }),

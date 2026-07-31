@@ -34,6 +34,7 @@ interface UseAudioPlayerOptions {
 export function useAudioPlayer(
   options: UseAudioPlayerOptions = {},
 ) {
+  const { beforePlayback } = options;
   const usingNativeAudioQueue = isNativeAudioQueueAvailable();
   const player = useExpoAudioPlayer(null, {
     updateInterval: PLAYER_STATUS_INTERVAL_MS,
@@ -58,7 +59,7 @@ export function useAudioPlayer(
   const playbackPausedRef = useRef(false);
   const [nativeAudioQueuePlaying, setNativeAudioQueuePlaying] =
     useState(false);
-  const [nativeSpeaking, setNativeSpeaking] = useState(false);
+  const [, setNativeSpeaking] = useState(false);
   const [nativeSpeechPlaying, setNativeSpeechPlaying] = useState(false);
   const [isPlaybackPaused, setPlaybackPaused] = useState(false);
   const {
@@ -67,9 +68,9 @@ export function useAudioPlayer(
   } =
     usePlaybackSession();
   const ensurePlaybackSession = useCallback(async () => {
-    await options.beforePlayback?.();
+    await beforePlayback?.();
     await ensurePlaybackSessionInternal();
-  }, [ensurePlaybackSessionInternal, options.beforePlayback]);
+  }, [beforePlayback, ensurePlaybackSessionInternal]);
   const clearNativeAudioQueueState = useCallback(() => {
     nativeAudioQueueContextsRef.current.clear();
     nativeAudioQueuePendingCountRef.current = 0;
@@ -127,7 +128,6 @@ export function useAudioPlayer(
       currentAudioRef,
       ensurePlaybackSession,
       finalizeDrainedStateRef,
-      hasSeenAudioPlayingRef,
       loadedSourceRef,
       nativeAudioQueueContextsRef,
       nativeAudioQueuePendingCountRef,
@@ -162,7 +162,6 @@ export function useAudioPlayer(
 
   const { enqueueSpeechPause, playNextNative, speakText } =
     useNativeSpeechPlayback({
-      nativeSpeaking,
       setNativeSpeaking,
       setNativeSpeechPlaying,
       nativeQueueRef,

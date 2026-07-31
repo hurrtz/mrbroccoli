@@ -31,19 +31,19 @@ describe("validateTtsProviderConnection", () => {
     (synthesizeProviderSpeech as jest.Mock).mockResolvedValue("/tmp/tts-ok.mp3");
 
     await validateTtsProviderConnection({
-      provider: "microsoft-azure",
-      apiKey: "azure-speech-key|westeurope",
+      provider: "openai",
+      apiKey: "sk-test",
       language: "en",
-      model: "azure-ai-speech-neural",
-      voice: "en-US-JennyNeural",
+      model: "gpt-4o-mini-tts",
+      voice: "alloy",
     });
 
     expect(synthesizeProviderSpeech).toHaveBeenCalledWith({
       text: "OK",
-      voice: "en-US-JennyNeural",
-      provider: "microsoft-azure",
-      providerModel: "azure-ai-speech-neural",
-      apiKey: "azure-speech-key|westeurope",
+      voice: "alloy",
+      provider: "openai",
+      providerModel: "gpt-4o-mini-tts",
+      apiKey: "sk-test",
       language: "en",
       speechLanguage: "en",
       abortSignal: undefined,

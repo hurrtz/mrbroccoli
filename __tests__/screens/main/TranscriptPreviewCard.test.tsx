@@ -50,6 +50,8 @@ describe("TranscriptPreviewCard", () => {
             id: "message-1",
             role: "assistant",
             content: "Reply",
+            model: "gpt-5.4",
+            provider: "openai",
             timestamp: "2026-07-21T12:00:00.000Z",
           },
         ]}
@@ -116,6 +118,8 @@ describe("TranscriptPreviewCard", () => {
             id: "message-1",
             role: "assistant",
             content: "Reply",
+            model: "gpt-5.4",
+            provider: "openai",
             timestamp: "2026-07-21T12:00:00.000Z",
           },
         ]}

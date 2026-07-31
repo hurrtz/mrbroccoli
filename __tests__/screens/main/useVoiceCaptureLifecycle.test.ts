@@ -3,7 +3,7 @@ import { AppState } from "react-native";
 
 import {
   MAX_RECORDING_MS,
-  useVoiceCaptureLifecycle,
+  useVoiceCaptureLifecycle as useVoiceCaptureLifecycleImplementation,
 } from "../../../src/screens/main/voiceSession/useVoiceCaptureLifecycle";
 
 jest.mock("../../../src/services/debugLogCapture", () => ({
@@ -45,7 +45,9 @@ function buildParams(overrides: Record<string, unknown> = {}) {
   const onCaptureStopAbandoned = jest.fn();
   const onCaptureStopStarted = jest.fn();
   const showToast = jest.fn();
-  const t = jest.fn((key: string) => key);
+  const t = jest.fn((key: string) => key) as jest.MockedFunction<
+    Parameters<typeof useVoiceCaptureLifecycleImplementation>[0]["t"]
+  >;
 
   return {
     nativeStt,
@@ -59,6 +61,12 @@ function buildParams(overrides: Record<string, unknown> = {}) {
     t,
     ...overrides,
   };
+}
+
+function useVoiceCaptureLifecycle(params: ReturnType<typeof buildParams>) {
+  return useVoiceCaptureLifecycleImplementation(
+    params as unknown as Parameters<typeof useVoiceCaptureLifecycleImplementation>[0],
+  );
 }
 
 describe("useVoiceCaptureLifecycle auto-stop", () => {

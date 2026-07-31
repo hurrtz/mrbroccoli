@@ -155,7 +155,6 @@ async function transcribeWithOpenAiStyleAudioInputProvider(
 ) {
   const {
     abortSignal,
-    apiKey,
     config,
     fileUri,
     language,

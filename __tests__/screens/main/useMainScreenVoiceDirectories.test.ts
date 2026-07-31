@@ -24,8 +24,16 @@ describe("useMainScreenVoiceDirectories", () => {
         voices: enabled
           ? [
               {
+                id: `${provider}-voice-1`,
+                name: `${provider} first`,
                 label: `${provider} first`,
                 value: `${provider}-voice-1`,
+                language: null,
+                accent: null,
+                gender: null,
+                tone: null,
+                description: null,
+                isCustom: false,
               },
             ]
           : [],

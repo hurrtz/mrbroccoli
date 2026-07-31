@@ -327,7 +327,9 @@ describe("ResponseModeToggle", () => {
       ).borderColor,
     ).toBe(lightColors.activeControl);
     expect(
-      StyleSheet.flatten(responseModeToggleStyles.optionPressed).transform,
+      (StyleSheet.flatten(responseModeToggleStyles.optionPressed) as {
+        transform?: unknown;
+      }).transform,
     ).toBeUndefined();
     expect(
       StyleSheet.flatten(

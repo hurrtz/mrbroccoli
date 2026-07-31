@@ -191,7 +191,7 @@ export function useSetupGuideVoiceTest(params: {
     }
 
     void reset(true);
-  }, [provider, routeResetKey, visible]);
+  }, [provider, reset, routeResetKey, visible]);
 
   const startRecording = useCallback(async () => {
     setErrorMessage(null);

@@ -1,12 +1,12 @@
 import { renderHook, waitFor } from "@testing-library/react-native";
 
 import { useSettingsNormalization } from "../../src/features/settings-core/useSettingsNormalization";
-import { DEFAULT_SETTINGS } from "../../src/types";
+import { DEFAULT_SETTINGS, type Settings } from "../../src/types";
 
 describe("useSettingsNormalization", () => {
   it("preserves native STT mode when provider STT is also available", async () => {
     const onUpdate = jest.fn();
-    const settings = {
+    const settings: Settings = {
       ...DEFAULT_SETTINGS,
       sttMode: "native" as const,
       sttProvider: null,
@@ -56,7 +56,7 @@ describe("useSettingsNormalization", () => {
 
   it("batches settings repair updates into one patch", async () => {
     const onUpdate = jest.fn();
-    const settings = {
+    const settings: Settings = {
       ...DEFAULT_SETTINGS,
       sttMode: "provider" as const,
       sttProvider: "anthropic",

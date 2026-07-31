@@ -30,7 +30,6 @@ function getNativeSpeechRuntimeTimeoutMs(text: string) {
 }
 
 export function useNativeSpeechPlayback(params: {
-  nativeSpeaking: boolean;
   setNativeSpeaking: Dispatch<SetStateAction<boolean>>;
   setNativeSpeechPlaying: Dispatch<SetStateAction<boolean>>;
   nativeQueueRef: MutableRefObject<NativeSpeechQueueItem[]>;
@@ -52,7 +51,6 @@ export function useNativeSpeechPlayback(params: {
   updatePendingPlaybackState: () => void;
 }) {
   const {
-    nativeSpeaking,
     setNativeSpeaking,
     setNativeSpeechPlaying,
     nativeQueueRef,
@@ -367,7 +365,6 @@ export function useNativeSpeechPlayback(params: {
     currentAudioRef,
     ensurePlaybackSession,
     finalizeDrainedState,
-    nativeSpeaking,
     nativeQueueRef,
     nativeSpeakingRef,
     playbackGenerationRef,
@@ -375,6 +372,7 @@ export function useNativeSpeechPlayback(params: {
     playNextAudio,
     playingRef,
     queueRef,
+    setNativeSpeaking,
     setNativeSpeechPlaying,
     startingRef,
     updatePendingPlaybackState,

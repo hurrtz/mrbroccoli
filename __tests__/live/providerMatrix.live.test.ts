@@ -88,7 +88,12 @@ jest.mock("expo-file-system", () => ({
 
     constructor(uri: string) {
       const type = uri.endsWith(".wav") ? "audio/wav" : "audio/m4a";
-      super([mockFileContents.get(uri) ?? new Uint8Array()], { type });
+      super(
+        [
+          (mockFileContents.get(uri) ?? new Uint8Array()) as unknown as BlobPart,
+        ],
+        { type },
+      );
       this.uri = uri;
       this.name = uri.split("/").pop() || "recording.m4a";
     }
@@ -229,8 +234,8 @@ liveTest(
 
       costTracker.recordProviderResponse(activeStep, payload, headers);
     };
-    const meteredFetch: typeof globalThis.fetch = async (...args) => {
-      const response = await originalFetch(...args);
+    const meteredFetch: typeof globalThis.fetch = async (input, init) => {
+      const response = await originalFetch(input, init);
       await captureResponse(response);
       return response;
     };

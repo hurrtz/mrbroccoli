@@ -100,7 +100,7 @@ describe("useProviderAvailabilityGuards", () => {
       useProviderAvailabilityGuards({
         activeResponseMode: "mode-2",
         availableResponseModes: ["mode-2"],
-        availableSttProviders: ["groq"],
+        availableSttProviders: ["mistral"],
         availableTtsProviders: ["xai"],
         loaded: true,
         providerApiKey: "key",
@@ -113,7 +113,7 @@ describe("useProviderAvailabilityGuards", () => {
     );
 
     await waitFor(() => {
-      expect(updateSettings).toHaveBeenCalledWith({ sttProvider: "groq" });
+      expect(updateSettings).toHaveBeenCalledWith({ sttProvider: "mistral" });
       expect(updateSettings).toHaveBeenCalledWith({ ttsProvider: "xai" });
     });
   });

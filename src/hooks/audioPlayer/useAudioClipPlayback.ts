@@ -13,7 +13,6 @@ export function useAudioClipPlayback(params: {
   currentAudioRef: MutableRefObject<AudioQueueItem | null>;
   ensurePlaybackSession: () => Promise<void>;
   finalizeDrainedStateRef: MutableRefObject<() => void>;
-  hasSeenAudioPlayingRef: MutableRefObject<boolean>;
   loadedSourceRef: MutableRefObject<boolean>;
   nativeAudioQueueContextsRef: MutableRefObject<Map<string, NativeAudioQueueContext>>;
   nativeAudioQueuePendingCountRef: MutableRefObject<number>;
@@ -38,7 +37,6 @@ export function useAudioClipPlayback(params: {
     currentAudioRef,
     ensurePlaybackSession,
     finalizeDrainedStateRef,
-    hasSeenAudioPlayingRef,
     loadedSourceRef,
     nativeAudioQueueContextsRef,
     nativeAudioQueuePendingCountRef,
@@ -62,7 +60,7 @@ export function useAudioClipPlayback(params: {
 
     player.remove();
     loadedSourceRef.current = false;
-  }, [player]);
+  }, [loadedSourceRef, player]);
 
   const playNextAudio = useCallback(async () => {
     if (usingNativeAudioQueue) {
@@ -138,12 +136,14 @@ export function useAudioClipPlayback(params: {
     currentAudioRef,
     ensurePlaybackSession,
     finalizeDrainedStateRef,
+    loadedSourceRef,
     nativeSpeakingRef,
     playbackPausedRef,
     player,
     playingRef,
     playbackGenerationRef,
     startingRef,
+    queueRef,
     updatePendingPlaybackState,
     usingNativeAudioQueue,
   ]);
@@ -215,6 +215,7 @@ export function useAudioClipPlayback(params: {
       playNextAudio,
       playbackGenerationRef,
       playingRef,
+      queueRef,
       startingRef,
       updatePendingPlaybackState,
       usingNativeAudioQueue,

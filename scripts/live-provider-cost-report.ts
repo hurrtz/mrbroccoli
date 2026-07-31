@@ -274,7 +274,7 @@ function countSearchCalls(
   visited.add(value);
 
   if (Array.isArray(value)) {
-    return value.reduce(
+    return value.reduce<number>(
       (total, entry) => total + countSearchCalls(entry, visited),
       0,
     );
@@ -290,7 +290,7 @@ function countSearchCalls(
 
   return (
     (isSearchCall ? 1 : 0) +
-    Object.values(record).reduce(
+    Object.values(record).reduce<number>(
       (total, entry) => total + countSearchCalls(entry, visited),
       0,
     )

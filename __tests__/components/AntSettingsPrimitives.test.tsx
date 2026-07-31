@@ -13,6 +13,8 @@ import { styles } from "../../src/features/settings/styles";
 import { LocalizationProvider } from "../../src/i18n";
 import { ThemeProvider } from "../../src/theme/ThemeContext";
 
+const AntModal = Modal as unknown as React.ComponentType<any>;
+
 function renderPickerRow(optionCount: 1 | 2, onChange = jest.fn()) {
   return render(
     <LocalizationProvider language="en">
@@ -241,7 +243,7 @@ describe("AntRadioSection", () => {
     ).toBeNull();
     fireEvent.press(screen.getByLabelText("About Reply Playback"));
 
-    expect(screen.UNSAFE_getByType(Modal).props).toMatchObject({
+    expect(screen.UNSAFE_getByType(AntModal).props).toMatchObject({
       modalType: "modal",
       title: "Reply Playback",
       visible: true,
@@ -267,7 +269,9 @@ describe("AntSwitchRow", () => {
 
 describe("provider card layout roles", () => {
   it("lets a one-row footer size itself without changing wrapped footers", () => {
-    expect(StyleSheet.flatten(styles.cardFooter).minHeight).toBeUndefined();
+    expect(
+      (StyleSheet.flatten(styles.cardFooter) as { minHeight?: number }).minHeight,
+    ).toBeUndefined();
     expect(StyleSheet.flatten(styles.cardFooter).paddingVertical).toBe(8);
     expect(StyleSheet.flatten(styles.capabilityRow).flexWrap).toBe("wrap");
   });

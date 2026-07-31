@@ -196,7 +196,11 @@ These notes are specific to this repository and supplement any parent-level inst
 
 ## Testing And Verification
 
-- There is no lint script in `package.json`.
+- `npm run static:verify` is the repository static-analysis gate. It runs
+  ESLint with zero tolerated warnings plus Knip checks for unused files,
+  dependencies, unresolved imports, and dependency cycles.
+- `npm run typecheck` validates production app code, Jest tests, and Node-based
+  release scripts through their dedicated TypeScript configurations.
 - Use the repository `Makefile` as the local CI entry point. Install the
   versioned hook with `make hooks-install`; `make pre-push` is the spend-free
   push gate, and `make pre-release-static` is the spend-free native/static

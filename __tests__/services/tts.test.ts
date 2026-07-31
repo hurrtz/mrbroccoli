@@ -30,7 +30,6 @@ import {
   clearProviderTtsAudioCacheForTests,
   synthesizeSpeech,
   synthesizeSpeechSequence,
-  TtsRequestError,
 } from "../../src/services/tts";
 import { resetProviderModelHealthForTests } from "../../src/services/providerResilience";
 import {
@@ -788,7 +787,7 @@ describe("synthesizeSpeech", () => {
         language: "en",
       }),
     ).rejects.toEqual(
-      expect.objectContaining<TtsRequestError>({
+      expect.objectContaining({
         name: "TtsRequestError",
         inputTooLong: true,
         message:

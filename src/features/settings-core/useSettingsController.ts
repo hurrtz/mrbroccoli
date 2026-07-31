@@ -62,7 +62,6 @@ export function useSettingsController({
     setNativePreviewText,
   } = usePreviewTextState({
     settings,
-    language,
   });
 
   const enabledProviders = useMemo(() => getEnabledProviders(settings), [settings]);

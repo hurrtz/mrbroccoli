@@ -158,6 +158,9 @@ export function ChatTranscript({
     if (messages.length === 0) {
       listRef.current?.scrollToOffset({ offset: 0, animated: false });
     }
+    // Message updates must not re-enable tail following after the user scrolls
+    // away; this reset is intentionally scoped to conversation changes.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [conversationKey, setTailState]);
 
   useEffect(() => {

@@ -372,7 +372,7 @@ describe("useAudioPlayer", () => {
     await act(async () => {
       result.current.enqueueAudio("reply.wav", {
         requestId: "reply-stop-1",
-        source: "reply",
+        source: "repeat",
         provider: "xai",
         providerModel: "text-to-speech",
       });
@@ -387,7 +387,7 @@ describe("useAudioPlayer", () => {
       expect.arrayContaining([
         expect.objectContaining({
           requestId: "reply-stop-1",
-          source: "reply",
+          source: "repeat",
           stage: "playback-stopped",
           provider: "xai",
           providerModel: "text-to-speech",

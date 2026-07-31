@@ -168,10 +168,10 @@ export function createVoicePipelineTtsQueue({
     () => Promise.resolve(),
   );
   const queuedTasks: Promise<void>[] = [];
-  const bufferedResults: Array<{
+  const bufferedResults: {
     text: string;
     result: TtsSynthesisResult;
-  }> = [];
+  }[] = [];
 
   let paragraphBuffer = "";
   let paragraphCount = 0;

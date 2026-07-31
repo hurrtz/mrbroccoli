@@ -1,9 +1,8 @@
-import { Conversation, Message } from "../types";
+import { AppLanguage, Conversation, Message } from "../types";
 import {
   getProviderLabel,
   getProviderModelName,
 } from "../constants/models";
-import { AppLanguage } from "../types";
 import { translate } from "../i18n";
 
 function formatSpeakerLabel(message: Message, language: AppLanguage) {

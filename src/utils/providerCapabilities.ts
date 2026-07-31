@@ -4,7 +4,7 @@ import {
   PROVIDER_STT_SUPPORT,
   PROVIDER_TTS_SUPPORT,
 } from "../constants/models";
-import { Provider, Settings } from "../types";
+import { Settings } from "../types";
 import { hasProviderCredentialForCapability } from "./providerCredentials";
 
 export function getEnabledProviders(settings: Settings) {

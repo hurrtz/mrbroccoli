@@ -57,6 +57,9 @@ config:
 typecheck:
 	@npm run typecheck
 
+static:
+	@npm run static:verify
+
 test:
 	@npm test -- --runInBand --watchman=false
 
@@ -107,6 +110,7 @@ pre-push:
 	@$(MAKE) maestro-verify
 	@$(MAKE) license
 	@$(MAKE) config
+	@$(MAKE) static
 	@$(MAKE) typecheck
 	@$(MAKE) test
 

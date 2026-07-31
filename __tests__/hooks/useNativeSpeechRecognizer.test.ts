@@ -44,7 +44,11 @@ jest.mock("../../src/services/nativeWaveform", () => ({
 }));
 
 const wrapper = ({ children }: { children: React.ReactNode }) =>
-  React.createElement(LocalizationProvider, { language: "en" }, children);
+  React.createElement(
+    LocalizationProvider as React.ComponentType<any>,
+    { language: "en" },
+    children,
+  );
 
 describe("useNativeSpeechRecognizer", () => {
   let dateNowSpy: jest.SpyInstance<number, []>;

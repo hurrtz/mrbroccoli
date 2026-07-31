@@ -41,7 +41,7 @@ describe("conversationExport", () => {
       model: "legacy-model",
       provider: "retired-provider",
       timestamp: "2026-03-15T12:00:05.000Z",
-    } as Message;
+    } as unknown as Message;
 
     expect(formatMessageForCopy(message, "en")).toBe(
       "retired-provider · legacy-model\nA historical answer.",

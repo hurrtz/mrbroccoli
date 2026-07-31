@@ -562,7 +562,6 @@ export function useAudioRecorder() {
     recorder,
     recorderState.canRecord,
     recorderState.isRecording,
-    recorderState.url,
     resolveStoppedRecordingUri,
     t,
     usingNativeRecorder,

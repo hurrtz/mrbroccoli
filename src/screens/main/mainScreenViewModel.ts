@@ -14,7 +14,6 @@ import {
   Message,
   Provider,
   Settings,
-  TtsListenLanguage,
   VoiceVisualPhase,
 } from "../../types";
 import { getStatusDisplayData } from "./statusSelectors";
@@ -31,7 +30,6 @@ interface AudioSignalState {
 
 interface GetMainScreenViewModelParams {
   activeConversation: Conversation | null;
-  availableTtsProviders: Provider[];
   isRecording: boolean;
   language: AppLanguage;
   model: string;
@@ -45,13 +43,11 @@ interface GetMainScreenViewModelParams {
   streamingText: string;
   sttProvider: Provider | null;
   t: TranslateFn;
-  ttsApiKey: string;
   ttsProvider: Provider | null;
 }
 
 export function getMainScreenViewModel({
   activeConversation,
-  availableTtsProviders,
   isRecording,
   language,
   model,
@@ -65,7 +61,6 @@ export function getMainScreenViewModel({
   streamingText,
   sttProvider,
   t,
-  ttsApiKey,
   ttsProvider,
 }: GetMainScreenViewModelParams) {
   const providerLabel = PROVIDER_LABELS[provider];

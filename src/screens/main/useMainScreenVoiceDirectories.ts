@@ -34,7 +34,26 @@ export function useMainScreenVoiceDirectories({
     enabled: loaded && Boolean(settings.apiKeys.elevenlabs.trim()),
   });
   const directories = useMemo(
-    () => ({ elevenlabs, mistral, xai }),
+    () => ({
+      elevenlabs: {
+        error: elevenlabs.error,
+        refresh: elevenlabs.refresh,
+        status: elevenlabs.status,
+        voices: elevenlabs.voices,
+      },
+      mistral: {
+        error: mistral.error,
+        refresh: mistral.refresh,
+        status: mistral.status,
+        voices: mistral.voices,
+      },
+      xai: {
+        error: xai.error,
+        refresh: xai.refresh,
+        status: xai.status,
+        voices: xai.voices,
+      },
+    }),
     [
       elevenlabs.error,
       elevenlabs.refresh,
@@ -50,6 +69,18 @@ export function useMainScreenVoiceDirectories({
       xai.voices,
     ],
   );
+  const selectedProviderVoices = useMemo(
+    () => ({
+      elevenlabs: settings.providerTtsVoices.elevenlabs,
+      mistral: settings.providerTtsVoices.mistral,
+      xai: settings.providerTtsVoices.xai,
+    }),
+    [
+      settings.providerTtsVoices.elevenlabs,
+      settings.providerTtsVoices.mistral,
+      settings.providerTtsVoices.xai,
+    ],
+  );
 
   useEffect(() => {
     if (!loaded) {
@@ -59,7 +90,7 @@ export function useMainScreenVoiceDirectories({
     for (const provider of PROVIDER_VOICE_DIRECTORY_PROVIDERS) {
       const voices = directories[provider]?.voices ?? [];
       const firstVoice = voices[0]?.value;
-      const selectedVoice = settings.providerTtsVoices[provider]?.trim();
+      const selectedVoice = selectedProviderVoices[provider]?.trim();
       const selectionAvailable = voices.some(
         (voice) => voice.value === selectedVoice,
       );
@@ -71,9 +102,7 @@ export function useMainScreenVoiceDirectories({
   }, [
     directories,
     loaded,
-    settings.providerTtsVoices.elevenlabs,
-    settings.providerTtsVoices.mistral,
-    settings.providerTtsVoices.xai,
+    selectedProviderVoices,
     updateProviderTtsVoice,
   ]);
 

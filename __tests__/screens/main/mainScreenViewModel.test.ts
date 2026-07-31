@@ -75,7 +75,6 @@ describe("getMainScreenViewModel", () => {
 
     const viewModel = getMainScreenViewModel({
       activeConversation: conversation,
-      availableTtsProviders: ["openai"],
       isRecording: false,
       language: "en",
       model: "gpt-5.4",
@@ -93,7 +92,6 @@ describe("getMainScreenViewModel", () => {
       streamingText: "Streaming reply",
       sttProvider: "openai",
       t,
-      ttsApiKey: "sk-test",
       ttsProvider: "openai",
     });
 
@@ -111,7 +109,6 @@ describe("getMainScreenViewModel", () => {
   it("shows synthesis rather than speaking while audio is only pending", () => {
     const viewModel = getMainScreenViewModel({
       activeConversation: null,
-      availableTtsProviders: ["openai"],
       isRecording: false,
       language: "en",
       model: "gpt-5.4",
@@ -129,7 +126,6 @@ describe("getMainScreenViewModel", () => {
       streamingText: "",
       sttProvider: null,
       t,
-      ttsApiKey: "sk-test",
       ttsProvider: "openai",
     });
 
@@ -140,7 +136,6 @@ describe("getMainScreenViewModel", () => {
   it("keeps paused playback in the speaking visual state", () => {
     const viewModel = getMainScreenViewModel({
       activeConversation: null,
-      availableTtsProviders: ["openai"],
       isRecording: false,
       language: "en",
       model: "gpt-5.4",
@@ -158,7 +153,6 @@ describe("getMainScreenViewModel", () => {
       streamingText: "",
       sttProvider: null,
       t,
-      ttsApiKey: "sk-test",
       ttsProvider: "openai",
     });
 
@@ -168,7 +162,6 @@ describe("getMainScreenViewModel", () => {
   it("does not expose the default model route when no reply provider is configured", () => {
     const viewModel = getMainScreenViewModel({
       activeConversation: null,
-      availableTtsProviders: [],
       isRecording: false,
       language: "en",
       model: DEFAULT_SETTINGS.responseModes[0].route.model,
@@ -186,7 +179,6 @@ describe("getMainScreenViewModel", () => {
       streamingText: "",
       sttProvider: null,
       t,
-      ttsApiKey: "",
       ttsProvider: null,
     });
 

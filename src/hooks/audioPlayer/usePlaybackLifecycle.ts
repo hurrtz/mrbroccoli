@@ -1,6 +1,6 @@
 import { type MutableRefObject, useEffect } from "react";
 import { stopNativeAudioQueue } from "../../services/nativeAudioQueue";
-import { recordSpeechDiagnostic, type SpeechDiagnosticsContext } from "../../services/speech/diagnostics";
+import { recordSpeechDiagnostic } from "../../services/speech/diagnostics";
 import { type AudioQueueItem, type NativeSpeechQueueItem } from "./types";
 
 export function usePlaybackLifecycle(params: {

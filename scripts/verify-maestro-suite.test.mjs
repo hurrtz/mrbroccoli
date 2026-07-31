@@ -86,8 +86,11 @@ test("retries a transient Maestro flow failure exactly once", () => {
         if (attempts === 1) {
           throw new Error("transient driver failure");
         }
+        return "";
       },
-      stderr: { write(message) { messages.push(message); } },
+      stderr: /** @type {any} */ ({
+        write(message) { messages.push(message); return true; },
+      }),
       udid: "emulator-5554",
       wait(milliseconds) { retryDelays.push(milliseconds); },
     });
@@ -120,7 +123,7 @@ test("stops after a repeated Maestro flow failure", () => {
             attempts += 1;
             throw new Error("persistent failure");
           },
-          stderr: { write() {} },
+          stderr: /** @type {any} */ ({ write() { return true; } }),
           udid: "emulator-5554",
           wait() {},
         }),

@@ -258,8 +258,7 @@ function SpeechStartTimelineBorder({
   }, [
     expectedProgress,
     overtimeProgress,
-    progress?.estimatedMs,
-    progress?.startedAt,
+    progress,
   ]);
 
   const expectedAnimatedProps = useAnimatedProps(() => ({

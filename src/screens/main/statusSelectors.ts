@@ -56,7 +56,6 @@ export function getStatusDisplayData(params: {
     inputMode,
     messageCount,
     playbackPaused = false,
-    pipelinePhase,
     providerLabel,
     t,
     ttsProviderLabel,

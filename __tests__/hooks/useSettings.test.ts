@@ -452,7 +452,7 @@ describe("useSettings", () => {
     await flushSettingsLoad();
 
     act(() => {
-      result.current.updateSettings({ responseTone: "friendly" });
+      result.current.updateSettings({ responseTone: "casual" });
       result.current.updateSettings({ responseTone: "concise" });
     });
 
@@ -936,7 +936,8 @@ describe("useSettings", () => {
 
     expect(result.current.settings.ttsMode).toBe("kokoro");
     expect(
-      (result.current.settings as Record<string, unknown>).localTtsVoices,
+      (result.current.settings as unknown as Record<string, unknown>)
+        .localTtsVoices,
     ).toBeUndefined();
   });
 

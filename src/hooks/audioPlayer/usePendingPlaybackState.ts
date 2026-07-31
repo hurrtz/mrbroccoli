@@ -1,6 +1,6 @@
 import { MutableRefObject, useCallback, useRef, useState } from "react";
 
-import { type SpeechDiagnosticsContext, recordSpeechDiagnostic } from "../../services/speech/diagnostics";
+import { recordSpeechDiagnostic } from "../../services/speech/diagnostics";
 
 import { PLAYBACK_ROUTE_SETTLE_MS } from "./shared";
 import { type AudioQueueItem, type NativeSpeechQueueItem } from "./types";
@@ -29,7 +29,7 @@ export function usePendingPlaybackState({
   usingNativeAudioQueue,
 }: UsePendingPlaybackStateParams) {
   const [hasPendingPlayback, setHasPendingPlayback] = useState(false);
-  const drainResolversRef = useRef<Array<() => void>>([]);
+  const drainResolversRef = useRef<(() => void)[]>([]);
   const lastPlaybackEndedAtRef = useRef(0);
 
   const hasPendingPlaybackNow = useCallback(() => {

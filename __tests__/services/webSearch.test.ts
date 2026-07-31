@@ -319,7 +319,7 @@ describe("webSearch", () => {
           }),
         ]);
         expect(
-          (body.tools as Array<Record<string, unknown>>)[0],
+          (body.tools as Record<string, unknown>[])[0],
         ).not.toHaveProperty("response_inclusion");
       },
       expectedSummary: "Anthropic web search found the current answer.",
@@ -465,14 +465,14 @@ describe("webSearch", () => {
       expectedSummary: "Mistral web search found the current answer.",
       expectedSourceUrl: "https://example.com/mistral-search",
     },
-  ] as Array<{
+  ] as {
     provider: WebSearchProvider;
     url: string;
     response: unknown;
     assertBody: (body: Record<string, unknown>) => void;
     expectedSummary: string;
     expectedSourceUrl: string;
-  }>)(
+  }[])(
     "uses the native web search route for $provider",
     async ({
       provider,

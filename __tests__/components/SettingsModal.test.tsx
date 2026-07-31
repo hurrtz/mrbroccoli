@@ -42,6 +42,8 @@ import {
   resetRuntimeCapabilityOverridesForTests,
 } from "../../src/services/runtimeCapabilityOverrides";
 
+const AntModalType = AntModal as unknown as React.ComponentType<any>;
+
 jest.mock("react-native-safe-area-context", () => ({
   SafeAreaView: ({ children, ...props }: React.PropsWithChildren) => {
     const React = require("react");
@@ -52,7 +54,6 @@ jest.mock("react-native-safe-area-context", () => ({
 }));
 
 jest.mock("react-native-reanimated", () => {
-  const React = require("react");
   const { View } = require("react-native");
 
   return {
@@ -123,6 +124,8 @@ function renderSettingsModal(
             kokoroModel={kokoroModel}
             providerVoiceDirectories={{}}
             onUpdate={jest.fn()}
+            onAddResponseMode={jest.fn()}
+            onRemoveResponseMode={jest.fn()}
             onUpdateResponseModeRoute={jest.fn()}
             onUpdateProviderSttModel={jest.fn()}
             onUpdateProviderTtsModel={jest.fn()}
@@ -355,7 +358,7 @@ describe("SettingsModal", () => {
         "The multilingual model downloads about 140 MB and occupies about 211 MB after installation.",
       ),
     ).toBeTruthy();
-    act(() => screen.UNSAFE_getByType(AntModal).props.footer[0].onPress());
+    act(() => screen.UNSAFE_getByType(AntModalType).props.footer[0].onPress());
 
     fireEvent.press(screen.getByLabelText("Expand English voice settings"));
     expect(screen.getByText("TTS Voice")).toBeTruthy();
@@ -1133,7 +1136,7 @@ describe("SettingsModal", () => {
       "About model selection",
     );
     fireEvent.press(modelSelectionInfoButton);
-    let infoModal = screen.UNSAFE_getByType(AntModal);
+    let infoModal = screen.UNSAFE_getByType(AntModalType);
     expect(infoModal.props.visible).toBe(true);
     expect(infoModal.props.title).toBe("Model Selection");
     expect(
@@ -1142,13 +1145,13 @@ describe("SettingsModal", () => {
       ),
     ).toBeTruthy();
     act(() => infoModal.props.footer[0].onPress());
-    expect(screen.UNSAFE_queryByType(AntModal)).toBeNull();
+    expect(screen.UNSAFE_queryByType(AntModalType)).toBeNull();
 
     const systemPromptInfoButton = screen.getByLabelText(
       "About the system prompt",
     );
     fireEvent.press(systemPromptInfoButton);
-    infoModal = screen.UNSAFE_getByType(AntModal);
+    infoModal = screen.UNSAFE_getByType(AntModalType);
     expect(infoModal.props.visible).toBe(true);
     expect(infoModal.props.title).toBe("System Prompt");
     expect(
@@ -1157,7 +1160,7 @@ describe("SettingsModal", () => {
       ),
     ).toBeTruthy();
     act(() => infoModal.props.footer[0].onPress());
-    expect(screen.UNSAFE_queryByType(AntModal)).toBeNull();
+    expect(screen.UNSAFE_queryByType(AntModalType)).toBeNull();
 
     fireEvent.press(screen.getByLabelText("Back to overview"));
     fireEvent.press(screen.getByLabelText("Open Search"));
@@ -1250,7 +1253,7 @@ describe("SettingsModal", () => {
     ).toBe("right");
 
     fireEvent.press(screen.getByLabelText("About Input Mode"));
-    expect(screen.UNSAFE_getByType(AntModal).props).toMatchObject({
+    expect(screen.UNSAFE_getByType(AntModalType).props).toMatchObject({
       modalType: "modal",
       title: "Input Mode",
       visible: true,
@@ -1271,7 +1274,7 @@ describe("SettingsModal", () => {
     });
 
     fireEvent.press(screen.getByLabelText("About Speech to Text"));
-    expect(screen.UNSAFE_getByType(AntModal).props).toMatchObject({
+    expect(screen.UNSAFE_getByType(AntModalType).props).toMatchObject({
       modalType: "modal",
       title: "Speech to Text",
       visible: true,
@@ -1635,7 +1638,7 @@ describe("SettingsModal", () => {
     expect(clearSpeechDiagnosticsMock).not.toHaveBeenCalled();
     const getConfirmation = () =>
       screen
-        .UNSAFE_getAllByType(AntModal)
+        .UNSAFE_getAllByType(AntModalType)
         .find(
           (modal) => modal.props.title === "Clear recent speech activity?",
         )!;
@@ -1692,7 +1695,7 @@ describe("SettingsModal", () => {
 
     fireEvent.press(screen.getByLabelText("Clear runtime compatibility"));
     const confirmation = screen
-      .UNSAFE_getAllByType(AntModal)
+      .UNSAFE_getAllByType(AntModalType)
       .find((modal) => modal.props.title === "Clear runtime compatibility?")!;
     const clearAction = confirmation.props.footer.find(
       (action: { text: string }) => action.text === "Clear",

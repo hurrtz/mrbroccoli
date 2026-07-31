@@ -39,11 +39,11 @@ const defaultProps = {
       model: "gpt-4.1-mini",
     },
     stt: {
-      enabled: true,
+      enabled: true as const,
       kind: "system" as const,
     },
     tts: {
-      enabled: false,
+      enabled: false as const,
       kind: "disabled" as const,
     },
     webSearch: {

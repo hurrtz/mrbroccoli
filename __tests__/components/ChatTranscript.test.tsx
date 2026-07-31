@@ -22,6 +22,8 @@ jest.mock("../../src/components/ChatBubble", () => ({
 const message = (id: string, content: string): Message => ({
   id,
   content,
+  model: "gpt-5.4",
+  provider: "openai",
   role: id.startsWith("user") ? "user" : "assistant",
   timestamp: "2026-07-21T12:00:00.000Z",
 });
@@ -29,8 +31,10 @@ const message = (id: string, content: string): Message => ({
 const scrollEvent = (offsetY: number) => ({
   nativeEvent: {
     contentOffset: { x: 0, y: offsetY },
+    contentInset: { bottom: 0, left: 0, right: 0, top: 0 },
     contentSize: { height: 1_000, width: 320 },
     layoutMeasurement: { height: 400, width: 320 },
+    zoomScale: 1,
   },
 });
 

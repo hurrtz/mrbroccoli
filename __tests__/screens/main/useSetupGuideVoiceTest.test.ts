@@ -1,7 +1,7 @@
 import { act, renderHook } from "@testing-library/react-native";
 
 import { useSetupGuideVoiceTest } from "../../../src/screens/main/useSetupGuideVoiceTest";
-import type { Settings } from "../../../src/types";
+import { DEFAULT_SETTINGS, type Settings } from "../../../src/types";
 
 jest.mock("expo-clipboard", () => ({
   setStringAsync: jest.fn(async () => undefined),
@@ -34,14 +34,12 @@ jest.mock("../../../src/services/whisper", () => ({
 }));
 
 const baseSettings = {
+  ...DEFAULT_SETTINGS,
   apiKeys: {
-    groq: "gsk-test",
+    ...DEFAULT_SETTINGS.apiKeys,
+    openai: "sk-test",
   },
-  assistantInstructions: "",
-  language: "en",
-  responseLength: "normal",
-  responseTone: "professional",
-} as unknown as Settings;
+} satisfies Settings;
 
 describe("useSetupGuideVoiceTest", () => {
   function createParams(
@@ -51,23 +49,27 @@ describe("useSetupGuideVoiceTest", () => {
       visible: false,
       settings: baseSettings,
       routes: {
-        llm: { provider: "groq" as const, model: "llama-3.3-70b-versatile" },
-        stt: {
+        llm: {
           enabled: true,
+          provider: "openai" as const,
+          model: "gpt-5.4",
+        },
+        stt: {
+          enabled: true as const,
           kind: "provider" as const,
-          provider: "groq" as const,
-          model: "whisper-large-v3-turbo",
+          provider: "openai" as const,
+          model: "gpt-4o-mini-transcribe",
         },
         tts: {
-          enabled: false,
-          kind: "off" as const,
+          enabled: false as const,
+          kind: "disabled" as const,
         },
         webSearch: {
-          available: false,
+          available: false as const,
           provider: null,
         },
       },
-      provider: "groq" as const,
+      provider: "openai" as const,
       player: {
         isPlaybackPaused: false,
         isPlaying: false,

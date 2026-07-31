@@ -114,7 +114,7 @@ async function sha256(file) {
     const stream = createReadStream(file);
     stream.on("data", (chunk) => hash.update(chunk));
     stream.once("error", reject);
-    stream.once("end", resolve);
+    stream.once("end", () => resolve());
   });
 
   return hash.digest("hex");

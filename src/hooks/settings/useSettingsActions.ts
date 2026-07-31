@@ -1,4 +1,4 @@
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 import type {
   ResponseMode,
   ResponseModeRoute,
@@ -59,8 +59,8 @@ export function useSettingsActions({ setSettings }: UseSettingsActionsParams) {
     });
   }, [setSettings]);
 
-  const updateProviderModel = useCallback(
-    createProviderModelUpdater(setSettings, "providerModels"),
+  const updateProviderModel = useMemo(
+    () => createProviderModelUpdater(setSettings, "providerModels"),
     [setSettings],
   );
 
@@ -71,8 +71,8 @@ export function useSettingsActions({ setSettings }: UseSettingsActionsParams) {
     [setSettings],
   );
 
-  const addResponseMode = useCallback(
-    createResponseModeAdder(setSettings),
+  const addResponseMode = useMemo(
+    () => createResponseModeAdder(setSettings),
     [setSettings],
   );
 
@@ -90,24 +90,27 @@ export function useSettingsActions({ setSettings }: UseSettingsActionsParams) {
     [setSettings],
   );
 
-  const updateProviderTtsVoice = useCallback(
-    createProviderModelUpdater(setSettings, "providerTtsVoices"),
+  const updateProviderTtsVoice = useMemo(
+    () => createProviderModelUpdater(setSettings, "providerTtsVoices"),
     [setSettings],
   );
 
-  const updateProviderTtsModel = useCallback(
-    createProviderModelUpdater(setSettings, "providerTtsModels"),
+  const updateProviderTtsModel = useMemo(
+    () => createProviderModelUpdater(setSettings, "providerTtsModels"),
     [setSettings],
   );
 
-  const updateProviderSttModel = useCallback(
-    createProviderModelUpdater(setSettings, "providerSttModels"),
+  const updateProviderSttModel = useMemo(
+    () => createProviderModelUpdater(setSettings, "providerSttModels"),
     [setSettings],
   );
 
-  const updateApiKey = useCallback(createApiKeyUpdater(setSettings), [setSettings]);
-  const updateProviderValidationResult = useCallback(
-    createProviderValidationResultUpdater(setSettings),
+  const updateApiKey = useMemo(
+    () => createApiKeyUpdater(setSettings),
+    [setSettings],
+  );
+  const updateProviderValidationResult = useMemo(
+    () => createProviderValidationResultUpdater(setSettings),
     [setSettings],
   );
   const restorePortableSettings = useCallback(

@@ -20,11 +20,10 @@ jest.mock("../../src/services/playbackCues", () => ({
   ),
 }));
 
-const mockPlayNativeRecordingCue = jest.fn(async () => true);
+const mockPlayNativeRecordingCue = jest.fn(async (_uri: string) => true);
 
 jest.mock("../../src/services/nativeWaveform", () => ({
-  playNativeRecordingCue: (...args: unknown[]) =>
-    mockPlayNativeRecordingCue(...args),
+  playNativeRecordingCue: (uri: string) => mockPlayNativeRecordingCue(uri),
 }));
 
 describe("useVoiceSessionController", () => {
@@ -40,9 +39,7 @@ describe("useVoiceSessionController", () => {
   });
 
   function renderController(
-    overrides: Partial<
-      Parameters<typeof useVoiceSessionController>[0]
-    > = {},
+    overrides: Record<string, unknown> = {},
   ) {
     const params = {
       abortRef: { current: null as AbortController | null },
@@ -118,8 +115,16 @@ describe("useVoiceSessionController", () => {
       ...overrides,
     };
 
-    const hook = renderHook(() => useVoiceSessionController(params));
-    return { ...hook, params };
+    const hook = renderHook(() =>
+      useVoiceSessionController(
+        params as unknown as Parameters<typeof useVoiceSessionController>[0],
+      )
+    );
+    return {
+      ...hook,
+      params,
+      rerender: () => hook.rerender(undefined),
+    };
   }
 
   it("shows a provider-specific toast instead of starting when the provider key is missing", async () => {

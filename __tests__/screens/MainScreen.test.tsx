@@ -534,7 +534,7 @@ describe("MainScreen", () => {
   it("keeps Web Search visible but disabled when its provider has no key", () => {
     useSharedSettings.mockReturnValue(
       createSharedSettingsValue({
-        webSearchProvider: DEFAULT_SETTINGS.responseModes[0].route.provider,
+        webSearchProvider: "openai",
       }),
     );
 
@@ -552,7 +552,7 @@ describe("MainScreen", () => {
         ...DEFAULT_SETTINGS.apiKeys,
         openai: "provider-key",
       },
-      webSearchMode: "auto",
+      webSearchMode: "on",
       webSearchProvider: "openai",
     });
     useSharedSettings.mockReturnValue(sharedSettings);
@@ -781,7 +781,7 @@ describe("MainScreen", () => {
           [provider]: "provider-key",
         },
         showDebugLogButton: true,
-        webSearchProvider: provider,
+        webSearchProvider: "openai",
       }),
     );
 

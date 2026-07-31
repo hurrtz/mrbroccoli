@@ -1,7 +1,6 @@
 import { useLocalization } from "../../i18n";
 import { PROVIDER_LABELS } from "../../constants/models";
 import {
-  AppLanguage,
   AssistantResponseLength,
   AssistantResponseTone,
   Provider,

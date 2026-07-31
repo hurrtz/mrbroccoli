@@ -1,13 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 
 import { TTS_LISTEN_LANGUAGE_OPTIONS } from "../../constants/localTts";
-import {
-  AppLanguage,
-  KokoroLanguage,
-  Provider,
-  Settings,
-  TtsListenLanguage,
-} from "../../types";
+import { KokoroLanguage, Provider, Settings, TtsListenLanguage } from "../../types";
 
 import {
   getNativePreviewSampleText,
@@ -29,11 +23,8 @@ function buildProviderPreviewTexts(settings: Settings): ProviderPreviewTexts {
   ) as ProviderPreviewTexts;
 }
 
-export function usePreviewTextState(params: {
-  settings: Settings;
-  language: AppLanguage;
-}) {
-  const { settings, language } = params;
+export function usePreviewTextState(params: { settings: Settings }) {
+  const { settings } = params;
   const [providerPreviewTexts, setProviderPreviewTexts] =
     useState<ProviderPreviewTexts>(() => buildProviderPreviewTexts(settings));
   const [nativePreviewText, setNativePreviewText] = useState(() =>

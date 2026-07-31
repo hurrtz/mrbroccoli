@@ -1,8 +1,8 @@
 import { act, renderHook } from "@testing-library/react-native";
 
-const mockSetAudioModeAsync = jest.fn(() => Promise.resolve());
-const mockSetIsAudioActiveAsync = jest.fn(() => Promise.resolve());
-const mockSetCategoryIOS = jest.fn();
+const mockSetAudioModeAsync = jest.fn((_options: unknown) => Promise.resolve());
+const mockSetIsAudioActiveAsync = jest.fn((_active: boolean) => Promise.resolve());
+const mockSetCategoryIOS = jest.fn((_options: unknown) => undefined);
 
 jest.mock("react-native", () => ({
   Platform: {
@@ -11,14 +11,14 @@ jest.mock("react-native", () => ({
 }));
 
 jest.mock("expo-audio", () => ({
-  setAudioModeAsync: (...args: unknown[]) => mockSetAudioModeAsync(...args),
-  setIsAudioActiveAsync: (...args: unknown[]) =>
-    mockSetIsAudioActiveAsync(...args),
+  setAudioModeAsync: (options: unknown) => mockSetAudioModeAsync(options),
+  setIsAudioActiveAsync: (active: boolean) =>
+    mockSetIsAudioActiveAsync(active),
 }));
 
 jest.mock("expo-speech-recognition", () => ({
   ExpoSpeechRecognitionModule: {
-    setCategoryIOS: (...args: unknown[]) => mockSetCategoryIOS(...args),
+    setCategoryIOS: (options: unknown) => mockSetCategoryIOS(options),
   },
 }));
 

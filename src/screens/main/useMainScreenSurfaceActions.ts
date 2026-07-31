@@ -56,6 +56,10 @@ export function useMainScreenSurfaceActions({
   updateSettings,
   webSearchActive,
 }: MainScreenSurfaceActionsParams) {
+  const {
+    handleAction: handleSetupGuideVoiceTest,
+    reset: resetSetupGuideVoiceTest,
+  } = setupGuideVoiceTest;
   const handleOpenDrawer = useCallback(() => {
     setDrawerVisible(true);
   }, [setDrawerVisible]);
@@ -93,11 +97,11 @@ export function useMainScreenSurfaceActions({
     void handleValidateProviderKey();
   }, [handleValidateProviderKey]);
   const handleSetupGuideVoiceTestAction = useCallback(() => {
-    void setupGuideVoiceTest.handleAction();
-  }, [setupGuideVoiceTest.handleAction]);
+    void handleSetupGuideVoiceTest();
+  }, [handleSetupGuideVoiceTest]);
   const handleResetSetupGuideVoiceTest = useCallback(() => {
-    void setupGuideVoiceTest.reset(true);
-  }, [setupGuideVoiceTest.reset]);
+    void resetSetupGuideVoiceTest(true);
+  }, [resetSetupGuideVoiceTest]);
   const handleFinishSetupGuidePress = useCallback(() => {
     void handleFinishSetupGuide();
   }, [handleFinishSetupGuide]);

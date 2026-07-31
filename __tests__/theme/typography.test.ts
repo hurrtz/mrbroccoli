@@ -30,6 +30,8 @@ describe("semantic typography", () => {
   it("reserves uppercase monospace for compact control labels", () => {
     expect(textStyles.controlLabel.textTransform).toBe("uppercase");
     expect(textStyles.controlLabel.fontFamily).toBeDefined();
-    expect(textStyles.subsectionTitle.textTransform).toBeUndefined();
+    expect(
+      (textStyles.subsectionTitle as { textTransform?: string }).textTransform,
+    ).toBeUndefined();
   });
 });

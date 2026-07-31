@@ -17,8 +17,7 @@ import type {
   SttBackendMode,
   TtsBackendMode,
 } from "../../types";
-import type { TranslateFn } from "./shared";
-import type { ShowToastFn } from "./shared";
+import type { ShowToastFn, TranslateFn } from "./shared";
 
 interface DebugLogCaptureControllerParams {
   activeConversationId: string | null;

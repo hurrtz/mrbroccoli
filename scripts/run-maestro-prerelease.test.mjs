@@ -74,6 +74,8 @@ test("disables dotenv for Release builds and scans both artifacts", () => {
         );
         fs.mkdirSync(app, { recursive: true });
       }
+
+      return "";
     };
     const captureCommand = (command) => {
       if (command === "adb") {
@@ -102,7 +104,7 @@ emulator-5554 device product:sdk model:Pixel transport_id:1
       captureCommand,
       environment: {},
       run,
-      stdout: { write() {} },
+      stdout: /** @type {any} */ ({ write() { return true; } }),
     });
 
     const androidBuild = calls.find(({ args }) =>

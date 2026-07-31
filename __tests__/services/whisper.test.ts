@@ -79,20 +79,6 @@ function mockBuildTestWavBase64() {
   return Buffer.from(wav).toString("base64");
 }
 
-async function waitForMockSocket() {
-  for (let attempt = 0; attempt < 20; attempt += 1) {
-    const socket = MockWebSocket.instances[0];
-
-    if (socket) {
-      return socket;
-    }
-
-    await Promise.resolve();
-  }
-
-  throw new Error("Expected realtime STT socket to be created.");
-}
-
 jest.mock("expo-file-system/legacy", () => ({
   readAsStringAsync: jest.fn((fileUri: string) =>
     Promise.resolve(

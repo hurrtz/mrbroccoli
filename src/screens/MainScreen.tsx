@@ -533,10 +533,8 @@ export function MainScreen() {
     t,
   });
 
-  const {
-    validateProvider: handleValidateProvider,
-    validateProviderCapability: handleValidateProviderCapability,
-  } = useProviderConnectionValidation({ language, settings });
+  const { validateProviderCapability: handleValidateProviderCapability } =
+    useProviderConnectionValidation({ language, settings });
 
   const {
     activeConversationTitle,
@@ -551,7 +549,6 @@ export function MainScreen() {
     visualPhase,
   } = getMainScreenViewModel({
     activeConversation,
-    availableTtsProviders,
     isRecording,
     language,
     model,
@@ -565,7 +562,6 @@ export function MainScreen() {
     streamingText,
     sttProvider,
     t,
-    ttsApiKey,
     ttsProvider,
   });
   const {

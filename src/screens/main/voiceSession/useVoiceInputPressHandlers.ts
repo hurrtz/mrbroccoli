@@ -31,6 +31,7 @@ export function useVoiceInputPressHandlers({
   togglePlaybackPause,
 }: UseVoiceInputPressHandlersParams) {
   const suppressNextPressOutRef = useRef(false);
+  const { isPlaybackPaused, isPlaying, stopPlayback } = player;
 
   const handlePressIn = useCallback(async () => {
     recordDebugLogEvent({
@@ -38,11 +39,11 @@ export function useVoiceInputPressHandlers({
       payload: {
         isBusy,
         isRecording,
-        playerIsPlaying: player.isPlaying,
+        playerIsPlaying: isPlaying,
       },
     });
 
-    if (playbackCanPause || player.isPlaybackPaused) {
+    if (playbackCanPause || isPlaybackPaused) {
       suppressNextPressOutRef.current = true;
       await togglePlaybackPause();
       return;
@@ -51,8 +52,8 @@ export function useVoiceInputPressHandlers({
       await cancelCurrentInteraction();
       return;
     }
-    if (player.isPlaying) {
-      await player.stopPlayback();
+    if (isPlaying) {
+      await stopPlayback();
       return;
     }
     if (!ensureVoiceSessionReady()) {
@@ -77,11 +78,11 @@ export function useVoiceInputPressHandlers({
     isBusy,
     isRecording,
     playbackCanPause,
-    player.isPlaybackPaused,
-    player.isPlaying,
-    player.stopPlayback,
+    isPlaybackPaused,
+    isPlaying,
     showToast,
     startVoiceCapture,
+    stopPlayback,
     t,
     togglePlaybackPause,
   ]);
@@ -117,19 +118,19 @@ export function useVoiceInputPressHandlers({
       payload: {
         isBusy,
         isRecording,
-        playerIsPlaying: player.isPlaying,
+        playerIsPlaying: isPlaying,
       },
     });
 
     if (
       !isRecording &&
-      !player.isPlaying &&
+      !isPlaying &&
       !isBusy &&
       !ensureVoiceSessionReady()
     ) {
       return;
     }
-    if (playbackCanPause || player.isPlaybackPaused) {
+    if (playbackCanPause || isPlaybackPaused) {
       await togglePlaybackPause();
       return;
     }
@@ -137,8 +138,8 @@ export function useVoiceInputPressHandlers({
       await cancelCurrentInteraction();
       return;
     }
-    if (player.isPlaying) {
-      await player.stopPlayback();
+    if (isPlaying) {
+      await stopPlayback();
       return;
     }
 
@@ -168,12 +169,12 @@ export function useVoiceInputPressHandlers({
     isBusy,
     isRecording,
     playbackCanPause,
-    player.isPlaybackPaused,
-    player.isPlaying,
-    player.stopPlayback,
+    isPlaybackPaused,
+    isPlaying,
     showToast,
     startVoiceCapture,
     stopVoiceCapture,
+    stopPlayback,
     t,
     togglePlaybackPause,
   ]);

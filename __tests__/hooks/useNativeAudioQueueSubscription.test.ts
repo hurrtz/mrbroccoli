@@ -34,11 +34,12 @@ describe("useNativeAudioQueueSubscription", () => {
         [
           "reply-1",
           {
+            generation: 0,
             uri: "file:///tmp/reply-1.m4a",
             onPlaybackStarted,
             diagnostics: {
               requestId: "request-1",
-              source: "llm",
+              source: "conversation" as const,
             },
           },
         ],
@@ -104,20 +105,22 @@ describe("useNativeAudioQueueSubscription", () => {
         [
           "broken",
           {
+            generation: 0,
             uri: "file:///tmp/broken.m4a",
             diagnostics: {
               requestId: "request-broken",
-              source: "llm" as const,
+              source: "conversation" as const,
             },
           },
         ],
         [
           "next",
           {
+            generation: 0,
             uri: "file:///tmp/next.m4a",
             diagnostics: {
               requestId: "request-next",
-              source: "llm" as const,
+              source: "conversation" as const,
             },
           },
         ],
