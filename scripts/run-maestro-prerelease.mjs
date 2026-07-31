@@ -110,10 +110,11 @@ function runMaestroSuite({
   cwd,
   outputDirectory,
   platform,
+  run = runCommand,
   suite,
   udid,
 }) {
-  runCommand(
+  run(
     process.execPath,
     [
       "scripts/run-maestro-suite.mjs",
@@ -173,7 +174,7 @@ export function runMaestroPrerelease({
     ["-p", "android", ":app:assembleRelease"],
     {
       cwd,
-      env: { NODE_ENV: "production" },
+      env: { EXPO_NO_DOTENV: "1", NODE_ENV: "production" },
     },
   );
 
@@ -220,7 +221,7 @@ export function runMaestroPrerelease({
       derivedData,
       "build",
     ],
-    { cwd },
+    { cwd, env: { EXPO_NO_DOTENV: "1", NODE_ENV: "production" } },
   );
 
   const iosApp = path.join(
@@ -242,10 +243,21 @@ export function runMaestroPrerelease({
     { cwd },
   );
 
+  run(
+    process.execPath,
+    [
+      "scripts/verify-release-artifact-secrets.mjs",
+      releaseApk,
+      iosApp,
+    ],
+    { cwd },
+  );
+
   runMaestroSuite({
     cwd,
     outputDirectory: "artifacts/maestro/release",
     platform: "android",
+    run,
     suite: "all",
     udid: androidEmulator,
   });
@@ -253,6 +265,7 @@ export function runMaestroPrerelease({
     cwd,
     outputDirectory: "artifacts/maestro/release",
     platform: "ios",
+    run,
     suite: "all",
     udid: iosSimulator,
   });
@@ -260,6 +273,7 @@ export function runMaestroPrerelease({
     cwd,
     outputDirectory: "artifacts/maestro/release-physical",
     platform: "android",
+    run,
     suite: "smoke",
     udid: androidPhysical,
   });

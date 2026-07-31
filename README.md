@@ -115,6 +115,7 @@ make pre-release-static
 make pre-release-maestro
 make pre-release-live
 make pre-release
+make release-aab
 ```
 
 `pre-push` is the fast, spend-free gate installed as the repository's Git
@@ -131,7 +132,10 @@ Android device, and one booted iOS simulator, runs every UI locale on both
 simulator platforms plus physical-device smoke coverage, and creates a
 screenshot review gallery. `pre-release` runs static, device, and live gates in
 that quota-safe order. Live validation and device work remain explicit release
-phases so neither can be triggered by a push.
+phases so neither can be triggered by a push. Release builds disable Expo's
+dotenv loading and scan the resulting app archive for exact configured API-key
+and signing-password values; `release-aab` applies both protections to the
+signed Android bundle.
 
 ## How Credentials Work
 

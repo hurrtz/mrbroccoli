@@ -26,7 +26,8 @@ IOS_DESTINATION ?= generic/platform=iOS Simulator
 	pre-release-static \
 	pre-release-live \
 	pre-release-maestro \
-	pre-release
+	pre-release \
+	release-aab
 
 help:
 	@printf '%s\n' \
@@ -37,6 +38,7 @@ help:
 		'make pre-release-live  Run the fail-fast live provider/model matrix' \
 		'make pre-release-maestro Build/install and run the cross-platform visual suite' \
 		'make pre-release       Run every local release gate in quota-safe order' \
+		'make release-aab       Build and secret-scan the signed Android release AAB' \
 		'make maestro-verify      Verify the E2E locale and screenshot contract' \
 		'make android-debug      Build a debug APK' \
 		'make ios-build          Build the app for the generic iOS Simulator'
@@ -100,6 +102,7 @@ pre-push:
 	@npm run maestro:prerelease:test
 	@npm run release-notes:test
 	@npm run release-notes:verify
+	@node --test scripts/verify-release-artifact-secrets.test.mjs
 	@$(MAKE) maestro-verify
 	@$(MAKE) license
 	@$(MAKE) config
@@ -138,3 +141,7 @@ pre-release:
 	@$(MAKE) pre-release-static
 	@$(MAKE) pre-release-maestro
 	@$(MAKE) pre-release-live
+
+release-aab:
+	@EXPO_NO_DOTENV=1 NODE_ENV=production $(ANDROID_GRADLE) :app:bundleRelease
+	@node scripts/verify-release-artifact-secrets.mjs android/app/build/outputs/bundle/release/app-release.aab

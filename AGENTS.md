@@ -175,7 +175,9 @@ These notes are specific to this repository and supplement any parent-level inst
   6. Push the release commit and verify that local `HEAD` exactly matches the
      remote branch before building.
   7. Automatically build the Android release bundle from that exact pushed
-     commit with `cd android && ./gradlew bundleRelease`.
+     commit with `make release-aab`. This disables Expo dotenv loading while
+     bundling and scans the resulting archive for configured local API-key and
+     signing-password values.
   8. Verify the AAB archive, signature, package name, embedded version name and
      version code, record its SHA-256, and report the final
      `android/app/build/outputs/bundle/release/app-release.aab` path.
@@ -245,6 +247,9 @@ These notes are specific to this repository and supplement any parent-level inst
 - Be careful around `ios/Podfile.lock` and native dependency versions. Do not churn native lockfiles unless the change actually requires it.
 - Android release builds must fail when production signing material is missing
   or incomplete. Never fall back to the debug key for a release artifact.
+- Native Release bundling must set `EXPO_NO_DOTENV=1`; local pre-release
+  credentials belong only to the live-test runner and must never influence app
+  bundles. Verify every distributable with the artifact secret scanner.
 
 ## Licensing And Provider Terms
 
