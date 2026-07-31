@@ -8,29 +8,16 @@ import {
 
 import { ReplayPhase } from "../../../hooks/useVoicePipeline";
 import { recordDebugLogEvent } from "../../../services/debugLogCapture";
-import { playNativeRecordingCue } from "../../../services/nativeWaveform";
-import {
-  getDriveCountdownCueAudioUri,
-  getDriveReadyCueAudioUri,
-} from "../../../services/playbackCues";
+import { getDriveReadyCueAudioUri } from "../../../services/playbackCues";
 import { Settings } from "../../../types";
 import { ShowToastFn, TranslateFn } from "../shared";
 import {
-  createDriveAcousticProfile,
-  getDriveAcousticProfileDiagnostics,
-  updateDriveAcousticProfileFromAmbient,
-  updateDriveAcousticProfileFromRecording,
-  updateDriveAcousticProfileRoute,
-} from "./driveAcousticProfile";
-import {
-  createDriveVoiceActivityState,
-  DriveVoiceActivityState,
-  getDriveCountdownSeconds,
-  getDriveSilenceRemainingMs,
-  getDriveVoiceActivityDiagnostics,
-  updateDriveVoiceActivity,
-} from "./driveVoiceActivity";
+  createDriveSessionState,
+  DriveSessionEvent,
+  transitionDriveSessionState,
+} from "./driveSessionStateMachine";
 import { AudioPlayerController } from "./types";
+import { useDriveSessionVoiceActivity } from "./useDriveSessionVoiceActivity";
 
 interface UseDriveSessionControllerParams {
   ambientInputMetering?: number | null;
@@ -85,17 +72,12 @@ export function useDriveSessionController({
   stopReplay,
   t,
 }: UseDriveSessionControllerParams) {
-  const [autoContinueEnabled, setAutoContinueEnabled] = useState(
-    settings.inputMode === "drive-session",
+  const [driveSessionState, setDriveSessionState] = useState(() =>
+    createDriveSessionState(settings.inputMode),
   );
-  const [engaged, setEngaged] = useState(false);
-  const [armRequested, setArmRequested] = useState(false);
-  const [silenceCountdownSeconds, setSilenceCountdownSeconds] =
-    useState<number | null>(null);
-  const [voiceActive, setVoiceActive] = useState(false);
-  const autoContinueEnabledRef = useRef(autoContinueEnabled);
-  const engagedRef = useRef(false);
-  const armRequestedRef = useRef(false);
+  const { armRequested, autoContinueEnabled, engaged } =
+    driveSessionState;
+  const driveSessionStateRef = useRef(driveSessionState);
   const pendingAutoRearmCueRef = useRef(false);
   const completedReplyVersionRef = useRef(completedReplyVersion);
   const previousIsBusyRef = useRef(isBusy);
@@ -108,16 +90,6 @@ export function useDriveSessionController({
   const replayPhaseRef = useRef(replayPhase);
   const playerIsPlayingRef = useRef(player.isPlaying);
   const playerIsPlaybackPausedRef = useRef(player.isPlaybackPaused);
-  const voiceActivityRef = useRef<DriveVoiceActivityState | null>(
-    null,
-  );
-  const acousticProfileRef = useRef(createDriveAcousticProfile());
-  const lastAcousticProfileLogAtRef = useRef(0);
-  const lastLoggedNoiseFloorDbRef = useRef(
-    acousticProfileRef.current.noiseFloorDb,
-  );
-  const autoSubmitInFlightRef = useRef(false);
-  const lastCountdownCueRef = useRef<number | null>(null);
 
   isBusyRef.current = isBusy;
   isRecordingRef.current = isRecording;
@@ -126,27 +98,45 @@ export function useDriveSessionController({
   playerIsPlayingRef.current = player.isPlaying;
   playerIsPlaybackPausedRef.current = player.isPlaybackPaused;
 
-  const updateAutoContinueEnabled = useCallback((enabled: boolean) => {
-    autoContinueEnabledRef.current = enabled;
-    setAutoContinueEnabled(enabled);
+  const transition = useCallback((event: DriveSessionEvent) => {
+    const nextState = transitionDriveSessionState(
+      driveSessionStateRef.current,
+      event,
+    );
+    driveSessionStateRef.current = nextState;
+    setDriveSessionState(nextState);
   }, []);
-
-  const updateEngaged = useCallback((nextEngaged: boolean) => {
-    engagedRef.current = nextEngaged;
-    setEngaged(nextEngaged);
-  }, []);
-
-  const updateArmRequested = useCallback((requested: boolean) => {
-    armRequestedRef.current = requested;
-    setArmRequested(requested);
-  }, []);
+  const {
+    resetAcousticProfile,
+    silenceCountdownSeconds,
+    voiceActive,
+  } = useDriveSessionVoiceActivity({
+    ambientInputMetering,
+    ambientMonitoring,
+    audioRoute,
+    autoContinueEnabled,
+    engaged,
+    inputMetering,
+    inputMode: settings.inputMode,
+    isBusy,
+    isRecording,
+    mainSurfaceVisible,
+    playerIsPlaybackPaused: player.isPlaybackPaused,
+    playerIsPlaying: player.isPlaying,
+    replayPhase,
+    showToast,
+    startAmbientMonitoring,
+    stopAmbientMonitoring,
+    stopVoiceCapture,
+    t,
+  });
 
   const arm = useCallback(async () => {
     if (
       settings.inputMode !== "drive-session" ||
-      !autoContinueEnabledRef.current ||
-      !engagedRef.current ||
-      !armRequestedRef.current ||
+      !driveSessionStateRef.current.autoContinueEnabled ||
+      !driveSessionStateRef.current.engaged ||
+      !driveSessionStateRef.current.armRequested ||
       armInFlightRef.current ||
       !mainSurfaceVisibleRef.current ||
       isBusyRef.current ||
@@ -160,7 +150,7 @@ export function useDriveSessionController({
     }
 
     if (!ensureVoiceSessionReady()) {
-      updateEngaged(false);
+      transition({ type: "disengage" });
       return;
     }
 
@@ -182,8 +172,8 @@ export function useDriveSessionController({
           const cueUri = await getDriveReadyCueAudioUri();
 
           if (
-            autoContinueEnabledRef.current &&
-            engagedRef.current &&
+            driveSessionStateRef.current.autoContinueEnabled &&
+            driveSessionStateRef.current.engaged &&
             generationRef.current === generation
           ) {
             player.enqueueAudio(cueUri);
@@ -199,8 +189,8 @@ export function useDriveSessionController({
       }
 
       if (
-        !autoContinueEnabledRef.current ||
-        !engagedRef.current ||
+        !driveSessionStateRef.current.autoContinueEnabled ||
+        !driveSessionStateRef.current.engaged ||
         generationRef.current !== generation ||
         !mainSurfaceVisibleRef.current ||
         isBusyRef.current ||
@@ -212,11 +202,11 @@ export function useDriveSessionController({
         return;
       }
 
-      updateArmRequested(false);
+      transition({ type: "arm-consumed" });
       await startVoiceCapture();
       if (
-        !autoContinueEnabledRef.current ||
-        !engagedRef.current ||
+        !driveSessionStateRef.current.autoContinueEnabled ||
+        !driveSessionStateRef.current.engaged ||
         generationRef.current !== generation
       ) {
         return;
@@ -227,11 +217,11 @@ export function useDriveSessionController({
       });
     } catch (error) {
       if (
-        autoContinueEnabledRef.current &&
-        engagedRef.current &&
+        driveSessionStateRef.current.autoContinueEnabled &&
+        driveSessionStateRef.current.engaged &&
         generationRef.current === generation
       ) {
-        updateEngaged(false);
+        transition({ type: "disengage" });
         showToast(
           error instanceof Error ? error.message : t("couldntStartVoiceInput"),
           undefined,
@@ -249,415 +239,52 @@ export function useDriveSessionController({
     showToast,
     startVoiceCapture,
     t,
-    updateArmRequested,
-    updateEngaged,
+    transition,
   ]);
 
   const engage = useCallback(() => {
     if (
       settings.inputMode !== "drive-session" ||
-      engagedRef.current
+      driveSessionStateRef.current.engaged
     ) {
       return;
     }
 
     generationRef.current += 1;
     pendingAutoRearmCueRef.current = false;
-    updateEngaged(true);
+    transition({ type: "engage" });
     recordDebugLogEvent({ event: "drive-session-engaged" });
-  }, [settings.inputMode, updateEngaged]);
+  }, [settings.inputMode, transition]);
 
   const suspend = useCallback(() => {
-    if (!engagedRef.current) {
+    if (!driveSessionStateRef.current.engaged) {
       return;
     }
 
     generationRef.current += 1;
     pendingAutoRearmCueRef.current = false;
-    updateArmRequested(false);
-    updateEngaged(false);
+    transition({ type: "suspend" });
     recordDebugLogEvent({ event: "drive-session-suspended" });
-  }, [updateArmRequested, updateEngaged]);
+  }, [transition]);
 
   useEffect(() => {
     const previousInputMode = previousInputModeRef.current;
     previousInputModeRef.current = settings.inputMode;
 
     if (settings.inputMode !== "drive-session") {
-      acousticProfileRef.current = createDriveAcousticProfile();
       suspend();
       return;
     }
 
     if (previousInputMode !== "drive-session") {
       generationRef.current += 1;
-      updateArmRequested(false);
-      updateEngaged(false);
-      updateAutoContinueEnabled(true);
+      transition({ type: "mode-entered" });
       recordDebugLogEvent({ event: "drive-session-mode-entered" });
     }
   }, [
     settings.inputMode,
     suspend,
-    updateAutoContinueEnabled,
-    updateArmRequested,
-    updateEngaged,
-  ]);
-
-  useEffect(() => {
-    const updated = updateDriveAcousticProfileRoute(
-      acousticProfileRef.current,
-      audioRoute,
-    );
-    acousticProfileRef.current = updated.profile;
-
-    if (!updated.reset) {
-      return;
-    }
-
-    const shouldRestartVoiceActivity =
-      settings.inputMode === "drive-session" &&
-      autoContinueEnabled &&
-      engaged &&
-      isRecording &&
-      mainSurfaceVisible;
-    voiceActivityRef.current = shouldRestartVoiceActivity
-      ? createDriveVoiceActivityState(Date.now(), {
-          noiseFloorDb: updated.profile.noiseFloorDb,
-          speechLevelDb: updated.profile.speechLevelDb,
-        })
-      : null;
-    lastLoggedNoiseFloorDbRef.current =
-      updated.profile.noiseFloorDb;
-    setSilenceCountdownSeconds(null);
-    setVoiceActive(false);
-    recordDebugLogEvent({
-      event: "drive-session-acoustic-profile-route-reset",
-      payload: {
-        ...getDriveAcousticProfileDiagnostics(updated.profile),
-      },
-    });
-  }, [
-    audioRoute,
-    autoContinueEnabled,
-    engaged,
-    isRecording,
-    mainSurfaceVisible,
-    settings.inputMode,
-  ]);
-
-  useEffect(() => {
-    const active =
-      settings.inputMode === "drive-session" &&
-      autoContinueEnabled &&
-      engaged &&
-      isRecording &&
-      mainSurfaceVisible;
-
-    if (!active) {
-      voiceActivityRef.current = null;
-      autoSubmitInFlightRef.current = false;
-      lastCountdownCueRef.current = null;
-      setSilenceCountdownSeconds(null);
-      setVoiceActive(false);
-      return;
-    }
-
-    if (!voiceActivityRef.current) {
-      const nowMs = Date.now();
-      voiceActivityRef.current =
-        createDriveVoiceActivityState(nowMs, {
-          noiseFloorDb: acousticProfileRef.current.noiseFloorDb,
-          speechLevelDb: acousticProfileRef.current.speechLevelDb,
-        });
-      setSilenceCountdownSeconds(null);
-      setVoiceActive(false);
-      recordDebugLogEvent({
-        event: "drive-session-voice-activity-monitor-started",
-        payload: {
-          ...getDriveAcousticProfileDiagnostics(
-            acousticProfileRef.current,
-          ),
-          countdownStartsAfterSpeech: true,
-          silenceWindowMs: 10_000,
-        },
-      });
-    }
-  }, [
-    autoContinueEnabled,
-    engaged,
-    isRecording,
-    mainSurfaceVisible,
-    settings.inputMode,
-  ]);
-
-  useEffect(() => {
-    const current = voiceActivityRef.current;
-    if (current === null || typeof inputMetering !== "number") {
-      return;
-    }
-
-    const nowMs = Date.now();
-    const updated = updateDriveVoiceActivity(
-      current,
-      inputMetering,
-      nowMs,
-    );
-    voiceActivityRef.current = updated;
-    acousticProfileRef.current =
-      updateDriveAcousticProfileFromRecording(
-        acousticProfileRef.current,
-        {
-          meteringDb: inputMetering,
-          noiseFloorDb: updated.noiseFloorDb,
-          nowMs,
-          voiceActive: updated.voiceActive,
-        },
-      );
-    setSilenceCountdownSeconds(
-      getDriveCountdownSeconds(updated, nowMs),
-    );
-
-    if (
-      !current.voiceActive &&
-      current.aboveThresholdSamples > 0 &&
-      !updated.voiceActive &&
-      updated.aboveThresholdSamples === 0
-    ) {
-      recordDebugLogEvent({
-        event: "drive-session-speech-candidate-rejected",
-        payload: {
-          ...getDriveVoiceActivityDiagnostics(updated),
-          candidateDurationMs:
-            current.candidateStartedAtMs === null
-              ? 0
-              : Math.max(0, nowMs - current.candidateStartedAtMs),
-          candidatePeakDb: current.candidatePeakDb,
-          candidateSamples: current.aboveThresholdSamples,
-          candidateTroughDb: current.candidateTroughDb,
-          meteringDb: inputMetering,
-        },
-      });
-    }
-
-    if (updated.voiceActive !== current.voiceActive) {
-      setVoiceActive(updated.voiceActive);
-      if (updated.voiceActive) {
-        lastCountdownCueRef.current = null;
-      }
-      recordDebugLogEvent({
-        event: updated.voiceActive
-          ? "drive-session-speech-started"
-          : "drive-session-speech-ended",
-        payload: {
-          hasDetectedSpeech: updated.hasDetectedSpeech,
-          meteringDb: inputMetering,
-          ...getDriveVoiceActivityDiagnostics(updated),
-        },
-      });
-    }
-  }, [inputMetering]);
-
-  useEffect(() => {
-    const shouldMonitorAmbient =
-      settings.inputMode === "drive-session" &&
-      autoContinueEnabled &&
-      engaged &&
-      mainSurfaceVisible &&
-      !isRecording &&
-      isBusy &&
-      replayPhase === "idle" &&
-      !player.isPlaying &&
-      !player.isPlaybackPaused;
-
-    if (shouldMonitorAmbient) {
-      void startAmbientMonitoring?.().catch((error) => {
-        recordDebugLogEvent({
-          event: "drive-session-ambient-monitor-start-failed",
-          level: "warn",
-          payload: { error },
-        });
-      });
-      return;
-    }
-
-    void stopAmbientMonitoring?.().catch((error) => {
-      recordDebugLogEvent({
-        event: "drive-session-ambient-monitor-stop-failed",
-        level: "warn",
-        payload: { error },
-      });
-    });
-  }, [
-    autoContinueEnabled,
-    engaged,
-    isBusy,
-    isRecording,
-    mainSurfaceVisible,
-    player.isPlaybackPaused,
-    player.isPlaying,
-    replayPhase,
-    settings.inputMode,
-    startAmbientMonitoring,
-    stopAmbientMonitoring,
-  ]);
-
-  useEffect(() => {
-    if (
-      !ambientMonitoring ||
-      typeof ambientInputMetering !== "number" ||
-      settings.inputMode !== "drive-session" ||
-      !autoContinueEnabled ||
-      !engaged ||
-      isRecording ||
-      player.isPlaying ||
-      player.isPlaybackPaused
-    ) {
-      return;
-    }
-
-    const nowMs = Date.now();
-    const previousNoiseFloorDb =
-      acousticProfileRef.current.noiseFloorDb;
-    const updated = updateDriveAcousticProfileFromAmbient(
-      acousticProfileRef.current,
-      ambientInputMetering,
-      nowMs,
-    );
-    acousticProfileRef.current = updated;
-
-    const noiseFloorShiftDb = Math.abs(
-      updated.noiseFloorDb -
-        lastLoggedNoiseFloorDbRef.current,
-    );
-    if (
-      noiseFloorShiftDb < 3 &&
-      nowMs - lastAcousticProfileLogAtRef.current < 5_000
-    ) {
-      return;
-    }
-
-    lastAcousticProfileLogAtRef.current = nowMs;
-    lastLoggedNoiseFloorDbRef.current = updated.noiseFloorDb;
-    recordDebugLogEvent({
-      event: "drive-session-acoustic-profile-updated",
-      payload: {
-        ...getDriveAcousticProfileDiagnostics(updated),
-        meteringDb: ambientInputMetering,
-        previousNoiseFloorDb:
-          Math.round(previousNoiseFloorDb * 10) / 10,
-        source: "ambient-monitor",
-      },
-    });
-  }, [
-    ambientInputMetering,
-    ambientMonitoring,
-    autoContinueEnabled,
-    engaged,
-    isRecording,
-    player.isPlaybackPaused,
-    player.isPlaying,
-    settings.inputMode,
-  ]);
-
-  useEffect(() => {
-    if (
-      settings.inputMode !== "drive-session" ||
-      !autoContinueEnabled ||
-      !engaged ||
-      !isRecording ||
-      !mainSurfaceVisible
-    ) {
-      return;
-    }
-
-    const tick = () => {
-      const activity = voiceActivityRef.current;
-      if (!activity || autoSubmitInFlightRef.current) {
-        return;
-      }
-
-      const nowMs = Date.now();
-      const countdownSeconds = getDriveCountdownSeconds(
-        activity,
-        nowMs,
-      );
-      setSilenceCountdownSeconds(countdownSeconds);
-
-      if (countdownSeconds === null) {
-        return;
-      }
-
-      if (
-        countdownSeconds >= 1 &&
-        countdownSeconds <= 3 &&
-        lastCountdownCueRef.current !== countdownSeconds
-      ) {
-        lastCountdownCueRef.current = countdownSeconds;
-        void getDriveCountdownCueAudioUri(4 - countdownSeconds)
-          .then(async (cueUri) => {
-            const played = await playNativeRecordingCue(cueUri);
-            if (!played) {
-              recordDebugLogEvent({
-                event: "drive-session-countdown-cue-unavailable",
-                level: "warn",
-                payload: { countdownSeconds },
-              });
-            }
-          })
-          .catch((error) => {
-            recordDebugLogEvent({
-              event: "drive-session-countdown-cue-failed",
-              level: "warn",
-              payload: {
-                countdownSeconds,
-                error,
-              },
-            });
-          });
-      }
-
-      if (getDriveSilenceRemainingMs(activity, nowMs) > 0) {
-        return;
-      }
-
-      autoSubmitInFlightRef.current = true;
-      recordDebugLogEvent({
-        event: "drive-session-silence-auto-submit",
-        payload: {
-          hasDetectedSpeech: activity.hasDetectedSpeech,
-          silenceWindowMs: 10_000,
-        },
-      });
-      void stopVoiceCapture().catch((error) => {
-        autoSubmitInFlightRef.current = false;
-        recordDebugLogEvent({
-          event: "drive-session-silence-auto-submit-failed",
-          level: "error",
-          payload: { error },
-        });
-        showToast(
-          error instanceof Error
-            ? error.message
-            : t("couldntProcessVoiceInput"),
-          undefined,
-          "danger",
-        );
-      });
-    };
-
-    tick();
-    const timer = setInterval(tick, 200);
-    return () => clearInterval(timer);
-  }, [
-    autoContinueEnabled,
-    engaged,
-    isRecording,
-    mainSurfaceVisible,
-    settings.inputMode,
-    showToast,
-    stopVoiceCapture,
-    t,
+    transition,
   ]);
 
   useEffect(() => {
@@ -674,13 +301,13 @@ export function useDriveSessionController({
     if (
       completedReplyVersion === previousReplyVersion ||
       settings.inputMode !== "drive-session" ||
-      !autoContinueEnabledRef.current ||
-      !engagedRef.current
+      !driveSessionStateRef.current.autoContinueEnabled ||
+      !driveSessionStateRef.current.engaged
     ) {
       return;
     }
 
-    updateArmRequested(true);
+    transition({ type: "arm-requested" });
     pendingAutoRearmCueRef.current = true;
     recordDebugLogEvent({
       event: "drive-session-reply-completed",
@@ -689,7 +316,7 @@ export function useDriveSessionController({
   }, [
     completedReplyVersion,
     settings.inputMode,
-    updateArmRequested,
+    transition,
   ]);
 
   useEffect(() => {
@@ -700,13 +327,13 @@ export function useDriveSessionController({
       !wasBusy ||
       isBusy ||
       settings.inputMode !== "drive-session" ||
-      !autoContinueEnabledRef.current ||
-      !engagedRef.current
+      !driveSessionStateRef.current.autoContinueEnabled ||
+      !driveSessionStateRef.current.engaged
     ) {
       return;
     }
 
-    updateArmRequested(true);
+    transition({ type: "arm-requested" });
     pendingAutoRearmCueRef.current = true;
     recordDebugLogEvent({
       event: "drive-session-pipeline-returned-idle",
@@ -718,7 +345,7 @@ export function useDriveSessionController({
     completedReplyVersion,
     isBusy,
     settings.inputMode,
-    updateArmRequested,
+    transition,
   ]);
 
   useEffect(() => {
@@ -752,16 +379,15 @@ export function useDriveSessionController({
   ]);
 
   const handleStop = useCallback(() => {
-    if (!autoContinueEnabledRef.current) {
+    if (!driveSessionStateRef.current.autoContinueEnabled) {
       return;
     }
 
     generationRef.current += 1;
     pendingAutoRearmCueRef.current = false;
-    updateArmRequested(false);
-    updateAutoContinueEnabled(false);
+    transition({ type: "pause" });
     recordDebugLogEvent({ event: "drive-session-auto-paused" });
-  }, [updateArmRequested, updateAutoContinueEnabled]);
+  }, [transition]);
 
   const handleContinue = useCallback(() => {
     if (!ensureVoiceSessionReady()) {
@@ -770,15 +396,11 @@ export function useDriveSessionController({
 
     generationRef.current += 1;
     pendingAutoRearmCueRef.current = false;
-    updateAutoContinueEnabled(true);
-    updateEngaged(true);
-    updateArmRequested(true);
+    transition({ type: "resume" });
     recordDebugLogEvent({ event: "drive-session-auto-resumed" });
   }, [
     ensureVoiceSessionReady,
-    updateAutoContinueEnabled,
-    updateArmRequested,
-    updateEngaged,
+    transition,
   ]);
 
   const handleRepeat = useCallback(async () => {
@@ -789,13 +411,12 @@ export function useDriveSessionController({
     }
 
     const shouldResume =
-      autoContinueEnabledRef.current &&
+      driveSessionStateRef.current.autoContinueEnabled &&
       settings.inputMode === "drive-session" &&
       mainSurfaceVisibleRef.current;
 
     generationRef.current += 1;
-    updateArmRequested(false);
-    updateEngaged(false);
+    transition({ type: "suspend" });
     await cancelVoiceCapture().catch(() => undefined);
     await stopReplay().catch(() => undefined);
     await cancelCurrentInteraction().catch(() => undefined);
@@ -811,14 +432,13 @@ export function useDriveSessionController({
     } finally {
       if (
         shouldResume &&
-        autoContinueEnabledRef.current &&
+        driveSessionStateRef.current.autoContinueEnabled &&
         settings.inputMode === "drive-session" &&
         mainSurfaceVisibleRef.current
       ) {
         generationRef.current += 1;
         pendingAutoRearmCueRef.current = true;
-        updateEngaged(true);
-        updateArmRequested(true);
+        transition({ type: "resume" });
       }
     }
   }, [
@@ -830,23 +450,19 @@ export function useDriveSessionController({
     showToast,
     stopReplay,
     t,
-    updateArmRequested,
-    updateEngaged,
+    transition,
   ]);
 
   const reset = useCallback(() => {
     generationRef.current += 1;
     pendingAutoRearmCueRef.current = false;
-    updateArmRequested(false);
-    updateEngaged(false);
-    acousticProfileRef.current = createDriveAcousticProfile();
-    lastLoggedNoiseFloorDbRef.current =
-      acousticProfileRef.current.noiseFloorDb;
+    transition({ type: "suspend" });
+    resetAcousticProfile();
     void stopAmbientMonitoring?.();
   }, [
+    resetAcousticProfile,
     stopAmbientMonitoring,
-    updateArmRequested,
-    updateEngaged,
+    transition,
   ]);
 
   return {
