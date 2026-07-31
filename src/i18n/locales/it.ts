@@ -858,10 +858,6 @@ export const it = {
   noBase64DecoderAvailable: "Nessun decoder base64 disponibile.",
   azureSpeechApiKeyFormat:
     "Microsoft Azure TTS necessita delle credenziali di riconoscimento vocale di Azure nel formato <key>|<region>, ad esempio abc123|westeurope o nel formato Azure combinato <endpoint>|<api-key>|<key>|<region>.",
-  googleCloudSpeechCredentialFormat: ({ provider }) =>
-    `${provider} STT necessita delle credenziali Google Cloud Speech nel formato <project-id>|<access-token>|<location> o nel formato combinato Gemini <Gemini API key>|<project-id>|<access-token>|<location>.`,
-  bytedanceSpeechCredentialFormat: ({ provider }) =>
-    `${provider} STT necessita di Doubao Credenziali vocali nel formato <app-key>|<access-key>, facoltativamente <app-key>|<access-key>|<resource-id> o nel formato combinato <ark-api-key>|<app-key>|<access-key>|<resource-id>.`,
   nativeTtsDoesNotSynthesizeAudioFiles:
     "TTS nativo non sintetizza i file audio.",
   localTtsUnavailableForLanguage: ({ languageLabel }) =>

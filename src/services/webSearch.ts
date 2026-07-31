@@ -309,52 +309,6 @@ function hasSuccessfulWebSearchCall(data: unknown) {
   });
 }
 
-function extractChatCompletionOutputText(data: unknown): string {
-  if (!data || typeof data !== "object") {
-    return "";
-  }
-
-  const choices =
-    "choices" in data && Array.isArray(data.choices) ? data.choices : [];
-  const firstMessage = choices[0];
-
-  if (!firstMessage || typeof firstMessage !== "object") {
-    return "";
-  }
-
-  const content =
-    "message" in firstMessage &&
-    firstMessage.message &&
-    typeof firstMessage.message === "object" &&
-    "content" in firstMessage.message
-      ? firstMessage.message.content
-      : "";
-
-  if (typeof content === "string") {
-    return content.trim();
-  }
-
-  if (!Array.isArray(content)) {
-    return "";
-  }
-
-  return content
-    .flatMap((part) => {
-      if (
-        part &&
-        typeof part === "object" &&
-        "text" in part &&
-        typeof part.text === "string"
-      ) {
-        return [part.text];
-      }
-
-      return [];
-    })
-    .join("")
-    .trim();
-}
-
 function extractAnthropicOutputText(data: unknown): string {
   if (!data || typeof data !== "object") {
     return "";
@@ -485,52 +439,6 @@ function extractMistralOutputText(data: unknown): string {
   }
 
   return parts.join("").trim();
-}
-
-function extractPerplexitySources(data: unknown) {
-  if (!data || typeof data !== "object") {
-    return [];
-  }
-
-  const sources: WebSearchSource[] = [];
-  const searchResults =
-    "search_results" in data && Array.isArray(data.search_results)
-      ? data.search_results
-      : [];
-  const citations =
-    "citations" in data && Array.isArray(data.citations) ? data.citations : [];
-
-  for (const entry of searchResults) {
-    if (!entry || typeof entry !== "object") {
-      continue;
-    }
-
-    const candidate = entry as {
-      title?: unknown;
-      url?: unknown;
-    };
-
-    if (typeof candidate.url === "string" && candidate.url.trim()) {
-      sources.push({
-        title:
-          typeof candidate.title === "string" && candidate.title.trim()
-            ? candidate.title.trim()
-            : candidate.url.trim(),
-        url: candidate.url.trim(),
-      });
-    }
-  }
-
-  for (const entry of citations) {
-    if (typeof entry === "string" && entry.trim()) {
-      sources.push({
-        title: entry.trim(),
-        url: entry.trim(),
-      });
-    }
-  }
-
-  return dedupeSources([...sources, ...extractGenericSources(data)]);
 }
 
 async function fetchWithTimeout(
@@ -827,31 +735,6 @@ async function searchWithQwen(params: WebSearchRequestParams) {
   return response;
 }
 
-async function searchWithResponsesTool(
-  params: WebSearchRequestParams,
-  url: string,
-) {
-  const model = getRequestWebSearchModel(params);
-  const maxOutputTokens = params.maxOutputTokens ?? 420;
-
-  return fetchJsonWebSearch(params, {
-    url,
-    model,
-    headers: buildBearerHeaders(params),
-    body: {
-      model,
-      input: [
-        {
-          role: "user",
-          content: buildPromptForProvider(params),
-        },
-      ],
-      tools: [{ type: "web_search" }],
-      max_output_tokens: maxOutputTokens,
-    },
-  });
-}
-
 async function searchWithGemini(params: WebSearchRequestParams) {
   const model = getRequestWebSearchModel(params);
 
@@ -940,164 +823,6 @@ async function searchWithMistral(params: WebSearchRequestParams) {
   });
 }
 
-function getKimiToolCalls(data: unknown) {
-  if (!data || typeof data !== "object") {
-    return [];
-  }
-
-  const choices =
-    "choices" in data && Array.isArray(data.choices) ? data.choices : [];
-  const firstChoice = choices[0];
-
-  if (!firstChoice || typeof firstChoice !== "object") {
-    return [];
-  }
-
-  const message =
-    "message" in firstChoice &&
-    firstChoice.message &&
-    typeof firstChoice.message === "object"
-      ? firstChoice.message
-      : null;
-  const toolCalls =
-    message && "tool_calls" in message && Array.isArray(message.tool_calls)
-      ? message.tool_calls
-      : [];
-
-  return toolCalls.filter(
-    (toolCall: unknown) => toolCall && typeof toolCall === "object",
-  ) as Array<{
-    id?: string;
-    function?: {
-      arguments?: string;
-      name?: string;
-    };
-  }>;
-}
-
-async function requestKimiChatCompletion(
-  params: WebSearchRequestParams,
-  messages: unknown[],
-) {
-  const model = getRequestWebSearchModel(params);
-  const maxOutputTokens = params.maxOutputTokens ?? 420;
-
-  return fetchJsonWebSearch(params, {
-    url: "https://api.moonshot.ai/v1/chat/completions",
-    model,
-    headers: buildBearerHeaders(params),
-    body: {
-      model,
-      messages,
-      tools: [
-        {
-          type: "builtin_function",
-          function: { name: "$web_search" },
-        },
-      ],
-      thinking: { type: "disabled" },
-      max_tokens: maxOutputTokens,
-    },
-  });
-}
-
-async function searchWithKimi(params: WebSearchRequestParams) {
-  const initialMessages = buildChatMessages(params);
-  const firstResponse = await requestKimiChatCompletion(
-    params,
-    initialMessages,
-  );
-  const toolCalls = getKimiToolCalls(firstResponse.data);
-
-  if (toolCalls.length === 0) {
-    return firstResponse;
-  }
-
-  const firstChoice =
-    firstResponse.data &&
-    typeof firstResponse.data === "object" &&
-    "choices" in firstResponse.data &&
-    Array.isArray(firstResponse.data.choices)
-      ? firstResponse.data.choices[0]
-      : null;
-  const assistantMessage =
-    firstChoice &&
-    typeof firstChoice === "object" &&
-    "message" in firstChoice &&
-    firstChoice.message &&
-    typeof firstChoice.message === "object"
-      ? firstChoice.message
-      : {
-          role: "assistant",
-          content: null,
-          tool_calls: toolCalls,
-        };
-  const toolMessages = toolCalls.map((toolCall) => ({
-    role: "tool",
-    tool_call_id: toolCall.id,
-    name: toolCall.function?.name ?? "$web_search",
-    content: toolCall.function?.arguments ?? "{}",
-  }));
-
-  return requestKimiChatCompletion(params, [
-    ...initialMessages,
-    assistantMessage,
-    ...toolMessages,
-  ]);
-}
-
-async function searchWithPerplexity(params: WebSearchRequestParams) {
-  const model = getRequestWebSearchModel(params);
-  const maxOutputTokens = params.maxOutputTokens ?? 420;
-  const response = await fetchWithTimeout(
-    "https://api.perplexity.ai/chat/completions",
-    {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${requireProviderKey(
-          params.provider,
-          params.apiKey,
-          params.language,
-        )}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model,
-        messages: [
-          {
-            role: "user",
-            content: buildWebSearchPrompt({
-              query: params.query,
-              conversationSummary: params.conversationSummary,
-            }),
-          },
-        ],
-        max_tokens: maxOutputTokens,
-      }),
-    },
-    WEB_SEARCH_TIMEOUT_MS_BY_PROVIDER[params.provider],
-    () => buildWebSearchTimeoutError(params.provider, params.language),
-    params.abortSignal,
-  );
-
-  if (!response.ok) {
-    const errorText = await response.text();
-    throw buildProviderHttpError({
-      provider: params.provider,
-      language: params.language,
-      status: response.status,
-      errorText,
-      action: "web-search",
-    });
-  }
-
-  return {
-    data: await response.json(),
-    model,
-    provider: params.provider,
-  } satisfies RawWebSearchResponse;
-}
-
 async function requestWebSearchOnce(params: WebSearchRequestParams) {
   switch (params.provider) {
     case "openai":
@@ -1106,21 +831,12 @@ async function requestWebSearchOnce(params: WebSearchRequestParams) {
       return searchWithAnthropic(params);
     case "alibaba-qwen-dashscope":
       return searchWithQwen(params);
-    case "bytedance-doubao-seed":
-      return searchWithResponsesTool(
-        params,
-        "https://ark.cn-beijing.volces.com/api/v3/responses",
-      );
     case "gemini":
       return searchWithGemini(params);
     case "xai":
       return searchWithXai(params);
     case "mistral":
       return searchWithMistral(params);
-    case "moonshot-ai-kimi":
-      return searchWithKimi(params);
-    case "perplexity":
-      return searchWithPerplexity(params);
     default:
       throw buildProviderNotWiredUpError(params.provider, params.language);
   }
@@ -1154,7 +870,6 @@ function normalizeGroundedAnswerResult(params: {
   switch (params.provider) {
     case "openai":
     case "alibaba-qwen-dashscope":
-    case "bytedance-doubao-seed":
     case "xai":
       summary = extractResponsesOutputText(params.data);
       break;
@@ -1167,10 +882,6 @@ function normalizeGroundedAnswerResult(params: {
     case "mistral":
       summary = extractMistralOutputText(params.data);
       break;
-    case "moonshot-ai-kimi":
-    case "perplexity":
-      summary = extractChatCompletionOutputText(params.data);
-      break;
     default:
       summary = "";
   }
@@ -1179,10 +890,7 @@ function normalizeGroundedAnswerResult(params: {
     return null;
   }
 
-  const sources =
-    params.provider === "perplexity"
-      ? extractPerplexitySources(params.data)
-      : extractGenericSources(params.data);
+  const sources = extractGenericSources(params.data);
 
   return {
     context: formatWebSearchContext({

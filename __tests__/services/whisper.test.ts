@@ -274,21 +274,6 @@ describe("transcribeAudio", () => {
     );
   });
 
-  it("does not expose the ByteDance bigmodel flash route as runtime STT", async () => {
-    await expect(
-      transcribeAudio({
-        fileUri: "/tmp/recording.m4a",
-        mode: "provider",
-        provider: "bytedance-doubao-seed",
-        providerModel: "bigmodel",
-        apiKey: "speech-app-key|speech-access-key",
-        language: "en",
-      }),
-    ).rejects.toThrow("ByteDance STT is not supported yet.");
-
-    expect(fetch).not.toHaveBeenCalled();
-  });
-
   it("uses Gemini audio input for STT with an AI Studio key", async () => {
     (fetch as jest.Mock).mockResolvedValueOnce({
       ok: true,
@@ -381,38 +366,6 @@ describe("transcribeAudio", () => {
       "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent",
     ]);
     expect(onModelResolved).toHaveBeenCalledWith("gemini-3.6-flash");
-  });
-
-  it("keeps Google Cloud Speech v2 working for Cloud-only credentials", async () => {
-    (fetch as jest.Mock).mockResolvedValueOnce({
-      ok: true,
-      json: async () => ({
-        results: [
-          {
-            alternatives: [{ transcript: "Hello from Cloud Speech" }],
-          },
-        ],
-      }),
-    });
-
-    const result = await transcribeAudio({
-      fileUri: "/tmp/recording.m4a",
-      mode: "provider",
-      provider: "gemini",
-      providerModel: "gemini-3.5-flash",
-      apiKey: "my-project|ya29.test-token|us",
-      language: "de",
-      speechLanguage: "uk",
-    });
-
-    expect(result).toBe("Hello from Cloud Speech");
-    const [url, options] = (fetch as jest.Mock).mock.calls[0];
-    expect(url).toBe(
-      "https://us-speech.googleapis.com/v2/projects/my-project/locations/us/recognizers/_:recognize",
-    );
-    expect(options.headers.Authorization).toBe("Bearer ya29.test-token");
-    expect(JSON.parse(options.body).config.model).toBe("chirp_3");
-    expect(JSON.parse(options.body).config.languageCodes).toEqual(["uk-UA"]);
   });
 
   it("uses the xAI standalone REST STT endpoint for recorded audio", async () => {

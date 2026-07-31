@@ -655,69 +655,6 @@ describe("streamChat", () => {
     }
   });
 
-  it("keeps Kimi K3 alive while reasoning before visible output", async () => {
-    jest.useFakeTimers();
-    const encoder = new TextEncoder();
-    const stream = new ReadableStream({
-      start(controller) {
-        setTimeout(() => {
-          controller.enqueue(
-            encoder.encode(
-              'data: {"choices":[{"delta":{"reasoning_content":"Still reasoning. "}}]}\n\n',
-            ),
-          );
-        }, 4 * 60_000);
-        setTimeout(() => {
-          controller.enqueue(
-            encoder.encode(
-              'data: {"choices":[{"delta":{"content":"Final answer."},"finish_reason":"stop"}]}\n\n',
-            ),
-          );
-          controller.enqueue(encoder.encode("data: [DONE]\n\n"));
-          controller.close();
-        }, 8 * 60_000);
-      },
-    });
-    (fetch as jest.Mock).mockResolvedValueOnce({ ok: true, body: stream });
-    const chunks: string[] = [];
-    const onDone = jest.fn();
-    const onError = jest.fn();
-
-    try {
-      const promise = streamChat({
-        messages: mockMessages,
-        model: "kimi-k3",
-        modelEffort: "max",
-        provider: "moonshot-ai-kimi",
-        apiKey: "kimi-test-key",
-        assistantInstructions: "",
-        responseLength: "normal",
-        responseTone: "professional",
-        language: "en",
-        onChunk: (text) => chunks.push(text),
-        onDone,
-        onError,
-      });
-
-      await jest.advanceTimersByTimeAsync(8 * 60_000);
-      await promise;
-
-      expect(chunks).toEqual(["Final answer."]);
-      expect(onDone).toHaveBeenCalledWith(
-        "Final answer.",
-        expect.objectContaining({ totalTokens: expect.any(Number) }),
-        expect.objectContaining({
-          providerState: {
-            kimiReasoningContent: "Still reasoning. ",
-          },
-        }),
-      );
-      expect(onError).not.toHaveBeenCalled();
-    } finally {
-      jest.useRealTimers();
-    }
-  });
-
   it("returns a development-only local reply for the Android smoke-test key", async () => {
     const chunks: string[] = [];
     const onDone = jest.fn();
@@ -1219,24 +1156,6 @@ describe("streamChat", () => {
       expected: { reasoning_effort: "none" },
     },
     {
-      provider: "bytedance-doubao-seed" as const,
-      model: "doubao-seed-2-1-turbo-260628",
-      modelEffort: "high",
-      expected: { reasoning_effort: "high" },
-    },
-    {
-      provider: "bytedance-doubao-seed" as const,
-      model: "doubao-seed-2-0-lite-260428",
-      modelEffort: "medium",
-      expected: { reasoning_effort: "medium" },
-    },
-    {
-      provider: "perplexity" as const,
-      model: "sonar-deep-research",
-      modelEffort: "high",
-      expected: { reasoning_effort: "high" },
-    },
-    {
       provider: "deepseek" as const,
       model: "deepseek-v4-pro",
       modelEffort: "max",
@@ -1256,18 +1175,6 @@ describe("streamChat", () => {
       model: "qwen3.7-plus-2026-05-26",
       modelEffort: "disabled",
       expected: { enable_thinking: false },
-    },
-    {
-      provider: "moonshot-ai-kimi" as const,
-      model: "kimi-k3",
-      modelEffort: "max",
-      expected: { reasoning_effort: "max" },
-    },
-    {
-      provider: "moonshot-ai-kimi" as const,
-      model: "kimi-k2.6",
-      modelEffort: "disabled",
-      expected: { thinking: { type: "disabled" } },
     },
   ])(
     "passes $provider effort controls through OpenAI-compatible chat requests",
@@ -1344,74 +1251,6 @@ describe("streamChat", () => {
     expect(JSON.parse(options.body).output_config).toEqual({
       effort: "medium",
     });
-  });
-
-  it("uses the configured routed endpoint for a hyphenated OpenAI-compatible provider", async () => {
-    const encoder = new TextEncoder();
-    const stream = new ReadableStream({
-      start(controller) {
-        controller.enqueue(
-          encoder.encode('data: {"choices":[{"delta":{"content":"Hi"}}]}\n\n'),
-        );
-        controller.enqueue(encoder.encode("data: [DONE]\n\n"));
-        controller.close();
-      },
-    });
-    (fetch as jest.Mock).mockResolvedValueOnce({ ok: true, body: stream });
-    const chunks: string[] = [];
-
-    await streamChat({
-      messages: mockMessages,
-      model: "kimi-k2.5",
-      provider: "moonshot-ai-kimi",
-      apiKey: "kimi-test-key",
-      assistantInstructions: "",
-      responseLength: "normal",
-      responseTone: "professional",
-      language: "en",
-      onChunk: (text) => chunks.push(text),
-      onDone: () => {},
-      onError: () => {},
-    });
-
-    expect(chunks).toEqual(["Hi"]);
-    const [url, options] = (fetch as jest.Mock).mock.calls[0];
-    expect(url).toBe("https://api.moonshot.ai/v1/chat/completions");
-    expect(JSON.parse(options.body).model).toBe("kimi-k2.5");
-  });
-
-  it("uses the Sonar chat-completions compatibility endpoint for Perplexity", async () => {
-    const encoder = new TextEncoder();
-    const stream = new ReadableStream({
-      start(controller) {
-        controller.enqueue(
-          encoder.encode('data: {"choices":[{"delta":{"content":"Hi"}}]}\n\n'),
-        );
-        controller.enqueue(encoder.encode("data: [DONE]\n\n"));
-        controller.close();
-      },
-    });
-    (fetch as jest.Mock).mockResolvedValueOnce({ ok: true, body: stream });
-    const chunks: string[] = [];
-
-    await streamChat({
-      messages: mockMessages,
-      model: "sonar",
-      provider: "perplexity",
-      apiKey: "pplx-test-key",
-      assistantInstructions: "",
-      responseLength: "normal",
-      responseTone: "professional",
-      language: "en",
-      onChunk: (text) => chunks.push(text),
-      onDone: () => {},
-      onError: () => {},
-    });
-
-    expect(chunks).toEqual(["Hi"]);
-    const [url, options] = (fetch as jest.Mock).mock.calls[0];
-    expect(url).toBe("https://api.perplexity.ai/chat/completions");
-    expect(JSON.parse(options.body).model).toBe("sonar");
   });
 
   it("replays Mistral thinking chunks on the following turn", async () => {
@@ -1520,138 +1359,6 @@ describe("streamChat", () => {
         text: "[Response generated by Mistral using Mistral Medium 3.5]\nThe answer is 391.",
       },
     ]);
-  });
-
-  it("replays Kimi reasoning content on the following turn", async () => {
-    const encoder = new TextEncoder();
-    const firstStream = new ReadableStream({
-      start(controller) {
-        controller.enqueue(
-          encoder.encode(
-            'data: {"choices":[{"delta":{"reasoning_content":"Think carefully. "}}]}\n\n',
-          ),
-        );
-        controller.enqueue(
-          encoder.encode(
-            'data: {"choices":[{"delta":{"content":"The answer is 42."}}]}\n\n',
-          ),
-        );
-        controller.enqueue(encoder.encode("data: [DONE]\n\n"));
-        controller.close();
-      },
-    });
-    const secondStream = new ReadableStream({
-      start(controller) {
-        controller.enqueue(
-          encoder.encode(
-            'data: {"choices":[{"delta":{"content":"Correct."}}]}\n\n',
-          ),
-        );
-        controller.enqueue(encoder.encode("data: [DONE]\n\n"));
-        controller.close();
-      },
-    });
-    (fetch as jest.Mock)
-      .mockResolvedValueOnce({ ok: true, body: firstStream })
-      .mockResolvedValueOnce({ ok: true, body: secondStream });
-    const firstOnDone = jest.fn();
-
-    await streamChat({
-      messages: mockMessages,
-      model: "kimi-k3",
-      modelEffort: "max",
-      provider: "moonshot-ai-kimi",
-      apiKey: "kimi-test-key",
-      assistantInstructions: "",
-      responseLength: "normal",
-      responseTone: "professional",
-      language: "en",
-      onChunk: () => {},
-      onDone: firstOnDone,
-      onError: () => {},
-    });
-
-    const firstMetadata = firstOnDone.mock.calls[0][2];
-    expect(firstMetadata.providerState.kimiReasoningContent).toBe(
-      "Think carefully. ",
-    );
-
-    await streamChat({
-      messages: [
-        ...mockMessages,
-        {
-          id: "2",
-          role: "assistant",
-          content: "The answer is 42.",
-          model: "kimi-k3",
-          provider: "moonshot-ai-kimi",
-          metadata: firstMetadata,
-          timestamp: "2026-01-01T00:00:01Z",
-        },
-        {
-          id: "3",
-          role: "user",
-          content: "Are you certain?",
-          model: null,
-          provider: null,
-          timestamp: "2026-01-01T00:00:02Z",
-        },
-      ],
-      model: "kimi-k3",
-      modelEffort: "max",
-      provider: "moonshot-ai-kimi",
-      apiKey: "kimi-test-key",
-      assistantInstructions: "",
-      responseLength: "normal",
-      responseTone: "professional",
-      language: "en",
-      onChunk: () => {},
-      onDone: () => {},
-      onError: () => {},
-    });
-
-    const secondBody = JSON.parse((fetch as jest.Mock).mock.calls[1][1].body);
-    expect(secondBody.messages[2]).toEqual({
-      role: "assistant",
-      content: "The answer is 42.",
-      reasoning_content: "Think carefully. ",
-    });
-  });
-
-  it("uses the Ark chat-completions compatibility endpoint for ByteDance", async () => {
-    const encoder = new TextEncoder();
-    const stream = new ReadableStream({
-      start(controller) {
-        controller.enqueue(
-          encoder.encode('data: {"choices":[{"delta":{"content":"Hi"}}]}\n\n'),
-        );
-        controller.enqueue(encoder.encode("data: [DONE]\n\n"));
-        controller.close();
-      },
-    });
-    (fetch as jest.Mock).mockResolvedValueOnce({ ok: true, body: stream });
-    const chunks: string[] = [];
-
-    await streamChat({
-      messages: mockMessages,
-      model: "doubao-seed-2-0-lite-260215",
-      provider: "bytedance-doubao-seed",
-      apiKey: "doubao-test-key",
-      assistantInstructions: "",
-      responseLength: "normal",
-      responseTone: "professional",
-      language: "en",
-      onChunk: (text) => chunks.push(text),
-      onDone: () => {},
-      onError: () => {},
-    });
-
-    expect(chunks).toEqual(["Hi"]);
-    const [url, options] = (fetch as jest.Mock).mock.calls[0];
-    expect(url).toBe(
-      "https://ark.cn-beijing.volces.com/api/v3/chat/completions",
-    );
-    expect(JSON.parse(options.body).model).toBe("doubao-seed-2-0-lite-260215");
   });
 
   it("emits a chunk when openai-compatible streaming falls back to a full response", async () => {

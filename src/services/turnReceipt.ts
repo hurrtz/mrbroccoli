@@ -23,7 +23,6 @@ const EFFORT_TRANSPORT_PARAMETERS: Record<string, string> = {
     "generationConfig.thinkingConfig.thinkingBudget",
   "gemini-thinking-level":
     "generationConfig.thinkingConfig.thinkingLevel",
-  "kimi-thinking": "thinking.type",
   "qwen-enable-thinking": "enable_thinking",
   "reasoning-effort": "reasoning_effort",
 };

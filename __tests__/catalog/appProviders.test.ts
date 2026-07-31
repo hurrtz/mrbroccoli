@@ -26,13 +26,10 @@ describe("app provider catalog bridge", () => {
       openrouter: "openrouter",
       anthropic: "anthropic",
       "alibaba-qwen-dashscope": "alibaba-qwen-dashscope",
-      "bytedance-doubao-seed": "bytedance-doubao-seed",
       gemini: "google-vertex-ai-studio",
       deepseek: "deepseek",
       elevenlabs: "elevenlabs",
       mistral: "mistral-ai",
-      "moonshot-ai-kimi": "moonshot-ai-kimi",
-      perplexity: "perplexity",
       xai: "xai",
     });
 
@@ -56,7 +53,6 @@ describe("app provider catalog bridge", () => {
     expect(listCatalogProviderIds()).toContain("openai");
     expect(listCatalogProviderIds()).toContain("anthropic");
     expect(listCatalogProviderIds()).toContain("mistral-ai");
-    expect(listCatalogProviderIds()).toContain("perplexity");
     expect(listCatalogProviderIds()).toContain("elevenlabs");
   });
 
@@ -123,7 +119,7 @@ describe("app provider catalog bridge", () => {
 
   it("supports broad capability checks for future picker and safeguard work", () => {
     expect(isCatalogServiceSupportedForAppProvider("anthropic", "tts")).toBe(false);
-    expect(isCatalogServiceSupportedForAppProvider("bytedance-doubao-seed", "tts")).toBe(true);
+    expect(isCatalogServiceSupportedForAppProvider("openai", "tts")).toBe(true);
     expect(isCatalogServiceSupportedForAppProvider("mistral", "stt")).toBe(true);
   });
 });

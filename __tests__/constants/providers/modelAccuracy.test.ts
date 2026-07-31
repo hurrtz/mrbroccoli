@@ -22,25 +22,19 @@ describe("provider model accuracy", () => {
       "openrouter",
       "anthropic",
       "alibaba-qwen-dashscope",
-      "bytedance-doubao-seed",
       "gemini",
       "xai",
       "deepseek",
       "mistral",
       "elevenlabs",
-      "moonshot-ai-kimi",
-      "perplexity",
     ]);
     expect(WEB_SEARCH_PROVIDER_IDS).toEqual([
       "openai",
       "anthropic",
       "alibaba-qwen-dashscope",
-      "bytedance-doubao-seed",
       "gemini",
       "xai",
       "mistral",
-      "moonshot-ai-kimi",
-      "perplexity",
     ]);
     expect(PROVIDER_ORDER).toEqual(
       expect.not.arrayContaining([
@@ -89,12 +83,12 @@ describe("provider model accuracy", () => {
   });
 
   it("uses the curated runtime picker, not broad catalog rows, for new response modes", () => {
-    const modes = deriveResponseModesForProvider("perplexity");
-    const runtimeIds = providerModelIds("perplexity");
+    const modes = deriveResponseModesForProvider("openai");
+    const runtimeIds = providerModelIds("openai");
     const modeModelIds = modes.map((mode) => mode.route.model);
 
     expect(modeModelIds).toEqual(runtimeIds.slice(0, 3));
-    expect(modeModelIds).not.toContain("perplexity/sonar");
+    expect(modeModelIds).not.toContain("gpt-4.1-nano");
   });
 
   it("exposes current Anthropic Claude 5 models and hides retired Claude 4.0 rows", () => {
@@ -150,7 +144,7 @@ describe("provider model accuracy", () => {
     ).toEqual(["voxtral-mini-2602"]);
   });
 
-  it("surfaces current Qwen and Doubao picker models", () => {
+  it("surfaces current Qwen picker models", () => {
     expect(providerModelIds("alibaba-qwen-dashscope")).toEqual(
       expect.arrayContaining([
         "qwen3.7-max-2026-05-20",
@@ -174,45 +168,6 @@ describe("provider model accuracy", () => {
         "qwen-flash",
       ]),
     );
-
-    expect(providerModelIds("bytedance-doubao-seed")).toEqual(
-      expect.arrayContaining([
-        "doubao-seed-2-1-pro-260628",
-        "doubao-seed-2-1-turbo-260628",
-        "doubao-seed-2-0-lite-260428",
-        "doubao-seed-2-0-mini-260428",
-      ]),
-    );
-    expect(PROVIDER_DEFAULT_MODELS["bytedance-doubao-seed"]).toBe(
-      "doubao-seed-2-1-turbo-260628",
-    );
-    expect(DEFAULT_PROVIDER_STT_MODELS["bytedance-doubao-seed"]).toBe("");
-    expect(PROVIDER_STT_MODEL_OPTIONS["bytedance-doubao-seed"]).toBeUndefined();
-  });
-
-  it("surfaces current Kimi models and hides discontinued K2 rows", () => {
-    expect(providerModelIds("moonshot-ai-kimi")).toEqual(
-      expect.arrayContaining([
-        "kimi-k3",
-        "kimi-k2.7-code",
-        "kimi-k2.7-code-highspeed",
-        "kimi-k2.6",
-      ]),
-    );
-    expect(providerModelIds("moonshot-ai-kimi")).not.toEqual(
-      expect.arrayContaining([
-        "kimi-k2-0905-preview",
-        "kimi-k2-thinking",
-        "kimi-k2-thinking-turbo",
-        "kimi-latest",
-        "kimi-thinking-preview",
-        "kimi-k2.5",
-        "moonshot-v1-128k",
-        "moonshot-v1-32k",
-        "moonshot-v1-8k",
-      ]),
-    );
-    expect(PROVIDER_DEFAULT_MODELS["moonshot-ai-kimi"]).toBe("kimi-k3");
   });
 
   it("exposes Mistral's current Voxtral speech model", () => {
@@ -234,7 +189,7 @@ describe("provider model accuracy", () => {
     ).toEqual(["eleven_flash_v2_5", "eleven_multilingual_v2", "eleven_v3"]);
   });
 
-  it("keeps OpenAI and Perplexity pickers aligned with their current callable endpoints", () => {
+  it("keeps the OpenAI picker aligned with its current callable endpoint", () => {
     expect(providerModelIds("openai")).toEqual(
       expect.arrayContaining([
         "gpt-5.6-sol",
@@ -252,12 +207,6 @@ describe("provider model accuracy", () => {
       expect.arrayContaining(["gpt-5.5-2026-04-23", "gpt-5.4-2026-03-05"]),
     );
     expect(providerModelIds("openai")).not.toContain("gpt-realtime-1.5");
-    expect(providerModelIds("perplexity")).toEqual([
-      "sonar",
-      "sonar-pro",
-      "sonar-reasoning-pro",
-      "sonar-deep-research",
-    ]);
   });
 
   it("keeps code-specific xAI models out of the voice-chat picker", () => {

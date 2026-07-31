@@ -864,10 +864,6 @@ export const cs = {
   noBase64DecoderAvailable: "Není k dispozici žádný dekodér base64.",
   azureSpeechApiKeyFormat:
     "Microsoft Azure TTS potřebuje přihlašovací údaje Azure Speech ve formátu <key>|<region>, například abc123|westeurope, nebo kombinovaný formát Azure <endpoint>|<api-key>|<key>|<region>.",
-  googleCloudSpeechCredentialFormat: ({ provider }) =>
-    `${provider} STT potřebuje přihlašovací údaje Google Cloud Speech ve formátu <project-id>|<access-token>|<location> nebo v kombinovaném formátu Gemini <Gemini API key>|<project-id>|ZXQPH8QXQXZ|ZXQPH9`,
-  bytedanceSpeechCredentialFormat: ({ provider }) =>
-    `${provider} STT potřebuje Doubao pověření řeči ve formátu <app-key>|<access-key>, volitelně <app-key>|<access-key>|<resource-id>, nebo kombinovaný formát <ark-api-key>|ZXQPH08QPHXQZZ|`,
   nativeTtsDoesNotSynthesizeAudioFiles:
     "Nativní TTS nesyntetizuje zvukové soubory.",
   localTtsUnavailableForLanguage: ({ languageLabel }) =>

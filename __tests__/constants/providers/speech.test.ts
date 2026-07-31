@@ -48,7 +48,6 @@ describe("speech provider constants", () => {
   });
 
   it("surfaces newly wired catalog-backed STT providers through the runtime manifest", () => {
-    expect(getProviderSttModelOptions("bytedance-doubao-seed")).toEqual([]);
     expect(getProviderSttModelOptions("alibaba-qwen-dashscope")).toEqual([
       { id: "qwen3-asr-flash", name: "Qwen3-ASR-Flash" },
     ]);
@@ -84,7 +83,6 @@ describe("speech provider constants", () => {
     expect(PROVIDER_DEFAULT_TTS_MODELS.gemini).toBe(
       "gemini-3.1-flash-tts-preview",
     );
-    expect(getProviderTtsModelOptions("bytedance-doubao-seed")).toEqual([]);
   });
 
   it("keeps xAI TTS aligned to the merged catalog service ids", () => {

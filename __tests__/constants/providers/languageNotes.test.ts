@@ -6,15 +6,6 @@ import {
 } from "../../../src/constants/providers/languageNotes";
 
 describe("provider language notes", () => {
-  it("explains the Moonshot account requirement for Kimi K3", () => {
-    expect(getProviderApiKeyHint("moonshot-ai-kimi", "en")).toContain(
-      "$1 account top-up",
-    );
-    expect(getProviderApiKeyHint("moonshot-ai-kimi", "de")).toContain(
-      "mindestens 1 USD",
-    );
-  });
-
   it("explains the permissions needed by restricted ElevenLabs keys", () => {
     expect(getProviderApiKeyHint("elevenlabs", "en")).toContain(
       "Text to Speech permission for TTS",

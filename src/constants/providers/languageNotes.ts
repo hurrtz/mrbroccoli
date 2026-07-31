@@ -262,62 +262,50 @@ const PROVIDER_API_KEY_HINT_OVERRIDES: LocalizedResource<
   en: {
     openrouter: `${GENERIC_PROVIDER_API_KEY_HINTS.en} One OpenRouter key unlocks the curated gateway models below. Requests pass through OpenRouter to the selected upstream provider; direct provider keys remain separate.`,
     elevenlabs: `${GENERIC_PROVIDER_API_KEY_HINTS.en} Restricted ElevenLabs keys need Text to Speech permission for TTS and Speech to Text permission for STT. Voices read is optional and only unlocks the account voice library.`,
-    "moonshot-ai-kimi": `${GENERIC_PROVIDER_API_KEY_HINTS.en} Kimi K3 requires at least one successful $1 account top-up before Moonshot unlocks access.`,
   },
   de: {
     openrouter: `${GENERIC_PROVIDER_API_KEY_HINTS.de} Ein OpenRouter-Key schaltet die kuratierten Gateway-Modelle frei. Anfragen laufen über OpenRouter zum ausgewählten Upstream-Anbieter; direkte Anbieter-Keys bleiben getrennt.`,
     elevenlabs: `${GENERIC_PROVIDER_API_KEY_HINTS.de} Eingeschränkte ElevenLabs-Keys benötigen für TTS die Berechtigung „Text to Speech“ und für STT „Speech to Text“. „Voices read“ ist optional und schaltet nur die persönliche Stimmenbibliothek frei.`,
-    "moonshot-ai-kimi": `${GENERIC_PROVIDER_API_KEY_HINTS.de} Moonshot schaltet Kimi K3 erst nach einer erfolgreichen Kontoaufladung von mindestens 1 USD frei.`,
   },
   uk: {
     openrouter: `${GENERIC_PROVIDER_API_KEY_HINTS.uk} Один ключ OpenRouter відкриває доступ до наведених нижче моделей шлюзу. Запити проходять через OpenRouter до вибраного кінцевого провайдера; прямі ключі провайдерів залишаються окремими.`,
     elevenlabs: `${GENERIC_PROVIDER_API_KEY_HINTS.uk} Обмеженим ключам ElevenLabs потрібен дозвіл Text to Speech для TTS і Speech to Text для STT. Дозвіл Voices read необов’язковий і лише відкриває бібліотеку голосів облікового запису.`,
-    "moonshot-ai-kimi": `${GENERIC_PROVIDER_API_KEY_HINTS.uk} Moonshot відкриває доступ до Kimi K3 після щонайменше одного успішного поповнення рахунку на 1 долар США.`,
   },
   hi: {
     openrouter: `${GENERIC_PROVIDER_API_KEY_HINTS.hi} एक OpenRouter कुंजी नीचे दिए गए चुने हुए गेटवे मॉडल खोलती है। अनुरोध OpenRouter से चुने गए मूल प्रदाता तक जाते हैं; सीधे प्रदाता की कुंजियाँ अलग रहती हैं।`,
     elevenlabs: `${GENERIC_PROVIDER_API_KEY_HINTS.hi} सीमित ElevenLabs कुंजियों को TTS के लिए Text to Speech और STT के लिए Speech to Text अनुमति चाहिए। Voices read वैकल्पिक है और केवल खाते की आवाज़ लाइब्रेरी खोलता है।`,
-    "moonshot-ai-kimi": `${GENERIC_PROVIDER_API_KEY_HINTS.hi} Moonshot, Kimi K3 की पहुँच कम से कम 1 अमेरिकी डॉलर के एक सफल खाते के टॉप-अप के बाद खोलता है।`,
   },
   es: {
     openrouter: `${GENERIC_PROVIDER_API_KEY_HINTS.es} Una clave de OpenRouter desbloquea los modelos de pasarela seleccionados que aparecen abajo. Las solicitudes pasan por OpenRouter hasta el proveedor de origen elegido; las claves directas de los proveedores siguen separadas.`,
     elevenlabs: `${GENERIC_PROVIDER_API_KEY_HINTS.es} Las claves restringidas de ElevenLabs necesitan el permiso Text to Speech para TTS y Speech to Text para STT. Voices read es opcional y solo desbloquea la biblioteca de voces de la cuenta.`,
-    "moonshot-ai-kimi": `${GENERIC_PROVIDER_API_KEY_HINTS.es} Moonshot desbloquea el acceso a Kimi K3 después de una recarga correcta de al menos 1 USD.`,
   },
   fr: {
     openrouter: `${GENERIC_PROVIDER_API_KEY_HINTS.fr} Une clé OpenRouter déverrouille les modèles de passerelle sélectionnés ci-dessous. Les requêtes passent par OpenRouter vers le fournisseur en amont choisi ; les clés directes des fournisseurs restent séparées.`,
     elevenlabs: `${GENERIC_PROVIDER_API_KEY_HINTS.fr} Les clés ElevenLabs restreintes nécessitent l’autorisation Text to Speech pour le TTS et Speech to Text pour le STT. Voices read est facultatif et déverrouille uniquement la bibliothèque de voix du compte.`,
-    "moonshot-ai-kimi": `${GENERIC_PROVIDER_API_KEY_HINTS.fr} Moonshot déverrouille l’accès à Kimi K3 après au moins un rechargement réussi de 1 USD.`,
   },
   it: {
     openrouter: `${GENERIC_PROVIDER_API_KEY_HINTS.it} Una chiave OpenRouter sblocca i modelli gateway selezionati qui sotto. Le richieste passano tramite OpenRouter al provider a monte scelto; le chiavi dirette dei provider restano separate.`,
     elevenlabs: `${GENERIC_PROVIDER_API_KEY_HINTS.it} Le chiavi ElevenLabs con restrizioni richiedono l’autorizzazione Text to Speech per il TTS e Speech to Text per lo STT. Voices read è facoltativo e sblocca solo la libreria vocale dell’account.`,
-    "moonshot-ai-kimi": `${GENERIC_PROVIDER_API_KEY_HINTS.it} Moonshot sblocca l’accesso a Kimi K3 dopo almeno una ricarica riuscita di 1 USD.`,
   },
   pt: {
     openrouter: `${GENERIC_PROVIDER_API_KEY_HINTS.pt} Uma chave OpenRouter desbloqueia os modelos de gateway selecionados abaixo. Os pedidos passam pelo OpenRouter para o fornecedor de origem escolhido; as chaves diretas dos fornecedores permanecem separadas.`,
     elevenlabs: `${GENERIC_PROVIDER_API_KEY_HINTS.pt} As chaves ElevenLabs restritas precisam da permissão Text to Speech para TTS e Speech to Text para STT. Voices read é opcional e apenas desbloqueia a biblioteca de vozes da conta.`,
-    "moonshot-ai-kimi": `${GENERIC_PROVIDER_API_KEY_HINTS.pt} A Moonshot desbloqueia o acesso ao Kimi K3 depois de pelo menos um carregamento bem-sucedido de 1 USD.`,
   },
   "pt-BR": {
     openrouter: `${GENERIC_PROVIDER_API_KEY_HINTS["pt-BR"]} Uma chave OpenRouter desbloqueia os modelos de gateway selecionados abaixo. As solicitações passam pelo OpenRouter até o provedor de origem escolhido; as chaves diretas dos provedores permanecem separadas.`,
     elevenlabs: `${GENERIC_PROVIDER_API_KEY_HINTS["pt-BR"]} As chaves restritas da ElevenLabs precisam da permissão Text to Speech para TTS e Speech to Text para STT. Voices read é opcional e apenas libera a biblioteca de vozes da conta.`,
-    "moonshot-ai-kimi": `${GENERIC_PROVIDER_API_KEY_HINTS["pt-BR"]} A Moonshot libera o acesso ao Kimi K3 após pelo menos uma recarga bem-sucedida de 1 USD.`,
   },
   ru: {
     openrouter: `${GENERIC_PROVIDER_API_KEY_HINTS.ru} Один ключ OpenRouter открывает доступ к выбранным моделям шлюза ниже. Запросы проходят через OpenRouter к выбранному исходному провайдеру; прямые ключи провайдеров остаются отдельными.`,
     elevenlabs: `${GENERIC_PROVIDER_API_KEY_HINTS.ru} Ограниченным ключам ElevenLabs требуется разрешение Text to Speech для TTS и Speech to Text для STT. Voices read необязательно и открывает только библиотеку голосов аккаунта.`,
-    "moonshot-ai-kimi": `${GENERIC_PROVIDER_API_KEY_HINTS.ru} Moonshot открывает доступ к Kimi K3 после как минимум одного успешного пополнения счёта на 1 доллар США.`,
   },
   "zh-CN": {
     openrouter: `${GENERIC_PROVIDER_API_KEY_HINTS["zh-CN"]} 一个 OpenRouter 密钥可解锁下方精选的网关模型。请求会经由 OpenRouter 发送到所选的上游提供商；各提供商的直接密钥仍保持独立。`,
     elevenlabs: `${GENERIC_PROVIDER_API_KEY_HINTS["zh-CN"]} 受限的 ElevenLabs 密钥需要 Text to Speech 权限才能使用 TTS，需要 Speech to Text 权限才能使用 STT。Voices read 为可选权限，仅用于解锁账户语音库。`,
-    "moonshot-ai-kimi": `${GENERIC_PROVIDER_API_KEY_HINTS["zh-CN"]} Moonshot 会在账户至少成功充值 1 美元后解锁 Kimi K3。`,
   },
   ar: {
     openrouter: `${GENERIC_PROVIDER_API_KEY_HINTS.ar} يتيح مفتاح OpenRouter واحد نماذج البوابة المختارة أدناه. تمر الطلبات عبر OpenRouter إلى المزوّد الأصلي المحدد؛ وتظل مفاتيح المزوّدين المباشرة منفصلة.`,
     elevenlabs: `${GENERIC_PROVIDER_API_KEY_HINTS.ar} تحتاج مفاتيح ElevenLabs المقيّدة إلى إذن Text to Speech لخدمة TTS وإذن Speech to Text لخدمة STT. إذن Voices read اختياري ولا يتيح سوى مكتبة أصوات الحساب.`,
-    "moonshot-ai-kimi": `${GENERIC_PROVIDER_API_KEY_HINTS.ar} تتيح Moonshot الوصول إلى Kimi K3 بعد عملية شحن ناجحة واحدة على الأقل بقيمة دولار أمريكي واحد.`,
   },
 };
 

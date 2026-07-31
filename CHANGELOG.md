@@ -13,6 +13,13 @@ the complete Play Store translations are kept in a dedicated file under
 ### Changed
 
 - Display the current release version on the Settings overview.
+- Focus the direct provider list on OpenAI, OpenRouter, Anthropic, Google,
+  xAI, DeepSeek, Mistral, Alibaba Qwen, and ElevenLabs by removing the direct
+  ByteDance, Moonshot, and Perplexity integrations. Kimi K3 remains available
+  through OpenRouter.
+- Use one Gemini API key for Google chat, recorded-audio transcription, web
+  search, and speech synthesis; the legacy Google Cloud Speech credential
+  format is no longer supported.
 
 ## 2.5.6 - 2026-07-31
 

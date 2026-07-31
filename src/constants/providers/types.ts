@@ -20,7 +20,6 @@ export interface ModelEffortConfig {
     | "gemini-thinking-budget"
     | "gemini-thinking-level"
     | "deepseek-thinking-effort"
-    | "kimi-thinking"
     | "qwen-enable-thinking"
     | "reasoning-effort";
 }

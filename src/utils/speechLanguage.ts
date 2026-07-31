@@ -24,14 +24,6 @@ export function getProviderSpeechLanguageCode(
   return getSpeechLanguageDefinition(language).providerCode;
 }
 
-export function getGoogleCloudSpeechLanguageCode(
-  language: SttLanguage,
-) {
-  return language === "auto"
-    ? getDeviceLocale()
-    : getSpeechLanguageDefinition(language).googleCloudLocale;
-}
-
 export function getFileAudioMimeType(fileUri: string) {
   const normalized = fileUri.toLowerCase();
 

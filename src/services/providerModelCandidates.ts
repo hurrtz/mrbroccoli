@@ -10,9 +10,9 @@ function getCapabilityManifest(
   provider: Provider,
   capability: ProviderModelCapability,
 ) {
-  return RUNTIME_PROVIDER_MANIFEST[provider][
+  return RUNTIME_PROVIDER_MANIFEST[provider]?.[
     capability
-  ] as RuntimeProviderManifestEntry[ProviderModelCapability];
+  ] as RuntimeProviderManifestEntry[ProviderModelCapability] | undefined;
 }
 
 export function getProviderModelCandidates(params: {
@@ -23,8 +23,8 @@ export function getProviderModelCandidates(params: {
 }) {
   const manifest = getCapabilityManifest(params.provider, params.capability);
   const requestedModel =
-    params.requestedModel?.trim() || manifest.defaultModel?.trim() || "";
-  const candidates = [requestedModel, ...(manifest.fallbackModelIds ?? [])];
+    params.requestedModel?.trim() || manifest?.defaultModel?.trim() || "";
+  const candidates = [requestedModel, ...(manifest?.fallbackModelIds ?? [])];
   const unique = new Set<string>();
 
   for (const candidate of candidates) {

@@ -61,21 +61,8 @@ describe("model effort metadata", () => {
       "disabled",
     );
     expect(getDefaultModelEffort("deepseek", "deepseek-v4-pro")).toBe("high");
-    expect(
-      getDefaultModelEffort(
-        "bytedance-doubao-seed",
-        "doubao-seed-2-1-turbo-260628",
-      ),
-    ).toBe("high");
     expect(getDefaultModelEffort("alibaba-qwen-dashscope", "qwen3.7-plus-2026-05-26")).toBe(
       "enabled",
-    );
-    expect(getDefaultModelEffort("moonshot-ai-kimi", "kimi-k2.6")).toBe(
-      "enabled",
-    );
-    expect(getDefaultModelEffort("moonshot-ai-kimi", "kimi-k3")).toBe("max");
-    expect(getDefaultModelEffort("perplexity", "sonar-deep-research")).toBe(
-      "medium",
     );
   });
 
@@ -161,28 +148,6 @@ describe("model effort metadata", () => {
         (option) => option.id,
       ),
     ).toEqual(["none", "high"]);
-    expect(
-      getModelEffortOptions(
-        "bytedance-doubao-seed",
-        "doubao-seed-2-1-turbo-260628",
-      ).map((option) => option.id),
-    ).toEqual(["minimal", "low", "medium", "high"]);
-    expect(
-      getModelEffortOptions(
-        "bytedance-doubao-seed",
-        "doubao-seed-2-0-lite-260428",
-      ).map((option) => option.id),
-    ).toEqual(["minimal", "low", "medium", "high"]);
-    expect(
-      getModelEffortOptions("perplexity", "sonar-deep-research").map(
-        (option) => option.id,
-      ),
-    ).toEqual(["low", "medium", "high"]);
-    expect(
-      getModelEffortOptions("moonshot-ai-kimi", "kimi-k3").map(
-        (option) => option.id,
-      ),
-    ).toEqual(["low", "high", "max"]);
   });
 
   it("normalizes response routes to supported effort values", () => {
@@ -266,9 +231,6 @@ describe("model effort metadata", () => {
         "enabled",
       ),
     ).toBe("enabled");
-    expect(
-      getModelEffortRequestBody("moonshot-ai-kimi", "kimi-k3", "high"),
-    ).toEqual({ reasoning_effort: "high" });
     expect(
       getModelEffortRequestBody("openai", "gpt-5.6-sol", "max"),
     ).toEqual({ reasoning_effort: "xhigh" });

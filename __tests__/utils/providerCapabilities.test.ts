@@ -64,12 +64,15 @@ describe("provider capability selectors", () => {
     expect(getEnabledTtsProviders(settings)).toEqual(["elevenlabs"]);
   });
 
-  it("does not treat ByteDance speech-only credentials as runtime readiness", () => {
+  it.each([
+    "my-project|ya29.test-token|us",
+    "opaque-test-key|my-project|ya29.test-token|us",
+  ])("rejects retired Gemini credential format %s", (gemini) => {
     const settings = {
       ...DEFAULT_SETTINGS,
       apiKeys: {
         ...DEFAULT_SETTINGS.apiKeys,
-        "bytedance-doubao-seed": "speech-app-key|speech-access-key",
+        gemini,
       },
     };
 
@@ -78,49 +81,7 @@ describe("provider capability selectors", () => {
     expect(getEnabledTtsProviders(settings)).toEqual([]);
   });
 
-  it("treats ByteDance Ark credentials as LLM-only readiness", () => {
-    const settings = {
-      ...DEFAULT_SETTINGS,
-      apiKeys: {
-        ...DEFAULT_SETTINGS.apiKeys,
-        "bytedance-doubao-seed": "ark-api-key",
-      },
-    };
-
-    expect(getEnabledProviders(settings)).toEqual(["bytedance-doubao-seed"]);
-    expect(getEnabledSttProviders(settings)).toEqual([]);
-    expect(getEnabledTtsProviders(settings)).toEqual([]);
-  });
-
-  it("treats Gemini Cloud Speech-only credentials as STT-only readiness", () => {
-    const settings = {
-      ...DEFAULT_SETTINGS,
-      apiKeys: {
-        ...DEFAULT_SETTINGS.apiKeys,
-        gemini: "my-project|ya29.test-token|us",
-      },
-    };
-
-    expect(getEnabledProviders(settings)).toEqual([]);
-    expect(getEnabledSttProviders(settings)).toEqual(["gemini"]);
-    expect(getEnabledTtsProviders(settings)).toEqual([]);
-  });
-
-  it("treats combined Gemini AI Studio and Cloud Speech credentials as ready for llm, stt, and tts", () => {
-    const settings = {
-      ...DEFAULT_SETTINGS,
-      apiKeys: {
-        ...DEFAULT_SETTINGS.apiKeys,
-        gemini: "opaque-test-key|my-project|ya29.test-token|us",
-      },
-    };
-
-    expect(getEnabledProviders(settings)).toEqual(["gemini"]);
-    expect(getEnabledSttProviders(settings)).toEqual(["gemini"]);
-    expect(getEnabledTtsProviders(settings)).toEqual(["gemini"]);
-  });
-
-  it("treats any non-empty Gemini key as ready for llm, stt, and tts validation", () => {
+  it("treats a Gemini API key as ready for llm, stt, and tts validation", () => {
     const settings = {
       ...DEFAULT_SETTINGS,
       apiKeys: {

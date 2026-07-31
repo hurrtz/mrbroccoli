@@ -7,13 +7,8 @@ import {
 import type { Provider } from "../../types";
 import type { ModelInfo } from "./types";
 import { PROVIDER_CONFIGS, PROVIDER_ORDER } from "./catalogData";
+import { RETIRED_PROVIDER_LABELS } from "./retiredProviders";
 import { isRuntimeProviderId } from "./runtimeState";
-
-const LEGACY_PROVIDER_LABELS: Readonly<Record<string, string>> = {
-  "bytedance-doubao-seed": "ByteDance",
-  "moonshot-ai-kimi": "Moonshot",
-  perplexity: "Perplexity",
-};
 
 export const PROVIDER_LABELS: Record<Provider, string> = Object.fromEntries(
   PROVIDER_ORDER.map((provider) => [provider, PROVIDER_CONFIGS[provider].label]),
@@ -32,7 +27,10 @@ export function getProviderLabel(provider: Provider | string) {
     return PROVIDER_LABELS[provider];
   }
 
-  return LEGACY_PROVIDER_LABELS[provider] ?? provider;
+  return (
+    (RETIRED_PROVIDER_LABELS as Readonly<Record<string, string>>)[provider] ??
+    provider
+  );
 }
 
 export function getProviderModelName(

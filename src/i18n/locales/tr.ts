@@ -865,10 +865,6 @@ export const tr = {
   noBase64DecoderAvailable: "Base64 kod çözücü yok.",
   azureSpeechApiKeyFormat:
     "Microsoft Azure TTS, <key>|<region> biçiminde Azure Konuşma kimlik bilgilerine ihtiyaç duyar; örneğin abc123|westeurope veya birleşik Azure biçimi <endpoint>|<api-key>|<key>|<region>.",
-  googleCloudSpeechCredentialFormat: ({ provider }) =>
-    `${provider} STT, <project-id>|<access-token>|<location> biçiminde Google Cloud Speech kimlik bilgilerine veya birleşik Gemini biçimi <Gemini API key>|<project-id>|<access-token>|<location>'ye ihtiyaç duyar.`,
-  bytedanceSpeechCredentialFormat: ({ provider }) =>
-    `${provider} STT, <app-key>|<access-key> biçiminde Doubao, isteğe bağlı olarak <app-key>|<access-key>|<resource-id> veya <ark-api-key>|<app-key>|<access-key>|<resource-id> birleşik biçiminde Doubao Konuşma kimlik bilgilerine ihtiyaç duyar.`,
   nativeTtsDoesNotSynthesizeAudioFiles:
     "Yerel TTS, ses dosyalarını sentezlemez.",
   localTtsUnavailableForLanguage: ({ languageLabel }) =>

@@ -863,10 +863,6 @@ export const ja = {
   noBase64DecoderAvailable: "利用可能なBase64デコーダーがありません。",
   azureSpeechApiKeyFormat:
     "Microsoft Azure TTS には、<key>|<region> 形式 (abc123|westeurope など)、または結合された Azure 形式 <endpoint>|<api-key>|<key>|<region> の形式の Azure Speech 資格情報が必要です。",
-  googleCloudSpeechCredentialFormat: ({ provider }) =>
-    `${provider} STT には、<project-id>|<access-token>|<location> 形式、または組み合わせた Gemini 形式 <Gemini API key>|<project-id>|<access-token>|<location> 形式の Google Cloud Speech 認証情報が必要です。`,
-  bytedanceSpeechCredentialFormat: ({ provider }) =>
-    `${provider} STTには、<app-key>|<access-key>、任意で<app-key>|<access-key>|<resource-id>、または統合形式の<ark-api-key>|<app-key>|<access-key>|<resource-id>によるDoubao Speech認証情報が必要です。`,
   nativeTtsDoesNotSynthesizeAudioFiles:
     "ネイティブ TTS はオーディオ ファイルを合成しません。",
   localTtsUnavailableForLanguage: ({ languageLabel }) =>

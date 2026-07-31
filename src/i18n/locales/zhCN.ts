@@ -856,10 +856,6 @@ export const zhCN = {
   noBase64DecoderAvailable: "没有可用的 Base64 解码器。",
   azureSpeechApiKeyFormat:
     "Microsoft Azure TTS 需要 <key>|<region> 格式的 Azure 语音凭据，例如 abc123|westeurope，或组合的 Azure 格式 <endpoint>|<api-key>|<key>|<region>。",
-  googleCloudSpeechCredentialFormat: ({ provider }) =>
-    `${provider} STT 需要 Google Cloud Speech 凭证，格式为 <project-id>|<access-token>|<location>，或组合的 Gemini 格式 <Gemini API key>|<project-id>|<access-token>|<location>。`,
-  bytedanceSpeechCredentialFormat: ({ provider }) =>
-    `${provider} STT 需要 Doubao 格式为 <app-key>|<access-key> 的语音凭证，可选 <app-key>|<access-key>|<resource-id> 或组合格式<ark-api-key>|<app-key>|<access-key>|<resource-id>。`,
   nativeTtsDoesNotSynthesizeAudioFiles:
     "Native TTS 不合成音频文件。",
   localTtsUnavailableForLanguage: ({ languageLabel }) =>

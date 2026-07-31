@@ -2,9 +2,8 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as SecureStore from "expo-secure-store";
 import type { Provider, ProviderApiKeys, Settings } from "../../types";
 import { reportPersistenceAlert } from "../../services/persistenceAlerts";
-import {
-  RUNTIME_PROVIDER_IDS,
-} from "../../constants/providers/runtimeState";
+import { RUNTIME_PROVIDER_IDS } from "../../constants/providers/runtimeState";
+import { RETIRED_PROVIDER_IDS } from "../../constants/providers/retiredProviders";
 import {
   API_KEY_STORAGE_PREFIX,
   type LegacyStoredSettings,
@@ -43,7 +42,7 @@ async function awaitPendingMutation(key: string) {
   await mutationQueues.get(key);
 }
 
-export function getApiKeyStorageKey(provider: Provider) {
+export function getApiKeyStorageKey(provider: Provider | string) {
   const safeProvider = provider.replace(/[^0-9A-Za-z._-]/g, "_");
   return `${API_KEY_STORAGE_PREFIX}.${safeProvider}`;
 }
@@ -87,6 +86,20 @@ export async function loadStoredApiKeys(): Promise<ProviderApiKeys> {
     RUNTIME_PROVIDER_IDS.map((provider) => [provider, ""]),
   ) as ProviderApiKeys;
   const failedStorageKeys = new Set<string>();
+
+  await Promise.all(
+    RETIRED_PROVIDER_IDS.map(async (provider) => {
+      try {
+        await SecureStore.deleteItemAsync(getApiKeyStorageKey(provider));
+      } catch (error) {
+        console.error(
+          `[settings-storage] failed to remove retired API key for ${provider}`,
+          error,
+        );
+        reportPersistenceAlert("settings", "save");
+      }
+    }),
+  );
 
   const readStoredValue = async (key: string, label: string) => {
     try {

@@ -45,9 +45,6 @@ const PROVIDER_MODEL_ALIAS_MIGRATIONS: Partial<
   gemini: {
     "gemini-3.1-flash-live-preview": "gemini-2.5-flash",
   },
-  "moonshot-ai-kimi": {
-    "kimi-k2.5": "kimi-k3",
-  },
 };
 
 export function migrateProviderModelAlias(provider: Provider, model: string) {

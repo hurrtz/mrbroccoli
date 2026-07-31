@@ -35,12 +35,9 @@ describe("webSearch", () => {
       "openai",
       "anthropic",
       "alibaba-qwen-dashscope",
-      "bytedance-doubao-seed",
       "gemini",
       "xai",
       "mistral",
-      "moonshot-ai-kimi",
-      "perplexity",
     ]);
     expect(WEB_SEARCH_PROVIDER_IDS).toEqual(
       expect.not.arrayContaining([
@@ -345,32 +342,6 @@ describe("webSearch", () => {
       expectedSourceUrl: "https://example.com/qwen-search",
     },
     {
-      provider: "bytedance-doubao-seed",
-      url: "https://ark.cn-beijing.volces.com/api/v3/responses",
-      response: {
-        output_text: "Doubao web search found the current answer.",
-        output: [
-          {
-            type: "web_search_call",
-            action: {
-              sources: [
-                {
-                  title: "Doubao search result",
-                  url: "https://example.com/doubao-search",
-                },
-              ],
-            },
-          },
-        ],
-      },
-      assertBody: (body: Record<string, unknown>) => {
-        expect(body.tools).toEqual([{ type: "web_search" }]);
-        expect(body.model).toBe("doubao-seed-2-1-turbo-260628");
-      },
-      expectedSummary: "Doubao web search found the current answer.",
-      expectedSourceUrl: "https://example.com/doubao-search",
-    },
-    {
       provider: "gemini",
       url: "https://generativelanguage.googleapis.com/v1beta/interactions",
       response: {
@@ -503,157 +474,6 @@ describe("webSearch", () => {
     },
   );
 
-  it("runs Kimi built-in web search through the required tool handoff", async () => {
-    (fetch as jest.Mock)
-      .mockResolvedValueOnce({
-        ok: true,
-        json: () =>
-          Promise.resolve({
-            choices: [
-              {
-                finish_reason: "tool_calls",
-                message: {
-                  role: "assistant",
-                  content: null,
-                  tool_calls: [
-                    {
-                      id: "call_1",
-                      type: "builtin_function",
-                      function: {
-                        name: "$web_search",
-                        arguments: '{"query":"current answer"}',
-                      },
-                    },
-                  ],
-                },
-              },
-            ],
-          }),
-      })
-      .mockResolvedValueOnce({
-        ok: true,
-        json: () =>
-          Promise.resolve({
-            choices: [
-              {
-                message: {
-                  content: "Kimi web search found the current answer.",
-                },
-              },
-            ],
-            citations: [
-              {
-                title: "Kimi search result",
-                url: "https://example.com/kimi-search",
-              },
-            ],
-          }),
-      });
-
-    const result = await searchWeb({
-      provider: "moonshot-ai-kimi",
-      apiKey: "kimi-key",
-      language: "en",
-      query: "What changed today?",
-    });
-
-    expect(fetch).toHaveBeenCalledTimes(2);
-    expect(fetch).toHaveBeenNthCalledWith(
-      1,
-      "https://api.moonshot.ai/v1/chat/completions",
-      expect.objectContaining({ method: "POST" }),
-    );
-    expect(fetchBody(0)).toEqual(
-      expect.objectContaining({
-        model: "kimi-k2.6",
-        thinking: { type: "disabled" },
-        tools: [
-          {
-            type: "builtin_function",
-            function: { name: "$web_search" },
-          },
-        ],
-      }),
-    );
-    expect(fetchBody(1).messages).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({
-          role: "tool",
-          tool_call_id: "call_1",
-          content: '{"query":"current answer"}',
-        }),
-      ]),
-    );
-    expect(result).toEqual(
-      expect.objectContaining({
-        model: "kimi-k2.6",
-        provider: "moonshot-ai-kimi",
-        summary: "Kimi web search found the current answer.",
-        sources: [
-          {
-            title: "Kimi search result",
-            url: "https://example.com/kimi-search",
-          },
-        ],
-      }),
-    );
-  });
-
-  it("returns a normalized summary and search_results list for Perplexity", async () => {
-    (fetch as jest.Mock).mockResolvedValueOnce({
-      ok: true,
-      json: () =>
-        Promise.resolve({
-          model: "sonar",
-          choices: [
-            {
-              message: {
-                role: "assistant",
-                content:
-                  "The latest Perseverance update confirms continued sampling activity.",
-              },
-            },
-          ],
-          search_results: [
-            {
-              title: "NASA Perseverance Rover",
-              url: "https://example.com/perseverance",
-              date: "2026-03-25",
-            },
-          ],
-          citations: ["https://example.com/perseverance"],
-        }),
-    });
-
-    const result = await searchWeb({
-      provider: "perplexity",
-      apiKey: "pplx-test",
-      language: "en",
-      query: "What is the latest Perseverance rover update?",
-    });
-
-    expect(fetch).toHaveBeenCalledWith(
-      "https://api.perplexity.ai/chat/completions",
-      expect.objectContaining({
-        method: "POST",
-      }),
-    );
-    expect(result).toEqual(
-      expect.objectContaining({
-        model: "sonar",
-        provider: "perplexity",
-        summary:
-          "The latest Perseverance update confirms continued sampling activity.",
-        sources: [
-          {
-            title: "NASA Perseverance Rover",
-            url: "https://example.com/perseverance",
-          },
-        ],
-      }),
-    );
-  });
-
   it("skips provider requests for blank queries", async () => {
     const result = await searchWeb({
       provider: "openai",
@@ -782,36 +602,4 @@ describe("webSearch", () => {
     );
   });
 
-  it("validates the configured provider through the web search service", async () => {
-    (fetch as jest.Mock).mockResolvedValueOnce({
-      ok: true,
-      json: () =>
-        Promise.resolve({
-          choices: [
-            {
-              message: {
-                role: "assistant",
-                content: "Today in UTC it is 2026-03-25.",
-              },
-            },
-          ],
-          search_results: [],
-        }),
-    });
-
-    await expect(
-      validateWebSearchConnection({
-        provider: "perplexity",
-        apiKey: "pplx-test",
-        language: "en",
-      }),
-    ).resolves.toBeUndefined();
-
-    expect(fetch).toHaveBeenCalledWith(
-      "https://api.perplexity.ai/chat/completions",
-      expect.objectContaining({
-        method: "POST",
-      }),
-    );
-  });
 });

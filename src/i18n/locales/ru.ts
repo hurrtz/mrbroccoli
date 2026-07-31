@@ -859,10 +859,6 @@ export const ru = {
   noBase64DecoderAvailable: "Декодера base64 нет.",
   azureSpeechApiKeyFormat:
     "Microsoft Azure TTS требуются учетные данные Azure Speech в формате <key>|<region>, например abc123|westeurope, или комбинированный формат Azure <endpoint>|<api-key>|<key>|<region>.",
-  googleCloudSpeechCredentialFormat: ({ provider }) =>
-    `${provider} STT требуются учетные данные Google Cloud Speech в формате <project-id>|<access-token>|<location> или комбинированном формате Gemini. <Gemini API key>|<project-id>|<access-token>|<location>.`,
-  bytedanceSpeechCredentialFormat: ({ provider }) =>
-    `${provider} STT требуется Doubao Речевые учетные данные в формате <app-key>|<access-key>, дополнительно <app-key>|<access-key>|<resource-id> или комбинированном формате <ark-api-key>|<app-key>|<access-key>|<resource-id>.`,
   nativeTtsDoesNotSynthesizeAudioFiles:
     "Родной TTS не синтезирует аудиофайлы.",
   localTtsUnavailableForLanguage: ({ languageLabel }) =>

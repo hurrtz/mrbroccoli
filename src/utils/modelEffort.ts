@@ -209,12 +209,6 @@ export function getModelEffortRequestBody(
         },
         reasoning_effort: value,
       };
-    case "kimi-thinking":
-      return {
-        thinking: {
-          type: value,
-        },
-      };
     case "qwen-enable-thinking":
       return {
         enable_thinking: value === "enabled",

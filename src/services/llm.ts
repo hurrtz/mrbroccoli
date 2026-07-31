@@ -102,7 +102,6 @@ interface StreamingLlmRequestParams extends LlmRequestParams {
   onStreamActivity?: () => void;
   onGeminiAssistantContent?: (content: GeminiAssistantContentPart[]) => void;
   onMistralAssistantContent?: (content: MistralAssistantContentChunk[]) => void;
-  onKimiReasoningContent?: (content: string) => void;
   onOpenRouterMetadata?: (metadata: MessageRouterMetadata) => void;
 }
 
@@ -252,7 +251,6 @@ const LLM_STREAM_REQUESTERS = {
       onChunk: params.onChunk,
       onStreamActivity: params.onStreamActivity,
       onMistralAssistantContent: params.onMistralAssistantContent,
-      onKimiReasoningContent: params.onKimiReasoningContent,
       onOpenRouterMetadata: params.onOpenRouterMetadata,
       abortSignal: params.abortSignal,
     }),
@@ -599,7 +597,7 @@ export async function streamChat({
   let releaseAbortSignal: (() => void) | null = null;
 
   try {
-    const requestMessages = addResponseProvenanceToMessages(messages, provider);
+    const requestMessages = addResponseProvenanceToMessages(messages);
     const requestedSystemPrompt = buildSystemPrompt({
       assistantInstructions,
       responseLength,
@@ -730,15 +728,6 @@ export async function streamChat({
                       providerState: {
                         ...replyMetadata?.providerState,
                         mistralAssistantContent: content,
-                      },
-                    };
-                  },
-                  onKimiReasoningContent: (content) => {
-                    replyMetadata = {
-                      ...replyMetadata,
-                      providerState: {
-                        ...replyMetadata?.providerState,
-                        kimiReasoningContent: content,
                       },
                     };
                   },

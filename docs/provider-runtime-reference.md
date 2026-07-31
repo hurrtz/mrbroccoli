@@ -1,6 +1,6 @@
 # Provider Runtime Reference
 
-Last updated: 2026-07-27
+Last updated: 2026-07-31
 
 This document tracks the providers that are present in Mr Broccoli's runtime
 manifest. The source of truth is `src/constants/providers/runtimeManifest.ts`;
@@ -10,8 +10,6 @@ this file is a human-readable reference for product and maintenance decisions.
 
 - Runtime providers must be useful for the voice-first conversation loop.
 - Dedicated web-search and web-data vendors are no longer runtime providers.
-- Perplexity remains because Sonar is treated as a grounded answer LLM, not as a
-  raw search backend.
 - Model pickers are curated. They intentionally exclude deprecated,
   alias-only, wrong-endpoint, coding-only, image/video-only, Chinese-only, and
   Mandarin-only rows.
@@ -26,8 +24,11 @@ The following providers are intentionally absent from runtime settings,
 validation, API-key storage, setup-guide routing, and web-search dispatch:
 
 - `brave`
+- `bytedance-doubao-seed`
 - `exa`
 - `firecrawl`
+- `moonshot-ai-kimi`
+- `perplexity`
 - `serpapi`
 - `tavily`
 
@@ -39,14 +40,11 @@ validation, API-key storage, setup-guide routing, and web-search dispatch:
 | `openrouter` | none | enabled | none | none | Optional multi-provider gateway with route metadata and privacy-constrained routing. |
 | `anthropic` | enabled | enabled | none | none | Claude Messages plus Anthropic web search. |
 | `alibaba-qwen-dashscope` | enabled | enabled | enabled | enabled | OpenAI-compatible chat plus Qwen Responses search and simple DashScope ASR/TTS routes. |
-| `bytedance-doubao-seed` | enabled | enabled | none | none | Ark chat plus Ark Responses web search; Doubao Speech is not runtime-exposed. |
-| `gemini` | enabled | enabled | enabled | enabled | Gemini GenerateContent/Live, Interactions search, Google Cloud Speech, and Gemini TTS. |
+| `gemini` | enabled | enabled | enabled | enabled | One AI Studio key covers Gemini GenerateContent/Live, Interactions search, recorded-audio transcription, and Gemini TTS. |
 | `xai` | enabled | enabled | enabled | enabled | Grok chat/Responses search plus standalone xAI STT/TTS routes. |
 | `deepseek` | none | enabled | none | none | DeepSeek chat completions only. |
 | `mistral` | enabled | enabled | enabled | enabled | Chat completions, Conversations web search, Voxtral Mini Transcribe 2, and Voxtral TTS. |
 | `elevenlabs` | none | none | enabled | enabled | Scribe STT plus TTS; account voice discovery is optional. |
-| `moonshot-ai-kimi` | enabled | enabled | none | none | Kimi OpenAI-compatible chat plus built-in web search. |
-| `perplexity` | enabled | enabled | none | none | Sonar chat completions are used for grounded answers. |
 
 ## Provider Details
 
@@ -100,17 +98,6 @@ validation, API-key storage, setup-guide routing, and web-search dispatch:
 - STT picker: `qwen3-asr-flash`.
 - TTS picker: `qwen3-tts-flash`, `qwen3-tts-instruct-flash`.
 
-### ByteDance / Doubao (`bytedance-doubao-seed`)
-
-- LLM transport: Volcengine Ark OpenAI-compatible chat completions.
-- Web search: Volcengine Ark Responses API with the provider-native web-search
-  tool.
-- LLM picker: Doubao Seed 2.1 Turbo/Pro and curated Seed 2.0 rows.
-- Effort: `reasoning_effort` on Seed 2.1 and Seed 2.0 rows.
-- STT/TTS: not runtime-exposed. Doubao Speech remains catalog context only
-  because the wired route is China-first and not a clearly multilingual BYOK
-  speech option for Mr Broccoli.
-
 ### Google / Gemini (`gemini`)
 
 - LLM transport: Gemini `models.generateContent`.
@@ -121,9 +108,9 @@ validation, API-key storage, setup-guide routing, and web-search dispatch:
 - Effort: `generationConfig.thinkingConfig.thinkingLevel` for Gemini 3.x rows
   that expose thinking levels.
 - Web search: Gemini Interactions API with `google_search` grounding.
-- STT picker: `gemini-3.5-flash` for AI Studio credentials. Existing Google
-  Cloud Speech credentials continue to use `chirp_3` through the compatibility
-  route.
+- STT picker: Gemini 3.6/3.5 Flash models transcribe recorded audio through
+  `generateContent` with the same AI Studio API key used by the other Google
+  capabilities.
 - TTS picker: Gemini TTS preview rows.
 
 ### xAI (`xai`)
@@ -178,28 +165,3 @@ validation, API-key storage, setup-guide routing, and web-search dispatch:
 - Restricted keys need Text to Speech permission for TTS and Speech to Text
   permission for STT. Voices read is optional and only enables account voice
   discovery.
-
-### Moonshot / Kimi (`moonshot-ai-kimi`)
-
-- LLM transport: OpenAI-compatible chat completions.
-- LLM picker: `kimi-k3`, `kimi-k2.7-code`,
-  `kimi-k2.7-code-highspeed`, `kimi-k2.6`.
-- Effort: Kimi K3 reasoning effort plus a `thinking.type` toggle for Kimi K2.6.
-- Web search: Kimi built-in `$web_search` tool on Kimi K2.6. Kimi K3 remains
-  the default chat route, but Moonshot currently advises against using K3 web
-  search in production while that capability is being updated. Mr Broccoli
-  disables Kimi thinking for the K2.6 search route as required by Moonshot's
-  web-search API contract.
-- STT/TTS: not runtime-exposed.
-
-### Perplexity (`perplexity`)
-
-- LLM transport: Sonar chat-completions compatibility endpoint.
-- Endpoint: the OpenAI-compatible `/chat/completions` alias accepted by the
-  canonical Sonar `/v1/sonar` API.
-- Web search: enabled through Sonar grounded answers.
-- LLM picker: `sonar`, `sonar-pro`, `sonar-reasoning-pro`,
-  `sonar-deep-research`.
-- Effort: `reasoning_effort` with low, medium, and high on
-  `sonar-deep-research`.
-- STT/TTS: not runtime-exposed.

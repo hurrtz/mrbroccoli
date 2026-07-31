@@ -267,6 +267,7 @@ export interface GeminiAssistantContentPart {
 export interface MessageProviderState {
   geminiAssistantContent?: GeminiAssistantContentPart[];
   mistralAssistantContent?: MistralAssistantContentChunk[];
+  /** Retained so conversations created by the removed direct Moonshot route remain readable. */
   kimiReasoningContent?: string;
 }
 

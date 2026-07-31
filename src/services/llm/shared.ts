@@ -104,17 +104,6 @@ export function toOpenAICompatibleMessages(
       };
     }
 
-    if (provider === "moonshot-ai-kimi" && message.role === "assistant") {
-      const reasoningContent =
-        message.metadata?.providerState?.kimiReasoningContent;
-
-      return {
-        role: message.role,
-        content: message.content,
-        ...(reasoningContent ? { reasoning_content: reasoningContent } : {}),
-      };
-    }
-
     return {
       role: message.role,
       content: message.content,

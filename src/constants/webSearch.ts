@@ -2,12 +2,9 @@ export const WEB_SEARCH_PROVIDER_IDS = [
   "openai",
   "anthropic",
   "alibaba-qwen-dashscope",
-  "bytedance-doubao-seed",
   "gemini",
   "xai",
   "mistral",
-  "moonshot-ai-kimi",
-  "perplexity",
 ] as const;
 export type WebSearchProvider = (typeof WEB_SEARCH_PROVIDER_IDS)[number];
 
@@ -80,12 +77,9 @@ export const WEB_SEARCH_PROVIDER_MODELS: Record<WebSearchProvider, string> = {
   openai: "gpt-5.6-sol",
   anthropic: "claude-sonnet-5",
   "alibaba-qwen-dashscope": "qwen3.7-plus-2026-05-26",
-  "bytedance-doubao-seed": "doubao-seed-2-1-turbo-260628",
   gemini: "gemini-3.6-flash",
   xai: "grok-4.3",
   mistral: "mistral-medium-3-5",
-  "moonshot-ai-kimi": "kimi-k2.6",
-  perplexity: "sonar",
 };
 export const WEB_SEARCH_PROVIDER_MODEL_CANDIDATES: Record<
   WebSearchProvider,
@@ -102,16 +96,9 @@ export const WEB_SEARCH_PROVIDER_MODEL_CANDIDATES: Record<
     "qwen3.6-flash-2026-04-16",
     "qwen3.5-flash-2026-02-23",
   ],
-  "bytedance-doubao-seed": [
-    "doubao-seed-2-1-turbo-260628",
-    "doubao-seed-2-0-lite-260428",
-    "doubao-seed-2-0-mini-260428",
-  ],
   gemini: ["gemini-3.6-flash", "gemini-3.5-flash", "gemini-3.5-flash-lite"],
   xai: ["grok-4.3", "grok-4.5"],
   mistral: ["mistral-medium-3-5", "mistral-small-2603", "mistral-large-2512"],
-  "moonshot-ai-kimi": ["kimi-k2.6", "kimi-k3", "kimi-k2.7-code-highspeed"],
-  perplexity: ["sonar", "sonar-pro", "sonar-reasoning-pro"],
 };
 export const WEB_SEARCH_MAX_SOURCES = 5;
 export const WEB_SEARCH_RESULT_LIMIT = 5;
@@ -122,12 +109,9 @@ export const WEB_SEARCH_TIMEOUT_MS_BY_PROVIDER: Record<
   openai: 25000,
   anthropic: 30000,
   "alibaba-qwen-dashscope": 30000,
-  "bytedance-doubao-seed": 30000,
   gemini: 30000,
   xai: 30000,
   mistral: 30000,
-  "moonshot-ai-kimi": 30000,
-  perplexity: 25000,
 };
 
 export const WEB_SEARCH_PROVIDER_KIND: Record<
@@ -137,12 +121,9 @@ export const WEB_SEARCH_PROVIDER_KIND: Record<
   openai: "grounded-answer",
   anthropic: "grounded-answer",
   "alibaba-qwen-dashscope": "grounded-answer",
-  "bytedance-doubao-seed": "grounded-answer",
   gemini: "grounded-answer",
   xai: "grounded-answer",
   mistral: "grounded-answer",
-  "moonshot-ai-kimi": "grounded-answer",
-  perplexity: "grounded-answer",
 };
 
 export function createDefaultWebSearchProviderSettings() {

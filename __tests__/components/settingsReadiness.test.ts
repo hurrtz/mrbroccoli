@@ -264,29 +264,24 @@ describe("settings readiness", () => {
     expectStatus(readiness.search, "ready");
   });
 
-  it.each([
-    ["gemini", "project-id|ya29.speech-token|us"],
-    ["bytedance-doubao-seed", "speech-app-key|speech-access-key"],
-  ] as const)(
-    "does not treat %s speech-only credentials as web-search readiness",
-    (provider, apiKey) => {
-      const settings = withSettings({
-        webSearchMode: "off",
-        webSearchProvider: provider,
-        apiKeys: {
-          ...DEFAULT_SETTINGS.apiKeys,
-          [provider]: apiKey,
-        },
-      });
+  it("does not treat retired Gemini composite credentials as web-search readiness", () => {
+    const provider = "gemini";
+    const settings = withSettings({
+      webSearchMode: "off",
+      webSearchProvider: provider,
+      apiKeys: {
+        ...DEFAULT_SETTINGS.apiKeys,
+        [provider]: "project-id|ya29.speech-token|us",
+      },
+    });
 
-      const readiness = getSettingsReadiness(settings, {
-        llmProviders: [],
-        sttProviders: [provider],
-        ttsProviders: [],
-        searchProviders: [provider],
-      });
+    const readiness = getSettingsReadiness(settings, {
+      llmProviders: [],
+      sttProviders: [],
+      ttsProviders: [],
+      searchProviders: [provider],
+    });
 
-      expectStatus(readiness.search, "broken");
-    },
-  );
+    expectStatus(readiness.search, "broken");
+  });
 });

@@ -29,14 +29,14 @@ describe("mainScreenRouteConfiguration", () => {
         elevenlabs: " eleven-key ",
         mistral: " mistral-key ",
         openai: " openai-key ",
-        perplexity: " search-key ",
+        xai: " search-key ",
       },
       sttMode: "provider" as const,
       sttProvider: "mistral" as const,
       ttsMode: "provider" as const,
       ttsProvider: "elevenlabs" as const,
       webSearchMode: "on" as const,
-      webSearchProvider: "perplexity" as const,
+      webSearchProvider: "xai" as const,
     };
 
     const result = getMainScreenRouteConfiguration(settings, true);
@@ -59,7 +59,7 @@ describe("mainScreenRouteConfiguration", () => {
         voiceInputDisabled: false,
         webSearchActive: true,
         webSearchApiKey: "search-key",
-        webSearchProvider: "perplexity",
+        webSearchProvider: "xai",
         webSearchReady: true,
       }),
     );

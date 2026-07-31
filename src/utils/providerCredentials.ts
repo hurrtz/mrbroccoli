@@ -1,12 +1,5 @@
 import type { Provider, ProviderCapability } from "../types";
-import {
-  parseBytedanceArkCredentials,
-  parseBytedanceSpeechCredentials,
-} from "../services/bytedance";
-import {
-  parseGoogleAiStudioCredentials,
-  parseGoogleCloudSpeechCredentials,
-} from "../services/google";
+import { parseGoogleAiStudioCredentials } from "../services/google";
 import {
   parseQwenApiCredential,
   qwenRegionSupportsAppSpeech,
@@ -25,24 +18,14 @@ export function hasAnyProviderCredential(provider: Provider, apiKey: string) {
   }
 
   if (provider === "gemini") {
-    return (
-      parseGoogleAiStudioCredentials(trimmedApiKey) !== null ||
-      parseGoogleCloudSpeechCredentials(trimmedApiKey) !== null
-    );
+    return parseGoogleAiStudioCredentials(trimmedApiKey) !== null;
   }
 
   if (provider === "alibaba-qwen-dashscope") {
     return Boolean(parseQwenApiCredential(trimmedApiKey).apiKey);
   }
 
-  if (provider !== "bytedance-doubao-seed") {
-    return true;
-  }
-
-  return (
-    parseBytedanceArkCredentials(trimmedApiKey) !== null ||
-    parseBytedanceSpeechCredentials(trimmedApiKey) !== null
-  );
+  return true;
 }
 
 export function hasProviderCredentialForCapability(
@@ -57,17 +40,7 @@ export function hasProviderCredentialForCapability(
   }
 
   if (provider === "gemini") {
-    switch (capability) {
-      case "llm":
-      case "tts":
-      case "search":
-        return parseGoogleAiStudioCredentials(trimmedApiKey) !== null;
-      case "stt":
-        return (
-          parseGoogleAiStudioCredentials(trimmedApiKey) !== null ||
-          parseGoogleCloudSpeechCredentials(trimmedApiKey) !== null
-        );
-    }
+    return parseGoogleAiStudioCredentials(trimmedApiKey) !== null;
   }
 
   if (provider === "alibaba-qwen-dashscope") {
@@ -84,17 +57,5 @@ export function hasProviderCredentialForCapability(
     );
   }
 
-  if (provider !== "bytedance-doubao-seed") {
-    return true;
-  }
-
-  switch (capability) {
-    case "llm":
-    case "search":
-      return parseBytedanceArkCredentials(trimmedApiKey) !== null;
-    case "stt":
-      return parseBytedanceSpeechCredentials(trimmedApiKey) !== null;
-    case "tts":
-      return false;
-  }
+  return true;
 }

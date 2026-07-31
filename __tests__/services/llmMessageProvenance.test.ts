@@ -76,28 +76,6 @@ describe("LLM message provenance", () => {
     ]);
   });
 
-  it("replays Kimi assistant history unchanged when continuing with Kimi", () => {
-    const message = {
-      role: "assistant" as const,
-      content: "The answer is 42.",
-      model: "kimi-k3",
-      provider: "moonshot-ai-kimi" as const,
-      metadata: {
-        providerState: {
-          kimiReasoningContent: "Think carefully.",
-        },
-      },
-    };
-
-    const annotated = addResponseProvenanceToMessages(
-      [message],
-      "moonshot-ai-kimi",
-    );
-
-    expect(annotated[0]).toBe(message);
-    expect(annotated[0].content).toBe("The answer is 42.");
-  });
-
   it("describes both current and historical identities without encouraging output labels", () => {
     expect(
       buildResponseProvenanceInstruction({

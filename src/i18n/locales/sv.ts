@@ -861,10 +861,6 @@ export const sv = {
   noBase64DecoderAvailable: "Ingen base64-avkodare tillgänglig.",
   azureSpeechApiKeyFormat:
     "Microsoft Azure TTS behöver Azure Speech-referenser i formatet <key>|<region>, till exempel abc123|westeurope, eller det kombinerade Azure-formatet <endpoint>|<api-key>|<key>|<region>.",
-  googleCloudSpeechCredentialFormat: ({ provider }) =>
-    `${provider} STT behöver Google Cloud Speech-referenser i formatet <project-id>|<access-token>|<location>, eller det kombinerade Gemini-formatet <Gemini API key>|<project-id>|<access-token>|XQPH.`,
-  bytedanceSpeechCredentialFormat: ({ provider }) =>
-    `${provider} STT behöver Doubao Talreferenser i formatet <app-key>|<access-key>, valfritt <app-key>|<access-key>|<resource-id>, eller det kombinerade formatet <ark-api-key>|<app-key>|<access-key>|<resource-id>.`,
   nativeTtsDoesNotSynthesizeAudioFiles:
     "Native TTS syntetiserar inte ljudfiler.",
   localTtsUnavailableForLanguage: ({ languageLabel }) =>

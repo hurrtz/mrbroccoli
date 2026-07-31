@@ -16,8 +16,6 @@ import { getProviderSttConfig } from "./whisper/config";
 import { createSttRecordingTooLargeError } from "./whisper/errors";
 import { waitForRecordedFileReady } from "./whisper/recordedFileReady";
 import {
-  transcribeWithBytedanceBigmodelFlashProvider,
-  transcribeWithGoogleCloudSpeechV2Provider,
   transcribeWithGoogleSpeechProvider,
   transcribeWithMultipartProvider,
   transcribeWithOpenAiAudioInputProvider,
@@ -165,32 +163,6 @@ export async function transcribeAudio(params: {
 
       if (config.kind === "openai-audio-input") {
         return transcribeWithOpenAiAudioInputProvider({
-          abortSignal,
-          apiKey,
-          config,
-          fileUri,
-          language,
-          speechLanguage,
-          provider,
-          providerModel: resolvedModel,
-        });
-      }
-
-      if (config.kind === "bytedance-bigmodel-flash") {
-        return transcribeWithBytedanceBigmodelFlashProvider({
-          abortSignal,
-          apiKey,
-          config,
-          fileUri,
-          language,
-          speechLanguage,
-          provider,
-          providerModel: resolvedModel,
-        });
-      }
-
-      if (config.kind === "google-cloud-speech-v2") {
-        return transcribeWithGoogleCloudSpeechV2Provider({
           abortSignal,
           apiKey,
           config,

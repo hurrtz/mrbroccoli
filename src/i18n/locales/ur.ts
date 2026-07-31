@@ -859,10 +859,6 @@ export const ur = {
   noBase64DecoderAvailable: "کوئی بیس 64 ڈیکوڈر دستیاب نہیں ہے۔",
   azureSpeechApiKeyFormat:
     "Microsoft Azure TTS کو <key>|<region> فارمیٹ میں Azure اسپیچ کی اسناد کی ضرورت ہے، مثال کے طور پر abc123|westeurope، یا مشترکہ Azure فارمیٹ <endpoint>|<api-key>|<key>|ZXPH6",
-  googleCloudSpeechCredentialFormat: ({ provider }) =>
-    `${provider} STT کو <project-id>|<access-token>|<location> فارمیٹ میں Google Cloud Speech اسناد کی ضرورت ہے، یا مشترکہ Gemini فارمیٹ <Gemini API key>|<project-id>|ZXQPH8QZQZ9|`,
-  bytedanceSpeechCredentialFormat: ({ provider }) =>
-    `${provider} STT کو <app-key>|<access-key> فارمیٹ میں Doubao تقریر کی اسناد کی ضرورت ہے، اختیاری طور پر <app-key>|<access-key>|<resource-id>، یا مشترکہ شکل <ark-api-key>|<app-key>|<access-key>|<resource-id>۔`,
   nativeTtsDoesNotSynthesizeAudioFiles:
     "مقامی TTS آڈیو فائلوں کی ترکیب نہیں کرتا ہے۔",
   localTtsUnavailableForLanguage: ({ languageLabel }) =>

@@ -7,13 +7,10 @@ export type RuntimeAppProviderId =
   | "openrouter"
   | "anthropic"
   | "alibaba-qwen-dashscope"
-  | "bytedance-doubao-seed"
   | "gemini"
   | "deepseek"
   | "elevenlabs"
   | "mistral"
-  | "moonshot-ai-kimi"
-  | "perplexity"
   | "xai";
 
 export type RuntimeLlmTransport =
@@ -24,10 +21,8 @@ export type RuntimeLlmTransport =
   | "anthropic";
 export type RuntimeSttTransport =
   | "none"
-  | "bytedance-bigmodel-flash"
   | "multipart"
   | "google-speech"
-  | "google-cloud-speech-v2"
   | "openai-audio-input"
   | "xai-stt-rest";
 export type RuntimeTtsTransport = "none" | "binary" | "gemini" | "dashscope";
@@ -48,7 +43,6 @@ export type RuntimeModelEffortTransportParam =
   | "gemini-thinking-budget"
   | "gemini-thinking-level"
   | "deepseek-thinking-effort"
-  | "kimi-thinking"
   | "qwen-enable-thinking"
   | "reasoning-effort";
 
@@ -406,24 +400,6 @@ const MISTRAL_ADJUSTABLE_REASONING_EFFORT = effortConfig(
   ["none", "high"],
 );
 
-const DOUBAO_SEED_21_EFFORT = effortConfig("reasoning-effort", "high", [
-  "minimal",
-  "low",
-  "medium",
-  "high",
-]);
-const DOUBAO_SEED_20_EFFORT = effortConfig("reasoning-effort", "medium", [
-  "minimal",
-  "low",
-  "medium",
-  "high",
-]);
-const PERPLEXITY_DEEP_RESEARCH_EFFORT = effortConfig(
-  "reasoning-effort",
-  "medium",
-  ["low", "medium", "high"],
-);
-
 const OPENROUTER_FULL_REASONING_EFFORT = effortConfig(
   "reasoning-effort",
   "medium",
@@ -461,19 +437,6 @@ const QWEN_THINKING_EFFORT = effortConfig(
   ["disabled", "enabled"],
   THINKING_TOGGLE_OPTIONS,
 );
-
-const KIMI_THINKING_EFFORT = effortConfig(
-  "kimi-thinking",
-  "enabled",
-  ["disabled", "enabled"],
-  THINKING_TOGGLE_OPTIONS,
-);
-
-const KIMI_K3_EFFORT = effortConfig("reasoning-effort", "max", [
-  "low",
-  "high",
-  "max",
-]);
 
 function getCatalogProviderDocument(providerId: CatalogProviderId) {
   return PROVIDER_DOCUMENTS.find(
@@ -519,14 +482,11 @@ export const RUNTIME_PROVIDER_ORDER = [
   "openrouter",
   "anthropic",
   "alibaba-qwen-dashscope",
-  "bytedance-doubao-seed",
   "gemini",
   "xai",
   "deepseek",
   "mistral",
   "elevenlabs",
-  "moonshot-ai-kimi",
-  "perplexity",
 ] as const satisfies readonly RuntimeAppProviderId[];
 
 export const RUNTIME_PROVIDER_MANIFEST: Record<
@@ -995,66 +955,14 @@ export const RUNTIME_PROVIDER_MANIFEST: Record<
         "DashScope TTS is limited to the standard non-realtime Qwen3-TTS-Flash families. Mr Broccoli filters the official system voice library to the selected model; realtime and custom-voice rows stay catalog-only to keep the app on straightforward BYOK flows.",
     },
   },
-  "bytedance-doubao-seed": {
-    appProvider: "bytedance-doubao-seed",
-    catalogProviderId: "bytedance-doubao-seed",
-    label: "ByteDance",
-    shortLabel: "DOUBAO",
-    apiKeyPlaceholder: "Ark API key",
-    apiKeyHint: "Unlocks Volcengine Ark chat models.",
-    apiKeyUrl: "https://www.volcengine.com/docs/82379/1298459",
-    llm: {
-      support: "provider",
-      transport: "openai-compatible",
-      endpoint: "https://ark.cn-beijing.volces.com/api/v3/chat/completions",
-      defaultModel: "doubao-seed-2-1-turbo-260628",
-      fallbackModelIds: [
-        "doubao-seed-2-1-turbo-260628",
-        "doubao-seed-2-0-lite-260428",
-        "doubao-seed-2-0-mini-260428",
-      ],
-      models: [
-        withEffort(
-          namedModel("doubao-seed-2-1-turbo-260628", "Doubao Seed 2.1 Turbo"),
-          DOUBAO_SEED_21_EFFORT,
-        ),
-        withEffort(
-          namedModel("doubao-seed-2-1-pro-260628", "Doubao Seed 2.1 Pro"),
-          DOUBAO_SEED_21_EFFORT,
-        ),
-        withEffort(
-          namedModel("doubao-seed-2-0-lite-260428", "Doubao Seed 2.0 Lite"),
-          DOUBAO_SEED_20_EFFORT,
-        ),
-        withEffort(
-          namedModel("doubao-seed-2-0-mini-260428", "Doubao Seed 2.0 Mini"),
-          DOUBAO_SEED_20_EFFORT,
-        ),
-        withEffort(model("doubao-seed-2-0-pro-260215"), DOUBAO_SEED_20_EFFORT),
-        withEffort(model("doubao-seed-2-0-lite-260215"), DOUBAO_SEED_20_EFFORT),
-        withEffort(model("doubao-seed-2-0-mini-260215"), DOUBAO_SEED_20_EFFORT),
-      ],
-    },
-    stt: {
-      support: "none",
-      transport: "none",
-      models: [],
-    },
-    tts: {
-      support: "none",
-      transport: "none",
-      models: [],
-      voiceOptions: [],
-    },
-  },
   gemini: {
     appProvider: "gemini",
     catalogProviderId: "google-vertex-ai-studio",
     label: "Google",
     shortLabel: "GOOGLE",
-    apiKeyPlaceholder: "Gemini API key|project-id|access-token|us",
+    apiKeyPlaceholder: "Gemini API key",
     apiKeyHint:
-      "Use an AI Studio Gemini API key for chat, speech transcription, and TTS. Existing Google Cloud Speech credentials remain supported as <project-id>|<access-token>|<location>, or combined as <Gemini API key>|<project-id>|<access-token>|<location>.",
+      "Use an AI Studio Gemini API key for chat, speech transcription, web search, and TTS.",
     apiKeyUrl: "https://aistudio.google.com/app/apikey",
     llm: {
       support: "provider",
@@ -1147,7 +1055,7 @@ export const RUNTIME_PROVIDER_MANIFEST: Record<
         "ja",
       ],
       languageNote:
-        "AI Studio keys transcribe recorded speech with Gemini. Existing Cloud Speech-only credentials continue to use Chirp 3.",
+        "AI Studio keys transcribe recorded speech with Gemini.",
     },
     tts: {
       support: "provider",
@@ -1536,76 +1444,6 @@ export const RUNTIME_PROVIDER_MANIFEST: Record<
       requiresVoice: true,
       languageNote:
         "ElevenLabs Flash v2.5 supports 32 languages, Multilingual v2 supports 29, and Eleven v3 supports more than 70. Mr Broccoli uses a built-in premade voice when the configured key cannot read the account voice library.",
-    },
-  },
-  "moonshot-ai-kimi": {
-    appProvider: "moonshot-ai-kimi",
-    catalogProviderId: "moonshot-ai-kimi",
-    label: "Moonshot",
-    shortLabel: "MOONSHOT",
-    apiKeyPlaceholder: "Enter API key",
-    apiKeyHint: "Unlocks Kimi models through Moonshot's OpenAI-compatible API.",
-    apiKeyUrl: "https://platform.kimi.ai/console/api-keys",
-    llm: {
-      support: "provider",
-      transport: "openai-compatible",
-      endpoint: "https://api.moonshot.ai/v1/chat/completions",
-      defaultModel: "kimi-k3",
-      fallbackModelIds: ["kimi-k3", "kimi-k2.6", "kimi-k2.7-code-highspeed"],
-      models: [
-        withEffort(namedModel("kimi-k3", "Kimi K3"), KIMI_K3_EFFORT),
-        namedModel("kimi-k2.7-code", "Kimi K2.7 Code"),
-        namedModel("kimi-k2.7-code-highspeed", "Kimi K2.7 Code HighSpeed"),
-        withEffort(namedModel("kimi-k2.6", "Kimi K2.6"), KIMI_THINKING_EFFORT),
-      ],
-    },
-    stt: {
-      support: "none",
-      transport: "none",
-      models: [],
-    },
-    tts: {
-      support: "none",
-      transport: "none",
-      models: [],
-      voiceOptions: [],
-    },
-  },
-  perplexity: {
-    appProvider: "perplexity",
-    catalogProviderId: "perplexity",
-    label: "Perplexity",
-    shortLabel: "PERPLEXITY",
-    apiKeyPlaceholder: "pplx-...",
-    apiKeyHint:
-      "Unlocks Perplexity Sonar models and Perplexity web-grounded search through the Sonar API.",
-    apiKeyUrl: "https://docs.perplexity.ai/docs/sonar/quickstart",
-    llm: {
-      support: "provider",
-      transport: "openai-compatible",
-      endpoint: "https://api.perplexity.ai/chat/completions",
-      defaultModel: "sonar",
-      fallbackModelIds: ["sonar", "sonar-pro", "sonar-reasoning-pro"],
-      models: [
-        model("sonar"),
-        model("sonar-pro"),
-        model("sonar-reasoning-pro"),
-        withEffort(
-          model("sonar-deep-research"),
-          PERPLEXITY_DEEP_RESEARCH_EFFORT,
-        ),
-      ],
-    },
-    stt: {
-      support: "none",
-      transport: "none",
-      models: [],
-    },
-    tts: {
-      support: "none",
-      transport: "none",
-      models: [],
-      voiceOptions: [],
     },
   },
 };

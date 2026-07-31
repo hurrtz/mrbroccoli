@@ -24,7 +24,7 @@ store notes.
 
 ## Supported Providers
 
-Eleven LLM-capable provider routes:
+Eight LLM-capable provider routes:
 
 - OpenAI
 - OpenRouter
@@ -32,18 +32,16 @@ Eleven LLM-capable provider routes:
 - Google Gemini
 - xAI
 - Mistral
-- ByteDance Doubao Seed
 - DeepSeek
 - Alibaba Qwen (DashScope)
-- Moonshot AI Kimi
-- Perplexity
 
-ElevenLabs is available as a dedicated speech provider. Dedicated web-search
-providers include Tavily, Brave, Exa, Firecrawl, and SerpApi.
+ElevenLabs is available as a dedicated speech provider. OpenAI, Anthropic,
+Google Gemini, xAI, Mistral, and Alibaba Qwen offer provider-native web search.
+Kimi K3 remains available through OpenRouter.
 
 Voice input and spoken replies are not tied to any single provider:
 
-- Speech-to-text prefers the device's native system recognizer, with capability-gated provider STT from OpenAI, Gemini/Google Cloud Speech, Mistral, xAI, Qwen, and ElevenLabs as alternatives.
+- Speech-to-text prefers the device's native system recognizer, with capability-gated provider STT from OpenAI, Gemini, Mistral, xAI, Qwen, and ElevenLabs as alternatives. The Gemini API key covers chat, recorded-audio transcription, web search, and speech synthesis.
 - Text-to-speech uses the device's native voices by default. An optional Kokoro model provides substantially more natural on-device English and Simplified Chinese speech, while capability-gated provider TTS from OpenAI, Gemini, xAI, Qwen, Mistral, and ElevenLabs remains available.
 - Mistral, xAI, and ElevenLabs account voices are discovered automatically and can be refreshed from Speaking settings. ElevenLabs falls back to a built-in premade voice when a restricted key cannot read account voices.
 

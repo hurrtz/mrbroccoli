@@ -4,29 +4,23 @@ import { defineProviderDocuments } from "./definitions";
 
 import AlibabaQwenDashscopeDocument from "./alibaba-qwen-dashscope";
 import AnthropicDocument from "./anthropic";
-import BytedanceDoubaoSeedDocument from "./bytedance-doubao-seed";
 import DeepseekDocument from "./deepseek";
 import ElevenlabsDocument from "./elevenlabs";
 import GoogleVertexAiStudioDocument from "./google-vertex-ai-studio";
 import MistralAiDocument from "./mistral-ai";
-import MoonshotAiKimiDocument from "./moonshot-ai-kimi";
 import OpenaiDocument from "./openai";
 import OpenrouterDocument from "./openrouter";
-import PerplexityDocument from "./perplexity";
 import XaiDocument from "./xai";
 
 export const PROVIDER_DOCUMENTS = defineProviderDocuments([
   AlibabaQwenDashscopeDocument,
   AnthropicDocument,
-  BytedanceDoubaoSeedDocument,
   DeepseekDocument,
   ElevenlabsDocument,
   GoogleVertexAiStudioDocument,
   MistralAiDocument,
-  MoonshotAiKimiDocument,
   OpenaiDocument,
   OpenrouterDocument,
-  PerplexityDocument,
   XaiDocument,
 ]);
 

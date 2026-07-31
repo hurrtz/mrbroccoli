@@ -3,26 +3,15 @@ import * as FileSystem from "expo-file-system/legacy";
 
 import { buildProviderHttpError, normalizeProviderTransportError } from "../providerErrors";
 import type { AppLanguage, Provider, SttLanguage } from "../../types";
-import {
-  createBytedanceRequestId,
-  requireBytedanceSpeechCredentials,
-} from "../bytedance";
-import {
-  buildGoogleCloudSpeechRecognizeEndpoint,
-  parseGoogleAiStudioCredentials,
-  requireGoogleCloudSpeechCredentials,
-} from "../google";
+import { requireGoogleAiStudioCredentials } from "../google";
 import {
   getFileAudioMimeType,
-  getGoogleCloudSpeechLanguageCode,
   getProviderSpeechLanguageCode,
 } from "../../utils/speechLanguage";
 import { getSpeechLanguageDefinition } from "../../constants/speechLanguages";
 import { fetchWithTimeout } from "./abort";
 import { getProviderSttTimeoutMs } from "./config";
 import type {
-  BytedanceBigmodelFlashTranscriptionConfig,
-  GoogleCloudSpeechV2TranscriptionConfig,
   GoogleSpeechTranscriptionConfig,
   OpenAiAudioInputTranscriptionConfig,
   MultipartTranscriptionConfig,
@@ -246,207 +235,6 @@ async function transcribeWithOpenAiStyleAudioInputProvider(
   return text ? text : null;
 }
 
-export async function transcribeWithBytedanceBigmodelFlashProvider(
-  params: SharedProviderParams & {
-    config: BytedanceBigmodelFlashTranscriptionConfig;
-  },
-) {
-  const {
-    abortSignal,
-    apiKey,
-    config,
-    fileUri,
-    language,
-    provider,
-    providerModel,
-    speechLanguage,
-  } = params;
-  const selectedModel = providerModel || config.defaultModel;
-  const credentials = requireBytedanceSpeechCredentials(apiKey, language);
-  const audioData = await FileSystem.readAsStringAsync(fileUri, {
-    encoding: "base64",
-  });
-
-  let response: Awaited<ReturnType<typeof fetch>>;
-
-  try {
-    response = await fetchWithTimeout(
-      config.endpoint,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "X-Api-App-Key": credentials.appKey,
-          "X-Api-Access-Key": credentials.accessKey,
-          "X-Api-Resource-Id": credentials.resourceId,
-          "X-Api-Request-Id": createBytedanceRequestId(),
-          "X-Api-Sequence": "-1",
-        },
-        body: JSON.stringify({
-          user: {
-            uid: credentials.appKey,
-          },
-          audio: {
-            data: audioData,
-          },
-          request: {
-            model_name: selectedModel,
-          },
-        }),
-      },
-      getProviderSttTimeoutMs(provider),
-      () => createSttTimeoutError({ provider, language }),
-      abortSignal,
-    );
-  } catch (error) {
-    throw normalizeProviderTransportError({
-      provider,
-      language,
-      error,
-      action: "transcription",
-    });
-  }
-
-  const responseText = await response.text();
-
-  if (!response.ok) {
-    throw buildProviderHttpError({
-      provider,
-      language,
-      status: response.status,
-      errorText: responseText,
-      action: "transcription",
-    });
-  }
-
-  const apiStatusCode = response.headers.get("X-Api-Status-Code");
-  const apiMessage = response.headers.get("X-Api-Message");
-
-  if (apiStatusCode && apiStatusCode !== "20000000") {
-    throw buildProviderHttpError({
-      provider,
-      language,
-      status: 400,
-      errorText: apiMessage || responseText || "Unknown ByteDance STT error.",
-      action: "transcription",
-    });
-  }
-
-  let data: any;
-
-  try {
-    data = responseText ? JSON.parse(responseText) : {};
-  } catch {
-    data = {};
-  }
-
-  const text =
-    typeof data?.result?.text === "string"
-      ? data.result.text.trim()
-      : Array.isArray(data?.result)
-        ? data.result
-            .map((entry: any) =>
-              typeof entry?.text === "string" ? entry.text : "",
-            )
-            .join(" ")
-            .trim()
-        : "";
-
-  return text ? text : null;
-}
-
-export async function transcribeWithGoogleCloudSpeechV2Provider(
-  params: SharedProviderParams & {
-    config: GoogleCloudSpeechV2TranscriptionConfig;
-  },
-) {
-  const {
-    abortSignal,
-    apiKey,
-    config,
-    fileUri,
-    language,
-    provider,
-    providerModel,
-    speechLanguage,
-  } = params;
-  const selectedModel = providerModel || config.defaultModel;
-  const credentials = requireGoogleCloudSpeechCredentials(apiKey, language);
-  const audioData = await FileSystem.readAsStringAsync(fileUri, {
-    encoding: "base64",
-  });
-
-  let response: Awaited<ReturnType<typeof fetch>>;
-
-  try {
-    response = await fetchWithTimeout(
-      buildGoogleCloudSpeechRecognizeEndpoint({
-        projectId: credentials.projectId,
-        location: credentials.location,
-      }),
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${credentials.accessToken}`,
-          "x-goog-user-project": credentials.projectId,
-        },
-        body: JSON.stringify({
-          config: {
-            autoDecodingConfig: {},
-            languageCodes: [
-              getGoogleCloudSpeechLanguageCode(speechLanguage),
-            ],
-            model: selectedModel,
-          },
-          content: audioData,
-        }),
-      },
-      getProviderSttTimeoutMs(provider),
-      () => createSttTimeoutError({ provider, language }),
-      abortSignal,
-    );
-  } catch (error) {
-    throw normalizeProviderTransportError({
-      provider,
-      language,
-      error,
-      action: "transcription",
-    });
-  }
-
-  if (!response.ok) {
-    const errorText = await response.text();
-    throw buildProviderHttpError({
-      provider,
-      language,
-      status: response.status,
-      errorText,
-      action: "transcription",
-    });
-  }
-
-  const data = await response.json();
-  const text = Array.isArray(data?.results)
-    ? data.results
-        .map((result: any) =>
-          Array.isArray(result?.alternatives)
-            ? result.alternatives
-                .map((alternative: any) =>
-                  typeof alternative?.transcript === "string"
-                    ? alternative.transcript
-                    : "",
-                )
-                .join(" ")
-            : "",
-        )
-        .join(" ")
-        .trim()
-    : "";
-
-  return text ? text : null;
-}
-
 export async function transcribeWithGoogleSpeechProvider(
   params: SharedProviderParams & {
     config: GoogleSpeechTranscriptionConfig;
@@ -462,18 +250,10 @@ export async function transcribeWithGoogleSpeechProvider(
     providerModel,
     speechLanguage,
   } = params;
-  const aiStudioCredentials = parseGoogleAiStudioCredentials(apiKey);
-
-  if (!aiStudioCredentials) {
-    return transcribeWithGoogleCloudSpeechV2Provider({
-      ...params,
-      config: {
-        kind: "google-cloud-speech-v2",
-        defaultModel: config.cloudDefaultModel,
-      },
-      providerModel: config.cloudDefaultModel,
-    });
-  }
+  const aiStudioCredentials = requireGoogleAiStudioCredentials(
+    apiKey,
+    language,
+  );
 
   const selectedModel = providerModel || config.defaultModel;
   const audioData = await FileSystem.readAsStringAsync(fileUri, {

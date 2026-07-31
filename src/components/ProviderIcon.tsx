@@ -3,15 +3,12 @@ import { Text } from "react-native";
 import type { SvgProps } from "react-native-svg";
 import AlibabaQwenIcon from "../../assets/providers/alibaba-qwen-dashscope.svg";
 import AnthropicIcon from "../../assets/providers/anthropic.svg";
-import ByteDanceIcon from "../../assets/providers/bytedance-doubao-seed.svg";
 import DeepSeekIcon from "../../assets/providers/deepseek.svg";
 import ElevenLabsIcon from "../../assets/providers/elevenlabs.svg";
 import GoogleIcon from "../../assets/providers/google-vertex-ai-studio.svg";
 import MistralIcon from "../../assets/providers/mistral-ai.svg";
-import MoonshotIcon from "../../assets/providers/moonshot-ai-kimi.svg";
 import OpenAIIcon from "../../assets/providers/openai.svg";
 import OpenRouterIcon from "../../assets/providers/openrouter.svg";
-import PerplexityIcon from "../../assets/providers/perplexity.svg";
 import XaiIcon from "../../assets/providers/xai.svg";
 import { Provider } from "../types";
 
@@ -21,17 +18,14 @@ const PROVIDER_ICON_COMPONENTS: Record<
 > = {
   "alibaba-qwen-dashscope": AlibabaQwenIcon,
   anthropic: AnthropicIcon,
-  "bytedance-doubao-seed": ByteDanceIcon,
   deepseek: DeepSeekIcon,
   elevenlabs: ElevenLabsIcon,
   gemini: GoogleIcon,
   "google-vertex-ai-studio": GoogleIcon,
   mistral: MistralIcon,
   "mistral-ai": MistralIcon,
-  "moonshot-ai-kimi": MoonshotIcon,
   openai: OpenAIIcon,
   openrouter: OpenRouterIcon,
-  perplexity: PerplexityIcon,
   xai: XaiIcon,
 };
 

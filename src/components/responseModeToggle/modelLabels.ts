@@ -13,7 +13,6 @@ const MODEL_FAMILY_PATTERNS: Array<{
   { family: "Qwen", pattern: /^Qwen[-\s]*(.+)$/i },
   { family: "Kimi", pattern: /^Kimi\s+(.+)$/i },
   { family: "Moonshot", pattern: /^Moonshot\s+(.+)$/i },
-  { family: "Doubao", pattern: /^Doubao\s+(.+)$/i },
   { family: "Mistral", pattern: /^Mistral\s+(.+)$/i },
   { family: "Ministral", pattern: /^Ministral\s+(.+)$/i },
   { family: "Magistral", pattern: /^Magistral\s+(.+)$/i },

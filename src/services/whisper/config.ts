@@ -16,22 +16,10 @@ export type OpenAiAudioInputTranscriptionConfig = {
   defaultModel: string;
 };
 
-export type BytedanceBigmodelFlashTranscriptionConfig = {
-  kind: "bytedance-bigmodel-flash";
-  endpoint: string;
-  defaultModel: string;
-};
-
-export type GoogleCloudSpeechV2TranscriptionConfig = {
-  kind: "google-cloud-speech-v2";
-  defaultModel: string;
-};
-
 export type GoogleSpeechTranscriptionConfig = {
   kind: "google-speech";
   endpointBase: string;
   defaultModel: string;
-  cloudDefaultModel: string;
 };
 
 export type XaiRestSttTranscriptionConfig = {
@@ -43,9 +31,7 @@ export type XaiRestSttTranscriptionConfig = {
 export type ProviderSttConfig =
   | MultipartTranscriptionConfig
   | OpenAiAudioInputTranscriptionConfig
-  | BytedanceBigmodelFlashTranscriptionConfig
   | GoogleSpeechTranscriptionConfig
-  | GoogleCloudSpeechV2TranscriptionConfig
   | XaiRestSttTranscriptionConfig;
 
 export const STT_TIMEOUT_MS = 60000;
@@ -76,26 +62,12 @@ function buildConfigForTransport(params: {
             defaultModel: params.defaultModel,
           }
         : null;
-    case "bytedance-bigmodel-flash":
-      return params.endpoint
-        ? {
-            kind: "bytedance-bigmodel-flash",
-            endpoint: params.endpoint,
-            defaultModel: params.defaultModel,
-          }
-        : null;
-    case "google-cloud-speech-v2":
-      return {
-        kind: "google-cloud-speech-v2",
-        defaultModel: params.defaultModel,
-      };
     case "google-speech":
       return params.endpointBase
         ? {
             kind: "google-speech",
             endpointBase: params.endpointBase,
             defaultModel: params.defaultModel,
-            cloudDefaultModel: "chirp_3",
           }
         : null;
     case "openai-audio-input":

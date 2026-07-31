@@ -880,10 +880,6 @@ export const hu = {
   noBase64DecoderAvailable: "Nem elérhető base64 dekóder.",
   azureSpeechApiKeyFormat:
     "A Microsoft Azure TTS-hez <key>|<region> formátumú Azure Speech hitelesítő adatok szükségesek, például abc123|westeurope, vagy a kombinált Azure-formátum: <endpoint>|<api-key>|<key>|<region>.",
-  googleCloudSpeechCredentialFormat: ({ provider }) =>
-    `${provider} STT-hez a Google Cloud Speech hitelesítő adatai <project-id>|<access-token>|<location> formátumban szükségesek, vagy a kombinált Gemini-formátumban: <Gemini API key>|<project-id>|<access-token>|<location>.`,
-  bytedanceSpeechCredentialFormat: ({ provider }) =>
-    `${provider} STT-hez Doubao Speech hitelesítő adatok szükségesek <app-key>|<access-key>, opcionálisan <app-key>|<access-key>|<resource-id>, vagy kombinált formátumban <ark-api-key>|<app-key>|<access-key>|<resource-id>.`,
   nativeTtsDoesNotSynthesizeAudioFiles:
     "A natív TTS nem szintetizál hangfájlokat.",
   localTtsUnavailableForLanguage: ({ languageLabel }) =>

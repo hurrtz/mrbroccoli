@@ -159,19 +159,9 @@ function addMarkerToGeminiContent(
 
 export function addResponseProvenanceToMessages<T extends ProvenanceMessage>(
   messages: T[],
-  currentProvider?: Provider,
 ): T[] {
   return messages.map((message) => {
     if (message.role !== "assistant") {
-      return message;
-    }
-
-    // Kimi K3 requires its complete prior assistant message to be replayed
-    // unchanged. Its reasoning_content is restored later by the transport.
-    if (
-      currentProvider === "moonshot-ai-kimi" &&
-      message.provider === currentProvider
-    ) {
       return message;
     }
 

@@ -858,10 +858,6 @@ export const ar = {
   noBase64DecoderAvailable: "لا يوجد وحدة فك ترميز Base64 متاحة.",
   azureSpeechApiKeyFormat:
     "يحتاج Microsoft Azure TTS إلى بيانات اعتماد Azure Speech بتنسيق <key>|<region>، على سبيل المثال abc123|westeurope، أو تنسيق Azure المدمج <endpoint>|<api-key>|<key>|<region>.",
-  googleCloudSpeechCredentialFormat: ({ provider }) =>
-    `يحتاج ${provider} STT إلى بيانات اعتماد Google Cloud Speech بالتنسيق <project-id>|<access-token>|<location>، أو بتنسيق Gemini المدمج <Gemini API key>|<project-id>|<access-token>|<location>.`,
-  bytedanceSpeechCredentialFormat: ({ provider }) =>
-    `يحتاج ${provider} STT إلى Doubao بيانات اعتماد الكلام بالتنسيق <app-key>|<access-key>، أو اختياريًا <app-key>|<access-key>|<resource-id>، أو التنسيق المدمج <ark-api-key>|<app-key>|<access-key>|<resource-id>.`,
   nativeTtsDoesNotSynthesizeAudioFiles:
     "لا يقوم TTS الأصلي بتجميع الملفات الصوتية.",
   localTtsUnavailableForLanguage: ({ languageLabel }) =>

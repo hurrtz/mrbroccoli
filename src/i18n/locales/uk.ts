@@ -887,10 +887,6 @@ export const uk = {
   noBase64DecoderAvailable: "Декодувальник Base64 недоступний.",
   azureSpeechApiKeyFormat:
     "Для Microsoft Azure TTS потрібні облікові дані Azure Speech у форматі <key>|<region>, наприклад abc123|westeurope, або в об’єднаному форматі Azure <endpoint>|<api-key>|<key>|<region>.",
-  googleCloudSpeechCredentialFormat: ({ provider }) =>
-    `Для STT ${provider} потрібні облікові дані Google Cloud Speech у форматі <project-id>|<access-token>|<location> або в об’єднаному форматі Gemini <Gemini API key>|<project-id>|<access-token>|<location>.`,
-  bytedanceSpeechCredentialFormat: ({ provider }) =>
-    `Для STT ${provider} потрібні облікові дані Doubao Speech у форматі <app-key>|<access-key>, за потреби <app-key>|<access-key>|<resource-id>, або в об’єднаному форматі <ark-api-key>|<app-key>|<access-key>|<resource-id>.`,
   nativeTtsDoesNotSynthesizeAudioFiles:
     "Системний TTS не створює аудіофайлів.",
   localTtsUnavailableForLanguage: ({ languageLabel }) =>

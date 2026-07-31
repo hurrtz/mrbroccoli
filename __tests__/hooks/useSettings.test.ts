@@ -207,9 +207,18 @@ describe("useSettings", () => {
     });
     expect(result.current.settings.setupGuideDismissed).toBe(true);
     expect(result.current.settings.showSetupGuideShortcut).toBe(true);
+    expect(SecureStore.deleteItemAsync).toHaveBeenCalledWith(
+      "mrbroccoli.provider_key.bytedance-doubao-seed",
+    );
+    expect(SecureStore.deleteItemAsync).toHaveBeenCalledWith(
+      "mrbroccoli.provider_key.moonshot-ai-kimi",
+    );
+    expect(SecureStore.deleteItemAsync).toHaveBeenCalledWith(
+      "mrbroccoli.provider_key.perplexity",
+    );
   });
 
-  it("migrates rolling model aliases to canonical snapshots", async () => {
+  it("migrates active aliases and drops removed provider routes", async () => {
     (AsyncStorage.getItem as jest.Mock).mockResolvedValueOnce(
       JSON.stringify({
         ...DEFAULT_SETTINGS,
@@ -268,25 +277,24 @@ describe("useSettings", () => {
     expect(result.current.settings.providerModels.gemini).toBe(
       "gemini-2.5-flash",
     );
+    expect(
+      Object.prototype.hasOwnProperty.call(
+        result.current.settings.providerModels,
+        "moonshot-ai-kimi",
+      ),
+    ).toBe(false);
     expect(result.current.settings.responseModes[0]?.route.model).toBe(
       "gpt-5.4-2026-03-05",
     );
     expect(result.current.settings.responseModes[1]?.route.model).toBe(
       "qwen3.7-plus-2026-05-26",
     );
-    expect(result.current.settings.providerModels["moonshot-ai-kimi"]).toBe(
-      "kimi-k3",
-    );
     expect(result.current.settings.responseModes[2]?.route).toEqual({
       provider: "gemini",
       model: "gemini-2.5-flash",
       effort: "dynamic",
     });
-    expect(result.current.settings.responseModes[3]?.route).toEqual({
-      provider: "moonshot-ai-kimi",
-      model: "kimi-k3",
-      effort: "max",
-    });
+    expect(result.current.settings.responseModes).toHaveLength(3);
   });
 
   it("restores persisted provider validation failures", async () => {
@@ -698,12 +706,9 @@ describe("useSettings", () => {
       "openai",
       "anthropic",
       "alibaba-qwen-dashscope",
-      "bytedance-doubao-seed",
       "gemini",
       "xai",
       "mistral",
-      "moonshot-ai-kimi",
-      "perplexity",
     ]);
   });
 
