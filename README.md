@@ -112,7 +112,9 @@ The repository includes a Makefile-based local CI workflow:
 make hooks-install
 make pre-push
 make pre-release-static
+make pre-release-maestro
 make pre-release-live
+make pre-release
 ```
 
 `pre-push` is the fast, spend-free gate installed as the repository's Git
@@ -123,8 +125,13 @@ native validation. `pre-release-live` derives every retained LLM model and
 effort, speech model, representative TTS voice, voice directory, web-search
 provider, and exposed search mode from the runtime manifest. It aborts on the
 first failure and rejects a matrix whose conservative release-test reservation
-exceeds `MR_BROCCOLI_PRERELEASE_MAX_USD`. Live validation and Maestro device
-work remain explicit release phases so neither can be triggered by a push.
+exceeds `MR_BROCCOLI_PRERELEASE_MAX_USD`. `pre-release-maestro` builds bundled
+Release apps, installs them on one Android emulator, one authorized physical
+Android device, and one booted iOS simulator, runs every UI locale on both
+simulator platforms plus physical-device smoke coverage, and creates a
+screenshot review gallery. `pre-release` runs static, device, and live gates in
+that quota-safe order. Live validation and device work remain explicit release
+phases so neither can be triggered by a push.
 
 ## How Credentials Work
 

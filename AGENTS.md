@@ -206,6 +206,21 @@ These notes are specific to this repository and supplement any parent-level inst
   permission is a failed release prerequisite. Do not weaken the matrix,
   silently skip the provider, or spend quota on later providers after this
   failure.
+- `make pre-release-maestro` requires exactly one connected Android emulator,
+  one connected physical Android device, and one booted iOS simulator. Override
+  ambiguous discovery with `MR_BROCCOLI_ANDROID_EMULATOR_UDID`,
+  `MR_BROCCOLI_ANDROID_PHYSICAL_UDID`, or
+  `MR_BROCCOLI_IOS_SIMULATOR_UDID`. It builds and installs bundled Release apps,
+  exercises every registered UI language on Android and iOS, runs the known
+  Drive/three-route landscape regression, and runs physical Android smoke
+  coverage.
+- A Maestro command pass is not the visual verdict. Review every image in
+  `artifacts/maestro/release/review-gallery.html` for clipping, overlap,
+  untranslated copy, RTL direction, missing content, and inconsistent states
+  before declaring the release ready.
+- `make pre-release` is the comprehensive local release gate. Its order is
+  static checks, cross-platform device/UI validation, then live provider calls,
+  so avoidable failures happen before quota is spent.
 - Use `npx tsc --noEmit` as the baseline repo-wide verification step for UI and type changes.
 - Use targeted Jest runs for affected areas instead of defaulting to the entire suite when only a small area changed.
 - Common focused tests:

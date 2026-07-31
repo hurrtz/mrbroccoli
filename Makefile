@@ -24,7 +24,9 @@ IOS_DESTINATION ?= generic/platform=iOS Simulator
 	pre-push \
 	prerelease-preflight \
 	pre-release-static \
-	pre-release-live
+	pre-release-live \
+	pre-release-maestro \
+	pre-release
 
 help:
 	@printf '%s\n' \
@@ -33,6 +35,8 @@ help:
 		'make prerelease-preflight Verify every secret and signing prerequisite first' \
 		'make pre-release-static Run the complete spend-free native/static release phase' \
 		'make pre-release-live  Run the fail-fast live provider/model matrix' \
+		'make pre-release-maestro Build/install and run the cross-platform visual suite' \
+		'make pre-release       Run every local release gate in quota-safe order' \
 		'make maestro-verify      Verify the E2E locale and screenshot contract' \
 		'make android-debug      Build a debug APK' \
 		'make ios-build          Build the app for the generic iOS Simulator'
@@ -93,6 +97,7 @@ pre-push:
 	@$(MAKE) worktree-check
 	@npm run prerelease:env:test
 	@npm run prerelease:live:test
+	@npm run maestro:prerelease:test
 	@$(MAKE) maestro-verify
 	@$(MAKE) license
 	@$(MAKE) config
@@ -120,3 +125,14 @@ pre-release-static:
 # reservation and stops on the first failing provider configuration.
 pre-release-live:
 	@npm run prerelease:live
+
+pre-release-maestro:
+	@npm run maestro:prerelease
+
+# Static and device failures are resolved before the live provider phase can
+# spend quota. Each phase retains its own fail-fast preconditions as well.
+pre-release:
+	@$(MAKE) prerelease-preflight
+	@$(MAKE) pre-release-static
+	@$(MAKE) pre-release-maestro
+	@$(MAKE) pre-release-live

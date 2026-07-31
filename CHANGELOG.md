@@ -44,6 +44,9 @@ the complete Play Store translations are kept in a dedicated file under
 - Add a local, manifest-driven release gate that checks every retained provider
   model and effort, all speech and web-search routes, and one representative
   voice per TTS model behind a fail-fast credential and spend-reservation gate.
+- Add an install-and-run Maestro release gate across Android emulator, physical
+  Android hardware, and iOS simulator, including every UI language, landscape
+  regressions, and a complete screenshot review gallery.
 
 ### Fixed
 
