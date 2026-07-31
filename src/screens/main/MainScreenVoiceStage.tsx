@@ -36,6 +36,7 @@ interface MainScreenVoiceStageProps {
   onTextMessageChange?: (text: string) => void;
   playbackPaused?: boolean;
   promptBlockedMessage?: string | null;
+  promptBlockedProgress?: number | null;
   recordingMaxMs: number;
   recordingStartedAtMs?: number | null;
   speechStartProgress?: VoiceTimingProgress | null;
@@ -68,6 +69,7 @@ export const MainScreenVoiceStage = React.memo(function MainScreenVoiceStage({
   onTextMessageChange,
   playbackPaused = false,
   promptBlockedMessage = null,
+  promptBlockedProgress = null,
   recordingMaxMs,
   recordingStartedAtMs = null,
   speechStartProgress = null,
@@ -117,6 +119,7 @@ export const MainScreenVoiceStage = React.memo(function MainScreenVoiceStage({
           onTextMessageChange={onTextMessageChange}
           playbackPaused={playbackPaused}
           promptBlockedMessage={promptBlockedMessage}
+          promptBlockedProgress={promptBlockedProgress}
           recordingMaxMs={recordingMaxMs}
           recordingStartedAtMs={recordingStartedAtMs}
           speechStartProgress={speechStartProgress}

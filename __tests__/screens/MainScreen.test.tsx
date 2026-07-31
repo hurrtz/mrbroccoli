@@ -69,7 +69,7 @@ jest.mock("expo-file-system/legacy", () => ({
 }));
 
 jest.mock("../../src/hooks/useKokoroModel", () => ({
-  useKokoroModel: () => ({
+  useKokoroModel: jest.fn(() => ({
     installed: false,
     verified: false,
     busy: null,
@@ -79,7 +79,7 @@ jest.mock("../../src/hooks/useKokoroModel", () => ({
     download: jest.fn(async () => true),
     refresh: jest.fn(async () => undefined),
     remove: jest.fn(async () => true),
-  }),
+  })),
 }));
 
 jest.mock("../../src/context/SettingsContext", () => ({
@@ -236,10 +236,12 @@ jest.mock("../../src/screens/main/MainScreenVoiceStage", () => ({
     disabled,
     onResolvePromptBlock,
     promptBlockedMessage,
+    promptBlockedProgress,
   }: {
     disabled?: boolean;
     onResolvePromptBlock?: () => void;
     promptBlockedMessage?: string | null;
+    promptBlockedProgress?: number | null;
   }) => {
     const React = require("react");
     const { Text, TouchableOpacity, View } = require("react-native");
@@ -257,6 +259,14 @@ jest.mock("../../src/screens/main/MainScreenVoiceStage", () => ({
             { onPress: onResolvePromptBlock },
             React.createElement(Text, null, promptBlockedMessage),
             React.createElement(Text, null, "resolve-prompt-block"),
+          )
+        : null,
+      promptBlockedProgress !== null &&
+        promptBlockedProgress !== undefined
+        ? React.createElement(
+            Text,
+            null,
+            `prompt-blocked-progress:${promptBlockedProgress}`,
           )
         : null,
     );
@@ -444,6 +454,11 @@ const { useProviderVoiceDirectory } = jest.requireMock(
 ) as {
   useProviderVoiceDirectory: jest.Mock;
 };
+const { useKokoroModel } = jest.requireMock(
+  "../../src/hooks/useKokoroModel",
+) as {
+  useKokoroModel: jest.Mock;
+};
 
 function createSharedSettingsValue(settingsOverrides: Partial<Settings> = {}) {
   return {
@@ -477,6 +492,17 @@ describe("MainScreen", () => {
       status: "idle",
       error: null,
       refresh: jest.fn(async () => []),
+    });
+    useKokoroModel.mockReturnValue({
+      installed: false,
+      verified: false,
+      busy: null,
+      phase: null,
+      progress: 0,
+      error: null,
+      download: jest.fn(async () => true),
+      refresh: jest.fn(async () => undefined),
+      remove: jest.fn(async () => true),
     });
   });
 
@@ -580,6 +606,35 @@ describe("MainScreen", () => {
 
     fireEvent.press(screen.getByText("resolve-prompt-block"));
     expect(screen.getByText("settings:open")).toBeTruthy();
+  });
+
+  it("shows Kokoro installation progress while prompt submission stays blocked", () => {
+    useKokoroModel.mockReturnValue({
+      installed: false,
+      verified: false,
+      busy: "downloading",
+      phase: "extracting",
+      progress: 0.42,
+      error: null,
+      download: jest.fn(async () => true),
+      refresh: jest.fn(async () => undefined),
+      remove: jest.fn(async () => true),
+    });
+    useSharedSettings.mockReturnValue(
+      createSharedSettingsValue({
+        apiKeys: {
+          ...DEFAULT_SETTINGS.apiKeys,
+          [DEFAULT_SETTINGS.responseModes[0].route.provider]: "provider-key",
+        },
+        spokenRepliesEnabled: true,
+        ttsMode: "kokoro",
+      }),
+    );
+
+    const screen = renderWithProviders(<MainScreen />);
+
+    expect(screen.getByText("Installing… 42%")).toBeTruthy();
+    expect(screen.getByText("prompt-blocked-progress:0.42")).toBeTruthy();
   });
 
   it("loads Mistral voices from its configured key and selects a default slug", async () => {

@@ -40,6 +40,7 @@ export function VoiceTextInputPager({
   onTextMessageChange,
   playbackPaused,
   promptBlockedMessage = null,
+  promptBlockedProgress = null,
   recordingMaxMs,
   recordingStartedAtMs,
   speechStartProgress,
@@ -151,6 +152,32 @@ export function VoiceTextInputPager({
               >
                 {t("openSpeakingSettings")}
               </Text>
+            ) : null}
+            {promptBlockedProgress !== null ? (
+              <View
+                testID="prompt-blocked-progress"
+                accessibilityRole="progressbar"
+                accessibilityValue={{
+                  min: 0,
+                  max: 100,
+                  now: Math.round(promptBlockedProgress * 100),
+                }}
+                style={[
+                  styles.promptBlockedProgressTrack,
+                  { backgroundColor: colors.border },
+                ]}
+              >
+                <View
+                  testID="prompt-blocked-progress-fill"
+                  style={[
+                    styles.promptBlockedProgressFill,
+                    {
+                      backgroundColor: colors.accent,
+                      width: `${promptBlockedProgress * 100}%`,
+                    },
+                  ]}
+                />
+              </View>
             ) : null}
           </View>
           {onResolvePromptBlock ? (

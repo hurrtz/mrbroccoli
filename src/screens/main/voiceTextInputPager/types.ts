@@ -32,6 +32,7 @@ export interface VoiceTextInputPagerProps {
   onTextMessageChange?: (text: string) => void;
   playbackPaused?: boolean;
   promptBlockedMessage?: string | null;
+  promptBlockedProgress?: number | null;
   recordingMaxMs: number;
   recordingStartedAtMs?: number | null;
   speechStartProgress?: VoiceTimingProgress | null;

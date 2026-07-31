@@ -336,8 +336,14 @@ describe("SettingsModal", () => {
     expect(download).toHaveBeenCalledTimes(1);
   });
 
-  it("downloads and verifies Kokoro before selecting it", async () => {
-    const download = jest.fn(async () => true);
+  it("selects Kokoro before its async download completes", async () => {
+    let finishDownload: (installed: boolean) => void = () => undefined;
+    const download = jest.fn(
+      () =>
+        new Promise<boolean>((resolve) => {
+          finishDownload = resolve;
+        }),
+    );
     const onUpdate = jest.fn();
     const alert = jest.spyOn(Alert, "alert");
     const screen = renderSettingsModal({
@@ -376,12 +382,17 @@ describe("SettingsModal", () => {
     const buttons = alert.mock.calls[0][2];
     const downloadButton = buttons?.find((button) => button.text === "Download");
 
-    await act(async () => {
-      await downloadButton?.onPress?.();
+    act(() => {
+      downloadButton?.onPress?.();
     });
 
     expect(download).toHaveBeenCalledTimes(1);
     expect(onUpdate).toHaveBeenCalledWith({ ttsMode: "kokoro" });
+
+    await act(async () => {
+      finishDownload(true);
+      await Promise.resolve();
+    });
   });
 
   it("keeps provider fallbacks empty until the user adds one", async () => {

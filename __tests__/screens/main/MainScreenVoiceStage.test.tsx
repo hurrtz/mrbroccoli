@@ -192,6 +192,7 @@ describe("MainScreenVoiceStage composer", () => {
           onResolvePromptBlock,
           onSubmitTextMessage,
           promptBlockedMessage,
+          promptBlockedProgress: 0.42,
         })}
       />,
     );
@@ -201,6 +202,14 @@ describe("MainScreenVoiceStage composer", () => {
     ).toEqual({ disabled: true });
     expect(screen.getByText(promptBlockedMessage)).toBeTruthy();
     expect(screen.getByText("Speaking settings")).toBeTruthy();
+    expect(
+      screen.getByTestId("prompt-blocked-progress").props.accessibilityValue,
+    ).toEqual({ min: 0, max: 100, now: 42 });
+    expect(
+      StyleSheet.flatten(
+        screen.getByTestId("prompt-blocked-progress-fill").props.style,
+      ).width,
+    ).toBe("42%");
 
     fireEvent.press(screen.getByTestId("voice-input-surface"));
     expect(onPress).not.toHaveBeenCalled();

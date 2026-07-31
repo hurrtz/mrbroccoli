@@ -100,6 +100,15 @@ export const voiceTextInputPagerStyles = StyleSheet.create({
   promptBlockedAction: {
     ...textStyles.compactAction,
   },
+  promptBlockedProgressTrack: {
+    height: 5,
+    borderRadius: 999,
+    overflow: "hidden",
+  },
+  promptBlockedProgressFill: {
+    height: "100%",
+    borderRadius: 999,
+  },
   pageIndicators: {
     height: 18,
     flexDirection: "row",

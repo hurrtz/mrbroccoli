@@ -156,10 +156,9 @@ export function SpeakingSettingsPage({
       },
       {
         text: t("download"),
-        onPress: async () => {
-          if (await kokoroModel.download()) {
-            onUpdate({ ttsMode: "kokoro" });
-          }
+        onPress: () => {
+          onUpdate({ ttsMode: "kokoro" });
+          void kokoroModel.download();
         },
       },
     ]);

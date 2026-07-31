@@ -110,8 +110,25 @@ export function MainScreen() {
     settings.ttsMode === "kokoro" &&
     !kokoroModelReady;
   const kokoroPromptBlockMessage = kokoroPromptBlocked
-    ? t("kokoroNotInstalled")
+    ? kokoroModel.error
+      ? kokoroModel.error
+      : kokoroModel.busy === "downloading"
+        ? t(
+            kokoroModel.phase === "extracting"
+              ? "kokoroExtracting"
+              : "kokoroDownloading",
+            { progress: Math.round(kokoroModel.progress * 100) },
+          )
+        : kokoroModel.busy === "verifying"
+          ? t("kokoroVerifying")
+          : kokoroModel.busy === "checking"
+            ? t("kokoroChecking")
+            : t("kokoroNotInstalled")
     : null;
+  const kokoroPromptBlockProgress =
+    kokoroPromptBlocked && kokoroModel.busy === "downloading"
+      ? Math.min(1, Math.max(0, kokoroModel.progress))
+      : null;
 
   const [styleSheetVisible, setStyleSheetVisible] = React.useState(false);
   const {
@@ -709,6 +726,7 @@ export function MainScreen() {
             onTextMessageChange: handleTextMessageChange,
             playbackPaused: player.isPlaybackPaused,
             promptBlockedMessage: kokoroPromptBlockMessage,
+            promptBlockedProgress: kokoroPromptBlockProgress,
             recordingMaxMs: maxRecordingMs,
             recordingStartedAtMs,
             speechStartProgress: phaseProgress?.speechStart ?? null,
