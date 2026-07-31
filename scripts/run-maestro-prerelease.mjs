@@ -59,11 +59,12 @@ function runCommand(command, args, options = {}) {
 
 function selectDevice({
   available,
+  environment,
   environmentName,
   kind,
   label,
 }) {
-  const override = process.env[environmentName]?.trim();
+  const override = environment[environmentName]?.trim();
   const candidates = available.filter((device) => device.kind === kind);
 
   if (override) {
@@ -84,9 +85,9 @@ function selectDevice({
   return candidates[0].udid;
 }
 
-function selectIosSimulator(available) {
+function selectIosSimulator(available, environment) {
   const environmentName = "MR_BROCCOLI_IOS_SIMULATOR_UDID";
-  const override = process.env[environmentName]?.trim();
+  const override = environment[environmentName]?.trim();
 
   if (override) {
     if (!available.some((device) => device.udid === override)) {
@@ -134,6 +135,7 @@ function runMaestroSuite({
 export function runMaestroPrerelease({
   cwd = process.cwd(),
   captureCommand = runCommand,
+  environment = process.env,
   run = runCommand,
   stdout = process.stdout,
 } = {}) {
@@ -146,12 +148,14 @@ export function runMaestroPrerelease({
   const androidDevices = parseAdbDevices(adbOutput);
   const androidEmulator = selectDevice({
     available: androidDevices,
+    environment,
     environmentName: "MR_BROCCOLI_ANDROID_EMULATOR_UDID",
     kind: "emulator",
     label: "Android emulator",
   });
   const androidPhysical = selectDevice({
     available: androidDevices,
+    environment,
     environmentName: "MR_BROCCOLI_ANDROID_PHYSICAL_UDID",
     kind: "physical",
     label: "physical Android device",
@@ -163,6 +167,7 @@ export function runMaestroPrerelease({
   );
   const iosSimulator = selectIosSimulator(
     parseBootedIosSimulators(simulatorOutput),
+    environment,
   );
 
   stdout.write(

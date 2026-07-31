@@ -100,6 +100,7 @@ emulator-5554 device product:sdk model:Pixel transport_id:1
     runMaestroPrerelease({
       cwd,
       captureCommand,
+      environment: {},
       run,
       stdout: { write() {} },
     });
