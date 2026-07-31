@@ -13,6 +13,7 @@ IOS_DESTINATION ?= generic/platform=iOS Simulator
 	typecheck \
 	test \
 	i18n \
+	maestro-verify \
 	license \
 	doctor \
 	dependencies-check \
@@ -30,6 +31,7 @@ help:
 		'make pre-push           Run the fast, spend-free local validation gate' \
 		'make prerelease-preflight Verify every secret and signing prerequisite first' \
 		'make pre-release-static Run the complete spend-free native/static release phase' \
+		'make maestro-verify      Verify the E2E locale and screenshot contract' \
 		'make android-debug      Build a debug APK' \
 		'make ios-build          Build the app for the generic iOS Simulator'
 
@@ -52,6 +54,10 @@ test:
 
 i18n:
 	@npm run i18n:verify
+
+maestro-verify:
+	@npm run maestro:test
+	@npm run maestro:verify
 
 license:
 	@npm run license:test
@@ -79,12 +85,12 @@ ios-build:
 		-configuration Debug \
 		-sdk iphonesimulator \
 		-destination '$(IOS_DESTINATION)' \
-		CODE_SIGNING_ALLOWED=NO \
 		build
 
 pre-push:
 	@$(MAKE) worktree-check
 	@npm run prerelease:env:test
+	@$(MAKE) maestro-verify
 	@$(MAKE) license
 	@$(MAKE) config
 	@$(MAKE) typecheck

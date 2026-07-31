@@ -38,6 +38,7 @@ export const MainScreenTopBar = React.memo(function MainScreenTopBar({
         icon="menu"
         onPress={onOpenDrawer}
         accessibilityLabel={drawerLabel}
+        testID="main-conversations-button"
       />
 
       <View
@@ -103,6 +104,7 @@ export const MainScreenTopBar = React.memo(function MainScreenTopBar({
           icon="setting"
           onPress={onOpenSettings}
           accessibilityLabel={settingsLabel}
+          testID="main-settings-button"
         />
       </View>
     </View>

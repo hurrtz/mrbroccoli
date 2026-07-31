@@ -56,6 +56,7 @@ export function ListeningSettingsPage({
       <AntSectionIntro title={t("voiceInput")} />
 
       <AntRadioSection<InputMode>
+        testID="input-mode-picker"
         label={t("inputMode")}
         options={[
           {

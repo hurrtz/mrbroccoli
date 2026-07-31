@@ -41,6 +41,7 @@ yarn-error.*
 
 # test coverage
 coverage/
+/artifacts/maestro/
 
 # generated native folders
 /ios/*

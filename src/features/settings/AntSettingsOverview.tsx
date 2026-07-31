@@ -1,13 +1,7 @@
 import React from "react";
-import {
-  Pressable,
-  Text,
-  View,
-} from "react-native";
+import { Pressable, Text, View } from "react-native";
 
-import {
-  List,
-} from "@ant-design/react-native";
+import { List } from "@ant-design/react-native";
 import Feather from "@expo/vector-icons/Feather";
 
 import appConfig from "../../../app.json";
@@ -128,15 +122,14 @@ export function AntSettingsOverview({
   ] as const;
 
   return (
-    <View style={styles.overview}>
+    <View testID="settings-page-overview" style={styles.overview}>
       {onOpenSetupGuide ? (
         <Pressable
+          testID="settings-guided-setup"
           onPress={onOpenSetupGuide}
           accessibilityRole="button"
           accessibilityLabel={t("settingsGuidedSetup")}
-          style={({ pressed }) =>
-            pressed ? styles.pressedControl : undefined
-          }
+          style={({ pressed }) => (pressed ? styles.pressedControl : undefined)}
         >
           <AntSettingsCard
             style={[
@@ -153,19 +146,12 @@ export function AntSettingsOverview({
                   {t("settingsGuidedSetup")}
                 </Text>
                 <Text
-                  style={[
-                    styles.setupSummary,
-                    { color: colors.textSecondary },
-                  ]}
+                  style={[styles.setupSummary, { color: colors.textSecondary }]}
                 >
                   {t("settingsGuidedSetupSummary")}
                 </Text>
               </View>
-              <Feather
-                name={drillInIcon}
-                size={20}
-                color={colors.textMuted}
-              />
+              <Feather name={drillInIcon} size={20} color={colors.textMuted} />
             </View>
           </AntSettingsCard>
         </Pressable>
@@ -189,15 +175,14 @@ export function AntSettingsOverview({
           return (
             <Pressable
               key={item.key}
+              testID={`settings-readiness-${item.key}`}
               style={({ pressed }) => [
                 styles.readinessStep,
                 pressed ? styles.pressedControl : null,
               ]}
               onPress={item.onPress}
               accessibilityRole="button"
-              accessibilityLabel={`${item.label}: ${t(
-                item.status.summaryKey,
-              )}`}
+              accessibilityLabel={`${item.label}: ${t(item.status.summaryKey)}`}
             >
               <View style={styles.readinessStepTrack}>
                 <View
@@ -205,9 +190,7 @@ export function AntSettingsOverview({
                     styles.readinessStepLine,
                     {
                       backgroundColor:
-                        previousReady && ready
-                          ? colors.success
-                          : colors.border,
+                        previousReady && ready ? colors.success : colors.border,
                       opacity: index === 0 ? 0 : 1,
                     },
                   ]}
@@ -236,11 +219,8 @@ export function AntSettingsOverview({
                     styles.readinessStepLine,
                     {
                       backgroundColor:
-                        ready && nextReady
-                          ? colors.success
-                          : colors.border,
-                      opacity:
-                        index === readinessItems.length - 1 ? 0 : 1,
+                        ready && nextReady ? colors.success : colors.border,
+                      opacity: index === readinessItems.length - 1 ? 0 : 1,
                     },
                   ]}
                 />
@@ -271,6 +251,7 @@ export function AntSettingsOverview({
             contentStyle={styles.fullBleedCardContent}
           >
             <List.Item
+              testID={`settings-overview-row-${row.page}`}
               multipleLine
               wrap
               thumb={

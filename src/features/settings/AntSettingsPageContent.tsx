@@ -1,9 +1,6 @@
 import React from "react";
 import type { SettingsReadiness } from "../settings-core/readiness";
-import type {
-  SettingsModalProps,
-  SettingsPage,
-} from "../settings-core/types";
+import type { SettingsModalProps, SettingsPage } from "../settings-core/types";
 import { useProviderValidationState } from "../settings-core/useProviderValidationState";
 import { useSettingsController } from "../settings-core/useSettingsController";
 import { Provider, TtsListenLanguage } from "../../types";
@@ -28,8 +25,18 @@ interface AntSettingsPageContentProps {
   validation: ReturnType<typeof useProviderValidationState>;
 }
 
-function DrillInPage({ children }: { children: React.ReactNode }) {
-  return <View style={styles.drillInPage}>{children}</View>;
+function DrillInPage({
+  children,
+  page,
+}: {
+  children: React.ReactNode;
+  page: Exclude<SettingsPage, "overview">;
+}) {
+  return (
+    <View testID={`settings-page-${page}`} style={styles.drillInPage}>
+      {children}
+    </View>
+  );
 }
 
 export function AntSettingsPageContent({
@@ -70,7 +77,7 @@ export function AntSettingsPageContent({
       );
     case "connections":
       return (
-        <DrillInPage>
+        <DrillInPage page="connections">
           <ConnectionsSettingsPage
             settings={settings}
             focusProvider={focusProvider}
@@ -103,7 +110,7 @@ export function AntSettingsPageContent({
       );
     case "thinking":
       return (
-        <DrillInPage>
+        <DrillInPage page="thinking">
           <ThinkingSettingsPage
             settings={settings}
             llmProviders={validation.selectableLlmProviders}
@@ -116,7 +123,7 @@ export function AntSettingsPageContent({
       );
     case "listening":
       return (
-        <DrillInPage>
+        <DrillInPage page="listening">
           <ListeningSettingsPage
             settings={settings}
             selectableSttProviders={validation.selectableSttProviders}
@@ -133,7 +140,7 @@ export function AntSettingsPageContent({
       );
     case "speaking":
       return (
-        <DrillInPage>
+        <DrillInPage page="speaking">
           <SpeakingSettingsPage
             settings={settings}
             kokoroModel={kokoroModel}
@@ -161,9 +168,7 @@ export function AntSettingsPageContent({
               provider: Provider,
               language: TtsListenLanguage,
               text: string,
-            ) =>
-              controller.setProviderPreviewText(provider, language, text)
-            }
+            ) => controller.setProviderPreviewText(provider, language, text)}
             onSetNativePreviewText={controller.setNativePreviewText}
             onSetKokoroPreviewText={controller.setKokoroPreviewText}
             onPreviewProviderVoice={controller.handlePreviewProviderVoice}
@@ -177,7 +182,7 @@ export function AntSettingsPageContent({
       );
     case "search":
       return (
-        <DrillInPage>
+        <DrillInPage page="search">
           <SearchSettingsPage
             settings={settings}
             searchProviders={validation.selectableSearchProviders}
@@ -187,7 +192,7 @@ export function AntSettingsPageContent({
       );
     case "app":
       return (
-        <DrillInPage>
+        <DrillInPage page="app">
           <AppSettingsPage
             settings={settings}
             speechDiagnostics={controller.speechDiagnostics}
@@ -197,7 +202,7 @@ export function AntSettingsPageContent({
       );
     case "data":
       return (
-        <DrillInPage>
+        <DrillInPage page="data">
           <DataPrivacySettingsPage
             onCreateAppDataBackup={props.onCreateAppDataBackup}
             onRestoreAppDataBackup={props.onRestoreAppDataBackup}

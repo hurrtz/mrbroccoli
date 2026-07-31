@@ -79,9 +79,9 @@ export const SetupGuideModal = React.memo(function SetupGuideModal({
         ? t("setupGuideProviderTitle")
         : step === "kokoro"
           ? t("setupGuideKokoroTitle")
-        : step === "voice-test"
-          ? t("setupGuideVoiceTestTitle")
-          : t("setupGuideSummaryTitle");
+          : step === "voice-test"
+            ? t("setupGuideVoiceTestTitle")
+            : t("setupGuideSummaryTitle");
 
   return (
     <Modal
@@ -140,6 +140,7 @@ export const SetupGuideModal = React.memo(function SetupGuideModal({
                 </Text>
               </View>
               <TouchableOpacity
+                testID="setup-guide-close"
                 onPress={onDismiss}
                 style={[
                   styles.closeButton,

@@ -1,0 +1,73 @@
+appId: com.tobiaswinkler.app.mrbroccoli
+name: Drive mode with three routes in landscape
+tags:
+  - visual
+  - layout
+---
+- launchApp:
+    clearState: true
+    clearKeychain: true
+    permissions:
+      all: allow
+- setOrientation: PORTRAIT
+- assertVisible:
+    id: setup-guide-card
+- tapOn:
+    id: setup-guide-not-now
+- assertVisible:
+    id: main-screen
+
+# A harmless placeholder credential exercises the normal route derivation
+# without making a provider request. State and Keychain are cleared per run.
+- tapOn:
+    id: main-settings-button
+- tapOn:
+    id: settings-overview-row-connections
+- tapOn:
+    id: provider-card-anthropic-header-control
+- assertVisible: "API key: Anthropic"
+- tapOn: "API key: Anthropic"
+- inputText: visual-test-only
+- pressKey: ENTER
+- tapOn:
+    id: settings-back-button
+
+# Select Drive mode through the real settings surface.
+- tapOn:
+    id: settings-overview-row-listening
+- assertVisible:
+    id: input-mode-picker-drive-session
+- tapOn:
+    id: input-mode-picker-drive-session
+- tapOn:
+    id: settings-back-button
+- tapOn:
+    id: settings-close-button
+
+# Confirm all three derived routes are rendered before and after rotation.
+- assertVisible:
+    id: response-mode-option-mode-1
+- assertVisible:
+    id: response-mode-option-mode-2
+- assertVisible:
+    id: response-mode-option-mode-3
+- assertVisible:
+    id: drive-session-controls
+- takeScreenshot:
+    path: ${PLATFORM}/visual/drive-three-routes-portrait
+- setOrientation: LANDSCAPE_LEFT
+- assertVisible:
+    id: landscape-left-pane
+- assertVisible:
+    id: landscape-right-pane
+- assertVisible:
+    id: response-mode-option-mode-1
+- assertVisible:
+    id: response-mode-option-mode-2
+- assertVisible:
+    id: response-mode-option-mode-3
+- assertVisible:
+    id: drive-session-controls
+- takeScreenshot:
+    path: ${PLATFORM}/visual/drive-three-routes-landscape
+- setOrientation: PORTRAIT

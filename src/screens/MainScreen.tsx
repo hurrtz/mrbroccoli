@@ -110,12 +110,7 @@ export function MainScreen() {
         getConversationById,
         settings,
       }),
-    [
-      activeConversation?.id,
-      conversations,
-      getConversationById,
-      settings,
-    ],
+    [activeConversation?.id, conversations, getConversationById, settings],
   );
   const handleRestoreAppDataBackup = React.useCallback(
     async (backup: Awaited<ReturnType<typeof createAppDataBackup>>) => {
@@ -295,8 +290,7 @@ export function MainScreen() {
     () => (isRecording ? Date.now() : null),
     [isRecording],
   );
-  const { dismissToast, showToast, toast } =
-    useMainScreenToastController();
+  const { dismissToast, showToast, toast } = useMainScreenToastController();
   usePersistenceFailureAlert(showToast, t);
 
   const {
@@ -687,6 +681,7 @@ export function MainScreen() {
 
   return (
     <SafeAreaView
+      testID="main-screen"
       style={[styles.container, { backgroundColor: colors.background }]}
       edges={
         Platform.OS === "ios" && isLandscape

@@ -93,9 +93,10 @@ export function AppSettingsPage({
   }, []);
 
   return (
-    <View style={styles.sectionPageStack}>
+    <View testID="app-settings-page" style={styles.sectionPageStack}>
       <View style={styles.sectionGroup}>
         <AntRadioSection<ThemeMode>
+          testID="app-theme"
           label={t("theme")}
           options={[
             { value: "light", label: t("light") },
@@ -365,8 +366,7 @@ export function AppSettingsPage({
               color: colors.accent,
               fontFamily: fonts.bodyMedium,
             },
-            onPress: () =>
-              setClearRuntimeOverridesConfirmationVisible(false),
+            onPress: () => setClearRuntimeOverridesConfirmationVisible(false),
           },
           {
             text: t("clear"),

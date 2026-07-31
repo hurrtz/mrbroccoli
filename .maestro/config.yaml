@@ -1,0 +1,7 @@
+flows:
+  - "flows/smoke/*.yaml"
+executionOrder:
+  continueOnFailure: false
+platform:
+  ios:
+    snapshotKeyHonorModalViews: false

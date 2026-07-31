@@ -1,0 +1,290 @@
+appId: com.tobiaswinkler.app.mrbroccoli
+name: Localized application coverage
+tags:
+  - visual
+---
+- launchApp:
+    clearState: true
+    clearKeychain: true
+    permissions:
+      all: allow
+- assertVisible:
+    id: setup-guide-card
+- tapOn:
+    id: setup-guide-not-now
+- assertVisible:
+    id: main-screen
+
+# Select the locale through the same settings surface a customer uses.
+- tapOn:
+    id: main-settings-button
+- scrollUntilVisible:
+    element:
+      id: settings-overview-row-app
+    direction: DOWN
+- tapOn:
+    id: settings-overview-row-app
+- tapOn:
+    id: app-language-picker
+- scrollUntilVisible:
+    element:
+      id: app-language-picker-option-${LOCALE}
+    direction: DOWN
+- tapOn:
+    id: app-language-picker-option-${LOCALE}
+- assertVisible:
+    id: settings-page-app
+- tapOn:
+    id: app-language-picker
+- takeScreenshot:
+    path: ${PLATFORM}/locales/${LOCALE}/language-picker
+- tapOn:
+    id: app-language-picker-close
+- assertVisible:
+    id: settings-page-app
+
+# App settings, including long-copy and diagnostics states.
+- takeScreenshot:
+    path: ${PLATFORM}/locales/${LOCALE}/settings-app-01
+- swipe:
+    direction: UP
+- takeScreenshot:
+    path: ${PLATFORM}/locales/${LOCALE}/settings-app-02
+- swipe:
+    direction: UP
+- takeScreenshot:
+    path: ${PLATFORM}/locales/${LOCALE}/settings-app-03
+- swipe:
+    direction: UP
+- takeScreenshot:
+    path: ${PLATFORM}/locales/${LOCALE}/settings-app-04
+- tapOn:
+    id: settings-back-button
+
+# Overview and the two onboarding screens reachable without credentials.
+- assertVisible:
+    id: settings-page-overview
+- takeScreenshot:
+    path: ${PLATFORM}/locales/${LOCALE}/settings-overview-01
+- swipe:
+    direction: UP
+- takeScreenshot:
+    path: ${PLATFORM}/locales/${LOCALE}/settings-overview-02
+- scrollUntilVisible:
+    element:
+      id: settings-guided-setup
+    direction: UP
+- tapOn:
+    id: settings-guided-setup
+- assertVisible:
+    id: setup-guide-card
+- takeScreenshot:
+    path: ${PLATFORM}/locales/${LOCALE}/setup-guide-intro
+- tapOn:
+    id: setup-guide-intro-continue
+- takeScreenshot:
+    path: ${PLATFORM}/locales/${LOCALE}/setup-guide-provider
+- tapOn:
+    id: setup-guide-close
+- assertVisible:
+    id: main-screen
+- tapOn:
+    id: main-settings-button
+- assertVisible:
+    id: settings-page-overview
+
+# Connections.
+- scrollUntilVisible:
+    element:
+      id: settings-overview-row-connections
+    direction: DOWN
+- tapOn:
+    id: settings-overview-row-connections
+- assertVisible:
+    id: settings-page-connections
+- takeScreenshot:
+    path: ${PLATFORM}/locales/${LOCALE}/settings-connections-01
+- swipe:
+    direction: UP
+- takeScreenshot:
+    path: ${PLATFORM}/locales/${LOCALE}/settings-connections-02
+- swipe:
+    direction: UP
+- takeScreenshot:
+    path: ${PLATFORM}/locales/${LOCALE}/settings-connections-03
+- swipe:
+    direction: UP
+- takeScreenshot:
+    path: ${PLATFORM}/locales/${LOCALE}/settings-connections-04
+- swipe:
+    direction: UP
+- takeScreenshot:
+    path: ${PLATFORM}/locales/${LOCALE}/settings-connections-05
+- swipe:
+    direction: UP
+- takeScreenshot:
+    path: ${PLATFORM}/locales/${LOCALE}/settings-connections-06
+- tapOn:
+    id: settings-back-button
+
+# Thinking.
+- scrollUntilVisible:
+    element:
+      id: settings-overview-row-thinking
+    direction: DOWN
+- tapOn:
+    id: settings-overview-row-thinking
+- assertVisible:
+    id: settings-page-thinking
+- takeScreenshot:
+    path: ${PLATFORM}/locales/${LOCALE}/settings-thinking-01
+- swipe:
+    direction: UP
+- takeScreenshot:
+    path: ${PLATFORM}/locales/${LOCALE}/settings-thinking-02
+- swipe:
+    direction: UP
+- takeScreenshot:
+    path: ${PLATFORM}/locales/${LOCALE}/settings-thinking-03
+- swipe:
+    direction: UP
+- takeScreenshot:
+    path: ${PLATFORM}/locales/${LOCALE}/settings-thinking-04
+- tapOn:
+    id: settings-back-button
+
+# Listening.
+- scrollUntilVisible:
+    element:
+      id: settings-overview-row-listening
+    direction: DOWN
+- tapOn:
+    id: settings-overview-row-listening
+- assertVisible:
+    id: settings-page-listening
+- takeScreenshot:
+    path: ${PLATFORM}/locales/${LOCALE}/settings-listening-01
+- swipe:
+    direction: UP
+- takeScreenshot:
+    path: ${PLATFORM}/locales/${LOCALE}/settings-listening-02
+- swipe:
+    direction: UP
+- takeScreenshot:
+    path: ${PLATFORM}/locales/${LOCALE}/settings-listening-03
+- swipe:
+    direction: UP
+- takeScreenshot:
+    path: ${PLATFORM}/locales/${LOCALE}/settings-listening-04
+- tapOn:
+    id: settings-back-button
+
+# Speaking.
+- scrollUntilVisible:
+    element:
+      id: settings-overview-row-speaking
+    direction: DOWN
+- tapOn:
+    id: settings-overview-row-speaking
+- assertVisible:
+    id: settings-page-speaking
+- takeScreenshot:
+    path: ${PLATFORM}/locales/${LOCALE}/settings-speaking-01
+- swipe:
+    direction: UP
+- takeScreenshot:
+    path: ${PLATFORM}/locales/${LOCALE}/settings-speaking-02
+- swipe:
+    direction: UP
+- takeScreenshot:
+    path: ${PLATFORM}/locales/${LOCALE}/settings-speaking-03
+- swipe:
+    direction: UP
+- takeScreenshot:
+    path: ${PLATFORM}/locales/${LOCALE}/settings-speaking-04
+- swipe:
+    direction: UP
+- takeScreenshot:
+    path: ${PLATFORM}/locales/${LOCALE}/settings-speaking-05
+- swipe:
+    direction: UP
+- takeScreenshot:
+    path: ${PLATFORM}/locales/${LOCALE}/settings-speaking-06
+- tapOn:
+    id: settings-back-button
+
+# Search.
+- scrollUntilVisible:
+    element:
+      id: settings-overview-row-search
+    direction: DOWN
+- tapOn:
+    id: settings-overview-row-search
+- assertVisible:
+    id: settings-page-search
+- takeScreenshot:
+    path: ${PLATFORM}/locales/${LOCALE}/settings-search-01
+- swipe:
+    direction: UP
+- takeScreenshot:
+    path: ${PLATFORM}/locales/${LOCALE}/settings-search-02
+- swipe:
+    direction: UP
+- takeScreenshot:
+    path: ${PLATFORM}/locales/${LOCALE}/settings-search-03
+- swipe:
+    direction: UP
+- takeScreenshot:
+    path: ${PLATFORM}/locales/${LOCALE}/settings-search-04
+- tapOn:
+    id: settings-back-button
+
+# Data and privacy.
+- scrollUntilVisible:
+    element:
+      id: settings-overview-row-data
+    direction: DOWN
+- tapOn:
+    id: settings-overview-row-data
+- assertVisible:
+    id: settings-page-data
+- takeScreenshot:
+    path: ${PLATFORM}/locales/${LOCALE}/settings-data-01
+- swipe:
+    direction: UP
+- takeScreenshot:
+    path: ${PLATFORM}/locales/${LOCALE}/settings-data-02
+- swipe:
+    direction: UP
+- takeScreenshot:
+    path: ${PLATFORM}/locales/${LOCALE}/settings-data-03
+- swipe:
+    direction: UP
+- takeScreenshot:
+    path: ${PLATFORM}/locales/${LOCALE}/settings-data-04
+- tapOn:
+    id: settings-back-button
+- tapOn:
+    id: settings-close-button
+
+# Home, drawer, per-conversation controls, and landscape split layout.
+- assertVisible:
+    id: main-screen
+- takeScreenshot:
+    path: ${PLATFORM}/locales/${LOCALE}/home-portrait
+- tapOn:
+    id: main-conversations-button
+- assertVisible:
+    id: conversation-drawer-empty-state
+- takeScreenshot:
+    path: ${PLATFORM}/locales/${LOCALE}/conversation-drawer
+- tapOn:
+    id: conversation-drawer-close
+- setOrientation: LANDSCAPE_LEFT
+- assertVisible:
+    id: landscape-left-pane
+- assertVisible:
+    id: landscape-right-pane
+- takeScreenshot:
+    path: ${PLATFORM}/locales/${LOCALE}/home-landscape
+- setOrientation: PORTRAIT

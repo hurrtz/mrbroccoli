@@ -1,0 +1,48 @@
+appId: com.tobiaswinkler.app.mrbroccoli
+name: Home and settings smoke test
+tags:
+  - smoke
+---
+- launchApp:
+    clearState: true
+    clearKeychain: true
+    permissions:
+      all: allow
+- assertVisible:
+    id: setup-guide-card
+- takeScreenshot:
+    path: ${PLATFORM}/smoke/setup-guide-intro
+- tapOn:
+    id: setup-guide-not-now
+- assertVisible:
+    id: main-screen
+- takeScreenshot:
+    path: ${PLATFORM}/smoke/home-portrait
+- tapOn:
+    id: main-settings-button
+- assertVisible:
+    id: settings-page-overview
+- takeScreenshot:
+    path: ${PLATFORM}/smoke/settings-overview
+- scrollUntilVisible:
+    element:
+      id: settings-overview-row-app
+    direction: DOWN
+- tapOn:
+    id: settings-overview-row-app
+- assertVisible:
+    id: settings-page-app
+- takeScreenshot:
+    path: ${PLATFORM}/smoke/settings-app
+- tapOn:
+    id: settings-back-button
+- tapOn:
+    id: settings-close-button
+- setOrientation: LANDSCAPE_LEFT
+- assertVisible:
+    id: landscape-left-pane
+- assertVisible:
+    id: landscape-right-pane
+- takeScreenshot:
+    path: ${PLATFORM}/smoke/home-landscape
+- setOrientation: PORTRAIT

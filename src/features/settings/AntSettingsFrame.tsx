@@ -1,11 +1,5 @@
 import React from "react";
-import {
-  Animated,
-  Pressable,
-  ScrollView,
-  Text,
-  View,
-} from "react-native";
+import { Animated, Pressable, ScrollView, Text, View } from "react-native";
 import Feather from "@expo/vector-icons/Feather";
 import type { EdgeInsets } from "react-native-safe-area-context";
 import { Toast } from "../../components/Toast";
@@ -63,14 +57,13 @@ export function AntSettingsFrame({
 
   return (
     <View
+      testID="settings-modal"
       accessibilityViewIsModal
       style={[
         styles.overlay,
         {
           paddingTop: isLandscape ? Math.max(insets.top + 8, 16) : 0,
-          paddingBottom: isLandscape
-            ? Math.max(insets.bottom + 8, 16)
-            : 0,
+          paddingBottom: isLandscape ? Math.max(insets.bottom + 8, 16) : 0,
           paddingHorizontal: isLandscape ? 12 : 0,
         },
       ]}
@@ -85,11 +78,7 @@ export function AntSettingsFrame({
           },
         ]}
       />
-      <Pressable
-        style={styles.backdrop}
-        onPress={onClose}
-        accessible={false}
-      />
+      <Pressable style={styles.backdrop} onPress={onClose} accessible={false} />
       <Animated.View
         style={[
           styles.modal,
@@ -127,6 +116,7 @@ export function AntSettingsFrame({
               style={styles.headerControl}
               onPress={onBack}
               accessibilityLabel={t("settingsBackToOverview")}
+              testID="settings-back-button"
             />
           ) : (
             <View style={styles.headerControl} />
@@ -147,19 +137,18 @@ export function AntSettingsFrame({
             style={styles.headerControl}
             onPress={onClose}
             accessibilityLabel={t("dismiss")}
+            testID="settings-close-button"
           />
         </View>
 
         <ScrollView
+          testID="settings-scroll-view"
           ref={contentScrollRef}
           style={styles.scroll}
           contentContainerStyle={[
             styles.content,
             {
-              paddingBottom: Math.max(
-                insets.bottom + 20,
-                keyboardInset + 20,
-              ),
+              paddingBottom: Math.max(insets.bottom + 20, keyboardInset + 20),
             },
           ]}
           showsVerticalScrollIndicator={false}

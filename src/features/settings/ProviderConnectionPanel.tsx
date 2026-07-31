@@ -2,6 +2,7 @@ import React from "react";
 import {
   ActivityIndicator,
   Modal,
+  Platform,
   Pressable,
   ScrollView,
   Text,
@@ -320,61 +321,78 @@ export function ProviderConnectionPanel({
         >
           {getProviderApiKeyHint(provider, language)}
         </Text>
-        <Input
-          value={displayedApiKey}
-          type={secureApiKey ? "password" : "text"}
-          onChangeText={(value) =>
-            onUpdateApiKey(
-              provider,
-              qwenCredentials
-                ? formatQwenApiCredential(value, qwenCredentials.region)
-                : value,
-            )
+        <View
+          testID={
+            Platform.OS === "ios"
+              ? `provider-api-key-input-${provider}`
+              : undefined
           }
-          onFocus={onTextInputFocus}
-          autoCapitalize="none"
-          autoCorrect={false}
-          autoComplete="off"
-          textContentType="none"
-          importantForAutofill="no"
-          spellCheck={false}
-          placeholder={getProviderApiKeyPlaceholder(provider, language)}
-          placeholderTextColor={colors.textMuted}
-          selectionColor={colors.accent}
-          inputStyle={{
-            color: colors.text,
-            fontFamily: fonts.body,
-            fontSize: 15,
-            lineHeight: 21,
-            paddingHorizontal: 12,
-          }}
-          suffix={
-            <Pressable
-              style={({ pressed }) => [
-                styles.inputSuffix,
-                pressed ? styles.pressedControl : null,
-              ]}
-              onPress={onToggleApiKeyVisibility}
-              accessibilityRole="button"
-              accessibilityLabel={secureApiKey ? t("showKey") : t("hideKey")}
-            >
-              <Icon
-                name={secureApiKey ? "eye" : "eye-invisible"}
-                size={18}
-                color={colors.textSecondary}
-              />
-            </Pressable>
-          }
-          styles={{
-            container: {
-              backgroundColor: colors.surface,
-              borderWidth: 1,
-              borderColor: colors.border,
-              borderRadius: 10,
-              minHeight: 46,
-            },
-          }}
-        />
+          collapsable={false}
+        >
+          <Input
+            testID={
+              Platform.OS === "ios"
+                ? undefined
+                : `provider-api-key-input-${provider}`
+            }
+            value={displayedApiKey}
+            accessibilityLabel={`${t("apiKey")}: ${PROVIDER_LABELS[provider]}`}
+            type={secureApiKey ? "password" : "text"}
+            onChangeText={(value) =>
+              onUpdateApiKey(
+                provider,
+                qwenCredentials
+                  ? formatQwenApiCredential(value, qwenCredentials.region)
+                  : value,
+              )
+            }
+            onFocus={onTextInputFocus}
+            autoCapitalize="none"
+            autoCorrect={false}
+            autoComplete="off"
+            textContentType="none"
+            importantForAutofill="no"
+            spellCheck={false}
+            placeholder={getProviderApiKeyPlaceholder(provider, language)}
+            placeholderTextColor={colors.textMuted}
+            selectionColor={colors.accent}
+            inputStyle={{
+              color: colors.text,
+              fontFamily: fonts.body,
+              fontSize: 15,
+              lineHeight: 21,
+              paddingHorizontal: 12,
+            }}
+            suffix={
+              <Pressable
+                style={({ pressed }) => [
+                  styles.inputSuffix,
+                  pressed ? styles.pressedControl : null,
+                ]}
+                onPress={onToggleApiKeyVisibility}
+                accessibilityRole="button"
+                accessibilityLabel={
+                  secureApiKey ? t("showKey") : t("hideKey")
+                }
+              >
+                <Icon
+                  name={secureApiKey ? "eye" : "eye-invisible"}
+                  size={18}
+                  color={colors.textSecondary}
+                />
+              </Pressable>
+            }
+            styles={{
+              container: {
+                backgroundColor: colors.surface,
+                borderWidth: 1,
+                borderColor: colors.border,
+                borderRadius: 10,
+                minHeight: 46,
+              },
+            }}
+          />
+        </View>
         {qwenCredentials ? (
           <View style={styles.connectionFullBleed}>
             <AntPickerRows

@@ -50,11 +50,8 @@ function KokoroFooter({
     <>
       <SecondaryButton label={t("setupGuideBack")} onPress={onBack} />
       <PrimaryButton
-        label={
-          useKokoro
-            ? t("setupGuideContinue")
-            : t("setupGuideSkipKokoro")
-        }
+        testID="setup-guide-kokoro-continue"
+        label={useKokoro ? t("setupGuideContinue") : t("setupGuideSkipKokoro")}
         disabled={kokoroModel.busy !== null}
         onPress={onContinueFromKokoro}
       />
@@ -65,14 +62,17 @@ function KokoroFooter({
 function SecondaryButton({
   label,
   onPress,
+  testID,
 }: {
   label: string;
   onPress: () => void;
+  testID?: string;
 }) {
   const { colors } = useTheme();
 
   return (
     <TouchableOpacity
+      testID={testID}
       onPress={onPress}
       style={[
         styles.secondaryButton,
@@ -98,15 +98,18 @@ function PrimaryButton({
   label,
   onPress,
   disabled = false,
+  testID,
 }: {
   label: string;
   onPress: () => void;
   disabled?: boolean;
+  testID?: string;
 }) {
   const { colors } = useTheme();
 
   return (
     <TouchableOpacity
+      testID={testID}
       activeOpacity={0.9}
       disabled={disabled}
       onPress={onPress}
@@ -139,8 +142,13 @@ function IntroFooter({
 
   return (
     <>
-      <SecondaryButton label={t("notNow")} onPress={onDismiss} />
+      <SecondaryButton
+        testID="setup-guide-not-now"
+        label={t("notNow")}
+        onPress={onDismiss}
+      />
       <PrimaryButton
+        testID="setup-guide-intro-continue"
         label={t("setupGuideContinue")}
         onPress={onContinueFromIntro}
       />
@@ -195,15 +203,21 @@ function ProviderFooter({
         </View>
       ) : null}
       <View style={styles.footerButtonRow}>
-        <SecondaryButton label={t("setupGuideBack")} onPress={onBack} />
+        <SecondaryButton
+          testID="setup-guide-provider-back"
+          label={t("setupGuideBack")}
+          onPress={onBack}
+        />
         <View style={styles.primaryButtonWrapper}>
           {canContinueFromProvider ? (
             <PrimaryButton
+              testID="setup-guide-provider-continue"
               label={t("setupGuideContinue")}
               onPress={onContinueFromProvider}
             />
           ) : (
             <PrimaryButton
+              testID="setup-guide-provider-validate"
               label={
                 isValidatingProviderKey
                   ? t("validatingKey")
@@ -238,14 +252,20 @@ function VoiceTestFooter({
 
   return (
     <>
-      <SecondaryButton label={t("setupGuideBack")} onPress={onBack} />
+      <SecondaryButton
+        testID="setup-guide-voice-back"
+        label={t("setupGuideBack")}
+        onPress={onBack}
+      />
       {canContinue ? (
         <PrimaryButton
+          testID="setup-guide-voice-continue"
           label={t("setupGuideContinue")}
           onPress={onContinueFromVoiceTest}
         />
       ) : (
         <PrimaryButton
+          testID="setup-guide-voice-action"
           label={getVoiceTestActionLabel(t, voiceTest.phase)}
           disabled={voiceTest.isBusy}
           onPress={onVoiceTestAction}
@@ -263,8 +283,16 @@ function SummaryFooter({
 
   return (
     <>
-      <SecondaryButton label={t("settings")} onPress={onOpenSettings} />
-      <PrimaryButton label={t("setupGuideFinish")} onPress={onFinish} />
+      <SecondaryButton
+        testID="setup-guide-open-settings"
+        label={t("settings")}
+        onPress={onOpenSettings}
+      />
+      <PrimaryButton
+        testID="setup-guide-finish"
+        label={t("setupGuideFinish")}
+        onPress={onFinish}
+      />
     </>
   );
 }
