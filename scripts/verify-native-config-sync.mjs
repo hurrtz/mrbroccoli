@@ -13,6 +13,7 @@ const iosInfo = readText("ios/MrBroccoli/Info.plist");
 const iosPodfile = readText("ios/Podfile");
 const iosProject = readText("ios/MrBroccoli.xcodeproj/project.pbxproj");
 const androidBuild = readText("android/app/build.gradle");
+const androidGradleProperties = readText("android/gradle.properties");
 const androidManifest = readText(
   "android/app/src/main/AndroidManifest.xml",
 );
@@ -139,6 +140,11 @@ assertIncludes(
   iosPodfile,
   `platform :ios, podfile_properties['ios.deploymentTarget'] || '${iosDeploymentTarget}'`,
 );
+assertIncludes(
+  "iOS unused Sherpa FFmpeg disabled",
+  iosPodfile,
+  "ENV['SHERPA_ONNX_DISABLE_FFMPEG'] = '1'",
+);
 assertAllEqual(
   "iOS project deployment target",
   iosDeploymentTargets,
@@ -153,6 +159,11 @@ assertIncludes(
   "Android application ID",
   androidBuild,
   `applicationId '${androidPackage}'`,
+);
+assertIncludes(
+  "Android unused Sherpa FFmpeg disabled",
+  androidGradleProperties,
+  "sherpaOnnxDisableFfmpeg=true",
 );
 assertAllEqual(
   "iOS marketing version",

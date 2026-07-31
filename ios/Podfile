@@ -1,5 +1,8 @@
 # Set by expo-router. This enables Fabric-only features from react-native-screens
 ENV['RNS_GAMMA_ENABLED'] ||= '1'
+# Mr Broccoli only uses Sherpa for Kokoro model extraction and WAV synthesis.
+# Keep its unused FFmpeg conversion/decoding runtime out of distributable builds.
+ENV['SHERPA_ONNX_DISABLE_FFMPEG'] = '1'
 require File.join(File.dirname(`node --print "require.resolve('expo/package.json')"`), "scripts/autolinking")
 require File.join(File.dirname(`node --print "require.resolve('react-native/package.json')"`), "scripts/react_native_pods")
 

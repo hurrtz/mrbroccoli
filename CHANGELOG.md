@@ -39,6 +39,8 @@ the complete Play Store translations are kept in a dedicated file under
 - Improve screen-reader behavior for pickers, overlays, voice phases, setup,
   and download/validation statuses, and expand interactive controls to
   accessible touch targets.
+- Reduce the native app footprint by excluding Sherpa's unused audio-conversion
+  runtime while retaining Kokoro model installation and WAV speech synthesis.
 
 ### Fixed
 
