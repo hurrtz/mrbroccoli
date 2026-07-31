@@ -74,6 +74,7 @@ tags:
     element:
       id: settings-guided-setup
     direction: UP
+    centerElement: true
 - tapOn:
     id: settings-guided-setup
 - assertVisible:
