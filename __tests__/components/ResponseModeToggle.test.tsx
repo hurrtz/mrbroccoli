@@ -723,7 +723,7 @@ describe("ResponseModeToggle", () => {
     ).toBeTruthy();
   });
 
-  it("stacks compact landscape cards one per row", () => {
+  it("lays out three compact landscape cards in one row", () => {
     const screen = renderWithProviders(
       <ResponseModeToggle
         compact
@@ -753,11 +753,12 @@ describe("ResponseModeToggle", () => {
       screen.getByTestId("response-mode-option-mode-1").props.style,
     );
 
-    expect(listStyle.flexDirection).toBe("column");
+    expect(listStyle.flexDirection).toBe("row");
     expect(listStyle.flexWrap).toBeUndefined();
-    expect(optionStyle.width).toBe("100%");
-    expect(optionStyle.flexShrink).toBe(0);
-    expect(optionStyle.minHeight).toBe(54);
+    expect(optionStyle.flex).toBe(1);
+    expect(optionStyle.minWidth).toBe(0);
+    expect(optionStyle.width).toBeUndefined();
+    expect(optionStyle.minHeight).toBe(82);
     expect(screen.getByText("openai:32")).toBeTruthy();
     expect(
       StyleSheet.flatten(
@@ -770,9 +771,8 @@ describe("ResponseModeToggle", () => {
       ),
     ).toEqual(
       expect.objectContaining({
-        flex: 1,
         height: 30,
-        width: "auto",
+        width: "100%",
       }),
     );
   });

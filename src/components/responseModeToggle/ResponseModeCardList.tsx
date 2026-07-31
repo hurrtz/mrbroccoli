@@ -26,8 +26,10 @@ export function ResponseModeCardList({
 }: ResponseModeCardListProps) {
   const singleMode = modes.length === 1;
   const detailedLayout = modes.length <= 2;
-  const threeCardPortrait = !compact && modes.length === 3;
   const threeCardCompact = compact && modes.length === 3;
+  const stackCompactCards = compact && !threeCardCompact;
+  const cardCompact = compact && !threeCardCompact;
+  const threeCardPortrait = modes.length === 3 && !cardCompact;
   const [modelLineMeasurements, setModelLineMeasurements] =
     React.useState<ModelLineMeasurements>({});
   const threeCardPortraitOneLine =
@@ -61,13 +63,13 @@ export function ResponseModeCardList({
       testID="response-mode-list"
       style={[
         styles.container,
-        compact ? styles.containerCompact : null,
+        stackCompactCards ? styles.containerCompact : null,
       ]}
     >
       {modes.map((mode) => (
         <ResponseModeCard
           key={mode.id}
-          compact={compact}
+          compact={cardCompact}
           detailedLayout={detailedLayout}
           enlargeThreeCardIcons={enlargeThreeCardIcons}
           mode={mode}

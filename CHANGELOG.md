@@ -37,6 +37,11 @@ the complete Play Store translations are kept in a dedicated file under
 - Redact credentials and user-authored text from debug captures before logs are
   written to disk or copied to the clipboard.
 
+### Fixed
+
+- Prevent three response modes from crowding or overlapping Drive controls in
+  landscape by using the horizontal three-card layout.
+
 ## 2.5.6 - 2026-07-31
 
 ### Changed
