@@ -64,6 +64,33 @@ const AGGREGATE_FLUSH_DELAY_MS = 1_000;
 // would perturb the very re-render/battery signal a capture is meant to measure.
 // Dropped from capture entirely.
 const HIGH_FREQUENCY_EVENTS = new Set<string>(["native-waveform-event"]);
+const REDACTED_SECRET = "[REDACTED]";
+const MAX_DEBUG_VALUE_DEPTH = 6;
+const MAX_DEBUG_ARRAY_LENGTH = 50;
+const SECRET_KEY_NAMES = new Set([
+  "apikey",
+  "authorization",
+  "cookie",
+  "credential",
+  "credentials",
+  "password",
+  "passphrase",
+  "secret",
+  "token",
+]);
+const PRIVATE_TEXT_KEY_NAMES = new Set([
+  "assistantinstructions",
+  "content",
+  "existingsummary",
+  "instructions",
+  "prompt",
+  "query",
+  "summary",
+  "systemprompt",
+  "text",
+  "transcript",
+  "webcontext",
+]);
 
 let activeSession: ActiveDebugLogSession | null = null;
 let lastExportPath: string | null = null;
@@ -112,14 +139,109 @@ function safeStringify(value: unknown) {
   }
 }
 
+function normalizeDebugKey(key: string) {
+  return key.toLowerCase().replace(/[^a-z]/g, "");
+}
+
+function redactSensitiveString(value: string) {
+  return value
+    .replace(/\bBearer\s+[A-Za-z0-9._~+/=-]+/gi, "Bearer [REDACTED]")
+    .replace(/\bsk-(?:ant-)?[A-Za-z0-9_-]{8,}\b/g, REDACTED_SECRET)
+    .replace(/\bxai-[A-Za-z0-9_-]{8,}\b/gi, REDACTED_SECRET)
+    .replace(/\bAIza[A-Za-z0-9_-]{16,}\b/g, REDACTED_SECRET)
+    .replace(
+      /([?&](?:api[_-]?key|authorization|credential|password|passphrase|secret|token)=)[^&#\s]*/gi,
+      `$1${REDACTED_SECRET}`,
+    )
+    .replace(
+      /((?:api[_ -]?key|authorization|credential|password|passphrase|secret|token)\s*[:=]\s*["']?)[^"',}\s]+/gi,
+      `$1${REDACTED_SECRET}`,
+    );
+}
+
+function sanitizeDebugValue(
+  value: unknown,
+  key = "",
+  depth = 0,
+  seen = new WeakSet<object>(),
+): unknown {
+  const normalizedKey = normalizeDebugKey(key);
+
+  if (SECRET_KEY_NAMES.has(normalizedKey)) {
+    return REDACTED_SECRET;
+  }
+
+  if (PRIVATE_TEXT_KEY_NAMES.has(normalizedKey) && typeof value === "string") {
+    return `[REDACTED_TEXT length=${value.length}]`;
+  }
+
+  if (typeof value === "string") {
+    return redactSensitiveString(value);
+  }
+
+  if (
+    value === null ||
+    value === undefined ||
+    typeof value === "number" ||
+    typeof value === "boolean"
+  ) {
+    return value;
+  }
+
+  if (value instanceof Error) {
+    return {
+      message: redactSensitiveString(value.message),
+      name: value.name,
+    };
+  }
+
+  if (depth >= MAX_DEBUG_VALUE_DEPTH) {
+    return "[TRUNCATED]";
+  }
+
+  if (typeof value !== "object") {
+    return String(value);
+  }
+
+  if (seen.has(value)) {
+    return "[CIRCULAR]";
+  }
+  seen.add(value);
+
+  if (Array.isArray(value)) {
+    const sanitized = value
+      .slice(0, MAX_DEBUG_ARRAY_LENGTH)
+      .map((entry) => sanitizeDebugValue(entry, key, depth + 1, seen));
+    if (value.length > MAX_DEBUG_ARRAY_LENGTH) {
+      sanitized.push(`[TRUNCATED ${value.length - MAX_DEBUG_ARRAY_LENGTH} items]`);
+    }
+    return sanitized;
+  }
+
+  return Object.fromEntries(
+    Object.entries(value).map(([entryKey, entryValue]) => [
+      entryKey,
+      sanitizeDebugValue(entryValue, entryKey, depth + 1, seen),
+    ]),
+  );
+}
+
+function sanitizeDebugPayload(payload?: Record<string, unknown>) {
+  if (!payload) {
+    return undefined;
+  }
+
+  return sanitizeDebugValue(payload) as Record<string, unknown>;
+}
+
 function formatConsoleArgs(args: unknown[]) {
   return args
     .map((arg) => {
       if (typeof arg === "string") {
-        return arg;
+        return redactSensitiveString(arg);
       }
 
-      return safeStringify(arg);
+      return safeStringify(sanitizeDebugValue(arg));
     })
     .join(" ");
 }
@@ -167,6 +289,7 @@ function appendEntry(
 
   activeSession.entries.push({
     ...entry,
+    payload: sanitizeDebugPayload(entry.payload),
     elapsedMs: Date.now() - activeSession.startedAtMs,
     timestamp: new Date().toISOString(),
   });
