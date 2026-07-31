@@ -10,6 +10,8 @@ the complete Play Store translations are kept in a dedicated file under
 
 ## Unreleased
 
+## 2.6.0 - 2026-07-31
+
 ### Added
 
 - Added readable and passphrase-encrypted app-data backups for portable
@@ -52,7 +54,17 @@ the complete Play Store translations are kept in a dedicated file under
 
 - Prevent three response modes from crowding or overlapping Drive controls in
   landscape by using the horizontal three-card layout.
+- Keep long voice-preview text inside its editor instead of letting it overlap
+  the preview button.
 - Update OpenAI Realtime text responses to the current GA event schema.
+- Keep Anthropic grounded web-search replies reliable when adaptive thinking is
+  enabled by reserving enough response budget and requiring a completed search.
+- Parse Gemini's current Interactions API search steps so grounded replies and
+  their search results are recognized correctly.
+
+### Store release notes
+
+See `docs/google-play-release-notes-2.6.0.md`.
 
 ## 2.5.6 - 2026-07-31
 
