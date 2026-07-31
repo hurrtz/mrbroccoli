@@ -2,6 +2,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import {
   generateConversationTitle,
+  generateInternalChat,
   streamChat,
   validateProviderConnection,
 } from "../../src/services/llm";
@@ -1612,5 +1613,37 @@ describe("validateProviderConnection", () => {
     ).rejects.toThrow(
       "OpenAI rejected the credentials for reply generation. Check the API key and permissions.",
     );
+  });
+});
+
+describe("generateInternalChat", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    resetProviderModelHealthForTests();
+  });
+
+  it("reports the exact effort accepted by the provider route", async () => {
+    (fetch as jest.Mock).mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({
+        choices: [{ finish_reason: "stop", message: { content: "OK" } }],
+      }),
+    });
+
+    const result = await generateInternalChat({
+      apiKey: "sk-test-key",
+      language: "en",
+      messages: [{ role: "user", content: "Reply only: OK" }],
+      model: "gpt-5.6-sol",
+      modelEffort: "high",
+      provider: "openai",
+      systemPrompt: "Return exactly OK.",
+    });
+
+    expect(result.model).toBe("gpt-5.6-sol");
+    expect(result.modelEffort).toBe("high");
+    expect(
+      JSON.parse((fetch as jest.Mock).mock.calls[0][1].body).reasoning_effort,
+    ).toBe("high");
   });
 });

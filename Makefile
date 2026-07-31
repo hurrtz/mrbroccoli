@@ -23,7 +23,8 @@ IOS_DESTINATION ?= generic/platform=iOS Simulator
 	ios-build \
 	pre-push \
 	prerelease-preflight \
-	pre-release-static
+	pre-release-static \
+	pre-release-live
 
 help:
 	@printf '%s\n' \
@@ -31,6 +32,7 @@ help:
 		'make pre-push           Run the fast, spend-free local validation gate' \
 		'make prerelease-preflight Verify every secret and signing prerequisite first' \
 		'make pre-release-static Run the complete spend-free native/static release phase' \
+		'make pre-release-live  Run the fail-fast live provider/model matrix' \
 		'make maestro-verify      Verify the E2E locale and screenshot contract' \
 		'make android-debug      Build a debug APK' \
 		'make ios-build          Build the app for the generic iOS Simulator'
@@ -90,6 +92,7 @@ ios-build:
 pre-push:
 	@$(MAKE) worktree-check
 	@npm run prerelease:env:test
+	@npm run prerelease:live:test
 	@$(MAKE) maestro-verify
 	@$(MAKE) license
 	@$(MAKE) config
@@ -111,3 +114,9 @@ pre-release-static:
 	@$(MAKE) i18n
 	@$(MAKE) android-unit
 	@$(MAKE) ios-build
+
+# The runner repeats the zero-network preflight internally before it loads any
+# local credential into the Jest process. It then enforces the configured USD
+# reservation and stops on the first failing provider configuration.
+pre-release-live:
+	@npm run prerelease:live

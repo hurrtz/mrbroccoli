@@ -41,11 +41,15 @@ the complete Play Store translations are kept in a dedicated file under
   accessible touch targets.
 - Reduce the native app footprint by excluding Sherpa's unused audio-conversion
   runtime while retaining Kokoro model installation and WAV speech synthesis.
+- Add a local, manifest-driven release gate that checks every retained provider
+  model and effort, all speech and web-search routes, and one representative
+  voice per TTS model behind a fail-fast credential and spend-reservation gate.
 
 ### Fixed
 
 - Prevent three response modes from crowding or overlapping Drive controls in
   landscape by using the horizontal three-card layout.
+- Update OpenAI Realtime text responses to the current GA event schema.
 
 ## 2.5.6 - 2026-07-31
 

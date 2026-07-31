@@ -195,6 +195,17 @@ These notes are specific to this repository and supplement any parent-level inst
   `make prerelease-preflight` before every provider or other quota-consuming
   request. A missing credential, release keystore, or cost ceiling aborts the
   entire run; partial provider coverage is not a release pass.
+- Run `make pre-release-live` only as an explicit release phase. It derives the
+  complete live matrix from `runtimeManifest.ts`, tests every retained LLM
+  model and offered effort, every STT/TTS model, one compatible voice per TTS
+  model, provider voice directories, web-search providers, and exposed search
+  modes. The runner must stop on the first failure, must not print credentials,
+  and must reject its conservative request reservation before network access
+  when it exceeds `MR_BROCCOLI_PRERELEASE_MAX_USD`.
+- A provider key that exists but lacks quota, credit, product access, or model
+  permission is a failed release prerequisite. Do not weaken the matrix,
+  silently skip the provider, or spend quota on later providers after this
+  failure.
 - Use `npx tsc --noEmit` as the baseline repo-wide verification step for UI and type changes.
 - Use targeted Jest runs for affected areas instead of defaulting to the entire suite when only a small area changed.
 - Common focused tests:

@@ -112,15 +112,19 @@ The repository includes a Makefile-based local CI workflow:
 make hooks-install
 make pre-push
 make pre-release-static
+make pre-release-live
 ```
 
 `pre-push` is the fast, spend-free gate installed as the repository's Git
 pre-push hook. `prerelease-preflight` checks the complete ignored
 `.env.local` secret/signing contract before any provider request.
 `pre-release-static` then adds Expo dependency checks plus Android and iOS
-native validation. The live provider/model matrix and Maestro visual suite are
-kept as explicit later phases so their cost and device requirements cannot be
-triggered accidentally.
+native validation. `pre-release-live` derives every retained LLM model and
+effort, speech model, representative TTS voice, voice directory, web-search
+provider, and exposed search mode from the runtime manifest. It aborts on the
+first failure and rejects a matrix whose conservative release-test reservation
+exceeds `MR_BROCCOLI_PRERELEASE_MAX_USD`. Live validation and Maestro device
+work remain explicit release phases so neither can be triggered by a push.
 
 ## How Credentials Work
 

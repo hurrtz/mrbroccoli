@@ -388,6 +388,9 @@ export async function generateInternalChat(params: {
   return {
     text,
     model: resolved.actualModel,
+    ...(resolved.actualModelEffort
+      ? { modelEffort: resolved.actualModelEffort }
+      : {}),
     usage: estimateChatUsage({
       provider: params.provider,
       model: resolved.actualModel,

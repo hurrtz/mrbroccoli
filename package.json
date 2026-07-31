@@ -10,6 +10,8 @@
     "config:verify": "node scripts/verify-native-config-sync.mjs",
     "prerelease:env:verify": "node scripts/verify-prerelease-env.mjs",
     "prerelease:env:test": "node --test scripts/verify-prerelease-env.test.mjs",
+    "prerelease:live": "node scripts/run-live-provider-matrix.mjs",
+    "prerelease:live:test": "node --test scripts/run-live-provider-matrix.test.mjs",
     "maestro:verify": "node scripts/verify-maestro-suite.mjs",
     "maestro:test": "node --test scripts/verify-maestro-suite.test.mjs",
     "license:notices:generate": "node scripts/verify-licenses.mjs --write",
