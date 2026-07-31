@@ -11,6 +11,7 @@ import {
 } from "../../types";
 import {
   createApiKeyUpdater,
+  createProviderValidationResultUpdater,
   createResponseModeAdder,
   createResponseModeRemover,
   createProviderModelUpdater,
@@ -105,6 +106,10 @@ export function useSettingsActions({ setSettings }: UseSettingsActionsParams) {
   );
 
   const updateApiKey = useCallback(createApiKeyUpdater(setSettings), [setSettings]);
+  const updateProviderValidationResult = useCallback(
+    createProviderValidationResultUpdater(setSettings),
+    [setSettings],
+  );
   const restorePortableSettings = useCallback(
     (portableSettings: PortableSettings) => {
       setSettings((current) => {
@@ -134,6 +139,7 @@ export function useSettingsActions({ setSettings }: UseSettingsActionsParams) {
     updateActiveResponseMode,
     updateProviderTtsVoice,
     updateApiKey,
+    updateProviderValidationResult,
     restorePortableSettings,
   };
 }

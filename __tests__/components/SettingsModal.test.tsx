@@ -128,6 +128,7 @@ function renderSettingsModal(
             onUpdateProviderTtsModel={jest.fn()}
             onUpdateProviderTtsVoice={jest.fn()}
             onUpdateApiKey={jest.fn()}
+            onUpdateProviderValidationResult={jest.fn()}
             onPreviewVoice={jest.fn(async () => undefined)}
             onStopPreviewVoice={jest.fn(async () => undefined)}
             onValidateProviderCapability={jest.fn(async () => undefined)}
@@ -880,7 +881,7 @@ describe("SettingsModal", () => {
     const onValidateProviderCapability = jest.fn(async () => {
       throw new Error(errorMessage);
     });
-    const onUpdate = jest.fn();
+    const onUpdateProviderValidationResult = jest.fn();
     const screen = renderSettingsModal({
       focusProvider: "openai",
       settings: {
@@ -890,7 +891,7 @@ describe("SettingsModal", () => {
           openai: "invalid-key",
         },
       },
-      onUpdate,
+      onUpdateProviderValidationResult,
       onValidateProviderCapability,
     });
 
@@ -908,17 +909,15 @@ describe("SettingsModal", () => {
       expect(
         within(screen.getByTestId("toast")).getByText(errorMessage),
       ).toBeTruthy();
-      expect(onUpdate).toHaveBeenCalledWith({
-        providerValidationResults: {
-          openai: expect.objectContaining({
-            llm: expect.objectContaining({
-              status: "error",
-              message: errorMessage,
-              model: expect.any(String),
-            }),
-          }),
-        },
-      });
+      expect(onUpdateProviderValidationResult).toHaveBeenCalledWith(
+        "openai",
+        "llm",
+        expect.objectContaining({
+          status: "error",
+          message: errorMessage,
+          model: expect.any(String),
+        }),
+      );
     });
 
     fireEvent.press(
@@ -1017,7 +1016,7 @@ describe("SettingsModal", () => {
   });
 
   it("replaces a persisted failure after a successful retest", async () => {
-    const onUpdate = jest.fn();
+    const onUpdateProviderValidationResult = jest.fn();
     const screen = renderSettingsModal({
       focusProvider: "openai",
       settings: {
@@ -1036,7 +1035,7 @@ describe("SettingsModal", () => {
           },
         },
       },
-      onUpdate,
+      onUpdateProviderValidationResult,
     });
 
     await waitFor(() => {
@@ -1046,16 +1045,14 @@ describe("SettingsModal", () => {
     fireEvent.press(screen.getByLabelText("Test LLM"));
 
     await waitFor(() => {
-      expect(onUpdate).toHaveBeenCalledWith({
-        providerValidationResults: {
-          openai: expect.objectContaining({
-            llm: expect.objectContaining({
-              status: "success",
-              model: expect.any(String),
-            }),
-          }),
-        },
-      });
+      expect(onUpdateProviderValidationResult).toHaveBeenCalledWith(
+        "openai",
+        "llm",
+        expect.objectContaining({
+          status: "success",
+          model: expect.any(String),
+        }),
+      );
       const llmPill = screen.getByTestId("provider-capability-pill-openai-llm");
       expect(llmPill.props.accessibilityLabel).toBe("LLM: Working");
       expect(screen.queryByText("Invalid")).toBeNull();

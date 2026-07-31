@@ -1,6 +1,6 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as SecureStore from "expo-secure-store";
-import { renderHook, act } from "@testing-library/react-native";
+import { renderHook, act, waitFor } from "@testing-library/react-native";
 import { MAX_RESPONSE_MODES } from "../../src/constants/providers/defaults";
 import { useSettings } from "../../src/hooks/useSettings";
 import {
@@ -1025,6 +1025,96 @@ describe("useSettings", () => {
       },
     });
     expect(persisted.apiKeys).toBeUndefined();
+  });
+
+  it("atomically persists every provider capability result across restart", async () => {
+    const firstRun = renderHook(() => useSettings());
+    await flushSettingsLoad();
+
+    act(() => {
+      firstRun.result.current.updateProviderValidationResult(
+        "mistral",
+        "llm",
+        {
+          status: "success",
+          model: "mistral-large-latest",
+        },
+      );
+      firstRun.result.current.updateProviderValidationResult(
+        "mistral",
+        "stt",
+        {
+          status: "success",
+          model: "voxtral-mini-latest",
+        },
+      );
+      firstRun.result.current.updateProviderValidationResult(
+        "mistral",
+        "tts",
+        {
+          status: "success",
+          model: "voxtral-tts-latest",
+        },
+      );
+      firstRun.result.current.updateProviderValidationResult(
+        "mistral",
+        "search",
+        {
+          status: "success",
+          model: "mistral-large-latest",
+        },
+      );
+      firstRun.result.current.updateProviderValidationResult(
+        "mistral",
+        "voices",
+        {
+          status: "success",
+          model: "voice-directory",
+        },
+      );
+    });
+
+    expect(
+      Object.keys(
+        firstRun.result.current.settings.providerValidationResults.mistral ??
+          {},
+      ),
+    ).toEqual(["llm", "stt", "tts", "search", "voices"]);
+
+    await waitFor(() => {
+      const calls = (AsyncStorage.setItem as jest.Mock).mock.calls;
+      expect(calls.length).toBeGreaterThanOrEqual(5);
+      const latest = JSON.parse(
+        calls[calls.length - 1][1],
+      ) as typeof DEFAULT_SETTINGS;
+      expect(
+        Object.keys(latest.providerValidationResults.mistral ?? {}),
+      ).toHaveLength(5);
+    });
+    const setItemCalls = (AsyncStorage.setItem as jest.Mock).mock.calls;
+    const persistedJson = setItemCalls[setItemCalls.length - 1][1] as string;
+    const persisted = JSON.parse(persistedJson) as typeof DEFAULT_SETTINGS;
+    expect(persisted.providerValidationResults.mistral).toEqual({
+      llm: expect.objectContaining({ status: "success" }),
+      stt: expect.objectContaining({ status: "success" }),
+      tts: expect.objectContaining({ status: "success" }),
+      search: expect.objectContaining({ status: "success" }),
+      voices: expect.objectContaining({ status: "success" }),
+    });
+
+    firstRun.unmount();
+    (AsyncStorage.getItem as jest.Mock).mockResolvedValue(persistedJson);
+    (SecureStore.getItemAsync as jest.Mock).mockImplementation((key: string) =>
+      Promise.resolve(
+        key === "mrbroccoli.provider_key.mistral" ? "mistral-key" : null,
+      ),
+    );
+
+    const restarted = renderHook(() => useSettings());
+    await flushSettingsLoad();
+
+    expect(restarted.result.current.settings.providerValidationResults.mistral)
+      .toEqual(persisted.providerValidationResults.mistral);
   });
 
   it("invalidates a failed validation when its key changes", async () => {

@@ -64,6 +64,8 @@ the complete Play Store translations are kept in a dedicated file under
 
 ### Fixed
 
+- Persist each provider capability test atomically so complete LLM, STT, TTS,
+  search, and voice-library health results survive app restarts.
 - Keep the conversation anchored to newly submitted prompts and incoming
   replies while preserving intentional reading of older messages.
 - Replace the artificial one-second silence between spoken paragraphs with a

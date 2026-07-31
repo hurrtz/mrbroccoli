@@ -12,6 +12,7 @@ import type {
 import {
   Provider,
   ProviderCapability,
+  ProviderValidationResult,
   ResponseMode,
   ResponseModeRoute,
   Settings,
@@ -40,6 +41,11 @@ export interface SettingsModalProps {
   onUpdateProviderTtsVoice: (provider: Provider, voice: string) => void;
   providerVoiceDirectories: ProviderVoiceDirectories;
   onUpdateApiKey: (provider: Provider, apiKey: string) => void;
+  onUpdateProviderValidationResult: (
+    provider: Provider,
+    capability: ProviderCapability,
+    result: ProviderValidationResult,
+  ) => void;
   onPreviewVoice: (
     request: VoicePreviewRequest,
     callbacks?: {

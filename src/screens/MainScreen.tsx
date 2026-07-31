@@ -70,6 +70,7 @@ export function MainScreen() {
     updateProviderTtsModel,
     updateProviderTtsVoice,
     updateApiKey,
+    updateProviderValidationResult,
     restorePortableSettings,
     loaded,
   } = useSharedSettings();
@@ -865,6 +866,7 @@ export function MainScreen() {
         onUpdateProviderTtsModel={updateProviderTtsModel}
         onUpdateProviderTtsVoice={updateProviderTtsVoice}
         onUpdateApiKey={updateApiKey}
+        onUpdateProviderValidationResult={updateProviderValidationResult}
         onPreviewVoice={handlePreviewVoice}
         onStopPreviewVoice={stopPreviewVoice}
         onValidateProviderCapability={handleValidateProviderCapability}

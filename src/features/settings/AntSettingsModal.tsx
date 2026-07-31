@@ -71,6 +71,7 @@ export const AntSettingsModal = React.memo(function AntSettingsModal(
     onPreviewVoice,
     onStopPreviewVoice,
     onValidateProviderCapability,
+    onUpdateProviderValidationResult,
     onClose,
   } = props;
   const { t } = useLocalization();
@@ -143,17 +144,13 @@ export const AntSettingsModal = React.memo(function AntSettingsModal(
       capability: ProviderCapability,
       result: ProviderValidationResult,
     ) => {
-      onUpdate({
-        providerValidationResults: {
-          ...settings.providerValidationResults,
-          [provider]: {
-            ...settings.providerValidationResults[provider],
-            [capability]: result,
-          },
-        },
+      recordDebugLogEvent({
+        event: "settings-provider-validation-persisted",
+        payload: { capability, provider, status: result.status },
       });
+      onUpdateProviderValidationResult(provider, capability, result);
     },
-    [onUpdate, settings.providerValidationResults],
+    [onUpdateProviderValidationResult],
   );
   const validation = useProviderValidationState({
     settings,

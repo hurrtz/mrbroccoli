@@ -91,6 +91,7 @@ export function useSettings() {
     updateActiveResponseMode,
     updateProviderTtsVoice,
     updateApiKey,
+    updateProviderValidationResult,
     restorePortableSettings,
   } = useSettingsActions({ setSettings });
 
@@ -106,6 +107,7 @@ export function useSettings() {
     updateActiveResponseMode,
     updateProviderTtsVoice,
     updateApiKey,
+    updateProviderValidationResult,
     restorePortableSettings,
     loaded,
   };

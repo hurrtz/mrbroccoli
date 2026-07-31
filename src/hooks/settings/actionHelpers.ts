@@ -1,4 +1,10 @@
-import type { Provider, ResponseMode, Settings } from "../../types";
+import type {
+  Provider,
+  ProviderCapability,
+  ProviderValidationResult,
+  ResponseMode,
+  Settings,
+} from "../../types";
 import { PROVIDER_LLM_SUPPORT } from "../../constants/models";
 import { resetProviderCircuit } from "../../services/providerResilience";
 import {
@@ -61,6 +67,29 @@ export function createProviderModelUpdater(
 ) {
   return (provider: Provider, value: string) => {
     updateNestedSettingsRecord(setSettings, key, provider, value);
+  };
+}
+
+export function createProviderValidationResultUpdater(
+  setSettings: SetSettings,
+) {
+  return (
+    provider: Provider,
+    capability: ProviderCapability,
+    result: ProviderValidationResult,
+  ) => {
+    setSettings((prev) =>
+      persistAndReturn({
+        ...prev,
+        providerValidationResults: {
+          ...prev.providerValidationResults,
+          [provider]: {
+            ...prev.providerValidationResults[provider],
+            [capability]: result,
+          },
+        },
+      }),
+    );
   };
 }
 

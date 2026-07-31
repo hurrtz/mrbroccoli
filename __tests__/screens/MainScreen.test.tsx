@@ -89,6 +89,7 @@ jest.mock("../../src/context/SettingsContext", () => ({
     updateProviderTtsVoice: jest.fn(),
     updateLocalTtsVoice: jest.fn(),
     updateApiKey: jest.fn(),
+    updateProviderValidationResult: jest.fn(),
     loaded: true,
   })),
 }));
@@ -471,6 +472,7 @@ function createSharedSettingsValue(settingsOverrides: Partial<Settings> = {}) {
     updateProviderTtsVoice: jest.fn(),
     updateLocalTtsVoice: jest.fn(),
     updateApiKey: jest.fn(),
+    updateProviderValidationResult: jest.fn(),
     loaded: true,
   };
 }
