@@ -1,95 +1,95 @@
 <en-US>
-Mr Broccoli 2.6.0 adds portable plain-text and passphrase-encrypted backups for settings and conversations—never API keys. Retired models and unsupported settings can now be disabled safely on-device while compatible routes recover automatically. Connections are simpler, diagnostics reveal less private data, and accessibility, translations, pickers, landscape layouts, provider replies, and web search are more reliable.
+Mr Broccoli 2.6.0 adds portable readable or encrypted backups for settings and conversations—never API keys. Retired models and unsupported options can be disabled on-device, with compatible routes recovering automatically. Debug reports are more robust while remaining private. Consistent thin icons, centered conversation headers, better scrolling and speech pacing, plus a new Stop action make conversations clearer and easier to control.
 </en-US>
 
 <ar>
-يضيف Mr Broccoli 2.6.0 نسخًا احتياطية محمولة بنص واضح أو مشفرة بعبارة مرور للإعدادات والمحادثات، من دون مفاتيح API مطلقًا. يمكن الآن تعطيل النماذج المتوقفة والإعدادات غير المدعومة بأمان على الجهاز مع استعادة المسارات المتوافقة تلقائيًا. أصبحت الاتصالات أبسط، والتشخيصات أكثر خصوصية، كما تحسنت إمكانية الوصول والترجمات والنوافذ والتخطيط الأفقي وردود المزودين وبحث الويب.
+يضيف Mr Broccoli 2.6.0 نسخًا احتياطية مقروءة أو مشفرة للإعدادات والمحادثات، من دون مفاتيح API. يمكن تعطيل النماذج المتوقفة والخيارات غير المدعومة على الجهاز، مع استعادة المسارات المتوافقة تلقائيًا. أصبحت تقارير التشخيص أقوى مع الحفاظ على الخصوصية. وتجعل الأيقونات الرفيعة المتناسقة وعناوين المحادثات الوسطية والتمرير وإيقاع الكلام المحسن وزر الإيقاف الجديد المحادثات أوضح وأسهل تحكمًا.
 </ar>
 
 <cs-CZ>
-Mr Broccoli 2.6.0 přidává přenosné zálohy nastavení a konverzací v čitelném nebo heslem šifrovaném formátu – nikdy bez klíčů API. Ukončené modely a nepodporovaná nastavení lze bezpečně vypnout v zařízení a kompatibilní trasy se automaticky obnoví. Připojení jsou jednodušší, diagnostika soukromější a zlepšila se přístupnost, překlady, výběry, zobrazení na šířku, odpovědi poskytovatelů i webové vyhledávání.
+Mr Broccoli 2.6.0 přidává přenosné čitelné nebo šifrované zálohy nastavení a konverzací – nikdy ne klíčů API. Ukončené modely a nepodporované volby lze vypnout v zařízení a kompatibilní trasy se automaticky obnoví. Diagnostické zprávy jsou spolehlivější a zůstávají soukromé. Jednotné tenké ikony, vystředěné nadpisy konverzací, lepší posouvání a tempo řeči i nové tlačítko Stop usnadňují ovládání.
 </cs-CZ>
 
 <de-DE>
-Mr. Brokkoli 2.6.0 ergänzt übertragbare Klartext- und passwortverschlüsselte Backups für Einstellungen und Unterhaltungen – niemals für API-Schlüssel. Eingestellte Modelle und nicht unterstützte Optionen lassen sich sicher auf dem Gerät deaktivieren; kompatible Routen übernehmen automatisch. Verbindungen sind übersichtlicher, Diagnosen privater und Barrierefreiheit, Übersetzungen, Auswahlfenster, Querformat, Anbieterantworten sowie Websuche zuverlässiger.
+Mr. Brokkoli 2.6.0 ergänzt lesbare oder verschlüsselte Backups für Einstellungen und Gespräche – niemals für API-Schlüssel. Eingestellte Modelle und nicht unterstützte Optionen lassen sich auf dem Gerät deaktivieren; kompatible Routen übernehmen automatisch. Diagnoseberichte sind robuster und bleiben privat. Einheitliche dünne Icons, zentrierte Gesprächsüberschriften, besseres Scrollen und natürlichere Sprechpausen sowie eine neue Stopp-Aktion erleichtern die Bedienung.
 </de-DE>
 
 <en-AU>
-Mr Broccoli 2.6.0 adds portable plain-text and passphrase-encrypted backups for settings and conversations—never API keys. Retired models and unsupported settings can now be disabled safely on-device while compatible routes recover automatically. Connections are simpler, diagnostics reveal less private data, and accessibility, translations, pickers, landscape layouts, provider replies, and web search are more reliable.
+Mr Broccoli 2.6.0 adds portable readable or encrypted backups for settings and conversations—never API keys. Retired models and unsupported options can be disabled on-device, with compatible routes recovering automatically. Debug reports are more robust while remaining private. Consistent thin icons, centred conversation headers, better scrolling and speech pacing, plus a new Stop action make conversations clearer and easier to control.
 </en-AU>
 
 <en-CA>
-Mr Broccoli 2.6.0 adds portable plain-text and passphrase-encrypted backups for settings and conversations—never API keys. Retired models and unsupported settings can now be disabled safely on-device while compatible routes recover automatically. Connections are simpler, diagnostics reveal less private data, and accessibility, translations, pickers, landscape layouts, provider replies, and web search are more reliable.
+Mr Broccoli 2.6.0 adds portable readable or encrypted backups for settings and conversations—never API keys. Retired models and unsupported options can be disabled on-device, with compatible routes recovering automatically. Debug reports are more robust while remaining private. Consistent thin icons, centred conversation headers, better scrolling and speech pacing, plus a new Stop action make conversations clearer and easier to control.
 </en-CA>
 
 <en-GB>
-Mr Broccoli 2.6.0 adds portable plain-text and passphrase-encrypted backups for settings and conversations—never API keys. Retired models and unsupported settings can now be disabled safely on-device while compatible routes recover automatically. Connections are simpler, diagnostics reveal less private data, and accessibility, translations, pickers, landscape layouts, provider replies, and web search are more reliable.
+Mr Broccoli 2.6.0 adds portable readable or encrypted backups for settings and conversations—never API keys. Retired models and unsupported options can be disabled on-device, with compatible routes recovering automatically. Debug reports are more robust while remaining private. Consistent thin icons, centred conversation headers, better scrolling and speech pacing, plus a new Stop action make conversations clearer and easier to control.
 </en-GB>
 
 <es-ES>
-Mr. Brócoli 2.6.0 añade copias portátiles, en texto claro o cifradas con contraseña, de ajustes y conversaciones; nunca de claves API. Los modelos retirados y las opciones no compatibles pueden desactivarse de forma segura en el dispositivo, mientras las rutas compatibles se recuperan solas. Las conexiones son más sencillas, los diagnósticos más privados y mejoran la accesibilidad, traducciones, selectores, vista horizontal, respuestas de proveedores y búsqueda web.
+Mr. Brócoli 2.6.0 añade copias legibles o cifradas de ajustes y conversaciones, nunca de claves API. Los modelos retirados y las opciones incompatibles pueden desactivarse en el dispositivo y las rutas compatibles se recuperan automáticamente. Los informes de diagnóstico son más robustos sin perder privacidad. Iconos finos y coherentes, títulos de conversación centrados, mejor desplazamiento y ritmo de voz, y una nueva acción Detener facilitan el control.
 </es-ES>
 
 <es-US>
-Mr. Brócoli 2.6.0 agrega respaldos portátiles, en texto claro o cifrados con contraseña, de ajustes y conversaciones; nunca de claves API. Los modelos retirados y las opciones no compatibles pueden desactivarse de forma segura en el dispositivo, mientras las rutas compatibles se recuperan solas. Las conexiones son más simples, los diagnósticos más privados y mejoran la accesibilidad, traducciones, selectores, vista horizontal, respuestas de proveedores y búsqueda web.
+Mr. Brócoli 2.6.0 agrega respaldos legibles o cifrados de ajustes y conversaciones, nunca de claves API. Los modelos retirados y las opciones incompatibles pueden desactivarse en el dispositivo y las rutas compatibles se recuperan automáticamente. Los informes de diagnóstico son más robustos sin perder privacidad. Íconos finos y coherentes, títulos de conversación centrados, mejor desplazamiento y ritmo de voz, y una nueva acción Detener facilitan el control.
 </es-US>
 
 <fr-CA>
-M. Brocoli 2.6.0 ajoute des sauvegardes portables, lisibles ou chiffrées par phrase secrète, des réglages et conversations — jamais des clés API. Les modèles retirés et options incompatibles peuvent être désactivés localement, avec reprise automatique par une route compatible. Les connexions sont simplifiées, les diagnostics plus privés, et l’accessibilité, les traductions, les sélecteurs, le mode paysage, les réponses des fournisseurs et la recherche web gagnent en fiabilité.
+M. Brocoli 2.6.0 ajoute des sauvegardes lisibles ou chiffrées des réglages et conversations — jamais des clés API. Les modèles retirés et options incompatibles peuvent être désactivés localement, avec reprise automatique par une route compatible. Les rapports de diagnostic sont plus robustes tout en restant privés. Icônes fines et cohérentes, titres de conversation centrés, défilement et rythme vocal améliorés, plus une nouvelle action Arrêter facilitent le contrôle.
 </fr-CA>
 
 <fr-FR>
-M. Brocoli 2.6.0 ajoute des sauvegardes portables, lisibles ou chiffrées par phrase secrète, des réglages et conversations — jamais des clés API. Les modèles retirés et options incompatibles peuvent être désactivés localement, avec reprise automatique par une route compatible. Les connexions sont simplifiées, les diagnostics plus privés, et l’accessibilité, les traductions, les sélecteurs, le mode paysage, les réponses des fournisseurs et la recherche web gagnent en fiabilité.
+M. Brocoli 2.6.0 ajoute des sauvegardes lisibles ou chiffrées des réglages et conversations — jamais des clés API. Les modèles retirés et options incompatibles peuvent être désactivés localement, avec reprise automatique par une route compatible. Les rapports de diagnostic sont plus robustes tout en restant privés. Icônes fines et cohérentes, titres de conversation centrés, défilement et rythme vocal améliorés, plus une nouvelle action Arrêter facilitent le contrôle.
 </fr-FR>
 
 <hi-IN>
-Mr Broccoli 2.6.0 में सेटिंग और बातचीत के पोर्टेबल सादे या पासफ़्रेज़-एन्क्रिप्टेड बैकअप जोड़े गए हैं—API कुंजियाँ कभी शामिल नहीं होतीं। बंद मॉडल और असमर्थित विकल्प डिवाइस पर सुरक्षित रूप से निष्क्रिय हो सकते हैं, जबकि संगत रूट अपने आप काम संभालते हैं। कनेक्शन सरल हैं, डायग्नोस्टिक्स में निजी डेटा कम है और एक्सेसिबिलिटी, अनुवाद, पिकर, लैंडस्केप लेआउट, प्रदाता जवाब व वेब खोज अधिक भरोसेमंद हैं।
+Mr Broccoli 2.6.0 में सेटिंग और बातचीत के पढ़ने योग्य या एन्क्रिप्टेड बैकअप हैं—API कुंजियाँ कभी शामिल नहीं होतीं। बंद मॉडल और असमर्थित विकल्प डिवाइस पर निष्क्रिय किए जा सकते हैं और संगत रूट अपने आप काम संभालते हैं। निजी रहते हुए डीबग रिपोर्ट अधिक मजबूत हैं। समान पतले आइकन, बीच में बातचीत शीर्षक, बेहतर स्क्रॉलिंग व बोलने की गति और नया Stop बटन बातचीत को स्पष्ट और नियंत्रित करना आसान बनाते हैं।
 </hi-IN>
 
 <hu-HU>
-A Mr Broccoli 2.6.0 hordozható, olvasható vagy jelszóval titkosított mentést kínál a beállításokhoz és beszélgetésekhez – API-kulcsok nélkül. A megszüntetett modellek és nem támogatott beállítások biztonságosan letilthatók az eszközön, a kompatibilis útvonalak pedig automatikusan átveszik a feladatot. Egyszerűbbek a kapcsolatok, bizalmasabb a diagnosztika, és javult az akadálymentesség, fordítás, választók, fekvő nézet, szolgáltatói válaszok és webes keresés.
+A Mr Broccoli 2.6.0 olvasható vagy titkosított mentést kínál a beállításokhoz és beszélgetésekhez – API-kulcsok nélkül. A megszüntetett modellek és nem támogatott lehetőségek letilthatók az eszközön, a kompatibilis útvonalak pedig automatikusan átveszik a feladatot. A hibajelentések robusztusabbak, de privátak maradnak. Egységes vékony ikonok, középre igazított beszélgetéscímek, jobb görgetés és beszédritmus, valamint új Leállítás művelet könnyíti a kezelést.
 </hu-HU>
 
 <it-IT>
-Mr Broccoli 2.6.0 aggiunge backup portatili, in chiaro o cifrati con passphrase, di impostazioni e conversazioni, mai delle chiavi API. Modelli ritirati e opzioni non supportate possono essere disattivati in sicurezza sul dispositivo, mentre i percorsi compatibili subentrano automaticamente. Connessioni e diagnostica sono più semplici e riservate; migliorano inoltre accessibilità, traduzioni, selettori, layout orizzontale, risposte dei provider e ricerca web.
+Mr Broccoli 2.6.0 aggiunge backup leggibili o cifrati di impostazioni e conversazioni, mai delle chiavi API. Modelli ritirati e opzioni non supportate possono essere disattivati sul dispositivo, mentre i percorsi compatibili subentrano automaticamente. I rapporti diagnostici sono più robusti pur restando privati. Icone sottili e coerenti, titoli delle conversazioni centrati, scorrimento e ritmo vocale migliori, più una nuova azione Stop facilitano il controllo.
 </it-IT>
 
 <ja-JP>
-Mr Broccoli 2.6.0では、設定と会話を平文またはパスフレーズ暗号化で持ち運べるバックアップを追加しました。APIキーは一切含まれません。終了したモデルや非対応設定は端末上で安全に無効化され、互換ルートへ自動復旧します。接続設定を整理し、診断データのプライバシー、アクセシビリティ、翻訳、選択画面、横向きレイアウト、プロバイダー応答、ウェブ検索を改善しました。
+Mr Broccoli 2.6.0では、設定と会話を平文または暗号化して持ち運べるバックアップを追加しました。APIキーは含まれません。終了したモデルや非対応オプションは端末上で無効化され、互換ルートへ自動復旧します。デバッグ報告はプライバシーを保ちながら強化されました。統一された細線アイコン、中央揃えの会話見出し、スクロールと読み上げの間、新しい停止操作により、会話を見やすく制御しやすくしました。
 </ja-JP>
 
 <pl-PL>
-Mr Broccoli 2.6.0 dodaje przenośne kopie ustawień i rozmów: czytelne lub szyfrowane hasłem, nigdy z kluczami API. Wycofane modele i nieobsługiwane opcje można bezpiecznie wyłączyć na urządzeniu, a zgodne trasy przejmują działanie automatycznie. Połączenia są prostsze, diagnostyka ujawnia mniej danych prywatnych, a dostępność, tłumaczenia, selektory, układ poziomy, odpowiedzi dostawców i wyszukiwanie internetowe są bardziej niezawodne.
+Mr Broccoli 2.6.0 dodaje czytelne lub szyfrowane kopie ustawień i rozmów, nigdy kluczy API. Wycofane modele i nieobsługiwane opcje można wyłączyć na urządzeniu, a zgodne trasy przejmują działanie automatycznie. Raporty diagnostyczne są solidniejsze, lecz pozostają prywatne. Spójne cienkie ikony, wyśrodkowane nagłówki rozmów, lepsze przewijanie i tempo mowy oraz nowa akcja Stop ułatwiają sterowanie.
 </pl-PL>
 
 <pt-BR>
-Mr Broccoli 2.6.0 adiciona backups portáteis, em texto aberto ou criptografados por senha, de configurações e conversas — nunca de chaves de API. Modelos descontinuados e opções incompatíveis podem ser desativados com segurança no aparelho, com recuperação automática por rotas compatíveis. As conexões ficaram mais simples, os diagnósticos mais privados e melhoraram a acessibilidade, traduções, seletores, layout horizontal, respostas dos provedores e busca na web.
+Mr Broccoli 2.6.0 adiciona backups legíveis ou criptografados de configurações e conversas — nunca de chaves de API. Modelos descontinuados e opções incompatíveis podem ser desativados no aparelho, com recuperação automática por rotas compatíveis. Os relatórios de diagnóstico são mais robustos sem deixar de ser privados. Ícones finos e consistentes, títulos de conversa centralizados, melhor rolagem e ritmo da fala, além da nova ação Parar, facilitam o controle.
 </pt-BR>
 
 <pt-PT>
-Mr Broccoli 2.6.0 adiciona cópias portáteis, em texto simples ou cifradas por palavra-passe, de definições e conversas — nunca de chaves API. Modelos descontinuados e opções incompatíveis podem ser desativados com segurança no dispositivo, com recuperação automática por rotas compatíveis. As ligações estão mais simples, os diagnósticos mais privados e melhoraram a acessibilidade, traduções, seletores, modo horizontal, respostas dos fornecedores e pesquisa web.
+Mr Broccoli 2.6.0 adiciona cópias legíveis ou cifradas de definições e conversas — nunca de chaves API. Modelos descontinuados e opções incompatíveis podem ser desativados no dispositivo, com recuperação automática por rotas compatíveis. Os relatórios de diagnóstico são mais robustos sem deixarem de ser privados. Ícones finos e consistentes, títulos de conversa centrados, melhor deslocamento e ritmo da fala, além da nova ação Parar, facilitam o controlo.
 </pt-PT>
 
 <ru-RU>
-В Mr Broccoli 2.6.0 появились переносимые резервные копии настроек и бесед: открытые или зашифрованные парольной фразой, но никогда не содержащие ключи API. Устаревшие модели и неподдерживаемые параметры безопасно отключаются на устройстве, а совместимые маршруты восстанавливают работу автоматически. Подключения стали проще, диагностика — приватнее; улучшены доступность, переводы, окна выбора, альбомный режим, ответы провайдеров и веб-поиск.
+В Mr Broccoli 2.6.0 появились читаемые или зашифрованные копии настроек и бесед без ключей API. Устаревшие модели и неподдерживаемые параметры отключаются на устройстве, а совместимые маршруты автоматически восстанавливают работу. Диагностические отчёты стали надёжнее, сохраняя приватность. Единые тонкие значки, заголовки бесед по центру, улучшенная прокрутка и темп речи, а также новое действие «Стоп» упрощают управление.
 </ru-RU>
 
 <sv-SE>
-Mr Broccoli 2.6.0 lägger till flyttbara säkerhetskopior av inställningar och samtal, i klartext eller krypterade med lösenfras – aldrig API-nycklar. Utfasade modeller och inkompatibla val kan stängas av säkert på enheten medan kompatibla vägar tar över automatiskt. Anslutningar är enklare, diagnostiken mer privat och tillgänglighet, översättningar, väljare, liggande layout, leverantörssvar samt webbsökning har blivit pålitligare.
+Mr Broccoli 2.6.0 lägger till läsbara eller krypterade säkerhetskopior av inställningar och samtal – aldrig API-nycklar. Utfasade modeller och inkompatibla val kan stängas av på enheten medan kompatibla vägar tar över automatiskt. Diagnostikrapporter är robustare men förblir privata. Enhetliga tunna ikoner, centrerade samtalsrubriker, bättre rullning och taltempo samt en ny Stopp-åtgärd gör samtal lättare att styra.
 </sv-SE>
 
 <tr-TR>
-Mr Broccoli 2.6.0, ayarlar ve konuşmalar için taşınabilir düz metin veya parolayla şifrelenmiş yedekler ekler; API anahtarları hiçbir zaman dahil edilmez. Kullanımdan kalkan modeller ve desteklenmeyen seçenekler cihazda güvenle devre dışı bırakılırken uyumlu yollar otomatik olarak devralır. Bağlantılar sadeleşti, tanılama daha özel hâle geldi; erişilebilirlik, çeviriler, seçiciler, yatay düzen, sağlayıcı yanıtları ve web araması iyileşti.
+Mr Broccoli 2.6.0, ayarlar ve konuşmalar için okunabilir veya şifreli yedekler ekler; API anahtarları dahil edilmez. Kullanımdan kalkan modeller ve desteklenmeyen seçenekler cihazda kapatılabilir, uyumlu yollar otomatik olarak devralır. Tanılama raporları gizli kalırken daha sağlamdır. Tutarlı ince simgeler, ortalanmış konuşma başlıkları, daha iyi kaydırma ve konuşma temposu ile yeni Durdur eylemi yönetimi kolaylaştırır.
 </tr-TR>
 
 <uk>
-Mr Broccoli 2.6.0 додає переносні відкриті або захищені парольною фразою резервні копії налаштувань і розмов — без ключів API. Виведені з експлуатації моделі та непідтримувані параметри можна безпечно вимкнути на пристрої, а сумісні маршрути автоматично відновлять роботу. Підключення стали простішими, діагностика — приватнішою; покращено доступність, переклади, вікна вибору, альбомний режим, відповіді провайдерів і веб-пошук.
+Mr Broccoli 2.6.0 додає відкриті або зашифровані копії налаштувань і розмов — без ключів API. Виведені з експлуатації моделі та непідтримувані параметри можна вимкнути на пристрої, а сумісні маршрути автоматично відновлять роботу. Діагностичні звіти стали надійнішими, зберігаючи приватність. Узгоджені тонкі піктограми, центровані заголовки розмов, краще прокручування й темп мовлення та нова дія «Стоп» спрощують керування.
 </uk>
 
 <ur>
-Mr Broccoli 2.6.0 میں ترتیبات اور گفتگو کے قابلِ منتقلی سادہ یا پاس فریز سے مرموز بیک اپ شامل ہیں—API کلیدیں کبھی شامل نہیں ہوتیں۔ بند شدہ ماڈلز اور غیر معاون اختیارات کو آلے پر محفوظ طریقے سے غیر فعال کیا جا سکتا ہے، جبکہ موافق راستے خودکار طور پر کام سنبھالتے ہیں۔ کنکشن آسان، تشخیص زیادہ نجی، اور رسائی، تراجم، انتخابی ونڈوز، لینڈ اسکیپ ترتیب، فراہم کنندہ جوابات اور ویب تلاش زیادہ قابلِ اعتماد ہیں۔
+Mr Broccoli 2.6.0 میں ترتیبات اور گفتگو کے قابلِ مطالعہ یا مرموز بیک اپ شامل ہیں—API کلیدیں شامل نہیں ہوتیں۔ بند ماڈلز اور غیر معاون اختیارات کو آلے پر بند کیا جا سکتا ہے، جبکہ موافق راستے خودکار طور پر کام سنبھالتے ہیں۔ تشخیصی رپورٹس نجی رہتے ہوئے زیادہ مضبوط ہیں۔ یکساں باریک آئیکنز، درمیان میں گفتگو کی سرخیاں، بہتر اسکرولنگ اور گفتگو کی رفتار، اور نیا Stop عمل کنٹرول آسان بناتے ہیں۔
 </ur>
 
 <zh-CN>
-Mr Broccoli 2.6.0 新增可迁移的设置与对话备份，可选择明文或口令加密，绝不包含 API 密钥。已停用的模型和不受支持的选项现在可在设备上安全关闭，并自动切换到兼容路径。连接设置更简洁，诊断信息暴露的隐私数据更少；无障碍体验、翻译、选择器、横屏布局、服务商回复和网络搜索也更加可靠。
+Mr Broccoli 2.6.0 新增设置与对话的明文或加密备份，绝不包含 API 密钥。已停用的模型和不受支持的选项可在设备上关闭，并自动切换到兼容路径。调试报告在保持隐私的同时更加可靠。统一的细线图标、居中的对话标题、更好的滚动与语音节奏，以及新的“停止”操作，让对话更清晰、更易控制。
 </zh-CN>

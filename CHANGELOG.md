@@ -24,9 +24,14 @@ the complete Play Store translations are kept in a dedicated file under
 ### Changed
 
 - Display the current release version on the Settings overview.
-- Standardize application glyphs on Ant Design with consistent semantic icon
-  sizing and accessible touch targets, while retaining official provider-brand
-  artwork.
+- Replace application glyphs with consistent thin Phosphor icons and semantic
+  sizing, while retaining official provider-brand artwork, compact transcript
+  disclosures, accessible touch targets, and clearer message actions.
+- Center the Conversations and Conversation Settings headings in the display
+  typeface and remove the inconsistent border from the conversation close
+  action.
+- Bring the voice/text swipe indicators closer together without shrinking their
+  accessible tap targets.
 - Focus the direct provider list on OpenAI, OpenRouter, Anthropic, Google,
   xAI, DeepSeek, Mistral, Alibaba Qwen, and ElevenLabs by removing the direct
   ByteDance, Moonshot, and Perplexity integrations. Kimi K3 remains available
@@ -41,6 +46,10 @@ the complete Play Store translations are kept in a dedicated file under
   network, and server failures never disable a configuration.
 - Redact credentials and user-authored text from debug captures before logs are
   written to disk or copied to the clipboard.
+- Make debug reports durable, bounded, recoverable after an interrupted
+  capture, and easier to diagnose with build, device, network, interaction,
+  turn, pipeline, and privacy-minimized platform exit context. Validate every
+  report before it is shared and clearly surface capture or export failures.
 - Improve screen-reader behavior for pickers, overlays, voice phases, setup,
   and download/validation statuses, and expand interactive controls to
   accessible touch targets.
