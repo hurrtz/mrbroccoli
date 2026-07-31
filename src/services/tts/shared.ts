@@ -49,6 +49,7 @@ const PROVIDER_TTS_TIMEOUT_POLICIES: Partial<
 };
 
 export class TtsRequestError extends Error {
+  readonly detail: string;
   readonly provider: Provider;
   readonly status: number;
   readonly inputTooLong: boolean;
@@ -56,6 +57,7 @@ export class TtsRequestError extends Error {
 
   constructor(params: {
     message: string;
+    detail: string;
     provider: Provider;
     status: number;
     inputTooLong: boolean;
@@ -63,6 +65,7 @@ export class TtsRequestError extends Error {
   }) {
     super(params.message);
     this.name = "TtsRequestError";
+    this.detail = params.detail;
     this.provider = params.provider;
     this.status = params.status;
     this.inputTooLong = params.inputTooLong;
@@ -324,6 +327,7 @@ export function buildTtsRequestError(params: {
   return new TtsRequestError({
     provider: params.provider,
     status: params.status,
+    detail: normalizedMessage,
     inputTooLong,
     failureKind: inputTooLong
       ? "context"

@@ -438,6 +438,14 @@ export const zhCN = {
     "它直接通过手机的内置语音合成器说话，因此您可以将其与配置的提供商声音进行比较。",
   nativeVoiceUnavailable:
     "此设备未报告任何本机系统语音以进行预览。",
+  runtimeCompatibilityOverrides: "运行时兼容性",
+  runtimeCompatibilityOverridesDescription: ({ count }) =>
+    `有 ${count} 个经提供商确认不可用的模型或设置配置仅在此设备上被停用。西兰花先生会自动绕过它们。`,
+  clearRuntimeCompatibilityOverrides: "清除运行时兼容性",
+  clearRuntimeCompatibilityOverridesConfirmationTitle:
+    "要清除运行时兼容性吗？",
+  clearRuntimeCompatibilityOverridesConfirmationMessage:
+    "之前停用的配置将可再次尝试。提供商可能会再次拒绝它们。",
   speechDiagnostics: "最近的演讲活动",
   speechDiagnosticsHint:
     "显示最新的语音请求、他们请求的路线、他们实际使用的路线以及任何后备原因。",

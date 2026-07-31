@@ -456,6 +456,14 @@ export const uk = {
     "Текст озвучується безпосередньо вбудованим синтезатором телефона, щоб його можна було порівняти з голосами провайдерів.",
   nativeVoiceUnavailable:
     "Пристрій не повідомив про доступні системні голоси для прослуховування.",
+  runtimeCompatibilityOverrides: "Сумісність під час роботи",
+  runtimeCompatibilityOverridesDescription: ({ count }) =>
+    `${count} конфігурацій моделей або налаштувань, недоступність яких підтвердив постачальник, вимкнено лише на цьому пристрої. Пан Броколі автоматично їх оминає.`,
+  clearRuntimeCompatibilityOverrides: "Очистити сумісність",
+  clearRuntimeCompatibilityOverridesConfirmationTitle:
+    "Очистити сумісність під час роботи?",
+  clearRuntimeCompatibilityOverridesConfirmationMessage:
+    "Раніше вимкнені конфігурації можна буде спробувати знову. Постачальник може повторно їх відхилити.",
   speechDiagnostics: "Нещодавня голосова активність",
   speechDiagnosticsHint:
     "Показує останні голосові запити, запитаний і фактично використаний маршрути та причину резервного переходу.",

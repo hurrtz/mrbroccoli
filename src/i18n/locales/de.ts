@@ -448,6 +448,14 @@ export const de = {
     "Nutzt direkt die eingebaute Sprachsynthese des Geräts, damit du sie mit konfigurierten Anbieter-Stimmen vergleichen kannst.",
   nativeVoiceUnavailable:
     "Dieses Gerät hat keine nativen Systemstimmen für die Vorschau.",
+  runtimeCompatibilityOverrides: "Laufzeitkompatibilität",
+  runtimeCompatibilityOverridesDescription: ({ count }) =>
+    `${count} vom Anbieter bestätigte, nicht verfügbare Modell- oder Einstellungskonfigurationen sind nur auf diesem Gerät deaktiviert. Mr. Brokkoli umgeht sie automatisch.`,
+  clearRuntimeCompatibilityOverrides: "Laufzeitkompatibilität löschen",
+  clearRuntimeCompatibilityOverridesConfirmationTitle:
+    "Laufzeitkompatibilität löschen?",
+  clearRuntimeCompatibilityOverridesConfirmationMessage:
+    "Zuvor deaktivierte Konfigurationen können erneut versucht werden. Ein Anbieter kann sie erneut ablehnen.",
   speechDiagnostics: "Letzte Aktivität",
   speechDiagnosticsHint:
     "Zeigt die letzten Sprachanfragen, die angefragte Route, die tatsächlich genutzte Route und den Grund für einen Fallback.",

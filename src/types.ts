@@ -299,8 +299,10 @@ export interface MessageRouterMetadata {
 
 export interface MessageModelFailoverMetadata {
   actualModel: string;
+  actualModelEffort?: string;
   attempts: number;
   requestedModel: string;
+  requestedModelEffort?: string;
 }
 
 export interface MessageTurnReceipt {

@@ -316,11 +316,13 @@ async function requestChatTextResolved(params: {
       requestedModel: params.model,
     }),
     capability: "llm",
+    modelEffort: params.modelEffort,
     provider: params.provider,
-    request: async (model) => {
+    request: async (model, modelEffort) => {
       const requestParams = {
         ...params,
         model,
+        modelEffort,
       };
       const config = getLlmProviderConfigOrThrow(
         params.provider,
@@ -683,8 +685,9 @@ export async function streamChat({
           requestedModel: model,
         }),
         capability: "llm",
+        modelEffort,
         provider,
-        request: async (actualModel) => {
+        request: async (actualModel, actualModelEffort) => {
           let fullText = "";
           let replyMetadata: MessageMetadata | undefined;
           const systemPrompt = buildSystemPrompt({
@@ -707,7 +710,7 @@ export async function streamChat({
           const requestParams = {
             messages: requestMessages,
             model: actualModel,
-            modelEffort,
+            modelEffort: actualModelEffort,
             provider,
             apiKey,
             language,
@@ -799,16 +802,26 @@ export async function streamChat({
       return;
     }
 
-    const { actualModel, attempts, requestedModel, value } = resolvedRequest;
+    const {
+      actualModel,
+      actualModelEffort,
+      attempts,
+      requestedModel,
+      requestedModelEffort,
+      usedFallback,
+      value,
+    } = resolvedRequest;
     const { fullText, systemPrompt } = value;
     let { replyMetadata } = value;
-    if (actualModel !== requestedModel || attempts > 1) {
+    if (usedFallback || attempts > 1) {
       replyMetadata = {
         ...replyMetadata,
         modelFailover: {
           actualModel,
+          actualModelEffort,
           attempts,
           requestedModel,
+          requestedModelEffort,
         },
       };
     }

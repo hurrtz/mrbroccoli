@@ -33,6 +33,12 @@ import {
   TtsRequestError,
 } from "../../src/services/tts";
 import { resetProviderModelHealthForTests } from "../../src/services/providerResilience";
+import {
+  getRuntimeCapabilityOverrides,
+  RUNTIME_CAPABILITY_OVERRIDES_STORAGE_KEY,
+  resetRuntimeCapabilityOverridesForTests,
+} from "../../src/services/runtimeCapabilityOverrides";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 global.fetch = jest.fn();
 
@@ -162,10 +168,12 @@ describe("splitTextForTts", () => {
 });
 
 describe("synthesizeSpeech", () => {
-  beforeEach(() => {
+  beforeEach(async () => {
+    await AsyncStorage.removeItem(RUNTIME_CAPABILITY_OVERRIDES_STORAGE_KEY);
     jest.clearAllMocks();
     clearProviderTtsAudioCacheForTests();
     resetProviderModelHealthForTests();
+    resetRuntimeCapabilityOverridesForTests();
   });
 
   it("generates a local Android dev WAV for the exact fake provider key", async () => {
@@ -272,6 +280,14 @@ describe("synthesizeSpeech", () => {
         ([, options]) => JSON.parse(options.body).model,
       ),
     ).toEqual(["tts-1-hd", "gpt-4o-mini-tts"]);
+    expect(getRuntimeCapabilityOverrides()).toEqual([
+      expect.objectContaining({
+        capability: "tts",
+        model: "tts-1-hd",
+        provider: "openai",
+        reason: "model-unavailable",
+      }),
+    ]);
   });
 
   it("sends delivery instructions to instruction-capable OpenAI TTS models", async () => {

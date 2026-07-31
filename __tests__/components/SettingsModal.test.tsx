@@ -1,4 +1,5 @@
 import React from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import {
   Alert,
   Modal as NativeModal,
@@ -36,6 +37,11 @@ import { useSpeechDiagnostics } from "../../src/hooks/useSpeechDiagnostics";
 import { clearSpeechDiagnostics } from "../../src/services/speech/diagnostics";
 import { getProviderValidationTarget } from "../../src/features/settings-core/providerSupport";
 import { APP_LANGUAGE_OPTIONS } from "../../src/i18n/localeRegistry";
+import {
+  RUNTIME_CAPABILITY_OVERRIDES_STORAGE_KEY,
+  disableRuntimeCapabilityConfiguration,
+  resetRuntimeCapabilityOverridesForTests,
+} from "../../src/services/runtimeCapabilityOverrides";
 
 jest.mock("react-native-safe-area-context", () => ({
   SafeAreaView: ({ children, ...props }: React.PropsWithChildren) => {
@@ -144,7 +150,9 @@ function renderSettingsModal(
 }
 
 describe("SettingsModal", () => {
-  afterEach(() => {
+  afterEach(async () => {
+    await AsyncStorage.removeItem(RUNTIME_CAPABILITY_OVERRIDES_STORAGE_KEY);
+    resetRuntimeCapabilityOverridesForTests();
     jest.mocked(useSpeechDiagnostics).mockReturnValue([]);
     jest.restoreAllMocks();
   });
@@ -1636,7 +1644,13 @@ describe("SettingsModal", () => {
     fireEvent.press(clearAction);
 
     expect(clearSpeechDiagnosticsMock).not.toHaveBeenCalled();
-    let confirmation = screen.UNSAFE_getByType(AntModal);
+    const getConfirmation = () =>
+      screen
+        .UNSAFE_getAllByType(AntModal)
+        .find(
+          (modal) => modal.props.title === "Clear recent speech activity?",
+        )!;
+    let confirmation = getConfirmation();
     expect(confirmation.props.visible).toBe(true);
     expect(confirmation.props.title).toBe("Clear recent speech activity?");
     expect(confirmation.props.children.props.children).toBe(
@@ -1649,12 +1663,12 @@ describe("SettingsModal", () => {
     act(() => {
       cancelAction.onPress();
     });
-    confirmation = screen.UNSAFE_getByType(AntModal);
+    confirmation = getConfirmation();
     expect(confirmation.props.visible).toBe(false);
     expect(clearSpeechDiagnosticsMock).not.toHaveBeenCalled();
 
     fireEvent.press(clearAction);
-    confirmation = screen.UNSAFE_getByType(AntModal);
+    confirmation = getConfirmation();
     const destructiveAction = confirmation.props.footer.find(
       (action: { text: string }) => action.text === "Clear",
     );
@@ -1665,5 +1679,47 @@ describe("SettingsModal", () => {
       destructiveAction.onPress();
     });
     expect(clearSpeechDiagnosticsMock).toHaveBeenCalledTimes(1);
+  });
+
+  it("shows and clears provider-confirmed runtime compatibility overrides", async () => {
+    await disableRuntimeCapabilityConfiguration({
+      capability: "llm",
+      disabledAt: 1,
+      effort: "high",
+      model: "gpt-5.6-sol",
+      provider: "openai",
+      reason: "configuration-unsupported",
+    });
+    const screen = renderSettingsModal();
+
+    fireEvent.press(screen.getByLabelText("Open App & diagnostics"));
+
+    await waitFor(() => {
+      expect(screen.getByText("Runtime compatibility")).toBeTruthy();
+      expect(
+        screen.getByText("OpenAI · LLM · gpt-5.6-sol · high"),
+      ).toBeTruthy();
+    });
+
+    fireEvent.press(
+      screen.getByLabelText("Clear runtime compatibility"),
+    );
+    const confirmation = screen
+      .UNSAFE_getAllByType(AntModal)
+      .find(
+        (modal) => modal.props.title === "Clear runtime compatibility?",
+      )!;
+    const clearAction = confirmation.props.footer.find(
+      (action: { text: string }) => action.text === "Clear",
+    );
+
+    await act(async () => {
+      await clearAction.onPress();
+    });
+    await waitFor(() => {
+      expect(
+        screen.queryByText("OpenAI · LLM · gpt-5.6-sol · high"),
+      ).toBeNull();
+    });
   });
 });

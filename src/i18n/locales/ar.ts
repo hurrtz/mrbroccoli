@@ -440,6 +440,14 @@ export const ar = {
     "يتحدث هذا مباشرة من خلال مُركِّب الكلام المدمج في الهاتف حتى تتمكن من مقارنته بأصوات الموفر التي تم تكوينها.",
   nativeVoiceUnavailable:
     "لم يُبلغ هذا الجهاز عن أي أصوات للنظام الأصلي للمعاينة.",
+  runtimeCompatibilityOverrides: "توافق وقت التشغيل",
+  runtimeCompatibilityOverridesDescription: ({ count }) =>
+    `تم تعطيل ${count} من تكوينات النماذج أو الإعدادات التي أكد المزوّد عدم توفرها على هذا الجهاز فقط. يتجاوزها السيد بروكلي تلقائيًا.`,
+  clearRuntimeCompatibilityOverrides: "مسح توافق وقت التشغيل",
+  clearRuntimeCompatibilityOverridesConfirmationTitle:
+    "هل تريد مسح توافق وقت التشغيل؟",
+  clearRuntimeCompatibilityOverridesConfirmationMessage:
+    "يمكن تجربة التكوينات المعطلة سابقًا من جديد. قد يرفضها المزوّد مرة أخرى.",
   speechDiagnostics: "نشاط الكلام الأخير",
   speechDiagnosticsHint:
     "يعرض أحدث طلبات الكلام، والمسار الذي طلبته، والمسار الذي استخدمته بالفعل، وأي سبب احتياطي.",

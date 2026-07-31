@@ -1,3 +1,5 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
 import {
   executeProviderModelRequest,
   getProviderCircuitState,
@@ -5,6 +7,10 @@ import {
   resetProviderModelHealthForTests,
 } from "../../src/services/providerResilience";
 import { ProviderRequestError } from "../../src/services/providerErrors";
+import {
+  getRuntimeCapabilityOverrides,
+  resetRuntimeCapabilityOverridesForTests,
+} from "../../src/services/runtimeCapabilityOverrides";
 
 function providerError(
   failureKind: ConstructorParameters<
@@ -28,8 +34,10 @@ function providerError(
 }
 
 describe("executeProviderModelRequest", () => {
-  beforeEach(() => {
+  beforeEach(async () => {
+    await AsyncStorage.clear();
     resetProviderModelHealthForTests();
+    resetRuntimeCapabilityOverridesForTests();
   });
 
   it("retries a transient model once before failing over", async () => {
@@ -300,4 +308,124 @@ describe("executeProviderModelRequest", () => {
     expect(secondRequest).toHaveBeenCalledWith("model-b");
     expect(result.actualModel).toBe("model-b");
   });
+
+  it("persists an explicitly retired model and skips it after a restart", async () => {
+    const retiredError = new ProviderRequestError({
+      action: "transcription",
+      detail: "Model retired-model is retired and no longer available.",
+      failureKind: "model-unavailable",
+      message: "Temporary provider problem.",
+      provider: "gemini",
+      status: 404,
+    });
+    const firstRequest = jest
+      .fn()
+      .mockRejectedValueOnce(retiredError)
+      .mockResolvedValueOnce("first");
+
+    await executeProviderModelRequest({
+      candidateModels: ["retired-model", "stable-model"],
+      capability: "stt",
+      provider: "gemini",
+      request: firstRequest,
+      retryDelayMs: 0,
+    });
+
+    expect(getRuntimeCapabilityOverrides()).toEqual([
+      expect.objectContaining({
+        capability: "stt",
+        model: "retired-model",
+        provider: "gemini",
+        reason: "model-unavailable",
+      }),
+    ]);
+
+    resetProviderModelHealthForTests();
+    resetRuntimeCapabilityOverridesForTests();
+    const secondRequest = jest.fn().mockResolvedValue("second");
+    const result = await executeProviderModelRequest({
+      candidateModels: ["retired-model", "stable-model"],
+      capability: "stt",
+      provider: "gemini",
+      request: secondRequest,
+      retryDelayMs: 0,
+    });
+
+    expect(secondRequest).toHaveBeenCalledWith("stable-model");
+    expect(result).toEqual({
+      actualModel: "stable-model",
+      attempts: 1,
+      requestedModel: "retired-model",
+      usedFallback: true,
+      value: "second",
+    });
+  });
+
+  it("persists only an unsupported effort and recovers on the same model", async () => {
+    const unsupportedEffortError = new ProviderRequestError({
+      action: "reply",
+      detail:
+        "Model gpt-5.6-sol does not support reasoning_effort high.",
+      failureKind: "model-unavailable",
+      message: "Temporary provider problem.",
+      provider: "openai",
+      status: 400,
+    });
+    const request = jest
+      .fn()
+      .mockRejectedValueOnce(unsupportedEffortError)
+      .mockResolvedValueOnce("OK");
+
+    const result = await executeProviderModelRequest({
+      candidateModels: ["gpt-5.6-sol"],
+      capability: "llm",
+      modelEffort: "high",
+      provider: "openai",
+      request,
+      retryDelayMs: 0,
+    });
+
+    expect(request.mock.calls).toEqual([
+      ["gpt-5.6-sol", "high"],
+      ["gpt-5.6-sol", "medium"],
+    ]);
+    expect(result).toEqual({
+      actualModel: "gpt-5.6-sol",
+      actualModelEffort: "medium",
+      attempts: 2,
+      requestedModel: "gpt-5.6-sol",
+      requestedModelEffort: "high",
+      usedFallback: true,
+      value: "OK",
+    });
+    expect(getRuntimeCapabilityOverrides()).toEqual([
+      expect.objectContaining({
+        capability: "llm",
+        effort: "high",
+        model: "gpt-5.6-sol",
+        provider: "openai",
+        reason: "configuration-unsupported",
+      }),
+    ]);
+  });
+
+  it.each(["authentication", "quota", "rate-limit", "server"] as const)(
+    "never persists an override for %s failures",
+    async (failureKind) => {
+      const error = providerError(failureKind);
+
+      await expect(
+        executeProviderModelRequest({
+          canRetry: () => false,
+          candidateModels: ["model-a"],
+          capability: "llm",
+          provider: "gemini",
+          request: jest.fn().mockRejectedValue(error),
+          retryDelayMs: 0,
+        }),
+      ).rejects.toBe(error);
+
+      expect(getRuntimeCapabilityOverrides()).toEqual([]);
+    },
+  );
 });

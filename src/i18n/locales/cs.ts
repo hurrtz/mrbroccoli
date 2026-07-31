@@ -441,6 +441,14 @@ export const cs = {
     "Hovoří přímo prostřednictvím vestavěného syntezátoru řeči v telefonu, takže jej můžete porovnat s hlasy nakonfigurovaných poskytovatelů.",
   nativeVoiceUnavailable:
     "Toto zařízení nenahlásilo žádné nativní systémové hlasy pro náhled.",
+  runtimeCompatibilityOverrides: "Kompatibilita za běhu",
+  runtimeCompatibilityOverridesDescription: ({ count }) =>
+    `${count} konfigurací modelů nebo nastavení, jejichž nedostupnost potvrdil poskytovatel, je vypnuto pouze na tomto zařízení. Pan Brokolice je automaticky obchází.`,
+  clearRuntimeCompatibilityOverrides: "Vymazat kompatibilitu za běhu",
+  clearRuntimeCompatibilityOverridesConfirmationTitle:
+    "Vymazat kompatibilitu za běhu?",
+  clearRuntimeCompatibilityOverridesConfirmationMessage:
+    "Dříve vypnuté konfigurace bude možné znovu vyzkoušet. Poskytovatel je může znovu odmítnout.",
   speechDiagnostics: "Nedávná řečová aktivita",
   speechDiagnosticsHint:
     "Zobrazuje nejnovější požadavky na řeč, trasu, o kterou požádali, trasu, kterou skutečně použili, a jakýkoli záložní důvod.",

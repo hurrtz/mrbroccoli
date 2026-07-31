@@ -1,12 +1,18 @@
-import { useState, useEffect, useCallback } from "react";
+import { useEffect, useState } from "react";
 import { type Settings, DEFAULT_SETTINGS } from "../types";
 import { mergeSettings } from "./settings/mergeStoredSettings";
 import {
+  persistPublicSettings,
   loadStoredSettingsSnapshot,
   persistNormalizedPublicSettings,
+  toPublicSettings,
 } from "./settings/storage";
 import { useSettingsActions } from "./settings/useSettingsActions";
 import { reportPersistenceAlert } from "../services/persistenceAlerts";
+import {
+  ensureRuntimeCapabilityOverridesLoaded,
+  subscribeToRuntimeCapabilityOverrides,
+} from "../services/runtimeCapabilityOverrides";
 
 export function useSettings() {
   const [settings, setSettings] = useState<Settings>(DEFAULT_SETTINGS);
@@ -15,8 +21,11 @@ export function useSettings() {
   useEffect(() => {
     let mounted = true;
 
-    void loadStoredSettingsSnapshot()
-      .then(async ({ storedSettings, apiKeys }) => {
+    void Promise.all([
+      loadStoredSettingsSnapshot(),
+      ensureRuntimeCapabilityOverridesLoaded(),
+    ])
+      .then(async ([{ storedSettings, apiKeys }]) => {
         if (!mounted) {
           return;
         }
@@ -42,6 +51,34 @@ export function useSettings() {
       mounted = false;
     };
   }, []);
+
+  useEffect(
+    () => {
+      if (!loaded) {
+        return;
+      }
+
+      return subscribeToRuntimeCapabilityOverrides(() => {
+        setSettings((current) => {
+          const normalized = mergeSettings(
+            toPublicSettings(current),
+            current.apiKeys,
+          );
+
+          if (
+            JSON.stringify(toPublicSettings(normalized)) ===
+            JSON.stringify(toPublicSettings(current))
+          ) {
+            return current;
+          }
+
+          void persistPublicSettings(normalized);
+          return normalized;
+        });
+      });
+    },
+    [loaded],
+  );
 
   const {
     updateSettings,

@@ -440,6 +440,14 @@ export const fr = {
     "Celui-ci parle directement via le synthétiseur vocal intégré au téléphone afin que vous puissiez le comparer avec les voix configurées du fournisseur.",
   nativeVoiceUnavailable:
     "Cet appareil n'a signalé aucune voix système native pour l'aperçu.",
+  runtimeCompatibilityOverrides: "Compatibilité d’exécution",
+  runtimeCompatibilityOverridesDescription: ({ count }) =>
+    `${count} configurations de modèle ou de réglage confirmées indisponibles par le fournisseur sont désactivées uniquement sur cet appareil. M. Brocoli les contourne automatiquement.`,
+  clearRuntimeCompatibilityOverrides: "Effacer la compatibilité d’exécution",
+  clearRuntimeCompatibilityOverridesConfirmationTitle:
+    "Effacer la compatibilité d’exécution ?",
+  clearRuntimeCompatibilityOverridesConfirmationMessage:
+    "Les configurations précédemment désactivées pourront être réessayées. Le fournisseur peut les refuser à nouveau.",
   speechDiagnostics: "Activité vocale récente",
   speechDiagnosticsHint:
     "Affiche les dernières demandes vocales, l'itinéraire demandé, l'itinéraire réellement utilisé et toute raison de secours.",

@@ -66,6 +66,8 @@ These notes are specific to this repository and supplement any parent-level inst
   - `src/services/tts.ts`
   - `src/components/ProviderIcon.tsx`
 - Model lists in `src/constants/models.ts` are user-facing pickers, not raw dumps of every possible provider SKU. Only add models that are actually usable with the app's current integration path.
+- `src/services/runtimeCapabilityOverrides.ts` stores provider-confirmed unavailable model or effort configurations under `@mrbroccoli/runtime-capability-overrides`. Only an explicit provider response tied to the precise model or effort may create a durable override. Authentication, credit, quota, rate-limit, network, timeout, capacity, generic 404, and server failures must never do so.
+- Runtime compatibility overrides are device-local. They filter request candidates and Settings options, trigger route normalization, and remain inspectable/resettable under App & diagnostics; do not replace them with remote configuration or telemetry.
 - For OpenAI, the app currently uses `v1/chat/completions` in `src/services/llm.ts`. Do not add specialized models that require a different API shape unless the service layer is updated too.
 - For Anthropic, the app currently uses `v1/messages` in `src/services/llm.ts`. Keep the picker aligned with models that work on that path.
 - When updating provider model lists, also check defaults and tests for hard-coded model IDs. Common follow-up files are:

@@ -13,6 +13,10 @@ import {
   WEB_SEARCH_TIMEOUT_MS_BY_PROVIDER,
 } from "../../src/constants/webSearch";
 import { resetProviderModelHealthForTests } from "../../src/services/providerResilience";
+import {
+  RUNTIME_CAPABILITY_OVERRIDES_STORAGE_KEY,
+  resetRuntimeCapabilityOverridesForTests,
+} from "../../src/services/runtimeCapabilityOverrides";
 
 jest.mock("../../src/services/debugLogCapture", () => ({
   recordDebugLogEvent: jest.fn(),
@@ -25,9 +29,11 @@ function fetchBody(callIndex = 0) {
 }
 
 describe("webSearch", () => {
-  beforeEach(() => {
+  beforeEach(async () => {
+    await AsyncStorage.removeItem(RUNTIME_CAPABILITY_OVERRIDES_STORAGE_KEY);
     jest.clearAllMocks();
     resetProviderModelHealthForTests();
+    resetRuntimeCapabilityOverridesForTests();
   });
 
   it("keeps raw search vendors removed while exposing native search-capable LLM providers", () => {
@@ -603,3 +609,4 @@ describe("webSearch", () => {
   });
 
 });
+import AsyncStorage from "@react-native-async-storage/async-storage";

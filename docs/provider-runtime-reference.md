@@ -13,6 +13,14 @@ this file is a human-readable reference for product and maintenance decisions.
 - Model pickers are curated. They intentionally exclude deprecated,
   alias-only, wrong-endpoint, coding-only, image/video-only, Chinese-only, and
   Mandarin-only rows.
+- When a provider explicitly confirms that a precise model or effort
+  configuration is unavailable, Mr Broccoli records a device-local runtime
+  compatibility override, removes that choice from Settings, and uses the
+  curated fallback chain. Authentication, credit, quota, rate-limit, network,
+  timeout, capacity, generic 404, and server failures never create durable
+  overrides. The stored list contains only provider, capability, model,
+  optional effort, reason, and timestamp; it can be reviewed and cleared under
+  App & diagnostics.
 - Provider-native web search is exposed only when `src/services/webSearch.ts`
   has an app-wired integration path.
 - Speech providers are exposed only when the app has a straightforward BYOK

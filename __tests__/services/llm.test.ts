@@ -1,3 +1,5 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
 import {
   generateConversationTitle,
   streamChat,
@@ -5,8 +7,17 @@ import {
 } from "../../src/services/llm";
 import { requestRealtimeChatViaWebSocket } from "../../src/services/llm/providers/openaiRealtime";
 import { resetProviderModelHealthForTests } from "../../src/services/providerResilience";
+import {
+  RUNTIME_CAPABILITY_OVERRIDES_STORAGE_KEY,
+  resetRuntimeCapabilityOverridesForTests,
+} from "../../src/services/runtimeCapabilityOverrides";
 import { Message } from "../../src/types";
 global.fetch = jest.fn();
+
+beforeEach(async () => {
+  await AsyncStorage.removeItem(RUNTIME_CAPABILITY_OVERRIDES_STORAGE_KEY);
+  resetRuntimeCapabilityOverridesForTests();
+});
 
 const OriginalWebSocket = (globalThis as any).WebSocket;
 
@@ -735,6 +746,7 @@ describe("streamChat", () => {
       onError: () => {},
     });
 
+    await new Promise((resolve) => setTimeout(resolve, 0));
     const socket = MockWebSocket.instances[0];
     expect(socket.url).toBe(
       "wss://api.openai.com/v1/realtime?model=gpt-realtime-2.1",

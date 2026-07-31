@@ -5,8 +5,11 @@ import { Modal } from "@ant-design/react-native";
 import Feather from "@expo/vector-icons/Feather";
 
 import { getTtsListenLanguageLabel } from "../../../constants/localTts";
+import { PROVIDER_LABELS } from "../../../constants/models";
 import { AntIconButton } from "../../../design-system/AntIconButton";
+import { useRuntimeCapabilityOverrides } from "../../../hooks/useRuntimeCapabilityOverrides";
 import { useLocalization } from "../../../i18n";
+import { clearRuntimeCapabilityOverrides } from "../../../services/runtimeCapabilityOverrides";
 import {
   clearSpeechDiagnostics,
   type SpeechDiagnosticRoute,
@@ -80,6 +83,11 @@ export function AppSettingsPage({
   const { language, t } = useLocalization();
   const [clearConfirmationVisible, setClearConfirmationVisible] =
     React.useState(false);
+  const [
+    clearRuntimeOverridesConfirmationVisible,
+    setClearRuntimeOverridesConfirmationVisible,
+  ] = React.useState(false);
+  const runtimeOverrides = useRuntimeCapabilityOverrides();
   const handleClear = React.useCallback(() => {
     setClearConfirmationVisible(true);
   }, []);
@@ -142,6 +150,55 @@ export function AppSettingsPage({
           }
           helperText={t("debugLogButtonUsageDescription")}
         />
+      </View>
+
+      <View
+        testID="runtime-compatibility-overrides-section"
+        style={styles.sectionGroup}
+      >
+        <AntSectionIntro
+          title={t("runtimeCompatibilityOverrides")}
+          extra={
+            runtimeOverrides.length > 0 ? (
+              <AntIconButton
+                accessibilityLabel={t("clearRuntimeCompatibilityOverrides")}
+                iconNode={
+                  <Feather name="trash-2" size={18} color={colors.danger} />
+                }
+                onPress={() =>
+                  setClearRuntimeOverridesConfirmationVisible(true)
+                }
+              />
+            ) : null
+          }
+        />
+        <AntSettingsCard>
+          <Text style={[styles.helperText, { color: colors.textSecondary }]}>
+            {t("runtimeCompatibilityOverridesDescription", {
+              count: runtimeOverrides.length,
+            })}
+          </Text>
+          {runtimeOverrides.map((override) => (
+            <Text
+              key={[
+                override.provider,
+                override.capability,
+                override.model,
+                override.effort ?? "",
+              ].join(":")}
+              style={[styles.helperText, { color: colors.textMuted }]}
+            >
+              {[
+                PROVIDER_LABELS[override.provider],
+                override.capability.toUpperCase(),
+                override.model,
+                override.effort,
+              ]
+                .filter(Boolean)
+                .join(" · ")}
+            </Text>
+          ))}
+        </AntSettingsCard>
       </View>
 
       <View testID="speech-diagnostics-section" style={styles.sectionGroup}>
@@ -292,6 +349,49 @@ export function AppSettingsPage({
       >
         <Text style={[styles.helperText, { color: colors.textSecondary }]}>
           {t("clearSpeechDiagnosticsConfirmationMessage")}
+        </Text>
+      </Modal>
+
+      <Modal
+        visible={clearRuntimeOverridesConfirmationVisible}
+        transparent
+        maskClosable={false}
+        title={t("clearRuntimeCompatibilityOverridesConfirmationTitle")}
+        onClose={() => setClearRuntimeOverridesConfirmationVisible(false)}
+        footer={[
+          {
+            text: t("cancel"),
+            style: {
+              color: colors.accent,
+              fontFamily: fonts.bodyMedium,
+            },
+            onPress: () =>
+              setClearRuntimeOverridesConfirmationVisible(false),
+          },
+          {
+            text: t("clear"),
+            style: {
+              color: colors.danger,
+              fontFamily: fonts.bodyMedium,
+            },
+            onPress: () => {
+              void clearRuntimeCapabilityOverrides();
+              setClearRuntimeOverridesConfirmationVisible(false);
+            },
+          },
+        ]}
+        styles={{
+          header: {
+            color: colors.text,
+            fontFamily: fonts.bodyMedium,
+          },
+          buttonText: {
+            fontFamily: fonts.bodyMedium,
+          },
+        }}
+      >
+        <Text style={[styles.helperText, { color: colors.textSecondary }]}>
+          {t("clearRuntimeCompatibilityOverridesConfirmationMessage")}
         </Text>
       </Modal>
     </View>

@@ -4,7 +4,6 @@ import { StyleSheet, Text, View } from "react-native";
 import { Button } from "@ant-design/react-native";
 import Feather from "@expo/vector-icons/Feather";
 
-import { PROVIDER_MODELS } from "../../../constants/models";
 import {
   MAX_RESPONSE_MODES,
   MIN_RESPONSE_MODES,
@@ -12,6 +11,7 @@ import {
 import { antButtonTypography } from "../../../design-system/antTypography";
 import { AntIconButton } from "../../../design-system/AntIconButton";
 import { useLocalization } from "../../../i18n";
+import { useRuntimeCapabilityOverrides } from "../../../hooks/useRuntimeCapabilityOverrides";
 import { useTheme } from "../../../theme/ThemeContext";
 import type {
   Provider,
@@ -27,6 +27,7 @@ import {
 import {
   getDefaultModelForProvider,
   getAvailableResponseModes,
+  getProviderLlmModelOptions,
   isValidModelForProvider,
 } from "../../../utils/responseModes";
 import { renderProviderPickerOptions } from "../../settings-core/helpers";
@@ -66,6 +67,7 @@ export function ThinkingSettingsPage({
 }) {
   const { colors } = useTheme();
   const { language, t } = useLocalization();
+  useRuntimeCapabilityOverrides();
   const canAdd = settings.responseModes.length < MAX_RESPONSE_MODES;
   const canRemove = settings.responseModes.length > MIN_RESPONSE_MODES;
   const readyModelCount = getAvailableResponseModes(settings).length;
@@ -153,10 +155,12 @@ export function ThinkingSettingsPage({
                   <AntPickerRow
                     label={t("model")}
                     value={route.model}
-                    options={PROVIDER_MODELS[route.provider].map((model) => ({
-                      value: model.id,
-                      label: model.name,
-                    }))}
+                    options={getProviderLlmModelOptions(route.provider).map(
+                      (model) => ({
+                        value: model.id,
+                        label: model.name,
+                      }),
+                    )}
                     onChange={(value) =>
                       onUpdateResponseModeRoute(
                         mode.id,

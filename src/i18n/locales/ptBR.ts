@@ -440,6 +440,14 @@ export const ptBR = {
     "Ele fala diretamente através do sintetizador de voz integrado do telefone para que você possa compará-lo com as vozes configuradas do provedor.",
   nativeVoiceUnavailable:
     "Este dispositivo não relatou nenhuma voz nativa do sistema para visualização.",
+  runtimeCompatibilityOverrides: "Compatibilidade em execução",
+  runtimeCompatibilityOverridesDescription: ({ count }) =>
+    `${count} configurações de modelo ou ajuste confirmadas como indisponíveis pelo provedor estão desativadas apenas neste dispositivo. O Sr. Brócolis desvia delas automaticamente.`,
+  clearRuntimeCompatibilityOverrides: "Limpar compatibilidade em execução",
+  clearRuntimeCompatibilityOverridesConfirmationTitle:
+    "Limpar a compatibilidade em execução?",
+  clearRuntimeCompatibilityOverridesConfirmationMessage:
+    "As configurações desativadas anteriormente poderão ser testadas novamente. O provedor pode rejeitá-las de novo.",
   speechDiagnostics: "Atividade de fala recente",
   speechDiagnosticsHint:
     "Mostra as últimas solicitações de fala, a rota solicitada, a rota realmente usada e qualquer motivo de fallback.",

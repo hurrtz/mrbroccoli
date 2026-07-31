@@ -1,7 +1,12 @@
 import * as FileSystem from "expo-file-system/legacy";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { transcribeAudio } from "../../src/services/whisper";
 import { getProviderSttTimeoutMs } from "../../src/services/whisper/config";
 import { resetProviderModelHealthForTests } from "../../src/services/providerResilience";
+import {
+  RUNTIME_CAPABILITY_OVERRIDES_STORAGE_KEY,
+  resetRuntimeCapabilityOverridesForTests,
+} from "../../src/services/runtimeCapabilityOverrides";
 
 global.fetch = jest.fn();
 
@@ -132,9 +137,11 @@ describe("transcribeAudio", () => {
     (globalThis as any).WebSocket = OriginalWebSocket;
   });
 
-  beforeEach(() => {
+  beforeEach(async () => {
+    await AsyncStorage.removeItem(RUNTIME_CAPABILITY_OVERRIDES_STORAGE_KEY);
     jest.clearAllMocks();
     resetProviderModelHealthForTests();
+    resetRuntimeCapabilityOverridesForTests();
     MockWebSocket.instances = [];
     require("expo-file-system").File.createdUris.length = 0;
     (FileSystem.getInfoAsync as jest.Mock).mockResolvedValue({

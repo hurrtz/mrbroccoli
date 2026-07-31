@@ -2,6 +2,7 @@ import { PROVIDER_MODELS } from "../constants/models";
 import type { ModelEffortConfig, ModelEffortOption } from "../constants/models";
 import { translate, type TranslationKey } from "../i18n";
 import type { AppLanguage, Provider, ResponseModeRoute } from "../types";
+import { isRuntimeCapabilityConfigurationDisabled } from "../services/runtimeCapabilityOverrides";
 
 const GENERIC_DEFAULT_EFFORT_IDS = ["medium", "normal"];
 const ANTHROPIC_ADAPTIVE_THINKING_MODELS = new Set([
@@ -34,7 +35,15 @@ export function getModelEffortOptions(
   provider: Provider,
   model: string,
 ): ModelEffortOption[] {
-  return getModelEffortConfig(provider, model)?.options ?? [];
+  return (getModelEffortConfig(provider, model)?.options ?? []).filter(
+    (option) =>
+      !isRuntimeCapabilityConfigurationDisabled({
+        capability: "llm",
+        effort: option.id,
+        model,
+        provider,
+      }),
+  );
 }
 
 function getModelEffortOption(
@@ -74,7 +83,7 @@ export function getDefaultModelEffort(
   model: string,
 ): string | undefined {
   const config = getModelEffortConfig(provider, model);
-  const options = config?.options ?? [];
+  const options = getModelEffortOptions(provider, model);
 
   if (options.length === 0) {
     return undefined;

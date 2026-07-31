@@ -441,6 +441,14 @@ export const tr = {
     "Bu, doğrudan telefonun yerleşik konuşma sentezleyicisi aracılığıyla konuşur, böylece onu yapılandırılmış sağlayıcı sesleriyle karşılaştırabilirsiniz.",
   nativeVoiceUnavailable:
     "Bu cihaz, önizleme için herhangi bir yerel sistem sesini bildirmedi.",
+  runtimeCompatibilityOverrides: "Çalışma zamanı uyumluluğu",
+  runtimeCompatibilityOverridesDescription: ({ count }) =>
+    `Sağlayıcının kullanılamadığını doğruladığı ${count} model veya ayar yapılandırması yalnızca bu cihazda devre dışı. Bay Brokoli bunları otomatik olarak atlar.`,
+  clearRuntimeCompatibilityOverrides: "Çalışma zamanı uyumluluğunu temizle",
+  clearRuntimeCompatibilityOverridesConfirmationTitle:
+    "Çalışma zamanı uyumluluğu temizlensin mi?",
+  clearRuntimeCompatibilityOverridesConfirmationMessage:
+    "Daha önce devre dışı bırakılan yapılandırmalar yeniden denenebilir. Sağlayıcı bunları tekrar reddedebilir.",
   speechDiagnostics: "Son Konuşma Etkinliği",
   speechDiagnosticsHint:
     "En son konuşma isteklerini, istedikleri rotayı, fiilen kullandıkları rotayı ve geri dönüş nedenlerini gösterir.",

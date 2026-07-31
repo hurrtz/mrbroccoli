@@ -1,15 +1,30 @@
 import type { Provider } from "../types";
+import {
+  getDefaultModelEffort,
+  getModelEffortOptions,
+  normalizeResponseModeRouteEffort,
+} from "../utils/modelEffort";
 
 import {
+  getPersistableRuntimeOverrideTarget,
   ProviderRequestError,
   type ProviderFailureKind,
 } from "./providerErrors";
+import {
+  disableRuntimeCapabilityConfiguration,
+  ensureRuntimeCapabilityOverridesLoaded,
+  isRuntimeCapabilityConfigurationDisabled,
+  type RuntimeCapabilityOverrideCapability,
+} from "./runtimeCapabilityOverrides";
 
-export type ResilientProviderCapability = "llm" | "stt" | "tts" | "web-search";
+export type ResilientProviderCapability =
+  RuntimeCapabilityOverrideCapability;
 
 export interface ProviderModelRequestResult<T> {
+  actualModelEffort?: string;
   actualModel: string;
   attempts: number;
+  requestedModelEffort?: string;
   requestedModel: string;
   usedFallback: boolean;
   value: T;
@@ -21,8 +36,9 @@ interface ProviderModelRequestParams<T> {
   candidateModels: readonly string[];
   capability: ResilientProviderCapability;
   maxSameModelRetries?: number;
+  modelEffort?: string;
   provider: Provider;
-  request: (model: string) => Promise<T>;
+  request: (model: string, modelEffort?: string) => Promise<T>;
   retryDelayMs?: number;
 }
 
@@ -226,6 +242,7 @@ function canFailOverToAnotherModel(kind: ProviderFailureKind | null) {
   // instead of assuming the entire provider is unavailable.
   return (
     kind === "capacity" ||
+    kind === "configuration-unsupported" ||
     kind === "model-unavailable" ||
     kind === "quota" ||
     kind === "rate-limit" ||
@@ -295,7 +312,15 @@ function getAvailableCandidates(params: {
   provider: Provider;
 }) {
   const candidates = normalizeCandidates(params.candidateModels);
-  const available = candidates.filter(
+  const runtimeAvailable = candidates.filter(
+    (model) =>
+      !isRuntimeCapabilityConfigurationDisabled({
+        capability: params.capability,
+        model,
+        provider: params.provider,
+      }),
+  );
+  const available = runtimeAvailable.filter(
     (model) =>
       !isModelCircuitOpen({
         capability: params.capability,
@@ -305,9 +330,58 @@ function getAvailableCandidates(params: {
   );
 
   // Never make a provider permanently unusable because every candidate was
-  // unhealthy in an earlier request. Probe the preferred model again when
-  // there is no healthy alternative.
-  return available.length > 0 ? available : candidates.slice(0, 1);
+  // temporarily unhealthy in an earlier request. Durable provider-confirmed
+  // overrides are never probed again until the local override is cleared.
+  return available.length > 0 ? available : runtimeAvailable.slice(0, 1);
+}
+
+function getAvailableModelEfforts(params: {
+  capability: ResilientProviderCapability;
+  model: string;
+  provider: Provider;
+  requestedEffort?: string;
+}) {
+  const requestedEffort = params.requestedEffort?.trim();
+
+  if (params.capability !== "llm" || !requestedEffort) {
+    return [undefined];
+  }
+
+  const effortOptions = getModelEffortOptions(params.provider, params.model);
+
+  if (effortOptions.length === 0) {
+    return [undefined];
+  }
+
+  const normalizedRequestedEffort = normalizeResponseModeRouteEffort({
+    effort: requestedEffort,
+    model: params.model,
+    provider: params.provider,
+  }).effort;
+  const candidates = [
+    normalizedRequestedEffort,
+    getDefaultModelEffort(params.provider, params.model),
+    ...effortOptions.map((option) => option.id),
+  ];
+  const unique = new Set<string>();
+
+  for (const candidate of candidates) {
+    const effort = candidate?.trim();
+
+    if (
+      effort &&
+      !isRuntimeCapabilityConfigurationDisabled({
+        capability: params.capability,
+        effort,
+        model: params.model,
+        provider: params.provider,
+      })
+    ) {
+      unique.add(effort);
+    }
+  }
+
+  return [...unique];
 }
 
 function waitForRetry(delayMs: number, abortSignal?: AbortSignal) {
@@ -343,6 +417,8 @@ function waitForRetry(delayMs: number, abortSignal?: AbortSignal) {
 export async function executeProviderModelRequest<T>(
   params: ProviderModelRequestParams<T>,
 ): Promise<ProviderModelRequestResult<T>> {
+  await ensureRuntimeCapabilityOverridesLoaded();
+
   const providerCircuit = getProviderCircuitState(
     params.provider,
     params.capability,
@@ -358,7 +434,18 @@ export async function executeProviderModelRequest<T>(
   }
 
   const requestedModel = params.candidateModels[0]?.trim() ?? "";
-  const candidates = getAvailableCandidates(params);
+  const requestedModelEffort = params.modelEffort?.trim();
+  const candidates = getAvailableCandidates(params)
+    .map((model) => ({
+      efforts: getAvailableModelEfforts({
+        capability: params.capability,
+        model,
+        provider: params.provider,
+        requestedEffort: requestedModelEffort,
+      }),
+      model,
+    }))
+    .filter(({ efforts }) => efforts.length > 0);
   const maxSameModelRetries =
     params.maxSameModelRetries ?? DEFAULT_MAX_SAME_MODEL_RETRIES;
   const retryDelayMs = params.retryDelayMs ?? DEFAULT_RETRY_DELAY_MS;
@@ -372,13 +459,13 @@ export async function executeProviderModelRequest<T>(
   }
 
   for (let modelIndex = 0; modelIndex < candidates.length; modelIndex += 1) {
-    const model = candidates[modelIndex];
+    const { efforts, model } = candidates[modelIndex];
+    let effortIndex = 0;
+    let sameModelRetry = 0;
 
-    for (
-      let sameModelRetry = 0;
-      sameModelRetry <= maxSameModelRetries;
-      sameModelRetry += 1
-    ) {
+    while (true) {
+      const modelEffort = efforts[effortIndex];
+
       if (params.abortSignal?.aborted) {
         const abortError = new Error("Provider request aborted.");
         abortError.name = "AbortError";
@@ -388,32 +475,50 @@ export async function executeProviderModelRequest<T>(
       attempts += 1;
 
       try {
-        const value = await params.request(model);
+        const value =
+          modelEffort === undefined
+            ? await params.request(model)
+            : await params.request(model, modelEffort);
 
         unhealthyModels.delete(
           circuitKey(params.provider, params.capability, model),
         );
         clearProviderCircuit(params.provider, params.capability);
+        const effortFallbackUsed =
+          model === requestedModel &&
+          requestedModelEffort !== undefined &&
+          getModelEffortOptions(params.provider, requestedModel).length > 0 &&
+          modelEffort !== requestedModelEffort;
 
-        if (attempts > 1 || model !== requestedModel) {
+        if (
+          attempts > 1 ||
+          model !== requestedModel ||
+          effortFallbackUsed
+        ) {
           recordResilienceEvent({
             event: "provider-model-request-recovered",
             payload: {
               actualModel: model,
+              actualModelEffort: modelEffort ?? null,
               attempts,
               capability: params.capability,
               provider: params.provider,
               requestedModel,
-              usedFallback: model !== requestedModel,
+              requestedModelEffort: requestedModelEffort ?? null,
+              usedFallback: model !== requestedModel || effortFallbackUsed,
             },
           });
         }
 
         return {
           actualModel: model,
+          ...(modelEffort ? { actualModelEffort: modelEffort } : {}),
           attempts,
           requestedModel,
-          usedFallback: model !== requestedModel,
+          ...(requestedModelEffort
+            ? { requestedModelEffort }
+            : {}),
+          usedFallback: model !== requestedModel || effortFallbackUsed,
           value,
         };
       } catch (error) {
@@ -424,6 +529,43 @@ export async function executeProviderModelRequest<T>(
         }
 
         const kind = getProviderFailureKind(error);
+        const persistableOverride = getPersistableRuntimeOverrideTarget({
+          effort: modelEffort,
+          error,
+          model,
+        });
+        if (persistableOverride) {
+          const configurationOverride =
+            persistableOverride.kind === "configuration";
+          const persisted =
+            await disableRuntimeCapabilityConfiguration({
+              capability: params.capability,
+              ...(configurationOverride
+                ? { effort: persistableOverride.effort }
+                : {}),
+              model,
+              provider: params.provider,
+              reason: configurationOverride
+                ? "configuration-unsupported"
+                : "model-unavailable",
+            });
+
+          if (persisted) {
+            recordResilienceEvent({
+              event: "provider-runtime-configuration-disabled",
+              level: "warn",
+              payload: {
+                capability: params.capability,
+                ...(configurationOverride
+                  ? { effort: persistableOverride.effort }
+                  : {}),
+                failureKind: kind,
+                model,
+                provider: params.provider,
+              },
+            });
+          }
+        }
         const failureScope =
           kind === "quota"
             ? isModelScopedQuotaFailure(error, model)
@@ -453,7 +595,32 @@ export async function executeProviderModelRequest<T>(
         });
 
         if (shouldRetrySameModel) {
+          sameModelRetry += 1;
           await waitForRetry(retryDelayMs, params.abortSignal);
+          continue;
+        }
+
+        const nextEffort = efforts[effortIndex + 1];
+        const shouldTryAnotherEffort =
+          callerAllowsRetry &&
+          persistableOverride?.kind === "configuration" &&
+          nextEffort !== undefined;
+
+        if (shouldTryAnotherEffort) {
+          effortIndex += 1;
+          sameModelRetry = 0;
+          recordResilienceEvent({
+            event: "provider-model-configuration-failover",
+            level: "warn",
+            payload: {
+              capability: params.capability,
+              failedEffort: modelEffort ?? null,
+              failureKind: kind ?? "unknown",
+              model,
+              nextEffort,
+              provider: params.provider,
+            },
+          });
           continue;
         }
 
@@ -480,12 +647,14 @@ export async function executeProviderModelRequest<T>(
           throw error;
         }
 
-        markModelUnhealthy({
-          capability: params.capability,
-          kind,
-          model,
-          provider: params.provider,
-        });
+        if (persistableOverride?.kind !== "configuration") {
+          markModelUnhealthy({
+            capability: params.capability,
+            kind,
+            model,
+            provider: params.provider,
+          });
+        }
         recordResilienceEvent({
           event: "provider-model-failover",
           level: "warn",
@@ -494,7 +663,7 @@ export async function executeProviderModelRequest<T>(
             failedModel: model,
             failureKind: kind ?? "unknown",
             ...(failureScope ? { failureScope } : {}),
-            nextModel: candidates[modelIndex + 1],
+            nextModel: candidates[modelIndex + 1]?.model,
             provider: params.provider,
             requestedModel,
           },

@@ -449,6 +449,14 @@ export const hu = {
     "Ez közvetlenül a telefon beépített beszédszintetizátorán keresztül beszél, így összehasonlíthatja a konfigurált szolgáltatói hangokkal.",
   nativeVoiceUnavailable:
     "Ez az eszköz nem jelentett egyetlen natív rendszerhangot sem az előnézethez.",
+  runtimeCompatibilityOverrides: "Futásidejű kompatibilitás",
+  runtimeCompatibilityOverridesDescription: ({ count }) =>
+    `${count} szolgáltató által igazoltan nem elérhető modell- vagy beállításkonfiguráció csak ezen az eszközön van letiltva. Brokkoli úr automatikusan elkerüli ezeket.`,
+  clearRuntimeCompatibilityOverrides: "Futásidejű kompatibilitás törlése",
+  clearRuntimeCompatibilityOverridesConfirmationTitle:
+    "Törlöd a futásidejű kompatibilitást?",
+  clearRuntimeCompatibilityOverridesConfirmationMessage:
+    "A korábban letiltott konfigurációk újra kipróbálhatók lesznek. A szolgáltató ismét elutasíthatja őket.",
   speechDiagnostics: "Legutóbbi beszédtevékenység",
   speechDiagnosticsHint:
     "Megjeleníti a legfrissebb beszédkéréseket, a kért útvonalat, a ténylegesen használt útvonalat és az esetleges tartalék okokat.",

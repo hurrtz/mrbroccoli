@@ -14,6 +14,7 @@ import {
   getProviderTtsModelOptions,
 } from "../../constants/models";
 import { useSpeechDiagnostics } from "../../hooks/useSpeechDiagnostics";
+import { useRuntimeCapabilityOverrides } from "../../hooks/useRuntimeCapabilityOverrides";
 import { useLocalization } from "../../i18n";
 import { TtsListenLanguage } from "../../types";
 import {
@@ -51,6 +52,7 @@ export function useSettingsController({
   const insets = useSafeAreaInsets();
   const contentScrollRef = useRef<ScrollView>(null);
   const speechDiagnostics = useSpeechDiagnostics(6);
+  useRuntimeCapabilityOverrides();
   const {
     providerPreviewTexts,
     kokoroPreviewTexts,

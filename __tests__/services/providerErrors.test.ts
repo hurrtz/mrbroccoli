@@ -2,6 +2,7 @@ import {
   buildProviderHttpError,
   classifyProviderHttpFailure,
   extractProviderErrorMessage,
+  getPersistableRuntimeOverrideTarget,
   ProviderRequestError,
   readSafeProviderErrorMessage,
 } from "../../src/services/providerErrors";
@@ -217,5 +218,47 @@ describe("buildProviderHttpError", () => {
         status: 400,
       }),
     );
+  });
+
+  it("recognizes an explicitly unsupported effort configuration", () => {
+    const error = buildProviderHttpError({
+      provider: "openai",
+      language: "en",
+      status: 400,
+      errorText: JSON.stringify({
+        error: {
+          message:
+            "Model gpt-5.6-sol does not support reasoning_effort high.",
+        },
+      }),
+      action: "reply",
+    });
+
+    expect(error.failureKind).toBe("model-unavailable");
+    expect(
+      getPersistableRuntimeOverrideTarget({
+        effort: "high",
+        error,
+        model: "gpt-5.6-sol",
+      }),
+    ).toEqual({ kind: "configuration", effort: "high" });
+  });
+
+  it("does not persist ambiguous status-only model failures", () => {
+    const error = new ProviderRequestError({
+      action: "reply",
+      detail: "Not found.",
+      failureKind: "model-unavailable",
+      message: "Temporary provider problem.",
+      provider: "openai",
+      status: 404,
+    });
+
+    expect(
+      getPersistableRuntimeOverrideTarget({
+        error,
+        model: "gpt-5.6-sol",
+      }),
+    ).toBeNull();
   });
 });

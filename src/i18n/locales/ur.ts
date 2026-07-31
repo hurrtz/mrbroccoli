@@ -438,6 +438,14 @@ export const ur = {
     "یہ فون کے بلٹ ان اسپیچ سنتھیسائزر کے ذریعے براہ راست بولتا ہے تاکہ آپ اس کا موازنہ فراہم کنندہ کی تشکیل شدہ آوازوں سے کر سکیں۔",
   nativeVoiceUnavailable:
     "اس ڈیوائس نے پیش نظارہ کے لیے کسی مقامی سسٹم کی آوازوں کی اطلاع نہیں دی۔",
+  runtimeCompatibilityOverrides: "رن ٹائم مطابقت",
+  runtimeCompatibilityOverridesDescription: ({ count }) =>
+    `فراہم کنندہ کی جانب سے غیر دستیاب قرار دی گئی ${count} ماڈل یا ترتیب کنفیگریشنز صرف اس ڈیوائس پر بند ہیں۔ مسٹر بروکلی خودکار طور پر ان سے بچتا ہے۔`,
+  clearRuntimeCompatibilityOverrides: "رن ٹائم مطابقت صاف کریں",
+  clearRuntimeCompatibilityOverridesConfirmationTitle:
+    "رن ٹائم مطابقت صاف کریں؟",
+  clearRuntimeCompatibilityOverridesConfirmationMessage:
+    "پہلے بند کی گئی کنفیگریشنز دوبارہ آزمائی جا سکیں گی۔ فراہم کنندہ انہیں دوبارہ مسترد کر سکتا ہے۔",
   speechDiagnostics: "حالیہ تقریری سرگرمی",
   speechDiagnosticsHint:
     "تقریر کی تازہ ترین درخواستیں، وہ راستہ جو انہوں نے مانگا تھا، وہ راستہ جو انہوں نے اصل میں استعمال کیا تھا، اور فال بیک کی کوئی وجہ دکھاتا ہے۔",

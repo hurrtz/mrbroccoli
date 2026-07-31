@@ -440,6 +440,14 @@ export const hi = {
     "यह फ़ोन के अंतर्निर्मित स्पीच सिंथेसाइज़र के माध्यम से सीधे बोलता है ताकि आप इसकी तुलना कॉन्फ़िगर किए गए प्रदाता की आवाज़ों से कर सकें।",
   nativeVoiceUnavailable:
     "इस डिवाइस ने पूर्वावलोकन के लिए किसी भी मूल सिस्टम आवाज़ की सूचना नहीं दी।",
+  runtimeCompatibilityOverrides: "रनटाइम संगतता",
+  runtimeCompatibilityOverridesDescription: ({ count }) =>
+    `प्रदाता द्वारा अनुपलब्ध बताए गए ${count} मॉडल या सेटिंग कॉन्फ़िगरेशन केवल इस डिवाइस पर बंद हैं। मिस्टर ब्रोकली उन्हें अपने-आप छोड़ देता है।`,
+  clearRuntimeCompatibilityOverrides: "रनटाइम संगतता साफ़ करें",
+  clearRuntimeCompatibilityOverridesConfirmationTitle:
+    "रनटाइम संगतता साफ़ करें?",
+  clearRuntimeCompatibilityOverridesConfirmationMessage:
+    "पहले बंद किए गए कॉन्फ़िगरेशन फिर आज़माए जा सकेंगे। प्रदाता उन्हें दोबारा अस्वीकार कर सकता है।",
   speechDiagnostics: "हाल की भाषण गतिविधि",
   speechDiagnosticsHint:
     "नवीनतम भाषण अनुरोध, उनके द्वारा मांगे गए मार्ग, वास्तव में उनके द्वारा उपयोग किए गए मार्ग और किसी भी फ़ॉलबैक कारण को दिखाता है।",

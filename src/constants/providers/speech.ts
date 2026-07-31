@@ -7,13 +7,17 @@ import {
   type RuntimeVoiceOption,
 } from "./runtimeManifest";
 import type { ModelInfo, TtsVoiceOption } from "./types";
+import { isRuntimeCapabilityConfigurationDisabled } from "../../services/runtimeCapabilityOverrides";
 
 function getCatalogSpeechModelLabel(
   provider: Provider,
   service: "stt" | "tts",
   modelId: string,
 ) {
-  return getCatalogModelForAppProvider(provider, modelId, service)?.publicName ?? null;
+  return (
+    getCatalogModelForAppProvider(provider, modelId, service)?.publicName ??
+    null
+  );
 }
 
 function buildRuntimeSpeechModelOptions(
@@ -23,7 +27,8 @@ function buildRuntimeSpeechModelOptions(
 ): ModelInfo[] {
   return specs.map(({ id, fallbackName }) => ({
     id,
-    name: getCatalogSpeechModelLabel(provider, service, id) ?? fallbackName ?? id,
+    name:
+      getCatalogSpeechModelLabel(provider, service, id) ?? fallbackName ?? id,
   }));
 }
 
@@ -57,7 +62,14 @@ export const PROVIDER_DEFAULT_STT_MODELS: Partial<Record<Provider, string>> =
   ) as Partial<Record<Provider, string>>;
 
 export function getProviderSttModelOptions(provider: Provider) {
-  return PROVIDER_STT_MODEL_OPTIONS[provider] ?? [];
+  return (PROVIDER_STT_MODEL_OPTIONS[provider] ?? []).filter(
+    (model) =>
+      !isRuntimeCapabilityConfigurationDisabled({
+        capability: "stt",
+        model: model.id,
+        provider,
+      }),
+  );
 }
 
 export function getSttModelLabel(provider: Provider, modelId: string) {
@@ -131,7 +143,14 @@ export function getProviderTtsVoiceOptions(
 }
 
 export function getProviderTtsModelOptions(provider: Provider) {
-  return PROVIDER_TTS_MODEL_OPTIONS[provider] ?? [];
+  return (PROVIDER_TTS_MODEL_OPTIONS[provider] ?? []).filter(
+    (model) =>
+      !isRuntimeCapabilityConfigurationDisabled({
+        capability: "tts",
+        model: model.id,
+        provider,
+      }),
+  );
 }
 
 export function providerUsesTtsVoiceDirectory(provider: Provider) {

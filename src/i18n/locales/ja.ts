@@ -441,6 +441,14 @@ export const ja = {
     "これは電話機の内蔵音声合成装置を介して直接話すため、設定されたプロバイダーの音声と比較できます。",
   nativeVoiceUnavailable:
     "このデバイスはプレビュー用のネイティブ システム音声を報告しませんでした。",
+  runtimeCompatibilityOverrides: "実行時の互換性",
+  runtimeCompatibilityOverridesDescription: ({ count }) =>
+    `プロバイダーが利用不可と確認したモデルまたは設定の構成 ${count} 件を、この端末だけで無効にしています。ミスター・ブロッコリーが自動的に回避します。`,
+  clearRuntimeCompatibilityOverrides: "実行時の互換性を消去",
+  clearRuntimeCompatibilityOverridesConfirmationTitle:
+    "実行時の互換性を消去しますか？",
+  clearRuntimeCompatibilityOverridesConfirmationMessage:
+    "以前無効にした構成を再試行できるようになります。プロバイダーが再び拒否する場合があります。",
   speechDiagnostics: "最近の音声処理",
   speechDiagnosticsHint:
     "最新の音声リクエスト、リクエストされたルート、実際に使用されたルート、およびフォールバック理由を表示します。",

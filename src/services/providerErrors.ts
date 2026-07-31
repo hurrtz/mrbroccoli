@@ -6,6 +6,7 @@ export type ProviderAction = "reply" | "transcription" | "web-search";
 export type ProviderFailureKind =
   | "authentication"
   | "capacity"
+  | "configuration-unsupported"
   | "context"
   | "credits"
   | "model-unavailable"
@@ -240,6 +241,27 @@ function isModelUnavailableFailure(status: number, detail: string) {
   return mentionsModel && unavailable && (status === 400 || status === 404);
 }
 
+function isConfigurationUnsupportedFailure(status: number, detail: string) {
+  if (status !== 400) {
+    return false;
+  }
+
+  const normalized = detail.toLowerCase();
+  const mentionsConfiguration =
+    normalized.includes("reasoning_effort") ||
+    normalized.includes("reasoning effort") ||
+    normalized.includes("thinking level") ||
+    normalized.includes("thinking_level") ||
+    normalized.includes("effort setting");
+  const explicitlyUnsupported =
+    normalized.includes("does not support") ||
+    normalized.includes("not supported") ||
+    normalized.includes("unsupported") ||
+    normalized.includes("no longer available");
+
+  return mentionsConfiguration && explicitlyUnsupported;
+}
+
 function makeProviderRequestError(params: {
   provider: Provider;
   action: ProviderAction;
@@ -284,6 +306,10 @@ function classifyProviderFailure(params: {
 
   if (isModelUnavailableFailure(status, detail)) {
     return "model-unavailable";
+  }
+
+  if (isConfigurationUnsupportedFailure(status, detail)) {
+    return "configuration-unsupported";
   }
 
   if (isRateLimitFailure(status, detail)) {
@@ -348,6 +374,7 @@ export function buildProviderHttpError(params: {
       });
       break;
     case "capacity":
+    case "configuration-unsupported":
     case "model-unavailable":
     case "server":
       message = translate(params.language, "providerTemporaryError", {
@@ -377,6 +404,73 @@ export function buildProviderHttpError(params: {
     status: params.status,
     message,
   });
+}
+
+export type PersistableRuntimeOverrideTarget =
+  | { kind: "configuration"; effort: string }
+  | { kind: "model" };
+
+export function getPersistableRuntimeOverrideTarget(params: {
+  effort?: string;
+  error: unknown;
+  model: string;
+}): PersistableRuntimeOverrideTarget | null {
+  const providerFailure =
+    params.error &&
+    typeof params.error === "object" &&
+    "failureKind" in params.error &&
+    "status" in params.error &&
+    "detail" in params.error
+      ? (params.error as {
+          detail?: unknown;
+          failureKind?: unknown;
+          status?: unknown;
+        })
+      : null;
+
+  if (
+    !providerFailure ||
+    (providerFailure.failureKind !== "model-unavailable" &&
+      providerFailure.failureKind !== "configuration-unsupported") ||
+    (providerFailure.status !== 400 && providerFailure.status !== 404) ||
+    typeof providerFailure.detail !== "string"
+  ) {
+    return null;
+  }
+
+  const detail = providerFailure.detail.toLowerCase();
+  const model = params.model.trim().toLowerCase();
+  const effort = params.effort?.trim().toLowerCase();
+  const explicitlyUnsupported =
+    detail.includes("does not exist") ||
+    detail.includes("does not support") ||
+    detail.includes("not found") ||
+    detail.includes("not supported") ||
+    detail.includes("unsupported") ||
+    detail.includes("no longer available") ||
+    detail.includes("retired") ||
+    detail.includes("deprecated");
+  const referencesModel =
+    (model.length > 0 && detail.includes(model)) ||
+    detail.includes("this model") ||
+    detail.includes("the model");
+  const referencesEffort =
+    Boolean(effort && detail.includes(effort)) &&
+    (detail.includes("reasoning_effort") ||
+      detail.includes("reasoning effort") ||
+      detail.includes("thinking level") ||
+      detail.includes("thinking_level") ||
+      detail.includes("effort setting"));
+
+  if (!explicitlyUnsupported) {
+    return null;
+  }
+
+  if (effort && referencesEffort) {
+    return { kind: "configuration", effort };
+  }
+
+  return referencesModel ? { kind: "model" } : null;
 }
 
 export function normalizeProviderTransportError(params: {

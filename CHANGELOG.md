@@ -20,6 +20,11 @@ the complete Play Store translations are kept in a dedicated file under
 - Use one Gemini API key for Google chat, recorded-audio transcription, web
   search, and speech synthesis; the legacy Google Cloud Speech credential
   format is no longer supported.
+- Persist provider-confirmed retired models and unsupported effort
+  configurations as on-device compatibility overrides, recover through the
+  curated fallback route, remove disabled choices from Settings, and expose a
+  local reset under App & diagnostics. Authentication, quota, rate-limit,
+  network, and server failures never disable a configuration.
 
 ## 2.5.6 - 2026-07-31
 

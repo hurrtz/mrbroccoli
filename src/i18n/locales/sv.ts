@@ -438,6 +438,14 @@ export const sv = {
     "Denna talar direkt genom telefonens inbyggda talsyntes så att du kan jämföra den med konfigurerade leverantörsröster.",
   nativeVoiceUnavailable:
     "Den här enheten har inte rapporterat några inbyggda systemröster för förhandsgranskning.",
+  runtimeCompatibilityOverrides: "Körningskompatibilitet",
+  runtimeCompatibilityOverridesDescription: ({ count }) =>
+    `${count} modell- eller inställningskonfigurationer som leverantören bekräftat som otillgängliga är inaktiverade endast på den här enheten. Herr Broccoli kringgår dem automatiskt.`,
+  clearRuntimeCompatibilityOverrides: "Rensa körningskompatibilitet",
+  clearRuntimeCompatibilityOverridesConfirmationTitle:
+    "Rensa körningskompatibiliteten?",
+  clearRuntimeCompatibilityOverridesConfirmationMessage:
+    "Tidigare inaktiverade konfigurationer kan provas igen. Leverantören kan avvisa dem på nytt.",
   speechDiagnostics: "Senaste talaktivitet",
   speechDiagnosticsHint:
     "Visar de senaste talförfrågningarna, rutten de bad om, rutten de faktiskt använde och eventuella reservorsaker.",

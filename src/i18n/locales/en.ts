@@ -439,6 +439,14 @@ export const en = {
     "This speaks directly through the phone's built-in speech synthesizer so you can compare it with configured provider voices.",
   nativeVoiceUnavailable:
     "This device did not report any native system voices for preview.",
+  runtimeCompatibilityOverrides: "Runtime compatibility",
+  runtimeCompatibilityOverridesDescription: ({ count }) =>
+    `${count} provider-confirmed unavailable model or setting configurations are disabled only on this device. Mr Broccoli routes around them automatically.`,
+  clearRuntimeCompatibilityOverrides: "Clear runtime compatibility",
+  clearRuntimeCompatibilityOverridesConfirmationTitle:
+    "Clear runtime compatibility?",
+  clearRuntimeCompatibilityOverridesConfirmationMessage:
+    "Previously disabled configurations can be tried again. A provider may reject them again.",
   speechDiagnostics: "Recent Speech Activity",
   speechDiagnosticsHint:
     "Shows the latest speech requests, the route they asked for, the route they actually used, and any fallback reason.",

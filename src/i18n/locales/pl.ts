@@ -443,6 +443,14 @@ export const pl = {
     "Mówi on bezpośrednio przez wbudowany syntezator mowy w telefonie, dzięki czemu można go porównać z głosami skonfigurowanymi przez operatora.",
   nativeVoiceUnavailable:
     "To urządzenie nie zgłosiło żadnych natywnych głosów systemowych do podglądu.",
+  runtimeCompatibilityOverrides: "Zgodność w czasie działania",
+  runtimeCompatibilityOverridesDescription: ({ count }) =>
+    `${count} konfiguracji modeli lub ustawień, których niedostępność potwierdził dostawca, jest wyłączonych tylko na tym urządzeniu. Pan Brokuł automatycznie je omija.`,
+  clearRuntimeCompatibilityOverrides: "Wyczyść zgodność w czasie działania",
+  clearRuntimeCompatibilityOverridesConfirmationTitle:
+    "Wyczyścić zgodność w czasie działania?",
+  clearRuntimeCompatibilityOverridesConfirmationMessage:
+    "Wcześniej wyłączone konfiguracje będzie można ponownie wypróbować. Dostawca może ponownie je odrzucić.",
   speechDiagnostics: "Ostatnia aktywność związana z mową",
   speechDiagnosticsHint:
     "Pokazuje najnowsze prośby o mowę, trasę, o którą prosiły, trasę faktycznie wykorzystaną i wszelkie przyczyny zastępcze.",

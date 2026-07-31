@@ -440,6 +440,14 @@ export const it = {
     "Questo parla direttamente attraverso il sintetizzatore vocale integrato nel telefono in modo da poterlo confrontare con le voci del provider configurate.",
   nativeVoiceUnavailable:
     "Questo dispositivo non ha segnalato alcuna voce di sistema nativa per l'anteprima.",
+  runtimeCompatibilityOverrides: "Compatibilità in esecuzione",
+  runtimeCompatibilityOverridesDescription: ({ count }) =>
+    `${count} configurazioni di modello o impostazione confermate non disponibili dal provider sono disattivate solo su questo dispositivo. Sig. Broccoli le evita automaticamente.`,
+  clearRuntimeCompatibilityOverrides: "Cancella compatibilità in esecuzione",
+  clearRuntimeCompatibilityOverridesConfirmationTitle:
+    "Cancellare la compatibilità in esecuzione?",
+  clearRuntimeCompatibilityOverridesConfirmationMessage:
+    "Le configurazioni disattivate in precedenza potranno essere riprovate. Il provider potrebbe rifiutarle di nuovo.",
   speechDiagnostics: "Attività vocale recente",
   speechDiagnosticsHint:
     "Mostra le ultime richieste vocali, il percorso richiesto, il percorso effettivamente utilizzato e qualsiasi motivo di fallback.",

@@ -153,7 +153,11 @@ export function getNormalizedProviderTtsModels(
   for (const provider of enabledTtsProviders) {
     const supportedModels = getProviderTtsModelOptions(provider);
     const defaultModel =
-      PROVIDER_DEFAULT_TTS_MODELS[provider] || supportedModels[0]?.id;
+      supportedModels.some(
+        (model) => model.id === PROVIDER_DEFAULT_TTS_MODELS[provider],
+      )
+        ? PROVIDER_DEFAULT_TTS_MODELS[provider]
+        : supportedModels[0]?.id;
 
     if (!supportedModels.length || !defaultModel) {
       continue;

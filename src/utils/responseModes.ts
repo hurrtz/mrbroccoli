@@ -18,6 +18,7 @@ import {
 } from "../types";
 import { normalizeResponseModeRouteEffort } from "./modelEffort";
 import { hasProviderCredentialForCapability } from "./providerCredentials";
+import { isRuntimeCapabilityConfigurationDisabled } from "../services/runtimeCapabilityOverrides";
 
 export const LEGACY_RESPONSE_MODE_ORDER = ["quick", "normal", "deep"] as const;
 
@@ -98,7 +99,7 @@ export function getSuggestedResponseModeRoute(
       (route) => route.provider === provider,
     )?.model;
 
-    return PROVIDER_MODELS[provider]
+    return getProviderLlmModelOptions(provider)
       .filter(({ id }) => id !== primaryModel)
       .map(({ id: model }) =>
         normalizeResponseModeRouteEffort({ provider, model }),
@@ -132,7 +133,7 @@ export function deriveResponseModesForProvider(
 ): ResponseModeSelections {
   const runtimeModelIds = Array.from(
     new Set(
-      PROVIDER_MODELS[provider]
+      getProviderLlmModelOptions(provider)
         .map((model) => model.id)
         .filter((model) => model.trim().length > 0),
     ),
@@ -198,17 +199,31 @@ export function isValidModelForProvider(
   provider: Provider,
   model: string,
 ): boolean {
-  return PROVIDER_MODELS[provider].some((entry) => entry.id === model);
+  return getProviderLlmModelOptions(provider).some(
+    (entry) => entry.id === model,
+  );
+}
+
+export function getProviderLlmModelOptions(provider: Provider) {
+  return PROVIDER_MODELS[provider].filter(
+    (model) =>
+      !isRuntimeCapabilityConfigurationDisabled({
+        capability: "llm",
+        model: model.id,
+        provider,
+      }),
+  );
 }
 
 export function getDefaultModelForProvider(provider: Provider): string {
   const curatedDefault = PROVIDER_DEFAULT_MODELS[provider];
+  const availableModels = getProviderLlmModelOptions(provider);
 
   if (isValidModelForProvider(provider, curatedDefault)) {
     return curatedDefault;
   }
 
-  return PROVIDER_MODELS[provider][0]?.id ?? "";
+  return availableModels[0]?.id ?? "";
 }
 
 export function getProviderValidationModel(

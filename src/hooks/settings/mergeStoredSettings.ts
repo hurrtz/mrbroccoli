@@ -520,7 +520,11 @@ export function mergeSettings(
 
     if (supportedSttModels.length > 0) {
       const fallbackSttModel =
-        PROVIDER_DEFAULT_STT_MODELS[provider] ?? supportedSttModels[0]?.id ?? "";
+        supportedSttModels.some(
+          (model) => model.id === PROVIDER_DEFAULT_STT_MODELS[provider],
+        )
+          ? (PROVIDER_DEFAULT_STT_MODELS[provider] ?? "")
+          : supportedSttModels[0]?.id ?? "";
 
       if (
         mergedProviderSttModels[provider] &&
@@ -534,7 +538,11 @@ export function mergeSettings(
 
     if (supportedTtsModels.length > 0) {
       const fallbackTtsModel =
-        PROVIDER_DEFAULT_TTS_MODELS[provider] ?? supportedTtsModels[0]?.id ?? "";
+        supportedTtsModels.some(
+          (model) => model.id === PROVIDER_DEFAULT_TTS_MODELS[provider],
+        )
+          ? (PROVIDER_DEFAULT_TTS_MODELS[provider] ?? "")
+          : supportedTtsModels[0]?.id ?? "";
 
       if (
         mergedProviderTtsModels[provider] &&
