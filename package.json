@@ -25,6 +25,7 @@
     "version:bump": "node scripts/bump-version.mjs",
     "pretest": "npm run config:verify",
     "test": "jest",
+    "test:coverage": "jest --coverage",
     "lint": "eslint app src __tests__ __mocks__ data plugins scripts --max-warnings=0",
     "static:dead-code": "knip --include files,dependencies,unlisted,unresolved,cycles --reporter compact",
     "static:verify": "npm run lint && npm run static:dead-code",

@@ -28,4 +28,16 @@ module.exports = {
   },
   moduleFileExtensions: ["ts", "tsx", "js", "jsx", "json", "svg"],
   testMatch: ["**/__tests__/**/*.test.(ts|tsx|js)"],
+  collectCoverageFrom: [
+    "src/**/*.{ts,tsx}",
+    "!src/**/*.d.ts",
+  ],
+  coverageThreshold: {
+    global: {
+      branches: 70,
+      functions: 45,
+      lines: 67,
+      statements: 67,
+    },
+  },
 };

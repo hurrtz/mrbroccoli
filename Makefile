@@ -63,6 +63,9 @@ static:
 test:
 	@npm test -- --runInBand --watchman=false
 
+coverage:
+	@npm run test:coverage -- --runInBand --watchman=false
+
 i18n:
 	@npm run i18n:verify
 
@@ -112,7 +115,7 @@ pre-push:
 	@$(MAKE) config
 	@$(MAKE) static
 	@$(MAKE) typecheck
-	@$(MAKE) test
+	@$(MAKE) coverage
 
 # This target must remain the first action of every comprehensive release run.
 # It performs no provider request and aborts before quota can be consumed.

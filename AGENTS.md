@@ -201,6 +201,9 @@ These notes are specific to this repository and supplement any parent-level inst
   dependencies, unresolved imports, and dependency cycles.
 - `npm run typecheck` validates production app code, Jest tests, and Node-based
   release scripts through their dedicated TypeScript configurations.
+- `npm run test:coverage -- --runInBand --watchman=false` measures the complete
+  `src/` tree, including unimported files, and enforces the checked-in global
+  floor. The local pre-push gate runs this coverage command.
 - Use the repository `Makefile` as the local CI entry point. Install the
   versioned hook with `make hooks-install`; `make pre-push` is the spend-free
   push gate, and `make pre-release-static` is the spend-free native/static
