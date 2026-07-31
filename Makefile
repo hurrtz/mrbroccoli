@@ -127,7 +127,8 @@ pre-release-static:
 
 # The runner repeats the zero-network preflight internally before it loads any
 # local credential into the Jest process. It then enforces the configured USD
-# reservation and stops on the first failing provider configuration.
+# reservation, records a private sanitized cost report even on failure, and
+# stops on the first failing provider configuration.
 pre-release-live:
 	@npm run prerelease:live
 

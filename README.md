@@ -126,7 +126,13 @@ native validation. `pre-release-live` derives every retained LLM model and
 effort, speech model, representative TTS voice, voice directory, web-search
 provider, and exposed search mode from the runtime manifest. It aborts on the
 first failure and rejects a matrix whose conservative release-test reservation
-exceeds `MR_BROCCOLI_PRERELEASE_MAX_USD`. `pre-release-maestro` builds bundled
+exceeds `MR_BROCCOLI_PRERELEASE_MAX_USD`. Every attempted live run also writes
+private JSON and Markdown cost reports under `artifacts/provider-matrix/`, even
+when a provider fails. Those reports contain only numeric usage metadata and
+release-fixture units—never credentials, prompts, transcripts, or responses.
+Provider-reported dollar charges are identified separately from pinned
+list-price estimates, account-plan credits, and explicitly unknown costs.
+`pre-release-maestro` builds bundled
 Release apps, installs them on one Android emulator, one authorized physical
 Android device, and one booted iOS simulator, runs every UI locale on both
 simulator platforms plus physical-device smoke coverage, and creates a

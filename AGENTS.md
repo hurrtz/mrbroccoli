@@ -205,6 +205,19 @@ These notes are specific to this repository and supplement any parent-level inst
   modes. The runner must stop on the first failure, must not print credentials,
   and must reject its conservative request reservation before network access
   when it exceeds `MR_BROCCOLI_PRERELEASE_MAX_USD`.
+- Release-specific exception: the complete 209-step paid provider matrix has
+  already passed for 2.6.0. Do not run `make pre-release-live` or the combined
+  `make pre-release` target again for any remaining 2.6.0 work. Use the
+  spend-free and relevant device/visual gates instead. Resume the complete paid
+  matrix for the release after 2.6.0.
+- Every attempted live matrix must leave private JSON and Markdown cost reports
+  in `artifacts/provider-matrix/`, including on failure. Retain only sanitized
+  numeric provider usage and deterministic fixture units; never persist keys,
+  prompts, transcripts, provider response content, or request payloads. Label
+  provider-reported USD separately from pinned list-price estimates, provider
+  credits, and costs that cannot be converted to USD without account-specific
+  billing details. The pre-request reservation remains the quota guard, not a
+  claim about the final invoice.
 - A provider key that exists but lacks quota, credit, product access, or model
   permission is a failed release prerequisite. Do not weaken the matrix,
   silently skip the provider, or spend quota on later providers after this
