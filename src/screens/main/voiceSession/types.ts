@@ -66,6 +66,7 @@ export interface UseVoiceSessionControllerParams {
   nativeStt: NativeSpeechRecognizerController;
   playReplyText: (text: string) => Promise<void>;
   player: AudioPlayerController;
+  promptSubmissionBlockMessage?: string | null;
   providerApiKey: string;
   providerLabel: string;
   recorder: AudioRecorderController;

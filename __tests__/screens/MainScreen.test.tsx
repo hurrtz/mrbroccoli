@@ -232,13 +232,33 @@ jest.mock("../../src/screens/main/MainScreenVoiceStage", () => ({
     const { Text } = require("react-native");
     return React.createElement(Text, null, "status-strip");
   },
-  MainScreenVoiceStage: ({ disabled }: { disabled?: boolean }) => {
+  MainScreenVoiceStage: ({
+    disabled,
+    onResolvePromptBlock,
+    promptBlockedMessage,
+  }: {
+    disabled?: boolean;
+    onResolvePromptBlock?: () => void;
+    promptBlockedMessage?: string | null;
+  }) => {
     const React = require("react");
-    const { Text } = require("react-native");
+    const { Text, TouchableOpacity, View } = require("react-native");
     return React.createElement(
-      Text,
+      View,
       null,
-      disabled ? "voice-stage:disabled" : "voice-stage:enabled",
+      React.createElement(
+        Text,
+        null,
+        disabled ? "voice-stage:disabled" : "voice-stage:enabled",
+      ),
+      promptBlockedMessage
+        ? React.createElement(
+            TouchableOpacity,
+            { onPress: onResolvePromptBlock },
+            React.createElement(Text, null, promptBlockedMessage),
+            React.createElement(Text, null, "resolve-prompt-block"),
+          )
+        : null,
     );
   },
 }));
@@ -535,6 +555,31 @@ describe("MainScreen", () => {
     const screen = renderWithProviders(<MainScreen />);
 
     expect(screen.getByText("voice-stage:enabled")).toBeTruthy();
+  });
+
+  it("blocks new prompts and links to Speaking settings when Kokoro is missing", () => {
+    useSharedSettings.mockReturnValue(
+      createSharedSettingsValue({
+        apiKeys: {
+          ...DEFAULT_SETTINGS.apiKeys,
+          [DEFAULT_SETTINGS.responseModes[0].route.provider]: "provider-key",
+        },
+        spokenRepliesEnabled: true,
+        ttsMode: "kokoro",
+      }),
+    );
+
+    const screen = renderWithProviders(<MainScreen />);
+
+    expect(screen.getByText("voice-stage:enabled")).toBeTruthy();
+    expect(
+      screen.getByText(
+        "Download and verify the model before selecting or using Kokoro. No provider key is required.",
+      ),
+    ).toBeTruthy();
+
+    fireEvent.press(screen.getByText("resolve-prompt-block"));
+    expect(screen.getByText("settings:open")).toBeTruthy();
   });
 
   it("loads Mistral voices from its configured key and selects a default slug", async () => {

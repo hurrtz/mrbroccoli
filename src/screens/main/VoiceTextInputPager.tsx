@@ -1,5 +1,6 @@
+import Feather from "@expo/vector-icons/Feather";
 import React from "react";
-import { View } from "react-native";
+import { Text, TouchableOpacity, View } from "react-native";
 import { PhaseAwareVoiceAction } from "./PhaseAwareVoiceAction";
 import { DriveSessionControls } from "./voiceTextInputPager/DriveSessionControls";
 import { InputSurfaceIndicators } from "./voiceTextInputPager/InputSurfaceIndicators";
@@ -34,9 +35,11 @@ export function VoiceTextInputPager({
   onPress,
   onPressIn,
   onPressOut,
+  onResolvePromptBlock,
   onSubmitTextMessage,
   onTextMessageChange,
   playbackPaused,
+  promptBlockedMessage = null,
   recordingMaxMs,
   recordingStartedAtMs,
   speechStartProgress,
@@ -52,6 +55,7 @@ export function VoiceTextInputPager({
     onInputSurfaceChange,
     onSubmitTextMessage,
     onTextMessageChange,
+    submissionDisabled: Boolean(promptBlockedMessage),
   });
 
   return (
@@ -76,6 +80,7 @@ export function VoiceTextInputPager({
           pageWidth={pager.pageWidth}
           panGesture={pager.panGesture}
           statusLabel={statusLabel}
+          submissionDisabled={Boolean(promptBlockedMessage)}
           t={t}
           textFocused={pager.textFocused}
           textInputGesture={pager.textInputGesture}
@@ -109,12 +114,61 @@ export function VoiceTextInputPager({
         ) : null}
       </View>
 
+      {promptBlockedMessage ? (
+        <TouchableOpacity
+          testID="prompt-blocked-notice"
+          accessibilityLabel={`${promptBlockedMessage} ${t(
+            "openSpeakingSettings",
+          )}`}
+          accessibilityRole={onResolvePromptBlock ? "button" : "text"}
+          activeOpacity={onResolvePromptBlock ? 0.76 : 1}
+          disabled={!onResolvePromptBlock}
+          onPress={onResolvePromptBlock}
+          style={[
+            styles.promptBlockedNotice,
+            {
+              backgroundColor: colors.surfaceAlt,
+              borderColor: colors.danger,
+            },
+          ]}
+        >
+          <Feather name="alert-circle" size={17} color={colors.danger} />
+          <View style={styles.promptBlockedCopy}>
+            <Text
+              style={[
+                styles.promptBlockedText,
+                { color: colors.textSecondary },
+              ]}
+            >
+              {promptBlockedMessage}
+            </Text>
+            {onResolvePromptBlock ? (
+              <Text
+                style={[
+                  styles.promptBlockedAction,
+                  { color: colors.accent },
+                ]}
+              >
+                {t("openSpeakingSettings")}
+              </Text>
+            ) : null}
+          </View>
+          {onResolvePromptBlock ? (
+            <Feather
+              name="chevron-right"
+              size={17}
+              color={colors.textSecondary}
+            />
+          ) : null}
+        </TouchableOpacity>
+      ) : null}
+
       {inputMode === "drive-session" ? (
         <DriveSessionControls
           autoContinueEnabled={driveAutoContinueEnabled}
           canRepeat={driveSessionCanRepeat}
           colors={colors}
-          disabled={disabled}
+          disabled={disabled || Boolean(promptBlockedMessage)}
           onContinue={onDriveContinue}
           onRepeat={onDriveRepeat}
           onStop={onDriveStop}

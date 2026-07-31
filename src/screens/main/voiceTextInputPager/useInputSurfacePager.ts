@@ -17,6 +17,7 @@ interface UseInputSurfacePagerParams {
   onInputSurfaceChange?: (surface: InputSurface) => void;
   onSubmitTextMessage: (text: string) => void;
   onTextMessageChange?: (text: string) => void;
+  submissionDisabled?: boolean;
 }
 
 export function useInputSurfacePager({
@@ -27,6 +28,7 @@ export function useInputSurfacePager({
   onInputSurfaceChange,
   onSubmitTextMessage,
   onTextMessageChange,
+  submissionDisabled = false,
 }: UseInputSurfacePagerParams) {
   const { width: windowWidth } = useWindowDimensions();
   const textInputRef = React.useRef<TextInput>(null);
@@ -39,7 +41,10 @@ export function useInputSurfacePager({
   const pageStride = pageWidth + PAGE_GAP;
   const trimmedTextMessage = textMessage.trim();
   const textSubmitDisabled =
-    disabled || isActive || trimmedTextMessage.length === 0;
+    disabled ||
+    submissionDisabled ||
+    isActive ||
+    trimmedTextMessage.length === 0;
 
   const focusTextInput = React.useCallback(() => {
     requestAnimationFrame(() => textInputRef.current?.focus());

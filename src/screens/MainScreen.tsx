@@ -22,6 +22,7 @@ import { useKokoroModel } from "../hooks/useKokoroModel";
 import { getTtsFallbackRoutes } from "../constants/ttsFallback";
 import { useLocalization } from "../i18n";
 import { useTheme } from "../theme/ThemeContext";
+import { isKokoroModelReady } from "../utils/kokoroModelReadiness";
 import { MainScreenWorkspace } from "./main/MainScreenWorkspace";
 import { StyleSheetModal } from "./main/StyleSheetModal";
 import { StatusDetailsModal } from "./main/StatusDetailsModal";
@@ -103,6 +104,14 @@ export function MainScreen() {
     beforePlayback: recorder.stopAmbientMonitoring,
   });
   const kokoroModel = useKokoroModel();
+  const kokoroModelReady = isKokoroModelReady(kokoroModel);
+  const kokoroPromptBlocked =
+    settings.spokenRepliesEnabled &&
+    settings.ttsMode === "kokoro" &&
+    !kokoroModelReady;
+  const kokoroPromptBlockMessage = kokoroPromptBlocked
+    ? t("kokoroNotInstalled")
+    : null;
 
   const [styleSheetVisible, setStyleSheetVisible] = React.useState(false);
   const {
@@ -307,6 +316,8 @@ export function MainScreen() {
     useTextTurnSubmitController({
       handleVoiceCaptureDone,
       isBusy,
+      promptSubmissionBlockMessage: kokoroPromptBlockMessage,
+      showToast,
     });
 
   useProviderAvailabilityGuards({
@@ -388,6 +399,7 @@ export function MainScreen() {
     nativeStt,
     playReplyText,
     player,
+    promptSubmissionBlockMessage: kokoroPromptBlockMessage,
     providerApiKey,
     providerLabel,
     recorder,
@@ -692,9 +704,11 @@ export function MainScreen() {
             onPress: handleTogglePress,
             onPressIn: handlePressIn,
             onPressOut: handlePressOut,
+            onResolvePromptBlock: handleOpenSpeakingSettings,
             onSubmitTextMessage: handleSubmitTextMessage,
             onTextMessageChange: handleTextMessageChange,
             playbackPaused: player.isPlaybackPaused,
+            promptBlockedMessage: kokoroPromptBlockMessage,
             recordingMaxMs: maxRecordingMs,
             recordingStartedAtMs,
             speechStartProgress: phaseProgress?.speechStart ?? null,

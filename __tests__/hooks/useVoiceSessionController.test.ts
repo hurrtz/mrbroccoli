@@ -137,6 +137,30 @@ describe("useVoiceSessionController", () => {
     expect(params.recorder.startRecording).not.toHaveBeenCalled();
   });
 
+  it("does not start recording while the selected voice route is unavailable", async () => {
+    const { result, params } = renderController({
+      promptSubmissionBlockMessage: "Install Kokoro first.",
+      settings: {
+        inputMode: "toggle-to-talk",
+        spokenRepliesEnabled: true,
+        sttMode: "provider",
+        ttsMode: "kokoro",
+        providerSttModels: {},
+      },
+    });
+
+    await act(async () => {
+      await result.current.handleTogglePress();
+    });
+
+    expect(params.showToast).toHaveBeenCalledWith(
+      "Install Kokoro first.",
+      undefined,
+      "danger",
+    );
+    expect(params.recorder.startRecording).not.toHaveBeenCalled();
+  });
+
   it("starts recording when idle and all routes are ready", async () => {
     const { result, params } = renderController();
 

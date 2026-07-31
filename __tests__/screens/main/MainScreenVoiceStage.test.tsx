@@ -116,6 +116,7 @@ const t = ((key: string) => {
     stopDriveSession: "Pause auto",
     repeatDriveReply: "Repeat last",
     continueDriveSession: "Resume auto",
+    openSpeakingSettings: "Speaking settings",
   };
   return copy[key] ?? key;
 }) as TranslateFn;
@@ -176,6 +177,47 @@ describe("MainScreenVoiceStage composer", () => {
 
     fireEvent.press(screen.getByTestId("voice-input-surface"));
     expect(onPress).toHaveBeenCalledTimes(1);
+  });
+
+  it("blocks prompt CTAs when the selected voice route is unavailable", () => {
+    const onPress = jest.fn();
+    const onResolvePromptBlock = jest.fn();
+    const onSubmitTextMessage = jest.fn();
+    const promptBlockedMessage =
+      "Download and verify the model before selecting or using Kokoro.";
+    const screen = render(
+      <MainScreenVoiceStage
+        {...createProps({
+          onPress,
+          onResolvePromptBlock,
+          onSubmitTextMessage,
+          promptBlockedMessage,
+        })}
+      />,
+    );
+
+    expect(
+      screen.getByTestId("voice-input-surface").props.accessibilityState,
+    ).toEqual({ disabled: true });
+    expect(screen.getByText(promptBlockedMessage)).toBeTruthy();
+    expect(screen.getByText("Speaking settings")).toBeTruthy();
+
+    fireEvent.press(screen.getByTestId("voice-input-surface"));
+    expect(onPress).not.toHaveBeenCalled();
+
+    fireEvent.press(screen.getByTestId("prompt-blocked-notice"));
+    expect(onResolvePromptBlock).toHaveBeenCalledTimes(1);
+
+    fireEvent.press(screen.getByLabelText("Show text input"));
+    const input = screen.getByPlaceholderText("Type a message");
+    expect(input.props.editable).toBe(true);
+    fireEvent.changeText(input, "Draft while blocked");
+    expect(
+      screen.getByLabelText("Send message").props.accessibilityState,
+    ).toEqual({ disabled: true });
+
+    fireEvent.press(screen.getByTestId("voice-text-primary-action"));
+    expect(onSubmitTextMessage).not.toHaveBeenCalled();
   });
 
   it("preserves the dark-mode voice control treatment", () => {

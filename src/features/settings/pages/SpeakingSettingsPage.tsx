@@ -19,6 +19,7 @@ import type {
   TtsBackendMode,
   TtsListenLanguage,
 } from "../../../types";
+import { isKokoroModelReady } from "../../../utils/kokoroModelReadiness";
 import { buildProviderPickerOptions } from "../../settings-core/providerPickerOptions";
 import type {
   PreviewButtonPhase,
@@ -136,8 +137,7 @@ export function SpeakingSettingsPage({
     settings.ttsMode === "native" || fallbackRoutes.includes("native");
   const kokoroRouteActive =
     settings.ttsMode === "kokoro" || fallbackRoutes.includes("kokoro");
-  const kokoroModelReady =
-    kokoroModel.installed && (kokoroModel.verified || !kokoroModel.error);
+  const kokoroModelReady = isKokoroModelReady(kokoroModel);
   const showKokoroSection =
     kokoroRouteActive ||
     kokoroModel.busy === "downloading" ||

@@ -100,4 +100,28 @@ describe("useTextTurnSubmitController", () => {
 
     expect(handleVoiceCaptureDone).not.toHaveBeenCalled();
   });
+
+  it("blocks submissions when the selected voice route is unavailable", () => {
+    const handleVoiceCaptureDone = jest.fn(async () => undefined);
+    const showToast = jest.fn();
+    const { result } = renderHook(() =>
+      useTextTurnSubmitController({
+        handleVoiceCaptureDone,
+        isBusy: false,
+        promptSubmissionBlockMessage: "Install Kokoro first.",
+        showToast,
+      }),
+    );
+
+    act(() => {
+      result.current.handleSubmitTextMessage("Blocked turn");
+    });
+
+    expect(handleVoiceCaptureDone).not.toHaveBeenCalled();
+    expect(showToast).toHaveBeenCalledWith(
+      "Install Kokoro first.",
+      undefined,
+      "danger",
+    );
+  });
 });

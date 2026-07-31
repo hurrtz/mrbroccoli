@@ -2,6 +2,7 @@ import { useCallback, useRef } from "react";
 
 import { recordDebugLogEvent } from "../../services/debugLogCapture";
 import type { Message } from "../../types";
+import type { ShowToastFn } from "./shared";
 
 interface UseTextTurnSubmitControllerParams {
   handleVoiceCaptureDone: (params: {
@@ -9,11 +10,15 @@ interface UseTextTurnSubmitControllerParams {
     transcriptionOverride?: string;
   }) => Promise<void>;
   isBusy: boolean;
+  promptSubmissionBlockMessage?: string | null;
+  showToast?: ShowToastFn;
 }
 
 export function useTextTurnSubmitController({
   handleVoiceCaptureDone,
   isBusy,
+  promptSubmissionBlockMessage,
+  showToast,
 }: UseTextTurnSubmitControllerParams) {
   const submissionInFlightRef = useRef(false);
 
@@ -26,6 +31,11 @@ export function useTextTurnSubmitController({
       const trimmed = params.text.trim();
 
       if (!trimmed || isBusy || submissionInFlightRef.current) {
+        return;
+      }
+
+      if (promptSubmissionBlockMessage) {
+        showToast?.(promptSubmissionBlockMessage, undefined, "danger");
         return;
       }
 
@@ -48,7 +58,12 @@ export function useTextTurnSubmitController({
         submissionInFlightRef.current = false;
       });
     },
-    [handleVoiceCaptureDone, isBusy],
+    [
+      handleVoiceCaptureDone,
+      isBusy,
+      promptSubmissionBlockMessage,
+      showToast,
+    ],
   );
 
   const handleSubmitTextMessage = useCallback(

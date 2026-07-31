@@ -79,6 +79,27 @@ export const voiceTextInputPagerStyles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
+  promptBlockedNotice: {
+    minHeight: 44,
+    borderRadius: 12,
+    borderWidth: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    marginTop: 4,
+    paddingHorizontal: 12,
+    paddingVertical: 9,
+  },
+  promptBlockedCopy: {
+    flex: 1,
+    gap: 2,
+  },
+  promptBlockedText: {
+    ...textStyles.supporting,
+  },
+  promptBlockedAction: {
+    ...textStyles.compactAction,
+  },
   pageIndicators: {
     height: 18,
     flexDirection: "row",

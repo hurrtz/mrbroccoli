@@ -8,6 +8,7 @@ interface UseVoiceSessionGuardsParams {
   availableSttProviders: Provider[];
   availableTtsProviders: Provider[];
   nativeSttAvailable: boolean;
+  promptSubmissionBlockMessage?: string | null;
   providerApiKey: string;
   providerLabel: string;
   settings: Pick<Settings, "spokenRepliesEnabled" | "sttMode" | "ttsMode">;
@@ -23,6 +24,7 @@ export function useVoiceSessionGuards({
   availableSttProviders,
   availableTtsProviders,
   nativeSttAvailable,
+  promptSubmissionBlockMessage,
   providerApiKey,
   providerLabel,
   settings,
@@ -40,6 +42,11 @@ export function useVoiceSessionGuards({
         undefined,
         "danger",
       );
+      return false;
+    }
+
+    if (promptSubmissionBlockMessage) {
+      showToast(promptSubmissionBlockMessage, undefined, "danger");
       return false;
     }
 
@@ -74,6 +81,7 @@ export function useVoiceSessionGuards({
     availableSttProviders,
     availableTtsProviders,
     nativeSttAvailable,
+    promptSubmissionBlockMessage,
     providerApiKey,
     providerLabel,
     settings.sttMode,

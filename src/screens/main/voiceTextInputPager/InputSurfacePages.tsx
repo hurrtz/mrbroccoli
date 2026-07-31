@@ -33,6 +33,7 @@ interface InputSurfacePagesProps {
   pageWidth: number;
   panGesture: GestureType;
   statusLabel: string;
+  submissionDisabled: boolean;
   t: TranslateFn;
   textFocused: boolean;
   textInputGesture: GestureType;
@@ -52,6 +53,7 @@ function VoiceInputSurface({
   onPressIn,
   onPressOut,
   statusLabel,
+  submissionDisabled,
 }: Pick<
   InputSurfacePagesProps,
   | "colors"
@@ -61,25 +63,30 @@ function VoiceInputSurface({
   | "onPressIn"
   | "onPressOut"
   | "statusLabel"
+  | "submissionDisabled"
 >) {
+  const actionDisabled = disabled || submissionDisabled;
+
   return (
     <GestureTouchableOpacity
       testID="voice-input-surface"
       accessibilityLabel={statusLabel}
       accessibilityRole="button"
-      accessibilityState={{ disabled }}
+      accessibilityState={{ disabled: actionDisabled }}
       activeOpacity={0.84}
-      disabled={disabled}
+      disabled={actionDisabled}
       onPress={inputMode === "push-to-talk" ? undefined : onPress}
       onPressIn={inputMode === "push-to-talk" ? onPressIn : undefined}
       onPressOut={inputMode === "push-to-talk" ? onPressOut : undefined}
       style={[
         styles.voiceSurface,
         {
-          backgroundColor: disabled
+          backgroundColor: actionDisabled
             ? colors.surfaceAlt
             : colors.activeControl,
-          borderColor: disabled ? colors.border : colors.activeControl,
+          borderColor: actionDisabled
+            ? colors.border
+            : colors.activeControl,
         },
       ]}
     >
@@ -88,7 +95,7 @@ function VoiceInputSurface({
         style={[
           styles.voiceIcon,
           {
-            backgroundColor: disabled
+            backgroundColor: actionDisabled
               ? colors.surfaceElevated
               : colors.activeControlIconBackground,
           },
@@ -97,7 +104,9 @@ function VoiceInputSurface({
         <Feather
           name="mic"
           size={22}
-          color={disabled ? colors.textMuted : colors.activeControlIcon}
+          color={
+            actionDisabled ? colors.textMuted : colors.activeControlIcon
+          }
         />
       </View>
     </GestureTouchableOpacity>
