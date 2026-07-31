@@ -146,9 +146,15 @@ __tests__/              Focused hook and service tests
 
 ## License
 
-No license file is currently included in this repository.
+Mr Broccoli's original code and assets are proprietary and all rights reserved.
+See [LICENSE](LICENSE). Third-party dependencies retain their own licenses;
+the generated notices are collected in
+[THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md), and the reviewed provider
+terms and distribution boundaries are documented in
+[docs/licensing-and-provider-terms.md](docs/licensing-and-provider-terms.md).
 
 The optional `kokoro-int8-multi-lang-v1_1` model is Apache-2.0 licensed and
 includes its license in the downloaded archive. The React Native wrapper is
 MIT licensed; its Sherpa/ONNX native dependencies retain their respective
-third-party licenses.
+third-party licenses. Sherpa's unused FFmpeg runtime is excluded from Android
+and iOS builds.

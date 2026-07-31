@@ -202,3 +202,19 @@ These notes are specific to this repository and supplement any parent-level inst
   - `npm test`
 - Home screen icons, launcher assets, and many native dependency changes require a native rebuild. OTA updates are not enough.
 - Be careful around `ios/Podfile.lock` and native dependency versions. Do not churn native lockfiles unless the change actually requires it.
+
+## Licensing And Provider Terms
+
+- The original app code and assets are proprietary under `LICENSE`; this never
+  overrides the separate licenses of third-party dependencies, fonts, models,
+  or native components.
+- Run `npm run license:verify` after dependency or native-runtime changes.
+  Regenerate notices deliberately with `npm run license:notices:generate` only
+  after reviewing every new or changed license.
+- Keep Sherpa's unused FFmpeg runtime disabled on Android and iOS unless a
+  future feature truly requires it and the LGPL distribution obligations have
+  been reviewed and implemented first.
+- Recheck `docs/licensing-and-provider-terms.md` before a release. Provider
+  terms can change independently of this repository. Gemini API clients
+  available in the EEA, Switzerland, or the UK must use paid services, and
+  OpenRouter routes also inherit the selected model's terms.
