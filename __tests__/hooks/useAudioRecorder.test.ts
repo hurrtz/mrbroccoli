@@ -6,9 +6,11 @@ import {
 
 import { useAudioRecorder } from "../../src/hooks/useAudioRecorder";
 import {
+  cancelNativeWaveformRecording,
   startNativeAmbientMonitoring,
   startNativeWaveformRecording,
   stopNativeAmbientMonitoring,
+  stopNativeWaveformRecording,
 } from "../../src/services/nativeWaveform";
 
 let nativeWaveformListener: ((event: any) => void) | null = null;
@@ -77,6 +79,17 @@ describe("useAudioRecorder permissions", () => {
     (requestRecordingPermissionsAsync as jest.Mock).mockResolvedValue({
       granted: true,
     });
+    (startNativeAmbientMonitoring as jest.Mock).mockResolvedValue({
+      audioRoute: "built-in",
+    });
+    (startNativeWaveformRecording as jest.Mock).mockResolvedValue({
+      uri: "file:///recording.wav",
+    });
+    (stopNativeAmbientMonitoring as jest.Mock).mockResolvedValue(true);
+    (stopNativeWaveformRecording as jest.Mock).mockResolvedValue({
+      uri: "file:///recording.wav",
+    });
+    (cancelNativeWaveformRecording as jest.Mock).mockResolvedValue(undefined);
   });
 
   it("does not reopen the permission request when recording access is granted", async () => {
@@ -173,5 +186,129 @@ describe("useAudioRecorder permissions", () => {
     expect(startNativeWaveformRecording).toHaveBeenCalledTimes(1);
     expect(result.current.ambientMonitoring).toBe(false);
     expect(result.current.ambientInputMetering).toBeNull();
+  });
+
+  it("stops a completed native recording and returns its URI", async () => {
+    const dateNowSpy = jest.spyOn(Date, "now").mockReturnValue(1_000);
+    const { result } = renderHook(() => useAudioRecorder());
+
+    await act(async () => {
+      await result.current.startRecording();
+    });
+    dateNowSpy.mockReturnValue(1_500);
+
+    let uri: string | null = null;
+    await act(async () => {
+      uri = await result.current.stopRecording();
+    });
+
+    expect(stopNativeWaveformRecording).toHaveBeenCalledWith(
+      (startNativeWaveformRecording as jest.Mock).mock.calls[0][0].sessionId,
+    );
+    expect(uri).toBe("file:///recording.wav");
+    expect(result.current.isRecording).toBe(false);
+    dateNowSpy.mockRestore();
+  });
+
+  it("discards a native recording that is too short for transcription", async () => {
+    const dateNowSpy = jest.spyOn(Date, "now").mockReturnValue(1_000);
+    const { result } = renderHook(() => useAudioRecorder());
+
+    await act(async () => {
+      await result.current.startRecording();
+    });
+    dateNowSpy.mockReturnValue(1_100);
+
+    let uri: string | null = "not-cleared";
+    await act(async () => {
+      uri = await result.current.stopRecording();
+    });
+
+    expect(cancelNativeWaveformRecording).toHaveBeenCalledTimes(1);
+    expect(stopNativeWaveformRecording).not.toHaveBeenCalled();
+    expect(uri).toBeNull();
+    dateNowSpy.mockRestore();
+  });
+
+  it("surfaces matching native recorder errors and ignores stale sessions", async () => {
+    const { result } = renderHook(() => useAudioRecorder());
+
+    await act(async () => {
+      await result.current.startRecording();
+    });
+    const sessionId =
+      (startNativeWaveformRecording as jest.Mock).mock.calls[0][0].sessionId;
+
+    act(() => {
+      nativeWaveformListener?.({
+        type: "error",
+        sessionId: "stale-session",
+        message: "Ignore me",
+      });
+    });
+    expect(result.current.lastError).toBeNull();
+
+    act(() => {
+      nativeWaveformListener?.({
+        type: "error",
+        sessionId,
+        message: "Recorder disconnected",
+      });
+    });
+
+    expect(result.current.lastError).toBe("Recorder disconnected");
+    expect(result.current.isRecording).toBe(false);
+    expect(cancelNativeWaveformRecording).toHaveBeenCalledWith(sessionId);
+
+    act(() => result.current.clearLastError());
+    expect(result.current.lastError).toBeNull();
+  });
+
+  it("updates the active audio route from native subscription events", async () => {
+    const { result } = renderHook(() => useAudioRecorder());
+
+    await act(async () => {
+      await result.current.startRecording();
+    });
+    const sessionId =
+      (startNativeWaveformRecording as jest.Mock).mock.calls[0][0].sessionId;
+
+    act(() => {
+      nativeWaveformListener?.({
+        type: "routeChanged",
+        sessionId,
+        audioRoute: "bluetooth",
+        reason: "new-device",
+      });
+    });
+
+    expect(result.current.audioRoute).toBe("bluetooth");
+  });
+
+  it("recovers when ambient monitoring cannot be started or stopped", async () => {
+    (startNativeAmbientMonitoring as jest.Mock).mockRejectedValueOnce(
+      new Error("ambient unavailable"),
+    );
+    const { result } = renderHook(() => useAudioRecorder());
+
+    await expect(result.current.startAmbientMonitoring()).resolves.toBe(false);
+    expect(result.current.ambientMonitoring).toBe(false);
+
+    (startNativeAmbientMonitoring as jest.Mock).mockResolvedValueOnce({
+      audioRoute: "built-in",
+    });
+    await act(async () => {
+      await result.current.startAmbientMonitoring();
+    });
+    (stopNativeAmbientMonitoring as jest.Mock).mockRejectedValueOnce(
+      new Error("already stopped"),
+    );
+
+    let stopped = true;
+    await act(async () => {
+      stopped = await result.current.stopAmbientMonitoring();
+    });
+    expect(stopped).toBe(false);
+    expect(result.current.ambientMonitoring).toBe(false);
   });
 });

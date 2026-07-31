@@ -254,4 +254,96 @@ describe("useNativeSpeechRecognizer", () => {
 
     expect(result.current.inputMetering).toBe(-21);
   });
+
+  it("subscribes to system recognition events and resolves the final transcript", async () => {
+    (isNativeWaveformAvailable as jest.Mock).mockReturnValue(false);
+    const { result } = renderHook(() => useNativeSpeechRecognizer("de"), {
+      wrapper,
+    });
+
+    expect(ExpoSpeechRecognitionModule.addListener).toHaveBeenCalledTimes(5);
+    expect(
+      (ExpoSpeechRecognitionModule.addListener as jest.Mock).mock.calls.map(
+        ([event]) => event,
+      ),
+    ).toEqual(["start", "result", "volumechange", "error", "end"]);
+
+    await act(async () => {
+      await result.current.startRecognition();
+      emitSpeechEvent("start", {});
+      emitSpeechEvent("volumechange", { value: 5 });
+    });
+
+    expect(ExpoSpeechRecognitionModule.start).toHaveBeenCalledWith(
+      expect.objectContaining({
+        lang: "de-DE",
+        interimResults: true,
+        volumeChangeEventOptions: {
+          enabled: true,
+          intervalMillis: 150,
+        },
+      }),
+    );
+    expect(result.current.isRecording).toBe(true);
+    expect(result.current.inputMetering).toBe(-28);
+
+    dateNowSpy.mockReturnValue(2_000);
+    let transcriptPromise: Promise<string | null>;
+    act(() => {
+      transcriptPromise = result.current.stopRecognition();
+      emitSpeechEvent("result", {
+        results: [{ transcript: "Hallo System" }],
+        isFinal: true,
+      });
+      emitSpeechEvent("end", {});
+    });
+
+    await expect(transcriptPromise!).resolves.toBe("Hallo System");
+    expect(ExpoSpeechRecognitionModule.stop).toHaveBeenCalledTimes(1);
+    expect(result.current.isRecording).toBe(false);
+    expect(result.current.inputMetering).toBeNull();
+  });
+
+  it("resolves an aborted system recognition session without surfacing an error", async () => {
+    (isNativeWaveformAvailable as jest.Mock).mockReturnValue(false);
+    const { result } = renderHook(() => useNativeSpeechRecognizer(), {
+      wrapper,
+    });
+
+    await act(async () => {
+      await result.current.startRecognition();
+    });
+
+    let abortPromise: Promise<void>;
+    act(() => {
+      abortPromise = result.current.abortRecognition();
+      emitSpeechEvent("error", { error: "aborted", message: "Aborted" });
+    });
+
+    await expect(abortPromise!).resolves.toBeUndefined();
+    expect(ExpoSpeechRecognitionModule.abort).toHaveBeenCalledTimes(1);
+    expect(result.current.isRecording).toBe(false);
+    expect(result.current.lastError).toBeNull();
+  });
+
+  it("removes system subscriptions and aborts recognition on unmount", async () => {
+    (isNativeWaveformAvailable as jest.Mock).mockReturnValue(false);
+    const { result, unmount } = renderHook(
+      () => useNativeSpeechRecognizer(),
+      { wrapper },
+    );
+
+    await act(async () => {
+      await result.current.startRecognition();
+    });
+
+    act(() => {
+      unmount();
+    });
+
+    expect(ExpoSpeechRecognitionModule.abort).toHaveBeenCalledTimes(1);
+    expect(
+      [...speechListeners.values()].every((listeners) => listeners.size === 0),
+    ).toBe(true);
+  });
 });
