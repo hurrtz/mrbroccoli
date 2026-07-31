@@ -28,14 +28,14 @@ function RepeatActionIcon({
   color: string;
 }) {
   if (state === "speaking") {
-    return <AntIcon name="stop" size="inline" color={color} />;
+    return <AntIcon name="stop" size="control" color={color} />;
   }
 
   if (state === "preparing") {
     return <PreparingRepeatIcon color={color} />;
   }
 
-  return <AntIcon name="sound" size="inline" color={color} />;
+  return <AntIcon name="sound" size="control" color={color} />;
 }
 
 function PreparingRepeatIcon({ color }: { color: string }) {
@@ -64,7 +64,7 @@ function PreparingRepeatIcon({ color }: { color: string }) {
 
   return (
     <Animated.View style={rotationStyle}>
-      <AntIcon name="loading" size="inline" color={color} />
+      <AntIcon name="loading" size="control" color={color} />
     </Animated.View>
   );
 }
@@ -178,7 +178,7 @@ export function MessageActions({
         >
           <AntIcon
             name={copyConfirmed ? "check" : "copy"}
-            size="inline"
+            size="control"
             color={
               copyConfirmed
                 ? getAccessibleForeground(colors.success)
@@ -203,7 +203,7 @@ export function MessageActions({
         >
           <AntIcon
             name="share-alt"
-            size="inline"
+            size="control"
             color={colors.textSecondary}
           />
         </TouchableOpacity>

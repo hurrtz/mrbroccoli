@@ -20,8 +20,12 @@ describe("ChatBubble", () => {
       .spyOn(Linking, "openURL")
       .mockResolvedValueOnce(undefined);
 
-    const { getByLabelText, getByTestId, getByText, queryByText } =
-      renderWithProviders(
+    const {
+      getByLabelText,
+      getByTestId,
+      getByText,
+      queryByText,
+    } = renderWithProviders(
         <ChatBubble
           message={{
             id: "assistant-1",
@@ -67,8 +71,14 @@ describe("ChatBubble", () => {
       expect.objectContaining({
         marginTop: 14,
         marginBottom: 4,
+        paddingVertical: 0,
       }),
     );
+    expect(
+      StyleSheet.flatten(
+        getByTestId("web-search-accordion-assistant-1").props.style,
+      ),
+    ).toEqual(expect.objectContaining({ minHeight: 44 }));
 
     fireEvent.press(getByLabelText("Show web search details"));
 
@@ -104,7 +114,8 @@ describe("ChatBubble", () => {
   });
 
   it("keeps the execution receipt collapsed and reveals exact routes on demand", () => {
-    const { getByLabelText, getByText, queryByText } = renderWithProviders(
+    const { getByLabelText, getByTestId, getByText, queryByText } =
+      renderWithProviders(
       <ChatBubble
         message={{
           id: "assistant-receipt",
@@ -183,6 +194,16 @@ describe("ChatBubble", () => {
 
     expect(getByText("Turn details")).toBeTruthy();
     expect(queryByText("Requested reply route")).toBeNull();
+    expect(
+      StyleSheet.flatten(
+        getByTestId("turn-receipt-assistant-receipt").props.style,
+      ),
+    ).toEqual(expect.objectContaining({ gap: 0, paddingVertical: 0 }));
+    expect(
+      StyleSheet.flatten(
+        getByTestId("turn-receipt-accordion-assistant-receipt").props.style,
+      ),
+    ).toEqual(expect.objectContaining({ minHeight: 44 }));
 
     fireEvent.press(getByLabelText("Show turn details"));
 
@@ -336,6 +357,13 @@ describe("ChatBubble", () => {
           .style,
       ),
     ).toEqual(expect.objectContaining({ height: 44, width: 44 }));
+    for (const icon of ["copy", "share-alt", "sound"]) {
+      expect(
+        StyleSheet.flatten(
+          assistant.getByTestId(`ant-icon-${icon}`).props.style,
+        ).fontSize,
+      ).toBe(20);
+    }
 
     const user = renderWithProviders(
       <ChatBubble

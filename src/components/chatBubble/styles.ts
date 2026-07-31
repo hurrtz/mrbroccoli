@@ -190,8 +190,8 @@ export const styles = StyleSheet.create({
     borderRadius: 16,
     borderWidth: 1,
     paddingHorizontal: 10,
-    paddingVertical: 9,
-    gap: 8,
+    paddingVertical: 0,
+    gap: 0,
   },
   turnReceiptToggle: {
     minHeight: 44,
@@ -223,7 +223,8 @@ export const styles = StyleSheet.create({
   },
   turnReceiptContent: {
     gap: 9,
-    paddingTop: 4,
+    paddingTop: 8,
+    paddingBottom: 10,
   },
   turnReceiptRow: {
     gap: 3,
@@ -249,8 +250,8 @@ export const styles = StyleSheet.create({
     borderRadius: 16,
     borderWidth: 1,
     paddingHorizontal: 10,
-    paddingVertical: 9,
-    gap: 8,
+    paddingVertical: 0,
+    gap: 0,
   },
   referenceToggle: {
     minHeight: 44,
@@ -279,7 +280,8 @@ export const styles = StyleSheet.create({
   },
   referenceContent: {
     gap: 8,
-    paddingTop: 4,
+    paddingTop: 8,
+    paddingBottom: 10,
   },
   referenceQuery: {
     fontSize: 12,
