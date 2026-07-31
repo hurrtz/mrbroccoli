@@ -146,7 +146,15 @@ describe("webSearch", () => {
       .mockResolvedValueOnce({
         ok: true,
         json: async () => ({
-          output: [
+          steps: [
+            {
+              type: "google_search_call",
+              arguments: { queries: ["What changed today?"] },
+            },
+            {
+              type: "google_search_result",
+              result: [],
+            },
             {
               type: "model_output",
               content: [
@@ -196,7 +204,15 @@ describe("webSearch", () => {
       .mockResolvedValueOnce({
         ok: true,
         json: async () => ({
-          output: [
+          steps: [
+            {
+              type: "google_search_call",
+              arguments: { queries: ["What changed today?"] },
+            },
+            {
+              type: "google_search_result",
+              result: [],
+            },
             {
               type: "model_output",
               content: [
@@ -359,7 +375,17 @@ describe("webSearch", () => {
       provider: "gemini",
       url: "https://generativelanguage.googleapis.com/v1beta/interactions",
       response: {
-        output: [
+        steps: [
+          {
+            type: "google_search_call",
+            arguments: {
+              queries: ["What changed today?"],
+            },
+          },
+          {
+            type: "google_search_result",
+            result: [],
+          },
           {
             type: "model_output",
             content: [
@@ -557,6 +583,36 @@ describe("webSearch", () => {
     ).rejects.toThrow(
       "Anthropic returned a response without running web search.",
     );
+  });
+
+  it("rejects a Gemini response that did not run Google Search", async () => {
+    (fetch as jest.Mock).mockResolvedValueOnce({
+      ok: true,
+      json: () =>
+        Promise.resolve({
+          status: "completed",
+          steps: [
+            {
+              type: "model_output",
+              content: [
+                {
+                  type: "text",
+                  text: "An answer from model memory.",
+                },
+              ],
+            },
+          ],
+        }),
+    });
+
+    await expect(
+      searchWeb({
+        provider: "gemini",
+        apiKey: "gemini-test",
+        language: "en",
+        query: "What changed today?",
+      }),
+    ).rejects.toThrow("Google returned a response without running web search.");
   });
 
   it.each([

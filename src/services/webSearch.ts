@@ -366,7 +366,11 @@ function extractGeminiOutputText(data: unknown): string {
   }
 
   const output =
-    "output" in data && Array.isArray(data.output) ? data.output : [];
+    "steps" in data && Array.isArray(data.steps)
+      ? data.steps
+      : "output" in data && Array.isArray(data.output)
+        ? data.output
+        : [];
   const outputParts: string[] = [];
 
   for (const item of output) {
@@ -421,6 +425,34 @@ function extractGeminiOutputText(data: unknown): string {
     )
     .join("")
     .trim();
+}
+
+function hasGeminiGoogleSearchResult(data: unknown) {
+  if (!data || typeof data !== "object") {
+    return false;
+  }
+
+  const steps =
+    "steps" in data && Array.isArray(data.steps)
+      ? data.steps
+      : "output" in data && Array.isArray(data.output)
+        ? data.output
+        : [];
+  const stepTypes = new Set(
+    steps.flatMap((step) =>
+      step &&
+      typeof step === "object" &&
+      "type" in step &&
+      typeof step.type === "string"
+        ? [step.type]
+        : [],
+    ),
+  );
+
+  return (
+    stepTypes.has("google_search_call") &&
+    stepTypes.has("google_search_result")
+  );
 }
 
 function extractMistralOutputText(data: unknown): string {
@@ -789,7 +821,7 @@ async function searchWithQwen(params: WebSearchRequestParams) {
 async function searchWithGemini(params: WebSearchRequestParams) {
   const model = getRequestWebSearchModel(params);
 
-  return fetchJsonWebSearch(params, {
+  const response = await fetchJsonWebSearch(params, {
     url: "https://generativelanguage.googleapis.com/v1beta/interactions",
     model,
     headers: {
@@ -805,6 +837,16 @@ async function searchWithGemini(params: WebSearchRequestParams) {
       tools: [{ type: "google_search" }],
     },
   });
+
+  if (!hasGeminiGoogleSearchResult(response.data)) {
+    throw new Error(
+      translate(params.language, "providerWebSearchNotRun", {
+        provider: PROVIDER_LABELS[params.provider],
+      }),
+    );
+  }
+
+  return response;
 }
 
 function getXaiMaxTurns(params: WebSearchRequestParams) {
