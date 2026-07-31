@@ -126,11 +126,19 @@ export const styles = StyleSheet.create({
   headerCopy: {
     flex: 1,
     justifyContent: "center",
+    alignItems: "center",
+  },
+  headerControlSpacer: {
+    width: 44,
+    height: 44,
   },
   title: {
-    fontSize: 24,
-    lineHeight: 28,
-    fontFamily: fonts.display,
+    fontSize: 26,
+    lineHeight: 32,
+    fontFamily: fonts.headline,
+    fontWeight: "400",
+    letterSpacing: -0.25,
+    textAlign: "center",
   },
   subtitle: {
     fontSize: 14,
@@ -143,7 +151,6 @@ export const styles = StyleSheet.create({
     borderRadius: 12,
     alignItems: "center",
     justifyContent: "center",
-    borderWidth: 1,
   },
   newSession: {
     marginTop: 14,

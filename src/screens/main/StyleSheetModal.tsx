@@ -114,6 +114,7 @@ export const StyleSheetModal = React.memo(function StyleSheetModal({
               { borderBottomColor: colors.border },
             ]}
           >
+            <View style={styles.styleSheetHeaderControlSpacer} />
             <View style={styles.styleSheetHeaderCopy}>
               <Text style={[styles.styleSheetTitle, { color: colors.text }]}>
                 {t("styleSheetTitle")}

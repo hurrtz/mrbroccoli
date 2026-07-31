@@ -39,6 +39,7 @@ export function ConversationDrawerHeader({
           },
         ]}
       >
+        <View style={styles.headerControlSpacer} />
         <View style={styles.headerCopy}>
           <Text style={[styles.title, { color: colors.text }]}>
             {t("conversations")}
@@ -50,7 +51,6 @@ export function ConversationDrawerHeader({
             styles.closeButton,
             {
               backgroundColor: colors.surfaceElevated,
-              borderColor: colors.border,
             },
           ]}
           onPress={onClose}

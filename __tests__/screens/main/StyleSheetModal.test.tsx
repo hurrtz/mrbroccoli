@@ -42,7 +42,14 @@ describe("StyleSheetModal", () => {
 
   it("renders title, subtitle, and active option descriptions", () => {
     const { getByText } = setup();
-    expect(getByText("Conversation settings")).toBeTruthy();
+    expect(
+      StyleSheet.flatten(getByText("Conversation settings").props.style),
+    ).toEqual(
+      expect.objectContaining({
+        fontFamily: "UnicaOne_400Regular",
+        textAlign: "center",
+      }),
+    );
     expect(
       getByText("Shape replies and speech for this conversation only."),
     ).toBeTruthy();

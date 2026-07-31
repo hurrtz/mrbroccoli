@@ -368,7 +368,7 @@ export const styles = StyleSheet.create({
   },
   styleSheetHeader: {
     flexDirection: "row",
-    alignItems: "flex-start",
+    alignItems: "center",
     justifyContent: "space-between",
     gap: 16,
     paddingHorizontal: 20,
@@ -380,6 +380,11 @@ export const styles = StyleSheet.create({
     flex: 1,
     minWidth: 0,
     gap: 4,
+    alignItems: "center",
+  },
+  styleSheetHeaderControlSpacer: {
+    width: 44,
+    height: 44,
   },
   styleSheetCloseButton: {
     width: 44,
@@ -389,14 +394,18 @@ export const styles = StyleSheet.create({
     justifyContent: "center",
   },
   styleSheetTitle: {
-    fontSize: 22,
-    lineHeight: 26,
-    fontFamily: fonts.display,
+    fontSize: 26,
+    lineHeight: 32,
+    fontFamily: fonts.headline,
+    fontWeight: "400",
+    letterSpacing: -0.25,
+    textAlign: "center",
   },
   styleSheetSubtitle: {
     fontSize: 13,
     lineHeight: 19,
     fontFamily: fonts.body,
+    textAlign: "center",
   },
   styleSheetGroup: {
     gap: 8,

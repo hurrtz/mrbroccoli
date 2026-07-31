@@ -101,7 +101,19 @@ describe("ConversationDrawer", () => {
   it("renders the drawer shell and existing conversations", () => {
     const screen = renderConversationDrawer();
 
-    expect(screen.getByText("Conversations")).toBeTruthy();
+    expect(
+      StyleSheet.flatten(screen.getByText("Conversations").props.style),
+    ).toEqual(
+      expect.objectContaining({
+        fontFamily: "UnicaOne_400Regular",
+        textAlign: "center",
+      }),
+    );
+    expect(
+      StyleSheet.flatten(
+        screen.getByTestId("conversation-drawer-close").props.style,
+      ).borderWidth,
+    ).toBeUndefined();
     expect(screen.getByText("Morning briefing")).toBeTruthy();
     expect(screen.getByText("Travel planning")).toBeTruthy();
     expect(
