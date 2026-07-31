@@ -20,6 +20,8 @@
     "license:notices:generate": "node scripts/verify-licenses.mjs --write",
     "license:verify": "node scripts/verify-licenses.mjs",
     "license:test": "node --test scripts/verify-licenses.test.mjs",
+    "release-notes:verify": "node scripts/verify-release-notes.mjs",
+    "release-notes:test": "node --test scripts/verify-release-notes.test.mjs",
     "version:bump": "node scripts/bump-version.mjs",
     "pretest": "npm run config:verify",
     "test": "jest",

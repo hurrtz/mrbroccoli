@@ -160,7 +160,8 @@ These notes are specific to this repository and supplement any parent-level inst
   2. Create `docs/google-play-release-notes-<version>.md` with the same complete
      locale-tag set as the preceding release-notes file. Summarize the complete
      release in every locale and keep every entry within Google Play's
-     500-character limit.
+     500-character limit. Run `npm run release-notes:verify`; it checks the
+     newest release-note file against the preceding tag order and limit.
   3. Run `npm run version:bump -- <version>` so the Expo/package versions,
      Android `versionCode`, and iOS build number remain synchronized.
   4. Validate the release with native configuration parity, TypeScript, the

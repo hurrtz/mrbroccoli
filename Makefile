@@ -98,6 +98,8 @@ pre-push:
 	@npm run prerelease:env:test
 	@npm run prerelease:live:test
 	@npm run maestro:prerelease:test
+	@npm run release-notes:test
+	@npm run release-notes:verify
 	@$(MAKE) maestro-verify
 	@$(MAKE) license
 	@$(MAKE) config
