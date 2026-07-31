@@ -12,6 +12,22 @@ the complete Play Store translations are kept in a dedicated file under
 
 No user-visible changes yet.
 
+## 2.5.6 - 2026-07-31
+
+### Fixed
+
+- Fixed an Android foreground-service startup race that could close the app
+  when starting a Drive Session or voice recording.
+- Fixed stopping a spoken-reply replay during preparation so it no longer
+  fails with a cancellation error.
+- Required the Kokoro on-device model to download and pass verification before
+  Kokoro can be selected, with clearer setup guidance for existing invalid
+  selections.
+
+### Store release notes
+
+See `docs/google-play-release-notes-2.5.6.md`.
+
 ## 2.5.5 - 2026-07-30
 
 ### Added
