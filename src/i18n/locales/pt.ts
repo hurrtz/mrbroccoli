@@ -735,7 +735,7 @@ export const pt = {
     `Opcional: descarregue Kokoro (cerca de ${size} MB) para obter respostas faladas muito mais naturais, sem fornecedor de voz ou encargos de utilização.`,
   setupGuideKokoroLanguageNote:
     "Este modelo fala atualmente inglês e chinês simplificado. Configure quaisquer rotas alternativas desejadas posteriormente nas definições de Fala.",
-  setupGuideKokoroDownload: "Download Kokoro",
+  setupGuideKokoroDownload: "Transferir o Kokoro",
   setupGuideUseKokoro: "Utilize Kokoro para respostas faladas",
   setupGuideUseKokoroSummary:
     "Mantenha a síntese no telefone sempre que o idioma de resposta for compatível.",

@@ -49,34 +49,45 @@ export interface AppLocaleDefinition {
   defaultTtsListenLanguage: SpeechLanguage;
 }
 
-const DEFAULT_ENGLISH_ASSISTANT_INSTRUCTIONS =
-  "You are a voice assistant. The user is speaking to you and will hear your response read aloud. Respond naturally and conversationally as if talking. Never use markdown, bullet points, numbered lists, headers, or any formatting. Keep responses concise and spoken-friendly.";
-
-const DEFAULT_GERMAN_ASSISTANT_INSTRUCTIONS =
-  "Du bist ein Sprachassistent. Die Nutzerin oder der Nutzer spricht mit dir und wird deine Antwort vorgelesen bekommen. Antworte natürlich und gesprächsnah, als wärest du in einem echten Gespräch. Verwende niemals Markdown, Aufzählungen, nummerierte Listen, Überschriften oder sonstige Formatierung. Halte Antworten knapp und gut vorlesbar.";
+const DEFAULT_ASSISTANT_INSTRUCTIONS = {
+  en: "You are a voice assistant. The user is speaking to you and will hear your response read aloud. Respond naturally and conversationally as if talking. Never use markdown, bullet points, numbered lists, headers, or any formatting. Keep responses concise and spoken-friendly.",
+  de: "Du bist ein Sprachassistent. Die Nutzerin oder der Nutzer spricht mit dir und wird deine Antwort vorgelesen bekommen. Antworte natürlich und gesprächsnah, als wärest du in einem echten Gespräch. Verwende niemals Markdown, Aufzählungen, nummerierte Listen, Überschriften oder sonstige Formatierung. Halte Antworten knapp und gut vorlesbar.",
+  uk: "Ти голосовий асистент. Користувач говорить з тобою та почує твою відповідь, озвучену вголос. Відповідай природно й невимушено, ніби під час розмови. Ніколи не використовуй Markdown, марковані чи нумеровані списки, заголовки або інше форматування. Відповідай стисло й так, щоб текст добре звучав уголос.",
+  hi: "आप एक वॉइस असिस्टेंट हैं। उपयोगकर्ता आपसे बोल रहा है और आपका उत्तर पढ़कर सुनाया जाएगा। स्वाभाविक और बातचीत के अंदाज़ में जवाब दें। Markdown, बुलेट पॉइंट, क्रमांकित सूचियाँ, शीर्षक या किसी भी तरह की फ़ॉर्मेटिंग का कभी उपयोग न करें। उत्तर संक्षिप्त और बोलकर सुनाने के अनुकूल रखें।",
+  es: "Eres un asistente de voz. La persona usuaria te está hablando y escuchará tu respuesta leída en voz alta. Responde de forma natural y conversacional, como si estuvierais hablando. No uses nunca Markdown, viñetas, listas numeradas, encabezados ni ningún otro formato. Mantén las respuestas breves y adecuadas para escucharlas.",
+  fr: "Tu es un assistant vocal. La personne te parle et entendra ta réponse lue à voix haute. Réponds de façon naturelle et conversationnelle, comme dans une discussion. N’utilise jamais de Markdown, de listes à puces ou numérotées, de titres ni aucune autre mise en forme. Garde des réponses concises et agréables à écouter.",
+  it: "Sei un assistente vocale. La persona ti sta parlando e ascolterà la tua risposta letta ad alta voce. Rispondi in modo naturale e colloquiale, come in una conversazione. Non usare mai Markdown, elenchi puntati o numerati, titoli o altra formattazione. Mantieni le risposte concise e adatte all’ascolto.",
+  pt: "És um assistente de voz. A pessoa está a falar contigo e ouvirá a tua resposta lida em voz alta. Responde de forma natural e conversacional, como numa conversa. Nunca uses Markdown, listas com marcadores ou numeradas, títulos nem qualquer outra formatação. Mantém as respostas concisas e adequadas para serem ouvidas.",
+  "pt-BR":
+    "Você é um assistente de voz. A pessoa está falando com você e ouvirá sua resposta lida em voz alta. Responda de forma natural e conversacional, como em uma conversa. Nunca use Markdown, listas com marcadores ou numeradas, títulos nem qualquer outra formatação. Mantenha as respostas concisas e adequadas para serem ouvidas.",
+  ru: "Ты голосовой помощник. Пользователь говорит с тобой и услышит твой ответ вслух. Отвечай естественно и непринуждённо, как в обычном разговоре. Никогда не используй Markdown, маркированные или нумерованные списки, заголовки и другое форматирование. Отвечай кратко и так, чтобы текст хорошо звучал вслух.",
+  "zh-CN":
+    "你是一名语音助手。用户正在与你交谈，并会听到你的回答被朗读出来。请像自然对话一样回应。不要使用 Markdown、项目符号、编号列表、标题或任何其他格式。回答应简洁，并适合朗读。",
+  ar: "أنت مساعد صوتي. يتحدث إليك المستخدم وسيستمع إلى ردك مقروءًا بصوت عالٍ. أجب بصورة طبيعية وحوارية كما لو كنت تتحدث معه. لا تستخدم Markdown أو القوائم النقطية أو المرقمة أو العناوين أو أي تنسيق آخر. اجعل الردود موجزة ومناسبة للاستماع.",
+  ja: "あなたは音声アシスタントです。ユーザーはあなたに話しかけ、回答は音声で読み上げられます。会話しているように自然な口調で答えてください。Markdown、箇条書き、番号付きリスト、見出し、その他の書式は使用しないでください。回答は簡潔で、読み上げに適したものにしてください。",
+  hu: "Hangasszisztens vagy. A felhasználó beszél hozzád, és hangosan felolvasva hallja majd a válaszodat. Válaszolj természetesen és társalgási stílusban, mintha beszélgetnétek. Soha ne használj Markdownt, felsorolást, számozott listát, címsort vagy más formázást. A válaszok legyenek tömörek és jól felolvashatók.",
+  cs: "Jsi hlasový asistent. Uživatel s tebou mluví a tvoji odpověď uslyší přečtenou nahlas. Odpovídej přirozeně a konverzačně, jako při běžném rozhovoru. Nikdy nepoužívej Markdown, odrážky, číslované seznamy, nadpisy ani jiné formátování. Odpovědi udržuj stručné a vhodné k předčítání.",
+  pl: "Jesteś asystentem głosowym. Użytkownik mówi do ciebie i usłyszy twoją odpowiedź odczytaną na głos. Odpowiadaj naturalnie i swobodnie, jak podczas rozmowy. Nigdy nie używaj Markdown, wypunktowań, list numerowanych, nagłówków ani innego formatowania. Odpowiedzi powinny być zwięzłe i dobrze brzmieć po odczytaniu.",
+  tr: "Bir sesli asistansın. Kullanıcı seninle konuşuyor ve yanıtını sesli olarak dinleyecek. Sohbet ediyormuş gibi doğal ve konuşma diline uygun yanıt ver. Markdown, madde işaretleri, numaralı listeler, başlıklar veya başka biçimlendirmeler kullanma. Yanıtları kısa ve dinlemeye uygun tut.",
+  sv: "Du är en röstassistent. Användaren talar med dig och kommer att höra ditt svar läsas upp. Svara naturligt och samtalsmässigt, som i ett vanligt samtal. Använd aldrig Markdown, punktlistor, numrerade listor, rubriker eller annan formatering. Håll svaren kortfattade och lämpade för uppläsning.",
+  ur: "آپ ایک صوتی معاون ہیں۔ صارف آپ سے بات کر رہا ہے اور آپ کا جواب بلند آواز میں سنایا جائے گا۔ فطری اور گفتگو کے انداز میں جواب دیں۔ Markdown، بلٹ پوائنٹس، نمبر والی فہرستیں، سرخیاں یا کوئی دوسری فارمیٹنگ کبھی استعمال نہ کریں۔ جوابات مختصر اور سننے کے لیے موزوں رکھیں۔",
+} as const;
 
 function defineAppLocale(
   definition: Omit<
     AppLocaleDefinition,
-    | "direction"
-    | "defaultContentLanguage"
-    | "defaultAssistantInstructions"
-    | "defaultTtsListenLanguage"
+    "direction" | "defaultContentLanguage" | "defaultTtsListenLanguage"
   > &
     Partial<
       Pick<
         AppLocaleDefinition,
-        | "direction"
-        | "defaultContentLanguage"
-        | "defaultAssistantInstructions"
-        | "defaultTtsListenLanguage"
+        "direction" | "defaultContentLanguage" | "defaultTtsListenLanguage"
       >
     >,
 ): AppLocaleDefinition {
   return {
     direction: "ltr",
     defaultContentLanguage: "en",
-    defaultAssistantInstructions: DEFAULT_ENGLISH_ASSISTANT_INSTRUCTIONS,
     defaultTtsListenLanguage: "en",
     ...definition,
   };
@@ -94,6 +105,7 @@ export const APP_LOCALES = {
     nativeName: "English",
     intlLocale: "en-US",
     messages: en,
+    defaultAssistantInstructions: DEFAULT_ASSISTANT_INSTRUCTIONS.en,
     antDesign: {
       modal: { ok: "OK", cancel: "Cancel", button: "Button" },
       picker: { ok: "OK", cancel: "Cancel", select: "Select" },
@@ -110,7 +122,7 @@ export const APP_LOCALES = {
       search: { cancel: "Abbrechen" },
     },
     defaultContentLanguage: "de",
-    defaultAssistantInstructions: DEFAULT_GERMAN_ASSISTANT_INSTRUCTIONS,
+    defaultAssistantInstructions: DEFAULT_ASSISTANT_INSTRUCTIONS.de,
     defaultTtsListenLanguage: "de",
   }),
   uk: defineAppLocale({
@@ -122,6 +134,7 @@ export const APP_LOCALES = {
       picker: { ok: "Гаразд", cancel: "Скасувати", select: "Вибрати" },
       search: { cancel: "Скасувати" },
     },
+    defaultAssistantInstructions: DEFAULT_ASSISTANT_INSTRUCTIONS.uk,
     defaultTtsListenLanguage: "uk",
   }),
   hi: defineAppLocale({
@@ -133,6 +146,7 @@ export const APP_LOCALES = {
       picker: { ok: "ठीक है", cancel: "रद्द करें", select: "चुनें" },
       search: { cancel: "रद्द करें" },
     },
+    defaultAssistantInstructions: DEFAULT_ASSISTANT_INSTRUCTIONS.hi,
     defaultTtsListenLanguage: "hi",
   }),
   es: defineAppLocale({
@@ -144,6 +158,7 @@ export const APP_LOCALES = {
       picker: { ok: "Aceptar", cancel: "Cancelar", select: "Seleccionar" },
       search: { cancel: "Cancelar" },
     },
+    defaultAssistantInstructions: DEFAULT_ASSISTANT_INSTRUCTIONS.es,
     defaultTtsListenLanguage: "es",
   }),
   fr: defineAppLocale({
@@ -155,6 +170,7 @@ export const APP_LOCALES = {
       picker: { ok: "OK", cancel: "Annuler", select: "Sélectionner" },
       search: { cancel: "Annuler" },
     },
+    defaultAssistantInstructions: DEFAULT_ASSISTANT_INSTRUCTIONS.fr,
     defaultTtsListenLanguage: "fr",
   }),
   it: defineAppLocale({
@@ -166,6 +182,7 @@ export const APP_LOCALES = {
       picker: { ok: "OK", cancel: "Annulla", select: "Seleziona" },
       search: { cancel: "Annulla" },
     },
+    defaultAssistantInstructions: DEFAULT_ASSISTANT_INSTRUCTIONS.it,
     defaultTtsListenLanguage: "it",
   }),
   pt: defineAppLocale({
@@ -177,6 +194,7 @@ export const APP_LOCALES = {
       picker: { ok: "OK", cancel: "Cancelar", select: "Selecionar" },
       search: { cancel: "Cancelar" },
     },
+    defaultAssistantInstructions: DEFAULT_ASSISTANT_INSTRUCTIONS.pt,
     defaultTtsListenLanguage: "pt",
   }),
   "pt-BR": defineAppLocale({
@@ -188,6 +206,7 @@ export const APP_LOCALES = {
       picker: { ok: "OK", cancel: "Cancelar", select: "Selecionar" },
       search: { cancel: "Cancelar" },
     },
+    defaultAssistantInstructions: DEFAULT_ASSISTANT_INSTRUCTIONS["pt-BR"],
     defaultTtsListenLanguage: "pt-BR",
   }),
   ru: defineAppLocale({
@@ -199,6 +218,7 @@ export const APP_LOCALES = {
       picker: { ok: "ОК", cancel: "Отмена", select: "Выбрать" },
       search: { cancel: "Отмена" },
     },
+    defaultAssistantInstructions: DEFAULT_ASSISTANT_INSTRUCTIONS.ru,
     defaultTtsListenLanguage: "ru",
   }),
   "zh-CN": defineAppLocale({
@@ -210,6 +230,7 @@ export const APP_LOCALES = {
       picker: { ok: "确定", cancel: "取消", select: "请选择" },
       search: { cancel: "取消" },
     },
+    defaultAssistantInstructions: DEFAULT_ASSISTANT_INSTRUCTIONS["zh-CN"],
     defaultTtsListenLanguage: "zh-CN",
   }),
   ar: defineAppLocale({
@@ -222,6 +243,7 @@ export const APP_LOCALES = {
       picker: { ok: "موافق", cancel: "إلغاء", select: "اختر" },
       search: { cancel: "إلغاء" },
     },
+    defaultAssistantInstructions: DEFAULT_ASSISTANT_INSTRUCTIONS.ar,
     defaultTtsListenLanguage: "ar",
   }),
   ja: defineAppLocale({
@@ -233,6 +255,7 @@ export const APP_LOCALES = {
       picker: { ok: "OK", cancel: "キャンセル", select: "選択" },
       search: { cancel: "キャンセル" },
     },
+    defaultAssistantInstructions: DEFAULT_ASSISTANT_INSTRUCTIONS.ja,
     defaultTtsListenLanguage: "ja",
   }),
   hu: defineAppLocale({
@@ -244,6 +267,7 @@ export const APP_LOCALES = {
       picker: { ok: "OK", cancel: "Mégse", select: "Kiválasztás" },
       search: { cancel: "Mégse" },
     },
+    defaultAssistantInstructions: DEFAULT_ASSISTANT_INSTRUCTIONS.hu,
     defaultTtsListenLanguage: "hu",
   }),
   cs: defineAppLocale({
@@ -255,6 +279,7 @@ export const APP_LOCALES = {
       picker: { ok: "OK", cancel: "Zrušit", select: "Vybrat" },
       search: { cancel: "Zrušit" },
     },
+    defaultAssistantInstructions: DEFAULT_ASSISTANT_INSTRUCTIONS.cs,
     defaultTtsListenLanguage: "cs",
   }),
   pl: defineAppLocale({
@@ -266,6 +291,7 @@ export const APP_LOCALES = {
       picker: { ok: "OK", cancel: "Anuluj", select: "Wybierz" },
       search: { cancel: "Anuluj" },
     },
+    defaultAssistantInstructions: DEFAULT_ASSISTANT_INSTRUCTIONS.pl,
     defaultTtsListenLanguage: "pl",
   }),
   tr: defineAppLocale({
@@ -277,6 +303,7 @@ export const APP_LOCALES = {
       picker: { ok: "Tamam", cancel: "İptal", select: "Seç" },
       search: { cancel: "İptal" },
     },
+    defaultAssistantInstructions: DEFAULT_ASSISTANT_INSTRUCTIONS.tr,
     defaultTtsListenLanguage: "tr",
   }),
   sv: defineAppLocale({
@@ -288,6 +315,7 @@ export const APP_LOCALES = {
       picker: { ok: "OK", cancel: "Avbryt", select: "Välj" },
       search: { cancel: "Avbryt" },
     },
+    defaultAssistantInstructions: DEFAULT_ASSISTANT_INSTRUCTIONS.sv,
     defaultTtsListenLanguage: "sv",
   }),
   ur: defineAppLocale({
@@ -304,6 +332,7 @@ export const APP_LOCALES = {
       },
       search: { cancel: "منسوخ کریں" },
     },
+    defaultAssistantInstructions: DEFAULT_ASSISTANT_INSTRUCTIONS.ur,
     defaultTtsListenLanguage: "ur",
   }),
 } as const;

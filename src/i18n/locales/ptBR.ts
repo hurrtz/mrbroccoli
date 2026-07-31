@@ -479,7 +479,7 @@ export const ptBR = {
     "Um pacote local ainda não está disponível para este idioma. A nuvem TTS ou a voz do sistema cuidarão disso.",
   downloadingLocalTtsPack: ({ progress }) =>
     `Baixando pacote local... ${progress}%`,
-  download: "Download",
+  download: "Baixar",
   downloadingShort: "Carregando...",
   voicePreviewText: "Texto de visualização de voz",
   voicePreviewPlaceholder: "Digite uma frase para ouvir essa voz.",

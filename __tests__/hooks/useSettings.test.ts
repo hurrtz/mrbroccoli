@@ -783,7 +783,7 @@ describe("useSettings", () => {
 
     expect(result.current.settings.language).toBe("ar");
     expect(result.current.settings.assistantInstructions).toBe(
-      DEFAULT_ASSISTANT_INSTRUCTIONS_BY_LANGUAGE.en,
+      DEFAULT_ASSISTANT_INSTRUCTIONS_BY_LANGUAGE.ar,
     );
     expect(result.current.settings.sttLanguage).toBe("auto");
     expect(result.current.settings.ttsListenLanguages).toEqual(["ar"]);

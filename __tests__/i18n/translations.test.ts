@@ -54,6 +54,28 @@ describe("translations", () => {
     });
   });
 
+  it("does not silently ship known English phrases in other locales", () => {
+    const englishInterfacePhrases = [
+      "push to talk",
+      "toggle to talk",
+      "drive session",
+      "native voice preview",
+      "download kokoro",
+    ];
+
+    APP_LANGUAGES.filter((language) => language !== "en").forEach(
+      (language) => {
+        const serializedDictionary = JSON.stringify(
+          translations[language],
+        ).toLocaleLowerCase("en");
+
+        englishInterfacePhrases.forEach((phrase) => {
+          expect(serializedDictionary).not.toContain(phrase);
+        });
+      },
+    );
+  });
+
   it("uses localized Uber Mode naming in every interface language", () => {
     Object.values(translations).forEach((dictionary) => {
       expect(dictionary.ulraMode).not.toContain("Ulra");
@@ -92,6 +114,16 @@ describe("translations", () => {
         language === "ar" || language === "ur" ? "rtl" : "ltr",
       );
     });
+  });
+
+  it("provides a localized default assistant prompt for every interface language", () => {
+    APP_LANGUAGES.filter((language) => language !== "en").forEach(
+      (language) => {
+        expect(getAppLocale(language).defaultAssistantInstructions).not.toBe(
+          getAppLocale("en").defaultAssistantInstructions,
+        );
+      },
+    );
   });
 
   it("uses the current app name in localized UI copy", () => {

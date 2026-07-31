@@ -267,10 +267,10 @@ export const de = {
     "Das Erzeugen des Titels hat zu lange gedauert. Bitte versuche es erneut.",
   inputMode: "Eingabemodus",
   voiceInput: "Spracheingabe",
-  pushToTalk: "Push to talk",
+  pushToTalk: "Zum Sprechen halten",
   pushToTalkDescription:
     "Lass den Button während des Sprechens gedrückt und lass ihn los, wenn du fertig bist.",
-  toggleToTalk: "Toggle to talk",
+  toggleToTalk: "Zum Sprechen tippen",
   toggleToTalkDescription:
     "Button einmal drücken, um loszusprechen, und dann noch einmal, wenn du fertig bist.",
   driveSession: "Fahrmodus",
@@ -445,7 +445,7 @@ export const de = {
   providerVoicePreviews: "Anbieter-Stimmvorschau",
   providerVoicePreviewsHint:
     "Teste hier die aktuell ausgewählte TTS-Route mit einem separaten Vorschautext pro Antwortsprache.",
-  nativeVoicePreviewSection: "Native Stimmvorschau",
+  nativeVoicePreviewSection: "Systemstimmenvorschau",
   nativeVoicePreviewSectionHint:
     "Nutzt direkt die eingebaute Sprachsynthese des Geräts, damit du sie mit konfigurierten Anbieter-Stimmen vergleichen kannst.",
   nativeVoiceUnavailable:

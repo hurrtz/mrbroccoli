@@ -267,7 +267,7 @@ export const sv = {
   toggleToTalk: "Växla till Tala",
   toggleToTalkDescription:
     "Tryck en gång för att börja spela in och tryck igen när du är klar.",
-  driveSession: "Drive Session",
+  driveSession: "Körläge",
   driveSessionDescription:
     "När automatisk fortsättning är på startar inspelningen efter varje talat svar. Tryck på huvudknappen när du är klar med att prata.",
   stopDriveSession: "Pausa auto",
@@ -435,7 +435,7 @@ export const sv = {
   providerVoicePreviews: "Providers röstförhandsvisningar",
   providerVoicePreviewsHint:
     "Testa den för närvarande valda TTS-rutten här med en separat förhandsgranskningstext för varje svarsspråk.",
-  nativeVoicePreviewSection: "Native Voice Preview",
+  nativeVoicePreviewSection: "Förhandsgranskning av systemröst",
   nativeVoicePreviewSectionHint:
     "Denna talar direkt genom telefonens inbyggda talsyntes så att du kan jämföra den med konfigurerade leverantörsröster.",
   nativeVoiceUnavailable:

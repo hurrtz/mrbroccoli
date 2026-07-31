@@ -261,10 +261,10 @@ export const cs = {
     "Generování názvu trvalo příliš dlouho. Zkuste to prosím znovu.",
   inputMode: "Režim vstupu",
   voiceInput: "Hlasový vstup",
-  pushToTalk: "Push to Talk",
+  pushToTalk: "Podržet pro mluvení",
   pushToTalkDescription:
     "Při mluvení podržte hlavní tlačítko a poté jej uvolněte pro odeslání.",
-  toggleToTalk: "Přepnout na Talk",
+  toggleToTalk: "Klepnutím spustit mluvení",
   toggleToTalkDescription:
     "Jedním klepnutím spustíte nahrávání a po dokončení klepněte znovu.",
   driveSession: "Řídit relaci",
