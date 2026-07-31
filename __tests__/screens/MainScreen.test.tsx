@@ -235,11 +235,13 @@ jest.mock("../../src/screens/main/MainScreenVoiceStage", () => ({
   MainScreenVoiceStage: ({
     disabled,
     onResolvePromptBlock,
+    promptBlockedActionLabel,
     promptBlockedMessage,
     promptBlockedProgress,
   }: {
     disabled?: boolean;
     onResolvePromptBlock?: () => void;
+    promptBlockedActionLabel?: string | null;
     promptBlockedMessage?: string | null;
     promptBlockedProgress?: number | null;
   }) => {
@@ -253,7 +255,7 @@ jest.mock("../../src/screens/main/MainScreenVoiceStage", () => ({
         null,
         disabled ? "voice-stage:disabled" : "voice-stage:enabled",
       ),
-      promptBlockedMessage
+      promptBlockedMessage && !promptBlockedActionLabel
         ? React.createElement(
             TouchableOpacity,
             { onPress: onResolvePromptBlock },
@@ -261,12 +263,11 @@ jest.mock("../../src/screens/main/MainScreenVoiceStage", () => ({
             React.createElement(Text, null, "resolve-prompt-block"),
           )
         : null,
-      promptBlockedProgress !== null &&
-        promptBlockedProgress !== undefined
+      promptBlockedActionLabel
         ? React.createElement(
             Text,
             null,
-            `prompt-blocked-progress:${promptBlockedProgress}`,
+            `prompt-blocked-action:${promptBlockedActionLabel}:${promptBlockedProgress}`,
           )
         : null,
     );
@@ -633,8 +634,9 @@ describe("MainScreen", () => {
 
     const screen = renderWithProviders(<MainScreen />);
 
-    expect(screen.getByText("Installing… 42%")).toBeTruthy();
-    expect(screen.getByText("prompt-blocked-progress:0.42")).toBeTruthy();
+    expect(
+      screen.getByText("prompt-blocked-action:Installing… 42%:0.42"),
+    ).toBeTruthy();
   });
 
   it("loads Mistral voices from its configured key and selects a default slug", async () => {

@@ -1,6 +1,7 @@
 import Feather from "@expo/vector-icons/Feather";
 import React from "react";
 import {
+  Text,
   TextInput,
   TouchableOpacity,
   View,
@@ -32,6 +33,8 @@ interface InputSurfacePagesProps {
   onTextMessageChange: (text: string) => void;
   pageWidth: number;
   panGesture: GestureType;
+  promptBlockedActionLabel: string | null;
+  promptBlockedProgress: number | null;
   statusLabel: string;
   submissionDisabled: boolean;
   t: TranslateFn;
@@ -52,6 +55,8 @@ function VoiceInputSurface({
   onPress,
   onPressIn,
   onPressOut,
+  promptBlockedActionLabel,
+  promptBlockedProgress,
   statusLabel,
   submissionDisabled,
 }: Pick<
@@ -62,6 +67,8 @@ function VoiceInputSurface({
   | "onPress"
   | "onPressIn"
   | "onPressOut"
+  | "promptBlockedActionLabel"
+  | "promptBlockedProgress"
   | "statusLabel"
   | "submissionDisabled"
 >) {
@@ -70,9 +77,18 @@ function VoiceInputSurface({
   return (
     <GestureTouchableOpacity
       testID="voice-input-surface"
-      accessibilityLabel={statusLabel}
+      accessibilityLabel={promptBlockedActionLabel ?? statusLabel}
       accessibilityRole="button"
       accessibilityState={{ disabled: actionDisabled }}
+      accessibilityValue={
+        promptBlockedProgress !== null
+          ? {
+              min: 0,
+              max: 100,
+              now: Math.round(promptBlockedProgress * 100),
+            }
+          : undefined
+      }
       activeOpacity={0.84}
       disabled={actionDisabled}
       onPress={inputMode === "push-to-talk" ? undefined : onPress}
@@ -90,25 +106,35 @@ function VoiceInputSurface({
         },
       ]}
     >
-      <View
-        testID="voice-input-icon"
-        style={[
-          styles.voiceIcon,
-          {
-            backgroundColor: actionDisabled
-              ? colors.surfaceElevated
-              : colors.activeControlIconBackground,
-          },
-        ]}
-      >
-        <Feather
-          name="mic"
-          size={22}
-          color={
-            actionDisabled ? colors.textMuted : colors.activeControlIcon
-          }
-        />
-      </View>
+      {promptBlockedActionLabel ? (
+        <Text
+          testID="voice-input-blocked-status"
+          numberOfLines={1}
+          style={[styles.blockedActionLabel, { color: colors.textMuted }]}
+        >
+          {promptBlockedActionLabel}
+        </Text>
+      ) : (
+        <View
+          testID="voice-input-icon"
+          style={[
+            styles.voiceIcon,
+            {
+              backgroundColor: actionDisabled
+                ? colors.surfaceElevated
+                : colors.activeControlIconBackground,
+            },
+          ]}
+        >
+          <Feather
+            name="mic"
+            size={22}
+            color={
+              actionDisabled ? colors.textMuted : colors.activeControlIcon
+            }
+          />
+        </View>
+      )}
     </GestureTouchableOpacity>
   );
 }
@@ -119,6 +145,8 @@ function TextInputSurface({
   onSubmitTextMessage,
   onTextFocusChange,
   onTextMessageChange,
+  promptBlockedActionLabel,
+  promptBlockedProgress,
   t,
   textFocused,
   textInputGesture,
@@ -132,6 +160,8 @@ function TextInputSurface({
   | "onSubmitTextMessage"
   | "onTextFocusChange"
   | "onTextMessageChange"
+  | "promptBlockedActionLabel"
+  | "promptBlockedProgress"
   | "t"
   | "textFocused"
   | "textInputGesture"
@@ -173,14 +203,26 @@ function TextInputSurface({
       </View>
       <TouchableOpacity
         testID="voice-text-primary-action"
-        accessibilityLabel={t("sendTextMessage")}
+        accessibilityLabel={
+          promptBlockedActionLabel ?? t("sendTextMessage")
+        }
         accessibilityRole="button"
         accessibilityState={{ disabled: textSubmitDisabled }}
+        accessibilityValue={
+          promptBlockedProgress !== null
+            ? {
+                min: 0,
+                max: 100,
+                now: Math.round(promptBlockedProgress * 100),
+              }
+            : undefined
+        }
         disabled={textSubmitDisabled}
         onPress={onSubmitTextMessage}
         activeOpacity={0.8}
         style={[
           styles.sendButton,
+          promptBlockedActionLabel ? styles.sendButtonBlockedStatus : null,
           {
             backgroundColor: textSubmitDisabled
               ? colors.surfaceAlt
@@ -188,13 +230,23 @@ function TextInputSurface({
           },
         ]}
       >
-        <Feather
-          name="arrow-up"
-          size={19}
-          color={
-            textSubmitDisabled ? colors.textMuted : colors.onPrimary
-          }
-        />
+        {promptBlockedActionLabel ? (
+          <Text
+            testID="text-input-blocked-status"
+            numberOfLines={1}
+            style={[styles.blockedActionLabel, { color: colors.textMuted }]}
+          >
+            {promptBlockedActionLabel}
+          </Text>
+        ) : (
+          <Feather
+            name="arrow-up"
+            size={19}
+            color={
+              textSubmitDisabled ? colors.textMuted : colors.onPrimary
+            }
+          />
+        )}
       </TouchableOpacity>
     </View>
   );

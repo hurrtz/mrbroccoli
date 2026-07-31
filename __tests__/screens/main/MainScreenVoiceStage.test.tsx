@@ -192,7 +192,6 @@ describe("MainScreenVoiceStage composer", () => {
           onResolvePromptBlock,
           onSubmitTextMessage,
           promptBlockedMessage,
-          promptBlockedProgress: 0.42,
         })}
       />,
     );
@@ -202,14 +201,6 @@ describe("MainScreenVoiceStage composer", () => {
     ).toEqual({ disabled: true });
     expect(screen.getByText(promptBlockedMessage)).toBeTruthy();
     expect(screen.getByText("Speaking settings")).toBeTruthy();
-    expect(
-      screen.getByTestId("prompt-blocked-progress").props.accessibilityValue,
-    ).toEqual({ min: 0, max: 100, now: 42 });
-    expect(
-      StyleSheet.flatten(
-        screen.getByTestId("prompt-blocked-progress-fill").props.style,
-      ).width,
-    ).toBe("42%");
 
     fireEvent.press(screen.getByTestId("voice-input-surface"));
     expect(onPress).not.toHaveBeenCalled();
@@ -224,6 +215,59 @@ describe("MainScreenVoiceStage composer", () => {
     expect(
       screen.getByLabelText("Send message").props.accessibilityState,
     ).toEqual({ disabled: true });
+
+    fireEvent.press(screen.getByTestId("voice-text-primary-action"));
+    expect(onSubmitTextMessage).not.toHaveBeenCalled();
+  });
+
+  it("shows installation progress directly on both disabled prompt CTAs", () => {
+    const onPress = jest.fn();
+    const onSubmitTextMessage = jest.fn();
+    const progressLabel = "Installing… 42%";
+    const screen = render(
+      <MainScreenVoiceStage
+        {...createProps({
+          onPress,
+          onSubmitTextMessage,
+          promptBlockedActionLabel: progressLabel,
+          promptBlockedMessage: progressLabel,
+          promptBlockedProgress: 0.42,
+        })}
+      />,
+    );
+
+    expect(screen.queryByTestId("prompt-blocked-notice")).toBeNull();
+    expect(screen.getByTestId("voice-input-blocked-status").props.children).toBe(
+      progressLabel,
+    );
+    expect(
+      screen.getByTestId("voice-input-surface").props.accessibilityValue,
+    ).toEqual({ min: 0, max: 100, now: 42 });
+    expect(
+      screen.getByTestId("voice-input-surface").props.accessibilityLabel,
+    ).toBe(progressLabel);
+    expect(screen.queryByText("icon:mic")).toBeNull();
+
+    fireEvent.press(screen.getByTestId("voice-input-surface"));
+    expect(onPress).not.toHaveBeenCalled();
+
+    fireEvent.press(screen.getByLabelText("Show text input"));
+    expect(screen.getByTestId("text-input-blocked-status").props.children).toBe(
+      progressLabel,
+    );
+    expect(
+      screen.getByTestId("voice-text-primary-action").props.accessibilityValue,
+    ).toEqual({ min: 0, max: 100, now: 42 });
+    expect(
+      StyleSheet.flatten(
+        screen.getByTestId("voice-text-primary-action").props.style,
+      ),
+    ).toEqual(
+      expect.objectContaining({
+        minWidth: 116,
+        width: "auto",
+      }),
+    );
 
     fireEvent.press(screen.getByTestId("voice-text-primary-action"));
     expect(onSubmitTextMessage).not.toHaveBeenCalled();

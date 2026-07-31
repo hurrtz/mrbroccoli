@@ -129,6 +129,13 @@ export function MainScreen() {
     kokoroPromptBlocked && kokoroModel.busy === "downloading"
       ? Math.min(1, Math.max(0, kokoroModel.progress))
       : null;
+  const kokoroPromptBlockActionLabel =
+    kokoroPromptBlocked &&
+    (kokoroModel.busy === "checking" ||
+      kokoroModel.busy === "downloading" ||
+      kokoroModel.busy === "verifying")
+      ? kokoroPromptBlockMessage
+      : null;
 
   const [styleSheetVisible, setStyleSheetVisible] = React.useState(false);
   const {
@@ -725,6 +732,7 @@ export function MainScreen() {
             onSubmitTextMessage: handleSubmitTextMessage,
             onTextMessageChange: handleTextMessageChange,
             playbackPaused: player.isPlaybackPaused,
+            promptBlockedActionLabel: kokoroPromptBlockActionLabel,
             promptBlockedMessage: kokoroPromptBlockMessage,
             promptBlockedProgress: kokoroPromptBlockProgress,
             recordingMaxMs: maxRecordingMs,

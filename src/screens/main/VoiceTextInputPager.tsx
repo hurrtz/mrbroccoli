@@ -39,6 +39,7 @@ export function VoiceTextInputPager({
   onSubmitTextMessage,
   onTextMessageChange,
   playbackPaused,
+  promptBlockedActionLabel = null,
   promptBlockedMessage = null,
   promptBlockedProgress = null,
   recordingMaxMs,
@@ -80,6 +81,8 @@ export function VoiceTextInputPager({
           onTextMessageChange={pager.handleTextMessageChange}
           pageWidth={pager.pageWidth}
           panGesture={pager.panGesture}
+          promptBlockedActionLabel={promptBlockedActionLabel}
+          promptBlockedProgress={promptBlockedProgress}
           statusLabel={statusLabel}
           submissionDisabled={Boolean(promptBlockedMessage)}
           t={t}
@@ -115,7 +118,7 @@ export function VoiceTextInputPager({
         ) : null}
       </View>
 
-      {promptBlockedMessage ? (
+      {promptBlockedMessage && !promptBlockedActionLabel ? (
         <TouchableOpacity
           testID="prompt-blocked-notice"
           accessibilityLabel={`${promptBlockedMessage} ${t(
@@ -152,32 +155,6 @@ export function VoiceTextInputPager({
               >
                 {t("openSpeakingSettings")}
               </Text>
-            ) : null}
-            {promptBlockedProgress !== null ? (
-              <View
-                testID="prompt-blocked-progress"
-                accessibilityRole="progressbar"
-                accessibilityValue={{
-                  min: 0,
-                  max: 100,
-                  now: Math.round(promptBlockedProgress * 100),
-                }}
-                style={[
-                  styles.promptBlockedProgressTrack,
-                  { backgroundColor: colors.border },
-                ]}
-              >
-                <View
-                  testID="prompt-blocked-progress-fill"
-                  style={[
-                    styles.promptBlockedProgressFill,
-                    {
-                      backgroundColor: colors.accent,
-                      width: `${promptBlockedProgress * 100}%`,
-                    },
-                  ]}
-                />
-              </View>
             ) : null}
           </View>
           {onResolvePromptBlock ? (
