@@ -1,6 +1,7 @@
 import Feather from "@expo/vector-icons/Feather";
 import React from "react";
 import {
+  AccessibilityInfo,
   LayoutChangeEvent,
   StyleSheet,
   Text,
@@ -424,6 +425,17 @@ export function PhaseAwareVoiceAction({
   const accessibilityLabel = showDriveCountdown
     ? `${statusLabel}. ${driveSilenceCountdownSeconds}s`
     : accessibilityLabelBase;
+  const phaseAnnouncement = `${phaseCopy.title}. ${phaseCopy.prompt}`;
+  const previousVisualPhase = React.useRef(visualPhase);
+
+  React.useEffect(() => {
+    if (previousVisualPhase.current === visualPhase) {
+      return;
+    }
+
+    previousVisualPhase.current = visualPhase;
+    AccessibilityInfo.announceForAccessibility(phaseAnnouncement);
+  }, [phaseAnnouncement, visualPhase]);
 
   React.useEffect(() => {
     cancelAnimation(animatedPhaseColor);

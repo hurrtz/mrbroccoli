@@ -139,6 +139,8 @@ export function VoiceTextInputPager({
           <Feather name="alert-circle" size={17} color={colors.danger} />
           <View style={styles.promptBlockedCopy}>
             <Text
+              accessibilityLiveRegion="assertive"
+              accessibilityRole="alert"
               style={[
                 styles.promptBlockedText,
                 { color: colors.textSecondary },

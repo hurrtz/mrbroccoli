@@ -111,6 +111,14 @@ These notes are specific to this repository and supplement any parent-level inst
 - User-visible strings must be translated across every registered dictionary
   under `src/i18n/locales/` and kept structurally in sync. Shared feature copy
   may live in a typed module under `src/i18n/` and be spread into every locale.
+- Keep interactive controls at least 44 by 44 points. Decorative icons may be
+  smaller, but must not define the touch target.
+- Modal content must isolate screen-reader focus; backdrop-only dismissal
+  layers stay out of the accessibility tree and every modal retains a labeled
+  close action.
+- Dynamic errors, validation results, downloads, and voice-pipeline phase
+  changes must be announced without flooding assistive technology with
+  per-frame or per-second updates.
 - Theme and color behavior live in `src/theme/`.
 - Settings UI work usually belongs in `src/features/settings/`; shared settings behavior belongs in `src/features/settings-core/`.
 - Home-screen interaction changes usually belong in `src/screens/MainScreen.tsx` and `src/components/ResponseModeToggle.tsx`.

@@ -57,11 +57,15 @@ export const StatusDetailsModal = React.memo(function StatusDetailsModal({
       onRequestClose={onClose}
       supportedOrientations={APP_MODAL_ORIENTATIONS}
     >
-      <SafeAreaView style={styles.statusDetailsOverlay}>
+      <SafeAreaView
+        accessibilityViewIsModal
+        style={styles.statusDetailsOverlay}
+      >
         <TouchableOpacity
           style={StyleSheet.absoluteFill}
           onPress={onClose}
           activeOpacity={1}
+          accessible={false}
         />
         <View
           style={[

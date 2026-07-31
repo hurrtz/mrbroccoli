@@ -36,6 +36,9 @@ the complete Play Store translations are kept in a dedicated file under
   network, and server failures never disable a configuration.
 - Redact credentials and user-authored text from debug captures before logs are
   written to disk or copied to the clipboard.
+- Improve screen-reader behavior for pickers, overlays, voice phases, setup,
+  and download/validation statuses, and expand interactive controls to
+  accessible touch targets.
 
 ### Fixed
 

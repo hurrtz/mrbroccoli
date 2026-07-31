@@ -125,7 +125,10 @@ export function AntProviderVoiceSection({
               provider: PROVIDER_LABELS[provider],
             })}
           </Text>
-          <Text style={[styles.helperText, { color: colors.textMuted }]}>
+          <Text
+            accessibilityLiveRegion="polite"
+            style={[styles.helperText, { color: colors.textMuted }]}
+          >
             {voiceDirectory.status === "ready"
               ? t("providerVoicesAvailable", {
                   count: voiceDirectory.voices.length,

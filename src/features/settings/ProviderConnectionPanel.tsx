@@ -541,7 +541,20 @@ export function ProviderConnectionPanel({
                       },
                     ]}
                   >
-                    {message ? `${status.label} · ${message}` : status.label}
+                    <Text
+                      accessibilityLiveRegion="polite"
+                      style={[
+                        styles.connectionImprintText,
+                        {
+                          color:
+                            validationState.status === "error"
+                              ? colors.danger
+                              : status.textColor,
+                        },
+                      ]}
+                    >
+                      {message ? `${status.label} · ${message}` : status.label}
+                    </Text>
                   </List.Item.Brief>
                 </List.Item>
               );

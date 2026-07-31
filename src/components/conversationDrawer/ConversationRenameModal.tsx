@@ -40,6 +40,7 @@ export function ConversationRenameModal({
         accessible={false}
       />
       <View
+        accessibilityViewIsModal
         style={[
           styles.renameCard,
           {

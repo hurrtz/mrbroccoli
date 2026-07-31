@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   Modal,
   FlatList,
+  Pressable,
   StyleSheet,
 } from "react-native";
 import Feather from "@expo/vector-icons/Feather";
@@ -58,6 +59,13 @@ export function Picker({
             opacity: disabled ? 0.55 : 1,
           },
         ]}
+        accessibilityLabel={`${label}. ${
+          disabled
+            ? t("chooseCompatibleProviderFirst")
+            : selected?.label || value
+        }`}
+        accessibilityRole="button"
+        accessibilityState={{ disabled, expanded: open }}
         onPress={() => {
           if (!disabled) {
             setOpen(true);
@@ -88,12 +96,17 @@ export function Picker({
         transparent
         animationType="fade"
         supportedOrientations={APP_MODAL_ORIENTATIONS}
+        onRequestClose={() => setOpen(false)}
       >
-        <TouchableOpacity
+        <View
           style={styles.overlay}
-          activeOpacity={1}
-          onPress={() => setOpen(false)}
+          accessibilityViewIsModal
         >
+          <Pressable
+            accessible={false}
+            onPress={() => setOpen(false)}
+            style={StyleSheet.absoluteFill}
+          />
           <View
             style={[
               styles.list,
@@ -110,10 +123,18 @@ export function Picker({
                 { borderBottomColor: colors.border, backgroundColor: colors.surface },
               ]}
             >
-              <Text style={[styles.listTitle, { color: colors.text }]}>
+              <Text
+                accessibilityRole="header"
+                style={[styles.listTitle, { color: colors.text }]}
+              >
                 {label}
               </Text>
-              <TouchableOpacity onPress={() => setOpen(false)}>
+              <TouchableOpacity
+                accessibilityLabel={t("dismiss")}
+                accessibilityRole="button"
+                onPress={() => setOpen(false)}
+                style={styles.closeButton}
+              >
                 <Feather name="x" size={18} color={colors.textSecondary} />
               </TouchableOpacity>
             </View>
@@ -135,6 +156,9 @@ export function Picker({
                           : colors.border,
                     },
                   ]}
+                  accessibilityLabel={item.label}
+                  accessibilityRole="radio"
+                  accessibilityState={{ checked: item.value === value }}
                   onPress={() => {
                     onChange(item.value);
                     setOpen(false);
@@ -151,7 +175,7 @@ export function Picker({
               contentContainerStyle={styles.listContent}
             />
           </View>
-        </TouchableOpacity>
+        </View>
       </Modal>
     </View>
   );
@@ -216,6 +240,12 @@ const styles = StyleSheet.create({
   },
   listTitle: {
     ...textStyles.sectionTitle,
+  },
+  closeButton: {
+    width: 44,
+    height: 44,
+    alignItems: "center",
+    justifyContent: "center",
   },
   listContent: {
     padding: 10,

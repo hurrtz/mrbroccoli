@@ -338,8 +338,8 @@ export const responseModeToggleStyles = StyleSheet.create({
     fontFamily: fonts.body,
   },
   overflowSheetClose: {
-    width: 40,
-    height: 40,
+    width: 44,
+    height: 44,
     alignItems: "center",
     justifyContent: "center",
   },

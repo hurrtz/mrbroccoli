@@ -153,7 +153,7 @@ export const styles = StyleSheet.create({
     marginTop: 3,
   },
   noticeAction: {
-    minHeight: 32,
+    minHeight: 44,
     flexDirection: "row",
     alignItems: "center",
     gap: 6,
@@ -193,7 +193,7 @@ export const styles = StyleSheet.create({
     gap: 8,
   },
   turnReceiptToggle: {
-    minHeight: 34,
+    minHeight: 44,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
@@ -252,7 +252,7 @@ export const styles = StyleSheet.create({
     gap: 8,
   },
   referenceToggle: {
-    minHeight: 34,
+    minHeight: 44,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
@@ -303,6 +303,7 @@ export const styles = StyleSheet.create({
   },
   sourceChip: {
     maxWidth: "100%",
+    minHeight: 44,
     flexDirection: "row",
     alignItems: "center",
     gap: 6,
@@ -343,9 +344,9 @@ export const styles = StyleSheet.create({
     borderTopWidth: StyleSheet.hairlineWidth,
   },
   iconAction: {
-    width: 28,
-    height: 28,
-    borderRadius: 8,
+    width: 44,
+    height: 44,
+    borderRadius: 10,
     borderWidth: 0,
     alignItems: "center",
     justifyContent: "center",

@@ -35,7 +35,7 @@ export const styles = StyleSheet.create({
   },
   headerControl: {
     width: 44,
-    height: 40,
+    height: 44,
     alignItems: "center",
     justifyContent: "center",
   },
@@ -186,7 +186,7 @@ export const styles = StyleSheet.create({
   },
   disclosureHeader: {
     flex: 1,
-    minHeight: 34,
+    minHeight: 44,
     flexDirection: "row",
     alignItems: "center",
     gap: 12,
@@ -200,8 +200,8 @@ export const styles = StyleSheet.create({
     gap: 2,
   },
   disclosureToggle: {
-    width: 34,
-    height: 34,
+    width: 44,
+    height: 44,
     alignItems: "center",
     justifyContent: "center",
   },
@@ -314,7 +314,7 @@ export const styles = StyleSheet.create({
   },
   numberInput: {
     width: 82,
-    minHeight: 42,
+    minHeight: 44,
     borderWidth: 1,
     borderRadius: 10,
     paddingHorizontal: 12,
@@ -334,7 +334,7 @@ export const styles = StyleSheet.create({
     gap: 8,
   },
   compactButton: {
-    minHeight: 34,
+    minHeight: 44,
     borderRadius: 9,
     paddingHorizontal: 10,
   },
@@ -385,7 +385,7 @@ export const styles = StyleSheet.create({
     gap: 8,
   },
   dataBackupButton: {
-    minHeight: 42,
+    minHeight: 44,
     borderRadius: 10,
   },
   dataBackupModalContent: {
@@ -415,9 +415,9 @@ export const styles = StyleSheet.create({
     fontWeight: "500",
   },
   iconButton: {
-    width: 36,
-    height: 34,
-    borderRadius: 9,
+    width: 44,
+    height: 44,
+    borderRadius: 10,
     paddingHorizontal: 0,
   },
   previewBlock: {
@@ -430,7 +430,7 @@ export const styles = StyleSheet.create({
     borderTopWidth: 0,
   },
   previewButton: {
-    minHeight: 42,
+    minHeight: 44,
     borderRadius: 10,
   },
   previewFieldHeader: {
@@ -452,7 +452,7 @@ export const styles = StyleSheet.create({
   },
   kokoroDownloadButton: {
     alignSelf: "flex-start",
-    minHeight: 40,
+    minHeight: 44,
     borderRadius: 10,
     paddingHorizontal: 14,
   },
@@ -537,8 +537,8 @@ export const styles = StyleSheet.create({
     gap: 2,
   },
   providerHeaderAction: {
-    width: 34,
-    height: 34,
+    width: 44,
+    height: 44,
     alignItems: "center",
     justifyContent: "center",
   },
@@ -574,8 +574,8 @@ export const styles = StyleSheet.create({
     marginHorizontal: -16,
   },
   inputSuffix: {
-    width: 34,
-    height: 34,
+    width: 44,
+    height: 44,
     alignItems: "center",
     justifyContent: "center",
   },

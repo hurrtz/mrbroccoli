@@ -1,6 +1,11 @@
 import React from "react";
 import { fireEvent, render, within } from "@testing-library/react-native";
-import { Keyboard, processColor, StyleSheet } from "react-native";
+import {
+  AccessibilityInfo,
+  Keyboard,
+  processColor,
+  StyleSheet,
+} from "react-native";
 
 import { MainScreenVoiceStage } from "../../../src/screens/main/MainScreenVoiceStage";
 import { TranslateFn } from "../../../src/screens/main/shared";
@@ -170,10 +175,10 @@ describe("MainScreenVoiceStage composer", () => {
     ).toEqual({ disabled: false, selected: true });
     expect(
       StyleSheet.flatten(screen.getByLabelText("Show voice input").props.style),
-    ).toEqual(expect.objectContaining({ width: 18 }));
+    ).toEqual(expect.objectContaining({ height: 44, width: 44 }));
     expect(
       StyleSheet.flatten(screen.getByLabelText("Show text input").props.style),
-    ).toEqual(expect.objectContaining({ width: 18 }));
+    ).toEqual(expect.objectContaining({ height: 44, width: 44 }));
 
     fireEvent.press(screen.getByTestId("voice-input-surface"));
     expect(onPress).toHaveBeenCalledTimes(1);
@@ -578,6 +583,34 @@ describe("MainScreenVoiceStage composer", () => {
     expect(
       screen.getByLabelText("Show voice input").props.accessibilityState,
     ).toEqual({ disabled: true, selected: true });
+  });
+
+  it("announces voice pipeline phase changes without announcing every ETA tick", () => {
+    const announce = jest
+      .spyOn(AccessibilityInfo, "announceForAccessibility")
+      .mockImplementation(() => undefined);
+    const screen = render(
+      <MainScreenVoiceStage
+        {...createProps({
+          isActive: true,
+          visualPhase: "recording",
+        })}
+      />,
+    );
+
+    expect(announce).not.toHaveBeenCalled();
+
+    screen.rerender(
+      <MainScreenVoiceStage
+        {...createProps({
+          isActive: true,
+          visualPhase: "thinking",
+        })}
+      />,
+    );
+
+    expect(announce).toHaveBeenCalledTimes(1);
+    announce.mockRestore();
   });
 
   it("continues the recording-capacity fill from the actual recording start", () => {

@@ -149,10 +149,10 @@ export const styles = StyleSheet.create({
   },
   apiKeyVisibilityButton: {
     position: "absolute",
-    top: 9,
-    right: 8,
-    width: 36,
-    height: 36,
+    top: 5,
+    right: 4,
+    width: 44,
+    height: 44,
     borderRadius: 10,
     alignItems: "center",
     justifyContent: "center",
@@ -214,6 +214,8 @@ export const styles = StyleSheet.create({
   },
   inlineLink: {
     alignSelf: "flex-start",
+    minHeight: 44,
+    justifyContent: "center",
   },
   inlineLinkText: {
     fontSize: 14,

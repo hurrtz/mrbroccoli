@@ -113,7 +113,7 @@ export const voiceTextInputPagerStyles = StyleSheet.create({
     ...textStyles.compactAction,
   },
   pageIndicators: {
-    height: 18,
+    height: 44,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
@@ -143,8 +143,8 @@ export const voiceTextInputPagerStyles = StyleSheet.create({
     textAlign: "center",
   },
   pageIndicatorTarget: {
-    width: 18,
-    height: 18,
+    width: 44,
+    height: 44,
     alignItems: "center",
     justifyContent: "center",
   },

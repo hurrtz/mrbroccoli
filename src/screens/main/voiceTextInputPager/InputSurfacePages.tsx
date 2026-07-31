@@ -109,6 +109,7 @@ function VoiceInputSurface({
       {promptBlockedActionLabel ? (
         <Text
           testID="voice-input-blocked-status"
+          accessibilityLiveRegion="polite"
           numberOfLines={1}
           style={[styles.blockedActionLabel, { color: colors.textMuted }]}
         >
@@ -233,6 +234,7 @@ function TextInputSurface({
         {promptBlockedActionLabel ? (
           <Text
             testID="text-input-blocked-status"
+            accessibilityLiveRegion="polite"
             numberOfLines={1}
             style={[styles.blockedActionLabel, { color: colors.textMuted }]}
           >

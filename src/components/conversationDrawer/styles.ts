@@ -104,7 +104,7 @@ export const styles = StyleSheet.create({
   },
   renameAction: {
     minWidth: 92,
-    minHeight: 42,
+    minHeight: 44,
     borderRadius: 10,
     borderWidth: 1,
     alignItems: "center",
@@ -182,8 +182,8 @@ export const styles = StyleSheet.create({
     fontFamily: fonts.body,
   },
   searchClearButton: {
-    width: 28,
-    height: 28,
+    width: 44,
+    height: 44,
     alignItems: "center",
     justifyContent: "center",
   },
@@ -258,7 +258,7 @@ export const styles = StyleSheet.create({
     borderRadius: 2,
   },
   itemPressArea: {
-    paddingRight: 44,
+    paddingRight: 54,
   },
   itemHeader: {
     marginBottom: 7,
@@ -274,16 +274,16 @@ export const styles = StyleSheet.create({
     fontFamily: fonts.display,
   },
   itemMenuButton: {
-    width: 34,
-    height: 34,
-    borderRadius: 10,
+    width: 44,
+    height: 44,
+    borderRadius: 12,
     borderWidth: 1,
     alignItems: "center",
     justifyContent: "center",
   },
   itemMenuButtonFloating: {
     position: "absolute",
-    top: 14,
+    top: 9,
     right: 14,
     zIndex: 2,
   },

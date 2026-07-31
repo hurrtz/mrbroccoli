@@ -1,5 +1,6 @@
 import React from "react";
 import { fireEvent } from "@testing-library/react-native";
+import { StyleSheet } from "react-native";
 
 import { Toast } from "../../src/components/Toast";
 import { renderWithProviders } from "../test-utils/renderWithProviders";
@@ -24,5 +25,30 @@ describe("Toast", () => {
     expect(onRetry.mock.invocationCallOrder[0]).toBeLessThan(
       onDismiss.mock.invocationCallOrder[0],
     );
+  });
+
+  it("announces its message and keeps actions at least 44 points tall", () => {
+    const screen = renderWithProviders(
+      <Toast
+        message="Connection failed."
+        onDismiss={jest.fn()}
+        onRetry={jest.fn()}
+        tone="danger"
+        visible
+      />,
+    );
+
+    expect(screen.getByText("Connection failed.").props).toEqual(
+      expect.objectContaining({
+        accessibilityLiveRegion: "assertive",
+        accessibilityRole: "alert",
+      }),
+    );
+    expect(
+      StyleSheet.flatten(screen.getByLabelText("Retry").props.style).minHeight,
+    ).toBe(44);
+    expect(
+      StyleSheet.flatten(screen.getByLabelText("Dismiss").props.style),
+    ).toEqual(expect.objectContaining({ height: 44, width: 44 }));
   });
 });

@@ -49,6 +49,7 @@ export function ConversationActionSheet({
         accessible={false}
       />
       <View
+        accessibilityViewIsModal
         style={[
           styles.actionSheet,
           {

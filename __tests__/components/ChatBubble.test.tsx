@@ -330,6 +330,12 @@ describe("ChatBubble", () => {
         borderTopWidth: StyleSheet.hairlineWidth,
       }),
     );
+    expect(
+      StyleSheet.flatten(
+        assistant.getByTestId("message-copy-action-assistant-actions").props
+          .style,
+      ),
+    ).toEqual(expect.objectContaining({ height: 44, width: 44 }));
 
     const user = renderWithProviders(
       <ChatBubble

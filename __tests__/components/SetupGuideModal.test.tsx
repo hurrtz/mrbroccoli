@@ -150,7 +150,9 @@ describe("SetupGuideModal", () => {
     fireEvent.press(screen.getByLabelText("Show key"));
     input = screen.getByDisplayValue("sk-test-secret");
     expect(input.props.secureTextEntry).toBe(false);
-    expect(screen.getByLabelText("Hide key")).toBeTruthy();
+    expect(
+      StyleSheet.flatten(screen.getByLabelText("Hide key").props.style),
+    ).toEqual(expect.objectContaining({ height: 44, width: 44 }));
 
     fireEvent.press(screen.getByLabelText("Hide key"));
     input = screen.getByDisplayValue("sk-test-secret");

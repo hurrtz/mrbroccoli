@@ -116,6 +116,11 @@ describe("ConversationDrawer", () => {
       screen.getByLabelText("Morning briefing").props.accessibilityState,
     ).toEqual({ selected: true });
     expect(screen.getAllByLabelText("Conversation actions")).toHaveLength(2);
+    expect(
+      StyleSheet.flatten(
+        screen.getByTestId("conversation-drawer-menu-one").props.style,
+      ),
+    ).toEqual(expect.objectContaining({ height: 44, width: 44 }));
   });
 
   it("exposes every conversation action as a labeled button", async () => {

@@ -63,8 +63,10 @@ export const ConversationMemoryModal = React.memo(
             style={[styles.backdrop, { backgroundColor: colors.overlay }]}
             activeOpacity={1}
             onPress={onClose}
+            accessible={false}
           />
           <View
+            accessibilityViewIsModal
             style={[
               styles.card,
               { maxWidth: cardMaxWidth },
@@ -99,6 +101,8 @@ export const ConversationMemoryModal = React.memo(
                   },
                 ]}
                 activeOpacity={0.85}
+                accessibilityLabel={t("dismiss")}
+                accessibilityRole="button"
               >
                 <Feather name="x" size={18} color={colors.textSecondary} />
               </TouchableOpacity>
@@ -142,6 +146,9 @@ export const ConversationMemoryModal = React.memo(
                 onPress={onCopy}
                 activeOpacity={0.88}
                 disabled={!hasSummary}
+                accessibilityLabel={t("copyMemory")}
+                accessibilityRole="button"
+                accessibilityState={{ disabled: !hasSummary }}
               >
                 <Text style={[styles.actionText, { color: colors.text }]}>
                   {t("copyMemory")}
@@ -159,6 +166,9 @@ export const ConversationMemoryModal = React.memo(
                 onPress={onClear}
                 activeOpacity={0.88}
                 disabled={!hasSummary}
+                accessibilityLabel={t("forgetMemory")}
+                accessibilityRole="button"
+                accessibilityState={{ disabled: !hasSummary }}
               >
                 <Text style={[styles.actionText, { color: colors.danger }]}>
                   {t("forgetMemory")}
@@ -218,9 +228,9 @@ const styles = StyleSheet.create({
     fontFamily: fonts.body,
   },
   closeButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 10,
+    width: 44,
+    height: 44,
+    borderRadius: 12,
     borderWidth: 1,
     alignItems: "center",
     justifyContent: "center",

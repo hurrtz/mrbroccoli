@@ -113,6 +113,8 @@ function KokoroStep({
         ]}
       >
         <Text
+          accessibilityLiveRegion="polite"
+          accessibilityRole="alert"
           style={[
             styles.statusText,
             {
@@ -445,7 +447,11 @@ function ProviderStep({
             },
           ]}
         >
-          <Text style={[styles.statusText, { color: colors.text }]}>
+          <Text
+            accessibilityLiveRegion="polite"
+            accessibilityRole="alert"
+            style={[styles.statusText, { color: colors.text }]}
+          >
             {currentValidationState.message}
           </Text>
         </View>
@@ -541,7 +547,11 @@ function VoiceTestStep({
                 },
               ]}
             >
-              <Text style={[styles.statusText, { color: colors.text }]}>
+              <Text
+                accessibilityLiveRegion="assertive"
+                accessibilityRole="alert"
+                style={[styles.statusText, { color: colors.text }]}
+              >
                 {voiceTest.errorMessage}
               </Text>
             </View>

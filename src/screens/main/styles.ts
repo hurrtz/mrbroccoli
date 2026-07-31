@@ -427,10 +427,13 @@ export const styles = StyleSheet.create({
     gap: 8,
   },
   styleSheetPill: {
+    minHeight: 44,
     paddingHorizontal: 14,
-    paddingVertical: 8,
+    paddingVertical: 6,
     borderRadius: 999,
     borderWidth: 1,
+    alignItems: "center",
+    justifyContent: "center",
   },
   styleSheetControlPressed: {
     opacity: 0.68,
@@ -461,7 +464,7 @@ export const styles = StyleSheet.create({
     marginBottom: 0,
   },
   styleSheetAutoRenameButton: {
-    minHeight: 38,
+    minHeight: 44,
     alignSelf: "flex-start",
     flexDirection: "row",
     alignItems: "center",
@@ -485,6 +488,7 @@ export const styles = StyleSheet.create({
   },
   styleSheetDoneButton: {
     alignSelf: "stretch",
+    minHeight: 44,
     paddingVertical: 12,
     borderRadius: 12,
     alignItems: "center",

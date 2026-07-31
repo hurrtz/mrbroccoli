@@ -48,6 +48,7 @@ export function AntIconButton({
       ])}
       activeStyle={{ backgroundColor: colors.surfaceAlt }}
       accessibilityLabel={accessibilityLabel}
+      accessibilityRole="button"
       onPress={onPress}
     >
       {iconNode ??

@@ -107,7 +107,6 @@ export function ConversationDrawerHeader({
             activeOpacity={0.82}
             accessibilityRole="button"
             accessibilityLabel={t("clear")}
-            hitSlop={8}
           >
             <Feather name="x" size={15} color={colors.textSecondary} />
           </TouchableOpacity>

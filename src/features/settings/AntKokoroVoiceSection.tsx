@@ -151,6 +151,8 @@ export function AntKokoroVoiceSection({
       >
         <Text
           testID="kokoro-model-status"
+          accessibilityLiveRegion="polite"
+          accessibilityRole="alert"
           style={[
             styles.helperText,
             {
@@ -172,6 +174,15 @@ export function AntKokoroVoiceSection({
             style={styles.kokoroDownloadButton}
             styles={antButtonTypography}
             accessibilityLabel={t("downloadKokoroModel")}
+            accessibilityValue={
+              model.busy === "downloading"
+                ? {
+                    min: 0,
+                    max: 100,
+                    now: progressPercent,
+                  }
+                : undefined
+            }
             onPress={() => {
               void model.download();
             }}

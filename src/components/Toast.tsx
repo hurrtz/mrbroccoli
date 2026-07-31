@@ -99,7 +99,13 @@ export function Toast({
           color={toneColor}
         />
       </View>
-      <Text style={[styles.message, { color: colors.text }]}>{message}</Text>
+      <Text
+        accessibilityLiveRegion={tone === "danger" ? "assertive" : "polite"}
+        accessibilityRole="alert"
+        style={[styles.message, { color: colors.text }]}
+      >
+        {message}
+      </Text>
       <View style={styles.actions}>
         {onRetry && (
           <TouchableOpacity
@@ -107,6 +113,8 @@ export function Toast({
               styles.retryButton,
               { backgroundColor: toneBackground, borderColor: toneColor },
             ]}
+            accessibilityRole="button"
+            accessibilityLabel={t("retry")}
             onPress={() => {
               onRetry();
               onDismiss();
@@ -180,19 +188,21 @@ const styles = StyleSheet.create({
     marginLeft: 12,
   },
   retryButton: {
+    minHeight: 44,
     paddingHorizontal: 12,
-    paddingVertical: 9,
     borderRadius: 10,
     borderWidth: 1,
+    alignItems: "center",
+    justifyContent: "center",
   },
   retry: {
     fontSize: 13,
     fontFamily: fonts.display,
   },
   dismissButton: {
-    width: 34,
-    height: 34,
-    borderRadius: 17,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
     borderWidth: 1,
     alignItems: "center",
     justifyContent: "center",
