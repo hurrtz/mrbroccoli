@@ -51,6 +51,7 @@ describe("StyleSheetModal", () => {
     ).toEqual(
       expect.objectContaining({
         fontFamily: "UnicaOne_400Regular",
+        fontSize: 20,
         textAlign: "center",
       }),
     );

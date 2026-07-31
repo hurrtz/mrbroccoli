@@ -26,6 +26,10 @@ describe("MainScreenTopBar", () => {
 
       expect(screen.getByText("Mr. Brokkoli")).toBeTruthy();
       expect(
+        StyleSheet.flatten(screen.getByText("Mr. Brokkoli").props.style)
+          .fontSize,
+      ).toBe(compact ? 14 : 26);
+      expect(
         screen.getByLabelText("Conversations").props.accessibilityRole,
       ).toBe("button");
       expect(screen.getByLabelText("Settings").props.accessibilityRole).toBe(

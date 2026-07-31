@@ -391,11 +391,11 @@ export const styles = StyleSheet.create({
     justifyContent: "center",
   },
   styleSheetTitle: {
-    fontSize: 26,
-    lineHeight: 32,
+    fontSize: 20,
+    lineHeight: 26,
     fontFamily: fonts.headline,
     fontWeight: "400",
-    letterSpacing: -0.25,
+    letterSpacing: -0.2,
     textAlign: "center",
   },
   styleSheetSubtitle: {

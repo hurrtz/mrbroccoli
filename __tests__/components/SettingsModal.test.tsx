@@ -166,8 +166,14 @@ describe("SettingsModal", () => {
       expect(
         StyleSheet.flatten(
           screen.getByTestId("settings-modal-title").props.style,
-        ).textAlign,
-      ).toBe("center");
+        ),
+      ).toEqual(
+        expect.objectContaining({
+          fontFamily: "UnicaOne_400Regular",
+          fontSize: 20,
+          textAlign: "center",
+        }),
+      );
       expect(screen.queryByTestId("settings-header-gradient")).toBeNull();
       expect(screen.queryByTestId("settings-modal-gradient")).toBeNull();
       expect(screen.getByTestId("phosphor-icon-close")).toBeTruthy();

@@ -154,8 +154,9 @@ const styles = StyleSheet.create({
     gap: 1,
   },
   wordmarkText: {
-    fontSize: 20,
-    letterSpacing: 0.3,
+    fontSize: 26,
+    lineHeight: 32,
+    letterSpacing: -0.25,
     fontFamily: fonts.headline,
   },
   compactBrand: {

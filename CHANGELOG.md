@@ -28,9 +28,9 @@ the complete Play Store translations are kept in a dedicated file under
   semantic sizing, while retaining official provider-brand artwork, compact
   transcript disclosures, accessible touch targets, and clearer message
   actions.
-- Center the Conversations and Conversation Settings headings in the display
-  typeface and remove the inconsistent border from the conversation close
-  action.
+- Promote the home wordmark to the larger screen-title size, align Conversations
+  and Conversation Settings with the smaller Settings page-title hierarchy,
+  and remove the inconsistent border from the conversation close action.
 - Keep the Conversation Settings title on one truncated line, anchor its close
   action to the top-right corner, and replace oversized pills with compact
   segmented choices.
