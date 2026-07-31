@@ -185,6 +185,16 @@ These notes are specific to this repository and supplement any parent-level inst
 ## Testing And Verification
 
 - There is no lint script in `package.json`.
+- Use the repository `Makefile` as the local CI entry point. Install the
+  versioned hook with `make hooks-install`; `make pre-push` is the spend-free
+  push gate, and `make pre-release-static` is the spend-free native/static
+  portion of comprehensive release validation.
+- Keep `.githooks/pre-push` repository-relative and non-interactive. Do not put
+  live provider calls or Maestro device work in the pre-push hook.
+- The comprehensive pre-release workflow must run
+  `make prerelease-preflight` before every provider or other quota-consuming
+  request. A missing credential, release keystore, or cost ceiling aborts the
+  entire run; partial provider coverage is not a release pass.
 - Use `npx tsc --noEmit` as the baseline repo-wide verification step for UI and type changes.
 - Use targeted Jest runs for affected areas instead of defaulting to the entire suite when only a small area changed.
 - Common focused tests:

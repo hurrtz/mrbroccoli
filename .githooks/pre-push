@@ -1,0 +1,5 @@
+#!/bin/sh
+set -eu
+
+repository_root=$(git rev-parse --show-toplevel)
+exec make -C "$repository_root" pre-push

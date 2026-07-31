@@ -104,6 +104,24 @@ npm run android
 npm test
 ```
 
+### Local validation
+
+The repository includes a Makefile-based local CI workflow:
+
+```bash
+make hooks-install
+make pre-push
+make pre-release-static
+```
+
+`pre-push` is the fast, spend-free gate installed as the repository's Git
+pre-push hook. `prerelease-preflight` checks the complete ignored
+`.env.local` secret/signing contract before any provider request.
+`pre-release-static` then adds Expo dependency checks plus Android and iOS
+native validation. The live provider/model matrix and Maestro visual suite are
+kept as explicit later phases so their cost and device requirements cannot be
+triggered accidentally.
+
 ## How Credentials Work
 
 - Provider API keys are entered in the Settings modal by the user.
