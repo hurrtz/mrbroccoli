@@ -155,7 +155,7 @@ export async function requestRealtimeChatViaWebSocket(params: {
           JSON.stringify({
             type: "response.create",
             response: {
-              modalities: ["text"],
+              output_modalities: ["text"],
               instructions: params.systemPrompt,
             },
           }),

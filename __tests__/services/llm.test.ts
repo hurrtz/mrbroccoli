@@ -760,7 +760,7 @@ describe("streamChat", () => {
     });
     expect(JSON.parse(socket.sent[1])).toMatchObject({
       type: "response.create",
-      response: { modalities: ["text"] },
+      response: { output_modalities: ["text"] },
     });
 
     socket.emitMessage({ type: "response.text.delta", delta: "Hi" });
