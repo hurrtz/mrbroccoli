@@ -56,6 +56,7 @@ coverage/
 !/ios/MrBroccoli/MrBroccoliAudioQueueSession.h
 !/ios/MrBroccoli/MrBroccoliAudioQueueSession.m
 !/ios/MrBroccoli/MrBroccoliBackgroundVoiceTurn.m
+!/ios/MrBroccoli/MrBroccoliBackgroundVoiceTurn.h
 !/ios/MrBroccoli/MrBroccoliNativeAudioQueue.m
 !/ios/MrBroccoli/MrBroccoliNativeWaveform.swift
 !/ios/MrBroccoli/MrBroccoliNativeWaveformView.swift
@@ -74,6 +75,8 @@ coverage/
 !/ios/MrBroccoli.xcodeproj/xcshareddata/
 !/ios/MrBroccoli.xcodeproj/xcshareddata/xcschemes/
 !/ios/MrBroccoli.xcodeproj/xcshareddata/xcschemes/MrBroccoli.xcscheme
+!/ios/MrBroccoliTests/
+!/ios/MrBroccoliTests/**
 /android/*
 !/android/build.gradle
 !/android/gradle.properties

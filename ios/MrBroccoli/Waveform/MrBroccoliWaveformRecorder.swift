@@ -335,11 +335,15 @@ final class MrBroccoliWaveformRecorder {
       let rawType = notification.userInfo?[
         AVAudioSessionInterruptionTypeKey
       ] as? UInt
-      let interruptionType = rawType.flatMap(
-        AVAudioSession.InterruptionType.init(rawValue:)
+      let rawOptions = notification.userInfo?[
+        AVAudioSessionInterruptionOptionKey
+      ] as? UInt ?? 0
+      let action = MrBroccoliWaveformInterruptionPolicy.action(
+        rawType: rawType,
+        rawOptions: rawOptions
       )
 
-      if interruptionType == .began {
+      if action == .began {
         self.emitEvent([
           "type": "interruption",
           "sessionId": sessionId,
@@ -348,15 +352,9 @@ final class MrBroccoliWaveformRecorder {
         return
       }
 
-      let rawOptions = notification.userInfo?[
-        AVAudioSessionInterruptionOptionKey
-      ] as? UInt ?? 0
-      let shouldResume = AVAudioSession.InterruptionOptions(
-        rawValue: rawOptions
-      ).contains(.shouldResume)
       var resumed = false
 
-      if shouldResume, let engine = self.audioEngine {
+      if action == .resume, let engine = self.audioEngine {
         do {
           try AVAudioSession.sharedInstance().setActive(true)
           if !engine.isRunning {

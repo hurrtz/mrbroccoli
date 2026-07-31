@@ -267,6 +267,11 @@ These notes are specific to this repository and supplement any parent-level inst
   emulator or device for native playback, waveform, foreground-service, and
   lifecycle race coverage. The comprehensive local pre-release gate runs this
   target automatically and fails if the native runtime checks cannot execute.
+- Run `make ios-native-test` with exactly one booted iOS simulator for native
+  playback, audio-session interruption, background-turn, and queue lifecycle
+  race coverage. Set `MR_BROCCOLI_IOS_SIMULATOR_UDID` when more than one
+  simulator is booted. The comprehensive local pre-release gate runs this
+  target automatically.
 
 ## Native And Build Notes
 

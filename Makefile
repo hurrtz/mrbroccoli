@@ -22,6 +22,7 @@ IOS_DESTINATION ?= generic/platform=iOS Simulator
 	android-debug \
 	ios-pods \
 	ios-build \
+	ios-native-test \
 	pre-push \
 	prerelease-preflight \
 	pre-release-static \
@@ -43,7 +44,8 @@ help:
 		'make maestro-verify      Verify the E2E locale and screenshot contract' \
 		'make android-debug      Build a debug APK' \
 		'make android-instrumentation Run native runtime tests on every connected Android device' \
-		'make ios-build          Build the app for the generic iOS Simulator'
+		'make ios-build          Build the app for the generic iOS Simulator' \
+		'make ios-native-test    Run native lifecycle tests on one booted iOS Simulator'
 
 hooks-install:
 	@git config core.hooksPath .githooks
@@ -106,6 +108,9 @@ ios-build:
 		-destination '$(IOS_DESTINATION)' \
 		build
 
+ios-native-test:
+	@node scripts/run-ios-native-tests.mjs
+
 pre-push:
 	@$(MAKE) worktree-check
 	@npm run prerelease:env:test
@@ -115,6 +120,7 @@ pre-push:
 	@npm run release-notes:verify
 	@node --test scripts/verify-release-artifact-secrets.test.mjs
 	@node --test scripts/verify-android-release-artifacts.test.mjs
+	@node --test scripts/run-ios-native-tests.test.mjs
 	@$(MAKE) maestro-verify
 	@$(MAKE) license
 	@$(MAKE) config
@@ -138,6 +144,7 @@ pre-release-static:
 	@$(MAKE) android-unit
 	@$(MAKE) android-instrumentation
 	@$(MAKE) ios-build
+	@$(MAKE) ios-native-test
 
 # The runner repeats the zero-network preflight internally before it loads any
 # local credential into the Jest process. It then enforces the configured USD

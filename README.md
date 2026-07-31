@@ -116,17 +116,20 @@ make pre-release-maestro
 make pre-release-live
 make pre-release
 make release-aab
+make ios-native-test
 ```
 
 `pre-push` is the fast, spend-free gate installed as the repository's Git
 pre-push hook. `prerelease-preflight` checks the complete ignored
 `.env.local` secret/signing contract before any provider request.
 `pre-release-static` then adds Expo dependency checks plus Android and iOS
-native validation. `pre-release-live` derives every retained LLM model and
-effort, speech model, representative TTS voice, voice directory, web-search
-provider, and exposed search mode from the runtime manifest. It aborts on the
-first failure and rejects a matrix whose conservative release-test reservation
-exceeds `MR_BROCCOLI_PRERELEASE_MAX_USD`. Every attempted live run also writes
+native validation, including Android instrumentation and iOS lifecycle tests
+on connected or booted devices. `pre-release-live` derives every retained LLM
+model and effort, speech model, representative TTS voice, voice directory,
+web-search provider, and exposed search mode from the runtime manifest. It
+aborts on the first failure and rejects a matrix whose conservative release-test
+reservation exceeds `MR_BROCCOLI_PRERELEASE_MAX_USD`. Every attempted live run
+also writes
 private JSON and Markdown cost reports under `artifacts/provider-matrix/`, even
 when a provider fails. Those reports contain only numeric usage metadata and
 release-fixture units—never credentials, prompts, transcripts, or responses.
