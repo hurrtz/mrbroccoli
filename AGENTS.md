@@ -102,6 +102,61 @@ These notes are specific to this repository and supplement any parent-level inst
 - Settings UI work usually belongs in `src/features/settings/`; shared settings behavior belongs in `src/features/settings-core/`.
 - Home-screen interaction changes usually belong in `src/screens/MainScreen.tsx` and `src/components/ResponseModeToggle.tsx`.
 
+## Commit Workflow
+
+- Keep every commit as atomic as reasonably possible: one coherent intent that
+  can be understood, reviewed, reverted, and validated independently.
+- Commit an implementation together with its directly related tests,
+  translations, and user-visible changelog entry. Do not split these merely to
+  produce smaller commits.
+- Separate unrelated behavior, refactors, repository-process documentation,
+  dependency changes, and release metadata into their own commits.
+- Before committing, inspect both the complete worktree and the staged diff so
+  unrelated user changes are never included accidentally.
+- During a version release, preserve the existing atomic feature and fix
+  commits. The final consolidated release commit contains only the coordinated
+  version/build metadata, dated changelog section, localized store notes, and
+  other inseparable release-scoped files; it must not absorb unrelated work.
+
+## Changelog And Release Workflow
+
+- Accumulate completed user-visible changes under `## Unreleased` in
+  `CHANGELOG.md`.
+- Do not modify an already released version's changelog or localized release
+  notes. Corrections and later work belong under `Unreleased`.
+- Do not increment the user-facing version, Android `versionCode`, or iOS build
+  number for each individual change. Increment them only when preparing a new
+  distributable release.
+- Treat an explicit user announcement or request to create a new version as
+  authorization to complete the entire release workflow below without stopping
+  after the metadata changes:
+  1. Move the accumulated `Unreleased` entries into a dated
+     `## <version> - YYYY-MM-DD` section and reset `Unreleased`.
+  2. Create `docs/google-play-release-notes-<version>.md` with the same complete
+     locale-tag set as the preceding release-notes file. Summarize the complete
+     release in every locale and keep every entry within Google Play's
+     500-character limit.
+  3. Run `npm run version:bump -- <version>` so the Expo/package versions,
+     Android `versionCode`, and iOS build number remain synchronized.
+  4. Validate the release with native configuration parity, TypeScript, the
+     complete Jest suite, Expo Doctor, Expo dependency alignment,
+     `git diff --check`, and locale-tag/character-limit checks.
+  5. Confirm the worktree scope, then stage the coordinated release metadata
+     and create one consolidated release commit for the version. Preserve the
+     preceding atomic feature and fix commits, and do not include unrelated user
+     files. Use a message such as
+     `chore(release): prepare <version>`.
+  6. Push the release commit and verify that local `HEAD` exactly matches the
+     remote branch before building.
+  7. Automatically build the Android release bundle from that exact pushed
+     commit with `cd android && ./gradlew bundleRelease`.
+  8. Verify the AAB archive, signature, package name, embedded version name and
+     version code, record its SHA-256, and report the final
+     `android/app/build/outputs/bundle/release/app-release.aab` path.
+- A release is not complete when only metadata, documentation, or a local
+  commit exists. The default endpoint is a pushed, verified commit plus a
+  verified Android release AAB.
+
 ## Testing And Verification
 
 - There is no lint script in `package.json`.
