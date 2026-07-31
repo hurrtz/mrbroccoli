@@ -146,6 +146,11 @@ function countCapturedScreenshots(directory) {
     ).length;
 }
 
+function waitForRetry(milliseconds) {
+  const signal = new Int32Array(new SharedArrayBuffer(4));
+  Atomics.wait(signal, 0, 0, milliseconds);
+}
+
 export function runFlow({
   cwd,
   environment,
@@ -155,6 +160,7 @@ export function runFlow({
   run = runCommand,
   stderr = process.stderr,
   udid,
+  wait = waitForRetry,
 }) {
   const envArgs = Object.entries(environment).flatMap(([key, value]) => [
     "-e",
@@ -197,6 +203,7 @@ export function runFlow({
       stderr.write(
         `Maestro flow failed once; retrying ${flow} on ${udid}.\n`,
       );
+      wait(3_000);
     }
   }
 }

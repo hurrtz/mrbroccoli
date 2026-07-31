@@ -61,6 +61,7 @@ test("retries a transient Maestro flow failure exactly once", () => {
   );
   const outputDirectory = path.join(cwd, "artifacts/maestro/retry");
   const messages = [];
+  const retryDelays = [];
   let attempts = 0;
 
   try {
@@ -78,9 +79,11 @@ test("retries a transient Maestro flow failure exactly once", () => {
       },
       stderr: { write(message) { messages.push(message); } },
       udid: "emulator-5554",
+      wait(milliseconds) { retryDelays.push(milliseconds); },
     });
 
     assert.equal(attempts, 2);
+    assert.deepEqual(retryDelays, [3_000]);
     assert.match(messages.join(""), /failed once; retrying/);
   } finally {
     fs.rmSync(cwd, { recursive: true, force: true });
@@ -109,6 +112,7 @@ test("stops after a repeated Maestro flow failure", () => {
           },
           stderr: { write() {} },
           udid: "emulator-5554",
+          wait() {},
         }),
       /persistent failure/,
     );
