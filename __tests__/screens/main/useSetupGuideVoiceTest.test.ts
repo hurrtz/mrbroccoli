@@ -29,9 +29,17 @@ jest.mock("../../../src/services/tts/providerRoute", () => ({
   synthesizeProviderSpeech: jest.fn(async () => "file://speech.wav"),
 }));
 
+jest.mock("../../../src/services/tts", () => ({
+  synthesizeSpeech: jest.fn(async () => "file://speech.wav"),
+}));
+
 jest.mock("../../../src/services/whisper", () => ({
   transcribeAudio: jest.fn(async () => "transcript"),
 }));
+
+import { streamChat } from "../../../src/services/llm";
+import { synthesizeSpeech } from "../../../src/services/tts";
+import { transcribeAudio } from "../../../src/services/whisper";
 
 const baseSettings = {
   ...DEFAULT_SETTINGS,
@@ -42,6 +50,15 @@ const baseSettings = {
 } satisfies Settings;
 
 describe("useSetupGuideVoiceTest", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    (transcribeAudio as jest.Mock).mockResolvedValue("transcript");
+    (synthesizeSpeech as jest.Mock).mockResolvedValue("file://speech.wav");
+    (streamChat as jest.Mock).mockImplementation(async ({ onDone }) => {
+      await onDone("A concise setup reply.");
+    });
+  });
+
   function createParams(
     overrides: Partial<Parameters<typeof useSetupGuideVoiceTest>[0]> = {},
   ) {
@@ -120,5 +137,116 @@ describe("useSetupGuideVoiceTest", () => {
     });
 
     expect(activeRecorder.stopRecording).not.toHaveBeenCalled();
+  });
+
+  it("completes a provider STT voice round trip in text-only mode", async () => {
+    const params = createParams();
+    const { result } = renderHook(() => useSetupGuideVoiceTest(params));
+
+    await act(async () => {
+      await result.current.handleAction();
+    });
+    expect(result.current.phase).toBe("recording");
+
+    await act(async () => {
+      await result.current.handleAction();
+    });
+
+    expect(transcribeAudio).toHaveBeenCalledWith(
+      expect.objectContaining({
+        fileUri: "file://voice.m4a",
+        provider: "openai",
+        providerModel: "gpt-4o-mini-transcribe",
+      }),
+    );
+    expect(streamChat).toHaveBeenCalledWith(
+      expect.objectContaining({
+        apiKey: "sk-test",
+        model: "gpt-5.4",
+        provider: "openai",
+      }),
+    );
+    expect(result.current.transcript).toBe("transcript");
+    expect(result.current.reply).toBe("A concise setup reply.");
+    expect(result.current.phase).toBe("success");
+  });
+
+  it("synthesizes and drains the configured provider TTS route", async () => {
+    const params = createParams({
+      routes: {
+        ...createParams().routes,
+        tts: {
+          enabled: true,
+          kind: "provider",
+          provider: "openai",
+          model: "gpt-4o-mini-tts",
+          voice: "alloy",
+        },
+      },
+    });
+    const { result } = renderHook(() => useSetupGuideVoiceTest(params));
+
+    await act(async () => {
+      await result.current.handleAction();
+    });
+    await act(async () => {
+      await result.current.handleAction();
+    });
+
+    expect(synthesizeSpeech).toHaveBeenCalledWith(
+      expect.objectContaining({
+        apiKey: "sk-test",
+        mode: "provider",
+        provider: "openai",
+        providerModel: "gpt-4o-mini-tts",
+        text: "A concise setup reply.",
+        voice: "alloy",
+      }),
+    );
+    expect(params.player.resetCancellation).toHaveBeenCalledTimes(1);
+    expect(params.player.enqueueAudio).toHaveBeenCalledWith(
+      "file://speech.wav",
+      expect.objectContaining({ source: "preview" }),
+    );
+    expect(params.player.waitForDrain).toHaveBeenCalledTimes(1);
+    expect(result.current.phase).toBe("success");
+  });
+
+  it("reports unavailable input without starting either recorder", async () => {
+    const params = createParams({
+      routes: {
+        ...createParams().routes,
+        stt: { enabled: false, kind: "disabled" },
+      },
+    });
+    const { result } = renderHook(() => useSetupGuideVoiceTest(params));
+
+    await act(async () => {
+      await result.current.handleAction();
+    });
+
+    expect(result.current.phase).toBe("error");
+    expect(result.current.errorMessage).toBe(
+      "setupGuideVoiceInputUnavailable",
+    );
+    expect(params.recorder.startRecording).not.toHaveBeenCalled();
+    expect(params.nativeStt.startRecognition).not.toHaveBeenCalled();
+  });
+
+  it("turns an empty provider transcript into a recoverable error", async () => {
+    (transcribeAudio as jest.Mock).mockResolvedValue("  ");
+    const params = createParams();
+    const { result } = renderHook(() => useSetupGuideVoiceTest(params));
+
+    await act(async () => {
+      await result.current.handleAction();
+    });
+    await act(async () => {
+      await result.current.handleAction();
+    });
+
+    expect(result.current.phase).toBe("error");
+    expect(result.current.errorMessage).toBe("couldntCatchThatTryAgain");
+    expect(streamChat).not.toHaveBeenCalled();
   });
 });
