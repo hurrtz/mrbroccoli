@@ -1,7 +1,7 @@
 import React from "react";
 import { Text, TouchableOpacity, View } from "react-native";
 
-import { AntIcon } from "../../design-system/AntIcon";
+import { PhosphorIcon } from "../../design-system/PhosphorIcon";
 
 import { useLocalization } from "../../i18n";
 import { useTheme } from "../../theme/ThemeContext";
@@ -31,7 +31,7 @@ export function ReplyFailureCard({
       ]}
     >
       <View style={styles.replyFailureHeader}>
-        <AntIcon
+        <PhosphorIcon
           name="exclamation-circle"
           size="inline"
           color={colors.danger}
@@ -62,7 +62,7 @@ export function ReplyFailureCard({
           accessibilityRole="button"
           accessibilityLabel={t("retryReply")}
         >
-          <AntIcon name="reload" size="inline" color={colors.accent} />
+          <PhosphorIcon name="reload" size="inline" color={colors.accent} />
           <Text
             style={[styles.replyFailureActionText, { color: colors.accent }]}
           >

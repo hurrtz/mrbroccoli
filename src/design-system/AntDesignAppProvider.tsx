@@ -30,8 +30,6 @@ export function AntDesignAppProvider({
     Outfit_600SemiBold,
     Outfit_700Bold,
     UnicaOne_400Regular,
-    antfill: require("../../node_modules/@ant-design/icons-react-native/fonts/antfill.ttf"),
-    antoutline: require("../../node_modules/@ant-design/icons-react-native/fonts/antoutline.ttf"),
   });
   const antTheme = React.useMemo(() => createAntTheme(colors), [colors]);
   const appLocale = getAppLocale(language);

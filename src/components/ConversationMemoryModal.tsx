@@ -7,7 +7,7 @@ import {
   View,
   useWindowDimensions,
 } from "react-native";
-import { AntIcon } from "../design-system/AntIcon";
+import { PhosphorIcon } from "../design-system/PhosphorIcon";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { APP_MODAL_ORIENTATIONS } from "../constants/layout";
 import { useLocalization } from "../i18n";
@@ -104,7 +104,7 @@ export const ConversationMemoryModal = React.memo(
                 accessibilityLabel={t("dismiss")}
                 accessibilityRole="button"
               >
-                <AntIcon
+                <PhosphorIcon
                   name="close"
                   size="control"
                   color={colors.textSecondary}

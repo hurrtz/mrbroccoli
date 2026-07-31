@@ -1,8 +1,8 @@
 import React from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 
-import { Checkbox, List, Modal } from "@ant-design/react-native";
-import { AntIcon } from "../../design-system/AntIcon";
+import { List, Modal } from "@ant-design/react-native";
+import { PhosphorIcon } from "../../design-system/PhosphorIcon";
 
 import {
   getTtsListenLanguageLabel,
@@ -71,7 +71,7 @@ export function AntListenLanguageSelector({
                     count: selectedLanguages.length,
                   })}
                 </Text>
-                <AntIcon
+                <PhosphorIcon
                   name="down"
                   size="compact"
                   color={colors.textMuted}
@@ -135,37 +135,62 @@ export function AntListenLanguageSelector({
           }}
         >
           <View>
-            {TTS_LISTEN_LANGUAGE_OPTIONS.map((entry, index) => (
-              <Checkbox.CheckboxItem
-                key={entry}
-                checked={selectedLanguages.includes(entry)}
-                right
-                onPress={() => onToggleLanguage(entry)}
-                styles={{
-                  Item: {
-                    backgroundColor: colors.surface,
-                    minHeight: 46,
-                  },
-                  Line: {
-                    borderBottomWidth:
-                      index === TTS_LISTEN_LANGUAGE_OPTIONS.length - 1
-                        ? 0
-                        : StyleSheet.hairlineWidth,
-                    borderBottomColor: colors.border,
-                  },
-                  Content: {
-                    color: colors.text,
-                    fontFamily: fonts.body,
-                    fontSize: 15,
-                  },
-                }}
-              >
-                {getTtsListenLanguageLabel(entry, language)}
-              </Checkbox.CheckboxItem>
-            ))}
+            {TTS_LISTEN_LANGUAGE_OPTIONS.map((entry, index) => {
+              const checked = selectedLanguages.includes(entry);
+
+              return (
+                <Pressable
+                  key={entry}
+                  onPress={() => onToggleLanguage(entry)}
+                  accessibilityRole="checkbox"
+                  accessibilityState={{ checked }}
+                  style={({ pressed }) => [
+                    localStyles.checkboxRow,
+                    {
+                      backgroundColor: pressed
+                        ? colors.surfaceAlt
+                        : colors.surface,
+                      borderBottomColor: colors.border,
+                      borderBottomWidth:
+                        index === TTS_LISTEN_LANGUAGE_OPTIONS.length - 1
+                          ? 0
+                          : StyleSheet.hairlineWidth,
+                    },
+                  ]}
+                >
+                  <Text
+                    style={[localStyles.checkboxLabel, { color: colors.text }]}
+                  >
+                    {getTtsListenLanguageLabel(entry, language)}
+                  </Text>
+                  <PhosphorIcon
+                    name={checked ? "checkbox-checked" : "checkbox-unchecked"}
+                    size="control"
+                    color={checked ? colors.accent : colors.textMuted}
+                  />
+                </Pressable>
+              );
+            })}
           </View>
         </Modal>
       ) : null}
     </>
   );
 }
+
+const localStyles = StyleSheet.create({
+  checkboxLabel: {
+    flex: 1,
+    fontFamily: fonts.body,
+    fontSize: 15,
+    lineHeight: 21,
+  },
+  checkboxRow: {
+    minHeight: 46,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+  },
+});

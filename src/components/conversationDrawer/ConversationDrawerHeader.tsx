@@ -1,7 +1,7 @@
 import React from "react";
 import { Text, TextInput, TouchableOpacity, View } from "react-native";
 
-import { AntIcon } from "../../design-system/AntIcon";
+import { PhosphorIcon } from "../../design-system/PhosphorIcon";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { useLocalization } from "../../i18n";
@@ -57,7 +57,11 @@ export function ConversationDrawerHeader({
           accessibilityRole="button"
           accessibilityLabel={t("dismiss")}
         >
-          <AntIcon name="close" size="control" color={colors.textSecondary} />
+          <PhosphorIcon
+            name="close"
+            size="control"
+            color={colors.textSecondary}
+          />
         </TouchableOpacity>
       </View>
 
@@ -69,7 +73,7 @@ export function ConversationDrawerHeader({
         accessibilityLabel={t("newSession")}
         style={[styles.newSession, { backgroundColor: colors.bubbleUser }]}
       >
-        <AntIcon name="plus" size="compact" color={colors.onPrimary} />
+        <PhosphorIcon name="plus" size="compact" color={colors.onPrimary} />
         <Text style={[styles.newSessionText, { color: colors.onPrimary }]}>
           {t("newSession")}
         </Text>
@@ -84,11 +88,7 @@ export function ConversationDrawerHeader({
           },
         ]}
       >
-        <AntIcon
-          name="search"
-          size="compact"
-          color={colors.textMuted}
-        />
+        <PhosphorIcon name="search" size="compact" color={colors.textMuted} />
         <TextInput
           testID="conversation-drawer-search-input"
           value={searchQuery}
@@ -107,7 +107,7 @@ export function ConversationDrawerHeader({
             accessibilityRole="button"
             accessibilityLabel={t("clear")}
           >
-            <AntIcon
+            <PhosphorIcon
               name="close"
               size="compact"
               color={colors.textSecondary}

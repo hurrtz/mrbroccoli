@@ -1,4 +1,4 @@
-import { AntIcon } from "../../../design-system/AntIcon";
+import { PhosphorIcon } from "../../../design-system/PhosphorIcon";
 import React from "react";
 import { Text, TouchableOpacity, View } from "react-native";
 import { Colors } from "../../../theme/colors";
@@ -50,7 +50,7 @@ export function DriveSessionControls({
           },
         ]}
       >
-        <AntIcon name="pause" size="compact" color={colors.text} />
+        <PhosphorIcon name="pause" size="compact" color={colors.text} />
         <Text style={[styles.driveControlLabel, { color: colors.text }]}>
           {t("stopDriveSession")}
         </Text>
@@ -75,7 +75,7 @@ export function DriveSessionControls({
           },
         ]}
       >
-        <AntIcon name="redo" size="compact" color={colors.text} />
+        <PhosphorIcon name="redo" size="compact" color={colors.text} />
         <Text style={[styles.driveControlLabel, { color: colors.text }]}>
           {t("repeatDriveReply")}
         </Text>
@@ -100,14 +100,12 @@ export function DriveSessionControls({
           },
         ]}
       >
-        <AntIcon
+        <PhosphorIcon
           name="play-circle"
           size="compact"
           color={colors.onPrimary}
         />
-        <Text
-          style={[styles.driveControlLabel, { color: colors.onPrimary }]}
-        >
+        <Text style={[styles.driveControlLabel, { color: colors.onPrimary }]}>
           {t("continueDriveSession")}
         </Text>
       </TouchableOpacity>

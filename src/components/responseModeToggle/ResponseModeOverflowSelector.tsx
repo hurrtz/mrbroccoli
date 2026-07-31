@@ -1,5 +1,5 @@
 import React from "react";
-import { AntIcon } from "../../design-system/AntIcon";
+import { PhosphorIcon } from "../../design-system/PhosphorIcon";
 import {
   Animated,
   Easing,
@@ -13,10 +13,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { APP_MODAL_ORIENTATIONS } from "../../constants/layout";
-import {
-  PROVIDER_LABELS,
-  getProviderModelName,
-} from "../../constants/models";
+import { PROVIDER_LABELS, getProviderModelName } from "../../constants/models";
 import { useLocalization } from "../../i18n";
 import { useTheme } from "../../theme/ThemeContext";
 import {
@@ -134,9 +131,7 @@ function ResponseModeOverflowOption({
       style={({ pressed }) => [
         styles.overflowOption,
         {
-          backgroundColor: active
-            ? colors.accentSoft
-            : colors.surfaceElevated,
+          backgroundColor: active ? colors.accentSoft : colors.surfaceElevated,
           borderColor: active ? colors.accent : colors.border,
           opacity: ready ? (pressed ? 0.76 : 1) : 0.5,
         },
@@ -158,12 +153,7 @@ function ResponseModeOverflowOption({
         >
           {PROVIDER_LABELS[item.route.provider]}
         </Text>
-        <Text
-          style={[
-            styles.overflowOptionModelName,
-            { color: colors.text },
-          ]}
-        >
+        <Text style={[styles.overflowOptionModelName, { color: colors.text }]}>
           {modelLabel}
         </Text>
       </View>
@@ -187,7 +177,7 @@ function ResponseModeOverflowOption({
       </View>
       <View style={styles.overflowOptionCheck}>
         {active ? (
-          <AntIcon name="check" size="control" color={colors.accent} />
+          <PhosphorIcon name="check" size="control" color={colors.accent} />
         ) : null}
       </View>
     </Pressable>
@@ -207,8 +197,7 @@ export function ResponseModeOverflowSelector({
   const [open, setOpen] = React.useState(false);
   const { backdropOpacity, exit, prepare, sheetTranslateY } =
     useResponseModeSheetAnimation(open, height);
-  const activeMode =
-    modes.find(({ id }) => id === selected) ?? modes[0];
+  const activeMode = modes.find(({ id }) => id === selected) ?? modes[0];
 
   const openSheet = React.useCallback(() => {
     prepare();
@@ -323,7 +312,7 @@ export function ResponseModeOverflowSelector({
             {activeEffortLabel}
           </Text>
         </View>
-        <AntIcon
+        <PhosphorIcon
           name="down"
           size={compact ? "compact" : "control"}
           color={colors.textSecondary}
@@ -388,10 +377,7 @@ export function ResponseModeOverflowSelector({
                 <View style={styles.overflowSheetHeaderCopy}>
                   <Text
                     accessibilityRole="header"
-                    style={[
-                      styles.overflowSheetTitle,
-                      { color: colors.text },
-                    ]}
+                    style={[styles.overflowSheetTitle, { color: colors.text }]}
                   >
                     {t("chooseResponseModel")}
                   </Text>
@@ -415,7 +401,7 @@ export function ResponseModeOverflowSelector({
                     pressed ? styles.iconPressed : null,
                   ]}
                 >
-                  <AntIcon
+                  <PhosphorIcon
                     name="close"
                     size="control"
                     color={colors.textSecondary}

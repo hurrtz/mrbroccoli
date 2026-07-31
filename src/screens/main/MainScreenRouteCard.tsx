@@ -7,7 +7,7 @@ import {
   ViewStyle,
 } from "react-native";
 
-import { AntIcon } from "../../design-system/AntIcon";
+import { PhosphorIcon } from "../../design-system/PhosphorIcon";
 
 import { ResponseModeToggle } from "../../components/ResponseModeToggle";
 import { Colors } from "../../theme/colors";
@@ -83,9 +83,9 @@ export const MainScreenRouteCard = React.memo(function MainScreenRouteCard({
                 },
               ]}
             >
-              <AntIcon name="key" size="inline" color={colors.text} />
+              <PhosphorIcon name="key" size="inline" color={colors.text} />
             </View>
-            <AntIcon name="export" size="compact" color={colors.accent} />
+            <PhosphorIcon name="export" size="compact" color={colors.accent} />
           </View>
           <Text style={[styles.providerEmptyTitle, { color: colors.text }]}>
             {t("setupGuideConnectProviderTitle")}

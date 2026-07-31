@@ -10,7 +10,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { APP_MODAL_ORIENTATIONS } from "../../constants/layout";
-import { AntIconButton } from "../../design-system/AntIconButton";
+import { IconButton } from "../../design-system/IconButton";
 import { Colors } from "../../theme/colors";
 
 import { TranslateFn } from "./shared";
@@ -92,7 +92,7 @@ export const StatusDetailsModal = React.memo(function StatusDetailsModal({
                 {statusDetail}
               </Text>
             </View>
-            <AntIconButton
+            <IconButton
               icon="close"
               iconSize="control"
               style={[

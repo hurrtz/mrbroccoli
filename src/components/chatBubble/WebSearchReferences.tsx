@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Linking, Text, TouchableOpacity, View } from "react-native";
 
-import { AntIcon } from "../../design-system/AntIcon";
+import { PhosphorIcon } from "../../design-system/PhosphorIcon";
 
 import { useLocalization } from "../../i18n";
 import { useTheme } from "../../theme/ThemeContext";
@@ -43,7 +43,7 @@ export function WebSearchReferences({ message }: { message: Message }) {
         }
       >
         <View style={styles.referenceToggleTitleRow}>
-          <AntIcon name="global" size="inline" color={colors.accent} />
+          <PhosphorIcon name="global" size="inline" color={colors.accent} />
           <Text style={[styles.referenceToggleTitle, { color: colors.text }]}>
             {t("webSearch")}
           </Text>
@@ -56,7 +56,7 @@ export function WebSearchReferences({ message }: { message: Message }) {
               count: webSearch.sources.length,
             })}
           </Text>
-          <AntIcon
+          <PhosphorIcon
             name={expanded ? "up" : "down"}
             size="compact"
             color={colors.textSecondary}
@@ -116,7 +116,7 @@ export function WebSearchReferences({ message }: { message: Message }) {
                       >
                         {sourceTitle}
                       </Text>
-                      <AntIcon
+                      <PhosphorIcon
                         name="export"
                         size="inline"
                         color={colors.textSecondary}

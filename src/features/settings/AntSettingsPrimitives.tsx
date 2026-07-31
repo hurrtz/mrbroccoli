@@ -14,14 +14,14 @@ import {
   type ViewStyle,
 } from "react-native";
 
-import { Card, Input, List, Radio } from "@ant-design/react-native";
+import { Card, Input, List } from "@ant-design/react-native";
 
 import { APP_MODAL_ORIENTATIONS } from "../../constants/layout";
 import {
-  AntIcon,
-  type AntIconName,
-  type AntIconSize,
-} from "../../design-system/AntIcon";
+  PhosphorIcon,
+  type PhosphorIconName,
+  type IconSize,
+} from "../../design-system/PhosphorIcon";
 import { useLocalization } from "../../i18n";
 import { useTheme } from "../../theme/ThemeContext";
 import { fonts } from "../../theme/typography";
@@ -35,6 +35,23 @@ const AntCardBody = Card.Body as React.ComponentType<
     children?: React.ReactNode;
   }
 >;
+
+const localStyles = StyleSheet.create({
+  selectionLabel: {
+    flex: 1,
+    fontFamily: fonts.body,
+    fontSize: 15,
+    lineHeight: 21,
+  },
+  selectionRow: {
+    minHeight: 46,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+  },
+});
 
 export type AntPickerOption = {
   value: string;
@@ -182,7 +199,7 @@ export function AntDisclosureCard({
               pressed ? styles.pressedControl : null,
             ]}
           >
-            <AntIcon
+            <PhosphorIcon
               name={expanded ? "up" : "down"}
               size="control"
               color={colors.textSecondary}
@@ -253,13 +270,13 @@ export function AntButtonLabel({
   label,
 }: {
   color: string;
-  icon: AntIconName;
-  iconSize?: AntIconSize;
+  icon: PhosphorIconName;
+  iconSize?: IconSize;
   label: string;
 }) {
   return (
     <View style={styles.buttonLabelRow}>
-      <AntIcon name={icon} size={iconSize} color={color} />
+      <PhosphorIcon name={icon} size={iconSize} color={color} />
       <Text style={[styles.buttonLabelText, { color }]}>{label}</Text>
     </View>
   );
@@ -368,48 +385,47 @@ export function AntRadioSection<T extends string>({
       contentStyle={styles.fullBleedCardContent}
     >
       <View testID={testID} style={styles.radioList}>
-        <Radio.Group
-          value={value}
-          onChange={(event) => onChange(event.target.value as T)}
-        >
-          {options.map((option, index) => (
-            <View
+        {options.map((option, index) => {
+          const selected = option.value === value;
+          const disabled = option.disabled === true;
+
+          return (
+            <Pressable
               key={option.value}
               testID={testID ? `${testID}-${option.value}` : undefined}
+              disabled={disabled}
+              onPress={() => onChange(option.value)}
+              accessibilityRole="radio"
+              accessibilityState={{ checked: selected, disabled }}
+              style={({ pressed }) => [
+                localStyles.selectionRow,
+                {
+                  backgroundColor: pressed
+                    ? colors.surfaceAlt
+                    : colors.surfaceElevated,
+                  borderBottomColor: colors.border,
+                  borderBottomWidth:
+                    index === options.length - 1 ? 0 : StyleSheet.hairlineWidth,
+                  opacity: disabled ? 0.55 : 1,
+                },
+              ]}
             >
-              <Radio.RadioItem
-                value={option.value}
-                disabled={option.disabled}
-                styles={{
-                  Item: {
-                    backgroundColor: colors.surfaceElevated,
-                    minHeight: 46,
-                  },
-                  Line: {
-                    borderBottomWidth:
-                      index === options.length - 1
-                        ? 0
-                        : StyleSheet.hairlineWidth,
-                  },
-                  Content: {
-                    color: colors.text,
-                    fontSize: 15,
-                  },
-                  radioItemContent: {
-                    color: colors.text,
-                    fontFamily: fonts.body,
-                    fontSize: 15,
-                  },
-                  radioItemContentDisable: {
-                    color: colors.textMuted,
-                  },
-                }}
+              <Text
+                style={[
+                  localStyles.selectionLabel,
+                  { color: disabled ? colors.textMuted : colors.text },
+                ]}
               >
                 {option.label}
-              </Radio.RadioItem>
-            </View>
-          ))}
-        </Radio.Group>
+              </Text>
+              <PhosphorIcon
+                name={selected ? "radio-selected" : "radio-unselected"}
+                size="control"
+                color={selected ? colors.accent : colors.textMuted}
+              />
+            </Pressable>
+          );
+        })}
       </View>
     </AntSettingsCard>
   );
@@ -443,7 +459,7 @@ export function AntPickerRow({
   const showStaticValueOnly = hasSingleOption && label === undefined;
   const disclosureIcon =
     !disabled && !hasSingleOption ? (
-      <AntIcon name="down" size="compact" color={colors.textMuted} />
+      <PhosphorIcon name="down" size="compact" color={colors.textMuted} />
     ) : null;
   const pickerIsInteractive = !hasSingleOption;
   const closePicker = React.useCallback(
@@ -618,7 +634,7 @@ export function AntPickerRow({
                   pressed ? styles.pressedControl : null,
                 ]}
               >
-                <AntIcon
+                <PhosphorIcon
                   name="close"
                   size="control"
                   color={colors.textSecondary}
@@ -689,7 +705,7 @@ export function AntPickerRow({
                       {option.label}
                     </Text>
                     {selected ? (
-                      <AntIcon
+                      <PhosphorIcon
                         name="check"
                         size="control"
                         color={colors.accent}

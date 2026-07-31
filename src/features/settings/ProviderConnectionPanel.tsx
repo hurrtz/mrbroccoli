@@ -21,8 +21,8 @@ import {
   getProviderApiKeyPlaceholder,
 } from "../../constants/models";
 import { antButtonTypography } from "../../design-system/antTypography";
-import { AntIconButton } from "../../design-system/AntIconButton";
-import { AntIcon } from "../../design-system/AntIcon";
+import { IconButton } from "../../design-system/IconButton";
+import { PhosphorIcon } from "../../design-system/PhosphorIcon";
 import { useLocalization } from "../../i18n";
 import { useTheme } from "../../theme/ThemeContext";
 import { fonts } from "../../theme/typography";
@@ -196,10 +196,10 @@ export function ProviderAboutModal({
           >
             {`${PROVIDER_LABELS[provider]} · ${t("aboutThisProvider")}`}
           </Text>
-          <AntIconButton
+          <IconButton
             accessibilityLabel={t("dismiss")}
             iconNode={
-              <AntIcon
+              <PhosphorIcon
                 name="close"
                 size="control"
                 color={colors.textSecondary}
@@ -375,11 +375,9 @@ export function ProviderConnectionPanel({
                 ]}
                 onPress={onToggleApiKeyVisibility}
                 accessibilityRole="button"
-                accessibilityLabel={
-                  secureApiKey ? t("showKey") : t("hideKey")
-                }
+                accessibilityLabel={secureApiKey ? t("showKey") : t("hideKey")}
               >
-                <AntIcon
+                <PhosphorIcon
                   name={secureApiKey ? "eye" : "eye-invisible"}
                   size="control"
                   color={colors.textSecondary}
@@ -485,9 +483,7 @@ export function ProviderConnectionPanel({
               const validationState = getValidationState(capability);
               const circuitState = getCircuitState(capability);
               const status = getStatusMeta(
-                circuitState
-                  ? "failing"
-                  : getCapabilityHealthState(capability),
+                circuitState ? "failing" : getCapabilityHealthState(capability),
                 t,
                 colors,
               );
@@ -525,7 +521,7 @@ export function ProviderConnectionPanel({
                       {isValidating ? (
                         <ActivityIndicator size="small" color={colors.accent} />
                       ) : (
-                        <AntIcon
+                        <PhosphorIcon
                           name={circuitState ? "reload" : "play-circle"}
                           size="control"
                           color={disabled ? colors.textMuted : colors.accent}

@@ -33,7 +33,6 @@
     "catalog:test": "jest __tests__/catalog --runInBand --watchman=false"
   },
   "dependencies": {
-    "@ant-design/icons-react-native": "^2.3.2",
     "@ant-design/react-native": "^5.4.3",
     "@dr.pogodin/react-native-fs": "^2.39.2",
     "@expo-google-fonts/outfit": "^0.4.3",
@@ -58,6 +57,7 @@
     "expo-speech": "~57.0.1",
     "expo-speech-recognition": "^56.0.1",
     "expo-status-bar": "~57.0.1",
+    "phosphor-react-native": "^3.0.6",
     "react": "19.2.3",
     "react-native": "0.86.2",
     "react-native-gesture-handler": "~2.32.0",

@@ -1,7 +1,7 @@
 import React from "react";
 import { Text, TouchableOpacity, View } from "react-native";
 
-import { AntIcon } from "../../design-system/AntIcon";
+import { PhosphorIcon } from "../../design-system/PhosphorIcon";
 
 import { useLocalization } from "../../i18n";
 import { useTheme } from "../../theme/ThemeContext";
@@ -49,7 +49,7 @@ export function PipelineNotices({
               },
             ]}
           >
-            <AntIcon
+            <PhosphorIcon
               name={notice.level === "error" ? "warning" : "info-circle"}
               size="inline"
               color={notice.level === "error" ? colors.danger : colors.accent}
@@ -70,7 +70,7 @@ export function PipelineNotices({
                   ? t("textToSpeech")
                   : notice.stage === "ulra"
                     ? t("ulraMode")
-                  : t("webSearch")}
+                    : t("webSearch")}
             </Text>
             <Text style={[styles.noticeText, { color: colors.textSecondary }]}>
               {notice.message}
@@ -96,7 +96,7 @@ export function PipelineNotices({
                     accessibilityRole="button"
                     accessibilityLabel={t("retrySpeech")}
                   >
-                    <AntIcon
+                    <PhosphorIcon
                       name="sound"
                       size="compact"
                       color={colors.accent}
@@ -125,7 +125,7 @@ export function PipelineNotices({
                     accessibilityRole="button"
                     accessibilityLabel={t("openSpeakingSettings")}
                   >
-                    <AntIcon
+                    <PhosphorIcon
                       name="setting"
                       size="compact"
                       color={colors.textSecondary}

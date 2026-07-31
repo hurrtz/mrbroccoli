@@ -1,21 +1,20 @@
 import React from "react";
 import {
+  Pressable,
   StyleSheet,
   type StyleProp,
   type ViewStyle,
 } from "react-native";
 
-import { Button } from "@ant-design/react-native";
-
 import { useTheme } from "../theme/ThemeContext";
 import {
-  AntIcon,
+  PhosphorIcon,
   MIN_ICON_TOUCH_TARGET,
-  type AntIconName,
-  type AntIconSize,
-} from "./AntIcon";
+  type IconSize,
+  type PhosphorIconName,
+} from "./PhosphorIcon";
 
-export function AntIconButton({
+export function IconButton({
   accessibilityLabel,
   active = false,
   icon,
@@ -28,10 +27,10 @@ export function AntIconButton({
 }: {
   accessibilityLabel: string;
   active?: boolean;
-  icon?: AntIconName;
+  icon?: PhosphorIconName;
   iconNode?: React.ReactNode;
   iconColor?: string;
-  iconSize?: AntIconSize;
+  iconSize?: IconSize;
   onPress: () => void;
   style?: StyleProp<ViewStyle>;
   testID?: string;
@@ -39,40 +38,40 @@ export function AntIconButton({
   const { colors } = useTheme();
 
   return (
-    <Button
+    <Pressable
       testID={testID}
-      type="ghost"
-      size="small"
-      style={StyleSheet.flatten([
+      style={({ pressed }) => [
         styles.button,
         {
-          backgroundColor: active ? colors.accentSoft : "transparent",
+          backgroundColor: pressed
+            ? colors.surfaceAlt
+            : active
+              ? colors.accentSoft
+              : "transparent",
           borderColor: active ? colors.accent : "transparent",
         },
         style,
-      ])}
-      activeStyle={{ backgroundColor: colors.surfaceAlt }}
+      ]}
       accessibilityLabel={accessibilityLabel}
       accessibilityRole="button"
       onPress={onPress}
     >
       {iconNode ??
         (icon ? (
-          <AntIcon
+          <PhosphorIcon
             name={icon}
             size={iconSize}
-            color={
-              iconColor ??
-              (active ? colors.accent : colors.textSecondary)
-            }
+            color={iconColor ?? (active ? colors.accent : colors.textSecondary)}
           />
         ) : null)}
-    </Button>
+    </Pressable>
   );
 }
 
 const styles = StyleSheet.create({
   button: {
+    alignItems: "center",
+    justifyContent: "center",
     width: MIN_ICON_TOUCH_TARGET,
     height: MIN_ICON_TOUCH_TARGET,
     minWidth: MIN_ICON_TOUCH_TARGET,

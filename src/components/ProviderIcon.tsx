@@ -10,10 +10,7 @@ import MistralIcon from "../../assets/providers/mistral-ai.svg";
 import OpenAIIcon from "../../assets/providers/openai.svg";
 import OpenRouterIcon from "../../assets/providers/openrouter.svg";
 import XaiIcon from "../../assets/providers/xai.svg";
-import {
-  resolveAntIconSize,
-  type AntIconSize,
-} from "../design-system/AntIcon";
+import { resolveIconSize, type IconSize } from "../design-system/PhosphorIcon";
 import { Provider } from "../types";
 
 const PROVIDER_ICON_COMPONENTS: Record<
@@ -50,7 +47,7 @@ interface ProviderIconProps {
   provider: Provider | string;
   color: string;
   label?: string;
-  size?: AntIconSize;
+  size?: IconSize;
 }
 
 function getFallbackProviderGlyph(value: string) {
@@ -74,7 +71,7 @@ export function ProviderIcon({
   size: requestedSize,
 }: ProviderIconProps) {
   const Icon = PROVIDER_ICON_COMPONENTS[provider];
-  const targetSize = resolveAntIconSize(requestedSize ?? "navigation");
+  const targetSize = resolveIconSize(requestedSize ?? "navigation");
 
   if (!Icon) {
     return (

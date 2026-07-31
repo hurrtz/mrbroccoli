@@ -10,7 +10,7 @@ import {
   Pressable,
   StyleSheet,
 } from "react-native";
-import { AntIcon } from "../design-system/AntIcon";
+import { PhosphorIcon } from "../design-system/PhosphorIcon";
 import { APP_MODAL_ORIENTATIONS } from "../constants/layout";
 import { useLocalization } from "../i18n";
 import { useTheme } from "../theme/ThemeContext";
@@ -78,7 +78,9 @@ export function Picker({
             {disabled ? t("unavailable") : dropdownLabel || t("selection")}
           </Text>
           <Text style={[styles.dropdownValue, { color: colors.text }]}>
-            {disabled ? t("chooseCompatibleProviderFirst") : selected?.label || value}
+            {disabled
+              ? t("chooseCompatibleProviderFirst")
+              : selected?.label || value}
           </Text>
         </View>
         <View
@@ -87,7 +89,7 @@ export function Picker({
             { backgroundColor: colors.accentSoft, borderColor: colors.border },
           ]}
         >
-          <AntIcon name="down" size="compact" color={colors.accent} />
+          <PhosphorIcon name="down" size="compact" color={colors.accent} />
         </View>
       </TouchableOpacity>
 
@@ -98,10 +100,7 @@ export function Picker({
         supportedOrientations={APP_MODAL_ORIENTATIONS}
         onRequestClose={() => setOpen(false)}
       >
-        <View
-          style={styles.overlay}
-          accessibilityViewIsModal
-        >
+        <View style={styles.overlay} accessibilityViewIsModal>
           <Pressable
             accessible={false}
             onPress={() => setOpen(false)}
@@ -120,7 +119,10 @@ export function Picker({
             <View
               style={[
                 styles.listHeader,
-                { borderBottomColor: colors.border, backgroundColor: colors.surface },
+                {
+                  borderBottomColor: colors.border,
+                  backgroundColor: colors.surface,
+                },
               ]}
             >
               <Text
@@ -135,7 +137,7 @@ export function Picker({
                 onPress={() => setOpen(false)}
                 style={styles.closeButton}
               >
-                <AntIcon
+                <PhosphorIcon
                   name="close"
                   size="control"
                   color={colors.textSecondary}
@@ -172,7 +174,7 @@ export function Picker({
                     {item.label}
                   </Text>
                   {item.value === value ? (
-                    <AntIcon
+                    <PhosphorIcon
                       name="check"
                       size="compact"
                       color={colors.accent}

@@ -9,7 +9,7 @@ import {
   View,
 } from "react-native";
 
-import { AntIcon } from "../../design-system/AntIcon";
+import { PhosphorIcon } from "../../design-system/PhosphorIcon";
 
 import {
   PROVIDER_API_KEY_HINTS,
@@ -68,10 +68,7 @@ function KokoroStep({
   onDownloadKokoro,
 }: Pick<
   SetupGuideStepContentProps,
-  | "kokoroModel"
-  | "useKokoro"
-  | "onToggleKokoro"
-  | "onDownloadKokoro"
+  "kokoroModel" | "useKokoro" | "onToggleKokoro" | "onDownloadKokoro"
 >) {
   const { colors } = useTheme();
   const { t } = useLocalization();
@@ -138,7 +135,11 @@ function KokoroStep({
             {kokoroModel.busy ? (
               <ActivityIndicator size="small" color={colors.accent} />
             ) : (
-              <AntIcon name="download" size="compact" color={colors.accent} />
+              <PhosphorIcon
+                name="download"
+                size="compact"
+                color={colors.accent}
+              />
             )}
             <Text style={[styles.inlineLinkText, { color: colors.accent }]}>
               {t("setupGuideKokoroDownload")}
@@ -398,7 +399,7 @@ function ProviderStep({
               isProviderApiKeyVisible ? t("hideKey") : t("showKey")
             }
           >
-            <AntIcon
+            <PhosphorIcon
               name={isProviderApiKeyVisible ? "eye-invisible" : "eye"}
               size="compact"
               color={colors.textSecondary}

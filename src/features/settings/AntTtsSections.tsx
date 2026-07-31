@@ -10,7 +10,7 @@ import {
 } from "../../constants/ttsFallback";
 import { useLocalization } from "../../i18n";
 import { useTheme } from "../../theme/ThemeContext";
-import { AntIcon } from "../../design-system/AntIcon";
+import { PhosphorIcon } from "../../design-system/PhosphorIcon";
 import type {
   KokoroTtsFallbackRoute,
   ProviderTtsFallbackRoute,
@@ -137,7 +137,11 @@ export function AntTtsFallbackSection({
                 route: getFallbackRouteLabel(route, t),
               })}
             >
-              <AntIcon name="arrow-up" size="compact" color={colors.accent} />
+              <PhosphorIcon
+                name="arrow-up"
+                size="compact"
+                color={colors.accent}
+              />
             </Button>
             <Button
               size="small"
@@ -160,7 +164,7 @@ export function AntTtsFallbackSection({
                 route: getFallbackRouteLabel(route, t),
               })}
             >
-              <AntIcon
+              <PhosphorIcon
                 name="arrow-down"
                 size="compact"
                 color={colors.accent}
@@ -178,7 +182,11 @@ export function AntTtsFallbackSection({
                 route: getFallbackRouteLabel(route, t),
               })}
             >
-              <AntIcon name="close" size="compact" color={colors.onDanger} />
+              <PhosphorIcon
+                name="close"
+                size="compact"
+                color={colors.onDanger}
+              />
             </Button>
           </View>
         ))

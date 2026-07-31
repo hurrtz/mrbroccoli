@@ -50,7 +50,7 @@ describe("AntPickerRow", () => {
     );
 
     expect(screen.getByText("OpenAI")).toBeTruthy();
-    expect(screen.queryByTestId("ant-icon-down")).toBeNull();
+    expect(screen.queryByTestId("phosphor-icon-down")).toBeNull();
     expect(itemStyle.borderWidth).toBeUndefined();
   });
 
@@ -79,7 +79,7 @@ describe("AntPickerRow", () => {
     const screen = renderPickerRow(2, onChange);
 
     expect(screen.getByText("OpenAI")).toBeTruthy();
-    expect(screen.getByTestId("ant-icon-down")).toBeTruthy();
+    expect(screen.getByTestId("phosphor-icon-down")).toBeTruthy();
 
     fireEvent.press(screen.getByTestId("provider-picker"));
 
@@ -129,7 +129,7 @@ describe("AntPickerRow", () => {
 
     expect(screen.getByText("Singapore")).toBeTruthy();
     expect(screen.queryByText("Region")).toBeNull();
-    expect(screen.getByTestId("ant-icon-down")).toBeTruthy();
+    expect(screen.getByTestId("phosphor-icon-down")).toBeTruthy();
   });
 
   it("lets a standalone dropdown align with surrounding cards", () => {
@@ -175,6 +175,40 @@ describe("AntPickerRow", () => {
 });
 
 describe("AntRadioSection", () => {
+  it("uses the full row to select an option and preserves disabled state", () => {
+    const onChange = jest.fn();
+    const screen = render(
+      <LocalizationProvider language="en">
+        <ThemeProvider mode="light">
+          <AntRadioSection
+            testID="reply-playback"
+            label="Reply Playback"
+            options={[
+              { value: "stream", label: "Sentences Arrive" },
+              { value: "wait", label: "Full Reply First" },
+              { value: "disabled", label: "Unavailable", disabled: true },
+            ]}
+            value="stream"
+            onChange={onChange}
+          />
+        </ThemeProvider>
+      </LocalizationProvider>,
+    );
+
+    expect(
+      screen.getByTestId("reply-playback-stream").props.accessibilityState,
+    ).toEqual({ checked: true, disabled: false });
+    expect(
+      screen.getByTestId("reply-playback-wait").props.accessibilityState,
+    ).toEqual({ checked: false, disabled: false });
+
+    fireEvent.press(screen.getByTestId("reply-playback-wait"));
+    fireEvent.press(screen.getByTestId("reply-playback-disabled"));
+
+    expect(onChange).toHaveBeenCalledTimes(1);
+    expect(onChange).toHaveBeenCalledWith("wait");
+  });
+
   it("keeps explanatory option copy behind a working info action", () => {
     const screen = render(
       <LocalizationProvider language="en">

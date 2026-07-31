@@ -15,7 +15,6 @@ import {
   within,
 } from "@testing-library/react-native";
 import {
-  Button as AntButton,
   Card as AntCard,
   List,
   Modal as AntModal,
@@ -170,9 +169,9 @@ describe("SettingsModal", () => {
       ).toBe("center");
       expect(screen.queryByTestId("settings-header-gradient")).toBeNull();
       expect(screen.queryByTestId("settings-modal-gradient")).toBeNull();
-      expect(screen.getByTestId("ant-icon-close")).toBeTruthy();
+      expect(screen.getByTestId("phosphor-icon-close")).toBeTruthy();
       expect(
-        screen.getAllByTestId("ant-icon-right").length,
+        screen.getAllByTestId("phosphor-icon-right").length,
       ).toBeGreaterThan(0);
       expect(screen.queryByText("Runtime Readiness")).toBeNull();
       expect(screen.getByText("Connections")).toBeTruthy();
@@ -192,7 +191,7 @@ describe("SettingsModal", () => {
     await waitFor(() => {
       expect(screen.queryByText("Back to overview")).toBeNull();
       expect(screen.getByLabelText("Back to overview")).toBeTruthy();
-      expect(screen.getByTestId("ant-icon-arrow-left")).toBeTruthy();
+      expect(screen.getByTestId("phosphor-icon-arrow-left")).toBeTruthy();
       expect(screen.getByTestId("settings-modal-title").props.children).toBe(
         "Connections",
       );
@@ -292,17 +291,17 @@ describe("SettingsModal", () => {
     );
 
     await waitFor(() => {
-      expect(screen.getAllByTestId("ant-icon-left").length).toBeGreaterThan(
-        0,
-      );
-      expect(screen.queryByTestId("ant-icon-right")).toBeNull();
+      expect(
+        screen.getAllByTestId("phosphor-icon-left").length,
+      ).toBeGreaterThan(0);
+      expect(screen.queryByTestId("phosphor-icon-right")).toBeNull();
     });
 
     fireEvent.press(screen.getByText(translate("ar", "settingsConnections")));
 
     await waitFor(() => {
-      expect(screen.getByTestId("ant-icon-arrow-right")).toBeTruthy();
-      expect(screen.queryByTestId("ant-icon-arrow-left")).toBeNull();
+      expect(screen.getByTestId("phosphor-icon-arrow-right")).toBeTruthy();
+      expect(screen.queryByTestId("phosphor-icon-arrow-left")).toBeNull();
     });
   });
 
@@ -1127,13 +1126,10 @@ describe("SettingsModal", () => {
       ),
     ).toBeNull();
 
-    const modelSelectionInfoButton = screen
-      .UNSAFE_getAllByType(AntButton)
-      .find(
-        (button) => button.props.accessibilityLabel === "About model selection",
-      );
-    expect(modelSelectionInfoButton).toBeDefined();
-    act(() => modelSelectionInfoButton!.props.onPress());
+    const modelSelectionInfoButton = screen.getByLabelText(
+      "About model selection",
+    );
+    fireEvent.press(modelSelectionInfoButton);
     let infoModal = screen.UNSAFE_getByType(AntModal);
     expect(infoModal.props.visible).toBe(true);
     expect(infoModal.props.title).toBe("Model Selection");
@@ -1145,14 +1141,10 @@ describe("SettingsModal", () => {
     act(() => infoModal.props.footer[0].onPress());
     expect(screen.UNSAFE_queryByType(AntModal)).toBeNull();
 
-    const systemPromptInfoButton = screen
-      .UNSAFE_getAllByType(AntButton)
-      .find(
-        (button) =>
-          button.props.accessibilityLabel === "About the system prompt",
-      );
-    expect(systemPromptInfoButton).toBeDefined();
-    act(() => systemPromptInfoButton!.props.onPress());
+    const systemPromptInfoButton = screen.getByLabelText(
+      "About the system prompt",
+    );
+    fireEvent.press(systemPromptInfoButton);
     infoModal = screen.UNSAFE_getByType(AntModal);
     expect(infoModal.props.visible).toBe(true);
     expect(infoModal.props.title).toBe("System Prompt");
@@ -1631,7 +1623,7 @@ describe("SettingsModal", () => {
 
     const clearAction = screen.getByLabelText("Clear recent speech activity");
     expect(
-      StyleSheet.flatten(screen.getByTestId("ant-icon-delete").props.style)
+      StyleSheet.flatten(screen.getByTestId("phosphor-icon-delete").props.style)
         .color,
     ).toBe("#DC2626");
 

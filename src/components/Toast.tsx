@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
-import { AntIcon } from "../design-system/AntIcon";
+import { PhosphorIcon } from "../design-system/PhosphorIcon";
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -93,7 +93,7 @@ export function Toast({
           { backgroundColor: toneBackground, borderColor: toneColor },
         ]}
       >
-        <AntIcon
+        <PhosphorIcon
           name={tone === "success" ? "check" : "exclamation-circle"}
           size="compact"
           color={toneColor}
@@ -134,7 +134,7 @@ export function Toast({
           accessibilityRole="button"
           accessibilityLabel={t("dismiss")}
         >
-          <AntIcon
+          <PhosphorIcon
             name="close"
             size="compact"
             color={colors.textSecondary}

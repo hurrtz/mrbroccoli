@@ -13,6 +13,7 @@ import {
   providerUsesTtsVoiceDirectory,
 } from "../../constants/models";
 import { antButtonTypography } from "../../design-system/antTypography";
+import { PhosphorIcon } from "../../design-system/PhosphorIcon";
 import { useLocalization } from "../../i18n";
 import type { ProviderVoiceDirectories } from "../../services/providerVoiceDirectory";
 import { useTheme } from "../../theme/ThemeContext";
@@ -154,10 +155,7 @@ export function AntProviderVoiceSection({
               {provider === "elevenlabs" &&
               isElevenLabsVoiceReadPermissionError(voiceDirectory.error) ? (
                 <Text
-                  style={[
-                    styles.helperText,
-                    { color: colors.textSecondary },
-                  ]}
+                  style={[styles.helperText, { color: colors.textSecondary }]}
                 >
                   {t("elevenLabsVoicesReadPermissionHint")}
                 </Text>
@@ -240,7 +238,15 @@ export function AntProviderVoiceSection({
               selectionColor={colors.accent}
               autoCapitalize="none"
               autoCorrect={false}
-              allowClear
+              allowClear={{
+                clearIcon: (
+                  <PhosphorIcon
+                    name="close"
+                    size="inline"
+                    color={colors.onPrimary}
+                  />
+                ),
+              }}
               inputStyle={{
                 color: colors.text,
                 fontFamily: fonts.body,

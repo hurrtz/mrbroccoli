@@ -3,7 +3,7 @@ import { StyleSheet, Text, View } from "react-native";
 
 import { Button } from "@ant-design/react-native";
 
-import { AntIconButton } from "../../design-system/AntIconButton";
+import { IconButton } from "../../design-system/IconButton";
 import { Colors } from "../../theme/colors";
 import { fonts } from "../../theme/typography";
 
@@ -34,7 +34,7 @@ export const MainScreenTopBar = React.memo(function MainScreenTopBar({
 }: MainScreenTopBarProps) {
   return (
     <View style={styles.topBar}>
-      <AntIconButton
+      <IconButton
         icon="menu"
         onPress={onOpenDrawer}
         accessibilityLabel={drawerLabel}
@@ -100,7 +100,7 @@ export const MainScreenTopBar = React.memo(function MainScreenTopBar({
           </Button>
         ) : null}
 
-        <AntIconButton
+        <IconButton
           icon="setting"
           onPress={onOpenSettings}
           accessibilityLabel={settingsLabel}

@@ -20,12 +20,8 @@ describe("ChatBubble", () => {
       .spyOn(Linking, "openURL")
       .mockResolvedValueOnce(undefined);
 
-    const {
-      getByLabelText,
-      getByTestId,
-      getByText,
-      queryByText,
-    } = renderWithProviders(
+    const { getByLabelText, getByTestId, getByText, queryByText } =
+      renderWithProviders(
         <ChatBubble
           message={{
             id: "assistant-1",
@@ -116,81 +112,81 @@ describe("ChatBubble", () => {
   it("keeps the execution receipt collapsed and reveals exact routes on demand", () => {
     const { getByLabelText, getByTestId, getByText, queryByText } =
       renderWithProviders(
-      <ChatBubble
-        message={{
-          id: "assistant-receipt",
-          role: "assistant",
-          content: "A transparent answer.",
-          model: "gpt-5.6",
-          provider: "openai",
-          timestamp: "2026-07-25T10:00:00.000Z",
-          metadata: {
-            turnReceipt: {
-              version: 1,
-              startedAt: "2026-07-25T09:59:55.000Z",
-              input: {
-                source: "voice",
-                mode: "provider",
-                provider: "openai",
-                model: "gpt-4o-transcribe",
-              },
-              requestedRoute: {
-                provider: "openai",
-                model: "gpt-5.6",
-              },
-              actualRoute: {
-                provider: "openai",
-                model: "gpt-5.6",
-              },
-              effort: {
-                selected: "xhigh",
-                label: "Extra high",
-                transportParameter: "reasoning_effort",
-                transportValue: "xhigh",
-                semantics: "provider-native",
-              },
-              webSearch: {
-                mode: "on",
-                provider: "openai",
-                requested: true,
-                ready: true,
-                used: true,
-                fellBack: false,
-                decisionReason: "manual-on",
-                model: "gpt-5.6-sol",
-              },
-              speechOutput: {
-                enabled: true,
-                requestedMode: "provider",
-                actualMode: "native",
-                provider: "elevenlabs",
-                model: "eleven_multilingual_v2",
-                voice: "Rachel",
-                fellBack: true,
-                fallbackReason: "The provider voice timed out.",
-              },
-              context: {
-                existingSummaryReused: true,
-                summaryUpdateRequested: true,
-                summaryUpdated: true,
-                fallbackUsed: false,
-                messagesAvailable: 14,
-                messagesSent: 6,
-                messagesSummarized: 8,
-              },
-              timing: {
-                transcriptionMs: 800,
-                contextMs: 120,
-                webSearchMs: 900,
-                modelMs: 2_500,
-                firstSpeechMs: 4_500,
-                totalMs: 7_200,
+        <ChatBubble
+          message={{
+            id: "assistant-receipt",
+            role: "assistant",
+            content: "A transparent answer.",
+            model: "gpt-5.6",
+            provider: "openai",
+            timestamp: "2026-07-25T10:00:00.000Z",
+            metadata: {
+              turnReceipt: {
+                version: 1,
+                startedAt: "2026-07-25T09:59:55.000Z",
+                input: {
+                  source: "voice",
+                  mode: "provider",
+                  provider: "openai",
+                  model: "gpt-4o-transcribe",
+                },
+                requestedRoute: {
+                  provider: "openai",
+                  model: "gpt-5.6",
+                },
+                actualRoute: {
+                  provider: "openai",
+                  model: "gpt-5.6",
+                },
+                effort: {
+                  selected: "xhigh",
+                  label: "Extra high",
+                  transportParameter: "reasoning_effort",
+                  transportValue: "xhigh",
+                  semantics: "provider-native",
+                },
+                webSearch: {
+                  mode: "on",
+                  provider: "openai",
+                  requested: true,
+                  ready: true,
+                  used: true,
+                  fellBack: false,
+                  decisionReason: "manual-on",
+                  model: "gpt-5.6-sol",
+                },
+                speechOutput: {
+                  enabled: true,
+                  requestedMode: "provider",
+                  actualMode: "native",
+                  provider: "elevenlabs",
+                  model: "eleven_multilingual_v2",
+                  voice: "Rachel",
+                  fellBack: true,
+                  fallbackReason: "The provider voice timed out.",
+                },
+                context: {
+                  existingSummaryReused: true,
+                  summaryUpdateRequested: true,
+                  summaryUpdated: true,
+                  fallbackUsed: false,
+                  messagesAvailable: 14,
+                  messagesSent: 6,
+                  messagesSummarized: 8,
+                },
+                timing: {
+                  transcriptionMs: 800,
+                  contextMs: 120,
+                  webSearchMs: 900,
+                  modelMs: 2_500,
+                  firstSpeechMs: 4_500,
+                  totalMs: 7_200,
+                },
               },
             },
-          },
-        }}
-      />,
-    );
+          }}
+        />,
+      );
 
     expect(getByText("Turn details")).toBeTruthy();
     expect(queryByText("Requested reply route")).toBeNull();
@@ -358,11 +354,11 @@ describe("ChatBubble", () => {
       ),
     ).toEqual(expect.objectContaining({ height: 44, width: 44 }));
     for (const icon of ["copy", "share-alt", "sound"]) {
-      expect(
-        StyleSheet.flatten(
-          assistant.getByTestId(`ant-icon-${icon}`).props.style,
-        ).fontSize,
-      ).toBe(20);
+      const iconStyle = StyleSheet.flatten(
+        assistant.getByTestId(`phosphor-icon-${icon}`).props.style,
+      );
+      expect(iconStyle.width).toBe(20);
+      expect(iconStyle.height).toBe(20);
     }
 
     const user = renderWithProviders(
@@ -398,15 +394,11 @@ describe("ChatBubble", () => {
       timestamp: "2026-07-22T10:02:00.000Z",
     };
     const screen = renderWithProviders(
-      <ChatBubble
-        selectable
-        message={assistantMessage}
-        onCopy={onCopy}
-      />,
+      <ChatBubble selectable message={assistantMessage} onCopy={onCopy} />,
     );
 
     try {
-      expect(screen.getByTestId("ant-icon-copy")).toBeTruthy();
+      expect(screen.getByTestId("phosphor-icon-copy")).toBeTruthy();
 
       await act(async () => {
         fireEvent.press(screen.getByLabelText("Copy"));
@@ -416,24 +408,25 @@ describe("ChatBubble", () => {
       const confirmedButton = screen.getByTestId(
         "message-copy-action-assistant-copy-confirmation",
       );
-      expect(screen.getByTestId("ant-icon-check")).toBeTruthy();
+      expect(screen.getByTestId("phosphor-icon-check")).toBeTruthy();
       expect(
         StyleSheet.flatten(confirmedButton.props.style).backgroundColor,
       ).toBe(lightColors.success);
       expect(
-        StyleSheet.flatten(screen.getByTestId("ant-icon-check").props.style)
-          .color,
+        StyleSheet.flatten(
+          screen.getByTestId("phosphor-icon-check").props.style,
+        ).color,
       ).toBe(getAccessibleForeground(lightColors.success));
 
       act(() => {
         jest.advanceTimersByTime(2_999);
       });
-      expect(screen.getByTestId("ant-icon-check")).toBeTruthy();
+      expect(screen.getByTestId("phosphor-icon-check")).toBeTruthy();
 
       act(() => {
         jest.advanceTimersByTime(1);
       });
-      expect(screen.getByTestId("ant-icon-copy")).toBeTruthy();
+      expect(screen.getByTestId("phosphor-icon-copy")).toBeTruthy();
     } finally {
       screen.unmount();
       jest.runOnlyPendingTimers();
@@ -461,13 +454,12 @@ describe("ChatBubble", () => {
 
     expect(
       StyleSheet.flatten(
-        screen.getByTestId(
-          "message-repeat-action-assistant-repeat-speaking",
-        ).props.style,
+        screen.getByTestId("message-repeat-action-assistant-repeat-speaking")
+          .props.style,
       ).backgroundColor,
     ).toBe(lightColors.success);
     expect(
-      StyleSheet.flatten(screen.getByTestId("ant-icon-stop").props.style)
+      StyleSheet.flatten(screen.getByTestId("phosphor-icon-stop").props.style)
         .color,
     ).toBe(getAccessibleForeground(lightColors.success));
   });
@@ -502,8 +494,9 @@ describe("ChatBubble", () => {
         ).backgroundColor,
       ).toBe(colors.phaseSynthesizing);
       expect(
-        StyleSheet.flatten(screen.getByTestId("ant-icon-loading").props.style)
-          .color,
+        StyleSheet.flatten(
+          screen.getByTestId("phosphor-icon-loading").props.style,
+        ).color,
       ).toBe(getAccessibleForeground(colors.phaseSynthesizing));
       screen.unmount();
     },
@@ -527,8 +520,8 @@ describe("ChatBubble", () => {
 
     fireEvent.press(screen.getByLabelText("Copy"));
 
-    expect(screen.getByTestId("ant-icon-copy")).toBeTruthy();
-    expect(screen.queryByTestId("ant-icon-check")).toBeNull();
+    expect(screen.getByTestId("phosphor-icon-copy")).toBeTruthy();
+    expect(screen.queryByTestId("phosphor-icon-check")).toBeNull();
     expect(
       StyleSheet.flatten(
         screen.getByTestId("message-copy-action-assistant-copy-failed").props

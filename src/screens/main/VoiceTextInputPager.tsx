@@ -1,13 +1,11 @@
-import { AntIcon } from "../../design-system/AntIcon";
+import { PhosphorIcon } from "../../design-system/PhosphorIcon";
 import React from "react";
 import { Text, TouchableOpacity, View } from "react-native";
 import { PhaseAwareVoiceAction } from "./PhaseAwareVoiceAction";
 import { DriveSessionControls } from "./voiceTextInputPager/DriveSessionControls";
 import { InputSurfaceIndicators } from "./voiceTextInputPager/InputSurfaceIndicators";
 import { InputSurfacePages } from "./voiceTextInputPager/InputSurfacePages";
-import {
-  voiceTextInputPagerStyles as styles,
-} from "./voiceTextInputPager/styles";
+import { voiceTextInputPagerStyles as styles } from "./voiceTextInputPager/styles";
 import {
   InputSurface,
   VoiceTextInputPagerProps,
@@ -100,9 +98,7 @@ export function VoiceTextInputPager({
           <View style={styles.activeActionOverlay}>
             <PhaseAwareVoiceAction
               colors={colors}
-              driveSilenceCountdownSeconds={
-                driveSilenceCountdownSeconds
-              }
+              driveSilenceCountdownSeconds={driveSilenceCountdownSeconds}
               driveVoiceActive={driveVoiceActive}
               inputMode={inputMode}
               layout={layout}
@@ -140,7 +136,7 @@ export function VoiceTextInputPager({
             },
           ]}
         >
-          <AntIcon
+          <PhosphorIcon
             name="exclamation-circle"
             size="compact"
             color={colors.danger}
@@ -158,17 +154,14 @@ export function VoiceTextInputPager({
             </Text>
             {onResolvePromptBlock ? (
               <Text
-                style={[
-                  styles.promptBlockedAction,
-                  { color: colors.accent },
-                ]}
+                style={[styles.promptBlockedAction, { color: colors.accent }]}
               >
                 {t("openSpeakingSettings")}
               </Text>
             ) : null}
           </View>
           {onResolvePromptBlock ? (
-            <AntIcon
+            <PhosphorIcon
               name="right"
               size="compact"
               color={colors.textSecondary}

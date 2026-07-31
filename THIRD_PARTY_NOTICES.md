@@ -398,7 +398,7 @@ SOFTWARE.
 ```
 
 ### @expo/cli@57.0.11
-Packages (42): @expo/cli@57.0.11, @expo/config-plugins@57.0.6, @expo/config@57.0.6, @expo/devtools@57.0.1, @expo/dom-webview@57.0.1, @expo/expo-modules-macros-plugin@0.6.1, @expo/fingerprint@0.20.6, @expo/image-utils@0.11.4, @expo/inline-modules@0.1.4, @expo/json-file@11.0.1, @expo/local-build-cache-provider@57.0.5, @expo/log-box@57.0.2, @expo/metro-config@57.0.7, @expo/metro-file-map@57.0.1, @expo/metro-runtime@57.0.8, @expo/osascript@2.7.1, @expo/package-manager@1.13.1, @expo/plist@0.8.1, @expo/prebuild-config@57.0.10, @expo/router-server@57.0.4, babel-preset-expo@57.0.5, expo-asset@57.0.8, expo-audio@57.0.3, expo-clipboard@57.0.1, expo-constants@57.0.8, expo-crypto@57.0.1, expo-document-picker@57.0.1, expo-file-system@57.0.1, expo-font@57.0.1, expo-glass-effect@57.0.1, expo-keep-awake@57.0.1, expo-linking@57.0.4, expo-modules-autolinking@57.0.9, expo-modules-core@57.0.8, expo-modules-jsi@57.0.4, expo-secure-store@57.0.1, expo-server@57.0.1, expo-sharing@57.0.8, expo-speech@57.0.1, expo-status-bar@57.0.1, expo-symbols@57.0.1, expo@57.0.9
+Packages (43): @expo/cli@57.0.11, @expo/config-plugins@57.0.6, @expo/config@57.0.6, @expo/devtools@57.0.1, @expo/dom-webview@57.0.1, @expo/expo-modules-macros-plugin@0.6.1, @expo/fingerprint@0.20.6, @expo/image-utils@0.11.4, @expo/inline-modules@0.1.4, @expo/json-file@11.0.1, @expo/local-build-cache-provider@57.0.5, @expo/log-box@57.0.2, @expo/metro-config@57.0.7, @expo/metro-file-map@57.0.1, @expo/metro-runtime@57.0.8, @expo/osascript@2.7.1, @expo/package-manager@1.13.1, @expo/plist@0.8.1, @expo/prebuild-config@57.0.10, @expo/router-server@57.0.4, babel-preset-expo@57.0.5, expo-asset@57.0.8, expo-audio@57.0.3, expo-clipboard@57.0.1, expo-constants@57.0.8, expo-crypto@57.0.1, expo-document-picker@57.0.1, expo-file-system@57.0.1, expo-font@57.0.1, expo-glass-effect@57.0.1, expo-keep-awake@57.0.1, expo-linking@57.0.4, expo-modules-autolinking@57.0.9, expo-modules-core@57.0.8, expo-modules-jsi@57.0.4, expo-network@57.0.1, expo-secure-store@57.0.1, expo-server@57.0.1, expo-sharing@57.0.8, expo-speech@57.0.1, expo-status-bar@57.0.1, expo-symbols@57.0.1, expo@57.0.9
 
 License: MIT
 
@@ -9273,6 +9273,33 @@ License: MIT
 The MIT License (MIT)
 
 Copyright (c) 2015 Javier Blanco
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+```
+
+### phosphor-react-native@3.0.6
+License: MIT
+
+```text
+MIT License
+
+Copyright (c) 2020 Dustin Do
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

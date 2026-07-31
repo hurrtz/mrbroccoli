@@ -2,7 +2,7 @@ import React from "react";
 import { Linking, Pressable, ScrollView, Text, View } from "react-native";
 
 import { Tag } from "@ant-design/react-native";
-import { AntIcon } from "../../../design-system/AntIcon";
+import { PhosphorIcon } from "../../../design-system/PhosphorIcon";
 
 import { getAppProviderForCatalogProviderId } from "../../../catalog/appProviders";
 import type { CatalogProviderId } from "../../../catalog";
@@ -249,7 +249,7 @@ export function ConnectionsSettingsPage({
                         : "createApiKey",
                     )}: ${PROVIDER_LABELS[provider]}`}
                   >
-                    <AntIcon
+                    <PhosphorIcon
                       name="key"
                       size="control"
                       color={colors.textSecondary}
@@ -266,7 +266,7 @@ export function ConnectionsSettingsPage({
                       PROVIDER_LABELS[provider]
                     }`}
                   >
-                    <AntIcon
+                    <PhosphorIcon
                       name="info-circle"
                       size="control"
                       color={colors.textSecondary}

@@ -11,7 +11,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { APP_MODAL_ORIENTATIONS } from "../../constants/layout";
-import { AntIconButton } from "../../design-system/AntIconButton";
+import { IconButton } from "../../design-system/IconButton";
 import {
   getResponseLengthOptions,
   getResponseToneOptions,
@@ -128,7 +128,7 @@ export const StyleSheetModal = React.memo(function StyleSheetModal({
                 {t("styleSheetSubtitle")}
               </Text>
             </View>
-            <AntIconButton
+            <IconButton
               testID="conversation-settings-close"
               icon="close"
               style={[

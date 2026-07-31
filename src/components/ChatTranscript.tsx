@@ -10,7 +10,7 @@ import {
   View,
   ViewStyle,
 } from "react-native";
-import { AntIcon } from "../design-system/AntIcon";
+import { PhosphorIcon } from "../design-system/PhosphorIcon";
 import { ChatBubble } from "./ChatBubble";
 import { useLocalization } from "../i18n";
 import { useTheme } from "../theme/ThemeContext";
@@ -171,10 +171,7 @@ export function ChatTranscript({
       return;
     }
 
-    if (
-      !latestUserMessageId ||
-      previous.messageId === latestUserMessageId
-    ) {
+    if (!latestUserMessageId || previous.messageId === latestUserMessageId) {
       return;
     }
 
@@ -254,8 +251,7 @@ export function ChatTranscript({
       setTailState(isAtTail);
 
       const movingAwayFromTail =
-        distanceFromBottom >
-        previousDistanceFromBottom + SCROLL_AWAY_DELTA_PX;
+        distanceFromBottom > previousDistanceFromBottom + SCROLL_AWAY_DELTA_PX;
 
       if (movingAwayFromTail) {
         userMovedAwayFromTailRef.current = true;
@@ -278,10 +274,8 @@ export function ChatTranscript({
   }, []);
 
   const handleScrollInteractionEnd = useCallback(() => {
-    const isAtTail =
-      distanceFromBottomRef.current <= AT_TAIL_THRESHOLD_PX;
-    followTailRef.current =
-      isAtTail && !userMovedAwayFromTailRef.current;
+    const isAtTail = distanceFromBottomRef.current <= AT_TAIL_THRESHOLD_PX;
+    followTailRef.current = isAtTail && !userMovedAwayFromTailRef.current;
     userScrollingRef.current = false;
     userMovedAwayFromTailRef.current = false;
     setTailState(isAtTail);
@@ -330,7 +324,7 @@ export function ChatTranscript({
       ]}
       ListEmptyComponent={
         <View style={styles.emptyCard}>
-          <AntIcon
+          <PhosphorIcon
             testID="empty-transcript-icon"
             name="info-circle"
             size="navigation"

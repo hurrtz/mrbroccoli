@@ -1,7 +1,7 @@
 import React from "react";
 import { FlatList, Text, View } from "react-native";
 
-import { AntIcon } from "../../design-system/AntIcon";
+import { PhosphorIcon } from "../../design-system/PhosphorIcon";
 
 import { useLocalization } from "../../i18n";
 import { useTheme } from "../../theme/ThemeContext";
@@ -60,11 +60,7 @@ export function ConversationDrawerList({
               },
             ]}
           >
-            <AntIcon
-              name="message"
-              size="control"
-              color={colors.accent}
-            />
+            <PhosphorIcon name="message" size="control" color={colors.accent} />
           </View>
           <Text
             style={[

@@ -1,5 +1,5 @@
 import React from "react";
-import { StyleSheet, Text } from "react-native";
+import { StyleSheet } from "react-native";
 import { render } from "@testing-library/react-native";
 
 import appConfig from "../../app.json";
@@ -21,10 +21,7 @@ describe("AntSettingsOverview", () => {
     const screen = render(
       <ThemeProvider mode="light">
         <LocalizationProvider language="en">
-          <AntSettingsOverview
-            readiness={readiness}
-            onOpenPage={jest.fn()}
-          />
+          <AntSettingsOverview readiness={readiness} onOpenPage={jest.fn()} />
         </LocalizationProvider>
       </ThemeProvider>,
     );
@@ -32,11 +29,9 @@ describe("AntSettingsOverview", () => {
     const thinkChip = screen.getByLabelText("Think: Ready");
     const speakChip = screen.getByLabelText("Speak: Off");
 
-    expect(screen.getAllByTestId("ant-icon-check")).toHaveLength(2);
+    expect(screen.getAllByTestId("phosphor-icon-check")).toHaveLength(2);
     expect(
-      StyleSheet.flatten(
-        screen.getByText("Think").props.style,
-      ).fontSize,
+      StyleSheet.flatten(screen.getByText("Think").props.style).fontSize,
     ).toBe(12);
     expect(thinkChip).toBeTruthy();
     expect(speakChip).toBeTruthy();
@@ -68,10 +63,7 @@ describe("AntSettingsOverview", () => {
     const screen = render(
       <ThemeProvider mode="light">
         <LocalizationProvider language="en">
-          <AntSettingsOverview
-            readiness={readiness}
-            onOpenPage={jest.fn()}
-          />
+          <AntSettingsOverview readiness={readiness} onOpenPage={jest.fn()} />
         </LocalizationProvider>
       </ThemeProvider>,
     );
@@ -85,10 +77,7 @@ describe("AntSettingsOverview", () => {
     const screen = render(
       <ThemeProvider mode="light">
         <LocalizationProvider language="en">
-          <AntSettingsOverview
-            readiness={readiness}
-            onOpenPage={jest.fn()}
-          />
+          <AntSettingsOverview readiness={readiness} onOpenPage={jest.fn()} />
         </LocalizationProvider>
       </ThemeProvider>,
     );
@@ -98,12 +87,13 @@ describe("AntSettingsOverview", () => {
     );
     const containerStyle = StyleSheet.flatten(iconContainer.props.style);
     const iconStyle = StyleSheet.flatten(
-      iconContainer.findByType(Text).props.style,
+      screen.getByTestId("phosphor-icon-key").props.style,
     );
 
     expect(containerStyle.width).toBe(34);
     expect(containerStyle.borderWidth).toBeUndefined();
-    expect(iconStyle.fontSize).toBe(28);
+    expect(iconStyle.width).toBe(28);
+    expect(iconStyle.height).toBe(28);
     expect(iconStyle.color).toBe(lightColors.text);
   });
 });

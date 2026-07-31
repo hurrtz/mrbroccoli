@@ -1,4 +1,7 @@
-import { AntIcon, type AntIconName } from "../../design-system/AntIcon";
+import {
+  PhosphorIcon,
+  type PhosphorIconName,
+} from "../../design-system/PhosphorIcon";
 import React from "react";
 import {
   AccessibilityInfo,
@@ -20,16 +23,9 @@ import Animated, {
 import Svg, { Path } from "react-native-svg";
 
 import { useReducedMotion } from "../../hooks/useReducedMotion";
-import {
-  Colors,
-  getAccessibleForeground,
-} from "../../theme/colors";
+import { Colors, getAccessibleForeground } from "../../theme/colors";
 import { fonts } from "../../theme/typography";
-import {
-  InputMode,
-  VoiceTimingProgress,
-  VoiceVisualPhase,
-} from "../../types";
+import { InputMode, VoiceTimingProgress, VoiceVisualPhase } from "../../types";
 import { getVoiceEta } from "../../utils/voiceEta";
 
 import { TranslateFn } from "./shared";
@@ -56,7 +52,7 @@ interface PhaseAwareVoiceActionProps {
 function getPhaseIcon(
   visualPhase: VoiceVisualPhase,
   playbackPaused: boolean,
-): AntIconName {
+): PhosphorIconName {
   switch (visualPhase) {
     case "recording":
       return "stop";
@@ -152,15 +148,9 @@ function getRoundedRectPerimeter(
   height: number,
   radius: number,
 ) {
-  const safeRadius = Math.max(
-    0,
-    Math.min(radius, width / 2, height / 2),
-  );
+  const safeRadius = Math.max(0, Math.min(radius, width / 2, height / 2));
 
-  return (
-    2 * (width + height - 4 * safeRadius) +
-    2 * Math.PI * safeRadius
-  );
+  return 2 * (width + height - 4 * safeRadius) + 2 * Math.PI * safeRadius;
 }
 
 function getTopCenterRoundedRectHalfPaths(
@@ -216,17 +206,9 @@ function SpeechStartTimelineBorder({
   const rectWidth = Math.max(0, width - TIMELINE_BORDER_WIDTH);
   const rectHeight = Math.max(0, height - TIMELINE_BORDER_WIDTH);
   const radius = Math.max(0, 17 - TIMELINE_BORDER_INSET);
-  const perimeter = getRoundedRectPerimeter(
-    rectWidth,
-    rectHeight,
-    radius,
-  );
+  const perimeter = getRoundedRectPerimeter(rectWidth, rectHeight, radius);
   const halfPerimeter = perimeter / 2;
-  const paths = getTopCenterRoundedRectHalfPaths(
-    width,
-    height,
-    radius,
-  );
+  const paths = getTopCenterRoundedRectHalfPaths(width, height, radius);
 
   React.useEffect(() => {
     cancelAnimation(expectedProgress);
@@ -243,15 +225,9 @@ function SpeechStartTimelineBorder({
     const expectedElapsedMs = Math.min(elapsedMs, estimatedMs);
     const overtimeElapsedMs = Math.max(0, elapsedMs - estimatedMs);
     const expectedFraction = expectedElapsedMs / estimatedMs;
-    const overtimeFraction = Math.min(
-      1,
-      overtimeElapsedMs / estimatedMs,
-    );
+    const overtimeFraction = Math.min(1, overtimeElapsedMs / estimatedMs);
     const expectedRemainingMs = Math.max(0, estimatedMs - elapsedMs);
-    const overtimeRemainingMs = Math.max(
-      0,
-      estimatedMs - overtimeElapsedMs,
-    );
+    const overtimeRemainingMs = Math.max(0, estimatedMs - overtimeElapsedMs);
 
     expectedProgress.value = expectedFraction;
     overtimeProgress.value = overtimeFraction;
@@ -292,8 +268,7 @@ function SpeechStartTimelineBorder({
     strokeDashoffset: halfPerimeter * expectedProgress.value,
   }));
   const overtimeAnimatedProps = useAnimatedProps(() => ({
-    strokeDashoffset:
-      halfPerimeter * (1 - overtimeProgress.value),
+    strokeDashoffset: halfPerimeter * (1 - overtimeProgress.value),
   }));
 
   if (!progress || width <= 0 || height <= 0 || perimeter <= 0) {
@@ -395,12 +370,7 @@ export function PhaseAwareVoiceAction({
   const phaseColor = getPhaseColor(visualPhase, colors);
   const phaseForeground = getAccessibleForeground(phaseColor);
   const animatedPhaseColor = useSharedValue(phaseColor);
-  const phaseCopy = getPhaseCopy(
-    visualPhase,
-    inputMode,
-    playbackPaused,
-    t,
-  );
+  const phaseCopy = getPhaseCopy(visualPhase, inputMode, playbackPaused, t);
   const isLandscape = layout === "landscape";
   const showSpeechEta =
     visualPhase !== "recording" &&
@@ -417,13 +387,13 @@ export function PhaseAwareVoiceAction({
     : 0;
   const countdownFontSize = 20 + countdownUrgency * 1.5;
   const countdownColor =
-    driveSilenceCountdownSeconds !== null &&
-    driveSilenceCountdownSeconds <= 3
+    driveSilenceCountdownSeconds !== null && driveSilenceCountdownSeconds <= 3
       ? colors.danger
       : phaseColor;
-  const accessibilityLabelBase = showSpeechEta && speechEta
-    ? `${phaseCopy.title}. ${phaseCopy.prompt}. ${speechEta.label}`
-    : statusLabel;
+  const accessibilityLabelBase =
+    showSpeechEta && speechEta
+      ? `${phaseCopy.title}. ${phaseCopy.prompt}. ${speechEta.label}`
+      : statusLabel;
   const accessibilityLabel = showDriveCountdown
     ? `${statusLabel}. ${driveSilenceCountdownSeconds}s`
     : accessibilityLabelBase;
@@ -456,10 +426,7 @@ export function PhaseAwareVoiceAction({
       const safeRecordingMaxMs = Math.max(1000, recordingMaxMs);
       const startedAtMs = recordingStartedAtMs ?? Date.now();
       const elapsedMs = Math.max(0, Date.now() - startedAtMs);
-      const elapsedFraction = Math.min(
-        1,
-        elapsedMs / safeRecordingMaxMs,
-      );
+      const elapsedFraction = Math.min(1, elapsedMs / safeRecordingMaxMs);
       recordingProgress.value = elapsedFraction;
 
       if (elapsedFraction < 1) {
@@ -471,12 +438,7 @@ export function PhaseAwareVoiceAction({
     }
 
     return () => cancelAnimation(recordingProgress);
-  }, [
-    recordingMaxMs,
-    recordingProgress,
-    recordingStartedAtMs,
-    visualPhase,
-  ]);
+  }, [recordingMaxMs, recordingProgress, recordingStartedAtMs, visualPhase]);
 
   React.useEffect(() => {
     if (!showSpeechEta) {
@@ -498,17 +460,14 @@ export function PhaseAwareVoiceAction({
   const surfaceColorStyle = useAnimatedStyle(() => ({
     backgroundColor: animatedPhaseColor.value,
   }));
-  const handleSurfaceLayout = React.useCallback(
-    (event: LayoutChangeEvent) => {
-      const { height, width } = event.nativeEvent.layout;
-      setSurfaceSize((current) =>
-        current.height === height && current.width === width
-          ? current
-          : { height, width },
-      );
-    },
-    [],
-  );
+  const handleSurfaceLayout = React.useCallback((event: LayoutChangeEvent) => {
+    const { height, width } = event.nativeEvent.layout;
+    setSurfaceSize((current) =>
+      current.height === height && current.width === width
+        ? current
+        : { height, width },
+    );
+  }, []);
 
   return (
     <Animated.View
@@ -539,10 +498,7 @@ export function PhaseAwareVoiceAction({
       >
         <Animated.View
           testID="voice-stage-phase-icon"
-          style={[
-            styles.phaseIcon,
-            { backgroundColor: phaseForeground },
-          ]}
+          style={[styles.phaseIcon, { backgroundColor: phaseForeground }]}
         >
           {showDriveCountdown ? (
             <Text
@@ -558,7 +514,7 @@ export function PhaseAwareVoiceAction({
               {driveSilenceCountdownSeconds}
             </Text>
           ) : (
-            <AntIcon
+            <PhosphorIcon
               name={getPhaseIcon(visualPhase, playbackPaused)}
               size="control"
               color={phaseColor}
@@ -567,14 +523,8 @@ export function PhaseAwareVoiceAction({
         </Animated.View>
       </TouchableOpacity>
 
-      <View
-        pointerEvents="none"
-        style={styles.phaseCopy}
-      >
-        <View
-          testID="voice-stage-left-copy"
-          style={styles.sideCopy}
-        >
+      <View pointerEvents="none" style={styles.phaseCopy}>
+        <View testID="voice-stage-left-copy" style={styles.sideCopy}>
           {visualPhase === "speaking" ? null : showSpeechEta ? (
             <>
               <Text
@@ -582,9 +532,7 @@ export function PhaseAwareVoiceAction({
                 minimumFontScale={0.72}
                 numberOfLines={1}
                 style={[
-                  isLandscape
-                    ? styles.landscapePhaseTitle
-                    : styles.phaseTitle,
+                  isLandscape ? styles.landscapePhaseTitle : styles.phaseTitle,
                   { color: phaseForeground },
                 ]}
               >
@@ -611,10 +559,7 @@ export function PhaseAwareVoiceAction({
           )}
         </View>
 
-        <View
-          testID="voice-stage-phase-copy"
-          style={styles.sideCopy}
-        >
+        <View testID="voice-stage-phase-copy" style={styles.sideCopy}>
           {showSpeechEta && speechEta ? (
             <Text
               testID="voice-stage-speech-eta"
@@ -639,9 +584,7 @@ export function PhaseAwareVoiceAction({
                 minimumFontScale={0.76}
                 numberOfLines={1}
                 style={[
-                  isLandscape
-                    ? styles.landscapePhaseTitle
-                    : styles.phaseTitle,
+                  isLandscape ? styles.landscapePhaseTitle : styles.phaseTitle,
                   { color: phaseForeground },
                 ]}
               >
@@ -669,25 +612,17 @@ export function PhaseAwareVoiceAction({
           onPress={onStopPlayback}
           style={styles.stopPlaybackAction}
         >
-          <AntIcon
-            name="stop"
-            size="compact"
-            color={phaseForeground}
-          />
+          <PhosphorIcon name="stop" size="compact" color={phaseForeground} />
           <Text
             numberOfLines={1}
-            style={[
-              styles.stopPlaybackLabel,
-              { color: phaseForeground },
-            ]}
+            style={[styles.stopPlaybackLabel, { color: phaseForeground }]}
           >
             {t("stop")}
           </Text>
         </TouchableOpacity>
       ) : null}
 
-      {visualPhase !== "recording" &&
-      visualPhase !== "speaking" ? (
+      {visualPhase !== "recording" && visualPhase !== "speaking" ? (
         <SpeechStartTimelineBorder
           colors={colors}
           height={surfaceSize.height}

@@ -2,14 +2,14 @@ import React from "react";
 import { StyleSheet, Text, View } from "react-native";
 
 import { Button } from "@ant-design/react-native";
-import { AntIcon } from "../../../design-system/AntIcon";
+import { PhosphorIcon } from "../../../design-system/PhosphorIcon";
 
 import {
   MAX_RESPONSE_MODES,
   MIN_RESPONSE_MODES,
 } from "../../../constants/providers/defaults";
 import { antButtonTypography } from "../../../design-system/antTypography";
-import { AntIconButton } from "../../../design-system/AntIconButton";
+import { IconButton } from "../../../design-system/IconButton";
 import { useLocalization } from "../../../i18n";
 import { useRuntimeCapabilityOverrides } from "../../../hooks/useRuntimeCapabilityOverrides";
 import { useTheme } from "../../../theme/ThemeContext";
@@ -109,10 +109,10 @@ export function ThinkingSettingsPage({
                 title={t("responseModeItemTitle", { index: index + 1 })}
                 headerExtra={
                   canRemove ? (
-                    <AntIconButton
+                    <IconButton
                       accessibilityLabel={t("removeResponseMode")}
                       iconNode={
-                        <AntIcon
+                        <PhosphorIcon
                           name="delete"
                           size="control"
                           color={colors.danger}
@@ -127,9 +127,7 @@ export function ThinkingSettingsPage({
                 <AntPickerRows>
                   <AntPickerRow
                     testID={`settings-model-provider-${mode.id}`}
-                    label={
-                      llmProviders.length > 1 ? t("provider") : undefined
-                    }
+                    label={llmProviders.length > 1 ? t("provider") : undefined}
                     value={route.provider}
                     options={renderProviderPickerOptions(llmProviders)}
                     onChange={(value) => {
@@ -249,32 +247,20 @@ export function ThinkingSettingsPage({
               <AntNumberInputRow
                 label={t("ulraModeRounds")}
                 value={settings.ulraModeRounds}
-                onChange={(value) =>
-                  onUpdate({ ulraModeRounds: value })
-                }
+                onChange={(value) => onUpdate({ ulraModeRounds: value })}
               />
               <Text
-                style={[
-                  styles.helperText,
-                  { color: colors.textSecondary },
-                ]}
+                style={[styles.helperText, { color: colors.textSecondary }]}
               >
                 {t("ulraModeCallEstimate", {
-                  count:
-                    readyModelCount *
-                      (settings.ulraModeRounds + 1) +
-                    1,
+                  count: readyModelCount * (settings.ulraModeRounds + 1) + 1,
                 })}
               </Text>
-              {readyModelCount > 4 ||
-              settings.ulraModeRounds > 3 ? (
+              {readyModelCount > 4 || settings.ulraModeRounds > 3 ? (
                 <Text
                   testID="ulra-mode-threshold-warning"
                   accessibilityRole="alert"
-                  style={[
-                    styles.warningText,
-                    { color: colors.danger },
-                  ]}
+                  style={[styles.warningText, { color: colors.danger }]}
                 >
                   {t("ulraModeThresholdWarning")}
                 </Text>

@@ -1,18 +1,11 @@
 import React, { useState } from "react";
 import { Text, TouchableOpacity, View } from "react-native";
-import { AntIcon } from "../../design-system/AntIcon";
+import { PhosphorIcon } from "../../design-system/PhosphorIcon";
 
-import {
-  getProviderLabel,
-  getProviderModelName,
-} from "../../constants/models";
+import { getProviderLabel, getProviderModelName } from "../../constants/models";
 import { useLocalization } from "../../i18n";
 import { useTheme } from "../../theme/ThemeContext";
-import type {
-  Message,
-  MessageTurnReceipt,
-  Provider,
-} from "../../types";
+import type { Message, MessageTurnReceipt, Provider } from "../../types";
 import { styles } from "./styles";
 
 function formatDuration(durationMs?: number) {
@@ -160,17 +153,13 @@ function formatContext(
 ) {
   const context = receipt.context;
   const states = [
-    context.existingSummaryReused
-      ? t("turnReceiptSummaryReused")
-      : undefined,
+    context.existingSummaryReused ? t("turnReceiptSummaryReused") : undefined,
     context.summaryUpdated ? t("turnReceiptSummaryUpdated") : undefined,
     context.fallbackUsed ? t("turnReceiptContextFallback") : undefined,
     context.gatewayCompression
       ? t("turnReceiptGatewayCompression", {
-          original:
-            context.gatewayCompression.originalCount ?? "?",
-          compressed:
-            context.gatewayCompression.compressedCount ?? "?",
+          original: context.gatewayCompression.originalCount ?? "?",
+          compressed: context.gatewayCompression.compressedCount ?? "?",
         })
       : undefined,
   ].filter(Boolean);
@@ -261,13 +250,11 @@ export function TurnReceiptCard({ message }: { message: Message }) {
         accessibilityRole="button"
         accessibilityState={{ expanded }}
         accessibilityLabel={
-          expanded
-            ? t("collapseTurnReceipt")
-            : t("expandTurnReceipt")
+          expanded ? t("collapseTurnReceipt") : t("expandTurnReceipt")
         }
       >
         <View style={styles.turnReceiptTitleRow}>
-          <AntIcon name="line-chart" size="inline" color={colors.accent} />
+          <PhosphorIcon name="line-chart" size="inline" color={colors.accent} />
           <Text style={[styles.turnReceiptTitle, { color: colors.text }]}>
             {t("turnReceipt")}
           </Text>
@@ -276,14 +263,13 @@ export function TurnReceiptCard({ message }: { message: Message }) {
           <Text
             style={[styles.turnReceiptSummary, { color: colors.textMuted }]}
           >
-            {receipt.actualRoute.gateway ??
-              t("turnReceiptDirect")}
+            {receipt.actualRoute.gateway ?? t("turnReceiptDirect")}
             {" · "}
             {formatDuration(
               receipt.timing.totalMs ?? receipt.timing.replyReadyMs,
             )}
           </Text>
-          <AntIcon
+          <PhosphorIcon
             name={expanded ? "up" : "down"}
             size="compact"
             color={colors.textSecondary}
@@ -293,7 +279,10 @@ export function TurnReceiptCard({ message }: { message: Message }) {
 
       {expanded ? (
         <View style={styles.turnReceiptContent}>
-          <ReceiptRow label={t("turnReceiptRequested")} value={requestedRoute} />
+          <ReceiptRow
+            label={t("turnReceiptRequested")}
+            value={requestedRoute}
+          />
           <ReceiptRow label={t("turnReceiptActual")} value={actualRoute} />
           {receipt.effort ? (
             <ReceiptRow

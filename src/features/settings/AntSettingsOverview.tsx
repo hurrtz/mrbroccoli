@@ -5,7 +5,10 @@ import { List } from "@ant-design/react-native";
 
 import appConfig from "../../../app.json";
 import { useLocalization } from "../../i18n";
-import { AntIcon, type AntIconName } from "../../design-system/AntIcon";
+import {
+  PhosphorIcon,
+  type PhosphorIconName,
+} from "../../design-system/PhosphorIcon";
 import { useTheme } from "../../theme/ThemeContext";
 import { fonts } from "../../theme/typography";
 import type { SettingsReadiness } from "../settings-core/readiness";
@@ -34,7 +37,7 @@ type OverviewRow = {
     | "settingsSearchSummary"
     | "settingsDataPrivacySummary"
     | "settingsAppDiagnosticsSummary";
-  icon: AntIconName;
+  icon: PhosphorIconName;
 };
 
 const overviewRows: OverviewRow[] = [
@@ -151,7 +154,7 @@ export function AntSettingsOverview({
                   {t("settingsGuidedSetupSummary")}
                 </Text>
               </View>
-              <AntIcon
+              <PhosphorIcon
                 name={drillInIcon}
                 size="control"
                 color={colors.textMuted}
@@ -209,13 +212,13 @@ export function AntSettingsOverview({
                   ]}
                 >
                   {ready ? (
-                    <AntIcon
+                    <PhosphorIcon
                       name="check"
                       size="inline"
                       color={colors.success}
                     />
                   ) : broken ? (
-                    <AntIcon
+                    <PhosphorIcon
                       name="exclamation-circle"
                       size="inline"
                       color={colors.danger}
@@ -267,7 +270,7 @@ export function AntSettingsOverview({
                   testID={`settings-overview-icon-${row.page}`}
                   style={styles.sectionIcon}
                 >
-                  <AntIcon
+                  <PhosphorIcon
                     name={row.icon}
                     size="prominent"
                     color={colors.text}
@@ -275,7 +278,7 @@ export function AntSettingsOverview({
                 </View>
               }
               extra={
-                <AntIcon
+                <PhosphorIcon
                   name={drillInIcon}
                   size="control"
                   color={colors.textMuted}

@@ -51,7 +51,8 @@ describe("ChatTranscript follow-tail scrolling", () => {
     ).toEqual(
       expect.objectContaining({
         color: lightColors.textSecondary,
-        fontSize: 24,
+        width: 24,
+        height: 24,
       }),
     );
   });
@@ -135,10 +136,7 @@ describe("ChatTranscript follow-tail scrolling", () => {
     const renderTranscript = (messages: Message[]) => (
       <ThemeProvider mode="light">
         <LocalizationProvider language="en">
-          <ChatTranscript
-            conversationId="conversation-1"
-            messages={messages}
-          />
+          <ChatTranscript conversationId="conversation-1" messages={messages} />
         </LocalizationProvider>
       </ThemeProvider>
     );
@@ -198,10 +196,7 @@ describe("ChatTranscript follow-tail scrolling", () => {
     const renderTranscript = (messages: Message[]) => (
       <ThemeProvider mode="light">
         <LocalizationProvider language="en">
-          <ChatTranscript
-            conversationId="conversation-1"
-            messages={messages}
-          />
+          <ChatTranscript conversationId="conversation-1" messages={messages} />
         </LocalizationProvider>
       </ThemeProvider>
     );
@@ -248,10 +243,7 @@ describe("ChatTranscript follow-tail scrolling", () => {
     const renderTranscript = (messages: Message[]) => (
       <ThemeProvider mode="light">
         <LocalizationProvider language="en">
-          <ChatTranscript
-            conversationId="conversation-1"
-            messages={messages}
-          />
+          <ChatTranscript conversationId="conversation-1" messages={messages} />
         </LocalizationProvider>
       </ThemeProvider>
     );
@@ -341,10 +333,7 @@ describe("ChatTranscript follow-tail scrolling", () => {
     );
     const screen = render(renderTranscript(0));
 
-    fireEvent(
-      screen.getByTestId("chat-transcript-list"),
-      "scrollBeginDrag",
-    );
+    fireEvent(screen.getByTestId("chat-transcript-list"), "scrollBeginDrag");
     fireEvent(
       screen.getByTestId("chat-transcript-list"),
       "scroll",

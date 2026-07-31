@@ -2,9 +2,9 @@ import React from "react";
 import { ScrollView, Text, View } from "react-native";
 
 import { Modal } from "@ant-design/react-native";
-import { AntIcon } from "../../design-system/AntIcon";
+import { PhosphorIcon } from "../../design-system/PhosphorIcon";
 
-import { AntIconButton } from "../../design-system/AntIconButton";
+import { IconButton } from "../../design-system/IconButton";
 import { useLocalization } from "../../i18n";
 import { useTheme } from "../../theme/ThemeContext";
 import { fonts } from "../../theme/typography";
@@ -26,10 +26,10 @@ export function AntSettingsInfoButton({
 
   return (
     <>
-      <AntIconButton
+      <IconButton
         accessibilityLabel={accessibilityLabel}
         iconNode={
-          <AntIcon
+          <PhosphorIcon
             name="info-circle"
             size="control"
             color={colors.textSecondary}

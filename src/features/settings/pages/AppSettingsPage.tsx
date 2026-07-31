@@ -2,11 +2,11 @@ import React from "react";
 import { Text, View } from "react-native";
 
 import { Modal } from "@ant-design/react-native";
-import { AntIcon } from "../../../design-system/AntIcon";
+import { PhosphorIcon } from "../../../design-system/PhosphorIcon";
 
 import { getTtsListenLanguageLabel } from "../../../constants/localTts";
 import { PROVIDER_LABELS } from "../../../constants/models";
-import { AntIconButton } from "../../../design-system/AntIconButton";
+import { IconButton } from "../../../design-system/IconButton";
 import { useRuntimeCapabilityOverrides } from "../../../hooks/useRuntimeCapabilityOverrides";
 import { useLocalization } from "../../../i18n";
 import { clearRuntimeCapabilityOverrides } from "../../../services/runtimeCapabilityOverrides";
@@ -164,10 +164,10 @@ export function AppSettingsPage({
           title={t("runtimeCompatibilityOverrides")}
           extra={
             runtimeOverrides.length > 0 ? (
-              <AntIconButton
+              <IconButton
                 accessibilityLabel={t("clearRuntimeCompatibilityOverrides")}
                 iconNode={
-                  <AntIcon
+                  <PhosphorIcon
                     name="delete"
                     size="control"
                     color={colors.danger}
@@ -223,10 +223,10 @@ export function AppSettingsPage({
                 {t("speechDiagnosticsHint")}
               </AntSettingsInfoButton>
               {speechDiagnostics.length > 0 ? (
-                <AntIconButton
+                <IconButton
                   accessibilityLabel={t("clearSpeechDiagnostics")}
                   iconNode={
-                    <AntIcon
+                    <PhosphorIcon
                       name="delete"
                       size="control"
                       color={colors.danger}

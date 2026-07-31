@@ -1,13 +1,8 @@
 import React, { useEffect, useState } from "react";
-import {
-  StyleProp,
-  Text,
-  View,
-  ViewStyle,
-} from "react-native";
+import { StyleProp, Text, View, ViewStyle } from "react-native";
 
 import { ChatTranscript } from "../../components/ChatTranscript";
-import { AntIconButton } from "../../design-system/AntIconButton";
+import { IconButton } from "../../design-system/IconButton";
 import { Colors } from "../../theme/colors";
 import { Message } from "../../types";
 
@@ -74,8 +69,7 @@ export function TranscriptPreviewCard({
 
   const usesCanvasPresentation =
     layout === "landscape" || presentation === "canvas";
-  const usesPortraitCanvas =
-    layout === "portrait" && presentation === "canvas";
+  const usesPortraitCanvas = layout === "portrait" && presentation === "canvas";
   const showScrollToLatest =
     scrollEnabled && messages.length > 0 && !isAtTranscriptTail;
   const showHeaderControls =
@@ -126,7 +120,7 @@ export function TranscriptPreviewCard({
         {showHeaderControls ? (
           <View style={styles.transcriptHeaderControls}>
             {showStyleControl && onOpenStyleSheet ? (
-              <AntIconButton
+              <IconButton
                 testID="conversation-style-control"
                 icon="control"
                 iconSize="control"
@@ -136,7 +130,7 @@ export function TranscriptPreviewCard({
               />
             ) : null}
             {showScrollToLatest ? (
-              <AntIconButton
+              <IconButton
                 testID="scroll-to-latest-control"
                 icon="down"
                 iconSize="control"

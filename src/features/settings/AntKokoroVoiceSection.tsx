@@ -11,8 +11,8 @@ import {
 } from "../../constants/kokoro";
 import { getTtsListenLanguageLabel } from "../../constants/localTts";
 import { antButtonTypography } from "../../design-system/antTypography";
-import { AntIconButton } from "../../design-system/AntIconButton";
-import { AntIcon } from "../../design-system/AntIcon";
+import { IconButton } from "../../design-system/IconButton";
+import { PhosphorIcon } from "../../design-system/PhosphorIcon";
 import type { KokoroModelController } from "../../hooks/useKokoroModel";
 import { useLocalization } from "../../i18n";
 import { useTheme } from "../../theme/ThemeContext";
@@ -139,10 +139,14 @@ export function AntKokoroVoiceSection({
         title={t("kokoroModel")}
         headerExtra={
           model.installed ? (
-            <AntIconButton
+            <IconButton
               accessibilityLabel={t("removeKokoroModel")}
               iconNode={
-                <AntIcon name="delete" size="control" color={colors.danger} />
+                <PhosphorIcon
+                  name="delete"
+                  size="control"
+                  color={colors.danger}
+                />
               }
               onPress={handleRemove}
             />
@@ -207,7 +211,7 @@ export function AntKokoroVoiceSection({
             },
           ]}
         >
-          <AntIcon
+          <PhosphorIcon
             name="exclamation-circle"
             size="compact"
             color={colors.textSecondary}

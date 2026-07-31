@@ -9,7 +9,7 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 
-import { AntIcon } from "../../design-system/AntIcon";
+import { PhosphorIcon } from "../../design-system/PhosphorIcon";
 
 import { useReducedMotion } from "../../hooks/useReducedMotion";
 import { useLocalization } from "../../i18n";
@@ -28,14 +28,14 @@ function RepeatActionIcon({
   color: string;
 }) {
   if (state === "speaking") {
-    return <AntIcon name="stop" size="control" color={color} />;
+    return <PhosphorIcon name="stop" size="control" color={color} />;
   }
 
   if (state === "preparing") {
     return <PreparingRepeatIcon color={color} />;
   }
 
-  return <AntIcon name="sound" size="control" color={color} />;
+  return <PhosphorIcon name="sound" size="control" color={color} />;
 }
 
 function PreparingRepeatIcon({ color }: { color: string }) {
@@ -64,7 +64,7 @@ function PreparingRepeatIcon({ color }: { color: string }) {
 
   return (
     <Animated.View style={rotationStyle}>
-      <AntIcon name="loading" size="control" color={color} />
+      <PhosphorIcon name="loading" size="control" color={color} />
     </Animated.View>
   );
 }
@@ -127,10 +127,8 @@ export function MessageActions({
 >) {
   const { colors } = useTheme();
   const { t } = useLocalization();
-  const {
-    confirmed: copyConfirmed,
-    showConfirmation: showCopyConfirmation,
-  } = useTimedConfirmation(message.id);
+  const { confirmed: copyConfirmed, showConfirmation: showCopyConfirmation } =
+    useTimedConfirmation(message.id);
 
   const handleCopyPress = async () => {
     try {
@@ -176,7 +174,7 @@ export function MessageActions({
           accessibilityRole="button"
           accessibilityLabel={copyConfirmed ? t("messageCopied") : t("copy")}
         >
-          <AntIcon
+          <PhosphorIcon
             name={copyConfirmed ? "check" : "copy"}
             size="control"
             color={
@@ -201,7 +199,7 @@ export function MessageActions({
           accessibilityRole="button"
           accessibilityLabel={t("share")}
         >
-          <AntIcon
+          <PhosphorIcon
             name="share-alt"
             size="control"
             color={colors.textSecondary}

@@ -1,11 +1,6 @@
-import { AntIcon } from "../../../design-system/AntIcon";
+import { PhosphorIcon } from "../../../design-system/PhosphorIcon";
 import React from "react";
-import {
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { Text, TextInput, TouchableOpacity, View } from "react-native";
 import {
   GestureDetector,
   GestureType,
@@ -100,9 +95,7 @@ function VoiceInputSurface({
           backgroundColor: actionDisabled
             ? colors.surfaceAlt
             : colors.activeControl,
-          borderColor: actionDisabled
-            ? colors.border
-            : colors.activeControl,
+          borderColor: actionDisabled ? colors.border : colors.activeControl,
         },
       ]}
     >
@@ -127,12 +120,10 @@ function VoiceInputSurface({
             },
           ]}
         >
-          <AntIcon
+          <PhosphorIcon
             name="audio"
             size="navigation"
-            color={
-              actionDisabled ? colors.textMuted : colors.activeControlIcon
-            }
+            color={actionDisabled ? colors.textMuted : colors.activeControlIcon}
           />
         </View>
       )}
@@ -204,9 +195,7 @@ function TextInputSurface({
       </View>
       <TouchableOpacity
         testID="voice-text-primary-action"
-        accessibilityLabel={
-          promptBlockedActionLabel ?? t("sendTextMessage")
-        }
+        accessibilityLabel={promptBlockedActionLabel ?? t("sendTextMessage")}
         accessibilityRole="button"
         accessibilityState={{ disabled: textSubmitDisabled }}
         accessibilityValue={
@@ -241,12 +230,10 @@ function TextInputSurface({
             {promptBlockedActionLabel}
           </Text>
         ) : (
-          <AntIcon
+          <PhosphorIcon
             name="arrow-up"
             size="control"
-            color={
-              textSubmitDisabled ? colors.textMuted : colors.onPrimary
-            }
+            color={textSubmitDisabled ? colors.textMuted : colors.onPrimary}
           />
         )}
       </TouchableOpacity>
@@ -255,22 +242,15 @@ function TextInputSurface({
 }
 
 export function InputSurfacePages(props: InputSurfacePagesProps) {
-  const {
-    activeSurface,
-    isActive,
-    pageWidth,
-    panGesture,
-    trackAnimatedStyle,
-  } = props;
+  const { activeSurface, isActive, pageWidth, panGesture, trackAnimatedStyle } =
+    props;
 
   return (
     <GestureDetector gesture={panGesture}>
       <Animated.View
         testID="voice-text-input-pager"
         accessibilityElementsHidden={isActive}
-        importantForAccessibility={
-          isActive ? "no-hide-descendants" : "auto"
-        }
+        importantForAccessibility={isActive ? "no-hide-descendants" : "auto"}
         pointerEvents={isActive ? "none" : "auto"}
         style={[
           styles.track,

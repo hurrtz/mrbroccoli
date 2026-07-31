@@ -1,9 +1,9 @@
 import React from "react";
 import { Animated, Pressable, ScrollView, Text, View } from "react-native";
-import { AntIcon } from "../../design-system/AntIcon";
+import { PhosphorIcon } from "../../design-system/PhosphorIcon";
 import type { EdgeInsets } from "react-native-safe-area-context";
 import { Toast } from "../../components/Toast";
-import { AntIconButton } from "../../design-system/AntIconButton";
+import { IconButton } from "../../design-system/IconButton";
 import { useLocalization } from "../../i18n";
 import { useTheme } from "../../theme/ThemeContext";
 import type { SettingsPage } from "../settings-core/types";
@@ -105,9 +105,9 @@ export function AntSettingsFrame({
           ]}
         >
           {showsBackButton ? (
-            <AntIconButton
+            <IconButton
               iconNode={
-                <AntIcon
+                <PhosphorIcon
                   name={isRtl ? "arrow-right" : "arrow-left"}
                   size="navigation"
                   color={colors.textSecondary}
@@ -130,9 +130,9 @@ export function AntSettingsFrame({
               {title}
             </Text>
           </View>
-          <AntIconButton
+          <IconButton
             iconNode={
-              <AntIcon
+              <PhosphorIcon
                 name="close"
                 size="navigation"
                 color={colors.textSecondary}

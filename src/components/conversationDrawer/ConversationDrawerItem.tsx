@@ -1,7 +1,7 @@
 import React from "react";
 import { Text, TouchableOpacity, View } from "react-native";
 
-import { AntIcon } from "../../design-system/AntIcon";
+import { PhosphorIcon } from "../../design-system/PhosphorIcon";
 import { Swipeable } from "react-native-gesture-handler";
 
 import { useLocalization } from "../../i18n";
@@ -49,7 +49,7 @@ export function ConversationDrawerItem({
       accessibilityRole="button"
       accessibilityLabel={t("delete")}
     >
-      <AntIcon name="delete" size="compact" color={colors.onDanger} />
+      <PhosphorIcon name="delete" size="compact" color={colors.onDanger} />
       <Text style={[styles.deleteText, { color: colors.onDanger }]}>
         {t("delete")}
       </Text>
@@ -78,7 +78,7 @@ export function ConversationDrawerItem({
         accessibilityRole="button"
         accessibilityLabel={t("conversationActions")}
       >
-        <AntIcon
+        <PhosphorIcon
           name="ellipsis"
           size="compact"
           color={colors.textSecondary}
@@ -96,7 +96,11 @@ export function ConversationDrawerItem({
         <View style={styles.itemHeader}>
           <View style={styles.itemTitleRow}>
             {conversation.pinned ? (
-              <AntIcon name="pushpin" size="inline" color={colors.accent} />
+              <PhosphorIcon
+                name="pushpin"
+                size="inline"
+                color={colors.accent}
+              />
             ) : null}
             <Text
               style={[styles.itemTitle, { color: colors.text }]}
@@ -152,7 +156,7 @@ export function ConversationDrawerItem({
               ]}
             />
             <View style={styles.itemFooterMessages}>
-              <AntIcon
+              <PhosphorIcon
                 name="message"
                 size="inline"
                 color={active ? colors.accent : colors.textMuted}
