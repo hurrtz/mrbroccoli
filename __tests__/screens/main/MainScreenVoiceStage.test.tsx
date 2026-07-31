@@ -174,6 +174,16 @@ describe("MainScreenVoiceStage composer", () => {
     expect(
       StyleSheet.flatten(screen.getByLabelText("Show text input").props.style),
     ).toEqual(expect.objectContaining({ height: 44, width: 44 }));
+    expect(
+      StyleSheet.flatten(
+        screen.getByTestId("voice-input-indicator").props.style,
+      ),
+    ).toEqual(expect.objectContaining({ transform: [{ translateX: 12 }] }));
+    expect(
+      StyleSheet.flatten(
+        screen.getByTestId("text-input-indicator").props.style,
+      ),
+    ).toEqual(expect.objectContaining({ transform: [{ translateX: -12 }] }));
 
     fireEvent.press(screen.getByTestId("voice-input-surface"));
     expect(onPress).toHaveBeenCalledTimes(1);

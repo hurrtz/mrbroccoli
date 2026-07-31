@@ -152,6 +152,12 @@ export const voiceTextInputPagerStyles = StyleSheet.create({
     height: 4,
     borderRadius: 2,
   },
+  pageIndicatorLeading: {
+    transform: [{ translateX: 12 }],
+  },
+  pageIndicatorTrailing: {
+    transform: [{ translateX: -12 }],
+  },
   pageIndicatorSelected: {
     width: 16,
   },

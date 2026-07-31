@@ -43,8 +43,12 @@ export function InputSurfaceIndicators({
             style={styles.pageIndicatorTarget}
           >
             <View
+              testID={`${surface}-input-indicator`}
               style={[
                 styles.pageIndicator,
+                surface === "voice"
+                  ? styles.pageIndicatorLeading
+                  : styles.pageIndicatorTrailing,
                 selected
                   ? styles.pageIndicatorSelected
                   : styles.pageIndicatorIdle,
