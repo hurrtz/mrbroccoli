@@ -12,26 +12,13 @@ the complete Play Store translations are kept in a dedicated file under
 
 No user-visible changes yet.
 
-## 2.5.7 - 2026-07-31
+## 2.5.6 - 2026-07-31
 
 ### Changed
 
 - Show Kokoro download, installation, and verification progress directly on
   temporarily disabled home-screen actions.
 - Made the full guided-setup shortcut row in Settings tappable.
-
-### Fixed
-
-- Prevented voice, typed, retry, and Drive Session prompts while the selected
-  Kokoro model is missing or still being prepared.
-- Fixed the Kokoro model-removal confirmation being hidden behind the Settings
-  window on Android.
-
-### Store release notes
-
-See `docs/google-play-release-notes-2.5.7.md`.
-
-## 2.5.6 - 2026-07-31
 
 ### Fixed
 
@@ -42,6 +29,10 @@ See `docs/google-play-release-notes-2.5.7.md`.
 - Required the Kokoro on-device model to download and pass verification before
   Kokoro can be selected, with clearer setup guidance for existing invalid
   selections.
+- Prevented voice, typed, retry, and Drive Session prompts while the selected
+  Kokoro model is missing or still being prepared.
+- Fixed the Kokoro model-removal confirmation being hidden behind the Settings
+  window on Android.
 
 ### Store release notes
 
