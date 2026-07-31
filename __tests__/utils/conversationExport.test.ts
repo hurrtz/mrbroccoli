@@ -29,7 +29,22 @@ describe("conversationExport", () => {
     };
 
     expect(formatMessageForCopy(message, "en")).toBe(
-      "OpenAI · GPT-5.4\nWind is moving air."
+      "OpenAI · GPT-5.4\nWind is moving air.",
+    );
+  });
+
+  it("keeps historical messages readable when their provider is no longer active", () => {
+    const message = {
+      id: "m-retired",
+      role: "assistant" as const,
+      content: "A historical answer.",
+      model: "legacy-model",
+      provider: "retired-provider",
+      timestamp: "2026-03-15T12:00:05.000Z",
+    } as Message;
+
+    expect(formatMessageForCopy(message, "en")).toBe(
+      "retired-provider · legacy-model\nA historical answer.",
     );
   });
 
@@ -64,7 +79,7 @@ describe("conversationExport", () => {
         "Conversation: Wind basics",
         "You\nExplain the wind.",
         "OpenAI · GPT-5.4\nWind is moving air.",
-      ].join("\n\n")
+      ].join("\n\n"),
     );
   });
 });

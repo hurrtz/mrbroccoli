@@ -1,7 +1,10 @@
 import React from "react";
 import { Text, View } from "react-native";
 
-import { getProviderModelName, PROVIDER_LABELS } from "../../constants/models";
+import {
+  getProviderLabel,
+  getProviderModelName,
+} from "../../constants/models";
 import { useLocalization } from "../../i18n";
 import { useTheme } from "../../theme/ThemeContext";
 import type { Message } from "../../types";
@@ -38,7 +41,7 @@ export function MessageHeader({ message }: { message: Message }) {
   const { locale, t } = useLocalization();
   const isUser = message.role === "user";
   const providerLabel = message.provider
-    ? PROVIDER_LABELS[message.provider]
+    ? getProviderLabel(message.provider)
     : null;
   const modelLabel =
     message.provider && message.model

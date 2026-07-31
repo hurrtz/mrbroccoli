@@ -1,5 +1,5 @@
 import { useCallback } from "react";
-import { PROVIDER_LABELS } from "../../constants/models";
+import { getProviderLabel } from "../../constants/models";
 import { ConversationMeta } from "../../types";
 import { sortConversationMeta } from "./meta";
 
@@ -20,10 +20,10 @@ export function useConversationSearch(params: {
       const matches = await Promise.all(
         conversations.map(async (conversationMeta) => {
           const providerLabels = (conversationMeta.providers ?? [])
-            .map((provider) => PROVIDER_LABELS[provider])
+            .map(getProviderLabel)
             .join(" ");
           const lastProviderLabel = conversationMeta.lastProvider
-            ? PROVIDER_LABELS[conversationMeta.lastProvider]
+            ? getProviderLabel(conversationMeta.lastProvider)
             : "";
           const metadataHaystack = [
             conversationMeta.title,

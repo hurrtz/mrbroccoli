@@ -1,4 +1,7 @@
-import { getProviderModelName, PROVIDER_LABELS } from "../../constants/models";
+import {
+  getProviderLabel,
+  getProviderModelName,
+} from "../../constants/models";
 import type {
   GeminiAssistantContentPart,
   MessageMetadata,
@@ -93,7 +96,7 @@ export function getResponseProvenanceLabel(
     return null;
   }
 
-  return `${PROVIDER_LABELS[message.provider]} using ${getProviderModelName(
+  return `${getProviderLabel(message.provider)} using ${getProviderModelName(
     message.provider,
     message.model,
   )}`;

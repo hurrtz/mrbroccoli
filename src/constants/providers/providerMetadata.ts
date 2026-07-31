@@ -7,6 +7,13 @@ import {
 import type { Provider } from "../../types";
 import type { ModelInfo } from "./types";
 import { PROVIDER_CONFIGS, PROVIDER_ORDER } from "./catalogData";
+import { isRuntimeProviderId } from "./runtimeState";
+
+const LEGACY_PROVIDER_LABELS: Readonly<Record<string, string>> = {
+  "bytedance-doubao-seed": "ByteDance",
+  "moonshot-ai-kimi": "Moonshot",
+  perplexity: "Perplexity",
+};
 
 export const PROVIDER_LABELS: Record<Provider, string> = Object.fromEntries(
   PROVIDER_ORDER.map((provider) => [provider, PROVIDER_CONFIGS[provider].label]),
@@ -20,7 +27,22 @@ export const PROVIDER_MODELS: Record<Provider, ModelInfo[]> = Object.fromEntries
   PROVIDER_ORDER.map((provider) => [provider, PROVIDER_CONFIGS[provider].models]),
 ) as Record<Provider, ModelInfo[]>;
 
-export function getProviderModelName(provider: Provider, modelId: string) {
+export function getProviderLabel(provider: Provider | string) {
+  if (isRuntimeProviderId(provider)) {
+    return PROVIDER_LABELS[provider];
+  }
+
+  return LEGACY_PROVIDER_LABELS[provider] ?? provider;
+}
+
+export function getProviderModelName(
+  provider: Provider | string,
+  modelId: string,
+) {
+  if (!isRuntimeProviderId(provider)) {
+    return modelId;
+  }
+
   const catalogMatch = getCatalogModelForAppProvider(provider, modelId, "llm");
 
   if (catalogMatch) {

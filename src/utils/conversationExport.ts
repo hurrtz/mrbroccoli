@@ -1,5 +1,8 @@
 import { Conversation, Message } from "../types";
-import { getProviderModelName, PROVIDER_LABELS } from "../constants/models";
+import {
+  getProviderLabel,
+  getProviderModelName,
+} from "../constants/models";
 import { AppLanguage } from "../types";
 import { translate } from "../i18n";
 
@@ -9,14 +12,14 @@ function formatSpeakerLabel(message: Message, language: AppLanguage) {
   }
 
   if (message.provider && message.model) {
-    return `${PROVIDER_LABELS[message.provider]} · ${getProviderModelName(
+    return `${getProviderLabel(message.provider)} · ${getProviderModelName(
       message.provider,
-      message.model
+      message.model,
     )}`;
   }
 
   if (message.provider) {
-    return PROVIDER_LABELS[message.provider];
+    return getProviderLabel(message.provider);
   }
 
   if (message.model) {
@@ -34,7 +37,8 @@ export function formatConversationForCopy(
   conversation: Conversation,
   language: AppLanguage
 ) {
-  const title = conversation.title.trim() || translate(language, "untitledConversation");
+  const title =
+    conversation.title.trim() || translate(language, "untitledConversation");
   const body = conversation.messages
     .map((message) => formatMessageForCopy(message, language))
     .join("\n\n");

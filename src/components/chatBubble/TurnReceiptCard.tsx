@@ -3,8 +3,8 @@ import { Text, TouchableOpacity, View } from "react-native";
 import Feather from "@expo/vector-icons/Feather";
 
 import {
+  getProviderLabel,
   getProviderModelName,
-  PROVIDER_LABELS,
 } from "../../constants/models";
 import { useLocalization } from "../../i18n";
 import { useTheme } from "../../theme/ThemeContext";
@@ -33,12 +33,12 @@ function formatRoute(
   strategy?: string,
   attempts?: number,
 ) {
-  const route = `${PROVIDER_LABELS[provider]} · ${getProviderModelName(
+  const route = `${getProviderLabel(provider)} · ${getProviderModelName(
     provider,
     model,
   )}`;
   const execution = upstreamProvider
-    ? `${gateway ?? PROVIDER_LABELS[provider]} → ${upstreamProvider}`
+    ? `${gateway ?? getProviderLabel(provider)} → ${upstreamProvider}`
     : gateway;
 
   return [
@@ -95,7 +95,7 @@ function formatInput(
   }
 
   const provider = receipt.input.provider
-    ? PROVIDER_LABELS[receipt.input.provider]
+    ? getProviderLabel(receipt.input.provider)
     : t("unavailable");
   return [source, provider, receipt.input.model].filter(Boolean).join(" · ");
 }
@@ -120,7 +120,7 @@ function formatSearch(
   }
 
   return [
-    search.provider ? PROVIDER_LABELS[search.provider] : undefined,
+    search.provider ? getProviderLabel(search.provider) : undefined,
     search.model,
   ]
     .filter(Boolean)
@@ -146,7 +146,7 @@ function formatSpeech(
   }
 
   return [
-    speech.provider ? PROVIDER_LABELS[speech.provider] : undefined,
+    speech.provider ? getProviderLabel(speech.provider) : undefined,
     speech.model,
     speech.voice,
   ]

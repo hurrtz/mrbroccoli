@@ -1,4 +1,8 @@
-import { getProviderModelName, PROVIDER_MODELS } from "../../../src/constants/models";
+import {
+  getProviderLabel,
+  getProviderModelName,
+  PROVIDER_MODELS,
+} from "../../../src/constants/models";
 
 describe("provider metadata constants", () => {
   it("uses catalog-backed labels for runtime model pickers when the catalog knows the model", () => {
@@ -22,6 +26,13 @@ describe("provider metadata constants", () => {
   it("uses direct catalog labels for known models even outside the curated picker list", () => {
     expect(getProviderModelName("xai", "grok-4")).toBe("Grok 4.3");
     expect(getProviderModelName("xai", "grok-latest")).toBe("Grok 4.3");
+  });
+
+  it("keeps historical provider metadata readable after a route is removed", () => {
+    expect(getProviderLabel("moonshot-ai-kimi")).toBe("Moonshot");
+    expect(getProviderModelName("retired-provider", "retired-model")).toBe(
+      "retired-model",
+    );
   });
 
   it("surfaces newly added Anthropic picker models from the catalog", () => {
