@@ -5,14 +5,6 @@ import { fireEvent, render } from "@testing-library/react-native";
 import { MainScreenRouteControls } from "../../../src/screens/main/MainScreenRouteControls";
 import { lightColors } from "../../../src/theme/colors";
 
-jest.mock("@expo/vector-icons", () => ({
-  Feather: ({ name }: { name: string }) => {
-    const React = require("react");
-    const { Text } = require("react-native");
-    return React.createElement(Text, null, `icon:${name}`);
-  },
-}));
-
 const t = (key: string) =>
   ({
     ulraMode: "Uber Mode",

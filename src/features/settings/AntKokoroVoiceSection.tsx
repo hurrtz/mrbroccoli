@@ -2,7 +2,6 @@ import React from "react";
 import { Alert, Text, View } from "react-native";
 
 import { Button } from "@ant-design/react-native";
-import Feather from "@expo/vector-icons/Feather";
 
 import {
   KOKORO_MODEL_DOWNLOAD_BYTES,
@@ -13,6 +12,7 @@ import {
 import { getTtsListenLanguageLabel } from "../../constants/localTts";
 import { antButtonTypography } from "../../design-system/antTypography";
 import { AntIconButton } from "../../design-system/AntIconButton";
+import { AntIcon } from "../../design-system/AntIcon";
 import type { KokoroModelController } from "../../hooks/useKokoroModel";
 import { useLocalization } from "../../i18n";
 import { useTheme } from "../../theme/ThemeContext";
@@ -142,7 +142,7 @@ export function AntKokoroVoiceSection({
             <AntIconButton
               accessibilityLabel={t("removeKokoroModel")}
               iconNode={
-                <Feather name="trash-2" size={18} color={colors.danger} />
+                <AntIcon name="delete" size="control" color={colors.danger} />
               }
               onPress={handleRemove}
             />
@@ -207,7 +207,11 @@ export function AntKokoroVoiceSection({
             },
           ]}
         >
-          <Feather name="alert-circle" size={17} color={colors.textSecondary} />
+          <AntIcon
+            name="exclamation-circle"
+            size="compact"
+            color={colors.textSecondary}
+          />
           <Text
             style={[
               styles.connectionImprintText,

@@ -94,7 +94,7 @@ export const StatusDetailsModal = React.memo(function StatusDetailsModal({
             </View>
             <AntIconButton
               icon="close"
-              iconSize={18}
+              iconSize="control"
               style={[
                 styles.menuIconButton,
                 {

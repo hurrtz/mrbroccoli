@@ -1,7 +1,7 @@
 import React from "react";
 import { Text, TouchableOpacity, View } from "react-native";
 
-import Feather from "@expo/vector-icons/Feather";
+import { AntIcon } from "../../design-system/AntIcon";
 
 import { useLocalization } from "../../i18n";
 import { useTheme } from "../../theme/ThemeContext";
@@ -49,9 +49,9 @@ export function PipelineNotices({
               },
             ]}
           >
-            <Feather
-              name={notice.level === "error" ? "alert-triangle" : "info"}
-              size={12}
+            <AntIcon
+              name={notice.level === "error" ? "warning" : "info-circle"}
+              size="inline"
               color={notice.level === "error" ? colors.danger : colors.accent}
             />
           </View>
@@ -96,7 +96,11 @@ export function PipelineNotices({
                     accessibilityRole="button"
                     accessibilityLabel={t("retrySpeech")}
                   >
-                    <Feather name="volume-2" size={13} color={colors.accent} />
+                    <AntIcon
+                      name="sound"
+                      size="compact"
+                      color={colors.accent}
+                    />
                     <Text
                       style={[
                         styles.noticeActionText,
@@ -121,9 +125,9 @@ export function PipelineNotices({
                     accessibilityRole="button"
                     accessibilityLabel={t("openSpeakingSettings")}
                   >
-                    <Feather
-                      name="settings"
-                      size={13}
+                    <AntIcon
+                      name="setting"
+                      size="compact"
                       color={colors.textSecondary}
                     />
                     <Text

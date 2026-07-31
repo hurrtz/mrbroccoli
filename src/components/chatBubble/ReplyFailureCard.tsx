@@ -1,7 +1,7 @@
 import React from "react";
 import { Text, TouchableOpacity, View } from "react-native";
 
-import Feather from "@expo/vector-icons/Feather";
+import { AntIcon } from "../../design-system/AntIcon";
 
 import { useLocalization } from "../../i18n";
 import { useTheme } from "../../theme/ThemeContext";
@@ -31,7 +31,11 @@ export function ReplyFailureCard({
       ]}
     >
       <View style={styles.replyFailureHeader}>
-        <Feather name="alert-circle" size={14} color={colors.danger} />
+        <AntIcon
+          name="exclamation-circle"
+          size="inline"
+          color={colors.danger}
+        />
         <Text style={[styles.replyFailureTitle, { color: colors.danger }]}>
           {t("replyFailed")}
         </Text>
@@ -58,7 +62,7 @@ export function ReplyFailureCard({
           accessibilityRole="button"
           accessibilityLabel={t("retryReply")}
         >
-          <Feather name="rotate-ccw" size={13} color={colors.accent} />
+          <AntIcon name="reload" size="inline" color={colors.accent} />
           <Text
             style={[styles.replyFailureActionText, { color: colors.accent }]}
           >

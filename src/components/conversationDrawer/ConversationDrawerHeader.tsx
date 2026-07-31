@@ -1,7 +1,7 @@
 import React from "react";
 import { Text, TextInput, TouchableOpacity, View } from "react-native";
 
-import Feather from "@expo/vector-icons/Feather";
+import { AntIcon } from "../../design-system/AntIcon";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { useLocalization } from "../../i18n";
@@ -57,7 +57,7 @@ export function ConversationDrawerHeader({
           accessibilityRole="button"
           accessibilityLabel={t("dismiss")}
         >
-          <Feather name="x" size={18} color={colors.textSecondary} />
+          <AntIcon name="close" size="control" color={colors.textSecondary} />
         </TouchableOpacity>
       </View>
 
@@ -69,7 +69,7 @@ export function ConversationDrawerHeader({
         accessibilityLabel={t("newSession")}
         style={[styles.newSession, { backgroundColor: colors.bubbleUser }]}
       >
-        <Feather name="plus" size={17} color={colors.onPrimary} />
+        <AntIcon name="plus" size="compact" color={colors.onPrimary} />
         <Text style={[styles.newSessionText, { color: colors.onPrimary }]}>
           {t("newSession")}
         </Text>
@@ -84,11 +84,10 @@ export function ConversationDrawerHeader({
           },
         ]}
       >
-        <Feather
+        <AntIcon
           name="search"
-          size={16}
+          size="compact"
           color={colors.textMuted}
-          accessible={false}
         />
         <TextInput
           testID="conversation-drawer-search-input"
@@ -108,7 +107,11 @@ export function ConversationDrawerHeader({
             accessibilityRole="button"
             accessibilityLabel={t("clear")}
           >
-            <Feather name="x" size={15} color={colors.textSecondary} />
+            <AntIcon
+              name="close"
+              size="compact"
+              color={colors.textSecondary}
+            />
           </TouchableOpacity>
         ) : null}
       </View>

@@ -11,14 +11,6 @@ import { MainScreenVoiceStage } from "../../../src/screens/main/MainScreenVoiceS
 import { TranslateFn } from "../../../src/screens/main/shared";
 import { darkColors, lightColors } from "../../../src/theme/colors";
 
-jest.mock("@expo/vector-icons", () => ({
-  Feather: ({ color, name }: { color?: string; name: string }) => {
-    const React = require("react");
-    const { Text } = require("react-native");
-    return React.createElement(Text, { style: { color } }, `icon:${name}`);
-  },
-}));
-
 jest.mock("../../../src/hooks/useReducedMotion", () => ({
   useReducedMotion: () => false,
 }));
@@ -153,7 +145,7 @@ describe("MainScreenVoiceStage composer", () => {
     expect(screen.getByTestId("voice-input-surface")).toBeTruthy();
     expect(screen.getByLabelText("Tap to speak")).toBeTruthy();
     expect(screen.queryByText("Tap to speak")).toBeNull();
-    expect(screen.getByText("icon:mic")).toBeTruthy();
+    expect(screen.getByTestId("ant-icon-audio")).toBeTruthy();
     expect(
       StyleSheet.flatten(screen.getByTestId("voice-input-surface").props.style),
     ).toEqual(
@@ -164,7 +156,8 @@ describe("MainScreenVoiceStage composer", () => {
       }),
     );
     expect(
-      StyleSheet.flatten(screen.getByText("icon:mic").props.style).color,
+      StyleSheet.flatten(screen.getByTestId("ant-icon-audio").props.style)
+        .color,
     ).toBe(lightColors.activeControlIcon);
     expect(
       StyleSheet.flatten(screen.getByTestId("voice-input-icon").props.style)
@@ -251,7 +244,7 @@ describe("MainScreenVoiceStage composer", () => {
     expect(
       screen.getByTestId("voice-input-surface").props.accessibilityLabel,
     ).toBe(progressLabel);
-    expect(screen.queryByText("icon:mic")).toBeNull();
+    expect(screen.queryByTestId("ant-icon-audio")).toBeNull();
 
     fireEvent.press(screen.getByTestId("voice-input-surface"));
     expect(onPress).not.toHaveBeenCalled();
@@ -288,7 +281,8 @@ describe("MainScreenVoiceStage composer", () => {
         .backgroundColor,
     ).toBe(darkColors.activeControl);
     expect(
-      StyleSheet.flatten(screen.getByText("icon:mic").props.style).color,
+      StyleSheet.flatten(screen.getByTestId("ant-icon-audio").props.style)
+        .color,
     ).toBe(darkColors.activeControlIcon);
     expect(
       StyleSheet.flatten(screen.getByTestId("voice-input-icon").props.style)
@@ -357,7 +351,7 @@ describe("MainScreenVoiceStage composer", () => {
     expect(
       screen.getByLabelText("Send message").props.accessibilityState,
     ).toEqual({ disabled: true });
-    expect(screen.getByText("icon:arrow-up")).toBeTruthy();
+    expect(screen.getByTestId("ant-icon-arrow-up")).toBeTruthy();
     expect(
       StyleSheet.flatten(
         screen.getByTestId("voice-text-primary-action").props.style,
@@ -366,7 +360,7 @@ describe("MainScreenVoiceStage composer", () => {
 
     fireEvent.changeText(input, "  Hello Mr Broccoli  ");
     expect(screen.getByLabelText("Send message")).toBeTruthy();
-    expect(screen.getByText("icon:arrow-up")).toBeTruthy();
+    expect(screen.getByTestId("ant-icon-arrow-up")).toBeTruthy();
 
     fireEvent.press(screen.getByTestId("voice-text-primary-action"));
     expect(onSubmitTextMessage).toHaveBeenCalledWith("Hello Mr Broccoli");
@@ -490,7 +484,7 @@ describe("MainScreenVoiceStage composer", () => {
         fontSize: 30.5,
       }),
     );
-    expect(screen.queryByText("icon:square")).toBeNull();
+    expect(screen.queryByTestId("ant-icon-stop")).toBeNull();
 
     screen.rerender(
       <MainScreenVoiceStage {...props} driveVoiceActive />,
@@ -499,7 +493,7 @@ describe("MainScreenVoiceStage composer", () => {
     expect(
       screen.queryByTestId("voice-stage-drive-countdown"),
     ).toBeNull();
-    expect(screen.getByText("icon:square")).toBeTruthy();
+    expect(screen.getByTestId("ant-icon-stop")).toBeTruthy();
   });
 
   it("preserves an unfinished text draft while the pipeline is active", () => {
@@ -590,7 +584,7 @@ describe("MainScreenVoiceStage composer", () => {
     ).toEqual(expect.objectContaining({ minHeight: 68 }));
     expect(screen.getByTestId("voice-stage-action-surface")).toBeTruthy();
     expect(screen.getByTestId("voice-stage-recording-fill")).toBeTruthy();
-    expect(screen.getByText("icon:square")).toBeTruthy();
+    expect(screen.getByTestId("ant-icon-stop")).toBeTruthy();
     expect(screen.getByText("Your turn")).toBeTruthy();
     expect(screen.getByText("Toggle to Talk")).toBeTruthy();
     expect(screen.getByText("Tap when done")).toBeTruthy();
@@ -739,8 +733,8 @@ describe("MainScreenVoiceStage composer", () => {
         screen.getByTestId("voice-stage-action-surface").props.style,
       ).backgroundColor,
     ).toBe(lightColors.phaseThinking);
-    expect(screen.getByText("icon:cpu")).toBeTruthy();
-    expect(screen.queryByText("icon:info")).toBeNull();
+    expect(screen.getByTestId("ant-icon-robot")).toBeTruthy();
+    expect(screen.queryByTestId("ant-icon-info-circle")).toBeNull();
     expect(screen.getByText("Please wait")).toBeTruthy();
     expect(screen.getByText("Thinking")).toBeTruthy();
     expect(screen.queryByTestId("voice-stage-phase-time")).toBeNull();
@@ -764,7 +758,7 @@ describe("MainScreenVoiceStage composer", () => {
         screen.getByTestId("voice-stage-action-surface").props.style,
       ).backgroundColor,
     ).toBe(lightColors.phaseThinkingBriefly);
-    expect(screen.getByText("icon:zap")).toBeTruthy();
+    expect(screen.getByTestId("ant-icon-thunderbolt")).toBeTruthy();
   });
 
   it("keeps phase, wait copy, icon, and ETA symmetric in landscape", () => {
@@ -814,7 +808,7 @@ describe("MainScreenVoiceStage composer", () => {
       />,
     );
 
-    expect(screen.getByText("icon:pause")).toBeTruthy();
+    expect(screen.getByTestId("ant-icon-pause")).toBeTruthy();
     expect(screen.getByText("Speaking")).toBeTruthy();
     fireEvent.press(screen.getByTestId("voice-stage-primary-action"));
     expect(onPress).toHaveBeenCalledTimes(1);
@@ -829,7 +823,7 @@ describe("MainScreenVoiceStage composer", () => {
         })}
       />,
     );
-    expect(screen.getByText("icon:play")).toBeTruthy();
+    expect(screen.getByTestId("ant-icon-play-circle")).toBeTruthy();
     expect(screen.getByText("Paused")).toBeTruthy();
   });
 });

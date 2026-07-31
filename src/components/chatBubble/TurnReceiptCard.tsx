@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Text, TouchableOpacity, View } from "react-native";
-import Feather from "@expo/vector-icons/Feather";
+import { AntIcon } from "../../design-system/AntIcon";
 
 import {
   getProviderLabel,
@@ -267,7 +267,7 @@ export function TurnReceiptCard({ message }: { message: Message }) {
         }
       >
         <View style={styles.turnReceiptTitleRow}>
-          <Feather name="activity" size={14} color={colors.accent} />
+          <AntIcon name="line-chart" size="inline" color={colors.accent} />
           <Text style={[styles.turnReceiptTitle, { color: colors.text }]}>
             {t("turnReceipt")}
           </Text>
@@ -283,9 +283,9 @@ export function TurnReceiptCard({ message }: { message: Message }) {
               receipt.timing.totalMs ?? receipt.timing.replyReadyMs,
             )}
           </Text>
-          <Feather
-            name={expanded ? "chevron-up" : "chevron-down"}
-            size={16}
+          <AntIcon
+            name={expanded ? "up" : "down"}
+            size="compact"
             color={colors.textSecondary}
           />
         </View>

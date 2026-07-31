@@ -1,7 +1,7 @@
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
 
-import { Button, Icon } from "@ant-design/react-native";
+import { Button } from "@ant-design/react-native";
 
 import { antButtonTypography } from "../../design-system/antTypography";
 import {
@@ -10,6 +10,7 @@ import {
 } from "../../constants/ttsFallback";
 import { useLocalization } from "../../i18n";
 import { useTheme } from "../../theme/ThemeContext";
+import { AntIcon } from "../../design-system/AntIcon";
 import type {
   KokoroTtsFallbackRoute,
   ProviderTtsFallbackRoute,
@@ -136,7 +137,7 @@ export function AntTtsFallbackSection({
                 route: getFallbackRouteLabel(route, t),
               })}
             >
-              <Icon name="arrow-up" size={16} color={colors.accent} />
+              <AntIcon name="arrow-up" size="compact" color={colors.accent} />
             </Button>
             <Button
               size="small"
@@ -159,7 +160,11 @@ export function AntTtsFallbackSection({
                 route: getFallbackRouteLabel(route, t),
               })}
             >
-              <Icon name="arrow-down" size={16} color={colors.accent} />
+              <AntIcon
+                name="arrow-down"
+                size="compact"
+                color={colors.accent}
+              />
             </Button>
             <Button
               size="small"
@@ -173,7 +178,7 @@ export function AntTtsFallbackSection({
                 route: getFallbackRouteLabel(route, t),
               })}
             >
-              <Icon name="close" size={16} color={colors.onDanger} />
+              <AntIcon name="close" size="compact" color={colors.onDanger} />
             </Button>
           </View>
         ))
@@ -199,7 +204,7 @@ export function AntTtsFallbackSection({
               <AntButtonLabel
                 color={colors.accent}
                 icon="plus"
-                iconSize={14}
+                iconSize="inline"
                 label={getFallbackRouteLabel(route, t)}
               />
             </Button>

@@ -9,7 +9,7 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 
-import Feather from "@expo/vector-icons/Feather";
+import { AntIcon } from "../../design-system/AntIcon";
 
 import { useReducedMotion } from "../../hooks/useReducedMotion";
 import { useLocalization } from "../../i18n";
@@ -28,14 +28,14 @@ function RepeatActionIcon({
   color: string;
 }) {
   if (state === "speaking") {
-    return <Feather name="square" size={14} color={color} />;
+    return <AntIcon name="stop" size="inline" color={color} />;
   }
 
   if (state === "preparing") {
     return <PreparingRepeatIcon color={color} />;
   }
 
-  return <Feather name="volume-2" size={14} color={color} />;
+  return <AntIcon name="sound" size="inline" color={color} />;
 }
 
 function PreparingRepeatIcon({ color }: { color: string }) {
@@ -64,7 +64,7 @@ function PreparingRepeatIcon({ color }: { color: string }) {
 
   return (
     <Animated.View style={rotationStyle}>
-      <Feather name="loader" size={14} color={color} />
+      <AntIcon name="loading" size="inline" color={color} />
     </Animated.View>
   );
 }
@@ -176,9 +176,9 @@ export function MessageActions({
           accessibilityRole="button"
           accessibilityLabel={copyConfirmed ? t("messageCopied") : t("copy")}
         >
-          <Feather
+          <AntIcon
             name={copyConfirmed ? "check" : "copy"}
-            size={14}
+            size="inline"
             color={
               copyConfirmed
                 ? getAccessibleForeground(colors.success)
@@ -201,7 +201,11 @@ export function MessageActions({
           accessibilityRole="button"
           accessibilityLabel={t("share")}
         >
-          <Feather name="share-2" size={14} color={colors.textSecondary} />
+          <AntIcon
+            name="share-alt"
+            size="inline"
+            color={colors.textSecondary}
+          />
         </TouchableOpacity>
       ) : null}
       {onRepeat ? (

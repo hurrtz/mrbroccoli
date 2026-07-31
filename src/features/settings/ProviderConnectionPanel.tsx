@@ -10,8 +10,7 @@ import {
 } from "react-native";
 
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Button, Icon, Input, List } from "@ant-design/react-native";
-import Feather from "@expo/vector-icons/Feather";
+import { Button, Input, List } from "@ant-design/react-native";
 
 import { getCatalogProviderEntry } from "../../catalog";
 import { getCatalogProviderIdForAppProvider } from "../../catalog/appProviders";
@@ -23,6 +22,7 @@ import {
 } from "../../constants/models";
 import { antButtonTypography } from "../../design-system/antTypography";
 import { AntIconButton } from "../../design-system/AntIconButton";
+import { AntIcon } from "../../design-system/AntIcon";
 import { useLocalization } from "../../i18n";
 import { useTheme } from "../../theme/ThemeContext";
 import { fonts } from "../../theme/typography";
@@ -199,7 +199,11 @@ export function ProviderAboutModal({
           <AntIconButton
             accessibilityLabel={t("dismiss")}
             iconNode={
-              <Feather name="x" size={21} color={colors.textSecondary} />
+              <AntIcon
+                name="close"
+                size="control"
+                color={colors.textSecondary}
+              />
             }
             onPress={onClose}
           />
@@ -375,9 +379,9 @@ export function ProviderConnectionPanel({
                   secureApiKey ? t("showKey") : t("hideKey")
                 }
               >
-                <Icon
+                <AntIcon
                   name={secureApiKey ? "eye" : "eye-invisible"}
-                  size={18}
+                  size="control"
                   color={colors.textSecondary}
                 />
               </Pressable>
@@ -521,9 +525,9 @@ export function ProviderConnectionPanel({
                       {isValidating ? (
                         <ActivityIndicator size="small" color={colors.accent} />
                       ) : (
-                        <Feather
-                          name={circuitState ? "refresh-cw" : "play-circle"}
-                          size={19}
+                        <AntIcon
+                          name={circuitState ? "reload" : "play-circle"}
+                          size="control"
                           color={disabled ? colors.textMuted : colors.accent}
                         />
                       )}

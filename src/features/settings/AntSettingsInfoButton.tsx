@@ -2,7 +2,7 @@ import React from "react";
 import { ScrollView, Text, View } from "react-native";
 
 import { Modal } from "@ant-design/react-native";
-import Feather from "@expo/vector-icons/Feather";
+import { AntIcon } from "../../design-system/AntIcon";
 
 import { AntIconButton } from "../../design-system/AntIconButton";
 import { useLocalization } from "../../i18n";
@@ -29,7 +29,11 @@ export function AntSettingsInfoButton({
       <AntIconButton
         accessibilityLabel={accessibilityLabel}
         iconNode={
-          <Feather name="info" size={19} color={colors.textSecondary} />
+          <AntIcon
+            name="info-circle"
+            size="control"
+            color={colors.textSecondary}
+          />
         }
         onPress={() => setVisible(true)}
       />

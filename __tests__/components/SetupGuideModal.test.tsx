@@ -25,14 +25,6 @@ jest.mock("react-native-safe-area-context", () => ({
   useSafeAreaInsets: () => ({ top: 0, bottom: 0, left: 0, right: 0 }),
 }));
 
-jest.mock("@expo/vector-icons", () => ({
-  Feather: ({ name }: { name: string }) => {
-    const React = require("react");
-    const { Text } = require("react-native");
-    return React.createElement(Text, null, name);
-  },
-}));
-
 const defaultProps = {
   visible: true,
   step: "provider" as const,

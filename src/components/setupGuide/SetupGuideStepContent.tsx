@@ -9,7 +9,7 @@ import {
   View,
 } from "react-native";
 
-import Feather from "@expo/vector-icons/Feather";
+import { AntIcon } from "../../design-system/AntIcon";
 
 import {
   PROVIDER_API_KEY_HINTS,
@@ -138,7 +138,7 @@ function KokoroStep({
             {kokoroModel.busy ? (
               <ActivityIndicator size="small" color={colors.accent} />
             ) : (
-              <Feather name="download" size={16} color={colors.accent} />
+              <AntIcon name="download" size="compact" color={colors.accent} />
             )}
             <Text style={[styles.inlineLinkText, { color: colors.accent }]}>
               {t("setupGuideKokoroDownload")}
@@ -398,9 +398,9 @@ function ProviderStep({
               isProviderApiKeyVisible ? t("hideKey") : t("showKey")
             }
           >
-            <Feather
-              name={isProviderApiKeyVisible ? "eye-off" : "eye"}
-              size={16}
+            <AntIcon
+              name={isProviderApiKeyVisible ? "eye-invisible" : "eye"}
+              size="compact"
               color={colors.textSecondary}
             />
           </TouchableOpacity>

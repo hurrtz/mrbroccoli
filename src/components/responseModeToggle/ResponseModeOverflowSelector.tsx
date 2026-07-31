@@ -1,5 +1,5 @@
 import React from "react";
-import Feather from "@expo/vector-icons/Feather";
+import { AntIcon } from "../../design-system/AntIcon";
 import {
   Animated,
   Easing,
@@ -146,7 +146,7 @@ function ResponseModeOverflowOption({
         <ProviderIcon
           provider={item.route.provider}
           color={active ? colors.accent : colors.textSecondary}
-          size={30}
+          size="feature"
         />
       </View>
       <View style={styles.overflowOptionModel}>
@@ -187,7 +187,7 @@ function ResponseModeOverflowOption({
       </View>
       <View style={styles.overflowOptionCheck}>
         {active ? (
-          <Feather name="check" size={19} color={colors.accent} />
+          <AntIcon name="check" size="control" color={colors.accent} />
         ) : null}
       </View>
     </Pressable>
@@ -268,7 +268,7 @@ export function ResponseModeOverflowSelector({
           <ProviderIcon
             provider={activeMode.route.provider}
             color={colors.textSecondary}
-            size={compact ? 36 : 42}
+            size={compact ? "feature" : "hero"}
           />
         </View>
         <View style={styles.overflowSelectorModel}>
@@ -323,9 +323,9 @@ export function ResponseModeOverflowSelector({
             {activeEffortLabel}
           </Text>
         </View>
-        <Feather
-          name="chevron-down"
-          size={compact ? 17 : 18}
+        <AntIcon
+          name="down"
+          size={compact ? "compact" : "control"}
           color={colors.textSecondary}
         />
       </Pressable>
@@ -415,9 +415,9 @@ export function ResponseModeOverflowSelector({
                     pressed ? styles.iconPressed : null,
                   ]}
                 >
-                  <Feather
-                    name="x"
-                    size={20}
+                  <AntIcon
+                    name="close"
+                    size="control"
                     color={colors.textSecondary}
                   />
                 </Pressable>

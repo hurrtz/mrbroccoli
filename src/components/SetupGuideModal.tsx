@@ -10,7 +10,7 @@ import {
   useWindowDimensions,
 } from "react-native";
 
-import Feather from "@expo/vector-icons/Feather";
+import { AntIcon } from "../design-system/AntIcon";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { APP_MODAL_ORIENTATIONS } from "../constants/layout";
@@ -153,7 +153,11 @@ export const SetupGuideModal = React.memo(function SetupGuideModal({
                 accessibilityRole="button"
                 accessibilityLabel={t("dismiss")}
               >
-                <Feather name="x" size={18} color={colors.textSecondary} />
+                <AntIcon
+                  name="close"
+                  size="control"
+                  color={colors.textSecondary}
+                />
               </TouchableOpacity>
             </View>
 

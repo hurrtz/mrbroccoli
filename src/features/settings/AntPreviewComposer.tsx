@@ -94,7 +94,7 @@ export function AntPreviewComposer({
         <AntButtonLabel
           color={colors.onActiveControl}
           icon={isPlaying ? "stop" : "sound"}
-          iconSize={16}
+          iconSize="compact"
           label={isBusy ? t("stop") : t("previewVoice")}
         />
       </Button>

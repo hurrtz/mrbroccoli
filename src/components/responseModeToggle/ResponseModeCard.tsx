@@ -64,13 +64,11 @@ function ProviderMark({
   const { colors } = useTheme();
   const size = detailedLayout
     ? singleMode
-      ? 42
-      : 34
+      ? "hero"
+      : "feature"
     : enlargeThreeCardIcons
-      ? 32
-      : compact
-        ? 26
-        : 24;
+      ? "feature"
+      : "navigation";
 
   return (
     <View

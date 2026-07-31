@@ -32,7 +32,7 @@ describe("AntSettingsOverview", () => {
     const thinkChip = screen.getByLabelText("Think: Ready");
     const speakChip = screen.getByLabelText("Speak: Off");
 
-    expect(screen.getAllByTestId("icon-check")).toHaveLength(2);
+    expect(screen.getAllByTestId("ant-icon-check")).toHaveLength(2);
     expect(
       StyleSheet.flatten(
         screen.getByText("Think").props.style,
@@ -103,7 +103,7 @@ describe("AntSettingsOverview", () => {
 
     expect(containerStyle.width).toBe(34);
     expect(containerStyle.borderWidth).toBeUndefined();
-    expect(iconStyle.fontSize).toBe(27);
+    expect(iconStyle.fontSize).toBe(28);
     expect(iconStyle.color).toBe(lightColors.text);
   });
 });

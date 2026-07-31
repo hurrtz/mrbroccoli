@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
-import Feather from "@expo/vector-icons/Feather";
+import { AntIcon } from "../design-system/AntIcon";
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -93,9 +93,9 @@ export function Toast({
           { backgroundColor: toneBackground, borderColor: toneColor },
         ]}
       >
-        <Feather
-          name={tone === "success" ? "check" : "alert-circle"}
-          size={16}
+        <AntIcon
+          name={tone === "success" ? "check" : "exclamation-circle"}
+          size="compact"
           color={toneColor}
         />
       </View>
@@ -134,7 +134,11 @@ export function Toast({
           accessibilityRole="button"
           accessibilityLabel={t("dismiss")}
         >
-          <Feather name="x" size={15} color={colors.textSecondary} />
+          <AntIcon
+            name="close"
+            size="compact"
+            color={colors.textSecondary}
+          />
         </TouchableOpacity>
       </View>
     </Animated.View>

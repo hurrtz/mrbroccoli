@@ -1,4 +1,4 @@
-import Feather from "@expo/vector-icons/Feather";
+import { AntIcon } from "../../design-system/AntIcon";
 import React from "react";
 import { Text, TouchableOpacity, View } from "react-native";
 import { PhaseAwareVoiceAction } from "./PhaseAwareVoiceAction";
@@ -138,7 +138,11 @@ export function VoiceTextInputPager({
             },
           ]}
         >
-          <Feather name="alert-circle" size={17} color={colors.danger} />
+          <AntIcon
+            name="exclamation-circle"
+            size="compact"
+            color={colors.danger}
+          />
           <View style={styles.promptBlockedCopy}>
             <Text
               accessibilityLiveRegion="assertive"
@@ -162,9 +166,9 @@ export function VoiceTextInputPager({
             ) : null}
           </View>
           {onResolvePromptBlock ? (
-            <Feather
-              name="chevron-right"
-              size={17}
+            <AntIcon
+              name="right"
+              size="compact"
               color={colors.textSecondary}
             />
           ) : null}

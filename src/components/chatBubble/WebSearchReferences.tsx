@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Linking, Text, TouchableOpacity, View } from "react-native";
 
-import Feather from "@expo/vector-icons/Feather";
+import { AntIcon } from "../../design-system/AntIcon";
 
 import { useLocalization } from "../../i18n";
 import { useTheme } from "../../theme/ThemeContext";
@@ -43,7 +43,7 @@ export function WebSearchReferences({ message }: { message: Message }) {
         }
       >
         <View style={styles.referenceToggleTitleRow}>
-          <Feather name="globe" size={14} color={colors.accent} />
+          <AntIcon name="global" size="inline" color={colors.accent} />
           <Text style={[styles.referenceToggleTitle, { color: colors.text }]}>
             {t("webSearch")}
           </Text>
@@ -56,9 +56,9 @@ export function WebSearchReferences({ message }: { message: Message }) {
               count: webSearch.sources.length,
             })}
           </Text>
-          <Feather
-            name={expanded ? "chevron-up" : "chevron-down"}
-            size={16}
+          <AntIcon
+            name={expanded ? "up" : "down"}
+            size="compact"
             color={colors.textSecondary}
           />
         </View>
@@ -116,9 +116,9 @@ export function WebSearchReferences({ message }: { message: Message }) {
                       >
                         {sourceTitle}
                       </Text>
-                      <Feather
-                        name="arrow-up-right"
-                        size={12}
+                      <AntIcon
+                        name="export"
+                        size="inline"
                         color={colors.textSecondary}
                       />
                     </TouchableOpacity>

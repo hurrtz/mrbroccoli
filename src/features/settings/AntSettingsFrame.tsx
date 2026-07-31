@@ -1,6 +1,6 @@
 import React from "react";
 import { Animated, Pressable, ScrollView, Text, View } from "react-native";
-import Feather from "@expo/vector-icons/Feather";
+import { AntIcon } from "../../design-system/AntIcon";
 import type { EdgeInsets } from "react-native-safe-area-context";
 import { Toast } from "../../components/Toast";
 import { AntIconButton } from "../../design-system/AntIconButton";
@@ -107,9 +107,9 @@ export function AntSettingsFrame({
           {showsBackButton ? (
             <AntIconButton
               iconNode={
-                <Feather
+                <AntIcon
                   name={isRtl ? "arrow-right" : "arrow-left"}
-                  size={22}
+                  size="navigation"
                   color={colors.textSecondary}
                 />
               }
@@ -132,7 +132,11 @@ export function AntSettingsFrame({
           </View>
           <AntIconButton
             iconNode={
-              <Feather name="x" size={22} color={colors.textSecondary} />
+              <AntIcon
+                name="close"
+                size="navigation"
+                color={colors.textSecondary}
+              />
             }
             style={styles.headerControl}
             onPress={onClose}

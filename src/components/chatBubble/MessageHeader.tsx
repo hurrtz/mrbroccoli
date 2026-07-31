@@ -73,7 +73,7 @@ export function MessageHeader({ message }: { message: Message }) {
                   provider={message.provider}
                   label={providerLabel ?? undefined}
                   color={colors.accent}
-                  size={16}
+                  size="compact"
                 />
               </View>
             ) : null}

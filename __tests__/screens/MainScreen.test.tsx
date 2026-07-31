@@ -27,10 +27,6 @@ jest.mock("react-native", () => {
 
 const mockUseWindowDimensions = jest.mocked(useWindowDimensions);
 
-jest.mock("@expo/vector-icons", () => ({
-  Feather: ({ children }: { children?: React.ReactNode }) => children ?? null,
-}));
-
 jest.mock("react-native-safe-area-context", () => ({
   SafeAreaView: ({
     children,

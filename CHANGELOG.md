@@ -24,6 +24,9 @@ the complete Play Store translations are kept in a dedicated file under
 ### Changed
 
 - Display the current release version on the Settings overview.
+- Standardize application glyphs on Ant Design with consistent semantic icon
+  sizing and accessible touch targets, while retaining official provider-brand
+  artwork.
 - Focus the direct provider list on OpenAI, OpenRouter, Anthropic, Google,
   xAI, DeepSeek, Mistral, Alibaba Qwen, and ElevenLabs by removing the direct
   ByteDance, Moonshot, and Perplexity integrations. Kimi K3 remains available

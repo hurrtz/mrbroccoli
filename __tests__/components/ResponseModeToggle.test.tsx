@@ -11,7 +11,7 @@ import { lightColors } from "../../src/theme/colors";
 import { renderWithProviders } from "../test-utils/renderWithProviders";
 
 jest.mock("../../src/components/ProviderIcon", () => ({
-  ProviderIcon: ({ provider, size }: { provider: string; size: number }) => {
+  ProviderIcon: ({ provider, size }: { provider: string; size: string }) => {
     const React = require("react");
     const { Text } = require("react-native");
     return React.createElement(Text, null, `${provider}:${size}`);
@@ -85,7 +85,7 @@ describe("ResponseModeToggle", () => {
     expect(screen.getByText("Effort: High")).toBeTruthy();
     expect(screen.queryByText("Gemini 3.6 Flash")).toBeNull();
     expect(screen.queryByText("Gemini 3.1 Pro Preview")).toBeNull();
-    expect(screen.getAllByText("gemini:34")).toHaveLength(2);
+    expect(screen.getAllByText("gemini:feature")).toHaveLength(2);
     expect(
       StyleSheet.flatten(
         screen.getByTestId("response-mode-option-mode-1").props.style,
@@ -141,7 +141,7 @@ describe("ResponseModeToggle", () => {
     expect(screen.getByText("Large 3")).toBeTruthy();
     expect(screen.getByText("Effort")).toBeTruthy();
     expect(screen.getByText("Fixed")).toBeTruthy();
-    expect(screen.getByText("mistral:42")).toBeTruthy();
+    expect(screen.getByText("mistral:hero")).toBeTruthy();
     expect(
       StyleSheet.flatten(
         screen.getByTestId("response-mode-option-content-mode-1").props.style,
@@ -237,7 +237,7 @@ describe("ResponseModeToggle", () => {
     expect(screen.getByText("Large 3")).toBeTruthy();
     expect(screen.getByText("Effort")).toBeTruthy();
     expect(screen.getByText("Fixed")).toBeTruthy();
-    expect(screen.getByText("mistral:42")).toBeTruthy();
+    expect(screen.getByText("mistral:hero")).toBeTruthy();
     expect(
       StyleSheet.flatten(
         screen.getByTestId("response-mode-details-mode-1").props.style,
@@ -277,7 +277,7 @@ describe("ResponseModeToggle", () => {
     expect(screen.getByText("2.5 Flash")).toBeTruthy();
     expect(screen.getByText("Effort: Medium")).toBeTruthy();
     expect(screen.getByText("Effort: High")).toBeTruthy();
-    expect(screen.getAllByText("gemini:34")).toHaveLength(2);
+    expect(screen.getAllByText("gemini:feature")).toHaveLength(2);
   });
 
   it("omits effort metadata, enlarges the provider logo, and centers the model", () => {
@@ -315,7 +315,7 @@ describe("ResponseModeToggle", () => {
     );
 
     expect(screen.getByText("Gemini 3.5 Flash")).toBeTruthy();
-    expect(screen.getAllByText("gemini:24")).toHaveLength(3);
+    expect(screen.getAllByText("gemini:navigation")).toHaveLength(3);
     expect(
       StyleSheet.flatten(
         screen.getByTestId("response-mode-option-mode-2").props.style,
@@ -397,7 +397,7 @@ describe("ResponseModeToggle", () => {
       />,
     );
 
-    expect(screen.getAllByText("gemini:24")).toHaveLength(3);
+    expect(screen.getAllByText("gemini:navigation")).toHaveLength(3);
 
     fireEvent(screen.getByTestId("response-mode-model-mode-1"), "textLayout", {
       nativeEvent: { lines: [{}] },
@@ -405,12 +405,12 @@ describe("ResponseModeToggle", () => {
     fireEvent(screen.getByTestId("response-mode-model-mode-2"), "textLayout", {
       nativeEvent: { lines: [{}] },
     });
-    expect(screen.getAllByText("gemini:24")).toHaveLength(3);
+    expect(screen.getAllByText("gemini:navigation")).toHaveLength(3);
 
     fireEvent(screen.getByTestId("response-mode-model-mode-3"), "textLayout", {
       nativeEvent: { lines: [{}] },
     });
-    expect(screen.getAllByText("gemini:32")).toHaveLength(3);
+    expect(screen.getAllByText("gemini:feature")).toHaveLength(3);
     expect(
       StyleSheet.flatten(
         screen.getByTestId("response-mode-option-content-mode-1").props.style,
@@ -470,7 +470,7 @@ describe("ResponseModeToggle", () => {
       nativeEvent: { lines: [{}] },
     });
 
-    expect(screen.getAllByText("gemini:24")).toHaveLength(3);
+    expect(screen.getAllByText("gemini:navigation")).toHaveLength(3);
   });
 
   it("preserves unchanged measurements when one three-card model changes", () => {
@@ -513,15 +513,15 @@ describe("ResponseModeToggle", () => {
         nativeEvent: { lines: [{}] },
       });
     }
-    expect(screen.getAllByText("gemini:32")).toHaveLength(3);
+    expect(screen.getAllByText("gemini:feature")).toHaveLength(3);
 
     fireEvent.press(screen.getByTestId("switch-middle-model"));
-    expect(screen.getAllByText("gemini:24")).toHaveLength(3);
+    expect(screen.getAllByText("gemini:navigation")).toHaveLength(3);
 
     fireEvent(screen.getByTestId("response-mode-model-mode-2"), "textLayout", {
       nativeEvent: { lines: [{}] },
     });
-    expect(screen.getAllByText("gemini:32")).toHaveLength(3);
+    expect(screen.getAllByText("gemini:feature")).toHaveLength(3);
   });
 
   it("lays out model cards without a visible wrapper", () => {
@@ -622,7 +622,9 @@ describe("ResponseModeToggle", () => {
       expect(screen.queryByTestId("response-mode-list")).toBeNull();
       expect(screen.queryByTestId("response-mode-option-mode-4")).toBeNull();
       expect(screen.getByTestId("response-mode-overflow-selector")).toBeTruthy();
-      expect(screen.getByText(`mistral:${compact ? 36 : 42}`)).toBeTruthy();
+      expect(
+        screen.getByText(`mistral:${compact ? "feature" : "hero"}`),
+      ).toBeTruthy();
       expect(screen.getByText("Medium 3.5")).toBeTruthy();
 
       fireEvent.press(screen.getByTestId("response-mode-overflow-selector"));
@@ -759,7 +761,7 @@ describe("ResponseModeToggle", () => {
     expect(optionStyle.minWidth).toBe(0);
     expect(optionStyle.width).toBeUndefined();
     expect(optionStyle.minHeight).toBe(82);
-    expect(screen.getByText("openai:32")).toBeTruthy();
+    expect(screen.getByText("openai:feature")).toBeTruthy();
     expect(
       StyleSheet.flatten(
         screen.getByTestId("response-mode-model-mode-1").props.style,

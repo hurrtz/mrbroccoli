@@ -1,4 +1,4 @@
-import Feather from "@expo/vector-icons/Feather";
+import { AntIcon, type AntIconName } from "../../design-system/AntIcon";
 import React from "react";
 import {
   AccessibilityInfo,
@@ -55,24 +55,24 @@ interface PhaseAwareVoiceActionProps {
 function getPhaseIcon(
   visualPhase: VoiceVisualPhase,
   playbackPaused: boolean,
-): React.ComponentProps<typeof Feather>["name"] {
+): AntIconName {
   switch (visualPhase) {
     case "recording":
-      return "square";
+      return "stop";
     case "transcribing":
       return "file-text";
     case "thinking-briefly":
-      return "zap";
+      return "thunderbolt";
     case "searching":
-      return "globe";
+      return "global";
     case "thinking":
-      return "cpu";
+      return "robot";
     case "synthesizing":
-      return "headphones";
+      return "customer-service";
     case "speaking":
-      return playbackPaused ? "play" : "pause";
+      return playbackPaused ? "play-circle" : "pause";
     default:
-      return "mic";
+      return "audio";
   }
 }
 
@@ -556,9 +556,9 @@ export function PhaseAwareVoiceAction({
               {driveSilenceCountdownSeconds}
             </Text>
           ) : (
-            <Feather
+            <AntIcon
               name={getPhaseIcon(visualPhase, playbackPaused)}
-              size={21}
+              size="control"
               color={phaseColor}
             />
           )}

@@ -1,7 +1,7 @@
 import React from "react";
 import { Text, TouchableOpacity, View } from "react-native";
 
-import Feather from "@expo/vector-icons/Feather";
+import { AntIcon } from "../../design-system/AntIcon";
 import { Swipeable } from "react-native-gesture-handler";
 
 import { useLocalization } from "../../i18n";
@@ -49,7 +49,7 @@ export function ConversationDrawerItem({
       accessibilityRole="button"
       accessibilityLabel={t("delete")}
     >
-      <Feather name="trash-2" size={16} color={colors.onDanger} />
+      <AntIcon name="delete" size="compact" color={colors.onDanger} />
       <Text style={[styles.deleteText, { color: colors.onDanger }]}>
         {t("delete")}
       </Text>
@@ -78,9 +78,9 @@ export function ConversationDrawerItem({
         accessibilityRole="button"
         accessibilityLabel={t("conversationActions")}
       >
-        <Feather
-          name="more-horizontal"
-          size={16}
+        <AntIcon
+          name="ellipsis"
+          size="compact"
           color={colors.textSecondary}
         />
       </TouchableOpacity>
@@ -96,7 +96,7 @@ export function ConversationDrawerItem({
         <View style={styles.itemHeader}>
           <View style={styles.itemTitleRow}>
             {conversation.pinned ? (
-              <Feather name="bookmark" size={13} color={colors.accent} />
+              <AntIcon name="pushpin" size="inline" color={colors.accent} />
             ) : null}
             <Text
               style={[styles.itemTitle, { color: colors.text }]}
@@ -152,9 +152,9 @@ export function ConversationDrawerItem({
               ]}
             />
             <View style={styles.itemFooterMessages}>
-              <Feather
-                name="message-square"
-                size={12}
+              <AntIcon
+                name="message"
+                size="inline"
                 color={active ? colors.accent : colors.textMuted}
               />
               <Text

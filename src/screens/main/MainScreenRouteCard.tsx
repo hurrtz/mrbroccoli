@@ -7,7 +7,7 @@ import {
   ViewStyle,
 } from "react-native";
 
-import Feather from "@expo/vector-icons/Feather";
+import { AntIcon } from "../../design-system/AntIcon";
 
 import { ResponseModeToggle } from "../../components/ResponseModeToggle";
 import { Colors } from "../../theme/colors";
@@ -83,9 +83,9 @@ export const MainScreenRouteCard = React.memo(function MainScreenRouteCard({
                 },
               ]}
             >
-              <Feather name="key" size={14} color={colors.text} />
+              <AntIcon name="key" size="inline" color={colors.text} />
             </View>
-            <Feather name="arrow-up-right" size={16} color={colors.accent} />
+            <AntIcon name="export" size="compact" color={colors.accent} />
           </View>
           <Text style={[styles.providerEmptyTitle, { color: colors.text }]}>
             {t("setupGuideConnectProviderTitle")}

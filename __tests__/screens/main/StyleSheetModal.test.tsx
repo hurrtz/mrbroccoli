@@ -5,10 +5,6 @@ import { fireEvent } from "@testing-library/react-native";
 import { StyleSheetModal } from "../../../src/screens/main/StyleSheetModal";
 import { renderWithProviders } from "../../test-utils/renderWithProviders";
 
-jest.mock("@expo/vector-icons", () => ({
-  Feather: ({ children }: { children?: React.ReactNode }) => children ?? null,
-}));
-
 describe("StyleSheetModal", () => {
   function setup(
     overrides: Partial<React.ComponentProps<typeof StyleSheetModal>> = {},

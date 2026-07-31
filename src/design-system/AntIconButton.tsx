@@ -5,10 +5,15 @@ import {
   type ViewStyle,
 } from "react-native";
 
-import { Button, Icon } from "@ant-design/react-native";
-import type { IconNames } from "@ant-design/react-native/lib/icon";
+import { Button } from "@ant-design/react-native";
 
 import { useTheme } from "../theme/ThemeContext";
+import {
+  AntIcon,
+  MIN_ICON_TOUCH_TARGET,
+  type AntIconName,
+  type AntIconSize,
+} from "./AntIcon";
 
 export function AntIconButton({
   accessibilityLabel,
@@ -16,17 +21,17 @@ export function AntIconButton({
   icon,
   iconNode,
   iconColor,
-  iconSize = 20,
+  iconSize = "control",
   onPress,
   style,
   testID,
 }: {
   accessibilityLabel: string;
   active?: boolean;
-  icon?: IconNames;
+  icon?: AntIconName;
   iconNode?: React.ReactNode;
   iconColor?: string;
-  iconSize?: number;
+  iconSize?: AntIconSize;
   onPress: () => void;
   style?: StyleProp<ViewStyle>;
   testID?: string;
@@ -53,7 +58,7 @@ export function AntIconButton({
     >
       {iconNode ??
         (icon ? (
-          <Icon
+          <AntIcon
             name={icon}
             size={iconSize}
             color={
@@ -68,10 +73,10 @@ export function AntIconButton({
 
 const styles = StyleSheet.create({
   button: {
-    width: 44,
-    height: 44,
-    minWidth: 44,
-    minHeight: 44,
+    width: MIN_ICON_TOUCH_TARGET,
+    height: MIN_ICON_TOUCH_TARGET,
+    minWidth: MIN_ICON_TOUCH_TARGET,
+    minHeight: MIN_ICON_TOUCH_TARGET,
     paddingHorizontal: 0,
     borderRadius: 12,
     borderWidth: 1,

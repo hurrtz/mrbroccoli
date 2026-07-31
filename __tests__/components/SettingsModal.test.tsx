@@ -52,14 +52,6 @@ jest.mock("react-native-safe-area-context", () => ({
   useSafeAreaInsets: () => ({ top: 0, bottom: 0, left: 0, right: 0 }),
 }));
 
-jest.mock("@expo/vector-icons", () => ({
-  Feather: ({ color, name }: { color?: string; name: string }) => {
-    const React = require("react");
-    const { Text } = require("react-native");
-    return React.createElement(Text, { style: { color } }, name);
-  },
-}));
-
 jest.mock("react-native-reanimated", () => {
   const React = require("react");
   const { View } = require("react-native");
@@ -178,9 +170,9 @@ describe("SettingsModal", () => {
       ).toBe("center");
       expect(screen.queryByTestId("settings-header-gradient")).toBeNull();
       expect(screen.queryByTestId("settings-modal-gradient")).toBeNull();
-      expect(screen.getByTestId("icon-x")).toBeTruthy();
+      expect(screen.getByTestId("ant-icon-close")).toBeTruthy();
       expect(
-        screen.getAllByTestId("icon-chevron-right").length,
+        screen.getAllByTestId("ant-icon-right").length,
       ).toBeGreaterThan(0);
       expect(screen.queryByText("Runtime Readiness")).toBeNull();
       expect(screen.getByText("Connections")).toBeTruthy();
@@ -200,7 +192,7 @@ describe("SettingsModal", () => {
     await waitFor(() => {
       expect(screen.queryByText("Back to overview")).toBeNull();
       expect(screen.getByLabelText("Back to overview")).toBeTruthy();
-      expect(screen.getByTestId("icon-arrow-left")).toBeTruthy();
+      expect(screen.getByTestId("ant-icon-arrow-left")).toBeTruthy();
       expect(screen.getByTestId("settings-modal-title").props.children).toBe(
         "Connections",
       );
@@ -300,17 +292,17 @@ describe("SettingsModal", () => {
     );
 
     await waitFor(() => {
-      expect(screen.getAllByTestId("icon-chevron-left").length).toBeGreaterThan(
+      expect(screen.getAllByTestId("ant-icon-left").length).toBeGreaterThan(
         0,
       );
-      expect(screen.queryByTestId("icon-chevron-right")).toBeNull();
+      expect(screen.queryByTestId("ant-icon-right")).toBeNull();
     });
 
     fireEvent.press(screen.getByText(translate("ar", "settingsConnections")));
 
     await waitFor(() => {
-      expect(screen.getByTestId("icon-arrow-right")).toBeTruthy();
-      expect(screen.queryByTestId("icon-arrow-left")).toBeNull();
+      expect(screen.getByTestId("ant-icon-arrow-right")).toBeTruthy();
+      expect(screen.queryByTestId("ant-icon-arrow-left")).toBeNull();
     });
   });
 
@@ -1639,7 +1631,8 @@ describe("SettingsModal", () => {
 
     const clearAction = screen.getByLabelText("Clear recent speech activity");
     expect(
-      StyleSheet.flatten(screen.getByTestId("icon-trash-2").props.style).color,
+      StyleSheet.flatten(screen.getByTestId("ant-icon-delete").props.style)
+        .color,
     ).toBe("#DC2626");
 
     fireEvent.press(clearAction);

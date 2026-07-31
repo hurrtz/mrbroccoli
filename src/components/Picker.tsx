@@ -10,7 +10,7 @@ import {
   Pressable,
   StyleSheet,
 } from "react-native";
-import Feather from "@expo/vector-icons/Feather";
+import { AntIcon } from "../design-system/AntIcon";
 import { APP_MODAL_ORIENTATIONS } from "../constants/layout";
 import { useLocalization } from "../i18n";
 import { useTheme } from "../theme/ThemeContext";
@@ -87,7 +87,7 @@ export function Picker({
             { backgroundColor: colors.accentSoft, borderColor: colors.border },
           ]}
         >
-          <Feather name="chevron-down" size={16} color={colors.accent} />
+          <AntIcon name="down" size="compact" color={colors.accent} />
         </View>
       </TouchableOpacity>
 
@@ -135,7 +135,11 @@ export function Picker({
                 onPress={() => setOpen(false)}
                 style={styles.closeButton}
               >
-                <Feather name="x" size={18} color={colors.textSecondary} />
+                <AntIcon
+                  name="close"
+                  size="control"
+                  color={colors.textSecondary}
+                />
               </TouchableOpacity>
             </View>
             <FlatList
@@ -168,7 +172,11 @@ export function Picker({
                     {item.label}
                   </Text>
                   {item.value === value ? (
-                    <Feather name="check" size={16} color={colors.accent} />
+                    <AntIcon
+                      name="check"
+                      size="compact"
+                      color={colors.accent}
+                    />
                   ) : null}
                 </TouchableOpacity>
               )}

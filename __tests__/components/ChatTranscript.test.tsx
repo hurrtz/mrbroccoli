@@ -48,12 +48,11 @@ describe("ChatTranscript follow-tail scrolling", () => {
       StyleSheet.flatten(
         screen.getByTestId("empty-transcript-icon").props.style,
       ),
-    ).toEqual({
-      color: lightColors.textSecondary,
-      fontSize: 22,
-    });
-    expect(screen.getByTestId("empty-transcript-icon").props.children).toBe(
-      "icon:info",
+    ).toEqual(
+      expect.objectContaining({
+        color: lightColors.textSecondary,
+        fontSize: 24,
+      }),
     );
   });
 

@@ -2,7 +2,7 @@ import React from "react";
 import { Text, View } from "react-native";
 
 import { Modal } from "@ant-design/react-native";
-import Feather from "@expo/vector-icons/Feather";
+import { AntIcon } from "../../../design-system/AntIcon";
 
 import { getTtsListenLanguageLabel } from "../../../constants/localTts";
 import { PROVIDER_LABELS } from "../../../constants/models";
@@ -167,7 +167,11 @@ export function AppSettingsPage({
               <AntIconButton
                 accessibilityLabel={t("clearRuntimeCompatibilityOverrides")}
                 iconNode={
-                  <Feather name="trash-2" size={18} color={colors.danger} />
+                  <AntIcon
+                    name="delete"
+                    size="control"
+                    color={colors.danger}
+                  />
                 }
                 onPress={() =>
                   setClearRuntimeOverridesConfirmationVisible(true)
@@ -222,7 +226,11 @@ export function AppSettingsPage({
                 <AntIconButton
                   accessibilityLabel={t("clearSpeechDiagnostics")}
                   iconNode={
-                    <Feather name="trash-2" size={18} color={colors.danger} />
+                    <AntIcon
+                      name="delete"
+                      size="control"
+                      color={colors.danger}
+                    />
                   }
                   onPress={handleClear}
                 />

@@ -1,7 +1,7 @@
 import React from "react";
 import { Text, TouchableOpacity, View } from "react-native";
 
-import Feather from "@expo/vector-icons/Feather";
+import { AntIcon } from "../../design-system/AntIcon";
 
 import { useLocalization } from "../../i18n";
 import { useTheme } from "../../theme/ThemeContext";
@@ -85,7 +85,7 @@ export function ConversationActionSheet({
           accessibilityRole="button"
           accessibilityLabel={conversation.pinned ? t("unpin") : t("pin")}
         >
-          <Feather name="bookmark" size={16} color={colors.textSecondary} />
+          <AntIcon name="pushpin" size="compact" color={colors.textSecondary} />
           <Text
             style={[styles.actionSheetRowText, { color: colors.textSecondary }]}
           >
@@ -107,7 +107,7 @@ export function ConversationActionSheet({
           accessibilityRole="button"
           accessibilityLabel={t("rename")}
         >
-          <Feather name="edit-3" size={16} color={colors.textSecondary} />
+          <AntIcon name="edit" size="compact" color={colors.textSecondary} />
           <Text
             style={[styles.actionSheetRowText, { color: colors.textSecondary }]}
           >
@@ -131,7 +131,7 @@ export function ConversationActionSheet({
           accessibilityRole="button"
           accessibilityLabel={t("memory")}
         >
-          <Feather name="archive" size={16} color={colors.textSecondary} />
+          <AntIcon name="inbox" size="compact" color={colors.textSecondary} />
           <Text
             style={[styles.actionSheetRowText, { color: colors.textSecondary }]}
           >
@@ -155,7 +155,11 @@ export function ConversationActionSheet({
           accessibilityRole="button"
           accessibilityLabel={t("share")}
         >
-          <Feather name="share" size={16} color={colors.textSecondary} />
+          <AntIcon
+            name="share-alt"
+            size="compact"
+            color={colors.textSecondary}
+          />
           <Text
             style={[styles.actionSheetRowText, { color: colors.textSecondary }]}
           >
@@ -179,7 +183,7 @@ export function ConversationActionSheet({
           accessibilityRole="button"
           accessibilityLabel={t("copy")}
         >
-          <Feather name="copy" size={16} color={colors.textSecondary} />
+          <AntIcon name="copy" size="compact" color={colors.textSecondary} />
           <Text
             style={[styles.actionSheetRowText, { color: colors.textSecondary }]}
           >
@@ -205,7 +209,7 @@ export function ConversationActionSheet({
           accessibilityRole="button"
           accessibilityLabel={t("delete")}
         >
-          <Feather name="trash-2" size={16} color={colors.danger} />
+          <AntIcon name="delete" size="compact" color={colors.danger} />
           <Text style={[styles.actionSheetRowText, { color: colors.danger }]}>
             {t("delete")}
           </Text>

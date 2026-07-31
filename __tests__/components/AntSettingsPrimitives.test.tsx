@@ -50,7 +50,7 @@ describe("AntPickerRow", () => {
     );
 
     expect(screen.getByText("OpenAI")).toBeTruthy();
-    expect(screen.queryByTestId("icon-chevron-down")).toBeNull();
+    expect(screen.queryByTestId("ant-icon-down")).toBeNull();
     expect(itemStyle.borderWidth).toBeUndefined();
   });
 
@@ -79,7 +79,7 @@ describe("AntPickerRow", () => {
     const screen = renderPickerRow(2, onChange);
 
     expect(screen.getByText("OpenAI")).toBeTruthy();
-    expect(screen.getByTestId("icon-chevron-down")).toBeTruthy();
+    expect(screen.getByTestId("ant-icon-down")).toBeTruthy();
 
     fireEvent.press(screen.getByTestId("provider-picker"));
 
@@ -129,7 +129,7 @@ describe("AntPickerRow", () => {
 
     expect(screen.getByText("Singapore")).toBeTruthy();
     expect(screen.queryByText("Region")).toBeNull();
-    expect(screen.getByTestId("icon-chevron-down")).toBeTruthy();
+    expect(screen.getByTestId("ant-icon-down")).toBeTruthy();
   });
 
   it("lets a standalone dropdown align with surrounding cards", () => {

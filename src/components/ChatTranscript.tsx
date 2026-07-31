@@ -10,7 +10,7 @@ import {
   View,
   ViewStyle,
 } from "react-native";
-import Feather from "@expo/vector-icons/Feather";
+import { AntIcon } from "../design-system/AntIcon";
 import { ChatBubble } from "./ChatBubble";
 import { useLocalization } from "../i18n";
 import { useTheme } from "../theme/ThemeContext";
@@ -288,10 +288,10 @@ export function ChatTranscript({
       ]}
       ListEmptyComponent={
         <View style={styles.emptyCard}>
-          <Feather
+          <AntIcon
             testID="empty-transcript-icon"
-            name="info"
-            size={22}
+            name="info-circle"
+            size="navigation"
             color={colors.textSecondary}
           />
           <Text style={[styles.emptyTitle, { color: colors.text }]}>

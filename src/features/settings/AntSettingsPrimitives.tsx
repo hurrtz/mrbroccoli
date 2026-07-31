@@ -14,11 +14,14 @@ import {
   type ViewStyle,
 } from "react-native";
 
-import { Card, Icon, Input, List, Radio } from "@ant-design/react-native";
-import Feather from "@expo/vector-icons/Feather";
-import type { IconNames } from "@ant-design/react-native/lib/icon";
+import { Card, Input, List, Radio } from "@ant-design/react-native";
 
 import { APP_MODAL_ORIENTATIONS } from "../../constants/layout";
+import {
+  AntIcon,
+  type AntIconName,
+  type AntIconSize,
+} from "../../design-system/AntIcon";
 import { useLocalization } from "../../i18n";
 import { useTheme } from "../../theme/ThemeContext";
 import { fonts } from "../../theme/typography";
@@ -178,9 +181,9 @@ export function AntDisclosureCard({
               pressed ? styles.pressedControl : null,
             ]}
           >
-            <Feather
-              name={expanded ? "chevron-up" : "chevron-down"}
-              size={20}
+            <AntIcon
+              name={expanded ? "up" : "down"}
+              size="control"
               color={colors.textSecondary}
             />
           </Pressable>
@@ -245,17 +248,17 @@ export function AntDisclosureCard({
 export function AntButtonLabel({
   color,
   icon,
-  iconSize = 15,
+  iconSize = "compact",
   label,
 }: {
   color: string;
-  icon: IconNames;
-  iconSize?: number;
+  icon: AntIconName;
+  iconSize?: AntIconSize;
   label: string;
 }) {
   return (
     <View style={styles.buttonLabelRow}>
-      <Icon name={icon} size={iconSize} color={color} />
+      <AntIcon name={icon} size={iconSize} color={color} />
       <Text style={[styles.buttonLabelText, { color }]}>{label}</Text>
     </View>
   );
@@ -438,7 +441,7 @@ export function AntPickerRow({
   const showStaticValueOnly = hasSingleOption && label === undefined;
   const disclosureIcon =
     !disabled && !hasSingleOption ? (
-      <Feather name="chevron-down" size={17} color={colors.textMuted} />
+      <AntIcon name="down" size="compact" color={colors.textMuted} />
     ) : null;
   const pickerIsInteractive = !hasSingleOption;
   const renderRow = (onPress?: () => void) => {
@@ -580,7 +583,11 @@ export function AntPickerRow({
                   pressed ? styles.pressedControl : null,
                 ]}
               >
-                <Feather name="x" size={21} color={colors.textSecondary} />
+                <AntIcon
+                  name="close"
+                  size="control"
+                  color={colors.textSecondary}
+                />
               </Pressable>
             </View>
             <FlatList
@@ -637,7 +644,11 @@ export function AntPickerRow({
                       {option.label}
                     </Text>
                     {selected ? (
-                      <Feather name="check" size={19} color={colors.accent} />
+                      <AntIcon
+                        name="check"
+                        size="control"
+                        color={colors.accent}
+                      />
                     ) : null}
                   </Pressable>
                 );

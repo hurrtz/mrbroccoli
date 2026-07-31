@@ -2,10 +2,10 @@ import React from "react";
 import { Pressable, Text, View } from "react-native";
 
 import { List } from "@ant-design/react-native";
-import Feather from "@expo/vector-icons/Feather";
 
 import appConfig from "../../../app.json";
 import { useLocalization } from "../../i18n";
+import { AntIcon, type AntIconName } from "../../design-system/AntIcon";
 import { useTheme } from "../../theme/ThemeContext";
 import { fonts } from "../../theme/typography";
 import type { SettingsReadiness } from "../settings-core/readiness";
@@ -34,7 +34,7 @@ type OverviewRow = {
     | "settingsSearchSummary"
     | "settingsDataPrivacySummary"
     | "settingsAppDiagnosticsSummary";
-  icon: React.ComponentProps<typeof Feather>["name"];
+  icon: AntIconName;
 };
 
 const overviewRows: OverviewRow[] = [
@@ -48,19 +48,19 @@ const overviewRows: OverviewRow[] = [
     page: "thinking",
     titleKey: "settingsThinking",
     summaryKey: "settingsThinkingSummary",
-    icon: "cpu",
+    icon: "robot",
   },
   {
     page: "listening",
     titleKey: "settingsListening",
     summaryKey: "settingsListeningSummary",
-    icon: "mic",
+    icon: "audio",
   },
   {
     page: "speaking",
     titleKey: "settingsSpeaking",
     summaryKey: "settingsSpeakingSummary",
-    icon: "volume-2",
+    icon: "sound",
   },
   {
     page: "search",
@@ -72,7 +72,7 @@ const overviewRows: OverviewRow[] = [
     page: "data",
     titleKey: "settingsDataPrivacy",
     summaryKey: "settingsDataPrivacySummary",
-    icon: "shield",
+    icon: "safety-certificate",
   },
   {
     page: "app",
@@ -93,7 +93,7 @@ export function AntSettingsOverview({
 }) {
   const { colors } = useTheme();
   const { isRtl, t } = useLocalization();
-  const drillInIcon = isRtl ? "chevron-left" : "chevron-right";
+  const drillInIcon = isRtl ? "left" : "right";
   const readinessItems = [
     {
       key: "thinking",
@@ -151,7 +151,11 @@ export function AntSettingsOverview({
                   {t("settingsGuidedSetupSummary")}
                 </Text>
               </View>
-              <Feather name={drillInIcon} size={20} color={colors.textMuted} />
+              <AntIcon
+                name={drillInIcon}
+                size="control"
+                color={colors.textMuted}
+              />
             </View>
           </AntSettingsCard>
         </Pressable>
@@ -205,11 +209,15 @@ export function AntSettingsOverview({
                   ]}
                 >
                   {ready ? (
-                    <Feather name="check" size={13} color={colors.success} />
+                    <AntIcon
+                      name="check"
+                      size="inline"
+                      color={colors.success}
+                    />
                   ) : broken ? (
-                    <Feather
-                      name="alert-circle"
-                      size={12}
+                    <AntIcon
+                      name="exclamation-circle"
+                      size="inline"
                       color={colors.danger}
                     />
                   ) : null}
@@ -259,13 +267,17 @@ export function AntSettingsOverview({
                   testID={`settings-overview-icon-${row.page}`}
                   style={styles.sectionIcon}
                 >
-                  <Feather name={row.icon} size={27} color={colors.text} />
+                  <AntIcon
+                    name={row.icon}
+                    size="prominent"
+                    color={colors.text}
+                  />
                 </View>
               }
               extra={
-                <Feather
+                <AntIcon
                   name={drillInIcon}
-                  size={20}
+                  size="control"
                   color={colors.textMuted}
                 />
               }

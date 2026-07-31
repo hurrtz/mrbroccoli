@@ -10,6 +10,10 @@ import MistralIcon from "../../assets/providers/mistral-ai.svg";
 import OpenAIIcon from "../../assets/providers/openai.svg";
 import OpenRouterIcon from "../../assets/providers/openrouter.svg";
 import XaiIcon from "../../assets/providers/xai.svg";
+import {
+  resolveAntIconSize,
+  type AntIconSize,
+} from "../design-system/AntIcon";
 import { Provider } from "../types";
 
 const PROVIDER_ICON_COMPONENTS: Record<
@@ -46,7 +50,7 @@ interface ProviderIconProps {
   provider: Provider | string;
   color: string;
   label?: string;
-  size?: number;
+  size?: AntIconSize;
 }
 
 function getFallbackProviderGlyph(value: string) {
@@ -70,13 +74,14 @@ export function ProviderIcon({
   size: requestedSize,
 }: ProviderIconProps) {
   const Icon = PROVIDER_ICON_COMPONENTS[provider];
+  const targetSize = resolveAntIconSize(requestedSize ?? "navigation");
 
   if (!Icon) {
     return (
       <Text
         style={{
           color,
-          fontSize: 12,
+          fontSize: Math.max(12, targetSize / 2),
           fontWeight: "700",
           letterSpacing: 0.8,
         }}
@@ -86,12 +91,15 @@ export function ProviderIcon({
     );
   }
 
-  const size = requestedSize
-    ? { width: requestedSize, height: requestedSize }
-    : PROVIDER_ICON_SIZES[provider] ?? {
-        width: 24,
-        height: 24,
-      };
+  const sourceSize = PROVIDER_ICON_SIZES[provider] ?? {
+    width: 24,
+    height: 24,
+  };
+  const scale = targetSize / Math.max(sourceSize.width, sourceSize.height);
+  const size = {
+    width: sourceSize.width * scale,
+    height: sourceSize.height * scale,
+  };
 
   return (
     <Icon

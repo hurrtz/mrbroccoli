@@ -2,7 +2,7 @@ import React from "react";
 import { StyleSheet, Text, View } from "react-native";
 
 import { Checkbox, List, Modal } from "@ant-design/react-native";
-import Feather from "@expo/vector-icons/Feather";
+import { AntIcon } from "../../design-system/AntIcon";
 
 import {
   getTtsListenLanguageLabel,
@@ -71,9 +71,9 @@ export function AntListenLanguageSelector({
                     count: selectedLanguages.length,
                   })}
                 </Text>
-                <Feather
-                  name="chevron-down"
-                  size={17}
+                <AntIcon
+                  name="down"
+                  size="compact"
                   color={colors.textMuted}
                 />
               </View>

@@ -108,6 +108,7 @@ export const styles = StyleSheet.create({
   },
   replyFailureAction: {
     alignSelf: "flex-start",
+    minHeight: 44,
     flexDirection: "row",
     alignItems: "center",
     gap: 6,

@@ -1,4 +1,4 @@
-import Feather from "@expo/vector-icons/Feather";
+import { AntIcon } from "../../../design-system/AntIcon";
 import React from "react";
 import { Text, TouchableOpacity, View } from "react-native";
 import { Colors } from "../../../theme/colors";
@@ -50,7 +50,7 @@ export function DriveSessionControls({
           },
         ]}
       >
-        <Feather name="pause" size={17} color={colors.text} />
+        <AntIcon name="pause" size="compact" color={colors.text} />
         <Text style={[styles.driveControlLabel, { color: colors.text }]}>
           {t("stopDriveSession")}
         </Text>
@@ -75,7 +75,7 @@ export function DriveSessionControls({
           },
         ]}
       >
-        <Feather name="repeat" size={17} color={colors.text} />
+        <AntIcon name="redo" size="compact" color={colors.text} />
         <Text style={[styles.driveControlLabel, { color: colors.text }]}>
           {t("repeatDriveReply")}
         </Text>
@@ -100,7 +100,11 @@ export function DriveSessionControls({
           },
         ]}
       >
-        <Feather name="play" size={17} color={colors.onPrimary} />
+        <AntIcon
+          name="play-circle"
+          size="compact"
+          color={colors.onPrimary}
+        />
         <Text
           style={[styles.driveControlLabel, { color: colors.onPrimary }]}
         >

@@ -113,6 +113,11 @@ These notes are specific to this repository and supplement any parent-level inst
   may live in a typed module under `src/i18n/` and be spread into every locale.
 - Keep interactive controls at least 44 by 44 points. Decorative icons may be
   smaller, but must not define the touch target.
+- Application glyphs must use the shared `src/design-system/AntIcon.tsx`
+  wrapper and its semantic size scale; do not import another icon font or use
+  raw numeric glyph sizes. The nine official provider-brand SVGs in
+  `ProviderIcon.tsx` are the deliberate exception and use the same semantic
+  visual-size tokens.
 - Modal content must isolate screen-reader focus; backdrop-only dismissal
   layers stay out of the accessibility tree and every modal retains a labeled
   close action.

@@ -378,7 +378,7 @@ describe("ChatBubble", () => {
     );
 
     try {
-      expect(screen.getByText("icon:copy")).toBeTruthy();
+      expect(screen.getByTestId("ant-icon-copy")).toBeTruthy();
 
       await act(async () => {
         fireEvent.press(screen.getByLabelText("Copy"));
@@ -388,23 +388,24 @@ describe("ChatBubble", () => {
       const confirmedButton = screen.getByTestId(
         "message-copy-action-assistant-copy-confirmation",
       );
-      expect(screen.getByText("icon:check")).toBeTruthy();
+      expect(screen.getByTestId("ant-icon-check")).toBeTruthy();
       expect(
         StyleSheet.flatten(confirmedButton.props.style).backgroundColor,
       ).toBe(lightColors.success);
-      expect(screen.getByTestId("icon-check").props.style.color).toBe(
-        getAccessibleForeground(lightColors.success),
-      );
+      expect(
+        StyleSheet.flatten(screen.getByTestId("ant-icon-check").props.style)
+          .color,
+      ).toBe(getAccessibleForeground(lightColors.success));
 
       act(() => {
         jest.advanceTimersByTime(2_999);
       });
-      expect(screen.getByText("icon:check")).toBeTruthy();
+      expect(screen.getByTestId("ant-icon-check")).toBeTruthy();
 
       act(() => {
         jest.advanceTimersByTime(1);
       });
-      expect(screen.getByText("icon:copy")).toBeTruthy();
+      expect(screen.getByTestId("ant-icon-copy")).toBeTruthy();
     } finally {
       screen.unmount();
       jest.runOnlyPendingTimers();
@@ -437,9 +438,10 @@ describe("ChatBubble", () => {
         ).props.style,
       ).backgroundColor,
     ).toBe(lightColors.success);
-    expect(screen.getByTestId("icon-square").props.style.color).toBe(
-      getAccessibleForeground(lightColors.success),
-    );
+    expect(
+      StyleSheet.flatten(screen.getByTestId("ant-icon-stop").props.style)
+        .color,
+    ).toBe(getAccessibleForeground(lightColors.success));
   });
 
   it.each([
@@ -471,9 +473,10 @@ describe("ChatBubble", () => {
           screen.getByTestId(`message-repeat-action-${messageId}`).props.style,
         ).backgroundColor,
       ).toBe(colors.phaseSynthesizing);
-      expect(screen.getByTestId("icon-loader").props.style.color).toBe(
-        getAccessibleForeground(colors.phaseSynthesizing),
-      );
+      expect(
+        StyleSheet.flatten(screen.getByTestId("ant-icon-loading").props.style)
+          .color,
+      ).toBe(getAccessibleForeground(colors.phaseSynthesizing));
       screen.unmount();
     },
   );
@@ -496,8 +499,8 @@ describe("ChatBubble", () => {
 
     fireEvent.press(screen.getByLabelText("Copy"));
 
-    expect(screen.getByText("icon:copy")).toBeTruthy();
-    expect(screen.queryByText("icon:check")).toBeNull();
+    expect(screen.getByTestId("ant-icon-copy")).toBeTruthy();
+    expect(screen.queryByTestId("ant-icon-check")).toBeNull();
     expect(
       StyleSheet.flatten(
         screen.getByTestId("message-copy-action-assistant-copy-failed").props

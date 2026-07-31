@@ -12,7 +12,6 @@ module.exports = {
   ],
   moduleNameMapper: {
     "\\.svg$": "<rootDir>/__mocks__/svgMock.js",
-    "^@expo/vector-icons/Feather$": "<rootDir>/__mocks__/FeatherIcon.js",
     "^expo-keep-awake$": "<rootDir>/__mocks__/expoKeepAwake.js",
     "^expo-clipboard$": "<rootDir>/__mocks__/expoClipboard.js",
     "^expo-file-system$": "<rootDir>/__mocks__/expoFileSystem.js",

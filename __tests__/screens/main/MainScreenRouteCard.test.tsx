@@ -6,14 +6,6 @@ import { TranslateFn } from "../../../src/screens/main/shared";
 import { lightColors } from "../../../src/theme/colors";
 import { renderWithProviders } from "../../test-utils/renderWithProviders";
 
-jest.mock("@expo/vector-icons", () => ({
-  Feather: ({ name }: { name: string }) => {
-    const React = require("react");
-    const { Text } = require("react-native");
-    return React.createElement(Text, null, `icon:${name}`);
-  },
-}));
-
 jest.mock("../../../src/components/ProviderIcon", () => ({
   ProviderIcon: ({ provider }: { provider: string }) => {
     const React = require("react");

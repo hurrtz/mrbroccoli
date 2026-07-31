@@ -129,7 +129,7 @@ export function TranscriptPreviewCard({
               <AntIconButton
                 testID="conversation-style-control"
                 icon="control"
-                iconSize={19}
+                iconSize="control"
                 style={styles.transcriptStyleControl}
                 onPress={onOpenStyleSheet}
                 accessibilityLabel={t("openStyleSheet")}
@@ -139,7 +139,7 @@ export function TranscriptPreviewCard({
               <AntIconButton
                 testID="scroll-to-latest-control"
                 icon="down"
-                iconSize={19}
+                iconSize="control"
                 style={styles.transcriptStyleControl}
                 onPress={() => {
                   setIsAtTranscriptTail(true);

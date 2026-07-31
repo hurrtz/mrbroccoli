@@ -1,4 +1,4 @@
-import Feather from "@expo/vector-icons/Feather";
+import { AntIcon } from "../../../design-system/AntIcon";
 import React from "react";
 import {
   Text,
@@ -127,9 +127,9 @@ function VoiceInputSurface({
             },
           ]}
         >
-          <Feather
-            name="mic"
-            size={22}
+          <AntIcon
+            name="audio"
+            size="navigation"
             color={
               actionDisabled ? colors.textMuted : colors.activeControlIcon
             }
@@ -241,9 +241,9 @@ function TextInputSurface({
             {promptBlockedActionLabel}
           </Text>
         ) : (
-          <Feather
+          <AntIcon
             name="arrow-up"
-            size={19}
+            size="control"
             color={
               textSubmitDisabled ? colors.textMuted : colors.onPrimary
             }

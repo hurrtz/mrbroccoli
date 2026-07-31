@@ -2,7 +2,7 @@ import React from "react";
 import { StyleSheet, Text, View } from "react-native";
 
 import { Button } from "@ant-design/react-native";
-import Feather from "@expo/vector-icons/Feather";
+import { AntIcon } from "../../../design-system/AntIcon";
 
 import {
   MAX_RESPONSE_MODES,
@@ -112,9 +112,9 @@ export function ThinkingSettingsPage({
                     <AntIconButton
                       accessibilityLabel={t("removeResponseMode")}
                       iconNode={
-                        <Feather
-                          name="trash-2"
-                          size={18}
+                        <AntIcon
+                          name="delete"
+                          size="control"
                           color={colors.danger}
                         />
                       }

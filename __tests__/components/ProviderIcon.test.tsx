@@ -32,11 +32,11 @@ describe("ProviderIcon", () => {
 
   it("supports compact icon sizing without changing the source asset", () => {
     const screen = render(
-      <ProviderIcon provider="xai" color="#123456" size={18} />,
+      <ProviderIcon provider="xai" color="#123456" size="compact" />,
     );
 
     expect(screen.getByTestId("provider-icon-xai").props).toEqual(
-      expect.objectContaining({ height: 18, width: 18 }),
+      expect.objectContaining({ height: 16, width: 16 }),
     );
   });
 });

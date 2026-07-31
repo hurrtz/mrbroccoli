@@ -38,7 +38,6 @@
     "@dr.pogodin/react-native-fs": "^2.39.2",
     "@expo-google-fonts/outfit": "^0.4.3",
     "@expo-google-fonts/unica-one": "^0.4.2",
-    "@expo/vector-icons": "^15.1.1",
     "@noble/hashes": "^1.8.0",
     "@react-native-async-storage/async-storage": "2.2.0",
     "expo": "^57.0.9",

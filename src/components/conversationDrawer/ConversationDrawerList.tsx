@@ -1,7 +1,7 @@
 import React from "react";
 import { FlatList, Text, View } from "react-native";
 
-import Feather from "@expo/vector-icons/Feather";
+import { AntIcon } from "../../design-system/AntIcon";
 
 import { useLocalization } from "../../i18n";
 import { useTheme } from "../../theme/ThemeContext";
@@ -60,11 +60,10 @@ export function ConversationDrawerList({
               },
             ]}
           >
-            <Feather
-              name="message-circle"
-              size={18}
+            <AntIcon
+              name="message"
+              size="control"
               color={colors.accent}
-              accessible={false}
             />
           </View>
           <Text
