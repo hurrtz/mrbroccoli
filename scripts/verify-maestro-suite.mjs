@@ -39,7 +39,7 @@ function propertyName(node) {
   return null;
 }
 
-export function readAppLanguages(cwd = process.cwd()) {
+export function readAppLocaleOptions(cwd = process.cwd()) {
   const registryPath = path.join(cwd, "src/i18n/localeRegistry.ts");
   const source = fs.readFileSync(registryPath, "utf8");
   const sourceFile = ts.createSourceFile(
@@ -49,7 +49,7 @@ export function readAppLanguages(cwd = process.cwd()) {
     true,
     ts.ScriptKind.TS,
   );
-  let languages = null;
+  let locales = null;
 
   sourceFile.forEachChild((node) => {
     if (!ts.isVariableStatement(node)) {
@@ -73,19 +73,46 @@ export function readAppLanguages(cwd = process.cwd()) {
         return;
       }
 
-      languages = initializer.properties
-        .map((property) =>
-          "name" in property ? propertyName(property.name) : null,
-        )
-        .filter(Boolean);
+      locales = initializer.properties.flatMap((property) => {
+        if (!ts.isPropertyAssignment(property)) {
+          return [];
+        }
+
+        const value = propertyName(property.name);
+        const definition = ts.isCallExpression(property.initializer)
+          ? property.initializer.arguments[0]
+          : null;
+        if (!value || !definition || !ts.isObjectLiteralExpression(definition)) {
+          return [];
+        }
+
+        const nativeNameProperty = definition.properties.find(
+          (candidate) =>
+            ts.isPropertyAssignment(candidate) &&
+            propertyName(candidate.name) === "nativeName",
+        );
+        if (
+          !nativeNameProperty ||
+          !ts.isPropertyAssignment(nativeNameProperty) ||
+          !ts.isStringLiteral(nativeNameProperty.initializer)
+        ) {
+          return [];
+        }
+
+        return [{ value, label: nativeNameProperty.initializer.text }];
+      });
     });
   });
 
-  if (!languages || languages.length === 0) {
+  if (!locales || locales.length === 0) {
     throw new Error("Could not derive APP_LANGUAGES from localeRegistry.ts");
   }
 
-  return languages;
+  return locales;
+}
+
+export function readAppLanguages(cwd = process.cwd()) {
+  return readAppLocaleOptions(cwd).map(({ value }) => value);
 }
 
 export function countScreenshots(flowText) {
@@ -148,28 +175,34 @@ export function validateMaestroSuite(cwd = process.cwd()) {
     }
   }
 
+  const exactLanguageOptionSelectors = localizedFlow.match(
+    /id:\s*\^app-language-picker-option-\$\{LOCALE\}\$/g,
+  );
+  if ((exactLanguageOptionSelectors?.length ?? 0) < 1) {
+    errors.push(
+      "Localized Maestro coverage must use an exact requested-language selector for scrolling",
+    );
+  }
+
   if (
-    !/id:\s*\^app-language-picker-option-\$\{LOCALE\}\$[\s\S]{0,160}centerElement:\s*true/.test(
+    /id:\s*\^app-language-picker-option-\$\{LOCALE\}\$[\s\S]{0,160}centerElement:\s*true/.test(
       localizedFlow,
     )
   ) {
     errors.push(
-      "Localized Maestro coverage must center an exact requested-language selector before selecting it",
-    );
-  }
-
-  const exactLanguageOptionSelectors = localizedFlow.match(
-    /id:\s*\^app-language-picker-option-\$\{LOCALE\}\$/g,
-  );
-  if ((exactLanguageOptionSelectors?.length ?? 0) < 2) {
-    errors.push(
-      "Localized Maestro coverage must use exact requested-language selectors for scrolling and tapping",
+      "Localized Maestro coverage must not center language rows because iOS can overscroll the requested option",
     );
   }
 
   if (!/id:\s*\^app-settings-page-\$\{LOCALE\}\$/.test(localizedFlow)) {
     errors.push(
       "Localized Maestro coverage must assert the exact active language after selection",
+    );
+  }
+
+  if (!/text:\s*\^\$\{LOCALE_LABEL_REGEX\}\$/.test(localizedFlow)) {
+    errors.push(
+      "Localized Maestro coverage must tap the exact visible native-language label",
     );
   }
 

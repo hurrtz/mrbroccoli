@@ -10,6 +10,7 @@ import {
   MAESTRO_SMOKE_FLOW,
   countScreenshots,
   readAppLanguages,
+  readAppLocaleOptions,
   validateMaestroSuite,
 } from "./verify-maestro-suite.mjs";
 
@@ -89,6 +90,10 @@ function versionAtLeast(actualText, minimumText) {
   }
 
   return true;
+}
+
+function escapeRegularExpression(value) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
 function runCommand(command, args, options = {}) {
@@ -265,18 +270,18 @@ function main() {
   }
 
   if (options.suite === "all" || options.suite === "locales") {
-    const configuredLanguages = readAppLanguages(cwd);
-    const languages = options.locale
-      ? configuredLanguages.filter((language) => language === options.locale)
-      : configuredLanguages;
+    const configuredLocales = readAppLocaleOptions(cwd);
+    const locales = options.locale
+      ? configuredLocales.filter(({ value }) => value === options.locale)
+      : configuredLocales;
 
-    if (languages.length === 0) {
+    if (locales.length === 0) {
       throw new Error(
-        `--locale must be one of: ${configuredLanguages.join(", ")}`,
+        `--locale must be one of: ${readAppLanguages(cwd).join(", ")}`,
       );
     }
 
-    for (const language of languages) {
+    for (const { label, value: language } of locales) {
       process.stdout.write(
         `Running ${options.platform} localized coverage: ${language}\n`,
       );
@@ -284,6 +289,7 @@ function main() {
         cwd,
         environment: {
           LOCALE: language,
+          LOCALE_LABEL_REGEX: escapeRegularExpression(label),
           PLATFORM: options.platform,
         },
         expectedScreenshotCount: verification.localizedScreenshotCount,

@@ -7,6 +7,7 @@ import test from "node:test";
 import {
   countScreenshots,
   readAppLanguages,
+  readAppLocaleOptions,
   validateMaestroSuite,
 } from "./verify-maestro-suite.mjs";
 import { runFlow } from "./run-maestro-suite.mjs";
@@ -17,6 +18,15 @@ test("derives the complete locale order from the TypeScript registry", () => {
   assert.equal(languages.length, 19);
   assert.deepEqual(languages.slice(0, 3), ["en", "de", "uk"]);
   assert.deepEqual(languages.slice(-2), ["sv", "ur"]);
+});
+
+test("derives native labels for exact locale selection", () => {
+  const locales = readAppLocaleOptions();
+
+  assert.deepEqual(locales.slice(7, 9), [
+    { value: "pt", label: "Português" },
+    { value: "pt-BR", label: "Português (Brasil)" },
+  ]);
 });
 
 test("counts only explicit screenshot commands", () => {
