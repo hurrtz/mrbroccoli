@@ -263,6 +263,10 @@ These notes are specific to this repository and supplement any parent-level inst
   - `__tests__/services/tts.test.ts`
   - `__tests__/services/whisper.test.ts`
 - Run `npm test` when changes are broad enough to justify the full suite.
+- Run `make android-instrumentation` with at least one connected Android
+  emulator or device for native playback, waveform, foreground-service, and
+  lifecycle race coverage. The comprehensive local pre-release gate runs this
+  target automatically and fails if the native runtime checks cannot execute.
 
 ## Native And Build Notes
 

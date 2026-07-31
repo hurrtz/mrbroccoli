@@ -18,6 +18,7 @@ IOS_DESTINATION ?= generic/platform=iOS Simulator
 	doctor \
 	dependencies-check \
 	android-unit \
+	android-instrumentation \
 	android-debug \
 	ios-pods \
 	ios-build \
@@ -41,6 +42,7 @@ help:
 		'make release-aab       Build, verify, and archive the signed Android release artifacts' \
 		'make maestro-verify      Verify the E2E locale and screenshot contract' \
 		'make android-debug      Build a debug APK' \
+		'make android-instrumentation Run native runtime tests on every connected Android device' \
 		'make ios-build          Build the app for the generic iOS Simulator'
 
 hooks-install:
@@ -85,6 +87,9 @@ dependencies-check:
 
 android-unit:
 	@NODE_ENV=test $(ANDROID_GRADLE) :app:testDebugUnitTest
+
+android-instrumentation:
+	@NODE_ENV=test $(ANDROID_GRADLE) :app:connectedDebugAndroidTest
 
 android-debug:
 	@NODE_ENV=development $(ANDROID_GRADLE) :app:assembleDebug
@@ -131,6 +136,7 @@ pre-release-static:
 	@$(MAKE) dependencies-check
 	@$(MAKE) i18n
 	@$(MAKE) android-unit
+	@$(MAKE) android-instrumentation
 	@$(MAKE) ios-build
 
 # The runner repeats the zero-network preflight internally before it loads any
