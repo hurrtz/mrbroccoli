@@ -288,8 +288,16 @@ describe("webSearch", () => {
         ],
       },
       assertBody: (body: Record<string, unknown>) => {
+        expect(body.max_tokens).toBe(420);
+        expect(body.output_config).toEqual({ effort: "low" });
+        expect(body.tool_choice).toEqual({
+          type: "tool",
+          name: "web_search",
+        });
         expect(body.tools).toEqual([
           expect.objectContaining({
+            allowed_callers: ["direct"],
+            max_uses: 5,
             name: "web_search",
             type: "web_search_20260318",
           }),
@@ -522,6 +530,32 @@ describe("webSearch", () => {
       }),
     ).rejects.toThrow(
       "Alibaba / Qwen returned a response without running web search.",
+    );
+  });
+
+  it("rejects an Anthropic response that did not run the web search tool", async () => {
+    (fetch as jest.Mock).mockResolvedValueOnce({
+      ok: true,
+      json: () =>
+        Promise.resolve({
+          content: [
+            {
+              type: "text",
+              text: "An answer from model memory.",
+            },
+          ],
+        }),
+    });
+
+    await expect(
+      searchWeb({
+        provider: "anthropic",
+        apiKey: "anthropic-test",
+        language: "en",
+        query: "What changed today?",
+      }),
+    ).rejects.toThrow(
+      "Anthropic returned a response without running web search.",
     );
   });
 

@@ -16,6 +16,7 @@ import { requireProviderKey } from "./llm/shared";
 import { resolveQwenApiEndpoint } from "../utils/qwenRegion";
 import { recordDebugLogEvent } from "./debugLogCapture";
 import { getWebSearchSourceDisplayTitle } from "../utils/webSearchSources";
+import { getModelEffortConfig } from "../utils/modelEffort";
 import { networkFetch } from "./networkFetch";
 import {
   buildProviderHttpError,
@@ -49,6 +50,8 @@ interface RawWebSearchResponse {
   model: string;
   provider: WebSearchProvider;
 }
+
+const ANTHROPIC_WEB_SEARCH_MIN_OUTPUT_TOKENS = 420;
 
 function buildProviderNotWiredUpError(
   provider: WebSearchProvider,
@@ -307,6 +310,23 @@ function hasSuccessfulWebSearchCall(data: unknown) {
 
     return !("status" in item) || item.status === "completed";
   });
+}
+
+function hasAnthropicWebSearchResult(data: unknown) {
+  if (!data || typeof data !== "object" || !("content" in data)) {
+    return false;
+  }
+
+  return (
+    Array.isArray(data.content) &&
+    data.content.some(
+      (part) =>
+        part &&
+        typeof part === "object" &&
+        "type" in part &&
+        part.type === "web_search_tool_result",
+    )
+  );
 }
 
 function extractAnthropicOutputText(data: unknown): string {
@@ -676,9 +696,17 @@ function buildChatMessages(params: WebSearchRequestParams) {
 
 async function searchWithAnthropic(params: WebSearchRequestParams) {
   const model = getRequestWebSearchModel(params);
-  const maxOutputTokens = params.maxOutputTokens ?? 420;
+  const maxOutputTokens = Math.max(
+    params.maxOutputTokens ?? ANTHROPIC_WEB_SEARCH_MIN_OUTPUT_TOKENS,
+    ANTHROPIC_WEB_SEARCH_MIN_OUTPUT_TOKENS,
+  );
+  const lowEffortOption = getModelEffortConfig(
+    "anthropic",
+    model,
+  )?.options.find((option) => option.id === "low");
+  const lowEffort = lowEffortOption?.transportValue ?? lowEffortOption?.id;
 
-  return fetchJsonWebSearch(params, {
+  const response = await fetchJsonWebSearch(params, {
     url: "https://api.anthropic.com/v1/messages",
     model,
     headers: {
@@ -692,15 +720,38 @@ async function searchWithAnthropic(params: WebSearchRequestParams) {
     body: {
       model,
       max_tokens: maxOutputTokens,
+      ...(lowEffort
+        ? {
+            output_config: {
+              effort: lowEffort,
+            },
+          }
+        : {}),
       messages: buildChatMessages(params),
       tools: [
         {
           type: "web_search_20260318",
           name: "web_search",
+          allowed_callers: ["direct"],
+          max_uses: 5,
         },
       ],
+      tool_choice: {
+        type: "tool",
+        name: "web_search",
+      },
     },
   });
+
+  if (!hasAnthropicWebSearchResult(response.data)) {
+    throw new Error(
+      translate(params.language, "providerWebSearchNotRun", {
+        provider: PROVIDER_LABELS[params.provider],
+      }),
+    );
+  }
+
+  return response;
 }
 
 async function searchWithQwen(params: WebSearchRequestParams) {
