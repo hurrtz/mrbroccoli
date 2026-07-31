@@ -11,6 +11,7 @@ export const ja = {
   chooseCompatibleProviderFirst:
     "まず互換性のあるプロバイダーを選択してください",
   settings: "設定",
+  settingsReleaseVersion: ({ version }) => `バージョン ${version}`,
   all: "すべて",
   firstRun: "初回起動",
   instructions: "指示",

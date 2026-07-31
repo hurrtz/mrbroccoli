@@ -10,6 +10,7 @@ export const fr = {
   selection: "Sélection",
   chooseCompatibleProviderFirst: "Choisissez d'abord un fournisseur compatible",
   settings: "Paramètres",
+  settingsReleaseVersion: ({ version }) => `Version ${version}`,
   all: "Tous",
   firstRun: "Premier lancement",
   instructions: "Instructions",

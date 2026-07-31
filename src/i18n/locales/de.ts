@@ -10,6 +10,7 @@ export const de = {
   selection: "Auswahl",
   chooseCompatibleProviderFirst: "Wähle zuerst nen geeigneten Anbieter",
   settings: "Einstellungen",
+  settingsReleaseVersion: ({ version }) => `Version ${version}`,
   all: "Alle",
   firstRun: "Erster Start",
   instructions: "Anweisungen",

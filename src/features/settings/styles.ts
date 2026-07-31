@@ -127,6 +127,11 @@ export const styles = StyleSheet.create({
   sectionCards: {
     gap: 10,
   },
+  releaseVersion: {
+    ...textStyles.caption,
+    paddingBottom: 4,
+    textAlign: "center",
+  },
   sectionIcon: {
     width: 34,
     alignItems: "center",

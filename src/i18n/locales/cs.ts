@@ -10,6 +10,7 @@ export const cs = {
   selection: "Výběr",
   chooseCompatibleProviderFirst: "Nejprve vyberte kompatibilního poskytovatele",
   settings: "Nastavení",
+  settingsReleaseVersion: ({ version }) => `Verze ${version}`,
   all: "Vše",
   firstRun: "První spuštění",
   instructions: "Instrukce",

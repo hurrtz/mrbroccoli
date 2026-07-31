@@ -10,6 +10,7 @@ export const zhCN = {
   selection: "选择",
   chooseCompatibleProviderFirst: "首先选择兼容的提供商",
   settings: "设置",
+  settingsReleaseVersion: ({ version }) => `版本 ${version}`,
   all: "全部",
   firstRun: "首次运行",
   instructions: "说明",

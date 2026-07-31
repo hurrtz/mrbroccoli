@@ -10,6 +10,7 @@ export const hi = {
   selection: "चयन",
   chooseCompatibleProviderFirst: "पहले एक संगत प्रदाता चुनें",
   settings: "सेटिंग्स",
+  settingsReleaseVersion: ({ version }) => `संस्करण ${version}`,
   all: "सभी",
   firstRun: "पहला लॉन्च",
   instructions: "निर्देश",

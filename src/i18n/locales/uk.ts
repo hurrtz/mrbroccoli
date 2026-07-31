@@ -10,6 +10,7 @@ export const uk = {
   selection: "Вибір",
   chooseCompatibleProviderFirst: "Спочатку виберіть сумісного провайдера",
   settings: "Налаштування",
+  settingsReleaseVersion: ({ version }) => `Версія ${version}`,
   all: "Усі",
   firstRun: "Перший запуск",
   instructions: "Інструкції",

@@ -10,6 +10,7 @@ export const ru = {
   selection: "Выбор",
   chooseCompatibleProviderFirst: "Сначала выберите совместимого провайдера",
   settings: "Настройки",
+  settingsReleaseVersion: ({ version }) => `Версия ${version}`,
   all: "Все",
   firstRun: "Первый запуск",
   instructions: "Инструкции",

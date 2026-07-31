@@ -10,6 +10,7 @@ export const ur = {
   selection: "انتخاب",
   chooseCompatibleProviderFirst: "پہلے ایک ہم آہنگ فراہم کنندہ کا انتخاب کریں۔",
   settings: "ترتیبات",
+  settingsReleaseVersion: ({ version }) => `ورژن ${version}`,
   all: "تمام",
   firstRun: "پہلا رن",
   instructions: "ہدایات",

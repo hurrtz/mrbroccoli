@@ -10,6 +10,7 @@ export const sv = {
   selection: "Val",
   chooseCompatibleProviderFirst: "Välj först en kompatibel leverantör",
   settings: "Inställningar",
+  settingsReleaseVersion: ({ version }) => `Version ${version}`,
   all: "Alla",
   firstRun: "Första körningen",
   instructions: "Instruktioner",

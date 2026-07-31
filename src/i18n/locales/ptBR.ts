@@ -10,6 +10,7 @@ export const ptBR = {
   selection: "Seleção",
   chooseCompatibleProviderFirst: "Escolha primeiro um provedor compatível",
   settings: "Configurações",
+  settingsReleaseVersion: ({ version }) => `Versão ${version}`,
   all: "Todos",
   firstRun: "Primeiro acesso",
   instructions: "Instruções",

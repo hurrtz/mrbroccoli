@@ -10,6 +10,7 @@ export const ar = {
   selection: "اختيار",
   chooseCompatibleProviderFirst: "اختر مزودًا متوافقًا أولاً",
   settings: "الإعدادات",
+  settingsReleaseVersion: ({ version }) => `الإصدار ${version}`,
   all: "الكل",
   firstRun: "التشغيل لأول مرة",
   instructions: "تعليمات",

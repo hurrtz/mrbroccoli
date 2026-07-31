@@ -10,6 +10,7 @@ export const hu = {
   selection: "Kiválasztás",
   chooseCompatibleProviderFirst: "Először válasszon kompatibilis szolgáltatót",
   settings: "Beállítások",
+  settingsReleaseVersion: ({ version }) => `Verzió ${version}`,
   all: "Összes",
   firstRun: "Első indítás",
   instructions: "Utasítások",

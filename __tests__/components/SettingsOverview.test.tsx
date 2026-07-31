@@ -2,6 +2,7 @@ import React from "react";
 import { StyleSheet, Text } from "react-native";
 import { render } from "@testing-library/react-native";
 
+import appConfig from "../../app.json";
 import { AntSettingsOverview } from "../../src/features/settings/AntSettingsOverview";
 import type { SettingsReadiness } from "../../src/features/settings-core/readiness";
 import { LocalizationProvider } from "../../src/i18n";
@@ -61,6 +62,23 @@ describe("AntSettingsOverview", () => {
 
     expect(screen.getByLabelText("Guided setup")).toBeTruthy();
     expect(screen.getAllByText("Guided setup")).toHaveLength(1);
+  });
+
+  it("shows the current release version from the app config", () => {
+    const screen = render(
+      <ThemeProvider mode="light">
+        <LocalizationProvider language="en">
+          <AntSettingsOverview
+            readiness={readiness}
+            onOpenPage={jest.fn()}
+          />
+        </LocalizationProvider>
+      </ThemeProvider>,
+    );
+
+    expect(screen.getByTestId("settings-release-version").props.children).toBe(
+      `Version ${appConfig.expo.version}`,
+    );
   });
 
   it("shows larger section icons without bordered icon containers", () => {

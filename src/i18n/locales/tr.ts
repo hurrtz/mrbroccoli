@@ -10,6 +10,7 @@ export const tr = {
   selection: "Seçim",
   chooseCompatibleProviderFirst: "Önce uyumlu bir sağlayıcı seçin",
   settings: "Ayarlar",
+  settingsReleaseVersion: ({ version }) => `Sürüm ${version}`,
   all: "Hepsi",
   firstRun: "İlk Çalıştırma",
   instructions: "Talimatlar",

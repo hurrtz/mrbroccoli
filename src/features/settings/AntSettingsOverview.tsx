@@ -10,6 +10,7 @@ import {
 } from "@ant-design/react-native";
 import Feather from "@expo/vector-icons/Feather";
 
+import appConfig from "../../../app.json";
 import { useLocalization } from "../../i18n";
 import { useTheme } from "../../theme/ThemeContext";
 import { fonts } from "../../theme/typography";
@@ -319,6 +320,15 @@ export function AntSettingsOverview({
           </AntSettingsCard>
         ))}
       </View>
+
+      <Text
+        testID="settings-release-version"
+        style={[styles.releaseVersion, { color: colors.textMuted }]}
+      >
+        {t("settingsReleaseVersion", {
+          version: appConfig.expo.version,
+        })}
+      </Text>
     </View>
   );
 }

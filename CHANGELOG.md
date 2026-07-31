@@ -10,7 +10,9 @@ the complete Play Store translations are kept in a dedicated file under
 
 ## Unreleased
 
-No user-visible changes yet.
+### Changed
+
+- Display the current release version on the Settings overview.
 
 ## 2.5.6 - 2026-07-31
 
