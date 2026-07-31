@@ -194,6 +194,16 @@ export function validateMaestroSuite(cwd = process.cwd()) {
     );
   }
 
+  if (
+    !/id:\s*\^app-language-picker-option-\$\{LOCALE\}\$[\s\S]{0,180}start:\s*50%,80%[\s\S]{0,80}end:\s*50%,65%/.test(
+      localizedFlow,
+    )
+  ) {
+    errors.push(
+      "Localized Maestro coverage must move bottom-edge language rows into the iOS safe tap area",
+    );
+  }
+
   if (!/id:\s*\^app-settings-page-\$\{LOCALE\}\$/.test(localizedFlow)) {
     errors.push(
       "Localized Maestro coverage must assert the exact active language after selection",
