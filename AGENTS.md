@@ -181,11 +181,15 @@ These notes are specific to this repository and supplement any parent-level inst
      remote branch before building.
   7. Automatically build the Android release bundle from that exact pushed
      commit with `make release-aab`. This disables Expo dotenv loading while
-     bundling and scans the resulting archive for configured local API-key and
-     signing-password values.
+     bundling, scans the resulting archive for configured local API-key and
+     signing-password values, and fails unless the AAB contains both its R8
+     deobfuscation mapping and native debug symbols. The target preserves the
+     AAB, `mapping.txt`, native-symbol ZIP, checksums, and manifest under the
+     ignored `artifacts/releases/android/<version>-<code>/<aab-sha>/` path.
   8. Verify the AAB archive, signature, package name, embedded version name and
      version code, record its SHA-256, and report the final
-     `android/app/build/outputs/bundle/release/app-release.aab` path.
+     `android/app/build/outputs/bundle/release/app-release.aab` path plus its
+     versioned diagnostic-artifact archive.
 - A release is not complete when only metadata, documentation, or a local
   commit exists. The default endpoint is a pushed, verified commit plus a
   verified Android release AAB.
@@ -268,6 +272,10 @@ These notes are specific to this repository and supplement any parent-level inst
 - Native Release bundling must set `EXPO_NO_DOTENV=1`; local pre-release
   credentials belong only to the live-test runner and must never influence app
   bundles. Verify every distributable with the artifact secret scanner.
+- Android release builds must keep R8 minification, resource shrinking, the
+  optimized Android rules baseline, and `SYMBOL_TABLE` native diagnostics
+  enabled. Treat a missing R8 mapping or native-symbol archive as a failed
+  release rather than bypassing the artifact verifier.
 
 ## Licensing And Provider Terms
 

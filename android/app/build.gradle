@@ -132,10 +132,15 @@ android {
             if (hasReleaseKeystore) {
                 signingConfig signingConfigs.release
             }
+            ndk {
+                // Keep native crash traces symbolicated without bundling full
+                // source paths and local variable information.
+                debugSymbolLevel 'SYMBOL_TABLE'
+            }
             def enableShrinkResources = findProperty('android.enableShrinkResourcesInReleaseBuilds') ?: 'false'
             shrinkResources enableShrinkResources.toBoolean()
             minifyEnabled enableMinifyInReleaseBuilds
-            proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
+            proguardFiles getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
             def enablePngCrunchInRelease = findProperty('android.enablePngCrunchInReleaseBuilds') ?: 'true'
             crunchPngs enablePngCrunchInRelease.toBoolean()
         }

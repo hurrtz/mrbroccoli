@@ -10,6 +10,12 @@ the complete Play Store translations are kept in a dedicated file under
 
 ## Unreleased
 
+### Changed
+
+- Optimize Android release builds with R8 and resource shrinking, and preserve
+  Play Console deobfuscation mappings plus native debug symbols for readable
+  production crash reports.
+
 ## 2.6.0 - 2026-07-31
 
 ### Added

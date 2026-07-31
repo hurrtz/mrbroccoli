@@ -15,6 +15,7 @@ const iosPodfile = readText("ios/Podfile");
 const iosProject = readText("ios/MrBroccoli.xcodeproj/project.pbxproj");
 const androidBuild = readText("android/app/build.gradle");
 const androidGradleProperties = readText("android/gradle.properties");
+const androidProguardRules = readText("android/app/proguard-rules.pro");
 const androidManifest = readText(
   "android/app/src/main/AndroidManifest.xml",
 );
@@ -181,6 +182,36 @@ assertIncludes(
   "Android unused Sherpa FFmpeg disabled",
   androidGradleProperties,
   "sherpaOnnxDisableFfmpeg=true",
+);
+assertIncludes(
+  "Android release minification",
+  androidGradleProperties,
+  "android.enableMinifyInReleaseBuilds=true",
+);
+assertIncludes(
+  "Android release resource shrinking",
+  androidGradleProperties,
+  "android.enableShrinkResourcesInReleaseBuilds=true",
+);
+assertIncludes(
+  "Android optimized ProGuard baseline",
+  androidBuild,
+  'getDefaultProguardFile("proguard-android-optimize.txt")',
+);
+assertIncludes(
+  "Android release native symbol table",
+  androidBuild,
+  "debugSymbolLevel 'SYMBOL_TABLE'",
+);
+assertIncludes(
+  "Android Reanimated R8 keep rules",
+  androidProguardRules,
+  "-keep class com.swmansion.reanimated.** { *; }",
+);
+assertIncludes(
+  "Android TurboModule R8 keep rules",
+  androidProguardRules,
+  "-keep class com.facebook.react.turbomodule.** { *; }",
 );
 assertIncludes(
   "Android diagnostics module implementation",

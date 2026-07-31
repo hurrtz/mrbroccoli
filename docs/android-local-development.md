@@ -49,6 +49,26 @@ cd android
 
 The debug APK is written under `android/app/build/outputs/apk/debug/`.
 
+## Build A Play Release
+
+From the repository root, use the release target rather than invoking the
+bundle task directly:
+
+```bash
+make release-aab
+```
+
+Release builds use R8 minification and resource shrinking. The target requires
+production signing material, disables Expo dotenv loading, scans the AAB for
+local credentials, and verifies that Play can decode both managed and native
+crashes. It preserves the signed AAB, R8 `mapping.txt`, native debug-symbol ZIP,
+checksums, and a machine-readable manifest under the ignored directory
+`artifacts/releases/android/<version>-<versionCode>/<aab-sha>/`.
+
+Gradle's files under `android/app/build/outputs/` are overwritten by later
+builds. Use the versioned archive when retaining or uploading diagnostics for a
+published release.
+
 ## Useful Checks
 
 ```bash
