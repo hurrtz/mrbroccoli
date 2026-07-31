@@ -456,6 +456,21 @@ describe("MainScreenVoiceStage composer", () => {
     ).toEqual({ disabled: false });
   });
 
+  it("reserves constrained landscape Drive mode for hands-free controls", () => {
+    const screen = render(
+      <MainScreenVoiceStage
+        {...createProps({
+          inputMode: "drive-session",
+          layout: "landscape",
+        })}
+      />,
+    );
+
+    expect(screen.getByTestId("drive-session-controls")).toBeTruthy();
+    expect(screen.queryByTestId("show-voice-input")).toBeNull();
+    expect(screen.queryByTestId("show-text-input")).toBeNull();
+  });
+
   it("shows an increasingly urgent Drive silence countdown in the CTA", () => {
     const props = createProps({
       driveAutoContinueEnabled: true,

@@ -72,7 +72,15 @@ export function MainScreenWorkspace({
             {...routeControls}
           />
 
-          <View style={styles.landscapeStageArea}>
+          <View
+            testID="landscape-stage-area"
+            style={[
+              styles.landscapeStageArea,
+              voiceStage.inputMode === "drive-session"
+                ? styles.landscapeStageAreaDrive
+                : null,
+            ]}
+          >
             <MainScreenVoiceStage
               colors={colors}
               layout="landscape"

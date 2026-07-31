@@ -59,6 +59,8 @@ export function VoiceTextInputPager({
     onTextMessageChange,
     submissionDisabled: Boolean(promptBlockedMessage),
   });
+  const showSurfaceIndicators =
+    layout !== "landscape" || inputMode !== "drive-session";
 
   return (
     <View style={styles.root}>
@@ -182,13 +184,15 @@ export function VoiceTextInputPager({
         />
       ) : null}
 
-      <InputSurfaceIndicators
-        activeSurface={pager.activeSurface}
-        colors={colors}
-        disabled={isActive}
-        onSelect={(surface: InputSurface) => pager.selectSurface(surface)}
-        t={t}
-      />
+      {showSurfaceIndicators ? (
+        <InputSurfaceIndicators
+          activeSurface={pager.activeSurface}
+          colors={colors}
+          disabled={isActive}
+          onSelect={(surface: InputSurface) => pager.selectSurface(surface)}
+          t={t}
+        />
+      ) : null}
     </View>
   );
 }

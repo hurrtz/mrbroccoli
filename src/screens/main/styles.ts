@@ -85,6 +85,9 @@ export const styles = StyleSheet.create({
     gap: 8,
     paddingVertical: 8,
   },
+  landscapeStageAreaDrive: {
+    justifyContent: "flex-start",
+  },
   landscapeTranscriptCard: {
     flex: 1,
     minHeight: 0,

@@ -44,6 +44,10 @@ export const MainScreenRouteControls = React.memo(
       ulraModeAvailable &&
       Boolean(onToggleUlraMode);
 
+    if (layout === "landscape" && !webSearchAvailable) {
+      return null;
+    }
+
     return (
       <View
         testID="route-controls-row"

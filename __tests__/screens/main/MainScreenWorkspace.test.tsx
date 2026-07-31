@@ -1,5 +1,6 @@
 import React from "react";
 import { render } from "@testing-library/react-native";
+import { StyleSheet } from "react-native";
 
 import { MainScreenWorkspace } from "../../../src/screens/main/MainScreenWorkspace";
 import { lightColors } from "../../../src/theme/colors";
@@ -158,5 +159,64 @@ describe("MainScreenWorkspace streaming isolation", () => {
     expect(mockVoicePagerRenderCount).toBe(1);
     expect(mockTranscriptRenderCount).toBe(2);
     expect(t.mock.calls.filter(([key]) => key === "webSearch")).toHaveLength(2);
+  });
+
+  it("top-aligns the complete Drive control stack in constrained landscape", () => {
+    const screen = render(
+      <MainScreenWorkspace
+        colors={lightColors}
+        isLandscape
+        topBar={{
+          brandName: "Mr Broccoli",
+          drawerLabel: "Conversations",
+          onOpenDrawer: jest.fn(),
+          onOpenSettings: jest.fn(),
+          settingsLabel: "Settings",
+        }}
+        routeCard={{
+          activeResponseMode: DEFAULT_SETTINGS.activeResponseMode,
+          availableResponseModes: [],
+          onOpenSetupGuide: jest.fn(),
+          onSelectResponseMode: jest.fn(),
+          responseModes: DEFAULT_SETTINGS.responseModes,
+          t: jest.fn((key: string) => key),
+        }}
+        routeControls={{
+          t: jest.fn((key: string) => key),
+        }}
+        voiceStage={{
+          inputMode: "drive-session",
+          isActive: false,
+          onPress: jest.fn(),
+          onPressIn: jest.fn(),
+          onPressOut: jest.fn(),
+          onSubmitTextMessage: jest.fn(),
+          recordingMaxMs: 60_000,
+          statusTitle: "Drive",
+          t: jest.fn((key: string) => key),
+          visualPhase: "idle",
+        }}
+        transcript={{
+          activeConversationId: null,
+          activeConversationTitle: "Untitled",
+          activeReplayMessageId: null,
+          messages: [],
+          onCopyMessage: jest.fn(),
+          onRetryMessage: jest.fn(),
+          replayPhase: "idle",
+          scrollEnabled: true,
+          showStyleControl: false,
+          showUsageStats: false,
+          showWhenEmpty: true,
+          t: jest.fn((key: string) => key),
+        }}
+      />,
+    );
+
+    expect(
+      StyleSheet.flatten(
+        screen.getByTestId("landscape-stage-area").props.style,
+      ).justifyContent,
+    ).toBe("flex-start");
   });
 });
