@@ -8,100 +8,46 @@ import {
 } from "./debugLogSanitizer";
 import { validateDebugLogEntries } from "./debugLogValidator";
 import { appendDebugLogFile } from "./debugLogFileStorage";
+import {
+  DEBUG_LOG_SCHEMA_VERSION,
+  encodeJournalRecord,
+  formatDebugLogSession,
+  parseJournal,
+  utf8Length,
+} from "./debugLog/format";
+import {
+  ensureLogsDirectory,
+  getActiveCapturePath,
+  getLegacyActiveCapturePath,
+  pruneCompletedLogs,
+  queueDebugLogWrite,
+  writeAtomic,
+} from "./debugLog/storage";
+import type {
+  ActiveDebugLogSession,
+  DebugLogCaptureResult,
+  DebugLogCaptureState,
+  DebugLogCategory,
+  DebugLogEntry,
+  DebugLogLevel,
+  PendingDebugLogAggregate,
+  PendingDebugLogEntry,
+  RecoveredDebugLogCaptureResult,
+} from "./debugLog/types";
 
-type DebugLogLevel = "log" | "info" | "warn" | "error";
-type DebugLogCategory = "app" | "console" | "speech" | "waveform";
-
-export interface DebugLogEntry {
-  category: DebugLogCategory;
-  elapsedMs: number;
-  event: string;
-  level: DebugLogLevel;
-  payload?: Record<string, unknown>;
-  sequence: number;
-  timestamp: string;
-}
-
-interface PendingDebugLogEntry {
-  category: DebugLogCategory;
-  event: string;
-  level: DebugLogLevel;
-  payload?: Record<string, unknown>;
-  timestamp: string;
-}
-
-interface ActiveDebugLogSession {
-  context: Record<string, unknown>;
-  droppedEntries: number;
-  entries: DebugLogEntry[];
-  finalPath: string;
-  id: string;
-  journalBytes: number;
-  livePath: string;
-  nextSequence: number;
-  pendingJournalLines: string[];
-  startedAtIso: string;
-  startedAtMs: number;
-  storageError: Error | null;
-  truncated: boolean;
-}
-
-interface PendingDebugLogAggregate {
-  category: DebugLogCategory;
-  count: number;
-  firstAtMs: number;
-  lastAtMs: number;
-  level: DebugLogLevel;
-  maxChunkLength: number;
-  totalChunkLength: number;
-}
-
-export interface DebugLogCaptureState {
-  active: boolean;
-  entryCount: number;
-  lastExportPath: string | null;
-  sessionId: string | null;
-  startedAt: string | null;
-  storageHealthy: boolean;
-  truncated: boolean;
-}
-
-export interface DebugLogCaptureResult {
-  content: string;
-  copiedToClipboard: boolean;
-  entryCount: number;
-  path: string;
-  sessionId: string;
-  validationIssueCount: number;
-}
-
-export interface RecoveredDebugLogCaptureResult {
-  copiedToClipboard: boolean;
-  entryCount: number;
-  path: string;
-  sessionId: string | null;
-}
-
-type JournalRecord =
-  | {
-      context: Record<string, unknown>;
-      schemaVersion: number;
-      sessionId: string;
-      startedAt: string;
-      type: "session";
-    }
-  | ({ type: "entry" } & DebugLogEntry);
+export type {
+  DebugLogCaptureResult,
+  DebugLogCaptureState,
+  DebugLogEntry,
+  RecoveredDebugLogCaptureResult,
+} from "./debugLog/types";
 
 const listeners = new Set<() => void>();
-const ACTIVE_CAPTURE_FILE_NAME = "debug-log-active.jsonl";
-const LEGACY_ACTIVE_CAPTURE_FILE_NAME = "debug-log-active.log";
-const DEBUG_LOG_SCHEMA_VERSION = 2;
 const FLUSH_DELAY_MS = 250;
 const AGGREGATE_FLUSH_DELAY_MS = 1_000;
 const MAX_CAPTURE_BYTES = 2 * 1024 * 1024;
 const MAX_CAPTURE_ENTRIES = 5_000;
 const MAX_CAPTURE_DURATION_MS = 30 * 60_000;
-const MAX_RETAINED_LOGS = 5;
 const MAX_PRE_ROLL_ENTRIES = 100;
 const MAX_PRE_ROLL_AGE_MS = 5 * 60_000;
 const HIGH_FREQUENCY_EVENTS = new Set<string>(["native-waveform-event"]);
@@ -115,7 +61,6 @@ let stopPromise: Promise<DebugLogCaptureResult | null> | null = null;
 const pendingAggregates = new Map<string, PendingDebugLogAggregate>();
 const preRollEntries: PendingDebugLogEntry[] = [];
 const turnIdsByAbortSignal = new WeakMap<AbortSignal, string>();
-let writeQueue = Promise.resolve();
 
 const originalConsole = {
   error: console.error.bind(console),
@@ -144,94 +89,6 @@ export function getDebugTurnIdForSignal(signal?: AbortSignal | null) {
   return signal ? (turnIdsByAbortSignal.get(signal) ?? null) : null;
 }
 
-function ensureLogsDirectory() {
-  const baseDirectory = FileSystem.documentDirectory ?? FileSystem.cacheDirectory;
-  if (!baseDirectory) {
-    throw new Error("No writable directory available for debug logs.");
-  }
-  return `${baseDirectory}debug-logs/`;
-}
-
-function getActiveCapturePath() {
-  return `${ensureLogsDirectory()}${ACTIVE_CAPTURE_FILE_NAME}`;
-}
-
-function getLegacyActiveCapturePath() {
-  return `${ensureLogsDirectory()}${LEGACY_ACTIVE_CAPTURE_FILE_NAME}`;
-}
-
-function safeStringify(value: unknown) {
-  try {
-    return JSON.stringify(value);
-  } catch {
-    return JSON.stringify("[UNSERIALIZABLE]");
-  }
-}
-
-function formatLogEntry(entry: DebugLogEntry) {
-  const payloadSuffix =
-    entry.payload && Object.keys(entry.payload).length > 0
-      ? ` ${safeStringify(entry.payload)}`
-      : "";
-  const elapsed = entry.elapsedMs < 0 ? `${entry.elapsedMs}ms` : `+${entry.elapsedMs}ms`;
-  return `[${entry.timestamp}] ${elapsed} [seq=${entry.sequence}] [${entry.level}] [${entry.category}] ${entry.event}${payloadSuffix}`;
-}
-
-function formatDebugLogSession(
-  session: Pick<
-    ActiveDebugLogSession,
-    "context" | "droppedEntries" | "entries" | "id" | "startedAtIso" | "startedAtMs" | "truncated"
-  >,
-  endedAtIso: string,
-  endedAtMs: number,
-  status: "complete" | "recovered",
-) {
-  const lines = [
-    "# Mr Broccoli Debug Log Capture",
-    `schemaVersion: ${DEBUG_LOG_SCHEMA_VERSION}`,
-    `sessionId: ${session.id}`,
-    `startedAt: ${session.startedAtIso}`,
-    `endedAt: ${endedAtIso}`,
-    `durationMs: ${Math.max(0, endedAtMs - session.startedAtMs)}`,
-    `status: ${status}`,
-    `entryCount: ${session.entries.length}`,
-    `droppedEntries: ${session.droppedEntries}`,
-    `truncated: ${session.truncated}`,
-    `context: ${safeStringify(session.context)}`,
-    "",
-    ...session.entries.map(formatLogEntry),
-  ];
-  return `${lines.join("\n")}\n`;
-}
-
-function encodeJournalRecord(record: JournalRecord) {
-  return `${safeStringify(record)}\n`;
-}
-
-function utf8Length(value: string) {
-  return new TextEncoder().encode(value).byteLength;
-}
-
-function queueWrite<T>(task: () => Promise<T>) {
-  const queued = writeQueue.catch(() => undefined).then(task);
-  writeQueue = queued.then(
-    () => undefined,
-    () => undefined,
-  );
-  return queued;
-}
-
-async function writeAtomic(path: string, content: string) {
-  const tempPath = `${path}.tmp-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
-  await FileSystem.writeAsStringAsync(tempPath, content);
-  try {
-    await FileSystem.moveAsync({ from: tempPath, to: path });
-  } catch (error) {
-    await FileSystem.deleteAsync(tempPath, { idempotent: true }).catch(() => undefined);
-    throw error;
-  }
-}
-
 function scheduleFlush() {
   if (!activeSession || flushTimer) {
     return;
@@ -248,7 +105,7 @@ async function flushPendingJournal(session: ActiveDebugLogSession | null) {
   }
   const lines = session.pendingJournalLines.splice(0).join("");
   try {
-    await queueWrite(() => appendDebugLogFile(session.livePath, lines));
+    await queueDebugLogWrite(() => appendDebugLogFile(session.livePath, lines));
   } catch (error) {
     session.pendingJournalLines.unshift(lines);
     session.storageError =
@@ -402,56 +259,6 @@ function recordEntry(entry: Omit<PendingDebugLogEntry, "timestamp">) {
     return;
   }
   appendEntry(entry);
-}
-
-function parseJournal(content: string) {
-  let header: Extract<JournalRecord, { type: "session" }> | null = null;
-  const entries: DebugLogEntry[] = [];
-  let malformedLines = 0;
-  for (const line of content.split("\n")) {
-    if (!line.trim()) continue;
-    try {
-      const record = JSON.parse(line) as JournalRecord;
-      if (record.type === "session") {
-        header = {
-          ...record,
-          context: sanitizeDebugPayload(record.context) ?? {},
-        };
-      } else if (
-        record.type === "entry" &&
-        typeof record.event === "string" &&
-        typeof record.sequence === "number"
-      ) {
-        entries.push({
-          ...record,
-          payload: sanitizeDebugPayload(record.payload),
-        });
-      } else {
-        malformedLines += 1;
-      }
-    } catch {
-      malformedLines += 1;
-    }
-  }
-  return { entries, header, malformedLines };
-}
-
-async function pruneCompletedLogs() {
-  const directory = ensureLogsDirectory();
-  const names = await FileSystem.readDirectoryAsync(directory).catch(() => []);
-  const retained = names
-    .filter((name) =>
-      /^(?:debug-log-\d+-.+|recovered-\d+)\.log$/.test(name),
-    )
-    .sort()
-    .reverse();
-  await Promise.all(
-    retained
-      .slice(MAX_RETAINED_LOGS)
-      .map((name) =>
-        FileSystem.deleteAsync(`${directory}${name}`, { idempotent: true }),
-      ),
-  );
 }
 
 export function getDebugLogCaptureState(): DebugLogCaptureState {
@@ -617,7 +424,7 @@ async function performStopDebugLogCapture(
     "complete",
   );
 
-  await queueWrite(async () => {
+  await queueDebugLogWrite(async () => {
     await FileSystem.makeDirectoryAsync(ensureLogsDirectory(), {
       intermediates: true,
     });
@@ -727,7 +534,7 @@ export async function recoverPendingDebugLogCapture(): Promise<RecoveredDebugLog
   }
 
   const recoveredPath = `${ensureLogsDirectory()}recovered-${Date.now()}.log`;
-  await queueWrite(async () => {
+  await queueDebugLogWrite(async () => {
     await FileSystem.makeDirectoryAsync(ensureLogsDirectory(), {
       intermediates: true,
     });
