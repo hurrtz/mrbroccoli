@@ -149,12 +149,27 @@ export function validateMaestroSuite(cwd = process.cwd()) {
   }
 
   if (
-    !/id:\s*app-language-picker-option-\$\{LOCALE\}[\s\S]{0,160}centerElement:\s*true/.test(
+    !/id:\s*\^app-language-picker-option-\$\{LOCALE\}\$[\s\S]{0,160}centerElement:\s*true/.test(
       localizedFlow,
     )
   ) {
     errors.push(
-      "Localized Maestro coverage must center the requested language before selecting it",
+      "Localized Maestro coverage must center an exact requested-language selector before selecting it",
+    );
+  }
+
+  const exactLanguageOptionSelectors = localizedFlow.match(
+    /id:\s*\^app-language-picker-option-\$\{LOCALE\}\$/g,
+  );
+  if ((exactLanguageOptionSelectors?.length ?? 0) < 2) {
+    errors.push(
+      "Localized Maestro coverage must use exact requested-language selectors for scrolling and tapping",
+    );
+  }
+
+  if (!/id:\s*\^app-settings-page-\$\{LOCALE\}\$/.test(localizedFlow)) {
+    errors.push(
+      "Localized Maestro coverage must assert the exact active language after selection",
     );
   }
 

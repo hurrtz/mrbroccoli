@@ -28,15 +28,15 @@ tags:
     id: app-language-picker
 - scrollUntilVisible:
     element:
-      id: app-language-picker-option-${LOCALE}
+      id: ^app-language-picker-option-${LOCALE}$
     direction: DOWN
     centerElement: true
 - tapOn:
-    id: app-language-picker-option-${LOCALE}
+    id: ^app-language-picker-option-${LOCALE}$
 - assertVisible:
     id: settings-page-app
 - assertVisible:
-    id: app-settings-page-${LOCALE}
+    id: ^app-settings-page-${LOCALE}$
 - tapOn:
     id: app-language-picker
 - takeScreenshot:
