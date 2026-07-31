@@ -96,6 +96,13 @@ describe("live provider pre-release matrix", () => {
     expect(getLiveProviderMatrixReservedUsd(steps)).toBeLessThanOrEqual(1);
   });
 
+  it("reserves token and tool-call headroom for Anthropic web search", () => {
+    expect(
+      steps.find((step) => step.id === "web-search:anthropic:balanced")
+        ?.reservedUsd,
+    ).toBe(0.06);
+  });
+
   it("has unique stable step identifiers", () => {
     expect(new Set(steps.map((step) => step.id)).size).toBe(steps.length);
   });

@@ -77,6 +77,15 @@ const RESERVED_USD = {
   voiceDirectory: 0,
 } as const;
 
+const WEB_SEARCH_RESERVED_USD_BY_PROVIDER: Partial<
+  Record<WebSearchProvider, number>
+> = {
+  // A forced Anthropic server-side search is $0.01 plus the search-result
+  // input tokens and answer tokens. Reserve against standard Sonnet pricing,
+  // not the temporary introductory rate.
+  anthropic: 0.06,
+};
+
 function stepId(parts: Array<string | undefined>) {
   return parts.filter(Boolean).join(":");
 }
@@ -164,7 +173,9 @@ export function buildLiveProviderMatrix(): LiveProviderMatrixStep[] {
         kind: "web-search",
         provider,
         searchMode,
-        reservedUsd: RESERVED_USD.webSearch,
+        reservedUsd:
+          WEB_SEARCH_RESERVED_USD_BY_PROVIDER[provider] ??
+          RESERVED_USD.webSearch,
       });
     }
   }
