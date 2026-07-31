@@ -116,7 +116,7 @@ export function useProviderConnectionValidation(params: {
           level: "error",
           payload: {
             capability,
-            message: error instanceof Error ? error.message : String(error),
+            error,
             provider,
             target: target.kind,
           },

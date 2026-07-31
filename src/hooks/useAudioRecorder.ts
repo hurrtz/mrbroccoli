@@ -248,7 +248,7 @@ export function useAudioRecorder() {
         event: "native-ambient-monitor-stop-failed",
         level: "warn",
         payload: {
-          message: error instanceof Error ? error.message : String(error),
+          error,
           sessionId,
         },
       });
@@ -309,7 +309,7 @@ export function useAudioRecorder() {
         event: "native-ambient-monitor-start-failed",
         level: "warn",
         payload: {
-          message: error instanceof Error ? error.message : String(error),
+          error,
           sessionId,
         },
       });
@@ -377,7 +377,7 @@ export function useAudioRecorder() {
           event: "recorder-start-failed",
           level: "error",
           payload: {
-            message: error instanceof Error ? error.message : String(error),
+            error,
             recorderRoute: "native-waveform",
             sessionId,
           },
@@ -494,7 +494,7 @@ export function useAudioRecorder() {
           level: "error",
           payload: {
             durationMs: duration,
-            message: error instanceof Error ? error.message : String(error),
+            error,
             recorderRoute: "native-waveform",
             sessionId,
           },

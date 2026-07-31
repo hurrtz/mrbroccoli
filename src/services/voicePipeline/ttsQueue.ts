@@ -36,6 +36,7 @@ import { extractCompleteParagraphs } from "./streaming";
 import type { RunVoicePipelineParams } from "./types";
 
 interface CreateVoicePipelineTtsQueueParams {
+  turnId?: string;
   abortSignal?: AbortSignal;
   callbacks: RunVoicePipelineParams["callbacks"];
   diagnosticsSource?: SpeechDiagnosticSource;
@@ -127,6 +128,7 @@ function getTtsChunkTargetChars(
 }
 
 export function createVoicePipelineTtsQueue({
+  turnId,
   abortSignal,
   callbacks,
   diagnosticsSource = "conversation",
@@ -155,6 +157,7 @@ export function createVoicePipelineTtsQueue({
     mode: ttsMode,
     provider: ttsProvider ?? null,
     providerModel: ttsModel || null,
+    turnId,
   };
   const bufferUntilComplete =
     ttsMode !== "native" && replyPlayback === "wait";

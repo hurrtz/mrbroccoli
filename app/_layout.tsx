@@ -5,6 +5,9 @@ import { SettingsProvider, useSharedSettings } from "../src/context/SettingsCont
 import { AntDesignAppProvider } from "../src/design-system/AntDesignAppProvider";
 import { LocalizationProvider, useLocalization } from "../src/i18n";
 import { ThemeProvider } from "../src/theme/ThemeContext";
+import { initializeDiagnosticPostmortem } from "../src/services/diagnosticPostmortem";
+
+initializeDiagnosticPostmortem();
 
 function RootLayoutInner() {
   const { settings } = useSharedSettings();

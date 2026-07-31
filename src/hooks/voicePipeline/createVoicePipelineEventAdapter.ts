@@ -65,6 +65,7 @@ type EventAdapterParams = Pick<
   streaming: ReturnType<typeof useStreamingTextScheduler>;
   streamingRenderRunId: number;
   transcriptionOverride?: string;
+  turnId: string;
   turnStartedAtMs: number;
 };
 
@@ -105,11 +106,19 @@ export function createVoicePipelineEventAdapter({
   ttsMode,
   ttsProvider,
   ulraMode,
+  turnId,
   turnStartedAtMs,
   updateConversationContextSummary,
   webSearchMode,
   webSearchProvider,
 }: EventAdapterParams) {
+  const recordTurnEvent = (
+    params: Parameters<typeof recordDebugLogEvent>[0],
+  ) =>
+    recordDebugLogEvent({
+      ...params,
+      payload: { ...params.payload, turnId },
+    });
   const ulraLatencyRoutes = ulraMode?.routes.map(
     ({ model: routeModel, modelEffort: routeEffort, provider: routeProvider }) => ({
       effort: routeEffort,
@@ -165,7 +174,7 @@ export function createVoicePipelineEventAdapter({
         firstSpeechMs: Date.now() - turnStartedAtMs,
       },
     }));
-    recordDebugLogEvent({
+    recordTurnEvent({
       event: "voice-pipeline-first-playback-started",
     });
     latency.finishLatencyProgress("synthesizing");
@@ -240,7 +249,7 @@ export function createVoicePipelineEventAdapter({
       }
 
       state.transcriptionReady = true;
-      recordDebugLogEvent({
+      recordTurnEvent({
         event: "voice-pipeline-transcription-ready",
         payload: {
           textLength: text.trim().length,
@@ -279,7 +288,7 @@ export function createVoicePipelineEventAdapter({
         return;
       }
 
-      recordDebugLogEvent({
+      recordTurnEvent({
         event: "voice-pipeline-context-summary-updated",
         payload: {
           summarizedCount,
@@ -300,7 +309,7 @@ export function createVoicePipelineEventAdapter({
         return;
       }
 
-      recordDebugLogEvent({
+      recordTurnEvent({
         event: "voice-pipeline-web-search-start",
       });
       latency.finishLatencyProgress("thinking-briefly");
@@ -316,7 +325,7 @@ export function createVoicePipelineEventAdapter({
         return;
       }
 
-      recordDebugLogEvent({
+      recordTurnEvent({
         event: "voice-pipeline-web-search-complete",
       });
       latency.finishLatencyProgress("searching");
@@ -332,12 +341,10 @@ export function createVoicePipelineEventAdapter({
         message: t("webSearchFallback"),
         detail: getUnexpectedIssueDetail(error, t("webSearchFallback")),
       };
-      recordDebugLogEvent({
+      recordTurnEvent({
         event: "voice-pipeline-web-search-fallback",
         level: "warn",
-        payload: {
-          message: error.message,
-        },
+        payload: { error },
       });
       messageState.queueAssistantNotice(notice);
       showToast(formatNoticeToast(notice), undefined, "danger");
@@ -356,7 +363,7 @@ export function createVoicePipelineEventAdapter({
       }
 
       handleLlmStarted();
-      recordDebugLogEvent({
+      recordTurnEvent({
         event: "voice-pipeline-stream-chunk",
         payload: {
           chunkLength: text.length,
@@ -376,7 +383,7 @@ export function createVoicePipelineEventAdapter({
         model;
       state.replyCompleted = true;
       handleLlmStarted();
-      recordDebugLogEvent({
+      recordTurnEvent({
         event: "voice-pipeline-response-done",
         payload: {
           actualModel,
@@ -423,7 +430,7 @@ export function createVoicePipelineEventAdapter({
         return;
       }
 
-      recordDebugLogEvent({
+      recordTurnEvent({
         event: "voice-pipeline-audio-ready",
         payload: {
           requestId: diagnostics?.requestId ?? null,
@@ -469,7 +476,7 @@ export function createVoicePipelineEventAdapter({
         return;
       }
 
-      recordDebugLogEvent({
+      recordTurnEvent({
         event: "voice-pipeline-speech-text-ready",
         payload: {
           requestId: diagnostics?.requestId ?? null,
@@ -519,13 +526,13 @@ export function createVoicePipelineEventAdapter({
         message: noticeMessage,
         detail: getUnexpectedIssueDetail(error, noticeMessage),
       };
-      recordDebugLogEvent({
+      recordTurnEvent({
         event: "voice-pipeline-tts-fallback",
         level: "warn",
         payload: {
           fallbackRoute: route,
           latencySampleAttribution: "requested-route",
-          message: error.message,
+          error,
           requestedRoute: ttsMode,
         },
       });

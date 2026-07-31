@@ -1,6 +1,7 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Conversation, ConversationMeta } from "../../types";
 import { reportPersistenceAlert } from "../../services/persistenceAlerts";
+import { recordDebugLogEvent } from "../../services/debugLogCapture";
 import {
   buildConversationMetaFromConversation,
   normalizeConversationMeta,
@@ -13,6 +14,21 @@ export const ACTIVE_CONVERSATION_KEY = "@mrbroccoli/active_conversation";
 const mutationQueues = new Map<string, Promise<void>>();
 
 function reportStorageFailure(key: string, operation: string, error: unknown) {
+  const storageScope = key === META_KEY
+    ? "metadata"
+    : key === ACTIVE_CONVERSATION_KEY
+      ? "active-conversation"
+      : "conversation";
+  recordDebugLogEvent({
+    event: "persistence-operation-failed",
+    level: "warn",
+    payload: {
+      domain: "conversations",
+      error,
+      operation,
+      storageScope,
+    },
+  });
   console.error(`[conversation-storage] ${operation} failed for ${key}`, error);
   reportPersistenceAlert("conversations", operation);
 }

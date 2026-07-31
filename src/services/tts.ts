@@ -108,9 +108,7 @@ async function getCachedProviderTtsAudio(cacheKey: string) {
     recordDebugLogEvent({
       event: "provider-tts-cache-read-failed",
       level: "warn",
-      payload: {
-        message: error instanceof Error ? error.message : String(error),
-      },
+      payload: { error },
     });
     return null;
   }
@@ -129,9 +127,7 @@ async function cacheProviderTtsAudio(
     recordDebugLogEvent({
       event: "provider-tts-cache-write-failed",
       level: "warn",
-      payload: {
-        message: error instanceof Error ? error.message : String(error),
-      },
+      payload: { error },
     });
   }
 }
@@ -259,6 +255,7 @@ export async function synthesizeSpeech(params: {
     voice: voice || null,
     language: resolvedSpeechLanguage,
     textLength: text.trim().length,
+    turnId: diagnostics?.turnId,
   });
 
   if (mode === "native") {

@@ -88,6 +88,15 @@ function recordResilienceEvent(params: {
   recordDebugLogEvent(params);
 }
 
+function getResilienceTurnId(signal?: AbortSignal) {
+  if (!signal) return null;
+  const debugLogCapture =
+    require("./debugLogCapture") as Partial<
+      typeof import("./debugLogCapture")
+    >;
+  return debugLogCapture.getDebugTurnIdForSignal?.(signal) ?? null;
+}
+
 function circuitKey(
   provider: Provider,
   capability: ResilientProviderCapability,
@@ -417,6 +426,7 @@ function waitForRetry(delayMs: number, abortSignal?: AbortSignal) {
 export async function executeProviderModelRequest<T>(
   params: ProviderModelRequestParams<T>,
 ): Promise<ProviderModelRequestResult<T>> {
+  const turnId = getResilienceTurnId(params.abortSignal);
   await ensureRuntimeCapabilityOverridesLoaded();
 
   const providerCircuit = getProviderCircuitState(
@@ -428,7 +438,7 @@ export async function executeProviderModelRequest<T>(
     recordResilienceEvent({
       event: "provider-circuit-request-blocked",
       level: "warn",
-      payload: { ...providerCircuit },
+      payload: { ...providerCircuit, turnId },
     });
     throw new ProviderCircuitOpenError(providerCircuit);
   }
@@ -506,6 +516,7 @@ export async function executeProviderModelRequest<T>(
               requestedModel,
               requestedModelEffort: requestedModelEffort ?? null,
               usedFallback: model !== requestedModel || effortFallbackUsed,
+              turnId,
             },
           });
         }
@@ -562,6 +573,7 @@ export async function executeProviderModelRequest<T>(
                 failureKind: kind,
                 model,
                 provider: params.provider,
+                turnId,
               },
             });
           }
@@ -588,9 +600,10 @@ export async function executeProviderModelRequest<T>(
             capability: params.capability,
             failureKind: kind ?? "unknown",
             ...(failureScope ? { failureScope } : {}),
-            message: error instanceof Error ? error.message : String(error),
+            error,
             model,
             provider: params.provider,
+            turnId,
           },
         });
 
@@ -619,6 +632,7 @@ export async function executeProviderModelRequest<T>(
               model,
               nextEffort,
               provider: params.provider,
+              turnId,
             },
           });
           continue;
@@ -666,6 +680,7 @@ export async function executeProviderModelRequest<T>(
             nextModel: candidates[modelIndex + 1]?.model,
             provider: params.provider,
             requestedModel,
+            turnId,
           },
         });
         break;

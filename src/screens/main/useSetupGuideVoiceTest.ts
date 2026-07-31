@@ -4,6 +4,7 @@ import { createSpeechRequestId } from "../../services/speech/diagnostics";
 import { streamChat } from "../../services/llm";
 import { synthesizeSpeech } from "../../services/tts";
 import { transcribeAudio } from "../../services/whisper";
+import { recordDebugLogEvent } from "../../services/debugLogCapture";
 import type { Settings } from "../../types";
 import type { useLocalization } from "../../i18n";
 import { useAudioPlayer } from "../../hooks/useAudioPlayer";
@@ -116,6 +117,21 @@ export function useSetupGuideVoiceTest(params: {
   const [reply, setReply] = useState("");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
+
+  useEffect(() => {
+    if (visible) {
+      recordDebugLogEvent({
+        event: "setup-guide-voice-test-phase-changed",
+        level: phase === "error" ? "warn" : "info",
+        payload: {
+          phase,
+          provider,
+          sttRoute: routes.stt.kind,
+          ttsRoute: routes.tts.kind,
+        },
+      });
+    }
+  }, [phase, provider, routes.stt.kind, routes.tts.kind, visible]);
   const routeResetKey = useMemo(
     () =>
       JSON.stringify({

@@ -9,6 +9,7 @@ import {
   verifyKokoroModel,
   type KokoroDownloadProgress,
 } from "../services/kokoroTts";
+import { recordDebugLogEvent } from "../services/debugLogCapture";
 
 export type KokoroModelState = {
   installed: boolean;
@@ -45,6 +46,7 @@ export function useKokoroModel(): KokoroModelController {
   const operationRef = useRef(0);
   const blockingOperationRef = useRef(false);
   const mountedRef = useRef(true);
+  const lastProgressBucketRef = useRef(-1);
 
   const refresh = useCallback(async () => {
     if (blockingOperationRef.current) {
@@ -58,6 +60,10 @@ export function useKokoroModel(): KokoroModelController {
       busy: "checking",
       error: null,
     }));
+    recordDebugLogEvent({
+      event: "kokoro-install-status-check-started",
+      payload: { operation },
+    });
 
     try {
       const status = await getKokoroInstallStatus();
@@ -74,6 +80,10 @@ export function useKokoroModel(): KokoroModelController {
         progress: status.installed ? 1 : 0,
         error: null,
       }));
+      recordDebugLogEvent({
+        event: "kokoro-install-status-check-completed",
+        payload: { installed: status.installed, operation },
+      });
     } catch (error) {
       if (!mountedRef.current || operationRef.current !== operation) {
         return;
@@ -84,6 +94,11 @@ export function useKokoroModel(): KokoroModelController {
         busy: null,
         error: normalizeError(error),
       }));
+      recordDebugLogEvent({
+        event: "kokoro-install-status-check-failed",
+        level: "warn",
+        payload: { error, operation },
+      });
     }
   }, []);
 
@@ -120,6 +135,11 @@ export function useKokoroModel(): KokoroModelController {
       progress: 0,
       error: null,
     });
+    lastProgressBucketRef.current = -1;
+    recordDebugLogEvent({
+      event: "kokoro-download-started",
+      payload: { operation },
+    });
 
     try {
       await downloadKokoroModel({
@@ -134,6 +154,14 @@ export function useKokoroModel(): KokoroModelController {
             phase,
             progress,
           }));
+          const bucket = Math.floor(progress * 10);
+          if (bucket !== lastProgressBucketRef.current) {
+            lastProgressBucketRef.current = bucket;
+            recordDebugLogEvent({
+              event: "kokoro-download-progress",
+              payload: { operation, phase, progressPercent: bucket * 10 },
+            });
+          }
         },
       });
 
@@ -148,6 +176,10 @@ export function useKokoroModel(): KokoroModelController {
         phase: null,
         progress: 1,
       }));
+      recordDebugLogEvent({
+        event: "kokoro-verification-started",
+        payload: { operation },
+      });
       await verifyKokoroModel();
 
       if (!mountedRef.current || operationRef.current !== operation) {
@@ -162,8 +194,17 @@ export function useKokoroModel(): KokoroModelController {
         progress: 1,
         error: null,
       });
+      recordDebugLogEvent({
+        event: "kokoro-download-completed",
+        payload: { operation, verified: true },
+      });
       return true;
     } catch (error) {
+      recordDebugLogEvent({
+        event: "kokoro-download-failed",
+        level: "warn",
+        payload: { error, operation },
+      });
       if (mountedRef.current && operationRef.current === operation) {
         const status = await getKokoroInstallStatus().catch(() => ({
           installed: false,
@@ -201,6 +242,10 @@ export function useKokoroModel(): KokoroModelController {
       busy: "removing",
       error: null,
     }));
+    recordDebugLogEvent({
+      event: "kokoro-removal-started",
+      payload: { operation },
+    });
 
     try {
       await removeKokoroModel();
@@ -217,8 +262,17 @@ export function useKokoroModel(): KokoroModelController {
         progress: 0,
         error: null,
       });
+      recordDebugLogEvent({
+        event: "kokoro-removal-completed",
+        payload: { operation },
+      });
       return true;
     } catch (error) {
+      recordDebugLogEvent({
+        event: "kokoro-removal-failed",
+        level: "warn",
+        payload: { error, operation },
+      });
       if (mountedRef.current && operationRef.current === operation) {
         setState((current) => ({
           ...current,

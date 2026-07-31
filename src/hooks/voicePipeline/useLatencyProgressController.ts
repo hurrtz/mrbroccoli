@@ -163,8 +163,8 @@ export function useLatencyProgressController({
             event: "adaptive-latency-estimate-load-failed",
             level: "warn",
             payload: {
+              error,
               key,
-              message: error instanceof Error ? error.message : String(error),
               phase,
             },
           });
@@ -231,9 +231,8 @@ export function useLatencyProgressController({
               event: "adaptive-latency-estimate-load-failed",
               level: "warn",
               payload: {
+                error,
                 key: active.key,
-                message:
-                  error instanceof Error ? error.message : String(error),
                 phase: active.phase,
               },
             });
@@ -270,8 +269,8 @@ export function useLatencyProgressController({
             level: "warn",
             payload: {
               durationMs,
+              error,
               key,
-              message: error instanceof Error ? error.message : String(error),
               phase,
             },
           });

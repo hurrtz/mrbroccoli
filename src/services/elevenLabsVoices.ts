@@ -1,4 +1,5 @@
 import { readSafeProviderErrorMessage } from "./providerErrors";
+import { networkFetch } from "./networkFetch";
 
 const ELEVENLABS_VOICES_ENDPOINT = "https://api.elevenlabs.io/v2/voices";
 const ELEVENLABS_VOICES_PAGE_SIZE = 100;
@@ -100,7 +101,7 @@ async function fetchElevenLabsVoicePage(params: {
       query.set("next_page_token", params.nextPageToken);
     }
 
-    const response = await fetch(`${ELEVENLABS_VOICES_ENDPOINT}?${query}`, {
+    const response = await networkFetch(`${ELEVENLABS_VOICES_ENDPOINT}?${query}`, {
       method: "GET",
       headers: {
         Accept: "application/json",

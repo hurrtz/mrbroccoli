@@ -69,7 +69,7 @@ export async function fetchWithTimeout(
         reject(onTimeout());
       }, timeoutMs);
     });
-    const fetchPromise = fetch(input, {
+    const fetchPromise = networkFetch(input, {
       ...init,
       signal: controller.signal,
     }).catch((error) => {
@@ -100,3 +100,4 @@ export async function fetchWithTimeout(
     }
   }
 }
+import { networkFetch } from "../networkFetch";

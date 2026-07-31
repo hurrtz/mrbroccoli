@@ -1,4 +1,5 @@
 import { readSafeProviderErrorMessage } from "./providerErrors";
+import { networkFetch } from "./networkFetch";
 
 const MISTRAL_VOICES_ENDPOINT = "https://api.mistral.ai/v1/audio/voices";
 const MISTRAL_VOICES_PAGE_SIZE = 10;
@@ -104,7 +105,7 @@ async function fetchMistralVoicePage(params: {
       offset: String(params.offset),
       type: "all",
     });
-    const response = await fetch(`${MISTRAL_VOICES_ENDPOINT}?${query}`, {
+    const response = await networkFetch(`${MISTRAL_VOICES_ENDPOINT}?${query}`, {
       method: "GET",
       headers: {
         Accept: "application/json",

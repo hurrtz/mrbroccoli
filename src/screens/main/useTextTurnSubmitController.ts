@@ -1,6 +1,9 @@
 import { useCallback, useRef } from "react";
 
-import { recordDebugLogEvent } from "../../services/debugLogCapture";
+import {
+  createDebugTurnId,
+  recordDebugLogEvent,
+} from "../../services/debugLogCapture";
 import type { Message } from "../../types";
 import type { ShowToastFn } from "./shared";
 
@@ -8,6 +11,7 @@ interface UseTextTurnSubmitControllerParams {
   handleVoiceCaptureDone: (params: {
     existingUserMessageId?: string;
     transcriptionOverride?: string;
+    turnId?: string;
   }) => Promise<void>;
   isBusy: boolean;
   promptSubmissionBlockMessage?: string | null;
@@ -40,6 +44,7 @@ export function useTextTurnSubmitController({
       }
 
       submissionInFlightRef.current = true;
+      const turnId = createDebugTurnId();
       recordDebugLogEvent({
         event:
           params.source === "retry"
@@ -48,12 +53,14 @@ export function useTextTurnSubmitController({
         payload: {
           messageId: params.existingUserMessageId ?? null,
           textLength: trimmed.length,
+          turnId,
         },
       });
 
       void handleVoiceCaptureDone({
         existingUserMessageId: params.existingUserMessageId,
         transcriptionOverride: trimmed,
+        turnId,
       }).finally(() => {
         submissionInFlightRef.current = false;
       });

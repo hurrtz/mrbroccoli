@@ -16,6 +16,7 @@ import {
   extractProviderErrorMessage,
   type ProviderFailureKind,
 } from "../providerErrors";
+import { networkFetch } from "../networkFetch";
 
 export const PROVIDER_TTS_MAX_INPUT_CHARS = 3500;
 export const PROVIDER_TTS_TARGET_CHUNK_CHARS = 600;
@@ -414,7 +415,7 @@ export async function fetchWithTimeout(
     }, timeoutMs);
   });
 
-  const fetchPromise = fetch(input, {
+  const fetchPromise = networkFetch(input, {
     ...init,
     signal: controller.signal,
   }).catch((error) => {

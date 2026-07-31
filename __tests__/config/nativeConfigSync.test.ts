@@ -21,7 +21,7 @@ describe("native app configuration", () => {
       status: 0,
       stderr: "",
       stdout:
-        "Native configuration matches app.json across 37 checks.\n",
+        "Native configuration matches app.json across 43 checks.\n",
     });
   });
 

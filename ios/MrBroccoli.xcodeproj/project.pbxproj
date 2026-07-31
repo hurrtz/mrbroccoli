@@ -35,6 +35,8 @@
 		C01A00000000000000000004 /* MrBroccoliVoiceActivityAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = C01A00000000000000000011 /* MrBroccoliVoiceActivityAttributes.swift */; };
 		C01A00000000000000000005 /* MrBroccoliVoiceLiveActivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = C01A00000000000000000015 /* MrBroccoliVoiceLiveActivity.swift */; };
 		C01A00000000000000000006 /* MrBroccoliVoiceLiveActivityBridge.m in Sources */ = {isa = PBXBuildFile; fileRef = C01A00000000000000000016 /* MrBroccoliVoiceLiveActivityBridge.m */; };
+		D1A600000000000000000001 /* MrBroccoliDiagnostics.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1A600000000000000000011 /* MrBroccoliDiagnostics.swift */; };
+		D1A600000000000000000002 /* MrBroccoliDiagnosticsBridge.m in Sources */ = {isa = PBXBuildFile; fileRef = D1A600000000000000000012 /* MrBroccoliDiagnosticsBridge.m */; };
 		E2385A0D49ADF64A271D5FFE /* libPods-MrBroccoli.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4C2E18CB4910ACB38E443AFE /* libPods-MrBroccoli.a */; };
 		F11748422D0307B40044C1D9 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F11748412D0307B40044C1D9 /* AppDelegate.swift */; };
 /* End PBXBuildFile section */
@@ -96,6 +98,8 @@
 		C01A00000000000000000015 /* MrBroccoliVoiceLiveActivity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = MrBroccoliVoiceLiveActivity.swift; path = MrBroccoli/MrBroccoliVoiceLiveActivity.swift; sourceTree = "<group>"; };
 		C01A00000000000000000016 /* MrBroccoliVoiceLiveActivityBridge.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = MrBroccoliVoiceLiveActivityBridge.m; path = MrBroccoli/MrBroccoliVoiceLiveActivityBridge.m; sourceTree = "<group>"; };
 		C52F9AF8602F178C80F51B50 /* ExpoModulesProvider.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ExpoModulesProvider.swift; path = "Pods/Target Support Files/Pods-MrBroccoli/ExpoModulesProvider.swift"; sourceTree = "<group>"; };
+		D1A600000000000000000011 /* MrBroccoliDiagnostics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = MrBroccoliDiagnostics.swift; path = MrBroccoli/MrBroccoliDiagnostics.swift; sourceTree = "<group>"; };
+		D1A600000000000000000012 /* MrBroccoliDiagnosticsBridge.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = MrBroccoliDiagnosticsBridge.m; path = MrBroccoli/MrBroccoliDiagnosticsBridge.m; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 		F11748412D0307B40044C1D9 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AppDelegate.swift; path = MrBroccoli/AppDelegate.swift; sourceTree = "<group>"; };
 		F11748442D0722820044C1D9 /* MrBroccoli-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "MrBroccoli-Bridging-Header.h"; path = "MrBroccoli/MrBroccoli-Bridging-Header.h"; sourceTree = "<group>"; };
@@ -125,6 +129,8 @@
 			isa = PBXGroup;
 			children = (
 				F11748412D0307B40044C1D9 /* AppDelegate.swift */,
+				D1A600000000000000000011 /* MrBroccoliDiagnostics.swift */,
+				D1A600000000000000000012 /* MrBroccoliDiagnosticsBridge.m */,
 				C01A00000000000000000015 /* MrBroccoliVoiceLiveActivity.swift */,
 				C01A00000000000000000016 /* MrBroccoliVoiceLiveActivityBridge.m */,
 				7C4A2D4D5A9E4A6FB6500001 /* MrBroccoliNativeAudioQueue.m */,
@@ -509,6 +515,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				F11748422D0307B40044C1D9 /* AppDelegate.swift in Sources */,
+				D1A600000000000000000001 /* MrBroccoliDiagnostics.swift in Sources */,
+				D1A600000000000000000002 /* MrBroccoliDiagnosticsBridge.m in Sources */,
 				C01A00000000000000000004 /* MrBroccoliVoiceActivityAttributes.swift in Sources */,
 				C01A00000000000000000005 /* MrBroccoliVoiceLiveActivity.swift in Sources */,
 				C01A00000000000000000006 /* MrBroccoliVoiceLiveActivityBridge.m in Sources */,

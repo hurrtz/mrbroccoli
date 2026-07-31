@@ -88,10 +88,7 @@ export function useProviderVoiceDirectory(params: {
         recordDebugLogEvent({
           event: "provider-voice-directory-load-failed",
           level: "error",
-          payload: {
-            message: normalizedError.message,
-            provider,
-          },
+          payload: { error: normalizedError, provider },
         });
         setStatus("error");
         setError(normalizedError);

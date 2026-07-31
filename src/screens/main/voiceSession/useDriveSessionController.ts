@@ -193,10 +193,7 @@ export function useDriveSessionController({
           recordDebugLogEvent({
             event: "drive-session-ready-cue-failed",
             level: "warn",
-            payload: {
-              message:
-                error instanceof Error ? error.message : String(error),
-            },
+            payload: { error },
           });
         }
       }
@@ -478,10 +475,7 @@ export function useDriveSessionController({
         recordDebugLogEvent({
           event: "drive-session-ambient-monitor-start-failed",
           level: "warn",
-          payload: {
-            message:
-              error instanceof Error ? error.message : String(error),
-          },
+          payload: { error },
         });
       });
       return;
@@ -491,10 +485,7 @@ export function useDriveSessionController({
       recordDebugLogEvent({
         event: "drive-session-ambient-monitor-stop-failed",
         level: "warn",
-        payload: {
-          message:
-            error instanceof Error ? error.message : String(error),
-        },
+        payload: { error },
       });
     });
   }, [
@@ -620,10 +611,7 @@ export function useDriveSessionController({
               level: "warn",
               payload: {
                 countdownSeconds,
-                message:
-                  error instanceof Error
-                    ? error.message
-                    : String(error),
+                error,
               },
             });
           });
@@ -646,10 +634,7 @@ export function useDriveSessionController({
         recordDebugLogEvent({
           event: "drive-session-silence-auto-submit-failed",
           level: "error",
-          payload: {
-            message:
-              error instanceof Error ? error.message : String(error),
-          },
+          payload: { error },
         });
         showToast(
           error instanceof Error

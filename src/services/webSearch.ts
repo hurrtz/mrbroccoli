@@ -1068,10 +1068,7 @@ export async function searchWeb(
     recordDebugLogEvent({
       event: "web-search-failed",
       level: "warn",
-      payload: {
-        message: normalizedError.message,
-        provider: params.provider,
-      },
+      payload: { error: normalizedError, provider: params.provider },
     });
     throw normalizedError;
   }

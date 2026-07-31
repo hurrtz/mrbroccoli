@@ -8,6 +8,7 @@ import { getWebSearchDecision } from "../webSearchHeuristics";
 import type { RunVoicePipelineParams } from "./types";
 
 interface ResolvePipelineWebSearchParams {
+  turnId: string;
   abortSignal?: AbortSignal;
   callbacks: RunVoicePipelineParams["callbacks"];
   conversationSummary?: string;
@@ -22,6 +23,7 @@ interface ResolvePipelineWebSearchParams {
 }
 
 export async function resolvePipelineWebSearch({
+  turnId,
   abortSignal,
   callbacks,
   conversationSummary,
@@ -71,6 +73,7 @@ export async function resolvePipelineWebSearch({
       reason: decision.reason,
       shouldSearch: decision.shouldSearch,
       signals: decision.matchedSignals,
+      turnId,
     },
   });
 

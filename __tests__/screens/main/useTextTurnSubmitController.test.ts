@@ -42,6 +42,7 @@ describe("useTextTurnSubmitController", () => {
     expect(handleVoiceCaptureDone).toHaveBeenCalledWith({
       existingUserMessageId: undefined,
       transcriptionOverride: "One turn",
+      turnId: expect.stringMatching(/^turn-/),
     });
 
     await act(async () => {
@@ -81,6 +82,7 @@ describe("useTextTurnSubmitController", () => {
     expect(handleVoiceCaptureDone).toHaveBeenCalledWith({
       existingUserMessageId: "message-1",
       transcriptionOverride: "Retry me",
+      turnId: expect.stringMatching(/^turn-/),
     });
   });
 

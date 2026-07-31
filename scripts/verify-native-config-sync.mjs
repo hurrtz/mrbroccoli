@@ -21,6 +21,16 @@ const androidManifest = readText(
 const androidStrings = readText(
   "android/app/src/main/res/values/strings.xml",
 );
+const androidDiagnostics = readText(
+  "android/app/src/main/java/com/tobiaswinkler/app/mrbroccoli/MrBroccoliDiagnosticsModule.kt",
+);
+const androidNativePackage = readText(
+  "android/app/src/main/java/com/tobiaswinkler/app/mrbroccoli/MrBroccoliNativeWaveformPackage.kt",
+);
+const iosDiagnostics = readText("ios/MrBroccoli/MrBroccoliDiagnostics.swift");
+const iosDiagnosticsBridge = readText(
+  "ios/MrBroccoli/MrBroccoliDiagnosticsBridge.m",
+);
 const androidAdaptiveIcon = readText(
   "android/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml",
 );
@@ -171,6 +181,36 @@ assertIncludes(
   "Android unused Sherpa FFmpeg disabled",
   androidGradleProperties,
   "sherpaOnnxDisableFfmpeg=true",
+);
+assertIncludes(
+  "Android diagnostics module implementation",
+  androidDiagnostics,
+  "getHistoricalProcessExitReasons",
+);
+assertIncludes(
+  "Android diagnostics module registration",
+  androidNativePackage,
+  "MrBroccoliDiagnosticsModule(reactContext)",
+);
+assertIncludes(
+  "iOS diagnostics source membership",
+  iosProject,
+  "MrBroccoliDiagnostics.swift",
+);
+assertIncludes(
+  "iOS diagnostics bridge membership",
+  iosProject,
+  "MrBroccoliDiagnosticsBridge.m",
+);
+assertIncludes(
+  "iOS MetricKit subscriber",
+  iosDiagnostics,
+  "MXMetricManagerSubscriber",
+);
+assertIncludes(
+  "iOS diagnostics bridge export",
+  iosDiagnosticsBridge,
+  "RCT_EXTERN_MODULE(MrBroccoliDiagnostics, NSObject)",
 );
 assertEqual(
   "Android release debug-signing fallback removed",

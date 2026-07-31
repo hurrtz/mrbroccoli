@@ -50,9 +50,7 @@ export function useVoiceSessionAppState({
           recordDebugLogEvent({
             event: "voice-capture-background-submit-failed",
             level: "error",
-            payload: {
-              message: error instanceof Error ? error.message : String(error),
-            },
+            payload: { error },
           });
           onBackgroundSubmitError(error);
         });

@@ -61,6 +61,7 @@ export interface PipelineCallbacks {
 }
 
 export interface RunVoicePipelineParams {
+  turnId: string;
   turnStartedAtMs?: number;
   audioUri?: string;
   transcriptionOverride?: string;

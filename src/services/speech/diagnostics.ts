@@ -34,6 +34,7 @@ export interface SpeechDiagnosticsContext {
   providerModel?: string | null;
   language?: TtsListenLanguage | "app";
   voice?: string | null;
+  turnId?: string;
 }
 
 export interface SpeechDiagnosticEvent {
@@ -52,6 +53,7 @@ export interface SpeechDiagnosticEvent {
   message?: string;
   fallbackReason?: string;
   textLength?: number;
+  turnId?: string;
 }
 
 export interface SpeechDiagnosticRequestSummary {
@@ -75,6 +77,7 @@ const MAX_SPEECH_DIAGNOSTICS = 200;
 
 let speechDiagnosticEvents: SpeechDiagnosticEvent[] = [];
 const speechDiagnosticsListeners = new Set<() => void>();
+const turnIdsByRequestId = new Map<string, string>();
 
 function nextSpeechDiagnosticId() {
   return `speech-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
@@ -93,8 +96,15 @@ export function createSpeechRequestId(prefix = "speech") {
 export function recordSpeechDiagnostic(
   event: Omit<SpeechDiagnosticEvent, "id" | "createdAt">,
 ) {
+  if (event.requestId && event.turnId) {
+    turnIdsByRequestId.set(event.requestId, event.turnId);
+  }
+  const turnId =
+    event.turnId ??
+    (event.requestId ? turnIdsByRequestId.get(event.requestId) : undefined);
   const entry: SpeechDiagnosticEvent = {
     ...event,
+    turnId,
     id: nextSpeechDiagnosticId(),
     createdAt: new Date().toISOString(),
     source: event.source ?? "unknown",
@@ -104,6 +114,18 @@ export function recordSpeechDiagnostic(
     0,
     MAX_SPEECH_DIAGNOSTICS,
   );
+  if (turnIdsByRequestId.size > MAX_SPEECH_DIAGNOSTICS) {
+    const retainedRequestIds = new Set(
+      speechDiagnosticEvents.flatMap((diagnostic) =>
+        diagnostic.requestId ? [diagnostic.requestId] : [],
+      ),
+    );
+    turnIdsByRequestId.forEach((_turnId, requestId) => {
+      if (!retainedRequestIds.has(requestId)) {
+        turnIdsByRequestId.delete(requestId);
+      }
+    });
+  }
   notifySpeechDiagnosticsListeners();
   recordDebugLogEvent({
     category: "speech",
@@ -120,6 +142,7 @@ export function recordSpeechDiagnostic(
       requestedRoute: entry.requestedRoute ?? null,
       source: entry.source,
       textLength: entry.textLength ?? null,
+      turnId: entry.turnId ?? null,
       voice: entry.voice ?? null,
     },
   });
@@ -198,5 +221,6 @@ export function getSpeechDiagnosticRequestSummaries(limit = 8) {
 
 export function clearSpeechDiagnostics() {
   speechDiagnosticEvents = [];
+  turnIdsByRequestId.clear();
   notifySpeechDiagnosticsListeners();
 }

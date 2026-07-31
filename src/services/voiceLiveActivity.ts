@@ -113,9 +113,7 @@ function ensureAndroidNotificationPermission(
       recordDebugLogEvent({
         event: "voice-live-activity-notification-permission-failed",
         level: "warn",
-        payload: {
-          message: error instanceof Error ? error.message : String(error),
-        },
+        payload: { error },
       });
       return false;
     });
@@ -136,10 +134,7 @@ function sendState(
       recordDebugLogEvent({
         event: "voice-live-activity-update-failed",
         level: "warn",
-        payload: {
-          message: error instanceof Error ? error.message : String(error),
-          phase: state.phase,
-        },
+        payload: { error, phase: state.phase },
       });
     });
 }
@@ -224,9 +219,7 @@ export function endVoiceLiveActivity(
     recordDebugLogEvent({
       event: "voice-live-activity-end-failed",
       level: "warn",
-      payload: {
-        message: error instanceof Error ? error.message : String(error),
-      },
+      payload: { error },
     });
   });
   return true;

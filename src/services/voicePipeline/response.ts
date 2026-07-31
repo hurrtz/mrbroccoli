@@ -10,6 +10,7 @@ import type { createVoicePipelineTtsQueue } from "./ttsQueue";
 import type { RunVoicePipelineParams } from "./types";
 
 interface RunPipelineResponseParams {
+  turnId: string;
   abortSignal?: AbortSignal;
   additionalUsage?: UsageEstimate;
   assistantInstructions: RunVoicePipelineParams["assistantInstructions"];
@@ -36,6 +37,7 @@ interface RunPipelineResponseParams {
 }
 
 export async function runPipelineResponse({
+  turnId,
   abortSignal,
   additionalUsage,
   assistantInstructions,
@@ -68,6 +70,7 @@ export async function runPipelineResponse({
       provider,
       hasWebSearchContext: !!webSearchContext,
       webSearchContextLength: webSearchContext?.length ?? 0,
+      turnId,
     },
   });
   if (!llmAlreadyStarted) {

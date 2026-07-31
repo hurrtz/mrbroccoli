@@ -1,6 +1,10 @@
 import { useCallback, useRef, type Dispatch, type SetStateAction } from "react";
 
-import { recordDebugLogEvent } from "../../services/debugLogCapture";
+import {
+  createDebugTurnId,
+  recordDebugLogEvent,
+  registerDebugTurnSignal,
+} from "../../services/debugLogCapture";
 import { runVoicePipeline } from "../../services/voicePipeline";
 import type { VoicePhaseProgress } from "../../types";
 import { createVoicePipelineEventAdapter } from "./createVoicePipelineEventAdapter";
@@ -113,12 +117,15 @@ export function useVoiceCaptureHandler({
       audioUri,
       existingUserMessageId,
       transcriptionOverride,
+      turnId: requestedTurnId,
     }: VoiceCaptureRequest) => {
       const previousAbortController = abortRef.current;
       const runId = activeCaptureRunRef.current + 1;
       activeCaptureRunRef.current = runId;
       previousAbortController?.abort();
       const abortController = new AbortController();
+      const turnId = requestedTurnId ?? createDebugTurnId();
+      registerDebugTurnSignal(abortController.signal, turnId);
       const turnStartedAtMs = Date.now();
       abortRef.current = abortController;
       const isCurrentRun = () =>
@@ -141,6 +148,7 @@ export function useVoiceCaptureHandler({
           hasAudioUri: !!audioUri,
           hasTranscriptionOverride: !!transcriptionOverride,
           ttsMode,
+          turnId,
         },
       });
       setPipelinePhase(
@@ -194,6 +202,7 @@ export function useVoiceCaptureHandler({
         streamingRenderRunId,
         t,
         transcriptionOverride,
+        turnId,
       });
       const eventAdapter = createVoicePipelineEventAdapter({
         activeConversation,
@@ -249,6 +258,7 @@ export function useVoiceCaptureHandler({
         ttsMode,
         ttsProvider,
         turnStartedAtMs,
+        turnId,
         ulraMode,
         updateConversationContextSummary,
         webSearchMode,
@@ -258,6 +268,7 @@ export function useVoiceCaptureHandler({
 
       try {
         const transcription = await runVoicePipeline({
+          turnId,
           turnStartedAtMs,
           audioUri,
           transcriptionOverride,
@@ -306,10 +317,11 @@ export function useVoiceCaptureHandler({
             clearLatencyProgress();
           }
           recordDebugLogEvent({
-            event: "voice-pipeline-aborted",
+            event: "voice-pipeline-handler-aborted",
             payload: {
               hasAudioUri: !!audioUri,
               hasTranscriptionOverride: !!transcriptionOverride,
+              turnId,
             },
           });
           return;
@@ -322,6 +334,7 @@ export function useVoiceCaptureHandler({
             event: "voice-pipeline-stale-run-finished",
             payload: {
               runId,
+              turnId,
             },
           });
           return;
@@ -331,6 +344,7 @@ export function useVoiceCaptureHandler({
           event: "voice-pipeline-finalizing",
           payload: {
             hasPendingPlayback: player.hasPendingPlaybackNow(),
+            turnId,
           },
         });
         if (player.hasPendingPlaybackNow()) {

@@ -25,6 +25,7 @@ import {
 import { useLocalization } from "../../i18n";
 import { useTheme } from "../../theme/ThemeContext";
 import { fonts } from "../../theme/typography";
+import { recordDebugLogEvent } from "../../services/debugLogCapture";
 
 import { AntSettingsInfoButton } from "./AntSettingsInfoButton";
 import { styles } from "./styles";
@@ -434,6 +435,7 @@ export function AntPickerRow({
   const { colors } = useTheme();
   const { t } = useLocalization();
   const [pickerVisible, setPickerVisible] = React.useState(false);
+  const controlId = testID ?? "settings-picker-unidentified";
   const selectedLabel =
     options.find((option) => option.value === value)?.label ??
     (options.length === 1 ? options[0].label : value);
@@ -444,6 +446,16 @@ export function AntPickerRow({
       <AntIcon name="down" size="compact" color={colors.textMuted} />
     ) : null;
   const pickerIsInteractive = !hasSingleOption;
+  const closePicker = React.useCallback(
+    (reason: "back" | "close" | "overlay" | "selection") => {
+      recordDebugLogEvent({
+        event: "settings-picker-dismissed",
+        payload: { controlId, reason },
+      });
+      setPickerVisible(false);
+    },
+    [controlId],
+  );
   const renderRow = (onPress?: () => void) => {
     const rowContent = (
       <View
@@ -527,10 +539,33 @@ export function AntPickerRow({
 
   return (
     <>
-      {renderRow(() => setPickerVisible(true))}
+      {renderRow(() => {
+        recordDebugLogEvent({
+          event: "settings-picker-open-requested",
+          payload: {
+            controlId,
+            disabled,
+            optionCount: options.length,
+            selectedValue: value,
+          },
+        });
+        setPickerVisible(true);
+      })}
       <Modal
         animationType="fade"
-        onRequestClose={() => setPickerVisible(false)}
+        onDismiss={() => {
+          recordDebugLogEvent({
+            event: "settings-picker-native-dismissed",
+            payload: { controlId },
+          });
+        }}
+        onRequestClose={() => closePicker("back")}
+        onShow={() => {
+          recordDebugLogEvent({
+            event: "settings-picker-presented",
+            payload: { controlId, optionCount: options.length },
+          });
+        }}
         statusBarTranslucent
         supportedOrientations={APP_MODAL_ORIENTATIONS}
         transparent
@@ -544,7 +579,7 @@ export function AntPickerRow({
           <Pressable
             accessibilityLabel={t("dismiss")}
             accessibilityRole="button"
-            onPress={() => setPickerVisible(false)}
+            onPress={() => closePicker("overlay")}
             style={[
               StyleSheet.absoluteFill,
               { backgroundColor: colors.overlay },
@@ -577,7 +612,7 @@ export function AntPickerRow({
                 accessibilityLabel={t("dismiss")}
                 accessibilityRole="button"
                 hitSlop={8}
-                onPress={() => setPickerVisible(false)}
+                onPress={() => closePicker("close")}
                 style={({ pressed }) => [
                   styles.pickerModalClose,
                   pressed ? styles.pressedControl : null,
@@ -614,8 +649,18 @@ export function AntPickerRow({
                     }}
                     disabled={option.disabled}
                     onPress={() => {
+                      recordDebugLogEvent({
+                        event: "settings-picker-option-selected",
+                        payload: {
+                          controlId,
+                          optionIndex: options.findIndex(
+                            (entry) => entry.value === option.value,
+                          ),
+                          selectedValue: option.value,
+                        },
+                      });
                       onChange(option.value);
-                      setPickerVisible(false);
+                      closePicker("selection");
                     }}
                     style={({ pressed }) => [
                       styles.pickerModalOption,

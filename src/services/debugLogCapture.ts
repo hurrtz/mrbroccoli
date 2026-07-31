@@ -1,12 +1,29 @@
 import * as Clipboard from "expo-clipboard";
 import * as FileSystem from "expo-file-system/legacy";
 
+import {
+  sanitizeConsoleArguments,
+  sanitizeDebugPayload,
+  sanitizeRecoveredLegacyLog,
+} from "./debugLogSanitizer";
+import { validateDebugLogEntries } from "./debugLogValidator";
+import { appendDebugLogFile } from "./debugLogFileStorage";
+
 type DebugLogLevel = "log" | "info" | "warn" | "error";
 type DebugLogCategory = "app" | "console" | "speech" | "waveform";
 
-interface DebugLogEntry {
+export interface DebugLogEntry {
   category: DebugLogCategory;
   elapsedMs: number;
+  event: string;
+  level: DebugLogLevel;
+  payload?: Record<string, unknown>;
+  sequence: number;
+  timestamp: string;
+}
+
+interface PendingDebugLogEntry {
+  category: DebugLogCategory;
   event: string;
   level: DebugLogLevel;
   payload?: Record<string, unknown>;
@@ -14,12 +31,19 @@ interface DebugLogEntry {
 }
 
 interface ActiveDebugLogSession {
+  context: Record<string, unknown>;
+  droppedEntries: number;
   entries: DebugLogEntry[];
   finalPath: string;
   id: string;
+  journalBytes: number;
   livePath: string;
+  nextSequence: number;
+  pendingJournalLines: string[];
   startedAtIso: string;
   startedAtMs: number;
+  storageError: Error | null;
+  truncated: boolean;
 }
 
 interface PendingDebugLogAggregate {
@@ -38,6 +62,8 @@ export interface DebugLogCaptureState {
   lastExportPath: string | null;
   sessionId: string | null;
   startedAt: string | null;
+  storageHealthy: boolean;
+  truncated: boolean;
 }
 
 export interface DebugLogCaptureResult {
@@ -46,6 +72,7 @@ export interface DebugLogCaptureResult {
   entryCount: number;
   path: string;
   sessionId: string;
+  validationIssueCount: number;
 }
 
 export interface RecoveredDebugLogCaptureResult {
@@ -55,49 +82,39 @@ export interface RecoveredDebugLogCaptureResult {
   sessionId: string | null;
 }
 
+type JournalRecord =
+  | {
+      context: Record<string, unknown>;
+      schemaVersion: number;
+      sessionId: string;
+      startedAt: string;
+      type: "session";
+    }
+  | ({ type: "entry" } & DebugLogEntry);
+
 const listeners = new Set<() => void>();
-const ACTIVE_CAPTURE_FILE_NAME = "debug-log-active.log";
+const ACTIVE_CAPTURE_FILE_NAME = "debug-log-active.jsonl";
+const LEGACY_ACTIVE_CAPTURE_FILE_NAME = "debug-log-active.log";
+const DEBUG_LOG_SCHEMA_VERSION = 2;
 const FLUSH_DELAY_MS = 250;
 const AGGREGATE_FLUSH_DELAY_MS = 1_000;
-// Per-frame events that would flood a capture (tens of thousands of lines) and,
-// because every recorded entry notifies listeners (re-rendering the screen),
-// would perturb the very re-render/battery signal a capture is meant to measure.
-// Dropped from capture entirely.
+const MAX_CAPTURE_BYTES = 2 * 1024 * 1024;
+const MAX_CAPTURE_ENTRIES = 5_000;
+const MAX_CAPTURE_DURATION_MS = 30 * 60_000;
+const MAX_RETAINED_LOGS = 5;
+const MAX_PRE_ROLL_ENTRIES = 100;
+const MAX_PRE_ROLL_AGE_MS = 5 * 60_000;
 const HIGH_FREQUENCY_EVENTS = new Set<string>(["native-waveform-event"]);
-const REDACTED_SECRET = "[REDACTED]";
-const MAX_DEBUG_VALUE_DEPTH = 6;
-const MAX_DEBUG_ARRAY_LENGTH = 50;
-const SECRET_KEY_NAMES = new Set([
-  "apikey",
-  "authorization",
-  "cookie",
-  "credential",
-  "credentials",
-  "password",
-  "passphrase",
-  "secret",
-  "token",
-]);
-const PRIVATE_TEXT_KEY_NAMES = new Set([
-  "assistantinstructions",
-  "content",
-  "existingsummary",
-  "instructions",
-  "prompt",
-  "query",
-  "summary",
-  "systemprompt",
-  "text",
-  "transcript",
-  "webcontext",
-]);
 
 let activeSession: ActiveDebugLogSession | null = null;
 let lastExportPath: string | null = null;
 let consoleCaptureInstalled = false;
 let flushTimer: ReturnType<typeof setTimeout> | null = null;
 let aggregateFlushTimer: ReturnType<typeof setTimeout> | null = null;
+let stopPromise: Promise<DebugLogCaptureResult | null> | null = null;
 const pendingAggregates = new Map<string, PendingDebugLogAggregate>();
+const preRollEntries: PendingDebugLogEntry[] = [];
+const turnIdsByAbortSignal = new WeakMap<AbortSignal, string>();
 let writeQueue = Promise.resolve();
 
 const originalConsole = {
@@ -108,22 +125,30 @@ const originalConsole = {
 };
 
 function notifyListeners() {
-  listeners.forEach((listener) => {
-    listener();
-  });
+  listeners.forEach((listener) => listener());
 }
 
 function nextSessionId() {
   return `debug-log-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 }
 
+export function createDebugTurnId() {
+  return `turn-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+}
+
+export function registerDebugTurnSignal(signal: AbortSignal, turnId: string) {
+  turnIdsByAbortSignal.set(signal, turnId);
+}
+
+export function getDebugTurnIdForSignal(signal?: AbortSignal | null) {
+  return signal ? (turnIdsByAbortSignal.get(signal) ?? null) : null;
+}
+
 function ensureLogsDirectory() {
   const baseDirectory = FileSystem.documentDirectory ?? FileSystem.cacheDirectory;
-
   if (!baseDirectory) {
     throw new Error("No writable directory available for debug logs.");
   }
-
   return `${baseDirectory}debug-logs/`;
 }
 
@@ -131,119 +156,16 @@ function getActiveCapturePath() {
   return `${ensureLogsDirectory()}${ACTIVE_CAPTURE_FILE_NAME}`;
 }
 
+function getLegacyActiveCapturePath() {
+  return `${ensureLogsDirectory()}${LEGACY_ACTIVE_CAPTURE_FILE_NAME}`;
+}
+
 function safeStringify(value: unknown) {
   try {
     return JSON.stringify(value);
   } catch {
-    return JSON.stringify(String(value));
+    return JSON.stringify("[UNSERIALIZABLE]");
   }
-}
-
-function normalizeDebugKey(key: string) {
-  return key.toLowerCase().replace(/[^a-z]/g, "");
-}
-
-function redactSensitiveString(value: string) {
-  return value
-    .replace(/\bBearer\s+[A-Za-z0-9._~+/=-]+/gi, "Bearer [REDACTED]")
-    .replace(/\bsk-(?:ant-)?[A-Za-z0-9_-]{8,}\b/g, REDACTED_SECRET)
-    .replace(/\bxai-[A-Za-z0-9_-]{8,}\b/gi, REDACTED_SECRET)
-    .replace(/\bAIza[A-Za-z0-9_-]{16,}\b/g, REDACTED_SECRET)
-    .replace(
-      /([?&](?:api[_-]?key|authorization|credential|password|passphrase|secret|token)=)[^&#\s]*/gi,
-      `$1${REDACTED_SECRET}`,
-    )
-    .replace(
-      /((?:api[_ -]?key|authorization|credential|password|passphrase|secret|token)\s*[:=]\s*["']?)[^"',}\s]+/gi,
-      `$1${REDACTED_SECRET}`,
-    );
-}
-
-function sanitizeDebugValue(
-  value: unknown,
-  key = "",
-  depth = 0,
-  seen = new WeakSet<object>(),
-): unknown {
-  const normalizedKey = normalizeDebugKey(key);
-
-  if (SECRET_KEY_NAMES.has(normalizedKey)) {
-    return REDACTED_SECRET;
-  }
-
-  if (PRIVATE_TEXT_KEY_NAMES.has(normalizedKey) && typeof value === "string") {
-    return `[REDACTED_TEXT length=${value.length}]`;
-  }
-
-  if (typeof value === "string") {
-    return redactSensitiveString(value);
-  }
-
-  if (
-    value === null ||
-    value === undefined ||
-    typeof value === "number" ||
-    typeof value === "boolean"
-  ) {
-    return value;
-  }
-
-  if (value instanceof Error) {
-    return {
-      message: redactSensitiveString(value.message),
-      name: value.name,
-    };
-  }
-
-  if (depth >= MAX_DEBUG_VALUE_DEPTH) {
-    return "[TRUNCATED]";
-  }
-
-  if (typeof value !== "object") {
-    return String(value);
-  }
-
-  if (seen.has(value)) {
-    return "[CIRCULAR]";
-  }
-  seen.add(value);
-
-  if (Array.isArray(value)) {
-    const sanitized = value
-      .slice(0, MAX_DEBUG_ARRAY_LENGTH)
-      .map((entry) => sanitizeDebugValue(entry, key, depth + 1, seen));
-    if (value.length > MAX_DEBUG_ARRAY_LENGTH) {
-      sanitized.push(`[TRUNCATED ${value.length - MAX_DEBUG_ARRAY_LENGTH} items]`);
-    }
-    return sanitized;
-  }
-
-  return Object.fromEntries(
-    Object.entries(value).map(([entryKey, entryValue]) => [
-      entryKey,
-      sanitizeDebugValue(entryValue, entryKey, depth + 1, seen),
-    ]),
-  );
-}
-
-function sanitizeDebugPayload(payload?: Record<string, unknown>) {
-  if (!payload) {
-    return undefined;
-  }
-
-  return sanitizeDebugValue(payload) as Record<string, unknown>;
-}
-
-function formatConsoleArgs(args: unknown[]) {
-  return args
-    .map((arg) => {
-      if (typeof arg === "string") {
-        return redactSensitiveString(arg);
-      }
-
-      return safeStringify(sanitizeDebugValue(arg));
-    })
-    .join(" ");
 }
 
 function formatLogEntry(entry: DebugLogEntry) {
@@ -251,49 +173,167 @@ function formatLogEntry(entry: DebugLogEntry) {
     entry.payload && Object.keys(entry.payload).length > 0
       ? ` ${safeStringify(entry.payload)}`
       : "";
-
-  return `[${entry.timestamp}] +${entry.elapsedMs}ms [${entry.level}] [${entry.category}] ${entry.event}${payloadSuffix}`;
+  const elapsed = entry.elapsedMs < 0 ? `${entry.elapsedMs}ms` : `+${entry.elapsedMs}ms`;
+  return `[${entry.timestamp}] ${elapsed} [seq=${entry.sequence}] [${entry.level}] [${entry.category}] ${entry.event}${payloadSuffix}`;
 }
 
 function formatDebugLogSession(
-  session: ActiveDebugLogSession,
+  session: Pick<
+    ActiveDebugLogSession,
+    "context" | "droppedEntries" | "entries" | "id" | "startedAtIso" | "startedAtMs" | "truncated"
+  >,
   endedAtIso: string,
   endedAtMs: number,
-  status: "active" | "complete",
+  status: "complete" | "recovered",
 ) {
   const lines = [
     "# Mr Broccoli Debug Log Capture",
+    `schemaVersion: ${DEBUG_LOG_SCHEMA_VERSION}`,
     `sessionId: ${session.id}`,
     `startedAt: ${session.startedAtIso}`,
     `endedAt: ${endedAtIso}`,
     `durationMs: ${Math.max(0, endedAtMs - session.startedAtMs)}`,
     `status: ${status}`,
     `entryCount: ${session.entries.length}`,
+    `droppedEntries: ${session.droppedEntries}`,
+    `truncated: ${session.truncated}`,
+    `context: ${safeStringify(session.context)}`,
     "",
     ...session.entries.map(formatLogEntry),
   ];
-
   return `${lines.join("\n")}\n`;
 }
 
-function appendEntry(
-  entry: Omit<DebugLogEntry, "elapsedMs" | "timestamp">,
-) {
-  if (!activeSession) {
+function encodeJournalRecord(record: JournalRecord) {
+  return `${safeStringify(record)}\n`;
+}
+
+function utf8Length(value: string) {
+  return new TextEncoder().encode(value).byteLength;
+}
+
+function queueWrite<T>(task: () => Promise<T>) {
+  const queued = writeQueue.catch(() => undefined).then(task);
+  writeQueue = queued.then(
+    () => undefined,
+    () => undefined,
+  );
+  return queued;
+}
+
+async function writeAtomic(path: string, content: string) {
+  const tempPath = `${path}.tmp-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
+  await FileSystem.writeAsStringAsync(tempPath, content);
+  try {
+    await FileSystem.moveAsync({ from: tempPath, to: path });
+  } catch (error) {
+    await FileSystem.deleteAsync(tempPath, { idempotent: true }).catch(() => undefined);
+    throw error;
+  }
+}
+
+function scheduleFlush() {
+  if (!activeSession || flushTimer) {
     return;
   }
+  flushTimer = setTimeout(() => {
+    flushTimer = null;
+    void flushPendingJournal(activeSession).catch(() => undefined);
+  }, FLUSH_DELAY_MS);
+}
 
-  if (HIGH_FREQUENCY_EVENTS.has(entry.event)) {
+async function flushPendingJournal(session: ActiveDebugLogSession | null) {
+  if (!session || session.pendingJournalLines.length === 0) {
     return;
   }
+  const lines = session.pendingJournalLines.splice(0).join("");
+  try {
+    await queueWrite(() => appendDebugLogFile(session.livePath, lines));
+  } catch (error) {
+    session.pendingJournalLines.unshift(lines);
+    session.storageError =
+      error instanceof Error ? error : new Error("Debug journal append failed.");
+    notifyListeners();
+    throw session.storageError;
+  }
+}
 
-  activeSession.entries.push({
+function appendPreRoll(entry: Omit<PendingDebugLogEntry, "timestamp">) {
+  const now = Date.now();
+  preRollEntries.push({
     ...entry,
     payload: sanitizeDebugPayload(entry.payload),
-    elapsedMs: Date.now() - activeSession.startedAtMs,
-    timestamp: new Date().toISOString(),
+    timestamp: new Date(now).toISOString(),
   });
+  while (
+    preRollEntries.length > MAX_PRE_ROLL_ENTRIES ||
+    (preRollEntries[0] &&
+      now - Date.parse(preRollEntries[0].timestamp) > MAX_PRE_ROLL_AGE_MS)
+  ) {
+    preRollEntries.shift();
+  }
+}
 
+function appendEntry(
+  entry: Omit<PendingDebugLogEntry, "timestamp">,
+  options: { force?: boolean; preRoll?: boolean; timestamp?: string } = {},
+) {
+  const session = activeSession;
+  if (!session) {
+    appendPreRoll(entry);
+    return;
+  }
+  if (HIGH_FREQUENCY_EVENTS.has(entry.event)) {
+    session.droppedEntries += 1;
+    return;
+  }
+
+  const now = Date.now();
+  const sanitizedPayload = sanitizeDebugPayload(
+    options.preRoll
+      ? { ...entry.payload, preRoll: true }
+      : entry.payload,
+  );
+  const candidate: DebugLogEntry = {
+    ...entry,
+    payload: sanitizedPayload,
+    elapsedMs: options.preRoll
+      ? Date.parse(options.timestamp ?? new Date(now).toISOString()) - session.startedAtMs
+      : now - session.startedAtMs,
+    sequence: session.nextSequence,
+    timestamp: options.timestamp ?? new Date(now).toISOString(),
+  };
+  const journalLine = encodeJournalRecord({ type: "entry", ...candidate });
+  const limitReached =
+    session.entries.length >= MAX_CAPTURE_ENTRIES ||
+    session.journalBytes + utf8Length(journalLine) > MAX_CAPTURE_BYTES ||
+    now - session.startedAtMs > MAX_CAPTURE_DURATION_MS;
+
+  if (limitReached && !options.force) {
+    session.droppedEntries += 1;
+    if (!session.truncated) {
+      session.truncated = true;
+      appendEntry(
+        {
+          category: "app",
+          event: "capture-limit-reached",
+          level: "warn",
+          payload: {
+            maxBytes: MAX_CAPTURE_BYTES,
+            maxDurationMs: MAX_CAPTURE_DURATION_MS,
+            maxEntries: MAX_CAPTURE_ENTRIES,
+          },
+        },
+        { force: true },
+      );
+    }
+    return;
+  }
+
+  session.nextSequence += 1;
+  session.entries.push(candidate);
+  session.pendingJournalLines.push(journalLine);
+  session.journalBytes += utf8Length(journalLine);
   notifyListeners();
   scheduleFlush();
 }
@@ -307,15 +347,12 @@ function clearAggregateFlushTimer() {
 
 function flushAggregatedEntries() {
   clearAggregateFlushTimer();
-
   if (!activeSession || pendingAggregates.size === 0) {
     pendingAggregates.clear();
     return;
   }
-
   const aggregates = [...pendingAggregates.entries()];
   pendingAggregates.clear();
-
   for (const [event, aggregate] of aggregates) {
     appendEntry({
       category: aggregate.category,
@@ -334,20 +371,7 @@ function flushAggregatedEntries() {
   }
 }
 
-function scheduleAggregateFlush() {
-  if (!activeSession || aggregateFlushTimer) {
-    return;
-  }
-
-  aggregateFlushTimer = setTimeout(() => {
-    aggregateFlushTimer = null;
-    flushAggregatedEntries();
-  }, AGGREGATE_FLUSH_DELAY_MS);
-}
-
-function aggregateStreamChunk(
-  entry: Omit<DebugLogEntry, "elapsedMs" | "timestamp">,
-) {
+function aggregateStreamChunk(entry: Omit<PendingDebugLogEntry, "timestamp">) {
   const chunkLength =
     typeof entry.payload?.chunkLength === "number" &&
     Number.isFinite(entry.payload.chunkLength)
@@ -355,7 +379,6 @@ function aggregateStreamChunk(
       : 0;
   const now = Date.now();
   const current = pendingAggregates.get(entry.event);
-
   pendingAggregates.set(entry.event, {
     category: entry.category,
     count: (current?.count ?? 0) + 1,
@@ -365,68 +388,70 @@ function aggregateStreamChunk(
     maxChunkLength: Math.max(current?.maxChunkLength ?? 0, chunkLength),
     totalChunkLength: (current?.totalChunkLength ?? 0) + chunkLength,
   });
-  scheduleAggregateFlush();
+  if (!aggregateFlushTimer) {
+    aggregateFlushTimer = setTimeout(() => {
+      aggregateFlushTimer = null;
+      flushAggregatedEntries();
+    }, AGGREGATE_FLUSH_DELAY_MS);
+  }
 }
 
-function recordEntry(entry: Omit<DebugLogEntry, "elapsedMs" | "timestamp">) {
-  if (!activeSession) {
-    return;
-  }
-
-  if (entry.event === "voice-pipeline-stream-chunk") {
+function recordEntry(entry: Omit<PendingDebugLogEntry, "timestamp">) {
+  if (entry.event === "voice-pipeline-stream-chunk" && activeSession) {
     aggregateStreamChunk(entry);
     return;
   }
-
   appendEntry(entry);
 }
 
-function queueWrite(task: () => Promise<void>) {
-  writeQueue = writeQueue.then(task).catch(() => undefined);
-  return writeQueue;
+function parseJournal(content: string) {
+  let header: Extract<JournalRecord, { type: "session" }> | null = null;
+  const entries: DebugLogEntry[] = [];
+  let malformedLines = 0;
+  for (const line of content.split("\n")) {
+    if (!line.trim()) continue;
+    try {
+      const record = JSON.parse(line) as JournalRecord;
+      if (record.type === "session") {
+        header = {
+          ...record,
+          context: sanitizeDebugPayload(record.context) ?? {},
+        };
+      } else if (
+        record.type === "entry" &&
+        typeof record.event === "string" &&
+        typeof record.sequence === "number"
+      ) {
+        entries.push({
+          ...record,
+          payload: sanitizeDebugPayload(record.payload),
+        });
+      } else {
+        malformedLines += 1;
+      }
+    } catch {
+      malformedLines += 1;
+    }
+  }
+  return { entries, header, malformedLines };
 }
 
-function scheduleFlush() {
-  if (!activeSession || flushTimer) {
-    return;
-  }
-
-  flushTimer = setTimeout(() => {
-    flushTimer = null;
-    void flushActiveSessionToDisk();
-  }, FLUSH_DELAY_MS);
-}
-
-async function flushActiveSessionToDisk(sessionOverride?: ActiveDebugLogSession) {
-  const session = sessionOverride ?? activeSession;
-
-  if (!session) {
-    return;
-  }
-
-  const content = formatDebugLogSession(
-    session,
-    new Date().toISOString(),
-    Date.now(),
-    "active",
+async function pruneCompletedLogs() {
+  const directory = ensureLogsDirectory();
+  const names = await FileSystem.readDirectoryAsync(directory).catch(() => []);
+  const retained = names
+    .filter((name) =>
+      /^(?:debug-log-\d+-.+|recovered-\d+)\.log$/.test(name),
+    )
+    .sort()
+    .reverse();
+  await Promise.all(
+    retained
+      .slice(MAX_RETAINED_LOGS)
+      .map((name) =>
+        FileSystem.deleteAsync(`${directory}${name}`, { idempotent: true }),
+      ),
   );
-
-  await queueWrite(async () => {
-    await FileSystem.makeDirectoryAsync(ensureLogsDirectory(), {
-      intermediates: true,
-    });
-    await FileSystem.writeAsStringAsync(session.livePath, content);
-  });
-}
-
-function parseSessionMetadata(content: string) {
-  const entryCountMatch = content.match(/^entryCount: (\d+)/m);
-  const sessionIdMatch = content.match(/^sessionId: (.+)$/m);
-
-  return {
-    entryCount: entryCountMatch ? Number(entryCountMatch[1]) : 0,
-    sessionId: sessionIdMatch?.[1]?.trim() ?? null,
-  };
 }
 
 export function getDebugLogCaptureState(): DebugLogCaptureState {
@@ -436,27 +461,23 @@ export function getDebugLogCaptureState(): DebugLogCaptureState {
     lastExportPath,
     sessionId: activeSession?.id ?? null,
     startedAt: activeSession?.startedAtIso ?? null,
+    storageHealthy: activeSession?.storageError === null,
+    truncated: activeSession?.truncated ?? false,
   };
 }
 
 export function subscribeToDebugLogCapture(listener: () => void) {
   listeners.add(listener);
-
   return () => {
     listeners.delete(listener);
   };
 }
 
 export function installDebugLogConsoleCapture() {
-  if (consoleCaptureInstalled) {
-    return;
-  }
-
+  if (consoleCaptureInstalled) return;
   consoleCaptureInstalled = true;
-
   (["log", "info", "warn", "error"] as const).forEach((level) => {
     const original = originalConsole[level];
-
     console[level] = (...args: unknown[]) => {
       original(...args);
       recordEntry({
@@ -464,7 +485,8 @@ export function installDebugLogConsoleCapture() {
         event: "console-output",
         level,
         payload: {
-          message: formatConsoleArgs(args),
+          argumentCount: args.length,
+          arguments: sanitizeConsoleArguments(args),
         },
       });
     };
@@ -485,68 +507,121 @@ export function recordDebugLogEvent(params: {
   });
 }
 
-export function startDebugLogCapture(payload: Record<string, unknown> = {}) {
+export async function startDebugLogCapture(
+  payload: Record<string, unknown> = {},
+) {
   installDebugLogConsoleCapture();
-
-  if (activeSession) {
-    return getDebugLogCaptureState();
-  }
+  if (activeSession) return getDebugLogCaptureState();
 
   const directory = ensureLogsDirectory();
-  const sessionId = nextSessionId();
+  const livePath = getActiveCapturePath();
+  const existing = await FileSystem.getInfoAsync(livePath);
+  if (existing.exists) {
+    throw new Error("A pending debug log must be recovered before starting a new capture.");
+  }
+  await FileSystem.makeDirectoryAsync(directory, { intermediates: true });
 
-  const nextSession: ActiveDebugLogSession = {
+  const sessionId = nextSessionId();
+  const startedAtMs = Date.now();
+  const context = sanitizeDebugPayload(payload) ?? {};
+  const session: ActiveDebugLogSession = {
+    context,
+    droppedEntries: 0,
     entries: [],
     finalPath: `${directory}${sessionId}.log`,
     id: sessionId,
-    livePath: getActiveCapturePath(),
-    startedAtIso: new Date().toISOString(),
-    startedAtMs: Date.now(),
+    journalBytes: 0,
+    livePath,
+    nextSequence: 1,
+    pendingJournalLines: [],
+    startedAtIso: new Date(startedAtMs).toISOString(),
+    startedAtMs,
+    storageError: null,
+    truncated: false,
   };
-
+  const header = encodeJournalRecord({
+    context,
+    schemaVersion: DEBUG_LOG_SCHEMA_VERSION,
+    sessionId,
+    startedAt: session.startedAtIso,
+    type: "session",
+  });
+  await FileSystem.writeAsStringAsync(livePath, header);
+  session.journalBytes = utf8Length(header);
+  activeSession = session;
   pendingAggregates.clear();
   clearAggregateFlushTimer();
-  activeSession = nextSession;
-  recordDebugLogEvent({
-    event: "capture-started",
-    payload,
-  });
-  notifyListeners();
-  void flushActiveSessionToDisk(nextSession);
 
+  const now = Date.now();
+  preRollEntries
+    .filter((entry) => now - Date.parse(entry.timestamp) <= MAX_PRE_ROLL_AGE_MS)
+    .forEach((entry) =>
+      appendEntry(entry, { preRoll: true, timestamp: entry.timestamp }),
+    );
+  preRollEntries.length = 0;
+  appendEntry(
+    { category: "app", event: "capture-started", level: "info", payload },
+    { force: true },
+  );
+  await flushPendingJournal(session);
+  notifyListeners();
   return getDebugLogCaptureState();
 }
 
-export async function stopDebugLogCapture(
-  payload: Record<string, unknown> = {},
+async function performStopDebugLogCapture(
+  payload: Record<string, unknown>,
 ): Promise<DebugLogCaptureResult | null> {
-  if (!activeSession) {
-    return null;
-  }
+  const session = activeSession;
+  if (!session) return null;
 
   flushAggregatedEntries();
-  recordDebugLogEvent({
-    event: "capture-stopping",
-    payload,
-  });
+  appendEntry(
+    {
+      category: "app",
+      event: "capture-stopping",
+      level: "info",
+      payload: {
+        ...payload,
+        droppedEntries: session.droppedEntries,
+        storageRecoveredAtStop: session.storageError !== null,
+        truncated: session.truncated,
+      },
+    },
+    { force: true },
+  );
+  const validationIssues = validateDebugLogEntries(session.entries);
+  appendEntry(
+    {
+      category: "app",
+      event: "capture-validation-summary",
+      level: validationIssues.length > 0 ? "warn" : "info",
+      payload: {
+        issueCount: validationIssues.length,
+        issues: validationIssues,
+      },
+    },
+    { force: true },
+  );
 
-  const session = activeSession;
   if (flushTimer) {
     clearTimeout(flushTimer);
     flushTimer = null;
   }
-
-  await flushActiveSessionToDisk(session);
-  const endedAtIso = new Date().toISOString();
+  await flushPendingJournal(session).catch(() => undefined);
   const endedAtMs = Date.now();
-  const content = formatDebugLogSession(session, endedAtIso, endedAtMs, "complete");
-  const path = session.finalPath;
+  const endedAtIso = new Date(endedAtMs).toISOString();
+  const content = formatDebugLogSession(
+    session,
+    endedAtIso,
+    endedAtMs,
+    "complete",
+  );
 
   await queueWrite(async () => {
     await FileSystem.makeDirectoryAsync(ensureLogsDirectory(), {
       intermediates: true,
     });
-    await FileSystem.writeAsStringAsync(path, content);
+    await writeAtomic(session.finalPath, content);
     await FileSystem.deleteAsync(session.livePath, { idempotent: true });
   });
 
@@ -561,36 +636,103 @@ export async function stopDebugLogCapture(
   activeSession = null;
   pendingAggregates.clear();
   clearAggregateFlushTimer();
-  lastExportPath = path;
+  lastExportPath = session.finalPath;
   notifyListeners();
-
+  await pruneCompletedLogs().catch(() => undefined);
   return {
     content,
     copiedToClipboard,
     entryCount: session.entries.length,
-    path,
+    path: session.finalPath,
     sessionId: session.id,
+    validationIssueCount: validationIssues.length,
+  };
+}
+
+export function stopDebugLogCapture(
+  payload: Record<string, unknown> = {},
+): Promise<DebugLogCaptureResult | null> {
+  if (stopPromise) return stopPromise;
+  stopPromise = performStopDebugLogCapture(payload).finally(() => {
+    stopPromise = null;
+  });
+  return stopPromise;
+}
+
+async function recoverJournal(path: string) {
+  const content = await FileSystem.readAsStringAsync(path);
+  const parsed = parseJournal(content);
+  if (!parsed.header) {
+    throw new Error("The pending debug journal does not contain a valid header.");
+  }
+  if (parsed.malformedLines > 0) {
+    const sequence = (parsed.entries.at(-1)?.sequence ?? 0) + 1;
+    parsed.entries.push({
+      category: "app",
+      elapsedMs: Math.max(0, Date.now() - Date.parse(parsed.header.startedAt)),
+      event: "capture-journal-tail-truncated",
+      level: "warn",
+      payload: { malformedLines: parsed.malformedLines },
+      sequence,
+      timestamp: new Date().toISOString(),
+    });
+  }
+  const startedAtMs = Date.parse(parsed.header.startedAt);
+  const endedAtMs = Date.now();
+  const session = {
+    context: parsed.header.context,
+    droppedEntries: parsed.malformedLines,
+    entries: parsed.entries,
+    id: parsed.header.sessionId,
+    startedAtIso: parsed.header.startedAt,
+    startedAtMs: Number.isFinite(startedAtMs) ? startedAtMs : endedAtMs,
+    truncated: parsed.malformedLines > 0,
+  };
+  return {
+    content: formatDebugLogSession(
+      session,
+      new Date(endedAtMs).toISOString(),
+      endedAtMs,
+      "recovered",
+    ),
+    entryCount: parsed.entries.length,
+    sessionId: parsed.header.sessionId,
   };
 }
 
 export async function recoverPendingDebugLogCapture(): Promise<RecoveredDebugLogCaptureResult | null> {
+  if (activeSession) return null;
   const livePath = getActiveCapturePath();
-  const info = await FileSystem.getInfoAsync(livePath);
+  const legacyPath = getLegacyActiveCapturePath();
+  const [journalInfo, legacyInfo] = await Promise.all([
+    FileSystem.getInfoAsync(livePath),
+    FileSystem.getInfoAsync(legacyPath),
+  ]);
+  if (!journalInfo.exists && !legacyInfo.exists) return null;
 
-  if (!info.exists) {
-    return null;
+  let content: string;
+  let entryCount = 0;
+  let sessionId: string | null = null;
+  const sourcePath = journalInfo.exists ? livePath : legacyPath;
+  if (journalInfo.exists) {
+    const recovered = await recoverJournal(livePath);
+    content = recovered.content;
+    entryCount = recovered.entryCount;
+    sessionId = recovered.sessionId;
+  } else {
+    const legacyContent = await FileSystem.readAsStringAsync(legacyPath);
+    content = sanitizeRecoveredLegacyLog(legacyContent);
+    entryCount = Number(content.match(/^entryCount: (\d+)/m)?.[1] ?? 0);
+    sessionId = content.match(/^sessionId: (.+)$/m)?.[1]?.trim() ?? null;
   }
 
-  const content = await FileSystem.readAsStringAsync(livePath);
-  const metadata = parseSessionMetadata(content);
   const recoveredPath = `${ensureLogsDirectory()}recovered-${Date.now()}.log`;
-
   await queueWrite(async () => {
     await FileSystem.makeDirectoryAsync(ensureLogsDirectory(), {
       intermediates: true,
     });
-    await FileSystem.writeAsStringAsync(recoveredPath, content);
-    await FileSystem.deleteAsync(livePath, { idempotent: true });
+    await writeAtomic(recoveredPath, content);
+    await FileSystem.deleteAsync(sourcePath, { idempotent: true });
   });
 
   let copiedToClipboard = false;
@@ -600,14 +742,8 @@ export async function recoverPendingDebugLogCapture(): Promise<RecoveredDebugLog
   } catch {
     copiedToClipboard = false;
   }
-
   lastExportPath = recoveredPath;
   notifyListeners();
-
-  return {
-    copiedToClipboard,
-    entryCount: metadata.entryCount,
-    path: recoveredPath,
-    sessionId: metadata.sessionId,
-  };
+  await pruneCompletedLogs().catch(() => undefined);
+  return { copiedToClipboard, entryCount, path: recoveredPath, sessionId };
 }

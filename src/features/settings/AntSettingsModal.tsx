@@ -16,6 +16,7 @@ import type {
 import { useProviderValidationState } from "../settings-core/useProviderValidationState";
 import { useSettingsController } from "../settings-core/useSettingsController";
 import { useLocalization } from "../../i18n";
+import { recordDebugLogEvent } from "../../services/debugLogCapture";
 import {
   Provider,
   ProviderCapability,
@@ -88,10 +89,51 @@ export const AntSettingsModal = React.memo(function AntSettingsModal(
   const [validationToastMessage, setValidationToastMessage] = React.useState<
     string | null
   >(null);
+  const diagnosticProps = React.useMemo<SettingsModalProps>(
+    () => ({
+      ...props,
+      onUpdate: (partial) => {
+        recordDebugLogEvent({
+          event: "settings-values-updated",
+          payload: { fields: Object.keys(partial).sort() },
+        });
+        props.onUpdate(partial);
+      },
+      onUpdateApiKey: (provider, apiKey) => {
+        recordDebugLogEvent({
+          event: "settings-provider-credential-updated",
+          payload: { configured: apiKey.trim().length > 0, provider },
+        });
+        props.onUpdateApiKey(provider, apiKey);
+      },
+      onUpdateProviderSttModel: (provider, model) => {
+        recordDebugLogEvent({
+          event: "settings-provider-model-updated",
+          payload: { capability: "stt", model, provider },
+        });
+        props.onUpdateProviderSttModel(provider, model);
+      },
+      onUpdateProviderTtsModel: (provider, model) => {
+        recordDebugLogEvent({
+          event: "settings-provider-model-updated",
+          payload: { capability: "tts", model, provider },
+        });
+        props.onUpdateProviderTtsModel(provider, model);
+      },
+      onUpdateProviderTtsVoice: (provider, voice) => {
+        recordDebugLogEvent({
+          event: "settings-provider-voice-updated",
+          payload: { configured: voice.trim().length > 0, provider },
+        });
+        props.onUpdateProviderTtsVoice(provider, voice);
+      },
+    }),
+    [props],
+  );
   const controller = useSettingsController({
     visible,
     settings,
-    onUpdate,
+    onUpdate: diagnosticProps.onUpdate,
     onPreviewVoice,
     onStopPreviewVoice,
   });
@@ -175,6 +217,15 @@ export const AntSettingsModal = React.memo(function AntSettingsModal(
     }
   }, [activePage, controller.contentScrollRef, visible]);
 
+  React.useEffect(() => {
+    if (visible) {
+      recordDebugLogEvent({
+        event: "settings-page-presented",
+        payload: { page: activePage },
+      });
+    }
+  }, [activePage, visible]);
+
   const getPageTitle = React.useCallback(
     (page: DrillInSettingsPage) => {
       switch (page) {
@@ -201,9 +252,15 @@ export const AntSettingsModal = React.memo(function AntSettingsModal(
     <AntSettingsPageContent
       activePage={activePage}
       controller={controller}
-      onOpenPage={setActivePage}
+      onOpenPage={(page) => {
+        recordDebugLogEvent({
+          event: "settings-page-open-requested",
+          payload: { from: activePage, to: page },
+        });
+        setActivePage(page);
+      }}
       onValidationStart={() => setValidationToastMessage(null)}
-      props={props}
+      props={diagnosticProps}
       readiness={readiness}
       validation={validation}
     />
@@ -213,6 +270,10 @@ export const AntSettingsModal = React.memo(function AntSettingsModal(
     activePage === "overview" ? t("settings") : getPageTitle(activePage);
 
   const handleBack = React.useCallback(() => {
+    recordDebugLogEvent({
+      event: "settings-back-requested",
+      payload: { page: activePage },
+    });
     if (activePage !== "overview") {
       setActivePage("overview");
       return;

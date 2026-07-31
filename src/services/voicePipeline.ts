@@ -19,6 +19,7 @@ export async function runVoicePipeline(
   params: RunVoicePipelineParams,
 ): Promise<string | null> {
   const {
+    turnId,
     turnStartedAtMs = Date.now(),
     audioUri,
     transcriptionOverride,
@@ -58,8 +59,34 @@ export async function runVoicePipeline(
     abortSignal,
   } = params;
 
+  const recordTurnEvent = (
+    event: Parameters<typeof recordDebugLogEvent>[0],
+  ) =>
+    recordDebugLogEvent({
+      ...event,
+      payload: { ...event.payload, turnId },
+    });
+
   let transcription: string | null = null;
   let retainCapturedAudio = false;
+  let terminalRecorded = false;
+  const recordRunTerminal = (
+    status: "aborted" | "complete" | "failed",
+    payload: Record<string, unknown> = {},
+  ) => {
+    if (terminalRecorded) return;
+    terminalRecorded = true;
+    recordTurnEvent({
+      event:
+        status === "complete"
+          ? "voice-pipeline-run-complete"
+          : status === "aborted"
+            ? "voice-pipeline-aborted"
+            : "voice-pipeline-run-failed",
+      level: status === "failed" ? "error" : "info",
+      payload,
+    });
+  };
   const effectiveWebSearchMode = webSearchMode ?? "off";
   const turnReceipt = createTurnReceipt({
     startedAtMs: turnStartedAtMs,
@@ -81,7 +108,7 @@ export async function runVoicePipeline(
   });
 
   try {
-    recordDebugLogEvent({
+    recordTurnEvent({
       event: "voice-pipeline-run-start",
       payload: {
         hasAudioUri: !!audioUri,
@@ -118,27 +145,30 @@ export async function runVoicePipeline(
 
     if (!transcription) {
       retainCapturedAudio = Boolean(audioUri && !abortSignal?.aborted);
-      recordDebugLogEvent({
+      recordTurnEvent({
         event: "voice-pipeline-run-empty-transcription",
         level: "warn",
         payload: {
           retainedCapturedAudio: retainCapturedAudio,
         },
       });
+      recordRunTerminal("failed", { reason: "empty-transcription" });
       return null;
     }
     if (abortSignal?.aborted) {
-      recordDebugLogEvent({
+      recordTurnEvent({
         event: "voice-pipeline-run-aborted-after-transcription",
       });
+      recordRunTerminal("aborted", { reason: "after-transcription" });
       return transcription;
     }
 
     callbacks.onTranscription(transcription);
     if (abortSignal?.aborted) {
-      recordDebugLogEvent({
+      recordTurnEvent({
         event: "voice-pipeline-run-aborted-after-onTranscription",
       });
+      recordRunTerminal("aborted", { reason: "after-transcription-callback" });
       return transcription;
     }
 
@@ -158,13 +188,15 @@ export async function runVoicePipeline(
     turnReceipt.context = contextResult.receipt;
 
     if (contextResult.aborted) {
-      recordDebugLogEvent({
+      recordTurnEvent({
         event: "voice-pipeline-run-context-aborted",
       });
+      recordRunTerminal("aborted", { reason: "context" });
       return transcription;
     }
 
     const webSearchResult = await resolvePipelineWebSearch({
+      turnId,
       abortSignal,
       callbacks,
       conversationSummary: contextResult.effectiveSummary || undefined,
@@ -179,6 +211,7 @@ export async function runVoicePipeline(
     });
 
     if (webSearchResult.aborted) {
+      recordRunTerminal("aborted", { reason: "web-search" });
       return transcription;
     }
 
@@ -214,9 +247,10 @@ export async function runVoicePipeline(
       });
 
       if (abortSignal?.aborted) {
-        recordDebugLogEvent({
+        recordTurnEvent({
           event: "voice-pipeline-ulra-mode-aborted",
         });
+        recordRunTerminal("aborted", { reason: "ulra-mode" });
         return transcription;
       }
 
@@ -237,7 +271,7 @@ export async function runVoicePipeline(
           synthesisModelEffort = fallbackRoute.modelEffort;
           synthesisProvider = fallbackRoute.provider;
           synthesisProviderApiKey = fallbackRoute.apiKey;
-          recordDebugLogEvent({
+          recordTurnEvent({
             event: "ulra-mode-synthesis-route-fallback",
             level: "warn",
             payload: {
@@ -327,6 +361,7 @@ export async function runVoicePipeline(
     }
 
     const ttsQueue = createVoicePipelineTtsQueue({
+      turnId,
       abortSignal,
       callbacks,
       language,
@@ -344,6 +379,7 @@ export async function runVoicePipeline(
     });
 
     const llmCompleted = await runPipelineResponse({
+      turnId,
       abortSignal,
       additionalUsage,
       assistantInstructions,
@@ -369,7 +405,7 @@ export async function runVoicePipeline(
       webSearchContext: webSearchResult.context,
     });
     if (!llmCompleted) {
-      recordDebugLogEvent({
+      recordTurnEvent({
         event: abortSignal?.aborted
           ? "voice-pipeline-llm-cancelled"
           : "voice-pipeline-llm-failed",
@@ -378,24 +414,32 @@ export async function runVoicePipeline(
           provider: synthesisProvider,
         },
       });
+      recordRunTerminal(abortSignal?.aborted ? "aborted" : "failed", {
+        model: synthesisModel,
+        provider: synthesisProvider,
+        reason: "llm",
+      });
       return transcription;
     }
-    recordDebugLogEvent({
+    recordTurnEvent({
       event: "voice-pipeline-llm-complete",
       payload: {
         model: synthesisModel,
         provider: synthesisProvider,
       },
     });
-    recordDebugLogEvent({
-      event: "voice-pipeline-run-complete",
-      payload: {
-        textLength: transcription.trim().length,
-      },
+    recordRunTerminal("complete", {
+      textLength: transcription.trim().length,
     });
     return transcription;
+  } catch (error) {
+    recordRunTerminal(abortSignal?.aborted ? "aborted" : "failed", {
+      error,
+      reason: abortSignal?.aborted ? "abort-signal" : "exception",
+    });
+    throw error;
   } finally {
-    recordDebugLogEvent({
+    recordTurnEvent({
       event: "voice-pipeline-run-cleanup",
       payload: {
         hadAudioUri: !!audioUri,

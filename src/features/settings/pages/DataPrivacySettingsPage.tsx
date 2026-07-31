@@ -19,6 +19,7 @@ import {
   type AppDataBackup,
   type AppDataBackupRestoreResult,
 } from "../../../services/appDataBackup";
+import { recordDebugLogEvent } from "../../../services/debugLogCapture";
 import { useTheme } from "../../../theme/ThemeContext";
 import { fonts } from "../../../theme/typography";
 import {
@@ -75,6 +76,22 @@ export function DataPrivacySettingsPage({
   const [restoreResult, setRestoreResult] =
     React.useState<AppDataBackupRestoreResult | null>(null);
   const [statusMessage, setStatusMessage] = React.useState<string | null>(null);
+
+  React.useEffect(() => {
+    const dialog = exportPassphraseVisible
+      ? "backup-export-passphrase"
+      : importPassphraseVisible
+        ? "backup-import-passphrase"
+        : pendingBackup
+          ? "backup-restore-preview"
+          : null;
+    if (dialog) {
+      recordDebugLogEvent({
+        event: "settings-dialog-presented",
+        payload: { dialog },
+      });
+    }
+  }, [exportPassphraseVisible, importPassphraseVisible, pendingBackup]);
 
   const resetPassphrase = React.useCallback(() => {
     setPassphrase("");
@@ -137,13 +154,31 @@ export function DataPrivacySettingsPage({
   );
 
   const exportReadableBackup = React.useCallback(async () => {
+    const startedAtMs = Date.now();
+    recordDebugLogEvent({
+      event: "backup-export-started",
+      payload: { encrypted: false },
+    });
     setBusy("export-readable");
     setRestoreResult(null);
     setStatusMessage(null);
     try {
       const backup = await onCreateAppDataBackup();
       await shareBackup(serializeAppDataBackup(backup), false);
+      recordDebugLogEvent({
+        event: "backup-export-completed",
+        payload: {
+          conversationCount: backup.data.conversations.length,
+          durationMs: Date.now() - startedAtMs,
+          encrypted: false,
+        },
+      });
     } catch (error) {
+      recordDebugLogEvent({
+        event: "backup-export-failed",
+        level: "warn",
+        payload: { durationMs: Date.now() - startedAtMs, encrypted: false, error },
+      });
       setStatusMessage(getErrorMessage(error, "backupExportFailed"));
     } finally {
       setBusy(null);
@@ -165,15 +200,33 @@ export function DataPrivacySettingsPage({
     }
 
     setBusy("export-encrypted");
+    const startedAtMs = Date.now();
+    recordDebugLogEvent({
+      event: "backup-export-started",
+      payload: { encrypted: true },
+    });
     setPassphraseError(null);
     setStatusMessage(null);
     try {
       const backup = await onCreateAppDataBackup();
       const encrypted = await encryptAppDataBackup(backup, passphrase);
       await shareBackup(encrypted, true);
+      recordDebugLogEvent({
+        event: "backup-export-completed",
+        payload: {
+          conversationCount: backup.data.conversations.length,
+          durationMs: Date.now() - startedAtMs,
+          encrypted: true,
+        },
+      });
       setExportPassphraseVisible(false);
       resetPassphrase();
     } catch (error) {
+      recordDebugLogEvent({
+        event: "backup-export-failed",
+        level: "warn",
+        payload: { durationMs: Date.now() - startedAtMs, encrypted: true, error },
+      });
       setPassphraseError(getErrorMessage(error, "backupExportFailed"));
     } finally {
       setBusy(null);
@@ -216,6 +269,8 @@ export function DataPrivacySettingsPage({
   ]);
 
   const chooseBackup = React.useCallback(async () => {
+    const startedAtMs = Date.now();
+    recordDebugLogEvent({ event: "backup-import-picker-requested" });
     setBusy("import");
     setRestoreResult(null);
     setStatusMessage(null);
@@ -227,6 +282,7 @@ export function DataPrivacySettingsPage({
         type: "*/*",
       });
       if (result.canceled) {
+        recordDebugLogEvent({ event: "backup-import-picker-cancelled" });
         return;
       }
 
@@ -247,7 +303,20 @@ export function DataPrivacySettingsPage({
       } else {
         setPendingBackup(parseAppDataBackup(content));
       }
+      recordDebugLogEvent({
+        event: "backup-import-parsed",
+        payload: {
+          durationMs: Date.now() - startedAtMs,
+          encrypted: isEncryptedAppDataBackup(content),
+          sizeBytes: asset.size ?? null,
+        },
+      });
     } catch (error) {
+      recordDebugLogEvent({
+        event: "backup-import-failed",
+        level: "warn",
+        payload: { durationMs: Date.now() - startedAtMs, error },
+      });
       setStatusMessage(getErrorMessage(error, "backupImportFailed"));
     } finally {
       if (pickedUri) {
@@ -265,12 +334,26 @@ export function DataPrivacySettingsPage({
     }
 
     setBusy("restore");
+    const startedAtMs = Date.now();
+    recordDebugLogEvent({
+      event: "backup-restore-started",
+      payload: { conversationCount: pendingBackup.data.conversations.length },
+    });
     setStatusMessage(null);
     try {
       const result = await onRestoreAppDataBackup(pendingBackup);
       setRestoreResult(result);
       setPendingBackup(null);
+      recordDebugLogEvent({
+        event: "backup-restore-completed",
+        payload: { ...result, durationMs: Date.now() - startedAtMs },
+      });
     } catch (error) {
+      recordDebugLogEvent({
+        event: "backup-restore-failed",
+        level: "warn",
+        payload: { durationMs: Date.now() - startedAtMs, error },
+      });
       setStatusMessage(getErrorMessage(error, "backupImportFailed"));
     } finally {
       setBusy(null);

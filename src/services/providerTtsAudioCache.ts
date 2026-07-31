@@ -219,10 +219,7 @@ async function ensureHydrated() {
         recordDebugLogEvent({
           event: "provider-tts-cache-hydration-failed",
           level: "warn",
-          payload: {
-            message:
-              error instanceof Error ? error.message : String(error),
-          },
+          payload: { error },
         });
       })
       .finally(() => {
@@ -303,9 +300,7 @@ export async function setProviderTtsAudioCacheEntry(
     recordDebugLogEvent({
       event: "provider-tts-cache-persist-failed",
       level: "warn",
-      payload: {
-        message: error instanceof Error ? error.message : String(error),
-      },
+      payload: { error },
     });
   }
 }

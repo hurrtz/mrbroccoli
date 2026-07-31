@@ -28,9 +28,7 @@ export function useVoiceSessionKeepAwake(active: boolean) {
         recordDebugLogEvent({
           event: "voice-session-keep-awake-failed",
           level: "warn",
-          payload: {
-            message: error instanceof Error ? error.message : String(error),
-          },
+          payload: { error },
         });
       });
 
@@ -50,9 +48,7 @@ export function useVoiceSessionKeepAwake(active: boolean) {
           recordDebugLogEvent({
             event: "voice-session-keep-awake-release-failed",
             level: "warn",
-            payload: {
-              message: error instanceof Error ? error.message : String(error),
-            },
+            payload: { error },
           });
         });
     };

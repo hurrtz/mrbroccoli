@@ -2,6 +2,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as SecureStore from "expo-secure-store";
 import type { Provider, ProviderApiKeys, Settings } from "../../types";
 import { reportPersistenceAlert } from "../../services/persistenceAlerts";
+import { recordDebugLogEvent } from "../../services/debugLogCapture";
 import { RUNTIME_PROVIDER_IDS } from "../../constants/providers/runtimeState";
 import { RETIRED_PROVIDER_IDS } from "../../constants/providers/retiredProviders";
 import {
@@ -24,6 +25,11 @@ function enqueueSettingsMutation(
     .catch(() => undefined)
     .then(operation)
     .catch((error) => {
+      recordDebugLogEvent({
+        event: "persistence-operation-failed",
+        level: "warn",
+        payload: { domain: "settings", error, operation: "save" },
+      });
       console.error(`[settings-storage] persistence failed for ${key}`, error);
       reportPersistenceAlert("settings", "save");
     });
@@ -92,6 +98,16 @@ export async function loadStoredApiKeys(): Promise<ProviderApiKeys> {
       try {
         await SecureStore.deleteItemAsync(getApiKeyStorageKey(provider));
       } catch (error) {
+        recordDebugLogEvent({
+          event: "persistence-operation-failed",
+          level: "warn",
+          payload: {
+            domain: "secure-settings",
+            error,
+            operation: "remove-retired-key",
+            provider,
+          },
+        });
         console.error(
           `[settings-storage] failed to remove retired API key for ${provider}`,
           error,
@@ -105,6 +121,16 @@ export async function loadStoredApiKeys(): Promise<ProviderApiKeys> {
     try {
       return await SecureStore.getItemAsync(key);
     } catch (error) {
+      recordDebugLogEvent({
+        event: "persistence-operation-failed",
+        level: "warn",
+        payload: {
+          domain: "secure-settings",
+          error,
+          operation: "load-provider-key",
+          provider: label,
+        },
+      });
       failedStorageKeys.add(key);
       console.error(`[settings-storage] failed to load API key for ${label}`, error);
       return null;
@@ -152,6 +178,16 @@ export async function loadStoredApiKeys(): Promise<ProviderApiKeys> {
         await SecureStore.setItemAsync(xaiStorageKey, migratedApiKey);
         await SecureStore.deleteItemAsync(legacyGrokStorageKey);
       } catch (error) {
+        recordDebugLogEvent({
+          event: "persistence-operation-failed",
+          level: "warn",
+          payload: {
+            domain: "secure-settings",
+            error,
+            operation: "migrate-provider-key",
+            provider: "xai",
+          },
+        });
         console.error(
           "[settings-storage] failed to persist the legacy grok API key migration",
           error,

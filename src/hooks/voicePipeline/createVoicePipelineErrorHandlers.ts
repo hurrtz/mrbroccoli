@@ -65,6 +65,7 @@ type ErrorHandlerParams = Pick<
   streamingRenderRunId: number;
   transcriptionOverride?: string;
   playbackStartedRef: MutableRefObject<boolean>;
+  turnId: string;
 };
 
 export function createVoicePipelineErrorHandlers({
@@ -88,7 +89,15 @@ export function createVoicePipelineErrorHandlers({
   streamingRenderRunId,
   t,
   transcriptionOverride,
+  turnId,
 }: ErrorHandlerParams) {
+  const recordTurnEvent = (
+    event: Parameters<typeof recordDebugLogEvent>[0],
+  ) =>
+    recordDebugLogEvent({
+      ...event,
+      payload: { ...event.payload, turnId },
+    });
   const handlePipelineError = async (error: Error) => {
     if (!isActiveRun()) {
       return;
@@ -98,13 +107,13 @@ export function createVoicePipelineErrorHandlers({
     const preserveProducedAudio =
       producedAudioRef.current &&
       (player.isPlaying || player.hasPendingPlaybackNow());
-    recordDebugLogEvent({
+    recordTurnEvent({
       event: "voice-pipeline-error",
       level: "error",
       payload: {
         hasAudioUri: !!audioUri,
         hasTranscriptionOverride: !!transcriptionOverride,
-        message: error.message,
+        error,
         preservedProducedAudio: preserveProducedAudio,
       },
     });
@@ -178,7 +187,7 @@ export function createVoicePipelineErrorHandlers({
 
   const handleNoTranscription = () => {
     retryableCapture.retainCaptureForRetry(audioUri);
-    recordDebugLogEvent({
+    recordTurnEvent({
       event: "voice-pipeline-no-transcription",
       level: "warn",
     });
@@ -200,13 +209,10 @@ export function createVoicePipelineErrorHandlers({
 
   const handleCaughtException = (error: unknown) => {
     state.turnFailed = true;
-    recordDebugLogEvent({
+    recordTurnEvent({
       event: "voice-pipeline-catch-error",
       level: "error",
-      payload: {
-        message:
-          error instanceof Error ? error.message : t("couldntProcessVoiceInput"),
-      },
+      payload: { error },
     });
     const errorMessage =
       error instanceof Error ? error.message : t("couldntProcessVoiceInput");

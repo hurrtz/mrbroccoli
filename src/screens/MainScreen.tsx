@@ -630,13 +630,24 @@ export function MainScreen() {
     handleToggle: handleToggleDebugLog,
   } = useDebugLogCaptureController({
     activeConversationId: activeConversation?.id ?? null,
+    appLanguage: language,
     inputMode: settings.inputMode,
+    isLandscape,
+    kokoroState: {
+      busy: kokoroModel.busy,
+      installed: kokoroModel.installed,
+      phase: kokoroModel.phase,
+      progress: kokoroModel.progress,
+      verified: kokoroModel.verified,
+    },
     model,
+    modelEffort,
     pipelinePhase,
     provider,
     replyPlayback: settings.replyPlayback,
     selectedSttModel,
     selectedTtsModel,
+    selectedTtsVoice,
     showToast,
     spokenRepliesEnabled: settings.spokenRepliesEnabled,
     sttMode: settings.sttMode,
@@ -644,6 +655,12 @@ export function MainScreen() {
     t,
     ttsMode: settings.ttsMode,
     ttsProvider,
+    ttsFallbackRoutes: getTtsFallbackRoutes(
+      settings.ttsFallbackPolicy,
+      settings.ttsMode,
+    ),
+    webSearchMode,
+    webSearchProvider: webSearchProvider ?? null,
   });
 
   useMainScreenDiagnostics({

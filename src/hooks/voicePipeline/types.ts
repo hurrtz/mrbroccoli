@@ -41,6 +41,7 @@ export interface VoiceCaptureRequest {
   audioUri?: string;
   existingUserMessageId?: string;
   transcriptionOverride?: string;
+  turnId?: string;
 }
 
 export type AudioPlayer = ReturnType<typeof useAudioPlayer>;

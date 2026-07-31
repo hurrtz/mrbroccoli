@@ -9,6 +9,7 @@ import {
   stopDebugLogCapture,
   subscribeToDebugLogCapture,
 } from "../../services/debugLogCapture";
+import { buildDebugRuntimeContext } from "../../services/debugRuntimeContext";
 import type {
   InputMode,
   Provider,
@@ -23,11 +24,22 @@ interface DebugLogCaptureControllerParams {
   activeConversationId: string | null;
   inputMode: InputMode;
   model: string;
+  modelEffort?: string;
+  appLanguage: string;
+  isLandscape: boolean;
+  kokoroState: {
+    busy: string | null;
+    installed: boolean;
+    phase: string | null;
+    progress: number;
+    verified: boolean;
+  };
   pipelinePhase: PipelinePhase;
   provider: Provider;
   replyPlayback: ReplyPlayback;
   selectedSttModel: string;
   selectedTtsModel: string;
+  selectedTtsVoice: string;
   showToast: ShowToastFn;
   spokenRepliesEnabled: boolean;
   sttMode: SttBackendMode;
@@ -35,17 +47,25 @@ interface DebugLogCaptureControllerParams {
   t: TranslateFn;
   ttsMode: TtsBackendMode;
   ttsProvider: Provider | null;
+  ttsFallbackRoutes: readonly string[];
+  webSearchMode: string;
+  webSearchProvider: string | null;
 }
 
 export function useDebugLogCaptureController({
   activeConversationId,
   inputMode,
   model,
+  modelEffort,
+  appLanguage,
+  isLandscape,
+  kokoroState,
   pipelinePhase,
   provider,
   replyPlayback,
   selectedSttModel,
   selectedTtsModel,
+  selectedTtsVoice,
   showToast,
   spokenRepliesEnabled,
   sttMode,
@@ -53,6 +73,9 @@ export function useDebugLogCaptureController({
   t,
   ttsMode,
   ttsProvider,
+  ttsFallbackRoutes,
+  webSearchMode,
+  webSearchProvider,
 }: DebugLogCaptureControllerParams) {
   const [captureActive, setCaptureActive] = useState(
     () => getDebugLogCaptureState().active,
@@ -69,6 +92,10 @@ export function useDebugLogCaptureController({
       activeConversationId,
       inputMode,
       model,
+      modelEffort: modelEffort ?? null,
+      appLanguage,
+      isLandscape,
+      kokoro: kokoroState,
       pipelinePhase,
       provider,
       replyPlayback,
@@ -79,28 +106,50 @@ export function useDebugLogCaptureController({
       ttsMode,
       ttsProvider,
       ttsModel: selectedTtsModel,
+      ttsVoice: selectedTtsVoice || null,
+      ttsFallbackRoutes,
+      webSearchMode,
+      webSearchProvider,
     }),
     [
       activeConversationId,
       inputMode,
       model,
+      modelEffort,
+      appLanguage,
+      isLandscape,
+      kokoroState,
       pipelinePhase,
       provider,
       replyPlayback,
       selectedSttModel,
       selectedTtsModel,
+      selectedTtsVoice,
       spokenRepliesEnabled,
       sttMode,
       sttProvider,
       ttsMode,
       ttsProvider,
+      ttsFallbackRoutes,
+      webSearchMode,
+      webSearchProvider,
     ],
   );
 
   const handleToggle = useCallback(async () => {
     if (!captureActive) {
-      startDebugLogCapture(buildCaptureContext());
-      showToast(t("debugLogCaptureStarted"));
+      try {
+        const context = await buildDebugRuntimeContext(buildCaptureContext());
+        await startDebugLogCapture(context);
+        showToast(t("debugLogCaptureStarted"));
+      } catch (error) {
+        recordDebugLogEvent({
+          event: "debug-log-start-failed",
+          level: "error",
+          payload: { error },
+        });
+        showToast(t("debugLogCaptureFailed"), undefined, "danger");
+      }
       return;
     }
 
@@ -131,9 +180,7 @@ export function useDebugLogCaptureController({
       recordDebugLogEvent({
         event: "debug-log-stop-failed",
         level: "error",
-        payload: {
-          message: error instanceof Error ? error.message : String(error),
-        },
+        payload: { error },
       });
       showToast(t("debugLogCaptureFailed"), undefined, "danger");
     }
@@ -170,9 +217,7 @@ export function useDebugLogCaptureController({
         recordDebugLogEvent({
           event: "debug-log-recovery-failed",
           level: "error",
-          payload: {
-            message: error instanceof Error ? error.message : String(error),
-          },
+          payload: { error },
         });
       });
 

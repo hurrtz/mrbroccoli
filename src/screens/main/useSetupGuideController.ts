@@ -8,6 +8,7 @@ import type { useNativeSpeechRecognizer } from "../../hooks/useNativeSpeechRecog
 import type { KokoroModelController } from "../../hooks/useKokoroModel";
 import { useLocalization } from "../../i18n";
 import { validateProviderConnection } from "../../services/llm";
+import { recordDebugLogEvent } from "../../services/debugLogCapture";
 import type {
   Provider,
   ProviderValidationResult,
@@ -69,6 +70,20 @@ export function useSetupGuideController({
     },
   );
   const [useKokoro, setUseKokoro] = useState(false);
+
+  useEffect(() => {
+    if (setupGuideVisible) {
+      recordDebugLogEvent({
+        event: "setup-guide-step-presented",
+        payload: {
+          openedFromSettings,
+          selectedProvider,
+          step,
+          useKokoro,
+        },
+      });
+    }
+  }, [openedFromSettings, selectedProvider, setupGuideVisible, step, useKokoro]);
 
   useEffect(() => {
     if (!loaded || setupGuideDismissed) {
@@ -222,6 +237,14 @@ export function useSetupGuideController({
   );
 
   const handleValidateProviderKey = useCallback(async () => {
+    recordDebugLogEvent({
+      event: "setup-guide-provider-validation-requested",
+      payload: {
+        hasCredential: Boolean(selectedProviderApiKey),
+        model: selectedProviderModel || null,
+        provider: selectedProvider,
+      },
+    });
     if (!selectedProvider) {
       setValidationState({
         status: "error",
@@ -300,6 +323,10 @@ export function useSetupGuideController({
           },
         },
       });
+      recordDebugLogEvent({
+        event: "setup-guide-provider-validation-completed",
+        payload: { model: selectedProviderModel, provider: selectedProvider },
+      });
       return true;
     } catch (error) {
       const message =
@@ -325,6 +352,11 @@ export function useSetupGuideController({
             llm: result,
           },
         },
+      });
+      recordDebugLogEvent({
+        event: "setup-guide-provider-validation-failed",
+        level: "warn",
+        payload: { error, model: selectedProviderModel, provider: selectedProvider },
       });
       return false;
     }

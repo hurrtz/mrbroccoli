@@ -139,7 +139,7 @@ export function useConversationTitleGenerator({
         level: "error",
         payload: {
           conversationId: conversation.id,
-          message: error instanceof Error ? error.message : String(error),
+          error,
           model,
           provider,
         },

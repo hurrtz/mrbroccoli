@@ -1,4 +1,5 @@
 import { readSafeProviderErrorMessage } from "./providerErrors";
+import { networkFetch } from "./networkFetch";
 
 const XAI_BUILT_IN_VOICES_ENDPOINT = "https://api.x.ai/v1/tts/voices";
 const XAI_CUSTOM_VOICES_ENDPOINT = "https://api.x.ai/v1/custom-voices";
@@ -92,7 +93,7 @@ async function fetchXaiVoicePayload(params: {
   }, XAI_VOICES_TIMEOUT_MS);
 
   try {
-    const response = await fetch(params.endpoint, {
+    const response = await networkFetch(params.endpoint, {
       method: "GET",
       headers: {
         Accept: "application/json",

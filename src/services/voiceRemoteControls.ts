@@ -122,10 +122,7 @@ export function setVoiceRemoteControlState(
     recordDebugLogEvent({
       event: "voice-remote-controls-update-failed",
       level: "warn",
-      payload: {
-        message: error instanceof Error ? error.message : String(error),
-        mode: state.mode,
-      },
+      payload: { error, mode: state.mode },
     });
   });
   return true;
@@ -207,4 +204,3 @@ export function resetVoiceRemoteControlsForTests() {
   currentSignature = null;
   initialUrlConsumed = false;
 }
-
