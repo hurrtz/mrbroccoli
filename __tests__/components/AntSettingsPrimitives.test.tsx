@@ -1,5 +1,5 @@
 import React from "react";
-import { StyleSheet } from "react-native";
+import { Modal as NativeModal, StyleSheet } from "react-native";
 import { fireEvent, render } from "@testing-library/react-native";
 import { List, Modal, Provider as AntProvider } from "@ant-design/react-native";
 
@@ -13,19 +13,32 @@ import { styles } from "../../src/features/settings/styles";
 import { LocalizationProvider } from "../../src/i18n";
 import { ThemeProvider } from "../../src/theme/ThemeContext";
 
-function renderPickerRow(optionCount: 1 | 2) {
+function renderPickerRow(optionCount: 1 | 2, onChange = jest.fn()) {
   return render(
-    <ThemeProvider mode="light">
-      <AntPickerRow
-        label="Provider"
-        value="openai"
-        options={[
-          { value: "openai", label: "OpenAI" },
-          ...(optionCount === 2 ? [{ value: "gemini", label: "Gemini" }] : []),
-        ]}
-        onChange={jest.fn()}
-      />
-    </ThemeProvider>,
+    <LocalizationProvider language="en">
+      <ThemeProvider mode="light">
+        <AntPickerRow
+          testID="provider-picker"
+          label="Provider"
+          value="openai"
+          options={[
+            { value: "openai", label: "OpenAI" },
+            ...(optionCount === 2
+              ? [{ value: "gemini", label: "Gemini" }]
+              : []),
+          ]}
+          onChange={onChange}
+        />
+      </ThemeProvider>
+    </LocalizationProvider>,
+  );
+}
+
+function renderPicker(element: React.ReactElement) {
+  return render(
+    <LocalizationProvider language="en">
+      <ThemeProvider mode="light">{element}</ThemeProvider>
+    </LocalizationProvider>,
   );
 }
 
@@ -33,7 +46,7 @@ describe("AntPickerRow", () => {
   it("renders a sole option as a static value without a disclosure icon", () => {
     const screen = renderPickerRow(1);
     const itemStyle = StyleSheet.flatten(
-      screen.UNSAFE_getByType(List.Item).props.style,
+      screen.getByTestId("provider-picker").props.style,
     );
 
     expect(screen.getByText("OpenAI")).toBeTruthy();
@@ -42,38 +55,47 @@ describe("AntPickerRow", () => {
   });
 
   it("keeps an unlabeled sole option in the right-hand value column", () => {
-    const screen = render(
-      <ThemeProvider mode="light">
-        <AntPickerRow
-          testID="single-provider"
-          value="gemini"
-          options={[{ value: "gemini", label: "Google" }]}
-          onChange={jest.fn()}
-        />
-      </ThemeProvider>,
+    const screen = renderPicker(
+      <AntPickerRow
+        testID="single-provider"
+        value="gemini"
+        options={[{ value: "gemini", label: "Google" }]}
+        onChange={jest.fn()}
+      />,
     );
 
-    expect(screen.UNSAFE_getByType(List.Item).props.children).toBeNull();
     expect(screen.getByTestId("single-provider-value").props.children).toBe(
       "Google",
     );
     expect(
-      StyleSheet.flatten(screen.getByTestId("single-provider-value").props.style)
-        .textAlign,
+      StyleSheet.flatten(
+        screen.getByTestId("single-provider-value").props.style,
+      ).textAlign,
     ).toBe("right");
   });
 
-  it("preserves the selected label when Ant Picker wraps the row", () => {
-    const screen = renderPickerRow(2);
+  it("opens an app-owned picker sheet and applies a selected option", () => {
+    const onChange = jest.fn();
+    const screen = renderPickerRow(2, onChange);
 
     expect(screen.getByText("OpenAI")).toBeTruthy();
-    expect(screen.queryByText("请选择")).toBeNull();
     expect(screen.getByTestId("icon-chevron-down")).toBeTruthy();
+
+    fireEvent.press(screen.getByTestId("provider-picker"));
+
+    expect(screen.getByTestId("provider-picker-modal")).toBeTruthy();
+    expect(screen.getByText("Gemini")).toBeTruthy();
+    expect(screen.UNSAFE_getByType(NativeModal).props.visible).toBe(true);
+
+    fireEvent.press(screen.getByTestId("provider-picker-option-gemini"));
+
+    expect(onChange).toHaveBeenCalledWith("gemini");
+    expect(screen.UNSAFE_getByType(NativeModal).props.visible).toBe(false);
   });
 
   it("renders dropdowns as bordered, padded form controls", () => {
     const screen = renderPickerRow(2);
-    const item = screen.UNSAFE_getByType(List.Item);
+    const item = screen.getByTestId("provider-picker");
     const itemStyle = StyleSheet.flatten(item.props.style);
 
     expect(itemStyle).toMatchObject({
@@ -83,24 +105,26 @@ describe("AntPickerRow", () => {
       borderRadius: 10,
       overflow: "hidden",
     });
-    expect(item.props.styles.Line).toMatchObject({
+    expect(
+      StyleSheet.flatten(
+        screen.getByTestId("provider-picker-content").props.style,
+      ),
+    ).toMatchObject({
       minHeight: 46,
       paddingVertical: 10,
     });
   });
 
   it("renders an unlabeled picker as a compact value selector", () => {
-    const screen = render(
-      <ThemeProvider mode="light">
-        <AntPickerRow
-          value="singapore"
-          options={[
-            { value: "singapore", label: "Singapore" },
-            { value: "us", label: "US (Virginia)" },
-          ]}
-          onChange={jest.fn()}
-        />
-      </ThemeProvider>,
+    const screen = renderPicker(
+      <AntPickerRow
+        value="singapore"
+        options={[
+          { value: "singapore", label: "Singapore" },
+          { value: "us", label: "US (Virginia)" },
+        ]}
+        onChange={jest.fn()}
+      />,
     );
 
     expect(screen.getByText("Singapore")).toBeTruthy();
@@ -109,40 +133,36 @@ describe("AntPickerRow", () => {
   });
 
   it("lets a standalone dropdown align with surrounding cards", () => {
-    const screen = render(
-      <ThemeProvider mode="light">
-        <AntPickerRow
-          testID="standalone-picker"
-          standalone
-          label="Language"
-          value="en"
-          options={[
-            { value: "en", label: "English" },
-            { value: "de", label: "German" },
-          ]}
-          onChange={jest.fn()}
-        />
-      </ThemeProvider>,
+    const screen = renderPicker(
+      <AntPickerRow
+        testID="standalone-picker"
+        standalone
+        label="Language"
+        value="en"
+        options={[
+          { value: "en", label: "English" },
+          { value: "de", label: "German" },
+        ]}
+        onChange={jest.fn()}
+      />,
     );
 
     expect(
-      StyleSheet.flatten(screen.UNSAFE_getByType(List.Item).props.style)
+      StyleSheet.flatten(screen.getByTestId("standalone-picker").props.style)
         .marginHorizontal,
     ).toBe(0);
   });
 
   it("does not render an Ant list boundary below picker rows", () => {
-    const screen = render(
-      <ThemeProvider mode="light">
-        <AntPickerRows>
-          <AntPickerRow
-            label="Region"
-            value="us"
-            options={[{ value: "us", label: "United States" }]}
-            onChange={jest.fn()}
-          />
-        </AntPickerRows>
-      </ThemeProvider>,
+    const screen = renderPicker(
+      <AntPickerRows>
+        <AntPickerRow
+          label="Region"
+          value="us"
+          options={[{ value: "us", label: "United States" }]}
+          onChange={jest.fn()}
+        />
+      </AntPickerRows>,
     );
     const list = screen.UNSAFE_getByType(List);
 
@@ -150,9 +170,7 @@ describe("AntPickerRow", () => {
       height: 0,
       backgroundColor: "transparent",
     });
-    expect(
-      screen.UNSAFE_getByType(List.Item).props.styles.Line.borderBottomWidth,
-    ).toBe(0);
+    expect(screen.UNSAFE_queryAllByType(List.Item)).toHaveLength(0);
   });
 });
 
@@ -205,11 +223,7 @@ describe("AntSwitchRow", () => {
   it("associates the visible label with the native switch", () => {
     const screen = render(
       <ThemeProvider mode="light">
-        <AntSwitchRow
-          label="Spoken Replies"
-          value
-          onChange={jest.fn()}
-        />
+        <AntSwitchRow label="Spoken Replies" value onChange={jest.fn()} />
       </ThemeProvider>,
     );
 

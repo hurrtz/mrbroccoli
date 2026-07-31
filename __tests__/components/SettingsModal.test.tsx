@@ -2,6 +2,7 @@ import React from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {
   Alert,
+  FlatList,
   Modal as NativeModal,
   Platform,
   StyleSheet,
@@ -18,7 +19,6 @@ import {
   Card as AntCard,
   List,
   Modal as AntModal,
-  Picker as AntPicker,
   Provider as AntProvider,
 } from "@ant-design/react-native";
 
@@ -300,9 +300,9 @@ describe("SettingsModal", () => {
     );
 
     await waitFor(() => {
-      expect(
-        screen.getAllByTestId("icon-chevron-left").length,
-      ).toBeGreaterThan(0);
+      expect(screen.getAllByTestId("icon-chevron-left").length).toBeGreaterThan(
+        0,
+      );
       expect(screen.queryByTestId("icon-chevron-right")).toBeNull();
     });
 
@@ -389,9 +389,7 @@ describe("SettingsModal", () => {
     });
 
     await waitFor(() => {
-      expect(
-        screen.getByLabelText("Remove the Kokoro model"),
-      ).toBeTruthy();
+      expect(screen.getByLabelText("Remove the Kokoro model")).toBeTruthy();
     });
 
     fireEvent.press(screen.getByLabelText("Remove the Kokoro model"));
@@ -457,7 +455,9 @@ describe("SettingsModal", () => {
     );
 
     const buttons = alert.mock.calls[0][2];
-    const downloadButton = buttons?.find((button) => button.text === "Download");
+    const downloadButton = buttons?.find(
+      (button) => button.text === "Download",
+    );
 
     act(() => {
       downloadButton?.onPress?.();
@@ -648,7 +648,9 @@ describe("SettingsModal", () => {
     const footer = screen.getByTestId("provider-capability-footer-openai");
 
     fireEvent(headerControl, "pressIn");
-    expect(StyleSheet.flatten(headerControl.props.style).transform).toBeUndefined();
+    expect(
+      StyleSheet.flatten(headerControl.props.style).transform,
+    ).toBeUndefined();
     fireEvent(headerControl, "pressOut");
 
     expect(
@@ -1179,9 +1181,7 @@ describe("SettingsModal", () => {
       );
       expect(screen.getByText("Web Search Provider")).toBeTruthy();
       expect(screen.getByText("Advanced Search Controls")).toBeTruthy();
-      expect(
-        screen.queryByLabelText("About Web Search Provider"),
-      ).toBeNull();
+      expect(screen.queryByLabelText("About Web Search Provider")).toBeNull();
       expect(screen.queryByText("Model Selection")).toBeNull();
     });
 
@@ -1211,22 +1211,16 @@ describe("SettingsModal", () => {
       expect(screen.queryByText("Web Search Provider")).toBeNull();
     });
 
-    const languagePicker = screen
-      .UNSAFE_getAllByType(List.Item)
-      .find((item) => item.props.testID === "app-language-picker");
-    expect(languagePicker).toBeDefined();
-    expect(
-      screen
-        .UNSAFE_getAllByType(AntPicker)
-        .find((picker) =>
-          picker.props.data?.some(
-            (option: { value: string }) => option.value === "uk",
-          ),
-        )?.props.data,
-    ).toEqual(APP_LANGUAGE_OPTIONS);
-    expect(StyleSheet.flatten(languagePicker!.props.style).marginHorizontal).toBe(
-      0,
+    const languagePicker = screen.getByTestId("app-language-picker");
+    fireEvent.press(languagePicker);
+    expect(screen.UNSAFE_getByType(FlatList).props.data).toEqual(
+      APP_LANGUAGE_OPTIONS,
     );
+    expect(screen.getByTestId("app-language-picker-option-uk")).toBeTruthy();
+    fireEvent.press(screen.getByTestId("app-language-picker-close"));
+    expect(
+      StyleSheet.flatten(languagePicker!.props.style).marginHorizontal,
+    ).toBe(0);
     expect(
       screen
         .UNSAFE_getAllByType(AntCard)
@@ -1363,15 +1357,11 @@ describe("SettingsModal", () => {
         screen.getByTestId("tts-provider-picker-value").props.style,
       ).textAlign,
     ).toBe("right");
-    const providerVoicePicker = screen
-      .UNSAFE_getAllByType(List.Item)
-      .find(
-        (item) =>
-          item.props.testID === "provider-tts-voice-picker-mistral",
-      );
-    expect(providerVoicePicker).toBeDefined();
+    const providerVoicePicker = screen.getByTestId(
+      "provider-tts-voice-picker-mistral",
+    );
     expect(
-      StyleSheet.flatten(providerVoicePicker!.props.style).marginHorizontal,
+      StyleSheet.flatten(providerVoicePicker.props.style).marginHorizontal,
     ).toBe(0);
     expect(
       screen
@@ -1389,17 +1379,12 @@ describe("SettingsModal", () => {
     fireEvent.press(screen.getByTestId("mistral-voices-refresh"));
     expect(onRefreshMistralVoices).toHaveBeenCalledTimes(1);
 
-    const voicePicker = screen
-      .UNSAFE_getAllByType(AntPicker)
-      .find((picker) =>
-        picker.props.data.some(
-          (option: { value: string }) => option.value === "studio-voice",
-        ),
-      );
-    expect(voicePicker).toBeTruthy();
-    act(() => {
-      voicePicker?.props.onOk?.(["studio-voice"]);
-    });
+    fireEvent.press(providerVoicePicker);
+    fireEvent.press(
+      screen.getByTestId(
+        "provider-tts-voice-picker-mistral-option-studio-voice",
+      ),
+    );
 
     expect(onUpdateProviderTtsVoice).toHaveBeenCalledWith(
       "mistral",
@@ -1514,17 +1499,10 @@ describe("SettingsModal", () => {
     fireEvent.press(screen.getByTestId("elevenlabs-voices-refresh"));
     expect(refresh).toHaveBeenCalledTimes(1);
 
-    const voicePicker = screen
-      .UNSAFE_getAllByType(AntPicker)
-      .find((picker) =>
-        picker.props.data.some(
-          (option: { value: string }) => option.value === "voice-2",
-        ),
-      );
-    expect(voicePicker).toBeTruthy();
-    act(() => {
-      voicePicker?.props.onOk?.(["voice-2"]);
-    });
+    fireEvent.press(screen.getByTestId("provider-tts-voice-picker-elevenlabs"));
+    fireEvent.press(
+      screen.getByTestId("provider-tts-voice-picker-elevenlabs-option-voice-2"),
+    );
 
     expect(onUpdateProviderTtsVoice).toHaveBeenCalledWith(
       "elevenlabs",
@@ -1723,14 +1701,10 @@ describe("SettingsModal", () => {
       ).toBeTruthy();
     });
 
-    fireEvent.press(
-      screen.getByLabelText("Clear runtime compatibility"),
-    );
+    fireEvent.press(screen.getByLabelText("Clear runtime compatibility"));
     const confirmation = screen
       .UNSAFE_getAllByType(AntModal)
-      .find(
-        (modal) => modal.props.title === "Clear runtime compatibility?",
-      )!;
+      .find((modal) => modal.props.title === "Clear runtime compatibility?")!;
     const clearAction = confirmation.props.footer.find(
       (action: { text: string }) => action.text === "Clear",
     );

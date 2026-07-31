@@ -1,5 +1,7 @@
 import React from "react";
 import {
+  FlatList,
+  Modal,
   Platform,
   Pressable,
   StyleSheet,
@@ -12,17 +14,11 @@ import {
   type ViewStyle,
 } from "react-native";
 
-import {
-  Card,
-  Icon,
-  Input,
-  List,
-  Picker,
-  Radio,
-} from "@ant-design/react-native";
+import { Card, Icon, Input, List, Radio } from "@ant-design/react-native";
 import Feather from "@expo/vector-icons/Feather";
 import type { IconNames } from "@ant-design/react-native/lib/icon";
 
+import { APP_MODAL_ORIENTATIONS } from "../../constants/layout";
 import { useLocalization } from "../../i18n";
 import { useTheme } from "../../theme/ThemeContext";
 import { fonts } from "../../theme/typography";
@@ -161,9 +157,7 @@ export function AntDisclosureCard({
           accessibilityState={{ expanded }}
           style={({ pressed }) => [
             styles.disclosureHeader,
-            pressed && headerPressFeedback
-              ? styles.pressedControl
-              : null,
+            pressed && headerPressFeedback ? styles.pressedControl : null,
           ]}
           onPress={onToggle}
         >
@@ -310,6 +304,7 @@ export function AntRadioSection<T extends string>({
   value,
   onChange,
   helperText,
+  testID,
 }: {
   label: string;
   options: {
@@ -321,6 +316,7 @@ export function AntRadioSection<T extends string>({
   value: T;
   onChange: (value: T) => void;
   helperText?: string;
+  testID?: string;
 }) {
   const { colors } = useTheme();
   const { t } = useLocalization();
@@ -367,41 +363,47 @@ export function AntRadioSection<T extends string>({
       }
       contentStyle={styles.fullBleedCardContent}
     >
-      <View style={styles.radioList}>
+      <View testID={testID} style={styles.radioList}>
         <Radio.Group
           value={value}
           onChange={(event) => onChange(event.target.value as T)}
         >
           {options.map((option, index) => (
-            <Radio.RadioItem
+            <View
               key={option.value}
-              value={option.value}
-              disabled={option.disabled}
-              styles={{
-                Item: {
-                  backgroundColor: colors.surfaceElevated,
-                  minHeight: 46,
-                },
-                Line: {
-                  borderBottomWidth:
-                    index === options.length - 1 ? 0 : StyleSheet.hairlineWidth,
-                },
-                Content: {
-                  color: colors.text,
-                  fontSize: 15,
-                },
-                radioItemContent: {
-                  color: colors.text,
-                  fontFamily: fonts.body,
-                  fontSize: 15,
-                },
-                radioItemContentDisable: {
-                  color: colors.textMuted,
-                },
-              }}
+              testID={testID ? `${testID}-${option.value}` : undefined}
             >
-              {option.label}
-            </Radio.RadioItem>
+              <Radio.RadioItem
+                value={option.value}
+                disabled={option.disabled}
+                styles={{
+                  Item: {
+                    backgroundColor: colors.surfaceElevated,
+                    minHeight: 46,
+                  },
+                  Line: {
+                    borderBottomWidth:
+                      index === options.length - 1
+                        ? 0
+                        : StyleSheet.hairlineWidth,
+                  },
+                  Content: {
+                    color: colors.text,
+                    fontSize: 15,
+                  },
+                  radioItemContent: {
+                    color: colors.text,
+                    fontFamily: fonts.body,
+                    fontSize: 15,
+                  },
+                  radioItemContentDisable: {
+                    color: colors.textMuted,
+                  },
+                }}
+              >
+                {option.label}
+              </Radio.RadioItem>
+            </View>
           ))}
         </Radio.Group>
       </View>
@@ -427,6 +429,8 @@ export function AntPickerRow({
   testID?: string;
 }) {
   const { colors } = useTheme();
+  const { t } = useLocalization();
+  const [pickerVisible, setPickerVisible] = React.useState(false);
   const selectedLabel =
     options.find((option) => option.value === value)?.label ??
     (options.length === 1 ? options[0].label : value);
@@ -437,11 +441,24 @@ export function AntPickerRow({
       <Feather name="chevron-down" size={17} color={colors.textMuted} />
     ) : null;
   const pickerIsInteractive = !hasSingleOption;
-  const renderRow = (onPress?: () => void) => (
-    <List.Item
-      testID={testID}
-      extra={
-        label || showStaticValueOnly ? (
+  const renderRow = (onPress?: () => void) => {
+    const rowContent = (
+      <View
+        testID={testID ? `${testID}-content` : undefined}
+        style={styles.pickerRowContent}
+      >
+        {showStaticValueOnly ? null : (
+          <Text
+            numberOfLines={1}
+            style={[
+              styles.pickerRowLabel,
+              { color: disabled ? colors.textMuted : colors.text },
+            ]}
+          >
+            {label ?? selectedLabel}
+          </Text>
+        )}
+        {label || showStaticValueOnly ? (
           <View style={styles.pickerValueRow}>
             <Text
               testID={testID ? `${testID}-value` : undefined}
@@ -459,86 +476,177 @@ export function AntPickerRow({
           </View>
         ) : (
           disclosureIcon
-        )
-      }
-      disabled={disabled || hasSingleOption}
-      onPress={onPress}
-      style={
-        pickerIsInteractive
-          ? [
-              styles.pickerItem,
-              standalone ? styles.pickerItemStandalone : null,
-              { borderColor: colors.border },
-            ]
-          : styles.pickerStaticItem
-      }
-      styles={{
-        Item: {
-          backgroundColor: pickerIsInteractive
-            ? colors.surface
-            : colors.surfaceElevated,
-        },
-        Line: {
-          borderBottomWidth: 0,
-          minHeight: 46,
-          paddingVertical: 10,
-        },
-        Content: {
-          color: colors.text,
-          fontFamily: fonts.body,
-          fontSize: 15,
-        },
-        Extra: {
-          maxWidth: "68%",
-          paddingLeft: 8,
-        },
-      }}
-    >
-      {showStaticValueOnly ? null : label ?? selectedLabel}
-    </List.Item>
-  );
+        )}
+      </View>
+    );
+    const rowStyle = [
+      pickerIsInteractive ? styles.pickerItem : styles.pickerStaticItem,
+      standalone && pickerIsInteractive ? styles.pickerItemStandalone : null,
+      {
+        backgroundColor: pickerIsInteractive
+          ? colors.surface
+          : colors.surfaceElevated,
+        borderColor: colors.border,
+      },
+    ];
+
+    if (!pickerIsInteractive) {
+      return (
+        <View testID={testID} style={rowStyle}>
+          {rowContent}
+        </View>
+      );
+    }
+
+    return (
+      <Pressable
+        testID={testID}
+        accessibilityLabel={
+          label ? `${label}. ${selectedLabel}` : selectedLabel
+        }
+        accessibilityRole="button"
+        accessibilityState={{ disabled, expanded: pickerVisible }}
+        disabled={disabled}
+        onPress={onPress}
+        style={({ pressed }) => [
+          rowStyle,
+          pressed ? styles.pressedControl : null,
+        ]}
+      >
+        {rowContent}
+      </Pressable>
+    );
+  };
 
   if (hasSingleOption) {
     return renderRow();
   }
 
   return (
-    <Picker
-      data={options.map((option) => ({
-        label: option.label,
-        value: option.value,
-      }))}
-      cols={1}
-      value={value ? [value] : []}
-      disabled={disabled}
-      styles={{
-        actionText: {
-          fontFamily: fonts.bodyMedium,
-        },
-        okText: {
-          fontFamily: fonts.bodyMedium,
-        },
-        dismissText: {
-          fontFamily: fonts.bodyMedium,
-        },
-        title: {
-          fontFamily: fonts.body,
-        },
-        itemStyle: {
-          fontFamily: fonts.body,
-        },
-        itemActiveStyle: {
-          fontFamily: fonts.bodyMedium,
-        },
-      }}
-      onOk={(nextValue) => {
-        if (nextValue[0] !== undefined) {
-          onChange(String(nextValue[0]));
-        }
-      }}
-    >
-      {({ toggle }) => renderRow(toggle)}
-    </Picker>
+    <>
+      {renderRow(() => setPickerVisible(true))}
+      <Modal
+        animationType="fade"
+        onRequestClose={() => setPickerVisible(false)}
+        statusBarTranslucent
+        supportedOrientations={APP_MODAL_ORIENTATIONS}
+        transparent
+        visible={pickerVisible}
+      >
+        <View
+          testID={testID ? `${testID}-modal` : undefined}
+          accessibilityViewIsModal
+          style={styles.pickerModalOverlay}
+        >
+          <Pressable
+            accessibilityLabel={t("dismiss")}
+            accessibilityRole="button"
+            onPress={() => setPickerVisible(false)}
+            style={[
+              StyleSheet.absoluteFill,
+              { backgroundColor: colors.overlay },
+            ]}
+          />
+          <View
+            style={[
+              styles.pickerModalCard,
+              {
+                backgroundColor: colors.surfaceElevated,
+                borderColor: colors.border,
+                shadowColor: colors.glow,
+              },
+            ]}
+          >
+            <View
+              style={[
+                styles.pickerModalHeader,
+                { borderBottomColor: colors.border },
+              ]}
+            >
+              <Text
+                accessibilityRole="header"
+                style={[styles.pickerModalTitle, { color: colors.text }]}
+              >
+                {label ?? selectedLabel}
+              </Text>
+              <Pressable
+                testID={testID ? `${testID}-close` : undefined}
+                accessibilityLabel={t("dismiss")}
+                accessibilityRole="button"
+                hitSlop={8}
+                onPress={() => setPickerVisible(false)}
+                style={({ pressed }) => [
+                  styles.pickerModalClose,
+                  pressed ? styles.pressedControl : null,
+                ]}
+              >
+                <Feather name="x" size={21} color={colors.textSecondary} />
+              </Pressable>
+            </View>
+            <FlatList
+              data={options}
+              keyExtractor={(option) => option.value}
+              contentContainerStyle={styles.pickerModalList}
+              renderItem={({ item: option }) => {
+                const selected = option.value === value;
+                return (
+                  <Pressable
+                    testID={
+                      testID
+                        ? `${testID}-option-${option.value.replace(
+                            /[^a-zA-Z0-9_-]+/g,
+                            "-",
+                          )}`
+                        : undefined
+                    }
+                    accessibilityLabel={option.label}
+                    accessibilityRole="radio"
+                    accessibilityState={{
+                      checked: selected,
+                      disabled: option.disabled,
+                    }}
+                    disabled={option.disabled}
+                    onPress={() => {
+                      onChange(option.value);
+                      setPickerVisible(false);
+                    }}
+                    style={({ pressed }) => [
+                      styles.pickerModalOption,
+                      {
+                        backgroundColor: selected
+                          ? colors.accentSoft
+                          : colors.surface,
+                        borderColor: selected
+                          ? colors.borderStrong
+                          : colors.border,
+                        opacity: option.disabled ? 0.5 : 1,
+                      },
+                      pressed ? styles.pressedControl : null,
+                    ]}
+                  >
+                    <Text
+                      style={[
+                        styles.pickerModalOptionText,
+                        {
+                          color: option.disabled
+                            ? colors.textMuted
+                            : colors.text,
+                        },
+                      ]}
+                    >
+                      {option.label}
+                    </Text>
+                    {selected ? (
+                      <Feather name="check" size={19} color={colors.accent} />
+                    ) : null}
+                  </Pressable>
+                );
+              }}
+            />
+          </View>
+        </View>
+      </Modal>
+    </>
   );
 }
 
@@ -705,9 +813,7 @@ export function AntNumberInputRow({
 
   return (
     <View style={styles.numberInputRow}>
-      <Text style={[styles.switchLabel, { color: colors.text }]}>
-        {label}
-      </Text>
+      <Text style={[styles.switchLabel, { color: colors.text }]}>{label}</Text>
       <TextInput
         testID="settings-number-input"
         accessibilityLabel={label}
@@ -717,9 +823,7 @@ export function AntNumberInputRow({
         selectTextOnFocus
         value={draft}
         onBlur={commit}
-        onChangeText={(nextValue) =>
-          setDraft(nextValue.replace(/[^0-9]/g, ""))
-        }
+        onChangeText={(nextValue) => setDraft(nextValue.replace(/[^0-9]/g, ""))}
         onSubmitEditing={commit}
         style={[
           styles.numberInput,
