@@ -9,6 +9,7 @@ import {
   readAppLanguages,
   validateMaestroSuite,
 } from "./verify-maestro-suite.mjs";
+import { runFlow } from "./run-maestro-suite.mjs";
 
 test("derives the complete locale order from the TypeScript registry", () => {
   const languages = readAppLanguages();
@@ -52,4 +53,67 @@ test("rejects a locale registry that cannot be derived", () => {
     () => readAppLanguages(directory),
     /Could not derive APP_LANGUAGES/,
   );
+});
+
+test("retries a transient Maestro flow failure exactly once", () => {
+  const cwd = fs.mkdtempSync(
+    path.join(os.tmpdir(), "mrbroccoli-maestro-retry-"),
+  );
+  const outputDirectory = path.join(cwd, "artifacts/maestro/retry");
+  const messages = [];
+  let attempts = 0;
+
+  try {
+    runFlow({
+      cwd,
+      environment: { PLATFORM: "android" },
+      expectedScreenshotCount: 0,
+      flow: ".maestro/fixture.yaml",
+      outputDirectory,
+      run() {
+        attempts += 1;
+        if (attempts === 1) {
+          throw new Error("transient driver failure");
+        }
+      },
+      stderr: { write(message) { messages.push(message); } },
+      udid: "emulator-5554",
+    });
+
+    assert.equal(attempts, 2);
+    assert.match(messages.join(""), /failed once; retrying/);
+  } finally {
+    fs.rmSync(cwd, { recursive: true, force: true });
+  }
+});
+
+test("stops after a repeated Maestro flow failure", () => {
+  const cwd = fs.mkdtempSync(
+    path.join(os.tmpdir(), "mrbroccoli-maestro-retry-"),
+  );
+  const outputDirectory = path.join(cwd, "artifacts/maestro/retry");
+  let attempts = 0;
+
+  try {
+    assert.throws(
+      () =>
+        runFlow({
+          cwd,
+          environment: {},
+          expectedScreenshotCount: 0,
+          flow: ".maestro/fixture.yaml",
+          outputDirectory,
+          run() {
+            attempts += 1;
+            throw new Error("persistent failure");
+          },
+          stderr: { write() {} },
+          udid: "emulator-5554",
+        }),
+      /persistent failure/,
+    );
+    assert.equal(attempts, 2);
+  } finally {
+    fs.rmSync(cwd, { recursive: true, force: true });
+  }
 });

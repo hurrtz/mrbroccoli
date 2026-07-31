@@ -1,6 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { spawnSync } from "node:child_process";
+import { pathToFileURL } from "node:url";
 
 import {
   MAESTRO_LOCALIZED_FLOW,
@@ -145,43 +146,58 @@ function countCapturedScreenshots(directory) {
     ).length;
 }
 
-function runFlow({
+export function runFlow({
   cwd,
   environment,
   expectedScreenshotCount,
   flow,
   outputDirectory,
+  run = runCommand,
+  stderr = process.stderr,
   udid,
 }) {
-  safelyResetDirectory(outputDirectory, cwd);
   const envArgs = Object.entries(environment).flatMap(([key, value]) => [
     "-e",
     `${key}=${value}`,
   ]);
 
-  runCommand(
-    "maestro",
-    [
-      "test",
-      "--no-ansi",
-      "--udid",
-      udid,
-      "--config",
-      ".maestro/config.yaml",
-      ...envArgs,
-      "--test-output-dir",
-      outputDirectory,
-      flow,
-    ],
-    { cwd },
-  );
+  for (let attempt = 1; attempt <= 2; attempt += 1) {
+    safelyResetDirectory(outputDirectory, cwd);
 
-  const actualScreenshotCount = countCapturedScreenshots(outputDirectory);
+    try {
+      run(
+        "maestro",
+        [
+          "test",
+          "--no-ansi",
+          "--udid",
+          udid,
+          "--config",
+          ".maestro/config.yaml",
+          ...envArgs,
+          "--test-output-dir",
+          outputDirectory,
+          flow,
+        ],
+        { cwd },
+      );
 
-  if (actualScreenshotCount !== expectedScreenshotCount) {
-    throw new Error(
-      `Expected ${expectedScreenshotCount} screenshots from ${flow}, found ${actualScreenshotCount}`,
-    );
+      const actualScreenshotCount = countCapturedScreenshots(outputDirectory);
+
+      if (actualScreenshotCount !== expectedScreenshotCount) {
+        throw new Error(
+          `Expected ${expectedScreenshotCount} screenshots from ${flow}, found ${actualScreenshotCount}`,
+        );
+      }
+      return;
+    } catch (error) {
+      if (attempt === 2) {
+        throw error;
+      }
+      stderr.write(
+        `Maestro flow failed once; retrying ${flow} on ${udid}.\n`,
+      );
+    }
   }
 }
 
@@ -276,13 +292,18 @@ function main() {
   );
 }
 
-try {
-  main();
-} catch (error) {
-  process.stderr.write(
-    `Maestro suite failed: ${
-      error instanceof Error ? error.message : String(error)
-    }\n`,
-  );
-  process.exitCode = 1;
+if (
+  process.argv[1] &&
+  import.meta.url === pathToFileURL(process.argv[1]).href
+) {
+  try {
+    main();
+  } catch (error) {
+    process.stderr.write(
+      `Maestro suite failed: ${
+        error instanceof Error ? error.message : String(error)
+      }\n`,
+    );
+    process.exitCode = 1;
+  }
 }
