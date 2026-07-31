@@ -1199,6 +1199,7 @@ describe("SettingsModal", () => {
         "App & diagnostics",
       );
       expect(screen.getByText("Theme")).toBeTruthy();
+      expect(screen.getByTestId("app-settings-page-en")).toBeTruthy();
       expect(screen.getByTestId("app-language-picker")).toBeTruthy();
       expect(screen.getByText("Usage Stats")).toBeTruthy();
       expect(screen.getByLabelText("About Debug Log Button")).toBeTruthy();

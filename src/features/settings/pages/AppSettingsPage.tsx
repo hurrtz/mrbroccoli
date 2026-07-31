@@ -93,7 +93,10 @@ export function AppSettingsPage({
   }, []);
 
   return (
-    <View testID="app-settings-page" style={styles.sectionPageStack}>
+    <View
+      testID={`app-settings-page-${language}`}
+      style={styles.sectionPageStack}
+    >
       <View style={styles.sectionGroup}>
         <AntRadioSection<ThemeMode>
           testID="app-theme"

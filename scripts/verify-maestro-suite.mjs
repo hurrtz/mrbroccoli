@@ -13,6 +13,7 @@ export const MAESTRO_LAYOUT_FLOW =
 
 const REQUIRED_LOCALIZED_SELECTORS = [
   "app-language-picker-option-${LOCALE}",
+  "app-settings-page-${LOCALE}",
   "settings-page-app",
   "settings-page-overview",
   "settings-page-connections",
@@ -145,6 +146,16 @@ export function validateMaestroSuite(cwd = process.cwd()) {
         `Localized Maestro coverage is missing selector: ${selector}`,
       );
     }
+  }
+
+  if (
+    !/id:\s*app-language-picker-option-\$\{LOCALE\}[\s\S]{0,160}centerElement:\s*true/.test(
+      localizedFlow,
+    )
+  ) {
+    errors.push(
+      "Localized Maestro coverage must center the requested language before selecting it",
+    );
   }
 
   if (
