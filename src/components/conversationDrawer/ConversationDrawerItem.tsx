@@ -68,10 +68,6 @@ export function ConversationDrawerItem({
         style={[
           styles.itemMenuButton,
           styles.itemMenuButtonFloating,
-          {
-            backgroundColor: colors.surfaceAlt,
-            borderColor: colors.border,
-          },
         ]}
         onPress={() => onOpenActionConversation(conversation.id)}
         activeOpacity={0.88}
@@ -79,7 +75,7 @@ export function ConversationDrawerItem({
         accessibilityLabel={t("conversationActions")}
       >
         <PhosphorIcon
-          name="ellipsis"
+          name="ellipsis-vertical"
           size="compact"
           color={colors.textSecondary}
         />

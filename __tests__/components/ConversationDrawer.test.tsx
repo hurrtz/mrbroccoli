@@ -125,6 +125,14 @@ describe("ConversationDrawer", () => {
         screen.getByTestId("conversation-drawer-menu-one").props.style,
       ),
     ).toEqual(expect.objectContaining({ height: 44, width: 44 }));
+    expect(
+      StyleSheet.flatten(
+        screen.getByTestId("conversation-drawer-menu-one").props.style,
+      ).borderWidth,
+    ).toBeUndefined();
+    expect(
+      screen.getAllByTestId("phosphor-icon-ellipsis-vertical"),
+    ).toHaveLength(2);
   });
 
   it("exposes every conversation action as a labeled button", async () => {

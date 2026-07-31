@@ -42,6 +42,10 @@ describe("StyleSheetModal", () => {
 
   it("renders title, subtitle, and active option descriptions", () => {
     const { getByText } = setup();
+    expect(getByText("Conversation settings").props.numberOfLines).toBe(1);
+    expect(getByText("Conversation settings").props.ellipsizeMode).toBe(
+      "tail",
+    );
     expect(
       StyleSheet.flatten(getByText("Conversation settings").props.style),
     ).toEqual(
@@ -57,6 +61,23 @@ describe("StyleSheetModal", () => {
     expect(getByText(/Keep the answer tight/)).toBeTruthy();
     // casual description
     expect(getByText(/Speak like a smart friend/)).toBeTruthy();
+  });
+
+  it("pins the close action to the top-right of the header", () => {
+    const { getByTestId } = setup();
+
+    expect(
+      StyleSheet.flatten(
+        getByTestId("conversation-settings-header").props.style,
+      ),
+    ).toEqual(expect.objectContaining({ position: "relative" }));
+    expect(
+      StyleSheet.flatten(
+        getByTestId("conversation-settings-close").props.style,
+      ),
+    ).toEqual(
+      expect.objectContaining({ position: "absolute", right: 12, top: 8 }),
+    );
   });
 
   it("renders as a full-width bottom drawer", () => {
@@ -122,7 +143,7 @@ describe("StyleSheetModal", () => {
     expect(onAutoRenameConversation).not.toHaveBeenCalled();
   });
 
-  it("renders all length and tone pills", () => {
+  it("renders all length and tone choices", () => {
     const { getByText } = setup();
     ["Brief", "Normal", "Thorough"].forEach((label) =>
       expect(getByText(label)).toBeTruthy(),
@@ -132,13 +153,34 @@ describe("StyleSheetModal", () => {
     );
   });
 
-  it("calls onChange with new responseLength when a length pill is pressed", () => {
+  it("uses compact segmented choices instead of pills", () => {
+    const { getByTestId } = setup();
+
+    expect(
+      StyleSheet.flatten(
+        getByTestId("conversation-settings-length-control").props.style,
+      ),
+    ).toEqual(
+      expect.objectContaining({ borderRadius: 8, borderWidth: 1, padding: 4 }),
+    );
+    expect(
+      StyleSheet.flatten(
+        getByTestId("conversation-settings-length-brief").props.style,
+      ),
+    ).toEqual(expect.objectContaining({ borderRadius: 6, minHeight: 44 }));
+    expect(
+      getByTestId("conversation-settings-length-brief").props
+        .accessibilityRole,
+    ).toBe("radio");
+  });
+
+  it("calls onChange with new responseLength when a length choice is pressed", () => {
     const { getByText, onChange } = setup();
     fireEvent.press(getByText("Thorough"));
     expect(onChange).toHaveBeenCalledWith({ responseLength: "thorough" });
   });
 
-  it("calls onChange with new responseTone when a tone pill is pressed", () => {
+  it("calls onChange with new responseTone when a tone choice is pressed", () => {
     const { getByText, onChange } = setup();
     fireEvent.press(getByText("Nerdy"));
     expect(onChange).toHaveBeenCalledWith({ responseTone: "nerdy" });

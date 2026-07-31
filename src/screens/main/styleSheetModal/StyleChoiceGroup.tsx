@@ -42,29 +42,39 @@ export function StyleChoiceGroup<Value extends string>({
       >
         {label}
       </Text>
-      <View style={styles.styleSheetPillRow}>
+      <View
+        testID={`${testID}-control`}
+        style={[
+          styles.styleSheetChoiceRow,
+          {
+            backgroundColor: colors.surfaceAlt,
+            borderColor: colors.border,
+          },
+        ]}
+      >
         {options.map((option) => {
           const active = option.value === value;
           return (
             <Pressable
               key={option.value}
+              testID={`${testID}-${option.value}`}
               style={({ pressed }) => [
-                styles.styleSheetPill,
+                styles.styleSheetChoice,
                 {
                   backgroundColor: active
                     ? colors.accentSoft
-                    : colors.surfaceElevated,
-                  borderColor: active ? colors.accent : colors.border,
+                    : "transparent",
+                  borderColor: active ? colors.accent : "transparent",
                 },
                 pressed ? styles.styleSheetControlPressed : null,
               ]}
               onPress={() => onChange(option.value)}
-              accessibilityRole="button"
-              accessibilityState={{ selected: active }}
+              accessibilityRole="radio"
+              accessibilityState={{ checked: active }}
             >
               <Text
                 style={[
-                  styles.styleSheetPillText,
+                  styles.styleSheetChoiceText,
                   {
                     color: active ? colors.text : colors.textSecondary,
                   },

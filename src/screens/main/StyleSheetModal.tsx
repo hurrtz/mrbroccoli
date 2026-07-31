@@ -109,14 +109,18 @@ export const StyleSheetModal = React.memo(function StyleSheetModal({
           ]}
         >
           <View
+            testID="conversation-settings-header"
             style={[
               styles.styleSheetHeader,
               { borderBottomColor: colors.border },
             ]}
           >
-            <View style={styles.styleSheetHeaderControlSpacer} />
             <View style={styles.styleSheetHeaderCopy}>
-              <Text style={[styles.styleSheetTitle, { color: colors.text }]}>
+              <Text
+                style={[styles.styleSheetTitle, { color: colors.text }]}
+                numberOfLines={1}
+                ellipsizeMode="tail"
+              >
                 {t("styleSheetTitle")}
               </Text>
               <Text

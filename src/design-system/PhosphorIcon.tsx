@@ -19,7 +19,7 @@ import {
   CopyIcon,
   CpuIcon,
   DownloadSimpleIcon,
-  DotsThreeIcon,
+  DotsThreeVerticalIcon,
   ExportIcon,
   EyeIcon,
   EyeSlashIcon,
@@ -91,7 +91,7 @@ const PHOSPHOR_ICONS = {
   down: CaretDownIcon,
   download: DownloadSimpleIcon,
   edit: PencilSimpleIcon,
-  ellipsis: DotsThreeIcon,
+  "ellipsis-vertical": DotsThreeVerticalIcon,
   "exclamation-circle": WarningCircleIcon,
   export: ExportIcon,
   eye: EyeIcon,
@@ -169,7 +169,7 @@ export function PhosphorIcon({
       size={resolvedSize}
       style={[{ color, width: resolvedSize, height: resolvedSize }, style]}
       testID={testID ?? `phosphor-icon-${name}`}
-      weight="thin"
+      weight="regular"
     />
   );
 }

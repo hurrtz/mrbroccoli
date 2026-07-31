@@ -283,8 +283,6 @@ export const styles = StyleSheet.create({
   itemMenuButton: {
     width: 44,
     height: 44,
-    borderRadius: 12,
-    borderWidth: 1,
     alignItems: "center",
     justifyContent: "center",
   },

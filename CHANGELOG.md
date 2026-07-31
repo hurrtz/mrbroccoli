@@ -24,12 +24,18 @@ the complete Play Store translations are kept in a dedicated file under
 ### Changed
 
 - Display the current release version on the Settings overview.
-- Replace application glyphs with consistent thin Phosphor icons and semantic
-  sizing, while retaining official provider-brand artwork, compact transcript
-  disclosures, accessible touch targets, and clearer message actions.
+- Replace application glyphs with consistent regular-weight Phosphor icons and
+  semantic sizing, while retaining official provider-brand artwork, compact
+  transcript disclosures, accessible touch targets, and clearer message
+  actions.
 - Center the Conversations and Conversation Settings headings in the display
   typeface and remove the inconsistent border from the conversation close
   action.
+- Keep the Conversation Settings title on one truncated line, anchor its close
+  action to the top-right corner, and replace oversized pills with compact
+  segmented choices.
+- Use the standard vertical overflow glyph for per-conversation actions while
+  retaining an invisible accessible touch target.
 - Bring the voice/text swipe indicators closer together without shrinking their
   accessible tap targets.
 - Focus the direct provider list on OpenAI, OpenRouter, Anthropic, Google,

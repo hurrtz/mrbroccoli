@@ -367,26 +367,23 @@ export const styles = StyleSheet.create({
     paddingBottom: 14,
   },
   styleSheetHeader: {
-    flexDirection: "row",
+    position: "relative",
     alignItems: "center",
-    justifyContent: "space-between",
-    gap: 16,
-    paddingHorizontal: 20,
+    paddingHorizontal: 68,
     paddingTop: 16,
     paddingBottom: 14,
     borderBottomWidth: 1,
   },
   styleSheetHeaderCopy: {
-    flex: 1,
+    width: "100%",
     minWidth: 0,
     gap: 4,
     alignItems: "center",
   },
-  styleSheetHeaderControlSpacer: {
-    width: 44,
-    height: 44,
-  },
   styleSheetCloseButton: {
+    position: "absolute",
+    top: 8,
+    right: 12,
     width: 44,
     height: 44,
     borderRadius: 22,
@@ -433,16 +430,19 @@ export const styles = StyleSheet.create({
     textTransform: "uppercase",
     fontFamily: fonts.mono,
   },
-  styleSheetPillRow: {
+  styleSheetChoiceRow: {
     flexDirection: "row",
     flexWrap: "wrap",
-    gap: 8,
+    gap: 4,
+    padding: 4,
+    borderRadius: 8,
+    borderWidth: 1,
   },
-  styleSheetPill: {
+  styleSheetChoice: {
     minHeight: 44,
     paddingHorizontal: 14,
     paddingVertical: 6,
-    borderRadius: 999,
+    borderRadius: 6,
     borderWidth: 1,
     alignItems: "center",
     justifyContent: "center",
@@ -451,7 +451,7 @@ export const styles = StyleSheet.create({
     opacity: 0.68,
     transform: [{ scale: 0.97 }],
   },
-  styleSheetPillText: {
+  styleSheetChoiceText: {
     fontSize: 13,
     lineHeight: 18,
     fontFamily: fonts.body,

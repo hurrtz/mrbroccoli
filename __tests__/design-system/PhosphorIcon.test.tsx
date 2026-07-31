@@ -49,7 +49,7 @@ describe("Phosphor icon system", () => {
     expect(icon.props.height).toBe(24);
   });
 
-  it("keeps every application glyph thin and on the shared wrapper", () => {
+  it("keeps every application glyph regular and on the shared wrapper", () => {
     const packageJson = JSON.parse(
       fs.readFileSync(path.join(root, "package.json"), "utf8"),
     ) as { dependencies?: Record<string, string> };
@@ -84,7 +84,7 @@ describe("Phosphor icon system", () => {
       return errors;
     });
 
-    expect(wrapper).toContain('weight="thin"');
+    expect(wrapper).toContain('weight="regular"');
     expect(violations).toEqual([]);
     expect(packageJson.dependencies?.["phosphor-react-native"]).toBeDefined();
     expect(
