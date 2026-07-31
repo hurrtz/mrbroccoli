@@ -43,6 +43,7 @@ jest.mock("../../src/services/ulraMode", () => ({
 }));
 
 jest.mock("../../src/services/playbackCues", () => ({
+  INTER_PARAGRAPH_PAUSE_MS: 250,
   getInterParagraphPauseAudioUri: jest.fn(async () =>
     "file:///tmp/paragraph-pause.wav"
   ),
@@ -587,7 +588,7 @@ describe("runVoicePipeline", () => {
     expect(events).toEqual(["speak:Wind is moving air.", "response-done"]);
   });
 
-  it("queues a one-second native speech pause between paragraphs", async () => {
+  it("queues a short native speech pause between paragraphs", async () => {
     (streamChat as jest.Mock).mockImplementation(
       async ({
         onChunk,
@@ -596,9 +597,11 @@ describe("runVoicePipeline", () => {
         onChunk: (text: string) => void;
         onDone: (text: string) => Promise<void>;
       }) => {
-        onChunk("First paragraph.\n\n");
+        onChunk("First line.\nStill first paragraph.\n\n");
         onChunk("Second paragraph.\n\n");
-        await onDone("First paragraph.\n\nSecond paragraph.");
+        await onDone(
+          "First line.\nStill first paragraph.\n\nSecond paragraph.",
+        );
       },
     );
 
@@ -630,8 +633,14 @@ describe("runVoicePipeline", () => {
     });
 
     expect(callbacks.onSpeechTextReady).toHaveBeenCalledTimes(2);
+    expect(callbacks.onSpeechTextReady).toHaveBeenNthCalledWith(
+      1,
+      "First line. Still first paragraph.",
+      undefined,
+      expect.any(Object),
+    );
     expect(callbacks.onSpeechPauseReady).toHaveBeenCalledTimes(1);
-    expect(callbacks.onSpeechPauseReady).toHaveBeenCalledWith(1_000);
+    expect(callbacks.onSpeechPauseReady).toHaveBeenCalledWith(250);
   });
 
   it("keeps complete stream text together when multiple sentences arrive in one chunk", async () => {

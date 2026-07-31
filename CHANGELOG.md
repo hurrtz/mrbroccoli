@@ -55,6 +55,12 @@ the complete Play Store translations are kept in a dedicated file under
 
 ### Fixed
 
+- Keep the conversation anchored to newly submitted prompts and incoming
+  replies while preserving intentional reading of older messages.
+- Replace the artificial one-second silence between spoken paragraphs with a
+  short natural cadence gap.
+- Add a dedicated Stop action that cancels current and prefetched reply audio,
+  alongside the existing pause and resume control.
 - Prevent three response modes from crowding or overlapping Drive controls in
   landscape by using the horizontal three-card layout.
 - Keep long voice-preview text inside its editor instead of letting it overlap

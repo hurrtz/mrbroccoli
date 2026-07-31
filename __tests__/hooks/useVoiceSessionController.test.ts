@@ -217,6 +217,24 @@ describe("useVoiceSessionController", () => {
     expect(player.pausePlayback).not.toHaveBeenCalled();
   });
 
+  it("completely stops playback and cancels prefetched reply work", async () => {
+    const abortController = new AbortController();
+    const { result, params } = renderController({
+      abortRef: { current: abortController },
+      replayPhase: "speaking",
+    });
+
+    await act(async () => {
+      await result.current.handleStopPlayback();
+    });
+
+    expect(abortController.signal.aborted).toBe(true);
+    expect(params.stopReplay).toHaveBeenCalledTimes(1);
+    expect(params.player.stopPlayback).toHaveBeenCalledTimes(1);
+    expect(params.setPipelinePhase).toHaveBeenCalledWith("idle");
+    expect(params.setStreamingText).toHaveBeenCalledWith("");
+  });
+
   it("processes a completed recording through the voice pipeline", async () => {
     const { result, params } = renderController({ isRecording: true });
 

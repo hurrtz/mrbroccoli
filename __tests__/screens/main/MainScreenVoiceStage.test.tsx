@@ -110,6 +110,7 @@ const t = ((key: string) => {
     thinking: "Thinking",
     speaking: "Speaking",
     paused: "Paused",
+    stop: "Stop",
     stopDriveSession: "Pause auto",
     repeatDriveReply: "Repeat last",
     continueDriveSession: "Resume auto",
@@ -126,6 +127,7 @@ function createProps(overrides: Record<string, unknown> = {}) {
     onPress: jest.fn(),
     onPressIn: jest.fn(),
     onPressOut: jest.fn(),
+    onStopPlayback: jest.fn(),
     onSubmitTextMessage: jest.fn(),
     recordingMaxMs: 150_000,
     statusTitle: "Tap to speak",
@@ -796,13 +798,15 @@ describe("MainScreenVoiceStage composer", () => {
     now.mockRestore();
   });
 
-  it("uses the primary CTA itself to pause and resume speaking", () => {
+  it("keeps pause and resume on the primary CTA with a separate Stop action", () => {
     const onPress = jest.fn();
+    const onStopPlayback = jest.fn();
     const screen = render(
       <MainScreenVoiceStage
         {...createProps({
           isActive: true,
           onPress,
+          onStopPlayback,
           visualPhase: "speaking",
         })}
       />,
@@ -812,12 +816,21 @@ describe("MainScreenVoiceStage composer", () => {
     expect(screen.getByText("Speaking")).toBeTruthy();
     fireEvent.press(screen.getByTestId("voice-stage-primary-action"));
     expect(onPress).toHaveBeenCalledTimes(1);
+    expect(screen.getByTestId("ant-icon-stop")).toBeTruthy();
+    expect(
+      StyleSheet.flatten(
+        screen.getByTestId("voice-stage-stop-playback").props.style,
+      ),
+    ).toEqual(expect.objectContaining({ minHeight: 44 }));
+    fireEvent.press(screen.getByTestId("voice-stage-stop-playback"));
+    expect(onStopPlayback).toHaveBeenCalledTimes(1);
 
     screen.rerender(
       <MainScreenVoiceStage
         {...createProps({
           isActive: true,
           onPress,
+          onStopPlayback,
           playbackPaused: true,
           visualPhase: "speaking",
         })}

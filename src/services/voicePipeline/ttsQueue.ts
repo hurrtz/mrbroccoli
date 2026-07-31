@@ -22,7 +22,10 @@ import type {
   SpeechDiagnosticSource,
   SpeechDiagnosticsContext,
 } from "../speech/diagnostics";
-import { getInterParagraphPauseAudioUri } from "../playbackCues";
+import {
+  getInterParagraphPauseAudioUri,
+  INTER_PARAGRAPH_PAUSE_MS,
+} from "../playbackCues";
 import {
   getProviderTtsTargetChunkChars,
   PROVIDER_TTS_MAX_INPUT_CHARS,
@@ -510,7 +513,7 @@ export function createVoicePipelineTtsQueue({
 
   const emitParagraphPause = async (result: TtsSynthesisResult) => {
     if (result.kind === "native") {
-      callbacks.onSpeechPauseReady?.(1_000);
+      callbacks.onSpeechPauseReady?.(INTER_PARAGRAPH_PAUSE_MS);
       return;
     }
 
@@ -537,7 +540,10 @@ export function createVoicePipelineTtsQueue({
     context?: { previousText?: string; nextText?: string },
     startsParagraph = false,
   ) => {
-    const trimmed = text.trim();
+    // Formatting whitespace helps the transcript remain readable but should
+    // not turn into an engine-specific spoken pause. Paragraph cadence is
+    // controlled explicitly below.
+    const trimmed = text.replace(/\s+/g, " ").trim();
 
     if (!trimmed) {
       return;
@@ -550,7 +556,7 @@ export function createVoicePipelineTtsQueue({
         appLanguage: language,
       });
       if (startsParagraph) {
-        callbacks.onSpeechPauseReady?.(1_000);
+        callbacks.onSpeechPauseReady?.(INTER_PARAGRAPH_PAUSE_MS);
       }
       emitResult(trimmed, {
         kind: "native",

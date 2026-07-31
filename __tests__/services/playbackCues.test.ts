@@ -3,6 +3,7 @@ import {
   getDriveCountdownCueAudioUri,
   getDriveReadyCueAudioUri,
   getInterParagraphPauseAudioUri,
+  INTER_PARAGRAPH_PAUSE_MS,
 } from "../../src/services/playbackCues";
 
 jest.mock("../../src/services/tts/shared", () => ({
@@ -13,14 +14,15 @@ jest.mock("../../src/services/tts/shared", () => ({
 }));
 
 describe("playback cues", () => {
-  it("builds and caches a one-second silent WAV for paragraph gaps", async () => {
+  it("builds and caches a short silent WAV for paragraph cadence", async () => {
     const firstUri = await getInterParagraphPauseAudioUri();
     const secondUri = await getInterParagraphPauseAudioUri();
     const pauseCall = (writeBytesAudioFile as jest.Mock).mock.calls[0][0];
     const pauseBytes = pauseCall.bytes as Uint8Array;
 
     expect(firstUri).toBe(secondUri);
-    expect(pauseBytes.length).toBe(44 + 16_000 * 2);
+    expect(INTER_PARAGRAPH_PAUSE_MS).toBe(250);
+    expect(pauseBytes.length).toBe(44 + 4_000 * 2);
     expect(
       Array.from(pauseBytes.slice(44)).every((sample) => sample === 0),
     ).toBe(true);

@@ -1,7 +1,7 @@
 import { writeBytesAudioFile } from "./tts/shared";
 
 const SAMPLE_RATE = 16_000;
-const INTER_PARAGRAPH_PAUSE_MS = 1_000;
+export const INTER_PARAGRAPH_PAUSE_MS = 250;
 const DRIVE_READY_CUE_MS = 720;
 const DRIVE_COUNTDOWN_CUE_MS = 180;
 

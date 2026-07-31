@@ -65,6 +65,32 @@ describe("ChatTranscript follow-tail scrolling", () => {
     );
   });
 
+  it("treats small native layout offsets as still being at the tail", () => {
+    const onTailStateChange = jest.fn();
+    const screen = render(
+      <ThemeProvider mode="light">
+        <LocalizationProvider language="en">
+          <ChatTranscript
+            conversationId="conversation-1"
+            messages={[message("user-1", "Hello")]}
+            onTailStateChange={onTailStateChange}
+          />
+        </LocalizationProvider>
+      </ThemeProvider>,
+    );
+    const list = screen.getByTestId("chat-transcript-list");
+
+    fireEvent(list, "scrollBeginDrag");
+    fireEvent(list, "scroll", scrollEvent(500));
+    fireEvent(list, "scrollEndDrag", scrollEvent(500));
+    expect(onTailStateChange).toHaveBeenLastCalledWith(false);
+
+    fireEvent(list, "scrollBeginDrag");
+    fireEvent(list, "scroll", scrollEvent(560));
+    fireEvent(list, "scrollEndDrag", scrollEvent(560));
+    expect(onTailStateChange).toHaveBeenLastCalledWith(true);
+  });
+
   it("retries the initial tail scroll after a hidden transcript gets a viewport", () => {
     const scrollToEnd = jest
       .spyOn(FlatList.prototype, "scrollToEnd")
@@ -198,6 +224,62 @@ describe("ChatTranscript follow-tail scrolling", () => {
     fireEvent(list, "contentSizeChange", 320, 700);
 
     expect(scrollToEnd).not.toHaveBeenCalled();
+
+    scrollToEnd.mockRestore();
+    global.requestAnimationFrame = originalRequestAnimationFrame;
+    global.cancelAnimationFrame = originalCancelAnimationFrame;
+  });
+
+  it("returns to the tail when the user submits a new prompt", () => {
+    const originalRequestAnimationFrame = global.requestAnimationFrame;
+    const originalCancelAnimationFrame = global.cancelAnimationFrame;
+    global.requestAnimationFrame = (callback) => {
+      callback(0);
+      return 1;
+    };
+    global.cancelAnimationFrame = () => undefined;
+    const scrollToEnd = jest
+      .spyOn(FlatList.prototype, "scrollToEnd")
+      .mockImplementation(() => undefined);
+    const initialMessages = [
+      message("user-1", "First question"),
+      message("assistant-1", "First answer"),
+    ];
+    const renderTranscript = (messages: Message[]) => (
+      <ThemeProvider mode="light">
+        <LocalizationProvider language="en">
+          <ChatTranscript
+            conversationId="conversation-1"
+            messages={messages}
+          />
+        </LocalizationProvider>
+      </ThemeProvider>
+    );
+    const screen = render(renderTranscript(initialMessages));
+    const list = screen.getByTestId("chat-transcript-list");
+
+    fireEvent(list, "scrollBeginDrag");
+    fireEvent(list, "scroll", scrollEvent(180));
+    fireEvent(list, "scrollEndDrag", scrollEvent(180));
+    scrollToEnd.mockClear();
+
+    screen.rerender(
+      renderTranscript([
+        ...initialMessages,
+        message("assistant-2", "Background update"),
+      ]),
+    );
+    expect(scrollToEnd).not.toHaveBeenCalled();
+
+    screen.rerender(
+      renderTranscript([
+        ...initialMessages,
+        message("assistant-2", "Background update"),
+        message("user-2", "New question"),
+        message("streaming", "New answer"),
+      ]),
+    );
+    expect(scrollToEnd).toHaveBeenLastCalledWith({ animated: false });
 
     scrollToEnd.mockRestore();
     global.requestAnimationFrame = originalRequestAnimationFrame;

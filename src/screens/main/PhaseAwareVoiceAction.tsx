@@ -43,6 +43,7 @@ interface PhaseAwareVoiceActionProps {
   onPress: () => void;
   onPressIn: () => void;
   onPressOut: () => void;
+  onStopPlayback: () => void;
   playbackPaused?: boolean;
   recordingMaxMs: number;
   recordingStartedAtMs?: number | null;
@@ -375,6 +376,7 @@ export function PhaseAwareVoiceAction({
   onPress,
   onPressIn,
   onPressOut,
+  onStopPlayback,
   playbackPaused = false,
   recordingMaxMs,
   recordingStartedAtMs = null,
@@ -573,7 +575,7 @@ export function PhaseAwareVoiceAction({
           testID="voice-stage-left-copy"
           style={styles.sideCopy}
         >
-          {showSpeechEta ? (
+          {visualPhase === "speaking" ? null : showSpeechEta ? (
             <>
               <Text
                 adjustsFontSizeToFit
@@ -658,6 +660,32 @@ export function PhaseAwareVoiceAction({
         </View>
       </View>
 
+      {visualPhase === "speaking" ? (
+        <TouchableOpacity
+          testID="voice-stage-stop-playback"
+          accessibilityLabel={t("stop")}
+          accessibilityRole="button"
+          activeOpacity={0.72}
+          onPress={onStopPlayback}
+          style={styles.stopPlaybackAction}
+        >
+          <AntIcon
+            name="stop"
+            size="compact"
+            color={phaseForeground}
+          />
+          <Text
+            numberOfLines={1}
+            style={[
+              styles.stopPlaybackLabel,
+              { color: phaseForeground },
+            ]}
+          >
+            {t("stop")}
+          </Text>
+        </TouchableOpacity>
+      ) : null}
+
       {visualPhase !== "recording" &&
       visualPhase !== "speaking" ? (
         <SpeechStartTimelineBorder
@@ -719,6 +747,27 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     paddingHorizontal: 8,
+  },
+  stopPlaybackAction: {
+    position: "absolute",
+    left: 8,
+    top: 12,
+    bottom: 12,
+    width: "30%",
+    minHeight: 44,
+    zIndex: 2,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 6,
+    paddingHorizontal: 6,
+  },
+  stopPlaybackLabel: {
+    fontFamily: fonts.body,
+    fontSize: 12,
+    lineHeight: 16,
+    fontWeight: "600",
+    textAlign: "center",
   },
   phasePromptText: {
     fontSize: 13,

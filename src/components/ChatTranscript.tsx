@@ -38,7 +38,7 @@ interface ChatTranscriptProps {
   scrollToLatestRequest?: number;
 }
 
-const AT_TAIL_THRESHOLD_PX = 4;
+const AT_TAIL_THRESHOLD_PX = 48;
 const SCROLL_AWAY_DELTA_PX = 0.5;
 
 export function getTranscriptDistanceFromBottom(event: NativeScrollEvent) {
@@ -84,6 +84,19 @@ export function ChatTranscript({
     () => conversationId ?? messages[0]?.id ?? "empty-conversation",
     [conversationId, messages],
   );
+  const latestUserMessageId = useMemo(() => {
+    for (let index = messages.length - 1; index >= 0; index -= 1) {
+      if (messages[index].role === "user") {
+        return messages[index].id;
+      }
+    }
+
+    return null;
+  }, [messages]);
+  const submittedUserMessageRef = useRef({
+    conversationKey,
+    messageId: latestUserMessageId,
+  });
   const resolvedEmptyTitle = emptyTitle ?? t("yourConversationAppearsHere");
   const resolvedEmptyDescription =
     emptyDescription ?? t("defaultTranscriptEmptyDescription");
@@ -146,6 +159,35 @@ export function ChatTranscript({
       listRef.current?.scrollToOffset({ offset: 0, animated: false });
     }
   }, [conversationKey, setTailState]);
+
+  useEffect(() => {
+    const previous = submittedUserMessageRef.current;
+
+    if (previous.conversationKey !== conversationKey) {
+      submittedUserMessageRef.current = {
+        conversationKey,
+        messageId: latestUserMessageId,
+      };
+      return;
+    }
+
+    if (
+      !latestUserMessageId ||
+      previous.messageId === latestUserMessageId
+    ) {
+      return;
+    }
+
+    submittedUserMessageRef.current = {
+      conversationKey,
+      messageId: latestUserMessageId,
+    };
+
+    // A newly submitted prompt starts a fresh exchange. Always bring it into
+    // view and resume following, even if the reader had inspected an older
+    // message immediately before sending.
+    scrollToTail(false);
+  }, [conversationKey, latestUserMessageId, scrollToTail]);
 
   useEffect(() => {
     if (handledScrollRequestRef.current === scrollToLatestRequest) {

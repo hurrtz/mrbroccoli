@@ -260,6 +260,32 @@ export function useVoiceSessionController({
     ],
   );
 
+  const handleStopPlayback = useCallback(async () => {
+    recordDebugLogEvent({
+      event: "voice-session-playback-stop-requested",
+      payload: {
+        inputMode: settings.inputMode,
+        playbackPaused: player.isPlaybackPaused,
+        replayPhase,
+      },
+    });
+
+    if (settings.inputMode === "drive-session") {
+      driveSession.handleStop();
+    }
+    if (replayPhase !== "idle") {
+      await stopReplay().catch(() => undefined);
+    }
+    await cancelCurrentInteraction();
+  }, [
+    cancelCurrentInteraction,
+    driveSession.handleStop,
+    player.isPlaybackPaused,
+    replayPhase,
+    settings.inputMode,
+    stopReplay,
+  ]);
+
   const resetVoiceSessionState = useCallback(async () => {
     recordDebugLogEvent({
       event: "voice-session-reset-requested",
@@ -301,6 +327,7 @@ export function useVoiceSessionController({
     handlePressIn: standardPressHandlers.handlePressIn,
     handlePressOut: standardPressHandlers.handlePressOut,
     handleRepeatDriveReply: driveSession.handleRepeat,
+    handleStopPlayback,
     handleStopDriveSession: driveSession.handleStop,
     handleTogglePress,
     maxRecordingMs,
