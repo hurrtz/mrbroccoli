@@ -250,12 +250,16 @@ describe("SetupGuideModal", () => {
       />,
     );
 
-    const shortcutSwitch = screen.getByLabelText(
+    const shortcutRow = screen.getByLabelText(
       "Show guided setup in Settings",
     );
-    expect(shortcutSwitch.props.value).toBe(true);
+    expect(shortcutRow.props.accessibilityRole).toBe("switch");
+    expect(shortcutRow.props.accessibilityState).toEqual({
+      checked: true,
+      disabled: false,
+    });
 
-    fireEvent(shortcutSwitch, "valueChange", false);
+    fireEvent.press(shortcutRow);
     expect(onChangeSettingsShortcutVisible).toHaveBeenCalledWith(false);
   });
 

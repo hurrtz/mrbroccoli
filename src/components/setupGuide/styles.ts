@@ -103,6 +103,9 @@ export const styles = StyleSheet.create({
     alignItems: "center",
     gap: 12,
   },
+  settingsShortcutRowPressed: {
+    opacity: 0.8,
+  },
   settingsShortcutCopy: {
     flex: 1,
     gap: 3,

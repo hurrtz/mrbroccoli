@@ -1,6 +1,7 @@
 import React from "react";
 import {
   ActivityIndicator,
+  Pressable,
   Switch,
   Text,
   TextInput,
@@ -205,9 +206,20 @@ function IntroStep({
         {t("setupGuideIntroNote")}
       </Text>
       {showSettingsShortcutOption ? (
-        <View
-          style={[
+        <Pressable
+          accessibilityLabel={t("setupGuideShowInSettings")}
+          accessibilityRole="switch"
+          accessibilityState={{
+            checked: settingsShortcutVisible,
+            disabled: !onChangeSettingsShortcutVisible,
+          }}
+          disabled={!onChangeSettingsShortcutVisible}
+          onPress={() =>
+            onChangeSettingsShortcutVisible?.(!settingsShortcutVisible)
+          }
+          style={({ pressed }) => [
             styles.settingsShortcutRow,
+            pressed ? styles.settingsShortcutRowPressed : null,
             {
               backgroundColor: colors.surfaceElevated,
               borderColor: colors.border,
@@ -230,8 +242,11 @@ function IntroStep({
             </Text>
           </View>
           <Switch
+            accessible={false}
+            focusable={false}
+            importantForAccessibility="no-hide-descendants"
+            pointerEvents="none"
             value={settingsShortcutVisible}
-            onValueChange={onChangeSettingsShortcutVisible}
             trackColor={{
               false: colors.borderStrong,
               true: colors.accentSoft,
@@ -239,9 +254,8 @@ function IntroStep({
             thumbColor={
               settingsShortcutVisible ? colors.accent : colors.textMuted
             }
-            accessibilityLabel={t("setupGuideShowInSettings")}
           />
-        </View>
+        </Pressable>
       ) : null}
     </>
   );
