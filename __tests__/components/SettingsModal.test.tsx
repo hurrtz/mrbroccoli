@@ -336,6 +336,53 @@ describe("SettingsModal", () => {
     expect(download).toHaveBeenCalledTimes(1);
   });
 
+  it("shows Kokoro removal above Settings and removes only after confirmation", async () => {
+    const remove = jest.fn(async () => true);
+    const alert = jest.spyOn(Alert, "alert");
+    const screen = renderSettingsModal({
+      focusTab: "tts",
+      settings: {
+        ...DEFAULT_SETTINGS,
+        ttsMode: "kokoro",
+      },
+      kokoroModel: {
+        installed: true,
+        verified: true,
+        busy: null,
+        phase: null,
+        progress: 1,
+        error: null,
+        download: jest.fn(async () => true),
+        refresh: jest.fn(async () => undefined),
+        remove,
+      },
+    });
+
+    await waitFor(() => {
+      expect(
+        screen.getByLabelText("Remove the Kokoro model"),
+      ).toBeTruthy();
+    });
+
+    fireEvent.press(screen.getByLabelText("Remove the Kokoro model"));
+
+    expect(alert).toHaveBeenCalledWith(
+      "Remove the Kokoro model?",
+      "This frees about 211 MB. You can download the model again at any time.",
+      expect.any(Array),
+    );
+    expect(remove).not.toHaveBeenCalled();
+
+    const buttons = alert.mock.calls[0][2];
+    const removeButton = buttons?.find((button) => button.text === "Remove");
+
+    act(() => {
+      removeButton?.onPress?.();
+    });
+
+    expect(remove).toHaveBeenCalledTimes(1);
+  });
+
   it("selects Kokoro before its async download completes", async () => {
     let finishDownload: (installed: boolean) => void = () => undefined;
     const download = jest.fn(

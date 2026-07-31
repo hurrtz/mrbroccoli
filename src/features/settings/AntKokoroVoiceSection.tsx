@@ -1,7 +1,7 @@
 import React from "react";
-import { Text, View } from "react-native";
+import { Alert, Text, View } from "react-native";
 
-import { Button, Modal } from "@ant-design/react-native";
+import { Button } from "@ant-design/react-native";
 import Feather from "@expo/vector-icons/Feather";
 
 import {
@@ -92,14 +92,14 @@ export function AntKokoroVoiceSection({
             : t("kokoroNotInstalled");
 
   const handleRemove = () => {
-    Modal.alert(
+    Alert.alert(
       t("kokoroRemoveTitle"),
       t("kokoroRemoveBody", { installedSize }),
       [
-        { text: t("cancel") },
+        { text: t("cancel"), style: "cancel" },
         {
           text: t("remove"),
-          style: { color: colors.danger },
+          style: "destructive",
           onPress: () => {
             void model.remove();
           },
