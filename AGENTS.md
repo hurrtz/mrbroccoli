@@ -148,6 +148,10 @@ These notes are specific to this repository and supplement any parent-level inst
 - Do not increment the user-facing version, Android `versionCode`, or iOS build
   number for each individual change. Increment them only when preparing a new
   distributable release.
+- Repository metadata is the version source of truth. Keep EAS configured with
+  `appVersionSource: local` and do not enable EAS `autoIncrement`; version and
+  build-number changes must be made by the reviewed version-bump script and
+  committed.
 - Treat an explicit user announcement or request to create a new version as
   authorization to complete the entire release workflow below without stopping
   after the metadata changes:
@@ -202,6 +206,8 @@ These notes are specific to this repository and supplement any parent-level inst
   - `npm test`
 - Home screen icons, launcher assets, and many native dependency changes require a native rebuild. OTA updates are not enough.
 - Be careful around `ios/Podfile.lock` and native dependency versions. Do not churn native lockfiles unless the change actually requires it.
+- Android release builds must fail when production signing material is missing
+  or incomplete. Never fall back to the debug key for a release artifact.
 
 ## Licensing And Provider Terms
 

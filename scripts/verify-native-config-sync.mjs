@@ -9,6 +9,7 @@ const readBytes = (path) => readFileSync(resolve(root, path));
 const appConfig = JSON.parse(readText("app.json")).expo;
 const packageJson = JSON.parse(readText("package.json"));
 const packageLock = JSON.parse(readText("package-lock.json"));
+const easConfig = JSON.parse(readText("eas.json"));
 const iosInfo = readText("ios/MrBroccoli/Info.plist");
 const iosPodfile = readText("ios/Podfile");
 const iosProject = readText("ios/MrBroccoli.xcodeproj/project.pbxproj");
@@ -98,6 +99,12 @@ const iosDeploymentTargets = [
 ].map((match) => match[1]);
 
 assertEqual("package.json version", packageJson.version, appConfig.version);
+assertEqual("EAS version source", easConfig.cli?.appVersionSource, "local");
+assertEqual(
+  "EAS production auto increment",
+  easConfig.build?.production?.autoIncrement ?? false,
+  false,
+);
 assertEqual("package-lock.json version", packageLock.version, appConfig.version);
 assertEqual(
   'package-lock.json packages[""] version',
@@ -164,6 +171,18 @@ assertIncludes(
   "Android unused Sherpa FFmpeg disabled",
   androidGradleProperties,
   "sherpaOnnxDisableFfmpeg=true",
+);
+assertEqual(
+  "Android release debug-signing fallback removed",
+  androidBuild.includes(
+    "signingConfig hasReleaseKeystore ? signingConfigs.release : signingConfigs.debug",
+  ),
+  false,
+);
+assertIncludes(
+  "Android release signing validation",
+  androidBuild,
+  'tasks.register("validateReleaseSigning")',
 );
 assertAllEqual(
   "iOS marketing version",

@@ -129,7 +129,9 @@ android {
             signingConfig signingConfigs.debug
         }
         release {
-            signingConfig hasReleaseKeystore ? signingConfigs.release : signingConfigs.debug
+            if (hasReleaseKeystore) {
+                signingConfig signingConfigs.release
+            }
             def enableShrinkResources = findProperty('android.enableShrinkResourcesInReleaseBuilds') ?: 'false'
             shrinkResources enableShrinkResources.toBoolean()
             minifyEnabled enableMinifyInReleaseBuilds
@@ -146,6 +148,37 @@ android {
     }
     androidResources {
         ignoreAssetsPattern '!.svn:!.git:!.ds_store:!*.scc:!CVS:!thumbs.db:!picasa.ini:!*~'
+    }
+}
+
+def validateReleaseSigning = tasks.register("validateReleaseSigning") {
+    group = "verification"
+    description = "Fails before a release build when the production keystore is incomplete."
+
+    doLast {
+        if (!hasReleaseKeystore) {
+            throw new GradleException(
+                "Release signing requires android/keystore.properties with storeFile, storePassword, keyAlias, and keyPassword."
+            )
+        }
+
+        def releaseStoreFile = rootProject.file(keystoreProperties['storeFile'])
+        if (!releaseStoreFile.exists()) {
+            throw new GradleException(
+                "Release signing keystore does not exist: ${releaseStoreFile}"
+            )
+        }
+    }
+}
+
+tasks.configureEach { task ->
+    if (
+        task.name.endsWith("Release") &&
+        (task.name.startsWith("assemble") ||
+            task.name.startsWith("bundle") ||
+            task.name.startsWith("package"))
+    ) {
+        task.dependsOn(validateReleaseSigning)
     }
 }
 
