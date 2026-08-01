@@ -49,6 +49,11 @@ coverage/
 !/ios/Podfile.lock
 !/ios/MrBroccoli/
 /ios/MrBroccoli/*
+!/ios/MrBroccoli/AppDelegate.swift
+!/ios/MrBroccoli/Images.xcassets/
+!/ios/MrBroccoli/Images.xcassets/**
+!/ios/MrBroccoli/MrBroccoli-Bridging-Header.h
+!/ios/MrBroccoli/MrBroccoli.entitlements
 !/ios/MrBroccoli/Waveform/
 !/ios/MrBroccoli/Waveform/**
 !/ios/MrBroccoli/MrBroccoliAudioQueueCoordinator.h
@@ -64,6 +69,10 @@ coverage/
 !/ios/MrBroccoli/MrBroccoliVoiceLiveActivity.swift
 !/ios/MrBroccoli/MrBroccoliVoiceLiveActivityBridge.m
 !/ios/MrBroccoli/Info.plist
+!/ios/MrBroccoli/PrivacyInfo.xcprivacy
+!/ios/MrBroccoli/SplashScreen.storyboard
+!/ios/MrBroccoli/Supporting/
+!/ios/MrBroccoli/Supporting/**
 !/ios/MrBroccoliLiveActivity/
 /ios/MrBroccoliLiveActivity/*
 !/ios/MrBroccoliLiveActivity/Info.plist
