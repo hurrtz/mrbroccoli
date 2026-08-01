@@ -197,6 +197,12 @@ These notes are specific to this repository and supplement any parent-level inst
 
 ## Testing And Verification
 
+- Every bug fix must include an automated regression test at the closest
+  reliable layer (unit, integration, native instrumentation, Maestro E2E, or
+  another appropriate automated check) that fails for the reported behavior
+  before the fix and passes afterward. A bug fix is not complete, committable,
+  or releasable without that test; keep the fix and its regression test in the
+  same atomic commit.
 - `npm run static:verify` is the repository static-analysis gate. It runs
   ESLint with zero tolerated warnings plus Knip checks for unused files,
   dependencies, unresolved imports, and dependency cycles.
