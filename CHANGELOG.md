@@ -35,6 +35,9 @@ the complete Play Store translations are kept in a dedicated file under
   with accessibility-large text on compact screens.
 - Prevent decorative application and provider icons from creating duplicate or
   confusing screen-reader stops.
+- Make voice-preview Stop respond immediately during Kokoro or provider speech
+  generation, prevent cancelled previews from playing later, and report
+  intentional cancellation separately from synthesis failures.
 
 ### Store release notes
 
