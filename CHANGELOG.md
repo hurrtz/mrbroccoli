@@ -10,16 +10,6 @@ the complete Play Store translations are kept in a dedicated file under
 
 ## Unreleased
 
-### Changed
-
-- Made Uber Mode deliberation more efficient and adversarial: reviewers now
-  receive only each participant's latest provider-anonymous
-  position, actively stress-test agreement, stop unused rounds after explicit
-  unanimous convergence, and share the conversation summary consistently with
-  every participant. Intermediate answers remain concise without a restrictive
-  word target, while the final synthesis retains earlier successful reasoning
-  within a safe context budget and always keeps every model's latest position.
-
 ## 2.7.0 - 2026-08-01
 
 ### Changed
@@ -32,6 +22,12 @@ the complete Play Store translations are kept in a dedicated file under
 - Strengthen release validation with fresh-checkout static analysis, enforced
   coverage and TypeScript checks, native lifecycle tests, release-size and
   secret budgets, and cross-platform accessibility and localization audits.
+- Make Uber Mode deliberation more efficient and adversarial: reviewers receive
+  each participant's latest provider-anonymous position, actively stress-test
+  agreement, and stop unused rounds after explicit unanimous convergence.
+  Intermediate answers retain material reasoning without a restrictive word
+  target, while final synthesis preserves earlier successful reasoning within
+  a safe context budget and always keeps every model's latest position.
 
 ### Fixed
 
