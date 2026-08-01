@@ -17,6 +17,8 @@ the complete Play Store translations are kept in a dedicated file under
 - Keep backup export responsive by deriving encryption keys on a native
   background queue, reject duplicate exports and obviously weak passphrases,
   and retain shared files long enough for mail apps to attach them reliably.
+- Prevent provider and model provenance labels from accumulating at the start
+  of replies across repeated conversation turns.
 
 ## 2.7.0 - 2026-08-01
 
