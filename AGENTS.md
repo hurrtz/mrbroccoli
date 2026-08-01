@@ -215,22 +215,25 @@ These notes are specific to this repository and supplement any parent-level inst
   starts with this isolated validation before native build and device gates.
 - Keep `.githooks/pre-push` repository-relative and non-interactive. Do not put
   live provider calls or Maestro device work in the pre-push hook.
+- The paid provider/model matrix is authorized only when the user explicitly
+  asks to wrap the accumulated batch of commits into a new version. Do not run
+  `make pre-release-live` or the combined `make pre-release` target during
+  investigation, feature or bug implementation, individual commits, pushes,
+  ordinary build verification, or merely because work is accumulating under
+  `Unreleased`. Normal development and push validation must remain spend-free.
 - The comprehensive pre-release workflow must run
   `make prerelease-preflight` before every provider or other quota-consuming
   request. A missing credential, release keystore, or cost ceiling aborts the
   entire run; partial provider coverage is not a release pass.
-- Run `make pre-release-live` only as an explicit release phase. It derives the
-  complete live matrix from `runtimeManifest.ts`, tests every retained LLM
-  model and offered effort, every STT/TTS model, one compatible voice per TTS
-  model, provider voice directories, web-search providers, and exposed search
-  modes. The runner must stop on the first failure, must not print credentials,
-  and must reject its conservative request reservation before network access
-  when it exceeds `MR_BROCCOLI_PRERELEASE_MAX_USD`.
-- Release-specific exception: the complete 209-step paid provider matrix has
-  already passed for 2.6.0. Do not run `make pre-release-live` or the combined
-  `make pre-release` target again for any remaining 2.6.0 work. Use the
-  spend-free and relevant device/visual gates instead. Resume the complete paid
-  matrix for the release after 2.6.0.
+- Once that explicit new-version request has been given, the
+  `make pre-release-live` target derives the complete live matrix from
+  `runtimeManifest.ts`,
+  tests every retained LLM model and offered effort, every STT/TTS model, one
+  compatible voice per TTS model, provider voice directories, web-search
+  providers, and exposed search modes. The runner must stop on the first
+  failure, must not print credentials, and must reject its conservative request
+  reservation before network access when it exceeds
+  `MR_BROCCOLI_PRERELEASE_MAX_USD`.
 - Every attempted live matrix must leave private JSON and Markdown cost reports
   in `artifacts/provider-matrix/`, including on failure. Retain only sanitized
   numeric provider usage and deterministic fixture units; never persist keys,
