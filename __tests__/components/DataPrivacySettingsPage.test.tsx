@@ -7,6 +7,7 @@ import * as Sharing from "expo-sharing";
 import { DataPrivacySettingsPage } from "../../src/features/settings/pages/DataPrivacySettingsPage";
 import { Modal as NativeDialog } from "../../src/design-system/NativeControls";
 import { LocalizationProvider } from "../../src/i18n";
+import * as AppDataBackupService from "../../src/services/appDataBackup";
 import {
   APP_DATA_BACKUP_MAX_BYTES,
   serializeAppDataBackup,
@@ -93,6 +94,10 @@ describe("DataPrivacySettingsPage", () => {
     });
   });
 
+  afterEach(() => {
+    jest.restoreAllMocks();
+  });
+
   it("exports a readable backup through a temporary file and removes it", async () => {
     const backup = createBackup();
     const screen = renderPage({
@@ -156,6 +161,193 @@ describe("DataPrivacySettingsPage", () => {
       "file:///cache/backup.json",
       { idempotent: true },
     );
+  });
+
+  it("validates and exports an encrypted backup through the passphrase dialog", async () => {
+    const backup = createBackup();
+    const encryptedDocument = JSON.stringify({
+      cipher: {
+        combined: "encrypted-payload",
+        ivBytes: 12,
+        name: "aes-256-gcm",
+        tagBytes: 16,
+      },
+      format: "mrbroccoli-app-data-encrypted",
+      kdf: {
+        iterations: 310_000,
+        name: "pbkdf2-hmac-sha256",
+        salt: "test-salt",
+      },
+      version: 1,
+    });
+    const encryptBackup = jest
+      .spyOn(AppDataBackupService, "encryptAppDataBackup")
+      .mockResolvedValue(encryptedDocument);
+    const onCreateAppDataBackup = jest.fn(async () => backup);
+    const screen = renderPage({ onCreateAppDataBackup });
+
+    fireEvent.press(screen.getByTestId("export-encrypted-backup"));
+    expect(getVisibleModal(screen)?.props.title).toBe(
+      "Protect this backup",
+    );
+
+    fireEvent.changeText(screen.getByTestId("backup-passphrase"), "short");
+    fireEvent.changeText(
+      screen.getByTestId("backup-passphrase-confirmation"),
+      "short",
+    );
+    await act(async () => {
+      getVisibleModal(screen)?.props.footer[1].onPress();
+    });
+    expect(screen.getByRole("alert").props.children).toBe(
+      "Use at least 12 characters. Store this passphrase safely; it cannot be recovered.",
+    );
+    expect(onCreateAppDataBackup).not.toHaveBeenCalled();
+
+    fireEvent.changeText(
+      screen.getByTestId("backup-passphrase"),
+      "a long test passphrase",
+    );
+    fireEvent.changeText(
+      screen.getByTestId("backup-passphrase-confirmation"),
+      "a long test passphrase",
+    );
+    await act(async () => {
+      getVisibleModal(screen)?.props.footer[1].onPress();
+    });
+
+    await waitFor(() => expect(Sharing.shareAsync).toHaveBeenCalledTimes(1));
+    expect(encryptBackup).toHaveBeenCalledWith(
+      backup,
+      "a long test passphrase",
+    );
+    const sharedPath = jest.mocked(Sharing.shareAsync).mock.calls[0][0];
+    expect(sharedPath).toMatch(/\.mrbroccoli\.encrypted$/);
+    expect(FileSystem.writeAsStringAsync).toHaveBeenCalledWith(
+      sharedPath,
+      encryptedDocument,
+    );
+    expect(Sharing.shareAsync).toHaveBeenCalledWith(
+      sharedPath,
+      expect.objectContaining({ mimeType: "application/octet-stream" }),
+    );
+    expect(getVisibleModal(screen)).toBeUndefined();
+  });
+
+  it("unlocks an encrypted import before showing the restore preview", async () => {
+    const backup = createBackup();
+    const encryptedDocument = JSON.stringify({
+      format: "mrbroccoli-app-data-encrypted",
+      version: 1,
+    });
+    const decryptBackup = jest
+      .spyOn(AppDataBackupService, "decryptAppDataBackup")
+      .mockResolvedValue(backup);
+    const onRestoreAppDataBackup = jest.fn(async () => ({
+      conversationsCopied: 0,
+      conversationsRestored: 1,
+      conversationsSkipped: 0,
+      settingsRestored: true,
+    }));
+    jest.mocked(DocumentPicker.getDocumentAsync).mockResolvedValue({
+      canceled: false,
+      assets: [
+        {
+          name: "backup.encrypted",
+          size: 512,
+          uri: "file:///cache/backup.encrypted",
+          mimeType: "application/octet-stream",
+          lastModified: 1_000,
+        },
+      ],
+    });
+    jest.mocked(FileSystem.readAsStringAsync).mockResolvedValue(
+      encryptedDocument,
+    );
+    const screen = renderPage({ onRestoreAppDataBackup });
+
+    fireEvent.press(screen.getByTestId("import-app-data-backup"));
+    await waitFor(() => {
+      expect(getVisibleModal(screen)?.props.title).toBe(
+        "Unlock encrypted backup",
+      );
+    });
+    expect(onRestoreAppDataBackup).not.toHaveBeenCalled();
+
+    fireEvent.changeText(
+      screen.getByTestId("import-backup-passphrase"),
+      "a long test passphrase",
+    );
+    await act(async () => {
+      getVisibleModal(screen)?.props.footer[1].onPress();
+    });
+
+    await waitFor(() => {
+      expect(getVisibleModal(screen)?.props.title).toBe(
+        "Restore this backup?",
+      );
+    });
+    expect(decryptBackup).toHaveBeenCalledWith(
+      encryptedDocument,
+      "a long test passphrase",
+    );
+    expect(onRestoreAppDataBackup).not.toHaveBeenCalled();
+
+    await act(async () => {
+      getVisibleModal(screen)?.props.footer[1].onPress();
+    });
+    await waitFor(() => {
+      expect(onRestoreAppDataBackup).toHaveBeenCalledWith(backup);
+      expect(screen.getByTestId("backup-restore-result")).toBeTruthy();
+    });
+  });
+
+  it("surfaces share and restore failures without reporting success", async () => {
+    jest.mocked(Sharing.isAvailableAsync).mockResolvedValue(false);
+    const screen = renderPage({
+      onRestoreAppDataBackup: jest.fn(async () => {
+        throw new Error("restore failed");
+      }),
+    });
+
+    fireEvent.press(screen.getByTestId("export-readable-backup"));
+    await waitFor(() => {
+      expect(screen.getByRole("alert").props.children).toBe(
+        "File sharing is not available on this device.",
+      );
+    });
+    expect(Sharing.shareAsync).not.toHaveBeenCalled();
+
+    const backup = createBackup();
+    jest.mocked(DocumentPicker.getDocumentAsync).mockResolvedValue({
+      canceled: false,
+      assets: [
+        {
+          name: "backup.json",
+          size: 512,
+          uri: "file:///cache/backup.json",
+          mimeType: "application/json",
+          lastModified: 1_000,
+        },
+      ],
+    });
+    jest
+      .mocked(FileSystem.readAsStringAsync)
+      .mockResolvedValue(serializeAppDataBackup(backup));
+
+    fireEvent.press(screen.getByTestId("import-app-data-backup"));
+    await waitFor(() => {
+      expect(getVisibleModal(screen)?.props.title).toBe("Restore this backup?");
+    });
+    await act(async () => {
+      getVisibleModal(screen)?.props.footer[1].onPress();
+    });
+    await waitFor(() => {
+      expect(screen.getByRole("alert").props.children).toBe(
+        "The backup could not be imported.",
+      );
+    });
+    expect(screen.queryByTestId("backup-restore-result")).toBeNull();
   });
 
   it("rejects an oversized import before reading or restoring it", async () => {
