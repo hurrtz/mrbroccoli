@@ -12,6 +12,7 @@ import {
 } from "./verify-maestro-suite.mjs";
 import {
   configureAccessibilityDisplay,
+  localeNeedsSafeScroll,
   runFlow,
 } from "./run-maestro-suite.mjs";
 
@@ -43,6 +44,12 @@ test("counts only explicit screenshot commands", () => {
 `),
     2,
   );
+});
+
+test("only nudges lower iOS locale rows into the safe tap area", () => {
+  assert.equal(localeNeedsSafeScroll("ios", 9), false);
+  assert.equal(localeNeedsSafeScroll("ios", 10), true);
+  assert.equal(localeNeedsSafeScroll("android", 18), false);
 });
 
 test("verifies the repository Maestro matrix", () => {

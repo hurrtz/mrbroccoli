@@ -245,6 +245,16 @@ export function validateMaestroSuite(cwd = process.cwd()) {
     );
   }
 
+  if (
+    !/LOCALE_NEEDS_SAFE_SCROLL[\s\S]{0,160}start:\s*50%,80%[\s\S]{0,80}end:\s*50%,65%/.test(
+      localizedFlow,
+    )
+  ) {
+    errors.push(
+      "Localized Maestro coverage must move lower iOS language rows into the safe tap area",
+    );
+  }
+
   if (!/id:\s*\^app-settings-page-\$\{LOCALE\}\$/.test(localizedFlow)) {
     errors.push(
       "Localized Maestro coverage must assert the exact active language after selection",

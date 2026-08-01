@@ -30,6 +30,14 @@ tags:
     element:
       id: ^app-language-picker-option-${LOCALE}$
     direction: DOWN
+- runFlow:
+    when:
+      true: ${LOCALE_NEEDS_SAFE_SCROLL == 'true'}
+    commands:
+      - swipe:
+          start: 50%,80%
+          end: 50%,65%
+          duration: 400
 - tapOn:
     id: ^app-language-picker-option-${LOCALE}$
 - assertVisible:

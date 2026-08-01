@@ -99,6 +99,10 @@ function versionAtLeast(actualText, minimumText) {
   return true;
 }
 
+export function localeNeedsSafeScroll(platform, configuredIndex) {
+  return platform === "ios" && configuredIndex >= 10;
+}
+
 function runCommand(command, args, options = {}) {
   const result = spawnSync(command, args, {
     cwd: options.cwd,
@@ -478,6 +482,9 @@ function main() {
     }
 
     for (const { value: language } of locales) {
+      const configuredIndex = configuredLocales.findIndex(
+        ({ value }) => value === language,
+      );
       process.stdout.write(
         `Running ${options.platform} localized coverage: ${language}\n`,
       );
@@ -485,6 +492,12 @@ function main() {
         cwd,
         environment: {
           LOCALE: language,
+          LOCALE_NEEDS_SAFE_SCROLL: localeNeedsSafeScroll(
+            options.platform,
+            configuredIndex,
+          )
+            ? "true"
+            : "false",
           PLATFORM: options.platform,
         },
         expectedScreenshotCount: verification.localizedScreenshotCount,
