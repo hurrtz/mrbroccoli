@@ -761,7 +761,7 @@ describe("MainScreen", () => {
     expect(screen.getByText("transcript-style-control")).toBeTruthy();
   });
 
-  it("uses the reduced two-pane landscape hierarchy", () => {
+  it("uses the balanced two-pane landscape hierarchy", () => {
     const provider = DEFAULT_SETTINGS.responseModes[0].route.provider;
     const route = {
       provider,
@@ -793,7 +793,7 @@ describe("MainScreen", () => {
     expect(
       StyleSheet.flatten(screen.getByTestId("landscape-left-pane").props.style)
         .flex,
-    ).toBe(0.42);
+    ).toBe(0.9);
     expect(screen.getByTestId("landscape-pane-divider")).toBeTruthy();
     expect(
       screen.getByTestId("route-web-search-container").props.accessibilityState,
