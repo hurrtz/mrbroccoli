@@ -41,6 +41,40 @@ function escapeHtml(value) {
     .replaceAll('"', "&quot;");
 }
 
+function validateScreenReaderEvidence(releaseRoot, platform) {
+  const evidencePath = path.join(
+    releaseRoot,
+    "screen-reader",
+    platform,
+    "evidence.json",
+  );
+  const hierarchyPath = path.join(
+    releaseRoot,
+    "screen-reader",
+    platform,
+    "hierarchy.json",
+  );
+
+  if (!fs.existsSync(evidencePath) || !fs.existsSync(hierarchyPath)) {
+    return [`${platform} screen-reader evidence is missing`];
+  }
+
+  try {
+    const evidence = JSON.parse(fs.readFileSync(evidencePath, "utf8"));
+    const expectedReader = platform === "android" ? "TalkBack" : "VoiceOver";
+    const controls = Array.isArray(evidence.controls) ? evidence.controls : [];
+
+    return evidence.platform === platform &&
+      evidence.reader === expectedReader &&
+      evidence.readerActive === true &&
+      controls.length >= 7
+      ? []
+      : [`${platform} screen-reader evidence is incomplete`];
+  } catch {
+    return [`${platform} screen-reader evidence is invalid JSON`];
+  }
+}
+
 export function verifyMaestroArtifacts(cwd = process.cwd()) {
   const releaseRoot = path.join(cwd, "artifacts", "maestro", "release");
   const physicalRoot = path.join(
@@ -78,6 +112,8 @@ export function verifyMaestroArtifacts(cwd = process.cwd()) {
         `${platform} release screenshots: expected ${expectedPlatformCount}, found ${actualCount}`,
       );
     }
+
+    errors.push(...validateScreenReaderEvidence(releaseRoot, platform));
 
     for (const language of languages) {
       const localeRoot = path.join(platformRoot, "locales", language);

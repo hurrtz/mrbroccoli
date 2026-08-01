@@ -44,6 +44,25 @@ test("verifies every locale and emits a review manifest and gallery", () => {
     const releaseRoot = path.join(cwd, "artifacts", "maestro", "release");
 
     for (const platform of ["android", "ios"]) {
+      const screenReaderRoot = path.join(
+        releaseRoot,
+        "screen-reader",
+        platform,
+      );
+      fs.mkdirSync(screenReaderRoot, { recursive: true });
+      fs.writeFileSync(
+        path.join(screenReaderRoot, "evidence.json"),
+        JSON.stringify({
+          controls: Array.from({ length: 7 }, (_, index) => ({ id: index })),
+          platform,
+          reader: platform === "android" ? "TalkBack" : "VoiceOver",
+          readerActive: true,
+        }),
+      );
+      fs.writeFileSync(
+        path.join(screenReaderRoot, "hierarchy.json"),
+        JSON.stringify({ attributes: {}, children: [] }),
+      );
       writePng(
         path.join(
           releaseRoot,

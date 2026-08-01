@@ -12,6 +12,8 @@ export const MAESTRO_LAYOUT_FLOW =
   ".maestro/flows/visual/drive-three-routes-landscape.yaml";
 export const MAESTRO_ACCESSIBILITY_FLOW =
   ".maestro/flows/visual/accessibility-display.yaml";
+export const MAESTRO_SCREEN_READER_FLOW =
+  ".maestro/flows/accessibility/screen-reader-home.yaml";
 
 const REQUIRED_LOCALIZED_SELECTORS = [
   "app-language-picker-option-${LOCALE}",
@@ -129,6 +131,7 @@ export function validateMaestroSuite(cwd = process.cwd()) {
   const smokeFlowPath = path.join(cwd, MAESTRO_SMOKE_FLOW);
   const layoutFlowPath = path.join(cwd, MAESTRO_LAYOUT_FLOW);
   const accessibilityFlowPath = path.join(cwd, MAESTRO_ACCESSIBILITY_FLOW);
+  const screenReaderFlowPath = path.join(cwd, MAESTRO_SCREEN_READER_FLOW);
   const configPath = path.join(cwd, ".maestro/config.yaml");
 
   for (const filePath of [
@@ -136,6 +139,7 @@ export function validateMaestroSuite(cwd = process.cwd()) {
     smokeFlowPath,
     layoutFlowPath,
     accessibilityFlowPath,
+    screenReaderFlowPath,
     configPath,
   ]) {
     if (!fs.existsSync(filePath)) {
@@ -156,11 +160,13 @@ export function validateMaestroSuite(cwd = process.cwd()) {
   const smokeFlow = fs.readFileSync(smokeFlowPath, "utf8");
   const layoutFlow = fs.readFileSync(layoutFlowPath, "utf8");
   const accessibilityFlow = fs.readFileSync(accessibilityFlowPath, "utf8");
+  const screenReaderFlow = fs.readFileSync(screenReaderFlowPath, "utf8");
   const maestroSource = [
     localizedFlow,
     smokeFlow,
     layoutFlow,
     accessibilityFlow,
+    screenReaderFlow,
     fs.readFileSync(configPath, "utf8"),
   ].join("\n");
 
@@ -176,6 +182,16 @@ export function validateMaestroSuite(cwd = process.cwd()) {
   ]) {
     if (!layoutFlow.includes(selector)) {
       errors.push(`Landscape Maestro coverage is missing selector: ${selector}`);
+    }
+  }
+
+  for (const selector of [
+    "setup-guide-card",
+    "setup-guide-not-now",
+    "main-screen",
+  ]) {
+    if (!screenReaderFlow.includes(selector)) {
+      errors.push(`Screen-reader preparation is missing selector: ${selector}`);
     }
   }
 

@@ -274,6 +274,24 @@ export function runMaestroPrerelease({
     suite: "all",
     udid: iosSimulator,
   });
+  for (const [platform, udid] of [
+    ["android", androidEmulator],
+    ["ios", iosSimulator],
+  ]) {
+    run(
+      process.execPath,
+      [
+        "scripts/run-screen-reader-check.mjs",
+        "--platform",
+        platform,
+        "--udid",
+        udid,
+        "--output-dir",
+        "artifacts/maestro/release/screen-reader",
+      ],
+      { cwd },
+    );
+  }
   runMaestroSuite({
     cwd,
     outputDirectory: "artifacts/maestro/release-physical",

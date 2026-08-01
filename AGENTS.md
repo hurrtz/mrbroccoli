@@ -251,8 +251,10 @@ These notes are specific to this repository and supplement any parent-level inst
   exercises every registered UI language on Android and iOS, runs the known
   Drive/three-route landscape regression, temporarily applies dark mode,
   increased contrast, and accessibility-large text on both simulators, and
-  runs physical Android smoke coverage. Simulator display settings are restored
-  even when a flow fails.
+  runs VoiceOver and TalkBack hierarchy checks against labelled home controls,
+  and runs physical Android smoke coverage. Simulator display and screen-reader
+  settings are restored even when a flow fails. The Android emulator image must
+  include Google TalkBack.
 - A Maestro command pass is not the visual verdict. Review every image in
   `artifacts/maestro/release/review-gallery.html` for clipping, overlap,
   untranslated copy, RTL direction, missing content, and inconsistent states

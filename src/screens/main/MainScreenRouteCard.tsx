@@ -61,6 +61,7 @@ export const MainScreenRouteCard = React.memo(function MainScreenRouteCard({
         </View>
       ) : (
         <TouchableOpacity
+          testID="provider-empty-state"
           style={[
             styles.providerEmptyState,
             compact ? styles.providerEmptyStateCompact : null,

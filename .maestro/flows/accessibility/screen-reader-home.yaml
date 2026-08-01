@@ -1,0 +1,17 @@
+appId: com.tobiaswinkler.app.mrbroccoli
+name: Prepare screen-reader home coverage
+tags:
+  - accessibility
+---
+- launchApp:
+    clearState: true
+    clearKeychain: true
+    permissions:
+      all: allow
+- assertVisible:
+    id: setup-guide-card
+- tapOn:
+    id: setup-guide-not-now
+- assertVisible:
+    id: main-screen
+- setOrientation: PORTRAIT

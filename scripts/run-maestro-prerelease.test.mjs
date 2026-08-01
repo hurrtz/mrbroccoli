@@ -114,6 +114,9 @@ emulator-5554 device product:sdk model:Pixel transport_id:1
     const secretScan = calls.find(({ args }) =>
       args.includes("scripts/verify-release-artifact-secrets.mjs"),
     );
+    const screenReaderChecks = calls.filter(({ args }) =>
+      args.includes("scripts/run-screen-reader-check.mjs"),
+    );
 
     assert.deepEqual(androidBuild.options.env, {
       EXPO_NO_DOTENV: "1",
@@ -124,6 +127,10 @@ emulator-5554 device product:sdk model:Pixel transport_id:1
       NODE_ENV: "production",
     });
     assert.ok(secretScan);
+    assert.deepEqual(
+      screenReaderChecks.map(({ args }) => args[2]),
+      ["android", "ios"],
+    );
     assert.equal(secretScan.args.at(-2).endsWith("app-release.apk"), true);
     assert.equal(secretScan.args.at(-1).endsWith("MrBroccoli.app"), true);
   } finally {
