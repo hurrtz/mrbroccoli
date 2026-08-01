@@ -99,10 +99,6 @@ function versionAtLeast(actualText, minimumText) {
   return true;
 }
 
-function escapeRegularExpression(value) {
-  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-}
-
 function runCommand(command, args, options = {}) {
   const result = spawnSync(command, args, {
     cwd: options.cwd,
@@ -481,7 +477,7 @@ function main() {
       );
     }
 
-    for (const { label, value: language } of locales) {
+    for (const { value: language } of locales) {
       process.stdout.write(
         `Running ${options.platform} localized coverage: ${language}\n`,
       );
@@ -489,7 +485,6 @@ function main() {
         cwd,
         environment: {
           LOCALE: language,
-          LOCALE_LABEL_REGEX: escapeRegularExpression(label),
           PLATFORM: options.platform,
         },
         expectedScreenshotCount: verification.localizedScreenshotCount,

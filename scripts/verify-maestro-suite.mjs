@@ -229,9 +229,9 @@ export function validateMaestroSuite(cwd = process.cwd()) {
   const exactLanguageOptionSelectors = localizedFlow.match(
     /id:\s*\^app-language-picker-option-\$\{LOCALE\}\$/g,
   );
-  if ((exactLanguageOptionSelectors?.length ?? 0) < 1) {
+  if ((exactLanguageOptionSelectors?.length ?? 0) < 2) {
     errors.push(
-      "Localized Maestro coverage must use an exact requested-language selector for scrolling",
+      "Localized Maestro coverage must find and tap the exact requested-language selector",
     );
   }
 
@@ -245,25 +245,9 @@ export function validateMaestroSuite(cwd = process.cwd()) {
     );
   }
 
-  if (
-    !/id:\s*\^app-language-picker-option-\$\{LOCALE\}\$[\s\S]{0,180}start:\s*50%,80%[\s\S]{0,80}end:\s*50%,65%/.test(
-      localizedFlow,
-    )
-  ) {
-    errors.push(
-      "Localized Maestro coverage must move bottom-edge language rows into the iOS safe tap area",
-    );
-  }
-
   if (!/id:\s*\^app-settings-page-\$\{LOCALE\}\$/.test(localizedFlow)) {
     errors.push(
       "Localized Maestro coverage must assert the exact active language after selection",
-    );
-  }
-
-  if (!/text:\s*\^\$\{LOCALE_LABEL_REGEX\}\$/.test(localizedFlow)) {
-    errors.push(
-      "Localized Maestro coverage must tap the exact visible native-language label",
     );
   }
 

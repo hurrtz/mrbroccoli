@@ -30,12 +30,8 @@ tags:
     element:
       id: ^app-language-picker-option-${LOCALE}$
     direction: DOWN
-- swipe:
-    start: 50%,80%
-    end: 50%,65%
-    duration: 400
 - tapOn:
-    text: ^${LOCALE_LABEL_REGEX}$
+    id: ^app-language-picker-option-${LOCALE}$
 - assertVisible:
     id: settings-page-app
 - assertVisible:
