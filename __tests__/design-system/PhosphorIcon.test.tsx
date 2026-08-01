@@ -3,6 +3,7 @@ import path from "node:path";
 
 import React from "react";
 import { render } from "@testing-library/react-native";
+import { StyleSheet } from "react-native";
 
 import {
   ICON_SIZE,
@@ -42,11 +43,16 @@ describe("Phosphor icon system", () => {
     const screen = render(
       <PhosphorIcon name="info-circle" size="navigation" color="#123456" />,
     );
-    const icon = screen.getByTestId("phosphor-icon-info-circle");
+    const icon = screen.UNSAFE_getByProps({
+      testID: "phosphor-icon-info-circle",
+    });
 
     expect(icon.props.accessible).toBe(false);
-    expect(icon.props.width).toBe(24);
-    expect(icon.props.height).toBe(24);
+    expect(icon.props.accessibilityElementsHidden).toBe(true);
+    expect(icon.props.focusable).toBe(false);
+    expect(icon.props.importantForAccessibility).toBe("no-hide-descendants");
+    expect(StyleSheet.flatten(icon.props.style).width).toBe(24);
+    expect(StyleSheet.flatten(icon.props.style).height).toBe(24);
   });
 
   it("keeps every application glyph regular and on the shared wrapper", () => {

@@ -142,6 +142,9 @@ export function resolveIconSize(size: IconSize) {
 
 type DecorativeIconProps = IconProps & {
   accessible?: boolean;
+  accessibilityElementsHidden?: boolean;
+  focusable?: boolean;
+  importantForAccessibility?: "auto" | "yes" | "no" | "no-hide-descendants";
 };
 
 export function PhosphorIcon({
@@ -165,7 +168,10 @@ export function PhosphorIcon({
   return (
     <Glyph
       accessible={false}
+      accessibilityElementsHidden
       color={color}
+      focusable={false}
+      importantForAccessibility="no-hide-descendants"
       size={resolvedSize}
       style={[{ color, width: resolvedSize, height: resolvedSize }, style]}
       testID={testID ?? `phosphor-icon-${name}`}

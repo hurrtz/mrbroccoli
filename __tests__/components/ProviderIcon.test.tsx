@@ -7,12 +7,15 @@ describe("ProviderIcon", () => {
   it("renders a bundled provider component with the requested color", () => {
     const screen = render(<ProviderIcon provider="xai" color="#123456" />);
 
-    expect(screen.getByTestId("provider-icon-xai").props).toEqual(
+    expect(screen.UNSAFE_getByProps({ testID: "provider-icon-xai" }).props).toEqual(
       expect.objectContaining({
         accessible: false,
+        accessibilityElementsHidden: true,
         color: "#123456",
         fill: "#123456",
+        focusable: false,
         height: 24,
+        importantForAccessibility: "no-hide-descendants",
         width: 24,
       }),
     );
@@ -27,7 +30,15 @@ describe("ProviderIcon", () => {
       />,
     );
 
-    expect(screen.getByText("FP")).toBeTruthy();
+    expect(
+      screen.UNSAFE_getByProps({ testID: "provider-icon-future-provider" }).props,
+    ).toEqual(
+      expect.objectContaining({
+        accessible: false,
+        accessibilityElementsHidden: true,
+        importantForAccessibility: "no-hide-descendants",
+      }),
+    );
   });
 
   it("supports compact icon sizing without changing the source asset", () => {
@@ -35,7 +46,7 @@ describe("ProviderIcon", () => {
       <ProviderIcon provider="xai" color="#123456" size="compact" />,
     );
 
-    expect(screen.getByTestId("provider-icon-xai").props).toEqual(
+    expect(screen.UNSAFE_getByProps({ testID: "provider-icon-xai" }).props).toEqual(
       expect.objectContaining({ height: 16, width: 16 }),
     );
   });

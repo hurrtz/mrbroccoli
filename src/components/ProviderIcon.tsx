@@ -76,6 +76,10 @@ export function ProviderIcon({
   if (!Icon) {
     return (
       <Text
+        accessible={false}
+        accessibilityElementsHidden
+        importantForAccessibility="no-hide-descendants"
+        testID={`provider-icon-${provider}`}
         style={{
           color,
           fontSize: Math.max(12, targetSize / 2),
@@ -105,6 +109,9 @@ export function ProviderIcon({
       color={color}
       fill={color}
       accessible={false}
+      accessibilityElementsHidden
+      focusable={false}
+      importantForAccessibility="no-hide-descendants"
       testID={`provider-icon-${provider}`}
     />
   );
