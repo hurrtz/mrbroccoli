@@ -19,6 +19,8 @@ the complete Play Store translations are kept in a dedicated file under
   and retain shared files long enough for mail apps to attach them reliably.
 - Prevent provider and model provenance labels from accumulating at the start
   of replies across repeated conversation turns.
+- Reject recordings with clear silence before sending them to provider speech
+  recognition, avoiding hallucinated one-word prompts such as “No” or “One”.
 
 ## 2.7.0 - 2026-08-01
 

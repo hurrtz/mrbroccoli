@@ -3,6 +3,7 @@ import {
   getRecordingPermissionsAsync,
   requestRecordingPermissionsAsync,
 } from "expo-audio";
+import * as FileSystem from "expo-file-system/legacy";
 
 import { useAudioRecorder } from "../../src/hooks/useAudioRecorder";
 import {
@@ -226,6 +227,40 @@ describe("useAudioRecorder permissions", () => {
 
     expect(cancelNativeWaveformRecording).toHaveBeenCalledTimes(1);
     expect(stopNativeWaveformRecording).not.toHaveBeenCalled();
+    expect(uri).toBeNull();
+    dateNowSpy.mockRestore();
+  });
+
+  it("discards a silent native recording before provider transcription", async () => {
+    const dateNowSpy = jest.spyOn(Date, "now").mockReturnValue(1_000);
+    const { result } = renderHook(() => useAudioRecorder());
+
+    await act(async () => {
+      await result.current.startRecording();
+    });
+    const sessionId =
+      (startNativeWaveformRecording as jest.Mock).mock.calls[0][0].sessionId;
+    act(() => {
+      [-160, -160, -160, -160].forEach((metering) => {
+        nativeWaveformListener?.({
+          type: "levels",
+          sessionId,
+          metering,
+        });
+      });
+    });
+    dateNowSpy.mockReturnValue(2_000);
+
+    let uri: string | null = "not-cleared";
+    await act(async () => {
+      uri = await result.current.stopRecording();
+    });
+
+    expect(stopNativeWaveformRecording).toHaveBeenCalledWith(sessionId);
+    expect(FileSystem.deleteAsync).toHaveBeenCalledWith(
+      "file:///recording.wav",
+      { idempotent: true },
+    );
     expect(uri).toBeNull();
     dateNowSpy.mockRestore();
   });

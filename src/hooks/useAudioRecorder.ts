@@ -18,6 +18,8 @@ import {
   subscribeToNativeWaveform,
 } from "../services/nativeWaveform";
 import { recordDebugLogEvent } from "../services/debugLogCapture";
+import { cleanupCapturedAudio } from "../services/voicePipeline/cleanup";
+import { assessRecordedSpeech } from "../services/recordingSpeechGate";
 
 export interface RecorderState {
   ambientInputMetering: number | null;
@@ -58,6 +60,7 @@ export function useAudioRecorder() {
     RECORDER_STATUS_INTERVAL_MS,
   );
   const startTimeRef = useRef<number>(0);
+  const recordingMeteringSamplesRef = useRef<number[]>([]);
   const nativeSessionIdRef = useRef<string | null>(null);
   const ambientSessionIdRef = useRef<string | null>(null);
   const [nativeRecording, setNativeRecording] = useState(false);
@@ -117,6 +120,7 @@ export function useAudioRecorder() {
         nativeSessionIdRef.current &&
         event.sessionId === nativeSessionIdRef.current
       ) {
+        recordingMeteringSamplesRef.current.push(event.metering);
         setNativeInputMetering(event.metering);
         return;
       }
@@ -222,6 +226,22 @@ export function useAudioRecorder() {
       }
     });
   }, [usingNativeRecorder]);
+
+  useEffect(() => {
+    if (
+      usingNativeRecorder ||
+      !recorderState.isRecording ||
+      typeof recorderState.metering !== "number"
+    ) {
+      return;
+    }
+
+    recordingMeteringSamplesRef.current.push(recorderState.metering);
+  }, [
+    recorderState.isRecording,
+    recorderState.metering,
+    usingNativeRecorder,
+  ]);
 
   const stopAmbientMonitoring = useCallback(async () => {
     const sessionId = ambientSessionIdRef.current;
@@ -357,6 +377,7 @@ export function useAudioRecorder() {
 
       nativeSessionIdRef.current = sessionId;
       setNativeInputMetering(null);
+      recordingMeteringSamplesRef.current = [];
 
       try {
         await startNativeWaveformRecording({ sessionId });
@@ -400,6 +421,7 @@ export function useAudioRecorder() {
     await ensurePermissions();
 
     setLastError(null);
+    recordingMeteringSamplesRef.current = [];
     await recorder.prepareToRecordAsync(RECORDING_OPTIONS);
     recorder.record();
     startTimeRef.current = Date.now();
@@ -464,12 +486,32 @@ export function useAudioRecorder() {
         startTimeRef.current = 0;
 
         if (result.uri) {
+          const speechAssessment = assessRecordedSpeech(
+            recordingMeteringSamplesRef.current,
+          );
+          recordingMeteringSamplesRef.current = [];
+          if (!speechAssessment.shouldSubmit) {
+            await cleanupCapturedAudio(result.uri);
+            recordDebugLogEvent({
+              event: "recorder-stop-discarded",
+              payload: {
+                durationMs: duration,
+                reason: "no-speech-detected",
+                recorderRoute: "native-waveform",
+                sessionId,
+                speechAssessment,
+              },
+            });
+            return null;
+          }
+
           recordDebugLogEvent({
             event: "recorder-stop-succeeded",
             payload: {
               durationMs: duration,
               recorderRoute: "native-waveform",
               sessionId,
+              speechAssessment,
               uri: result.uri,
             },
           });
@@ -538,11 +580,30 @@ export function useAudioRecorder() {
     const resolvedUri = await resolveStoppedRecordingUri();
 
     if (resolvedUri) {
+      const speechAssessment = assessRecordedSpeech(
+        recordingMeteringSamplesRef.current,
+      );
+      recordingMeteringSamplesRef.current = [];
+      if (!speechAssessment.shouldSubmit) {
+        await cleanupCapturedAudio(resolvedUri);
+        recordDebugLogEvent({
+          event: "recorder-stop-discarded",
+          payload: {
+            durationMs: duration,
+            reason: "no-speech-detected",
+            recorderRoute: "expo-audio",
+            speechAssessment,
+          },
+        });
+        return null;
+      }
+
       recordDebugLogEvent({
         event: "recorder-stop-succeeded",
         payload: {
           durationMs: duration,
           recorderRoute: "expo-audio",
+          speechAssessment,
           uri: resolvedUri,
         },
       });
