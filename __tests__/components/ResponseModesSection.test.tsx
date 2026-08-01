@@ -122,7 +122,7 @@ describe("ThinkingSettingsPage response modes", () => {
     expect(screen.getByTestId("ulra-mode-threshold-warning")).toBeTruthy();
     expect(
       screen.getByText(
-        "About 56 model calls per message with the current setup.",
+        "Up to 56 model calls per message with the current setup.",
       ),
     ).toBeTruthy();
 

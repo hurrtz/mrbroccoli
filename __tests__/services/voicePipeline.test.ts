@@ -2228,6 +2228,7 @@ describe("runVoicePipeline", () => {
       summary: "Fresh answer",
     });
     (runUlraModeDeliberation as jest.Mock).mockResolvedValueOnce({
+      convergenceReached: false,
       entries: [
         {
           modeId: "mode-1",
@@ -2336,6 +2337,8 @@ describe("runVoicePipeline", () => {
     await runVoicePipeline({
       transcriptionOverride: "What is new today?",
       messages: [],
+      contextSummary:
+        "[Conversation response provenance v1]\nThe user previously selected option B.",
       model: "gpt-test",
       provider: "openai",
       providerApiKey: "openai-key",
@@ -2365,6 +2368,8 @@ describe("runVoicePipeline", () => {
     expect(runUlraModeDeliberation).toHaveBeenCalledWith(
       expect.objectContaining({
         config: ulraMode,
+        conversationSummary:
+          "[Conversation response provenance v1]\nThe user previously selected option B.",
         webSearchContext: "Fresh shared evidence",
       }),
     );
@@ -2393,6 +2398,7 @@ describe("runVoicePipeline", () => {
       }),
       expect.objectContaining({
         ulraMode: expect.objectContaining({
+          convergenceReached: false,
           failedCalls: 1,
           retiredParticipants: 1,
           roundsCompleted: 1,
@@ -2428,6 +2434,7 @@ describe("runVoicePipeline", () => {
       }),
     ).rejects.toThrow("OpenAI key rejected");
     (runUlraModeDeliberation as jest.Mock).mockResolvedValueOnce({
+      convergenceReached: false,
       entries: [
         {
           modeId: "mode-2",

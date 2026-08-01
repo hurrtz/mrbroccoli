@@ -129,18 +129,18 @@ export const zhCN = {
   ulraModeSettingsDescription:
     "当主屏幕上至少有两个模型可用时，允许多个模型共同推演。",
   ulraModeInfo:
-    "终极模式会先分别询问主屏幕上每个可用模型。随后在每轮复核中，所有模型都会查看此前的全部回答。当前选中的模型负责综合生成最终回答。推演内容会与所有相关服务提供商共享。",
+    "终极模式会先分别询问主屏幕上每个可用模型。每轮复核时，模型会批判性检验每位参与者最新的精简观点；明确全体达成一致后会跳过剩余轮次。当前选中的模型负责综合生成最终回答。推演内容会与所有相关服务提供商共享。",
   ulraModeRounds: "复核轮数",
   ulraModeCallEstimate: ({ count }) =>
-    `按当前设置，每条消息大约调用模型 ${count} 次。`,
+    `按当前设置，每条消息最多调用模型 ${count} 次。`,
   ulraModeThresholdWarning:
     "超过 4 个模型或 3 轮复核可能耗时很长、消耗大量令牌，并触及服务提供商的上下文或速率限制。这只是提醒，不会阻止使用。",
   ulraModeFirstUseTitle: "启用终极模式？",
   ulraModeFirstUseMessage: ({ calls, models, rounds }) =>
-    `使用 ${models} 个模型和 ${rounds} 轮复核时，一条消息可能调用模型约 ${calls} 次。所需时间和费用可能大幅增加，推演内容也会与所有相关服务提供商共享。`,
+    `使用 ${models} 个模型和最多 ${rounds} 轮复核时，一条消息最多可能调用模型 ${calls} 次。所需时间和费用可能大幅增加，推演内容也会与所有相关服务提供商共享。`,
   ulraModeHighRiskTitle: "大型终极模式运行",
   ulraModeHighRiskMessage: ({ calls, models, rounds }) =>
-    `${models} 个模型和 ${rounds} 轮复核可能调用模型约 ${calls} 次。运行可能耗时很长、使用大量令牌并触及提供商限制。仍要继续吗？`,
+    `${models} 个模型和 ${rounds} 轮复核最多可能调用模型 ${calls} 次。运行可能耗时很长、使用大量令牌并触及提供商限制。仍要继续吗？`,
   ulraModeEnableAction: "启用",
   ulraModeNeedsTwoModels:
     "终极模式至少需要两个已就绪的主屏幕模型。",

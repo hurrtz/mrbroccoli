@@ -131,18 +131,18 @@ export const it = {
   ulraModeSettingsDescription:
     "Consente il confronto tra più modelli quando almeno due modelli della schermata iniziale sono pronti.",
   ulraModeInfo:
-    "La modalità suprema interroga separatamente ogni modello pronto nella schermata iniziale. A ogni round, tutti i modelli esaminano poi tutte le risposte precedenti. Il modello selezionato sintetizza la risposta finale. Il confronto viene condiviso con tutti i provider coinvolti.",
+    "La modalità suprema interroga separatamente ogni modello pronto nella schermata iniziale. A ogni round, i modelli mettono alla prova l’ultima posizione sintetica di ciascun partecipante; i round inutilizzati vengono saltati dopo una convergenza unanime esplicita. Il modello selezionato sintetizza la risposta finale. Il confronto viene condiviso con tutti i provider coinvolti.",
   ulraModeRounds: "Round di revisione",
   ulraModeCallEstimate: ({ count }) =>
-    `Circa ${count} chiamate ai modelli per messaggio con la configurazione attuale.`,
+    `Fino a ${count} chiamate ai modelli per messaggio con la configurazione attuale.`,
   ulraModeThresholdWarning:
     "Più di 4 modelli o 3 round possono richiedere molto tempo, consumare molti token e raggiungere i limiti di contesto o frequenza dei provider. Questo è solo un avviso.",
   ulraModeFirstUseTitle: "Attivare la modalità suprema?",
   ulraModeFirstUseMessage: ({ calls, models, rounds }) =>
-    `Con ${models} modelli e ${rounds} round di revisione, un messaggio può effettuare circa ${calls} chiamate ai modelli. Potrebbe richiedere molto più tempo, costare sensibilmente di più e condividere il confronto con tutti i provider coinvolti.`,
+    `Con ${models} modelli e fino a ${rounds} round di revisione, un messaggio può effettuare fino a ${calls} chiamate ai modelli. Potrebbe richiedere molto più tempo, costare sensibilmente di più e condividere il confronto con tutti i provider coinvolti.`,
   ulraModeHighRiskTitle: "Esecuzione estesa della modalità suprema",
   ulraModeHighRiskMessage: ({ calls, models, rounds }) =>
-    `${models} modelli e ${rounds} round di revisione possono effettuare circa ${calls} chiamate ai modelli. Potrebbe richiedere molto tempo, usare molti token e raggiungere i limiti dei provider. Continuare comunque?`,
+    `${models} modelli e ${rounds} round di revisione possono effettuare fino a ${calls} chiamate ai modelli. Potrebbe richiedere molto tempo, usare molti token e raggiungere i limiti dei provider. Continuare comunque?`,
   ulraModeEnableAction: "Attiva",
   ulraModeNeedsTwoModels:
     "La modalità suprema richiede almeno due modelli pronti nella schermata iniziale.",

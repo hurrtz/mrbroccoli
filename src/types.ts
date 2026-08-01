@@ -234,6 +234,7 @@ export interface MessageUlraModeContribution extends MessageUlraModeCall {
 }
 
 export interface MessageUlraModeMetadata {
+  convergenceReached?: boolean;
   contributions: MessageUlraModeContribution[];
   estimatedIntermediateTokens: number;
   failedCalls: number;

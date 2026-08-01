@@ -129,18 +129,18 @@ export const tr = {
   ulraModeSettingsDescription:
     "Ana ekrandaki en az iki model hazır olduğunda çok modelli değerlendirmeye izin verir.",
   ulraModeInfo:
-    "Süper Mod önce ana ekrandaki her hazır modele ayrı ayrı sorar. Ardından her turda tüm modeller önceki tüm yanıtları inceler. Seçili model nihai yanıtı sentezler. Değerlendirme, ilgili tüm sağlayıcılarla paylaşılır.",
+    "Süper Mod önce ana ekrandaki her hazır modele ayrı ayrı sorar. Her turda modeller, her katılımcının en son kısa görüşünü eleştirel biçimde sınar; açık ve oybirliğiyle uzlaşma sağlanırsa kalan turlar atlanır. Seçili model nihai yanıtı sentezler. Değerlendirme, ilgili tüm sağlayıcılarla paylaşılır.",
   ulraModeRounds: "İnceleme turları",
   ulraModeCallEstimate: ({ count }) =>
-    `Mevcut ayarla mesaj başına yaklaşık ${count} model çağrısı.`,
+    `Mevcut ayarla mesaj başına en fazla ${count} model çağrısı.`,
   ulraModeThresholdWarning:
     "4'ten fazla model veya 3'ten fazla tur çok uzun sürebilir, çok sayıda token tüketebilir ve sağlayıcıların bağlam ya da hız sınırlarına ulaşabilir. Bu yalnızca bir uyarıdır.",
   ulraModeFirstUseTitle: "Süper Mod etkinleştirilsin mi?",
   ulraModeFirstUseMessage: ({ calls, models, rounds }) =>
-    `${models} model ve ${rounds} inceleme turuyla bir mesaj yaklaşık ${calls} model çağrısı yapabilir. Çok daha uzun sürebilir, belirgin biçimde daha pahalı olabilir ve değerlendirmeyi ilgili tüm sağlayıcılarla paylaşabilir.`,
+    `${models} model ve en fazla ${rounds} inceleme turuyla bir mesaj en fazla ${calls} model çağrısı yapabilir. Çok daha uzun sürebilir, belirgin biçimde daha pahalı olabilir ve değerlendirmeyi ilgili tüm sağlayıcılarla paylaşabilir.`,
   ulraModeHighRiskTitle: "Büyük Süper Mod çalıştırması",
   ulraModeHighRiskMessage: ({ calls, models, rounds }) =>
-    `${models} model ve ${rounds} inceleme turu yaklaşık ${calls} model çağrısı yapabilir. Bu çok uzun sürebilir, çok sayıda token kullanabilir ve sağlayıcı sınırlarına ulaşabilir. Yine de devam edilsin mi?`,
+    `${models} model ve ${rounds} inceleme turu en fazla ${calls} model çağrısı yapabilir. Bu çok uzun sürebilir, çok sayıda token kullanabilir ve sağlayıcı sınırlarına ulaşabilir. Yine de devam edilsin mi?`,
   ulraModeEnableAction: "Etkinleştir",
   ulraModeNeedsTwoModels:
     "Süper Mod için ana ekranda en az iki hazır model gerekir.",

@@ -130,18 +130,18 @@ export const cs = {
   ulraModeSettingsDescription:
     "Povolí společné uvažování více modelů, když jsou připraveny alespoň dva modely z domovské obrazovky.",
   ulraModeInfo:
-    "Superrežim nejprve osloví každý připravený model z domovské obrazovky samostatně. V každém kole pak všechny modely posoudí všechny předchozí odpovědi. Vybraný model vytvoří závěrečnou odpověď. Obsah uvažování se sdílí se všemi zapojenými poskytovateli.",
+    "Superrežim nejprve osloví každý připravený model z domovské obrazovky samostatně. V každém kole modely kriticky posoudí nejnovější stručné stanovisko každého účastníka; nevyužitá kola skončí po výslovné jednomyslné shodě. Vybraný model vytvoří závěrečnou odpověď. Obsah uvažování se sdílí se všemi zapojenými poskytovateli.",
   ulraModeRounds: "Kola kontroly",
   ulraModeCallEstimate: ({ count }) =>
-    `Při aktuálním nastavení přibližně ${count} volání modelů na zprávu.`,
+    `Při aktuálním nastavení nejvýše ${count} volání modelů na zprávu.`,
   ulraModeThresholdWarning:
     "Více než 4 modely nebo 3 kola mohou trvat velmi dlouho, spotřebovat mnoho tokenů a narazit na limity kontextu či frekvence poskytovatelů. Jde pouze o upozornění.",
   ulraModeFirstUseTitle: "Zapnout superrežim?",
   ulraModeFirstUseMessage: ({ calls, models, rounds }) =>
-    `Při ${models} modelech a ${rounds} kolech kontroly může jedna zpráva provést přibližně ${calls} volání modelů. Může trvat výrazně déle, stát podstatně více a sdílet uvažování se všemi zapojenými poskytovateli.`,
+    `Při ${models} modelech a nejvýše ${rounds} kolech kontroly může jedna zpráva provést až ${calls} volání modelů. Může trvat výrazně déle, stát podstatně více a sdílet uvažování se všemi zapojenými poskytovateli.`,
   ulraModeHighRiskTitle: "Rozsáhlý běh superrežimu",
   ulraModeHighRiskMessage: ({ calls, models, rounds }) =>
-    `${models} modelů a ${rounds} kol kontroly může provést přibližně ${calls} volání modelů. Může to trvat velmi dlouho, spotřebovat mnoho tokenů a narazit na limity poskytovatelů. Přesto pokračovat?`,
+    `${models} modelů a ${rounds} kol kontroly může provést až ${calls} volání modelů. Může to trvat velmi dlouho, spotřebovat mnoho tokenů a narazit na limity poskytovatelů. Přesto pokračovat?`,
   ulraModeEnableAction: "Zapnout",
   ulraModeNeedsTwoModels:
     "Superrežim vyžaduje alespoň dva připravené modely na domovské obrazovce.",

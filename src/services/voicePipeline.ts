@@ -241,6 +241,7 @@ export async function runVoicePipeline(
         abortSignal,
         assistantInstructions,
         config: ulraMode,
+        conversationSummary: contextResult.effectiveSummary || undefined,
         language,
         messages: allMessages,
         webSearchContext: webSearchResult.context,
@@ -321,6 +322,7 @@ export async function runVoicePipeline(
           ...(partialFailureNotice ? [partialFailureNotice] : []),
         ],
         ulraMode: {
+          convergenceReached: deliberation.convergenceReached,
           contributions: deliberation.entries.map(
             ({
               modeId,

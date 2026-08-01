@@ -133,18 +133,18 @@ export const de = {
   ulraModeSettingsDescription:
     "Erlaubt Beratungen mit mehreren Modellen, sobald mindestens zwei Modelle auf dem Startbildschirm bereit sind.",
   ulraModeInfo:
-    "Der Übermodus fragt jedes bereite Modell auf dem Startbildschirm zunächst unabhängig. In jeder Runde prüfen anschließend alle Modelle sämtliche bisherigen Antworten. Das ausgewählte Modell fasst am Ende zusammen. Die Beratung wird mit allen beteiligten Anbietern geteilt.",
+    "Der Übermodus fragt jedes bereite Modell auf dem Startbildschirm zunächst unabhängig. In jeder Prüfrunde hinterfragen die Modelle die letzte kompakte Position jedes Teilnehmers; bei ausdrücklicher einstimmiger Übereinstimmung entfallen ungenutzte Runden. Das ausgewählte Modell fasst am Ende zusammen. Die Beratung wird mit allen beteiligten Anbietern geteilt.",
   ulraModeRounds: "Prüfrunden",
   ulraModeCallEstimate: ({ count }) =>
-    `Mit der aktuellen Konfiguration etwa ${count} Modellaufrufe pro Nachricht.`,
+    `Mit der aktuellen Konfiguration bis zu ${count} Modellaufrufe pro Nachricht.`,
   ulraModeThresholdWarning:
     "Mehr als 4 Modelle oder 3 Runden können sehr lange dauern, viele Tokens verbrauchen und Kontext- oder Ratenlimits der Anbieter erreichen. Dies ist nur eine Warnung.",
   ulraModeFirstUseTitle: "Übermodus aktivieren?",
   ulraModeFirstUseMessage: ({ calls, models, rounds }) =>
-    `Mit ${models} Modellen und ${rounds} Prüfrunden kann eine Nachricht etwa ${calls} Modellaufrufe auslösen. Das kann erheblich länger dauern, deutlich mehr kosten und die Beratung mit allen beteiligten Anbietern teilen.`,
+    `Mit ${models} Modellen und bis zu ${rounds} Prüfrunden kann eine Nachricht bis zu ${calls} Modellaufrufe auslösen. Das kann erheblich länger dauern, deutlich mehr kosten und die Beratung mit allen beteiligten Anbietern teilen.`,
   ulraModeHighRiskTitle: "Großer Übermodus-Durchlauf",
   ulraModeHighRiskMessage: ({ calls, models, rounds }) =>
-    `${models} Modelle und ${rounds} Prüfrunden können etwa ${calls} Modellaufrufe auslösen. Das kann sehr lange dauern, viele Tokens verbrauchen und Anbieterlimits erreichen. Trotzdem fortfahren?`,
+    `${models} Modelle und ${rounds} Prüfrunden können bis zu ${calls} Modellaufrufe auslösen. Das kann sehr lange dauern, viele Tokens verbrauchen und Anbieterlimits erreichen. Trotzdem fortfahren?`,
   ulraModeEnableAction: "Aktivieren",
   ulraModeNeedsTwoModels:
     "Der Übermodus benötigt mindestens zwei einsatzbereite Modelle auf dem Startbildschirm.",

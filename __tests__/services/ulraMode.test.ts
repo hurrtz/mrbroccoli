@@ -3,6 +3,7 @@ import { ProviderRequestError } from "../../src/services/providerErrors";
 import {
   getUlraModeFailureParticipants,
   runUlraModeDeliberation,
+  ULRA_MODE_MAX_CONTRIBUTION_CHARACTERS,
   UlraModeConfig,
 } from "../../src/services/ulraMode";
 
@@ -62,6 +63,7 @@ describe("runUlraModeDeliberation", () => {
     const result = await runUlraModeDeliberation({
       assistantInstructions: "Be precise.",
       config,
+      conversationSummary: "The user previously selected option B.",
       language: "en",
       messages: [{ role: "user", content: "Compare these options." }],
     });
@@ -72,11 +74,25 @@ describe("runUlraModeDeliberation", () => {
     expect(result.failures).toEqual([]);
     expect(result.estimatedUsage.totalTokens).toBe(135);
 
+    expect(result.convergenceReached).toBe(false);
+    expect(
+      generateInternalChatMock.mock.calls.every(
+        ([request]) =>
+          request.messages.length === 1 &&
+          request.messages[0]?.content === "Compare these options.",
+      ),
+    ).toBe(true);
+    expect(
+      generateInternalChatMock.mock.calls.every(([request]) =>
+        request.systemPrompt.includes(
+          "Earlier conversation summary for background context only",
+        ),
+      ),
+    ).toBe(true);
+
     const firstRoundPrompts = generateInternalChatMock.mock.calls
       .slice(3, 6)
-      .map(
-        ([request]) => request.messages[request.messages.length - 1]?.content,
-      );
+      .map(([request]) => request.systemPrompt);
     expect(
       firstRoundPrompts.every((prompt) => prompt?.includes('"round":0')),
     ).toBe(true);
@@ -86,17 +102,126 @@ describe("runUlraModeDeliberation", () => {
 
     const secondRoundPrompts = generateInternalChatMock.mock.calls
       .slice(6, 9)
-      .map(
-        ([request]) => request.messages[request.messages.length - 1]?.content,
-      );
+      .map(([request]) => request.systemPrompt);
     expect(
       secondRoundPrompts.every((prompt) => prompt?.includes('"round":1')),
     ).toBe(true);
     expect(
+      secondRoundPrompts.some((prompt) => prompt?.includes('"round":0')),
+    ).toBe(false);
+    expect(
       secondRoundPrompts.some((prompt) => prompt?.includes('"round":2')),
     ).toBe(false);
     expect(result.synthesisPrompt).toContain(
-      "Successful private contributions: 9.",
+      "Latest participant positions: 3.",
+    );
+    expect(result.synthesisPrompt.match(/"participant":/g)).toHaveLength(3);
+    expect(result.synthesisPrompt).toContain(
+      "Give well-supported minority critiques full consideration",
+    );
+    expect(firstRoundPrompts[0]).toContain("Actively stress-test");
+    expect(firstRoundPrompts[0]).toContain("UBER_REVIEW: CHALLENGE");
+    expect(firstRoundPrompts[0]).toContain("never manufacture disagreement");
+    expect(firstRoundPrompts[0]).not.toContain('"provider":');
+    expect(firstRoundPrompts[0]).not.toContain('"model":');
+    expect(firstRoundPrompts[0]).not.toContain('"modeId":');
+    expect(result.synthesisPrompt).not.toContain('"provider":');
+    expect(result.synthesisPrompt).not.toContain('"model":');
+  });
+
+  it("stops unused review rounds only after unanimous explicit convergence", async () => {
+    generateInternalChatMock.mockImplementation(async (params) => ({
+      model: params.model,
+      text: params.systemPrompt.includes("review round")
+        ? "UBER_REVIEW: CONVERGED\nThe positions survive stress-testing."
+        : `${params.provider} independent position`,
+      usage: {
+        kind: "reply",
+        source: "estimated",
+        promptTokens: 10,
+        completionTokens: 5,
+        totalTokens: 15,
+      },
+    }));
+
+    const result = await runUlraModeDeliberation({
+      assistantInstructions: "",
+      config: { ...config, rounds: 5 },
+      language: "en",
+      messages: [{ role: "user", content: "Question" }],
+    });
+
+    expect(generateInternalChatMock).toHaveBeenCalledTimes(6);
+    expect(result.entries).toHaveLength(6);
+    expect(result.roundsCompleted).toBe(1);
+    expect(result.convergenceReached).toBe(true);
+    expect(result.synthesisPrompt).not.toContain("UBER_REVIEW");
+    expect(result.synthesisPrompt).toContain('"round":1');
+    expect(result.synthesisPrompt.match(/"participant":/g)).toHaveLength(3);
+  });
+
+  it("continues when models challenge peers or omit the convergence marker", async () => {
+    generateInternalChatMock.mockImplementation(async (params) => ({
+      model: params.model,
+      text: params.systemPrompt.includes("review round 1")
+        ? "UBER_REVIEW: CHALLENGE\nA material assumption remains unsupported."
+        : params.systemPrompt.includes("review round 2")
+          ? "The marker was omitted, so convergence is unproven."
+          : `${params.provider} independent position`,
+      usage: {
+        kind: "reply",
+        source: "estimated",
+        promptTokens: 10,
+        completionTokens: 5,
+        totalTokens: 15,
+      },
+    }));
+
+    const result = await runUlraModeDeliberation({
+      assistantInstructions: "",
+      config: { ...config, rounds: 2 },
+      language: "en",
+      messages: [{ role: "user", content: "Question" }],
+    });
+
+    expect(generateInternalChatMock).toHaveBeenCalledTimes(9);
+    expect(result.roundsCompleted).toBe(2);
+    expect(result.convergenceReached).toBe(false);
+  });
+
+  it("bounds runaway contributions before sharing them with other models", async () => {
+    const oversizedResponse = `Opening evidence ${"x".repeat(
+      ULRA_MODE_MAX_CONTRIBUTION_CHARACTERS * 2,
+    )} final conclusion`;
+    generateInternalChatMock.mockImplementation(async (params) => ({
+      model: params.model,
+      text: oversizedResponse,
+      usage: {
+        kind: "reply",
+        source: "estimated",
+        promptTokens: 10,
+        completionTokens: 2_000,
+        totalTokens: 2_010,
+      },
+    }));
+
+    const result = await runUlraModeDeliberation({
+      assistantInstructions: "",
+      config: { ...config, rounds: 1 },
+      language: "en",
+      messages: [{ role: "user", content: "Question" }],
+    });
+
+    expect(
+      result.entries.every(
+        ({ text }) => text.length <= ULRA_MODE_MAX_CONTRIBUTION_CHARACTERS,
+      ),
+    ).toBe(true);
+    expect(result.entries[0]?.text).toContain("Middle omitted");
+    expect(result.entries[0]?.text).toContain("Opening evidence");
+    expect(result.entries[0]?.text).toContain("final conclusion");
+    expect(result.synthesisPrompt.length).toBeLessThan(
+      oversizedResponse.length * config.routes.length,
     );
   });
 
@@ -128,6 +253,7 @@ describe("runUlraModeDeliberation", () => {
     expect(result.entries).toHaveLength(4);
     expect(result.failures).toHaveLength(2);
     expect(result.roundsCompleted).toBe(1);
+    expect(result.convergenceReached).toBe(false);
     expect(result.synthesisPrompt).toContain("Failed private calls: 2.");
   });
 

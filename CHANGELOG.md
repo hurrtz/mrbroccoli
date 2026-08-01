@@ -10,6 +10,14 @@ the complete Play Store translations are kept in a dedicated file under
 
 ## Unreleased
 
+### Changed
+
+- Made Uber Mode deliberation more efficient and adversarial: reviewers now
+  receive only each participant's latest compact and provider-anonymous
+  position, actively stress-test agreement, stop unused rounds after explicit
+  unanimous convergence, and share the conversation summary consistently with
+  every participant.
+
 ## 2.7.0 - 2026-08-01
 
 ### Changed

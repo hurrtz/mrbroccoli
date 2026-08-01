@@ -129,18 +129,18 @@ export const sv = {
   ulraModeSettingsDescription:
     "Tillåter överläggning mellan flera modeller när minst två modeller på startskärmen är redo.",
   ulraModeInfo:
-    "Superläget frågar först varje redo modell på startskärmen var för sig. I varje omgång granskar sedan alla modeller alla tidigare svar. Den valda modellen sammanställer slutsvaret. Överläggningen delas med alla berörda leverantörer.",
+    "Superläget frågar först varje redo modell på startskärmen var för sig. I varje omgång ifrågasätter modellerna varje deltagares senaste kompakta ståndpunkt; återstående omgångar hoppas över efter uttrycklig enhällig samsyn. Den valda modellen sammanställer slutsvaret. Överläggningen delas med alla berörda leverantörer.",
   ulraModeRounds: "Granskningsomgångar",
   ulraModeCallEstimate: ({ count }) =>
-    `Cirka ${count} modellanrop per meddelande med den aktuella konfigurationen.`,
+    `Upp till ${count} modellanrop per meddelande med den aktuella konfigurationen.`,
   ulraModeThresholdWarning:
     "Fler än 4 modeller eller 3 omgångar kan ta mycket lång tid, använda många token och nå leverantörernas kontext- eller hastighetsgränser. Detta är bara en varning.",
   ulraModeFirstUseTitle: "Aktivera Superläge?",
   ulraModeFirstUseMessage: ({ calls, models, rounds }) =>
-    `Med ${models} modeller och ${rounds} granskningsomgångar kan ett meddelande göra cirka ${calls} modellanrop. Det kan ta mycket längre tid, kosta betydligt mer och dela överläggningen med alla berörda leverantörer.`,
+    `Med ${models} modeller och upp till ${rounds} granskningsomgångar kan ett meddelande göra upp till ${calls} modellanrop. Det kan ta mycket längre tid, kosta betydligt mer och dela överläggningen med alla berörda leverantörer.`,
   ulraModeHighRiskTitle: "Stor körning i Superläge",
   ulraModeHighRiskMessage: ({ calls, models, rounds }) =>
-    `${models} modeller och ${rounds} granskningsomgångar kan göra cirka ${calls} modellanrop. Det kan ta mycket lång tid, använda många token och nå leverantörsgränser. Fortsätta ändå?`,
+    `${models} modeller och ${rounds} granskningsomgångar kan göra upp till ${calls} modellanrop. Det kan ta mycket lång tid, använda många token och nå leverantörsgränser. Fortsätta ändå?`,
   ulraModeEnableAction: "Aktivera",
   ulraModeNeedsTwoModels:
     "Superläget behöver minst två redo modeller på startskärmen.",

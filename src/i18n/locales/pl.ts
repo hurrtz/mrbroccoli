@@ -131,18 +131,18 @@ export const pl = {
   ulraModeSettingsDescription:
     "Pozwala wielu modelom wspólnie rozważyć odpowiedź, gdy gotowe są co najmniej dwa modele z ekranu głównego.",
   ulraModeInfo:
-    "Supertryb najpierw pyta osobno każdy gotowy model z ekranu głównego. W każdej rundzie wszystkie modele analizują następnie wszystkie wcześniejsze odpowiedzi. Wybrany model tworzy końcową syntezę. Treść rozważań jest udostępniana wszystkim zaangażowanym dostawcom.",
+    "Supertryb najpierw pyta osobno każdy gotowy model z ekranu głównego. W każdej rundzie modele krytycznie oceniają najnowsze zwięzłe stanowisko każdego uczestnika; pozostałe rundy są pomijane po wyraźnej jednomyślnej zgodzie. Wybrany model tworzy końcową syntezę. Treść rozważań jest udostępniana wszystkim zaangażowanym dostawcom.",
   ulraModeRounds: "Rundy przeglądu",
   ulraModeCallEstimate: ({ count }) =>
-    `Przy bieżącej konfiguracji około ${count} wywołań modeli na wiadomość.`,
+    `Przy bieżącej konfiguracji maksymalnie ${count} wywołań modeli na wiadomość.`,
   ulraModeThresholdWarning:
     "Więcej niż 4 modele lub 3 rundy może trwać bardzo długo, zużyć wiele tokenów i osiągnąć limity kontekstu lub częstotliwości dostawców. To tylko ostrzeżenie.",
   ulraModeFirstUseTitle: "Włączyć supertryb?",
   ulraModeFirstUseMessage: ({ calls, models, rounds }) =>
-    `Przy ${models} modelach i ${rounds} rundach przeglądu jedna wiadomość może wykonać około ${calls} wywołań modeli. Może to potrwać znacznie dłużej, kosztować dużo więcej i udostępnić rozważania wszystkim zaangażowanym dostawcom.`,
+    `Przy ${models} modelach i maksymalnie ${rounds} rundach przeglądu jedna wiadomość może wykonać do ${calls} wywołań modeli. Może to potrwać znacznie dłużej, kosztować dużo więcej i udostępnić rozważania wszystkim zaangażowanym dostawcom.`,
   ulraModeHighRiskTitle: "Duże uruchomienie supertrybu",
   ulraModeHighRiskMessage: ({ calls, models, rounds }) =>
-    `${models} modeli i ${rounds} rund przeglądu może wykonać około ${calls} wywołań modeli. Może to trwać bardzo długo, zużyć wiele tokenów i osiągnąć limity dostawców. Kontynuować mimo to?`,
+    `${models} modeli i ${rounds} rund przeglądu może wykonać maksymalnie ${calls} wywołań modeli. Może to trwać bardzo długo, zużyć wiele tokenów i osiągnąć limity dostawców. Kontynuować mimo to?`,
   ulraModeEnableAction: "Włącz",
   ulraModeNeedsTwoModels:
     "Supertryb wymaga co najmniej dwóch gotowych modeli na ekranie głównym.",

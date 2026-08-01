@@ -131,18 +131,18 @@ export const ptBR = {
   ulraModeSettingsDescription:
     "Permite a deliberação entre vários modelos quando pelo menos dois modelos da tela inicial estão prontos.",
   ulraModeInfo:
-    "O modo Supremo consulta separadamente cada modelo pronto na tela inicial. Em cada rodada, todos os modelos analisam todas as respostas anteriores. O modelo selecionado sintetiza a resposta final. A deliberação é compartilhada com todos os provedores envolvidos.",
+    "O modo Supremo consulta separadamente cada modelo pronto na tela inicial. Em cada rodada, os modelos questionam a posição resumida mais recente de cada participante; as rodadas restantes são ignoradas após uma convergência unânime explícita. O modelo selecionado sintetiza a resposta final. A deliberação é compartilhada com todos os provedores envolvidos.",
   ulraModeRounds: "Rodadas de revisão",
   ulraModeCallEstimate: ({ count }) =>
-    `Cerca de ${count} chamadas de modelo por mensagem com a configuração atual.`,
+    `Até ${count} chamadas de modelo por mensagem com a configuração atual.`,
   ulraModeThresholdWarning:
     "Mais de 4 modelos ou 3 rodadas podem levar muito tempo, consumir muitos tokens e atingir limites de contexto ou taxa dos provedores. Isto é apenas um aviso.",
   ulraModeFirstUseTitle: "Ativar o modo Supremo?",
   ulraModeFirstUseMessage: ({ calls, models, rounds }) =>
-    `Com ${models} modelos e ${rounds} rodadas de revisão, uma mensagem pode fazer cerca de ${calls} chamadas de modelo. Pode demorar muito mais, custar bem mais e compartilhar a deliberação com todos os provedores envolvidos.`,
+    `Com ${models} modelos e até ${rounds} rodadas de revisão, uma mensagem pode fazer até ${calls} chamadas de modelo. Pode demorar muito mais, custar bem mais e compartilhar a deliberação com todos os provedores envolvidos.`,
   ulraModeHighRiskTitle: "Execução extensa do modo Supremo",
   ulraModeHighRiskMessage: ({ calls, models, rounds }) =>
-    `${models} modelos e ${rounds} rodadas de revisão podem fazer cerca de ${calls} chamadas de modelo. Isso pode levar muito tempo, usar muitos tokens e atingir limites dos provedores. Continuar mesmo assim?`,
+    `${models} modelos e ${rounds} rodadas de revisão podem fazer até ${calls} chamadas de modelo. Isso pode levar muito tempo, usar muitos tokens e atingir limites dos provedores. Continuar mesmo assim?`,
   ulraModeEnableAction: "Ativar",
   ulraModeNeedsTwoModels:
     "O modo Supremo precisa de pelo menos dois modelos prontos na tela inicial.",
