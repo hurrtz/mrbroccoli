@@ -10,11 +10,29 @@ the complete Play Store translations are kept in a dedicated file under
 
 ## Unreleased
 
+## 2.7.0 - 2026-08-01
+
 ### Changed
 
 - Optimize Android release builds with R8 and resource shrinking, and preserve
   Play Console deobfuscation mappings plus native debug symbols for readable
   production crash reports.
+- Remove the legacy Ant Design Native runtime dependency while retaining the
+  app's established native controls and visual behavior.
+- Strengthen release validation with fresh-checkout static analysis, enforced
+  coverage and TypeScript checks, native lifecycle tests, release-size and
+  secret budgets, and cross-platform accessibility and localization audits.
+
+### Fixed
+
+- Keep navigation, response routes, Settings, and conversation controls usable
+  with accessibility-large text on compact screens.
+- Prevent decorative application and provider icons from creating duplicate or
+  confusing screen-reader stops.
+
+### Store release notes
+
+See `docs/google-play-release-notes-2.7.0.md`.
 
 ## 2.6.0 - 2026-07-31
 
