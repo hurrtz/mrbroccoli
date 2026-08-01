@@ -1,7 +1,7 @@
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
 
-import { Button } from "@ant-design/react-native";
+import { Button } from "../../design-system/NativeControls";
 
 import { IconButton } from "../../design-system/IconButton";
 import { Colors } from "../../theme/colors";

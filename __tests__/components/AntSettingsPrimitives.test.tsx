@@ -1,8 +1,11 @@
 import React from "react";
 import { Modal as NativeModal, StyleSheet } from "react-native";
 import { fireEvent, render } from "@testing-library/react-native";
-import { List, Modal, Provider as AntProvider } from "@ant-design/react-native";
 
+import {
+  List,
+  Modal as NativeDialog,
+} from "../../src/design-system/NativeControls";
 import {
   AntPickerRow,
   AntPickerRows,
@@ -13,7 +16,7 @@ import { styles } from "../../src/features/settings/styles";
 import { LocalizationProvider } from "../../src/i18n";
 import { ThemeProvider } from "../../src/theme/ThemeContext";
 
-const AntModal = Modal as unknown as React.ComponentType<any>;
+const NativeDialogType = NativeDialog as unknown as React.ComponentType<any>;
 
 function renderPickerRow(optionCount: 1 | 2, onChange = jest.fn()) {
   return render(
@@ -155,7 +158,7 @@ describe("AntPickerRow", () => {
     ).toBe(0);
   });
 
-  it("does not render an Ant list boundary below picker rows", () => {
+  it("groups picker rows without inserting compatibility list rows", () => {
     const screen = renderPicker(
       <AntPickerRows>
         <AntPickerRow
@@ -166,12 +169,7 @@ describe("AntPickerRow", () => {
         />
       </AntPickerRows>,
     );
-    const list = screen.UNSAFE_getByType(List);
-
-    expect(list.props.styles.BodyBottomLine).toEqual({
-      height: 0,
-      backgroundColor: "transparent",
-    });
+    expect(screen.UNSAFE_queryAllByType(List)).toHaveLength(0);
     expect(screen.UNSAFE_queryAllByType(List.Item)).toHaveLength(0);
   });
 });
@@ -215,8 +213,7 @@ describe("AntRadioSection", () => {
     const screen = render(
       <LocalizationProvider language="en">
         <ThemeProvider mode="light">
-          <AntProvider>
-            <AntRadioSection
+          <AntRadioSection
               label="Reply Playback"
               options={[
                 {
@@ -232,8 +229,7 @@ describe("AntRadioSection", () => {
               ]}
               value="stream"
               onChange={jest.fn()}
-            />
-          </AntProvider>
+          />
         </ThemeProvider>
       </LocalizationProvider>,
     );
@@ -243,7 +239,7 @@ describe("AntRadioSection", () => {
     ).toBeNull();
     fireEvent.press(screen.getByLabelText("About Reply Playback"));
 
-    expect(screen.UNSAFE_getByType(AntModal).props).toMatchObject({
+    expect(screen.UNSAFE_getByType(NativeDialogType).props).toMatchObject({
       modalType: "modal",
       title: "Reply Playback",
       visible: true,

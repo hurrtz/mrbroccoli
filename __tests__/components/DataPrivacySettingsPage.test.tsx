@@ -1,11 +1,11 @@
 import React from "react";
 import { act, fireEvent, render, waitFor } from "@testing-library/react-native";
-import { Modal as AntModal, Provider as AntProvider } from "@ant-design/react-native";
 import * as DocumentPicker from "expo-document-picker";
 import * as FileSystem from "expo-file-system/legacy";
 import * as Sharing from "expo-sharing";
 
 import { DataPrivacySettingsPage } from "../../src/features/settings/pages/DataPrivacySettingsPage";
+import { Modal as NativeDialog } from "../../src/design-system/NativeControls";
 import { LocalizationProvider } from "../../src/i18n";
 import {
   APP_DATA_BACKUP_MAX_BYTES,
@@ -15,7 +15,7 @@ import {
 import { ThemeProvider } from "../../src/theme/ThemeContext";
 import { DEFAULT_SETTINGS } from "../../src/types";
 
-const AntModalType = AntModal as unknown as React.ComponentType<any>;
+const NativeDialogType = NativeDialog as unknown as React.ComponentType<any>;
 
 function createBackup(): AppDataBackup {
   const {
@@ -57,8 +57,7 @@ function renderPage(overrides: {
   return render(
     <ThemeProvider mode="light">
       <LocalizationProvider language="en">
-        <AntProvider>
-          <DataPrivacySettingsPage
+        <DataPrivacySettingsPage
             onCreateAppDataBackup={
               overrides.onCreateAppDataBackup ??
               jest.fn(async () => createBackup())
@@ -72,8 +71,7 @@ function renderPage(overrides: {
                 settingsRestored: true,
               }))
             }
-          />
-        </AntProvider>
+        />
       </LocalizationProvider>
     </ThemeProvider>,
   );
@@ -81,7 +79,7 @@ function renderPage(overrides: {
 
 function getVisibleModal(screen: ReturnType<typeof render>) {
   return screen
-    .UNSAFE_getAllByType(AntModalType)
+    .UNSAFE_getAllByType(NativeDialogType)
     .find((modal) => modal.props.visible);
 }
 

@@ -148,6 +148,8 @@ export const styles = StyleSheet.create({
     gap: 10,
   },
   card: {
+    borderRadius: 12,
+    borderWidth: StyleSheet.hairlineWidth,
     overflow: "hidden",
     paddingBottom: 0,
   },
@@ -157,6 +159,9 @@ export const styles = StyleSheet.create({
     gap: 10,
   },
   cardHeader: {
+    alignItems: "center",
+    flexDirection: "row",
+    gap: 12,
     minHeight: 50,
     marginLeft: 0,
     paddingHorizontal: 16,

@@ -330,11 +330,11 @@ sections 10, 12, and 16.
   the active route. Tapping it opens a scrollable bottom sheet with the full
   route list, active-state feedback, effort metadata, a uniformly fading
   backdrop, and safe bottom spacing.
-- Settings now uses the Ant Design Native surface under
+- Settings uses the app-owned React Native surface under
   `src/features/settings/`, with separate responsive frame, navigation,
   page-routing, and page components. Provider cards use distinct header, body,
   and capability-footer regions; help content opens in standard scrollable
-  information modals.
+  information modals. The former Ant Design dependency has been retired.
 - Outfit is the copy and control typeface. Unica One is limited to the product
   wordmark and major Settings page titles.
 - Speaking settings now cover native, provider, and downloaded Kokoro routes;

@@ -1,7 +1,7 @@
 import React from "react";
 import { Text, View } from "react-native";
 
-import { List } from "@ant-design/react-native";
+import { List } from "../../../design-system/NativeControls";
 
 import {
   WEB_SEARCH_DEPTH_VALUES,

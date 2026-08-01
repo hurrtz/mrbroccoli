@@ -1,7 +1,7 @@
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
 
-import { Button, Input } from "@ant-design/react-native";
+import { Button, Input } from "../../design-system/NativeControls";
 
 import { getTtsListenLanguageLabel } from "../../constants/localTts";
 import {
@@ -12,7 +12,6 @@ import {
   providerRequiresTtsVoice,
   providerUsesTtsVoiceDirectory,
 } from "../../constants/models";
-import { antButtonTypography } from "../../design-system/antTypography";
 import { PhosphorIcon } from "../../design-system/PhosphorIcon";
 import { useLocalization } from "../../i18n";
 import type { ProviderVoiceDirectories } from "../../services/providerVoiceDirectory";
@@ -173,7 +172,6 @@ export function AntProviderVoiceSection({
             styles.compactButton,
             { borderColor: colors.border },
           ])}
-          styles={antButtonTypography}
           onPress={() => {
             void voiceDirectory.refresh();
           }}

@@ -72,6 +72,7 @@ describe("Phosphor icon system", () => {
         errors.push(`${relative}: bypasses the shared Phosphor icon wrapper`);
       }
       if (
+        source.includes("@ant-design/react-native") ||
         source.includes("@ant-design/icons-react-native") ||
         /\bAntIcon(?:Button|Name|Size)?\b/.test(source) ||
         /import\s*\{[^}]*\b(?:Checkbox|Radio)\b[^}]*\}\s*from\s*["']@ant-design\/react-native["']/.test(
@@ -89,6 +90,9 @@ describe("Phosphor icon system", () => {
     expect(packageJson.dependencies?.["phosphor-react-native"]).toBeDefined();
     expect(
       packageJson.dependencies?.["@ant-design/icons-react-native"],
+    ).toBeUndefined();
+    expect(
+      packageJson.dependencies?.["@ant-design/react-native"],
     ).toBeUndefined();
     expect(packageJson.dependencies?.["@expo/vector-icons"]).toBeUndefined();
   });

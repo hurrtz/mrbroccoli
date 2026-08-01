@@ -19,14 +19,13 @@ The registry entry owns:
 - the self-written language name shown in the picker;
 - the `Intl` locale;
 - left-to-right or right-to-left direction;
-- Ant Design modal, picker, and search copy;
 - explicit defaults for content language, assistant instructions, and the TTS
   listen language.
 
 Language persistence, validation, picker options, translation lookup, regional
-formatting, root direction, and Ant Design locale data are all derived from
-this registry. Do not add a second language allowlist or a chain of
-`language === "..."` checks.
+formatting, and root direction are all derived from this registry. Shared
+native controls use the same application translation dictionary. Do not add a
+second language allowlist or a chain of `language === "..."` checks.
 
 ## Speech-language contract
 

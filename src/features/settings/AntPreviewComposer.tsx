@@ -1,9 +1,8 @@
 import React from "react";
 import { Text, TextInput, View } from "react-native";
 
-import { Button } from "@ant-design/react-native";
+import { Button } from "../../design-system/NativeControls";
 
-import { antButtonTypography } from "../../design-system/antTypography";
 import { useLocalization } from "../../i18n";
 import { useTheme } from "../../theme/ThemeContext";
 import { fonts } from "../../theme/typography";
@@ -86,7 +85,6 @@ export function AntPreviewComposer({
         loading={isGenerating}
         disabled={disabled}
         style={styles.previewButton}
-        styles={antButtonTypography}
         onPress={() => {
           void (isBusy ? onStop() : onPreview());
         }}

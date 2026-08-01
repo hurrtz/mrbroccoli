@@ -1,11 +1,10 @@
 import React, { useState } from "react";
 import { Alert, StyleSheet, Text, View } from "react-native";
 
-import { Button } from "@ant-design/react-native";
+import { Button } from "../../../design-system/NativeControls";
 
 import { providerTtsModelSupportsInstructions } from "../../../constants/models";
 import { getTtsFallbackRoutes } from "../../../constants/ttsFallback";
-import { antButtonTypography } from "../../../design-system/antTypography";
 import type { KokoroModelController } from "../../../hooks/useKokoroModel";
 import { useLocalization } from "../../../i18n";
 import { clearProviderTtsAudioCache } from "../../../services/providerTtsAudioCache";
@@ -399,7 +398,6 @@ export function SpeakingSettingsPage({
             void handleClearSpeechCache();
           }}
           accessibilityLabel={t("clearSpeechReplayCache")}
-          styles={antButtonTypography}
         >
           <AntButtonLabel
             color={colors.accent}

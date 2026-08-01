@@ -14,15 +14,12 @@ import {
   waitFor,
   within,
 } from "@testing-library/react-native";
-import {
-  Card as AntCard,
-  List,
-  Modal as AntModal,
-  Provider as AntProvider,
-} from "@ant-design/react-native";
-
 import { AntSettingsModal as SettingsModal } from "../../src/features/settings/AntSettingsModal";
 import { PROVIDER_LABELS } from "../../src/constants/models";
+import {
+  List,
+  Modal as NativeDialog,
+} from "../../src/design-system/NativeControls";
 import { LocalizationProvider, translate } from "../../src/i18n";
 import { ThemeProvider } from "../../src/theme/ThemeContext";
 import { lightColors } from "../../src/theme/colors";
@@ -42,7 +39,7 @@ import {
   resetRuntimeCapabilityOverridesForTests,
 } from "../../src/services/runtimeCapabilityOverrides";
 
-const AntModalType = AntModal as unknown as React.ComponentType<any>;
+const NativeDialogType = NativeDialog as unknown as React.ComponentType<any>;
 
 jest.mock("react-native-safe-area-context", () => ({
   SafeAreaView: ({ children, ...props }: React.PropsWithChildren) => {
@@ -117,8 +114,7 @@ function renderSettingsModal(
   return render(
     <ThemeProvider mode="light">
       <LocalizationProvider language={language}>
-        <AntProvider>
-          <SettingsModal
+        <SettingsModal
             visible
             settings={DEFAULT_SETTINGS}
             kokoroModel={kokoroModel}
@@ -143,8 +139,7 @@ function renderSettingsModal(
             }}
             onClose={jest.fn()}
             {...overrideProps}
-          />
-        </AntProvider>
+        />
       </LocalizationProvider>
     </ThemeProvider>,
   );
@@ -358,7 +353,9 @@ describe("SettingsModal", () => {
         "The multilingual model downloads about 140 MB and occupies about 211 MB after installation.",
       ),
     ).toBeTruthy();
-    act(() => screen.UNSAFE_getByType(AntModalType).props.footer[0].onPress());
+    act(() =>
+      screen.UNSAFE_getByType(NativeDialogType).props.footer[0].onPress(),
+    );
 
     fireEvent.press(screen.getByLabelText("Expand English voice settings"));
     expect(screen.getByText("TTS Voice")).toBeTruthy();
@@ -1136,7 +1133,7 @@ describe("SettingsModal", () => {
       "About model selection",
     );
     fireEvent.press(modelSelectionInfoButton);
-    let infoModal = screen.UNSAFE_getByType(AntModalType);
+    let infoModal = screen.UNSAFE_getByType(NativeDialogType);
     expect(infoModal.props.visible).toBe(true);
     expect(infoModal.props.title).toBe("Model Selection");
     expect(
@@ -1145,13 +1142,13 @@ describe("SettingsModal", () => {
       ),
     ).toBeTruthy();
     act(() => infoModal.props.footer[0].onPress());
-    expect(screen.UNSAFE_queryByType(AntModalType)).toBeNull();
+    expect(screen.UNSAFE_queryByType(NativeDialogType)).toBeNull();
 
     const systemPromptInfoButton = screen.getByLabelText(
       "About the system prompt",
     );
     fireEvent.press(systemPromptInfoButton);
-    infoModal = screen.UNSAFE_getByType(AntModalType);
+    infoModal = screen.UNSAFE_getByType(NativeDialogType);
     expect(infoModal.props.visible).toBe(true);
     expect(infoModal.props.title).toBe("System Prompt");
     expect(
@@ -1160,7 +1157,7 @@ describe("SettingsModal", () => {
       ),
     ).toBeTruthy();
     act(() => infoModal.props.footer[0].onPress());
-    expect(screen.UNSAFE_queryByType(AntModalType)).toBeNull();
+    expect(screen.UNSAFE_queryByType(NativeDialogType)).toBeNull();
 
     fireEvent.press(screen.getByLabelText("Back to overview"));
     fireEvent.press(screen.getByLabelText("Open Search"));
@@ -1212,11 +1209,6 @@ describe("SettingsModal", () => {
     expect(
       StyleSheet.flatten(languagePicker!.props.style).marginHorizontal,
     ).toBe(0);
-    expect(
-      screen
-        .UNSAFE_getAllByType(AntCard)
-        .some((card) => within(card).queryByTestId("app-language-picker")),
-    ).toBe(false);
   });
 
   it("keeps Voice Input free of a redundant heading info action", async () => {
@@ -1253,7 +1245,7 @@ describe("SettingsModal", () => {
     ).toBe("right");
 
     fireEvent.press(screen.getByLabelText("About Input Mode"));
-    expect(screen.UNSAFE_getByType(AntModalType).props).toMatchObject({
+    expect(screen.UNSAFE_getByType(NativeDialogType).props).toMatchObject({
       modalType: "modal",
       title: "Input Mode",
       visible: true,
@@ -1274,7 +1266,7 @@ describe("SettingsModal", () => {
     });
 
     fireEvent.press(screen.getByLabelText("About Speech to Text"));
-    expect(screen.UNSAFE_getByType(AntModalType).props).toMatchObject({
+    expect(screen.UNSAFE_getByType(NativeDialogType).props).toMatchObject({
       modalType: "modal",
       title: "Speech to Text",
       visible: true,
@@ -1354,13 +1346,6 @@ describe("SettingsModal", () => {
     expect(
       StyleSheet.flatten(providerVoicePicker.props.style).marginHorizontal,
     ).toBe(0);
-    expect(
-      screen
-        .UNSAFE_getAllByType(AntCard)
-        .some((card) =>
-          within(card).queryByTestId("provider-tts-voice-picker-mistral"),
-        ),
-    ).toBe(false);
 
     fireEvent.press(screen.getByLabelText("Expand English voice settings"));
     expect(
@@ -1638,7 +1623,7 @@ describe("SettingsModal", () => {
     expect(clearSpeechDiagnosticsMock).not.toHaveBeenCalled();
     const getConfirmation = () =>
       screen
-        .UNSAFE_getAllByType(AntModalType)
+        .UNSAFE_getAllByType(NativeDialogType)
         .find(
           (modal) => modal.props.title === "Clear recent speech activity?",
         )!;
@@ -1695,7 +1680,7 @@ describe("SettingsModal", () => {
 
     fireEvent.press(screen.getByLabelText("Clear runtime compatibility"));
     const confirmation = screen
-      .UNSAFE_getAllByType(AntModalType)
+      .UNSAFE_getAllByType(NativeDialogType)
       .find((modal) => modal.props.title === "Clear runtime compatibility?")!;
     const clearAction = confirmation.props.footer.find(
       (action: { text: string }) => action.text === "Clear",

@@ -1,7 +1,7 @@
 import React from "react";
 import { ScrollView, Text, View } from "react-native";
 
-import { Modal } from "@ant-design/react-native";
+import { Modal } from "../../design-system/NativeControls";
 import { PhosphorIcon } from "../../design-system/PhosphorIcon";
 
 import { IconButton } from "../../design-system/IconButton";

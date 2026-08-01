@@ -1,7 +1,7 @@
 import React from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
-import { List, Modal } from "@ant-design/react-native";
+import { List, Modal } from "../../design-system/NativeControls";
 import { PhosphorIcon } from "../../design-system/PhosphorIcon";
 
 import {

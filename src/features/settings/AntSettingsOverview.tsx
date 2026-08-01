@@ -1,7 +1,7 @@
 import React from "react";
 import { Pressable, Text, View } from "react-native";
 
-import { List } from "@ant-design/react-native";
+import { List } from "../../design-system/NativeControls";
 
 import appConfig from "../../../app.json";
 import { useLocalization } from "../../i18n";

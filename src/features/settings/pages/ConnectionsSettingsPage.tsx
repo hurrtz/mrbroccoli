@@ -1,7 +1,7 @@
 import React from "react";
 import { Linking, Pressable, ScrollView, Text, View } from "react-native";
 
-import { Tag } from "@ant-design/react-native";
+import { Tag } from "../../../design-system/NativeControls";
 import { PhosphorIcon } from "../../../design-system/PhosphorIcon";
 
 import { getAppProviderForCatalogProviderId } from "../../../catalog/appProviders";

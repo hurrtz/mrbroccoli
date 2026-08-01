@@ -1,7 +1,7 @@
 import React from "react";
 import { Alert, Text, View } from "react-native";
 
-import { Button } from "@ant-design/react-native";
+import { Button } from "../../design-system/NativeControls";
 
 import {
   KOKORO_MODEL_DOWNLOAD_BYTES,
@@ -10,7 +10,6 @@ import {
   getTtsListenLanguageForKokoro,
 } from "../../constants/kokoro";
 import { getTtsListenLanguageLabel } from "../../constants/localTts";
-import { antButtonTypography } from "../../design-system/antTypography";
 import { IconButton } from "../../design-system/IconButton";
 import { PhosphorIcon } from "../../design-system/PhosphorIcon";
 import type { KokoroModelController } from "../../hooks/useKokoroModel";
@@ -176,7 +175,6 @@ export function AntKokoroVoiceSection({
             loading={model.busy !== null}
             disabled={model.busy !== null}
             style={styles.kokoroDownloadButton}
-            styles={antButtonTypography}
             accessibilityLabel={t("downloadKokoroModel")}
             accessibilityValue={
               model.busy === "downloading"

@@ -10,7 +10,7 @@ import {
 } from "react-native";
 
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Button, Input, List } from "@ant-design/react-native";
+import { Button, Input, List } from "../../design-system/NativeControls";
 
 import { getCatalogProviderEntry } from "../../catalog";
 import { getCatalogProviderIdForAppProvider } from "../../catalog/appProviders";
@@ -20,7 +20,6 @@ import {
   getProviderApiKeyHint,
   getProviderApiKeyPlaceholder,
 } from "../../constants/models";
-import { antButtonTypography } from "../../design-system/antTypography";
 import { IconButton } from "../../design-system/IconButton";
 import { PhosphorIcon } from "../../design-system/PhosphorIcon";
 import { useLocalization } from "../../i18n";
@@ -441,7 +440,6 @@ export function ProviderConnectionPanel({
             loading={isValidatingAny}
             disabled={!apiKey.trim() || !canValidateAny || isValidatingAny}
             style={styles.compactButton}
-            styles={antButtonTypography}
             onPress={() => {
               void onValidateAll();
             }}

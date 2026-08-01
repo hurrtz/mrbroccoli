@@ -1,6 +1,5 @@
 import React from "react";
 import { fireEvent, render } from "@testing-library/react-native";
-import { Provider as AntProvider } from "@ant-design/react-native";
 
 import { AntListenLanguageSelector } from "../../src/features/settings/AntListenLanguageSelector";
 import { LocalizationProvider } from "../../src/i18n";
@@ -12,12 +11,10 @@ describe("AntListenLanguageSelector", () => {
     const screen = render(
       <LocalizationProvider language="en">
         <ThemeProvider mode="light">
-          <AntProvider>
-            <AntListenLanguageSelector
+          <AntListenLanguageSelector
               selectedLanguages={["en"]}
               onToggleLanguage={onToggleLanguage}
-            />
-          </AntProvider>
+          />
         </ThemeProvider>
       </LocalizationProvider>,
     );

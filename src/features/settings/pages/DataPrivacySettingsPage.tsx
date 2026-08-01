@@ -1,7 +1,7 @@
 import React from "react";
 import { Text, TextInput, View } from "react-native";
 
-import { Button, Modal } from "@ant-design/react-native";
+import { Button, Modal } from "../../../design-system/NativeControls";
 import * as DocumentPicker from "expo-document-picker";
 import * as FileSystem from "expo-file-system/legacy";
 import * as Sharing from "expo-sharing";

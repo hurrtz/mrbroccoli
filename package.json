@@ -40,7 +40,6 @@
     "catalog:test": "jest __tests__/catalog --runInBand --watchman=false"
   },
   "dependencies": {
-    "@ant-design/react-native": "^5.4.3",
     "@dr.pogodin/react-native-fs": "^2.39.2",
     "@expo-google-fonts/outfit": "^0.4.3",
     "@expo-google-fonts/unica-one": "^0.4.2",

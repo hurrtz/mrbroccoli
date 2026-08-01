@@ -1,14 +1,13 @@
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
 
-import { Button } from "@ant-design/react-native";
+import { Button } from "../../../design-system/NativeControls";
 import { PhosphorIcon } from "../../../design-system/PhosphorIcon";
 
 import {
   MAX_RESPONSE_MODES,
   MIN_RESPONSE_MODES,
 } from "../../../constants/providers/defaults";
-import { antButtonTypography } from "../../../design-system/antTypography";
 import { IconButton } from "../../../design-system/IconButton";
 import { useLocalization } from "../../../i18n";
 import { useRuntimeCapabilityOverrides } from "../../../hooks/useRuntimeCapabilityOverrides";
@@ -205,7 +204,6 @@ export function ThinkingSettingsPage({
             ])}
             onPress={onAddResponseMode}
             accessibilityLabel={t("addResponseMode")}
-            styles={antButtonTypography}
           >
             <AntButtonLabel
               color={colors.accent}

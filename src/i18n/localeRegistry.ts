@@ -22,28 +22,11 @@ import type { SpeechLanguage } from "../constants/speechLanguages";
 
 export type AppTextDirection = "ltr" | "rtl";
 
-export interface AntDesignLocaleCopy {
-  modal: {
-    ok: string;
-    cancel: string;
-    button: string;
-  };
-  picker: {
-    ok: string;
-    cancel: string;
-    select: string;
-  };
-  search: {
-    cancel: string;
-  };
-}
-
 export interface AppLocaleDefinition {
   nativeName: string;
   intlLocale: string;
   direction: AppTextDirection;
   messages: TranslationDictionary;
-  antDesign: AntDesignLocaleCopy;
   defaultContentLanguage: "en" | "de";
   defaultAssistantInstructions: string;
   defaultTtsListenLanguage: SpeechLanguage;
@@ -97,8 +80,8 @@ function defineAppLocale(
  * The single registration point for app-interface locales.
  *
  * Adding a locale requires one dictionary and one entry here. Language
- * persistence, formatting, direction, picker options, and Ant Design copy are
- * all derived from this registry.
+ * persistence, formatting, direction, and picker options are all derived from
+ * this registry.
  */
 export const APP_LOCALES = {
   en: defineAppLocale({
@@ -106,21 +89,11 @@ export const APP_LOCALES = {
     intlLocale: "en-US",
     messages: en,
     defaultAssistantInstructions: DEFAULT_ASSISTANT_INSTRUCTIONS.en,
-    antDesign: {
-      modal: { ok: "OK", cancel: "Cancel", button: "Button" },
-      picker: { ok: "OK", cancel: "Cancel", select: "Select" },
-      search: { cancel: "Cancel" },
-    },
   }),
   de: defineAppLocale({
     nativeName: "Deutsch",
     intlLocale: "de-DE",
     messages: de,
-    antDesign: {
-      modal: { ok: "OK", cancel: "Abbrechen", button: "Schaltfläche" },
-      picker: { ok: "OK", cancel: "Abbrechen", select: "Auswählen" },
-      search: { cancel: "Abbrechen" },
-    },
     defaultContentLanguage: "de",
     defaultAssistantInstructions: DEFAULT_ASSISTANT_INSTRUCTIONS.de,
     defaultTtsListenLanguage: "de",
@@ -129,11 +102,6 @@ export const APP_LOCALES = {
     nativeName: "Українська",
     intlLocale: "uk-UA",
     messages: uk,
-    antDesign: {
-      modal: { ok: "Гаразд", cancel: "Скасувати", button: "Кнопка" },
-      picker: { ok: "Гаразд", cancel: "Скасувати", select: "Вибрати" },
-      search: { cancel: "Скасувати" },
-    },
     defaultAssistantInstructions: DEFAULT_ASSISTANT_INSTRUCTIONS.uk,
     defaultTtsListenLanguage: "uk",
   }),
@@ -141,11 +109,6 @@ export const APP_LOCALES = {
     nativeName: "हिन्दी",
     intlLocale: "hi-IN",
     messages: hi,
-    antDesign: {
-      modal: { ok: "ठीक है", cancel: "रद्द करें", button: "बटन" },
-      picker: { ok: "ठीक है", cancel: "रद्द करें", select: "चुनें" },
-      search: { cancel: "रद्द करें" },
-    },
     defaultAssistantInstructions: DEFAULT_ASSISTANT_INSTRUCTIONS.hi,
     defaultTtsListenLanguage: "hi",
   }),
@@ -153,11 +116,6 @@ export const APP_LOCALES = {
     nativeName: "Español",
     intlLocale: "es-ES",
     messages: es,
-    antDesign: {
-      modal: { ok: "Aceptar", cancel: "Cancelar", button: "Botón" },
-      picker: { ok: "Aceptar", cancel: "Cancelar", select: "Seleccionar" },
-      search: { cancel: "Cancelar" },
-    },
     defaultAssistantInstructions: DEFAULT_ASSISTANT_INSTRUCTIONS.es,
     defaultTtsListenLanguage: "es",
   }),
@@ -165,11 +123,6 @@ export const APP_LOCALES = {
     nativeName: "Français",
     intlLocale: "fr-FR",
     messages: fr,
-    antDesign: {
-      modal: { ok: "OK", cancel: "Annuler", button: "Bouton" },
-      picker: { ok: "OK", cancel: "Annuler", select: "Sélectionner" },
-      search: { cancel: "Annuler" },
-    },
     defaultAssistantInstructions: DEFAULT_ASSISTANT_INSTRUCTIONS.fr,
     defaultTtsListenLanguage: "fr",
   }),
@@ -177,11 +130,6 @@ export const APP_LOCALES = {
     nativeName: "Italiano",
     intlLocale: "it-IT",
     messages: it,
-    antDesign: {
-      modal: { ok: "OK", cancel: "Annulla", button: "Pulsante" },
-      picker: { ok: "OK", cancel: "Annulla", select: "Seleziona" },
-      search: { cancel: "Annulla" },
-    },
     defaultAssistantInstructions: DEFAULT_ASSISTANT_INSTRUCTIONS.it,
     defaultTtsListenLanguage: "it",
   }),
@@ -189,11 +137,6 @@ export const APP_LOCALES = {
     nativeName: "Português",
     intlLocale: "pt-PT",
     messages: pt,
-    antDesign: {
-      modal: { ok: "OK", cancel: "Cancelar", button: "Botão" },
-      picker: { ok: "OK", cancel: "Cancelar", select: "Selecionar" },
-      search: { cancel: "Cancelar" },
-    },
     defaultAssistantInstructions: DEFAULT_ASSISTANT_INSTRUCTIONS.pt,
     defaultTtsListenLanguage: "pt",
   }),
@@ -201,11 +144,6 @@ export const APP_LOCALES = {
     nativeName: "Português (Brasil)",
     intlLocale: "pt-BR",
     messages: ptBR,
-    antDesign: {
-      modal: { ok: "OK", cancel: "Cancelar", button: "Botão" },
-      picker: { ok: "OK", cancel: "Cancelar", select: "Selecionar" },
-      search: { cancel: "Cancelar" },
-    },
     defaultAssistantInstructions: DEFAULT_ASSISTANT_INSTRUCTIONS["pt-BR"],
     defaultTtsListenLanguage: "pt-BR",
   }),
@@ -213,11 +151,6 @@ export const APP_LOCALES = {
     nativeName: "Русский",
     intlLocale: "ru-RU",
     messages: ru,
-    antDesign: {
-      modal: { ok: "ОК", cancel: "Отмена", button: "Кнопка" },
-      picker: { ok: "ОК", cancel: "Отмена", select: "Выбрать" },
-      search: { cancel: "Отмена" },
-    },
     defaultAssistantInstructions: DEFAULT_ASSISTANT_INSTRUCTIONS.ru,
     defaultTtsListenLanguage: "ru",
   }),
@@ -225,11 +158,6 @@ export const APP_LOCALES = {
     nativeName: "简体中文",
     intlLocale: "zh-CN",
     messages: zhCN,
-    antDesign: {
-      modal: { ok: "确定", cancel: "取消", button: "按钮" },
-      picker: { ok: "确定", cancel: "取消", select: "请选择" },
-      search: { cancel: "取消" },
-    },
     defaultAssistantInstructions: DEFAULT_ASSISTANT_INSTRUCTIONS["zh-CN"],
     defaultTtsListenLanguage: "zh-CN",
   }),
@@ -238,11 +166,6 @@ export const APP_LOCALES = {
     intlLocale: "ar",
     direction: "rtl",
     messages: ar,
-    antDesign: {
-      modal: { ok: "موافق", cancel: "إلغاء", button: "زر" },
-      picker: { ok: "موافق", cancel: "إلغاء", select: "اختر" },
-      search: { cancel: "إلغاء" },
-    },
     defaultAssistantInstructions: DEFAULT_ASSISTANT_INSTRUCTIONS.ar,
     defaultTtsListenLanguage: "ar",
   }),
@@ -250,11 +173,6 @@ export const APP_LOCALES = {
     nativeName: "日本語",
     intlLocale: "ja-JP",
     messages: ja,
-    antDesign: {
-      modal: { ok: "OK", cancel: "キャンセル", button: "ボタン" },
-      picker: { ok: "OK", cancel: "キャンセル", select: "選択" },
-      search: { cancel: "キャンセル" },
-    },
     defaultAssistantInstructions: DEFAULT_ASSISTANT_INSTRUCTIONS.ja,
     defaultTtsListenLanguage: "ja",
   }),
@@ -262,11 +180,6 @@ export const APP_LOCALES = {
     nativeName: "Magyar",
     intlLocale: "hu-HU",
     messages: hu,
-    antDesign: {
-      modal: { ok: "OK", cancel: "Mégse", button: "Gomb" },
-      picker: { ok: "OK", cancel: "Mégse", select: "Kiválasztás" },
-      search: { cancel: "Mégse" },
-    },
     defaultAssistantInstructions: DEFAULT_ASSISTANT_INSTRUCTIONS.hu,
     defaultTtsListenLanguage: "hu",
   }),
@@ -274,11 +187,6 @@ export const APP_LOCALES = {
     nativeName: "Čeština",
     intlLocale: "cs-CZ",
     messages: cs,
-    antDesign: {
-      modal: { ok: "OK", cancel: "Zrušit", button: "Tlačítko" },
-      picker: { ok: "OK", cancel: "Zrušit", select: "Vybrat" },
-      search: { cancel: "Zrušit" },
-    },
     defaultAssistantInstructions: DEFAULT_ASSISTANT_INSTRUCTIONS.cs,
     defaultTtsListenLanguage: "cs",
   }),
@@ -286,11 +194,6 @@ export const APP_LOCALES = {
     nativeName: "Polski",
     intlLocale: "pl-PL",
     messages: pl,
-    antDesign: {
-      modal: { ok: "OK", cancel: "Anuluj", button: "Przycisk" },
-      picker: { ok: "OK", cancel: "Anuluj", select: "Wybierz" },
-      search: { cancel: "Anuluj" },
-    },
     defaultAssistantInstructions: DEFAULT_ASSISTANT_INSTRUCTIONS.pl,
     defaultTtsListenLanguage: "pl",
   }),
@@ -298,11 +201,6 @@ export const APP_LOCALES = {
     nativeName: "Türkçe",
     intlLocale: "tr-TR",
     messages: tr,
-    antDesign: {
-      modal: { ok: "Tamam", cancel: "İptal", button: "Düğme" },
-      picker: { ok: "Tamam", cancel: "İptal", select: "Seç" },
-      search: { cancel: "İptal" },
-    },
     defaultAssistantInstructions: DEFAULT_ASSISTANT_INSTRUCTIONS.tr,
     defaultTtsListenLanguage: "tr",
   }),
@@ -310,11 +208,6 @@ export const APP_LOCALES = {
     nativeName: "Svenska",
     intlLocale: "sv-SE",
     messages: sv,
-    antDesign: {
-      modal: { ok: "OK", cancel: "Avbryt", button: "Knapp" },
-      picker: { ok: "OK", cancel: "Avbryt", select: "Välj" },
-      search: { cancel: "Avbryt" },
-    },
     defaultAssistantInstructions: DEFAULT_ASSISTANT_INSTRUCTIONS.sv,
     defaultTtsListenLanguage: "sv",
   }),
@@ -323,15 +216,6 @@ export const APP_LOCALES = {
     intlLocale: "ur-PK",
     direction: "rtl",
     messages: ur,
-    antDesign: {
-      modal: { ok: "ٹھیک ہے", cancel: "منسوخ کریں", button: "بٹن" },
-      picker: {
-        ok: "ٹھیک ہے",
-        cancel: "منسوخ کریں",
-        select: "منتخب کریں",
-      },
-      search: { cancel: "منسوخ کریں" },
-    },
     defaultAssistantInstructions: DEFAULT_ASSISTANT_INSTRUCTIONS.ur,
     defaultTtsListenLanguage: "ur",
   }),

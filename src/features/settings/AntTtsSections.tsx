@@ -1,9 +1,8 @@
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
 
-import { Button } from "@ant-design/react-native";
+import { Button } from "../../design-system/NativeControls";
 
-import { antButtonTypography } from "../../design-system/antTypography";
 import {
   TTS_FALLBACK_OPTIONS,
   getTtsFallbackRoutes,
@@ -124,7 +123,6 @@ export function AntTtsFallbackSection({
                 styles.iconButton,
                 { borderColor: colors.border },
               ])}
-              styles={antButtonTypography}
               onPress={() => {
                 const nextRoutes = [...routes];
                 [nextRoutes[index - 1], nextRoutes[index]] = [
@@ -151,7 +149,6 @@ export function AntTtsFallbackSection({
                 styles.iconButton,
                 { borderColor: colors.border },
               ])}
-              styles={antButtonTypography}
               onPress={() => {
                 const nextRoutes = [...routes];
                 [nextRoutes[index], nextRoutes[index + 1]] = [
@@ -174,7 +171,6 @@ export function AntTtsFallbackSection({
               size="small"
               type="warning"
               style={styles.iconButton}
-              styles={antButtonTypography}
               onPress={() =>
                 updateRoutes(routes.filter((candidate) => candidate !== route))
               }
@@ -203,7 +199,6 @@ export function AntTtsFallbackSection({
                 styles.compactButton,
                 { borderColor: colors.border },
               ])}
-              styles={antButtonTypography}
               onPress={() => updateRoutes([...routes, route])}
               accessibilityLabel={t("addFallbackRoute", {
                 route: getFallbackRouteLabel(route, t),

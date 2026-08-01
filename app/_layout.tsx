@@ -2,7 +2,7 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { Stack } from "expo-router";
 import { View } from "react-native";
 import { SettingsProvider, useSharedSettings } from "../src/context/SettingsContext";
-import { AntDesignAppProvider } from "../src/design-system/AntDesignAppProvider";
+import { AppFontProvider } from "../src/design-system/AppFontProvider";
 import { LocalizationProvider, useLocalization } from "../src/i18n";
 import { ThemeProvider } from "../src/theme/ThemeContext";
 import { initializeDiagnosticPostmortem } from "../src/services/diagnosticPostmortem";
@@ -15,11 +15,11 @@ function RootLayoutInner() {
 
   return (
     <ThemeProvider mode={settings.theme}>
-      <AntDesignAppProvider>
+      <AppFontProvider>
         <View style={{ flex: 1, direction }}>
           <Stack screenOptions={{ headerShown: false }} />
         </View>
-      </AntDesignAppProvider>
+      </AppFontProvider>
     </ThemeProvider>
   );
 }
