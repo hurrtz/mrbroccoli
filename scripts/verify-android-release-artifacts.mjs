@@ -107,6 +107,101 @@ function listArchiveEntries(archive) {
   return result.stdout.split(/\r?\n/).filter(Boolean);
 }
 
+function listArchiveEntrySizes(archive) {
+  const result = spawnSync("unzip", ["-l", archive], {
+    encoding: "utf8",
+    maxBuffer: 32 * 1024 * 1024,
+  });
+
+  if (result.error) {
+    throw result.error;
+  }
+  if (result.status !== 0) {
+    throw new Error(
+      `Could not inspect sizes in ${archive}: ${result.stderr.trim() || `unzip exited ${result.status}`}`,
+    );
+  }
+
+  return parseArchiveSizeListing(result.stdout);
+}
+
+export function parseArchiveSizeListing(listing) {
+  return listing.split(/\r?\n/).flatMap((line) => {
+    const match = line.match(
+      /^\s*(\d+)\s+\d{2}-\d{2}-\d{4}\s+\d{2}:\d{2}\s+(.+)$/,
+    );
+
+    return match ? [{ bytes: Number(match[1]), path: match[2] }] : [];
+  });
+}
+
+export function inspectAndroidBundleSize({ bundleBytes, budget, entries }) {
+  if (budget.schemaVersion !== 1) {
+    throw new Error(
+      `Unsupported release size budget schema: ${budget.schemaVersion}`,
+    );
+  }
+
+  const androidBudget = budget.android;
+  if (
+    !androidBudget ||
+    !Number.isSafeInteger(androidBudget.aabMaxBytes) ||
+    !Number.isSafeInteger(androidBudget.arm64NativeMaxBytes) ||
+    !Number.isSafeInteger(androidBudget.bundledOnnxMaxBytes)
+  ) {
+    throw new Error("Android release size budget is incomplete");
+  }
+
+  const nativeBytesByAbi = {};
+  let bundledOnnxBytes = 0;
+
+  for (const entry of entries) {
+    const nativeMatch = entry.path.match(/^base\/lib\/([^/]+)\/[^/]+\.so$/);
+    if (nativeMatch) {
+      const abi = nativeMatch[1];
+      nativeBytesByAbi[abi] = (nativeBytesByAbi[abi] ?? 0) + entry.bytes;
+    }
+
+    if (/^base\/assets\/.*\.onnx$/i.test(entry.path)) {
+      bundledOnnxBytes += entry.bytes;
+    }
+    if (/^base\/assets\/.*kokoro/i.test(entry.path)) {
+      throw new Error(
+        `Optional Kokoro model asset must not be bundled: ${entry.path}`,
+      );
+    }
+  }
+
+  const arm64NativeBytes = nativeBytesByAbi["arm64-v8a"] ?? 0;
+  const failures = [];
+
+  if (bundleBytes > androidBudget.aabMaxBytes) {
+    failures.push(
+      `AAB is ${bundleBytes} bytes; budget is ${androidBudget.aabMaxBytes}`,
+    );
+  }
+  if (arm64NativeBytes > androidBudget.arm64NativeMaxBytes) {
+    failures.push(
+      `arm64 native payload is ${arm64NativeBytes} bytes; budget is ${androidBudget.arm64NativeMaxBytes}`,
+    );
+  }
+  if (bundledOnnxBytes > androidBudget.bundledOnnxMaxBytes) {
+    failures.push(
+      `bundled ONNX payload is ${bundledOnnxBytes} bytes; budget is ${androidBudget.bundledOnnxMaxBytes}`,
+    );
+  }
+
+  if (failures.length > 0) {
+    throw new Error(`Android release size budget exceeded: ${failures.join("; ")}`);
+  }
+
+  return {
+    bundleBytes,
+    bundledOnnxBytes,
+    nativeBytesByAbi,
+  };
+}
+
 async function sha256(file) {
   const hash = createHash("sha256");
 
@@ -141,9 +236,18 @@ export async function verifyAndArchiveAndroidRelease({
   }
 
   const bundleEntries = listArchiveEntries(bundle);
+  const bundleEntrySizes = listArchiveEntrySizes(bundle);
   const metadata = inspectBundleMetadataEntries(bundleEntries);
   const nativeArchiveEntries = listArchiveEntries(nativeSymbols);
   verifyExternalNativeSymbols(metadata.nativeSymbolEntries, nativeArchiveEntries);
+  const sizeBudget = JSON.parse(
+    readFileSync(resolveFromRoot("config/release-size-budget.json"), "utf8"),
+  );
+  const sizeReport = inspectAndroidBundleSize({
+    budget: sizeBudget,
+    bundleBytes,
+    entries: bundleEntrySizes,
+  });
 
   const appConfig = JSON.parse(
     readFileSync(resolveFromRoot("app.json"), "utf8"),
@@ -198,6 +302,7 @@ export async function verifyAndArchiveAndroidRelease({
           nativeSymbolAbis: metadata.abis,
           nativeSymbolTableCount: metadata.nativeSymbolEntries.length,
         },
+        sizeReport,
         artifacts,
       },
       null,
@@ -210,12 +315,13 @@ export async function verifyAndArchiveAndroidRelease({
       `Android release artifacts verified for ${appConfig.version} (${versionCode}).`,
       `R8 mapping: ${BUNDLE_MAPPING_ENTRY}`,
       `Native symbols: ${metadata.nativeSymbolEntries.length} tables across ${metadata.abis.join(", ")}`,
+      `AAB size: ${sizeReport.bundleBytes} bytes (arm64 native: ${sizeReport.nativeBytesByAbi["arm64-v8a"] ?? 0}; bundled ONNX: ${sizeReport.bundledOnnxBytes})`,
       `Archived: ${path.relative(cwd, archiveDirectory)}`,
       "",
     ].join("\n"),
   );
 
-  return { archiveDirectory, artifacts, metadata };
+  return { archiveDirectory, artifacts, metadata, sizeReport };
 }
 
 if (

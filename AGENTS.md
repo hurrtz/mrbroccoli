@@ -297,6 +297,10 @@ These notes are specific to this repository and supplement any parent-level inst
   optimized Android rules baseline, and `SYMBOL_TABLE` native diagnostics
   enabled. Treat a missing R8 mapping or native-symbol archive as a failed
   release rather than bypassing the artifact verifier.
+- Android release verification enforces `config/release-size-budget.json` for
+  the AAB upload, the arm64 native payload, and bundled ONNX assets. Kokoro
+  remains download-only and must never appear in an application bundle. Raise
+  a budget only after documenting and reviewing the concrete size increase.
 
 ## Licensing And Provider Terms
 
