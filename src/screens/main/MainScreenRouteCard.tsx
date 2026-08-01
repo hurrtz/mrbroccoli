@@ -63,6 +63,7 @@ export const MainScreenRouteCard = React.memo(function MainScreenRouteCard({
         <TouchableOpacity
           style={[
             styles.providerEmptyState,
+            compact ? styles.providerEmptyStateCompact : null,
             {
               backgroundColor: colors.surfaceElevated,
               borderColor: colors.border,
@@ -90,11 +91,13 @@ export const MainScreenRouteCard = React.memo(function MainScreenRouteCard({
           <Text style={[styles.providerEmptyTitle, { color: colors.text }]}>
             {t("setupGuideConnectProviderTitle")}
           </Text>
-          <Text
-            style={[styles.providerEmptyText, { color: colors.textSecondary }]}
-          >
-            {t("setupGuideConnectProviderDescription")}
-          </Text>
+          {!compact ? (
+            <Text
+              style={[styles.providerEmptyText, { color: colors.textSecondary }]}
+            >
+              {t("setupGuideConnectProviderDescription")}
+            </Text>
+          ) : null}
         </TouchableOpacity>
       )}
     </View>

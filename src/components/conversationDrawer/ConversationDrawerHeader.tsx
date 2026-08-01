@@ -41,7 +41,13 @@ export function ConversationDrawerHeader({
       >
         <View style={styles.headerControlSpacer} />
         <View style={styles.headerCopy}>
-          <Text style={[styles.title, { color: colors.text }]}>
+          <Text
+            numberOfLines={1}
+            ellipsizeMode="tail"
+            maxFontSizeMultiplier={1.4}
+            accessibilityRole="header"
+            style={[styles.title, { color: colors.text }]}
+          >
             {t("conversations")}
           </Text>
         </View>

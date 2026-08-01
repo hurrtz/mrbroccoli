@@ -56,13 +56,21 @@ export const MainScreenTopBar = React.memo(function MainScreenTopBar({
               },
             ]}
           >
-            <Text style={[styles.compactBrandText, { color: colors.text }]}>
+            <Text
+              numberOfLines={1}
+              maxFontSizeMultiplier={1.4}
+              style={[styles.compactBrandText, { color: colors.text }]}
+            >
               {brandName}
             </Text>
           </View>
         ) : (
           <View style={styles.wordmark}>
-            <Text style={[styles.wordmarkText, { color: colors.text }]}>
+            <Text
+              numberOfLines={1}
+              maxFontSizeMultiplier={1.4}
+              style={[styles.wordmarkText, { color: colors.text }]}
+            >
               {brandName}
             </Text>
           </View>

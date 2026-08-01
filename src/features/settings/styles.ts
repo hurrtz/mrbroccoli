@@ -95,6 +95,10 @@ export const styles = StyleSheet.create({
   readinessGrid: {
     flexDirection: "row",
   },
+  readinessGridLargeText: {
+    flexDirection: "column",
+    gap: 8,
+  },
   readinessStepLabel: {
     fontFamily: fonts.bodyMedium,
     fontSize: 12,
@@ -102,15 +106,29 @@ export const styles = StyleSheet.create({
     fontWeight: "500",
     textAlign: "center",
   },
+  readinessStepLabelLargeText: {
+    flex: 1,
+    textAlign: "auto",
+  },
   readinessStep: {
     flex: 1,
     alignItems: "center",
     gap: 6,
   },
+  readinessStepLargeText: {
+    flexDirection: "row",
+    justifyContent: "flex-start",
+    minHeight: 44,
+    paddingHorizontal: 4,
+  },
   readinessStepTrack: {
     width: "100%",
     flexDirection: "row",
     alignItems: "center",
+  },
+  readinessStepTrackLargeText: {
+    flex: 0,
+    width: 28,
   },
   readinessStepLine: {
     flex: 1,

@@ -1,5 +1,5 @@
 import React from "react";
-import { Pressable, Text, View } from "react-native";
+import { Pressable, Text, View, useWindowDimensions } from "react-native";
 
 import { List } from "../../design-system/NativeControls";
 
@@ -96,6 +96,8 @@ export function AntSettingsOverview({
 }) {
   const { colors } = useTheme();
   const { isRtl, t } = useLocalization();
+  const { fontScale } = useWindowDimensions();
+  const usesLargeTextLayout = fontScale >= 1.5;
   const drillInIcon = isRtl ? "left" : "right";
   const readinessItems = [
     {
@@ -164,7 +166,13 @@ export function AntSettingsOverview({
         </Pressable>
       ) : null}
 
-      <View style={styles.readinessGrid}>
+      <View
+        testID="settings-readiness-grid"
+        style={[
+          styles.readinessGrid,
+          usesLargeTextLayout ? styles.readinessGridLargeText : null,
+        ]}
+      >
         {readinessItems.map((item, index) => {
           const previousReady =
             index > 0 && readinessItems[index - 1].status.state === "ready";
@@ -185,20 +193,29 @@ export function AntSettingsOverview({
               testID={`settings-readiness-${item.key}`}
               style={({ pressed }) => [
                 styles.readinessStep,
+                usesLargeTextLayout ? styles.readinessStepLargeText : null,
                 pressed ? styles.pressedControl : null,
               ]}
               onPress={item.onPress}
               accessibilityRole="button"
               accessibilityLabel={`${item.label}: ${t(item.status.summaryKey)}`}
             >
-              <View style={styles.readinessStepTrack}>
+              <View
+                style={[
+                  styles.readinessStepTrack,
+                  usesLargeTextLayout
+                    ? styles.readinessStepTrackLargeText
+                    : null,
+                ]}
+              >
                 <View
                   style={[
                     styles.readinessStepLine,
                     {
                       backgroundColor:
                         previousReady && ready ? colors.success : colors.border,
-                      opacity: index === 0 ? 0 : 1,
+                      opacity:
+                        usesLargeTextLayout || index === 0 ? 0 : 1,
                     },
                   ]}
                 />
@@ -231,7 +248,11 @@ export function AntSettingsOverview({
                     {
                       backgroundColor:
                         ready && nextReady ? colors.success : colors.border,
-                      opacity: index === readinessItems.length - 1 ? 0 : 1,
+                      opacity:
+                        usesLargeTextLayout ||
+                        index === readinessItems.length - 1
+                          ? 0
+                          : 1,
                     },
                   ]}
                 />
@@ -239,6 +260,9 @@ export function AntSettingsOverview({
               <Text
                 style={[
                   styles.readinessStepLabel,
+                  usesLargeTextLayout
+                    ? styles.readinessStepLabelLargeText
+                    : null,
                   {
                     color: broken
                       ? colors.danger

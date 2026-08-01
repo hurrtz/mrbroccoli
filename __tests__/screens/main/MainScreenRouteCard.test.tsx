@@ -72,4 +72,24 @@ describe("MainScreenRouteCard", () => {
     fireEvent.press(screen.getByRole("button"));
     expect(onOpenSetupGuide).toHaveBeenCalledTimes(1);
   });
+
+  it("keeps the landscape empty state compact without losing accessible copy", () => {
+    const screen = renderWithProviders(
+      <MainScreenRouteCard
+        activeResponseMode="mode-1"
+        availableResponseModes={[]}
+        colors={lightColors}
+        compact
+        onOpenSetupGuide={jest.fn()}
+        onSelectResponseMode={jest.fn()}
+        responseModes={responseModes}
+        t={t}
+      />,
+    );
+
+    expect(screen.queryByText("Add an API key to begin.")).toBeNull();
+    expect(
+      screen.getByLabelText("Connect a provider. Add an API key to begin."),
+    ).toBeTruthy();
+  });
 });

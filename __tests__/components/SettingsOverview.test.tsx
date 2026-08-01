@@ -1,4 +1,5 @@
 import React from "react";
+import * as ReactNative from "react-native";
 import { StyleSheet } from "react-native";
 import { render } from "@testing-library/react-native";
 
@@ -95,5 +96,29 @@ describe("AntSettingsOverview", () => {
     expect(iconStyle.width).toBe(28);
     expect(iconStyle.height).toBe(28);
     expect(iconStyle.color).toBe(lightColors.text);
+  });
+
+  it("stacks readiness steps instead of breaking labels at large text sizes", () => {
+    jest.spyOn(ReactNative, "useWindowDimensions").mockReturnValue({
+      fontScale: 2,
+      height: 844,
+      scale: 3,
+      width: 390,
+    });
+    const screen = render(
+      <ThemeProvider mode="light">
+        <LocalizationProvider language="en">
+          <AntSettingsOverview readiness={readiness} onOpenPage={jest.fn()} />
+        </LocalizationProvider>
+      </ThemeProvider>,
+    );
+
+    expect(
+      StyleSheet.flatten(screen.getByTestId("settings-readiness-grid").props.style)
+        .flexDirection,
+    ).toBe("column");
+    expect(StyleSheet.flatten(screen.getByText("Think").props.style).textAlign).toBe(
+      "auto",
+    );
   });
 });

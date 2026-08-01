@@ -64,7 +64,7 @@ export const styles = StyleSheet.create({
     minHeight: 0,
   },
   landscapeLeftColumn: {
-    flex: 0.42,
+    flex: 0.9,
     minWidth: 0,
     paddingRight: 12,
   },
@@ -117,6 +117,12 @@ export const styles = StyleSheet.create({
     paddingVertical: 14,
     justifyContent: "center",
     gap: 6,
+  },
+  providerEmptyStateCompact: {
+    minHeight: 0,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    gap: 4,
   },
   providerEmptyHeader: {
     flexDirection: "row",
