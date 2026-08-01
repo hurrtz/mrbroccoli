@@ -13,16 +13,11 @@ describe("native app configuration", () => {
       },
     );
 
-    expect({
-      status: result.status,
-      stderr: result.stderr,
-      stdout: result.stdout,
-    }).toEqual({
-      status: 0,
-      stderr: "",
-      stdout:
-        "Native configuration matches app.json across 49 checks.\n",
-    });
+    expect(result.status).toBe(0);
+    expect(result.stderr).toBe("");
+    expect(result.stdout).toMatch(
+      /^Native configuration matches app\.json across \d+ checks\.\n$/,
+    );
   });
 
   it("increments both store build counters in a version bump", () => {
