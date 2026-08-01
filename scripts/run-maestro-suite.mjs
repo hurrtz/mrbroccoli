@@ -4,6 +4,7 @@ import { spawnSync } from "node:child_process";
 import { pathToFileURL } from "node:url";
 
 import {
+  MAESTRO_ACCESSIBILITY_FLOW,
   MAESTRO_LOCALIZED_FLOW,
   MAESTRO_LAYOUT_FLOW,
   MAESTRO_MINIMUM_VERSION,
@@ -50,15 +51,21 @@ function parseArguments(argv) {
   if (!["android", "ios"].includes(options.platform)) {
     throw new Error("--platform must be android or ios");
   }
-  if (!["all", "smoke", "locales", "layout"].includes(options.suite)) {
-    throw new Error("--suite must be all, smoke, locales, or layout");
+  if (
+    !["all", "smoke", "locales", "layout", "accessibility"].includes(
+      options.suite,
+    )
+  ) {
+    throw new Error(
+      "--suite must be all, smoke, locales, layout, or accessibility",
+    );
   }
   if (!options.udid) {
     throw new Error("--udid is required");
   }
   if (
     options.locale &&
-    (options.suite === "smoke" || options.suite === "layout")
+    ["smoke", "layout", "accessibility"].includes(options.suite)
   ) {
     throw new Error("--locale can only be used with all or locales");
   }
@@ -154,6 +161,174 @@ function countCapturedScreenshots(directory) {
 function waitForRetry(milliseconds) {
   const signal = new Int32Array(new SharedArrayBuffer(4));
   Atomics.wait(signal, 0, 0, milliseconds);
+}
+
+function captureTrimmed(run, command, args, cwd) {
+  return run(command, args, { capture: true, cwd }).trim();
+}
+
+function restoreAndroidSetting({ cwd, key, namespace, run, udid, value }) {
+  const action = value === "null" || value === ""
+    ? ["delete", namespace, key]
+    : ["put", namespace, key, value];
+  run("adb", ["-s", udid, "shell", "settings", ...action], { cwd });
+}
+
+export function configureAccessibilityDisplay({
+  cwd,
+  platform,
+  run = runCommand,
+  udid,
+}) {
+  if (platform === "ios") {
+    const previous = {
+      appearance: captureTrimmed(
+        run,
+        "xcrun",
+        ["simctl", "ui", udid, "appearance"],
+        cwd,
+      ),
+      contrast: captureTrimmed(
+        run,
+        "xcrun",
+        ["simctl", "ui", udid, "increase_contrast"],
+        cwd,
+      ),
+      contentSize: captureTrimmed(
+        run,
+        "xcrun",
+        ["simctl", "ui", udid, "content_size"],
+        cwd,
+      ),
+    };
+
+    if (
+      !["light", "dark"].includes(previous.appearance) ||
+      !["enabled", "disabled"].includes(previous.contrast) ||
+      ["unknown", "unsupported", ""].includes(previous.contentSize)
+    ) {
+      throw new Error(
+        `Could not capture restorable iOS accessibility display state for ${udid}`,
+      );
+    }
+
+    run("xcrun", ["simctl", "ui", udid, "appearance", "dark"], { cwd });
+    run(
+      "xcrun",
+      ["simctl", "ui", udid, "increase_contrast", "enabled"],
+      { cwd },
+    );
+    run(
+      "xcrun",
+      [
+        "simctl",
+        "ui",
+        udid,
+        "content_size",
+        "accessibility-extra-large",
+      ],
+      { cwd },
+    );
+
+    return () => {
+      run(
+        "xcrun",
+        ["simctl", "ui", udid, "content_size", previous.contentSize],
+        { cwd },
+      );
+      run(
+        "xcrun",
+        ["simctl", "ui", udid, "increase_contrast", previous.contrast],
+        { cwd },
+      );
+      run(
+        "xcrun",
+        ["simctl", "ui", udid, "appearance", previous.appearance],
+        { cwd },
+      );
+    };
+  }
+
+  const fontScale = captureTrimmed(
+    run,
+    "adb",
+    ["-s", udid, "shell", "settings", "get", "system", "font_scale"],
+    cwd,
+  );
+  const contrast = captureTrimmed(
+    run,
+    "adb",
+    [
+      "-s",
+      udid,
+      "shell",
+      "settings",
+      "get",
+      "secure",
+      "high_text_contrast_enabled",
+    ],
+    cwd,
+  );
+  const nightOutput = captureTrimmed(
+    run,
+    "adb",
+    ["-s", udid, "shell", "cmd", "uimode", "night"],
+    cwd,
+  );
+  const nightMode = nightOutput.match(/night mode:\s*(yes|no|auto)/i)?.[1];
+
+  if (!nightMode) {
+    throw new Error(
+      `Could not capture restorable Android night mode for ${udid}: ${nightOutput}`,
+    );
+  }
+
+  run(
+    "adb",
+    ["-s", udid, "shell", "settings", "put", "system", "font_scale", "1.3"],
+    { cwd },
+  );
+  run(
+    "adb",
+    [
+      "-s",
+      udid,
+      "shell",
+      "settings",
+      "put",
+      "secure",
+      "high_text_contrast_enabled",
+      "1",
+    ],
+    { cwd },
+  );
+  run("adb", ["-s", udid, "shell", "cmd", "uimode", "night", "yes"], {
+    cwd,
+  });
+
+  return () => {
+    restoreAndroidSetting({
+      cwd,
+      key: "font_scale",
+      namespace: "system",
+      run,
+      udid,
+      value: fontScale,
+    });
+    restoreAndroidSetting({
+      cwd,
+      key: "high_text_contrast_enabled",
+      namespace: "secure",
+      run,
+      udid,
+      value: contrast,
+    });
+    run(
+      "adb",
+      ["-s", udid, "shell", "cmd", "uimode", "night", nightMode.toLowerCase()],
+      { cwd },
+    );
+  };
 }
 
 export function runFlow({
@@ -267,6 +442,31 @@ function main() {
       outputDirectory: path.join(platformOutput, "layout"),
       udid: options.udid,
     });
+  }
+
+  if (options.suite === "all" || options.suite === "accessibility") {
+    const accessibilityText = fs.readFileSync(
+      path.join(cwd, MAESTRO_ACCESSIBILITY_FLOW),
+      "utf8",
+    );
+    const restoreDisplay = configureAccessibilityDisplay({
+      cwd,
+      platform: options.platform,
+      udid: options.udid,
+    });
+
+    try {
+      runFlow({
+        cwd,
+        environment: { PLATFORM: options.platform },
+        expectedScreenshotCount: countScreenshots(accessibilityText),
+        flow: MAESTRO_ACCESSIBILITY_FLOW,
+        outputDirectory: path.join(platformOutput, "accessibility"),
+        udid: options.udid,
+      });
+    } finally {
+      restoreDisplay();
+    }
   }
 
   if (options.suite === "all" || options.suite === "locales") {

@@ -4,6 +4,7 @@ import path from "node:path";
 import { pathToFileURL } from "node:url";
 
 import {
+  MAESTRO_ACCESSIBILITY_FLOW,
   MAESTRO_LAYOUT_FLOW,
   MAESTRO_LOCALIZED_FLOW,
   MAESTRO_SMOKE_FLOW,
@@ -58,8 +59,14 @@ export function verifyMaestroArtifacts(cwd = process.cwd()) {
   const layoutCount = countScreenshots(
     fs.readFileSync(path.join(cwd, MAESTRO_LAYOUT_FLOW), "utf8"),
   );
+  const accessibilityCount = countScreenshots(
+    fs.readFileSync(path.join(cwd, MAESTRO_ACCESSIBILITY_FLOW), "utf8"),
+  );
   const expectedPlatformCount =
-    smokeCount + layoutCount + languages.length * localizedCount;
+    smokeCount +
+    layoutCount +
+    accessibilityCount +
+    languages.length * localizedCount;
   const errors = [];
 
   for (const platform of ["android", "ios"]) {

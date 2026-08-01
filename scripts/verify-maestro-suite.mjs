@@ -10,6 +10,8 @@ export const MAESTRO_LOCALIZED_FLOW =
 export const MAESTRO_SMOKE_FLOW = ".maestro/flows/smoke/home-and-settings.yaml";
 export const MAESTRO_LAYOUT_FLOW =
   ".maestro/flows/visual/drive-three-routes-landscape.yaml";
+export const MAESTRO_ACCESSIBILITY_FLOW =
+  ".maestro/flows/visual/accessibility-display.yaml";
 
 const REQUIRED_LOCALIZED_SELECTORS = [
   "app-language-picker-option-${LOCALE}",
@@ -126,12 +128,14 @@ export function validateMaestroSuite(cwd = process.cwd()) {
   const localizedFlowPath = path.join(cwd, MAESTRO_LOCALIZED_FLOW);
   const smokeFlowPath = path.join(cwd, MAESTRO_SMOKE_FLOW);
   const layoutFlowPath = path.join(cwd, MAESTRO_LAYOUT_FLOW);
+  const accessibilityFlowPath = path.join(cwd, MAESTRO_ACCESSIBILITY_FLOW);
   const configPath = path.join(cwd, ".maestro/config.yaml");
 
   for (const filePath of [
     localizedFlowPath,
     smokeFlowPath,
     layoutFlowPath,
+    accessibilityFlowPath,
     configPath,
   ]) {
     if (!fs.existsSync(filePath)) {
@@ -140,16 +144,23 @@ export function validateMaestroSuite(cwd = process.cwd()) {
   }
 
   if (errors.length > 0) {
-    return { errors, languages, localizedScreenshotCount: 0 };
+    return {
+      accessibilityScreenshotCount: 0,
+      errors,
+      languages,
+      localizedScreenshotCount: 0,
+    };
   }
 
   const localizedFlow = fs.readFileSync(localizedFlowPath, "utf8");
   const smokeFlow = fs.readFileSync(smokeFlowPath, "utf8");
   const layoutFlow = fs.readFileSync(layoutFlowPath, "utf8");
+  const accessibilityFlow = fs.readFileSync(accessibilityFlowPath, "utf8");
   const maestroSource = [
     localizedFlow,
     smokeFlow,
     layoutFlow,
+    accessibilityFlow,
     fs.readFileSync(configPath, "utf8"),
   ].join("\n");
 
@@ -174,6 +185,29 @@ export function validateMaestroSuite(cwd = process.cwd()) {
         `Localized Maestro coverage is missing selector: ${selector}`,
       );
     }
+  }
+
+  for (const selector of [
+    "setup-guide-card",
+    "main-screen",
+    "conversation-drawer-empty-state",
+    "settings-page-overview",
+    "settings-page-app",
+    "landscape-left-pane",
+    "landscape-right-pane",
+  ]) {
+    if (!accessibilityFlow.includes(selector)) {
+      errors.push(
+        `Accessibility Maestro coverage is missing selector: ${selector}`,
+      );
+    }
+  }
+
+  const accessibilityScreenshotCount = countScreenshots(accessibilityFlow);
+  if (accessibilityScreenshotCount < 7) {
+    errors.push(
+      `Accessibility flow must capture at least 7 surfaces, found ${accessibilityScreenshotCount}`,
+    );
   }
 
   const exactLanguageOptionSelectors = localizedFlow.match(
@@ -249,7 +283,12 @@ export function validateMaestroSuite(cwd = process.cwd()) {
     );
   }
 
-  return { errors, languages, localizedScreenshotCount };
+  return {
+    accessibilityScreenshotCount,
+    errors,
+    languages,
+    localizedScreenshotCount,
+  };
 }
 
 export function runMaestroSuiteVerification({

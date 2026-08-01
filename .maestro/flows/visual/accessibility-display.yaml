@@ -1,0 +1,62 @@
+appId: com.tobiaswinkler.app.mrbroccoli
+name: Dark high-contrast large-text coverage
+tags:
+  - visual
+  - accessibility
+---
+- launchApp:
+    clearState: true
+    clearKeychain: true
+    permissions:
+      all: allow
+- setOrientation: PORTRAIT
+- assertVisible:
+    id: setup-guide-card
+- takeScreenshot:
+    path: ${PLATFORM}/accessibility/setup-guide
+- tapOn:
+    id: setup-guide-not-now
+- assertVisible:
+    id: main-screen
+- takeScreenshot:
+    path: ${PLATFORM}/accessibility/home
+- tapOn:
+    id: main-conversations-button
+- assertVisible:
+    id: conversation-drawer-empty-state
+- takeScreenshot:
+    path: ${PLATFORM}/accessibility/conversation-drawer
+- tapOn:
+    id: conversation-drawer-close
+- tapOn:
+    id: main-settings-button
+- assertVisible:
+    id: settings-page-overview
+- takeScreenshot:
+    path: ${PLATFORM}/accessibility/settings-overview
+- scrollUntilVisible:
+    element:
+      id: settings-overview-row-app
+    direction: DOWN
+- tapOn:
+    id: settings-overview-row-app
+- assertVisible:
+    id: settings-page-app
+- takeScreenshot:
+    path: ${PLATFORM}/accessibility/settings-app-top
+- swipe:
+    direction: UP
+- takeScreenshot:
+    path: ${PLATFORM}/accessibility/settings-app-bottom
+- tapOn:
+    id: settings-back-button
+- tapOn:
+    id: settings-close-button
+- setOrientation: LANDSCAPE_LEFT
+- assertVisible:
+    id: landscape-left-pane
+- assertVisible:
+    id: landscape-right-pane
+- takeScreenshot:
+    path: ${PLATFORM}/accessibility/home-landscape
+- setOrientation: PORTRAIT

@@ -28,6 +28,7 @@ test("verifies every locale and emits a review manifest and gallery", () => {
       [".maestro/templates/localized-coverage.yaml", "locale"],
       [".maestro/flows/smoke/home-and-settings.yaml", "smoke"],
       [".maestro/flows/visual/drive-three-routes-landscape.yaml", "layout"],
+      [".maestro/flows/visual/accessibility-display.yaml", "accessibility"],
     ];
 
     for (const [relativePath, name] of flowFiles) {
@@ -54,6 +55,15 @@ test("verifies every locale and emits a review manifest and gallery", () => {
       );
       writePng(
         path.join(releaseRoot, platform, "layout", "takeScreenshot", "layout.png"),
+      );
+      writePng(
+        path.join(
+          releaseRoot,
+          platform,
+          "accessibility",
+          "takeScreenshot",
+          "accessibility.png",
+        ),
       );
 
       for (const language of languages) {
@@ -86,8 +96,8 @@ test("verifies every locale and emits a review manifest and gallery", () => {
     const result = verifyMaestroArtifacts(cwd);
 
     assert.deepEqual(result.errors, []);
-    assert.equal(result.expectedPlatformCount, languages.length + 2);
-    assert.equal(result.files.length, (languages.length + 2) * 2 + 1);
+    assert.equal(result.expectedPlatformCount, languages.length + 3);
+    assert.equal(result.files.length, (languages.length + 3) * 2 + 1);
     assert.ok(
       fs.existsSync(path.join(releaseRoot, "review-manifest.json")),
     );

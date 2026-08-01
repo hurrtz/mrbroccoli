@@ -10,7 +10,10 @@ import {
   readAppLocaleOptions,
   validateMaestroSuite,
 } from "./verify-maestro-suite.mjs";
-import { runFlow } from "./run-maestro-suite.mjs";
+import {
+  configureAccessibilityDisplay,
+  runFlow,
+} from "./run-maestro-suite.mjs";
 
 test("derives the complete locale order from the TypeScript registry", () => {
   const languages = readAppLanguages();
@@ -133,4 +136,77 @@ test("stops after a repeated Maestro flow failure", () => {
   } finally {
     fs.rmSync(cwd, { recursive: true, force: true });
   }
+});
+
+test("configures and restores iOS dark high-contrast large text", () => {
+  const calls = [];
+  const run = (command, args, options = {}) => {
+    calls.push({ command, args, options });
+    const option = args[3];
+    if (options.capture && option === "appearance") return "light\n";
+    if (options.capture && option === "increase_contrast") return "disabled\n";
+    if (options.capture && option === "content_size") return "large\n";
+    return "";
+  };
+
+  const restore = configureAccessibilityDisplay({
+    cwd: "/repo",
+    platform: "ios",
+    run,
+    udid: "IOS-UDID",
+  });
+  restore();
+
+  assert.deepEqual(
+    calls
+      .filter(({ options }) => !options.capture)
+      .map(({ args }) => args.slice(3)),
+    [
+      ["appearance", "dark"],
+      ["increase_contrast", "enabled"],
+      ["content_size", "accessibility-extra-large"],
+      ["content_size", "large"],
+      ["increase_contrast", "disabled"],
+      ["appearance", "light"],
+    ],
+  );
+});
+
+test("configures and restores Android dark high-contrast large text", () => {
+  const calls = [];
+  const run = (command, args, options = {}) => {
+    calls.push({ command, args, options });
+    if (options.capture && args.includes("font_scale")) return "1.0\n";
+    if (options.capture && args.includes("high_text_contrast_enabled")) {
+      return "null\n";
+    }
+    if (options.capture && args.includes("uimode")) return "Night mode: no\n";
+    return "";
+  };
+
+  const restore = configureAccessibilityDisplay({
+    cwd: "/repo",
+    platform: "android",
+    run,
+    udid: "emulator-5554",
+  });
+  restore();
+
+  const mutations = calls
+    .filter(({ options }) => !options.capture)
+    .map(({ args }) => args.slice(3));
+  assert.deepEqual(mutations, [
+    ["settings", "put", "system", "font_scale", "1.3"],
+    [
+      "settings",
+      "put",
+      "secure",
+      "high_text_contrast_enabled",
+      "1",
+    ],
+    ["cmd", "uimode", "night", "yes"],
+    ["settings", "put", "system", "font_scale", "1.0"],
+    ["settings", "delete", "secure", "high_text_contrast_enabled"],
+    ["cmd", "uimode", "night", "no"],
+  ]);
 });
