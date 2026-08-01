@@ -132,6 +132,18 @@ function runMaestroSuite({
   );
 }
 
+function uninstallExistingAndroidApp({ captureCommand, cwd, run, udid }) {
+  const installedPath = captureCommand(
+    "adb",
+    ["-s", udid, "shell", "pm", "path", APP_ID],
+    { capture: true, cwd },
+  ).trim();
+
+  if (installedPath) {
+    run("adb", ["-s", udid, "uninstall", APP_ID], { cwd });
+  }
+}
+
 export function runMaestroPrerelease({
   cwd = process.cwd(),
   captureCommand = runCommand,
@@ -199,7 +211,12 @@ export function runMaestroPrerelease({
   }
 
   for (const udid of [androidEmulator, androidPhysical]) {
-    run("adb", ["-s", udid, "install", "-r", releaseApk], { cwd });
+    // The spend-free instrumentation phase intentionally installs a
+    // debug-signed APK on the emulator. Remove any existing test installation
+    // before installing the release-signed app so the following phase cannot
+    // fail with INSTALL_FAILED_UPDATE_INCOMPATIBLE.
+    uninstallExistingAndroidApp({ captureCommand, cwd, run, udid });
+    run("adb", ["-s", udid, "install", releaseApk], { cwd });
     run("adb", ["-s", udid, "shell", "pm", "path", APP_ID], { cwd });
   }
 

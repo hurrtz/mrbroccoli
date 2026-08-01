@@ -77,12 +77,16 @@ test("disables dotenv for Release builds and scans both artifacts", () => {
 
       return "";
     };
-    const captureCommand = (command) => {
-      if (command === "adb") {
+    const captureCommand = (command, args) => {
+      if (command === "adb" && args[0] === "devices") {
         return `List of devices attached
 emulator-5554 device product:sdk model:Pixel transport_id:1
 192.168.1.20:41231 device product:phone model:Phone transport_id:2
 `;
+      }
+
+      if (command === "adb") {
+        return `package:/data/app/${args[1]}/base.apk\n`;
       }
 
       return JSON.stringify({
@@ -117,6 +121,12 @@ emulator-5554 device product:sdk model:Pixel transport_id:1
     const screenReaderChecks = calls.filter(({ args }) =>
       args.includes("scripts/run-screen-reader-check.mjs"),
     );
+    const androidUninstalls = calls.filter(
+      ({ command, args }) => command === "adb" && args.includes("uninstall"),
+    );
+    const androidInstalls = calls.filter(
+      ({ command, args }) => command === "adb" && args.includes("install"),
+    );
 
     assert.deepEqual(androidBuild.options.env, {
       EXPO_NO_DOTENV: "1",
@@ -133,6 +143,21 @@ emulator-5554 device product:sdk model:Pixel transport_id:1
     );
     assert.equal(secretScan.args.at(-2).endsWith("app-release.apk"), true);
     assert.equal(secretScan.args.at(-1).endsWith("MrBroccoli.app"), true);
+    assert.deepEqual(
+      androidUninstalls.map(({ args }) => args.slice(0, 3)),
+      [
+        ["-s", "emulator-5554", "uninstall"],
+        ["-s", "192.168.1.20:41231", "uninstall"],
+      ],
+    );
+    assert.deepEqual(
+      androidInstalls.map(({ args }) => args.slice(0, 3)),
+      [
+        ["-s", "emulator-5554", "install"],
+        ["-s", "192.168.1.20:41231", "install"],
+      ],
+    );
+    assert.equal(androidInstalls.every(({ args }) => !args.includes("-r")), true);
   } finally {
     fs.rmSync(cwd, { recursive: true, force: true });
   }
