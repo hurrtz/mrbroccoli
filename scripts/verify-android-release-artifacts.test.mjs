@@ -9,6 +9,7 @@ import {
   parseArchiveSizeListing,
   parseAndroidVersionCode,
   verifyExternalNativeSymbols,
+  verifySherpaJniMapping,
 } from "./verify-android-release-artifacts.mjs";
 
 const sizeBudget = {
@@ -64,6 +65,72 @@ test("requires the external native-symbol archive to match the AAB", () => {
     () =>
       verifyExternalNativeSymbols(embedded, ["arm64-v8a/libexample.so.sym"]),
     /missing 1 symbol table/,
+  );
+});
+
+test("rejects release mappings that rename Sherpa JNI configuration classes", () => {
+  const preserved = `com.k2fsa.sherpa.onnx.GeneratedAudio -> com.k2fsa.sherpa.onnx.GeneratedAudio:
+    float[] samples -> samples
+    int sampleRate -> sampleRate
+com.k2fsa.sherpa.onnx.GenerationConfig -> com.k2fsa.sherpa.onnx.GenerationConfig:
+    float silenceScale -> silenceScale
+    float speed -> speed
+    int sid -> sid
+    float[] referenceAudio -> referenceAudio
+    int referenceSampleRate -> referenceSampleRate
+    java.lang.String referenceText -> referenceText
+    int numSteps -> numSteps
+    java.util.Map extra -> extra
+com.k2fsa.sherpa.onnx.OfflineTts -> com.k2fsa.sherpa.onnx.OfflineTts:
+    com.k2fsa.sherpa.onnx.OfflineTtsConfig config -> config
+    long ptr -> ptr
+com.k2fsa.sherpa.onnx.OfflineTtsConfig -> com.k2fsa.sherpa.onnx.OfflineTtsConfig:
+    com.k2fsa.sherpa.onnx.OfflineTtsModelConfig model -> model
+    java.lang.String ruleFsts -> ruleFsts
+    java.lang.String ruleFars -> ruleFars
+    int maxNumSentences -> maxNumSentences
+    float silenceScale -> silenceScale
+com.k2fsa.sherpa.onnx.OfflineTtsKokoroModelConfig -> com.k2fsa.sherpa.onnx.OfflineTtsKokoroModelConfig:
+    java.lang.String model -> model
+    java.lang.String voices -> voices
+    java.lang.String tokens -> tokens
+    java.lang.String dataDir -> dataDir
+    java.lang.String lexicon -> lexicon
+    java.lang.String lang -> lang
+    java.lang.String dictDir -> dictDir
+    float lengthScale -> lengthScale
+com.k2fsa.sherpa.onnx.OfflineTtsModelConfig -> com.k2fsa.sherpa.onnx.OfflineTtsModelConfig:
+    com.k2fsa.sherpa.onnx.OfflineTtsVitsModelConfig vits -> vits
+    com.k2fsa.sherpa.onnx.OfflineTtsMatchaModelConfig matcha -> matcha
+    com.k2fsa.sherpa.onnx.OfflineTtsKokoroModelConfig kokoro -> kokoro
+    com.k2fsa.sherpa.onnx.OfflineTtsZipVoiceModelConfig zipvoice -> zipvoice
+    com.k2fsa.sherpa.onnx.OfflineTtsKittenModelConfig kitten -> kitten
+    com.k2fsa.sherpa.onnx.OfflineTtsPocketModelConfig pocket -> pocket
+    com.k2fsa.sherpa.onnx.OfflineTtsSupertonicModelConfig supertonic -> supertonic
+    int numThreads -> numThreads
+    boolean debug -> debug
+    java.lang.String provider -> provider`;
+
+  assert.doesNotThrow(() => verifySherpaJniMapping(preserved));
+  assert.throws(
+    () =>
+      verifySherpaJniMapping(
+        preserved.replace(
+          "com.k2fsa.sherpa.onnx.OfflineTtsKokoroModelConfig -> com.k2fsa.sherpa.onnx.OfflineTtsKokoroModelConfig:",
+          "com.k2fsa.sherpa.onnx.OfflineTtsKokoroModelConfig -> H8.w:",
+        ),
+      ),
+    /R8 renamed Sherpa JNI class/,
+  );
+  assert.throws(
+    () =>
+      verifySherpaJniMapping(
+        preserved.replace(
+          "java.lang.String model -> model",
+          "java.lang.String model -> a",
+        ),
+      ),
+    /R8 renamed Sherpa JNI field/,
   );
 });
 

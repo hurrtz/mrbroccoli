@@ -8,4 +8,8 @@
 -keep class com.swmansion.reanimated.** { *; }
 -keep class com.facebook.react.turbomodule.** { *; }
 
+# sherpa-onnx JNI reads Kotlin configuration objects by their original class
+# and field names. Renaming either side makes ART abort inside GetObjectField.
+-keep class com.k2fsa.sherpa.onnx.** { *; }
+
 # Add any project-specific keep options here.

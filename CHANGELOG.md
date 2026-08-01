@@ -10,6 +10,11 @@ the complete Play Store translations are kept in a dedicated file under
 
 ## Unreleased
 
+### Fixed
+
+- Prevent Android release optimization from renaming Sherpa JNI classes and
+  crashing the app when Kokoro speech initializes.
+
 ## 2.7.0 - 2026-08-01
 
 ### Changed
