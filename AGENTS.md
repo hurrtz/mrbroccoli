@@ -209,6 +209,10 @@ These notes are specific to this repository and supplement any parent-level inst
   versioned hook with `make hooks-install`; `make pre-push` is the spend-free
   push gate, and `make pre-release-static` is the spend-free native/static
   portion of comprehensive release validation.
+- `make fresh-checkout` refuses a dirty worktree, creates a detached worktree
+  at the exact current `HEAD`, installs only from the lockfile, and reruns the
+  complete pre-push gate without dotenv loading. `make pre-release-static`
+  starts with this isolated validation before native build and device gates.
 - Keep `.githooks/pre-push` repository-relative and non-interactive. Do not put
   live provider calls or Maestro device work in the pre-push hook.
 - The comprehensive pre-release workflow must run

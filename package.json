@@ -17,6 +17,8 @@
     "maestro:prerelease": "node scripts/run-maestro-prerelease.mjs",
     "maestro:prerelease:test": "node --test scripts/run-maestro-prerelease.test.mjs scripts/verify-maestro-artifacts.test.mjs",
     "maestro:artifacts:verify": "node scripts/verify-maestro-artifacts.mjs",
+    "fresh-checkout": "node scripts/run-fresh-checkout-validation.mjs",
+    "fresh-checkout:test": "node --test scripts/run-fresh-checkout-validation.test.mjs",
     "license:notices:generate": "node scripts/verify-licenses.mjs --write",
     "license:verify": "node scripts/verify-licenses.mjs",
     "license:test": "node --test scripts/verify-licenses.test.mjs",

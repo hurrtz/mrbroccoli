@@ -9,6 +9,7 @@ IOS_DESTINATION ?= generic/platform=iOS Simulator
 	help \
 	hooks-install \
 	worktree-check \
+	fresh-checkout \
 	config \
 	typecheck \
 	test \
@@ -35,6 +36,7 @@ help:
 	@printf '%s\n' \
 		'make hooks-install       Install the repository-managed pre-push hook' \
 		'make pre-push           Run the fast, spend-free local validation gate' \
+		'make fresh-checkout     Re-run pre-push from an isolated detached HEAD' \
 		'make prerelease-preflight Verify every secret and signing prerequisite first' \
 		'make pre-release-static Run the complete spend-free native/static release phase' \
 		'make pre-release-live  Run the fail-fast live provider/model matrix' \
@@ -54,6 +56,10 @@ hooks-install:
 worktree-check:
 	@git diff --check
 	@git diff --cached --check
+
+fresh-checkout:
+	@npm run fresh-checkout:test
+	@npm run fresh-checkout
 
 config:
 	@npm run config:verify
@@ -137,7 +143,7 @@ prerelease-preflight:
 # and Maestro phase. It is safe to rerun while developing the release suite.
 pre-release-static:
 	@$(MAKE) prerelease-preflight
-	@$(MAKE) pre-push
+	@$(MAKE) fresh-checkout
 	@$(MAKE) doctor
 	@$(MAKE) dependencies-check
 	@$(MAKE) i18n
