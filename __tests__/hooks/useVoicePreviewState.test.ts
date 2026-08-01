@@ -116,4 +116,75 @@ describe("useVoicePreviewState", () => {
       await Promise.resolve();
     });
   });
+
+  it("clears a generating preview immediately when the visible Stop action is used", async () => {
+    let finishPreview: (() => void) | null = null;
+    let finishStop: (() => void) | null = null;
+    let reportPlaybackStarted: (() => void) | undefined;
+    const onPreviewVoice = jest.fn(
+      async (
+        _request,
+        callbacks?: {
+          onPlaybackStarted?: () => void;
+        },
+      ) => {
+        reportPlaybackStarted = callbacks?.onPlaybackStarted;
+        await new Promise<void>((resolve) => {
+          finishPreview = resolve;
+        });
+      },
+    );
+    const onStopPreviewVoice = jest.fn(
+      () =>
+        new Promise<void>((resolve) => {
+          finishStop = resolve;
+        }),
+    );
+    const hook = renderHook(() =>
+      useVoicePreviewState({
+        visible: true,
+        settings: DEFAULT_SETTINGS,
+        language: "en",
+        providerPreviewTexts: buildProviderPreviewTexts(),
+        kokoroPreviewTexts: { en: "Kokoro English", zh: "Kokoro Chinese" },
+        nativePreviewText: "Native preview",
+        selectedNativeVoice: "Samantha",
+        onPreviewVoice,
+        onStopPreviewVoice,
+      }),
+    );
+
+    let previewPromise: Promise<void> = Promise.resolve();
+    await act(async () => {
+      previewPromise = hook.result.current.handlePreviewKokoroVoice("en");
+      await Promise.resolve();
+    });
+
+    expect(hook.result.current.activePreview).toEqual({
+      id: "kokoro:en",
+      phase: "generating",
+    });
+
+    let stopPromise: Promise<void> = Promise.resolve();
+    act(() => {
+      stopPromise = hook.result.current.stopActivePreview();
+    });
+
+    expect(hook.result.current.activePreview).toBeNull();
+    expect(onStopPreviewVoice).toHaveBeenCalledTimes(1);
+
+    act(() => {
+      reportPlaybackStarted?.();
+    });
+    expect(hook.result.current.activePreview).toBeNull();
+
+    await act(async () => {
+      finishStop?.();
+      await stopPromise;
+      finishPreview?.();
+      await previewPromise;
+    });
+
+    expect(hook.result.current.activePreview).toBeNull();
+  });
 });

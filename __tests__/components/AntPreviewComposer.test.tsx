@@ -43,4 +43,33 @@ describe("AntPreviewComposer", () => {
     fireEvent.changeText(input, "Updated preview text");
     expect(setText).toHaveBeenCalledWith("Updated preview text");
   });
+
+  it("keeps Stop interactive while voice generation is pending", () => {
+    const onStop = jest.fn().mockResolvedValue(undefined);
+    const screen = render(
+      <LocalizationProvider language="en">
+        <ThemeProvider mode="light">
+          <AntPreviewComposer
+            text="A pending voice preview"
+            setText={jest.fn()}
+            phase="generating"
+            interactionDisabled={false}
+            onPreview={jest.fn().mockResolvedValue(undefined)}
+            onStop={onStop}
+            onTextInputFocus={jest.fn()}
+          />
+        </ThemeProvider>
+      </LocalizationProvider>,
+    );
+
+    const action = screen.getByRole("button", { name: "Stop" });
+    expect(action.props.accessibilityState).toEqual(
+      expect.objectContaining({ disabled: false }),
+    );
+    expect(screen.getByText("Stop")).toBeTruthy();
+
+    fireEvent.press(action);
+
+    expect(onStop).toHaveBeenCalledTimes(1);
+  });
 });

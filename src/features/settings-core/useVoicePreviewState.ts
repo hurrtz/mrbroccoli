@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 import {
   PROVIDER_DEFAULT_TTS_MODELS,
@@ -45,12 +45,33 @@ export function useVoicePreviewState(params: {
     id: string;
     phase: PreviewButtonPhase;
   } | null>(null);
+  const activePreviewRef = useRef(activePreview);
+  const previewOperationRef = useRef(0);
+
+  const updateActivePreview = useCallback(
+    (next: { id: string; phase: PreviewButtonPhase } | null) => {
+      activePreviewRef.current = next;
+      setActivePreview(next);
+    },
+    [],
+  );
 
   useEffect(() => {
     if (!visible) {
-      setActivePreview(null);
+      previewOperationRef.current += 1;
+      updateActivePreview(null);
     }
-  }, [visible]);
+  }, [updateActivePreview, visible]);
+
+  const stopActivePreview = useCallback(async () => {
+    if (!activePreviewRef.current) {
+      return;
+    }
+
+    previewOperationRef.current += 1;
+    updateActivePreview(null);
+    await onStopPreviewVoice();
+  }, [onStopPreviewVoice, updateActivePreview]);
 
   const handleExactPreview = useCallback(
     async (
@@ -63,17 +84,18 @@ export function useVoicePreviewState(params: {
         return;
       }
 
-      if (activePreview?.id === previewId) {
-        setActivePreview(null);
-        await onStopPreviewVoice();
+      if (activePreviewRef.current?.id === previewId) {
+        await stopActivePreview();
         return;
       }
 
-      if (activePreview) {
+      if (activePreviewRef.current) {
         return;
       }
 
-      setActivePreview({ id: previewId, phase: "generating" });
+      const previewOperation = previewOperationRef.current + 1;
+      previewOperationRef.current = previewOperation;
+      updateActivePreview({ id: previewId, phase: "generating" });
       try {
         await onPreviewVoice(
           {
@@ -82,21 +104,22 @@ export function useVoicePreviewState(params: {
           },
           {
             onPlaybackStarted: () => {
-              setActivePreview((current) =>
-                current?.id === previewId
-                  ? { id: previewId, phase: "playing" }
-                  : current,
-              );
+              if (
+                previewOperationRef.current === previewOperation &&
+                activePreviewRef.current?.id === previewId
+              ) {
+                updateActivePreview({ id: previewId, phase: "playing" });
+              }
             },
           },
         );
       } finally {
-        setActivePreview((current) =>
-          current?.id === previewId ? null : current,
-        );
+        if (previewOperationRef.current === previewOperation) {
+          updateActivePreview(null);
+        }
       }
     },
-    [activePreview, onPreviewVoice, onStopPreviewVoice],
+    [onPreviewVoice, stopActivePreview, updateActivePreview],
   );
 
   const handlePreviewProviderVoice = useCallback(
@@ -162,5 +185,6 @@ export function useVoicePreviewState(params: {
     handlePreviewProviderVoice,
     handlePreviewNativeVoice,
     handlePreviewKokoroVoice,
+    stopActivePreview,
   };
 }

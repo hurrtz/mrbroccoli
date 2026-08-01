@@ -11,6 +11,7 @@ export type SpeechDiagnosticStage =
   | "tts-requested"
   | "tts-succeeded"
   | "tts-fallback"
+  | "tts-cancelled"
   | "tts-failed"
   | "local-attempt"
   | "local-failed"

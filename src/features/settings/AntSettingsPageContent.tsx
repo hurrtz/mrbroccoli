@@ -55,7 +55,6 @@ export function AntSettingsPageContent({
     onAddResponseMode,
     onOpenSetupGuide,
     onRemoveResponseMode,
-    onStopPreviewVoice,
     onUpdate,
     onUpdateApiKey,
     onUpdateProviderSttModel,
@@ -163,7 +162,7 @@ export function AntSettingsPageContent({
             onUpdateProviderTtsModel={onUpdateProviderTtsModel}
             onUpdateProviderTtsVoice={onUpdateProviderTtsVoice}
             providerVoiceDirectories={providerVoiceDirectories}
-            onStopPreviewVoice={onStopPreviewVoice}
+            onStopPreviewVoice={controller.stopActivePreview}
             onSetProviderPreviewText={(
               provider: Provider,
               language: TtsListenLanguage,

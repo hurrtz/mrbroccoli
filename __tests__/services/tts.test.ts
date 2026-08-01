@@ -38,6 +38,10 @@ import {
   resetRuntimeCapabilityOverridesForTests,
 } from "../../src/services/runtimeCapabilityOverrides";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import {
+  clearSpeechDiagnostics,
+  getSpeechDiagnostics,
+} from "../../src/services/speech/diagnostics";
 
 global.fetch = jest.fn();
 
@@ -171,6 +175,7 @@ describe("synthesizeSpeech", () => {
     await AsyncStorage.removeItem(RUNTIME_CAPABILITY_OVERRIDES_STORAGE_KEY);
     jest.clearAllMocks();
     clearProviderTtsAudioCacheForTests();
+    clearSpeechDiagnostics();
     resetProviderModelHealthForTests();
     resetRuntimeCapabilityOverridesForTests();
   });
@@ -216,6 +221,70 @@ describe("synthesizeSpeech", () => {
     expect(body.model).toBe("gpt-4o-mini-tts");
     expect(body.voice).toBe("alloy");
     expect(body.input).toBe("Hello world");
+  });
+
+  it("records an aborted provider preview as cancelled instead of failed", async () => {
+    const controller = new AbortController();
+    let markFetchStarted: (() => void) | null = null;
+    const fetchStarted = new Promise<void>((resolve) => {
+      markFetchStarted = resolve;
+    });
+    (fetch as jest.Mock).mockImplementationOnce(
+      (_input: RequestInfo | URL, init: RequestInit) =>
+        new Promise((_resolve, reject) => {
+          markFetchStarted?.();
+          const rejectAsAborted = () => {
+            const error = new Error("Aborted");
+            error.name = "AbortError";
+            reject(error);
+          };
+
+          if (init.signal?.aborted) {
+            rejectAsAborted();
+            return;
+          }
+
+          init.signal?.addEventListener("abort", rejectAsAborted, {
+            once: true,
+          });
+        }),
+    );
+
+    const synthesis = synthesizeSpeech({
+      text: "Cancel this provider preview",
+      voice: "alloy",
+      mode: "provider",
+      provider: "openai",
+      apiKey: "sk-test",
+      language: "en",
+      diagnostics: {
+        requestId: "preview-cancel-1",
+        source: "preview",
+      },
+      abortSignal: controller.signal,
+    });
+
+    await fetchStarted;
+    controller.abort();
+
+    await expect(synthesis).rejects.toMatchObject({ name: "AbortError" });
+    expect(getSpeechDiagnostics()).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          requestId: "preview-cancel-1",
+          source: "preview",
+          stage: "tts-cancelled",
+        }),
+      ]),
+    );
+    expect(getSpeechDiagnostics()).not.toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          requestId: "preview-cancel-1",
+          stage: "tts-failed",
+        }),
+      ]),
+    );
   });
 
   it("reuses successful provider audio for an identical synthesis request", async () => {

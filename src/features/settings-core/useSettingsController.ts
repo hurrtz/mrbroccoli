@@ -137,6 +137,7 @@ export function useSettingsController({
     handlePreviewProviderVoice,
     handlePreviewNativeVoice,
     handlePreviewKokoroVoice,
+    stopActivePreview,
   } = useVoicePreviewState({
     visible,
     settings,
@@ -255,6 +256,7 @@ export function useSettingsController({
     handlePreviewProviderVoice,
     handlePreviewNativeVoice,
     handlePreviewKokoroVoice,
+    stopActivePreview,
     providerPickerDisabled,
     ttsProviderPickerDisabled,
     selectedSttProviderModelOptions,

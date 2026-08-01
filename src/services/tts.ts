@@ -144,6 +144,13 @@ function isLocalAndroidDevTtsEnabled(apiKey: string | undefined) {
   );
 }
 
+function wasSpeechSynthesisCancelled(
+  error: Error,
+  abortSignal?: AbortSignal,
+) {
+  return abortSignal?.aborted === true || error.name === "AbortError";
+}
+
 function buildLocalAndroidDevWavBytes(text: string) {
   const sampleRate = 16_000;
   const durationMs = Math.min(900, Math.max(320, text.trim().length * 18));
@@ -307,7 +314,12 @@ export async function synthesizeSpeech(params: {
       recordSpeechDiagnostic({
         requestId,
         source: diagnostics?.source ?? "unknown",
-        stage: "tts-failed",
+        stage: wasSpeechSynthesisCancelled(
+          normalizedKokoroError,
+          abortSignal,
+        )
+          ? "tts-cancelled"
+          : "tts-failed",
         requestedRoute: "kokoro",
         actualRoute: "kokoro",
         provider: null,
@@ -434,7 +446,9 @@ export async function synthesizeSpeech(params: {
     recordSpeechDiagnostic({
       requestId,
       source: diagnostics?.source ?? "unknown",
-      stage: "tts-failed",
+      stage: wasSpeechSynthesisCancelled(normalizedProviderError, abortSignal)
+        ? "tts-cancelled"
+        : "tts-failed",
       requestedRoute: "provider",
       actualRoute: "provider",
       provider,

@@ -34,9 +34,7 @@ export function AntPreviewComposer({
 }) {
   const { colors } = useTheme();
   const { t } = useLocalization();
-  const isGenerating = phase === "generating";
-  const isPlaying = phase === "playing";
-  const isBusy = isGenerating || isPlaying;
+  const isBusy = phase !== "idle";
   const disabled = interactionDisabled || (!isBusy && text.trim().length === 0);
 
   return (
@@ -81,8 +79,8 @@ export function AntPreviewComposer({
         }}
       />
       <Button
+        accessibilityLabel={isBusy ? t("stop") : t("previewVoice")}
         type="primary"
-        loading={isGenerating}
         disabled={disabled}
         style={styles.previewButton}
         onPress={() => {
@@ -91,7 +89,7 @@ export function AntPreviewComposer({
       >
         <AntButtonLabel
           color={colors.onActiveControl}
-          icon={isPlaying ? "stop" : "sound"}
+          icon={isBusy ? "stop" : "sound"}
           iconSize="compact"
           label={isBusy ? t("stop") : t("previewVoice")}
         />

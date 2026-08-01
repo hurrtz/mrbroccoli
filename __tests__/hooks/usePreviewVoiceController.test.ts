@@ -117,4 +117,68 @@ describe("usePreviewVoiceController", () => {
     );
     expect(onPlaybackStarted).toHaveBeenCalledTimes(1);
   });
+
+  it("aborts pending synthesis without enqueueing late preview audio", async () => {
+    let requestSignal: AbortSignal | undefined;
+    mockSynthesizeSpeech.mockImplementationOnce(
+      ({ abortSignal }: { abortSignal?: AbortSignal }) =>
+        new Promise<string>((_resolve, reject) => {
+          requestSignal = abortSignal;
+          abortSignal?.addEventListener(
+            "abort",
+            () => {
+              const error = new Error("Voice preview cancelled.");
+              error.name = "AbortError";
+              reject(error);
+            },
+            { once: true },
+          );
+        }),
+    );
+    const player = {
+      enqueueAudio: jest.fn(),
+      isPlaying: false,
+      resetCancellation: jest.fn(),
+      speakText: jest.fn(),
+      stopPlayback: jest.fn(async () => undefined),
+      waitForDrain: jest.fn(async () => undefined),
+    };
+    const showToast = jest.fn();
+    const { result } = renderHook(() =>
+      usePreviewVoiceController({
+        isBusy: false,
+        isRecording: false,
+        language: "en",
+        player,
+        settings: {
+          apiKeys: {} as never,
+          providerTtsModels: {} as never,
+        },
+        showToast,
+        t: (key) => key,
+      }),
+    );
+
+    let previewPromise: Promise<void> = Promise.resolve();
+    await act(async () => {
+      previewPromise = result.current.handlePreviewVoice({
+        mode: "kokoro",
+        language: "en",
+        text: "Cancel this slow preview",
+        voice: "af_maple",
+      });
+      await Promise.resolve();
+    });
+
+    expect(requestSignal?.aborted).toBe(false);
+
+    await act(async () => {
+      await result.current.stopPreviewVoice();
+      await previewPromise;
+    });
+
+    expect(requestSignal?.aborted).toBe(true);
+    expect(player.enqueueAudio).not.toHaveBeenCalled();
+    expect(showToast).not.toHaveBeenCalled();
+  });
 });
