@@ -45,7 +45,7 @@ help:
 		'make release-aab       Build, verify, and archive the signed Android release artifacts' \
 		'make maestro-verify      Verify the E2E locale and screenshot contract' \
 		'make android-debug      Build a debug APK' \
-		'make android-instrumentation Run native runtime tests on every connected Android device' \
+		'make android-instrumentation Run native runtime tests on one connected Android emulator' \
 		'make ios-build          Build the app for the generic iOS Simulator' \
 		'make ios-native-test    Run native lifecycle tests on one booted iOS Simulator'
 
@@ -97,7 +97,7 @@ android-unit:
 	@NODE_ENV=test $(ANDROID_GRADLE) :app:testDebugUnitTest
 
 android-instrumentation:
-	@NODE_ENV=test $(ANDROID_GRADLE) :app:connectedDebugAndroidTest
+	@node scripts/run-android-instrumentation.mjs
 
 android-debug:
 	@NODE_ENV=development $(ANDROID_GRADLE) :app:assembleDebug
@@ -126,6 +126,7 @@ pre-push:
 	@npm run release-notes:verify
 	@node --test scripts/verify-release-artifact-secrets.test.mjs
 	@node --test scripts/verify-android-release-artifacts.test.mjs
+	@node --test scripts/run-android-instrumentation.test.mjs
 	@node --test scripts/run-ios-native-tests.test.mjs
 	@$(MAKE) maestro-verify
 	@$(MAKE) license
