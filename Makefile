@@ -12,7 +12,9 @@ IOS_DESTINATION ?= generic/platform=iOS Simulator
 	fresh-checkout \
 	config \
 	typecheck \
+	static \
 	test \
+	coverage \
 	i18n \
 	maestro-verify \
 	license \
@@ -119,6 +121,7 @@ ios-native-test:
 
 pre-push:
 	@$(MAKE) worktree-check
+	@node --test scripts/makefile-contract.test.mjs
 	@npm run prerelease:env:test
 	@npm run prerelease:live:test
 	@npm run maestro:prerelease:test
