@@ -129,7 +129,7 @@ export const sv = {
   ulraModeSettingsDescription:
     "Tillåter överläggning mellan flera modeller när minst två modeller på startskärmen är redo.",
   ulraModeInfo:
-    "Superläget frågar först varje redo modell på startskärmen var för sig. I varje omgång ifrågasätter modellerna varje deltagares senaste kompakta ståndpunkt; återstående omgångar hoppas över efter uttrycklig enhällig samsyn. Den valda modellen sammanställer slutsvaret. Överläggningen delas med alla berörda leverantörer.",
+    "Superläget frågar först varje redo modell på startskärmen var för sig. I varje omgång ifrågasätter modellerna varje deltagares senaste ståndpunkt; återstående omgångar hoppas över efter uttrycklig enhällig samsyn. Den valda modellen sammanställer slutsvaret från lyckade omgångar och behåller alltid varje modells senaste ståndpunkt. Överläggningen delas med alla berörda leverantörer.",
   ulraModeRounds: "Granskningsomgångar",
   ulraModeCallEstimate: ({ count }) =>
     `Upp till ${count} modellanrop per meddelande med den aktuella konfigurationen.`,

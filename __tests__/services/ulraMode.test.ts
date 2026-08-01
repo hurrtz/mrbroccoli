@@ -4,6 +4,7 @@ import {
   getUlraModeFailureParticipants,
   runUlraModeDeliberation,
   ULRA_MODE_MAX_CONTRIBUTION_CHARACTERS,
+  ULRA_MODE_SYNTHESIS_HISTORY_TOKEN_BUDGET,
   UlraModeConfig,
 } from "../../src/services/ulraMode";
 
@@ -113,15 +114,33 @@ describe("runUlraModeDeliberation", () => {
       secondRoundPrompts.some((prompt) => prompt?.includes('"round":2')),
     ).toBe(false);
     expect(result.synthesisPrompt).toContain(
-      "Latest participant positions: 3.",
+      "Successful private contributions retained: 9.",
     );
-    expect(result.synthesisPrompt.match(/"participant":/g)).toHaveLength(3);
+    expect(result.synthesisPrompt.match(/"participant":/g)).toHaveLength(9);
+    expect(result.synthesisPrompt).toContain('"round":0');
+    expect(result.synthesisPrompt).toContain('"round":1');
+    expect(result.synthesisPrompt).toContain('"round":2');
+    expect(result.synthesisPrompt).toContain(
+      "retained successful private Uber Mode history",
+    );
+    expect(result.synthesisPrompt).toContain(
+      "highest available round as its current position",
+    );
+    expect(result.synthesisPrompt).toContain(
+      "Older superseded contributions omitted for context safety: 0.",
+    );
     expect(result.synthesisPrompt).toContain(
       "Give well-supported minority critiques full consideration",
     );
     expect(firstRoundPrompts[0]).toContain("Actively stress-test");
     expect(firstRoundPrompts[0]).toContain("UBER_REVIEW: CHALLENGE");
     expect(firstRoundPrompts[0]).toContain("never manufacture disagreement");
+    expect(
+      generateInternalChatMock.mock.calls.every(
+        ([request]) => !request.systemPrompt.includes("250 words"),
+      ),
+    ).toBe(true);
+    expect(firstRoundPrompts[0]).toContain("all material reasoning and evidence");
     expect(firstRoundPrompts[0]).not.toContain('"provider":');
     expect(firstRoundPrompts[0]).not.toContain('"model":');
     expect(firstRoundPrompts[0]).not.toContain('"modeId":');
@@ -156,8 +175,9 @@ describe("runUlraModeDeliberation", () => {
     expect(result.roundsCompleted).toBe(1);
     expect(result.convergenceReached).toBe(true);
     expect(result.synthesisPrompt).not.toContain("UBER_REVIEW");
+    expect(result.synthesisPrompt).toContain('"round":0');
     expect(result.synthesisPrompt).toContain('"round":1');
-    expect(result.synthesisPrompt.match(/"participant":/g)).toHaveLength(3);
+    expect(result.synthesisPrompt.match(/"participant":/g)).toHaveLength(6);
   });
 
   it("continues when models challenge peers or omit the convergence marker", async () => {
@@ -189,7 +209,7 @@ describe("runUlraModeDeliberation", () => {
     expect(result.convergenceReached).toBe(false);
   });
 
-  it("bounds runaway contributions before sharing them with other models", async () => {
+  it("uses a generous emergency bound for runaway contributions", async () => {
     const oversizedResponse = `Opening evidence ${"x".repeat(
       ULRA_MODE_MAX_CONTRIBUTION_CHARACTERS * 2,
     )} final conclusion`;
@@ -212,6 +232,7 @@ describe("runUlraModeDeliberation", () => {
       messages: [{ role: "user", content: "Question" }],
     });
 
+    expect(ULRA_MODE_MAX_CONTRIBUTION_CHARACTERS).toBe(8_000);
     expect(
       result.entries.every(
         ({ text }) => text.length <= ULRA_MODE_MAX_CONTRIBUTION_CHARACTERS,
@@ -220,8 +241,43 @@ describe("runUlraModeDeliberation", () => {
     expect(result.entries[0]?.text).toContain("Middle omitted");
     expect(result.entries[0]?.text).toContain("Opening evidence");
     expect(result.entries[0]?.text).toContain("final conclusion");
+    expect(result.synthesisPrompt.match(/"participant":/g)).toHaveLength(6);
     expect(result.synthesisPrompt.length).toBeLessThan(
-      oversizedResponse.length * config.routes.length,
+      oversizedResponse.length * result.entries.length,
+    );
+  });
+
+  it("retains every latest position while dropping only older history under context pressure", async () => {
+    const oversizedResponse = `Opening evidence ${"x".repeat(
+      ULRA_MODE_MAX_CONTRIBUTION_CHARACTERS * 2,
+    )} final conclusion`;
+    generateInternalChatMock.mockImplementation(async (params) => ({
+      model: params.model,
+      text: oversizedResponse,
+      usage: {
+        kind: "reply",
+        source: "estimated",
+        promptTokens: 10,
+        completionTokens: 2_000,
+        totalTokens: 2_010,
+      },
+    }));
+
+    const result = await runUlraModeDeliberation({
+      assistantInstructions: "",
+      config: { ...config, rounds: 4 },
+      language: "en",
+      messages: [{ role: "user", content: "Question" }],
+    });
+
+    expect(ULRA_MODE_SYNTHESIS_HISTORY_TOKEN_BUDGET).toBe(24_000);
+    expect(result.entries).toHaveLength(15);
+    expect(result.synthesisPrompt.match(/"round":4/g)).toHaveLength(3);
+    const synthesisEntries =
+      result.synthesisPrompt.match(/"participant":/g) ?? [];
+    expect(synthesisEntries.length).toBeLessThan(result.entries.length);
+    expect(result.synthesisPrompt).toMatch(
+      /Older superseded contributions omitted for context safety: [1-9]\d*\./,
     );
   });
 

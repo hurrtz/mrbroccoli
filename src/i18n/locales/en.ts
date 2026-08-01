@@ -129,7 +129,7 @@ export const en = {
   ulraModeSettingsDescription:
     "Allow multi-model deliberation when at least two home-screen models are ready.",
   ulraModeInfo:
-    "Uber Mode asks every ready home-screen model independently. In each review round, models challenge every participant's latest compact position; unused rounds stop after explicit unanimous convergence. The selected model synthesizes the final response. The deliberation is shared with every provider involved.",
+    "Uber Mode asks every ready home-screen model independently. In each review round, models challenge every participant's latest position; unused rounds stop after explicit unanimous convergence. The selected model synthesizes from successful rounds while always retaining every model's latest position. The deliberation is shared with every provider involved.",
   ulraModeRounds: "Review rounds",
   ulraModeCallEstimate: ({ count }) =>
     `Up to ${count} model calls per message with the current setup.`,

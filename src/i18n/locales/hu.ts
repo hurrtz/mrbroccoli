@@ -133,7 +133,7 @@ export const hu = {
   ulraModeSettingsDescription:
     "Több modell közös mérlegelését engedélyezi, ha legalább két kezdőképernyős modell készen áll.",
   ulraModeInfo:
-    "A Szuper mód először külön-külön megkérdezi a kezdőképernyő minden elérhető modelljét. Minden körben a modellek kritikusan vizsgálják az egyes résztvevők legutóbbi tömör álláspontját; a fennmaradó körök egyértelmű egyhangú konvergencia után kimaradnak. A kiválasztott modell készíti el a végső választ. A mérlegelés minden érintett szolgáltatóval megosztásra kerül.",
+    "A Szuper mód először külön-külön megkérdezi a kezdőképernyő minden elérhető modelljét. Minden körben a modellek kritikusan vizsgálják az egyes résztvevők legutóbbi álláspontját; a fennmaradó körök egyértelmű egyhangú konvergencia után kimaradnak. A kiválasztott modell a sikeres körökből készíti el a végső választ úgy, hogy minden modell legutóbbi álláspontja mindig megmarad. A mérlegelés minden érintett szolgáltatóval megosztásra kerül.",
   ulraModeRounds: "Felülvizsgálati körök",
   ulraModeCallEstimate: ({ count }) =>
     `A jelenlegi beállítással üzenetenként legfeljebb ${count} modellhívás.`,

@@ -131,7 +131,7 @@ export const pl = {
   ulraModeSettingsDescription:
     "Pozwala wielu modelom wspólnie rozważyć odpowiedź, gdy gotowe są co najmniej dwa modele z ekranu głównego.",
   ulraModeInfo:
-    "Supertryb najpierw pyta osobno każdy gotowy model z ekranu głównego. W każdej rundzie modele krytycznie oceniają najnowsze zwięzłe stanowisko każdego uczestnika; pozostałe rundy są pomijane po wyraźnej jednomyślnej zgodzie. Wybrany model tworzy końcową syntezę. Treść rozważań jest udostępniana wszystkim zaangażowanym dostawcom.",
+    "Supertryb najpierw pyta osobno każdy gotowy model z ekranu głównego. W każdej rundzie modele krytycznie oceniają najnowsze stanowisko każdego uczestnika; pozostałe rundy są pomijane po wyraźnej jednomyślnej zgodzie. Wybrany model tworzy końcową syntezę z udanych rund, zawsze zachowując najnowsze stanowisko każdego modelu. Treść rozważań jest udostępniana wszystkim zaangażowanym dostawcom.",
   ulraModeRounds: "Rundy przeglądu",
   ulraModeCallEstimate: ({ count }) =>
     `Przy bieżącej konfiguracji maksymalnie ${count} wywołań modeli na wiadomość.`,

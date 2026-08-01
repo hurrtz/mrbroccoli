@@ -130,7 +130,7 @@ export const cs = {
   ulraModeSettingsDescription:
     "Povolí společné uvažování více modelů, když jsou připraveny alespoň dva modely z domovské obrazovky.",
   ulraModeInfo:
-    "Superrežim nejprve osloví každý připravený model z domovské obrazovky samostatně. V každém kole modely kriticky posoudí nejnovější stručné stanovisko každého účastníka; nevyužitá kola skončí po výslovné jednomyslné shodě. Vybraný model vytvoří závěrečnou odpověď. Obsah uvažování se sdílí se všemi zapojenými poskytovateli.",
+    "Superrežim nejprve osloví každý připravený model z domovské obrazovky samostatně. V každém kole modely kriticky posoudí nejnovější stanovisko každého účastníka; nevyužitá kola skončí po výslovné jednomyslné shodě. Vybraný model vytvoří závěrečnou odpověď z úspěšných kol a vždy zachová nejnovější stanovisko každého modelu. Obsah uvažování se sdílí se všemi zapojenými poskytovateli.",
   ulraModeRounds: "Kola kontroly",
   ulraModeCallEstimate: ({ count }) =>
     `Při aktuálním nastavení nejvýše ${count} volání modelů na zprávu.`,

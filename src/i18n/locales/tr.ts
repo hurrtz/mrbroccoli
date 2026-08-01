@@ -129,7 +129,7 @@ export const tr = {
   ulraModeSettingsDescription:
     "Ana ekrandaki en az iki model hazır olduğunda çok modelli değerlendirmeye izin verir.",
   ulraModeInfo:
-    "Süper Mod önce ana ekrandaki her hazır modele ayrı ayrı sorar. Her turda modeller, her katılımcının en son kısa görüşünü eleştirel biçimde sınar; açık ve oybirliğiyle uzlaşma sağlanırsa kalan turlar atlanır. Seçili model nihai yanıtı sentezler. Değerlendirme, ilgili tüm sağlayıcılarla paylaşılır.",
+    "Süper Mod önce ana ekrandaki her hazır modele ayrı ayrı sorar. Her turda modeller, her katılımcının en son görüşünü eleştirel biçimde sınar; açık ve oybirliğiyle uzlaşma sağlanırsa kalan turlar atlanır. Seçili model, her modelin en son görüşünü daima koruyarak başarılı turlardan nihai yanıtı sentezler. Değerlendirme, ilgili tüm sağlayıcılarla paylaşılır.",
   ulraModeRounds: "İnceleme turları",
   ulraModeCallEstimate: ({ count }) =>
     `Mevcut ayarla mesaj başına en fazla ${count} model çağrısı.`,

@@ -133,7 +133,7 @@ export const de = {
   ulraModeSettingsDescription:
     "Erlaubt Beratungen mit mehreren Modellen, sobald mindestens zwei Modelle auf dem Startbildschirm bereit sind.",
   ulraModeInfo:
-    "Der Übermodus fragt jedes bereite Modell auf dem Startbildschirm zunächst unabhängig. In jeder Prüfrunde hinterfragen die Modelle die letzte kompakte Position jedes Teilnehmers; bei ausdrücklicher einstimmiger Übereinstimmung entfallen ungenutzte Runden. Das ausgewählte Modell fasst am Ende zusammen. Die Beratung wird mit allen beteiligten Anbietern geteilt.",
+    "Der Übermodus fragt jedes bereite Modell auf dem Startbildschirm zunächst unabhängig. In jeder Prüfrunde hinterfragen die Modelle die letzte Position jedes Teilnehmers; bei ausdrücklicher einstimmiger Übereinstimmung entfallen ungenutzte Runden. Das ausgewählte Modell fasst die erfolgreichen Runden zur endgültigen Antwort zusammen, wobei die letzte Position jedes Modells immer erhalten bleibt. Die Beratung wird mit allen beteiligten Anbietern geteilt.",
   ulraModeRounds: "Prüfrunden",
   ulraModeCallEstimate: ({ count }) =>
     `Mit der aktuellen Konfiguration bis zu ${count} Modellaufrufe pro Nachricht.`,

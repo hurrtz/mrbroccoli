@@ -131,7 +131,7 @@ export const it = {
   ulraModeSettingsDescription:
     "Consente il confronto tra più modelli quando almeno due modelli della schermata iniziale sono pronti.",
   ulraModeInfo:
-    "La modalità suprema interroga separatamente ogni modello pronto nella schermata iniziale. A ogni round, i modelli mettono alla prova l’ultima posizione sintetica di ciascun partecipante; i round inutilizzati vengono saltati dopo una convergenza unanime esplicita. Il modello selezionato sintetizza la risposta finale. Il confronto viene condiviso con tutti i provider coinvolti.",
+    "La modalità suprema interroga separatamente ogni modello pronto nella schermata iniziale. A ogni round, i modelli mettono alla prova l’ultima posizione di ciascun partecipante; i round inutilizzati vengono saltati dopo una convergenza unanime esplicita. Il modello selezionato sintetizza i round completati con successo, conservando sempre l’ultima posizione di ogni modello. Il confronto viene condiviso con tutti i provider coinvolti.",
   ulraModeRounds: "Round di revisione",
   ulraModeCallEstimate: ({ count }) =>
     `Fino a ${count} chiamate ai modelli per messaggio con la configurazione attuale.`,

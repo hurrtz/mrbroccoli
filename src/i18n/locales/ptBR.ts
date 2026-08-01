@@ -131,7 +131,7 @@ export const ptBR = {
   ulraModeSettingsDescription:
     "Permite a deliberação entre vários modelos quando pelo menos dois modelos da tela inicial estão prontos.",
   ulraModeInfo:
-    "O modo Supremo consulta separadamente cada modelo pronto na tela inicial. Em cada rodada, os modelos questionam a posição resumida mais recente de cada participante; as rodadas restantes são ignoradas após uma convergência unânime explícita. O modelo selecionado sintetiza a resposta final. A deliberação é compartilhada com todos os provedores envolvidos.",
+    "O modo Supremo consulta separadamente cada modelo pronto na tela inicial. Em cada rodada, os modelos questionam a posição mais recente de cada participante; as rodadas restantes são ignoradas após uma convergência unânime explícita. O modelo selecionado sintetiza as rodadas concluídas com êxito, mantendo sempre a posição mais recente de cada modelo. A deliberação é compartilhada com todos os provedores envolvidos.",
   ulraModeRounds: "Rodadas de revisão",
   ulraModeCallEstimate: ({ count }) =>
     `Até ${count} chamadas de modelo por mensagem com a configuração atual.`,

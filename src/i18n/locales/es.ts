@@ -131,7 +131,7 @@ export const es = {
   ulraModeSettingsDescription:
     "Permite la deliberación entre varios modelos cuando hay al menos dos modelos de inicio listos.",
   ulraModeInfo:
-    "El modo supremo consulta por separado a cada modelo listo de la pantalla de inicio. En cada ronda, los modelos cuestionan la última posición resumida de cada participante; las rondas restantes se omiten tras una convergencia unánime y explícita. El modelo seleccionado sintetiza la respuesta final. La deliberación se comparte con todos los proveedores implicados.",
+    "El modo supremo consulta por separado a cada modelo listo de la pantalla de inicio. En cada ronda, los modelos cuestionan la última posición de cada participante; las rondas restantes se omiten tras una convergencia unánime y explícita. El modelo seleccionado sintetiza las rondas completadas correctamente, conservando siempre la última posición de cada modelo. La deliberación se comparte con todos los proveedores implicados.",
   ulraModeRounds: "Rondas de revisión",
   ulraModeCallEstimate: ({ count }) =>
     `Hasta ${count} llamadas a modelos por mensaje con la configuración actual.`,

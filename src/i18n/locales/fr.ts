@@ -131,7 +131,7 @@ export const fr = {
   ulraModeSettingsDescription:
     "Autorise une délibération entre plusieurs modèles lorsque au moins deux modèles de l’accueil sont prêts.",
   ulraModeInfo:
-    "Le mode suprême interroge d’abord séparément chaque modèle prêt de l’écran d’accueil. À chaque tour, les modèles remettent en question la dernière position concise de chaque participant ; les tours restants sont évités après une convergence unanime explicite. Le modèle sélectionné synthétise la réponse finale. La délibération est partagée avec tous les fournisseurs concernés.",
+    "Le mode suprême interroge d’abord séparément chaque modèle prêt de l’écran d’accueil. À chaque tour, les modèles remettent en question la dernière position de chaque participant ; les tours restants sont évités après une convergence unanime explicite. Le modèle sélectionné synthétise les tours réussis en conservant toujours la dernière position de chaque modèle. La délibération est partagée avec tous les fournisseurs concernés.",
   ulraModeRounds: "Tours de révision",
   ulraModeCallEstimate: ({ count }) =>
     `Jusqu’à ${count} appels de modèles par message avec la configuration actuelle.`,
