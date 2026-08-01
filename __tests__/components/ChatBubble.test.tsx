@@ -10,6 +10,8 @@ import {
 } from "../../src/theme/colors";
 import { renderWithProviders } from "../test-utils/renderWithProviders";
 
+const hiddenIconQuery = { includeHiddenElements: true } as const;
+
 describe("ChatBubble", () => {
   beforeEach(() => {
     jest.clearAllMocks();
@@ -355,7 +357,8 @@ describe("ChatBubble", () => {
     ).toEqual(expect.objectContaining({ height: 44, width: 44 }));
     for (const icon of ["copy", "share-alt", "sound"]) {
       const iconStyle = StyleSheet.flatten(
-        assistant.getByTestId(`phosphor-icon-${icon}`).props.style,
+        assistant.getByTestId(`phosphor-icon-${icon}`, hiddenIconQuery).props
+          .style,
       );
       expect(iconStyle.width).toBe(20);
       expect(iconStyle.height).toBe(20);
@@ -398,7 +401,9 @@ describe("ChatBubble", () => {
     );
 
     try {
-      expect(screen.getByTestId("phosphor-icon-copy")).toBeTruthy();
+      expect(
+        screen.getByTestId("phosphor-icon-copy", hiddenIconQuery),
+      ).toBeTruthy();
 
       await act(async () => {
         fireEvent.press(screen.getByLabelText("Copy"));
@@ -408,25 +413,32 @@ describe("ChatBubble", () => {
       const confirmedButton = screen.getByTestId(
         "message-copy-action-assistant-copy-confirmation",
       );
-      expect(screen.getByTestId("phosphor-icon-check")).toBeTruthy();
+      expect(
+        screen.getByTestId("phosphor-icon-check", hiddenIconQuery),
+      ).toBeTruthy();
       expect(
         StyleSheet.flatten(confirmedButton.props.style).backgroundColor,
       ).toBe(lightColors.success);
       expect(
         StyleSheet.flatten(
-          screen.getByTestId("phosphor-icon-check").props.style,
+          screen.getByTestId("phosphor-icon-check", hiddenIconQuery).props
+            .style,
         ).color,
       ).toBe(getAccessibleForeground(lightColors.success));
 
       act(() => {
         jest.advanceTimersByTime(2_999);
       });
-      expect(screen.getByTestId("phosphor-icon-check")).toBeTruthy();
+      expect(
+        screen.getByTestId("phosphor-icon-check", hiddenIconQuery),
+      ).toBeTruthy();
 
       act(() => {
         jest.advanceTimersByTime(1);
       });
-      expect(screen.getByTestId("phosphor-icon-copy")).toBeTruthy();
+      expect(
+        screen.getByTestId("phosphor-icon-copy", hiddenIconQuery),
+      ).toBeTruthy();
     } finally {
       screen.unmount();
       jest.runOnlyPendingTimers();
@@ -459,7 +471,9 @@ describe("ChatBubble", () => {
       ).backgroundColor,
     ).toBe(lightColors.success);
     expect(
-      StyleSheet.flatten(screen.getByTestId("phosphor-icon-stop").props.style)
+      StyleSheet.flatten(
+        screen.getByTestId("phosphor-icon-stop", hiddenIconQuery).props.style,
+      )
         .color,
     ).toBe(getAccessibleForeground(lightColors.success));
   });
@@ -495,7 +509,8 @@ describe("ChatBubble", () => {
       ).toBe(colors.phaseSynthesizing);
       expect(
         StyleSheet.flatten(
-          screen.getByTestId("phosphor-icon-loading").props.style,
+          screen.getByTestId("phosphor-icon-loading", hiddenIconQuery).props
+            .style,
         ).color,
       ).toBe(getAccessibleForeground(colors.phaseSynthesizing));
       screen.unmount();
@@ -520,8 +535,12 @@ describe("ChatBubble", () => {
 
     fireEvent.press(screen.getByLabelText("Copy"));
 
-    expect(screen.getByTestId("phosphor-icon-copy")).toBeTruthy();
-    expect(screen.queryByTestId("phosphor-icon-check")).toBeNull();
+    expect(
+      screen.getByTestId("phosphor-icon-copy", hiddenIconQuery),
+    ).toBeTruthy();
+    expect(
+      screen.queryByTestId("phosphor-icon-check", hiddenIconQuery),
+    ).toBeNull();
     expect(
       StyleSheet.flatten(
         screen.getByTestId("message-copy-action-assistant-copy-failed").props

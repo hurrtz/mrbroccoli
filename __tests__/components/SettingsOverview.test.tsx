@@ -10,6 +10,8 @@ import { LocalizationProvider } from "../../src/i18n";
 import { ThemeProvider } from "../../src/theme/ThemeContext";
 import { lightColors } from "../../src/theme/colors";
 
+const hiddenIconQuery = { includeHiddenElements: true } as const;
+
 const readiness: SettingsReadiness = {
   think: { state: "ready", summaryKey: "settingsReadinessReady" },
   listen: { state: "ready", summaryKey: "settingsReadinessReady" },
@@ -30,7 +32,9 @@ describe("AntSettingsOverview", () => {
     const thinkChip = screen.getByLabelText("Think: Ready");
     const speakChip = screen.getByLabelText("Speak: Off");
 
-    expect(screen.getAllByTestId("phosphor-icon-check")).toHaveLength(2);
+    expect(
+      screen.getAllByTestId("phosphor-icon-check", hiddenIconQuery),
+    ).toHaveLength(2);
     expect(
       StyleSheet.flatten(screen.getByText("Think").props.style).fontSize,
     ).toBe(12);
@@ -88,7 +92,7 @@ describe("AntSettingsOverview", () => {
     );
     const containerStyle = StyleSheet.flatten(iconContainer.props.style);
     const iconStyle = StyleSheet.flatten(
-      screen.getByTestId("phosphor-icon-key").props.style,
+      screen.getByTestId("phosphor-icon-key", hiddenIconQuery).props.style,
     );
 
     expect(containerStyle.width).toBe(34);

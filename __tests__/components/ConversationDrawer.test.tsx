@@ -7,6 +7,8 @@ import { ConversationDrawerList } from "../../src/components/conversationDrawer/
 import { ConversationMeta } from "../../src/types";
 import { renderWithProviders } from "../test-utils/renderWithProviders";
 
+const hiddenIconQuery = { includeHiddenElements: true } as const;
+
 jest.mock("react-native-safe-area-context", () => ({
   useSafeAreaInsets: () => ({ top: 0, bottom: 0, left: 0, right: 0 }),
 }));
@@ -132,7 +134,10 @@ describe("ConversationDrawer", () => {
       ).borderWidth,
     ).toBeUndefined();
     expect(
-      screen.getAllByTestId("phosphor-icon-ellipsis-vertical"),
+      screen.getAllByTestId(
+        "phosphor-icon-ellipsis-vertical",
+        hiddenIconQuery,
+      ),
     ).toHaveLength(2);
   });
 

@@ -17,6 +17,7 @@ import { LocalizationProvider } from "../../src/i18n";
 import { ThemeProvider } from "../../src/theme/ThemeContext";
 
 const NativeDialogType = NativeDialog as unknown as React.ComponentType<any>;
+const hiddenIconQuery = { includeHiddenElements: true } as const;
 
 function renderPickerRow(optionCount: 1 | 2, onChange = jest.fn()) {
   return render(
@@ -55,7 +56,9 @@ describe("AntPickerRow", () => {
     );
 
     expect(screen.getByText("OpenAI")).toBeTruthy();
-    expect(screen.queryByTestId("phosphor-icon-down")).toBeNull();
+    expect(
+      screen.queryByTestId("phosphor-icon-down", hiddenIconQuery),
+    ).toBeNull();
     expect(itemStyle.borderWidth).toBeUndefined();
   });
 
@@ -84,7 +87,9 @@ describe("AntPickerRow", () => {
     const screen = renderPickerRow(2, onChange);
 
     expect(screen.getByText("OpenAI")).toBeTruthy();
-    expect(screen.getByTestId("phosphor-icon-down")).toBeTruthy();
+    expect(
+      screen.getByTestId("phosphor-icon-down", hiddenIconQuery),
+    ).toBeTruthy();
 
     fireEvent.press(screen.getByTestId("provider-picker"));
 
@@ -134,7 +139,9 @@ describe("AntPickerRow", () => {
 
     expect(screen.getByText("Singapore")).toBeTruthy();
     expect(screen.queryByText("Region")).toBeNull();
-    expect(screen.getByTestId("phosphor-icon-down")).toBeTruthy();
+    expect(
+      screen.getByTestId("phosphor-icon-down", hiddenIconQuery),
+    ).toBeTruthy();
   });
 
   it("lets a standalone dropdown align with surrounding cards", () => {

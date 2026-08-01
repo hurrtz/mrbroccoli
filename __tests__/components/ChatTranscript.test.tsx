@@ -28,6 +28,8 @@ const message = (id: string, content: string): Message => ({
   timestamp: "2026-07-21T12:00:00.000Z",
 });
 
+const hiddenIconQuery = { includeHiddenElements: true } as const;
+
 const scrollEvent = (offsetY: number) => ({
   nativeEvent: {
     contentOffset: { x: 0, y: offsetY },
@@ -50,7 +52,7 @@ describe("ChatTranscript follow-tail scrolling", () => {
 
     expect(
       StyleSheet.flatten(
-        screen.getByTestId("empty-transcript-icon").props.style,
+        screen.getByTestId("empty-transcript-icon", hiddenIconQuery).props.style,
       ),
     ).toEqual(
       expect.objectContaining({

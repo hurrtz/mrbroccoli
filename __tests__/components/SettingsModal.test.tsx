@@ -40,6 +40,7 @@ import {
 } from "../../src/services/runtimeCapabilityOverrides";
 
 const NativeDialogType = NativeDialog as unknown as React.ComponentType<any>;
+const hiddenIconQuery = { includeHiddenElements: true } as const;
 
 jest.mock("react-native-safe-area-context", () => ({
   SafeAreaView: ({ children, ...props }: React.PropsWithChildren) => {
@@ -174,9 +175,11 @@ describe("SettingsModal", () => {
       );
       expect(screen.queryByTestId("settings-header-gradient")).toBeNull();
       expect(screen.queryByTestId("settings-modal-gradient")).toBeNull();
-      expect(screen.getByTestId("phosphor-icon-close")).toBeTruthy();
       expect(
-        screen.getAllByTestId("phosphor-icon-right").length,
+        screen.getByTestId("phosphor-icon-close", hiddenIconQuery),
+      ).toBeTruthy();
+      expect(
+        screen.getAllByTestId("phosphor-icon-right", hiddenIconQuery).length,
       ).toBeGreaterThan(0);
       expect(screen.queryByText("Runtime Readiness")).toBeNull();
       expect(screen.getByText("Connections")).toBeTruthy();
@@ -196,7 +199,9 @@ describe("SettingsModal", () => {
     await waitFor(() => {
       expect(screen.queryByText("Back to overview")).toBeNull();
       expect(screen.getByLabelText("Back to overview")).toBeTruthy();
-      expect(screen.getByTestId("phosphor-icon-arrow-left")).toBeTruthy();
+      expect(
+        screen.getByTestId("phosphor-icon-arrow-left", hiddenIconQuery),
+      ).toBeTruthy();
       expect(screen.getByTestId("settings-modal-title").props.children).toBe(
         "Connections",
       );
@@ -297,16 +302,22 @@ describe("SettingsModal", () => {
 
     await waitFor(() => {
       expect(
-        screen.getAllByTestId("phosphor-icon-left").length,
+        screen.getAllByTestId("phosphor-icon-left", hiddenIconQuery).length,
       ).toBeGreaterThan(0);
-      expect(screen.queryByTestId("phosphor-icon-right")).toBeNull();
+      expect(
+        screen.queryByTestId("phosphor-icon-right", hiddenIconQuery),
+      ).toBeNull();
     });
 
     fireEvent.press(screen.getByText(translate("ar", "settingsConnections")));
 
     await waitFor(() => {
-      expect(screen.getByTestId("phosphor-icon-arrow-right")).toBeTruthy();
-      expect(screen.queryByTestId("phosphor-icon-arrow-left")).toBeNull();
+      expect(
+        screen.getByTestId("phosphor-icon-arrow-right", hiddenIconQuery),
+      ).toBeTruthy();
+      expect(
+        screen.queryByTestId("phosphor-icon-arrow-left", hiddenIconQuery),
+      ).toBeNull();
     });
   });
 
@@ -1614,7 +1625,9 @@ describe("SettingsModal", () => {
 
     const clearAction = screen.getByLabelText("Clear recent speech activity");
     expect(
-      StyleSheet.flatten(screen.getByTestId("phosphor-icon-delete").props.style)
+      StyleSheet.flatten(
+        screen.getByTestId("phosphor-icon-delete", hiddenIconQuery).props.style,
+      )
         .color,
     ).toBe("#DC2626");
 
