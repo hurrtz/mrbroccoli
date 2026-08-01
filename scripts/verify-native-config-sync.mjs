@@ -20,6 +20,10 @@ const androidProguardRules = readText("android/app/proguard-rules.pro");
 const androidManifest = readText(
   "android/app/src/main/AndroidManifest.xml",
 );
+const imagePickerPlugin = appConfig.plugins?.find(
+  (plugin) => Array.isArray(plugin) && plugin[0] === "expo-image-picker",
+);
+const imagePickerOptions = imagePickerPlugin?.[1] ?? {};
 const androidStrings = readText(
   "android/app/src/main/res/values/strings.xml",
 );
@@ -110,6 +114,22 @@ const iosBundleVersion =
 const iosProjectVersions = [
   ...iosProject.matchAll(/CURRENT_PROJECT_VERSION = ([^;]+);/g),
 ].map((match) => match[1]);
+
+assertIncludes(
+  "iOS camera permission",
+  iosInfo,
+  `<key>NSCameraUsageDescription</key>\n\t<string>${imagePickerOptions.cameraPermission}</string>`,
+);
+assertIncludes(
+  "iOS photo permission",
+  iosInfo,
+  `<key>NSPhotoLibraryUsageDescription</key>\n\t<string>${imagePickerOptions.photosPermission}</string>`,
+);
+assertIncludes(
+  "Android camera permission",
+  androidManifest,
+  '<uses-permission android:name="android.permission.CAMERA"/>',
+);
 const iosDeploymentTargets = [
   ...iosProject.matchAll(/IPHONEOS_DEPLOYMENT_TARGET = ([^;]+);/g),
 ].map((match) => match[1]);

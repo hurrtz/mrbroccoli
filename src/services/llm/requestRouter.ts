@@ -8,6 +8,8 @@ import type {
   Provider,
 } from "../../types";
 import { resolveQwenApiEndpoint } from "../../utils/qwenRegion";
+import { modelSupportsImageInput } from "../../utils/imageInputCapabilities";
+import { prepareMessageImagesForRequest } from "../imageAttachmentFiles";
 import { getProviderModelCandidates } from "../providerModelCandidates";
 import {
   executeProviderModelRequest,
@@ -216,12 +218,30 @@ export const LLM_STREAM_REQUESTERS = {
 export async function requestChatTextResolved(
   params: LlmRequestParams,
 ): Promise<ProviderModelRequestResult<string>> {
+  const hasImages = params.messages.some(
+    (message) => (message.attachments?.length ?? 0) > 0,
+  );
+  if (hasImages && !modelSupportsImageInput(params.provider, params.model)) {
+    throw new Error(
+      translate(params.language, "imageInputUnsupported", {
+        provider: PROVIDER_LABELS[params.provider],
+        model: params.model,
+      }),
+    );
+  }
+  const messages = hasImages
+    ? await prepareMessageImagesForRequest(params.messages)
+    : params.messages;
+
   return executeProviderModelRequest({
     abortSignal: params.abortSignal,
     candidateModels: getProviderModelCandidates({
       capability: "llm",
       provider: params.provider,
       requestedModel: params.model,
+      isCompatible: hasImages
+        ? (candidate) => modelSupportsImageInput(params.provider, candidate)
+        : undefined,
     }),
     capability: "llm",
     modelEffort: params.modelEffort,
@@ -229,6 +249,7 @@ export async function requestChatTextResolved(
     request: async (model, modelEffort) => {
       const requestParams = {
         ...params,
+        messages,
         model,
         modelEffort,
       };

@@ -24,10 +24,12 @@ export function estimateTextTokens(text: string) {
 
 export function estimateMessageTokens(
   message: Pick<Message, "role" | "content"> &
-    Partial<Pick<Message, "model" | "provider">>,
+    Partial<Pick<Message, "model" | "provider" | "attachments">>,
 ) {
   return (
-    estimateTextTokens(getMessageContentWithResponseProvenance(message)) + 10
+    estimateTextTokens(getMessageContentWithResponseProvenance(message)) +
+    (message.attachments?.length ?? 0) * 1000 +
+    10
   );
 }
 

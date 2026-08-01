@@ -1147,6 +1147,26 @@ describe("useVoicePipeline", () => {
 
   it("shows the retry toast when no transcription is produced", async () => {
     const params = createParams();
+    const attachment = {
+      id: "image-1",
+      kind: "image" as const,
+      uri: "file:///message-images/image-1.jpg",
+      mimeType: "image/jpeg" as const,
+      width: 1200,
+      height: 800,
+      byteSize: 1000,
+      sharedWithProviders: ["openai" as const],
+    };
+    const messagesOverride = [
+      {
+        id: "message-1",
+        role: "user" as const,
+        content: "Earlier context",
+        model: null,
+        provider: null,
+        timestamp: "2026-08-02T08:00:00.000Z",
+      },
+    ];
     (runVoicePipeline as jest.Mock).mockImplementation(async () => {
       jest.advanceTimersByTime(1_000);
       return null;
@@ -1156,7 +1176,9 @@ describe("useVoicePipeline", () => {
 
     await act(async () => {
       await result.current.handleVoiceCaptureDone({
+        attachments: [attachment],
         audioUri: "file://capture.wav",
+        messagesOverride,
       });
     });
 
@@ -1177,7 +1199,9 @@ describe("useVoicePipeline", () => {
     });
     expect(runVoicePipeline).toHaveBeenLastCalledWith(
       expect.objectContaining({
+        attachments: [attachment],
         audioUri: "file://capture.wav",
+        messages: messagesOverride,
       }),
     );
     expect(

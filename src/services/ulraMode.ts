@@ -288,7 +288,7 @@ export async function runUlraModeDeliberation(params: {
   conversationSummary?: string;
   pastConversationKnowledge?: string;
   language: AppLanguage;
-  messages: Pick<Message, "role" | "content">[];
+  messages: Pick<Message, "role" | "content" | "attachments">[];
   webSearchContext?: string;
 }): Promise<UlraModeResult> {
   const routes = params.config.routes;

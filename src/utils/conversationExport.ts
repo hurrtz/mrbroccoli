@@ -29,7 +29,18 @@ function formatSpeakerLabel(message: Message, language: AppLanguage) {
 }
 
 export function formatMessageForCopy(message: Message, language: AppLanguage) {
-  return `${formatSpeakerLabel(message, language)}\n${message.content.trim()}`;
+  const imagePlaceholder = message.attachments?.length
+    ? translate(language, "conversationImagePlaceholder", {
+        count: message.attachments.length,
+      })
+    : "";
+  return [
+    formatSpeakerLabel(message, language),
+    imagePlaceholder,
+    message.content.trim(),
+  ]
+    .filter(Boolean)
+    .join("\n");
 }
 
 export function formatConversationForCopy(

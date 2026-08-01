@@ -15,6 +15,9 @@ the complete Play Store translations are kept in a dedicated file under
 - Add optional on-device knowledge from past conversations with local hybrid
   retrieval, visible source sessions, and private conversations that are never
   indexed while retaining their own in-session memory.
+- Add up to four camera or photo-library images to typed and spoken prompts,
+  keep them with conversation history and backups, and require explicit
+  consent before resending them to new or multiple reasoning providers.
 
 ### Fixed
 

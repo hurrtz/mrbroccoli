@@ -20,4 +20,5 @@ module.exports = {
   aesDecryptAsync: jest.fn(),
   aesEncryptAsync: jest.fn(async () => new MockSealedData()),
   getRandomBytes: jest.fn((length) => new Uint8Array(length)),
+  randomUUID: jest.fn(() => "mock-image-uuid"),
 };

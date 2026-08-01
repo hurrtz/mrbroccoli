@@ -12,6 +12,7 @@ import type {
   ConversationSettings,
   KokoroVoiceSelections,
   Message,
+  MessageImageAttachment,
   Provider,
   ReplyPlayback,
   SttBackendMode,
@@ -38,8 +39,10 @@ export type PipelinePhase =
 export type ReplayPhase = "idle" | "preparing" | "speaking";
 
 export interface VoiceCaptureRequest {
+  attachments?: MessageImageAttachment[];
   audioUri?: string;
   existingUserMessageId?: string;
+  messagesOverride?: Message[];
   transcriptionOverride?: string;
   turnId?: string;
 }
@@ -110,6 +113,7 @@ export interface UseVoicePipelineParams {
     key: TranslationKey,
     params?: Record<string, string | number | undefined>,
   ) => string;
+  onAttachmentsAccepted?: (attachmentIds: string[]) => void;
 }
 
 export interface UseVoicePipelineResult {

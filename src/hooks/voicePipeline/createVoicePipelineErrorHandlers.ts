@@ -1,7 +1,11 @@
 import type { MutableRefObject } from "react";
 
 import { recordDebugLogEvent } from "../../services/debugLogCapture";
-import type { MessagePipelineNotice } from "../../types";
+import type {
+  Message,
+  MessageImageAttachment,
+  MessagePipelineNotice,
+} from "../../types";
 import type {
   PipelinePhase,
   UseVoicePipelineParams,
@@ -31,7 +35,9 @@ type ErrorHandlerParams = Pick<
   | "showToast"
   | "t"
 > & {
+  attachments?: MessageImageAttachment[];
   audioUri?: string;
+  messagesOverride?: Message[];
   handleRepeatLastReply: (
     textOverride?: string,
     messageId?: string,
@@ -71,11 +77,13 @@ type ErrorHandlerParams = Pick<
 export function createVoicePipelineErrorHandlers({
   activeConversation,
   addMessage,
+  attachments,
   audioUri,
   handleRepeatLastReply,
   isActiveRun,
   lastCompletedReplyRef,
   latency,
+  messagesOverride,
   messageState,
   player,
   playbackStartedRef,
@@ -140,9 +148,11 @@ export function createVoicePipelineErrorHandlers({
           }
         : () => {
             retryCapture({
+              attachments,
               audioUri,
               existingUserMessageId:
                 messageState.lastUserMessageIdRef.current ?? undefined,
+              messagesOverride,
               transcriptionOverride,
             });
           };
@@ -195,7 +205,7 @@ export function createVoicePipelineErrorHandlers({
       t("couldntCatchThatTryAgain"),
       audioUri
         ? () => {
-            retryCapture({ audioUri });
+            retryCapture({ attachments, audioUri, messagesOverride });
           }
         : undefined,
       "danger",
@@ -222,7 +232,11 @@ export function createVoicePipelineErrorHandlers({
       !state.transcriptionReady && audioUri ? audioUri : undefined;
     const retryAction = retryableAudioUri
       ? () => {
-          retryCapture({ audioUri: retryableAudioUri });
+          retryCapture({
+            attachments,
+            audioUri: retryableAudioUri,
+            messagesOverride,
+          });
         }
       : undefined;
 

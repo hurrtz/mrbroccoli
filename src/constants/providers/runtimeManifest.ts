@@ -36,6 +36,7 @@ export interface RuntimeModelSpec {
   releaseDate?: string;
   effort?: RuntimeModelEffortConfig;
   supportsInstructions?: boolean;
+  supportsImageInput?: boolean;
 }
 
 export type RuntimeModelEffortTransportParam =
@@ -73,6 +74,7 @@ interface RuntimeLlmProviderManifest {
   defaultModel: string;
   fallbackModelIds: string[];
   models: RuntimeModelSpec[];
+  supportsImageInput?: boolean;
   realtimeModelIds?: string[];
   realtimeTransport?: Exclude<RuntimeLlmTransport, "none">;
 }
@@ -504,6 +506,7 @@ export const RUNTIME_PROVIDER_MANIFEST: Record<
     apiKeyUrl: "https://platform.openai.com/settings/organization/api-keys",
     llm: {
       support: "provider",
+      supportsImageInput: true,
       transport: "openai-compatible",
       endpoint: "https://api.openai.com/v1/chat/completions",
       defaultModel: "gpt-5.6-sol",
@@ -545,8 +548,14 @@ export const RUNTIME_PROVIDER_MANIFEST: Record<
         ),
         namedModel("gpt-4.1-2025-04-14", "GPT-4.1"),
         namedModel("gpt-4.1-mini-2025-04-14", "GPT-4.1 mini"),
-        namedModel("gpt-realtime-2.1", "GPT-Realtime-2.1"),
-        namedModel("gpt-realtime-2.1-mini", "GPT-Realtime-2.1 mini"),
+        {
+          ...namedModel("gpt-realtime-2.1", "GPT-Realtime-2.1"),
+          supportsImageInput: false,
+        },
+        {
+          ...namedModel("gpt-realtime-2.1-mini", "GPT-Realtime-2.1 mini"),
+          supportsImageInput: false,
+        },
       ],
     },
     stt: {
@@ -648,6 +657,7 @@ export const RUNTIME_PROVIDER_MANIFEST: Record<
     apiKeyUrl: "https://openrouter.ai/settings/keys",
     llm: {
       support: "provider",
+      supportsImageInput: true,
       transport: "openai-compatible",
       endpoint: "https://openrouter.ai/api/v1/chat/completions",
       defaultModel: "openai/gpt-5.6-sol-20260709",
@@ -694,10 +704,13 @@ export const RUNTIME_PROVIDER_MANIFEST: Record<
           OPENROUTER_GROK_REASONING_EFFORT,
         ),
         withEffort(
-          namedModel(
-            "deepseek/deepseek-v4-pro-20260423",
-            "DeepSeek · DeepSeek V4 Pro",
-          ),
+          {
+            ...namedModel(
+              "deepseek/deepseek-v4-pro-20260423",
+              "DeepSeek · DeepSeek V4 Pro",
+            ),
+            supportsImageInput: false,
+          },
           OPENROUTER_DEEPSEEK_REASONING_EFFORT,
         ),
         withEffort(
@@ -736,6 +749,7 @@ export const RUNTIME_PROVIDER_MANIFEST: Record<
     apiKeyUrl: "https://platform.claude.com/settings/keys",
     llm: {
       support: "provider",
+      supportsImageInput: true,
       transport: "anthropic",
       defaultModel: "claude-sonnet-5",
       fallbackModelIds: [
@@ -786,6 +800,7 @@ export const RUNTIME_PROVIDER_MANIFEST: Record<
       "https://www.alibabacloud.com/help/en/model-studio/compatibility-of-openai-with-dashscope",
     llm: {
       support: "provider",
+      supportsImageInput: true,
       transport: "openai-compatible",
       endpoint:
         "https://dashscope-intl.aliyuncs.com/compatible-mode/v1/chat/completions",
@@ -966,6 +981,7 @@ export const RUNTIME_PROVIDER_MANIFEST: Record<
     apiKeyUrl: "https://aistudio.google.com/app/apikey",
     llm: {
       support: "provider",
+      supportsImageInput: true,
       transport: "gemini-generate-content",
       endpoint: "https://generativelanguage.googleapis.com/v1beta",
       defaultModel: "gemini-3.6-flash",
@@ -1174,6 +1190,7 @@ export const RUNTIME_PROVIDER_MANIFEST: Record<
     apiKeyUrl: "https://console.x.ai/team/default/api-keys",
     llm: {
       support: "provider",
+      supportsImageInput: true,
       transport: "openai-compatible",
       endpoint: "https://api.x.ai/v1/chat/completions",
       defaultModel: "grok-4.5",
@@ -1253,6 +1270,7 @@ export const RUNTIME_PROVIDER_MANIFEST: Record<
     apiKeyUrl: "https://platform.deepseek.com/api_keys",
     llm: {
       support: "provider",
+      supportsImageInput: false,
       transport: "openai-compatible",
       endpoint: "https://api.deepseek.com/chat/completions",
       defaultModel: "deepseek-v4-flash",
@@ -1290,6 +1308,7 @@ export const RUNTIME_PROVIDER_MANIFEST: Record<
     apiKeyUrl: "https://console.mistral.ai/api-keys",
     llm: {
       support: "provider",
+      supportsImageInput: true,
       transport: "openai-compatible",
       endpoint: "https://api.mistral.ai/v1/chat/completions",
       defaultModel: "mistral-medium-3-5",

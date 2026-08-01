@@ -1,7 +1,13 @@
 import { PROVIDER_LABELS } from "../../constants/models";
 import { RUNTIME_PROVIDER_MANIFEST } from "../../constants/providers/runtimeManifest";
 import { translate } from "../../i18n";
-import { AppLanguage, MessageMetadata, Provider } from "../../types";
+import {
+  AppLanguage,
+  MessageImageAttachment,
+  MessageMetadata,
+  Provider,
+} from "../../types";
+import type { PreparedMessageImageAttachment } from "../imageAttachmentFiles";
 
 export interface ChatMessage {
   role: "user" | "assistant";
@@ -9,6 +15,20 @@ export interface ChatMessage {
   model?: string | null;
   provider?: Provider | null;
   metadata?: MessageMetadata;
+  attachments?: (
+    | MessageImageAttachment
+    | PreparedMessageImageAttachment
+  )[];
+}
+
+function requirePreparedImages(message: ChatMessage) {
+  return (message.attachments ?? []).map((attachment) => {
+    if (!("data" in attachment) || !attachment.data) {
+      throw new Error("An attached image could not be read.");
+    }
+
+    return attachment;
+  });
 }
 
 type OpenAiCompatibleLlmConfig = {
@@ -84,10 +104,27 @@ export function getProviderLlmConfig(
 }
 
 export function toAPIMessages(messages: ChatMessage[]) {
-  return messages.map((message) => ({
-    role: message.role,
-    content: message.content,
-  }));
+  return messages.map((message) => {
+    const images = requirePreparedImages(message);
+
+    return {
+      role: message.role,
+      content:
+        message.role === "user" && images.length > 0
+          ? [
+              ...images.map((image) => ({
+                type: "image" as const,
+                source: {
+                  type: "base64" as const,
+                  media_type: image.mimeType,
+                  data: image.data,
+                },
+              })),
+              { type: "text" as const, text: message.content },
+            ]
+          : message.content,
+    };
+  });
 }
 
 export function toOpenAICompatibleMessages(
@@ -95,6 +132,8 @@ export function toOpenAICompatibleMessages(
   messages: ChatMessage[],
 ) {
   return messages.map((message) => {
+    const images = requirePreparedImages(message);
+
     if (provider === "mistral" && message.role === "assistant") {
       return {
         role: message.role,
@@ -106,7 +145,18 @@ export function toOpenAICompatibleMessages(
 
     return {
       role: message.role,
-      content: message.content,
+      content:
+        message.role === "user" && images.length > 0
+          ? [
+              { type: "text" as const, text: message.content },
+              ...images.map((image) => ({
+                type: "image_url" as const,
+                image_url: {
+                  url: `data:${image.mimeType};base64,${image.data}`,
+                },
+              })),
+            ]
+          : message.content,
     };
   });
 }

@@ -57,6 +57,8 @@
     "expo-document-picker": "~57.0.1",
     "expo-file-system": "~57.0.1",
     "expo-font": "~57.0.1",
+    "expo-image-manipulator": "~57.0.7",
+    "expo-image-picker": "~57.0.7",
     "expo-keep-awake": "~57.0.1",
     "expo-linking": "~57.0.4",
     "expo-network": "~57.0.1",

@@ -7,6 +7,7 @@ import {
 import {
   CONVERSATION_TITLE_PROMPT,
   CONTEXT_SUMMARIZER_PROMPT,
+  addImageContentSafetyInstruction,
   formatMessagesForSummary,
 } from "./prompts";
 import {
@@ -16,7 +17,7 @@ import {
 } from "./requestRouter";
 
 export async function generateInternalChat(params: {
-  messages: Pick<Message, "role" | "content">[];
+  messages: Pick<Message, "role" | "content" | "attachments">[];
   model: string;
   modelEffort?: string;
   provider: Provider;
@@ -25,13 +26,20 @@ export async function generateInternalChat(params: {
   systemPrompt: string;
   abortSignal?: AbortSignal;
 }) {
-  const messages = params.messages.map(({ role, content }) => ({
+  const messages = params.messages.map(({ role, content, attachments }) => ({
     role,
     content,
+    attachments,
   }));
+  const systemPrompt = messages.some(
+    (message) => (message.attachments?.length ?? 0) > 0,
+  )
+    ? addImageContentSafetyInstruction(params.systemPrompt)
+    : params.systemPrompt;
   const resolved = await requestChatTextResolved({
     ...params,
     messages,
+    systemPrompt,
   });
   const text = resolved.value.trim();
 
@@ -49,7 +57,7 @@ export async function generateInternalChat(params: {
       provider: params.provider,
       model: resolved.actualModel,
       kind: "reply",
-      systemPrompt: params.systemPrompt,
+      systemPrompt,
       messages,
       completionText: text,
     }),

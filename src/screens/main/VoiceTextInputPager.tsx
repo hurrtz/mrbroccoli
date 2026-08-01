@@ -2,6 +2,7 @@ import { PhosphorIcon } from "../../design-system/PhosphorIcon";
 import React from "react";
 import { Text, TouchableOpacity, View } from "react-native";
 import { PhaseAwareVoiceAction } from "./PhaseAwareVoiceAction";
+import { MessageImageAttachments } from "../../components/MessageImageAttachments";
 import { DriveSessionControls } from "./voiceTextInputPager/DriveSessionControls";
 import { InputSurfaceIndicators } from "./voiceTextInputPager/InputSurfaceIndicators";
 import { InputSurfacePages } from "./voiceTextInputPager/InputSurfacePages";
@@ -15,6 +16,7 @@ import { useInputSurfacePager } from "./voiceTextInputPager/useInputSurfacePager
 export type { InputSurface } from "./voiceTextInputPager/types";
 
 export function VoiceTextInputPager({
+  attachments = [],
   colors,
   disabled,
   driveAutoContinueEnabled = false,
@@ -27,6 +29,9 @@ export function VoiceTextInputPager({
   isActive,
   layout,
   onInputSurfaceChange,
+  imageAttachmentDisabled = false,
+  onAddImage,
+  onRemoveImage,
   onDriveContinue,
   onDriveRepeat,
   onDriveStop,
@@ -63,6 +68,13 @@ export function VoiceTextInputPager({
 
   return (
     <View style={styles.root}>
+      <MessageImageAttachments
+        attachments={attachments}
+        colors={colors}
+        compact
+        onRemove={disabled || isActive ? undefined : onRemoveImage}
+        t={t}
+      />
       <View
         testID="voice-text-input-viewport"
         onLayout={pager.handleLayout}
@@ -184,13 +196,34 @@ export function VoiceTextInputPager({
       ) : null}
 
       {showSurfaceIndicators ? (
-        <InputSurfaceIndicators
-          activeSurface={pager.activeSurface}
-          colors={colors}
-          disabled={isActive}
-          onSelect={(surface: InputSurface) => pager.selectSurface(surface)}
-          t={t}
-        />
+        <View style={styles.composerToolbar}>
+          {onAddImage ? (
+            <TouchableOpacity
+              accessibilityLabel={t("addImage")}
+              accessibilityRole="button"
+              disabled={disabled || isActive || imageAttachmentDisabled}
+              onPress={onAddImage}
+              style={styles.imageButton}
+            >
+              <PhosphorIcon
+                color={
+                  disabled || isActive || imageAttachmentDisabled
+                    ? colors.textMuted
+                    : colors.textSecondary
+                }
+                name="image"
+                size="control"
+              />
+            </TouchableOpacity>
+          ) : null}
+          <InputSurfaceIndicators
+            activeSurface={pager.activeSurface}
+            colors={colors}
+            disabled={isActive}
+            onSelect={(surface: InputSurface) => pager.selectSurface(surface)}
+            t={t}
+          />
+        </View>
       ) : null}
     </View>
   );

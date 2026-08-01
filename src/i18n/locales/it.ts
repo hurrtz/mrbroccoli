@@ -1,10 +1,12 @@
 import type { TranslationDictionary } from "../types";
 import { dataBackupTranslations } from "../dataBackupTranslations";
 import { conversationKnowledgeTranslations } from "../conversationKnowledgeTranslations";
+import { imagePromptTranslations } from "../imagePromptTranslations";
 
 export const it = {
   ...dataBackupTranslations.it,
   ...conversationKnowledgeTranslations.it,
+  ...imagePromptTranslations.it,
   appName: "Sig. Broccoli",
   retry: "Riprova",
   dismiss: "Chiudi",

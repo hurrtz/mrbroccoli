@@ -1,0 +1,176 @@
+import { Alert } from "react-native";
+import { act, renderHook } from "@testing-library/react-native";
+
+import { useImagePromptSubmission } from "../../../src/screens/main/useImagePromptSubmission";
+import type { TranslateFn } from "../../../src/screens/main/shared";
+import type { MessageImageAttachment } from "../../../src/types";
+import { markConversationSummaryProvenance } from "../../../src/services/conversationContext";
+
+const attachment: MessageImageAttachment = {
+  id: "image-1",
+  kind: "image",
+  uri: "file:///message-images/image-1.jpg",
+  mimeType: "image/jpeg",
+  width: 1200,
+  height: 800,
+  byteSize: 1000,
+  sharedWithProviders: [],
+};
+
+const t = ((key: string, params?: Record<string, string | number | undefined>) =>
+  params ? `${key}:${JSON.stringify(params)}` : key) as TranslateFn;
+
+describe("useImagePromptSubmission", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it("requires consent before sending a new image to multiple providers", async () => {
+    const runVoiceCapture = jest.fn(async () => undefined);
+    jest.spyOn(Alert, "alert").mockImplementation(() => undefined);
+    const { result } = renderHook(() =>
+      useImagePromptSubmission({
+        activeConversation: null,
+        imageRoutes: [
+          { provider: "openai", model: "gpt-5.5-2026-04-23" },
+          { provider: "anthropic", model: "claude-sonnet-5" },
+        ],
+        onAddImage: jest.fn(),
+        pendingAttachments: [attachment],
+        runVoiceCapture,
+        showToast: jest.fn(),
+        t,
+        updateMessage: jest.fn(() => null),
+      }),
+    );
+
+    let submission!: Promise<void>;
+    act(() => {
+      submission = result.current.handleVoiceCaptureDone({
+        attachments: [attachment],
+        transcriptionOverride: "What is this?",
+      });
+    });
+    const buttons = jest.mocked(Alert.alert).mock.calls[0][2];
+    await act(async () => {
+      buttons?.[1].onPress?.();
+      await submission;
+    });
+
+    expect(runVoiceCapture).toHaveBeenCalledWith(
+      expect.objectContaining({
+        attachments: [
+          expect.objectContaining({
+            sharedWithProviders: ["openai", "anthropic"],
+          }),
+        ],
+      }),
+    );
+  });
+
+  it("adds pending images to a recorded voice prompt", async () => {
+    const runVoiceCapture = jest.fn(async () => undefined);
+    const { result } = renderHook(() =>
+      useImagePromptSubmission({
+        activeConversation: null,
+        imageRoutes: [
+          { provider: "openai", model: "gpt-5.5-2026-04-23" },
+        ],
+        onAddImage: jest.fn(),
+        pendingAttachments: [attachment],
+        runVoiceCapture,
+        showToast: jest.fn(),
+        t,
+        updateMessage: jest.fn(() => null),
+      }),
+    );
+
+    await act(async () => {
+      await result.current.handleRecordedVoiceCaptureDone({
+        audioUri: "file:///capture.wav",
+      });
+    });
+
+    expect(runVoiceCapture).toHaveBeenCalledWith(
+      expect.objectContaining({
+        attachments: [
+          expect.objectContaining({
+            id: attachment.id,
+            sharedWithProviders: ["openai"],
+          }),
+        ],
+        audioUri: "file:///capture.wav",
+      }),
+    );
+  });
+
+  it("blocks image submission for a text-only route", () => {
+    const showToast = jest.fn();
+    const onAddImage = jest.fn();
+    const { result } = renderHook(() =>
+      useImagePromptSubmission({
+        activeConversation: null,
+        imageRoutes: [
+          { provider: "deepseek", model: "deepseek-v4-flash" },
+        ],
+        onAddImage,
+        pendingAttachments: [attachment],
+        runVoiceCapture: jest.fn(async () => undefined),
+        showToast,
+        t,
+        updateMessage: jest.fn(() => null),
+      }),
+    );
+
+    act(() => result.current.handleAddImage());
+
+    expect(result.current.imageInputBlockMessage).toContain(
+      "imageInputUnsupported",
+    );
+    expect(showToast).toHaveBeenCalledWith(
+      expect.stringContaining("imageInputUnsupported"),
+      undefined,
+      "danger",
+    );
+    expect(onAddImage).not.toHaveBeenCalled();
+  });
+
+  it("does not block a text-only route for images outside the active context window", () => {
+    const { result } = renderHook(() =>
+      useImagePromptSubmission({
+        activeConversation: {
+          id: "conversation-1",
+          title: "Old image",
+          createdAt: "2026-08-02T08:00:00.000Z",
+          updatedAt: "2026-08-02T08:01:00.000Z",
+          contextSummary: markConversationSummaryProvenance(
+            "The user previously shared a photo.",
+          ),
+          summarizedMessageCount: 1,
+          messages: [
+            {
+              id: "old-image-message",
+              role: "user",
+              content: "Remember this",
+              attachments: [attachment],
+              model: null,
+              provider: null,
+              timestamp: "2026-08-02T08:00:00.000Z",
+            },
+          ],
+        },
+        imageRoutes: [
+          { provider: "deepseek", model: "deepseek-v4-flash" },
+        ],
+        onAddImage: jest.fn(),
+        pendingAttachments: [],
+        runVoiceCapture: jest.fn(async () => undefined),
+        showToast: jest.fn(),
+        t,
+        updateMessage: jest.fn(() => null),
+      }),
+    );
+
+    expect(result.current.imageInputBlockMessage).toBeNull();
+  });
+});

@@ -39,6 +39,9 @@ import { useVoiceSessionController } from "./main/useVoiceSessionController";
 import { useUlraModeControl } from "./main/useUlraModeControl";
 import { getKokoroPromptBlockState } from "./main/kokoroPromptBlockState";
 import { useMainScreenDataBackup } from "./main/useMainScreenDataBackup";
+import { useMainScreenImageAttachments } from "./main/useMainScreenImageAttachments";
+import { formatMessageForCopy } from "../utils/conversationExport";
+import { useImagePromptSubmission } from "./main/useImagePromptSubmission";
 
 export function MainScreen() {
   const { colors, isDark } = useTheme();
@@ -252,6 +255,16 @@ export function MainScreen() {
   );
   const { dismissToast, showToast, toast } = useMainScreenToastController();
   usePersistenceFailureAlert(showToast, t);
+  const showImageError = React.useCallback(
+    (message: string) => showToast(message, undefined, "danger"),
+    [showToast],
+  );
+
+  const pendingImages = useMainScreenImageAttachments({
+    disabled: voiceInputDisabled,
+    showError: showImageError,
+    t,
+  });
 
   const {
     completedReplyVersion,
@@ -267,7 +280,7 @@ export function MainScreen() {
     handleRepeatLastReply,
     playReplyText,
     stopReplay,
-    handleVoiceCaptureDone,
+    handleVoiceCaptureDone: runVoiceCapture,
   } = useVoicePipeline({
     activeConversation,
     privateConversationIds,
@@ -317,9 +330,34 @@ export function MainScreen() {
     isRecording,
     showToast,
     t,
+    onAttachmentsAccepted: pendingImages.handleAttachmentsAccepted,
   });
 
   const isBusy = pipelinePhase !== "idle";
+
+  const imageRoutes = React.useMemo(
+    () => [
+      { provider, model },
+      ...(ulraModeConfiguration?.routes ?? []).map((route) => ({
+        provider: route.provider,
+        model: route.model,
+      })),
+    ],
+    [model, provider, ulraModeConfiguration],
+  );
+  const imagePromptSubmission = useImagePromptSubmission({
+    activeConversation,
+    imageRoutes,
+    onAddImage: pendingImages.handleAddImage,
+    pendingAttachments: pendingImages.attachments,
+    runVoiceCapture,
+    showToast,
+    t,
+    updateMessage,
+  });
+  const promptSubmissionBlockMessage =
+    kokoroPromptBlockMessage ?? imagePromptSubmission.imageInputBlockMessage;
+  const handleVoiceCaptureDone = imagePromptSubmission.handleVoiceCaptureDone;
 
   const handleRepeatMessage = useMainScreenReplyReplay({
     activeReplayMessageId,
@@ -331,7 +369,8 @@ export function MainScreen() {
     useTextTurnSubmitController({
       handleVoiceCaptureDone,
       isBusy,
-      promptSubmissionBlockMessage: kokoroPromptBlockMessage,
+      pendingAttachments: pendingImages.attachments,
+      promptSubmissionBlockMessage,
       showToast,
     });
 
@@ -407,7 +446,8 @@ export function MainScreen() {
     availableSttProviders,
     availableTtsProviders,
     completedReplyVersion,
-    handleVoiceCaptureDone,
+    handleVoiceCaptureDone:
+      imagePromptSubmission.handleRecordedVoiceCaptureDone,
     isBusy,
     isRecording,
     lastCompletedReplyRef,
@@ -415,7 +455,7 @@ export function MainScreen() {
     nativeStt,
     playReplyText,
     player,
-    promptSubmissionBlockMessage: kokoroPromptBlockMessage,
+    promptSubmissionBlockMessage,
     providerApiKey,
     providerLabel,
     recorder,
@@ -698,14 +738,18 @@ export function MainScreen() {
           webSearchReady,
         },
         voiceStage: {
+          attachments: pendingImages.attachments,
           disabled: voiceInputDisabled,
           driveAutoContinueEnabled, driveSilenceCountdownSeconds,
           driveSessionCanRepeat, driveVoiceActive,
           initialInputSurface: inputSurfaceRef.current,
           initialTextMessage: textMessageDraftRef.current,
+          imageAttachmentDisabled: voiceInputDisabled,
           inputMode: settings.inputMode,
           isActive: isActive && mainSurfaceVisible,
           onInputSurfaceChange: handleInputSurfaceChange,
+          onAddImage: imagePromptSubmission.handleAddImage,
+          onRemoveImage: pendingImages.handleRemoveImage,
           onDriveContinue: handleContinueDriveSession,
           onDriveRepeat: handleRepeatDriveReply,
           onDriveStop: handleStopDriveSession,
@@ -725,12 +769,15 @@ export function MainScreen() {
         transcript: {
           activeConversationId: activeConversation?.id ?? null,
           activeConversationTitle, activeReplayMessageId, messages,
-          onCopyMessage: (message) => handleCopyMessage(message.content),
+          onCopyMessage: (message) =>
+            handleCopyMessage(formatMessageForCopy(message, language)),
           onOpenSpeakingSettings: handleOpenSpeakingSettings,
           onOpenStyleSheet: handleOpenConversationSettings,
           onRepeatMessage: (message) => { void handleRepeatMessage(message); },
           onRetryMessage: handleRetryMessage,
-          onShareMessage: (message) => { void handleShareMessage(message.content); },
+          onShareMessage: (message) => {
+            void handleShareMessage(formatMessageForCopy(message, language));
+          },
           replayPhase, scrollEnabled: true, showStyleControl: showStyleChip,
           showUsageStats: settings.showUsageStats, showWhenEmpty: true, t,
         },
@@ -819,7 +866,11 @@ export function MainScreen() {
         onShareThread: handleShareDrawerThread,
         onManageMemory: handleManageDrawerMemory,
         onRenameThread: handleRenameDrawerThread,
-        onTogglePinned: handleTogglePinned, onNewSession: handleStartNewSession,
+        onTogglePinned: handleTogglePinned,
+        onNewSession: () => {
+          pendingImages.clearAttachments();
+          void handleStartNewSession();
+        },
         onTogglePrivate: (id) => { void handleTogglePrivate(id); },
         onDelete: handleDeleteConversation, onClose: handleCloseDrawer,
         onDismiss: handleDrawerDismiss,

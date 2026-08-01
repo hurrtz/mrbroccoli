@@ -20,6 +20,9 @@ module.exports = {
     "^expo-crypto$": "<rootDir>/__mocks__/expoCrypto.js",
     "^expo-document-picker$":
       "<rootDir>/__mocks__/expoDocumentPicker.js",
+    "^expo-image-picker$": "<rootDir>/__mocks__/expoImagePicker.js",
+    "^expo-image-manipulator$":
+      "<rootDir>/__mocks__/expoImageManipulator.js",
     "^expo-constants$": "<rootDir>/__mocks__/expoConstants.js",
     "^expo-network$": "<rootDir>/__mocks__/expoNetwork.js",
     "^expo-sharing$": "<rootDir>/__mocks__/expoSharing.js",

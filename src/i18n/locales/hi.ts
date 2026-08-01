@@ -1,10 +1,12 @@
 import type { TranslationDictionary } from "../types";
 import { dataBackupTranslations } from "../dataBackupTranslations";
 import { conversationKnowledgeTranslations } from "../conversationKnowledgeTranslations";
+import { imagePromptTranslations } from "../imagePromptTranslations";
 
 export const hi = {
   ...dataBackupTranslations.hi,
   ...conversationKnowledgeTranslations.hi,
+  ...imagePromptTranslations.hi,
   appName: "मिस्टर ब्रोकली",
   retry: "पुन: प्रयास करें",
   dismiss: "बंद करें",

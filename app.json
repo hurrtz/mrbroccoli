@@ -14,6 +14,14 @@
       "expo-font",
       "expo-asset",
       "expo-audio",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Allow Mr Broccoli to select photos you choose as prompt context. Mr Broccoli does not scan your photo library.",
+          "cameraPermission": "Allow Mr Broccoli to take photos you choose as prompt context.",
+          "microphonePermission": "Allow Mr Broccoli to use the microphone for native speech input."
+        }
+      ],
       "expo-router",
       "expo-secure-store",
       "expo-status-bar",

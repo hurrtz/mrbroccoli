@@ -1,4 +1,5 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as FileSystem from "expo-file-system/legacy";
 import { renderHook, act, waitFor } from "@testing-library/react-native";
 import { useConversations } from "../../src/hooks/useConversations";
 import {
@@ -390,6 +391,153 @@ describe("useConversations", () => {
     });
   });
 
+  it("restores backed-up image bytes to a fresh app-owned file", async () => {
+    const { result } = renderHook(() => useConversations());
+    await waitFor(() => expect(result.current.loaded).toBe(true));
+
+    await act(async () => {
+      await result.current.restoreConversationBackup(
+        [
+          {
+            conversation: {
+              id: "imported-image-conversation",
+              title: "Imported image",
+              createdAt: "2026-08-02T08:00:00.000Z",
+              updatedAt: "2026-08-02T08:01:00.000Z",
+              messages: [
+                {
+                  id: "message-with-image",
+                  role: "user",
+                  content: "Describe this",
+                  attachments: [
+                    {
+                      id: "backup-image-id",
+                      kind: "image",
+                      uri: "mrbroccoli-backup://image/backup-image-id",
+                      mimeType: "image/jpeg",
+                      width: 1200,
+                      height: 800,
+                      byteSize: 11,
+                      sharedWithProviders: ["openai"],
+                    },
+                  ],
+                  model: null,
+                  provider: null,
+                  timestamp: "2026-08-02T08:00:00.000Z",
+                },
+              ],
+            },
+            attachments: [
+              {
+                id: "backup-image-id",
+                mimeType: "image/jpeg",
+                width: 1200,
+                height: 800,
+                byteSize: 11,
+                data: "aW1hZ2UtYnl0ZXM=",
+              },
+            ],
+            pinned: false,
+          },
+        ],
+        "imported-image-conversation",
+      );
+    });
+
+    expect(FileSystem.writeAsStringAsync).toHaveBeenCalledWith(
+      "file:///documents/message-images/test-uuid-1.jpg",
+      "aW1hZ2UtYnl0ZXM=",
+      { encoding: "base64" },
+    );
+    expect(
+      result.current.activeConversation?.messages[0].attachments?.[0],
+    ).toEqual(
+      expect.objectContaining({
+        id: "test-uuid-1",
+        uri: "file:///documents/message-images/test-uuid-1.jpg",
+      }),
+    );
+  });
+
+  it("skips a repeated image backup after local attachment IDs are regenerated", async () => {
+    const stored = new Map<string, string>();
+    (AsyncStorage.getItem as jest.Mock).mockImplementation(
+      async (key: string) => stored.get(key) ?? null,
+    );
+    (AsyncStorage.setItem as jest.Mock).mockImplementation(
+      async (key: string, value: string) => {
+        stored.set(key, value);
+      },
+    );
+    (FileSystem.readAsStringAsync as jest.Mock).mockResolvedValue(
+      "aW1hZ2UtYnl0ZXM=",
+    );
+    const record = {
+      conversation: {
+        id: "repeat-image-conversation",
+        title: "Repeat image",
+        createdAt: "2026-08-02T08:00:00.000Z",
+        updatedAt: "2026-08-02T08:01:00.000Z",
+        messages: [
+          {
+            id: "message-with-image",
+            role: "user" as const,
+            content: "Describe this",
+            attachments: [
+              {
+                id: "backup-image-id",
+                kind: "image" as const,
+                uri: "mrbroccoli-backup://image/backup-image-id",
+                mimeType: "image/jpeg" as const,
+                width: 1200,
+                height: 800,
+                byteSize: 11,
+                sharedWithProviders: ["openai" as const],
+              },
+            ],
+            model: null,
+            provider: null,
+            timestamp: "2026-08-02T08:00:00.000Z",
+          },
+        ],
+      },
+      attachments: [
+        {
+          id: "backup-image-id",
+          mimeType: "image/jpeg" as const,
+          width: 1200,
+          height: 800,
+          byteSize: 11,
+          data: "aW1hZ2UtYnl0ZXM=",
+        },
+      ],
+      pinned: false,
+    };
+    const { result } = renderHook(() => useConversations());
+    await waitFor(() => expect(result.current.loaded).toBe(true));
+
+    await act(async () => {
+      await result.current.restoreConversationBackup([record], null);
+    });
+
+    let repeatedResult:
+      | Awaited<ReturnType<typeof result.current.restoreConversationBackup>>
+      | undefined;
+    await act(async () => {
+      repeatedResult = await result.current.restoreConversationBackup(
+        [record],
+        null,
+      );
+    });
+
+    expect(repeatedResult).toEqual({
+      conversationsCopied: 0,
+      conversationsRestored: 0,
+      conversationsSkipped: 1,
+    });
+    expect(result.current.conversations).toHaveLength(1);
+  });
+
   it("keeps useful conversation titles beyond the old 40-character limit", async () => {
     const { result } = renderHook(() => useConversations());
     const firstMessage =
@@ -739,10 +887,36 @@ describe("useConversations", () => {
     });
     const id = result.current.conversations[0].id;
     await act(async () => {
+      result.current.addMessage({
+        role: "user",
+        content: "Delete this image",
+        attachments: [
+          {
+            id: "delete-image",
+            kind: "image",
+            uri: "file:///documents/message-images/delete-image.jpg",
+            mimeType: "image/jpeg",
+            width: 100,
+            height: 100,
+            byteSize: 100,
+            sharedWithProviders: ["openai"],
+          },
+        ],
+        model: null,
+        provider: null,
+      });
+    });
+    await act(async () => {
       result.current.deleteConversation(id);
     });
     expect(result.current.conversations).toHaveLength(0);
     expect(result.current.activeConversation).toBeNull();
+    await waitFor(() =>
+      expect(FileSystem.deleteAsync).toHaveBeenCalledWith(
+        "file:///documents/message-images/delete-image.jpg",
+        { idempotent: true },
+      ),
+    );
   });
 
   it("renames a conversation and keeps the active conversation in sync", async () => {

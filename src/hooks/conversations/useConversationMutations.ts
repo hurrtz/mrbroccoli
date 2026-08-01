@@ -33,6 +33,120 @@ import {
   setConversationKnowledgePrivate,
   syncConversationKnowledge,
 } from "../../services/conversationKnowledge";
+import {
+  deleteImageAttachments,
+  readImageAttachmentData,
+  writeRestoredImageAttachment,
+} from "../../services/imageAttachmentFiles";
+
+async function isIdenticalBackupConversation(
+  existing: Conversation,
+  record: AppDataBackupConversation,
+) {
+  const portableExisting: Conversation = {
+    ...existing,
+    messages: existing.messages.map((message, messageIndex) => ({
+      ...message,
+      attachments: message.attachments?.map((attachment, attachmentIndex) => {
+        const backupAttachment =
+          record.conversation.messages[messageIndex]?.attachments?.[
+            attachmentIndex
+          ];
+        return {
+          ...attachment,
+          id: backupAttachment?.id ?? attachment.id,
+          uri:
+            backupAttachment?.uri ??
+            `mrbroccoli-backup://image/${attachment.id}`,
+        };
+      }),
+    })),
+  };
+  if (JSON.stringify(portableExisting) !== JSON.stringify(record.conversation)) {
+    return false;
+  }
+
+  const dataById = new Map(
+    (record.attachments ?? []).map((attachment) => [
+      attachment.id,
+      attachment.data,
+    ]),
+  );
+  try {
+    const comparisons = await Promise.all(
+      existing.messages.flatMap((message, messageIndex) =>
+        (message.attachments ?? []).map(
+          async (attachment, attachmentIndex) => {
+            const backupId =
+              record.conversation.messages[messageIndex]?.attachments?.[
+                attachmentIndex
+              ]?.id;
+            const expected = backupId ? dataById.get(backupId) : undefined;
+            return (
+              expected !== undefined &&
+              (await readImageAttachmentData(attachment)) === expected
+            );
+          },
+        ),
+      ),
+    );
+    return comparisons.every(Boolean);
+  } catch {
+    return false;
+  }
+}
+
+async function materializeBackupConversation(
+  record: AppDataBackupConversation,
+) {
+  const backupAttachments = new Map(
+    (record.attachments ?? []).map((attachment) => [
+      attachment.id,
+      attachment,
+    ]),
+  );
+  const restoredAttachments = new Map<
+    string,
+    Awaited<ReturnType<typeof writeRestoredImageAttachment>>
+  >();
+
+  try {
+    for (const message of record.conversation.messages) {
+      for (const attachment of message.attachments ?? []) {
+        if (restoredAttachments.has(attachment.id)) {
+          continue;
+        }
+        const backupAttachment = backupAttachments.get(attachment.id);
+        if (!backupAttachment) {
+          throw new Error("Backup image data is missing.");
+        }
+        const restored = await writeRestoredImageAttachment({
+          ...backupAttachment,
+          id: uuid.v4() as string,
+          sharedWithProviders: attachment.sharedWithProviders,
+        });
+        restoredAttachments.set(attachment.id, restored);
+      }
+    }
+
+    return {
+      ...record.conversation,
+      messages: record.conversation.messages.map((message) => ({
+        ...message,
+        attachments: message.attachments?.map((attachment) => {
+          const restored = restoredAttachments.get(attachment.id);
+          if (!restored) {
+            throw new Error("Backup image data is missing.");
+          }
+          return restored;
+        }),
+      })),
+    };
+  } catch (error) {
+    await deleteImageAttachments([...restoredAttachments.values()]);
+    throw error;
+  }
+}
 
 export function useConversationMutations(params: {
   activeConversationRef: MutableRefObject<Conversation | null>;
@@ -342,8 +456,22 @@ export function useConversationMutations(params: {
 
   const deleteConversation = useCallback(
     (id: string) => {
-      void removeConversation(id);
-      void removeConversationKnowledge(id);
+      const activeConversation =
+        activeConversationRef.current?.id === id
+          ? activeConversationRef.current
+          : null;
+      void (async () => {
+        const conversation = activeConversation ?? (await readConversation(id));
+        await Promise.all([
+          removeConversation(id),
+          removeConversationKnowledge(id),
+          deleteImageAttachments(
+            conversation?.messages.flatMap(
+              (message) => message.attachments ?? [],
+            ) ?? [],
+          ),
+        ]);
+      })();
       setConversations((previous) => persistMetas(previous.filter((entry) => entry.id !== id)));
 
       if (activeConversationRef.current?.id === id) {
@@ -378,8 +506,10 @@ export function useConversationMutations(params: {
           const existingConversation = await readConversation(originalId);
           if (
             existingConversation &&
-            JSON.stringify(existingConversation) ===
-              JSON.stringify(record.conversation) &&
+            (await isIdenticalBackupConversation(
+              existingConversation,
+              record,
+            )) &&
             existingMeta.pinned === record.pinned
           ) {
             conversationsSkipped += 1;
@@ -398,7 +528,7 @@ export function useConversationMutations(params: {
         usedIds.add(restoredId);
 
         const restoredConversation = {
-          ...record.conversation,
+          ...(await materializeBackupConversation(record)),
           id: restoredId,
         };
         const restoredMeta = {

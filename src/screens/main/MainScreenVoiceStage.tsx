@@ -4,6 +4,7 @@ import { View } from "react-native";
 import { Colors } from "../../theme/colors";
 import {
   InputMode,
+  MessageImageAttachment,
   VoiceTimingProgress,
   VoiceVisualPhase,
 } from "../../types";
@@ -21,10 +22,14 @@ interface MainScreenVoiceStageProps {
   driveVoiceActive?: boolean;
   initialInputSurface?: InputSurface;
   initialTextMessage?: string;
+  attachments?: MessageImageAttachment[];
+  imageAttachmentDisabled?: boolean;
   inputMode: InputMode;
   isActive: boolean;
   layout?: "portrait" | "landscape";
   onInputSurfaceChange?: (surface: InputSurface) => void;
+  onAddImage?: () => void;
+  onRemoveImage?: (attachmentId: string) => void;
   onDriveContinue?: () => void | Promise<void>;
   onDriveRepeat?: () => void | Promise<void>;
   onDriveStop?: () => void | Promise<void>;
@@ -48,6 +53,7 @@ interface MainScreenVoiceStageProps {
 }
 
 export const MainScreenVoiceStage = React.memo(function MainScreenVoiceStage({
+  attachments = [],
   colors,
   disabled = false,
   driveAutoContinueEnabled = false,
@@ -56,10 +62,13 @@ export const MainScreenVoiceStage = React.memo(function MainScreenVoiceStage({
   driveVoiceActive = false,
   initialInputSurface,
   initialTextMessage,
+  imageAttachmentDisabled = false,
   inputMode,
   isActive,
   layout = "portrait",
   onInputSurfaceChange,
+  onAddImage,
+  onRemoveImage,
   onDriveContinue,
   onDriveRepeat,
   onDriveStop,
@@ -98,6 +107,7 @@ export const MainScreenVoiceStage = React.memo(function MainScreenVoiceStage({
         ]}
       >
         <VoiceTextInputPager
+          attachments={attachments}
           colors={colors}
           disabled={disabled}
           driveAutoContinueEnabled={driveAutoContinueEnabled}
@@ -108,10 +118,13 @@ export const MainScreenVoiceStage = React.memo(function MainScreenVoiceStage({
           driveVoiceActive={driveVoiceActive}
           initialSurface={initialInputSurface}
           initialTextMessage={initialTextMessage}
+          imageAttachmentDisabled={imageAttachmentDisabled}
           inputMode={inputMode}
           isActive={isActive}
           layout={layout}
           onInputSurfaceChange={onInputSurfaceChange}
+          onAddImage={onAddImage}
+          onRemoveImage={onRemoveImage}
           onDriveContinue={onDriveContinue}
           onDriveRepeat={onDriveRepeat}
           onDriveStop={onDriveStop}

@@ -9,6 +9,7 @@ import type {
   AssistantResponseTone,
   KokoroVoiceSelections,
   Message,
+  MessageImageAttachment,
   MessageMetadata,
   Provider,
   ReplyPlayback,
@@ -65,6 +66,7 @@ export interface RunVoicePipelineParams {
   turnStartedAtMs?: number;
   audioUri?: string;
   transcriptionOverride?: string;
+  attachments?: MessageImageAttachment[];
   messages: Message[];
   model: string;
   modelEffort?: string;

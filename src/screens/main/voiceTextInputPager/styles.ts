@@ -113,11 +113,23 @@ export const voiceTextInputPagerStyles = StyleSheet.create({
     ...textStyles.compactAction,
   },
   pageIndicators: {
+    flex: 1,
     height: 44,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
     gap: 0,
+  },
+  composerToolbar: {
+    minHeight: 44,
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  imageButton: {
+    width: 44,
+    height: 44,
+    alignItems: "center",
+    justifyContent: "center",
   },
   driveControls: {
     flexDirection: "row",

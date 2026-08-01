@@ -1,5 +1,7 @@
 module.exports = {
+  EncodingType: { Base64: "base64" },
   cacheDirectory: "file:///cache/",
+  copyAsync: jest.fn(async () => undefined),
   documentDirectory: "file:///documents/",
   deleteAsync: jest.fn(async () => undefined),
   getInfoAsync: jest.fn(async () => ({

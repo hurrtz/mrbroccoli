@@ -4,18 +4,16 @@ import {
   createDebugTurnId,
   recordDebugLogEvent,
 } from "../../services/debugLogCapture";
-import type { Message } from "../../types";
+import type { Message, MessageImageAttachment } from "../../types";
+import type { VoiceCaptureRequest } from "../../hooks/useVoicePipeline";
 import type { ShowToastFn } from "./shared";
 
 interface UseTextTurnSubmitControllerParams {
-  handleVoiceCaptureDone: (params: {
-    existingUserMessageId?: string;
-    transcriptionOverride?: string;
-    turnId?: string;
-  }) => Promise<void>;
+  handleVoiceCaptureDone: (params: VoiceCaptureRequest) => Promise<void>;
   isBusy: boolean;
   promptSubmissionBlockMessage?: string | null;
   showToast?: ShowToastFn;
+  pendingAttachments?: MessageImageAttachment[];
 }
 
 export function useTextTurnSubmitController({
@@ -23,6 +21,7 @@ export function useTextTurnSubmitController({
   isBusy,
   promptSubmissionBlockMessage,
   showToast,
+  pendingAttachments = [],
 }: UseTextTurnSubmitControllerParams) {
   const submissionInFlightRef = useRef(false);
 
@@ -58,6 +57,9 @@ export function useTextTurnSubmitController({
       });
 
       void handleVoiceCaptureDone({
+        ...(params.source !== "retry" && pendingAttachments.length > 0
+          ? { attachments: pendingAttachments }
+          : {}),
         existingUserMessageId: params.existingUserMessageId,
         transcriptionOverride: trimmed,
         turnId,
@@ -70,6 +72,7 @@ export function useTextTurnSubmitController({
       isBusy,
       promptSubmissionBlockMessage,
       showToast,
+      pendingAttachments,
     ],
   );
 

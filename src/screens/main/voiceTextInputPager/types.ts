@@ -1,5 +1,6 @@
 import {
   InputMode,
+  MessageImageAttachment,
   VoiceTimingProgress,
   VoiceVisualPhase,
 } from "../../../types";
@@ -21,6 +22,10 @@ export interface VoiceTextInputPagerProps {
   isActive: boolean;
   layout: "portrait" | "landscape";
   onInputSurfaceChange?: (surface: InputSurface) => void;
+  attachments?: MessageImageAttachment[];
+  imageAttachmentDisabled?: boolean;
+  onAddImage?: () => void;
+  onRemoveImage?: (attachmentId: string) => void;
   onDriveContinue?: () => void | Promise<void>;
   onDriveRepeat?: () => void | Promise<void>;
   onDriveStop?: () => void | Promise<void>;

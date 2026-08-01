@@ -14,6 +14,7 @@ export type { PipelinePhase, ReplayPhase } from "./voicePipeline/types";
 export type {
   UseVoicePipelineParams,
   UseVoicePipelineResult,
+  VoiceCaptureRequest,
 } from "./voicePipeline/types";
 
 export function useVoicePipeline(

@@ -18,6 +18,33 @@ describe("conversationExport", () => {
     expect(formatMessageForCopy(message, "en")).toBe("You\nExplain the wind.");
   });
 
+  it("uses a privacy-safe placeholder instead of image data", () => {
+    const message: Message = {
+      id: "m-image",
+      role: "user",
+      content: "What is this?",
+      attachments: [
+        {
+          id: "image-1",
+          kind: "image",
+          uri: "file:///private/image.jpg",
+          mimeType: "image/jpeg",
+          width: 100,
+          height: 100,
+          byteSize: 100,
+          sharedWithProviders: ["openai"],
+        },
+      ],
+      model: null,
+      provider: null,
+      timestamp: "2026-03-15T12:00:00.000Z",
+    };
+
+    expect(formatMessageForCopy(message, "en")).toBe(
+      "You\n[Image]\nWhat is this?",
+    );
+  });
+
   it("formats assistant messages with provider and model labels", () => {
     const message: Message = {
       id: "m-2",

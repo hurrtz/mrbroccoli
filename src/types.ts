@@ -476,11 +476,25 @@ export interface Message {
   id: string;
   role: "user" | "assistant";
   content: string;
+  attachments?: MessageImageAttachment[];
   model: string | null;
   provider: Provider | null;
   usage?: UsageEstimate;
   metadata?: MessageMetadata;
   timestamp: string;
+}
+
+export type MessageImageMimeType = "image/jpeg" | "image/png" | "image/webp";
+
+export interface MessageImageAttachment {
+  id: string;
+  kind: "image";
+  uri: string;
+  mimeType: MessageImageMimeType;
+  width: number;
+  height: number;
+  byteSize: number;
+  sharedWithProviders: Provider[];
 }
 
 export interface ConversationUsageEvent {

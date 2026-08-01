@@ -89,8 +89,15 @@ jest.mock("expo-crypto", () => {
   };
 });
 
+jest.mock("expo-file-system/legacy", () => ({
+  EncodingType: { Base64: "base64" },
+  readAsStringAsync: jest.fn(async () => "aW1hZ2UtYnl0ZXM="),
+}));
+
 import {
   AppDataBackupError,
+  APP_DATA_BACKUP_MAX_BYTES,
+  ENCRYPTED_APP_DATA_BACKUP_MAX_BYTES,
   createAppDataBackup,
   decryptAppDataBackup,
   encryptAppDataBackup,
@@ -99,6 +106,7 @@ import {
   serializeAppDataBackup,
 } from "../../src/services/appDataBackup";
 import { DEFAULT_SETTINGS, type Conversation } from "../../src/types";
+import * as FileSystem from "expo-file-system/legacy";
 
 const conversation: Conversation = {
   id: "conversation-1",
@@ -158,6 +166,12 @@ async function createBackup() {
 }
 
 describe("appDataBackup", () => {
+  it("allows encrypted envelopes to account for base64 expansion", () => {
+    expect(ENCRYPTED_APP_DATA_BACKUP_MAX_BYTES).toBeGreaterThan(
+      APP_DATA_BACKUP_MAX_BYTES,
+    );
+  });
+
   it("exports conversations and portable settings without credentials or diagnostics", async () => {
     const backup = await createBackup();
     const serialized = serializeAppDataBackup(backup);
@@ -174,6 +188,125 @@ describe("appDataBackup", () => {
     expect(serialized).not.toContain("secret-openai-key");
     expect(serialized).not.toContain("private account detail");
     expect(parseAppDataBackup(serialized)).toEqual(backup);
+  });
+
+  it("embeds image bytes without leaking device-local paths", async () => {
+    const conversationWithImage: Conversation = {
+      ...conversation,
+      messages: [
+        {
+          ...conversation.messages[0],
+          attachments: [
+            {
+              id: "image-1",
+              kind: "image",
+              uri: "file:///private/message-images/image-1.jpg",
+              mimeType: "image/jpeg",
+              width: 1200,
+              height: 800,
+              byteSize: 11,
+              sharedWithProviders: ["openai"],
+            },
+          ],
+        },
+      ],
+    };
+    const backup = await createAppDataBackup({
+      activeConversationId: conversation.id,
+      appVersion: "2.7.0",
+      conversationMetas: [
+        {
+          id: conversation.id,
+          title: conversation.title,
+          createdAt: conversation.createdAt,
+          updatedAt: conversation.updatedAt,
+          messageCount: 1,
+          providers: [],
+          providerModels: {},
+          lastModel: null,
+          lastProvider: null,
+          pinned: false,
+        },
+      ],
+      getConversationById: async () => conversationWithImage,
+      settings: DEFAULT_SETTINGS,
+    });
+    const serialized = serializeAppDataBackup(backup);
+
+    expect(serialized).not.toContain("file:///private/");
+    expect(backup.data.conversations[0].attachments).toEqual([
+      expect.objectContaining({
+        id: "image-1",
+        data: "aW1hZ2UtYnl0ZXM=",
+      }),
+    ]);
+    expect(
+      backup.data.conversations[0].conversation.messages[0].attachments?.[0]
+        .uri,
+    ).toBe("mrbroccoli-backup://image/image-1");
+    expect(parseAppDataBackup(serialized)).toEqual(backup);
+  });
+
+  it("rejects oversized image backups before reading image files", async () => {
+    const oversizedConversation: Conversation = {
+      ...conversation,
+      messages: [
+        {
+          ...conversation.messages[0],
+          attachments: Array.from({ length: 4 }, (_, index) => ({
+            id: `image-${index}`,
+            kind: "image" as const,
+            uri: `file:///private/message-images/image-${index}.png`,
+            mimeType: "image/png" as const,
+            width: 2000,
+            height: 2000,
+            byteSize: 12 * 1024 * 1024,
+            sharedWithProviders: ["openai" as const],
+          })),
+        },
+      ],
+    };
+    jest.mocked(FileSystem.readAsStringAsync).mockClear();
+
+    await expect(
+      createAppDataBackup({
+        activeConversationId: conversation.id,
+        appVersion: "2.7.0",
+        conversationMetas: [
+          {
+            id: conversation.id,
+            title: conversation.title,
+            createdAt: conversation.createdAt,
+            updatedAt: conversation.updatedAt,
+            messageCount: 1,
+            providers: [],
+            providerModels: {},
+            lastModel: null,
+            lastProvider: null,
+            pinned: false,
+          },
+        ],
+        getConversationById: async () => oversizedConversation,
+        settings: DEFAULT_SETTINGS,
+      }),
+    ).rejects.toMatchObject({ code: "too-large" });
+    expect(FileSystem.readAsStringAsync).not.toHaveBeenCalled();
+  });
+
+  it("migrates readable version 1 backups without attachments", async () => {
+    const backup = await createBackup();
+    const legacy = {
+      ...backup,
+      version: 1,
+      data: {
+        ...backup.data,
+        conversations: backup.data.conversations.map(
+          ({ attachments: _attachments, ...record }) => record,
+        ),
+      },
+    };
+
+    expect(parseAppDataBackup(JSON.stringify(legacy))).toEqual(legacy);
   });
 
   it("encrypts and decrypts an authenticated backup with a passphrase", async () => {

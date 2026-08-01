@@ -10,15 +10,19 @@ import { bytesToUtf8, utf8ToBytes } from "@noble/hashes/utils";
 import type {
   Conversation,
   ConversationMeta,
+  MessageImageMimeType,
   Settings,
 } from "../types";
 import { deriveBackupKeyBytes } from "./backupKeyDerivation";
+import { readImageAttachmentData } from "./imageAttachmentFiles";
 
 export const APP_DATA_BACKUP_FORMAT = "mrbroccoli-app-data";
-export const APP_DATA_BACKUP_VERSION = 1;
+export const APP_DATA_BACKUP_VERSION = 2;
 export const ENCRYPTED_APP_DATA_BACKUP_FORMAT =
   "mrbroccoli-app-data-encrypted";
 export const APP_DATA_BACKUP_MAX_BYTES = 50 * 1024 * 1024;
+export const ENCRYPTED_APP_DATA_BACKUP_MAX_BYTES =
+  Math.ceil((APP_DATA_BACKUP_MAX_BYTES * 4) / 3) + 64 * 1024;
 export const APP_DATA_BACKUP_MIN_PASSPHRASE_LENGTH = 12;
 
 const PBKDF2_ITERATIONS = 310_000;
@@ -26,9 +30,11 @@ const PBKDF2_SALT_BYTES = 16;
 const AES_KEY_BYTES = 32;
 const AES_IV_BYTES = 12;
 const AES_TAG_BYTES = 16;
-const ENCRYPTION_AAD = utf8ToBytes(
-  `${ENCRYPTED_APP_DATA_BACKUP_FORMAT}:${APP_DATA_BACKUP_VERSION}`,
-);
+const SUPPORTED_APP_DATA_BACKUP_VERSIONS = [1, 2] as const;
+
+function encryptionAad(version: number) {
+  return utf8ToBytes(`${ENCRYPTED_APP_DATA_BACKUP_FORMAT}:${version}`);
+}
 
 export type PortableSettings = Omit<
   Settings,
@@ -36,8 +42,18 @@ export type PortableSettings = Omit<
 >;
 
 export interface AppDataBackupConversation {
+  attachments?: AppDataBackupImageAttachment[];
   conversation: Conversation;
   pinned: boolean;
+}
+
+export interface AppDataBackupImageAttachment {
+  byteSize: number;
+  data: string;
+  height: number;
+  id: string;
+  mimeType: MessageImageMimeType;
+  width: number;
 }
 
 export interface AppDataBackup {
@@ -49,7 +65,7 @@ export interface AppDataBackup {
   };
   exportedAt: string;
   format: typeof APP_DATA_BACKUP_FORMAT;
-  version: typeof APP_DATA_BACKUP_VERSION;
+  version: 1 | typeof APP_DATA_BACKUP_VERSION;
 }
 
 export interface EncryptedAppDataBackup {
@@ -65,7 +81,7 @@ export interface EncryptedAppDataBackup {
     name: "pbkdf2-hmac-sha256";
     salt: string;
   };
-  version: typeof APP_DATA_BACKUP_VERSION;
+  version: 1 | typeof APP_DATA_BACKUP_VERSION;
 }
 
 export interface AppDataBackupRestoreResult {
@@ -140,13 +156,67 @@ function isValidMessage(value: unknown) {
     return false;
   }
 
+  const attachments = value.attachments;
+
   return (
     typeof value.id === "string" &&
     (value.role === "user" || value.role === "assistant") &&
     typeof value.content === "string" &&
     isNullableString(value.model) &&
     isNullableString(value.provider) &&
-    typeof value.timestamp === "string"
+    typeof value.timestamp === "string" &&
+    (attachments === undefined ||
+      (Array.isArray(attachments) &&
+        attachments.every(
+          (attachment) =>
+            isRecord(attachment) &&
+            attachment.kind === "image" &&
+            typeof attachment.id === "string" &&
+            typeof attachment.uri === "string" &&
+            attachment.uri ===
+              `mrbroccoli-backup://image/${attachment.id}` &&
+            ["image/jpeg", "image/png", "image/webp"].includes(
+              String(attachment.mimeType),
+            ) &&
+            typeof attachment.width === "number" &&
+            attachment.width > 0 &&
+            typeof attachment.height === "number" &&
+            attachment.height > 0 &&
+            typeof attachment.byteSize === "number" &&
+            attachment.byteSize > 0 &&
+            Array.isArray(attachment.sharedWithProviders) &&
+            attachment.sharedWithProviders.every(
+              (provider) => typeof provider === "string",
+            ),
+        )))
+  );
+}
+
+function isValidBackupImageAttachment(
+  value: unknown,
+): value is AppDataBackupImageAttachment {
+  const hasValidData =
+    isRecord(value) &&
+    typeof value.data === "string" &&
+    value.data.length > 0 &&
+    value.data.length % 4 === 0 &&
+    /^[A-Za-z0-9+/]*={0,2}$/.test(value.data);
+
+  return (
+    isRecord(value) &&
+    typeof value.id === "string" &&
+    value.id.length > 0 &&
+    ["image/jpeg", "image/png", "image/webp"].includes(
+      String(value.mimeType),
+    ) &&
+    typeof value.width === "number" &&
+    value.width > 0 &&
+    typeof value.height === "number" &&
+    value.height > 0 &&
+    typeof value.byteSize === "number" &&
+    value.byteSize > 0 &&
+    hasValidData &&
+    base64ToBytes(value.data as string).byteLength === value.byteSize
   );
 }
 
@@ -173,15 +243,45 @@ function isValidConversation(value: unknown): value is Conversation {
 function isValidBackupConversation(
   value: unknown,
 ): value is AppDataBackupConversation {
+  if (
+    !isRecord(value) ||
+    typeof value.pinned !== "boolean" ||
+    !isValidConversation(value.conversation)
+  ) {
+    return false;
+  }
+
+  const referencedIds = value.conversation.messages.flatMap((message) =>
+    (message.attachments ?? []).map((attachment) => attachment.id),
+  );
+  if (referencedIds.length === 0) {
+    return (
+      value.attachments === undefined ||
+      (Array.isArray(value.attachments) && value.attachments.length === 0)
+    );
+  }
+  if (
+    !Array.isArray(value.attachments) ||
+    !value.attachments.every(isValidBackupImageAttachment)
+  ) {
+    return false;
+  }
+  const attachmentIds = value.attachments.map(
+    (attachment) => (attachment as AppDataBackupImageAttachment).id,
+  );
+
   return (
-    isRecord(value) &&
-    typeof value.pinned === "boolean" &&
-    isValidConversation(value.conversation)
+    new Set(attachmentIds).size === attachmentIds.length &&
+    referencedIds.every((id) => attachmentIds.includes(id)) &&
+    attachmentIds.every((id) => referencedIds.includes(id))
   );
 }
 
-function parseJsonDocument(content: string) {
-  if (utf8ToBytes(content).byteLength > APP_DATA_BACKUP_MAX_BYTES) {
+function parseJsonDocument(
+  content: string,
+  maxBytes = APP_DATA_BACKUP_MAX_BYTES,
+) {
+  if (utf8ToBytes(content).byteLength > maxBytes) {
     throw new AppDataBackupError("too-large");
   }
 
@@ -201,7 +301,11 @@ function parsePlainBackupDocument(value: unknown): AppDataBackup {
     throw new AppDataBackupError("invalid");
   }
 
-  if (value.version !== APP_DATA_BACKUP_VERSION) {
+  if (
+    !SUPPORTED_APP_DATA_BACKUP_VERSIONS.includes(
+      value.version as (typeof SUPPORTED_APP_DATA_BACKUP_VERSIONS)[number],
+    )
+  ) {
     throw new AppDataBackupError("unsupported");
   }
 
@@ -212,7 +316,14 @@ function parsePlainBackupDocument(value: unknown): AppDataBackup {
     !isRecord(value.data.settings) ||
     "apiKeys" in value.data.settings ||
     !Array.isArray(value.data.conversations) ||
-    !value.data.conversations.every(isValidBackupConversation) ||
+    !(value.version === 1
+      ? value.data.conversations.every(
+          (record) =>
+            isRecord(record) &&
+            typeof record.pinned === "boolean" &&
+            isValidConversation(record.conversation),
+        )
+      : value.data.conversations.every(isValidBackupConversation)) ||
     !isNullableString(value.data.activeConversationId)
   ) {
     throw new AppDataBackupError("invalid");
@@ -240,7 +351,11 @@ function parseEncryptedBackupDocument(
     throw new AppDataBackupError("invalid");
   }
 
-  if (value.version !== APP_DATA_BACKUP_VERSION) {
+  if (
+    !SUPPORTED_APP_DATA_BACKUP_VERSIONS.includes(
+      value.version as (typeof SUPPORTED_APP_DATA_BACKUP_VERSIONS)[number],
+    )
+  ) {
     throw new AppDataBackupError("unsupported");
   }
 
@@ -281,15 +396,69 @@ export async function createAppDataBackup(params: {
   getConversationById: (id: string) => Promise<Conversation | null>;
   settings: Settings;
 }): Promise<AppDataBackup> {
-  const records = await Promise.all(
-    params.conversationMetas.map(async (meta) => {
-      const conversation = await params.getConversationById(meta.id);
-      return conversation
-        ? {
-            conversation,
-            pinned: meta.pinned,
-          }
-        : null;
+  const conversations = await Promise.all(
+    params.conversationMetas.map((meta) =>
+      params.getConversationById(meta.id),
+    ),
+  );
+  const estimatedImageDataBytes = conversations.reduce(
+    (total, conversation) =>
+      total +
+      (conversation?.messages.reduce(
+        (conversationTotal, message) =>
+          conversationTotal +
+          (message.attachments ?? []).reduce(
+            (messageTotal, attachment) =>
+              messageTotal + Math.ceil(attachment.byteSize / 3) * 4,
+            0,
+          ),
+        0,
+      ) ?? 0),
+    0,
+  );
+  if (estimatedImageDataBytes > APP_DATA_BACKUP_MAX_BYTES) {
+    throw new AppDataBackupError("too-large");
+  }
+
+  const records: (AppDataBackupConversation | null)[] = await Promise.all(
+    params.conversationMetas.map(async (meta, conversationIndex) => {
+      const conversation = conversations[conversationIndex];
+      if (!conversation) {
+        return null;
+      }
+
+      const attachments = await Promise.all(
+        conversation.messages.flatMap((message) =>
+          (message.attachments ?? []).map(async (attachment) => ({
+            byteSize: attachment.byteSize,
+            data: await readImageAttachmentData(attachment),
+            height: attachment.height,
+            id: attachment.id,
+            mimeType: attachment.mimeType,
+            width: attachment.width,
+          })),
+        ),
+      );
+      const portableConversation: Conversation = {
+        ...conversation,
+        messages: conversation.messages.map((message) => ({
+          ...message,
+          ...(message.attachments?.length
+            ? {
+                attachments: message.attachments.map((attachment) => ({
+                  ...attachment,
+                  uri: `mrbroccoli-backup://image/${attachment.id}`,
+                })),
+              }
+            : {}),
+        })),
+      };
+
+      return {
+        ...(attachments.length > 0 ? { attachments } : {}),
+        conversation: portableConversation,
+        pinned: meta.pinned,
+      };
     }),
   );
 
@@ -309,7 +478,11 @@ export async function createAppDataBackup(params: {
 }
 
 export function serializeAppDataBackup(backup: AppDataBackup) {
-  return `${JSON.stringify(backup, null, 2)}\n`;
+  const content = `${JSON.stringify(backup, null, 2)}\n`;
+  if (utf8ToBytes(content).byteLength > APP_DATA_BACKUP_MAX_BYTES) {
+    throw new AppDataBackupError("too-large");
+  }
+  return content;
 }
 
 export function parseAppDataBackup(content: string) {
@@ -317,7 +490,10 @@ export function parseAppDataBackup(content: string) {
 }
 
 export function isEncryptedAppDataBackup(content: string) {
-  const parsed = parseJsonDocument(content);
+  const parsed = parseJsonDocument(
+    content,
+    ENCRYPTED_APP_DATA_BACKUP_MAX_BYTES,
+  );
   return (
     isRecord(parsed) &&
     parsed.format === ENCRYPTED_APP_DATA_BACKUP_FORMAT
@@ -380,7 +556,7 @@ export async function encryptAppDataBackup(
   const key = await deriveBackupKey(passphrase, salt);
   const plaintext = utf8ToBytes(serializeAppDataBackup(backup));
   const sealed = await aesEncryptAsync(plaintext, key, {
-    additionalData: ENCRYPTION_AAD,
+    additionalData: encryptionAad(APP_DATA_BACKUP_VERSION),
     nonce: { length: AES_IV_BYTES },
     tagLength: AES_TAG_BYTES,
   });
@@ -414,7 +590,9 @@ export async function decryptAppDataBackup(
     throw new AppDataBackupError("passphrase-required");
   }
 
-  const encrypted = parseEncryptedBackupDocument(parseJsonDocument(content));
+  const encrypted = parseEncryptedBackupDocument(
+    parseJsonDocument(content, ENCRYPTED_APP_DATA_BACKUP_MAX_BYTES),
+  );
   let salt: Uint8Array;
 
   try {
@@ -434,7 +612,7 @@ export async function decryptAppDataBackup(
       tagLength: encrypted.cipher.tagBytes,
     });
     const plaintext = await aesDecryptAsync(sealed, key, {
-      additionalData: ENCRYPTION_AAD,
+      additionalData: encryptionAad(encrypted.version),
       output: "bytes",
     });
     const backup = parseAppDataBackup(bytesToUtf8(plaintext));

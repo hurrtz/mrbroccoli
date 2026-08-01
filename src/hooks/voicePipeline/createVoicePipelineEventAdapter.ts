@@ -3,7 +3,10 @@ import type { MutableRefObject } from "react";
 import { recordDebugLogEvent } from "../../services/debugLogCapture";
 import type { LatencyRouteDescriptor } from "../../services/latencyStats";
 import type { PipelineCallbacks } from "../../services/voicePipeline/types";
-import type { MessagePipelineNotice } from "../../types";
+import type {
+  MessageImageAttachment,
+  MessagePipelineNotice,
+} from "../../types";
 import { getSpeechLanguageDefinition } from "../../constants/speechLanguages";
 import type { VoiceTurnRunState } from "./createVoicePipelineErrorHandlers";
 import type { PipelinePhase, UseVoicePipelineParams } from "./types";
@@ -23,6 +26,7 @@ type EventAdapterParams = Pick<
   | "initialConversationSettings"
   | "model"
   | "modelEffort"
+  | "onAttachmentsAccepted"
   | "player"
   | "provider"
   | "replyPlayback"
@@ -43,6 +47,7 @@ type EventAdapterParams = Pick<
   | "webSearchMode"
   | "webSearchProvider"
 > & {
+  attachments?: MessageImageAttachment[];
   existingUserMessageId?: string;
   isActiveRun: () => boolean;
   lastCompletedReplyRef: MutableRefObject<string>;
@@ -72,6 +77,7 @@ type EventAdapterParams = Pick<
 export function createVoicePipelineEventAdapter({
   activeConversation,
   addMessage,
+  attachments,
   createConversation,
   existingUserMessageId,
   initialConversationSettings,
@@ -81,6 +87,7 @@ export function createVoicePipelineEventAdapter({
   messageState,
   model,
   modelEffort,
+  onAttachmentsAccepted,
   onError,
   player,
   playbackStartedRef,
@@ -278,10 +285,16 @@ export function createVoicePipelineEventAdapter({
       const userMessage = addMessage({
         role: "user",
         content: text,
+        attachments,
         model: null,
         provider: null,
       });
       messageState.lastUserMessageIdRef.current = userMessage?.id ?? null;
+      if (userMessage && attachments?.length) {
+        onAttachmentsAccepted?.(
+          attachments.map((attachment) => attachment.id),
+        );
+      }
     },
     onContextSummary: (summary, summarizedCount, usage) => {
       if (!isActiveRun()) {

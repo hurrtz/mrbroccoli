@@ -3,7 +3,9 @@ import { translate } from "../../i18n";
 import type { Message, MessageMetadata } from "../../types";
 import { estimateChatUsage } from "../../utils/usageStats";
 import { getProviderModelCandidates } from "../providerModelCandidates";
+import { prepareMessageImagesForRequest } from "../imageAttachmentFiles";
 import { executeProviderModelRequest } from "../providerResilience";
+import { modelSupportsImageInput } from "../../utils/imageInputCapabilities";
 import {
   addResponseProvenanceToMessages,
   createResponseProvenanceStreamFilter,
@@ -77,7 +79,21 @@ export async function streamChat({
   let releaseAbortSignal: (() => void) | null = null;
 
   try {
-    const requestMessages = addResponseProvenanceToMessages(messages);
+    const hasImages = messages.some(
+      (message) => (message.attachments?.length ?? 0) > 0,
+    );
+    if (hasImages && !modelSupportsImageInput(provider, model)) {
+      throw new Error(
+        translate(language, "imageInputUnsupported", {
+          provider: PROVIDER_LABELS[provider],
+          model,
+        }),
+      );
+    }
+    const provenanceMessages = addResponseProvenanceToMessages(messages);
+    const requestMessages = hasImages
+      ? await prepareMessageImagesForRequest(provenanceMessages)
+      : provenanceMessages;
     const requestedSystemPrompt = buildSystemPrompt({
       assistantInstructions,
       responseLength,
@@ -162,6 +178,9 @@ export async function streamChat({
           capability: "llm",
           provider,
           requestedModel: model,
+          isCompatible: hasImages
+            ? (candidate) => modelSupportsImageInput(provider, candidate)
+            : undefined,
         }),
         capability: "llm",
         modelEffort,

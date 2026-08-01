@@ -49,6 +49,7 @@ export function useVoiceCaptureHandler({
   modelEffort,
   pastConversationKnowledgeEnabled = false,
   privateConversationIds = [],
+  onAttachmentsAccepted,
   onReplyCompleted,
   player,
   provider,
@@ -116,8 +117,10 @@ export function useVoiceCaptureHandler({
 
   const handleVoiceCaptureDone = useCallback(
     async ({
+      attachments,
       audioUri,
       existingUserMessageId,
+      messagesOverride,
       transcriptionOverride,
       turnId: requestedTurnId,
     }: VoiceCaptureRequest) => {
@@ -173,6 +176,7 @@ export function useVoiceCaptureHandler({
       const errorHandlers = createVoicePipelineErrorHandlers({
         activeConversation,
         addMessage,
+        attachments,
         audioUri,
         handleRepeatLastReply,
         isActiveRun,
@@ -180,6 +184,7 @@ export function useVoiceCaptureHandler({
         latency: {
           clearLatencyProgress,
         },
+        messagesOverride,
         messageState: {
           lastAssistantMessageIdRef,
           lastUserMessageIdRef,
@@ -209,6 +214,7 @@ export function useVoiceCaptureHandler({
       const eventAdapter = createVoicePipelineEventAdapter({
         activeConversation,
         addMessage,
+        attachments,
         createConversation,
         existingUserMessageId,
         initialConversationSettings,
@@ -231,6 +237,7 @@ export function useVoiceCaptureHandler({
         },
         model,
         modelEffort,
+        onAttachmentsAccepted,
         onError: errorHandlers.handlePipelineError,
         player,
         playbackStartedRef,
@@ -274,7 +281,8 @@ export function useVoiceCaptureHandler({
           turnStartedAtMs,
           audioUri,
           transcriptionOverride,
-          messages: activeConversation?.messages || [],
+          attachments,
+          messages: messagesOverride ?? activeConversation?.messages ?? [],
           contextSummary: activeConversation?.contextSummary,
           summarizedMessageCount: activeConversation?.summarizedMessageCount,
           currentConversationId: activeConversation?.id ?? null,
@@ -429,6 +437,7 @@ export function useVoiceCaptureHandler({
       modelEffort,
       pastConversationKnowledgeEnabled,
       privateConversationIds,
+      onAttachmentsAccepted,
       onReplyCompleted,
       persistPendingNoticesForUser,
       player,

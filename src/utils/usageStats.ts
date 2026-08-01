@@ -103,7 +103,7 @@ export function estimateChatUsage(params: {
   model: string;
   kind: UsageEstimateKind;
   systemPrompt: string;
-  messages: Pick<Message, "role" | "content">[];
+  messages: Pick<Message, "role" | "content" | "attachments">[];
   completionText: string;
 }): UsageEstimate {
   const promptTokens =

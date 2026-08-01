@@ -117,6 +117,9 @@ const t = ((key: string) => {
     repeatDriveReply: "Repeat last",
     continueDriveSession: "Resume auto",
     openSpeakingSettings: "Speaking settings",
+    addImage: "Add image",
+    attachedImageLabel: "Attached image 1 of 1",
+    removeAttachedImage: "Remove attached image 1",
   };
   return copy[key] ?? key;
 }) as TranslateFn;
@@ -140,6 +143,40 @@ function createProps(overrides: Record<string, unknown> = {}) {
 }
 
 describe("MainScreenVoiceStage composer", () => {
+  it("shows accessible add and remove controls for prompt images", () => {
+    const onAddImage = jest.fn();
+    const onRemoveImage = jest.fn();
+    const screen = render(
+      <MainScreenVoiceStage
+        {...createProps({
+          attachments: [
+            {
+              id: "image-1",
+              kind: "image",
+              uri: "file:///message-images/image-1.jpg",
+              mimeType: "image/jpeg",
+              width: 1200,
+              height: 800,
+              byteSize: 1000,
+              sharedWithProviders: [],
+            },
+          ],
+          onAddImage,
+          onRemoveImage,
+        })}
+      />,
+    );
+
+    fireEvent.press(screen.getByLabelText("Add image"));
+    fireEvent.press(screen.getByLabelText("Remove attached image 1"));
+
+    expect(onAddImage).toHaveBeenCalledTimes(1);
+    expect(onRemoveImage).toHaveBeenCalledWith("image-1");
+    expect(
+      StyleSheet.flatten(screen.getByLabelText("Add image").props.style),
+    ).toEqual(expect.objectContaining({ width: 44, height: 44 }));
+  });
+
   it("starts with a prominent full-width voice surface", () => {
     const onPress = jest.fn();
     const screen = render(

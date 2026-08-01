@@ -39,18 +39,33 @@ function toGeminiRole(role: ChatMessage["role"]) {
   return role === "assistant" ? "model" : "user";
 }
 
-function toGeminiContents(messages: ChatMessage[]) {
+export function toGeminiContents(messages: ChatMessage[]) {
   return messages.map((message) => {
     const preservedAssistantContent =
       message.role === "assistant" && message.provider === "gemini"
         ? message.metadata?.providerState?.geminiAssistantContent
         : undefined;
 
+    const imageParts = (message.attachments ?? []).map((attachment) => {
+      if (!("data" in attachment) || !attachment.data) {
+        throw new Error("An attached image could not be read.");
+      }
+
+      return {
+        inlineData: {
+          mimeType: attachment.mimeType,
+          data: attachment.data,
+        },
+      };
+    });
+
     return {
       role: toGeminiRole(message.role),
       parts: preservedAssistantContent?.length
         ? preservedAssistantContent
-        : [{ text: message.content }],
+        : message.role === "user" && imageParts.length > 0
+          ? [...imageParts, { text: message.content }]
+          : [{ text: message.content }],
     };
   });
 }
