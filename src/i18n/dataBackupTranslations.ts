@@ -16,6 +16,7 @@ type DataBackupTranslation = {
   backupPassphraseConfirm: string;
   backupPassphraseMinimum: (params: TranslationParams) => string;
   backupPassphrasesDoNotMatch: string;
+  backupPassphraseWeak: string;
   encryptedBackupPassphraseTitle: string;
   backupRestorePreviewTitle: string;
   backupRestorePreviewMessage: (params: TranslationParams) => string;
@@ -53,6 +54,8 @@ export const dataBackupTranslations = {
     backupPassphraseMinimum: ({ count }) =>
       `Use at least ${count} characters. Store this passphrase safely; it cannot be recovered.`,
     backupPassphrasesDoNotMatch: "The passphrases do not match.",
+    backupPassphraseWeak:
+      "Choose a less predictable passphrase. Repeated characters and common sequences are not secure.",
     encryptedBackupPassphraseTitle: "Unlock encrypted backup",
     backupRestorePreviewTitle: "Restore this backup?",
     backupRestorePreviewMessage: ({ conversationCount, appVersion }) =>
@@ -91,6 +94,8 @@ export const dataBackupTranslations = {
     backupPassphraseMinimum: ({ count }) =>
       `Verwende mindestens ${count} Zeichen. Bewahre die Passphrase sicher auf; sie kann nicht wiederhergestellt werden.`,
     backupPassphrasesDoNotMatch: "Die Passphrasen stimmen nicht überein.",
+    backupPassphraseWeak:
+      "Wähle eine weniger vorhersehbare Passphrase. Wiederholte Zeichen und häufige Folgen sind nicht sicher.",
     encryptedBackupPassphraseTitle: "Verschlüsselte Sicherung entsperren",
     backupRestorePreviewTitle: "Diese Sicherung wiederherstellen?",
     backupRestorePreviewMessage: ({ conversationCount, appVersion }) =>
@@ -130,6 +135,8 @@ export const dataBackupTranslations = {
     backupPassphraseMinimum: ({ count }) =>
       `Використайте щонайменше ${count} символів. Збережіть фразу надійно — її неможливо відновити.`,
     backupPassphrasesDoNotMatch: "Парольні фрази не збігаються.",
+    backupPassphraseWeak:
+      "Виберіть менш передбачувану парольну фразу. Повторювані символи та поширені послідовності ненадійні.",
     encryptedBackupPassphraseTitle: "Розблокувати зашифровану копію",
     backupRestorePreviewTitle: "Відновити цю копію?",
     backupRestorePreviewMessage: ({ conversationCount, appVersion }) =>
@@ -169,6 +176,8 @@ export const dataBackupTranslations = {
     backupPassphraseMinimum: ({ count }) =>
       `कम से कम ${count} अक्षर इस्तेमाल करें। पासफ़्रेज़ सुरक्षित रखें; इसे वापस नहीं पाया जा सकता।`,
     backupPassphrasesDoNotMatch: "पासफ़्रेज़ मेल नहीं खाते।",
+    backupPassphraseWeak:
+      "कम अनुमान योग्य पासफ़्रेज़ चुनें। दोहराए गए अक्षर और सामान्य क्रम सुरक्षित नहीं हैं।",
     encryptedBackupPassphraseTitle: "एन्क्रिप्टेड बैकअप खोलें",
     backupRestorePreviewTitle: "यह बैकअप पुनर्स्थापित करें?",
     backupRestorePreviewMessage: ({ conversationCount, appVersion }) =>
@@ -207,6 +216,8 @@ export const dataBackupTranslations = {
     backupPassphraseMinimum: ({ count }) =>
       `Usa al menos ${count} caracteres. Guarda bien la frase; no se puede recuperar.`,
     backupPassphrasesDoNotMatch: "Las frases de contraseña no coinciden.",
+    backupPassphraseWeak:
+      "Elige una frase de contraseña menos predecible. Los caracteres repetidos y las secuencias comunes no son seguros.",
     encryptedBackupPassphraseTitle: "Desbloquear copia cifrada",
     backupRestorePreviewTitle: "¿Restaurar esta copia?",
     backupRestorePreviewMessage: ({ conversationCount, appVersion }) =>
@@ -247,6 +258,8 @@ export const dataBackupTranslations = {
     backupPassphraseMinimum: ({ count }) =>
       `Utilisez au moins ${count} caractères. Conservez la phrase en lieu sûr : elle est irrécupérable.`,
     backupPassphrasesDoNotMatch: "Les phrases secrètes ne correspondent pas.",
+    backupPassphraseWeak:
+      "Choisissez une phrase secrète moins prévisible. Les caractères répétés et les suites courantes ne sont pas sûrs.",
     encryptedBackupPassphraseTitle: "Déverrouiller la sauvegarde chiffrée",
     backupRestorePreviewTitle: "Restaurer cette sauvegarde ?",
     backupRestorePreviewMessage: ({ conversationCount, appVersion }) =>
@@ -287,6 +300,8 @@ export const dataBackupTranslations = {
     backupPassphraseMinimum: ({ count }) =>
       `Usa almeno ${count} caratteri. Conserva la passphrase al sicuro: non può essere recuperata.`,
     backupPassphrasesDoNotMatch: "Le passphrase non coincidono.",
+    backupPassphraseWeak:
+      "Scegli una passphrase meno prevedibile. I caratteri ripetuti e le sequenze comuni non sono sicuri.",
     encryptedBackupPassphraseTitle: "Sblocca backup crittografato",
     backupRestorePreviewTitle: "Ripristinare questo backup?",
     backupRestorePreviewMessage: ({ conversationCount, appVersion }) =>
@@ -327,6 +342,8 @@ export const dataBackupTranslations = {
     backupPassphraseMinimum: ({ count }) =>
       `Use pelo menos ${count} carateres. Guarde a frase-passe em segurança; não pode ser recuperada.`,
     backupPassphrasesDoNotMatch: "As frases-passe não coincidem.",
+    backupPassphraseWeak:
+      "Escolha uma frase-passe menos previsível. Caracteres repetidos e sequências comuns não são seguros.",
     encryptedBackupPassphraseTitle: "Desbloquear cópia encriptada",
     backupRestorePreviewTitle: "Restaurar esta cópia?",
     backupRestorePreviewMessage: ({ conversationCount, appVersion }) =>
@@ -367,6 +384,8 @@ export const dataBackupTranslations = {
     backupPassphraseMinimum: ({ count }) =>
       `Use pelo menos ${count} caracteres. Guarde a frase em segurança; ela não pode ser recuperada.`,
     backupPassphrasesDoNotMatch: "As frases secretas não coincidem.",
+    backupPassphraseWeak:
+      "Escolha uma frase secreta menos previsível. Caracteres repetidos e sequências comuns não são seguros.",
     encryptedBackupPassphraseTitle: "Desbloquear backup criptografado",
     backupRestorePreviewTitle: "Restaurar este backup?",
     backupRestorePreviewMessage: ({ conversationCount, appVersion }) =>
@@ -407,6 +426,8 @@ export const dataBackupTranslations = {
     backupPassphraseMinimum: ({ count }) =>
       `Используйте не менее ${count} символов. Надёжно сохраните фразу — восстановить её нельзя.`,
     backupPassphrasesDoNotMatch: "Парольные фразы не совпадают.",
+    backupPassphraseWeak:
+      "Выберите менее предсказуемую парольную фразу. Повторяющиеся символы и распространённые последовательности небезопасны.",
     encryptedBackupPassphraseTitle: "Разблокировать зашифрованную копию",
     backupRestorePreviewTitle: "Восстановить эту копию?",
     backupRestorePreviewMessage: ({ conversationCount, appVersion }) =>
@@ -443,6 +464,7 @@ export const dataBackupTranslations = {
     backupPassphraseMinimum: ({ count }) =>
       `请至少使用 ${count} 个字符。请妥善保存密码短语；它无法找回。`,
     backupPassphrasesDoNotMatch: "两次输入的密码短语不一致。",
+    backupPassphraseWeak: "请选择更难预测的密码短语。重复字符和常见序列并不安全。",
     encryptedBackupPassphraseTitle: "解锁加密备份",
     backupRestorePreviewTitle: "恢复此备份？",
     backupRestorePreviewMessage: ({ conversationCount, appVersion }) =>
@@ -480,6 +502,8 @@ export const dataBackupTranslations = {
     backupPassphraseMinimum: ({ count }) =>
       `استخدم ${count} حرفًا على الأقل. احفظ عبارة المرور بأمان؛ لا يمكن استعادتها.`,
     backupPassphrasesDoNotMatch: "عبارتا المرور غير متطابقتين.",
+    backupPassphraseWeak:
+      "اختر عبارة مرور أقل قابلية للتوقع. الأحرف المتكررة والتسلسلات الشائعة غير آمنة.",
     encryptedBackupPassphraseTitle: "فتح النسخة المشفرة",
     backupRestorePreviewTitle: "استعادة هذه النسخة؟",
     backupRestorePreviewMessage: ({ conversationCount, appVersion }) =>
@@ -517,6 +541,8 @@ export const dataBackupTranslations = {
     backupPassphraseMinimum: ({ count }) =>
       `${count} 文字以上にしてください。パスフレーズは復元できないため、安全に保管してください。`,
     backupPassphrasesDoNotMatch: "パスフレーズが一致しません。",
+    backupPassphraseWeak:
+      "推測されにくいパスフレーズを選んでください。文字の繰り返しや一般的な並びは安全ではありません。",
     encryptedBackupPassphraseTitle: "暗号化バックアップを解除",
     backupRestorePreviewTitle: "このバックアップを復元しますか？",
     backupRestorePreviewMessage: ({ conversationCount, appVersion }) =>
@@ -556,6 +582,8 @@ export const dataBackupTranslations = {
     backupPassphraseMinimum: ({ count }) =>
       `Legalább ${count} karaktert használjon. Őrizze biztonságban a jelmondatot; nem állítható vissza.`,
     backupPassphrasesDoNotMatch: "A jelmondatok nem egyeznek.",
+    backupPassphraseWeak:
+      "Válassz kevésbé kiszámítható jelmondatot. Az ismétlődő karakterek és gyakori sorozatok nem biztonságosak.",
     encryptedBackupPassphraseTitle: "Titkosított mentés feloldása",
     backupRestorePreviewTitle: "Visszaállítja ezt a mentést?",
     backupRestorePreviewMessage: ({ conversationCount, appVersion }) =>
@@ -594,6 +622,8 @@ export const dataBackupTranslations = {
     backupPassphraseMinimum: ({ count }) =>
       `Použijte alespoň ${count} znaků. Frázi bezpečně uložte; nelze ji obnovit.`,
     backupPassphrasesDoNotMatch: "Heslové fráze se neshodují.",
+    backupPassphraseWeak:
+      "Zvolte méně předvídatelnou heslovou frázi. Opakované znaky a běžné posloupnosti nejsou bezpečné.",
     encryptedBackupPassphraseTitle: "Odemknout šifrovanou zálohu",
     backupRestorePreviewTitle: "Obnovit tuto zálohu?",
     backupRestorePreviewMessage: ({ conversationCount, appVersion }) =>
@@ -633,6 +663,8 @@ export const dataBackupTranslations = {
     backupPassphraseMinimum: ({ count }) =>
       `Użyj co najmniej ${count} znaków. Zapisz hasło bezpiecznie; nie można go odzyskać.`,
     backupPassphrasesDoNotMatch: "Hasła nie są zgodne.",
+    backupPassphraseWeak:
+      "Wybierz mniej przewidywalne hasło. Powtarzające się znaki i popularne sekwencje nie są bezpieczne.",
     encryptedBackupPassphraseTitle: "Odblokuj zaszyfrowaną kopię",
     backupRestorePreviewTitle: "Przywrócić tę kopię?",
     backupRestorePreviewMessage: ({ conversationCount, appVersion }) =>
@@ -672,6 +704,8 @@ export const dataBackupTranslations = {
     backupPassphraseMinimum: ({ count }) =>
       `Använd minst ${count} tecken. Förvara lösenfrasen säkert; den kan inte återställas.`,
     backupPassphrasesDoNotMatch: "Lösenfraserna stämmer inte överens.",
+    backupPassphraseWeak:
+      "Välj en mindre förutsägbar lösenfras. Upprepade tecken och vanliga sekvenser är inte säkra.",
     encryptedBackupPassphraseTitle: "Lås upp krypterad kopia",
     backupRestorePreviewTitle: "Återställa den här kopian?",
     backupRestorePreviewMessage: ({ conversationCount, appVersion }) =>
@@ -711,6 +745,8 @@ export const dataBackupTranslations = {
     backupPassphraseMinimum: ({ count }) =>
       `En az ${count} karakter kullanın. Parola ifadesini güvenle saklayın; kurtarılamaz.`,
     backupPassphrasesDoNotMatch: "Parola ifadeleri eşleşmiyor.",
+    backupPassphraseWeak:
+      "Daha az tahmin edilebilir bir parola ifadesi seçin. Tekrarlanan karakterler ve yaygın diziler güvenli değildir.",
     encryptedBackupPassphraseTitle: "Şifreli yedeğin kilidini aç",
     backupRestorePreviewTitle: "Bu yedek geri yüklensin mi?",
     backupRestorePreviewMessage: ({ conversationCount, appVersion }) =>
@@ -750,6 +786,8 @@ export const dataBackupTranslations = {
     backupPassphraseMinimum: ({ count }) =>
       `کم از کم ${count} حروف استعمال کریں۔ پاس فریز محفوظ رکھیں؛ اسے واپس حاصل نہیں کیا جا سکتا۔`,
     backupPassphrasesDoNotMatch: "پاس فریز ایک جیسی نہیں ہیں۔",
+    backupPassphraseWeak:
+      "کم قابل اندازہ پاس فریز منتخب کریں۔ دہرائے گئے حروف اور عام ترتیب محفوظ نہیں ہیں۔",
     encryptedBackupPassphraseTitle: "مرموز بیک اپ کھولیں",
     backupRestorePreviewTitle: "یہ بیک اپ بحال کریں؟",
     backupRestorePreviewMessage: ({ conversationCount, appVersion }) =>

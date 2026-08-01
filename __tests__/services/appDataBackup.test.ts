@@ -193,6 +193,14 @@ describe("appDataBackup", () => {
     });
   });
 
+  it("rejects obviously weak passphrases when creating encrypted backups", async () => {
+    const backup = await createBackup();
+
+    await expect(
+      encryptAppDataBackup(backup, "aaaaaaaaaaaa"),
+    ).rejects.toMatchObject({ code: "passphrase-too-weak" });
+  });
+
   it("rejects backups that contain API key fields or duplicate conversation ids", async () => {
     const backup = await createBackup();
     const withApiKeys = {

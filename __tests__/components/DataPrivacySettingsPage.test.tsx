@@ -92,13 +92,21 @@ describe("DataPrivacySettingsPage", () => {
       assets: null,
       canceled: true,
     });
+    jest.mocked(FileSystem.readDirectoryAsync).mockResolvedValue([]);
+    jest.mocked(FileSystem.getInfoAsync).mockResolvedValue({
+      exists: true,
+      isDirectory: false,
+      modificationTime: Date.now() / 1_000,
+      size: 512,
+      uri: "file:///cache/backups/test-backup",
+    });
   });
 
   afterEach(() => {
     jest.restoreAllMocks();
   });
 
-  it("exports a readable backup through a temporary file and removes it", async () => {
+  it("retains a shared readable backup so deferred mail attachments remain readable", async () => {
     const backup = createBackup();
     const screen = renderPage({
       onCreateAppDataBackup: jest.fn(async () => backup),
@@ -112,7 +120,7 @@ describe("DataPrivacySettingsPage", () => {
       sharedPath,
       serializeAppDataBackup(backup),
     );
-    expect(FileSystem.deleteAsync).toHaveBeenCalledWith(sharedPath, {
+    expect(FileSystem.deleteAsync).not.toHaveBeenCalledWith(sharedPath, {
       idempotent: true,
     });
   });
@@ -206,6 +214,22 @@ describe("DataPrivacySettingsPage", () => {
 
     fireEvent.changeText(
       screen.getByTestId("backup-passphrase"),
+      "aaaaaaaaaaaa",
+    );
+    fireEvent.changeText(
+      screen.getByTestId("backup-passphrase-confirmation"),
+      "aaaaaaaaaaaa",
+    );
+    await act(async () => {
+      getVisibleModal(screen)?.props.footer[1].onPress();
+    });
+    expect(screen.getByRole("alert").props.children).toBe(
+      "Choose a less predictable passphrase. Repeated characters and common sequences are not secure.",
+    );
+    expect(onCreateAppDataBackup).not.toHaveBeenCalled();
+
+    fireEvent.changeText(
+      screen.getByTestId("backup-passphrase"),
       "a long test passphrase",
     );
     fireEvent.changeText(
@@ -232,6 +256,48 @@ describe("DataPrivacySettingsPage", () => {
       expect.objectContaining({ mimeType: "application/octet-stream" }),
     );
     expect(getVisibleModal(screen)).toBeUndefined();
+  });
+
+  it("runs only one encrypted export when the action is pressed repeatedly", async () => {
+    const backup = createBackup();
+    let finishEncryption: ((content: string) => void) | undefined;
+    jest
+      .spyOn(AppDataBackupService, "encryptAppDataBackup")
+      .mockImplementation(
+        () =>
+          new Promise<string>((resolve) => {
+            finishEncryption = resolve;
+          }),
+      );
+    const onCreateAppDataBackup = jest.fn(async () => backup);
+    const screen = renderPage({ onCreateAppDataBackup });
+
+    fireEvent.press(screen.getByTestId("export-encrypted-backup"));
+    fireEvent.changeText(
+      screen.getByTestId("backup-passphrase"),
+      "a long test passphrase",
+    );
+    fireEvent.changeText(
+      screen.getByTestId("backup-passphrase-confirmation"),
+      "a long test passphrase",
+    );
+    const exportAction = getVisibleModal(screen)?.props.footer[1].onPress;
+    await act(async () => {
+      exportAction();
+      exportAction();
+    });
+
+    await waitFor(() => expect(onCreateAppDataBackup).toHaveBeenCalledTimes(1));
+    expect(AppDataBackupService.encryptAppDataBackup).toHaveBeenCalledTimes(1);
+    expect(getVisibleModal(screen)?.props.footer[1]).toMatchObject({
+      disabled: true,
+      loading: true,
+    });
+
+    await act(async () => {
+      finishEncryption?.("encrypted-document");
+    });
+    await waitFor(() => expect(Sharing.shareAsync).toHaveBeenCalledTimes(1));
   });
 
   it("unlocks an encrypted import before showing the restore preview", async () => {

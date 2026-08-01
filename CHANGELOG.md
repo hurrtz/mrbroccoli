@@ -14,6 +14,9 @@ the complete Play Store translations are kept in a dedicated file under
 
 - Prevent Android release optimization from renaming Sherpa JNI classes and
   crashing the app when Kokoro speech initializes.
+- Keep backup export responsive by deriving encryption keys on a native
+  background queue, reject duplicate exports and obviously weak passphrases,
+  and retain shared files long enough for mail apps to attach them reliably.
 
 ## 2.7.0 - 2026-08-01
 

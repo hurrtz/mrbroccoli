@@ -25,6 +25,9 @@ const androidStrings = readText(
 const androidDiagnostics = readText(
   "android/app/src/main/java/com/tobiaswinkler/app/mrbroccoli/MrBroccoliDiagnosticsModule.kt",
 );
+const androidBackupCrypto = readText(
+  "android/app/src/main/java/com/tobiaswinkler/app/mrbroccoli/MrBroccoliBackupCryptoModule.kt",
+);
 const androidNativePackage = readText(
   "android/app/src/main/java/com/tobiaswinkler/app/mrbroccoli/MrBroccoliNativeWaveformPackage.kt",
 );
@@ -32,6 +35,7 @@ const iosDiagnostics = readText("ios/MrBroccoli/MrBroccoliDiagnostics.swift");
 const iosDiagnosticsBridge = readText(
   "ios/MrBroccoli/MrBroccoliDiagnosticsBridge.m",
 );
+const iosBackupCrypto = readText("ios/MrBroccoli/MrBroccoliBackupCrypto.m");
 const androidAdaptiveIcon = readText(
   "android/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml",
 );
@@ -224,6 +228,16 @@ assertIncludes(
   "MrBroccoliDiagnosticsModule(reactContext)",
 );
 assertIncludes(
+  "Android backup crypto background execution",
+  androidBackupCrypto,
+  "Executors.newSingleThreadExecutor",
+);
+assertIncludes(
+  "Android backup crypto module registration",
+  androidNativePackage,
+  "MrBroccoliBackupCryptoModule(reactContext)",
+);
+assertIncludes(
   "iOS diagnostics source membership",
   iosProject,
   "MrBroccoliDiagnostics.swift",
@@ -242,6 +256,16 @@ assertIncludes(
   "iOS diagnostics bridge export",
   iosDiagnosticsBridge,
   "RCT_EXTERN_MODULE(MrBroccoliDiagnostics, NSObject)",
+);
+assertIncludes(
+  "iOS backup crypto source membership",
+  iosProject,
+  "MrBroccoliBackupCrypto.m in Sources",
+);
+assertIncludes(
+  "iOS backup crypto background queue",
+  iosBackupCrypto,
+  "com.tobiaswinkler.mrbroccoli.backup-crypto",
 );
 assertEqual(
   "Android release debug-signing fallback removed",

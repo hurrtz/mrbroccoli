@@ -13,12 +13,17 @@ import {
   AppDataBackupError,
   decryptAppDataBackup,
   encryptAppDataBackup,
+  isBackupPassphraseObviouslyWeak,
   isEncryptedAppDataBackup,
   parseAppDataBackup,
   serializeAppDataBackup,
   type AppDataBackup,
   type AppDataBackupRestoreResult,
 } from "../../../services/appDataBackup";
+import {
+  cleanupExpiredBackupShareFiles,
+  writeBackupShareFile,
+} from "../../../services/appDataBackupFiles";
 import { recordDebugLogEvent } from "../../../services/debugLogCapture";
 import { useTheme } from "../../../theme/ThemeContext";
 import { fonts } from "../../../theme/typography";
@@ -76,6 +81,28 @@ export function DataPrivacySettingsPage({
   const [restoreResult, setRestoreResult] =
     React.useState<AppDataBackupRestoreResult | null>(null);
   const [statusMessage, setStatusMessage] = React.useState<string | null>(null);
+  const busyRef = React.useRef<BusyState>(null);
+
+  const beginOperation = React.useCallback(
+    (operation: Exclude<BusyState, null>) => {
+      if (busyRef.current !== null) {
+        return false;
+      }
+      busyRef.current = operation;
+      setBusy(operation);
+      return true;
+    },
+    [],
+  );
+
+  const endOperation = React.useCallback(() => {
+    busyRef.current = null;
+    setBusy(null);
+  }, []);
+
+  React.useEffect(() => {
+    void cleanupExpiredBackupShareFiles();
+  }, []);
 
   React.useEffect(() => {
     const dialog = exportPassphraseVisible
@@ -106,6 +133,8 @@ export function DataPrivacySettingsPage({
           case "decrypt-failed":
           case "passphrase-required":
             return t("backupDecryptFailed");
+          case "passphrase-too-weak":
+            return t("backupPassphraseWeak");
           case "too-large":
             return t("backupTooLarge");
           case "unsupported":
@@ -128,49 +157,44 @@ export function DataPrivacySettingsPage({
         throw new Error("share-unavailable");
       }
 
-      const baseDirectory = FileSystem.cacheDirectory;
-      if (!baseDirectory) {
-        throw new Error("cache-unavailable");
-      }
-
-      const directory = `${baseDirectory}backups/`;
-      const path = `${directory}${getBackupFileName(encrypted)}`;
-      await FileSystem.makeDirectoryAsync(directory, { intermediates: true });
-
-      try {
-        await FileSystem.writeAsStringAsync(path, content);
-        await Sharing.shareAsync(path, {
-          dialogTitle: t("dataBackup"),
-          mimeType: encrypted ? "application/octet-stream" : "application/json",
-          UTI: encrypted ? "public.data" : "public.json",
-        });
-      } finally {
-        await FileSystem.deleteAsync(path, { idempotent: true }).catch(
-          () => undefined,
-        );
-      }
+      const file = await writeBackupShareFile(
+        content,
+        getBackupFileName(encrypted),
+      );
+      await Sharing.shareAsync(file.path, {
+        dialogTitle: t("dataBackup"),
+        mimeType: encrypted ? "application/octet-stream" : "application/json",
+        UTI: encrypted ? "public.data" : "public.json",
+      });
+      return file;
     },
     [t],
   );
 
   const exportReadableBackup = React.useCallback(async () => {
+    if (!beginOperation("export-readable")) {
+      return;
+    }
     const startedAtMs = Date.now();
     recordDebugLogEvent({
       event: "backup-export-started",
       payload: { encrypted: false },
     });
-    setBusy("export-readable");
     setRestoreResult(null);
     setStatusMessage(null);
     try {
       const backup = await onCreateAppDataBackup();
-      await shareBackup(serializeAppDataBackup(backup), false);
+      const sharedFile = await shareBackup(
+        serializeAppDataBackup(backup),
+        false,
+      );
       recordDebugLogEvent({
         event: "backup-export-completed",
         payload: {
           conversationCount: backup.data.conversations.length,
           durationMs: Date.now() - startedAtMs,
           encrypted: false,
+          sharedFileSizeBytes: sharedFile.sizeBytes,
         },
       });
     } catch (error) {
@@ -181,9 +205,15 @@ export function DataPrivacySettingsPage({
       });
       setStatusMessage(getErrorMessage(error, "backupExportFailed"));
     } finally {
-      setBusy(null);
+      endOperation();
     }
-  }, [getErrorMessage, onCreateAppDataBackup, shareBackup]);
+  }, [
+    beginOperation,
+    endOperation,
+    getErrorMessage,
+    onCreateAppDataBackup,
+    shareBackup,
+  ]);
 
   const exportEncryptedBackup = React.useCallback(async () => {
     if (passphrase.length < APP_DATA_BACKUP_MIN_PASSPHRASE_LENGTH) {
@@ -198,8 +228,14 @@ export function DataPrivacySettingsPage({
       setPassphraseError(t("backupPassphrasesDoNotMatch"));
       return;
     }
+    if (isBackupPassphraseObviouslyWeak(passphrase)) {
+      setPassphraseError(t("backupPassphraseWeak"));
+      return;
+    }
+    if (!beginOperation("export-encrypted")) {
+      return;
+    }
 
-    setBusy("export-encrypted");
     const startedAtMs = Date.now();
     recordDebugLogEvent({
       event: "backup-export-started",
@@ -210,13 +246,14 @@ export function DataPrivacySettingsPage({
     try {
       const backup = await onCreateAppDataBackup();
       const encrypted = await encryptAppDataBackup(backup, passphrase);
-      await shareBackup(encrypted, true);
+      const sharedFile = await shareBackup(encrypted, true);
       recordDebugLogEvent({
         event: "backup-export-completed",
         payload: {
           conversationCount: backup.data.conversations.length,
           durationMs: Date.now() - startedAtMs,
           encrypted: true,
+          sharedFileSizeBytes: sharedFile.sizeBytes,
         },
       });
       setExportPassphraseVisible(false);
@@ -229,9 +266,11 @@ export function DataPrivacySettingsPage({
       });
       setPassphraseError(getErrorMessage(error, "backupExportFailed"));
     } finally {
-      setBusy(null);
+      endOperation();
     }
   }, [
+    beginOperation,
+    endOperation,
     getErrorMessage,
     onCreateAppDataBackup,
     passphrase,
@@ -246,8 +285,10 @@ export function DataPrivacySettingsPage({
       setPassphraseError(t("backupDecryptFailed"));
       return;
     }
+    if (!beginOperation("import")) {
+      return;
+    }
 
-    setBusy("import");
     setPassphraseError(null);
     try {
       const backup = await decryptAppDataBackup(encryptedDocument, passphrase);
@@ -258,10 +299,12 @@ export function DataPrivacySettingsPage({
     } catch (error) {
       setPassphraseError(getErrorMessage(error, "backupImportFailed"));
     } finally {
-      setBusy(null);
+      endOperation();
     }
   }, [
+    beginOperation,
     encryptedDocument,
+    endOperation,
     getErrorMessage,
     passphrase,
     resetPassphrase,
@@ -269,9 +312,11 @@ export function DataPrivacySettingsPage({
   ]);
 
   const chooseBackup = React.useCallback(async () => {
+    if (!beginOperation("import")) {
+      return;
+    }
     const startedAtMs = Date.now();
     recordDebugLogEvent({ event: "backup-import-picker-requested" });
-    setBusy("import");
     setRestoreResult(null);
     setStatusMessage(null);
     let pickedUri: string | null = null;
@@ -324,16 +369,18 @@ export function DataPrivacySettingsPage({
           () => undefined,
         );
       }
-      setBusy(null);
+      endOperation();
     }
-  }, [getErrorMessage, resetPassphrase]);
+  }, [beginOperation, endOperation, getErrorMessage, resetPassphrase]);
 
   const restoreBackup = React.useCallback(async () => {
     if (!pendingBackup) {
       return;
     }
+    if (!beginOperation("restore")) {
+      return;
+    }
 
-    setBusy("restore");
     const startedAtMs = Date.now();
     recordDebugLogEvent({
       event: "backup-restore-started",
@@ -356,9 +403,15 @@ export function DataPrivacySettingsPage({
       });
       setStatusMessage(getErrorMessage(error, "backupImportFailed"));
     } finally {
-      setBusy(null);
+      endOperation();
     }
-  }, [getErrorMessage, onRestoreAppDataBackup, pendingBackup]);
+  }, [
+    beginOperation,
+    endOperation,
+    getErrorMessage,
+    onRestoreAppDataBackup,
+    pendingBackup,
+  ]);
 
   return (
     <View style={styles.sectionPageStack}>
@@ -461,6 +514,7 @@ export function DataPrivacySettingsPage({
         }}
         footer={[
           {
+            disabled: busy !== null,
             text: t("cancel"),
             onPress: () => {
               setExportPassphraseVisible(false);
@@ -468,6 +522,8 @@ export function DataPrivacySettingsPage({
             },
           },
           {
+            disabled: busy !== null,
+            loading: busy === "export-encrypted",
             text: t("exportEncryptedBackup"),
             onPress: () => void exportEncryptedBackup(),
           },
@@ -540,6 +596,7 @@ export function DataPrivacySettingsPage({
         }}
         footer={[
           {
+            disabled: busy !== null,
             text: t("cancel"),
             onPress: () => {
               setEncryptedDocument(null);
@@ -548,6 +605,8 @@ export function DataPrivacySettingsPage({
             },
           },
           {
+            disabled: busy !== null,
+            loading: busy === "import",
             text: t("continue"),
             onPress: () => void importEncryptedBackup(),
           },
@@ -592,10 +651,13 @@ export function DataPrivacySettingsPage({
         onClose={() => setPendingBackup(null)}
         footer={[
           {
+            disabled: busy !== null,
             text: t("cancel"),
             onPress: () => setPendingBackup(null),
           },
           {
+            disabled: busy !== null,
+            loading: busy === "restore",
             text: t("restoreBackup"),
             style: {
               color: colors.accent,

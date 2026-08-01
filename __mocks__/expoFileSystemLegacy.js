@@ -8,6 +8,7 @@ module.exports = {
     size: 0,
   })),
   makeDirectoryAsync: jest.fn(async () => undefined),
+  readDirectoryAsync: jest.fn(async () => []),
   readAsStringAsync: jest.fn(async () => ""),
   writeAsStringAsync: jest.fn(async () => undefined),
 };

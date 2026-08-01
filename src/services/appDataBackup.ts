@@ -5,8 +5,6 @@ import {
   aesEncryptAsync,
   getRandomBytes,
 } from "expo-crypto";
-import { pbkdf2Async } from "@noble/hashes/pbkdf2";
-import { sha256 } from "@noble/hashes/sha256";
 import { bytesToUtf8, utf8ToBytes } from "@noble/hashes/utils";
 
 import type {
@@ -14,6 +12,7 @@ import type {
   ConversationMeta,
   Settings,
 } from "../types";
+import { deriveBackupKeyBytes } from "./backupKeyDerivation";
 
 export const APP_DATA_BACKUP_FORMAT = "mrbroccoli-app-data";
 export const APP_DATA_BACKUP_VERSION = 1;
@@ -82,6 +81,7 @@ export class AppDataBackupError extends Error {
       | "decrypt-failed"
       | "invalid"
       | "passphrase-required"
+      | "passphrase-too-weak"
       | "too-large"
       | "unsupported",
   ) {
@@ -323,11 +323,38 @@ export function isEncryptedAppDataBackup(content: string) {
   );
 }
 
+export function isBackupPassphraseObviouslyWeak(passphrase: string) {
+  const normalized = passphrase.normalize("NFKC").trim().toLowerCase();
+  const compact = normalized.replace(/\s/g, "");
+  if (compact.length === 0 || new Set(compact).size <= 2) {
+    return true;
+  }
+
+  for (let unitLength = 1; unitLength <= 4; unitLength += 1) {
+    if (
+      normalized.length % unitLength === 0 &&
+      normalized.slice(0, unitLength).repeat(normalized.length / unitLength) ===
+        normalized
+    ) {
+      return true;
+    }
+  }
+
+  return [
+    "123456789012",
+    "password1234",
+    "passwordpassword",
+    "qwertyuiop12",
+    "letmeinletmein",
+  ].includes(compact);
+}
+
 async function deriveBackupKey(passphrase: string, salt: Uint8Array) {
-  const keyBytes = await pbkdf2Async(sha256, passphrase.normalize("NFKC"), salt, {
-    c: PBKDF2_ITERATIONS,
-    dkLen: AES_KEY_BYTES,
-    asyncTick: 10,
+  const keyBytes = await deriveBackupKeyBytes({
+    iterations: PBKDF2_ITERATIONS,
+    keyLength: AES_KEY_BYTES,
+    passphrase,
+    salt,
   });
 
   try {
@@ -343,6 +370,9 @@ export async function encryptAppDataBackup(
 ) {
   if (passphrase.length < APP_DATA_BACKUP_MIN_PASSPHRASE_LENGTH) {
     throw new AppDataBackupError("passphrase-required");
+  }
+  if (isBackupPassphraseObviouslyWeak(passphrase)) {
+    throw new AppDataBackupError("passphrase-too-weak");
   }
 
   const salt = getRandomBytes(PBKDF2_SALT_BYTES);

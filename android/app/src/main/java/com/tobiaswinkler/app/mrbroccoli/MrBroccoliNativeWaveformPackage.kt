@@ -12,6 +12,7 @@ class MrBroccoliNativeWaveformPackage : ReactPackage {
     listOf(
       MrBroccoliNativeWaveformModule(reactContext),
       MrBroccoliNativeAudioQueueModule(reactContext),
+      MrBroccoliBackupCryptoModule(reactContext),
       MrBroccoliDiagnosticsModule(reactContext),
       MrBroccoliVoiceLiveActivityModule(reactContext),
     )

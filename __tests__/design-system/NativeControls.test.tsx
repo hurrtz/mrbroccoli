@@ -46,4 +46,28 @@ describe("NativeControls", () => {
     fireEvent.press(screen.getByText("Done"));
     expect(onDone).toHaveBeenCalledTimes(1);
   });
+
+  it("disables a loading dialog action while showing progress", () => {
+    const onExport = jest.fn();
+    const screen = renderControl(
+      <Modal
+        visible
+        footer={[{ text: "Export", loading: true, onPress: onExport }]}
+      >
+        Content
+      </Modal>,
+    );
+
+    const action = screen
+      .getAllByRole("button")
+      .find((button) => button.props.accessibilityState?.busy);
+    expect(action).toBeDefined();
+    expect(action!.props.accessibilityState).toEqual({
+      busy: true,
+      disabled: true,
+    });
+    expect(screen.getByTestId("native-dialog-action-loading")).toBeTruthy();
+    fireEvent.press(action!);
+    expect(onExport).not.toHaveBeenCalled();
+  });
 });

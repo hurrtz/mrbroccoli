@@ -267,6 +267,8 @@ const ListItem = Object.assign(NativeListItem, { Brief: ListItemBrief });
 export const List = Object.assign(NativeList, { Item: ListItem });
 
 export interface DialogAction {
+  disabled?: boolean;
+  loading?: boolean;
   onPress: () => void;
   style?: StyleProp<TextStyle>;
   text: string;
@@ -351,12 +353,29 @@ export function Modal({
                 <Pressable
                   key={`${action.text}:${index}`}
                   accessibilityRole="button"
+                  accessibilityState={{
+                    busy: action.loading,
+                    disabled: action.disabled || action.loading,
+                  }}
+                  disabled={action.disabled || action.loading}
                   onPress={action.onPress}
                   style={({ pressed }) => [
                     controlStyles.dialogAction,
-                    pressed ? controlStyles.pressed : null,
+                    pressed && !action.disabled && !action.loading
+                      ? controlStyles.pressed
+                      : null,
+                    action.disabled || action.loading
+                      ? controlStyles.disabled
+                      : null,
                   ]}
                 >
+                  {action.loading ? (
+                    <ActivityIndicator
+                      testID="native-dialog-action-loading"
+                      size="small"
+                      color={colors.accent}
+                    />
+                  ) : null}
                   <Text
                     style={[
                       controlStyles.dialogActionText,
@@ -425,7 +444,10 @@ const controlStyles = StyleSheet.create({
     justifyContent: "center",
   },
   dialogAction: {
+    alignItems: "center",
     borderRadius: 8,
+    flexDirection: "row",
+    gap: 8,
     minHeight: 44,
     paddingHorizontal: 14,
     paddingVertical: 11,
