@@ -2,11 +2,13 @@ import type { TranslationDictionary } from "../types";
 import { dataBackupTranslations } from "../dataBackupTranslations";
 import { conversationKnowledgeTranslations } from "../conversationKnowledgeTranslations";
 import { imagePromptTranslations } from "../imagePromptTranslations";
+import { onDeviceTranslations } from "../onDeviceTranslations";
 
 export const it = {
   ...dataBackupTranslations.it,
   ...conversationKnowledgeTranslations.it,
   ...imagePromptTranslations.it,
+  ...onDeviceTranslations.it,
   appName: "Sig. Broccoli",
   retry: "Riprova",
   dismiss: "Chiudi",

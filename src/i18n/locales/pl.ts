@@ -2,11 +2,13 @@ import type { TranslationDictionary } from "../types";
 import { dataBackupTranslations } from "../dataBackupTranslations";
 import { conversationKnowledgeTranslations } from "../conversationKnowledgeTranslations";
 import { imagePromptTranslations } from "../imagePromptTranslations";
+import { onDeviceTranslations } from "../onDeviceTranslations";
 
 export const pl = {
   ...dataBackupTranslations.pl,
   ...conversationKnowledgeTranslations.pl,
   ...imagePromptTranslations.pl,
+  ...onDeviceTranslations.pl,
   appName: "Pan Brokuł",
   retry: "Spróbuj ponownie",
   dismiss: "Odrzuć",

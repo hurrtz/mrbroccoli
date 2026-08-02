@@ -8,6 +8,10 @@ jest.mock("@react-native-async-storage/async-storage", () => ({
   setItem: jest.fn(async () => undefined),
 }));
 
+jest.mock("../../src/services/localSpeechModels", () => ({
+  synthesizeLocalSpeech: jest.fn(),
+}));
+
 jest.mock("expo-file-system/legacy", () => ({
   cacheDirectory: "file:///tmp/",
   documentDirectory: "file:///tmp/",
@@ -42,6 +46,7 @@ import {
   clearSpeechDiagnostics,
   getSpeechDiagnostics,
 } from "../../src/services/speech/diagnostics";
+import { synthesizeLocalSpeech } from "../../src/services/localSpeechModels";
 
 global.fetch = jest.fn();
 
@@ -178,6 +183,31 @@ describe("synthesizeSpeech", () => {
     clearSpeechDiagnostics();
     resetProviderModelHealthForTests();
     resetRuntimeCapabilityOverridesForTests();
+  });
+
+  it("uses the selected on-device TTS model without a provider", async () => {
+    (synthesizeLocalSpeech as jest.Mock).mockResolvedValue({
+      fileUri: "file:///tmp/local.wav",
+      audioDurationSeconds: 1,
+    });
+
+    await expect(
+      synthesizeSpeech({
+        text: "Hallo.",
+        voice: "",
+        mode: "local",
+        localModelId: "piper-de-de-thorsten",
+        language: "de",
+        listenLanguages: ["de"],
+      }),
+    ).resolves.toBe("file:///tmp/local.wav");
+    expect(synthesizeLocalSpeech).toHaveBeenCalledWith(
+      expect.objectContaining({
+        modelId: "piper-de-de-thorsten",
+        speechLanguage: "de",
+        text: "Hallo.",
+      }),
+    );
   });
 
   it("generates a local Android dev WAV for the exact fake provider key", async () => {

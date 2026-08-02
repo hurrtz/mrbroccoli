@@ -18,9 +18,11 @@ import {
 } from "./constants/webSearch";
 import type { RuntimeAppProviderId } from "./constants/providers/runtimeManifest";
 import type {
-  SpeechLanguage,
-  SttLanguage,
-} from "./constants/speechLanguages";
+  LocalLlmModelId,
+  LocalSttModelId,
+  LocalTtsModelId,
+} from "./constants/localModels";
+import type { SpeechLanguage, SttLanguage } from "./constants/speechLanguages";
 import { DEFAULT_KOKORO_VOICES } from "./constants/kokoro";
 import { DEFAULT_TTS_FALLBACK_POLICY } from "./constants/ttsFallback";
 import {
@@ -31,53 +33,40 @@ import {
 import type { AppLanguage } from "./i18n/localeRegistry";
 
 export type { AppLanguage } from "./i18n/localeRegistry";
-export type {
-  SpeechLanguage,
-  SttLanguage,
-} from "./constants/speechLanguages";
+export type { SpeechLanguage, SttLanguage } from "./constants/speechLanguages";
 
 export type Provider = RuntimeAppProviderId;
-export type InputMode =
-  | "push-to-talk"
-  | "toggle-to-talk"
-  | "drive-session";
+export type InputMode = "push-to-talk" | "toggle-to-talk" | "drive-session";
 export type ReplyPlayback = "stream" | "wait";
 export type TtsPlayback = ReplyPlayback;
 export type ThemeMode = "light" | "dark" | "system";
 export type ToastTone = "info" | "success" | "danger";
 export type ResponseMode = string;
 export type TtsListenLanguage = SpeechLanguage;
-export type SttBackendMode = "native" | "provider";
-export type TtsBackendMode = "native" | "kokoro" | "provider";
+export type SttBackendMode = "native" | "local" | "provider";
+export type TtsBackendMode = "native" | "kokoro" | "local" | "provider";
 export type ProviderTtsFallbackRoute = "kokoro" | "native";
 export type KokoroTtsFallbackRoute = "provider" | "native";
+export type LocalTtsFallbackRoute = "provider" | "native";
 export type TtsFallbackRoute =
-  | ProviderTtsFallbackRoute
-  | KokoroTtsFallbackRoute;
+  ProviderTtsFallbackRoute | KokoroTtsFallbackRoute | LocalTtsFallbackRoute;
 export interface TtsFallbackPolicy {
   provider: ProviderTtsFallbackRoute[];
   kokoro: KokoroTtsFallbackRoute[];
+  local: LocalTtsFallbackRoute[];
 }
 export type KokoroLanguage = "en" | "zh";
 export type KokoroVoiceSelections = Record<KokoroLanguage, string>;
-export type ProviderCapability =
-  | "llm"
-  | "stt"
-  | "tts"
-  | "search"
-  | "voices";
+export type ProviderCapability = "llm" | "stt" | "tts" | "search" | "voices";
 export type AssistantResponseLength = "brief" | "normal" | "thorough";
 export type AssistantResponseTone =
-  | "professional"
-  | "casual"
-  | "nerdy"
-  | "concise"
-  | "socratic"
-  | "eli5";
+  "professional" | "casual" | "nerdy" | "concise" | "socratic" | "eli5";
 export interface ResponseModeRoute {
   provider: Provider;
   model: string;
   effort?: string;
+  runtime?: "provider" | "local";
+  localModelId?: LocalLlmModelId;
 }
 export interface ResponseModeConfig {
   id: ResponseMode;
@@ -114,6 +103,12 @@ export type VoicePreviewRequest =
       mode: "kokoro";
       language: KokoroLanguage;
       voice: string;
+    }
+  | {
+      text: string;
+      mode: "local";
+      modelId: LocalTtsModelId;
+      previewLanguage: TtsListenLanguage;
     }
   | {
       text: string;
@@ -175,8 +170,11 @@ export interface Settings {
   sttMode: SttBackendMode;
   sttLanguage: SttLanguage;
   sttProvider: Provider | null;
+  localLanguages: SpeechLanguage[];
+  localSttModelId: LocalSttModelId | null;
   ttsMode: TtsBackendMode;
   ttsProvider: Provider | null;
+  localTtsModelId: LocalTtsModelId | null;
   ttsListenLanguages: TtsListenLanguage[];
   ttsInstructions: string;
   assistantInstructions: string;
@@ -191,7 +189,10 @@ export interface Settings {
   ulraModeWarningAcknowledged: boolean;
   webSearchMode: WebSearchMode;
   webSearchProvider: WebSearchProvider | null;
-  webSearchProviderSettings: Record<WebSearchProvider, WebSearchProviderSettings>;
+  webSearchProviderSettings: Record<
+    WebSearchProvider,
+    WebSearchProviderSettings
+  >;
   apiKeys: ProviderApiKeys;
 }
 
@@ -268,8 +269,7 @@ export interface MistralThinkingContentChunk {
 }
 
 export type MistralAssistantContentChunk =
-  | MistralTextContentChunk
-  | MistralThinkingContentChunk;
+  MistralTextContentChunk | MistralThinkingContentChunk;
 
 export interface GeminiAssistantContentPart {
   text?: string;
@@ -289,8 +289,9 @@ export interface MessageReplyFailureMetadata {
 }
 
 export interface MessageTurnReceiptRoute {
-  provider: Provider;
+  provider: Provider | null;
   model: string;
+  runtime?: "provider" | "local";
   gateway?: string;
   upstreamProvider?: string;
   strategy?: string;
@@ -452,8 +453,11 @@ export const DEFAULT_SETTINGS: Settings = {
   sttMode: "native",
   sttLanguage: "auto",
   sttProvider: null,
+  localLanguages: getDefaultTtsListenLanguages("en"),
+  localSttModelId: null,
   ttsMode: "native",
   ttsProvider: null,
+  localTtsModelId: null,
   ttsListenLanguages: getDefaultTtsListenLanguages("en"),
   ttsInstructions: "",
   assistantInstructions: getDefaultAssistantInstructions("en"),

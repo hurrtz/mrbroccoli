@@ -42,6 +42,56 @@ describe("settings readiness", () => {
     expectStatus(readiness.think, "broken");
   });
 
+  it("marks selected local thinking, listening, and compatible speech ready", () => {
+    const settings = withSettings({
+      responseModes: [
+        {
+          id: "mode-1",
+          route: {
+            runtime: "local",
+            localModelId: "qwen3-0.6b-q8",
+            provider: "openai",
+            model: "Qwen3 0.6B",
+          },
+        },
+      ],
+      activeResponseMode: "mode-1",
+      sttMode: "local",
+      localSttModelId: "whisper-tiny",
+      ttsMode: "local",
+      localTtsModelId: "piper-de-de-thorsten",
+      ttsListenLanguages: ["de"],
+    });
+
+    const readiness = getSettingsReadiness(settings, {
+      llmProviders: [],
+      sttProviders: [],
+      ttsProviders: [],
+      searchProviders: [],
+    });
+
+    expectStatus(readiness.think, "ready");
+    expectStatus(readiness.listen, "ready");
+    expectStatus(readiness.speak, "ready");
+  });
+
+  it("marks a local voice broken when it cannot cover every selected language", () => {
+    const settings = withSettings({
+      ttsMode: "local",
+      localTtsModelId: "piper-de-de-thorsten",
+      ttsListenLanguages: ["de", "en"],
+    });
+
+    const readiness = getSettingsReadiness(settings, {
+      llmProviders: [],
+      sttProviders: [],
+      ttsProviders: [],
+      searchProviders: [],
+    });
+
+    expectStatus(readiness.speak, "broken");
+  });
+
   it("marks provider STT broken when provider STT is selected without an enabled STT provider", () => {
     const settings = withSettings({
       sttMode: "provider",
@@ -149,6 +199,7 @@ describe("settings readiness", () => {
       ttsFallbackPolicy: {
         provider: ["kokoro"],
         kokoro: [],
+        local: [],
       },
       apiKeys: {
         ...DEFAULT_SETTINGS.apiKeys,
@@ -188,10 +239,7 @@ describe("settings readiness", () => {
       searchProviders: [],
     };
 
-    expectStatus(
-      getSettingsReadiness(baseSettings, context).speak,
-      "broken",
-    );
+    expectStatus(getSettingsReadiness(baseSettings, context).speak, "broken");
     expectStatus(
       getSettingsReadiness(
         {
@@ -230,6 +278,7 @@ describe("settings readiness", () => {
       ttsFallbackPolicy: {
         provider: ["kokoro", "native"],
         kokoro: ["provider", "native"],
+        local: [],
       },
     });
 

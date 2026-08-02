@@ -12,6 +12,7 @@ import { useTheme } from "../../theme/ThemeContext";
 import { PhosphorIcon } from "../../design-system/PhosphorIcon";
 import type {
   KokoroTtsFallbackRoute,
+  LocalTtsFallbackRoute,
   ProviderTtsFallbackRoute,
   Settings,
   TtsFallbackRoute,
@@ -74,10 +75,15 @@ export function AntTtsFallbackSection({
               ...settings.ttsFallbackPolicy,
               provider: nextRoutes as ProviderTtsFallbackRoute[],
             }
-          : {
-              ...settings.ttsFallbackPolicy,
-              kokoro: nextRoutes as KokoroTtsFallbackRoute[],
-            },
+          : primaryMode === "kokoro"
+            ? {
+                ...settings.ttsFallbackPolicy,
+                kokoro: nextRoutes as KokoroTtsFallbackRoute[],
+              }
+            : {
+                ...settings.ttsFallbackPolicy,
+                local: nextRoutes as LocalTtsFallbackRoute[],
+              },
     });
   };
 

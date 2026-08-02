@@ -63,7 +63,11 @@ export function updateTopLevelSettingsValue<K extends keyof Settings>(
 
 export function createProviderModelUpdater(
   setSettings: SetSettings,
-  key: "providerModels" | "providerSttModels" | "providerTtsModels" | "providerTtsVoices",
+  key:
+    | "providerModels"
+    | "providerSttModels"
+    | "providerTtsModels"
+    | "providerTtsVoices",
 ) {
   return (provider: Provider, value: string) => {
     updateNestedSettingsRecord(setSettings, key, provider, value);
@@ -94,7 +98,10 @@ export function createProviderValidationResultUpdater(
 }
 
 export function createResponseModeUpdater(setSettings: SetSettings) {
-  return (mode: ResponseMode, value: Settings["responseModes"][number]["route"]) => {
+  return (
+    mode: ResponseMode,
+    value: Settings["responseModes"][number]["route"],
+  ) => {
     const normalizedValue = normalizeResponseModeRouteEffort(value);
 
     setSettings((prev) =>
@@ -156,7 +163,7 @@ export function createResponseModeRemover(setSettings: SetSettings) {
 
       const nextActiveResponseMode =
         prev.activeResponseMode === mode
-          ? nextResponseModes[0]?.id ?? prev.activeResponseMode
+          ? (nextResponseModes[0]?.id ?? prev.activeResponseMode)
           : prev.activeResponseMode;
 
       return persistAndReturn({
@@ -171,12 +178,13 @@ export function createResponseModeRemover(setSettings: SetSettings) {
 function hasUsableResponseMode(settings: Settings): boolean {
   return settings.responseModes.some(
     ({ route }) =>
-      route.model.trim().length > 0 &&
-      hasProviderCredentialForCapability(
-        route.provider,
-        settings.apiKeys[route.provider],
-        "llm",
-      ),
+      (route.runtime === "local" && Boolean(route.localModelId)) ||
+      (route.model.trim().length > 0 &&
+        hasProviderCredentialForCapability(
+          route.provider,
+          settings.apiKeys[route.provider],
+          "llm",
+        )),
   );
 }
 

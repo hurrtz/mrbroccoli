@@ -27,6 +27,7 @@ type EventAdapterParams = Pick<
   | "model"
   | "modelEffort"
   | "onAttachmentsAccepted"
+  | "localLlmModelId"
   | "player"
   | "provider"
   | "replyPlayback"
@@ -35,6 +36,7 @@ type EventAdapterParams = Pick<
   | "selectedSttModel"
   | "selectedTtsModel"
   | "selectedTtsVoice"
+  | "localTtsModelId"
   | "showToast"
   | "spokenRepliesEnabled"
   | "sttMode"
@@ -88,6 +90,7 @@ export function createVoicePipelineEventAdapter({
   model,
   modelEffort,
   onAttachmentsAccepted,
+  localLlmModelId,
   onError,
   player,
   playbackStartedRef,
@@ -99,6 +102,7 @@ export function createVoicePipelineEventAdapter({
   selectedSttModel,
   selectedTtsModel,
   selectedTtsVoice,
+  localTtsModelId,
   setPipelinePhase,
   setStreamingText,
   showToast,
@@ -119,15 +123,17 @@ export function createVoicePipelineEventAdapter({
   webSearchMode,
   webSearchProvider,
 }: EventAdapterParams) {
-  const recordTurnEvent = (
-    params: Parameters<typeof recordDebugLogEvent>[0],
-  ) =>
+  const recordTurnEvent = (params: Parameters<typeof recordDebugLogEvent>[0]) =>
     recordDebugLogEvent({
       ...params,
       payload: { ...params.payload, turnId },
     });
   const ulraLatencyRoutes = ulraMode?.routes.map(
-    ({ model: routeModel, modelEffort: routeEffort, provider: routeProvider }) => ({
+    ({
+      model: routeModel,
+      modelEffort: routeEffort,
+      provider: routeProvider,
+    }) => ({
       effort: routeEffort,
       model: routeModel,
       provider: routeProvider,
@@ -275,11 +281,11 @@ export function createVoicePipelineEventAdapter({
           createConversation(
             text,
             model,
-            provider,
+            localLlmModelId ? null : provider,
             initialConversationSettings,
           );
         } else {
-          createConversation(text, model, provider);
+          createConversation(text, model, localLlmModelId ? null : provider);
         }
       }
       const userMessage = addMessage({
@@ -314,7 +320,7 @@ export function createVoicePipelineEventAdapter({
         summarizedCount,
         usage,
         model,
-        provider,
+        localLlmModelId ? null : provider,
       );
     },
     onWebSearchStart: () => {
@@ -431,7 +437,7 @@ export function createVoicePipelineEventAdapter({
         role: "assistant",
         content: fullText,
         model: actualModel,
-        provider,
+        provider: localLlmModelId ? null : provider,
         usage,
         metadata: messageState.consumeAssistantMetadata(metadata),
       });
@@ -453,10 +459,11 @@ export function createVoicePipelineEventAdapter({
       producedAudioRef.current = true;
       const actualMode =
         diagnostics?.mode === "kokoro" ||
+        diagnostics?.mode === "local" ||
         diagnostics?.mode === "provider"
           ? diagnostics.mode
-          : ttsMode === "kokoro"
-            ? "kokoro"
+          : ttsMode === "kokoro" || ttsMode === "local"
+            ? ttsMode
             : "provider";
       messageState.updateAssistantTurnReceipt((receipt) => ({
         ...receipt,
@@ -464,7 +471,12 @@ export function createVoicePipelineEventAdapter({
           ...receipt.speechOutput,
           actualMode,
           provider: actualMode === "provider" ? ttsProvider : null,
-          model: actualMode === "provider" ? selectedTtsModel : undefined,
+          model:
+            actualMode === "provider"
+              ? selectedTtsModel
+              : actualMode === "local"
+                ? (localTtsModelId ?? undefined)
+                : undefined,
           voice: diagnostics?.voice ?? selectedTtsVoice,
         },
       }));
@@ -511,9 +523,8 @@ export function createVoicePipelineEventAdapter({
         voice,
         ...(diagnostics?.language && diagnostics.language !== "app"
           ? {
-              language:
-                getSpeechLanguageDefinition(diagnostics.language)
-                  .nativeLocale,
+              language: getSpeechLanguageDefinition(diagnostics.language)
+                .nativeLocale,
             }
           : {}),
         diagnostics,
@@ -559,10 +570,8 @@ export function createVoicePipelineEventAdapter({
           ...receipt.speechOutput,
           actualMode: route,
           provider: route === "provider" ? ttsProvider : null,
-          model:
-            route === "provider" ? selectedTtsModel : undefined,
-          voice:
-            route === "provider" ? selectedTtsVoice : undefined,
+          model: route === "provider" ? selectedTtsModel : undefined,
+          voice: route === "provider" ? selectedTtsVoice : undefined,
           fellBack: true,
           fallbackReason: notice.detail ?? notice.message,
         },

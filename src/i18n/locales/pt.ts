@@ -2,11 +2,13 @@ import type { TranslationDictionary } from "../types";
 import { dataBackupTranslations } from "../dataBackupTranslations";
 import { conversationKnowledgeTranslations } from "../conversationKnowledgeTranslations";
 import { imagePromptTranslations } from "../imagePromptTranslations";
+import { onDeviceTranslations } from "../onDeviceTranslations";
 
 export const pt = {
   ...dataBackupTranslations.pt,
   ...conversationKnowledgeTranslations.pt,
   ...imagePromptTranslations.pt,
+  ...onDeviceTranslations.pt,
   appName: "Sr. Brócolo",
   retry: "Tentar novamente",
   dismiss: "Fechar",

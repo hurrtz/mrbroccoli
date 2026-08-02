@@ -18,6 +18,12 @@ the complete Play Store translations are kept in a dedicated file under
 - Add up to four camera or photo-library images to typed and spoken prompts,
   keep them with conversation history and backups, and require explicit
   consent before resending them to new or multiple reasoning providers.
+- Add a guided on-device AI catalogue for Android and iOS. It filters models by
+  the selected languages and measured device capacity, verifies every download,
+  benchmarks models before use, and makes local Whisper, Qwen, Kokoro, and
+  Piper routes selectable from the normal listening, thinking, and speaking
+  settings. Web search remains disabled for local responses in this first
+  version.
 
 ### Fixed
 

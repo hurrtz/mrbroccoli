@@ -10,6 +10,8 @@ import type { TranslationParams } from "../i18n/types";
 export const KOKORO_MODEL_ID = "kokoro-int8-multi-lang-v1_1";
 export const KOKORO_MODEL_DOWNLOAD_BYTES = 147_031_220;
 export const KOKORO_MODEL_INSTALLED_BYTES = 221_000_000;
+export const KOKORO_MODEL_SHA256 =
+  "a1e94694776049035c4f2c6529f003aaece993c76aae9a78995831c3c4dcafc6";
 export const KOKORO_IDLE_RELEASE_MS = 12_000;
 export const KOKORO_TTS_TARGET_CHUNK_CHARS = 240;
 
@@ -94,9 +96,7 @@ export const DEFAULT_KOKORO_VOICES: KokoroVoiceSelections = {
   zh: "zf_001",
 };
 
-export function isKokoroLanguage(
-  language: TtsListenLanguage,
-): boolean {
+export function isKokoroLanguage(language: TtsListenLanguage): boolean {
   return KOKORO_SUPPORTED_LANGUAGES.includes(
     language as (typeof KOKORO_SUPPORTED_LANGUAGES)[number],
   );
@@ -128,13 +128,11 @@ export function getKokoroVoiceOptions(
   }));
 }
 
-export function getKokoroVoiceConfig(
-  language: KokoroLanguage,
-  voice: string,
-) {
+export function getKokoroVoiceConfig(language: KokoroLanguage, voice: string) {
   return (
-    KOKORO_VOICE_OPTIONS[language].find((candidate) => candidate.id === voice) ??
-    KOKORO_VOICE_OPTIONS[language][0]
+    KOKORO_VOICE_OPTIONS[language].find(
+      (candidate) => candidate.id === voice,
+    ) ?? KOKORO_VOICE_OPTIONS[language][0]
   );
 }
 

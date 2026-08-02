@@ -11,10 +11,7 @@ export interface AudioPlayerController {
   isActivelyPlaying?: boolean;
   isPlaybackPaused: boolean;
   isPlaying: boolean;
-  enqueueAudio: (
-    uri: string,
-    diagnostics?: SpeechDiagnosticsContext,
-  ) => void;
+  enqueueAudio: (uri: string, diagnostics?: SpeechDiagnosticsContext) => void;
   pausePlayback: () => Promise<boolean>;
   resetCancellation: () => void;
   resumePlayback: () => Promise<boolean>;
@@ -75,7 +72,11 @@ export interface UseVoiceSessionControllerParams {
   setStreamingText: (text: string) => void;
   settings: Pick<
     Settings,
+    | "activeResponseMode"
     | "inputMode"
+    | "localSttModelId"
+    | "localTtsModelId"
+    | "responseModes"
     | "spokenRepliesEnabled"
     | "sttMode"
     | "ttsMode"

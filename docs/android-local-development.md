@@ -69,6 +69,13 @@ Gradle's files under `android/app/build/outputs/` are overwritten by later
 builds. Use the versioned archive when retaining or uploading diagnostics for a
 published release.
 
+The on-device reasoning runtime adds two portable CPU libraries to the arm64
+release payload. A stripped Release build measured 66,407,192 bytes in total;
+`librnllama.so` and `librnllama_jni.so` account for 10,228,848 bytes of that
+payload. The reviewed arm64 ceiling in `config/release-size-budget.json` is
+therefore 70 MiB. The AAB and bundled-ONNX ceilings were not raised: reasoning,
+speech-recognition, and speech-generation models remain download-only.
+
 ## Useful Checks
 
 ```bash

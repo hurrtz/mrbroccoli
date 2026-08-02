@@ -56,9 +56,7 @@ function getModelEffortOption(
   }
 
   const options = getModelEffortOptions(provider, model);
-  const exactOption = options.find(
-    (option) => option.id === effort,
-  );
+  const exactOption = options.find((option) => option.id === effort);
 
   if (exactOption) {
     return exactOption;
@@ -106,6 +104,15 @@ export function getDefaultModelEffort(
 export function normalizeResponseModeRouteEffort(
   route: ResponseModeRoute,
 ): ResponseModeRoute {
+  if (route.runtime === "local" && route.localModelId) {
+    return {
+      provider: route.provider,
+      model: route.model,
+      runtime: "local",
+      localModelId: route.localModelId,
+    };
+  }
+
   const defaultEffort = getDefaultModelEffort(route.provider, route.model);
 
   if (!defaultEffort) {
@@ -140,6 +147,9 @@ export function getResponseModeRouteEffortLabel(
   route: ResponseModeRoute,
   language: AppLanguage,
 ): string | undefined {
+  if (route.runtime === "local") {
+    return undefined;
+  }
   const normalizedRoute = normalizeResponseModeRouteEffort(route);
   const option = getModelEffortOption(
     normalizedRoute.provider,

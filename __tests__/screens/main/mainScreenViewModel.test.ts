@@ -1,9 +1,5 @@
 import { getMainScreenViewModel } from "../../../src/screens/main/mainScreenViewModel";
-import {
-  Conversation,
-  DEFAULT_SETTINGS,
-  Settings,
-} from "../../../src/types";
+import { Conversation, DEFAULT_SETTINGS, Settings } from "../../../src/types";
 
 function t(key: any, params?: Record<string, string | number | undefined>) {
   if (key === "messageCount") {
@@ -38,6 +34,7 @@ describe("getMainScreenViewModel", () => {
       ttsFallbackPolicy: {
         provider: ["kokoro", "native"],
         kokoro: [],
+        local: [],
       },
       spokenRepliesEnabled: true,
       ttsProvider: "openai",

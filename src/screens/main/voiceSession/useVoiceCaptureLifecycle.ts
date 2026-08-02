@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef } from "react";
 import { AppState } from "react-native";
 import { recordDebugLogEvent } from "../../../services/debugLogCapture";
 import { cleanupCapturedAudio } from "../../../services/voicePipeline/cleanup";
+import type { SttBackendMode } from "../../../types";
 
 import type { ShowToastFn, TranslateFn } from "../shared";
 import type {
@@ -31,7 +32,7 @@ interface UseVoiceCaptureLifecycleParams {
   }) => Promise<void>;
   recorder: AudioRecorderController;
   showToast: ShowToastFn;
-  sttMode: "native" | "provider";
+  sttMode: SttBackendMode;
   t: TranslateFn;
 }
 

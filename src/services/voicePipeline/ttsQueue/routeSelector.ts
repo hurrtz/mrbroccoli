@@ -49,6 +49,7 @@ export function createTtsRouteSelector({
     ttsListenLanguages,
     ttsMode,
     ttsModel,
+    localTtsModelId,
     ttsProvider,
     ttsVoice,
     turnId,
@@ -81,7 +82,7 @@ export function createTtsRouteSelector({
       source: diagnosticsSource,
       mode: route,
       provider: route === "provider" ? (ttsProvider ?? null) : null,
-      providerModel: route === "provider" ? (ttsModel || null) : null,
+      providerModel: route === "provider" ? ttsModel || null : null,
       turnId,
       language: speechLanguage,
       voice:
@@ -89,7 +90,9 @@ export function createTtsRouteSelector({
           ? ttsVoice || null
           : route === "kokoro"
             ? kokoroVoice
-            : null,
+            : route === "local"
+              ? (localTtsModelId ?? null)
+              : null,
     };
   };
 
@@ -124,6 +127,13 @@ export function createTtsRouteSelector({
       };
     }
 
+    if (route === "local" && !localTtsModelId) {
+      return {
+        kind: "error",
+        error: new Error(translate(language, "chooseOnDeviceTtsModel")),
+      };
+    }
+
     if (
       route === "provider" &&
       (!ttsProvider ||
@@ -135,10 +145,7 @@ export function createTtsRouteSelector({
           ttsProvider
             ? translate(language, "speechLanguageUnsupportedByProvider", {
                 provider: PROVIDER_LABELS[ttsProvider],
-                language: getTtsListenLanguageLabel(
-                  speechLanguage,
-                  language,
-                ),
+                language: getTtsListenLanguageLabel(speechLanguage, language),
               })
             : translate(language, "chooseTextToSpeechProviderInSettings"),
         ),
@@ -148,8 +155,9 @@ export function createTtsRouteSelector({
     try {
       const audio = await synthesizeSpeech({
         text,
-        voice: route === "kokoro" ? diagnostics.voice ?? "" : ttsVoice,
+        voice: route === "kokoro" ? (diagnostics.voice ?? "") : ttsVoice,
         mode: route,
+        localModelId: route === "local" ? localTtsModelId : undefined,
         provider: route === "provider" ? ttsProvider : undefined,
         providerModel: route === "provider" ? ttsModel : undefined,
         apiKey: route === "provider" ? ttsApiKey : undefined,
@@ -204,7 +212,7 @@ export function createTtsRouteSelector({
       actualRoute: route,
       mode: route,
       provider: route === "provider" ? (ttsProvider ?? null) : null,
-      providerModel: route === "provider" ? (ttsModel || null) : null,
+      providerModel: route === "provider" ? ttsModel || null : null,
       language: speechLanguage,
       voice: route === "provider" ? ttsVoice || null : null,
       fallbackReason: error.message,
@@ -228,12 +236,7 @@ export function createTtsRouteSelector({
         throw abortError;
       }
 
-      const attempt = await attemptRoute(
-        route,
-        text,
-        speechLanguage,
-        context,
-      );
+      const attempt = await attemptRoute(route, text, speechLanguage, context);
 
       if (attempt.kind === "success") {
         selectedRoutes.set(speechLanguage, route);

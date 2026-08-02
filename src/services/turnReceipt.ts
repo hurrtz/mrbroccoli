@@ -5,24 +5,24 @@ import type {
   SttBackendMode,
   TtsBackendMode,
 } from "../types";
-import type {
-  WebSearchMode,
-  WebSearchProvider,
-} from "../constants/webSearch";
+import type { WebSearchMode, WebSearchProvider } from "../constants/webSearch";
 import {
   getModelEffortConfig,
   getModelEffortOptionLabel,
   getModelEffortTransportParam,
   getModelEffortTransportValue,
 } from "../utils/modelEffort";
+import type {
+  LocalLlmModelId,
+  LocalSttModelId,
+  LocalTtsModelId,
+} from "../constants/localModels";
 
 const EFFORT_TRANSPORT_PARAMETERS: Record<string, string> = {
   "anthropic-output-effort": "output_config.effort",
   "deepseek-thinking-effort": "reasoning_effort",
-  "gemini-thinking-budget":
-    "generationConfig.thinkingConfig.thinkingBudget",
-  "gemini-thinking-level":
-    "generationConfig.thinkingConfig.thinkingLevel",
+  "gemini-thinking-budget": "generationConfig.thinkingConfig.thinkingBudget",
+  "gemini-thinking-level": "generationConfig.thinkingConfig.thinkingLevel",
   "qwen-enable-thinking": "enable_thinking",
   "reasoning-effort": "reasoning_effort",
 };
@@ -33,14 +33,17 @@ interface CreateTurnReceiptParams {
   sttMode: SttBackendMode;
   sttProvider?: Provider | null;
   sttModel?: string;
+  localSttModelId?: LocalSttModelId | null;
   provider: Provider;
   model: string;
   modelEffort?: string;
+  localLlmModelId?: LocalLlmModelId;
   language: AppLanguage;
   spokenRepliesEnabled: boolean;
   ttsMode: TtsBackendMode;
   ttsProvider?: Provider | null;
   ttsModel?: string;
+  localTtsModelId?: LocalTtsModelId | null;
   ttsVoice: string;
   webSearchMode: WebSearchMode;
   webSearchProvider?: WebSearchProvider | null;
@@ -52,14 +55,17 @@ export function createTurnReceipt({
   sttMode,
   sttProvider,
   sttModel,
+  localSttModelId,
   provider,
   model,
   modelEffort,
+  localLlmModelId,
   language,
   spokenRepliesEnabled,
   ttsMode,
   ttsProvider,
   ttsModel,
+  localTtsModelId,
   ttsVoice,
   webSearchMode,
   webSearchProvider,
@@ -82,15 +88,22 @@ export function createTurnReceipt({
       source: inputSource,
       mode: sttMode,
       provider: sttMode === "provider" ? sttProvider : null,
-      model: sttMode === "provider" ? sttModel : undefined,
+      model:
+        sttMode === "provider"
+          ? sttModel
+          : sttMode === "local"
+            ? (localSttModelId ?? undefined)
+            : undefined,
     },
     requestedRoute: {
-      provider,
-      model,
+      provider: localLlmModelId ? null : provider,
+      model: localLlmModelId ?? model,
+      runtime: localLlmModelId ? "local" : "provider",
     },
     actualRoute: {
-      provider,
-      model,
+      provider: localLlmModelId ? null : provider,
+      model: localLlmModelId ?? model,
+      runtime: localLlmModelId ? "local" : "provider",
     },
     effort:
       modelEffort && effortOption
@@ -98,8 +111,8 @@ export function createTurnReceipt({
             selected: modelEffort,
             label: getModelEffortOptionLabel(effortOption, language),
             transportParameter: effortTransportKey
-              ? EFFORT_TRANSPORT_PARAMETERS[effortTransportKey] ??
-                effortTransportKey
+              ? (EFFORT_TRANSPORT_PARAMETERS[effortTransportKey] ??
+                effortTransportKey)
               : undefined,
             transportValue: effortTransportValue,
             semantics: "provider-native",
@@ -123,7 +136,9 @@ export function createTurnReceipt({
       model:
         spokenRepliesEnabled && ttsMode === "provider"
           ? ttsModel
-          : undefined,
+          : spokenRepliesEnabled && ttsMode === "local"
+            ? (localTtsModelId ?? undefined)
+            : undefined,
       voice: spokenRepliesEnabled ? ttsVoice : undefined,
       fellBack: false,
     },

@@ -11,7 +11,6 @@ import {
   type Provider,
   type ReplyPlayback,
   type Settings,
-  type SttBackendMode,
   type ThemeMode,
   type TtsListenLanguage,
   DEFAULT_SETTINGS,
@@ -26,6 +25,12 @@ import {
   normalizeSttLanguage,
 } from "../../constants/speechLanguages";
 import type { LegacyStoredSettings } from "./types";
+import {
+  getLocalModel,
+  isLocalModelId,
+  type LocalSttModelId,
+  type LocalTtsModelId,
+} from "../../constants/localModels";
 
 function isAllowedValue<T extends string>(
   value: unknown,
@@ -51,10 +56,6 @@ const REPLY_PLAYBACK_OPTIONS = [
   "stream",
   "wait",
 ] as const satisfies readonly ReplyPlayback[];
-const STT_MODES = [
-  "native",
-  "provider",
-] as const satisfies readonly SttBackendMode[];
 const THEME_MODES = [
   "light",
   "dark",
@@ -78,9 +79,7 @@ function getStoredBoolean(value: unknown, fallback: boolean) {
 }
 
 function getStoredPositiveInteger(value: unknown, fallback: number) {
-  return typeof value === "number" &&
-    Number.isSafeInteger(value) &&
-    value >= 1
+  return typeof value === "number" && Number.isSafeInteger(value) && value >= 1
     ? value
     : fallback;
 }
@@ -104,9 +103,9 @@ function getStoredTtsListenLanguages(
     new Set(
       value
         .map(normalizeSpeechLanguage)
-        .filter((candidate): candidate is TtsListenLanguage =>
-          candidate !== null &&
-          SPEECH_LANGUAGE_OPTIONS.includes(candidate),
+        .filter(
+          (candidate): candidate is TtsListenLanguage =>
+            candidate !== null && SPEECH_LANGUAGE_OPTIONS.includes(candidate),
         ),
     ),
   );
@@ -114,6 +113,23 @@ function getStoredTtsListenLanguages(
   return languages.length > 0
     ? languages
     : getDefaultTtsListenLanguages(language);
+}
+
+function getStoredLocalModelId<T extends "stt" | "tts">(
+  value: unknown,
+  capability: T,
+): T extends "stt" ? LocalSttModelId | null : LocalTtsModelId | null {
+  if (
+    !isLocalModelId(value) ||
+    getLocalModel(value).capability !== capability ||
+    (capability === "tts" && value === "kokoro-multilingual")
+  ) {
+    return null as T extends "stt"
+      ? LocalSttModelId | null
+      : LocalTtsModelId | null;
+  }
+
+  return value as T extends "stt" ? LocalSttModelId : LocalTtsModelId;
 }
 
 export function normalizeStoredScalarSettings(
@@ -133,6 +149,9 @@ export function normalizeStoredScalarSettings(
   | "replyPlayback"
   | "spokenRepliesEnabled"
   | "ttsListenLanguages"
+  | "localLanguages"
+  | "localSttModelId"
+  | "localTtsModelId"
   | "setupGuideDismissed"
   | "showSetupGuideShortcut"
   | "showUsageStats"
@@ -178,21 +197,26 @@ export function normalizeStoredScalarSettings(
     ttsMode:
       storedSettings?.ttsMode === "provider"
         ? "provider"
-        : storedSettings?.ttsMode === "kokoro" ||
-            storedSettings?.ttsMode === "local"
-          ? "kokoro"
-          : "native",
+        : storedSettings?.ttsMode === "local" &&
+            getStoredLocalModelId(storedSettings?.localTtsModelId, "tts")
+          ? "local"
+          : storedSettings?.ttsMode === "kokoro" ||
+              storedSettings?.ttsMode === "local"
+            ? "kokoro"
+            : "native",
     language,
     theme: getAllowedValue(
       storedSettings?.theme,
       THEME_MODES,
       DEFAULT_SETTINGS.theme,
     ),
-    sttMode: getAllowedValue(
-      storedSettings?.sttMode,
-      STT_MODES,
-      DEFAULT_SETTINGS.sttMode,
-    ),
+    sttMode:
+      storedSettings?.sttMode === "provider"
+        ? "provider"
+        : storedSettings?.sttMode === "local" &&
+            getStoredLocalModelId(storedSettings?.localSttModelId, "stt")
+          ? "local"
+          : "native",
     sttLanguage: normalizeSttLanguage(
       storedSettings?.sttLanguage,
       DEFAULT_SETTINGS.sttLanguage,
@@ -223,6 +247,18 @@ export function normalizeStoredScalarSettings(
     ttsListenLanguages: getStoredTtsListenLanguages(
       storedSettings?.ttsListenLanguages,
       language,
+    ),
+    localLanguages: getStoredTtsListenLanguages(
+      storedSettings?.localLanguages,
+      language,
+    ),
+    localSttModelId: getStoredLocalModelId(
+      storedSettings?.localSttModelId,
+      "stt",
+    ),
+    localTtsModelId: getStoredLocalModelId(
+      storedSettings?.localTtsModelId,
+      "tts",
     ),
     setupGuideDismissed: getStoredBoolean(
       storedSettings?.setupGuideDismissed,
@@ -279,9 +315,7 @@ export function normalizeStoredScalarSettings(
       storedSettings?.ttsProvider,
       DEFAULT_SETTINGS.ttsProvider,
     ),
-    webSearchProvider: isWebSearchProvider(
-      storedSettings?.webSearchProvider,
-    )
+    webSearchProvider: isWebSearchProvider(storedSettings?.webSearchProvider)
       ? storedSettings.webSearchProvider
       : DEFAULT_SETTINGS.webSearchProvider,
   };

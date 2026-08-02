@@ -37,6 +37,7 @@ export function useMainScreenResponseModeSelection({
       });
 
       if (
+        nextRoute.runtime !== "local" &&
         !hasProviderCredentialForCapability(
           nextProvider,
           settings.apiKeys[nextProvider],
@@ -68,12 +69,6 @@ export function useMainScreenResponseModeSelection({
       });
       updateActiveResponseMode(nextMode);
     },
-    [
-      activeResponseMode,
-      settings,
-      showToast,
-      t,
-      updateActiveResponseMode,
-    ],
+    [activeResponseMode, settings, showToast, t, updateActiveResponseMode],
   );
 }

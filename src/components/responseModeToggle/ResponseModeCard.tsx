@@ -1,9 +1,8 @@
 import React from "react";
 import { Pressable, Text, View } from "react-native";
-import {
-  PROVIDER_LABELS,
-  getProviderModelName,
-} from "../../constants/models";
+import { PROVIDER_LABELS, getProviderModelName } from "../../constants/models";
+import { getLocalModel } from "../../constants/localModels";
+import { PhosphorIcon } from "../../design-system/PhosphorIcon";
 import { useLocalization } from "../../i18n";
 import { useTheme } from "../../theme/ThemeContext";
 import { ResponseMode, ResponseModeConfig } from "../../types";
@@ -50,6 +49,7 @@ function ProviderMark({
   enlargeThreeCardIcons,
   highlighted,
   id,
+  local,
   provider,
   singleMode,
 }: Pick<
@@ -59,6 +59,7 @@ function ProviderMark({
   activeForeground: string;
   highlighted: boolean;
   id: ResponseMode;
+  local: boolean;
   provider: ResponseModeConfig["route"]["provider"];
 }) {
   const { colors } = useTheme();
@@ -77,19 +78,25 @@ function ProviderMark({
         styles.providerRow,
         compact ? styles.providerRowCompact : null,
         detailedLayout ? styles.providerRowDetailedPortrait : null,
-        enlargeThreeCardIcons
-          ? styles.providerRowThreeCardOneLine
-          : null,
+        enlargeThreeCardIcons ? styles.providerRowThreeCardOneLine : null,
         detailedLayout && singleMode
           ? styles.providerRowDetailedPortraitSingle
           : null,
       ]}
     >
-      <ProviderIcon
-        provider={provider}
-        color={highlighted ? activeForeground : colors.textSecondary}
-        size={size}
-      />
+      {local ? (
+        <PhosphorIcon
+          name="cpu"
+          color={highlighted ? activeForeground : colors.textSecondary}
+          size={size}
+        />
+      ) : (
+        <ProviderIcon
+          provider={provider}
+          color={highlighted ? activeForeground : colors.textSecondary}
+          size={size}
+        />
+      )}
     </View>
   );
 }
@@ -242,10 +249,7 @@ function DenseModelDetails({
           onTextLayout={
             threeCardPortrait
               ? ({ nativeEvent }) =>
-                  onMeasureModel(
-                    modelMeasurementKey,
-                    nativeEvent.lines.length,
-                  )
+                  onMeasureModel(modelMeasurementKey, nativeEvent.lines.length)
               : undefined
           }
         >
@@ -275,8 +279,17 @@ export function ResponseModeCard({
   const active = id === selected;
   const highlighted = active && !singleMode;
   const activeForeground = colors.onActiveControl;
-  const modelLabel = getProviderModelName(route.provider, route.model);
-  const modelMeasurementKey = `${id}:${route.provider}:${route.model}`;
+  const local = route.runtime === "local" && Boolean(route.localModelId);
+  const modelLabel =
+    local && route.localModelId
+      ? getLocalModel(route.localModelId).name
+      : getProviderModelName(route.provider, route.model);
+  const routeLabel = local
+    ? t("settingsOnDevice")
+    : PROVIDER_LABELS[route.provider];
+  const modelMeasurementKey = `${id}:${local ? "local" : route.provider}:${
+    route.localModelId ?? route.model
+  }`;
   const effortLabel =
     getResponseModeRouteEffortLabel(route, language) ?? t("fixed");
   const secondaryForeground = highlighted
@@ -326,7 +339,7 @@ export function ResponseModeCard({
       onPress={disabled ? undefined : () => onSelect(id)}
       accessibilityRole="button"
       accessibilityLabel={t("useResponseMode", {
-        mode: `${PROVIDER_LABELS[route.provider]}. ${modelLabel}`,
+        mode: `${routeLabel}. ${modelLabel}`,
       })}
       accessibilityState={{ disabled, selected: active }}
     >
@@ -338,9 +351,7 @@ export function ResponseModeCard({
           detailedLayout ? styles.optionInnerDetailedPortrait : null,
           singleMode ? styles.optionInnerSingle : null,
           compact && singleMode ? styles.optionInnerSingleCompact : null,
-          threeCardPortraitOneLine
-            ? styles.optionInnerThreeCardOneLine
-            : null,
+          threeCardPortraitOneLine ? styles.optionInnerThreeCardOneLine : null,
         ]}
       >
         <View
@@ -364,6 +375,7 @@ export function ResponseModeCard({
             enlargeThreeCardIcons={enlargeThreeCardIcons}
             highlighted={highlighted}
             id={id}
+            local={local}
             provider={route.provider}
             singleMode={singleMode}
           />

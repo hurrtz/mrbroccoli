@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 
 import { Provider, ResponseMode, Settings } from "../../types";
+import { getResponseModeRoute } from "../../utils/responseModes";
 
 interface UseProviderAvailabilityGuardsParams {
   activeResponseMode: ResponseMode;
@@ -30,7 +31,8 @@ export function useProviderAvailabilityGuards({
   updateSettings,
 }: UseProviderAvailabilityGuardsParams) {
   useEffect(() => {
-    if (!loaded || providerApiKey) {
+    const activeRoute = getResponseModeRoute(settings, activeResponseMode);
+    if (!loaded || providerApiKey || activeRoute?.runtime === "local") {
       return;
     }
 
@@ -44,6 +46,7 @@ export function useProviderAvailabilityGuards({
     availableResponseModes,
     loaded,
     providerApiKey,
+    settings,
     updateActiveResponseMode,
   ]);
 

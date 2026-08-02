@@ -73,6 +73,9 @@ export function getNextResponseModeId(modes: ResponseModeSelections) {
 }
 
 function getResponseModeRouteIdentity(route: ResponseModeRoute) {
+  if (route.runtime === "local" && route.localModelId) {
+    return `local\u0000${route.localModelId}`;
+  }
   return `${route.provider}\u0000${route.model}\u0000${route.effort ?? ""}`;
 }
 
@@ -160,7 +163,7 @@ function getResponseModeEntry(
 }
 
 export function getResponseModeRoute(
-  settings: Settings,
+  settings: Pick<Settings, "activeResponseMode" | "responseModes">,
   mode: ResponseMode = settings.activeResponseMode,
 ): ResponseModeRoute {
   return (
@@ -180,12 +183,13 @@ export function isResponseModeReady(
   }
 
   return (
-    route.model.trim().length > 0 &&
-    hasProviderCredentialForCapability(
-      route.provider,
-      settings.apiKeys[route.provider],
-      "llm",
-    )
+    (route.runtime === "local" && Boolean(route.localModelId)) ||
+    (route.model.trim().length > 0 &&
+      hasProviderCredentialForCapability(
+        route.provider,
+        settings.apiKeys[route.provider],
+        "llm",
+      ))
   );
 }
 
@@ -239,12 +243,20 @@ export function getProviderValidationModel(
 
   const activeRoute = getResponseModeRoute(settings);
 
-  if (activeRoute?.provider === provider && activeRoute.model.trim()) {
+  if (
+    activeRoute?.runtime !== "local" &&
+    activeRoute?.provider === provider &&
+    activeRoute.model.trim()
+  ) {
     return activeRoute.model;
   }
 
   for (const { route } of settings.responseModes) {
-    if (route.provider === provider && route.model.trim()) {
+    if (
+      route.runtime !== "local" &&
+      route.provider === provider &&
+      route.model.trim()
+    ) {
       return route.model;
     }
   }

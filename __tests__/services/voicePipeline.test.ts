@@ -1,9 +1,6 @@
 import { runVoicePipeline as runVoicePipelineImplementation } from "../../src/services/voicePipeline";
 import type { RunVoicePipelineParams } from "../../src/services/voicePipeline/types";
-import {
-  splitIntoSentences,
-  synthesizeSpeech,
-} from "../../src/services/tts";
+import { splitIntoSentences, synthesizeSpeech } from "../../src/services/tts";
 import { transcribeAudio } from "../../src/services/whisper";
 import { searchWeb } from "../../src/services/webSearch";
 import {
@@ -17,6 +14,7 @@ import {
 } from "../../src/services/providerResilience";
 import { ProviderRequestError } from "../../src/services/providerErrors";
 import { retrieveConversationKnowledge } from "../../src/services/conversationKnowledge";
+import { streamLocalChat } from "../../src/services/localLlm";
 
 jest.mock("expo-file-system/legacy", () => ({
   deleteAsync: jest.fn(() => Promise.resolve()),
@@ -43,6 +41,10 @@ jest.mock("../../src/services/conversationKnowledge", () => ({
   retrieveConversationKnowledge: jest.fn(),
 }));
 
+jest.mock("../../src/services/localLlm", () => ({
+  streamLocalChat: jest.fn(),
+}));
+
 jest.mock("../../src/services/ulraMode", () => ({
   getUlraModeFailureParticipants: jest.fn(() => [
     "#2 · Anthropic / claude-test",
@@ -52,8 +54,8 @@ jest.mock("../../src/services/ulraMode", () => ({
 
 jest.mock("../../src/services/playbackCues", () => ({
   INTER_PARAGRAPH_PAUSE_MS: 250,
-  getInterParagraphPauseAudioUri: jest.fn(async () =>
-    "file:///tmp/paragraph-pause.wav"
+  getInterParagraphPauseAudioUri: jest.fn(
+    async () => "file:///tmp/paragraph-pause.wav",
   ),
 }));
 
@@ -242,6 +244,84 @@ describe("runVoicePipeline", () => {
     );
   });
 
+  it("passes source-backed past knowledge to an on-device response", async () => {
+    (retrieveConversationKnowledge as jest.Mock).mockResolvedValue({
+      context: "SOURCE 1 — Private architecture\nUser: Keep inference local.",
+      metadata: {
+        engine: "local-hybrid-v1",
+        sources: [
+          {
+            conversationId: "architecture",
+            title: "Private architecture",
+            updatedAt: "2026-08-01T08:00:00.000Z",
+          },
+        ],
+      },
+    });
+    (streamLocalChat as jest.Mock).mockResolvedValue({
+      fullText: "I will keep inference local.",
+      usage: {
+        kind: "reply",
+        source: "estimated",
+        promptTokens: 20,
+        completionTokens: 7,
+        totalTokens: 27,
+      },
+    });
+    const callbacks = {
+      onTranscription: jest.fn(),
+      onLlmStart: jest.fn(),
+      onChunk: jest.fn(),
+      onResponseDone: jest.fn(),
+      onAudioReady: jest.fn(),
+      onSpeechTextReady: jest.fn(),
+      onError: jest.fn(),
+    };
+
+    await runVoicePipeline({
+      transcriptionOverride: "What did we decide?",
+      messages: [],
+      currentConversationId: "current",
+      privateConversationIds: ["private"],
+      pastConversationKnowledgeEnabled: true,
+      model: "qwen3-0.6b-q8",
+      localLlmModelId: "qwen3-0.6b-q8",
+      provider: "openai",
+      providerApiKey: "",
+      sttMode: "native",
+      ttsMode: "native",
+      ttsVoice: "alloy",
+      replyPlayback: "wait",
+      spokenRepliesEnabled: false,
+      assistantInstructions: "Be accurate.",
+      responseLength: "normal",
+      responseTone: "professional",
+      language: "en",
+      callbacks,
+    });
+
+    expect(streamChat).not.toHaveBeenCalled();
+    expect(streamLocalChat).toHaveBeenCalledWith(
+      expect.objectContaining({
+        modelId: "qwen3-0.6b-q8",
+        pastConversationKnowledge: expect.stringContaining(
+          "Keep inference local",
+        ),
+      }),
+    );
+    expect(callbacks.onResponseDone).toHaveBeenCalledWith(
+      "I will keep inference local.",
+      expect.objectContaining({ totalTokens: 27 }),
+      expect.objectContaining({
+        conversationKnowledge: expect.objectContaining({
+          sources: [
+            expect.objectContaining({ conversationId: "architecture" }),
+          ],
+        }),
+      }),
+    );
+  });
+
   it("uses a native transcript override and skips provider STT", async () => {
     (streamChat as jest.Mock).mockImplementation(
       async ({
@@ -354,10 +434,12 @@ describe("runVoicePipeline", () => {
           requestedRoute: {
             provider: "openai",
             model: "gpt-5.4",
+            runtime: "provider",
           },
           actualRoute: {
             provider: "openai",
             model: "gpt-5.4",
+            runtime: "provider",
           },
           speechOutput: expect.objectContaining({
             enabled: false,
@@ -1780,14 +1862,10 @@ describe("runVoicePipeline", () => {
       }) => {
         onChunk("This is the English answer.\n\n");
         onChunk("Це українська відповідь.");
-        await onDone(
-          "This is the English answer.\n\nЦе українська відповідь.",
-        );
+        await onDone("This is the English answer.\n\nЦе українська відповідь.");
       },
     );
-    (synthesizeSpeech as jest.Mock).mockResolvedValueOnce(
-      "/tmp/english.wav",
-    );
+    (synthesizeSpeech as jest.Mock).mockResolvedValueOnce("/tmp/english.wav");
     const callbacks = {
       onTranscription: jest.fn(),
       onChunk: jest.fn(),

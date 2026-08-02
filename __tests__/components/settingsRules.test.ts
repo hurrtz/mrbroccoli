@@ -26,6 +26,7 @@ describe("settingsRules", () => {
       ttsFallbackPolicy: {
         provider: [],
         kokoro: ["provider" as const],
+        local: [],
       },
     };
 

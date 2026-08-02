@@ -36,7 +36,11 @@
     "ios": {
       "icon": "./assets/appIcon/ios.png",
       "bundleIdentifier": "com.tobiaswinkler.app.mrbroccoli",
-      "deploymentTarget": "16.4"
+      "deploymentTarget": "16.4",
+      "entitlements": {
+        "com.apple.developer.kernel.extended-virtual-addressing": true,
+        "com.apple.developer.kernel.increased-memory-limit": true
+      }
     },
     "android": {
       "icon": "./assets/appIcon/ios.png",

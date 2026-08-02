@@ -2,11 +2,13 @@ import type { TranslationValue } from "../types";
 import { dataBackupTranslations } from "../dataBackupTranslations";
 import { conversationKnowledgeTranslations } from "../conversationKnowledgeTranslations";
 import { imagePromptTranslations } from "../imagePromptTranslations";
+import { onDeviceTranslations } from "../onDeviceTranslations";
 
 export const en = {
   ...dataBackupTranslations.en,
   ...conversationKnowledgeTranslations.en,
   ...imagePromptTranslations.en,
+  ...onDeviceTranslations.en,
   appName: "Mr Broccoli",
   retry: "Retry",
   dismiss: "Dismiss",

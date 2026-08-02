@@ -66,6 +66,7 @@ jest.mock("react-native-sherpa-onnx/download", () => ({
     downloadUrl: "https://example.com/kokoro.tar.bz2",
     archiveExt: "tar.bz2",
     bytes: 147_031_220,
+    sha256: "a1e94694776049035c4f2c6529f003aaece993c76aae9a78995831c3c4dcafc6",
   }),
 }));
 
@@ -242,9 +243,7 @@ describe("Kokoro TTS service", () => {
       totalSpaceEx: 4_000_000_000,
     });
 
-    await expect(downloadKokoroModel()).rejects.toThrow(
-      "Kokoro needs about",
-    );
+    await expect(downloadKokoroModel()).rejects.toThrow("Kokoro needs about");
     expect(mockDownloadModel).not.toHaveBeenCalled();
   });
 

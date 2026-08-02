@@ -12,6 +12,7 @@ import { ListeningSettingsPage } from "./pages/ListeningSettingsPage";
 import { SearchSettingsPage } from "./pages/SearchSettingsPage";
 import { SpeakingSettingsPage } from "./pages/SpeakingSettingsPage";
 import { ThinkingSettingsPage } from "./pages/ThinkingSettingsPage";
+import { OnDeviceSettingsPage } from "./pages/OnDeviceSettingsPage";
 import { styles } from "./styles";
 import { View } from "react-native";
 
@@ -186,6 +187,17 @@ export function AntSettingsPageContent({
             settings={settings}
             searchProviders={validation.selectableSearchProviders}
             onUpdate={onUpdate}
+          />
+        </DrillInPage>
+      );
+    case "local":
+      return (
+        <DrillInPage page="local">
+          <OnDeviceSettingsPage
+            settings={settings}
+            kokoroModel={kokoroModel}
+            onUpdate={onUpdate}
+            onPreviewVoice={props.onPreviewVoice}
           />
         </DrillInPage>
       );

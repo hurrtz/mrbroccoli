@@ -19,13 +19,24 @@ function formatDuration(durationMs?: number) {
 }
 
 function formatRoute(
-  provider: Provider,
+  provider: Provider | null,
   model: string,
+  t: ReturnType<typeof useLocalization>["t"],
   gateway?: string,
   upstreamProvider?: string,
   strategy?: string,
   attempts?: number,
 ) {
+  if (!provider) {
+    return [
+      `${t("settingsOnDevice")} · ${model}`,
+      strategy,
+      attempts && attempts > 1 ? `×${attempts}` : undefined,
+    ]
+      .filter(Boolean)
+      .join(" · ");
+  }
+
   const route = `${getProviderLabel(provider)} · ${getProviderModelName(
     provider,
     model,
@@ -86,6 +97,11 @@ function formatInput(
   if (receipt.input.mode === "native") {
     return `${source} · ${t("turnReceiptSystemSpeech")}`;
   }
+  if (receipt.input.mode === "local") {
+    return [source, t("settingsOnDevice"), receipt.input.model]
+      .filter(Boolean)
+      .join(" · ");
+  }
 
   const provider = receipt.input.provider
     ? getProviderLabel(receipt.input.provider)
@@ -136,6 +152,9 @@ function formatSpeech(
   }
   if (speech.actualMode === "kokoro") {
     return ["Kokoro", speech.voice].filter(Boolean).join(" · ");
+  }
+  if (speech.actualMode === "local") {
+    return [t("settingsOnDevice"), speech.model].filter(Boolean).join(" · ");
   }
 
   return [
@@ -225,6 +244,7 @@ export function TurnReceiptCard({ message }: { message: Message }) {
   const requestedRoute = formatRoute(
     receipt.requestedRoute.provider,
     receipt.requestedRoute.model,
+    t,
     receipt.requestedRoute.gateway,
     receipt.requestedRoute.upstreamProvider,
     receipt.requestedRoute.strategy,
@@ -233,6 +253,7 @@ export function TurnReceiptCard({ message }: { message: Message }) {
   const actualRoute = formatRoute(
     receipt.actualRoute.provider,
     receipt.actualRoute.model,
+    t,
     receipt.actualRoute.gateway,
     receipt.actualRoute.upstreamProvider,
     receipt.actualRoute.strategy,

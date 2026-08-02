@@ -27,6 +27,7 @@ export async function runVoicePipeline(
     attachments,
     messages,
     model,
+    localLlmModelId,
     provider,
     providerApiKey,
     sttMode,
@@ -34,10 +35,12 @@ export async function runVoicePipeline(
     sttProvider,
     sttApiKey,
     sttModel,
+    localSttModelId,
     ttsMode,
     ttsProvider,
     ttsApiKey,
     ttsModel,
+    localTtsModelId,
     ttsVoice,
     kokoroVoices,
     ttsFallbackRoutes,
@@ -64,9 +67,7 @@ export async function runVoicePipeline(
     abortSignal,
   } = params;
 
-  const recordTurnEvent = (
-    event: Parameters<typeof recordDebugLogEvent>[0],
-  ) =>
+  const recordTurnEvent = (event: Parameters<typeof recordDebugLogEvent>[0]) =>
     recordDebugLogEvent({
       ...event,
       payload: { ...event.payload, turnId },
@@ -99,14 +100,17 @@ export async function runVoicePipeline(
     sttMode,
     sttProvider,
     sttModel,
+    localSttModelId,
     provider,
     model,
     modelEffort,
+    localLlmModelId,
     language,
     spokenRepliesEnabled,
     ttsMode,
     ttsProvider,
     ttsModel,
+    localTtsModelId,
     ttsVoice,
     webSearchMode: effectiveWebSearchMode,
     webSearchProvider,
@@ -135,6 +139,7 @@ export async function runVoicePipeline(
         sttMode,
         sttModel,
         sttProvider,
+        localSttModelId,
         transcriptionOverride,
         onModelResolved: (actualModel) => {
           turnReceipt.input.model = actualModel;
@@ -187,6 +192,7 @@ export async function runVoicePipeline(
       model,
       provider,
       providerApiKey,
+      skipSummaryUpdate: Boolean(localLlmModelId),
       summarizedMessageCount,
     });
     turnReceipt.timing.contextMs = Date.now() - contextStartedAtMs;
@@ -344,14 +350,10 @@ export async function runVoicePipeline(
           ? {
               stage: "ulra" as const,
               level: "warning" as const,
-              message: translate(
-                language,
-                "ulraModePartialFailureNotice",
-                {
-                  failed: deliberation.failures.length,
-                  succeeded: deliberation.entries.length,
-                },
-              ),
+              message: translate(language, "ulraModePartialFailureNotice", {
+                failed: deliberation.failures.length,
+                succeeded: deliberation.entries.length,
+              }),
               detail: getUlraModeFailureParticipants(
                 deliberation.failures,
               ).join(", "),
@@ -381,8 +383,7 @@ export async function runVoicePipeline(
               usage,
             }),
           ),
-          estimatedIntermediateTokens:
-            deliberation.estimatedUsage.totalTokens,
+          estimatedIntermediateTokens: deliberation.estimatedUsage.totalTokens,
           failedCalls: deliberation.failures.length,
           failures: deliberation.failures.map(
             ({
@@ -418,6 +419,7 @@ export async function runVoicePipeline(
       ttsListenLanguages,
       ttsMode,
       ttsModel,
+      localTtsModelId,
       ttsProvider,
       ttsVoice,
       ttsInstructions,
@@ -435,6 +437,7 @@ export async function runVoicePipeline(
       llmAlreadyStarted: Boolean(ulraMode),
       messages: allMessages,
       model: synthesisModel,
+      localLlmModelId,
       modelStartedAtMs,
       modelEffort: synthesisModelEffort,
       provider: synthesisProvider,

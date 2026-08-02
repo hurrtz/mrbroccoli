@@ -47,6 +47,7 @@ import {
   MAX_RESPONSE_MODES,
 } from "../../constants/providers/defaults";
 import { normalizeResponseModeRouteEffort } from "../../utils/modelEffort";
+import { getLocalModel, isLocalModelId } from "../../constants/localModels";
 import {
   LEGACY_MODEL_FIELD_KEYS,
   type LegacyStoredSettings,
@@ -106,7 +107,9 @@ function migrateLegacyProviderRecord<T>(
 
   let migrated: Partial<Record<string, T>> | undefined;
 
-  for (const [legacyId, canonicalId] of Object.entries(LEGACY_PROVIDER_ALIASES)) {
+  for (const [legacyId, canonicalId] of Object.entries(
+    LEGACY_PROVIDER_ALIASES,
+  )) {
     if (!(legacyId in record)) {
       continue;
     }
@@ -142,43 +145,33 @@ function migrateLegacyProviders(
     storedSettings: {
       ...storedSettings,
       ttsProvider: migrateLegacyProviderId(storedSettings.ttsProvider) as
-        | Provider
-        | null
-        | undefined,
+        Provider | null | undefined,
       sttProvider: migrateLegacyProviderId(storedSettings.sttProvider) as
-        | Provider
-        | null
-        | undefined,
+        Provider | null | undefined,
       lastProvider: migrateLegacyProviderId(storedSettings.lastProvider) as
-        | Provider
-        | undefined,
+        Provider | undefined,
       apiKeys: migrateLegacyProviderRecord(
         storedSettings.apiKeys as Partial<Record<string, string>> | undefined,
       ) as LegacyStoredSettings["apiKeys"],
       providerTtsVoices: migrateLegacyProviderRecord(
         storedSettings.providerTtsVoices as
-          | Partial<Record<string, string>>
-          | undefined,
+          Partial<Record<string, string>> | undefined,
       ) as LegacyStoredSettings["providerTtsVoices"],
       providerTtsModels: migrateLegacyProviderRecord(
         storedSettings.providerTtsModels as
-          | Partial<Record<string, string>>
-          | undefined,
+          Partial<Record<string, string>> | undefined,
       ) as LegacyStoredSettings["providerTtsModels"],
       providerSttModels: migrateLegacyProviderRecord(
         storedSettings.providerSttModels as
-          | Partial<Record<string, string>>
-          | undefined,
+          Partial<Record<string, string>> | undefined,
       ) as LegacyStoredSettings["providerSttModels"],
       providerModels: migrateLegacyProviderRecord(
         storedSettings.providerModels as
-          | Partial<Record<string, string>>
-          | undefined,
+          Partial<Record<string, string>> | undefined,
       ) as LegacyStoredSettings["providerModels"],
       providerValidationResults: migrateLegacyProviderRecord(
         storedSettings.providerValidationResults as
-          | Partial<Record<string, unknown>>
-          | undefined,
+          Partial<Record<string, unknown>> | undefined,
       ) as LegacyStoredSettings["providerValidationResults"],
     },
     storedApiKeys: migratedApiKeys,
@@ -229,10 +222,9 @@ function extractStoredProviderTtsVoices(
     return {};
   }
 
-  const storedProviderVoices =
-    extractRuntimeProviderStringRecord(
-      storedSettings.providerTtsVoices,
-    ) as Partial<ProviderTtsVoiceSelections>;
+  const storedProviderVoices = extractRuntimeProviderStringRecord(
+    storedSettings.providerTtsVoices,
+  ) as Partial<ProviderTtsVoiceSelections>;
   const legacyTtsVoice =
     typeof storedSettings.ttsVoice === "string" && storedSettings.ttsVoice
       ? storedSettings.ttsVoice
@@ -304,9 +296,7 @@ function extractStoredProviderValidationResults(
     return {
       status: value.status,
       model: value.model,
-      ...(typeof value.message === "string"
-        ? { message: value.message }
-        : {}),
+      ...(typeof value.message === "string" ? { message: value.message } : {}),
       ...(typeof value.configKey === "string"
         ? { configKey: value.configKey }
         : {}),
@@ -379,7 +369,26 @@ function extractStoredResponseModeRoute(
   }
 
   const candidate = entry as Partial<ResponseModeRoute>;
-  const provider = isProvider(candidate.provider) ? candidate.provider : undefined;
+  if (
+    candidate.runtime === "local" &&
+    isLocalModelId(candidate.localModelId) &&
+    getLocalModel(candidate.localModelId).capability === "llm"
+  ) {
+    const fallbackProvider = isProvider(candidate.provider)
+      ? candidate.provider
+      : DEFAULT_SETTINGS.lastProvider;
+    const localModel = getLocalModel(candidate.localModelId);
+
+    return {
+      runtime: "local",
+      localModelId: candidate.localModelId,
+      provider: fallbackProvider,
+      model: localModel.name,
+    };
+  }
+  const provider = isProvider(candidate.provider)
+    ? candidate.provider
+    : undefined;
 
   if (!provider) {
     return null;
@@ -519,16 +528,17 @@ export function mergeSettings(
     const supportedSttModels = getProviderSttModelOptions(provider);
 
     if (supportedSttModels.length > 0) {
-      const fallbackSttModel =
-        supportedSttModels.some(
-          (model) => model.id === PROVIDER_DEFAULT_STT_MODELS[provider],
-        )
-          ? (PROVIDER_DEFAULT_STT_MODELS[provider] ?? "")
-          : supportedSttModels[0]?.id ?? "";
+      const fallbackSttModel = supportedSttModels.some(
+        (model) => model.id === PROVIDER_DEFAULT_STT_MODELS[provider],
+      )
+        ? (PROVIDER_DEFAULT_STT_MODELS[provider] ?? "")
+        : (supportedSttModels[0]?.id ?? "");
 
       if (
         mergedProviderSttModels[provider] &&
-        !supportedSttModels.some((model) => model.id === mergedProviderSttModels[provider])
+        !supportedSttModels.some(
+          (model) => model.id === mergedProviderSttModels[provider],
+        )
       ) {
         mergedProviderSttModels[provider] = fallbackSttModel;
       }
@@ -537,16 +547,17 @@ export function mergeSettings(
     const supportedTtsModels = getProviderTtsModelOptions(provider);
 
     if (supportedTtsModels.length > 0) {
-      const fallbackTtsModel =
-        supportedTtsModels.some(
-          (model) => model.id === PROVIDER_DEFAULT_TTS_MODELS[provider],
-        )
-          ? (PROVIDER_DEFAULT_TTS_MODELS[provider] ?? "")
-          : supportedTtsModels[0]?.id ?? "";
+      const fallbackTtsModel = supportedTtsModels.some(
+        (model) => model.id === PROVIDER_DEFAULT_TTS_MODELS[provider],
+      )
+        ? (PROVIDER_DEFAULT_TTS_MODELS[provider] ?? "")
+        : (supportedTtsModels[0]?.id ?? "");
 
       if (
         mergedProviderTtsModels[provider] &&
-        !supportedTtsModels.some((model) => model.id === mergedProviderTtsModels[provider])
+        !supportedTtsModels.some(
+          (model) => model.id === mergedProviderTtsModels[provider],
+        )
       ) {
         mergedProviderTtsModels[provider] = fallbackTtsModel;
       }
@@ -565,14 +576,16 @@ export function mergeSettings(
     extractStoredWebSearchProviderSettings(storedSettings);
   const hasStoredResponseModes = extractedResponseModes.length > 0;
   const legacyActiveResponseModeIndex = LEGACY_RESPONSE_MODE_ORDER.indexOf(
-    storedSettings?.activeResponseMode as typeof LEGACY_RESPONSE_MODE_ORDER[number],
+    storedSettings?.activeResponseMode as (typeof LEGACY_RESPONSE_MODE_ORDER)[number],
   );
   const activeResponseMode = (() => {
     const storedActiveResponseMode = storedSettings?.activeResponseMode;
 
     if (
       isResponseMode(storedActiveResponseMode) &&
-      extractedResponseModes.some((mode) => mode.id === storedActiveResponseMode)
+      extractedResponseModes.some(
+        (mode) => mode.id === storedActiveResponseMode,
+      )
     ) {
       return storedActiveResponseMode;
     }
@@ -584,10 +597,7 @@ export function mergeSettings(
       );
     }
 
-    return (
-      extractedResponseModes[0]?.id ??
-      DEFAULT_SETTINGS.activeResponseMode
-    );
+    return extractedResponseModes[0]?.id ?? DEFAULT_SETTINGS.activeResponseMode;
   })();
   const hasConfiguredKeys = Object.values(mergedApiKeys).some(
     (apiKey) => apiKey.trim().length > 0,
@@ -606,18 +616,14 @@ export function mergeSettings(
     ...scalarSettings,
     webSearchProviderSettings,
     activeResponseMode,
-    responseModes:
-      !storedSettings
-        ? DEFAULT_SETTINGS.responseModes
-        : hasStoredResponseModes
-          ? extractedResponseModes
-          : Array.from(
-              { length: DEFAULT_RESPONSE_MODE_COUNT },
-              (_, index) => ({
-                id: createResponseModeId(index),
-                route: legacyResponseModeRoute,
-              }),
-            ),
+    responseModes: !storedSettings
+      ? DEFAULT_SETTINGS.responseModes
+      : hasStoredResponseModes
+        ? extractedResponseModes
+        : Array.from({ length: DEFAULT_RESPONSE_MODE_COUNT }, (_, index) => ({
+            id: createResponseModeId(index),
+            route: legacyResponseModeRoute,
+          })),
     providerModels: mergedProviderModels,
     providerSttModels: mergedProviderSttModels,
     providerTtsModels: mergedProviderTtsModels,
@@ -625,9 +631,7 @@ export function mergeSettings(
       ...DEFAULT_SETTINGS.providerTtsVoices,
       ...extractStoredProviderTtsVoices(storedSettings),
     },
-    kokoroVoices: normalizeKokoroVoiceSelections(
-      storedSettings?.kokoroVoices,
-    ),
+    kokoroVoices: normalizeKokoroVoiceSelections(storedSettings?.kokoroVoices),
     ttsFallbackPolicy: normalizeTtsFallbackPolicy(
       storedSettings?.ttsFallbackPolicy,
     ),

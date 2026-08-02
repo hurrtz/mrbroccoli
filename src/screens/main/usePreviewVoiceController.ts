@@ -4,11 +4,7 @@ import { recordDebugLogEvent } from "../../services/debugLogCapture";
 import type { SpeechDiagnosticsContext } from "../../services/speech/diagnostics";
 import { createSpeechRequestId } from "../../services/speech/diagnostics";
 import { synthesizeSpeech } from "../../services/tts";
-import {
-  AppLanguage,
-  Settings,
-  VoicePreviewRequest,
-} from "../../types";
+import { AppLanguage, Settings, VoicePreviewRequest } from "../../types";
 import { PROVIDER_DEFAULT_TTS_MODELS } from "../../constants/models";
 import { getTtsListenLanguageForKokoro } from "../../constants/kokoro";
 import { getSpeechLanguageDefinition } from "../../constants/speechLanguages";
@@ -74,9 +70,11 @@ export function usePreviewVoiceController({
       const previewLanguage =
         request.mode === "provider"
           ? request.previewLanguage
-          : request.mode === "kokoro"
-            ? request.language
-            : null;
+          : request.mode === "local"
+            ? request.previewLanguage
+            : request.mode === "kokoro"
+              ? request.language
+              : null;
 
       recordDebugLogEvent({
         event: "voice-preview-requested",
@@ -119,9 +117,8 @@ export function usePreviewVoiceController({
           ensurePreviewActive();
           player.speakText(trimmed, {
             voice: request.nativeVoice,
-            language:
-              getSpeechLanguageDefinition(request.previewLanguage)
-                .nativeLocale,
+            language: getSpeechLanguageDefinition(request.previewLanguage)
+              .nativeLocale,
             diagnostics: speechDiagnostics,
           });
           callbacks?.onPlaybackStarted?.();
@@ -145,11 +142,8 @@ export function usePreviewVoiceController({
             voice: request.voice,
             mode: "kokoro",
             language,
-            listenLanguages: [
-              getTtsListenLanguageForKokoro(request.language),
-            ],
-            speechLanguage:
-              getTtsListenLanguageForKokoro(request.language),
+            listenLanguages: [getTtsListenLanguageForKokoro(request.language)],
+            speechLanguage: getTtsListenLanguageForKokoro(request.language),
             diagnostics: kokoroSpeechDiagnostics,
             abortSignal: previewAbortController.signal,
           });
@@ -164,6 +158,35 @@ export function usePreviewVoiceController({
               mode: request.mode,
               route: "kokoro-audio",
             },
+          });
+          return;
+        }
+
+        if (request.mode === "local") {
+          const localSpeechDiagnostics = {
+            ...speechDiagnostics,
+            mode: "local" as const,
+            providerModel: request.modelId,
+          };
+          const audioUri = await synthesizeSpeech({
+            text: trimmed,
+            voice: request.modelId,
+            mode: "local",
+            localModelId: request.modelId,
+            language,
+            listenLanguages: [request.previewLanguage],
+            speechLanguage: request.previewLanguage,
+            diagnostics: localSpeechDiagnostics,
+            abortSignal: previewAbortController.signal,
+          });
+
+          ensurePreviewActive();
+          player.enqueueAudio(audioUri, localSpeechDiagnostics);
+          callbacks?.onPlaybackStarted?.();
+          await player.waitForDrain();
+          recordDebugLogEvent({
+            event: "voice-preview-finished",
+            payload: { mode: request.mode, route: "local-audio" },
           });
           return;
         }
