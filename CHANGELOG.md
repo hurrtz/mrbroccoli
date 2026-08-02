@@ -10,6 +10,8 @@ the complete Play Store translations are kept in a dedicated file under
 
 ## Unreleased
 
+## 2.8.0 - 2026-08-02
+
 ### Added
 
 - Add optional on-device knowledge from past conversations with local hybrid
@@ -42,6 +44,10 @@ the complete Play Store translations are kept in a dedicated file under
   of replies across repeated conversation turns.
 - Reject recordings with clear silence before sending them to provider speech
   recognition, avoiding hallucinated one-word prompts such as “No” or “One”.
+
+### Store release notes
+
+See `docs/google-play-release-notes-2.8.0.md`.
 
 ## 2.7.0 - 2026-08-01
 
