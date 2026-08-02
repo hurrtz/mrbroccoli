@@ -29,6 +29,9 @@ the complete Play Store translations are kept in a dedicated file under
 
 ### Fixed
 
+- Prevent local Whisper testing and transcription from terminating the app
+  during automatic language detection, and benchmark a real speech fixture
+  through the normal file-transcription route instead of synthetic silence.
 - Make the Free home action open on-device setup instead of remaining disabled,
   open the complete on-device model catalogue from Settings, and return to the
   same Settings flow after a Premium prompt closes.

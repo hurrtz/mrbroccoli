@@ -1,7 +1,11 @@
+import * as FileSystem from "expo-file-system/legacy";
+
 const mockDestroy = jest.fn().mockResolvedValue(undefined);
-const mockTranscribeSamples = jest.fn().mockRejectedValue(new Error("failed"));
+const mockTranscribeFile = jest.fn().mockRejectedValue(new Error("failed"));
+const mockTranscribeSamples = jest.fn();
 const mockCreateStt = jest.fn().mockResolvedValue({
   destroy: mockDestroy,
+  transcribeFile: mockTranscribeFile,
   transcribeSamples: mockTranscribeSamples,
 });
 
@@ -51,15 +55,42 @@ describe("local speech model checks", () => {
     jest.clearAllMocks();
   });
 
-  it("destroys the STT engine when its benchmark throws", async () => {
+  it("benchmarks real audio through the file-transcription route and cleans up", async () => {
     const result = await benchmarkLocalStt("whisper-tiny", "de");
 
     expect(result.status).toBe("failed");
+    const audioPath = expect.stringMatching(
+      /^file:\/\/\/cache\/local-stt-benchmark-\d+\.wav$/,
+    );
+    expect(FileSystem.writeAsStringAsync).toHaveBeenCalledWith(
+      audioPath,
+      expect.any(String),
+      { encoding: "base64" },
+    );
+    expect(mockTranscribeFile).toHaveBeenCalledWith(
+      expect.stringMatching(/^\/cache\/local-stt-benchmark-\d+\.wav$/),
+    );
+    expect(mockTranscribeSamples).not.toHaveBeenCalled();
     expect(mockDestroy).toHaveBeenCalledTimes(1);
+    expect(FileSystem.deleteAsync).toHaveBeenCalledWith(audioPath, {
+      idempotent: true,
+    });
     expect(saveLocalModelBenchmarkResult).toHaveBeenCalledWith(
       expect.objectContaining({
         modelId: "whisper-tiny",
         status: "failed",
+      }),
+    );
+  });
+
+  it("uses Sherpa's empty language sentinel for automatic Whisper detection", async () => {
+    await benchmarkLocalStt("whisper-tiny", "auto");
+
+    expect(mockCreateStt).toHaveBeenCalledWith(
+      expect.objectContaining({
+        modelOptions: {
+          whisper: { language: "", task: "transcribe" },
+        },
       }),
     );
   });

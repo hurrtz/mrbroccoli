@@ -1,7 +1,9 @@
 import {
   cacheDirectory,
   deleteAsync,
+  EncodingType,
   getInfoAsync,
+  writeAsStringAsync,
 } from "expo-file-system/legacy";
 
 import {
@@ -20,6 +22,10 @@ import {
   type LocalModelBenchmarkResult,
 } from "./localDeviceCapabilities";
 import { getLocalModelInstallStatus } from "./localModelManager";
+import {
+  getLocalSttBenchmarkAudioBase64,
+  LOCAL_STT_BENCHMARK_AUDIO_DURATION_SECONDS,
+} from "./sttValidationAudio";
 
 function getSherpaModule() {
   // eslint-disable-next-line @typescript-eslint/no-require-imports -- lazy native loading keeps Jest and unsupported builds import-safe
@@ -55,7 +61,7 @@ async function requireInstalledPath(
 
 function whisperLanguage(language: SttLanguage) {
   return language === "auto"
-    ? "auto"
+    ? ""
     : getSpeechLanguageDefinition(language).providerCode;
 }
 
@@ -180,8 +186,18 @@ export async function benchmarkLocalStt(
   const device = await probeLocalDeviceCapabilities();
   const overallStartedAt = Date.now();
   let loadMs = 0;
+  let benchmarkAudioUri: string | null = null;
 
   try {
+    if (!cacheDirectory) {
+      throw new Error("Local speech benchmark storage is unavailable.");
+    }
+    benchmarkAudioUri = `${cacheDirectory}local-stt-benchmark-${Date.now()}.wav`;
+    await writeAsStringAsync(
+      benchmarkAudioUri,
+      getLocalSttBenchmarkAudioBase64(),
+      { encoding: EncodingType.Base64 },
+    );
     const path = await requireInstalledPath(model.id);
     const { fileModelPath } = getSherpaModule();
     const { createSTT } = getSttModule();
@@ -192,22 +208,23 @@ export async function benchmarkLocalStt(
       preferInt8: true,
       numThreads: 2,
       provider: "cpu",
-      modelOptions: { whisper: { language: whisperLanguage(language) } },
+      modelOptions: {
+        whisper: { language: whisperLanguage(language), task: "transcribe" },
+      },
     });
     loadMs = Date.now() - loadStartedAt;
-    const audioSeconds = 2;
     const runStartedAt = Date.now();
     let durationMs: number;
     try {
-      await engine.transcribeSamples(
-        new Array(16_000 * audioSeconds).fill(0),
-        16_000,
+      await engine.transcribeFile(
+        benchmarkAudioUri.replace(/^file:\/\//, ""),
       );
       durationMs = Date.now() - runStartedAt;
     } finally {
       await engine.destroy().catch(() => undefined);
     }
-    const realtimeFactor = durationMs / 1000 / audioSeconds;
+    const realtimeFactor =
+      durationMs / 1000 / LOCAL_STT_BENCHMARK_AUDIO_DURATION_SECONDS;
     const status =
       loadMs <= model.benchmark.maximumLoadMs &&
       realtimeFactor <= (model.benchmark.maximumRealtimeFactor ?? Infinity)
@@ -238,6 +255,12 @@ export async function benchmarkLocalStt(
     };
     await saveLocalModelBenchmarkResult(benchmark);
     return benchmark;
+  } finally {
+    if (benchmarkAudioUri) {
+      await deleteAsync(benchmarkAudioUri, { idempotent: true }).catch(
+        () => undefined,
+      );
+    }
   }
 }
 
