@@ -219,6 +219,49 @@ describe("PremiumEntitlementProvider", () => {
     });
   });
 
+  it("selects the base Buy purchase option for Play Billing 9", async () => {
+    mockFetchProducts.mockResolvedValueOnce([
+      {
+        id: PREMIUM_PRODUCT_ID,
+        type: "in-app",
+        platform: "android",
+        displayPrice: "€14.99",
+        discountOffers: [
+          {
+            id: "launch-discount",
+            offerTokenAndroid: "discount-token",
+          },
+          {
+            id: null,
+            offerTokenAndroid: "base-buy-token",
+            preorderDetailsAndroid: null,
+            rentalDetailsAndroid: null,
+          },
+        ],
+      },
+    ]);
+    const screen = renderProvider();
+    await waitFor(() =>
+      expect(screen.getByTestId("store-product").props.children).toBe(
+        PREMIUM_PRODUCT_ID,
+      ),
+    );
+
+    fireEvent.press(screen.getByTestId("purchase-premium"));
+
+    await waitFor(() => expect(mockRequestPurchase).toHaveBeenCalledTimes(1));
+    expect(mockRequestPurchase).toHaveBeenCalledWith({
+      request: {
+        apple: { sku: PREMIUM_PRODUCT_ID },
+        google: {
+          skus: [PREMIUM_PRODUCT_ID],
+          offerToken: "base-buy-token",
+        },
+      },
+      type: "in-app",
+    });
+  });
+
   it("does not start a purchase when the store product is unavailable", async () => {
     mockFetchProducts.mockResolvedValueOnce([]);
     const screen = renderProvider();

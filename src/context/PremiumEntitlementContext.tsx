@@ -51,6 +51,19 @@ interface PremiumEntitlementContextValue {
   clearError: () => void;
 }
 
+function getGoogleBuyOfferToken(product: Product) {
+  if (product.platform !== "android") {
+    return undefined;
+  }
+  return product.discountOffers?.find(
+    (offer) =>
+      offer.id == null &&
+      offer.preorderDetailsAndroid == null &&
+      offer.rentalDetailsAndroid == null &&
+      Boolean(offer.offerTokenAndroid),
+  )?.offerTokenAndroid;
+}
+
 const PremiumEntitlementContext =
   createContext<PremiumEntitlementContextValue | null>(null);
 
@@ -283,10 +296,14 @@ export function PremiumEntitlementProvider({
           return;
         }
       }
+      const googleOfferToken = getGoogleBuyOfferToken(storeProduct);
       await requestPurchase({
         request: {
           apple: { sku: PREMIUM_PRODUCT_ID },
-          google: { skus: [PREMIUM_PRODUCT_ID] },
+          google: {
+            skus: [PREMIUM_PRODUCT_ID],
+            ...(googleOfferToken ? { offerToken: googleOfferToken } : {}),
+          },
         },
         type: "in-app",
       });

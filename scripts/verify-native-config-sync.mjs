@@ -15,6 +15,19 @@ const iosPodfile = readText("ios/Podfile");
 const iosPodfileLock = readText("ios/Podfile.lock");
 const iosPodfileProperties = JSON.parse(readText("ios/Podfile.properties.json"));
 const iosProject = readText("ios/MrBroccoli.xcodeproj/project.pbxproj");
+const iosProductionScheme = readText(
+  "ios/MrBroccoli.xcodeproj/xcshareddata/xcschemes/MrBroccoli.xcscheme",
+);
+const iosStoreKitScheme = readText(
+  "ios/MrBroccoli.xcodeproj/xcshareddata/xcschemes/MrBroccoli-StoreKit.xcscheme",
+);
+const iosStoreKitConfiguration = JSON.parse(
+  readText("ios/MrBroccoli/MrBroccoli.storekit"),
+);
+const premiumConstants = readText("src/constants/premium.ts");
+const premiumProductId = premiumConstants.match(
+  /PREMIUM_PRODUCT_ID\s*=\s*\n?\s*"([^"]+)"/,
+)?.[1];
 const androidBuild = readText("android/app/build.gradle");
 const androidGradleProperties = readText("android/gradle.properties");
 const androidProguardRules = readText("android/app/proguard-rules.pro");
@@ -186,6 +199,52 @@ assertIncludes(
   "iOS OpenIAP resource",
   iosProject,
   '"${PODS_ROOT}/openiap/openiap-versions.json"',
+);
+assertEqual(
+  "Premium product ID",
+  premiumProductId,
+  "com.tobiaswinkler.app.mrbroccoli.premium.lifetime",
+);
+assertIncludes(
+  "iOS In-App Purchase capability",
+  iosProject,
+  "com.apple.InAppPurchase = {",
+);
+assertIncludes(
+  "iOS StoreKit configuration project reference",
+  iosProject,
+  "MrBroccoli.storekit",
+);
+assertEqual(
+  "iOS StoreKit product count",
+  iosStoreKitConfiguration.products?.length,
+  1,
+);
+const premiumStoreKitProduct = iosStoreKitConfiguration.products?.[0];
+assertEqual(
+  "iOS StoreKit product ID",
+  premiumStoreKitProduct?.productID,
+  premiumProductId,
+);
+assertEqual(
+  "iOS StoreKit product type",
+  premiumStoreKitProduct?.type,
+  "NonConsumable",
+);
+assertEqual(
+  "iOS StoreKit product price",
+  premiumStoreKitProduct?.displayPrice,
+  "14.99",
+);
+assertIncludes(
+  "iOS local StoreKit scheme",
+  iosStoreKitScheme,
+  'identifier = "../MrBroccoli/MrBroccoli.storekit"',
+);
+assertEqual(
+  "iOS production scheme StoreKit isolation",
+  iosProductionScheme.includes("StoreKitConfigurationFileReference"),
+  false,
 );
 assertEqual(
   "iOS SQLite FTS build property",

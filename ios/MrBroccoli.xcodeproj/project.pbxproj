@@ -110,6 +110,7 @@
 		8A5C26011111111111111125 /* MrBroccoliAudioQueueCoordinator.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = MrBroccoliAudioQueueCoordinator.m; path = MrBroccoli/MrBroccoliAudioQueueCoordinator.m; sourceTree = "<group>"; };
 		AA286B85B6C04FC6940260E9 /* SplashScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = SplashScreen.storyboard; path = MrBroccoli/SplashScreen.storyboard; sourceTree = "<group>"; };
 		BB2F792C24A3F905000567C9 /* Expo.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Expo.plist; sourceTree = "<group>"; };
+		B4A100000000000000000001 /* MrBroccoli.storekit */ = {isa = PBXFileReference; lastKnownFileType = text; path = MrBroccoli/MrBroccoli.storekit; sourceTree = "<group>"; };
 		C01A00000000000000000011 /* MrBroccoliVoiceActivityAttributes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MrBroccoliVoiceActivityAttributes.swift; sourceTree = "<group>"; };
 		C01A00000000000000000012 /* MrBroccoliVoiceLiveActivity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MrBroccoliVoiceLiveActivity.swift; sourceTree = "<group>"; };
 		C01A00000000000000000013 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -189,6 +190,7 @@
 				13B07FB61A68108700A75B9A /* Info.plist */,
 				AA286B85B6C04FC6940260E9 /* SplashScreen.storyboard */,
 				64F9FFC99FC7060C97837358 /* PrivacyInfo.xcprivacy */,
+				B4A100000000000000000001 /* MrBroccoli.storekit */,
 			);
 			name = MrBroccoli;
 			sourceTree = "<group>";
@@ -393,6 +395,11 @@
 						DevelopmentTeam = Y295UCE38G;
 						LastSwiftMigration = 1250;
 						ProvisioningStyle = Automatic;
+						SystemCapabilities = {
+							com.apple.InAppPurchase = {
+								enabled = 1;
+							};
+						};
 					};
 					C01A00000000000000000026 = {
 						DevelopmentTeam = Y295UCE38G;

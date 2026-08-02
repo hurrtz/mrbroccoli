@@ -55,6 +55,7 @@ coverage/
 !/ios/MrBroccoli/Images.xcassets/**
 !/ios/MrBroccoli/MrBroccoli-Bridging-Header.h
 !/ios/MrBroccoli/MrBroccoli.entitlements
+!/ios/MrBroccoli/MrBroccoli.storekit
 !/ios/MrBroccoli/Waveform/
 !/ios/MrBroccoli/Waveform/**
 !/ios/MrBroccoli/MrBroccoliAudioQueueCoordinator.h

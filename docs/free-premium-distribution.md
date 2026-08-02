@@ -109,6 +109,20 @@ backend for stronger purchase verification and lifecycle management:
 The repository cannot create or price store products. Before distributing the
 binary:
 
+### Repository-native testing
+
+- Xcode exposes a shared `MrBroccoli-StoreKit` scheme backed by
+  `ios/MrBroccoli/MrBroccoli.storekit`. Run that scheme from the Xcode IDE to
+  test the lifetime purchase locally without an App Store Connect product or a
+  Sandbox Apple Account. The normal `MrBroccoli` scheme deliberately has no
+  StoreKit configuration and therefore uses the App Store sandbox or
+  production environment appropriate to the signed build.
+- Android includes the Play Billing permission, the OpenIAP Play dependency,
+  pending-purchase handling, base Buy purchase-option selection, and
+  non-consumable acknowledgement. Google does not provide an Xcode-style local
+  billing catalogue; end-to-end Android purchases require an active Play
+  Console product and a licensed test account.
+
 ### App Store Connect
 
 1. Change the base app price to Free.
@@ -123,12 +137,15 @@ binary:
 ### Google Play Console
 
 1. Make the application Free before the public Free/Premium launch.
-2. Create and activate a **one-time product** with the exact product ID above,
-   a non-consumable purchase option, localized listing, and localized prices.
-3. Configure license testers and test tracks, then test purchased and pending
-   outcomes, cancellation, interrupted completion, acknowledgement, reinstall,
-   second device, refund/revocation reconciliation, and restore with no owned
-   product.
+2. Create and activate a **one-time product** with the exact product ID above.
+   Add one **Buy** purchase option (not Rent), make it the base/backwards-
+   compatible option, and configure localized listing, availability, and
+   prices. Do not add a discount, pre-order, rental, quantity, or consumable
+   path for the lifetime entitlement.
+3. Configure license testers and an internal test track, then test purchased
+   and pending outcomes, cancellation, interrupted completion,
+   acknowledgement, reinstall, second device, refund/revocation
+   reconciliation, and restore with no owned product.
 
 `expo-iap` is native code and therefore requires a development or release build;
 Expo Go cannot exercise purchases.
