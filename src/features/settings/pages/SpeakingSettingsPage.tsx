@@ -4,6 +4,7 @@ import { Alert, StyleSheet, Text, View } from "react-native";
 import { Button } from "../../../design-system/NativeControls";
 
 import { providerTtsModelSupportsInstructions } from "../../../constants/models";
+import { getLocalModel } from "../../../constants/localModels";
 import { getTtsFallbackRoutes } from "../../../constants/ttsFallback";
 import type { KokoroModelController } from "../../../hooks/useKokoroModel";
 import { useLocalization } from "../../../i18n";
@@ -244,6 +245,12 @@ export function SpeakingSettingsPage({
               label: t("provider"),
               description: t("providerTtsDescription"),
             },
+            {
+              value: "local",
+              label: t("settingsOnDevice"),
+              description: t("settingsOnDeviceSummary"),
+              disabled: !settings.localTtsModelId,
+            },
           ]}
           value={settings.ttsMode}
           onChange={handleTtsModeChange}
@@ -251,6 +258,22 @@ export function SpeakingSettingsPage({
 
         <AntTtsFallbackSection settings={settings} onUpdate={onUpdate} />
       </View>
+
+      {settings.ttsMode === "local" && settings.localTtsModelId ? (
+        <AntPickerSection title={t("onDeviceSpeakingModels")}>
+          <AntPickerRow
+            label={t("model")}
+            value={settings.localTtsModelId}
+            options={[
+              {
+                value: settings.localTtsModelId,
+                label: getLocalModel(settings.localTtsModelId).name,
+              },
+            ]}
+            onChange={() => undefined}
+          />
+        </AntPickerSection>
+      ) : null}
 
       {providerRouteActive ? (
         <>
@@ -276,9 +299,7 @@ export function SpeakingSettingsPage({
             <AntPickerRow
               testID="tts-provider-picker"
               label={
-                ttsProviderOptions.length > 1
-                  ? t("ttsProvider")
-                  : undefined
+                ttsProviderOptions.length > 1 ? t("ttsProvider") : undefined
               }
               value={settings.ttsProvider ?? ""}
               options={ttsProviderOptions}

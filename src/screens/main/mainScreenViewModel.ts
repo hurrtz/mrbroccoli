@@ -21,6 +21,8 @@ import { TranslateFn } from "./shared";
 import { getConversationUsageDisplayData } from "./usageSelectors";
 import { hasProviderCredentialForCapability } from "../../utils/providerCredentials";
 import { getTtsFallbackRoutes } from "../../constants/ttsFallback";
+import { getLocalModel } from "../../constants/localModels";
+import { getResponseModeRoute } from "../../utils/responseModes";
 
 interface AudioSignalState {
   isActivelyPlaying: boolean;
@@ -63,42 +65,59 @@ export function getMainScreenViewModel({
   t,
   ttsProvider,
 }: GetMainScreenViewModelParams) {
-  const providerLabel = PROVIDER_LABELS[provider];
-  const modelLabel = getProviderModelName(provider, model);
-  const routeModelLabel = hasProviderCredentialForCapability(
-    provider,
-    settings.apiKeys[provider],
-    "llm",
-  )
+  const responseRoute = getResponseModeRoute(settings);
+  const localLlmModel =
+    responseRoute.runtime === "local" && responseRoute.localModelId
+      ? getLocalModel(responseRoute.localModelId)
+      : null;
+  const providerLabel = localLlmModel
+    ? t("settingsOnDevice")
+    : PROVIDER_LABELS[provider];
+  const modelLabel =
+    localLlmModel?.name ?? getProviderModelName(provider, model);
+  const routeModelLabel = localLlmModel
     ? `${providerLabel} · ${modelLabel}`
-    : t("noProviderYet");
+    : hasProviderCredentialForCapability(
+          provider,
+          settings.apiKeys[provider],
+          "llm",
+        )
+      ? `${providerLabel} · ${modelLabel}`
+      : t("noProviderYet");
   const sttStatusLabel =
     settings.sttMode === "native"
       ? t("appNative")
-      : sttProvider
-        ? `${PROVIDER_LABELS[sttProvider]}${
-            getProviderSttModelOptions(sttProvider).length > 1 &&
-            selectedSttModel
-              ? ` · ${getSttModelLabel(sttProvider, selectedSttModel)}`
-              : ""
-          }`
-        : t("noProviderYet");
-
-  const ttsStatusLabel =
-    !settings.spokenRepliesEnabled
-      ? t("spokenRepliesOff")
-      : settings.ttsMode === "native"
-        ? t("systemVoice")
-        : settings.ttsMode === "kokoro"
-          ? `Kokoro · ${settings.kokoroVoices.en}`
-        : ttsProvider
-          ? `${PROVIDER_LABELS[ttsProvider]}${
-              getProviderTtsModelOptions(ttsProvider).length > 1 &&
-              selectedTtsModel
-                ? ` · ${getTtsModelLabel(ttsProvider, selectedTtsModel)}`
+      : settings.sttMode === "local"
+        ? settings.localSttModelId
+          ? `${t("settingsOnDevice")} · ${getLocalModel(settings.localSttModelId).name}`
+          : t("noProviderYet")
+        : sttProvider
+          ? `${PROVIDER_LABELS[sttProvider]}${
+              getProviderSttModelOptions(sttProvider).length > 1 &&
+              selectedSttModel
+                ? ` · ${getSttModelLabel(sttProvider, selectedSttModel)}`
                 : ""
-            } · ${getTtsVoiceLabel(ttsProvider, selectedTtsVoice, language)}`
-          : t("noTtsProvider");
+            }`
+          : t("noProviderYet");
+
+  const ttsStatusLabel = !settings.spokenRepliesEnabled
+    ? t("spokenRepliesOff")
+    : settings.ttsMode === "native"
+      ? t("systemVoice")
+      : settings.ttsMode === "kokoro"
+        ? `Kokoro · ${settings.kokoroVoices.en}`
+        : settings.ttsMode === "local"
+          ? settings.localTtsModelId
+            ? `${t("settingsOnDevice")} · ${getLocalModel(settings.localTtsModelId).name}`
+            : t("noTtsProvider")
+          : ttsProvider
+            ? `${PROVIDER_LABELS[ttsProvider]}${
+                getProviderTtsModelOptions(ttsProvider).length > 1 &&
+                selectedTtsModel
+                  ? ` · ${getTtsModelLabel(ttsProvider, selectedTtsModel)}`
+                  : ""
+              } · ${getTtsVoiceLabel(ttsProvider, selectedTtsVoice, language)}`
+            : t("noTtsProvider");
 
   const fallbackTtsRoutes = getTtsFallbackRoutes(
     settings.ttsFallbackPolicy,
@@ -166,7 +185,9 @@ export function getMainScreenViewModel({
     pipelinePhase,
     providerLabel,
     t,
-    ttsProviderLabel: ttsProvider ? PROVIDER_LABELS[ttsProvider] : providerLabel,
+    ttsProviderLabel: ttsProvider
+      ? PROVIDER_LABELS[ttsProvider]
+      : providerLabel,
     visualPhase,
   });
 

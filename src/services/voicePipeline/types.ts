@@ -21,6 +21,11 @@ import type {
 } from "../../types";
 import type { SpeechDiagnosticsContext } from "../speech/diagnostics";
 import type { UlraModeConfig } from "../ulraMode";
+import type {
+  LocalLlmModelId,
+  LocalSttModelId,
+  LocalTtsModelId,
+} from "../../constants/localModels";
 
 export interface PipelineCallbacks {
   onTranscription: (text: string) => void;
@@ -68,6 +73,7 @@ export interface RunVoicePipelineParams {
   messages: Message[];
   model: string;
   modelEffort?: string;
+  localLlmModelId?: LocalLlmModelId;
   provider: Provider;
   providerApiKey: string;
   sttMode: SttBackendMode;
@@ -75,10 +81,12 @@ export interface RunVoicePipelineParams {
   sttProvider?: Provider | null;
   sttApiKey?: string;
   sttModel?: string;
+  localSttModelId?: LocalSttModelId | null;
   ttsMode: TtsBackendMode;
   ttsProvider?: Provider | null;
   ttsApiKey?: string;
   ttsModel?: string;
+  localTtsModelId?: LocalTtsModelId | null;
   ttsVoice: string;
   kokoroVoices?: KokoroVoiceSelections;
   ttsFallbackRoutes?: TtsFallbackRoute[];

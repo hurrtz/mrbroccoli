@@ -126,6 +126,36 @@ PODS:
   - hermes-engine (250829098.0.16):
     - hermes-engine/Pre-built (= 250829098.0.16)
   - hermes-engine/Pre-built (250829098.0.16)
+  - llama-rn (0.12.8):
+    - boost
+    - DoubleConversion
+    - fast_float
+    - fmt
+    - glog
+    - hermes-engine
+    - RCT-Folly
+    - RCT-Folly/Fabric
+    - RCTRequired
+    - RCTTypeSafety
+    - React
+    - React-callinvoker
+    - React-Core
+    - React-debug
+    - React-Fabric
+    - React-featureflags
+    - React-graphics
+    - React-ImageManager
+    - React-jsi
+    - React-NativeModulesApple
+    - React-RCTFabric
+    - React-renderercss
+    - React-rendererdebug
+    - React-utils
+    - ReactCodegen
+    - ReactCommon/turbomodule/bridging
+    - ReactCommon/turbomodule/core
+    - SocketRocket
+    - Yoga
   - MMKV (2.4.0):
     - MMKVCore (~> 2.4.0)
   - MMKVCore (2.4.0)
@@ -3246,6 +3276,7 @@ DEPENDENCIES:
   - fmt (from `../node_modules/react-native/third-party-podspecs/fmt.podspec`)
   - glog (from `../node_modules/react-native/third-party-podspecs/glog.podspec`)
   - hermes-engine (from `../node_modules/react-native/sdks/hermes-engine/hermes-engine.podspec`)
+  - llama-rn (from `../node_modules/llama.rn`)
   - RCT-Folly (from `../node_modules/react-native/third-party-podspecs/RCT-Folly.podspec`)
   - RCTDeprecation (from `../node_modules/react-native/ReactApple/Libraries/RCTFoundation/RCTDeprecation`)
   - RCTRequired (from `../node_modules/react-native/Libraries/Required`)
@@ -3406,6 +3437,8 @@ EXTERNAL SOURCES:
   hermes-engine:
     :podspec: "../node_modules/react-native/sdks/hermes-engine/hermes-engine.podspec"
     :tag: hermes-v250829098.0.16
+  llama-rn:
+    :path: "../node_modules/llama.rn"
   RCT-Folly:
     :podspec: "../node_modules/react-native/third-party-podspecs/RCT-Folly.podspec"
   RCTDeprecation:
@@ -3605,11 +3638,12 @@ SPEC CHECKSUMS:
   fast_float: b32c788ed9c6a8c584d114d0047beda9664e7cc6
   FBLazyVector: d153c0a7ab3a2c865dd311cb3a5418cd66b658e6
   fmt: 530618a01105dae0fa3a2f27c81ae11fa8f67eac
-  glog: 5683914934d5b6e4240e497e0f4a3b42d1854183
-  hermes-engine: a0aa4f0348b07c8268ca03c8fc64f44632bb804c
+  glog: 9c7bd858f1402a8e680d1637276210773c093b76
+  hermes-engine: 8b1dc33d6d08a4bc796d471cd436c077bec2b8cc
+  llama-rn: d80ded4096e1d6d22dac509ad41c8cfd03e5a033
   MMKV: 86859fdfa2b0b21db1fd6e48788474a6416a2c77
   MMKVCore: 3d16ce9f7d411e135020915fde98a056859a1efa
-  RCT-Folly: b29feb752b08042c62badaef7d453f3bb5e6ae23
+  RCT-Folly: 36c4f904fb6cd0219dcb76b94e9502d2a72fab0b
   RCTDeprecation: debcd5d989dc39edd50d61566b56e96da1c167b0
   RCTRequired: f06ef156c6b0244ac76aa51ef2e830a1a13004c8
   RCTSwiftUI: 04eac825e818fb067564bed44b20308916085563
@@ -3690,7 +3724,7 @@ SPEC CHECKSUMS:
   RNScreens: 9ef9bf849ca034edcbe4ea7bfe8164d492e1f128
   RNSVG: c6acd5c597d26625214295105756c5e488f5ae4c
   RNWorklets: 57279243f09ce1f3a4fc9cea2ce9b8e379688f30
-  SherpaOnnx: 28e7c88e024ef8dd99f938941ace62ecf2194ef4
+  SherpaOnnx: 2aa9f5a8d137ba0b6ae1e748ac9103296d67e875
   SocketRocket: d4aabe649be1e368d1318fdf28a022d714d65748
   Yoga: 0b38f02674a32b9a15de1f41f8680ffa06eaf8ef
 

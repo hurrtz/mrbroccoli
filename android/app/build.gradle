@@ -149,6 +149,17 @@ android {
         jniLibs {
             def enableLegacyPackaging = findProperty('expo.useLegacyPackaging') ?: 'false'
             useLegacyPackaging enableLegacyPackaging.toBoolean()
+
+            // The local LLM route is deliberately CPU-only and benchmarked on
+            // each phone. Keep llama.rn's portable libraries; its optional
+            // ARM feature, OpenCL, Hexagon, and x86 tuning variants would add
+            // roughly 66 MiB per ARM install without being selected here.
+            excludes += [
+                '**/librnllama_v8*.so',
+                '**/librnllama_jni_v8*.so',
+                '**/librnllama_x86_64.so',
+                '**/librnllama_jni_x86_64.so',
+            ]
         }
     }
     androidResources {

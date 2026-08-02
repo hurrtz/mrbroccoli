@@ -4,6 +4,7 @@ import android.app.ActivityManager
 import android.app.ApplicationExitInfo
 import android.content.Context
 import android.os.Build
+import android.os.PowerManager
 import com.facebook.react.bridge.Arguments
 import com.facebook.react.bridge.Promise
 import com.facebook.react.bridge.ReactApplicationContext
@@ -59,6 +60,52 @@ class MrBroccoliDiagnosticsModule(
       promise.resolve(records)
     } catch (error: Exception) {
       promise.reject("diagnostics_exit_history_failed", "Could not read process exit history.", error)
+    }
+  }
+
+  @ReactMethod
+  fun getDeviceCapabilities(promise: Promise) {
+    try {
+      val activityManager =
+        reactApplicationContext.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+      val memoryInfo = ActivityManager.MemoryInfo()
+      activityManager.getMemoryInfo(memoryInfo)
+      val powerManager =
+        reactApplicationContext.getSystemService(Context.POWER_SERVICE) as PowerManager
+      val thermalState =
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+          when (powerManager.currentThermalStatus) {
+            PowerManager.THERMAL_STATUS_NONE -> "nominal"
+            PowerManager.THERMAL_STATUS_LIGHT -> "fair"
+            PowerManager.THERMAL_STATUS_MODERATE -> "fair"
+            PowerManager.THERMAL_STATUS_SEVERE -> "serious"
+            PowerManager.THERMAL_STATUS_CRITICAL -> "critical"
+            PowerManager.THERMAL_STATUS_EMERGENCY -> "critical"
+            PowerManager.THERMAL_STATUS_SHUTDOWN -> "critical"
+            else -> "unknown"
+          }
+        } else {
+          "unknown"
+        }
+
+      promise.resolve(Arguments.createMap().apply {
+        putString("platform", "android")
+        putDouble("physicalMemoryBytes", memoryInfo.totalMem.toDouble())
+        putDouble("availableMemoryBytes", memoryInfo.availMem.toDouble())
+        putBoolean("memoryLow", memoryInfo.lowMemory)
+        putInt("processorCount", Runtime.getRuntime().availableProcessors())
+        putInt("activeProcessorCount", Runtime.getRuntime().availableProcessors())
+        putString("architecture", Build.SUPPORTED_ABIS.firstOrNull() ?: Build.CPU_ABI)
+        putString("osVersion", Build.VERSION.RELEASE)
+        putBoolean("lowPowerMode", powerManager.isPowerSaveMode)
+        putString("thermalState", thermalState)
+      })
+    } catch (error: Exception) {
+      promise.reject(
+        "diagnostics_device_capabilities_failed",
+        "Could not inspect device capabilities.",
+        error,
+      )
     }
   }
 

@@ -10,6 +10,15 @@ the complete Play Store translations are kept in a dedicated file under
 
 ## Unreleased
 
+### Added
+
+- Add a guided on-device AI catalogue for Android and iOS. It filters models by
+  the selected languages and measured device capacity, verifies every download,
+  benchmarks models before use, and makes local Whisper, Qwen, Kokoro, and
+  Piper routes selectable from the normal listening, thinking, and speaking
+  settings. Web search remains disabled for local responses in this first
+  version.
+
 ### Fixed
 
 - Prevent Android release optimization from renaming Sherpa JNI classes and

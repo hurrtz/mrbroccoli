@@ -19,10 +19,7 @@ import {
   resolveKokoroLanguage,
 } from "../constants/kokoro";
 import { synthesizeKokoroSpeech } from "./kokoroTts";
-import {
-  splitIntoSentences,
-  splitTextForTts,
-} from "./tts/chunking";
+import { splitIntoSentences, splitTextForTts } from "./tts/chunking";
 import { synthesizeProviderSpeech } from "./tts/providerRoute";
 import { resolveTtsListenLanguage } from "../utils/ttsRouting";
 import {
@@ -44,6 +41,8 @@ import {
   TtsRequestError,
   writeBytesAudioFile,
 } from "./tts/shared";
+import type { LocalTtsModelId } from "../constants/localModels";
+import { synthesizeLocalSpeech } from "./localSpeechModels";
 
 export {
   getProviderTtsTimeoutMs,
@@ -144,10 +143,7 @@ function isLocalAndroidDevTtsEnabled(apiKey: string | undefined) {
   );
 }
 
-function wasSpeechSynthesisCancelled(
-  error: Error,
-  abortSignal?: AbortSignal,
-) {
+function wasSpeechSynthesisCancelled(error: Error, abortSignal?: AbortSignal) {
   return abortSignal?.aborted === true || error.name === "AbortError";
 }
 
@@ -208,6 +204,7 @@ export async function synthesizeSpeech(params: {
   text: string;
   voice: string;
   mode: TtsBackendMode;
+  localModelId?: LocalTtsModelId | null;
   provider?: Provider | null;
   providerModel?: string;
   apiKey?: string;
@@ -225,6 +222,7 @@ export async function synthesizeSpeech(params: {
     text,
     voice,
     mode,
+    localModelId,
     provider,
     providerModel,
     apiKey,
@@ -314,10 +312,7 @@ export async function synthesizeSpeech(params: {
       recordSpeechDiagnostic({
         requestId,
         source: diagnostics?.source ?? "unknown",
-        stage: wasSpeechSynthesisCancelled(
-          normalizedKokoroError,
-          abortSignal,
-        )
+        stage: wasSpeechSynthesisCancelled(normalizedKokoroError, abortSignal)
           ? "tts-cancelled"
           : "tts-failed",
         requestedRoute: "kokoro",
@@ -330,6 +325,31 @@ export async function synthesizeSpeech(params: {
       });
       throw normalizedKokoroError;
     }
+  }
+
+  if (mode === "local") {
+    if (!localModelId) {
+      throw new Error(translate(language, "chooseOnDeviceTtsModel"));
+    }
+    const result = await synthesizeLocalSpeech({
+      text,
+      modelId: localModelId,
+      speechLanguage: resolvedSpeechLanguage,
+      abortSignal,
+    });
+    recordSpeechDiagnostic({
+      requestId,
+      source: diagnostics?.source ?? "unknown",
+      stage: "tts-succeeded",
+      requestedRoute: "local",
+      actualRoute: "local",
+      provider: null,
+      providerModel: localModelId,
+      voice: localModelId,
+      language: resolvedSpeechLanguage,
+      textLength: text.trim().length,
+    });
+    return result.fileUri;
   }
 
   if (!provider) {
@@ -377,9 +397,7 @@ export async function synthesizeSpeech(params: {
     return audioPath;
   }
 
-  const cachedAudio = await getCachedProviderTtsAudio(
-    providerAudioCacheKey,
-  );
+  const cachedAudio = await getCachedProviderTtsAudio(providerAudioCacheKey);
   if (cachedAudio) {
     actualProviderModel = cachedAudio.providerModel;
     if (diagnostics) {
@@ -466,6 +484,7 @@ export async function synthesizeSpeechSequence(params: {
   text: string;
   voice: string;
   mode: TtsBackendMode;
+  localModelId?: LocalTtsModelId | null;
   provider?: Provider | null;
   providerModel?: string;
   apiKey?: string;
@@ -480,7 +499,7 @@ export async function synthesizeSpeechSequence(params: {
 }) {
   const segments = splitTextForTts(
     params.text,
-    params.mode === "kokoro"
+    params.mode === "kokoro" || params.mode === "local"
       ? KOKORO_TTS_TARGET_CHUNK_CHARS
       : Math.min(
           PROVIDER_TTS_MAX_INPUT_CHARS,
@@ -501,11 +520,11 @@ export async function synthesizeSpeechSequence(params: {
         text: segment,
         previousText:
           params.provider === "elevenlabs"
-            ? segments[index - 1] ?? params.previousText
+            ? (segments[index - 1] ?? params.previousText)
             : params.previousText,
         nextText:
           params.provider === "elevenlabs"
-            ? segments[index + 1] ?? params.nextText
+            ? (segments[index + 1] ?? params.nextText)
             : params.nextText,
       }),
     );

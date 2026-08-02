@@ -25,6 +25,11 @@ import type {
 } from "../../types";
 import type { useAudioPlayer } from "../useAudioPlayer";
 import type { UlraModeConfig } from "../../services/ulraMode";
+import type {
+  LocalLlmModelId,
+  LocalSttModelId,
+  LocalTtsModelId,
+} from "../../constants/localModels";
 
 export type PipelinePhase =
   | "idle"
@@ -72,15 +77,18 @@ export interface UseVoicePipelineParams {
   providerApiKey: string;
   model: string;
   modelEffort?: string;
+  localLlmModelId?: LocalLlmModelId;
   sttMode: SttBackendMode;
   sttLanguage: SttLanguage;
   sttProvider: Provider | null;
   sttApiKey: string;
   selectedSttModel: string;
+  localSttModelId?: LocalSttModelId | null;
   ttsMode: TtsBackendMode;
   ttsProvider: Provider | null;
   ttsApiKey: string;
   selectedTtsModel: string;
+  localTtsModelId?: LocalTtsModelId | null;
   selectedTtsVoice: string;
   kokoroVoices: KokoroVoiceSelections;
   ttsFallbackRoutes: TtsFallbackRoute[];

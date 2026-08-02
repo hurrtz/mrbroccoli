@@ -66,12 +66,7 @@ export interface SettingsModalProps {
 }
 
 export type SettingsTab =
-  | "instructions"
-  | "providers"
-  | "web"
-  | "stt"
-  | "tts"
-  | "ui";
+  "instructions" | "providers" | "web" | "stt" | "tts" | "ui";
 
 export type SettingsPage =
   | "overview"
@@ -79,6 +74,7 @@ export type SettingsPage =
   | "thinking"
   | "listening"
   | "speaking"
+  | "local"
   | "search"
   | "data"
   | "app";
@@ -104,11 +100,7 @@ export type ProviderValidationStates = Partial<
 >;
 
 export type ProviderHealthState =
-  | "unconfigured"
-  | "configured"
-  | "validating"
-  | "healthy"
-  | "failing";
+  "unconfigured" | "configured" | "validating" | "healthy" | "failing";
 
 export type PreviewButtonPhase = "idle" | "generating" | "playing";
 

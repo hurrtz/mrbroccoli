@@ -1,18 +1,10 @@
 import React from "react";
-import {
-  Animated,
-  Modal,
-  Platform,
-  useWindowDimensions,
-} from "react-native";
+import { Animated, Modal, Platform, useWindowDimensions } from "react-native";
 
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { getSettingsReadiness } from "../settings-core/readiness";
-import type {
-  SettingsModalProps,
-  SettingsPage,
-} from "../settings-core/types";
+import type { SettingsModalProps, SettingsPage } from "../settings-core/types";
 import { useProviderValidationState } from "../settings-core/useProviderValidationState";
 import { useSettingsController } from "../settings-core/useSettingsController";
 import { useLocalization } from "../../i18n";
@@ -194,13 +186,7 @@ export const AntSettingsModal = React.memo(function AntSettingsModal(
       duration: 190,
       useNativeDriver: true,
     }).start();
-  }, [
-    entrance,
-    focusCatalogProviderId,
-    focusProvider,
-    focusTab,
-    visible,
-  ]);
+  }, [entrance, focusCatalogProviderId, focusProvider, focusTab, visible]);
 
   React.useEffect(() => {
     if (visible) {
@@ -233,6 +219,8 @@ export const AntSettingsModal = React.memo(function AntSettingsModal(
           return t("settingsListening");
         case "speaking":
           return t("settingsSpeaking");
+        case "local":
+          return t("settingsOnDevice");
         case "search":
           return t("settingsSearch");
         case "data":

@@ -1,8 +1,10 @@
 import type { TranslationDictionary } from "../types";
 import { dataBackupTranslations } from "../dataBackupTranslations";
+import { onDeviceTranslations } from "../onDeviceTranslations";
 
 export const hi = {
   ...dataBackupTranslations.hi,
+  ...onDeviceTranslations.hi,
   appName: "मिस्टर ब्रोकली",
   retry: "पुन: प्रयास करें",
   dismiss: "बंद करें",

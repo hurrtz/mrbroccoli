@@ -1,6 +1,6 @@
 # Licensing and provider-terms review
 
-Reviewed on 2026-07-31. This is an engineering compliance record, not legal
+Reviewed on 2026-08-02. This is an engineering compliance record, not legal
 advice.
 
 ## Conclusion
@@ -11,8 +11,9 @@ does not require the client application's source code to be published.
 
 That conclusion has two boundaries:
 
-1. Third-party software, fonts, and the optional Kokoro model retain their own
-   licenses. Their notices must accompany distributed builds.
+1. Third-party software, fonts, native inference runtimes, and optional
+   downloaded models retain their own licenses. Their notices and attribution
+   requirements must be preserved.
 2. API and model use remains subject to the provider's current terms, usage
    policies, regional restrictions, and any model-specific terms.
 
@@ -30,9 +31,17 @@ unreviewed dependency licenses during validation.
   iOS. This removes the LGPL-2.1/LGPL-2.0 components from distributable builds.
 - `react-native-sherpa-onnx` is MIT licensed; Sherpa ONNX is Apache-2.0;
   ONNX Runtime is MIT; libarchive and zstd use permissive licenses.
-- The only downloaded on-device model is
-  `kokoro-int8-multi-lang-v1_1`, whose archive declares Apache-2.0 and includes
-  its own license file. The model is optional and is not bundled in the app.
+- `llama.rn` and its included `llama.cpp` runtime are MIT licensed.
+- Optional on-device models are never bundled. The catalogue pins their source,
+  artifact size, SHA-256 digest, and license before download:
+  - Qwen3 0.6B and 1.7B GGUF files: Apache-2.0.
+  - Whisper Tiny: MIT.
+  - Kokoro multilingual: Apache-2.0; the archive includes its license file.
+  - Piper Kristin: public domain; Thorsten and Faber: CC0-1.0; Sharvard:
+    CC-BY-3.0; Siwis: CC-BY-4.0.
+- Downloaded models, their benchmark results, and generated audio are
+  device-local and excluded from app-data backups. Attribution-bearing model
+  archives and their source links must remain intact.
 
 Run `npm run license:verify` after dependency or native-runtime changes. A new
 or changed license must be reviewed and deliberately added to the allowlist;

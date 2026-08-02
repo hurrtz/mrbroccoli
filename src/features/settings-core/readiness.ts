@@ -11,6 +11,7 @@ import {
   providerSupportsSttLanguage,
   providerSupportsTtsLanguage,
 } from "../../constants/providerSpeechLanguages";
+import { getLocalModel } from "../../constants/localModels";
 
 export type SettingsReadinessState = "ready" | "attention" | "broken" | "off";
 
@@ -63,6 +64,9 @@ function getThinkReadiness(
   context: SettingsReadinessContext,
 ) {
   const runnableModes = settings.responseModes.filter((mode) => {
+    if (mode.route.runtime === "local") {
+      return Boolean(mode.route.localModelId);
+    }
     const provider = mode.route.provider;
     return (
       context.llmProviders.includes(provider) &&
@@ -85,6 +89,10 @@ function getListenReadiness(
 ) {
   if (settings.sttMode === "native") {
     return status("ready");
+  }
+
+  if (settings.sttMode === "local") {
+    return settings.localSttModelId ? status("ready") : status("broken");
   }
 
   const provider = settings.sttProvider;
@@ -122,6 +130,14 @@ function getSpeakReadiness(
         settings.providerTtsVoices[provider]?.trim() ||
         PROVIDER_DEFAULT_TTS_VOICES[provider]?.trim()
       ));
+  const localModel = settings.localTtsModelId
+    ? getLocalModel(settings.localTtsModelId)
+    : null;
+  const localReady =
+    localModel?.capability === "tts" &&
+    settings.ttsListenLanguages.every((language) =>
+      localModel.languages.includes(language),
+    );
   const fallbackRoutes = getTtsFallbackRoutes(
     settings.ttsFallbackPolicy,
     settings.ttsMode,
@@ -141,30 +157,35 @@ function getSpeakReadiness(
   const primaryReady =
     settings.ttsMode === "kokoro"
       ? !!context.kokoroInstalled
-      : providerReady;
+      : settings.ttsMode === "local"
+        ? localReady
+        : providerReady;
 
   if (!primaryReady) {
     return status("broken");
   }
 
   const routeOrder = [settings.ttsMode, ...fallbackRoutes];
-  const everyLanguageHasRoute = settings.ttsListenLanguages.every(
-    (language) =>
-      routeOrder.some((route) => {
-        if (route === "native") {
-          return true;
-        }
+  const everyLanguageHasRoute = settings.ttsListenLanguages.every((language) =>
+    routeOrder.some((route) => {
+      if (route === "native") {
+        return true;
+      }
 
-        if (route === "kokoro") {
-          return !!context.kokoroInstalled && isKokoroLanguage(language);
-        }
+      if (route === "kokoro") {
+        return !!context.kokoroInstalled && isKokoroLanguage(language);
+      }
 
-        return (
-          providerReady &&
-          !!provider &&
-          providerSupportsTtsLanguage(provider, language)
-        );
-      }),
+      if (route === "local") {
+        return Boolean(localReady && localModel?.languages.includes(language));
+      }
+
+      return (
+        providerReady &&
+        !!provider &&
+        providerSupportsTtsLanguage(provider, language)
+      );
+    }),
   );
 
   if (!everyLanguageHasRoute) {
@@ -174,10 +195,12 @@ function getSpeakReadiness(
   const primarySupportsEveryLanguage =
     settings.ttsMode === "kokoro"
       ? settings.ttsListenLanguages.every(isKokoroLanguage)
-      : !!provider &&
-        settings.ttsListenLanguages.every((language) =>
-          providerSupportsTtsLanguage(provider, language),
-        );
+      : settings.ttsMode === "local"
+        ? localReady
+        : !!provider &&
+          settings.ttsListenLanguages.every((language) =>
+            providerSupportsTtsLanguage(provider, language),
+          );
 
   return hasUnavailableFallback || !primarySupportsEveryLanguage
     ? status("attention")

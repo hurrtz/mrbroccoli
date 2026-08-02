@@ -1,9 +1,6 @@
 import { runVoicePipeline as runVoicePipelineImplementation } from "../../src/services/voicePipeline";
 import type { RunVoicePipelineParams } from "../../src/services/voicePipeline/types";
-import {
-  splitIntoSentences,
-  synthesizeSpeech,
-} from "../../src/services/tts";
+import { splitIntoSentences, synthesizeSpeech } from "../../src/services/tts";
 import { transcribeAudio } from "../../src/services/whisper";
 import { searchWeb } from "../../src/services/webSearch";
 import {
@@ -47,8 +44,8 @@ jest.mock("../../src/services/ulraMode", () => ({
 
 jest.mock("../../src/services/playbackCues", () => ({
   INTER_PARAGRAPH_PAUSE_MS: 250,
-  getInterParagraphPauseAudioUri: jest.fn(async () =>
-    "file:///tmp/paragraph-pause.wav"
+  getInterParagraphPauseAudioUri: jest.fn(
+    async () => "file:///tmp/paragraph-pause.wav",
   ),
 }));
 
@@ -265,10 +262,12 @@ describe("runVoicePipeline", () => {
           requestedRoute: {
             provider: "openai",
             model: "gpt-5.4",
+            runtime: "provider",
           },
           actualRoute: {
             provider: "openai",
             model: "gpt-5.4",
+            runtime: "provider",
           },
           speechOutput: expect.objectContaining({
             enabled: false,
@@ -1691,14 +1690,10 @@ describe("runVoicePipeline", () => {
       }) => {
         onChunk("This is the English answer.\n\n");
         onChunk("Це українська відповідь.");
-        await onDone(
-          "This is the English answer.\n\nЦе українська відповідь.",
-        );
+        await onDone("This is the English answer.\n\nЦе українська відповідь.");
       },
     );
-    (synthesizeSpeech as jest.Mock).mockResolvedValueOnce(
-      "/tmp/english.wav",
-    );
+    (synthesizeSpeech as jest.Mock).mockResolvedValueOnce("/tmp/english.wav");
     const callbacks = {
       onTranscription: jest.fn(),
       onChunk: jest.fn(),

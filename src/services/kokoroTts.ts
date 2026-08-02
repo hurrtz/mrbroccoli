@@ -11,6 +11,7 @@ import {
   KOKORO_MODEL_DOWNLOAD_BYTES,
   KOKORO_MODEL_ID,
   KOKORO_MODEL_INSTALLED_BYTES,
+  KOKORO_MODEL_SHA256,
   getKokoroVoiceConfig,
   resolveKokoroLanguage,
 } from "../constants/kokoro";
@@ -21,7 +22,7 @@ import type {
 } from "../types";
 
 type KokoroEngine = Awaited<
-  ReturnType<typeof import("react-native-sherpa-onnx/tts")["createTTS"]>
+  ReturnType<(typeof import("react-native-sherpa-onnx/tts"))["createTTS"]>
 >;
 
 type KokoroSession = {
@@ -80,6 +81,17 @@ function createAbortError() {
 function assertNotAborted(signal?: AbortSignal) {
   if (signal?.aborted) {
     throw createAbortError();
+  }
+}
+
+function assertPinnedKokoroMetadata(model: { bytes: number; sha256?: string }) {
+  if (
+    model.bytes !== KOKORO_MODEL_DOWNLOAD_BYTES ||
+    model.sha256?.toLowerCase() !== KOKORO_MODEL_SHA256
+  ) {
+    throw new Error(
+      "Kokoro changed upstream. Mr Broccoli will not download an unreviewed artifact.",
+    );
   }
 }
 
@@ -218,18 +230,16 @@ async function downloadKokoroModelInForeground(params?: {
     getModelByIdByCategory,
     ModelCategory,
   } = getDownloadModule();
-  const {
-    downloadFile,
-    exists,
-    mkdir,
-    stopDownload,
-    unlink,
-  } = getFsModule();
-  const model = await getModelByIdByCategory(ModelCategory.Tts, KOKORO_MODEL_ID);
+  const { downloadFile, exists, mkdir, stopDownload, unlink } = getFsModule();
+  const model = await getModelByIdByCategory(
+    ModelCategory.Tts,
+    KOKORO_MODEL_ID,
+  );
 
   if (!model) {
     throw new Error("The Kokoro model is not available for download.");
   }
+  assertPinnedKokoroMetadata(model);
 
   await deleteIncompleteDownload(ModelCategory.Tts, KOKORO_MODEL_ID);
   const storageRoot = await getDownloadStorageBase();
@@ -452,6 +462,7 @@ export async function downloadKokoroModel(params?: {
 }) {
   const {
     downloadModelByCategory,
+    getModelByIdByCategory,
     ModelCategory,
     refreshModelsByCategory,
   } = getDownloadModule();
@@ -471,6 +482,14 @@ export async function downloadKokoroModel(params?: {
   }
 
   await refreshModelsByCategory(ModelCategory.Tts);
+  const model = await getModelByIdByCategory(
+    ModelCategory.Tts,
+    KOKORO_MODEL_ID,
+  );
+  if (!model) {
+    throw new Error("The Kokoro model is not available for download.");
+  }
+  assertPinnedKokoroMetadata(model);
   try {
     await downloadModelByCategory(ModelCategory.Tts, KOKORO_MODEL_ID, {
       signal: params?.abortSignal,

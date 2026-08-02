@@ -51,6 +51,7 @@ export function useVoicePipeline(
     player: params.player,
     selectedTtsModel: params.selectedTtsModel,
     selectedTtsVoice: params.selectedTtsVoice,
+    localTtsModelId: params.localTtsModelId,
     kokoroVoices: params.kokoroVoices,
     ttsFallbackRoutes: params.ttsFallbackRoutes,
     ttsInstructions: params.ttsInstructions,
@@ -68,8 +69,7 @@ export function useVoicePipeline(
     abortRef,
     handleRepeatLastReply,
     lastCompletedReplyRef,
-    onReplyCompleted: () =>
-      setCompletedReplyVersion((version) => version + 1),
+    onReplyCompleted: () => setCompletedReplyVersion((version) => version + 1),
     setPhaseProgress,
     setPipelinePhase,
     setStreamingText,

@@ -1,8 +1,10 @@
 import type { TranslationDictionary } from "../types";
 import { dataBackupTranslations } from "../dataBackupTranslations";
+import { onDeviceTranslations } from "../onDeviceTranslations";
 
 export const ar = {
   ...dataBackupTranslations.ar,
+  ...onDeviceTranslations.ar,
   appName: "السيد بروكلي",
   retry: "أعد المحاولة",
   dismiss: "إغلاق",

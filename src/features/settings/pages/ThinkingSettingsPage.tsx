@@ -11,6 +11,7 @@ import {
 import { IconButton } from "../../../design-system/IconButton";
 import { useLocalization } from "../../../i18n";
 import { useRuntimeCapabilityOverrides } from "../../../hooks/useRuntimeCapabilityOverrides";
+import { getLocalModel } from "../../../constants/localModels";
 import { useTheme } from "../../../theme/ThemeContext";
 import type {
   Provider,
@@ -70,6 +71,9 @@ export function ThinkingSettingsPage({
   const canAdd = settings.responseModes.length < MAX_RESPONSE_MODES;
   const canRemove = settings.responseModes.length > MIN_RESPONSE_MODES;
   const readyModelCount = getAvailableResponseModes(settings).length;
+  const hasLocalRoute = settings.responseModes.some(
+    ({ route }) => route.runtime === "local" && route.localModelId,
+  );
 
   return (
     <View testID="thinking-settings-page" style={styles.sectionPageStack}>
@@ -86,7 +90,7 @@ export function ThinkingSettingsPage({
           }
         />
 
-        {llmProviders.length === 0 ? (
+        {llmProviders.length === 0 && !hasLocalRoute ? (
           <AntSettingsCard>
             <Text style={[styles.helperText, { color: colors.textSecondary }]}>
               {t("responseModesNoConfiguredProviders")}
@@ -94,11 +98,17 @@ export function ThinkingSettingsPage({
           </AntSettingsCard>
         ) : (
           settings.responseModes.map((mode, index) => {
-            const route = normalizeResponseModeRouteEffort(mode.route);
-            const effortOptions = getModelEffortOptions(
-              route.provider,
-              route.model,
-            );
+            const route =
+              mode.route.runtime === "local"
+                ? mode.route
+                : normalizeResponseModeRouteEffort(mode.route);
+            const localModel =
+              route.runtime === "local" && route.localModelId
+                ? getLocalModel(route.localModelId)
+                : null;
+            const effortOptions = localModel
+              ? []
+              : getModelEffortOptions(route.provider, route.model);
             const showEffort =
               effortOptions.length > 0 && route.effort !== undefined;
 
@@ -124,50 +134,75 @@ export function ThinkingSettingsPage({
                 contentStyle={styles.fullBleedCardContent}
               >
                 <AntPickerRows>
-                  <AntPickerRow
-                    testID={`settings-model-provider-${mode.id}`}
-                    label={llmProviders.length > 1 ? t("provider") : undefined}
-                    value={route.provider}
-                    options={renderProviderPickerOptions(llmProviders)}
-                    onChange={(value) => {
-                      const nextProvider = value as Provider;
-                      const preferredModel =
-                        settings.providerModels[nextProvider];
-                      const nextModel = isValidModelForProvider(
-                        nextProvider,
-                        preferredModel,
-                      )
-                        ? preferredModel
-                        : getDefaultModelForProvider(nextProvider);
+                  {localModel ? (
+                    <>
+                      <AntPickerRow
+                        testID={`settings-model-provider-${mode.id}`}
+                        value="local"
+                        options={[
+                          { value: "local", label: t("settingsOnDevice") },
+                        ]}
+                        onChange={() => undefined}
+                      />
+                      <AntPickerRow
+                        label={t("model")}
+                        value={localModel.id}
+                        options={[
+                          { value: localModel.id, label: localModel.name },
+                        ]}
+                        onChange={() => undefined}
+                      />
+                    </>
+                  ) : (
+                    <>
+                      <AntPickerRow
+                        testID={`settings-model-provider-${mode.id}`}
+                        label={
+                          llmProviders.length > 1 ? t("provider") : undefined
+                        }
+                        value={route.provider}
+                        options={renderProviderPickerOptions(llmProviders)}
+                        onChange={(value) => {
+                          const nextProvider = value as Provider;
+                          const preferredModel =
+                            settings.providerModels[nextProvider];
+                          const nextModel = isValidModelForProvider(
+                            nextProvider,
+                            preferredModel,
+                          )
+                            ? preferredModel
+                            : getDefaultModelForProvider(nextProvider);
 
-                      onUpdateResponseModeRoute(
-                        mode.id,
-                        normalizeResponseModeRouteEffort({
-                          provider: nextProvider,
-                          model: nextModel,
-                        }),
-                      );
-                    }}
-                  />
-                  <AntPickerRow
-                    label={t("model")}
-                    value={route.model}
-                    options={getProviderLlmModelOptions(route.provider).map(
-                      (model) => ({
-                        value: model.id,
-                        label: model.name,
-                      }),
-                    )}
-                    onChange={(value) =>
-                      onUpdateResponseModeRoute(
-                        mode.id,
-                        normalizeResponseModeRouteEffort({
-                          ...route,
-                          model: value,
-                        }),
-                      )
-                    }
-                  />
+                          onUpdateResponseModeRoute(
+                            mode.id,
+                            normalizeResponseModeRouteEffort({
+                              provider: nextProvider,
+                              model: nextModel,
+                            }),
+                          );
+                        }}
+                      />
+                      <AntPickerRow
+                        label={t("model")}
+                        value={route.model}
+                        options={getProviderLlmModelOptions(route.provider).map(
+                          (model) => ({
+                            value: model.id,
+                            label: model.name,
+                          }),
+                        )}
+                        onChange={(value) =>
+                          onUpdateResponseModeRoute(
+                            mode.id,
+                            normalizeResponseModeRouteEffort({
+                              ...route,
+                              model: value,
+                            }),
+                          )
+                        }
+                      />
+                    </>
+                  )}
                   {showEffort ? (
                     <AntPickerRow
                       label={t("effort")}

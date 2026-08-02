@@ -17,6 +17,7 @@ interface ResolveContextualMessagesParams {
   model: string;
   provider: RunVoicePipelineParams["provider"];
   providerApiKey: string;
+  skipSummaryUpdate?: boolean;
   summarizedMessageCount?: number;
 }
 
@@ -29,11 +30,11 @@ export async function resolveContextualMessages({
   model,
   provider,
   providerApiKey,
+  skipSummaryUpdate = false,
   summarizedMessageCount,
 }: ResolveContextualMessagesParams) {
-  const canReuseExistingSummary = hasCurrentConversationSummaryProvenance(
-    contextSummary,
-  );
+  const canReuseExistingSummary =
+    hasCurrentConversationSummaryProvenance(contextSummary);
   const existingSummaryBody = canReuseExistingSummary
     ? getConversationSummaryBody(contextSummary)
     : "";
@@ -51,7 +52,7 @@ export async function resolveContextualMessages({
   let summaryUpdated = false;
   let fallbackUsed = false;
 
-  if (contextPlan.needsSummaryUpdate) {
+  if (contextPlan.needsSummaryUpdate && !skipSummaryUpdate) {
     try {
       const { summary: updatedSummary, usage } =
         await summarizeConversationContext({
@@ -122,7 +123,8 @@ export async function resolveContextualMessages({
     effectiveSummary,
     receipt: {
       existingSummaryReused: Boolean(existingSummaryBody),
-      summaryUpdateRequested: contextPlan.needsSummaryUpdate,
+      summaryUpdateRequested:
+        contextPlan.needsSummaryUpdate && !skipSummaryUpdate,
       summaryUpdated,
       fallbackUsed,
       messagesAvailable: messages.length,

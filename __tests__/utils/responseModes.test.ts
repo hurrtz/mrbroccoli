@@ -13,6 +13,25 @@ describe("response mode selectors", () => {
     expect(getAvailableResponseModes(DEFAULT_SETTINGS)).toEqual([]);
   });
 
+  it("treats an on-device response route as ready without a provider key", () => {
+    const settings = {
+      ...DEFAULT_SETTINGS,
+      responseModes: [
+        {
+          id: "mode-1",
+          route: {
+            runtime: "local" as const,
+            localModelId: "qwen3-0.6b-q8" as const,
+            provider: "openai" as const,
+            model: "Qwen3 0.6B",
+          },
+        },
+      ],
+    };
+
+    expect(getAvailableResponseModes(settings)).toEqual(["mode-1"]);
+  });
+
   it("returns only response modes backed by configured provider keys", () => {
     const settings = {
       ...DEFAULT_SETTINGS,
@@ -69,9 +88,7 @@ describe("response mode selectors", () => {
       },
     };
 
-    expect(getProviderValidationModel(settings, "openai")).toBe(
-      "gpt-5-mini",
-    );
+    expect(getProviderValidationModel(settings, "openai")).toBe("gpt-5-mini");
   });
 
   it("uses the curated provider default instead of the first picker entry", () => {

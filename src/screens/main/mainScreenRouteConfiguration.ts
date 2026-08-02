@@ -21,6 +21,7 @@ import {
   getAvailableResponseModes,
   getResponseModeRoute,
 } from "../../utils/responseModes";
+import { getLocalModel } from "../../constants/localModels";
 
 export function getMainScreenRouteConfiguration(
   settings: Settings,
@@ -28,6 +29,10 @@ export function getMainScreenRouteConfiguration(
 ) {
   const activeResponseMode = settings.activeResponseMode;
   const activeResponseRoute = getResponseModeRoute(settings);
+  const localLlmModelId =
+    activeResponseRoute.runtime === "local"
+      ? activeResponseRoute.localModelId
+      : undefined;
   const provider = activeResponseRoute.provider;
   const providerApiKey = settings.apiKeys[provider].trim();
   const model = activeResponseRoute.model;
@@ -40,9 +45,9 @@ export function getMainScreenRouteConfiguration(
           rounds: settings.ulraModeRounds,
           routes: settings.responseModes
             .filter(({ id }) => availableResponseModeSet.has(id))
+            .filter(({ route }) => route.runtime !== "local")
             .filter(
-              ({ route }) =>
-                !getProviderCircuitState(route.provider, "llm"),
+              ({ route }) => !getProviderCircuitState(route.provider, "llm"),
             )
             .map(({ id, route }) => ({
               apiKey: settings.apiKeys[route.provider].trim(),
@@ -60,12 +65,8 @@ export function getMainScreenRouteConfiguration(
   const ttsProvider = settings.ttsProvider;
   const webSearchProvider = settings.webSearchProvider;
   const webSearchMode = settings.webSearchMode;
-  const sttApiKey = sttProvider
-    ? settings.apiKeys[sttProvider].trim()
-    : "";
-  const ttsApiKey = ttsProvider
-    ? settings.apiKeys[ttsProvider].trim()
-    : "";
+  const sttApiKey = sttProvider ? settings.apiKeys[sttProvider].trim() : "";
+  const ttsApiKey = ttsProvider ? settings.apiKeys[ttsProvider].trim() : "";
   const webSearchApiKey = webSearchProvider
     ? settings.apiKeys[webSearchProvider].trim()
     : "";
@@ -103,27 +104,27 @@ export function getMainScreenRouteConfiguration(
     globalSelectedTtsVoice,
     model,
     modelEffort,
+    localLlmModelId,
     provider,
     providerApiKey,
-    providerLabel: PROVIDER_LABELS[provider],
+    providerLabel: localLlmModelId
+      ? getLocalModel(localLlmModelId).name
+      : PROVIDER_LABELS[provider],
     selectedSttModel,
     selectedTtsModel,
     sttApiKey,
     sttProvider,
     ttsApiKey,
     ttsProvider,
-    ulraMode:
-      ulraMode && ulraMode.routes.length > 1 ? ulraMode : undefined,
+    ulraMode: ulraMode && ulraMode.routes.length > 1 ? ulraMode : undefined,
     voiceInputDisabled:
       !conversationsLoaded ||
-      !hasProviderCredentialForCapability(
-        provider,
-        providerApiKey,
-        "llm",
-      ),
-    webSearchActive: webSearchMode !== "off" && webSearchReady,
+      (!localLlmModelId &&
+        !hasProviderCredentialForCapability(provider, providerApiKey, "llm")),
+    webSearchActive:
+      !localLlmModelId && webSearchMode !== "off" && webSearchReady,
     webSearchApiKey,
-    webSearchMode,
+    webSearchMode: localLlmModelId ? "off" : webSearchMode,
     webSearchOptions,
     webSearchProvider,
     webSearchReady,
@@ -157,17 +158,9 @@ export function getConversationTtsControlState(params: {
 
   const voices = providerHasVoiceDirectory(ttsProvider)
     ? providerVoiceDirectories[ttsProvider]?.voices.length
-      ? providerVoiceDirectories[ttsProvider]?.voices ?? []
-      : getProviderTtsVoiceOptions(
-          ttsProvider,
-          language,
-          selectedTtsModel,
-        )
-    : getProviderTtsVoiceOptions(
-        ttsProvider,
-        language,
-        selectedTtsModel,
-      );
+      ? (providerVoiceDirectories[ttsProvider]?.voices ?? [])
+      : getProviderTtsVoiceOptions(ttsProvider, language, selectedTtsModel)
+    : getProviderTtsVoiceOptions(ttsProvider, language, selectedTtsModel);
   const conversationTtsVoiceOptions = voices.map((voice) => ({
     value:
       "value" in voice && typeof voice.value === "string"

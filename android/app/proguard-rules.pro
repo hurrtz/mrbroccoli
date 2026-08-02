@@ -12,4 +12,8 @@
 # and field names. Renaming either side makes ART abort inside GetObjectField.
 -keep class com.k2fsa.sherpa.onnx.** { *; }
 
+# llama.rn installs its JSI bindings and resolves optimized native variants
+# through these Java entry points.
+-keep class com.rnllama.** { *; }
+
 # Add any project-specific keep options here.

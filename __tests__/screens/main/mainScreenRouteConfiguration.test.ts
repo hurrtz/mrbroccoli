@@ -44,8 +44,7 @@ describe("mainScreenRouteConfiguration", () => {
     expect(result).toEqual(
       expect.objectContaining({
         activeResponseMode: "normal",
-        globalSelectedTtsVoice:
-          settings.providerTtsVoices.elevenlabs,
+        globalSelectedTtsVoice: settings.providerTtsVoices.elevenlabs,
         model: "gpt-5.2",
         modelEffort: "high",
         provider: "openai",
@@ -84,9 +83,42 @@ describe("mainScreenRouteConfiguration", () => {
     };
 
     expect(
-      getMainScreenRouteConfiguration(settings, false)
-        .voiceInputDisabled,
+      getMainScreenRouteConfiguration(settings, false).voiceInputDisabled,
     ).toBe(true);
+  });
+
+  it("runs a local response mode without a key and disables web search", () => {
+    const settings = {
+      ...DEFAULT_SETTINGS,
+      activeResponseMode: "mode-1",
+      responseModes: [
+        {
+          id: "mode-1",
+          route: {
+            runtime: "local" as const,
+            localModelId: "qwen3-0.6b-q8" as const,
+            provider: "openai" as const,
+            model: "Qwen3 0.6B",
+          },
+        },
+      ],
+      webSearchMode: "on" as const,
+      webSearchProvider: "openai" as const,
+      apiKeys: {
+        ...DEFAULT_SETTINGS.apiKeys,
+        openai: "search-only-key",
+      },
+    };
+
+    expect(getMainScreenRouteConfiguration(settings, true)).toEqual(
+      expect.objectContaining({
+        localLlmModelId: "qwen3-0.6b-q8",
+        providerLabel: "Qwen3 0.6B",
+        voiceInputDisabled: false,
+        webSearchActive: false,
+        webSearchMode: "off",
+      }),
+    );
   });
 
   it("builds Uber routes only from ready home-screen models", () => {
@@ -126,9 +158,7 @@ describe("mainScreenRouteConfiguration", () => {
       },
     };
 
-    expect(
-      getMainScreenRouteConfiguration(settings, true).ulraMode,
-    ).toEqual({
+    expect(getMainScreenRouteConfiguration(settings, true).ulraMode).toEqual({
       rounds: 5,
       routes: [
         {
@@ -189,10 +219,7 @@ describe("mainScreenRouteConfiguration", () => {
       },
     ]);
     expect(result.conversationTtsRouteLabel).toBe(
-      `ElevenLabs · ${getTtsModelLabel(
-        "elevenlabs",
-        selectedTtsModel,
-      )}`,
+      `ElevenLabs · ${getTtsModelLabel("elevenlabs", selectedTtsModel)}`,
     );
     expect(result.ttsInstructionsSupported).toBe(false);
   });

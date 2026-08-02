@@ -8,6 +8,7 @@ interface ResolvePipelineTranscriptionParams {
   sttApiKey?: string;
   sttMode: Parameters<typeof transcribeAudio>[0]["mode"];
   sttModel?: string;
+  localSttModelId?: Parameters<typeof transcribeAudio>[0]["localModelId"];
   sttProvider?: Parameters<typeof transcribeAudio>[0]["provider"];
   transcriptionOverride?: string;
   onModelResolved?: (model: string) => void;
@@ -21,6 +22,7 @@ export async function resolvePipelineTranscription({
   sttApiKey,
   sttMode,
   sttModel,
+  localSttModelId,
   sttProvider,
   transcriptionOverride,
   onModelResolved,
@@ -42,6 +44,7 @@ export async function resolvePipelineTranscription({
     mode: sttMode,
     provider: sttProvider,
     providerModel: sttModel,
+    localModelId: localSttModelId,
     apiKey: sttApiKey,
     language,
     speechLanguage,

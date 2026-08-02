@@ -2,11 +2,7 @@ import { useCallback, useRef, useState } from "react";
 
 import { createSpeechRequestId } from "../../services/speech/diagnostics";
 import { createVoicePipelineTtsQueue } from "../../services/voicePipeline/ttsQueue";
-import type {
-  AudioPlayer,
-  ReplayPhase,
-  UseVoicePipelineParams,
-} from "./types";
+import type { AudioPlayer, ReplayPhase, UseVoicePipelineParams } from "./types";
 import { resolveTtsListenLanguage } from "../../utils/ttsRouting";
 import { getSpeechLanguageDefinition } from "../../constants/speechLanguages";
 import { PROVIDER_LABELS } from "../../constants/models";
@@ -18,6 +14,7 @@ type ReplayControllerParams = Pick<
   | "language"
   | "selectedTtsModel"
   | "selectedTtsVoice"
+  | "localTtsModelId"
   | "kokoroVoices"
   | "ttsFallbackRoutes"
   | "ttsInstructions"
@@ -42,6 +39,7 @@ export function useReplyReplayController({
   player,
   selectedTtsModel,
   selectedTtsVoice,
+  localTtsModelId,
   kokoroVoices,
   ttsFallbackRoutes,
   ttsInstructions,
@@ -57,9 +55,9 @@ export function useReplyReplayController({
   const replaySessionRef = useRef(0);
   const replayAbortRef = useRef<AbortController | null>(null);
   const [replayPhase, setReplayPhase] = useState<ReplayPhase>("idle");
-  const [activeReplayMessageId, setActiveReplayMessageId] = useState<string | null>(
-    null,
-  );
+  const [activeReplayMessageId, setActiveReplayMessageId] = useState<
+    string | null
+  >(null);
 
   const playReplyText = useCallback(
     async (text: string, messageId?: string) => {
@@ -114,8 +112,7 @@ export function useReplyReplayController({
             appLanguage: language,
           });
           player.speakText(trimmed, {
-            language:
-              getSpeechLanguageDefinition(speechLanguage).nativeLocale,
+            language: getSpeechLanguageDefinition(speechLanguage).nativeLocale,
             diagnostics: speechDiagnostics,
           });
           await player.waitForDrain();
@@ -151,12 +148,11 @@ export function useReplyReplayController({
               setReplayPhase("speaking");
               player.speakText(segmentText, {
                 voice,
-                ...(diagnostics?.language &&
-                diagnostics.language !== "app"
+                ...(diagnostics?.language && diagnostics.language !== "app"
                   ? {
-                      language:
-                        getSpeechLanguageDefinition(diagnostics.language)
-                          .nativeLocale,
+                      language: getSpeechLanguageDefinition(
+                        diagnostics.language,
+                      ).nativeLocale,
                     }
                   : {}),
                 diagnostics,
@@ -207,6 +203,7 @@ export function useReplyReplayController({
           ttsListenLanguages,
           ttsMode,
           ttsModel: selectedTtsModel,
+          localTtsModelId,
           ttsProvider,
           ttsVoice: selectedTtsVoice,
           ttsInstructions,
@@ -236,6 +233,7 @@ export function useReplyReplayController({
       player,
       selectedTtsModel,
       selectedTtsVoice,
+      localTtsModelId,
       kokoroVoices,
       ttsFallbackRoutes,
       ttsInstructions,
@@ -261,7 +259,8 @@ export function useReplyReplayController({
 
   const handleRepeatLastReply = useCallback(
     async (textOverride?: string, messageId?: string) => {
-      const replyText = textOverride?.trim() || lastCompletedReplyRef.current.trim();
+      const replyText =
+        textOverride?.trim() || lastCompletedReplyRef.current.trim();
 
       if (!replyText) {
         showToast(t("noReplyToRepeatYet"));

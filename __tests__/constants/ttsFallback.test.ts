@@ -8,6 +8,7 @@ describe("TTS fallback policy", () => {
     expect(normalizeTtsFallbackPolicy(undefined)).toEqual({
       provider: [],
       kokoro: [],
+      local: [],
     });
   });
 
@@ -16,10 +17,12 @@ describe("TTS fallback policy", () => {
       normalizeTtsFallbackPolicy({
         provider: ["native", "kokoro", "native", "provider"],
         kokoro: ["provider", "native", "provider", "kokoro"],
+        local: ["native", "provider", "native", "kokoro"],
       }),
     ).toEqual({
       provider: ["native", "kokoro"],
       kokoro: ["provider", "native"],
+      local: ["native", "provider"],
     });
   });
 
@@ -29,6 +32,7 @@ describe("TTS fallback policy", () => {
         {
           provider: ["kokoro", "native"],
           kokoro: ["provider", "native"],
+          local: ["provider", "native"],
         },
         "native",
       ),

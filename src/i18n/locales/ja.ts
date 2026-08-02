@@ -1,8 +1,10 @@
 import type { TranslationDictionary } from "../types";
 import { dataBackupTranslations } from "../dataBackupTranslations";
+import { onDeviceTranslations } from "../onDeviceTranslations";
 
 export const ja = {
   ...dataBackupTranslations.ja,
+  ...onDeviceTranslations.ja,
   appName: "ミスター・ブロッコリー",
   retry: "再試行",
   dismiss: "閉じる",

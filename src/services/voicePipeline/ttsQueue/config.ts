@@ -1,6 +1,4 @@
-import {
-  KOKORO_TTS_TARGET_CHUNK_CHARS,
-} from "../../../constants/kokoro";
+import { KOKORO_TTS_TARGET_CHUNK_CHARS } from "../../../constants/kokoro";
 import type { TtsBackendMode, TtsFallbackRoute } from "../../../types";
 import {
   getProviderTtsTargetChunkChars,
@@ -37,6 +35,10 @@ export function getTtsChunkTargetChars(
 ) {
   const targetSizes = routes.flatMap((route) => {
     if (route === "kokoro") {
+      return [KOKORO_TTS_TARGET_CHUNK_CHARS];
+    }
+
+    if (route === "local") {
       return [KOKORO_TTS_TARGET_CHUNK_CHARS];
     }
 

@@ -10,7 +10,9 @@ export const STORAGE_KEY = "@mrbroccoli/settings";
 export const API_KEY_STORAGE_PREFIX = "mrbroccoli.provider_key";
 
 export type PublicSettings = Omit<Settings, "apiKeys">;
-export type SettingsUpdate = Partial<Omit<Settings, "apiKeys" | "providerModels">>;
+export type SettingsUpdate = Partial<
+  Omit<Settings, "apiKeys" | "providerModels">
+>;
 
 export type LegacyStoredSettings = Omit<
   Partial<Settings>,
@@ -21,7 +23,7 @@ export type LegacyStoredSettings = Omit<
   webSearchMode?: Settings["webSearchMode"] | "auto";
   ttsPlayback?: ReplyPlayback;
   ttsVoice?: string;
-  ttsMode?: Settings["ttsMode"] | "local";
+  ttsMode?: Settings["ttsMode"];
   localTtsVoices?: unknown;
   openaiModel?: string;
   anthropicModel?: string;
@@ -35,10 +37,9 @@ export type LegacyStoredSettings = Omit<
   xaiModel?: string;
 };
 
-export const LEGACY_MODEL_FIELD_KEYS: Partial<Record<
-  Provider,
-  keyof LegacyStoredSettings
->> = {
+export const LEGACY_MODEL_FIELD_KEYS: Partial<
+  Record<Provider, keyof LegacyStoredSettings>
+> = {
   openai: "openaiModel",
   anthropic: "anthropicModel",
   gemini: "geminiModel",

@@ -13,6 +13,7 @@ import type {
 import { buildProviderPickerOptions } from "../../settings-core/providerPickerOptions";
 import { SPEECH_LANGUAGE_OPTIONS } from "../../../constants/speechLanguages";
 import { getTtsListenLanguageLabel } from "../../../constants/localTts";
+import { getLocalModel } from "../../../constants/localModels";
 
 import {
   AntPickerRow,
@@ -112,6 +113,12 @@ export function ListeningSettingsPage({
             label: t("provider"),
             description: t("providerSttDescription"),
           },
+          {
+            value: "local",
+            label: t("settingsOnDevice"),
+            description: t("settingsOnDeviceSummary"),
+            disabled: !settings.localSttModelId,
+          },
         ]}
         value={settings.sttMode}
         onChange={(value) => onUpdate({ sttMode: value })}
@@ -161,11 +168,7 @@ export function ListeningSettingsPage({
         >
           <AntPickerRow
             testID="stt-provider-picker"
-            label={
-              sttProviderOptions.length > 1
-                ? t("provider")
-                : undefined
-            }
+            label={sttProviderOptions.length > 1 ? t("provider") : undefined}
             value={settings.sttProvider ?? ""}
             options={sttProviderOptions}
             disabled={sttProviderOptions.length === 0}
@@ -185,6 +188,22 @@ export function ListeningSettingsPage({
               }
             />
           ) : null}
+        </AntPickerSection>
+      ) : null}
+
+      {settings.sttMode === "local" && settings.localSttModelId ? (
+        <AntPickerSection title={t("onDeviceListeningModels")}>
+          <AntPickerRow
+            label={t("model")}
+            value={settings.localSttModelId}
+            options={[
+              {
+                value: settings.localSttModelId,
+                label: getLocalModel(settings.localSttModelId).name,
+              },
+            ]}
+            onChange={() => undefined}
+          />
         </AntPickerSection>
       ) : null}
     </View>

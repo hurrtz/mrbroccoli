@@ -67,4 +67,45 @@ final class MrBroccoliDiagnostics: NSObject {
       resolve([])
     }
   }
+
+  @objc(getDeviceCapabilities:rejecter:)
+  func getDeviceCapabilities(
+    _ resolve: @escaping RCTPromiseResolveBlock,
+    rejecter reject: @escaping RCTPromiseRejectBlock
+  ) {
+    let processInfo = ProcessInfo.processInfo
+    let thermalState: String
+
+    switch processInfo.thermalState {
+    case .nominal:
+      thermalState = "nominal"
+    case .fair:
+      thermalState = "fair"
+    case .serious:
+      thermalState = "serious"
+    case .critical:
+      thermalState = "critical"
+    @unknown default:
+      thermalState = "unknown"
+    }
+
+    #if arch(arm64)
+      let architecture = "arm64"
+    #elseif arch(x86_64)
+      let architecture = "x86_64"
+    #else
+      let architecture = "unknown"
+    #endif
+
+    resolve([
+      "platform": "ios",
+      "physicalMemoryBytes": Double(processInfo.physicalMemory),
+      "processorCount": processInfo.processorCount,
+      "activeProcessorCount": processInfo.activeProcessorCount,
+      "architecture": architecture,
+      "osVersion": processInfo.operatingSystemVersionString,
+      "lowPowerMode": processInfo.isLowPowerModeEnabled,
+      "thermalState": thermalState,
+    ])
+  }
 }

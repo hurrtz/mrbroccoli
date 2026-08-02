@@ -26,6 +26,7 @@ type OverviewRow = {
     | "settingsThinking"
     | "settingsListening"
     | "settingsSpeaking"
+    | "settingsOnDevice"
     | "settingsSearch"
     | "settingsDataPrivacy"
     | "settingsAppDiagnostics";
@@ -34,6 +35,7 @@ type OverviewRow = {
     | "settingsThinkingSummary"
     | "settingsListeningSummary"
     | "settingsSpeakingSummary"
+    | "settingsOnDeviceSummary"
     | "settingsSearchSummary"
     | "settingsDataPrivacySummary"
     | "settingsAppDiagnosticsSummary";
@@ -64,6 +66,12 @@ const overviewRows: OverviewRow[] = [
     titleKey: "settingsSpeaking",
     summaryKey: "settingsSpeakingSummary",
     icon: "sound",
+  },
+  {
+    page: "local",
+    titleKey: "settingsOnDevice",
+    summaryKey: "settingsOnDeviceSummary",
+    icon: "cpu",
   },
   {
     page: "search",
@@ -214,8 +222,7 @@ export function AntSettingsOverview({
                     {
                       backgroundColor:
                         previousReady && ready ? colors.success : colors.border,
-                      opacity:
-                        usesLargeTextLayout || index === 0 ? 0 : 1,
+                      opacity: usesLargeTextLayout || index === 0 ? 0 : 1,
                     },
                   ]}
                 />

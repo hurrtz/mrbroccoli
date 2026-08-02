@@ -1,8 +1,10 @@
 import type { TranslationDictionary } from "../types";
 import { dataBackupTranslations } from "../dataBackupTranslations";
+import { onDeviceTranslations } from "../onDeviceTranslations";
 
 export const de = {
   ...dataBackupTranslations.de,
+  ...onDeviceTranslations.de,
   appName: "Mr. Brokkoli",
   retry: "Noch mal",
   dismiss: "Schließen",

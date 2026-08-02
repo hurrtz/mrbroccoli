@@ -66,6 +66,7 @@
     "expo-speech": "~57.0.1",
     "expo-speech-recognition": "^56.0.1",
     "expo-status-bar": "~57.0.1",
+    "llama.rn": "^0.12.8",
     "phosphor-react-native": "^3.0.6",
     "react": "19.2.3",
     "react-native": "0.86.2",

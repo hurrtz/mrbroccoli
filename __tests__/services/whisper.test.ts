@@ -14,6 +14,12 @@ jest.mock("../../src/services/whisper/recordedFileReady", () => ({
   waitForRecordedFileReady: jest.fn(() => Promise.resolve()),
 }));
 
+jest.mock("../../src/services/localSpeechModels", () => ({
+  transcribeLocalAudio: jest.fn(),
+}));
+
+import { transcribeLocalAudio } from "../../src/services/localSpeechModels";
+
 const OriginalWebSocket = (globalThis as any).WebSocket;
 
 class MockWebSocket {
@@ -134,6 +140,30 @@ describe("transcribeAudio", () => {
       exists: true,
       size: 8192,
     });
+  });
+
+  it("uses the selected on-device STT model without a provider", async () => {
+    (transcribeLocalAudio as jest.Mock).mockResolvedValue("Lokaler Text");
+    const onModelResolved = jest.fn();
+
+    await expect(
+      transcribeAudio({
+        fileUri: "/tmp/recording.m4a",
+        mode: "local",
+        localModelId: "whisper-tiny",
+        language: "de",
+        speechLanguage: "de",
+        onModelResolved,
+      }),
+    ).resolves.toBe("Lokaler Text");
+    expect(transcribeLocalAudio).toHaveBeenCalledWith(
+      expect.objectContaining({
+        fileUri: "/tmp/recording.m4a",
+        language: "de",
+        modelId: "whisper-tiny",
+      }),
+    );
+    expect(onModelResolved).toHaveBeenCalledWith("whisper-tiny");
   });
 
   it("uses a shorter STT timeout budget for OpenAI than the generic provider default", () => {

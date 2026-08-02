@@ -116,30 +116,30 @@ function renderSettingsModal(
     <ThemeProvider mode="light">
       <LocalizationProvider language={language}>
         <SettingsModal
-            visible
-            settings={DEFAULT_SETTINGS}
-            kokoroModel={kokoroModel}
-            providerVoiceDirectories={{}}
-            onUpdate={jest.fn()}
-            onAddResponseMode={jest.fn()}
-            onRemoveResponseMode={jest.fn()}
-            onUpdateResponseModeRoute={jest.fn()}
-            onUpdateProviderSttModel={jest.fn()}
-            onUpdateProviderTtsModel={jest.fn()}
-            onUpdateProviderTtsVoice={jest.fn()}
-            onUpdateApiKey={jest.fn()}
-            onUpdateProviderValidationResult={jest.fn()}
-            onPreviewVoice={jest.fn(async () => undefined)}
-            onStopPreviewVoice={jest.fn(async () => undefined)}
-            onValidateProviderCapability={jest.fn(async () => undefined)}
-            onCreateAppDataBackup={async () => {
-              throw new Error("Not used in this test.");
-            }}
-            onRestoreAppDataBackup={async () => {
-              throw new Error("Not used in this test.");
-            }}
-            onClose={jest.fn()}
-            {...overrideProps}
+          visible
+          settings={DEFAULT_SETTINGS}
+          kokoroModel={kokoroModel}
+          providerVoiceDirectories={{}}
+          onUpdate={jest.fn()}
+          onAddResponseMode={jest.fn()}
+          onRemoveResponseMode={jest.fn()}
+          onUpdateResponseModeRoute={jest.fn()}
+          onUpdateProviderSttModel={jest.fn()}
+          onUpdateProviderTtsModel={jest.fn()}
+          onUpdateProviderTtsVoice={jest.fn()}
+          onUpdateApiKey={jest.fn()}
+          onUpdateProviderValidationResult={jest.fn()}
+          onPreviewVoice={jest.fn(async () => undefined)}
+          onStopPreviewVoice={jest.fn(async () => undefined)}
+          onValidateProviderCapability={jest.fn(async () => undefined)}
+          onCreateAppDataBackup={async () => {
+            throw new Error("Not used in this test.");
+          }}
+          onRestoreAppDataBackup={async () => {
+            throw new Error("Not used in this test.");
+          }}
+          onClose={jest.fn()}
+          {...overrideProps}
         />
       </LocalizationProvider>
     </ThemeProvider>,
@@ -507,6 +507,7 @@ describe("SettingsModal", () => {
       ttsFallbackPolicy: {
         provider: ["kokoro"],
         kokoro: [],
+        local: [],
       },
     });
   });
@@ -521,6 +522,7 @@ describe("SettingsModal", () => {
         ttsFallbackPolicy: {
           provider: ["kokoro", "native"],
           kokoro: [],
+          local: [],
         },
       },
       onUpdate,
@@ -537,6 +539,7 @@ describe("SettingsModal", () => {
       ttsFallbackPolicy: {
         provider: ["native", "kokoro"],
         kokoro: [],
+        local: [],
       },
     });
   });
@@ -1627,8 +1630,7 @@ describe("SettingsModal", () => {
     expect(
       StyleSheet.flatten(
         screen.getByTestId("phosphor-icon-delete", hiddenIconQuery).props.style,
-      )
-        .color,
+      ).color,
     ).toBe("#DC2626");
 
     fireEvent.press(clearAction);

@@ -11,7 +11,16 @@ interface UseVoiceSessionGuardsParams {
   promptSubmissionBlockMessage?: string | null;
   providerApiKey: string;
   providerLabel: string;
-  settings: Pick<Settings, "spokenRepliesEnabled" | "sttMode" | "ttsMode">;
+  settings: Pick<
+    Settings,
+    | "activeResponseMode"
+    | "localSttModelId"
+    | "localTtsModelId"
+    | "responseModes"
+    | "spokenRepliesEnabled"
+    | "sttMode"
+    | "ttsMode"
+  >;
   showToast: ShowToastFn;
   sttApiKey: string;
   sttProvider: Provider | null;
@@ -36,7 +45,10 @@ export function useVoiceSessionGuards({
   ttsProvider,
 }: UseVoiceSessionGuardsParams) {
   return useCallback(() => {
-    if (!providerApiKey) {
+    const responseRoute = settings.responseModes?.find(
+      (route) => route.id === settings.activeResponseMode,
+    );
+    if (responseRoute?.route.runtime !== "local" && !providerApiKey) {
       showToast(
         t("addProviderKeyToUseProvider", { provider: providerLabel }),
         undefined,
@@ -65,12 +77,26 @@ export function useVoiceSessionGuards({
       return false;
     }
 
+    if (settings.sttMode === "local" && !settings.localSttModelId) {
+      showToast(t("chooseSttBeforeVoiceSession"), undefined, "danger");
+      return false;
+    }
+
     if (
       settings.spokenRepliesEnabled &&
       settings.ttsMode === "provider" &&
       (!ttsProvider ||
         !availableTtsProviders.includes(ttsProvider) ||
         !ttsApiKey)
+    ) {
+      showToast(t("chooseTtsBeforeSpokenReplies"), undefined, "danger");
+      return false;
+    }
+
+    if (
+      settings.spokenRepliesEnabled &&
+      settings.ttsMode === "local" &&
+      !settings.localTtsModelId
     ) {
       showToast(t("chooseTtsBeforeSpokenReplies"), undefined, "danger");
       return false;
@@ -84,9 +110,7 @@ export function useVoiceSessionGuards({
     promptSubmissionBlockMessage,
     providerApiKey,
     providerLabel,
-    settings.sttMode,
-    settings.spokenRepliesEnabled,
-    settings.ttsMode,
+    settings,
     showToast,
     sttApiKey,
     sttProvider,

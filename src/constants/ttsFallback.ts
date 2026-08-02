@@ -1,5 +1,6 @@
 import type {
   KokoroTtsFallbackRoute,
+  LocalTtsFallbackRoute,
   ProviderTtsFallbackRoute,
   TtsBackendMode,
   TtsFallbackPolicy,
@@ -9,11 +10,22 @@ import type {
 export const DEFAULT_TTS_FALLBACK_POLICY: TtsFallbackPolicy = {
   provider: [],
   kokoro: [],
+  local: [],
 };
 
 export const TTS_FALLBACK_OPTIONS = {
-  provider: ["kokoro", "native"] as const satisfies readonly ProviderTtsFallbackRoute[],
-  kokoro: ["provider", "native"] as const satisfies readonly KokoroTtsFallbackRoute[],
+  provider: [
+    "kokoro",
+    "native",
+  ] as const satisfies readonly ProviderTtsFallbackRoute[],
+  kokoro: [
+    "provider",
+    "native",
+  ] as const satisfies readonly KokoroTtsFallbackRoute[],
+  local: [
+    "provider",
+    "native",
+  ] as const satisfies readonly LocalTtsFallbackRoute[],
 };
 
 export function getTtsFallbackRoutes(
@@ -23,19 +35,19 @@ export function getTtsFallbackRoutes(
   return primaryMode === "native" ? [] : [...policy[primaryMode]];
 }
 
-export function normalizeTtsFallbackPolicy(
-  value: unknown,
-): TtsFallbackPolicy {
+export function normalizeTtsFallbackPolicy(value: unknown): TtsFallbackPolicy {
   if (!value || typeof value !== "object") {
     return {
       provider: [],
       kokoro: [],
+      local: [],
     };
   }
 
   const candidate = value as {
     provider?: unknown;
     kokoro?: unknown;
+    local?: unknown;
   };
   const normalizeRoutes = <T extends TtsFallbackRoute>(
     routes: unknown,
@@ -48,10 +60,7 @@ export function normalizeTtsFallbackPolicy(
     const normalized: T[] = [];
 
     for (const route of routes) {
-      if (
-        allowed.includes(route as T) &&
-        !normalized.includes(route as T)
-      ) {
+      if (allowed.includes(route as T) && !normalized.includes(route as T)) {
         normalized.push(route as T);
       }
     }
@@ -60,7 +69,11 @@ export function normalizeTtsFallbackPolicy(
   };
 
   return {
-    provider: normalizeRoutes(candidate.provider, TTS_FALLBACK_OPTIONS.provider),
+    provider: normalizeRoutes(
+      candidate.provider,
+      TTS_FALLBACK_OPTIONS.provider,
+    ),
     kokoro: normalizeRoutes(candidate.kokoro, TTS_FALLBACK_OPTIONS.kokoro),
+    local: normalizeRoutes(candidate.local, TTS_FALLBACK_OPTIONS.local),
   };
 }

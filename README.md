@@ -10,7 +10,8 @@ store notes.
 ## Highlights
 
 - Voice-first interaction with live recording and playback states
-- Optional Kokoro neural speech synthesis running entirely on-device
+- Guided on-device catalogue with device checks, verified downloads, benchmarks,
+  and local Qwen, Whisper, Kokoro, and Piper routes
 - User-managed API keys stored securely on device with `expo-secure-store`
 - Multi-provider support with branded provider selection
 - Optional OpenRouter gateway onboarding alongside direct provider keys
@@ -41,24 +42,32 @@ Kimi K3 remains available through OpenRouter.
 
 Voice input and spoken replies are not tied to any single provider:
 
-- Speech-to-text prefers the device's native system recognizer, with capability-gated provider STT from OpenAI, Gemini, Mistral, xAI, Qwen, and ElevenLabs as alternatives. The Gemini API key covers chat, recorded-audio transcription, web search, and speech synthesis.
-- Text-to-speech uses the device's native voices by default. An optional Kokoro model provides substantially more natural on-device English and Simplified Chinese speech, while capability-gated provider TTS from OpenAI, Gemini, xAI, Qwen, Mistral, and ElevenLabs remains available.
+- Speech-to-text prefers the device's native system recognizer. Downloadable
+  Whisper Tiny runs locally, while OpenAI, Gemini, Mistral, xAI, Qwen, and
+  ElevenLabs remain available as capability-gated provider alternatives.
+- Text-to-speech uses the device's native voices by default. Downloadable Kokoro
+  and language-specific Piper voices run locally, while OpenAI, Gemini, xAI,
+  Qwen, Mistral, and ElevenLabs remain available as provider alternatives.
+- Downloadable Qwen3 0.6B and 1.7B models are normal response modes. Their turns
+  do not use provider credentials, conversation summarization, or web search.
 - Mistral, xAI, and ElevenLabs account voices are discovered automatically and can be refreshed from Speaking settings. ElevenLabs falls back to a built-in premade voice when a restricted key cannot read account voices.
 
 Every interface locale is also an official speech language: English, German,
 Ukrainian, Hindi, Spanish, French, Italian, European and Brazilian Portuguese,
 Russian, Simplified Chinese, Arabic, Japanese, Hungarian, Czech, Polish,
 Turkish, Swedish, and Urdu. Interface, recognition, and spoken-reply languages
-are configured independently. Provider compatibility is checked before each
-route is used; native availability depends on the voices and recognizers
+are configured independently for system and provider routes. The on-device
+catalogue uses one shared conversation-language choice and offers only models
+that cover every selected language. Provider compatibility is checked before
+each route is used; native availability depends on the voices and recognizers
 installed by the operating system.
 
-The Kokoro model is downloaded only when the user opts in (about 140 MiB
-downloaded and 211 MiB installed). It is not bundled in the initial app
-download. TTS fallbacks are opt-in: provider speech can fall back to Kokoro,
-the system voice, or both in the chosen order; Kokoro can likewise fall back
-to a configured provider, the system voice, or both. System speech has no
-fallback route.
+Local models are downloaded only after the user opts in and are never bundled
+in the initial app download or app-data backups. The app probes each phone's
+memory, storage, architecture, operating system, and current device state,
+excludes impossible choices, verifies pinned artifacts, and requires an
+on-device benchmark before a model can be selected. TTS fallbacks remain
+explicit and ordered; system speech has no fallback route.
 
 OpenRouter is an optional LLM gateway: one key exposes a curated cross-provider model set while direct provider connections remain available. Requests routed through it are labeled separately from direct routes.
 
@@ -181,7 +190,8 @@ __tests__/              Focused hook and service tests
 ## Notes
 
 - Home screen icons and launcher assets require a new native build. OTA updates alone will not change them.
-- Kokoro and its Sherpa/ONNX runtime require a native rebuild; adding only an OTA update is not sufficient.
+- Sherpa/ONNX and llama.rn runtime changes require a native rebuild; adding only
+  an OTA update is not sufficient.
 - The iOS bundle identifier is `com.tobiaswinkler.app.mrbroccoli`.
 - The Android application ID and namespace are `com.tobiaswinkler.app.mrbroccoli`.
 - The Expo slug and on-device persistence keys use the `mrbroccoli` namespace.
@@ -195,8 +205,8 @@ the generated notices are collected in
 terms and distribution boundaries are documented in
 [docs/licensing-and-provider-terms.md](docs/licensing-and-provider-terms.md).
 
-The optional `kokoro-int8-multi-lang-v1_1` model is Apache-2.0 licensed and
-includes its license in the downloaded archive. The React Native wrapper is
-MIT licensed; its Sherpa/ONNX native dependencies retain their respective
+Optional model licenses are displayed in the on-device catalogue; licenses and
+sources are recorded in the provider-terms review. The llama.rn and Sherpa
+wrappers are MIT licensed; their native dependencies retain their respective
 third-party licenses. Sherpa's unused FFmpeg runtime is excluded from Android
 and iOS builds.

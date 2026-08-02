@@ -7,10 +7,7 @@ import {
   DEFAULT_SETTINGS,
   DEFAULT_ASSISTANT_INSTRUCTIONS_BY_LANGUAGE,
 } from "../../src/types";
-import {
-  APP_LANGUAGES,
-  getAppLocale,
-} from "../../src/i18n/localeRegistry";
+import { APP_LANGUAGES, getAppLocale } from "../../src/i18n/localeRegistry";
 import {
   deriveResponseModesForProvider,
   getAvailableResponseModes,
@@ -164,8 +161,7 @@ describe("useSettings", () => {
       ulraModeEnabled: DEFAULT_SETTINGS.ulraModeEnabled,
       ulraModeActive: DEFAULT_SETTINGS.ulraModeActive,
       ulraModeRounds: DEFAULT_SETTINGS.ulraModeRounds,
-      ulraModeWarningAcknowledged:
-        DEFAULT_SETTINGS.ulraModeWarningAcknowledged,
+      ulraModeWarningAcknowledged: DEFAULT_SETTINGS.ulraModeWarningAcknowledged,
       ttsListenLanguages: ["fr"],
     });
   });
@@ -943,9 +939,7 @@ describe("useSettings", () => {
 
   it("migrates legacy settings to no implicit TTS fallbacks", async () => {
     const stored = { ...DEFAULT_SETTINGS };
-    delete (
-      stored as Partial<typeof DEFAULT_SETTINGS>
-    ).ttsFallbackPolicy;
+    delete (stored as Partial<typeof DEFAULT_SETTINGS>).ttsFallbackPolicy;
 
     (AsyncStorage.getItem as jest.Mock).mockResolvedValueOnce(
       JSON.stringify(stored),
@@ -957,6 +951,7 @@ describe("useSettings", () => {
     expect(result.current.settings.ttsFallbackPolicy).toEqual({
       provider: [],
       kokoro: [],
+      local: [],
     });
   });
 
@@ -977,7 +972,66 @@ describe("useSettings", () => {
     expect(result.current.settings.ttsFallbackPolicy).toEqual({
       provider: ["native", "kokoro"],
       kokoro: ["provider", "native"],
+      local: [],
     });
+  });
+
+  it("restores validated local model routes and speech selections", async () => {
+    (AsyncStorage.getItem as jest.Mock).mockResolvedValueOnce(
+      JSON.stringify({
+        ...DEFAULT_SETTINGS,
+        activeResponseMode: "mode-1",
+        responseModes: [
+          {
+            id: "mode-1",
+            route: {
+              runtime: "local",
+              localModelId: "qwen3-0.6b-q8",
+              provider: "openai",
+              model: "stale display name",
+            },
+          },
+        ],
+        localLanguages: ["de"],
+        sttMode: "local",
+        localSttModelId: "whisper-tiny",
+        ttsMode: "local",
+        localTtsModelId: "piper-de-de-thorsten",
+      }),
+    );
+
+    const { result } = renderHook(() => useSettings());
+    await flushSettingsLoad();
+
+    expect(result.current.settings.responseModes[0].route).toEqual({
+      runtime: "local",
+      localModelId: "qwen3-0.6b-q8",
+      provider: "openai",
+      model: "Qwen3 0.6B",
+    });
+    expect(result.current.settings.localLanguages).toEqual(["de"]);
+    expect(result.current.settings.sttMode).toBe("local");
+    expect(result.current.settings.localSttModelId).toBe("whisper-tiny");
+    expect(result.current.settings.ttsMode).toBe("local");
+    expect(result.current.settings.localTtsModelId).toBe(
+      "piper-de-de-thorsten",
+    );
+  });
+
+  it("does not retain local STT mode without a valid downloaded-model selection", async () => {
+    (AsyncStorage.getItem as jest.Mock).mockResolvedValueOnce(
+      JSON.stringify({
+        ...DEFAULT_SETTINGS,
+        sttMode: "local",
+        localSttModelId: "piper-de-de-thorsten",
+      }),
+    );
+
+    const { result } = renderHook(() => useSettings());
+    await flushSettingsLoad();
+
+    expect(result.current.settings.sttMode).toBe("native");
+    expect(result.current.settings.localSttModelId).toBeNull();
   });
 
   it("persists provider api keys in SecureStore", async () => {
@@ -1033,30 +1087,18 @@ describe("useSettings", () => {
     await flushSettingsLoad();
 
     act(() => {
-      firstRun.result.current.updateProviderValidationResult(
-        "mistral",
-        "llm",
-        {
-          status: "success",
-          model: "mistral-large-latest",
-        },
-      );
-      firstRun.result.current.updateProviderValidationResult(
-        "mistral",
-        "stt",
-        {
-          status: "success",
-          model: "voxtral-mini-latest",
-        },
-      );
-      firstRun.result.current.updateProviderValidationResult(
-        "mistral",
-        "tts",
-        {
-          status: "success",
-          model: "voxtral-tts-latest",
-        },
-      );
+      firstRun.result.current.updateProviderValidationResult("mistral", "llm", {
+        status: "success",
+        model: "mistral-large-latest",
+      });
+      firstRun.result.current.updateProviderValidationResult("mistral", "stt", {
+        status: "success",
+        model: "voxtral-mini-latest",
+      });
+      firstRun.result.current.updateProviderValidationResult("mistral", "tts", {
+        status: "success",
+        model: "voxtral-tts-latest",
+      });
       firstRun.result.current.updateProviderValidationResult(
         "mistral",
         "search",
@@ -1114,8 +1156,9 @@ describe("useSettings", () => {
     const restarted = renderHook(() => useSettings());
     await flushSettingsLoad();
 
-    expect(restarted.result.current.settings.providerValidationResults.mistral)
-      .toEqual(persisted.providerValidationResults.mistral);
+    expect(
+      restarted.result.current.settings.providerValidationResults.mistral,
+    ).toEqual(persisted.providerValidationResults.mistral);
   });
 
   it("invalidates a failed validation when its key changes", async () => {

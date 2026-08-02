@@ -23,6 +23,8 @@ import {
 } from "./whisper/providers";
 import { getProviderModelCandidates } from "./providerModelCandidates";
 import { executeProviderModelRequest } from "./providerResilience";
+import type { LocalSttModelId } from "../constants/localModels";
+import { transcribeLocalAudio } from "./localSpeechModels";
 
 function isRemoteAudioSource(fileUri: string) {
   return /^(https?:\/\/|oss:\/\/)/i.test(fileUri);
@@ -70,6 +72,7 @@ export async function transcribeAudio(params: {
   mode: SttBackendMode;
   provider?: Provider | null;
   providerModel?: string;
+  localModelId?: LocalSttModelId | null;
   apiKey?: string;
   language: AppLanguage;
   speechLanguage?: SttLanguage;
@@ -81,6 +84,7 @@ export async function transcribeAudio(params: {
     mode,
     provider,
     providerModel,
+    localModelId,
     apiKey,
     language,
     speechLanguage = "auto",
@@ -90,6 +94,23 @@ export async function transcribeAudio(params: {
 
   if (mode === "native") {
     throw new Error(translate(language, "nativeSttHandledInApp"));
+  }
+
+  if (mode === "local") {
+    if (!localModelId) {
+      throw new Error(translate(language, "chooseOnDeviceSttModel"));
+    }
+    if (!isRemoteAudioSource(fileUri)) {
+      await waitForRecordedFileReady(fileUri, language, abortSignal);
+    }
+    const result = await transcribeLocalAudio({
+      fileUri,
+      modelId: localModelId,
+      language: speechLanguage,
+      abortSignal,
+    });
+    onModelResolved?.(localModelId);
+    return result;
   }
 
   if (!provider) {

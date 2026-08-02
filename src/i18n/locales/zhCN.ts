@@ -1,8 +1,10 @@
 import type { TranslationDictionary } from "../types";
 import { dataBackupTranslations } from "../dataBackupTranslations";
+import { onDeviceTranslations } from "../onDeviceTranslations";
 
 export const zhCN = {
   ...dataBackupTranslations.zhCN,
+  ...onDeviceTranslations["zh-CN"],
   appName: "西兰花先生",
   retry: "重试",
   dismiss: "关闭",

@@ -1,7 +1,4 @@
-import type {
-  SpeechLanguage,
-  TtsBackendMode,
-} from "../../../types";
+import type { SpeechLanguage, TtsBackendMode } from "../../../types";
 import type {
   SpeechDiagnosticSource,
   SpeechDiagnosticsContext,
@@ -22,6 +19,7 @@ export interface CreateVoicePipelineTtsQueueParams {
   ttsListenLanguages?: RunVoicePipelineParams["ttsListenLanguages"];
   ttsMode: RunVoicePipelineParams["ttsMode"];
   ttsModel?: string;
+  localTtsModelId?: RunVoicePipelineParams["localTtsModelId"];
   ttsProvider?: RunVoicePipelineParams["ttsProvider"];
   ttsVoice: string;
   ttsInstructions?: string;
@@ -34,7 +32,7 @@ export type AudioDiagnostics = NonNullable<
 export type TtsSynthesisResult =
   | {
       kind: "audio";
-      route: "kokoro" | "provider";
+      route: "kokoro" | "local" | "provider";
       audio: string;
       diagnostics: AudioDiagnostics;
     }

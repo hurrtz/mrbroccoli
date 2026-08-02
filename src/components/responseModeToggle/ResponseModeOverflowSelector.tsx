@@ -14,6 +14,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { APP_MODAL_ORIENTATIONS } from "../../constants/layout";
 import { PROVIDER_LABELS, getProviderModelName } from "../../constants/models";
+import { getLocalModel } from "../../constants/localModels";
 import { useLocalization } from "../../i18n";
 import { useTheme } from "../../theme/ThemeContext";
 import {
@@ -111,10 +112,15 @@ function ResponseModeOverflowOption({
   const { colors } = useTheme();
   const { language, t } = useLocalization();
   const active = item.id === selected;
-  const modelLabel = getProviderModelName(
-    item.route.provider,
-    item.route.model,
-  );
+  const local =
+    item.route.runtime === "local" && Boolean(item.route.localModelId);
+  const modelLabel =
+    local && item.route.localModelId
+      ? getLocalModel(item.route.localModelId).name
+      : getProviderModelName(item.route.provider, item.route.model);
+  const routeLabel = local
+    ? t("settingsOnDevice")
+    : PROVIDER_LABELS[item.route.provider];
   const effortLabel =
     getResponseModeRouteEffortLabel(item.route, language) ?? t("fixed");
 
@@ -122,7 +128,7 @@ function ResponseModeOverflowOption({
     <Pressable
       testID={`response-mode-overflow-option-${item.id}`}
       accessibilityLabel={t("useResponseMode", {
-        mode: `${PROVIDER_LABELS[item.route.provider]}. ${modelLabel}`,
+        mode: `${routeLabel}. ${modelLabel}`,
       })}
       accessibilityRole="button"
       accessibilityState={{ disabled: !ready, selected: active }}
@@ -138,11 +144,19 @@ function ResponseModeOverflowOption({
       ]}
     >
       <View style={styles.overflowOptionProvider}>
-        <ProviderIcon
-          provider={item.route.provider}
-          color={active ? colors.accent : colors.textSecondary}
-          size="feature"
-        />
+        {local ? (
+          <PhosphorIcon
+            name="cpu"
+            color={active ? colors.accent : colors.textSecondary}
+            size="feature"
+          />
+        ) : (
+          <ProviderIcon
+            provider={item.route.provider}
+            color={active ? colors.accent : colors.textSecondary}
+            size="feature"
+          />
+        )}
       </View>
       <View style={styles.overflowOptionModel}>
         <Text
@@ -151,7 +165,7 @@ function ResponseModeOverflowOption({
             { color: colors.textSecondary },
           ]}
         >
-          {PROVIDER_LABELS[item.route.provider]}
+          {routeLabel}
         </Text>
         <Text style={[styles.overflowOptionModelName, { color: colors.text }]}>
           {modelLabel}
@@ -220,10 +234,13 @@ export function ResponseModeOverflowSelector({
     return null;
   }
 
-  const activeModelLabel = getProviderModelName(
-    activeMode.route.provider,
-    activeMode.route.model,
-  );
+  const activeLocal =
+    activeMode.route.runtime === "local" &&
+    Boolean(activeMode.route.localModelId);
+  const activeModelLabel =
+    activeLocal && activeMode.route.localModelId
+      ? getLocalModel(activeMode.route.localModelId).name
+      : getProviderModelName(activeMode.route.provider, activeMode.route.model);
   const activeCompactLabel = getResponseModeCardModelLabels(
     activeMode.route.provider,
     activeModelLabel,
@@ -254,11 +271,19 @@ export function ResponseModeOverflowSelector({
             compact ? styles.overflowSelectorProviderCompact : null,
           ]}
         >
-          <ProviderIcon
-            provider={activeMode.route.provider}
-            color={colors.textSecondary}
-            size={compact ? "feature" : "hero"}
-          />
+          {activeLocal ? (
+            <PhosphorIcon
+              name="cpu"
+              color={colors.textSecondary}
+              size={compact ? "feature" : "hero"}
+            />
+          ) : (
+            <ProviderIcon
+              provider={activeMode.route.provider}
+              color={colors.textSecondary}
+              size={compact ? "feature" : "hero"}
+            />
+          )}
         </View>
         <View style={styles.overflowSelectorModel}>
           <Text
