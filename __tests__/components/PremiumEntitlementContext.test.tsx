@@ -6,7 +6,6 @@ import * as SecureStore from "expo-secure-store";
 import { PREMIUM_PRODUCT_ID } from "../../src/constants/premium";
 import {
   PremiumEntitlementProvider,
-  shouldBypassPremiumEntitlement,
   usePremiumEntitlement,
 } from "../../src/context/PremiumEntitlementContext";
 import { cachePremiumEntitlement } from "../../src/services/premiumEntitlement";
@@ -105,12 +104,6 @@ describe("PremiumEntitlementProvider", () => {
     mockReconnect.mockResolvedValue(true);
     mockRequestPurchase.mockResolvedValue(null);
     mockRestorePurchases.mockResolvedValue(undefined);
-  });
-
-  it("bypasses Premium only for local Debug builds outside Jest", () => {
-    expect(shouldBypassPremiumEntitlement(true, "development")).toBe(true);
-    expect(shouldBypassPremiumEntitlement(false, "production")).toBe(false);
-    expect(shouldBypassPremiumEntitlement(true, "test")).toBe(false);
   });
 
   it("keeps a cached entitlement when the store is temporarily unavailable", async () => {

@@ -25,6 +25,9 @@ const iosStoreKitConfiguration = JSON.parse(
   readText("ios/MrBroccoli/MrBroccoli.storekit"),
 );
 const premiumConstants = readText("src/constants/premium.ts");
+const premiumEntitlementContext = readText(
+  "src/context/PremiumEntitlementContext.tsx",
+);
 const premiumProductId = premiumConstants.match(
   /PREMIUM_PRODUCT_ID\s*=\s*\n?\s*"([^"]+)"/,
 )?.[1];
@@ -33,9 +36,6 @@ const androidGradleProperties = readText("android/gradle.properties");
 const androidProguardRules = readText("android/app/proguard-rules.pro");
 const androidManifest = readText(
   "android/app/src/main/AndroidManifest.xml",
-);
-const androidDebugManifest = readText(
-  "android/app/src/debug/AndroidManifest.xml",
 );
 const imagePickerPlugin = appConfig.plugins?.find(
   (plugin) => Array.isArray(plugin) && plugin[0] === "expo-image-picker",
@@ -75,6 +75,13 @@ function assertIncludes(label, source, expected) {
   checkCount += 1;
   if (!source.includes(expected)) {
     failures.push(`${label}: expected ${JSON.stringify(expected)}`);
+  }
+}
+
+function assertExcludes(label, source, unexpected) {
+  checkCount += 1;
+  if (source.includes(unexpected)) {
+    failures.push(`${label}: did not expect ${JSON.stringify(unexpected)}`);
   }
 }
 
@@ -150,15 +157,20 @@ assertIncludes(
   androidManifest,
   '<uses-permission android:name="android.permission.CAMERA"/>',
 );
-assertIncludes(
-  "Android Debug package isolation",
+assertExcludes(
+  "Android Debug package remains Play Billing compatible",
   androidBuild,
-  "applicationIdSuffix '.debug'",
+  "applicationIdSuffix",
 );
-assertIncludes(
-  "Android Debug app label",
-  androidDebugManifest,
-  'android:label="Mr Broccoli Debug"',
+assertExcludes(
+  "Premium entitlement does not depend on __DEV__",
+  premiumEntitlementContext,
+  "__DEV__",
+);
+assertExcludes(
+  "Premium entitlement does not depend on NODE_ENV",
+  premiumEntitlementContext,
+  "NODE_ENV",
 );
 const iosDeploymentTargets = [
   ...iosProject.matchAll(/IPHONEOS_DEPLOYMENT_TARGET = ([^;]+);/g),
