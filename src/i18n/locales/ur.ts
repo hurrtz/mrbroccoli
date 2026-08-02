@@ -3,12 +3,14 @@ import { dataBackupTranslations } from "../dataBackupTranslations";
 import { conversationKnowledgeTranslations } from "../conversationKnowledgeTranslations";
 import { imagePromptTranslations } from "../imagePromptTranslations";
 import { onDeviceTranslations } from "../onDeviceTranslations";
+import { premiumTranslations } from "../premiumTranslations";
 
 export const ur = {
   ...dataBackupTranslations.ur,
   ...conversationKnowledgeTranslations.ur,
   ...imagePromptTranslations.ur,
   ...onDeviceTranslations.ur,
+  ...premiumTranslations.ur,
   appName: "مسٹر بروکلی",
   retry: "دوبارہ کوشش کریں۔",
   dismiss: "بند کریں",

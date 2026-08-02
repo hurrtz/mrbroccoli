@@ -12,7 +12,10 @@ import {
 import { useTheme } from "../../theme/ThemeContext";
 import { fonts } from "../../theme/typography";
 import type { SettingsReadiness } from "../settings-core/readiness";
-import type { SettingsPage } from "../settings-core/types";
+import {
+  isPremiumSettingsPage,
+  type SettingsPage,
+} from "../settings-core/types";
 
 import { AntSettingsCard } from "./AntSettingsPrimitives";
 import { styles } from "./styles";
@@ -95,12 +98,16 @@ const overviewRows: OverviewRow[] = [
 
 export function AntSettingsOverview({
   readiness,
+  isPremium,
   onOpenPage,
   onOpenSetupGuide,
+  onOpenPremium,
 }: {
   readiness: SettingsReadiness;
+  isPremium: boolean;
   onOpenPage: (page: DrillInSettingsPage) => void;
   onOpenSetupGuide?: () => void;
+  onOpenPremium: () => void;
 }) {
   const { colors } = useTheme();
   const { isRtl, t } = useLocalization();
@@ -136,6 +143,38 @@ export function AntSettingsOverview({
 
   return (
     <View testID="settings-page-overview" style={styles.overview}>
+      {!isPremium ? (
+        <Pressable
+          testID="settings-premium-upgrade"
+          onPress={onOpenPremium}
+          accessibilityRole="button"
+          accessibilityLabel={t("upgradeToPremium")}
+          style={({ pressed }) => (pressed ? styles.pressedControl : undefined)}
+        >
+          <AntSettingsCard
+            style={{
+              backgroundColor: colors.accentSoft,
+              borderColor: colors.accent,
+            }}
+          >
+            <View style={styles.setupCardBody}>
+              <View style={styles.setupCopy}>
+                <Text
+                  style={[styles.setupTitle, { color: colors.text }]}
+                >
+                  {t("upgradeToPremium")}
+                </Text>
+                <Text
+                  style={[styles.setupSummary, { color: colors.textSecondary }]}
+                >
+                  {t("premiumDescription")}
+                </Text>
+              </View>
+              <PhosphorIcon name="lock" size="control" color={colors.accent} />
+            </View>
+          </AntSettingsCard>
+        </Pressable>
+      ) : null}
       {onOpenSetupGuide ? (
         <Pressable
           testID="settings-guided-setup"
@@ -174,7 +213,7 @@ export function AntSettingsOverview({
         </Pressable>
       ) : null}
 
-      <View
+      {isPremium ? <View
         testID="settings-readiness-grid"
         style={[
           styles.readinessGrid,
@@ -284,10 +323,12 @@ export function AntSettingsOverview({
             </Pressable>
           );
         })}
-      </View>
+      </View> : null}
 
       <View style={styles.sectionCards}>
-        {overviewRows.map((row) => (
+        {overviewRows.map((row) => {
+          const locked = !isPremium && isPremiumSettingsPage(row.page);
+          return (
           <AntSettingsCard
             key={row.page}
             contentStyle={styles.fullBleedCardContent}
@@ -310,12 +351,12 @@ export function AntSettingsOverview({
               }
               extra={
                 <PhosphorIcon
-                  name={drillInIcon}
+                  name={locked ? "lock" : drillInIcon}
                   size="control"
                   color={colors.textMuted}
                 />
               }
-              onPress={() => onOpenPage(row.page)}
+              onPress={() => (locked ? onOpenPremium() : onOpenPage(row.page))}
               accessibilityRole="button"
               accessibilityLabel={t("settingsOpenSection", {
                 section: t(row.titleKey),
@@ -353,7 +394,8 @@ export function AntSettingsOverview({
               </List.Item.Brief>
             </List.Item>
           </AntSettingsCard>
-        ))}
+          );
+        })}
       </View>
 
       <Text

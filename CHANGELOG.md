@@ -10,6 +10,33 @@ the complete Play Store translations are kept in a dedicated file under
 
 ## Unreleased
 
+### Added
+
+- Add a zero-account Free experience that selects, downloads, verifies, and
+  benchmarks one complete on-device listening, thinking, and speaking setup
+  for the user's languages and phone. Once installed, Free conversations and
+  session history run without provider keys or network inference.
+- Add a permanent Premium unlock through App Store and Play Store billing,
+  including localized store pricing, offline entitlement caching, automatic
+  same-platform ownership reconciliation, and an explicit restore action.
+
+### Changed
+
+- Keep cloud providers, response-mode configuration, web search, images,
+  Drive and Uber modes, cross-session knowledge, portable archive sync, and
+  advanced controls behind Premium while preserving the user's configuration
+  across Free and Premium transitions.
+
+### Fixed
+
+- Reuse suitable models already installed on the device when building the Free
+  profile, avoid models that failed a current-device benchmark when an
+  alternative exists, and keep setup open until all three local routes pass.
+- Stop portable conversation archive sync and provider-backed title generation
+  from crossing the Free offline boundary, discard delayed image-picker results
+  after image access is locked, and release local benchmark resources after
+  failures.
+
 ## 2.8.0 - 2026-08-02
 
 ### Added

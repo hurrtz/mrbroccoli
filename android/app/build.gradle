@@ -99,6 +99,7 @@ android {
 
     namespace 'com.tobiaswinkler.app.mrbroccoli'
     defaultConfig {
+        missingDimensionStrategy "platform", "play"
         applicationId 'com.tobiaswinkler.app.mrbroccoli'
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
@@ -219,6 +220,7 @@ tasks.configureEach { task ->
 }
 
 dependencies {
+    implementation "io.github.hyochan.openiap:openiap-google:3.0.0"
     // The version of react-native is set by the React Native Gradle Plugin
     implementation("com.facebook.react:react-android")
     implementation("com.google.android.material:material:1.14.0")

@@ -29,6 +29,7 @@ export interface ConversationArchiveController {
 }
 
 export function useConversationArchive(params: {
+  enabled: boolean;
   activeConversationId: string | null;
   conversationMetas: ConversationsApi["conversations"];
   conversationsLoaded: boolean;
@@ -80,7 +81,11 @@ export function useConversationArchive(params: {
   }, [setConfig]);
 
   const syncNow = React.useCallback(async () => {
-    if (!configRef.current || !paramsRef.current.conversationsLoaded) {
+    if (
+      !paramsRef.current.enabled ||
+      !configRef.current ||
+      !paramsRef.current.conversationsLoaded
+    ) {
       return;
     }
     if (syncingRef.current) {
@@ -134,7 +139,11 @@ export function useConversationArchive(params: {
   }, [setConfig]);
 
   const chooseDirectory = React.useCallback(async () => {
-    if (syncingRef.current || choosingRef.current) {
+    if (
+      !paramsRef.current.enabled ||
+      syncingRef.current ||
+      choosingRef.current
+    ) {
       return;
     }
     choosingRef.current = true;
@@ -196,7 +205,12 @@ export function useConversationArchive(params: {
   const configuredDirectoryUri = config?.directoryUri;
 
   React.useEffect(() => {
-    if (!loaded || !configuredDirectoryUri || !params.conversationsLoaded) {
+    if (
+      !params.enabled ||
+      !loaded ||
+      !configuredDirectoryUri ||
+      !params.conversationsLoaded
+    ) {
       return;
     }
     const timeout = setTimeout(() => {
@@ -208,6 +222,7 @@ export function useConversationArchive(params: {
     fingerprint,
     loaded,
     params.conversationsLoaded,
+    params.enabled,
     syncNow,
   ]);
 

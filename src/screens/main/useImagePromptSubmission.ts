@@ -44,6 +44,7 @@ function getContextualMessages(conversation: Conversation | null) {
 
 export function useImagePromptSubmission(params: {
   activeConversation: Conversation | null;
+  imagesEnabled: boolean;
   imageRoutes: ImagePromptRoute[];
   onAddImage: () => void;
   pendingAttachments: MessageImageAttachment[];
@@ -57,20 +58,24 @@ export function useImagePromptSubmission(params: {
 }) {
   const unsupportedRoute = useMemo(
     () =>
-      params.imageRoutes.find(
-        (route) => !modelSupportsImageInput(route.provider, route.model),
-      ) ?? null,
-    [params.imageRoutes],
+      !params.imagesEnabled
+        ? null
+        : (params.imageRoutes.find(
+            (route) => !modelSupportsImageInput(route.provider, route.model),
+          ) ?? null),
+    [params.imageRoutes, params.imagesEnabled],
   );
   const contextualMessages = useMemo(
     () => getContextualMessages(params.activeConversation),
     [params.activeConversation],
   );
-  const hasConversationImages = Boolean(
-    contextualMessages.some(
-      (message) => (message.attachments?.length ?? 0) > 0,
-    ),
-  );
+  const hasConversationImages =
+    params.imagesEnabled &&
+    Boolean(
+      contextualMessages.some(
+        (message) => (message.attachments?.length ?? 0) > 0,
+      ),
+    );
   const imageInputBlockMessage =
     unsupportedRoute &&
     (params.pendingAttachments.length > 0 || hasConversationImages)
@@ -81,6 +86,9 @@ export function useImagePromptSubmission(params: {
       : null;
 
   const handleAddImage = useCallback(() => {
+    if (!params.imagesEnabled) {
+      return;
+    }
     if (unsupportedRoute) {
       params.showToast(
         params.t("imageInputUnsupported", {
@@ -101,12 +109,14 @@ export function useImagePromptSubmission(params: {
       const contextualMessageIds = new Set(
         contextualMessages.map((message) => message.id),
       );
-      const allAttachments = [
-        ...contextualMessages.flatMap(
-          (message) => message.attachments ?? [],
-        ),
-        ...(request.attachments ?? []),
-      ];
+      const allAttachments = params.imagesEnabled
+        ? [
+            ...contextualMessages.flatMap(
+              (message) => message.attachments ?? [],
+            ),
+            ...(request.attachments ?? []),
+          ]
+        : [];
       if (allAttachments.length === 0) {
         await params.runVoiceCapture(request);
         return;
@@ -136,8 +146,7 @@ export function useImagePromptSubmission(params: {
       );
       const hasNewRecipient = allAttachments.some((attachment) =>
         recipientProviders.some(
-          (recipient) =>
-            !attachment.sharedWithProviders.includes(recipient),
+          (recipient) => !attachment.sharedWithProviders.includes(recipient),
         ),
       );
 

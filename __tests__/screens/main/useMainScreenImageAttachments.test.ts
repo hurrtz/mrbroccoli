@@ -50,7 +50,9 @@ describe("useMainScreenImageAttachments", () => {
     });
     await waitFor(() => expect(result.current.attachments).toHaveLength(1));
 
-    expect(ImagePicker.requestMediaLibraryPermissionsAsync).not.toHaveBeenCalled();
+    expect(
+      ImagePicker.requestMediaLibraryPermissionsAsync,
+    ).not.toHaveBeenCalled();
     expect(ImagePicker.launchImageLibraryAsync).toHaveBeenCalledWith(
       expect.objectContaining({
         allowsMultipleSelection: true,
@@ -70,5 +72,42 @@ describe("useMainScreenImageAttachments", () => {
       "file:///documents/message-images/mock-image-uuid.jpg",
       { idempotent: true },
     );
+  });
+
+  it("discards a pending picker result when image access becomes disabled", async () => {
+    let resolvePending: (value: ImagePicker.ImagePickerResult) => void = () =>
+      undefined;
+    jest.mocked(ImagePicker.getPendingResultAsync).mockReturnValueOnce(
+      new Promise((resolve) => {
+        resolvePending = resolve;
+      }),
+    );
+    const props = {
+      disabled: false,
+      showError: jest.fn(),
+      t,
+    };
+    const { result, rerender } = renderHook(
+      ({ disabled }) => useMainScreenImageAttachments({ ...props, disabled }),
+      { initialProps: { disabled: false } },
+    );
+
+    rerender({ disabled: true });
+    await act(async () => {
+      resolvePending({
+        canceled: false,
+        assets: [
+          {
+            uri: "file:///picker/pending.jpg",
+            width: 800,
+            height: 600,
+            type: "image",
+            mimeType: "image/jpeg",
+          },
+        ],
+      });
+    });
+
+    expect(result.current.attachments).toEqual([]);
   });
 });

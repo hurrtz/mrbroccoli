@@ -4,7 +4,11 @@ import { Animated, Modal, Platform, useWindowDimensions } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { getSettingsReadiness } from "../settings-core/readiness";
-import type { SettingsModalProps, SettingsPage } from "../settings-core/types";
+import {
+  isPremiumSettingsPage,
+  type SettingsModalProps,
+  type SettingsPage,
+} from "../settings-core/types";
 import { useProviderValidationState } from "../settings-core/useProviderValidationState";
 import { useSettingsController } from "../settings-core/useSettingsController";
 import { useLocalization } from "../../i18n";
@@ -24,10 +28,14 @@ function getInitialSettingsPage({
   focusProvider,
   focusCatalogProviderId,
   focusTab,
+  isPremium,
 }: Pick<
   SettingsModalProps,
   "focusProvider" | "focusCatalogProviderId" | "focusTab"
->): SettingsPage {
+> & { isPremium: boolean }): SettingsPage {
+  if (!isPremium) {
+    return "overview";
+  }
   if (focusProvider || focusCatalogProviderId || focusTab === "providers") {
     return "connections";
   }
@@ -54,6 +62,7 @@ export const AntSettingsModal = React.memo(function AntSettingsModal(
 ) {
   const {
     visible,
+    isPremium,
     settings,
     kokoroModel,
     focusProvider,
@@ -76,6 +85,7 @@ export const AntSettingsModal = React.memo(function AntSettingsModal(
       focusProvider,
       focusCatalogProviderId,
       focusTab,
+      isPremium,
     }),
   );
   const [validationToastMessage, setValidationToastMessage] = React.useState<
@@ -179,6 +189,7 @@ export const AntSettingsModal = React.memo(function AntSettingsModal(
         focusProvider,
         focusCatalogProviderId,
         focusTab,
+        isPremium,
       }),
     );
     Animated.timing(entrance, {
@@ -186,7 +197,14 @@ export const AntSettingsModal = React.memo(function AntSettingsModal(
       duration: 190,
       useNativeDriver: true,
     }).start();
-  }, [entrance, focusCatalogProviderId, focusProvider, focusTab, visible]);
+  }, [
+    entrance,
+    focusCatalogProviderId,
+    focusProvider,
+    focusTab,
+    isPremium,
+    visible,
+  ]);
 
   React.useEffect(() => {
     if (visible) {
@@ -241,6 +259,14 @@ export const AntSettingsModal = React.memo(function AntSettingsModal(
           event: "settings-page-open-requested",
           payload: { from: activePage, to: page },
         });
+        if (!isPremium && isPremiumSettingsPage(page)) {
+          props.onOpenPremium();
+          return;
+        }
+        if (!isPremium && page === "local") {
+          props.onOpenOfflineSetup();
+          return;
+        }
         setActivePage(page);
       }}
       onValidationStart={() => setValidationToastMessage(null)}

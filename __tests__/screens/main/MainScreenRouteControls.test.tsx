@@ -131,9 +131,22 @@ describe("MainScreenRouteControls", () => {
     );
 
     expect(screen.queryByTestId("route-controls-row")).toBeNull();
-    expect(
-      screen.queryByTestId("route-web-search-container"),
-    ).toBeNull();
+    expect(screen.queryByTestId("route-web-search-container")).toBeNull();
+  });
+
+  it("omits premium route controls when the caller hides Web Search", () => {
+    const screen = render(
+      <MainScreenRouteControls
+        colors={lightColors}
+        onToggleWebSearchEnabled={jest.fn()}
+        showWebSearch={false}
+        t={t}
+        webSearchReady
+      />,
+    );
+
+    expect(screen.queryByTestId("route-controls-row")).toBeNull();
+    expect(screen.queryByTestId("route-web-search-container")).toBeNull();
   });
 
   it("shows the Uber Mode switch on the portrait left side only", () => {
@@ -183,8 +196,6 @@ describe("MainScreenRouteControls", () => {
         webSearchReady
       />,
     );
-    expect(
-      screen.queryByTestId("route-ulra-mode-container"),
-    ).toBeNull();
+    expect(screen.queryByTestId("route-ulra-mode-container")).toBeNull();
   });
 });

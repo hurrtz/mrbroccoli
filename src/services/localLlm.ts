@@ -270,6 +270,8 @@ export async function benchmarkLocalLlm(
     };
     await saveLocalModelBenchmarkResult(benchmark);
     return benchmark;
+  } finally {
+    await releaseLocalLlmResources().catch(() => undefined);
   }
 }
 

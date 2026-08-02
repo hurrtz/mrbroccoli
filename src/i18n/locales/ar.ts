@@ -3,12 +3,14 @@ import { dataBackupTranslations } from "../dataBackupTranslations";
 import { conversationKnowledgeTranslations } from "../conversationKnowledgeTranslations";
 import { imagePromptTranslations } from "../imagePromptTranslations";
 import { onDeviceTranslations } from "../onDeviceTranslations";
+import { premiumTranslations } from "../premiumTranslations";
 
 export const ar = {
   ...dataBackupTranslations.ar,
   ...conversationKnowledgeTranslations.ar,
   ...imagePromptTranslations.ar,
   ...onDeviceTranslations.ar,
+  ...premiumTranslations.ar,
   appName: "السيد بروكلي",
   retry: "أعد المحاولة",
   dismiss: "إغلاق",

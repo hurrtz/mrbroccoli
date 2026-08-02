@@ -1,6 +1,10 @@
 import React from "react";
 import type { SettingsReadiness } from "../settings-core/readiness";
-import type { SettingsModalProps, SettingsPage } from "../settings-core/types";
+import {
+  isPremiumSettingsPage,
+  type SettingsModalProps,
+  type SettingsPage,
+} from "../settings-core/types";
 import { useProviderValidationState } from "../settings-core/useProviderValidationState";
 import { useSettingsController } from "../settings-core/useSettingsController";
 import { Provider, TtsListenLanguage } from "../../types";
@@ -14,7 +18,12 @@ import { SpeakingSettingsPage } from "./pages/SpeakingSettingsPage";
 import { ThinkingSettingsPage } from "./pages/ThinkingSettingsPage";
 import { OnDeviceSettingsPage } from "./pages/OnDeviceSettingsPage";
 import { styles } from "./styles";
-import { View } from "react-native";
+import { Text, View } from "react-native";
+import { Button } from "../../design-system/NativeControls";
+import { useLocalization } from "../../i18n";
+import { useTheme } from "../../theme/ThemeContext";
+import { fonts } from "../../theme/typography";
+import { AntSettingsCard } from "./AntSettingsPrimitives";
 
 interface AntSettingsPageContentProps {
   activePage: SettingsPage;
@@ -37,6 +46,43 @@ function DrillInPage({
     <View testID={`settings-page-${page}`} style={styles.drillInPage}>
       {children}
     </View>
+  );
+}
+
+function LockedSettingsPage({
+  onOpenPremium,
+  page,
+}: {
+  onOpenPremium: () => void;
+  page: Exclude<SettingsPage, "overview">;
+}) {
+  const { colors } = useTheme();
+  const { t } = useLocalization();
+  return (
+    <DrillInPage page={page}>
+      <AntSettingsCard>
+        <Text
+          style={{
+            color: colors.textSecondary,
+            fontFamily: fonts.body,
+            fontSize: 15,
+            lineHeight: 22,
+          }}
+        >
+          {t("premiumDescription")}
+        </Text>
+        <Button type="primary" onPress={onOpenPremium}>
+          <Text
+            style={{
+              color: colors.onActiveControl,
+              fontFamily: fonts.bodyMedium,
+            }}
+          >
+            {t("upgradeToPremium")}
+          </Text>
+        </Button>
+      </AntSettingsCard>
+    </DrillInPage>
   );
 }
 
@@ -66,13 +112,28 @@ export function AntSettingsPageContent({
     settings,
   } = props;
 
+  if (
+    !props.isPremium &&
+    activePage !== "overview" &&
+    isPremiumSettingsPage(activePage)
+  ) {
+    return (
+      <LockedSettingsPage
+        onOpenPremium={props.onOpenPremium}
+        page={activePage}
+      />
+    );
+  }
+
   switch (activePage) {
     case "overview":
       return (
         <AntSettingsOverview
+          isPremium={props.isPremium}
           readiness={readiness}
           onOpenPage={onOpenPage}
           onOpenSetupGuide={onOpenSetupGuide}
+          onOpenPremium={props.onOpenPremium}
         />
       );
     case "connections":
@@ -215,8 +276,10 @@ export function AntSettingsPageContent({
       return (
         <DrillInPage page="data">
           <DataPrivacySettingsPage
+            isPremium={props.isPremium}
             settings={settings}
             onUpdate={onUpdate}
+            onOpenPremium={props.onOpenPremium}
             conversationArchive={props.conversationArchive}
             onCreateAppDataBackup={props.onCreateAppDataBackup}
             onRestoreAppDataBackup={props.onRestoreAppDataBackup}

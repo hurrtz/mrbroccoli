@@ -31,7 +31,8 @@
         {
           "enableFTS": true
         }
-      ]
+      ],
+      "expo-iap"
     ],
     "ios": {
       "icon": "./assets/appIcon/ios.png",

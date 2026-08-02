@@ -43,6 +43,7 @@ import { useMainScreenDataBackup } from "./main/useMainScreenDataBackup";
 import { useMainScreenImageAttachments } from "./main/useMainScreenImageAttachments";
 import { formatMessageForCopy } from "../utils/conversationExport";
 import { useImagePromptSubmission } from "./main/useImagePromptSubmission";
+import { useFreeOfflineMode } from "./main/useFreeOfflineMode";
 
 export function MainScreen() {
   const { colors, isDark } = useTheme();
@@ -63,9 +64,16 @@ export function MainScreen() {
     restorePortableSettings,
     loaded,
   } = useSharedSettings();
+  const freeOffline = useFreeOfflineMode({
+    settings,
+    settingsLoaded: loaded,
+    updateSettings,
+  });
+  const runtimeSettings = freeOffline.effectiveSettings;
+  const [premiumModalVisible, setPremiumModalVisible] = React.useState(false);
   const providerVoiceDirectories = useMainScreenVoiceDirectories({
     loaded,
-    settings,
+    settings: runtimeSettings,
     updateProviderTtsVoice,
   });
   const {
@@ -89,17 +97,18 @@ export function MainScreen() {
     loaded: conversationsLoaded = true,
   } = useConversations({
     pastConversationKnowledgeEnabled:
-      settings.pastConversationKnowledgeEnabled,
+      runtimeSettings.pastConversationKnowledgeEnabled,
   });
   const privateConversationIds = React.useMemo(
-    () => conversations
-      .filter((conversation) => conversation.isPrivate)
-      .map((conversation) => conversation.id),
+    () =>
+      conversations
+        .filter((conversation) => conversation.isPrivate)
+        .map((conversation) => conversation.id),
     [conversations],
   );
   const routeConfiguration = React.useMemo(
-    () => getMainScreenRouteConfiguration(settings, conversationsLoaded),
-    [conversationsLoaded, settings],
+    () => getMainScreenRouteConfiguration(runtimeSettings, conversationsLoaded),
+    [conversationsLoaded, runtimeSettings],
   );
   const {
     createBackup: handleCreateAppDataBackup,
@@ -113,6 +122,7 @@ export function MainScreen() {
     settings,
   });
   const conversationArchive = useConversationArchive({
+    enabled: freeOffline.entitlement.isPremium,
     activeConversationId: activeConversation?.id ?? null,
     conversationMetas: conversations,
     conversationsLoaded,
@@ -120,7 +130,7 @@ export function MainScreen() {
   });
 
   const recorder = useAudioRecorder();
-  const nativeStt = useNativeSpeechRecognizer(settings.sttLanguage);
+  const nativeStt = useNativeSpeechRecognizer(runtimeSettings.sttLanguage);
   const player = useAudioPlayer({
     beforePlayback: recorder.stopAmbientMonitoring,
   });
@@ -131,9 +141,9 @@ export function MainScreen() {
     progress: kokoroPromptBlockProgress,
   } = getKokoroPromptBlockState({
     kokoroModel,
-    spokenRepliesEnabled: settings.spokenRepliesEnabled,
+    spokenRepliesEnabled: runtimeSettings.spokenRepliesEnabled,
     t,
-    ttsMode: settings.ttsMode,
+    ttsMode: runtimeSettings.ttsMode,
   });
 
   const [styleSheetVisible, setStyleSheetVisible] = React.useState(false);
@@ -194,18 +204,23 @@ export function MainScreen() {
   const isLandscape = width > height;
   const ulraMode = useUlraModeControl({
     availableModelCount: availableResponseModes.length,
-    settings,
+    settings: runtimeSettings,
     t,
     updateSettings,
   });
-  const showStyleChip = loaded && availableResponseModes.length > 0;
+  const showStyleChip =
+    loaded &&
+    freeOffline.entitlement.isPremium &&
+    availableResponseModes.length > 0;
   const mainSurfaceVisible = !(
     drawerVisible ||
     memoryVisible ||
     settingsVisible ||
     setupGuideVisible ||
     statusDetailsVisible ||
-    styleSheetVisible
+    styleSheetVisible ||
+    freeOffline.modalVisible ||
+    premiumModalVisible
   );
   const {
     assistantInstructions,
@@ -222,10 +237,10 @@ export function MainScreen() {
     updateTtsVoice,
   } = useConversationSettings({
     activeConversation,
-    globalAssistantInstructions: settings.assistantInstructions,
-    globalResponseLength: settings.responseLength,
-    globalResponseTone: settings.responseTone,
-    globalTtsInstructions: settings.ttsInstructions,
+    globalAssistantInstructions: runtimeSettings.assistantInstructions,
+    globalResponseLength: runtimeSettings.responseLength,
+    globalResponseTone: runtimeSettings.responseTone,
+    globalTtsInstructions: runtimeSettings.ttsInstructions,
     globalTtsVoice: globalSelectedTtsVoice,
     ttsModel: selectedTtsModel,
     ttsProvider,
@@ -237,14 +252,14 @@ export function MainScreen() {
         language,
         providerVoiceDirectories,
         selectedTtsModel,
-        settings,
+        settings: runtimeSettings,
         ttsProvider,
       }),
     [
       language,
       providerVoiceDirectories,
       selectedTtsModel,
-      settings,
+      runtimeSettings,
       ttsProvider,
     ],
   );
@@ -254,7 +269,7 @@ export function MainScreen() {
     ttsInstructionsSupported,
   } = conversationTtsControlState;
   const isRecording =
-    settings.sttMode === "native"
+    runtimeSettings.sttMode === "native"
       ? nativeStt.isRecording
       : recorder.isRecording;
   const recordingStartedAtMs = React.useMemo(
@@ -269,7 +284,7 @@ export function MainScreen() {
   );
 
   const pendingImages = useMainScreenImageAttachments({
-    disabled: voiceInputDisabled,
+    disabled: voiceInputDisabled || !freeOffline.entitlement.isPremium,
     showError: showImageError,
     t,
   });
@@ -293,7 +308,7 @@ export function MainScreen() {
     activeConversation,
     privateConversationIds,
     pastConversationKnowledgeEnabled:
-      settings.pastConversationKnowledgeEnabled,
+      runtimeSettings.pastConversationKnowledgeEnabled,
     addMessage,
     createConversation,
     initialConversationSettings,
@@ -305,29 +320,29 @@ export function MainScreen() {
     model,
     modelEffort,
     localLlmModelId,
-    sttMode: settings.sttMode,
-    sttLanguage: settings.sttLanguage,
+    sttMode: runtimeSettings.sttMode,
+    sttLanguage: runtimeSettings.sttLanguage,
     sttProvider,
     sttApiKey,
     selectedSttModel,
-    localSttModelId: settings.localSttModelId,
+    localSttModelId: runtimeSettings.localSttModelId,
     selectedTtsModel,
-    localTtsModelId: settings.localTtsModelId,
-    ttsMode: settings.ttsMode,
+    localTtsModelId: runtimeSettings.localTtsModelId,
+    ttsMode: runtimeSettings.ttsMode,
     ttsProvider,
     ttsApiKey,
     selectedTtsVoice:
-      settings.ttsMode === "kokoro"
-        ? settings.kokoroVoices.en
+      runtimeSettings.ttsMode === "kokoro"
+        ? runtimeSettings.kokoroVoices.en
         : selectedTtsVoice,
-    kokoroVoices: settings.kokoroVoices,
+    kokoroVoices: runtimeSettings.kokoroVoices,
     ttsFallbackRoutes: getTtsFallbackRoutes(
-      settings.ttsFallbackPolicy,
-      settings.ttsMode,
+      runtimeSettings.ttsFallbackPolicy,
+      runtimeSettings.ttsMode,
     ),
-    ttsListenLanguages: settings.ttsListenLanguages,
-    replyPlayback: settings.replyPlayback,
-    spokenRepliesEnabled: settings.spokenRepliesEnabled,
+    ttsListenLanguages: runtimeSettings.ttsListenLanguages,
+    replyPlayback: runtimeSettings.replyPlayback,
+    spokenRepliesEnabled: runtimeSettings.spokenRepliesEnabled,
     assistantInstructions,
     responseLength,
     responseTone,
@@ -358,6 +373,7 @@ export function MainScreen() {
   );
   const imagePromptSubmission = useImagePromptSubmission({
     activeConversation,
+    imagesEnabled: freeOffline.entitlement.isPremium,
     imageRoutes,
     onAddImage: pendingImages.handleAddImage,
     pendingAttachments: pendingImages.attachments,
@@ -392,7 +408,7 @@ export function MainScreen() {
     availableTtsProviders,
     loaded,
     providerApiKey,
-    settings,
+    settings: runtimeSettings,
     sttProvider,
     ttsProvider,
     updateActiveResponseMode,
@@ -425,15 +441,15 @@ export function MainScreen() {
     useKokoro: setupGuideUseKokoro,
   } = useSetupGuideController({
     kokoroModel,
-    loaded,
+    loaded: loaded && freeOffline.entitlement.isPremium,
     nativeStt,
     openSettings,
     player,
     recorder,
     setSetupGuideVisible,
     setupGuideVisible,
-    setupGuideDismissed: settings.setupGuideDismissed,
-    settings,
+    setupGuideDismissed: runtimeSettings.setupGuideDismissed,
+    settings: runtimeSettings,
     updateApiKey,
     updateSettings,
   });
@@ -473,7 +489,7 @@ export function MainScreen() {
     replayPhase,
     setPipelinePhase,
     setStreamingText,
-    settings,
+    settings: runtimeSettings,
     showToast,
     sttApiKey,
     sttProvider,
@@ -524,7 +540,10 @@ export function MainScreen() {
       model,
       modelEffort,
       provider,
-      providerReady: !voiceInputDisabled,
+      providerReady:
+        freeOffline.entitlement.isPremium &&
+        !localLlmModelId &&
+        !voiceInputDisabled,
       renameConversation,
       showToast,
       t,
@@ -532,7 +551,7 @@ export function MainScreen() {
 
   const handleResponseModeChange = useMainScreenResponseModeSelection({
     activeResponseMode,
-    settings,
+    settings: runtimeSettings,
     showToast,
     t,
     updateActiveResponseMode,
@@ -543,7 +562,7 @@ export function MainScreen() {
     isRecording,
     language,
     player,
-    settings,
+    settings: runtimeSettings,
     showToast,
     t,
   });
@@ -573,7 +592,7 @@ export function MainScreen() {
     selectedSttModel,
     selectedTtsModel,
     selectedTtsVoice,
-    settings,
+    settings: runtimeSettings,
     streamingText,
     sttProvider,
     t,
@@ -630,7 +649,7 @@ export function MainScreen() {
     pipelinePhase,
     playerIsPlaying: player.isPlaying,
     playerPaused: player.isPlaybackPaused,
-    spokenRepliesEnabled: settings.spokenRepliesEnabled,
+    spokenRepliesEnabled: runtimeSettings.spokenRepliesEnabled,
   });
 
   useEffect(() => {
@@ -643,7 +662,7 @@ export function MainScreen() {
   } = useDebugLogCaptureController({
     activeConversationId: activeConversation?.id ?? null,
     appLanguage: language,
-    inputMode: settings.inputMode,
+    inputMode: runtimeSettings.inputMode,
     isLandscape,
     kokoroState: {
       busy: kokoroModel.busy,
@@ -656,20 +675,20 @@ export function MainScreen() {
     modelEffort,
     pipelinePhase,
     provider,
-    replyPlayback: settings.replyPlayback,
+    replyPlayback: runtimeSettings.replyPlayback,
     selectedSttModel,
     selectedTtsModel,
     selectedTtsVoice,
     showToast,
-    spokenRepliesEnabled: settings.spokenRepliesEnabled,
-    sttMode: settings.sttMode,
+    spokenRepliesEnabled: runtimeSettings.spokenRepliesEnabled,
+    sttMode: runtimeSettings.sttMode,
     sttProvider,
     t,
-    ttsMode: settings.ttsMode,
+    ttsMode: runtimeSettings.ttsMode,
     ttsProvider,
     ttsFallbackRoutes: getTtsFallbackRoutes(
-      settings.ttsFallbackPolicy,
-      settings.ttsMode,
+      runtimeSettings.ttsFallbackPolicy,
+      runtimeSettings.ttsMode,
     ),
     webSearchMode,
     webSearchProvider: webSearchProvider ?? null,
@@ -682,7 +701,7 @@ export function MainScreen() {
     activeResponseMode,
     conversationCount: conversations.length,
     drawerVisible,
-    inputMode: settings.inputMode,
+    inputMode: runtimeSettings.inputMode,
     isRecording,
     loaded,
     memoryConversationId: memoryConversation?.id ?? null,
@@ -694,17 +713,17 @@ export function MainScreen() {
     playerIsPlaying: player.isPlaying,
     provider,
     replayPhase,
-    replyPlayback: settings.replyPlayback,
+    replyPlayback: runtimeSettings.replyPlayback,
     responseLength,
     responseTone,
     settingsFocusCatalogProviderId: settingsFocusCatalogProviderId ?? null,
     settingsVisible,
     setupGuideVisible,
-    spokenRepliesEnabled: settings.spokenRepliesEnabled,
+    spokenRepliesEnabled: runtimeSettings.spokenRepliesEnabled,
     statusDetailsVisible,
-    sttMode: settings.sttMode,
+    sttMode: runtimeSettings.sttMode,
     sttProvider,
-    ttsMode: settings.ttsMode,
+    ttsMode: runtimeSettings.ttsMode,
     ttsProvider,
     visualPhase,
   });
@@ -730,41 +749,51 @@ export function MainScreen() {
           debugLogLabel: t("debugLogLabel"),
           drawerLabel: t("conversations"),
           onOpenDrawer: handleOpenDrawer,
+          onOpenPremium:
+            freeOffline.entitlement.status === "free"
+              ? () => setPremiumModalVisible(true)
+              : undefined,
           onOpenSettings: handleOpenMainSettings,
           onToggleDebugLog:
-            settings.showDebugLogButton || debugLogCaptureState.active
+            runtimeSettings.showDebugLogButton || debugLogCaptureState.active
               ? handleToggleDebugLog
               : undefined,
+          premiumLabel: t("premium"),
           settingsLabel: t("settings"),
         },
         routeCard: {
           activeResponseMode,
           availableResponseModes: loaded ? availableResponseModes : [],
-          onOpenSetupGuide: handleOpenProviderSettings,
+          onOpenSetupGuide: freeOffline.entitlement.isPremium
+            ? handleOpenProviderSettings
+            : () => freeOffline.setModalVisible(true),
           onSelectResponseMode: handleResponseModeChange,
-          responseModes: settings.responseModes,
+          responseModes: runtimeSettings.responseModes,
           t,
         },
         routeControls: {
+          showWebSearch: freeOffline.entitlement.isPremium,
           onToggleUlraMode: ulraMode.handleToggle,
           onToggleWebSearchEnabled: handleToggleWebSearch,
           t,
           ulraModeActive: ulraMode.active,
-          ulraModeAvailable: ulraMode.available,
+          ulraModeAvailable:
+            freeOffline.entitlement.isPremium && ulraMode.available,
           webSearchEnabled: webSearchActive,
-          webSearchReady,
+          webSearchReady: freeOffline.entitlement.isPremium && webSearchReady,
         },
         voiceStage: {
           attachments: pendingImages.attachments,
-          disabled: voiceInputDisabled,
+          disabled: voiceInputDisabled || !freeOffline.freeRuntimeReady,
           driveAutoContinueEnabled,
           driveSilenceCountdownSeconds,
           driveSessionCanRepeat,
           driveVoiceActive,
           initialInputSurface: inputSurfaceRef.current,
           initialTextMessage: textMessageDraftRef.current,
-          imageAttachmentDisabled: voiceInputDisabled,
-          inputMode: settings.inputMode,
+          imageAttachmentDisabled:
+            voiceInputDisabled || !freeOffline.entitlement.isPremium,
+          inputMode: runtimeSettings.inputMode,
           isActive: isActive && mainSurfaceVisible,
           onInputSurfaceChange: handleInputSurfaceChange,
           onAddImage: imagePromptSubmission.handleAddImage,
@@ -809,7 +838,7 @@ export function MainScreen() {
           replayPhase,
           scrollEnabled: true,
           showStyleControl: showStyleChip,
-          showUsageStats: settings.showUsageStats,
+          showUsageStats: runtimeSettings.showUsageStats,
           showWhenEmpty: true,
           t,
         },
@@ -866,16 +895,26 @@ export function MainScreen() {
         onPreviewVoice: handlePreviewVoice,
         onStopPreviewVoice: stopPreviewVoice,
         onValidateProviderCapability: handleValidateProviderCapability,
-        onOpenSetupGuide: settings.showSetupGuideShortcut
-          ? handleOpenSetupGuideFromSettings
-          : undefined,
+        onOpenSetupGuide:
+          freeOffline.entitlement.isPremium && settings.showSetupGuideShortcut
+            ? handleOpenSetupGuideFromSettings
+            : undefined,
+        isPremium: freeOffline.entitlement.isPremium,
+        onOpenPremium: () => {
+          closeSettings();
+          setPremiumModalVisible(true);
+        },
+        onOpenOfflineSetup: () => {
+          closeSettings();
+          freeOffline.setModalVisible(true);
+        },
         onCreateAppDataBackup: handleCreateAppDataBackup,
         onRestoreAppDataBackup: handleRestoreAppDataBackup,
         conversationArchive,
         onClose: closeSettings,
       }}
       setupGuide={{
-        visible: setupGuideVisible,
+        visible: setupGuideVisible && freeOffline.entitlement.isPremium,
         step: setupGuideStep,
         providerOptions: setupGuideProviderOptions,
         selectedProvider: setupGuideSelectedProvider,
@@ -901,9 +940,21 @@ export function MainScreen() {
         onFinish: handleFinishSetupGuidePress,
         onOpenSettings: handleOpenSettingsFromSetupGuide,
         showSettingsShortcutOption: setupGuideOpenedFromSettings,
-        settingsShortcutVisible: settings.showSetupGuideShortcut,
+        settingsShortcutVisible:
+          freeOffline.entitlement.isPremium && settings.showSetupGuideShortcut,
         onChangeSettingsShortcutVisible:
           handleSetupGuideShortcutVisibilityChange,
+      }}
+      freeOffline={{
+        controller: freeOffline,
+        onOpenPremium: () => {
+          freeOffline.setModalVisible(false);
+          setPremiumModalVisible(true);
+        },
+      }}
+      premiumUpgrade={{
+        visible: premiumModalVisible,
+        onClose: () => setPremiumModalVisible(false),
       }}
       conversationMemory={{
         visible: memoryVisible,

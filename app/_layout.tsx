@@ -1,11 +1,15 @@
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { Stack } from "expo-router";
 import { View } from "react-native";
-import { SettingsProvider, useSharedSettings } from "../src/context/SettingsContext";
+import {
+  SettingsProvider,
+  useSharedSettings,
+} from "../src/context/SettingsContext";
 import { AppFontProvider } from "../src/design-system/AppFontProvider";
 import { LocalizationProvider, useLocalization } from "../src/i18n";
 import { ThemeProvider } from "../src/theme/ThemeContext";
 import { initializeDiagnosticPostmortem } from "../src/services/diagnosticPostmortem";
+import { PremiumEntitlementProvider } from "../src/context/PremiumEntitlementContext";
 
 initializeDiagnosticPostmortem();
 
@@ -29,7 +33,9 @@ function LocalizedRootLayoutInner() {
 
   return (
     <LocalizationProvider language={settings.language}>
-      <RootLayoutInner />
+      <PremiumEntitlementProvider>
+        <RootLayoutInner />
+      </PremiumEntitlementProvider>
     </LocalizationProvider>
   );
 }

@@ -53,6 +53,9 @@ PODS:
     - ExpoModulesCore
   - ExpoGlassEffect (57.0.1):
     - ExpoModulesCore
+  - ExpoIap (5.0.0):
+    - ExpoModulesCore
+    - openiap (= 3.0.0)
   - ExpoImageManipulator (57.0.7):
     - ExpoModulesCore
     - SDWebImageWebPCoder
@@ -178,6 +181,7 @@ PODS:
   - MMKV (2.4.0):
     - MMKVCore (~> 2.4.0)
   - MMKVCore (2.4.0)
+  - openiap (3.0.0)
   - RCT-Folly (2024.11.18.00):
     - boost
     - DoubleConversion
@@ -3279,6 +3283,7 @@ DEPENDENCIES:
   - ExpoFileSystem (from `../node_modules/expo-file-system/ios`)
   - ExpoFont (from `../node_modules/expo-font/ios`)
   - ExpoGlassEffect (from `../node_modules/expo-glass-effect/ios`)
+  - ExpoIap (from `../node_modules/expo-iap/ios`)
   - ExpoImageManipulator (from `../node_modules/expo-image-manipulator/ios`)
   - ExpoImagePicker (from `../node_modules/expo-image-picker/ios`)
   - ExpoKeepAwake (from `../node_modules/expo-keep-awake/ios`)
@@ -3394,6 +3399,7 @@ SPEC REPOS:
     - libwebp
     - MMKV
     - MMKVCore
+    - openiap
     - SDWebImage
     - SDWebImageWebPCoder
     - SocketRocket
@@ -3425,6 +3431,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/expo-font/ios"
   ExpoGlassEffect:
     :path: "../node_modules/expo-glass-effect/ios"
+  ExpoIap:
+    :path: "../node_modules/expo-iap/ios"
   ExpoImageManipulator:
     :path: "../node_modules/expo-image-manipulator/ios"
   ExpoImagePicker:
@@ -3655,6 +3663,7 @@ SPEC CHECKSUMS:
   ExpoFileSystem: e441dae0ae671fc451640517550973d9e024fdf0
   ExpoFont: 59e1faf66ba9bcd232ae1e2ce58d202a48b6f65e
   ExpoGlassEffect: 4b62afb489e6b84357701737ce002137c9d5fdbc
+  ExpoIap: 567bf4071887fe1b65913deb0152f072f683e780
   ExpoImageManipulator: 3bdad664e6eb2e632b10edb4ba92d7983d54d81a
   ExpoImagePicker: 53793977b6f686c3f1230739a1dbe7178a9cef80
   ExpoKeepAwake: c26f14275017370cc8a4b7b43a0e23361f2053a5
@@ -3682,6 +3691,7 @@ SPEC CHECKSUMS:
   llama-rn: d80ded4096e1d6d22dac509ad41c8cfd03e5a033
   MMKV: 86859fdfa2b0b21db1fd6e48788474a6416a2c77
   MMKVCore: 3d16ce9f7d411e135020915fde98a056859a1efa
+  openiap: 8341dac17f2e06ec15d704b76837556a5e6a6c51
   RCT-Folly: b29feb752b08042c62badaef7d453f3bb5e6ae23
   RCTDeprecation: debcd5d989dc39edd50d61566b56e96da1c167b0
   RCTRequired: f06ef156c6b0244ac76aa51ef2e830a1a13004c8

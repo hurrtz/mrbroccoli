@@ -3,12 +3,14 @@ import { dataBackupTranslations } from "../dataBackupTranslations";
 import { conversationKnowledgeTranslations } from "../conversationKnowledgeTranslations";
 import { imagePromptTranslations } from "../imagePromptTranslations";
 import { onDeviceTranslations } from "../onDeviceTranslations";
+import { premiumTranslations } from "../premiumTranslations";
 
 export const it = {
   ...dataBackupTranslations.it,
   ...conversationKnowledgeTranslations.it,
   ...imagePromptTranslations.it,
   ...onDeviceTranslations.it,
+  ...premiumTranslations.it,
   appName: "Sig. Broccoli",
   retry: "Riprova",
   dismiss: "Chiudi",

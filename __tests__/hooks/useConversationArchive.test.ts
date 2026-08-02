@@ -8,9 +8,7 @@ import {
 import type { ConversationMeta } from "../../src/types";
 
 jest.mock("../../src/services/conversationArchive", () => {
-  const actual = jest.requireActual(
-    "../../src/services/conversationArchive",
-  );
+  const actual = jest.requireActual("../../src/services/conversationArchive");
   return {
     ...actual,
     clearConversationArchiveConfig: jest.fn(async () => undefined),
@@ -66,6 +64,7 @@ describe("useConversationArchive", () => {
     const hook = renderHook(
       ({ updatedAt }) =>
         useConversationArchive({
+          enabled: true,
           activeConversationId: "conversation-1",
           conversationMetas: [createMeta(updatedAt)],
           conversationsLoaded: true,
@@ -102,5 +101,25 @@ describe("useConversationArchive", () => {
     await waitFor(() =>
       expect(syncConversationArchive).toHaveBeenCalledTimes(2),
     );
+  });
+
+  it("does not sync a configured archive while the feature is disabled", async () => {
+    const hook = renderHook(() =>
+      useConversationArchive({
+        enabled: false,
+        activeConversationId: "conversation-1",
+        conversationMetas: [createMeta("2026-08-02T08:01:00.000Z")],
+        conversationsLoaded: true,
+        getConversationById: jest.fn(),
+      }),
+    );
+
+    await waitFor(() => expect(hook.result.current.loaded).toBe(true));
+    await act(async () => {
+      jest.advanceTimersByTime(1_500);
+      await hook.result.current.syncNow();
+    });
+
+    expect(syncConversationArchive).not.toHaveBeenCalled();
   });
 });

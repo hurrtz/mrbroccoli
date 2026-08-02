@@ -1,7 +1,7 @@
 import React from "react";
 import * as ReactNative from "react-native";
 import { StyleSheet } from "react-native";
-import { render } from "@testing-library/react-native";
+import { fireEvent, render } from "@testing-library/react-native";
 
 import appConfig from "../../app.json";
 import { AntSettingsOverview } from "../../src/features/settings/AntSettingsOverview";
@@ -19,12 +19,21 @@ const readiness: SettingsReadiness = {
   search: { state: "attention", summaryKey: "settingsReadinessNeedsAttention" },
 };
 
+function overviewProps() {
+  return {
+    isPremium: true,
+    readiness,
+    onOpenPage: jest.fn(),
+    onOpenPremium: jest.fn(),
+  };
+}
+
 describe("AntSettingsOverview", () => {
   it("renders readiness as a concise, accessible progression", () => {
     const screen = render(
       <ThemeProvider mode="light">
         <LocalizationProvider language="en">
-          <AntSettingsOverview readiness={readiness} onOpenPage={jest.fn()} />
+          <AntSettingsOverview {...overviewProps()} />
         </LocalizationProvider>
       </ThemeProvider>,
     );
@@ -52,8 +61,7 @@ describe("AntSettingsOverview", () => {
       <ThemeProvider mode="light">
         <LocalizationProvider language="en">
           <AntSettingsOverview
-            readiness={readiness}
-            onOpenPage={jest.fn()}
+            {...overviewProps()}
             onOpenSetupGuide={jest.fn()}
           />
         </LocalizationProvider>
@@ -68,7 +76,7 @@ describe("AntSettingsOverview", () => {
     const screen = render(
       <ThemeProvider mode="light">
         <LocalizationProvider language="en">
-          <AntSettingsOverview readiness={readiness} onOpenPage={jest.fn()} />
+          <AntSettingsOverview {...overviewProps()} />
         </LocalizationProvider>
       </ThemeProvider>,
     );
@@ -82,7 +90,7 @@ describe("AntSettingsOverview", () => {
     const screen = render(
       <ThemeProvider mode="light">
         <LocalizationProvider language="en">
-          <AntSettingsOverview readiness={readiness} onOpenPage={jest.fn()} />
+          <AntSettingsOverview {...overviewProps()} />
         </LocalizationProvider>
       </ThemeProvider>,
     );
@@ -112,17 +120,41 @@ describe("AntSettingsOverview", () => {
     const screen = render(
       <ThemeProvider mode="light">
         <LocalizationProvider language="en">
-          <AntSettingsOverview readiness={readiness} onOpenPage={jest.fn()} />
+          <AntSettingsOverview {...overviewProps()} />
         </LocalizationProvider>
       </ThemeProvider>,
     );
 
     expect(
-      StyleSheet.flatten(screen.getByTestId("settings-readiness-grid").props.style)
-        .flexDirection,
+      StyleSheet.flatten(
+        screen.getByTestId("settings-readiness-grid").props.style,
+      ).flexDirection,
     ).toBe("column");
-    expect(StyleSheet.flatten(screen.getByText("Think").props.style).textAlign).toBe(
-      "auto",
+    expect(
+      StyleSheet.flatten(screen.getByText("Think").props.style).textAlign,
+    ).toBe("auto");
+  });
+
+  it("locks provider configuration in Free while keeping local and data sections visible", () => {
+    const onOpenPremium = jest.fn();
+    const onOpenPage = jest.fn();
+    const screen = render(
+      <ThemeProvider mode="light">
+        <LocalizationProvider language="en">
+          <AntSettingsOverview
+            isPremium={false}
+            readiness={readiness}
+            onOpenPage={onOpenPage}
+            onOpenPremium={onOpenPremium}
+          />
+        </LocalizationProvider>
+      </ThemeProvider>,
     );
+
+    expect(screen.queryByTestId("settings-readiness-grid")).toBeNull();
+    fireEvent.press(screen.getByTestId("settings-overview-row-connections"));
+    expect(onOpenPremium).toHaveBeenCalledTimes(1);
+    fireEvent.press(screen.getByTestId("settings-overview-row-data"));
+    expect(onOpenPage).toHaveBeenCalledWith("data");
   });
 });

@@ -117,6 +117,7 @@ function renderSettingsModal(
       <LocalizationProvider language={language}>
         <SettingsModal
           visible
+          isPremium
           settings={DEFAULT_SETTINGS}
           kokoroModel={kokoroModel}
           providerVoiceDirectories={{}}
@@ -132,6 +133,8 @@ function renderSettingsModal(
           onPreviewVoice={jest.fn(async () => undefined)}
           onStopPreviewVoice={jest.fn(async () => undefined)}
           onValidateProviderCapability={jest.fn(async () => undefined)}
+          onOpenPremium={jest.fn()}
+          onOpenOfflineSetup={jest.fn()}
           conversationArchive={{
             chooseDirectory: jest.fn(async () => undefined),
             configured: false,

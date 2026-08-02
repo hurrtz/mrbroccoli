@@ -32,6 +32,9 @@ unreviewed dependency licenses during validation.
 - `react-native-sherpa-onnx` is MIT licensed; Sherpa ONNX is Apache-2.0;
   ONNX Runtime is MIT; libarchive and zstd use permissive licenses.
 - `llama.rn` and its included `llama.cpp` runtime are MIT licensed.
+- `expo-iap` and its OpenIAP Apple and Google bindings are MIT licensed. Store
+  purchases remain subject to the current Apple Developer and Google Play
+  distribution agreements and billing policies.
 - Optional on-device models are never bundled. The catalogue pins their source,
   artifact size, SHA-256 digest, and license before download:
   - Qwen3 0.6B and 1.7B GGUF files: Apache-2.0.

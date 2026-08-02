@@ -12,6 +12,7 @@ const packageLock = JSON.parse(readText("package-lock.json"));
 const easConfig = JSON.parse(readText("eas.json"));
 const iosInfo = readText("ios/MrBroccoli/Info.plist");
 const iosPodfile = readText("ios/Podfile");
+const iosPodfileLock = readText("ios/Podfile.lock");
 const iosPodfileProperties = JSON.parse(readText("ios/Podfile.properties.json"));
 const iosProject = readText("ios/MrBroccoli.xcodeproj/project.pbxproj");
 const androidBuild = readText("android/app/build.gradle");
@@ -139,6 +140,11 @@ const iosDeploymentTargets = [
 const sqlitePlugin = appConfig.plugins.find(
   (plugin) => Array.isArray(plugin) && plugin[0] === "expo-sqlite",
 );
+const iapPlugin = appConfig.plugins.find(
+  (plugin) =>
+    plugin === "expo-iap" ||
+    (Array.isArray(plugin) && plugin[0] === "expo-iap"),
+);
 
 assertEqual("package.json version", packageJson.version, appConfig.version);
 assertEqual("EAS version source", easConfig.cli?.appVersionSource, "local");
@@ -162,6 +168,24 @@ assertEqual(
   "Expo SQLite FTS plugin",
   sqlitePlugin?.[1]?.enableFTS,
   true,
+);
+assertEqual("Expo IAP plugin", Boolean(iapPlugin), true);
+assertEqual(
+  "Expo IAP package",
+  packageJson.dependencies?.["expo-iap"],
+  "^5.0.0",
+);
+assertEqual(
+  "Expo IAP lockfile package",
+  packageLock.packages?.["node_modules/expo-iap"]?.version,
+  "5.0.0",
+);
+assertIncludes("iOS Expo IAP pod", iosPodfileLock, "- ExpoIap (5.0.0):");
+assertIncludes("iOS OpenIAP pod", iosPodfileLock, "- openiap (3.0.0)");
+assertIncludes(
+  "iOS OpenIAP resource",
+  iosProject,
+  '"${PODS_ROOT}/openiap/openiap-versions.json"',
 );
 assertEqual(
   "iOS SQLite FTS build property",
@@ -223,6 +247,31 @@ assertIncludes(
   "Android application ID",
   androidBuild,
   `applicationId '${androidPackage}'`,
+);
+assertIncludes(
+  "Android Play Billing permission",
+  androidManifest,
+  '<uses-permission android:name="com.android.vending.BILLING"/>',
+);
+assertIncludes(
+  "Android OpenIAP Play dependency",
+  androidBuild,
+  'implementation "io.github.hyochan.openiap:openiap-google:3.0.0"',
+);
+assertIncludes(
+  "Android OpenIAP Play dimension",
+  androidBuild,
+  'missingDimensionStrategy "platform", "play"',
+);
+assertIncludes(
+  "Android OpenIAP Horizon disabled",
+  androidGradleProperties,
+  "horizonEnabled=false",
+);
+assertIncludes(
+  "Android OpenIAP Fire OS disabled",
+  androidGradleProperties,
+  "fireOsEnabled=false",
 );
 assertIncludes(
   "Android unused Sherpa FFmpeg disabled",

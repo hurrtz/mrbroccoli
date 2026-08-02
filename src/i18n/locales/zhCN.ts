@@ -3,12 +3,14 @@ import { dataBackupTranslations } from "../dataBackupTranslations";
 import { conversationKnowledgeTranslations } from "../conversationKnowledgeTranslations";
 import { imagePromptTranslations } from "../imagePromptTranslations";
 import { onDeviceTranslations } from "../onDeviceTranslations";
+import { premiumTranslations } from "../premiumTranslations";
 
 export const zhCN = {
   ...dataBackupTranslations.zhCN,
   ...conversationKnowledgeTranslations.zhCN,
   ...imagePromptTranslations.zhCN,
   ...onDeviceTranslations["zh-CN"],
+  ...premiumTranslations["zh-CN"],
   appName: "西兰花先生",
   retry: "重试",
   dismiss: "关闭",

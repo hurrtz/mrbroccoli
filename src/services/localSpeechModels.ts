@@ -59,6 +59,17 @@ function whisperLanguage(language: SttLanguage) {
     : getSpeechLanguageDefinition(language).providerCode;
 }
 
+export function getLocalTtsBenchmarkText(language: SpeechLanguage) {
+  const samples: Partial<Record<SpeechLanguage, string>> = {
+    en: "Hello from Mr Broccoli.",
+    de: "Hallo von Mr Broccoli.",
+    es: "Hola desde Mr Broccoli.",
+    fr: "Bonjour de la part de Mr Broccoli.",
+    "pt-BR": "Olá, aqui é o Mr Broccoli.",
+  };
+  return samples[language] ?? "Hello from Mr Broccoli.";
+}
+
 export async function transcribeLocalAudio(params: {
   fileUri: string;
   modelId: LocalSttModelId;
@@ -186,12 +197,16 @@ export async function benchmarkLocalStt(
     loadMs = Date.now() - loadStartedAt;
     const audioSeconds = 2;
     const runStartedAt = Date.now();
-    await engine.transcribeSamples(
-      new Array(16_000 * audioSeconds).fill(0),
-      16_000,
-    );
-    const durationMs = Date.now() - runStartedAt;
-    await engine.destroy();
+    let durationMs: number;
+    try {
+      await engine.transcribeSamples(
+        new Array(16_000 * audioSeconds).fill(0),
+        16_000,
+      );
+      durationMs = Date.now() - runStartedAt;
+    } finally {
+      await engine.destroy().catch(() => undefined);
+    }
     const realtimeFactor = durationMs / 1000 / audioSeconds;
     const status =
       loadMs <= model.benchmark.maximumLoadMs &&
@@ -239,7 +254,7 @@ export async function benchmarkLocalTts(
   try {
     const synthesisStartedAt = Date.now();
     const result = await synthesizeLocalSpeech({
-      text: "Hello from Mr Broccoli.",
+      text: getLocalTtsBenchmarkText(speechLanguage),
       modelId,
       speechLanguage,
     });

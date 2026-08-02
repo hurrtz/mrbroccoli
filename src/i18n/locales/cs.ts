@@ -3,12 +3,14 @@ import { dataBackupTranslations } from "../dataBackupTranslations";
 import { conversationKnowledgeTranslations } from "../conversationKnowledgeTranslations";
 import { imagePromptTranslations } from "../imagePromptTranslations";
 import { onDeviceTranslations } from "../onDeviceTranslations";
+import { premiumTranslations } from "../premiumTranslations";
 
 export const cs = {
   ...dataBackupTranslations.cs,
   ...conversationKnowledgeTranslations.cs,
   ...imagePromptTranslations.cs,
   ...onDeviceTranslations.cs,
+  ...premiumTranslations.cs,
   appName: "Pan Brokolice",
   retry: "Zkuste to znovu",
   dismiss: "Zavřít",

@@ -3,12 +3,14 @@ import { dataBackupTranslations } from "../dataBackupTranslations";
 import { conversationKnowledgeTranslations } from "../conversationKnowledgeTranslations";
 import { imagePromptTranslations } from "../imagePromptTranslations";
 import { onDeviceTranslations } from "../onDeviceTranslations";
+import { premiumTranslations } from "../premiumTranslations";
 
 export const tr = {
   ...dataBackupTranslations.tr,
   ...conversationKnowledgeTranslations.tr,
   ...imagePromptTranslations.tr,
   ...onDeviceTranslations.tr,
+  ...premiumTranslations.tr,
   appName: "Bay Brokoli",
   retry: "Yeniden dene",
   dismiss: "Reddet",

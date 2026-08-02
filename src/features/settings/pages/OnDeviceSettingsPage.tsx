@@ -50,6 +50,7 @@ import {
 import { AntListenLanguageSelector } from "../AntListenLanguageSelector";
 import { AntSectionIntro, AntSettingsCard } from "../AntSettingsPrimitives";
 import { styles } from "../styles";
+import { formatBytes } from "../../../utils/formatBytes";
 
 type BusyAction = {
   action: "download" | "remove" | "test";
@@ -57,12 +58,6 @@ type BusyAction = {
 };
 
 const CAPABILITY_ORDER = ["llm", "stt", "tts"] as const;
-
-function formatBytes(bytes: number) {
-  return bytes >= 1024 ** 3
-    ? `${(bytes / 1024 ** 3).toFixed(1)} GB`
-    : `${Math.round(bytes / 1024 ** 2)} MB`;
-}
 
 function testStatusKey(result?: LocalModelBenchmarkResult) {
   switch (result?.status) {

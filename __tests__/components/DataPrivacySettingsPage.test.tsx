@@ -50,20 +50,26 @@ function createBackup(): AppDataBackup {
   };
 }
 
-function renderPage(overrides: {
-  conversationArchive?: ConversationArchiveController;
-  onCreateAppDataBackup?: () => Promise<AppDataBackup>;
-  onRestoreAppDataBackup?: React.ComponentProps<
-    typeof DataPrivacySettingsPage
-  >["onRestoreAppDataBackup"];
-  onUpdate?: React.ComponentProps<typeof DataPrivacySettingsPage>["onUpdate"];
-} = {}) {
+function renderPage(
+  overrides: {
+    conversationArchive?: ConversationArchiveController;
+    onCreateAppDataBackup?: () => Promise<AppDataBackup>;
+    onRestoreAppDataBackup?: React.ComponentProps<
+      typeof DataPrivacySettingsPage
+    >["onRestoreAppDataBackup"];
+    onUpdate?: React.ComponentProps<typeof DataPrivacySettingsPage>["onUpdate"];
+    isPremium?: boolean;
+    onOpenPremium?: () => void;
+  } = {},
+) {
   return render(
     <ThemeProvider mode="light">
       <LocalizationProvider language="en">
         <DataPrivacySettingsPage
+          isPremium={overrides.isPremium ?? true}
           settings={DEFAULT_SETTINGS}
           onUpdate={overrides.onUpdate ?? jest.fn()}
+          onOpenPremium={overrides.onOpenPremium ?? jest.fn()}
           conversationArchive={
             overrides.conversationArchive ?? {
               chooseDirectory: jest.fn(async () => undefined),
@@ -194,6 +200,42 @@ describe("DataPrivacySettingsPage", () => {
     expect(chooseDirectory).toHaveBeenCalledTimes(1);
   });
 
+  it("keeps Premium knowledge and archive operations locked in Free", () => {
+    const onOpenPremium = jest.fn();
+    const screen = renderPage({ isPremium: false, onOpenPremium });
+
+    expect(
+      screen.queryByLabelText("Use past conversation knowledge"),
+    ).toBeNull();
+    expect(
+      screen.queryByTestId("choose-conversation-archive-folder"),
+    ).toBeNull();
+    fireEvent.press(screen.getAllByText("Unlock Premium")[0]);
+    expect(onOpenPremium).toHaveBeenCalledTimes(1);
+  });
+
+  it("still lets a Free user disconnect a previously configured archive", () => {
+    const disconnect = jest.fn(async () => undefined);
+    const screen = renderPage({
+      isPremium: false,
+      conversationArchive: {
+        chooseDirectory: jest.fn(async () => undefined),
+        configured: true,
+        directoryName: "Mr Broccoli Archive",
+        disconnect,
+        error: null,
+        lastSyncedAt: null,
+        loaded: true,
+        syncNow: jest.fn(async () => undefined),
+        syncing: false,
+      },
+    });
+
+    fireEvent.press(screen.getByTestId("disconnect-conversation-archive"));
+    expect(disconnect).toHaveBeenCalledTimes(1);
+    expect(screen.queryByTestId("sync-conversation-archive")).toBeNull();
+  });
+
   it("retains a shared readable backup so deferred mail attachments remain readable", async () => {
     const backup = createBackup();
     const screen = renderPage({
@@ -283,9 +325,7 @@ describe("DataPrivacySettingsPage", () => {
     const screen = renderPage({ onCreateAppDataBackup });
 
     fireEvent.press(screen.getByTestId("export-encrypted-backup"));
-    expect(getVisibleModal(screen)?.props.title).toBe(
-      "Protect this backup",
-    );
+    expect(getVisibleModal(screen)?.props.title).toBe("Protect this backup");
 
     fireEvent.changeText(screen.getByTestId("backup-passphrase"), "short");
     fireEvent.changeText(
@@ -349,14 +389,12 @@ describe("DataPrivacySettingsPage", () => {
   it("runs only one encrypted export when the action is pressed repeatedly", async () => {
     const backup = createBackup();
     let finishEncryption: ((content: string) => void) | undefined;
-    jest
-      .spyOn(AppDataBackupService, "encryptAppDataBackup")
-      .mockImplementation(
-        () =>
-          new Promise<string>((resolve) => {
-            finishEncryption = resolve;
-          }),
-      );
+    jest.spyOn(AppDataBackupService, "encryptAppDataBackup").mockImplementation(
+      () =>
+        new Promise<string>((resolve) => {
+          finishEncryption = resolve;
+        }),
+    );
     const onCreateAppDataBackup = jest.fn(async () => backup);
     const screen = renderPage({ onCreateAppDataBackup });
 
@@ -415,9 +453,9 @@ describe("DataPrivacySettingsPage", () => {
         },
       ],
     });
-    jest.mocked(FileSystem.readAsStringAsync).mockResolvedValue(
-      encryptedDocument,
-    );
+    jest
+      .mocked(FileSystem.readAsStringAsync)
+      .mockResolvedValue(encryptedDocument);
     const screen = renderPage({ onRestoreAppDataBackup });
 
     fireEvent.press(screen.getByTestId("import-app-data-backup"));
@@ -437,9 +475,7 @@ describe("DataPrivacySettingsPage", () => {
     });
 
     await waitFor(() => {
-      expect(getVisibleModal(screen)?.props.title).toBe(
-        "Restore this backup?",
-      );
+      expect(getVisibleModal(screen)?.props.title).toBe("Restore this backup?");
     });
     expect(decryptBackup).toHaveBeenCalledWith(
       encryptedDocument,

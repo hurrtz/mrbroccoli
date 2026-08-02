@@ -3,12 +3,14 @@ import { dataBackupTranslations } from "../dataBackupTranslations";
 import { conversationKnowledgeTranslations } from "../conversationKnowledgeTranslations";
 import { imagePromptTranslations } from "../imagePromptTranslations";
 import { onDeviceTranslations } from "../onDeviceTranslations";
+import { premiumTranslations } from "../premiumTranslations";
 
 export const ru = {
   ...dataBackupTranslations.ru,
   ...conversationKnowledgeTranslations.ru,
   ...imagePromptTranslations.ru,
   ...onDeviceTranslations.ru,
+  ...premiumTranslations.ru,
   appName: "Мистер Брокколи",
   retry: "Повторить попытку",
   dismiss: "Закрыть",

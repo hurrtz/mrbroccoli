@@ -3,12 +3,14 @@ import { dataBackupTranslations } from "../dataBackupTranslations";
 import { conversationKnowledgeTranslations } from "../conversationKnowledgeTranslations";
 import { imagePromptTranslations } from "../imagePromptTranslations";
 import { onDeviceTranslations } from "../onDeviceTranslations";
+import { premiumTranslations } from "../premiumTranslations";
 
 export const ja = {
   ...dataBackupTranslations.ja,
   ...conversationKnowledgeTranslations.ja,
   ...imagePromptTranslations.ja,
   ...onDeviceTranslations.ja,
+  ...premiumTranslations.ja,
   appName: "ミスター・ブロッコリー",
   retry: "再試行",
   dismiss: "閉じる",

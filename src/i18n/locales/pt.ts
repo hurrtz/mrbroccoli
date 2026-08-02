@@ -3,12 +3,14 @@ import { dataBackupTranslations } from "../dataBackupTranslations";
 import { conversationKnowledgeTranslations } from "../conversationKnowledgeTranslations";
 import { imagePromptTranslations } from "../imagePromptTranslations";
 import { onDeviceTranslations } from "../onDeviceTranslations";
+import { premiumTranslations } from "../premiumTranslations";
 
 export const pt = {
   ...dataBackupTranslations.pt,
   ...conversationKnowledgeTranslations.pt,
   ...imagePromptTranslations.pt,
   ...onDeviceTranslations.pt,
+  ...premiumTranslations.pt,
   appName: "Sr. Brócolo",
   retry: "Tentar novamente",
   dismiss: "Fechar",

@@ -18,12 +18,14 @@ export function useMainScreenImageAttachments(params: {
   const { disabled, showError, t } = params;
   const [attachments, setAttachments] = useState<MessageImageAttachment[]>([]);
   const attachmentsRef = useRef(attachments);
+  const disabledRef = useRef(disabled);
   const mountedRef = useRef(true);
   attachmentsRef.current = attachments;
+  disabledRef.current = disabled;
 
   const appendPickerResult = useCallback(
     async (result: ImagePicker.ImagePickerResult) => {
-      if (result.canceled) {
+      if (disabledRef.current || result.canceled) {
         return;
       }
 
@@ -120,7 +122,7 @@ export function useMainScreenImageAttachments(params: {
   }, [appendPickerResult, showError, t]);
 
   const handleAddImage = useCallback(() => {
-    if (disabled) {
+    if (disabledRef.current) {
       return;
     }
     if (attachmentsRef.current.length >= MAX_MESSAGE_IMAGE_ATTACHMENTS) {
@@ -139,16 +141,14 @@ export function useMainScreenImageAttachments(params: {
       },
       { text: t("dismiss"), style: "cancel" },
     ]);
-  }, [chooseFromPhotos, disabled, showError, t, takePhoto]);
+  }, [chooseFromPhotos, showError, t, takePhoto]);
 
   const handleRemoveImage = useCallback((attachmentId: string) => {
     const current = attachmentsRef.current;
     const removed = current.filter(
       (attachment) => attachment.id === attachmentId,
     );
-    const next = current.filter(
-      (attachment) => attachment.id !== attachmentId,
-    );
+    const next = current.filter((attachment) => attachment.id !== attachmentId);
     attachmentsRef.current = next;
     setAttachments(next);
     void deleteImageAttachments(removed);
@@ -169,6 +169,12 @@ export function useMainScreenImageAttachments(params: {
     setAttachments([]);
     void deleteImageAttachments(current);
   }, []);
+
+  useEffect(() => {
+    if (disabled && attachmentsRef.current.length > 0) {
+      clearAttachments();
+    }
+  }, [clearAttachments, disabled]);
 
   useEffect(
     () => () => {

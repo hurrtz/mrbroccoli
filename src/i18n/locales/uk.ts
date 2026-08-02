@@ -3,12 +3,14 @@ import { dataBackupTranslations } from "../dataBackupTranslations";
 import { conversationKnowledgeTranslations } from "../conversationKnowledgeTranslations";
 import { imagePromptTranslations } from "../imagePromptTranslations";
 import { onDeviceTranslations } from "../onDeviceTranslations";
+import { premiumTranslations } from "../premiumTranslations";
 
 export const uk = {
   ...dataBackupTranslations.uk,
   ...conversationKnowledgeTranslations.uk,
   ...imagePromptTranslations.uk,
   ...onDeviceTranslations.uk,
+  ...premiumTranslations.uk,
   appName: "Пан Броколі",
   retry: "Повторити",
   dismiss: "Закрити",

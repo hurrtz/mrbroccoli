@@ -6,6 +6,8 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { ConversationDrawer } from "../../components/ConversationDrawer";
 import { ConversationMemoryModal } from "../../components/ConversationMemoryModal";
 import { SetupGuideModal } from "../../components/SetupGuideModal";
+import { FreeOfflineSetupModal } from "../../components/FreeOfflineSetupModal";
+import { PremiumUpgradeModal } from "../../components/PremiumUpgradeModal";
 import { Toast } from "../../components/Toast";
 import { AntSettingsModal } from "../../features/settings/AntSettingsModal";
 import { Colors } from "../../theme/colors";
@@ -18,8 +20,10 @@ interface MainScreenPresentationProps {
   colors: Colors;
   conversationDrawer: React.ComponentProps<typeof ConversationDrawer>;
   conversationMemory: React.ComponentProps<typeof ConversationMemoryModal>;
+  freeOffline: React.ComponentProps<typeof FreeOfflineSetupModal>;
   isDark: boolean;
   isLandscape: boolean;
+  premiumUpgrade: React.ComponentProps<typeof PremiumUpgradeModal>;
   settingsModal: React.ComponentProps<typeof AntSettingsModal>;
   setupGuide: React.ComponentProps<typeof SetupGuideModal>;
   statusDetails: React.ComponentProps<typeof StatusDetailsModal>;
@@ -32,8 +36,10 @@ export function MainScreenPresentation({
   colors,
   conversationDrawer,
   conversationMemory,
+  freeOffline,
   isDark,
   isLandscape,
+  premiumUpgrade,
   settingsModal,
   setupGuide,
   statusDetails,
@@ -69,6 +75,8 @@ export function MainScreenPresentation({
       <StatusDetailsModal {...statusDetails} />
       <AntSettingsModal {...settingsModal} />
       <SetupGuideModal {...setupGuide} />
+      <FreeOfflineSetupModal {...freeOffline} />
+      <PremiumUpgradeModal {...premiumUpgrade} />
       <ConversationMemoryModal {...conversationMemory} />
       <ConversationDrawer {...conversationDrawer} />
     </SafeAreaView>

@@ -7,6 +7,22 @@ import { DEFAULT_SETTINGS, type Settings } from "../../src/types";
 import { getDefaultModelForProvider } from "../../src/utils/responseModes";
 import { renderWithProviders } from "../test-utils/renderWithProviders";
 
+jest.mock("../../src/context/PremiumEntitlementContext", () => ({
+  usePremiumEntitlement: jest.fn(() => ({
+    busy: false,
+    clearError: jest.fn(),
+    displayPrice: null,
+    error: null,
+    isPremium: true,
+    purchasePremium: jest.fn(async () => undefined),
+    refreshPremium: jest.fn(async () => undefined),
+    restorePremium: jest.fn(async () => undefined),
+    status: "premium",
+    storeConnected: true,
+    storeProduct: null,
+  })),
+}));
+
 jest.mock("react-native", () => {
   const actual = jest.requireActual("react-native");
   const mockedUseWindowDimensions = jest.fn(() => ({

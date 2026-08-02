@@ -17,6 +17,7 @@ interface MainScreenRouteControlsProps {
   layout?: "portrait" | "landscape";
   onToggleWebSearchEnabled?: () => void;
   onToggleUlraMode?: () => void;
+  showWebSearch?: boolean;
   t: TranslateFn;
   ulraModeActive?: boolean;
   ulraModeAvailable?: boolean;
@@ -30,6 +31,7 @@ export const MainScreenRouteControls = React.memo(
     layout = "portrait",
     onToggleWebSearchEnabled,
     onToggleUlraMode,
+    showWebSearch = true,
     t,
     ulraModeActive = false,
     ulraModeAvailable = false,
@@ -40,11 +42,11 @@ export const MainScreenRouteControls = React.memo(
       webSearchReady && Boolean(onToggleWebSearchEnabled);
     const webSearchValue = webSearchAvailable && webSearchEnabled;
     const showUlraMode =
-      layout === "portrait" &&
-      ulraModeAvailable &&
-      Boolean(onToggleUlraMode);
+      layout === "portrait" && ulraModeAvailable && Boolean(onToggleUlraMode);
+    const showWebSearchControl =
+      showWebSearch && (layout === "portrait" || webSearchAvailable);
 
-    if (layout === "landscape" && !webSearchAvailable) {
+    if (!showWebSearchControl && !showUlraMode) {
       return null;
     }
 
@@ -66,66 +68,68 @@ export const MainScreenRouteControls = React.memo(
             value={ulraModeActive}
           />
         ) : null}
-        <Pressable
-          testID="route-web-search-container"
-          accessibilityLabel={t("webSearch")}
-          accessibilityRole="switch"
-          accessibilityState={{
-            checked: webSearchValue,
-            disabled: !webSearchAvailable,
-          }}
-          disabled={!webSearchAvailable}
-          onPress={
-            webSearchAvailable
-              ? () => onToggleWebSearchEnabled?.()
-              : undefined
-          }
-          style={({ pressed }) => [
-            styles.searchControl,
-            !webSearchAvailable ? styles.searchControlDisabled : null,
-            pressed && webSearchAvailable
-              ? styles.searchControlPressed
-              : null,
-          ]}
-        >
-          <Text
-            testID="route-web-search-label"
-            accessible={false}
-            style={[
-              styles.searchLabel,
-              {
-                color: webSearchAvailable
-                  ? colors.textSecondary
-                  : colors.textMuted,
-              },
-            ]}
-          >
-            {t("webSearch")}
-          </Text>
-          <NativeSwitch
-            testID="route-web-search-control"
-            accessible={false}
-            focusable={false}
-            importantForAccessibility="no-hide-descendants"
-            pointerEvents="none"
-            style={styles.searchSwitch}
-            value={webSearchValue}
-            disabled={!webSearchAvailable}
-            trackColor={{
-              false: colors.borderStrong,
-              true:
-                Platform.OS === "android" ? colors.accentSoft : colors.accent,
+        {showWebSearchControl ? (
+          <Pressable
+            testID="route-web-search-container"
+            accessibilityLabel={t("webSearch")}
+            accessibilityRole="switch"
+            accessibilityState={{
+              checked: webSearchValue,
+              disabled: !webSearchAvailable,
             }}
-            thumbColor={
-              Platform.OS === "android"
-                ? webSearchValue
-                  ? colors.accent
-                  : colors.surface
+            disabled={!webSearchAvailable}
+            onPress={
+              webSearchAvailable
+                ? () => onToggleWebSearchEnabled?.()
                 : undefined
             }
-            ios_backgroundColor={colors.borderStrong}
-          />
-        </Pressable>
+            style={({ pressed }) => [
+              styles.searchControl,
+              !webSearchAvailable ? styles.searchControlDisabled : null,
+              pressed && webSearchAvailable
+                ? styles.searchControlPressed
+                : null,
+            ]}
+          >
+            <Text
+              testID="route-web-search-label"
+              accessible={false}
+              style={[
+                styles.searchLabel,
+                {
+                  color: webSearchAvailable
+                    ? colors.textSecondary
+                    : colors.textMuted,
+                },
+              ]}
+            >
+              {t("webSearch")}
+            </Text>
+            <NativeSwitch
+              testID="route-web-search-control"
+              accessible={false}
+              focusable={false}
+              importantForAccessibility="no-hide-descendants"
+              pointerEvents="none"
+              style={styles.searchSwitch}
+              value={webSearchValue}
+              disabled={!webSearchAvailable}
+              trackColor={{
+                false: colors.borderStrong,
+                true:
+                  Platform.OS === "android" ? colors.accentSoft : colors.accent,
+              }}
+              thumbColor={
+                Platform.OS === "android"
+                  ? webSearchValue
+                    ? colors.accent
+                    : colors.surface
+                  : undefined
+              }
+              ios_backgroundColor={colors.borderStrong}
+            />
+          </Pressable>
+        ) : null}
       </View>
     );
   },
@@ -166,8 +170,7 @@ function RouteSwitchControl({
         value={value}
         trackColor={{
           false: colors.borderStrong,
-          true:
-            Platform.OS === "android" ? colors.accentSoft : colors.accent,
+          true: Platform.OS === "android" ? colors.accentSoft : colors.accent,
         }}
         thumbColor={
           Platform.OS === "android"

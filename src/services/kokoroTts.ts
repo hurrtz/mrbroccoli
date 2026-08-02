@@ -20,6 +20,15 @@ import type {
   KokoroVoiceSelections,
   TtsListenLanguage,
 } from "../types";
+import {
+  LOCAL_MODEL_CATALOG_VERSION,
+  getLocalModel,
+} from "../constants/localModels";
+import {
+  probeLocalDeviceCapabilities,
+  saveLocalModelBenchmarkResult,
+  type LocalModelBenchmarkResult,
+} from "./localDeviceCapabilities";
 
 type KokoroEngine = Awaited<
   ReturnType<(typeof import("react-native-sherpa-onnx/tts"))["createTTS"]>
@@ -415,6 +424,7 @@ export async function synthesizeKokoroSpeech(params: {
         fileUri,
         language,
         voice: voice.id,
+        audioDurationSeconds: audio.samples.length / audio.sampleRate,
       };
     } catch (error) {
       if (fileUri) {
@@ -453,6 +463,69 @@ export async function verifyKokoroModel() {
 
   if (!info.exists || !("size" in info) || (info.size ?? 0) <= 44) {
     throw new Error("Kokoro installed, but its voice test produced no audio.");
+  }
+}
+
+export async function benchmarkKokoroModel(
+  language: KokoroLanguage,
+): Promise<LocalModelBenchmarkResult> {
+  const model = getLocalModel("kokoro-multilingual");
+  const device = await probeLocalDeviceCapabilities();
+  const startedAt = Date.now();
+  let generatedFileUri: string | null = null;
+
+  try {
+    await releaseKokoroResources();
+    const result = await synthesizeKokoroSpeech({
+      text:
+        language === "zh"
+          ? "你好，我是 Mr Broccoli。"
+          : "Hello from Mr Broccoli.",
+      listenLanguages: [language === "zh" ? "zh-CN" : "en"],
+      voices: DEFAULT_KOKORO_VOICES,
+    });
+    generatedFileUri = result.fileUri;
+    const durationMs = Date.now() - startedAt;
+    const realtimeFactor =
+      durationMs / 1000 / Math.max(0.001, result.audioDurationSeconds);
+    const status =
+      durationMs <= model.benchmark.maximumLoadMs &&
+      realtimeFactor <= (model.benchmark.maximumRealtimeFactor ?? Infinity)
+        ? "viable"
+        : "below-target";
+    const benchmark: LocalModelBenchmarkResult = {
+      modelId: model.id,
+      catalogVersion: LOCAL_MODEL_CATALOG_VERSION,
+      testedAt: new Date().toISOString(),
+      status,
+      loadMs: durationMs,
+      durationMs,
+      realtimeFactor,
+      device,
+    };
+    await saveLocalModelBenchmarkResult(benchmark);
+    return benchmark;
+  } catch (error) {
+    const durationMs = Date.now() - startedAt;
+    const benchmark: LocalModelBenchmarkResult = {
+      modelId: model.id,
+      catalogVersion: LOCAL_MODEL_CATALOG_VERSION,
+      testedAt: new Date().toISOString(),
+      status: "failed",
+      loadMs: durationMs,
+      durationMs,
+      detail: error instanceof Error ? error.message : String(error),
+      device,
+    };
+    await saveLocalModelBenchmarkResult(benchmark);
+    return benchmark;
+  } finally {
+    if (generatedFileUri) {
+      await deleteAsync(generatedFileUri, { idempotent: true }).catch(
+        () => undefined,
+      );
+    }
+    await releaseKokoroResources().catch(() => undefined);
   }
 }
 

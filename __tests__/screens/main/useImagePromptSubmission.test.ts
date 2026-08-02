@@ -17,8 +17,10 @@ const attachment: MessageImageAttachment = {
   sharedWithProviders: [],
 };
 
-const t = ((key: string, params?: Record<string, string | number | undefined>) =>
-  params ? `${key}:${JSON.stringify(params)}` : key) as TranslateFn;
+const t = ((
+  key: string,
+  params?: Record<string, string | number | undefined>,
+) => (params ? `${key}:${JSON.stringify(params)}` : key)) as TranslateFn;
 
 describe("useImagePromptSubmission", () => {
   beforeEach(() => {
@@ -31,6 +33,7 @@ describe("useImagePromptSubmission", () => {
     const { result } = renderHook(() =>
       useImagePromptSubmission({
         activeConversation: null,
+        imagesEnabled: true,
         imageRoutes: [
           { provider: "openai", model: "gpt-5.5-2026-04-23" },
           { provider: "anthropic", model: "claude-sonnet-5" },
@@ -73,9 +76,8 @@ describe("useImagePromptSubmission", () => {
     const { result } = renderHook(() =>
       useImagePromptSubmission({
         activeConversation: null,
-        imageRoutes: [
-          { provider: "openai", model: "gpt-5.5-2026-04-23" },
-        ],
+        imagesEnabled: true,
+        imageRoutes: [{ provider: "openai", model: "gpt-5.5-2026-04-23" }],
         onAddImage: jest.fn(),
         pendingAttachments: [attachment],
         runVoiceCapture,
@@ -110,9 +112,8 @@ describe("useImagePromptSubmission", () => {
     const { result } = renderHook(() =>
       useImagePromptSubmission({
         activeConversation: null,
-        imageRoutes: [
-          { provider: "deepseek", model: "deepseek-v4-flash" },
-        ],
+        imagesEnabled: true,
+        imageRoutes: [{ provider: "deepseek", model: "deepseek-v4-flash" }],
         onAddImage,
         pendingAttachments: [attachment],
         runVoiceCapture: jest.fn(async () => undefined),
@@ -159,9 +160,8 @@ describe("useImagePromptSubmission", () => {
             },
           ],
         },
-        imageRoutes: [
-          { provider: "deepseek", model: "deepseek-v4-flash" },
-        ],
+        imagesEnabled: true,
+        imageRoutes: [{ provider: "deepseek", model: "deepseek-v4-flash" }],
         onAddImage: jest.fn(),
         pendingAttachments: [],
         runVoiceCapture: jest.fn(async () => undefined),
@@ -172,5 +172,53 @@ describe("useImagePromptSubmission", () => {
     );
 
     expect(result.current.imageInputBlockMessage).toBeNull();
+  });
+
+  it("does not resend history images after Premium image access is disabled", async () => {
+    const runVoiceCapture = jest.fn(async () => undefined);
+    const updateMessage = jest.fn(() => null);
+    const { result } = renderHook(() =>
+      useImagePromptSubmission({
+        activeConversation: {
+          id: "conversation-1",
+          title: "Premium image",
+          createdAt: "2026-08-02T08:00:00.000Z",
+          updatedAt: "2026-08-02T08:01:00.000Z",
+          contextSummary: null,
+          summarizedMessageCount: 0,
+          messages: [
+            {
+              id: "image-message",
+              role: "user",
+              content: "Remember this",
+              attachments: [attachment],
+              model: null,
+              provider: null,
+              timestamp: "2026-08-02T08:00:00.000Z",
+            },
+          ],
+        },
+        imagesEnabled: false,
+        imageRoutes: [{ provider: "deepseek", model: "deepseek-v4-flash" }],
+        onAddImage: jest.fn(),
+        pendingAttachments: [],
+        runVoiceCapture,
+        showToast: jest.fn(),
+        t,
+        updateMessage,
+      }),
+    );
+
+    await act(async () => {
+      await result.current.handleVoiceCaptureDone({
+        transcriptionOverride: "Continue without the image",
+      });
+    });
+
+    expect(result.current.imageInputBlockMessage).toBeNull();
+    expect(runVoiceCapture).toHaveBeenCalledWith({
+      transcriptionOverride: "Continue without the image",
+    });
+    expect(updateMessage).not.toHaveBeenCalled();
   });
 });

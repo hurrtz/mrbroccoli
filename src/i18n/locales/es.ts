@@ -3,12 +3,14 @@ import { dataBackupTranslations } from "../dataBackupTranslations";
 import { conversationKnowledgeTranslations } from "../conversationKnowledgeTranslations";
 import { imagePromptTranslations } from "../imagePromptTranslations";
 import { onDeviceTranslations } from "../onDeviceTranslations";
+import { premiumTranslations } from "../premiumTranslations";
 
 export const es = {
   ...dataBackupTranslations.es,
   ...conversationKnowledgeTranslations.es,
   ...imagePromptTranslations.es,
   ...onDeviceTranslations.es,
+  ...premiumTranslations.es,
   appName: "Sr. Brócoli",
   retry: "Reintentar",
   dismiss: "Cerrar",

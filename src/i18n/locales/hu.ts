@@ -3,12 +3,14 @@ import { dataBackupTranslations } from "../dataBackupTranslations";
 import { conversationKnowledgeTranslations } from "../conversationKnowledgeTranslations";
 import { imagePromptTranslations } from "../imagePromptTranslations";
 import { onDeviceTranslations } from "../onDeviceTranslations";
+import { premiumTranslations } from "../premiumTranslations";
 
 export const hu = {
   ...dataBackupTranslations.hu,
   ...conversationKnowledgeTranslations.hu,
   ...imagePromptTranslations.hu,
   ...onDeviceTranslations.hu,
+  ...premiumTranslations.hu,
   appName: "Brokkoli úr",
   retry: "Próbálja újra",
   dismiss: "Bezárás",

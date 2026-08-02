@@ -32,13 +32,20 @@ import {
   AntButtonLabel,
   AntSectionIntro,
   AntSettingsCard,
-  AntSwitchRow,
 } from "../AntSettingsPrimitives";
 import { styles } from "../styles";
 import type { Settings } from "../../../types";
+import {
+  ConversationArchiveSection,
+  PastConversationKnowledgeSection,
+} from "./dataPrivacy/DataPrivacyKnowledgeSections";
 
 type BusyState =
-  "export-encrypted" | "export-readable" | "import" | "restore" | null;
+  | "export-encrypted"
+  | "export-readable"
+  | "import"
+  | "restore"
+  | null;
 
 function getBackupFileName(encrypted: boolean) {
   const timestamp = new Date()
@@ -52,16 +59,20 @@ function getBackupFileName(encrypted: boolean) {
 
 export function DataPrivacySettingsPage({
   conversationArchive,
+  isPremium,
   onCreateAppDataBackup,
+  onOpenPremium,
   onRestoreAppDataBackup,
   settings,
   onUpdate,
 }: {
   conversationArchive: ConversationArchiveController;
+  isPremium: boolean;
   onCreateAppDataBackup: () => Promise<AppDataBackup>;
   onRestoreAppDataBackup: (
     backup: AppDataBackup,
   ) => Promise<AppDataBackupRestoreResult>;
+  onOpenPremium: () => void;
   settings: Settings;
   onUpdate: (partial: Partial<Settings>) => void;
 }) {
@@ -431,138 +442,17 @@ export function DataPrivacySettingsPage({
 
   return (
     <View style={styles.sectionPageStack}>
-      <View style={styles.sectionGroup}>
-        <AntSectionIntro
-          title={t("pastConversationKnowledge")}
-          description={t("pastConversationKnowledgeDescription")}
-        />
-        <AntSettingsCard>
-          <AntSwitchRow
-            label={t("usePastConversationKnowledge")}
-            description={t("usePastConversationKnowledgeDescription")}
-            value={settings.pastConversationKnowledgeEnabled}
-            onChange={(pastConversationKnowledgeEnabled) =>
-              onUpdate({ pastConversationKnowledgeEnabled })
-            }
-          />
-          <Text style={[styles.helperText, { color: colors.textMuted }]}>
-            {t("pastConversationKnowledgeDisclosure")}
-          </Text>
-        </AntSettingsCard>
-      </View>
-
-      <View style={styles.sectionGroup}>
-        <AntSectionIntro
-          title={t("conversationArchive")}
-          description={t("conversationArchiveDescription")}
-        />
-        <AntSettingsCard>
-          <Text style={[styles.warningText, { color: colors.danger }]}>
-            {t("conversationArchiveWarning")}
-          </Text>
-          {conversationArchive.configured ? (
-            <View style={styles.dataBackupActions}>
-              <Text
-                style={[styles.helperText, { color: colors.textSecondary }]}
-              >
-                {t("conversationArchiveFolder", {
-                  folder: conversationArchive.directoryName ?? "",
-                })}
-              </Text>
-              <Text style={[styles.helperText, { color: colors.textMuted }]}>
-                {conversationArchive.lastSyncedAt
-                  ? t("conversationArchiveLastSynced", {
-                      date: new Date(
-                        conversationArchive.lastSyncedAt,
-                      ).toLocaleString(),
-                    })
-                  : t("conversationArchiveNeverSynced")}
-              </Text>
-              <Button
-                testID="sync-conversation-archive"
-                disabled={
-                  !conversationArchive.loaded || conversationArchive.syncing
-                }
-                loading={conversationArchive.syncing}
-                onPress={() => void conversationArchive.syncNow()}
-                style={styles.dataBackupButton}
-              >
-                <AntButtonLabel
-                  color={colors.text}
-                  icon="reload"
-                  label={t("conversationArchiveSyncNow")}
-                />
-              </Button>
-              <Button
-                testID="change-conversation-archive-folder"
-                disabled={
-                  !conversationArchive.loaded || conversationArchive.syncing
-                }
-                onPress={() => void conversationArchive.chooseDirectory()}
-                style={styles.dataBackupButton}
-              >
-                <AntButtonLabel
-                  color={colors.text}
-                  icon="folder-open"
-                  label={t("conversationArchiveChangeFolder")}
-                />
-              </Button>
-              <Button
-                testID="disconnect-conversation-archive"
-                disabled={
-                  !conversationArchive.loaded || conversationArchive.syncing
-                }
-                onPress={() => void conversationArchive.disconnect()}
-                style={styles.dataBackupButton}
-              >
-                <AntButtonLabel
-                  color={colors.text}
-                  icon="close"
-                  label={t("conversationArchiveDisconnect")}
-                />
-              </Button>
-            </View>
-          ) : (
-            <Button
-              testID="choose-conversation-archive-folder"
-              disabled={
-                !conversationArchive.loaded || conversationArchive.syncing
-              }
-              loading={conversationArchive.syncing}
-              onPress={() => void conversationArchive.chooseDirectory()}
-              style={styles.dataBackupButton}
-            >
-              <AntButtonLabel
-                color={colors.text}
-                icon="folder-open"
-                label={t("conversationArchiveChooseFolder")}
-              />
-            </Button>
-          )}
-          {conversationArchive.syncing ? (
-            <Text
-              accessibilityLiveRegion="polite"
-              style={[styles.helperText, { color: colors.textMuted }]}
-            >
-              {t("conversationArchiveSyncing")}
-            </Text>
-          ) : null}
-          {conversationArchive.error ? (
-            <Text
-              accessibilityRole="alert"
-              style={[styles.helperText, { color: colors.danger }]}
-            >
-              {t(
-                conversationArchive.error === "access-lost"
-                  ? "conversationArchiveAccessLost"
-                  : conversationArchive.error === "unavailable"
-                    ? "conversationArchiveUnavailable"
-                    : "conversationArchiveSyncFailed",
-              )}
-            </Text>
-          ) : null}
-        </AntSettingsCard>
-      </View>
+      <PastConversationKnowledgeSection
+        isPremium={isPremium}
+        onOpenPremium={onOpenPremium}
+        onUpdate={onUpdate}
+        settings={settings}
+      />
+      <ConversationArchiveSection
+        conversationArchive={conversationArchive}
+        isPremium={isPremium}
+        onOpenPremium={onOpenPremium}
+      />
 
       <View style={styles.sectionGroup}>
         <AntSectionIntro

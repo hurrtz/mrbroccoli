@@ -23,6 +23,7 @@ import {
 
 export interface SettingsModalProps {
   visible: boolean;
+  isPremium: boolean;
   settings: Settings;
   kokoroModel: KokoroModelController;
   focusProvider?: Provider;
@@ -59,6 +60,8 @@ export interface SettingsModalProps {
     capability: ProviderCapability,
   ) => Promise<void>;
   onOpenSetupGuide?: () => void;
+  onOpenPremium: () => void;
+  onOpenOfflineSetup: () => void;
   conversationArchive: ConversationArchiveController;
   onCreateAppDataBackup: () => Promise<AppDataBackup>;
   onRestoreAppDataBackup: (
@@ -68,7 +71,12 @@ export interface SettingsModalProps {
 }
 
 export type SettingsTab =
-  "instructions" | "providers" | "web" | "stt" | "tts" | "ui";
+  | "instructions"
+  | "providers"
+  | "web"
+  | "stt"
+  | "tts"
+  | "ui";
 
 export type SettingsPage =
   | "overview"
@@ -80,6 +88,18 @@ export type SettingsPage =
   | "search"
   | "data"
   | "app";
+
+export const PREMIUM_SETTINGS_PAGES = [
+  "connections",
+  "thinking",
+  "listening",
+  "speaking",
+  "search",
+] as const satisfies readonly SettingsPage[];
+
+export function isPremiumSettingsPage(page: SettingsPage) {
+  return (PREMIUM_SETTINGS_PAGES as readonly SettingsPage[]).includes(page);
+}
 
 export type TextInputFocusHandler = NonNullable<
   React.ComponentProps<typeof TextInput>["onFocus"]
@@ -102,7 +122,11 @@ export type ProviderValidationStates = Partial<
 >;
 
 export type ProviderHealthState =
-  "unconfigured" | "configured" | "validating" | "healthy" | "failing";
+  | "unconfigured"
+  | "configured"
+  | "validating"
+  | "healthy"
+  | "failing";
 
 export type PreviewButtonPhase = "idle" | "generating" | "playing";
 

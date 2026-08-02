@@ -3,12 +3,14 @@ import { dataBackupTranslations } from "../dataBackupTranslations";
 import { conversationKnowledgeTranslations } from "../conversationKnowledgeTranslations";
 import { imagePromptTranslations } from "../imagePromptTranslations";
 import { onDeviceTranslations } from "../onDeviceTranslations";
+import { premiumTranslations } from "../premiumTranslations";
 
 export const ptBR = {
   ...dataBackupTranslations.ptBR,
   ...conversationKnowledgeTranslations.ptBR,
   ...imagePromptTranslations.ptBR,
   ...onDeviceTranslations.ptBR,
+  ...premiumTranslations.ptBR,
   appName: "Sr. Brócolis",
   retry: "Tentar novamente",
   dismiss: "Fechar",
