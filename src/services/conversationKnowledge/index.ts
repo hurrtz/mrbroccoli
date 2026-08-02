@@ -151,8 +151,8 @@ async function deleteConversationRows(
 export function removeConversationKnowledge(conversationId: string) {
   return enqueueConversationMutation(conversationId, async () => {
     const database = await getDatabase();
-    await database.withExclusiveTransactionAsync((transaction) =>
-      deleteConversationRows(transaction, conversationId),
+    await database.withTransactionAsync(() =>
+      deleteConversationRows(database, conversationId),
     );
   });
 }
@@ -199,7 +199,8 @@ export function syncConversationKnowledge(
       return;
     }
 
-    await database.withExclusiveTransactionAsync(async (transaction) => {
+    await database.withTransactionAsync(async () => {
+      const transaction = database;
       if (privateConversationIds.has(conversation.id)) {
         await deleteConversationRows(transaction, conversation.id);
         return;
@@ -265,7 +266,8 @@ export async function clearConversationKnowledgeIndex() {
     await Promise.all(conversationMutationQueues.values());
     await enqueueDatabaseMutation(async () => {
       const database = await getDatabase();
-      await database.withExclusiveTransactionAsync(async (transaction) => {
+      await database.withTransactionAsync(async () => {
+        const transaction = database;
         await transaction.runAsync("DELETE FROM knowledge_chunks_fts");
         await transaction.runAsync("DELETE FROM knowledge_conversations");
       });

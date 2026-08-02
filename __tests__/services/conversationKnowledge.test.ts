@@ -41,6 +41,7 @@ const sqliteMock = SQLite as typeof SQLite & {
     getAllAsync: jest.Mock;
     getFirstAsync: jest.Mock;
     runAsync: jest.Mock;
+    withTransactionAsync: jest.Mock;
     withExclusiveTransactionAsync: jest.Mock;
   };
 };
@@ -92,6 +93,10 @@ describe("conversation knowledge", () => {
     jest.clearAllMocks();
 
     sqliteMock.__database.withExclusiveTransactionAsync.mockImplementation(
+      async (operation: (database: typeof sqliteMock.__database) => unknown) =>
+        operation(sqliteMock.__database),
+    );
+    sqliteMock.__database.withTransactionAsync.mockImplementation(
       async (operation: (database: typeof sqliteMock.__database) => unknown) =>
         operation(sqliteMock.__database),
     );
@@ -242,7 +247,7 @@ describe("conversation knowledge", () => {
   it("serializes writes from different conversations on the shared database", async () => {
     let activeTransactions = 0;
     let maximumActiveTransactions = 0;
-    sqliteMock.__database.withExclusiveTransactionAsync.mockImplementation(
+    sqliteMock.__database.withTransactionAsync.mockImplementation(
       async (operation: (database: typeof sqliteMock.__database) => unknown) => {
         activeTransactions += 1;
         maximumActiveTransactions = Math.max(
@@ -270,6 +275,24 @@ describe("conversation knowledge", () => {
     ]);
 
     expect(maximumActiveTransactions).toBe(1);
+  });
+
+  it("keeps FTS mutations on the retained database connection", async () => {
+    const conversation = createConversation(
+      "garden",
+      "Garden",
+      "How often should I water tomatoes?",
+      "Water them in the morning.",
+    );
+
+    await syncConversationKnowledge(conversation, true);
+    await removeConversationKnowledge(conversation.id);
+    await clearConversationKnowledgeIndex();
+
+    expect(sqliteMock.__database.withTransactionAsync).toHaveBeenCalledTimes(3);
+    expect(
+      sqliteMock.__database.withExclusiveTransactionAsync,
+    ).not.toHaveBeenCalled();
   });
 
   it("retrieves local sources while excluding the current and private conversations", async () => {

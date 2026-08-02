@@ -18,6 +18,8 @@ the complete Play Store translations are kept in a dedicated file under
 
 ### Fixed
 
+- Prevent the optional past-conversation knowledge index from terminating the
+  iOS app while opening or clearing its local full-text database.
 - Prevent Android release optimization from renaming Sherpa JNI classes and
   crashing the app when Kokoro speech initializes.
 - Keep backup export responsive by deriving encryption keys on a native
