@@ -141,6 +141,9 @@ export function MainScreen() {
     progress: kokoroPromptBlockProgress,
   } = getKokoroPromptBlockState({
     kokoroModel,
+    verifiedByOfflineProfile:
+      freeOffline.entitlement.status === "free" &&
+      freeOffline.freeRuntimeReady,
     spokenRepliesEnabled: runtimeSettings.spokenRepliesEnabled,
     t,
     ttsMode: runtimeSettings.ttsMode,

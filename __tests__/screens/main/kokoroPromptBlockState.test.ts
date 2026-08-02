@@ -32,6 +32,22 @@ describe("getKokoroPromptBlockState", () => {
     ).toEqual({ actionLabel: null, message: null, progress: null });
   });
 
+  it("accepts Kokoro readiness verified by the Free offline profile", () => {
+    expect(
+      getKokoroPromptBlockState({
+        kokoroModel: {
+          ...readyModel,
+          installed: false,
+          verified: false,
+        },
+        verifiedByOfflineProfile: true,
+        spokenRepliesEnabled: true,
+        t,
+        ttsMode: "kokoro",
+      }),
+    ).toEqual({ actionLabel: null, message: null, progress: null });
+  });
+
   it("shows bounded download progress directly on the disabled action", () => {
     expect(
       getKokoroPromptBlockState({

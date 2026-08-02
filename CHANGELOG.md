@@ -31,6 +31,9 @@ the complete Play Store translations are kept in a dedicated file under
 
 ### Fixed
 
+- Trust a successfully installed and benchmarked Free on-device profile when
+  it selects Kokoro, avoiding a stale verification warning that redirected
+  Free users into the Premium-only Speaking settings after changing language.
 - Prevent local Whisper testing and transcription from terminating the app
   during automatic language detection, and benchmark a real speech fixture
   through the normal file-transcription route instead of synthetic silence.

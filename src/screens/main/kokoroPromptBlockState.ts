@@ -4,6 +4,7 @@ import { TranslateFn } from "./shared";
 
 interface GetKokoroPromptBlockStateParams {
   kokoroModel: KokoroModelState;
+  verifiedByOfflineProfile?: boolean;
   spokenRepliesEnabled: boolean;
   t: TranslateFn;
   ttsMode: Settings["ttsMode"];
@@ -11,6 +12,7 @@ interface GetKokoroPromptBlockStateParams {
 
 export function getKokoroPromptBlockState({
   kokoroModel,
+  verifiedByOfflineProfile = false,
   spokenRepliesEnabled,
   t,
   ttsMode,
@@ -18,6 +20,7 @@ export function getKokoroPromptBlockState({
   const blocked =
     spokenRepliesEnabled &&
     ttsMode === "kokoro" &&
+    !verifiedByOfflineProfile &&
     !(kokoroModel.installed && kokoroModel.verified);
 
   if (!blocked) {
