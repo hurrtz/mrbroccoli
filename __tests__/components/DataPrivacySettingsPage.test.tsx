@@ -15,6 +15,7 @@ import {
 } from "../../src/services/appDataBackup";
 import { ThemeProvider } from "../../src/theme/ThemeContext";
 import { DEFAULT_SETTINGS } from "../../src/types";
+import type { ConversationArchiveController } from "../../src/hooks/useConversationArchive";
 
 const NativeDialogType = NativeDialog as unknown as React.ComponentType<any>;
 
@@ -50,6 +51,7 @@ function createBackup(): AppDataBackup {
 }
 
 function renderPage(overrides: {
+  conversationArchive?: ConversationArchiveController;
   onCreateAppDataBackup?: () => Promise<AppDataBackup>;
   onRestoreAppDataBackup?: React.ComponentProps<
     typeof DataPrivacySettingsPage
@@ -62,19 +64,32 @@ function renderPage(overrides: {
         <DataPrivacySettingsPage
           settings={DEFAULT_SETTINGS}
           onUpdate={overrides.onUpdate ?? jest.fn()}
-            onCreateAppDataBackup={
-              overrides.onCreateAppDataBackup ??
-              jest.fn(async () => createBackup())
+          conversationArchive={
+            overrides.conversationArchive ?? {
+              chooseDirectory: jest.fn(async () => undefined),
+              configured: false,
+              directoryName: null,
+              disconnect: jest.fn(async () => undefined),
+              error: null,
+              lastSyncedAt: null,
+              loaded: true,
+              syncNow: jest.fn(async () => undefined),
+              syncing: false,
             }
-            onRestoreAppDataBackup={
-              overrides.onRestoreAppDataBackup ??
-              jest.fn(async () => ({
-                conversationsCopied: 0,
-                conversationsRestored: 1,
-                conversationsSkipped: 0,
-                settingsRestored: true,
-              }))
-            }
+          }
+          onCreateAppDataBackup={
+            overrides.onCreateAppDataBackup ??
+            jest.fn(async () => createBackup())
+          }
+          onRestoreAppDataBackup={
+            overrides.onRestoreAppDataBackup ??
+            jest.fn(async () => ({
+              conversationsCopied: 0,
+              conversationsRestored: 1,
+              conversationsSkipped: 0,
+              settingsRestored: true,
+            }))
+          }
         />
       </LocalizationProvider>
     </ThemeProvider>,
@@ -118,13 +133,65 @@ describe("DataPrivacySettingsPage", () => {
     expect(
       screen.getByText(/Retrieved excerpts are sent to the model provider/),
     ).toBeTruthy();
-    expect(screen.getByText(/Private conversations are never indexed/)).toBeTruthy();
+    expect(
+      screen.getByText(/Private conversations are never indexed/),
+    ).toBeTruthy();
 
     fireEvent(toggle, "valueChange", true);
 
     expect(onUpdate).toHaveBeenCalledWith({
       pastConversationKnowledgeEnabled: true,
     });
+  });
+
+  it("chooses, updates, and disconnects the plaintext conversation archive", () => {
+    const conversationArchive: ConversationArchiveController = {
+      chooseDirectory: jest.fn(async () => undefined),
+      configured: true,
+      directoryName: "Mr Broccoli Archive",
+      disconnect: jest.fn(async () => undefined),
+      error: null,
+      lastSyncedAt: "2026-08-02T10:00:00.000Z",
+      loaded: true,
+      syncNow: jest.fn(async () => undefined),
+      syncing: false,
+    };
+    const screen = renderPage({ conversationArchive });
+
+    expect(screen.getByText("AI conversation archive")).toBeTruthy();
+    expect(screen.getByText("Folder: Mr Broccoli Archive")).toBeTruthy();
+    expect(screen.getByText(/Archive files are plain text/)).toBeTruthy();
+
+    fireEvent.press(screen.getByTestId("sync-conversation-archive"));
+    fireEvent.press(screen.getByTestId("change-conversation-archive-folder"));
+    fireEvent.press(screen.getByTestId("disconnect-conversation-archive"));
+
+    expect(conversationArchive.syncNow).toHaveBeenCalledTimes(1);
+    expect(conversationArchive.chooseDirectory).toHaveBeenCalledTimes(1);
+    expect(conversationArchive.disconnect).toHaveBeenCalledTimes(1);
+  });
+
+  it("surfaces lost archive access and lets the user choose a folder", () => {
+    const chooseDirectory = jest.fn(async () => undefined);
+    const screen = renderPage({
+      conversationArchive: {
+        chooseDirectory,
+        configured: false,
+        directoryName: null,
+        disconnect: jest.fn(async () => undefined),
+        error: "access-lost",
+        lastSyncedAt: null,
+        loaded: true,
+        syncNow: jest.fn(async () => undefined),
+        syncing: false,
+      },
+    });
+
+    expect(screen.getByRole("alert").props.children).toBe(
+      "Folder access was lost. Choose the archive folder again.",
+    );
+    fireEvent.press(screen.getByTestId("choose-conversation-archive-folder"));
+    expect(chooseDirectory).toHaveBeenCalledTimes(1);
   });
 
   it("retains a shared readable backup so deferred mail attachments remain readable", async () => {

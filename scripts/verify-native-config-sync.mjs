@@ -40,6 +40,9 @@ const iosDiagnostics = readText("ios/MrBroccoli/MrBroccoliDiagnostics.swift");
 const iosDiagnosticsBridge = readText(
   "ios/MrBroccoli/MrBroccoliDiagnosticsBridge.m",
 );
+const iosArchiveDirectory = readText(
+  "ios/MrBroccoli/MrBroccoliArchiveDirectory.m",
+);
 const iosBackupCrypto = readText("ios/MrBroccoli/MrBroccoliBackupCrypto.m");
 const androidAdaptiveIcon = readText(
   "android/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml",
@@ -295,6 +298,21 @@ assertIncludes(
   "iOS diagnostics bridge export",
   iosDiagnosticsBridge,
   "RCT_EXTERN_MODULE(MrBroccoliDiagnostics, NSObject)",
+);
+assertIncludes(
+  "iOS archive directory source membership",
+  iosProject,
+  "MrBroccoliArchiveDirectory.m in Sources",
+);
+assertIncludes(
+  "iOS archive directory bookmark persistence",
+  iosArchiveDirectory,
+  "bookmarkDataWithOptions:NSURLBookmarkCreationMinimalBookmark",
+);
+assertIncludes(
+  "iOS archive directory bookmark resolution",
+  iosArchiveDirectory,
+  "URLByResolvingBookmarkData",
 );
 assertIncludes(
   "iOS backup crypto source membership",

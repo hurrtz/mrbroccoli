@@ -5,7 +5,10 @@ import * as Clipboard from "expo-clipboard";
 
 import { TranslationKey } from "../../i18n";
 import { AppLanguage, Conversation } from "../../types";
-import { formatConversationForCopy } from "../../utils/conversationExport";
+import {
+  formatConversationForAiHandoff,
+  formatConversationForCopy,
+} from "../../utils/conversationExport";
 import type { useConversations } from "../../hooks/useConversations";
 import type { ShowToastFn } from "./shared";
 
@@ -115,7 +118,7 @@ export function useConversationActions({
       }
 
       const title = conversation.title.trim() || t("untitledConversation");
-      const message = formatConversationForCopy(conversation, language);
+      const message = formatConversationForAiHandoff(conversation);
 
       try {
         await Share.share(
@@ -131,7 +134,7 @@ export function useConversationActions({
         showToast(t("couldntShareText"), undefined, "danger");
       }
     },
-    [language, resolveConversation, showToast, t],
+    [resolveConversation, showToast, t],
   );
 
   const handleShareMessage = useCallback(

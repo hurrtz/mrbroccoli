@@ -64,6 +64,7 @@ coverage/
 !/ios/MrBroccoli/MrBroccoliBackgroundVoiceTurn.m
 !/ios/MrBroccoli/MrBroccoliBackgroundVoiceTurn.h
 !/ios/MrBroccoli/MrBroccoliBackupCrypto.m
+!/ios/MrBroccoli/MrBroccoliArchiveDirectory.m
 !/ios/MrBroccoli/MrBroccoliNativeAudioQueue.m
 !/ios/MrBroccoli/MrBroccoliNativeWaveform.swift
 !/ios/MrBroccoli/MrBroccoliNativeWaveformView.swift

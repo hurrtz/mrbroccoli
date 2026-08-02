@@ -24,6 +24,10 @@ the complete Play Store translations are kept in a dedicated file under
   Piper routes selectable from the normal listening, thinking, and speaking
   settings. Web search remains disabled for local responses in this first
   version.
+- Keep readable Markdown copies of conversations in a user-selected Files or
+  Drive folder, automatically maintain index and latest-conversation files,
+  and share threads as structured handoffs for other AI apps. Provider keys,
+  hidden memory, instructions, and runtime metadata remain excluded.
 
 ### Fixed
 

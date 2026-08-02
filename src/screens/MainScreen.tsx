@@ -5,6 +5,7 @@ import { useAudioPlayer } from "../hooks/useAudioPlayer";
 import { useAudioRecorder } from "../hooks/useAudioRecorder";
 import { useNativeSpeechRecognizer } from "../hooks/useNativeSpeechRecognizer";
 import { useConversations } from "../hooks/useConversations";
+import { useConversationArchive } from "../hooks/useConversationArchive";
 import { useVoicePipeline } from "../hooks/useVoicePipeline";
 import { useBatteryDiagnostics } from "../hooks/useBatteryDiagnostics";
 import { useKokoroModel } from "../hooks/useKokoroModel";
@@ -110,6 +111,12 @@ export function MainScreen() {
     restoreConversationBackup,
     restorePortableSettings,
     settings,
+  });
+  const conversationArchive = useConversationArchive({
+    activeConversationId: activeConversation?.id ?? null,
+    conversationMetas: conversations,
+    conversationsLoaded,
+    getConversationById,
   });
 
   const recorder = useAudioRecorder();
@@ -864,6 +871,7 @@ export function MainScreen() {
           : undefined,
         onCreateAppDataBackup: handleCreateAppDataBackup,
         onRestoreAppDataBackup: handleRestoreAppDataBackup,
+        conversationArchive,
         onClose: closeSettings,
       }}
       setupGuide={{

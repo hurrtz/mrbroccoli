@@ -115,6 +115,20 @@ jest.mock("../../src/hooks/useConversations", () => ({
   })),
 }));
 
+jest.mock("../../src/hooks/useConversationArchive", () => ({
+  useConversationArchive: jest.fn(() => ({
+    chooseDirectory: jest.fn(async () => undefined),
+    configured: false,
+    directoryName: null,
+    disconnect: jest.fn(async () => undefined),
+    error: null,
+    lastSyncedAt: null,
+    loaded: true,
+    syncNow: jest.fn(async () => undefined),
+    syncing: false,
+  })),
+}));
+
 jest.mock("../../src/hooks/useProviderVoiceDirectory", () => ({
   useProviderVoiceDirectory: jest.fn(() => ({
     voices: [],

@@ -4,6 +4,7 @@ import {
   getProviderModelName,
 } from "../constants/models";
 import { translate } from "../i18n";
+export { formatConversationForAiHandoff } from "../services/conversationArchiveFormat";
 
 function formatSpeakerLabel(message: Message, language: AppLanguage) {
   if (message.role === "user") {

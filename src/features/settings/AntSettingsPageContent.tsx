@@ -217,6 +217,7 @@ export function AntSettingsPageContent({
           <DataPrivacySettingsPage
             settings={settings}
             onUpdate={onUpdate}
+            conversationArchive={props.conversationArchive}
             onCreateAppDataBackup={props.onCreateAppDataBackup}
             onRestoreAppDataBackup={props.onRestoreAppDataBackup}
           />

@@ -3,6 +3,20 @@ import type { TranslationParams } from "./types";
 type DataBackupTranslation = {
   settingsDataPrivacy: string;
   settingsDataPrivacySummary: string;
+  conversationArchive: string;
+  conversationArchiveDescription: string;
+  conversationArchiveWarning: string;
+  conversationArchiveChooseFolder: string;
+  conversationArchiveChangeFolder: string;
+  conversationArchiveSyncNow: string;
+  conversationArchiveDisconnect: string;
+  conversationArchiveFolder: (params: TranslationParams) => string;
+  conversationArchiveLastSynced: (params: TranslationParams) => string;
+  conversationArchiveNeverSynced: string;
+  conversationArchiveSyncing: string;
+  conversationArchiveAccessLost: string;
+  conversationArchiveUnavailable: string;
+  conversationArchiveSyncFailed: string;
   dataBackup: string;
   dataBackupDescription: string;
   dataBackupKeysExcluded: string;
@@ -35,7 +49,27 @@ type DataBackupTranslation = {
 export const dataBackupTranslations = {
   en: {
     settingsDataPrivacy: "Data & privacy",
-    settingsDataPrivacySummary: "Export or restore your settings and conversations.",
+    settingsDataPrivacySummary:
+      "Export or restore your settings and conversations.",
+    conversationArchive: "AI conversation archive",
+    conversationArchiveDescription:
+      "Keep readable Markdown copies of your conversations in a Files or Drive folder for use with other AI apps.",
+    conversationArchiveWarning:
+      "Archive files are plain text. Anyone with folder access can read them. Disconnecting stops updates but leaves the files in place.",
+    conversationArchiveChooseFolder: "Choose archive folder",
+    conversationArchiveChangeFolder: "Change folder",
+    conversationArchiveSyncNow: "Sync now",
+    conversationArchiveDisconnect: "Disconnect",
+    conversationArchiveFolder: ({ folder }) => `Folder: ${folder}`,
+    conversationArchiveLastSynced: ({ date }) => `Last synced: ${date}`,
+    conversationArchiveNeverSynced: "Not synced yet",
+    conversationArchiveSyncing: "Syncing conversations…",
+    conversationArchiveAccessLost:
+      "Folder access was lost. Choose the archive folder again.",
+    conversationArchiveUnavailable:
+      "Folder integration is unavailable in this app build.",
+    conversationArchiveSyncFailed:
+      "The conversation archive could not be updated.",
     dataBackup: "App data backup",
     dataBackupDescription:
       "Create a portable copy of your settings and complete conversation history.",
@@ -66,7 +100,8 @@ export const dataBackupTranslations = {
     backupInvalid: "This backup file is invalid.",
     backupUnsupported: "This backup version is not supported.",
     backupTooLarge: "This backup is too large to import.",
-    backupDecryptFailed: "The backup could not be unlocked. Check the passphrase.",
+    backupDecryptFailed:
+      "The backup could not be unlocked. Check the passphrase.",
     backupExportFailed: "The backup could not be exported.",
     backupImportFailed: "The backup could not be imported.",
     backupShareUnavailable: "File sharing is not available on this device.",
@@ -76,6 +111,26 @@ export const dataBackupTranslations = {
     settingsDataPrivacy: "Daten & Datenschutz",
     settingsDataPrivacySummary:
       "Einstellungen und Gespräche exportieren oder wiederherstellen.",
+    conversationArchive: "KI-Gesprächsarchiv",
+    conversationArchiveDescription:
+      "Speichere lesbare Markdown-Kopien deiner Gespräche in einem Dateien- oder Drive-Ordner für andere KI-Apps.",
+    conversationArchiveWarning:
+      "Archivdateien sind Klartext. Jede Person mit Ordnerzugriff kann sie lesen. Beim Trennen bleiben die Dateien erhalten.",
+    conversationArchiveChooseFolder: "Archivordner wählen",
+    conversationArchiveChangeFolder: "Ordner ändern",
+    conversationArchiveSyncNow: "Jetzt synchronisieren",
+    conversationArchiveDisconnect: "Trennen",
+    conversationArchiveFolder: ({ folder }) => `Ordner: ${folder}`,
+    conversationArchiveLastSynced: ({ date }) =>
+      `Zuletzt synchronisiert: ${date}`,
+    conversationArchiveNeverSynced: "Noch nicht synchronisiert",
+    conversationArchiveSyncing: "Gespräche werden synchronisiert…",
+    conversationArchiveAccessLost:
+      "Der Ordnerzugriff ging verloren. Wähle den Archivordner erneut.",
+    conversationArchiveUnavailable:
+      "Die Ordnerintegration ist in diesem App-Build nicht verfügbar.",
+    conversationArchiveSyncFailed:
+      "Das Gesprächsarchiv konnte nicht aktualisiert werden.",
     dataBackup: "Sicherung der App-Daten",
     dataBackupDescription:
       "Erstelle eine portable Kopie deiner Einstellungen und des vollständigen Gesprächsverlaufs.",
@@ -110,13 +165,33 @@ export const dataBackupTranslations = {
       "Die Sicherung konnte nicht entsperrt werden. Prüfe die Passphrase.",
     backupExportFailed: "Die Sicherung konnte nicht exportiert werden.",
     backupImportFailed: "Die Sicherung konnte nicht importiert werden.",
-    backupShareUnavailable: "Dateifreigabe ist auf diesem Gerät nicht verfügbar.",
+    backupShareUnavailable:
+      "Dateifreigabe ist auf diesem Gerät nicht verfügbar.",
     continue: "Weiter",
   },
   uk: {
     settingsDataPrivacy: "Дані та конфіденційність",
     settingsDataPrivacySummary:
       "Експортуйте або відновлюйте налаштування й розмови.",
+    conversationArchive: "Архів розмов для ШІ",
+    conversationArchiveDescription:
+      "Зберігайте читабельні Markdown-копії розмов у папці Files або Drive для інших застосунків ШІ.",
+    conversationArchiveWarning:
+      "Файли архіву є звичайним текстом. Їх може прочитати кожен із доступом до папки. Після від’єднання файли залишаться.",
+    conversationArchiveChooseFolder: "Вибрати папку архіву",
+    conversationArchiveChangeFolder: "Змінити папку",
+    conversationArchiveSyncNow: "Синхронізувати зараз",
+    conversationArchiveDisconnect: "Від’єднати",
+    conversationArchiveFolder: ({ folder }) => `Папка: ${folder}`,
+    conversationArchiveLastSynced: ({ date }) =>
+      `Остання синхронізація: ${date}`,
+    conversationArchiveNeverSynced: "Ще не синхронізовано",
+    conversationArchiveSyncing: "Синхронізація розмов…",
+    conversationArchiveAccessLost:
+      "Доступ до папки втрачено. Виберіть папку архіву знову.",
+    conversationArchiveUnavailable:
+      "Інтеграція з папками недоступна в цій збірці застосунку.",
+    conversationArchiveSyncFailed: "Не вдалося оновити архів розмов.",
     dataBackup: "Резервна копія даних",
     dataBackupDescription:
       "Створіть переносну копію налаштувань і повної історії розмов.",
@@ -158,6 +233,24 @@ export const dataBackupTranslations = {
     settingsDataPrivacy: "डेटा और गोपनीयता",
     settingsDataPrivacySummary:
       "अपनी सेटिंग और बातचीत निर्यात या पुनर्स्थापित करें।",
+    conversationArchive: "AI वार्तालाप संग्रह",
+    conversationArchiveDescription:
+      "अन्य AI ऐप्स के लिए वार्तालापों की पठनीय Markdown प्रतियाँ Files या Drive फ़ोल्डर में रखें।",
+    conversationArchiveWarning:
+      "संग्रह फ़ाइलें सादा टेक्स्ट हैं। फ़ोल्डर का ऐक्सेस रखने वाला कोई भी इन्हें पढ़ सकता है। डिस्कनेक्ट करने पर फ़ाइलें बनी रहती हैं।",
+    conversationArchiveChooseFolder: "संग्रह फ़ोल्डर चुनें",
+    conversationArchiveChangeFolder: "फ़ोल्डर बदलें",
+    conversationArchiveSyncNow: "अभी सिंक करें",
+    conversationArchiveDisconnect: "डिस्कनेक्ट करें",
+    conversationArchiveFolder: ({ folder }) => `फ़ोल्डर: ${folder}`,
+    conversationArchiveLastSynced: ({ date }) => `पिछला सिंक: ${date}`,
+    conversationArchiveNeverSynced: "अभी तक सिंक नहीं हुआ",
+    conversationArchiveSyncing: "वार्तालाप सिंक हो रहे हैं…",
+    conversationArchiveAccessLost:
+      "फ़ोल्डर ऐक्सेस खो गया। संग्रह फ़ोल्डर फिर से चुनें।",
+    conversationArchiveUnavailable:
+      "इस ऐप बिल्ड में फ़ोल्डर इंटीग्रेशन उपलब्ध नहीं है।",
+    conversationArchiveSyncFailed: "वार्तालाप संग्रह अपडेट नहीं हो सका।",
     dataBackup: "ऐप डेटा बैकअप",
     dataBackupDescription:
       "अपनी सेटिंग और पूरी बातचीत के इतिहास की पोर्टेबल प्रति बनाएँ।",
@@ -198,6 +291,26 @@ export const dataBackupTranslations = {
     settingsDataPrivacy: "Datos y privacidad",
     settingsDataPrivacySummary:
       "Exporta o restaura tus ajustes y conversaciones.",
+    conversationArchive: "Archivo de conversaciones para IA",
+    conversationArchiveDescription:
+      "Guarda copias legibles en Markdown de tus conversaciones en una carpeta de Archivos o Drive para otras apps de IA.",
+    conversationArchiveWarning:
+      "Los archivos están en texto plano. Cualquiera con acceso a la carpeta puede leerlos. Al desconectar, los archivos permanecen.",
+    conversationArchiveChooseFolder: "Elegir carpeta del archivo",
+    conversationArchiveChangeFolder: "Cambiar carpeta",
+    conversationArchiveSyncNow: "Sincronizar ahora",
+    conversationArchiveDisconnect: "Desconectar",
+    conversationArchiveFolder: ({ folder }) => `Carpeta: ${folder}`,
+    conversationArchiveLastSynced: ({ date }) =>
+      `Última sincronización: ${date}`,
+    conversationArchiveNeverSynced: "Aún no se ha sincronizado",
+    conversationArchiveSyncing: "Sincronizando conversaciones…",
+    conversationArchiveAccessLost:
+      "Se perdió el acceso a la carpeta. Vuelve a elegir la carpeta del archivo.",
+    conversationArchiveUnavailable:
+      "La integración con carpetas no está disponible en esta versión de la app.",
+    conversationArchiveSyncFailed:
+      "No se pudo actualizar el archivo de conversaciones.",
     dataBackup: "Copia de los datos de la app",
     dataBackupDescription:
       "Crea una copia portátil de tus ajustes y del historial completo de conversaciones.",
@@ -240,6 +353,26 @@ export const dataBackupTranslations = {
     settingsDataPrivacy: "Données et confidentialité",
     settingsDataPrivacySummary:
       "Exportez ou restaurez vos réglages et conversations.",
+    conversationArchive: "Archive de conversations pour l’IA",
+    conversationArchiveDescription:
+      "Conservez des copies Markdown lisibles de vos conversations dans un dossier Fichiers ou Drive pour d’autres apps d’IA.",
+    conversationArchiveWarning:
+      "Les fichiers sont en texte brut. Toute personne ayant accès au dossier peut les lire. La déconnexion conserve les fichiers.",
+    conversationArchiveChooseFolder: "Choisir le dossier d’archive",
+    conversationArchiveChangeFolder: "Changer de dossier",
+    conversationArchiveSyncNow: "Synchroniser maintenant",
+    conversationArchiveDisconnect: "Déconnecter",
+    conversationArchiveFolder: ({ folder }) => `Dossier : ${folder}`,
+    conversationArchiveLastSynced: ({ date }) =>
+      `Dernière synchronisation : ${date}`,
+    conversationArchiveNeverSynced: "Pas encore synchronisé",
+    conversationArchiveSyncing: "Synchronisation des conversations…",
+    conversationArchiveAccessLost:
+      "L’accès au dossier a été perdu. Choisissez à nouveau le dossier d’archive.",
+    conversationArchiveUnavailable:
+      "L’intégration aux dossiers n’est pas disponible dans cette version de l’app.",
+    conversationArchiveSyncFailed:
+      "Impossible de mettre à jour l’archive de conversations.",
     dataBackup: "Sauvegarde des données",
     dataBackupDescription:
       "Créez une copie portable de vos réglages et de tout l’historique des conversations.",
@@ -282,6 +415,26 @@ export const dataBackupTranslations = {
     settingsDataPrivacy: "Dati e privacy",
     settingsDataPrivacySummary:
       "Esporta o ripristina impostazioni e conversazioni.",
+    conversationArchive: "Archivio conversazioni per IA",
+    conversationArchiveDescription:
+      "Conserva copie Markdown leggibili delle conversazioni in una cartella File o Drive per altre app di IA.",
+    conversationArchiveWarning:
+      "I file sono in testo semplice. Chiunque acceda alla cartella può leggerli. La disconnessione lascia i file al loro posto.",
+    conversationArchiveChooseFolder: "Scegli cartella archivio",
+    conversationArchiveChangeFolder: "Cambia cartella",
+    conversationArchiveSyncNow: "Sincronizza ora",
+    conversationArchiveDisconnect: "Disconnetti",
+    conversationArchiveFolder: ({ folder }) => `Cartella: ${folder}`,
+    conversationArchiveLastSynced: ({ date }) =>
+      `Ultima sincronizzazione: ${date}`,
+    conversationArchiveNeverSynced: "Non ancora sincronizzato",
+    conversationArchiveSyncing: "Sincronizzazione conversazioni…",
+    conversationArchiveAccessLost:
+      "Accesso alla cartella perso. Scegli di nuovo la cartella archivio.",
+    conversationArchiveUnavailable:
+      "L’integrazione con le cartelle non è disponibile in questa build.",
+    conversationArchiveSyncFailed:
+      "Impossibile aggiornare l’archivio conversazioni.",
     dataBackup: "Backup dei dati dell’app",
     dataBackupDescription:
       "Crea una copia portatile delle impostazioni e dell’intera cronologia delle conversazioni.",
@@ -322,8 +475,27 @@ export const dataBackupTranslations = {
   },
   pt: {
     settingsDataPrivacy: "Dados e privacidade",
-    settingsDataPrivacySummary:
-      "Exporte ou restaure definições e conversas.",
+    settingsDataPrivacySummary: "Exporte ou restaure definições e conversas.",
+    conversationArchive: "Arquivo de conversas para IA",
+    conversationArchiveDescription:
+      "Guarde cópias Markdown legíveis das conversas numa pasta Ficheiros ou Drive para outras apps de IA.",
+    conversationArchiveWarning:
+      "Os ficheiros são texto simples. Quem tiver acesso à pasta pode lê-los. Ao desligar, os ficheiros permanecem.",
+    conversationArchiveChooseFolder: "Escolher pasta do arquivo",
+    conversationArchiveChangeFolder: "Alterar pasta",
+    conversationArchiveSyncNow: "Sincronizar agora",
+    conversationArchiveDisconnect: "Desligar",
+    conversationArchiveFolder: ({ folder }) => `Pasta: ${folder}`,
+    conversationArchiveLastSynced: ({ date }) =>
+      `Última sincronização: ${date}`,
+    conversationArchiveNeverSynced: "Ainda não sincronizado",
+    conversationArchiveSyncing: "A sincronizar conversas…",
+    conversationArchiveAccessLost:
+      "O acesso à pasta foi perdido. Escolha novamente a pasta do arquivo.",
+    conversationArchiveUnavailable:
+      "A integração com pastas não está disponível nesta versão da app.",
+    conversationArchiveSyncFailed:
+      "Não foi possível atualizar o arquivo de conversas.",
     dataBackup: "Cópia de segurança dos dados",
     dataBackupDescription:
       "Crie uma cópia portátil das definições e de todo o histórico de conversas.",
@@ -366,6 +538,26 @@ export const dataBackupTranslations = {
     settingsDataPrivacy: "Dados e privacidade",
     settingsDataPrivacySummary:
       "Exporte ou restaure configurações e conversas.",
+    conversationArchive: "Arquivo de conversas para IA",
+    conversationArchiveDescription:
+      "Guarde cópias Markdown legíveis das conversas em uma pasta Arquivos ou Drive para outros apps de IA.",
+    conversationArchiveWarning:
+      "Os arquivos são texto simples. Quem tiver acesso à pasta pode lê-los. Ao desconectar, os arquivos permanecem.",
+    conversationArchiveChooseFolder: "Escolher pasta do arquivo",
+    conversationArchiveChangeFolder: "Alterar pasta",
+    conversationArchiveSyncNow: "Sincronizar agora",
+    conversationArchiveDisconnect: "Desconectar",
+    conversationArchiveFolder: ({ folder }) => `Pasta: ${folder}`,
+    conversationArchiveLastSynced: ({ date }) =>
+      `Última sincronização: ${date}`,
+    conversationArchiveNeverSynced: "Ainda não sincronizado",
+    conversationArchiveSyncing: "Sincronizando conversas…",
+    conversationArchiveAccessLost:
+      "O acesso à pasta foi perdido. Escolha novamente a pasta do arquivo.",
+    conversationArchiveUnavailable:
+      "A integração com pastas não está disponível nesta versão do app.",
+    conversationArchiveSyncFailed:
+      "Não foi possível atualizar o arquivo de conversas.",
     dataBackup: "Backup dos dados do app",
     dataBackupDescription:
       "Crie uma cópia portátil das configurações e de todo o histórico de conversas.",
@@ -408,6 +600,25 @@ export const dataBackupTranslations = {
     settingsDataPrivacy: "Данные и конфиденциальность",
     settingsDataPrivacySummary:
       "Экспортируйте или восстановите настройки и разговоры.",
+    conversationArchive: "Архив разговоров для ИИ",
+    conversationArchiveDescription:
+      "Храните читаемые Markdown-копии разговоров в папке Файлы или Drive для других приложений ИИ.",
+    conversationArchiveWarning:
+      "Файлы архива — обычный текст. Их может прочитать любой с доступом к папке. При отключении файлы сохраняются.",
+    conversationArchiveChooseFolder: "Выбрать папку архива",
+    conversationArchiveChangeFolder: "Сменить папку",
+    conversationArchiveSyncNow: "Синхронизировать сейчас",
+    conversationArchiveDisconnect: "Отключить",
+    conversationArchiveFolder: ({ folder }) => `Папка: ${folder}`,
+    conversationArchiveLastSynced: ({ date }) =>
+      `Последняя синхронизация: ${date}`,
+    conversationArchiveNeverSynced: "Ещё не синхронизировано",
+    conversationArchiveSyncing: "Синхронизация разговоров…",
+    conversationArchiveAccessLost:
+      "Доступ к папке потерян. Выберите папку архива снова.",
+    conversationArchiveUnavailable:
+      "Интеграция с папками недоступна в этой сборке приложения.",
+    conversationArchiveSyncFailed: "Не удалось обновить архив разговоров.",
     dataBackup: "Резервная копия данных",
     dataBackupDescription:
       "Создайте переносимую копию настроек и полной истории разговоров.",
@@ -448,6 +659,23 @@ export const dataBackupTranslations = {
   zhCN: {
     settingsDataPrivacy: "数据与隐私",
     settingsDataPrivacySummary: "导出或恢复设置和对话。",
+    conversationArchive: "AI 对话存档",
+    conversationArchiveDescription:
+      "将对话的可读 Markdown 副本保存到“文件”或云端硬盘文件夹，供其他 AI 应用使用。",
+    conversationArchiveWarning:
+      "存档文件是纯文本。有权访问文件夹的人都能阅读。断开连接会停止更新，但不会删除文件。",
+    conversationArchiveChooseFolder: "选择存档文件夹",
+    conversationArchiveChangeFolder: "更改文件夹",
+    conversationArchiveSyncNow: "立即同步",
+    conversationArchiveDisconnect: "断开连接",
+    conversationArchiveFolder: ({ folder }) => `文件夹：${folder}`,
+    conversationArchiveLastSynced: ({ date }) => `上次同步：${date}`,
+    conversationArchiveNeverSynced: "尚未同步",
+    conversationArchiveSyncing: "正在同步对话…",
+    conversationArchiveAccessLost:
+      "文件夹访问权限已失效。请重新选择存档文件夹。",
+    conversationArchiveUnavailable: "此应用版本不支持文件夹集成。",
+    conversationArchiveSyncFailed: "无法更新对话存档。",
     dataBackup: "应用数据备份",
     dataBackupDescription: "创建包含设置和完整对话记录的便携副本。",
     dataBackupKeysExcluded:
@@ -464,7 +692,8 @@ export const dataBackupTranslations = {
     backupPassphraseMinimum: ({ count }) =>
       `请至少使用 ${count} 个字符。请妥善保存密码短语；它无法找回。`,
     backupPassphrasesDoNotMatch: "两次输入的密码短语不一致。",
-    backupPassphraseWeak: "请选择更难预测的密码短语。重复字符和常见序列并不安全。",
+    backupPassphraseWeak:
+      "请选择更难预测的密码短语。重复字符和常见序列并不安全。",
     encryptedBackupPassphraseTitle: "解锁加密备份",
     backupRestorePreviewTitle: "恢复此备份？",
     backupRestorePreviewMessage: ({ conversationCount, appVersion }) =>
@@ -484,6 +713,24 @@ export const dataBackupTranslations = {
   ar: {
     settingsDataPrivacy: "البيانات والخصوصية",
     settingsDataPrivacySummary: "صدّر إعداداتك ومحادثاتك أو استعدها.",
+    conversationArchive: "أرشيف المحادثات للذكاء الاصطناعي",
+    conversationArchiveDescription:
+      "احتفظ بنسخ Markdown مقروءة من محادثاتك في مجلد الملفات أو Drive لاستخدامها مع تطبيقات ذكاء اصطناعي أخرى.",
+    conversationArchiveWarning:
+      "ملفات الأرشيف نص عادي. يمكن لأي شخص لديه وصول إلى المجلد قراءتها. قطع الاتصال لا يحذف الملفات.",
+    conversationArchiveChooseFolder: "اختيار مجلد الأرشيف",
+    conversationArchiveChangeFolder: "تغيير المجلد",
+    conversationArchiveSyncNow: "المزامنة الآن",
+    conversationArchiveDisconnect: "قطع الاتصال",
+    conversationArchiveFolder: ({ folder }) => `المجلد: ${folder}`,
+    conversationArchiveLastSynced: ({ date }) => `آخر مزامنة: ${date}`,
+    conversationArchiveNeverSynced: "لم تتم المزامنة بعد",
+    conversationArchiveSyncing: "تجري مزامنة المحادثات…",
+    conversationArchiveAccessLost:
+      "فُقد الوصول إلى المجلد. اختر مجلد الأرشيف مرة أخرى.",
+    conversationArchiveUnavailable:
+      "تكامل المجلدات غير متاح في هذا الإصدار من التطبيق.",
+    conversationArchiveSyncFailed: "تعذر تحديث أرشيف المحادثات.",
     dataBackup: "نسخة احتياطية لبيانات التطبيق",
     dataBackupDescription:
       "أنشئ نسخة قابلة للنقل من إعداداتك وسجل المحادثات الكامل.",
@@ -493,8 +740,7 @@ export const dataBackupTranslations = {
     exportEncryptedBackup: "تصدير نسخة مشفرة",
     readableBackupWarning:
       "النسخة القابلة للقراءة نص عادي. يمكن لأي شخص يملك الملف قراءة محادثاتك.",
-    encryptedBackupHint:
-      "النسخة المشفرة محمية بعبارة مرور لا يمكن استعادتها.",
+    encryptedBackupHint: "النسخة المشفرة محمية بعبارة مرور لا يمكن استعادتها.",
     importBackup: "استيراد نسخة احتياطية",
     backupPassphraseTitle: "حماية هذه النسخة",
     backupPassphrase: "عبارة المرور",
@@ -523,9 +769,26 @@ export const dataBackupTranslations = {
   ja: {
     settingsDataPrivacy: "データとプライバシー",
     settingsDataPrivacySummary: "設定と会話をエクスポートまたは復元します。",
+    conversationArchive: "AI会話アーカイブ",
+    conversationArchiveDescription:
+      "会話の読みやすいMarkdownコピーをファイルまたはDriveフォルダに保存し、他のAIアプリで使えます。",
+    conversationArchiveWarning:
+      "アーカイブはプレーンテキストです。フォルダにアクセスできる人は内容を読めます。接続を解除してもファイルは残ります。",
+    conversationArchiveChooseFolder: "アーカイブフォルダを選択",
+    conversationArchiveChangeFolder: "フォルダを変更",
+    conversationArchiveSyncNow: "今すぐ同期",
+    conversationArchiveDisconnect: "接続を解除",
+    conversationArchiveFolder: ({ folder }) => `フォルダ：${folder}`,
+    conversationArchiveLastSynced: ({ date }) => `最終同期：${date}`,
+    conversationArchiveNeverSynced: "まだ同期されていません",
+    conversationArchiveSyncing: "会話を同期中…",
+    conversationArchiveAccessLost:
+      "フォルダへのアクセスが失われました。アーカイブフォルダを再選択してください。",
+    conversationArchiveUnavailable:
+      "このアプリビルドではフォルダ連携を利用できません。",
+    conversationArchiveSyncFailed: "会話アーカイブを更新できませんでした。",
     dataBackup: "アプリデータのバックアップ",
-    dataBackupDescription:
-      "設定と会話履歴全体の持ち運べるコピーを作成します。",
+    dataBackupDescription: "設定と会話履歴全体の持ち運べるコピーを作成します。",
     dataBackupKeysExcluded:
       "プロバイダーの API キーは決して含まれません。デバッグログ、ダウンロード済みモデル、音声、キャッシュ、実行時診断も除外されます。",
     exportReadableBackup: "読み取り可能なバックアップを書き出す",
@@ -564,6 +827,25 @@ export const dataBackupTranslations = {
     settingsDataPrivacy: "Adatok és adatvédelem",
     settingsDataPrivacySummary:
       "Beállítások és beszélgetések exportálása vagy visszaállítása.",
+    conversationArchive: "MI-beszélgetésarchívum",
+    conversationArchiveDescription:
+      "Tárold a beszélgetések olvasható Markdown-másolatait egy Fájlok vagy Drive mappában más MI-appokhoz.",
+    conversationArchiveWarning:
+      "Az archívum egyszerű szöveg. A mappához hozzáférők elolvashatják. A leválasztás nem törli a fájlokat.",
+    conversationArchiveChooseFolder: "Archívummappa kiválasztása",
+    conversationArchiveChangeFolder: "Mappa módosítása",
+    conversationArchiveSyncNow: "Szinkronizálás most",
+    conversationArchiveDisconnect: "Leválasztás",
+    conversationArchiveFolder: ({ folder }) => `Mappa: ${folder}`,
+    conversationArchiveLastSynced: ({ date }) =>
+      `Utolsó szinkronizálás: ${date}`,
+    conversationArchiveNeverSynced: "Még nincs szinkronizálva",
+    conversationArchiveSyncing: "Beszélgetések szinkronizálása…",
+    conversationArchiveAccessLost:
+      "A mappahozzáférés elveszett. Válaszd ki újra az archívummappát.",
+    conversationArchiveUnavailable:
+      "A mappaintegráció ebben az appverzióban nem érhető el.",
+    conversationArchiveSyncFailed: "A beszélgetésarchívum nem frissíthető.",
     dataBackup: "Alkalmazásadatok biztonsági mentése",
     dataBackupDescription:
       "Hordozható másolat készítése a beállításokról és a teljes beszélgetési előzményről.",
@@ -604,6 +886,26 @@ export const dataBackupTranslations = {
     settingsDataPrivacy: "Data a soukromí",
     settingsDataPrivacySummary:
       "Exportujte nebo obnovte nastavení a konverzace.",
+    conversationArchive: "Archiv konverzací pro AI",
+    conversationArchiveDescription:
+      "Ukládejte čitelné Markdown kopie konverzací do složky Soubory nebo Drive pro jiné AI aplikace.",
+    conversationArchiveWarning:
+      "Soubory archivu jsou prostý text. Každý s přístupem ke složce je může číst. Odpojení soubory nesmaže.",
+    conversationArchiveChooseFolder: "Vybrat složku archivu",
+    conversationArchiveChangeFolder: "Změnit složku",
+    conversationArchiveSyncNow: "Synchronizovat nyní",
+    conversationArchiveDisconnect: "Odpojit",
+    conversationArchiveFolder: ({ folder }) => `Složka: ${folder}`,
+    conversationArchiveLastSynced: ({ date }) =>
+      `Poslední synchronizace: ${date}`,
+    conversationArchiveNeverSynced: "Zatím nesynchronizováno",
+    conversationArchiveSyncing: "Synchronizace konverzací…",
+    conversationArchiveAccessLost:
+      "Přístup ke složce byl ztracen. Vyberte složku archivu znovu.",
+    conversationArchiveUnavailable:
+      "Integrace složek není v tomto sestavení aplikace dostupná.",
+    conversationArchiveSyncFailed:
+      "Archiv konverzací se nepodařilo aktualizovat.",
     dataBackup: "Záloha dat aplikace",
     dataBackupDescription:
       "Vytvořte přenositelnou kopii nastavení a celé historie konverzací.",
@@ -634,8 +936,7 @@ export const dataBackupTranslations = {
     backupInvalid: "Tento soubor zálohy není platný.",
     backupUnsupported: "Tato verze zálohy není podporována.",
     backupTooLarge: "Tato záloha je pro import příliš velká.",
-    backupDecryptFailed:
-      "Zálohu nelze odemknout. Zkontrolujte heslovou frázi.",
+    backupDecryptFailed: "Zálohu nelze odemknout. Zkontrolujte heslovou frázi.",
     backupExportFailed: "Zálohu se nepodařilo exportovat.",
     backupImportFailed: "Zálohu se nepodařilo importovat.",
     backupShareUnavailable: "Sdílení souborů není na tomto zařízení dostupné.",
@@ -643,8 +944,27 @@ export const dataBackupTranslations = {
   },
   pl: {
     settingsDataPrivacy: "Dane i prywatność",
-    settingsDataPrivacySummary:
-      "Eksportuj lub przywróć ustawienia i rozmowy.",
+    settingsDataPrivacySummary: "Eksportuj lub przywróć ustawienia i rozmowy.",
+    conversationArchive: "Archiwum rozmów dla AI",
+    conversationArchiveDescription:
+      "Zapisuj czytelne kopie Markdown rozmów w folderze Pliki lub Drive do użycia w innych aplikacjach AI.",
+    conversationArchiveWarning:
+      "Pliki archiwum są zwykłym tekstem. Każdy z dostępem do folderu może je przeczytać. Odłączenie nie usuwa plików.",
+    conversationArchiveChooseFolder: "Wybierz folder archiwum",
+    conversationArchiveChangeFolder: "Zmień folder",
+    conversationArchiveSyncNow: "Synchronizuj teraz",
+    conversationArchiveDisconnect: "Odłącz",
+    conversationArchiveFolder: ({ folder }) => `Folder: ${folder}`,
+    conversationArchiveLastSynced: ({ date }) =>
+      `Ostatnia synchronizacja: ${date}`,
+    conversationArchiveNeverSynced: "Jeszcze nie zsynchronizowano",
+    conversationArchiveSyncing: "Synchronizowanie rozmów…",
+    conversationArchiveAccessLost:
+      "Utracono dostęp do folderu. Wybierz folder archiwum ponownie.",
+    conversationArchiveUnavailable:
+      "Integracja z folderami nie jest dostępna w tej kompilacji aplikacji.",
+    conversationArchiveSyncFailed:
+      "Nie udało się zaktualizować archiwum rozmów.",
     dataBackup: "Kopia danych aplikacji",
     dataBackupDescription:
       "Utwórz przenośną kopię ustawień i pełnej historii rozmów.",
@@ -686,6 +1006,26 @@ export const dataBackupTranslations = {
     settingsDataPrivacy: "Data och integritet",
     settingsDataPrivacySummary:
       "Exportera eller återställ inställningar och konversationer.",
+    conversationArchive: "AI-konversationsarkiv",
+    conversationArchiveDescription:
+      "Spara läsbara Markdown-kopior av konversationer i en Filer- eller Drive-mapp för andra AI-appar.",
+    conversationArchiveWarning:
+      "Arkivfilerna är vanlig text. Alla med mappåtkomst kan läsa dem. Frånkoppling lämnar filerna kvar.",
+    conversationArchiveChooseFolder: "Välj arkivmapp",
+    conversationArchiveChangeFolder: "Byt mapp",
+    conversationArchiveSyncNow: "Synkronisera nu",
+    conversationArchiveDisconnect: "Koppla från",
+    conversationArchiveFolder: ({ folder }) => `Mapp: ${folder}`,
+    conversationArchiveLastSynced: ({ date }) =>
+      `Senast synkroniserad: ${date}`,
+    conversationArchiveNeverSynced: "Inte synkroniserat än",
+    conversationArchiveSyncing: "Synkroniserar konversationer…",
+    conversationArchiveAccessLost:
+      "Åtkomsten till mappen förlorades. Välj arkivmappen igen.",
+    conversationArchiveUnavailable:
+      "Mappintegrering är inte tillgänglig i den här appversionen.",
+    conversationArchiveSyncFailed:
+      "Konversationsarkivet kunde inte uppdateras.",
     dataBackup: "Säkerhetskopia av appdata",
     dataBackupDescription:
       "Skapa en flyttbar kopia av inställningarna och hela konversationshistoriken.",
@@ -720,13 +1060,32 @@ export const dataBackupTranslations = {
       "Säkerhetskopian kunde inte låsas upp. Kontrollera lösenfrasen.",
     backupExportFailed: "Säkerhetskopian kunde inte exporteras.",
     backupImportFailed: "Säkerhetskopian kunde inte importeras.",
-    backupShareUnavailable: "Fildelning är inte tillgänglig på den här enheten.",
+    backupShareUnavailable:
+      "Fildelning är inte tillgänglig på den här enheten.",
     continue: "Fortsätt",
   },
   tr: {
     settingsDataPrivacy: "Veriler ve gizlilik",
     settingsDataPrivacySummary:
       "Ayarlarınızı ve konuşmalarınızı dışa aktarın veya geri yükleyin.",
+    conversationArchive: "Yapay zekâ konuşma arşivi",
+    conversationArchiveDescription:
+      "Konuşmaların okunabilir Markdown kopyalarını diğer yapay zekâ uygulamaları için Dosyalar veya Drive klasöründe tutun.",
+    conversationArchiveWarning:
+      "Arşiv dosyaları düz metindir. Klasöre erişen herkes okuyabilir. Bağlantıyı kesmek dosyaları silmez.",
+    conversationArchiveChooseFolder: "Arşiv klasörü seç",
+    conversationArchiveChangeFolder: "Klasörü değiştir",
+    conversationArchiveSyncNow: "Şimdi eşitle",
+    conversationArchiveDisconnect: "Bağlantıyı kes",
+    conversationArchiveFolder: ({ folder }) => `Klasör: ${folder}`,
+    conversationArchiveLastSynced: ({ date }) => `Son eşitleme: ${date}`,
+    conversationArchiveNeverSynced: "Henüz eşitlenmedi",
+    conversationArchiveSyncing: "Konuşmalar eşitleniyor…",
+    conversationArchiveAccessLost:
+      "Klasör erişimi kayboldu. Arşiv klasörünü yeniden seçin.",
+    conversationArchiveUnavailable:
+      "Klasör entegrasyonu bu uygulama yapısında kullanılamıyor.",
+    conversationArchiveSyncFailed: "Konuşma arşivi güncellenemedi.",
     dataBackup: "Uygulama verisi yedeği",
     dataBackupDescription:
       "Ayarların ve tüm konuşma geçmişinin taşınabilir bir kopyasını oluşturun.",
@@ -766,8 +1125,25 @@ export const dataBackupTranslations = {
   },
   ur: {
     settingsDataPrivacy: "ڈیٹا اور رازداری",
-    settingsDataPrivacySummary:
-      "اپنی ترتیبات اور گفتگو برآمد یا بحال کریں۔",
+    settingsDataPrivacySummary: "اپنی ترتیبات اور گفتگو برآمد یا بحال کریں۔",
+    conversationArchive: "AI گفتگو آرکائیو",
+    conversationArchiveDescription:
+      "دوسری AI ایپس کے لیے گفتگو کی قابل مطالعہ Markdown نقول Files یا Drive فولڈر میں رکھیں۔",
+    conversationArchiveWarning:
+      "آرکائیو فائلیں سادہ متن ہیں۔ فولڈر تک رسائی رکھنے والا کوئی بھی انہیں پڑھ سکتا ہے۔ رابطہ منقطع کرنے سے فائلیں حذف نہیں ہوں گی۔",
+    conversationArchiveChooseFolder: "آرکائیو فولڈر منتخب کریں",
+    conversationArchiveChangeFolder: "فولڈر تبدیل کریں",
+    conversationArchiveSyncNow: "ابھی ہم آہنگ کریں",
+    conversationArchiveDisconnect: "رابطہ منقطع کریں",
+    conversationArchiveFolder: ({ folder }) => `فولڈر: ${folder}`,
+    conversationArchiveLastSynced: ({ date }) => `آخری ہم آہنگی: ${date}`,
+    conversationArchiveNeverSynced: "ابھی ہم آہنگ نہیں ہوا",
+    conversationArchiveSyncing: "گفتگو ہم آہنگ ہو رہی ہے…",
+    conversationArchiveAccessLost:
+      "فولڈر کی رسائی ختم ہو گئی۔ آرکائیو فولڈر دوبارہ منتخب کریں۔",
+    conversationArchiveUnavailable:
+      "اس ایپ بلڈ میں فولڈر انضمام دستیاب نہیں ہے۔",
+    conversationArchiveSyncFailed: "گفتگو آرکائیو اپ ڈیٹ نہیں ہو سکا۔",
     dataBackup: "ایپ ڈیٹا بیک اپ",
     dataBackupDescription:
       "اپنی ترتیبات اور گفتگو کی مکمل تاریخ کی قابل منتقلی نقل بنائیں۔",

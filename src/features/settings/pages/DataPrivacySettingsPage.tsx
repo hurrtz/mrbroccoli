@@ -7,6 +7,7 @@ import * as FileSystem from "expo-file-system/legacy";
 import * as Sharing from "expo-sharing";
 
 import { useLocalization } from "../../../i18n";
+import type { ConversationArchiveController } from "../../../hooks/useConversationArchive";
 import {
   APP_DATA_BACKUP_MAX_BYTES,
   APP_DATA_BACKUP_MIN_PASSPHRASE_LENGTH,
@@ -37,11 +38,7 @@ import { styles } from "../styles";
 import type { Settings } from "../../../types";
 
 type BusyState =
-  | "export-encrypted"
-  | "export-readable"
-  | "import"
-  | "restore"
-  | null;
+  "export-encrypted" | "export-readable" | "import" | "restore" | null;
 
 function getBackupFileName(encrypted: boolean) {
   const timestamp = new Date()
@@ -54,11 +51,13 @@ function getBackupFileName(encrypted: boolean) {
 }
 
 export function DataPrivacySettingsPage({
+  conversationArchive,
   onCreateAppDataBackup,
   onRestoreAppDataBackup,
   settings,
   onUpdate,
 }: {
+  conversationArchive: ConversationArchiveController;
   onCreateAppDataBackup: () => Promise<AppDataBackup>;
   onRestoreAppDataBackup: (
     backup: AppDataBackup,
@@ -133,7 +132,10 @@ export function DataPrivacySettingsPage({
   }, []);
 
   const getErrorMessage = React.useCallback(
-    (error: unknown, fallbackKey: "backupExportFailed" | "backupImportFailed") => {
+    (
+      error: unknown,
+      fallbackKey: "backupExportFailed" | "backupImportFailed",
+    ) => {
       if (error instanceof AppDataBackupError) {
         switch (error.code) {
           case "decrypt-failed":
@@ -207,7 +209,11 @@ export function DataPrivacySettingsPage({
       recordDebugLogEvent({
         event: "backup-export-failed",
         level: "warn",
-        payload: { durationMs: Date.now() - startedAtMs, encrypted: false, error },
+        payload: {
+          durationMs: Date.now() - startedAtMs,
+          encrypted: false,
+          error,
+        },
       });
       setStatusMessage(getErrorMessage(error, "backupExportFailed"));
     } finally {
@@ -268,7 +274,11 @@ export function DataPrivacySettingsPage({
       recordDebugLogEvent({
         event: "backup-export-failed",
         level: "warn",
-        payload: { durationMs: Date.now() - startedAtMs, encrypted: true, error },
+        payload: {
+          durationMs: Date.now() - startedAtMs,
+          encrypted: true,
+          error,
+        },
       });
       setPassphraseError(getErrorMessage(error, "backupExportFailed"));
     } finally {
@@ -438,6 +448,119 @@ export function DataPrivacySettingsPage({
           <Text style={[styles.helperText, { color: colors.textMuted }]}>
             {t("pastConversationKnowledgeDisclosure")}
           </Text>
+        </AntSettingsCard>
+      </View>
+
+      <View style={styles.sectionGroup}>
+        <AntSectionIntro
+          title={t("conversationArchive")}
+          description={t("conversationArchiveDescription")}
+        />
+        <AntSettingsCard>
+          <Text style={[styles.warningText, { color: colors.danger }]}>
+            {t("conversationArchiveWarning")}
+          </Text>
+          {conversationArchive.configured ? (
+            <View style={styles.dataBackupActions}>
+              <Text
+                style={[styles.helperText, { color: colors.textSecondary }]}
+              >
+                {t("conversationArchiveFolder", {
+                  folder: conversationArchive.directoryName ?? "",
+                })}
+              </Text>
+              <Text style={[styles.helperText, { color: colors.textMuted }]}>
+                {conversationArchive.lastSyncedAt
+                  ? t("conversationArchiveLastSynced", {
+                      date: new Date(
+                        conversationArchive.lastSyncedAt,
+                      ).toLocaleString(),
+                    })
+                  : t("conversationArchiveNeverSynced")}
+              </Text>
+              <Button
+                testID="sync-conversation-archive"
+                disabled={
+                  !conversationArchive.loaded || conversationArchive.syncing
+                }
+                loading={conversationArchive.syncing}
+                onPress={() => void conversationArchive.syncNow()}
+                style={styles.dataBackupButton}
+              >
+                <AntButtonLabel
+                  color={colors.text}
+                  icon="reload"
+                  label={t("conversationArchiveSyncNow")}
+                />
+              </Button>
+              <Button
+                testID="change-conversation-archive-folder"
+                disabled={
+                  !conversationArchive.loaded || conversationArchive.syncing
+                }
+                onPress={() => void conversationArchive.chooseDirectory()}
+                style={styles.dataBackupButton}
+              >
+                <AntButtonLabel
+                  color={colors.text}
+                  icon="folder-open"
+                  label={t("conversationArchiveChangeFolder")}
+                />
+              </Button>
+              <Button
+                testID="disconnect-conversation-archive"
+                disabled={
+                  !conversationArchive.loaded || conversationArchive.syncing
+                }
+                onPress={() => void conversationArchive.disconnect()}
+                style={styles.dataBackupButton}
+              >
+                <AntButtonLabel
+                  color={colors.text}
+                  icon="close"
+                  label={t("conversationArchiveDisconnect")}
+                />
+              </Button>
+            </View>
+          ) : (
+            <Button
+              testID="choose-conversation-archive-folder"
+              disabled={
+                !conversationArchive.loaded || conversationArchive.syncing
+              }
+              loading={conversationArchive.syncing}
+              onPress={() => void conversationArchive.chooseDirectory()}
+              style={styles.dataBackupButton}
+            >
+              <AntButtonLabel
+                color={colors.text}
+                icon="folder-open"
+                label={t("conversationArchiveChooseFolder")}
+              />
+            </Button>
+          )}
+          {conversationArchive.syncing ? (
+            <Text
+              accessibilityLiveRegion="polite"
+              style={[styles.helperText, { color: colors.textMuted }]}
+            >
+              {t("conversationArchiveSyncing")}
+            </Text>
+          ) : null}
+          {conversationArchive.error ? (
+            <Text
+              accessibilityRole="alert"
+              style={[styles.helperText, { color: colors.danger }]}
+            >
+              {t(
+                conversationArchive.error === "access-lost"
+                  ? "conversationArchiveAccessLost"
+                  : conversationArchive.error === "unavailable"
+                    ? "conversationArchiveUnavailable"
+                    : "conversationArchiveSyncFailed",
+              )}
+            </Text>
+          ) : null}
         </AntSettingsCard>
       </View>
 
@@ -696,8 +819,7 @@ export function DataPrivacySettingsPage({
         <Text style={[styles.helperText, { color: colors.textSecondary }]}>
           {pendingBackup
             ? t("backupRestorePreviewMessage", {
-                conversationCount:
-                  pendingBackup.data.conversations.length,
+                conversationCount: pendingBackup.data.conversations.length,
                 appVersion: pendingBackup.appVersion,
               })
             : ""}

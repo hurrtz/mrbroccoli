@@ -208,6 +208,58 @@ describe("useConversationActions", () => {
     );
   });
 
+  it("shares the active conversation as a structured AI handoff", async () => {
+    const activeConversation = {
+      id: "conversation-1",
+      title: "Trip planning",
+      createdAt: "2026-03-22T10:00:00.000Z",
+      updatedAt: "2026-03-22T10:00:00.000Z",
+      messages: [
+        {
+          id: "m1",
+          role: "user" as const,
+          content: "Hello there",
+          model: null,
+          provider: null,
+          timestamp: "2026-03-22T10:00:00.000Z",
+        },
+      ],
+    };
+    const { result } = renderHook(() =>
+      useConversationActions({
+        activeConversation,
+        memoryConversation: null,
+        getConversationById: jest.fn(),
+        renameConversation: jest.fn(),
+        toggleConversationPinned: jest.fn(),
+        toggleConversationPrivate: jest.fn(),
+        clearConversationMemory: jest.fn(),
+        deleteConversation: jest.fn(),
+        selectConversation: jest.fn(),
+        clearActiveConversation: jest.fn(),
+        resetVoiceSessionState: jest.fn(),
+        openMemoryConversation: jest.fn(),
+        setMemoryConversation: jest.fn(),
+        showToast: jest.fn(),
+        language: "en",
+        t: (key) => key,
+      }),
+    );
+
+    await act(async () => {
+      await result.current.handleShareThread();
+    });
+
+    expect(Share.share).toHaveBeenCalledWith(
+      expect.objectContaining({
+        message: expect.stringContaining(
+          "Use this transcript as context and continue from its final turn.",
+        ),
+      }),
+      { dialogTitle: "Trip planning" },
+    );
+  });
+
   it("updates memory state after clearing saved conversation memory", async () => {
     const setMemoryConversation = jest.fn();
     const showToast = jest.fn();

@@ -132,6 +132,17 @@ function renderSettingsModal(
           onPreviewVoice={jest.fn(async () => undefined)}
           onStopPreviewVoice={jest.fn(async () => undefined)}
           onValidateProviderCapability={jest.fn(async () => undefined)}
+          conversationArchive={{
+            chooseDirectory: jest.fn(async () => undefined),
+            configured: false,
+            directoryName: null,
+            disconnect: jest.fn(async () => undefined),
+            error: null,
+            lastSyncedAt: null,
+            loaded: true,
+            syncNow: jest.fn(async () => undefined),
+            syncing: false,
+          }}
           onCreateAppDataBackup={async () => {
             throw new Error("Not used in this test.");
           }}

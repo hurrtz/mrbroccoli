@@ -9,6 +9,7 @@ import type {
   AppDataBackup,
   AppDataBackupRestoreResult,
 } from "../../services/appDataBackup";
+import type { ConversationArchiveController } from "../../hooks/useConversationArchive";
 import {
   Provider,
   ProviderCapability,
@@ -58,6 +59,7 @@ export interface SettingsModalProps {
     capability: ProviderCapability,
   ) => Promise<void>;
   onOpenSetupGuide?: () => void;
+  conversationArchive: ConversationArchiveController;
   onCreateAppDataBackup: () => Promise<AppDataBackup>;
   onRestoreAppDataBackup: (
     backup: AppDataBackup,

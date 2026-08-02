@@ -40,6 +40,7 @@
 		C01A00000000000000000006 /* MrBroccoliVoiceLiveActivityBridge.m in Sources */ = {isa = PBXBuildFile; fileRef = C01A00000000000000000016 /* MrBroccoliVoiceLiveActivityBridge.m */; };
 		D1A600000000000000000001 /* MrBroccoliDiagnostics.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1A600000000000000000011 /* MrBroccoliDiagnostics.swift */; };
 		D1A600000000000000000002 /* MrBroccoliDiagnosticsBridge.m in Sources */ = {isa = PBXBuildFile; fileRef = D1A600000000000000000012 /* MrBroccoliDiagnosticsBridge.m */; };
+		E1B700000000000000000002 /* MrBroccoliArchiveDirectory.m in Sources */ = {isa = PBXBuildFile; fileRef = E1B700000000000000000012 /* MrBroccoliArchiveDirectory.m */; };
 		D2A600000000000000000001 /* MrBroccoliWaveformInterruptionPolicy.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2A600000000000000000011 /* MrBroccoliWaveformInterruptionPolicy.swift */; };
 		E1B700000000000000000001 /* MrBroccoliBackupCrypto.m in Sources */ = {isa = PBXBuildFile; fileRef = E1B700000000000000000011 /* MrBroccoliBackupCrypto.m */; };
 		E2385A0D49ADF64A271D5FFE /* libPods-MrBroccoli.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4C2E18CB4910ACB38E443AFE /* libPods-MrBroccoli.a */; };
@@ -119,6 +120,7 @@
 		CF5165F0FF79A69CD834CE27 /* Pods-MrBroccoliTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-MrBroccoliTests.release.xcconfig"; path = "Target Support Files/Pods-MrBroccoliTests/Pods-MrBroccoliTests.release.xcconfig"; sourceTree = "<group>"; };
 		D1A600000000000000000011 /* MrBroccoliDiagnostics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = MrBroccoliDiagnostics.swift; path = MrBroccoli/MrBroccoliDiagnostics.swift; sourceTree = "<group>"; };
 		D1A600000000000000000012 /* MrBroccoliDiagnosticsBridge.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = MrBroccoliDiagnosticsBridge.m; path = MrBroccoli/MrBroccoliDiagnosticsBridge.m; sourceTree = "<group>"; };
+		E1B700000000000000000012 /* MrBroccoliArchiveDirectory.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = MrBroccoliArchiveDirectory.m; path = MrBroccoli/MrBroccoliArchiveDirectory.m; sourceTree = "<group>"; };
 		D2A600000000000000000011 /* MrBroccoliWaveformInterruptionPolicy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MrBroccoliWaveformInterruptionPolicy.swift; sourceTree = "<group>"; };
 		E1B700000000000000000011 /* MrBroccoliBackupCrypto.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = MrBroccoliBackupCrypto.m; path = MrBroccoli/MrBroccoliBackupCrypto.m; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
@@ -169,6 +171,7 @@
 				D1A600000000000000000011 /* MrBroccoliDiagnostics.swift */,
 				D1A600000000000000000012 /* MrBroccoliDiagnosticsBridge.m */,
 				E1B700000000000000000011 /* MrBroccoliBackupCrypto.m */,
+				E1B700000000000000000012 /* MrBroccoliArchiveDirectory.m */,
 				C01A00000000000000000015 /* MrBroccoliVoiceLiveActivity.swift */,
 				C01A00000000000000000016 /* MrBroccoliVoiceLiveActivityBridge.m */,
 				7C4A2D4D5A9E4A6FB6500001 /* MrBroccoliNativeAudioQueue.m */,
@@ -662,6 +665,7 @@
 				D1A600000000000000000001 /* MrBroccoliDiagnostics.swift in Sources */,
 				D1A600000000000000000002 /* MrBroccoliDiagnosticsBridge.m in Sources */,
 				E1B700000000000000000001 /* MrBroccoliBackupCrypto.m in Sources */,
+				E1B700000000000000000002 /* MrBroccoliArchiveDirectory.m in Sources */,
 				C01A00000000000000000004 /* MrBroccoliVoiceActivityAttributes.swift in Sources */,
 				C01A00000000000000000005 /* MrBroccoliVoiceLiveActivity.swift in Sources */,
 				C01A00000000000000000006 /* MrBroccoliVoiceLiveActivityBridge.m in Sources */,
