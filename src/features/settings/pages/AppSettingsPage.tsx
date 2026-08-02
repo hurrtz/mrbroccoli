@@ -69,10 +69,12 @@ function formatSpeechDiagnosticTime(createdAt: string) {
 }
 
 export function AppSettingsPage({
+  isPremium,
   settings,
   speechDiagnostics,
   onUpdate,
 }: {
+  isPremium: boolean;
   settings: Settings;
   speechDiagnostics: SpeechDiagnosticRequestSummary[];
   onUpdate: (
@@ -117,97 +119,105 @@ export function AppSettingsPage({
           options={APP_LANGUAGE_OPTIONS}
           onChange={(value) => onUpdate({ language: value as AppLanguage })}
         />
-        <AntRadioSection<"show" | "hide">
-          label={t("usageStats")}
-          options={[
-            {
-              value: "hide",
-              label: t("hide"),
-              description: t("usageStatsHiddenDescription"),
-            },
-            {
-              value: "show",
-              label: t("show"),
-              description: t("usageStatsVisibleDescription"),
-            },
-          ]}
-          value={settings.showUsageStats ? "show" : "hide"}
-          onChange={(value) => onUpdate({ showUsageStats: value === "show" })}
-        />
-        <AntRadioSection<"show" | "hide">
-          label={t("debugLogButton")}
-          options={[
-            {
-              value: "hide",
-              label: t("hide"),
-              description: t("debugLogButtonHiddenDescription"),
-            },
-            {
-              value: "show",
-              label: t("show"),
-              description: t("debugLogButtonVisibleDescription"),
-            },
-          ]}
-          value={settings.showDebugLogButton ? "show" : "hide"}
-          onChange={(value) =>
-            onUpdate({ showDebugLogButton: value === "show" })
-          }
-          helperText={t("debugLogButtonUsageDescription")}
-        />
+        {isPremium ? (
+          <>
+            <AntRadioSection<"show" | "hide">
+              label={t("usageStats")}
+              options={[
+                {
+                  value: "hide",
+                  label: t("hide"),
+                  description: t("usageStatsHiddenDescription"),
+                },
+                {
+                  value: "show",
+                  label: t("show"),
+                  description: t("usageStatsVisibleDescription"),
+                },
+              ]}
+              value={settings.showUsageStats ? "show" : "hide"}
+              onChange={(value) =>
+                onUpdate({ showUsageStats: value === "show" })
+              }
+            />
+            <AntRadioSection<"show" | "hide">
+              label={t("debugLogButton")}
+              options={[
+                {
+                  value: "hide",
+                  label: t("hide"),
+                  description: t("debugLogButtonHiddenDescription"),
+                },
+                {
+                  value: "show",
+                  label: t("show"),
+                  description: t("debugLogButtonVisibleDescription"),
+                },
+              ]}
+              value={settings.showDebugLogButton ? "show" : "hide"}
+              onChange={(value) =>
+                onUpdate({ showDebugLogButton: value === "show" })
+              }
+              helperText={t("debugLogButtonUsageDescription")}
+            />
+          </>
+        ) : null}
       </View>
 
-      <View
-        testID="runtime-compatibility-overrides-section"
-        style={styles.sectionGroup}
-      >
-        <AntSectionIntro
-          title={t("runtimeCompatibilityOverrides")}
-          extra={
-            runtimeOverrides.length > 0 ? (
-              <IconButton
-                accessibilityLabel={t("clearRuntimeCompatibilityOverrides")}
-                iconNode={
-                  <PhosphorIcon
-                    name="delete"
-                    size="control"
-                    color={colors.danger}
-                  />
-                }
-                onPress={() =>
-                  setClearRuntimeOverridesConfirmationVisible(true)
-                }
-              />
-            ) : null
-          }
-        />
-        <AntSettingsCard>
-          <Text style={[styles.helperText, { color: colors.textSecondary }]}>
-            {t("runtimeCompatibilityOverridesDescription", {
-              count: runtimeOverrides.length,
-            })}
-          </Text>
-          {runtimeOverrides.map((override) => (
-            <Text
-              key={[
-                override.provider,
-                override.capability,
-                override.model,
-                override.effort ?? "",
-              ].join(":")}
-              style={[styles.helperText, { color: colors.textMuted }]}
-            >
-              {[
-                PROVIDER_LABELS[override.provider],
-                override.capability.toUpperCase(),
-                override.model,
-                override.effort,
-              ]
-                .filter(Boolean)
-                .join(" · ")}
+      {isPremium ? (
+        <View
+          testID="runtime-compatibility-overrides-section"
+          style={styles.sectionGroup}
+        >
+          <AntSectionIntro
+            title={t("runtimeCompatibilityOverrides")}
+            extra={
+              runtimeOverrides.length > 0 ? (
+                <IconButton
+                  accessibilityLabel={t("clearRuntimeCompatibilityOverrides")}
+                  iconNode={
+                    <PhosphorIcon
+                      name="delete"
+                      size="control"
+                      color={colors.danger}
+                    />
+                  }
+                  onPress={() =>
+                    setClearRuntimeOverridesConfirmationVisible(true)
+                  }
+                />
+              ) : null
+            }
+          />
+          <AntSettingsCard>
+            <Text style={[styles.helperText, { color: colors.textSecondary }]}>
+              {t("runtimeCompatibilityOverridesDescription", {
+                count: runtimeOverrides.length,
+              })}
             </Text>
-          ))}
-        </AntSettingsCard>
-      </View>
+            {runtimeOverrides.map((override) => (
+              <Text
+                key={[
+                  override.provider,
+                  override.capability,
+                  override.model,
+                  override.effort ?? "",
+                ].join(":")}
+                style={[styles.helperText, { color: colors.textMuted }]}
+              >
+                {[
+                  PROVIDER_LABELS[override.provider],
+                  override.capability.toUpperCase(),
+                  override.model,
+                  override.effort,
+                ]
+                  .filter(Boolean)
+                  .join(" · ")}
+              </Text>
+            ))}
+          </AntSettingsCard>
+        </View>
+      ) : null}
 
       <View testID="speech-diagnostics-section" style={styles.sectionGroup}>
         <AntSectionIntro

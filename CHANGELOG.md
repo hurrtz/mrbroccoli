@@ -22,6 +22,10 @@ the complete Play Store translations are kept in a dedicated file under
 
 ### Changed
 
+- Simplify Free Settings around three usable areas: on-device AI, data and
+  privacy, and app preferences. Remove locked Premium sections and irrelevant
+  provider controls from the Free flow, with one unobtrusive upgrade card at
+  the end.
 - Hide the image attachment action from the Free home screen instead of
   showing a disabled Premium-only button beneath the main action.
 - Keep cloud providers, response-mode configuration, web search, images,

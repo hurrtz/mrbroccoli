@@ -74,11 +74,9 @@ export function PastConversationKnowledgeSection({
 export function ConversationArchiveSection({
   conversationArchive,
   isPremium,
-  onOpenPremium,
 }: {
   conversationArchive: ConversationArchiveController;
   isPremium: boolean;
-  onOpenPremium: () => void;
 }) {
   const { colors } = useTheme();
   const { t } = useLocalization();
@@ -193,7 +191,6 @@ export function ConversationArchiveSection({
           </>
         ) : (
           <View style={styles.dataBackupActions}>
-            <PremiumGate onOpenPremium={onOpenPremium} />
             {conversationArchive.configured ? (
               <Button
                 testID="disconnect-conversation-archive"

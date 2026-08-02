@@ -442,17 +442,27 @@ export function DataPrivacySettingsPage({
 
   return (
     <View style={styles.sectionPageStack}>
-      <PastConversationKnowledgeSection
-        isPremium={isPremium}
-        onOpenPremium={onOpenPremium}
-        onUpdate={onUpdate}
-        settings={settings}
-      />
-      <ConversationArchiveSection
-        conversationArchive={conversationArchive}
-        isPremium={isPremium}
-        onOpenPremium={onOpenPremium}
-      />
+      {isPremium ? (
+        <>
+          <PastConversationKnowledgeSection
+            isPremium
+            onOpenPremium={onOpenPremium}
+            onUpdate={onUpdate}
+            settings={settings}
+          />
+          <ConversationArchiveSection
+            conversationArchive={conversationArchive}
+            isPremium
+          />
+        </>
+      ) : null}
+
+      {!isPremium && conversationArchive.configured ? (
+        <ConversationArchiveSection
+          conversationArchive={conversationArchive}
+          isPremium={false}
+        />
+      ) : null}
 
       <View style={styles.sectionGroup}>
         <AntSectionIntro

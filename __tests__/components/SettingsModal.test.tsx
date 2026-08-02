@@ -253,6 +253,82 @@ describe("SettingsModal", () => {
     expect(onOpenPremium).not.toHaveBeenCalled();
   });
 
+  it("shows only usable sections on the Free overview", async () => {
+    const screen = renderSettingsModal({ isPremium: false });
+
+    await waitFor(() => {
+      expect(screen.getByTestId("settings-overview-row-local")).toBeTruthy();
+    });
+    expect(screen.getByTestId("settings-overview-row-data")).toBeTruthy();
+    expect(screen.getByTestId("settings-overview-row-app")).toBeTruthy();
+    expect(screen.getByTestId("settings-premium-upgrade")).toBeTruthy();
+
+    for (const page of [
+      "connections",
+      "thinking",
+      "listening",
+      "speaking",
+      "search",
+    ]) {
+      expect(screen.queryByTestId(`settings-overview-row-${page}`)).toBeNull();
+    }
+  });
+
+  it("keeps Free data and app settings focused on usable controls", async () => {
+    const screen = renderSettingsModal({ isPremium: false });
+
+    fireEvent.press(screen.getByTestId("settings-overview-row-data"));
+
+    await waitFor(() => {
+      expect(screen.getByText("App data backup")).toBeTruthy();
+    });
+    expect(screen.queryByText("Past conversation knowledge")).toBeNull();
+    expect(screen.queryByText("AI conversation archive")).toBeNull();
+    expect(screen.queryByText("Unlock Premium")).toBeNull();
+
+    fireEvent.press(screen.getByLabelText("Back to overview"));
+    fireEvent.press(screen.getByTestId("settings-overview-row-app"));
+
+    await waitFor(() => {
+      expect(screen.getByTestId("app-language-picker")).toBeTruthy();
+    });
+    expect(screen.getByText("Theme")).toBeTruthy();
+    expect(screen.getByText("Recent Speech Activity")).toBeTruthy();
+    expect(screen.queryByText("Usage Stats")).toBeNull();
+    expect(screen.queryByLabelText("About Debug Log Button")).toBeNull();
+    expect(
+      screen.queryByTestId("runtime-compatibility-overrides-section"),
+    ).toBeNull();
+  });
+
+  it("lets Free users disconnect an archive configured before downgrade", async () => {
+    const disconnect = jest.fn(async () => undefined);
+    const screen = renderSettingsModal({
+      isPremium: false,
+      conversationArchive: {
+        chooseDirectory: jest.fn(async () => undefined),
+        configured: true,
+        directoryName: "Mr Broccoli",
+        disconnect,
+        error: null,
+        lastSyncedAt: null,
+        loaded: true,
+        syncNow: jest.fn(async () => undefined),
+        syncing: false,
+      },
+    });
+
+    fireEvent.press(screen.getByTestId("settings-overview-row-data"));
+
+    await waitFor(() => {
+      expect(screen.getByTestId("disconnect-conversation-archive")).toBeTruthy();
+    });
+    expect(screen.queryByText("Unlock Premium")).toBeNull();
+
+    fireEvent.press(screen.getByTestId("disconnect-conversation-archive"));
+    expect(disconnect).toHaveBeenCalledTimes(1);
+  });
+
   it("opens localized data backup controls and explains the API-key exclusion", async () => {
     const screen = renderSettingsModal();
 

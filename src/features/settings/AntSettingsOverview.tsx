@@ -114,6 +114,9 @@ export function AntSettingsOverview({
   const { fontScale } = useWindowDimensions();
   const usesLargeTextLayout = fontScale >= 1.5;
   const drillInIcon = isRtl ? "left" : "right";
+  const visibleOverviewRows = isPremium
+    ? overviewRows
+    : overviewRows.filter((row) => !isPremiumSettingsPage(row.page));
   const readinessItems = [
     {
       key: "thinking",
@@ -143,38 +146,6 @@ export function AntSettingsOverview({
 
   return (
     <View testID="settings-page-overview" style={styles.overview}>
-      {!isPremium ? (
-        <Pressable
-          testID="settings-premium-upgrade"
-          onPress={onOpenPremium}
-          accessibilityRole="button"
-          accessibilityLabel={t("upgradeToPremium")}
-          style={({ pressed }) => (pressed ? styles.pressedControl : undefined)}
-        >
-          <AntSettingsCard
-            style={{
-              backgroundColor: colors.accentSoft,
-              borderColor: colors.accent,
-            }}
-          >
-            <View style={styles.setupCardBody}>
-              <View style={styles.setupCopy}>
-                <Text
-                  style={[styles.setupTitle, { color: colors.text }]}
-                >
-                  {t("upgradeToPremium")}
-                </Text>
-                <Text
-                  style={[styles.setupSummary, { color: colors.textSecondary }]}
-                >
-                  {t("premiumDescription")}
-                </Text>
-              </View>
-              <PhosphorIcon name="lock" size="control" color={colors.accent} />
-            </View>
-          </AntSettingsCard>
-        </Pressable>
-      ) : null}
       {onOpenSetupGuide ? (
         <Pressable
           testID="settings-guided-setup"
@@ -326,9 +297,7 @@ export function AntSettingsOverview({
       </View> : null}
 
       <View style={styles.sectionCards}>
-        {overviewRows.map((row) => {
-          const locked = !isPremium && isPremiumSettingsPage(row.page);
-          return (
+        {visibleOverviewRows.map((row) => (
           <AntSettingsCard
             key={row.page}
             contentStyle={styles.fullBleedCardContent}
@@ -345,25 +314,32 @@ export function AntSettingsOverview({
                   <PhosphorIcon
                     name={row.icon}
                     size="prominent"
-                    color={colors.text}
+                    color={
+                      !isPremium && row.page === "local"
+                        ? colors.accent
+                        : colors.text
+                    }
                   />
                 </View>
               }
               extra={
                 <PhosphorIcon
-                  name={locked ? "lock" : drillInIcon}
+                  name={drillInIcon}
                   size="control"
                   color={colors.textMuted}
                 />
               }
-              onPress={() => (locked ? onOpenPremium() : onOpenPage(row.page))}
+              onPress={() => onOpenPage(row.page)}
               accessibilityRole="button"
               accessibilityLabel={t("settingsOpenSection", {
                 section: t(row.titleKey),
               })}
               styles={{
                 Item: {
-                  backgroundColor: colors.surfaceElevated,
+                  backgroundColor:
+                    !isPremium && row.page === "local"
+                      ? colors.accentSoft
+                      : colors.surfaceElevated,
                 },
                 Line: {
                   borderBottomWidth: 0,
@@ -394,9 +370,41 @@ export function AntSettingsOverview({
               </List.Item.Brief>
             </List.Item>
           </AntSettingsCard>
-          );
-        })}
+        ))}
       </View>
+
+      {!isPremium ? (
+        <Pressable
+          testID="settings-premium-upgrade"
+          onPress={onOpenPremium}
+          accessibilityRole="button"
+          accessibilityLabel={t("upgradeToPremium")}
+          style={({ pressed }) =>
+            pressed ? styles.pressedControl : undefined
+          }
+        >
+          <AntSettingsCard
+            style={{
+              backgroundColor: colors.surfaceAlt,
+              borderColor: colors.border,
+            }}
+          >
+            <View style={styles.setupCardBody}>
+              <View style={styles.setupCopy}>
+                <Text style={[styles.setupTitle, { color: colors.text }]}>
+                  {t("upgradeToPremium")}
+                </Text>
+                <Text
+                  style={[styles.setupSummary, { color: colors.textSecondary }]}
+                >
+                  {t("premiumDescription")}
+                </Text>
+              </View>
+              <PhosphorIcon name="lock" size="control" color={colors.accent} />
+            </View>
+          </AntSettingsCard>
+        </Pressable>
+      ) : null}
 
       <Text
         testID="settings-release-version"

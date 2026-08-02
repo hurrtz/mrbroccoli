@@ -266,6 +266,7 @@ export function AntSettingsPageContent({
       return (
         <DrillInPage page="app">
           <AppSettingsPage
+            isPremium={props.isPremium}
             settings={settings}
             speechDiagnostics={controller.speechDiagnostics}
             onUpdate={onUpdate}
