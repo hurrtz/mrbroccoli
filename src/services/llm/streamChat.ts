@@ -20,7 +20,7 @@ import {
 } from "./requestRouter";
 import type { StreamChatParams } from "./types";
 
-const LLM_REPLY_INACTIVITY_TIMEOUT_MS = 5 * 60_000;
+export const LLM_REPLY_INACTIVITY_TIMEOUT_MS = 10 * 60_000;
 const LOCAL_ANDROID_DEV_API_KEY = "sk-test-android-local-dev";
 
 function buildProviderReplyTimeoutError(

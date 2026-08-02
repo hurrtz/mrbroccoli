@@ -38,6 +38,8 @@ the complete Play Store translations are kept in a dedicated file under
 - Prevent a stalled private Uber Mode participant from blocking an entire run
   indefinitely; timed-out participants are skipped while successful models
   continue through review and final synthesis.
+- Allow max-effort model replies to remain inactive for up to ten minutes
+  before timing out, matching Uber Mode's participant deadline.
 - Trust a successfully installed and benchmarked Free on-device profile when
   it selects Kokoro, avoiding a stale verification warning that redirected
   Free users into the Premium-only Speaking settings after changing language.

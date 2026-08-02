@@ -6,6 +6,7 @@ import {
   streamChat,
   validateProviderConnection,
 } from "../../src/services/llm";
+import { LLM_REPLY_INACTIVITY_TIMEOUT_MS } from "../../src/services/llm/streamChat";
 import { requestRealtimeChatViaWebSocket } from "../../src/services/llm/providers/openaiRealtime";
 import { resetProviderModelHealthForTests } from "../../src/services/providerResilience";
 import {
@@ -699,6 +700,15 @@ describe("streamChat", () => {
         onDone,
         onError,
       });
+
+      expect(LLM_REPLY_INACTIVITY_TIMEOUT_MS).toBe(10 * 60_000);
+
+      await jest.advanceTimersByTimeAsync(5 * 60_000);
+
+      expect(onDone).not.toHaveBeenCalled();
+      expect(requestSignal).toBeDefined();
+      expect(requestSignal?.aborted).toBe(false);
+      expect(onError).not.toHaveBeenCalled();
 
       await jest.advanceTimersByTimeAsync(5 * 60_000);
       await promise;
