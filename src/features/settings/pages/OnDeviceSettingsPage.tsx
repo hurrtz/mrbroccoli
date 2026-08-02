@@ -3,9 +3,7 @@ import { AccessibilityInfo, Alert, StyleSheet, Text, View } from "react-native";
 
 import { Button } from "../../../design-system/NativeControls";
 import {
-  LOCAL_MODEL_CATALOG_VERSION,
   LOCAL_MODEL_CATALOG,
-  getLocalModel,
   localModelSupportsLanguages,
   type LocalModelCapability,
   type LocalModelDefinition,
@@ -17,13 +15,11 @@ import {
   evaluateLocalModelEligibility,
   getLocalModelBenchmarkResults,
   probeLocalDeviceCapabilities,
-  saveLocalModelBenchmarkResult,
   type LocalDeviceSnapshot,
   type LocalModelBenchmarkResult,
 } from "../../../services/localDeviceCapabilities";
 import {
   downloadLocalModel,
-  getLocalModelInstallStatus,
   removeLocalModel,
   type LocalModelDownloadProgress,
   type LocalModelInstallStatus,
@@ -33,7 +29,8 @@ import {
   benchmarkLocalStt,
   benchmarkLocalTts,
 } from "../../../services/localSpeechModels";
-import { verifyKokoroModel } from "../../../services/kokoroTts";
+import { benchmarkKokoroModel } from "../../../services/kokoroTts";
+import { getLocalCatalogInstallStatuses } from "../../../services/offlineProfileManager";
 import { useTheme } from "../../../theme/ThemeContext";
 import { fonts } from "../../../theme/typography";
 import type {
@@ -116,15 +113,10 @@ export function OnDeviceSettingsPage({
 
   const refreshModelState = React.useCallback(async () => {
     const [nextInstalls, nextBenchmarks] = await Promise.all([
-      Promise.all(
-        LOCAL_MODEL_CATALOG.map(
-          async (model) =>
-            [model.id, await getLocalModelInstallStatus(model.id)] as const,
-        ),
-      ),
+      getLocalCatalogInstallStatuses(),
       getLocalModelBenchmarkResults(),
     ]);
-    setInstalls(Object.fromEntries(nextInstalls));
+    setInstalls(nextInstalls);
     setBenchmarks(nextBenchmarks);
   }, []);
 
@@ -245,43 +237,6 @@ export function OnDeviceSettingsPage({
     }
   };
 
-  const benchmarkKokoro = async () => {
-    const device = await probeLocalDeviceCapabilities();
-    const startedAt = Date.now();
-    try {
-      await verifyKokoroModel();
-      const durationMs = Date.now() - startedAt;
-      const result: LocalModelBenchmarkResult = {
-        modelId: "kokoro-multilingual",
-        catalogVersion: LOCAL_MODEL_CATALOG_VERSION,
-        testedAt: new Date().toISOString(),
-        status:
-          durationMs <=
-          getLocalModel("kokoro-multilingual").benchmark.maximumLoadMs
-            ? "viable"
-            : "below-target",
-        loadMs: durationMs,
-        durationMs,
-        device,
-      };
-      await saveLocalModelBenchmarkResult(result);
-      return result;
-    } catch (error) {
-      const result: LocalModelBenchmarkResult = {
-        modelId: "kokoro-multilingual",
-        catalogVersion: LOCAL_MODEL_CATALOG_VERSION,
-        testedAt: new Date().toISOString(),
-        status: "failed",
-        loadMs: 0,
-        durationMs: Date.now() - startedAt,
-        detail: error instanceof Error ? error.message : String(error),
-        device,
-      };
-      await saveLocalModelBenchmarkResult(result);
-      return result;
-    }
-  };
-
   const handleTest = async (model: LocalModelDefinition) => {
     setBusy({ action: "test", modelId: model.id });
     try {
@@ -296,7 +251,9 @@ export function OnDeviceSettingsPage({
             : "auto",
         );
       } else if (model.id === "kokoro-multilingual") {
-        result = await benchmarkKokoro();
+        result = await benchmarkKokoroModel(
+          settings.localLanguages.includes("zh-CN") ? "zh" : "en",
+        );
       } else {
         const previewLanguage = settings.localLanguages[0];
         result = await benchmarkLocalTts(model.id, previewLanguage);

@@ -15,11 +15,9 @@ interface MainScreenTopBarProps {
   debugLogLabel?: string;
   drawerLabel: string;
   onOpenDrawer: () => void;
-  onOpenPremium?: () => void;
   onOpenSettings: () => void;
   onToggleDebugLog?: () => void;
   settingsLabel: string;
-  premiumLabel?: string;
 }
 
 export const MainScreenTopBar = React.memo(function MainScreenTopBar({
@@ -30,11 +28,9 @@ export const MainScreenTopBar = React.memo(function MainScreenTopBar({
   debugLogLabel = "LOG",
   drawerLabel,
   onOpenDrawer,
-  onOpenPremium,
   onOpenSettings,
   onToggleDebugLog,
   settingsLabel,
-  premiumLabel = "Premium",
 }: MainScreenTopBarProps) {
   return (
     <View style={styles.topBar}>
@@ -82,25 +78,6 @@ export const MainScreenTopBar = React.memo(function MainScreenTopBar({
       </View>
 
       <View style={styles.actions}>
-        {onOpenPremium ? (
-          <Button
-            type="ghost"
-            size="small"
-            style={[
-              styles.premiumButton,
-              {
-                backgroundColor: colors.accentSoft,
-                borderColor: colors.accent,
-              },
-            ]}
-            onPress={onOpenPremium}
-            accessibilityLabel={premiumLabel}
-          >
-            <Text style={[styles.premiumButtonText, { color: colors.accent }]}>
-              {premiumLabel}
-            </Text>
-          </Button>
-        ) : null}
         {onToggleDebugLog ? (
           <Button
             type="ghost"
@@ -178,14 +155,6 @@ const styles = StyleSheet.create({
     fontSize: 11,
     letterSpacing: 0.6,
     fontFamily: fonts.displayHeavy,
-  },
-  premiumButton: {
-    minHeight: 44,
-    paddingHorizontal: 12,
-  },
-  premiumButtonText: {
-    fontFamily: fonts.bodyMedium,
-    fontSize: 13,
   },
   wordmark: {
     flexDirection: "row",

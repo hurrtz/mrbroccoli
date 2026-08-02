@@ -23,6 +23,7 @@ import {
 
 export interface SettingsModalProps {
   visible: boolean;
+  suspended?: boolean;
   isPremium: boolean;
   settings: Settings;
   kokoroModel: KokoroModelController;
@@ -61,7 +62,6 @@ export interface SettingsModalProps {
   ) => Promise<void>;
   onOpenSetupGuide?: () => void;
   onOpenPremium: () => void;
-  onOpenOfflineSetup: () => void;
   conversationArchive: ConversationArchiveController;
   onCreateAppDataBackup: () => Promise<AppDataBackup>;
   onRestoreAppDataBackup: (

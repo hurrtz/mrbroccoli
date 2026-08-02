@@ -328,6 +328,44 @@ describe("MainScreenVoiceStage composer", () => {
     expect(onSubmitTextMessage).not.toHaveBeenCalled();
   });
 
+  it("turns a blocked Free prompt CTA into an on-device setup action", () => {
+    const onPress = jest.fn();
+    const onResolvePromptBlock = jest.fn();
+    const onSubmitTextMessage = jest.fn();
+    const actionLabel = "Download and test";
+    const screen = render(
+      <MainScreenVoiceStage
+        {...createProps({
+          onPress,
+          onResolvePromptBlock,
+          onSubmitTextMessage,
+          promptBlockedActionEnabled: true,
+          promptBlockedActionLabel: actionLabel,
+          promptBlockedMessage: "Set up local models to continue.",
+        })}
+      />,
+    );
+
+    expect(
+      screen.getByTestId("voice-input-surface").props.accessibilityState,
+    ).toEqual({ disabled: false });
+    fireEvent.press(screen.getByTestId("voice-input-surface"));
+    expect(onResolvePromptBlock).toHaveBeenCalledTimes(1);
+    expect(onPress).not.toHaveBeenCalled();
+
+    fireEvent.press(screen.getByLabelText("Show text input"));
+    fireEvent.changeText(
+      screen.getByPlaceholderText("Type a message"),
+      "Draft while setup is required",
+    );
+    expect(
+      screen.getByTestId("voice-text-primary-action").props.accessibilityState,
+    ).toEqual({ disabled: false });
+    fireEvent.press(screen.getByTestId("voice-text-primary-action"));
+    expect(onResolvePromptBlock).toHaveBeenCalledTimes(2);
+    expect(onSubmitTextMessage).not.toHaveBeenCalled();
+  });
+
   it("preserves the dark-mode voice control treatment", () => {
     const screen = render(
       <MainScreenVoiceStage {...createProps({ colors: darkColors })} />,

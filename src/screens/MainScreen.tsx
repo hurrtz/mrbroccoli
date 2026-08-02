@@ -749,16 +749,11 @@ export function MainScreen() {
           debugLogLabel: t("debugLogLabel"),
           drawerLabel: t("conversations"),
           onOpenDrawer: handleOpenDrawer,
-          onOpenPremium:
-            freeOffline.entitlement.status === "free"
-              ? () => setPremiumModalVisible(true)
-              : undefined,
           onOpenSettings: handleOpenMainSettings,
           onToggleDebugLog:
             runtimeSettings.showDebugLogButton || debugLogCaptureState.active
               ? handleToggleDebugLog
               : undefined,
-          premiumLabel: t("premium"),
           settingsLabel: t("settings"),
         },
         routeCard: {
@@ -784,7 +779,8 @@ export function MainScreen() {
         },
         voiceStage: {
           attachments: pendingImages.attachments,
-          disabled: voiceInputDisabled || !freeOffline.freeRuntimeReady,
+          disabled:
+            voiceInputDisabled || freeOffline.entitlement.status === "loading",
           driveAutoContinueEnabled,
           driveSilenceCountdownSeconds,
           driveSessionCanRepeat,
@@ -805,13 +801,36 @@ export function MainScreen() {
           onPressIn: handlePressIn,
           onPressOut: handlePressOut,
           onStopPlayback: handleStopPlayback,
-          onResolvePromptBlock: handleOpenSpeakingSettings,
+          onResolvePromptBlock:
+            freeOffline.entitlement.status === "free" &&
+            !freeOffline.freeRuntimeReady
+              ? () => freeOffline.setModalVisible(true)
+              : handleOpenSpeakingSettings,
           onSubmitTextMessage: handleSubmitTextMessage,
           onTextMessageChange: handleTextMessageChange,
           playbackPaused: player.isPlaybackPaused,
-          promptBlockedActionLabel: kokoroPromptBlockActionLabel,
-          promptBlockedMessage: kokoroPromptBlockMessage,
-          promptBlockedProgress: kokoroPromptBlockProgress,
+          promptBlockedActionEnabled:
+            freeOffline.entitlement.status === "free" &&
+            !freeOffline.freeRuntimeReady &&
+            !freeOffline.checking &&
+            !freeOffline.preparing,
+          promptBlockedActionLabel:
+            freeOffline.entitlement.status === "free" &&
+            !freeOffline.freeRuntimeReady
+              ? freeOffline.checking || freeOffline.preparing
+                ? t("onDeviceTestingDevice")
+                : t("freeOfflineDownloadAndTest")
+              : kokoroPromptBlockActionLabel,
+          promptBlockedMessage:
+            freeOffline.entitlement.status === "free" &&
+            !freeOffline.freeRuntimeReady
+              ? t("freeOfflineIntro")
+              : kokoroPromptBlockMessage,
+          promptBlockedProgress:
+            freeOffline.entitlement.status === "free" &&
+            !freeOffline.freeRuntimeReady
+              ? null
+              : kokoroPromptBlockProgress,
           recordingMaxMs: maxRecordingMs,
           recordingStartedAtMs,
           speechStartProgress: phaseProgress?.speechStart ?? null,
@@ -878,6 +897,7 @@ export function MainScreen() {
       }}
       settingsModal={{
         visible: settingsVisible,
+        suspended: premiumModalVisible,
         settings,
         kokoroModel,
         providerVoiceDirectories,
@@ -901,12 +921,7 @@ export function MainScreen() {
             : undefined,
         isPremium: freeOffline.entitlement.isPremium,
         onOpenPremium: () => {
-          closeSettings();
           setPremiumModalVisible(true);
-        },
-        onOpenOfflineSetup: () => {
-          closeSettings();
-          freeOffline.setModalVisible(true);
         },
         onCreateAppDataBackup: handleCreateAppDataBackup,
         onRestoreAppDataBackup: handleRestoreAppDataBackup,

@@ -41,6 +41,7 @@ interface PremiumEntitlementContextValue {
   isPremium: boolean;
   storeConnected: boolean;
   storeProduct: Product | null;
+  storeProductLoading: boolean;
   displayPrice: string | null;
   busy: boolean;
   error: PremiumStoreError;
@@ -81,6 +82,7 @@ export function PremiumEntitlementProvider({
 }) {
   const [status, setStatus] = useState<PremiumEntitlementStatus>("loading");
   const [storeProduct, setStoreProduct] = useState<Product | null>(null);
+  const [storeProductLoading, setStoreProductLoading] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<PremiumStoreError>(null);
   const [cacheLoaded, setCacheLoaded] = useState(false);
@@ -207,10 +209,16 @@ export function PremiumEntitlementProvider({
   );
 
   const loadProduct = useCallback(async () => {
-    if (!connected) {
-      return;
-    }
+    setStoreProductLoading(true);
     try {
+      if (!connected) {
+        const reconnected = await reconnect();
+        if (!reconnected) {
+          setStoreProduct(null);
+          setError("store-unavailable");
+          return null;
+        }
+      }
       const products = await fetchProducts({
         skus: [PREMIUM_PRODUCT_ID],
         type: "in-app",
@@ -220,10 +228,18 @@ export function PremiumEntitlementProvider({
           candidate.type === "in-app" && candidate.id === PREMIUM_PRODUCT_ID,
       );
       setStoreProduct(product ?? null);
+      if (!product) {
+        setError("store-unavailable");
+      }
+      return product ?? null;
     } catch {
+      setStoreProduct(null);
       setError("store-unavailable");
+      return null;
+    } finally {
+      setStoreProductLoading(false);
     }
-  }, [connected]);
+  }, [connected, reconnect]);
 
   useEffect(() => {
     if (!connected || !cacheLoaded || reconciliationStartedRef.current) {
@@ -252,6 +268,10 @@ export function PremiumEntitlementProvider({
   }, [cacheLoaded, reconcileWithStore]);
 
   const purchasePremium = useCallback(async () => {
+    if (!storeProduct) {
+      setError("store-unavailable");
+      return;
+    }
     setBusy(true);
     setError(null);
     try {
@@ -274,7 +294,16 @@ export function PremiumEntitlementProvider({
       setError("purchase-failed");
       setBusy(false);
     }
-  }, [connected, reconnect, requestPurchase]);
+  }, [connected, reconnect, requestPurchase, storeProduct]);
+
+  const restorePremium = useCallback(
+    () => reconcileWithStore(true),
+    [reconcileWithStore],
+  );
+  const refreshPremium = useCallback(async () => {
+    await reconcileWithStore(false);
+    await loadProduct();
+  }, [loadProduct, reconcileWithStore]);
 
   const value = useMemo<PremiumEntitlementContextValue>(
     () => ({
@@ -282,12 +311,13 @@ export function PremiumEntitlementProvider({
       isPremium: status === "premium",
       storeConnected: connected,
       storeProduct,
+      storeProductLoading,
       displayPrice: storeProduct?.displayPrice ?? null,
       busy,
       error,
       purchasePremium,
-      restorePremium: () => reconcileWithStore(true),
-      refreshPremium: () => reconcileWithStore(false),
+      restorePremium,
+      refreshPremium,
       clearError: () => setError(null),
     }),
     [
@@ -295,9 +325,11 @@ export function PremiumEntitlementProvider({
       connected,
       error,
       purchasePremium,
-      reconcileWithStore,
+      refreshPremium,
+      restorePremium,
       status,
       storeProduct,
+      storeProductLoading,
     ],
   );
 

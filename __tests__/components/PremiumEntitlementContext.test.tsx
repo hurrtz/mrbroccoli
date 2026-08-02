@@ -64,6 +64,10 @@ function Probe() {
   return (
     <>
       <Text testID="entitlement-status">{entitlement.status}</Text>
+      <Text testID="entitlement-error">{entitlement.error ?? "none"}</Text>
+      <Text testID="store-product">
+        {entitlement.storeProduct?.id ?? "none"}
+      </Text>
       <Pressable
         testID="restore-premium"
         onPress={() => void entitlement.restorePremium()}
@@ -88,7 +92,13 @@ describe("PremiumEntitlementProvider", () => {
   beforeEach(() => {
     mockSecureValues.clear();
     jest.clearAllMocks();
-    mockFetchProducts.mockResolvedValue([]);
+    mockFetchProducts.mockResolvedValue([
+      {
+        id: PREMIUM_PRODUCT_ID,
+        type: "in-app",
+        displayPrice: "€14.99",
+      },
+    ]);
     mockFinishTransaction.mockResolvedValue(undefined);
     mockGetAvailablePurchases.mockResolvedValue([]);
     mockReconnect.mockResolvedValue(true);
@@ -207,6 +217,22 @@ describe("PremiumEntitlementProvider", () => {
       purchase: expect.objectContaining({ productId: PREMIUM_PRODUCT_ID }),
       isConsumable: false,
     });
+  });
+
+  it("does not start a purchase when the store product is unavailable", async () => {
+    mockFetchProducts.mockResolvedValueOnce([]);
+    const screen = renderProvider();
+
+    await waitFor(() => {
+      expect(screen.getByTestId("store-product").props.children).toBe("none");
+      expect(screen.getByTestId("entitlement-error").props.children).toBe(
+        "store-unavailable",
+      );
+    });
+
+    fireEvent.press(screen.getByTestId("purchase-premium"));
+
+    expect(mockRequestPurchase).not.toHaveBeenCalled();
   });
 
   it("does not grant Premium for an unconfirmed purchase state", async () => {

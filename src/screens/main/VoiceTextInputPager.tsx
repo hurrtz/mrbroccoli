@@ -43,6 +43,7 @@ export function VoiceTextInputPager({
   onSubmitTextMessage,
   onTextMessageChange,
   playbackPaused,
+  promptBlockedActionEnabled = false,
   promptBlockedActionLabel = null,
   promptBlockedMessage = null,
   promptBlockedProgress = null,
@@ -89,11 +90,13 @@ export function VoiceTextInputPager({
           onPress={onPress}
           onPressIn={onPressIn}
           onPressOut={onPressOut}
+          onResolvePromptBlock={onResolvePromptBlock}
           onSubmitTextMessage={pager.handleSubmitTextMessage}
           onTextFocusChange={pager.setTextFocused}
           onTextMessageChange={pager.handleTextMessageChange}
           pageWidth={pager.pageWidth}
           panGesture={pager.panGesture}
+          promptBlockedActionEnabled={promptBlockedActionEnabled}
           promptBlockedActionLabel={promptBlockedActionLabel}
           promptBlockedProgress={promptBlockedProgress}
           statusLabel={statusLabel}

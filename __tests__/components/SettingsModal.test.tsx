@@ -88,6 +88,10 @@ jest.mock("../../src/services/speech/diagnostics", () => ({
   clearSpeechDiagnostics: jest.fn(),
 }));
 
+jest.mock("../../src/services/offlineProfileManager", () => ({
+  getLocalCatalogInstallStatuses: jest.fn(async () => ({})),
+}));
+
 jest.mock("../../src/components/ProviderIcon", () => ({
   ProviderIcon: ({ label, provider }: { label?: string; provider: string }) => {
     const React = require("react");
@@ -134,7 +138,6 @@ function renderSettingsModal(
           onStopPreviewVoice={jest.fn(async () => undefined)}
           onValidateProviderCapability={jest.fn(async () => undefined)}
           onOpenPremium={jest.fn()}
-          onOpenOfflineSetup={jest.fn()}
           conversationArchive={{
             chooseDirectory: jest.fn(async () => undefined),
             configured: false,
@@ -236,6 +239,18 @@ describe("SettingsModal", () => {
       expect(screen.queryByText("Runtime Readiness")).toBeNull();
       expect(screen.queryByPlaceholderText("Search services")).toBeNull();
     });
+  });
+
+  it("opens on-device model downloads directly for Free users", async () => {
+    const onOpenPremium = jest.fn();
+    const screen = renderSettingsModal({ isPremium: false, onOpenPremium });
+
+    fireEvent.press(screen.getByTestId("settings-overview-row-local"));
+
+    await waitFor(() => {
+      expect(screen.getByTestId("settings-page-local")).toBeTruthy();
+    });
+    expect(onOpenPremium).not.toHaveBeenCalled();
   });
 
   it("opens localized data backup controls and explains the API-key exclusion", async () => {

@@ -23,11 +23,13 @@ interface InputSurfacePagesProps {
   onPress: () => void;
   onPressIn: () => void;
   onPressOut: () => void;
+  onResolvePromptBlock?: () => void;
   onSubmitTextMessage: () => void;
   onTextFocusChange: (focused: boolean) => void;
   onTextMessageChange: (text: string) => void;
   pageWidth: number;
   panGesture: GestureType;
+  promptBlockedActionEnabled: boolean;
   promptBlockedActionLabel: string | null;
   promptBlockedProgress: number | null;
   statusLabel: string;
@@ -50,6 +52,8 @@ function VoiceInputSurface({
   onPress,
   onPressIn,
   onPressOut,
+  onResolvePromptBlock,
+  promptBlockedActionEnabled,
   promptBlockedActionLabel,
   promptBlockedProgress,
   statusLabel,
@@ -62,12 +66,18 @@ function VoiceInputSurface({
   | "onPress"
   | "onPressIn"
   | "onPressOut"
+  | "onResolvePromptBlock"
+  | "promptBlockedActionEnabled"
   | "promptBlockedActionLabel"
   | "promptBlockedProgress"
   | "statusLabel"
   | "submissionDisabled"
 >) {
-  const actionDisabled = disabled || submissionDisabled;
+  const canResolvePromptBlock =
+    promptBlockedActionEnabled && Boolean(onResolvePromptBlock);
+  const actionDisabled =
+    disabled || (submissionDisabled && !canResolvePromptBlock);
+  const handlePress = canResolvePromptBlock ? onResolvePromptBlock : onPress;
 
   return (
     <GestureTouchableOpacity
@@ -86,9 +96,21 @@ function VoiceInputSurface({
       }
       activeOpacity={0.84}
       disabled={actionDisabled}
-      onPress={inputMode === "push-to-talk" ? undefined : onPress}
-      onPressIn={inputMode === "push-to-talk" ? onPressIn : undefined}
-      onPressOut={inputMode === "push-to-talk" ? onPressOut : undefined}
+      onPress={
+        inputMode === "push-to-talk" && !canResolvePromptBlock
+          ? undefined
+          : handlePress
+      }
+      onPressIn={
+        inputMode === "push-to-talk" && !canResolvePromptBlock
+          ? onPressIn
+          : undefined
+      }
+      onPressOut={
+        inputMode === "push-to-talk" && !canResolvePromptBlock
+          ? onPressOut
+          : undefined
+      }
       style={[
         styles.voiceSurface,
         {
@@ -104,7 +126,14 @@ function VoiceInputSurface({
           testID="voice-input-blocked-status"
           accessibilityLiveRegion="polite"
           numberOfLines={1}
-          style={[styles.blockedActionLabel, { color: colors.textMuted }]}
+          style={[
+            styles.blockedActionLabel,
+            {
+              color: canResolvePromptBlock
+                ? colors.activeControlIcon
+                : colors.textMuted,
+            },
+          ]}
         >
           {promptBlockedActionLabel}
         </Text>
@@ -137,6 +166,8 @@ function TextInputSurface({
   onSubmitTextMessage,
   onTextFocusChange,
   onTextMessageChange,
+  onResolvePromptBlock,
+  promptBlockedActionEnabled,
   promptBlockedActionLabel,
   promptBlockedProgress,
   t,
@@ -152,6 +183,8 @@ function TextInputSurface({
   | "onSubmitTextMessage"
   | "onTextFocusChange"
   | "onTextMessageChange"
+  | "onResolvePromptBlock"
+  | "promptBlockedActionEnabled"
   | "promptBlockedActionLabel"
   | "promptBlockedProgress"
   | "t"
@@ -161,6 +194,11 @@ function TextInputSurface({
   | "textMessage"
   | "textSubmitDisabled"
 >) {
+  const canResolvePromptBlock =
+    promptBlockedActionEnabled && Boolean(onResolvePromptBlock);
+  const primaryActionDisabled =
+    disabled || (textSubmitDisabled && !canResolvePromptBlock);
+
   return (
     <View
       testID="text-input-surface"
@@ -197,7 +235,7 @@ function TextInputSurface({
         testID="voice-text-primary-action"
         accessibilityLabel={promptBlockedActionLabel ?? t("sendTextMessage")}
         accessibilityRole="button"
-        accessibilityState={{ disabled: textSubmitDisabled }}
+        accessibilityState={{ disabled: primaryActionDisabled }}
         accessibilityValue={
           promptBlockedProgress !== null
             ? {
@@ -207,14 +245,16 @@ function TextInputSurface({
               }
             : undefined
         }
-        disabled={textSubmitDisabled}
-        onPress={onSubmitTextMessage}
+        disabled={primaryActionDisabled}
+        onPress={
+          canResolvePromptBlock ? onResolvePromptBlock : onSubmitTextMessage
+        }
         activeOpacity={0.8}
         style={[
           styles.sendButton,
           promptBlockedActionLabel ? styles.sendButtonBlockedStatus : null,
           {
-            backgroundColor: textSubmitDisabled
+            backgroundColor: primaryActionDisabled
               ? colors.surfaceAlt
               : colors.bubbleUser,
           },
@@ -225,7 +265,14 @@ function TextInputSurface({
             testID="text-input-blocked-status"
             accessibilityLiveRegion="polite"
             numberOfLines={1}
-            style={[styles.blockedActionLabel, { color: colors.textMuted }]}
+            style={[
+              styles.blockedActionLabel,
+              {
+                color: canResolvePromptBlock
+                  ? colors.onPrimary
+                  : colors.textMuted,
+              },
+            ]}
           >
             {promptBlockedActionLabel}
           </Text>
@@ -233,7 +280,7 @@ function TextInputSurface({
           <PhosphorIcon
             name="arrow-up"
             size="control"
-            color={textSubmitDisabled ? colors.textMuted : colors.onPrimary}
+            color={primaryActionDisabled ? colors.textMuted : colors.onPrimary}
           />
         )}
       </TouchableOpacity>

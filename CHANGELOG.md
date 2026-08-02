@@ -29,6 +29,12 @@ the complete Play Store translations are kept in a dedicated file under
 
 ### Fixed
 
+- Make the Free home action open on-device setup instead of remaining disabled,
+  open the complete on-device model catalogue from Settings, and return to the
+  same Settings flow after a Premium prompt closes.
+- Remove the redundant home-screen Premium shortcut and prevent purchase
+  attempts from failing silently when the App Store or Play Store product is
+  unavailable by showing the store error with an explicit retry action.
 - Reuse suitable models already installed on the device when building the Free
   profile, avoid models that failed a current-device benchmark when an
   alternative exists, and keep setup open until all three local routes pass.

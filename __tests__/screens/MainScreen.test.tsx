@@ -20,6 +20,7 @@ jest.mock("../../src/context/PremiumEntitlementContext", () => ({
     status: "premium",
     storeConnected: true,
     storeProduct: null,
+    storeProductLoading: false,
   })),
 }));
 
@@ -343,10 +344,14 @@ jest.mock("../../src/screens/main/StatusDetailsModal", () => ({
 jest.mock("../../src/features/settings/AntSettingsModal", () => ({
   AntSettingsModal: ({
     visible,
+    suspended,
     onOpenSetupGuide,
+    onOpenPremium,
   }: {
     visible: boolean;
+    suspended?: boolean;
     onOpenSetupGuide?: () => void;
+    onOpenPremium: () => void;
   }) => {
     const React = require("react");
     const { Text, TouchableOpacity, View } = require("react-native");
@@ -356,13 +361,20 @@ jest.mock("../../src/features/settings/AntSettingsModal", () => ({
       React.createElement(
         Text,
         null,
-        visible ? "settings:open" : "settings:closed",
+        visible && !suspended ? "settings:open" : "settings:closed",
       ),
-      visible && onOpenSetupGuide
+      visible && !suspended && onOpenSetupGuide
         ? React.createElement(
             TouchableOpacity,
             { onPress: onOpenSetupGuide },
             React.createElement(Text, null, "guided-setup-shortcut"),
+          )
+        : null,
+      visible && !suspended
+        ? React.createElement(
+            TouchableOpacity,
+            { onPress: onOpenPremium },
+            React.createElement(Text, null, "settings-upgrade-premium"),
           )
         : null,
     );
@@ -731,6 +743,19 @@ describe("MainScreen", () => {
     expect(screen.getByText("settings:open")).toBeTruthy();
     expect(screen.getByText("guided-setup-shortcut")).toBeTruthy();
     expect(screen.getByText("drawer:open")).toBeTruthy();
+  });
+
+  it("returns to Settings after presenting the Premium purchase", () => {
+    const screen = renderWithProviders(<MainScreen />);
+
+    fireEvent.press(screen.getByText("open-settings"));
+    fireEvent.press(screen.getByText("settings-upgrade-premium"));
+
+    expect(screen.getByText("settings:closed")).toBeTruthy();
+    expect(screen.getByText("Unlock Premium")).toBeTruthy();
+
+    fireEvent.press(screen.getByText("Done"));
+    expect(screen.getByText("settings:open")).toBeTruthy();
   });
 
   it("hides the guided-setup shortcut after it is disabled", () => {

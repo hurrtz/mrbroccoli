@@ -62,6 +62,7 @@ export const AntSettingsModal = React.memo(function AntSettingsModal(
 ) {
   const {
     visible,
+    suspended = false,
     isPremium,
     settings,
     kokoroModel,
@@ -263,10 +264,6 @@ export const AntSettingsModal = React.memo(function AntSettingsModal(
           props.onOpenPremium();
           return;
         }
-        if (!isPremium && page === "local") {
-          props.onOpenOfflineSetup();
-          return;
-        }
         setActivePage(page);
       }}
       onValidationStart={() => setValidationToastMessage(null)}
@@ -291,7 +288,7 @@ export const AntSettingsModal = React.memo(function AntSettingsModal(
     onClose();
   }, [activePage, onClose]);
 
-  if (!visible) {
+  if (!visible || suspended) {
     return null;
   }
 

@@ -29,6 +29,8 @@ export function PremiumUpgradeModal({
   const purchaseLabel = premium.displayPrice
     ? t("premiumBuyPrice", { price: premium.displayPrice })
     : t("premiumBuy");
+  const purchaseUnavailable =
+    !premium.storeProductLoading && !premium.storeProduct;
 
   return (
     <Modal
@@ -42,10 +44,22 @@ export function PremiumUpgradeModal({
           : [
               {
                 text: purchaseLabel,
-                loading: premium.busy,
-                disabled: premium.busy,
+                loading: premium.busy || premium.storeProductLoading,
+                disabled:
+                  premium.busy ||
+                  premium.storeProductLoading ||
+                  !premium.storeProduct,
                 onPress: () => void premium.purchasePremium(),
               },
+              ...(purchaseUnavailable
+                ? [
+                    {
+                      text: t("retry"),
+                      disabled: premium.busy,
+                      onPress: () => void premium.refreshPremium(),
+                    },
+                  ]
+                : []),
               {
                 text: t("restorePurchase"),
                 disabled: premium.busy,

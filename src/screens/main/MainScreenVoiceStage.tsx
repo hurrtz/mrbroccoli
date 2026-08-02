@@ -41,6 +41,7 @@ interface MainScreenVoiceStageProps {
   onSubmitTextMessage: (text: string) => void;
   onTextMessageChange?: (text: string) => void;
   playbackPaused?: boolean;
+  promptBlockedActionEnabled?: boolean;
   promptBlockedActionLabel?: string | null;
   promptBlockedMessage?: string | null;
   promptBlockedProgress?: number | null;
@@ -80,6 +81,7 @@ export const MainScreenVoiceStage = React.memo(function MainScreenVoiceStage({
   onSubmitTextMessage,
   onTextMessageChange,
   playbackPaused = false,
+  promptBlockedActionEnabled = false,
   promptBlockedActionLabel = null,
   promptBlockedMessage = null,
   promptBlockedProgress = null,
@@ -136,6 +138,7 @@ export const MainScreenVoiceStage = React.memo(function MainScreenVoiceStage({
           onSubmitTextMessage={onSubmitTextMessage}
           onTextMessageChange={onTextMessageChange}
           playbackPaused={playbackPaused}
+          promptBlockedActionEnabled={promptBlockedActionEnabled}
           promptBlockedActionLabel={promptBlockedActionLabel}
           promptBlockedMessage={promptBlockedMessage}
           promptBlockedProgress={promptBlockedProgress}
