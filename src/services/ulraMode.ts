@@ -5,7 +5,10 @@ import { estimateTextTokens } from "./conversationContext";
 import { recordDebugLogEvent } from "./debugLogCapture";
 import { generateInternalChat } from "./llm";
 import { getProviderFailureKind } from "./providerResilience";
-import type { ProviderFailureKind } from "./providerErrors";
+import {
+  ProviderRequestError,
+  type ProviderFailureKind,
+} from "./providerErrors";
 
 export interface UlraModeRoute {
   apiKey: string;
@@ -53,6 +56,7 @@ export interface UlraModeResult {
 
 export const ULRA_MODE_MAX_CONTRIBUTION_CHARACTERS = 8_000;
 export const ULRA_MODE_SYNTHESIS_HISTORY_TOKEN_BUDGET = 24_000;
+export const ULRA_MODE_PARTICIPANT_TIMEOUT_MS = 10 * 60_000;
 
 const ULRA_REVIEW_MARKER = "UBER_REVIEW";
 
@@ -63,10 +67,67 @@ const TERMINAL_PARTICIPANT_FAILURES = new Set<ProviderFailureKind>([
   "model-unavailable",
   "quota",
   "rejected",
+  "timeout",
 ]);
 
 function isTerminalParticipantFailure(failureKind: ProviderFailureKind | null) {
   return failureKind ? TERMINAL_PARTICIPANT_FAILURES.has(failureKind) : false;
+}
+
+async function runParticipantWithDeadline<T>(params: {
+  abortSignal?: AbortSignal;
+  language: AppLanguage;
+  provider: Provider;
+  request: (abortSignal: AbortSignal) => Promise<T>;
+}) {
+  const requestAbortController = new AbortController();
+  const timeoutError = new ProviderRequestError({
+    action: "reply",
+    detail: `Private Uber Mode participant exceeded ${ULRA_MODE_PARTICIPANT_TIMEOUT_MS} ms.`,
+    failureKind: "timeout",
+    message: translate(params.language, "providerTimeoutError", {
+      provider: PROVIDER_LABELS[params.provider],
+      action: translate(params.language, "replyGenerationAction"),
+    }),
+    provider: params.provider,
+  });
+  let timeoutId: ReturnType<typeof setTimeout> | null = null;
+  let rejectAbort: (reason?: unknown) => void = () => undefined;
+
+  const timeoutPromise = new Promise<never>((_, reject) => {
+    timeoutId = setTimeout(() => {
+      requestAbortController.abort();
+      reject(timeoutError);
+    }, ULRA_MODE_PARTICIPANT_TIMEOUT_MS);
+  });
+  const abortPromise = new Promise<never>((_, reject) => {
+    rejectAbort = reject;
+  });
+  const handleAbort = () => {
+    requestAbortController.abort();
+    const abortError = new Error("Uber Mode participant request aborted.");
+    abortError.name = "AbortError";
+    rejectAbort(abortError);
+  };
+
+  if (params.abortSignal?.aborted) {
+    handleAbort();
+  } else {
+    params.abortSignal?.addEventListener("abort", handleAbort, { once: true });
+  }
+
+  try {
+    return await Promise.race([
+      params.request(requestAbortController.signal),
+      timeoutPromise,
+      abortPromise,
+    ]);
+  } finally {
+    if (timeoutId) {
+      clearTimeout(timeoutId);
+    }
+    params.abortSignal?.removeEventListener("abort", handleAbort);
+  }
 }
 
 function getParticipantLabel(
@@ -335,8 +396,9 @@ export async function runUlraModeDeliberation(params: {
       },
     });
 
-    const settled = await Promise.allSettled(
+    const settled = await Promise.all(
       activeRoutes.map(async ({ participant, route }) => {
+        const startedAtMs = Date.now();
         recordDebugLogEvent({
           event: "ulra-mode-participant-requested",
           payload: {
@@ -347,46 +409,92 @@ export async function runUlraModeDeliberation(params: {
             round,
           },
         });
-        const result = await generateInternalChat({
-          abortSignal: params.abortSignal,
-          apiKey: route.apiKey,
-          language: params.language,
-          messages: params.messages,
-          model: route.model,
-          modelEffort: route.modelEffort,
-          provider: route.provider,
-          systemPrompt: buildParticipantSystemPrompt({
-            assistantInstructions: params.assistantInstructions,
-            conversationSummary: params.conversationSummary,
-            pastConversationKnowledge: params.pastConversationKnowledge,
-            phaseInstructions: promptForParticipant(participant),
-            webSearchContext: params.webSearchContext,
-          }),
-        });
-
-        const contribution =
-          round === 0
-            ? {
-                text: compactContributionText(result.text),
-                reviewVerdict: undefined,
-              }
-            : parseReviewContribution(result.text);
-
-        return {
-          entry: {
-            modeId: route.modeId,
-            model: result.model ?? route.model,
-            participant,
+        try {
+          const result = await runParticipantWithDeadline({
+            abortSignal: params.abortSignal,
+            language: params.language,
             provider: route.provider,
-            ...(contribution.reviewVerdict
-              ? { reviewVerdict: contribution.reviewVerdict }
-              : {}),
-            round,
-            text: contribution.text,
-            usage: result.usage,
-          } satisfies UlraModeEntry,
-          originalResponseLength: result.text.length,
-        };
+            request: (abortSignal) =>
+              generateInternalChat({
+                abortSignal,
+                apiKey: route.apiKey,
+                language: params.language,
+                messages: params.messages,
+                model: route.model,
+                modelEffort: route.modelEffort,
+                provider: route.provider,
+                systemPrompt: buildParticipantSystemPrompt({
+                  assistantInstructions: params.assistantInstructions,
+                  conversationSummary: params.conversationSummary,
+                  pastConversationKnowledge: params.pastConversationKnowledge,
+                  phaseInstructions: promptForParticipant(participant),
+                  webSearchContext: params.webSearchContext,
+                }),
+              }),
+          });
+          const contribution =
+            round === 0
+              ? {
+                  text: compactContributionText(result.text),
+                  reviewVerdict: undefined,
+                }
+              : parseReviewContribution(result.text);
+          const value = {
+            entry: {
+              modeId: route.modeId,
+              model: result.model ?? route.model,
+              participant,
+              provider: route.provider,
+              ...(contribution.reviewVerdict
+                ? { reviewVerdict: contribution.reviewVerdict }
+                : {}),
+              round,
+              text: contribution.text,
+              usage: result.usage,
+            } satisfies UlraModeEntry,
+            originalResponseLength: result.text.length,
+          };
+
+          recordDebugLogEvent({
+            event: "ulra-mode-participant-completed",
+            payload: {
+              durationMs: Date.now() - startedAtMs,
+              modeId: route.modeId,
+              model: value.entry.model,
+              participant,
+              provider: route.provider,
+              requestedModel: route.model,
+              responseLength: value.originalResponseLength,
+              retainedResponseLength: value.entry.text.length,
+              reviewVerdict: value.entry.reviewVerdict ?? null,
+              round,
+              usedFallback: value.entry.model !== route.model,
+            },
+          });
+
+          return { status: "fulfilled", value } as const;
+        } catch (reason) {
+          const message =
+            reason instanceof Error ? reason.message : String(reason);
+          const failureKind = getProviderFailureKind(reason);
+
+          recordDebugLogEvent({
+            event: "ulra-mode-participant-failed",
+            level: "warn",
+            payload: {
+              durationMs: Date.now() - startedAtMs,
+              failureKind: failureKind ?? "unknown",
+              message,
+              modeId: route.modeId,
+              model: route.model,
+              participant,
+              provider: route.provider,
+              round,
+            },
+          });
+
+          return { reason, status: "rejected" } as const;
+        }
       }),
     );
 
@@ -401,21 +509,6 @@ export async function runUlraModeDeliberation(params: {
       if (result.status === "fulfilled") {
         successes += 1;
         entries.push(result.value.entry);
-        recordDebugLogEvent({
-          event: "ulra-mode-participant-completed",
-          payload: {
-            modeId: route.modeId,
-            model: result.value.entry.model,
-            participant,
-            provider: route.provider,
-            requestedModel: route.model,
-            responseLength: result.value.originalResponseLength,
-            retainedResponseLength: result.value.entry.text.length,
-            reviewVerdict: result.value.entry.reviewVerdict ?? null,
-            round,
-            usedFallback: result.value.entry.model !== route.model,
-          },
-        });
         return;
       }
 
@@ -433,20 +526,6 @@ export async function runUlraModeDeliberation(params: {
         provider: route.provider,
         round,
       });
-      recordDebugLogEvent({
-        event: "ulra-mode-participant-failed",
-        level: "warn",
-        payload: {
-          failureKind: failureKind ?? "unknown",
-          message,
-          modeId: route.modeId,
-          model: route.model,
-          participant,
-          provider: route.provider,
-          round,
-        },
-      });
-
       if (isTerminalParticipantFailure(failureKind)) {
         retiredParticipants.add(participant);
         recordDebugLogEvent({

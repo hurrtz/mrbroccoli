@@ -1,9 +1,11 @@
 import { generateInternalChat } from "../../src/services/llm";
+import { recordDebugLogEvent } from "../../src/services/debugLogCapture";
 import { ProviderRequestError } from "../../src/services/providerErrors";
 import {
   getUlraModeFailureParticipants,
   runUlraModeDeliberation,
   ULRA_MODE_MAX_CONTRIBUTION_CHARACTERS,
+  ULRA_MODE_PARTICIPANT_TIMEOUT_MS,
   ULRA_MODE_SYNTHESIS_HISTORY_TOKEN_BUDGET,
   UlraModeConfig,
 } from "../../src/services/ulraMode";
@@ -18,6 +20,9 @@ jest.mock("../../src/services/llm", () => ({
 
 const generateInternalChatMock = generateInternalChat as jest.MockedFunction<
   typeof generateInternalChat
+>;
+const recordDebugLogEventMock = recordDebugLogEvent as jest.MockedFunction<
+  typeof recordDebugLogEvent
 >;
 
 const config: UlraModeConfig = {
@@ -311,6 +316,79 @@ describe("runUlraModeDeliberation", () => {
     expect(result.roundsCompleted).toBe(1);
     expect(result.convergenceReached).toBe(false);
     expect(result.synthesisPrompt).toContain("Failed private calls: 2.");
+  });
+
+  it("times out and retires a private participant that never settles", async () => {
+    jest.useFakeTimers();
+
+    try {
+      let hungRequestSignal: AbortSignal | undefined;
+      generateInternalChatMock.mockImplementation(async (params) => {
+        if (params.provider === "anthropic") {
+          hungRequestSignal = params.abortSignal;
+          return new Promise(() => undefined);
+        }
+
+        return {
+          model: params.model,
+          text: `${params.provider} contribution`,
+          usage: {
+            kind: "reply",
+            source: "estimated",
+            promptTokens: 4,
+            completionTokens: 2,
+            totalTokens: 6,
+          },
+        };
+      });
+
+      let result: Awaited<ReturnType<typeof runUlraModeDeliberation>> | null =
+        null;
+      const deliberationPromise = runUlraModeDeliberation({
+        assistantInstructions: "",
+        config: { ...config, rounds: 1 },
+        language: "en",
+        messages: [{ role: "user", content: "Question" }],
+      }).then((value) => {
+        result = value;
+        return value;
+      });
+
+      await jest.advanceTimersByTimeAsync(0);
+
+      expect(
+        recordDebugLogEventMock.mock.calls.filter(
+          ([event]) => event.event === "ulra-mode-participant-completed",
+        ),
+      ).toHaveLength(2);
+      expect(
+        recordDebugLogEventMock.mock.calls.some(
+          ([event]) => event.event === "ulra-mode-round-completed",
+        ),
+      ).toBe(false);
+
+      await jest.advanceTimersByTimeAsync(ULRA_MODE_PARTICIPANT_TIMEOUT_MS);
+
+      expect(result).not.toBeNull();
+      expect(await deliberationPromise).toEqual(
+        expect.objectContaining({
+          retiredParticipants: 1,
+          roundsCompleted: 1,
+        }),
+      );
+      expect(hungRequestSignal?.aborted).toBe(true);
+      expect(generateInternalChatMock).toHaveBeenCalledTimes(5);
+      expect(result?.entries).toHaveLength(4);
+      expect(result?.failures).toEqual([
+        expect.objectContaining({
+          failureKind: "timeout",
+          participant: 2,
+          round: 0,
+        }),
+      ]);
+    } finally {
+      jest.useRealTimers();
+    }
   });
 
   it("does not call a terminally failed participant in later rounds", async () => {

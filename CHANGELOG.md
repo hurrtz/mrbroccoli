@@ -35,6 +35,9 @@ the complete Play Store translations are kept in a dedicated file under
 
 ### Fixed
 
+- Prevent a stalled private Uber Mode participant from blocking an entire run
+  indefinitely; timed-out participants are skipped while successful models
+  continue through review and final synthesis.
 - Trust a successfully installed and benchmarked Free on-device profile when
   it selects Kokoro, avoiding a stale verification warning that redirected
   Free users into the Premium-only Speaking settings after changing language.
