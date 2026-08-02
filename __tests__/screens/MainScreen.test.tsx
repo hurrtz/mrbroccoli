@@ -262,12 +262,14 @@ jest.mock("../../src/screens/main/MainScreenVoiceStage", () => ({
   },
   MainScreenVoiceStage: ({
     disabled,
+    onAddImage,
     onResolvePromptBlock,
     promptBlockedActionLabel,
     promptBlockedMessage,
     promptBlockedProgress,
   }: {
     disabled?: boolean;
+    onAddImage?: () => void;
     onResolvePromptBlock?: () => void;
     promptBlockedActionLabel?: string | null;
     promptBlockedMessage?: string | null;
@@ -283,6 +285,9 @@ jest.mock("../../src/screens/main/MainScreenVoiceStage", () => ({
         null,
         disabled ? "voice-stage:disabled" : "voice-stage:enabled",
       ),
+      onAddImage
+        ? React.createElement(Text, null, "image-action")
+        : null,
       promptBlockedMessage && !promptBlockedActionLabel
         ? React.createElement(
             TouchableOpacity,
@@ -499,6 +504,11 @@ const { useKokoroModel } = jest.requireMock(
 ) as {
   useKokoroModel: jest.Mock;
 };
+const { usePremiumEntitlement } = jest.requireMock(
+  "../../src/context/PremiumEntitlementContext",
+) as {
+  usePremiumEntitlement: jest.Mock;
+};
 
 function createSharedSettingsValue(settingsOverrides: Partial<Settings> = {}) {
   return {
@@ -528,6 +538,20 @@ describe("MainScreen", () => {
       width: 430,
     });
     useSharedSettings.mockReturnValue(createSharedSettingsValue());
+    usePremiumEntitlement.mockReturnValue({
+      busy: false,
+      clearError: jest.fn(),
+      displayPrice: null,
+      error: null,
+      isPremium: true,
+      purchasePremium: jest.fn(async () => undefined),
+      refreshPremium: jest.fn(async () => undefined),
+      restorePremium: jest.fn(async () => undefined),
+      status: "premium",
+      storeConnected: true,
+      storeProduct: null,
+      storeProductLoading: false,
+    });
     useProviderVoiceDirectory.mockReturnValue({
       voices: [],
       status: "idle",
@@ -571,6 +595,30 @@ describe("MainScreen", () => {
     expect(screen.getByText("settings:closed")).toBeTruthy();
     expect(screen.getByText("drawer:closed")).toBeTruthy();
     expect(screen.getByText("open-drawer")).toBeTruthy();
+  });
+
+  it("hides the image action from Free users", () => {
+    usePremiumEntitlement.mockReturnValue({
+      busy: false,
+      clearError: jest.fn(),
+      displayPrice: null,
+      error: null,
+      isPremium: false,
+      purchasePremium: jest.fn(async () => undefined),
+      refreshPremium: jest.fn(async () => undefined),
+      restorePremium: jest.fn(async () => undefined),
+      status: "free",
+      storeConnected: true,
+      storeProduct: null,
+      storeProductLoading: false,
+    });
+    useSharedSettings.mockReturnValue({
+      ...createSharedSettingsValue(),
+      loaded: false,
+    });
+    const screen = renderWithProviders(<MainScreen />);
+
+    expect(screen.queryByText("image-action")).toBeNull();
   });
 
   it("keeps Web Search visible but disabled when its provider has no key", () => {

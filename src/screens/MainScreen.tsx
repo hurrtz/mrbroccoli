@@ -792,7 +792,9 @@ export function MainScreen() {
           inputMode: runtimeSettings.inputMode,
           isActive: isActive && mainSurfaceVisible,
           onInputSurfaceChange: handleInputSurfaceChange,
-          onAddImage: imagePromptSubmission.handleAddImage,
+          onAddImage: freeOffline.entitlement.isPremium
+            ? imagePromptSubmission.handleAddImage
+            : undefined,
           onRemoveImage: pendingImages.handleRemoveImage,
           onDriveContinue: handleContinueDriveSession,
           onDriveRepeat: handleRepeatDriveReply,

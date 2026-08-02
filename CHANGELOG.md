@@ -22,6 +22,8 @@ the complete Play Store translations are kept in a dedicated file under
 
 ### Changed
 
+- Hide the image attachment action from the Free home screen instead of
+  showing a disabled Premium-only button beneath the main action.
 - Keep cloud providers, response-mode configuration, web search, images,
   Drive and Uber modes, cross-session knowledge, portable archive sync, and
   advanced controls behind Premium while preserving the user's configuration
