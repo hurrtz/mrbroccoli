@@ -34,6 +34,9 @@ const androidProguardRules = readText("android/app/proguard-rules.pro");
 const androidManifest = readText(
   "android/app/src/main/AndroidManifest.xml",
 );
+const androidDebugManifest = readText(
+  "android/app/src/debug/AndroidManifest.xml",
+);
 const imagePickerPlugin = appConfig.plugins?.find(
   (plugin) => Array.isArray(plugin) && plugin[0] === "expo-image-picker",
 );
@@ -146,6 +149,16 @@ assertIncludes(
   "Android camera permission",
   androidManifest,
   '<uses-permission android:name="android.permission.CAMERA"/>',
+);
+assertIncludes(
+  "Android Debug package isolation",
+  androidBuild,
+  "applicationIdSuffix '.debug'",
+);
+assertIncludes(
+  "Android Debug app label",
+  androidDebugManifest,
+  'android:label="Mr Broccoli Debug"',
 );
 const iosDeploymentTargets = [
   ...iosProject.matchAll(/IPHONEOS_DEPLOYMENT_TARGET = ([^;]+);/g),

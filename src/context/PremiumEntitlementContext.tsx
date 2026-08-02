@@ -28,6 +28,19 @@ import {
   loadCachedPremiumEntitlement,
 } from "../services/premiumEntitlement";
 
+export function shouldBypassPremiumEntitlement(
+  isDev: boolean,
+  nodeEnv: string | undefined,
+): boolean {
+  return isDev && nodeEnv !== "test";
+}
+
+// Local device-testing bypass. Production and Jest keep real store entitlement behavior.
+const LOCAL_DEBUG_PREMIUM_BYPASS = shouldBypassPremiumEntitlement(
+  typeof __DEV__ !== "undefined" && __DEV__,
+  process.env.NODE_ENV,
+);
+
 export type PremiumEntitlementStatus = "loading" | "free" | "premium";
 export type PremiumStoreError =
   | "cancelled"
@@ -324,8 +337,8 @@ export function PremiumEntitlementProvider({
 
   const value = useMemo<PremiumEntitlementContextValue>(
     () => ({
-      status,
-      isPremium: status === "premium",
+      status: LOCAL_DEBUG_PREMIUM_BYPASS ? "premium" : status,
+      isPremium: LOCAL_DEBUG_PREMIUM_BYPASS || status === "premium",
       storeConnected: connected,
       storeProduct,
       storeProductLoading,

@@ -127,6 +127,8 @@ android {
     }
     buildTypes {
         debug {
+            // Keep local Debug installs isolated from signed production builds.
+            applicationIdSuffix '.debug'
             signingConfig signingConfigs.debug
         }
         release {
