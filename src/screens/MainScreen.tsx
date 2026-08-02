@@ -142,8 +142,7 @@ export function MainScreen() {
   } = getKokoroPromptBlockState({
     kokoroModel,
     verifiedByOfflineProfile:
-      freeOffline.entitlement.status === "free" &&
-      freeOffline.freeRuntimeReady,
+      freeOffline.entitlement.status === "free" && freeOffline.freeRuntimeReady,
     spokenRepliesEnabled: runtimeSettings.spokenRepliesEnabled,
     t,
     ttsMode: runtimeSettings.ttsMode,
@@ -762,6 +761,8 @@ export function MainScreen() {
         routeCard: {
           activeResponseMode,
           availableResponseModes: loaded ? availableResponseModes : [],
+          isPremium: freeOffline.entitlement.isPremium,
+          offlineReady: freeOffline.freeRuntimeReady,
           onOpenSetupGuide: freeOffline.entitlement.isPremium
             ? handleOpenProviderSettings
             : () => freeOffline.setModalVisible(true),
@@ -920,10 +921,14 @@ export function MainScreen() {
         onPreviewVoice: handlePreviewVoice,
         onStopPreviewVoice: stopPreviewVoice,
         onValidateProviderCapability: handleValidateProviderCapability,
-        onOpenSetupGuide:
-          freeOffline.entitlement.isPremium && settings.showSetupGuideShortcut
+        onOpenSetupGuide: freeOffline.entitlement.isPremium
+          ? settings.showSetupGuideShortcut
             ? handleOpenSetupGuideFromSettings
-            : undefined,
+            : undefined
+          : () => {
+              closeSettings();
+              freeOffline.setModalVisible(true);
+            },
         isPremium: freeOffline.entitlement.isPremium,
         onOpenPremium: () => {
           setPremiumModalVisible(true);

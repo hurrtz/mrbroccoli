@@ -109,6 +109,22 @@ export const styles = StyleSheet.create({
   routeModeRow: {
     width: "100%",
   },
+  freeEditionStatus: {
+    alignItems: "center",
+    flexDirection: "row",
+    gap: 8,
+    minHeight: 44,
+    paddingHorizontal: 4,
+  },
+  freeEditionStatusCompact: {
+    minHeight: 44,
+  },
+  freeEditionLabel: {
+    flex: 1,
+    fontFamily: fonts.bodyMedium,
+    fontSize: 13,
+    lineHeight: 18,
+  },
   providerEmptyState: {
     borderRadius: 14,
     borderWidth: 1,

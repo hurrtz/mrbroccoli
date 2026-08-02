@@ -43,6 +43,7 @@ export function AntSettingsCard({
   footer,
   headerExtra,
   style,
+  testID,
   title,
 }: {
   children: React.ReactNode;
@@ -50,6 +51,7 @@ export function AntSettingsCard({
   footer?: React.ReactNode;
   headerExtra?: React.ReactNode;
   style?: StyleProp<ViewStyle>;
+  testID?: string;
   title?: React.ReactNode;
 }) {
   const { colors } = useTheme();
@@ -62,6 +64,7 @@ export function AntSettingsCard({
 
   return (
     <View
+      testID={testID}
       style={[
         styles.card,
         {

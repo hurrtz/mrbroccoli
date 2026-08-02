@@ -89,6 +89,8 @@ describe("MainScreenWorkspace streaming isolation", () => {
       routeCard: {
         activeResponseMode,
         availableResponseModes: [activeResponseMode],
+        isPremium: true,
+        offlineReady: false,
         onOpenSetupGuide,
         onSelectResponseMode,
         responseModes: DEFAULT_SETTINGS.responseModes,
@@ -177,6 +179,8 @@ describe("MainScreenWorkspace streaming isolation", () => {
         routeCard={{
           activeResponseMode: DEFAULT_SETTINGS.activeResponseMode,
           availableResponseModes: [],
+          isPremium: true,
+          offlineReady: false,
           onOpenSetupGuide: jest.fn(),
           onSelectResponseMode: jest.fn(),
           responseModes: DEFAULT_SETTINGS.responseModes,
@@ -216,9 +220,8 @@ describe("MainScreenWorkspace streaming isolation", () => {
     );
 
     expect(
-      StyleSheet.flatten(
-        screen.getByTestId("landscape-stage-area").props.style,
-      ).justifyContent,
+      StyleSheet.flatten(screen.getByTestId("landscape-stage-area").props.style)
+        .justifyContent,
     ).toBe("flex-start");
   });
 });

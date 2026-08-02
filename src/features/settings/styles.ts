@@ -145,6 +145,17 @@ export const styles = StyleSheet.create({
   sectionCards: {
     gap: 10,
   },
+  overviewGroup: {
+    gap: 8,
+  },
+  overviewGroupTitle: {
+    fontFamily: fonts.bodyMedium,
+    fontSize: 12,
+    lineHeight: 16,
+    letterSpacing: 0.8,
+    paddingHorizontal: 4,
+    textTransform: "uppercase",
+  },
   releaseVersion: {
     ...textStyles.caption,
     paddingBottom: 4,

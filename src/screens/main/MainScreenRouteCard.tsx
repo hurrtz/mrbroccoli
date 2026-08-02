@@ -21,6 +21,8 @@ interface MainScreenRouteCardProps {
   availableResponseModes: ResponseMode[];
   colors: Colors;
   compact?: boolean;
+  isPremium: boolean;
+  offlineReady: boolean;
   onOpenSetupGuide: () => void;
   onSelectResponseMode: (mode: ResponseMode) => void;
   responseModes: ResponseModeSelections;
@@ -33,6 +35,8 @@ export const MainScreenRouteCard = React.memo(function MainScreenRouteCard({
   availableResponseModes,
   colors,
   compact = false,
+  isPremium,
+  offlineReady,
   onOpenSetupGuide,
   onSelectResponseMode,
   responseModes,
@@ -49,6 +53,31 @@ export const MainScreenRouteCard = React.memo(function MainScreenRouteCard({
         },
       ]}
     >
+      {!isPremium ? (
+        <TouchableOpacity
+          testID="free-edition-status"
+          style={[
+            styles.freeEditionStatus,
+            compact ? styles.freeEditionStatusCompact : null,
+          ]}
+          onPress={onOpenSetupGuide}
+          activeOpacity={0.72}
+          accessibilityRole="button"
+          accessibilityLabel={`${t("freeEdition")}. ${t(
+            offlineReady ? "freeOfflineReady" : "freeOfflineIntro",
+          )}`}
+        >
+          <PhosphorIcon
+            name={offlineReady ? "check-circle" : "safety-certificate"}
+            size="compact"
+            color={offlineReady ? colors.success : colors.accent}
+          />
+          <Text style={[styles.freeEditionLabel, { color: colors.text }]}>
+            {t("freeEdition")}
+          </Text>
+          <PhosphorIcon name="right" size="inline" color={colors.textMuted} />
+        </TouchableOpacity>
+      ) : null}
       {availableResponseModes.length > 0 ? (
         <View testID="response-mode-row" style={styles.routeModeRow}>
           <ResponseModeToggle
@@ -59,7 +88,7 @@ export const MainScreenRouteCard = React.memo(function MainScreenRouteCard({
             readyModes={availableResponseModes}
           />
         </View>
-      ) : (
+      ) : !isPremium ? null : (
         <TouchableOpacity
           testID="provider-empty-state"
           style={[
@@ -94,7 +123,10 @@ export const MainScreenRouteCard = React.memo(function MainScreenRouteCard({
           </Text>
           {!compact ? (
             <Text
-              style={[styles.providerEmptyText, { color: colors.textSecondary }]}
+              style={[
+                styles.providerEmptyText,
+                { color: colors.textSecondary },
+              ]}
             >
               {t("setupGuideConnectProviderDescription")}
             </Text>

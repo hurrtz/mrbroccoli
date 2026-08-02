@@ -16,6 +16,9 @@ jest.mock("../../../src/components/ProviderIcon", () => ({
 
 const t = ((key: string) => {
   const copy: Record<string, string> = {
+    freeEdition: "Private Offline · Free",
+    freeOfflineIntro: "Choose languages and prepare private AI.",
+    freeOfflineReady: "Your private offline setup is ready.",
     setupGuideConnectProviderTitle: "Connect a provider",
     setupGuideConnectProviderDescription: "Add an API key to begin.",
   };
@@ -40,6 +43,8 @@ describe("MainScreenRouteCard", () => {
         activeResponseMode="mode-1"
         availableResponseModes={["mode-1", "mode-2"]}
         colors={lightColors}
+        isPremium
+        offlineReady={false}
         onOpenSetupGuide={jest.fn()}
         onSelectResponseMode={jest.fn()}
         responseModes={responseModes}
@@ -62,6 +67,8 @@ describe("MainScreenRouteCard", () => {
         activeResponseMode="mode-1"
         availableResponseModes={[]}
         colors={lightColors}
+        isPremium
+        offlineReady={false}
         onOpenSetupGuide={onOpenSetupGuide}
         onSelectResponseMode={jest.fn()}
         responseModes={responseModes}
@@ -80,6 +87,8 @@ describe("MainScreenRouteCard", () => {
         availableResponseModes={[]}
         colors={lightColors}
         compact
+        isPremium
+        offlineReady={false}
         onOpenSetupGuide={jest.fn()}
         onSelectResponseMode={jest.fn()}
         responseModes={responseModes}
@@ -91,5 +100,51 @@ describe("MainScreenRouteCard", () => {
     expect(
       screen.getByLabelText("Connect a provider. Add an API key to begin."),
     ).toBeTruthy();
+  });
+
+  it("shows Free as a ready private offline edition", () => {
+    const onOpenSetupGuide = jest.fn();
+    const screen = renderWithProviders(
+      <MainScreenRouteCard
+        activeResponseMode="mode-1"
+        availableResponseModes={["mode-1"]}
+        colors={lightColors}
+        isPremium={false}
+        offlineReady
+        onOpenSetupGuide={onOpenSetupGuide}
+        onSelectResponseMode={jest.fn()}
+        responseModes={responseModes}
+        t={t}
+      />,
+    );
+
+    expect(screen.getByText("Private Offline · Free")).toBeTruthy();
+    fireEvent.press(
+      screen.getByLabelText(
+        "Private Offline · Free. Your private offline setup is ready.",
+      ),
+    );
+    expect(onOpenSetupGuide).toHaveBeenCalledTimes(1);
+  });
+
+  it("opens Free setup instead of showing the cloud-provider empty state", () => {
+    const onOpenSetupGuide = jest.fn();
+    const screen = renderWithProviders(
+      <MainScreenRouteCard
+        activeResponseMode="mode-1"
+        availableResponseModes={[]}
+        colors={lightColors}
+        isPremium={false}
+        offlineReady={false}
+        onOpenSetupGuide={onOpenSetupGuide}
+        onSelectResponseMode={jest.fn()}
+        responseModes={responseModes}
+        t={t}
+      />,
+    );
+
+    expect(screen.queryByTestId("provider-empty-state")).toBeNull();
+    fireEvent.press(screen.getByTestId("free-edition-status"));
+    expect(onOpenSetupGuide).toHaveBeenCalledTimes(1);
   });
 });

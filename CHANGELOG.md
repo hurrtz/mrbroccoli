@@ -22,6 +22,16 @@ the complete Play Store translations are kept in a dedicated file under
 
 ### Changed
 
+- Present Free as a coherent Private Offline edition across Home, setup, and
+  Settings, with a three-step language/model/conversation flow and explicit
+  language-aware system-voice fallback for multilingual profiles.
+- Group Settings by conversation, voice and models, and privacy and app tasks;
+  replace the technical readiness dashboard with a clear edition summary and
+  a direct setup action.
+- Explain Premium before purchase with its concrete provider, response-mode,
+  Uber, web, image, Drive, knowledge, and archive benefits, plus the one-time,
+  no-subscription, no-token-markup purchase model and same-platform restore
+  boundary.
 - Simplify Free Settings around three usable areas: on-device AI, data and
   privacy, and app preferences. Remove locked Premium sections and irrelevant
   provider controls from the Free flow, with one unobtrusive upgrade card at

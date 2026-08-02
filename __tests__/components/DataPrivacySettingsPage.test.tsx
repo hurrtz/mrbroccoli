@@ -200,7 +200,7 @@ describe("DataPrivacySettingsPage", () => {
     expect(chooseDirectory).toHaveBeenCalledTimes(1);
   });
 
-  it("keeps Premium knowledge and archive operations locked in Free", () => {
+  it("hides Premium knowledge and archive operations in Free", () => {
     const onOpenPremium = jest.fn();
     const screen = renderPage({ isPremium: false, onOpenPremium });
 
@@ -210,8 +210,8 @@ describe("DataPrivacySettingsPage", () => {
     expect(
       screen.queryByTestId("choose-conversation-archive-folder"),
     ).toBeNull();
-    fireEvent.press(screen.getAllByText("Unlock Premium")[0]);
-    expect(onOpenPremium).toHaveBeenCalledTimes(1);
+    expect(screen.queryByText("Unlock Premium")).toBeNull();
+    expect(onOpenPremium).not.toHaveBeenCalled();
   });
 
   it("still lets a Free user disconnect a previously configured archive", () => {

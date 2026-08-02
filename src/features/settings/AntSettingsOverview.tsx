@@ -1,5 +1,5 @@
 import React from "react";
-import { Pressable, Text, View, useWindowDimensions } from "react-native";
+import { Pressable, Text, View } from "react-native";
 
 import { List } from "../../design-system/NativeControls";
 
@@ -11,7 +11,6 @@ import {
 } from "../../design-system/PhosphorIcon";
 import { useTheme } from "../../theme/ThemeContext";
 import { fonts } from "../../theme/typography";
-import type { SettingsReadiness } from "../settings-core/readiness";
 import {
   isPremiumSettingsPage,
   type SettingsPage,
@@ -96,14 +95,27 @@ const overviewRows: OverviewRow[] = [
   },
 ];
 
+const overviewGroups = [
+  {
+    titleKey: "settingsGroupConversation" as const,
+    pages: ["connections", "thinking", "search"] as const,
+  },
+  {
+    titleKey: "settingsGroupVoiceModels" as const,
+    pages: ["listening", "speaking", "local"] as const,
+  },
+  {
+    titleKey: "settingsGroupPrivacyApp" as const,
+    pages: ["data", "app"] as const,
+  },
+];
+
 export function AntSettingsOverview({
-  readiness,
   isPremium,
   onOpenPage,
   onOpenSetupGuide,
   onOpenPremium,
 }: {
-  readiness: SettingsReadiness;
   isPremium: boolean;
   onOpenPage: (page: DrillInSettingsPage) => void;
   onOpenSetupGuide?: () => void;
@@ -111,41 +123,47 @@ export function AntSettingsOverview({
 }) {
   const { colors } = useTheme();
   const { isRtl, t } = useLocalization();
-  const { fontScale } = useWindowDimensions();
-  const usesLargeTextLayout = fontScale >= 1.5;
   const drillInIcon = isRtl ? "left" : "right";
   const visibleOverviewRows = isPremium
     ? overviewRows
     : overviewRows.filter((row) => !isPremiumSettingsPage(row.page));
-  const readinessItems = [
-    {
-      key: "thinking",
-      label: t("settingsReadinessThink"),
-      status: readiness.think,
-      onPress: () => onOpenPage("thinking"),
-    },
-    {
-      key: "listening",
-      label: t("settingsReadinessListen"),
-      status: readiness.listen,
-      onPress: () => onOpenPage("listening"),
-    },
-    {
-      key: "speaking",
-      label: t("settingsReadinessSpeak"),
-      status: readiness.speak,
-      onPress: () => onOpenPage("speaking"),
-    },
-    {
-      key: "search",
-      label: t("settingsReadinessSearch"),
-      status: readiness.search,
-      onPress: () => onOpenPage("search"),
-    },
-  ] as const;
+  const visibleGroups = overviewGroups
+    .map((group) => ({
+      ...group,
+      rows: group.pages
+        .map((page) => visibleOverviewRows.find((row) => row.page === page))
+        .filter((row): row is OverviewRow => Boolean(row)),
+    }))
+    .filter((group) => group.rows.length > 0);
 
   return (
     <View testID="settings-page-overview" style={styles.overview}>
+      <AntSettingsCard
+        testID="settings-edition-card"
+        style={{
+          backgroundColor: isPremium ? colors.accentSoft : colors.surfaceAlt,
+          borderColor: isPremium ? colors.borderStrong : colors.border,
+        }}
+      >
+        <View style={styles.setupCardBody}>
+          <PhosphorIcon
+            name={isPremium ? "check-circle" : "safety-certificate"}
+            size="prominent"
+            color={isPremium ? colors.success : colors.accent}
+          />
+          <View style={styles.setupCopy}>
+            <Text style={[styles.setupTitle, { color: colors.text }]}>
+              {isPremium ? t("premiumUnlocked") : t("freeEdition")}
+            </Text>
+            <Text
+              style={[styles.setupSummary, { color: colors.textSecondary }]}
+            >
+              {isPremium ? t("premiumDescription") : t("freeOfflineIntro")}
+            </Text>
+          </View>
+        </View>
+      </AntSettingsCard>
+
       {onOpenSetupGuide ? (
         <Pressable
           testID="settings-guided-setup"
@@ -171,7 +189,9 @@ export function AntSettingsOverview({
                 <Text
                   style={[styles.setupSummary, { color: colors.textSecondary }]}
                 >
-                  {t("settingsGuidedSetupSummary")}
+                  {isPremium
+                    ? t("settingsGuidedSetupSummary")
+                    : t("freeOfflineIntro")}
                 </Text>
               </View>
               <PhosphorIcon
@@ -184,194 +204,91 @@ export function AntSettingsOverview({
         </Pressable>
       ) : null}
 
-      {isPremium ? <View
-        testID="settings-readiness-grid"
-        style={[
-          styles.readinessGrid,
-          usesLargeTextLayout ? styles.readinessGridLargeText : null,
-        ]}
-      >
-        {readinessItems.map((item, index) => {
-          const previousReady =
-            index > 0 && readinessItems[index - 1].status.state === "ready";
-          const nextReady =
-            index < readinessItems.length - 1 &&
-            readinessItems[index + 1].status.state === "ready";
-          const ready = item.status.state === "ready";
-          const broken = item.status.state === "broken";
-          const statusColor = broken
-            ? colors.danger
-            : ready
-              ? colors.success
-              : colors.borderStrong;
-
-          return (
-            <Pressable
-              key={item.key}
-              testID={`settings-readiness-${item.key}`}
-              style={({ pressed }) => [
-                styles.readinessStep,
-                usesLargeTextLayout ? styles.readinessStepLargeText : null,
-                pressed ? styles.pressedControl : null,
-              ]}
-              onPress={item.onPress}
-              accessibilityRole="button"
-              accessibilityLabel={`${item.label}: ${t(item.status.summaryKey)}`}
-            >
-              <View
-                style={[
-                  styles.readinessStepTrack,
-                  usesLargeTextLayout
-                    ? styles.readinessStepTrackLargeText
-                    : null,
-                ]}
-              >
-                <View
-                  style={[
-                    styles.readinessStepLine,
-                    {
-                      backgroundColor:
-                        previousReady && ready ? colors.success : colors.border,
-                      opacity: usesLargeTextLayout || index === 0 ? 0 : 1,
-                    },
-                  ]}
-                />
-                <View
-                  style={[
-                    styles.readinessStepCircle,
-                    {
-                      backgroundColor: colors.surface,
-                      borderColor: statusColor,
-                    },
-                  ]}
-                >
-                  {ready ? (
-                    <PhosphorIcon
-                      name="check"
-                      size="inline"
-                      color={colors.success}
-                    />
-                  ) : broken ? (
-                    <PhosphorIcon
-                      name="exclamation-circle"
-                      size="inline"
-                      color={colors.danger}
-                    />
-                  ) : null}
-                </View>
-                <View
-                  style={[
-                    styles.readinessStepLine,
-                    {
-                      backgroundColor:
-                        ready && nextReady ? colors.success : colors.border,
-                      opacity:
-                        usesLargeTextLayout ||
-                        index === readinessItems.length - 1
-                          ? 0
-                          : 1,
-                    },
-                  ]}
-                />
-              </View>
-              <Text
-                style={[
-                  styles.readinessStepLabel,
-                  usesLargeTextLayout
-                    ? styles.readinessStepLabelLargeText
-                    : null,
-                  {
-                    color: broken
-                      ? colors.danger
-                      : ready
-                        ? colors.success
-                        : colors.textSecondary,
-                  },
-                ]}
-              >
-                {item.label}
-              </Text>
-            </Pressable>
-          );
-        })}
-      </View> : null}
-
-      <View style={styles.sectionCards}>
-        {visibleOverviewRows.map((row) => (
-          <AntSettingsCard
-            key={row.page}
-            contentStyle={styles.fullBleedCardContent}
+      {visibleGroups.map((group) => (
+        <View key={group.titleKey} style={styles.overviewGroup}>
+          <Text
+            style={[styles.overviewGroupTitle, { color: colors.textMuted }]}
           >
-            <List.Item
-              testID={`settings-overview-row-${row.page}`}
-              multipleLine
-              wrap
-              thumb={
-                <View
-                  testID={`settings-overview-icon-${row.page}`}
-                  style={styles.sectionIcon}
-                >
-                  <PhosphorIcon
-                    name={row.icon}
-                    size="prominent"
-                    color={
-                      !isPremium && row.page === "local"
-                        ? colors.accent
-                        : colors.text
-                    }
-                  />
-                </View>
-              }
-              extra={
-                <PhosphorIcon
-                  name={drillInIcon}
-                  size="control"
-                  color={colors.textMuted}
-                />
-              }
-              onPress={() => onOpenPage(row.page)}
-              accessibilityRole="button"
-              accessibilityLabel={t("settingsOpenSection", {
-                section: t(row.titleKey),
-              })}
-              styles={{
-                Item: {
-                  backgroundColor:
-                    !isPremium && row.page === "local"
-                      ? colors.accentSoft
-                      : colors.surfaceElevated,
-                },
-                Line: {
-                  borderBottomWidth: 0,
-                  paddingVertical: 12,
-                },
-                Content: {
-                  color: colors.text,
-                  fontFamily: fonts.bodyMedium,
-                  fontSize: 16,
-                  fontWeight: "600",
-                },
-                Extra: {
-                  paddingStart: 10,
-                },
-              }}
-            >
-              {t(row.titleKey)}
-              <List.Item.Brief
-                wrap
-                style={{
-                  color: colors.textSecondary,
-                  fontFamily: fonts.body,
-                  fontSize: 13,
-                  lineHeight: 19,
-                }}
+            {t(group.titleKey)}
+          </Text>
+          <View style={styles.sectionCards}>
+            {group.rows.map((row) => (
+              <AntSettingsCard
+                key={row.page}
+                contentStyle={styles.fullBleedCardContent}
               >
-                {t(row.summaryKey)}
-              </List.Item.Brief>
-            </List.Item>
-          </AntSettingsCard>
-        ))}
-      </View>
+                <List.Item
+                  testID={`settings-overview-row-${row.page}`}
+                  multipleLine
+                  wrap
+                  thumb={
+                    <View
+                      testID={`settings-overview-icon-${row.page}`}
+                      style={styles.sectionIcon}
+                    >
+                      <PhosphorIcon
+                        name={row.icon}
+                        size="prominent"
+                        color={
+                          !isPremium && row.page === "local"
+                            ? colors.accent
+                            : colors.text
+                        }
+                      />
+                    </View>
+                  }
+                  extra={
+                    <PhosphorIcon
+                      name={drillInIcon}
+                      size="control"
+                      color={colors.textMuted}
+                    />
+                  }
+                  onPress={() => onOpenPage(row.page)}
+                  accessibilityRole="button"
+                  accessibilityLabel={t("settingsOpenSection", {
+                    section: t(row.titleKey),
+                  })}
+                  styles={{
+                    Item: {
+                      backgroundColor:
+                        !isPremium && row.page === "local"
+                          ? colors.accentSoft
+                          : colors.surfaceElevated,
+                    },
+                    Line: {
+                      borderBottomWidth: 0,
+                      paddingVertical: 12,
+                    },
+                    Content: {
+                      color: colors.text,
+                      fontFamily: fonts.bodyMedium,
+                      fontSize: 16,
+                      fontWeight: "600",
+                    },
+                    Extra: {
+                      paddingStart: 10,
+                    },
+                  }}
+                >
+                  {t(row.titleKey)}
+                  <List.Item.Brief
+                    wrap
+                    style={{
+                      color: colors.textSecondary,
+                      fontFamily: fonts.body,
+                      fontSize: 13,
+                      lineHeight: 19,
+                    }}
+                  >
+                    {t(row.summaryKey)}
+                  </List.Item.Brief>
+                </List.Item>
+              </AntSettingsCard>
+            ))}
+          </View>
+        </View>
+      ))}
 
       {!isPremium ? (
         <Pressable
@@ -379,9 +296,7 @@ export function AntSettingsOverview({
           onPress={onOpenPremium}
           accessibilityRole="button"
           accessibilityLabel={t("upgradeToPremium")}
-          style={({ pressed }) =>
-            pressed ? styles.pressedControl : undefined
-          }
+          style={({ pressed }) => (pressed ? styles.pressedControl : undefined)}
         >
           <AntSettingsCard
             style={{

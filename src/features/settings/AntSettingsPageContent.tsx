@@ -1,5 +1,4 @@
 import React from "react";
-import type { SettingsReadiness } from "../settings-core/readiness";
 import {
   isPremiumSettingsPage,
   type SettingsModalProps,
@@ -31,7 +30,6 @@ interface AntSettingsPageContentProps {
   onOpenPage: (page: SettingsPage) => void;
   onValidationStart: () => void;
   props: SettingsModalProps;
-  readiness: SettingsReadiness;
   validation: ReturnType<typeof useProviderValidationState>;
 }
 
@@ -92,7 +90,6 @@ export function AntSettingsPageContent({
   onOpenPage,
   onValidationStart,
   props,
-  readiness,
   validation,
 }: AntSettingsPageContentProps) {
   const {
@@ -130,7 +127,6 @@ export function AntSettingsPageContent({
       return (
         <AntSettingsOverview
           isPremium={props.isPremium}
-          readiness={readiness}
           onOpenPage={onOpenPage}
           onOpenSetupGuide={onOpenSetupGuide}
           onOpenPremium={props.onOpenPremium}

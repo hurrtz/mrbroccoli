@@ -1,5 +1,5 @@
 import React from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { usePremiumEntitlement } from "../context/PremiumEntitlementContext";
 import { Modal } from "../design-system/NativeControls";
@@ -31,6 +31,12 @@ export function PremiumUpgradeModal({
     : t("premiumBuy");
   const purchaseUnavailable =
     !premium.storeProductLoading && !premium.storeProduct;
+  const benefits = [
+    { icon: "key" as const, label: t("premiumBenefitProviders") },
+    { icon: "redo" as const, label: t("premiumBenefitModes") },
+    { icon: "global" as const, label: t("premiumBenefitTools") },
+    { icon: "folder-open" as const, label: t("premiumBenefitKnowledge") },
+  ];
 
   return (
     <Modal
@@ -69,7 +75,11 @@ export function PremiumUpgradeModal({
         { text: t("done"), disabled: premium.busy, onPress: onClose },
       ]}
     >
-      <View style={styles.content}>
+      <ScrollView
+        style={styles.scroll}
+        contentContainerStyle={styles.content}
+        keyboardShouldPersistTaps="handled"
+      >
         <View style={styles.heroRow}>
           <PhosphorIcon
             name={premium.isPremium ? "check-circle" : "thunderbolt"}
@@ -83,6 +93,33 @@ export function PremiumUpgradeModal({
         <Text style={[styles.body, { color: colors.textSecondary }]}>
           {t("premiumDescription")}
         </Text>
+        <View style={styles.benefits}>
+          {benefits.map((benefit) => (
+            <View key={benefit.icon} style={styles.benefitRow}>
+              <PhosphorIcon
+                name={benefit.icon}
+                size="control"
+                color={colors.accent}
+              />
+              <Text style={[styles.benefitText, { color: colors.text }]}>
+                {benefit.label}
+              </Text>
+            </View>
+          ))}
+        </View>
+        <View
+          style={[
+            styles.valueCard,
+            { backgroundColor: colors.accentSoft, borderColor: colors.border },
+          ]}
+        >
+          <Text style={[styles.valueText, { color: colors.text }]}>
+            {t("premiumPurchaseValue")}
+          </Text>
+          <Text style={[styles.hint, { color: colors.textSecondary }]}>
+            {t("premiumFreeKeepsWorking")}
+          </Text>
+        </View>
         <Text style={[styles.hint, { color: colors.textMuted }]}>
           {t("premiumRestoreHint")}
         </Text>
@@ -94,16 +131,32 @@ export function PremiumUpgradeModal({
             {errorText}
           </Text>
         ) : null}
-      </View>
+      </ScrollView>
     </Modal>
   );
 }
 
 const styles = StyleSheet.create({
+  scroll: { maxHeight: 520 },
   content: { gap: 14 },
   heroRow: { alignItems: "center", flexDirection: "row", gap: 12 },
   heroText: { fontFamily: fonts.headline, fontSize: 22, lineHeight: 28 },
   body: { fontFamily: fonts.body, fontSize: 15, lineHeight: 22 },
+  benefits: { gap: 12 },
+  benefitRow: { alignItems: "center", flexDirection: "row", gap: 12 },
+  benefitText: {
+    flex: 1,
+    fontFamily: fonts.bodyMedium,
+    fontSize: 14,
+    lineHeight: 20,
+  },
+  valueCard: {
+    borderRadius: 12,
+    borderWidth: StyleSheet.hairlineWidth,
+    gap: 8,
+    padding: 14,
+  },
+  valueText: { fontFamily: fonts.bodyMedium, fontSize: 14, lineHeight: 20 },
   hint: { fontFamily: fonts.body, fontSize: 13, lineHeight: 19 },
   error: { fontFamily: fonts.bodyMedium, fontSize: 14, lineHeight: 20 },
 });

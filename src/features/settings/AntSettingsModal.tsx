@@ -3,7 +3,6 @@ import { Animated, Modal, Platform, useWindowDimensions } from "react-native";
 
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import { getSettingsReadiness } from "../settings-core/readiness";
 import {
   isPremiumSettingsPage,
   type SettingsModalProps,
@@ -65,7 +64,6 @@ export const AntSettingsModal = React.memo(function AntSettingsModal(
     suspended = false,
     isPremium,
     settings,
-    kokoroModel,
     focusProvider,
     focusCatalogProviderId,
     focusTab,
@@ -160,25 +158,6 @@ export const AntSettingsModal = React.memo(function AntSettingsModal(
     onValidationError: setValidationToastMessage,
     onValidationResult: handleProviderValidationResult,
   });
-  const readiness = React.useMemo(
-    () =>
-      getSettingsReadiness(settings, {
-        llmProviders: validation.selectableLlmProviders,
-        sttProviders: validation.selectableSttProviders,
-        ttsProviders: validation.selectableTtsProviders,
-        searchProviders: validation.selectableSearchProviders,
-        kokoroInstalled: kokoroModel.installed,
-      }),
-    [
-      kokoroModel.installed,
-      validation.selectableLlmProviders,
-      validation.selectableSearchProviders,
-      validation.selectableSttProviders,
-      validation.selectableTtsProviders,
-      settings,
-    ],
-  );
-
   React.useEffect(() => {
     if (!visible) {
       entrance.setValue(0);
@@ -268,7 +247,6 @@ export const AntSettingsModal = React.memo(function AntSettingsModal(
       }}
       onValidationStart={() => setValidationToastMessage(null)}
       props={diagnosticProps}
-      readiness={readiness}
       validation={validation}
     />
   );

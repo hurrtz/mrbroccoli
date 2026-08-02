@@ -1,6 +1,8 @@
 import type { TranslationParams } from "./types";
+import { editionTranslations } from "./editionTranslations";
 
 const en = {
+  ...editionTranslations.en,
   premium: "Premium",
   upgradeToPremium: "Unlock Premium",
   premiumDescription:
@@ -42,6 +44,7 @@ const define = (value: PremiumTranslations) => value;
 const rawPremiumTranslations = {
   en,
   de: define({
+    ...editionTranslations.de,
     premium: "Premium",
     upgradeToPremium: "Premium freischalten",
     premiumDescription:
@@ -77,6 +80,7 @@ const rawPremiumTranslations = {
       "Das Smartphone steht vorübergehend unter Speicher-, Strom- oder Hitzedruck. Versuche es später erneut.",
   }),
   uk: define({
+    ...editionTranslations.uk,
     premium: "Premium",
     upgradeToPremium: "Розблокувати Premium",
     premiumDescription:
@@ -111,6 +115,7 @@ const rawPremiumTranslations = {
       "Телефон тимчасово обмежений пам’яттю, живленням або температурою. Спробуйте пізніше.",
   }),
   hi: define({
+    ...editionTranslations.hi,
     premium: "प्रीमियम",
     upgradeToPremium: "प्रीमियम अनलॉक करें",
     premiumDescription:
@@ -146,6 +151,7 @@ const rawPremiumTranslations = {
       "फ़ोन पर अभी मेमोरी, ऊर्जा या गर्मी का दबाव है। बाद में कोशिश करें।",
   }),
   es: define({
+    ...editionTranslations.es,
     premium: "Premium",
     upgradeToPremium: "Desbloquear Premium",
     premiumDescription:
@@ -181,6 +187,7 @@ const rawPremiumTranslations = {
       "El teléfono tiene presión temporal de memoria, energía o temperatura. Inténtalo más tarde.",
   }),
   fr: define({
+    ...editionTranslations.fr,
     premium: "Premium",
     upgradeToPremium: "Débloquer Premium",
     premiumDescription:
@@ -216,6 +223,7 @@ const rawPremiumTranslations = {
       "Le téléphone subit une contrainte temporaire de mémoire, d’énergie ou de température. Réessayez plus tard.",
   }),
   it: define({
+    ...editionTranslations.it,
     premium: "Premium",
     upgradeToPremium: "Sblocca Premium",
     premiumDescription:
@@ -250,6 +258,7 @@ const rawPremiumTranslations = {
       "Il telefono è temporaneamente sotto pressione di memoria, energia o calore. Riprova più tardi.",
   }),
   pt: define({
+    ...editionTranslations.pt,
     premium: "Premium",
     upgradeToPremium: "Desbloquear Premium",
     premiumDescription:
@@ -284,6 +293,7 @@ const rawPremiumTranslations = {
       "O telefone está temporariamente sob pressão de memória, energia ou calor. Tente mais tarde.",
   }),
   ptBR: define({
+    ...editionTranslations.ptBR,
     premium: "Premium",
     upgradeToPremium: "Desbloquear Premium",
     premiumDescription:
@@ -318,6 +328,7 @@ const rawPremiumTranslations = {
       "O celular está temporariamente sob pressão de memória, energia ou calor. Tente mais tarde.",
   }),
   ru: define({
+    ...editionTranslations.ru,
     premium: "Premium",
     upgradeToPremium: "Открыть Premium",
     premiumDescription:
@@ -352,6 +363,7 @@ const rawPremiumTranslations = {
       "Телефон временно ограничен памятью, питанием или температурой. Повторите позже.",
   }),
   "zh-CN": define({
+    ...editionTranslations["zh-CN"],
     premium: "高级版",
     upgradeToPremium: "解锁高级版",
     premiumDescription:
@@ -384,6 +396,7 @@ const rawPremiumTranslations = {
       "手机暂时受到内存、电量或温度压力，请稍后再试。",
   }),
   ar: define({
+    ...editionTranslations.ar,
     premium: "Premium",
     upgradeToPremium: "فتح Premium",
     premiumDescription:
@@ -418,6 +431,7 @@ const rawPremiumTranslations = {
       "يتعرض الهاتف مؤقتًا لضغط الذاكرة أو الطاقة أو الحرارة. حاول لاحقًا.",
   }),
   ja: define({
+    ...editionTranslations.ja,
     premium: "Premium",
     upgradeToPremium: "Premiumを解除",
     premiumDescription:
@@ -453,6 +467,7 @@ const rawPremiumTranslations = {
       "端末が一時的にメモリ、電力、熱の制約を受けています。後でもう一度お試しください。",
   }),
   hu: define({
+    ...editionTranslations.hu,
     premium: "Premium",
     upgradeToPremium: "Premium feloldása",
     premiumDescription:
@@ -487,6 +502,7 @@ const rawPremiumTranslations = {
       "A telefont átmenetileg memória-, energia- vagy hőterhelés éri. Próbáld később.",
   }),
   cs: define({
+    ...editionTranslations.cs,
     premium: "Premium",
     upgradeToPremium: "Odemknout Premium",
     premiumDescription:
@@ -521,6 +537,7 @@ const rawPremiumTranslations = {
       "Telefon je dočasně zatížen pamětí, napájením nebo teplotou. Zkuste to později.",
   }),
   pl: define({
+    ...editionTranslations.pl,
     premium: "Premium",
     upgradeToPremium: "Odblokuj Premium",
     premiumDescription:
@@ -555,6 +572,7 @@ const rawPremiumTranslations = {
       "Telefon jest tymczasowo obciążony pamięcią, zasilaniem lub temperaturą. Spróbuj później.",
   }),
   tr: define({
+    ...editionTranslations.tr,
     premium: "Premium",
     upgradeToPremium: "Premium’u aç",
     premiumDescription:
@@ -590,6 +608,7 @@ const rawPremiumTranslations = {
       "Telefon geçici olarak bellek, güç veya ısı baskısı altında. Daha sonra deneyin.",
   }),
   sv: define({
+    ...editionTranslations.sv,
     premium: "Premium",
     upgradeToPremium: "Lås upp Premium",
     premiumDescription:
@@ -624,6 +643,7 @@ const rawPremiumTranslations = {
       "Telefonen är tillfälligt belastad av minne, ström eller värme. Försök senare.",
   }),
   ur: define({
+    ...editionTranslations.ur,
     premium: "پریمیم",
     upgradeToPremium: "پریمیم کھولیں",
     premiumDescription:

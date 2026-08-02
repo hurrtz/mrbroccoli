@@ -103,7 +103,7 @@ export function FreeOfflineSetupModal({
             ]
           : []),
         {
-          text: t("done"),
+          text: ready ? t("freeOfflineStart") : t("done"),
           disabled: controller.preparing,
           onPress: () => controller.setModalVisible(false),
         },
@@ -116,6 +116,9 @@ export function FreeOfflineSetupModal({
       >
         <Text style={[styles.body, { color: colors.textSecondary }]}>
           {t("freeOfflineIntro")}
+        </Text>
+        <Text style={[styles.stepTitle, { color: colors.text }]}>
+          {t("freeOfflineLanguagesStep")}
         </Text>
         <View style={styles.languages}>
           {TTS_LISTEN_LANGUAGE_OPTIONS.map((entry) => {
@@ -153,27 +156,37 @@ export function FreeOfflineSetupModal({
         </View>
 
         {profile ? (
-          <View
-            style={[
-              styles.profile,
-              {
-                backgroundColor: colors.surfaceAlt,
-                borderColor: colors.border,
-              },
-            ]}
-          >
-            <Text style={[styles.profileTitle, { color: colors.text }]}>
-              {t("freeOfflineProfile")}
+          <View style={styles.stepSection}>
+            <Text style={[styles.stepTitle, { color: colors.text }]}>
+              {t("freeOfflineModelsStep")}
             </Text>
-            <Text style={[styles.body, { color: colors.textSecondary }]}>
-              {profile.stt.name} · {profile.llm.name} ·{" "}
-              {profile.tts?.name ?? t("systemVoice")}
-            </Text>
-            <Text style={[styles.hint, { color: colors.textMuted }]}>
-              {t("freeOfflineDownloadSize", {
-                size: formatBytes(profile.downloadBytes),
-              })}
-            </Text>
+            <View
+              style={[
+                styles.profile,
+                {
+                  backgroundColor: colors.surfaceAlt,
+                  borderColor: colors.border,
+                },
+              ]}
+            >
+              <Text style={[styles.profileTitle, { color: colors.text }]}>
+                {t("freeOfflineProfile")}
+              </Text>
+              <Text style={[styles.body, { color: colors.textSecondary }]}>
+                {profile.stt.name} · {profile.llm.name} ·{" "}
+                {profile.tts?.name ?? t("systemVoice")}
+              </Text>
+              {!profile.tts ? (
+                <Text style={[styles.hint, { color: colors.textSecondary }]}>
+                  {t("freeOfflineSystemVoiceNote")}
+                </Text>
+              ) : null}
+              <Text style={[styles.hint, { color: colors.textMuted }]}>
+                {t("freeOfflineDownloadSize", {
+                  size: formatBytes(profile.downloadBytes),
+                })}
+              </Text>
+            </View>
           </View>
         ) : null}
 
@@ -183,13 +196,6 @@ export function FreeOfflineSetupModal({
             style={[styles.status, { color: colors.textSecondary }]}
           >
             {t("onDeviceTestingDevice")}
-          </Text>
-        ) : ready ? (
-          <Text
-            accessibilityLiveRegion="polite"
-            style={[styles.status, { color: colors.success }]}
-          >
-            {t("freeOfflineReady")}
           </Text>
         ) : unavailableText ? (
           <Text
@@ -215,6 +221,19 @@ export function FreeOfflineSetupModal({
             {controller.error}
           </Text>
         ) : null}
+        {ready ? (
+          <View style={styles.stepSection}>
+            <Text style={[styles.stepTitle, { color: colors.text }]}>
+              {t("freeOfflineStartStep")}
+            </Text>
+            <Text
+              accessibilityLiveRegion="polite"
+              style={[styles.status, { color: colors.success }]}
+            >
+              {t("freeOfflineReady")}
+            </Text>
+          </View>
+        ) : null}
         <Text style={[styles.hint, { color: colors.textMuted }]}>
           {t("freeOfflineInternetDisclosure")}
         </Text>
@@ -227,6 +246,13 @@ const styles = StyleSheet.create({
   scroll: { maxHeight: 520 },
   content: { gap: 14, paddingBottom: 4 },
   body: { fontFamily: fonts.body, fontSize: 15, lineHeight: 22 },
+  stepSection: { gap: 8 },
+  stepTitle: {
+    fontFamily: fonts.display,
+    fontSize: 16,
+    fontWeight: "600",
+    lineHeight: 22,
+  },
   hint: { fontFamily: fonts.body, fontSize: 13, lineHeight: 19 },
   languages: { flexDirection: "row", flexWrap: "wrap", gap: 8 },
   language: {

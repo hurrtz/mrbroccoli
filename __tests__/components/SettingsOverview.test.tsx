@@ -1,35 +1,25 @@
 import React from "react";
-import * as ReactNative from "react-native";
 import { StyleSheet } from "react-native";
 import { fireEvent, render } from "@testing-library/react-native";
 
 import appConfig from "../../app.json";
 import { AntSettingsOverview } from "../../src/features/settings/AntSettingsOverview";
-import type { SettingsReadiness } from "../../src/features/settings-core/readiness";
 import { LocalizationProvider } from "../../src/i18n";
 import { ThemeProvider } from "../../src/theme/ThemeContext";
 import { lightColors } from "../../src/theme/colors";
 
 const hiddenIconQuery = { includeHiddenElements: true } as const;
 
-const readiness: SettingsReadiness = {
-  think: { state: "ready", summaryKey: "settingsReadinessReady" },
-  listen: { state: "ready", summaryKey: "settingsReadinessReady" },
-  speak: { state: "off", summaryKey: "settingsReadinessOff" },
-  search: { state: "attention", summaryKey: "settingsReadinessNeedsAttention" },
-};
-
 function overviewProps() {
   return {
     isPremium: true,
-    readiness,
     onOpenPage: jest.fn(),
     onOpenPremium: jest.fn(),
   };
 }
 
 describe("AntSettingsOverview", () => {
-  it("renders readiness as a concise, accessible progression", () => {
+  it("leads with the current edition and task-oriented groups", () => {
     const screen = render(
       <ThemeProvider mode="light">
         <LocalizationProvider language="en">
@@ -38,22 +28,14 @@ describe("AntSettingsOverview", () => {
       </ThemeProvider>,
     );
 
-    const thinkChip = screen.getByLabelText("Think: Ready");
-    const speakChip = screen.getByLabelText("Speak: Off");
-
     expect(
-      screen.getAllByTestId("phosphor-icon-check", hiddenIconQuery),
-    ).toHaveLength(2);
-    expect(
-      StyleSheet.flatten(screen.getByText("Think").props.style).fontSize,
-    ).toBe(12);
-    expect(thinkChip).toBeTruthy();
-    expect(speakChip).toBeTruthy();
-    expect(screen.queryByText("Runtime Readiness")).toBeNull();
-    expect(screen.queryByText("Ready")).toBeNull();
-    expect(screen.queryByText("Off")).toBeNull();
-    expect(screen.queryByText("Attention")).toBeNull();
-    expect(screen.queryByText("Broken")).toBeNull();
+      screen.getByTestId("phosphor-icon-check-circle", hiddenIconQuery),
+    ).toBeTruthy();
+    expect(screen.getByText("Premium is unlocked")).toBeTruthy();
+    expect(screen.getByText("Conversation & tools")).toBeTruthy();
+    expect(screen.getByText("Voice & models")).toBeTruthy();
+    expect(screen.getByText("Privacy & app")).toBeTruthy();
+    expect(screen.queryByTestId("settings-readiness-grid")).toBeNull();
   });
 
   it("exposes guided setup as one clear action", () => {
@@ -110,32 +92,22 @@ describe("AntSettingsOverview", () => {
     expect(iconStyle.color).toBe(lightColors.text);
   });
 
-  it("stacks readiness steps instead of breaking labels at large text sizes", () => {
-    jest.spyOn(ReactNative, "useWindowDimensions").mockReturnValue({
-      fontScale: 2,
-      height: 844,
-      scale: 3,
-      width: 390,
-    });
+  it("identifies Free as a coherent private offline edition", () => {
     const screen = render(
       <ThemeProvider mode="light">
         <LocalizationProvider language="en">
-          <AntSettingsOverview {...overviewProps()} />
+          <AntSettingsOverview {...overviewProps()} isPremium={false} />
         </LocalizationProvider>
       </ThemeProvider>,
     );
 
-    expect(
-      StyleSheet.flatten(
-        screen.getByTestId("settings-readiness-grid").props.style,
-      ).flexDirection,
-    ).toBe("column");
-    expect(
-      StyleSheet.flatten(screen.getByText("Think").props.style).textAlign,
-    ).toBe("auto");
+    expect(screen.getByText("Private Offline · Free")).toBeTruthy();
+    expect(screen.queryByText("Conversation & tools")).toBeNull();
+    expect(screen.getByText("Voice & models")).toBeTruthy();
+    expect(screen.getByText("Privacy & app")).toBeTruthy();
   });
 
-  it("locks provider configuration in Free while keeping local and data sections visible", () => {
+  it("keeps Free focused on usable sections and routes upgrades through one action", () => {
     const onOpenPremium = jest.fn();
     const onOpenPage = jest.fn();
     const screen = render(
@@ -143,7 +115,6 @@ describe("AntSettingsOverview", () => {
         <LocalizationProvider language="en">
           <AntSettingsOverview
             isPremium={false}
-            readiness={readiness}
             onOpenPage={onOpenPage}
             onOpenPremium={onOpenPremium}
           />
@@ -152,7 +123,10 @@ describe("AntSettingsOverview", () => {
     );
 
     expect(screen.queryByTestId("settings-readiness-grid")).toBeNull();
-    fireEvent.press(screen.getByTestId("settings-overview-row-connections"));
+    expect(
+      screen.queryByTestId("settings-overview-row-connections"),
+    ).toBeNull();
+    fireEvent.press(screen.getByTestId("settings-premium-upgrade"));
     expect(onOpenPremium).toHaveBeenCalledTimes(1);
     fireEvent.press(screen.getByTestId("settings-overview-row-data"));
     expect(onOpenPage).toHaveBeenCalledWith("data");
