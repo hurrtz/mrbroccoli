@@ -18,6 +18,7 @@ interface ConversationActionSheetProps {
   onOpenRenameModal: (conversation: ConversationMeta) => void;
   onShareThread: (conversationId: string) => void;
   onTogglePinned: (conversationId: string) => void;
+  onTogglePrivate: (conversationId: string) => void;
 }
 
 export function ConversationActionSheet({
@@ -29,6 +30,7 @@ export function ConversationActionSheet({
   onOpenRenameModal,
   onShareThread,
   onTogglePinned,
+  onTogglePrivate,
 }: ConversationActionSheetProps) {
   const { colors } = useTheme();
   const { t } = useLocalization();
@@ -94,6 +96,42 @@ export function ConversationActionSheet({
             style={[styles.actionSheetRowText, { color: colors.textSecondary }]}
           >
             {conversation.pinned ? t("unpin") : t("pin")}
+          </Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          testID="conversation-action-toggle-private"
+          style={[
+            styles.actionSheetRow,
+            {
+              backgroundColor: colors.surfaceElevated,
+              borderColor: colors.border,
+            },
+          ]}
+          onPress={() => {
+            onTogglePrivate(conversation.id);
+            onClose();
+          }}
+          activeOpacity={0.88}
+          accessibilityRole="button"
+          accessibilityLabel={
+            conversation.isPrivate
+              ? t("includeConversationInKnowledge")
+              : t("markConversationPrivate")
+          }
+          accessibilityHint={t("privateConversationDescription")}
+        >
+          <PhosphorIcon
+            name={conversation.isPrivate ? "global" : "lock"}
+            size="compact"
+            color={colors.textSecondary}
+          />
+          <Text
+            style={[styles.actionSheetRowText, { color: colors.textSecondary }]}
+          >
+            {conversation.isPrivate
+              ? t("includeConversationInKnowledge")
+              : t("markConversationPrivate")}
           </Text>
         </TouchableOpacity>
 

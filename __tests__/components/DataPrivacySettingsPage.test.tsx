@@ -54,11 +54,14 @@ function renderPage(overrides: {
   onRestoreAppDataBackup?: React.ComponentProps<
     typeof DataPrivacySettingsPage
   >["onRestoreAppDataBackup"];
+  onUpdate?: React.ComponentProps<typeof DataPrivacySettingsPage>["onUpdate"];
 } = {}) {
   return render(
     <ThemeProvider mode="light">
       <LocalizationProvider language="en">
         <DataPrivacySettingsPage
+          settings={DEFAULT_SETTINGS}
+          onUpdate={overrides.onUpdate ?? jest.fn()}
             onCreateAppDataBackup={
               overrides.onCreateAppDataBackup ??
               jest.fn(async () => createBackup())
@@ -104,6 +107,24 @@ describe("DataPrivacySettingsPage", () => {
 
   afterEach(() => {
     jest.restoreAllMocks();
+  });
+
+  it("keeps past conversation knowledge opt-in and discloses provider sharing", () => {
+    const onUpdate = jest.fn();
+    const screen = renderPage({ onUpdate });
+    const toggle = screen.getByLabelText("Use past conversation knowledge");
+
+    expect(toggle.props.value).toBe(false);
+    expect(
+      screen.getByText(/Retrieved excerpts are sent to the model provider/),
+    ).toBeTruthy();
+    expect(screen.getByText(/Private conversations are never indexed/)).toBeTruthy();
+
+    fireEvent(toggle, "valueChange", true);
+
+    expect(onUpdate).toHaveBeenCalledWith({
+      pastConversationKnowledgeEnabled: true,
+    });
   });
 
   it("retains a shared readable backup so deferred mail attachments remain readable", async () => {

@@ -28,6 +28,11 @@ import {
   removeConversation,
   saveConversation,
 } from "./storage";
+import {
+  removeConversationKnowledge,
+  setConversationKnowledgePrivate,
+  syncConversationKnowledge,
+} from "../../services/conversationKnowledge";
 
 export function useConversationMutations(params: {
   activeConversationRef: MutableRefObject<Conversation | null>;
@@ -35,6 +40,7 @@ export function useConversationMutations(params: {
   persistMetas: (metas: ConversationMeta[]) => ConversationMeta[];
   setActiveConversationValue: (conversation: Conversation | null) => void;
   setConversations: Dispatch<SetStateAction<ConversationMeta[]>>;
+  pastConversationKnowledgeEnabled: boolean;
 }) {
   const {
     activeConversationRef,
@@ -42,6 +48,7 @@ export function useConversationMutations(params: {
     persistMetas,
     setActiveConversationValue,
     setConversations,
+    pastConversationKnowledgeEnabled,
   } = params;
   const selectionRequestRef = useRef(0);
 
@@ -78,6 +85,7 @@ export function useConversationMutations(params: {
         lastModel: initialModel,
         lastProvider: initialProvider,
         pinned: false,
+        isPrivate: false,
       };
 
       setConversations((previous) => persistMetas([meta, ...previous]));
@@ -134,6 +142,16 @@ export function useConversationMutations(params: {
 
       setActiveConversationValue(updatedConversation);
       saveConversation(updatedConversation);
+      if (
+        messageInput.role === "assistant" &&
+        pastConversationKnowledgeEnabled &&
+        !updatedConversation.isPrivate
+      ) {
+        void syncConversationKnowledge(
+          updatedConversation,
+          true,
+        );
+      }
       setConversations((previous) =>
         persistMetas(
           previous.map((meta) =>
@@ -171,7 +189,13 @@ export function useConversationMutations(params: {
 
       return message;
     },
-    [activeConversationRef, persistMetas, setActiveConversationValue, setConversations],
+    [
+      activeConversationRef,
+      pastConversationKnowledgeEnabled,
+      persistMetas,
+      setActiveConversationValue,
+      setConversations,
+    ],
   );
 
   const updateMessage = useCallback(
@@ -319,6 +343,7 @@ export function useConversationMutations(params: {
   const deleteConversation = useCallback(
     (id: string) => {
       void removeConversation(id);
+      void removeConversationKnowledge(id);
       setConversations((previous) => persistMetas(previous.filter((entry) => entry.id !== id)));
 
       if (activeConversationRef.current?.id === id) {
@@ -382,6 +407,12 @@ export function useConversationMutations(params: {
         };
 
         await saveConversation(restoredConversation);
+        if (
+          pastConversationKnowledgeEnabled &&
+          !restoredConversation.isPrivate
+        ) {
+          void syncConversationKnowledge(restoredConversation, true);
+        }
         restoredMetas.push(restoredMeta);
         restoredByOriginalId.set(originalId, restoredConversation);
         conversationsRestored += 1;
@@ -409,6 +440,7 @@ export function useConversationMutations(params: {
     },
     [
       conversationMetas,
+      pastConversationKnowledgeEnabled,
       persistMetas,
       setActiveConversationValue,
       setConversations,
@@ -436,6 +468,9 @@ export function useConversationMutations(params: {
       };
 
       saveConversation(updatedConversation);
+      if (pastConversationKnowledgeEnabled && !updatedConversation.isPrivate) {
+        void syncConversationKnowledge(updatedConversation, true);
+      }
 
       if (activeConversationRef.current?.id === id) {
         setActiveConversationValue(updatedConversation);
@@ -454,7 +489,14 @@ export function useConversationMutations(params: {
         ),
       );
     },
-    [activeConversationRef, getConversationById, persistMetas, setActiveConversationValue, setConversations],
+    [
+      activeConversationRef,
+      getConversationById,
+      pastConversationKnowledgeEnabled,
+      persistMetas,
+      setActiveConversationValue,
+      setConversations,
+    ],
   );
 
   const toggleConversationPinned = useCallback(
@@ -482,6 +524,57 @@ export function useConversationMutations(params: {
     [persistMetas, setConversations],
   );
 
+  const toggleConversationPrivate = useCallback(
+    async (id: string) => {
+      const currentConversation =
+        activeConversationRef.current?.id === id
+          ? activeConversationRef.current
+          : await getConversationById(id);
+
+      if (!currentConversation) {
+        return null;
+      }
+
+      const isPrivate = !currentConversation.isPrivate;
+      const updatedConversation: Conversation = {
+        ...currentConversation,
+        isPrivate,
+      };
+
+      const privacyUpdate = setConversationKnowledgePrivate(id, isPrivate);
+      await saveConversation(updatedConversation);
+
+      if (activeConversationRef.current?.id === id) {
+        setActiveConversationValue(updatedConversation);
+      }
+
+      setConversations((previous) =>
+        persistMetas(
+          previous.map((conversation) =>
+            conversation.id === id
+              ? { ...conversation, isPrivate }
+              : conversation,
+          ),
+        ),
+      );
+
+      await privacyUpdate;
+      if (!isPrivate && pastConversationKnowledgeEnabled) {
+        await syncConversationKnowledge(updatedConversation, true);
+      }
+
+      return isPrivate;
+    },
+    [
+      activeConversationRef,
+      getConversationById,
+      pastConversationKnowledgeEnabled,
+      persistMetas,
+      setActiveConversationValue,
+      setConversations,
+    ],
+  );
+
   const clearActiveConversation = useCallback(() => {
     selectionRequestRef.current += 1;
     setActiveConversationValue(null);
@@ -498,6 +591,7 @@ export function useConversationMutations(params: {
     renameConversation,
     selectConversation,
     toggleConversationPinned,
+    toggleConversationPrivate,
     updateMessage,
     updateConversationContextSummary,
     updateConversationSettings,

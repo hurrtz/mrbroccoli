@@ -31,8 +31,10 @@ import {
   AntButtonLabel,
   AntSectionIntro,
   AntSettingsCard,
+  AntSwitchRow,
 } from "../AntSettingsPrimitives";
 import { styles } from "../styles";
+import type { Settings } from "../../../types";
 
 type BusyState =
   | "export-encrypted"
@@ -54,11 +56,15 @@ function getBackupFileName(encrypted: boolean) {
 export function DataPrivacySettingsPage({
   onCreateAppDataBackup,
   onRestoreAppDataBackup,
+  settings,
+  onUpdate,
 }: {
   onCreateAppDataBackup: () => Promise<AppDataBackup>;
   onRestoreAppDataBackup: (
     backup: AppDataBackup,
   ) => Promise<AppDataBackupRestoreResult>;
+  settings: Settings;
+  onUpdate: (partial: Partial<Settings>) => void;
 }) {
   const { colors } = useTheme();
   const { t } = useLocalization();
@@ -415,6 +421,26 @@ export function DataPrivacySettingsPage({
 
   return (
     <View style={styles.sectionPageStack}>
+      <View style={styles.sectionGroup}>
+        <AntSectionIntro
+          title={t("pastConversationKnowledge")}
+          description={t("pastConversationKnowledgeDescription")}
+        />
+        <AntSettingsCard>
+          <AntSwitchRow
+            label={t("usePastConversationKnowledge")}
+            description={t("usePastConversationKnowledgeDescription")}
+            value={settings.pastConversationKnowledgeEnabled}
+            onChange={(pastConversationKnowledgeEnabled) =>
+              onUpdate({ pastConversationKnowledgeEnabled })
+            }
+          />
+          <Text style={[styles.helperText, { color: colors.textMuted }]}>
+            {t("pastConversationKnowledgeDisclosure")}
+          </Text>
+        </AntSettingsCard>
+      </View>
+
       <View style={styles.sectionGroup}>
         <AntSectionIntro
           title={t("dataBackup")}

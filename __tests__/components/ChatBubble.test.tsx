@@ -111,6 +111,42 @@ describe("ChatBubble", () => {
     expect(queryByText("Sources")).toBeNull();
   });
 
+  it("shows which past conversations contributed to a reply", () => {
+    const { getByLabelText, getByText, queryByText } = renderWithProviders(
+      <ChatBubble
+        message={{
+          id: "assistant-memory",
+          role: "assistant",
+          content: "We chose a local index.",
+          model: "gpt-5.4",
+          provider: "openai",
+          timestamp: "2026-08-02T12:05:00.000Z",
+          metadata: {
+            conversationKnowledge: {
+              engine: "local-hybrid-v1",
+              sources: [
+                {
+                  conversationId: "architecture",
+                  title: "Architecture notes",
+                  updatedAt: "2026-08-01T08:00:00.000Z",
+                },
+              ],
+            },
+          },
+        }}
+      />,
+    );
+
+    expect(getByText("Past conversations")).toBeTruthy();
+    expect(getByText("1 source")).toBeTruthy();
+    expect(queryByText("Architecture notes")).toBeNull();
+
+    fireEvent.press(getByLabelText("Show recalled conversation sources"));
+
+    expect(getByText("Architecture notes")).toBeTruthy();
+    expect(getByLabelText("Hide recalled conversation sources")).toBeTruthy();
+  });
+
   it("keeps the execution receipt collapsed and reveals exact routes on demand", () => {
     const { getByLabelText, getByTestId, getByText, queryByText } =
       renderWithProviders(

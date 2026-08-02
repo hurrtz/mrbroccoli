@@ -23,6 +23,7 @@ module.exports = {
     "^expo-constants$": "<rootDir>/__mocks__/expoConstants.js",
     "^expo-network$": "<rootDir>/__mocks__/expoNetwork.js",
     "^expo-sharing$": "<rootDir>/__mocks__/expoSharing.js",
+    "^expo-sqlite$": "<rootDir>/__mocks__/expoSQLite.js",
     "^react-native-reanimated$":
       "<rootDir>/__mocks__/reactNativeReanimated.js",
   },

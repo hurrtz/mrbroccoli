@@ -16,6 +16,7 @@ import {
   resetProviderModelHealthForTests,
 } from "../../src/services/providerResilience";
 import { ProviderRequestError } from "../../src/services/providerErrors";
+import { retrieveConversationKnowledge } from "../../src/services/conversationKnowledge";
 
 jest.mock("expo-file-system/legacy", () => ({
   deleteAsync: jest.fn(() => Promise.resolve()),
@@ -36,6 +37,10 @@ jest.mock("../../src/services/llm", () => ({
 
 jest.mock("../../src/services/webSearch", () => ({
   searchWeb: jest.fn(),
+}));
+
+jest.mock("../../src/services/conversationKnowledge", () => ({
+  retrieveConversationKnowledge: jest.fn(),
 }));
 
 jest.mock("../../src/services/ulraMode", () => ({
@@ -151,6 +156,90 @@ describe("runVoicePipeline", () => {
       usage: undefined,
     });
     (searchWeb as jest.Mock).mockResolvedValue(null);
+    (retrieveConversationKnowledge as jest.Mock).mockResolvedValue(null);
+  });
+
+  it("injects source-backed past knowledge while preserving private exclusions", async () => {
+    (retrieveConversationKnowledge as jest.Mock).mockResolvedValue({
+      context:
+        "SOURCE 1 — Architecture notes (2026-08-01, conversation architecture)\nUser: Keep the index local.",
+      metadata: {
+        engine: "local-hybrid-v1",
+        sources: [
+          {
+            conversationId: "architecture",
+            title: "Architecture notes",
+            updatedAt: "2026-08-01T08:00:00.000Z",
+          },
+        ],
+      },
+    });
+    (streamChat as jest.Mock).mockImplementation(
+      async ({ onDone }: { onDone: (text: string) => Promise<void> }) => {
+        await onDone("Use the local index.");
+      },
+    );
+    const callbacks = {
+      onTranscription: jest.fn(),
+      onLlmStart: jest.fn(),
+      onChunk: jest.fn(),
+      onResponseDone: jest.fn(),
+      onAudioReady: jest.fn(),
+      onSpeechTextReady: jest.fn(),
+      onError: jest.fn(),
+    };
+
+    await runVoicePipeline({
+      transcriptionOverride: "What did we decide about the index?",
+      messages: [],
+      currentConversationId: "current",
+      privateConversationIds: ["private"],
+      pastConversationKnowledgeEnabled: true,
+      model: "gpt-5.4",
+      provider: "openai",
+      providerApiKey: "test-key",
+      sttMode: "native",
+      ttsMode: "native",
+      ttsVoice: "alloy",
+      replyPlayback: "wait",
+      spokenRepliesEnabled: false,
+      assistantInstructions: "Be accurate.",
+      responseLength: "normal",
+      responseTone: "professional",
+      language: "en",
+      callbacks,
+    });
+
+    expect(retrieveConversationKnowledge).toHaveBeenCalledWith({
+      currentConversationId: "current",
+      privateConversationIds: ["private"],
+      query: "What did we decide about the index?",
+    });
+    expect(streamChat).toHaveBeenCalledWith(
+      expect.objectContaining({
+        pastConversationKnowledge: expect.stringContaining(
+          "Keep the index local",
+        ),
+      }),
+    );
+    expect(callbacks.onResponseDone).toHaveBeenCalledWith(
+      "Use the local index.",
+      undefined,
+      expect.objectContaining({
+        conversationKnowledge: expect.objectContaining({
+          sources: [
+            expect.objectContaining({ conversationId: "architecture" }),
+          ],
+        }),
+        turnReceipt: expect.objectContaining({
+          context: expect.objectContaining({
+            pastKnowledgeRequested: true,
+            pastKnowledgeUsed: true,
+            pastKnowledgeSourceCount: 1,
+          }),
+        }),
+      }),
+    );
   });
 
   it("uses a native transcript override and skips provider STT", async () => {

@@ -791,6 +791,50 @@ describe("useConversations", () => {
     expect(result.current.conversations[1]?.title).toBe("Second");
   });
 
+  it("persists private status without removing in-session memory", async () => {
+    const stored = new Map<string, string>();
+    (AsyncStorage.getItem as jest.Mock).mockImplementation(
+      async (key: string) => stored.get(key) ?? null,
+    );
+    (AsyncStorage.setItem as jest.Mock).mockImplementation(
+      async (key: string, value: string) => {
+        stored.set(key, value);
+      },
+    );
+    const { result } = renderHook(() => useConversations({
+      pastConversationKnowledgeEnabled: true,
+    }));
+
+    await waitFor(() => expect(result.current.loaded).toBe(true));
+    await act(async () => {
+      result.current.createConversation("Private design notes");
+      result.current.updateConversationContextSummary("Keep this locally", 2);
+    });
+    const conversationId = result.current.activeConversation?.id;
+
+    await act(async () => {
+      await result.current.toggleConversationPrivate(conversationId!);
+    });
+
+    expect(result.current.activeConversation).toEqual(
+      expect.objectContaining({
+        id: conversationId,
+        isPrivate: true,
+        contextSummary: "Keep this locally",
+      }),
+    );
+    expect(result.current.conversations[0]).toEqual(
+      expect.objectContaining({ id: conversationId, isPrivate: true }),
+    );
+    await waitFor(() => {
+      expect(
+        JSON.parse(
+          stored.get(`@mrbroccoli/conversation/${conversationId}`) ?? "{}",
+        ),
+      ).toEqual(expect.objectContaining({ isPrivate: true }));
+    });
+  });
+
   it("searches saved conversations by transcript content", async () => {
     const { result } = renderHook(() => useConversations());
 

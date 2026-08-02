@@ -130,6 +130,7 @@ export function normalizeConversationMeta(meta: Partial<ConversationMeta>) {
     lastModel: meta.lastModel ?? null,
     lastProvider: meta.lastProvider ?? null,
     pinned: meta.pinned ?? false,
+    isPrivate: meta.isPrivate ?? false,
   };
 }
 
@@ -139,7 +140,8 @@ export function conversationMetaNeedsHydration(meta: Partial<ConversationMeta>) 
     typeof meta.messageCount !== "number" ||
     !Array.isArray(meta.providers) ||
     typeof meta.providerModels !== "object" ||
-    meta.providerModels === null
+    meta.providerModels === null ||
+    typeof meta.isPrivate !== "boolean"
   );
 }
 
@@ -176,5 +178,6 @@ export function buildConversationMetaFromConversation(
     lastModel: inferredState.lastModel ?? existingMeta?.lastModel ?? null,
     lastProvider: inferredState.lastProvider ?? existingMeta?.lastProvider ?? null,
     pinned: existingMeta?.pinned ?? false,
+    isPrivate: conversation.isPrivate ?? existingMeta?.isPrivate ?? false,
   });
 }

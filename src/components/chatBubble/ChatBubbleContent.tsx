@@ -8,6 +8,7 @@ import { ReplyFailureCard } from "./ReplyFailureCard";
 import { TurnReceiptCard } from "./TurnReceiptCard";
 import { UsageCard } from "./UsageCard";
 import { WebSearchReferences } from "./WebSearchReferences";
+import { ConversationKnowledgeReferences } from "./ConversationKnowledgeReferences";
 import type { ChatBubbleProps } from "./types";
 
 export function ChatBubbleContent({
@@ -32,6 +33,7 @@ export function ChatBubbleContent({
         onOpenSpeakingSettings={onOpenSpeakingSettings}
       />
       <TurnReceiptCard message={message} />
+      <ConversationKnowledgeReferences message={message} />
       <WebSearchReferences message={message} />
       <UsageCard message={message} showUsageStats={showUsageStats} />
       {selectable && message.role === "assistant" ? (

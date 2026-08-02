@@ -45,6 +45,7 @@ coverage/
 
 # generated native folders
 /ios/*
+!/ios/Podfile.properties.json
 !/ios/Podfile
 !/ios/Podfile.lock
 !/ios/MrBroccoli/

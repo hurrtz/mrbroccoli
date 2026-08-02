@@ -86,7 +86,11 @@ export function ConversationDrawerItem({
         onPress={() => onSelectConversation(conversation.id)}
         activeOpacity={0.9}
         accessibilityRole="button"
-        accessibilityLabel={conversation.title}
+        accessibilityLabel={
+          conversation.isPrivate
+            ? `${conversation.title}. ${t("privateConversation")}`
+            : conversation.title
+        }
         accessibilityState={{ selected: active }}
       >
         <View style={styles.itemHeader}>
@@ -96,6 +100,13 @@ export function ConversationDrawerItem({
                 name="pushpin"
                 size="inline"
                 color={colors.accent}
+              />
+            ) : null}
+            {conversation.isPrivate ? (
+              <PhosphorIcon
+                name="lock"
+                size="inline"
+                color={colors.textSecondary}
               />
             ) : null}
             <Text

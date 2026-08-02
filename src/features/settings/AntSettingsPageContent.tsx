@@ -203,6 +203,8 @@ export function AntSettingsPageContent({
       return (
         <DrillInPage page="data">
           <DataPrivacySettingsPage
+            settings={settings}
+            onUpdate={onUpdate}
             onCreateAppDataBackup={props.onCreateAppDataBackup}
             onRestoreAppDataBackup={props.onRestoreAppDataBackup}
           />

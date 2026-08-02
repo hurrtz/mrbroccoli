@@ -1,8 +1,10 @@
 import type { TranslationDictionary } from "../types";
 import { dataBackupTranslations } from "../dataBackupTranslations";
+import { conversationKnowledgeTranslations } from "../conversationKnowledgeTranslations";
 
 export const cs = {
   ...dataBackupTranslations.cs,
+  ...conversationKnowledgeTranslations.cs,
   appName: "Pan Brokolice",
   retry: "Zkuste to znovu",
   dismiss: "Zavřít",

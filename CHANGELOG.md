@@ -10,6 +10,12 @@ the complete Play Store translations are kept in a dedicated file under
 
 ## Unreleased
 
+### Added
+
+- Add optional on-device knowledge from past conversations with local hybrid
+  retrieval, visible source sessions, and private conversations that are never
+  indexed while retaining their own in-session memory.
+
 ### Fixed
 
 - Prevent Android release optimization from renaming Sherpa JNI classes and

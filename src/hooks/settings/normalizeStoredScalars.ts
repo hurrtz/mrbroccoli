@@ -137,6 +137,7 @@ export function normalizeStoredScalarSettings(
   | "showSetupGuideShortcut"
   | "showUsageStats"
   | "showDebugLogButton"
+  | "pastConversationKnowledgeEnabled"
   | "ulraModeEnabled"
   | "ulraModeActive"
   | "ulraModeRounds"
@@ -238,6 +239,10 @@ export function normalizeStoredScalarSettings(
     showDebugLogButton: getStoredBoolean(
       storedSettings?.showDebugLogButton,
       DEFAULT_SETTINGS.showDebugLogButton,
+    ),
+    pastConversationKnowledgeEnabled: getStoredBoolean(
+      storedSettings?.pastConversationKnowledgeEnabled,
+      DEFAULT_SETTINGS.pastConversationKnowledgeEnabled,
     ),
     ulraModeEnabled,
     ulraModeActive:

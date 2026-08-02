@@ -162,6 +162,11 @@ function formatContext(
           compressed: context.gatewayCompression.compressedCount ?? "?",
         })
       : undefined,
+    context.pastKnowledgeUsed
+      ? t("turnReceiptPastKnowledge", {
+          count: context.pastKnowledgeSourceCount ?? 0,
+        })
+      : undefined,
   ].filter(Boolean);
 
   return t("turnReceiptContextValue", {
@@ -183,6 +188,9 @@ function formatTimings(
       : undefined,
     timing.contextMs !== undefined
       ? `${t("turnReceiptTimingContext")} ${formatDuration(timing.contextMs)}`
+      : undefined,
+    timing.pastKnowledgeMs !== undefined
+      ? `${t("turnReceiptTimingKnowledge")} ${formatDuration(timing.pastKnowledgeMs)}`
       : undefined,
     timing.webSearchMs !== undefined
       ? `${t("turnReceiptTimingSearch")} ${formatDuration(timing.webSearchMs)}`

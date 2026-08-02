@@ -48,6 +48,8 @@ export type AudioPlayer = ReturnType<typeof useAudioPlayer>;
 
 export interface UseVoicePipelineParams {
   activeConversation: Conversation | null;
+  privateConversationIds?: string[];
+  pastConversationKnowledgeEnabled?: boolean;
   addMessage: (msg: Omit<Message, "id" | "timestamp">) => Message | null;
   createConversation: (
     firstMessage: string,

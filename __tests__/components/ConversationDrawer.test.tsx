@@ -81,6 +81,7 @@ function renderConversationDrawer(
       onManageMemory={jest.fn()}
       onRenameThread={jest.fn()}
       onTogglePinned={jest.fn()}
+      onTogglePrivate={jest.fn()}
       onNewSession={jest.fn(async () => undefined)}
       onDelete={jest.fn()}
       onClose={jest.fn()}
@@ -225,6 +226,18 @@ describe("ConversationDrawer", () => {
     fireEvent.press(screen.getByTestId("conversation-rename-save"));
 
     expect(onRenameThread).toHaveBeenCalledWith("one", "Renamed briefing");
+  });
+
+  it("marks a conversation private from its action sheet", async () => {
+    const onTogglePrivate = jest.fn();
+    const screen = renderConversationDrawer({ onTogglePrivate });
+
+    fireEvent.press(screen.getByTestId("conversation-drawer-menu-one"));
+    fireEvent.press(
+      await screen.findByTestId("conversation-action-toggle-private"),
+    );
+
+    expect(onTogglePrivate).toHaveBeenCalledWith("one");
   });
 
   it("starts a new session and closes the drawer", async () => {

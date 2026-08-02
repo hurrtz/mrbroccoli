@@ -16,6 +16,7 @@ interface RunPipelineResponseParams {
   assistantInstructions: RunVoicePipelineParams["assistantInstructions"];
   callbacks: RunVoicePipelineParams["callbacks"];
   conversationSummary?: string;
+  pastConversationKnowledge?: string;
   language: RunVoicePipelineParams["language"];
   llmAlreadyStarted?: boolean;
   messages: Message[];
@@ -43,6 +44,7 @@ export async function runPipelineResponse({
   assistantInstructions,
   callbacks,
   conversationSummary,
+  pastConversationKnowledge,
   language,
   llmAlreadyStarted = false,
   messages,
@@ -91,6 +93,7 @@ export async function runPipelineResponse({
     responseTone,
     language,
     conversationSummary,
+    pastConversationKnowledge,
     spokenParagraphStreaming:
       spokenRepliesEnabled && replyPlayback === "stream",
     synthesisContext,

@@ -1,8 +1,10 @@
 import type { TranslationDictionary } from "../types";
 import { dataBackupTranslations } from "../dataBackupTranslations";
+import { conversationKnowledgeTranslations } from "../conversationKnowledgeTranslations";
 
 export const hu = {
   ...dataBackupTranslations.hu,
+  ...conversationKnowledgeTranslations.hu,
   appName: "Brokkoli úr",
   retry: "Próbálja újra",
   dismiss: "Bezárás",

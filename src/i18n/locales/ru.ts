@@ -1,8 +1,10 @@
 import type { TranslationDictionary } from "../types";
 import { dataBackupTranslations } from "../dataBackupTranslations";
+import { conversationKnowledgeTranslations } from "../conversationKnowledgeTranslations";
 
 export const ru = {
   ...dataBackupTranslations.ru,
+  ...conversationKnowledgeTranslations.ru,
   appName: "Мистер Брокколи",
   retry: "Повторить попытку",
   dismiss: "Закрыть",

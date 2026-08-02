@@ -14,6 +14,7 @@ import { resolvePipelineTranscription } from "./voicePipeline/transcription";
 import type { RunVoicePipelineParams } from "./voicePipeline/types";
 import { resolvePipelineWebSearch } from "./voicePipeline/webSearch";
 import { createTurnReceipt } from "./turnReceipt";
+import { retrieveConversationKnowledge } from "./conversationKnowledge";
 
 export async function runVoicePipeline(
   params: RunVoicePipelineParams,
@@ -45,6 +46,9 @@ export async function runVoicePipeline(
     spokenRepliesEnabled = true,
     contextSummary,
     summarizedMessageCount,
+    currentConversationId,
+    privateConversationIds,
+    pastConversationKnowledgeEnabled = false,
     assistantInstructions,
     responseLength,
     responseTone,
@@ -195,6 +199,37 @@ export async function runVoicePipeline(
       return transcription;
     }
 
+    turnReceipt.context.pastKnowledgeRequested =
+      pastConversationKnowledgeEnabled;
+    const pastKnowledgeStartedAtMs = pastConversationKnowledgeEnabled
+      ? Date.now()
+      : null;
+    const pastKnowledgeQuery = [
+      transcription,
+      ...contextResult.contextualMessages
+        .slice(-4)
+        .map((message) => message.content),
+    ].join("\n\n");
+    const pastKnowledgeResult = pastConversationKnowledgeEnabled
+      ? await retrieveConversationKnowledge({
+          currentConversationId,
+          privateConversationIds,
+          query: pastKnowledgeQuery,
+        })
+      : null;
+    if (pastKnowledgeStartedAtMs !== null) {
+      turnReceipt.timing.pastKnowledgeMs =
+        Date.now() - pastKnowledgeStartedAtMs;
+    }
+    turnReceipt.context.pastKnowledgeUsed = Boolean(pastKnowledgeResult);
+    turnReceipt.context.pastKnowledgeSourceCount =
+      pastKnowledgeResult?.metadata.sources.length ?? 0;
+
+    if (abortSignal?.aborted) {
+      recordRunTerminal("aborted", { reason: "past-conversation-knowledge" });
+      return transcription;
+    }
+
     const webSearchResult = await resolvePipelineWebSearch({
       turnId,
       abortSignal,
@@ -228,7 +263,12 @@ export async function runVoicePipeline(
     ];
     const modelStartedAtMs = Date.now();
     let additionalUsage: UsageEstimate | undefined;
-    let responseMetadata = webSearchResult.responseMetadata;
+    let responseMetadata = {
+      ...webSearchResult.responseMetadata,
+      ...(pastKnowledgeResult
+        ? { conversationKnowledge: pastKnowledgeResult.metadata }
+        : {}),
+    };
     let synthesisContext: string | undefined;
     let synthesisModel = model;
     let synthesisModelEffort = modelEffort;
@@ -242,6 +282,7 @@ export async function runVoicePipeline(
         assistantInstructions,
         config: ulraMode,
         conversationSummary: contextResult.effectiveSummary || undefined,
+        pastConversationKnowledge: pastKnowledgeResult?.context,
         language,
         messages: allMessages,
         webSearchContext: webSearchResult.context,
@@ -387,6 +428,7 @@ export async function runVoicePipeline(
       assistantInstructions,
       callbacks,
       conversationSummary: contextResult.effectiveSummary || undefined,
+      pastConversationKnowledge: pastKnowledgeResult?.context,
       language,
       llmAlreadyStarted: Boolean(ulraMode),
       messages: allMessages,

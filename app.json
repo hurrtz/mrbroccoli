@@ -17,7 +17,13 @@
       "expo-router",
       "expo-secure-store",
       "expo-status-bar",
-      "expo-sharing"
+      "expo-sharing",
+      [
+        "expo-sqlite",
+        {
+          "enableFTS": true
+        }
+      ]
     ],
     "ios": {
       "icon": "./assets/appIcon/ios.png",

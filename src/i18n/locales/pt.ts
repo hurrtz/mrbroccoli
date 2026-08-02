@@ -1,8 +1,10 @@
 import type { TranslationDictionary } from "../types";
 import { dataBackupTranslations } from "../dataBackupTranslations";
+import { conversationKnowledgeTranslations } from "../conversationKnowledgeTranslations";
 
 export const pt = {
   ...dataBackupTranslations.pt,
+  ...conversationKnowledgeTranslations.pt,
   appName: "Sr. Brócolo",
   retry: "Tentar novamente",
   dismiss: "Fechar",

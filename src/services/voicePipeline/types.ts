@@ -88,6 +88,9 @@ export interface RunVoicePipelineParams {
   spokenRepliesEnabled?: boolean;
   contextSummary?: string;
   summarizedMessageCount?: number;
+  currentConversationId?: string | null;
+  privateConversationIds?: string[];
+  pastConversationKnowledgeEnabled?: boolean;
   assistantInstructions: string;
   responseLength: AssistantResponseLength;
   responseTone: AssistantResponseTone;

@@ -105,6 +105,7 @@ const conversation: Conversation = {
   title: "Private notes",
   createdAt: "2026-07-31T08:00:00.000Z",
   updatedAt: "2026-07-31T08:01:00.000Z",
+  isPrivate: true,
   messages: [
     {
       id: "message-1",
@@ -169,6 +170,7 @@ describe("appDataBackup", () => {
       "providerValidationResults",
     );
     expect(backup.data.settings.ulraModeActive).toBe(false);
+    expect(backup.data.conversations[0]?.conversation.isPrivate).toBe(true);
     expect(serialized).not.toContain("secret-openai-key");
     expect(serialized).not.toContain("private account detail");
     expect(parseAppDataBackup(serialized)).toEqual(backup);

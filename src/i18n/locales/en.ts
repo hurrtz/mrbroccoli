@@ -1,8 +1,10 @@
 import type { TranslationValue } from "../types";
 import { dataBackupTranslations } from "../dataBackupTranslations";
+import { conversationKnowledgeTranslations } from "../conversationKnowledgeTranslations";
 
 export const en = {
   ...dataBackupTranslations.en,
+  ...conversationKnowledgeTranslations.en,
   appName: "Mr Broccoli",
   retry: "Retry",
   dismiss: "Dismiss",

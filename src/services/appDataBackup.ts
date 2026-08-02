@@ -162,6 +162,7 @@ function isValidConversation(value: unknown): value is Conversation {
     typeof value.createdAt === "string" &&
     typeof value.updatedAt === "string" &&
     value.messages.every(isValidMessage) &&
+    (value.isPrivate === undefined || typeof value.isPrivate === "boolean") &&
     isOptionalString(value.contextSummary) &&
     (value.summarizedMessageCount === undefined ||
       (typeof value.summarizedMessageCount === "number" &&

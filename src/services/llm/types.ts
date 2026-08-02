@@ -19,6 +19,7 @@ export interface StreamChatParams {
   responseTone: AssistantResponseTone;
   language: AppLanguage;
   conversationSummary?: string;
+  pastConversationKnowledge?: string;
   spokenParagraphStreaming?: boolean;
   synthesisContext?: string;
   webSearchContext?: string;

@@ -77,12 +77,22 @@ export function MainScreen() {
     clearConversationMemory,
     renameConversation,
     toggleConversationPinned,
+    toggleConversationPrivate,
     searchConversations,
     deleteConversation,
     restoreConversationBackup,
     clearActiveConversation,
     loaded: conversationsLoaded = true,
-  } = useConversations();
+  } = useConversations({
+    pastConversationKnowledgeEnabled:
+      settings.pastConversationKnowledgeEnabled,
+  });
+  const privateConversationIds = React.useMemo(
+    () => conversations
+      .filter((conversation) => conversation.isPrivate)
+      .map((conversation) => conversation.id),
+    [conversations],
+  );
   const routeConfiguration = React.useMemo(
     () => getMainScreenRouteConfiguration(settings, conversationsLoaded),
     [conversationsLoaded, settings],
@@ -260,6 +270,9 @@ export function MainScreen() {
     handleVoiceCaptureDone,
   } = useVoicePipeline({
     activeConversation,
+    privateConversationIds,
+    pastConversationKnowledgeEnabled:
+      settings.pastConversationKnowledgeEnabled,
     addMessage,
     createConversation,
     initialConversationSettings,
@@ -426,6 +439,7 @@ export function MainScreen() {
     handleShareMessage,
     handleRenameThread,
     handleTogglePinned,
+    handleTogglePrivate,
     handleDeleteConversation,
     handleSelectConversation,
     handleStartNewSession,
@@ -438,6 +452,7 @@ export function MainScreen() {
     getConversationById,
     renameConversation,
     toggleConversationPinned,
+    toggleConversationPrivate,
     clearConversationMemory,
     deleteConversation,
     selectConversation,
@@ -805,6 +820,7 @@ export function MainScreen() {
         onManageMemory: handleManageDrawerMemory,
         onRenameThread: handleRenameDrawerThread,
         onTogglePinned: handleTogglePinned, onNewSession: handleStartNewSession,
+        onTogglePrivate: (id) => { void handleTogglePrivate(id); },
         onDelete: handleDeleteConversation, onClose: handleCloseDrawer,
         onDismiss: handleDrawerDismiss,
       }}

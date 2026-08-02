@@ -113,6 +113,8 @@ PODS:
     - ExpoModulesCore
   - ExpoSpeechRecognition (56.0.1):
     - ExpoModulesCore
+  - ExpoSQLite (57.0.1):
+    - ExpoModulesCore
   - ExpoSymbols (57.0.1):
     - ExpoModulesCore
   - ExpoUI (57.0.8):
@@ -3239,6 +3241,7 @@ DEPENDENCIES:
   - ExpoSharing (from `../node_modules/expo-sharing/ios`)
   - ExpoSpeech (from `../node_modules/expo-speech/ios`)
   - ExpoSpeechRecognition (from `../node_modules/expo-speech-recognition/ios`)
+  - ExpoSQLite (from `../node_modules/expo-sqlite/ios`)
   - ExpoSymbols (from `../node_modules/expo-symbols/ios`)
   - "ExpoUI (from `../node_modules/@expo/ui/ios`)"
   - fast_float (from `../node_modules/react-native/third-party-podspecs/fast_float.podspec`)
@@ -3391,6 +3394,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/expo-speech/ios"
   ExpoSpeechRecognition:
     :path: "../node_modules/expo-speech-recognition/ios"
+  ExpoSQLite:
+    :path: "../node_modules/expo-sqlite/ios"
   ExpoSymbols:
     :path: "../node_modules/expo-symbols/ios"
   ExpoUI:
@@ -3600,6 +3605,7 @@ SPEC CHECKSUMS:
   ExpoSharing: dcf5cb459c99f344aabf126b171eb61d2e49276f
   ExpoSpeech: 0e90904e2af5d6f166d4d2ffbdab535686597938
   ExpoSpeechRecognition: 119acf84448579e53f841d040aad76982f945e2d
+  ExpoSQLite: ddd65ed74bdebcff20f6766e682f9321ecb28ab8
   ExpoSymbols: 7c7c7bd3c52f0b6dcbba6e8af4088b0dc1ea7d29
   ExpoUI: 62ef3713d3cce9736b063fe4edf8cb9c611a36d5
   fast_float: b32c788ed9c6a8c584d114d0047beda9664e7cc6

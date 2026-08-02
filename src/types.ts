@@ -184,6 +184,7 @@ export interface Settings {
   responseTone: AssistantResponseTone;
   showUsageStats: boolean;
   showDebugLogButton: boolean;
+  pastConversationKnowledgeEnabled: boolean;
   ulraModeEnabled: boolean;
   ulraModeActive: boolean;
   ulraModeRounds: number;
@@ -213,6 +214,17 @@ export interface MessageWebSearchMetadata {
   query: string;
   summary: string;
   sources: WebSearchSource[];
+}
+
+export interface MessageConversationKnowledgeSource {
+  conversationId: string;
+  title: string;
+  updatedAt: string;
+}
+
+export interface MessageConversationKnowledgeMetadata {
+  engine: "local-hybrid-v1";
+  sources: MessageConversationKnowledgeSource[];
 }
 
 export interface MessagePipelineNotice {
@@ -352,6 +364,9 @@ export interface MessageTurnReceipt {
     messagesAvailable: number;
     messagesSent: number;
     messagesSummarized: number;
+    pastKnowledgeRequested?: boolean;
+    pastKnowledgeUsed?: boolean;
+    pastKnowledgeSourceCount?: number;
     gatewayCompression?: {
       originalCount?: number;
       compressedCount?: number;
@@ -360,6 +375,7 @@ export interface MessageTurnReceipt {
   timing: {
     transcriptionMs?: number;
     contextMs?: number;
+    pastKnowledgeMs?: number;
     webSearchMs?: number;
     modelMs?: number;
     replyReadyMs?: number;
@@ -369,6 +385,7 @@ export interface MessageTurnReceipt {
 }
 
 export interface MessageMetadata {
+  conversationKnowledge?: MessageConversationKnowledgeMetadata;
   webSearch?: MessageWebSearchMetadata;
   ulraMode?: MessageUlraModeMetadata;
   notices?: MessagePipelineNotice[];
@@ -444,6 +461,7 @@ export const DEFAULT_SETTINGS: Settings = {
   responseTone: "professional",
   showUsageStats: false,
   showDebugLogButton: false,
+  pastConversationKnowledgeEnabled: false,
   ulraModeEnabled: true,
   ulraModeActive: false,
   ulraModeRounds: 2,
@@ -498,6 +516,7 @@ export interface Conversation {
   usageEvents?: ConversationUsageEvent[];
   contextSummary?: string;
   summarizedMessageCount?: number;
+  isPrivate?: boolean;
 }
 
 export interface ConversationMeta {
@@ -511,4 +530,5 @@ export interface ConversationMeta {
   lastModel: string | null;
   lastProvider: Provider | null;
   pinned: boolean;
+  isPrivate?: boolean;
 }

@@ -22,6 +22,7 @@ interface UseConversationActionsParams {
   getConversationById: ConversationsApi["getConversationById"];
   renameConversation: ConversationsApi["renameConversation"];
   toggleConversationPinned: ConversationsApi["toggleConversationPinned"];
+  toggleConversationPrivate: ConversationsApi["toggleConversationPrivate"];
   clearConversationMemory: ConversationsApi["clearConversationMemory"];
   deleteConversation: ConversationsApi["deleteConversation"];
   selectConversation: ConversationsApi["selectConversation"];
@@ -40,6 +41,7 @@ export function useConversationActions({
   getConversationById,
   renameConversation,
   toggleConversationPinned,
+  toggleConversationPrivate,
   clearConversationMemory,
   deleteConversation,
   selectConversation,
@@ -170,6 +172,23 @@ export function useConversationActions({
     [showToast, t, toggleConversationPinned],
   );
 
+  const handleTogglePrivate = useCallback(
+    async (conversationId: string) => {
+      const isPrivate = await toggleConversationPrivate(conversationId);
+      if (isPrivate === null) {
+        return;
+      }
+      showToast(
+        isPrivate
+          ? t("conversationMarkedPrivate")
+          : t("conversationIncludedInKnowledge"),
+        undefined,
+        "success",
+      );
+    },
+    [showToast, t, toggleConversationPrivate],
+  );
+
   const handleSelectConversation = useCallback(
     async (conversationId: string) => {
       await resetVoiceSessionState();
@@ -240,6 +259,7 @@ export function useConversationActions({
     handleShareMessage,
     handleRenameThread,
     handleTogglePinned,
+    handleTogglePrivate,
     handleSelectConversation,
     handleStartNewSession,
     handleDeleteConversation,

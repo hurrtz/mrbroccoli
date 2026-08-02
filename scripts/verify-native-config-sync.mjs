@@ -12,6 +12,7 @@ const packageLock = JSON.parse(readText("package-lock.json"));
 const easConfig = JSON.parse(readText("eas.json"));
 const iosInfo = readText("ios/MrBroccoli/Info.plist");
 const iosPodfile = readText("ios/Podfile");
+const iosPodfileProperties = JSON.parse(readText("ios/Podfile.properties.json"));
 const iosProject = readText("ios/MrBroccoli.xcodeproj/project.pbxproj");
 const androidBuild = readText("android/app/build.gradle");
 const androidGradleProperties = readText("android/gradle.properties");
@@ -112,6 +113,9 @@ const iosProjectVersions = [
 const iosDeploymentTargets = [
   ...iosProject.matchAll(/IPHONEOS_DEPLOYMENT_TARGET = ([^;]+);/g),
 ].map((match) => match[1]);
+const sqlitePlugin = appConfig.plugins.find(
+  (plugin) => Array.isArray(plugin) && plugin[0] === "expo-sqlite",
+);
 
 assertEqual("package.json version", packageJson.version, appConfig.version);
 assertEqual("EAS version source", easConfig.cli?.appVersionSource, "local");
@@ -130,6 +134,21 @@ assertEqual(
   "supported platforms",
   JSON.stringify(appConfig.platforms),
   JSON.stringify(["ios", "android"]),
+);
+assertEqual(
+  "Expo SQLite FTS plugin",
+  sqlitePlugin?.[1]?.enableFTS,
+  true,
+);
+assertEqual(
+  "iOS SQLite FTS build property",
+  iosPodfileProperties["expo.sqlite.enableFTS"],
+  "true",
+);
+assertIncludes(
+  "Android SQLite FTS build property",
+  androidGradleProperties,
+  "expo.sqlite.enableFTS=true",
 );
 assertIncludes(
   "iOS display name",
