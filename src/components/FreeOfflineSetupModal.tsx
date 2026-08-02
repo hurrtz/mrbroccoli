@@ -16,6 +16,7 @@ import { Modal } from "../design-system/NativeControls";
 import { PhosphorIcon } from "../design-system/PhosphorIcon";
 import { useLocalization } from "../i18n";
 import type { FreeOfflineModeController } from "../screens/main/useFreeOfflineMode";
+import { getOfflineProfileModels } from "../services/offlineProfile";
 import { useTheme } from "../theme/ThemeContext";
 import { fonts } from "../theme/typography";
 import { formatBytes } from "../utils/formatBytes";
@@ -38,7 +39,7 @@ export function FreeOfflineSetupModal({
       return null;
     }
     const model = profile
-      ? [profile.llm, profile.stt, profile.tts].find(
+      ? getOfflineProfileModels(profile).find(
           (candidate) => candidate.id === preparationProgress.modelId,
         )
       : null;
@@ -67,7 +68,7 @@ export function FreeOfflineSetupModal({
             : t("freeOfflineUnavailableTemporary");
   const progressModel =
     profile && preparationProgress
-      ? [profile.llm, profile.stt, profile.tts].find(
+      ? getOfflineProfileModels(profile).find(
           (candidate) => candidate.id === preparationProgress.modelId,
         )
       : null;
@@ -165,7 +166,8 @@ export function FreeOfflineSetupModal({
               {t("freeOfflineProfile")}
             </Text>
             <Text style={[styles.body, { color: colors.textSecondary }]}>
-              {profile.stt.name} · {profile.llm.name} · {profile.tts.name}
+              {profile.stt.name} · {profile.llm.name} ·{" "}
+              {profile.tts?.name ?? t("systemVoice")}
             </Text>
             <Text style={[styles.hint, { color: colors.textMuted }]}>
               {t("freeOfflineDownloadSize", {

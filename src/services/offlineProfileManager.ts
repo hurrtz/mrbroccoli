@@ -22,7 +22,7 @@ import {
   type LocalModelInstallStatus,
 } from "./localModelManager";
 import { benchmarkLocalStt, benchmarkLocalTts } from "./localSpeechModels";
-import type { OfflineProfile } from "./offlineProfile";
+import { getOfflineProfileModels, type OfflineProfile } from "./offlineProfile";
 
 export interface OfflineProfileReadiness {
   ready: boolean;
@@ -38,10 +38,6 @@ export interface OfflinePreparationProgress {
   modelCount: number;
   action: "checking" | "downloading" | "benchmarking";
   download?: LocalModelDownloadProgress;
-}
-
-function profileModels(profile: OfflineProfile) {
-  return [profile.llm, profile.stt, profile.tts] as const;
 }
 
 function benchmarkMatchesDevice(
@@ -63,7 +59,7 @@ export function evaluateOfflineProfileReadiness(params: {
   installs: Partial<Record<LocalModelId, LocalModelInstallStatus>>;
   benchmarks: Partial<Record<LocalModelId, LocalModelBenchmarkResult>>;
 }): OfflineProfileReadiness {
-  const models = profileModels(params.profile);
+  const models = getOfflineProfileModels(params.profile);
   const failedModel = models.find((model) => {
     const install = params.installs[model.id];
     return (
@@ -113,7 +109,7 @@ export async function getOfflineProfileReadiness(
 ) {
   const [installEntries, benchmarks] = await Promise.all([
     Promise.all(
-      profileModels(profile).map(
+      getOfflineProfileModels(profile).map(
         async (model) => [model.id, await getInstallStatus(model.id)] as const,
       ),
     ),
@@ -168,7 +164,7 @@ export async function prepareOfflineProfile(
     onProgress?: (progress: OfflinePreparationProgress) => void;
   },
 ) {
-  const models = profileModels(profile);
+  const models = getOfflineProfileModels(profile);
 
   for (const [index, model] of models.entries()) {
     options?.onProgress?.({

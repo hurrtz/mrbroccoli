@@ -35,6 +35,9 @@ the complete Play Store translations are kept in a dedicated file under
 
 ### Fixed
 
+- Let Free users select multiple conversation languages even when no single
+  downloaded voice covers them all; local listening and thinking stay active
+  while the phone's language-aware system voice handles spoken replies.
 - Prevent a stalled private Uber Mode participant from blocking an entire run
   indefinitely; timed-out participants are skipped while successful models
   continue through review and final synthesis.

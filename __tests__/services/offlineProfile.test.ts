@@ -72,21 +72,41 @@ describe("free offline profile selection", () => {
     if (result.status === "ready") {
       expect(result.profile.llm.id).toBe("qwen3-0.6b-q8");
       expect(result.profile.stt.id).toBe("whisper-tiny");
-      expect(result.profile.tts.id).toBe("kokoro-multilingual");
+      expect(result.profile.tts?.id).toBe("kokoro-multilingual");
     }
   });
 
   it("selects the language-specific German voice", () => {
-    expect(readyProfile("de").tts.id).toBe("piper-de-de-thorsten");
+    expect(readyProfile("de").tts?.id).toBe("piper-de-de-thorsten");
   });
 
-  it("rejects a language set without one complete local TTS route", () => {
-    expect(
-      selectOfflineProfile({
-        languages: ["en", "de"],
-        snapshot: device(),
-      }),
-    ).toEqual({ status: "unavailable", reason: "language" });
+  it("uses the system voice when two languages have no shared local TTS model", () => {
+    const result = selectOfflineProfile({
+      languages: ["en", "de"],
+      snapshot: device(),
+    });
+
+    expect(result.status).toBe("ready");
+    if (result.status === "ready") {
+      expect(result.profile.languages).toEqual(["en", "de"]);
+      expect(result.profile.tts).toBeNull();
+      expect(result.profile.downloadBytes).toBe(
+        getLocalModel("qwen3-0.6b-q8").downloadBytes +
+          getLocalModel("whisper-tiny").downloadBytes,
+      );
+    }
+  });
+
+  it("keeps Free available in a language without a downloadable voice pack", () => {
+    const result = selectOfflineProfile({
+      languages: ["ja"],
+      snapshot: device(),
+    });
+
+    expect(result.status).toBe("ready");
+    if (result.status === "ready") {
+      expect(result.profile.tts).toBeNull();
+    }
   });
 
   it("checks aggregate installation storage instead of each model alone", () => {
@@ -139,7 +159,7 @@ describe("free offline profile selection", () => {
     expect(result.status).toBe("ready");
     if (result.status === "ready") {
       expect(result.profile.llm.id).toBe("qwen3-1.7b-q8");
-      expect(result.profile.tts.id).toBe("piper-en-us-kristin");
+      expect(result.profile.tts?.id).toBe("piper-en-us-kristin");
       expect(result.profile.downloadBytes).toBe(0);
     }
   });
@@ -183,6 +203,27 @@ describe("free offline profile selection", () => {
     expect(effective.pastConversationKnowledgeEnabled).toBe(false);
     expect(effective.apiKeys.openai).toBe("");
     expect(settings.apiKeys.openai).toBe("kept-secret");
+  });
+
+  it("routes a bilingual Free profile through language-aware system speech", () => {
+    const selection = selectOfflineProfile({
+      languages: ["en", "de"],
+      snapshot: device(),
+    });
+    if (selection.status !== "ready") {
+      throw new Error("Expected a bilingual offline profile");
+    }
+
+    const effective = applyOfflineProfileToSettings(
+      DEFAULT_SETTINGS,
+      selection.profile,
+    );
+
+    expect(effective.sttMode).toBe("local");
+    expect(effective.sttLanguage).toBe("auto");
+    expect(effective.ttsMode).toBe("native");
+    expect(effective.localTtsModelId).toBeNull();
+    expect(effective.ttsListenLanguages).toEqual(["en", "de"]);
   });
 
   it("keeps Free inert while no complete profile is ready", () => {

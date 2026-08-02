@@ -21,11 +21,20 @@ export interface OfflineProfile {
   languages: SpeechLanguage[];
   llm: LocalLlmModelDefinition;
   stt: LocalSttModelDefinition;
-  tts: LocalTtsModelDefinition;
+  /** Null means the phone's language-aware system voice is used. */
+  tts: LocalTtsModelDefinition | null;
   downloadBytes: number;
   installedBytes: number;
   minimumFreeStorageBytes: number;
   retryLater: boolean;
+}
+
+export function getOfflineProfileModels(profile: OfflineProfile) {
+  return [
+    profile.llm,
+    profile.stt,
+    ...(profile.tts ? [profile.tts] : []),
+  ] satisfies LocalModelDefinition[];
 }
 
 export type OfflineProfileSelection =
@@ -130,7 +139,7 @@ export function selectOfflineProfile(params: {
       left.installedBytes - right.installedBytes,
   );
 
-  if (!llms.length || !sttModels.length || !ttsModels.length) {
+  if (!llms.length || !sttModels.length) {
     return { status: "unavailable", reason: "language" };
   }
 
@@ -144,7 +153,7 @@ export function selectOfflineProfile(params: {
     (model) => isPermanentlyEligible(model, params.snapshot).eligible,
   );
 
-  if (!viableLlms.length || !viableStt.length || !viableTts.length) {
+  if (!viableLlms.length || !viableStt.length) {
     return { status: "unavailable", reason: "device" };
   }
 
@@ -161,12 +170,14 @@ export function selectOfflineProfile(params: {
     ...candidateOptions,
     models: viableStt,
   })[0];
-  const tts = sortCandidates({
-    ...candidateOptions,
-    models: viableTts,
-    tieBreaker: (model) => ttsPreference(model),
-  })[0];
-  const models = [llm, stt, tts];
+  const tts = viableTts.length
+    ? sortCandidates({
+        ...candidateOptions,
+        models: viableTts,
+        tieBreaker: (model) => ttsPreference(model),
+      })[0]
+    : null;
+  const models: LocalModelDefinition[] = [llm, stt, ...(tts ? [tts] : [])];
   const missingModels = models.filter(
     (model) => !params.installedModelIds?.has(model.id),
   );
@@ -236,7 +247,7 @@ export function applyOfflineProfileToSettings(
   settings: Settings,
   profile: OfflineProfile,
 ): Settings {
-  const ttsIsKokoro = profile.tts.id === "kokoro-multilingual";
+  const ttsIsKokoro = profile.tts?.id === "kokoro-multilingual";
 
   return {
     ...applyFreeRuntimeBoundaries(settings),
@@ -254,10 +265,14 @@ export function applyOfflineProfileToSettings(
     ],
     sttMode: "local",
     localSttModelId: profile.stt.id,
+    sttLanguage:
+      profile.languages.length === 1 ? profile.languages[0] : "auto",
     localLanguages: profile.languages,
-    ttsMode: ttsIsKokoro ? "kokoro" : "local",
+    ttsMode: profile.tts ? (ttsIsKokoro ? "kokoro" : "local") : "native",
     localTtsModelId:
-      profile.tts.id === "kokoro-multilingual" ? null : profile.tts.id,
+      !profile.tts || profile.tts.id === "kokoro-multilingual"
+        ? null
+        : profile.tts.id,
     ttsListenLanguages: profile.languages,
   };
 }

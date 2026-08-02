@@ -31,10 +31,7 @@ if (selection.status !== "ready") {
 const profile = selection.profile;
 
 function benchmark(
-  modelId:
-    | (typeof profile)["llm"]["id"]
-    | (typeof profile)["stt"]["id"]
-    | (typeof profile)["tts"]["id"],
+  modelId: LocalModelBenchmarkResult["modelId"],
   status: LocalModelBenchmarkResult["status"] = "viable",
 ): LocalModelBenchmarkResult {
   return {
@@ -50,16 +47,17 @@ function benchmark(
 
 describe("offline profile readiness", () => {
   const installs = Object.fromEntries(
-    [profile.llm, profile.stt, profile.tts].map((model) => [
-      model.id,
-      { installed: true, path: `/models/${model.id}`, verified: true },
-    ]),
+    [profile.llm, profile.stt, profile.tts]
+      .filter(Boolean)
+      .map((model) => [
+        model.id,
+        { installed: true, path: `/models/${model.id}`, verified: true },
+      ]),
   );
   const benchmarks = Object.fromEntries(
-    [profile.llm, profile.stt, profile.tts].map((model) => [
-      model.id,
-      benchmark(model.id),
-    ]),
+    [profile.llm, profile.stt, profile.tts]
+      .filter(Boolean)
+      .map((model) => [model.id, benchmark(model.id)]),
   );
 
   it("requires every installed model to have a viable benchmark for this device", () => {
