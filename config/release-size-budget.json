@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "android": {
-    "aabMaxBytes": 167772160,
+    "aabMaxBytes": 188743680,
     "arm64NativeMaxBytes": 73400320,
     "bundledOnnxMaxBytes": 131072
   }

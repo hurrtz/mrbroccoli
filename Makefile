@@ -175,6 +175,6 @@ pre-release:
 	@$(MAKE) pre-release-live
 
 release-aab:
-	@EXPO_NO_DOTENV=1 NODE_ENV=production $(ANDROID_GRADLE) :app:bundleRelease
+	@EXPO_NO_DOTENV=1 NODE_ENV=production $(ANDROID_GRADLE) :app:bundleRelease :app:assembleRelease
 	@node scripts/verify-release-artifact-secrets.mjs android/app/build/outputs/bundle/release/app-release.aab
 	@node scripts/verify-android-release-artifacts.mjs

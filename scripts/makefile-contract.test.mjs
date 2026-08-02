@@ -28,3 +28,15 @@ test("declares every command target as phony", () => {
     `Make targets can be shadowed by same-named files: ${missing.join(", ")}`,
   );
 });
+
+test("release AAB rebuilds the matching external native-symbol archive", () => {
+  const source = fs.readFileSync(new URL("../Makefile", import.meta.url), "utf8");
+  const recipe = source.match(/^release-aab:\n((?:\t.*\n?)+)/m)?.[1] ?? "";
+
+  assert.match(recipe, /:app:bundleRelease :app:assembleRelease/);
+  assert.ok(
+    recipe.indexOf(":app:assembleRelease") <
+      recipe.indexOf("verify-android-release-artifacts.mjs"),
+    "the external native-symbol archive must be refreshed before verification",
+  );
+});
