@@ -253,6 +253,35 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 ```
 
+### @emnapi/core@1.11.2
+Packages (3): @emnapi/core@1.11.2, @emnapi/runtime@1.11.2, @emnapi/wasi-threads@1.2.2
+
+License: MIT
+
+```text
+MIT License
+
+Copyright (c) 2021-present Toyobayashi
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+```
+
 ### @expo-google-fonts/material-symbols@0.4.42
 License: MIT AND Apache-2.0
 
@@ -368,7 +397,7 @@ SOFTWARE.
 ```
 
 ### @expo/devcert@1.2.1
-Packages (58): @expo/devcert@1.2.1, @expo/sdk-runtime-versions@1.0.0, @expo/ui@57.0.8, @expo/ws-tunnel@2.0.0, @react-native/assets-registry@0.86.2, @react-native/babel-plugin-codegen@0.86.2, @react-native/babel-preset@0.86.2, @react-native/codegen@0.86.2, @react-native/community-cli-plugin@0.86.2, @react-native/debugger-shell@0.86.2, @react-native/dev-middleware@0.86.2, @react-native/gradle-plugin@0.86.2, @react-native/jest-preset@0.86.2, @react-native/js-polyfills@0.86.2, @react-native/metro-babel-transformer@0.86.2, @react-native/metro-config@0.86.2, @react-native/normalize-colors@0.86.2, @react-native/virtualized-lists@0.86.2, babel-plugin-react-compiler@1.0.0, bplist-parser@0.3.1, client-only@0.0.1, css.escape@1.5.1, emoji-regex@8.0.0, expo-router@57.0.9, hermes-compiler@250829098.0.16, imurmurhash@0.1.4, jest-pnp-resolver@1.2.3, jimp-compact@0.16.1, jsesc@3.1.0, metro-babel-transformer@0.84.4, metro-cache-key@0.84.4, metro-cache@0.84.4, metro-config@0.84.4, metro-core@0.84.4, metro-file-map@0.84.4, metro-minify-terser@0.84.4, metro-resolver@0.84.4, metro-runtime@0.84.4, metro-source-map@0.84.4, metro-symbolicate@0.84.4, metro-transform-plugins@0.84.4, metro-transform-worker@0.84.4, metro@0.84.4, natural-compare@1.4.0, ob1@0.84.4, react-devtools-core@6.1.5, react-remove-scroll-bar@2.3.8, regenerate-unicode-properties@10.2.2, regenerate@1.4.2, regexpu-core@6.4.0, regjsgen@0.8.0, server-only@0.0.1, standard-navigation@0.0.5, structured-headers@0.4.1, unicode-canonical-property-names-ecmascript@2.0.1, unicode-match-property-ecmascript@2.0.0, unicode-match-property-value-ecmascript@2.2.1, unicode-property-aliases-ecmascript@2.2.0
+Packages (60): @expo/devcert@1.2.1, @expo/sdk-runtime-versions@1.0.0, @expo/ui@57.0.8, @expo/ws-tunnel@2.0.0, @napi-rs/wasm-runtime@1.2.2, @react-native/assets-registry@0.86.2, @react-native/babel-plugin-codegen@0.86.2, @react-native/babel-preset@0.86.2, @react-native/codegen@0.86.2, @react-native/community-cli-plugin@0.86.2, @react-native/debugger-shell@0.86.2, @react-native/dev-middleware@0.86.2, @react-native/gradle-plugin@0.86.2, @react-native/jest-preset@0.86.2, @react-native/js-polyfills@0.86.2, @react-native/metro-babel-transformer@0.86.2, @react-native/metro-config@0.86.2, @react-native/normalize-colors@0.86.2, @react-native/virtualized-lists@0.86.2, @tybys/wasm-util@0.10.3, babel-plugin-react-compiler@1.0.0, bplist-parser@0.3.1, client-only@0.0.1, css.escape@1.5.1, emoji-regex@8.0.0, expo-router@57.0.9, hermes-compiler@250829098.0.16, imurmurhash@0.1.4, jest-pnp-resolver@1.2.3, jimp-compact@0.16.1, jsesc@3.1.0, metro-babel-transformer@0.84.4, metro-cache-key@0.84.4, metro-cache@0.84.4, metro-config@0.84.4, metro-core@0.84.4, metro-file-map@0.84.4, metro-minify-terser@0.84.4, metro-resolver@0.84.4, metro-runtime@0.84.4, metro-source-map@0.84.4, metro-symbolicate@0.84.4, metro-transform-plugins@0.84.4, metro-transform-worker@0.84.4, metro@0.84.4, natural-compare@1.4.0, ob1@0.84.4, react-devtools-core@6.1.5, react-remove-scroll-bar@2.3.8, regenerate-unicode-properties@10.2.2, regenerate@1.4.2, regexpu-core@6.4.0, regjsgen@0.8.0, server-only@0.0.1, standard-navigation@0.0.5, structured-headers@0.4.1, unicode-canonical-property-names-ecmascript@2.0.1, unicode-match-property-ecmascript@2.0.0, unicode-match-property-value-ecmascript@2.2.1, unicode-property-aliases-ecmascript@2.2.0
 
 License: MIT
 
@@ -2384,7 +2413,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ```
 
-### brace-expansion@5.0.9
+### brace-expansion@5.0.8
 License: MIT
 
 ```text
