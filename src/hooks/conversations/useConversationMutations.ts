@@ -251,14 +251,14 @@ export function useConversationMutations(params: {
         return null;
       }
 
-      const [report, snapshot] = await Promise.all([
+      const [report, repairSnapshot] = await Promise.all([
         Promise.resolve(scanConversationIntegrity(conversation)),
         readConversationIntegrityRepairSnapshot(id),
       ]);
       return {
         conversation,
+        repairSnapshot,
         report,
-        undoAvailable: snapshot !== null,
       };
     },
     [getConversationById],

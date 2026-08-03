@@ -1,6 +1,7 @@
 import type { TranslationValue } from "../types";
 import { dataBackupTranslations } from "../dataBackupTranslations";
 import { conversationKnowledgeTranslations } from "../conversationKnowledgeTranslations";
+import { conversationIntegrityTranslations } from "../conversationIntegrityTranslations";
 import { imagePromptTranslations } from "../imagePromptTranslations";
 import { onDeviceTranslations } from "../onDeviceTranslations";
 import { premiumTranslations } from "../premiumTranslations";
@@ -8,6 +9,7 @@ import { premiumTranslations } from "../premiumTranslations";
 export const en = {
   ...dataBackupTranslations.en,
   ...conversationKnowledgeTranslations.en,
+  ...conversationIntegrityTranslations.en,
   ...imagePromptTranslations.en,
   ...onDeviceTranslations.en,
   ...premiumTranslations.en,

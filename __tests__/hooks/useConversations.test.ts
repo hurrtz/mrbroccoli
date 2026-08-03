@@ -1240,7 +1240,7 @@ describe("useConversations", () => {
         await result.current.inspectConversationIntegrity(conversationId);
     });
     expect(preview?.report.automaticallyRepairableCount).toBe(1);
-    expect(preview?.undoAvailable).toBe(false);
+    expect(preview?.repairSnapshot).toBeNull();
 
     await act(async () => {
       await result.current.repairConversationIntegrity(conversationId);
@@ -1256,7 +1256,7 @@ describe("useConversations", () => {
       preview =
         await result.current.inspectConversationIntegrity(conversationId);
     });
-    expect(preview?.undoAvailable).toBe(true);
+    expect(preview?.repairSnapshot).not.toBeNull();
 
     await act(async () => {
       await result.current.undoConversationIntegrityRepair(conversationId);

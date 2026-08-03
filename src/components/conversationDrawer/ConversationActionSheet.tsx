@@ -1,5 +1,5 @@
 import React from "react";
-import { Text, TouchableOpacity, View } from "react-native";
+import { ScrollView, Text, TouchableOpacity, View } from "react-native";
 
 import { PhosphorIcon } from "../../design-system/PhosphorIcon";
 
@@ -15,6 +15,7 @@ interface ConversationActionSheetProps {
   onCopyThread: (conversationId: string) => void;
   onDelete: (conversationId: string) => void;
   onManageMemory: (conversationId: string) => void;
+  onReviewIntegrity: (conversation: ConversationMeta) => void;
   onOpenRenameModal: (conversation: ConversationMeta) => void;
   onShareThread: (conversationId: string) => void;
   onTogglePinned: (conversationId: string) => void;
@@ -27,6 +28,7 @@ export function ConversationActionSheet({
   onCopyThread,
   onDelete,
   onManageMemory,
+  onReviewIntegrity,
   onOpenRenameModal,
   onShareThread,
   onTogglePinned,
@@ -50,8 +52,10 @@ export function ConversationActionSheet({
         onPress={onClose}
         accessible={false}
       />
-      <View
+      <ScrollView
         accessibilityViewIsModal
+        contentContainerStyle={styles.actionSheetContent}
+        showsVerticalScrollIndicator
         style={[
           styles.actionSheet,
           {
@@ -162,6 +166,32 @@ export function ConversationActionSheet({
         </TouchableOpacity>
 
         <TouchableOpacity
+          testID="conversation-action-review-integrity"
+          style={[
+            styles.actionSheetRow,
+            {
+              backgroundColor: colors.surfaceElevated,
+              borderColor: colors.border,
+            },
+          ]}
+          onPress={() => onReviewIntegrity(conversation)}
+          activeOpacity={0.88}
+          accessibilityRole="button"
+          accessibilityLabel={t("reviewConversationIntegrity")}
+        >
+          <PhosphorIcon
+            name="safety-certificate"
+            size="compact"
+            color={colors.textSecondary}
+          />
+          <Text
+            style={[styles.actionSheetRowText, { color: colors.textSecondary }]}
+          >
+            {t("reviewConversationIntegrity")}
+          </Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
           style={[
             styles.actionSheetRow,
             {
@@ -268,7 +298,7 @@ export function ConversationActionSheet({
             {t("delete")}
           </Text>
         </TouchableOpacity>
-      </View>
+      </ScrollView>
     </View>
   );
 }

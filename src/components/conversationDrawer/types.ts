@@ -1,4 +1,5 @@
 import { ConversationMeta } from "../../types";
+import type { ConversationIntegrityInspection } from "../../services/conversationIntegrity";
 
 export interface ConversationDrawerProps {
   visible: boolean;
@@ -9,6 +10,12 @@ export interface ConversationDrawerProps {
   onCopyThread: (id: string) => void;
   onShareThread: (id: string) => void;
   onManageMemory: (id: string) => void;
+  onInspectIntegrity: (
+    id: string,
+  ) => Promise<ConversationIntegrityInspection | null>;
+  onRepairIntegrity: (id: string) => Promise<unknown>;
+  onUndoIntegrityRepair: (id: string) => Promise<unknown>;
+  onExportIntegrityOriginals: (text: string) => void;
   onRenameThread: (id: string, title: string) => void;
   onTogglePinned: (id: string) => void;
   onTogglePrivate: (id: string) => void;

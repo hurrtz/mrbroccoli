@@ -1,6 +1,7 @@
 import type { TranslationDictionary } from "../types";
 import { dataBackupTranslations } from "../dataBackupTranslations";
 import { conversationKnowledgeTranslations } from "../conversationKnowledgeTranslations";
+import { conversationIntegrityTranslations } from "../conversationIntegrityTranslations";
 import { imagePromptTranslations } from "../imagePromptTranslations";
 import { onDeviceTranslations } from "../onDeviceTranslations";
 import { premiumTranslations } from "../premiumTranslations";
@@ -8,6 +9,7 @@ import { premiumTranslations } from "../premiumTranslations";
 export const tr = {
   ...dataBackupTranslations.tr,
   ...conversationKnowledgeTranslations.tr,
+  ...conversationIntegrityTranslations.tr,
   ...imagePromptTranslations.tr,
   ...onDeviceTranslations.tr,
   ...premiumTranslations.tr,

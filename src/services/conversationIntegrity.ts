@@ -36,6 +36,12 @@ export interface ConversationIntegrityRepairApplication {
   snapshot: ConversationIntegrityRepairSnapshot | null;
 }
 
+export interface ConversationIntegrityInspection {
+  conversation: Conversation;
+  repairSnapshot: ConversationIntegrityRepairSnapshot | null;
+  report: ConversationIntegrityReport;
+}
+
 function inspectAssistantMessage(
   message: Message,
 ): ConversationIntegrityFinding | null {

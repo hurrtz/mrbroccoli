@@ -48,6 +48,10 @@ the complete Play Store translations are kept in a dedicated file under
 
 ### Fixed
 
+- Add a conversation-integrity review for saved assistant responses that
+  previews suspected internal-context leakage before changing anything,
+  preserves the original locally for export or undo, and avoids automatic
+  deletion when no safe repaired prefix exists.
 - Make debug capture available in Free and record sanitized Premium store
   diagnostics for connection, product lookup, retry, purchase, restore, and
   entitlement reconciliation failures.
