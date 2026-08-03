@@ -907,6 +907,55 @@ describe("runVoicePipeline", () => {
     expect(events).toEqual(["speak:Wind is moving air.", "response-done"]);
   });
 
+  it("speaks a Markdown response through the speech-only renderer", async () => {
+    const response = [
+      "## Recommendation",
+      "- Choose **Quick** for routine turns.",
+      "- See the [notes](https://example.com/models). [1]",
+    ].join("\n");
+    (streamChat as jest.Mock).mockImplementation(
+      async ({ onDone }: { onDone: (text: string) => Promise<void> }) => {
+        await onDone(response);
+      },
+    );
+    const callbacks = {
+      onTranscription: jest.fn(),
+      onChunk: jest.fn(),
+      onResponseDone: jest.fn(),
+      onAudioReady: jest.fn(),
+      onSpeechTextReady: jest.fn(),
+      onError: jest.fn(),
+    };
+
+    await runVoicePipeline({
+      transcriptionOverride: "Which route?",
+      messages: [],
+      model: "gpt-5.4",
+      provider: "openai",
+      providerApiKey: "sk-test",
+      sttMode: "native",
+      ttsMode: "native",
+      ttsVoice: "",
+      replyPlayback: "wait",
+      assistantInstructions: "You are a voice assistant.",
+      responseLength: "normal",
+      responseTone: "professional",
+      language: "en",
+      callbacks,
+    });
+
+    expect(callbacks.onResponseDone).toHaveBeenCalledWith(
+      response,
+      undefined,
+      expect.any(Object),
+    );
+    expect(callbacks.onSpeechTextReady).toHaveBeenCalledWith(
+      "Recommendation. Choose Quick for routine turns. See the notes.",
+      undefined,
+      expect.any(Object),
+    );
+  });
+
   it("queues a short native speech pause between paragraphs", async () => {
     (streamChat as jest.Mock).mockImplementation(
       async ({

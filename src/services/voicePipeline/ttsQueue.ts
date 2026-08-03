@@ -5,6 +5,7 @@ import {
   INTER_PARAGRAPH_PAUSE_MS,
 } from "../playbackCues";
 import { splitTextForTts } from "../tts";
+import { renderTextForSpeech } from "../speechTextRenderer";
 import { extractCompleteParagraphs } from "./streaming";
 import {
   getTtsChunkTargetChars,
@@ -211,13 +212,18 @@ export function createVoicePipelineTtsQueue(
       return;
     }
 
+    const speechText = renderTextForSpeech(text);
+    if (!speechText) {
+      return;
+    }
+
     if (ttsMode === "native") {
-      enqueueTtsChunk(text, undefined, startsParagraph);
+      enqueueTtsChunk(speechText, undefined, startsParagraph);
       return;
     }
 
     const segments = splitTextForTts(
-      text,
+      speechText,
       getTtsChunkTargetChars(routeOrder, ttsProvider),
     );
 

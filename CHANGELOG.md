@@ -12,6 +12,8 @@ the complete Play Store translations are kept in a dedicated file under
 
 ### Added
 
+- Render Markdown headings, lists, links, citations, tables, and code fences
+  into clearer speech without changing the visible or saved response.
 - Save any transcript message as a user-controlled, source-linked decision,
   idea, assumption, counterargument, question, hypothesis, or next action.
   Saved insights stay inspectable and removable in Memory and appear in
