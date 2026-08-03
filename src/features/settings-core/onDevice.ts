@@ -8,19 +8,20 @@ import { deriveResponseModesForProvider } from "../../utils/responseModes";
 export function getLocalLanguageSettingsUpdate(
   settings: Settings,
   language: SpeechLanguage,
+  singleChoice = false,
 ): Partial<Omit<Settings, "apiKeys" | "providerModels">> | null {
   const selected = settings.localLanguages.includes(language);
-  const nextLanguages = selected
-    ? settings.localLanguages.filter((candidate) => candidate !== language)
-    : [...settings.localLanguages, language];
+  const nextLanguages = singleChoice
+    ? [language]
+    : selected
+      ? settings.localLanguages.filter((candidate) => candidate !== language)
+      : [...settings.localLanguages, language];
 
   if (nextLanguages.length === 0) {
     return null;
   }
 
-  const nextSettings: Partial<
-    Omit<Settings, "apiKeys" | "providerModels">
-  > = {
+  const nextSettings: Partial<Omit<Settings, "apiKeys" | "providerModels">> = {
     localLanguages: nextLanguages,
     ttsListenLanguages: nextLanguages,
     sttLanguage: nextLanguages.length === 1 ? nextLanguages[0] : "auto",

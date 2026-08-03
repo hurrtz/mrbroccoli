@@ -14,8 +14,9 @@ the complete Play Store translations are kept in a dedicated file under
 
 - Add a zero-account Free experience that selects, downloads, verifies, and
   benchmarks one complete on-device listening, thinking, and speaking setup
-  for the user's languages and phone. Once installed, Free conversations and
-  session history run without provider keys or network inference.
+  for the user's preferred speaking language and phone. Once installed, Free
+  conversations and session history run without provider keys or network
+  inference.
 - Add a permanent Premium unlock through App Store and Play Store billing,
   including localized store pricing, offline entitlement caching, automatic
   same-platform ownership reconciliation, and an explicit restore action.
@@ -65,9 +66,10 @@ the complete Play Store translations are kept in a dedicated file under
   first transcribed turn, reject interrupted Anthropic streams instead of
   silently continuing them, and block serialized internal context before it
   can be spoken, saved, or re-indexed.
-- Let Free users select multiple conversation languages even when no single
-  downloaded voice covers them all; local listening and thinking stay active
-  while the phone's language-aware system voice handles spoken replies.
+- Keep Free setup focused on one preferred speaking language chosen from
+  English, Spanish, French, German, Portuguese, Russian, or Italian. Portuguese
+  automatically follows the phone's Brazilian or European locale, with the
+  phone's language-aware system voice available when no downloaded voice fits.
 - Prevent a stalled private Uber Mode participant from blocking an entire run
   indefinitely; timed-out participants are skipped while successful models
   continue through review and final synthesis.

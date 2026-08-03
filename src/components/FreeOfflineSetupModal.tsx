@@ -8,10 +8,8 @@ import {
   View,
 } from "react-native";
 
-import {
-  TTS_LISTEN_LANGUAGE_OPTIONS,
-  getTtsListenLanguageLabel,
-} from "../constants/localTts";
+import { getTtsListenLanguageLabel } from "../constants/localTts";
+import { FREE_SPEECH_LANGUAGE_OPTIONS } from "../constants/speechLanguages";
 import { Modal } from "../design-system/NativeControls";
 import { PhosphorIcon } from "../design-system/PhosphorIcon";
 import { useLocalization } from "../i18n";
@@ -121,16 +119,16 @@ export function FreeOfflineSetupModal({
           {t("freeOfflineLanguagesStep")}
         </Text>
         <View style={styles.languages}>
-          {TTS_LISTEN_LANGUAGE_OPTIONS.map((entry) => {
-            const selected =
-              controller.effectiveSettings.localLanguages.includes(entry);
+          {FREE_SPEECH_LANGUAGE_OPTIONS.map((entry) => {
+            const selected = controller.selectedLanguage === entry;
             return (
               <Pressable
                 key={entry}
-                accessibilityRole="checkbox"
-                accessibilityState={{ checked: selected }}
+                testID={`free-language-${entry}`}
+                accessibilityRole="radio"
+                accessibilityState={{ checked: selected, selected }}
                 disabled={controller.preparing}
-                onPress={() => controller.toggleLanguage(entry)}
+                onPress={() => controller.selectLanguage(entry)}
                 style={({ pressed }) => [
                   styles.language,
                   {
@@ -146,7 +144,7 @@ export function FreeOfflineSetupModal({
                   {getTtsListenLanguageLabel(entry, language)}
                 </Text>
                 <PhosphorIcon
-                  name={selected ? "checkbox-checked" : "checkbox-unchecked"}
+                  name={selected ? "radio-selected" : "radio-unselected"}
                   size="compact"
                   color={selected ? colors.accent : colors.textMuted}
                 />

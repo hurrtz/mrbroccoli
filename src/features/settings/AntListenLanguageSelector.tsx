@@ -20,9 +20,13 @@ import { styles } from "./styles";
 export function AntListenLanguageSelector({
   selectedLanguages,
   onToggleLanguage,
+  availableLanguages = TTS_LISTEN_LANGUAGE_OPTIONS,
+  singleChoice = false,
 }: {
   selectedLanguages: TtsListenLanguage[];
   onToggleLanguage: (language: TtsListenLanguage) => void;
+  availableLanguages?: readonly TtsListenLanguage[];
+  singleChoice?: boolean;
 }) {
   const { colors } = useTheme();
   const { language, t } = useLocalization();
@@ -135,15 +139,18 @@ export function AntListenLanguageSelector({
           }}
         >
           <View>
-            {TTS_LISTEN_LANGUAGE_OPTIONS.map((entry, index) => {
+            {availableLanguages.map((entry, index) => {
               const checked = selectedLanguages.includes(entry);
 
               return (
                 <Pressable
                   key={entry}
                   onPress={() => onToggleLanguage(entry)}
-                  accessibilityRole="checkbox"
-                  accessibilityState={{ checked }}
+                  accessibilityRole={singleChoice ? "radio" : "checkbox"}
+                  accessibilityState={{
+                    checked,
+                    ...(singleChoice ? { selected: checked } : {}),
+                  }}
                   style={({ pressed }) => [
                     localStyles.checkboxRow,
                     {
@@ -152,7 +159,7 @@ export function AntListenLanguageSelector({
                         : colors.surface,
                       borderBottomColor: colors.border,
                       borderBottomWidth:
-                        index === TTS_LISTEN_LANGUAGE_OPTIONS.length - 1
+                        index === availableLanguages.length - 1
                           ? 0
                           : StyleSheet.hairlineWidth,
                     },
@@ -164,7 +171,15 @@ export function AntListenLanguageSelector({
                     {getTtsListenLanguageLabel(entry, language)}
                   </Text>
                   <PhosphorIcon
-                    name={checked ? "checkbox-checked" : "checkbox-unchecked"}
+                    name={
+                      singleChoice
+                        ? checked
+                          ? "radio-selected"
+                          : "radio-unselected"
+                        : checked
+                          ? "checkbox-checked"
+                          : "checkbox-unchecked"
+                    }
                     size="control"
                     color={checked ? colors.accent : colors.textMuted}
                   />

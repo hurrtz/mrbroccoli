@@ -173,6 +173,37 @@ export const SPEECH_LANGUAGE_REGISTRY = {
 export type SpeechLanguage = keyof typeof SPEECH_LANGUAGE_REGISTRY;
 export type SttLanguage = "auto" | SpeechLanguage;
 
+export const FREE_SPEECH_LANGUAGE_OPTIONS = [
+  "en",
+  "es",
+  "fr",
+  "de",
+  "pt",
+  "ru",
+  "it",
+] as const satisfies readonly SpeechLanguage[];
+export type FreeSpeechLanguage = (typeof FREE_SPEECH_LANGUAGE_OPTIONS)[number];
+
+export function normalizeFreeSpeechLanguage(
+  value: SpeechLanguage,
+): FreeSpeechLanguage | null {
+  const normalized = value === "pt-BR" ? "pt" : value;
+  return FREE_SPEECH_LANGUAGE_OPTIONS.includes(normalized as FreeSpeechLanguage)
+    ? (normalized as FreeSpeechLanguage)
+    : null;
+}
+
+export function resolveFreeSpeechLanguage(
+  language: FreeSpeechLanguage,
+  preferredLocale: string,
+): SpeechLanguage {
+  if (language !== "pt") {
+    return language;
+  }
+
+  return /^pt[-_]br\b/i.test(preferredLocale) ? "pt-BR" : "pt";
+}
+
 export const SPEECH_LANGUAGE_OPTIONS = Object.freeze(
   Object.keys(SPEECH_LANGUAGE_REGISTRY) as SpeechLanguage[],
 );
@@ -184,9 +215,7 @@ export function isSpeechLanguage(value: unknown): value is SpeechLanguage {
   );
 }
 
-export function normalizeSpeechLanguage(
-  value: unknown,
-): SpeechLanguage | null {
+export function normalizeSpeechLanguage(value: unknown): SpeechLanguage | null {
   if (value === "zh") {
     return "zh-CN";
   }

@@ -28,6 +28,20 @@ describe("on-device language settings", () => {
     });
   });
 
+  it("replaces the language when Free setup uses a single choice", () => {
+    expect(
+      getLocalLanguageSettingsUpdate(
+        settings({ localLanguages: ["en", "de"] }),
+        "it",
+        true,
+      ),
+    ).toMatchObject({
+      localLanguages: ["it"],
+      sttLanguage: "it",
+      ttsListenLanguages: ["it"],
+    });
+  });
+
   it("disables a selected local voice that cannot cover the new languages", () => {
     expect(
       getLocalLanguageSettingsUpdate(

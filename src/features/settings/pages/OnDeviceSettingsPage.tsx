@@ -39,6 +39,7 @@ import type {
   VoicePreviewRequest,
 } from "../../../types";
 import { MAX_RESPONSE_MODES } from "../../../constants/providers/defaults";
+import { FREE_SPEECH_LANGUAGE_OPTIONS } from "../../../constants/speechLanguages";
 import { getLocalLanguageSettingsUpdate } from "../../settings-core/onDevice";
 import {
   deriveResponseModesForProvider,
@@ -82,11 +83,13 @@ function capabilityTitleKey(capability: LocalModelCapability) {
 
 export function OnDeviceSettingsPage({
   settings,
+  isPremium,
   kokoroModel,
   onUpdate,
   onPreviewVoice,
 }: {
   settings: Settings;
+  isPremium: boolean;
   kokoroModel: KokoroModelController;
   onUpdate: (
     partial: Partial<Omit<Settings, "apiKeys" | "providerModels">>,
@@ -139,7 +142,11 @@ export function OnDeviceSettingsPage({
   }, [refreshModelState, runDeviceProbe]);
 
   const toggleLanguage = (language: SpeechLanguage) => {
-    const nextSettings = getLocalLanguageSettingsUpdate(settings, language);
+    const nextSettings = getLocalLanguageSettingsUpdate(
+      settings,
+      language,
+      !isPremium,
+    );
     if (nextSettings) {
       onUpdate(nextSettings);
     }
@@ -476,6 +483,10 @@ export function OnDeviceSettingsPage({
         <AntListenLanguageSelector
           selectedLanguages={settings.localLanguages}
           onToggleLanguage={toggleLanguage}
+          availableLanguages={
+            isPremium ? undefined : FREE_SPEECH_LANGUAGE_OPTIONS
+          }
+          singleChoice={!isPremium}
         />
       </View>
 

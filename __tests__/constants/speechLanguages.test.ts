@@ -1,18 +1,18 @@
 import {
+  FREE_SPEECH_LANGUAGE_OPTIONS,
   SPEECH_LANGUAGE_OPTIONS,
   SPEECH_LANGUAGE_REGISTRY,
   isSpeechLanguage,
   normalizeSpeechLanguage,
   normalizeSttLanguage,
+  normalizeFreeSpeechLanguage,
+  resolveFreeSpeechLanguage,
 } from "../../src/constants/speechLanguages";
 import {
   LOCAL_PREVIEW_SAMPLE_TEXT_BY_LANGUAGE,
   PROVIDER_PREVIEW_SAMPLE_TEXT_BY_LANGUAGE,
 } from "../../src/constants/voicePreviewSamples";
-import {
-  APP_LANGUAGES,
-  getAppLocale,
-} from "../../src/i18n/localeRegistry";
+import { APP_LANGUAGES, getAppLocale } from "../../src/i18n/localeRegistry";
 import {
   RUNTIME_PROVIDER_MANIFEST,
   RUNTIME_PROVIDER_ORDER,
@@ -67,6 +67,22 @@ describe("speech language registry", () => {
     expect(SPEECH_LANGUAGE_REGISTRY.ur.nativeLocale).toBe("ur-PK");
   });
 
+  it("offers exactly seven single-choice Free speaking languages", () => {
+    expect(FREE_SPEECH_LANGUAGE_OPTIONS).toEqual([
+      "en",
+      "es",
+      "fr",
+      "de",
+      "pt",
+      "ru",
+      "it",
+    ]);
+    expect(normalizeFreeSpeechLanguage("pt-BR")).toBe("pt");
+    expect(normalizeFreeSpeechLanguage("zh-CN")).toBeNull();
+    expect(resolveFreeSpeechLanguage("pt", "pt-BR")).toBe("pt-BR");
+    expect(resolveFreeSpeechLanguage("pt", "pt-PT")).toBe("pt");
+  });
+
   it("provides routing metadata and previews for every language", () => {
     SPEECH_LANGUAGE_OPTIONS.forEach((language) => {
       const definition = SPEECH_LANGUAGE_REGISTRY[language];
@@ -74,9 +90,9 @@ describe("speech language registry", () => {
       expect(definition.nativeLocale).toMatch(/^[a-z]{2,3}(?:-[A-Za-z0-9]+)+$/);
       expect(definition.providerCode.length).toBeGreaterThan(0);
       expect(definition.googleCloudLocale.length).toBeGreaterThan(0);
-      expect(PROVIDER_PREVIEW_SAMPLE_TEXT_BY_LANGUAGE[language].trim()).not.toBe(
-        "",
-      );
+      expect(
+        PROVIDER_PREVIEW_SAMPLE_TEXT_BY_LANGUAGE[language].trim(),
+      ).not.toBe("");
       expect(LOCAL_PREVIEW_SAMPLE_TEXT_BY_LANGUAGE[language].trim()).not.toBe(
         "",
       );
@@ -95,7 +111,9 @@ describe("speech language registry", () => {
       expect(
         RUNTIME_PROVIDER_ORDER.some((provider) => {
           const stt = RUNTIME_PROVIDER_MANIFEST[provider].stt;
-          return stt.support === "provider" && stt.languages?.includes(language);
+          return (
+            stt.support === "provider" && stt.languages?.includes(language)
+          );
         }),
       ).toBe(true);
     });
@@ -106,7 +124,9 @@ describe("speech language registry", () => {
       expect(
         RUNTIME_PROVIDER_ORDER.some((provider) => {
           const tts = RUNTIME_PROVIDER_MANIFEST[provider].tts;
-          return tts.support === "provider" && tts.languages?.includes(language);
+          return (
+            tts.support === "provider" && tts.languages?.includes(language)
+          );
         }),
       ).toBe(true);
     });

@@ -10,7 +10,7 @@ import { renderWithProviders } from "../test-utils/renderWithProviders";
 
 const GIB = 1024 ** 3;
 
-function bilingualController(): FreeOfflineModeController {
+function freeController(): FreeOfflineModeController {
   const snapshot: LocalDeviceSnapshot = {
     version: 1,
     capturedAt: "2026-08-02T00:00:00.000Z",
@@ -28,17 +28,17 @@ function bilingualController(): FreeOfflineModeController {
     thermalState: "nominal",
   };
   const selection = selectOfflineProfile({
-    languages: ["en", "de"],
+    languages: ["en"],
     snapshot,
   });
   if (selection.status !== "ready") {
-    throw new Error("Expected a bilingual Free profile");
+    throw new Error("Expected a Free profile");
   }
 
   return {
     effectiveSettings: {
       ...DEFAULT_SETTINGS,
-      localLanguages: ["en", "de"],
+      localLanguages: ["en"],
     },
     entitlement: {} as FreeOfflineModeController["entitlement"],
     freeRuntimeReady: true,
@@ -51,15 +51,16 @@ function bilingualController(): FreeOfflineModeController {
     selection,
     readiness: { ready: true } as FreeOfflineModeController["readiness"],
     error: null,
-    toggleLanguage: jest.fn(),
+    selectedLanguage: "en",
+    selectLanguage: jest.fn(),
     prepare: jest.fn(async () => undefined),
     refresh: jest.fn(async () => null),
   };
 }
 
 describe("FreeOfflineSetupModal", () => {
-  it("explains bilingual system speech and ends with one clear start action", () => {
-    const controller = bilingualController();
+  it("offers seven single-choice languages and ends with one clear start action", () => {
+    const controller = freeController();
     const screen = renderWithProviders(
       <FreeOfflineSetupModal
         controller={controller}
@@ -67,14 +68,14 @@ describe("FreeOfflineSetupModal", () => {
       />,
     );
 
-    expect(screen.getByText("1 · Choose conversation languages")).toBeTruthy();
+    expect(screen.getByText("1 · Choose your speaking language")).toBeTruthy();
     expect(screen.getByText("2 · Prepare private AI")).toBeTruthy();
     expect(screen.getByText("3 · Start talking")).toBeTruthy();
-    expect(
-      screen.getByText(
-        "No single downloaded voice covers this language set, so replies use the phone’s language-aware system voice. Listening and thinking stay local.",
-      ),
-    ).toBeTruthy();
+    expect(screen.getAllByRole("radio")).toHaveLength(7);
+    expect(screen.queryByText("Simplified Chinese")).toBeNull();
+
+    fireEvent.press(screen.getByTestId("free-language-it"));
+    expect(controller.selectLanguage).toHaveBeenCalledWith("it");
 
     fireEvent.press(screen.getByText("Start talking"));
     expect(controller.setModalVisible).toHaveBeenCalledWith(false);

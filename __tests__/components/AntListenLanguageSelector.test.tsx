@@ -12,8 +12,8 @@ describe("AntListenLanguageSelector", () => {
       <LocalizationProvider language="en">
         <ThemeProvider mode="light">
           <AntListenLanguageSelector
-              selectedLanguages={["en"]}
-              onToggleLanguage={onToggleLanguage}
+            selectedLanguages={["en"]}
+            onToggleLanguage={onToggleLanguage}
           />
         </ThemeProvider>
       </LocalizationProvider>,
@@ -27,5 +27,33 @@ describe("AntListenLanguageSelector", () => {
 
     expect(onToggleLanguage).toHaveBeenCalledTimes(1);
     expect(onToggleLanguage).toHaveBeenCalledWith("de");
+  });
+
+  it("supports a restricted single-choice language list", () => {
+    const onToggleLanguage = jest.fn();
+    const screen = render(
+      <LocalizationProvider language="en">
+        <ThemeProvider mode="light">
+          <AntListenLanguageSelector
+            selectedLanguages={["en"]}
+            onToggleLanguage={onToggleLanguage}
+            availableLanguages={["en", "it"]}
+            singleChoice
+          />
+        </ThemeProvider>
+      </LocalizationProvider>,
+    );
+
+    fireEvent.press(screen.getByLabelText("Listen Languages"));
+
+    const languageRows = screen.getAllByRole("radio");
+    expect(languageRows).toHaveLength(2);
+    expect(languageRows[0].props.accessibilityState).toEqual({
+      checked: true,
+      selected: true,
+    });
+    fireEvent.press(languageRows[1]);
+
+    expect(onToggleLanguage).toHaveBeenCalledWith("it");
   });
 });

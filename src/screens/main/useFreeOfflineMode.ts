@@ -2,7 +2,13 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { usePremiumEntitlement } from "../../context/PremiumEntitlementContext";
 import type { LocalModelId } from "../../constants/localModels";
-import type { Settings, SpeechLanguage } from "../../types";
+import {
+  FREE_SPEECH_LANGUAGE_OPTIONS,
+  normalizeFreeSpeechLanguage,
+  resolveFreeSpeechLanguage,
+  type FreeSpeechLanguage,
+} from "../../constants/speechLanguages";
+import type { Settings } from "../../types";
 import {
   applyOfflineProfileToSettings,
   applyUnavailableFreeSettings,
@@ -35,7 +41,8 @@ export interface FreeOfflineModeController {
   selection: OfflineProfileSelection | null;
   readiness: OfflineProfileReadiness | null;
   error: string | null;
-  toggleLanguage: (language: SpeechLanguage) => void;
+  selectedLanguage: FreeSpeechLanguage;
+  selectLanguage: (language: FreeSpeechLanguage) => void;
   prepare: () => Promise<void>;
   refresh: () => Promise<OfflineProfileReadiness | null>;
 }
@@ -65,6 +72,39 @@ export function useFreeOfflineMode(params: {
   const refreshOperationRef = useRef(0);
   const preparationAbortRef = useRef<AbortController | null>(null);
   const openedForFreeRef = useRef(false);
+  const deviceLocale = useMemo(
+    () => Intl.DateTimeFormat().resolvedOptions().locale,
+    [],
+  );
+  const selectedLanguage = useMemo(
+    () =>
+      settings.localLanguages
+        .map(normalizeFreeSpeechLanguage)
+        .find((language): language is FreeSpeechLanguage =>
+          Boolean(language),
+        ) ?? FREE_SPEECH_LANGUAGE_OPTIONS[0],
+    [settings.localLanguages],
+  );
+  const resolvedLanguage = useMemo(() => {
+    if (
+      selectedLanguage === "pt" &&
+      settings.localLanguages.includes("pt-BR")
+    ) {
+      return "pt-BR" as const;
+    }
+    const preferredLocale =
+      settings.language === "pt-BR"
+        ? "pt-BR"
+        : settings.language === "pt"
+          ? "pt-PT"
+          : deviceLocale;
+    return resolveFreeSpeechLanguage(selectedLanguage, preferredLocale);
+  }, [
+    deviceLocale,
+    selectedLanguage,
+    settings.language,
+    settings.localLanguages,
+  ]);
 
   const refresh = useCallback(async () => {
     if (entitlement.status !== "free") {
@@ -86,7 +126,7 @@ export function useFreeOfflineMode(params: {
           .map(([modelId]) => modelId as LocalModelId),
       );
       const nextSelection = selectOfflineProfile({
-        languages: settings.localLanguages,
+        languages: [resolvedLanguage],
         snapshot: nextSnapshot,
         installedModelIds,
         benchmarks,
@@ -121,7 +161,36 @@ export function useFreeOfflineMode(params: {
         setChecking(false);
       }
     }
-  }, [entitlement.status, settings.localLanguages]);
+  }, [entitlement.status, resolvedLanguage]);
+
+  useEffect(() => {
+    if (!settingsLoaded || entitlement.status !== "free") {
+      return;
+    }
+    if (
+      settings.localLanguages.length === 1 &&
+      settings.localLanguages[0] === resolvedLanguage &&
+      settings.ttsListenLanguages.length === 1 &&
+      settings.ttsListenLanguages[0] === resolvedLanguage &&
+      settings.sttLanguage === resolvedLanguage
+    ) {
+      return;
+    }
+
+    updateSettings({
+      localLanguages: [resolvedLanguage],
+      ttsListenLanguages: [resolvedLanguage],
+      sttLanguage: resolvedLanguage,
+    });
+  }, [
+    entitlement.status,
+    resolvedLanguage,
+    settings.localLanguages,
+    settings.sttLanguage,
+    settings.ttsListenLanguages,
+    settingsLoaded,
+    updateSettings,
+  ]);
 
   useEffect(() => {
     if (!settingsLoaded || entitlement.status !== "free") {
@@ -145,22 +214,22 @@ export function useFreeOfflineMode(params: {
     [],
   );
 
-  const toggleLanguage = useCallback(
-    (language: SpeechLanguage) => {
-      const selected = settings.localLanguages.includes(language);
-      const nextLanguages = selected
-        ? settings.localLanguages.filter((candidate) => candidate !== language)
-        : [...settings.localLanguages, language];
-      if (nextLanguages.length === 0) {
-        return;
-      }
+  const selectLanguage = useCallback(
+    (language: FreeSpeechLanguage) => {
+      const preferredLocale =
+        settings.language === "pt-BR"
+          ? "pt-BR"
+          : settings.language === "pt"
+            ? "pt-PT"
+            : deviceLocale;
+      const nextLanguage = resolveFreeSpeechLanguage(language, preferredLocale);
       updateSettings({
-        localLanguages: nextLanguages,
-        ttsListenLanguages: nextLanguages,
-        sttLanguage: nextLanguages.length === 1 ? nextLanguages[0] : "auto",
+        localLanguages: [nextLanguage],
+        ttsListenLanguages: [nextLanguage],
+        sttLanguage: nextLanguage,
       });
     },
-    [settings.localLanguages, updateSettings],
+    [deviceLocale, settings.language, updateSettings],
   );
 
   const prepare = useCallback(async () => {
@@ -221,7 +290,8 @@ export function useFreeOfflineMode(params: {
     selection,
     readiness,
     error,
-    toggleLanguage,
+    selectedLanguage,
+    selectLanguage,
     prepare,
     refresh,
   };

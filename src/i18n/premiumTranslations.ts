@@ -22,7 +22,7 @@ const en = {
   premiumErrorPending: "The purchase is awaiting approval.",
   freeOfflineTitle: "Private on-device mode",
   freeOfflineIntro:
-    "Choose your conversation languages. Mr Broccoli will automatically find one complete local listening, thinking, and speaking setup that fits this phone.",
+    "Choose your preferred speaking language. Mr Broccoli will automatically find one complete local listening, thinking, and speaking setup that fits this phone.",
   freeOfflineInternetDisclosure:
     "The model download needs internet access. After installation, Free conversations and sessions stay entirely on this device.",
   freeOfflineProfile: "Recommended local setup",
@@ -32,9 +32,9 @@ const en = {
     `${model} · ${index} of ${count}`,
   freeOfflineReady: "Your private offline setup is ready.",
   freeOfflineUnavailableLanguage:
-    "No complete local setup supports every selected language yet.",
+    "No complete local setup supports this language yet.",
   freeOfflineUnavailableDevice:
-    "This phone cannot safely run a complete local setup for these languages.",
+    "This phone cannot safely run a complete local setup for this language.",
   freeOfflineUnavailableStorage:
     "There is not enough free storage for the complete local setup.",
   freeOfflineUnavailableTemporary:
@@ -67,7 +67,7 @@ const rawPremiumTranslations = {
     premiumErrorPending: "Der Kauf wartet auf Bestätigung.",
     freeOfflineTitle: "Privater Modus auf dem Gerät",
     freeOfflineIntro:
-      "Wähle deine Gesprächssprachen. Mr Broccoli findet automatisch eine vollständige lokale Kombination zum Hören, Denken und Sprechen, die zu diesem Smartphone passt.",
+      "Wähle deine bevorzugte Sprechsprache. Mr Broccoli findet automatisch eine vollständige lokale Kombination zum Hören, Denken und Sprechen, die zu diesem Smartphone passt.",
     freeOfflineInternetDisclosure:
       "Der Modell-Download benötigt Internet. Danach bleiben kostenlose Gespräche und Sitzungen vollständig auf diesem Gerät.",
     freeOfflineProfile: "Empfohlene lokale Kombination",
@@ -77,9 +77,9 @@ const rawPremiumTranslations = {
       `${model} · ${index} von ${count}`,
     freeOfflineReady: "Deine private Offline-Kombination ist bereit.",
     freeOfflineUnavailableLanguage:
-      "Noch unterstützt keine vollständige lokale Kombination alle ausgewählten Sprachen.",
+      "Noch unterstützt keine vollständige lokale Kombination diese Sprache.",
     freeOfflineUnavailableDevice:
-      "Dieses Smartphone kann für diese Sprachen keine vollständige lokale Kombination sicher ausführen.",
+      "Dieses Smartphone kann für diese Sprache keine vollständige lokale Kombination sicher ausführen.",
     freeOfflineUnavailableStorage:
       "Für die vollständige lokale Kombination ist nicht genug Speicher frei.",
     freeOfflineUnavailableTemporary:
@@ -105,7 +105,7 @@ const rawPremiumTranslations = {
     premiumErrorPending: "Покупка очікує підтвердження.",
     freeOfflineTitle: "Приватний режим на пристрої",
     freeOfflineIntro:
-      "Виберіть мови розмови. Mr Broccoli автоматично знайде повний локальний набір для слухання, мислення й мовлення, який підходить цьому телефону.",
+      "Виберіть бажану мову спілкування. Mr Broccoli автоматично знайде повний локальний набір для слухання, мислення й мовлення, який підходить цьому телефону.",
     freeOfflineInternetDisclosure:
       "Для завантаження моделей потрібен інтернет. Після встановлення безкоштовні розмови й сесії залишаються лише на цьому пристрої.",
     freeOfflineProfile: "Рекомендований локальний набір",
@@ -115,9 +115,9 @@ const rawPremiumTranslations = {
       `${model} · ${index} з ${count}`,
     freeOfflineReady: "Приватний офлайн-набір готовий.",
     freeOfflineUnavailableLanguage:
-      "Повного локального набору для всіх вибраних мов ще немає.",
+      "Повного локального набору для цієї мови ще немає.",
     freeOfflineUnavailableDevice:
-      "Цей телефон не може безпечно запустити повний локальний набір для цих мов.",
+      "Цей телефон не може безпечно запустити повний локальний набір для цієї мови.",
     freeOfflineUnavailableStorage:
       "Недостатньо вільного місця для повного локального набору.",
     freeOfflineUnavailableTemporary:
@@ -144,7 +144,7 @@ const rawPremiumTranslations = {
     premiumErrorPending: "खरीद स्वीकृति की प्रतीक्षा में है।",
     freeOfflineTitle: "निजी ऑन-डिवाइस मोड",
     freeOfflineIntro:
-      "अपनी बातचीत की भाषाएँ चुनें। Mr Broccoli इस फ़ोन के लिए पूरा स्थानीय सुनने, सोचने और बोलने का सेट स्वतः खोजेगा।",
+      "अपनी पसंदीदा बोलने की भाषा चुनें। Mr Broccoli इस फ़ोन के लिए पूरा स्थानीय सुनने, सोचने और बोलने का सेट स्वतः खोजेगा।",
     freeOfflineInternetDisclosure:
       "मॉडल डाउनलोड के लिए इंटरनेट चाहिए। स्थापना के बाद मुफ़्त बातचीत और सत्र पूरी तरह इसी डिवाइस पर रहते हैं।",
     freeOfflineProfile: "सुझाया स्थानीय सेट",
@@ -154,9 +154,9 @@ const rawPremiumTranslations = {
       `${model} · ${index} / ${count}`,
     freeOfflineReady: "निजी ऑफ़लाइन सेट तैयार है।",
     freeOfflineUnavailableLanguage:
-      "अभी सभी चुनी भाषाओं के लिए पूरा स्थानीय सेट उपलब्ध नहीं है।",
+      "इस भाषा के लिए अभी पूरा स्थानीय सेट उपलब्ध नहीं है।",
     freeOfflineUnavailableDevice:
-      "यह फ़ोन इन भाषाओं के लिए पूरा स्थानीय सेट सुरक्षित रूप से नहीं चला सकता।",
+      "यह फ़ोन इस भाषा के लिए पूरा स्थानीय सेट सुरक्षित रूप से नहीं चला सकता।",
     freeOfflineUnavailableStorage:
       "पूरे स्थानीय सेट के लिए पर्याप्त खाली जगह नहीं है।",
     freeOfflineUnavailableTemporary:
@@ -183,7 +183,7 @@ const rawPremiumTranslations = {
     premiumErrorPending: "La compra espera aprobación.",
     freeOfflineTitle: "Modo privado en el dispositivo",
     freeOfflineIntro:
-      "Elige los idiomas. Mr Broccoli buscará automáticamente una configuración local completa para escuchar, pensar y hablar que funcione en este teléfono.",
+      "Elige tu idioma hablado preferido. Mr Broccoli buscará automáticamente una configuración local completa para escuchar, pensar y hablar que funcione en este teléfono.",
     freeOfflineInternetDisclosure:
       "La descarga de modelos necesita internet. Después, las conversaciones y sesiones gratuitas permanecen íntegramente en este dispositivo.",
     freeOfflineProfile: "Configuración local recomendada",
@@ -193,9 +193,9 @@ const rawPremiumTranslations = {
       `${model} · ${index} de ${count}`,
     freeOfflineReady: "La configuración privada sin conexión está lista.",
     freeOfflineUnavailableLanguage:
-      "Todavía no hay una configuración local completa para todos los idiomas elegidos.",
+      "Todavía no hay una configuración local completa para este idioma.",
     freeOfflineUnavailableDevice:
-      "Este teléfono no puede ejecutar con seguridad una configuración local completa para estos idiomas.",
+      "Este teléfono no puede ejecutar con seguridad una configuración local completa para este idioma.",
     freeOfflineUnavailableStorage:
       "No hay suficiente espacio libre para la configuración local completa.",
     freeOfflineUnavailableTemporary:
@@ -222,7 +222,7 @@ const rawPremiumTranslations = {
     premiumErrorPending: "L’achat attend une validation.",
     freeOfflineTitle: "Mode privé sur l’appareil",
     freeOfflineIntro:
-      "Choisissez vos langues. Mr Broccoli trouvera automatiquement une configuration locale complète d’écoute, de réflexion et de parole adaptée à ce téléphone.",
+      "Choisissez votre langue parlée préférée. Mr Broccoli trouvera automatiquement une configuration locale complète d’écoute, de réflexion et de parole adaptée à ce téléphone.",
     freeOfflineInternetDisclosure:
       "Le téléchargement des modèles nécessite internet. Ensuite, les conversations et sessions gratuites restent entièrement sur cet appareil.",
     freeOfflineProfile: "Configuration locale recommandée",
@@ -232,9 +232,9 @@ const rawPremiumTranslations = {
       `${model} · ${index} sur ${count}`,
     freeOfflineReady: "Votre configuration privée hors ligne est prête.",
     freeOfflineUnavailableLanguage:
-      "Aucune configuration locale complète ne prend encore en charge toutes les langues choisies.",
+      "Aucune configuration locale complète ne prend encore en charge cette langue.",
     freeOfflineUnavailableDevice:
-      "Ce téléphone ne peut pas exécuter en toute sécurité une configuration locale complète pour ces langues.",
+      "Ce téléphone ne peut pas exécuter en toute sécurité une configuration locale complète pour cette langue.",
     freeOfflineUnavailableStorage:
       "L’espace libre est insuffisant pour la configuration locale complète.",
     freeOfflineUnavailableTemporary:
@@ -260,7 +260,7 @@ const rawPremiumTranslations = {
     premiumErrorPending: "L’acquisto è in attesa di approvazione.",
     freeOfflineTitle: "Modalità privata sul dispositivo",
     freeOfflineIntro:
-      "Scegli le lingue. Mr Broccoli troverà automaticamente una configurazione locale completa per ascolto, ragionamento e voce adatta a questo telefono.",
+      "Scegli la lingua parlata che preferisci. Mr Broccoli troverà automaticamente una configurazione locale completa per ascolto, ragionamento e voce adatta a questo telefono.",
     freeOfflineInternetDisclosure:
       "Il download dei modelli richiede internet. Dopo l’installazione, conversazioni e sessioni gratuite restano interamente sul dispositivo.",
     freeOfflineProfile: "Configurazione locale consigliata",
@@ -270,9 +270,9 @@ const rawPremiumTranslations = {
       `${model} · ${index} di ${count}`,
     freeOfflineReady: "La configurazione privata offline è pronta.",
     freeOfflineUnavailableLanguage:
-      "Nessuna configurazione locale completa supporta ancora tutte le lingue selezionate.",
+      "Nessuna configurazione locale completa supporta ancora questa lingua.",
     freeOfflineUnavailableDevice:
-      "Questo telefono non può eseguire in sicurezza una configurazione locale completa per queste lingue.",
+      "Questo telefono non può eseguire in sicurezza una configurazione locale completa per questa lingua.",
     freeOfflineUnavailableStorage:
       "Spazio libero insufficiente per la configurazione locale completa.",
     freeOfflineUnavailableTemporary:
@@ -298,7 +298,7 @@ const rawPremiumTranslations = {
     premiumErrorPending: "A compra aguarda aprovação.",
     freeOfflineTitle: "Modo privado no dispositivo",
     freeOfflineIntro:
-      "Escolha os idiomas. Mr Broccoli encontrará automaticamente uma configuração local completa para ouvir, pensar e falar adequada a este telefone.",
+      "Escolha o idioma falado que prefere. Mr Broccoli encontrará automaticamente uma configuração local completa para ouvir, pensar e falar adequada a este telefone.",
     freeOfflineInternetDisclosure:
       "A transferência dos modelos necessita de internet. Depois, as conversas e sessões gratuitas ficam totalmente neste dispositivo.",
     freeOfflineProfile: "Configuração local recomendada",
@@ -308,9 +308,9 @@ const rawPremiumTranslations = {
       `${model} · ${index} de ${count}`,
     freeOfflineReady: "A configuração privada offline está pronta.",
     freeOfflineUnavailableLanguage:
-      "Ainda não existe uma configuração local completa para todos os idiomas selecionados.",
+      "Ainda não existe uma configuração local completa para este idioma.",
     freeOfflineUnavailableDevice:
-      "Este telefone não pode executar com segurança uma configuração local completa para estes idiomas.",
+      "Este telefone não pode executar com segurança uma configuração local completa para este idioma.",
     freeOfflineUnavailableStorage:
       "Não há espaço livre suficiente para a configuração local completa.",
     freeOfflineUnavailableTemporary:
@@ -336,7 +336,7 @@ const rawPremiumTranslations = {
     premiumErrorPending: "A compra aguarda aprovação.",
     freeOfflineTitle: "Modo privado no dispositivo",
     freeOfflineIntro:
-      "Escolha os idiomas. Mr Broccoli encontrará automaticamente uma configuração local completa para ouvir, pensar e falar adequada a este celular.",
+      "Escolha seu idioma falado preferido. Mr Broccoli encontrará automaticamente uma configuração local completa para ouvir, pensar e falar adequada a este celular.",
     freeOfflineInternetDisclosure:
       "O download dos modelos precisa de internet. Depois, as conversas e sessões gratuitas ficam totalmente neste dispositivo.",
     freeOfflineProfile: "Configuração local recomendada",
@@ -346,9 +346,9 @@ const rawPremiumTranslations = {
       `${model} · ${index} de ${count}`,
     freeOfflineReady: "A configuração privada offline está pronta.",
     freeOfflineUnavailableLanguage:
-      "Ainda não existe uma configuração local completa para todos os idiomas selecionados.",
+      "Ainda não existe uma configuração local completa para este idioma.",
     freeOfflineUnavailableDevice:
-      "Este celular não pode executar com segurança uma configuração local completa para esses idiomas.",
+      "Este celular não pode executar com segurança uma configuração local completa para este idioma.",
     freeOfflineUnavailableStorage:
       "Não há espaço livre suficiente para a configuração local completa.",
     freeOfflineUnavailableTemporary:
@@ -374,7 +374,7 @@ const rawPremiumTranslations = {
     premiumErrorPending: "Покупка ожидает подтверждения.",
     freeOfflineTitle: "Приватный режим на устройстве",
     freeOfflineIntro:
-      "Выберите языки. Mr Broccoli автоматически найдёт полный локальный набор для распознавания, мышления и речи, подходящий телефону.",
+      "Выберите предпочитаемый язык общения. Mr Broccoli автоматически найдёт полный локальный набор для распознавания, мышления и речи, подходящий телефону.",
     freeOfflineInternetDisclosure:
       "Для загрузки моделей нужен интернет. После установки бесплатные разговоры и сессии остаются только на устройстве.",
     freeOfflineProfile: "Рекомендуемый локальный набор",
@@ -384,9 +384,9 @@ const rawPremiumTranslations = {
       `${model} · ${index} из ${count}`,
     freeOfflineReady: "Приватный офлайн-набор готов.",
     freeOfflineUnavailableLanguage:
-      "Полного локального набора для всех выбранных языков пока нет.",
+      "Полного локального набора для этого языка пока нет.",
     freeOfflineUnavailableDevice:
-      "Этот телефон не может безопасно запустить полный локальный набор для этих языков.",
+      "Этот телефон не может безопасно запустить полный локальный набор для этого языка.",
     freeOfflineUnavailableStorage:
       "Недостаточно свободного места для полного локального набора.",
     freeOfflineUnavailableTemporary:
@@ -412,7 +412,7 @@ const rawPremiumTranslations = {
     premiumErrorPending: "购买正在等待批准。",
     freeOfflineTitle: "私密设备端模式",
     freeOfflineIntro:
-      "请选择对话语言。Mr Broccoli 会自动查找一套适合此手机的本地听、思考和语音组合。",
+      "请选择你偏好的口语。Mr Broccoli 会自动查找一套适合此手机的本地听、思考和语音组合。",
     freeOfflineInternetDisclosure:
       "下载模型需要联网。安装后，免费对话和会话完全保留在此设备上。",
     freeOfflineProfile: "推荐的本地组合",
@@ -421,9 +421,9 @@ const rawPremiumTranslations = {
     freeOfflinePreparing: ({ model, index, count }) =>
       `${model} · ${index}/${count}`,
     freeOfflineReady: "私密离线组合已准备就绪。",
-    freeOfflineUnavailableLanguage: "目前没有完整的本地组合支持所有所选语言。",
+    freeOfflineUnavailableLanguage: "目前没有完整的本地组合支持此语言。",
     freeOfflineUnavailableDevice:
-      "此手机无法安全运行这些语言所需的完整本地组合。",
+      "此手机无法安全运行此语言所需的完整本地组合。",
     freeOfflineUnavailableStorage: "没有足够的可用空间安装完整本地组合。",
     freeOfflineUnavailableTemporary:
       "手机暂时受到内存、电量或温度压力，请稍后再试。",
@@ -448,7 +448,7 @@ const rawPremiumTranslations = {
     premiumErrorPending: "الشراء بانتظار الموافقة.",
     freeOfflineTitle: "الوضع الخاص على الجهاز",
     freeOfflineIntro:
-      "اختر لغات المحادثة. سيجد Mr Broccoli تلقائيًا إعدادًا محليًا كاملًا للاستماع والتفكير والنطق يناسب هذا الهاتف.",
+      "اختر لغة التحدث المفضلة. سيجد Mr Broccoli تلقائيًا إعدادًا محليًا كاملًا للاستماع والتفكير والنطق يناسب هذا الهاتف.",
     freeOfflineInternetDisclosure:
       "يتطلب تنزيل النماذج اتصالًا بالإنترنت. بعد التثبيت تبقى المحادثات والجلسات المجانية بالكامل على هذا الجهاز.",
     freeOfflineProfile: "الإعداد المحلي المقترح",
@@ -458,9 +458,9 @@ const rawPremiumTranslations = {
       `${model} · ${index} من ${count}`,
     freeOfflineReady: "الإعداد الخاص دون اتصال جاهز.",
     freeOfflineUnavailableLanguage:
-      "لا يوجد بعد إعداد محلي كامل يدعم كل اللغات المحددة.",
+      "لا يوجد بعد إعداد محلي كامل يدعم هذه اللغة.",
     freeOfflineUnavailableDevice:
-      "لا يستطيع هذا الهاتف تشغيل إعداد محلي كامل لهذه اللغات بأمان.",
+      "لا يستطيع هذا الهاتف تشغيل إعداد محلي كامل لهذه اللغة بأمان.",
     freeOfflineUnavailableStorage:
       "لا توجد مساحة حرة كافية للإعداد المحلي الكامل.",
     freeOfflineUnavailableTemporary:
@@ -487,7 +487,7 @@ const rawPremiumTranslations = {
     premiumErrorPending: "購入は承認待ちです。",
     freeOfflineTitle: "非公開オンデバイスモード",
     freeOfflineIntro:
-      "会話言語を選んでください。Mr Broccoliが、この端末に適したローカルの聞き取り・思考・音声の完全な構成を自動で探します。",
+      "希望する話し言葉を選んでください。Mr Broccoliが、この端末に適したローカルの聞き取り・思考・音声の完全な構成を自動で探します。",
     freeOfflineInternetDisclosure:
       "モデルのダウンロードにはインターネットが必要です。インストール後、無料の会話とセッションは完全にこの端末内に残ります。",
     freeOfflineProfile: "推奨ローカル構成",
@@ -497,9 +497,9 @@ const rawPremiumTranslations = {
       `${model} · ${index}/${count}`,
     freeOfflineReady: "非公開オフライン構成の準備ができました。",
     freeOfflineUnavailableLanguage:
-      "選択したすべての言語に対応する完全なローカル構成はまだありません。",
+      "この言語に対応する完全なローカル構成はまだありません。",
     freeOfflineUnavailableDevice:
-      "この端末では、これらの言語の完全なローカル構成を安全に実行できません。",
+      "この端末では、この言語の完全なローカル構成を安全に実行できません。",
     freeOfflineUnavailableStorage:
       "完全なローカル構成に必要な空き容量がありません。",
     freeOfflineUnavailableTemporary:
@@ -525,7 +525,7 @@ const rawPremiumTranslations = {
     premiumErrorPending: "A vásárlás jóváhagyásra vár.",
     freeOfflineTitle: "Privát eszközön futó mód",
     freeOfflineIntro:
-      "Válaszd ki a nyelveket. Mr Broccoli automatikusan megkeresi a telefonhoz illő teljes helyi hallási, gondolkodási és beszédbeállítást.",
+      "Válaszd ki a kívánt beszélt nyelvet. Mr Broccoli automatikusan megkeresi a telefonhoz illő teljes helyi hallási, gondolkodási és beszédbeállítást.",
     freeOfflineInternetDisclosure:
       "A modellek letöltéséhez internet kell. Telepítés után az ingyenes beszélgetések és munkamenetek teljesen az eszközön maradnak.",
     freeOfflineProfile: "Ajánlott helyi beállítás",
@@ -535,9 +535,9 @@ const rawPremiumTranslations = {
       `${model} · ${index}/${count}`,
     freeOfflineReady: "A privát offline beállítás kész.",
     freeOfflineUnavailableLanguage:
-      "Még nincs teljes helyi beállítás minden kiválasztott nyelvhez.",
+      "Ehhez a nyelvhez még nincs teljes helyi beállítás.",
     freeOfflineUnavailableDevice:
-      "Ez a telefon nem tud biztonságosan teljes helyi beállítást futtatni ezekhez a nyelvekhez.",
+      "Ez a telefon nem tud biztonságosan teljes helyi beállítást futtatni ehhez a nyelvhez.",
     freeOfflineUnavailableStorage:
       "Nincs elég szabad hely a teljes helyi beállításhoz.",
     freeOfflineUnavailableTemporary:
@@ -563,7 +563,7 @@ const rawPremiumTranslations = {
     premiumErrorPending: "Nákup čeká na schválení.",
     freeOfflineTitle: "Soukromý režim v zařízení",
     freeOfflineIntro:
-      "Vyberte jazyky. Mr Broccoli automaticky najde kompletní místní sestavu pro poslech, myšlení a řeč vhodnou pro tento telefon.",
+      "Vyberte preferovaný jazyk mluvení. Mr Broccoli automaticky najde kompletní místní sestavu pro poslech, myšlení a řeč vhodnou pro tento telefon.",
     freeOfflineInternetDisclosure:
       "Stažení modelů vyžaduje internet. Po instalaci zůstávají bezplatné konverzace a relace zcela v zařízení.",
     freeOfflineProfile: "Doporučená místní sestava",
@@ -573,9 +573,9 @@ const rawPremiumTranslations = {
       `${model} · ${index} z ${count}`,
     freeOfflineReady: "Soukromá offline sestava je připravena.",
     freeOfflineUnavailableLanguage:
-      "Pro všechny vybrané jazyky zatím není kompletní místní sestava.",
+      "Pro tento jazyk zatím není kompletní místní sestava.",
     freeOfflineUnavailableDevice:
-      "Tento telefon nemůže bezpečně spustit kompletní místní sestavu pro tyto jazyky.",
+      "Tento telefon nemůže bezpečně spustit kompletní místní sestavu pro tento jazyk.",
     freeOfflineUnavailableStorage:
       "Pro kompletní místní sestavu není dostatek volného místa.",
     freeOfflineUnavailableTemporary:
@@ -601,7 +601,7 @@ const rawPremiumTranslations = {
     premiumErrorPending: "Zakup oczekuje na zatwierdzenie.",
     freeOfflineTitle: "Prywatny tryb na urządzeniu",
     freeOfflineIntro:
-      "Wybierz języki. Mr Broccoli automatycznie znajdzie pełny lokalny zestaw do słuchania, myślenia i mówienia odpowiedni dla telefonu.",
+      "Wybierz preferowany język mówiony. Mr Broccoli automatycznie znajdzie pełny lokalny zestaw do słuchania, myślenia i mówienia odpowiedni dla telefonu.",
     freeOfflineInternetDisclosure:
       "Pobranie modeli wymaga internetu. Po instalacji bezpłatne rozmowy i sesje pozostają w całości na urządzeniu.",
     freeOfflineProfile: "Zalecany zestaw lokalny",
@@ -611,9 +611,9 @@ const rawPremiumTranslations = {
       `${model} · ${index} z ${count}`,
     freeOfflineReady: "Prywatny zestaw offline jest gotowy.",
     freeOfflineUnavailableLanguage:
-      "Nie ma jeszcze pełnego zestawu lokalnego dla wszystkich wybranych języków.",
+      "Nie ma jeszcze pełnego zestawu lokalnego dla tego języka.",
     freeOfflineUnavailableDevice:
-      "Ten telefon nie może bezpiecznie uruchomić pełnego zestawu lokalnego dla tych języków.",
+      "Ten telefon nie może bezpiecznie uruchomić pełnego zestawu lokalnego dla tego języka.",
     freeOfflineUnavailableStorage:
       "Za mało wolnego miejsca na pełny zestaw lokalny.",
     freeOfflineUnavailableTemporary:
@@ -640,7 +640,7 @@ const rawPremiumTranslations = {
     premiumErrorPending: "Satın alma onay bekliyor.",
     freeOfflineTitle: "Özel cihaz içi mod",
     freeOfflineIntro:
-      "Konuşma dillerini seçin. Mr Broccoli bu telefona uygun eksiksiz yerel dinleme, düşünme ve konuşma kurulumunu otomatik bulur.",
+      "Tercih ettiğiniz konuşma dilini seçin. Mr Broccoli bu telefona uygun eksiksiz yerel dinleme, düşünme ve konuşma kurulumunu otomatik bulur.",
     freeOfflineInternetDisclosure:
       "Model indirmek için internet gerekir. Kurulumdan sonra ücretsiz konuşmalar ve oturumlar tamamen bu cihazda kalır.",
     freeOfflineProfile: "Önerilen yerel kurulum",
@@ -650,9 +650,9 @@ const rawPremiumTranslations = {
       `${model} · ${index}/${count}`,
     freeOfflineReady: "Özel çevrimdışı kurulum hazır.",
     freeOfflineUnavailableLanguage:
-      "Henüz seçilen tüm dilleri destekleyen eksiksiz yerel kurulum yok.",
+      "Bu dili destekleyen eksiksiz yerel kurulum henüz yok.",
     freeOfflineUnavailableDevice:
-      "Bu telefon bu diller için eksiksiz yerel kurulumu güvenle çalıştıramıyor.",
+      "Bu telefon bu dil için eksiksiz yerel kurulumu güvenle çalıştıramıyor.",
     freeOfflineUnavailableStorage:
       "Eksiksiz yerel kurulum için yeterli boş alan yok.",
     freeOfflineUnavailableTemporary:
@@ -678,7 +678,7 @@ const rawPremiumTranslations = {
     premiumErrorPending: "Köpet väntar på godkännande.",
     freeOfflineTitle: "Privat läge på enheten",
     freeOfflineIntro:
-      "Välj samtalsspråk. Mr Broccoli hittar automatiskt en komplett lokal uppsättning för lyssning, tänkande och tal som passar telefonen.",
+      "Välj önskat talspråk. Mr Broccoli hittar automatiskt en komplett lokal uppsättning för lyssning, tänkande och tal som passar telefonen.",
     freeOfflineInternetDisclosure:
       "Modellhämtningen kräver internet. Efter installationen stannar gratis samtal och sessioner helt på enheten.",
     freeOfflineProfile: "Rekommenderad lokal uppsättning",
@@ -688,9 +688,9 @@ const rawPremiumTranslations = {
       `${model} · ${index} av ${count}`,
     freeOfflineReady: "Din privata offlineuppsättning är klar.",
     freeOfflineUnavailableLanguage:
-      "Det finns ännu ingen komplett lokal uppsättning för alla valda språk.",
+      "Det finns ännu ingen komplett lokal uppsättning för det här språket.",
     freeOfflineUnavailableDevice:
-      "Telefonen kan inte säkert köra en komplett lokal uppsättning för dessa språk.",
+      "Telefonen kan inte säkert köra en komplett lokal uppsättning för det här språket.",
     freeOfflineUnavailableStorage:
       "Det finns inte tillräckligt med ledigt utrymme för den kompletta lokala uppsättningen.",
     freeOfflineUnavailableTemporary:
@@ -717,7 +717,7 @@ const rawPremiumTranslations = {
     premiumErrorPending: "خریداری منظوری کی منتظر ہے۔",
     freeOfflineTitle: "نجی آن ڈیوائس موڈ",
     freeOfflineIntro:
-      "گفتگو کی زبانیں منتخب کریں۔ Mr Broccoli خودکار طور پر اس فون کے لیے مکمل مقامی سننے، سوچنے اور بولنے کا سیٹ تلاش کرے گا۔",
+      "اپنی پسندیدہ بولنے کی زبان منتخب کریں۔ Mr Broccoli خودکار طور پر اس فون کے لیے مکمل مقامی سننے، سوچنے اور بولنے کا سیٹ تلاش کرے گا۔",
     freeOfflineInternetDisclosure:
       "ماڈل ڈاؤن لوڈ کے لیے انٹرنیٹ چاہیے۔ تنصیب کے بعد مفت گفتگو اور سیشن مکمل طور پر اسی ڈیوائس پر رہتے ہیں۔",
     freeOfflineProfile: "تجویز کردہ مقامی سیٹ",
@@ -727,9 +727,9 @@ const rawPremiumTranslations = {
       `${model} · ${index}/${count}`,
     freeOfflineReady: "نجی آف لائن سیٹ تیار ہے۔",
     freeOfflineUnavailableLanguage:
-      "ابھی تمام منتخب زبانوں کے لیے مکمل مقامی سیٹ دستیاب نہیں۔",
+      "اس زبان کے لیے ابھی مکمل مقامی سیٹ دستیاب نہیں۔",
     freeOfflineUnavailableDevice:
-      "یہ فون ان زبانوں کے لیے مکمل مقامی سیٹ محفوظ طریقے سے نہیں چلا سکتا۔",
+      "یہ فون اس زبان کے لیے مکمل مقامی سیٹ محفوظ طریقے سے نہیں چلا سکتا۔",
     freeOfflineUnavailableStorage: "مکمل مقامی سیٹ کے لیے کافی خالی جگہ نہیں۔",
     freeOfflineUnavailableTemporary:
       "فون عارضی طور پر میموری، توانائی یا گرمی کے دباؤ میں ہے۔ بعد میں کوشش کریں۔",

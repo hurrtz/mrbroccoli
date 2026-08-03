@@ -11,7 +11,7 @@ const en = {
   premiumBenefitTools: "Add web search, images, and cloud Drive sessions",
   premiumBenefitKnowledge:
     "Use past-session knowledge and the portable Markdown archive",
-  freeOfflineLanguagesStep: "1 · Choose conversation languages",
+  freeOfflineLanguagesStep: "1 · Choose your speaking language",
   freeOfflineModelsStep: "2 · Prepare private AI",
   freeOfflineStartStep: "3 · Start talking",
   freeOfflineSystemVoiceNote:
@@ -41,7 +41,7 @@ export const editionTranslations = {
       "Nutze Websuche, Bilder und Cloud-Sitzungen im Drive-Modus",
     premiumBenefitKnowledge:
       "Nutze Wissen aus früheren Sitzungen und das portable Markdown-Archiv",
-    freeOfflineLanguagesStep: "1 · Gesprächssprachen wählen",
+    freeOfflineLanguagesStep: "1 · Deine Sprechsprache wählen",
     freeOfflineModelsStep: "2 · Private KI vorbereiten",
     freeOfflineStartStep: "3 · Gespräch starten",
     freeOfflineSystemVoiceNote:
@@ -64,7 +64,7 @@ export const editionTranslations = {
     premiumBenefitTools: "Додайте вебпошук, зображення та хмарні сесії Drive",
     premiumBenefitKnowledge:
       "Використовуйте знання минулих сесій і переносний Markdown-архів",
-    freeOfflineLanguagesStep: "1 · Виберіть мови розмови",
+    freeOfflineLanguagesStep: "1 · Виберіть мову спілкування",
     freeOfflineModelsStep: "2 · Підготуйте приватний ШІ",
     freeOfflineStartStep: "3 · Почніть розмову",
     freeOfflineSystemVoiceNote:
@@ -87,7 +87,7 @@ export const editionTranslations = {
     premiumBenefitTools: "वेब खोज, चित्र और क्लाउड Drive सत्र जोड़ें",
     premiumBenefitKnowledge:
       "पिछले सत्रों की जानकारी और पोर्टेबल Markdown संग्रह इस्तेमाल करें",
-    freeOfflineLanguagesStep: "1 · बातचीत की भाषाएँ चुनें",
+    freeOfflineLanguagesStep: "1 · अपनी बोलने की भाषा चुनें",
     freeOfflineModelsStep: "2 · निजी AI तैयार करें",
     freeOfflineStartStep: "3 · बातचीत शुरू करें",
     freeOfflineSystemVoiceNote:
@@ -111,7 +111,7 @@ export const editionTranslations = {
       "Añade búsqueda web, imágenes y sesiones Drive en la nube",
     premiumBenefitKnowledge:
       "Usa conocimiento de sesiones anteriores y el archivo Markdown portátil",
-    freeOfflineLanguagesStep: "1 · Elige los idiomas",
+    freeOfflineLanguagesStep: "1 · Elige tu idioma hablado",
     freeOfflineModelsStep: "2 · Prepara la IA privada",
     freeOfflineStartStep: "3 · Empieza a hablar",
     freeOfflineSystemVoiceNote:
@@ -135,7 +135,7 @@ export const editionTranslations = {
       "Ajoutez recherche web, images et sessions Drive dans le cloud",
     premiumBenefitKnowledge:
       "Utilisez les connaissances passées et l’archive Markdown portable",
-    freeOfflineLanguagesStep: "1 · Choisissez les langues",
+    freeOfflineLanguagesStep: "1 · Choisissez votre langue parlée",
     freeOfflineModelsStep: "2 · Préparez l’IA privée",
     freeOfflineStartStep: "3 · Commencez à parler",
     freeOfflineSystemVoiceNote:
@@ -159,7 +159,7 @@ export const editionTranslations = {
       "Aggiungi ricerca web, immagini e sessioni Drive nel cloud",
     premiumBenefitKnowledge:
       "Usa la conoscenza delle sessioni passate e l’archivio Markdown portatile",
-    freeOfflineLanguagesStep: "1 · Scegli le lingue",
+    freeOfflineLanguagesStep: "1 · Scegli la lingua parlata",
     freeOfflineModelsStep: "2 · Prepara l’IA privata",
     freeOfflineStartStep: "3 · Inizia a parlare",
     freeOfflineSystemVoiceNote:
@@ -183,7 +183,7 @@ export const editionTranslations = {
       "Adicione pesquisa web, imagens e sessões Drive na cloud",
     premiumBenefitKnowledge:
       "Use conhecimento de sessões anteriores e o arquivo Markdown portátil",
-    freeOfflineLanguagesStep: "1 · Escolha os idiomas",
+    freeOfflineLanguagesStep: "1 · Escolha o idioma falado",
     freeOfflineModelsStep: "2 · Prepare a IA privada",
     freeOfflineStartStep: "3 · Comece a falar",
     freeOfflineSystemVoiceNote:
@@ -207,7 +207,7 @@ export const editionTranslations = {
       "Adicione busca na web, imagens e sessões Drive na nuvem",
     premiumBenefitKnowledge:
       "Use conhecimento de sessões anteriores e o arquivo Markdown portátil",
-    freeOfflineLanguagesStep: "1 · Escolha os idiomas",
+    freeOfflineLanguagesStep: "1 · Escolha seu idioma falado",
     freeOfflineModelsStep: "2 · Prepare a IA privada",
     freeOfflineStartStep: "3 · Comece a falar",
     freeOfflineSystemVoiceNote:
@@ -231,7 +231,7 @@ export const editionTranslations = {
       "Добавьте веб-поиск, изображения и облачные сеансы Drive",
     premiumBenefitKnowledge:
       "Используйте знания прошлых сеансов и переносимый Markdown-архив",
-    freeOfflineLanguagesStep: "1 · Выберите языки разговора",
+    freeOfflineLanguagesStep: "1 · Выберите язык общения",
     freeOfflineModelsStep: "2 · Подготовьте приватный ИИ",
     freeOfflineStartStep: "3 · Начните разговор",
     freeOfflineSystemVoiceNote:
@@ -251,7 +251,7 @@ export const editionTranslations = {
     premiumBenefitModes: "切换回复模式并运行多模型 Uber 协商",
     premiumBenefitTools: "加入网页搜索、图片和云端 Drive 会话",
     premiumBenefitKnowledge: "使用过往会话知识和可携带的 Markdown 档案",
-    freeOfflineLanguagesStep: "1 · 选择对话语言",
+    freeOfflineLanguagesStep: "1 · 选择你的口语",
     freeOfflineModelsStep: "2 · 准备私密 AI",
     freeOfflineStartStep: "3 · 开始对话",
     freeOfflineSystemVoiceNote:
@@ -272,7 +272,7 @@ export const editionTranslations = {
     premiumBenefitTools: "أضف بحث الويب والصور وجلسات Drive السحابية",
     premiumBenefitKnowledge:
       "استخدم معرفة الجلسات السابقة وأرشيف Markdown القابل للنقل",
-    freeOfflineLanguagesStep: "1 · اختر لغات المحادثة",
+    freeOfflineLanguagesStep: "1 · اختر لغة التحدث",
     freeOfflineModelsStep: "2 · جهّز الذكاء الاصطناعي الخاص",
     freeOfflineStartStep: "3 · ابدأ الحديث",
     freeOfflineSystemVoiceNote:
@@ -293,7 +293,7 @@ export const editionTranslations = {
     premiumBenefitTools: "ウェブ検索、画像、クラウド Drive セッションを追加",
     premiumBenefitKnowledge:
       "過去セッションの知識と持ち運べる Markdown アーカイブを利用",
-    freeOfflineLanguagesStep: "1 · 会話言語を選ぶ",
+    freeOfflineLanguagesStep: "1 · 話す言語を選ぶ",
     freeOfflineModelsStep: "2 · プライベート AI を準備",
     freeOfflineStartStep: "3 · 会話を始める",
     freeOfflineSystemVoiceNote:
@@ -317,7 +317,7 @@ export const editionTranslations = {
       "Adj hozzá webes keresést, képeket és felhős Drive-meneteket",
     premiumBenefitKnowledge:
       "Használd a korábbi menetek tudását és a hordozható Markdown-archívumot",
-    freeOfflineLanguagesStep: "1 · Válaszd ki a beszélgetés nyelveit",
+    freeOfflineLanguagesStep: "1 · Válaszd ki a beszélt nyelvet",
     freeOfflineModelsStep: "2 · Készítsd elő a privát MI-t",
     freeOfflineStartStep: "3 · Kezdj beszélgetni",
     freeOfflineSystemVoiceNote:
@@ -341,7 +341,7 @@ export const editionTranslations = {
       "Přidejte webové hledání, obrázky a cloudové relace Drive",
     premiumBenefitKnowledge:
       "Používejte znalosti minulých relací a přenosný archiv Markdown",
-    freeOfflineLanguagesStep: "1 · Vyberte jazyky konverzace",
+    freeOfflineLanguagesStep: "1 · Vyberte jazyk mluvení",
     freeOfflineModelsStep: "2 · Připravte soukromou AI",
     freeOfflineStartStep: "3 · Začněte mluvit",
     freeOfflineSystemVoiceNote:
@@ -365,7 +365,7 @@ export const editionTranslations = {
       "Dodaj wyszukiwanie w sieci, obrazy i chmurowe sesje Drive",
     premiumBenefitKnowledge:
       "Korzystaj z wiedzy z poprzednich sesji i przenośnego archiwum Markdown",
-    freeOfflineLanguagesStep: "1 · Wybierz języki rozmowy",
+    freeOfflineLanguagesStep: "1 · Wybierz język mówiony",
     freeOfflineModelsStep: "2 · Przygotuj prywatną AI",
     freeOfflineStartStep: "3 · Zacznij rozmawiać",
     freeOfflineSystemVoiceNote:
@@ -389,7 +389,7 @@ export const editionTranslations = {
       "Web araması, görseller ve bulut Drive oturumları ekleyin",
     premiumBenefitKnowledge:
       "Geçmiş oturum bilgisini ve taşınabilir Markdown arşivini kullanın",
-    freeOfflineLanguagesStep: "1 · Konuşma dillerini seçin",
+    freeOfflineLanguagesStep: "1 · Konuşma dilinizi seçin",
     freeOfflineModelsStep: "2 · Özel yapay zekâyı hazırlayın",
     freeOfflineStartStep: "3 · Konuşmaya başlayın",
     freeOfflineSystemVoiceNote:
@@ -413,7 +413,7 @@ export const editionTranslations = {
       "Lägg till webbsökning, bilder och Drive-sessioner i molnet",
     premiumBenefitKnowledge:
       "Använd kunskap från tidigare sessioner och det portabla Markdown-arkivet",
-    freeOfflineLanguagesStep: "1 · Välj samtalsspråk",
+    freeOfflineLanguagesStep: "1 · Välj ditt talspråk",
     freeOfflineModelsStep: "2 · Förbered privat AI",
     freeOfflineStartStep: "3 · Börja prata",
     freeOfflineSystemVoiceNote:
@@ -436,7 +436,7 @@ export const editionTranslations = {
     premiumBenefitTools: "ویب تلاش، تصاویر اور کلاؤڈ Drive سیشن شامل کریں",
     premiumBenefitKnowledge:
       "پچھلے سیشن کا علم اور قابل منتقلی Markdown آرکائیو استعمال کریں",
-    freeOfflineLanguagesStep: "1 · گفتگو کی زبانیں منتخب کریں",
+    freeOfflineLanguagesStep: "1 · اپنی بولنے کی زبان منتخب کریں",
     freeOfflineModelsStep: "2 · نجی AI تیار کریں",
     freeOfflineStartStep: "3 · گفتگو شروع کریں",
     freeOfflineSystemVoiceNote:
