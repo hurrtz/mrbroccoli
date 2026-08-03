@@ -202,8 +202,11 @@ __tests__/              Focused hook and service tests
 - Home screen icons and launcher assets require a new native build. OTA updates alone will not change them.
 - Sherpa/ONNX and llama.rn runtime changes require a native rebuild; adding only
   an OTA update is not sufficient.
-- The iOS bundle identifier is `com.tobiaswinkler.app.mrbroccoli`.
-- The Android application ID and namespace are `com.tobiaswinkler.app.mrbroccoli`.
+- Release builds use `com.tobiaswinkler.app.mrbroccoli` as the iOS bundle
+  identifier and Android application ID. Debug builds append `.dev` so local
+  installs can coexist with the App Store or Play Store app.
+- The Android namespace remains `com.tobiaswinkler.app.mrbroccoli` in every
+  build variant.
 - The Expo slug and on-device persistence keys use the `mrbroccoli` namespace.
 
 ## License

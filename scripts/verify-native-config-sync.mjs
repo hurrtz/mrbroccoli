@@ -44,6 +44,12 @@ const imagePickerOptions = imagePickerPlugin?.[1] ?? {};
 const androidStrings = readText(
   "android/app/src/main/res/values/strings.xml",
 );
+const androidDebugStrings = readText(
+  "android/app/src/debug/res/values/strings.xml",
+);
+const androidInstrumentation = readText(
+  "scripts/run-android-instrumentation.mjs",
+);
 const androidDiagnostics = readText(
   "android/app/src/main/java/com/tobiaswinkler/app/mrbroccoli/MrBroccoliDiagnosticsModule.kt",
 );
@@ -119,8 +125,10 @@ async function pngFingerprint(path) {
 }
 
 const iosBundleIdentifier = appConfig.ios?.bundleIdentifier;
+const iosDevelopmentBundleIdentifier = `${iosBundleIdentifier}.dev`;
 const iosDeploymentTarget = appConfig.ios?.deploymentTarget;
 const androidPackage = appConfig.android?.package;
+const androidDevelopmentPackage = `${androidPackage}.dev`;
 const scheme = appConfig.scheme;
 const iconPath = appConfig.icon?.replace(/^\.\//, "");
 const iosIconPath = appConfig.ios?.icon?.replace(/^\.\//, "");
@@ -141,6 +149,9 @@ const iosBundleVersion =
 const iosProjectVersions = [
   ...iosProject.matchAll(/CURRENT_PROJECT_VERSION = ([^;]+);/g),
 ].map((match) => match[1]);
+const iosBundleIdentifiers = [
+  ...iosProject.matchAll(/PRODUCT_BUNDLE_IDENTIFIER = ([^;]+);/g),
+].map((match) => match[1]);
 
 assertIncludes(
   "iOS camera permission",
@@ -157,10 +168,10 @@ assertIncludes(
   androidManifest,
   '<uses-permission android:name="android.permission.CAMERA"/>',
 );
-assertExcludes(
-  "Android Debug package remains Play Billing compatible",
+assertIncludes(
+  "Android Debug application ID suffix",
   androidBuild,
-  "applicationIdSuffix",
+  "buildTypes {\n        debug {\n            applicationIdSuffix '.dev'",
 );
 assertExcludes(
   "Premium entitlement does not depend on __DEV__",
@@ -282,14 +293,29 @@ assertIncludes(
   "expo.sqlite.enableFTS=true",
 );
 assertIncludes(
-  "iOS display name",
+  "iOS configuration-specific display name",
   iosInfo,
-  `<string>${appConfig.name}</string>`,
+  "<string>$(APP_DISPLAY_NAME)</string>",
+);
+assertIncludes(
+  "iOS Debug display name",
+  iosProject,
+  `APP_DISPLAY_NAME = "${appConfig.name} Dev";`,
+);
+assertIncludes(
+  "iOS Release display name",
+  iosProject,
+  `APP_DISPLAY_NAME = "${appConfig.name}";`,
 );
 assertIncludes(
   "Android display name",
   androidStrings,
   `>${appConfig.name}</string>`,
+);
+assertIncludes(
+  "Android Debug display name",
+  androidDebugStrings,
+  `>${appConfig.name} Dev</string>`,
 );
 assertIncludes("iOS URL scheme", iosInfo, `<string>${scheme}</string>`);
 assertIncludes(
@@ -297,15 +323,19 @@ assertIncludes(
   androidManifest,
   `android:scheme="${scheme}"`,
 );
-assertIncludes(
-  "iOS bundle identifier",
-  iosProject,
-  `PRODUCT_BUNDLE_IDENTIFIER = ${iosBundleIdentifier};`,
-);
-assertIncludes(
-  "iOS Live Activity bundle identifier",
-  iosProject,
-  `PRODUCT_BUNDLE_IDENTIFIER = ${iosBundleIdentifier}.liveactivity;`,
+assertEqual(
+  "iOS configuration-specific bundle identifiers",
+  JSON.stringify([...iosBundleIdentifiers].sort()),
+  JSON.stringify(
+    [
+      iosBundleIdentifier,
+      `${iosBundleIdentifier}.liveactivity`,
+      `${iosBundleIdentifier}.tests`,
+      iosDevelopmentBundleIdentifier,
+      `${iosDevelopmentBundleIdentifier}.liveactivity`,
+      `${iosDevelopmentBundleIdentifier}.tests`,
+    ].sort(),
+  ),
 );
 assertIncludes(
   "iOS Podfile deployment target",
@@ -331,6 +361,11 @@ assertIncludes(
   "Android application ID",
   androidBuild,
   `applicationId '${androidPackage}'`,
+);
+assertIncludes(
+  "Android instrumentation application ID",
+  androidInstrumentation,
+  `const APP_PACKAGE = "${androidDevelopmentPackage}";`,
 );
 assertIncludes(
   "Android Play Billing permission",
