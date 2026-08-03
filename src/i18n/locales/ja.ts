@@ -25,7 +25,7 @@ export const ja = {
   ...onboardingTranslations.ja,
   ...premiumTranslations.ja,
   ...transcriptEditTranslations.ja,
-  appName: "ミスター・ブロッコリー",
+  appName: "Mr Broccoli",
   retry: "再試行",
   dismiss: "閉じる",
   done: "完了",
@@ -392,7 +392,7 @@ export const ja = {
   providerTtsDescription: "選択した構成済みサービスを音声応答に使用します。",
   ttsFallbackRoutes: "フォールバック ルート",
   ttsFallbackRoutesHint:
-    "オプション。必要なルートのみを、試行する順序で追加します。ルートが話し始めると、ミスター・ブロッコリーは残りの応答の間ルート上に留まります。",
+    "オプション。必要なルートのみを、試行する順序で追加します。ルートが話し始めると、Mr Broccoliは残りの応答の間ルート上に留まります。",
   ttsFallbackNone:
     "フォールバックは設定されていません。音声ルートに失敗した場合はエラーを表示します。",
   ttsFallbackPosition: ({ position, route }) => `${position}。 ${route}`,
@@ -427,7 +427,7 @@ export const ja = {
   elevenLabsVoicesReadPermissionHint:
     "ElevenLabsでこのAPIキーを編集し、「Voices → Read」を有効にしてから、ここで更新してください。",
   providerVoicesLoadingHint: ({ provider }) =>
-    `ミスター・ブロッコリーは、${provider} から利用可能な音声を自動的にロードします。`,
+    `Mr Broccoliは、${provider} から利用可能な音声を自動的にロードします。`,
   providerVoiceId: "音声ID",
   providerVoiceIdPlaceholder: "音声 ID を入力してください",
   providerVoiceIdFallbackHint:
@@ -435,7 +435,7 @@ export const ja = {
   providerVoiceIdRequired: ({ provider }) =>
     `音声出力を使用する前に、${provider} 音声ライブラリを更新するか、音声 ID を入力してください。`,
   qwenSpeechUnavailableInUs:
-    "ミスター・ブロッコリーの現在のQwen音声ルートは米国リージョンでは利用できません。Qwenの音声機能にはシンガポールまたは北京を選択してください。",
+    "Mr Broccoliの現在のQwen音声ルートは米国リージョンでは利用できません。Qwenの音声機能にはシンガポールまたは北京を選択してください。",
   qwenApiRegion: "Qwen API リージョン",
   qwenRegionSingapore: "シンガポール",
   qwenRegionUs: "米国 (バージニア)",
@@ -443,12 +443,12 @@ export const ja = {
   qwenRegionHint:
     "選択したリージョンは、この API キーが作成されたリージョンと一致する必要があります。",
   qwenRegionUsSpeechHint:
-    "米国地域キーは、ここでチャットと Web 検索をサポートします。ミスター・ブロッコリーの現在の Qwen STT および TTS ルートには、シンガポールまたは北京のキーが必要です。",
+    "米国地域キーは、ここでチャットと Web 検索をサポートします。Mr Broccoliの現在の Qwen STT および TTS ルートには、シンガポールまたは北京のキーが必要です。",
   providerDefaultVoiceHint:
     "このプロバイダーは現在、プレビューおよび音声応答にデフォルトの音声を使用しています。",
   listenLanguages: "読み上げ言語",
   listenLanguagesHint:
-    "聞こえの良い返信言語を選択してください。ミスター・ブロッコリーは、音声出力をルーティングするときに、この順序でそれらを試行します。",
+    "聞こえの良い返信言語を選択してください。Mr Broccoliは、音声出力をルーティングするときに、この順序でそれらを試行します。",
   listenLanguagesSelected: ({ count }) =>
     count === 1
       ? "1 つの言語が選択されました"
@@ -467,7 +467,7 @@ export const ja = {
     "このデバイスはプレビュー用のネイティブ システム音声を報告しませんでした。",
   runtimeCompatibilityOverrides: "実行時の互換性",
   runtimeCompatibilityOverridesDescription: ({ count }) =>
-    `プロバイダーが利用不可と確認したモデルまたは設定の構成 ${count} 件を、この端末だけで無効にしています。ミスター・ブロッコリーが自動的に回避します。`,
+    `プロバイダーが利用不可と確認したモデルまたは設定の構成 ${count} 件を、この端末だけで無効にしています。Mr Broccoliが自動的に回避します。`,
   clearRuntimeCompatibilityOverrides: "実行時の互換性を消去",
   clearRuntimeCompatibilityOverridesConfirmationTitle:
     "実行時の互換性を消去しますか？",
@@ -612,7 +612,7 @@ export const ja = {
   conversationActions: "会話アクション",
   statusDetails: "ステータスの詳細",
   persistenceFailure:
-    "ミスター・ブロッコリーはこのデバイスにデータを保存できませんでした。アプリを開いたままにして、もう一度試してください。最近の変更は再起動後に失われる可能性があります。",
+    "Mr Broccoliはこのデバイスにデータを保存できませんでした。アプリを開いたままにして、もう一度試してください。最近の変更は再起動後に失われる可能性があります。",
   show: "表示",
   showTranscript: "トランスクリプトを表示",
   hide: "非表示",
@@ -707,7 +707,7 @@ export const ja = {
   idle: "アイドル",
   yourConversationAppearsHere: "あなたの会話がここに表示されます",
   defaultTranscriptEmptyDescription:
-    "音声またはテキストを使用して始めます。ミスター・ブロッコリーはスレッドを維持し、ここで応答します。",
+    "音声またはテキストを使用して始めます。Mr Broccoliはスレッドを維持し、ここで応答します。",
   delete: "削除",
   deleteConversationConfirmationTitle: ({ title }) =>
     `「${title}」を削除しますか？`,
@@ -720,7 +720,7 @@ export const ja = {
   newSession: "新しいセッション",
   noSavedConversationsYet: "保存された会話はまだありません",
   drawerEmptyDescription:
-    "メインビューから話し始めると、ミスター・ブロッコリーが自動的にセッションを構築します。",
+    "メインビューから話し始めると、Mr Broccoliが自動的にセッションを構築します。",
   setupGuideTitle: "アプリを設定する",
   setupGuideSubtitle: "認証情報を追加し、設定でルートを選択します。",
   fastestStartPreset: "最小限のセットアップ",
@@ -733,9 +733,9 @@ export const ja = {
     "次に [設定] を開いて、認証情報を貼り付けて検証できるようにします。",
   useThisSetup: "この設定を使用",
   notNow: "今はしない",
-  setupGuideIntroTitle: "ミスター・ブロッコリーの仕組み",
+  setupGuideIntroTitle: "Mr Broccoliの仕組み",
   setupGuideIntroBody:
-    "ミスター・ブロッコリーは空白で始まります。すでに使用している外部サービスの資格情報を追加し、応答、音声入力、音声出力、およびオプションの Web コンテキストのルーティング方法を選択します。",
+    "Mr Broccoliは空白で始まります。すでに使用している外部サービスの資格情報を追加し、応答、音声入力、音声出力、およびオプションの Web コンテキストのルーティング方法を選択します。",
   setupGuideIntroNote:
     "セットアップ後、メインの音声コントロールを使用して会話を開始および停止します。現在のトランスクリプトはホーム画面で利用可能なままであり、すべてのルートは後から設定で変更できます。",
   setupGuideProviderTitle: "認証情報の追加",
@@ -768,7 +768,7 @@ export const ja = {
   setupGuideSkipKokoro: "今はスキップしてください",
   setupGuideVoiceTestTitle: "セットアップをテストする",
   setupGuideVoiceTestBody:
-    "短い文を言ってください。ミスター・ブロッコリーは、マイクのアクセス、文字起こし、設定された応答ルート、および許容可能な音声ルートが利用可能な場合の音声出力をテストします。",
+    "短い文を言ってください。Mr Broccoliは、マイクのアクセス、文字起こし、設定された応答ルート、および許容可能な音声ルートが利用可能な場合の音声出力をテストします。",
   setupGuideVoiceTestNoInputBody:
     "このセットアップでは音声入力は利用できません。引き続き検出されたルートを確認し、必要に応じて後で音声設定を調整します。",
   setupGuideVoiceTestTextOnlyNote:
@@ -787,7 +787,7 @@ export const ja = {
     "このデバイスのこの設定では音声入力は利用できません。",
   setupGuideSummaryTitle: "セットアップ完了",
   setupGuideSummaryBody:
-    "これは、ミスター・ブロッコリーが現在の構成で使用するルートです。",
+    "これは、Mr Broccoliが現在の構成で使用するルートです。",
   setupGuideSummaryLlm: "LLM",
   setupGuideSummaryStt: "音声をテキストに変換",
   setupGuideSummaryTts: "テキスト読み上げ",
@@ -812,7 +812,7 @@ export const ja = {
     "トランスクリプトとは異なるタイトル、ルート、モデル、またはフレーズを試してください。",
   memoryModalTitle: "会話記憶",
   memoryModalDescription:
-    "これは、スレッドが古いターンを圧縮するのに十分な長さになると、ミスター・ブロッコリーが引き継ぐコンパクトな要約です。",
+    "これは、スレッドが古いターンを圧縮するのに十分な長さになると、Mr Broccoliが引き継ぐコンパクトな要約です。",
   memorySummary: "保存済みの要約",
   memorySummaryEmpty:
     "まだコンパクトなメモリがありません。このスレッドが長くなったら、古いターンはここにまとめられます。",

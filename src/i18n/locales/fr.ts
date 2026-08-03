@@ -25,7 +25,7 @@ export const fr = {
   ...onboardingTranslations.fr,
   ...premiumTranslations.fr,
   ...transcriptEditTranslations.fr,
-  appName: "M. Brocoli",
+  appName: "Mr Broccoli",
   retry: "Réessayer",
   dismiss: "Fermer",
   done: "Terminé",
@@ -393,7 +393,7 @@ export const fr = {
     "Utilisez le service configuré sélectionné pour les réponses vocales.",
   ttsFallbackRoutes: "Itinéraires de secours",
   ttsFallbackRoutesHint:
-    "Facultatif. Ajoutez uniquement les itinéraires souhaités, dans l’ordre dans lequel ils doivent être essayés. Une fois qu'un itinéraire commence à parler, M. Brocoli y reste pour le reste de la réponse.",
+    "Facultatif. Ajoutez uniquement les itinéraires souhaités, dans l’ordre dans lequel ils doivent être essayés. Une fois qu'un itinéraire commence à parler, Mr Broccoli y reste pour le reste de la réponse.",
   ttsFallbackNone:
     "Aucune solution de secours n'est configurée. Un échec vocal sera affiché à la place.",
   ttsFallbackPosition: ({ position, route }) => `${position}. ${route}`,
@@ -428,7 +428,7 @@ export const fr = {
   elevenLabsVoicesReadPermissionHint:
     "Dans ElevenLabs, modifiez cette clé API et activez Voix → Lire, puis actualisez ici.",
   providerVoicesLoadingHint: ({ provider }) =>
-    `M. Brocoli charge automatiquement les voix disponibles à partir de ${provider}.`,
+    `Mr Broccoli charge automatiquement les voix disponibles à partir de ${provider}.`,
   providerVoiceId: "Identifiant vocal",
   providerVoiceIdPlaceholder: "Entrez un identifiant vocal",
   providerVoiceIdFallbackHint:
@@ -436,7 +436,7 @@ export const fr = {
   providerVoiceIdRequired: ({ provider }) =>
     `Actualisez la bibliothèque vocale ${provider} ou saisissez un identifiant vocal avant d'utiliser la sortie vocale.`,
   qwenSpeechUnavailableInUs:
-    "Les routes vocales Qwen actuelles de M. Brocoli ne sont pas disponibles dans la région des États-Unis. Choisissez Singapour ou Pékin pour le discours Qwen.",
+    "Les routes vocales Qwen actuelles de Mr Broccoli ne sont pas disponibles dans la région des États-Unis. Choisissez Singapour ou Pékin pour le discours Qwen.",
   qwenApiRegion: "Région Qwen API",
   qwenRegionSingapore: "Singapour",
   qwenRegionUs: "États-Unis (Virginie)",
@@ -444,12 +444,12 @@ export const fr = {
   qwenRegionHint:
     "La région sélectionnée doit correspondre à la région dans laquelle cette clé API a été créée.",
   qwenRegionUsSpeechHint:
-    "Les clés de la région américaine prennent en charge le chat et la recherche sur le Web ici. Les itinéraires Qwen STT et TTS actuels de M. Brocoli nécessitent une clé de Singapour ou de Pékin.",
+    "Les clés de la région américaine prennent en charge le chat et la recherche sur le Web ici. Les itinéraires Qwen STT et TTS actuels de Mr Broccoli nécessitent une clé de Singapour ou de Pékin.",
   providerDefaultVoiceHint:
     "Ce fournisseur utilise actuellement sa voix par défaut pour l'aperçu et les réponses vocales.",
   listenLanguages: "Écouter les langues",
   listenLanguagesHint:
-    "Choisissez les langues de réponse dans lesquelles vous souhaitez que le son soit bon. M. Brocoli les essaie dans cet ordre lors du routage de la sortie vocale.",
+    "Choisissez les langues de réponse dans lesquelles vous souhaitez que le son soit bon. Mr Broccoli les essaie dans cet ordre lors du routage de la sortie vocale.",
   listenLanguagesSelected: ({ count }) =>
     count === 1 ? "1 langue sélectionnée" : `${count} langues sélectionnées`,
   localVoicePacks: "Packs vocaux locaux",
@@ -466,7 +466,7 @@ export const fr = {
     "Cet appareil n'a signalé aucune voix système native pour l'aperçu.",
   runtimeCompatibilityOverrides: "Compatibilité d’exécution",
   runtimeCompatibilityOverridesDescription: ({ count }) =>
-    `${count} configurations de modèle ou de réglage confirmées indisponibles par le fournisseur sont désactivées uniquement sur cet appareil. M. Brocoli les contourne automatiquement.`,
+    `${count} configurations de modèle ou de réglage confirmées indisponibles par le fournisseur sont désactivées uniquement sur cet appareil. Mr Broccoli les contourne automatiquement.`,
   clearRuntimeCompatibilityOverrides: "Effacer la compatibilité d’exécution",
   clearRuntimeCompatibilityOverridesConfirmationTitle:
     "Effacer la compatibilité d’exécution ?",
@@ -611,7 +611,7 @@ export const fr = {
   conversationActions: "Actions de conversation",
   statusDetails: "Détails du statut",
   persistenceFailure:
-    "M. Brocoli n'a pas pu enregistrer les données sur cet appareil. Gardez l'application ouverte et réessayez ; les modifications récentes peuvent être perdues après le redémarrage.",
+    "Mr Broccoli n'a pas pu enregistrer les données sur cet appareil. Gardez l'application ouverte et réessayez ; les modifications récentes peuvent être perdues après le redémarrage.",
   show: "Montrer",
   showTranscript: "Afficher la transcription",
   hide: "Cacher",
@@ -705,7 +705,7 @@ export const fr = {
   idle: "Inactif",
   yourConversationAppearsHere: "Votre conversation apparaît ici",
   defaultTranscriptEmptyDescription:
-    "Utilisez la voix ou le texte pour commencer. M. Brocoli conservera le fil de discussion et répondra ici.",
+    "Utilisez la voix ou le texte pour commencer. Mr Broccoli conservera le fil de discussion et répondra ici.",
   delete: "Supprimer",
   deleteConversationConfirmationTitle: ({ title }) => `Supprimer « ${title} » ?`,
   deleteConversationConfirmationMessage:
@@ -716,7 +716,7 @@ export const fr = {
   newSession: "Nouvelle séance",
   noSavedConversationsYet: "Aucune conversation enregistrée pour l'instant",
   drawerEmptyDescription:
-    "Commencez à parler à partir de la vue principale et M. Brocoli créera automatiquement une session.",
+    "Commencez à parler à partir de la vue principale et Mr Broccoli créera automatiquement une session.",
   setupGuideTitle: "Configurer l'application",
   setupGuideSubtitle: "Ajoutez des informations d'identification et choisissez des itinéraires dans Paramètres.",
   fastestStartPreset: "Configuration minimale",
@@ -729,9 +729,9 @@ export const fr = {
     "Nous ouvrirons ensuite les paramètres afin que vous puissiez coller et valider les informations d'identification.",
   useThisSetup: "Utilisez cette configuration",
   notNow: "Pas maintenant",
-  setupGuideIntroTitle: "Comment fonctionne M. Brocoli",
+  setupGuideIntroTitle: "Comment fonctionne Mr Broccoli",
   setupGuideIntroBody:
-    "M. Brocoli démarre vide. Ajoutez des informations d'identification pour les services externes que vous utilisez déjà, puis choisissez la manière dont les réponses, la saisie vocale, la sortie vocale et le contexte Web facultatif sont acheminés.",
+    "Mr Broccoli démarre vide. Ajoutez des informations d'identification pour les services externes que vous utilisez déjà, puis choisissez la manière dont les réponses, la saisie vocale, la sortie vocale et le contexte Web facultatif sont acheminés.",
   setupGuideIntroNote:
     "Après la configuration, utilisez la commande vocale principale pour démarrer et arrêter une conversation. La transcription actuelle reste disponible sur l'écran d'accueil et chaque itinéraire peut être modifié ultérieurement dans Paramètres.",
   setupGuideProviderTitle: "Ajouter des informations d'identification",
@@ -764,7 +764,7 @@ export const fr = {
   setupGuideSkipKokoro: "Passer pour l'instant",
   setupGuideVoiceTestTitle: "Testez votre configuration",
   setupGuideVoiceTestBody:
-    "Dites une courte phrase. M. Brocoli testera l'accès au microphone, la transcription, l'itinéraire de réponse configuré et la sortie vocale lorsqu'un itinéraire vocal acceptable est disponible.",
+    "Dites une courte phrase. Mr Broccoli testera l'accès au microphone, la transcription, l'itinéraire de réponse configuré et la sortie vocale lorsqu'un itinéraire vocal acceptable est disponible.",
   setupGuideVoiceTestNoInputBody:
     "La saisie vocale n'est pas disponible avec cette configuration. Continuez à examiner les itinéraires détectés, puis ajustez les paramètres vocaux plus tard si nécessaire.",
   setupGuideVoiceTestTextOnlyNote:
@@ -783,7 +783,7 @@ export const fr = {
     "La saisie vocale n'est pas disponible pour cette configuration sur cet appareil.",
   setupGuideSummaryTitle: "Configuration terminée",
   setupGuideSummaryBody:
-    "Voici l'itinéraire que M. Brocoli utilisera avec votre configuration actuelle.",
+    "Voici l'itinéraire que Mr Broccoli utilisera avec votre configuration actuelle.",
   setupGuideSummaryLlm: "LLM",
   setupGuideSummaryStt: "Discours en texte",
   setupGuideSummaryTts: "Synthèse vocale",
@@ -808,7 +808,7 @@ export const fr = {
     "Essayez un titre, un itinéraire, un modèle ou une phrase différent de la transcription.",
   memoryModalTitle: "Mémoire de conversations",
   memoryModalDescription:
-    "Il s'agit du résumé compact que M. Brocoli poursuit une fois qu'un thread devient suffisamment long pour compresser les tours plus anciens.",
+    "Il s'agit du résumé compact que Mr Broccoli poursuit une fois qu'un thread devient suffisamment long pour compresser les tours plus anciens.",
   memorySummary: "Résumé enregistré",
   memorySummaryEmpty:
     "Pas encore de mémoire compacte. Une fois que ce fil sera plus long, les tours plus anciens seront résumés ici.",

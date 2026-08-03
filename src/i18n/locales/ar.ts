@@ -25,7 +25,7 @@ export const ar = {
   ...onboardingTranslations.ar,
   ...premiumTranslations.ar,
   ...transcriptEditTranslations.ar,
-  appName: "السيد بروكلي",
+  appName: "Mr Broccoli",
   retry: "أعد المحاولة",
   dismiss: "إغلاق",
   done: "تم",
@@ -393,7 +393,7 @@ export const ar = {
     "استخدم الخدمة المحددة التي تم تكوينها للردود المنطوقة.",
   ttsFallbackRoutes: "الطرق الاحتياطية",
   ttsFallbackRoutesHint:
-    "خياري. قم بإضافة المسارات التي تريدها فقط، بالترتيب الذي يجب تجربتها به. بمجرد أن يبدأ المسار في التحدث، يظل السيد بروكلي عليه لبقية الرد.",
+    "خياري. قم بإضافة المسارات التي تريدها فقط، بالترتيب الذي يجب تجربتها به. بمجرد أن يبدأ المسار في التحدث، يظل Mr Broccoli عليه لبقية الرد.",
   ttsFallbackNone:
     "لم يتم تكوين أي احتياطي. سيتم عرض فشل صوتي بدلاً من ذلك.",
   ttsFallbackPosition: ({ position, route }) => `${position}. ${route}`,
@@ -428,7 +428,7 @@ export const ar = {
   elevenLabsVoicesReadPermissionHint:
     "في ElevenLabs، قم بتحرير مفتاح API هذا وقم بتمكين الأصوات → قراءة، ثم قم بالتحديث هنا.",
   providerVoicesLoadingHint: ({ provider }) =>
-    `يقوم السيد بروكلي بتحميل الأصوات المتاحة تلقائيًا من ${provider}.`,
+    `يقوم Mr Broccoli بتحميل الأصوات المتاحة تلقائيًا من ${provider}.`,
   providerVoiceId: "الهوية الصوتية",
   providerVoiceIdPlaceholder: "أدخل معرفًا صوتيًا",
   providerVoiceIdFallbackHint:
@@ -436,7 +436,7 @@ export const ar = {
   providerVoiceIdRequired: ({ provider }) =>
     `قم بتحديث مكتبة الصوت ${provider} أو أدخل معرفًا صوتيًا قبل استخدام إخراج الكلام.`,
   qwenSpeechUnavailableInUs:
-    "مسارات الكلام Qwen الحالية لـ السيد بروكلي غير متوفرة في منطقة الولايات المتحدة. اختر سنغافورة أو بكين لخطاب Qwen.",
+    "مسارات الكلام Qwen الحالية لـ Mr Broccoli غير متوفرة في منطقة الولايات المتحدة. اختر سنغافورة أو بكين لخطاب Qwen.",
   qwenApiRegion: "منطقة Qwen API",
   qwenRegionSingapore: "سنغافورة",
   qwenRegionUs: "الولايات المتحدة (فرجينيا)",
@@ -444,12 +444,12 @@ export const ar = {
   qwenRegionHint:
     "يجب أن تتطابق المنطقة المحددة مع المنطقة التي تم إنشاء مفتاح API فيها.",
   qwenRegionUsSpeechHint:
-    "تدعم مفاتيح منطقة الولايات المتحدة الدردشة والبحث على الويب هنا. تتطلب مسارات السيد بروكلي الحالية Qwen STT وTTS مفتاح سنغافورة أو بكين.",
+    "تدعم مفاتيح منطقة الولايات المتحدة الدردشة والبحث على الويب هنا. تتطلب مسارات Mr Broccoli الحالية Qwen STT وTTS مفتاح سنغافورة أو بكين.",
   providerDefaultVoiceHint:
     "يستخدم هذا الموفر حاليًا صوته الافتراضي للمعاينة والردود المنطوقة.",
   listenLanguages: "الاستماع اللغات",
   listenLanguagesHint:
-    "اختر لغات الرد التي تريدها أن تبدو جيدة. يقوم السيد بروكلي بتجربتها بهذا الترتيب عند توجيه إخراج الكلام.",
+    "اختر لغات الرد التي تريدها أن تبدو جيدة. يقوم Mr Broccoli بتجربتها بهذا الترتيب عند توجيه إخراج الكلام.",
   listenLanguagesSelected: ({ count }) =>
     count === 1 ? "تم اختيار لغة واحدة" : `تم تحديد اللغات ${count}`,
   localVoicePacks: "حزم الصوت المحلية",
@@ -466,7 +466,7 @@ export const ar = {
     "لم يُبلغ هذا الجهاز عن أي أصوات للنظام الأصلي للمعاينة.",
   runtimeCompatibilityOverrides: "توافق وقت التشغيل",
   runtimeCompatibilityOverridesDescription: ({ count }) =>
-    `تم تعطيل ${count} من تكوينات النماذج أو الإعدادات التي أكد المزوّد عدم توفرها على هذا الجهاز فقط. يتجاوزها السيد بروكلي تلقائيًا.`,
+    `تم تعطيل ${count} من تكوينات النماذج أو الإعدادات التي أكد المزوّد عدم توفرها على هذا الجهاز فقط. يتجاوزها Mr Broccoli تلقائيًا.`,
   clearRuntimeCompatibilityOverrides: "مسح توافق وقت التشغيل",
   clearRuntimeCompatibilityOverridesConfirmationTitle:
     "هل تريد مسح توافق وقت التشغيل؟",
@@ -611,7 +611,7 @@ export const ar = {
   conversationActions: "إجراءات المحادثة",
   statusDetails: "تفاصيل الحالة",
   persistenceFailure:
-    "تعذر على السيد بروكلي حفظ البيانات على هذا الجهاز. أبقِ التطبيق مفتوحًا وحاول مرة أخرى؛ قد يتم فقدان التغييرات الأخيرة بعد إعادة التشغيل.",
+    "تعذر على Mr Broccoli حفظ البيانات على هذا الجهاز. أبقِ التطبيق مفتوحًا وحاول مرة أخرى؛ قد يتم فقدان التغييرات الأخيرة بعد إعادة التشغيل.",
   show: "يعرض",
   showTranscript: "إظهار النص",
   hide: "يخفي",
@@ -705,7 +705,7 @@ export const ar = {
   idle: "عاطل",
   yourConversationAppearsHere: "تظهر محادثتك هنا",
   defaultTranscriptEmptyDescription:
-    "استخدم الصوت أو النص للبدء. سيحتفظ السيد بروكلي بالموضوع ويرد هنا.",
+    "استخدم الصوت أو النص للبدء. سيحتفظ Mr Broccoli بالموضوع ويرد هنا.",
   delete: "يمسح",
   deleteConversationConfirmationTitle: ({ title }) => `هل تريد حذف "${title}"؟`,
   deleteConversationConfirmationMessage:
@@ -716,7 +716,7 @@ export const ar = {
   newSession: "جلسة جديدة",
   noSavedConversationsYet: "لا توجد محادثات محفوظة حتى الآن",
   drawerEmptyDescription:
-    "ابدأ التحدث من العرض الرئيسي وسيقوم السيد بروكلي بإنشاء جلسة تلقائيًا.",
+    "ابدأ التحدث من العرض الرئيسي وسيقوم Mr Broccoli بإنشاء جلسة تلقائيًا.",
   setupGuideTitle: "قم بتكوين التطبيق",
   setupGuideSubtitle: "أضف بيانات الاعتماد واختر الطرق في الإعدادات.",
   fastestStartPreset: "الحد الأدنى من الإعداد",
@@ -729,9 +729,9 @@ export const ar = {
     "سنفتح الإعدادات بعد ذلك حتى تتمكن من لصق بيانات الاعتماد والتحقق من صحتها.",
   useThisSetup: "استخدم هذا الإعداد",
   notNow: "ليس الآن",
-  setupGuideIntroTitle: "كيف يعمل السيد بروكلي",
+  setupGuideIntroTitle: "كيف يعمل Mr Broccoli",
   setupGuideIntroBody:
-    "يبدأ السيد بروكلي فارغًا. أضف بيانات اعتماد للخدمات الخارجية التي تستخدمها بالفعل، ثم اختر كيفية توجيه الردود وإدخال الكلام والمخرجات المنطوقة وسياق الويب الاختياري.",
+    "يبدأ Mr Broccoli فارغًا. أضف بيانات اعتماد للخدمات الخارجية التي تستخدمها بالفعل، ثم اختر كيفية توجيه الردود وإدخال الكلام والمخرجات المنطوقة وسياق الويب الاختياري.",
   setupGuideIntroNote:
     "بعد الإعداد، استخدم التحكم الصوتي الرئيسي لبدء المحادثة وإيقافها. يظل النص الحالي متاحًا على الشاشة الرئيسية، ويمكن تغيير كل مسار لاحقًا في الإعدادات.",
   setupGuideProviderTitle: "إضافة بيانات الاعتماد",
@@ -764,7 +764,7 @@ export const ar = {
   setupGuideSkipKokoro: "تخطي الآن",
   setupGuideVoiceTestTitle: "اختبار الإعداد الخاص بك",
   setupGuideVoiceTestBody:
-    "قل جملة قصيرة. سيختبر السيد بروكلي الوصول إلى الميكروفون والنسخ ومسار الرد الذي تم تكوينه والإخراج المنطوق عند توفر مسار صوتي مقبول.",
+    "قل جملة قصيرة. سيختبر Mr Broccoli الوصول إلى الميكروفون والنسخ ومسار الرد الذي تم تكوينه والإخراج المنطوق عند توفر مسار صوتي مقبول.",
   setupGuideVoiceTestNoInputBody:
     "الإدخال الصوتي غير متاح مع هذا الإعداد. استمر في مراجعة المسارات المكتشفة، ثم اضبط إعدادات الكلام لاحقًا إذا لزم الأمر.",
   setupGuideVoiceTestTextOnlyNote:
@@ -783,7 +783,7 @@ export const ar = {
     "الإدخال الصوتي غير متاح لهذا الإعداد على هذا الجهاز.",
   setupGuideSummaryTitle: "اكتمل الإعداد",
   setupGuideSummaryBody:
-    "هذا هو المسار الذي سيستخدمه السيد بروكلي مع التكوين الحالي الخاص بك.",
+    "هذا هو المسار الذي سيستخدمه Mr Broccoli مع التكوين الحالي الخاص بك.",
   setupGuideSummaryLlm: "LLM",
   setupGuideSummaryStt: "الكلام إلى النص",
   setupGuideSummaryTts: "تحويل النص إلى كلام",
@@ -808,7 +808,7 @@ export const ar = {
     "جرّب عنوانًا أو مسارًا أو نموذجًا أو عبارة مختلفة من النص.",
   memoryModalTitle: "ذاكرة المحادثة",
   memoryModalDescription:
-    "هذا هو الملخص المضغوط الذي يتم تنفيذه بواسطة السيد بروكلي بمجرد أن يصبح الخيط طويلًا بما يكفي لضغط المنعطفات القديمة.",
+    "هذا هو الملخص المضغوط الذي يتم تنفيذه بواسطة Mr Broccoli بمجرد أن يصبح الخيط طويلًا بما يكفي لضغط المنعطفات القديمة.",
   memorySummary: "الملخص المحفوظ",
   memorySummaryEmpty:
     "لا توجد ذاكرة مدمجة حتى الآن. بمجرد أن يصبح هذا الموضوع أطول، سيتم تلخيص المنعطفات القديمة هنا.",

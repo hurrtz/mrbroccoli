@@ -25,7 +25,7 @@ export const hu = {
   ...onboardingTranslations.hu,
   ...premiumTranslations.hu,
   ...transcriptEditTranslations.hu,
-  appName: "Brokkoli úr",
+  appName: "Mr Broccoli",
   retry: "Próbálja újra",
   dismiss: "Bezárás",
   done: "Kész",
@@ -402,7 +402,7 @@ export const hu = {
     "A kiválasztott konfigurált szolgáltatást használja a szóbeli válaszokhoz.",
   ttsFallbackRoutes: "Tartalék útvonalak",
   ttsFallbackRoutesHint:
-    "Opcionális. Csak a kívánt útvonalakat adja hozzá, a kipróbálás sorrendjében. Amint egy útvonal beszélni kezd, Brokkoli úr azt használja a válasz hátralévő részében.",
+    "Opcionális. Csak a kívánt útvonalakat adja hozzá, a kipróbálás sorrendjében. Amint egy útvonal beszélni kezd, Mr Broccoli azt használja a válasz hátralévő részében.",
   ttsFallbackNone:
     "Nincs tartalék konfigurálva. Helyette hanghiba jelenik meg.",
   ttsFallbackPosition: ({ position, route }) => `${position}. ${route}`,
@@ -437,7 +437,7 @@ export const hu = {
   elevenLabsVoicesReadPermissionHint:
     "Az ElevenLabsban szerkessze ezt az API-kulcsot, engedélyezze a Voices → Read jogosultságot, majd frissítse itt.",
   providerVoicesLoadingHint: ({ provider }) =>
-    `Brokkoli úr automatikusan betölti az elérhető hangokat a ${provider}-ből.`,
+    `Mr Broccoli automatikusan betölti az elérhető hangokat a ${provider}-ből.`,
   providerVoiceId: "Hangazonosító",
   providerVoiceIdPlaceholder: "Adjon meg egy hangazonosítót",
   providerVoiceIdFallbackHint:
@@ -445,7 +445,7 @@ export const hu = {
   providerVoiceIdRequired: ({ provider }) =>
     `Frissítse a ${provider} hangkönyvtárat, vagy adjon meg egy hangazonosítót a beszédkimenet használata előtt.`,
   qwenSpeechUnavailableInUs:
-    "Brokkoli úr jelenlegi Qwen beszédútvonalai nem érhetők el az Egyesült Államok régiójában. Válassza Szingapúrt vagy Pekinget a Qwen beszédhez.",
+    "Mr Broccoli jelenlegi Qwen beszédútvonalai nem érhetők el az Egyesült Államok régiójában. Válassza Szingapúrt vagy Pekinget a Qwen beszédhez.",
   qwenApiRegion: "Qwen API régió",
   qwenRegionSingapore: "Szingapúr",
   qwenRegionUs: "USA (Virginia)",
@@ -453,12 +453,12 @@ export const hu = {
   qwenRegionHint:
     "A kiválasztott régiónak meg kell egyeznie azzal a régióval, amelyben ez az API-kulcs létrejött.",
   qwenRegionUsSpeechHint:
-    "Az amerikai régiókulcsok itt támogatják a csevegést és az internetes keresést. Brokkoli úr jelenlegi Qwen STT- és TTS-útvonalaihoz szingapúri vagy pekingi kulcs szükséges.",
+    "Az amerikai régiókulcsok itt támogatják a csevegést és az internetes keresést. Mr Broccoli jelenlegi Qwen STT- és TTS-útvonalaihoz szingapúri vagy pekingi kulcs szükséges.",
   providerDefaultVoiceHint:
     "Ez a szolgáltató jelenleg az alapértelmezett hangját használja az előnézethez és a szóbeli válaszokhoz.",
   listenLanguages: "Felolvasási nyelvek",
   listenLanguagesHint:
-    "Válassza ki azokat a válasznyelveket, amelyeken jó minőségű felolvasást szeretne. Brokkoli úr ebben a sorrendben próbálja ki őket a hangkimenet irányításakor.",
+    "Válassza ki azokat a válasznyelveket, amelyeken jó minőségű felolvasást szeretne. Mr Broccoli ebben a sorrendben próbálja ki őket a hangkimenet irányításakor.",
   listenLanguagesSelected: ({ count }) =>
     count === 1 ? "1 nyelv kiválasztva" : `${count} nyelv kiválasztva`,
   localVoicePacks: "Helyi hangcsomagok",
@@ -475,7 +475,7 @@ export const hu = {
     "Ez az eszköz nem jelentett egyetlen natív rendszerhangot sem az előnézethez.",
   runtimeCompatibilityOverrides: "Futásidejű kompatibilitás",
   runtimeCompatibilityOverridesDescription: ({ count }) =>
-    `${count} szolgáltató által igazoltan nem elérhető modell- vagy beállításkonfiguráció csak ezen az eszközön van letiltva. Brokkoli úr automatikusan elkerüli ezeket.`,
+    `${count} szolgáltató által igazoltan nem elérhető modell- vagy beállításkonfiguráció csak ezen az eszközön van letiltva. Mr Broccoli automatikusan elkerüli ezeket.`,
   clearRuntimeCompatibilityOverrides: "Futásidejű kompatibilitás törlése",
   clearRuntimeCompatibilityOverridesConfirmationTitle:
     "Törlöd a futásidejű kompatibilitást?",
@@ -624,7 +624,7 @@ export const hu = {
   conversationActions: "Beszélgetési műveletek",
   statusDetails: "Állapot részletei",
   persistenceFailure:
-    "Brokkoli úr nem tudott adatokat menteni ezen az eszközön. Tartsa nyitva az alkalmazást, és próbálja újra; a legutóbbi módosítások újraindítás után elveszhetnek.",
+    "Mr Broccoli nem tudott adatokat menteni ezen az eszközön. Tartsa nyitva az alkalmazást, és próbálja újra; a legutóbbi módosítások újraindítás után elveszhetnek.",
   show: "Megjelenítés",
   showTranscript: "Átirat megjelenítése",
   hide: "Elrejtés",
@@ -719,7 +719,7 @@ export const hu = {
   idle: "Tétlen",
   yourConversationAppearsHere: "Az Ön beszélgetése itt jelenik meg",
   defaultTranscriptEmptyDescription:
-    "A kezdéshez használjon hangot vagy szöveget. Brokkoli úr megőrzi a beszélgetést, és itt válaszol.",
+    "A kezdéshez használjon hangot vagy szöveget. Mr Broccoli megőrzi a beszélgetést, és itt válaszol.",
   delete: "Törlés",
   deleteConversationConfirmationTitle: ({ title }) =>
     `Törli a „${title}” elemet?`,
@@ -731,7 +731,7 @@ export const hu = {
   newSession: "Új munkamenet",
   noSavedConversationsYet: "Még nincsenek mentett beszélgetések",
   drawerEmptyDescription:
-    "Kezdjen el beszélni a főnézetben, és Brokkoli úr automatikusan létrehoz egy munkamenetet.",
+    "Kezdjen el beszélni a főnézetben, és Mr Broccoli automatikusan létrehoz egy munkamenetet.",
   setupGuideTitle: "Konfigurálja az alkalmazást",
   setupGuideSubtitle:
     "Adjon hozzá hitelesítési adatokat, és válasszon útvonalakat a Beállításokban.",
@@ -745,9 +745,9 @@ export const hu = {
     "Legközelebb megnyitjuk a Beállításokat, így beillesztheti és ellenőrizheti a hitelesítő adatokat.",
   useThisSetup: "Használja ezt a beállítást",
   notNow: "Most nem",
-  setupGuideIntroTitle: "Hogyan működik Brokkoli úr",
+  setupGuideIntroTitle: "Hogyan működik Mr Broccoli",
   setupGuideIntroBody:
-    "Brokkoli úr üresen kezdődik. Adjon hozzá hitelesítési adatokat a már használt külső szolgáltatásokhoz, majd válassza ki a válaszok, a beszédbevitel, a szóbeli kimenet és az opcionális webkontextus továbbításának módját.",
+    "Mr Broccoli üresen kezdődik. Adjon hozzá hitelesítési adatokat a már használt külső szolgáltatásokhoz, majd válassza ki a válaszok, a beszédbevitel, a szóbeli kimenet és az opcionális webkontextus továbbításának módját.",
   setupGuideIntroNote:
     "A beállítás után használja a fő hangvezérlést a beszélgetés indításához és leállításához. Az aktuális átirat elérhető marad a kezdőképernyőn, és minden útvonal később módosítható a Beállításokban.",
   setupGuideProviderTitle: "Hitelesítési adatok hozzáadása",
@@ -780,7 +780,7 @@ export const hu = {
   setupGuideSkipKokoro: "Kihagyás most",
   setupGuideVoiceTestTitle: "Tesztelje le beállításait",
   setupGuideVoiceTestBody:
-    "Mondjon egy rövid mondatot. Brokkoli úr teszteli a mikrofonhozzáférést, az átírást, a beállított válaszútvonalat és – ha elérhető megfelelő hangútvonal – a hangkimenetet.",
+    "Mondjon egy rövid mondatot. Mr Broccoli teszteli a mikrofonhozzáférést, az átírást, a beállított válaszútvonalat és – ha elérhető megfelelő hangútvonal – a hangkimenetet.",
   setupGuideVoiceTestNoInputBody:
     "A hangbevitel nem érhető el ezzel a beállítással. Folytassa az észlelt útvonalak áttekintését, majd szükség esetén módosítsa a beszédbeállításokat később.",
   setupGuideVoiceTestTextOnlyNote:
@@ -799,7 +799,7 @@ export const hu = {
     "A hangbevitel ehhez a beállításhoz nem érhető el ezen az eszközön.",
   setupGuideSummaryTitle: "Beállítás kész",
   setupGuideSummaryBody:
-    "Brokkoli úr ezt az útvonalat fogja használni a jelenlegi beállításokkal.",
+    "Mr Broccoli ezt az útvonalat fogja használni a jelenlegi beállításokkal.",
   setupGuideSummaryLlm: "LLM",
   setupGuideSummaryStt: "Beszéd szöveggé",
   setupGuideSummaryTts: "Szöveg beszédté",
@@ -828,7 +828,7 @@ export const hu = {
     "Próbáljon más címet, útvonalat, modellt vagy kifejezést az átiratból.",
   memoryModalTitle: "Beszélgetési memória",
   memoryModalDescription:
-    "Ez az a tömör összefoglaló, amelyet Brokkoli úr továbbvisz, amikor a beszélgetés már elég hosszú a régebbi fordulók tömörítéséhez.",
+    "Ez az a tömör összefoglaló, amelyet Mr Broccoli továbbvisz, amikor a beszélgetés már elég hosszú a régebbi fordulók tömörítéséhez.",
   memorySummary: "Mentett összefoglaló",
   memorySummaryEmpty:
     "Még nincs kompakt memória. Amint ez a szál hosszabb lesz, itt összefoglaljuk a régebbi köröket.",

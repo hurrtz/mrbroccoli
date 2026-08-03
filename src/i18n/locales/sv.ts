@@ -25,7 +25,7 @@ export const sv = {
   ...onboardingTranslations.sv,
   ...premiumTranslations.sv,
   ...transcriptEditTranslations.sv,
-  appName: "Herr Broccoli",
+  appName: "Mr Broccoli",
   retry: "Försök igen",
   dismiss: "Stäng",
   done: "Klart",
@@ -393,7 +393,7 @@ export const sv = {
     "Använd den valda konfigurerade tjänsten för talade svar.",
   ttsFallbackRoutes: "Reservrutter",
   ttsFallbackRoutesHint:
-    "Valfritt. Lägg bara till de rutter du vill ha, i den ordning de ska provas. När en rutt börjar tala, stannar Herr Broccoli på den under resten av svaret.",
+    "Valfritt. Lägg bara till de rutter du vill ha, i den ordning de ska provas. När en rutt börjar tala, stannar Mr Broccoli på den under resten av svaret.",
   ttsFallbackNone: "Ingen reserv är konfigurerad. Ett röstfel visas istället.",
   ttsFallbackPosition: ({ position, route }) => `${position}. ${route}`,
   addFallbackRoute: ({ route }) => `Lägg till ${route} reserv`,
@@ -426,7 +426,7 @@ export const sv = {
   elevenLabsVoicesReadPermissionHint:
     "I ElevenLabs, redigera denna API-nyckel och aktivera Röster → Läs och uppdatera sedan här.",
   providerVoicesLoadingHint: ({ provider }) =>
-    `Herr Broccoli laddar tillgängliga röster automatiskt från ${provider}.`,
+    `Mr Broccoli laddar tillgängliga röster automatiskt från ${provider}.`,
   providerVoiceId: "Röst-ID",
   providerVoiceIdPlaceholder: "Ange ett röst-ID",
   providerVoiceIdFallbackHint:
@@ -434,7 +434,7 @@ export const sv = {
   providerVoiceIdRequired: ({ provider }) =>
     `Uppdatera ${provider} röstbibliotek eller ange ett röst-ID innan du använder tal.`,
   qwenSpeechUnavailableInUs:
-    "Herr Broccolis nuvarande Qwen-talrutter är inte tillgängliga i USA-regionen. Välj Singapore eller Peking för Qwen-tal.",
+    "De nuvarande Qwen-talrutterna för Mr Broccoli är inte tillgängliga i USA-regionen. Välj Singapore eller Peking för Qwen-tal.",
   qwenApiRegion: "Qwen API-region",
   qwenRegionSingapore: "Singapore",
   qwenRegionUs: "USA (Virginia)",
@@ -442,12 +442,12 @@ export const sv = {
   qwenRegionHint:
     "Den valda regionen måste matcha regionen där denna API-nyckel skapades.",
   qwenRegionUsSpeechHint:
-    "USA-regionnycklar stöder chatt och webbsökning här. Herr Broccolis nuvarande Qwen STT- och TTS-rutter kräver en Singapore- eller Beijing-nyckel.",
+    "USA-regionnycklar stöder chatt och webbsökning här. De nuvarande Qwen STT- och TTS-rutterna för Mr Broccoli kräver en Singapore- eller Beijing-nyckel.",
   providerDefaultVoiceHint:
     "Denna leverantör använder för närvarande sin standardröst för förhandsgranskning och talade svar.",
   listenLanguages: "Lyssna på språk",
   listenLanguagesHint:
-    "Välj de svarsspråk du vill ska låta bra. Herr Broccoli provar dem i denna ordning vid dirigering av talutgång.",
+    "Välj de svarsspråk du vill ska låta bra. Mr Broccoli provar dem i denna ordning vid dirigering av talutgång.",
   listenLanguagesSelected: ({ count }) =>
     count === 1 ? "1 språk valt" : `${count} språk har valts`,
   localVoicePacks: "Lokala röstpaket",
@@ -464,7 +464,7 @@ export const sv = {
     "Den här enheten har inte rapporterat några inbyggda systemröster för förhandsgranskning.",
   runtimeCompatibilityOverrides: "Körningskompatibilitet",
   runtimeCompatibilityOverridesDescription: ({ count }) =>
-    `${count} modell- eller inställningskonfigurationer som leverantören bekräftat som otillgängliga är inaktiverade endast på den här enheten. Herr Broccoli kringgår dem automatiskt.`,
+    `${count} modell- eller inställningskonfigurationer som leverantören bekräftat som otillgängliga är inaktiverade endast på den här enheten. Mr Broccoli kringgår dem automatiskt.`,
   clearRuntimeCompatibilityOverrides: "Rensa körningskompatibilitet",
   clearRuntimeCompatibilityOverridesConfirmationTitle:
     "Rensa körningskompatibiliteten?",
@@ -610,7 +610,7 @@ export const sv = {
   conversationActions: "Konversationsåtgärder",
   statusDetails: "Statusinformation",
   persistenceFailure:
-    "Herr Broccoli kunde inte spara data på den här enheten. Håll appen öppen och försök igen; de senaste ändringarna kan gå förlorade efter omstart.",
+    "Mr Broccoli kunde inte spara data på den här enheten. Håll appen öppen och försök igen; de senaste ändringarna kan gå förlorade efter omstart.",
   show: "Visa",
   showTranscript: "Visa utskrift",
   hide: "Göm",
@@ -704,7 +704,7 @@ export const sv = {
   idle: "Inaktiv",
   yourConversationAppearsHere: "Din konversation visas här",
   defaultTranscriptEmptyDescription:
-    "Använd röst eller text för att börja. Herr Broccoli kommer att behålla tråden och svara här.",
+    "Använd röst eller text för att börja. Mr Broccoli kommer att behålla tråden och svara här.",
   delete: "Ta bort",
   deleteConversationConfirmationTitle: ({ title }) => `Ta bort "${title}"?`,
   deleteConversationConfirmationMessage:
@@ -715,7 +715,7 @@ export const sv = {
   newSession: "Ny session",
   noSavedConversationsYet: "Inga sparade konversationer än",
   drawerEmptyDescription:
-    "Börja tala från huvudvyn och Herr Broccoli bygger en session automatiskt.",
+    "Börja tala från huvudvyn och Mr Broccoli bygger en session automatiskt.",
   setupGuideTitle: "Konfigurera appen",
   setupGuideSubtitle:
     "Lägg till autentiseringsuppgifter och välj rutter i Inställningar.",
@@ -729,9 +729,9 @@ export const sv = {
     "Vi kommer att öppna Inställningar härnäst så att du kan klistra in och validera autentiseringsuppgifter.",
   useThisSetup: "Använd denna inställning",
   notNow: "Inte nu",
-  setupGuideIntroTitle: "Hur Herr Broccoli fungerar",
+  setupGuideIntroTitle: "Hur Mr Broccoli fungerar",
   setupGuideIntroBody:
-    "Herr Broccoli börjar tomt. Lägg till autentiseringsuppgifter för externa tjänster som du redan använder och välj sedan hur svar, talinmatning, talad utdata och valfri webbkontext dirigeras.",
+    "Mr Broccoli börjar tomt. Lägg till autentiseringsuppgifter för externa tjänster som du redan använder och välj sedan hur svar, talinmatning, talad utdata och valfri webbkontext dirigeras.",
   setupGuideIntroNote:
     "Efter installationen använder du huvudröstkontrollen för att starta och stoppa en konversation. Den aktuella utskriften förblir tillgänglig på startskärmen och varje rutt kan ändras senare i Inställningar.",
   setupGuideProviderTitle: "Lägg till autentiseringsuppgifter",
@@ -764,7 +764,7 @@ export const sv = {
   setupGuideSkipKokoro: "Hoppa över nu",
   setupGuideVoiceTestTitle: "Testa din installation",
   setupGuideVoiceTestBody:
-    "Säg en kort mening. Herr Broccoli kommer att testa mikrofonåtkomst, transkription, den konfigurerade svarsvägen och talad utdata när en acceptabel röstväg är tillgänglig.",
+    "Säg en kort mening. Mr Broccoli kommer att testa mikrofonåtkomst, transkription, den konfigurerade svarsvägen och talad utdata när en acceptabel röstväg är tillgänglig.",
   setupGuideVoiceTestNoInputBody:
     "Röstinmatning är inte tillgänglig med denna inställning. Fortsätt att granska de upptäckta rutterna och justera sedan talinställningarna senare om det behövs.",
   setupGuideVoiceTestTextOnlyNote:
@@ -783,7 +783,7 @@ export const sv = {
     "Röstinmatning är inte tillgänglig för den här konfigurationen på den här enheten.",
   setupGuideSummaryTitle: "Installationen är klar",
   setupGuideSummaryBody:
-    "Här är rutten Herr Broccoli kommer att använda med din nuvarande konfiguration.",
+    "Här är rutten Mr Broccoli kommer att använda med din nuvarande konfiguration.",
   setupGuideSummaryLlm: "LLM",
   setupGuideSummaryStt: "Tal till text",
   setupGuideSummaryTts: "Text till tal",
@@ -810,7 +810,7 @@ export const sv = {
     "Prova en annan titel, rutt, modell eller fras från avskriften.",
   memoryModalTitle: "Konversationsminne",
   memoryModalDescription:
-    "Detta är den kompakta sammanfattningen Herr Broccoli förs vidare när en tråd blir tillräckligt lång för att komprimera äldre varv.",
+    "Detta är den kompakta sammanfattningen Mr Broccoli förs vidare när en tråd blir tillräckligt lång för att komprimera äldre varv.",
   memorySummary: "Sparad sammanfattning",
   memorySummaryEmpty:
     "Inget kompakt minne ännu. När den här tråden blir längre kommer äldre svängar att sammanfattas här.",

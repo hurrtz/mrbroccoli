@@ -83,6 +83,8 @@ the complete Play Store translations are kept in a dedicated file under
 
 ### Fixed
 
+- Keep the product name exactly “Mr Broccoli” in every interface language
+  instead of translating, respelling, or punctuating the brand per locale.
 - Make past-conversation retrieval abstain on weak incidental matches, suppress
   duplicated conversation copies, and label retained sources by match quality
   while continuing to index user-authored messages only.

@@ -25,7 +25,7 @@ export const pl = {
   ...onboardingTranslations.pl,
   ...premiumTranslations.pl,
   ...transcriptEditTranslations.pl,
-  appName: "Pan Brokuł",
+  appName: "Mr Broccoli",
   retry: "Spróbuj ponownie",
   dismiss: "Odrzuć",
   done: "Gotowe",
@@ -396,7 +396,7 @@ export const pl = {
     "Użyj wybranej skonfigurowanej usługi do odpowiedzi głosowych.",
   ttsFallbackRoutes: "Trasy awaryjne",
   ttsFallbackRoutesHint:
-    "Opcjonalne. Dodaj tylko te trasy, które chcesz, w kolejności, w jakiej powinny być wypróbowane. Gdy trasa zacznie mówić, Pan Brokuł pozostanie na niej do końca odpowiedzi.",
+    "Opcjonalne. Dodaj tylko te trasy, które chcesz, w kolejności, w jakiej powinny być wypróbowane. Gdy trasa zacznie mówić, Mr Broccoli pozostanie na niej do końca odpowiedzi.",
   ttsFallbackNone:
     "Nie skonfigurowano żadnego powrotu. Zamiast tego zostanie wyświetlona awaria głosu.",
   ttsFallbackPosition: ({ position, route }) => `${position}. ${route}`,
@@ -431,7 +431,7 @@ export const pl = {
   elevenLabsVoicesReadPermissionHint:
     "W ElevenLabs edytuj ten klucz API i włącz Głosy → Czytaj, a następnie odśwież tutaj.",
   providerVoicesLoadingHint: ({ provider }) =>
-    `Pan Brokuł automatycznie ładuje dostępne głosy z ${provider}.`,
+    `Mr Broccoli automatycznie ładuje dostępne głosy z ${provider}.`,
   providerVoiceId: "Identyfikator głosowy",
   providerVoiceIdPlaceholder: "Wprowadź identyfikator głosowy",
   providerVoiceIdFallbackHint:
@@ -439,7 +439,7 @@ export const pl = {
   providerVoiceIdRequired: ({ provider }) =>
     `Odśwież bibliotekę głosową ${provider} lub wprowadź identyfikator głosowy przed użyciem mowy.`,
   qwenSpeechUnavailableInUs:
-    "Obecne trasy mowy Pan Brokuł Qwen nie są dostępne w regionie USA. Wybierz Singapur lub Pekin, aby wysłuchać przemówienia Qwen.",
+    "Obecne trasy mowy Mr Broccoli Qwen nie są dostępne w regionie USA. Wybierz Singapur lub Pekin, aby wysłuchać przemówienia Qwen.",
   qwenApiRegion: "Region API Qwen",
   qwenRegionSingapore: "Singapur",
   qwenRegionUs: "USA (Wirginia)",
@@ -447,12 +447,12 @@ export const pl = {
   qwenRegionHint:
     "Wybrany region musi odpowiadać regionowi, w którym utworzono ten klucz API.",
   qwenRegionUsSpeechHint:
-    "Klucze regionu USA obsługują tutaj czat i wyszukiwanie w Internecie. Obecne trasy Qwen STT i TTS Pan Brokuł wymagają klucza Singapuru lub Pekinu.",
+    "Klucze regionu USA obsługują tutaj czat i wyszukiwanie w Internecie. Obecne trasy Qwen STT i TTS Mr Broccoli wymagają klucza Singapuru lub Pekinu.",
   providerDefaultVoiceHint:
     "Ten dostawca używa obecnie domyślnego głosu do podglądu i odpowiedzi głosowych.",
   listenLanguages: "Słuchaj języków",
   listenLanguagesHint:
-    "Wybierz języki odpowiedzi, w których chcesz dobrze brzmieć. Pan Brokuł wypróbowuje je w tej kolejności podczas routingu wyjścia mowy.",
+    "Wybierz języki odpowiedzi, w których chcesz dobrze brzmieć. Mr Broccoli wypróbowuje je w tej kolejności podczas routingu wyjścia mowy.",
   listenLanguagesSelected: ({ count }) =>
     count === 1 ? "Wybrano 1 język" : `Wybrano języki ${count}`,
   localVoicePacks: "Lokalne pakiety głosowe",
@@ -469,7 +469,7 @@ export const pl = {
     "To urządzenie nie zgłosiło żadnych natywnych głosów systemowych do podglądu.",
   runtimeCompatibilityOverrides: "Zgodność w czasie działania",
   runtimeCompatibilityOverridesDescription: ({ count }) =>
-    `${count} konfiguracji modeli lub ustawień, których niedostępność potwierdził dostawca, jest wyłączonych tylko na tym urządzeniu. Pan Brokuł automatycznie je omija.`,
+    `${count} konfiguracji modeli lub ustawień, których niedostępność potwierdził dostawca, jest wyłączonych tylko na tym urządzeniu. Mr Broccoli automatycznie je omija.`,
   clearRuntimeCompatibilityOverrides: "Wyczyść zgodność w czasie działania",
   clearRuntimeCompatibilityOverridesConfirmationTitle:
     "Wyczyścić zgodność w czasie działania?",
@@ -617,7 +617,7 @@ export const pl = {
   conversationActions: "Działania konwersacyjne",
   statusDetails: "Szczegóły statusu",
   persistenceFailure:
-    "Pan Brokuł nie mógł zapisać danych na tym urządzeniu. Pozostaw aplikację otwartą i spróbuj ponownie; ostatnie zmiany mogą zostać utracone po ponownym uruchomieniu.",
+    "Mr Broccoli nie mógł zapisać danych na tym urządzeniu. Pozostaw aplikację otwartą i spróbuj ponownie; ostatnie zmiany mogą zostać utracone po ponownym uruchomieniu.",
   show: "Pokaż",
   showTranscript: "Pokaż transkrypcję",
   hide: "Ukryj",
@@ -711,7 +711,7 @@ export const pl = {
   idle: "Bezczynny",
   yourConversationAppearsHere: "Twoja rozmowa pojawi się tutaj",
   defaultTranscriptEmptyDescription:
-    "Aby rozpocząć, użyj głosu lub tekstu. Pan Brokuł zachowa wątek i odpowie tutaj.",
+    "Aby rozpocząć, użyj głosu lub tekstu. Mr Broccoli zachowa wątek i odpowie tutaj.",
   delete: "Usuń",
   deleteConversationConfirmationTitle: ({ title }) => `Usunąć „${title}”?`,
   deleteConversationConfirmationMessage:
@@ -723,7 +723,7 @@ export const pl = {
   newSession: "Nowa sesja",
   noSavedConversationsYet: "Nie ma jeszcze zapisanych rozmów",
   drawerEmptyDescription:
-    "Zacznij mówić w widoku głównym, a Pan Brokuł automatycznie zbuduje sesję.",
+    "Zacznij mówić w widoku głównym, a Mr Broccoli automatycznie zbuduje sesję.",
   setupGuideTitle: "Skonfiguruj aplikację",
   setupGuideSubtitle:
     "Dodaj dane uwierzytelniające i wybierz trasy w Ustawieniach.",
@@ -737,9 +737,9 @@ export const pl = {
     "Następnie otworzymy Ustawienia, abyś mógł wkleić i zweryfikować dane uwierzytelniające.",
   useThisSetup: "Użyj tej konfiguracji",
   notNow: "Nie teraz",
-  setupGuideIntroTitle: "Jak działa Pan Brokuł",
+  setupGuideIntroTitle: "Jak działa Mr Broccoli",
   setupGuideIntroBody:
-    "Pan Brokuł zaczyna się od pustego. Dodaj dane uwierzytelniające do usług zewnętrznych, z których już korzystasz, a następnie wybierz sposób kierowania odpowiedzi, wprowadzania mowy i komunikatów głosowych oraz opcjonalnego kontekstu internetowego.",
+    "Mr Broccoli zaczyna się od pustego. Dodaj dane uwierzytelniające do usług zewnętrznych, z których już korzystasz, a następnie wybierz sposób kierowania odpowiedzi, wprowadzania mowy i komunikatów głosowych oraz opcjonalnego kontekstu internetowego.",
   setupGuideIntroNote:
     "Po konfiguracji użyj głównego sterowania głosowego, aby rozpocząć i zakończyć rozmowę. Bieżący zapis pozostaje dostępny na ekranie głównym, a każdą trasę można później zmienić w Ustawieniach.",
   setupGuideProviderTitle: "Dodaj dane uwierzytelniające",
@@ -772,7 +772,7 @@ export const pl = {
   setupGuideSkipKokoro: "Pomiń na razie",
   setupGuideVoiceTestTitle: "Przetestuj swoją konfigurację",
   setupGuideVoiceTestBody:
-    "Powiedz krótkie zdanie. Pan Brokuł przetestuje dostęp do mikrofonu, transkrypcję, skonfigurowaną trasę odpowiedzi i dźwięk mówiony, gdy dostępna będzie akceptowalna trasa głosowa.",
+    "Powiedz krótkie zdanie. Mr Broccoli przetestuje dostęp do mikrofonu, transkrypcję, skonfigurowaną trasę odpowiedzi i dźwięk mówiony, gdy dostępna będzie akceptowalna trasa głosowa.",
   setupGuideVoiceTestNoInputBody:
     "Wprowadzanie głosowe nie jest dostępne w tej konfiguracji. Kontynuuj przeglądanie wykrytych tras, a następnie w razie potrzeby dostosuj ustawienia mowy później.",
   setupGuideVoiceTestTextOnlyNote:
@@ -791,7 +791,7 @@ export const pl = {
     "Wprowadzanie głosowe nie jest dostępne w przypadku tej konfiguracji na tym urządzeniu.",
   setupGuideSummaryTitle: "Konfiguracja ukończona",
   setupGuideSummaryBody:
-    "Oto trasa, której Pan Brokuł użyje w Twojej bieżącej konfiguracji.",
+    "Oto trasa, której Mr Broccoli użyje w Twojej bieżącej konfiguracji.",
   setupGuideSummaryLlm: "LLM",
   setupGuideSummaryStt: "Mowa na tekst",
   setupGuideSummaryTts: "Tekst na mowę",
@@ -817,7 +817,7 @@ export const pl = {
     "Wypróbuj inny tytuł, trasę, model lub frazę z transkrypcji.",
   memoryModalTitle: "Pamięć rozmów",
   memoryModalDescription:
-    "Oto krótkie podsumowanie Pan Brokuł jest kontynuowane, gdy wątek stanie się wystarczająco długi, aby skompresować starsze zwoje.",
+    "Oto krótkie podsumowanie Mr Broccoli jest kontynuowane, gdy wątek stanie się wystarczająco długi, aby skompresować starsze zwoje.",
   memorySummary: "Zapisane podsumowanie",
   memorySummaryEmpty:
     "Nie ma jeszcze pamięci kompaktowej. Gdy ten wątek stanie się dłuższy, starsze tury zostaną tutaj podsumowane.",

@@ -40,7 +40,7 @@ export const onDeviceTranslations = {
     settingsOnDeviceSummary:
       "Private lokale Modelle, Geräteprüfung, Downloads und Tests.",
     onDeviceIntro:
-      "Wähle Sprachen einmal aus. Mr. Brokkoli bietet danach nur lokale Modelle zum Hören, Denken und Sprechen an, die zu diesem Smartphone passen.",
+      "Wähle Sprachen einmal aus. Mr Broccoli bietet danach nur lokale Modelle zum Hören, Denken und Sprechen an, die zu diesem Smartphone passen.",
     onDeviceLanguages: "Gesprächssprachen",
     onDeviceLanguagesHint:
       "Jedes lokale Modell muss alle ausgewählten Sprachen unterstützen. Die Auswahl aktualisiert auch Erkennung und Sprachausgabe.",
@@ -70,7 +70,7 @@ export const onDeviceTranslations = {
     settingsOnDeviceSummary:
       "Приватні локальні моделі, перевірка пристрою, завантаження й тести.",
     onDeviceIntro:
-      "Виберіть мови один раз, і Пан Броколі запропонує лише локальні моделі для слухання, мислення та мовлення, які підходять цьому телефону.",
+      "Виберіть мови один раз, і Mr Broccoli запропонує лише локальні моделі для слухання, мислення та мовлення, які підходять цьому телефону.",
     onDeviceLanguages: "Мови розмови",
     onDeviceLanguagesHint:
       "Кожна локальна модель має підтримувати всі вибрані мови. Вибір також оновлює мови розпізнавання та озвучення.",
@@ -100,7 +100,7 @@ export const onDeviceTranslations = {
     settingsOnDeviceSummary:
       "निजी स्थानीय मॉडल, डिवाइस जाँच, डाउनलोड और परीक्षण।",
     onDeviceIntro:
-      "भाषाएँ एक बार चुनें। फिर मिस्टर ब्रोकली केवल इसी फ़ोन पर चल सकने वाले स्थानीय सुनने, सोचने और बोलने के मॉडल दिखाएगा।",
+      "भाषाएँ एक बार चुनें। फिर Mr Broccoli केवल इसी फ़ोन पर चल सकने वाले स्थानीय सुनने, सोचने और बोलने के मॉडल दिखाएगा।",
     onDeviceLanguages: "बातचीत की भाषाएँ",
     onDeviceLanguagesHint:
       "हर स्थानीय मॉडल को चुनी हुई सभी भाषाओं का समर्थन करना होगा। यह चयन सुनने और बोले गए उत्तरों की भाषाएँ भी बदलता है।",
@@ -129,7 +129,7 @@ export const onDeviceTranslations = {
     settingsOnDeviceSummary:
       "Modelos locales privados, comprobación del dispositivo, descargas y pruebas.",
     onDeviceIntro:
-      "Elige los idiomas una vez y Sr. Brócoli solo ofrecerá modelos locales de escucha, razonamiento y voz que funcionen en este teléfono.",
+      "Elige los idiomas una vez y Mr Broccoli solo ofrecerá modelos locales de escucha, razonamiento y voz que funcionen en este teléfono.",
     onDeviceLanguages: "Idiomas de conversación",
     onDeviceLanguagesHint:
       "Cada modelo local debe admitir todos estos idiomas. La selección también actualiza los idiomas de reconocimiento y respuesta hablada.",
@@ -159,7 +159,7 @@ export const onDeviceTranslations = {
     settingsOnDeviceSummary:
       "Modèles locaux privés, contrôle de l’appareil, téléchargements et tests.",
     onDeviceIntro:
-      "Choisissez les langues une fois. M. Brocoli ne proposera ensuite que les modèles locaux d’écoute, de réflexion et de voix adaptés à ce téléphone.",
+      "Choisissez les langues une fois. Mr Broccoli ne proposera ensuite que les modèles locaux d’écoute, de réflexion et de voix adaptés à ce téléphone.",
     onDeviceLanguages: "Langues de conversation",
     onDeviceLanguagesHint:
       "Chaque modèle local doit prendre en charge toutes ces langues. Ce choix met aussi à jour les langues d’écoute et des réponses vocales.",
@@ -189,7 +189,7 @@ export const onDeviceTranslations = {
     settingsOnDeviceSummary:
       "Modelli locali privati, verifica del dispositivo, download e test.",
     onDeviceIntro:
-      "Scegli le lingue una volta: Sig. Broccoli offrirà solo modelli locali di ascolto, ragionamento e voce adatti a questo telefono.",
+      "Scegli le lingue una volta: Mr Broccoli offrirà solo modelli locali di ascolto, ragionamento e voce adatti a questo telefono.",
     onDeviceLanguages: "Lingue della conversazione",
     onDeviceLanguagesHint:
       "Ogni modello locale deve supportare tutte le lingue selezionate. La scelta aggiorna anche le lingue di ascolto e risposta vocale.",
@@ -219,7 +219,7 @@ export const onDeviceTranslations = {
     settingsOnDeviceSummary:
       "Modelos locais privados, verificação do dispositivo, transferências e testes.",
     onDeviceIntro:
-      "Escolhe os idiomas uma vez. O Sr. Brócolo só mostrará modelos locais de escuta, raciocínio e voz adequados a este telemóvel.",
+      "Escolhe os idiomas uma vez. O Mr Broccoli só mostrará modelos locais de escuta, raciocínio e voz adequados a este telemóvel.",
     onDeviceLanguages: "Idiomas da conversa",
     onDeviceLanguagesHint:
       "Cada modelo local tem de suportar todos os idiomas escolhidos. A seleção também atualiza os idiomas de escuta e resposta falada.",
@@ -249,7 +249,7 @@ export const onDeviceTranslations = {
     settingsOnDeviceSummary:
       "Modelos locais privados, verificação do dispositivo, downloads e testes.",
     onDeviceIntro:
-      "Escolha os idiomas uma vez. O Sr. Brócolis só mostrará modelos locais de escuta, raciocínio e voz adequados a este celular.",
+      "Escolha os idiomas uma vez. O Mr Broccoli só mostrará modelos locais de escuta, raciocínio e voz adequados a este celular.",
     onDeviceLanguages: "Idiomas da conversa",
     onDeviceLanguagesHint:
       "Cada modelo local deve aceitar todos os idiomas escolhidos. A seleção também atualiza os idiomas de escuta e resposta falada.",
@@ -279,7 +279,7 @@ export const onDeviceTranslations = {
     settingsOnDeviceSummary:
       "Приватные локальные модели, проверка устройства, загрузки и тесты.",
     onDeviceIntro:
-      "Выберите языки один раз, и Мистер Брокколи предложит только подходящие этому телефону локальные модели для распознавания, ответов и озвучивания.",
+      "Выберите языки один раз, и Mr Broccoli предложит только подходящие этому телефону локальные модели для распознавания, ответов и озвучивания.",
     onDeviceLanguages: "Языки разговора",
     onDeviceLanguagesHint:
       "Каждая локальная модель должна поддерживать все выбранные языки. Выбор также обновляет языки распознавания и голосовых ответов.",
@@ -308,7 +308,7 @@ export const onDeviceTranslations = {
     settingsOnDevice: "设备端 AI",
     settingsOnDeviceSummary: "私密本地模型、设备检测、下载与测试。",
     onDeviceIntro:
-      "只需选择一次语言，西兰花先生就只会提供适合此手机的本地听写、推理和语音模型。",
+      "只需选择一次语言，Mr Broccoli就只会提供适合此手机的本地听写、推理和语音模型。",
     onDeviceLanguages: "对话语言",
     onDeviceLanguagesHint:
       "每个本地模型都必须支持所有所选语言。此选择也会更新听写和语音回复语言。",
@@ -336,7 +336,7 @@ export const onDeviceTranslations = {
     settingsOnDeviceSummary:
       "نماذج محلية خاصة وفحص الجهاز والتنزيلات والاختبارات.",
     onDeviceIntro:
-      "اختر اللغات مرة واحدة، وسيعرض السيد بروكلي فقط نماذج الاستماع والتفكير والصوت المحلية المناسبة لهذا الهاتف.",
+      "اختر اللغات مرة واحدة، وسيعرض Mr Broccoli فقط نماذج الاستماع والتفكير والصوت المحلية المناسبة لهذا الهاتف.",
     onDeviceLanguages: "لغات المحادثة",
     onDeviceLanguagesHint:
       "يجب أن يدعم كل نموذج محلي جميع اللغات المحددة. يحدّث هذا الاختيار أيضًا لغات الاستماع والردود المنطوقة.",
@@ -365,7 +365,7 @@ export const onDeviceTranslations = {
     settingsOnDeviceSummary:
       "プライベートなローカルモデル、端末チェック、ダウンロード、テスト。",
     onDeviceIntro:
-      "言語を一度選ぶと、ミスター・ブロッコリーはこの端末に適したローカルの音声認識・推論・音声モデルだけを表示します。",
+      "言語を一度選ぶと、Mr Broccoliはこの端末に適したローカルの音声認識・推論・音声モデルだけを表示します。",
     onDeviceLanguages: "会話の言語",
     onDeviceLanguagesHint:
       "各ローカルモデルは選択したすべての言語に対応する必要があります。この選択は音声認識と読み上げの言語にも反映されます。",
@@ -394,7 +394,7 @@ export const onDeviceTranslations = {
     settingsOnDeviceSummary:
       "Privát helyi modellek, eszközellenőrzés, letöltések és tesztek.",
     onDeviceIntro:
-      "Válaszd ki egyszer a nyelveket, és Brokkoli úr csak az ezen a telefonon futó helyi hallási, gondolkodási és beszédmodelleket kínálja fel.",
+      "Válaszd ki egyszer a nyelveket, és Mr Broccoli csak az ezen a telefonon futó helyi hallási, gondolkodási és beszédmodelleket kínálja fel.",
     onDeviceLanguages: "Beszélgetési nyelvek",
     onDeviceLanguagesHint:
       "Minden helyi modellnek támogatnia kell az összes kiválasztott nyelvet. Ez a felismerés és a felolvasás nyelveit is frissíti.",
@@ -424,7 +424,7 @@ export const onDeviceTranslations = {
     settingsOnDeviceSummary:
       "Soukromé místní modely, kontrola zařízení, stahování a testy.",
     onDeviceIntro:
-      "Vyberte jazyky jednou a Pan Brokolice nabídne jen místní modely poslechu, uvažování a hlasu vhodné pro tento telefon.",
+      "Vyberte jazyky jednou a Mr Broccoli nabídne jen místní modely poslechu, uvažování a hlasu vhodné pro tento telefon.",
     onDeviceLanguages: "Jazyky konverzace",
     onDeviceLanguagesHint:
       "Každý místní model musí podporovat všechny vybrané jazyky. Volba upraví také jazyky rozpoznávání a mluvených odpovědí.",
@@ -453,7 +453,7 @@ export const onDeviceTranslations = {
     settingsOnDeviceSummary:
       "Prywatne modele lokalne, kontrola urządzenia, pobieranie i testy.",
     onDeviceIntro:
-      "Wybierz języki raz, a Pan Brokuł pokaże tylko lokalne modele słuchania, rozumowania i głosu odpowiednie dla tego telefonu.",
+      "Wybierz języki raz, a Mr Broccoli pokaże tylko lokalne modele słuchania, rozumowania i głosu odpowiednie dla tego telefonu.",
     onDeviceLanguages: "Języki rozmowy",
     onDeviceLanguagesHint:
       "Każdy model lokalny musi obsługiwać wszystkie wybrane języki. Wybór aktualizuje też języki rozpoznawania i odpowiedzi głosowych.",
@@ -482,7 +482,7 @@ export const onDeviceTranslations = {
     settingsOnDeviceSummary:
       "Özel yerel modeller, cihaz kontrolü, indirmeler ve testler.",
     onDeviceIntro:
-      "Dilleri bir kez seçin; Bay Brokoli yalnızca bu telefona uygun yerel dinleme, düşünme ve ses modellerini sunar.",
+      "Dilleri bir kez seçin; Mr Broccoli yalnızca bu telefona uygun yerel dinleme, düşünme ve ses modellerini sunar.",
     onDeviceLanguages: "Konuşma dilleri",
     onDeviceLanguagesHint:
       "Her yerel model seçilen tüm dilleri desteklemelidir. Bu seçim dinleme ve sesli yanıt dillerini de günceller.",
@@ -511,7 +511,7 @@ export const onDeviceTranslations = {
     settingsOnDeviceSummary:
       "Privata lokala modeller, enhetskontroll, hämtningar och tester.",
     onDeviceIntro:
-      "Välj språk en gång. Herr Broccoli visar sedan bara lokala modeller för lyssning, resonemang och tal som passar den här telefonen.",
+      "Välj språk en gång. Mr Broccoli visar sedan bara lokala modeller för lyssning, resonemang och tal som passar den här telefonen.",
     onDeviceLanguages: "Samtalsspråk",
     onDeviceLanguagesHint:
       "Varje lokal modell måste stödja alla valda språk. Valet uppdaterar även språk för igenkänning och talade svar.",
@@ -539,7 +539,7 @@ export const onDeviceTranslations = {
     settingsOnDevice: "ڈیوائس پر AI",
     settingsOnDeviceSummary: "نجی مقامی ماڈلز، ڈیوائس جانچ، ڈاؤن لوڈ اور ٹیسٹ۔",
     onDeviceIntro:
-      "زبانیں ایک بار منتخب کریں، پھر مسٹر بروکلی صرف اسی فون کے لیے موزوں مقامی سننے، سوچنے اور بولنے کے ماڈلز دکھائے گا۔",
+      "زبانیں ایک بار منتخب کریں، پھر Mr Broccoli صرف اسی فون کے لیے موزوں مقامی سننے، سوچنے اور بولنے کے ماڈلز دکھائے گا۔",
     onDeviceLanguages: "گفتگو کی زبانیں",
     onDeviceLanguagesHint:
       "ہر مقامی ماڈل کو منتخب تمام زبانوں کی معاونت کرنا ہوگی۔ یہ انتخاب سننے اور بولے گئے جواب کی زبانیں بھی بدلتا ہے۔",

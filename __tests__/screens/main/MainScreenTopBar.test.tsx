@@ -7,13 +7,13 @@ import { lightColors } from "../../../src/theme/colors";
 
 describe("MainScreenTopBar", () => {
   it.each([false, true])(
-    "shows the localized brand when compact is %s",
+    "shows the canonical brand when compact is %s",
     (compact) => {
       const onOpenDrawer = jest.fn();
       const onOpenSettings = jest.fn();
       const screen = render(
         <MainScreenTopBar
-          brandName="Mr. Brokkoli"
+          brandName="Mr Broccoli"
           colors={lightColors}
           compact={compact}
           drawerLabel="Conversations"
@@ -24,9 +24,9 @@ describe("MainScreenTopBar", () => {
         />,
       );
 
-      expect(screen.getByText("Mr. Brokkoli")).toBeTruthy();
+      expect(screen.getByText("Mr Broccoli")).toBeTruthy();
       expect(
-        StyleSheet.flatten(screen.getByText("Mr. Brokkoli").props.style)
+        StyleSheet.flatten(screen.getByText("Mr Broccoli").props.style)
           .fontSize,
       ).toBe(compact ? 14 : 26);
       expect(

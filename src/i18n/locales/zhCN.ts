@@ -25,7 +25,7 @@ export const zhCN = {
   ...onboardingTranslations["zh-CN"],
   ...premiumTranslations["zh-CN"],
   ...transcriptEditTranslations["zh-CN"],
-  appName: "西兰花先生",
+  appName: "Mr Broccoli",
   retry: "重试",
   dismiss: "关闭",
   done: "完成",
@@ -391,7 +391,7 @@ export const zhCN = {
     "使用选定的配置服务进行语音回复。",
   ttsFallbackRoutes: "后备路线",
   ttsFallbackRoutesHint:
-    "选修的。仅添加您想要的路线，按照应尝试的顺序。一旦路由开始说话，西兰花先生 就会保留在该路由上以完成其余的回复。",
+    "选修的。仅添加您想要的路线，按照应尝试的顺序。一旦路由开始说话，Mr Broccoli 就会保留在该路由上以完成其余的回复。",
   ttsFallbackNone:
     "未配置后备。相反，将显示语音故障。",
   ttsFallbackPosition: ({ position, route }) => `${position}。 ${route}`,
@@ -426,7 +426,7 @@ export const zhCN = {
   elevenLabsVoicesReadPermissionHint:
     "在 ElevenLabs 中，编辑此 API 键并启用 Voices → Read，然后在此处刷新。",
   providerVoicesLoadingHint: ({ provider }) =>
-    `西兰花先生 自动从 ${provider} 加载可用语音。`,
+    `Mr Broccoli 自动从 ${provider} 加载可用语音。`,
   providerVoiceId: "语音识别",
   providerVoiceIdPlaceholder: "输入语音 ID",
   providerVoiceIdFallbackHint:
@@ -434,7 +434,7 @@ export const zhCN = {
   providerVoiceIdRequired: ({ provider }) =>
     `使用语音输出前，请刷新${provider}语音库或输入语音ID。`,
   qwenSpeechUnavailableInUs:
-    "西兰花先生目前的Qwen语音路由在美国地区不可用。选择新加坡或北京进行Qwen演讲。",
+    "Mr Broccoli目前的Qwen语音路由在美国地区不可用。选择新加坡或北京进行Qwen演讲。",
   qwenApiRegion: "Qwen API 区域",
   qwenRegionSingapore: "新加坡",
   qwenRegionUs: "美国（弗吉尼亚州）",
@@ -442,12 +442,12 @@ export const zhCN = {
   qwenRegionHint:
     "所选区域必须与创建此 API 密钥的区域匹配。",
   qwenRegionUsSpeechHint:
-    "美国区域按键支持此处的聊天和网络搜索。 西兰花先生目前的Qwen、STT和TTS航线需要新加坡或北京钥匙。",
+    "美国区域按键支持此处的聊天和网络搜索。 Mr Broccoli目前的Qwen、STT和TTS航线需要新加坡或北京钥匙。",
   providerDefaultVoiceHint:
     "该提供商当前使用其默认语音进行预览和语音回复。",
   listenLanguages: "听语言",
   listenLanguagesHint:
-    "选择您希望听起来不错的回复语言。 西兰花先生 在路由语音输出时按此顺序尝试它们。",
+    "选择您希望听起来不错的回复语言。 Mr Broccoli 在路由语音输出时按此顺序尝试它们。",
   listenLanguagesSelected: ({ count }) =>
     count === 1 ? "已选择 1 种语言" : `${count} 选择的语言`,
   localVoicePacks: "本地语音包",
@@ -464,7 +464,7 @@ export const zhCN = {
     "此设备未报告任何本机系统语音以进行预览。",
   runtimeCompatibilityOverrides: "运行时兼容性",
   runtimeCompatibilityOverridesDescription: ({ count }) =>
-    `有 ${count} 个经提供商确认不可用的模型或设置配置仅在此设备上被停用。西兰花先生会自动绕过它们。`,
+    `有 ${count} 个经提供商确认不可用的模型或设置配置仅在此设备上被停用。Mr Broccoli会自动绕过它们。`,
   clearRuntimeCompatibilityOverrides: "清除运行时兼容性",
   clearRuntimeCompatibilityOverridesConfirmationTitle:
     "要清除运行时兼容性吗？",
@@ -609,7 +609,7 @@ export const zhCN = {
   conversationActions: "对话动作",
   statusDetails: "状态详情",
   persistenceFailure:
-    "西兰花先生 无法在此设备上保存数据。保持应用程序打开并重试；重启后最近的更改可能会丢失。",
+    "Mr Broccoli 无法在此设备上保存数据。保持应用程序打开并重试；重启后最近的更改可能会丢失。",
   show: "展示",
   showTranscript: "显示成绩单",
   hide: "隐藏",
@@ -703,7 +703,7 @@ export const zhCN = {
   idle: "闲置的",
   yourConversationAppearsHere: "您的对话出现在这里",
   defaultTranscriptEmptyDescription:
-    "使用语音或文本开始。 西兰花先生 将保留该线程并在此回复。",
+    "使用语音或文本开始。 Mr Broccoli 将保留该线程并在此回复。",
   delete: "删除",
   deleteConversationConfirmationTitle: ({ title }) => `删除“${title}”？`,
   deleteConversationConfirmationMessage:
@@ -714,7 +714,7 @@ export const zhCN = {
   newSession: "新会议",
   noSavedConversationsYet: "尚未保存对话",
   drawerEmptyDescription:
-    "从主视图开始说话，西兰花先生 将自动建立会话。",
+    "从主视图开始说话，Mr Broccoli 将自动建立会话。",
   setupGuideTitle: "配置应用程序",
   setupGuideSubtitle: "添加凭据并在“设置”中选择路由。",
   fastestStartPreset: "最少的设置",
@@ -727,9 +727,9 @@ export const zhCN = {
     "接下来我们将打开“设置”，以便您可以粘贴和验证凭据。",
   useThisSetup: "使用此设置",
   notNow: "现在不要",
-  setupGuideIntroTitle: "西兰花先生 的工作原理",
+  setupGuideIntroTitle: "Mr Broccoli 的工作原理",
   setupGuideIntroBody:
-    "西兰花先生 开始为空白。为您已使用的外部服务添加凭据，然后选择回复、语音输入、语音输出和可选 Web 上下文的路由方式。",
+    "Mr Broccoli 开始为空白。为您已使用的外部服务添加凭据，然后选择回复、语音输入、语音输出和可选 Web 上下文的路由方式。",
   setupGuideIntroNote:
     "设置后，使用主语音控制来开始和停止对话。当前的成绩单在主屏幕上保持可用，并且以后可以在“设置”中更改每条路线。",
   setupGuideProviderTitle: "添加凭证",
@@ -762,7 +762,7 @@ export const zhCN = {
   setupGuideSkipKokoro: "暂时跳过",
   setupGuideVoiceTestTitle: "测试您的设置",
   setupGuideVoiceTestBody:
-    "说一个简短的句子。当可接受的语音路由可用时，西兰花先生 将测试麦克风访问、转录、配置的回复路由和语音输出。",
+    "说一个简短的句子。当可接受的语音路由可用时，Mr Broccoli 将测试麦克风访问、转录、配置的回复路由和语音输出。",
   setupGuideVoiceTestNoInputBody:
     "此设置无法使用语音输入。继续检查检测到的路线，然后根据需要调整语音设置。",
   setupGuideVoiceTestTextOnlyNote:
@@ -781,7 +781,7 @@ export const zhCN = {
     "此设备上的此设置无法使用语音输入。",
   setupGuideSummaryTitle: "设置完成",
   setupGuideSummaryBody:
-    "这是 西兰花先生 将与您当前配置一起使用的路线。",
+    "这是 Mr Broccoli 将与您当前配置一起使用的路线。",
   setupGuideSummaryLlm: "LLM",
   setupGuideSummaryStt: "语音转文字",
   setupGuideSummaryTts: "文字转语音",
@@ -806,7 +806,7 @@ export const zhCN = {
     "尝试使用文字记录中不同的标题、路线、模型或短语。",
   memoryModalTitle: "对话记忆",
   memoryModalDescription:
-    "一旦线程变得足够长以压缩较旧的回合，这是 西兰花先生 的紧凑摘要。",
+    "一旦线程变得足够长以压缩较旧的回合，这是 Mr Broccoli 的紧凑摘要。",
   memorySummary: "已保存摘要",
   memorySummaryEmpty:
     "还没有紧凑型内存。一旦这条线变得更长，旧的回合将在这里总结。",

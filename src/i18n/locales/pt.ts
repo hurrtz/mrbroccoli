@@ -25,7 +25,7 @@ export const pt = {
   ...onboardingTranslations.pt,
   ...premiumTranslations.pt,
   ...transcriptEditTranslations.pt,
-  appName: "Sr. Brócolo",
+  appName: "Mr Broccoli",
   retry: "Tentar novamente",
   dismiss: "Fechar",
   done: "Concluído",
@@ -393,7 +393,7 @@ export const pt = {
     "Utilize o serviço configurado selecionado para respostas faladas.",
   ttsFallbackRoutes: "Rotas alternativas",
   ttsFallbackRoutesHint:
-    "Opcional. Adicione apenas as rotas pretendidas, pela ordem em que devem ser tentadas. Assim que uma rota começa a falar, Sr. Brócolo permanece nela durante o resto da resposta.",
+    "Opcional. Adicione apenas as rotas pretendidas, pela ordem em que devem ser tentadas. Assim que uma rota começa a falar, Mr Broccoli permanece nela durante o resto da resposta.",
   ttsFallbackNone:
     "Nenhum substituto está configurado. Uma falha de voz será mostrada no seu lugar.",
   ttsFallbackPosition: ({ position, route }) => `${position}. ${route}`,
@@ -428,7 +428,7 @@ export const pt = {
   elevenLabsVoicesReadPermissionHint:
     "Em ElevenLabs, edite esta chave API e ative Voices → Read e atualize aqui.",
   providerVoicesLoadingHint: ({ provider }) =>
-    `Sr. Brócolo carrega as vozes disponíveis automaticamente a partir de ${provider}.`,
+    `Mr Broccoli carrega as vozes disponíveis automaticamente a partir de ${provider}.`,
   providerVoiceId: "ID de voz",
   providerVoiceIdPlaceholder: "Introduza um ID de voz",
   providerVoiceIdFallbackHint:
@@ -436,7 +436,7 @@ export const pt = {
   providerVoiceIdRequired: ({ provider }) =>
     `Atualize a biblioteca de voz ${provider} ou introduza um ID de voz antes de utilizar a saída de voz.`,
   qwenSpeechUnavailableInUs:
-    "As rotas de voz Qwen atuais de Sr. Brócolo não estão disponíveis na região dos EUA. Escolha Singapura ou Pequim para o discurso Qwen.",
+    "As rotas de voz Qwen atuais de Mr Broccoli não estão disponíveis na região dos EUA. Escolha Singapura ou Pequim para o discurso Qwen.",
   qwenApiRegion: "Região Qwen API",
   qwenRegionSingapore: "Cingapura",
   qwenRegionUs: "EUA (Virgínia)",
@@ -444,12 +444,12 @@ export const pt = {
   qwenRegionHint:
     "A região selecionada deve corresponder à região na qual esta chave API foi criada.",
   qwenRegionUsSpeechHint:
-    "As chaves da região dos EUA suportam o chat e a pesquisa na web aqui. As rotas Qwen STT e TTS atuais a partir de Sr. Brócolo requerem uma chave de Singapura ou Pequim.",
+    "As chaves da região dos EUA suportam o chat e a pesquisa na web aqui. As rotas Qwen STT e TTS atuais a partir de Mr Broccoli requerem uma chave de Singapura ou Pequim.",
   providerDefaultVoiceHint:
     "Este fornecedor utiliza atualmente a sua voz padrão para visualização e respostas faladas.",
   listenLanguages: "Ouvir idiomas",
   listenLanguagesHint:
-    "Escolha os idiomas de resposta que pretende que soem bem. Sr. Brócolo tenta-os por esta ordem ao encaminhar a saída de voz.",
+    "Escolha os idiomas de resposta que pretende que soem bem. Mr Broccoli tenta-os por esta ordem ao encaminhar a saída de voz.",
   listenLanguagesSelected: ({ count }) =>
     count === 1 ? "1 idioma selecionado" : `Idiomas ${count} selecionados`,
   localVoicePacks: "Pacotes de voz locais",
@@ -466,7 +466,7 @@ export const pt = {
     "Este dispositivo não reportou nenhuma voz nativa do sistema para visualização.",
   runtimeCompatibilityOverrides: "Compatibilidade em execução",
   runtimeCompatibilityOverridesDescription: ({ count }) =>
-    `${count} configurações de modelo ou definição confirmadas como indisponíveis pelo fornecedor estão desativadas apenas neste dispositivo. O Sr. Brócolo contorna-as automaticamente.`,
+    `${count} configurações de modelo ou definição confirmadas como indisponíveis pelo fornecedor estão desativadas apenas neste dispositivo. O Mr Broccoli contorna-as automaticamente.`,
   clearRuntimeCompatibilityOverrides: "Limpar compatibilidade em execução",
   clearRuntimeCompatibilityOverridesConfirmationTitle:
     "Limpar a compatibilidade em execução?",
@@ -611,7 +611,7 @@ export const pt = {
   conversationActions: "Ações de conversação",
   statusDetails: "Detalhes do estado",
   persistenceFailure:
-    "Sr. Brócolo não conseguiu guardar dados neste dispositivo. Mantenha a aplicação aberta e tente novamente; alterações recentes podem ser perdidas após a reinicialização.",
+    "Mr Broccoli não conseguiu guardar dados neste dispositivo. Mantenha a aplicação aberta e tente novamente; alterações recentes podem ser perdidas após a reinicialização.",
   show: "Espetáculo",
   showTranscript: "Mostrar transcrição",
   hide: "Ocultar",
@@ -705,7 +705,7 @@ export const pt = {
   idle: "Ocioso",
   yourConversationAppearsHere: "A sua conversa aparece aqui",
   defaultTranscriptEmptyDescription:
-    "Use voz ou texto para começar. Sr. Brócolo manterá o tópico e responderá aqui.",
+    "Use voz ou texto para começar. Mr Broccoli manterá o tópico e responderá aqui.",
   delete: "Eliminar",
   deleteConversationConfirmationTitle: ({ title }) => `Apagar “${title}”?`,
   deleteConversationConfirmationMessage:
@@ -716,7 +716,7 @@ export const pt = {
   newSession: "Nova sessão",
   noSavedConversationsYet: "Ainda não há conversas guardadas",
   drawerEmptyDescription:
-    "Comece a falar na vista principal e Sr. Brócolo criará uma sessão automaticamente.",
+    "Comece a falar na vista principal e Mr Broccoli criará uma sessão automaticamente.",
   setupGuideTitle: "Configurar a aplicação",
   setupGuideSubtitle: "Adicione credenciais e escolha rotas em Definições.",
   fastestStartPreset: "Configuração mínima",
@@ -729,9 +729,9 @@ export const pt = {
     "A seguir abriremos as Definições para que possa colar e validar as credenciais.",
   useThisSetup: "Utilize esta configuração",
   notNow: "Agora não",
-  setupGuideIntroTitle: "Como funciona o Sr. Brócolo",
+  setupGuideIntroTitle: "Como funciona o Mr Broccoli",
   setupGuideIntroBody:
-    "Sr. Brócolo começa em branco. Adicione credenciais para serviços externos que já utiliza e escolha como as respostas, a entrada de fala, a saída falada e o contexto Web opcional serão encaminhados.",
+    "Mr Broccoli começa em branco. Adicione credenciais para serviços externos que já utiliza e escolha como as respostas, a entrada de fala, a saída falada e o contexto Web opcional serão encaminhados.",
   setupGuideIntroNote:
     "Após a configuração, utilize o controlo de voz principal para iniciar e interromper uma conversa. A transcrição atual permanece disponível no ecrã inicial e cada rota pode ser alterada posteriormente nas Definições.",
   setupGuideProviderTitle: "Adicionar credenciais",
@@ -764,7 +764,7 @@ export const pt = {
   setupGuideSkipKokoro: "Saltar por enquanto",
   setupGuideVoiceTestTitle: "Teste a sua configuração",
   setupGuideVoiceTestBody:
-    "Diga uma frase curta. Sr. Brócolo testará o acesso ao microfone, a transcrição, a rota de resposta configurada e a saída falada quando uma rota de voz aceitável estiver disponível.",
+    "Diga uma frase curta. Mr Broccoli testará o acesso ao microfone, a transcrição, a rota de resposta configurada e a saída falada quando uma rota de voz aceitável estiver disponível.",
   setupGuideVoiceTestNoInputBody:
     "A entrada de voz não está disponível nesta configuração. Continue a rever as rotas detetadas e ajuste as definições de fala mais tarde, se necessário.",
   setupGuideVoiceTestTextOnlyNote:
@@ -783,7 +783,7 @@ export const pt = {
     "A entrada de voz não está disponível para esta definição neste dispositivo.",
   setupGuideSummaryTitle: "Configuração concluída",
   setupGuideSummaryBody:
-    "Aqui está a rota que Sr. Brócolo irá utilizar com a sua configuração atual.",
+    "Aqui está a rota que Mr Broccoli irá utilizar com a sua configuração atual.",
   setupGuideSummaryLlm: "LLM",
   setupGuideSummaryStt: "Fala para texto",
   setupGuideSummaryTts: "Texto para voz",
@@ -808,7 +808,7 @@ export const pt = {
     "Experimente um título, percurso, modelo ou frase diferente da transcrição.",
   memoryModalTitle: "Memória de conversa",
   memoryModalDescription:
-    "Este é o resumo compacto que Sr. Brócolo avança quando um thread se torna suficientemente longo para comprimir voltas mais antigas.",
+    "Este é o resumo compacto que Mr Broccoli avança quando um thread se torna suficientemente longo para comprimir voltas mais antigas.",
   memorySummary: "Resumo salvo",
   memorySummaryEmpty:
     "Ainda não há memória compacta. Quando este tópico se tornar mais longo, as curvas mais antigas serão resumidas aqui.",

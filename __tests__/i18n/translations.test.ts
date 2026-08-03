@@ -126,44 +126,35 @@ describe("translations", () => {
     );
   });
 
-  it("uses the current app name in localized UI copy", () => {
-    expect(translations.en.appName).toBe("Mr Broccoli");
-    expect(translations.de.appName).toBe("Mr. Brokkoli");
-    expect(translations.uk.appName).toBe("Пан Броколі");
-    expect(translations.hi.appName).toBe("मिस्टर ब्रोकली");
-    expect(translations.es.appName).toBe("Sr. Brócoli");
-    expect(translations.fr.appName).toBe("M. Brocoli");
-    expect(translations.it.appName).toBe("Sig. Broccoli");
-    expect(translations.pt.appName).toBe("Sr. Brócolo");
-    expect(translations["pt-BR"].appName).toBe("Sr. Brócolis");
-    expect(translations.ru.appName).toBe("Мистер Брокколи");
-    expect(translations["zh-CN"].appName).toBe("西兰花先生");
-    expect(translations.ar.appName).toBe("السيد بروكلي");
-    expect(translations.ja.appName).toBe("ミスター・ブロッコリー");
-    expect(translations.hu.appName).toBe("Brokkoli úr");
-    expect(translations.cs.appName).toBe("Pan Brokolice");
-    expect(translations.pl.appName).toBe("Pan Brokuł");
-    expect(translations.tr.appName).toBe("Bay Brokoli");
-    expect(translations.sv.appName).toBe("Herr Broccoli");
-    expect(translations.ur.appName).toBe("مسٹر بروکلی");
-    expect(JSON.stringify(translations.de)).not.toContain("Mr Broccoli");
-    expect(JSON.stringify(translations.uk)).not.toContain("Mr Broccoli");
-    expect(JSON.stringify(translations.hi)).not.toContain("Mr Broccoli");
-    expect(JSON.stringify(translations.es)).not.toContain("Mr Broccoli");
-    expect(JSON.stringify(translations.fr)).not.toContain("Mr Broccoli");
-    expect(JSON.stringify(translations.it)).not.toContain("Mr Broccoli");
-    expect(JSON.stringify(translations.pt)).not.toContain("Mr Broccoli");
-    expect(JSON.stringify(translations["pt-BR"])).not.toContain("Mr Broccoli");
-    expect(JSON.stringify(translations.ru)).not.toContain("Mr Broccoli");
-    expect(JSON.stringify(translations["zh-CN"])).not.toContain("Mr Broccoli");
-    expect(JSON.stringify(translations.ar)).not.toContain("Mr Broccoli");
-    expect(JSON.stringify(translations.ja)).not.toContain("Mr Broccoli");
-    expect(JSON.stringify(translations.hu)).not.toContain("Mr Broccoli");
-    expect(JSON.stringify(translations.cs)).not.toContain("Mr Broccoli");
-    expect(JSON.stringify(translations.pl)).not.toContain("Mr Broccoli");
-    expect(JSON.stringify(translations.tr)).not.toContain("Mr Broccoli");
-    expect(JSON.stringify(translations.sv)).not.toContain("Mr Broccoli");
-    expect(JSON.stringify(translations.ur)).not.toContain("Mr Broccoli");
+  it("keeps the exact Mr Broccoli brand in every interface language", () => {
+    Object.values(translations).forEach((dictionary) => {
+      expect(dictionary.appName).toBe("Mr Broccoli");
+    });
+
+    const retiredLocalizedNames = [
+      "Mr. Brokkoli",
+      "Пан Броколі",
+      "Мистер Брокколи",
+      "ミスター・ブロッコリー",
+      "मिस्टर ब्रोकली",
+      "السيد بروكلي",
+      "مسٹر بروکلی",
+      "西兰花先生",
+      "Sr. Brócoli",
+      "Sr. Brócolo",
+      "Sr. Brócolis",
+      "Sig. Broccoli",
+      "M. Brocoli",
+      "Brokkoli úr",
+      "Pan Brokolice",
+      "Pan Brokuł",
+      "Bay Brokoli",
+      "Herr Broccoli",
+    ];
+    const serializedTranslations = JSON.stringify(translations);
+    retiredLocalizedNames.forEach((name) => {
+      expect(serializedTranslations).not.toContain(name);
+    });
   });
 
   it("resolves Ukrainian UI copy and regional formatting", () => {
