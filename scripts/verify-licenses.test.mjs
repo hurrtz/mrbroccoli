@@ -3,6 +3,8 @@ import test from "node:test";
 
 import {
   isApprovedLicense,
+  noticePackageKeys,
+  noticesCoverPackages,
   resolvedLicense,
 } from "./verify-licenses.mjs";
 
@@ -35,5 +37,32 @@ test("uses reviewed package-specific license metadata overrides", () => {
       license: "Apache-2.0",
     }),
     "Apache-2.0",
+  );
+});
+
+test("accepts a portable notice inventory that is a superset of this platform", () => {
+  const notices = [
+    "### @scope/alpha@1.2.3",
+    "License: MIT",
+    "### beta@2.0.0",
+    "Packages (2): beta@2.0.0, optional-wasm@3.0.0",
+  ].join("\n");
+  const packages = [
+    { name: "@scope/alpha", version: "1.2.3" },
+    { name: "beta", version: "2.0.0" },
+  ];
+
+  assert.deepEqual([...noticePackageKeys(notices)].sort(), [
+    "@scope/alpha@1.2.3",
+    "beta@2.0.0",
+    "optional-wasm@3.0.0",
+  ]);
+  assert.equal(noticesCoverPackages(notices, packages), true);
+  assert.equal(
+    noticesCoverPackages(notices, [
+      ...packages,
+      { name: "new-runtime", version: "1.0.0" },
+    ]),
+    false,
   );
 });

@@ -52,7 +52,7 @@ function benchmark(
   const snapshot = device();
   return {
     modelId,
-    catalogVersion: 1,
+    catalogVersion: 2,
     testedAt: snapshot.capturedAt,
     status,
     loadMs: 10,
@@ -78,6 +78,22 @@ describe("free offline profile selection", () => {
 
   it("selects the language-specific German voice", () => {
     expect(readyProfile("de").tts?.id).toBe("piper-de-de-thorsten");
+  });
+
+  it.each([
+    ["it", "piper-it-it-paola"],
+    ["ru", "piper-ru-ru-dmitri"],
+    ["pt", "piper-pt-pt-tugao"],
+  ] as const)("selects a compact %s voice", (language, modelId) => {
+    const result = selectOfflineProfile({
+      languages: [language],
+      snapshot: device(),
+    });
+
+    expect(result.status).toBe("ready");
+    if (result.status === "ready") {
+      expect(result.profile.tts?.id).toBe(modelId);
+    }
   });
 
   it("uses the system voice when two languages have no shared local TTS model", () => {

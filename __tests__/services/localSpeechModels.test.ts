@@ -48,6 +48,7 @@ import { saveLocalModelBenchmarkResult } from "../../src/services/localDeviceCap
 import {
   benchmarkLocalStt,
   getLocalTtsBenchmarkText,
+  transcribeLocalAudio,
 } from "../../src/services/localSpeechModels";
 
 describe("local speech model checks", () => {
@@ -95,6 +96,26 @@ describe("local speech model checks", () => {
     );
   });
 
+  it("does not send Whisper-only options to Omnilingual ASR", async () => {
+    mockTranscribeFile.mockResolvedValueOnce({ text: "ciao" });
+
+    await expect(
+      transcribeLocalAudio({
+        fileUri: "file:///recording.wav",
+        modelId: "omnilingual-asr-300m",
+        language: "it",
+      }),
+    ).resolves.toBe("ciao");
+
+    expect(mockCreateStt).toHaveBeenCalledWith(
+      expect.objectContaining({
+        modelType: "omnilingual",
+        modelOptions: undefined,
+      }),
+    );
+    expect(mockDestroy).toHaveBeenCalledTimes(1);
+  });
+
   it("uses the selected language for local TTS benchmarks", () => {
     expect(getLocalTtsBenchmarkText("de")).toBe("Hallo von Mr Broccoli.");
     expect(getLocalTtsBenchmarkText("es")).toBe("Hola desde Mr Broccoli.");
@@ -104,5 +125,8 @@ describe("local speech model checks", () => {
     expect(getLocalTtsBenchmarkText("pt-BR")).toBe(
       "Olá, aqui é o Mr Broccoli.",
     );
+    expect(getLocalTtsBenchmarkText("pt")).toBe("Olá, aqui é o Mr Broccoli.");
+    expect(getLocalTtsBenchmarkText("it")).toBe("Ciao da Mr Broccoli.");
+    expect(getLocalTtsBenchmarkText("ru")).toBe("Привет от Mr Broccoli.");
   });
 });

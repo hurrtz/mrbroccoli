@@ -83,12 +83,16 @@ const NATIVE_LICENSES = [
 
 const REVIEWED_SHERPA_MODEL_LICENSE_ROWS = [
   "sherpa-onnx-whisper-tiny.tar.bz2,mit,yes,high,manual,https://github.com/openai/whisper/",
+  "sherpa-onnx-omnilingual-asr-1600-languages-300M-ctc-v2-int8-2026-02-05.tar.bz2,apache-2.0,yes,high,archive_license_file,sherpa-onnx-omnilingual-asr-1600-languages-300M-ctc-v2-int8-2026-02-05/LICENSE",
   "kokoro-int8-multi-lang-v1_1.tar.bz2,apache-2.0,yes,high,archive_license_file,kokoro-int8-multi-lang-v1_1/LICENSE",
   "vits-piper-en_US-kristin-medium-int8.tar.bz2,public-domain,yes,high,manual,https://huggingface.co/csukuangfj/vits-piper-en_US-kristin-medium",
   "vits-piper-de_DE-thorsten-medium-int8.tar.bz2,cc0,yes,high,manual,https://huggingface.co/rhasspy/piper-voices/tree/main",
   "vits-piper-es_ES-sharvard-medium-int8.tar.bz2,cc-by-3.0,yes,high,manual,https://huggingface.co/rhasspy/piper-voices/tree/main",
   "vits-piper-fr_FR-siwis-medium-int8.tar.bz2,cc-by-4.0,yes,medium,huggingface_model_card,https://huggingface.co/csukuangfj/vits-piper-fr_FR-siwis-medium",
   "vits-piper-pt_BR-faber-medium-int8.tar.bz2,cc0,yes,high,manual,https://huggingface.co/rhasspy/piper-voices/tree/main",
+  "vits-piper-pt_PT-tugao-medium-int8.tar.bz2,cc0,yes,high,huggingface_model_card,https://huggingface.co/csukuangfj/vits-piper-pt_PT-tugao-medium",
+  "vits-piper-ru_RU-dmitri-medium-int8.tar.bz2,cc0,yes,high,manual,https://huggingface.co/rhasspy/piper-voices/tree/main",
+  "vits-piper-it_IT-paola-medium-int8.tar.bz2,cc0,yes,high,manual,https://huggingface.co/rhasspy/piper-voices/tree/main",
 ];
 
 function fail(message) {
@@ -105,6 +109,32 @@ export function resolvedLicense(packageInfo) {
 
 export function isApprovedLicense(license) {
   return APPROVED_LICENSES.has(license);
+}
+
+export function noticePackageKeys(notices) {
+  const keys = new Set();
+
+  for (const line of notices.split("\n")) {
+    const heading = line.match(/^### (.+@[^\s]+)$/);
+    if (heading) {
+      keys.add(heading[1]);
+      continue;
+    }
+
+    const group = line.match(/^Packages \(\d+\): (.+)$/);
+    if (group) {
+      for (const key of group[1].split(", ")) {
+        keys.add(key);
+      }
+    }
+  }
+
+  return keys;
+}
+
+export function noticesCoverPackages(notices, packages) {
+  const covered = noticePackageKeys(notices);
+  return packages.every((packageInfo) => covered.has(packageKey(packageInfo)));
 }
 
 function collectProductionPackages() {
@@ -197,9 +227,11 @@ function verifyNativeLicenses() {
     fail("Android must keep Sherpa FFmpeg disabled");
   }
   for (const row of REVIEWED_SHERPA_MODEL_LICENSE_ROWS) {
-    const registry = row.startsWith("sherpa-onnx-whisper-")
-      ? asrModelLicenseCsv
-      : modelLicenseCsv;
+    const registry =
+      row.startsWith("sherpa-onnx-whisper-") ||
+      row.startsWith("sherpa-onnx-omnilingual-asr-")
+        ? asrModelLicenseCsv
+        : modelLicenseCsv;
     if (!registry.includes(row)) {
       fail(`A reviewed Sherpa model license record changed: ${row}`);
     }
@@ -329,9 +361,13 @@ export function verifyLicenses({ write = false } = {}) {
 
   if (write) {
     fs.writeFileSync(noticesPath, expectedNotices);
+  } else if (!fs.existsSync(noticesPath)) {
+    fail(
+      "THIRD_PARTY_NOTICES.md is missing; run npm run license:notices:generate",
+    );
   } else if (
-    !fs.existsSync(noticesPath) ||
-    fs.readFileSync(noticesPath, "utf8") !== expectedNotices
+    fs.readFileSync(noticesPath, "utf8") !== expectedNotices &&
+    !noticesCoverPackages(fs.readFileSync(noticesPath, "utf8"), packages)
   ) {
     fail(
       "THIRD_PARTY_NOTICES.md is stale; run npm run license:notices:generate",

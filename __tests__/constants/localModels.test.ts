@@ -30,4 +30,27 @@ describe("local model catalogue", () => {
       localModelSupportsLanguages(LOCAL_MODEL_CATALOG[0], ["de", "uk"]),
     ).toBe(true);
   });
+
+  it("covers every Free language with a compact local voice", () => {
+    expect(
+      getLocalModelsForLanguages("tts", ["it"]).map(({ id }) => id),
+    ).toContain("piper-it-it-paola");
+    expect(
+      getLocalModelsForLanguages("tts", ["ru"]).map(({ id }) => id),
+    ).toContain("piper-ru-ru-dmitri");
+    expect(
+      getLocalModelsForLanguages("tts", ["pt"]).map(({ id }) => id),
+    ).toContain("piper-pt-pt-tugao");
+    expect(
+      getLocalModelsForLanguages("tts", ["pt-BR"]).map(({ id }) => id),
+    ).toContain("piper-pt-br-faber");
+  });
+
+  it("offers Omnilingual as an optional broad-language recognizer", () => {
+    expect(
+      getLocalModelsForLanguages("stt", ["en", "it", "pt", "ru"]).map(
+        ({ id }) => id,
+      ),
+    ).toEqual(["whisper-tiny", "omnilingual-asr-300m"]);
+  });
 });

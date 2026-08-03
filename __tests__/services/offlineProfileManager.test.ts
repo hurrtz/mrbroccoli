@@ -36,7 +36,7 @@ function benchmark(
 ): LocalModelBenchmarkResult {
   return {
     modelId,
-    catalogVersion: 1,
+    catalogVersion: 2,
     testedAt: "2026-08-02T00:00:00.000Z",
     status,
     loadMs: 10,

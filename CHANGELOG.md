@@ -12,6 +12,9 @@ the complete Play Store translations are kept in a dedicated file under
 
 ### Added
 
+- Add optional Omnilingual on-device speech recognition and compact Piper
+  voices for Italian, Russian, and European Portuguese, each with pinned
+  artifacts, license checks, and device-local benchmarks.
 - Add a zero-account Free experience that selects, downloads, verifies, and
   benchmarks one complete on-device listening, thinking, and speaking setup
   for the user's preferred speaking language and phone. Once installed, Free

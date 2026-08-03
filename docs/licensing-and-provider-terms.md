@@ -38,10 +38,11 @@ unreviewed dependency licenses during validation.
 - Optional on-device models are never bundled. The catalogue pins their source,
   artifact size, SHA-256 digest, and license before download:
   - Qwen3 0.6B and 1.7B GGUF files: Apache-2.0.
-  - Whisper Tiny: MIT.
+  - Whisper Tiny: MIT; Omnilingual ASR 300M v2 int8: Apache-2.0.
   - Kokoro multilingual: Apache-2.0; the archive includes its license file.
   - Piper Kristin: public domain; Thorsten and Faber: CC0-1.0; Sharvard:
-    CC-BY-3.0; Siwis: CC-BY-4.0.
+    CC-BY-3.0; Siwis: CC-BY-4.0; European Portuguese Tugão, Russian
+    Dmitri, and Italian Paola: CC0-1.0.
 - Downloaded models, their benchmark results, and generated audio are
   device-local and excluded from app-data backups. Attribution-bearing model
   archives and their source links must remain intact.

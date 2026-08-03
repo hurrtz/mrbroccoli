@@ -65,13 +65,30 @@ function whisperLanguage(language: SttLanguage) {
     : getSpeechLanguageDefinition(language).providerCode;
 }
 
+function getSttModelOptions(
+  model: LocalSttModelDefinition,
+  language: SttLanguage,
+) {
+  return model.sherpaModelType === "whisper"
+    ? {
+        whisper: {
+          language: whisperLanguage(language),
+          task: "transcribe" as const,
+        },
+      }
+    : undefined;
+}
+
 export function getLocalTtsBenchmarkText(language: SpeechLanguage) {
   const samples: Partial<Record<SpeechLanguage, string>> = {
     en: "Hello from Mr Broccoli.",
     de: "Hallo von Mr Broccoli.",
     es: "Hola desde Mr Broccoli.",
     fr: "Bonjour de la part de Mr Broccoli.",
+    it: "Ciao da Mr Broccoli.",
+    pt: "Olá, aqui é o Mr Broccoli.",
     "pt-BR": "Olá, aqui é o Mr Broccoli.",
+    ru: "Привет от Mr Broccoli.",
   };
   return samples[language] ?? "Hello from Mr Broccoli.";
 }
@@ -95,12 +112,7 @@ export async function transcribeLocalAudio(params: {
     preferInt8: true,
     numThreads: 2,
     provider: "cpu",
-    modelOptions: {
-      whisper: {
-        language: whisperLanguage(params.language),
-        task: "transcribe",
-      },
-    },
+    modelOptions: getSttModelOptions(model, params.language),
   });
 
   try {
@@ -208,17 +220,13 @@ export async function benchmarkLocalStt(
       preferInt8: true,
       numThreads: 2,
       provider: "cpu",
-      modelOptions: {
-        whisper: { language: whisperLanguage(language), task: "transcribe" },
-      },
+      modelOptions: getSttModelOptions(model, language),
     });
     loadMs = Date.now() - loadStartedAt;
     const runStartedAt = Date.now();
     let durationMs: number;
     try {
-      await engine.transcribeFile(
-        benchmarkAudioUri.replace(/^file:\/\//, ""),
-      );
+      await engine.transcribeFile(benchmarkAudioUri.replace(/^file:\/\//, ""));
       durationMs = Date.now() - runStartedAt;
     } finally {
       await engine.destroy().catch(() => undefined);

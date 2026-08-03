@@ -3,7 +3,7 @@ import {
   type SpeechLanguage,
 } from "./speechLanguages";
 
-export const LOCAL_MODEL_CATALOG_VERSION = 1;
+export const LOCAL_MODEL_CATALOG_VERSION = 2;
 
 export type LocalModelCapability = "llm" | "stt" | "tts";
 export type LocalModelRuntime = "llama-rn" | "sherpa-onnx";
@@ -12,17 +12,24 @@ export type LocalModelId =
   | "qwen3-0.6b-q8"
   | "qwen3-1.7b-q8"
   | "whisper-tiny"
+  | "omnilingual-asr-300m"
   | "kokoro-multilingual"
   | "piper-en-us-kristin"
   | "piper-de-de-thorsten"
   | "piper-es-es-sharvard"
   | "piper-fr-fr-siwis"
-  | "piper-pt-br-faber";
+  | "piper-pt-br-faber"
+  | "piper-pt-pt-tugao"
+  | "piper-ru-ru-dmitri"
+  | "piper-it-it-paola";
 export type LocalLlmModelId = Extract<
   LocalModelId,
   "qwen3-0.6b-q8" | "qwen3-1.7b-q8"
 >;
-export type LocalSttModelId = Extract<LocalModelId, "whisper-tiny">;
+export type LocalSttModelId = Extract<
+  LocalModelId,
+  "whisper-tiny" | "omnilingual-asr-300m"
+>;
 export type LocalTtsModelId = Extract<
   LocalModelId,
   | "piper-en-us-kristin"
@@ -30,6 +37,9 @@ export type LocalTtsModelId = Extract<
   | "piper-es-es-sharvard"
   | "piper-fr-fr-siwis"
   | "piper-pt-br-faber"
+  | "piper-pt-pt-tugao"
+  | "piper-ru-ru-dmitri"
+  | "piper-it-it-paola"
 >;
 export type LocalTtsCatalogModelId = LocalTtsModelId | "kokoro-multilingual";
 
@@ -77,7 +87,7 @@ export interface LocalSttModelDefinition extends LocalModelBase {
   capability: "stt";
   runtime: "sherpa-onnx";
   runtimeModelId: string;
-  sherpaModelType: "whisper";
+  sherpaModelType: "whisper" | "omnilingual";
 }
 
 export interface LocalTtsModelDefinition extends LocalModelBase {
@@ -179,6 +189,31 @@ export const LOCAL_MODEL_CATALOG = [
     requirements: speechRequirements(2, 175_000_000),
     benchmark: {
       maximumLoadMs: 20_000,
+      maximumRealtimeFactor: 1.5,
+    },
+  },
+  {
+    id: "omnilingual-asr-300m",
+    capability: "stt",
+    name: "Omnilingual ASR 300M",
+    description:
+      "Broader multilingual on-device recognition for stronger phones.",
+    runtime: "sherpa-onnx",
+    runtimeModelId:
+      "sherpa-onnx-omnilingual-asr-1600-languages-300M-ctc-v2-int8-2026-02-05",
+    sherpaModelType: "omnilingual",
+    languages: ALL_SPEECH_LANGUAGES,
+    downloadBytes: 292_313_120,
+    installedBytes: 430_000_000,
+    sha256: "951b32409aade32bd525310bb39e9666773ba3fc611a39e817f620936d76c631",
+    license: "Apache-2.0",
+    sourceUrl:
+      "https://k2-fsa.github.io/sherpa/onnx/omnilingual-asr/models.html",
+    downloadUrl:
+      "https://github.com/k2-fsa/sherpa-onnx/releases/download/asr-models/sherpa-onnx-omnilingual-asr-1600-languages-300M-ctc-v2-int8-2026-02-05.tar.bz2",
+    requirements: speechRequirements(4, 430_000_000),
+    benchmark: {
+      maximumLoadMs: 30_000,
       maximumRealtimeFactor: 1.5,
     },
   },
@@ -302,6 +337,66 @@ export const LOCAL_MODEL_CATALOG = [
     sourceUrl: "https://huggingface.co/rhasspy/piper-voices",
     downloadUrl:
       "https://github.com/k2-fsa/sherpa-onnx/releases/download/tts-models/vits-piper-pt_BR-faber-medium-int8.tar.bz2",
+    requirements: speechRequirements(2, 32_000_000),
+    benchmark: { maximumLoadMs: 15_000, maximumRealtimeFactor: 1.5 },
+  },
+  {
+    id: "piper-pt-pt-tugao",
+    capability: "tts",
+    name: "Piper · Tugão",
+    description: "Compact European Portuguese voice.",
+    runtime: "sherpa-onnx",
+    runtimeModelId: "vits-piper-pt_PT-tugao-medium-int8",
+    sherpaModelType: "vits",
+    speakerId: 0,
+    languages: ["pt"],
+    downloadBytes: 21_253_211,
+    installedBytes: 32_000_000,
+    sha256: "8f4c5e4a5994d0d1a2c10fb3035631add0460ea5c776f5ea40d3d6051140dbc3",
+    license: "CC0-1.0",
+    sourceUrl: "https://huggingface.co/rhasspy/piper-voices",
+    downloadUrl:
+      "https://github.com/k2-fsa/sherpa-onnx/releases/download/tts-models/vits-piper-pt_PT-tugao-medium-int8.tar.bz2",
+    requirements: speechRequirements(2, 32_000_000),
+    benchmark: { maximumLoadMs: 15_000, maximumRealtimeFactor: 1.5 },
+  },
+  {
+    id: "piper-ru-ru-dmitri",
+    capability: "tts",
+    name: "Piper · Dmitri",
+    description: "Compact Russian voice.",
+    runtime: "sherpa-onnx",
+    runtimeModelId: "vits-piper-ru_RU-dmitri-medium-int8",
+    sherpaModelType: "vits",
+    speakerId: 0,
+    languages: ["ru"],
+    downloadBytes: 21_129_441,
+    installedBytes: 32_000_000,
+    sha256: "7636793307f634ce54c6e65528a91a61683114f1a6635a08caf64ba6c54e6a63",
+    license: "CC0-1.0",
+    sourceUrl: "https://huggingface.co/rhasspy/piper-voices",
+    downloadUrl:
+      "https://github.com/k2-fsa/sherpa-onnx/releases/download/tts-models/vits-piper-ru_RU-dmitri-medium-int8.tar.bz2",
+    requirements: speechRequirements(2, 32_000_000),
+    benchmark: { maximumLoadMs: 15_000, maximumRealtimeFactor: 1.5 },
+  },
+  {
+    id: "piper-it-it-paola",
+    capability: "tts",
+    name: "Piper · Paola",
+    description: "Compact Italian voice.",
+    runtime: "sherpa-onnx",
+    runtimeModelId: "vits-piper-it_IT-paola-medium-int8",
+    sherpaModelType: "vits",
+    speakerId: 0,
+    languages: ["it"],
+    downloadBytes: 21_143_212,
+    installedBytes: 32_000_000,
+    sha256: "2b975ed305391c056944a4dde67ee754dd824099503a860295bb4c1d724662d8",
+    license: "CC0-1.0",
+    sourceUrl: "https://huggingface.co/rhasspy/piper-voices",
+    downloadUrl:
+      "https://github.com/k2-fsa/sherpa-onnx/releases/download/tts-models/vits-piper-it_IT-paola-medium-int8.tar.bz2",
     requirements: speechRequirements(2, 32_000_000),
     benchmark: { maximumLoadMs: 15_000, maximumRealtimeFactor: 1.5 },
   },
