@@ -2597,6 +2597,7 @@ describe("runVoicePipeline", () => {
           model: "gpt-test",
           participant: 1,
           provider: "openai",
+          reviewVerdict: "challenge",
           round: 1,
           text: "Reviewed contribution",
           usage: {
@@ -2746,11 +2747,20 @@ describe("runVoicePipeline", () => {
       expect.objectContaining({
         ulraMode: expect.objectContaining({
           convergenceReached: false,
+          contributions: expect.arrayContaining([
+            expect.objectContaining({
+              participant: 1,
+              reviewVerdict: "challenge",
+            }),
+          ]),
           failedCalls: 1,
           retiredParticipants: 1,
           roundsCompleted: 1,
           roundsRequested: 1,
           successfulCalls: 2,
+          synthesisContract: "evidence-ledger-v1",
+          synthesisContributions: 2,
+          synthesisOmittedContributions: 0,
         }),
         notices: [
           expect.objectContaining({

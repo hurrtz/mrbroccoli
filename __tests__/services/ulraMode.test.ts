@@ -81,6 +81,10 @@ describe("runUlraModeDeliberation", () => {
     expect(result.estimatedUsage.totalTokens).toBe(135);
 
     expect(result.convergenceReached).toBe(false);
+    expect(result.synthesisContract).toBe("evidence-ledger-v1");
+    expect(result.synthesisContributions).toBe(9);
+    expect(result.synthesisOmittedContributions).toBe(0);
+    expect(result.synthesisEstimatedTokens).toBeGreaterThan(0);
     expect(
       generateInternalChatMock.mock.calls.every(
         ([request]) =>
@@ -137,6 +141,22 @@ describe("runUlraModeDeliberation", () => {
     expect(result.synthesisPrompt).toContain(
       "Give well-supported minority critiques full consideration",
     );
+    expect(result.synthesisPrompt).toContain("evidence-ledger-v1");
+    expect(result.synthesisPrompt).toContain("privately build a claim ledger");
+    expect(result.synthesisPrompt).toContain("reasoned inferences");
+    expect(result.synthesisPrompt).toContain(
+      "assumptions that still need verification",
+    );
+    expect(result.synthesisPrompt).toContain(
+      "unresolved challenges or dissent",
+    );
+    expect(result.synthesisPrompt).toContain(
+      "Never invent evidence or citations",
+    );
+    expect(result.synthesisPrompt).toContain("Completed review rounds: 2.");
+    expect(result.synthesisPrompt).toContain(
+      "Unanimous explicit convergence reached: no.",
+    );
     expect(firstRoundPrompts[0]).toContain("Actively stress-test");
     expect(firstRoundPrompts[0]).toContain("UBER_REVIEW: CHALLENGE");
     expect(firstRoundPrompts[0]).toContain("never manufacture disagreement");
@@ -145,7 +165,9 @@ describe("runUlraModeDeliberation", () => {
         ([request]) => !request.systemPrompt.includes("250 words"),
       ),
     ).toBe(true);
-    expect(firstRoundPrompts[0]).toContain("all material reasoning and evidence");
+    expect(firstRoundPrompts[0]).toContain(
+      "all material reasoning and evidence",
+    );
     expect(firstRoundPrompts[0]).not.toContain('"provider":');
     expect(firstRoundPrompts[0]).not.toContain('"model":');
     expect(firstRoundPrompts[0]).not.toContain('"modeId":');
@@ -183,6 +205,10 @@ describe("runUlraModeDeliberation", () => {
     expect(result.synthesisPrompt).toContain('"round":0');
     expect(result.synthesisPrompt).toContain('"round":1');
     expect(result.synthesisPrompt.match(/"participant":/g)).toHaveLength(6);
+    expect(result.synthesisPrompt).toContain('"reviewVerdict":"converged"');
+    expect(result.synthesisPrompt).toContain(
+      "Unanimous explicit convergence reached: yes.",
+    );
   });
 
   it("continues when models challenge peers or omit the convergence marker", async () => {
@@ -212,6 +238,7 @@ describe("runUlraModeDeliberation", () => {
     expect(generateInternalChatMock).toHaveBeenCalledTimes(9);
     expect(result.roundsCompleted).toBe(2);
     expect(result.convergenceReached).toBe(false);
+    expect(result.synthesisPrompt).toContain('"reviewVerdict":"challenge"');
   });
 
   it("uses a generous emergency bound for runaway contributions", async () => {
@@ -281,6 +308,8 @@ describe("runUlraModeDeliberation", () => {
     const synthesisEntries =
       result.synthesisPrompt.match(/"participant":/g) ?? [];
     expect(synthesisEntries.length).toBeLessThan(result.entries.length);
+    expect(result.synthesisContributions).toBe(synthesisEntries.length);
+    expect(result.synthesisOmittedContributions).toBeGreaterThan(0);
     expect(result.synthesisPrompt).toMatch(
       /Older superseded contributions omitted for context safety: [1-9]\d*\./,
     );

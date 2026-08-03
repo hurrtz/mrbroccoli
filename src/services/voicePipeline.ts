@@ -376,13 +376,17 @@ export async function runVoicePipeline(
             ({
               modeId,
               model: entryModel,
+              participant,
               provider: entryProvider,
+              reviewVerdict,
               round,
               usage,
             }) => ({
               modeId,
               model: entryModel,
+              participant,
               provider: entryProvider,
+              ...(reviewVerdict ? { reviewVerdict } : {}),
               round,
               usage,
             }),
@@ -393,11 +397,15 @@ export async function runVoicePipeline(
             ({
               modeId,
               model: failedModel,
+              participant,
               provider: failedProvider,
+              failureKind,
               round,
             }) => ({
               modeId,
               model: failedModel,
+              ...(failureKind ? { failureKind } : {}),
+              participant,
               provider: failedProvider,
               round,
             }),
@@ -406,6 +414,15 @@ export async function runVoicePipeline(
           roundsCompleted: deliberation.roundsCompleted,
           roundsRequested: ulraMode.rounds,
           successfulCalls: deliberation.entries.length,
+          synthesisContract:
+            deliberation.synthesisContract ?? "evidence-ledger-v1",
+          synthesisContributions:
+            deliberation.synthesisContributions ?? deliberation.entries.length,
+          synthesisEstimatedTokens:
+            deliberation.synthesisEstimatedTokens ??
+            deliberation.estimatedUsage.totalTokens,
+          synthesisOmittedContributions:
+            deliberation.synthesisOmittedContributions ?? 0,
         },
       };
     }

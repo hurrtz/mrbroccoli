@@ -7,6 +7,7 @@ import { MessageImageAttachments } from "../MessageImageAttachments";
 import { PipelineNotices } from "./PipelineNotices";
 import { ReplyFailureCard } from "./ReplyFailureCard";
 import { TurnReceiptCard } from "./TurnReceiptCard";
+import { UberModeAuditCard } from "./UberModeAuditCard";
 import { UsageCard } from "./UsageCard";
 import { WebSearchReferences } from "./WebSearchReferences";
 import { ConversationKnowledgeReferences } from "./ConversationKnowledgeReferences";
@@ -46,6 +47,7 @@ export function ChatBubbleContent({
         onOpenSpeakingSettings={onOpenSpeakingSettings}
       />
       <TurnReceiptCard message={message} />
+      <UberModeAuditCard message={message} />
       <ConversationKnowledgeReferences message={message} />
       <WebSearchReferences message={message} />
       <UsageCard message={message} showUsageStats={showUsageStats} />

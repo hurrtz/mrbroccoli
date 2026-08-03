@@ -4,6 +4,7 @@ import { conversationKnowledgeTranslations } from "../conversationKnowledgeTrans
 import { conversationIntegrityTranslations } from "../conversationIntegrityTranslations";
 import { conversationArtifactTranslations } from "../conversationArtifactTranslations";
 import { interruptionTranslations } from "../interruptionTranslations";
+import { ulraAuditTranslations } from "../ulraAuditTranslations";
 import { imagePromptTranslations } from "../imagePromptTranslations";
 import { memoryEditTranslations } from "../memoryEditTranslations";
 import { onDeviceTranslations } from "../onDeviceTranslations";
@@ -14,6 +15,7 @@ import { transcriptEditTranslations } from "../transcriptEditTranslations";
 export const ur = {
   ...conversationArtifactTranslations.ur,
   ...interruptionTranslations.ur,
+  ...ulraAuditTranslations.ur,
   ...dataBackupTranslations.ur,
   ...conversationKnowledgeTranslations.ur,
   ...conversationIntegrityTranslations.ur,

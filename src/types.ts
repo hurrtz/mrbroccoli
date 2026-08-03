@@ -239,13 +239,16 @@ export interface MessagePipelineNotice {
 }
 
 export interface MessageUlraModeCall {
+  failureKind?: string;
   modeId: string;
   model: string;
+  participant?: number;
   provider: Provider;
   round: number;
 }
 
 export interface MessageUlraModeContribution extends MessageUlraModeCall {
+  reviewVerdict?: "challenge" | "converged";
   usage: UsageEstimate;
 }
 
@@ -259,6 +262,10 @@ export interface MessageUlraModeMetadata {
   roundsCompleted: number;
   roundsRequested: number;
   successfulCalls: number;
+  synthesisContract?: "evidence-ledger-v1";
+  synthesisContributions?: number;
+  synthesisEstimatedTokens?: number;
+  synthesisOmittedContributions?: number;
 }
 
 export interface MistralTextContentChunk {

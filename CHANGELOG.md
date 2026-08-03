@@ -12,6 +12,10 @@ the complete Play Store translations are kept in a dedicated file under
 
 ### Added
 
+- Add an expandable Uber Mode audit to each deliberated reply, showing routes,
+  rounds, challenge and convergence verdicts, failures, retired participants,
+  retained synthesis history, and intermediate tokens without storing private
+  contribution text.
 - Interrupt a spoken response with a dedicated speak-now control. Completed
   answers remain intact, still-streaming text is retained with a visible
   interruption marker, prefetched audio is stopped, and recording starts only
@@ -42,6 +46,9 @@ the complete Play Store translations are kept in a dedicated file under
 
 ### Changed
 
+- Strengthen Uber Mode synthesis with an evidence-ledger contract that keeps
+  established information, inference, assumptions, and unresolved dissent
+  distinct and passes explicit review verdicts into the final synthesis.
 - Make each conversation's compact memory directly editable as well as
   inspectable, copyable, and forgettable, so an automatic summary can be
   corrected before it shapes later turns.

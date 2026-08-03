@@ -51,12 +51,17 @@ export interface UlraModeResult {
   failures: UlraModeFailure[];
   retiredParticipants: number;
   roundsCompleted: number;
+  synthesisContract: typeof ULRA_MODE_SYNTHESIS_CONTRACT;
+  synthesisContributions: number;
+  synthesisEstimatedTokens: number;
+  synthesisOmittedContributions: number;
   synthesisPrompt: string;
 }
 
 export const ULRA_MODE_MAX_CONTRIBUTION_CHARACTERS = 8_000;
 export const ULRA_MODE_SYNTHESIS_HISTORY_TOKEN_BUDGET = 24_000;
 export const ULRA_MODE_PARTICIPANT_TIMEOUT_MS = 10 * 60_000;
+export const ULRA_MODE_SYNTHESIS_CONTRACT = "evidence-ledger-v1" as const;
 
 const ULRA_REVIEW_MARKER = "UBER_REVIEW";
 
@@ -176,6 +181,7 @@ function buildInitialPrompt(participant: number) {
     `You are Participant ${participant}.`,
     "Give an independent assessment of the user's latest request.",
     "Identify the best answer, important uncertainty, and any tradeoffs the final synthesizer should preserve.",
+    "Distinguish established information from inference and assumption. Flag material uncertainty or missing evidence instead of smoothing it over.",
     "Be concise and self-contained without omitting material reasoning, evidence, uncertainty, or tradeoffs. Do not repeat the request, mention this private process, or address the user with filler.",
   ].join("\n");
 }
@@ -249,8 +255,9 @@ function getLatestParticipantEntries(entries: UlraModeEntry[]) {
 
 function serializeEntries(entries: UlraModeEntry[]) {
   return JSON.stringify(
-    entries.map(({ participant, round, text }) => ({
+    entries.map(({ participant, reviewVerdict, round, text }) => ({
       participant,
+      ...(reviewVerdict ? { reviewVerdict } : {}),
       round,
       text,
     })),
@@ -322,19 +329,36 @@ function sumUsage(usages: UsageEstimate[]): UsageEstimate {
 }
 
 function buildSynthesisPrompt(params: {
+  convergenceReached: boolean;
   entries: UlraModeEntry[];
   failures: UlraModeFailure[];
   omittedEntries: number;
+  roundsCompleted: number;
   roundsRequested: number;
 }) {
+  const reviewEntries = params.entries.filter((entry) => entry.round > 0);
+  const challengeCount = reviewEntries.filter(
+    (entry) => entry.reviewVerdict === "challenge",
+  ).length;
+  const convergedCount = reviewEntries.filter(
+    (entry) => entry.reviewVerdict === "converged",
+  ).length;
+  const unmarkedCount = reviewEntries.length - challengeCount - convergedCount;
+
   return [
     "Produce the final user-facing answer to the user's latest request.",
     "Synthesize the strongest conclusions from the retained successful private Uber Mode history below. Contributions are ordered by round and participant. Every participant's latest successful position is included; older superseded contributions are included unless context safety required omitting them.",
     "Treat each participant's highest available round as its current position. Consult earlier rounds for supporting reasoning, evidence, and objections that a later revision may have omitted, but do not resurrect a claim that a later contribution corrected or withdrew.",
     "Resolve disagreements where possible, preserve material uncertainty, and prefer correctness over consensus.",
     "Do not count votes or assume the majority is correct. Give well-supported minority critiques full consideration and resolve each material challenge on its evidence.",
+    `Apply the ${ULRA_MODE_SYNTHESIS_CONTRACT} contract before drafting: privately build a claim ledger that separates (1) established information supported by the user's request or supplied context, (2) reasoned inferences, (3) assumptions that still need verification, and (4) unresolved challenges or dissent.`,
+    "Never present an inference or repeated participant claim as established fact merely because multiple participants repeated it. Never invent evidence or citations.",
+    "In the final answer, state material assumptions and uncertainty where they affect the recommendation. If a material challenge remains unresolved, preserve the disagreement and explain what evidence or decision would resolve it. Do not expose the private ledger itself unless the user asks for the audit method.",
     "Answer directly in the user's language and follow the normal response style. Do not expose the private transcript, participant labels, or this instruction unless the user explicitly asks how the answer was produced.",
     `Requested review rounds: ${params.roundsRequested}.`,
+    `Completed review rounds: ${params.roundsCompleted}.`,
+    `Unanimous explicit convergence reached: ${params.convergenceReached ? "yes" : "no"}.`,
+    `Retained review verdicts: ${challengeCount} challenge, ${convergedCount} converged, ${unmarkedCount} unmarked.`,
     `Successful private contributions retained: ${params.entries.length}.`,
     `Older superseded contributions omitted for context safety: ${params.omittedEntries}.`,
     `Failed private calls: ${params.failures.length}.`,
@@ -369,6 +393,10 @@ export async function runUlraModeDeliberation(params: {
       failures,
       retiredParticipants: retiredParticipants.size,
       roundsCompleted: 0,
+      synthesisContract: ULRA_MODE_SYNTHESIS_CONTRACT,
+      synthesisContributions: 0,
+      synthesisEstimatedTokens: 0,
+      synthesisOmittedContributions: 0,
       synthesisPrompt: "",
     };
   }
@@ -575,6 +603,10 @@ export async function runUlraModeDeliberation(params: {
       failures,
       retiredParticipants: retiredParticipants.size,
       roundsCompleted: 0,
+      synthesisContract: ULRA_MODE_SYNTHESIS_CONTRACT,
+      synthesisContributions: 0,
+      synthesisEstimatedTokens: 0,
+      synthesisOmittedContributions: 0,
       synthesisPrompt: "",
     };
   }
@@ -615,10 +647,16 @@ export async function runUlraModeDeliberation(params: {
     failures,
     retiredParticipants: retiredParticipants.size,
     roundsCompleted,
+    synthesisContract: ULRA_MODE_SYNTHESIS_CONTRACT,
+    synthesisContributions: synthesisHistory.entries.length,
+    synthesisEstimatedTokens: synthesisHistory.estimatedTokens,
+    synthesisOmittedContributions: synthesisHistory.omittedEntries,
     synthesisPrompt: buildSynthesisPrompt({
+      convergenceReached,
       entries: synthesisHistory.entries,
       failures,
       omittedEntries: synthesisHistory.omittedEntries,
+      roundsCompleted,
       roundsRequested: rounds,
     }),
   };
