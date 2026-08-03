@@ -10,8 +10,6 @@ the complete Play Store translations are kept in a dedicated file under
 
 ## Unreleased
 
-## 2.8.1 - 2026-08-03
-
 ### Added
 
 - Add a zero-account Free experience that selects, downloads, verifies, and
