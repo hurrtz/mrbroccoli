@@ -107,6 +107,18 @@ npx pod-install
 npm run ios
 ```
 
+For a standalone physical-iPhone build that coexists with the App Store app,
+connect one iPhone and run:
+
+```bash
+npm run ios:standalone
+```
+
+This builds the Release runtime with embedded JavaScript, installs it as
+`Mr Broccoli Dev` under the `.dev` bundle identifier, and launches it without
+Metro. Use `npm run ios:standalone -- --device <name-or-udid>` when more than
+one physical iPhone is connected.
+
 ```bash
 npm run android
 ```
@@ -205,6 +217,9 @@ __tests__/              Focused hook and service tests
 - Release builds use `com.tobiaswinkler.app.mrbroccoli` as the iOS bundle
   identifier and Android application ID. Debug builds append `.dev` so local
   installs can coexist with the App Store or Play Store app.
+- `npm run ios:standalone` combines the iOS Release runtime with the `.dev`
+  identity for offline physical-device testing; normal Release and App Store
+  builds retain the production identifier.
 - The Android namespace remains `com.tobiaswinkler.app.mrbroccoli` in every
   build variant.
 - The Expo slug and on-device persistence keys use the `mrbroccoli` namespace.

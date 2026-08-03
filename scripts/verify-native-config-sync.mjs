@@ -154,7 +154,7 @@ const iosProjectVersions = [
 ].map((match) => match[1]);
 const iosBundleIdentifiers = [
   ...iosProject.matchAll(/PRODUCT_BUNDLE_IDENTIFIER = ([^;]+);/g),
-].map((match) => match[1]);
+].map((match) => match[1].replace(/^"(.*)"$/, "$1"));
 
 assertIncludes(
   "iOS camera permission",
@@ -323,7 +323,17 @@ assertIncludes(
 assertIncludes(
   "iOS Release display name",
   iosProject,
-  `APP_DISPLAY_NAME = "${appConfig.name}";`,
+  `APP_DISPLAY_NAME = "${appConfig.name}$(MR_BROCCOLI_LOCAL_DISPLAY_SUFFIX)";`,
+);
+assertIncludes(
+  "iOS Release local bundle suffix defaults empty",
+  iosProject,
+  'MR_BROCCOLI_LOCAL_BUNDLE_SUFFIX = "";',
+);
+assertIncludes(
+  "iOS Release local display suffix defaults empty",
+  iosProject,
+  'MR_BROCCOLI_LOCAL_DISPLAY_SUFFIX = "";',
 );
 assertIncludes(
   "Android display name",
@@ -346,8 +356,8 @@ assertEqual(
   JSON.stringify([...iosBundleIdentifiers].sort()),
   JSON.stringify(
     [
-      iosBundleIdentifier,
-      `${iosBundleIdentifier}.liveactivity`,
+      `${iosBundleIdentifier}$(MR_BROCCOLI_LOCAL_BUNDLE_SUFFIX)`,
+      `${iosBundleIdentifier}$(MR_BROCCOLI_LOCAL_BUNDLE_SUFFIX).liveactivity`,
       `${iosBundleIdentifier}.tests`,
       iosDevelopmentBundleIdentifier,
       `${iosDevelopmentBundleIdentifier}.liveactivity`,

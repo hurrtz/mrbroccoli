@@ -846,7 +846,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 6248A357DF5BC319044A9D16 /* Pods-MrBroccoli.release.xcconfig */;
 			buildSettings = {
-				APP_DISPLAY_NAME = "Mr Broccoli";
+				APP_DISPLAY_NAME = "Mr Broccoli$(MR_BROCCOLI_LOCAL_DISPLAY_SUFFIX)";
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_EXPLICIT_MODULES = NO;
 				CLANG_ENABLE_MODULES = YES;
@@ -876,7 +876,7 @@
 					"-lc++",
 				);
 				OTHER_SWIFT_FLAGS = "$(inherited) -D EXPO_CONFIGURATION_RELEASE";
-				PRODUCT_BUNDLE_IDENTIFIER = com.tobiaswinkler.app.mrbroccoli;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.tobiaswinkler.app.mrbroccoli$(MR_BROCCOLI_LOCAL_BUNDLE_SUFFIX)";
 				PRODUCT_NAME = MrBroccoli;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
@@ -1016,6 +1016,8 @@
 				);
 				LIBRARY_SEARCH_PATHS = "$(SDKROOT)/usr/lib/swift\"$(inherited)\"";
 				MTL_ENABLE_DEBUG_INFO = NO;
+				MR_BROCCOLI_LOCAL_BUNDLE_SUFFIX = "";
+				MR_BROCCOLI_LOCAL_DISPLAY_SUFFIX = "";
 				OTHER_CFLAGS = (
 					"$(inherited)",
 					"-DRCT_REMOVE_LEGACY_ARCH=1",
@@ -1094,7 +1096,7 @@
 				);
 				MARKETING_VERSION = 2.8.0;
 				OTHER_SWIFT_FLAGS = "$(inherited) -D EXPO_CONFIGURATION_RELEASE";
-				PRODUCT_BUNDLE_IDENTIFIER = com.tobiaswinkler.app.mrbroccoli.liveactivity;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.tobiaswinkler.app.mrbroccoli$(MR_BROCCOLI_LOCAL_BUNDLE_SUFFIX).liveactivity";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
