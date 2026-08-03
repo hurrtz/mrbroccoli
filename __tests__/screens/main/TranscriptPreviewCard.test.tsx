@@ -1,6 +1,11 @@
 import React from "react";
 
-import { act, fireEvent, render } from "@testing-library/react-native";
+import {
+  act,
+  fireEvent,
+  render,
+  waitFor,
+} from "@testing-library/react-native";
 import { StyleSheet } from "react-native";
 
 import { TranscriptPreviewCard } from "../../../src/screens/main/TranscriptPreviewCard";
@@ -10,12 +15,30 @@ let mockTailStateChange: ((isAtTail: boolean) => void) | null = null;
 
 jest.mock("../../../src/components/ChatTranscript", () => ({
   ChatTranscript: ({
+    messages,
+    onEditMessage,
     messageSelectionEnabled,
     onRepeatMessage,
     onShareMessage,
     onTailStateChange,
     scrollToLatestRequest,
   }: {
+    messages: {
+      id: string;
+      role: "user" | "assistant";
+      content: string;
+      model: string | null;
+      provider: string | null;
+      timestamp: string;
+    }[];
+    onEditMessage?: (message: {
+      id: string;
+      role: "user" | "assistant";
+      content: string;
+      model: string | null;
+      provider: string | null;
+      timestamp: string;
+    }) => void;
     messageSelectionEnabled?: boolean;
     onRepeatMessage?: () => void;
     onShareMessage?: () => void;
@@ -23,12 +46,23 @@ jest.mock("../../../src/components/ChatTranscript", () => ({
     scrollToLatestRequest?: number;
   }) => {
     const React = require("react");
-    const { Text } = require("react-native");
+    const { Pressable, Text, View } = require("react-native");
     mockTailStateChange = onTailStateChange ?? null;
     return React.createElement(
-      Text,
+      View,
       null,
-      `actions:${Boolean(onRepeatMessage)}:${Boolean(onShareMessage)}:selection:${Boolean(messageSelectionEnabled)}:latest:${scrollToLatestRequest ?? 0}`,
+      React.createElement(
+        Text,
+        null,
+        `actions:${Boolean(onRepeatMessage)}:${Boolean(onShareMessage)}:selection:${Boolean(messageSelectionEnabled)}:latest:${scrollToLatestRequest ?? 0}`,
+      ),
+      onEditMessage && messages[0]
+        ? React.createElement(
+            Pressable,
+            { onPress: () => onEditMessage(messages[0]) },
+            React.createElement(Text, null, "Open correction"),
+          )
+        : null,
     );
   },
 }));
@@ -189,5 +223,58 @@ describe("TranscriptPreviewCard", () => {
 
     expect(headerStyle.marginHorizontal).toBeUndefined();
     expect(headerStyle.borderTopWidth).toBeUndefined();
+  });
+
+  it("edits a user transcript with an explicit future-context warning", async () => {
+    const onEditMessage = jest.fn(async () => true);
+    const screen = render(
+      <TranscriptPreviewCard
+        activeConversationId="conversation-1"
+        colors={lightColors}
+        messages={[
+          {
+            id: "message-1",
+            role: "user",
+            content: "All in on end design",
+            model: null,
+            provider: null,
+            timestamp: "2026-08-03T10:00:00.000Z",
+          },
+        ]}
+        onCopyMessage={jest.fn()}
+        onEditMessage={onEditMessage}
+        onRetryMessage={jest.fn()}
+        showUsageStats={false}
+        showWhenEmpty
+        t={(key) =>
+          ({
+            cancel: "Cancel",
+            correctTranscriptHint:
+              "Existing replies are not changed; future context is updated.",
+            correctTranscriptTitle: "Correct transcript",
+            save: "Save",
+          })[key] ?? key
+        }
+      />,
+    );
+
+    fireEvent.press(screen.getByText("Open correction"));
+    expect(
+      screen.getByText(
+        "Existing replies are not changed; future context is updated.",
+      ),
+    ).toBeTruthy();
+    fireEvent.changeText(
+      screen.getByTestId("transcript-correction-input"),
+      "All in on Ant Design",
+    );
+    fireEvent.press(screen.getByText("Save"));
+
+    await waitFor(() =>
+      expect(onEditMessage).toHaveBeenCalledWith(
+        expect.objectContaining({ id: "message-1" }),
+        "All in on Ant Design",
+      ),
+    );
   });
 });

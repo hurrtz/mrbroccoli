@@ -6,6 +6,7 @@ import { imagePromptTranslations } from "../imagePromptTranslations";
 import { onDeviceTranslations } from "../onDeviceTranslations";
 import { onboardingTranslations } from "../onboardingTranslations";
 import { premiumTranslations } from "../premiumTranslations";
+import { transcriptEditTranslations } from "../transcriptEditTranslations";
 
 export const ar = {
   ...dataBackupTranslations.ar,
@@ -15,6 +16,7 @@ export const ar = {
   ...onDeviceTranslations.ar,
   ...onboardingTranslations.ar,
   ...premiumTranslations.ar,
+  ...transcriptEditTranslations.ar,
   appName: "السيد بروكلي",
   retry: "أعد المحاولة",
   dismiss: "إغلاق",

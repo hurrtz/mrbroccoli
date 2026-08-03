@@ -6,6 +6,7 @@ import { imagePromptTranslations } from "../imagePromptTranslations";
 import { onDeviceTranslations } from "../onDeviceTranslations";
 import { onboardingTranslations } from "../onboardingTranslations";
 import { premiumTranslations } from "../premiumTranslations";
+import { transcriptEditTranslations } from "../transcriptEditTranslations";
 
 export const uk = {
   ...dataBackupTranslations.uk,
@@ -15,6 +16,7 @@ export const uk = {
   ...onDeviceTranslations.uk,
   ...onboardingTranslations.uk,
   ...premiumTranslations.uk,
+  ...transcriptEditTranslations.uk,
   appName: "Пан Броколі",
   retry: "Повторити",
   dismiss: "Закрити",

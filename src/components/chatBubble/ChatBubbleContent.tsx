@@ -17,6 +17,7 @@ import { useTheme } from "../../theme/ThemeContext";
 export function ChatBubbleContent({
   message,
   onCopy,
+  onEdit,
   onShare,
   onRepeat,
   onRetry,
@@ -47,10 +48,11 @@ export function ChatBubbleContent({
       <ConversationKnowledgeReferences message={message} />
       <WebSearchReferences message={message} />
       <UsageCard message={message} showUsageStats={showUsageStats} />
-      {selectable && message.role === "assistant" ? (
+      {selectable && (message.role === "assistant" || onEdit) ? (
         <MessageActions
           message={message}
           onCopy={onCopy}
+          onEdit={message.role === "user" ? onEdit : undefined}
           onShare={onShare}
           onRepeat={onRepeat}
           repeatState={repeatState}

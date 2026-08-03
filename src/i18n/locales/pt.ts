@@ -6,6 +6,7 @@ import { imagePromptTranslations } from "../imagePromptTranslations";
 import { onDeviceTranslations } from "../onDeviceTranslations";
 import { onboardingTranslations } from "../onboardingTranslations";
 import { premiumTranslations } from "../premiumTranslations";
+import { transcriptEditTranslations } from "../transcriptEditTranslations";
 
 export const pt = {
   ...dataBackupTranslations.pt,
@@ -15,6 +16,7 @@ export const pt = {
   ...onDeviceTranslations.pt,
   ...onboardingTranslations.pt,
   ...premiumTranslations.pt,
+  ...transcriptEditTranslations.pt,
   appName: "Sr. Brócolo",
   retry: "Tentar novamente",
   dismiss: "Fechar",

@@ -6,6 +6,7 @@ import { imagePromptTranslations } from "../imagePromptTranslations";
 import { onDeviceTranslations } from "../onDeviceTranslations";
 import { onboardingTranslations } from "../onboardingTranslations";
 import { premiumTranslations } from "../premiumTranslations";
+import { transcriptEditTranslations } from "../transcriptEditTranslations";
 
 export const tr = {
   ...dataBackupTranslations.tr,
@@ -15,6 +16,7 @@ export const tr = {
   ...onDeviceTranslations.tr,
   ...onboardingTranslations.tr,
   ...premiumTranslations.tr,
+  ...transcriptEditTranslations.tr,
   appName: "Bay Brokoli",
   retry: "Yeniden dene",
   dismiss: "Reddet",

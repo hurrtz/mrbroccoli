@@ -47,6 +47,7 @@ function MessageRowSurface({
 export const ChatBubble = React.memo(function ChatBubble({
   message,
   onCopy,
+  onEdit,
   onShare,
   onRepeat,
   onRetry,
@@ -65,6 +66,7 @@ export const ChatBubble = React.memo(function ChatBubble({
       <ChatBubbleContent
         message={message}
         onCopy={onCopy}
+        onEdit={onEdit}
         onShare={onShare}
         onRepeat={onRepeat}
         onRetry={onRetry}

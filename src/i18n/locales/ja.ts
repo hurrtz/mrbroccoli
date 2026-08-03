@@ -6,6 +6,7 @@ import { imagePromptTranslations } from "../imagePromptTranslations";
 import { onDeviceTranslations } from "../onDeviceTranslations";
 import { onboardingTranslations } from "../onboardingTranslations";
 import { premiumTranslations } from "../premiumTranslations";
+import { transcriptEditTranslations } from "../transcriptEditTranslations";
 
 export const ja = {
   ...dataBackupTranslations.ja,
@@ -15,6 +16,7 @@ export const ja = {
   ...onDeviceTranslations.ja,
   ...onboardingTranslations.ja,
   ...premiumTranslations.ja,
+  ...transcriptEditTranslations.ja,
   appName: "ミスター・ブロッコリー",
   retry: "再試行",
   dismiss: "閉じる",

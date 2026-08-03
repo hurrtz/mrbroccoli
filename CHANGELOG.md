@@ -12,6 +12,9 @@ the complete Play Store translations are kept in a dedicated file under
 
 ### Added
 
+- Correct a misheard user transcript in place. Corrections update saved
+  history, search, archives, future conversation context, and optional local
+  knowledge while leaving already-generated replies visibly unchanged.
 - Show separate Quick and Thorough on-device response cards when a phone has
   enough memory and storage for both benchmarked Qwen models; smaller phones
   keep a single viable Quick card.

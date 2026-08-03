@@ -6,6 +6,7 @@ import { imagePromptTranslations } from "../imagePromptTranslations";
 import { onDeviceTranslations } from "../onDeviceTranslations";
 import { onboardingTranslations } from "../onboardingTranslations";
 import { premiumTranslations } from "../premiumTranslations";
+import { transcriptEditTranslations } from "../transcriptEditTranslations";
 
 export const zhCN = {
   ...dataBackupTranslations.zhCN,
@@ -15,6 +16,7 @@ export const zhCN = {
   ...onDeviceTranslations["zh-CN"],
   ...onboardingTranslations["zh-CN"],
   ...premiumTranslations["zh-CN"],
+  ...transcriptEditTranslations["zh-CN"],
   appName: "西兰花先生",
   retry: "重试",
   dismiss: "关闭",

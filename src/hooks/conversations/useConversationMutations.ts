@@ -497,6 +497,67 @@ export function useConversationMutations(params: {
     [activeConversationRef, persistMetas, setActiveConversationValue, setConversations],
   );
 
+  const editUserMessage = useCallback(
+    async (messageId: string, content: string) => {
+      const currentConversation = activeConversationRef.current;
+      const normalizedContent = content.trim();
+
+      if (!currentConversation || !normalizedContent) {
+        return false;
+      }
+
+      const existingMessage = currentConversation.messages.find(
+        (message) => message.id === messageId,
+      );
+      if (
+        !existingMessage ||
+        existingMessage.role !== "user" ||
+        existingMessage.content === normalizedContent
+      ) {
+        return false;
+      }
+
+      const updatedAt = new Date().toISOString();
+      const updatedConversation: Conversation = {
+        ...currentConversation,
+        updatedAt,
+        messages: currentConversation.messages.map((message) =>
+          message.id === messageId
+            ? { ...message, content: normalizedContent, editedAt: updatedAt }
+            : message,
+        ),
+      };
+      delete updatedConversation.contextSummary;
+      delete updatedConversation.summarizedMessageCount;
+
+      setActiveConversationValue(updatedConversation);
+      await saveConversation(updatedConversation);
+      setConversations((previous) =>
+        persistMetas(
+          previous.map((meta) =>
+            meta.id === updatedConversation.id ? { ...meta, updatedAt } : meta,
+          ),
+        ),
+      );
+
+      if (
+        pastConversationKnowledgeEnabled &&
+        !updatedConversation.isPrivate
+      ) {
+        await syncConversationKnowledge(updatedConversation, true);
+      }
+
+      return true;
+    },
+    [
+      activeConversationRef,
+      pastConversationKnowledgeEnabled,
+      persistMetas,
+      setActiveConversationValue,
+      setConversations,
+    ],
+  );
+
   const updateConversationContextSummary = useCallback(
     (
       contextSummary: string,
@@ -853,6 +914,7 @@ export function useConversationMutations(params: {
     clearConversationMemory,
     createConversation,
     deleteConversation,
+    editUserMessage,
     restoreConversationBackup,
     getConversationById,
     inspectConversationIntegrity,

@@ -6,6 +6,7 @@ import { imagePromptTranslations } from "../imagePromptTranslations";
 import { onDeviceTranslations } from "../onDeviceTranslations";
 import { onboardingTranslations } from "../onboardingTranslations";
 import { premiumTranslations } from "../premiumTranslations";
+import { transcriptEditTranslations } from "../transcriptEditTranslations";
 
 export const cs = {
   ...dataBackupTranslations.cs,
@@ -15,6 +16,7 @@ export const cs = {
   ...onDeviceTranslations.cs,
   ...onboardingTranslations.cs,
   ...premiumTranslations.cs,
+  ...transcriptEditTranslations.cs,
   appName: "Pan Brokolice",
   retry: "Zkuste to znovu",
   dismiss: "Zavřít",

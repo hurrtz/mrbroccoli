@@ -6,6 +6,7 @@ import { imagePromptTranslations } from "../imagePromptTranslations";
 import { onDeviceTranslations } from "../onDeviceTranslations";
 import { onboardingTranslations } from "../onboardingTranslations";
 import { premiumTranslations } from "../premiumTranslations";
+import { transcriptEditTranslations } from "../transcriptEditTranslations";
 
 export const ru = {
   ...dataBackupTranslations.ru,
@@ -15,6 +16,7 @@ export const ru = {
   ...onDeviceTranslations.ru,
   ...onboardingTranslations.ru,
   ...premiumTranslations.ru,
+  ...transcriptEditTranslations.ru,
   appName: "Мистер Брокколи",
   retry: "Повторить попытку",
   dismiss: "Закрыть",

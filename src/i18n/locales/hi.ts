@@ -6,6 +6,7 @@ import { imagePromptTranslations } from "../imagePromptTranslations";
 import { onDeviceTranslations } from "../onDeviceTranslations";
 import { onboardingTranslations } from "../onboardingTranslations";
 import { premiumTranslations } from "../premiumTranslations";
+import { transcriptEditTranslations } from "../transcriptEditTranslations";
 
 export const hi = {
   ...dataBackupTranslations.hi,
@@ -15,6 +16,7 @@ export const hi = {
   ...onDeviceTranslations.hi,
   ...onboardingTranslations.hi,
   ...premiumTranslations.hi,
+  ...transcriptEditTranslations.hi,
   appName: "मिस्टर ब्रोकली",
   retry: "पुन: प्रयास करें",
   dismiss: "बंद करें",

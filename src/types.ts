@@ -485,6 +485,7 @@ export interface Message {
   id: string;
   role: "user" | "assistant";
   content: string;
+  editedAt?: string;
   attachments?: MessageImageAttachment[];
   model: string | null;
   provider: Provider | null;

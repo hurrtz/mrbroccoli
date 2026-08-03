@@ -118,12 +118,18 @@ function useTimedConfirmation(resetKey: string) {
 export function MessageActions({
   message,
   onCopy,
+  onEdit,
   onShare,
   onRepeat,
   repeatState = "idle",
 }: Pick<
   ChatBubbleProps,
-  "message" | "onCopy" | "onShare" | "onRepeat" | "repeatState"
+  | "message"
+  | "onCopy"
+  | "onEdit"
+  | "onShare"
+  | "onRepeat"
+  | "repeatState"
 >) {
   const { colors } = useTheme();
   const { t } = useLocalization();
@@ -140,7 +146,7 @@ export function MessageActions({
     }
   };
 
-  if (!onCopy && !onShare && !onRepeat) {
+  if (!onCopy && !onEdit && !onShare && !onRepeat) {
     return null;
   }
 
@@ -155,6 +161,28 @@ export function MessageActions({
         },
       ]}
     >
+      {onEdit ? (
+        <TouchableOpacity
+          testID={`message-edit-action-${message.id}`}
+          style={[
+            styles.iconAction,
+            {
+              backgroundColor: colors.surfaceAlt,
+              borderColor: colors.border,
+            },
+          ]}
+          onPress={() => onEdit(message)}
+          activeOpacity={0.88}
+          accessibilityRole="button"
+          accessibilityLabel={t("correctTranscript")}
+        >
+          <PhosphorIcon
+            name="edit"
+            size="control"
+            color={colors.textSecondary}
+          />
+        </TouchableOpacity>
+      ) : null}
       {onCopy ? (
         <TouchableOpacity
           testID={`message-copy-action-${message.id}`}

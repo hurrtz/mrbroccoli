@@ -95,6 +95,7 @@ export function MainScreen() {
     undoConversationIntegrityRepair,
     searchConversations,
     deleteConversation,
+    editUserMessage,
     restoreConversationBackup,
     clearActiveConversation,
     loaded: conversationsLoaded = true,
@@ -854,6 +855,9 @@ export function MainScreen() {
           messages,
           onCopyMessage: (message) =>
             handleCopyMessage(formatMessageForCopy(message, language)),
+          onEditMessage: isBusy
+            ? undefined
+            : (message, content) => editUserMessage(message.id, content),
           onOpenSpeakingSettings: handleOpenSpeakingSettings,
           onOpenStyleSheet: handleOpenConversationSettings,
           onRepeatMessage: (message) => {

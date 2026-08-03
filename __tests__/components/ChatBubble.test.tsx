@@ -17,6 +17,25 @@ describe("ChatBubble", () => {
     jest.clearAllMocks();
   });
 
+  it("offers transcript correction for selectable user messages", () => {
+    const onEdit = jest.fn();
+    const message = {
+      id: "user-transcript",
+      role: "user" as const,
+      content: "Misheard transcript",
+      model: null,
+      provider: null,
+      timestamp: "2026-08-03T10:00:00.000Z",
+    };
+    const screen = renderWithProviders(
+      <ChatBubble selectable message={message} onEdit={onEdit} />,
+    );
+
+    fireEvent.press(screen.getByLabelText("Correct transcript"));
+
+    expect(onEdit).toHaveBeenCalledWith(message);
+  });
+
   it("keeps web-search details collapsed until requested and opens citation links", () => {
     const openUrlSpy = jest
       .spyOn(Linking, "openURL")

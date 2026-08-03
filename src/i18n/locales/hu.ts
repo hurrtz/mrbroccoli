@@ -6,6 +6,7 @@ import { imagePromptTranslations } from "../imagePromptTranslations";
 import { onDeviceTranslations } from "../onDeviceTranslations";
 import { onboardingTranslations } from "../onboardingTranslations";
 import { premiumTranslations } from "../premiumTranslations";
+import { transcriptEditTranslations } from "../transcriptEditTranslations";
 
 export const hu = {
   ...dataBackupTranslations.hu,
@@ -15,6 +16,7 @@ export const hu = {
   ...onDeviceTranslations.hu,
   ...onboardingTranslations.hu,
   ...premiumTranslations.hu,
+  ...transcriptEditTranslations.hu,
   appName: "Brokkoli úr",
   retry: "Próbálja újra",
   dismiss: "Bezárás",

@@ -120,6 +120,7 @@ const conversation: Conversation = {
       id: "message-1",
       role: "user",
       content: "A private thought",
+      editedAt: "2026-07-31T08:00:30.000Z",
       model: null,
       provider: null,
       timestamp: "2026-07-31T08:00:00.000Z",

@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { StyleProp, Text, View, ViewStyle } from "react-native";
+import { StyleProp, StyleSheet, Text, View, ViewStyle } from "react-native";
 
 import { ChatTranscript } from "../../components/ChatTranscript";
 import { IconButton } from "../../design-system/IconButton";
+import { Input, Modal } from "../../design-system/NativeControls";
 import { Colors } from "../../theme/colors";
+import { fonts } from "../../theme/typography";
 import { Message } from "../../types";
 
 import { TranslateFn } from "./shared";
@@ -17,6 +19,7 @@ interface TranscriptPreviewCardProps {
   messages: Message[];
   activeReplayMessageId?: string | null;
   onCopyMessage: (message: Message) => Promise<boolean>;
+  onEditMessage?: (message: Message, content: string) => Promise<boolean>;
   onRepeatMessage?: (message: Message) => void;
   onRetryMessage: (message: Message) => void;
   onOpenStyleSheet?: () => void;
@@ -41,6 +44,7 @@ export function TranscriptPreviewCard({
   messages,
   activeReplayMessageId = null,
   onCopyMessage,
+  onEditMessage,
   onRepeatMessage,
   onRetryMessage,
   onOpenStyleSheet,
@@ -58,9 +62,14 @@ export function TranscriptPreviewCard({
 }: TranscriptPreviewCardProps) {
   const [isAtTranscriptTail, setIsAtTranscriptTail] = useState(true);
   const [scrollToLatestRequest, setScrollToLatestRequest] = useState(0);
+  const [editingMessage, setEditingMessage] = useState<Message | null>(null);
+  const [editingText, setEditingText] = useState("");
+  const [savingCorrection, setSavingCorrection] = useState(false);
 
   useEffect(() => {
     setIsAtTranscriptTail(true);
+    setEditingMessage(null);
+    setEditingText("");
   }, [activeConversationId]);
 
   if (!showWhenEmpty && messages.length === 0) {
@@ -158,6 +167,14 @@ export function TranscriptPreviewCard({
           showUsageStats={showUsageStats}
           activeRepeatMessageId={activeReplayMessageId}
           onCopyMessage={onCopyMessage}
+          onEditMessage={
+            onEditMessage
+              ? (message) => {
+                  setEditingMessage(message);
+                  setEditingText(message.content);
+                }
+              : undefined
+          }
           onRepeatMessage={onRepeatMessage}
           onRetryMessage={onRetryMessage}
           onOpenSpeakingSettings={onOpenSpeakingSettings}
@@ -167,6 +184,75 @@ export function TranscriptPreviewCard({
           scrollToLatestRequest={scrollToLatestRequest}
         />
       </View>
+
+      <Modal
+        visible={editingMessage !== null}
+        title={t("correctTranscriptTitle")}
+        maskClosable={!savingCorrection}
+        onClose={() => {
+          if (!savingCorrection) {
+            setEditingMessage(null);
+            setEditingText("");
+          }
+        }}
+        footer={[
+          {
+            text: t("cancel"),
+            disabled: savingCorrection,
+            onPress: () => {
+              setEditingMessage(null);
+              setEditingText("");
+            },
+          },
+          {
+            text: t("save"),
+            loading: savingCorrection,
+            disabled:
+              savingCorrection ||
+              !editingText.trim() ||
+              editingText.trim() === editingMessage?.content,
+            onPress: () => {
+              if (!editingMessage || !onEditMessage) {
+                return;
+              }
+              setSavingCorrection(true);
+              void onEditMessage(editingMessage, editingText)
+                .then((saved) => {
+                  if (saved) {
+                    setEditingMessage(null);
+                    setEditingText("");
+                  }
+                })
+                .catch(() => undefined)
+                .finally(() => setSavingCorrection(false));
+            },
+          },
+        ]}
+      >
+        <View style={correctionStyles.body}>
+          <Text
+            style={[
+              correctionStyles.hint,
+              { color: colors.textSecondary },
+            ]}
+          >
+            {t("correctTranscriptHint")}
+          </Text>
+          <Input.TextArea
+            testID="transcript-correction-input"
+            autoFocus
+            rows={8}
+            value={editingText}
+            disabled={savingCorrection}
+            onChangeText={setEditingText}
+          />
+        </View>
+      </Modal>
     </View>
   );
 }
+
+const correctionStyles = StyleSheet.create({
+  body: { gap: 12 },
+  hint: { fontFamily: fonts.body, fontSize: 14, lineHeight: 20 },
+});

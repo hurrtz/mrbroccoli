@@ -6,6 +6,7 @@ import { imagePromptTranslations } from "../imagePromptTranslations";
 import { onDeviceTranslations } from "../onDeviceTranslations";
 import { onboardingTranslations } from "../onboardingTranslations";
 import { premiumTranslations } from "../premiumTranslations";
+import { transcriptEditTranslations } from "../transcriptEditTranslations";
 
 export const sv = {
   ...dataBackupTranslations.sv,
@@ -15,6 +16,7 @@ export const sv = {
   ...onDeviceTranslations.sv,
   ...onboardingTranslations.sv,
   ...premiumTranslations.sv,
+  ...transcriptEditTranslations.sv,
   appName: "Herr Broccoli",
   retry: "Försök igen",
   dismiss: "Stäng",

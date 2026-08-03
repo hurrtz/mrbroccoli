@@ -25,6 +25,7 @@ interface ChatTranscriptProps {
   contentContainerStyle?: StyleProp<ViewStyle>;
   scrollEnabled?: boolean;
   onCopyMessage?: (message: Message) => Promise<boolean>;
+  onEditMessage?: (message: Message) => void;
   onShareMessage?: (message: Message) => void;
   onRepeatMessage?: (message: Message) => void;
   onRetryMessage?: (message: Message) => void;
@@ -58,6 +59,7 @@ export function ChatTranscript({
   contentContainerStyle,
   scrollEnabled = true,
   onCopyMessage,
+  onEditMessage,
   onShareMessage,
   onRepeatMessage,
   onRetryMessage,
@@ -309,6 +311,7 @@ export function ChatTranscript({
         <ChatBubble
           message={item}
           onCopy={onCopyMessage}
+          onEdit={onEditMessage}
           onShare={onShareMessage}
           onRepeat={onRepeatMessage}
           onRetry={onRetryMessage}

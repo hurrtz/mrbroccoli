@@ -58,7 +58,9 @@ export function MessageHeader({ message }: { message: Message }) {
             numberOfLines={1}
             style={[styles.timestampLabel, { color: colors.textMuted }]}
           >
-            {timestampLabel}
+            {message.editedAt
+              ? `${timestampLabel} · ${t("transcriptEdited")}`
+              : timestampLabel}
           </Text>
           <Text style={[styles.roleLabel, { color: colors.accent }]}>
             {t("you")}

@@ -6,6 +6,7 @@ import { imagePromptTranslations } from "../imagePromptTranslations";
 import { onDeviceTranslations } from "../onDeviceTranslations";
 import { onboardingTranslations } from "../onboardingTranslations";
 import { premiumTranslations } from "../premiumTranslations";
+import { transcriptEditTranslations } from "../transcriptEditTranslations";
 
 export const ur = {
   ...dataBackupTranslations.ur,
@@ -15,6 +16,7 @@ export const ur = {
   ...onDeviceTranslations.ur,
   ...onboardingTranslations.ur,
   ...premiumTranslations.ur,
+  ...transcriptEditTranslations.ur,
   appName: "مسٹر بروکلی",
   retry: "دوبارہ کوشش کریں۔",
   dismiss: "بند کریں",

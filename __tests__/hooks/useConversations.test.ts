@@ -677,6 +677,52 @@ describe("useConversations", () => {
     );
   });
 
+  it("corrects a user transcript and invalidates stale compact memory", async () => {
+    const { result } = renderHook(() => useConversations());
+
+    await act(async () => {
+      result.current.createConversation("Transcript correction");
+    });
+
+    let messageId = "";
+    await act(async () => {
+      messageId =
+        result.current.addMessage({
+          role: "user",
+          content: "All in on end design",
+          model: null,
+          provider: null,
+        })?.id ?? "";
+      result.current.updateConversationContextSummary(
+        "The user prefers end design.",
+        1,
+      );
+    });
+
+    await act(async () => {
+      await result.current.editUserMessage(
+        messageId,
+        "All in on Ant Design",
+      );
+    });
+
+    expect(result.current.activeConversation?.contextSummary).toBeUndefined();
+    expect(
+      result.current.activeConversation?.summarizedMessageCount,
+    ).toBeUndefined();
+    expect(result.current.activeConversation?.messages[0]).toEqual(
+      expect.objectContaining({
+        content: "All in on Ant Design",
+        editedAt: expect.any(String),
+      }),
+    );
+    await expect(
+      result.current.searchConversations("Ant Design"),
+    ).resolves.toEqual([
+      expect.objectContaining({ title: "Transcript correction" }),
+    ]);
+  });
+
   it("persists a rolling context summary on the active conversation", async () => {
     const { result } = renderHook(() => useConversations());
 

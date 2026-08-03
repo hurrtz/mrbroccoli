@@ -6,6 +6,7 @@ import { imagePromptTranslations } from "../imagePromptTranslations";
 import { onDeviceTranslations } from "../onDeviceTranslations";
 import { onboardingTranslations } from "../onboardingTranslations";
 import { premiumTranslations } from "../premiumTranslations";
+import { transcriptEditTranslations } from "../transcriptEditTranslations";
 
 export const de = {
   ...dataBackupTranslations.de,
@@ -15,6 +16,7 @@ export const de = {
   ...onDeviceTranslations.de,
   ...onboardingTranslations.de,
   ...premiumTranslations.de,
+  ...transcriptEditTranslations.de,
   appName: "Mr. Brokkoli",
   retry: "Noch mal",
   dismiss: "Schließen",
