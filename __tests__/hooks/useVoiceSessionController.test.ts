@@ -222,6 +222,38 @@ describe("useVoiceSessionController", () => {
     expect(player.pausePlayback).not.toHaveBeenCalled();
   });
 
+  it("stops spoken playback, preserves a partial reply, and starts a barge-in recording", async () => {
+    const abortController = new AbortController();
+    const preserveInterruptedReply = jest.fn();
+    const player = {
+      isPlaybackPaused: false,
+      isPlaying: true,
+      pausePlayback: jest.fn(async () => true),
+      resetCancellation: jest.fn(),
+      resumePlayback: jest.fn(async () => true),
+      speakText: jest.fn(),
+      stopPlayback: jest.fn(async () => undefined),
+      waitForDrain: jest.fn(async () => undefined),
+      waitForPlaybackRouteSettle: jest.fn(async () => undefined),
+    };
+    const { result, params } = renderController({
+      abortRef: { current: abortController },
+      isBusy: true,
+      player,
+      preserveInterruptedReply,
+    });
+
+    await act(async () => {
+      await result.current.handleInterruptPlayback();
+    });
+
+    expect(preserveInterruptedReply).toHaveBeenCalledTimes(1);
+    expect(abortController.signal.aborted).toBe(true);
+    expect(player.stopPlayback).toHaveBeenCalledTimes(1);
+    expect(player.pausePlayback).not.toHaveBeenCalled();
+    expect(params.recorder.startRecording).toHaveBeenCalledTimes(1);
+  });
+
   it("completely stops playback and cancels prefetched reply work", async () => {
     const abortController = new AbortController();
     const { result, params } = renderController({

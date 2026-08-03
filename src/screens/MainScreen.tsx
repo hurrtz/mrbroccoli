@@ -473,6 +473,7 @@ export function MainScreen() {
     handlePressOut,
     handleRepeatDriveReply,
     handleStopPlayback,
+    handleInterruptPlayback,
     handleStopDriveSession,
     handleTogglePress,
     maxRecordingMs,
@@ -491,6 +492,30 @@ export function MainScreen() {
     nativeStt,
     playReplyText,
     player,
+    preserveInterruptedReply: () => {
+      const partialReply = streamingText.trim();
+      if (
+        !partialReply ||
+        partialReply === lastCompletedReplyRef.current.trim()
+      ) {
+        return;
+      }
+      addMessage({
+        role: "assistant",
+        content: partialReply,
+        model,
+        provider: localLlmModelId ? null : provider,
+        metadata: {
+          notices: [
+            {
+              stage: "interruption",
+              level: "warning",
+              message: t("replyInterruptedNotice"),
+            },
+          ],
+        },
+      });
+    },
     promptSubmissionBlockMessage,
     providerApiKey,
     providerLabel,
@@ -817,6 +842,7 @@ export function MainScreen() {
           onPress: handleTogglePress,
           onPressIn: handlePressIn,
           onPressOut: handlePressOut,
+          onInterruptPlayback: handleInterruptPlayback,
           onStopPlayback: handleStopPlayback,
           onResolvePromptBlock:
             freeOffline.entitlement.status === "free" &&

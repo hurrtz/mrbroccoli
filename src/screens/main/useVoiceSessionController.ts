@@ -25,6 +25,7 @@ export function useVoiceSessionController({
   mainSurfaceVisible,
   nativeStt,
   playReplyText,
+  preserveInterruptedReply,
   player,
   promptSubmissionBlockMessage,
   providerApiKey,
@@ -296,6 +297,42 @@ export function useVoiceSessionController({
     stopReplay,
   ]);
 
+  const handleInterruptPlayback = useCallback(async () => {
+    if (!ensureVoiceSessionReady()) {
+      return;
+    }
+
+    recordDebugLogEvent({
+      event: "voice-session-playback-interrupted-for-capture",
+      payload: {
+        inputMode: settings.inputMode,
+        replayPhase,
+      },
+    });
+    preserveInterruptedReply?.();
+    if (replayPhase !== "idle") {
+      await stopReplay().catch(() => undefined);
+    }
+    await cancelCurrentInteraction();
+    try {
+      await startVoiceCaptureAfterAmbientStop();
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : t("couldntStartVoiceInput");
+      showToast(message, undefined, "danger");
+    }
+  }, [
+    cancelCurrentInteraction,
+    ensureVoiceSessionReady,
+    preserveInterruptedReply,
+    replayPhase,
+    settings.inputMode,
+    showToast,
+    startVoiceCaptureAfterAmbientStop,
+    stopReplay,
+    t,
+  ]);
+
   const resetVoiceSessionState = useCallback(async () => {
     recordDebugLogEvent({
       event: "voice-session-reset-requested",
@@ -339,6 +376,7 @@ export function useVoiceSessionController({
     handlePressOut: standardPressHandlers.handlePressOut,
     handleRepeatDriveReply: driveSession.handleRepeat,
     handleStopPlayback,
+    handleInterruptPlayback,
     handleStopDriveSession: driveSession.handleStop,
     handleTogglePress,
     maxRecordingMs,

@@ -12,6 +12,10 @@ the complete Play Store translations are kept in a dedicated file under
 
 ### Added
 
+- Interrupt a spoken response with a dedicated speak-now control. Completed
+  answers remain intact, still-streaming text is retained with a visible
+  interruption marker, prefetched audio is stopped, and recording starts only
+  after the playback route settles.
 - Render Markdown headings, lists, links, citations, tables, and code fences
   into clearer speech without changing the visible or saved response.
 - Save any transcript message as a user-controlled, source-linked decision,

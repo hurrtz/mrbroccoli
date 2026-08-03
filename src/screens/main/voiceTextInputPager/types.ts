@@ -32,6 +32,7 @@ export interface VoiceTextInputPagerProps {
   onPress: () => void;
   onPressIn: () => void;
   onPressOut: () => void;
+  onInterruptPlayback?: () => void;
   onStopPlayback: () => void;
   onResolvePromptBlock?: () => void;
   onSubmitTextMessage: (text: string) => void;

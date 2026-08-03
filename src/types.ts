@@ -232,7 +232,7 @@ export interface MessageConversationKnowledgeMetadata {
 }
 
 export interface MessagePipelineNotice {
-  stage: "stt" | "tts" | "ulra" | "web-search";
+  stage: "stt" | "tts" | "ulra" | "web-search" | "interruption";
   level: "warning" | "error";
   message: string;
   detail?: string;

@@ -111,6 +111,7 @@ const t = ((key: string) => {
     converting: "Converting",
     thinking: "Thinking",
     speaking: "Speaking",
+    tapToSpeak: "Tap to speak",
     paused: "Paused",
     stop: "Stop",
     stopDriveSession: "Pause auto",
@@ -132,6 +133,7 @@ function createProps(overrides: Record<string, unknown> = {}) {
     onPress: jest.fn(),
     onPressIn: jest.fn(),
     onPressOut: jest.fn(),
+    onInterruptPlayback: jest.fn(),
     onStopPlayback: jest.fn(),
     onSubmitTextMessage: jest.fn(),
     recordingMaxMs: 150_000,
@@ -912,11 +914,13 @@ describe("MainScreenVoiceStage composer", () => {
   it("keeps pause and resume on the primary CTA with a separate Stop action", () => {
     const onPress = jest.fn();
     const onStopPlayback = jest.fn();
+    const onInterruptPlayback = jest.fn();
     const screen = render(
       <MainScreenVoiceStage
         {...createProps({
           isActive: true,
           onPress,
+          onInterruptPlayback,
           onStopPlayback,
           visualPhase: "speaking",
         })}
@@ -939,12 +943,20 @@ describe("MainScreenVoiceStage composer", () => {
     ).toEqual(expect.objectContaining({ minHeight: 44 }));
     fireEvent.press(screen.getByTestId("voice-stage-stop-playback"));
     expect(onStopPlayback).toHaveBeenCalledTimes(1);
+    expect(
+      StyleSheet.flatten(
+        screen.getByTestId("voice-stage-interrupt-playback").props.style,
+      ),
+    ).toEqual(expect.objectContaining({ minHeight: 44 }));
+    fireEvent.press(screen.getByTestId("voice-stage-interrupt-playback"));
+    expect(onInterruptPlayback).toHaveBeenCalledTimes(1);
 
     screen.rerender(
       <MainScreenVoiceStage
         {...createProps({
           isActive: true,
           onPress,
+          onInterruptPlayback,
           onStopPlayback,
           playbackPaused: true,
           visualPhase: "speaking",
@@ -955,5 +967,6 @@ describe("MainScreenVoiceStage composer", () => {
       screen.getByTestId("phosphor-icon-play-circle", hiddenIconQuery),
     ).toBeTruthy();
     expect(screen.getByText("Paused")).toBeTruthy();
+    expect(screen.queryByTestId("voice-stage-interrupt-playback")).toBeNull();
   });
 });

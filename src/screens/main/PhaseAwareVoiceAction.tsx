@@ -39,6 +39,7 @@ interface PhaseAwareVoiceActionProps {
   onPress: () => void;
   onPressIn: () => void;
   onPressOut: () => void;
+  onInterruptPlayback?: () => void;
   onStopPlayback: () => void;
   playbackPaused?: boolean;
   recordingMaxMs: number;
@@ -350,6 +351,7 @@ export function PhaseAwareVoiceAction({
   onPress,
   onPressIn,
   onPressOut,
+  onInterruptPlayback,
   onStopPlayback,
   playbackPaused = false,
   recordingMaxMs,
@@ -621,6 +623,31 @@ export function PhaseAwareVoiceAction({
         </TouchableOpacity>
       ) : null}
 
+      {visualPhase === "speaking" &&
+      !playbackPaused &&
+      onInterruptPlayback ? (
+        <TouchableOpacity
+          testID="voice-stage-interrupt-playback"
+          accessibilityLabel={t("tapToSpeak")}
+          accessibilityRole="button"
+          activeOpacity={0.72}
+          onPress={inputMode === "push-to-talk" ? undefined : onInterruptPlayback}
+          onPressIn={
+            inputMode === "push-to-talk" ? onInterruptPlayback : undefined
+          }
+          onPressOut={inputMode === "push-to-talk" ? onPressOut : undefined}
+          style={styles.interruptPlaybackAction}
+        >
+          <PhosphorIcon name="mic" size="compact" color={phaseForeground} />
+          <Text
+            numberOfLines={1}
+            style={[styles.stopPlaybackLabel, { color: phaseForeground }]}
+          >
+            {t("tapToSpeak")}
+          </Text>
+        </TouchableOpacity>
+      ) : null}
+
       {visualPhase !== "recording" && visualPhase !== "speaking" ? (
         <SpeechStartTimelineBorder
           colors={colors}
@@ -695,6 +722,19 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     gap: 6,
     paddingHorizontal: 6,
+  },
+  interruptPlaybackAction: {
+    position: "absolute",
+    right: 8,
+    top: 12,
+    bottom: 12,
+    width: "30%",
+    minHeight: 44,
+    borderRadius: 12,
+    alignItems: "center",
+    justifyContent: "center",
+    flexDirection: "row",
+    gap: 5,
   },
   stopPlaybackLabel: {
     fontFamily: fonts.body,

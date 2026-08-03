@@ -62,6 +62,7 @@ export interface UseVoiceSessionControllerParams {
   mainSurfaceVisible: boolean;
   nativeStt: NativeSpeechRecognizerController;
   playReplyText: (text: string) => Promise<void>;
+  preserveInterruptedReply?: () => void;
   player: AudioPlayerController;
   promptSubmissionBlockMessage?: string | null;
   providerApiKey: string;

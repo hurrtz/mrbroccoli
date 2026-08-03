@@ -36,6 +36,7 @@ interface MainScreenVoiceStageProps {
   onPress: () => void;
   onPressIn: () => void;
   onPressOut: () => void;
+  onInterruptPlayback?: () => void;
   onStopPlayback: () => void;
   onResolvePromptBlock?: () => void;
   onSubmitTextMessage: (text: string) => void;
@@ -76,6 +77,7 @@ export const MainScreenVoiceStage = React.memo(function MainScreenVoiceStage({
   onPress,
   onPressIn,
   onPressOut,
+  onInterruptPlayback,
   onStopPlayback,
   onResolvePromptBlock,
   onSubmitTextMessage,
@@ -133,6 +135,7 @@ export const MainScreenVoiceStage = React.memo(function MainScreenVoiceStage({
           onPress={onPress}
           onPressIn={onPressIn}
           onPressOut={onPressOut}
+          onInterruptPlayback={onInterruptPlayback}
           onStopPlayback={onStopPlayback}
           onResolvePromptBlock={onResolvePromptBlock}
           onSubmitTextMessage={onSubmitTextMessage}

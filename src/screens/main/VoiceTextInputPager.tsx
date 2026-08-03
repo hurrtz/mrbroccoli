@@ -38,6 +38,7 @@ export function VoiceTextInputPager({
   onPress,
   onPressIn,
   onPressOut,
+  onInterruptPlayback,
   onStopPlayback,
   onResolvePromptBlock,
   onSubmitTextMessage,
@@ -120,6 +121,7 @@ export function VoiceTextInputPager({
               onPress={onPress}
               onPressIn={onPressIn}
               onPressOut={onPressOut}
+              onInterruptPlayback={onInterruptPlayback}
               onStopPlayback={onStopPlayback}
               playbackPaused={playbackPaused}
               recordingMaxMs={recordingMaxMs}
