@@ -1,4 +1,7 @@
-import { selectOfflineProfile } from "../../src/services/offlineProfile";
+import {
+  getOfflineProfileModels,
+  selectOfflineProfile,
+} from "../../src/services/offlineProfile";
 import { evaluateOfflineProfileReadiness } from "../../src/services/offlineProfileManager";
 import type {
   LocalDeviceSnapshot,
@@ -47,17 +50,16 @@ function benchmark(
 
 describe("offline profile readiness", () => {
   const installs = Object.fromEntries(
-    [profile.llm, profile.stt, profile.tts]
-      .filter(Boolean)
-      .map((model) => [
-        model.id,
-        { installed: true, path: `/models/${model.id}`, verified: true },
-      ]),
+    getOfflineProfileModels(profile).map((model) => [
+      model.id,
+      { installed: true, path: `/models/${model.id}`, verified: true },
+    ]),
   );
   const benchmarks = Object.fromEntries(
-    [profile.llm, profile.stt, profile.tts]
-      .filter(Boolean)
-      .map((model) => [model.id, benchmark(model.id)]),
+    getOfflineProfileModels(profile).map((model) => [
+      model.id,
+      benchmark(model.id),
+    ]),
   );
 
   it("requires every installed model to have a viable benchmark for this device", () => {

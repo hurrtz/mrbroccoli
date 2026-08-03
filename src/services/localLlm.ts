@@ -58,6 +58,10 @@ function maxReplyTokens(responseLength: AssistantResponseLength) {
   }
 }
 
+function enablesThinking(model: LocalLlmModelDefinition) {
+  return model.responseProfile === "thorough";
+}
+
 async function destroyActiveContext() {
   const current = activeContext;
   activeContext = null;
@@ -173,7 +177,7 @@ export async function streamLocalChat(params: {
           temperature: 0.65,
           top_p: 0.9,
           min_p: 0.05,
-          enable_thinking: false,
+          enable_thinking: enablesThinking(model),
         },
         ({ token }) => {
           if (!params.abortSignal?.aborted && token) {
@@ -231,10 +235,10 @@ export async function benchmarkLocalLlm(
           content: "Reply with one sentence about green plants.",
         },
       ],
-      n_predict: 32,
+      n_predict: enablesThinking(model) ? 96 : 32,
       stop: STOP_WORDS,
       temperature: 0,
-      enable_thinking: false,
+      enable_thinking: enablesThinking(model),
     });
     const durationMs = Date.now() - generationStartedAt;
     const tokensPerSecond =

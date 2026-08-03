@@ -171,8 +171,10 @@ export function FreeOfflineSetupModal({
                 {t("freeOfflineProfile")}
               </Text>
               <Text style={[styles.body, { color: colors.textSecondary }]}>
-                {profile.stt.name} · {profile.llm.name} ·{" "}
-                {profile.tts?.name ?? t("systemVoice")}
+                {profile.stt.name} · {profile.llm.name}
+                {profile.thoroughLlm
+                  ? ` + ${profile.thoroughLlm.name}`
+                  : ""} · {profile.tts?.name ?? t("systemVoice")}
               </Text>
               {!profile.tts ? (
                 <Text style={[styles.hint, { color: colors.textSecondary }]}>

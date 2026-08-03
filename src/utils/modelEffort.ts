@@ -3,6 +3,7 @@ import type { ModelEffortConfig, ModelEffortOption } from "../constants/models";
 import { translate, type TranslationKey } from "../i18n";
 import type { AppLanguage, Provider, ResponseModeRoute } from "../types";
 import { isRuntimeCapabilityConfigurationDisabled } from "../services/runtimeCapabilityOverrides";
+import { getLocalModel } from "../constants/localModels";
 
 const GENERIC_DEFAULT_EFFORT_IDS = ["medium", "normal"];
 const ANTHROPIC_ADAPTIVE_THINKING_MODELS = new Set([
@@ -148,7 +149,16 @@ export function getResponseModeRouteEffortLabel(
   language: AppLanguage,
 ): string | undefined {
   if (route.runtime === "local") {
-    return undefined;
+    if (!route.localModelId) {
+      return undefined;
+    }
+    const model = getLocalModel(route.localModelId);
+    return model.capability === "llm"
+      ? translate(
+          language,
+          model.responseProfile === "thorough" ? "thorough" : "brief",
+        )
+      : undefined;
   }
   const normalizedRoute = normalizeResponseModeRouteEffort(route);
   const option = getModelEffortOption(

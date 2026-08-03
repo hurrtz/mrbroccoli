@@ -16,10 +16,12 @@ import {
 } from "./localDeviceCapabilities";
 
 export const FREE_OFFLINE_RESPONSE_MODE_ID = "free-offline";
+export const FREE_OFFLINE_THOROUGH_RESPONSE_MODE_ID = "free-offline-thorough";
 
 export interface OfflineProfile {
   languages: SpeechLanguage[];
   llm: LocalLlmModelDefinition;
+  thoroughLlm: LocalLlmModelDefinition | null;
   stt: LocalSttModelDefinition;
   /** Null means the phone's language-aware system voice is used. */
   tts: LocalTtsModelDefinition | null;
@@ -32,6 +34,7 @@ export interface OfflineProfile {
 export function getOfflineProfileModels(profile: OfflineProfile) {
   return [
     profile.llm,
+    ...(profile.thoroughLlm ? [profile.thoroughLlm] : []),
     profile.stt,
     ...(profile.tts ? [profile.tts] : []),
   ] satisfies LocalModelDefinition[];
@@ -78,6 +81,18 @@ function benchmarkMatchesDevice(
     benchmark.device.architecture === snapshot.architecture &&
     benchmark.device.osVersion === snapshot.osVersion &&
     benchmark.device.physicalMemoryBytes === snapshot.physicalMemoryBytes
+  );
+}
+
+function hasCurrentBenchmarkFailure(params: {
+  model: LocalModelDefinition;
+  snapshot: LocalDeviceSnapshot;
+  benchmarks?: Partial<Record<LocalModelId, LocalModelBenchmarkResult>>;
+}) {
+  const benchmark = params.benchmarks?.[params.model.id];
+  return (
+    benchmarkMatchesDevice(benchmark, params.snapshot) &&
+    (benchmark?.status === "below-target" || benchmark?.status === "failed")
   );
 }
 
@@ -146,6 +161,18 @@ export function selectOfflineProfile(params: {
   const viableLlms = llms.filter(
     (model) => isPermanentlyEligible(model, params.snapshot).eligible,
   );
+  const viableQuickLlms = viableLlms.filter(
+    (model) => model.responseProfile === "quick",
+  );
+  const viableThoroughLlms = viableLlms.filter(
+    (model) =>
+      model.responseProfile === "thorough" &&
+      !hasCurrentBenchmarkFailure({
+        model,
+        snapshot: params.snapshot,
+        benchmarks: params.benchmarks,
+      }),
+  );
   const viableStt = sttModels.filter(
     (model) => isPermanentlyEligible(model, params.snapshot).eligible,
   );
@@ -153,7 +180,7 @@ export function selectOfflineProfile(params: {
     (model) => isPermanentlyEligible(model, params.snapshot).eligible,
   );
 
-  if (!viableLlms.length || !viableStt.length) {
+  if (!viableQuickLlms.length || !viableStt.length) {
     return { status: "unavailable", reason: "device" };
   }
 
@@ -164,8 +191,14 @@ export function selectOfflineProfile(params: {
   };
   const llm = sortCandidates({
     ...candidateOptions,
-    models: viableLlms,
+    models: viableQuickLlms,
   })[0];
+  const thoroughCandidate = viableThoroughLlms.length
+    ? sortCandidates({
+        ...candidateOptions,
+        models: viableThoroughLlms,
+      })[0]
+    : null;
   const stt = sortCandidates({
     ...candidateOptions,
     models: viableStt,
@@ -177,16 +210,33 @@ export function selectOfflineProfile(params: {
         tieBreaker: (model) => ttsPreference(model),
       })[0]
     : null;
-  const models: LocalModelDefinition[] = [llm, stt, ...(tts ? [tts] : [])];
-  const missingModels = models.filter(
-    (model) => !params.installedModelIds?.has(model.id),
-  );
-  const installedBytes = missingModels.reduce(
-    (total, model) => total + model.installedBytes,
-    0,
-  );
-  const minimumFreeStorageBytes =
-    installedBytes + Math.max(...models.map(modelSafetyReserve));
+  const baseModels: LocalModelDefinition[] = [llm, stt, ...(tts ? [tts] : [])];
+  const footprint = (models: LocalModelDefinition[]) => {
+    const missingModels = models.filter(
+      (model) => !params.installedModelIds?.has(model.id),
+    );
+    const installedBytes = missingModels.reduce(
+      (total, model) => total + model.installedBytes,
+      0,
+    );
+    return {
+      missingModels,
+      installedBytes,
+      minimumFreeStorageBytes:
+        installedBytes + Math.max(...models.map(modelSafetyReserve)),
+    };
+  };
+  const thoroughModels = thoroughCandidate
+    ? [llm, thoroughCandidate, stt, ...(tts ? [tts] : [])]
+    : baseModels;
+  const thoroughFootprint = footprint(thoroughModels);
+  const includesThorough =
+    Boolean(thoroughCandidate) &&
+    params.snapshot.freeStorageBytes >=
+      thoroughFootprint.minimumFreeStorageBytes;
+  const models = includesThorough ? thoroughModels : baseModels;
+  const { missingModels, installedBytes, minimumFreeStorageBytes } =
+    includesThorough ? thoroughFootprint : footprint(baseModels);
 
   if (params.snapshot.freeStorageBytes < minimumFreeStorageBytes) {
     return { status: "unavailable", reason: "storage" };
@@ -204,6 +254,7 @@ export function selectOfflineProfile(params: {
     profile: {
       languages,
       llm,
+      thoroughLlm: includesThorough ? thoroughCandidate : null,
       stt,
       tts,
       downloadBytes: missingModels.reduce(
@@ -247,21 +298,40 @@ export function applyOfflineProfileToSettings(
   profile: OfflineProfile,
 ): Settings {
   const ttsIsKokoro = profile.tts?.id === "kokoro-multilingual";
+  const responseModes = [
+    {
+      id: FREE_OFFLINE_RESPONSE_MODE_ID,
+      route: {
+        provider: settings.lastProvider,
+        model: profile.llm.name,
+        runtime: "local" as const,
+        localModelId: profile.llm.id,
+      },
+    },
+    ...(profile.thoroughLlm
+      ? [
+          {
+            id: FREE_OFFLINE_THOROUGH_RESPONSE_MODE_ID,
+            route: {
+              provider: settings.lastProvider,
+              model: profile.thoroughLlm.name,
+              runtime: "local" as const,
+              localModelId: profile.thoroughLlm.id,
+            },
+          },
+        ]
+      : []),
+  ];
+  const activeResponseMode = responseModes.some(
+    ({ id }) => id === settings.activeResponseMode,
+  )
+    ? settings.activeResponseMode
+    : FREE_OFFLINE_RESPONSE_MODE_ID;
 
   return {
     ...applyFreeRuntimeBoundaries(settings),
-    activeResponseMode: FREE_OFFLINE_RESPONSE_MODE_ID,
-    responseModes: [
-      {
-        id: FREE_OFFLINE_RESPONSE_MODE_ID,
-        route: {
-          provider: settings.lastProvider,
-          model: profile.llm.name,
-          runtime: "local",
-          localModelId: profile.llm.id,
-        },
-      },
-    ],
+    activeResponseMode,
+    responseModes,
     sttMode: "local",
     localSttModelId: profile.stt.id,
     sttLanguage: profile.languages.length === 1 ? profile.languages[0] : "auto",
@@ -276,8 +346,14 @@ export function applyOfflineProfileToSettings(
 }
 
 export function applyUnavailableFreeSettings(settings: Settings): Settings {
-  const llm = getLocalModelsForLanguages("llm", settings.localLanguages)[0];
-  const fallbackLlm = llm ?? getLocalModelsForLanguages("llm", ["en"])[0];
+  const llm = getLocalModelsForLanguages("llm", settings.localLanguages).find(
+    (model) => model.responseProfile === "quick",
+  );
+  const fallbackLlm =
+    llm ??
+    getLocalModelsForLanguages("llm", ["en"]).find(
+      (model) => model.responseProfile === "quick",
+    );
   if (!fallbackLlm) {
     throw new Error("The local model catalogue has no Free LLM fallback.");
   }

@@ -71,6 +71,7 @@ describe("free offline profile selection", () => {
     expect(result.status).toBe("ready");
     if (result.status === "ready") {
       expect(result.profile.llm.id).toBe("qwen3-0.6b-q8");
+      expect(result.profile.thoroughLlm?.id).toBe("qwen3-1.7b-q8");
       expect(result.profile.stt.id).toBe("whisper-tiny");
       expect(result.profile.tts?.id).toBe("kokoro-multilingual");
     }
@@ -108,6 +109,7 @@ describe("free offline profile selection", () => {
       expect(result.profile.tts).toBeNull();
       expect(result.profile.downloadBytes).toBe(
         getLocalModel("qwen3-0.6b-q8").downloadBytes +
+          getLocalModel("qwen3-1.7b-q8").downloadBytes +
           getLocalModel("whisper-tiny").downloadBytes,
       );
     }
@@ -161,7 +163,7 @@ describe("free offline profile selection", () => {
     }
   });
 
-  it("reuses an already installed complete profile before downloading defaults", () => {
+  it("keeps Quick and reuses installed Thorough and speech models", () => {
     const result = selectOfflineProfile({
       languages: ["en"],
       snapshot: device(),
@@ -174,9 +176,12 @@ describe("free offline profile selection", () => {
 
     expect(result.status).toBe("ready");
     if (result.status === "ready") {
-      expect(result.profile.llm.id).toBe("qwen3-1.7b-q8");
+      expect(result.profile.llm.id).toBe("qwen3-0.6b-q8");
+      expect(result.profile.thoroughLlm?.id).toBe("qwen3-1.7b-q8");
       expect(result.profile.tts?.id).toBe("piper-en-us-kristin");
-      expect(result.profile.downloadBytes).toBe(0);
+      expect(result.profile.downloadBytes).toBe(
+        getLocalModel("qwen3-0.6b-q8").downloadBytes,
+      );
     }
   });
 
@@ -193,6 +198,7 @@ describe("free offline profile selection", () => {
     expect(result.status).toBe("ready");
     if (result.status === "ready") {
       expect(result.profile.llm.id).toBe("qwen3-0.6b-q8");
+      expect(result.profile.thoroughLlm).toBeNull();
     }
   });
 
@@ -211,8 +217,11 @@ describe("free offline profile selection", () => {
       readyProfile("de"),
     );
 
-    expect(effective.responseModes).toHaveLength(1);
+    expect(effective.responseModes).toHaveLength(2);
     expect(effective.responseModes[0]?.route.runtime).toBe("local");
+    expect(effective.responseModes[1]?.route.localModelId).toBe(
+      "qwen3-1.7b-q8",
+    );
     expect(effective.sttMode).toBe("local");
     expect(effective.ttsMode).toBe("local");
     expect(effective.webSearchMode).toBe("off");
@@ -221,6 +230,35 @@ describe("free offline profile selection", () => {
     expect(effective.showDebugLogButton).toBe(true);
     expect(effective.apiKeys.openai).toBe("");
     expect(settings.apiKeys.openai).toBe("kept-secret");
+  });
+
+  it("preserves the Thorough card after the user selects it", () => {
+    const profile = readyProfile("de");
+    const effective = applyOfflineProfileToSettings(
+      { ...DEFAULT_SETTINGS, activeResponseMode: "free-offline-thorough" },
+      profile,
+    );
+
+    expect(effective.activeResponseMode).toBe("free-offline-thorough");
+  });
+
+  it("keeps one Quick route when memory or storage cannot support Thorough", () => {
+    const selection = selectOfflineProfile({
+      languages: ["de"],
+      snapshot: device({
+        physicalMemoryBytes: 4 * GIB,
+        availableMemoryBytes: 2 * GIB,
+      }),
+    });
+    if (selection.status !== "ready") {
+      throw new Error("Expected a Quick-only profile");
+    }
+
+    expect(selection.profile.thoroughLlm).toBeNull();
+    expect(
+      applyOfflineProfileToSettings(DEFAULT_SETTINGS, selection.profile)
+        .responseModes,
+    ).toHaveLength(1);
   });
 
   it("routes a bilingual Free profile through language-aware system speech", () => {

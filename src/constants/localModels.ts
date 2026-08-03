@@ -80,6 +80,7 @@ export interface LocalLlmModelDefinition extends LocalModelBase {
   runtime: "llama-rn";
   fileName: string;
   contextTokens: number;
+  responseProfile: "quick" | "thorough";
 }
 
 export interface LocalSttModelDefinition extends LocalModelBase {
@@ -147,6 +148,7 @@ export const LOCAL_MODEL_CATALOG = [
       minimumTokensPerSecond: 3,
     },
     contextTokens: 4_096,
+    responseProfile: "quick",
   },
   {
     id: "qwen3-1.7b-q8",
@@ -169,6 +171,7 @@ export const LOCAL_MODEL_CATALOG = [
       minimumTokensPerSecond: 3,
     },
     contextTokens: 4_096,
+    responseProfile: "thorough",
   },
   {
     id: "whisper-tiny",

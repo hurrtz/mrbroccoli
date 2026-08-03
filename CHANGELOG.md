@@ -12,6 +12,9 @@ the complete Play Store translations are kept in a dedicated file under
 
 ### Added
 
+- Show separate Quick and Thorough on-device response cards when a phone has
+  enough memory and storage for both benchmarked Qwen models; smaller phones
+  keep a single viable Quick card.
 - Add optional Omnilingual on-device speech recognition and compact Piper
   voices for Italian, Russian, and European Portuguese, each with pinned
   artifacts, license checks, and device-local benchmarks.

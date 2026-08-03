@@ -141,8 +141,8 @@ async function benchmarkProfileModel(
   profile: OfflineProfile,
   modelId: LocalModelId,
 ) {
-  if (modelId === profile.llm.id) {
-    return benchmarkLocalLlm(profile.llm.id);
+  if (modelId === profile.llm.id || modelId === profile.thoroughLlm?.id) {
+    return benchmarkLocalLlm(modelId as typeof profile.llm.id);
   }
   if (modelId === profile.stt.id) {
     const language: SttLanguage =

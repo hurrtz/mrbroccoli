@@ -87,7 +87,28 @@ describe("local LLM", () => {
     expect(mockInitLlama).toHaveBeenCalledWith(
       expect.objectContaining({ model: "/models/qwen.gguf" }),
     );
+    expect(mockCompletion).toHaveBeenCalledWith(
+      expect.objectContaining({ enable_thinking: false }),
+      expect.any(Function),
+    );
     expect(onChunk).toHaveBeenNthCalledWith(1, "Local ");
     expect(onChunk).toHaveBeenNthCalledWith(2, "reply.");
+  });
+
+  it("enables Qwen thinking only for the thorough local model", async () => {
+    await streamLocalChat({
+      messages: [],
+      modelId: "qwen3-1.7b-q8",
+      assistantInstructions: "Be helpful.",
+      responseLength: "normal",
+      responseTone: "professional",
+      language: "en",
+      onChunk: jest.fn(),
+    });
+
+    expect(mockCompletion).toHaveBeenCalledWith(
+      expect.objectContaining({ enable_thinking: true }),
+      expect.any(Function),
+    );
   });
 });

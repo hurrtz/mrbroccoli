@@ -4,11 +4,37 @@ import {
   getModelEffortOptions,
   getModelEffortRequestBody,
   getModelEffortTransportValue,
+  getResponseModeRouteEffortLabel,
   normalizeResponseModeRouteEffort,
 } from "../../src/utils/modelEffort";
 import { APP_LANGUAGES } from "../../src/i18n/localeRegistry";
 
 describe("model effort metadata", () => {
+  it("labels local Quick and Thorough behavior without provider metadata", () => {
+    expect(
+      getResponseModeRouteEffortLabel(
+        {
+          provider: "openai",
+          model: "Qwen3 0.6B",
+          runtime: "local",
+          localModelId: "qwen3-0.6b-q8",
+        },
+        "en",
+      ),
+    ).toBe("Brief");
+    expect(
+      getResponseModeRouteEffortLabel(
+        {
+          provider: "openai",
+          model: "Qwen3 1.7B",
+          runtime: "local",
+          localModelId: "qwen3-1.7b-q8",
+        },
+        "en",
+      ),
+    ).toBe("Thorough");
+  });
+
   it("localizes effort labels for the Ukrainian interface", () => {
     expect(
       getModelEffortOptionLabel(
