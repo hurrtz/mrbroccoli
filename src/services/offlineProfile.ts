@@ -230,7 +230,6 @@ function applyFreeRuntimeBoundaries(settings: Settings): Settings {
     responseLength: "normal",
     responseTone: "professional",
     showUsageStats: false,
-    showDebugLogButton: false,
     setupGuideDismissed: true,
     showSetupGuideShortcut: false,
     pastConversationKnowledgeEnabled: false,
@@ -265,8 +264,7 @@ export function applyOfflineProfileToSettings(
     ],
     sttMode: "local",
     localSttModelId: profile.stt.id,
-    sttLanguage:
-      profile.languages.length === 1 ? profile.languages[0] : "auto",
+    sttLanguage: profile.languages.length === 1 ? profile.languages[0] : "auto",
     localLanguages: profile.languages,
     ttsMode: profile.tts ? (ttsIsKokoro ? "kokoro" : "local") : "native",
     localTtsModelId:

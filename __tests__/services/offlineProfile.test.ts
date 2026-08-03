@@ -185,6 +185,7 @@ describe("free offline profile selection", () => {
       ...DEFAULT_SETTINGS,
       apiKeys: { ...DEFAULT_SETTINGS.apiKeys, openai: "kept-secret" },
       pastConversationKnowledgeEnabled: true,
+      showDebugLogButton: true,
       ulraModeActive: true,
       webSearchMode: "on" as const,
       webSearchProvider: "openai" as const,
@@ -201,6 +202,7 @@ describe("free offline profile selection", () => {
     expect(effective.webSearchMode).toBe("off");
     expect(effective.ulraModeActive).toBe(false);
     expect(effective.pastConversationKnowledgeEnabled).toBe(false);
+    expect(effective.showDebugLogButton).toBe(true);
     expect(effective.apiKeys.openai).toBe("");
     expect(settings.apiKeys.openai).toBe("kept-secret");
   });

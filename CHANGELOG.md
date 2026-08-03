@@ -48,6 +48,9 @@ the complete Play Store translations are kept in a dedicated file under
 
 ### Fixed
 
+- Make debug capture available in Free and record sanitized Premium store
+  diagnostics for connection, product lookup, retry, purchase, restore, and
+  entitlement reconciliation failures.
 - Restore saved image attachments after iOS app updates by resolving their
   relative paths against the current app container, preventing one stale image
   URL from blocking readable or encrypted session backups.

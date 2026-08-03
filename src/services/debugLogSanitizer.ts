@@ -15,10 +15,14 @@ const SECRET_KEY_NAMES = new Set([
   "credentials",
   "password",
   "passphrase",
+  "purchasetoken",
+  "receipt",
   "refreshtoken",
   "accesstoken",
   "secret",
   "token",
+  "transactionid",
+  "transactiontoken",
 ]);
 
 const PRIVATE_TEXT_KEY_NAMES = new Set([
@@ -53,6 +57,7 @@ const SAFE_DIAGNOSTIC_TEXT_KEY_NAMES = new Set([
   "applanguage",
   "appstate",
   "appversion",
+  "applicationid",
   "audioroute",
   "brand",
   "buildversion",
@@ -66,6 +71,7 @@ const SAFE_DIAGNOSTIC_TEXT_KEY_NAMES = new Set([
   "effort",
   "event",
   "executionenvironment",
+  "expectedproductid",
   "failedeffort",
   "failurekind",
   "failurescope",
@@ -99,6 +105,9 @@ const SAFE_DIAGNOSTIC_TEXT_KEY_NAMES = new Set([
   "platformversion",
   "provider",
   "providermodel",
+  "productid",
+  "productids",
+  "purchasestate",
   "reason",
   "recorderroute",
   "reference",
@@ -154,7 +163,10 @@ function isSecretKey(key: string) {
     normalized.endsWith("accesstoken") ||
     normalized.endsWith("refreshtoken") ||
     normalized.endsWith("authtoken") ||
-    normalized.endsWith("clientsecret")
+    normalized.endsWith("clientsecret") ||
+    normalized.endsWith("purchasetoken") ||
+    normalized.endsWith("receipt") ||
+    normalized.endsWith("transactiontoken")
   );
 }
 
@@ -281,17 +293,21 @@ export function sanitizeDebugValue(
       .slice(0, MAX_DEBUG_ARRAY_LENGTH)
       .map((entry) => sanitizeDebugValue(entry, key, depth + 1, seen));
     if (value.length > MAX_DEBUG_ARRAY_LENGTH) {
-      sanitized.push(`[TRUNCATED ${value.length - MAX_DEBUG_ARRAY_LENGTH} items]`);
+      sanitized.push(
+        `[TRUNCATED ${value.length - MAX_DEBUG_ARRAY_LENGTH} items]`,
+      );
     }
     return sanitized;
   }
 
   const entries = Object.entries(value);
   const sanitized = Object.fromEntries(
-    entries.slice(0, MAX_DEBUG_OBJECT_KEYS).map(([entryKey, entryValue]) => [
-      entryKey,
-      sanitizeDebugValue(entryValue, entryKey, depth + 1, seen),
-    ]),
+    entries
+      .slice(0, MAX_DEBUG_OBJECT_KEYS)
+      .map(([entryKey, entryValue]) => [
+        entryKey,
+        sanitizeDebugValue(entryValue, entryKey, depth + 1, seen),
+      ]),
   );
   if (entries.length > MAX_DEBUG_OBJECT_KEYS) {
     sanitized._truncatedKeys = entries.length - MAX_DEBUG_OBJECT_KEYS;
@@ -330,18 +346,22 @@ export function sanitizeConsoleArguments(args: unknown[]) {
         .slice(0, MAX_DEBUG_ARRAY_LENGTH)
         .map((entry) => sanitizeConsoleValue(entry, depth + 1, seen));
       if (value.length > MAX_DEBUG_ARRAY_LENGTH) {
-        sanitized.push(`[TRUNCATED ${value.length - MAX_DEBUG_ARRAY_LENGTH} items]`);
+        sanitized.push(
+          `[TRUNCATED ${value.length - MAX_DEBUG_ARRAY_LENGTH} items]`,
+        );
       }
       return sanitized;
     }
     const entries = Object.entries(value);
     const sanitized = Object.fromEntries(
-      entries.slice(0, MAX_DEBUG_OBJECT_KEYS).map(([entryKey, entryValue]) => [
-        entryKey,
-        isSecretKey(entryKey)
-          ? REDACTED_SECRET
-          : sanitizeConsoleValue(entryValue, depth + 1, seen),
-      ]),
+      entries
+        .slice(0, MAX_DEBUG_OBJECT_KEYS)
+        .map(([entryKey, entryValue]) => [
+          entryKey,
+          isSecretKey(entryKey)
+            ? REDACTED_SECRET
+            : sanitizeConsoleValue(entryValue, depth + 1, seen),
+        ]),
     );
     if (entries.length > MAX_DEBUG_OBJECT_KEYS) {
       sanitized._truncatedKeys = entries.length - MAX_DEBUG_OBJECT_KEYS;

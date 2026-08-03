@@ -25,6 +25,7 @@ const mockReconnect = jest.fn();
 const mockRequestPurchase = jest.fn();
 const mockRestorePurchases = jest.fn();
 const mockGetApplicationId = jest.fn();
+const mockRecordDebugLogEvent = jest.fn();
 const mockSecureValues = new Map<string, string>();
 let mockOnPurchaseSuccess: (purchase: {
   productId: string;
@@ -68,6 +69,10 @@ jest.mock("expo-iap", () => ({
   },
 }));
 
+jest.mock("../../src/services/debugLogCapture", () => ({
+  recordDebugLogEvent: (...args: unknown[]) => mockRecordDebugLogEvent(...args),
+}));
+
 function Probe() {
   const entitlement = usePremiumEntitlement();
   return (
@@ -83,6 +88,10 @@ function Probe() {
       <Pressable
         testID="restore-premium"
         onPress={() => void entitlement.restorePremium()}
+      />
+      <Pressable
+        testID="refresh-premium"
+        onPress={() => void entitlement.refreshPremium()}
       />
       <Pressable
         testID="purchase-premium"
@@ -115,9 +124,7 @@ describe("PremiumEntitlementProvider", () => {
     mockSecureValues.clear();
     jest.clearAllMocks();
     await AsyncStorage.clear();
-    mockGetApplicationId.mockResolvedValue(
-      "com.tobiaswinkler.app.mrbroccoli",
-    );
+    mockGetApplicationId.mockResolvedValue("com.tobiaswinkler.app.mrbroccoli");
     NativeModules.MrBroccoliDiagnostics = {
       getApplicationId: mockGetApplicationId,
     };
@@ -263,6 +270,9 @@ describe("PremiumEntitlementProvider", () => {
         "premium",
       );
     });
+    expect(mockRecordDebugLogEvent).toHaveBeenCalledWith(
+      expect.objectContaining({ event: "premium-restore-requested" }),
+    );
   });
 
   it("grants and finalizes the permanent product after a purchase", async () => {
@@ -355,6 +365,62 @@ describe("PremiumEntitlementProvider", () => {
     fireEvent.press(screen.getByTestId("purchase-premium"));
 
     expect(mockRequestPurchase).not.toHaveBeenCalled();
+    expect(mockRecordDebugLogEvent).toHaveBeenCalledWith(
+      expect.objectContaining({
+        event: "premium-store-products-loaded",
+        payload: expect.objectContaining({
+          expectedProductFound: false,
+          expectedProductId: PREMIUM_PRODUCT_ID,
+          productCount: 0,
+          productIds: [],
+        }),
+      }),
+    );
+    expect(mockRecordDebugLogEvent).toHaveBeenCalledWith(
+      expect.objectContaining({
+        event: "premium-purchase-request-blocked",
+        payload: expect.objectContaining({ reason: "product-unavailable" }),
+      }),
+    );
+  });
+
+  it("logs a failed product lookup and an explicit retry", async () => {
+    const lookupError = Object.assign(new Error("StoreKit unavailable"), {
+      code: "iap-not-available",
+    });
+    mockFetchProducts.mockRejectedValueOnce(lookupError);
+    const screen = renderProvider();
+
+    await waitFor(() => {
+      expect(screen.getByTestId("entitlement-error").props.children).toBe(
+        "store-unavailable",
+      );
+    });
+    expect(mockRecordDebugLogEvent).toHaveBeenCalledWith(
+      expect.objectContaining({
+        event: "premium-store-products-load-failed",
+        level: "error",
+        payload: expect.objectContaining({ error: lookupError }),
+      }),
+    );
+
+    mockFetchProducts.mockResolvedValueOnce([
+      {
+        id: PREMIUM_PRODUCT_ID,
+        type: "in-app",
+        displayPrice: "€14.99",
+      },
+    ]);
+    fireEvent.press(screen.getByTestId("refresh-premium"));
+
+    await waitFor(() => {
+      expect(screen.getByTestId("store-product").props.children).toBe(
+        PREMIUM_PRODUCT_ID,
+      );
+    });
+    expect(mockRecordDebugLogEvent).toHaveBeenCalledWith(
+      expect.objectContaining({ event: "premium-store-refresh-requested" }),
+    );
   });
 
   it("does not grant Premium for an unconfirmed purchase state", async () => {

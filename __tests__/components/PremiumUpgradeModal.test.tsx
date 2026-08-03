@@ -4,13 +4,23 @@ import { PremiumUpgradeModal } from "../../src/components/PremiumUpgradeModal";
 import { usePremiumEntitlement } from "../../src/context/PremiumEntitlementContext";
 import { renderWithProviders } from "../test-utils/renderWithProviders";
 
+const mockRecordDebugLogEvent = jest.fn();
+
 jest.mock("../../src/context/PremiumEntitlementContext", () => ({
   usePremiumEntitlement: jest.fn(),
+}));
+
+jest.mock("../../src/services/debugLogCapture", () => ({
+  recordDebugLogEvent: (...args: unknown[]) => mockRecordDebugLogEvent(...args),
 }));
 
 const mockedUsePremiumEntitlement = jest.mocked(usePremiumEntitlement);
 
 describe("PremiumUpgradeModal", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
   it("makes the one-time value and concrete Premium capabilities visible", () => {
     mockedUsePremiumEntitlement.mockReturnValue({
       status: "free",
@@ -51,5 +61,15 @@ describe("PremiumUpgradeModal", () => {
       ),
     ).toBeTruthy();
     expect(screen.getByText("Buy Premium · €14.99")).toBeTruthy();
+    expect(mockRecordDebugLogEvent).toHaveBeenCalledWith({
+      event: "premium-upgrade-dialog-presented",
+      payload: {
+        busy: false,
+        connected: true,
+        productAvailable: true,
+        productLoading: false,
+        status: "free",
+      },
+    });
   });
 });

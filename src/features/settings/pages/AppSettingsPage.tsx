@@ -142,48 +142,45 @@ export function AppSettingsPage({
           onChange={(value) => onUpdate({ language: value as AppLanguage })}
         />
         {isPremium ? (
-          <>
-            <AntRadioSection<"show" | "hide">
-              label={t("usageStats")}
-              options={[
-                {
-                  value: "hide",
-                  label: t("hide"),
-                  description: t("usageStatsHiddenDescription"),
-                },
-                {
-                  value: "show",
-                  label: t("show"),
-                  description: t("usageStatsVisibleDescription"),
-                },
-              ]}
-              value={settings.showUsageStats ? "show" : "hide"}
-              onChange={(value) =>
-                onUpdate({ showUsageStats: value === "show" })
-              }
-            />
-            <AntRadioSection<"show" | "hide">
-              label={t("debugLogButton")}
-              options={[
-                {
-                  value: "hide",
-                  label: t("hide"),
-                  description: t("debugLogButtonHiddenDescription"),
-                },
-                {
-                  value: "show",
-                  label: t("show"),
-                  description: t("debugLogButtonVisibleDescription"),
-                },
-              ]}
-              value={settings.showDebugLogButton ? "show" : "hide"}
-              onChange={(value) =>
-                onUpdate({ showDebugLogButton: value === "show" })
-              }
-              helperText={t("debugLogButtonUsageDescription")}
-            />
-          </>
+          <AntRadioSection<"show" | "hide">
+            label={t("usageStats")}
+            options={[
+              {
+                value: "hide",
+                label: t("hide"),
+                description: t("usageStatsHiddenDescription"),
+              },
+              {
+                value: "show",
+                label: t("show"),
+                description: t("usageStatsVisibleDescription"),
+              },
+            ]}
+            value={settings.showUsageStats ? "show" : "hide"}
+            onChange={(value) => onUpdate({ showUsageStats: value === "show" })}
+          />
         ) : null}
+        <AntRadioSection<"show" | "hide">
+          label={t("debugLogButton")}
+          testID="settings-debug-log-button"
+          options={[
+            {
+              value: "hide",
+              label: t("hide"),
+              description: t("debugLogButtonHiddenDescription"),
+            },
+            {
+              value: "show",
+              label: t("show"),
+              description: t("debugLogButtonVisibleDescription"),
+            },
+          ]}
+          value={settings.showDebugLogButton ? "show" : "hide"}
+          onChange={(value) =>
+            onUpdate({ showDebugLogButton: value === "show" })
+          }
+          helperText={t("debugLogButtonUsageDescription")}
+        />
       </View>
 
       {isPremium ? (

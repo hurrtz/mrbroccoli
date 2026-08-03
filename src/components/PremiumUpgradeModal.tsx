@@ -5,6 +5,7 @@ import { usePremiumEntitlement } from "../context/PremiumEntitlementContext";
 import { Modal } from "../design-system/NativeControls";
 import { PhosphorIcon } from "../design-system/PhosphorIcon";
 import { useLocalization } from "../i18n";
+import { recordDebugLogEvent } from "../services/debugLogCapture";
 import { useTheme } from "../theme/ThemeContext";
 import { fonts } from "../theme/typography";
 
@@ -18,6 +19,29 @@ export function PremiumUpgradeModal({
   const { colors } = useTheme();
   const { t } = useLocalization();
   const premium = usePremiumEntitlement();
+  const wasVisibleRef = React.useRef(false);
+  React.useEffect(() => {
+    if (visible && !wasVisibleRef.current) {
+      recordDebugLogEvent({
+        event: "premium-upgrade-dialog-presented",
+        payload: {
+          busy: premium.busy,
+          connected: premium.storeConnected,
+          productAvailable: Boolean(premium.storeProduct),
+          productLoading: premium.storeProductLoading,
+          status: premium.status,
+        },
+      });
+    }
+    wasVisibleRef.current = visible;
+  }, [
+    premium.busy,
+    premium.status,
+    premium.storeConnected,
+    premium.storeProduct,
+    premium.storeProductLoading,
+    visible,
+  ]);
   const errorText =
     premium.error === "pending"
       ? t("premiumErrorPending")

@@ -1,11 +1,7 @@
 import Constants from "expo-constants";
 import * as Network from "expo-network";
-import {
-  AppState,
-  Dimensions,
-  I18nManager,
-  Platform,
-} from "react-native";
+import { AppState, Dimensions, I18nManager, Platform } from "react-native";
+import { getApplicationId } from "./developmentEntitlement";
 
 export async function buildDebugRuntimeContext(
   appContext: Record<string, unknown>,
@@ -15,16 +11,18 @@ export async function buildDebugRuntimeContext(
   const platformConstants = Platform.constants as Record<string, unknown>;
   const nativeBuildVersion =
     Platform.OS === "ios"
-      ? Constants.platform?.ios?.buildNumber ?? null
+      ? (Constants.platform?.ios?.buildNumber ?? null)
       : Platform.OS === "android"
-        ? Constants.platform?.android?.versionCode ?? null
+        ? (Constants.platform?.android?.versionCode ?? null)
         : null;
   const network = await Network.getNetworkStateAsync().catch(() => null);
+  const applicationId = await getApplicationId();
 
   return {
     ...appContext,
     runtime: {
       appState: AppState.currentState,
+      applicationId,
       appVersion: Constants.expoConfig?.version ?? null,
       buildVersion: nativeBuildVersion,
       debugBuild: __DEV__,
@@ -44,8 +42,7 @@ export async function buildDebugRuntimeContext(
         windowWidth: window.width,
       },
       executionEnvironment: Constants.executionEnvironment,
-      locale:
-        Intl.DateTimeFormat().resolvedOptions().locale ?? "undetermined",
+      locale: Intl.DateTimeFormat().resolvedOptions().locale ?? "undetermined",
       network: network
         ? {
             isConnected: network.isConnected,

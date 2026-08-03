@@ -277,7 +277,8 @@ describe("SettingsModal", () => {
   });
 
   it("keeps Free data and app settings focused on usable controls", async () => {
-    const screen = renderSettingsModal({ isPremium: false });
+    const onUpdate = jest.fn();
+    const screen = renderSettingsModal({ isPremium: false, onUpdate });
 
     fireEvent.press(screen.getByTestId("settings-overview-row-data"));
 
@@ -297,7 +298,9 @@ describe("SettingsModal", () => {
     expect(screen.getByText("Theme")).toBeTruthy();
     expect(screen.getByText("Recent Speech Activity")).toBeTruthy();
     expect(screen.queryByText("Usage Stats")).toBeNull();
-    expect(screen.queryByLabelText("About Debug Log Button")).toBeNull();
+    expect(screen.getByLabelText("About Debug Log Button")).toBeTruthy();
+    fireEvent.press(screen.getByTestId("settings-debug-log-button-show"));
+    expect(onUpdate).toHaveBeenCalledWith({ showDebugLogButton: true });
     expect(
       screen.queryByTestId("runtime-compatibility-overrides-section"),
     ).toBeNull();
@@ -323,7 +326,9 @@ describe("SettingsModal", () => {
     fireEvent.press(screen.getByTestId("settings-overview-row-data"));
 
     await waitFor(() => {
-      expect(screen.getByTestId("disconnect-conversation-archive")).toBeTruthy();
+      expect(
+        screen.getByTestId("disconnect-conversation-archive"),
+      ).toBeTruthy();
     });
     expect(screen.queryByText("Unlock Premium")).toBeNull();
 
@@ -1352,13 +1357,11 @@ describe("SettingsModal", () => {
       onSetDevelopmentEntitlementMode,
     });
 
-    fireEvent.press(
-      developmentScreen.getByLabelText("Open App & diagnostics"),
-    );
+    fireEvent.press(developmentScreen.getByLabelText("Open App & diagnostics"));
     await waitFor(() => {
       expect(
-        developmentScreen.getByTestId("development-entitlement-mode-free")
-          .props.accessibilityState,
+        developmentScreen.getByTestId("development-entitlement-mode-free").props
+          .accessibilityState,
       ).toEqual({ checked: true, disabled: false });
     });
     expect(developmentScreen.getByText("Development entitlement")).toBeTruthy();

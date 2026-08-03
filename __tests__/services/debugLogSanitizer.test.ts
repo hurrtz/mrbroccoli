@@ -55,6 +55,25 @@ describe("debugLogSanitizer", () => {
     ]);
   });
 
+  it("keeps StoreKit product diagnostics while redacting purchase secrets", () => {
+    const sanitized = sanitizeDebugPayload({
+      applicationId: "com.tobiaswinkler.app.mrbroccoli",
+      expectedProductId: "com.tobiaswinkler.app.mrbroccoli.premium.lifetime",
+      productIds: ["com.tobiaswinkler.app.mrbroccoli.premium.lifetime"],
+      purchaseState: "purchased",
+      receipt: "private-receipt",
+      transactionToken: "private-token",
+    });
+    const serialized = JSON.stringify(sanitized);
+
+    expect(serialized).toContain("com.tobiaswinkler.app.mrbroccoli");
+    expect(serialized).toContain("premium.lifetime");
+    expect(serialized).toContain("purchased");
+    expect(serialized).not.toContain("private-receipt");
+    expect(serialized).not.toContain("private-token");
+    expect(serialized).toContain("[REDACTED]");
+  });
+
   it("bounds hostile payloads and handles cycles", () => {
     const circular: Record<string, unknown> = {};
     circular.self = circular;
@@ -65,10 +84,10 @@ describe("debugLogSanitizer", () => {
         (_, index) => index,
       ),
       oversizedObject: Object.fromEntries(
-        Array.from(
-          { length: DEBUG_LOG_LIMITS.objectKeys + 2 },
-          (_, index) => [`key${index}`, index],
-        ),
+        Array.from({ length: DEBUG_LOG_LIMITS.objectKeys + 2 }, (_, index) => [
+          `key${index}`,
+          index,
+        ]),
       ),
       oversizedString: "x".repeat(DEBUG_LOG_LIMITS.stringLength + 20),
       model: "m".repeat(DEBUG_LOG_LIMITS.stringLength + 20),

@@ -12,10 +12,9 @@ type DiagnosticsNativeModule = {
   getApplicationId?: () => Promise<string | null>;
 };
 
-async function getApplicationId() {
+export async function getApplicationId() {
   const diagnostics = NativeModules.MrBroccoliDiagnostics as
-    | DiagnosticsNativeModule
-    | undefined;
+    DiagnosticsNativeModule | undefined;
   if (!diagnostics?.getApplicationId) {
     return null;
   }
@@ -32,9 +31,7 @@ export async function isDevelopmentAppVariant() {
   return applicationId?.endsWith(DEVELOPMENT_APPLICATION_ID_SUFFIX) === true;
 }
 
-export async function loadDevelopmentEntitlementMode(): Promise<
-  DevelopmentEntitlementMode | null
-> {
+export async function loadDevelopmentEntitlementMode(): Promise<DevelopmentEntitlementMode | null> {
   if (!(await isDevelopmentAppVariant())) {
     return null;
   }
