@@ -5,7 +5,9 @@ import { sortConversationMeta } from "./meta";
 
 export function useConversationSearch(params: {
   conversations: ConversationMeta[];
-  getConversationById: (id: string) => Promise<import("../../types").Conversation | null>;
+  getConversationById: (
+    id: string,
+  ) => Promise<import("../../types").Conversation | null>;
 }) {
   const { conversations, getConversationById } = params;
 
@@ -48,6 +50,7 @@ export function useConversationSearch(params: {
           const conversationHaystack = [
             conversation.contextSummary ?? "",
             ...conversation.messages.map((message) => message.content),
+            ...(conversation.artifacts ?? []).map((artifact) => artifact.text),
           ]
             .join(" ")
             .toLowerCase();

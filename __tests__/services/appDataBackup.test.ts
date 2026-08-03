@@ -59,9 +59,7 @@ jest.mock("expo-crypto", () => {
         cipher.final(),
       ]);
       return new MockSealedData(
-        Uint8Array.from(
-          Buffer.concat([iv, ciphertext, cipher.getAuthTag()]),
-        ),
+        Uint8Array.from(Buffer.concat([iv, ciphertext, cipher.getAuthTag()])),
       );
     },
     aesDecryptAsync: async (
@@ -126,6 +124,15 @@ const conversation: Conversation = {
       timestamp: "2026-07-31T08:00:00.000Z",
     },
   ],
+  artifacts: [
+    {
+      id: "artifact-1",
+      kind: "assumption",
+      text: "This is worth verifying.",
+      sourceMessageId: "message-1",
+      createdAt: "2026-07-31T08:01:00.000Z",
+    },
+  ],
 };
 
 async function createBackup() {
@@ -178,9 +185,7 @@ describe("appDataBackup", () => {
     const backup = await createBackup();
     const serialized = serializeAppDataBackup(backup);
 
-    expect(backup.data.conversations).toEqual([
-      { conversation, pinned: true },
-    ]);
+    expect(backup.data.conversations).toEqual([{ conversation, pinned: true }]);
     expect(backup.data.settings).not.toHaveProperty("apiKeys");
     expect(backup.data.settings).not.toHaveProperty(
       "providerValidationResults",
@@ -202,8 +207,7 @@ describe("appDataBackup", () => {
             {
               id: "image-1",
               kind: "image",
-              uri:
-                "file:///var/mobile/Containers/Data/Application/OLD-CONTAINER/Documents/message-images/image-1.jpg",
+              uri: "file:///var/mobile/Containers/Data/Application/OLD-CONTAINER/Documents/message-images/image-1.jpg",
               mimeType: "image/jpeg",
               width: 1200,
               height: 800,
@@ -378,6 +382,37 @@ describe("appDataBackup", () => {
       },
     };
     expect(() => parseAppDataBackup(JSON.stringify(duplicate))).toThrow(
+      AppDataBackupError,
+    );
+  });
+
+  it("rejects saved insights whose type or source provenance is invalid", async () => {
+    const backup = await createBackup();
+    const invalid = {
+      ...backup,
+      data: {
+        ...backup.data,
+        conversations: [
+          {
+            ...backup.data.conversations[0],
+            conversation: {
+              ...backup.data.conversations[0].conversation,
+              artifacts: [
+                {
+                  id: "bad-artifact",
+                  kind: "fact",
+                  text: "Unverified",
+                  sourceMessageId: "missing-message",
+                  createdAt: "2026-08-03T12:00:00.000Z",
+                },
+              ],
+            },
+          },
+        ],
+      },
+    };
+
+    expect(() => parseAppDataBackup(JSON.stringify(invalid))).toThrow(
       AppDataBackupError,
     );
   });

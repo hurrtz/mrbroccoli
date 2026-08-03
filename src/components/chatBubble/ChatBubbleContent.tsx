@@ -18,6 +18,7 @@ export function ChatBubbleContent({
   message,
   onCopy,
   onEdit,
+  onSaveInsight,
   onShare,
   onRepeat,
   onRetry,
@@ -48,11 +49,13 @@ export function ChatBubbleContent({
       <ConversationKnowledgeReferences message={message} />
       <WebSearchReferences message={message} />
       <UsageCard message={message} showUsageStats={showUsageStats} />
-      {selectable && (message.role === "assistant" || onEdit) ? (
+      {selectable &&
+      (message.role === "assistant" || onEdit || onSaveInsight) ? (
         <MessageActions
           message={message}
           onCopy={onCopy}
           onEdit={message.role === "user" ? onEdit : undefined}
+          onSaveInsight={onSaveInsight}
           onShare={onShare}
           onRepeat={onRepeat}
           repeatState={repeatState}

@@ -198,7 +198,9 @@ describe("conversation knowledge", () => {
             .filter((chunk) => !excludedIds.has(chunk.conversationId))
             .filter((chunk) =>
               terms.some((term) =>
-                chunk.content.toLocaleLowerCase().includes(term.toLocaleLowerCase()),
+                chunk.content
+                  .toLocaleLowerCase()
+                  .includes(term.toLocaleLowerCase()),
               ),
             )
             .map((chunk, rank) => ({ ...toStoredRow(chunk), rank }));
@@ -217,9 +219,7 @@ describe("conversation knowledge", () => {
               .map(({ targetId }) => targetId),
           );
           return chunks
-            .filter(
-              (chunk) => chunk.id === seedId || neighborIds.has(chunk.id),
-            )
+            .filter((chunk) => chunk.id === seedId || neighborIds.has(chunk.id))
             .sort((left, right) => left.ordinal - right.ordinal)
             .map(({ content, ordinal }) => ({ content, ordinal }));
         }
@@ -248,7 +248,9 @@ describe("conversation knowledge", () => {
     let activeTransactions = 0;
     let maximumActiveTransactions = 0;
     sqliteMock.__database.withTransactionAsync.mockImplementation(
-      async (operation: (database: typeof sqliteMock.__database) => unknown) => {
+      async (
+        operation: (database: typeof sqliteMock.__database) => unknown,
+      ) => {
         activeTransactions += 1;
         maximumActiveTransactions = Math.max(
           maximumActiveTransactions,
@@ -322,6 +324,31 @@ describe("conversation knowledge", () => {
       "User: Which earlier decisions should I revisit?",
     );
     expect(chunks[0]?.content).not.toContain("confidential launch assumption");
+  });
+
+  it("indexes assistant-derived content only after the user saves it as an insight", async () => {
+    const conversation = createConversation(
+      "approved",
+      "Approved decision",
+      "What should we do?",
+      "Use the green release path.",
+    );
+    conversation.artifacts = [
+      {
+        id: "approved-artifact",
+        kind: "decision",
+        text: "Use the green release path.",
+        sourceMessageId: "approved-assistant",
+        createdAt: "2026-08-01T08:11:00.000Z",
+      },
+    ];
+
+    await syncConversationKnowledge(conversation, true);
+
+    expect(chunks.map((chunk) => chunk.content)).toEqual([
+      "User: What should we do?",
+      "User-saved decision: Use the green release path.",
+    ]);
   });
 
   it("retrieves local sources while excluding the current and private conversations", async () => {
@@ -424,7 +451,8 @@ describe("conversation knowledge", () => {
     await syncConversationKnowledge(original, true);
     await syncConversationKnowledge(importedCopy, true);
     const result = await retrieveConversationKnowledge({
-      query: "Which language and model profile should offline onboarding choose?",
+      query:
+        "Which language and model profile should offline onboarding choose?",
     });
 
     expect(result?.metadata.sources).toHaveLength(1);

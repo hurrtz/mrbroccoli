@@ -109,4 +109,36 @@ describe("conversationExport", () => {
       ].join("\n\n"),
     );
   });
+
+  it("includes user-approved saved insights in a thread copy", () => {
+    const conversation: Conversation = {
+      id: "c-2",
+      title: "Product direction",
+      createdAt: "2026-08-03T12:00:00.000Z",
+      updatedAt: "2026-08-03T12:01:00.000Z",
+      messages: [
+        {
+          id: "m-1",
+          role: "assistant",
+          content: "Offer a faster local route.",
+          model: "gpt-5.4",
+          provider: "openai",
+          timestamp: "2026-08-03T12:00:00.000Z",
+        },
+      ],
+      artifacts: [
+        {
+          id: "a-1",
+          kind: "decision",
+          text: "Offer Quick and Thorough routes.",
+          sourceMessageId: "m-1",
+          createdAt: "2026-08-03T12:01:00.000Z",
+        },
+      ],
+    };
+
+    expect(formatConversationForCopy(conversation, "en")).toContain(
+      "Saved insights\nDecision: Offer Quick and Thorough routes.",
+    );
+  });
 });

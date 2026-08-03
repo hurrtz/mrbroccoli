@@ -5,7 +5,7 @@ import {
 } from "./embedding";
 
 const MAX_CHUNK_CHARACTERS = 1_600;
-const CHUNK_FORMAT_VERSION = "conversation-user-messages-v2";
+const CHUNK_FORMAT_VERSION = "conversation-user-messages-and-artifacts-v3";
 
 export interface ConversationKnowledgeChunk {
   content: string;
@@ -28,9 +28,8 @@ function splitLongText(text: string) {
       candidate.lastIndexOf("\n"),
       candidate.lastIndexOf(" "),
     );
-    const splitAt = boundary > MAX_CHUNK_CHARACTERS / 2
-      ? boundary
-      : MAX_CHUNK_CHARACTERS;
+    const splitAt =
+      boundary > MAX_CHUNK_CHARACTERS / 2 ? boundary : MAX_CHUNK_CHARACTERS;
     chunks.push(remainder.slice(0, splitAt).trim());
     remainder = remainder.slice(splitAt).trim();
   }
@@ -51,26 +50,24 @@ export function buildConversationKnowledgeChunks(
     }
 
     const content = message.content.trim();
+    return content ? splitLongText(`User: ${content}`) : [];
+  });
+  const savedArtifacts = (conversation.artifacts ?? []).flatMap((artifact) => {
+    const content = artifact.text.trim();
     return content
-      ? splitLongText(`User: ${content}`)
+      ? splitLongText(`User-saved ${artifact.kind}: ${content}`)
       : [];
   });
 
-  return userMessages.map(
-    (content, ordinal) => ({
-      content,
-      id: `${conversation.id}:${ordinal}`,
-      ordinal,
-      vector: createLocalKnowledgeEmbedding(
-        `${conversation.title}\n${content}`,
-      ),
-    }),
-  );
+  return [...userMessages, ...savedArtifacts].map((content, ordinal) => ({
+    content,
+    id: `${conversation.id}:${ordinal}`,
+    ordinal,
+    vector: createLocalKnowledgeEmbedding(`${conversation.title}\n${content}`),
+  }));
 }
 
-export function getConversationKnowledgeRevision(
-  conversation: Conversation,
-) {
+export function getConversationKnowledgeRevision(conversation: Conversation) {
   const source = [
     CHUNK_FORMAT_VERSION,
     LOCAL_KNOWLEDGE_EMBEDDING.id,
@@ -79,6 +76,9 @@ export function getConversationKnowledgeRevision(
     conversation.messages.length,
     conversation.messages.at(-1)?.id ?? "",
     conversation.messages.at(-1)?.content.length ?? 0,
+    conversation.artifacts?.length ?? 0,
+    conversation.artifacts?.at(-1)?.id ?? "",
+    conversation.artifacts?.at(-1)?.text.length ?? 0,
   ].join("|");
   let hash = 0x811c9dc5;
 

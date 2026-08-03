@@ -1,11 +1,6 @@
 import React from "react";
 
-import {
-  act,
-  fireEvent,
-  render,
-  waitFor,
-} from "@testing-library/react-native";
+import { act, fireEvent, render, waitFor } from "@testing-library/react-native";
 import { StyleSheet } from "react-native";
 
 import { TranscriptPreviewCard } from "../../../src/screens/main/TranscriptPreviewCard";
@@ -17,6 +12,7 @@ jest.mock("../../../src/components/ChatTranscript", () => ({
   ChatTranscript: ({
     messages,
     onEditMessage,
+    onSaveInsightMessage,
     messageSelectionEnabled,
     onRepeatMessage,
     onShareMessage,
@@ -32,6 +28,14 @@ jest.mock("../../../src/components/ChatTranscript", () => ({
       timestamp: string;
     }[];
     onEditMessage?: (message: {
+      id: string;
+      role: "user" | "assistant";
+      content: string;
+      model: string | null;
+      provider: string | null;
+      timestamp: string;
+    }) => void;
+    onSaveInsightMessage?: (message: {
       id: string;
       role: "user" | "assistant";
       content: string;
@@ -61,6 +65,13 @@ jest.mock("../../../src/components/ChatTranscript", () => ({
             Pressable,
             { onPress: () => onEditMessage(messages[0]) },
             React.createElement(Text, null, "Open correction"),
+          )
+        : null,
+      onSaveInsightMessage && messages[0]
+        ? React.createElement(
+            Pressable,
+            { onPress: () => onSaveInsightMessage(messages[0]) },
+            React.createElement(Text, null, "Open saved insight"),
           )
         : null,
     );
@@ -175,7 +186,9 @@ describe("TranscriptPreviewCard", () => {
     );
 
     expect(
-      StyleSheet.flatten(screen.getByTestId("transcript-header-copy").props.style),
+      StyleSheet.flatten(
+        screen.getByTestId("transcript-header-copy").props.style,
+      ),
     ).toEqual(
       expect.objectContaining({
         flexGrow: 1,
@@ -274,6 +287,63 @@ describe("TranscriptPreviewCard", () => {
       expect(onEditMessage).toHaveBeenCalledWith(
         expect.objectContaining({ id: "message-1" }),
         "All in on Ant Design",
+      ),
+    );
+  });
+
+  it("requires the user to classify and confirm a saved insight", async () => {
+    const onSaveInsight = jest.fn(async () => true);
+    const screen = render(
+      <TranscriptPreviewCard
+        activeConversationId="conversation-1"
+        colors={lightColors}
+        messages={[
+          {
+            id: "message-1",
+            role: "assistant",
+            content: "Ship a quick local route first.",
+            model: "gpt-5.4",
+            provider: "openai",
+            timestamp: "2026-08-03T10:00:00.000Z",
+          },
+        ]}
+        onCopyMessage={jest.fn()}
+        onSaveInsight={onSaveInsight}
+        onRetryMessage={jest.fn()}
+        showUsageStats={false}
+        showWhenEmpty
+        t={(key) =>
+          ({
+            artifactAction: "Next action",
+            artifactAssumption: "Assumption",
+            artifactCounterargument: "Counterargument",
+            artifactDecision: "Decision",
+            artifactHypothesis: "Hypothesis",
+            artifactIdea: "Idea",
+            artifactQuestion: "Open question",
+            artifactType: "Insight type",
+            cancel: "Cancel",
+            save: "Save",
+            saveInsightHint: "Confirm meaning and exact text.",
+            saveInsightTitle: "Save insight",
+          })[key] ?? key
+        }
+      />,
+    );
+
+    fireEvent.press(screen.getByText("Open saved insight"));
+    fireEvent.press(screen.getByText("Next action"));
+    fireEvent.changeText(
+      screen.getByTestId("insight-text-input"),
+      "Ship the Quick route first.",
+    );
+    fireEvent.press(screen.getByText("Save"));
+
+    await waitFor(() =>
+      expect(onSaveInsight).toHaveBeenCalledWith(
+        expect.objectContaining({ id: "message-1" }),
+        "action",
+        "Ship the Quick route first.",
       ),
     );
   });

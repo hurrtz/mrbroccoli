@@ -18,8 +18,7 @@ import { readImageAttachmentData } from "./imageAttachmentFiles";
 
 export const APP_DATA_BACKUP_FORMAT = "mrbroccoli-app-data";
 export const APP_DATA_BACKUP_VERSION = 2;
-export const ENCRYPTED_APP_DATA_BACKUP_FORMAT =
-  "mrbroccoli-app-data-encrypted";
+export const ENCRYPTED_APP_DATA_BACKUP_FORMAT = "mrbroccoli-app-data-encrypted";
 export const APP_DATA_BACKUP_MAX_BYTES = 50 * 1024 * 1024;
 export const ENCRYPTED_APP_DATA_BACKUP_MAX_BYTES =
   Math.ceil((APP_DATA_BACKUP_MAX_BYTES * 4) / 3) + 64 * 1024;
@@ -173,8 +172,7 @@ function isValidMessage(value: unknown) {
             attachment.kind === "image" &&
             typeof attachment.id === "string" &&
             typeof attachment.uri === "string" &&
-            attachment.uri ===
-              `mrbroccoli-backup://image/${attachment.id}` &&
+            attachment.uri === `mrbroccoli-backup://image/${attachment.id}` &&
             ["image/jpeg", "image/png", "image/webp"].includes(
               String(attachment.mimeType),
             ) &&
@@ -189,6 +187,32 @@ function isValidMessage(value: unknown) {
               (provider) => typeof provider === "string",
             ),
         )))
+  );
+}
+
+const CONVERSATION_ARTIFACT_KINDS = [
+  "decision",
+  "idea",
+  "assumption",
+  "counterargument",
+  "question",
+  "hypothesis",
+  "action",
+] as const;
+
+function isValidConversationArtifact(value: unknown) {
+  return (
+    isRecord(value) &&
+    typeof value.id === "string" &&
+    value.id.length > 0 &&
+    CONVERSATION_ARTIFACT_KINDS.includes(
+      value.kind as (typeof CONVERSATION_ARTIFACT_KINDS)[number],
+    ) &&
+    typeof value.text === "string" &&
+    value.text.trim().length > 0 &&
+    typeof value.sourceMessageId === "string" &&
+    value.sourceMessageId.length > 0 &&
+    typeof value.createdAt === "string"
   );
 }
 
@@ -224,6 +248,7 @@ function isValidConversation(value: unknown): value is Conversation {
   if (!isRecord(value) || !Array.isArray(value.messages)) {
     return false;
   }
+  const messages = value.messages;
 
   return (
     typeof value.id === "string" &&
@@ -231,7 +256,18 @@ function isValidConversation(value: unknown): value is Conversation {
     typeof value.title === "string" &&
     typeof value.createdAt === "string" &&
     typeof value.updatedAt === "string" &&
-    value.messages.every(isValidMessage) &&
+    messages.every(isValidMessage) &&
+    (value.artifacts === undefined ||
+      (Array.isArray(value.artifacts) &&
+        value.artifacts.every(isValidConversationArtifact) &&
+        value.artifacts.every((artifact) =>
+          messages.some(
+            (message) =>
+              isRecord(artifact) &&
+              isRecord(message) &&
+              artifact.sourceMessageId === message.id,
+          ),
+        ))) &&
     (value.isPrivate === undefined || typeof value.isPrivate === "boolean") &&
     isOptionalString(value.contextSummary) &&
     (value.summarizedMessageCount === undefined ||
@@ -330,8 +366,7 @@ function parsePlainBackupDocument(value: unknown): AppDataBackup {
   }
 
   const conversationIds = value.data.conversations.map(
-    (record) =>
-      (record as AppDataBackupConversation).conversation.id,
+    (record) => (record as AppDataBackupConversation).conversation.id,
   );
   if (new Set(conversationIds).size !== conversationIds.length) {
     throw new AppDataBackupError("invalid");
@@ -340,9 +375,7 @@ function parsePlainBackupDocument(value: unknown): AppDataBackup {
   return value as unknown as AppDataBackup;
 }
 
-function parseEncryptedBackupDocument(
-  value: unknown,
-): EncryptedAppDataBackup {
+function parseEncryptedBackupDocument(value: unknown): EncryptedAppDataBackup {
   if (!isRecord(value)) {
     throw new AppDataBackupError("invalid");
   }
@@ -397,9 +430,7 @@ export async function createAppDataBackup(params: {
   settings: Settings;
 }): Promise<AppDataBackup> {
   const conversations = await Promise.all(
-    params.conversationMetas.map((meta) =>
-      params.getConversationById(meta.id),
-    ),
+    params.conversationMetas.map((meta) => params.getConversationById(meta.id)),
   );
   const estimatedImageDataBytes = conversations.reduce(
     (total, conversation) =>
@@ -494,10 +525,7 @@ export function isEncryptedAppDataBackup(content: string) {
     content,
     ENCRYPTED_APP_DATA_BACKUP_MAX_BYTES,
   );
-  return (
-    isRecord(parsed) &&
-    parsed.format === ENCRYPTED_APP_DATA_BACKUP_FORMAT
-  );
+  return isRecord(parsed) && parsed.format === ENCRYPTED_APP_DATA_BACKUP_FORMAT;
 }
 
 export function isBackupPassphraseObviouslyWeak(passphrase: string) {

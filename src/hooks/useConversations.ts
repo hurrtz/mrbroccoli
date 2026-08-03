@@ -62,6 +62,7 @@ export function useConversations({
 
   const {
     addMessage,
+    addConversationArtifact,
     clearActiveConversation,
     clearConversationMemory,
     createConversation,
@@ -72,6 +73,7 @@ export function useConversations({
     inspectConversationIntegrity,
     renameConversation,
     repairConversationIntegrity,
+    removeConversationArtifact,
     selectConversation,
     toggleConversationPinned,
     toggleConversationPrivate,
@@ -142,6 +144,7 @@ export function useConversations({
     selectConversation,
     getConversationById,
     addMessage,
+    addConversationArtifact,
     updateMessage,
     updateConversationMemory,
     updateConversationContextSummary,
@@ -150,6 +153,7 @@ export function useConversations({
     inspectConversationIntegrity,
     renameConversation,
     repairConversationIntegrity,
+    removeConversationArtifact,
     toggleConversationPinned,
     toggleConversationPrivate,
     undoConversationIntegrityRepair,

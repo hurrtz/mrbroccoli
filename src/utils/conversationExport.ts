@@ -1,9 +1,12 @@
-import { AppLanguage, Conversation, Message } from "../types";
-import {
-  getProviderLabel,
-  getProviderModelName,
-} from "../constants/models";
+import type {
+  AppLanguage,
+  Conversation,
+  ConversationArtifactKind,
+  Message,
+} from "../types";
+import { getProviderLabel, getProviderModelName } from "../constants/models";
 import { translate } from "../i18n";
+import type { TranslationKey } from "../i18n";
 export { formatConversationForAiHandoff } from "../services/conversationArchiveFormat";
 
 function formatSpeakerLabel(message: Message, language: AppLanguage) {
@@ -46,16 +49,35 @@ export function formatMessageForCopy(message: Message, language: AppLanguage) {
 
 export function formatConversationForCopy(
   conversation: Conversation,
-  language: AppLanguage
+  language: AppLanguage,
 ) {
   const title =
     conversation.title.trim() || translate(language, "untitledConversation");
   const body = conversation.messages
     .map((message) => formatMessageForCopy(message, language))
     .join("\n\n");
+  const artifactTranslationKeys = {
+    decision: "artifactDecision",
+    idea: "artifactIdea",
+    assumption: "artifactAssumption",
+    counterargument: "artifactCounterargument",
+    question: "artifactQuestion",
+    hypothesis: "artifactHypothesis",
+    action: "artifactAction",
+  } satisfies Record<ConversationArtifactKind, TranslationKey>;
+  const artifacts = conversation.artifacts?.length
+    ? [
+        translate(language, "savedInsights"),
+        ...conversation.artifacts.map(
+          (artifact) =>
+            `${translate(language, artifactTranslationKeys[artifact.kind])}: ${artifact.text.trim()}`,
+        ),
+      ].join("\n")
+    : "";
 
   return [
     translate(language, "conversationExportHeader", { title }),
+    artifacts,
     body,
   ]
     .filter(Boolean)

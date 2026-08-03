@@ -8,6 +8,8 @@ import {
 import uuid from "react-native-uuid";
 import {
   Conversation,
+  ConversationArtifact,
+  ConversationArtifactKind,
   ConversationMeta,
   ConversationSettings,
   Message,
@@ -72,7 +74,9 @@ async function isIdenticalBackupConversation(
       }),
     })),
   };
-  if (JSON.stringify(portableExisting) !== JSON.stringify(record.conversation)) {
+  if (
+    JSON.stringify(portableExisting) !== JSON.stringify(record.conversation)
+  ) {
     return false;
   }
 
@@ -85,19 +89,17 @@ async function isIdenticalBackupConversation(
   try {
     const comparisons = await Promise.all(
       existing.messages.flatMap((message, messageIndex) =>
-        (message.attachments ?? []).map(
-          async (attachment, attachmentIndex) => {
-            const backupId =
-              record.conversation.messages[messageIndex]?.attachments?.[
-                attachmentIndex
-              ]?.id;
-            const expected = backupId ? dataById.get(backupId) : undefined;
-            return (
-              expected !== undefined &&
-              (await readImageAttachmentData(attachment)) === expected
-            );
-          },
-        ),
+        (message.attachments ?? []).map(async (attachment, attachmentIndex) => {
+          const backupId =
+            record.conversation.messages[messageIndex]?.attachments?.[
+              attachmentIndex
+            ]?.id;
+          const expected = backupId ? dataById.get(backupId) : undefined;
+          return (
+            expected !== undefined &&
+            (await readImageAttachmentData(attachment)) === expected
+          );
+        }),
       ),
     );
     return comparisons.every(Boolean);
@@ -110,10 +112,7 @@ async function materializeBackupConversation(
   record: AppDataBackupConversation,
 ) {
   const backupAttachments = new Map(
-    (record.attachments ?? []).map((attachment) => [
-      attachment.id,
-      attachment,
-    ]),
+    (record.attachments ?? []).map((attachment) => [attachment.id, attachment]),
   );
   const restoredAttachments = new Map<
     string,
@@ -397,10 +396,7 @@ export function useConversationMutations(params: {
         pastConversationKnowledgeEnabled &&
         !updatedConversation.isPrivate
       ) {
-        void syncConversationKnowledge(
-          updatedConversation,
-          true,
-        );
+        void syncConversationKnowledge(updatedConversation, true);
       }
       setConversations((previous) =>
         persistMetas(
@@ -412,7 +408,8 @@ export function useConversationMutations(params: {
                   updatedAt: updatedConversation.updatedAt,
                   messageCount: updatedConversation.messages.length,
                   providers:
-                    messageInput.provider && !meta.providers.includes(messageInput.provider)
+                    messageInput.provider &&
+                    !meta.providers.includes(messageInput.provider)
                       ? [...meta.providers, messageInput.provider]
                       : meta.providers,
                   providerModels:
@@ -424,7 +421,9 @@ export function useConversationMutations(params: {
                           ).includes(messageInput.model)
                             ? meta.providerModels[messageInput.provider]
                             : [
-                                ...(meta.providerModels[messageInput.provider] ?? []),
+                                ...(meta.providerModels[
+                                  messageInput.provider
+                                ] ?? []),
                                 messageInput.model,
                               ],
                         }
@@ -494,7 +493,12 @@ export function useConversationMutations(params: {
 
       return updatedMessage;
     },
-    [activeConversationRef, persistMetas, setActiveConversationValue, setConversations],
+    [
+      activeConversationRef,
+      persistMetas,
+      setActiveConversationValue,
+      setConversations,
+    ],
   );
 
   const editUserMessage = useCallback(
@@ -540,10 +544,7 @@ export function useConversationMutations(params: {
         ),
       );
 
-      if (
-        pastConversationKnowledgeEnabled &&
-        !updatedConversation.isPrivate
-      ) {
+      if (pastConversationKnowledgeEnabled && !updatedConversation.isPrivate) {
         await syncConversationKnowledge(updatedConversation, true);
       }
 
@@ -551,6 +552,111 @@ export function useConversationMutations(params: {
     },
     [
       activeConversationRef,
+      pastConversationKnowledgeEnabled,
+      persistMetas,
+      setActiveConversationValue,
+      setConversations,
+    ],
+  );
+
+  const addConversationArtifact = useCallback(
+    async (messageId: string, kind: ConversationArtifactKind, text: string) => {
+      const currentConversation = activeConversationRef.current;
+      const normalizedText = text.trim();
+      if (
+        !currentConversation ||
+        !normalizedText ||
+        !currentConversation.messages.some(
+          (message) => message.id === messageId,
+        )
+      ) {
+        return null;
+      }
+
+      const createdAt = new Date().toISOString();
+      const artifact: ConversationArtifact = {
+        id: uuid.v4() as string,
+        kind,
+        text: normalizedText,
+        sourceMessageId: messageId,
+        createdAt,
+      };
+      const updatedConversation: Conversation = {
+        ...currentConversation,
+        artifacts: [...(currentConversation.artifacts ?? []), artifact],
+        updatedAt: createdAt,
+      };
+
+      setActiveConversationValue(updatedConversation);
+      await saveConversation(updatedConversation);
+      setConversations((previous) =>
+        persistMetas(
+          previous.map((meta) =>
+            meta.id === updatedConversation.id
+              ? { ...meta, updatedAt: createdAt }
+              : meta,
+          ),
+        ),
+      );
+      if (pastConversationKnowledgeEnabled && !updatedConversation.isPrivate) {
+        await syncConversationKnowledge(updatedConversation, true);
+      }
+
+      return artifact;
+    },
+    [
+      activeConversationRef,
+      pastConversationKnowledgeEnabled,
+      persistMetas,
+      setActiveConversationValue,
+      setConversations,
+    ],
+  );
+
+  const removeConversationArtifact = useCallback(
+    async (conversationId: string, artifactId: string) => {
+      const currentConversation =
+        activeConversationRef.current?.id === conversationId
+          ? activeConversationRef.current
+          : await getConversationById(conversationId);
+      if (
+        !currentConversation ||
+        !(currentConversation.artifacts ?? []).some(
+          (artifact) => artifact.id === artifactId,
+        )
+      ) {
+        return null;
+      }
+
+      const updatedAt = new Date().toISOString();
+      const updatedConversation: Conversation = {
+        ...currentConversation,
+        artifacts: (currentConversation.artifacts ?? []).filter(
+          (artifact) => artifact.id !== artifactId,
+        ),
+        updatedAt,
+      };
+
+      await saveConversation(updatedConversation);
+      if (activeConversationRef.current?.id === conversationId) {
+        setActiveConversationValue(updatedConversation);
+      }
+      setConversations((previous) =>
+        persistMetas(
+          previous.map((meta) =>
+            meta.id === conversationId ? { ...meta, updatedAt } : meta,
+          ),
+        ),
+      );
+      if (pastConversationKnowledgeEnabled && !updatedConversation.isPrivate) {
+        await syncConversationKnowledge(updatedConversation, true);
+      }
+
+      return updatedConversation;
+    },
+    [
+      activeConversationRef,
+      getConversationById,
       pastConversationKnowledgeEnabled,
       persistMetas,
       setActiveConversationValue,
@@ -697,14 +803,21 @@ export function useConversationMutations(params: {
           ),
         ]);
       })();
-      setConversations((previous) => persistMetas(previous.filter((entry) => entry.id !== id)));
+      setConversations((previous) =>
+        persistMetas(previous.filter((entry) => entry.id !== id)),
+      );
 
       if (activeConversationRef.current?.id === id) {
         selectionRequestRef.current += 1;
         setActiveConversationValue(null);
       }
     },
-    [activeConversationRef, persistMetas, setActiveConversationValue, setConversations],
+    [
+      activeConversationRef,
+      persistMetas,
+      setActiveConversationValue,
+      setConversations,
+    ],
   );
 
   const restoreConversationBackup = useCallback(
@@ -780,7 +893,7 @@ export function useConversationMutations(params: {
       }
 
       const importedActiveConversation = importedActiveConversationId
-        ? restoredByOriginalId.get(importedActiveConversationId) ?? null
+        ? (restoredByOriginalId.get(importedActiveConversationId) ?? null)
         : null;
       if (importedActiveConversation) {
         selectionRequestRef.current += 1;
@@ -937,6 +1050,7 @@ export function useConversationMutations(params: {
 
   return {
     addMessage,
+    addConversationArtifact,
     clearActiveConversation,
     clearConversationMemory,
     createConversation,
@@ -947,6 +1061,7 @@ export function useConversationMutations(params: {
     inspectConversationIntegrity,
     renameConversation,
     repairConversationIntegrity,
+    removeConversationArtifact,
     selectConversation,
     toggleConversationPinned,
     toggleConversationPrivate,

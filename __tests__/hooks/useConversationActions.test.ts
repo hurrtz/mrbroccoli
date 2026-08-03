@@ -40,6 +40,7 @@ describe("useConversationActions", () => {
         toggleConversationPrivate: jest.fn(),
         clearConversationMemory: jest.fn(),
         updateConversationMemory: jest.fn(),
+        removeConversationArtifact: jest.fn(),
         deleteConversation: jest.fn(),
         selectConversation: jest.fn(),
         clearActiveConversation,
@@ -80,6 +81,7 @@ describe("useConversationActions", () => {
         toggleConversationPrivate: jest.fn(),
         clearConversationMemory: jest.fn(),
         updateConversationMemory: jest.fn(),
+        removeConversationArtifact: jest.fn(),
         deleteConversation: jest.fn(),
         selectConversation,
         clearActiveConversation: jest.fn(),
@@ -125,6 +127,7 @@ describe("useConversationActions", () => {
         toggleConversationPrivate: jest.fn(),
         clearConversationMemory: jest.fn(),
         updateConversationMemory: jest.fn(),
+        removeConversationArtifact: jest.fn(),
         deleteConversation,
         selectConversation: jest.fn(),
         clearActiveConversation: jest.fn(),
@@ -181,6 +184,7 @@ describe("useConversationActions", () => {
         toggleConversationPrivate: jest.fn(),
         clearConversationMemory: jest.fn(),
         updateConversationMemory: jest.fn(),
+        removeConversationArtifact: jest.fn(),
         deleteConversation: jest.fn(),
         selectConversation: jest.fn(),
         clearActiveConversation: jest.fn(),
@@ -194,7 +198,7 @@ describe("useConversationActions", () => {
             threadCopied: "thread copied",
             nothingToCopyYet: "nothing to copy",
             couldntCopyText: "copy failed",
-          }[key] ?? key),
+          })[key] ?? key,
       }),
     );
 
@@ -239,6 +243,7 @@ describe("useConversationActions", () => {
         toggleConversationPrivate: jest.fn(),
         clearConversationMemory: jest.fn(),
         updateConversationMemory: jest.fn(),
+        removeConversationArtifact: jest.fn(),
         deleteConversation: jest.fn(),
         selectConversation: jest.fn(),
         clearActiveConversation: jest.fn(),
@@ -294,6 +299,7 @@ describe("useConversationActions", () => {
         toggleConversationPrivate: jest.fn(),
         clearConversationMemory,
         updateConversationMemory: jest.fn(),
+        removeConversationArtifact: jest.fn(),
         deleteConversation: jest.fn(),
         selectConversation: jest.fn(),
         clearActiveConversation: jest.fn(),
@@ -305,7 +311,7 @@ describe("useConversationActions", () => {
         t: (key) =>
           ({
             memoryCleared: "memory cleared",
-          }[key] ?? key),
+          })[key] ?? key,
       }),
     );
 
@@ -338,9 +344,7 @@ describe("useConversationActions", () => {
       ...memoryConversation,
       contextSummary: "Corrected summary",
     };
-    const updateConversationMemory = jest.fn(
-      async () => updatedConversation,
-    );
+    const updateConversationMemory = jest.fn(async () => updatedConversation);
     const { result } = renderHook(() =>
       useConversationActions({
         activeConversation: null,
@@ -351,6 +355,7 @@ describe("useConversationActions", () => {
         toggleConversationPrivate: jest.fn(),
         clearConversationMemory: jest.fn(),
         updateConversationMemory,
+        removeConversationArtifact: jest.fn(),
         deleteConversation: jest.fn(),
         selectConversation: jest.fn(),
         clearActiveConversation: jest.fn(),
@@ -374,6 +379,66 @@ describe("useConversationActions", () => {
     expect(setMemoryConversation).toHaveBeenCalledWith(updatedConversation);
     expect(showToast).toHaveBeenCalledWith(
       "memory saved",
+      undefined,
+      "success",
+    );
+  });
+
+  it("removes an inspected saved insight and refreshes the modal conversation", async () => {
+    const setMemoryConversation = jest.fn();
+    const showToast = jest.fn();
+    const memoryConversation = {
+      id: "conversation-1",
+      title: "Trip planning",
+      createdAt: "2026-03-22T10:00:00.000Z",
+      updatedAt: "2026-03-22T10:00:00.000Z",
+      messages: [],
+      artifacts: [
+        {
+          id: "artifact-1",
+          kind: "decision" as const,
+          text: "Take the train.",
+          sourceMessageId: "message-1",
+          createdAt: "2026-03-22T10:01:00.000Z",
+        },
+      ],
+    };
+    const updatedConversation = { ...memoryConversation, artifacts: [] };
+    const removeConversationArtifact = jest.fn(async () => updatedConversation);
+    const { result } = renderHook(() =>
+      useConversationActions({
+        activeConversation: null,
+        memoryConversation,
+        getConversationById: jest.fn(),
+        renameConversation: jest.fn(),
+        toggleConversationPinned: jest.fn(),
+        toggleConversationPrivate: jest.fn(),
+        clearConversationMemory: jest.fn(),
+        updateConversationMemory: jest.fn(),
+        removeConversationArtifact,
+        deleteConversation: jest.fn(),
+        selectConversation: jest.fn(),
+        clearActiveConversation: jest.fn(),
+        resetVoiceSessionState: jest.fn(),
+        openMemoryConversation: jest.fn(),
+        setMemoryConversation,
+        showToast,
+        language: "en",
+        t: (key) => ({ insightRemoved: "insight removed" })[key] ?? key,
+      }),
+    );
+
+    await act(async () => {
+      await result.current.handleRemoveArtifact("artifact-1");
+    });
+
+    expect(removeConversationArtifact).toHaveBeenCalledWith(
+      "conversation-1",
+      "artifact-1",
+    );
+    expect(setMemoryConversation).toHaveBeenCalledWith(updatedConversation);
+    expect(showToast).toHaveBeenCalledWith(
+      "insight removed",
       undefined,
       "success",
     );

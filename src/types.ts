@@ -227,9 +227,7 @@ export interface MessageConversationKnowledgeSource {
 export interface MessageConversationKnowledgeMetadata {
   contentPolicy?: "user-authored-only";
   engine:
-    | "local-hybrid-v1"
-    | "local-user-authored-v2"
-    | "local-user-authored-v3";
+    "local-hybrid-v1" | "local-user-authored-v2" | "local-user-authored-v3";
   sources: MessageConversationKnowledgeSource[];
 }
 
@@ -530,12 +528,30 @@ export interface ConversationSettings {
   ttsVoice?: ConversationTtsVoiceSetting;
 }
 
+export type ConversationArtifactKind =
+  | "decision"
+  | "idea"
+  | "assumption"
+  | "counterargument"
+  | "question"
+  | "hypothesis"
+  | "action";
+
+export interface ConversationArtifact {
+  id: string;
+  kind: ConversationArtifactKind;
+  text: string;
+  sourceMessageId: string;
+  createdAt: string;
+}
+
 export interface Conversation {
   id: string;
   title: string;
   createdAt: string;
   updatedAt: string;
   messages: Message[];
+  artifacts?: ConversationArtifact[];
   settings?: ConversationSettings;
   usageEvents?: ConversationUsageEvent[];
   contextSummary?: string;

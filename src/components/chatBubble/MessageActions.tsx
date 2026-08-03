@@ -119,6 +119,7 @@ export function MessageActions({
   message,
   onCopy,
   onEdit,
+  onSaveInsight,
   onShare,
   onRepeat,
   repeatState = "idle",
@@ -127,6 +128,7 @@ export function MessageActions({
   | "message"
   | "onCopy"
   | "onEdit"
+  | "onSaveInsight"
   | "onShare"
   | "onRepeat"
   | "repeatState"
@@ -146,7 +148,7 @@ export function MessageActions({
     }
   };
 
-  if (!onCopy && !onEdit && !onShare && !onRepeat) {
+  if (!onCopy && !onEdit && !onSaveInsight && !onShare && !onRepeat) {
     return null;
   }
 
@@ -178,6 +180,28 @@ export function MessageActions({
         >
           <PhosphorIcon
             name="edit"
+            size="control"
+            color={colors.textSecondary}
+          />
+        </TouchableOpacity>
+      ) : null}
+      {onSaveInsight ? (
+        <TouchableOpacity
+          testID={`message-save-insight-action-${message.id}`}
+          style={[
+            styles.iconAction,
+            {
+              backgroundColor: colors.surfaceAlt,
+              borderColor: colors.border,
+            },
+          ]}
+          onPress={() => onSaveInsight(message)}
+          activeOpacity={0.88}
+          accessibilityRole="button"
+          accessibilityLabel={t("saveAsInsight")}
+        >
+          <PhosphorIcon
+            name="file-text"
             size="control"
             color={colors.textSecondary}
           />

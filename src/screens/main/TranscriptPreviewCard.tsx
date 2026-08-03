@@ -1,12 +1,21 @@
 import React, { useEffect, useState } from "react";
-import { StyleProp, StyleSheet, Text, View, ViewStyle } from "react-native";
+import {
+  Pressable,
+  StyleProp,
+  StyleSheet,
+  Text,
+  View,
+  ViewStyle,
+} from "react-native";
 
 import { ChatTranscript } from "../../components/ChatTranscript";
 import { IconButton } from "../../design-system/IconButton";
+import { PhosphorIcon } from "../../design-system/PhosphorIcon";
 import { Input, Modal } from "../../design-system/NativeControls";
+import type { TranslationKey } from "../../i18n";
 import { Colors } from "../../theme/colors";
 import { fonts } from "../../theme/typography";
-import { Message } from "../../types";
+import type { ConversationArtifactKind, Message } from "../../types";
 
 import { TranslateFn } from "./shared";
 import { styles } from "./styles";
@@ -20,6 +29,11 @@ interface TranscriptPreviewCardProps {
   activeReplayMessageId?: string | null;
   onCopyMessage: (message: Message) => Promise<boolean>;
   onEditMessage?: (message: Message, content: string) => Promise<boolean>;
+  onSaveInsight?: (
+    message: Message,
+    kind: ConversationArtifactKind,
+    text: string,
+  ) => Promise<boolean>;
   onRepeatMessage?: (message: Message) => void;
   onRetryMessage: (message: Message) => void;
   onOpenStyleSheet?: () => void;
@@ -36,6 +50,19 @@ interface TranscriptPreviewCardProps {
   t: TranslateFn;
 }
 
+const ARTIFACT_CHOICES = [
+  { kind: "decision", label: "artifactDecision" },
+  { kind: "idea", label: "artifactIdea" },
+  { kind: "assumption", label: "artifactAssumption" },
+  { kind: "counterargument", label: "artifactCounterargument" },
+  { kind: "question", label: "artifactQuestion" },
+  { kind: "hypothesis", label: "artifactHypothesis" },
+  { kind: "action", label: "artifactAction" },
+] satisfies {
+  kind: ConversationArtifactKind;
+  label: TranslationKey;
+}[];
+
 export function TranscriptPreviewCard({
   activeConversationId,
   activeConversationTitle,
@@ -45,6 +72,7 @@ export function TranscriptPreviewCard({
   activeReplayMessageId = null,
   onCopyMessage,
   onEditMessage,
+  onSaveInsight,
   onRepeatMessage,
   onRetryMessage,
   onOpenStyleSheet,
@@ -65,11 +93,18 @@ export function TranscriptPreviewCard({
   const [editingMessage, setEditingMessage] = useState<Message | null>(null);
   const [editingText, setEditingText] = useState("");
   const [savingCorrection, setSavingCorrection] = useState(false);
+  const [insightMessage, setInsightMessage] = useState<Message | null>(null);
+  const [insightKind, setInsightKind] =
+    useState<ConversationArtifactKind>("decision");
+  const [insightText, setInsightText] = useState("");
+  const [savingInsight, setSavingInsight] = useState(false);
 
   useEffect(() => {
     setIsAtTranscriptTail(true);
     setEditingMessage(null);
     setEditingText("");
+    setInsightMessage(null);
+    setInsightText("");
   }, [activeConversationId]);
 
   if (!showWhenEmpty && messages.length === 0) {
@@ -175,6 +210,15 @@ export function TranscriptPreviewCard({
                 }
               : undefined
           }
+          onSaveInsightMessage={
+            onSaveInsight
+              ? (message) => {
+                  setInsightMessage(message);
+                  setInsightKind("decision");
+                  setInsightText(message.content);
+                }
+              : undefined
+          }
           onRepeatMessage={onRepeatMessage}
           onRetryMessage={onRetryMessage}
           onOpenSpeakingSettings={onOpenSpeakingSettings}
@@ -231,10 +275,7 @@ export function TranscriptPreviewCard({
       >
         <View style={correctionStyles.body}>
           <Text
-            style={[
-              correctionStyles.hint,
-              { color: colors.textSecondary },
-            ]}
+            style={[correctionStyles.hint, { color: colors.textSecondary }]}
           >
             {t("correctTranscriptHint")}
           </Text>
@@ -248,6 +289,102 @@ export function TranscriptPreviewCard({
           />
         </View>
       </Modal>
+
+      <Modal
+        visible={insightMessage !== null}
+        title={t("saveInsightTitle")}
+        maskClosable={!savingInsight}
+        onClose={() => {
+          if (!savingInsight) {
+            setInsightMessage(null);
+            setInsightText("");
+          }
+        }}
+        footer={[
+          {
+            text: t("cancel"),
+            disabled: savingInsight,
+            onPress: () => {
+              setInsightMessage(null);
+              setInsightText("");
+            },
+          },
+          {
+            text: t("save"),
+            loading: savingInsight,
+            disabled: savingInsight || !insightText.trim(),
+            onPress: () => {
+              if (!insightMessage || !onSaveInsight) {
+                return;
+              }
+              setSavingInsight(true);
+              void onSaveInsight(insightMessage, insightKind, insightText)
+                .then((saved) => {
+                  if (saved) {
+                    setInsightMessage(null);
+                    setInsightText("");
+                  }
+                })
+                .catch(() => undefined)
+                .finally(() => setSavingInsight(false));
+            },
+          },
+        ]}
+      >
+        <View style={correctionStyles.body}>
+          <Text
+            style={[correctionStyles.hint, { color: colors.textSecondary }]}
+          >
+            {t("saveInsightHint")}
+          </Text>
+          <Text style={[insightStyles.fieldLabel, { color: colors.text }]}>
+            {t("artifactType")}
+          </Text>
+          <View style={insightStyles.choiceList}>
+            {ARTIFACT_CHOICES.map((choice) => {
+              const selected = choice.kind === insightKind;
+              return (
+                <Pressable
+                  key={choice.kind}
+                  testID={`insight-kind-${choice.kind}`}
+                  accessibilityRole="radio"
+                  accessibilityState={{ selected }}
+                  disabled={savingInsight}
+                  onPress={() => setInsightKind(choice.kind)}
+                  style={({ pressed }) => [
+                    insightStyles.choice,
+                    {
+                      backgroundColor: selected
+                        ? colors.accentSoft
+                        : colors.surfaceElevated,
+                      borderColor: selected ? colors.accent : colors.border,
+                      opacity: pressed ? 0.76 : 1,
+                    },
+                  ]}
+                >
+                  <PhosphorIcon
+                    name={selected ? "radio-selected" : "radio-unselected"}
+                    size="control"
+                    color={selected ? colors.accent : colors.textSecondary}
+                  />
+                  <Text
+                    style={[insightStyles.choiceLabel, { color: colors.text }]}
+                  >
+                    {t(choice.label)}
+                  </Text>
+                </Pressable>
+              );
+            })}
+          </View>
+          <Input.TextArea
+            testID="insight-text-input"
+            rows={6}
+            value={insightText}
+            disabled={savingInsight}
+            onChangeText={setInsightText}
+          />
+        </View>
+      </Modal>
     </View>
   );
 }
@@ -255,4 +392,20 @@ export function TranscriptPreviewCard({
 const correctionStyles = StyleSheet.create({
   body: { gap: 12 },
   hint: { fontFamily: fonts.body, fontSize: 14, lineHeight: 20 },
+});
+
+const insightStyles = StyleSheet.create({
+  fieldLabel: { fontFamily: fonts.bodyMedium, fontSize: 14, lineHeight: 20 },
+  choiceList: { gap: 8 },
+  choice: {
+    alignItems: "center",
+    borderRadius: 12,
+    borderWidth: 1,
+    flexDirection: "row",
+    gap: 10,
+    minHeight: 44,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+  },
+  choiceLabel: { flex: 1, fontFamily: fonts.body, fontSize: 14 },
 });

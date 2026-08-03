@@ -2,6 +2,7 @@ import type { TranslationValue } from "../types";
 import { dataBackupTranslations } from "../dataBackupTranslations";
 import { conversationKnowledgeTranslations } from "../conversationKnowledgeTranslations";
 import { conversationIntegrityTranslations } from "../conversationIntegrityTranslations";
+import { conversationArtifactTranslations } from "../conversationArtifactTranslations";
 import { imagePromptTranslations } from "../imagePromptTranslations";
 import { memoryEditTranslations } from "../memoryEditTranslations";
 import { onDeviceTranslations } from "../onDeviceTranslations";
@@ -10,6 +11,7 @@ import { premiumTranslations } from "../premiumTranslations";
 import { transcriptEditTranslations } from "../transcriptEditTranslations";
 
 export const en = {
+  ...conversationArtifactTranslations.en,
   ...dataBackupTranslations.en,
   ...conversationKnowledgeTranslations.en,
   ...conversationIntegrityTranslations.en,

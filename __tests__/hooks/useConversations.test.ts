@@ -64,7 +64,10 @@ describe("useConversations", () => {
     };
     const stored = new Map<string, string>([
       ["@mrbroccoli/active_conversation", conversation.id],
-      ["@mrbroccoli/conversation/restored-active-thread", JSON.stringify(conversation)],
+      [
+        "@mrbroccoli/conversation/restored-active-thread",
+        JSON.stringify(conversation),
+      ],
       [
         "@mrbroccoli/conversations",
         JSON.stringify([
@@ -123,7 +126,10 @@ describe("useConversations", () => {
     };
     const stored = new Map<string, string>([
       ["@mrbroccoli/active_conversation", conversation.id],
-      ["@mrbroccoli/conversation/legacy-title-thread", JSON.stringify(conversation)],
+      [
+        "@mrbroccoli/conversation/legacy-title-thread",
+        JSON.stringify(conversation),
+      ],
       [
         "@mrbroccoli/conversations",
         JSON.stringify([
@@ -196,20 +202,18 @@ describe("useConversations", () => {
     ]);
     let releaseMetaRead: (value: string) => void = () => undefined;
     let metaReadCount = 0;
-    (AsyncStorage.getItem as jest.Mock).mockImplementation(
-      (key: string) => {
-        if (key === "@mrbroccoli/conversations") {
-          metaReadCount += 1;
-          if (metaReadCount === 1) {
-            return new Promise<string>((resolve) => {
-              releaseMetaRead = resolve;
-            });
-          }
+    (AsyncStorage.getItem as jest.Mock).mockImplementation((key: string) => {
+      if (key === "@mrbroccoli/conversations") {
+        metaReadCount += 1;
+        if (metaReadCount === 1) {
+          return new Promise<string>((resolve) => {
+            releaseMetaRead = resolve;
+          });
         }
+      }
 
-        return Promise.resolve(stored.get(key) ?? null);
-      },
-    );
+      return Promise.resolve(stored.get(key) ?? null);
+    });
     (AsyncStorage.setItem as jest.Mock).mockImplementation(
       async (key: string, value: string) => {
         stored.set(key, value);
@@ -234,10 +238,7 @@ describe("useConversations", () => {
     expect(result.current.loaded).toBe(true);
     expect(result.current.activeConversation?.id).toBe(createdConversationId);
     expect(result.current.conversations.map(({ id }) => id)).toEqual(
-      expect.arrayContaining([
-        "stored-before-launch",
-        createdConversationId,
-      ]),
+      expect.arrayContaining(["stored-before-launch", createdConversationId]),
     );
 
     await waitFor(() => {
@@ -245,10 +246,7 @@ describe("useConversations", () => {
         stored.get("@mrbroccoli/conversations") ?? "[]",
       );
       expect(persistedMetas.map(({ id }: { id: string }) => id)).toEqual(
-        expect.arrayContaining([
-          "stored-before-launch",
-          createdConversationId,
-        ]),
+        expect.arrayContaining(["stored-before-launch", createdConversationId]),
       );
     });
   });
@@ -383,9 +381,11 @@ describe("useConversations", () => {
       id: "test-uuid-2",
       title: "Imported conversation",
     });
-    expect(JSON.parse(stored.get(
-      `@mrbroccoli/conversation/${localConversation.id}`,
-    )!)).toMatchObject({
+    expect(
+      JSON.parse(
+        stored.get(`@mrbroccoli/conversation/${localConversation.id}`)!,
+      ),
+    ).toMatchObject({
       id: localConversation.id,
       title: "Local conversation",
     });
@@ -700,10 +700,7 @@ describe("useConversations", () => {
     });
 
     await act(async () => {
-      await result.current.editUserMessage(
-        messageId,
-        "All in on Ant Design",
-      );
+      await result.current.editUserMessage(messageId, "All in on Ant Design");
     });
 
     expect(result.current.activeConversation?.contextSummary).toBeUndefined();
@@ -745,6 +742,55 @@ describe("useConversations", () => {
       "@mrbroccoli/conversation/test-uuid-1",
       expect.stringContaining('"summarizedMessageCount":4'),
     );
+  });
+
+  it("saves and removes a source-linked insight under user control", async () => {
+    const { result } = renderHook(() => useConversations());
+    let sourceMessageId = "";
+
+    await act(async () => {
+      result.current.createConversation("Architecture review");
+      sourceMessageId =
+        result.current.addMessage({
+          role: "assistant",
+          content: "Keep inference local on the phone.",
+          model: "gpt-5.4",
+          provider: "openai",
+        })?.id ?? "";
+    });
+
+    let artifactId = "";
+    await act(async () => {
+      artifactId =
+        (
+          await result.current.addConversationArtifact(
+            sourceMessageId,
+            "decision",
+            "Inference stays on device",
+          )
+        )?.id ?? "";
+    });
+
+    expect(result.current.activeConversation?.artifacts).toEqual([
+      expect.objectContaining({
+        id: artifactId,
+        kind: "decision",
+        sourceMessageId,
+        text: "Inference stays on device",
+      }),
+    ]);
+    await expect(
+      result.current.searchConversations("stays on device"),
+    ).resolves.toHaveLength(1);
+
+    await act(async () => {
+      await result.current.removeConversationArtifact(
+        result.current.activeConversation?.id ?? "",
+        artifactId,
+      );
+    });
+
+    expect(result.current.activeConversation?.artifacts).toEqual([]);
   });
 
   it("lets the user correct saved compact memory without changing its scope", async () => {
@@ -1045,9 +1091,11 @@ describe("useConversations", () => {
         stored.set(key, value);
       },
     );
-    const { result } = renderHook(() => useConversations({
-      pastConversationKnowledgeEnabled: true,
-    }));
+    const { result } = renderHook(() =>
+      useConversations({
+        pastConversationKnowledgeEnabled: true,
+      }),
+    );
 
     await waitFor(() => expect(result.current.loaded).toBe(true));
     await act(async () => {
@@ -1190,8 +1238,7 @@ describe("useConversations", () => {
             {
               id: "image-1",
               kind: "image",
-              uri:
-                "file:///var/mobile/Containers/Data/Application/OLD-CONTAINER/Documents/message-images/image-1.jpg",
+              uri: "file:///var/mobile/Containers/Data/Application/OLD-CONTAINER/Documents/message-images/image-1.jpg",
               mimeType: "image/jpeg",
               width: 1200,
               height: 800,

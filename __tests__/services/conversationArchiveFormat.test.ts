@@ -64,6 +64,15 @@ function createConversation(): Conversation {
         timestamp: "2026-08-02T08:02:00.000Z",
       },
     ],
+    artifacts: [
+      {
+        id: "artifact-1",
+        kind: "decision",
+        text: "Spend three days in the old town.",
+        sourceMessageId: "message-2",
+        createdAt: "2026-08-02T08:03:00.000Z",
+      },
+    ],
   };
 }
 
@@ -110,6 +119,13 @@ describe("conversationArchiveFormat", () => {
     expect(session).toContain("## Assistant — OpenAI · GPT-5.4");
     expect(session).toContain("Start with three days in the old town.");
     expect(session).toContain("[1 image attached]");
+    expect(session).toContain("## Saved insights");
+    expect(session).toContain(
+      "**Decision** — Spend three days in the old town.",
+    );
+    expect(session).toContain(
+      "Assistant — OpenAI · GPT-5.4, 2026-08-02T08:01:00.000Z",
+    );
     expect(session).not.toContain("file:///private/travel-photo.jpg");
     expect(session).not.toContain("Private generated memory");
     expect(session).not.toContain("Hidden conversation instructions");
@@ -130,6 +146,7 @@ describe("conversationArchiveFormat", () => {
     expect(handoff).toContain("## User");
     expect(handoff).toContain("## Assistant — OpenAI · GPT-5.4");
     expect(handoff).toContain("[1 image attached]");
+    expect(handoff).toContain("## Saved insights");
     expect(handoff).not.toContain("file:///private/travel-photo.jpg");
     expect(handoff).not.toContain("Private generated memory");
   });

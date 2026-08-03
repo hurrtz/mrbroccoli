@@ -12,6 +12,10 @@ the complete Play Store translations are kept in a dedicated file under
 
 ### Added
 
+- Save any transcript message as a user-controlled, source-linked decision,
+  idea, assumption, counterargument, question, hypothesis, or next action.
+  Saved insights stay inspectable and removable in Memory and appear in
+  search, backups, thread copies, AI handoffs, and portable Markdown archives.
 - Correct a misheard user transcript in place. Corrections update saved
   history, search, archives, future conversation context, and optional local
   knowledge while leaving already-generated replies visibly unchanged.
