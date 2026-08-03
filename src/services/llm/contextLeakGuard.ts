@@ -6,6 +6,11 @@ export type InternalContextLeakReason =
   | "serialized-internal-context"
   | "verbatim-internal-context";
 
+export interface SerializedInternalContextLeakLocation {
+  markerIds: string[];
+  start: number;
+}
+
 interface ContextLeakInspectionParams {
   hasHistoricalContext: boolean;
   protectedTexts: string[];
@@ -56,6 +61,27 @@ function getMarkerIds(text: string, hasHistoricalContext: boolean) {
   return getEnabledMarkers(hasHistoricalContext)
     .filter(({ pattern }) => pattern.test(text))
     .map(({ id }) => id);
+}
+
+export function locateSerializedInternalContextLeak(
+  text: string,
+  hasHistoricalContext = true,
+): SerializedInternalContextLeakLocation | null {
+  const matches = getEnabledMarkers(hasHistoricalContext).flatMap(
+    ({ id, pattern }) => {
+      const match = pattern.exec(text);
+      return match ? [{ id, start: match.index }] : [];
+    },
+  );
+
+  if (matches.length < 2) {
+    return null;
+  }
+
+  return {
+    markerIds: matches.map(({ id }) => id),
+    start: Math.min(...matches.map(({ start }) => start)),
+  };
 }
 
 function hasVerbatimProtectedText(

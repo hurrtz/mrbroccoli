@@ -1,9 +1,20 @@
 import {
   createInternalContextLeakStreamGuard,
   inspectInternalContextLeak,
+  locateSerializedInternalContextLeak,
 } from "../../src/services/llm/contextLeakGuard";
 
 describe("internal context leak guard", () => {
+  it("locates the first marker of a serialized internal-context suffix", () => {
+    const safePrefix = "Keep this answer.";
+    const text = `${safePrefix}\n\nSOURCE 3 — Earlier thread\nUser: hidden context`;
+
+    expect(locateSerializedInternalContextLeak(text)).toEqual({
+      markerIds: ["source-header", "serialized-speaker"],
+      start: text.indexOf("\nSOURCE"),
+    });
+  });
+
   it("allows an isolated marker mention without treating it as a context dump", () => {
     const chunks: string[] = [];
     const guard = createInternalContextLeakStreamGuard({
