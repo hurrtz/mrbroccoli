@@ -85,6 +85,7 @@ test("builds the Release runtime with local-only .dev overrides", () => {
     "-destination",
     "id=phone-1",
   ]);
+  assert.ok(args.includes("MR_BROCCOLI_LOCAL_APP_ICON=AppIconDev"));
   assert.ok(args.includes("MR_BROCCOLI_LOCAL_BUNDLE_SUFFIX=.dev"));
   assert.ok(args.includes("MR_BROCCOLI_LOCAL_DISPLAY_SUFFIX= Dev"));
   assert.equal(args.includes("Debug"), false);

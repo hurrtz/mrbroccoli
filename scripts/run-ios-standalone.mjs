@@ -132,6 +132,7 @@ export function createXcodeBuildArgs(deviceUdid, derivedDataPath) {
     `id=${deviceUdid}`,
     "-derivedDataPath",
     derivedDataPath,
+    "MR_BROCCOLI_LOCAL_APP_ICON=AppIconDev",
     "MR_BROCCOLI_LOCAL_BUNDLE_SUFFIX=.dev",
     "MR_BROCCOLI_LOCAL_DISPLAY_SUFFIX= Dev",
     "-allowProvisioningUpdates",

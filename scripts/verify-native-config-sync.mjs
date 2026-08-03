@@ -76,6 +76,11 @@ const androidAdaptiveIcon = readText(
 const iosAppIconContents = JSON.parse(
   readText("ios/MrBroccoli/Images.xcassets/AppIcon.appiconset/Contents.json"),
 );
+const iosDevelopmentAppIconContents = JSON.parse(
+  readText(
+    "ios/MrBroccoli/Images.xcassets/AppIconDev.appiconset/Contents.json",
+  ),
+);
 
 const failures = [];
 let checkCount = 0;
@@ -321,9 +326,24 @@ assertIncludes(
   `APP_DISPLAY_NAME = "${appConfig.name} Dev";`,
 );
 assertIncludes(
+  "iOS Debug app icon",
+  iosProject,
+  "ASSETCATALOG_COMPILER_APPICON_NAME = AppIconDev;",
+);
+assertIncludes(
   "iOS Release display name",
   iosProject,
   `APP_DISPLAY_NAME = "${appConfig.name}$(MR_BROCCOLI_LOCAL_DISPLAY_SUFFIX)";`,
+);
+assertIncludes(
+  "iOS Release app icon",
+  iosProject,
+  'ASSETCATALOG_COMPILER_APPICON_NAME = "$(MR_BROCCOLI_LOCAL_APP_ICON)";',
+);
+assertIncludes(
+  "iOS Release local app icon defaults production",
+  iosProject,
+  "MR_BROCCOLI_LOCAL_APP_ICON = AppIcon;",
 );
 assertIncludes(
   "iOS Release local bundle suffix defaults empty",
@@ -638,6 +658,20 @@ assertEqual(
   await pngFingerprint(iconPath),
   await pngFingerprint(
     "ios/MrBroccoli/Images.xcassets/AppIcon.appiconset/App-Icon-1024x1024@1x.png",
+  ),
+);
+assertEqual(
+  "iOS development app icon asset",
+  iosDevelopmentAppIconContents.images?.some(
+    (image) => image.filename === "App-Icon-Dev-1024x1024@1x.png",
+  ),
+  true,
+);
+assertEqual(
+  "iOS development app icon content",
+  await pngFingerprint("assets/appIcon/android-monochrome.png"),
+  await pngFingerprint(
+    "ios/MrBroccoli/Images.xcassets/AppIconDev.appiconset/App-Icon-Dev-1024x1024@1x.png",
   ),
 );
 

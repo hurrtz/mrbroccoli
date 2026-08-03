@@ -116,8 +116,10 @@ npm run ios:standalone
 
 This builds the Release runtime with embedded JavaScript, installs it as
 `Mr Broccoli Dev` under the `.dev` bundle identifier, and launches it without
-Metro. Use `npm run ios:standalone -- --device <name-or-udid>` when more than
-one physical iPhone is connected.
+Metro. The dev app uses the checked-in monochrome launcher artwork so it is
+visually distinct from the production app. Use
+`npm run ios:standalone -- --device <name-or-udid>` when more than one physical
+iPhone is connected.
 
 ```bash
 npm run android
