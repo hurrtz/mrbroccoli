@@ -1,17 +1,18 @@
 import {
   getLocalModelsForLanguages,
   type LocalLlmModelDefinition,
-  type LocalLlmModelId,
   type LocalModelDefinition,
   type LocalModelId,
   type LocalSttModelDefinition,
-  type LocalSttModelId,
-  type LocalTtsCatalogModelId,
   type LocalTtsModelDefinition,
 } from "../constants/localModels";
 import type { SpeechLanguage } from "../constants/speechLanguages";
 import { createRuntimeProviderStringRecord } from "../constants/providers/runtimeState";
-import { getDefaultAssistantInstructions, type Settings } from "../types";
+import {
+  getDefaultAssistantInstructions,
+  type FreeOfflineProfileOverrides,
+  type Settings,
+} from "../types";
 import {
   evaluateLocalModelEligibility,
   type LocalDeviceSnapshot,
@@ -25,7 +26,8 @@ export interface OfflineProfile {
   languages: SpeechLanguage[];
   llm: LocalLlmModelDefinition;
   thoroughLlm: LocalLlmModelDefinition | null;
-  stt: LocalSttModelDefinition;
+  /** Null means the phone's on-device speech recognizer is used. */
+  stt: LocalSttModelDefinition | null;
   /** Null means the phone's language-aware system voice is used. */
   tts: LocalTtsModelDefinition | null;
   downloadBytes: number;
@@ -34,18 +36,13 @@ export interface OfflineProfile {
   retryLater: boolean;
 }
 
-export interface OfflineProfileOverrides {
-  quickLlmModelId?: LocalLlmModelId;
-  thoroughLlmModelId?: LocalLlmModelId | null;
-  sttModelId?: LocalSttModelId;
-  ttsModelId?: LocalTtsCatalogModelId | null;
-}
+export type OfflineProfileOverrides = FreeOfflineProfileOverrides;
 
 export function getOfflineProfileModels(profile: OfflineProfile) {
   return [
     profile.llm,
     ...(profile.thoroughLlm ? [profile.thoroughLlm] : []),
-    profile.stt,
+    ...(profile.stt ? [profile.stt] : []),
     ...(profile.tts ? [profile.tts] : []),
   ] satisfies LocalModelDefinition[];
 }
@@ -151,6 +148,7 @@ export function selectOfflineProfile(params: {
   installedModelIds?: ReadonlySet<LocalModelId>;
   benchmarks?: Partial<Record<LocalModelId, LocalModelBenchmarkResult>>;
   overrides?: OfflineProfileOverrides;
+  nativeSttEligible?: boolean;
 }): OfflineProfileSelection {
   const languages = Array.from(new Set(params.languages));
   if (languages.length === 0) {
@@ -165,7 +163,9 @@ export function selectOfflineProfile(params: {
       left.installedBytes - right.installedBytes,
   );
 
-  if (!llms.length || !sttModels.length) {
+  const nativeSttSelected =
+    params.overrides?.sttModelId === null && params.nativeSttEligible === true;
+  if (!llms.length || (!sttModels.length && !nativeSttSelected)) {
     return { status: "unavailable", reason: "language" };
   }
 
@@ -191,7 +191,7 @@ export function selectOfflineProfile(params: {
     (model) => isPermanentlyEligible(model, params.snapshot).eligible,
   );
 
-  if (!viableQuickLlms.length || !viableStt.length) {
+  if (!viableQuickLlms.length || (!viableStt.length && !nativeSttSelected)) {
     return { status: "unavailable", reason: "device" };
   }
 
@@ -226,9 +226,10 @@ export function selectOfflineProfile(params: {
     ...candidateOptions,
     models: viableStt,
   });
-  const stt =
-    sortedStt.find((model) => model.id === params.overrides?.sttModelId) ??
-    sortedStt[0];
+  const stt = nativeSttSelected
+    ? null
+    : (sortedStt.find((model) => model.id === params.overrides?.sttModelId) ??
+      sortedStt[0]);
   const sortedTts = viableTts.length
     ? sortCandidates({
         ...candidateOptions,
@@ -242,7 +243,11 @@ export function selectOfflineProfile(params: {
       : (sortedTts.find((model) => model.id === params.overrides?.ttsModelId) ??
         sortedTts[0] ??
         null);
-  const baseModels: LocalModelDefinition[] = [llm, stt, ...(tts ? [tts] : [])];
+  const baseModels: LocalModelDefinition[] = [
+    llm,
+    ...(stt ? [stt] : []),
+    ...(tts ? [tts] : []),
+  ];
   const footprint = (models: LocalModelDefinition[]) => {
     const missingModels = models.filter(
       (model) => !params.installedModelIds?.has(model.id),
@@ -258,8 +263,8 @@ export function selectOfflineProfile(params: {
         installedBytes + Math.max(...models.map(modelSafetyReserve)),
     };
   };
-  const thoroughModels = thoroughCandidate
-    ? [llm, thoroughCandidate, stt, ...(tts ? [tts] : [])]
+  const thoroughModels: LocalModelDefinition[] = thoroughCandidate
+    ? [llm, thoroughCandidate, ...(stt ? [stt] : []), ...(tts ? [tts] : [])]
     : baseModels;
   const thoroughFootprint = footprint(thoroughModels);
   const includesThorough =
@@ -364,8 +369,9 @@ export function applyOfflineProfileToSettings(
     ...applyFreeRuntimeBoundaries(settings),
     activeResponseMode,
     responseModes,
-    sttMode: "local",
-    localSttModelId: profile.stt.id,
+    sttMode: profile.stt ? "local" : "native",
+    nativeSttRequiresOnDevice: profile.stt === null,
+    localSttModelId: profile.stt?.id ?? null,
     sttLanguage: profile.languages.length === 1 ? profile.languages[0] : "auto",
     localLanguages: profile.languages,
     ttsMode: profile.tts ? (ttsIsKokoro ? "kokoro" : "local") : "native",
@@ -405,6 +411,7 @@ export function applyUnavailableFreeSettings(settings: Settings): Settings {
       },
     ],
     sttMode: "local",
+    nativeSttRequiresOnDevice: false,
     localSttModelId: null,
     ttsMode: "native",
     localTtsModelId: null,

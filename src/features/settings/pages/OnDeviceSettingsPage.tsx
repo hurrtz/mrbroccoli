@@ -31,6 +31,13 @@ import {
 } from "../../../services/localSpeechModels";
 import { benchmarkKokoroModel } from "../../../services/kokoroTts";
 import { getLocalCatalogInstallStatuses } from "../../../services/offlineProfileManager";
+import { selectOfflineProfile } from "../../../services/offlineProfile";
+import {
+  probeNativeSpeechCapabilities,
+  type NativeSpeechCapabilities,
+} from "../../../services/nativeSpeechCapabilities";
+import { useNativeVoiceOptions } from "../../settings-core/useNativeVoiceOptions";
+import { getKokoroVoiceOptions } from "../../../constants/kokoro";
 import { useTheme } from "../../../theme/ThemeContext";
 import { fonts } from "../../../theme/typography";
 import type {
@@ -46,7 +53,11 @@ import {
   getNextResponseModeId,
 } from "../../../utils/responseModes";
 import { AntListenLanguageSelector } from "../AntListenLanguageSelector";
-import { AntSectionIntro, AntSettingsCard } from "../AntSettingsPrimitives";
+import {
+  AntPickerRow,
+  AntSectionIntro,
+  AntSettingsCard,
+} from "../AntSettingsPrimitives";
 import { styles } from "../styles";
 import { formatBytes } from "../../../utils/formatBytes";
 
@@ -102,6 +113,8 @@ export function OnDeviceSettingsPage({
     null,
   );
   const [probeError, setProbeError] = React.useState<string | null>(null);
+  const [nativeSpeechCapabilities, setNativeSpeechCapabilities] =
+    React.useState<NativeSpeechCapabilities | null>(null);
   const [probing, setProbing] = React.useState(true);
   const [busy, setBusy] = React.useState<BusyAction | null>(null);
   const [progress, setProgress] = React.useState<
@@ -113,6 +126,13 @@ export function OnDeviceSettingsPage({
   const [benchmarks, setBenchmarks] = React.useState<
     Partial<Record<LocalModelId, LocalModelBenchmarkResult>>
   >({});
+  const { nativeVoiceOptions, selectedNativeVoice, setSelectedNativeVoice } =
+    useNativeVoiceOptions({
+      visible: true,
+      shouldLoad: true,
+      listenLanguages: settings.localLanguages,
+      preferredVoiceId: settings.nativeTtsVoiceId,
+    });
 
   const refreshModelState = React.useCallback(async () => {
     const [nextInstalls, nextBenchmarks] = await Promise.all([
@@ -127,14 +147,20 @@ export function OnDeviceSettingsPage({
     setProbing(true);
     setProbeError(null);
     try {
-      setSnapshot(await probeLocalDeviceCapabilities());
+      const [nextSnapshot, nextNativeSpeechCapabilities] = await Promise.all([
+        probeLocalDeviceCapabilities(),
+        probeNativeSpeechCapabilities(settings.localLanguages[0] ?? "en"),
+      ]);
+      setSnapshot(nextSnapshot);
+      setNativeSpeechCapabilities(nextNativeSpeechCapabilities);
     } catch (error) {
       setProbeError(error instanceof Error ? error.message : String(error));
       setSnapshot(null);
+      setNativeSpeechCapabilities(null);
     } finally {
       setProbing(false);
     }
-  }, []);
+  }, [settings.localLanguages]);
 
   React.useEffect(() => {
     void runDeviceProbe();
@@ -148,7 +174,16 @@ export function OnDeviceSettingsPage({
       !isPremium,
     );
     if (nextSettings) {
-      onUpdate(nextSettings);
+      onUpdate(
+        isPremium
+          ? nextSettings
+          : {
+              ...nextSettings,
+              freeOnboardingLanguageInitialized: true,
+              freeOfflineSetupCompleted: false,
+              freeOfflineProfileOverrides: {},
+            },
+      );
     }
   };
 
@@ -162,6 +197,32 @@ export function OnDeviceSettingsPage({
         evaluateLocalModelEligibility(model, snapshot).eligible,
     );
   }, [settings.localLanguages, snapshot]);
+  const selectedFreeProfile = React.useMemo(() => {
+    if (isPremium || !snapshot) {
+      return null;
+    }
+    const result = selectOfflineProfile({
+      languages: settings.localLanguages,
+      snapshot,
+      installedModelIds: new Set(
+        Object.entries(installs)
+          .filter(([, status]) => status?.verified)
+          .map(([modelId]) => modelId as LocalModelId),
+      ),
+      benchmarks,
+      overrides: settings.freeOfflineProfileOverrides,
+      nativeSttEligible: nativeSpeechCapabilities?.nativeSttEligible,
+    });
+    return result.status === "ready" ? result.profile : null;
+  }, [
+    benchmarks,
+    installs,
+    isPremium,
+    nativeSpeechCapabilities?.nativeSttEligible,
+    settings.freeOfflineProfileOverrides,
+    settings.localLanguages,
+    snapshot,
+  ]);
 
   const handleDownload = async (model: LocalModelDefinition) => {
     setBusy({ action: "download", modelId: model.id });
@@ -300,8 +361,41 @@ export function OnDeviceSettingsPage({
   };
 
   const handleUse = (model: LocalModelDefinition) => {
+    if (!isPremium) {
+      const current = settings.freeOfflineProfileOverrides;
+      if (model.capability === "llm") {
+        onUpdate({
+          freeOfflineProfileOverrides:
+            model.responseProfile === "thorough"
+              ? { ...current, thoroughLlmModelId: model.id }
+              : { ...current, quickLlmModelId: model.id },
+        });
+        return;
+      }
+      if (model.capability === "stt") {
+        onUpdate({
+          sttMode: "local",
+          nativeSttRequiresOnDevice: false,
+          localSttModelId: model.id,
+          freeOfflineProfileOverrides: { ...current, sttModelId: model.id },
+        });
+        return;
+      }
+      onUpdate({
+        ...(model.id === "kokoro-multilingual"
+          ? { localTtsModelId: null, ttsMode: "kokoro" as const }
+          : { localTtsModelId: model.id, ttsMode: "local" as const }),
+        freeOfflineProfileOverrides: { ...current, ttsModelId: model.id },
+      });
+      return;
+    }
+
     if (model.capability === "stt") {
-      onUpdate({ localSttModelId: model.id, sttMode: "local" });
+      onUpdate({
+        localSttModelId: model.id,
+        nativeSttRequiresOnDevice: false,
+        sttMode: "local",
+      });
       return;
     }
     if (model.capability === "tts") {
@@ -344,6 +438,18 @@ export function OnDeviceSettingsPage({
   };
 
   const isModelSelected = (model: LocalModelDefinition) => {
+    if (!isPremium && selectedFreeProfile) {
+      if (model.capability === "llm") {
+        return (
+          selectedFreeProfile.llm.id === model.id ||
+          selectedFreeProfile.thoroughLlm?.id === model.id
+        );
+      }
+      if (model.capability === "stt") {
+        return selectedFreeProfile.stt?.id === model.id;
+      }
+      return selectedFreeProfile.tts?.id === model.id;
+    }
     if (model.capability === "llm") {
       return settings.responseModes.some(
         ({ id, route }) =>
@@ -365,8 +471,7 @@ export function OnDeviceSettingsPage({
     const benchmark = benchmarks[model.id];
     const modelBusy = busy?.modelId === model.id;
     const downloadProgress = progress[model.id];
-    const canUse =
-      install?.verified && benchmark && benchmark.status !== "failed";
+    const canUse = install?.verified && benchmark?.status === "viable";
 
     return (
       <AntSettingsCard key={model.id} title={model.name}>
@@ -430,6 +535,101 @@ export function OnDeviceSettingsPage({
           >
             {benchmark.detail}
           </Text>
+        ) : null}
+        {model.id === "kokoro-multilingual" && isModelSelected(model) ? (
+          <AntPickerRow
+            testID="on-device-kokoro-voice"
+            label={t("ttsVoice")}
+            value={settings.kokoroVoices.en}
+            options={getKokoroVoiceOptions("en", settings.language)}
+            onChange={(voice) =>
+              onUpdate({
+                kokoroVoices: { ...settings.kokoroVoices, en: voice },
+              })
+            }
+          />
+        ) : null}
+      </AntSettingsCard>
+    );
+  };
+
+  const renderNativeRoute = (capability: "stt" | "tts") => {
+    const isStt = capability === "stt";
+    const selected = isStt
+      ? !isPremium
+        ? selectedFreeProfile?.stt === null
+        : settings.sttMode === "native"
+      : !isPremium
+        ? selectedFreeProfile?.tts === null
+        : settings.ttsMode === "native";
+    const disabled =
+      isStt && nativeSpeechCapabilities?.nativeSttEligible !== true;
+    const handleSelect = () => {
+      if (isStt) {
+        onUpdate({
+          sttMode: "native",
+          nativeSttRequiresOnDevice: !isPremium,
+          localSttModelId: null,
+          ...(!isPremium
+            ? {
+                freeOfflineProfileOverrides: {
+                  ...settings.freeOfflineProfileOverrides,
+                  sttModelId: null,
+                },
+              }
+            : {}),
+        });
+        return;
+      }
+      onUpdate({
+        ttsMode: "native",
+        localTtsModelId: null,
+        ...(!isPremium
+          ? {
+              freeOfflineProfileOverrides: {
+                ...settings.freeOfflineProfileOverrides,
+                ttsModelId: null,
+              },
+            }
+          : {}),
+      });
+    };
+
+    return (
+      <AntSettingsCard title={isStt ? t("appNative") : t("systemVoice")}>
+        <Text style={[localStyles.meta, { color: colors.textMuted }]}>
+          {isStt
+            ? t(disabled ? "onboardingNotRecommended" : "onboardingLikely")
+            : t("onboardingLikely")}
+        </Text>
+        <View style={localStyles.actions}>
+          <Button
+            size="small"
+            type={selected ? "ghost" : "primary"}
+            disabled={disabled || selected}
+            onPress={handleSelect}
+          >
+            <Text
+              style={{
+                color: selected ? colors.textMuted : colors.onActiveControl,
+              }}
+            >
+              {t(selected ? "onDeviceInUse" : "onDeviceUse")}
+            </Text>
+          </Button>
+        </View>
+        {!isStt && selected ? (
+          <AntPickerRow
+            testID="on-device-native-voice"
+            label={t("ttsVoice")}
+            value={selectedNativeVoice}
+            options={nativeVoiceOptions}
+            disabled={nativeVoiceOptions.length === 0}
+            onChange={(voice) => {
+              setSelectedNativeVoice(voice);
+              onUpdate({ nativeTtsVoiceId: voice });
+            }}
+          />
         ) : null}
       </AntSettingsCard>
     );
@@ -511,6 +711,9 @@ export function OnDeviceSettingsPage({
         return (
           <View key={capability} style={styles.sectionGroup}>
             <AntSectionIntro title={t(capabilityTitleKey(capability))} />
+            {capability === "stt" || capability === "tts"
+              ? renderNativeRoute(capability)
+              : null}
             {models.map(renderModel)}
           </View>
         );

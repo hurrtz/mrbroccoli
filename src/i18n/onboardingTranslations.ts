@@ -14,6 +14,8 @@ const en = {
     `Estimated setup time · ${eta}`,
   onboardingProgress: ({ percent, eta }: TranslationParams) =>
     `${percent}% · about ${eta} remaining`,
+  onboardingStepsRemaining: ({ remaining, count }: TranslationParams) =>
+    `${remaining} of ${count} steps remaining`,
   onboardingModelCaution:
     "Larger models can respond more slowly, use more memory, and warm the phone during long sessions. The device test must pass before use.",
 };
@@ -35,6 +37,8 @@ export const onboardingTranslations = {
     onboardingQuickOnly: "Nur schnell",
     onboardingEstimatedTime: ({ eta }) => `Geschätzte Einrichtung · ${eta}`,
     onboardingProgress: ({ percent, eta }) => `${percent} % · noch etwa ${eta}`,
+    onboardingStepsRemaining: ({ remaining, count }) =>
+      `${remaining} von ${count} Schritten verbleiben`,
     onboardingModelCaution:
       "Größere Modelle können langsamer antworten, mehr Speicher nutzen und das Smartphone bei langen Sitzungen erwärmen. Vor der Nutzung muss der Gerätetest bestehen.",
   }),
@@ -51,6 +55,8 @@ export const onboardingTranslations = {
     onboardingEstimatedTime: ({ eta }) => `Орієнтовне налаштування · ${eta}`,
     onboardingProgress: ({ percent, eta }) =>
       `${percent}% · залишилося близько ${eta}`,
+    onboardingStepsRemaining: ({ remaining, count }) =>
+      `Залишилося кроків: ${remaining} із ${count}`,
     onboardingModelCaution:
       "Більші моделі можуть відповідати повільніше, використовувати більше пам’яті й нагрівати телефон під час довгих сесій. Перед використанням тест пристрою має пройти успішно.",
   }),
@@ -66,6 +72,8 @@ export const onboardingTranslations = {
     onboardingQuickOnly: "केवल त्वरित",
     onboardingEstimatedTime: ({ eta }) => `अनुमानित सेटअप समय · ${eta}`,
     onboardingProgress: ({ percent, eta }) => `${percent}% · लगभग ${eta} शेष`,
+    onboardingStepsRemaining: ({ remaining, count }) =>
+      `${count} में से ${remaining} चरण शेष`,
     onboardingModelCaution:
       "बड़े मॉडल धीमे उत्तर दे सकते हैं, अधिक मेमोरी ले सकते हैं और लंबे सत्र में फ़ोन गर्म कर सकते हैं। उपयोग से पहले डिवाइस परीक्षण पास होना चाहिए।",
   }),
@@ -82,6 +90,8 @@ export const onboardingTranslations = {
     onboardingEstimatedTime: ({ eta }) => `Tiempo estimado · ${eta}`,
     onboardingProgress: ({ percent, eta }) =>
       `${percent}% · quedan unos ${eta}`,
+    onboardingStepsRemaining: ({ remaining, count }) =>
+      `Quedan ${remaining} de ${count} pasos`,
     onboardingModelCaution:
       "Los modelos grandes pueden responder más despacio, usar más memoria y calentar el teléfono en sesiones largas. Deben superar la prueba del dispositivo antes de usarlos.",
   }),
@@ -98,6 +108,8 @@ export const onboardingTranslations = {
     onboardingEstimatedTime: ({ eta }) => `Durée estimée · ${eta}`,
     onboardingProgress: ({ percent, eta }) =>
       `${percent} % · environ ${eta} restantes`,
+    onboardingStepsRemaining: ({ remaining, count }) =>
+      `${remaining} étapes sur ${count} restantes`,
     onboardingModelCaution:
       "Les grands modèles peuvent répondre plus lentement, utiliser plus de mémoire et chauffer le téléphone pendant les longues sessions. Le test de l’appareil doit réussir avant utilisation.",
   }),
@@ -114,6 +126,8 @@ export const onboardingTranslations = {
     onboardingEstimatedTime: ({ eta }) => `Tempo stimato · ${eta}`,
     onboardingProgress: ({ percent, eta }) =>
       `${percent}% · circa ${eta} rimanenti`,
+    onboardingStepsRemaining: ({ remaining, count }) =>
+      `${remaining} passaggi su ${count} rimanenti`,
     onboardingModelCaution:
       "I modelli più grandi possono rispondere più lentamente, usare più memoria e scaldare il telefono durante sessioni lunghe. Il test del dispositivo deve riuscire prima dell’uso.",
   }),
@@ -130,6 +144,8 @@ export const onboardingTranslations = {
     onboardingEstimatedTime: ({ eta }) => `Tempo estimado · ${eta}`,
     onboardingProgress: ({ percent, eta }) =>
       `${percent}% · cerca de ${eta} restantes`,
+    onboardingStepsRemaining: ({ remaining, count }) =>
+      `Faltam ${remaining} de ${count} passos`,
     onboardingModelCaution:
       "Os modelos maiores podem responder mais devagar, usar mais memória e aquecer o telemóvel em sessões longas. O teste do dispositivo tem de passar antes da utilização.",
   }),
@@ -146,6 +162,8 @@ export const onboardingTranslations = {
     onboardingEstimatedTime: ({ eta }) => `Tempo estimado · ${eta}`,
     onboardingProgress: ({ percent, eta }) =>
       `${percent}% · cerca de ${eta} restantes`,
+    onboardingStepsRemaining: ({ remaining, count }) =>
+      `Restam ${remaining} de ${count} etapas`,
     onboardingModelCaution:
       "Modelos maiores podem responder mais devagar, usar mais memória e aquecer o celular em sessões longas. O teste do dispositivo precisa passar antes do uso.",
   }),
@@ -162,6 +180,8 @@ export const onboardingTranslations = {
     onboardingEstimatedTime: ({ eta }) => `Оценка настройки · ${eta}`,
     onboardingProgress: ({ percent, eta }) =>
       `${percent}% · осталось около ${eta}`,
+    onboardingStepsRemaining: ({ remaining, count }) =>
+      `Осталось шагов: ${remaining} из ${count}`,
     onboardingModelCaution:
       "Большие модели могут отвечать медленнее, использовать больше памяти и нагревать телефон при долгой работе. Перед использованием тест устройства должен пройти успешно.",
   }),
@@ -177,6 +197,8 @@ export const onboardingTranslations = {
     onboardingQuickOnly: "仅快速回答",
     onboardingEstimatedTime: ({ eta }) => `预计设置时间 · ${eta}`,
     onboardingProgress: ({ percent, eta }) => `${percent}% · 约剩余 ${eta}`,
+    onboardingStepsRemaining: ({ remaining, count }) =>
+      `还剩 ${remaining}/${count} 个步骤`,
     onboardingModelCaution:
       "较大的模型可能回答更慢、占用更多内存，并在长时间使用时使手机发热。使用前必须通过设备测试。",
   }),
@@ -192,6 +214,8 @@ export const onboardingTranslations = {
     onboardingQuickOnly: "سريع فقط",
     onboardingEstimatedTime: ({ eta }) => `الوقت التقديري · ${eta}`,
     onboardingProgress: ({ percent, eta }) => `${percent}% · متبقٍ نحو ${eta}`,
+    onboardingStepsRemaining: ({ remaining, count }) =>
+      `متبقي ${remaining} من ${count} خطوات`,
     onboardingModelCaution:
       "قد تستجيب النماذج الأكبر ببطء وتستخدم ذاكرة أكثر وتُسخّن الهاتف في الجلسات الطويلة. يجب اجتياز اختبار الجهاز قبل الاستخدام.",
   }),
@@ -207,6 +231,8 @@ export const onboardingTranslations = {
     onboardingQuickOnly: "すばやい応答のみ",
     onboardingEstimatedTime: ({ eta }) => `推定セットアップ時間 · ${eta}`,
     onboardingProgress: ({ percent, eta }) => `${percent}% · 残り約 ${eta}`,
+    onboardingStepsRemaining: ({ remaining, count }) =>
+      `残り ${remaining}/${count} ステップ`,
     onboardingModelCaution:
       "大きなモデルは応答が遅く、メモリ使用量が増え、長時間の利用で端末が熱くなることがあります。利用前に端末テストへの合格が必要です。",
   }),
@@ -223,6 +249,8 @@ export const onboardingTranslations = {
     onboardingEstimatedTime: ({ eta }) => `Becsült beállítási idő · ${eta}`,
     onboardingProgress: ({ percent, eta }) =>
       `${percent}% · körülbelül ${eta} van hátra`,
+    onboardingStepsRemaining: ({ remaining, count }) =>
+      `${remaining}/${count} lépés van hátra`,
     onboardingModelCaution:
       "A nagyobb modellek lassabban válaszolhatnak, több memóriát használhatnak és hosszú munkamenetben melegíthetik a telefont. Használat előtt át kell menniük az eszközteszten.",
   }),
@@ -238,6 +266,8 @@ export const onboardingTranslations = {
     onboardingQuickOnly: "Pouze rychlé",
     onboardingEstimatedTime: ({ eta }) => `Odhad nastavení · ${eta}`,
     onboardingProgress: ({ percent, eta }) => `${percent} % · zbývá asi ${eta}`,
+    onboardingStepsRemaining: ({ remaining, count }) =>
+      `Zbývá ${remaining} z ${count} kroků`,
     onboardingModelCaution:
       "Větší modely mohou odpovídat pomaleji, využívat více paměti a při dlouhých relacích zahřívat telefon. Před použitím musí projít testem zařízení.",
   }),
@@ -254,6 +284,8 @@ export const onboardingTranslations = {
     onboardingEstimatedTime: ({ eta }) => `Szacowany czas · ${eta}`,
     onboardingProgress: ({ percent, eta }) =>
       `${percent}% · pozostało około ${eta}`,
+    onboardingStepsRemaining: ({ remaining, count }) =>
+      `Pozostało ${remaining} z ${count} kroków`,
     onboardingModelCaution:
       "Większe modele mogą odpowiadać wolniej, zużywać więcej pamięci i nagrzewać telefon podczas długich sesji. Przed użyciem muszą przejść test urządzenia.",
   }),
@@ -270,6 +302,8 @@ export const onboardingTranslations = {
     onboardingEstimatedTime: ({ eta }) => `Tahmini kurulum · ${eta}`,
     onboardingProgress: ({ percent, eta }) =>
       `%${percent} · yaklaşık ${eta} kaldı`,
+    onboardingStepsRemaining: ({ remaining, count }) =>
+      `${count} adımdan ${remaining} kaldı`,
     onboardingModelCaution:
       "Daha büyük modeller daha yavaş yanıt verebilir, daha fazla bellek kullanabilir ve uzun oturumlarda telefonu ısıtabilir. Kullanımdan önce cihaz testini geçmelidir.",
   }),
@@ -286,6 +320,8 @@ export const onboardingTranslations = {
     onboardingEstimatedTime: ({ eta }) => `Beräknad tid · ${eta}`,
     onboardingProgress: ({ percent, eta }) =>
       `${percent} % · ungefär ${eta} kvar`,
+    onboardingStepsRemaining: ({ remaining, count }) =>
+      `${remaining} av ${count} steg återstår`,
     onboardingModelCaution:
       "Större modeller kan svara långsammare, använda mer minne och värma telefonen under långa sessioner. Enhetstestet måste godkännas före användning.",
   }),
@@ -302,6 +338,8 @@ export const onboardingTranslations = {
     onboardingEstimatedTime: ({ eta }) => `اندازاً سیٹ اپ وقت · ${eta}`,
     onboardingProgress: ({ percent, eta }) =>
       `${percent}% · تقریباً ${eta} باقی`,
+    onboardingStepsRemaining: ({ remaining, count }) =>
+      `${count} میں سے ${remaining} مراحل باقی`,
     onboardingModelCaution:
       "بڑے ماڈلز آہستہ جواب دے سکتے ہیں، زیادہ میموری استعمال کر سکتے ہیں اور طویل سیشن میں فون گرم کر سکتے ہیں۔ استعمال سے پہلے ڈیوائس ٹیسٹ پاس ہونا ضروری ہے۔",
   }),

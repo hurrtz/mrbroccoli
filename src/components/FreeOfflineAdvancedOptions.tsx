@@ -7,6 +7,8 @@ import {
   type LocalModelDefinition,
 } from "../constants/localModels";
 import { PhosphorIcon } from "../design-system/PhosphorIcon";
+import { getKokoroVoiceOptions } from "../constants/kokoro";
+import { AntPickerRow } from "../features/settings/AntSettingsPrimitives";
 import { useLocalization } from "../i18n";
 import type { FreeOfflineModeController } from "../screens/main/useFreeOfflineMode";
 import {
@@ -39,7 +41,7 @@ export function FreeOfflineAdvancedOptions({
   profile: OfflineProfile;
 }) {
   const { colors } = useTheme();
-  const { t } = useLocalization();
+  const { language: appLanguage, t } = useLocalization();
   const [visible, setVisible] = React.useState(false);
   const snapshot = controller.snapshot;
   const language = profile.languages[0];
@@ -131,30 +133,40 @@ export function FreeOfflineAdvancedOptions({
     );
   };
 
-  const renderSystemOption = (
-    label: string,
-    selected: boolean,
-    onPress: () => void,
-  ) => (
+  const renderSystemOption = (params: {
+    label: string;
+    selected: boolean;
+    onPress: () => void;
+    disabled?: boolean;
+    testID?: string;
+  }) => (
     <Pressable
+      testID={params.testID}
       accessibilityRole="radio"
-      accessibilityState={{ checked: selected, selected }}
-      disabled={controller.preparing}
-      onPress={onPress}
+      accessibilityState={{
+        checked: params.selected,
+        disabled: params.disabled,
+        selected: params.selected,
+      }}
+      disabled={controller.preparing || params.disabled}
+      onPress={params.onPress}
       style={({ pressed }) => [
         styles.option,
         {
-          backgroundColor: selected ? colors.accentSoft : colors.surface,
-          borderColor: selected ? colors.accent : colors.border,
+          backgroundColor: params.selected ? colors.accentSoft : colors.surface,
+          borderColor: params.selected ? colors.accent : colors.border,
         },
+        params.disabled ? styles.disabled : null,
         pressed ? styles.pressed : null,
       ]}
     >
-      <Text style={[styles.optionName, { color: colors.text }]}>{label}</Text>
+      <Text style={[styles.optionName, { color: colors.text }]}>
+        {params.label}
+      </Text>
       <PhosphorIcon
-        name={selected ? "radio-selected" : "radio-unselected"}
+        name={params.selected ? "radio-selected" : "radio-unselected"}
         size="compact"
-        color={selected ? colors.accent : colors.textMuted}
+        color={params.selected ? colors.accent : colors.textMuted}
       />
     </Pressable>
   );
@@ -215,11 +227,11 @@ export function FreeOfflineAdvancedOptions({
           <Text style={[styles.groupTitle, { color: colors.text }]}>
             {t("onboardingThoroughModel")}
           </Text>
-          {renderSystemOption(
-            t("onboardingQuickOnly"),
-            profile.thoroughLlm === null,
-            () => controller.selectThoroughLlm(null),
-          )}
+          {renderSystemOption({
+            label: t("onboardingQuickOnly"),
+            selected: profile.thoroughLlm === null,
+            onPress: () => controller.selectThoroughLlm(null),
+          })}
           {candidates
             .filter(
               (model) =>
@@ -233,19 +245,49 @@ export function FreeOfflineAdvancedOptions({
           <Text style={[styles.groupTitle, { color: colors.text }]}>
             {t("onDeviceListeningModels")}
           </Text>
+          {renderSystemOption({
+            label: `${t("appNative")} · ${t("speechToText")}`,
+            selected: profile.stt === null,
+            disabled:
+              controller.nativeSpeechCapabilities?.nativeSttEligible !== true,
+            onPress: () => controller.selectStt(null),
+            testID: "onboarding-native-stt",
+          })}
           {candidates
             .filter((model) => model.capability === "stt")
-            .map((model) => renderOption(model, profile.stt.id === model.id))}
+            .map((model) => renderOption(model, profile.stt?.id === model.id))}
 
           <Text style={[styles.groupTitle, { color: colors.text }]}>
             {t("onDeviceSpeakingModels")}
           </Text>
-          {renderSystemOption(t("systemVoice"), profile.tts === null, () =>
-            controller.selectTts(null),
-          )}
+          {renderSystemOption({
+            label: t("systemVoice"),
+            selected: profile.tts === null,
+            onPress: () => controller.selectTts(null),
+            testID: "onboarding-native-tts",
+          })}
           {candidates
             .filter((model) => model.capability === "tts")
             .map((model) => renderOption(model, profile.tts?.id === model.id))}
+
+          {profile.tts === null && controller.nativeVoiceOptions.length ? (
+            <AntPickerRow
+              testID="onboarding-native-voice"
+              label={t("ttsVoice")}
+              value={controller.selectedNativeVoice}
+              options={controller.nativeVoiceOptions}
+              onChange={controller.selectNativeVoice}
+            />
+          ) : null}
+          {profile.tts?.id === "kokoro-multilingual" ? (
+            <AntPickerRow
+              testID="onboarding-kokoro-voice"
+              label={t("ttsVoice")}
+              value={controller.effectiveSettings.kokoroVoices.en}
+              options={getKokoroVoiceOptions("en", appLanguage)}
+              onChange={controller.selectKokoroVoice}
+            />
+          ) : null}
 
           <Text style={[styles.hint, { color: colors.textSecondary }]}>
             {t("onboardingModelCaution")}

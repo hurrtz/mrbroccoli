@@ -2,7 +2,10 @@ import {
   getOfflineProfileModels,
   selectOfflineProfile,
 } from "../../src/services/offlineProfile";
-import { evaluateOfflineProfileReadiness } from "../../src/services/offlineProfileManager";
+import {
+  evaluateOfflineProfileReadiness,
+  getOfflinePreparationSteps,
+} from "../../src/services/offlineProfileManager";
 import type {
   LocalDeviceSnapshot,
   LocalModelBenchmarkResult,
@@ -100,5 +103,19 @@ describe("offline profile readiness", () => {
         benchmarks: { ...benchmarks, [profile.llm.id]: stale },
       }).ready,
     ).toBe(false);
+  });
+
+  it("reports one download step per missing model and one test step per model", () => {
+    const models = getOfflineProfileModels(profile);
+    const steps = getOfflinePreparationSteps(profile, {
+      [models[0].id]: installs[models[0].id],
+    });
+
+    expect(steps.filter((step) => step.action === "downloading")).toHaveLength(
+      models.length - 1,
+    );
+    expect(steps.filter((step) => step.action === "benchmarking")).toHaveLength(
+      models.length,
+    );
   });
 });

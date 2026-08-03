@@ -89,7 +89,7 @@ export function getMainScreenRouteConfiguration(
     ? settings.providerTtsVoices[ttsProvider] ||
       PROVIDER_DEFAULT_TTS_VOICES[ttsProvider] ||
       ""
-    : "";
+    : settings.nativeTtsVoiceId;
   const selectedTtsModel = ttsProvider
     ? settings.providerTtsModels[ttsProvider] ||
       PROVIDER_DEFAULT_TTS_MODELS[ttsProvider] ||

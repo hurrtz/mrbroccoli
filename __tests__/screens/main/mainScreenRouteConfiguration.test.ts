@@ -87,6 +87,18 @@ describe("mainScreenRouteConfiguration", () => {
     ).toBe(true);
   });
 
+  it("uses the persisted phone voice for native speech", () => {
+    const result = getMainScreenRouteConfiguration(
+      {
+        ...DEFAULT_SETTINGS,
+        nativeTtsVoiceId: "com.apple.voice.samantha",
+      },
+      true,
+    );
+
+    expect(result.globalSelectedTtsVoice).toBe("com.apple.voice.samantha");
+  });
+
   it("runs a local response mode without a key and disables web search", () => {
     const settings = {
       ...DEFAULT_SETTINGS,

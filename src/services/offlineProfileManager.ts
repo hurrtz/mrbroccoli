@@ -34,10 +34,36 @@ export interface OfflineProfileReadiness {
 
 export interface OfflinePreparationProgress {
   modelId: LocalModelId;
-  modelIndex: number;
-  modelCount: number;
-  action: "checking" | "downloading" | "benchmarking";
+  stepIndex: number;
+  stepCount: number;
+  stepsRemaining: number;
+  action: "downloading" | "benchmarking";
+  stepProgress: number | null;
   download?: LocalModelDownloadProgress;
+}
+
+export interface OfflinePreparationStep {
+  modelId: LocalModelId;
+  action: OfflinePreparationProgress["action"];
+}
+
+export function getOfflinePreparationSteps(
+  profile: OfflineProfile,
+  installs: OfflineProfileReadiness["installs"],
+): OfflinePreparationStep[] {
+  const models = getOfflineProfileModels(profile);
+  return [
+    ...models
+      .filter((model) => !installs[model.id]?.verified)
+      .map((model) => ({
+        modelId: model.id,
+        action: "downloading" as const,
+      })),
+    ...models.map((model) => ({
+      modelId: model.id,
+      action: "benchmarking" as const,
+    })),
+  ];
 }
 
 function benchmarkMatchesDevice(
@@ -144,7 +170,7 @@ async function benchmarkProfileModel(
   if (modelId === profile.llm.id || modelId === profile.thoroughLlm?.id) {
     return benchmarkLocalLlm(modelId as typeof profile.llm.id);
   }
-  if (modelId === profile.stt.id) {
+  if (modelId === profile.stt?.id) {
     const language: SttLanguage =
       profile.languages.length === 1 ? profile.languages[0] : "auto";
     return benchmarkLocalStt(profile.stt.id, language);
@@ -165,42 +191,55 @@ export async function prepareOfflineProfile(
   },
 ) {
   const models = getOfflineProfileModels(profile);
+  const installEntries = await Promise.all(
+    models.map(
+      async (model) => [model.id, await getInstallStatus(model.id)] as const,
+    ),
+  );
+  const steps = getOfflinePreparationSteps(
+    profile,
+    Object.fromEntries(installEntries),
+  );
 
-  for (const [index, model] of models.entries()) {
-    options?.onProgress?.({
+  for (const [stepIndex, step] of steps.entries()) {
+    if (options?.abortSignal?.aborted) {
+      const abortError = new Error("Setup was cancelled.");
+      abortError.name = "AbortError";
+      throw abortError;
+    }
+    const model = models.find((candidate) => candidate.id === step.modelId);
+    if (!model) {
+      throw new Error(`Unknown setup model: ${step.modelId}`);
+    }
+    const progress = (
+      stepProgress: number | null,
+      download?: LocalModelDownloadProgress,
+    ): OfflinePreparationProgress => ({
       modelId: model.id,
-      modelIndex: index,
-      modelCount: models.length,
-      action: "checking",
+      stepIndex,
+      stepCount: steps.length,
+      stepsRemaining: steps.length - stepIndex - (stepProgress === 1 ? 1 : 0),
+      action: step.action,
+      stepProgress,
+      download,
     });
-    const status = await getInstallStatus(model.id);
-    if (!status.verified) {
+
+    options?.onProgress?.(progress(step.action === "downloading" ? 0 : null));
+    if (step.action === "downloading") {
       await downloadProfileModel(model.id, {
         abortSignal: options?.abortSignal,
         onProgress: (download) =>
-          options?.onProgress?.({
-            modelId: model.id,
-            modelIndex: index,
-            modelCount: models.length,
-            action: "downloading",
-            download,
-          }),
+          options?.onProgress?.(progress(download.progress, download)),
       });
+    } else {
+      const benchmark = await benchmarkProfileModel(profile, model.id);
+      if (benchmark.status !== "viable") {
+        throw new Error(
+          benchmark.detail ||
+            `${model.name} is not fast enough on this device.`,
+        );
+      }
     }
-  }
-
-  for (const [index, model] of models.entries()) {
-    options?.onProgress?.({
-      modelId: model.id,
-      modelIndex: index,
-      modelCount: models.length,
-      action: "benchmarking",
-    });
-    const benchmark = await benchmarkProfileModel(profile, model.id);
-    if (benchmark.status !== "viable") {
-      throw new Error(
-        benchmark.detail || `${model.name} is not fast enough on this device.`,
-      );
-    }
+    options?.onProgress?.(progress(1));
   }
 }

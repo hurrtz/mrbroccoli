@@ -1018,6 +1018,42 @@ describe("useSettings", () => {
     );
   });
 
+  it("restores validated Free onboarding preferences", async () => {
+    (AsyncStorage.getItem as jest.Mock).mockResolvedValueOnce(
+      JSON.stringify({
+        ...DEFAULT_SETTINGS,
+        freeOnboardingLanguageInitialized: true,
+        freeOfflineSetupCompleted: true,
+        nativeSttRequiresOnDevice: true,
+        nativeTtsVoiceId: "com.apple.voice.samantha",
+        freeOfflineProfileOverrides: {
+          quickLlmModelId: "qwen3-0.6b-q8",
+          thoroughLlmModelId: null,
+          sttModelId: null,
+          ttsModelId: "piper-de-de-thorsten",
+        },
+      }),
+    );
+
+    const { result } = renderHook(() => useSettings());
+    await flushSettingsLoad();
+
+    expect(result.current.settings.freeOnboardingLanguageInitialized).toBe(
+      true,
+    );
+    expect(result.current.settings.freeOfflineSetupCompleted).toBe(true);
+    expect(result.current.settings.nativeSttRequiresOnDevice).toBe(true);
+    expect(result.current.settings.nativeTtsVoiceId).toBe(
+      "com.apple.voice.samantha",
+    );
+    expect(result.current.settings.freeOfflineProfileOverrides).toEqual({
+      quickLlmModelId: "qwen3-0.6b-q8",
+      thoroughLlmModelId: null,
+      sttModelId: null,
+      ttsModelId: "piper-de-de-thorsten",
+    });
+  });
+
   it("does not retain local STT mode without a valid downloaded-model selection", async () => {
     (AsyncStorage.getItem as jest.Mock).mockResolvedValueOnce(
       JSON.stringify({

@@ -19,7 +19,10 @@ function canUseNativeWaveformRecorderForRecognition() {
   return typeof Platform.Version === "number" && Platform.Version >= 33;
 }
 
-export function useNativeSpeechRecognizer(sttLanguage: SttLanguage = "auto") {
+export function useNativeSpeechRecognizer(
+  sttLanguage: SttLanguage = "auto",
+  requiresOnDeviceRecognition = false,
+) {
   const { t } = useLocalization();
   const usingNativeRecorder = canUseNativeWaveformRecorderForRecognition();
   const session = useRecognitionSession({ t });
@@ -34,13 +37,13 @@ export function useNativeSpeechRecognizer(sttLanguage: SttLanguage = "auto") {
     startRecognition,
     stopRecognition,
     abortRecognition,
-  } =
-    useRecognitionControls({
-      session,
-      t,
-      sttLanguage,
-      usingNativeRecorder,
-    });
+  } = useRecognitionControls({
+    session,
+    t,
+    sttLanguage,
+    usingNativeRecorder,
+    requiresOnDeviceRecognition,
+  });
 
   return {
     isAvailable: ExpoSpeechRecognitionModule.isRecognitionAvailable(),

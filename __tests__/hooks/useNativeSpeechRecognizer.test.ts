@@ -70,18 +70,24 @@ describe("useNativeSpeechRecognizer", () => {
         };
       },
     );
-    (ExpoSpeechRecognitionModule.isRecognitionAvailable as jest.Mock).mockReturnValue(
-      true,
+    (
+      ExpoSpeechRecognitionModule.isRecognitionAvailable as jest.Mock
+    ).mockReturnValue(true);
+    (
+      ExpoSpeechRecognitionModule.getPermissionsAsync as jest.Mock
+    ).mockResolvedValue({ granted: true });
+    (
+      ExpoSpeechRecognitionModule.requestPermissionsAsync as jest.Mock
+    ).mockResolvedValue({ granted: true });
+    (ExpoSpeechRecognitionModule.start as jest.Mock).mockImplementation(
+      () => undefined,
     );
-    (ExpoSpeechRecognitionModule.getPermissionsAsync as jest.Mock).mockResolvedValue(
-      { granted: true },
+    (ExpoSpeechRecognitionModule.stop as jest.Mock).mockImplementation(
+      () => undefined,
     );
-    (ExpoSpeechRecognitionModule.requestPermissionsAsync as jest.Mock).mockResolvedValue(
-      { granted: true },
+    (ExpoSpeechRecognitionModule.abort as jest.Mock).mockImplementation(
+      () => undefined,
     );
-    (ExpoSpeechRecognitionModule.start as jest.Mock).mockImplementation(() => undefined);
-    (ExpoSpeechRecognitionModule.stop as jest.Mock).mockImplementation(() => undefined);
-    (ExpoSpeechRecognitionModule.abort as jest.Mock).mockImplementation(() => undefined);
     (isNativeWaveformAvailable as jest.Mock).mockReturnValue(true);
     (startNativeWaveformRecording as jest.Mock).mockResolvedValue({
       uri: "file://capture.wav",
@@ -154,21 +160,19 @@ describe("useNativeSpeechRecognizer", () => {
       await result.current.startRecognition();
     });
 
-    const sessionId =
-      (startNativeWaveformRecording as jest.Mock).mock.calls[0][0].sessionId;
+    const sessionId = (startNativeWaveformRecording as jest.Mock).mock
+      .calls[0][0].sessionId;
 
     await act(async () => {
       await result.current.abortRecognition();
     });
 
-    expect(cancelNativeWaveformRecording).toHaveBeenCalledWith(
-      sessionId,
-    );
+    expect(cancelNativeWaveformRecording).toHaveBeenCalledWith(sessionId);
     expect(result.current.isRecording).toBe(false);
   });
 
   it("stops native recording and returns the recorded transcript", async () => {
-    const { result } = renderHook(() => useNativeSpeechRecognizer("uk"), {
+    const { result } = renderHook(() => useNativeSpeechRecognizer("uk", true), {
       wrapper,
     });
 
@@ -197,6 +201,7 @@ describe("useNativeSpeechRecognizer", () => {
     expect(ExpoSpeechRecognitionModule.start).toHaveBeenCalledWith(
       expect.objectContaining({
         lang: "uk-UA",
+        requiresOnDeviceRecognition: true,
         audioSource: {
           uri: "file://capture.wav",
         },
@@ -214,8 +219,8 @@ describe("useNativeSpeechRecognizer", () => {
       await result.current.startRecognition();
     });
 
-    const sessionId =
-      (startNativeWaveformRecording as jest.Mock).mock.calls[0][0].sessionId;
+    const sessionId = (startNativeWaveformRecording as jest.Mock).mock
+      .calls[0][0].sessionId;
 
     await act(async () => {
       emitNativeWaveformEvent({
@@ -225,9 +230,7 @@ describe("useNativeSpeechRecognizer", () => {
       });
     });
 
-    expect(cancelNativeWaveformRecording).toHaveBeenCalledWith(
-      sessionId,
-    );
+    expect(cancelNativeWaveformRecording).toHaveBeenCalledWith(sessionId);
     expect(result.current.lastError).toBe("Recorder write failed");
     expect(result.current.isRecording).toBe(false);
   });
@@ -241,8 +244,8 @@ describe("useNativeSpeechRecognizer", () => {
       await result.current.startRecognition();
     });
 
-    const sessionId =
-      (startNativeWaveformRecording as jest.Mock).mock.calls[0][0].sessionId;
+    const sessionId = (startNativeWaveformRecording as jest.Mock).mock
+      .calls[0][0].sessionId;
 
     act(() => {
       emitNativeWaveformEvent({
@@ -278,6 +281,7 @@ describe("useNativeSpeechRecognizer", () => {
       expect.objectContaining({
         lang: "de-DE",
         interimResults: true,
+        requiresOnDeviceRecognition: false,
         volumeChangeEventOptions: {
           enabled: true,
           intervalMillis: 150,
@@ -328,10 +332,9 @@ describe("useNativeSpeechRecognizer", () => {
 
   it("removes system subscriptions and aborts recognition on unmount", async () => {
     (isNativeWaveformAvailable as jest.Mock).mockReturnValue(false);
-    const { result, unmount } = renderHook(
-      () => useNativeSpeechRecognizer(),
-      { wrapper },
-    );
+    const { result, unmount } = renderHook(() => useNativeSpeechRecognizer(), {
+      wrapper,
+    });
 
     await act(async () => {
       await result.current.startRecognition();

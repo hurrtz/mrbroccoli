@@ -8,6 +8,7 @@ interface TranscribeRecordedFileParams {
   finalTranscriptRef: React.MutableRefObject<string>;
   latestTranscriptRef: React.MutableRefObject<string>;
   sttLanguage: SttLanguage;
+  requiresOnDeviceRecognition: boolean;
   t: (
     key: TranslationKey,
     params?: Record<string, string | number | undefined>,
@@ -19,6 +20,7 @@ export function transcribeRecordedFile({
   finalTranscriptRef,
   latestTranscriptRef,
   sttLanguage,
+  requiresOnDeviceRecognition,
   t,
 }: TranscribeRecordedFileParams) {
   return new Promise<string | null>((resolve, reject) => {
@@ -68,11 +70,16 @@ export function transcribeRecordedFile({
       },
     );
 
-    const endSubscription = ExpoSpeechRecognitionModule.addListener("end", () => {
-      const transcript =
-        finalTranscriptRef.current.trim() || latestTranscriptRef.current.trim() || null;
-      finish(transcript);
-    });
+    const endSubscription = ExpoSpeechRecognitionModule.addListener(
+      "end",
+      () => {
+        const transcript =
+          finalTranscriptRef.current.trim() ||
+          latestTranscriptRef.current.trim() ||
+          null;
+        finish(transcript);
+      },
+    );
 
     try {
       ExpoSpeechRecognitionModule.start({
@@ -80,7 +87,7 @@ export function transcribeRecordedFile({
         interimResults: true,
         continuous: false,
         addsPunctuation: true,
-        requiresOnDeviceRecognition: false,
+        requiresOnDeviceRecognition,
         audioSource: {
           uri: fileUri,
         },

@@ -23,6 +23,7 @@ interface UseRecognitionControlsParams {
   ) => string;
   usingNativeRecorder: boolean;
   sttLanguage: SttLanguage;
+  requiresOnDeviceRecognition: boolean;
 }
 
 export function useRecognitionControls({
@@ -30,6 +31,7 @@ export function useRecognitionControls({
   t,
   usingNativeRecorder,
   sttLanguage,
+  requiresOnDeviceRecognition,
 }: UseRecognitionControlsParams) {
   const {
     abortRequestedRef,
@@ -52,12 +54,10 @@ export function useRecognitionControls({
       throw new Error(t("speechRecognitionUnavailableOnDevice"));
     }
 
-    let permissions =
-      await ExpoSpeechRecognitionModule.getPermissionsAsync();
+    let permissions = await ExpoSpeechRecognitionModule.getPermissionsAsync();
 
     if (!permissions.granted) {
-      permissions =
-        await ExpoSpeechRecognitionModule.requestPermissionsAsync();
+      permissions = await ExpoSpeechRecognitionModule.requestPermissionsAsync();
     }
 
     if (!permissions.granted) {
@@ -108,7 +108,7 @@ export function useRecognitionControls({
         interimResults: true,
         continuous: false,
         addsPunctuation: true,
-        requiresOnDeviceRecognition: false,
+        requiresOnDeviceRecognition,
         iosTaskHint: "dictation",
         iosVoiceProcessingEnabled: true,
         volumeChangeEventOptions: {
@@ -136,6 +136,7 @@ export function useRecognitionControls({
     setLastError,
     startedAtRef,
     sttLanguage,
+    requiresOnDeviceRecognition,
     t,
     usingNativeRecorder,
   ]);
@@ -217,6 +218,7 @@ export function useRecognitionControls({
         finalTranscriptRef,
         latestTranscriptRef,
         sttLanguage,
+        requiresOnDeviceRecognition,
         t,
       });
 
@@ -249,6 +251,7 @@ export function useRecognitionControls({
     stopRequestedRef,
     stopResolverRef,
     sttLanguage,
+    requiresOnDeviceRecognition,
     t,
     usingNativeRecorder,
   ]);

@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
-import { usePremiumEntitlement } from "../../context/PremiumEntitlementContext";
 import type {
   LocalLlmModelId,
   LocalModelId,
@@ -13,15 +12,26 @@ import {
   resolveFreeSpeechLanguage,
   type FreeSpeechLanguage,
 } from "../../constants/speechLanguages";
-import type { Settings } from "../../types";
+import { usePremiumEntitlement } from "../../context/PremiumEntitlementContext";
+import { useNativeVoiceOptions } from "../../features/settings-core/useNativeVoiceOptions";
+import { getFreeOnboardingLanguageFromStorefront } from "../../services/freeOnboardingLanguage";
+import {
+  getLocalModelBenchmarkResults,
+  probeLocalDeviceCapabilities,
+  type LocalDeviceSnapshot,
+} from "../../services/localDeviceCapabilities";
+import {
+  probeNativeSpeechCapabilities,
+  type NativeSpeechCapabilities,
+} from "../../services/nativeSpeechCapabilities";
 import {
   applyOfflineProfileToSettings,
   applyUnavailableFreeSettings,
-  selectOfflineProfile,
-  type OfflineProfileSelection,
-  type OfflineProfileOverrides,
-  type OfflineProfile,
   getOfflineProfileModels,
+  selectOfflineProfile,
+  type OfflineProfile,
+  type OfflineProfileOverrides,
+  type OfflineProfileSelection,
 } from "../../services/offlineProfile";
 import {
   getLocalCatalogInstallStatuses,
@@ -30,25 +40,23 @@ import {
   type OfflinePreparationProgress,
   type OfflineProfileReadiness,
 } from "../../services/offlineProfileManager";
-import {
-  getLocalModelBenchmarkResults,
-  probeLocalDeviceCapabilities,
-  type LocalDeviceSnapshot,
-} from "../../services/localDeviceCapabilities";
+import type { Settings } from "../../types";
 
 const ASSUMED_SETUP_DOWNLOAD_BYTES_PER_SECOND = 1.5 * 1024 * 1024;
+const INITIAL_RECOMMENDATION_PRESENTATION_MS = 3_400;
 
 export function estimatePreparationSeconds(
   profile: OfflineProfile,
   installs: OfflineProfileReadiness["installs"] = {},
 ) {
-  const models = getOfflineProfileModels(profile).filter(
+  const allModels = getOfflineProfileModels(profile);
+  const missingModels = allModels.filter(
     (model) => !installs[model.id]?.verified,
   );
   const downloadSeconds =
-    models.reduce((total, model) => total + model.downloadBytes, 0) /
+    missingModels.reduce((total, model) => total + model.downloadBytes, 0) /
     ASSUMED_SETUP_DOWNLOAD_BYTES_PER_SECOND;
-  const validationSeconds = models.reduce(
+  const validationSeconds = allModels.reduce(
     (total, model) => total + model.benchmark.maximumLoadMs / 1_000 + 5,
     0,
   );
@@ -62,12 +70,13 @@ export interface FreeOfflineModeController {
   modalVisible: boolean;
   setModalVisible: (visible: boolean) => void;
   checking: boolean;
-  evaluationStage: "device" | "models" | null;
+  evaluationStage: "device" | "models" | "plan" | null;
   preparing: boolean;
   preparationProgress: OfflinePreparationProgress | null;
   estimatedSetupSeconds: number | null;
   preparationEtaSeconds: number | null;
   snapshot: LocalDeviceSnapshot | null;
+  nativeSpeechCapabilities: NativeSpeechCapabilities | null;
   selection: OfflineProfileSelection | null;
   readiness: OfflineProfileReadiness | null;
   installs: OfflineProfileReadiness["installs"];
@@ -78,8 +87,13 @@ export interface FreeOfflineModeController {
   selectLanguage: (language: FreeSpeechLanguage) => void;
   selectQuickLlm: (modelId: LocalLlmModelId) => void;
   selectThoroughLlm: (modelId: LocalLlmModelId | null) => void;
-  selectStt: (modelId: LocalSttModelId) => void;
+  selectStt: (modelId: LocalSttModelId | null) => void;
   selectTts: (modelId: LocalTtsCatalogModelId | null) => void;
+  nativeVoiceOptions: { value: string; label: string }[];
+  selectedNativeVoice: string;
+  selectNativeVoice: (voiceId: string) => void;
+  selectKokoroVoice: (voiceId: string) => void;
+  start: () => void;
   prepare: () => Promise<void>;
   refresh: () => Promise<OfflineProfileReadiness | null>;
 }
@@ -96,7 +110,7 @@ export function useFreeOfflineMode(params: {
   const [modalVisible, setModalVisible] = useState(false);
   const [checking, setChecking] = useState(false);
   const [evaluationStage, setEvaluationStage] = useState<
-    "device" | "models" | null
+    "device" | "models" | "plan" | null
   >(null);
   const [preparing, setPreparing] = useState(false);
   const [preparationProgress, setPreparationProgress] =
@@ -105,6 +119,8 @@ export function useFreeOfflineMode(params: {
     number | null
   >(null);
   const [snapshot, setSnapshot] = useState<LocalDeviceSnapshot | null>(null);
+  const [nativeSpeechCapabilities, setNativeSpeechCapabilities] =
+    useState<NativeSpeechCapabilities | null>(null);
   const [selection, setSelection] = useState<OfflineProfileSelection | null>(
     null,
   );
@@ -117,12 +133,12 @@ export function useFreeOfflineMode(params: {
   const [benchmarks, setBenchmarks] = useState<
     OfflineProfileReadiness["benchmarks"]
   >({});
-  const [overrides, setOverrides] = useState<OfflineProfileOverrides>({});
   const [error, setError] = useState<string | null>(null);
   const refreshOperationRef = useRef(0);
   const preparationAbortRef = useRef<AbortController | null>(null);
   const openedForFreeRef = useRef(false);
   const completedInitialEvaluationRef = useRef(false);
+  const skipNextAutomaticRefreshRef = useRef(false);
   const deviceLocale = useMemo(
     () => Intl.DateTimeFormat().resolvedOptions().locale,
     [],
@@ -156,6 +172,13 @@ export function useFreeOfflineMode(params: {
     settings.language,
     settings.localLanguages,
   ]);
+  const { nativeVoiceOptions, selectedNativeVoice, setSelectedNativeVoice } =
+    useNativeVoiceOptions({
+      visible: modalVisible,
+      shouldLoad: modalVisible,
+      listenLanguages: [resolvedLanguage],
+      preferredVoiceId: settings.nativeTtsVoiceId,
+    });
 
   const refresh = useCallback(async () => {
     if (entitlement.status !== "free") {
@@ -170,30 +193,47 @@ export function useFreeOfflineMode(params: {
       if (refreshOperationRef.current === operation) {
         setEvaluationStage("models");
       }
-    }, 500);
-    const presentationDelayMs = completedInitialEvaluationRef.current
-      ? 250
-      : 1_400;
+    }, 900);
+    const planStageTimer = setTimeout(() => {
+      if (refreshOperationRef.current === operation) {
+        setEvaluationStage("plan");
+      }
+    }, 2_200);
+    const presentationDelayMs =
+      completedInitialEvaluationRef.current ||
+      settings.freeOfflineSetupCompleted
+        ? 250
+        : INITIAL_RECOMMENDATION_PRESENTATION_MS;
+
     try {
-      const [[nextSnapshot, installs, benchmarks]] = await Promise.all([
-        Promise.all([
-          probeLocalDeviceCapabilities(),
-          getLocalCatalogInstallStatuses(),
-          getLocalModelBenchmarkResults(),
-        ]),
+      const languagePromise = settings.freeOnboardingLanguageInitialized
+        ? Promise.resolve(resolvedLanguage)
+        : getFreeOnboardingLanguageFromStorefront(deviceLocale);
+      const [[nextSnapshot, nextInstalls, nextBenchmarks], nextLanguage] =
+        await Promise.all([
+          Promise.all([
+            probeLocalDeviceCapabilities(),
+            getLocalCatalogInstallStatuses(),
+            getLocalModelBenchmarkResults(),
+          ]),
+          languagePromise,
+        ]);
+      const [nextNativeSpeechCapabilities] = await Promise.all([
+        probeNativeSpeechCapabilities(nextLanguage),
         new Promise((resolve) => setTimeout(resolve, presentationDelayMs)),
       ]);
       const installedModelIds = new Set(
-        Object.entries(installs)
+        Object.entries(nextInstalls)
           .filter(([, status]) => status?.verified)
           .map(([modelId]) => modelId as LocalModelId),
       );
       const nextSelection = selectOfflineProfile({
-        languages: [resolvedLanguage],
+        languages: [nextLanguage],
         snapshot: nextSnapshot,
         installedModelIds,
-        benchmarks,
-        overrides,
+        benchmarks: nextBenchmarks,
+        overrides: settings.freeOfflineProfileOverrides,
+        nativeSttEligible: nextNativeSpeechCapabilities.nativeSttEligible,
       });
       const nextReadiness =
         nextSelection.status === "ready"
@@ -206,12 +246,23 @@ export function useFreeOfflineMode(params: {
       if (refreshOperationRef.current !== operation) {
         return null;
       }
-      setInstalls(installs);
-      setBenchmarks(benchmarks);
+      setInstalls(nextInstalls);
+      setBenchmarks(nextBenchmarks);
       setSnapshot(nextSnapshot);
+      setNativeSpeechCapabilities(nextNativeSpeechCapabilities);
       setSelection(nextSelection);
       setReadiness(nextReadiness);
       completedInitialEvaluationRef.current = true;
+
+      if (!settings.freeOnboardingLanguageInitialized) {
+        skipNextAutomaticRefreshRef.current = true;
+        updateSettings({
+          freeOnboardingLanguageInitialized: true,
+          localLanguages: [nextLanguage],
+          ttsListenLanguages: [nextLanguage],
+          sttLanguage: nextLanguage,
+        });
+      }
       return nextReadiness;
     } catch (nextError) {
       if (refreshOperationRef.current === operation) {
@@ -219,21 +270,35 @@ export function useFreeOfflineMode(params: {
           nextError instanceof Error ? nextError.message : String(nextError),
         );
         setSnapshot(null);
+        setNativeSpeechCapabilities(null);
         setSelection(null);
         setReadiness(null);
       }
       return null;
     } finally {
       clearTimeout(modelStageTimer);
+      clearTimeout(planStageTimer);
       if (refreshOperationRef.current === operation) {
         setChecking(false);
         setEvaluationStage(null);
       }
     }
-  }, [entitlement.status, overrides, resolvedLanguage]);
+  }, [
+    deviceLocale,
+    entitlement.status,
+    resolvedLanguage,
+    settings.freeOfflineProfileOverrides,
+    settings.freeOfflineSetupCompleted,
+    settings.freeOnboardingLanguageInitialized,
+    updateSettings,
+  ]);
 
   useEffect(() => {
-    if (!settingsLoaded || entitlement.status !== "free") {
+    if (
+      !settingsLoaded ||
+      entitlement.status !== "free" ||
+      !settings.freeOnboardingLanguageInitialized
+    ) {
       return;
     }
     if (
@@ -254,6 +319,7 @@ export function useFreeOfflineMode(params: {
   }, [
     entitlement.status,
     resolvedLanguage,
+    settings.freeOnboardingLanguageInitialized,
     settings.localLanguages,
     settings.sttLanguage,
     settings.ttsListenLanguages,
@@ -270,10 +336,19 @@ export function useFreeOfflineMode(params: {
     }
     if (!openedForFreeRef.current) {
       openedForFreeRef.current = true;
-      setModalVisible(true);
+      setModalVisible(!settings.freeOfflineSetupCompleted);
+    }
+    if (skipNextAutomaticRefreshRef.current) {
+      skipNextAutomaticRefreshRef.current = false;
+      return;
     }
     void refresh();
-  }, [entitlement.status, refresh, settingsLoaded]);
+  }, [
+    entitlement.status,
+    refresh,
+    settings.freeOfflineSetupCompleted,
+    settingsLoaded,
+  ]);
 
   useEffect(
     () => () => {
@@ -292,8 +367,10 @@ export function useFreeOfflineMode(params: {
             ? "pt-PT"
             : deviceLocale;
       const nextLanguage = resolveFreeSpeechLanguage(language, preferredLocale);
-      setOverrides({});
       updateSettings({
+        freeOnboardingLanguageInitialized: true,
+        freeOfflineSetupCompleted: false,
+        freeOfflineProfileOverrides: {},
         localLanguages: [nextLanguage],
         ttsListenLanguages: [nextLanguage],
         sttLanguage: nextLanguage,
@@ -302,18 +379,57 @@ export function useFreeOfflineMode(params: {
     [deviceLocale, settings.language, updateSettings],
   );
 
-  const selectQuickLlm = useCallback((modelId: LocalLlmModelId) => {
-    setOverrides((current) => ({ ...current, quickLlmModelId: modelId }));
-  }, []);
-  const selectThoroughLlm = useCallback((modelId: LocalLlmModelId | null) => {
-    setOverrides((current) => ({ ...current, thoroughLlmModelId: modelId }));
-  }, []);
-  const selectStt = useCallback((modelId: LocalSttModelId) => {
-    setOverrides((current) => ({ ...current, sttModelId: modelId }));
-  }, []);
-  const selectTts = useCallback((modelId: LocalTtsCatalogModelId | null) => {
-    setOverrides((current) => ({ ...current, ttsModelId: modelId }));
-  }, []);
+  const updateOverrides = useCallback(
+    (partial: OfflineProfileOverrides) => {
+      updateSettings({
+        freeOfflineSetupCompleted: false,
+        freeOfflineProfileOverrides: {
+          ...settings.freeOfflineProfileOverrides,
+          ...partial,
+        },
+      });
+    },
+    [settings.freeOfflineProfileOverrides, updateSettings],
+  );
+  const selectQuickLlm = useCallback(
+    (modelId: LocalLlmModelId) => updateOverrides({ quickLlmModelId: modelId }),
+    [updateOverrides],
+  );
+  const selectThoroughLlm = useCallback(
+    (modelId: LocalLlmModelId | null) =>
+      updateOverrides({ thoroughLlmModelId: modelId }),
+    [updateOverrides],
+  );
+  const selectStt = useCallback(
+    (modelId: LocalSttModelId | null) =>
+      updateOverrides({ sttModelId: modelId }),
+    [updateOverrides],
+  );
+  const selectTts = useCallback(
+    (modelId: LocalTtsCatalogModelId | null) =>
+      updateOverrides({ ttsModelId: modelId }),
+    [updateOverrides],
+  );
+  const selectNativeVoice = useCallback(
+    (voiceId: string) => {
+      setSelectedNativeVoice(voiceId);
+      updateSettings({ nativeTtsVoiceId: voiceId });
+    },
+    [setSelectedNativeVoice, updateSettings],
+  );
+  const selectKokoroVoice = useCallback(
+    (voiceId: string) => {
+      updateSettings({
+        kokoroVoices: { ...settings.kokoroVoices, en: voiceId },
+      });
+    },
+    [settings.kokoroVoices, updateSettings],
+  );
+  const start = useCallback(() => {
+    skipNextAutomaticRefreshRef.current = true;
+    updateSettings({ freeOfflineSetupCompleted: true });
+    setModalVisible(false);
+  }, [updateSettings]);
 
   const prepare = useCallback(async () => {
     if (selection?.status !== "ready" || preparing) {
@@ -324,71 +440,33 @@ export function useFreeOfflineMode(params: {
     setPreparing(true);
     setError(null);
     setPreparationProgress(null);
-    const profileModels = getOfflineProfileModels(selection.profile);
-    const missingModels = profileModels.filter(
-      (model) => !installs[model.id]?.verified,
+    const estimatedSeconds = estimatePreparationSeconds(
+      selection.profile,
+      installs,
     );
-    const preparationStartedAt = Date.now();
-    setPreparationEtaSeconds(
-      estimatePreparationSeconds(selection.profile, installs),
-    );
+    setPreparationEtaSeconds(estimatedSeconds);
     try {
       await prepareOfflineProfile(selection.profile, {
         abortSignal: abortController.signal,
         onProgress: (nextProgress) => {
           setPreparationProgress(nextProgress);
-          if (nextProgress.action === "downloading" && nextProgress.download) {
-            const currentModel = profileModels[nextProgress.modelIndex];
-            const currentMissingIndex = missingModels.findIndex(
-              (model) => model.id === currentModel?.id,
-            );
-            const completedBytes = missingModels
-              .slice(0, Math.max(0, currentMissingIndex))
-              .reduce((total, model) => total + model.downloadBytes, 0);
-            const currentBytes = currentModel
-              ? currentModel.downloadBytes *
-                (nextProgress.download.phase === "downloading"
-                  ? nextProgress.download.progress
-                  : 1)
-              : 0;
-            const transferredBytes = completedBytes + currentBytes;
-            const elapsedSeconds = Math.max(
-              0.25,
-              (Date.now() - preparationStartedAt) / 1_000,
-            );
-            const bytesPerSecond = transferredBytes / elapsedSeconds;
-            const remainingBytes = Math.max(
-              0,
-              missingModels.reduce(
-                (total, model) => total + model.downloadBytes,
-                0,
-              ) - transferredBytes,
-            );
-            if (bytesPerSecond > 0 && transferredBytes > 256 * 1024) {
-              setPreparationEtaSeconds(
-                Math.max(1, Math.ceil(remainingBytes / bytesPerSecond)),
-              );
-            }
-          } else if (nextProgress.action === "benchmarking") {
-            setPreparationEtaSeconds(
-              Math.max(
-                1,
-                Math.ceil(
-                  profileModels
-                    .slice(nextProgress.modelIndex)
-                    .reduce(
-                      (total, model) =>
-                        total + model.benchmark.maximumLoadMs / 1_000 + 5,
-                      0,
-                    ),
-                ),
-              ),
-            );
-          }
+          const completedSteps =
+            nextProgress.stepIndex + (nextProgress.stepProgress ?? 0);
+          const remainingFraction = Math.max(
+            0,
+            1 - completedSteps / Math.max(1, nextProgress.stepCount),
+          );
+          setPreparationEtaSeconds(
+            remainingFraction === 0
+              ? 0
+              : Math.max(1, Math.ceil(estimatedSeconds * remainingFraction)),
+          );
         },
       });
       const nextReadiness = await refresh();
       if (nextReadiness?.ready) {
+        skipNextAutomaticRefreshRef.current = true;
+        updateSettings({ freeOfflineSetupCompleted: true });
         setModalVisible(false);
       }
     } catch (nextError) {
@@ -406,7 +484,7 @@ export function useFreeOfflineMode(params: {
       setPreparationProgress(null);
       setPreparationEtaSeconds(null);
     }
-  }, [installs, preparing, refresh, selection]);
+  }, [installs, preparing, refresh, selection, updateSettings]);
 
   const estimatedSetupSeconds = useMemo(
     () =>
@@ -440,11 +518,12 @@ export function useFreeOfflineMode(params: {
     estimatedSetupSeconds,
     preparationEtaSeconds,
     snapshot,
+    nativeSpeechCapabilities,
     selection,
     readiness,
     installs,
     benchmarks,
-    overrides,
+    overrides: settings.freeOfflineProfileOverrides,
     error,
     selectedLanguage,
     selectLanguage,
@@ -452,6 +531,11 @@ export function useFreeOfflineMode(params: {
     selectThoroughLlm,
     selectStt,
     selectTts,
+    nativeVoiceOptions,
+    selectedNativeVoice,
+    selectNativeVoice,
+    selectKokoroVoice,
+    start,
     prepare,
     refresh,
   };

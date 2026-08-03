@@ -20,6 +20,7 @@ import type { RuntimeAppProviderId } from "./constants/providers/runtimeManifest
 import type {
   LocalLlmModelId,
   LocalSttModelId,
+  LocalTtsCatalogModelId,
   LocalTtsModelId,
 } from "./constants/localModels";
 import type { SpeechLanguage, SttLanguage } from "./constants/speechLanguages";
@@ -57,6 +58,12 @@ export interface TtsFallbackPolicy {
 }
 export type KokoroLanguage = "en" | "zh";
 export type KokoroVoiceSelections = Record<KokoroLanguage, string>;
+export interface FreeOfflineProfileOverrides {
+  quickLlmModelId?: LocalLlmModelId;
+  thoroughLlmModelId?: LocalLlmModelId | null;
+  sttModelId?: LocalSttModelId | null;
+  ttsModelId?: LocalTtsCatalogModelId | null;
+}
 export type ProviderCapability = "llm" | "stt" | "tts" | "search" | "voices";
 export type AssistantResponseLength = "brief" | "normal" | "thorough";
 export type AssistantResponseTone =
@@ -166,13 +173,18 @@ export interface Settings {
   theme: ThemeMode;
   setupGuideDismissed: boolean;
   showSetupGuideShortcut: boolean;
+  freeOnboardingLanguageInitialized: boolean;
+  freeOfflineSetupCompleted: boolean;
+  freeOfflineProfileOverrides: FreeOfflineProfileOverrides;
   lastProvider: Provider;
   sttMode: SttBackendMode;
+  nativeSttRequiresOnDevice: boolean;
   sttLanguage: SttLanguage;
   sttProvider: Provider | null;
   localLanguages: SpeechLanguage[];
   localSttModelId: LocalSttModelId | null;
   ttsMode: TtsBackendMode;
+  nativeTtsVoiceId: string;
   ttsProvider: Provider | null;
   localTtsModelId: LocalTtsModelId | null;
   ttsListenLanguages: TtsListenLanguage[];
@@ -459,13 +471,18 @@ export const DEFAULT_SETTINGS: Settings = {
   theme: "system",
   setupGuideDismissed: false,
   showSetupGuideShortcut: true,
+  freeOnboardingLanguageInitialized: false,
+  freeOfflineSetupCompleted: false,
+  freeOfflineProfileOverrides: {},
   lastProvider: DEFAULT_RUNTIME_PROVIDER_ID,
   sttMode: "native",
+  nativeSttRequiresOnDevice: false,
   sttLanguage: "auto",
   sttProvider: null,
   localLanguages: getDefaultTtsListenLanguages("en"),
   localSttModelId: null,
   ttsMode: "native",
+  nativeTtsVoiceId: "",
   ttsProvider: null,
   localTtsModelId: null,
   ttsListenLanguages: getDefaultTtsListenLanguages("en"),

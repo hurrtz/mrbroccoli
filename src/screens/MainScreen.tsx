@@ -137,7 +137,10 @@ export function MainScreen() {
   });
 
   const recorder = useAudioRecorder();
-  const nativeStt = useNativeSpeechRecognizer(runtimeSettings.sttLanguage);
+  const nativeStt = useNativeSpeechRecognizer(
+    runtimeSettings.sttLanguage,
+    runtimeSettings.nativeSttRequiresOnDevice,
+  );
   const player = useAudioPlayer({
     beforePlayback: recorder.stopAmbientMonitoring,
   });
@@ -1030,10 +1033,6 @@ export function MainScreen() {
       }}
       freeOffline={{
         controller: freeOffline,
-        onOpenPremium: () => {
-          freeOffline.setModalVisible(false);
-          setPremiumModalVisible(true);
-        },
       }}
       premiumUpgrade={{
         visible: premiumModalVisible,

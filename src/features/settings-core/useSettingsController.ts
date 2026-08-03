@@ -24,10 +24,7 @@ import {
 } from "../../utils/providerCapabilities";
 import { getTtsFallbackRoutes } from "../../constants/ttsFallback";
 
-import {
-  SettingsModalProps,
-  TextInputFocusHandler,
-} from "./types";
+import { SettingsModalProps, TextInputFocusHandler } from "./types";
 import { useNativeVoiceOptions } from "./useNativeVoiceOptions";
 import { usePreviewTextState } from "./usePreviewTextState";
 import { useSettingsKeyboardInset } from "./useSettingsKeyboardInset";
@@ -42,11 +39,7 @@ export function useSettingsController({
   onStopPreviewVoice,
 }: Pick<
   SettingsModalProps,
-  | "visible"
-  | "settings"
-  | "onUpdate"
-  | "onPreviewVoice"
-  | "onStopPreviewVoice"
+  "visible" | "settings" | "onUpdate" | "onPreviewVoice" | "onStopPreviewVoice"
 >) {
   const { language } = useLocalization();
   const insets = useSafeAreaInsets();
@@ -64,7 +57,10 @@ export function useSettingsController({
     settings,
   });
 
-  const enabledProviders = useMemo(() => getEnabledProviders(settings), [settings]);
+  const enabledProviders = useMemo(
+    () => getEnabledProviders(settings),
+    [settings],
+  );
   const enabledSttProviders = useMemo(
     () => getEnabledSttProviders(settings),
     [settings],
@@ -77,15 +73,20 @@ export function useSettingsController({
     visible,
     bottomInset: insets.bottom,
   });
-  const {
-    nativeVoiceOptions,
-    selectedNativeVoice,
-    setSelectedNativeVoice,
-  } = useNativeVoiceOptions({
-    visible,
-    shouldLoad: visible,
-    listenLanguages: settings.ttsListenLanguages,
-  });
+  const { nativeVoiceOptions, selectedNativeVoice, setSelectedNativeVoice } =
+    useNativeVoiceOptions({
+      visible,
+      shouldLoad: visible,
+      listenLanguages: settings.ttsListenLanguages,
+      preferredVoiceId: settings.nativeTtsVoiceId,
+    });
+  const selectNativeVoice = React.useCallback(
+    (voiceId: string) => {
+      setSelectedNativeVoice(voiceId);
+      onUpdate({ nativeTtsVoiceId: voiceId });
+    },
+    [onUpdate, setSelectedNativeVoice],
+  );
 
   useSettingsNormalization({
     visible,
@@ -161,13 +162,11 @@ export function useSettingsController({
       ).includes("provider")
     ) || enabledTtsProviders.length === 0;
   const selectedSttProviderModelOptions =
-    settings.sttProvider &&
-    enabledSttProviders.includes(settings.sttProvider)
+    settings.sttProvider && enabledSttProviders.includes(settings.sttProvider)
       ? getProviderSttModelOptions(settings.sttProvider)
       : [];
   const selectedSttProviderModel =
-    settings.sttProvider &&
-    enabledSttProviders.includes(settings.sttProvider)
+    settings.sttProvider && enabledSttProviders.includes(settings.sttProvider)
       ? settings.providerSttModels[settings.sttProvider] ||
         selectedSttProviderModelOptions[0]?.id ||
         ""
@@ -199,19 +198,17 @@ export function useSettingsController({
   const selectedPreviewProviderModelOptions = selectedPreviewProvider
     ? getProviderTtsModelOptions(selectedPreviewProvider)
     : [];
-  const selectedPreviewProviderModel =
-    selectedPreviewProvider
-      ? settings.providerTtsModels[selectedPreviewProvider] ||
-        PROVIDER_DEFAULT_TTS_MODELS[selectedPreviewProvider] ||
-        selectedPreviewProviderModelOptions[0]?.id ||
-        ""
-      : "";
+  const selectedPreviewProviderModel = selectedPreviewProvider
+    ? settings.providerTtsModels[selectedPreviewProvider] ||
+      PROVIDER_DEFAULT_TTS_MODELS[selectedPreviewProvider] ||
+      selectedPreviewProviderModelOptions[0]?.id ||
+      ""
+    : "";
   const providerRouteActive =
     settings.ttsMode === "provider" ||
-    getTtsFallbackRoutes(
-      settings.ttsFallbackPolicy,
-      settings.ttsMode,
-    ).includes("provider");
+    getTtsFallbackRoutes(settings.ttsFallbackPolicy, settings.ttsMode).includes(
+      "provider",
+    );
   const ttsLanguageNote =
     settings.ttsMode === "native"
       ? getNativeTtsLanguageNote(language)
@@ -269,7 +266,7 @@ export function useSettingsController({
     selectedPreviewProviderModel,
     nativeVoiceOptions,
     selectedNativeVoice,
-    setSelectedNativeVoice,
+    setSelectedNativeVoice: selectNativeVoice,
     toggleListenLanguage,
   };
 }

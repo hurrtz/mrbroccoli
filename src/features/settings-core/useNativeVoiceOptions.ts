@@ -1,7 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
 
-import * as Speech from "expo-speech";
-
 import type { TtsListenLanguage } from "../../types";
 import { getSpeechLanguageDefinition } from "../../constants/speechLanguages";
 
@@ -12,8 +10,14 @@ export function useNativeVoiceOptions(params: {
   visible: boolean;
   shouldLoad: boolean;
   listenLanguages: TtsListenLanguage[];
+  preferredVoiceId?: string;
 }) {
-  const { visible, shouldLoad, listenLanguages } = params;
+  const {
+    visible,
+    shouldLoad,
+    listenLanguages,
+    preferredVoiceId = "",
+  } = params;
   const [nativeVoices, setNativeVoices] = useState<NativeSpeechVoice[]>([]);
   const [selectedNativeVoice, setSelectedNativeVoice] = useState("");
 
@@ -23,10 +27,12 @@ export function useNativeVoiceOptions(params: {
     }
 
     let cancelled = false;
-    const preferredLanguagePrefix =
-      getSpeechLanguageDefinition(listenLanguages[0] ?? "en")
-        .providerCode;
+    const preferredLanguagePrefix = getSpeechLanguageDefinition(
+      listenLanguages[0] ?? "en",
+    ).providerCode;
 
+    // eslint-disable-next-line @typescript-eslint/no-require-imports -- lazy native loading keeps MainScreen Jest imports safe
+    const Speech = require("expo-speech") as typeof import("expo-speech");
     void Speech.getAvailableVoicesAsync()
       .then((voices) => {
         if (cancelled) {
@@ -67,6 +73,12 @@ export function useNativeVoiceOptions(params: {
         setNativeVoices(sortedVoices);
         setSelectedNativeVoice((previous) => {
           if (
+            preferredVoiceId &&
+            sortedVoices.some((voice) => voice.identifier === preferredVoiceId)
+          ) {
+            return preferredVoiceId;
+          }
+          if (
             previous &&
             sortedVoices.some((voice) => voice.identifier === previous)
           ) {
@@ -88,7 +100,7 @@ export function useNativeVoiceOptions(params: {
     return () => {
       cancelled = true;
     };
-  }, [listenLanguages, shouldLoad, visible]);
+  }, [listenLanguages, preferredVoiceId, shouldLoad, visible]);
 
   const nativeVoiceOptions = useMemo(
     () =>

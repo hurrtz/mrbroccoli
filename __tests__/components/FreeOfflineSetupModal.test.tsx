@@ -54,6 +54,12 @@ function freeController(): FreeOfflineModeController {
     estimatedSetupSeconds: 120,
     preparationEtaSeconds: null,
     snapshot,
+    nativeSpeechCapabilities: {
+      recognitionAvailable: true,
+      onDeviceRecognitionAvailable: true,
+      targetLocaleInstalled: true,
+      nativeSttEligible: true,
+    },
     selection,
     readiness: { ready: true } as FreeOfflineModeController["readiness"],
     installs: {},
@@ -66,6 +72,13 @@ function freeController(): FreeOfflineModeController {
     selectThoroughLlm: jest.fn(),
     selectStt: jest.fn(),
     selectTts: jest.fn(),
+    nativeVoiceOptions: [
+      { value: "com.apple.voice", label: "Samantha · en-US" },
+    ],
+    selectedNativeVoice: "com.apple.voice",
+    selectNativeVoice: jest.fn(),
+    selectKokoroVoice: jest.fn(),
+    start: jest.fn(),
     prepare: jest.fn(async () => undefined),
     refresh: jest.fn(async () => null),
   };
@@ -75,10 +88,7 @@ describe("FreeOfflineSetupModal", () => {
   it("offers seven single-choice languages and ends with one clear start action", () => {
     const controller = freeController();
     const screen = renderWithProviders(
-      <FreeOfflineSetupModal
-        controller={controller}
-        onOpenPremium={jest.fn()}
-      />,
+      <FreeOfflineSetupModal controller={controller} />,
     );
 
     expect(screen.getByText("1 · Choose your speaking language")).toBeTruthy();
@@ -91,16 +101,14 @@ describe("FreeOfflineSetupModal", () => {
     expect(controller.selectLanguage).toHaveBeenCalledWith("it");
 
     fireEvent.press(screen.getByText("Start talking"));
-    expect(controller.setModalVisible).toHaveBeenCalledWith(false);
+    expect(controller.start).toHaveBeenCalledTimes(1);
+    expect(screen.queryByText("Unlock Premium")).toBeNull();
   });
 
   it("reveals device evidence and every compatible model choice on demand", () => {
     const controller = freeController();
     const screen = renderWithProviders(
-      <FreeOfflineSetupModal
-        controller={controller}
-        onOpenPremium={jest.fn()}
-      />,
+      <FreeOfflineSetupModal controller={controller} />,
     );
 
     fireEvent.press(screen.getByTestId("onboarding-advanced-toggle"));
@@ -110,12 +118,16 @@ describe("FreeOfflineSetupModal", () => {
     expect(screen.getByText("Thorough reasoning")).toBeTruthy();
     expect(screen.getByText("Omnilingual ASR 300M")).toBeTruthy();
     expect(screen.getByText("Piper · Kristin")).toBeTruthy();
+    expect(screen.getByTestId("onboarding-native-stt")).toBeTruthy();
+    expect(screen.getByTestId("onboarding-kokoro-voice")).toBeTruthy();
     expect(screen.getByText(/Larger models can respond/)).toBeTruthy();
 
-    fireEvent.press(screen.getByTestId("onboarding-model-omnilingual-asr-300m"));
-    expect(controller.selectStt).toHaveBeenCalledWith(
-      "omnilingual-asr-300m",
+    fireEvent.press(
+      screen.getByTestId("onboarding-model-omnilingual-asr-300m"),
     );
+    expect(controller.selectStt).toHaveBeenCalledWith("omnilingual-asr-300m");
+    fireEvent.press(screen.getByTestId("onboarding-native-stt"));
+    expect(controller.selectStt).toHaveBeenCalledWith(null);
   });
 
   it("shows a readable matching stage while the recommendation is evaluated", () => {
@@ -125,30 +137,19 @@ describe("FreeOfflineSetupModal", () => {
       evaluationStage: "models" as const,
     };
     const screen = renderWithProviders(
-      <FreeOfflineSetupModal
-        controller={controller}
-        onOpenPremium={jest.fn()}
-      />,
+      <FreeOfflineSetupModal controller={controller} />,
     );
 
     expect(screen.getByText("Matching the best local models…")).toBeTruthy();
   });
 
-  it("shows cumulative download progress instead of restarting for each model", () => {
+  it("shows per-step progress, remaining steps, and ETA", () => {
     const base = freeController();
     if (base.selection?.status !== "ready") {
       throw new Error("Expected a Free profile");
     }
     const models = getOfflineProfileModels(base.selection.profile);
     const current = models[1];
-    const totalBytes = models.reduce(
-      (total, model) => total + model.downloadBytes,
-      0,
-    );
-    const expectedPercent = Math.round(
-      ((models[0].downloadBytes + current.downloadBytes / 2) / totalBytes) *
-        100,
-    );
     const controller: FreeOfflineModeController = {
       ...base,
       freeRuntimeReady: false,
@@ -156,23 +157,27 @@ describe("FreeOfflineSetupModal", () => {
       preparationEtaSeconds: 90,
       preparationProgress: {
         modelId: current.id,
-        modelIndex: 1,
-        modelCount: models.length,
+        stepIndex: 1,
+        stepCount: models.length * 2,
+        stepsRemaining: models.length * 2 - 1,
         action: "downloading",
+        stepProgress: 0.5,
         download: { phase: "downloading", progress: 0.5 },
       },
       readiness: { ready: false } as FreeOfflineModeController["readiness"],
     };
     const screen = renderWithProviders(
-      <FreeOfflineSetupModal
-        controller={controller}
-        onOpenPremium={jest.fn()}
-      />,
+      <FreeOfflineSetupModal controller={controller} />,
     );
 
     expect(
       screen.getByTestId("onboarding-download-progress").props
         .accessibilityValue,
-    ).toEqual({ min: 0, max: 100, now: expectedPercent });
+    ).toEqual({ min: 0, max: 100, now: 50 });
+    expect(
+      screen.getByText(
+        `${models.length * 2 - 1} of ${models.length * 2} steps remaining`,
+      ),
+    ).toBeTruthy();
   });
 });

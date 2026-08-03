@@ -53,16 +53,17 @@ the complete Play Store translations are kept in a dedicated file under
   inspectable, copyable, and forgettable, so an automatic summary can be
   corrected before it shapes later turns.
 - Streamline first-run Free setup around one speaking language and an automatic
-  phone-to-model recommendation, with a deliberately readable evaluation,
-  model summary, green start action, download progress, and a live ETA. An
-  Advanced toggle exposes phone evidence, compatibility guidance, and every
-  viable local LLM, STT, and TTS choice.
+  storefront-aware phone-to-model recommendation, with a deliberately readable
+  evaluation, model summary, one green confirmation action, per-step download
+  progress, remaining-step count, and a live ETA. An Advanced toggle exposes
+  phone evidence, compatibility guidance, persistent Quick/Thorough model
+  choices, local or phone-native speech routes, and voice selection.
 - Build cross-session knowledge from user-authored messages only, while keeping
   assistant answers available through ordinary conversation search. This stops
   conclusions from earlier AI replies becoming unattributed recursive memory.
 - Present Free as a coherent Private Offline edition across Home, setup, and
-  Settings, with a three-step language/model/conversation flow and explicit
-  language-aware system-voice fallback for multilingual profiles.
+  Settings, with a three-step single-language model flow and explicit
+  language-aware phone speech options.
 - Group Settings by conversation, voice and models, and privacy and app tasks;
   replace the technical readiness dashboard with a clear edition summary and
   a direct setup action.
@@ -70,10 +71,9 @@ the complete Play Store translations are kept in a dedicated file under
   Uber, web, image, Drive, knowledge, and archive benefits, plus the one-time,
   no-subscription, no-token-markup purchase model and same-platform restore
   boundary.
-- Simplify Free Settings around three usable areas: on-device AI, data and
-  privacy, and app preferences. Remove locked Premium sections and irrelevant
-  provider controls from the Free flow, with one unobtrusive upgrade card at
-  the end.
+- Keep Free Settings focused on on-device AI, data and privacy, and app
+  preferences while exposing the same complete device evidence, model tests,
+  route choices, and voice controls as the onboarding wizard's Advanced view.
 - Hide the image attachment action from the Free home screen instead of
   showing a disabled Premium-only button beneath the main action.
 - Keep cloud providers, response-mode configuration, web search, images,

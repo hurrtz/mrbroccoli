@@ -81,6 +81,41 @@ describe("free offline profile selection", () => {
     expect(readyProfile("de").tts?.id).toBe("piper-de-de-thorsten");
   });
 
+  it("uses phone-native offline recognition only when the device reports it", () => {
+    const result = selectOfflineProfile({
+      languages: ["de"],
+      snapshot: device(),
+      nativeSttEligible: true,
+      overrides: { sttModelId: null },
+    });
+
+    expect(result.status).toBe("ready");
+    if (result.status === "ready") {
+      expect(result.profile.stt).toBeNull();
+      const effective = applyOfflineProfileToSettings(
+        DEFAULT_SETTINGS,
+        result.profile,
+      );
+      expect(effective.sttMode).toBe("native");
+      expect(effective.nativeSttRequiresOnDevice).toBe(true);
+      expect(effective.localSttModelId).toBeNull();
+    }
+  });
+
+  it("falls back to local recognition when phone-native offline recognition is unavailable", () => {
+    const result = selectOfflineProfile({
+      languages: ["de"],
+      snapshot: device(),
+      nativeSttEligible: false,
+      overrides: { sttModelId: null },
+    });
+
+    expect(result.status).toBe("ready");
+    if (result.status === "ready") {
+      expect(result.profile.stt?.id).toBe("whisper-tiny");
+    }
+  });
+
   it.each([
     ["it", "piper-it-it-paola"],
     ["ru", "piper-ru-ru-dmitri"],

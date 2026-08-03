@@ -8,6 +8,7 @@ import {
   type AssistantResponseLength,
   type AssistantResponseTone,
   type InputMode,
+  type FreeOfflineProfileOverrides,
   type Provider,
   type ReplyPlayback,
   type Settings,
@@ -29,6 +30,8 @@ import {
   getLocalModel,
   isLocalModelId,
   type LocalSttModelId,
+  type LocalLlmModelId,
+  type LocalTtsCatalogModelId,
   type LocalTtsModelId,
 } from "../../constants/localModels";
 
@@ -76,6 +79,46 @@ const RESPONSE_TONES = [
 ] as const satisfies readonly AssistantResponseTone[];
 function getStoredBoolean(value: unknown, fallback: boolean) {
   return typeof value === "boolean" ? value : fallback;
+}
+
+function getStoredFreeOfflineProfileOverrides(
+  value: unknown,
+): FreeOfflineProfileOverrides {
+  if (!value || typeof value !== "object" || Array.isArray(value)) {
+    return {};
+  }
+
+  const stored = value as Record<string, unknown>;
+  const result: FreeOfflineProfileOverrides = {};
+  const quick = stored.quickLlmModelId;
+  if (isLocalModelId(quick)) {
+    const model = getLocalModel(quick);
+    if (model.capability === "llm" && model.responseProfile === "quick") {
+      result.quickLlmModelId = quick as LocalLlmModelId;
+    }
+  }
+  const thorough = stored.thoroughLlmModelId;
+  if (thorough === null) {
+    result.thoroughLlmModelId = null;
+  } else if (isLocalModelId(thorough)) {
+    const model = getLocalModel(thorough);
+    if (model.capability === "llm" && model.responseProfile === "thorough") {
+      result.thoroughLlmModelId = thorough as LocalLlmModelId;
+    }
+  }
+  const stt = stored.sttModelId;
+  if (stt === null) {
+    result.sttModelId = null;
+  } else if (isLocalModelId(stt) && getLocalModel(stt).capability === "stt") {
+    result.sttModelId = stt as LocalSttModelId;
+  }
+  const tts = stored.ttsModelId;
+  if (tts === null) {
+    result.ttsModelId = null;
+  } else if (isLocalModelId(tts) && getLocalModel(tts).capability === "tts") {
+    result.ttsModelId = tts as LocalTtsCatalogModelId;
+  }
+  return result;
 }
 
 function getStoredPositiveInteger(value: unknown, fallback: number) {
@@ -153,6 +196,11 @@ export function normalizeStoredScalarSettings(
   | "localSttModelId"
   | "localTtsModelId"
   | "setupGuideDismissed"
+  | "freeOnboardingLanguageInitialized"
+  | "freeOfflineSetupCompleted"
+  | "freeOfflineProfileOverrides"
+  | "nativeSttRequiresOnDevice"
+  | "nativeTtsVoiceId"
   | "showSetupGuideShortcut"
   | "showUsageStats"
   | "showDebugLogButton"
@@ -264,6 +312,25 @@ export function normalizeStoredScalarSettings(
       storedSettings?.setupGuideDismissed,
       hasConfiguredKeys,
     ),
+    freeOnboardingLanguageInitialized: getStoredBoolean(
+      storedSettings?.freeOnboardingLanguageInitialized,
+      DEFAULT_SETTINGS.freeOnboardingLanguageInitialized,
+    ),
+    freeOfflineSetupCompleted: getStoredBoolean(
+      storedSettings?.freeOfflineSetupCompleted,
+      DEFAULT_SETTINGS.freeOfflineSetupCompleted,
+    ),
+    freeOfflineProfileOverrides: getStoredFreeOfflineProfileOverrides(
+      storedSettings?.freeOfflineProfileOverrides,
+    ),
+    nativeSttRequiresOnDevice: getStoredBoolean(
+      storedSettings?.nativeSttRequiresOnDevice,
+      DEFAULT_SETTINGS.nativeSttRequiresOnDevice,
+    ),
+    nativeTtsVoiceId:
+      typeof storedSettings?.nativeTtsVoiceId === "string"
+        ? storedSettings.nativeTtsVoiceId
+        : DEFAULT_SETTINGS.nativeTtsVoiceId,
     showSetupGuideShortcut: getStoredBoolean(
       storedSettings?.showSetupGuideShortcut,
       DEFAULT_SETTINGS.showSetupGuideShortcut,

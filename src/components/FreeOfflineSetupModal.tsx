@@ -23,10 +23,8 @@ import { FreeOfflineAdvancedOptions } from "./FreeOfflineAdvancedOptions";
 
 export function FreeOfflineSetupModal({
   controller,
-  onOpenPremium,
 }: {
   controller: FreeOfflineModeController;
-  onOpenPremium: () => void;
 }) {
   const { colors } = useTheme();
   const { language, t } = useLocalization();
@@ -45,8 +43,8 @@ export function FreeOfflineSetupModal({
       : null;
     return t("freeOfflinePreparing", {
       model: model?.name ?? preparationProgress.modelId,
-      index: preparationProgress.modelIndex + 1,
-      count: preparationProgress.modelCount,
+      index: preparationProgress.stepIndex + 1,
+      count: preparationProgress.stepCount,
     });
   }, [preparationProgress, profile, t]);
 
@@ -75,43 +73,17 @@ export function FreeOfflineSetupModal({
   const progressText = preparationProgress
     ? t("freeOfflinePreparing", {
         model: progressModel?.name ?? preparationProgress.modelId,
-        index: preparationProgress.modelIndex + 1,
-        count: preparationProgress.modelCount,
+        index: preparationProgress.stepIndex + 1,
+        count: preparationProgress.stepCount,
       })
     : null;
-  const missingProfileModels = profile
-    ? getOfflineProfileModels(profile).filter(
-        (model) => !controller.installs[model.id]?.verified,
-      )
-    : [];
-  const currentDownloadIndex = preparationProgress
-    ? missingProfileModels.findIndex(
-        (model) => model.id === preparationProgress.modelId,
-      )
-    : -1;
-  const downloadTotalBytes = missingProfileModels.reduce(
-    (total, model) => total + model.downloadBytes,
-    0,
-  );
-  const downloadedBeforeCurrent = missingProfileModels
-    .slice(0, Math.max(0, currentDownloadIndex))
-    .reduce((total, model) => total + model.downloadBytes, 0);
-  const currentDownloadProgress = preparationProgress?.download
-    ? preparationProgress.download.phase === "downloading"
-      ? preparationProgress.download.progress
-      : 1
-    : null;
+  const currentDownloadProgress =
+    preparationProgress?.action === "downloading"
+      ? preparationProgress.stepProgress
+      : null;
   const downloadPercent =
-    currentDownloadProgress !== null &&
-    currentDownloadIndex >= 0 &&
-    downloadTotalBytes > 0
-      ? Math.round(
-          ((downloadedBeforeCurrent +
-            missingProfileModels[currentDownloadIndex].downloadBytes *
-              currentDownloadProgress) /
-            downloadTotalBytes) *
-            100,
-        )
+    currentDownloadProgress !== null
+      ? Math.round(currentDownloadProgress * 100)
       : null;
   const etaSeconds = controller.preparing
     ? controller.preparationEtaSeconds
@@ -126,11 +98,6 @@ export function FreeOfflineSetupModal({
       maskClosable={!controller.preparing}
       title={t("freeOfflineTitle")}
       footer={[
-        {
-          text: t("upgradeToPremium"),
-          disabled: controller.preparing,
-          onPress: onOpenPremium,
-        },
         ...(profile && !ready
           ? [
               {
@@ -148,7 +115,7 @@ export function FreeOfflineSetupModal({
                 text: t("freeOfflineStart"),
                 tone: "success" as const,
                 disabled: controller.preparing,
-                onPress: () => controller.setModalVisible(false),
+                onPress: controller.start,
               },
             ]
           : !profile
@@ -226,7 +193,7 @@ export function FreeOfflineSetupModal({
                 {t("freeOfflineProfile")}
               </Text>
               <Text style={[styles.body, { color: colors.textSecondary }]}>
-                {profile.stt.name} · {profile.llm.name}
+                {profile.stt?.name ?? t("appNative")} · {profile.llm.name}
                 {profile.thoroughLlm
                   ? ` + ${profile.thoroughLlm.name}`
                   : ""} · {profile.tts?.name ?? t("systemVoice")}
@@ -260,7 +227,8 @@ export function FreeOfflineSetupModal({
             style={[styles.status, { color: colors.textSecondary }]}
           >
             {t(
-              controller.evaluationStage === "models"
+              controller.evaluationStage === "models" ||
+                controller.evaluationStage === "plan"
                 ? "onboardingMatchingModels"
                 : "onDeviceTestingDevice",
             )}
@@ -316,6 +284,12 @@ export function FreeOfflineSetupModal({
                 ) : null}
               </>
             ) : null}
+            <Text style={[styles.hint, { color: colors.textSecondary }]}>
+              {t("onboardingStepsRemaining", {
+                remaining: preparationProgress?.stepsRemaining ?? 0,
+                count: preparationProgress?.stepCount ?? 0,
+              })}
+            </Text>
           </View>
         ) : null}
         {controller.error ? (
