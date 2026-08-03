@@ -18,6 +18,8 @@ import { getOfflineProfileModels } from "../services/offlineProfile";
 import { useTheme } from "../theme/ThemeContext";
 import { fonts } from "../theme/typography";
 import { formatBytes } from "../utils/formatBytes";
+import { formatVoiceEtaDuration } from "../utils/voiceEta";
+import { FreeOfflineAdvancedOptions } from "./FreeOfflineAdvancedOptions";
 
 export function FreeOfflineSetupModal({
   controller,
@@ -77,6 +79,45 @@ export function FreeOfflineSetupModal({
         count: preparationProgress.modelCount,
       })
     : null;
+  const missingProfileModels = profile
+    ? getOfflineProfileModels(profile).filter(
+        (model) => !controller.installs[model.id]?.verified,
+      )
+    : [];
+  const currentDownloadIndex = preparationProgress
+    ? missingProfileModels.findIndex(
+        (model) => model.id === preparationProgress.modelId,
+      )
+    : -1;
+  const downloadTotalBytes = missingProfileModels.reduce(
+    (total, model) => total + model.downloadBytes,
+    0,
+  );
+  const downloadedBeforeCurrent = missingProfileModels
+    .slice(0, Math.max(0, currentDownloadIndex))
+    .reduce((total, model) => total + model.downloadBytes, 0);
+  const currentDownloadProgress = preparationProgress?.download
+    ? preparationProgress.download.phase === "downloading"
+      ? preparationProgress.download.progress
+      : 1
+    : null;
+  const downloadPercent =
+    currentDownloadProgress !== null &&
+    currentDownloadIndex >= 0 &&
+    downloadTotalBytes > 0
+      ? Math.round(
+          ((downloadedBeforeCurrent +
+            missingProfileModels[currentDownloadIndex].downloadBytes *
+              currentDownloadProgress) /
+            downloadTotalBytes) *
+            100,
+        )
+      : null;
+  const etaSeconds = controller.preparing
+    ? controller.preparationEtaSeconds
+    : controller.estimatedSetupSeconds;
+  const etaLabel =
+    etaSeconds === null ? null : formatVoiceEtaDuration(etaSeconds);
 
   return (
     <Modal
@@ -94,17 +135,31 @@ export function FreeOfflineSetupModal({
           ? [
               {
                 text: t("freeOfflineDownloadAndTest"),
+                tone: "success" as const,
                 loading: controller.preparing,
                 disabled: controller.checking || controller.preparing,
                 onPress: () => void controller.prepare(),
               },
             ]
           : []),
-        {
-          text: ready ? t("freeOfflineStart") : t("done"),
-          disabled: controller.preparing,
-          onPress: () => controller.setModalVisible(false),
-        },
+        ...(ready
+          ? [
+              {
+                text: t("freeOfflineStart"),
+                tone: "success" as const,
+                disabled: controller.preparing,
+                onPress: () => controller.setModalVisible(false),
+              },
+            ]
+          : !profile
+            ? [
+                {
+                  text: t("done"),
+                  disabled: controller.preparing,
+                  onPress: () => controller.setModalVisible(false),
+                },
+              ]
+            : []),
       ]}
     >
       <ScrollView
@@ -186,7 +241,16 @@ export function FreeOfflineSetupModal({
                   size: formatBytes(profile.downloadBytes),
                 })}
               </Text>
+              {etaLabel ? (
+                <Text style={[styles.hint, { color: colors.textMuted }]}>
+                  {t("onboardingEstimatedTime", { eta: etaLabel })}
+                </Text>
+              ) : null}
             </View>
+            <FreeOfflineAdvancedOptions
+              controller={controller}
+              profile={profile}
+            />
           </View>
         ) : null}
 
@@ -195,7 +259,11 @@ export function FreeOfflineSetupModal({
             accessibilityLiveRegion="polite"
             style={[styles.status, { color: colors.textSecondary }]}
           >
-            {t("onDeviceTestingDevice")}
+            {t(
+              controller.evaluationStage === "models"
+                ? "onboardingMatchingModels"
+                : "onDeviceTestingDevice",
+            )}
           </Text>
         ) : unavailableText ? (
           <Text
@@ -206,12 +274,49 @@ export function FreeOfflineSetupModal({
           </Text>
         ) : null}
         {progressText ? (
-          <Text
-            accessibilityLiveRegion="polite"
-            style={[styles.status, { color: colors.accent }]}
-          >
-            {progressText}
-          </Text>
+          <View style={styles.progressSection}>
+            <Text
+              accessibilityLiveRegion="polite"
+              style={[styles.status, { color: colors.accent }]}
+            >
+              {progressText}
+            </Text>
+            {downloadPercent !== null ? (
+              <>
+                <View
+                  testID="onboarding-download-progress"
+                  accessibilityRole="progressbar"
+                  accessibilityValue={{
+                    min: 0,
+                    max: 100,
+                    now: downloadPercent,
+                  }}
+                  style={[
+                    styles.progressTrack,
+                    { backgroundColor: colors.border },
+                  ]}
+                >
+                  <View
+                    style={[
+                      styles.progressFill,
+                      {
+                        backgroundColor: colors.success,
+                        width: `${downloadPercent}%`,
+                      },
+                    ]}
+                  />
+                </View>
+                {etaLabel ? (
+                  <Text style={[styles.hint, { color: colors.textSecondary }]}>
+                    {t("onboardingProgress", {
+                      percent: downloadPercent,
+                      eta: etaLabel,
+                    })}
+                  </Text>
+                ) : null}
+              </>
+            ) : null}
+          </View>
         ) : null}
         {controller.error ? (
           <Text
@@ -267,6 +372,9 @@ const styles = StyleSheet.create({
   },
   languageText: { fontFamily: fonts.body, fontSize: 14 },
   pressed: { opacity: 0.72 },
+  progressFill: { borderRadius: 4, height: 8 },
+  progressSection: { gap: 6 },
+  progressTrack: { borderRadius: 4, height: 8, overflow: "hidden" },
   profile: {
     borderRadius: 12,
     borderWidth: StyleSheet.hairlineWidth,

@@ -4,6 +4,7 @@ import { conversationKnowledgeTranslations } from "../conversationKnowledgeTrans
 import { conversationIntegrityTranslations } from "../conversationIntegrityTranslations";
 import { imagePromptTranslations } from "../imagePromptTranslations";
 import { onDeviceTranslations } from "../onDeviceTranslations";
+import { onboardingTranslations } from "../onboardingTranslations";
 import { premiumTranslations } from "../premiumTranslations";
 
 export const ja = {
@@ -12,6 +13,7 @@ export const ja = {
   ...conversationIntegrityTranslations.ja,
   ...imagePromptTranslations.ja,
   ...onDeviceTranslations.ja,
+  ...onboardingTranslations.ja,
   ...premiumTranslations.ja,
   appName: "ミスター・ブロッコリー",
   retry: "再試行",

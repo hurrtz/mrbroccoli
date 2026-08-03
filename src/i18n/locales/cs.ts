@@ -4,6 +4,7 @@ import { conversationKnowledgeTranslations } from "../conversationKnowledgeTrans
 import { conversationIntegrityTranslations } from "../conversationIntegrityTranslations";
 import { imagePromptTranslations } from "../imagePromptTranslations";
 import { onDeviceTranslations } from "../onDeviceTranslations";
+import { onboardingTranslations } from "../onboardingTranslations";
 import { premiumTranslations } from "../premiumTranslations";
 
 export const cs = {
@@ -12,6 +13,7 @@ export const cs = {
   ...conversationIntegrityTranslations.cs,
   ...imagePromptTranslations.cs,
   ...onDeviceTranslations.cs,
+  ...onboardingTranslations.cs,
   ...premiumTranslations.cs,
   appName: "Pan Brokolice",
   retry: "Zkuste to znovu",

@@ -1,10 +1,7 @@
 import React from "react";
 import { fireEvent, render } from "@testing-library/react-native";
 
-import {
-  Button,
-  Modal,
-} from "../../src/design-system/NativeControls";
+import { Button, Modal } from "../../src/design-system/NativeControls";
 import { ThemeProvider } from "../../src/theme/ThemeContext";
 
 function renderControl(element: React.ReactElement) {
@@ -45,6 +42,24 @@ describe("NativeControls", () => {
     expect(screen.getByRole("header").props.children).toBe("Details");
     fireEvent.press(screen.getByText("Done"));
     expect(onDone).toHaveBeenCalledTimes(1);
+  });
+
+  it("renders an inviting success action without changing its semantics", () => {
+    const screen = renderControl(
+      <Modal
+        visible
+        footer={[{ text: "Start", tone: "success", onPress: jest.fn() }]}
+      >
+        Ready
+      </Modal>,
+    );
+
+    const action = screen.getByRole("button", { name: "Start" });
+    expect(action.props.style).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ backgroundColor: "#059669" }),
+      ]),
+    );
   });
 
   it("disables a loading dialog action while showing progress", () => {

@@ -4,6 +4,7 @@ import { conversationKnowledgeTranslations } from "../conversationKnowledgeTrans
 import { conversationIntegrityTranslations } from "../conversationIntegrityTranslations";
 import { imagePromptTranslations } from "../imagePromptTranslations";
 import { onDeviceTranslations } from "../onDeviceTranslations";
+import { onboardingTranslations } from "../onboardingTranslations";
 import { premiumTranslations } from "../premiumTranslations";
 
 export const uk = {
@@ -12,6 +13,7 @@ export const uk = {
   ...conversationIntegrityTranslations.uk,
   ...imagePromptTranslations.uk,
   ...onDeviceTranslations.uk,
+  ...onboardingTranslations.uk,
   ...premiumTranslations.uk,
   appName: "Пан Броколі",
   retry: "Повторити",

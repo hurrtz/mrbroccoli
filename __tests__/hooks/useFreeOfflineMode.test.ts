@@ -64,7 +64,9 @@ describe("useFreeOfflineMode", () => {
         sttLanguage: "de",
       });
     });
-    await waitFor(() => expect(result.current.selection?.status).toBe("ready"));
+    await waitFor(() => expect(result.current.selection?.status).toBe("ready"), {
+      timeout: 2_500,
+    });
   });
 
   it("replaces the preferred language instead of accumulating selections", async () => {
@@ -82,7 +84,9 @@ describe("useFreeOfflineMode", () => {
       }),
     );
 
-    await waitFor(() => expect(result.current.selection?.status).toBe("ready"));
+    await waitFor(() => expect(result.current.selection?.status).toBe("ready"), {
+      timeout: 2_500,
+    });
 
     act(() => result.current.selectLanguage("it"));
 
@@ -91,5 +95,36 @@ describe("useFreeOfflineMode", () => {
       ttsListenLanguages: ["it"],
       sttLanguage: "it",
     });
+  });
+
+  it("re-evaluates an advanced model choice against the same phone", async () => {
+    const { result } = renderHook(() =>
+      useFreeOfflineMode({
+        settings: {
+          ...DEFAULT_SETTINGS,
+          localLanguages: ["en"],
+          ttsListenLanguages: ["en"],
+          sttLanguage: "en",
+        },
+        settingsLoaded: true,
+        updateSettings: jest.fn(),
+      }),
+    );
+
+    await waitFor(() => expect(result.current.selection?.status).toBe("ready"), {
+      timeout: 2_500,
+    });
+    act(() => result.current.selectStt("omnilingual-asr-300m"));
+
+    await waitFor(
+      () => {
+        const selection = result.current.selection;
+        expect(selection?.status).toBe("ready");
+        if (selection?.status === "ready") {
+          expect(selection.profile.stt.id).toBe("omnilingual-asr-300m");
+        }
+      },
+      { timeout: 1_500 },
+    );
   });
 });

@@ -4,6 +4,7 @@ import { conversationKnowledgeTranslations } from "../conversationKnowledgeTrans
 import { conversationIntegrityTranslations } from "../conversationIntegrityTranslations";
 import { imagePromptTranslations } from "../imagePromptTranslations";
 import { onDeviceTranslations } from "../onDeviceTranslations";
+import { onboardingTranslations } from "../onboardingTranslations";
 import { premiumTranslations } from "../premiumTranslations";
 
 export const es = {
@@ -12,6 +13,7 @@ export const es = {
   ...conversationIntegrityTranslations.es,
   ...imagePromptTranslations.es,
   ...onDeviceTranslations.es,
+  ...onboardingTranslations.es,
   ...premiumTranslations.es,
   appName: "Sr. Brócoli",
   retry: "Reintentar",

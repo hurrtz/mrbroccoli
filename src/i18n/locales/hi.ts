@@ -4,6 +4,7 @@ import { conversationKnowledgeTranslations } from "../conversationKnowledgeTrans
 import { conversationIntegrityTranslations } from "../conversationIntegrityTranslations";
 import { imagePromptTranslations } from "../imagePromptTranslations";
 import { onDeviceTranslations } from "../onDeviceTranslations";
+import { onboardingTranslations } from "../onboardingTranslations";
 import { premiumTranslations } from "../premiumTranslations";
 
 export const hi = {
@@ -12,6 +13,7 @@ export const hi = {
   ...conversationIntegrityTranslations.hi,
   ...imagePromptTranslations.hi,
   ...onDeviceTranslations.hi,
+  ...onboardingTranslations.hi,
   ...premiumTranslations.hi,
   appName: "मिस्टर ब्रोकली",
   retry: "पुन: प्रयास करें",

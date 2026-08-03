@@ -4,6 +4,7 @@ import { conversationKnowledgeTranslations } from "../conversationKnowledgeTrans
 import { conversationIntegrityTranslations } from "../conversationIntegrityTranslations";
 import { imagePromptTranslations } from "../imagePromptTranslations";
 import { onDeviceTranslations } from "../onDeviceTranslations";
+import { onboardingTranslations } from "../onboardingTranslations";
 import { premiumTranslations } from "../premiumTranslations";
 
 export const ptBR = {
@@ -12,6 +13,7 @@ export const ptBR = {
   ...conversationIntegrityTranslations.ptBR,
   ...imagePromptTranslations.ptBR,
   ...onDeviceTranslations.ptBR,
+  ...onboardingTranslations.ptBR,
   ...premiumTranslations.ptBR,
   appName: "Sr. Brócolis",
   retry: "Tentar novamente",

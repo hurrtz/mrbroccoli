@@ -29,6 +29,11 @@ the complete Play Store translations are kept in a dedicated file under
 
 ### Changed
 
+- Streamline first-run Free setup around one speaking language and an automatic
+  phone-to-model recommendation, with a deliberately readable evaluation,
+  model summary, green start action, download progress, and a live ETA. An
+  Advanced toggle exposes phone evidence, compatibility guidance, and every
+  viable local LLM, STT, and TTS choice.
 - Build cross-session knowledge from user-authored messages only, while keeping
   assistant answers available through ordinary conversation search. This stops
   conclusions from earlier AI replies becoming unattributed recursive memory.

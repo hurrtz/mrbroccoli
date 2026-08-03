@@ -4,6 +4,7 @@ import { conversationKnowledgeTranslations } from "../conversationKnowledgeTrans
 import { conversationIntegrityTranslations } from "../conversationIntegrityTranslations";
 import { imagePromptTranslations } from "../imagePromptTranslations";
 import { onDeviceTranslations } from "../onDeviceTranslations";
+import { onboardingTranslations } from "../onboardingTranslations";
 import { premiumTranslations } from "../premiumTranslations";
 
 export const zhCN = {
@@ -12,6 +13,7 @@ export const zhCN = {
   ...conversationIntegrityTranslations.zhCN,
   ...imagePromptTranslations.zhCN,
   ...onDeviceTranslations["zh-CN"],
+  ...onboardingTranslations["zh-CN"],
   ...premiumTranslations["zh-CN"],
   appName: "西兰花先生",
   retry: "重试",

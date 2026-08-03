@@ -4,6 +4,7 @@ import { conversationKnowledgeTranslations } from "../conversationKnowledgeTrans
 import { conversationIntegrityTranslations } from "../conversationIntegrityTranslations";
 import { imagePromptTranslations } from "../imagePromptTranslations";
 import { onDeviceTranslations } from "../onDeviceTranslations";
+import { onboardingTranslations } from "../onboardingTranslations";
 import { premiumTranslations } from "../premiumTranslations";
 
 export const it = {
@@ -12,6 +13,7 @@ export const it = {
   ...conversationIntegrityTranslations.it,
   ...imagePromptTranslations.it,
   ...onDeviceTranslations.it,
+  ...onboardingTranslations.it,
   ...premiumTranslations.it,
   appName: "Sig. Broccoli",
   retry: "Riprova",

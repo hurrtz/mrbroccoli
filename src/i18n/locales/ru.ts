@@ -4,6 +4,7 @@ import { conversationKnowledgeTranslations } from "../conversationKnowledgeTrans
 import { conversationIntegrityTranslations } from "../conversationIntegrityTranslations";
 import { imagePromptTranslations } from "../imagePromptTranslations";
 import { onDeviceTranslations } from "../onDeviceTranslations";
+import { onboardingTranslations } from "../onboardingTranslations";
 import { premiumTranslations } from "../premiumTranslations";
 
 export const ru = {
@@ -12,6 +13,7 @@ export const ru = {
   ...conversationIntegrityTranslations.ru,
   ...imagePromptTranslations.ru,
   ...onDeviceTranslations.ru,
+  ...onboardingTranslations.ru,
   ...premiumTranslations.ru,
   appName: "Мистер Брокколи",
   retry: "Повторить попытку",

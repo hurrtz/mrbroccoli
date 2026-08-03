@@ -4,6 +4,7 @@ import { conversationKnowledgeTranslations } from "../conversationKnowledgeTrans
 import { conversationIntegrityTranslations } from "../conversationIntegrityTranslations";
 import { imagePromptTranslations } from "../imagePromptTranslations";
 import { onDeviceTranslations } from "../onDeviceTranslations";
+import { onboardingTranslations } from "../onboardingTranslations";
 import { premiumTranslations } from "../premiumTranslations";
 
 export const ur = {
@@ -12,6 +13,7 @@ export const ur = {
   ...conversationIntegrityTranslations.ur,
   ...imagePromptTranslations.ur,
   ...onDeviceTranslations.ur,
+  ...onboardingTranslations.ur,
   ...premiumTranslations.ur,
   appName: "مسٹر بروکلی",
   retry: "دوبارہ کوشش کریں۔",

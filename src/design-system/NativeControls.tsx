@@ -45,8 +45,7 @@ export function Button({
       : type === "warning"
         ? colors.danger
         : "transparent";
-  const borderColor =
-    type === "ghost" ? colors.border : backgroundColor;
+  const borderColor = type === "ghost" ? colors.border : backgroundColor;
 
   return (
     <Pressable
@@ -63,7 +62,7 @@ export function Button({
         size === "small" ? controlStyles.smallButton : null,
         { backgroundColor, borderColor },
         style,
-        pressed && !unavailable ? activeStyle ?? controlStyles.pressed : null,
+        pressed && !unavailable ? (activeStyle ?? controlStyles.pressed) : null,
         unavailable ? controlStyles.disabled : null,
       ]}
     >
@@ -106,7 +105,8 @@ function NativeInput({
   ...textInputProps
 }: InputProps) {
   const { colors } = useTheme();
-  const clearIcon = typeof allowClear === "object" ? allowClear.clearIcon : null;
+  const clearIcon =
+    typeof allowClear === "object" ? allowClear.clearIcon : null;
   const showClear = Boolean(allowClear && value);
 
   return (
@@ -272,6 +272,7 @@ export interface DialogAction {
   onPress: () => void;
   style?: StyleProp<TextStyle>;
   text: string;
+  tone?: "default" | "success";
 }
 
 interface DialogProps {
@@ -311,7 +312,10 @@ export function Modal({
     >
       <View
         accessibilityViewIsModal
-        style={[controlStyles.dialogOverlay, { backgroundColor: colors.overlay }]}
+        style={[
+          controlStyles.dialogOverlay,
+          { backgroundColor: colors.overlay },
+        ]}
       >
         {maskClosable ? (
           <Pressable
@@ -361,6 +365,9 @@ export function Modal({
                   onPress={action.onPress}
                   style={({ pressed }) => [
                     controlStyles.dialogAction,
+                    action.tone === "success"
+                      ? { backgroundColor: colors.success }
+                      : null,
                     pressed && !action.disabled && !action.loading
                       ? controlStyles.pressed
                       : null,
@@ -379,7 +386,12 @@ export function Modal({
                   <Text
                     style={[
                       controlStyles.dialogActionText,
-                      { color: colors.accent },
+                      {
+                        color:
+                          action.tone === "success"
+                            ? colors.onActiveControl
+                            : colors.accent,
+                      },
                       styles?.buttonText,
                       action.style,
                     ]}

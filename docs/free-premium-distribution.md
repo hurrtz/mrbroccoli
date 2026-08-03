@@ -9,8 +9,8 @@ purchase; it does not maintain separate Free and Premium builds.
 | ---------------------------------------------------------- | ----------------------------------------------------------- | -------------------------------------------------------- |
 | Account                                                    | None                                                        | None required                                            |
 | Conversations and session manager                          | Local                                                       | Local, with all advanced controls                        |
-| Listening, reasoning, and speech                           | One automatically selected on-device profile                | All local routes and configured providers                |
-| Model setup                                                | Language choice, device check, one download-and-test action | Full catalogue, providers, models, voices, and fallbacks |
+| Listening, reasoning, and speech                           | One automatically selected on-device profile, with Quick and Thorough reasoning where viable | All local routes and configured providers                |
+| Model setup                                                | One speaking language, automatic recommendation, optional advanced choices, and one download-and-test action | Full catalogue, providers, models, voices, and fallbacks |
 | Provider keys                                              | Never used by the effective Free runtime                    | BYOK through the existing secure-store flow              |
 | Web search, images, Drive, and Uber Mode                    | Unavailable                                                 | Available                                                |
 | Past-session knowledge and portable archive sync           | Unavailable                                                 | Available                                                |
@@ -22,20 +22,31 @@ network-capable features without changing the user's stored settings.
 
 ## Free eligibility and preparation
 
-The user selects every language they intend to use. The app then:
+The user selects exactly one preferred speaking language: English, Spanish,
+French, German, Portuguese, Russian, or Italian. Portuguese follows the phone's
+Brazilian or European locale. The app then:
 
 1. Probes platform, architecture, physical memory, free storage, low-power
    state, memory pressure, and thermal state.
-2. Finds one LLM, STT model, and TTS model that all support every selected
-   language and meet the device's hard requirements.
+2. Finds a Quick LLM, an optional Thorough LLM, one STT model, and one TTS
+   route that support the selected language and meet the device's hard
+   requirements.
 3. Prefers a viable, already installed combination before requesting another
    download. Known current-device benchmark failures rank behind alternatives.
-4. Shows the exact recommended models and combined download size.
+4. Keeps the recommendation visible long enough to be understood, then shows
+   the exact models, combined download size, and estimated setup time.
 5. Downloads only after consent, verifies the pinned model artifacts, and runs
-   a per-model benchmark on the current device.
-6. Enables conversation input only after all three installed models have a
+   a per-model benchmark on the current device while showing progress and a
+   live ETA.
+6. Enables conversation input only after all selected installed models have a
    viable benchmark for the current platform, architecture, OS version, and
    physical-memory profile.
+
+An Advanced toggle exposes the measured phone specification, current-device
+benchmark status or conservative likelihood for every language-compatible
+catalogue option, download size, license, known memory and heat caution, and
+manual model choices. Hard-incompatible choices remain disabled, and any
+selected model still has to pass the real device benchmark.
 
 The download itself requires internet access to the pinned model hosts. After
 installation, the effective Free runtime has a local LLM route, local STT,
@@ -44,10 +55,12 @@ no image route, no past-session retrieval, and no portable archive sync.
 Stored Premium configuration is overlaid rather than deleted, so upgrading or
 restoring Premium immediately brings it back.
 
-Current complete TTS profiles cover English, Simplified Chinese, German,
-Spanish, French, and Brazilian Portuguese. The multilingual LLM and Whisper
-support more languages, but Free correctly remains unavailable until one local
-TTS route covers the user's entire selected language set.
+Current Free profiles cover English, Spanish, French, German, Brazilian and
+European Portuguese, Russian, and Italian. Where a compact pinned Piper voice
+is not selected, the language-aware system voice remains the local TTS route.
+Omnilingual ASR is available as a broader alternative to Whisper in Advanced
+options. A sufficiently capable phone receives separate Quick and Thorough
+home routes; constrained phones keep only the viable Quick route.
 
 ## Premium product
 

@@ -1,9 +1,12 @@
 import {
   getLocalModelsForLanguages,
   type LocalLlmModelDefinition,
+  type LocalLlmModelId,
   type LocalModelDefinition,
   type LocalModelId,
   type LocalSttModelDefinition,
+  type LocalSttModelId,
+  type LocalTtsCatalogModelId,
   type LocalTtsModelDefinition,
 } from "../constants/localModels";
 import type { SpeechLanguage } from "../constants/speechLanguages";
@@ -29,6 +32,13 @@ export interface OfflineProfile {
   installedBytes: number;
   minimumFreeStorageBytes: number;
   retryLater: boolean;
+}
+
+export interface OfflineProfileOverrides {
+  quickLlmModelId?: LocalLlmModelId;
+  thoroughLlmModelId?: LocalLlmModelId | null;
+  sttModelId?: LocalSttModelId;
+  ttsModelId?: LocalTtsCatalogModelId | null;
 }
 
 export function getOfflineProfileModels(profile: OfflineProfile) {
@@ -140,6 +150,7 @@ export function selectOfflineProfile(params: {
   snapshot: LocalDeviceSnapshot;
   installedModelIds?: ReadonlySet<LocalModelId>;
   benchmarks?: Partial<Record<LocalModelId, LocalModelBenchmarkResult>>;
+  overrides?: OfflineProfileOverrides;
 }): OfflineProfileSelection {
   const languages = Array.from(new Set(params.languages));
   if (languages.length === 0) {
@@ -189,27 +200,48 @@ export function selectOfflineProfile(params: {
     installedModelIds: params.installedModelIds,
     benchmarks: params.benchmarks,
   };
-  const llm = sortCandidates({
+  const sortedQuickLlms = sortCandidates({
     ...candidateOptions,
     models: viableQuickLlms,
-  })[0];
-  const thoroughCandidate = viableThoroughLlms.length
+  });
+  const llm =
+    sortedQuickLlms.find(
+      (model) => model.id === params.overrides?.quickLlmModelId,
+    ) ?? sortedQuickLlms[0];
+  const sortedThoroughLlms = viableThoroughLlms.length
     ? sortCandidates({
         ...candidateOptions,
         models: viableThoroughLlms,
-      })[0]
-    : null;
-  const stt = sortCandidates({
+      })
+    : [];
+  const thoroughCandidate =
+    params.overrides?.thoroughLlmModelId === null
+      ? null
+      : (sortedThoroughLlms.find(
+          (model) => model.id === params.overrides?.thoroughLlmModelId,
+        ) ??
+        sortedThoroughLlms[0] ??
+        null);
+  const sortedStt = sortCandidates({
     ...candidateOptions,
     models: viableStt,
-  })[0];
-  const tts = viableTts.length
+  });
+  const stt =
+    sortedStt.find((model) => model.id === params.overrides?.sttModelId) ??
+    sortedStt[0];
+  const sortedTts = viableTts.length
     ? sortCandidates({
         ...candidateOptions,
         models: viableTts,
         tieBreaker: (model) => ttsPreference(model),
-      })[0]
-    : null;
+      })
+    : [];
+  const tts =
+    params.overrides?.ttsModelId === null
+      ? null
+      : (sortedTts.find((model) => model.id === params.overrides?.ttsModelId) ??
+        sortedTts[0] ??
+        null);
   const baseModels: LocalModelDefinition[] = [llm, stt, ...(tts ? [tts] : [])];
   const footprint = (models: LocalModelDefinition[]) => {
     const missingModels = models.filter(

@@ -261,6 +261,25 @@ describe("free offline profile selection", () => {
     ).toHaveLength(1);
   });
 
+  it("applies compatible advanced speech and reasoning choices", () => {
+    const selection = selectOfflineProfile({
+      languages: ["en"],
+      snapshot: device(),
+      overrides: {
+        thoroughLlmModelId: null,
+        sttModelId: "omnilingual-asr-300m",
+        ttsModelId: "piper-en-us-kristin",
+      },
+    });
+    if (selection.status !== "ready") {
+      throw new Error("Expected an advanced profile");
+    }
+
+    expect(selection.profile.thoroughLlm).toBeNull();
+    expect(selection.profile.stt.id).toBe("omnilingual-asr-300m");
+    expect(selection.profile.tts?.id).toBe("piper-en-us-kristin");
+  });
+
   it("routes a bilingual Free profile through language-aware system speech", () => {
     const selection = selectOfflineProfile({
       languages: ["en", "de"],

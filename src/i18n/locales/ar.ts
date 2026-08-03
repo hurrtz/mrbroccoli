@@ -4,6 +4,7 @@ import { conversationKnowledgeTranslations } from "../conversationKnowledgeTrans
 import { conversationIntegrityTranslations } from "../conversationIntegrityTranslations";
 import { imagePromptTranslations } from "../imagePromptTranslations";
 import { onDeviceTranslations } from "../onDeviceTranslations";
+import { onboardingTranslations } from "../onboardingTranslations";
 import { premiumTranslations } from "../premiumTranslations";
 
 export const ar = {
@@ -12,6 +13,7 @@ export const ar = {
   ...conversationIntegrityTranslations.ar,
   ...imagePromptTranslations.ar,
   ...onDeviceTranslations.ar,
+  ...onboardingTranslations.ar,
   ...premiumTranslations.ar,
   appName: "السيد بروكلي",
   retry: "أعد المحاولة",

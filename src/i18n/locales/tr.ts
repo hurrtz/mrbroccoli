@@ -4,6 +4,7 @@ import { conversationKnowledgeTranslations } from "../conversationKnowledgeTrans
 import { conversationIntegrityTranslations } from "../conversationIntegrityTranslations";
 import { imagePromptTranslations } from "../imagePromptTranslations";
 import { onDeviceTranslations } from "../onDeviceTranslations";
+import { onboardingTranslations } from "../onboardingTranslations";
 import { premiumTranslations } from "../premiumTranslations";
 
 export const tr = {
@@ -12,6 +13,7 @@ export const tr = {
   ...conversationIntegrityTranslations.tr,
   ...imagePromptTranslations.tr,
   ...onDeviceTranslations.tr,
+  ...onboardingTranslations.tr,
   ...premiumTranslations.tr,
   appName: "Bay Brokoli",
   retry: "Yeniden dene",

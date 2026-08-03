@@ -4,6 +4,7 @@ import { conversationKnowledgeTranslations } from "../conversationKnowledgeTrans
 import { conversationIntegrityTranslations } from "../conversationIntegrityTranslations";
 import { imagePromptTranslations } from "../imagePromptTranslations";
 import { onDeviceTranslations } from "../onDeviceTranslations";
+import { onboardingTranslations } from "../onboardingTranslations";
 import { premiumTranslations } from "../premiumTranslations";
 
 export const pl = {
@@ -12,6 +13,7 @@ export const pl = {
   ...conversationIntegrityTranslations.pl,
   ...imagePromptTranslations.pl,
   ...onDeviceTranslations.pl,
+  ...onboardingTranslations.pl,
   ...premiumTranslations.pl,
   appName: "Pan Brokuł",
   retry: "Spróbuj ponownie",
