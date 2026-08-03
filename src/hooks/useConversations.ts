@@ -77,6 +77,7 @@ export function useConversations({
     toggleConversationPrivate,
     undoConversationIntegrityRepair,
     updateMessage,
+    updateConversationMemory,
     updateConversationContextSummary,
     updateConversationSettings,
   } = useConversationMutations({
@@ -142,6 +143,7 @@ export function useConversations({
     getConversationById,
     addMessage,
     updateMessage,
+    updateConversationMemory,
     updateConversationContextSummary,
     updateConversationSettings,
     clearConversationMemory,

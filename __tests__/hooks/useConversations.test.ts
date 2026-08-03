@@ -747,6 +747,30 @@ describe("useConversations", () => {
     );
   });
 
+  it("lets the user correct saved compact memory without changing its scope", async () => {
+    const { result } = renderHook(() => useConversations());
+
+    await act(async () => {
+      result.current.createConversation("Memory editing");
+      result.current.updateConversationContextSummary("Original summary", 4);
+    });
+    const conversationId = result.current.activeConversation?.id ?? "";
+
+    await act(async () => {
+      await result.current.updateConversationMemory(
+        conversationId,
+        "Corrected summary",
+      );
+    });
+
+    expect(result.current.activeConversation).toEqual(
+      expect.objectContaining({
+        contextSummary: "Corrected summary",
+        summarizedMessageCount: 4,
+      }),
+    );
+  });
+
   it("stores summary usage events alongside conversation memory", async () => {
     const { result } = renderHook(() => useConversations());
 

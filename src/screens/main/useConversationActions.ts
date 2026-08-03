@@ -27,6 +27,7 @@ interface UseConversationActionsParams {
   toggleConversationPinned: ConversationsApi["toggleConversationPinned"];
   toggleConversationPrivate: ConversationsApi["toggleConversationPrivate"];
   clearConversationMemory: ConversationsApi["clearConversationMemory"];
+  updateConversationMemory: ConversationsApi["updateConversationMemory"];
   deleteConversation: ConversationsApi["deleteConversation"];
   selectConversation: ConversationsApi["selectConversation"];
   clearActiveConversation: ConversationsApi["clearActiveConversation"];
@@ -46,6 +47,7 @@ export function useConversationActions({
   toggleConversationPinned,
   toggleConversationPrivate,
   clearConversationMemory,
+  updateConversationMemory,
   deleteConversation,
   selectConversation,
   clearActiveConversation,
@@ -254,6 +256,33 @@ export function useConversationActions({
     showToast(t("memoryCleared"), undefined, "success");
   }, [clearConversationMemory, memoryConversation, setMemoryConversation, showToast, t]);
 
+  const handleSaveMemory = useCallback(
+    async (summary: string) => {
+      if (!memoryConversation) {
+        return false;
+      }
+
+      const updatedConversation = await updateConversationMemory(
+        memoryConversation.id,
+        summary,
+      );
+      if (!updatedConversation) {
+        return false;
+      }
+
+      setMemoryConversation(updatedConversation);
+      showToast(t("memorySaved"), undefined, "success");
+      return true;
+    },
+    [
+      memoryConversation,
+      setMemoryConversation,
+      showToast,
+      t,
+      updateConversationMemory,
+    ],
+  );
+
   return {
     copyText,
     handleCopyMessage,
@@ -269,5 +298,6 @@ export function useConversationActions({
     openMemory,
     handleCopyMemory,
     handleClearMemory,
+    handleSaveMemory,
   };
 }

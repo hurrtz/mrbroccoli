@@ -85,6 +85,7 @@ export function MainScreen() {
     inspectConversationIntegrity,
     addMessage,
     updateMessage,
+    updateConversationMemory,
     updateConversationContextSummary,
     updateConversationSettings,
     clearConversationMemory,
@@ -519,6 +520,7 @@ export function MainScreen() {
     openMemory,
     handleCopyMemory,
     handleClearMemory,
+    handleSaveMemory,
   } = useConversationActions({
     activeConversation,
     memoryConversation,
@@ -527,6 +529,7 @@ export function MainScreen() {
     toggleConversationPinned,
     toggleConversationPrivate,
     clearConversationMemory,
+    updateConversationMemory,
     deleteConversation,
     selectConversation,
     clearActiveConversation,
@@ -999,6 +1002,7 @@ export function MainScreen() {
         summarizedMessageCount: memoryConversation?.summarizedMessageCount,
         onCopy: handleCopyMemoryPress,
         onClear: handleClearMemoryPress,
+        onSave: handleSaveMemory,
         onClose: closeMemory,
       }}
       conversationDrawer={{

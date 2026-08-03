@@ -3,6 +3,7 @@ import { dataBackupTranslations } from "../dataBackupTranslations";
 import { conversationKnowledgeTranslations } from "../conversationKnowledgeTranslations";
 import { conversationIntegrityTranslations } from "../conversationIntegrityTranslations";
 import { imagePromptTranslations } from "../imagePromptTranslations";
+import { memoryEditTranslations } from "../memoryEditTranslations";
 import { onDeviceTranslations } from "../onDeviceTranslations";
 import { onboardingTranslations } from "../onboardingTranslations";
 import { premiumTranslations } from "../premiumTranslations";
@@ -13,6 +14,7 @@ export const hi = {
   ...conversationKnowledgeTranslations.hi,
   ...conversationIntegrityTranslations.hi,
   ...imagePromptTranslations.hi,
+  ...memoryEditTranslations.hi,
   ...onDeviceTranslations.hi,
   ...onboardingTranslations.hi,
   ...premiumTranslations.hi,

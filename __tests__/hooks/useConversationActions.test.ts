@@ -39,6 +39,7 @@ describe("useConversationActions", () => {
         toggleConversationPinned: jest.fn(),
         toggleConversationPrivate: jest.fn(),
         clearConversationMemory: jest.fn(),
+        updateConversationMemory: jest.fn(),
         deleteConversation: jest.fn(),
         selectConversation: jest.fn(),
         clearActiveConversation,
@@ -78,6 +79,7 @@ describe("useConversationActions", () => {
         toggleConversationPinned: jest.fn(),
         toggleConversationPrivate: jest.fn(),
         clearConversationMemory: jest.fn(),
+        updateConversationMemory: jest.fn(),
         deleteConversation: jest.fn(),
         selectConversation,
         clearActiveConversation: jest.fn(),
@@ -122,6 +124,7 @@ describe("useConversationActions", () => {
         toggleConversationPinned: jest.fn(),
         toggleConversationPrivate: jest.fn(),
         clearConversationMemory: jest.fn(),
+        updateConversationMemory: jest.fn(),
         deleteConversation,
         selectConversation: jest.fn(),
         clearActiveConversation: jest.fn(),
@@ -177,6 +180,7 @@ describe("useConversationActions", () => {
         toggleConversationPinned: jest.fn(),
         toggleConversationPrivate: jest.fn(),
         clearConversationMemory: jest.fn(),
+        updateConversationMemory: jest.fn(),
         deleteConversation: jest.fn(),
         selectConversation: jest.fn(),
         clearActiveConversation: jest.fn(),
@@ -234,6 +238,7 @@ describe("useConversationActions", () => {
         toggleConversationPinned: jest.fn(),
         toggleConversationPrivate: jest.fn(),
         clearConversationMemory: jest.fn(),
+        updateConversationMemory: jest.fn(),
         deleteConversation: jest.fn(),
         selectConversation: jest.fn(),
         clearActiveConversation: jest.fn(),
@@ -288,6 +293,7 @@ describe("useConversationActions", () => {
         toggleConversationPinned: jest.fn(),
         toggleConversationPrivate: jest.fn(),
         clearConversationMemory,
+        updateConversationMemory: jest.fn(),
         deleteConversation: jest.fn(),
         selectConversation: jest.fn(),
         clearActiveConversation: jest.fn(),
@@ -311,6 +317,63 @@ describe("useConversationActions", () => {
     expect(setMemoryConversation).toHaveBeenCalledWith(clearedConversation);
     expect(showToast).toHaveBeenCalledWith(
       "memory cleared",
+      undefined,
+      "success",
+    );
+  });
+
+  it("updates the inspected memory after a user correction", async () => {
+    const setMemoryConversation = jest.fn();
+    const showToast = jest.fn();
+    const memoryConversation = {
+      id: "conversation-1",
+      title: "Trip planning",
+      createdAt: "2026-03-22T10:00:00.000Z",
+      updatedAt: "2026-03-22T10:00:00.000Z",
+      messages: [],
+      contextSummary: "Old summary",
+      summarizedMessageCount: 3,
+    };
+    const updatedConversation = {
+      ...memoryConversation,
+      contextSummary: "Corrected summary",
+    };
+    const updateConversationMemory = jest.fn(
+      async () => updatedConversation,
+    );
+    const { result } = renderHook(() =>
+      useConversationActions({
+        activeConversation: null,
+        memoryConversation,
+        getConversationById: jest.fn(),
+        renameConversation: jest.fn(),
+        toggleConversationPinned: jest.fn(),
+        toggleConversationPrivate: jest.fn(),
+        clearConversationMemory: jest.fn(),
+        updateConversationMemory,
+        deleteConversation: jest.fn(),
+        selectConversation: jest.fn(),
+        clearActiveConversation: jest.fn(),
+        resetVoiceSessionState: jest.fn(),
+        openMemoryConversation: jest.fn(),
+        setMemoryConversation,
+        showToast,
+        language: "en",
+        t: (key) => ({ memorySaved: "memory saved" })[key] ?? key,
+      }),
+    );
+
+    await act(async () => {
+      await result.current.handleSaveMemory("Corrected summary");
+    });
+
+    expect(updateConversationMemory).toHaveBeenCalledWith(
+      "conversation-1",
+      "Corrected summary",
+    );
+    expect(setMemoryConversation).toHaveBeenCalledWith(updatedConversation);
+    expect(showToast).toHaveBeenCalledWith(
+      "memory saved",
       undefined,
       "success",
     );

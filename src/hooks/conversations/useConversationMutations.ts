@@ -651,6 +651,33 @@ export function useConversationMutations(params: {
     [activeConversationRef, getConversationById, setActiveConversationValue],
   );
 
+  const updateConversationMemory = useCallback(
+    async (id: string, summary: string) => {
+      const currentConversation =
+        activeConversationRef.current?.id === id
+          ? activeConversationRef.current
+          : await getConversationById(id);
+      const normalizedSummary = summary.trim();
+
+      if (!currentConversation || !normalizedSummary) {
+        return null;
+      }
+
+      const updatedConversation: Conversation = {
+        ...currentConversation,
+        contextSummary: normalizedSummary,
+      };
+
+      await saveConversation(updatedConversation);
+      if (activeConversationRef.current?.id === id) {
+        setActiveConversationValue(updatedConversation);
+      }
+
+      return updatedConversation;
+    },
+    [activeConversationRef, getConversationById, setActiveConversationValue],
+  );
+
   const deleteConversation = useCallback(
     (id: string) => {
       const activeConversation =
@@ -925,6 +952,7 @@ export function useConversationMutations(params: {
     toggleConversationPrivate,
     undoConversationIntegrityRepair,
     updateMessage,
+    updateConversationMemory,
     updateConversationContextSummary,
     updateConversationSettings,
   };

@@ -32,6 +32,9 @@ the complete Play Store translations are kept in a dedicated file under
 
 ### Changed
 
+- Make each conversation's compact memory directly editable as well as
+  inspectable, copyable, and forgettable, so an automatic summary can be
+  corrected before it shapes later turns.
 - Streamline first-run Free setup around one speaking language and an automatic
   phone-to-model recommendation, with a deliberately readable evaluation,
   model summary, green start action, download progress, and a live ETA. An
