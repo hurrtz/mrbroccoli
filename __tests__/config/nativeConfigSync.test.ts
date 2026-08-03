@@ -60,4 +60,43 @@ describe("native app configuration", () => {
       `Would bump ${currentVersion} -> ${targetVersion}, Android versionCode ${androidVersionCode} -> ${androidVersionCode + 1}, and iOS build ${iosBuildNumber} -> ${iosBuildNumber + 1}.`,
     );
   });
+
+  it("increments store build counters without changing the version", () => {
+    const appConfig = require("../../app.json");
+    const currentVersion = appConfig.expo.version as string;
+    const androidBuild = readFileSync(
+      resolve(process.cwd(), "android/app/build.gradle"),
+      "utf8",
+    );
+    const iosInfo = readFileSync(
+      resolve(process.cwd(), "ios/MrBroccoli/Info.plist"),
+      "utf8",
+    );
+    const androidVersionCode = Number(
+      androidBuild.match(/^\s*versionCode\s+(\d+)\s*$/m)?.[1],
+    );
+    const iosBuildNumber = Number(
+      iosInfo.match(
+        /<key>CFBundleVersion<\/key>\s*<string>(\d+)<\/string>/,
+      )?.[1],
+    );
+    const result = spawnSync(
+      process.execPath,
+      [
+        resolve(process.cwd(), "scripts/bump-version.mjs"),
+        "--dry-run",
+        "--build-only",
+      ],
+      {
+        cwd: process.cwd(),
+        encoding: "utf8",
+      },
+    );
+
+    expect(result.status).toBe(0);
+    expect(result.stderr).toBe("");
+    expect(result.stdout).toContain(
+      `Would bump Android versionCode ${androidVersionCode} -> ${androidVersionCode + 1} and iOS build ${iosBuildNumber} -> ${iosBuildNumber + 1}; version remains ${currentVersion}.`,
+    );
+  });
 });

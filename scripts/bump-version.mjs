@@ -21,21 +21,31 @@ function abort(message) {
 
 function parseArguments(args) {
   const dryRun = args.includes("--dry-run");
+  const buildOnly = args.includes("--build-only");
   const unknownOptions = args.filter(
-    (argument) => argument.startsWith("--") && argument !== "--dry-run",
+    (argument) =>
+      argument.startsWith("--") &&
+      argument !== "--build-only" &&
+      argument !== "--dry-run",
   );
   const versions = args.filter((argument) => !argument.startsWith("--"));
 
   if (unknownOptions.length > 0) {
     abort(`unknown option ${unknownOptions[0]}`);
   }
-  if (versions.length !== 1 || !versionPattern.test(versions[0])) {
+  if (buildOnly && versions.length > 0) {
+    abort("--build-only does not accept a version");
+  }
+  if (
+    !buildOnly &&
+    (versions.length !== 1 || !versionPattern.test(versions[0]))
+  ) {
     abort(
       "provide exactly one numeric version, for example: npm run version:bump -- 2.4.3",
     );
   }
 
-  return { dryRun, targetVersion: versions[0] };
+  return { buildOnly, dryRun, targetVersion: versions[0] ?? null };
 }
 
 function compareVersions(left, right) {
@@ -69,7 +79,9 @@ function verifyNativeConfig() {
   ).status === 0;
 }
 
-const { dryRun, targetVersion } = parseArguments(process.argv.slice(2));
+const { buildOnly, dryRun, targetVersion } = parseArguments(
+  process.argv.slice(2),
+);
 const original = Object.fromEntries(
   Object.entries(paths).map(([key, path]) => [
     key,
@@ -102,7 +114,7 @@ const iosProjectVersionMatches = [
 if (!versionPattern.test(currentVersion ?? "")) {
   abort(`app.json has an invalid Expo version: ${JSON.stringify(currentVersion)}`);
 }
-if (compareVersions(targetVersion, currentVersion) <= 0) {
+if (!buildOnly && compareVersions(targetVersion, currentVersion) <= 0) {
   abort(
     `target version ${targetVersion} must be greater than current version ${currentVersion}`,
   );
@@ -134,10 +146,11 @@ if (
   );
 }
 const nextIosBuildNumber = iosBuildNumber + 1;
-appConfig.expo.version = targetVersion;
-packageJson.version = targetVersion;
-packageLock.version = targetVersion;
-packageLock.packages[""].version = targetVersion;
+const resolvedTargetVersion = buildOnly ? currentVersion : targetVersion;
+appConfig.expo.version = resolvedTargetVersion;
+packageJson.version = resolvedTargetVersion;
+packageLock.version = resolvedTargetVersion;
+packageLock.packages[""].version = resolvedTargetVersion;
 
 const updated = {
   appConfig: `${JSON.stringify(appConfig, null, 2)}\n`,
@@ -152,7 +165,7 @@ const updated = {
       `$1${nextAndroidVersionCode}$2`,
     ),
     /^(\s*versionName\s+)"[^"]+"(\s*)$/gm,
-    `$1"${targetVersion}"$2`,
+    `$1"${resolvedTargetVersion}"$2`,
   ),
   iosInfo: replaceExactlyOnce(
     "iOS CFBundleVersion",
@@ -160,7 +173,7 @@ const updated = {
       "iOS CFBundleShortVersionString",
       original.iosInfo,
       /(<key>CFBundleShortVersionString<\/key>\s*<string>)[^<]+(<\/string>)/g,
-      `$1${targetVersion}$2`,
+      `$1${resolvedTargetVersion}$2`,
     ),
     /(<key>CFBundleVersion<\/key>\s*<string>)\d+(<\/string>)/g,
     `$1${nextIosBuildNumber}$2`,
@@ -168,7 +181,7 @@ const updated = {
   iosProject: original.iosProject
     .replace(
       /MARKETING_VERSION = [^;]+;/g,
-      `MARKETING_VERSION = ${targetVersion};`,
+      `MARKETING_VERSION = ${resolvedTargetVersion};`,
     )
     .replace(
       /CURRENT_PROJECT_VERSION = \d+;/g,
@@ -178,22 +191,30 @@ const updated = {
 
 if (dryRun) {
   console.log(
-    `Would bump ${currentVersion} -> ${targetVersion}, Android versionCode ${androidVersionCode} -> ${nextAndroidVersionCode}, and iOS build ${iosBuildNumber} -> ${nextIosBuildNumber}.`,
+    buildOnly
+      ? `Would bump Android versionCode ${androidVersionCode} -> ${nextAndroidVersionCode} and iOS build ${iosBuildNumber} -> ${nextIosBuildNumber}; version remains ${currentVersion}.`
+      : `Would bump ${currentVersion} -> ${targetVersion}, Android versionCode ${androidVersionCode} -> ${nextAndroidVersionCode}, and iOS build ${iosBuildNumber} -> ${nextIosBuildNumber}.`,
   );
   process.exit(0);
 }
 
 for (const [key, path] of Object.entries(paths)) {
-  writeFileSync(resolve(root, path), updated[key]);
+  if (updated[key] !== original[key]) {
+    writeFileSync(resolve(root, path), updated[key]);
+  }
 }
 
 if (!verifyNativeConfig()) {
   for (const [key, path] of Object.entries(paths)) {
-    writeFileSync(resolve(root, path), original[key]);
+    if (updated[key] !== original[key]) {
+      writeFileSync(resolve(root, path), original[key]);
+    }
   }
   abort("post-bump verification failed; restored the previous version files");
 }
 
 console.log(
-  `Bumped ${currentVersion} -> ${targetVersion}, Android versionCode ${androidVersionCode} -> ${nextAndroidVersionCode}, and iOS build ${iosBuildNumber} -> ${nextIosBuildNumber}.`,
+  buildOnly
+    ? `Bumped Android versionCode ${androidVersionCode} -> ${nextAndroidVersionCode} and iOS build ${iosBuildNumber} -> ${nextIosBuildNumber}; version remains ${currentVersion}.`
+    : `Bumped ${currentVersion} -> ${targetVersion}, Android versionCode ${androidVersionCode} -> ${nextAndroidVersionCode}, and iOS build ${iosBuildNumber} -> ${nextIosBuildNumber}.`,
 );
