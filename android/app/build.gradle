@@ -103,7 +103,7 @@ android {
         applicationId 'com.tobiaswinkler.app.mrbroccoli'
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 20
+        versionCode 21
         versionName "2.8.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
