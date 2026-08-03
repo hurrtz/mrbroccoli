@@ -27,6 +27,11 @@ import {
   isOwnedPremiumPurchase,
   loadCachedPremiumEntitlement,
 } from "../services/premiumEntitlement";
+import {
+  loadDevelopmentEntitlementMode,
+  saveDevelopmentEntitlementMode,
+  type DevelopmentEntitlementMode,
+} from "../services/developmentEntitlement";
 
 export type PremiumEntitlementStatus = "loading" | "free" | "premium";
 export type PremiumStoreError =
@@ -45,6 +50,10 @@ interface PremiumEntitlementContextValue {
   displayPrice: string | null;
   busy: boolean;
   error: PremiumStoreError;
+  developmentEntitlementMode: DevelopmentEntitlementMode | null;
+  setDevelopmentEntitlementMode: (
+    mode: DevelopmentEntitlementMode,
+  ) => Promise<void>;
   purchasePremium: () => Promise<void>;
   restorePremium: () => Promise<void>;
   refreshPremium: () => Promise<void>;
@@ -99,6 +108,8 @@ export function PremiumEntitlementProvider({
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<PremiumStoreError>(null);
   const [cacheLoaded, setCacheLoaded] = useState(false);
+  const [developmentEntitlementMode, setDevelopmentEntitlementModeState] =
+    useState<DevelopmentEntitlementMode | null>(null);
   const reconciliationStartedRef = useRef(false);
   const reconciliationInFlightRef = useRef(false);
 
@@ -110,6 +121,9 @@ export function PremiumEntitlementProvider({
 
   const handlePurchaseSuccess = useCallback(
     (purchase: Purchase) => {
+      if (developmentEntitlementMode) {
+        return;
+      }
       if (purchase.productId !== PREMIUM_PRODUCT_ID) {
         return;
       }
@@ -136,16 +150,22 @@ export function PremiumEntitlementProvider({
         })
         .finally(() => setBusy(false));
     },
-    [grantPremium],
+    [developmentEntitlementMode, grantPremium],
   );
 
   const { connected, reconnect, requestPurchase } = useIAP({
     onPurchaseSuccess: handlePurchaseSuccess,
     onPurchaseError: (purchaseError) => {
+      if (developmentEntitlementMode) {
+        return;
+      }
       setError(purchaseErrorKind(purchaseError));
       setBusy(false);
     },
     onError: () => {
+      if (developmentEntitlementMode) {
+        return;
+      }
       setError("store-unavailable");
       setBusy(false);
     },
@@ -154,22 +174,32 @@ export function PremiumEntitlementProvider({
   useEffect(() => {
     let active = true;
 
-    void loadCachedPremiumEntitlement()
-      .then((cached) => {
+    void (async () => {
+      try {
+        const developmentMode = await loadDevelopmentEntitlementMode();
+        if (!active) {
+          return;
+        }
+        if (developmentMode) {
+          setDevelopmentEntitlementModeState(developmentMode);
+          setStatus(developmentMode);
+          return;
+        }
+
+        const cached = await loadCachedPremiumEntitlement();
         if (active) {
           setStatus(cached ? "premium" : "free");
         }
-      })
-      .catch(() => {
+      } catch {
         if (active) {
           setStatus("free");
         }
-      })
-      .finally(() => {
+      } finally {
         if (active) {
           setCacheLoaded(true);
         }
-      });
+      }
+    })();
 
     return () => {
       active = false;
@@ -178,6 +208,9 @@ export function PremiumEntitlementProvider({
 
   const reconcileWithStore = useCallback(
     async (restore: boolean) => {
+      if (developmentEntitlementMode) {
+        return;
+      }
       if (reconciliationInFlightRef.current) {
         return;
       }
@@ -218,10 +251,13 @@ export function PremiumEntitlementProvider({
         setBusy(false);
       }
     },
-    [connected, grantPremium, reconnect],
+    [connected, developmentEntitlementMode, grantPremium, reconnect],
   );
 
   const loadProduct = useCallback(async () => {
+    if (developmentEntitlementMode) {
+      return null;
+    }
     setStoreProductLoading(true);
     try {
       if (!connected) {
@@ -252,18 +288,32 @@ export function PremiumEntitlementProvider({
     } finally {
       setStoreProductLoading(false);
     }
-  }, [connected, reconnect]);
+  }, [connected, developmentEntitlementMode, reconnect]);
 
   useEffect(() => {
-    if (!connected || !cacheLoaded || reconciliationStartedRef.current) {
+    if (
+      developmentEntitlementMode ||
+      !connected ||
+      !cacheLoaded ||
+      reconciliationStartedRef.current
+    ) {
       return;
     }
     reconciliationStartedRef.current = true;
     void loadProduct();
     void reconcileWithStore(false);
-  }, [cacheLoaded, connected, loadProduct, reconcileWithStore]);
+  }, [
+    cacheLoaded,
+    connected,
+    developmentEntitlementMode,
+    loadProduct,
+    reconcileWithStore,
+  ]);
 
   useEffect(() => {
+    if (developmentEntitlementMode || !cacheLoaded) {
+      return;
+    }
     let previousState: AppStateStatus = AppState.currentState;
     const subscription = AppState.addEventListener("change", (nextState) => {
       const returningToForeground =
@@ -278,9 +328,30 @@ export function PremiumEntitlementProvider({
       }
     });
     return () => subscription.remove();
-  }, [cacheLoaded, reconcileWithStore]);
+  }, [cacheLoaded, developmentEntitlementMode, reconcileWithStore]);
+
+  const setDevelopmentEntitlementMode = useCallback(
+    async (mode: DevelopmentEntitlementMode) => {
+      if (!developmentEntitlementMode) {
+        return;
+      }
+      if (!(await saveDevelopmentEntitlementMode(mode))) {
+        return;
+      }
+      setDevelopmentEntitlementModeState(mode);
+      setStatus(mode);
+      setStoreProduct(null);
+      setError(null);
+      setBusy(false);
+    },
+    [developmentEntitlementMode],
+  );
 
   const purchasePremium = useCallback(async () => {
+    if (developmentEntitlementMode) {
+      setError("store-unavailable");
+      return;
+    }
     if (!storeProduct) {
       setError("store-unavailable");
       return;
@@ -311,7 +382,13 @@ export function PremiumEntitlementProvider({
       setError("purchase-failed");
       setBusy(false);
     }
-  }, [connected, reconnect, requestPurchase, storeProduct]);
+  }, [
+    connected,
+    developmentEntitlementMode,
+    reconnect,
+    requestPurchase,
+    storeProduct,
+  ]);
 
   const restorePremium = useCallback(
     () => reconcileWithStore(true),
@@ -326,12 +403,14 @@ export function PremiumEntitlementProvider({
     () => ({
       status,
       isPremium: status === "premium",
-      storeConnected: connected,
+      storeConnected: developmentEntitlementMode === null && connected,
       storeProduct,
       storeProductLoading,
       displayPrice: storeProduct?.displayPrice ?? null,
       busy,
       error,
+      developmentEntitlementMode,
+      setDevelopmentEntitlementMode,
       purchasePremium,
       restorePremium,
       refreshPremium,
@@ -340,10 +419,12 @@ export function PremiumEntitlementProvider({
     [
       busy,
       connected,
+      developmentEntitlementMode,
       error,
       purchasePremium,
       refreshPremium,
       restorePremium,
+      setDevelopmentEntitlementMode,
       status,
       storeProduct,
       storeProductLoading,

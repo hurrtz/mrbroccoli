@@ -23,6 +23,11 @@ class MrBroccoliDiagnosticsModule(
   override fun getName(): String = NAME
 
   @ReactMethod
+  fun getApplicationId(promise: Promise) {
+    promise.resolve(reactApplicationContext.packageName)
+  }
+
+  @ReactMethod
   fun consumePostmortemRecords(promise: Promise) {
     val records = Arguments.createArray()
     if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {

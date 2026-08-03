@@ -13,6 +13,9 @@ const en = {
   premiumRestoreHint:
     "A permanent purchase is restored through the same App Store or Play Store account on this platform. No Mr Broccoli account is required.",
   premiumUnlocked: "Premium is unlocked",
+  developmentEntitlement: "Development entitlement",
+  developmentEntitlementHint:
+    "Only available in .dev builds. Changes apply immediately and do not affect store purchases.",
   premiumErrorUnavailable:
     "The store is unavailable right now. Try again later.",
   premiumErrorFailed: "The purchase could not be completed.",
@@ -55,6 +58,9 @@ const rawPremiumTranslations = {
     premiumRestoreHint:
       "Ein dauerhafter Kauf wird über dasselbe App-Store- oder Play-Store-Konto auf dieser Plattform wiederhergestellt. Ein Mr Broccoli Konto ist nicht erforderlich.",
     premiumUnlocked: "Premium ist freigeschaltet",
+    developmentEntitlement: "Entwicklungsberechtigung",
+    developmentEntitlementHint:
+      "Nur in .dev-Builds verfügbar. Änderungen gelten sofort und wirken sich nicht auf Store-Käufe aus.",
     premiumErrorUnavailable:
       "Der Store ist gerade nicht verfügbar. Versuche es später erneut.",
     premiumErrorFailed: "Der Kauf konnte nicht abgeschlossen werden.",
@@ -91,6 +97,9 @@ const rawPremiumTranslations = {
     premiumRestoreHint:
       "Постійна покупка відновлюється через той самий обліковий запис App Store або Play Store на цій платформі. Обліковий запис Mr Broccoli не потрібен.",
     premiumUnlocked: "Premium розблоковано",
+    developmentEntitlement: "Право доступу для розробки",
+    developmentEntitlementHint:
+      "Доступно лише у збірках .dev. Зміни застосовуються одразу й не впливають на покупки в магазині.",
     premiumErrorUnavailable: "Магазин зараз недоступний. Спробуйте пізніше.",
     premiumErrorFailed: "Не вдалося завершити покупку.",
     premiumErrorPending: "Покупка очікує підтвердження.",
@@ -126,6 +135,9 @@ const rawPremiumTranslations = {
     premiumRestoreHint:
       "स्थायी खरीद इसी प्लेटफ़ॉर्म पर उसी App Store या Play Store खाते से बहाल होती है। Mr Broccoli खाते की जरूरत नहीं है।",
     premiumUnlocked: "प्रीमियम अनलॉक है",
+    developmentEntitlement: "डेवलपमेंट अधिकार",
+    developmentEntitlementHint:
+      ".dev बिल्ड में ही उपलब्ध। बदलाव तुरंत लागू होते हैं और स्टोर खरीदारी को प्रभावित नहीं करते।",
     premiumErrorUnavailable:
       "स्टोर अभी उपलब्ध नहीं है। बाद में फिर कोशिश करें।",
     premiumErrorFailed: "खरीद पूरी नहीं हुई।",
@@ -162,6 +174,9 @@ const rawPremiumTranslations = {
     premiumRestoreHint:
       "La compra permanente se restaura con la misma cuenta de App Store o Play Store en esta plataforma. No hace falta una cuenta de Mr Broccoli.",
     premiumUnlocked: "Premium está desbloqueado",
+    developmentEntitlement: "Acceso de desarrollo",
+    developmentEntitlementHint:
+      "Solo disponible en compilaciones .dev. Los cambios se aplican de inmediato y no afectan a las compras de la tienda.",
     premiumErrorUnavailable:
       "La tienda no está disponible ahora. Inténtalo más tarde.",
     premiumErrorFailed: "No se pudo completar la compra.",
@@ -198,6 +213,9 @@ const rawPremiumTranslations = {
     premiumRestoreHint:
       "L’achat permanent est restauré avec le même compte App Store ou Play Store sur cette plateforme. Aucun compte Mr Broccoli n’est requis.",
     premiumUnlocked: "Premium est débloqué",
+    developmentEntitlement: "Accès de développement",
+    developmentEntitlementHint:
+      "Disponible uniquement dans les builds .dev. Les modifications s’appliquent immédiatement et n’affectent pas les achats du Store.",
     premiumErrorUnavailable:
       "La boutique est indisponible. Réessayez plus tard.",
     premiumErrorFailed: "L’achat n’a pas pu être finalisé.",
@@ -234,6 +252,9 @@ const rawPremiumTranslations = {
     premiumRestoreHint:
       "L’acquisto permanente viene ripristinato con lo stesso account App Store o Play Store su questa piattaforma. Non serve un account Mr Broccoli.",
     premiumUnlocked: "Premium è sbloccato",
+    developmentEntitlement: "Accesso di sviluppo",
+    developmentEntitlementHint:
+      "Disponibile solo nelle build .dev. Le modifiche si applicano subito e non influiscono sugli acquisti dello store.",
     premiumErrorUnavailable: "Lo store non è disponibile. Riprova più tardi.",
     premiumErrorFailed: "Impossibile completare l’acquisto.",
     premiumErrorPending: "L’acquisto è in attesa di approvazione.",
@@ -269,6 +290,9 @@ const rawPremiumTranslations = {
     premiumRestoreHint:
       "A compra permanente é restaurada com a mesma conta da App Store ou Play Store nesta plataforma. Não é necessária uma conta Mr Broccoli.",
     premiumUnlocked: "Premium está desbloqueado",
+    developmentEntitlement: "Acesso de desenvolvimento",
+    developmentEntitlementHint:
+      "Disponível apenas em compilações .dev. As alterações são aplicadas imediatamente e não afetam as compras na loja.",
     premiumErrorUnavailable: "A loja não está disponível. Tente mais tarde.",
     premiumErrorFailed: "Não foi possível concluir a compra.",
     premiumErrorPending: "A compra aguarda aprovação.",
@@ -304,6 +328,9 @@ const rawPremiumTranslations = {
     premiumRestoreHint:
       "A compra permanente é restaurada com a mesma conta da App Store ou Play Store nesta plataforma. Não é necessária uma conta Mr Broccoli.",
     premiumUnlocked: "Premium está desbloqueado",
+    developmentEntitlement: "Acesso de desenvolvimento",
+    developmentEntitlementHint:
+      "Disponível apenas em builds .dev. As alterações são aplicadas imediatamente e não afetam as compras na loja.",
     premiumErrorUnavailable: "A loja não está disponível. Tente mais tarde.",
     premiumErrorFailed: "Não foi possível concluir a compra.",
     premiumErrorPending: "A compra aguarda aprovação.",
@@ -339,6 +366,9 @@ const rawPremiumTranslations = {
     premiumRestoreHint:
       "Постоянная покупка восстанавливается через ту же учётную запись App Store или Play Store на этой платформе. Учётная запись Mr Broccoli не нужна.",
     premiumUnlocked: "Premium разблокирован",
+    developmentEntitlement: "Доступ для разработки",
+    developmentEntitlementHint:
+      "Доступно только в сборках .dev. Изменения применяются сразу и не влияют на покупки в магазине.",
     premiumErrorUnavailable: "Магазин сейчас недоступен. Повторите позже.",
     premiumErrorFailed: "Не удалось завершить покупку.",
     premiumErrorPending: "Покупка ожидает подтверждения.",
@@ -374,6 +404,9 @@ const rawPremiumTranslations = {
     premiumRestoreHint:
       "永久购买可通过本平台上相同的 App Store 或 Play Store 帐户恢复，无需 Mr Broccoli 帐户。",
     premiumUnlocked: "高级版已解锁",
+    developmentEntitlement: "开发版权限",
+    developmentEntitlementHint:
+      "仅在 .dev 构建中可用。更改会立即生效，且不会影响商店购买。",
     premiumErrorUnavailable: "商店当前不可用，请稍后再试。",
     premiumErrorFailed: "无法完成购买。",
     premiumErrorPending: "购买正在等待批准。",
@@ -407,6 +440,9 @@ const rawPremiumTranslations = {
     premiumRestoreHint:
       "تُستعاد عملية الشراء الدائمة عبر حساب App Store أو Play Store نفسه على هذه المنصة، ولا يلزم حساب Mr Broccoli.",
     premiumUnlocked: "تم فتح Premium",
+    developmentEntitlement: "استحقاق إصدار التطوير",
+    developmentEntitlementHint:
+      "متاح فقط في إصدارات .dev. تُطبَّق التغييرات فورًا ولا تؤثر في مشتريات المتجر.",
     premiumErrorUnavailable: "المتجر غير متاح الآن. حاول لاحقًا.",
     premiumErrorFailed: "تعذر إكمال الشراء.",
     premiumErrorPending: "الشراء بانتظار الموافقة.",
@@ -442,6 +478,9 @@ const rawPremiumTranslations = {
     premiumRestoreHint:
       "永久購入は、このプラットフォームの同じApp StoreまたはPlay Storeアカウントで復元されます。Mr Broccoliアカウントは不要です。",
     premiumUnlocked: "Premiumが解除されました",
+    developmentEntitlement: "開発用アクセス権",
+    developmentEntitlementHint:
+      ".dev ビルドでのみ利用できます。変更はすぐに適用され、ストアでの購入には影響しません。",
     premiumErrorUnavailable:
       "ストアを利用できません。後でもう一度お試しください。",
     premiumErrorFailed: "購入を完了できませんでした。",
@@ -478,6 +517,9 @@ const rawPremiumTranslations = {
     premiumRestoreHint:
       "A végleges vásárlás ezen a platformon ugyanazzal az App Store- vagy Play Store-fiókkal állítható vissza. Mr Broccoli-fiók nem szükséges.",
     premiumUnlocked: "Premium feloldva",
+    developmentEntitlement: "Fejlesztői jogosultság",
+    developmentEntitlementHint:
+      "Csak .dev buildekben érhető el. A módosítások azonnal érvénybe lépnek, és nem érintik az áruházi vásárlásokat.",
     premiumErrorUnavailable: "Az áruház most nem érhető el. Próbáld később.",
     premiumErrorFailed: "A vásárlás nem fejezhető be.",
     premiumErrorPending: "A vásárlás jóváhagyásra vár.",
@@ -513,6 +555,9 @@ const rawPremiumTranslations = {
     premiumRestoreHint:
       "Trvalý nákup se obnoví přes stejný účet App Store nebo Play Store na této platformě. Účet Mr Broccoli není potřeba.",
     premiumUnlocked: "Premium je odemčeno",
+    developmentEntitlement: "Vývojářské oprávnění",
+    developmentEntitlementHint:
+      "K dispozici pouze v sestaveních .dev. Změny se projeví okamžitě a neovlivní nákupy v obchodě.",
     premiumErrorUnavailable: "Obchod teď není dostupný. Zkuste to později.",
     premiumErrorFailed: "Nákup se nepodařilo dokončit.",
     premiumErrorPending: "Nákup čeká na schválení.",
@@ -548,6 +593,9 @@ const rawPremiumTranslations = {
     premiumRestoreHint:
       "Stały zakup jest przywracany przez to samo konto App Store lub Play Store na tej platformie. Konto Mr Broccoli nie jest wymagane.",
     premiumUnlocked: "Premium jest odblokowane",
+    developmentEntitlement: "Uprawnienie deweloperskie",
+    developmentEntitlementHint:
+      "Dostępne tylko w kompilacjach .dev. Zmiany są stosowane natychmiast i nie wpływają na zakupy w sklepie.",
     premiumErrorUnavailable: "Sklep jest teraz niedostępny. Spróbuj później.",
     premiumErrorFailed: "Nie udało się dokończyć zakupu.",
     premiumErrorPending: "Zakup oczekuje na zatwierdzenie.",
@@ -583,6 +631,9 @@ const rawPremiumTranslations = {
     premiumRestoreHint:
       "Kalıcı satın alma bu platformdaki aynı App Store veya Play Store hesabıyla geri yüklenir. Mr Broccoli hesabı gerekmez.",
     premiumUnlocked: "Premium açık",
+    developmentEntitlement: "Geliştirme erişimi",
+    developmentEntitlementHint:
+      "Yalnızca .dev derlemelerinde kullanılabilir. Değişiklikler hemen uygulanır ve mağaza satın alımlarını etkilemez.",
     premiumErrorUnavailable:
       "Mağaza şu anda kullanılamıyor. Daha sonra deneyin.",
     premiumErrorFailed: "Satın alma tamamlanamadı.",
@@ -619,6 +670,9 @@ const rawPremiumTranslations = {
     premiumRestoreHint:
       "Det permanenta köpet återställs med samma App Store- eller Play Store-konto på denna plattform. Inget Mr Broccoli-konto krävs.",
     premiumUnlocked: "Premium är upplåst",
+    developmentEntitlement: "Utvecklarbehörighet",
+    developmentEntitlementHint:
+      "Endast tillgängligt i .dev-byggen. Ändringar gäller direkt och påverkar inte köp i butiken.",
     premiumErrorUnavailable: "Butiken är inte tillgänglig nu. Försök senare.",
     premiumErrorFailed: "Köpet kunde inte slutföras.",
     premiumErrorPending: "Köpet väntar på godkännande.",
@@ -654,6 +708,9 @@ const rawPremiumTranslations = {
     premiumRestoreHint:
       "مستقل خریداری اسی پلیٹ فارم پر اسی App Store یا Play Store اکاؤنٹ سے بحال ہوتی ہے۔ Mr Broccoli اکاؤنٹ درکار نہیں۔",
     premiumUnlocked: "پریمیم کھل گیا",
+    developmentEntitlement: "ڈیولپمنٹ استحقاق",
+    developmentEntitlementHint:
+      "صرف .dev بلڈز میں دستیاب ہے۔ تبدیلیاں فوراً لاگو ہوتی ہیں اور اسٹور کی خریداریوں پر اثر نہیں ڈالتیں۔",
     premiumErrorUnavailable:
       "اسٹور ابھی دستیاب نہیں۔ بعد میں دوبارہ کوشش کریں۔",
     premiumErrorFailed: "خریداری مکمل نہیں ہو سکی۔",

@@ -18,6 +18,7 @@ import {
 import { useTheme } from "../../../theme/ThemeContext";
 import { fonts } from "../../../theme/typography";
 import type { AppLanguage, Settings, ThemeMode } from "../../../types";
+import type { DevelopmentEntitlementMode } from "../../../services/developmentEntitlement";
 import { APP_LANGUAGE_OPTIONS } from "../../../i18n/localeRegistry";
 
 import {
@@ -69,12 +70,18 @@ function formatSpeechDiagnosticTime(createdAt: string) {
 }
 
 export function AppSettingsPage({
+  developmentEntitlementMode,
   isPremium,
+  onSetDevelopmentEntitlementMode,
   settings,
   speechDiagnostics,
   onUpdate,
 }: {
+  developmentEntitlementMode: DevelopmentEntitlementMode | null;
   isPremium: boolean;
+  onSetDevelopmentEntitlementMode: (
+    mode: DevelopmentEntitlementMode,
+  ) => Promise<void>;
   settings: Settings;
   speechDiagnostics: SpeechDiagnosticRequestSummary[];
   onUpdate: (
@@ -100,6 +107,21 @@ export function AppSettingsPage({
       style={styles.sectionPageStack}
     >
       <View style={styles.sectionGroup}>
+        {developmentEntitlementMode ? (
+          <AntRadioSection<DevelopmentEntitlementMode>
+            testID="development-entitlement-mode"
+            label={t("developmentEntitlement")}
+            options={[
+              { value: "free", label: t("freeEdition") },
+              { value: "premium", label: t("premium") },
+            ]}
+            value={developmentEntitlementMode}
+            onChange={(mode) => {
+              void onSetDevelopmentEntitlementMode(mode);
+            }}
+            helperText={t("developmentEntitlementHint")}
+          />
+        ) : null}
         <AntRadioSection<ThemeMode>
           testID="app-theme"
           label={t("theme")}

@@ -15,6 +15,8 @@ describe("PremiumUpgradeModal", () => {
     mockedUsePremiumEntitlement.mockReturnValue({
       status: "free",
       isPremium: false,
+      developmentEntitlementMode: null,
+      setDevelopmentEntitlementMode: jest.fn(async () => undefined),
       busy: false,
       error: null,
       storeConnected: true,

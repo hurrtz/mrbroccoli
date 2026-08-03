@@ -930,6 +930,10 @@ export function MainScreen() {
               freeOffline.setModalVisible(true);
             },
         isPremium: freeOffline.entitlement.isPremium,
+        developmentEntitlementMode:
+          freeOffline.entitlement.developmentEntitlementMode,
+        onSetDevelopmentEntitlementMode:
+          freeOffline.entitlement.setDevelopmentEntitlementMode,
         onOpenPremium: () => {
           setPremiumModalVisible(true);
         },

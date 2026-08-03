@@ -122,6 +122,7 @@ function renderSettingsModal(
         <SettingsModal
           visible
           isPremium
+          developmentEntitlementMode={null}
           settings={DEFAULT_SETTINGS}
           kokoroModel={kokoroModel}
           providerVoiceDirectories={{}}
@@ -138,6 +139,7 @@ function renderSettingsModal(
           onStopPreviewVoice={jest.fn(async () => undefined)}
           onValidateProviderCapability={jest.fn(async () => undefined)}
           onOpenPremium={jest.fn()}
+          onSetDevelopmentEntitlementMode={jest.fn(async () => undefined)}
           conversationArchive={{
             chooseDirectory: jest.fn(async () => undefined),
             configured: false,
@@ -1328,6 +1330,43 @@ describe("SettingsModal", () => {
     expect(
       StyleSheet.flatten(languagePicker!.props.style).marginHorizontal,
     ).toBe(0);
+  });
+
+  it("shows the entitlement simulator only for a .dev app variant", async () => {
+    const releaseScreen = renderSettingsModal();
+
+    fireEvent.press(releaseScreen.getByLabelText("Open App & diagnostics"));
+    await waitFor(() => {
+      expect(
+        releaseScreen.getByTestId("settings-modal-title").props.children,
+      ).toBe("App & diagnostics");
+    });
+    expect(
+      releaseScreen.queryByTestId("development-entitlement-mode"),
+    ).toBeNull();
+    releaseScreen.unmount();
+
+    const onSetDevelopmentEntitlementMode = jest.fn(async () => undefined);
+    const developmentScreen = renderSettingsModal({
+      developmentEntitlementMode: "free",
+      onSetDevelopmentEntitlementMode,
+    });
+
+    fireEvent.press(
+      developmentScreen.getByLabelText("Open App & diagnostics"),
+    );
+    await waitFor(() => {
+      expect(
+        developmentScreen.getByTestId("development-entitlement-mode-free")
+          .props.accessibilityState,
+      ).toEqual({ checked: true, disabled: false });
+    });
+    expect(developmentScreen.getByText("Development entitlement")).toBeTruthy();
+
+    fireEvent.press(
+      developmentScreen.getByTestId("development-entitlement-mode-premium"),
+    );
+    expect(onSetDevelopmentEntitlementMode).toHaveBeenCalledWith("premium");
   });
 
   it("keeps Voice Input free of a redundant heading info action", async () => {

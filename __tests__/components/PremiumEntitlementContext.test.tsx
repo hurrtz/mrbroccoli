@@ -1,5 +1,12 @@
 import React from "react";
-import { AppState, Pressable, Text, type AppStateStatus } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import {
+  AppState,
+  NativeModules,
+  Pressable,
+  Text,
+  type AppStateStatus,
+} from "react-native";
 import { act, fireEvent, render, waitFor } from "@testing-library/react-native";
 import * as SecureStore from "expo-secure-store";
 
@@ -9,6 +16,7 @@ import {
   usePremiumEntitlement,
 } from "../../src/context/PremiumEntitlementContext";
 import { cachePremiumEntitlement } from "../../src/services/premiumEntitlement";
+import { DEVELOPMENT_ENTITLEMENT_MODE_STORAGE_KEY } from "../../src/services/developmentEntitlement";
 
 const mockFetchProducts = jest.fn();
 const mockFinishTransaction = jest.fn();
@@ -16,6 +24,7 @@ const mockGetAvailablePurchases = jest.fn();
 const mockReconnect = jest.fn();
 const mockRequestPurchase = jest.fn();
 const mockRestorePurchases = jest.fn();
+const mockGetApplicationId = jest.fn();
 const mockSecureValues = new Map<string, string>();
 let mockOnPurchaseSuccess: (purchase: {
   productId: string;
@@ -65,6 +74,9 @@ function Probe() {
     <>
       <Text testID="entitlement-status">{entitlement.status}</Text>
       <Text testID="entitlement-error">{entitlement.error ?? "none"}</Text>
+      <Text testID="development-entitlement-mode">
+        {entitlement.developmentEntitlementMode ?? "none"}
+      </Text>
       <Text testID="store-product">
         {entitlement.storeProduct?.id ?? "none"}
       </Text>
@@ -75,6 +87,16 @@ function Probe() {
       <Pressable
         testID="purchase-premium"
         onPress={() => void entitlement.purchasePremium()}
+      />
+      <Pressable
+        testID="simulate-free"
+        onPress={() => void entitlement.setDevelopmentEntitlementMode("free")}
+      />
+      <Pressable
+        testID="simulate-premium"
+        onPress={() =>
+          void entitlement.setDevelopmentEntitlementMode("premium")
+        }
       />
     </>
   );
@@ -89,9 +111,16 @@ function renderProvider() {
 }
 
 describe("PremiumEntitlementProvider", () => {
-  beforeEach(() => {
+  beforeEach(async () => {
     mockSecureValues.clear();
     jest.clearAllMocks();
+    await AsyncStorage.clear();
+    mockGetApplicationId.mockResolvedValue(
+      "com.tobiaswinkler.app.mrbroccoli",
+    );
+    NativeModules.MrBroccoliDiagnostics = {
+      getApplicationId: mockGetApplicationId,
+    };
     mockFetchProducts.mockResolvedValue([
       {
         id: PREMIUM_PRODUCT_ID,
@@ -104,6 +133,56 @@ describe("PremiumEntitlementProvider", () => {
     mockReconnect.mockResolvedValue(true);
     mockRequestPurchase.mockResolvedValue(null);
     mockRestorePurchases.mockResolvedValue(undefined);
+  });
+
+  it("uses the isolated .dev simulation without consulting the store", async () => {
+    mockGetApplicationId.mockResolvedValue(
+      "com.tobiaswinkler.app.mrbroccoli.dev",
+    );
+    await AsyncStorage.setItem(
+      DEVELOPMENT_ENTITLEMENT_MODE_STORAGE_KEY,
+      "premium",
+    );
+    const screen = renderProvider();
+
+    await waitFor(() => {
+      expect(screen.getByTestId("entitlement-status").props.children).toBe(
+        "premium",
+      );
+      expect(
+        screen.getByTestId("development-entitlement-mode").props.children,
+      ).toBe("premium");
+    });
+    expect(mockFetchProducts).not.toHaveBeenCalled();
+    expect(mockGetAvailablePurchases).not.toHaveBeenCalled();
+
+    fireEvent.press(screen.getByTestId("simulate-free"));
+
+    await waitFor(() => {
+      expect(screen.getByTestId("entitlement-status").props.children).toBe(
+        "free",
+      );
+    });
+    await expect(
+      AsyncStorage.getItem(DEVELOPMENT_ENTITLEMENT_MODE_STORAGE_KEY),
+    ).resolves.toBe("free");
+  });
+
+  it("ignores a stored simulation for the release application identity", async () => {
+    await AsyncStorage.setItem(
+      DEVELOPMENT_ENTITLEMENT_MODE_STORAGE_KEY,
+      "premium",
+    );
+    const screen = renderProvider();
+
+    await waitFor(() => {
+      expect(
+        screen.getByTestId("development-entitlement-mode").props.children,
+      ).toBe("none");
+    });
+    await waitFor(() =>
+      expect(mockGetAvailablePurchases).toHaveBeenCalledTimes(1),
+    );
   });
 
   it("keeps a cached entitlement when the store is temporarily unavailable", async () => {

@@ -28,6 +28,9 @@ const premiumConstants = readText("src/constants/premium.ts");
 const premiumEntitlementContext = readText(
   "src/context/PremiumEntitlementContext.tsx",
 );
+const developmentEntitlement = readText(
+  "src/services/developmentEntitlement.ts",
+);
 const premiumProductId = premiumConstants.match(
   /PREMIUM_PRODUCT_ID\s*=\s*\n?\s*"([^"]+)"/,
 )?.[1];
@@ -181,6 +184,21 @@ assertExcludes(
 assertExcludes(
   "Premium entitlement does not depend on NODE_ENV",
   premiumEntitlementContext,
+  "NODE_ENV",
+);
+assertIncludes(
+  "Development entitlement is gated by application ID suffix",
+  developmentEntitlement,
+  "applicationId?.endsWith(DEVELOPMENT_APPLICATION_ID_SUFFIX) === true",
+);
+assertExcludes(
+  "Development entitlement does not depend on __DEV__",
+  developmentEntitlement,
+  "__DEV__",
+);
+assertExcludes(
+  "Development entitlement does not depend on NODE_ENV",
+  developmentEntitlement,
   "NODE_ENV",
 );
 const iosDeploymentTargets = [
@@ -433,6 +451,11 @@ assertIncludes(
   "getHistoricalProcessExitReasons",
 );
 assertIncludes(
+  "Android application ID diagnostics",
+  androidDiagnostics,
+  "reactApplicationContext.packageName",
+);
+assertIncludes(
   "Android diagnostics module registration",
   androidNativePackage,
   "MrBroccoliDiagnosticsModule(reactContext)",
@@ -463,9 +486,19 @@ assertIncludes(
   "MXMetricManagerSubscriber",
 );
 assertIncludes(
+  "iOS application ID diagnostics",
+  iosDiagnostics,
+  "Bundle.main.bundleIdentifier",
+);
+assertIncludes(
   "iOS diagnostics bridge export",
   iosDiagnosticsBridge,
   "RCT_EXTERN_MODULE(MrBroccoliDiagnostics, NSObject)",
+);
+assertIncludes(
+  "iOS application ID diagnostics bridge",
+  iosDiagnosticsBridge,
+  "getApplicationId:(RCTPromiseResolveBlock)resolve",
 );
 assertIncludes(
   "iOS archive directory source membership",

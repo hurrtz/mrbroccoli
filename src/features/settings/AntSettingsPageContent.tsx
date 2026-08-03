@@ -263,8 +263,12 @@ export function AntSettingsPageContent({
         <DrillInPage page="app">
           <AppSettingsPage
             isPremium={props.isPremium}
+            developmentEntitlementMode={props.developmentEntitlementMode}
             settings={settings}
             speechDiagnostics={controller.speechDiagnostics}
+            onSetDevelopmentEntitlementMode={
+              props.onSetDevelopmentEntitlementMode
+            }
             onUpdate={onUpdate}
           />
         </DrillInPage>

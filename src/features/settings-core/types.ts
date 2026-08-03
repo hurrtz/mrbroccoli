@@ -10,6 +10,7 @@ import type {
   AppDataBackupRestoreResult,
 } from "../../services/appDataBackup";
 import type { ConversationArchiveController } from "../../hooks/useConversationArchive";
+import type { DevelopmentEntitlementMode } from "../../services/developmentEntitlement";
 import {
   Provider,
   ProviderCapability,
@@ -25,6 +26,10 @@ export interface SettingsModalProps {
   visible: boolean;
   suspended?: boolean;
   isPremium: boolean;
+  developmentEntitlementMode: DevelopmentEntitlementMode | null;
+  onSetDevelopmentEntitlementMode: (
+    mode: DevelopmentEntitlementMode,
+  ) => Promise<void>;
   settings: Settings;
   kokoroModel: KokoroModelController;
   focusProvider?: Provider;

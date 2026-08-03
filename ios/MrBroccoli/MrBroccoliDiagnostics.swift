@@ -56,6 +56,14 @@ final class MrBroccoliDiagnostics: NSObject {
     }
   }
 
+  @objc(getApplicationId:rejecter:)
+  func getApplicationId(
+    _ resolve: RCTPromiseResolveBlock,
+    rejecter reject: RCTPromiseRejectBlock
+  ) {
+    resolve(Bundle.main.bundleIdentifier)
+  }
+
   @objc(consumePostmortemRecords:rejecter:)
   func consumePostmortemRecords(
     _ resolve: @escaping RCTPromiseResolveBlock,
