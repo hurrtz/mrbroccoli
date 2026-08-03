@@ -128,6 +128,7 @@ export function createVoicePipelineEventAdapter({
       ...params,
       payload: { ...params.payload, turnId },
     });
+  let runConversationId = activeConversation?.id ?? null;
   const ulraLatencyRoutes = ulraMode?.routes.map(
     ({
       model: routeModel,
@@ -274,18 +275,22 @@ export function createVoicePipelineEventAdapter({
       }
       setPipelinePhase("thinking-briefly");
       if (existingUserMessageId) {
-        return;
+        return runConversationId;
       }
       if (!activeConversation) {
         if (initialConversationSettings) {
-          createConversation(
+          runConversationId = createConversation(
             text,
             model,
             localLlmModelId ? null : provider,
             initialConversationSettings,
           );
         } else {
-          createConversation(text, model, localLlmModelId ? null : provider);
+          runConversationId = createConversation(
+            text,
+            model,
+            localLlmModelId ? null : provider,
+          );
         }
       }
       const userMessage = addMessage({
@@ -301,6 +306,7 @@ export function createVoicePipelineEventAdapter({
           attachments.map((attachment) => attachment.id),
         );
       }
+      return runConversationId;
     },
     onContextSummary: (summary, summarizedCount, usage) => {
       if (!isActiveRun()) {

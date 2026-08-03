@@ -437,10 +437,14 @@ export async function retrieveConversationKnowledge(params: {
     ]);
     const sourceLimit = params.sourceLimit ?? DEFAULT_SOURCE_LIMIT;
     const selected = mergeRankedSeeds(ftsRows, vectorRows);
+    const excludedConversationIds = new Set(excludedIds);
     const selectedConversations = new Set<string>();
     const sourceRows: RankedKnowledgeRow[] = [];
 
     for (const row of selected) {
+      if (excludedConversationIds.has(row.conversationId)) {
+        continue;
+      }
       if (selectedConversations.has(row.conversationId)) {
         continue;
       }
@@ -489,7 +493,7 @@ export async function retrieveConversationKnowledge(params: {
     return {
       context: contexts.join("\n\n"),
       metadata: {
-        engine: "local-hybrid-v1",
+        engine: "local-user-authored-v2",
         sources,
       },
     };

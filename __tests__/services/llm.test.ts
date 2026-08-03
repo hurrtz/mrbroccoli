@@ -579,7 +579,7 @@ describe("streamChat", () => {
     ]);
   });
 
-  it("continues Anthropic replies when the stream closes without a terminal event", async () => {
+  it("rejects Anthropic replies when the stream closes without a terminal event", async () => {
     const encoder = new TextEncoder();
     const interruptedStream = new ReadableStream({
       start(controller) {
@@ -591,25 +591,12 @@ describe("streamChat", () => {
         controller.close();
       },
     });
-    const continuationStream = new ReadableStream({
-      start(controller) {
-        controller.enqueue(
-          encoder.encode(
-            'event: content_block_delta\ndata: {"type":"content_block_delta","delta":{"type":"text_delta","text":"sentence, now complete."}}\n\n',
-          ),
-        );
-        controller.enqueue(
-          encoder.encode(
-            'event: message_stop\ndata: {"type":"message_stop"}\n\n',
-          ),
-        );
-        controller.close();
-      },
+    (fetch as jest.Mock).mockResolvedValueOnce({
+      ok: true,
+      body: interruptedStream,
     });
-    (fetch as jest.Mock)
-      .mockResolvedValueOnce({ ok: true, body: interruptedStream })
-      .mockResolvedValueOnce({ ok: true, body: continuationStream });
     const onDone = jest.fn();
+    const onError = jest.fn();
 
     await streamChat({
       messages: mockMessages,
@@ -622,12 +609,57 @@ describe("streamChat", () => {
       language: "en",
       onChunk: jest.fn(),
       onDone,
-      onError: jest.fn(),
+      onError,
     });
 
-    expect(onDone).toHaveBeenCalledWith(
-      "Interrupted midsentence, now complete.",
-      expect.any(Object),
+    expect(fetch).toHaveBeenCalledTimes(1);
+    expect(onDone).not.toHaveBeenCalled();
+    expect(onError).toHaveBeenCalledWith(
+      expect.objectContaining({
+        message: "Anthropic's reply ended before it was complete. Try again.",
+      }),
+    );
+  });
+
+  it("does not continue after an Anthropic stream error", async () => {
+    const encoder = new TextEncoder();
+    const stream = new ReadableStream({
+      start(controller) {
+        controller.enqueue(
+          encoder.encode(
+            'event: content_block_delta\ndata: {"type":"content_block_delta","delta":{"type":"text_delta","text":"Partial reply"}}\n\n',
+          ),
+        );
+        controller.enqueue(
+          encoder.encode(
+            'event: error\ndata: {"type":"error","error":{"message":"connection failed mid-stream"}}\n\n',
+          ),
+        );
+        controller.close();
+      },
+    });
+    (fetch as jest.Mock).mockResolvedValueOnce({ ok: true, body: stream });
+    const onDone = jest.fn();
+    const onError = jest.fn();
+
+    await streamChat({
+      messages: mockMessages,
+      model: "claude-fable-5",
+      provider: "anthropic",
+      apiKey: "sk-ant-test-key",
+      assistantInstructions: "",
+      responseLength: "normal",
+      responseTone: "professional",
+      language: "en",
+      onChunk: jest.fn(),
+      onDone,
+      onError,
+    });
+
+    expect(fetch).toHaveBeenCalledTimes(1);
+    expect(onDone).not.toHaveBeenCalled();
+    expect(onError).toHaveBeenCalledWith(
+      expect.objectContaining({ message: "connection failed mid-stream" }),
     );
   });
 

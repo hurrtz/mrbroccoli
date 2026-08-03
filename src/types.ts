@@ -224,7 +224,7 @@ export interface MessageConversationKnowledgeSource {
 }
 
 export interface MessageConversationKnowledgeMetadata {
-  engine: "local-hybrid-v1";
+  engine: "local-hybrid-v1" | "local-user-authored-v2";
   sources: MessageConversationKnowledgeSource[];
 }
 

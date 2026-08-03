@@ -22,6 +22,9 @@ the complete Play Store translations are kept in a dedicated file under
 
 ### Changed
 
+- Build cross-session knowledge from user-authored messages only, while keeping
+  assistant answers available through ordinary conversation search. This stops
+  conclusions from earlier AI replies becoming unattributed recursive memory.
 - Present Free as a coherent Private Offline edition across Home, setup, and
   Settings, with a three-step language/model/conversation flow and explicit
   language-aware system-voice fallback for multilingual profiles.
@@ -45,6 +48,10 @@ the complete Play Store translations are kept in a dedicated file under
 
 ### Fixed
 
+- Keep the active conversation out of past-conversation retrieval from its
+  first transcribed turn, reject interrupted Anthropic streams instead of
+  silently continuing them, and block serialized internal context before it
+  can be spoken, saved, or re-indexed.
 - Let Free users select multiple conversation languages even when no single
   downloaded voice covers them all; local listening and thinking stay active
   while the phone's language-aware system voice handles spoken replies.

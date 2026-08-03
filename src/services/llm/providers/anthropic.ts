@@ -187,63 +187,55 @@ async function requestAnthropicChatStreamOnce(params: {
   let sawMessageStop = false;
   let stopReason: string | null = null;
 
-  try {
-    await readEventStream(response.body, async ({ type, data }) => {
-      if (!data) {
-        return;
-      }
-
-      const payload = JSON.parse(data);
-
-      if (type === "error") {
-        throw new Error(
-          typeof payload?.error?.message === "string"
-            ? payload.error.message
-            : "Anthropic stream failed.",
-        );
-      }
-
-      if (type === "message_delta") {
-        stopReason =
-          typeof payload?.delta?.stop_reason === "string"
-            ? payload.delta.stop_reason
-            : stopReason;
-        return;
-      }
-
-      if (type === "message_stop") {
-        sawMessageStop = true;
-        return;
-      }
-
-      if (type !== "content_block_delta") {
-        return;
-      }
-
-      const delta =
-        payload?.type === "content_block_delta" &&
-        payload?.delta?.type === "text_delta" &&
-        typeof payload.delta.text === "string"
-          ? payload.delta.text
-          : "";
-
-      if (!delta) {
-        return;
-      }
-
-      fullText += delta;
-      onChunk(delta);
-    });
-  } catch (error) {
-    if (abortSignal?.aborted) {
-      throw error;
+  await readEventStream(response.body, async ({ type, data }) => {
+    if (!data) {
+      return;
     }
 
-    // A 200 stream can still fail mid-flight. Preserve any emitted text and
-    // let the outer continuation loop resume from it instead of accepting a
-    // partial reply as complete.
-    sawMessageStop = false;
-    stopReason = null;
+    const payload = JSON.parse(data);
+
+    if (type === "error") {
+      throw new Error(
+        typeof payload?.error?.message === "string"
+          ? payload.error.message
+          : "Anthropic stream failed.",
+      );
+    }
+
+    if (type === "message_delta") {
+      stopReason =
+        typeof payload?.delta?.stop_reason === "string"
+          ? payload.delta.stop_reason
+          : stopReason;
+      return;
+    }
+
+    if (type === "message_stop") {
+      sawMessageStop = true;
+      return;
+    }
+
+    if (type !== "content_block_delta") {
+      return;
+    }
+
+    const delta =
+      payload?.type === "content_block_delta" &&
+      payload?.delta?.type === "text_delta" &&
+      typeof payload.delta.text === "string"
+        ? payload.delta.text
+        : "";
+
+    if (!delta) {
+      return;
+    }
+
+    fullText += delta;
+    onChunk(delta);
+  });
+
+  if (!sawMessageStop) {
+    throw buildIncompleteReplyError(params.language);
   }
 
   return {
@@ -277,8 +269,7 @@ export async function requestAnthropicChatStream(params: {
     });
     fullText += result.fullText;
 
-    const needsContinuation =
-      result.stopReason === "max_tokens" || !result.sawMessageStop;
+    const needsContinuation = result.stopReason === "max_tokens";
 
     if (!needsContinuation) {
       return fullText;

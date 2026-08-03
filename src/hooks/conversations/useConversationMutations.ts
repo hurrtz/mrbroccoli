@@ -205,6 +205,7 @@ export function useConversationMutations(params: {
       setConversations((previous) => persistMetas([meta, ...previous]));
       saveConversation(conversation);
       setActiveConversationValue(conversation);
+      return conversation.id;
     },
     [persistMetas, setActiveConversationValue, setConversations],
   );
@@ -257,7 +258,7 @@ export function useConversationMutations(params: {
       setActiveConversationValue(updatedConversation);
       saveConversation(updatedConversation);
       if (
-        messageInput.role === "assistant" &&
+        messageInput.role === "user" &&
         pastConversationKnowledgeEnabled &&
         !updatedConversation.isPrivate
       ) {

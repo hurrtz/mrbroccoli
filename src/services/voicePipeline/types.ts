@@ -29,7 +29,7 @@ import type {
 } from "../../constants/localModels";
 
 export interface PipelineCallbacks {
-  onTranscription: (text: string) => void;
+  onTranscription: (text: string) => string | null | void;
   onContextSummary?: (
     summary: string,
     summarizedMessageCount: number,

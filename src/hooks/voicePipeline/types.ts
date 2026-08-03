@@ -64,7 +64,7 @@ export interface UseVoicePipelineParams {
     initialModel?: string | null,
     initialProvider?: Provider | null,
     initialSettings?: ConversationSettings,
-  ) => void;
+  ) => string;
   initialConversationSettings?: ConversationSettings;
   updateMessage: (
     messageId: string,

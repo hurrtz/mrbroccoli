@@ -295,6 +295,35 @@ describe("conversation knowledge", () => {
     ).not.toHaveBeenCalled();
   });
 
+  it("indexes user-authored history without promoting assistant output to knowledge", async () => {
+    const conversation = createConversation(
+      "derived",
+      "Derived answer",
+      "Which earlier decisions should I revisit?",
+      "Session E established the confidential launch assumption.",
+    );
+    conversation.messages[1].metadata = {
+      conversationKnowledge: {
+        engine: "local-hybrid-v1",
+        sources: [
+          {
+            conversationId: "session-e",
+            title: "Session E",
+            updatedAt: "2026-07-31T10:00:00.000Z",
+          },
+        ],
+      },
+    };
+
+    await syncConversationKnowledge(conversation, true);
+
+    expect(chunks).toHaveLength(1);
+    expect(chunks[0]?.content).toBe(
+      "User: Which earlier decisions should I revisit?",
+    );
+    expect(chunks[0]?.content).not.toContain("confidential launch assumption");
+  });
+
   it("retrieves local sources while excluding the current and private conversations", async () => {
     const garden = createConversation(
       "garden",
@@ -346,8 +375,13 @@ describe("conversation knowledge", () => {
     expect(result?.metadata.sources).toEqual([
       expect.objectContaining({ conversationId: garden.id }),
     ]);
-    expect(result?.context).toContain("Water the tomatoes in the morning");
-    expect(result?.context).toContain("Check the neighboring soil");
+    expect(result?.metadata.engine).toBe("local-user-authored-v2");
+    expect(result?.context).toContain("How often should I water the tomatoes?");
+    expect(result?.context).toContain("What should I check next?");
+    expect(result?.context).not.toContain("Water the tomatoes in the morning");
+    expect(result?.context).not.toContain(
+      "Check the neighboring soil before watering again",
+    );
     expect(result?.context).not.toContain("secret tomato supplier");
     expect(result?.context).not.toContain("Current answer");
   });

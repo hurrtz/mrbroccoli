@@ -244,6 +244,137 @@ describe("runVoicePipeline", () => {
     );
   });
 
+  it("uses the conversation created by transcription as the retrieval exclusion", async () => {
+    (streamChat as jest.Mock).mockImplementation(
+      async ({ onDone }: { onDone: (text: string) => Promise<void> }) => {
+        await onDone("Fresh answer.");
+      },
+    );
+    const callbacks = {
+      onTranscription: jest.fn(() => "created-current"),
+      onLlmStart: jest.fn(),
+      onChunk: jest.fn(),
+      onResponseDone: jest.fn(),
+      onAudioReady: jest.fn(),
+      onSpeechTextReady: jest.fn(),
+      onError: jest.fn(),
+    };
+
+    await runVoicePipeline({
+      transcriptionOverride: "Start a new conversation about device heat.",
+      messages: [],
+      currentConversationId: null,
+      privateConversationIds: [],
+      pastConversationKnowledgeEnabled: true,
+      model: "gpt-5.4",
+      provider: "openai",
+      providerApiKey: "test-key",
+      sttMode: "native",
+      ttsMode: "native",
+      ttsVoice: "alloy",
+      replyPlayback: "wait",
+      spokenRepliesEnabled: false,
+      assistantInstructions: "Be accurate.",
+      responseLength: "normal",
+      responseTone: "professional",
+      language: "en",
+      callbacks,
+    });
+
+    expect(retrieveConversationKnowledge).toHaveBeenCalledWith(
+      expect.objectContaining({
+        currentConversationId: "created-current",
+      }),
+    );
+  });
+
+  it("blocks serialized hidden context before saving or speaking it", async () => {
+    (retrieveConversationKnowledge as jest.Mock).mockResolvedValue({
+      context:
+        "SOURCE 1 — Earlier notes (2026-08-01)\nUser: Historical context",
+      metadata: {
+        engine: "local-user-authored-v2",
+        sources: [
+          {
+            conversationId: "earlier",
+            title: "Earlier notes",
+            updatedAt: "2026-08-01T08:00:00.000Z",
+          },
+        ],
+      },
+    });
+    (streamChat as jest.Mock).mockImplementation(
+      async ({
+        onChunk,
+        onDone,
+        onError,
+      }: {
+        onChunk: (text: string) => void;
+        onDone: (text: string) => Promise<void>;
+        onError: (error: Error) => Promise<void>;
+      }) => {
+        const safeText =
+          "The hardware verdict needs a live benchmark before it is final. ";
+        const leakedText =
+          "[Truncated: earlier conversation had 6 more turns]\n\n" +
+          "SOURCE 4 — Weather notes (2026-04-14)\n" +
+          "User: Hidden historical text";
+        try {
+          onChunk(safeText);
+          onChunk(leakedText);
+          await onDone(safeText + leakedText);
+        } catch (error) {
+          await onError(error as Error);
+        }
+      },
+    );
+    const callbacks = {
+      onTranscription: jest.fn(),
+      onLlmStart: jest.fn(),
+      onChunk: jest.fn(),
+      onResponseDone: jest.fn(),
+      onAudioReady: jest.fn(),
+      onSpeechTextReady: jest.fn(),
+      onError: jest.fn(),
+    };
+
+    await runVoicePipeline({
+      transcriptionOverride: "Assess the hardware check.",
+      messages: [],
+      currentConversationId: "current",
+      privateConversationIds: [],
+      pastConversationKnowledgeEnabled: true,
+      model: "claude-fable-5",
+      provider: "anthropic",
+      providerApiKey: "test-key",
+      sttMode: "native",
+      ttsMode: "native",
+      ttsVoice: "alloy",
+      replyPlayback: "stream",
+      spokenRepliesEnabled: true,
+      assistantInstructions: "Keep internal context private.",
+      responseLength: "normal",
+      responseTone: "professional",
+      language: "en",
+      callbacks,
+    });
+
+    expect(callbacks.onResponseDone).not.toHaveBeenCalled();
+    expect(callbacks.onSpeechTextReady).not.toHaveBeenCalledWith(
+      expect.stringContaining("Hidden historical text"),
+      expect.anything(),
+      expect.anything(),
+    );
+    expect(callbacks.onChunk.mock.calls.flat().join(" ")).not.toContain(
+      "Hidden historical text",
+    );
+    expect(callbacks.onError).toHaveBeenCalledWith(
+      expect.objectContaining({
+        message: "Anthropic's reply ended before it was complete. Try again.",
+      }),
+    );
+  });
+
   it("passes source-backed past knowledge to an on-device response", async () => {
     (retrieveConversationKnowledge as jest.Mock).mockResolvedValue({
       context: "SOURCE 1 — Private architecture\nUser: Keep inference local.",

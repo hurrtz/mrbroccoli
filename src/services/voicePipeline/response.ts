@@ -4,7 +4,13 @@ import type {
   MessageTurnReceipt,
   UsageEstimate,
 } from "../../types";
+import { PROVIDER_LABELS } from "../../constants/models";
+import { translate } from "../../i18n";
 import { recordDebugLogEvent } from "../debugLogCapture";
+import {
+  createInternalContextLeakStreamGuard,
+  type InternalContextLeakReason,
+} from "../llm/contextLeakGuard";
 import { streamChat } from "../llm";
 import { streamLocalChat } from "../localLlm";
 import type { createVoicePipelineTtsQueue } from "./ttsQueue";
@@ -85,10 +91,35 @@ export async function runPipelineResponse({
 
   let completed = false;
   const startedAtMs = modelStartedAtMs ?? Date.now();
+  const buildContextLeakError = (reason: InternalContextLeakReason) => {
+    recordDebugLogEvent({
+      event: "voice-pipeline-internal-context-leak-blocked",
+      level: "warn",
+      payload: {
+        model,
+        provider,
+        reason,
+        turnId,
+      },
+    });
+    return new Error(
+      translate(language, "providerIncompleteReplyError", {
+        provider: PROVIDER_LABELS[provider],
+      }),
+    );
+  };
+  const contextLeakGuard = createInternalContextLeakStreamGuard({
+    hasHistoricalContext: Boolean(
+      conversationSummary || pastConversationKnowledge,
+    ),
+    onChunk: (text) => ttsQueue.handleStreamChunk(text),
+    onLeak: buildContextLeakError,
+    protectedTexts: [conversationSummary, synthesisContext],
+  });
 
   const onChunk = (text: string) => {
     if (!abortSignal?.aborted) {
-      ttsQueue.handleStreamChunk(text);
+      contextLeakGuard.push(text);
     }
   };
   const onDone = async (
@@ -99,6 +130,8 @@ export async function runPipelineResponse({
     if (abortSignal?.aborted) {
       return;
     }
+
+    contextLeakGuard.flush(fullText);
 
     const completedAtMs = Date.now();
     turnReceipt.timing.modelMs = completedAtMs - startedAtMs;

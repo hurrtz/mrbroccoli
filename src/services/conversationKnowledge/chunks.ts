@@ -1,26 +1,17 @@
-import type { Conversation, Message } from "../../types";
+import type { Conversation } from "../../types";
 import {
   createLocalKnowledgeEmbedding,
   LOCAL_KNOWLEDGE_EMBEDDING,
 } from "./embedding";
 
 const MAX_CHUNK_CHARACTERS = 1_600;
-const CHUNK_FORMAT_VERSION = "conversation-turns-v1";
+const CHUNK_FORMAT_VERSION = "conversation-user-messages-v2";
 
 export interface ConversationKnowledgeChunk {
   content: string;
   id: string;
   ordinal: number;
   vector: Uint8Array;
-}
-
-function getMessageLabel(message: Message) {
-  if (message.role === "user") {
-    return "User";
-  }
-
-  const route = [message.provider, message.model].filter(Boolean).join(" / ");
-  return route ? `Assistant (${route})` : "Assistant";
 }
 
 function splitLongText(text: string) {
@@ -51,38 +42,21 @@ function splitLongText(text: string) {
   return chunks;
 }
 
-function groupConversationTurns(messages: Message[]) {
-  const groups: string[] = [];
-  let current: string[] = [];
-
-  const flush = () => {
-    const content = current.join("\n\n").trim();
-    if (content) {
-      groups.push(...splitLongText(content));
-    }
-    current = [];
-  };
-
-  for (const message of messages) {
-    const content = message.content.trim();
-    if (!content) {
-      continue;
-    }
-
-    if (message.role === "user" && current.length > 0) {
-      flush();
-    }
-    current.push(`${getMessageLabel(message)}: ${content}`);
-  }
-  flush();
-
-  return groups;
-}
-
 export function buildConversationKnowledgeChunks(
   conversation: Conversation,
 ): ConversationKnowledgeChunk[] {
-  return groupConversationTurns(conversation.messages).map(
+  const userMessages = conversation.messages.flatMap((message) => {
+    if (message.role !== "user") {
+      return [];
+    }
+
+    const content = message.content.trim();
+    return content
+      ? splitLongText(`User: ${content}`)
+      : [];
+  });
+
+  return userMessages.map(
     (content, ordinal) => ({
       content,
       id: `${conversation.id}:${ordinal}`,

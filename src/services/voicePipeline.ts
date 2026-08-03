@@ -173,7 +173,11 @@ export async function runVoicePipeline(
       return transcription;
     }
 
-    callbacks.onTranscription(transcription);
+    const callbackConversationId = callbacks.onTranscription(transcription);
+    const effectiveCurrentConversationId =
+      typeof callbackConversationId === "string"
+        ? callbackConversationId
+        : currentConversationId;
     if (abortSignal?.aborted) {
       recordTurnEvent({
         event: "voice-pipeline-run-aborted-after-onTranscription",
@@ -219,7 +223,7 @@ export async function runVoicePipeline(
     ].join("\n\n");
     const pastKnowledgeResult = pastConversationKnowledgeEnabled
       ? await retrieveConversationKnowledge({
-          currentConversationId,
+          currentConversationId: effectiveCurrentConversationId,
           privateConversationIds,
           query: pastKnowledgeQuery,
         })
