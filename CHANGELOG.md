@@ -48,6 +48,9 @@ the complete Play Store translations are kept in a dedicated file under
 
 ### Fixed
 
+- Restore saved image attachments after iOS app updates by resolving their
+  relative paths against the current app container, preventing one stale image
+  URL from blocking readable or encrypted session backups.
 - Keep the active conversation out of past-conversation retrieval from its
   first transcribed turn, reject interrupted Anthropic streams instead of
   silently continuing them, and block serialized internal context before it

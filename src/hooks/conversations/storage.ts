@@ -3,6 +3,10 @@ import { Conversation, ConversationMeta } from "../../types";
 import { reportPersistenceAlert } from "../../services/persistenceAlerts";
 import { recordDebugLogEvent } from "../../services/debugLogCapture";
 import {
+  relativizeConversationImageAttachmentUris,
+  resolveConversationImageAttachmentUris,
+} from "../../services/imageAttachmentFiles";
+import {
   buildConversationMetaFromConversation,
   normalizeConversationMeta,
   sortConversationMeta,
@@ -74,7 +78,9 @@ export async function readConversation(id: string) {
       return null;
     }
 
-    return JSON.parse(raw) as Conversation;
+    return resolveConversationImageAttachmentUris(
+      JSON.parse(raw) as Conversation,
+    );
   } catch (error) {
     reportStorageFailure(key, "read", error);
     return null;
@@ -110,7 +116,9 @@ export async function readActiveConversationId() {
 
 export function saveConversation(conversation: Conversation) {
   const key = conversationKey(conversation.id);
-  const serialized = JSON.stringify(conversation);
+  const serialized = JSON.stringify(
+    relativizeConversationImageAttachmentUris(conversation),
+  );
   return enqueueMutation(key, "save", () => AsyncStorage.setItem(key, serialized));
 }
 

@@ -5,6 +5,7 @@ import {
   createMessageImageAttachment,
   MAX_MESSAGE_IMAGE_LONG_EDGE,
 } from "../../src/services/imageAttachments";
+import { deleteImageAttachments } from "../../src/services/imageAttachmentFiles";
 
 const mockResize = jest.fn();
 const mockRenderAsync = jest.fn();
@@ -84,6 +85,27 @@ describe("imageAttachments", () => {
     });
     expect(FileSystem.deleteAsync).toHaveBeenCalledWith(
       "file:///cache/processed.jpg",
+      { idempotent: true },
+    );
+  });
+
+  it("deletes a saved image from the current app container", async () => {
+    await deleteImageAttachments([
+      {
+        id: "image-uuid",
+        kind: "image",
+        uri:
+          "file:///var/mobile/Containers/Data/Application/OLD-CONTAINER/Documents/message-images/image-uuid.jpg",
+        mimeType: "image/jpeg",
+        width: 1200,
+        height: 800,
+        byteSize: 4321,
+        sharedWithProviders: ["openai"],
+      },
+    ]);
+
+    expect(FileSystem.deleteAsync).toHaveBeenCalledWith(
+      "file:///documents/message-images/image-uuid.jpg",
       { idempotent: true },
     );
   });

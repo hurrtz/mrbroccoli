@@ -90,6 +90,7 @@ jest.mock("expo-crypto", () => {
 });
 
 jest.mock("expo-file-system/legacy", () => ({
+  documentDirectory: "file:///documents/",
   EncodingType: { Base64: "base64" },
   readAsStringAsync: jest.fn(async () => "aW1hZ2UtYnl0ZXM="),
 }));
@@ -190,7 +191,7 @@ describe("appDataBackup", () => {
     expect(parseAppDataBackup(serialized)).toEqual(backup);
   });
 
-  it("embeds image bytes without leaking device-local paths", async () => {
+  it("rebases stale iOS image paths before embedding backup bytes", async () => {
     const conversationWithImage: Conversation = {
       ...conversation,
       messages: [
@@ -200,7 +201,8 @@ describe("appDataBackup", () => {
             {
               id: "image-1",
               kind: "image",
-              uri: "file:///private/message-images/image-1.jpg",
+              uri:
+                "file:///var/mobile/Containers/Data/Application/OLD-CONTAINER/Documents/message-images/image-1.jpg",
               mimeType: "image/jpeg",
               width: 1200,
               height: 800,
@@ -211,6 +213,14 @@ describe("appDataBackup", () => {
         },
       ],
     };
+    jest
+      .mocked(FileSystem.readAsStringAsync)
+      .mockImplementationOnce(async (uri) => {
+        if (uri !== "file:///documents/message-images/image-1.jpg") {
+          throw new Error("ERR_FILE_NOT_READABLE");
+        }
+        return "aW1hZ2UtYnl0ZXM=";
+      });
     const backup = await createAppDataBackup({
       activeConversationId: conversation.id,
       appVersion: "2.7.0",
@@ -233,7 +243,11 @@ describe("appDataBackup", () => {
     });
     const serialized = serializeAppDataBackup(backup);
 
-    expect(serialized).not.toContain("file:///private/");
+    expect(serialized).not.toContain("OLD-CONTAINER");
+    expect(FileSystem.readAsStringAsync).toHaveBeenCalledWith(
+      "file:///documents/message-images/image-1.jpg",
+      { encoding: "base64" },
+    );
     expect(backup.data.conversations[0].attachments).toEqual([
       expect.objectContaining({
         id: "image-1",

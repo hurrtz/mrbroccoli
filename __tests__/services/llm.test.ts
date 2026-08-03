@@ -16,6 +16,7 @@ import {
 import { Message } from "../../src/types";
 
 jest.mock("expo-file-system/legacy", () => ({
+  documentDirectory: "file:///documents/",
   EncodingType: { Base64: "base64" },
   readAsStringAsync: jest.fn(async () => "encoded-image"),
 }));

@@ -1,6 +1,7 @@
 import * as FileSystem from "expo-file-system/legacy";
 
 import type {
+  Conversation,
   MessageImageAttachment,
   MessageImageMimeType,
   Provider,
@@ -33,6 +34,69 @@ function extensionForMimeType(mimeType: MessageImageMimeType) {
   return "jpg";
 }
 
+function imageAttachmentRelativeUri(
+  attachment: Pick<MessageImageAttachment, "id" | "mimeType">,
+) {
+  return `${IMAGE_DIRECTORY_NAME}/${attachment.id}.${extensionForMimeType(
+    attachment.mimeType,
+  )}`;
+}
+
+export function resolveImageAttachmentUri(
+  attachment: Pick<MessageImageAttachment, "id" | "mimeType">,
+) {
+  return `${imageDirectory()}${attachment.id}.${extensionForMimeType(
+    attachment.mimeType,
+  )}`;
+}
+
+function mapConversationImageAttachmentUris(
+  conversation: Conversation,
+  mapUri: (
+    attachment: Pick<MessageImageAttachment, "id" | "mimeType">,
+  ) => string,
+) {
+  let changed = false;
+  const messages = conversation.messages.map((message) => {
+    if (!message.attachments?.length) {
+      return message;
+    }
+
+    let messageChanged = false;
+    const attachments = message.attachments.map((attachment) => {
+      const uri = mapUri(attachment);
+      if (uri === attachment.uri) {
+        return attachment;
+      }
+      changed = true;
+      messageChanged = true;
+      return { ...attachment, uri };
+    });
+
+    return messageChanged ? { ...message, attachments } : message;
+  });
+
+  return changed ? { ...conversation, messages } : conversation;
+}
+
+export function resolveConversationImageAttachmentUris(
+  conversation: Conversation,
+) {
+  return mapConversationImageAttachmentUris(
+    conversation,
+    resolveImageAttachmentUri,
+  );
+}
+
+export function relativizeConversationImageAttachmentUris(
+  conversation: Conversation,
+) {
+  return mapConversationImageAttachmentUris(
+    conversation,
+    imageAttachmentRelativeUri,
+  );
+}
+
 export async function ensureImageAttachmentDirectory() {
   const directory = imageDirectory();
   await FileSystem.makeDirectoryAsync(directory, { intermediates: true });
@@ -50,7 +114,7 @@ export async function createImageAttachmentUri(
 export async function readImageAttachmentData(
   attachment: MessageImageAttachment,
 ) {
-  return FileSystem.readAsStringAsync(attachment.uri, {
+  return FileSystem.readAsStringAsync(resolveImageAttachmentUri(attachment), {
     encoding: FileSystem.EncodingType.Base64,
   });
 }
@@ -73,6 +137,7 @@ export async function prepareMessageImagesForRequest<
         attachments: await Promise.all(
           message.attachments.map(async (attachment) => ({
             ...attachment,
+            uri: resolveImageAttachmentUri(attachment),
             data: await readImageAttachmentData(attachment),
           })),
         ),
@@ -90,9 +155,9 @@ export async function deleteImageAttachments(
 ) {
   await Promise.all(
     attachments.map((attachment) =>
-      FileSystem.deleteAsync(attachment.uri, { idempotent: true }).catch(
-        () => undefined,
-      ),
+      FileSystem.deleteAsync(resolveImageAttachmentUri(attachment), {
+        idempotent: true,
+      }).catch(() => undefined),
     ),
   );
 }

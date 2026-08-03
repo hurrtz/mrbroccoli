@@ -1096,6 +1096,65 @@ describe("useConversations", () => {
     await expect(readConversation(base.id)).resolves.toEqual(newest);
   });
 
+  it("persists image paths relative to the app container and resolves them on read", async () => {
+    const stored = new Map<string, string>();
+    (AsyncStorage.setItem as jest.Mock).mockImplementation(
+      async (key: string, value: string) => {
+        stored.set(key, value);
+      },
+    );
+    (AsyncStorage.getItem as jest.Mock).mockImplementation(
+      async (key: string) => stored.get(key) ?? null,
+    );
+    const conversation: Conversation = {
+      id: "portable-image-path",
+      title: "Portable image",
+      createdAt: "2026-08-03T08:00:00.000Z",
+      updatedAt: "2026-08-03T08:01:00.000Z",
+      messages: [
+        {
+          id: "image-message",
+          role: "user",
+          content: "Keep this image across updates",
+          attachments: [
+            {
+              id: "image-1",
+              kind: "image",
+              uri:
+                "file:///var/mobile/Containers/Data/Application/OLD-CONTAINER/Documents/message-images/image-1.jpg",
+              mimeType: "image/jpeg",
+              width: 1200,
+              height: 800,
+              byteSize: 11,
+              sharedWithProviders: ["openai"],
+            },
+          ],
+          model: null,
+          provider: null,
+          timestamp: "2026-08-03T08:00:00.000Z",
+        },
+      ],
+    };
+
+    await saveConversation(conversation);
+
+    const serialized = JSON.parse(
+      stored.get("@mrbroccoli/conversation/portable-image-path") ?? "{}",
+    ) as Conversation;
+    expect(serialized.messages[0]?.attachments?.[0]?.uri).toBe(
+      "message-images/image-1.jpg",
+    );
+    await expect(readConversation(conversation.id)).resolves.toMatchObject({
+      messages: [
+        {
+          attachments: [
+            { uri: "file:///documents/message-images/image-1.jpg" },
+          ],
+        },
+      ],
+    });
+  });
+
   it("orders deletion after pending writes so a removed thread stays removed", async () => {
     const stored = new Map<string, string>();
     let releaseSave: () => void = () => undefined;
