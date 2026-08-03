@@ -21,6 +21,41 @@ const VECTOR_SCAN_LIMIT = 1_500;
 const FTS_SEED_LIMIT = 24;
 const DEFAULT_SOURCE_LIMIT = 3;
 const DEFAULT_CONTEXT_CHARACTER_BUDGET = 4_800;
+const MIN_VECTOR_CANDIDATE_SCORE = 0.16;
+const MIN_VECTOR_ONLY_SCORE = 0.42;
+const MIN_HYBRID_VECTOR_SCORE = 0.24;
+const STRONG_MATCH_SCORE = 0.62;
+const NEAR_DUPLICATE_VECTOR_SCORE = 0.94;
+const LOW_INFORMATION_QUERY_TOKENS = new Set([
+  // English
+  "a", "an", "and", "are", "as", "at", "be", "been", "but", "by",
+  "can", "could", "did", "do", "does", "for", "from", "had", "has",
+  "have", "how", "i", "if", "in", "into", "is", "it", "me", "my",
+  "of", "on", "or", "our", "should", "that", "the", "their", "then",
+  "there", "these", "they", "this", "to", "was", "we", "were", "what",
+  "when", "where", "which", "who", "why", "will", "with", "would", "you",
+  "your",
+  // German
+  "aber", "als", "am", "an", "auf", "aus", "bei", "das", "dein", "deine",
+  "dem", "den", "der", "des", "die", "du", "ein", "eine", "einem", "einen",
+  "einer", "er", "es", "für", "ich", "ihr", "im", "ist", "kann", "könnte",
+  "mein", "meine", "mit", "oder", "sein", "sind", "sie", "sollte", "und",
+  "unser", "von", "war", "waren", "was", "welche", "welcher", "welches",
+  "wie", "wir", "wo", "warum", "zu", "zum", "zur",
+  // Spanish, French, Italian, and Portuguese
+  "al", "alla", "anche", "avec", "comme", "con", "da", "dans", "de", "del",
+  "della", "des", "di", "du", "e", "el", "en", "et", "eu", "gli", "il",
+  "in", "la", "le", "les", "lo", "ma", "mais", "me", "mi", "mon", "na",
+  "nel", "no", "nos", "nous", "o", "ou", "para", "par", "per", "por",
+  "pour", "que", "qui", "se", "si", "son", "su", "sur", "tu", "un", "una",
+  "une", "vous", "y",
+  // Russian
+  "а", "без", "бы", "был", "была", "были", "быть", "в", "вы", "где", "да",
+  "для", "до", "его", "ее", "если", "есть", "же", "за", "и", "из", "или",
+  "как", "когда", "кто", "ли", "мне", "мы", "на", "не", "но", "о", "он",
+  "она", "они", "от", "по", "почему", "с", "со", "так", "то", "у", "что",
+  "это", "я",
+]);
 
 interface StoredKnowledgeRow {
   content: string;
@@ -32,8 +67,14 @@ interface StoredKnowledgeRow {
   vector: Uint8Array;
 }
 
-interface RankedKnowledgeRow extends StoredKnowledgeRow {
+interface VectorKnowledgeRow extends StoredKnowledgeRow {
   score: number;
+}
+
+interface RankedKnowledgeRow extends VectorKnowledgeRow {
+  match: "strong" | "related";
+  score: number;
+  vectorScore: number;
 }
 
 export interface ConversationKnowledgeRetrieval {
@@ -289,11 +330,17 @@ function buildExclusionClause(ids: string[]) {
 }
 
 function buildFtsQuery(query: string) {
-  return Array.from(new Set(tokenizeKnowledgeText(query)))
+  return getKnowledgeQueryTokens(query)
     .filter((token) => token.length >= 2)
     .slice(0, 16)
     .map((token) => `"${token.replace(/"/g, '""')}"*`)
     .join(" OR ");
+}
+
+function getKnowledgeQueryTokens(query: string) {
+  return Array.from(new Set(tokenizeKnowledgeText(query))).filter(
+    (token) => !LOW_INFORMATION_QUERY_TOKENS.has(token),
+  );
 }
 
 async function getFtsSeeds(
@@ -354,40 +401,137 @@ async function getVectorSeeds(
     LOCAL_KNOWLEDGE_EMBEDDING.id,
     ...exclusion.parameters,
   );
-  const queryVector = createLocalKnowledgeEmbedding(query);
+  const queryTokens = getKnowledgeQueryTokens(query);
+  const queryVector = createLocalKnowledgeEmbedding(
+    queryTokens.join(" ") || query,
+  );
 
   return rows
     .map((row) => ({
       ...row,
       score: compareLocalKnowledgeEmbeddings(queryVector, row.vector),
     }))
-    .filter(({ score }) => score >= 0.18)
+    .filter(({ score }) => score >= MIN_VECTOR_CANDIDATE_SCORE)
     .sort((left, right) => right.score - left.score)
     .slice(0, FTS_SEED_LIMIT);
 }
 
+function getLexicalEvidence(query: string, row: StoredKnowledgeRow) {
+  const queryTokens = getKnowledgeQueryTokens(query);
+  const preferredTokens = queryTokens.filter(
+    (token) => token.length >= 4 || /^\d+$/.test(token),
+  );
+  const evidenceTokens = preferredTokens.length > 0
+    ? preferredTokens
+    : queryTokens.filter((token) => token.length >= 2);
+  const rowTokens = new Set(
+    tokenizeKnowledgeText(`${row.title}\n${row.content}`),
+  );
+  const matchedTokens = evidenceTokens.filter((token) => rowTokens.has(token));
+
+  return {
+    coverage:
+      evidenceTokens.length > 0
+        ? matchedTokens.length / evidenceTokens.length
+        : 0,
+    evidenceTokenCount: evidenceTokens.length,
+    matchedTokenCount: matchedTokens.length,
+  };
+}
+
 function mergeRankedSeeds(
+  query: string,
   ftsRows: StoredKnowledgeRow[],
-  vectorRows: RankedKnowledgeRow[],
+  vectorRows: VectorKnowledgeRow[],
 ) {
-  const ranked = new Map<string, RankedKnowledgeRow>();
+  const candidates = new Map<string, StoredKnowledgeRow>();
+  const ftsIds = new Set(ftsRows.map(({ id }) => id));
+  const vectorScores = new Map(
+    vectorRows.map(({ id, score }) => [id, score] as const),
+  );
 
-  ftsRows.forEach((row, index) => {
-    ranked.set(row.id, {
-      ...row,
-      score: 0.72 + 0.28 * (1 - index / Math.max(1, ftsRows.length)),
-    });
-  });
+  ftsRows.forEach((row) => candidates.set(row.id, row));
   vectorRows.forEach((row) => {
-    const existing = ranked.get(row.id);
-    ranked.set(row.id, {
-      ...row,
-      score: Math.max(existing?.score ?? 0, row.score * 0.74) +
-        (existing ? row.score * 0.18 : 0),
-    });
+    candidates.set(row.id, row);
   });
+  const queryTokens = getKnowledgeQueryTokens(query);
+  const queryVector = createLocalKnowledgeEmbedding(
+    queryTokens.join(" ") || query,
+  );
 
-  return [...ranked.values()].sort((left, right) => right.score - left.score);
+  return [...candidates.values()]
+    .flatMap((row) => {
+      const vectorScore =
+        vectorScores.get(row.id) ??
+        compareLocalKnowledgeEmbeddings(queryVector, row.vector);
+      const lexical = getLexicalEvidence(query, row);
+      const requiredTokenMatches = Math.min(2, lexical.evidenceTokenCount);
+      const hasExactEvidence =
+        requiredTokenMatches > 0 &&
+        lexical.matchedTokenCount >= requiredTokenMatches;
+      const hasHybridEvidence =
+        ftsIds.has(row.id) &&
+        lexical.matchedTokenCount > 0 &&
+        vectorScore >= MIN_HYBRID_VECTOR_SCORE;
+      const hasStrongVectorEvidence = vectorScore >= MIN_VECTOR_ONLY_SCORE;
+
+      if (
+        !hasExactEvidence &&
+        !hasHybridEvidence &&
+        !hasStrongVectorEvidence
+      ) {
+        return [];
+      }
+
+      const score =
+        Math.max(0, vectorScore) * 0.52 +
+        lexical.coverage * 0.4 +
+        (ftsIds.has(row.id) ? 0.08 : 0);
+      return [
+        {
+          ...row,
+          match:
+            score >= STRONG_MATCH_SCORE &&
+            (lexical.matchedTokenCount >= 2 || vectorScore >= 0.5)
+              ? ("strong" as const)
+              : ("related" as const),
+          score,
+          vectorScore,
+        },
+      ];
+    })
+    .sort(
+      (left, right) =>
+        right.score - left.score ||
+        right.updatedAt.localeCompare(left.updatedAt),
+    );
+}
+
+function normalizeDuplicateText(value: string) {
+  return value
+    .normalize("NFKC")
+    .toLocaleLowerCase()
+    .replace(/^user\s*:\s*/u, "")
+    .replace(/[^\p{L}\p{N}]+/gu, " ")
+    .trim();
+}
+
+function areNearDuplicateRows(
+  candidate: RankedKnowledgeRow,
+  selected: RankedKnowledgeRow,
+) {
+  const candidateContent = normalizeDuplicateText(candidate.content);
+  const selectedContent = normalizeDuplicateText(selected.content);
+  if (candidateContent && candidateContent === selectedContent) {
+    return true;
+  }
+
+  return (
+    normalizeDuplicateText(candidate.title) ===
+      normalizeDuplicateText(selected.title) &&
+    compareLocalKnowledgeEmbeddings(candidate.vector, selected.vector) >=
+      NEAR_DUPLICATE_VECTOR_SCORE
+  );
 }
 
 async function expandSeedContext(
@@ -436,7 +580,7 @@ export async function retrieveConversationKnowledge(params: {
       getVectorSeeds(database, query, excludedIds),
     ]);
     const sourceLimit = params.sourceLimit ?? DEFAULT_SOURCE_LIMIT;
-    const selected = mergeRankedSeeds(ftsRows, vectorRows);
+    const selected = mergeRankedSeeds(query, ftsRows, vectorRows);
     const excludedConversationIds = new Set(excludedIds);
     const selectedConversations = new Set<string>();
     const sourceRows: RankedKnowledgeRow[] = [];
@@ -446,6 +590,13 @@ export async function retrieveConversationKnowledge(params: {
         continue;
       }
       if (selectedConversations.has(row.conversationId)) {
+        continue;
+      }
+      if (
+        sourceRows.some((selectedRow) =>
+          areNearDuplicateRows(row, selectedRow),
+        )
+      ) {
         continue;
       }
       selectedConversations.add(row.conversationId);
@@ -465,7 +616,7 @@ export async function retrieveConversationKnowledge(params: {
     const sources: MessageConversationKnowledgeMetadata["sources"] = [];
     let usedCharacters = 0;
 
-    for (const [index, row] of sourceRows.entries()) {
+    for (const row of sourceRows) {
       const expanded = await expandSeedContext(database, row);
       const remaining = contextBudget - usedCharacters;
       if (remaining <= 0) {
@@ -477,10 +628,11 @@ export async function retrieveConversationKnowledge(params: {
       }
       usedCharacters += excerpt.length;
       contexts.push(
-        `SOURCE ${index + 1} — ${row.title} (${row.updatedAt})\n${excerpt}`,
+        `SOURCE ${contexts.length + 1} — ${row.title} (${row.updatedAt})\n${excerpt}`,
       );
       sources.push({
         conversationId: row.conversationId,
+        match: row.match,
         title: row.title,
         updatedAt: row.updatedAt,
       });
@@ -493,7 +645,8 @@ export async function retrieveConversationKnowledge(params: {
     return {
       context: contexts.join("\n\n"),
       metadata: {
-        engine: "local-user-authored-v2",
+        contentPolicy: "user-authored-only",
+        engine: "local-user-authored-v3",
         sources,
       },
     };

@@ -375,7 +375,9 @@ describe("conversation knowledge", () => {
     expect(result?.metadata.sources).toEqual([
       expect.objectContaining({ conversationId: garden.id }),
     ]);
-    expect(result?.metadata.engine).toBe("local-user-authored-v2");
+    expect(result?.metadata.engine).toBe("local-user-authored-v3");
+    expect(result?.metadata.contentPolicy).toBe("user-authored-only");
+    expect(result?.metadata.sources[0]?.match).toBe("strong");
     expect(result?.context).toContain("How often should I water the tomatoes?");
     expect(result?.context).toContain("What should I check next?");
     expect(result?.context).not.toContain("Water the tomatoes in the morning");
@@ -384,6 +386,49 @@ describe("conversation knowledge", () => {
     );
     expect(result?.context).not.toContain("secret tomato supplier");
     expect(result?.context).not.toContain("Current answer");
+  });
+
+  it("abstains when retrieval finds only an incidental low-confidence word", async () => {
+    await syncConversationKnowledge(
+      createConversation(
+        "recipes",
+        "Quick recipes",
+        "The app can save a broccoli soup recipe.",
+        "Saved.",
+      ),
+      true,
+    );
+
+    await expect(
+      retrieveConversationKnowledge({
+        query: "What is the train schedule in Madrid?",
+      }),
+    ).resolves.toBeNull();
+  });
+
+  it("suppresses duplicate sources imported as separate conversations", async () => {
+    const original = createConversation(
+      "roadmap-original",
+      "Product roadmap",
+      "The offline onboarding should choose one language and one model profile.",
+      "Understood.",
+    );
+    const importedCopy = createConversation(
+      "roadmap-copy",
+      "Product roadmap",
+      "The offline onboarding should choose one language and one model profile.",
+      "Understood.",
+    );
+    importedCopy.updatedAt = "2026-08-02T08:10:00.000Z";
+
+    await syncConversationKnowledge(original, true);
+    await syncConversationKnowledge(importedCopy, true);
+    const result = await retrieveConversationKnowledge({
+      query: "Which language and model profile should offline onboarding choose?",
+    });
+
+    expect(result?.metadata.sources).toHaveLength(1);
+    expect(result?.metadata.sources[0]?.conversationId).toBe("roadmap-copy");
   });
 
   it("deletes indexed rows when a conversation becomes private or knowledge is disabled", async () => {

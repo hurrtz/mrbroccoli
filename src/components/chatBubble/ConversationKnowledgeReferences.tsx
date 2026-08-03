@@ -83,6 +83,23 @@ export function ConversationKnowledgeReferences({
 
       {expanded ? (
         <View style={styles.referenceContent}>
+          {knowledge.contentPolicy === "user-authored-only" ? (
+            <View style={styles.knowledgePolicyRow}>
+              <PhosphorIcon
+                name="safety-certificate"
+                size="inline"
+                color={colors.accent}
+              />
+              <Text
+                style={[
+                  styles.knowledgePolicyText,
+                  { color: colors.textSecondary },
+                ]}
+              >
+                {t("knowledgeUserAuthoredOnly")}
+              </Text>
+            </View>
+          ) : null}
           <View style={styles.sourcesRow}>
             {knowledge.sources.map((source) => (
               <View
@@ -105,6 +122,13 @@ export function ConversationKnowledgeReferences({
                   style={[styles.referenceHeading, { color: colors.textMuted }]}
                 >
                   {formatKnowledgeSourceDate(source.updatedAt, locale)}
+                  {source.match
+                    ? ` · ${
+                        source.match === "strong"
+                          ? t("knowledgeMatchStrong")
+                          : t("knowledgeMatchRelated")
+                      }`
+                    : ""}
                 </Text>
               </View>
             ))}

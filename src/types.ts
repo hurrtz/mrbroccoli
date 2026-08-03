@@ -219,12 +219,17 @@ export interface MessageWebSearchMetadata {
 
 export interface MessageConversationKnowledgeSource {
   conversationId: string;
+  match?: "strong" | "related";
   title: string;
   updatedAt: string;
 }
 
 export interface MessageConversationKnowledgeMetadata {
-  engine: "local-hybrid-v1" | "local-user-authored-v2";
+  contentPolicy?: "user-authored-only";
+  engine:
+    | "local-hybrid-v1"
+    | "local-user-authored-v2"
+    | "local-user-authored-v3";
   sources: MessageConversationKnowledgeSource[];
 }
 

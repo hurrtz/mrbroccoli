@@ -283,6 +283,17 @@ export const styles = StyleSheet.create({
     paddingTop: 8,
     paddingBottom: 10,
   },
+  knowledgePolicyRow: {
+    minHeight: 24,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+  },
+  knowledgePolicyText: {
+    fontSize: 11,
+    lineHeight: 16,
+    fontFamily: fonts.bodyMedium,
+  },
   referenceQuery: {
     fontSize: 12,
     lineHeight: 18,
@@ -307,9 +318,8 @@ export const styles = StyleSheet.create({
   sourceChip: {
     maxWidth: "100%",
     minHeight: 44,
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 6,
+    alignItems: "flex-start",
+    gap: 3,
     borderRadius: 999,
     borderWidth: 1,
     paddingHorizontal: 10,

@@ -123,10 +123,12 @@ describe("ChatBubble", () => {
           timestamp: "2026-08-02T12:05:00.000Z",
           metadata: {
             conversationKnowledge: {
-              engine: "local-hybrid-v1",
+              contentPolicy: "user-authored-only",
+              engine: "local-user-authored-v3",
               sources: [
                 {
                   conversationId: "architecture",
+                  match: "strong",
                   title: "Architecture notes",
                   updatedAt: "2026-08-01T08:00:00.000Z",
                 },
@@ -144,6 +146,8 @@ describe("ChatBubble", () => {
     fireEvent.press(getByLabelText("Show recalled conversation sources"));
 
     expect(getByText("Architecture notes")).toBeTruthy();
+    expect(getByText("User messages only")).toBeTruthy();
+    expect(getByText(/Strong match/)).toBeTruthy();
     expect(getByLabelText("Hide recalled conversation sources")).toBeTruthy();
   });
 

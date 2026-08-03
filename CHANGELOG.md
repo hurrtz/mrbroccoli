@@ -48,6 +48,9 @@ the complete Play Store translations are kept in a dedicated file under
 
 ### Fixed
 
+- Make past-conversation retrieval abstain on weak incidental matches, suppress
+  duplicated conversation copies, and label retained sources by match quality
+  while continuing to index user-authored messages only.
 - Add a conversation-integrity review for saved assistant responses that
   previews suspected internal-context leakage before changing anything,
   preserves the original locally for export or undo, and avoids automatic
