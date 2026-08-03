@@ -44,7 +44,10 @@ jest.mock("react-native-sherpa-onnx/download", () => ({
   refreshModelsByCategory: (...args: unknown[]) => mockRefreshModels(...args),
 }));
 
-import { getLocalModel } from "../../src/constants/localModels";
+import {
+  getLocalModel,
+  LOCAL_MODEL_CATALOG_VERSION,
+} from "../../src/constants/localModels";
 import {
   downloadLocalModel,
   getLocalModelInstallStatus,
@@ -116,7 +119,7 @@ describe("local model manager", () => {
       "/documents/local-models/llm/Qwen3-0.6B-Q8_0.gguf",
     );
     expect(mockWriteFile).toHaveBeenCalledWith(
-      expect.stringContaining(".verified-1"),
+      `/documents/local-models/llm/Qwen3-0.6B-Q8_0.gguf.verified-${LOCAL_MODEL_CATALOG_VERSION}`,
       model.sha256,
       "utf8",
     );
