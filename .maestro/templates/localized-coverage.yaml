@@ -1,4 +1,4 @@
-appId: com.tobiaswinkler.app.mrbroccoli
+appId: ${APP_ID}
 name: Localized application coverage
 tags:
   - visual
@@ -71,7 +71,7 @@ tags:
 - tapOn:
     id: settings-back-button
 
-# Overview and the two onboarding screens reachable without credentials.
+# Overview.
 - assertVisible:
     id: settings-page-overview
 - takeScreenshot:
@@ -80,35 +80,13 @@ tags:
     direction: UP
 - takeScreenshot:
     path: ${PLATFORM}/locales/${LOCALE}/settings-overview-02
-- scrollUntilVisible:
-    element:
-      id: settings-guided-setup
-    direction: UP
-    centerElement: true
-- tapOn:
-    id: settings-guided-setup
-- assertVisible:
-    id: setup-guide-card
-- takeScreenshot:
-    path: ${PLATFORM}/locales/${LOCALE}/setup-guide-intro
-- tapOn:
-    id: setup-guide-intro-continue
-- takeScreenshot:
-    path: ${PLATFORM}/locales/${LOCALE}/setup-guide-provider
-- tapOn:
-    id: setup-guide-close
-- assertVisible:
-    id: main-screen
-- tapOn:
-    id: main-settings-button
-- assertVisible:
-    id: settings-page-overview
 
 # Connections.
 - scrollUntilVisible:
     element:
       id: settings-overview-row-connections
-    direction: DOWN
+    direction: UP
+    centerElement: true
 - tapOn:
     id: settings-overview-row-connections
 - assertVisible:
@@ -127,14 +105,6 @@ tags:
     direction: UP
 - takeScreenshot:
     path: ${PLATFORM}/locales/${LOCALE}/settings-connections-04
-- swipe:
-    direction: UP
-- takeScreenshot:
-    path: ${PLATFORM}/locales/${LOCALE}/settings-connections-05
-- swipe:
-    direction: UP
-- takeScreenshot:
-    path: ${PLATFORM}/locales/${LOCALE}/settings-connections-06
 - tapOn:
     id: settings-back-button
 

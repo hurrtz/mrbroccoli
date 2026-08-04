@@ -1,4 +1,4 @@
-appId: com.tobiaswinkler.app.mrbroccoli
+appId: ${APP_ID}
 name: Dark high-contrast large-text coverage
 tags:
   - visual
@@ -38,6 +38,8 @@ tags:
     element:
       id: settings-overview-row-app
     direction: DOWN
+- takeScreenshot:
+    path: ${PLATFORM}/accessibility/settings-overview-bottom
 - tapOn:
     id: settings-overview-row-app
 - assertVisible:

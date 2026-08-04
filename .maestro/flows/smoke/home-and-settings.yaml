@@ -1,4 +1,4 @@
-appId: com.tobiaswinkler.app.mrbroccoli
+appId: ${APP_ID}
 name: Home and settings smoke test
 tags:
   - smoke

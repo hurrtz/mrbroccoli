@@ -3,7 +3,7 @@ import path from "node:path";
 import { spawnSync } from "node:child_process";
 import { pathToFileURL } from "node:url";
 
-const APP_ID = "com.tobiaswinkler.app.mrbroccoli";
+const APP_ID = "com.tobiaswinkler.app.mrbroccoli.maestro";
 
 export function parseAdbDevices(output) {
   return output
@@ -108,6 +108,7 @@ function selectIosSimulator(available, environment) {
 }
 
 function runMaestroSuite({
+  appId,
   cwd,
   outputDirectory,
   platform,
@@ -119,6 +120,8 @@ function runMaestroSuite({
     process.execPath,
     [
       "scripts/run-maestro-suite.mjs",
+      "--app-id",
+      appId,
       "--platform",
       platform,
       "--suite",
@@ -188,7 +191,12 @@ export function runMaestroPrerelease({
 
   run(
     path.join(cwd, "android", "gradlew"),
-    ["-p", "android", ":app:assembleRelease"],
+    [
+      "-p",
+      "android",
+      "-PmrBroccoliMaestroVariant=true",
+      ":app:assembleRelease",
+    ],
     {
       cwd,
       env: { EXPO_NO_DOTENV: "1", NODE_ENV: "production" },
@@ -241,6 +249,8 @@ export function runMaestroPrerelease({
       `platform=iOS Simulator,id=${iosSimulator}`,
       "-derivedDataPath",
       derivedData,
+      "MR_BROCCOLI_LOCAL_BUNDLE_SUFFIX=.maestro",
+      "MR_BROCCOLI_LOCAL_DISPLAY_SUFFIX= Maestro",
       "build",
     ],
     { cwd, env: { EXPO_NO_DOTENV: "1", NODE_ENV: "production" } },
@@ -276,6 +286,7 @@ export function runMaestroPrerelease({
   );
 
   runMaestroSuite({
+    appId: APP_ID,
     cwd,
     outputDirectory: "artifacts/maestro/release",
     platform: "android",
@@ -284,6 +295,7 @@ export function runMaestroPrerelease({
     udid: androidEmulator,
   });
   runMaestroSuite({
+    appId: APP_ID,
     cwd,
     outputDirectory: "artifacts/maestro/release",
     platform: "ios",
@@ -299,6 +311,8 @@ export function runMaestroPrerelease({
       process.execPath,
       [
         "scripts/run-screen-reader-check.mjs",
+        "--app-id",
+        APP_ID,
         "--platform",
         platform,
         "--udid",
@@ -310,6 +324,7 @@ export function runMaestroPrerelease({
     );
   }
   runMaestroSuite({
+    appId: APP_ID,
     cwd,
     outputDirectory: "artifacts/maestro/release-physical",
     platform: "android",

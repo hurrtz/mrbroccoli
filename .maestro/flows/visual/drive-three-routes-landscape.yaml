@@ -1,4 +1,4 @@
-appId: com.tobiaswinkler.app.mrbroccoli
+appId: ${APP_ID}
 name: Drive mode with three routes in landscape
 tags:
   - visual

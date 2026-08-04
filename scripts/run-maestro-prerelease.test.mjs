@@ -138,9 +138,17 @@ emulator-5554 device product:sdk model:Pixel transport_id:1
     });
     assert.ok(secretScan);
     assert.deepEqual(
-      screenReaderChecks.map(({ args }) => args[2]),
+      screenReaderChecks.map(({ args }) => args[4]),
       ["android", "ios"],
     );
+    assert.equal(
+      screenReaderChecks.every(({ args }) =>
+        args.includes("com.tobiaswinkler.app.mrbroccoli.maestro"),
+      ),
+      true,
+    );
+    assert.ok(androidBuild.args.includes("-PmrBroccoliMaestroVariant=true"));
+    assert.ok(iosBuild.args.includes("MR_BROCCOLI_LOCAL_BUNDLE_SUFFIX=.maestro"));
     assert.equal(secretScan.args.at(-2).endsWith("app-release.apk"), true);
     assert.equal(secretScan.args.at(-1).endsWith("MrBroccoli.app"), true);
     assert.deepEqual(

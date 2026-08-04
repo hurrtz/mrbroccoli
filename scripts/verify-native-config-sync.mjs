@@ -196,6 +196,11 @@ assertIncludes(
   developmentEntitlement,
   "applicationId?.endsWith(DEVELOPMENT_APPLICATION_ID_SUFFIX) === true",
 );
+assertIncludes(
+  "Maestro entitlement is gated by its isolated application ID suffix",
+  developmentEntitlement,
+  "applicationId?.endsWith(MAESTRO_APPLICATION_ID_SUFFIX) === true",
+);
 assertExcludes(
   "Development entitlement does not depend on __DEV__",
   developmentEntitlement,

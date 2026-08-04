@@ -1,5 +1,4 @@
 import {
-  APP_ID,
   capture,
   captureHierarchy,
   runPrepFlow,
@@ -83,6 +82,7 @@ function rebootSimulator(execute, cwd, udid) {
 }
 
 export function runIosScreenReaderCheck({
+  appId,
   cwd,
   execute,
   outputDirectory,
@@ -103,12 +103,12 @@ export function runIosScreenReaderCheck({
       rebootSimulator(execute, cwd, udid);
     }
 
-    runPrepFlow({ cwd, execute, outputDirectory, udid });
+    runPrepFlow({ appId, cwd, execute, outputDirectory, udid });
     for (const key of READER_KEYS) {
       writeBoolean(execute, cwd, udid, key, true);
     }
     rebootSimulator(execute, cwd, udid);
-    execute("xcrun", ["simctl", "launch", udid, APP_ID], { cwd });
+    execute("xcrun", ["simctl", "launch", udid, appId], { cwd });
     wait(1_500);
 
     const enabled = readPreference(

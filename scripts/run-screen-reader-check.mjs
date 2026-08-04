@@ -9,11 +9,13 @@ import {
 } from "./screen-reader/hierarchy.mjs";
 import { runIosScreenReaderCheck } from "./screen-reader/ios.mjs";
 import { executeCommand } from "./screen-reader/runtime.mjs";
+import { DEFAULT_APP_ID } from "./screen-reader/runtime.mjs";
 
 export { flattenHierarchy, validateScreenReaderHierarchy };
 
 function parseArguments(argv) {
   const options = {
+    appId: DEFAULT_APP_ID,
     outputDirectory: "artifacts/maestro/screen-reader",
     platform: "",
     udid: "",
@@ -23,7 +25,10 @@ function parseArguments(argv) {
     const argument = argv[index];
     const value = argv[index + 1];
 
-    if (argument === "--platform" && value) {
+    if (argument === "--app-id" && value) {
+      options.appId = value;
+      index += 1;
+    } else if (argument === "--platform" && value) {
       options.platform = value;
       index += 1;
     } else if (argument === "--udid" && value) {
@@ -48,6 +53,7 @@ function parseArguments(argv) {
 }
 
 export function runScreenReaderCheck({
+  appId = DEFAULT_APP_ID,
   cwd = process.cwd(),
   execute = executeCommand,
   outputDirectory,
@@ -60,12 +66,14 @@ export function runScreenReaderCheck({
   const result =
     platform === "android"
       ? runAndroidScreenReaderCheck({
+          appId,
           cwd,
           execute,
           outputDirectory: platformOutput,
           udid,
         })
       : runIosScreenReaderCheck({
+          appId,
           cwd,
           execute,
           outputDirectory: platformOutput,
@@ -108,6 +116,7 @@ if (
   try {
     const options = parseArguments(process.argv.slice(2));
     runScreenReaderCheck({
+      appId: options.appId,
       outputDirectory: options.outputDirectory,
       platform: options.platform,
       udid: options.udid,

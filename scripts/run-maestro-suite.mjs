@@ -15,8 +15,11 @@ import {
   validateMaestroSuite,
 } from "./verify-maestro-suite.mjs";
 
+const DEFAULT_APP_ID = "com.tobiaswinkler.app.mrbroccoli";
+
 function parseArguments(argv) {
   const options = {
+    appId: DEFAULT_APP_ID,
     outputDirectory: "artifacts/maestro",
     platform: null,
     suite: "all",
@@ -30,6 +33,9 @@ function parseArguments(argv) {
 
     if (argument === "--platform" && value) {
       options.platform = value;
+      index += 1;
+    } else if (argument === "--app-id" && value) {
+      options.appId = value;
       index += 1;
     } else if (argument === "--suite" && value) {
       options.suite = value;
@@ -421,7 +427,7 @@ function main() {
     );
     runFlow({
       cwd,
-      environment: { PLATFORM: options.platform },
+      environment: { APP_ID: options.appId, PLATFORM: options.platform },
       expectedScreenshotCount: countScreenshots(smokeText),
       flow: MAESTRO_SMOKE_FLOW,
       outputDirectory: path.join(platformOutput, "smoke"),
@@ -436,7 +442,7 @@ function main() {
     );
     runFlow({
       cwd,
-      environment: { PLATFORM: options.platform },
+      environment: { APP_ID: options.appId, PLATFORM: options.platform },
       expectedScreenshotCount: countScreenshots(layoutText),
       flow: MAESTRO_LAYOUT_FLOW,
       outputDirectory: path.join(platformOutput, "layout"),
@@ -458,7 +464,7 @@ function main() {
     try {
       runFlow({
         cwd,
-        environment: { PLATFORM: options.platform },
+        environment: { APP_ID: options.appId, PLATFORM: options.platform },
         expectedScreenshotCount: countScreenshots(accessibilityText),
         flow: MAESTRO_ACCESSIBILITY_FLOW,
         outputDirectory: path.join(platformOutput, "accessibility"),
@@ -491,6 +497,7 @@ function main() {
       runFlow({
         cwd,
         environment: {
+          APP_ID: options.appId,
           LOCALE: language,
           LOCALE_NEEDS_SAFE_SCROLL: localeNeedsSafeScroll(
             options.platform,

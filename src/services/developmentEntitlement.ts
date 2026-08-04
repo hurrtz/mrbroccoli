@@ -7,6 +7,7 @@ export const DEVELOPMENT_ENTITLEMENT_MODE_STORAGE_KEY =
   "@mrbroccoli/development-entitlement-mode";
 
 const DEVELOPMENT_APPLICATION_ID_SUFFIX = ".dev";
+const MAESTRO_APPLICATION_ID_SUFFIX = ".maestro";
 
 type DiagnosticsNativeModule = {
   getApplicationId?: () => Promise<string | null>;
@@ -32,7 +33,16 @@ export async function isDevelopmentAppVariant() {
 }
 
 export async function loadDevelopmentEntitlementMode(): Promise<DevelopmentEntitlementMode | null> {
-  if (!(await isDevelopmentAppVariant())) {
+  const applicationId = await getApplicationId();
+
+  // Release UI automation uses an isolated application identity so a clean
+  // install can reach the complete Premium surface without StoreKit or Play
+  // test-account state. The production identity cannot enter this branch.
+  if (applicationId?.endsWith(MAESTRO_APPLICATION_ID_SUFFIX) === true) {
+    return "premium";
+  }
+
+  if (applicationId?.endsWith(DEVELOPMENT_APPLICATION_ID_SUFFIX) !== true) {
     return null;
   }
 

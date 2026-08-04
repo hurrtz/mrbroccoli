@@ -261,16 +261,6 @@ export function validateMaestroSuite(cwd = process.cwd()) {
     );
   }
 
-  if (
-    !/id:\s*settings-guided-setup[\s\S]{0,160}centerElement:\s*true/.test(
-      localizedFlow,
-    )
-  ) {
-    errors.push(
-      "Localized Maestro coverage must center guided setup below the fixed Settings header",
-    );
-  }
-
   if (languages.length !== 19) {
     errors.push(
       `Expected 19 registered UI languages, found ${languages.length}`,

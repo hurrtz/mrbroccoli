@@ -57,6 +57,7 @@ function notificationPermissionGranted(packageDump) {
 }
 
 export function runAndroidScreenReaderCheck({
+  appId,
   cwd,
   execute,
   outputDirectory,
@@ -97,7 +98,7 @@ export function runAndroidScreenReaderCheck({
 
   try {
     setReader(execute, cwd, udid, false);
-    runPrepFlow({ cwd, execute, outputDirectory, udid });
+    runPrepFlow({ appId, cwd, execute, outputDirectory, udid });
     execute(
       "adb",
       [

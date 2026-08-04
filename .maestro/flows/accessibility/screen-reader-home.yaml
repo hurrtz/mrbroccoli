@@ -1,4 +1,4 @@
-appId: com.tobiaswinkler.app.mrbroccoli
+appId: ${APP_ID}
 name: Prepare screen-reader home coverage
 tags:
   - accessibility

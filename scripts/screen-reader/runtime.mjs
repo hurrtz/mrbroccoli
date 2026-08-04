@@ -1,7 +1,7 @@
 import path from "node:path";
 import { spawnSync } from "node:child_process";
 
-export const APP_ID = "com.tobiaswinkler.app.mrbroccoli";
+export const DEFAULT_APP_ID = "com.tobiaswinkler.app.mrbroccoli";
 const PREP_FLOW = ".maestro/flows/accessibility/screen-reader-home.yaml";
 
 export function wait(milliseconds) {
@@ -47,13 +47,15 @@ export function capture(
   });
 }
 
-export function runPrepFlow({ cwd, execute, outputDirectory, udid }) {
+export function runPrepFlow({ appId, cwd, execute, outputDirectory, udid }) {
   execute(
     "maestro",
     [
       "test",
       "--config",
       ".maestro/config.yaml",
+      "-e",
+      `APP_ID=${appId}`,
       "--udid",
       udid,
       "--test-output-dir",
