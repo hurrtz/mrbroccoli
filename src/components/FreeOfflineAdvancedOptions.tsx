@@ -120,6 +120,9 @@ export function FreeOfflineAdvancedOptions({
             {model.name}
           </Text>
           <Text style={[styles.meta, { color: colors.textSecondary }]}>
+            {model.catalogTier === "advanced"
+              ? `${t("onboardingAdvancedOptions")} · `
+              : ""}
             {formatBytes(model.downloadBytes)} · {model.license} ·{" "}
             {statusLabel(model)}
           </Text>

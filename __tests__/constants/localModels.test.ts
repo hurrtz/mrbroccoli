@@ -3,6 +3,7 @@ import {
   getLocalModelsForLanguages,
   localModelSupportsLanguages,
 } from "../../src/constants/localModels";
+import { FREE_SPEECH_LANGUAGE_OPTIONS } from "../../src/constants/speechLanguages";
 
 describe("local model catalogue", () => {
   it("contains only version-pinned artifacts with integrity metadata", () => {
@@ -16,6 +17,7 @@ describe("local model catalogue", () => {
       expect(model.installedBytes).toBeGreaterThanOrEqual(model.downloadBytes);
       expect(model.sha256).toMatch(/^[a-f0-9]{64}$/);
       expect(model.requirements.platforms).toEqual(["android", "ios"]);
+      expect(["recommended", "advanced"]).toContain(model.catalogTier);
     }
   });
 
@@ -46,11 +48,81 @@ describe("local model catalogue", () => {
     ).toContain("piper-pt-br-faber");
   });
 
-  it("offers Omnilingual as an optional broad-language recognizer", () => {
-    expect(
-      getLocalModelsForLanguages("stt", ["en", "it", "pt", "ru"]).map(
-        ({ id }) => id,
-      ),
-    ).toEqual(["whisper-tiny", "omnilingual-asr-300m"]);
+  it("offers a curated multilingual recognition range", () => {
+    const modelIds = getLocalModelsForLanguages("stt", [
+      "en",
+      "it",
+      "pt",
+      "ru",
+    ]).map(({ id }) => id);
+
+    expect(modelIds).toEqual([
+      "whisper-tiny",
+      "whisper-base",
+      "whisper-small",
+      "omnilingual-asr-300m",
+      "parakeet-tdt-0.6b-v3-int8",
+      "qwen3-asr-0.6b-int8",
+    ]);
   });
+
+  it("keeps strong reasoning choices for Russian without offering unsupported models", () => {
+    const modelIds = getLocalModelsForLanguages("llm", ["ru"]).map(
+      ({ id }) => id,
+    );
+
+    expect(modelIds).toEqual([
+      "qwen3-0.6b-q8",
+      "qwen3.5-0.8b-q8",
+      "qwen3-1.7b-q8",
+      "qwen3-4b-q4",
+    ]);
+    expect(modelIds).not.toContain("granite-4.0-1b-q4");
+    expect(modelIds).not.toContain("ministral-3-3b-reasoning-q4");
+  });
+
+  it.each(["en", "de", "es", "fr", "it", "pt-BR", "ru"] as const)(
+    "offers at least two downloadable voices for %s",
+    (language) => {
+      expect(
+        getLocalModelsForLanguages("tts", [language]).length,
+      ).toBeGreaterThanOrEqual(2);
+    },
+  );
+
+  it("keeps the only permissively licensed European Portuguese Piper voice", () => {
+    expect(
+      getLocalModelsForLanguages("tts", ["pt"]).map(({ id }) => id),
+    ).toEqual(["piper-pt-pt-tugao"]);
+  });
+
+  it.each([...FREE_SPEECH_LANGUAGE_OPTIONS, "pt-BR"] as const)(
+    "provides a recommended route and advanced range for %s",
+    (language) => {
+      const llms = getLocalModelsForLanguages("llm", [language]);
+      const stt = getLocalModelsForLanguages("stt", [language]);
+      const tts = getLocalModelsForLanguages("tts", [language]);
+
+      expect(
+        llms.some(({ catalogTier }) => catalogTier === "recommended"),
+      ).toBe(true);
+      expect(llms.some(({ catalogTier }) => catalogTier === "advanced")).toBe(
+        true,
+      );
+      expect(stt.some(({ catalogTier }) => catalogTier === "recommended")).toBe(
+        true,
+      );
+      expect(stt.some(({ catalogTier }) => catalogTier === "advanced")).toBe(
+        true,
+      );
+      expect(tts.some(({ catalogTier }) => catalogTier === "recommended")).toBe(
+        true,
+      );
+      if (language !== "pt") {
+        expect(tts.some(({ catalogTier }) => catalogTier === "advanced")).toBe(
+          true,
+        );
+      }
+    },
+  );
 });

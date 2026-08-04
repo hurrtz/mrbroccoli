@@ -3,6 +3,8 @@ import {
   type SpeechLanguage,
 } from "./speechLanguages";
 
+// Increment only when existing artifact or benchmark contracts change. Adding a
+// new model must not invalidate verified downloads and benchmarks for others.
 export const LOCAL_MODEL_CATALOG_VERSION = 2;
 
 export type LocalModelCapability = "llm" | "stt" | "tts";
@@ -10,36 +12,68 @@ export type LocalModelRuntime = "llama-rn" | "sherpa-onnx";
 export type LocalModelPlatform = "android" | "ios";
 export type LocalModelId =
   | "qwen3-0.6b-q8"
+  | "qwen3.5-0.8b-q8"
+  | "granite-4.0-1b-q4"
   | "qwen3-1.7b-q8"
+  | "ministral-3-3b-reasoning-q4"
+  | "qwen3-4b-q4"
   | "whisper-tiny"
+  | "whisper-base"
+  | "whisper-small"
   | "omnilingual-asr-300m"
+  | "parakeet-tdt-0.6b-v3-int8"
+  | "qwen3-asr-0.6b-int8"
   | "kokoro-multilingual"
   | "piper-en-us-kristin"
+  | "piper-en-us-norman"
   | "piper-de-de-thorsten"
+  | "piper-de-de-kerstin"
   | "piper-es-es-sharvard"
+  | "piper-es-es-davefx"
   | "piper-fr-fr-siwis"
+  | "piper-fr-fr-gilles"
   | "piper-pt-br-faber"
+  | "piper-pt-br-cadu"
   | "piper-pt-pt-tugao"
   | "piper-ru-ru-dmitri"
-  | "piper-it-it-paola";
+  | "piper-ru-ru-denis"
+  | "piper-it-it-paola"
+  | "piper-it-it-riccardo";
 export type LocalLlmModelId = Extract<
   LocalModelId,
-  "qwen3-0.6b-q8" | "qwen3-1.7b-q8"
+  | "qwen3-0.6b-q8"
+  | "qwen3.5-0.8b-q8"
+  | "granite-4.0-1b-q4"
+  | "qwen3-1.7b-q8"
+  | "ministral-3-3b-reasoning-q4"
+  | "qwen3-4b-q4"
 >;
 export type LocalSttModelId = Extract<
   LocalModelId,
-  "whisper-tiny" | "omnilingual-asr-300m"
+  | "whisper-tiny"
+  | "whisper-base"
+  | "whisper-small"
+  | "omnilingual-asr-300m"
+  | "parakeet-tdt-0.6b-v3-int8"
+  | "qwen3-asr-0.6b-int8"
 >;
 export type LocalTtsModelId = Extract<
   LocalModelId,
   | "piper-en-us-kristin"
+  | "piper-en-us-norman"
   | "piper-de-de-thorsten"
+  | "piper-de-de-kerstin"
   | "piper-es-es-sharvard"
+  | "piper-es-es-davefx"
   | "piper-fr-fr-siwis"
+  | "piper-fr-fr-gilles"
   | "piper-pt-br-faber"
+  | "piper-pt-br-cadu"
   | "piper-pt-pt-tugao"
   | "piper-ru-ru-dmitri"
+  | "piper-ru-ru-denis"
   | "piper-it-it-paola"
+  | "piper-it-it-riccardo"
 >;
 export type LocalTtsCatalogModelId = LocalTtsModelId | "kokoro-multilingual";
 
@@ -62,6 +96,8 @@ interface LocalModelBase {
   capability: LocalModelCapability;
   name: string;
   description: string;
+  /** Recommended entries may be selected automatically; advanced entries are opt-in. */
+  catalogTier: "recommended" | "advanced";
   runtime: LocalModelRuntime;
   languages: readonly SpeechLanguage[];
   downloadBytes: number;
@@ -88,7 +124,7 @@ export interface LocalSttModelDefinition extends LocalModelBase {
   capability: "stt";
   runtime: "sherpa-onnx";
   runtimeModelId: string;
-  sherpaModelType: "whisper" | "omnilingual";
+  sherpaModelType: "whisper" | "omnilingual" | "nemo_transducer" | "qwen3_asr";
 }
 
 export interface LocalTtsModelDefinition extends LocalModelBase {
@@ -132,6 +168,7 @@ export const LOCAL_MODEL_CATALOG = [
     capability: "llm",
     name: "Qwen3 0.6B",
     description: "Small multilingual response model; fastest local option.",
+    catalogTier: "recommended",
     runtime: "llama-rn",
     languages: ALL_SPEECH_LANGUAGES,
     fileName: "Qwen3-0.6B-Q8_0.gguf",
@@ -151,10 +188,61 @@ export const LOCAL_MODEL_CATALOG = [
     responseProfile: "quick",
   },
   {
+    id: "qwen3.5-0.8b-q8",
+    capability: "llm",
+    name: "Qwen3.5 0.8B",
+    description:
+      "Newer compact multilingual model for users who want another quick-response option.",
+    catalogTier: "advanced",
+    runtime: "llama-rn",
+    languages: ALL_SPEECH_LANGUAGES,
+    fileName: "Qwen3.5-0.8B-Q8_0.gguf",
+    downloadBytes: 833_592_096,
+    installedBytes: 833_592_096,
+    sha256: "37ae482d336108d23516fa35e8e0c4126688d81018b87178a18d752a1357814f",
+    license: "Apache-2.0",
+    sourceUrl: "https://huggingface.co/ggml-org/Qwen3.5-0.8B-GGUF",
+    downloadUrl:
+      "https://huggingface.co/ggml-org/Qwen3.5-0.8B-GGUF/resolve/main/Qwen3.5-0.8B-Q8_0.gguf?download=true",
+    requirements: qwenRequirements(4, 833_592_096),
+    benchmark: {
+      maximumLoadMs: 45_000,
+      minimumTokensPerSecond: 3,
+    },
+    contextTokens: 4_096,
+    responseProfile: "quick",
+  },
+  {
+    id: "granite-4.0-1b-q4",
+    capability: "llm",
+    name: "Granite 4.0 1B",
+    description:
+      "Compact alternative for English and the supported Western European languages.",
+    catalogTier: "advanced",
+    runtime: "llama-rn",
+    languages: ["en", "de", "es", "fr", "it", "pt", "pt-BR"],
+    fileName: "granite-4.0-1b-Q4_K_M.gguf",
+    downloadBytes: 1_023_645_440,
+    installedBytes: 1_023_645_440,
+    sha256: "22ec0f9cc99a90185312de3c882c84e7bd6789bdd050389844380a01a831d7f1",
+    license: "Apache-2.0",
+    sourceUrl: "https://huggingface.co/ibm-granite/granite-4.0-1b-GGUF",
+    downloadUrl:
+      "https://huggingface.co/ibm-granite/granite-4.0-1b-GGUF/resolve/main/granite-4.0-1b-Q4_K_M.gguf?download=true",
+    requirements: qwenRequirements(4, 1_023_645_440),
+    benchmark: {
+      maximumLoadMs: 45_000,
+      minimumTokensPerSecond: 3,
+    },
+    contextTokens: 4_096,
+    responseProfile: "quick",
+  },
+  {
     id: "qwen3-1.7b-q8",
     capability: "llm",
     name: "Qwen3 1.7B",
     description: "Higher-quality multilingual responses on stronger phones.",
+    catalogTier: "recommended",
     runtime: "llama-rn",
     languages: ALL_SPEECH_LANGUAGES,
     fileName: "Qwen3-1.7B-Q8_0.gguf",
@@ -174,10 +262,62 @@ export const LOCAL_MODEL_CATALOG = [
     responseProfile: "thorough",
   },
   {
+    id: "ministral-3-3b-reasoning-q4",
+    capability: "llm",
+    name: "Ministral 3 3B Reasoning",
+    description:
+      "Purpose-built reasoning alternative for high-end phones and supported European languages.",
+    catalogTier: "advanced",
+    runtime: "llama-rn",
+    languages: ["en", "de", "es", "fr", "it", "pt", "pt-BR"],
+    fileName: "Ministral-3-3B-Reasoning-2512-Q4_K_M.gguf",
+    downloadBytes: 2_147_021_472,
+    installedBytes: 2_147_021_472,
+    sha256: "7e9516cc01a039bb3e2d41227cdf388849bc1c942c4624c84567b1684cd9c0fc",
+    license: "Apache-2.0",
+    sourceUrl:
+      "https://huggingface.co/mistralai/Ministral-3-3B-Reasoning-2512-GGUF",
+    downloadUrl:
+      "https://huggingface.co/mistralai/Ministral-3-3B-Reasoning-2512-GGUF/resolve/main/Ministral-3-3B-Reasoning-2512-Q4_K_M.gguf?download=true",
+    requirements: qwenRequirements(8, 2_147_021_472),
+    benchmark: {
+      maximumLoadMs: 70_000,
+      minimumTokensPerSecond: 3,
+    },
+    contextTokens: 4_096,
+    responseProfile: "thorough",
+  },
+  {
+    id: "qwen3-4b-q4",
+    capability: "llm",
+    name: "Qwen3 4B",
+    description:
+      "Larger multilingual reasoning option, including Russian, for high-end phones.",
+    catalogTier: "advanced",
+    runtime: "llama-rn",
+    languages: ALL_SPEECH_LANGUAGES,
+    fileName: "Qwen3-4B-Q4_K_M.gguf",
+    downloadBytes: 2_497_280_256,
+    installedBytes: 2_497_280_256,
+    sha256: "7485fe6f11af29433bc51cab58009521f205840f5b4ae3a32fa7f92e8534fdf5",
+    license: "Apache-2.0",
+    sourceUrl: "https://huggingface.co/Qwen/Qwen3-4B-GGUF",
+    downloadUrl:
+      "https://huggingface.co/Qwen/Qwen3-4B-GGUF/resolve/main/Qwen3-4B-Q4_K_M.gguf?download=true",
+    requirements: qwenRequirements(8, 2_497_280_256),
+    benchmark: {
+      maximumLoadMs: 75_000,
+      minimumTokensPerSecond: 3,
+    },
+    contextTokens: 4_096,
+    responseProfile: "thorough",
+  },
+  {
     id: "whisper-tiny",
     capability: "stt",
     name: "Whisper Tiny",
     description: "Multilingual on-device speech recognition.",
+    catalogTier: "recommended",
     runtime: "sherpa-onnx",
     runtimeModelId: "sherpa-onnx-whisper-tiny",
     sherpaModelType: "whisper",
@@ -196,11 +336,60 @@ export const LOCAL_MODEL_CATALOG = [
     },
   },
   {
+    id: "whisper-base",
+    capability: "stt",
+    name: "Whisper Base",
+    description:
+      "Balanced multilingual recognition with more capacity than Whisper Tiny.",
+    catalogTier: "advanced",
+    runtime: "sherpa-onnx",
+    runtimeModelId: "sherpa-onnx-whisper-base",
+    sherpaModelType: "whisper",
+    languages: ALL_SPEECH_LANGUAGES,
+    downloadBytes: 207_557_382,
+    installedBytes: 315_000_000,
+    sha256: "911b2083efd7c0dca2ac3b358b75222660dc09fb716d64fbfc417ba6c99ff3de",
+    license: "MIT",
+    sourceUrl: "https://github.com/openai/whisper",
+    downloadUrl:
+      "https://github.com/k2-fsa/sherpa-onnx/releases/download/asr-models/sherpa-onnx-whisper-base.tar.bz2",
+    requirements: speechRequirements(3, 315_000_000),
+    benchmark: {
+      maximumLoadMs: 25_000,
+      maximumRealtimeFactor: 1.5,
+    },
+  },
+  {
+    id: "whisper-small",
+    capability: "stt",
+    name: "Whisper Small",
+    description:
+      "Higher-accuracy Whisper option for stronger phones and difficult audio.",
+    catalogTier: "advanced",
+    runtime: "sherpa-onnx",
+    runtimeModelId: "sherpa-onnx-whisper-small",
+    sherpaModelType: "whisper",
+    languages: ALL_SPEECH_LANGUAGES,
+    downloadBytes: 639_387_718,
+    installedBytes: 970_000_000,
+    sha256: "486a46afbb7ba798507190ffe02fea2dd726049af212e774537efac6afb210a6",
+    license: "MIT",
+    sourceUrl: "https://github.com/openai/whisper",
+    downloadUrl:
+      "https://github.com/k2-fsa/sherpa-onnx/releases/download/asr-models/sherpa-onnx-whisper-small.tar.bz2",
+    requirements: speechRequirements(5, 970_000_000),
+    benchmark: {
+      maximumLoadMs: 40_000,
+      maximumRealtimeFactor: 1.5,
+    },
+  },
+  {
     id: "omnilingual-asr-300m",
     capability: "stt",
     name: "Omnilingual ASR 300M",
     description:
       "Broader multilingual on-device recognition for stronger phones.",
+    catalogTier: "recommended",
     runtime: "sherpa-onnx",
     runtimeModelId:
       "sherpa-onnx-omnilingual-asr-1600-languages-300M-ctc-v2-int8-2026-02-05",
@@ -221,10 +410,59 @@ export const LOCAL_MODEL_CATALOG = [
     },
   },
   {
+    id: "parakeet-tdt-0.6b-v3-int8",
+    capability: "stt",
+    name: "Parakeet TDT 0.6B v3",
+    description:
+      "Modern multilingual recognition with punctuation for stronger phones.",
+    catalogTier: "advanced",
+    runtime: "sherpa-onnx",
+    runtimeModelId: "sherpa-onnx-nemo-parakeet-tdt-0.6b-v3-int8",
+    sherpaModelType: "nemo_transducer",
+    languages: ["en", "de", "es", "fr", "it", "pt", "pt-BR", "ru"],
+    downloadBytes: 487_170_055,
+    installedBytes: 750_000_000,
+    sha256: "5793d0fd397c5778d2cf2126994d58e9d56b1be7c04d13c7a15bb1b4eafb16bf",
+    license: "CC-BY-4.0",
+    sourceUrl: "https://huggingface.co/nvidia/parakeet-tdt-0.6b-v3",
+    downloadUrl:
+      "https://github.com/k2-fsa/sherpa-onnx/releases/download/asr-models/sherpa-onnx-nemo-parakeet-tdt-0.6b-v3-int8.tar.bz2",
+    requirements: speechRequirements(6, 750_000_000),
+    benchmark: {
+      maximumLoadMs: 45_000,
+      maximumRealtimeFactor: 1.5,
+    },
+  },
+  {
+    id: "qwen3-asr-0.6b-int8",
+    capability: "stt",
+    name: "Qwen3-ASR 0.6B",
+    description:
+      "Large multilingual recognizer for users prioritizing recognition quality.",
+    catalogTier: "advanced",
+    runtime: "sherpa-onnx",
+    runtimeModelId: "sherpa-onnx-qwen3-asr-0.6B-int8-2026-03-25",
+    sherpaModelType: "qwen3_asr",
+    languages: ["en", "de", "es", "fr", "it", "pt", "pt-BR", "ru"],
+    downloadBytes: 878_702_423,
+    installedBytes: 1_350_000_000,
+    sha256: "393f8a14e2f5fb96746aaab342997a40641001fbd5bf9592a080a8329178ee96",
+    license: "Apache-2.0",
+    sourceUrl: "https://huggingface.co/Qwen/Qwen3-ASR-0.6B",
+    downloadUrl:
+      "https://github.com/k2-fsa/sherpa-onnx/releases/download/asr-models/sherpa-onnx-qwen3-asr-0.6B-int8-2026-03-25.tar.bz2",
+    requirements: speechRequirements(8, 1_350_000_000),
+    benchmark: {
+      maximumLoadMs: 70_000,
+      maximumRealtimeFactor: 1.5,
+    },
+  },
+  {
     id: "kokoro-multilingual",
     capability: "tts",
     name: "Kokoro",
     description: "Natural English and Simplified Chinese on-device speech.",
+    catalogTier: "recommended",
     runtime: "sherpa-onnx",
     runtimeModelId: "kokoro-int8-multi-lang-v1_1",
     sherpaModelType: "kokoro",
@@ -248,6 +486,7 @@ export const LOCAL_MODEL_CATALOG = [
     capability: "tts",
     name: "Piper · Kristin",
     description: "Compact US English voice.",
+    catalogTier: "recommended",
     runtime: "sherpa-onnx",
     runtimeModelId: "vits-piper-en_US-kristin-medium-int8",
     sherpaModelType: "vits",
@@ -264,10 +503,33 @@ export const LOCAL_MODEL_CATALOG = [
     benchmark: { maximumLoadMs: 15_000, maximumRealtimeFactor: 1.5 },
   },
   {
+    id: "piper-en-us-norman",
+    capability: "tts",
+    name: "Piper · Norman",
+    description: "Alternative compact US English voice.",
+    catalogTier: "advanced",
+    runtime: "sherpa-onnx",
+    runtimeModelId: "vits-piper-en_US-norman-medium-int8",
+    sherpaModelType: "vits",
+    speakerId: 0,
+    languages: ["en"],
+    downloadBytes: 20_987_233,
+    installedBytes: 31_000_000,
+    sha256: "cb481a514bc213ccf3899391c0f27fdcc4e4b814ec30496f28089a027b5aa01b",
+    license: "Public Domain",
+    sourceUrl:
+      "https://huggingface.co/csukuangfj/vits-piper-en_US-norman-medium",
+    downloadUrl:
+      "https://github.com/k2-fsa/sherpa-onnx/releases/download/tts-models/vits-piper-en_US-norman-medium-int8.tar.bz2",
+    requirements: speechRequirements(2, 31_000_000),
+    benchmark: { maximumLoadMs: 15_000, maximumRealtimeFactor: 1.5 },
+  },
+  {
     id: "piper-de-de-thorsten",
     capability: "tts",
     name: "Piper · Thorsten",
     description: "Compact German voice.",
+    catalogTier: "recommended",
     runtime: "sherpa-onnx",
     runtimeModelId: "vits-piper-de_DE-thorsten-medium-int8",
     sherpaModelType: "vits",
@@ -284,10 +546,32 @@ export const LOCAL_MODEL_CATALOG = [
     benchmark: { maximumLoadMs: 15_000, maximumRealtimeFactor: 1.5 },
   },
   {
+    id: "piper-de-de-kerstin",
+    capability: "tts",
+    name: "Piper · Kerstin",
+    description: "Alternative compact German voice.",
+    catalogTier: "advanced",
+    runtime: "sherpa-onnx",
+    runtimeModelId: "vits-piper-de_DE-kerstin-low-int8",
+    sherpaModelType: "vits",
+    speakerId: 0,
+    languages: ["de"],
+    downloadBytes: 21_174_728,
+    installedBytes: 32_000_000,
+    sha256: "bcd8039667940cf2efc939b844f4b33d0823096572fcc1a8caaa2faa77f3379c",
+    license: "CC0-1.0",
+    sourceUrl: "https://huggingface.co/rhasspy/piper-voices",
+    downloadUrl:
+      "https://github.com/k2-fsa/sherpa-onnx/releases/download/tts-models/vits-piper-de_DE-kerstin-low-int8.tar.bz2",
+    requirements: speechRequirements(2, 32_000_000),
+    benchmark: { maximumLoadMs: 15_000, maximumRealtimeFactor: 1.5 },
+  },
+  {
     id: "piper-es-es-sharvard",
     capability: "tts",
     name: "Piper · Sharvard",
     description: "Compact Spanish voice.",
+    catalogTier: "recommended",
     runtime: "sherpa-onnx",
     runtimeModelId: "vits-piper-es_ES-sharvard-medium-int8",
     sherpaModelType: "vits",
@@ -304,10 +588,32 @@ export const LOCAL_MODEL_CATALOG = [
     benchmark: { maximumLoadMs: 15_000, maximumRealtimeFactor: 1.5 },
   },
   {
+    id: "piper-es-es-davefx",
+    capability: "tts",
+    name: "Piper · DaveFX",
+    description: "Alternative compact Spanish voice.",
+    catalogTier: "advanced",
+    runtime: "sherpa-onnx",
+    runtimeModelId: "vits-piper-es_ES-davefx-medium-int8",
+    sherpaModelType: "vits",
+    speakerId: 0,
+    languages: ["es"],
+    downloadBytes: 21_171_632,
+    installedBytes: 32_000_000,
+    sha256: "8bb8ac1cefb727caec9bd9c6c3185c673c8b42c53bd29bb25d5a7715dac37125",
+    license: "CC0-1.0",
+    sourceUrl: "https://huggingface.co/rhasspy/piper-voices",
+    downloadUrl:
+      "https://github.com/k2-fsa/sherpa-onnx/releases/download/tts-models/vits-piper-es_ES-davefx-medium-int8.tar.bz2",
+    requirements: speechRequirements(2, 32_000_000),
+    benchmark: { maximumLoadMs: 15_000, maximumRealtimeFactor: 1.5 },
+  },
+  {
     id: "piper-fr-fr-siwis",
     capability: "tts",
     name: "Piper · Siwis",
     description: "Compact French voice.",
+    catalogTier: "recommended",
     runtime: "sherpa-onnx",
     runtimeModelId: "vits-piper-fr_FR-siwis-medium-int8",
     sherpaModelType: "vits",
@@ -324,10 +630,32 @@ export const LOCAL_MODEL_CATALOG = [
     benchmark: { maximumLoadMs: 15_000, maximumRealtimeFactor: 1.5 },
   },
   {
+    id: "piper-fr-fr-gilles",
+    capability: "tts",
+    name: "Piper · Gilles",
+    description: "Alternative compact French voice.",
+    catalogTier: "advanced",
+    runtime: "sherpa-onnx",
+    runtimeModelId: "vits-piper-fr_FR-gilles-low-int8",
+    sherpaModelType: "vits",
+    speakerId: 0,
+    languages: ["fr"],
+    downloadBytes: 21_248_965,
+    installedBytes: 32_000_000,
+    sha256: "92d2bfd9b6b32b9787557c466b15620e453aecc10ec521762660e034941b3c43",
+    license: "CC0-1.0",
+    sourceUrl: "https://huggingface.co/rhasspy/piper-voices",
+    downloadUrl:
+      "https://github.com/k2-fsa/sherpa-onnx/releases/download/tts-models/vits-piper-fr_FR-gilles-low-int8.tar.bz2",
+    requirements: speechRequirements(2, 32_000_000),
+    benchmark: { maximumLoadMs: 15_000, maximumRealtimeFactor: 1.5 },
+  },
+  {
     id: "piper-pt-br-faber",
     capability: "tts",
     name: "Piper · Faber",
     description: "Compact Brazilian Portuguese voice.",
+    catalogTier: "recommended",
     runtime: "sherpa-onnx",
     runtimeModelId: "vits-piper-pt_BR-faber-medium-int8",
     sherpaModelType: "vits",
@@ -344,10 +672,32 @@ export const LOCAL_MODEL_CATALOG = [
     benchmark: { maximumLoadMs: 15_000, maximumRealtimeFactor: 1.5 },
   },
   {
+    id: "piper-pt-br-cadu",
+    capability: "tts",
+    name: "Piper · Cadu",
+    description: "Alternative compact Brazilian Portuguese voice.",
+    catalogTier: "advanced",
+    runtime: "sherpa-onnx",
+    runtimeModelId: "vits-piper-pt_BR-cadu-medium-int8",
+    sherpaModelType: "vits",
+    speakerId: 0,
+    languages: ["pt-BR"],
+    downloadBytes: 21_135_464,
+    installedBytes: 32_000_000,
+    sha256: "78f1caf0a74cc6cb8dedaff87affd232ee653d5b0394d4cf4d2e97ecbfa5ff3d",
+    license: "CC0-1.0",
+    sourceUrl: "https://huggingface.co/rhasspy/piper-voices",
+    downloadUrl:
+      "https://github.com/k2-fsa/sherpa-onnx/releases/download/tts-models/vits-piper-pt_BR-cadu-medium-int8.tar.bz2",
+    requirements: speechRequirements(2, 32_000_000),
+    benchmark: { maximumLoadMs: 15_000, maximumRealtimeFactor: 1.5 },
+  },
+  {
     id: "piper-pt-pt-tugao",
     capability: "tts",
     name: "Piper · Tugão",
     description: "Compact European Portuguese voice.",
+    catalogTier: "recommended",
     runtime: "sherpa-onnx",
     runtimeModelId: "vits-piper-pt_PT-tugao-medium-int8",
     sherpaModelType: "vits",
@@ -368,6 +718,7 @@ export const LOCAL_MODEL_CATALOG = [
     capability: "tts",
     name: "Piper · Dmitri",
     description: "Compact Russian voice.",
+    catalogTier: "recommended",
     runtime: "sherpa-onnx",
     runtimeModelId: "vits-piper-ru_RU-dmitri-medium-int8",
     sherpaModelType: "vits",
@@ -384,10 +735,32 @@ export const LOCAL_MODEL_CATALOG = [
     benchmark: { maximumLoadMs: 15_000, maximumRealtimeFactor: 1.5 },
   },
   {
+    id: "piper-ru-ru-denis",
+    capability: "tts",
+    name: "Piper · Denis",
+    description: "Alternative compact Russian voice.",
+    catalogTier: "advanced",
+    runtime: "sherpa-onnx",
+    runtimeModelId: "vits-piper-ru_RU-denis-medium-int8",
+    sherpaModelType: "vits",
+    speakerId: 0,
+    languages: ["ru"],
+    downloadBytes: 21_058_905,
+    installedBytes: 32_000_000,
+    sha256: "d710e29eb7854c42461d16d65d3cef753cc559639ca75806edc75ba71f23af66",
+    license: "CC0-1.0",
+    sourceUrl: "https://huggingface.co/rhasspy/piper-voices",
+    downloadUrl:
+      "https://github.com/k2-fsa/sherpa-onnx/releases/download/tts-models/vits-piper-ru_RU-denis-medium-int8.tar.bz2",
+    requirements: speechRequirements(2, 32_000_000),
+    benchmark: { maximumLoadMs: 15_000, maximumRealtimeFactor: 1.5 },
+  },
+  {
     id: "piper-it-it-paola",
     capability: "tts",
     name: "Piper · Paola",
     description: "Compact Italian voice.",
+    catalogTier: "recommended",
     runtime: "sherpa-onnx",
     runtimeModelId: "vits-piper-it_IT-paola-medium-int8",
     sherpaModelType: "vits",
@@ -401,6 +774,27 @@ export const LOCAL_MODEL_CATALOG = [
     downloadUrl:
       "https://github.com/k2-fsa/sherpa-onnx/releases/download/tts-models/vits-piper-it_IT-paola-medium-int8.tar.bz2",
     requirements: speechRequirements(2, 32_000_000),
+    benchmark: { maximumLoadMs: 15_000, maximumRealtimeFactor: 1.5 },
+  },
+  {
+    id: "piper-it-it-riccardo",
+    capability: "tts",
+    name: "Piper · Riccardo",
+    description: "Alternative lightweight Italian voice.",
+    catalogTier: "advanced",
+    runtime: "sherpa-onnx",
+    runtimeModelId: "vits-piper-it_IT-riccardo-x_low-int8",
+    sherpaModelType: "vits",
+    speakerId: 0,
+    languages: ["it"],
+    downloadBytes: 13_329_285,
+    installedBytes: 21_000_000,
+    sha256: "afc2ea457fd45420dbdd87db4b3927b4fc97b00511964d474bb43e03092d37c1",
+    license: "BSD-3-Clause",
+    sourceUrl: "https://huggingface.co/rhasspy/piper-voices",
+    downloadUrl:
+      "https://github.com/k2-fsa/sherpa-onnx/releases/download/tts-models/vits-piper-it_IT-riccardo-x_low-int8.tar.bz2",
+    requirements: speechRequirements(2, 21_000_000),
     benchmark: { maximumLoadMs: 15_000, maximumRealtimeFactor: 1.5 },
   },
 ] as const satisfies readonly LocalModelDefinition[];

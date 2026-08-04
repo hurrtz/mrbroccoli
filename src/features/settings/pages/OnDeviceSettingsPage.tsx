@@ -476,6 +476,9 @@ export function OnDeviceSettingsPage({
     return (
       <AntSettingsCard key={model.id} title={model.name}>
         <Text style={[localStyles.meta, { color: colors.textMuted }]}>
+          {model.catalogTier === "advanced"
+            ? `${t("onboardingAdvancedOptions")} · `
+            : ""}
           {formatBytes(model.downloadBytes)} · {model.license} ·{" "}
           {t(testStatusKey(benchmark))}
         </Text>

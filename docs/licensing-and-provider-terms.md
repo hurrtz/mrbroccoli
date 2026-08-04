@@ -1,6 +1,6 @@
 # Licensing and provider-terms review
 
-Reviewed on 2026-08-02. This is an engineering compliance record, not legal
+Reviewed on 2026-08-04. This is an engineering compliance record, not legal
 advice.
 
 ## Conclusion
@@ -37,12 +37,18 @@ unreviewed dependency licenses during validation.
   distribution agreements and billing policies.
 - Optional on-device models are never bundled. The catalogue pins their source,
   artifact size, SHA-256 digest, and license before download:
-  - Qwen3 0.6B and 1.7B GGUF files: Apache-2.0.
-  - Whisper Tiny: MIT; Omnilingual ASR 300M v2 int8: Apache-2.0.
+  - Qwen3 0.6B, 1.7B, and 4B and Qwen3.5 0.8B GGUF files: Apache-2.0.
+  - IBM Granite 4.0 1B and Mistral Ministral 3 3B Reasoning GGUF files:
+    Apache-2.0.
+  - Whisper Tiny, Base, and Small: MIT; Omnilingual ASR 300M v2 int8 and
+    Qwen3-ASR 0.6B int8: Apache-2.0; NVIDIA Parakeet TDT 0.6B v3 int8:
+    CC-BY-4.0.
   - Kokoro multilingual: Apache-2.0; the archive includes its license file.
   - Piper Kristin: public domain; Thorsten and Faber: CC0-1.0; Sharvard:
     CC-BY-3.0; Siwis: CC-BY-4.0; European Portuguese Tugão, Russian
-    Dmitri, and Italian Paola: CC0-1.0.
+    Dmitri, and Italian Paola: CC0-1.0. Alternative Norman is public domain;
+    Kerstin, DaveFX, Gilles, Cadu, and Denis are CC0-1.0; Riccardo is
+    BSD-3-Clause.
 - Downloaded models, their benchmark results, and generated audio are
   device-local and excluded from app-data backups. Attribution-bearing model
   archives and their source links must remain intact.

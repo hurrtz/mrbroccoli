@@ -116,6 +116,28 @@ describe("local speech model checks", () => {
     expect(mockDestroy).toHaveBeenCalledTimes(1);
   });
 
+  it.each([
+    ["parakeet-tdt-0.6b-v3-int8", "nemo_transducer"],
+    ["qwen3-asr-0.6b-int8", "qwen3_asr"],
+  ] as const)(
+    "routes %s through Sherpa's %s recognizer",
+    async (modelId, modelType) => {
+      mockTranscribeFile.mockResolvedValueOnce({ text: "recognized" });
+
+      await expect(
+        transcribeLocalAudio({
+          fileUri: "file:///recording.wav",
+          modelId,
+          language: "ru",
+        }),
+      ).resolves.toBe("recognized");
+
+      expect(mockCreateStt).toHaveBeenCalledWith(
+        expect.objectContaining({ modelType, modelOptions: undefined }),
+      );
+    },
+  );
+
   it("uses the selected language for local TTS benchmarks", () => {
     expect(getLocalTtsBenchmarkText("de")).toBe("Hallo von Mr Broccoli.");
     expect(getLocalTtsBenchmarkText("es")).toBe("Hola desde Mr Broccoli.");

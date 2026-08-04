@@ -142,6 +142,12 @@ function sortCandidates<T extends LocalModelDefinition>(params: {
   );
 }
 
+function preferredAutomaticCandidates<T extends LocalModelDefinition>(
+  models: T[],
+) {
+  return models.filter((model) => model.catalogTier === "recommended");
+}
+
 export function selectOfflineProfile(params: {
   languages: readonly SpeechLanguage[];
   snapshot: LocalDeviceSnapshot;
@@ -190,8 +196,22 @@ export function selectOfflineProfile(params: {
   const viableTts = ttsModels.filter(
     (model) => isPermanentlyEligible(model, params.snapshot).eligible,
   );
+  const automaticQuickLlms = preferredAutomaticCandidates(viableQuickLlms);
+  const automaticThoroughLlms =
+    preferredAutomaticCandidates(viableThoroughLlms);
+  const automaticStt = preferredAutomaticCandidates(viableStt);
+  const automaticTts = preferredAutomaticCandidates(viableTts);
+  const hasQuickOverride = viableQuickLlms.some(
+    (model) => model.id === params.overrides?.quickLlmModelId,
+  );
+  const hasSttOverride = viableStt.some(
+    (model) => model.id === params.overrides?.sttModelId,
+  );
 
-  if (!viableQuickLlms.length || (!viableStt.length && !nativeSttSelected)) {
+  if (
+    (!automaticQuickLlms.length && !hasQuickOverride) ||
+    (!automaticStt.length && !hasSttOverride && !nativeSttSelected)
+  ) {
     return { status: "unavailable", reason: "device" };
   }
 
@@ -204,14 +224,24 @@ export function selectOfflineProfile(params: {
     ...candidateOptions,
     models: viableQuickLlms,
   });
+  const sortedAutomaticQuickLlms = sortCandidates({
+    ...candidateOptions,
+    models: automaticQuickLlms,
+  });
   const llm =
     sortedQuickLlms.find(
       (model) => model.id === params.overrides?.quickLlmModelId,
-    ) ?? sortedQuickLlms[0];
+    ) ?? sortedAutomaticQuickLlms[0];
   const sortedThoroughLlms = viableThoroughLlms.length
     ? sortCandidates({
         ...candidateOptions,
         models: viableThoroughLlms,
+      })
+    : [];
+  const sortedAutomaticThoroughLlms = viableThoroughLlms.length
+    ? sortCandidates({
+        ...candidateOptions,
+        models: automaticThoroughLlms,
       })
     : [];
   const thoroughCandidate =
@@ -220,7 +250,7 @@ export function selectOfflineProfile(params: {
       : (sortedThoroughLlms.find(
           (model) => model.id === params.overrides?.thoroughLlmModelId,
         ) ??
-        sortedThoroughLlms[0] ??
+        sortedAutomaticThoroughLlms[0] ??
         null);
   const sortedStt = sortCandidates({
     ...candidateOptions,
@@ -229,7 +259,10 @@ export function selectOfflineProfile(params: {
   const stt = nativeSttSelected
     ? null
     : (sortedStt.find((model) => model.id === params.overrides?.sttModelId) ??
-      sortedStt[0]);
+      sortCandidates({
+        ...candidateOptions,
+        models: automaticStt,
+      })[0]);
   const sortedTts = viableTts.length
     ? sortCandidates({
         ...candidateOptions,
@@ -241,7 +274,13 @@ export function selectOfflineProfile(params: {
     params.overrides?.ttsModelId === null
       ? null
       : (sortedTts.find((model) => model.id === params.overrides?.ttsModelId) ??
-        sortedTts[0] ??
+        (viableTts.length
+          ? sortCandidates({
+              ...candidateOptions,
+              models: automaticTts,
+              tieBreaker: (model) => ttsPreference(model),
+            })[0]
+          : undefined) ??
         null);
   const baseModels: LocalModelDefinition[] = [
     llm,
@@ -385,12 +424,15 @@ export function applyOfflineProfileToSettings(
 
 export function applyUnavailableFreeSettings(settings: Settings): Settings {
   const llm = getLocalModelsForLanguages("llm", settings.localLanguages).find(
-    (model) => model.responseProfile === "quick",
+    (model) =>
+      model.responseProfile === "quick" && model.catalogTier === "recommended",
   );
   const fallbackLlm =
     llm ??
     getLocalModelsForLanguages("llm", ["en"]).find(
-      (model) => model.responseProfile === "quick",
+      (model) =>
+        model.responseProfile === "quick" &&
+        model.catalogTier === "recommended",
     );
   if (!fallbackLlm) {
     throw new Error("The local model catalogue has no Free LLM fallback.");

@@ -220,6 +220,25 @@ describe("free offline profile selection", () => {
     }
   });
 
+  it("does not let installed advanced models replace automatic recommendations", () => {
+    const result = selectOfflineProfile({
+      languages: ["en"],
+      snapshot: device(),
+      installedModelIds: new Set([
+        "qwen3.5-0.8b-q8",
+        "whisper-base",
+        "piper-en-us-norman",
+      ]),
+    });
+
+    expect(result.status).toBe("ready");
+    if (result.status === "ready") {
+      expect(result.profile.llm.id).toBe("qwen3-0.6b-q8");
+      expect(result.profile.stt?.id).toBe("whisper-tiny");
+      expect(result.profile.tts?.id).toBe("kokoro-multilingual");
+    }
+  });
+
   it("avoids a model with a current failed device benchmark", () => {
     const result = selectOfflineProfile({
       languages: ["en"],
@@ -313,6 +332,27 @@ describe("free offline profile selection", () => {
     expect(selection.profile.thoroughLlm).toBeNull();
     expect(selection.profile.stt.id).toBe("omnilingual-asr-300m");
     expect(selection.profile.tts?.id).toBe("piper-en-us-kristin");
+  });
+
+  it("applies opt-in catalogue alternatives after device filtering", () => {
+    const selection = selectOfflineProfile({
+      languages: ["ru"],
+      snapshot: device(),
+      overrides: {
+        quickLlmModelId: "qwen3.5-0.8b-q8",
+        thoroughLlmModelId: "qwen3-4b-q4",
+        sttModelId: "parakeet-tdt-0.6b-v3-int8",
+        ttsModelId: "piper-ru-ru-denis",
+      },
+    });
+    if (selection.status !== "ready") {
+      throw new Error("Expected an advanced Russian profile");
+    }
+
+    expect(selection.profile.llm.id).toBe("qwen3.5-0.8b-q8");
+    expect(selection.profile.thoroughLlm?.id).toBe("qwen3-4b-q4");
+    expect(selection.profile.stt?.id).toBe("parakeet-tdt-0.6b-v3-int8");
+    expect(selection.profile.tts?.id).toBe("piper-ru-ru-denis");
   });
 
   it("routes a bilingual Free profile through language-aware system speech", () => {

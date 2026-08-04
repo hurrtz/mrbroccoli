@@ -12,6 +12,11 @@ the complete Play Store translations are kept in a dedicated file under
 
 ### Added
 
+- Expand the on-device catalogue with opt-in Qwen3.5, Granite, Ministral
+  Reasoning, and larger Qwen reasoning routes; Whisper Base and Small,
+  Parakeet, and Qwen3-ASR recognition; and additional permissively licensed
+  Piper voices. Automatic setup keeps its proven defaults, while every
+  advanced choice remains device-filtered and benchmark-gated.
 - Add an expandable Uber Mode audit to each deliberated reply, showing routes,
   rounds, challenge and convergence verdicts, failures, retired participants,
   retained synthesis history, and intermediate tokens without storing private

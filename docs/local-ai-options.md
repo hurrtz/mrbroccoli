@@ -1,6 +1,6 @@
 # Local AI options review
 
-Reviewed on 2026-08-03. This is an engineering and product assessment, not
+Reviewed on 2026-08-04. This is an engineering and product assessment, not
 legal advice. Model availability, licenses, artifacts, and runtime support must
 be rechecked before each release.
 
@@ -17,18 +17,25 @@ are known:
 - a successful benchmark on the user's own device before the route can be
   selected.
 
-The first expansion is deliberately conservative:
+Free setup matches one selected speaking language, not a simultaneous
+seven-language profile. This materially expands the safe candidate pool while
+keeping the automatic path conservative:
 
-- add CC0 Piper voices for Italian, Russian, and European Portuguese;
-- add the Apache-2.0 Omnilingual ASR 300M v2 int8 model as an optional,
-  broad-language alternative to Whisper Tiny;
-- retain Qwen3 0.6B as the default quick-response model and make Qwen3 1.7B's
-  existing thinking mode the thorough option on phones that pass its benchmark;
-- keep Qwen3-ASR 0.6B available as a researched advanced candidate until its
-  approximately 879 MB download and sustained memory use have passed the
-  physical-device matrix; and
-- do not offer Supertonic 3 or LFM2.5 Thinking yet because their current mobile
-  bridge or licensing conditions need product work described below.
+- Qwen3 0.6B remains the automatic Quick model and Qwen3 1.7B remains the
+  automatic Thorough model on phones that fit both;
+- Qwen3.5 0.8B and Granite 4.0 1B are opt-in Quick alternatives, while
+  Ministral 3 3B Reasoning and Qwen3 4B are opt-in Thorough alternatives;
+- Whisper Base and Small, NVIDIA Parakeet TDT 0.6B v3, and Qwen3-ASR 0.6B join
+  Whisper Tiny and Omnilingual as language-compatible recognition choices;
+- a second permissively licensed Piper voice is offered for every Free locale
+  except European Portuguese, where the remaining reviewed archives are
+  non-commercial; and
+- Supertonic 3 and platform-native reasoning remain separate integration gates
+  because their current mobile APIs cannot yet enforce the selected language.
+
+Advanced entries never replace an automatic recommendation merely because
+they were downloaded. A user must choose one explicitly, download its exact
+pinned bytes, and pass the benchmark on that device before use.
 
 ## Current runtime boundary
 
@@ -47,35 +54,39 @@ current candidates.
 
 ## Reasoning and response models
 
-| Candidate | What it offers | Language fit | Mobile and license assessment | Decision |
-| --- | --- | --- | --- | --- |
-| Qwen3 0.6B Q8 | Small general chat model with switchable thinking | Covers the seven Free languages | Apache-2.0; already integrated and about 639 MB | Default Quick route |
-| Qwen3 1.7B Q8 | Better-capacity sibling with switchable thinking | Covers the seven Free languages | Apache-2.0; already integrated and about 1.83 GB; needs at least a strong 6 GB-class phone and a passing device benchmark | Thorough route when viable |
-| [Qwen3.5 0.8B](https://huggingface.co/Qwen/Qwen3.5-0.8B) | Newer hybrid reasoning architecture and broad multilingual coverage | 201 languages | Apache-2.0; an official Q8 GGUF is about 834 MB and the shipped `llama.cpp` recognizes Qwen3.5 | Benchmark candidate; do not displace a known-working default without device evidence |
-| [LFM2.5 1.2B Thinking](https://huggingface.co/LiquidAI/LFM2.5-1.2B-Thinking) | Purpose-built compact reasoning model; official Q4 is about 731 MB | English, Arabic, Chinese, French, German, Japanese, Korean, Spanish; no Italian, Portuguese, or Russian | Runtime-compatible, but the LFM Open License v1.0 excludes commercial use by entities with annual revenue of USD 10M or more | License-gated research option, not a default distributable model |
-| [IBM Granite 4.0 1B](https://huggingface.co/ibm-granite/granite-4.0-1b) | Apache-licensed instruction model and official GGUF | Includes Italian and Portuguese but not Russian | About 1.02 GB at Q4; model card calls out precision-specific hardware behavior | Secondary benchmark candidate |
-| [Ministral 3 3B](https://huggingface.co/mistralai/Ministral-3-3B-Instruct-2512) | Stronger edge-oriented general model and long context | Eleven languages; incomplete seven-language fit | Apache-2.0 but approximately 2.15 GB at Q4, so suitable only for high-end phones | Advanced future candidate |
-| [SmolLM3 3B](https://huggingface.co/HuggingFaceTB/SmolLM3-3B) | Explicit dual thinking/non-thinking behavior | Covers six target languages, not Russian | Apache-2.0; materially larger than the current default | Advanced future candidate |
-| [Phi-4 Mini Instruct](https://huggingface.co/microsoft/Phi-4-mini-instruct) | Strong small-model reasoning and all seven target languages | Complete fit | MIT model, but Microsoft does not publish the GGUF artifact the app would need; community conversions are larger and add a provenance boundary | Wait for an official compatible artifact |
-| [EuroLLM 1.7B Instruct](https://huggingface.co/utter-project/EuroLLM-1.7B-Instruct) | Broad European-language coverage including all seven | Complete fit | Apache-2.0, but no official GGUF; its own card warns that it is not preference-aligned and may produce problematic or hallucinated content | Research/translation candidate, not the assistant default |
-| Gemma 3 1B / Llama 3.2 1B | Popular compact alternatives | Gemma is broad; Llama omits Russian | Gated or model-specific terms, plus incomplete target fit for Llama | Not suitable for frictionless one-tap setup |
+| Candidate                                                                                       | What it offers                                                      | Language fit                                                                                            | Mobile and license assessment                                                                                                                  | Decision                                                         |
+| ----------------------------------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------- |
+| Qwen3 0.6B Q8                                                                                   | Small general chat model with switchable thinking                   | Covers every Free language                                                                              | Apache-2.0; about 639 MB                                                                                                                       | Automatic Quick route                                            |
+| Qwen3 1.7B Q8                                                                                   | Better-capacity sibling with switchable thinking                    | Covers every Free language                                                                              | Apache-2.0; about 1.83 GB; needs at least a strong 6 GB-class phone and a passing device benchmark                                             | Automatic Thorough route when viable                             |
+| [Qwen3.5 0.8B](https://huggingface.co/Qwen/Qwen3.5-0.8B)                                        | Newer hybrid reasoning architecture and broad multilingual coverage | 201 languages                                                                                           | Apache-2.0; the pinned ggml-org Q8 conversion is about 834 MB and the shipped `llama.cpp` recognizes Qwen3.5                                   | Integrated as an advanced Quick option                           |
+| [LFM2.5 1.2B Thinking](https://huggingface.co/LiquidAI/LFM2.5-1.2B-Thinking)                    | Purpose-built compact reasoning model; official Q4 is about 731 MB  | English, Arabic, Chinese, French, German, Japanese, Korean, Spanish; no Italian, Portuguese, or Russian | Runtime-compatible, but the LFM Open License v1.0 excludes commercial use by entities with annual revenue of USD 10M or more                   | License-gated research option, not a default distributable model |
+| [IBM Granite 4.0 1B](https://huggingface.co/ibm-granite/granite-4.0-1b)                         | Apache-licensed instruction model and official GGUF                 | English, German, Spanish, French, Italian, and Portuguese; not Russian                                  | About 1.02 GB at Q4; model card calls out precision-specific hardware behavior                                                                 | Integrated as an advanced Quick option for compatible languages  |
+| [Ministral 3 3B Reasoning](https://huggingface.co/mistralai/Ministral-3-3B-Reasoning-2512-GGUF) | Purpose-built edge reasoning model                                  | English, German, Spanish, French, Italian, and Portuguese; not Russian                                  | Official Apache-2.0 GGUF, approximately 2.15 GB at Q4                                                                                          | Integrated as a high-end Thorough option                         |
+| [Qwen3 4B](https://huggingface.co/Qwen/Qwen3-4B-GGUF)                                           | Larger switchable-thinking model                                    | Covers every Free language, including Russian                                                           | Official Apache-2.0 GGUF, approximately 2.50 GB at Q4                                                                                          | Integrated as a high-end Thorough option                         |
+| [SmolLM3 3B](https://huggingface.co/HuggingFaceTB/SmolLM3-3B)                                   | Explicit dual thinking/non-thinking behavior                        | Covers six target languages, not Russian                                                                | Apache-2.0; materially larger than the current default                                                                                         | Advanced future candidate                                        |
+| [Phi-4 Mini Instruct](https://huggingface.co/microsoft/Phi-4-mini-instruct)                     | Strong small-model reasoning and all seven target languages         | Complete fit                                                                                            | MIT model, but Microsoft does not publish the GGUF artifact the app would need; community conversions are larger and add a provenance boundary | Wait for an official compatible artifact                         |
+| [EuroLLM 1.7B Instruct](https://huggingface.co/utter-project/EuroLLM-1.7B-Instruct)             | Broad European-language coverage including all seven                | Complete fit                                                                                            | Apache-2.0, but no official GGUF; its own card warns that it is not preference-aligned and may produce problematic or hallucinated content     | Research/translation candidate, not the assistant default        |
+| Gemma 3 1B / Llama 3.2 1B                                                                       | Popular compact alternatives                                        | Gemma is broad; Llama omits Russian                                                                     | Gated or model-specific terms, plus incomplete target fit for Llama                                                                            | Not suitable for frictionless one-tap setup                      |
 
-The existing Qwen pair is therefore still the most defensible all-language
-combination today. The product distinction should be behavioral and honest:
-Quick disables thinking and limits response work; Thorough enables thinking and
-uses the larger model only when it is installed and benchmarked as viable.
+The existing Qwen pair remains the most defensible automatic combination. The
+new entries provide real choice per selected language without claiming that a
+parameter count or newer release is universally better. Quick disables
+thinking and limits response work; Thorough enables thinking and uses a larger
+model only when it is installed and benchmarked as viable.
 
 ## Speech-to-text
 
-| Candidate | Coverage and size | Runtime and license assessment | Decision |
-| --- | --- | --- | --- |
-| [Whisper Tiny](https://github.com/openai/whisper) | Multilingual; roughly 116 MB compressed | MIT; already working through Sherpa | Keep as the fastest/default download |
-| Whisper Base | Same multilingual family with more capacity; roughly 208 MB compressed | MIT and Sherpa-compatible, but the old release asset does not publish a digest alongside it | Possible quality step after independently pinning and testing the artifact |
-| [Omnilingual ASR 300M v2 int8](https://k2-fsa.github.io/sherpa/onnx/omnilingual-asr/models.html) | More than 1,600 languages; roughly 292 MB compressed | Apache-2.0; supported by the exact React Native/Sherpa bridge | Add as optional broad-language recognition and benchmark on device |
-| [Qwen3-ASR 0.6B int8](https://huggingface.co/Qwen/Qwen3-ASR-0.6B) | 30 languages plus 22 Chinese dialects, including all seven target languages; roughly 879 MB compressed | Apache-2.0 and supported by the exact bridge | Advanced candidate pending physical-device memory, heat, and latency evidence |
-| [Moonshine](https://github.com/usefulsensors/moonshine) | Designed for fast edge transcription | Available artifacts are language-specific, so seven-language coverage multiplies downloads | Revisit if a compact multilingual mobile artifact becomes available |
-| SenseVoice | Fast compact recognition | Chinese, English, Japanese, Korean, and Cantonese only | Reject for the Free language set |
-| Platform speech recognizers | No model download and often hardware optimized | Availability, offline behavior, and privacy depend on operating-system language packs and settings | Keep as the default system option; never describe it as guaranteed offline |
+| Candidate                                                                                        | Coverage and size                                                                               | Runtime and license assessment                                                                     | Decision                                                                   |
+| ------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------- |
+| [Whisper Tiny](https://github.com/openai/whisper)                                                | Multilingual; roughly 116 MB compressed                                                         | MIT; already working through Sherpa                                                                | Keep as the fastest/default download                                       |
+| Whisper Base                                                                                     | Same multilingual family with more capacity; roughly 208 MB compressed                          | MIT and Sherpa-compatible; pinned against Sherpa's published checksum                              | Integrated balanced option                                                 |
+| Whisper Small                                                                                    | Higher-capacity multilingual Whisper; roughly 639 MB compressed                                 | MIT and Sherpa-compatible; pinned against Sherpa's published checksum                              | Integrated higher-accuracy option for stronger phones                      |
+| [Omnilingual ASR 300M v2 int8](https://k2-fsa.github.io/sherpa/onnx/omnilingual-asr/models.html) | More than 1,600 languages; roughly 292 MB compressed                                            | Apache-2.0; supported by the exact React Native/Sherpa bridge                                      | Add as optional broad-language recognition and benchmark on device         |
+| [NVIDIA Parakeet TDT 0.6B v3 int8](https://huggingface.co/nvidia/parakeet-tdt-0.6b-v3)           | Covers every Free language; roughly 487 MB compressed                                           | CC-BY-4.0 and supported by the bridge's NeMo transducer route                                      | Integrated advanced option                                                 |
+| [Qwen3-ASR 0.6B int8](https://huggingface.co/Qwen/Qwen3-ASR-0.6B)                                | 30 languages plus 22 Chinese dialects, including every Free language; roughly 879 MB compressed | Apache-2.0 and supported by the exact bridge                                                       | Integrated high-memory advanced option                                     |
+| [Moonshine](https://github.com/usefulsensors/moonshine)                                          | Designed for fast edge transcription                                                            | Available artifacts are language-specific, so seven-language coverage multiplies downloads         | Revisit if a compact multilingual mobile artifact becomes available        |
+| SenseVoice                                                                                       | Fast compact recognition                                                                        | Chinese, English, Japanese, Korean, and Cantonese only                                             | Reject for the Free language set                                           |
+| Platform speech recognizers                                                                      | No model download and often hardware optimized                                                  | Availability, offline behavior, and privacy depend on operating-system language packs and settings | Keep as the default system option; never describe it as guaranteed offline |
 
 Accuracy cannot be inferred from parameter count alone. The setup evaluation
 must compare a real bundled utterance for load time and real-time factor, and
@@ -84,14 +95,14 @@ work.
 
 ## Text-to-speech
 
-| Candidate | Coverage and size | Runtime and license assessment | Decision |
-| --- | --- | --- | --- |
-| Platform voices | Broadest installed-language coverage and no app download | Quality and offline behavior vary by installed operating-system voice | Default when a verified local pack is absent |
-| Piper int8 voices | One compact voice per language, generally 21–24 MB compressed | Existing VITS path works. Licenses vary per voice, so every archive must be reviewed separately | Keep current packs; add CC0 Italian Paola, Russian Dmitri, and European Portuguese Tugão |
-| Kokoro multilingual | More natural multi-speaker output for English and Simplified Chinese | Apache-2.0; current optional integration is about 147 MB compressed | Keep as an optional supported route, not a claim of seven-language coverage |
-| [Supertonic 3](https://huggingface.co/Supertone/supertonic-3) | 99M parameters, fixed speakers, and 31 languages including all seven targets; roughly 129 MB int8 Sherpa archive | OpenRAIL-M has use restrictions and downstream notice obligations. Sherpa 1.13.2 supports it, but the latest React Native package embeds 1.12.35 and exposes no language selector for the new multilingual model | High-priority future option after native-core upgrade, language bridge, terms UX, and regression tests |
-| [MeloTTS](https://github.com/myshell-ai/MeloTTS) | Multilingual voices and controllable accents | MIT code, but no compatible artifact/bridge in the shipped runtime and language coverage does not cleanly match all targets | Research only |
-| [Piper project successors](https://github.com/OHF-Voice/piper1-gpl) | Active Piper-compatible ecosystem | The maintained engine is GPL-3.0; voice licenses still vary | Do not add the GPL runtime to the proprietary app; existing Sherpa VITS inference remains acceptable |
+| Candidate                                                           | Coverage and size                                                                                                  | Runtime and license assessment                                                                                                                                                                   | Decision                                                                                                            |
+| ------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------- |
+| Platform voices                                                     | Broadest installed-language coverage and no app download                                                           | Quality and offline behavior vary by installed operating-system voice                                                                                                                            | Default when a verified local pack is absent                                                                        |
+| Piper int8 voices                                                   | One or two compact voices per Free language, generally 13–24 MB compressed                                         | Existing VITS path works. Every exposed archive has an independently reviewed permissive or attribution license                                                                                  | Integrated; European Portuguese keeps one downloadable voice because the other reviewed archives are non-commercial |
+| Kokoro multilingual                                                 | More natural multi-speaker output for English and Simplified Chinese                                               | Apache-2.0; current optional integration is about 147 MB compressed                                                                                                                              | Keep as an optional supported route, not a claim of seven-language coverage                                         |
+| [Supertonic 3](https://huggingface.co/Supertone/supertonic-3)       | 99M parameters, fixed speakers, and 31 languages including every Free language; roughly 129 MB int8 Sherpa archive | OpenRAIL-M has use restrictions and downstream notice obligations. The current React Native package embeds Sherpa 1.12.34 and exposes no generation-language selector for the multilingual model | High-priority future option after native-core upgrade, language bridge, terms UX, and regression tests              |
+| [MeloTTS](https://github.com/myshell-ai/MeloTTS)                    | Multilingual voices and controllable accents                                                                       | MIT code, but no compatible artifact/bridge in the shipped runtime and language coverage does not cleanly match all targets                                                                      | Research only                                                                                                       |
+| [Piper project successors](https://github.com/OHF-Voice/piper1-gpl) | Active Piper-compatible ecosystem                                                                                  | The maintained engine is GPL-3.0; voice licenses still vary                                                                                                                                      | Do not add the GPL runtime to the proprietary app; existing Sherpa VITS inference remains acceptable                |
 
 ## Artifact and device gates
 

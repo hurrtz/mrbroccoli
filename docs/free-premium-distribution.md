@@ -1,20 +1,20 @@
 # Free and Premium distribution
 
-Reviewed on 2026-08-02. The app uses one binary and one permanent in-app
+Reviewed on 2026-08-04. The app uses one binary and one permanent in-app
 purchase; it does not maintain separate Free and Premium builds.
 
 ## Product boundary
 
-| Capability                                                 | Free                                                        | Premium                                                  |
-| ---------------------------------------------------------- | ----------------------------------------------------------- | -------------------------------------------------------- |
-| Account                                                    | None                                                        | None required                                            |
-| Conversations and session manager                          | Local                                                       | Local, with all advanced controls                        |
-| Listening, reasoning, and speech                           | One automatically selected on-device profile, with Quick and Thorough reasoning where viable | All local routes and configured providers                |
+| Capability                                                 | Free                                                                                                         | Premium                                                  |
+| ---------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------- |
+| Account                                                    | None                                                                                                         | None required                                            |
+| Conversations and session manager                          | Local                                                                                                        | Local, with all advanced controls                        |
+| Listening, reasoning, and speech                           | One automatically selected on-device profile, with Quick and Thorough reasoning where viable                 | All local routes and configured providers                |
 | Model setup                                                | One speaking language, automatic recommendation, optional advanced choices, and one download-and-test action | Full catalogue, providers, models, voices, and fallbacks |
-| Provider keys                                              | Never used by the effective Free runtime                    | BYOK through the existing secure-store flow              |
-| Web search, images, Drive, and Uber Mode                    | Unavailable                                                 | Available                                                |
-| Past-session knowledge and portable archive sync           | Unavailable                                                 | Available                                                |
-| Backup import and export, privacy, theme, and app language | Available                                                   | Available                                                |
+| Provider keys                                              | Never used by the effective Free runtime                                                                     | BYOK through the existing secure-store flow              |
+| Web search, images, Drive, and Uber Mode                   | Unavailable                                                                                                  | Available                                                |
+| Past-session knowledge and portable archive sync           | Unavailable                                                                                                  | Available                                                |
+| Backup import and export, privacy, theme, and app language | Available                                                                                                    | Available                                                |
 
 Free is not a crippled cloud trial. It is a private, useful local product with
 no variable inference cost. Premium unlocks breadth, customization, and all
@@ -58,9 +58,13 @@ restoring Premium immediately brings it back.
 Current Free profiles cover English, Spanish, French, German, Brazilian and
 European Portuguese, Russian, and Italian. Where a compact pinned Piper voice
 is not selected, the language-aware system voice remains the local TTS route.
-Omnilingual ASR is available as a broader alternative to Whisper in Advanced
-options. A sufficiently capable phone receives separate Quick and Thorough
-home routes; constrained phones keep only the viable Quick route.
+Advanced options add Qwen3.5 and Granite quick models; Ministral Reasoning and
+Qwen3 4B thorough models; Whisper Base and Small, Parakeet, and Qwen3-ASR
+recognizers; and a second reviewed Piper voice where a permissively licensed
+archive exists. European Portuguese retains Tugão plus the phone's native voice
+directory because the other reviewed Piper archives prohibit commercial use.
+A sufficiently capable phone receives separate Quick and Thorough home routes;
+constrained phones keep only the viable Quick route.
 
 ## Premium product
 
