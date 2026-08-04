@@ -59,6 +59,27 @@ the complete Play Store translations are kept in a dedicated file under
 
 ### Changed
 
+- Present required Free onboarding as a full-width app screen instead of a
+  narrow modal. It shares the localized home wordmark and spacing, offers a
+  single initially empty language dropdown whose placeholder carries the
+  selection instruction, highlights the personalized best-match setup only
+  after an explicit choice and a short matching step, and uses a compact
+  Advanced checkbox plus a clear Start action. The recommendation card avoids
+  duplicate confirmation decoration and uses the same restrained corner radius
+  as the language dropdown without a decorative top rail. Major screen sections
+  have clearer separation, with extra emphasis between the language dropdown
+  and recommendation, while the recommendation-to-Advanced relationship remains
+  compact. The card now uses `Your best setup` as its sole headline instead of
+  repeating a second best-match claim. The page language still defaults from
+  the storefront with an English fallback. The Start action remains visible but
+  disabled until a language is selected and the matching presentation has
+  completed. The screen replaces the main workspace until setup is complete and
+  cannot be dismissed before every selected model has been downloaded,
+  installed, verified, and tested. The best-match recommendation now remains
+  immutable while Advanced options maintain a separate selected-setup preview;
+  hiding Advanced switches Start back to the recommendation without discarding
+  the custom draft. Advanced sections share one heading hierarchy, and voice
+  selection lives inside the selected text-to-speech option.
 - Update the home-screen wordmark immediately with the selected interface
   language, and replace the visible translated debug-log text with the shared
   bug icon while retaining an accessible localized label.

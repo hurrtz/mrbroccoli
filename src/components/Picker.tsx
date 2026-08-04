@@ -21,9 +21,12 @@ interface PickerProps {
   value: string;
   options: { value: string; label: string }[];
   onChange: (value: string) => void;
+  testID?: string;
   disabled?: boolean;
   dropdownLabel?: string;
+  hideDropdownLabel?: boolean;
   hideLabel?: boolean;
+  placeholder?: string;
   containerStyle?: StyleProp<ViewStyle>;
 }
 
@@ -32,9 +35,12 @@ export function Picker({
   value,
   options,
   onChange,
+  testID,
   disabled = false,
   dropdownLabel,
+  hideDropdownLabel = false,
   hideLabel = false,
+  placeholder,
   containerStyle,
 }: PickerProps) {
   const { colors } = useTheme();
@@ -50,6 +56,7 @@ export function Picker({
         </Text>
       )}
       <TouchableOpacity
+        testID={testID}
         style={[
           styles.dropdown,
           {
@@ -62,7 +69,7 @@ export function Picker({
         accessibilityLabel={`${label}. ${
           disabled
             ? t("chooseCompatibleProviderFirst")
-            : selected?.label || value
+            : selected?.label || placeholder || label
         }`}
         accessibilityRole="button"
         accessibilityState={{ disabled, expanded: open }}
@@ -74,13 +81,17 @@ export function Picker({
         disabled={disabled}
       >
         <View style={styles.dropdownText}>
-          <Text style={[styles.dropdownLabel, { color: colors.textSecondary }]}>
-            {disabled ? t("unavailable") : dropdownLabel || t("selection")}
-          </Text>
+          {hideDropdownLabel ? null : (
+            <Text
+              style={[styles.dropdownLabel, { color: colors.textSecondary }]}
+            >
+              {disabled ? t("unavailable") : dropdownLabel || t("selection")}
+            </Text>
+          )}
           <Text style={[styles.dropdownValue, { color: colors.text }]}>
             {disabled
               ? t("chooseCompatibleProviderFirst")
-              : selected?.label || value}
+              : selected?.label || placeholder || value}
           </Text>
         </View>
         <View

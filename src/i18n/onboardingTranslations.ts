@@ -2,6 +2,7 @@ import type { TranslationParams } from "./types";
 
 const en = {
   onboardingAdvancedOptions: "Advanced options",
+  onboardingSelectedSetup: "Your selected setup",
   onboardingDeviceDetails: "Phone details",
   onboardingMatchingModels: "Matching the best local models…",
   onboardingLikely: "Likely to work",
@@ -27,6 +28,7 @@ export const onboardingTranslations = {
   en,
   de: define({
     onboardingAdvancedOptions: "Erweiterte Optionen",
+    onboardingSelectedSetup: "Deine Auswahl",
     onboardingDeviceDetails: "Smartphone-Details",
     onboardingMatchingModels: "Die besten lokalen Modelle werden ermittelt…",
     onboardingLikely: "Funktioniert voraussichtlich",
@@ -44,6 +46,7 @@ export const onboardingTranslations = {
   }),
   uk: define({
     onboardingAdvancedOptions: "Розширені параметри",
+    onboardingSelectedSetup: "Ваш вибраний набір",
     onboardingDeviceDetails: "Дані телефона",
     onboardingMatchingModels: "Підбираємо найкращі локальні моделі…",
     onboardingLikely: "Імовірно працюватиме",
@@ -62,6 +65,7 @@ export const onboardingTranslations = {
   }),
   hi: define({
     onboardingAdvancedOptions: "उन्नत विकल्प",
+    onboardingSelectedSetup: "आपका चुना हुआ सेटअप",
     onboardingDeviceDetails: "फ़ोन का विवरण",
     onboardingMatchingModels: "सबसे अच्छे स्थानीय मॉडल मिलाए जा रहे हैं…",
     onboardingLikely: "चलने की संभावना है",
@@ -79,6 +83,7 @@ export const onboardingTranslations = {
   }),
   es: define({
     onboardingAdvancedOptions: "Opciones avanzadas",
+    onboardingSelectedSetup: "Tu configuración elegida",
     onboardingDeviceDetails: "Datos del teléfono",
     onboardingMatchingModels: "Buscando los mejores modelos locales…",
     onboardingLikely: "Es probable que funcione",
@@ -97,6 +102,7 @@ export const onboardingTranslations = {
   }),
   fr: define({
     onboardingAdvancedOptions: "Options avancées",
+    onboardingSelectedSetup: "Votre configuration choisie",
     onboardingDeviceDetails: "Caractéristiques du téléphone",
     onboardingMatchingModels: "Recherche des meilleurs modèles locaux…",
     onboardingLikely: "Devrait fonctionner",
@@ -115,6 +121,7 @@ export const onboardingTranslations = {
   }),
   it: define({
     onboardingAdvancedOptions: "Opzioni avanzate",
+    onboardingSelectedSetup: "La configurazione scelta",
     onboardingDeviceDetails: "Dettagli del telefono",
     onboardingMatchingModels: "Ricerca dei migliori modelli locali…",
     onboardingLikely: "Probabile funzionamento",
@@ -133,6 +140,7 @@ export const onboardingTranslations = {
   }),
   pt: define({
     onboardingAdvancedOptions: "Opções avançadas",
+    onboardingSelectedSetup: "A sua configuração",
     onboardingDeviceDetails: "Detalhes do telemóvel",
     onboardingMatchingModels: "A escolher os melhores modelos locais…",
     onboardingLikely: "Provavelmente funciona",
@@ -151,6 +159,7 @@ export const onboardingTranslations = {
   }),
   ptBR: define({
     onboardingAdvancedOptions: "Opções avançadas",
+    onboardingSelectedSetup: "Sua configuração",
     onboardingDeviceDetails: "Detalhes do celular",
     onboardingMatchingModels: "Escolhendo os melhores modelos locais…",
     onboardingLikely: "Provavelmente funciona",
@@ -169,6 +178,7 @@ export const onboardingTranslations = {
   }),
   ru: define({
     onboardingAdvancedOptions: "Расширенные параметры",
+    onboardingSelectedSetup: "Выбранная конфигурация",
     onboardingDeviceDetails: "Характеристики телефона",
     onboardingMatchingModels: "Подбираем лучшие локальные модели…",
     onboardingLikely: "Скорее всего, будет работать",
@@ -187,6 +197,7 @@ export const onboardingTranslations = {
   }),
   "zh-CN": define({
     onboardingAdvancedOptions: "高级选项",
+    onboardingSelectedSetup: "你选择的设置",
     onboardingDeviceDetails: "手机详情",
     onboardingMatchingModels: "正在匹配最佳本地模型…",
     onboardingLikely: "预计可以运行",
@@ -204,6 +215,7 @@ export const onboardingTranslations = {
   }),
   ar: define({
     onboardingAdvancedOptions: "خيارات متقدمة",
+    onboardingSelectedSetup: "إعدادك المختار",
     onboardingDeviceDetails: "تفاصيل الهاتف",
     onboardingMatchingModels: "جارٍ اختيار أفضل النماذج المحلية…",
     onboardingLikely: "مرجح أن يعمل",
@@ -221,6 +233,7 @@ export const onboardingTranslations = {
   }),
   ja: define({
     onboardingAdvancedOptions: "詳細オプション",
+    onboardingSelectedSetup: "選択したセットアップ",
     onboardingDeviceDetails: "端末情報",
     onboardingMatchingModels: "最適なローカルモデルを選択中…",
     onboardingLikely: "動作する見込み",
@@ -238,6 +251,7 @@ export const onboardingTranslations = {
   }),
   hu: define({
     onboardingAdvancedOptions: "Speciális beállítások",
+    onboardingSelectedSetup: "A kiválasztott beállítás",
     onboardingDeviceDetails: "Telefon adatai",
     onboardingMatchingModels: "A legjobb helyi modellek kiválasztása…",
     onboardingLikely: "Várhatóan működik",
@@ -256,6 +270,7 @@ export const onboardingTranslations = {
   }),
   cs: define({
     onboardingAdvancedOptions: "Pokročilé možnosti",
+    onboardingSelectedSetup: "Vaše vybrané nastavení",
     onboardingDeviceDetails: "Údaje telefonu",
     onboardingMatchingModels: "Vybíráme nejlepší místní modely…",
     onboardingLikely: "Pravděpodobně bude fungovat",
@@ -273,6 +288,7 @@ export const onboardingTranslations = {
   }),
   pl: define({
     onboardingAdvancedOptions: "Opcje zaawansowane",
+    onboardingSelectedSetup: "Wybrana konfiguracja",
     onboardingDeviceDetails: "Dane telefonu",
     onboardingMatchingModels: "Dobieranie najlepszych modeli lokalnych…",
     onboardingLikely: "Prawdopodobnie zadziała",
@@ -291,6 +307,7 @@ export const onboardingTranslations = {
   }),
   tr: define({
     onboardingAdvancedOptions: "Gelişmiş seçenekler",
+    onboardingSelectedSetup: "Seçtiğiniz kurulum",
     onboardingDeviceDetails: "Telefon ayrıntıları",
     onboardingMatchingModels: "En iyi yerel modeller eşleştiriliyor…",
     onboardingLikely: "Muhtemelen çalışır",
@@ -309,6 +326,7 @@ export const onboardingTranslations = {
   }),
   sv: define({
     onboardingAdvancedOptions: "Avancerade alternativ",
+    onboardingSelectedSetup: "Din valda konfiguration",
     onboardingDeviceDetails: "Telefoninformation",
     onboardingMatchingModels: "Matchar de bästa lokala modellerna…",
     onboardingLikely: "Fungerar sannolikt",
@@ -327,6 +345,7 @@ export const onboardingTranslations = {
   }),
   ur: define({
     onboardingAdvancedOptions: "اعلیٰ اختیارات",
+    onboardingSelectedSetup: "آپ کا منتخب کردہ سیٹ اپ",
     onboardingDeviceDetails: "فون کی تفصیلات",
     onboardingMatchingModels: "بہترین مقامی ماڈلز منتخب کیے جا رہے ہیں…",
     onboardingLikely: "چلنے کا امکان ہے",

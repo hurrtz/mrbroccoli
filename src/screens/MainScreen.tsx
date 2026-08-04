@@ -230,7 +230,7 @@ export function MainScreen() {
     setupGuideVisible ||
     statusDetailsVisible ||
     styleSheetVisible ||
-    freeOffline.modalVisible ||
+    freeOffline.setupVisible ||
     premiumModalVisible
   );
   const {
@@ -804,7 +804,7 @@ export function MainScreen() {
           offlineReady: freeOffline.freeRuntimeReady,
           onOpenSetupGuide: freeOffline.entitlement.isPremium
             ? handleOpenProviderSettings
-            : () => freeOffline.setModalVisible(true),
+            : freeOffline.openSetup,
           onSelectResponseMode: handleResponseModeChange,
           responseModes: runtimeSettings.responseModes,
           t,
@@ -850,7 +850,7 @@ export function MainScreen() {
           onResolvePromptBlock:
             freeOffline.entitlement.status === "free" &&
             !freeOffline.freeRuntimeReady
-              ? () => freeOffline.setModalVisible(true)
+              ? freeOffline.openSetup
               : handleOpenSpeakingSettings,
           onSubmitTextMessage: handleSubmitTextMessage,
           onTextMessageChange: handleTextMessageChange,
@@ -974,7 +974,7 @@ export function MainScreen() {
             : undefined
           : () => {
               closeSettings();
-              freeOffline.setModalVisible(true);
+              freeOffline.openSetup();
             },
         isPremium: freeOffline.entitlement.isPremium,
         developmentEntitlementMode:

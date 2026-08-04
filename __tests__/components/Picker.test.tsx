@@ -68,4 +68,29 @@ describe("Picker accessibility", () => {
 
     expect(screen.queryByLabelText("Dismiss")).toBeNull();
   });
+
+  it("shows a non-selected placeholder without a separate field label", () => {
+    const screen = renderWithProviders(
+      <Picker
+        hideDropdownLabel
+        hideLabel
+        label="Choose your language"
+        placeholder="Choose your language"
+        value=""
+        options={[{ label: "English", value: "en" }]}
+        onChange={jest.fn()}
+      />,
+    );
+
+    expect(screen.getByText("Choose your language")).toBeTruthy();
+    expect(
+      screen.getByLabelText("Choose your language. Choose your language"),
+    ).toBeTruthy();
+    expect(screen.queryByText("Selection")).toBeNull();
+
+    fireEvent.press(screen.getByRole("button"));
+    expect(screen.getByLabelText("English").props.accessibilityState).toEqual({
+      checked: false,
+    });
+  });
 });

@@ -6,7 +6,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { ConversationDrawer } from "../../components/ConversationDrawer";
 import { ConversationMemoryModal } from "../../components/ConversationMemoryModal";
 import { SetupGuideModal } from "../../components/SetupGuideModal";
-import { FreeOfflineSetupModal } from "../../components/FreeOfflineSetupModal";
+import { FreeOfflineSetupScreen } from "../../components/FreeOfflineSetupScreen";
 import { PremiumUpgradeModal } from "../../components/PremiumUpgradeModal";
 import { Toast } from "../../components/Toast";
 import { AntSettingsModal } from "../../features/settings/AntSettingsModal";
@@ -20,7 +20,7 @@ interface MainScreenPresentationProps {
   colors: Colors;
   conversationDrawer: React.ComponentProps<typeof ConversationDrawer>;
   conversationMemory: React.ComponentProps<typeof ConversationMemoryModal>;
-  freeOffline: React.ComponentProps<typeof FreeOfflineSetupModal>;
+  freeOffline: React.ComponentProps<typeof FreeOfflineSetupScreen>;
   isDark: boolean;
   isLandscape: boolean;
   premiumUpgrade: React.ComponentProps<typeof PremiumUpgradeModal>;
@@ -60,25 +60,39 @@ export function MainScreenPresentation({
       <StatusBar style={isDark ? "light" : "dark"} />
       <Toast {...toast} />
 
-      <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
-        keyboardVerticalOffset={Platform.OS === "ios" ? 64 : 0}
-        style={[
-          styles.defaultLayout,
-          isLandscape ? styles.defaultLayoutLandscape : null,
-        ]}
-      >
-        <MainScreenWorkspace {...workspace} />
-      </KeyboardAvoidingView>
+      {freeOffline.controller.setupVisible ? (
+        <KeyboardAvoidingView
+          behavior={Platform.OS === "ios" ? "padding" : "height"}
+          keyboardVerticalOffset={Platform.OS === "ios" ? 64 : 0}
+          style={[
+            styles.defaultLayout,
+            isLandscape ? styles.defaultLayoutLandscape : null,
+          ]}
+        >
+          <FreeOfflineSetupScreen {...freeOffline} />
+        </KeyboardAvoidingView>
+      ) : (
+        <>
+          <KeyboardAvoidingView
+            behavior={Platform.OS === "ios" ? "padding" : "height"}
+            keyboardVerticalOffset={Platform.OS === "ios" ? 64 : 0}
+            style={[
+              styles.defaultLayout,
+              isLandscape ? styles.defaultLayoutLandscape : null,
+            ]}
+          >
+            <MainScreenWorkspace {...workspace} />
+          </KeyboardAvoidingView>
 
-      <StyleSheetModal {...styleSheet} />
-      <StatusDetailsModal {...statusDetails} />
-      <AntSettingsModal {...settingsModal} />
-      <SetupGuideModal {...setupGuide} />
-      <FreeOfflineSetupModal {...freeOffline} />
-      <PremiumUpgradeModal {...premiumUpgrade} />
-      <ConversationMemoryModal {...conversationMemory} />
-      <ConversationDrawer {...conversationDrawer} />
+          <StyleSheetModal {...styleSheet} />
+          <StatusDetailsModal {...statusDetails} />
+          <AntSettingsModal {...settingsModal} />
+          <SetupGuideModal {...setupGuide} />
+          <PremiumUpgradeModal {...premiumUpgrade} />
+          <ConversationMemoryModal {...conversationMemory} />
+          <ConversationDrawer {...conversationDrawer} />
+        </>
+      )}
     </SafeAreaView>
   );
 }

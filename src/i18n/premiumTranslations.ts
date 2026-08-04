@@ -22,12 +22,12 @@ const en = {
   premiumErrorPending: "The purchase is awaiting approval.",
   freeOfflineTitle: "Private on-device mode",
   freeOfflineIntro:
-    "Choose your preferred speaking language. Mr Broccoli will automatically find one complete local listening, thinking, and speaking setup that fits this phone.",
+    "Choose your language while Mr Broccoli checks this phone and recommends the best private listening, reasoning, and voice setup it can run reliably. Tap Start to download, install, and test everything before your first conversation.",
   freeOfflineInternetDisclosure:
     "The model download needs internet access. After installation, Free conversations and sessions stay entirely on this device.",
-  freeOfflineProfile: "Recommended local setup",
+  freeOfflineProfile: "Best match for you and this phone",
   freeOfflineDownloadSize: ({ size }: TranslationParams) => `${size} download`,
-  freeOfflineDownloadAndTest: "Download and test",
+  freeOfflineDownloadAndTest: "Start",
   freeOfflinePreparing: ({ model, index, count }: TranslationParams) =>
     `${model} · ${index} of ${count}`,
   freeOfflineReady: "Your private offline setup is ready.",
@@ -67,12 +67,12 @@ const rawPremiumTranslations = {
     premiumErrorPending: "Der Kauf wartet auf Bestätigung.",
     freeOfflineTitle: "Privater Modus auf dem Gerät",
     freeOfflineIntro:
-      "Wähle deine bevorzugte Sprechsprache. Mr Broccoli findet automatisch eine vollständige lokale Kombination zum Hören, Denken und Sprechen, die zu diesem Smartphone passt.",
+      "Wähle deine Sprache, während Mr Broccoli dieses Smartphone prüft und die beste private Kombination zum Hören, Denken und Sprechen empfiehlt, die es zuverlässig ausführen kann. Mit Start wird vor deinem ersten Gespräch alles heruntergeladen, installiert und getestet.",
     freeOfflineInternetDisclosure:
       "Der Modell-Download benötigt Internet. Danach bleiben kostenlose Gespräche und Sitzungen vollständig auf diesem Gerät.",
-    freeOfflineProfile: "Empfohlene lokale Kombination",
+    freeOfflineProfile: "Beste Wahl für dich und dieses Smartphone",
     freeOfflineDownloadSize: ({ size }) => `${size} Download`,
-    freeOfflineDownloadAndTest: "Herunterladen und testen",
+    freeOfflineDownloadAndTest: "Start",
     freeOfflinePreparing: ({ model, index, count }) =>
       `${model} · ${index} von ${count}`,
     freeOfflineReady: "Deine private Offline-Kombination ist bereit.",
@@ -105,12 +105,12 @@ const rawPremiumTranslations = {
     premiumErrorPending: "Покупка очікує підтвердження.",
     freeOfflineTitle: "Приватний режим на пристрої",
     freeOfflineIntro:
-      "Виберіть бажану мову спілкування. Mr Broccoli автоматично знайде повний локальний набір для слухання, мислення й мовлення, який підходить цьому телефону.",
+      "Виберіть свою мову, а Mr Broccoli перевірить цей телефон і запропонує найкращий приватний набір для розпізнавання, міркування та мовлення, який він може надійно запускати. Натисніть «Почати», щоб завантажити, установити й перевірити все до першої розмови.",
     freeOfflineInternetDisclosure:
       "Для завантаження моделей потрібен інтернет. Після встановлення безкоштовні розмови й сесії залишаються лише на цьому пристрої.",
-    freeOfflineProfile: "Рекомендований локальний набір",
+    freeOfflineProfile: "Найкращий варіант для вас і цього телефона",
     freeOfflineDownloadSize: ({ size }) => `Завантаження ${size}`,
-    freeOfflineDownloadAndTest: "Завантажити й перевірити",
+    freeOfflineDownloadAndTest: "Почати",
     freeOfflinePreparing: ({ model, index, count }) =>
       `${model} · ${index} з ${count}`,
     freeOfflineReady: "Приватний офлайн-набір готовий.",
@@ -144,12 +144,12 @@ const rawPremiumTranslations = {
     premiumErrorPending: "खरीद स्वीकृति की प्रतीक्षा में है।",
     freeOfflineTitle: "निजी ऑन-डिवाइस मोड",
     freeOfflineIntro:
-      "अपनी पसंदीदा बोलने की भाषा चुनें। Mr Broccoli इस फ़ोन के लिए पूरा स्थानीय सुनने, सोचने और बोलने का सेट स्वतः खोजेगा।",
+      "अपनी भाषा चुनें। Mr Broccoli इस फ़ोन की जाँच करके ऐसा सबसे अच्छा निजी सुनने, तर्क करने और बोलने का सेटअप सुझाएगा जिसे यह भरोसेमंद ढंग से चला सके। पहली बातचीत से पहले सब कुछ डाउनलोड, इंस्टॉल और जाँचने के लिए शुरू करें दबाएँ।",
     freeOfflineInternetDisclosure:
       "मॉडल डाउनलोड के लिए इंटरनेट चाहिए। स्थापना के बाद मुफ़्त बातचीत और सत्र पूरी तरह इसी डिवाइस पर रहते हैं।",
-    freeOfflineProfile: "सुझाया स्थानीय सेट",
+    freeOfflineProfile: "आपके और इस फ़ोन के लिए सबसे उपयुक्त",
     freeOfflineDownloadSize: ({ size }) => `${size} डाउनलोड`,
-    freeOfflineDownloadAndTest: "डाउनलोड और जाँचें",
+    freeOfflineDownloadAndTest: "शुरू करें",
     freeOfflinePreparing: ({ model, index, count }) =>
       `${model} · ${index} / ${count}`,
     freeOfflineReady: "निजी ऑफ़लाइन सेट तैयार है।",
@@ -183,12 +183,12 @@ const rawPremiumTranslations = {
     premiumErrorPending: "La compra espera aprobación.",
     freeOfflineTitle: "Modo privado en el dispositivo",
     freeOfflineIntro:
-      "Elige tu idioma hablado preferido. Mr Broccoli buscará automáticamente una configuración local completa para escuchar, pensar y hablar que funcione en este teléfono.",
+      "Elige tu idioma mientras Mr Broccoli analiza este teléfono y recomienda la mejor configuración privada de escucha, razonamiento y voz que pueda ejecutar de forma fiable. Pulsa Empezar para descargar, instalar y probarlo todo antes de la primera conversación.",
     freeOfflineInternetDisclosure:
       "La descarga de modelos necesita internet. Después, las conversaciones y sesiones gratuitas permanecen íntegramente en este dispositivo.",
-    freeOfflineProfile: "Configuración local recomendada",
+    freeOfflineProfile: "La mejor opción para ti y este teléfono",
     freeOfflineDownloadSize: ({ size }) => `${size} de descarga`,
-    freeOfflineDownloadAndTest: "Descargar y probar",
+    freeOfflineDownloadAndTest: "Empezar",
     freeOfflinePreparing: ({ model, index, count }) =>
       `${model} · ${index} de ${count}`,
     freeOfflineReady: "La configuración privada sin conexión está lista.",
@@ -222,12 +222,12 @@ const rawPremiumTranslations = {
     premiumErrorPending: "L’achat attend une validation.",
     freeOfflineTitle: "Mode privé sur l’appareil",
     freeOfflineIntro:
-      "Choisissez votre langue parlée préférée. Mr Broccoli trouvera automatiquement une configuration locale complète d’écoute, de réflexion et de parole adaptée à ce téléphone.",
+      "Choisissez votre langue pendant que Mr Broccoli analyse ce téléphone et recommande la meilleure configuration privée d’écoute, de raisonnement et de voix qu’il peut exécuter de façon fiable. Touchez Démarrer pour tout télécharger, installer et tester avant votre première conversation.",
     freeOfflineInternetDisclosure:
       "Le téléchargement des modèles nécessite internet. Ensuite, les conversations et sessions gratuites restent entièrement sur cet appareil.",
-    freeOfflineProfile: "Configuration locale recommandée",
+    freeOfflineProfile: "Le meilleur choix pour vous et ce téléphone",
     freeOfflineDownloadSize: ({ size }) => `${size} à télécharger`,
-    freeOfflineDownloadAndTest: "Télécharger et tester",
+    freeOfflineDownloadAndTest: "Démarrer",
     freeOfflinePreparing: ({ model, index, count }) =>
       `${model} · ${index} sur ${count}`,
     freeOfflineReady: "Votre configuration privée hors ligne est prête.",
@@ -260,12 +260,12 @@ const rawPremiumTranslations = {
     premiumErrorPending: "L’acquisto è in attesa di approvazione.",
     freeOfflineTitle: "Modalità privata sul dispositivo",
     freeOfflineIntro:
-      "Scegli la lingua parlata che preferisci. Mr Broccoli troverà automaticamente una configurazione locale completa per ascolto, ragionamento e voce adatta a questo telefono.",
+      "Scegli la tua lingua mentre Mr Broccoli analizza questo telefono e consiglia la migliore configurazione privata di ascolto, ragionamento e voce che può eseguire in modo affidabile. Tocca Inizia per scaricare, installare e testare tutto prima della prima conversazione.",
     freeOfflineInternetDisclosure:
       "Il download dei modelli richiede internet. Dopo l’installazione, conversazioni e sessioni gratuite restano interamente sul dispositivo.",
-    freeOfflineProfile: "Configurazione locale consigliata",
+    freeOfflineProfile: "La scelta migliore per te e questo telefono",
     freeOfflineDownloadSize: ({ size }) => `${size} da scaricare`,
-    freeOfflineDownloadAndTest: "Scarica e testa",
+    freeOfflineDownloadAndTest: "Inizia",
     freeOfflinePreparing: ({ model, index, count }) =>
       `${model} · ${index} di ${count}`,
     freeOfflineReady: "La configurazione privata offline è pronta.",
@@ -298,12 +298,12 @@ const rawPremiumTranslations = {
     premiumErrorPending: "A compra aguarda aprovação.",
     freeOfflineTitle: "Modo privado no dispositivo",
     freeOfflineIntro:
-      "Escolha o idioma falado que prefere. Mr Broccoli encontrará automaticamente uma configuração local completa para ouvir, pensar e falar adequada a este telefone.",
+      "Escolha o seu idioma enquanto o Mr Broccoli analisa este telefone e recomenda a melhor configuração privada de audição, raciocínio e voz que consegue executar com fiabilidade. Toque em Começar para transferir, instalar e testar tudo antes da primeira conversa.",
     freeOfflineInternetDisclosure:
       "A transferência dos modelos necessita de internet. Depois, as conversas e sessões gratuitas ficam totalmente neste dispositivo.",
-    freeOfflineProfile: "Configuração local recomendada",
+    freeOfflineProfile: "A melhor opção para si e para este telemóvel",
     freeOfflineDownloadSize: ({ size }) => `${size} para transferir`,
-    freeOfflineDownloadAndTest: "Transferir e testar",
+    freeOfflineDownloadAndTest: "Começar",
     freeOfflinePreparing: ({ model, index, count }) =>
       `${model} · ${index} de ${count}`,
     freeOfflineReady: "A configuração privada offline está pronta.",
@@ -336,12 +336,12 @@ const rawPremiumTranslations = {
     premiumErrorPending: "A compra aguarda aprovação.",
     freeOfflineTitle: "Modo privado no dispositivo",
     freeOfflineIntro:
-      "Escolha seu idioma falado preferido. Mr Broccoli encontrará automaticamente uma configuração local completa para ouvir, pensar e falar adequada a este celular.",
+      "Escolha seu idioma enquanto o Mr Broccoli analisa este celular e recomenda a melhor configuração privada de escuta, raciocínio e voz que ele consegue executar com segurança. Toque em Começar para baixar, instalar e testar tudo antes da primeira conversa.",
     freeOfflineInternetDisclosure:
       "O download dos modelos precisa de internet. Depois, as conversas e sessões gratuitas ficam totalmente neste dispositivo.",
-    freeOfflineProfile: "Configuração local recomendada",
+    freeOfflineProfile: "A melhor opção para você e este celular",
     freeOfflineDownloadSize: ({ size }) => `${size} de download`,
-    freeOfflineDownloadAndTest: "Baixar e testar",
+    freeOfflineDownloadAndTest: "Começar",
     freeOfflinePreparing: ({ model, index, count }) =>
       `${model} · ${index} de ${count}`,
     freeOfflineReady: "A configuração privada offline está pronta.",
@@ -374,12 +374,12 @@ const rawPremiumTranslations = {
     premiumErrorPending: "Покупка ожидает подтверждения.",
     freeOfflineTitle: "Приватный режим на устройстве",
     freeOfflineIntro:
-      "Выберите предпочитаемый язык общения. Mr Broccoli автоматически найдёт полный локальный набор для распознавания, мышления и речи, подходящий телефону.",
+      "Выберите свой язык, а Mr Broccoli проверит этот телефон и предложит лучший приватный набор для распознавания, рассуждения и речи, который он сможет надёжно запускать. Нажмите «Начать», чтобы скачать, установить и проверить всё до первого разговора.",
     freeOfflineInternetDisclosure:
       "Для загрузки моделей нужен интернет. После установки бесплатные разговоры и сессии остаются только на устройстве.",
-    freeOfflineProfile: "Рекомендуемый локальный набор",
+    freeOfflineProfile: "Лучший вариант для вас и этого телефона",
     freeOfflineDownloadSize: ({ size }) => `Загрузка ${size}`,
-    freeOfflineDownloadAndTest: "Скачать и проверить",
+    freeOfflineDownloadAndTest: "Начать",
     freeOfflinePreparing: ({ model, index, count }) =>
       `${model} · ${index} из ${count}`,
     freeOfflineReady: "Приватный офлайн-набор готов.",
@@ -412,12 +412,12 @@ const rawPremiumTranslations = {
     premiumErrorPending: "购买正在等待批准。",
     freeOfflineTitle: "私密设备端模式",
     freeOfflineIntro:
-      "请选择你偏好的口语。Mr Broccoli 会自动查找一套适合此手机的本地听、思考和语音组合。",
+      "请选择你的语言。Mr Broccoli 会检查这部手机，并推荐它能够可靠运行的最佳私密听写、推理和语音组合。点击“开始”，即可在首次对话前下载、安装并测试全部内容。",
     freeOfflineInternetDisclosure:
       "下载模型需要联网。安装后，免费对话和会话完全保留在此设备上。",
-    freeOfflineProfile: "推荐的本地组合",
+    freeOfflineProfile: "最适合你和这部手机的组合",
     freeOfflineDownloadSize: ({ size }) => `下载 ${size}`,
-    freeOfflineDownloadAndTest: "下载并测试",
+    freeOfflineDownloadAndTest: "开始",
     freeOfflinePreparing: ({ model, index, count }) =>
       `${model} · ${index}/${count}`,
     freeOfflineReady: "私密离线组合已准备就绪。",
@@ -448,12 +448,12 @@ const rawPremiumTranslations = {
     premiumErrorPending: "الشراء بانتظار الموافقة.",
     freeOfflineTitle: "الوضع الخاص على الجهاز",
     freeOfflineIntro:
-      "اختر لغة التحدث المفضلة. سيجد Mr Broccoli تلقائيًا إعدادًا محليًا كاملًا للاستماع والتفكير والنطق يناسب هذا الهاتف.",
+      "اختر لغتك بينما يفحص Mr Broccoli هذا الهاتف ويوصي بأفضل إعداد خاص للاستماع والاستدلال والصوت يمكنه تشغيله بثبات. اضغط على ابدأ لتنزيل كل شيء وتثبيته واختباره قبل محادثتك الأولى.",
     freeOfflineInternetDisclosure:
       "يتطلب تنزيل النماذج اتصالًا بالإنترنت. بعد التثبيت تبقى المحادثات والجلسات المجانية بالكامل على هذا الجهاز.",
-    freeOfflineProfile: "الإعداد المحلي المقترح",
+    freeOfflineProfile: "أفضل إعداد لك ولهذا الهاتف",
     freeOfflineDownloadSize: ({ size }) => `تنزيل ${size}`,
-    freeOfflineDownloadAndTest: "تنزيل واختبار",
+    freeOfflineDownloadAndTest: "ابدأ",
     freeOfflinePreparing: ({ model, index, count }) =>
       `${model} · ${index} من ${count}`,
     freeOfflineReady: "الإعداد الخاص دون اتصال جاهز.",
@@ -487,12 +487,12 @@ const rawPremiumTranslations = {
     premiumErrorPending: "購入は承認待ちです。",
     freeOfflineTitle: "非公開オンデバイスモード",
     freeOfflineIntro:
-      "希望する話し言葉を選んでください。Mr Broccoliが、この端末に適したローカルの聞き取り・思考・音声の完全な構成を自動で探します。",
+      "言語を選ぶと、Mr Broccoliがこのスマートフォンを分析し、安定して動作する最適なプライベート聞き取り・推論・音声構成を提案します。開始をタップすると、最初の会話の前にすべてをダウンロード、インストール、テストします。",
     freeOfflineInternetDisclosure:
       "モデルのダウンロードにはインターネットが必要です。インストール後、無料の会話とセッションは完全にこの端末内に残ります。",
-    freeOfflineProfile: "推奨ローカル構成",
+    freeOfflineProfile: "あなたとこのスマートフォンに最適",
     freeOfflineDownloadSize: ({ size }) => `${size}のダウンロード`,
-    freeOfflineDownloadAndTest: "ダウンロードしてテスト",
+    freeOfflineDownloadAndTest: "開始",
     freeOfflinePreparing: ({ model, index, count }) =>
       `${model} · ${index}/${count}`,
     freeOfflineReady: "非公開オフライン構成の準備ができました。",
@@ -525,12 +525,12 @@ const rawPremiumTranslations = {
     premiumErrorPending: "A vásárlás jóváhagyásra vár.",
     freeOfflineTitle: "Privát eszközön futó mód",
     freeOfflineIntro:
-      "Válaszd ki a kívánt beszélt nyelvet. Mr Broccoli automatikusan megkeresi a telefonhoz illő teljes helyi hallási, gondolkodási és beszédbeállítást.",
+      "Válaszd ki a nyelved, miközben Mr Broccoli felméri ezt a telefont, és a megbízhatóan futtatható legjobb privát hallási, következtetési és hangbeállítást ajánlja. Az első beszélgetés előtt az Indítás gombbal tölthetsz le, telepíthetsz és tesztelhetsz mindent.",
     freeOfflineInternetDisclosure:
       "A modellek letöltéséhez internet kell. Telepítés után az ingyenes beszélgetések és munkamenetek teljesen az eszközön maradnak.",
-    freeOfflineProfile: "Ajánlott helyi beállítás",
+    freeOfflineProfile: "A legjobb választás neked és ennek a telefonnak",
     freeOfflineDownloadSize: ({ size }) => `${size} letöltés`,
-    freeOfflineDownloadAndTest: "Letöltés és teszt",
+    freeOfflineDownloadAndTest: "Indítás",
     freeOfflinePreparing: ({ model, index, count }) =>
       `${model} · ${index}/${count}`,
     freeOfflineReady: "A privát offline beállítás kész.",
@@ -563,12 +563,12 @@ const rawPremiumTranslations = {
     premiumErrorPending: "Nákup čeká na schválení.",
     freeOfflineTitle: "Soukromý režim v zařízení",
     freeOfflineIntro:
-      "Vyberte preferovaný jazyk mluvení. Mr Broccoli automaticky najde kompletní místní sestavu pro poslech, myšlení a řeč vhodnou pro tento telefon.",
+      "Vyberte svůj jazyk. Mr Broccoli mezitím prověří tento telefon a doporučí nejlepší soukromou sestavu pro poslech, uvažování a hlas, kterou dokáže spolehlivě provozovat. Klepnutím na Začít vše stáhnete, nainstalujete a otestujete před první konverzací.",
     freeOfflineInternetDisclosure:
       "Stažení modelů vyžaduje internet. Po instalaci zůstávají bezplatné konverzace a relace zcela v zařízení.",
-    freeOfflineProfile: "Doporučená místní sestava",
+    freeOfflineProfile: "Nejlepší volba pro vás a tento telefon",
     freeOfflineDownloadSize: ({ size }) => `Stažení ${size}`,
-    freeOfflineDownloadAndTest: "Stáhnout a otestovat",
+    freeOfflineDownloadAndTest: "Začít",
     freeOfflinePreparing: ({ model, index, count }) =>
       `${model} · ${index} z ${count}`,
     freeOfflineReady: "Soukromá offline sestava je připravena.",
@@ -601,12 +601,12 @@ const rawPremiumTranslations = {
     premiumErrorPending: "Zakup oczekuje na zatwierdzenie.",
     freeOfflineTitle: "Prywatny tryb na urządzeniu",
     freeOfflineIntro:
-      "Wybierz preferowany język mówiony. Mr Broccoli automatycznie znajdzie pełny lokalny zestaw do słuchania, myślenia i mówienia odpowiedni dla telefonu.",
+      "Wybierz swój język, a Mr Broccoli sprawdzi ten telefon i zaproponuje najlepszy prywatny zestaw do słuchania, rozumowania i mówienia, który może działać niezawodnie. Naciśnij Rozpocznij, aby pobrać, zainstalować i przetestować wszystko przed pierwszą rozmową.",
     freeOfflineInternetDisclosure:
       "Pobranie modeli wymaga internetu. Po instalacji bezpłatne rozmowy i sesje pozostają w całości na urządzeniu.",
-    freeOfflineProfile: "Zalecany zestaw lokalny",
+    freeOfflineProfile: "Najlepszy wybór dla Ciebie i tego telefonu",
     freeOfflineDownloadSize: ({ size }) => `Pobieranie ${size}`,
-    freeOfflineDownloadAndTest: "Pobierz i przetestuj",
+    freeOfflineDownloadAndTest: "Rozpocznij",
     freeOfflinePreparing: ({ model, index, count }) =>
       `${model} · ${index} z ${count}`,
     freeOfflineReady: "Prywatny zestaw offline jest gotowy.",
@@ -640,12 +640,12 @@ const rawPremiumTranslations = {
     premiumErrorPending: "Satın alma onay bekliyor.",
     freeOfflineTitle: "Özel cihaz içi mod",
     freeOfflineIntro:
-      "Tercih ettiğiniz konuşma dilini seçin. Mr Broccoli bu telefona uygun eksiksiz yerel dinleme, düşünme ve konuşma kurulumunu otomatik bulur.",
+      "Dilinizi seçin. Mr Broccoli bu telefonu inceler ve güvenilir biçimde çalıştırabileceği en iyi özel dinleme, akıl yürütme ve ses kurulumunu önerir. İlk konuşmanızdan önce her şeyi indirmek, kurmak ve test etmek için Başlat’a dokunun.",
     freeOfflineInternetDisclosure:
       "Model indirmek için internet gerekir. Kurulumdan sonra ücretsiz konuşmalar ve oturumlar tamamen bu cihazda kalır.",
-    freeOfflineProfile: "Önerilen yerel kurulum",
+    freeOfflineProfile: "Sizin ve bu telefon için en iyi seçenek",
     freeOfflineDownloadSize: ({ size }) => `${size} indirme`,
-    freeOfflineDownloadAndTest: "İndir ve test et",
+    freeOfflineDownloadAndTest: "Başlat",
     freeOfflinePreparing: ({ model, index, count }) =>
       `${model} · ${index}/${count}`,
     freeOfflineReady: "Özel çevrimdışı kurulum hazır.",
@@ -678,12 +678,12 @@ const rawPremiumTranslations = {
     premiumErrorPending: "Köpet väntar på godkännande.",
     freeOfflineTitle: "Privat läge på enheten",
     freeOfflineIntro:
-      "Välj önskat talspråk. Mr Broccoli hittar automatiskt en komplett lokal uppsättning för lyssning, tänkande och tal som passar telefonen.",
+      "Välj ditt språk medan Mr Broccoli analyserar telefonen och rekommenderar den bästa privata uppsättningen för lyssning, resonemang och röst som den kan köra tillförlitligt. Tryck på Starta för att hämta, installera och testa allt före ditt första samtal.",
     freeOfflineInternetDisclosure:
       "Modellhämtningen kräver internet. Efter installationen stannar gratis samtal och sessioner helt på enheten.",
-    freeOfflineProfile: "Rekommenderad lokal uppsättning",
+    freeOfflineProfile: "Bästa valet för dig och den här telefonen",
     freeOfflineDownloadSize: ({ size }) => `${size} hämtning`,
-    freeOfflineDownloadAndTest: "Hämta och testa",
+    freeOfflineDownloadAndTest: "Starta",
     freeOfflinePreparing: ({ model, index, count }) =>
       `${model} · ${index} av ${count}`,
     freeOfflineReady: "Din privata offlineuppsättning är klar.",
@@ -717,12 +717,12 @@ const rawPremiumTranslations = {
     premiumErrorPending: "خریداری منظوری کی منتظر ہے۔",
     freeOfflineTitle: "نجی آن ڈیوائس موڈ",
     freeOfflineIntro:
-      "اپنی پسندیدہ بولنے کی زبان منتخب کریں۔ Mr Broccoli خودکار طور پر اس فون کے لیے مکمل مقامی سننے، سوچنے اور بولنے کا سیٹ تلاش کرے گا۔",
+      "اپنی زبان منتخب کریں۔ Mr Broccoli اس فون کو جانچ کر سننے، استدلال اور آواز کا بہترین نجی سیٹ اپ تجویز کرے گا جسے یہ قابل اعتماد طریقے سے چلا سکے۔ پہلی گفتگو سے پہلے سب کچھ ڈاؤن لوڈ، انسٹال اور ٹیسٹ کرنے کے لیے شروع کریں دبائیں۔",
     freeOfflineInternetDisclosure:
       "ماڈل ڈاؤن لوڈ کے لیے انٹرنیٹ چاہیے۔ تنصیب کے بعد مفت گفتگو اور سیشن مکمل طور پر اسی ڈیوائس پر رہتے ہیں۔",
-    freeOfflineProfile: "تجویز کردہ مقامی سیٹ",
+    freeOfflineProfile: "آپ اور اس فون کے لیے بہترین انتخاب",
     freeOfflineDownloadSize: ({ size }) => `${size} ڈاؤن لوڈ`,
-    freeOfflineDownloadAndTest: "ڈاؤن لوڈ اور ٹیسٹ",
+    freeOfflineDownloadAndTest: "شروع کریں",
     freeOfflinePreparing: ({ model, index, count }) =>
       `${model} · ${index}/${count}`,
     freeOfflineReady: "نجی آف لائن سیٹ تیار ہے۔",

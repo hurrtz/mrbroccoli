@@ -1,6 +1,12 @@
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
 
+import {
+  APP_HEADER_MIN_HEIGHT,
+  APP_HEADER_PADDING_BOTTOM,
+  APP_HEADER_PADDING_TOP,
+  AppWordmark,
+} from "../../components/AppWordmark";
 import { IconButton } from "../../design-system/IconButton";
 import { Colors } from "../../theme/colors";
 import { fonts } from "../../theme/typography";
@@ -63,15 +69,7 @@ export const MainScreenTopBar = React.memo(function MainScreenTopBar({
             </Text>
           </View>
         ) : (
-          <View style={styles.wordmark}>
-            <Text
-              numberOfLines={1}
-              maxFontSizeMultiplier={1.4}
-              style={[styles.wordmarkText, { color: colors.text }]}
-            >
-              {brandName}
-            </Text>
-          </View>
+          <AppWordmark color={colors.text} name={brandName} />
         )}
       </View>
 
@@ -103,8 +101,9 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    paddingTop: 8,
-    paddingBottom: 10,
+    minHeight: APP_HEADER_MIN_HEIGHT,
+    paddingTop: APP_HEADER_PADDING_TOP,
+    paddingBottom: APP_HEADER_PADDING_BOTTOM,
   },
   brandLayer: {
     position: "absolute",
@@ -119,17 +118,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 10,
-  },
-  wordmark: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 1,
-  },
-  wordmarkText: {
-    fontSize: 26,
-    lineHeight: 32,
-    letterSpacing: -0.25,
-    fontFamily: fonts.headline,
   },
   compactBrand: {
     flexDirection: "row",
