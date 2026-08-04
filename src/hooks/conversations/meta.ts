@@ -118,7 +118,8 @@ function inferConversationState(messages: Message[]) {
     }
 
     if (message.provider && message.model) {
-      const seenModels = seenProviderModels.get(message.provider) ?? new Set<string>();
+      const seenModels =
+        seenProviderModels.get(message.provider) ?? new Set<string>();
       if (!seenModels.has(message.model)) {
         seenModels.add(message.model);
         seenProviderModels.set(message.provider, seenModels);
@@ -151,8 +152,22 @@ function inferConversationState(messages: Message[]) {
     lastProvider,
     providers,
     providerModels,
-    messageCount: messages.length,
   };
+}
+
+export function getVisibleConversationMessageCount(
+  conversation: Pick<Conversation, "branch" | "messages">,
+) {
+  if (!conversation.branch) {
+    return conversation.messages.length;
+  }
+
+  const checkpointIndex = conversation.messages.findIndex(
+    ({ id }) => id === conversation.branch?.branchMessageId,
+  );
+  return checkpointIndex >= 0
+    ? conversation.messages.length - checkpointIndex
+    : conversation.messages.length;
 }
 
 function compareConversationMeta(
@@ -180,26 +195,26 @@ export function normalizeConversationMeta(meta: Partial<ConversationMeta>) {
     createdAt: meta.createdAt ?? meta.updatedAt ?? new Date(0).toISOString(),
     updatedAt: meta.updatedAt ?? new Date(0).toISOString(),
     messageCount: meta.messageCount ?? 0,
-    providers:
-      meta.providers ??
-      (meta.lastProvider ? [meta.lastProvider] : []),
+    providers: meta.providers ?? (meta.lastProvider ? [meta.lastProvider] : []),
     providerModels: meta.providerModels ?? {},
     lastModel: meta.lastModel ?? null,
     lastProvider: meta.lastProvider ?? null,
     pinned: meta.pinned ?? false,
-    branchSchemaVersion: 1 as const,
+    branchSchemaVersion: 2 as const,
     isPrivate: meta.isPrivate ?? false,
   };
 }
 
-export function conversationMetaNeedsHydration(meta: Partial<ConversationMeta>) {
+export function conversationMetaNeedsHydration(
+  meta: Partial<ConversationMeta>,
+) {
   return (
     !meta.createdAt ||
     typeof meta.messageCount !== "number" ||
     !Array.isArray(meta.providers) ||
     typeof meta.providerModels !== "object" ||
     meta.providerModels === null ||
-    meta.branchSchemaVersion !== 1 ||
+    meta.branchSchemaVersion !== 2 ||
     typeof meta.isPrivate !== "boolean"
   );
 }
@@ -225,20 +240,21 @@ export function buildConversationMetaFromConversation(
     title: conversation.title,
     createdAt: conversation.createdAt,
     updatedAt: conversation.updatedAt,
-    messageCount: inferredState.messageCount,
+    messageCount: getVisibleConversationMessageCount(conversation),
     providers:
       inferredState.providers.length > 0
         ? inferredState.providers
-        : existingMeta?.providers ?? [],
+        : (existingMeta?.providers ?? []),
     providerModels:
       Object.keys(inferredState.providerModels).length > 0
         ? inferredState.providerModels
-        : existingMeta?.providerModels ?? {},
+        : (existingMeta?.providerModels ?? {}),
     lastModel: inferredState.lastModel ?? existingMeta?.lastModel ?? null,
-    lastProvider: inferredState.lastProvider ?? existingMeta?.lastProvider ?? null,
+    lastProvider:
+      inferredState.lastProvider ?? existingMeta?.lastProvider ?? null,
     pinned: existingMeta?.pinned ?? false,
     branch: conversation.branch,
-    branchSchemaVersion: 1,
+    branchSchemaVersion: 2,
     isPrivate: conversation.isPrivate ?? existingMeta?.isPrivate ?? false,
   });
 }

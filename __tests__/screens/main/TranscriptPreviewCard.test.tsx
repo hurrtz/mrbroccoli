@@ -1,7 +1,7 @@
 import React from "react";
 
 import { act, fireEvent, render, waitFor } from "@testing-library/react-native";
-import { StyleSheet } from "react-native";
+import { Alert, StyleSheet } from "react-native";
 
 import { TranscriptPreviewCard } from "../../../src/screens/main/TranscriptPreviewCard";
 import { lightColors } from "../../../src/theme/colors";
@@ -12,6 +12,7 @@ jest.mock("../../../src/components/ChatTranscript", () => ({
   ChatTranscript: ({
     messages,
     onEditMessage,
+    onBranchMessage,
     onSaveInsightMessage,
     messageSelectionEnabled,
     onRepeatMessage,
@@ -30,6 +31,14 @@ jest.mock("../../../src/components/ChatTranscript", () => ({
       timestamp: string;
     }[];
     onEditMessage?: (message: {
+      id: string;
+      role: "user" | "assistant";
+      content: string;
+      model: string | null;
+      provider: string | null;
+      timestamp: string;
+    }) => void;
+    onBranchMessage?: (message: {
       id: string;
       role: "user" | "assistant";
       content: string;
@@ -64,6 +73,11 @@ jest.mock("../../../src/components/ChatTranscript", () => ({
         null,
         `actions:${Boolean(onRepeatMessage)}:${Boolean(onShareMessage)}:selection:${Boolean(messageSelectionEnabled)}:latest:${scrollToLatestRequest ?? 0}`,
       ),
+      React.createElement(
+        Text,
+        null,
+        `messages:${messages.map(({ id }) => id).join(",")}`,
+      ),
       onEditMessage && messages[0]
         ? React.createElement(
             Pressable,
@@ -76,6 +90,13 @@ jest.mock("../../../src/components/ChatTranscript", () => ({
             Pressable,
             { onPress: () => onSaveInsightMessage(messages[0]) },
             React.createElement(Text, null, "Open saved insight"),
+          )
+        : null,
+      onBranchMessage && messages[0]
+        ? React.createElement(
+            Pressable,
+            { onPress: () => onBranchMessage(messages[0]) },
+            React.createElement(Text, null, "Request branch"),
           )
         : null,
       onOpenBranches && messages[0]
@@ -97,6 +118,10 @@ jest.mock("../../../src/components/ChatTranscript", () => ({
 describe("TranscriptPreviewCard", () => {
   beforeEach(() => {
     mockTailStateChange = null;
+  });
+
+  afterEach(() => {
+    jest.restoreAllMocks();
   });
 
   it("keeps message actions on the home transcript without an expand control", () => {
@@ -256,6 +281,7 @@ describe("TranscriptPreviewCard", () => {
 
   it("edits a user transcript with an explicit future-context warning", async () => {
     const onEditMessage = jest.fn(async () => true);
+    const onBranchMessage = jest.fn(async () => true);
     const screen = render(
       <TranscriptPreviewCard
         activeConversationId="conversation-1"
@@ -272,6 +298,7 @@ describe("TranscriptPreviewCard", () => {
         ]}
         onCopyMessage={jest.fn()}
         onEditMessage={onEditMessage}
+        onBranchMessage={onBranchMessage}
         onRetryMessage={jest.fn()}
         showUsageStats={false}
         showWhenEmpty
@@ -282,6 +309,7 @@ describe("TranscriptPreviewCard", () => {
               "Existing replies are not changed; future context is updated.",
             correctTranscriptTitle: "Correct transcript",
             save: "Save",
+            saveAndSend: "Save + send",
           })[key] ?? key
         }
       />,
@@ -305,6 +333,171 @@ describe("TranscriptPreviewCard", () => {
         "All in on Ant Design",
       ),
     );
+    expect(onBranchMessage).not.toHaveBeenCalled();
+  });
+
+  it("saves and sends an edited prompt from the correction dialog", async () => {
+    const onEditMessage = jest.fn(async () => true);
+    const onBranchMessage = jest.fn(async () => true);
+    const screen = render(
+      <TranscriptPreviewCard
+        activeConversationId="conversation-1"
+        colors={lightColors}
+        messages={[
+          {
+            id: "message-1",
+            role: "user",
+            content: "Original prompt",
+            model: null,
+            provider: null,
+            timestamp: "2026-08-03T10:00:00.000Z",
+          },
+        ]}
+        onCopyMessage={jest.fn()}
+        onEditMessage={onEditMessage}
+        onBranchMessage={onBranchMessage}
+        onRetryMessage={jest.fn()}
+        showUsageStats={false}
+        showWhenEmpty
+        t={(key) =>
+          ({
+            cancel: "Cancel",
+            correctTranscriptTitle: "Correct transcript",
+            save: "Save",
+            saveAndSend: "Save + send",
+          })[key] ?? key
+        }
+      />,
+    );
+
+    fireEvent.press(screen.getByText("Open correction"));
+    fireEvent.changeText(
+      screen.getByTestId("transcript-correction-input"),
+      "Corrected prompt",
+    );
+    fireEvent.press(screen.getByText("Save + send"));
+
+    await waitFor(() => {
+      expect(onEditMessage).toHaveBeenCalledWith(
+        expect.objectContaining({ id: "message-1" }),
+        "Corrected prompt",
+      );
+      expect(onBranchMessage).toHaveBeenCalledWith(
+        expect.objectContaining({ id: "message-1" }),
+      );
+    });
+  });
+
+  it("confirms the standalone fork action before creating a branch", () => {
+    const alertSpy = jest
+      .spyOn(Alert, "alert")
+      .mockImplementation(() => undefined);
+    const onBranchMessage = jest.fn(async () => true);
+    const screen = render(
+      <TranscriptPreviewCard
+        activeConversationId="conversation-1"
+        colors={lightColors}
+        messages={[
+          {
+            id: "message-1",
+            role: "assistant",
+            content: "Checkpoint",
+            model: "gpt-5.4",
+            provider: "openai",
+            timestamp: "2026-08-03T10:00:00.000Z",
+          },
+        ]}
+        onBranchMessage={onBranchMessage}
+        onCopyMessage={jest.fn()}
+        onRetryMessage={jest.fn()}
+        showUsageStats={false}
+        showWhenEmpty
+        t={(key) =>
+          ({
+            cancel: "Cancel",
+            createFork: "Create fork",
+            createForkConfirmation:
+              "Do you want to create a fork of this conversation?",
+            createForkTitle: "Create a fork?",
+          })[key] ?? key
+        }
+      />,
+    );
+
+    fireEvent.press(screen.getByText("Request branch"));
+    expect(onBranchMessage).not.toHaveBeenCalled();
+    expect(alertSpy).toHaveBeenCalledWith(
+      "Create a fork?",
+      "Do you want to create a fork of this conversation?",
+      expect.arrayContaining([
+        expect.objectContaining({ text: "Cancel", style: "cancel" }),
+        expect.objectContaining({ text: "Create fork" }),
+      ]),
+    );
+
+    alertSpy.mock.calls[0]?.[2]
+      ?.find(({ text }) => text === "Create fork")
+      ?.onPress?.();
+    expect(onBranchMessage).toHaveBeenCalledWith(
+      expect.objectContaining({ id: "message-1" }),
+    );
+  });
+
+  it("shows a branch from its checkpoint while keeping inherited context hidden", () => {
+    const screen = render(
+      <TranscriptPreviewCard
+        activeConversationId="child-conversation"
+        activeConversationBranch={{
+          rootConversationId: "parent-conversation",
+          parentConversationId: "parent-conversation",
+          parentMessageId: "parent-checkpoint",
+          branchMessageId: "child-checkpoint",
+          kind: "continue-from-message",
+          createdAt: "2026-08-04T10:01:00.000Z",
+        }}
+        colors={lightColors}
+        messages={[
+          {
+            id: "inherited-message",
+            role: "assistant",
+            content: "Inherited context",
+            model: "gpt-5.4",
+            provider: "openai",
+            timestamp: "2026-08-04T09:59:00.000Z",
+          },
+          {
+            id: "child-checkpoint",
+            role: "user",
+            content: "Forked prompt",
+            model: null,
+            provider: null,
+            timestamp: "2026-08-04T10:00:00.000Z",
+          },
+          {
+            id: "child-reply",
+            role: "assistant",
+            content: "Forked reply",
+            model: "gpt-5.4",
+            provider: "openai",
+            timestamp: "2026-08-04T10:01:00.000Z",
+          },
+        ]}
+        onCopyMessage={jest.fn()}
+        onRetryMessage={jest.fn()}
+        showUsageStats={false}
+        showWhenEmpty
+        t={(key) => key}
+      />,
+    );
+
+    expect(
+      screen.getByText("messages:child-checkpoint,child-reply"),
+    ).toBeTruthy();
+    expect(
+      screen.queryByText(
+        "messages:inherited-message,child-checkpoint,child-reply",
+      ),
+    ).toBeNull();
   });
 
   it("opens a branch from the checkpoint marker", async () => {
@@ -361,7 +554,9 @@ describe("TranscriptPreviewCard", () => {
 
     fireEvent.press(screen.getByText("Open branches"));
     expect(screen.getByText("Branches from this message")).toBeTruthy();
-    fireEvent.press(screen.getByTestId("message-branch-choice-child-conversation"));
+    fireEvent.press(
+      screen.getByTestId("message-branch-choice-child-conversation"),
+    );
 
     expect(onSelectBranchConversation).toHaveBeenCalledWith(
       "child-conversation",

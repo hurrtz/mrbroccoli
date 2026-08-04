@@ -39,6 +39,13 @@ export function ChatBubbleContent({
 
   return (
     <>
+      {branchOrigin ? (
+        <MessageBranchIndicator
+          messageId={message.id}
+          branchOrigin={branchOrigin}
+          onOpenBranchSource={onOpenBranchSource}
+        />
+      ) : null}
       <MessageHeader message={message} />
       <MessageImageAttachments
         attachments={message.attachments ?? []}
@@ -49,9 +56,7 @@ export function ChatBubbleContent({
       <MessageBranchIndicator
         messageId={message.id}
         branchChildren={branchChildren}
-        branchOrigin={branchOrigin}
         onOpenBranches={onOpenBranches}
-        onOpenBranchSource={onOpenBranchSource}
       />
       <ReplyFailureCard message={message} onRetry={onRetry} />
       <PipelineNotices
@@ -68,9 +73,11 @@ export function ChatBubbleContent({
       (message.role === "assistant" || onEdit || onBranch || onSaveInsight) ? (
         <MessageActions
           message={message}
+          branchOrigin={branchOrigin}
           onCopy={onCopy}
           onEdit={message.role === "user" ? onEdit : undefined}
           onBranch={onBranch}
+          onOpenBranchSource={onOpenBranchSource}
           onSaveInsight={onSaveInsight}
           onShare={onShare}
           onRepeat={onRepeat}

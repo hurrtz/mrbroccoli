@@ -186,6 +186,9 @@ describe("local LLM", () => {
     expect(completionParams.messages[0].content).toContain(
       "keine englischen Überschriften",
     );
+    expect(completionParams.messages[0].content).toContain(
+      "Wenn die letzte Nachricht das Thema wechselt",
+    );
     expect(result.termination).toEqual(
       expect.objectContaining({
         completionTokenLimit: 1024,
@@ -209,7 +212,8 @@ describe("local LLM", () => {
   });
 
   it("drops an unfinished private thinking block", () => {
-    expect(sanitizeLocalResponseText("<think>Still reasoning in English"))
-      .toBe("");
+    expect(sanitizeLocalResponseText("<think>Still reasoning in English")).toBe(
+      "",
+    );
   });
 });

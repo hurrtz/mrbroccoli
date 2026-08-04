@@ -36,7 +36,7 @@ describe("ChatBubble", () => {
     expect(onEdit).toHaveBeenCalledWith(message);
   });
 
-  it("offers a send action only after a user transcript was edited", () => {
+  it("keeps sending out of the action row after a user transcript was edited", () => {
     const onBranch = jest.fn();
     const message = {
       id: "edited-user-transcript",
@@ -51,7 +51,8 @@ describe("ChatBubble", () => {
       <ChatBubble selectable message={message} onBranch={onBranch} />,
     );
 
-    fireEvent.press(screen.getByLabelText("Send message"));
+    expect(screen.queryByLabelText("Send message")).toBeNull();
+    fireEvent.press(screen.getByLabelText("Branch from here"));
 
     expect(onBranch).toHaveBeenCalledWith(message);
     const uneditedScreen = renderWithProviders(
@@ -61,7 +62,6 @@ describe("ChatBubble", () => {
         onBranch={onBranch}
       />,
     );
-    expect(uneditedScreen.queryByLabelText("Send message")).toBeNull();
     expect(uneditedScreen.getByLabelText("Branch from here")).toBeTruthy();
   });
 
@@ -119,6 +119,7 @@ describe("ChatBubble", () => {
     };
     const screen = renderWithProviders(
       <ChatBubble
+        selectable
         message={message}
         branchChildren={[child]}
         branchOrigin={branchOrigin}
@@ -127,14 +128,47 @@ describe("ChatBubble", () => {
       />,
     );
 
-    fireEvent.press(screen.getByLabelText("Branch starts here · Parent conversation"));
+    fireEvent.press(
+      screen.getByLabelText(
+        "Context from “Parent conversation” is included up to this fork. Tap to return to the fork point.",
+      ),
+    );
+    fireEvent.press(screen.getByLabelText("Back to fork point"));
     fireEvent.press(screen.getByLabelText("1 branch"));
 
-    expect(onOpenBranchSource).toHaveBeenCalledWith(
+    expect(onOpenBranchSource).toHaveBeenCalledTimes(2);
+    expect(onOpenBranchSource).toHaveBeenLastCalledWith(
       "parent-conversation",
       "parent-message",
     );
     expect(onOpenBranches).toHaveBeenCalledWith([child]);
+  });
+
+  it("moves insight saving behind the secondary action menu", () => {
+    const onSaveInsight = jest.fn();
+    const message = {
+      id: "assistant-insight",
+      role: "assistant" as const,
+      content: "A useful decision",
+      model: "gpt-5.4",
+      provider: "openai" as const,
+      timestamp: "2026-08-04T09:05:00.000Z",
+    };
+    const screen = renderWithProviders(
+      <ChatBubble selectable message={message} onSaveInsight={onSaveInsight} />,
+    );
+
+    expect(
+      screen.queryByTestId("message-save-insight-action-assistant-insight"),
+    ).toBeNull();
+    fireEvent.press(
+      screen.getByTestId("message-more-actions-assistant-insight"),
+    );
+    fireEvent.press(
+      screen.getByTestId("message-save-insight-action-assistant-insight"),
+    );
+
+    expect(onSaveInsight).toHaveBeenCalledWith(message);
   });
 
   it("keeps web-search details collapsed until requested and opens citation links", () => {
@@ -633,8 +667,7 @@ describe("ChatBubble", () => {
     expect(
       StyleSheet.flatten(
         screen.getByTestId("phosphor-icon-stop", hiddenIconQuery).props.style,
-      )
-        .color,
+      ).color,
     ).toBe(getAccessibleForeground(lightColors.success));
   });
 

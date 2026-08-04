@@ -15,10 +15,7 @@ export function MessageBranchIndicator({
   onOpenBranchSource,
 }: Pick<
   ChatBubbleProps,
-  | "branchChildren"
-  | "branchOrigin"
-  | "onOpenBranches"
-  | "onOpenBranchSource"
+  "branchChildren" | "branchOrigin" | "onOpenBranches" | "onOpenBranchSource"
 > & { messageId: string }) {
   const { colors } = useTheme();
   const { t } = useLocalization();
@@ -29,8 +26,8 @@ export function MessageBranchIndicator({
 
   const originLabel = branchOrigin?.parentAvailable
     ? branchOrigin.parentTitle
-      ? `${t("branchStartsHere")} · ${branchOrigin.parentTitle}`
-      : t("branchStartsHere")
+      ? t("branchContextKeptFrom", { title: branchOrigin.parentTitle })
+      : t("branchContextKept")
     : t("branchSourceUnavailable");
   const originContent = branchOrigin ? (
     <>
@@ -106,9 +103,7 @@ export function MessageBranchIndicator({
           activeOpacity={0.88}
         >
           <PhosphorIcon name="branch" size="inline" color={colors.accent} />
-          <Text
-            style={[styles.branchIndicatorText, { color: colors.accent }]}
-          >
+          <Text style={[styles.branchIndicatorText, { color: colors.accent }]}>
             {t("branchCount", { count: branchChildren.length })}
           </Text>
         </TouchableOpacity>

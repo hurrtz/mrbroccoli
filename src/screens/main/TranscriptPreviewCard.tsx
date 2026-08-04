@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import {
+  Alert,
   Pressable,
   StyleProp,
   StyleSheet,
@@ -37,7 +38,7 @@ interface TranscriptPreviewCardProps {
   activeReplayMessageId?: string | null;
   onCopyMessage: (message: Message) => Promise<boolean>;
   onEditMessage?: (message: Message, content: string) => Promise<boolean>;
-  onBranchMessage?: (message: Message) => void;
+  onBranchMessage?: (message: Message) => Promise<boolean> | void;
   onSelectBranchConversation?: (conversationId: string) => Promise<void> | void;
   onSaveInsight?: (
     message: Message,
@@ -106,7 +107,9 @@ export function TranscriptPreviewCard({
   const [scrollToLatestRequest, setScrollToLatestRequest] = useState(0);
   const [editingMessage, setEditingMessage] = useState<Message | null>(null);
   const [editingText, setEditingText] = useState("");
-  const [savingCorrection, setSavingCorrection] = useState(false);
+  const [savingCorrection, setSavingCorrection] = useState<
+    "save" | "send" | null
+  >(null);
   const [insightMessage, setInsightMessage] = useState<Message | null>(null);
   const [insightKind, setInsightKind] =
     useState<ConversationArtifactKind>("decision");
@@ -129,17 +132,44 @@ export function TranscriptPreviewCard({
   const branchParent = React.useMemo(
     () =>
       activeConversationBranch
-        ? conversationBranches.find(
+        ? (conversationBranches.find(
             ({ id }) => id === activeConversationBranch.parentConversationId,
-          ) ?? null
+          ) ?? null)
         : null,
     [activeConversationBranch, conversationBranches],
   );
+  const visibleMessages = React.useMemo(() => {
+    if (!activeConversationBranch) {
+      return messages;
+    }
+
+    const checkpointIndex = messages.findIndex(
+      ({ id }) => id === activeConversationBranch.branchMessageId,
+    );
+    return checkpointIndex >= 0 ? messages.slice(checkpointIndex) : messages;
+  }, [activeConversationBranch, messages]);
+
+  const requestBranch = (message: Message) => {
+    if (!onBranchMessage) {
+      return;
+    }
+
+    Alert.alert(t("createForkTitle"), t("createForkConfirmation"), [
+      { text: t("cancel"), style: "cancel" },
+      {
+        text: t("createFork"),
+        onPress: () => {
+          void onBranchMessage(message);
+        },
+      },
+    ]);
+  };
 
   useEffect(() => {
     setIsAtTranscriptTail(true);
     setEditingMessage(null);
     setEditingText("");
+    setSavingCorrection(null);
     setInsightMessage(null);
     setInsightText("");
     setBranchChoices([]);
@@ -244,7 +274,7 @@ export function TranscriptPreviewCard({
       <View style={styles.transcriptBody}>
         <ChatTranscript
           conversationId={activeConversationId}
-          messages={messages}
+          messages={visibleMessages}
           emptyTitle={t("noTranscriptYet")}
           emptyDescription={t("previewTranscriptEmptyDescription")}
           contentContainerStyle={styles.previewTranscriptContent}
@@ -264,7 +294,7 @@ export function TranscriptPreviewCard({
           branchChildrenByMessageId={branchChildrenByMessageId}
           branchOrigin={activeConversationBranch}
           branchParent={branchParent}
-          onBranchMessage={onBranchMessage}
+          onBranchMessage={onBranchMessage ? requestBranch : undefined}
           onOpenBranches={
             onSelectBranchConversation ? setBranchChoices : undefined
           }
@@ -298,9 +328,9 @@ export function TranscriptPreviewCard({
       <Modal
         visible={editingMessage !== null}
         title={t("correctTranscriptTitle")}
-        maskClosable={!savingCorrection}
+        maskClosable={savingCorrection === null}
         onClose={() => {
-          if (!savingCorrection) {
+          if (savingCorrection === null) {
             setEditingMessage(null);
             setEditingText("");
           }
@@ -308,7 +338,7 @@ export function TranscriptPreviewCard({
         footer={[
           {
             text: t("cancel"),
-            disabled: savingCorrection,
+            disabled: savingCorrection !== null,
             onPress: () => {
               setEditingMessage(null);
               setEditingText("");
@@ -316,16 +346,16 @@ export function TranscriptPreviewCard({
           },
           {
             text: t("save"),
-            loading: savingCorrection,
+            loading: savingCorrection === "save",
             disabled:
-              savingCorrection ||
+              savingCorrection !== null ||
               !editingText.trim() ||
               editingText.trim() === editingMessage?.content,
             onPress: () => {
               if (!editingMessage || !onEditMessage) {
                 return;
               }
-              setSavingCorrection(true);
+              setSavingCorrection("save");
               void onEditMessage(editingMessage, editingText)
                 .then((saved) => {
                   if (saved) {
@@ -334,7 +364,36 @@ export function TranscriptPreviewCard({
                   }
                 })
                 .catch(() => undefined)
-                .finally(() => setSavingCorrection(false));
+                .finally(() => setSavingCorrection(null));
+            },
+          },
+          {
+            text: t("saveAndSend"),
+            tone: "success",
+            loading: savingCorrection === "send",
+            disabled:
+              savingCorrection !== null ||
+              !onBranchMessage ||
+              !editingText.trim() ||
+              editingText.trim() === editingMessage?.content,
+            onPress: () => {
+              if (!editingMessage || !onEditMessage || !onBranchMessage) {
+                return;
+              }
+              setSavingCorrection("send");
+              void onEditMessage(editingMessage, editingText)
+                .then(async (saved) => {
+                  if (!saved) {
+                    return;
+                  }
+                  const branched = await onBranchMessage(editingMessage);
+                  if (branched !== false) {
+                    setEditingMessage(null);
+                    setEditingText("");
+                  }
+                })
+                .catch(() => undefined)
+                .finally(() => setSavingCorrection(null));
             },
           },
         ]}
@@ -350,7 +409,7 @@ export function TranscriptPreviewCard({
             autoFocus
             rows={8}
             value={editingText}
-            disabled={savingCorrection}
+            disabled={savingCorrection !== null}
             onChangeText={setEditingText}
           />
         </View>

@@ -5,7 +5,9 @@ export interface ConversationBranchRow {
   depth: number;
   ancestorHasNextSibling: boolean[];
   hasChildren: boolean;
+  isExpanded: boolean;
   isLastSibling: boolean;
+  parentTitle?: string;
 }
 
 export function getConversationBranchesByMessageId(
@@ -40,12 +42,17 @@ export function getConversationBranchesByMessageId(
 
 export function buildConversationBranchRows(
   conversations: ConversationMeta[],
+  expandedConversationIds?: ReadonlySet<string>,
 ): ConversationBranchRow[] {
   const byId = new Map(
-    conversations.map((conversation) => [conversation.id, conversation] as const),
+    conversations.map(
+      (conversation) => [conversation.id, conversation] as const,
+    ),
   );
   const rankById = new Map(
-    conversations.map((conversation, index) => [conversation.id, index] as const),
+    conversations.map(
+      (conversation, index) => [conversation.id, index] as const,
+    ),
   );
   const childrenByParentId = new Map<string, ConversationMeta[]>();
   const roots: ConversationMeta[] = [];
@@ -88,6 +95,16 @@ export function buildConversationBranchRows(
 
   const rows: ConversationBranchRow[] = [];
   const visited = new Set<string>();
+  const suppressed = new Set<string>();
+  const suppressDescendants = (conversation: ConversationMeta) => {
+    for (const child of childrenByParentId.get(conversation.id) ?? []) {
+      if (suppressed.has(child.id)) {
+        continue;
+      }
+      suppressed.add(child.id);
+      suppressDescendants(child);
+    }
+  };
   const visit = (
     conversation: ConversationMeta,
     depth: number,
@@ -104,8 +121,26 @@ export function buildConversationBranchRows(
       depth,
       ancestorHasNextSibling,
       hasChildren: children.length > 0,
+      isExpanded:
+        children.length > 0 &&
+        (expandedConversationIds === undefined ||
+          expandedConversationIds.has(conversation.id)),
       isLastSibling,
+      ...(conversation.branch?.parentConversationId
+        ? {
+            parentTitle: byId.get(conversation.branch.parentConversationId)
+              ?.title,
+          }
+        : {}),
     });
+
+    if (
+      expandedConversationIds !== undefined &&
+      !expandedConversationIds.has(conversation.id)
+    ) {
+      suppressDescendants(conversation);
+      return;
+    }
 
     children.forEach((child, index) => {
       visit(
@@ -123,7 +158,7 @@ export function buildConversationBranchRows(
   });
 
   for (const conversation of conversations) {
-    if (!visited.has(conversation.id)) {
+    if (!visited.has(conversation.id) && !suppressed.has(conversation.id)) {
       visit(conversation, 0, [], true);
     }
   }

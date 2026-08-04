@@ -30,15 +30,12 @@ interface ChatTranscriptProps {
   scrollEnabled?: boolean;
   onCopyMessage?: (message: Message) => Promise<boolean>;
   onEditMessage?: (message: Message) => void;
-  onBranchMessage?: (message: Message) => void;
+  onBranchMessage?: (message: Message) => Promise<boolean> | void;
   branchChildrenByMessageId?: ReadonlyMap<string, ConversationMeta[]>;
   branchOrigin?: ConversationBranchOrigin;
   branchParent?: ConversationMeta | null;
   onOpenBranches?: (branches: ConversationMeta[]) => void;
-  onOpenBranchSource?: (
-    conversationId: string,
-    messageId: string,
-  ) => void;
+  onOpenBranchSource?: (conversationId: string, messageId: string) => void;
   onSaveInsightMessage?: (message: Message) => void;
   onShareMessage?: (message: Message) => void;
   onRepeatMessage?: (message: Message) => void;
@@ -227,8 +224,7 @@ export function ChatTranscript({
   useEffect(() => {
     if (
       !scrollToMessageRequest ||
-      handledMessageScrollRequestRef.current ===
-        scrollToMessageRequest.request
+      handledMessageScrollRequestRef.current === scrollToMessageRequest.request
     ) {
       return;
     }

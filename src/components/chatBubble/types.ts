@@ -15,12 +15,9 @@ export interface ChatBubbleProps {
   };
   onCopy?: (message: Message) => Promise<boolean>;
   onEdit?: (message: Message) => void;
-  onBranch?: (message: Message) => void;
+  onBranch?: (message: Message) => Promise<boolean> | void;
   onOpenBranches?: (branches: ConversationMeta[]) => void;
-  onOpenBranchSource?: (
-    conversationId: string,
-    messageId: string,
-  ) => void;
+  onOpenBranchSource?: (conversationId: string, messageId: string) => void;
   onSaveInsight?: (message: Message) => void;
   onShare?: (message: Message) => void;
   onRepeat?: (message: Message) => void;

@@ -368,6 +368,7 @@ export const styles = StyleSheet.create({
   },
   actionRow: {
     flexDirection: "row",
+    flexWrap: "wrap",
     justifyContent: "flex-start",
     alignItems: "center",
     gap: 4,
@@ -385,5 +386,38 @@ export const styles = StyleSheet.create({
     borderWidth: 0,
     alignItems: "center",
     justifyContent: "center",
+  },
+  textAction: {
+    minHeight: 44,
+    maxWidth: "100%",
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    borderRadius: 10,
+    borderWidth: 1,
+    paddingHorizontal: 10,
+  },
+  textActionLabel: {
+    flexShrink: 1,
+    fontSize: 12,
+    lineHeight: 16,
+    fontFamily: fonts.bodyMedium,
+  },
+  moreActionList: {
+    gap: 4,
+  },
+  moreAction: {
+    minHeight: 48,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+    paddingHorizontal: 4,
+    paddingVertical: 6,
+  },
+  moreActionText: {
+    flex: 1,
+    fontSize: 15,
+    lineHeight: 20,
+    fontFamily: fonts.bodyMedium,
   },
 });

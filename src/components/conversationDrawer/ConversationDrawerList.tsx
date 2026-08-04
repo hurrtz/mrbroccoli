@@ -33,9 +33,50 @@ export function ConversationDrawerList({
 }: ConversationDrawerListProps) {
   const { colors } = useTheme();
   const { locale, t } = useLocalization();
+  const [expansionOverrides, setExpansionOverrides] = React.useState<
+    ReadonlyMap<string, boolean>
+  >(new Map());
+  const expandedConversationIds = React.useMemo(() => {
+    if (searchQuery.trim()) {
+      return new Set(conversations.map(({ id }) => id));
+    }
+
+    const byId = new Map(
+      conversations.map((conversation) => [conversation.id, conversation]),
+    );
+    const activeAncestors = new Set<string>();
+    let current = activeId ? byId.get(activeId) : undefined;
+    const visited = new Set<string>();
+    while (current?.branch?.parentConversationId && !visited.has(current.id)) {
+      visited.add(current.id);
+      const parentId = current.branch.parentConversationId;
+      activeAncestors.add(parentId);
+      current = byId.get(parentId);
+    }
+
+    const expanded = new Set<string>();
+    for (const conversation of conversations) {
+      const override = expansionOverrides.get(conversation.id);
+      if (override ?? activeAncestors.has(conversation.id)) {
+        expanded.add(conversation.id);
+      }
+    }
+    return expanded;
+  }, [activeId, conversations, expansionOverrides, searchQuery]);
   const branchRows = React.useMemo(
-    () => buildConversationBranchRows(conversations),
-    [conversations],
+    () => buildConversationBranchRows(conversations, expandedConversationIds),
+    [conversations, expandedConversationIds],
+  );
+
+  const toggleBranchExpanded = React.useCallback(
+    (conversationId: string, isExpanded: boolean) => {
+      setExpansionOverrides((current) => {
+        const next = new Map(current);
+        next.set(conversationId, !isExpanded);
+        return next;
+      });
+    },
+    [],
   );
 
   return (
@@ -99,6 +140,7 @@ export function ConversationDrawerList({
           onDelete={onDeleteConversation}
           onOpenActionConversation={onOpenActionConversation}
           onSelectConversation={onSelectConversation}
+          onToggleBranchExpanded={toggleBranchExpanded}
         />
       )}
     />

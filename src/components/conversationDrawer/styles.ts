@@ -398,6 +398,9 @@ export const styles = StyleSheet.create({
     paddingVertical: 15,
     overflow: "hidden",
   },
+  itemBranch: {
+    paddingVertical: 10,
+  },
   branchRail: {
     position: "absolute",
     left: 8,
@@ -446,6 +449,24 @@ export const styles = StyleSheet.create({
   },
   itemPressArea: {
     paddingRight: 54,
+  },
+  itemPressAreaWithBranchToggle: {
+    paddingRight: 96,
+  },
+  branchToggleButton: {
+    position: "absolute",
+    zIndex: 2,
+    top: 8,
+    right: 46,
+    width: 44,
+    height: 44,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  branchParentText: {
+    fontSize: 12,
+    lineHeight: 17,
+    fontFamily: fonts.bodyMedium,
   },
   itemHeader: {
     marginBottom: 7,

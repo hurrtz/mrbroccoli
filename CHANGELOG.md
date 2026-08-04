@@ -56,6 +56,13 @@ the complete Play Store translations are kept in a dedicated file under
 
 ### Changed
 
+- Keep branch families compact and collapsed until opened, expand the active
+  path automatically, label each child with its parent, and show a child thread
+  from its forked checkpoint while retaining earlier parent context invisibly.
+- Confirm standalone fork actions, move edited-prompt submission into an
+  explicit Save + send dialog action, provide parent navigation above and below
+  the forked checkpoint, and move advanced insight saving out of the primary
+  message-action row.
 - Strengthen Uber Mode synthesis with an evidence-ledger contract that keeps
   established information, inference, assumptions, and unresolved dissent
   distinct and passes explicit review verdicts into the final synthesis.
@@ -93,6 +100,9 @@ the complete Play Store translations are kept in a dedicated file under
 
 ### Fixed
 
+- Tell small on-device reasoning models to treat the latest message as the
+  current task and not blend an earlier topic into the answer when a branch
+  changes subject.
 - Keep Free setup's selected speaking language, interface locale, local model
   prompt, and speech routes synchronized; repair existing mismatched profiles,
   and remove private Qwen thinking plus stray Markdown from visible, saved, and
@@ -101,10 +111,9 @@ the complete Play Store translations are kept in a dedicated file under
   heading or ending mid-answer by enforcing the target language in its own
   language, removing standalone generated titles, and reserving a separate
   generation budget for private reasoning.
-- Add a Send action to edited user transcripts that creates an independent
-  conversation branch through the corrected prompt, preserves prior context,
-  settings, privacy, artifacts, and image files, and generates the replacement
-  reply without changing the original conversation.
+- Let Save + send on an edited user transcript create an independent branch
+  through the corrected prompt, preserving prior context, settings, privacy,
+  artifacts, and image files while generating the replacement reply.
 - Keep the product name exactly “Mr Broccoli” in every interface language
   instead of translating, respelling, or punctuating the brand per locale.
 - Make past-conversation retrieval abstain on weak incidental matches, suppress

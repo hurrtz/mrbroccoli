@@ -24,6 +24,7 @@ import type {
 } from "../../services/appDataBackup";
 import {
   buildConversationMetaFromConversation,
+  getVisibleConversationMessageCount,
   normalizeConversationTitle,
   truncateConversationTitle,
 } from "./meta";
@@ -459,7 +460,8 @@ export function useConversationMutations(params: {
                   title: updatedConversation.title,
                   createdAt: updatedConversation.createdAt,
                   updatedAt: updatedConversation.updatedAt,
-                  messageCount: updatedConversation.messages.length,
+                  messageCount:
+                    getVisibleConversationMessageCount(updatedConversation),
                   providers:
                     messageInput.provider &&
                     !meta.providers.includes(messageInput.provider)
@@ -621,11 +623,7 @@ export function useConversationMutations(params: {
         ) ?? -1;
       const sourceMessage = currentConversation?.messages[messageIndex];
 
-      if (
-        !currentConversation ||
-        messageIndex < 0 ||
-        !sourceMessage
-      ) {
+      if (!currentConversation || messageIndex < 0 || !sourceMessage) {
         return null;
       }
 
@@ -1082,7 +1080,8 @@ export function useConversationMutations(params: {
 
       const restoredIdByOriginalId = new Map(
         [...restoredByOriginalId.entries()].map(
-          ([originalId, conversation]) => [originalId, conversation.id] as const,
+          ([originalId, conversation]) =>
+            [originalId, conversation.id] as const,
         ),
       );
       for (const pending of pendingRestores) {

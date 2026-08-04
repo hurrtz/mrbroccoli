@@ -140,10 +140,7 @@ describe("ConversationDrawer", () => {
       ).borderWidth,
     ).toBeUndefined();
     expect(
-      screen.getAllByTestId(
-        "phosphor-icon-ellipsis-vertical",
-        hiddenIconQuery,
-      ),
+      screen.getAllByTestId("phosphor-icon-ellipsis-vertical", hiddenIconQuery),
     ).toHaveLength(2);
   });
 
@@ -183,10 +180,12 @@ describe("ConversationDrawer", () => {
     await waitFor(() => {
       expect(onSearchConversations).toHaveBeenCalledWith("travel");
       expect(
-        screen.UNSAFE_getByType(FlatList).props.data.map(
-          ({ conversation }: { conversation: ConversationMeta }) =>
-            conversation,
-        ),
+        screen
+          .UNSAFE_getByType(FlatList)
+          .props.data.map(
+            ({ conversation }: { conversation: ConversationMeta }) =>
+              conversation,
+          ),
       ).toEqual([conversations[1]]);
     });
   });
@@ -219,10 +218,13 @@ describe("ConversationDrawer", () => {
 
     expect(
       rows.map(
-        ({ conversation, depth }: { conversation: ConversationMeta; depth: number }) => [
-          conversation.id,
+        ({
+          conversation,
           depth,
-        ],
+        }: {
+          conversation: ConversationMeta;
+          depth: number;
+        }) => [conversation.id, depth],
       ),
     ).toEqual([
       ["one", 0],
@@ -230,6 +232,66 @@ describe("ConversationDrawer", () => {
     ]);
     expect(screen.getByTestId("conversation-branch-rail-one")).toBeTruthy();
     expect(screen.getByTestId("conversation-branch-rail-child")).toBeTruthy();
+    expect(screen.getByText("Branch of “Morning briefing”")).toBeTruthy();
+    expect(
+      screen.getByTestId("conversation-branch-toggle-one").props
+        .accessibilityState,
+    ).toEqual({ expanded: true });
+
+    fireEvent.press(screen.getByTestId("conversation-branch-toggle-one"));
+    expect(
+      screen
+        .UNSAFE_getByType(FlatList)
+        .props.data.map(
+          ({ conversation }: { conversation: ConversationMeta }) =>
+            conversation.id,
+        ),
+    ).toEqual(["one"]);
+  });
+
+  it("collapses inactive branch families by default and expands them on demand", () => {
+    const child: ConversationMeta = {
+      ...conversations[1],
+      id: "child",
+      title: "Branched explanation",
+      branch: {
+        rootConversationId: "one",
+        parentConversationId: "one",
+        parentMessageId: "message-2",
+        branchMessageId: "child-message-2",
+        kind: "continue-from-message",
+        createdAt: "2026-03-20T08:20:00.000Z",
+      },
+    };
+    const screen = renderWithProviders(
+      <ConversationDrawerList
+        activeId="one"
+        conversations={[child, conversations[0]]}
+        searchQuery=""
+        onDeleteConversation={jest.fn()}
+        onOpenActionConversation={jest.fn()}
+        onSelectConversation={jest.fn()}
+      />,
+    );
+
+    expect(
+      screen
+        .UNSAFE_getByType(FlatList)
+        .props.data.map(
+          ({ conversation }: { conversation: ConversationMeta }) =>
+            conversation.id,
+        ),
+    ).toEqual(["one"]);
+
+    fireEvent.press(screen.getByTestId("conversation-branch-toggle-one"));
+    expect(
+      screen
+        .UNSAFE_getByType(FlatList)
+        .props.data.map(
+          ({ conversation }: { conversation: ConversationMeta }) =>
+            conversation.id,
+        ),
+    ).toEqual(["one", "child"]);
   });
 
   it("tightens the empty state for a landscape drawer", () => {

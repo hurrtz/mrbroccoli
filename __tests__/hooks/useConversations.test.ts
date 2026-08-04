@@ -1035,6 +1035,16 @@ describe("useConversations", () => {
     expect(FileSystem.writeAsStringAsync).toHaveBeenCalled();
     expect(result.current.activeConversation?.id).toBe(fork?.conversation.id);
     expect(result.current.conversations).toHaveLength(2);
+    expect(
+      result.current.conversations.find(
+        ({ id }) => id === fork?.conversation.id,
+      ),
+    ).toEqual(
+      expect.objectContaining({
+        branchSchemaVersion: 2,
+        messageCount: 1,
+      }),
+    );
     await expect(
       result.current.getConversationById(originalConversationId),
     ).resolves.toEqual(
@@ -1084,9 +1094,8 @@ describe("useConversations", () => {
       ReturnType<typeof result.current.branchConversationAtMessage>
     > = null;
     await act(async () => {
-      firstBranch = await result.current.branchConversationAtMessage(
-        rootCheckpointId,
-      );
+      firstBranch =
+        await result.current.branchConversationAtMessage(rootCheckpointId);
     });
     let nestedCheckpointId = "";
     await act(async () => {
@@ -1109,9 +1118,8 @@ describe("useConversations", () => {
       ReturnType<typeof result.current.branchConversationAtMessage>
     > = null;
     await act(async () => {
-      nestedBranch = await result.current.branchConversationAtMessage(
-        nestedCheckpointId,
-      );
+      nestedBranch =
+        await result.current.branchConversationAtMessage(nestedCheckpointId);
     });
 
     expect(firstBranch?.conversation.branch).toEqual(

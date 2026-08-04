@@ -43,24 +43,43 @@ const STOP_WORDS = [
   "<|endoftext|>",
 ];
 
-const LOCAL_TARGET_LANGUAGE_INSTRUCTIONS: Partial<
-  Record<AppLanguage, string>
-> = {
-  en: "Answer exclusively in English. Start directly with the answer without repeating the topic or request as a heading. Do not add a title or introductory label. Only use another language when the user explicitly asks for a translation or a reply in that language. Keep private reasoning internal and return only the final answer.",
-  de: "Antworte ausschließlich auf Deutsch. Beginne direkt mit der Antwort, ohne das Thema oder die Anfrage als Überschrift zu wiederholen. Verwende keine englischen Überschriften oder Einleitungen. Wechsle nur dann in eine andere Sprache, wenn die Person ausdrücklich um eine Übersetzung oder eine Antwort in dieser Sprache bittet. Behalte interne Überlegungen für dich und gib nur die endgültige Antwort aus.",
-  es: "Responde exclusivamente en español. Empieza directamente con la respuesta, sin repetir el tema ni la petición como título. No añadas títulos ni introducciones en inglés. Usa otro idioma solo si la persona pide expresamente una traducción o una respuesta en ese idioma. Mantén privado el razonamiento interno y devuelve únicamente la respuesta final.",
-  fr: "Réponds exclusivement en français. Commence directement par la réponse, sans répéter le sujet ni la demande sous forme de titre. N’ajoute aucun titre ni préambule en anglais. N’utilise une autre langue que si la personne demande explicitement une traduction ou une réponse dans cette langue. Garde le raisonnement interne privé et ne fournis que la réponse finale.",
-  it: "Rispondi esclusivamente in italiano. Inizia direttamente con la risposta, senza ripetere l’argomento o la richiesta come titolo. Non aggiungere titoli o introduzioni in inglese. Usa un’altra lingua solo se la persona chiede esplicitamente una traduzione o una risposta in quella lingua. Mantieni privato il ragionamento interno e restituisci solo la risposta finale.",
-  pt: "Responde exclusivamente em português europeu. Começa diretamente pela resposta, sem repetir o tema ou o pedido como título. Não acrescentes títulos nem introduções em inglês. Usa outra língua apenas se a pessoa pedir explicitamente uma tradução ou uma resposta nessa língua. Mantém o raciocínio interno privado e apresenta apenas a resposta final.",
-  "pt-BR":
-    "Responda exclusivamente em português brasileiro. Comece diretamente pela resposta, sem repetir o tema ou o pedido como título. Não acrescente títulos nem introduções em inglês. Use outro idioma apenas se a pessoa pedir explicitamente uma tradução ou uma resposta nesse idioma. Mantenha o raciocínio interno privado e apresente somente a resposta final.",
-  ru: "Отвечай исключительно на русском языке. Начинай сразу с ответа, не повторяя тему или запрос в виде заголовка. Не добавляй заголовки или вступления на английском языке. Используй другой язык только по прямой просьбе о переводе или ответе на этом языке. Не раскрывай внутренние рассуждения и выдавай только окончательный ответ.",
-};
+const LOCAL_TARGET_LANGUAGE_INSTRUCTIONS: Partial<Record<AppLanguage, string>> =
+  {
+    en: "Answer exclusively in English. Start directly with the answer without repeating the topic or request as a heading. Do not add a title or introductory label. Only use another language when the user explicitly asks for a translation or a reply in that language. Keep private reasoning internal and return only the final answer.",
+    de: "Antworte ausschließlich auf Deutsch. Beginne direkt mit der Antwort, ohne das Thema oder die Anfrage als Überschrift zu wiederholen. Verwende keine englischen Überschriften oder Einleitungen. Wechsle nur dann in eine andere Sprache, wenn die Person ausdrücklich um eine Übersetzung oder eine Antwort in dieser Sprache bittet. Behalte interne Überlegungen für dich und gib nur die endgültige Antwort aus.",
+    es: "Responde exclusivamente en español. Empieza directamente con la respuesta, sin repetir el tema ni la petición como título. No añadas títulos ni introducciones en inglés. Usa otro idioma solo si la persona pide expresamente una traducción o una respuesta en ese idioma. Mantén privado el razonamiento interno y devuelve únicamente la respuesta final.",
+    fr: "Réponds exclusivement en français. Commence directement par la réponse, sans répéter le sujet ni la demande sous forme de titre. N’ajoute aucun titre ni préambule en anglais. N’utilise une autre langue que si la personne demande explicitement une traduction ou une réponse dans cette langue. Garde le raisonnement interne privé et ne fournis que la réponse finale.",
+    it: "Rispondi esclusivamente in italiano. Inizia direttamente con la risposta, senza ripetere l’argomento o la richiesta come titolo. Non aggiungere titoli o introduzioni in inglese. Usa un’altra lingua solo se la persona chiede esplicitamente una traduzione o una risposta in quella lingua. Mantieni privato il ragionamento interno e restituisci solo la risposta finale.",
+    pt: "Responde exclusivamente em português europeu. Começa diretamente pela resposta, sem repetir o tema ou o pedido como título. Não acrescentes títulos nem introduções em inglês. Usa outra língua apenas se a pessoa pedir explicitamente uma tradução ou uma resposta nessa língua. Mantém o raciocínio interno privado e apresenta apenas a resposta final.",
+    "pt-BR":
+      "Responda exclusivamente em português brasileiro. Comece diretamente pela resposta, sem repetir o tema ou o pedido como título. Não acrescente títulos nem introduções em inglês. Use outro idioma apenas se a pessoa pedir explicitamente uma tradução ou uma resposta nesse idioma. Mantenha o raciocínio interno privado e apresente somente a resposta final.",
+    ru: "Отвечай исключительно на русском языке. Начинай сразу с ответа, не повторяя тему или запрос в виде заголовка. Не добавляй заголовки или вступления на английском языке. Используй другой язык только по прямой просьбе о переводе или ответе на этом языке. Не раскрывай внутренние рассуждения и выдавай только окончательный ответ.",
+  };
+
+const LOCAL_LATEST_REQUEST_INSTRUCTIONS: Partial<Record<AppLanguage, string>> =
+  {
+    en: "Answer the final user message as the current task. Earlier turns are background context only. If the final message changes topic, follow the new topic completely and do not blend the earlier topic into the answer.",
+    de: "Beantworte die letzte Nachricht der Person als aktuelle Aufgabe. Frühere Beiträge dienen nur als Hintergrund. Wenn die letzte Nachricht das Thema wechselt, folge vollständig dem neuen Thema und vermische es nicht mit dem früheren Thema.",
+    es: "Responde al último mensaje de la persona como la tarea actual. Los turnos anteriores son solo contexto. Si el último mensaje cambia de tema, sigue por completo el tema nuevo y no lo mezcles con el anterior.",
+    fr: "Réponds au dernier message de la personne comme à la tâche actuelle. Les échanges précédents ne sont qu’un contexte. Si le dernier message change de sujet, suis entièrement le nouveau sujet sans le mélanger avec l’ancien.",
+    it: "Rispondi all’ultimo messaggio della persona come compito attuale. I turni precedenti sono solo contesto. Se l’ultimo messaggio cambia argomento, segui completamente il nuovo argomento senza mescolarlo con quello precedente.",
+    pt: "Responde à última mensagem da pessoa como a tarefa atual. As mensagens anteriores servem apenas de contexto. Se a última mensagem mudar de tema, segue totalmente o novo tema sem o misturar com o anterior.",
+    "pt-BR":
+      "Responda à última mensagem da pessoa como a tarefa atual. As mensagens anteriores servem apenas de contexto. Se a última mensagem mudar de assunto, siga totalmente o novo assunto sem misturá-lo com o anterior.",
+    ru: "Отвечай на последнее сообщение пользователя как на текущую задачу. Предыдущие сообщения служат только контекстом. Если последнее сообщение меняет тему, полностью следуй новой теме и не смешивай её с предыдущей.",
+  };
 
 function getLocalTargetLanguageInstruction(language: AppLanguage) {
   return (
     LOCAL_TARGET_LANGUAGE_INSTRUCTIONS[language] ??
     `Respond exclusively in the language identified by ${language}. Start directly with the answer, do not add a title, keep private reasoning internal, and return only the final answer.`
+  );
+}
+
+function getLocalLatestRequestInstruction(language: AppLanguage) {
+  return (
+    LOCAL_LATEST_REQUEST_INSTRUCTIONS[language] ??
+    "Answer the final user message as the current task. Earlier turns are background context only. If the final message changes topic, follow the new topic completely and do not blend the earlier topic into the answer."
   );
 }
 
@@ -244,6 +263,7 @@ export async function streamLocalChat(params: {
       spokenParagraphStreaming: params.spokenParagraphStreaming,
       webSearchContext: params.webSearchContext,
     }),
+    getLocalLatestRequestInstruction(params.language),
     getLocalTargetLanguageInstruction(params.language),
   ].join("\n\n");
   const task = completionTask.then(async () => {
@@ -310,9 +330,7 @@ export async function streamLocalChat(params: {
         error.name = "AbortError";
         throw error;
       }
-      const fullText = sanitizeLocalResponseText(
-        result.content || result.text,
-      );
+      const fullText = sanitizeLocalResponseText(result.content || result.text);
       if (!fullText) {
         throw new Error(`${model.name} returned an empty response.`);
       }

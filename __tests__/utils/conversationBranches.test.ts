@@ -45,14 +45,11 @@ describe("conversation branch graph", () => {
     const sibling = meta("sibling", branch("root", "root", "root-message"));
     const nested = meta("nested", branch("root", "first", "first-message"));
 
-    const rows = buildConversationBranchRows([
-      sibling,
-      nested,
-      first,
-      root,
-    ]);
+    const rows = buildConversationBranchRows([sibling, nested, first, root]);
 
-    expect(rows.map(({ conversation, depth }) => [conversation.id, depth])).toEqual([
+    expect(
+      rows.map(({ conversation, depth }) => [conversation.id, depth]),
+    ).toEqual([
       ["root", 0],
       ["sibling", 1],
       ["first", 1],
@@ -71,6 +68,19 @@ describe("conversation branch graph", () => {
     expect(buildConversationBranchRows([orphan])).toEqual([
       expect.objectContaining({ conversation: orphan, depth: 0 }),
     ]);
+  });
+
+  it("omits every descendant of a collapsed conversation", () => {
+    const root = meta("root");
+    const child = meta("child", branch("root", "root", "root-message"));
+    const nested = meta("nested", branch("root", "child", "child-message"));
+
+    const rows = buildConversationBranchRows([nested, child, root], new Set());
+
+    expect(rows.map(({ conversation }) => conversation.id)).toEqual(["root"]);
+    expect(rows[0]).toEqual(
+      expect.objectContaining({ hasChildren: true, isExpanded: false }),
+    );
   });
 
   it("maps every direct child to its exact parent checkpoint", () => {

@@ -570,9 +570,7 @@ export interface ConversationArtifact {
 }
 
 export type ConversationBranchKind =
-  | "edited-prompt"
-  | "alternative-response"
-  | "continue-from-message";
+  "edited-prompt" | "alternative-response" | "continue-from-message";
 
 export interface ConversationBranchOrigin {
   rootConversationId: string;
@@ -617,6 +615,6 @@ export interface ConversationMeta {
   lastProvider: Provider | null;
   pinned: boolean;
   branch?: ConversationBranchOrigin;
-  branchSchemaVersion?: 1;
+  branchSchemaVersion?: 2;
   isPrivate?: boolean;
 }

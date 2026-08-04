@@ -107,18 +107,18 @@ export function useTextTurnSubmitController({
   );
 
   const handleBranchMessage = useCallback(
-    (message: Message) => {
+    async (message: Message): Promise<boolean> => {
       if (
         !branchConversationAtMessage ||
         isBusy ||
         submissionInFlightRef.current
       ) {
-        return;
+        return false;
       }
 
       if (message.role === "user" && promptSubmissionBlockMessage) {
         showToast?.(promptSubmissionBlockMessage, undefined, "danger");
-        return;
+        return false;
       }
 
       submissionInFlightRef.current = true;
@@ -133,53 +133,53 @@ export function useTextTurnSubmitController({
         },
       });
 
-      void branchConversationAtMessage(message.id)
-        .then(async (branch) => {
-          if (!branch) {
-            throw new Error("The conversation could not be branched.");
-          }
-          recordDebugLogEvent({
-            event: "conversation-branch-created",
-            payload: {
-              conversationId: branch.conversation.id,
-              contextMessageCount: branch.contextMessages.length,
-              kind: branch.conversation.branch?.kind ?? null,
-              sourceMessageId: message.id,
-              turnId,
-            },
-          });
-
-          if (branch.checkpointMessage.role === "assistant") {
-            if (branchCreatedMessage) {
-              showToast?.(branchCreatedMessage, undefined, "success");
-            }
-            return;
-          }
-
-          await handleVoiceCaptureDone({
-            ...(branch.checkpointMessage.attachments?.length
-              ? { attachments: branch.checkpointMessage.attachments }
-              : {}),
-            conversationOverride: branch.conversation,
-            existingUserMessageId: branch.checkpointMessage.id,
-            messagesOverride: branch.contextMessages,
-            transcriptionOverride: branch.checkpointMessage.content,
+      try {
+        const branch = await branchConversationAtMessage(message.id);
+        if (!branch) {
+          throw new Error("The conversation could not be branched.");
+        }
+        recordDebugLogEvent({
+          event: "conversation-branch-created",
+          payload: {
+            conversationId: branch.conversation.id,
+            contextMessageCount: branch.contextMessages.length,
+            kind: branch.conversation.branch?.kind ?? null,
+            sourceMessageId: message.id,
             turnId,
-          });
-        })
-        .catch((error) => {
-          recordDebugLogEvent({
-            event: "conversation-branch-failed",
-            level: "warn",
-            payload: { error, messageId: message.id, turnId },
-          });
-          if (branchFailureMessage) {
-            showToast?.(branchFailureMessage, undefined, "danger");
-          }
-        })
-        .finally(() => {
-          submissionInFlightRef.current = false;
+          },
         });
+
+        if (branch.checkpointMessage.role === "assistant") {
+          if (branchCreatedMessage) {
+            showToast?.(branchCreatedMessage, undefined, "success");
+          }
+          return true;
+        }
+
+        await handleVoiceCaptureDone({
+          ...(branch.checkpointMessage.attachments?.length
+            ? { attachments: branch.checkpointMessage.attachments }
+            : {}),
+          conversationOverride: branch.conversation,
+          existingUserMessageId: branch.checkpointMessage.id,
+          messagesOverride: branch.contextMessages,
+          transcriptionOverride: branch.checkpointMessage.content,
+          turnId,
+        });
+        return true;
+      } catch (error) {
+        recordDebugLogEvent({
+          event: "conversation-branch-failed",
+          level: "warn",
+          payload: { error, messageId: message.id, turnId },
+        });
+        if (branchFailureMessage) {
+          showToast?.(branchFailureMessage, undefined, "danger");
+        }
+        return false;
+      } finally {
+        submissionInFlightRef.current = false;
+      }
     },
     [
       branchConversationAtMessage,

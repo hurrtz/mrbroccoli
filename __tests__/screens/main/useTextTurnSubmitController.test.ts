@@ -126,12 +126,12 @@ describe("useTextTurnSubmitController", () => {
       }),
     );
 
+    let created = false;
     await act(async () => {
-      result.current.handleBranchMessage(sourceMessage);
-      await Promise.resolve();
-      await Promise.resolve();
+      created = await result.current.handleBranchMessage(sourceMessage);
     });
 
+    expect(created).toBe(true);
     expect(branchConversationAtMessage).toHaveBeenCalledWith("source-prompt-1");
     expect(handleVoiceCaptureDone).toHaveBeenCalledWith({
       conversationOverride: conversation,
@@ -179,12 +179,12 @@ describe("useTextTurnSubmitController", () => {
       }),
     );
 
+    let created = false;
     await act(async () => {
-      result.current.handleBranchMessage(sourceMessage);
-      await Promise.resolve();
-      await Promise.resolve();
+      created = await result.current.handleBranchMessage(sourceMessage);
     });
 
+    expect(created).toBe(true);
     expect(branchConversationAtMessage).toHaveBeenCalledWith(
       "source-assistant",
     );

@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { TouchableOpacity, View } from "react-native";
+import { Pressable, Text, TouchableOpacity, View } from "react-native";
 import Animated, {
   cancelAnimation,
   Easing,
@@ -10,6 +10,7 @@ import Animated, {
 } from "react-native-reanimated";
 
 import { PhosphorIcon } from "../../design-system/PhosphorIcon";
+import { Modal } from "../../design-system/NativeControls";
 
 import { useReducedMotion } from "../../hooks/useReducedMotion";
 import { useLocalization } from "../../i18n";
@@ -117,9 +118,11 @@ function useTimedConfirmation(resetKey: string) {
 
 export function MessageActions({
   message,
+  branchOrigin,
   onCopy,
   onEdit,
   onBranch,
+  onOpenBranchSource,
   onSaveInsight,
   onShare,
   onRepeat,
@@ -127,9 +130,11 @@ export function MessageActions({
 }: Pick<
   ChatBubbleProps,
   | "message"
+  | "branchOrigin"
   | "onCopy"
   | "onEdit"
   | "onBranch"
+  | "onOpenBranchSource"
   | "onSaveInsight"
   | "onShare"
   | "onRepeat"
@@ -139,6 +144,11 @@ export function MessageActions({
   const { t } = useLocalization();
   const { confirmed: copyConfirmed, showConfirmation: showCopyConfirmation } =
     useTimedConfirmation(message.id);
+  const [moreActionsVisible, setMoreActionsVisible] = useState(false);
+  const userSecondaryActions = message.role === "user";
+  const hasMoreActions = Boolean(
+    onSaveInsight || (userSecondaryActions && (onCopy || onShare || onRepeat)),
+  );
 
   const handleCopyPress = async () => {
     try {
@@ -154,6 +164,7 @@ export function MessageActions({
     !onCopy &&
     !onEdit &&
     !onBranch &&
+    !(branchOrigin?.parentAvailable && onOpenBranchSource) &&
     !onSaveInsight &&
     !onShare &&
     !onRepeat
@@ -200,61 +211,51 @@ export function MessageActions({
           style={[
             styles.iconAction,
             {
-              backgroundColor:
-                message.role === "user" && message.editedAt
-                  ? colors.accent
-                  : colors.surfaceAlt,
-              borderColor:
-                message.role === "user" && message.editedAt
-                  ? colors.accent
-                  : colors.border,
-            },
-          ]}
-          onPress={() => onBranch(message)}
-          activeOpacity={0.88}
-          accessibilityRole="button"
-          accessibilityLabel={
-            message.role === "user" && message.editedAt
-              ? t("sendTextMessage")
-              : t("branchFromHere")
-          }
-        >
-          <PhosphorIcon
-            name={
-              message.role === "user" && message.editedAt ? "send" : "branch"
-            }
-            size="control"
-            color={
-              message.role === "user" && message.editedAt
-                ? getAccessibleForeground(colors.accent)
-                : colors.textSecondary
-            }
-          />
-        </TouchableOpacity>
-      ) : null}
-      {onSaveInsight ? (
-        <TouchableOpacity
-          testID={`message-save-insight-action-${message.id}`}
-          style={[
-            styles.iconAction,
-            {
               backgroundColor: colors.surfaceAlt,
               borderColor: colors.border,
             },
           ]}
-          onPress={() => onSaveInsight(message)}
+          onPress={() => {
+            void onBranch(message);
+          }}
           activeOpacity={0.88}
           accessibilityRole="button"
-          accessibilityLabel={t("saveAsInsight")}
+          accessibilityLabel={t("branchFromHere")}
         >
           <PhosphorIcon
-            name="file-text"
+            name="branch"
             size="control"
             color={colors.textSecondary}
           />
         </TouchableOpacity>
       ) : null}
-      {onCopy ? (
+      {branchOrigin?.parentAvailable && onOpenBranchSource ? (
+        <TouchableOpacity
+          testID={`message-branch-back-action-${message.id}`}
+          style={[
+            styles.textAction,
+            {
+              backgroundColor: colors.accentSoft,
+              borderColor: colors.borderStrong,
+            },
+          ]}
+          onPress={() =>
+            onOpenBranchSource(
+              branchOrigin.parentConversationId,
+              branchOrigin.parentMessageId,
+            )
+          }
+          activeOpacity={0.88}
+          accessibilityRole="button"
+          accessibilityLabel={t("backToForkPoint")}
+        >
+          <PhosphorIcon name="left" size="compact" color={colors.accent} />
+          <Text style={[styles.textActionLabel, { color: colors.accent }]}>
+            {t("backToForkPoint")}
+          </Text>
+        </TouchableOpacity>
+      ) : null}
+      {onCopy && !userSecondaryActions ? (
         <TouchableOpacity
           testID={`message-copy-action-${message.id}`}
           style={[
@@ -284,7 +285,7 @@ export function MessageActions({
           />
         </TouchableOpacity>
       ) : null}
-      {onShare ? (
+      {onShare && !userSecondaryActions ? (
         <TouchableOpacity
           style={[
             styles.iconAction,
@@ -305,7 +306,7 @@ export function MessageActions({
           />
         </TouchableOpacity>
       ) : null}
-      {onRepeat ? (
+      {onRepeat && !userSecondaryActions ? (
         <TouchableOpacity
           testID={`message-repeat-action-${message.id}`}
           style={[
@@ -343,6 +344,125 @@ export function MessageActions({
             }
           />
         </TouchableOpacity>
+      ) : null}
+      {hasMoreActions ? (
+        <TouchableOpacity
+          testID={`message-more-actions-${message.id}`}
+          style={[
+            styles.iconAction,
+            {
+              backgroundColor: colors.surfaceAlt,
+              borderColor: colors.border,
+            },
+          ]}
+          onPress={() => setMoreActionsVisible(true)}
+          activeOpacity={0.88}
+          accessibilityRole="button"
+          accessibilityLabel={t("conversationActions")}
+        >
+          <PhosphorIcon
+            name="ellipsis-vertical"
+            size="control"
+            color={colors.textSecondary}
+          />
+        </TouchableOpacity>
+      ) : null}
+      {hasMoreActions ? (
+        <Modal
+          visible={moreActionsVisible}
+          title={t("conversationActions")}
+          onClose={() => setMoreActionsVisible(false)}
+          footer={[
+            {
+              text: t("done"),
+              onPress: () => setMoreActionsVisible(false),
+            },
+          ]}
+        >
+          <View style={styles.moreActionList}>
+            {onSaveInsight ? (
+              <Pressable
+                testID={`message-save-insight-action-${message.id}`}
+                style={styles.moreAction}
+                onPress={() => {
+                  setMoreActionsVisible(false);
+                  onSaveInsight(message);
+                }}
+                accessibilityRole="button"
+                accessibilityLabel={t("saveAsInsight")}
+              >
+                <PhosphorIcon
+                  name="file-text"
+                  size="control"
+                  color={colors.textSecondary}
+                />
+                <Text style={[styles.moreActionText, { color: colors.text }]}>
+                  {t("saveAsInsight")}
+                </Text>
+              </Pressable>
+            ) : null}
+            {userSecondaryActions && onCopy ? (
+              <Pressable
+                style={styles.moreAction}
+                onPress={() => {
+                  setMoreActionsVisible(false);
+                  void handleCopyPress();
+                }}
+                accessibilityRole="button"
+                accessibilityLabel={t("copy")}
+              >
+                <PhosphorIcon
+                  name="copy"
+                  size="control"
+                  color={colors.textSecondary}
+                />
+                <Text style={[styles.moreActionText, { color: colors.text }]}>
+                  {t("copy")}
+                </Text>
+              </Pressable>
+            ) : null}
+            {userSecondaryActions && onShare ? (
+              <Pressable
+                style={styles.moreAction}
+                onPress={() => {
+                  setMoreActionsVisible(false);
+                  onShare(message);
+                }}
+                accessibilityRole="button"
+                accessibilityLabel={t("share")}
+              >
+                <PhosphorIcon
+                  name="share-alt"
+                  size="control"
+                  color={colors.textSecondary}
+                />
+                <Text style={[styles.moreActionText, { color: colors.text }]}>
+                  {t("share")}
+                </Text>
+              </Pressable>
+            ) : null}
+            {userSecondaryActions && onRepeat ? (
+              <Pressable
+                style={styles.moreAction}
+                onPress={() => {
+                  setMoreActionsVisible(false);
+                  onRepeat(message);
+                }}
+                accessibilityRole="button"
+                accessibilityLabel={t("repeatReply")}
+              >
+                <PhosphorIcon
+                  name="sound"
+                  size="control"
+                  color={colors.textSecondary}
+                />
+                <Text style={[styles.moreActionText, { color: colors.text }]}>
+                  {t("repeatReply")}
+                </Text>
+              </Pressable>
+            ) : null}
+          </View>
+        </Modal>
       ) : null}
     </View>
   );
