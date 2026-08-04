@@ -32,10 +32,6 @@ the complete Play Store translations are kept in a dedicated file under
   after the playback route settles.
 - Render Markdown headings, lists, links, citations, tables, and code fences
   into clearer speech without changing the visible or saved response.
-- Save any transcript message as a user-controlled, source-linked decision,
-  idea, assumption, counterargument, question, hypothesis, or next action.
-  Saved insights stay inspectable and removable in Memory and appear in
-  search, backups, thread copies, AI handoffs, and portable Markdown archives.
 - Correct a misheard user transcript in place. Corrections update saved
   history, search, archives, future conversation context, and optional local
   knowledge while leaving already-generated replies visibly unchanged.
@@ -61,8 +57,8 @@ the complete Play Store translations are kept in a dedicated file under
   from its forked checkpoint while retaining earlier parent context invisibly.
 - Confirm standalone fork actions, move edited-prompt submission into an
   explicit Save + send dialog action, provide parent navigation above and below
-  the forked checkpoint, and move advanced insight saving out of the primary
-  message-action row.
+  the forked checkpoint, and keep secondary user-message actions out of the
+  primary message-action row.
 - Strengthen Uber Mode synthesis with an evidence-ledger contract that keeps
   established information, inference, assumptions, and unresolved dissent
   distinct and passes explicit review verdicts into the final synthesis.
@@ -75,9 +71,10 @@ the complete Play Store translations are kept in a dedicated file under
   progress, remaining-step count, and a live ETA. An Advanced toggle exposes
   phone evidence, compatibility guidance, persistent Quick/Thorough model
   choices, local or phone-native speech routes, and voice selection.
-- Build cross-session knowledge from user-authored messages only, while keeping
-  assistant answers available through ordinary conversation search. This stops
-  conclusions from earlier AI replies becoming unattributed recursive memory.
+- Build cross-session knowledge automatically from every user and assistant
+  message in eligible conversations, without asking users to categorize or
+  promote individual messages. Retrieved context remains linked to its source
+  conversation, while private conversations remain excluded.
 - Present Free as a coherent Private Offline edition across Home, setup, and
   Settings, with a three-step single-language model flow and explicit
   language-aware phone speech options.
@@ -113,12 +110,12 @@ the complete Play Store translations are kept in a dedicated file under
   generation budget for private reasoning.
 - Let Save + send on an edited user transcript create an independent branch
   through the corrected prompt, preserving prior context, settings, privacy,
-  artifacts, and image files while generating the replacement reply.
+  and image files while generating the replacement reply.
 - Keep the product name exactly “Mr Broccoli” in every interface language
   instead of translating, respelling, or punctuating the brand per locale.
 - Make past-conversation retrieval abstain on weak incidental matches, suppress
   duplicated conversation copies, and label retained sources by match quality
-  while continuing to index user-authored messages only.
+  while indexing the complete eligible conversation history.
 - Add a conversation-integrity review for saved assistant responses that
   previews suspected internal-context leakage before changing anything,
   preserves the original locally for export or undo, and avoids automatic

@@ -4,11 +4,7 @@ import { Share } from "react-native";
 import * as Clipboard from "expo-clipboard";
 
 import type { TranslationKey } from "../../i18n";
-import type {
-  AppLanguage,
-  Conversation,
-  ConversationArtifactKind,
-} from "../../types";
+import type { AppLanguage, Conversation } from "../../types";
 import {
   formatConversationForAiHandoff,
   formatConversationForCopy,
@@ -23,16 +19,6 @@ type TranslateFn = (
 
 type ConversationsApi = ReturnType<typeof useConversations>;
 
-const ARTIFACT_TRANSLATION_KEYS = {
-  decision: "artifactDecision",
-  idea: "artifactIdea",
-  assumption: "artifactAssumption",
-  counterargument: "artifactCounterargument",
-  question: "artifactQuestion",
-  hypothesis: "artifactHypothesis",
-  action: "artifactAction",
-} satisfies Record<ConversationArtifactKind, TranslationKey>;
-
 interface UseConversationActionsParams {
   activeConversation: Conversation | null;
   memoryConversation: Conversation | null;
@@ -42,7 +28,6 @@ interface UseConversationActionsParams {
   toggleConversationPrivate: ConversationsApi["toggleConversationPrivate"];
   clearConversationMemory: ConversationsApi["clearConversationMemory"];
   updateConversationMemory: ConversationsApi["updateConversationMemory"];
-  removeConversationArtifact: ConversationsApi["removeConversationArtifact"];
   deleteConversation: ConversationsApi["deleteConversation"];
   selectConversation: ConversationsApi["selectConversation"];
   clearActiveConversation: ConversationsApi["clearActiveConversation"];
@@ -63,7 +48,6 @@ export function useConversationActions({
   toggleConversationPrivate,
   clearConversationMemory,
   updateConversationMemory,
-  removeConversationArtifact,
   deleteConversation,
   selectConversation,
   clearActiveConversation,
@@ -250,26 +234,13 @@ export function useConversationActions({
 
   const handleCopyMemory = useCallback(async () => {
     const summary = memoryConversation?.contextSummary?.trim() ?? "";
-    const artifacts = memoryConversation?.artifacts ?? [];
 
-    if (!summary && artifacts.length === 0) {
+    if (!summary) {
       showToast(t("noConversationToManageYet"));
       return;
     }
 
-    const artifactText = artifacts.length
-      ? [
-          t("savedInsights"),
-          ...artifacts.map(
-            (artifact) =>
-              `${t(ARTIFACT_TRANSLATION_KEYS[artifact.kind])}: ${artifact.text}`,
-          ),
-        ].join("\n")
-      : "";
-    await copyText(
-      [summary, artifactText].filter(Boolean).join("\n\n"),
-      t("memoryCopied"),
-    );
+    await copyText(summary, t("memoryCopied"));
   }, [copyText, memoryConversation, showToast, t]);
 
   const handleClearMemory = useCallback(async () => {
@@ -318,33 +289,6 @@ export function useConversationActions({
     ],
   );
 
-  const handleRemoveArtifact = useCallback(
-    async (artifactId: string) => {
-      if (!memoryConversation) {
-        return false;
-      }
-
-      const updatedConversation = await removeConversationArtifact(
-        memoryConversation.id,
-        artifactId,
-      );
-      if (!updatedConversation) {
-        return false;
-      }
-
-      setMemoryConversation(updatedConversation);
-      showToast(t("insightRemoved"), undefined, "success");
-      return true;
-    },
-    [
-      memoryConversation,
-      removeConversationArtifact,
-      setMemoryConversation,
-      showToast,
-      t,
-    ],
-  );
-
   return {
     copyText,
     handleCopyMessage,
@@ -361,6 +305,5 @@ export function useConversationActions({
     handleCopyMemory,
     handleClearMemory,
     handleSaveMemory,
-    handleRemoveArtifact,
   };
 }

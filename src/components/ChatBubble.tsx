@@ -53,7 +53,6 @@ export const ChatBubble = React.memo(function ChatBubble({
   onBranch,
   onOpenBranches,
   onOpenBranchSource,
-  onSaveInsight,
   onShare,
   onRepeat,
   onRetry,
@@ -78,7 +77,6 @@ export const ChatBubble = React.memo(function ChatBubble({
         onBranch={onBranch}
         onOpenBranches={onOpenBranches}
         onOpenBranchSource={onOpenBranchSource}
-        onSaveInsight={onSaveInsight}
         onShare={onShare}
         onRepeat={onRepeat}
         onRetry={onRetry}

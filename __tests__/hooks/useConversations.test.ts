@@ -1215,55 +1215,6 @@ describe("useConversations", () => {
     );
   });
 
-  it("saves and removes a source-linked insight under user control", async () => {
-    const { result } = renderHook(() => useConversations());
-    let sourceMessageId = "";
-
-    await act(async () => {
-      result.current.createConversation("Architecture review");
-      sourceMessageId =
-        result.current.addMessage({
-          role: "assistant",
-          content: "Keep inference local on the phone.",
-          model: "gpt-5.4",
-          provider: "openai",
-        })?.id ?? "";
-    });
-
-    let artifactId = "";
-    await act(async () => {
-      artifactId =
-        (
-          await result.current.addConversationArtifact(
-            sourceMessageId,
-            "decision",
-            "Inference stays on device",
-          )
-        )?.id ?? "";
-    });
-
-    expect(result.current.activeConversation?.artifacts).toEqual([
-      expect.objectContaining({
-        id: artifactId,
-        kind: "decision",
-        sourceMessageId,
-        text: "Inference stays on device",
-      }),
-    ]);
-    await expect(
-      result.current.searchConversations("stays on device"),
-    ).resolves.toHaveLength(1);
-
-    await act(async () => {
-      await result.current.removeConversationArtifact(
-        result.current.activeConversation?.id ?? "",
-        artifactId,
-      );
-    });
-
-    expect(result.current.activeConversation?.artifacts).toEqual([]);
-  });
-
   it("lets the user correct saved compact memory without changing its scope", async () => {
     const { result } = renderHook(() => useConversations());
 

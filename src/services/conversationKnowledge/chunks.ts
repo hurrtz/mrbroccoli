@@ -5,7 +5,7 @@ import {
 } from "./embedding";
 
 const MAX_CHUNK_CHARACTERS = 1_600;
-const CHUNK_FORMAT_VERSION = "conversation-user-messages-and-artifacts-v3";
+const CHUNK_FORMAT_VERSION = "conversation-message-history-v4";
 
 export interface ConversationKnowledgeChunk {
   content: string;
@@ -44,22 +44,17 @@ function splitLongText(text: string) {
 export function buildConversationKnowledgeChunks(
   conversation: Conversation,
 ): ConversationKnowledgeChunk[] {
-  const userMessages = conversation.messages.flatMap((message) => {
-    if (message.role !== "user") {
+  const messageHistory = conversation.messages.flatMap((message) => {
+    const content = message.content.trim();
+    if (!content) {
       return [];
     }
 
-    const content = message.content.trim();
-    return content ? splitLongText(`User: ${content}`) : [];
-  });
-  const savedArtifacts = (conversation.artifacts ?? []).flatMap((artifact) => {
-    const content = artifact.text.trim();
-    return content
-      ? splitLongText(`User-saved ${artifact.kind}: ${content}`)
-      : [];
+    const speaker = message.role === "user" ? "User" : "Assistant";
+    return splitLongText(`${speaker}: ${content}`);
   });
 
-  return [...userMessages, ...savedArtifacts].map((content, ordinal) => ({
+  return messageHistory.map((content, ordinal) => ({
     content,
     id: `${conversation.id}:${ordinal}`,
     ordinal,
@@ -76,9 +71,6 @@ export function getConversationKnowledgeRevision(conversation: Conversation) {
     conversation.messages.length,
     conversation.messages.at(-1)?.id ?? "",
     conversation.messages.at(-1)?.content.length ?? 0,
-    conversation.artifacts?.length ?? 0,
-    conversation.artifacts?.at(-1)?.id ?? "",
-    conversation.artifacts?.at(-1)?.text.length ?? 0,
   ].join("|");
   let hash = 0x811c9dc5;
 

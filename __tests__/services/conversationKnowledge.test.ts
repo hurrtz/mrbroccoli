@@ -297,7 +297,7 @@ describe("conversation knowledge", () => {
     ).not.toHaveBeenCalled();
   });
 
-  it("indexes user-authored history without promoting assistant output to knowledge", async () => {
+  it("indexes every message without requiring a categorized insight", async () => {
     const conversation = createConversation(
       "derived",
       "Derived answer",
@@ -316,29 +316,12 @@ describe("conversation knowledge", () => {
         ],
       },
     };
-
-    await syncConversationKnowledge(conversation, true);
-
-    expect(chunks).toHaveLength(1);
-    expect(chunks[0]?.content).toBe(
-      "User: Which earlier decisions should I revisit?",
-    );
-    expect(chunks[0]?.content).not.toContain("confidential launch assumption");
-  });
-
-  it("indexes assistant-derived content only after the user saves it as an insight", async () => {
-    const conversation = createConversation(
-      "approved",
-      "Approved decision",
-      "What should we do?",
-      "Use the green release path.",
-    );
     conversation.artifacts = [
       {
-        id: "approved-artifact",
+        id: "legacy-artifact",
         kind: "decision",
-        text: "Use the green release path.",
-        sourceMessageId: "approved-assistant",
+        text: "Legacy categorized duplicate",
+        sourceMessageId: "derived-assistant",
         createdAt: "2026-08-01T08:11:00.000Z",
       },
     ];
@@ -346,9 +329,31 @@ describe("conversation knowledge", () => {
     await syncConversationKnowledge(conversation, true);
 
     expect(chunks.map((chunk) => chunk.content)).toEqual([
-      "User: What should we do?",
-      "User-saved decision: Use the green release path.",
+      "User: Which earlier decisions should I revisit?",
+      "Assistant: Session E established the confidential launch assumption.",
     ]);
+    expect(chunks.some(({ content }) => content.includes("Legacy"))).toBe(false);
+  });
+
+  it("retrieves an assistant message as a past-conversation source", async () => {
+    const conversation = createConversation(
+      "release-plan",
+      "Release planning",
+      "What should the release process optimize?",
+      "Adopt the heliotrope release protocol for staged validation.",
+    );
+
+    await syncConversationKnowledge(conversation, true);
+    const result = await retrieveConversationKnowledge({
+      query: "What was the heliotrope release protocol?",
+    });
+
+    expect(result?.metadata.sources).toEqual([
+      expect.objectContaining({ conversationId: conversation.id }),
+    ]);
+    expect(result?.context).toContain(
+      "Assistant: Adopt the heliotrope release protocol for staged validation.",
+    );
   });
 
   it("retrieves local sources while excluding the current and private conversations", async () => {
@@ -391,6 +396,16 @@ describe("conversation knowledge", () => {
     );
 
     await syncConversationKnowledge(garden, true);
+    expect(
+      chunks
+        .filter(({ conversationId }) => conversationId === garden.id)
+        .map(({ content }) => content),
+    ).toEqual([
+      "User: How often should I water the tomatoes?",
+      "Assistant: Water the tomatoes in the morning.",
+      "User: What should I check next?",
+      "Assistant: Check the neighboring soil before watering again.",
+    ]);
     await syncConversationKnowledge(privatePlan, true);
     await syncConversationKnowledge(current, true);
     const result = await retrieveConversationKnowledge({
@@ -402,15 +417,11 @@ describe("conversation knowledge", () => {
     expect(result?.metadata.sources).toEqual([
       expect.objectContaining({ conversationId: garden.id }),
     ]);
-    expect(result?.metadata.engine).toBe("local-user-authored-v3");
-    expect(result?.metadata.contentPolicy).toBe("user-authored-only");
+    expect(result?.metadata.engine).toBe("local-conversation-history-v4");
+    expect(result?.metadata.contentPolicy).toBeUndefined();
     expect(result?.metadata.sources[0]?.match).toBe("strong");
     expect(result?.context).toContain("How often should I water the tomatoes?");
-    expect(result?.context).toContain("What should I check next?");
-    expect(result?.context).not.toContain("Water the tomatoes in the morning");
-    expect(result?.context).not.toContain(
-      "Check the neighboring soil before watering again",
-    );
+    expect(result?.context).toContain("Water the tomatoes in the morning");
     expect(result?.context).not.toContain("secret tomato supplier");
     expect(result?.context).not.toContain("Current answer");
   });
@@ -467,7 +478,7 @@ describe("conversation knowledge", () => {
       "Every morning",
     );
     await syncConversationKnowledge(garden, true);
-    expect(chunks).toHaveLength(1);
+    expect(chunks).toHaveLength(2);
 
     await setConversationKnowledgePrivate(garden.id, true);
     expect(chunks).toHaveLength(0);
@@ -477,7 +488,7 @@ describe("conversation knowledge", () => {
 
     await setConversationKnowledgePrivate(garden.id, false);
     await syncConversationKnowledge(garden, true);
-    expect(chunks).toHaveLength(1);
+    expect(chunks).toHaveLength(2);
     await clearConversationKnowledgeIndex();
     expect(chunks).toHaveLength(0);
     await removeConversationKnowledge(garden.id);

@@ -84,7 +84,6 @@ export function MainScreen() {
     getConversationById,
     inspectConversationIntegrity,
     addMessage,
-    addConversationArtifact,
     updateMessage,
     updateConversationMemory,
     updateConversationContextSummary,
@@ -92,7 +91,6 @@ export function MainScreen() {
     clearConversationMemory,
     renameConversation,
     repairConversationIntegrity,
-    removeConversationArtifact,
     toggleConversationPinned,
     toggleConversationPrivate,
     undoConversationIntegrityRepair,
@@ -555,7 +553,6 @@ export function MainScreen() {
     handleCopyMemory,
     handleClearMemory,
     handleSaveMemory,
-    handleRemoveArtifact,
   } = useConversationActions({
     activeConversation,
     memoryConversation,
@@ -565,7 +562,6 @@ export function MainScreen() {
     toggleConversationPrivate,
     clearConversationMemory,
     updateConversationMemory,
-    removeConversationArtifact,
     deleteConversation,
     selectConversation,
     clearActiveConversation,
@@ -902,20 +898,6 @@ export function MainScreen() {
             : (message, content) => editUserMessage(message.id, content),
           onBranchMessage: isBusy ? undefined : handleBranchMessage,
           onSelectBranchConversation: isBusy ? undefined : selectConversation,
-          onSaveInsight: isBusy
-            ? undefined
-            : async (message, kind, text) => {
-                const artifact = await addConversationArtifact(
-                  message.id,
-                  kind,
-                  text,
-                );
-                if (!artifact) {
-                  return false;
-                }
-                showToast(t("insightSaved"), undefined, "success");
-                return true;
-              },
           onOpenSpeakingSettings: handleOpenSpeakingSettings,
           onOpenStyleSheet: handleOpenConversationSettings,
           onRepeatMessage: (message) => {
@@ -1051,12 +1033,9 @@ export function MainScreen() {
         title: memoryConversation?.title ?? t("freshSession"),
         summary: memoryConversation?.contextSummary,
         summarizedMessageCount: memoryConversation?.summarizedMessageCount,
-        artifacts: memoryConversation?.artifacts,
-        messages: memoryConversation?.messages,
         onCopy: handleCopyMemoryPress,
         onClear: handleClearMemoryPress,
         onSave: handleSaveMemory,
-        onRemoveArtifact: handleRemoveArtifact,
         onClose: closeMemory,
       }}
       conversationDrawer={{

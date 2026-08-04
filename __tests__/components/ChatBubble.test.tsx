@@ -144,8 +144,7 @@ describe("ChatBubble", () => {
     expect(onOpenBranches).toHaveBeenCalledWith([child]);
   });
 
-  it("moves insight saving behind the secondary action menu", () => {
-    const onSaveInsight = jest.fn();
+  it("does not show an insight action for assistant messages", () => {
     const message = {
       id: "assistant-insight",
       role: "assistant" as const,
@@ -155,20 +154,16 @@ describe("ChatBubble", () => {
       timestamp: "2026-08-04T09:05:00.000Z",
     };
     const screen = renderWithProviders(
-      <ChatBubble selectable message={message} onSaveInsight={onSaveInsight} />,
+      <ChatBubble selectable message={message} />,
     );
 
     expect(
       screen.queryByTestId("message-save-insight-action-assistant-insight"),
     ).toBeNull();
-    fireEvent.press(
-      screen.getByTestId("message-more-actions-assistant-insight"),
-    );
-    fireEvent.press(
-      screen.getByTestId("message-save-insight-action-assistant-insight"),
-    );
-
-    expect(onSaveInsight).toHaveBeenCalledWith(message);
+    expect(
+      screen.queryByTestId("message-more-actions-assistant-insight"),
+    ).toBeNull();
+    expect(screen.queryByText("Save as insight")).toBeNull();
   });
 
   it("keeps web-search details collapsed until requested and opens citation links", () => {

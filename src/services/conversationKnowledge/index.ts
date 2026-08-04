@@ -511,7 +511,7 @@ function normalizeDuplicateText(value: string) {
   return value
     .normalize("NFKC")
     .toLocaleLowerCase()
-    .replace(/^user\s*:\s*/u, "")
+    .replace(/^(?:user|assistant)\s*:\s*/u, "")
     .replace(/[^\p{L}\p{N}]+/gu, " ")
     .trim();
 }
@@ -647,8 +647,7 @@ export async function retrieveConversationKnowledge(params: {
     return {
       context: contexts.join("\n\n"),
       metadata: {
-        contentPolicy: "user-authored-only",
-        engine: "local-user-authored-v3",
+        engine: "local-conversation-history-v4",
         sources,
       },
     };

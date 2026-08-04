@@ -9,7 +9,6 @@ import uuid from "react-native-uuid";
 import {
   Conversation,
   ConversationArtifact,
-  ConversationArtifactKind,
   ConversationBranchResult,
   ConversationMeta,
   ConversationSettings,
@@ -754,111 +753,6 @@ export function useConversationMutations(params: {
     ],
   );
 
-  const addConversationArtifact = useCallback(
-    async (messageId: string, kind: ConversationArtifactKind, text: string) => {
-      const currentConversation = activeConversationRef.current;
-      const normalizedText = text.trim();
-      if (
-        !currentConversation ||
-        !normalizedText ||
-        !currentConversation.messages.some(
-          (message) => message.id === messageId,
-        )
-      ) {
-        return null;
-      }
-
-      const createdAt = new Date().toISOString();
-      const artifact: ConversationArtifact = {
-        id: uuid.v4() as string,
-        kind,
-        text: normalizedText,
-        sourceMessageId: messageId,
-        createdAt,
-      };
-      const updatedConversation: Conversation = {
-        ...currentConversation,
-        artifacts: [...(currentConversation.artifacts ?? []), artifact],
-        updatedAt: createdAt,
-      };
-
-      setActiveConversationValue(updatedConversation);
-      await saveConversation(updatedConversation);
-      setConversations((previous) =>
-        persistMetas(
-          previous.map((meta) =>
-            meta.id === updatedConversation.id
-              ? { ...meta, updatedAt: createdAt }
-              : meta,
-          ),
-        ),
-      );
-      if (pastConversationKnowledgeEnabled && !updatedConversation.isPrivate) {
-        await syncConversationKnowledge(updatedConversation, true);
-      }
-
-      return artifact;
-    },
-    [
-      activeConversationRef,
-      pastConversationKnowledgeEnabled,
-      persistMetas,
-      setActiveConversationValue,
-      setConversations,
-    ],
-  );
-
-  const removeConversationArtifact = useCallback(
-    async (conversationId: string, artifactId: string) => {
-      const currentConversation =
-        activeConversationRef.current?.id === conversationId
-          ? activeConversationRef.current
-          : await getConversationById(conversationId);
-      if (
-        !currentConversation ||
-        !(currentConversation.artifacts ?? []).some(
-          (artifact) => artifact.id === artifactId,
-        )
-      ) {
-        return null;
-      }
-
-      const updatedAt = new Date().toISOString();
-      const updatedConversation: Conversation = {
-        ...currentConversation,
-        artifacts: (currentConversation.artifacts ?? []).filter(
-          (artifact) => artifact.id !== artifactId,
-        ),
-        updatedAt,
-      };
-
-      await saveConversation(updatedConversation);
-      if (activeConversationRef.current?.id === conversationId) {
-        setActiveConversationValue(updatedConversation);
-      }
-      setConversations((previous) =>
-        persistMetas(
-          previous.map((meta) =>
-            meta.id === conversationId ? { ...meta, updatedAt } : meta,
-          ),
-        ),
-      );
-      if (pastConversationKnowledgeEnabled && !updatedConversation.isPrivate) {
-        await syncConversationKnowledge(updatedConversation, true);
-      }
-
-      return updatedConversation;
-    },
-    [
-      activeConversationRef,
-      getConversationById,
-      pastConversationKnowledgeEnabled,
-      persistMetas,
-      setActiveConversationValue,
-      setConversations,
-    ],
-  );
-
   const updateConversationContextSummary = useCallback(
     (
       contextSummary: string,
@@ -1292,7 +1186,6 @@ export function useConversationMutations(params: {
 
   return {
     addMessage,
-    addConversationArtifact,
     clearActiveConversation,
     clearConversationMemory,
     createConversation,
@@ -1304,7 +1197,6 @@ export function useConversationMutations(params: {
     inspectConversationIntegrity,
     renameConversation,
     repairConversationIntegrity,
-    removeConversationArtifact,
     selectConversation,
     toggleConversationPinned,
     toggleConversationPrivate,

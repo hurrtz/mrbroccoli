@@ -123,7 +123,6 @@ export function MessageActions({
   onEdit,
   onBranch,
   onOpenBranchSource,
-  onSaveInsight,
   onShare,
   onRepeat,
   repeatState = "idle",
@@ -135,7 +134,6 @@ export function MessageActions({
   | "onEdit"
   | "onBranch"
   | "onOpenBranchSource"
-  | "onSaveInsight"
   | "onShare"
   | "onRepeat"
   | "repeatState"
@@ -147,7 +145,7 @@ export function MessageActions({
   const [moreActionsVisible, setMoreActionsVisible] = useState(false);
   const userSecondaryActions = message.role === "user";
   const hasMoreActions = Boolean(
-    onSaveInsight || (userSecondaryActions && (onCopy || onShare || onRepeat)),
+    userSecondaryActions && (onCopy || onShare || onRepeat),
   );
 
   const handleCopyPress = async () => {
@@ -165,7 +163,6 @@ export function MessageActions({
     !onEdit &&
     !onBranch &&
     !(branchOrigin?.parentAvailable && onOpenBranchSource) &&
-    !onSaveInsight &&
     !onShare &&
     !onRepeat
   ) {
@@ -380,27 +377,6 @@ export function MessageActions({
           ]}
         >
           <View style={styles.moreActionList}>
-            {onSaveInsight ? (
-              <Pressable
-                testID={`message-save-insight-action-${message.id}`}
-                style={styles.moreAction}
-                onPress={() => {
-                  setMoreActionsVisible(false);
-                  onSaveInsight(message);
-                }}
-                accessibilityRole="button"
-                accessibilityLabel={t("saveAsInsight")}
-              >
-                <PhosphorIcon
-                  name="file-text"
-                  size="control"
-                  color={colors.textSecondary}
-                />
-                <Text style={[styles.moreActionText, { color: colors.text }]}>
-                  {t("saveAsInsight")}
-                </Text>
-              </Pressable>
-            ) : null}
             {userSecondaryActions && onCopy ? (
               <Pressable
                 style={styles.moreAction}

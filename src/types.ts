@@ -239,7 +239,10 @@ export interface MessageConversationKnowledgeSource {
 export interface MessageConversationKnowledgeMetadata {
   contentPolicy?: "user-authored-only";
   engine:
-    "local-hybrid-v1" | "local-user-authored-v2" | "local-user-authored-v3";
+    | "local-hybrid-v1"
+    | "local-user-authored-v2"
+    | "local-user-authored-v3"
+    | "local-conversation-history-v4";
   sources: MessageConversationKnowledgeSource[];
 }
 
@@ -552,6 +555,7 @@ export interface ConversationSettings {
   ttsVoice?: ConversationTtsVoiceSetting;
 }
 
+/** @deprecated Retained only for restoring and exporting legacy app data. */
 export type ConversationArtifactKind =
   | "decision"
   | "idea"
@@ -561,6 +565,7 @@ export type ConversationArtifactKind =
   | "hypothesis"
   | "action";
 
+/** @deprecated Retained only for restoring and exporting legacy app data. */
 export interface ConversationArtifact {
   id: string;
   kind: ConversationArtifactKind;
@@ -587,6 +592,7 @@ export interface Conversation {
   createdAt: string;
   updatedAt: string;
   messages: Message[];
+  /** @deprecated Retained only for restoring and exporting legacy app data. */
   artifacts?: ConversationArtifact[];
   settings?: ConversationSettings;
   usageEvents?: ConversationUsageEvent[];

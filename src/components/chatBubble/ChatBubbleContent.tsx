@@ -25,7 +25,6 @@ export function ChatBubbleContent({
   onBranch,
   onOpenBranches,
   onOpenBranchSource,
-  onSaveInsight,
   onShare,
   onRepeat,
   onRetry,
@@ -70,7 +69,7 @@ export function ChatBubbleContent({
       <WebSearchReferences message={message} />
       <UsageCard message={message} showUsageStats={showUsageStats} />
       {selectable &&
-      (message.role === "assistant" || onEdit || onBranch || onSaveInsight) ? (
+      (message.role === "assistant" || onEdit || onBranch) ? (
         <MessageActions
           message={message}
           branchOrigin={branchOrigin}
@@ -78,7 +77,6 @@ export function ChatBubbleContent({
           onEdit={message.role === "user" ? onEdit : undefined}
           onBranch={onBranch}
           onOpenBranchSource={onOpenBranchSource}
-          onSaveInsight={onSaveInsight}
           onShare={onShare}
           onRepeat={onRepeat}
           repeatState={repeatState}
