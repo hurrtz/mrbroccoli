@@ -230,15 +230,7 @@ export function FreeOfflineAdvancedOptions({
       </Pressable>
 
       {visible && snapshot ? (
-        <View style={styles.panel}>
-          <FreeOfflineProfileCard
-            estimatedSetupSeconds={controller.customEstimatedSetupSeconds}
-            profile={profile}
-            ready={controller.customReadiness?.ready === true}
-            testID="onboarding-custom-setup-card"
-            title={t("onboardingSelectedSetup")}
-          />
-
+        <View testID="onboarding-advanced-panel" style={styles.panel}>
           <View style={styles.group}>
             <Text
               testID="onboarding-heading-phone"
@@ -353,6 +345,15 @@ export function FreeOfflineAdvancedOptions({
               {t("onDevicePerformanceCaution")}
             </Text>
           </View>
+
+          <FreeOfflineProfileCard
+            estimatedSetupSeconds={controller.customEstimatedSetupSeconds}
+            profile={profile}
+            ready={controller.customReadiness?.ready === true}
+            testID="onboarding-custom-setup-card"
+            title={t("onboardingSelectedSetup")}
+            tone="custom"
+          />
         </View>
       ) : null}
     </View>

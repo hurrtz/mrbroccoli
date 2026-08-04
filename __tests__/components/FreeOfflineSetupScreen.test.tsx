@@ -9,6 +9,7 @@ import {
   selectOfflineProfile,
 } from "../../src/services/offlineProfile";
 import type { LocalDeviceSnapshot } from "../../src/services/localDeviceCapabilities";
+import { lightColors } from "../../src/theme/colors";
 import { DEFAULT_SETTINGS } from "../../src/types";
 import { renderWithProviders } from "../test-utils/renderWithProviders";
 
@@ -305,6 +306,33 @@ describe("FreeOfflineSetupScreen", () => {
     ).toBeTruthy();
     expect(screen.getByText(/12.4 tok\/s · 420 ms load/)).toBeTruthy();
     expect(screen.getByText(/Predictions are estimates/)).toBeTruthy();
+
+    const advancedPanel = screen.getByTestId("onboarding-advanced-panel");
+    const advancedChildren = React.Children.toArray(
+      advancedPanel.props.children,
+    );
+    expect(advancedChildren.at(-1)).toEqual(
+      expect.objectContaining({
+        props: expect.objectContaining({
+          testID: "onboarding-custom-setup-card",
+        }),
+      }),
+    );
+    expect(
+      StyleSheet.flatten(
+        screen.getByTestId("onboarding-custom-setup-card").props.style,
+      ),
+    ).toEqual(
+      expect.objectContaining({
+        backgroundColor: `${lightColors.phaseSearching}1A`,
+        borderColor: lightColors.phaseSearching,
+      }),
+    );
+    expect(
+      StyleSheet.flatten(
+        screen.getByTestId("onboarding-recommendation-card").props.style,
+      ),
+    ).toEqual(expect.objectContaining({ opacity: 0.42, elevation: 0 }));
 
     fireEvent.press(
       screen.getByTestId("onboarding-model-omnilingual-asr-300m"),

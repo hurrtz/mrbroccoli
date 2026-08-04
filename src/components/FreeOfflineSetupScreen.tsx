@@ -225,6 +225,7 @@ export function FreeOfflineSetupScreen({
               ready={controller.recommendedReadiness?.ready === true}
               testID="onboarding-recommendation-card"
               title={t("freeOfflineModelsStep")}
+              visuallyDisabled={controller.advancedOptionsEnabled}
             />
             {customProfile ? (
               <FreeOfflineAdvancedOptions

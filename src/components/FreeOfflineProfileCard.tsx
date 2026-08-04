@@ -19,6 +19,8 @@ export function FreeOfflineProfileCard({
   ready,
   testID,
   title,
+  tone = "recommended",
+  visuallyDisabled = false,
 }: {
   estimatedSetupSeconds: number | null;
   headerTestID?: string;
@@ -26,9 +28,16 @@ export function FreeOfflineProfileCard({
   ready: boolean;
   testID: string;
   title: string;
+  tone?: "recommended" | "custom";
+  visuallyDisabled?: boolean;
 }) {
   const { colors } = useTheme();
   const { t } = useLocalization();
+  const customTone = tone === "custom";
+  const accentColor = customTone ? colors.phaseSearching : colors.success;
+  const softBackground = customTone
+    ? `${colors.phaseSearching}1A`
+    : colors.accentSoft;
   const etaLabel =
     estimatedSetupSeconds === null
       ? null
@@ -69,10 +78,11 @@ export function FreeOfflineProfileCard({
       testID={testID}
       style={[
         styles.card,
+        visuallyDisabled ? styles.visuallyDisabled : null,
         {
-          backgroundColor: colors.accentSoft,
-          borderColor: colors.success,
-          shadowColor: colors.success,
+          backgroundColor: softBackground,
+          borderColor: accentColor,
+          shadowColor: accentColor,
         },
       ]}
     >
@@ -86,7 +96,7 @@ export function FreeOfflineProfileCard({
           <PhosphorIcon
             name="safety-certificate"
             size="feature"
-            color={colors.success}
+            color={accentColor}
           />
         </View>
         <Text style={[styles.title, { color: colors.text }]}>{title}</Text>
@@ -107,13 +117,13 @@ export function FreeOfflineProfileCard({
             <View
               style={[
                 styles.modelIcon,
-                { backgroundColor: colors.accentSoft },
+                { backgroundColor: softBackground },
               ]}
             >
               <PhosphorIcon
                 name={item.icon}
                 size="compact"
-                color={colors.success}
+                color={accentColor}
               />
             </View>
             <View style={styles.modelCopy}>
@@ -138,7 +148,7 @@ export function FreeOfflineProfileCard({
             { backgroundColor: colors.surfaceElevated },
           ]}
         >
-          <PhosphorIcon name="download" size="inline" color={colors.success} />
+          <PhosphorIcon name="download" size="inline" color={accentColor} />
           <Text style={[styles.pillText, { color: colors.textSecondary }]}>
             {t("freeOfflineDownloadSize", {
               size: formatBytes(profile.downloadBytes),
@@ -155,7 +165,7 @@ export function FreeOfflineProfileCard({
             <PhosphorIcon
               name="thunderbolt"
               size="inline"
-              color={colors.success}
+              color={accentColor}
             />
             <Text style={[styles.pillText, { color: colors.textSecondary }]}>
               {t("onboardingEstimatedTime", { eta: etaLabel })}
@@ -252,5 +262,10 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "600",
     lineHeight: 24,
+  },
+  visuallyDisabled: {
+    elevation: 0,
+    opacity: 0.42,
+    shadowOpacity: 0,
   },
 });

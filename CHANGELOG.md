@@ -64,6 +64,11 @@ the complete Play Store translations are kept in a dedicated file under
 
 ### Changed
 
+- Put the Advanced `Your selected setup` summary after all model and device
+  controls, immediately before setup completion. It now uses the app's soft
+  violet AI-work color to distinguish a user-curated plan from the green
+  automatic recommendation; enabling Advanced visually disables the automatic
+  card so the active configuration source is unambiguous.
 - Make Free on-device preparation thermal-safe: reuse current viable device
   tests, validate the essential Quick, listening, and speaking paths without
   making the larger Thorough model a blocking benchmark, pause automatically
