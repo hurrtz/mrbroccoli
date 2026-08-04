@@ -110,13 +110,14 @@ describe("local LLM", () => {
     expect(mockCompletion).toHaveBeenCalledWith(
       expect.objectContaining({
         enable_thinking: true,
+        n_predict: 1024,
         reasoning_format: "auto",
       }),
       expect.any(Function),
     );
   });
 
-  it("keeps Qwen reasoning private and saves a plain German answer", async () => {
+  it("keeps Qwen reasoning and a generated English title out of a German answer", async () => {
     mockCompletion.mockImplementationOnce(
       async (
         _params: unknown,
@@ -132,19 +133,25 @@ describe("local LLM", () => {
           reasoning_content: "English reasoning",
         });
         onToken?.({
-          token: "</think>**Versch",
-          content: "**Versch",
+          token: "</think>**Quantum Mechanics**",
+          content: "**Quantum Mechanics**",
           reasoning_content: "English reasoning",
         });
         onToken?.({
-          token: "ränkung** ist faszinierend.",
-          content: "**Verschränkung** ist faszinierend.",
+          token: "\n\nDie Quanten",
+          content: "**Quantum Mechanics**\n\nDie Quanten",
+          reasoning_content: "English reasoning",
+        });
+        onToken?.({
+          token: "mechanik ist faszinierend.",
+          content:
+            "**Quantum Mechanics**\n\nDie Quantenmechanik ist faszinierend.",
           reasoning_content: "English reasoning",
         });
         return {
           content:
-            "<think>English reasoning</think>\n\n**Verschränkung** ist faszinierend.",
-          text: "<think>English reasoning</think>\n\n**Verschränkung** ist faszinierend.",
+            "<think>English reasoning</think>\n\n**Quantum Mechanics**\n\nDie Quantenmechanik ist faszinierend.",
+          text: "<think>English reasoning</think>\n\n**Quantum Mechanics**\n\nDie Quantenmechanik ist faszinierend.",
           interrupted: false,
           tokens_evaluated: 14,
           tokens_predicted: 8,
@@ -164,18 +171,41 @@ describe("local LLM", () => {
       onChunk,
     });
 
-    expect(result.fullText).toBe("Verschränkung ist faszinierend.");
+    expect(result.fullText).toBe("Die Quantenmechanik ist faszinierend.");
     expect(onChunk.mock.calls.flat().join("")).toBe(
-      "Verschränkung ist faszinierend.",
+      "Die Quantenmechanik ist faszinierend.",
     );
     expect(onChunk.mock.calls.flat().join("")).not.toContain("think");
+    expect(onChunk.mock.calls.flat().join("")).not.toContain(
+      "Quantum Mechanics",
+    );
     const completionParams = mockCompletion.mock.calls[0][0];
     expect(completionParams.messages[0].content).toContain(
-      "single target language is German",
+      "Antworte ausschließlich auf Deutsch",
     );
     expect(completionParams.messages[0].content).toContain(
-      "Respond in German",
+      "keine englischen Überschriften",
     );
+    expect(result.termination).toEqual(
+      expect.objectContaining({
+        completionTokenLimit: 1024,
+        limitReached: false,
+      }),
+    );
+  });
+
+  it("removes only standalone leading Markdown titles", () => {
+    expect(
+      sanitizeLocalResponseText(
+        "**Quantum Mechanics**\n\nDie Quantenmechanik ist faszinierend.",
+      ),
+    ).toBe("Die Quantenmechanik ist faszinierend.");
+    expect(
+      sanitizeLocalResponseText("**Verschränkung** ist faszinierend."),
+    ).toBe("Verschränkung ist faszinierend.");
+    expect(
+      sanitizeLocalResponseText("**Quantum Mechanics**", { streaming: true }),
+    ).toBe("");
   });
 
   it("drops an unfinished private thinking block", () => {

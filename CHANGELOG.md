@@ -92,6 +92,10 @@ the complete Play Store translations are kept in a dedicated file under
   prompt, and speech routes synchronized; repair existing mismatched profiles,
   and remove private Qwen thinking plus stray Markdown from visible, saved, and
   spoken on-device replies.
+- Prevent Qwen Thorough replies from starting with an English Markdown topic
+  heading or ending mid-answer by enforcing the target language in its own
+  language, removing standalone generated titles, and reserving a separate
+  generation budget for private reasoning.
 - Keep the product name exactly “Mr Broccoli” in every interface language
   instead of translating, respelling, or punctuating the brand per locale.
 - Make past-conversation retrieval abstain on weak incidental matches, suppress

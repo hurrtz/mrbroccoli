@@ -43,36 +43,75 @@ const STOP_WORDS = [
   "<|endoftext|>",
 ];
 
-const LOCAL_RESPONSE_LANGUAGE_NAMES: Partial<Record<AppLanguage, string>> = {
-  en: "English",
-  de: "German",
-  es: "Spanish",
-  fr: "French",
-  it: "Italian",
-  pt: "European Portuguese",
-  "pt-BR": "Brazilian Portuguese",
-  ru: "Russian",
+const LOCAL_TARGET_LANGUAGE_INSTRUCTIONS: Partial<
+  Record<AppLanguage, string>
+> = {
+  en: "Answer exclusively in English. Start directly with the answer without repeating the topic or request as a heading. Do not add a title or introductory label. Only use another language when the user explicitly asks for a translation or a reply in that language. Keep private reasoning internal and return only the final answer.",
+  de: "Antworte ausschließlich auf Deutsch. Beginne direkt mit der Antwort, ohne das Thema oder die Anfrage als Überschrift zu wiederholen. Verwende keine englischen Überschriften oder Einleitungen. Wechsle nur dann in eine andere Sprache, wenn die Person ausdrücklich um eine Übersetzung oder eine Antwort in dieser Sprache bittet. Behalte interne Überlegungen für dich und gib nur die endgültige Antwort aus.",
+  es: "Responde exclusivamente en español. Empieza directamente con la respuesta, sin repetir el tema ni la petición como título. No añadas títulos ni introducciones en inglés. Usa otro idioma solo si la persona pide expresamente una traducción o una respuesta en ese idioma. Mantén privado el razonamiento interno y devuelve únicamente la respuesta final.",
+  fr: "Réponds exclusivement en français. Commence directement par la réponse, sans répéter le sujet ni la demande sous forme de titre. N’ajoute aucun titre ni préambule en anglais. N’utilise une autre langue que si la personne demande explicitement une traduction ou une réponse dans cette langue. Garde le raisonnement interne privé et ne fournis que la réponse finale.",
+  it: "Rispondi esclusivamente in italiano. Inizia direttamente con la risposta, senza ripetere l’argomento o la richiesta come titolo. Non aggiungere titoli o introduzioni in inglese. Usa un’altra lingua solo se la persona chiede esplicitamente una traduzione o una risposta in quella lingua. Mantieni privato il ragionamento interno e restituisci solo la risposta finale.",
+  pt: "Responde exclusivamente em português europeu. Começa diretamente pela resposta, sem repetir o tema ou o pedido como título. Não acrescentes títulos nem introduções em inglês. Usa outra língua apenas se a pessoa pedir explicitamente uma tradução ou uma resposta nessa língua. Mantém o raciocínio interno privado e apresenta apenas a resposta final.",
+  "pt-BR":
+    "Responda exclusivamente em português brasileiro. Comece diretamente pela resposta, sem repetir o tema ou o pedido como título. Não acrescente títulos nem introduções em inglês. Use outro idioma apenas se a pessoa pedir explicitamente uma tradução ou uma resposta nesse idioma. Mantenha o raciocínio interno privado e apresente somente a resposta final.",
+  ru: "Отвечай исключительно на русском языке. Начинай сразу с ответа, не повторяя тему или запрос в виде заголовка. Не добавляй заголовки или вступления на английском языке. Используй другой язык только по прямой просьбе о переводе или ответе на этом языке. Не раскрывай внутренние рассуждения и выдавай только окончательный ответ.",
 };
 
-function getLocalAssistantInstructions(
-  assistantInstructions: string,
-  language: AppLanguage,
-) {
-  const languageName = LOCAL_RESPONSE_LANGUAGE_NAMES[language] ?? language;
-  return [
-    assistantInstructions.trim(),
-    `The offline profile's single target language is ${languageName}. Respond in ${languageName}. Do not switch to English because internal reasoning or other system text is in English. Only use another language when the user explicitly asks for a translation or a reply in that language. Keep private reasoning internal and return only the final answer.`,
-  ]
-    .filter(Boolean)
-    .join("\n\n");
+function getLocalTargetLanguageInstruction(language: AppLanguage) {
+  return (
+    LOCAL_TARGET_LANGUAGE_INSTRUCTIONS[language] ??
+    `Respond exclusively in the language identified by ${language}. Start directly with the answer, do not add a title, keep private reasoning internal, and return only the final answer.`
+  );
 }
 
-export function sanitizeLocalResponseText(text: string) {
+function stripLeadingMarkdownTitle(text: string, streaming: boolean) {
+  const trimmed = text.trimStart();
+  const atxTitle = trimmed.match(/^#{1,6}[^\S\r\n]+[^\r\n]+/u)?.[0];
+  if (atxTitle) {
+    const remainder = trimmed.slice(atxTitle.length);
+    const lineBreak = remainder.match(/^[^\S\r\n]*(?:\r?\n)+/u)?.[0];
+    if (lineBreak) {
+      return remainder.slice(lineBreak.length).trimStart();
+    }
+    return streaming ? "" : text;
+  }
+
+  for (const marker of ["***", "___", "**", "__"] as const) {
+    if (!trimmed.startsWith(marker)) {
+      continue;
+    }
+    const closingIndex = trimmed.indexOf(marker, marker.length);
+    if (closingIndex < 0) {
+      return streaming ? "" : text;
+    }
+    const remainder = trimmed.slice(closingIndex + marker.length);
+    const lineBreak = remainder.match(/^[^\S\r\n]*(?:\r?\n)+/u)?.[0];
+    if (lineBreak) {
+      return remainder.slice(lineBreak.length).trimStart();
+    }
+    if (!remainder) {
+      return streaming ? "" : text;
+    }
+    return text;
+  }
+
+  return text;
+}
+
+export function sanitizeLocalResponseText(
+  text: string,
+  options: { streaming?: boolean } = {},
+) {
   const withoutPrivateReasoning = text
     .replace(/<think\b[^>]*>[\s\S]*?<\/think\s*>/giu, " ")
     .replace(/<think\b[^>]*>[\s\S]*$/giu, " ")
     .replace(/<\/?think\b[^>]*>/giu, " ");
-  return renderTextForSpeech(withoutPrivateReasoning);
+  return renderTextForSpeech(
+    stripLeadingMarkdownTitle(
+      withoutPrivateReasoning,
+      options.streaming === true,
+    ),
+  );
 }
 
 function getLlamaModule() {
@@ -80,7 +119,21 @@ function getLlamaModule() {
   return require("llama.rn") as typeof import("llama.rn");
 }
 
-function maxReplyTokens(responseLength: AssistantResponseLength) {
+function maxReplyTokens(
+  responseLength: AssistantResponseLength,
+  thinkingEnabled: boolean,
+) {
+  if (thinkingEnabled) {
+    switch (responseLength) {
+      case "brief":
+        return 512;
+      case "thorough":
+        return 1_536;
+      default:
+        return 1_024;
+    }
+  }
+
   switch (responseLength) {
     case "brief":
       return 192;
@@ -179,20 +232,20 @@ export async function streamLocalChat(params: {
 }) {
   const model = getLocalModel(params.modelId) as LocalLlmModelDefinition;
   const thinkingEnabled = enablesThinking(model);
-  const systemPrompt = buildSystemPrompt({
-    assistantInstructions: getLocalAssistantInstructions(
-      params.assistantInstructions,
-      params.language,
-    ),
-    responseLength: params.responseLength,
-    responseTone: params.responseTone,
-    language: params.language,
-    currentModel: model.name,
-    conversationSummary: params.conversationSummary,
-    pastConversationKnowledge: params.pastConversationKnowledge,
-    spokenParagraphStreaming: params.spokenParagraphStreaming,
-    webSearchContext: params.webSearchContext,
-  });
+  const systemPrompt = [
+    buildSystemPrompt({
+      assistantInstructions: params.assistantInstructions,
+      responseLength: params.responseLength,
+      responseTone: params.responseTone,
+      language: params.language,
+      currentModel: model.name,
+      conversationSummary: params.conversationSummary,
+      pastConversationKnowledge: params.pastConversationKnowledge,
+      spokenParagraphStreaming: params.spokenParagraphStreaming,
+      webSearchContext: params.webSearchContext,
+    }),
+    getLocalTargetLanguageInstruction(params.language),
+  ].join("\n\n");
   const task = completionTask.then(async () => {
     const context = await getContext(model);
     const abort = () => {
@@ -206,9 +259,15 @@ export async function streamLocalChat(params: {
         error.name = "AbortError";
         throw error;
       }
+      const completionTokenLimit = maxReplyTokens(
+        params.responseLength,
+        thinkingEnabled,
+      );
       let streamedVisibleText = "";
       const streamParsedContent = (content: string) => {
-        const nextVisibleText = sanitizeLocalResponseText(content);
+        const nextVisibleText = sanitizeLocalResponseText(content, {
+          streaming: true,
+        });
         if (
           !nextVisibleText ||
           nextVisibleText === streamedVisibleText ||
@@ -225,7 +284,7 @@ export async function streamLocalChat(params: {
       const result = await context.completion(
         {
           messages: toLocalMessages(systemPrompt, params.messages),
-          n_predict: maxReplyTokens(params.responseLength),
+          n_predict: completionTokenLimit,
           stop: STOP_WORDS,
           temperature: 0.65,
           top_p: 0.9,
@@ -264,7 +323,20 @@ export async function streamLocalChat(params: {
         completionTokens: result.tokens_predicted,
         totalTokens: result.tokens_evaluated + result.tokens_predicted,
       };
-      return { fullText, usage, timings: result.timings };
+      return {
+        fullText,
+        usage,
+        timings: result.timings,
+        termination: {
+          completionTokenLimit,
+          contextFull: result.context_full === true,
+          limitReached:
+            Boolean(result.stopped_limit) ||
+            result.tokens_predicted >= completionTokenLimit,
+          stoppedEos: result.stopped_eos === true,
+          stoppedWord: Boolean(result.stopped_word),
+        },
+      };
     } finally {
       params.abortSignal?.removeEventListener("abort", abort);
     }

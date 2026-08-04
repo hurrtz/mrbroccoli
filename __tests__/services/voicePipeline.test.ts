@@ -15,6 +15,7 @@ import {
 import { ProviderRequestError } from "../../src/services/providerErrors";
 import { retrieveConversationKnowledge } from "../../src/services/conversationKnowledge";
 import { streamLocalChat } from "../../src/services/localLlm";
+import { recordDebugLogEvent } from "../../src/services/debugLogCapture";
 
 jest.mock("expo-file-system/legacy", () => ({
   deleteAsync: jest.fn(() => Promise.resolve()),
@@ -398,6 +399,13 @@ describe("runVoicePipeline", () => {
         completionTokens: 7,
         totalTokens: 27,
       },
+      termination: {
+        completionTokenLimit: 384,
+        contextFull: false,
+        limitReached: false,
+        stoppedEos: true,
+        stoppedWord: false,
+      },
     });
     const callbacks = {
       onTranscription: jest.fn(),
@@ -451,6 +459,14 @@ describe("runVoicePipeline", () => {
         }),
       }),
     );
+    expect(recordDebugLogEvent).toHaveBeenCalledWith({
+      event: "voice-pipeline-local-llm-finished",
+      payload: expect.objectContaining({
+        completionTokenLimit: 384,
+        completionTokens: 7,
+        limitReached: false,
+      }),
+    });
   });
 
   it("uses a native transcript override and skips provider STT", async () => {

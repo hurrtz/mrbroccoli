@@ -206,6 +206,18 @@ export async function runPipelineResponse({
         abortSignal,
         onChunk,
       });
+      recordDebugLogEvent({
+        event: "voice-pipeline-local-llm-finished",
+        payload: {
+          completionTokenLimit: result.termination.completionTokenLimit,
+          completionTokens: result.usage.completionTokens,
+          contextFull: result.termination.contextFull,
+          limitReached: result.termination.limitReached,
+          stoppedEos: result.termination.stoppedEos,
+          stoppedWord: result.termination.stoppedWord,
+          turnId,
+        },
+      });
       await onDone(result.fullText, result.usage);
     } catch (error) {
       if (!abortSignal?.aborted) {
