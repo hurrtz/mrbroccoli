@@ -96,8 +96,10 @@ interface LocalModelBase {
   capability: LocalModelCapability;
   name: string;
   description: string;
-  /** Recommended entries may be selected automatically; advanced entries are opt-in. */
+  /** Controls the detail label shown in model pickers. */
   catalogTier: "recommended" | "advanced";
+  /** Higher values win automatic setup after device and language filtering. */
+  automaticPriority?: number;
   runtime: LocalModelRuntime;
   languages: readonly SpeechLanguage[];
   downloadBytes: number;
@@ -169,6 +171,7 @@ export const LOCAL_MODEL_CATALOG = [
     name: "Qwen3 0.6B",
     description: "Small multilingual response model; fastest local option.",
     catalogTier: "recommended",
+    automaticPriority: 10,
     runtime: "llama-rn",
     languages: ALL_SPEECH_LANGUAGES,
     fileName: "Qwen3-0.6B-Q8_0.gguf",
@@ -194,6 +197,7 @@ export const LOCAL_MODEL_CATALOG = [
     description:
       "Newer compact multilingual model for users who want another quick-response option.",
     catalogTier: "advanced",
+    automaticPriority: 20,
     runtime: "llama-rn",
     languages: ALL_SPEECH_LANGUAGES,
     fileName: "Qwen3.5-0.8B-Q8_0.gguf",
@@ -219,6 +223,7 @@ export const LOCAL_MODEL_CATALOG = [
     description:
       "Compact alternative for English and the supported Western European languages.",
     catalogTier: "advanced",
+    automaticPriority: 30,
     runtime: "llama-rn",
     languages: ["en", "de", "es", "fr", "it", "pt", "pt-BR"],
     fileName: "granite-4.0-1b-Q4_K_M.gguf",
@@ -243,6 +248,7 @@ export const LOCAL_MODEL_CATALOG = [
     name: "Qwen3 1.7B",
     description: "Higher-quality multilingual responses on stronger phones.",
     catalogTier: "recommended",
+    automaticPriority: 10,
     runtime: "llama-rn",
     languages: ALL_SPEECH_LANGUAGES,
     fileName: "Qwen3-1.7B-Q8_0.gguf",
@@ -268,6 +274,7 @@ export const LOCAL_MODEL_CATALOG = [
     description:
       "Purpose-built reasoning alternative for high-end phones and supported European languages.",
     catalogTier: "advanced",
+    automaticPriority: 30,
     runtime: "llama-rn",
     languages: ["en", "de", "es", "fr", "it", "pt", "pt-BR"],
     fileName: "Ministral-3-3B-Reasoning-2512-Q4_K_M.gguf",
@@ -294,6 +301,7 @@ export const LOCAL_MODEL_CATALOG = [
     description:
       "Larger multilingual reasoning option, including Russian, for high-end phones.",
     catalogTier: "advanced",
+    automaticPriority: 30,
     runtime: "llama-rn",
     languages: ALL_SPEECH_LANGUAGES,
     fileName: "Qwen3-4B-Q4_K_M.gguf",
@@ -318,6 +326,7 @@ export const LOCAL_MODEL_CATALOG = [
     name: "Whisper Tiny",
     description: "Multilingual on-device speech recognition.",
     catalogTier: "recommended",
+    automaticPriority: 10,
     runtime: "sherpa-onnx",
     runtimeModelId: "sherpa-onnx-whisper-tiny",
     sherpaModelType: "whisper",
@@ -342,6 +351,7 @@ export const LOCAL_MODEL_CATALOG = [
     description:
       "Balanced multilingual recognition with more capacity than Whisper Tiny.",
     catalogTier: "advanced",
+    automaticPriority: 20,
     runtime: "sherpa-onnx",
     runtimeModelId: "sherpa-onnx-whisper-base",
     sherpaModelType: "whisper",
@@ -366,6 +376,7 @@ export const LOCAL_MODEL_CATALOG = [
     description:
       "Higher-accuracy Whisper option for stronger phones and difficult audio.",
     catalogTier: "advanced",
+    automaticPriority: 30,
     runtime: "sherpa-onnx",
     runtimeModelId: "sherpa-onnx-whisper-small",
     sherpaModelType: "whisper",
@@ -390,6 +401,7 @@ export const LOCAL_MODEL_CATALOG = [
     description:
       "Broader multilingual on-device recognition for stronger phones.",
     catalogTier: "recommended",
+    automaticPriority: 25,
     runtime: "sherpa-onnx",
     runtimeModelId:
       "sherpa-onnx-omnilingual-asr-1600-languages-300M-ctc-v2-int8-2026-02-05",
@@ -416,6 +428,7 @@ export const LOCAL_MODEL_CATALOG = [
     description:
       "Modern multilingual recognition with punctuation for stronger phones.",
     catalogTier: "advanced",
+    automaticPriority: 40,
     runtime: "sherpa-onnx",
     runtimeModelId: "sherpa-onnx-nemo-parakeet-tdt-0.6b-v3-int8",
     sherpaModelType: "nemo_transducer",
@@ -440,6 +453,7 @@ export const LOCAL_MODEL_CATALOG = [
     description:
       "Large multilingual recognizer for users prioritizing recognition quality.",
     catalogTier: "advanced",
+    automaticPriority: 35,
     runtime: "sherpa-onnx",
     runtimeModelId: "sherpa-onnx-qwen3-asr-0.6B-int8-2026-03-25",
     sherpaModelType: "qwen3_asr",
@@ -463,6 +477,7 @@ export const LOCAL_MODEL_CATALOG = [
     name: "Kokoro",
     description: "Natural English and Simplified Chinese on-device speech.",
     catalogTier: "recommended",
+    automaticPriority: 20,
     runtime: "sherpa-onnx",
     runtimeModelId: "kokoro-int8-multi-lang-v1_1",
     sherpaModelType: "kokoro",
@@ -487,6 +502,7 @@ export const LOCAL_MODEL_CATALOG = [
     name: "Piper · Kristin",
     description: "Compact US English voice.",
     catalogTier: "recommended",
+    automaticPriority: 10,
     runtime: "sherpa-onnx",
     runtimeModelId: "vits-piper-en_US-kristin-medium-int8",
     sherpaModelType: "vits",
@@ -530,6 +546,7 @@ export const LOCAL_MODEL_CATALOG = [
     name: "Piper · Thorsten",
     description: "Compact German voice.",
     catalogTier: "recommended",
+    automaticPriority: 10,
     runtime: "sherpa-onnx",
     runtimeModelId: "vits-piper-de_DE-thorsten-medium-int8",
     sherpaModelType: "vits",
@@ -572,6 +589,7 @@ export const LOCAL_MODEL_CATALOG = [
     name: "Piper · Sharvard",
     description: "Compact Spanish voice.",
     catalogTier: "recommended",
+    automaticPriority: 10,
     runtime: "sherpa-onnx",
     runtimeModelId: "vits-piper-es_ES-sharvard-medium-int8",
     sherpaModelType: "vits",
@@ -614,6 +632,7 @@ export const LOCAL_MODEL_CATALOG = [
     name: "Piper · Siwis",
     description: "Compact French voice.",
     catalogTier: "recommended",
+    automaticPriority: 10,
     runtime: "sherpa-onnx",
     runtimeModelId: "vits-piper-fr_FR-siwis-medium-int8",
     sherpaModelType: "vits",
@@ -656,6 +675,7 @@ export const LOCAL_MODEL_CATALOG = [
     name: "Piper · Faber",
     description: "Compact Brazilian Portuguese voice.",
     catalogTier: "recommended",
+    automaticPriority: 10,
     runtime: "sherpa-onnx",
     runtimeModelId: "vits-piper-pt_BR-faber-medium-int8",
     sherpaModelType: "vits",
@@ -698,6 +718,7 @@ export const LOCAL_MODEL_CATALOG = [
     name: "Piper · Tugão",
     description: "Compact European Portuguese voice.",
     catalogTier: "recommended",
+    automaticPriority: 10,
     runtime: "sherpa-onnx",
     runtimeModelId: "vits-piper-pt_PT-tugao-medium-int8",
     sherpaModelType: "vits",
@@ -719,6 +740,7 @@ export const LOCAL_MODEL_CATALOG = [
     name: "Piper · Dmitri",
     description: "Compact Russian voice.",
     catalogTier: "recommended",
+    automaticPriority: 10,
     runtime: "sherpa-onnx",
     runtimeModelId: "vits-piper-ru_RU-dmitri-medium-int8",
     sherpaModelType: "vits",
@@ -761,6 +783,7 @@ export const LOCAL_MODEL_CATALOG = [
     name: "Piper · Paola",
     description: "Compact Italian voice.",
     catalogTier: "recommended",
+    automaticPriority: 10,
     runtime: "sherpa-onnx",
     runtimeModelId: "vits-piper-it_IT-paola-medium-int8",
     sherpaModelType: "vits",

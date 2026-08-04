@@ -114,7 +114,8 @@ function modelPreference(params: {
   const installed = params.installedModelIds?.has(params.model.id) === true;
 
   return (
-    (knownFailure ? 100 : 0) +
+    (knownFailure ? 10_000 : 0) -
+    (params.model.automaticPriority ?? 0) * 100 +
     (installed ? 0 : 10) +
     (currentBenchmark?.status === "viable" ? 0 : 1)
   );
@@ -139,8 +140,16 @@ function sortCandidates<T extends LocalModelDefinition>(params: {
 
 function preferredAutomaticCandidates<T extends LocalModelDefinition>(
   models: T[],
+  params: {
+    snapshot: LocalDeviceSnapshot;
+    benchmarks?: Partial<Record<LocalModelId, LocalModelBenchmarkResult>>;
+  },
 ) {
-  return models.filter((model) => model.catalogTier === "recommended");
+  return models.filter(
+    (model) =>
+      model.automaticPriority !== undefined &&
+      !hasCurrentBenchmarkFailure({ model, ...params }),
+  );
 }
 
 export function selectOfflineProfile(params: {
@@ -191,11 +200,26 @@ export function selectOfflineProfile(params: {
   const viableTts = ttsModels.filter(
     (model) => isPermanentlyEligible(model, params.snapshot).eligible,
   );
-  const automaticQuickLlms = preferredAutomaticCandidates(viableQuickLlms);
-  const automaticThoroughLlms =
-    preferredAutomaticCandidates(viableThoroughLlms);
-  const automaticStt = preferredAutomaticCandidates(viableStt);
-  const automaticTts = preferredAutomaticCandidates(viableTts);
+  const automaticCandidateOptions = {
+    snapshot: params.snapshot,
+    benchmarks: params.benchmarks,
+  };
+  const automaticQuickLlms = preferredAutomaticCandidates(
+    viableQuickLlms,
+    automaticCandidateOptions,
+  );
+  const automaticThoroughLlms = preferredAutomaticCandidates(
+    viableThoroughLlms,
+    automaticCandidateOptions,
+  );
+  const automaticStt = preferredAutomaticCandidates(
+    viableStt,
+    automaticCandidateOptions,
+  );
+  const automaticTts = preferredAutomaticCandidates(
+    viableTts,
+    automaticCandidateOptions,
+  );
   const hasQuickOverride = viableQuickLlms.some(
     (model) => model.id === params.overrides?.quickLlmModelId,
   );

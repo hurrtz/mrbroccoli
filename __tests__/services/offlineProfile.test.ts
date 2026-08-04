@@ -70,15 +70,44 @@ describe("free offline profile selection", () => {
 
     expect(result.status).toBe("ready");
     if (result.status === "ready") {
-      expect(result.profile.llm.id).toBe("qwen3-0.6b-q8");
-      expect(result.profile.thoroughLlm?.id).toBe("qwen3-1.7b-q8");
-      expect(result.profile.stt.id).toBe("whisper-tiny");
+      expect(result.profile.llm.id).toBe("granite-4.0-1b-q4");
+      expect(result.profile.thoroughLlm?.id).toBe(
+        "ministral-3-3b-reasoning-q4",
+      );
+      expect(result.profile.stt.id).toBe("parakeet-tdt-0.6b-v3-int8");
       expect(result.profile.tts?.id).toBe("kokoro-multilingual");
     }
   });
 
   it("selects the language-specific German voice", () => {
     expect(readyProfile("de").tts?.id).toBe("piper-de-de-thorsten");
+  });
+
+  it("selects stronger German models for a high-end iPhone", () => {
+    const result = selectOfflineProfile({
+      languages: ["de"],
+      snapshot: device({
+        platform: "ios",
+        physicalMemoryBytes: 11.4 * GIB,
+        availableMemoryBytes: 8 * GIB,
+        freeStorageBytes: 345.8 * GIB,
+        totalStorageBytes: 512 * GIB,
+        processorCount: 6,
+        activeProcessorCount: 6,
+        architecture: "arm64",
+        osVersion: "26.5.2",
+      }),
+    });
+
+    expect(result.status).toBe("ready");
+    if (result.status === "ready") {
+      expect(result.profile.llm.id).toBe("granite-4.0-1b-q4");
+      expect(result.profile.thoroughLlm?.id).toBe(
+        "ministral-3-3b-reasoning-q4",
+      );
+      expect(result.profile.stt?.id).toBe("parakeet-tdt-0.6b-v3-int8");
+      expect(result.profile.tts?.id).toBe("piper-de-de-thorsten");
+    }
   });
 
   it("uses phone-native offline recognition only when the device reports it", () => {
@@ -112,7 +141,7 @@ describe("free offline profile selection", () => {
 
     expect(result.status).toBe("ready");
     if (result.status === "ready") {
-      expect(result.profile.stt?.id).toBe("whisper-tiny");
+      expect(result.profile.stt?.id).toBe("parakeet-tdt-0.6b-v3-int8");
     }
   });
 
@@ -143,9 +172,9 @@ describe("free offline profile selection", () => {
       expect(result.profile.languages).toEqual(["en", "de"]);
       expect(result.profile.tts).toBeNull();
       expect(result.profile.downloadBytes).toBe(
-        getLocalModel("qwen3-0.6b-q8").downloadBytes +
-          getLocalModel("qwen3-1.7b-q8").downloadBytes +
-          getLocalModel("whisper-tiny").downloadBytes,
+        getLocalModel("granite-4.0-1b-q4").downloadBytes +
+          getLocalModel("ministral-3-3b-reasoning-q4").downloadBytes +
+          getLocalModel("parakeet-tdt-0.6b-v3-int8").downloadBytes,
       );
     }
   });
@@ -163,8 +192,8 @@ describe("free offline profile selection", () => {
   });
 
   it("checks aggregate installation storage instead of each model alone", () => {
-    const llm = getLocalModel("qwen3-0.6b-q8");
-    const stt = getLocalModel("whisper-tiny");
+    const llm = getLocalModel("granite-4.0-1b-q4");
+    const stt = getLocalModel("parakeet-tdt-0.6b-v3-int8");
     const tts = getLocalModel("piper-de-de-thorsten");
     const combinedRequired =
       llm.installedBytes +
@@ -185,8 +214,8 @@ describe("free offline profile selection", () => {
       languages: ["de"],
       snapshot: device({ freeStorageBytes: 900 * 1024 ** 2 }),
       installedModelIds: new Set([
-        "qwen3-0.6b-q8",
-        "whisper-tiny",
+        "granite-4.0-1b-q4",
+        "parakeet-tdt-0.6b-v3-int8",
         "piper-de-de-thorsten",
       ]),
     });
@@ -198,7 +227,7 @@ describe("free offline profile selection", () => {
     }
   });
 
-  it("keeps Quick and reuses installed Thorough and speech models", () => {
+  it("does not let smaller installed fallbacks displace stronger models", () => {
     const result = selectOfflineProfile({
       languages: ["en"],
       snapshot: device(),
@@ -211,16 +240,16 @@ describe("free offline profile selection", () => {
 
     expect(result.status).toBe("ready");
     if (result.status === "ready") {
-      expect(result.profile.llm.id).toBe("qwen3-0.6b-q8");
-      expect(result.profile.thoroughLlm?.id).toBe("qwen3-1.7b-q8");
-      expect(result.profile.tts?.id).toBe("piper-en-us-kristin");
-      expect(result.profile.downloadBytes).toBe(
-        getLocalModel("qwen3-0.6b-q8").downloadBytes,
+      expect(result.profile.llm.id).toBe("granite-4.0-1b-q4");
+      expect(result.profile.thoroughLlm?.id).toBe(
+        "ministral-3-3b-reasoning-q4",
       );
+      expect(result.profile.stt?.id).toBe("parakeet-tdt-0.6b-v3-int8");
+      expect(result.profile.tts?.id).toBe("kokoro-multilingual");
     }
   });
 
-  it("does not let installed advanced models replace automatic recommendations", () => {
+  it("does not let lower-ranked installed models replace automatic recommendations", () => {
     const result = selectOfflineProfile({
       languages: ["en"],
       snapshot: device(),
@@ -233,8 +262,8 @@ describe("free offline profile selection", () => {
 
     expect(result.status).toBe("ready");
     if (result.status === "ready") {
-      expect(result.profile.llm.id).toBe("qwen3-0.6b-q8");
-      expect(result.profile.stt?.id).toBe("whisper-tiny");
+      expect(result.profile.llm.id).toBe("granite-4.0-1b-q4");
+      expect(result.profile.stt?.id).toBe("parakeet-tdt-0.6b-v3-int8");
       expect(result.profile.tts?.id).toBe("kokoro-multilingual");
     }
   });
@@ -243,16 +272,19 @@ describe("free offline profile selection", () => {
     const result = selectOfflineProfile({
       languages: ["en"],
       snapshot: device(),
-      installedModelIds: new Set(["qwen3-1.7b-q8"]),
+      installedModelIds: new Set(["ministral-3-3b-reasoning-q4"]),
       benchmarks: {
-        "qwen3-1.7b-q8": benchmark("qwen3-1.7b-q8", "below-target"),
+        "ministral-3-3b-reasoning-q4": benchmark(
+          "ministral-3-3b-reasoning-q4",
+          "below-target",
+        ),
       },
     });
 
     expect(result.status).toBe("ready");
     if (result.status === "ready") {
-      expect(result.profile.llm.id).toBe("qwen3-0.6b-q8");
-      expect(result.profile.thoroughLlm).toBeNull();
+      expect(result.profile.llm.id).toBe("granite-4.0-1b-q4");
+      expect(result.profile.thoroughLlm?.id).toBe("qwen3-4b-q4");
     }
   });
 
@@ -278,7 +310,7 @@ describe("free offline profile selection", () => {
     );
     expect(effective.responseModes[0]?.route.runtime).toBe("local");
     expect(effective.responseModes[1]?.route.localModelId).toBe(
-      "qwen3-1.7b-q8",
+      "ministral-3-3b-reasoning-q4",
     );
     expect(effective.sttMode).toBe("local");
     expect(effective.ttsMode).toBe("local");
@@ -313,10 +345,27 @@ describe("free offline profile selection", () => {
     }
 
     expect(selection.profile.thoroughLlm).toBeNull();
+    expect(selection.profile.llm.id).toBe("granite-4.0-1b-q4");
     expect(
       applyOfflineProfileToSettings(DEFAULT_SETTINGS, selection.profile)
         .responseModes,
     ).toHaveLength(1);
+  });
+
+  it("keeps Qwen3 0.6B as a constrained-device fallback", () => {
+    const selection = selectOfflineProfile({
+      languages: ["de"],
+      snapshot: device({
+        physicalMemoryBytes: 3 * GIB,
+        availableMemoryBytes: 1.5 * GIB,
+      }),
+    });
+    if (selection.status !== "ready") {
+      throw new Error("Expected a constrained fallback profile");
+    }
+
+    expect(selection.profile.llm.id).toBe("qwen3-0.6b-q8");
+    expect(selection.profile.thoroughLlm).toBeNull();
   });
 
   it("applies compatible advanced speech and reasoning choices", () => {

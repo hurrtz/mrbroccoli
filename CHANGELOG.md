@@ -26,8 +26,9 @@ the complete Play Store translations are kept in a dedicated file under
 - Expand the on-device catalogue with opt-in Qwen3.5, Granite, Ministral
   Reasoning, and larger Qwen reasoning routes; Whisper Base and Small,
   Parakeet, and Qwen3-ASR recognition; and additional permissively licensed
-  Piper voices. Automatic setup keeps its proven defaults, while every
-  advanced choice remains device-filtered and benchmark-gated.
+  Piper voices. Automatic setup quality-ranks approved candidates after
+  language and device filtering, while every advanced choice remains
+  benchmark-gated and available for manual selection.
 - Add an expandable Uber Mode audit to each deliberated reply, showing routes,
   rounds, challenge and convergence verdicts, failures, retired participants,
   retained synthesis history, and intermediate tokens without storing private
@@ -58,6 +59,10 @@ the complete Play Store translations are kept in a dedicated file under
 
 ### Changed
 
+- Prefer stronger automatic Free models when the phone has enough headroom.
+  Qwen3 0.6B remains a constrained-device fallback instead of displacing
+  Granite on the Quick card; high-end German profiles now pair Granite with
+  Ministral Reasoning and Parakeet speech recognition.
 - Keep branch families compact and collapsed until opened, expand the active
   path automatically, label each child with its parent, and show a child thread
   from its forked checkpoint while retaining earlier parent context invisibly.
