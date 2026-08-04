@@ -292,11 +292,10 @@ describe("FreeOfflineSetupScreen", () => {
       ),
     ).toBe(2);
     for (const capability of ["quick", "thorough", "tts", "stt"]) {
-      expect(
-        screen.UNSAFE_getByProps({
-          testID: `onboarding-recommendation-card-${capability}-ready`,
-        }),
-      ).toBeTruthy();
+      const tick = screen.UNSAFE_getByProps({
+        testID: `onboarding-recommendation-card-${capability}-ready`,
+      });
+      expect(tick.props.size).toBe("control");
     }
     for (const technicalName of [
       controller.recommendedSelection.profile.llm.name,

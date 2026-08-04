@@ -68,7 +68,8 @@ the complete Play Store translations are kept in a dedicated file under
 ### Changed
 
 - Make the automatic Free recommendation reassuring rather than technical: it
-  now confirms four plain-language capabilities without exposing model brands,
+  now confirms four plain-language capabilities with prominent green checks
+  without exposing model brands,
   presents download size and setup time directly on the recommendation card,
   and uses the same plain-language Quick and Thorough names on the Home cards.
   Exact model names remain available in Advanced setup and Settings.
