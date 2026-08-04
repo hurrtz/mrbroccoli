@@ -182,7 +182,7 @@ export function FreeOfflineProfileCard({
                     </Text>
                     <PhosphorIcon
                       testID={`${testID}-${item.key}-ready`}
-                      name="check-circle"
+                      name="check"
                       size="hero"
                       color={colors.success}
                     />
