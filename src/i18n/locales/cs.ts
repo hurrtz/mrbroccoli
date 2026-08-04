@@ -25,7 +25,7 @@ export const cs = {
   ...onboardingTranslations.cs,
   ...premiumTranslations.cs,
   ...transcriptEditTranslations.cs,
-  appName: "Mr Broccoli",
+  appName: "Pan Brokolice",
   retry: "Zkuste to znovu",
   dismiss: "Zavřít",
   done: "Hotovo",

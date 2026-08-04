@@ -25,7 +25,7 @@ export const hi = {
   ...onboardingTranslations.hi,
   ...premiumTranslations.hi,
   ...transcriptEditTranslations.hi,
-  appName: "Mr Broccoli",
+  appName: "मिस्टर ब्रोकली",
   retry: "पुन: प्रयास करें",
   dismiss: "बंद करें",
   done: "हो गया",

@@ -25,7 +25,7 @@ export const sv = {
   ...onboardingTranslations.sv,
   ...premiumTranslations.sv,
   ...transcriptEditTranslations.sv,
-  appName: "Mr Broccoli",
+  appName: "Herr Broccoli",
   retry: "Försök igen",
   dismiss: "Stäng",
   done: "Klart",

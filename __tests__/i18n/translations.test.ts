@@ -126,34 +126,34 @@ describe("translations", () => {
     );
   });
 
-  it("keeps the exact Mr Broccoli brand in every interface language", () => {
-    Object.values(translations).forEach((dictionary) => {
-      expect(dictionary.appName).toBe("Mr Broccoli");
-    });
-
-    const retiredLocalizedNames = [
-      "Mr. Brokkoli",
-      "Пан Броколі",
-      "Мистер Брокколи",
-      "ミスター・ブロッコリー",
-      "मिस्टर ब्रोकली",
-      "السيد بروكلي",
-      "مسٹر بروکلی",
-      "西兰花先生",
-      "Sr. Brócoli",
-      "Sr. Brócolo",
-      "Sr. Brócolis",
-      "Sig. Broccoli",
-      "M. Brocoli",
-      "Brokkoli úr",
-      "Pan Brokolice",
-      "Pan Brokuł",
-      "Bay Brokoli",
-      "Herr Broccoli",
-    ];
-    const serializedTranslations = JSON.stringify(translations);
-    retiredLocalizedNames.forEach((name) => {
-      expect(serializedTranslations).not.toContain(name);
+  it("localizes the visible wordmark with the interface language", () => {
+    expect(
+      Object.fromEntries(
+        APP_LANGUAGES.map((language) => [
+          language,
+          translations[language].appName,
+        ]),
+      ),
+    ).toEqual({
+      en: "Mr Broccoli",
+      de: "Mr. Brokkoli",
+      uk: "Пан Броколі",
+      hi: "मिस्टर ब्रोकली",
+      es: "Sr. Brócoli",
+      fr: "M. Brocoli",
+      it: "Sig. Broccoli",
+      pt: "Sr. Brócolo",
+      "pt-BR": "Sr. Brócolis",
+      ru: "Мистер Брокколи",
+      "zh-CN": "西兰花先生",
+      ar: "السيد بروكلي",
+      ja: "ミスター・ブロッコリー",
+      hu: "Brokkoli úr",
+      cs: "Pan Brokolice",
+      pl: "Pan Brokuł",
+      tr: "Bay Brokoli",
+      sv: "Herr Broccoli",
+      ur: "مسٹر بروکلی",
     });
   });
 

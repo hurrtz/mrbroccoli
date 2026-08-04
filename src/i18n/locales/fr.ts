@@ -25,7 +25,7 @@ export const fr = {
   ...onboardingTranslations.fr,
   ...premiumTranslations.fr,
   ...transcriptEditTranslations.fr,
-  appName: "Mr Broccoli",
+  appName: "M. Brocoli",
   retry: "Réessayer",
   dismiss: "Fermer",
   done: "Terminé",

@@ -1,8 +1,6 @@
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
 
-import { Button } from "../../design-system/NativeControls";
-
 import { IconButton } from "../../design-system/IconButton";
 import { Colors } from "../../theme/colors";
 import { fonts } from "../../theme/typography";
@@ -25,7 +23,7 @@ export const MainScreenTopBar = React.memo(function MainScreenTopBar({
   colors,
   compact = false,
   debugLogActive = false,
-  debugLogLabel = "LOG",
+  debugLogLabel = "Debug log",
   drawerLabel,
   onOpenDrawer,
   onOpenSettings,
@@ -79,33 +77,13 @@ export const MainScreenTopBar = React.memo(function MainScreenTopBar({
 
       <View style={styles.actions}>
         {onToggleDebugLog ? (
-          <Button
-            type="ghost"
-            size="small"
-            style={StyleSheet.flatten([
-              styles.iconButton,
-              {
-                backgroundColor: debugLogActive
-                  ? colors.accentSoft
-                  : "transparent",
-                borderColor: debugLogActive ? colors.accent : "transparent",
-              },
-            ])}
-            activeStyle={{ backgroundColor: colors.surfaceAlt }}
+          <IconButton
+            icon="bug"
+            active={debugLogActive}
             onPress={onToggleDebugLog}
             accessibilityLabel={debugLogLabel}
-          >
-            <Text
-              style={[
-                styles.logButtonText,
-                {
-                  color: debugLogActive ? colors.accent : colors.textSecondary,
-                },
-              ]}
-            >
-              {debugLogLabel}
-            </Text>
-          </Button>
+            testID="main-debug-log-button"
+          />
         ) : null}
 
         <IconButton
@@ -137,24 +115,10 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  iconButton: {
-    width: 44,
-    height: 44,
-    minWidth: 44,
-    minHeight: 44,
-    borderRadius: 12,
-    paddingHorizontal: 0,
-    borderWidth: 1,
-  },
   actions: {
     flexDirection: "row",
     alignItems: "center",
     gap: 10,
-  },
-  logButtonText: {
-    fontSize: 11,
-    letterSpacing: 0.6,
-    fontFamily: fonts.displayHeavy,
   },
   wordmark: {
     flexDirection: "row",

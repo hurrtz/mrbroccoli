@@ -25,7 +25,7 @@ export const it = {
   ...onboardingTranslations.it,
   ...premiumTranslations.it,
   ...transcriptEditTranslations.it,
-  appName: "Mr Broccoli",
+  appName: "Sig. Broccoli",
   retry: "Riprova",
   dismiss: "Chiudi",
   done: "Fatto",

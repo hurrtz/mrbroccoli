@@ -25,7 +25,7 @@ export const zhCN = {
   ...onboardingTranslations["zh-CN"],
   ...premiumTranslations["zh-CN"],
   ...transcriptEditTranslations["zh-CN"],
-  appName: "Mr Broccoli",
+  appName: "西兰花先生",
   retry: "重试",
   dismiss: "关闭",
   done: "完成",

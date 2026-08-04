@@ -25,7 +25,7 @@ export const ja = {
   ...onboardingTranslations.ja,
   ...premiumTranslations.ja,
   ...transcriptEditTranslations.ja,
-  appName: "Mr Broccoli",
+  appName: "ミスター・ブロッコリー",
   retry: "再試行",
   dismiss: "閉じる",
   done: "完了",

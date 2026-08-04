@@ -59,6 +59,9 @@ the complete Play Store translations are kept in a dedicated file under
 
 ### Changed
 
+- Update the home-screen wordmark immediately with the selected interface
+  language, and replace the visible translated debug-log text with the shared
+  bug icon while retaining an accessible localized label.
 - Prefer stronger automatic Free models when the phone has enough headroom.
   Qwen3 0.6B remains a constrained-device fallback instead of displacing
   Granite on the Quick card; high-end German profiles now pair Granite with

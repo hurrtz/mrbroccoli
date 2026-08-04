@@ -25,7 +25,7 @@ export const ru = {
   ...onboardingTranslations.ru,
   ...premiumTranslations.ru,
   ...transcriptEditTranslations.ru,
-  appName: "Mr Broccoli",
+  appName: "Мистер Брокколи",
   retry: "Повторить попытку",
   dismiss: "Закрыть",
   done: "Готово",

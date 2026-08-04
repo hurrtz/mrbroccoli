@@ -25,7 +25,7 @@ export const ur = {
   ...onboardingTranslations.ur,
   ...premiumTranslations.ur,
   ...transcriptEditTranslations.ur,
-  appName: "Mr Broccoli",
+  appName: "مسٹر بروکلی",
   retry: "دوبارہ کوشش کریں۔",
   dismiss: "بند کریں",
   done: "مکمل",

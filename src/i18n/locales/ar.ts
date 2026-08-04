@@ -25,7 +25,7 @@ export const ar = {
   ...onboardingTranslations.ar,
   ...premiumTranslations.ar,
   ...transcriptEditTranslations.ar,
-  appName: "Mr Broccoli",
+  appName: "السيد بروكلي",
   retry: "أعد المحاولة",
   dismiss: "إغلاق",
   done: "تم",

@@ -25,7 +25,7 @@ export const ptBR = {
   ...onboardingTranslations.ptBR,
   ...premiumTranslations.ptBR,
   ...transcriptEditTranslations.ptBR,
-  appName: "Mr Broccoli",
+  appName: "Sr. Brócolis",
   retry: "Tentar novamente",
   dismiss: "Fechar",
   done: "Feito",

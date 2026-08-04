@@ -25,7 +25,7 @@ export const hu = {
   ...onboardingTranslations.hu,
   ...premiumTranslations.hu,
   ...transcriptEditTranslations.hu,
-  appName: "Mr Broccoli",
+  appName: "Brokkoli úr",
   retry: "Próbálja újra",
   dismiss: "Bezárás",
   done: "Kész",

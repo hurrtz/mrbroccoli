@@ -25,7 +25,7 @@ export const tr = {
   ...onboardingTranslations.tr,
   ...premiumTranslations.tr,
   ...transcriptEditTranslations.tr,
-  appName: "Mr Broccoli",
+  appName: "Bay Brokoli",
   retry: "Yeniden dene",
   dismiss: "Reddet",
   done: "Tamam",

@@ -25,7 +25,7 @@ export const uk = {
   ...onboardingTranslations.uk,
   ...premiumTranslations.uk,
   ...transcriptEditTranslations.uk,
-  appName: "Mr Broccoli",
+  appName: "Пан Броколі",
   retry: "Повторити",
   dismiss: "Закрити",
   done: "Готово",

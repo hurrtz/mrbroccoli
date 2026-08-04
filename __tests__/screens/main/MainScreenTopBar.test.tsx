@@ -16,6 +16,7 @@ describe("MainScreenTopBar", () => {
           brandName="Mr Broccoli"
           colors={lightColors}
           compact={compact}
+          debugLogLabel="Capture debug log"
           drawerLabel="Conversations"
           onOpenDrawer={onOpenDrawer}
           onOpenSettings={onOpenSettings}
@@ -35,7 +36,13 @@ describe("MainScreenTopBar", () => {
       expect(screen.getByLabelText("Settings").props.accessibilityRole).toBe(
         "button",
       );
-      expect(screen.getByText("LOG")).toBeTruthy();
+      expect(screen.queryByText("LOG")).toBeNull();
+      expect(
+        screen.UNSAFE_getByProps({ testID: "phosphor-icon-bug" }),
+      ).toBeTruthy();
+      expect(
+        screen.getByLabelText("Capture debug log").props.accessibilityRole,
+      ).toBe("button");
 
       const drawerButton = screen.getByLabelText("Conversations");
       const settingsButton = screen.getByLabelText("Settings");
