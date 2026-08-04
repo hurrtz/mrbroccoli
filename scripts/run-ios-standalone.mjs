@@ -68,8 +68,8 @@ export function connectedPhysicalIphones(devices) {
     (device) =>
       device.hardwareProperties?.platform === "iOS" &&
       device.hardwareProperties?.reality === "physical" &&
-      device.connectionProperties?.tunnelState === "connected" &&
-      device.deviceProperties?.ddiServicesAvailable === true,
+      device.connectionProperties?.pairingState === "paired" &&
+      device.connectionProperties?.tunnelState !== "unavailable",
   );
 }
 

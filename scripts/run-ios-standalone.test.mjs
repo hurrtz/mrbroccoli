@@ -17,10 +17,12 @@ function device({
   platform = "iOS",
   reality = "physical",
   connected = true,
+  paired = true,
 }) {
   return {
     identifier,
     connectionProperties: {
+      pairingState: paired ? "paired" : "unpaired",
       tunnelState: connected ? "connected" : "unavailable",
     },
     deviceProperties: {
@@ -57,6 +59,25 @@ test("selects only a connected physical iPhone", () => {
   assert.equal(selectDevice(devices, null), connectedIphone);
   assert.equal(selectDevice(devices, "Phone"), connectedIphone);
   assert.equal(selectDevice(devices, "phone-1"), connectedIphone);
+});
+
+test("selects a paired iPhone before its developer services are active", () => {
+  const dormantIphone = device({ name: "Dormant iPhone", udid: "phone-1" });
+  dormantIphone.connectionProperties.tunnelState = "disconnected";
+  dormantIphone.deviceProperties.ddiServicesAvailable = false;
+
+  assert.deepEqual(connectedPhysicalIphones([dormantIphone]), [dormantIphone]);
+  assert.equal(selectDevice([dormantIphone], "Dormant iPhone"), dormantIphone);
+});
+
+test("rejects an unpaired physical iPhone", () => {
+  const unpairedIphone = device({
+    name: "Unpaired iPhone",
+    paired: false,
+    udid: "phone-1",
+  });
+
+  assert.deepEqual(connectedPhysicalIphones([unpairedIphone]), []);
 });
 
 test("requires an explicit selector when multiple iPhones are connected", () => {

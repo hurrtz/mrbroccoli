@@ -154,6 +154,9 @@ the complete Play Store translations are kept in a dedicated file under
 
 ### Fixed
 
+- Let the standalone iOS deployment script find a paired physical iPhone while
+  its CoreDevice tunnel and developer services are still dormant, matching
+  Expo's device discovery instead of incorrectly reporting the phone missing.
 - Tell small on-device reasoning models to treat the latest message as the
   current task and not blend an earlier topic into the answer when a branch
   changes subject.
