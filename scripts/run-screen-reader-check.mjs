@@ -8,8 +8,10 @@ import {
   validateScreenReaderHierarchy,
 } from "./screen-reader/hierarchy.mjs";
 import { runIosScreenReaderCheck } from "./screen-reader/ios.mjs";
-import { executeCommand } from "./screen-reader/runtime.mjs";
-import { DEFAULT_APP_ID } from "./screen-reader/runtime.mjs";
+import {
+  DEFAULT_APP_ID,
+  executeCommand,
+} from "./screen-reader/runtime.mjs";
 
 export { flattenHierarchy, validateScreenReaderHierarchy };
 
