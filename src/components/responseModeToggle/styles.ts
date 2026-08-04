@@ -137,6 +137,12 @@ export const responseModeToggleStyles = StyleSheet.create({
     fontFamily: fonts.display,
     textAlign: "center",
   },
+  localModeLabel: {
+    fontFamily: fonts.displayHeavy,
+    fontSize: 16,
+    lineHeight: 21,
+    textAlign: "center",
+  },
   modelTextCompact: {
     fontSize: 12,
     lineHeight: 15,

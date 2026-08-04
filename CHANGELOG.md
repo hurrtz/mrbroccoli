@@ -71,7 +71,8 @@ the complete Play Store translations are kept in a dedicated file under
   now confirms four plain-language capabilities with large green checks
   without exposing model brands,
   presents download size and setup time directly on the recommendation card,
-  and uses the same plain-language Quick and Thorough names on the Home cards.
+  and reduces the Free Home cards to only `Quick response` and
+  `Thorough thinking`.
   Exact model names remain available in Advanced setup and Settings.
 - Arrange both automatic and custom setup summaries with Quick responses and
   Thorough reasoning first, followed by Text to Speech and Speech to Text.

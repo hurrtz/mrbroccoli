@@ -44,7 +44,7 @@ describe("ResponseModeToggle", () => {
     });
   });
 
-  it("uses reassuring capability names for local Home cards", () => {
+  it("shows only the simple response names on local Home cards", () => {
     const screen = renderWithProviders(
       <ResponseModeToggle
         selected="quick"
@@ -72,18 +72,24 @@ describe("ResponseModeToggle", () => {
       />,
     );
 
-    expect(screen.getByText("Model for quick responses")).toBeTruthy();
-    expect(screen.getByText("Model for thorough reasoning")).toBeTruthy();
-    expect(screen.getAllByText("On-device AI")).toHaveLength(2);
+    expect(screen.getByText("Quick response")).toBeTruthy();
+    expect(screen.getByText("Thorough thinking")).toBeTruthy();
+    expect(screen.queryByText("On-device AI")).toBeNull();
     expect(screen.queryByText(/Granite/i)).toBeNull();
     expect(screen.queryByText(/Ministral/i)).toBeNull();
+    expect(screen.queryByTestId("response-mode-provider-quick")).toBeNull();
+    expect(screen.queryByTestId("response-mode-provider-thorough")).toBeNull();
+    expect(screen.queryByTestId("response-mode-family-quick")).toBeNull();
+    expect(screen.queryByTestId("response-mode-family-thorough")).toBeNull();
+    expect(screen.queryByTestId("response-mode-effort-quick")).toBeNull();
+    expect(screen.queryByTestId("response-mode-effort-thorough")).toBeNull();
     expect(
       screen.getByTestId("response-mode-option-quick").props.accessibilityLabel,
-    ).toContain("Model for quick responses");
+    ).toContain("Quick response");
     expect(
       screen.getByTestId("response-mode-option-thorough").props
         .accessibilityLabel,
-    ).toContain("Model for thorough reasoning");
+    ).toContain("Thorough thinking");
   });
 
   it("uses a three-row horizontal layout for two portrait cards", () => {

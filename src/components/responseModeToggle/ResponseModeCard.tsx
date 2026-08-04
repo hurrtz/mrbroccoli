@@ -286,12 +286,12 @@ export function ResponseModeCard({
   const local = route.runtime === "local" && Boolean(route.localModelId);
   const localModel =
     local && route.localModelId ? getLocalModel(route.localModelId) : null;
-  const modelLabel = localModel
+  const modelLabel = local
     ? t(
-        localModel.capability === "llm" &&
+        localModel?.capability === "llm" &&
           localModel.responseProfile === "thorough"
-          ? "onboardingBestSetupThoroughModel"
-          : "onboardingBestSetupQuickModel",
+          ? "freeHomeThoroughMode"
+          : "freeHomeQuickMode",
       )
     : getProviderModelName(route.provider, route.model);
   const routeLabel = local
@@ -350,7 +350,7 @@ export function ResponseModeCard({
       onPress={disabled ? undefined : () => onSelect(id)}
       accessibilityRole="button"
       accessibilityLabel={t("useResponseMode", {
-        mode: `${routeLabel}. ${modelLabel}`,
+        mode: local ? modelLabel : `${routeLabel}. ${modelLabel}`,
       })}
       accessibilityState={{ disabled, selected: active }}
     >
@@ -379,21 +379,37 @@ export function ResponseModeCard({
               : null,
           ]}
         >
-          <ProviderMark
-            activeForeground={activeForeground}
-            compact={compact}
-            detailedLayout={detailedLayout}
-            enlargeThreeCardIcons={enlargeThreeCardIcons}
-            highlighted={highlighted}
-            id={id}
-            local={local}
-            provider={route.provider}
-            singleMode={singleMode}
-          />
-          {detailedLayout ? (
-            <DetailedModelDetails {...contentProps} />
+          {local ? (
+            <Text
+              testID={`response-mode-model-${id}`}
+              style={[
+                styles.localModeLabel,
+                {
+                  color: highlighted ? activeForeground : colors.text,
+                },
+              ]}
+            >
+              {modelLabel}
+            </Text>
           ) : (
-            <DenseModelDetails {...contentProps} />
+            <>
+              <ProviderMark
+                activeForeground={activeForeground}
+                compact={compact}
+                detailedLayout={detailedLayout}
+                enlargeThreeCardIcons={enlargeThreeCardIcons}
+                highlighted={highlighted}
+                id={id}
+                local={local}
+                provider={route.provider}
+                singleMode={singleMode}
+              />
+              {detailedLayout ? (
+                <DetailedModelDetails {...contentProps} />
+              ) : (
+                <DenseModelDetails {...contentProps} />
+              )}
+            </>
           )}
         </View>
       </View>
