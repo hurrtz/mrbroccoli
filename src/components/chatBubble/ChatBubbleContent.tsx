@@ -11,15 +11,20 @@ import { UberModeAuditCard } from "./UberModeAuditCard";
 import { UsageCard } from "./UsageCard";
 import { WebSearchReferences } from "./WebSearchReferences";
 import { ConversationKnowledgeReferences } from "./ConversationKnowledgeReferences";
+import { MessageBranchIndicator } from "./MessageBranchIndicator";
 import type { ChatBubbleProps } from "./types";
 import { useLocalization } from "../../i18n";
 import { useTheme } from "../../theme/ThemeContext";
 
 export function ChatBubbleContent({
   message,
+  branchChildren,
+  branchOrigin,
   onCopy,
   onEdit,
-  onFork,
+  onBranch,
+  onOpenBranches,
+  onOpenBranchSource,
   onSaveInsight,
   onShare,
   onRepeat,
@@ -41,6 +46,13 @@ export function ChatBubbleContent({
         t={t}
       />
       <MessageText message={message} selectable={selectable} />
+      <MessageBranchIndicator
+        messageId={message.id}
+        branchChildren={branchChildren}
+        branchOrigin={branchOrigin}
+        onOpenBranches={onOpenBranches}
+        onOpenBranchSource={onOpenBranchSource}
+      />
       <ReplyFailureCard message={message} onRetry={onRetry} />
       <PipelineNotices
         message={message}
@@ -53,14 +65,12 @@ export function ChatBubbleContent({
       <WebSearchReferences message={message} />
       <UsageCard message={message} showUsageStats={showUsageStats} />
       {selectable &&
-      (message.role === "assistant" || onEdit || onFork || onSaveInsight) ? (
+      (message.role === "assistant" || onEdit || onBranch || onSaveInsight) ? (
         <MessageActions
           message={message}
           onCopy={onCopy}
           onEdit={message.role === "user" ? onEdit : undefined}
-          onFork={
-            message.role === "user" && message.editedAt ? onFork : undefined
-          }
+          onBranch={onBranch}
           onSaveInsight={onSaveInsight}
           onShare={onShare}
           onRepeat={onRepeat}

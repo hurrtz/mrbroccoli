@@ -10,7 +10,7 @@ import {
   Conversation,
   ConversationArtifact,
   ConversationArtifactKind,
-  ConversationFork,
+  ConversationBranchResult,
   ConversationMeta,
   ConversationSettings,
   Message,
@@ -53,7 +53,7 @@ import {
   saveConversationIntegrityRepairSnapshot,
 } from "../../services/conversationIntegrityStorage";
 
-async function cloneMessagesForFork(messages: Message[]) {
+async function cloneMessagesForBranch(messages: Message[]) {
   const attachmentsBySourceId = new Map<string, MessageImageAttachment>();
   const createdAttachments: MessageImageAttachment[] = [];
   const messageIds = new Map<string, string>();
@@ -425,8 +425,16 @@ export function useConversationMutations(params: {
         id: uuid.v4() as string,
         timestamp: new Date().toISOString(),
       };
+      const startsAssistantCheckpointBranch =
+        messageInput.role === "user" &&
+        currentConversation.branch?.kind === "continue-from-message" &&
+        currentConversation.messages.at(-1)?.id ===
+          currentConversation.branch.branchMessageId;
       const updatedConversation: Conversation = {
         ...currentConversation,
+        ...(startsAssistantCheckpointBranch
+          ? { title: truncateConversationTitle(message.content) }
+          : {}),
         updatedAt: message.timestamp,
         messages: [...currentConversation.messages, message],
       };
@@ -448,6 +456,7 @@ export function useConversationMutations(params: {
             meta.id === updatedConversation.id
               ? {
                   ...meta,
+                  title: updatedConversation.title,
                   createdAt: updatedConversation.createdAt,
                   updatedAt: updatedConversation.updatedAt,
                   messageCount: updatedConversation.messages.length,
@@ -603,8 +612,8 @@ export function useConversationMutations(params: {
     ],
   );
 
-  const forkConversationAtMessage = useCallback(
-    async (messageId: string): Promise<ConversationFork | null> => {
+  const branchConversationAtMessage = useCallback(
+    async (messageId: string): Promise<ConversationBranchResult | null> => {
       const currentConversation = activeConversationRef.current;
       const messageIndex =
         currentConversation?.messages.findIndex(
@@ -615,20 +624,36 @@ export function useConversationMutations(params: {
       if (
         !currentConversation ||
         messageIndex < 0 ||
-        sourceMessage?.role !== "user" ||
-        !sourceMessage.editedAt
+        !sourceMessage
       ) {
         return null;
       }
 
       const now = new Date().toISOString();
-      const { clonedMessages, messageIds } = await cloneMessagesForFork(
+      const { clonedMessages, messageIds } = await cloneMessagesForBranch(
         currentConversation.messages.slice(0, messageIndex + 1),
       );
-      const promptMessage = clonedMessages.at(-1);
-      if (!promptMessage) {
+      const checkpointMessage = clonedMessages.at(-1);
+      if (!checkpointMessage) {
         return null;
       }
+
+      const conversationId = uuid.v4() as string;
+      const rootConversationId =
+        currentConversation.branch?.rootConversationId ??
+        currentConversation.id;
+      const familyIds = [
+        ...new Set([
+          currentConversation.id,
+          ...conversationMetas
+            .filter(
+              (meta) =>
+                meta.id === rootConversationId ||
+                meta.branch?.rootConversationId === rootConversationId,
+            )
+            .map(({ id }) => id),
+        ]),
+      ];
 
       const artifacts = currentConversation.artifacts
         ?.map((artifact) => {
@@ -647,17 +672,29 @@ export function useConversationMutations(params: {
           Boolean(artifact),
         );
       const conversation: Conversation = {
-        id: uuid.v4() as string,
-        title: truncateConversationTitle(promptMessage.content),
+        id: conversationId,
+        title: truncateConversationTitle(
+          sourceMessage.role === "user"
+            ? checkpointMessage.content
+            : currentConversation.title,
+        ),
         createdAt: now,
         updatedAt: now,
         messages: clonedMessages,
-        knowledgeExcludedConversationIds: [
-          ...new Set([
-            ...(currentConversation.knowledgeExcludedConversationIds ?? []),
-            currentConversation.id,
-          ]),
-        ],
+        knowledgeExcludedConversationIds: familyIds,
+        branch: {
+          rootConversationId,
+          parentConversationId: currentConversation.id,
+          parentMessageId: sourceMessage.id,
+          branchMessageId: checkpointMessage.id,
+          kind:
+            sourceMessage.role === "assistant"
+              ? "continue-from-message"
+              : sourceMessage.editedAt
+                ? "edited-prompt"
+                : "alternative-response",
+          createdAt: now,
+        },
         ...(artifacts?.length ? { artifacts } : {}),
         ...(currentConversation.settings
           ? {
@@ -673,7 +710,29 @@ export function useConversationMutations(params: {
       };
       const meta = buildConversationMetaFromConversation(conversation);
 
-      await saveConversation(conversation);
+      await Promise.all([
+        saveConversation(conversation),
+        ...familyIds.map(async (familyConversationId) => {
+          const familyConversation =
+            familyConversationId === currentConversation.id
+              ? currentConversation
+              : await readConversation(familyConversationId);
+          if (!familyConversation) {
+            return;
+          }
+
+          await saveConversation({
+            ...familyConversation,
+            knowledgeExcludedConversationIds: [
+              ...new Set([
+                ...(familyConversation.knowledgeExcludedConversationIds ?? []),
+                ...familyIds.filter((id) => id !== familyConversationId),
+                conversationId,
+              ]),
+            ],
+          });
+        }),
+      ]);
       setConversations((previous) => persistMetas([meta, ...previous]));
       setActiveConversationValue(conversation);
 
@@ -684,11 +743,12 @@ export function useConversationMutations(params: {
       return {
         conversation,
         contextMessages: clonedMessages.slice(0, -1),
-        promptMessage,
+        checkpointMessage,
       };
     },
     [
       activeConversationRef,
+      conversationMetas,
       pastConversationKnowledgeEnabled,
       persistMetas,
       setActiveConversationValue,
@@ -969,6 +1029,11 @@ export function useConversationMutations(params: {
       const usedIds = new Set(existingMetasById.keys());
       const restoredMetas: ConversationMeta[] = [];
       const restoredByOriginalId = new Map<string, Conversation>();
+      const pendingRestores: {
+        originalId: string;
+        conversation: Conversation;
+        pinned: boolean;
+      }[] = [];
       let conversationsCopied = 0;
       let conversationsRestored = 0;
       let conversationsSkipped = 0;
@@ -1006,11 +1071,50 @@ export function useConversationMutations(params: {
           ...(await materializeBackupConversation(record)),
           id: restoredId,
         };
-        const restoredMeta = {
-          ...buildConversationMetaFromConversation(restoredConversation),
+        restoredByOriginalId.set(originalId, restoredConversation);
+        pendingRestores.push({
+          originalId,
+          conversation: restoredConversation,
           pinned: record.pinned,
-        };
+        });
+        conversationsRestored += 1;
+      }
 
+      const restoredIdByOriginalId = new Map(
+        [...restoredByOriginalId.entries()].map(
+          ([originalId, conversation]) => [originalId, conversation.id] as const,
+        ),
+      );
+      for (const pending of pendingRestores) {
+        const remapConversationId = (id: string) =>
+          restoredIdByOriginalId.get(id) ?? id;
+        const restoredConversation: Conversation = {
+          ...pending.conversation,
+          ...(pending.conversation.knowledgeExcludedConversationIds
+            ? {
+                knowledgeExcludedConversationIds: [
+                  ...new Set(
+                    pending.conversation.knowledgeExcludedConversationIds.map(
+                      remapConversationId,
+                    ),
+                  ),
+                ],
+              }
+            : {}),
+          ...(pending.conversation.branch
+            ? {
+                branch: {
+                  ...pending.conversation.branch,
+                  rootConversationId: remapConversationId(
+                    pending.conversation.branch.rootConversationId,
+                  ),
+                  parentConversationId: remapConversationId(
+                    pending.conversation.branch.parentConversationId,
+                  ),
+                },
+              }
+            : {}),
+        };
         await saveConversation(restoredConversation);
         if (
           pastConversationKnowledgeEnabled &&
@@ -1018,9 +1122,11 @@ export function useConversationMutations(params: {
         ) {
           void syncConversationKnowledge(restoredConversation, true);
         }
-        restoredMetas.push(restoredMeta);
-        restoredByOriginalId.set(originalId, restoredConversation);
-        conversationsRestored += 1;
+        restoredMetas.push({
+          ...buildConversationMetaFromConversation(restoredConversation),
+          pinned: pending.pinned,
+        });
+        restoredByOriginalId.set(pending.originalId, restoredConversation);
       }
 
       if (restoredMetas.length > 0) {
@@ -1193,7 +1299,7 @@ export function useConversationMutations(params: {
     createConversation,
     deleteConversation,
     editUserMessage,
-    forkConversationAtMessage,
+    branchConversationAtMessage,
     restoreConversationBackup,
     getConversationById,
     inspectConversationIntegrity,

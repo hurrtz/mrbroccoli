@@ -3,6 +3,7 @@ import { Conversation, ConversationMeta } from "../types";
 import {
   persistActiveConversationId,
   persistConversationMeta,
+  saveConversation,
 } from "./conversations/storage";
 import { useConversationHydration } from "./conversations/useConversationHydration";
 import { useConversationMutations } from "./conversations/useConversationMutations";
@@ -68,7 +69,7 @@ export function useConversations({
     createConversation,
     deleteConversation,
     editUserMessage,
-    forkConversationAtMessage,
+    branchConversationAtMessage,
     restoreConversationBackup,
     getConversationById,
     inspectConversationIntegrity,
@@ -91,6 +92,76 @@ export function useConversations({
     setConversations,
     pastConversationKnowledgeEnabled,
   });
+  const branchExclusionReconciliationRef = useRef<string | null>(null);
+  const branchFamilySignature = conversations
+    .map(
+      ({ branch, id }) =>
+        `${id}:${branch?.rootConversationId ?? id}:${
+          branch?.parentConversationId ?? "root"
+        }`,
+    )
+    .join("|");
+
+  useEffect(() => {
+    if (
+      !loaded ||
+      branchExclusionReconciliationRef.current === branchFamilySignature
+    ) {
+      return;
+    }
+    branchExclusionReconciliationRef.current = branchFamilySignature;
+    const familyIdsByRoot = new Map<string, string[]>();
+    for (const meta of conversations) {
+      const rootId = meta.branch?.rootConversationId ?? meta.id;
+      familyIdsByRoot.set(rootId, [
+        ...(familyIdsByRoot.get(rootId) ?? []),
+        meta.id,
+      ]);
+    }
+
+    void Promise.all(
+      [...familyIdsByRoot.values()]
+        .filter((familyIds) => familyIds.length > 1)
+        .flatMap((familyIds) =>
+          familyIds.map(async (conversationId) => {
+            const conversation = await getConversationById(conversationId);
+            if (!conversation) {
+              return;
+            }
+            const nextExcludedIds = [
+              ...new Set([
+                ...(conversation.knowledgeExcludedConversationIds ?? []),
+                ...familyIds.filter((id) => id !== conversationId),
+              ]),
+            ];
+            if (
+              JSON.stringify(nextExcludedIds) ===
+              JSON.stringify(
+                conversation.knowledgeExcludedConversationIds ?? [],
+              )
+            ) {
+              return;
+            }
+
+            const updatedConversation = {
+              ...conversation,
+              knowledgeExcludedConversationIds: nextExcludedIds,
+            };
+            await saveConversation(updatedConversation);
+            if (activeConversationRef.current?.id === conversationId) {
+              setActiveConversationValue(updatedConversation);
+            }
+          }),
+        ),
+    );
+  }, [
+    activeConversationRef,
+    branchFamilySignature,
+    conversations,
+    getConversationById,
+    loaded,
+    setActiveConversationValue,
+  ]);
   const knowledgeReconciliationRef = useRef<string | null>(null);
   const knowledgeConversationSignature = conversations
     .map(({ id, isPrivate, title }) => `${id}:${isPrivate ? 1 : 0}:${title}`)
@@ -161,7 +232,7 @@ export function useConversations({
     searchConversations,
     deleteConversation,
     editUserMessage,
-    forkConversationAtMessage,
+    branchConversationAtMessage,
     restoreConversationBackup,
     clearActiveConversation,
   };

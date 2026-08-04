@@ -569,6 +569,20 @@ export interface ConversationArtifact {
   createdAt: string;
 }
 
+export type ConversationBranchKind =
+  | "edited-prompt"
+  | "alternative-response"
+  | "continue-from-message";
+
+export interface ConversationBranchOrigin {
+  rootConversationId: string;
+  parentConversationId: string;
+  parentMessageId: string;
+  branchMessageId: string;
+  kind: ConversationBranchKind;
+  createdAt: string;
+}
+
 export interface Conversation {
   id: string;
   title: string;
@@ -581,13 +595,14 @@ export interface Conversation {
   contextSummary?: string;
   summarizedMessageCount?: number;
   knowledgeExcludedConversationIds?: string[];
+  branch?: ConversationBranchOrigin;
   isPrivate?: boolean;
 }
 
-export interface ConversationFork {
+export interface ConversationBranchResult {
   conversation: Conversation;
   contextMessages: Message[];
-  promptMessage: Message;
+  checkpointMessage: Message;
 }
 
 export interface ConversationMeta {
@@ -601,5 +616,7 @@ export interface ConversationMeta {
   lastModel: string | null;
   lastProvider: Provider | null;
   pinned: boolean;
+  branch?: ConversationBranchOrigin;
+  branchSchemaVersion?: 1;
   isPrivate?: boolean;
 }

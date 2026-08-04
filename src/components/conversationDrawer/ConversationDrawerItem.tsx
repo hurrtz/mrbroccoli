@@ -6,13 +6,14 @@ import { Swipeable } from "react-native-gesture-handler";
 
 import { useLocalization } from "../../i18n";
 import { useTheme } from "../../theme/ThemeContext";
-import { ConversationMeta } from "../../types";
+import type { ConversationBranchRow } from "../../utils/conversationBranches";
 import { ProviderIcon } from "../ProviderIcon";
 
+import { ConversationBranchRail } from "./ConversationBranchRail";
 import { styles } from "./styles";
 
 interface ConversationDrawerItemProps {
-  conversation: ConversationMeta;
+  row: ConversationBranchRow;
   active: boolean;
   formatDateTime: (iso: string) => string;
   onDelete: (conversationId: string) => void;
@@ -21,7 +22,7 @@ interface ConversationDrawerItemProps {
 }
 
 export function ConversationDrawerItem({
-  conversation,
+  row,
   active,
   formatDateTime,
   onDelete,
@@ -30,6 +31,7 @@ export function ConversationDrawerItem({
 }: ConversationDrawerItemProps) {
   const { colors } = useTheme();
   const { t } = useLocalization();
+  const { conversation } = row;
   const providers =
     conversation.providers && conversation.providers.length > 0
       ? conversation.providers
@@ -82,15 +84,20 @@ export function ConversationDrawerItem({
       </TouchableOpacity>
       <TouchableOpacity
         testID={`conversation-drawer-item-${conversation.id}`}
-        style={styles.itemPressArea}
+        style={[
+          styles.itemPressArea,
+          { paddingLeft: Math.min(row.depth, 4) * 14 + 22 },
+        ]}
         onPress={() => onSelectConversation(conversation.id)}
         activeOpacity={0.9}
         accessibilityRole="button"
-        accessibilityLabel={
-          conversation.isPrivate
-            ? `${conversation.title}. ${t("privateConversation")}`
-            : conversation.title
-        }
+        accessibilityLabel={[
+          conversation.title,
+          conversation.isPrivate ? t("privateConversation") : null,
+          conversation.branch ? t("branchStartsHere") : null,
+        ]
+          .filter(Boolean)
+          .join(". ")}
         accessibilityState={{ selected: active }}
       >
         <View style={styles.itemHeader}>
@@ -196,7 +203,10 @@ export function ConversationDrawerItem({
           },
         ]}
       >
-        <View style={styles.item}>{cardBody}</View>
+        <View style={styles.item}>
+          <ConversationBranchRail row={row} active={active} />
+          {cardBody}
+        </View>
       </View>
     </Swipeable>
   );

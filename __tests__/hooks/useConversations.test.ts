@@ -165,6 +165,131 @@ describe("useConversations", () => {
     expect(result.current.conversations[0]?.title).toBe(fullTitle);
   });
 
+  it("infers exact branch lineage for forks created before branch metadata existed", async () => {
+    const parent: Conversation = {
+      id: "legacy-parent",
+      title: "Legacy parent",
+      createdAt: "2026-08-04T08:00:00.000Z",
+      updatedAt: "2026-08-04T08:04:00.000Z",
+      messages: [
+        {
+          id: "parent-user-1",
+          role: "user",
+          content: "First question",
+          model: null,
+          provider: null,
+          timestamp: "2026-08-04T08:00:00.000Z",
+        },
+        {
+          id: "parent-assistant-1",
+          role: "assistant",
+          content: "First answer",
+          model: "gpt-5.4",
+          provider: "openai",
+          timestamp: "2026-08-04T08:01:00.000Z",
+        },
+        {
+          id: "parent-user-2",
+          role: "user",
+          content: "Corrected follow-up",
+          editedAt: "2026-08-04T08:03:00.000Z",
+          model: null,
+          provider: null,
+          timestamp: "2026-08-04T08:02:00.000Z",
+        },
+        {
+          id: "parent-assistant-2",
+          role: "assistant",
+          content: "Old divergent reply",
+          model: "gpt-5.4",
+          provider: "openai",
+          timestamp: "2026-08-04T08:04:00.000Z",
+        },
+      ],
+    };
+    const legacyBranch: Conversation = {
+      id: "legacy-child",
+      title: "Corrected follow-up",
+      createdAt: "2026-08-04T08:03:30.000Z",
+      updatedAt: "2026-08-04T08:03:30.000Z",
+      knowledgeExcludedConversationIds: [parent.id],
+      messages: [
+        ...parent.messages.slice(0, 3).map((message, index) => ({
+          ...message,
+          id: `child-message-${index}`,
+        })),
+        {
+          id: "child-generated-reply",
+          role: "assistant",
+          content: "New reply in the branch",
+          model: "gpt-5.4",
+          provider: "openai",
+          timestamp: "2026-08-04T08:05:00.000Z",
+        },
+      ],
+    };
+    const stored = new Map<string, string>([
+      ["@mrbroccoli/active_conversation", legacyBranch.id],
+      [`@mrbroccoli/conversation/${parent.id}`, JSON.stringify(parent)],
+      [
+        `@mrbroccoli/conversation/${legacyBranch.id}`,
+        JSON.stringify(legacyBranch),
+      ],
+      [
+        "@mrbroccoli/conversations",
+        JSON.stringify(
+          [legacyBranch, parent].map((conversation) => ({
+            id: conversation.id,
+            title: conversation.title,
+            createdAt: conversation.createdAt,
+            updatedAt: conversation.updatedAt,
+            messageCount: conversation.messages.length,
+            providers: [],
+            providerModels: {},
+            lastModel: null,
+            lastProvider: null,
+            pinned: false,
+            isPrivate: false,
+          })),
+        ),
+      ],
+    ]);
+    (AsyncStorage.getItem as jest.Mock).mockImplementation(
+      async (key: string) => stored.get(key) ?? null,
+    );
+    (AsyncStorage.setItem as jest.Mock).mockImplementation(
+      async (key: string, value: string) => {
+        stored.set(key, value);
+      },
+    );
+
+    const { result } = renderHook(() => useConversations());
+
+    await waitFor(() => {
+      expect(result.current.activeConversation?.branch).toEqual(
+        expect.objectContaining({
+          rootConversationId: parent.id,
+          parentConversationId: parent.id,
+          parentMessageId: "parent-user-2",
+          branchMessageId: "child-message-2",
+          kind: "edited-prompt",
+        }),
+      );
+    });
+    expect(
+      result.current.conversations.find(({ id }) => id === legacyBranch.id)
+        ?.branch,
+    ).toEqual(result.current.activeConversation?.branch);
+    await waitFor(() => {
+      const restoredParent = JSON.parse(
+        stored.get(`@mrbroccoli/conversation/${parent.id}`) ?? "{}",
+      ) as Conversation;
+      expect(restoredParent.knowledgeExcludedConversationIds).toContain(
+        legacyBranch.id,
+      );
+    });
+  });
+
   it("merges a conversation created while launch hydration is still reading storage", async () => {
     const storedConversation: Conversation = {
       id: "stored-before-launch",
@@ -389,6 +514,89 @@ describe("useConversations", () => {
       id: localConversation.id,
       title: "Local conversation",
     });
+  });
+
+  it("remaps branch ancestry when a backup family is restored as copies", async () => {
+    const stored = new Map<string, string>();
+    (AsyncStorage.getItem as jest.Mock).mockImplementation(
+      async (key: string) => stored.get(key) ?? null,
+    );
+    (AsyncStorage.setItem as jest.Mock).mockImplementation(
+      async (key: string, value: string) => {
+        stored.set(key, value);
+      },
+    );
+    const { result } = renderHook(() => useConversations());
+    await waitFor(() => expect(result.current.loaded).toBe(true));
+    await act(async () => {
+      result.current.createConversation("Local root");
+    });
+    const conflictingRootId = result.current.activeConversation!.id;
+    const parentMessage = {
+      id: "backup-root-message",
+      role: "assistant" as const,
+      content: "Checkpoint",
+      model: "gpt-5.4",
+      provider: "openai" as const,
+      timestamp: "2026-08-04T10:00:00.000Z",
+    };
+    const childMessage = {
+      ...parentMessage,
+      id: "backup-child-message",
+    };
+
+    await act(async () => {
+      await result.current.restoreConversationBackup(
+        [
+          {
+            conversation: {
+              id: conflictingRootId,
+              title: "Imported root",
+              createdAt: "2026-08-04T10:00:00.000Z",
+              updatedAt: "2026-08-04T10:00:00.000Z",
+              messages: [parentMessage],
+            },
+            pinned: false,
+          },
+          {
+            conversation: {
+              id: "imported-child",
+              title: "Imported child",
+              createdAt: "2026-08-04T10:01:00.000Z",
+              updatedAt: "2026-08-04T10:01:00.000Z",
+              messages: [childMessage],
+              knowledgeExcludedConversationIds: [conflictingRootId],
+              branch: {
+                rootConversationId: conflictingRootId,
+                parentConversationId: conflictingRootId,
+                parentMessageId: parentMessage.id,
+                branchMessageId: childMessage.id,
+                kind: "continue-from-message",
+                createdAt: "2026-08-04T10:01:00.000Z",
+              },
+            },
+            pinned: false,
+          },
+        ],
+        "imported-child",
+      );
+    });
+
+    const copiedRoot = result.current.conversations.find(
+      ({ title }) => title === "Imported root",
+    );
+    expect(copiedRoot?.id).toBeTruthy();
+    expect(copiedRoot?.id).not.toBe(conflictingRootId);
+    expect(result.current.activeConversation).toEqual(
+      expect.objectContaining({
+        id: "imported-child",
+        knowledgeExcludedConversationIds: [copiedRoot?.id],
+        branch: expect.objectContaining({
+          rootConversationId: copiedRoot?.id,
+          parentConversationId: copiedRoot?.id,
+        }),
+      }),
+    );
   });
 
   it("restores backed-up image bytes to a fresh app-owned file", async () => {
@@ -784,10 +992,10 @@ describe("useConversations", () => {
     });
 
     let fork: Awaited<
-      ReturnType<typeof result.current.forkConversationAtMessage>
+      ReturnType<typeof result.current.branchConversationAtMessage>
     > = null;
     await act(async () => {
-      fork = await result.current.forkConversationAtMessage(editedMessageId);
+      fork = await result.current.branchConversationAtMessage(editedMessageId);
     });
 
     expect(fork).not.toBeNull();
@@ -795,6 +1003,12 @@ describe("useConversations", () => {
       expect.objectContaining({
         title: "Corrected follow-up",
         settings: { responseLength: "thorough" },
+        branch: expect.objectContaining({
+          rootConversationId: originalConversationId,
+          parentConversationId: originalConversationId,
+          parentMessageId: editedMessageId,
+          kind: "edited-prompt",
+        }),
       }),
     );
     expect(fork?.conversation.messages).toHaveLength(3);
@@ -807,8 +1021,8 @@ describe("useConversations", () => {
     expect(fork?.conversation.knowledgeExcludedConversationIds).toEqual([
       originalConversationId,
     ]);
-    expect(fork?.promptMessage.id).not.toBe(editedMessageId);
-    expect(fork?.promptMessage.attachments?.[0]).toEqual(
+    expect(fork?.checkpointMessage.id).not.toBe(editedMessageId);
+    expect(fork?.checkpointMessage.attachments?.[0]).toEqual(
       expect.objectContaining({
         id: expect.not.stringMatching(/^source-image$/),
         sharedWithProviders: ["openai"],
@@ -825,6 +1039,7 @@ describe("useConversations", () => {
       result.current.getConversationById(originalConversationId),
     ).resolves.toEqual(
       expect.objectContaining({
+        knowledgeExcludedConversationIds: [fork?.conversation.id],
         messages: expect.arrayContaining([
           expect.objectContaining({
             content: "Answer that should remain only in the original",
@@ -832,6 +1047,140 @@ describe("useConversations", () => {
         ]),
       }),
     );
+  });
+
+  it("branches recursively from assistant checkpoints and isolates the whole family", async () => {
+    const stored = new Map<string, string>();
+    (AsyncStorage.getItem as jest.Mock).mockImplementation(
+      async (key: string) => stored.get(key) ?? null,
+    );
+    (AsyncStorage.setItem as jest.Mock).mockImplementation(
+      async (key: string, value: string) => {
+        stored.set(key, value);
+      },
+    );
+    const { result } = renderHook(() => useConversations());
+    let rootId = "";
+    let rootCheckpointId = "";
+
+    await act(async () => {
+      rootId = result.current.createConversation("Root question");
+      result.current.addMessage({
+        role: "user",
+        content: "Root question",
+        model: null,
+        provider: null,
+      });
+      rootCheckpointId =
+        result.current.addMessage({
+          role: "assistant",
+          content: "Root answer",
+          model: "gpt-5.4",
+          provider: "openai",
+        })?.id ?? "";
+    });
+
+    let firstBranch: Awaited<
+      ReturnType<typeof result.current.branchConversationAtMessage>
+    > = null;
+    await act(async () => {
+      firstBranch = await result.current.branchConversationAtMessage(
+        rootCheckpointId,
+      );
+    });
+    let nestedCheckpointId = "";
+    await act(async () => {
+      result.current.addMessage({
+        role: "user",
+        content: "Follow this branch",
+        model: null,
+        provider: null,
+      });
+      nestedCheckpointId =
+        result.current.addMessage({
+          role: "assistant",
+          content: "Nested answer",
+          model: "gpt-5.4",
+          provider: "openai",
+        })?.id ?? "";
+    });
+
+    let nestedBranch: Awaited<
+      ReturnType<typeof result.current.branchConversationAtMessage>
+    > = null;
+    await act(async () => {
+      nestedBranch = await result.current.branchConversationAtMessage(
+        nestedCheckpointId,
+      );
+    });
+
+    expect(firstBranch?.conversation.branch).toEqual(
+      expect.objectContaining({
+        rootConversationId: rootId,
+        parentConversationId: rootId,
+        parentMessageId: rootCheckpointId,
+        kind: "continue-from-message",
+      }),
+    );
+    expect(nestedBranch?.conversation.branch).toEqual(
+      expect.objectContaining({
+        rootConversationId: rootId,
+        parentConversationId: firstBranch?.conversation.id,
+        parentMessageId: nestedCheckpointId,
+        kind: "continue-from-message",
+      }),
+    );
+
+    const firstBranchId = firstBranch?.conversation.id ?? "";
+    const nestedBranchId = nestedBranch?.conversation.id ?? "";
+    await expect(result.current.getConversationById(rootId)).resolves.toEqual(
+      expect.objectContaining({
+        knowledgeExcludedConversationIds: expect.arrayContaining([
+          firstBranchId,
+          nestedBranchId,
+        ]),
+      }),
+    );
+    await expect(
+      result.current.getConversationById(firstBranchId),
+    ).resolves.toEqual(
+      expect.objectContaining({
+        title: "Follow this branch",
+        knowledgeExcludedConversationIds: expect.arrayContaining([
+          rootId,
+          nestedBranchId,
+        ]),
+      }),
+    );
+    expect(nestedBranch?.conversation.knowledgeExcludedConversationIds).toEqual(
+      expect.arrayContaining([rootId, firstBranchId]),
+    );
+  });
+
+  it("creates an alternative-response branch from an unedited user prompt", async () => {
+    const { result } = renderHook(() => useConversations());
+    let messageId = "";
+    await act(async () => {
+      result.current.createConversation("Try another answer");
+      messageId =
+        result.current.addMessage({
+          role: "user",
+          content: "Try another answer",
+          model: null,
+          provider: null,
+        })?.id ?? "";
+    });
+
+    let branch: Awaited<
+      ReturnType<typeof result.current.branchConversationAtMessage>
+    > = null;
+    await act(async () => {
+      branch = await result.current.branchConversationAtMessage(messageId);
+    });
+
+    expect(branch?.conversation.branch?.kind).toBe("alternative-response");
+    expect(branch?.contextMessages).toEqual([]);
+    expect(branch?.checkpointMessage.role).toBe("user");
   });
 
   it("persists a rolling context summary on the active conversation", async () => {

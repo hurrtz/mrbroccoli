@@ -10,6 +10,7 @@ import { ConversationMeta } from "../../types";
 import { formatConversationDateTime } from "./formatConversationDateTime";
 import { ConversationDrawerItem } from "./ConversationDrawerItem";
 import { styles } from "./styles";
+import { buildConversationBranchRows } from "../../utils/conversationBranches";
 
 interface ConversationDrawerListProps {
   activeId: string | null;
@@ -32,11 +33,15 @@ export function ConversationDrawerList({
 }: ConversationDrawerListProps) {
   const { colors } = useTheme();
   const { locale, t } = useLocalization();
+  const branchRows = React.useMemo(
+    () => buildConversationBranchRows(conversations),
+    [conversations],
+  );
 
   return (
     <FlatList
-      data={conversations}
-      keyExtractor={(item) => item.id}
+      data={branchRows}
+      keyExtractor={(item) => item.conversation.id}
       contentContainerStyle={styles.list}
       ListEmptyComponent={
         <View
@@ -88,8 +93,8 @@ export function ConversationDrawerList({
       }
       renderItem={({ item }) => (
         <ConversationDrawerItem
-          conversation={item}
-          active={item.id === activeId}
+          row={item}
+          active={item.conversation.id === activeId}
           formatDateTime={(iso) => formatConversationDateTime(iso, locale)}
           onDelete={onDeleteConversation}
           onOpenActionConversation={onOpenActionConversation}

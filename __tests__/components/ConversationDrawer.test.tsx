@@ -182,10 +182,54 @@ describe("ConversationDrawer", () => {
 
     await waitFor(() => {
       expect(onSearchConversations).toHaveBeenCalledWith("travel");
-      expect(screen.UNSAFE_getByType(FlatList).props.data).toEqual([
-        conversations[1],
-      ]);
+      expect(
+        screen.UNSAFE_getByType(FlatList).props.data.map(
+          ({ conversation }: { conversation: ConversationMeta }) =>
+            conversation,
+        ),
+      ).toEqual([conversations[1]]);
     });
+  });
+
+  it("renders related conversations as a Git-style branch tree", () => {
+    const child: ConversationMeta = {
+      ...conversations[1],
+      id: "child",
+      title: "Branched explanation",
+      branch: {
+        rootConversationId: "one",
+        parentConversationId: "one",
+        parentMessageId: "message-2",
+        branchMessageId: "child-message-2",
+        kind: "continue-from-message",
+        createdAt: "2026-03-20T08:20:00.000Z",
+      },
+    };
+    const screen = renderWithProviders(
+      <ConversationDrawerList
+        activeId="child"
+        conversations={[child, conversations[0]]}
+        searchQuery=""
+        onDeleteConversation={jest.fn()}
+        onOpenActionConversation={jest.fn()}
+        onSelectConversation={jest.fn()}
+      />,
+    );
+    const rows = screen.UNSAFE_getByType(FlatList).props.data;
+
+    expect(
+      rows.map(
+        ({ conversation, depth }: { conversation: ConversationMeta; depth: number }) => [
+          conversation.id,
+          depth,
+        ],
+      ),
+    ).toEqual([
+      ["one", 0],
+      ["child", 1],
+    ]);
+    expect(screen.getByTestId("conversation-branch-rail-one")).toBeTruthy();
+    expect(screen.getByTestId("conversation-branch-rail-child")).toBeTruthy();
   });
 
   it("tightens the empty state for a landscape drawer", () => {

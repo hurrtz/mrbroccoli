@@ -12,6 +12,11 @@ the complete Play Store translations are kept in a dedicated file under
 
 ### Added
 
+- Continue from any user or assistant checkpoint, including inside an existing
+  branch. Transcript markers identify the exact branch point, the conversation
+  drawer renders recursive Git-style rails, related checkpoints are directly
+  navigable, and every branch remains independently usable if its parent is
+  deleted or restored from backup.
 - Expand the on-device catalogue with opt-in Qwen3.5, Granite, Ministral
   Reasoning, and larger Qwen reasoning routes; Whisper Base and Small,
   Parakeet, and Qwen3-ASR recognition; and additional permissively licensed

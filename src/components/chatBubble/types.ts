@@ -1,12 +1,26 @@
-import type { Message } from "../../types";
+import type {
+  ConversationBranchOrigin,
+  ConversationMeta,
+  Message,
+} from "../../types";
 
 export type RepeatState = "idle" | "preparing" | "speaking";
 
 export interface ChatBubbleProps {
   message: Message;
+  branchChildren?: ConversationMeta[];
+  branchOrigin?: ConversationBranchOrigin & {
+    parentTitle?: string;
+    parentAvailable: boolean;
+  };
   onCopy?: (message: Message) => Promise<boolean>;
   onEdit?: (message: Message) => void;
-  onFork?: (message: Message) => void;
+  onBranch?: (message: Message) => void;
+  onOpenBranches?: (branches: ConversationMeta[]) => void;
+  onOpenBranchSource?: (
+    conversationId: string,
+    messageId: string,
+  ) => void;
   onSaveInsight?: (message: Message) => void;
   onShare?: (message: Message) => void;
   onRepeat?: (message: Message) => void;

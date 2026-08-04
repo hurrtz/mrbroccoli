@@ -99,7 +99,7 @@ export function MainScreen() {
     searchConversations,
     deleteConversation,
     editUserMessage,
-    forkConversationAtMessage,
+    branchConversationAtMessage,
     restoreConversationBackup,
     clearActiveConversation,
     loaded: conversationsLoaded = true,
@@ -405,10 +405,11 @@ export function MainScreen() {
     stopReplay,
   });
 
-  const { handleForkMessage, handleRetryMessage, handleSubmitTextMessage } =
+  const { handleBranchMessage, handleRetryMessage, handleSubmitTextMessage } =
     useTextTurnSubmitController({
-      forkConversationAtMessage,
-      forkFailureMessage: t("persistenceFailure"),
+      branchConversationAtMessage,
+      branchCreatedMessage: t("branchReady"),
+      branchFailureMessage: t("persistenceFailure"),
       handleVoiceCaptureDone,
       isBusy,
       pendingAttachments: pendingImages.attachments,
@@ -890,6 +891,8 @@ export function MainScreen() {
         transcript: {
           activeConversationId: activeConversation?.id ?? null,
           activeConversationTitle,
+          activeConversationBranch: activeConversation?.branch,
+          conversationBranches: conversations,
           activeReplayMessageId,
           messages,
           onCopyMessage: (message) =>
@@ -897,7 +900,8 @@ export function MainScreen() {
           onEditMessage: isBusy
             ? undefined
             : (message, content) => editUserMessage(message.id, content),
-          onForkMessage: isBusy ? undefined : handleForkMessage,
+          onBranchMessage: isBusy ? undefined : handleBranchMessage,
+          onSelectBranchConversation: isBusy ? undefined : selectConversation,
           onSaveInsight: isBusy
             ? undefined
             : async (message, kind, text) => {

@@ -72,6 +72,37 @@ describe("ChatTranscript follow-tail scrolling", () => {
     );
   });
 
+  it("scrolls to the exact checkpoint selected through branch navigation", () => {
+    const scrollToIndex = jest
+      .spyOn(FlatList.prototype, "scrollToIndex")
+      .mockImplementation(() => undefined);
+
+    render(
+      <ThemeProvider mode="light">
+        <LocalizationProvider language="en">
+          <ChatTranscript
+            conversationId="branch-conversation"
+            messages={[
+              message("user-1", "Earlier"),
+              message("assistant-1", "Branch checkpoint"),
+            ]}
+            scrollToMessageRequest={{
+              messageId: "assistant-1",
+              request: 1,
+            }}
+          />
+        </LocalizationProvider>
+      </ThemeProvider>,
+    );
+
+    expect(scrollToIndex).toHaveBeenCalledWith({
+      animated: true,
+      index: 1,
+      viewPosition: 0.35,
+    });
+    scrollToIndex.mockRestore();
+  });
+
   it("treats small native layout offsets as still being at the tail", () => {
     const onTailStateChange = jest.fn();
     const screen = render(

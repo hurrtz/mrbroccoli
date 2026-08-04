@@ -119,7 +119,7 @@ export function MessageActions({
   message,
   onCopy,
   onEdit,
-  onFork,
+  onBranch,
   onSaveInsight,
   onShare,
   onRepeat,
@@ -129,7 +129,7 @@ export function MessageActions({
   | "message"
   | "onCopy"
   | "onEdit"
-  | "onFork"
+  | "onBranch"
   | "onSaveInsight"
   | "onShare"
   | "onRepeat"
@@ -153,7 +153,7 @@ export function MessageActions({
   if (
     !onCopy &&
     !onEdit &&
-    !onFork &&
+    !onBranch &&
     !onSaveInsight &&
     !onShare &&
     !onRepeat
@@ -194,25 +194,41 @@ export function MessageActions({
           />
         </TouchableOpacity>
       ) : null}
-      {onFork ? (
+      {onBranch ? (
         <TouchableOpacity
-          testID={`message-fork-action-${message.id}`}
+          testID={`message-branch-action-${message.id}`}
           style={[
             styles.iconAction,
             {
-              backgroundColor: colors.accent,
-              borderColor: colors.accent,
+              backgroundColor:
+                message.role === "user" && message.editedAt
+                  ? colors.accent
+                  : colors.surfaceAlt,
+              borderColor:
+                message.role === "user" && message.editedAt
+                  ? colors.accent
+                  : colors.border,
             },
           ]}
-          onPress={() => onFork(message)}
+          onPress={() => onBranch(message)}
           activeOpacity={0.88}
           accessibilityRole="button"
-          accessibilityLabel={t("sendTextMessage")}
+          accessibilityLabel={
+            message.role === "user" && message.editedAt
+              ? t("sendTextMessage")
+              : t("branchFromHere")
+          }
         >
           <PhosphorIcon
-            name="send"
+            name={
+              message.role === "user" && message.editedAt ? "send" : "branch"
+            }
             size="control"
-            color={getAccessibleForeground(colors.accent)}
+            color={
+              message.role === "user" && message.editedAt
+                ? getAccessibleForeground(colors.accent)
+                : colors.textSecondary
+            }
           />
         </TouchableOpacity>
       ) : null}

@@ -15,7 +15,13 @@ import { Input, Modal } from "../../design-system/NativeControls";
 import type { TranslationKey } from "../../i18n";
 import { Colors } from "../../theme/colors";
 import { fonts } from "../../theme/typography";
-import type { ConversationArtifactKind, Message } from "../../types";
+import type {
+  ConversationArtifactKind,
+  ConversationBranchOrigin,
+  ConversationMeta,
+  Message,
+} from "../../types";
+import { getConversationBranchesByMessageId } from "../../utils/conversationBranches";
 
 import { TranslateFn } from "./shared";
 import { styles } from "./styles";
@@ -23,13 +29,16 @@ import { styles } from "./styles";
 interface TranscriptPreviewCardProps {
   activeConversationId?: string | null;
   activeConversationTitle?: string;
+  activeConversationBranch?: ConversationBranchOrigin;
+  conversationBranches?: ConversationMeta[];
   colors: Colors;
   layout?: "portrait" | "landscape";
   messages: Message[];
   activeReplayMessageId?: string | null;
   onCopyMessage: (message: Message) => Promise<boolean>;
   onEditMessage?: (message: Message, content: string) => Promise<boolean>;
-  onForkMessage?: (message: Message) => void;
+  onBranchMessage?: (message: Message) => void;
+  onSelectBranchConversation?: (conversationId: string) => Promise<void> | void;
   onSaveInsight?: (
     message: Message,
     kind: ConversationArtifactKind,
@@ -67,13 +76,16 @@ const ARTIFACT_CHOICES = [
 export function TranscriptPreviewCard({
   activeConversationId,
   activeConversationTitle,
+  activeConversationBranch,
+  conversationBranches = [],
   colors,
   layout = "portrait",
   messages,
   activeReplayMessageId = null,
   onCopyMessage,
   onEditMessage,
-  onForkMessage,
+  onBranchMessage,
+  onSelectBranchConversation,
   onSaveInsight,
   onRepeatMessage,
   onRetryMessage,
@@ -100,6 +112,29 @@ export function TranscriptPreviewCard({
     useState<ConversationArtifactKind>("decision");
   const [insightText, setInsightText] = useState("");
   const [savingInsight, setSavingInsight] = useState(false);
+  const [branchChoices, setBranchChoices] = useState<ConversationMeta[]>([]);
+  const [branchNavigationTarget, setBranchNavigationTarget] = useState<{
+    conversationId: string;
+    messageId: string;
+    request: number;
+  } | null>(null);
+  const branchChildrenByMessageId = React.useMemo(
+    () =>
+      getConversationBranchesByMessageId(
+        conversationBranches,
+        activeConversationId ?? null,
+      ),
+    [activeConversationId, conversationBranches],
+  );
+  const branchParent = React.useMemo(
+    () =>
+      activeConversationBranch
+        ? conversationBranches.find(
+            ({ id }) => id === activeConversationBranch.parentConversationId,
+          ) ?? null
+        : null,
+    [activeConversationBranch, conversationBranches],
+  );
 
   useEffect(() => {
     setIsAtTranscriptTail(true);
@@ -107,7 +142,21 @@ export function TranscriptPreviewCard({
     setEditingText("");
     setInsightMessage(null);
     setInsightText("");
+    setBranchChoices([]);
   }, [activeConversationId]);
+
+  const openBranchConversation = (
+    conversationId: string,
+    messageId: string,
+  ) => {
+    setBranchChoices([]);
+    setBranchNavigationTarget((current) => ({
+      conversationId,
+      messageId,
+      request: (current?.request ?? 0) + 1,
+    }));
+    void onSelectBranchConversation?.(conversationId);
+  };
 
   if (!showWhenEmpty && messages.length === 0) {
     return null;
@@ -212,7 +261,16 @@ export function TranscriptPreviewCard({
                 }
               : undefined
           }
-          onForkMessage={onForkMessage}
+          branchChildrenByMessageId={branchChildrenByMessageId}
+          branchOrigin={activeConversationBranch}
+          branchParent={branchParent}
+          onBranchMessage={onBranchMessage}
+          onOpenBranches={
+            onSelectBranchConversation ? setBranchChoices : undefined
+          }
+          onOpenBranchSource={
+            onSelectBranchConversation ? openBranchConversation : undefined
+          }
           onSaveInsightMessage={
             onSaveInsight
               ? (message) => {
@@ -229,6 +287,11 @@ export function TranscriptPreviewCard({
           repeatPlaybackStatus={replayPhase}
           onTailStateChange={setIsAtTranscriptTail}
           scrollToLatestRequest={scrollToLatestRequest}
+          scrollToMessageRequest={
+            branchNavigationTarget?.conversationId === activeConversationId
+              ? branchNavigationTarget
+              : null
+          }
         />
       </View>
 
@@ -290,6 +353,64 @@ export function TranscriptPreviewCard({
             disabled={savingCorrection}
             onChangeText={setEditingText}
           />
+        </View>
+      </Modal>
+
+      <Modal
+        visible={branchChoices.length > 0}
+        title={t("branchesFromMessage")}
+        onClose={() => setBranchChoices([])}
+        footer={[
+          {
+            text: t("done"),
+            onPress: () => setBranchChoices([]),
+          },
+        ]}
+      >
+        <View style={correctionStyles.branchList}>
+          {branchChoices.map((branch) => (
+            <Pressable
+              key={branch.id}
+              testID={`message-branch-choice-${branch.id}`}
+              style={({ pressed }) => [
+                correctionStyles.branchChoice,
+                {
+                  backgroundColor: pressed
+                    ? colors.accentSoft
+                    : colors.surfaceAlt,
+                  borderColor: colors.border,
+                },
+              ]}
+              onPress={() =>
+                openBranchConversation(
+                  branch.id,
+                  branch.branch?.branchMessageId ?? "",
+                )
+              }
+              accessibilityRole="button"
+              accessibilityLabel={branch.title}
+            >
+              <PhosphorIcon
+                name="branch"
+                size="control"
+                color={colors.accent}
+              />
+              <Text
+                style={[
+                  correctionStyles.branchChoiceText,
+                  { color: colors.text },
+                ]}
+                numberOfLines={2}
+              >
+                {branch.title}
+              </Text>
+              <PhosphorIcon
+                name="right"
+                size="compact"
+                color={colors.textSecondary}
+              />
+            </Pressable>
+          ))}
         </View>
       </Modal>
 
@@ -395,6 +516,23 @@ export function TranscriptPreviewCard({
 const correctionStyles = StyleSheet.create({
   body: { gap: 12 },
   hint: { fontFamily: fonts.body, fontSize: 14, lineHeight: 20 },
+  branchList: { gap: 8 },
+  branchChoice: {
+    minHeight: 52,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+    borderRadius: 12,
+    borderWidth: 1,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+  },
+  branchChoiceText: {
+    flex: 1,
+    fontFamily: fonts.bodyMedium,
+    fontSize: 14,
+    lineHeight: 19,
+  },
 });
 
 const insightStyles = StyleSheet.create({

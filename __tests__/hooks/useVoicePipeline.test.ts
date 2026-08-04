@@ -731,7 +731,10 @@ describe("useVoicePipeline", () => {
       createdAt: "2026-08-04T08:03:00.000Z",
       updatedAt: "2026-08-04T08:03:00.000Z",
       messages: [contextMessage, promptMessage],
-      knowledgeExcludedConversationIds: ["original-conversation"],
+      knowledgeExcludedConversationIds: [
+        "original-conversation",
+        "sibling-conversation",
+      ],
     };
     const params = createParams({
       activeConversation: originalConversation,
@@ -758,7 +761,10 @@ describe("useVoicePipeline", () => {
     expect(runVoicePipeline).toHaveBeenCalledWith(
       expect.objectContaining({
         currentConversationId: "fork-conversation",
-        conversationKnowledgeExcludedIds: ["original-conversation"],
+        conversationKnowledgeExcludedIds: [
+          "original-conversation",
+          "sibling-conversation",
+        ],
         messages: [contextMessage],
       }),
     );

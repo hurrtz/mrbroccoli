@@ -15,7 +15,11 @@ import { ChatBubble } from "./ChatBubble";
 import { useLocalization } from "../i18n";
 import { useTheme } from "../theme/ThemeContext";
 import { fonts } from "../theme/typography";
-import { Message } from "../types";
+import type {
+  ConversationBranchOrigin,
+  ConversationMeta,
+  Message,
+} from "../types";
 
 interface ChatTranscriptProps {
   messages: Message[];
@@ -26,7 +30,15 @@ interface ChatTranscriptProps {
   scrollEnabled?: boolean;
   onCopyMessage?: (message: Message) => Promise<boolean>;
   onEditMessage?: (message: Message) => void;
-  onForkMessage?: (message: Message) => void;
+  onBranchMessage?: (message: Message) => void;
+  branchChildrenByMessageId?: ReadonlyMap<string, ConversationMeta[]>;
+  branchOrigin?: ConversationBranchOrigin;
+  branchParent?: ConversationMeta | null;
+  onOpenBranches?: (branches: ConversationMeta[]) => void;
+  onOpenBranchSource?: (
+    conversationId: string,
+    messageId: string,
+  ) => void;
   onSaveInsightMessage?: (message: Message) => void;
   onShareMessage?: (message: Message) => void;
   onRepeatMessage?: (message: Message) => void;
@@ -39,6 +51,7 @@ interface ChatTranscriptProps {
   conversationId?: string | null;
   onTailStateChange?: (isAtTail: boolean) => void;
   scrollToLatestRequest?: number;
+  scrollToMessageRequest?: { messageId: string; request: number } | null;
 }
 
 const AT_TAIL_THRESHOLD_PX = 48;
@@ -62,7 +75,12 @@ export function ChatTranscript({
   scrollEnabled = true,
   onCopyMessage,
   onEditMessage,
-  onForkMessage,
+  onBranchMessage,
+  branchChildrenByMessageId,
+  branchOrigin,
+  branchParent,
+  onOpenBranches,
+  onOpenBranchSource,
   onSaveInsightMessage,
   onShareMessage,
   onRepeatMessage,
@@ -75,6 +93,7 @@ export function ChatTranscript({
   conversationId = null,
   onTailStateChange,
   scrollToLatestRequest = 0,
+  scrollToMessageRequest = null,
 }: ChatTranscriptProps) {
   const { colors } = useTheme();
   const { t } = useLocalization();
@@ -86,6 +105,7 @@ export function ChatTranscript({
   const isAtTailRef = useRef(true);
   const tailScrollFrameRef = useRef<number | null>(null);
   const handledScrollRequestRef = useRef(scrollToLatestRequest);
+  const handledMessageScrollRequestRef = useRef<number | null>(null);
   const conversationKey = useMemo(
     () => conversationId ?? messages[0]?.id ?? "empty-conversation",
     [conversationId, messages],
@@ -204,6 +224,31 @@ export function ChatTranscript({
     scrollToTail(true);
   }, [scrollToLatestRequest, scrollToTail]);
 
+  useEffect(() => {
+    if (
+      !scrollToMessageRequest ||
+      handledMessageScrollRequestRef.current ===
+        scrollToMessageRequest.request
+    ) {
+      return;
+    }
+
+    const index = messages.findIndex(
+      (message) => message.id === scrollToMessageRequest.messageId,
+    );
+    if (index < 0) {
+      return;
+    }
+
+    handledMessageScrollRequestRef.current = scrollToMessageRequest.request;
+    followTailRef.current = false;
+    listRef.current?.scrollToIndex({
+      animated: true,
+      index,
+      viewPosition: 0.35,
+    });
+  }, [messages, scrollToMessageRequest]);
+
   const handleContentSizeChange = useCallback(() => {
     if (
       messages.length === 0 ||
@@ -314,9 +359,21 @@ export function ChatTranscript({
       renderItem={({ item }) => (
         <ChatBubble
           message={item}
+          branchChildren={branchChildrenByMessageId?.get(item.id)}
+          branchOrigin={
+            branchOrigin && branchOrigin.branchMessageId === item.id
+              ? {
+                  ...branchOrigin,
+                  parentAvailable: Boolean(branchParent),
+                  parentTitle: branchParent?.title,
+                }
+              : undefined
+          }
           onCopy={onCopyMessage}
           onEdit={onEditMessage}
-          onFork={onForkMessage}
+          onBranch={onBranchMessage}
+          onOpenBranches={onOpenBranches}
+          onOpenBranchSource={onOpenBranchSource}
           onSaveInsight={onSaveInsightMessage}
           onShare={onShareMessage}
           onRepeat={onRepeatMessage}
@@ -357,6 +414,19 @@ export function ChatTranscript({
       scrollEventThrottle={16}
       onLayout={handleLayout}
       onContentSizeChange={handleContentSizeChange}
+      onScrollToIndexFailed={({ averageItemLength, index }) => {
+        listRef.current?.scrollToOffset({
+          animated: false,
+          offset: Math.max(0, averageItemLength * index),
+        });
+        requestAnimationFrame(() => {
+          listRef.current?.scrollToIndex({
+            animated: true,
+            index,
+            viewPosition: 0.35,
+          });
+        });
+      }}
       onScroll={updateUserScrollPosition}
       onScrollBeginDrag={handleScrollBeginDrag}
       onScrollEndDrag={handleScrollInteractionEnd}

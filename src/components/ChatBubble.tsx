@@ -46,9 +46,13 @@ function MessageRowSurface({
 
 export const ChatBubble = React.memo(function ChatBubble({
   message,
+  branchChildren,
+  branchOrigin,
   onCopy,
   onEdit,
-  onFork,
+  onBranch,
+  onOpenBranches,
+  onOpenBranchSource,
   onSaveInsight,
   onShare,
   onRepeat,
@@ -67,9 +71,13 @@ export const ChatBubble = React.memo(function ChatBubble({
     >
       <ChatBubbleContent
         message={message}
+        branchChildren={branchChildren}
+        branchOrigin={branchOrigin}
         onCopy={onCopy}
         onEdit={onEdit}
-        onFork={onFork}
+        onBranch={onBranch}
+        onOpenBranches={onOpenBranches}
+        onOpenBranchSource={onOpenBranchSource}
         onSaveInsight={onSaveInsight}
         onShare={onShare}
         onRepeat={onRepeat}

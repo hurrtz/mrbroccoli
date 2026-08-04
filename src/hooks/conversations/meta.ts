@@ -46,6 +46,63 @@ export function restoreLegacyConversationTitle(
   };
 }
 
+export function restoreLegacyConversationBranch(
+  conversation: Conversation,
+  parent: Conversation | null,
+): Conversation {
+  if (conversation.branch || !parent) {
+    return conversation;
+  }
+
+  const excludedIds = conversation.knowledgeExcludedConversationIds ?? [];
+  const parentConversationId = excludedIds.at(-1);
+  let checkpointIndex = -1;
+  const comparableMessageCount = Math.min(
+    conversation.messages.length,
+    parent.messages.length,
+  );
+  for (let index = 0; index < comparableMessageCount; index += 1) {
+    const branchCandidate = conversation.messages[index];
+    const parentCandidate = parent.messages[index];
+    if (
+      branchCandidate.role !== parentCandidate.role ||
+      branchCandidate.content !== parentCandidate.content ||
+      branchCandidate.timestamp !== parentCandidate.timestamp
+    ) {
+      break;
+    }
+    checkpointIndex = index;
+  }
+  const branchMessage = conversation.messages[checkpointIndex];
+  const parentMessage = parent.messages[checkpointIndex];
+
+  if (
+    parentConversationId !== parent.id ||
+    checkpointIndex < 0 ||
+    !branchMessage ||
+    !parentMessage
+  ) {
+    return conversation;
+  }
+
+  return {
+    ...conversation,
+    branch: {
+      rootConversationId: excludedIds[0] ?? parent.id,
+      parentConversationId: parent.id,
+      parentMessageId: parentMessage.id,
+      branchMessageId: branchMessage.id,
+      kind:
+        branchMessage.role === "user" && branchMessage.editedAt
+          ? "edited-prompt"
+          : branchMessage.role === "user"
+            ? "alternative-response"
+            : "continue-from-message",
+      createdAt: conversation.createdAt,
+    },
+  };
+}
+
 function inferConversationState(messages: Message[]) {
   let lastModel: string | null = null;
   let lastProvider: Provider | null = null;
@@ -130,6 +187,7 @@ export function normalizeConversationMeta(meta: Partial<ConversationMeta>) {
     lastModel: meta.lastModel ?? null,
     lastProvider: meta.lastProvider ?? null,
     pinned: meta.pinned ?? false,
+    branchSchemaVersion: 1 as const,
     isPrivate: meta.isPrivate ?? false,
   };
 }
@@ -141,6 +199,7 @@ export function conversationMetaNeedsHydration(meta: Partial<ConversationMeta>) 
     !Array.isArray(meta.providers) ||
     typeof meta.providerModels !== "object" ||
     meta.providerModels === null ||
+    meta.branchSchemaVersion !== 1 ||
     typeof meta.isPrivate !== "boolean"
   );
 }
@@ -178,6 +237,8 @@ export function buildConversationMetaFromConversation(
     lastModel: inferredState.lastModel ?? existingMeta?.lastModel ?? null,
     lastProvider: inferredState.lastProvider ?? existingMeta?.lastProvider ?? null,
     pinned: existingMeta?.pinned ?? false,
+    branch: conversation.branch,
+    branchSchemaVersion: 1,
     isPrivate: conversation.isPrivate ?? existingMeta?.isPrivate ?? false,
   });
 }

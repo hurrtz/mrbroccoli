@@ -5,7 +5,7 @@ import {
   recordDebugLogEvent,
 } from "../../services/debugLogCapture";
 import type {
-  ConversationFork,
+  ConversationBranchResult,
   Message,
   MessageImageAttachment,
 } from "../../types";
@@ -15,10 +15,11 @@ import type { ShowToastFn } from "./shared";
 interface UseTextTurnSubmitControllerParams {
   handleVoiceCaptureDone: (params: VoiceCaptureRequest) => Promise<void>;
   isBusy: boolean;
-  forkConversationAtMessage?: (
+  branchConversationAtMessage?: (
     messageId: string,
-  ) => Promise<ConversationFork | null>;
-  forkFailureMessage?: string;
+  ) => Promise<ConversationBranchResult | null>;
+  branchCreatedMessage?: string;
+  branchFailureMessage?: string;
   promptSubmissionBlockMessage?: string | null;
   showToast?: ShowToastFn;
   pendingAttachments?: MessageImageAttachment[];
@@ -27,8 +28,9 @@ interface UseTextTurnSubmitControllerParams {
 export function useTextTurnSubmitController({
   handleVoiceCaptureDone,
   isBusy,
-  forkConversationAtMessage,
-  forkFailureMessage,
+  branchConversationAtMessage,
+  branchCreatedMessage,
+  branchFailureMessage,
   promptSubmissionBlockMessage,
   showToast,
   pendingAttachments = [],
@@ -104,19 +106,17 @@ export function useTextTurnSubmitController({
     [runTextTurn],
   );
 
-  const handleForkMessage = useCallback(
+  const handleBranchMessage = useCallback(
     (message: Message) => {
       if (
-        message.role !== "user" ||
-        !message.editedAt ||
-        !forkConversationAtMessage ||
+        !branchConversationAtMessage ||
         isBusy ||
         submissionInFlightRef.current
       ) {
         return;
       }
 
-      if (promptSubmissionBlockMessage) {
+      if (message.role === "user" && promptSubmissionBlockMessage) {
         showToast?.(promptSubmissionBlockMessage, undefined, "danger");
         return;
       }
@@ -124,47 +124,57 @@ export function useTextTurnSubmitController({
       submissionInFlightRef.current = true;
       const turnId = createDebugTurnId();
       recordDebugLogEvent({
-        event: "text-message-fork-requested",
+        event: "conversation-branch-requested",
         payload: {
           messageId: message.id,
+          messageRole: message.role,
           textLength: message.content.trim().length,
           turnId,
         },
       });
 
-      void forkConversationAtMessage(message.id)
-        .then(async (fork) => {
-          if (!fork) {
-            throw new Error("The edited message could not be forked.");
+      void branchConversationAtMessage(message.id)
+        .then(async (branch) => {
+          if (!branch) {
+            throw new Error("The conversation could not be branched.");
           }
           recordDebugLogEvent({
-            event: "text-message-fork-created",
+            event: "conversation-branch-created",
             payload: {
-              conversationId: fork.conversation.id,
-              contextMessageCount: fork.contextMessages.length,
+              conversationId: branch.conversation.id,
+              contextMessageCount: branch.contextMessages.length,
+              kind: branch.conversation.branch?.kind ?? null,
               sourceMessageId: message.id,
               turnId,
             },
           });
+
+          if (branch.checkpointMessage.role === "assistant") {
+            if (branchCreatedMessage) {
+              showToast?.(branchCreatedMessage, undefined, "success");
+            }
+            return;
+          }
+
           await handleVoiceCaptureDone({
-            ...(fork.promptMessage.attachments?.length
-              ? { attachments: fork.promptMessage.attachments }
+            ...(branch.checkpointMessage.attachments?.length
+              ? { attachments: branch.checkpointMessage.attachments }
               : {}),
-            conversationOverride: fork.conversation,
-            existingUserMessageId: fork.promptMessage.id,
-            messagesOverride: fork.contextMessages,
-            transcriptionOverride: fork.promptMessage.content,
+            conversationOverride: branch.conversation,
+            existingUserMessageId: branch.checkpointMessage.id,
+            messagesOverride: branch.contextMessages,
+            transcriptionOverride: branch.checkpointMessage.content,
             turnId,
           });
         })
         .catch((error) => {
           recordDebugLogEvent({
-            event: "text-message-fork-failed",
+            event: "conversation-branch-failed",
             level: "warn",
             payload: { error, messageId: message.id, turnId },
           });
-          if (forkFailureMessage) {
-            showToast?.(forkFailureMessage, undefined, "danger");
+          if (branchFailureMessage) {
+            showToast?.(branchFailureMessage, undefined, "danger");
           }
         })
         .finally(() => {
@@ -172,8 +182,9 @@ export function useTextTurnSubmitController({
         });
     },
     [
-      forkConversationAtMessage,
-      forkFailureMessage,
+      branchConversationAtMessage,
+      branchCreatedMessage,
+      branchFailureMessage,
       handleVoiceCaptureDone,
       isBusy,
       promptSubmissionBlockMessage,
@@ -182,7 +193,7 @@ export function useTextTurnSubmitController({
   );
 
   return {
-    handleForkMessage,
+    handleBranchMessage,
     handleRetryMessage,
     handleSubmitTextMessage,
   };

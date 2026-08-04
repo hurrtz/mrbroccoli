@@ -200,6 +200,33 @@ const CONVERSATION_ARTIFACT_KINDS = [
   "action",
 ] as const;
 
+const CONVERSATION_BRANCH_KINDS = [
+  "edited-prompt",
+  "alternative-response",
+  "continue-from-message",
+] as const;
+
+function isValidConversationBranch(
+  value: unknown,
+  messages: Conversation["messages"],
+) {
+  return (
+    isRecord(value) &&
+    typeof value.rootConversationId === "string" &&
+    value.rootConversationId.length > 0 &&
+    typeof value.parentConversationId === "string" &&
+    value.parentConversationId.length > 0 &&
+    typeof value.parentMessageId === "string" &&
+    value.parentMessageId.length > 0 &&
+    typeof value.branchMessageId === "string" &&
+    messages.some((message) => message.id === value.branchMessageId) &&
+    CONVERSATION_BRANCH_KINDS.includes(
+      value.kind as (typeof CONVERSATION_BRANCH_KINDS)[number],
+    ) &&
+    typeof value.createdAt === "string"
+  );
+}
+
 function isValidConversationArtifact(value: unknown) {
   return (
     isRecord(value) &&
@@ -274,6 +301,8 @@ function isValidConversation(value: unknown): value is Conversation {
         value.knowledgeExcludedConversationIds.every(
           (id) => typeof id === "string" && id.length > 0,
         ))) &&
+    (value.branch === undefined ||
+      isValidConversationBranch(value.branch, messages)) &&
     isOptionalString(value.contextSummary) &&
     (value.summarizedMessageCount === undefined ||
       (typeof value.summarizedMessageCount === "number" &&

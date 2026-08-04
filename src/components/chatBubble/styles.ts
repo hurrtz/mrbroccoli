@@ -344,6 +344,28 @@ export const styles = StyleSheet.create({
     lineHeight: 16,
     fontFamily: fonts.mono,
   },
+  branchIndicatorList: {
+    marginTop: 12,
+    gap: 6,
+  },
+  branchIndicator: {
+    minHeight: 44,
+    maxWidth: "100%",
+    alignSelf: "flex-start",
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 7,
+    borderRadius: 10,
+    borderWidth: 1,
+    paddingHorizontal: 10,
+    paddingVertical: 7,
+  },
+  branchIndicatorText: {
+    flexShrink: 1,
+    fontSize: 12,
+    lineHeight: 16,
+    fontFamily: fonts.bodyMedium,
+  },
   actionRow: {
     flexDirection: "row",
     justifyContent: "flex-start",

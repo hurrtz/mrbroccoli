@@ -114,6 +114,14 @@ const conversation: Conversation = {
   updatedAt: "2026-07-31T08:01:00.000Z",
   isPrivate: true,
   knowledgeExcludedConversationIds: ["source-conversation"],
+  branch: {
+    rootConversationId: "source-conversation",
+    parentConversationId: "source-conversation",
+    parentMessageId: "source-message",
+    branchMessageId: "message-1",
+    kind: "edited-prompt",
+    createdAt: "2026-07-31T08:00:30.000Z",
+  },
   messages: [
     {
       id: "message-1",

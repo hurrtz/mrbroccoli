@@ -37,7 +37,7 @@ describe("ChatBubble", () => {
   });
 
   it("offers a send action only after a user transcript was edited", () => {
-    const onFork = jest.fn();
+    const onBranch = jest.fn();
     const message = {
       id: "edited-user-transcript",
       role: "user" as const,
@@ -48,20 +48,93 @@ describe("ChatBubble", () => {
       timestamp: "2026-08-04T08:59:00.000Z",
     };
     const screen = renderWithProviders(
-      <ChatBubble selectable message={message} onFork={onFork} />,
+      <ChatBubble selectable message={message} onBranch={onBranch} />,
     );
 
     fireEvent.press(screen.getByLabelText("Send message"));
 
-    expect(onFork).toHaveBeenCalledWith(message);
+    expect(onBranch).toHaveBeenCalledWith(message);
     const uneditedScreen = renderWithProviders(
       <ChatBubble
         selectable
         message={{ ...message, editedAt: undefined }}
-        onFork={onFork}
+        onBranch={onBranch}
       />,
     );
     expect(uneditedScreen.queryByLabelText("Send message")).toBeNull();
+    expect(uneditedScreen.getByLabelText("Branch from here")).toBeTruthy();
+  });
+
+  it("can branch from an assistant checkpoint", () => {
+    const onBranch = jest.fn();
+    const message = {
+      id: "assistant-checkpoint",
+      role: "assistant" as const,
+      content: "A useful checkpoint",
+      model: "gpt-5.4",
+      provider: "openai" as const,
+      timestamp: "2026-08-04T09:05:00.000Z",
+    };
+    const screen = renderWithProviders(
+      <ChatBubble selectable message={message} onBranch={onBranch} />,
+    );
+
+    fireEvent.press(screen.getByLabelText("Branch from here"));
+
+    expect(onBranch).toHaveBeenCalledWith(message);
+  });
+
+  it("shows the exact source and children at a branch checkpoint", () => {
+    const onOpenBranches = jest.fn();
+    const onOpenBranchSource = jest.fn();
+    const message = {
+      id: "branch-message",
+      role: "assistant" as const,
+      content: "A branch checkpoint",
+      model: "gpt-5.4",
+      provider: "openai" as const,
+      timestamp: "2026-08-04T09:05:00.000Z",
+    };
+    const child = {
+      id: "child-conversation",
+      title: "Child branch",
+      createdAt: "2026-08-04T09:06:00.000Z",
+      updatedAt: "2026-08-04T09:06:00.000Z",
+      messageCount: 2,
+      providers: ["openai" as const],
+      providerModels: { openai: ["gpt-5.4"] },
+      lastModel: "gpt-5.4",
+      lastProvider: "openai" as const,
+      pinned: false,
+    };
+    const branchOrigin = {
+      rootConversationId: "root-conversation",
+      parentConversationId: "parent-conversation",
+      parentMessageId: "parent-message",
+      branchMessageId: message.id,
+      kind: "continue-from-message" as const,
+      createdAt: "2026-08-04T09:05:30.000Z",
+      parentAvailable: true,
+      parentTitle: "Parent conversation",
+    };
+    const screen = renderWithProviders(
+      <ChatBubble
+        message={message}
+        branchChildren={[child]}
+        branchOrigin={branchOrigin}
+        onOpenBranches={onOpenBranches}
+        onOpenBranchSource={onOpenBranchSource}
+      />,
+    );
+
+    fireEvent.press(screen.getByLabelText("Branch starts here · Parent conversation"));
+    fireEvent.press(screen.getByLabelText("1 branch"));
+
+    expect(onOpenBranchSource).toHaveBeenCalledWith(
+      "parent-conversation",
+      "parent-message",
+    );
+    expect(onOpenBranches).toHaveBeenCalledWith([child]);
   });
 
   it("keeps web-search details collapsed until requested and opens citation links", () => {

@@ -18,6 +18,8 @@ jest.mock("../../../src/components/ChatTranscript", () => ({
     onShareMessage,
     onTailStateChange,
     scrollToLatestRequest,
+    branchChildrenByMessageId,
+    onOpenBranches,
   }: {
     messages: {
       id: string;
@@ -48,6 +50,8 @@ jest.mock("../../../src/components/ChatTranscript", () => ({
     onShareMessage?: () => void;
     onTailStateChange?: (isAtTail: boolean) => void;
     scrollToLatestRequest?: number;
+    branchChildrenByMessageId?: ReadonlyMap<string, unknown[]>;
+    onOpenBranches?: (branches: unknown[]) => void;
   }) => {
     const React = require("react");
     const { Pressable, Text, View } = require("react-native");
@@ -72,6 +76,18 @@ jest.mock("../../../src/components/ChatTranscript", () => ({
             Pressable,
             { onPress: () => onSaveInsightMessage(messages[0]) },
             React.createElement(Text, null, "Open saved insight"),
+          )
+        : null,
+      onOpenBranches && messages[0]
+        ? React.createElement(
+            Pressable,
+            {
+              onPress: () =>
+                onOpenBranches(
+                  branchChildrenByMessageId?.get(messages[0].id) ?? [],
+                ),
+            },
+            React.createElement(Text, null, "Open branches"),
           )
         : null,
     );
@@ -288,6 +304,67 @@ describe("TranscriptPreviewCard", () => {
         expect.objectContaining({ id: "message-1" }),
         "All in on Ant Design",
       ),
+    );
+  });
+
+  it("opens a branch from the checkpoint marker", async () => {
+    const onSelectBranchConversation = jest.fn(async () => undefined);
+    const screen = render(
+      <TranscriptPreviewCard
+        activeConversationId="root-conversation"
+        colors={lightColors}
+        conversationBranches={[
+          {
+            id: "child-conversation",
+            title: "Child branch",
+            createdAt: "2026-08-04T10:01:00.000Z",
+            updatedAt: "2026-08-04T10:01:00.000Z",
+            messageCount: 1,
+            providers: [],
+            providerModels: {},
+            lastModel: null,
+            lastProvider: null,
+            pinned: false,
+            branch: {
+              rootConversationId: "root-conversation",
+              parentConversationId: "root-conversation",
+              parentMessageId: "message-1",
+              branchMessageId: "child-message-1",
+              kind: "continue-from-message",
+              createdAt: "2026-08-04T10:01:00.000Z",
+            },
+          },
+        ]}
+        messages={[
+          {
+            id: "message-1",
+            role: "assistant",
+            content: "Checkpoint",
+            model: "gpt-5.4",
+            provider: "openai",
+            timestamp: "2026-08-04T10:00:00.000Z",
+          },
+        ]}
+        onCopyMessage={jest.fn()}
+        onRetryMessage={jest.fn()}
+        onSelectBranchConversation={onSelectBranchConversation}
+        showUsageStats={false}
+        showWhenEmpty
+        t={(key) =>
+          ({
+            branchesFromMessage: "Branches from this message",
+            done: "Done",
+          })[key] ?? key
+        }
+      />,
+    );
+
+    fireEvent.press(screen.getByText("Open branches"));
+    expect(screen.getByText("Branches from this message")).toBeTruthy();
+    fireEvent.press(screen.getByTestId("message-branch-choice-child-conversation"));
+
+    expect(onSelectBranchConversation).toHaveBeenCalledWith(
+      "child-conversation",
     );
   });
 

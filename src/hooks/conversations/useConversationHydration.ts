@@ -10,6 +10,7 @@ import {
   buildConversationMetaFromConversation,
   conversationMetaNeedsHydration,
   normalizeConversationMeta,
+  restoreLegacyConversationBranch,
   restoreLegacyConversationTitle,
   sortConversationMeta,
 } from "./meta";
@@ -121,8 +122,19 @@ export function useConversationHydration(params: {
               return normalizedMeta;
             }
 
-            const restoredConversation =
+            const titleRestoredConversation =
               restoreLegacyConversationTitle(conversation);
+            const legacyParentId =
+              titleRestoredConversation.knowledgeExcludedConversationIds?.at(
+                -1,
+              );
+            const legacyParent = legacyParentId
+              ? await readConversation(legacyParentId)
+              : null;
+            const restoredConversation = restoreLegacyConversationBranch(
+              titleRestoredConversation,
+              legacyParent,
+            );
             if (restoredConversation !== conversation) {
               void saveConversation(restoredConversation);
             }
