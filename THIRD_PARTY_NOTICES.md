@@ -338,8 +338,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ```
 
-### @expo/cli@57.0.11
-Packages (47): @expo/cli@57.0.11, @expo/config-plugins@57.0.6, @expo/config@57.0.6, @expo/devtools@57.0.1, @expo/dom-webview@57.0.1, @expo/expo-modules-macros-plugin@0.6.1, @expo/fingerprint@0.20.6, @expo/image-utils@0.11.4, @expo/inline-modules@0.1.4, @expo/json-file@11.0.1, @expo/local-build-cache-provider@57.0.5, @expo/log-box@57.0.2, @expo/metro-config@57.0.7, @expo/metro-file-map@57.0.1, @expo/metro-runtime@57.0.8, @expo/osascript@2.7.1, @expo/package-manager@1.13.1, @expo/plist@0.8.1, @expo/prebuild-config@57.0.10, @expo/router-server@57.0.4, babel-preset-expo@57.0.5, expo-asset@57.0.8, expo-audio@57.0.3, expo-clipboard@57.0.1, expo-constants@57.0.8, expo-crypto@57.0.1, expo-document-picker@57.0.1, expo-file-system@57.0.1, expo-font@57.0.1, expo-glass-effect@57.0.1, expo-image-loader@57.0.1, expo-image-manipulator@57.0.7, expo-image-picker@57.0.7, expo-keep-awake@57.0.1, expo-linking@57.0.4, expo-modules-autolinking@57.0.9, expo-modules-core@57.0.8, expo-modules-jsi@57.0.4, expo-network@57.0.1, expo-secure-store@57.0.1, expo-server@57.0.1, expo-sharing@57.0.8, expo-speech@57.0.1, expo-sqlite@57.0.1, expo-status-bar@57.0.1, expo-symbols@57.0.1, expo@57.0.9
+### @expo/cli@57.0.12
+Packages (47): @expo/cli@57.0.12, @expo/config-plugins@57.0.6, @expo/config@57.0.6, @expo/devtools@57.0.1, @expo/dom-webview@57.0.1, @expo/expo-modules-macros-plugin@0.6.1, @expo/fingerprint@0.20.6, @expo/image-utils@0.11.4, @expo/inline-modules@0.1.4, @expo/json-file@11.0.1, @expo/local-build-cache-provider@57.0.5, @expo/log-box@57.0.2, @expo/metro-config@57.0.7, @expo/metro-file-map@57.0.1, @expo/metro-runtime@57.0.8, @expo/osascript@2.7.1, @expo/package-manager@1.13.1, @expo/plist@0.8.1, @expo/prebuild-config@57.0.10, @expo/router-server@57.0.5, babel-preset-expo@57.0.5, expo-asset@57.0.8, expo-audio@57.0.3, expo-clipboard@57.0.1, expo-constants@57.0.9, expo-crypto@57.0.1, expo-document-picker@57.0.1, expo-file-system@57.0.1, expo-font@57.0.1, expo-glass-effect@57.0.1, expo-image-loader@57.0.1, expo-image-manipulator@57.0.7, expo-image-picker@57.0.7, expo-keep-awake@57.0.1, expo-linking@57.0.5, expo-modules-autolinking@57.0.9, expo-modules-core@57.0.9, expo-modules-jsi@57.0.4, expo-network@57.0.1, expo-secure-store@57.0.1, expo-server@57.0.1, expo-sharing@57.0.8, expo-speech@57.0.1, expo-sqlite@57.0.1, expo-status-bar@57.0.1, expo-symbols@57.0.1, expo@57.0.10
 
 License: MIT
 
@@ -397,7 +397,7 @@ SOFTWARE.
 ```
 
 ### @expo/devcert@1.2.1
-Packages (60): @expo/devcert@1.2.1, @expo/sdk-runtime-versions@1.0.0, @expo/ui@57.0.8, @expo/ws-tunnel@2.0.0, @napi-rs/wasm-runtime@1.2.2, @react-native/assets-registry@0.86.2, @react-native/babel-plugin-codegen@0.86.2, @react-native/babel-preset@0.86.2, @react-native/codegen@0.86.2, @react-native/community-cli-plugin@0.86.2, @react-native/debugger-shell@0.86.2, @react-native/dev-middleware@0.86.2, @react-native/gradle-plugin@0.86.2, @react-native/jest-preset@0.86.2, @react-native/js-polyfills@0.86.2, @react-native/metro-babel-transformer@0.86.2, @react-native/metro-config@0.86.2, @react-native/normalize-colors@0.86.2, @react-native/virtualized-lists@0.86.2, @tybys/wasm-util@0.10.3, babel-plugin-react-compiler@1.0.0, bplist-parser@0.3.1, client-only@0.0.1, css.escape@1.5.1, emoji-regex@8.0.0, expo-router@57.0.9, hermes-compiler@250829098.0.16, imurmurhash@0.1.4, jest-pnp-resolver@1.2.3, jimp-compact@0.16.1, jsesc@3.1.0, metro-babel-transformer@0.84.4, metro-cache-key@0.84.4, metro-cache@0.84.4, metro-config@0.84.4, metro-core@0.84.4, metro-file-map@0.84.4, metro-minify-terser@0.84.4, metro-resolver@0.84.4, metro-runtime@0.84.4, metro-source-map@0.84.4, metro-symbolicate@0.84.4, metro-transform-plugins@0.84.4, metro-transform-worker@0.84.4, metro@0.84.4, natural-compare@1.4.0, ob1@0.84.4, react-devtools-core@6.1.5, react-remove-scroll-bar@2.3.8, regenerate-unicode-properties@10.2.2, regenerate@1.4.2, regexpu-core@6.4.0, regjsgen@0.8.0, server-only@0.0.1, standard-navigation@0.0.5, structured-headers@0.4.1, unicode-canonical-property-names-ecmascript@2.0.1, unicode-match-property-ecmascript@2.0.0, unicode-match-property-value-ecmascript@2.2.1, unicode-property-aliases-ecmascript@2.2.0
+Packages (60): @expo/devcert@1.2.1, @expo/sdk-runtime-versions@1.0.0, @expo/ui@57.0.9, @expo/ws-tunnel@2.0.0, @napi-rs/wasm-runtime@1.2.2, @react-native/assets-registry@0.86.2, @react-native/babel-plugin-codegen@0.86.2, @react-native/babel-preset@0.86.2, @react-native/codegen@0.86.2, @react-native/community-cli-plugin@0.86.2, @react-native/debugger-shell@0.86.2, @react-native/dev-middleware@0.86.2, @react-native/gradle-plugin@0.86.2, @react-native/jest-preset@0.86.2, @react-native/js-polyfills@0.86.2, @react-native/metro-babel-transformer@0.86.2, @react-native/metro-config@0.86.2, @react-native/normalize-colors@0.86.2, @react-native/virtualized-lists@0.86.2, @tybys/wasm-util@0.10.3, babel-plugin-react-compiler@1.0.0, bplist-parser@0.3.1, client-only@0.0.1, css.escape@1.5.1, emoji-regex@8.0.0, expo-router@57.0.10, hermes-compiler@250829098.0.16, imurmurhash@0.1.4, jest-pnp-resolver@1.2.3, jimp-compact@0.16.1, jsesc@3.1.0, metro-babel-transformer@0.84.4, metro-cache-key@0.84.4, metro-cache@0.84.4, metro-config@0.84.4, metro-core@0.84.4, metro-file-map@0.84.4, metro-minify-terser@0.84.4, metro-resolver@0.84.4, metro-runtime@0.84.4, metro-source-map@0.84.4, metro-symbolicate@0.84.4, metro-transform-plugins@0.84.4, metro-transform-worker@0.84.4, metro@0.84.4, natural-compare@1.4.0, ob1@0.84.4, react-devtools-core@6.1.5, react-remove-scroll-bar@2.3.8, regenerate-unicode-properties@10.2.2, regenerate@1.4.2, regexpu-core@6.4.0, regjsgen@0.8.0, server-only@0.0.1, standard-navigation@0.0.5, structured-headers@0.4.1, unicode-canonical-property-names-ecmascript@2.0.1, unicode-match-property-ecmascript@2.0.0, unicode-match-property-value-ecmascript@2.2.1, unicode-property-aliases-ecmascript@2.2.0
 
 License: MIT
 
@@ -776,7 +776,7 @@ THE SOFTWARE.
 ```
 
 ### @radix-ui/primitive@1.1.4
-Packages (20): @radix-ui/primitive@1.1.4, @radix-ui/react-collection@1.1.11, @radix-ui/react-compose-refs@1.1.3, @radix-ui/react-context@1.1.4, @radix-ui/react-dialog@1.1.18, @radix-ui/react-direction@1.1.2, @radix-ui/react-dismissable-layer@1.1.14, @radix-ui/react-focus-guards@1.1.4, @radix-ui/react-focus-scope@1.1.11, @radix-ui/react-id@1.1.2, @radix-ui/react-portal@1.1.13, @radix-ui/react-presence@1.1.6, @radix-ui/react-primitive@2.1.7, @radix-ui/react-roving-focus@1.1.14, @radix-ui/react-slot@1.3.0, @radix-ui/react-tabs@1.1.16, @radix-ui/react-use-callback-ref@1.1.2, @radix-ui/react-use-controllable-state@1.2.3, @radix-ui/react-use-effect-event@0.0.3, @radix-ui/react-use-layout-effect@1.1.2
+Packages (31): @radix-ui/primitive@1.1.4, @radix-ui/primitive@1.1.7, @radix-ui/react-collection@1.1.11, @radix-ui/react-compose-refs@1.1.3, @radix-ui/react-compose-refs@1.1.5, @radix-ui/react-context@1.1.4, @radix-ui/react-context@1.2.2, @radix-ui/react-dialog@1.1.23, @radix-ui/react-direction@1.1.2, @radix-ui/react-dismissable-layer@1.1.19, @radix-ui/react-focus-guards@1.1.6, @radix-ui/react-focus-scope@1.1.16, @radix-ui/react-id@1.1.2, @radix-ui/react-id@1.1.4, @radix-ui/react-portal@1.1.17, @radix-ui/react-presence@1.1.10, @radix-ui/react-presence@1.1.6, @radix-ui/react-primitive@2.1.10, @radix-ui/react-primitive@2.1.7, @radix-ui/react-roving-focus@1.1.14, @radix-ui/react-slot@1.3.0, @radix-ui/react-slot@1.3.3, @radix-ui/react-tabs@1.1.16, @radix-ui/react-use-callback-ref@1.1.2, @radix-ui/react-use-callback-ref@1.1.4, @radix-ui/react-use-controllable-state@1.2.3, @radix-ui/react-use-controllable-state@1.2.6, @radix-ui/react-use-effect-event@0.0.3, @radix-ui/react-use-effect-event@0.0.5, @radix-ui/react-use-layout-effect@1.1.2, @radix-ui/react-use-layout-effect@1.1.4
 
 License: MIT
 
@@ -1207,7 +1207,7 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 ```
 
-### agent-cli-detector@0.1.4
+### agent-cli-detector@0.1.5
 License: MIT
 
 ```text
@@ -2413,7 +2413,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ```
 
-### brace-expansion@5.0.8
+### brace-expansion@5.0.9
 License: MIT
 
 ```text
