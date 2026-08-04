@@ -269,6 +269,11 @@ function isValidConversation(value: unknown): value is Conversation {
           ),
         ))) &&
     (value.isPrivate === undefined || typeof value.isPrivate === "boolean") &&
+    (value.knowledgeExcludedConversationIds === undefined ||
+      (Array.isArray(value.knowledgeExcludedConversationIds) &&
+        value.knowledgeExcludedConversationIds.every(
+          (id) => typeof id === "string" && id.length > 0,
+        ))) &&
     isOptionalString(value.contextSummary) &&
     (value.summarizedMessageCount === undefined ||
       (typeof value.summarizedMessageCount === "number" &&

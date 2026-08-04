@@ -99,6 +99,7 @@ export interface RunVoicePipelineParams {
   contextSummary?: string;
   summarizedMessageCount?: number;
   currentConversationId?: string | null;
+  conversationKnowledgeExcludedIds?: string[];
   privateConversationIds?: string[];
   pastConversationKnowledgeEnabled?: boolean;
   assistantInstructions: string;

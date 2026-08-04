@@ -48,6 +48,7 @@ export const ChatBubble = React.memo(function ChatBubble({
   message,
   onCopy,
   onEdit,
+  onFork,
   onSaveInsight,
   onShare,
   onRepeat,
@@ -68,6 +69,7 @@ export const ChatBubble = React.memo(function ChatBubble({
         message={message}
         onCopy={onCopy}
         onEdit={onEdit}
+        onFork={onFork}
         onSaveInsight={onSaveInsight}
         onShare={onShare}
         onRepeat={onRepeat}

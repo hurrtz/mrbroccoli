@@ -720,6 +720,120 @@ describe("useConversations", () => {
     ]);
   });
 
+  it("forks an edited prompt with independent history and image files", async () => {
+    const stored = new Map<string, string>();
+    (AsyncStorage.getItem as jest.Mock).mockImplementation(
+      async (key: string) => stored.get(key) ?? null,
+    );
+    (AsyncStorage.setItem as jest.Mock).mockImplementation(
+      async (key: string, value: string) => {
+        stored.set(key, value);
+      },
+    );
+    const { result } = renderHook(() => useConversations());
+    let originalConversationId = "";
+    let editedMessageId = "";
+    const sourceAttachment = {
+      id: "source-image",
+      kind: "image" as const,
+      uri: "file:///documents/message-images/source-image.jpg",
+      mimeType: "image/jpeg" as const,
+      width: 640,
+      height: 480,
+      byteSize: 128,
+      sharedWithProviders: ["openai" as const],
+    };
+
+    await act(async () => {
+      originalConversationId = result.current.createConversation(
+        "Original question",
+        "gpt-5.4",
+        "openai",
+        { responseLength: "thorough" },
+      );
+      result.current.addMessage({
+        role: "user",
+        content: "Original question",
+        model: null,
+        provider: null,
+      });
+      result.current.addMessage({
+        role: "assistant",
+        content: "Original answer",
+        model: "gpt-5.4",
+        provider: "openai",
+      });
+      editedMessageId =
+        result.current.addMessage({
+          role: "user",
+          content: "Misheard follow-up",
+          attachments: [sourceAttachment],
+          model: null,
+          provider: null,
+        })?.id ?? "";
+      result.current.addMessage({
+        role: "assistant",
+        content: "Answer that should remain only in the original",
+        model: "gpt-5.4",
+        provider: "openai",
+      });
+      await result.current.editUserMessage(
+        editedMessageId,
+        "Corrected follow-up",
+      );
+    });
+
+    let fork: Awaited<
+      ReturnType<typeof result.current.forkConversationAtMessage>
+    > = null;
+    await act(async () => {
+      fork = await result.current.forkConversationAtMessage(editedMessageId);
+    });
+
+    expect(fork).not.toBeNull();
+    expect(fork?.conversation).toEqual(
+      expect.objectContaining({
+        title: "Corrected follow-up",
+        settings: { responseLength: "thorough" },
+      }),
+    );
+    expect(fork?.conversation.messages).toHaveLength(3);
+    expect(fork?.conversation.messages.map(({ content }) => content)).toEqual([
+      "Original question",
+      "Original answer",
+      "Corrected follow-up",
+    ]);
+    expect(fork?.contextMessages).toHaveLength(2);
+    expect(fork?.conversation.knowledgeExcludedConversationIds).toEqual([
+      originalConversationId,
+    ]);
+    expect(fork?.promptMessage.id).not.toBe(editedMessageId);
+    expect(fork?.promptMessage.attachments?.[0]).toEqual(
+      expect.objectContaining({
+        id: expect.not.stringMatching(/^source-image$/),
+        sharedWithProviders: ["openai"],
+      }),
+    );
+    expect(FileSystem.readAsStringAsync).toHaveBeenCalledWith(
+      "file:///documents/message-images/source-image.jpg",
+      { encoding: "base64" },
+    );
+    expect(FileSystem.writeAsStringAsync).toHaveBeenCalled();
+    expect(result.current.activeConversation?.id).toBe(fork?.conversation.id);
+    expect(result.current.conversations).toHaveLength(2);
+    await expect(
+      result.current.getConversationById(originalConversationId),
+    ).resolves.toEqual(
+      expect.objectContaining({
+        messages: expect.arrayContaining([
+          expect.objectContaining({
+            content: "Answer that should remain only in the original",
+          }),
+        ]),
+      }),
+    );
+  });
+
   it("persists a rolling context summary on the active conversation", async () => {
     const { result } = renderHook(() => useConversations());
 

@@ -96,6 +96,10 @@ the complete Play Store translations are kept in a dedicated file under
   heading or ending mid-answer by enforcing the target language in its own
   language, removing standalone generated titles, and reserving a separate
   generation budget for private reasoning.
+- Add a Send action to edited user transcripts that creates an independent
+  conversation branch through the corrected prompt, preserves prior context,
+  settings, privacy, artifacts, and image files, and generates the replacement
+  reply without changing the original conversation.
 - Keep the product name exactly “Mr Broccoli” in every interface language
   instead of translating, respelling, or punctuating the brand per locale.
 - Make past-conversation retrieval abstain on weak incidental matches, suppress

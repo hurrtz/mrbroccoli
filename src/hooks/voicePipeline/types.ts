@@ -46,6 +46,7 @@ export type ReplayPhase = "idle" | "preparing" | "speaking";
 export interface VoiceCaptureRequest {
   attachments?: MessageImageAttachment[];
   audioUri?: string;
+  conversationOverride?: Conversation;
   existingUserMessageId?: string;
   messagesOverride?: Message[];
   transcriptionOverride?: string;

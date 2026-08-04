@@ -99,6 +99,7 @@ export function MainScreen() {
     searchConversations,
     deleteConversation,
     editUserMessage,
+    forkConversationAtMessage,
     restoreConversationBackup,
     clearActiveConversation,
     loaded: conversationsLoaded = true,
@@ -404,8 +405,10 @@ export function MainScreen() {
     stopReplay,
   });
 
-  const { handleRetryMessage, handleSubmitTextMessage } =
+  const { handleForkMessage, handleRetryMessage, handleSubmitTextMessage } =
     useTextTurnSubmitController({
+      forkConversationAtMessage,
+      forkFailureMessage: t("persistenceFailure"),
       handleVoiceCaptureDone,
       isBusy,
       pendingAttachments: pendingImages.attachments,
@@ -894,6 +897,7 @@ export function MainScreen() {
           onEditMessage: isBusy
             ? undefined
             : (message, content) => editUserMessage(message.id, content),
+          onForkMessage: isBusy ? undefined : handleForkMessage,
           onSaveInsight: isBusy
             ? undefined
             : async (message, kind, text) => {

@@ -10,9 +10,11 @@ import {
   Conversation,
   ConversationArtifact,
   ConversationArtifactKind,
+  ConversationFork,
   ConversationMeta,
   ConversationSettings,
   Message,
+  MessageImageAttachment,
   Provider,
   UsageEstimate,
 } from "../../types";
@@ -50,6 +52,48 @@ import {
   removeConversationIntegrityRepairSnapshot,
   saveConversationIntegrityRepairSnapshot,
 } from "../../services/conversationIntegrityStorage";
+
+async function cloneMessagesForFork(messages: Message[]) {
+  const attachmentsBySourceId = new Map<string, MessageImageAttachment>();
+  const createdAttachments: MessageImageAttachment[] = [];
+  const messageIds = new Map<string, string>();
+
+  try {
+    const clonedMessages: Message[] = [];
+    for (const message of messages) {
+      const id = uuid.v4() as string;
+      messageIds.set(message.id, id);
+      const attachments: MessageImageAttachment[] = [];
+
+      for (const attachment of message.attachments ?? []) {
+        let clonedAttachment = attachmentsBySourceId.get(attachment.id);
+        if (!clonedAttachment) {
+          clonedAttachment = await writeRestoredImageAttachment({
+            ...attachment,
+            data: await readImageAttachmentData(attachment),
+            id: uuid.v4() as string,
+          });
+          attachmentsBySourceId.set(attachment.id, clonedAttachment);
+          createdAttachments.push(clonedAttachment);
+        }
+        attachments.push(clonedAttachment);
+      }
+
+      clonedMessages.push({
+        ...message,
+        id,
+        ...(attachments.length > 0
+          ? { attachments }
+          : { attachments: undefined }),
+      });
+    }
+
+    return { clonedMessages, messageIds };
+  } catch (error) {
+    await deleteImageAttachments(createdAttachments);
+    throw error;
+  }
+}
 
 async function isIdenticalBackupConversation(
   existing: Conversation,
@@ -559,6 +603,99 @@ export function useConversationMutations(params: {
     ],
   );
 
+  const forkConversationAtMessage = useCallback(
+    async (messageId: string): Promise<ConversationFork | null> => {
+      const currentConversation = activeConversationRef.current;
+      const messageIndex =
+        currentConversation?.messages.findIndex(
+          (message) => message.id === messageId,
+        ) ?? -1;
+      const sourceMessage = currentConversation?.messages[messageIndex];
+
+      if (
+        !currentConversation ||
+        messageIndex < 0 ||
+        sourceMessage?.role !== "user" ||
+        !sourceMessage.editedAt
+      ) {
+        return null;
+      }
+
+      const now = new Date().toISOString();
+      const { clonedMessages, messageIds } = await cloneMessagesForFork(
+        currentConversation.messages.slice(0, messageIndex + 1),
+      );
+      const promptMessage = clonedMessages.at(-1);
+      if (!promptMessage) {
+        return null;
+      }
+
+      const artifacts = currentConversation.artifacts
+        ?.map((artifact) => {
+          const clonedSourceMessageId = messageIds.get(
+            artifact.sourceMessageId,
+          );
+          return clonedSourceMessageId
+            ? {
+                ...artifact,
+                id: uuid.v4() as string,
+                sourceMessageId: clonedSourceMessageId,
+              }
+            : null;
+        })
+        .filter((artifact): artifact is ConversationArtifact =>
+          Boolean(artifact),
+        );
+      const conversation: Conversation = {
+        id: uuid.v4() as string,
+        title: truncateConversationTitle(promptMessage.content),
+        createdAt: now,
+        updatedAt: now,
+        messages: clonedMessages,
+        knowledgeExcludedConversationIds: [
+          ...new Set([
+            ...(currentConversation.knowledgeExcludedConversationIds ?? []),
+            currentConversation.id,
+          ]),
+        ],
+        ...(artifacts?.length ? { artifacts } : {}),
+        ...(currentConversation.settings
+          ? {
+              settings: {
+                ...currentConversation.settings,
+                ...(currentConversation.settings.ttsVoice
+                  ? { ttsVoice: { ...currentConversation.settings.ttsVoice } }
+                  : {}),
+              },
+            }
+          : {}),
+        ...(currentConversation.isPrivate ? { isPrivate: true } : {}),
+      };
+      const meta = buildConversationMetaFromConversation(conversation);
+
+      await saveConversation(conversation);
+      setConversations((previous) => persistMetas([meta, ...previous]));
+      setActiveConversationValue(conversation);
+
+      if (pastConversationKnowledgeEnabled && !conversation.isPrivate) {
+        void syncConversationKnowledge(conversation, true);
+      }
+
+      return {
+        conversation,
+        contextMessages: clonedMessages.slice(0, -1),
+        promptMessage,
+      };
+    },
+    [
+      activeConversationRef,
+      pastConversationKnowledgeEnabled,
+      persistMetas,
+      setActiveConversationValue,
+      setConversations,
+    ],
+  );
+
   const addConversationArtifact = useCallback(
     async (messageId: string, kind: ConversationArtifactKind, text: string) => {
       const currentConversation = activeConversationRef.current;
@@ -1056,6 +1193,7 @@ export function useConversationMutations(params: {
     createConversation,
     deleteConversation,
     editUserMessage,
+    forkConversationAtMessage,
     restoreConversationBackup,
     getConversationById,
     inspectConversationIntegrity,

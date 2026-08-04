@@ -26,6 +26,7 @@ interface ChatTranscriptProps {
   scrollEnabled?: boolean;
   onCopyMessage?: (message: Message) => Promise<boolean>;
   onEditMessage?: (message: Message) => void;
+  onForkMessage?: (message: Message) => void;
   onSaveInsightMessage?: (message: Message) => void;
   onShareMessage?: (message: Message) => void;
   onRepeatMessage?: (message: Message) => void;
@@ -61,6 +62,7 @@ export function ChatTranscript({
   scrollEnabled = true,
   onCopyMessage,
   onEditMessage,
+  onForkMessage,
   onSaveInsightMessage,
   onShareMessage,
   onRepeatMessage,
@@ -314,6 +316,7 @@ export function ChatTranscript({
           message={item}
           onCopy={onCopyMessage}
           onEdit={onEditMessage}
+          onFork={onForkMessage}
           onSaveInsight={onSaveInsightMessage}
           onShare={onShareMessage}
           onRepeat={onRepeatMessage}

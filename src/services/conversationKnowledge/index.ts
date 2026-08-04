@@ -555,6 +555,7 @@ async function expandSeedContext(
 
 export async function retrieveConversationKnowledge(params: {
   currentConversationId?: string | null;
+  excludedConversationIds?: string[];
   privateConversationIds?: string[];
   query: string;
   sourceLimit?: number;
@@ -567,6 +568,7 @@ export async function retrieveConversationKnowledge(params: {
     }
     const excludedIds = Array.from(
       new Set([
+        ...(params.excludedConversationIds ?? []),
         ...(params.privateConversationIds ?? []),
         ...privateConversationIds,
         ...(params.currentConversationId ? [params.currentConversationId] : []),

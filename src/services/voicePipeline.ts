@@ -51,6 +51,7 @@ export async function runVoicePipeline(
     contextSummary,
     summarizedMessageCount,
     currentConversationId,
+    conversationKnowledgeExcludedIds,
     privateConversationIds,
     pastConversationKnowledgeEnabled = false,
     assistantInstructions,
@@ -224,6 +225,7 @@ export async function runVoicePipeline(
     const pastKnowledgeResult = pastConversationKnowledgeEnabled
       ? await retrieveConversationKnowledge({
           currentConversationId: effectiveCurrentConversationId,
+          excludedConversationIds: conversationKnowledgeExcludedIds,
           privateConversationIds,
           query: pastKnowledgeQuery,
         })

@@ -105,13 +105,17 @@ export function useImagePromptSubmission(params: {
 
   const handleVoiceCaptureDone = useCallback(
     async (request: VoiceCaptureRequest) => {
-      const conversationMessages = params.activeConversation?.messages ?? [];
+      const conversation =
+        request.conversationOverride ?? params.activeConversation;
+      const requestContextualMessages = getContextualMessages(conversation);
+      const conversationMessages =
+        request.messagesOverride ?? conversation?.messages ?? [];
       const contextualMessageIds = new Set(
-        contextualMessages.map((message) => message.id),
+        requestContextualMessages.map((message) => message.id),
       );
       const allAttachments = params.imagesEnabled
         ? [
-            ...contextualMessages.flatMap(
+            ...requestContextualMessages.flatMap(
               (message) => message.attachments ?? [],
             ),
             ...(request.attachments ?? []),
@@ -212,7 +216,7 @@ export function useImagePromptSubmission(params: {
         messagesOverride,
       });
     },
-    [contextualMessages, params, unsupportedRoute],
+    [params, unsupportedRoute],
   );
 
   const handleRecordedVoiceCaptureDone = useCallback(

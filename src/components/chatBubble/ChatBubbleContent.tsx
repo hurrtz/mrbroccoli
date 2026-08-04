@@ -19,6 +19,7 @@ export function ChatBubbleContent({
   message,
   onCopy,
   onEdit,
+  onFork,
   onSaveInsight,
   onShare,
   onRepeat,
@@ -52,11 +53,14 @@ export function ChatBubbleContent({
       <WebSearchReferences message={message} />
       <UsageCard message={message} showUsageStats={showUsageStats} />
       {selectable &&
-      (message.role === "assistant" || onEdit || onSaveInsight) ? (
+      (message.role === "assistant" || onEdit || onFork || onSaveInsight) ? (
         <MessageActions
           message={message}
           onCopy={onCopy}
           onEdit={message.role === "user" ? onEdit : undefined}
+          onFork={
+            message.role === "user" && message.editedAt ? onFork : undefined
+          }
           onSaveInsight={onSaveInsight}
           onShare={onShare}
           onRepeat={onRepeat}

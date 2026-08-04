@@ -29,6 +29,7 @@ interface TranscriptPreviewCardProps {
   activeReplayMessageId?: string | null;
   onCopyMessage: (message: Message) => Promise<boolean>;
   onEditMessage?: (message: Message, content: string) => Promise<boolean>;
+  onForkMessage?: (message: Message) => void;
   onSaveInsight?: (
     message: Message,
     kind: ConversationArtifactKind,
@@ -72,6 +73,7 @@ export function TranscriptPreviewCard({
   activeReplayMessageId = null,
   onCopyMessage,
   onEditMessage,
+  onForkMessage,
   onSaveInsight,
   onRepeatMessage,
   onRetryMessage,
@@ -210,6 +212,7 @@ export function TranscriptPreviewCard({
                 }
               : undefined
           }
+          onForkMessage={onForkMessage}
           onSaveInsightMessage={
             onSaveInsight
               ? (message) => {

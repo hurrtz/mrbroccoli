@@ -68,6 +68,7 @@ export function useConversations({
     createConversation,
     deleteConversation,
     editUserMessage,
+    forkConversationAtMessage,
     restoreConversationBackup,
     getConversationById,
     inspectConversationIntegrity,
@@ -160,6 +161,7 @@ export function useConversations({
     searchConversations,
     deleteConversation,
     editUserMessage,
+    forkConversationAtMessage,
     restoreConversationBackup,
     clearActiveConversation,
   };

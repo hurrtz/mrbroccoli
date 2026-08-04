@@ -122,6 +122,7 @@ export function useVoiceCaptureHandler({
     async ({
       attachments,
       audioUri,
+      conversationOverride,
       existingUserMessageId,
       messagesOverride,
       transcriptionOverride,
@@ -141,6 +142,7 @@ export function useVoiceCaptureHandler({
         abortRef.current === abortController;
       const isActiveRun = () =>
         isCurrentRun() && !abortController.signal.aborted;
+      const conversationForRun = conversationOverride ?? activeConversation;
 
       prepareCaptureForTurn(audioUri);
       if (previousAbortController) {
@@ -177,7 +179,7 @@ export function useVoiceCaptureHandler({
         void handleVoiceCaptureDone(request);
       };
       const errorHandlers = createVoicePipelineErrorHandlers({
-        activeConversation,
+        activeConversation: conversationForRun,
         addMessage,
         attachments,
         audioUri,
@@ -215,7 +217,7 @@ export function useVoiceCaptureHandler({
         turnId,
       });
       const eventAdapter = createVoicePipelineEventAdapter({
-        activeConversation,
+        activeConversation: conversationForRun,
         addMessage,
         attachments,
         createConversation,
@@ -287,10 +289,12 @@ export function useVoiceCaptureHandler({
           audioUri,
           transcriptionOverride,
           attachments,
-          messages: messagesOverride ?? activeConversation?.messages ?? [],
-          contextSummary: activeConversation?.contextSummary,
-          summarizedMessageCount: activeConversation?.summarizedMessageCount,
-          currentConversationId: activeConversation?.id ?? null,
+          messages: messagesOverride ?? conversationForRun?.messages ?? [],
+          contextSummary: conversationForRun?.contextSummary,
+          summarizedMessageCount: conversationForRun?.summarizedMessageCount,
+          currentConversationId: conversationForRun?.id ?? null,
+          conversationKnowledgeExcludedIds:
+            conversationForRun?.knowledgeExcludedConversationIds,
           privateConversationIds,
           pastConversationKnowledgeEnabled,
           model,

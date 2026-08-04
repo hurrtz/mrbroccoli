@@ -580,7 +580,14 @@ export interface Conversation {
   usageEvents?: ConversationUsageEvent[];
   contextSummary?: string;
   summarizedMessageCount?: number;
+  knowledgeExcludedConversationIds?: string[];
   isPrivate?: boolean;
+}
+
+export interface ConversationFork {
+  conversation: Conversation;
+  contextMessages: Message[];
+  promptMessage: Message;
 }
 
 export interface ConversationMeta {

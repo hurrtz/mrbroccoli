@@ -119,6 +119,7 @@ export function MessageActions({
   message,
   onCopy,
   onEdit,
+  onFork,
   onSaveInsight,
   onShare,
   onRepeat,
@@ -128,6 +129,7 @@ export function MessageActions({
   | "message"
   | "onCopy"
   | "onEdit"
+  | "onFork"
   | "onSaveInsight"
   | "onShare"
   | "onRepeat"
@@ -148,7 +150,14 @@ export function MessageActions({
     }
   };
 
-  if (!onCopy && !onEdit && !onSaveInsight && !onShare && !onRepeat) {
+  if (
+    !onCopy &&
+    !onEdit &&
+    !onFork &&
+    !onSaveInsight &&
+    !onShare &&
+    !onRepeat
+  ) {
     return null;
   }
 
@@ -182,6 +191,28 @@ export function MessageActions({
             name="edit"
             size="control"
             color={colors.textSecondary}
+          />
+        </TouchableOpacity>
+      ) : null}
+      {onFork ? (
+        <TouchableOpacity
+          testID={`message-fork-action-${message.id}`}
+          style={[
+            styles.iconAction,
+            {
+              backgroundColor: colors.accent,
+              borderColor: colors.accent,
+            },
+          ]}
+          onPress={() => onFork(message)}
+          activeOpacity={0.88}
+          accessibilityRole="button"
+          accessibilityLabel={t("sendTextMessage")}
+        >
+          <PhosphorIcon
+            name="send"
+            size="control"
+            color={getAccessibleForeground(colors.accent)}
           />
         </TouchableOpacity>
       ) : null}

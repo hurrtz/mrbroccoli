@@ -113,6 +113,7 @@ const conversation: Conversation = {
   createdAt: "2026-07-31T08:00:00.000Z",
   updatedAt: "2026-07-31T08:01:00.000Z",
   isPrivate: true,
+  knowledgeExcludedConversationIds: ["source-conversation"],
   messages: [
     {
       id: "message-1",

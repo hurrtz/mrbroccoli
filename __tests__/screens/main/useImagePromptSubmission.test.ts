@@ -106,6 +106,89 @@ describe("useImagePromptSubmission", () => {
     );
   });
 
+  it("authorizes images from an explicit fork instead of stale active history", async () => {
+    const runVoiceCapture = jest.fn(async () => undefined);
+    const updateMessage = jest.fn(() => null);
+    jest.spyOn(Alert, "alert").mockImplementation(() => undefined);
+    const forkContextMessage = {
+      id: "fork-context",
+      role: "user" as const,
+      content: "Earlier image",
+      attachments: [attachment],
+      model: null,
+      provider: null,
+      timestamp: "2026-08-04T08:00:00.000Z",
+    };
+    const forkPromptMessage = {
+      id: "fork-prompt",
+      role: "user" as const,
+      content: "Corrected question",
+      editedAt: "2026-08-04T08:02:00.000Z",
+      model: null,
+      provider: null,
+      timestamp: "2026-08-04T08:01:00.000Z",
+    };
+    const forkConversation = {
+      id: "fork-conversation",
+      title: "Corrected question",
+      createdAt: "2026-08-04T08:02:00.000Z",
+      updatedAt: "2026-08-04T08:02:00.000Z",
+      messages: [forkContextMessage, forkPromptMessage],
+    };
+    const { result } = renderHook(() =>
+      useImagePromptSubmission({
+        activeConversation: {
+          id: "stale-conversation",
+          title: "Stale",
+          createdAt: "2026-08-04T07:00:00.000Z",
+          updatedAt: "2026-08-04T07:00:00.000Z",
+          messages: [],
+        },
+        imagesEnabled: true,
+        imageRoutes: [{ provider: "openai", model: "gpt-5.5-2026-04-23" }],
+        onAddImage: jest.fn(),
+        pendingAttachments: [],
+        runVoiceCapture,
+        showToast: jest.fn(),
+        t,
+        updateMessage,
+      }),
+    );
+
+    let submission!: Promise<void>;
+    act(() => {
+      submission = result.current.handleVoiceCaptureDone({
+        conversationOverride: forkConversation,
+        existingUserMessageId: forkPromptMessage.id,
+        messagesOverride: [forkContextMessage],
+        transcriptionOverride: forkPromptMessage.content,
+      });
+    });
+    const buttons = jest.mocked(Alert.alert).mock.calls[0][2];
+    await act(async () => {
+      buttons?.[1].onPress?.();
+      await submission;
+    });
+
+    expect(updateMessage).toHaveBeenCalledWith(
+      "fork-context",
+      expect.any(Function),
+    );
+    expect(runVoiceCapture).toHaveBeenCalledWith(
+      expect.objectContaining({
+        conversationOverride: forkConversation,
+        messagesOverride: [
+          expect.objectContaining({
+            id: "fork-context",
+            attachments: [
+              expect.objectContaining({ sharedWithProviders: ["openai"] }),
+            ],
+          }),
+        ],
+      }),
+    );
+  });
+
   it("blocks image submission for a text-only route", () => {
     const showToast = jest.fn();
     const onAddImage = jest.fn();

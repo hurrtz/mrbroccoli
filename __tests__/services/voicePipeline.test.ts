@@ -196,6 +196,7 @@ describe("runVoicePipeline", () => {
       transcriptionOverride: "What did we decide about the index?",
       messages: [],
       currentConversationId: "current",
+      conversationKnowledgeExcludedIds: ["fork-source"],
       privateConversationIds: ["private"],
       pastConversationKnowledgeEnabled: true,
       model: "gpt-5.4",
@@ -215,6 +216,7 @@ describe("runVoicePipeline", () => {
 
     expect(retrieveConversationKnowledge).toHaveBeenCalledWith({
       currentConversationId: "current",
+      excludedConversationIds: ["fork-source"],
       privateConversationIds: ["private"],
       query: "What did we decide about the index?",
     });

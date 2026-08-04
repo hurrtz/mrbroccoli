@@ -4,13 +4,21 @@ import {
   createDebugTurnId,
   recordDebugLogEvent,
 } from "../../services/debugLogCapture";
-import type { Message, MessageImageAttachment } from "../../types";
+import type {
+  ConversationFork,
+  Message,
+  MessageImageAttachment,
+} from "../../types";
 import type { VoiceCaptureRequest } from "../../hooks/useVoicePipeline";
 import type { ShowToastFn } from "./shared";
 
 interface UseTextTurnSubmitControllerParams {
   handleVoiceCaptureDone: (params: VoiceCaptureRequest) => Promise<void>;
   isBusy: boolean;
+  forkConversationAtMessage?: (
+    messageId: string,
+  ) => Promise<ConversationFork | null>;
+  forkFailureMessage?: string;
   promptSubmissionBlockMessage?: string | null;
   showToast?: ShowToastFn;
   pendingAttachments?: MessageImageAttachment[];
@@ -19,6 +27,8 @@ interface UseTextTurnSubmitControllerParams {
 export function useTextTurnSubmitController({
   handleVoiceCaptureDone,
   isBusy,
+  forkConversationAtMessage,
+  forkFailureMessage,
   promptSubmissionBlockMessage,
   showToast,
   pendingAttachments = [],
@@ -94,7 +104,85 @@ export function useTextTurnSubmitController({
     [runTextTurn],
   );
 
+  const handleForkMessage = useCallback(
+    (message: Message) => {
+      if (
+        message.role !== "user" ||
+        !message.editedAt ||
+        !forkConversationAtMessage ||
+        isBusy ||
+        submissionInFlightRef.current
+      ) {
+        return;
+      }
+
+      if (promptSubmissionBlockMessage) {
+        showToast?.(promptSubmissionBlockMessage, undefined, "danger");
+        return;
+      }
+
+      submissionInFlightRef.current = true;
+      const turnId = createDebugTurnId();
+      recordDebugLogEvent({
+        event: "text-message-fork-requested",
+        payload: {
+          messageId: message.id,
+          textLength: message.content.trim().length,
+          turnId,
+        },
+      });
+
+      void forkConversationAtMessage(message.id)
+        .then(async (fork) => {
+          if (!fork) {
+            throw new Error("The edited message could not be forked.");
+          }
+          recordDebugLogEvent({
+            event: "text-message-fork-created",
+            payload: {
+              conversationId: fork.conversation.id,
+              contextMessageCount: fork.contextMessages.length,
+              sourceMessageId: message.id,
+              turnId,
+            },
+          });
+          await handleVoiceCaptureDone({
+            ...(fork.promptMessage.attachments?.length
+              ? { attachments: fork.promptMessage.attachments }
+              : {}),
+            conversationOverride: fork.conversation,
+            existingUserMessageId: fork.promptMessage.id,
+            messagesOverride: fork.contextMessages,
+            transcriptionOverride: fork.promptMessage.content,
+            turnId,
+          });
+        })
+        .catch((error) => {
+          recordDebugLogEvent({
+            event: "text-message-fork-failed",
+            level: "warn",
+            payload: { error, messageId: message.id, turnId },
+          });
+          if (forkFailureMessage) {
+            showToast?.(forkFailureMessage, undefined, "danger");
+          }
+        })
+        .finally(() => {
+          submissionInFlightRef.current = false;
+        });
+    },
+    [
+      forkConversationAtMessage,
+      forkFailureMessage,
+      handleVoiceCaptureDone,
+      isBusy,
+      promptSubmissionBlockMessage,
+      showToast,
+    ],
+  );
+
   return {
+    handleForkMessage,
     handleRetryMessage,
     handleSubmitTextMessage,
   };

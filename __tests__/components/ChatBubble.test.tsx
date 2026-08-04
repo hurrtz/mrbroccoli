@@ -36,6 +36,34 @@ describe("ChatBubble", () => {
     expect(onEdit).toHaveBeenCalledWith(message);
   });
 
+  it("offers a send action only after a user transcript was edited", () => {
+    const onFork = jest.fn();
+    const message = {
+      id: "edited-user-transcript",
+      role: "user" as const,
+      content: "Corrected transcript",
+      editedAt: "2026-08-04T09:00:00.000Z",
+      model: null,
+      provider: null,
+      timestamp: "2026-08-04T08:59:00.000Z",
+    };
+    const screen = renderWithProviders(
+      <ChatBubble selectable message={message} onFork={onFork} />,
+    );
+
+    fireEvent.press(screen.getByLabelText("Send message"));
+
+    expect(onFork).toHaveBeenCalledWith(message);
+    const uneditedScreen = renderWithProviders(
+      <ChatBubble
+        selectable
+        message={{ ...message, editedAt: undefined }}
+        onFork={onFork}
+      />,
+    );
+    expect(uneditedScreen.queryByLabelText("Send message")).toBeNull();
+  });
+
   it("keeps web-search details collapsed until requested and opens citation links", () => {
     const openUrlSpy = jest
       .spyOn(Linking, "openURL")

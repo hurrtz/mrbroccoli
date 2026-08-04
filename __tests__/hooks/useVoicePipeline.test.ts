@@ -700,6 +700,80 @@ describe("useVoicePipeline", () => {
     );
   });
 
+  it("targets an explicit fork while the rendered conversation is still stale", async () => {
+    const originalConversation = {
+      id: "original-conversation",
+      title: "Original",
+      createdAt: "2026-08-04T08:00:00.000Z",
+      updatedAt: "2026-08-04T08:01:00.000Z",
+      messages: [],
+    };
+    const contextMessage = {
+      id: "fork-context",
+      role: "assistant" as const,
+      content: "Earlier context",
+      model: "gpt-5.4",
+      provider: "openai" as const,
+      timestamp: "2026-08-04T08:01:00.000Z",
+    };
+    const promptMessage = {
+      id: "fork-prompt",
+      role: "user" as const,
+      content: "Corrected prompt",
+      editedAt: "2026-08-04T08:03:00.000Z",
+      model: null,
+      provider: null,
+      timestamp: "2026-08-04T08:02:00.000Z",
+    };
+    const forkConversation = {
+      id: "fork-conversation",
+      title: "Corrected prompt",
+      createdAt: "2026-08-04T08:03:00.000Z",
+      updatedAt: "2026-08-04T08:03:00.000Z",
+      messages: [contextMessage, promptMessage],
+      knowledgeExcludedConversationIds: ["original-conversation"],
+    };
+    const params = createParams({
+      activeConversation: originalConversation,
+      spokenRepliesEnabled: false,
+    });
+    (runVoicePipeline as jest.Mock).mockImplementation(
+      async ({ callbacks }: any) => {
+        callbacks.onTranscription("Corrected prompt");
+        callbacks.onResponseDone("Forked reply");
+        return "Corrected prompt";
+      },
+    );
+    const { result } = renderHook(() => useVoicePipeline(params));
+
+    await act(async () => {
+      await result.current.handleVoiceCaptureDone({
+        conversationOverride: forkConversation,
+        existingUserMessageId: promptMessage.id,
+        messagesOverride: [contextMessage],
+        transcriptionOverride: promptMessage.content,
+      });
+    });
+
+    expect(runVoicePipeline).toHaveBeenCalledWith(
+      expect.objectContaining({
+        currentConversationId: "fork-conversation",
+        conversationKnowledgeExcludedIds: ["original-conversation"],
+        messages: [contextMessage],
+      }),
+    );
+    expect(params.createConversation).not.toHaveBeenCalled();
+    expect(params.addMessage).not.toHaveBeenCalledWith(
+      expect.objectContaining({ role: "user" }),
+    );
+    expect(params.addMessage).toHaveBeenCalledWith(
+      expect.objectContaining({
+        content: "Forked reply",
+        role: "assistant",
+      }),
+    );
+  });
+
   it("does not stop produced audio when a later speech chunk fails", async () => {
     const player = createPlayer({
       isPlaying: true,

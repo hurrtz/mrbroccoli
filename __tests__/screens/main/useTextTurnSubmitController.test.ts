@@ -86,6 +86,62 @@ describe("useTextTurnSubmitController", () => {
     });
   });
 
+  it("forks an edited message before submitting it in the new conversation", async () => {
+    const handleVoiceCaptureDone = jest.fn(async () => undefined);
+    const contextMessage: Message = {
+      id: "fork-context-1",
+      role: "assistant",
+      content: "Earlier context",
+      model: "gpt-5.4",
+      provider: "openai",
+      timestamp: "2026-08-04T08:00:00.000Z",
+    };
+    const promptMessage: Message = {
+      id: "fork-prompt-1",
+      role: "user",
+      content: "Corrected request",
+      editedAt: "2026-08-04T08:02:00.000Z",
+      model: null,
+      provider: null,
+      timestamp: "2026-08-04T08:01:00.000Z",
+    };
+    const conversation = {
+      id: "fork-1",
+      title: "Corrected request",
+      createdAt: "2026-08-04T08:02:00.000Z",
+      updatedAt: "2026-08-04T08:02:00.000Z",
+      messages: [contextMessage, promptMessage],
+    };
+    const forkConversationAtMessage = jest.fn(async () => ({
+      conversation,
+      contextMessages: [contextMessage],
+      promptMessage,
+    }));
+    const sourceMessage = { ...promptMessage, id: "source-prompt-1" };
+    const { result } = renderHook(() =>
+      useTextTurnSubmitController({
+        forkConversationAtMessage,
+        handleVoiceCaptureDone,
+        isBusy: false,
+      }),
+    );
+
+    await act(async () => {
+      result.current.handleForkMessage(sourceMessage);
+      await Promise.resolve();
+      await Promise.resolve();
+    });
+
+    expect(forkConversationAtMessage).toHaveBeenCalledWith("source-prompt-1");
+    expect(handleVoiceCaptureDone).toHaveBeenCalledWith({
+      conversationOverride: conversation,
+      existingUserMessageId: "fork-prompt-1",
+      messagesOverride: [contextMessage],
+      transcriptionOverride: "Corrected request",
+      turnId: expect.stringMatching(/^turn-/),
+    });
+  });
+
   it("ignores empty or busy submissions", () => {
     const handleVoiceCaptureDone = jest.fn(async () => undefined);
     const { result } = renderHook(() =>
