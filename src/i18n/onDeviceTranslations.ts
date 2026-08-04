@@ -1,6 +1,264 @@
 import type { TranslationParams } from "./types";
 
+const performanceTranslations = {
+  en: {
+    onDevicePerformanceMeasured: "Measured on this phone",
+    onDevicePerformanceCalibrated: "Estimated from tests on this phone",
+    onDevicePerformanceEstimated: "Estimated from phone specifications",
+    onDevicePerformanceStrong: "Strong fit",
+    onDevicePerformanceClose: "Close fit; test before using",
+    onDevicePerformanceLoad: ({ load }: TranslationParams) => `${load} ms load`,
+    onDevicePerformanceHeadroom: ({ headroom }: TranslationParams) =>
+      `${headroom}× RAM headroom`,
+    onDevicePerformanceCaution:
+      "Predictions are estimates. The model test is short and cannot guarantee sustained speed, heat, or battery use.",
+  },
+  de: {
+    onDevicePerformanceMeasured: "Auf diesem Smartphone gemessen",
+    onDevicePerformanceCalibrated: "Aus Tests auf diesem Smartphone geschätzt",
+    onDevicePerformanceEstimated: "Aus den Gerätedaten geschätzt",
+    onDevicePerformanceStrong: "Sehr gut geeignet",
+    onDevicePerformanceClose: "Knapp geeignet; vor Verwendung testen",
+    onDevicePerformanceLoad: ({ load }: TranslationParams) =>
+      `${load} ms Ladezeit`,
+    onDevicePerformanceHeadroom: ({ headroom }: TranslationParams) =>
+      `${headroom}× RAM-Reserve`,
+    onDevicePerformanceCaution:
+      "Prognosen sind Schätzungen. Der Modelltest ist kurz und garantiert weder Dauergeschwindigkeit noch Wärme- oder Akkuverhalten.",
+  },
+  uk: {
+    onDevicePerformanceMeasured: "Виміряно на цьому телефоні",
+    onDevicePerformanceCalibrated: "Оцінено за тестами на цьому телефоні",
+    onDevicePerformanceEstimated: "Оцінено за характеристиками телефону",
+    onDevicePerformanceStrong: "Добре підходить",
+    onDevicePerformanceClose: "На межі; перевірте перед використанням",
+    onDevicePerformanceLoad: ({ load }: TranslationParams) =>
+      `${load} мс завантаження`,
+    onDevicePerformanceHeadroom: ({ headroom }: TranslationParams) =>
+      `${headroom}× запасу ОЗП`,
+    onDevicePerformanceCaution:
+      "Прогнози є орієнтовними. Короткий тест моделі не гарантує тривалої швидкості, нагрівання чи витрати батареї.",
+  },
+  hi: {
+    onDevicePerformanceMeasured: "इस फ़ोन पर मापा गया",
+    onDevicePerformanceCalibrated: "इस फ़ोन के परीक्षणों से अनुमानित",
+    onDevicePerformanceEstimated: "फ़ोन की विशेषताओं से अनुमानित",
+    onDevicePerformanceStrong: "बहुत उपयुक्त",
+    onDevicePerformanceClose: "सीमित उपयुक्तता; उपयोग से पहले जाँचें",
+    onDevicePerformanceLoad: ({ load }: TranslationParams) =>
+      `${load} मि.से. लोड`,
+    onDevicePerformanceHeadroom: ({ headroom }: TranslationParams) =>
+      `${headroom}× RAM गुंजाइश`,
+    onDevicePerformanceCaution:
+      "अनुमान केवल मार्गदर्शन हैं। छोटा मॉडल परीक्षण लंबे समय की गति, गर्मी या बैटरी उपयोग की गारंटी नहीं देता।",
+  },
+  es: {
+    onDevicePerformanceMeasured: "Medido en este teléfono",
+    onDevicePerformanceCalibrated:
+      "Estimado a partir de pruebas en este teléfono",
+    onDevicePerformanceEstimated:
+      "Estimado a partir de las especificaciones del teléfono",
+    onDevicePerformanceStrong: "Muy adecuado",
+    onDevicePerformanceClose: "Ajustado; pruébalo antes de usarlo",
+    onDevicePerformanceLoad: ({ load }: TranslationParams) =>
+      `${load} ms de carga`,
+    onDevicePerformanceHeadroom: ({ headroom }: TranslationParams) =>
+      `${headroom}× de margen de RAM`,
+    onDevicePerformanceCaution:
+      "Las predicciones son estimaciones. La prueba del modelo es breve y no garantiza la velocidad sostenida, el calor ni el uso de batería.",
+  },
+  fr: {
+    onDevicePerformanceMeasured: "Mesuré sur ce téléphone",
+    onDevicePerformanceCalibrated: "Estimé à partir de tests sur ce téléphone",
+    onDevicePerformanceEstimated:
+      "Estimé à partir des caractéristiques du téléphone",
+    onDevicePerformanceStrong: "Très bien adapté",
+    onDevicePerformanceClose: "Limite ; testez avant utilisation",
+    onDevicePerformanceLoad: ({ load }: TranslationParams) =>
+      `${load} ms de chargement`,
+    onDevicePerformanceHeadroom: ({ headroom }: TranslationParams) =>
+      `${headroom}× de marge RAM`,
+    onDevicePerformanceCaution:
+      "Les prédictions sont des estimations. Le test du modèle est bref et ne garantit ni la vitesse prolongée, ni la chauffe, ni l’autonomie.",
+  },
+  it: {
+    onDevicePerformanceMeasured: "Misurato su questo telefono",
+    onDevicePerformanceCalibrated:
+      "Stimato dai test eseguiti su questo telefono",
+    onDevicePerformanceEstimated: "Stimato dalle specifiche del telefono",
+    onDevicePerformanceStrong: "Molto adatto",
+    onDevicePerformanceClose: "Al limite; prova prima dell’uso",
+    onDevicePerformanceLoad: ({ load }: TranslationParams) =>
+      `${load} ms di caricamento`,
+    onDevicePerformanceHeadroom: ({ headroom }: TranslationParams) =>
+      `${headroom}× di margine RAM`,
+    onDevicePerformanceCaution:
+      "Le previsioni sono stime. Il test del modello è breve e non garantisce velocità prolungata, calore o consumo della batteria.",
+  },
+  pt: {
+    onDevicePerformanceMeasured: "Medido neste telemóvel",
+    onDevicePerformanceCalibrated:
+      "Estimado a partir de testes neste telemóvel",
+    onDevicePerformanceEstimated:
+      "Estimado a partir das especificações do telemóvel",
+    onDevicePerformanceStrong: "Muito adequado",
+    onDevicePerformanceClose: "No limite; testa antes de usar",
+    onDevicePerformanceLoad: ({ load }: TranslationParams) =>
+      `${load} ms de carregamento`,
+    onDevicePerformanceHeadroom: ({ headroom }: TranslationParams) =>
+      `${headroom}× de margem de RAM`,
+    onDevicePerformanceCaution:
+      "As previsões são estimativas. O teste do modelo é breve e não garante velocidade prolongada, aquecimento ou consumo da bateria.",
+  },
+  ptBR: {
+    onDevicePerformanceMeasured: "Medido neste celular",
+    onDevicePerformanceCalibrated: "Estimado a partir de testes neste celular",
+    onDevicePerformanceEstimated:
+      "Estimado a partir das especificações do celular",
+    onDevicePerformanceStrong: "Muito adequado",
+    onDevicePerformanceClose: "No limite; teste antes de usar",
+    onDevicePerformanceLoad: ({ load }: TranslationParams) =>
+      `${load} ms de carregamento`,
+    onDevicePerformanceHeadroom: ({ headroom }: TranslationParams) =>
+      `${headroom}× de margem de RAM`,
+    onDevicePerformanceCaution:
+      "As previsões são estimativas. O teste do modelo é breve e não garante velocidade contínua, aquecimento ou consumo de bateria.",
+  },
+  ru: {
+    onDevicePerformanceMeasured: "Измерено на этом телефоне",
+    onDevicePerformanceCalibrated: "Оценено по тестам на этом телефоне",
+    onDevicePerformanceEstimated: "Оценено по характеристикам телефона",
+    onDevicePerformanceStrong: "Хорошо подходит",
+    onDevicePerformanceClose: "На пределе; проверьте перед использованием",
+    onDevicePerformanceLoad: ({ load }: TranslationParams) =>
+      `${load} мс загрузки`,
+    onDevicePerformanceHeadroom: ({ headroom }: TranslationParams) =>
+      `${headroom}× запаса ОЗУ`,
+    onDevicePerformanceCaution:
+      "Прогнозы являются оценочными. Короткий тест модели не гарантирует длительную скорость, нагрев или расход батареи.",
+  },
+  "zh-CN": {
+    onDevicePerformanceMeasured: "在此手机上实测",
+    onDevicePerformanceCalibrated: "根据此手机上的测试估算",
+    onDevicePerformanceEstimated: "根据手机规格估算",
+    onDevicePerformanceStrong: "非常适合",
+    onDevicePerformanceClose: "勉强适合；使用前请测试",
+    onDevicePerformanceLoad: ({ load }: TranslationParams) =>
+      `${load} 毫秒加载`,
+    onDevicePerformanceHeadroom: ({ headroom }: TranslationParams) =>
+      `${headroom}× 内存余量`,
+    onDevicePerformanceCaution:
+      "预测仅为估算。模型测试时间较短，不能保证持续速度、发热或电池消耗。",
+  },
+  ar: {
+    onDevicePerformanceMeasured: "مقاس على هذا الهاتف",
+    onDevicePerformanceCalibrated: "مقدّر من اختبارات على هذا الهاتف",
+    onDevicePerformanceEstimated: "مقدّر من مواصفات الهاتف",
+    onDevicePerformanceStrong: "ملائم جدًا",
+    onDevicePerformanceClose: "ملاءمة محدودة؛ اختبره قبل الاستخدام",
+    onDevicePerformanceLoad: ({ load }: TranslationParams) =>
+      `${load} مللي ثانية للتحميل`,
+    onDevicePerformanceHeadroom: ({ headroom }: TranslationParams) =>
+      `${headroom}× هامش ذاكرة`,
+    onDevicePerformanceCaution:
+      "التوقعات تقديرية. اختبار النموذج قصير ولا يضمن السرعة المستمرة أو الحرارة أو استهلاك البطارية.",
+  },
+  ja: {
+    onDevicePerformanceMeasured: "この端末で測定",
+    onDevicePerformanceCalibrated: "この端末のテスト結果から推定",
+    onDevicePerformanceEstimated: "端末仕様から推定",
+    onDevicePerformanceStrong: "非常に適しています",
+    onDevicePerformanceClose: "余裕が少ないため使用前にテストしてください",
+    onDevicePerformanceLoad: ({ load }: TranslationParams) =>
+      `読み込み ${load} ms`,
+    onDevicePerformanceHeadroom: ({ headroom }: TranslationParams) =>
+      `RAM 余裕 ${headroom}×`,
+    onDevicePerformanceCaution:
+      "予測は目安です。モデルテストは短時間のため、持続速度、発熱、バッテリー消費は保証できません。",
+  },
+  hu: {
+    onDevicePerformanceMeasured: "Ezen a telefonon mérve",
+    onDevicePerformanceCalibrated: "A telefon tesztjeiből becsülve",
+    onDevicePerformanceEstimated: "A telefon adataiból becsülve",
+    onDevicePerformanceStrong: "Nagyon jó illeszkedés",
+    onDevicePerformanceClose: "Határeset; használat előtt teszteld",
+    onDevicePerformanceLoad: ({ load }: TranslationParams) =>
+      `${load} ms betöltés`,
+    onDevicePerformanceHeadroom: ({ headroom }: TranslationParams) =>
+      `${headroom}× RAM-tartalék`,
+    onDevicePerformanceCaution:
+      "Az előrejelzések becslések. A rövid modellteszt nem garantálja a tartós sebességet, hőmérsékletet vagy akkumulátor-használatot.",
+  },
+  cs: {
+    onDevicePerformanceMeasured: "Změřeno na tomto telefonu",
+    onDevicePerformanceCalibrated: "Odhadnuto z testů na tomto telefonu",
+    onDevicePerformanceEstimated: "Odhadnuto z parametrů telefonu",
+    onDevicePerformanceStrong: "Velmi vhodné",
+    onDevicePerformanceClose: "Na hranici; před použitím otestujte",
+    onDevicePerformanceLoad: ({ load }: TranslationParams) =>
+      `${load} ms načítání`,
+    onDevicePerformanceHeadroom: ({ headroom }: TranslationParams) =>
+      `${headroom}× rezerva RAM`,
+    onDevicePerformanceCaution:
+      "Předpovědi jsou pouze odhady. Krátký test modelu nezaručuje trvalou rychlost, zahřívání ani spotřebu baterie.",
+  },
+  pl: {
+    onDevicePerformanceMeasured: "Zmierzono na tym telefonie",
+    onDevicePerformanceCalibrated: "Oszacowano z testów na tym telefonie",
+    onDevicePerformanceEstimated: "Oszacowano ze specyfikacji telefonu",
+    onDevicePerformanceStrong: "Bardzo dobre dopasowanie",
+    onDevicePerformanceClose: "Na granicy; przetestuj przed użyciem",
+    onDevicePerformanceLoad: ({ load }: TranslationParams) =>
+      `${load} ms ładowania`,
+    onDevicePerformanceHeadroom: ({ headroom }: TranslationParams) =>
+      `${headroom}× zapasu RAM`,
+    onDevicePerformanceCaution:
+      "Prognozy są szacunkowe. Krótki test modelu nie gwarantuje stałej szybkości, temperatury ani zużycia baterii.",
+  },
+  tr: {
+    onDevicePerformanceMeasured: "Bu telefonda ölçüldü",
+    onDevicePerformanceCalibrated: "Bu telefondaki testlerden tahmin edildi",
+    onDevicePerformanceEstimated: "Telefon özelliklerinden tahmin edildi",
+    onDevicePerformanceStrong: "Çok uygun",
+    onDevicePerformanceClose: "Sınırda; kullanmadan önce test edin",
+    onDevicePerformanceLoad: ({ load }: TranslationParams) =>
+      `${load} ms yükleme`,
+    onDevicePerformanceHeadroom: ({ headroom }: TranslationParams) =>
+      `${headroom}× RAM payı`,
+    onDevicePerformanceCaution:
+      "Tahminler yaklaşık değerlerdir. Kısa model testi sürekli hızı, ısınmayı veya pil kullanımını garanti etmez.",
+  },
+  sv: {
+    onDevicePerformanceMeasured: "Uppmätt på den här telefonen",
+    onDevicePerformanceCalibrated:
+      "Uppskattat från tester på den här telefonen",
+    onDevicePerformanceEstimated: "Uppskattat från telefonens specifikationer",
+    onDevicePerformanceStrong: "Mycket bra passform",
+    onDevicePerformanceClose: "På gränsen; testa före användning",
+    onDevicePerformanceLoad: ({ load }: TranslationParams) =>
+      `${load} ms inläsning`,
+    onDevicePerformanceHeadroom: ({ headroom }: TranslationParams) =>
+      `${headroom}× RAM-marginal`,
+    onDevicePerformanceCaution:
+      "Prognoser är uppskattningar. Det korta modelltestet garanterar inte varaktig hastighet, värme eller batterianvändning.",
+  },
+  ur: {
+    onDevicePerformanceMeasured: "اس فون پر ناپا گیا",
+    onDevicePerformanceCalibrated: "اس فون کے ٹیسٹ سے اندازہ لگایا گیا",
+    onDevicePerformanceEstimated: "فون کی خصوصیات سے اندازہ لگایا گیا",
+    onDevicePerformanceStrong: "بہت موزوں",
+    onDevicePerformanceClose: "حد کے قریب؛ استعمال سے پہلے جانچیں",
+    onDevicePerformanceLoad: ({ load }: TranslationParams) =>
+      `${load} ملی سیکنڈ لوڈ`,
+    onDevicePerformanceHeadroom: ({ headroom }: TranslationParams) =>
+      `${headroom}× ریم گنجائش`,
+    onDevicePerformanceCaution:
+      "پیش گوئیاں اندازے ہیں۔ مختصر ماڈل ٹیسٹ مسلسل رفتار، حرارت یا بیٹری استعمال کی ضمانت نہیں دیتا۔",
+  },
+};
+
 const en = {
+  ...performanceTranslations.en,
   settingsOnDevice: "On-device AI",
   settingsOnDeviceSummary:
     "Private local models, device checks, downloads, and tests.",
@@ -36,6 +294,7 @@ const define = (value: OnDeviceTranslations) => value;
 export const onDeviceTranslations = {
   en,
   de: define({
+    ...performanceTranslations.de,
     settingsOnDevice: "KI auf dem Gerät",
     settingsOnDeviceSummary:
       "Private lokale Modelle, Geräteprüfung, Downloads und Tests.",
@@ -66,6 +325,7 @@ export const onDeviceTranslations = {
       "Wähle in den Einstellungen ein Sprachmodell auf dem Gerät aus.",
   }),
   uk: define({
+    ...performanceTranslations.uk,
     settingsOnDevice: "ШІ на пристрої",
     settingsOnDeviceSummary:
       "Приватні локальні моделі, перевірка пристрою, завантаження й тести.",
@@ -96,6 +356,7 @@ export const onDeviceTranslations = {
       "Виберіть у налаштуваннях модель мовлення на пристрої.",
   }),
   hi: define({
+    ...performanceTranslations.hi,
     settingsOnDevice: "डिवाइस पर AI",
     settingsOnDeviceSummary:
       "निजी स्थानीय मॉडल, डिवाइस जाँच, डाउनलोड और परीक्षण।",
@@ -125,6 +386,7 @@ export const onDeviceTranslations = {
     chooseOnDeviceTtsModel: "सेटिंग्स में डिवाइस पर चलने वाला वाक् मॉडल चुनें।",
   }),
   es: define({
+    ...performanceTranslations.es,
     settingsOnDevice: "IA en el dispositivo",
     settingsOnDeviceSummary:
       "Modelos locales privados, comprobación del dispositivo, descargas y pruebas.",
@@ -155,6 +417,7 @@ export const onDeviceTranslations = {
       "Elige en Ajustes un modelo de voz en el dispositivo.",
   }),
   fr: define({
+    ...performanceTranslations.fr,
     settingsOnDevice: "IA sur l’appareil",
     settingsOnDeviceSummary:
       "Modèles locaux privés, contrôle de l’appareil, téléchargements et tests.",
@@ -185,6 +448,7 @@ export const onDeviceTranslations = {
       "Choisissez dans les réglages un modèle vocal sur l’appareil.",
   }),
   it: define({
+    ...performanceTranslations.it,
     settingsOnDevice: "IA sul dispositivo",
     settingsOnDeviceSummary:
       "Modelli locali privati, verifica del dispositivo, download e test.",
@@ -215,6 +479,7 @@ export const onDeviceTranslations = {
       "Scegli nelle impostazioni un modello vocale sul dispositivo.",
   }),
   pt: define({
+    ...performanceTranslations.pt,
     settingsOnDevice: "IA no dispositivo",
     settingsOnDeviceSummary:
       "Modelos locais privados, verificação do dispositivo, transferências e testes.",
@@ -245,6 +510,7 @@ export const onDeviceTranslations = {
       "Escolhe nas definições um modelo de voz no dispositivo.",
   }),
   ptBR: define({
+    ...performanceTranslations.ptBR,
     settingsOnDevice: "IA no dispositivo",
     settingsOnDeviceSummary:
       "Modelos locais privados, verificação do dispositivo, downloads e testes.",
@@ -275,6 +541,7 @@ export const onDeviceTranslations = {
       "Escolha nas configurações um modelo de voz no dispositivo.",
   }),
   ru: define({
+    ...performanceTranslations.ru,
     settingsOnDevice: "ИИ на устройстве",
     settingsOnDeviceSummary:
       "Приватные локальные модели, проверка устройства, загрузки и тесты.",
@@ -305,6 +572,7 @@ export const onDeviceTranslations = {
       "Выберите в настройках модель озвучивания на устройстве.",
   }),
   "zh-CN": define({
+    ...performanceTranslations["zh-CN"],
     settingsOnDevice: "设备端 AI",
     settingsOnDeviceSummary: "私密本地模型、设备检测、下载与测试。",
     onDeviceIntro:
@@ -332,6 +600,7 @@ export const onDeviceTranslations = {
     chooseOnDeviceTtsModel: "请在设置中选择设备端语音模型。",
   }),
   ar: define({
+    ...performanceTranslations.ar,
     settingsOnDevice: "ذكاء اصطناعي على الجهاز",
     settingsOnDeviceSummary:
       "نماذج محلية خاصة وفحص الجهاز والتنزيلات والاختبارات.",
@@ -361,6 +630,7 @@ export const onDeviceTranslations = {
     chooseOnDeviceTtsModel: "اختر نموذج كلام يعمل على الجهاز من الإعدادات.",
   }),
   ja: define({
+    ...performanceTranslations.ja,
     settingsOnDevice: "オンデバイス AI",
     settingsOnDeviceSummary:
       "プライベートなローカルモデル、端末チェック、ダウンロード、テスト。",
@@ -390,6 +660,7 @@ export const onDeviceTranslations = {
     chooseOnDeviceTtsModel: "設定でオンデバイス音声モデルを選択してください。",
   }),
   hu: define({
+    ...performanceTranslations.hu,
     settingsOnDevice: "Eszközön futó MI",
     settingsOnDeviceSummary:
       "Privát helyi modellek, eszközellenőrzés, letöltések és tesztek.",
@@ -420,6 +691,7 @@ export const onDeviceTranslations = {
       "Válassz egy eszközön futó beszédmodellt a Beállításokban.",
   }),
   cs: define({
+    ...performanceTranslations.cs,
     settingsOnDevice: "AI v zařízení",
     settingsOnDeviceSummary:
       "Soukromé místní modely, kontrola zařízení, stahování a testy.",
@@ -449,6 +721,7 @@ export const onDeviceTranslations = {
     chooseOnDeviceTtsModel: "V nastavení vyberte hlasový model v zařízení.",
   }),
   pl: define({
+    ...performanceTranslations.pl,
     settingsOnDevice: "AI na urządzeniu",
     settingsOnDeviceSummary:
       "Prywatne modele lokalne, kontrola urządzenia, pobieranie i testy.",
@@ -478,6 +751,7 @@ export const onDeviceTranslations = {
     chooseOnDeviceTtsModel: "W Ustawieniach wybierz model mowy na urządzeniu.",
   }),
   tr: define({
+    ...performanceTranslations.tr,
     settingsOnDevice: "Cihaz içi yapay zekâ",
     settingsOnDeviceSummary:
       "Özel yerel modeller, cihaz kontrolü, indirmeler ve testler.",
@@ -507,6 +781,7 @@ export const onDeviceTranslations = {
     chooseOnDeviceTtsModel: "Ayarlar’dan cihaz içi bir konuşma modeli seçin.",
   }),
   sv: define({
+    ...performanceTranslations.sv,
     settingsOnDevice: "AI på enheten",
     settingsOnDeviceSummary:
       "Privata lokala modeller, enhetskontroll, hämtningar och tester.",
@@ -536,6 +811,7 @@ export const onDeviceTranslations = {
     chooseOnDeviceTtsModel: "Välj en talmodell på enheten i Inställningar.",
   }),
   ur: define({
+    ...performanceTranslations.ur,
     settingsOnDevice: "ڈیوائس پر AI",
     settingsOnDeviceSummary: "نجی مقامی ماڈلز، ڈیوائس جانچ، ڈاؤن لوڈ اور ٹیسٹ۔",
     onDeviceIntro:

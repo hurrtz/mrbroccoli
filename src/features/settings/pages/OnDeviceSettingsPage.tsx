@@ -2,6 +2,7 @@ import React from "react";
 import { AccessibilityInfo, Alert, StyleSheet, Text, View } from "react-native";
 
 import { Button } from "../../../design-system/NativeControls";
+import { LocalModelPerformanceSummary } from "../../../components/LocalModelPerformanceSummary";
 import {
   LOCAL_MODEL_CATALOG,
   localModelSupportsLanguages,
@@ -479,9 +480,16 @@ export function OnDeviceSettingsPage({
           {model.catalogTier === "advanced"
             ? `${t("onboardingAdvancedOptions")} · `
             : ""}
-          {formatBytes(model.downloadBytes)} · {model.license} ·{" "}
-          {t(testStatusKey(benchmark))}
+          {formatBytes(model.downloadBytes)} · {model.license}
         </Text>
+        {snapshot ? (
+          <LocalModelPerformanceSummary
+            model={model}
+            snapshot={snapshot}
+            benchmark={benchmark}
+            benchmarks={benchmarks}
+          />
+        ) : null}
         {downloadProgress ? (
           <Text style={[localStyles.meta, { color: colors.accent }]}>
             {Math.round(downloadProgress.progress * 100)}%
@@ -667,6 +675,9 @@ export function OnDeviceSettingsPage({
               })}
             </Text>
           ) : null}
+          <Text style={[localStyles.meta, { color: colors.textMuted }]}>
+            {t("onDevicePerformanceCaution")}
+          </Text>
           {probeError ? (
             <Text
               accessibilityRole="alert"

@@ -12,6 +12,12 @@ the complete Play Store translations are kept in a dedicated file under
 
 ### Added
 
+- Assess every compatible on-device model before download using the current
+  phone's RAM, available memory, storage, architecture, OS, power, and thermal
+  state. Advanced onboarding and Settings distinguish specification estimates,
+  estimates calibrated from another model tested on the same phone, and exact
+  short benchmark results with tokens per second or speech real-time factor,
+  load time, and RAM headroom.
 - Continue from any user or assistant checkpoint, including inside an existing
   branch. Transcript markers identify the exact branch point, the conversation
   drawer renders recursive Git-style rails, related checkpoints are directly

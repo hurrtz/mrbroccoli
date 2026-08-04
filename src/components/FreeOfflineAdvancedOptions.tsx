@@ -7,31 +7,16 @@ import {
   type LocalModelDefinition,
 } from "../constants/localModels";
 import { PhosphorIcon } from "../design-system/PhosphorIcon";
+import { LocalModelPerformanceSummary } from "./LocalModelPerformanceSummary";
 import { getKokoroVoiceOptions } from "../constants/kokoro";
 import { AntPickerRow } from "../features/settings/AntSettingsPrimitives";
 import { useLocalization } from "../i18n";
 import type { FreeOfflineModeController } from "../screens/main/useFreeOfflineMode";
-import {
-  evaluateLocalModelEligibility,
-  type LocalDeviceSnapshot,
-  type LocalModelBenchmarkResult,
-} from "../services/localDeviceCapabilities";
+import { evaluateLocalModelEligibility } from "../services/localDeviceCapabilities";
 import type { OfflineProfile } from "../services/offlineProfile";
 import { useTheme } from "../theme/ThemeContext";
 import { fonts } from "../theme/typography";
 import { formatBytes } from "../utils/formatBytes";
-
-function benchmarkMatchesSnapshot(
-  benchmark: LocalModelBenchmarkResult | undefined,
-  snapshot: LocalDeviceSnapshot,
-) {
-  return (
-    benchmark?.device.platform === snapshot.platform &&
-    benchmark.device.architecture === snapshot.architecture &&
-    benchmark.device.osVersion === snapshot.osVersion &&
-    benchmark.device.physicalMemoryBytes === snapshot.physicalMemoryBytes
-  );
-}
 
 export function FreeOfflineAdvancedOptions({
   controller,
@@ -54,28 +39,6 @@ export function FreeOfflineAdvancedOptions({
         : [],
     [language],
   );
-
-  const statusLabel = (model: LocalModelDefinition) => {
-    if (!snapshot) {
-      return t("onDeviceNotTested");
-    }
-    const benchmark = controller.benchmarks[model.id];
-    if (benchmarkMatchesSnapshot(benchmark, snapshot)) {
-      return t(
-        benchmark?.status === "viable"
-          ? "onDeviceViable"
-          : benchmark?.status === "below-target"
-            ? "onDeviceBelowTarget"
-            : "onDeviceTestFailed",
-      );
-    }
-    const eligibility = evaluateLocalModelEligibility(model, snapshot);
-    return t(
-      eligibility.eligible && !eligibility.retryLater
-        ? "onboardingLikely"
-        : "onboardingNotRecommended",
-    );
-  };
 
   const renderOption = (model: LocalModelDefinition, selected: boolean) => {
     const eligibility = snapshot
@@ -123,9 +86,14 @@ export function FreeOfflineAdvancedOptions({
             {model.catalogTier === "advanced"
               ? `${t("onboardingAdvancedOptions")} · `
               : ""}
-            {formatBytes(model.downloadBytes)} · {model.license} ·{" "}
-            {statusLabel(model)}
+            {formatBytes(model.downloadBytes)} · {model.license}
           </Text>
+          <LocalModelPerformanceSummary
+            model={model}
+            snapshot={snapshot!}
+            benchmark={controller.benchmarks[model.id]}
+            benchmarks={controller.benchmarks}
+          />
         </View>
         <PhosphorIcon
           name={selected ? "radio-selected" : "radio-unselected"}
@@ -294,6 +262,9 @@ export function FreeOfflineAdvancedOptions({
 
           <Text style={[styles.hint, { color: colors.textSecondary }]}>
             {t("onboardingModelCaution")}
+          </Text>
+          <Text style={[styles.hint, { color: colors.textMuted }]}>
+            {t("onDevicePerformanceCaution")}
           </Text>
         </View>
       ) : null}

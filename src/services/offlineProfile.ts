@@ -18,6 +18,7 @@ import {
 } from "../types";
 import {
   evaluateLocalModelEligibility,
+  localModelBenchmarkMatchesDevice,
   type LocalDeviceSnapshot,
   type LocalModelBenchmarkResult,
 } from "./localDeviceCapabilities";
@@ -82,18 +83,6 @@ function modelSafetyReserve(model: LocalModelDefinition) {
   );
 }
 
-function benchmarkMatchesDevice(
-  benchmark: LocalModelBenchmarkResult | undefined,
-  snapshot: LocalDeviceSnapshot,
-) {
-  return (
-    benchmark?.device.platform === snapshot.platform &&
-    benchmark.device.architecture === snapshot.architecture &&
-    benchmark.device.osVersion === snapshot.osVersion &&
-    benchmark.device.physicalMemoryBytes === snapshot.physicalMemoryBytes
-  );
-}
-
 function hasCurrentBenchmarkFailure(params: {
   model: LocalModelDefinition;
   snapshot: LocalDeviceSnapshot;
@@ -101,7 +90,7 @@ function hasCurrentBenchmarkFailure(params: {
 }) {
   const benchmark = params.benchmarks?.[params.model.id];
   return (
-    benchmarkMatchesDevice(benchmark, params.snapshot) &&
+    localModelBenchmarkMatchesDevice(benchmark, params.snapshot) &&
     (benchmark?.status === "below-target" || benchmark?.status === "failed")
   );
 }
@@ -113,7 +102,10 @@ function modelPreference(params: {
   benchmarks?: Partial<Record<LocalModelId, LocalModelBenchmarkResult>>;
 }) {
   const benchmark = params.benchmarks?.[params.model.id];
-  const currentBenchmark = benchmarkMatchesDevice(benchmark, params.snapshot)
+  const currentBenchmark = localModelBenchmarkMatchesDevice(
+    benchmark,
+    params.snapshot,
+  )
     ? benchmark
     : undefined;
   const knownFailure =

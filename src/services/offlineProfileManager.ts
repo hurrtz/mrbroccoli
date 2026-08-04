@@ -6,6 +6,7 @@ import {
 import type { SttLanguage } from "../types";
 import {
   getLocalModelBenchmarkResults,
+  localModelBenchmarkMatchesDevice,
   type LocalDeviceSnapshot,
   type LocalModelBenchmarkResult,
 } from "./localDeviceCapabilities";
@@ -66,19 +67,6 @@ export function getOfflinePreparationSteps(
   ];
 }
 
-function benchmarkMatchesDevice(
-  benchmark: LocalModelBenchmarkResult | undefined,
-  snapshot: LocalDeviceSnapshot,
-) {
-  return (
-    benchmark?.status === "viable" &&
-    benchmark.device.platform === snapshot.platform &&
-    benchmark.device.architecture === snapshot.architecture &&
-    benchmark.device.osVersion === snapshot.osVersion &&
-    benchmark.device.physicalMemoryBytes === snapshot.physicalMemoryBytes
-  );
-}
-
 export function evaluateOfflineProfileReadiness(params: {
   profile: OfflineProfile;
   snapshot: LocalDeviceSnapshot;
@@ -91,7 +79,11 @@ export function evaluateOfflineProfileReadiness(params: {
     return (
       !install?.installed ||
       !install.verified ||
-      !benchmarkMatchesDevice(params.benchmarks[model.id], params.snapshot)
+      params.benchmarks[model.id]?.status !== "viable" ||
+      !localModelBenchmarkMatchesDevice(
+        params.benchmarks[model.id],
+        params.snapshot,
+      )
     );
   });
 

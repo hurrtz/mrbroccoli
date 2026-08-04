@@ -106,7 +106,22 @@ describe("FreeOfflineSetupModal", () => {
   });
 
   it("reveals device evidence and every compatible model choice on demand", () => {
-    const controller = freeController();
+    const base = freeController();
+    const controller: FreeOfflineModeController = {
+      ...base,
+      benchmarks: {
+        "qwen3-0.6b-q8": {
+          modelId: "qwen3-0.6b-q8",
+          catalogVersion: 2,
+          testedAt: "2026-08-04T00:00:00.000Z",
+          status: "viable",
+          loadMs: 420,
+          durationMs: 2_000,
+          tokensPerSecond: 12.4,
+          device: base.snapshot!,
+        },
+      },
+    };
     const screen = renderWithProviders(
       <FreeOfflineSetupModal controller={controller} />,
     );
@@ -121,6 +136,11 @@ describe("FreeOfflineSetupModal", () => {
     expect(screen.getByTestId("onboarding-native-stt")).toBeTruthy();
     expect(screen.getByTestId("onboarding-kokoro-voice")).toBeTruthy();
     expect(screen.getByText(/Larger models can respond/)).toBeTruthy();
+    expect(
+      screen.getByText("Measured on this phone · Test passed"),
+    ).toBeTruthy();
+    expect(screen.getByText(/12.4 tok\/s · 420 ms load/)).toBeTruthy();
+    expect(screen.getByText(/Predictions are estimates/)).toBeTruthy();
 
     fireEvent.press(
       screen.getByTestId("onboarding-model-omnilingual-asr-300m"),
