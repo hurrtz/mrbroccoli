@@ -2,20 +2,14 @@ import { useCallback } from "react";
 
 import type { SettingsTab } from "../../features/settings-core/types";
 import type { Provider, Settings } from "../../types";
-import type { SetupGuideStep } from "./setupGuideSupport";
 
 interface MainScreenSurfaceActionsParams {
-  closeSettings: () => void;
   handleClearMemory: () => Promise<void>;
   handleCopyMemory: () => Promise<void>;
   handleCopyThread: (conversationId?: string) => Promise<void>;
   handleFinishSetupGuide: () => Promise<void>;
   handleGenerateTitle: () => Promise<void>;
   handleOpenSettingsFromSummary: () => Promise<void>;
-  handleOpenSetupGuide: (
-    step?: SetupGuideStep,
-    source?: "settings" | "app",
-  ) => void;
   handleRenameThread: (
     conversationId: string,
     nextTitle: string,
@@ -36,14 +30,12 @@ interface MainScreenSurfaceActionsParams {
 }
 
 export function useMainScreenSurfaceActions({
-  closeSettings,
   handleClearMemory,
   handleCopyMemory,
   handleCopyThread,
   handleFinishSetupGuide,
   handleGenerateTitle,
   handleOpenSettingsFromSummary,
-  handleOpenSetupGuide,
   handleRenameThread,
   handleShareThread,
   handleValidateProviderKey,
@@ -86,10 +78,6 @@ export function useMainScreenSurfaceActions({
   const handleCloseConversationSettings = useCallback(() => {
     setStyleSheetVisible(false);
   }, [setStyleSheetVisible]);
-  const handleOpenSetupGuideFromSettings = useCallback(() => {
-    closeSettings();
-    handleOpenSetupGuide("intro", "settings");
-  }, [closeSettings, handleOpenSetupGuide]);
   const handleAutoRenameConversation = useCallback(() => {
     void handleGenerateTitle();
   }, [handleGenerateTitle]);
@@ -163,7 +151,6 @@ export function useMainScreenSurfaceActions({
     handleOpenMainSettings,
     handleOpenProviderSettings,
     handleOpenSettingsFromSetupGuide,
-    handleOpenSetupGuideFromSettings,
     handleOpenSpeakingSettings,
     handleRenameDrawerThread,
     handleResetSetupGuideVoiceTest,

@@ -97,7 +97,6 @@ export function AntSettingsPageContent({
     focusProvider,
     kokoroModel,
     onAddResponseMode,
-    onOpenSetupGuide,
     onRemoveResponseMode,
     onUpdate,
     onUpdateApiKey,
@@ -128,7 +127,6 @@ export function AntSettingsPageContent({
         <AntSettingsOverview
           isPremium={props.isPremium}
           onOpenPage={onOpenPage}
-          onOpenSetupGuide={onOpenSetupGuide}
           onOpenPremium={props.onOpenPremium}
         />
       );
@@ -158,9 +156,6 @@ export function AntSettingsPageContent({
               await validation.validateAllProviderCapabilities(provider);
             }}
             onUpdateApiKey={onUpdateApiKey}
-            onChangeSetupGuideShortcut={(visible) =>
-              onUpdate({ showSetupGuideShortcut: visible })
-            }
             onTextInputFocus={controller.handleTextInputFocus}
           />
         </DrillInPage>

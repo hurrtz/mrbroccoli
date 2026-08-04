@@ -69,9 +69,6 @@ export const styles = StyleSheet.create({
   overview: {
     gap: 16,
   },
-  setupCard: {
-    overflow: "hidden",
-  },
   setupCardBody: {
     flexDirection: "row",
     alignItems: "center",

@@ -38,20 +38,17 @@ describe("AntSettingsOverview", () => {
     expect(screen.queryByTestId("settings-readiness-grid")).toBeNull();
   });
 
-  it("exposes guided setup as one clear action", () => {
+  it("omits the retired guided setup card", () => {
     const screen = render(
       <ThemeProvider mode="light">
         <LocalizationProvider language="en">
-          <AntSettingsOverview
-            {...overviewProps()}
-            onOpenSetupGuide={jest.fn()}
-          />
+          <AntSettingsOverview {...overviewProps()} />
         </LocalizationProvider>
       </ThemeProvider>,
     );
 
-    expect(screen.getByLabelText("Guided setup")).toBeTruthy();
-    expect(screen.getAllByText("Guided setup")).toHaveLength(1);
+    expect(screen.queryByTestId("settings-guided-setup")).toBeNull();
+    expect(screen.queryByText("Guided setup")).toBeNull();
   });
 
   it("shows the current release version from the app config", () => {
@@ -92,7 +89,7 @@ describe("AntSettingsOverview", () => {
     expect(iconStyle.color).toBe(lightColors.text);
   });
 
-  it("identifies Free as a coherent private offline edition", () => {
+  it("omits the redundant Free edition card", () => {
     const screen = render(
       <ThemeProvider mode="light">
         <LocalizationProvider language="en">
@@ -101,7 +98,8 @@ describe("AntSettingsOverview", () => {
       </ThemeProvider>,
     );
 
-    expect(screen.getByText("Private Offline · Free")).toBeTruthy();
+    expect(screen.queryByTestId("settings-edition-card")).toBeNull();
+    expect(screen.queryByText("Private Offline · Free")).toBeNull();
     expect(screen.queryByText("Conversation & tools")).toBeNull();
     expect(screen.getByText("Voice & models")).toBeTruthy();
     expect(screen.getByText("Privacy & app")).toBeTruthy();

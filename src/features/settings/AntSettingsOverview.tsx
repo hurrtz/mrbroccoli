@@ -113,12 +113,10 @@ const overviewGroups = [
 export function AntSettingsOverview({
   isPremium,
   onOpenPage,
-  onOpenSetupGuide,
   onOpenPremium,
 }: {
   isPremium: boolean;
   onOpenPage: (page: DrillInSettingsPage) => void;
-  onOpenSetupGuide?: () => void;
   onOpenPremium: () => void;
 }) {
   const { colors } = useTheme();
@@ -138,70 +136,32 @@ export function AntSettingsOverview({
 
   return (
     <View testID="settings-page-overview" style={styles.overview}>
-      <AntSettingsCard
-        testID="settings-edition-card"
-        style={{
-          backgroundColor: isPremium ? colors.accentSoft : colors.surfaceAlt,
-          borderColor: isPremium ? colors.borderStrong : colors.border,
-        }}
-      >
-        <View style={styles.setupCardBody}>
-          <PhosphorIcon
-            name={isPremium ? "check-circle" : "safety-certificate"}
-            size="prominent"
-            color={isPremium ? colors.success : colors.accent}
-          />
-          <View style={styles.setupCopy}>
-            <Text style={[styles.setupTitle, { color: colors.text }]}>
-              {isPremium ? t("premiumUnlocked") : t("freeEdition")}
-            </Text>
-            <Text
-              style={[styles.setupSummary, { color: colors.textSecondary }]}
-            >
-              {isPremium ? t("premiumDescription") : t("freeOfflineIntro")}
-            </Text>
-          </View>
-        </View>
-      </AntSettingsCard>
-
-      {onOpenSetupGuide ? (
-        <Pressable
-          testID="settings-guided-setup"
-          onPress={onOpenSetupGuide}
-          accessibilityRole="button"
-          accessibilityLabel={t("settingsGuidedSetup")}
-          style={({ pressed }) => (pressed ? styles.pressedControl : undefined)}
+      {isPremium ? (
+        <AntSettingsCard
+          testID="settings-edition-card"
+          style={{
+            backgroundColor: colors.accentSoft,
+            borderColor: colors.borderStrong,
+          }}
         >
-          <AntSettingsCard
-            style={[
-              styles.setupCard,
-              {
-                backgroundColor: colors.accentSoft,
-                borderColor: colors.borderStrong,
-              },
-            ]}
-          >
-            <View style={styles.setupCardBody}>
-              <View style={styles.setupCopy}>
-                <Text style={[styles.setupTitle, { color: colors.text }]}>
-                  {t("settingsGuidedSetup")}
-                </Text>
-                <Text
-                  style={[styles.setupSummary, { color: colors.textSecondary }]}
-                >
-                  {isPremium
-                    ? t("settingsGuidedSetupSummary")
-                    : t("freeOfflineIntro")}
-                </Text>
-              </View>
-              <PhosphorIcon
-                name={drillInIcon}
-                size="control"
-                color={colors.textMuted}
-              />
+          <View style={styles.setupCardBody}>
+            <PhosphorIcon
+              name="check-circle"
+              size="prominent"
+              color={colors.success}
+            />
+            <View style={styles.setupCopy}>
+              <Text style={[styles.setupTitle, { color: colors.text }]}>
+                {t("premiumUnlocked")}
+              </Text>
+              <Text
+                style={[styles.setupSummary, { color: colors.textSecondary }]}
+              >
+                {t("premiumDescription")}
+              </Text>
             </View>
-          </AntSettingsCard>
-        </Pressable>
+          </View>
+        </AntSettingsCard>
       ) : null}
 
       {visibleGroups.map((group) => (

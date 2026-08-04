@@ -10,6 +10,11 @@ the complete Play Store translations are kept in a dedicated file under
 
 ## Unreleased
 
+### Changed
+
+- Simplify Settings by removing the redundant Free edition summary and Guided
+  setup shortcut cards. Free setup remains available from Home.
+
 ### Added
 
 - Preview the selected system or Kokoro voice directly beside its Advanced

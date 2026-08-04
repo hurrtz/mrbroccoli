@@ -350,12 +350,10 @@ jest.mock("../../src/features/settings/AntSettingsModal", () => ({
   AntSettingsModal: ({
     visible,
     suspended,
-    onOpenSetupGuide,
     onOpenPremium,
   }: {
     visible: boolean;
     suspended?: boolean;
-    onOpenSetupGuide?: () => void;
     onOpenPremium: () => void;
   }) => {
     const React = require("react");
@@ -368,13 +366,6 @@ jest.mock("../../src/features/settings/AntSettingsModal", () => ({
         null,
         visible && !suspended ? "settings:open" : "settings:closed",
       ),
-      visible && !suspended && onOpenSetupGuide
-        ? React.createElement(
-            TouchableOpacity,
-            { onPress: onOpenSetupGuide },
-            React.createElement(Text, null, "guided-setup-shortcut"),
-          )
-        : null,
       visible && !suspended
         ? React.createElement(
             TouchableOpacity,
@@ -812,7 +803,7 @@ describe("MainScreen", () => {
     fireEvent.press(screen.getByText("open-drawer"));
 
     expect(screen.getByText("settings:open")).toBeTruthy();
-    expect(screen.getByText("guided-setup-shortcut")).toBeTruthy();
+    expect(screen.queryByText("guided-setup-shortcut")).toBeNull();
     expect(screen.getByText("drawer:open")).toBeTruthy();
   });
 
@@ -827,18 +818,6 @@ describe("MainScreen", () => {
 
     fireEvent.press(screen.getByText("Done"));
     expect(screen.getByText("settings:open")).toBeTruthy();
-  });
-
-  it("hides the guided-setup shortcut after it is disabled", () => {
-    useSharedSettings.mockReturnValue(
-      createSharedSettingsValue({ showSetupGuideShortcut: false }),
-    );
-    const screen = renderWithProviders(<MainScreen />);
-
-    fireEvent.press(screen.getByText("open-settings"));
-
-    expect(screen.getByText("settings:open")).toBeTruthy();
-    expect(screen.queryByText("guided-setup-shortcut")).toBeNull();
   });
 
   it("hides the debug log action by default", () => {

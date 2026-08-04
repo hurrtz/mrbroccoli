@@ -443,7 +443,6 @@ export function MainScreen() {
     handleContinueFromVoiceTest,
     handleFinishSetupGuide,
     handleOpenSettingsFromSummary,
-    handleOpenSetupGuide,
     openedFromSettings: setupGuideOpenedFromSettings,
     step: setupGuideStep,
     providerOptions: setupGuideProviderOptions,
@@ -653,7 +652,6 @@ export function MainScreen() {
     handleOpenMainSettings,
     handleOpenProviderSettings,
     handleOpenSettingsFromSetupGuide,
-    handleOpenSetupGuideFromSettings,
     handleOpenSpeakingSettings,
     handleRenameDrawerThread,
     handleResetSetupGuideVoiceTest,
@@ -663,14 +661,12 @@ export function MainScreen() {
     handleToggleWebSearch,
     handleValidateSetupGuideProviderKey,
   } = useMainScreenSurfaceActions({
-    closeSettings,
     handleClearMemory,
     handleCopyMemory,
     handleCopyThread,
     handleFinishSetupGuide,
     handleGenerateTitle,
     handleOpenSettingsFromSummary,
-    handleOpenSetupGuide,
     handleRenameThread,
     handleShareThread,
     handleValidateProviderKey,
@@ -968,14 +964,6 @@ export function MainScreen() {
         onPreviewVoice: handlePreviewVoice,
         onStopPreviewVoice: stopPreviewVoice,
         onValidateProviderCapability: handleValidateProviderCapability,
-        onOpenSetupGuide: freeOffline.entitlement.isPremium
-          ? settings.showSetupGuideShortcut
-            ? handleOpenSetupGuideFromSettings
-            : undefined
-          : () => {
-              closeSettings();
-              freeOffline.openSetup();
-            },
         isPremium: freeOffline.entitlement.isPremium,
         developmentEntitlementMode:
           freeOffline.entitlement.developmentEntitlementMode,

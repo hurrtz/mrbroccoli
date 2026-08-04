@@ -65,7 +65,6 @@ export interface SettingsModalProps {
     provider: Provider,
     capability: ProviderCapability,
   ) => Promise<void>;
-  onOpenSetupGuide?: () => void;
   onOpenPremium: () => void;
   conversationArchive: ConversationArchiveController;
   onCreateAppDataBackup: () => Promise<AppDataBackup>;
