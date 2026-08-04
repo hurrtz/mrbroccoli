@@ -96,7 +96,7 @@ the complete Play Store translations are kept in a dedicated file under
   single initially empty language dropdown whose placeholder carries the
   selection instruction, highlights the personalized best-match setup only
   after an explicit choice and a short matching step, and uses a compact
-  Advanced checkbox plus a clear Start action. The recommendation card avoids
+  Advanced checkbox plus a more prominent Start action. The recommendation card avoids
   duplicate confirmation decoration and uses the same restrained corner radius
   as the language dropdown without a decorative top rail. Major screen sections
   have clearer separation, with extra emphasis between the language dropdown

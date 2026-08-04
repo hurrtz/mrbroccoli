@@ -186,6 +186,20 @@ describe("FreeOfflineSetupScreen", () => {
     expect(screen.getByText("Your best setup")).toBeTruthy();
     expect(screen.queryByText("Language")).toBeNull();
     expect(screen.queryAllByRole("radio")).toHaveLength(0);
+    expect(
+      StyleSheet.flatten(
+        screen.getByTestId("free-offline-primary-action").props.style,
+      ),
+    ).toEqual(
+      expect.objectContaining({
+        minHeight: 56,
+        paddingHorizontal: 20,
+        paddingVertical: 14,
+      }),
+    );
+    expect(StyleSheet.flatten(screen.getByText("Start").props.style)).toEqual(
+      expect.objectContaining({ fontSize: 16, lineHeight: 22 }),
+    );
 
     fireEvent.press(screen.getByTestId("free-language-picker"));
     expect(screen.getByRole("header").props.children).toBe(
