@@ -72,7 +72,8 @@ the complete Play Store translations are kept in a dedicated file under
   without exposing model brands,
   presents download size and setup time directly on the recommendation card,
   and reduces the Free Home cards to only `Quick response` and
-  `Thorough thinking`.
+  `Thorough thinking`, centered in each card. Completed local routes now remain
+  visible immediately after relaunch instead of briefly collapsing to Quick.
   Exact model names remain available in Advanced setup and Settings.
 - Arrange both automatic and custom setup summaries with Quick responses and
   Thorough reasoning first, followed by Text to Speech and Speech to Text.

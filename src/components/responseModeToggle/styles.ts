@@ -91,6 +91,10 @@ export const responseModeToggleStyles = StyleSheet.create({
     justifyContent: "space-evenly",
     gap: 0,
   },
+  localModeContent: {
+    alignItems: "center",
+    justifyContent: "center",
+  },
   providerRow: {
     minHeight: 24,
     width: "100%",

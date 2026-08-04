@@ -585,12 +585,28 @@ export function useFreeOfflineMode(params: {
   }, [settings.kokoroVoices.en, storedLanguage]);
 
   const completeSetup = useCallback(
-    (withCustomSelections: boolean) => {
+    (profile: OfflineProfile, withCustomSelections: boolean) => {
+      const persistedProfileSettings = applyOfflineProfileToSettings(
+        settings,
+        profile,
+      );
       updateSettings({
+        activeResponseMode: persistedProfileSettings.activeResponseMode,
+        responseModes: persistedProfileSettings.responseModes,
+        language: persistedProfileSettings.language,
         freeOfflineSetupCompleted: true,
         freeOfflineProfileOverrides: withCustomSelections
           ? settings.freeOfflineProfileOverrides
           : {},
+        sttMode: persistedProfileSettings.sttMode,
+        nativeSttRequiresOnDevice:
+          persistedProfileSettings.nativeSttRequiresOnDevice,
+        localSttModelId: persistedProfileSettings.localSttModelId,
+        sttLanguage: persistedProfileSettings.sttLanguage,
+        localLanguages: persistedProfileSettings.localLanguages,
+        ttsMode: persistedProfileSettings.ttsMode,
+        localTtsModelId: persistedProfileSettings.localTtsModelId,
+        ttsListenLanguages: persistedProfileSettings.ttsListenLanguages,
         nativeTtsVoiceId: withCustomSelections
           ? selectedNativeVoice
           : recommendedNativeVoice,
@@ -607,19 +623,18 @@ export function useFreeOfflineMode(params: {
       recommendedNativeVoice,
       selectedKokoroVoice,
       selectedNativeVoice,
-      settings.freeOfflineProfileOverrides,
-      settings.kokoroVoices,
+      settings,
       updateSettings,
     ],
   );
 
   const start = useCallback(() => {
-    if (readiness?.ready !== true) {
+    if (readiness?.ready !== true || selection?.status !== "ready") {
       return;
     }
     skipNextAutomaticRefreshRef.current = true;
-    completeSetup(useCustomProfile);
-  }, [completeSetup, readiness?.ready, useCustomProfile]);
+    completeSetup(selection.profile, useCustomProfile);
+  }, [completeSetup, readiness?.ready, selection, useCustomProfile]);
 
   const prepare = useCallback(async () => {
     if (selection?.status !== "ready" || preparing) {
@@ -637,6 +652,7 @@ export function useFreeOfflineMode(params: {
       snapshot,
     );
     const preparingCustomSelection = useCustomProfileRef.current;
+    const preparingProfile = selection.profile;
     setPreparationEtaSeconds(estimatedSeconds);
     try {
       await prepareOfflineProfile(selection.profile, {
@@ -659,7 +675,7 @@ export function useFreeOfflineMode(params: {
       const nextReadiness = await refresh();
       if (nextReadiness?.ready) {
         skipNextAutomaticRefreshRef.current = true;
-        completeSetup(preparingCustomSelection);
+        completeSetup(preparingProfile, preparingCustomSelection);
       }
     } catch (nextError) {
       if (!abortController.signal.aborted) {

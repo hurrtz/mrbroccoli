@@ -352,6 +352,23 @@ describe("free offline profile selection", () => {
     ).toHaveLength(1);
   });
 
+  it("keeps the completed Quick and Thorough routes during cold-start evaluation", () => {
+    const completedSettings = {
+      ...applyOfflineProfileToSettings(DEFAULT_SETTINGS, readyProfile("de")),
+      freeOfflineSetupCompleted: true,
+    };
+
+    const effective = applyUnavailableFreeSettings(completedSettings);
+
+    expect(effective.responseModes.map(({ id }) => id)).toEqual([
+      "free-offline",
+      "free-offline-thorough",
+    ]);
+    expect(effective.responseModes.map(({ route }) => route.localModelId)).toEqual(
+      ["granite-4.0-1b-q4", "ministral-3-3b-reasoning-q4"],
+    );
+  });
+
   it("keeps Qwen3 0.6B as a constrained-device fallback", () => {
     const selection = selectOfflineProfile({
       languages: ["de"],

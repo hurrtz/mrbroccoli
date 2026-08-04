@@ -84,6 +84,16 @@ describe("ResponseModeToggle", () => {
     expect(screen.queryByTestId("response-mode-effort-quick")).toBeNull();
     expect(screen.queryByTestId("response-mode-effort-thorough")).toBeNull();
     expect(
+      StyleSheet.flatten(
+        screen.getByTestId("response-mode-option-content-quick").props.style,
+      ),
+    ).toEqual(
+      expect.objectContaining({
+        alignItems: "center",
+        justifyContent: "center",
+      }),
+    );
+    expect(
       screen.getByTestId("response-mode-option-quick").props.accessibilityLabel,
     ).toContain("Quick response");
     expect(

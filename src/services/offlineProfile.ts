@@ -446,6 +446,24 @@ export function applyOfflineProfileToSettings(
 }
 
 export function applyUnavailableFreeSettings(settings: Settings): Settings {
+  const persistedResponseModes = settings.freeOfflineSetupCompleted
+    ? settings.responseModes.filter(
+        ({ route }) =>
+          route.runtime === "local" && Boolean(route.localModelId),
+      )
+    : [];
+  if (persistedResponseModes.length > 0) {
+    return {
+      ...applyFreeRuntimeBoundaries(settings),
+      activeResponseMode: persistedResponseModes.some(
+        ({ id }) => id === settings.activeResponseMode,
+      )
+        ? settings.activeResponseMode
+        : persistedResponseModes[0].id,
+      responseModes: persistedResponseModes,
+    };
+  }
+
   const llm = getLocalModelsForLanguages("llm", settings.localLanguages).find(
     (model) =>
       model.responseProfile === "quick" && model.catalogTier === "recommended",

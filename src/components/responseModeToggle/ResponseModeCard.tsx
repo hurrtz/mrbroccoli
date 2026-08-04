@@ -377,6 +377,7 @@ export function ResponseModeCard({
             threeCardPortraitOneLine
               ? styles.optionContentThreeCardOneLine
               : null,
+            local ? styles.localModeContent : null,
           ]}
         >
           {local ? (

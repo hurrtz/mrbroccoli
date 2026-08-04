@@ -1,7 +1,10 @@
 import { act, renderHook, waitFor } from "@testing-library/react-native";
 
 import { useFreeOfflineMode } from "../../src/screens/main/useFreeOfflineMode";
-import { prepareOfflineProfile } from "../../src/services/offlineProfileManager";
+import {
+  getOfflineProfileReadiness,
+  prepareOfflineProfile,
+} from "../../src/services/offlineProfileManager";
 import { DEFAULT_SETTINGS, type Settings } from "../../src/types";
 
 jest.mock("../../src/context/PremiumEntitlementContext", () => ({
@@ -199,6 +202,56 @@ describe("useFreeOfflineMode", () => {
         sttModelId: "omnilingual-asr-300m",
       },
     });
+  });
+
+  it("persists the completed local routes for the next app launch", async () => {
+    jest.mocked(getOfflineProfileReadiness).mockResolvedValueOnce({
+      ready: true,
+      installed: true,
+      failedModelId: null,
+      installs: {},
+      benchmarks: {},
+    });
+    const updateSettings = jest.fn();
+    const { result } = renderHook(() =>
+      useFreeOfflineMode({
+        settings: {
+          ...DEFAULT_SETTINGS,
+          localLanguages: ["de"],
+          ttsListenLanguages: ["de"],
+          sttLanguage: "de",
+          freeOnboardingLanguageInitialized: true,
+          freeOfflineSetupCompleted: true,
+        },
+        settingsLoaded: true,
+        updateSettings,
+      }),
+    );
+
+    await waitFor(
+      () => {
+        expect(result.current.selection?.status).toBe("ready");
+        expect(result.current.readiness?.ready).toBe(true);
+      },
+      { timeout: 2_500 },
+    );
+
+    act(() => result.current.openSetup());
+    act(() => result.current.start());
+
+    const completion = updateSettings.mock.calls.find(
+      ([partial]) => partial.freeOfflineSetupCompleted === true,
+    )?.[0];
+    expect(completion).toEqual(
+      expect.objectContaining({
+        activeResponseMode: "free-offline",
+        freeOfflineSetupCompleted: true,
+        responseModes: [
+          expect.objectContaining({ id: "free-offline" }),
+          expect.objectContaining({ id: "free-offline-thorough" }),
+        ],
+      }),
+    );
   });
 
   it("keeps the recommendation immutable while preserving a hidden custom draft", async () => {
