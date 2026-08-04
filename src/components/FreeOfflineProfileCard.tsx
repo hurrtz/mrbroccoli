@@ -42,34 +42,44 @@ export function FreeOfflineProfileCard({
     estimatedSetupSeconds === null
       ? null
       : formatVoiceEtaDuration(estimatedSetupSeconds);
-  const models = [
+  const modelRows = [
     {
-      key: "stt",
-      icon: "mic" as PhosphorIconName,
-      label: t("speechToText"),
-      model: profile.stt?.name ?? t("appNative"),
+      key: "reasoning",
+      models: [
+        {
+          key: "quick",
+          icon: "thunderbolt" as PhosphorIconName,
+          label: t("onboardingQuickModel"),
+          model: profile.llm.name,
+        },
+        ...(profile.thoroughLlm
+          ? [
+              {
+                key: "thorough",
+                icon: "cpu" as PhosphorIconName,
+                label: t("onboardingThoroughModel"),
+                model: profile.thoroughLlm.name,
+              },
+            ]
+          : []),
+      ],
     },
     {
-      key: "quick",
-      icon: "thunderbolt" as PhosphorIconName,
-      label: t("onboardingQuickModel"),
-      model: profile.llm.name,
-    },
-    ...(profile.thoroughLlm
-      ? [
-          {
-            key: "thorough",
-            icon: "cpu" as PhosphorIconName,
-            label: t("onboardingThoroughModel"),
-            model: profile.thoroughLlm.name,
-          },
-        ]
-      : []),
-    {
-      key: "tts",
-      icon: "sound" as PhosphorIconName,
-      label: t("textToSpeech"),
-      model: profile.tts?.name ?? t("systemVoice"),
+      key: "speech",
+      models: [
+        {
+          key: "tts",
+          icon: "sound" as PhosphorIconName,
+          label: t("textToSpeech"),
+          model: profile.tts?.name ?? t("systemVoice"),
+        },
+        {
+          key: "stt",
+          icon: "mic" as PhosphorIconName,
+          label: t("speechToText"),
+          model: profile.stt?.name ?? t("appNative"),
+        },
+      ],
     },
   ];
 
@@ -102,41 +112,52 @@ export function FreeOfflineProfileCard({
         <Text style={[styles.title, { color: colors.text }]}>{title}</Text>
       </View>
 
-      <View style={styles.models}>
-        {models.map((item) => (
+      <View testID={`${testID}-models`} style={styles.models}>
+        {modelRows.map((row) => (
           <View
-            key={item.key}
-            style={[
-              styles.model,
-              {
-                backgroundColor: colors.surfaceElevated,
-                borderColor: colors.border,
-              },
-            ]}
+            key={row.key}
+            testID={`${testID}-${row.key}-row`}
+            style={styles.modelRow}
           >
-            <View
-              style={[
-                styles.modelIcon,
-                { backgroundColor: softBackground },
-              ]}
-            >
-              <PhosphorIcon
-                name={item.icon}
-                size="compact"
-                color={accentColor}
-              />
-            </View>
-            <View style={styles.modelCopy}>
-              <Text style={[styles.modelLabel, { color: colors.textMuted }]}>
-                {item.label}
-              </Text>
-              <Text
-                numberOfLines={2}
-                style={[styles.modelName, { color: colors.text }]}
+            {row.models.map((item) => (
+              <View
+                key={item.key}
+                testID={`${testID}-${item.key}`}
+                style={[
+                  styles.model,
+                  {
+                    backgroundColor: colors.surfaceElevated,
+                    borderColor: colors.border,
+                  },
+                ]}
               >
-                {item.model}
-              </Text>
-            </View>
+                <View
+                  style={[
+                    styles.modelIcon,
+                    { backgroundColor: softBackground },
+                  ]}
+                >
+                  <PhosphorIcon
+                    name={item.icon}
+                    size="compact"
+                    color={accentColor}
+                  />
+                </View>
+                <View style={styles.modelCopy}>
+                  <Text
+                    style={[styles.modelLabel, { color: colors.textMuted }]}
+                  >
+                    {item.label}
+                  </Text>
+                  <Text
+                    numberOfLines={2}
+                    style={[styles.modelName, { color: colors.text }]}
+                  >
+                    {item.model}
+                  </Text>
+                </View>
+              </View>
+            ))}
           </View>
         ))}
       </View>
@@ -220,9 +241,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
     borderRadius: 12,
     borderWidth: StyleSheet.hairlineWidth,
-    flexBasis: "47%",
     flexDirection: "row",
-    flexGrow: 1,
+    flex: 1,
     gap: 8,
     minHeight: 68,
     padding: 10,
@@ -243,7 +263,8 @@ const styles = StyleSheet.create({
     textTransform: "uppercase",
   },
   modelName: { fontFamily: fonts.bodyMedium, fontSize: 13, lineHeight: 17 },
-  models: { flexDirection: "row", flexWrap: "wrap", gap: 8 },
+  modelRow: { flexDirection: "row", gap: 8 },
+  models: { gap: 8 },
   pill: {
     alignItems: "center",
     borderRadius: 999,

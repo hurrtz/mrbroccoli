@@ -20,6 +20,7 @@ import type { FreeOfflineModeController } from "../screens/main/useFreeOfflineMo
 import { getOfflineProfileModels } from "../services/offlineProfile";
 import { useTheme } from "../theme/ThemeContext";
 import { fonts } from "../theme/typography";
+import type { VoicePreviewRequest } from "../types";
 import { formatVoiceEtaDuration } from "../utils/voiceEta";
 import {
   APP_HEADER_MIN_HEIGHT,
@@ -33,8 +34,12 @@ import { Picker } from "./Picker";
 
 export function FreeOfflineSetupScreen({
   controller,
+  onPreviewVoice,
+  onStopPreviewVoice,
 }: {
   controller: FreeOfflineModeController;
+  onPreviewVoice: (request: VoicePreviewRequest) => Promise<void>;
+  onStopPreviewVoice: () => Promise<void>;
 }) {
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
@@ -230,6 +235,8 @@ export function FreeOfflineSetupScreen({
             {customProfile ? (
               <FreeOfflineAdvancedOptions
                 controller={controller}
+                onPreviewVoice={onPreviewVoice}
+                onStopPreviewVoice={onStopPreviewVoice}
                 profile={customProfile}
               />
             ) : null}

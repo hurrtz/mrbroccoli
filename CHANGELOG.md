@@ -12,6 +12,9 @@ the complete Play Store translations are kept in a dedicated file under
 
 ### Added
 
+- Preview the selected system or Kokoro voice directly beside its Advanced
+  onboarding dropdown. The volume button becomes Stop during synthesis or
+  playback and restores itself when the sample finishes.
 - Keep completed sanitized debug captures in app storage and mirror them into a
   `debug-logs` folder beside the user-selected conversation archive. Later
   archive syncs backfill retained logs when a direct folder write was
@@ -64,6 +67,8 @@ the complete Play Store translations are kept in a dedicated file under
 
 ### Changed
 
+- Arrange both automatic and custom setup summaries with Quick responses and
+  Thorough reasoning first, followed by Text to Speech and Speech to Text.
 - Put the Advanced `Your selected setup` summary after all model and device
   controls, immediately before setup completion. It now uses the app's soft
   violet AI-work color to distinguish a user-curated plan from the green

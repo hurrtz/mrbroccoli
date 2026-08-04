@@ -7,6 +7,8 @@ import {
   localModelSupportsLanguages,
   type LocalModelDefinition,
 } from "../constants/localModels";
+import { LOCAL_PREVIEW_SAMPLE_TEXT_BY_LANGUAGE } from "../constants/voicePreviewSamples";
+import { IconButton } from "../design-system/IconButton";
 import { PhosphorIcon } from "../design-system/PhosphorIcon";
 import { AntPickerRow } from "../features/settings/AntSettingsPrimitives";
 import { useLocalization } from "../i18n";
@@ -15,6 +17,7 @@ import { evaluateLocalModelEligibility } from "../services/localDeviceCapabiliti
 import type { OfflineProfile } from "../services/offlineProfile";
 import { useTheme } from "../theme/ThemeContext";
 import { fonts } from "../theme/typography";
+import type { VoicePreviewRequest } from "../types";
 import { formatBytes } from "../utils/formatBytes";
 
 import { FreeOfflineProfileCard } from "./FreeOfflineProfileCard";
@@ -22,16 +25,27 @@ import { LocalModelPerformanceSummary } from "./LocalModelPerformanceSummary";
 
 export function FreeOfflineAdvancedOptions({
   controller,
+  onPreviewVoice,
+  onStopPreviewVoice,
   profile,
 }: {
   controller: FreeOfflineModeController;
+  onPreviewVoice: (request: VoicePreviewRequest) => Promise<void>;
+  onStopPreviewVoice: () => Promise<void>;
   profile: OfflineProfile;
 }) {
   const { colors } = useTheme();
   const { language: appLanguage, t } = useLocalization();
   const snapshot = controller.snapshot;
   const visible = controller.advancedOptionsEnabled;
-  const language = profile.languages[0];
+  const language = profile.languages[0] ?? "en";
+  const [voicePreviewActive, setVoicePreviewActive] = React.useState(false);
+  const voicePreviewActiveRef = React.useRef(false);
+  const voicePreviewOperationRef = React.useRef(0);
+  const onPreviewVoiceRef = React.useRef(onPreviewVoice);
+  const onStopPreviewVoiceRef = React.useRef(onStopPreviewVoice);
+  onPreviewVoiceRef.current = onPreviewVoice;
+  onStopPreviewVoiceRef.current = onStopPreviewVoice;
   const candidates = React.useMemo(
     () =>
       language
@@ -42,24 +56,124 @@ export function FreeOfflineAdvancedOptions({
     [language],
   );
 
-  const kokoroVoicePicker = (
-    <AntPickerRow
-      testID="onboarding-kokoro-voice"
-      label={t("ttsVoice")}
-      value={controller.selectedKokoroVoice}
-      options={getKokoroVoiceOptions("en", appLanguage)}
-      onChange={controller.selectKokoroVoice}
-    />
+  const stopActiveVoicePreview = React.useCallback(async () => {
+    voicePreviewOperationRef.current += 1;
+    const wasActive = voicePreviewActiveRef.current;
+    voicePreviewActiveRef.current = false;
+    setVoicePreviewActive(false);
+    if (wasActive) {
+      await onStopPreviewVoiceRef.current();
+    }
+  }, []);
+
+  const startVoicePreview = React.useCallback(
+    async (request: VoicePreviewRequest) => {
+      if (voicePreviewActiveRef.current) {
+        await stopActiveVoicePreview();
+        return;
+      }
+
+      const operation = voicePreviewOperationRef.current + 1;
+      voicePreviewOperationRef.current = operation;
+      voicePreviewActiveRef.current = true;
+      setVoicePreviewActive(true);
+      try {
+        await onPreviewVoiceRef.current(request);
+      } finally {
+        if (voicePreviewOperationRef.current === operation) {
+          voicePreviewActiveRef.current = false;
+          setVoicePreviewActive(false);
+        }
+      }
+    },
+    [stopActiveVoicePreview],
   );
-  const nativeVoicePicker = controller.nativeVoiceOptions.length ? (
-    <AntPickerRow
-      testID="onboarding-native-voice"
-      label={t("ttsVoice")}
-      value={controller.selectedNativeVoice}
-      options={controller.nativeVoiceOptions}
-      onChange={controller.selectNativeVoice}
-    />
-  ) : null;
+
+  React.useEffect(() => {
+    if ((!visible || controller.preparing) && voicePreviewActiveRef.current) {
+      void stopActiveVoicePreview();
+    }
+  }, [controller.preparing, stopActiveVoicePreview, visible]);
+
+  React.useEffect(
+    () => () => {
+      voicePreviewOperationRef.current += 1;
+      if (voicePreviewActiveRef.current) {
+        voicePreviewActiveRef.current = false;
+        void onStopPreviewVoiceRef.current();
+      }
+    },
+    [],
+  );
+
+  const renderVoicePicker = (params: {
+    onChange: (voiceId: string) => void;
+    options: { value: string; label: string }[];
+    request: () => VoicePreviewRequest;
+    testID: string;
+    value: string;
+  }) => (
+    <View style={styles.voicePickerRow}>
+      <View style={styles.voicePicker}>
+        <AntPickerRow
+          testID={params.testID}
+          label={t("ttsVoice")}
+          value={params.value}
+          options={params.options}
+          onChange={(voiceId) => {
+            if (voicePreviewActiveRef.current) {
+              void stopActiveVoicePreview();
+            }
+            params.onChange(voiceId);
+          }}
+        />
+      </View>
+      <IconButton
+        testID={`${params.testID}-preview`}
+        accessibilityLabel={
+          voicePreviewActive ? t("stop") : t("previewVoice")
+        }
+        active={voicePreviewActive}
+        disabled={controller.preparing || !params.value}
+        icon={voicePreviewActive ? "stop" : "sound"}
+        onPress={() => {
+          void (voicePreviewActive
+            ? stopActiveVoicePreview()
+            : startVoicePreview(params.request()));
+        }}
+        style={{
+          borderColor: voicePreviewActive ? colors.accent : colors.border,
+        }}
+      />
+    </View>
+  );
+
+  const kokoroVoicePicker = renderVoicePicker({
+    testID: "onboarding-kokoro-voice",
+    value: controller.selectedKokoroVoice,
+    options: getKokoroVoiceOptions("en", appLanguage),
+    onChange: controller.selectKokoroVoice,
+    request: () => ({
+      text: LOCAL_PREVIEW_SAMPLE_TEXT_BY_LANGUAGE[language],
+      mode: "kokoro",
+      language: language === "zh-CN" ? "zh" : "en",
+      voice: controller.selectedKokoroVoice,
+    }),
+  });
+  const nativeVoicePicker = controller.nativeVoiceOptions.length
+    ? renderVoicePicker({
+        testID: "onboarding-native-voice",
+        value: controller.selectedNativeVoice,
+        options: controller.nativeVoiceOptions,
+        onChange: controller.selectNativeVoice,
+        request: () => ({
+          text: LOCAL_PREVIEW_SAMPLE_TEXT_BY_LANGUAGE[language],
+          mode: "native",
+          nativeVoice: controller.selectedNativeVoice,
+          previewLanguage: language,
+        }),
+      })
+    : null;
 
   const renderOption = (model: LocalModelDefinition, selected: boolean) => {
     const eligibility = snapshot
@@ -405,5 +519,11 @@ const styles = StyleSheet.create({
     justifyContent: "flex-end",
     minHeight: 44,
     paddingHorizontal: 2,
+  },
+  voicePicker: { flex: 1, minWidth: 0 },
+  voicePickerRow: {
+    alignItems: "center",
+    flexDirection: "row",
+    gap: 8,
   },
 });

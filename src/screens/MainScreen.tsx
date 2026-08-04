@@ -1023,6 +1023,8 @@ export function MainScreen() {
       }}
       freeOffline={{
         controller: freeOffline,
+        onPreviewVoice: handlePreviewVoice,
+        onStopPreviewVoice: stopPreviewVoice,
       }}
       premiumUpgrade={{
         visible: premiumModalVisible,

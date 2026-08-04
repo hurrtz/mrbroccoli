@@ -1,8 +1,14 @@
 import React from "react";
 import { StyleSheet } from "react-native";
-import { fireEvent, within } from "@testing-library/react-native";
+import {
+  act,
+  fireEvent,
+  waitFor,
+  within,
+} from "@testing-library/react-native";
 
 import { FreeOfflineSetupScreen } from "../../src/components/FreeOfflineSetupScreen";
+import { LOCAL_PREVIEW_SAMPLE_TEXT_BY_LANGUAGE } from "../../src/constants/voicePreviewSamples";
 import type { FreeOfflineModeController } from "../../src/screens/main/useFreeOfflineMode";
 import {
   getOfflineProfileModels,
@@ -104,12 +110,42 @@ function freeController(): FreeOfflineModeController {
   };
 }
 
+function renderSetup(
+  controller: FreeOfflineModeController,
+  callbacks: {
+    onPreviewVoice?: React.ComponentProps<
+      typeof FreeOfflineSetupScreen
+    >["onPreviewVoice"];
+    onStopPreviewVoice?: React.ComponentProps<
+      typeof FreeOfflineSetupScreen
+    >["onStopPreviewVoice"];
+  } = {},
+) {
+  return renderWithProviders(
+    <FreeOfflineSetupScreen
+      controller={controller}
+      onPreviewVoice={
+        callbacks.onPreviewVoice ?? jest.fn(async () => undefined)
+      }
+      onStopPreviewVoice={
+        callbacks.onStopPreviewVoice ?? jest.fn(async () => undefined)
+      }
+    />,
+  );
+}
+
+function childTestIDs(children: React.ReactNode) {
+  return React.Children.toArray(children).map((child) =>
+    React.isValidElement<{ testID?: string }>(child)
+      ? child.props.testID
+      : null,
+  );
+}
+
 describe("FreeOfflineSetupScreen", () => {
   it("uses the full screen, matches the app wordmark, and offers no close action", () => {
     const controller = freeController();
-    const screen = renderWithProviders(
-      <FreeOfflineSetupScreen controller={controller} />,
-    );
+    const screen = renderSetup(controller);
 
     expect(screen.getByTestId("free-offline-setup-screen")).toBeTruthy();
     expect(
@@ -150,9 +186,7 @@ describe("FreeOfflineSetupScreen", () => {
 
   it("offers seven languages in a dropdown and ends with one clear start action", () => {
     const controller = freeController();
-    const screen = renderWithProviders(
-      <FreeOfflineSetupScreen controller={controller} />,
-    );
+    const screen = renderSetup(controller);
 
     expect(screen.queryByText("Choose your language")).toBeNull();
     expect(screen.getByText("Your best setup")).toBeTruthy();
@@ -186,9 +220,7 @@ describe("FreeOfflineSetupScreen", () => {
       customReadiness: null,
       readiness: null,
     };
-    const screen = renderWithProviders(
-      <FreeOfflineSetupScreen controller={controller} />,
-    );
+    const screen = renderSetup(controller);
 
     expect(screen.getByText("Choose your language")).toBeTruthy();
     expect(screen.queryByText("English")).toBeNull();
@@ -214,9 +246,7 @@ describe("FreeOfflineSetupScreen", () => {
 
   it("presents the recommendation as a personalized highlight with a compact advanced checkbox", () => {
     const controller = freeController();
-    const screen = renderWithProviders(
-      <FreeOfflineSetupScreen controller={controller} />,
-    );
+    const screen = renderSetup(controller);
 
     expect(
       StyleSheet.flatten(
@@ -233,6 +263,33 @@ describe("FreeOfflineSetupScreen", () => {
     expect(screen.getByText("Quick responses")).toBeTruthy();
     expect(screen.getByText("Speech to Text")).toBeTruthy();
     expect(screen.getByText("Text to Speech")).toBeTruthy();
+    expect(
+      childTestIDs(
+        screen.getByTestId("onboarding-recommendation-card-models").props
+          .children,
+      ),
+    ).toEqual([
+      "onboarding-recommendation-card-reasoning-row",
+      "onboarding-recommendation-card-speech-row",
+    ]);
+    expect(
+      childTestIDs(
+        screen.getByTestId("onboarding-recommendation-card-reasoning-row")
+          .props.children,
+      ),
+    ).toEqual([
+      "onboarding-recommendation-card-quick",
+      "onboarding-recommendation-card-thorough",
+    ]);
+    expect(
+      childTestIDs(
+        screen.getByTestId("onboarding-recommendation-card-speech-row").props
+          .children,
+      ),
+    ).toEqual([
+      "onboarding-recommendation-card-tts",
+      "onboarding-recommendation-card-stt",
+    ]);
     expect(
       React.Children.count(
         screen.getByTestId("onboarding-recommendation-header").props.children,
@@ -271,9 +328,7 @@ describe("FreeOfflineSetupScreen", () => {
         },
       },
     };
-    const screen = renderWithProviders(
-      <FreeOfflineSetupScreen controller={controller} />,
-    );
+    const screen = renderSetup(controller);
 
     expect(screen.getByText("Phone details")).toBeTruthy();
     expect(screen.getByText("Your selected setup")).toBeTruthy();
@@ -286,6 +341,11 @@ describe("FreeOfflineSetupScreen", () => {
       within(
         screen.getByTestId("onboarding-model-kokoro-multilingual-card"),
       ).getByTestId("onboarding-kokoro-voice"),
+    ).toBeTruthy();
+    expect(
+      within(
+        screen.getByTestId("onboarding-model-kokoro-multilingual-card"),
+      ).getByTestId("onboarding-kokoro-voice-preview"),
     ).toBeTruthy();
     const phoneHeading = StyleSheet.flatten(
       screen.getByTestId("onboarding-heading-phone").props.style,
@@ -333,6 +393,33 @@ describe("FreeOfflineSetupScreen", () => {
         screen.getByTestId("onboarding-recommendation-card").props.style,
       ),
     ).toEqual(expect.objectContaining({ opacity: 0.42, elevation: 0 }));
+    expect(
+      childTestIDs(
+        screen.getByTestId("onboarding-custom-setup-card-models").props
+          .children,
+      ),
+    ).toEqual([
+      "onboarding-custom-setup-card-reasoning-row",
+      "onboarding-custom-setup-card-speech-row",
+    ]);
+    expect(
+      childTestIDs(
+        screen.getByTestId("onboarding-custom-setup-card-reasoning-row").props
+          .children,
+      ),
+    ).toEqual([
+      "onboarding-custom-setup-card-quick",
+      "onboarding-custom-setup-card-thorough",
+    ]);
+    expect(
+      childTestIDs(
+        screen.getByTestId("onboarding-custom-setup-card-speech-row").props
+          .children,
+      ),
+    ).toEqual([
+      "onboarding-custom-setup-card-tts",
+      "onboarding-custom-setup-card-stt",
+    ]);
 
     fireEvent.press(
       screen.getByTestId("onboarding-model-omnilingual-asr-300m"),
@@ -362,9 +449,7 @@ describe("FreeOfflineSetupScreen", () => {
       selection: customSelection,
       hasCustomSelections: true,
     };
-    const screen = renderWithProviders(
-      <FreeOfflineSetupScreen controller={controller} />,
-    );
+    const screen = renderSetup(controller);
 
     expect(
       within(screen.getByTestId("onboarding-recommendation-card")).getByText(
@@ -383,7 +468,7 @@ describe("FreeOfflineSetupScreen", () => {
     ).toBeNull();
   });
 
-  it("keeps the selected system voice inside its TTS option", () => {
+  it("keeps the selected system voice and preview control inside its TTS option", async () => {
     const base = freeController();
     const customSelection = selectOfflineProfile({
       languages: ["en"],
@@ -400,15 +485,69 @@ describe("FreeOfflineSetupScreen", () => {
       selection: customSelection,
       hasCustomSelections: true,
     };
-    const screen = renderWithProviders(
-      <FreeOfflineSetupScreen controller={controller} />,
+    let resolvePreview: (() => void) | undefined;
+    const onPreviewVoice = jest.fn(
+      () =>
+        new Promise<void>((resolve) => {
+          resolvePreview = resolve;
+        }),
+    );
+    const onStopPreviewVoice = jest.fn(async () => {
+      resolvePreview?.();
+    });
+    const screen = renderSetup(controller, {
+      onPreviewVoice,
+      onStopPreviewVoice,
+    });
+
+    const nativeTtsCard = within(
+      screen.getByTestId("onboarding-native-tts-card"),
+    );
+    expect(nativeTtsCard.getByTestId("onboarding-native-voice")).toBeTruthy();
+    const preview = nativeTtsCard.getByTestId(
+      "onboarding-native-voice-preview",
+    );
+    expect(preview.props.accessibilityLabel).toBe("Preview Voice");
+
+    fireEvent.press(preview);
+    expect(onPreviewVoice).toHaveBeenCalledWith({
+      text: LOCAL_PREVIEW_SAMPLE_TEXT_BY_LANGUAGE.en,
+      mode: "native",
+      nativeVoice: "com.apple.voice",
+      previewLanguage: "en",
+    });
+    await waitFor(() =>
+      expect(
+        nativeTtsCard.getByTestId("onboarding-native-voice-preview").props
+          .accessibilityLabel,
+      ).toBe("Stop"),
     );
 
+    act(() => resolvePreview?.());
+    await waitFor(() =>
+      expect(
+        nativeTtsCard.getByTestId("onboarding-native-voice-preview").props
+          .accessibilityLabel,
+      ).toBe("Preview Voice"),
+    );
+
+    fireEvent.press(
+      nativeTtsCard.getByTestId("onboarding-native-voice-preview"),
+    );
+    await waitFor(() =>
+      expect(
+        nativeTtsCard.getByTestId("onboarding-native-voice-preview").props
+          .accessibilityLabel,
+      ).toBe("Stop"),
+    );
+    fireEvent.press(
+      nativeTtsCard.getByTestId("onboarding-native-voice-preview"),
+    );
+    await waitFor(() => expect(onStopPreviewVoice).toHaveBeenCalledTimes(1));
     expect(
-      within(screen.getByTestId("onboarding-native-tts-card")).getByTestId(
-        "onboarding-native-voice",
-      ),
-    ).toBeTruthy();
+      nativeTtsCard.getByTestId("onboarding-native-voice-preview").props
+        .accessibilityLabel,
+    ).toBe("Preview Voice");
   });
 
   it("shows a readable matching stage while the recommendation is evaluated", () => {
@@ -423,9 +562,7 @@ describe("FreeOfflineSetupScreen", () => {
       customReadiness: null,
       readiness: null,
     };
-    const screen = renderWithProviders(
-      <FreeOfflineSetupScreen controller={controller} />,
-    );
+    const screen = renderSetup(controller);
 
     expect(
       screen.getByTestId("onboarding-recommendation-spinner"),
@@ -464,9 +601,7 @@ describe("FreeOfflineSetupScreen", () => {
       },
       readiness: { ready: false } as FreeOfflineModeController["readiness"],
     };
-    const screen = renderWithProviders(
-      <FreeOfflineSetupScreen controller={controller} />,
-    );
+    const screen = renderSetup(controller);
 
     expect(
       screen.getByTestId("onboarding-download-progress").props
@@ -498,9 +633,7 @@ describe("FreeOfflineSetupScreen", () => {
       readiness: { ready: false } as FreeOfflineModeController["readiness"],
     };
 
-    const screen = renderWithProviders(
-      <FreeOfflineSetupScreen controller={controller} />,
-    );
+    const screen = renderSetup(controller);
 
     expect(
       screen.getByText("Letting the phone cool down before continuing…"),

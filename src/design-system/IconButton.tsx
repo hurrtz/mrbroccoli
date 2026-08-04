@@ -17,6 +17,7 @@ import {
 export function IconButton({
   accessibilityLabel,
   active = false,
+  disabled = false,
   icon,
   iconNode,
   iconColor,
@@ -27,6 +28,7 @@ export function IconButton({
 }: {
   accessibilityLabel: string;
   active?: boolean;
+  disabled?: boolean;
   icon?: PhosphorIconName;
   iconNode?: React.ReactNode;
   iconColor?: string;
@@ -51,9 +53,12 @@ export function IconButton({
           borderColor: active ? colors.accent : "transparent",
         },
         style,
+        disabled ? styles.disabled : null,
       ]}
       accessibilityLabel={accessibilityLabel}
       accessibilityRole="button"
+      accessibilityState={{ disabled }}
+      disabled={disabled}
       onPress={onPress}
     >
       {iconNode ??
@@ -80,4 +85,5 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     borderWidth: 1,
   },
+  disabled: { opacity: 0.45 },
 });
