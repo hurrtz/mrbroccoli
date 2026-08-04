@@ -20,6 +20,7 @@ export function useNativeVoiceOptions(params: {
   } = params;
   const [nativeVoices, setNativeVoices] = useState<NativeSpeechVoice[]>([]);
   const [selectedNativeVoice, setSelectedNativeVoice] = useState("");
+  const listenLanguage = listenLanguages[0] ?? "en";
 
   useEffect(() => {
     if (!visible || !shouldLoad) {
@@ -28,7 +29,7 @@ export function useNativeVoiceOptions(params: {
 
     let cancelled = false;
     const preferredLanguagePrefix = getSpeechLanguageDefinition(
-      listenLanguages[0] ?? "en",
+      listenLanguage,
     ).providerCode;
 
     // eslint-disable-next-line @typescript-eslint/no-require-imports -- lazy native loading keeps MainScreen Jest imports safe
@@ -100,7 +101,7 @@ export function useNativeVoiceOptions(params: {
     return () => {
       cancelled = true;
     };
-  }, [listenLanguages, preferredVoiceId, shouldLoad, visible]);
+  }, [listenLanguage, preferredVoiceId, shouldLoad, visible]);
 
   const nativeVoiceOptions = useMemo(
     () =>

@@ -19,6 +19,7 @@ import { useNativeVoiceOptions } from "../../features/settings-core/useNativeVoi
 import { getFreeOnboardingLanguageFromStorefront } from "../../services/freeOnboardingLanguage";
 import {
   getLocalModelBenchmarkResults,
+  localModelBenchmarkMatchesDevice,
   probeLocalDeviceCapabilities,
   type LocalDeviceSnapshot,
 } from "../../services/localDeviceCapabilities";
@@ -37,6 +38,7 @@ import {
 } from "../../services/offlineProfile";
 import {
   getLocalCatalogInstallStatuses,
+  getOfflineProfileValidationModels,
   getOfflineProfileReadiness,
   prepareOfflineProfile,
   type OfflinePreparationProgress,
@@ -50,6 +52,8 @@ const INITIAL_RECOMMENDATION_PRESENTATION_MS = 2_000;
 export function estimatePreparationSeconds(
   profile: OfflineProfile,
   installs: OfflineProfileReadiness["installs"] = {},
+  benchmarks: OfflineProfileReadiness["benchmarks"] = {},
+  snapshot?: LocalDeviceSnapshot | null,
 ) {
   const allModels = getOfflineProfileModels(profile);
   const missingModels = allModels.filter(
@@ -58,10 +62,19 @@ export function estimatePreparationSeconds(
   const downloadSeconds =
     missingModels.reduce((total, model) => total + model.downloadBytes, 0) /
     ASSUMED_SETUP_DOWNLOAD_BYTES_PER_SECOND;
-  const validationSeconds = allModels.reduce(
-    (total, model) => total + model.benchmark.maximumLoadMs / 1_000 + 5,
-    0,
-  );
+  const validationSeconds = getOfflineProfileValidationModels(profile)
+    .filter((model) => {
+      const benchmark = benchmarks[model.id];
+      return (
+        benchmark?.status !== "viable" ||
+        !snapshot ||
+        !localModelBenchmarkMatchesDevice(benchmark, snapshot)
+      );
+    })
+    .reduce(
+      (total, model) => total + model.benchmark.maximumLoadMs / 1_000 + 5,
+      0,
+    );
   return Math.max(15, Math.ceil(downloadSeconds + validationSeconds));
 }
 
@@ -213,7 +226,12 @@ export function useFreeOfflineMode(params: {
   const { nativeVoiceOptions, selectedNativeVoice, setSelectedNativeVoice } =
     useNativeVoiceOptions({
       visible: setupVisible,
-      shouldLoad: setupVisible && resolvedLanguage !== null,
+      shouldLoad:
+        setupVisible &&
+        resolvedLanguage !== null &&
+        advancedOptionsEnabled &&
+        customSelection?.status === "ready" &&
+        customSelection.profile.tts === null,
       listenLanguages: [resolvedLanguage ?? "en"],
       preferredVoiceId: settings.nativeTtsVoiceId,
     });
@@ -615,6 +633,8 @@ export function useFreeOfflineMode(params: {
     const estimatedSeconds = estimatePreparationSeconds(
       selection.profile,
       installs,
+      benchmarks,
+      snapshot,
     );
     const preparingCustomSelection = useCustomProfileRef.current;
     setPreparationEtaSeconds(estimatedSeconds);
@@ -656,21 +676,31 @@ export function useFreeOfflineMode(params: {
       setPreparationProgress(null);
       setPreparationEtaSeconds(null);
     }
-  }, [completeSetup, installs, preparing, refresh, selection]);
+  }, [benchmarks, completeSetup, installs, preparing, refresh, selection, snapshot]);
 
   const recommendedEstimatedSetupSeconds = useMemo(
     () =>
       recommendedSelection?.status === "ready"
-        ? estimatePreparationSeconds(recommendedSelection.profile, installs)
+        ? estimatePreparationSeconds(
+            recommendedSelection.profile,
+            installs,
+            benchmarks,
+            snapshot,
+          )
         : null,
-    [installs, recommendedSelection],
+    [benchmarks, installs, recommendedSelection, snapshot],
   );
   const customEstimatedSetupSeconds = useMemo(
     () =>
       customSelection?.status === "ready"
-        ? estimatePreparationSeconds(customSelection.profile, installs)
+        ? estimatePreparationSeconds(
+            customSelection.profile,
+            installs,
+            benchmarks,
+            snapshot,
+          )
         : null,
-    [customSelection, installs],
+    [benchmarks, customSelection, installs, snapshot],
   );
   const estimatedSetupSeconds = useCustomProfile
     ? customEstimatedSetupSeconds

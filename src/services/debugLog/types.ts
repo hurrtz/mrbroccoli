@@ -65,6 +65,7 @@ export interface DebugLogCaptureResult {
 }
 
 export interface RecoveredDebugLogCaptureResult {
+  content: string;
   copiedToClipboard: boolean;
   entryCount: number;
   path: string;

@@ -1,12 +1,12 @@
-import React, { useEffect } from "react";
-import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
+import React, { useEffect, useRef } from "react";
+import {
+  Animated,
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+} from "react-native";
 import { PhosphorIcon } from "../design-system/PhosphorIcon";
-import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
-  withTiming,
-  withDelay,
-} from "react-native-reanimated";
 import { useLocalization } from "../i18n";
 import { useTheme } from "../theme/ThemeContext";
 import { fonts } from "../theme/typography";
@@ -31,33 +31,61 @@ export function Toast({
 }: ToastProps) {
   const { colors } = useTheme();
   const { t } = useLocalization();
-  const opacity = useSharedValue(0);
-  const translateY = useSharedValue(-20);
+  const opacity = useRef(new Animated.Value(0)).current;
+  const translateY = useRef(new Animated.Value(-20)).current;
 
   useEffect(() => {
+    let dismissTimer: ReturnType<typeof setTimeout> | null = null;
+    opacity.stopAnimation();
+    translateY.stopAnimation();
+
     if (visible) {
-      opacity.value = withTiming(1, { duration: 200 });
-      translateY.value = withTiming(0, { duration: 200 });
+      Animated.parallel([
+        Animated.timing(opacity, {
+          duration: 200,
+          toValue: 1,
+          useNativeDriver: true,
+        }),
+        Animated.timing(translateY, {
+          duration: 200,
+          toValue: 0,
+          useNativeDriver: true,
+        }),
+      ]).start();
 
       if (!onRetry) {
-        opacity.value = withDelay(duration, withTiming(0, { duration: 200 }));
-        translateY.value = withDelay(
-          duration,
-          withTiming(-20, { duration: 200 }),
-        );
-        const timer = setTimeout(onDismiss, duration + 200);
-        return () => clearTimeout(timer);
+        dismissTimer = setTimeout(() => {
+          Animated.parallel([
+            Animated.timing(opacity, {
+              duration: 200,
+              toValue: 0,
+              useNativeDriver: true,
+            }),
+            Animated.timing(translateY, {
+              duration: 200,
+              toValue: -20,
+              useNativeDriver: true,
+            }),
+          ]).start(({ finished }) => {
+            if (finished) {
+              onDismiss();
+            }
+          });
+        }, duration);
       }
     } else {
-      opacity.value = withTiming(0, { duration: 200 });
-      translateY.value = withTiming(-20, { duration: 200 });
+      opacity.setValue(0);
+      translateY.setValue(-20);
     }
-  }, [duration, onDismiss, onRetry, opacity, translateY, visible]);
 
-  const animatedStyle = useAnimatedStyle(() => ({
-    opacity: opacity.value,
-    transform: [{ translateY: translateY.value }],
-  }));
+    return () => {
+      if (dismissTimer) {
+        clearTimeout(dismissTimer);
+      }
+      opacity.stopAnimation();
+      translateY.stopAnimation();
+    };
+  }, [duration, onDismiss, onRetry, opacity, translateY, visible]);
 
   if (!visible) return null;
 
@@ -83,7 +111,7 @@ export function Toast({
           backgroundColor: colors.surfaceElevated,
           borderColor: tone === "info" ? colors.border : toneColor,
         },
-        animatedStyle,
+        { opacity, transform: [{ translateY }] },
       ]}
     >
       <View style={[styles.accentStripe, { backgroundColor: toneColor }]} />

@@ -10,6 +10,7 @@ import {
   subscribeToDebugLogCapture,
 } from "../../services/debugLogCapture";
 import { buildDebugRuntimeContext } from "../../services/debugRuntimeContext";
+import { archiveDebugLogInConversationArchive } from "../../services/conversationArchive";
 import type {
   InputMode,
   Provider,
@@ -162,6 +163,16 @@ export function useDebugLogCaptureController({
         result.path.split("/").filter(Boolean).pop() ??
         result.sessionId ??
         "debug-log.log";
+      await archiveDebugLogInConversationArchive({
+        content: result.content,
+        fileName,
+      }).catch((error) => {
+        recordDebugLogEvent({
+          event: "debug-log-archive-write-failed",
+          level: "warn",
+          payload: { error, fileName },
+        });
+      });
       showToast(
         result.copiedToClipboard
           ? t("debugLogCaptureStopped", {
@@ -198,6 +209,16 @@ export function useDebugLogCaptureController({
           result.path.split("/").filter(Boolean).pop() ??
           result.sessionId ??
           "recovered-debug-log.log";
+        void archiveDebugLogInConversationArchive({
+          content: result.content,
+          fileName,
+        }).catch((error) => {
+          recordDebugLogEvent({
+            event: "debug-log-archive-recovery-write-failed",
+            level: "warn",
+            payload: { error, fileName },
+          });
+        });
         showToast(
           result.copiedToClipboard
             ? t("debugLogCaptureRecovered", {

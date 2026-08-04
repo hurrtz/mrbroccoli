@@ -21,6 +21,7 @@ jest.mock("../../src/services/localDeviceCapabilities", () => ({
 }));
 
 import {
+  LOCAL_LLM_IDLE_RELEASE_MS,
   releaseLocalLlmResources,
   sanitizeLocalResponseText,
   streamLocalChat,
@@ -115,6 +116,30 @@ describe("local LLM", () => {
       }),
       expect.any(Function),
     );
+  });
+
+  it("releases a foreground-idle model context after a response", async () => {
+    jest.useFakeTimers();
+    try {
+      await streamLocalChat({
+        messages: [],
+        modelId: "qwen3-0.6b-q8",
+        assistantInstructions: "Be helpful.",
+        responseLength: "brief",
+        responseTone: "professional",
+        language: "en",
+        onChunk: jest.fn(),
+      });
+
+      expect(mockRelease).not.toHaveBeenCalled();
+      await jest.advanceTimersByTimeAsync(LOCAL_LLM_IDLE_RELEASE_MS - 1);
+      expect(mockRelease).not.toHaveBeenCalled();
+      await jest.advanceTimersByTimeAsync(1);
+      await Promise.resolve();
+      expect(mockRelease).toHaveBeenCalledTimes(1);
+    } finally {
+      jest.useRealTimers();
+    }
   });
 
   it("keeps Qwen reasoning and a generated English title out of a German answer", async () => {

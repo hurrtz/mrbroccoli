@@ -16,6 +16,7 @@ import type {
 import { buildSystemPrompt } from "./llm/prompts";
 import { getLocalModelInstallStatus } from "./localModelManager";
 import { renderTextForSpeech } from "./speechTextRenderer";
+import { recordDebugLogEvent } from "./debugLogCapture";
 import {
   probeLocalDeviceCapabilities,
   saveLocalModelBenchmarkResult,
@@ -31,6 +32,9 @@ let activeContext: { modelId: LocalLlmModelId; context: LlamaContext } | null =
 let contextTask = Promise.resolve();
 let completionTask = Promise.resolve();
 let appStateSubscription: { remove: () => void } | null = null;
+let idleReleaseTimer: ReturnType<typeof setTimeout> | null = null;
+
+export const LOCAL_LLM_IDLE_RELEASE_MS = 30_000;
 
 const STOP_WORDS = [
   "</s>",
@@ -167,11 +171,44 @@ function enablesThinking(model: LocalLlmModelDefinition) {
   return model.responseProfile === "thorough";
 }
 
+function cancelIdleRelease() {
+  if (!idleReleaseTimer) {
+    return;
+  }
+  clearTimeout(idleReleaseTimer);
+  idleReleaseTimer = null;
+}
+
+function scheduleIdleRelease() {
+  cancelIdleRelease();
+  if (!activeContext) {
+    return;
+  }
+  const modelId = activeContext.modelId;
+  idleReleaseTimer = setTimeout(() => {
+    idleReleaseTimer = null;
+    recordDebugLogEvent({
+      event: "local-llm-idle-release-triggered",
+      payload: { idleMs: LOCAL_LLM_IDLE_RELEASE_MS, modelId },
+    });
+    void releaseLocalLlmResources();
+  }, LOCAL_LLM_IDLE_RELEASE_MS);
+  recordDebugLogEvent({
+    event: "local-llm-idle-release-scheduled",
+    payload: { idleMs: LOCAL_LLM_IDLE_RELEASE_MS, modelId },
+  });
+}
+
 async function destroyActiveContext() {
+  cancelIdleRelease();
   const current = activeContext;
   activeContext = null;
   if (current) {
     await current.context.release().catch(() => undefined);
+    recordDebugLogEvent({
+      event: "local-llm-context-released",
+      payload: { modelId: current.modelId },
+    });
   }
 }
 
@@ -190,6 +227,7 @@ function registerAppStateRelease() {
 }
 
 async function getContext(model: LocalLlmModelDefinition) {
+  cancelIdleRelease();
   const task = contextTask.then(async () => {
     if (activeContext?.modelId === model.id) {
       return activeContext.context;
@@ -215,6 +253,10 @@ async function getContext(model: LocalLlmModelDefinition) {
       no_extra_bufts: true,
     });
     activeContext = { modelId: model.id, context };
+    recordDebugLogEvent({
+      event: "local-llm-context-created",
+      payload: { modelId: model.id },
+    });
     registerAppStateRelease();
     return context;
   });
@@ -360,8 +402,12 @@ export async function streamLocalChat(params: {
     }
   });
   completionTask = task.then(
-    () => undefined,
-    () => undefined,
+    () => {
+      scheduleIdleRelease();
+    },
+    () => {
+      scheduleIdleRelease();
+    },
   );
   return task;
 }

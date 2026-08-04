@@ -12,6 +12,11 @@ the complete Play Store translations are kept in a dedicated file under
 
 ### Added
 
+- Keep completed sanitized debug captures in app storage and mirror them into a
+  `debug-logs` folder beside the user-selected conversation archive. Later
+  archive syncs backfill retained logs when a direct folder write was
+  temporarily unavailable, so a failed clipboard paste no longer loses the
+  only accessible copy.
 - Assess every compatible on-device model before download using the current
   phone's RAM, available memory, storage, architecture, OS, power, and thermal
   state. Advanced onboarding and Settings distinguish specification estimates,
@@ -59,6 +64,17 @@ the complete Play Store translations are kept in a dedicated file under
 
 ### Changed
 
+- Make Free on-device preparation thermal-safe: reuse current viable device
+  tests, validate the essential Quick, listening, and speaking paths without
+  making the larger Thorough model a blocking benchmark, pause automatically
+  under heat, memory, or power pressure, and add short cooldowns between heavy
+  steps. Completed downloads and tests survive the pause, the setup resumes
+  when the phone is safe, and an unused local language-model context is
+  released after 30 seconds in the foreground. Native iOS voices are loaded
+  only when Advanced options actually select the system voice, and an equal
+  language selection no longer retriggers the expensive system voice-directory
+  request on every render. Setup toasts now use the native animation driver
+  instead of scheduling their transition through Worklets.
 - Present required Free onboarding as a full-width app screen instead of a
   narrow modal. It shares the localized home wordmark and spacing, offers a
   single initially empty language dropdown whose placeholder carries the
@@ -75,7 +91,8 @@ the complete Play Store translations are kept in a dedicated file under
   disabled until a language is selected and the matching presentation has
   completed. The screen replaces the main workspace until setup is complete and
   cannot be dismissed before every selected model has been downloaded,
-  installed, verified, and tested. The best-match recommendation now remains
+  installed, and verified and the essential runtime paths have passed their
+  device tests. The best-match recommendation now remains
   immutable while Advanced options maintain a separate selected-setup preview;
   hiding Advanced switches Start back to the recommendation without discarding
   the custom draft. Advanced sections share one heading hierarchy, and voice

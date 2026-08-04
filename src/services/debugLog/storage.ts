@@ -3,6 +3,8 @@ import * as FileSystem from "expo-file-system/legacy";
 const ACTIVE_CAPTURE_FILE_NAME = "debug-log-active.jsonl";
 const LEGACY_ACTIVE_CAPTURE_FILE_NAME = "debug-log-active.log";
 const MAX_RETAINED_LOGS = 5;
+const COMPLETED_LOG_FILE_PATTERN =
+  /^(?:debug-log-\d+-.+|recovered-\d+)\.log$/;
 
 let writeQueue = Promise.resolve();
 
@@ -48,7 +50,7 @@ export async function pruneCompletedLogs() {
   const directory = ensureLogsDirectory();
   const names = await FileSystem.readDirectoryAsync(directory).catch(() => []);
   const retained = names
-    .filter((name) => /^(?:debug-log-\d+-.+|recovered-\d+)\.log$/.test(name))
+    .filter((name) => COMPLETED_LOG_FILE_PATTERN.test(name))
     .sort()
     .reverse();
   await Promise.all(
@@ -57,5 +59,29 @@ export async function pruneCompletedLogs() {
       .map((name) =>
         FileSystem.deleteAsync(`${directory}${name}`, { idempotent: true }),
       ),
+  );
+}
+
+export async function readCompletedDebugLogs() {
+  const directory = ensureLogsDirectory();
+  const names = await FileSystem.readDirectoryAsync(directory).catch(() => []);
+  const completedNames = names
+    .filter((name) => COMPLETED_LOG_FILE_PATTERN.test(name))
+    .sort();
+  return (
+    await Promise.all(
+      completedNames.map(async (name) => {
+        try {
+          return {
+            content: await FileSystem.readAsStringAsync(`${directory}${name}`),
+            name,
+          };
+        } catch {
+          return null;
+        }
+      }),
+    )
+  ).filter(
+    (entry): entry is { content: string; name: string } => entry !== null,
   );
 }

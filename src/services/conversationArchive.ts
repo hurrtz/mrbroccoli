@@ -3,6 +3,7 @@ import { Directory, File } from "expo-file-system";
 import { NativeModules, Platform } from "react-native";
 
 import type { Conversation, ConversationMeta } from "../types";
+import { readCompletedDebugLogs } from "./debugLog/storage";
 import {
   buildConversationArchiveDocuments,
   CONVERSATION_ARCHIVE_SESSION_FILE_PATTERN,
@@ -171,14 +172,51 @@ function getOrCreateDirectory(parent: Directory, name: string) {
   return existing ?? parent.createDirectory(name);
 }
 
-function writeFile(directory: Directory, name: string, content: string) {
+function writeFile(
+  directory: Directory,
+  name: string,
+  content: string,
+  mimeType = "text/markdown",
+) {
   const existing = directory
     .list()
     .find(
       (entry): entry is File => entry instanceof File && entry.name === name,
     );
-  const file = existing ?? directory.createFile(name, "text/markdown");
+  const file = existing ?? directory.createFile(name, mimeType);
   file.write(content);
+}
+
+function normalizeDebugLogFileName(fileName: string) {
+  return /^(?:debug-log-\d+-[a-z0-9]+|recovered-\d+)\.log$/i.test(fileName)
+    ? fileName
+    : `debug-log-${Date.now()}.log`;
+}
+
+export async function archiveDebugLogInConversationArchive(params: {
+  content: string;
+  fileName: string;
+}) {
+  const config = await loadConversationArchiveConfig();
+  if (!config) {
+    return { archived: false as const };
+  }
+  const resolved = await resolveArchiveDirectory(config);
+  try {
+    resolved.directory.list();
+    const logsDirectory = getOrCreateDirectory(
+      resolved.directory,
+      "debug-logs",
+    );
+    const fileName = normalizeDebugLogFileName(params.fileName);
+    writeFile(logsDirectory, fileName, params.content, "text/plain");
+    if (resolved.config !== config) {
+      await saveConversationArchiveConfig(resolved.config);
+    }
+    return { archived: true as const, fileName };
+  } catch (error) {
+    throw new ConversationArchiveError("sync-failed", error);
+  }
 }
 
 export async function syncConversationArchive(params: {
@@ -190,6 +228,7 @@ export async function syncConversationArchive(params: {
 }) {
   const resolved = await resolveArchiveDirectory(params.config);
   let sessionsDirectory: Directory;
+  let debugLogsDirectory: Directory | null = null;
 
   try {
     resolved.directory.list();
@@ -214,6 +253,21 @@ export async function syncConversationArchive(params: {
   });
 
   try {
+    const completedDebugLogs = await readCompletedDebugLogs();
+    if (completedDebugLogs.length > 0) {
+      debugLogsDirectory = getOrCreateDirectory(
+        resolved.directory,
+        "debug-logs",
+      );
+      for (const log of completedDebugLogs) {
+        writeFile(
+          debugLogsDirectory,
+          normalizeDebugLogFileName(log.name),
+          log.content,
+          "text/plain",
+        );
+      }
+    }
     for (const [name, content] of documents.sessions) {
       writeFile(sessionsDirectory, name, content);
     }

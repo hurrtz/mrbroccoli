@@ -1,8 +1,10 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Directory } from "expo-file-system";
+import * as LegacyFileSystem from "expo-file-system/legacy";
 import { NativeModules, Platform } from "react-native";
 
 import {
+  archiveDebugLogInConversationArchive,
   CONVERSATION_ARCHIVE_CONFIG_KEY,
   loadConversationArchiveConfig,
   pickConversationArchiveDirectory,
@@ -52,6 +54,8 @@ describe("conversationArchive", () => {
   beforeEach(async () => {
     jest.replaceProperty(Platform, "OS", "android");
     fileSystemTestApi.__reset();
+    jest.mocked(LegacyFileSystem.readDirectoryAsync).mockResolvedValue([]);
+    jest.mocked(LegacyFileSystem.readAsStringAsync).mockResolvedValue("");
     await AsyncStorage.clear();
   });
 
@@ -160,5 +164,63 @@ describe("conversationArchive", () => {
 
     await expect(loadConversationArchiveConfig()).resolves.toEqual(config);
     expect(CONVERSATION_ARCHIVE_CONFIG_KEY).not.toBe("@mrbroccoli/settings");
+  });
+
+  it("stores completed sanitized debug logs beside archived sessions", async () => {
+    const root = new Directory("file:///archive");
+    root.create();
+    const config = {
+      version: 1 as const,
+      directoryName: "Archive",
+      directoryUri: root.uri,
+    };
+    await AsyncStorage.setItem(
+      CONVERSATION_ARCHIVE_CONFIG_KEY,
+      JSON.stringify(config),
+    );
+
+    await expect(
+      archiveDebugLogInConversationArchive({
+        content: "# Sanitized debug log",
+        fileName: "debug-log-100-safe.log",
+      }),
+    ).resolves.toEqual({
+      archived: true,
+      fileName: "debug-log-100-safe.log",
+    });
+    expect(
+      fileSystemTestApi.__getFileContent(
+        `${root.uri}/debug-logs/debug-log-100-safe.log`,
+      ),
+    ).toBe("# Sanitized debug log");
+  });
+
+  it("backfills retained app debug logs during a later archive sync", async () => {
+    const root = new Directory("file:///archive");
+    root.create();
+    jest
+      .mocked(LegacyFileSystem.readDirectoryAsync)
+      .mockResolvedValueOnce(["debug-log-200-backfill.log"]);
+    jest
+      .mocked(LegacyFileSystem.readAsStringAsync)
+      .mockResolvedValueOnce("# Retained sanitized log");
+
+    await syncConversationArchive({
+      activeConversationId: null,
+      config: {
+        version: 1,
+        directoryName: "Archive",
+        directoryUri: root.uri,
+      },
+      conversationMetas: [],
+      getConversationById: jest.fn(),
+      now: () => new Date("2026-08-04T10:00:00.000Z"),
+    });
+
+    expect(
+      fileSystemTestApi.__getFileContent(
+        `${root.uri}/debug-logs/debug-log-200-backfill.log`,
+      ),
+    ).toBe("# Retained sanitized log");
   });
 });

@@ -552,5 +552,11 @@ export async function recoverPendingDebugLogCapture(): Promise<RecoveredDebugLog
   lastExportPath = recoveredPath;
   notifyListeners();
   await pruneCompletedLogs().catch(() => undefined);
-  return { copiedToClipboard, entryCount, path: recoveredPath, sessionId };
+  return {
+    content,
+    copiedToClipboard,
+    entryCount,
+    path: recoveredPath,
+    sessionId,
+  };
 }

@@ -34,11 +34,17 @@ jest.mock("../../src/services/localDeviceCapabilities", () => {
   };
 });
 
-jest.mock("../../src/services/offlineProfileManager", () => ({
-  getLocalCatalogInstallStatuses: jest.fn(async () => ({})),
-  getOfflineProfileReadiness: jest.fn(async () => ({ ready: false })),
-  prepareOfflineProfile: jest.fn(async () => undefined),
-}));
+jest.mock("../../src/services/offlineProfileManager", () => {
+  const actual = jest.requireActual(
+    "../../src/services/offlineProfileManager",
+  );
+  return {
+    ...actual,
+    getLocalCatalogInstallStatuses: jest.fn(async () => ({})),
+    getOfflineProfileReadiness: jest.fn(async () => ({ ready: false })),
+    prepareOfflineProfile: jest.fn(async () => undefined),
+  };
+});
 
 jest.mock("../../src/services/freeOnboardingLanguage", () => ({
   getFreeOnboardingLanguageFromStorefront: jest.fn(async () => "en"),

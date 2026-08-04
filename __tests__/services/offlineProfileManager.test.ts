@@ -5,6 +5,7 @@ import {
 import {
   evaluateOfflineProfileReadiness,
   getOfflinePreparationSteps,
+  getOfflineProfileValidationModels,
 } from "../../src/services/offlineProfileManager";
 import type {
   LocalDeviceSnapshot,
@@ -105,7 +106,24 @@ describe("offline profile readiness", () => {
     ).toBe(false);
   });
 
-  it("reports one download step per missing model and one test step per model", () => {
+  it("does not make the optional thorough model a blocking onboarding benchmark", () => {
+    if (!profile.thoroughLlm) {
+      throw new Error("Expected a thorough model for this device");
+    }
+    const { [profile.thoroughLlm.id]: _omitted, ...withoutThoroughBenchmark } =
+      benchmarks;
+
+    expect(
+      evaluateOfflineProfileReadiness({
+        profile,
+        snapshot,
+        installs,
+        benchmarks: withoutThoroughBenchmark,
+      }).ready,
+    ).toBe(true);
+  });
+
+  it("reports downloads for missing models and tests only required runtime paths", () => {
     const models = getOfflineProfileModels(profile);
     const steps = getOfflinePreparationSteps(profile, {
       [models[0].id]: installs[models[0].id],
@@ -115,7 +133,20 @@ describe("offline profile readiness", () => {
       models.length - 1,
     );
     expect(steps.filter((step) => step.action === "benchmarking")).toHaveLength(
-      models.length,
+      getOfflineProfileValidationModels(profile).length,
     );
+    expect(
+      steps.some(
+        (step) =>
+          step.action === "benchmarking" &&
+          step.modelId === profile.thoroughLlm?.id,
+      ),
+    ).toBe(false);
+  });
+
+  it("reuses viable benchmarks from the current device", () => {
+    expect(
+      getOfflinePreparationSteps(profile, installs, benchmarks, snapshot),
+    ).toEqual([]);
   });
 });

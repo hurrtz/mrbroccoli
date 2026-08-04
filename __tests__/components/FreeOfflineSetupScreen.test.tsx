@@ -450,4 +450,33 @@ describe("FreeOfflineSetupScreen", () => {
       ),
     ).toBeTruthy();
   });
+
+  it("explains an automatic thermal pause without failing setup", () => {
+    const base = freeController();
+    if (base.selection?.status !== "ready") {
+      throw new Error("Expected a Free profile");
+    }
+    const controller: FreeOfflineModeController = {
+      ...base,
+      preparing: true,
+      preparationProgress: {
+        modelId: base.selection.profile.llm.id,
+        stepIndex: 0,
+        stepCount: 3,
+        stepsRemaining: 3,
+        action: "cooling",
+        stepProgress: null,
+      },
+      readiness: { ready: false } as FreeOfflineModeController["readiness"],
+    };
+
+    const screen = renderWithProviders(
+      <FreeOfflineSetupScreen controller={controller} />,
+    );
+
+    expect(
+      screen.getByText("Letting the phone cool down before continuing…"),
+    ).toBeTruthy();
+    expect(screen.queryByTestId("onboarding-download-progress")).toBeNull();
+  });
 });

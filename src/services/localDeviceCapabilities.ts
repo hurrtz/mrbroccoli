@@ -39,6 +39,15 @@ export interface LocalModelEligibility {
   reasons: LocalModelEligibilityReason[];
 }
 
+export function hasLocalDeviceRuntimePressure(snapshot: LocalDeviceSnapshot) {
+  return (
+    snapshot.lowPowerMode ||
+    snapshot.memoryLow ||
+    snapshot.thermalState === "serious" ||
+    snapshot.thermalState === "critical"
+  );
+}
+
 export interface LocalModelBenchmarkResult {
   modelId: LocalModelId;
   catalogVersion: number;
@@ -170,11 +179,7 @@ export function evaluateLocalModelEligibility(
     reasons.push("storage");
   }
 
-  const retryLater =
-    snapshot.lowPowerMode ||
-    snapshot.memoryLow ||
-    snapshot.thermalState === "serious" ||
-    snapshot.thermalState === "critical";
+  const retryLater = hasLocalDeviceRuntimePressure(snapshot);
   if (retryLater) {
     reasons.push("temporary-device-state");
   }
