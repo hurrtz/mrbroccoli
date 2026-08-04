@@ -295,7 +295,7 @@ describe("FreeOfflineSetupScreen", () => {
       const tick = screen.UNSAFE_getByProps({
         testID: `onboarding-recommendation-card-${capability}-ready`,
       });
-      expect(tick.props.size).toBe("control");
+      expect(tick.props.size).toBe("hero");
     }
     for (const technicalName of [
       controller.recommendedSelection.profile.llm.name,
