@@ -10,6 +10,8 @@ the complete Play Store translations are kept in a dedicated file under
 
 ## Unreleased
 
+## 3.0.0 - 2026-08-04
+
 ### Changed
 
 - Simplify Settings by removing the redundant Free edition summary and Guided
@@ -236,6 +238,10 @@ the complete Play Store translations are kept in a dedicated file under
   from crossing the Free offline boundary, discard delayed image-picker results
   after image access is locked, and release local benchmark resources after
   failures.
+
+### Store release notes
+
+See `docs/google-play-release-notes-3.0.0.md`.
 
 ## 2.8.0 - 2026-08-02
 
