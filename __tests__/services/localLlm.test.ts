@@ -22,6 +22,7 @@ jest.mock("../../src/services/localDeviceCapabilities", () => ({
 
 import {
   releaseLocalLlmResources,
+  sanitizeLocalResponseText,
   streamLocalChat,
 } from "../../src/services/localLlm";
 
@@ -107,8 +108,78 @@ describe("local LLM", () => {
     });
 
     expect(mockCompletion).toHaveBeenCalledWith(
-      expect.objectContaining({ enable_thinking: true }),
+      expect.objectContaining({
+        enable_thinking: true,
+        reasoning_format: "auto",
+      }),
       expect.any(Function),
     );
+  });
+
+  it("keeps Qwen reasoning private and saves a plain German answer", async () => {
+    mockCompletion.mockImplementationOnce(
+      async (
+        _params: unknown,
+        onToken?: (value: {
+          content?: string;
+          reasoning_content?: string;
+          token: string;
+        }) => void,
+      ) => {
+        onToken?.({
+          token: "<think>English reasoning",
+          content: "",
+          reasoning_content: "English reasoning",
+        });
+        onToken?.({
+          token: "</think>**Versch",
+          content: "**Versch",
+          reasoning_content: "English reasoning",
+        });
+        onToken?.({
+          token: "ränkung** ist faszinierend.",
+          content: "**Verschränkung** ist faszinierend.",
+          reasoning_content: "English reasoning",
+        });
+        return {
+          content:
+            "<think>English reasoning</think>\n\n**Verschränkung** ist faszinierend.",
+          text: "<think>English reasoning</think>\n\n**Verschränkung** ist faszinierend.",
+          interrupted: false,
+          tokens_evaluated: 14,
+          tokens_predicted: 8,
+          timings: { predicted_per_second: 7 },
+        };
+      },
+    );
+    const onChunk = jest.fn();
+
+    const result = await streamLocalChat({
+      messages: [],
+      modelId: "qwen3-1.7b-q8",
+      assistantInstructions: "Be helpful.",
+      responseLength: "normal",
+      responseTone: "professional",
+      language: "de",
+      onChunk,
+    });
+
+    expect(result.fullText).toBe("Verschränkung ist faszinierend.");
+    expect(onChunk.mock.calls.flat().join("")).toBe(
+      "Verschränkung ist faszinierend.",
+    );
+    expect(onChunk.mock.calls.flat().join("")).not.toContain("think");
+    const completionParams = mockCompletion.mock.calls[0][0];
+    expect(completionParams.messages[0].content).toContain(
+      "single target language is German",
+    );
+    expect(completionParams.messages[0].content).toContain(
+      "Respond in German",
+    );
+  });
+
+  it("drops an unfinished private thinking block", () => {
+    expect(sanitizeLocalResponseText("<think>Still reasoning in English"))
+      .toBe("");
   });
 });

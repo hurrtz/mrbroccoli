@@ -15,6 +15,7 @@ import type {
 } from "../types";
 import { buildSystemPrompt } from "./llm/prompts";
 import { getLocalModelInstallStatus } from "./localModelManager";
+import { renderTextForSpeech } from "./speechTextRenderer";
 import {
   probeLocalDeviceCapabilities,
   saveLocalModelBenchmarkResult,
@@ -41,6 +42,38 @@ const STOP_WORDS = [
   "<|end_of_turn|>",
   "<|endoftext|>",
 ];
+
+const LOCAL_RESPONSE_LANGUAGE_NAMES: Partial<Record<AppLanguage, string>> = {
+  en: "English",
+  de: "German",
+  es: "Spanish",
+  fr: "French",
+  it: "Italian",
+  pt: "European Portuguese",
+  "pt-BR": "Brazilian Portuguese",
+  ru: "Russian",
+};
+
+function getLocalAssistantInstructions(
+  assistantInstructions: string,
+  language: AppLanguage,
+) {
+  const languageName = LOCAL_RESPONSE_LANGUAGE_NAMES[language] ?? language;
+  return [
+    assistantInstructions.trim(),
+    `The offline profile's single target language is ${languageName}. Respond in ${languageName}. Do not switch to English because internal reasoning or other system text is in English. Only use another language when the user explicitly asks for a translation or a reply in that language. Keep private reasoning internal and return only the final answer.`,
+  ]
+    .filter(Boolean)
+    .join("\n\n");
+}
+
+export function sanitizeLocalResponseText(text: string) {
+  const withoutPrivateReasoning = text
+    .replace(/<think\b[^>]*>[\s\S]*?<\/think\s*>/giu, " ")
+    .replace(/<think\b[^>]*>[\s\S]*$/giu, " ")
+    .replace(/<\/?think\b[^>]*>/giu, " ");
+  return renderTextForSpeech(withoutPrivateReasoning);
+}
 
 function getLlamaModule() {
   // eslint-disable-next-line @typescript-eslint/no-require-imports -- lazy native loading keeps Jest and unsupported builds import-safe
@@ -145,8 +178,12 @@ export async function streamLocalChat(params: {
   abortSignal?: AbortSignal;
 }) {
   const model = getLocalModel(params.modelId) as LocalLlmModelDefinition;
+  const thinkingEnabled = enablesThinking(model);
   const systemPrompt = buildSystemPrompt({
-    assistantInstructions: params.assistantInstructions,
+    assistantInstructions: getLocalAssistantInstructions(
+      params.assistantInstructions,
+      params.language,
+    ),
     responseLength: params.responseLength,
     responseTone: params.responseTone,
     language: params.language,
@@ -169,6 +206,22 @@ export async function streamLocalChat(params: {
         error.name = "AbortError";
         throw error;
       }
+      let streamedVisibleText = "";
+      const streamParsedContent = (content: string) => {
+        const nextVisibleText = sanitizeLocalResponseText(content);
+        if (
+          !nextVisibleText ||
+          nextVisibleText === streamedVisibleText ||
+          !nextVisibleText.startsWith(streamedVisibleText)
+        ) {
+          return;
+        }
+        const nextChunk = nextVisibleText.slice(streamedVisibleText.length);
+        streamedVisibleText = nextVisibleText;
+        if (nextChunk) {
+          params.onChunk(nextChunk);
+        }
+      };
       const result = await context.completion(
         {
           messages: toLocalMessages(systemPrompt, params.messages),
@@ -177,10 +230,18 @@ export async function streamLocalChat(params: {
           temperature: 0.65,
           top_p: 0.9,
           min_p: 0.05,
-          enable_thinking: enablesThinking(model),
+          enable_thinking: thinkingEnabled,
+          reasoning_format: thinkingEnabled ? "auto" : "none",
         },
-        ({ token }) => {
-          if (!params.abortSignal?.aborted && token) {
+        ({ content, token }) => {
+          if (params.abortSignal?.aborted) {
+            return;
+          }
+          if (thinkingEnabled) {
+            if (typeof content === "string") {
+              streamParsedContent(content);
+            }
+          } else if (token) {
             params.onChunk(token);
           }
         },
@@ -190,7 +251,9 @@ export async function streamLocalChat(params: {
         error.name = "AbortError";
         throw error;
       }
-      const fullText = (result.content || result.text).trim();
+      const fullText = sanitizeLocalResponseText(
+        result.content || result.text,
+      );
       if (!fullText) {
         throw new Error(`${model.name} returned an empty response.`);
       }

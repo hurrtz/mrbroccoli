@@ -88,6 +88,10 @@ the complete Play Store translations are kept in a dedicated file under
 
 ### Fixed
 
+- Keep Free setup's selected speaking language, interface locale, local model
+  prompt, and speech routes synchronized; repair existing mismatched profiles,
+  and remove private Qwen thinking plus stray Markdown from visible, saved, and
+  spoken on-device replies.
 - Keep the product name exactly “Mr Broccoli” in every interface language
   instead of translating, respelling, or punctuating the brand per locale.
 - Make past-conversation retrieval abstain on weak incidental matches, suppress

@@ -272,6 +272,10 @@ describe("free offline profile selection", () => {
     );
 
     expect(effective.responseModes).toHaveLength(2);
+    expect(effective.language).toBe("de");
+    expect(effective.assistantInstructions).toContain(
+      "Antworte natürlich und gesprächsnah",
+    );
     expect(effective.responseModes[0]?.route.runtime).toBe("local");
     expect(effective.responseModes[1]?.route.localModelId).toBe(
       "qwen3-1.7b-q8",

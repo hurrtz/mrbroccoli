@@ -359,7 +359,7 @@ export function MainScreen() {
     responseLength,
     responseTone,
     ttsInstructions: effectiveTtsInstructions,
-    language,
+    language: runtimeSettings.language,
     webSearchMode,
     webSearchProvider,
     webSearchApiKey,

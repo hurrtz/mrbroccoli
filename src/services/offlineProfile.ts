@@ -6,7 +6,10 @@ import {
   type LocalSttModelDefinition,
   type LocalTtsModelDefinition,
 } from "../constants/localModels";
-import type { SpeechLanguage } from "../constants/speechLanguages";
+import {
+  getAppLanguageForFreeSpeechLanguage,
+  type SpeechLanguage,
+} from "../constants/speechLanguages";
 import { createRuntimeProviderStringRecord } from "../constants/providers/runtimeState";
 import {
   getDefaultAssistantInstructions,
@@ -373,6 +376,10 @@ export function applyOfflineProfileToSettings(
   settings: Settings,
   profile: OfflineProfile,
 ): Settings {
+  const targetLanguage =
+    profile.languages.length === 1
+      ? getAppLanguageForFreeSpeechLanguage(profile.languages[0])
+      : settings.language;
   const ttsIsKokoro = profile.tts?.id === "kokoro-multilingual";
   const responseModes = [
     {
@@ -405,7 +412,7 @@ export function applyOfflineProfileToSettings(
     : FREE_OFFLINE_RESPONSE_MODE_ID;
 
   return {
-    ...applyFreeRuntimeBoundaries(settings),
+    ...applyFreeRuntimeBoundaries({ ...settings, language: targetLanguage }),
     activeResponseMode,
     responseModes,
     sttMode: profile.stt ? "local" : "native",

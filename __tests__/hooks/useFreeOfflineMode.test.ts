@@ -82,6 +82,7 @@ describe("useFreeOfflineMode", () => {
     expect(result.current.selectedLanguage).toBe("de");
     await waitFor(() => {
       expect(updateSettings).toHaveBeenCalledWith({
+        language: "de",
         localLanguages: ["de"],
         ttsListenLanguages: ["de"],
         sttLanguage: "de",
@@ -125,6 +126,7 @@ describe("useFreeOfflineMode", () => {
       freeOnboardingLanguageInitialized: true,
       freeOfflineSetupCompleted: false,
       freeOfflineProfileOverrides: {},
+      language: "it",
       localLanguages: ["it"],
       ttsListenLanguages: ["it"],
       sttLanguage: "it",
@@ -178,6 +180,7 @@ describe("useFreeOfflineMode", () => {
       () => {
         expect(updateSettings).toHaveBeenCalledWith({
           freeOnboardingLanguageInitialized: true,
+          language: "en",
           localLanguages: ["en"],
           ttsListenLanguages: ["en"],
           sttLanguage: "en",

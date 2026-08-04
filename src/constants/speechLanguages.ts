@@ -1,4 +1,5 @@
 import type { TranslationKey } from "../i18n/types";
+import type { AppLanguage } from "../i18n/localeRegistry";
 
 export interface SpeechLanguageDefinition {
   labelKey: TranslationKey;
@@ -202,6 +203,16 @@ export function resolveFreeSpeechLanguage(
   }
 
   return /^pt[-_]br\b/i.test(preferredLocale) ? "pt-BR" : "pt";
+}
+
+export function getAppLanguageForFreeSpeechLanguage(
+  language: SpeechLanguage,
+): AppLanguage {
+  if (language === "pt-BR") {
+    return "pt-BR";
+  }
+
+  return normalizeFreeSpeechLanguage(language) ?? "en";
 }
 
 export const SPEECH_LANGUAGE_OPTIONS = Object.freeze(

@@ -504,6 +504,11 @@ const { useKokoroModel } = jest.requireMock(
 ) as {
   useKokoroModel: jest.Mock;
 };
+const { useVoicePipeline } = jest.requireMock(
+  "../../src/hooks/useVoicePipeline",
+) as {
+  useVoicePipeline: jest.Mock;
+};
 const { usePremiumEntitlement } = jest.requireMock(
   "../../src/context/PremiumEntitlementContext",
 ) as {
@@ -595,6 +600,24 @@ describe("MainScreen", () => {
     expect(screen.getByText("settings:closed")).toBeTruthy();
     expect(screen.getByText("drawer:closed")).toBeTruthy();
     expect(screen.getByText("open-drawer")).toBeTruthy();
+  });
+
+  it("uses the effective profile language for local response generation", () => {
+    useVoicePipeline.mockClear();
+    useSharedSettings.mockReturnValue(
+      createSharedSettingsValue({
+        language: "de",
+        localLanguages: ["de"],
+        sttLanguage: "de",
+        ttsListenLanguages: ["de"],
+      }),
+    );
+
+    renderWithProviders(<MainScreen />, { language: "en" });
+
+    expect(useVoicePipeline).toHaveBeenCalledWith(
+      expect.objectContaining({ language: "de" }),
+    );
   });
 
   it("hides the image action from Free users", () => {

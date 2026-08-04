@@ -8,6 +8,7 @@ import type {
 } from "../../constants/localModels";
 import {
   FREE_SPEECH_LANGUAGE_OPTIONS,
+  getAppLanguageForFreeSpeechLanguage,
   normalizeFreeSpeechLanguage,
   resolveFreeSpeechLanguage,
   type FreeSpeechLanguage,
@@ -172,6 +173,10 @@ export function useFreeOfflineMode(params: {
     settings.language,
     settings.localLanguages,
   ]);
+  const selectedAppLanguage = useMemo(
+    () => getAppLanguageForFreeSpeechLanguage(resolvedLanguage),
+    [resolvedLanguage],
+  );
   const { nativeVoiceOptions, selectedNativeVoice, setSelectedNativeVoice } =
     useNativeVoiceOptions({
       visible: modalVisible,
@@ -255,9 +260,12 @@ export function useFreeOfflineMode(params: {
       completedInitialEvaluationRef.current = true;
 
       if (!settings.freeOnboardingLanguageInitialized) {
+        const nextAppLanguage =
+          getAppLanguageForFreeSpeechLanguage(nextLanguage);
         skipNextAutomaticRefreshRef.current = true;
         updateSettings({
           freeOnboardingLanguageInitialized: true,
+          language: nextAppLanguage,
           localLanguages: [nextLanguage],
           ttsListenLanguages: [nextLanguage],
           sttLanguage: nextLanguage,
@@ -306,12 +314,14 @@ export function useFreeOfflineMode(params: {
       settings.localLanguages[0] === resolvedLanguage &&
       settings.ttsListenLanguages.length === 1 &&
       settings.ttsListenLanguages[0] === resolvedLanguage &&
-      settings.sttLanguage === resolvedLanguage
+      settings.sttLanguage === resolvedLanguage &&
+      settings.language === selectedAppLanguage
     ) {
       return;
     }
 
     updateSettings({
+      language: selectedAppLanguage,
       localLanguages: [resolvedLanguage],
       ttsListenLanguages: [resolvedLanguage],
       sttLanguage: resolvedLanguage,
@@ -320,10 +330,12 @@ export function useFreeOfflineMode(params: {
     entitlement.status,
     resolvedLanguage,
     settings.freeOnboardingLanguageInitialized,
+    settings.language,
     settings.localLanguages,
     settings.sttLanguage,
     settings.ttsListenLanguages,
     settingsLoaded,
+    selectedAppLanguage,
     updateSettings,
   ]);
 
@@ -371,6 +383,7 @@ export function useFreeOfflineMode(params: {
         freeOnboardingLanguageInitialized: true,
         freeOfflineSetupCompleted: false,
         freeOfflineProfileOverrides: {},
+        language: getAppLanguageForFreeSpeechLanguage(nextLanguage),
         localLanguages: [nextLanguage],
         ttsListenLanguages: [nextLanguage],
         sttLanguage: nextLanguage,
