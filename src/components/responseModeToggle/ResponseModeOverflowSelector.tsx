@@ -114,10 +114,18 @@ function ResponseModeOverflowOption({
   const active = item.id === selected;
   const local =
     item.route.runtime === "local" && Boolean(item.route.localModelId);
-  const modelLabel =
+  const localModel =
     local && item.route.localModelId
-      ? getLocalModel(item.route.localModelId).name
-      : getProviderModelName(item.route.provider, item.route.model);
+      ? getLocalModel(item.route.localModelId)
+      : null;
+  const modelLabel = localModel
+    ? t(
+        localModel.capability === "llm" &&
+          localModel.responseProfile === "thorough"
+          ? "onboardingBestSetupThoroughModel"
+          : "onboardingBestSetupQuickModel",
+      )
+    : getProviderModelName(item.route.provider, item.route.model);
   const routeLabel = local
     ? t("settingsOnDevice")
     : PROVIDER_LABELS[item.route.provider];
@@ -237,14 +245,24 @@ export function ResponseModeOverflowSelector({
   const activeLocal =
     activeMode.route.runtime === "local" &&
     Boolean(activeMode.route.localModelId);
-  const activeModelLabel =
+  const activeLocalModel =
     activeLocal && activeMode.route.localModelId
-      ? getLocalModel(activeMode.route.localModelId).name
-      : getProviderModelName(activeMode.route.provider, activeMode.route.model);
-  const activeCompactLabel = getResponseModeCardModelLabels(
-    activeMode.route.provider,
-    activeModelLabel,
-  );
+      ? getLocalModel(activeMode.route.localModelId)
+      : null;
+  const activeModelLabel = activeLocalModel
+    ? t(
+        activeLocalModel.capability === "llm" &&
+          activeLocalModel.responseProfile === "thorough"
+          ? "onboardingBestSetupThoroughModel"
+          : "onboardingBestSetupQuickModel",
+      )
+    : getProviderModelName(activeMode.route.provider, activeMode.route.model);
+  const activeCompactLabel = activeLocal
+    ? { family: t("settingsOnDevice"), name: activeModelLabel }
+    : getResponseModeCardModelLabels(
+        activeMode.route.provider,
+        activeModelLabel,
+      );
   const activeEffortLabel =
     getResponseModeRouteEffortLabel(activeMode.route, language) ?? t("fixed");
 

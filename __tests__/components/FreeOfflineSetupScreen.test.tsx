@@ -1,11 +1,6 @@
 import React from "react";
 import { StyleSheet } from "react-native";
-import {
-  act,
-  fireEvent,
-  waitFor,
-  within,
-} from "@testing-library/react-native";
+import { act, fireEvent, waitFor, within } from "@testing-library/react-native";
 
 import { FreeOfflineSetupScreen } from "../../src/components/FreeOfflineSetupScreen";
 import { LOCAL_PREVIEW_SAMPLE_TEXT_BY_LANGUAGE } from "../../src/constants/voicePreviewSamples";
@@ -178,9 +173,8 @@ describe("FreeOfflineSetupScreen", () => {
       ).gap,
     ).toBe(20);
     expect(
-      StyleSheet.flatten(
-        screen.getByTestId("free-offline-footer").props.style,
-      ).paddingBottom,
+      StyleSheet.flatten(screen.getByTestId("free-offline-footer").props.style)
+        .paddingBottom,
     ).toBe(24);
   });
 
@@ -225,9 +219,7 @@ describe("FreeOfflineSetupScreen", () => {
     expect(screen.getByText("Choose your language")).toBeTruthy();
     expect(screen.queryByText("English")).toBeNull();
     expect(screen.queryByText("Your best setup")).toBeNull();
-    expect(
-      screen.queryByTestId("onboarding-recommendation-card"),
-    ).toBeNull();
+    expect(screen.queryByTestId("onboarding-recommendation-card")).toBeNull();
     const start = screen.getByTestId("free-offline-primary-action");
     expect(start.props.accessibilityState).toEqual({
       busy: false,
@@ -246,6 +238,9 @@ describe("FreeOfflineSetupScreen", () => {
 
   it("presents the recommendation as a personalized highlight with a compact advanced checkbox", () => {
     const controller = freeController();
+    if (controller.recommendedSelection?.status !== "ready") {
+      throw new Error("Expected a recommended Free profile");
+    }
     const screen = renderSetup(controller);
 
     expect(
@@ -260,9 +255,10 @@ describe("FreeOfflineSetupScreen", () => {
     ).toBe(8);
     expect(screen.getAllByText("Your best setup")).toHaveLength(1);
     expect(screen.queryByText("Best match for you and this phone")).toBeNull();
-    expect(screen.getByText("Quick responses")).toBeTruthy();
-    expect(screen.getByText("Speech to Text")).toBeTruthy();
-    expect(screen.getByText("Text to Speech")).toBeTruthy();
+    expect(screen.getByText("Model for quick responses")).toBeTruthy();
+    expect(screen.getByText("Model for thorough reasoning")).toBeTruthy();
+    expect(screen.getByText("Model for recording")).toBeTruthy();
+    expect(screen.getByText("Model for speaking")).toBeTruthy();
     expect(
       childTestIDs(
         screen.getByTestId("onboarding-recommendation-card-models").props
@@ -274,8 +270,8 @@ describe("FreeOfflineSetupScreen", () => {
     ]);
     expect(
       childTestIDs(
-        screen.getByTestId("onboarding-recommendation-card-reasoning-row")
-          .props.children,
+        screen.getByTestId("onboarding-recommendation-card-reasoning-row").props
+          .children,
       ),
     ).toEqual([
       "onboarding-recommendation-card-quick",
@@ -295,6 +291,45 @@ describe("FreeOfflineSetupScreen", () => {
         screen.getByTestId("onboarding-recommendation-header").props.children,
       ),
     ).toBe(2);
+    for (const capability of ["quick", "thorough", "tts", "stt"]) {
+      expect(
+        screen.UNSAFE_getByProps({
+          testID: `onboarding-recommendation-card-${capability}-ready`,
+        }),
+      ).toBeTruthy();
+    }
+    for (const technicalName of [
+      controller.recommendedSelection.profile.llm.name,
+      controller.recommendedSelection.profile.thoroughLlm?.name,
+      controller.recommendedSelection.profile.tts?.name,
+      controller.recommendedSelection.profile.stt?.name,
+    ].filter(Boolean)) {
+      expect(
+        within(
+          screen.getByTestId("onboarding-recommendation-card"),
+        ).queryByText(technicalName!),
+      ).toBeNull();
+    }
+    expect(
+      StyleSheet.flatten(
+        screen.getByTestId("onboarding-recommendation-card-meta").props.style,
+      ),
+    ).toEqual(
+      expect.objectContaining({
+        flexWrap: "nowrap",
+        justifyContent: "space-between",
+      }),
+    );
+    const downloadStyle = StyleSheet.flatten(
+      screen.getByTestId("onboarding-recommendation-card-download").props.style,
+    );
+    expect(downloadStyle.textAlign).toBe("left");
+    expect(downloadStyle.backgroundColor).toBeUndefined();
+    const etaStyle = StyleSheet.flatten(
+      screen.getByTestId("onboarding-recommendation-card-eta").props.style,
+    );
+    expect(etaStyle.textAlign).toBe("right");
+    expect(etaStyle.backgroundColor).toBeUndefined();
 
     const advanced = screen.getByTestId("onboarding-advanced-toggle");
     expect(advanced.props.accessibilityRole).toBe("checkbox");
@@ -332,8 +367,8 @@ describe("FreeOfflineSetupScreen", () => {
 
     expect(screen.getByText("Phone details")).toBeTruthy();
     expect(screen.getByText("Your selected setup")).toBeTruthy();
-    expect(screen.getAllByText("Quick responses")).toHaveLength(3);
-    expect(screen.getAllByText("Thorough reasoning")).toHaveLength(3);
+    expect(screen.getAllByText("Quick responses")).toHaveLength(2);
+    expect(screen.getAllByText("Thorough reasoning")).toHaveLength(2);
     expect(screen.getByText("Omnilingual ASR 300M")).toBeTruthy();
     expect(screen.getByText("Piper · Kristin")).toBeTruthy();
     expect(screen.getByTestId("onboarding-native-stt")).toBeTruthy();
@@ -356,9 +391,9 @@ describe("FreeOfflineSetupScreen", () => {
       "onboarding-heading-listening",
       "onboarding-heading-speaking",
     ]) {
-      expect(StyleSheet.flatten(screen.getByTestId(testID).props.style)).toEqual(
-        phoneHeading,
-      );
+      expect(
+        StyleSheet.flatten(screen.getByTestId(testID).props.style),
+      ).toEqual(phoneHeading);
     }
     expect(screen.getByText(/Larger models can respond/)).toBeTruthy();
     expect(
@@ -452,8 +487,13 @@ describe("FreeOfflineSetupScreen", () => {
     const screen = renderSetup(controller);
 
     expect(
-      within(screen.getByTestId("onboarding-recommendation-card")).getByText(
+      within(screen.getByTestId("onboarding-recommendation-card")).queryByText(
         base.recommendedSelection.profile.llm.name,
+      ),
+    ).toBeNull();
+    expect(
+      within(screen.getByTestId("onboarding-recommendation-card")).getByText(
+        "Model for quick responses",
       ),
     ).toBeTruthy();
     expect(
@@ -462,9 +502,9 @@ describe("FreeOfflineSetupScreen", () => {
       ),
     ).toBeTruthy();
     expect(
-      within(
-        screen.getByTestId("onboarding-recommendation-card"),
-      ).queryByText(customSelection.profile.llm.name),
+      within(screen.getByTestId("onboarding-recommendation-card")).queryByText(
+        customSelection.profile.llm.name,
+      ),
     ).toBeNull();
   });
 
@@ -569,9 +609,7 @@ describe("FreeOfflineSetupScreen", () => {
     ).toBeTruthy();
     expect(screen.getByText("Matching the best local models…")).toBeTruthy();
     expect(screen.queryByText("Your best setup")).toBeNull();
-    expect(
-      screen.queryByTestId("onboarding-recommendation-card"),
-    ).toBeNull();
+    expect(screen.queryByTestId("onboarding-recommendation-card")).toBeNull();
     expect(
       screen.getByTestId("free-offline-primary-action").props
         .accessibilityState,

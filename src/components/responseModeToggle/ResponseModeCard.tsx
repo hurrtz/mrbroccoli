@@ -32,6 +32,7 @@ interface CardContentProps {
   effortLabel: string;
   highlighted: boolean;
   id: ResponseMode;
+  local: boolean;
   modelLabel: string;
   modelMeasurementKey: string;
   onMeasureModel: (measurementKey: string, lineCount: number) => void;
@@ -107,6 +108,7 @@ function DetailedModelDetails({
   effortLabel,
   highlighted,
   id,
+  local,
   modelLabel,
   provider,
   secondaryForeground,
@@ -114,7 +116,9 @@ function DetailedModelDetails({
 }: CardContentProps) {
   const { colors } = useTheme();
   const { t } = useLocalization();
-  const labels = getResponseModeCardModelLabels(provider, modelLabel);
+  const labels = local
+    ? { family: t("settingsOnDevice"), name: modelLabel }
+    : getResponseModeCardModelLabels(provider, modelLabel);
 
   return (
     <>
@@ -280,10 +284,16 @@ export function ResponseModeCard({
   const highlighted = active && !singleMode;
   const activeForeground = colors.onActiveControl;
   const local = route.runtime === "local" && Boolean(route.localModelId);
-  const modelLabel =
-    local && route.localModelId
-      ? getLocalModel(route.localModelId).name
-      : getProviderModelName(route.provider, route.model);
+  const localModel =
+    local && route.localModelId ? getLocalModel(route.localModelId) : null;
+  const modelLabel = localModel
+    ? t(
+        localModel.capability === "llm" &&
+          localModel.responseProfile === "thorough"
+          ? "onboardingBestSetupThoroughModel"
+          : "onboardingBestSetupQuickModel",
+      )
+    : getProviderModelName(route.provider, route.model);
   const routeLabel = local
     ? t("settingsOnDevice")
     : PROVIDER_LABELS[route.provider];
@@ -303,6 +313,7 @@ export function ResponseModeCard({
     effortLabel,
     highlighted,
     id,
+    local,
     modelLabel,
     modelMeasurementKey,
     onMeasureModel,

@@ -49,7 +49,11 @@ export function FreeOfflineProfileCard({
         {
           key: "quick",
           icon: "thunderbolt" as PhosphorIconName,
-          label: t("onboardingQuickModel"),
+          label: t(
+            customTone
+              ? "onboardingQuickModel"
+              : "onboardingBestSetupQuickModel",
+          ),
           model: profile.llm.name,
         },
         ...(profile.thoroughLlm
@@ -57,7 +61,11 @@ export function FreeOfflineProfileCard({
               {
                 key: "thorough",
                 icon: "cpu" as PhosphorIconName,
-                label: t("onboardingThoroughModel"),
+                label: t(
+                  customTone
+                    ? "onboardingThoroughModel"
+                    : "onboardingBestSetupThoroughModel",
+                ),
                 model: profile.thoroughLlm.name,
               },
             ]
@@ -70,13 +78,17 @@ export function FreeOfflineProfileCard({
         {
           key: "tts",
           icon: "sound" as PhosphorIconName,
-          label: t("textToSpeech"),
+          label: t(
+            customTone ? "textToSpeech" : "onboardingBestSetupRecordingModel",
+          ),
           model: profile.tts?.name ?? t("systemVoice"),
         },
         {
           key: "stt",
           icon: "mic" as PhosphorIconName,
-          label: t("speechToText"),
+          label: t(
+            customTone ? "speechToText" : "onboardingBestSetupSpeakingModel",
+          ),
           model: profile.stt?.name ?? t("appNative"),
         },
       ],
@@ -98,10 +110,7 @@ export function FreeOfflineProfileCard({
     >
       <View testID={headerTestID} style={styles.header}>
         <View
-          style={[
-            styles.heroIcon,
-            { backgroundColor: colors.surfaceElevated },
-          ]}
+          style={[styles.heroIcon, { backgroundColor: colors.surfaceElevated }]}
         >
           <PhosphorIcon
             name="safety-certificate"
@@ -125,73 +134,121 @@ export function FreeOfflineProfileCard({
                 testID={`${testID}-${item.key}`}
                 style={[
                   styles.model,
+                  !customTone ? styles.recommendedModel : null,
                   {
                     backgroundColor: colors.surfaceElevated,
                     borderColor: colors.border,
                   },
                 ]}
               >
-                <View
-                  style={[
-                    styles.modelIcon,
-                    { backgroundColor: softBackground },
-                  ]}
-                >
-                  <PhosphorIcon
-                    name={item.icon}
-                    size="compact"
-                    color={accentColor}
-                  />
-                </View>
-                <View style={styles.modelCopy}>
-                  <Text
-                    style={[styles.modelLabel, { color: colors.textMuted }]}
-                  >
-                    {item.label}
-                  </Text>
-                  <Text
-                    numberOfLines={2}
-                    style={[styles.modelName, { color: colors.text }]}
-                  >
-                    {item.model}
-                  </Text>
-                </View>
+                {customTone ? (
+                  <>
+                    <View
+                      style={[
+                        styles.modelIcon,
+                        { backgroundColor: softBackground },
+                      ]}
+                    >
+                      <PhosphorIcon
+                        name={item.icon}
+                        size="compact"
+                        color={accentColor}
+                      />
+                    </View>
+                    <View style={styles.modelCopy}>
+                      <Text
+                        style={[styles.modelLabel, { color: colors.textMuted }]}
+                      >
+                        {item.label}
+                      </Text>
+                      <Text
+                        numberOfLines={2}
+                        style={[styles.modelName, { color: colors.text }]}
+                      >
+                        {item.model}
+                      </Text>
+                    </View>
+                  </>
+                ) : (
+                  <>
+                    <Text
+                      numberOfLines={2}
+                      style={[
+                        styles.recommendedModelLabel,
+                        { color: colors.text },
+                      ]}
+                    >
+                      {item.label}
+                    </Text>
+                    <PhosphorIcon
+                      testID={`${testID}-${item.key}-ready`}
+                      name="check-circle"
+                      size="compact"
+                      color={colors.success}
+                    />
+                  </>
+                )}
               </View>
             ))}
           </View>
         ))}
       </View>
 
-      <View style={styles.meta}>
-        <View
-          style={[
-            styles.pill,
-            { backgroundColor: colors.surfaceElevated },
-          ]}
-        >
-          <PhosphorIcon name="download" size="inline" color={accentColor} />
-          <Text style={[styles.pillText, { color: colors.textSecondary }]}>
+      <View
+        testID={`${testID}-meta`}
+        style={[styles.meta, !customTone ? styles.recommendedMeta : null]}
+      >
+        {customTone ? (
+          <View
+            style={[styles.pill, { backgroundColor: colors.surfaceElevated }]}
+          >
+            <PhosphorIcon name="download" size="inline" color={accentColor} />
+            <Text style={[styles.pillText, { color: colors.textSecondary }]}>
+              {t("freeOfflineDownloadSize", {
+                size: formatBytes(profile.downloadBytes),
+              })}
+            </Text>
+          </View>
+        ) : (
+          <Text
+            testID={`${testID}-download`}
+            style={[
+              styles.recommendedMetaText,
+              styles.recommendedMetaStart,
+              { color: colors.textSecondary },
+            ]}
+          >
             {t("freeOfflineDownloadSize", {
               size: formatBytes(profile.downloadBytes),
             })}
           </Text>
-        </View>
+        )}
         {etaLabel ? (
-          <View
-            style={[
-              styles.pill,
-              { backgroundColor: colors.surfaceElevated },
-            ]}
-          >
-            <PhosphorIcon
-              name="thunderbolt"
-              size="inline"
-              color={accentColor}
-            />
-            <Text style={[styles.pillText, { color: colors.textSecondary }]}>
+          customTone ? (
+            <View
+              style={[styles.pill, { backgroundColor: colors.surfaceElevated }]}
+            >
+              <PhosphorIcon
+                name="thunderbolt"
+                size="inline"
+                color={accentColor}
+              />
+              <Text style={[styles.pillText, { color: colors.textSecondary }]}>
+                {t("onboardingEstimatedTime", { eta: etaLabel })}
+              </Text>
+            </View>
+          ) : (
+            <Text
+              testID={`${testID}-eta`}
+              style={[
+                styles.recommendedMetaText,
+                styles.recommendedMetaEnd,
+                { color: colors.textSecondary },
+              ]}
+            >
               {t("onboardingEstimatedTime", { eta: etaLabel })}
             </Text>
-          </View>
+          )
         ) : null}
       </View>
 
@@ -275,6 +332,25 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
   },
   pillText: { fontFamily: fonts.bodyMedium, fontSize: 11, lineHeight: 15 },
+  recommendedMeta: {
+    flexWrap: "nowrap",
+    justifyContent: "space-between",
+  },
+  recommendedMetaEnd: { textAlign: "right" },
+  recommendedMetaStart: { textAlign: "left" },
+  recommendedMetaText: {
+    flex: 1,
+    fontFamily: fonts.bodyMedium,
+    fontSize: 11,
+    lineHeight: 15,
+  },
+  recommendedModel: { justifyContent: "space-between" },
+  recommendedModelLabel: {
+    flex: 1,
+    fontFamily: fonts.bodyMedium,
+    fontSize: 13,
+    lineHeight: 17,
+  },
   readyRow: { alignItems: "center", flexDirection: "row", gap: 8 },
   status: { fontFamily: fonts.bodyMedium, fontSize: 14, lineHeight: 20 },
   title: {

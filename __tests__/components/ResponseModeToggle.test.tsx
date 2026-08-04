@@ -26,30 +26,64 @@ describe("ResponseModeToggle", () => {
       family: "Gemini",
       name: "3.1 Pro Preview",
     });
-    expect(
-      getResponseModeCardModelLabels("openai", "GPT-5.6 Sol"),
-    ).toEqual({
+    expect(getResponseModeCardModelLabels("openai", "GPT-5.6 Sol")).toEqual({
       family: "GPT",
       name: "5.6 Sol",
     });
     expect(
-      getResponseModeCardModelLabels(
-        "openrouter",
-        "Google · Gemini 3.6 Flash",
-      ),
+      getResponseModeCardModelLabels("openrouter", "Google · Gemini 3.6 Flash"),
     ).toEqual({
       family: "Gemini",
       name: "3.6 Flash",
     });
     expect(
-      getResponseModeCardModelLabels(
-        "alibaba-qwen-dashscope",
-        "Qwen3.5-Plus",
-      ),
+      getResponseModeCardModelLabels("alibaba-qwen-dashscope", "Qwen3.5-Plus"),
     ).toEqual({
       family: "Qwen",
       name: "3.5 Plus",
     });
+  });
+
+  it("uses reassuring capability names for local Home cards", () => {
+    const screen = renderWithProviders(
+      <ResponseModeToggle
+        selected="quick"
+        onSelect={jest.fn()}
+        modes={[
+          {
+            id: "quick",
+            route: {
+              provider: "openai",
+              model: "qwen3-0.6b-q8",
+              runtime: "local",
+              localModelId: "granite-4.0-1b-q4",
+            },
+          },
+          {
+            id: "thorough",
+            route: {
+              provider: "openai",
+              model: "qwen3-1.7b-q4",
+              runtime: "local",
+              localModelId: "ministral-3-3b-reasoning-q4",
+            },
+          },
+        ]}
+      />,
+    );
+
+    expect(screen.getByText("Model for quick responses")).toBeTruthy();
+    expect(screen.getByText("Model for thorough reasoning")).toBeTruthy();
+    expect(screen.getAllByText("On-device AI")).toHaveLength(2);
+    expect(screen.queryByText(/Granite/i)).toBeNull();
+    expect(screen.queryByText(/Ministral/i)).toBeNull();
+    expect(
+      screen.getByTestId("response-mode-option-quick").props.accessibilityLabel,
+    ).toContain("Model for quick responses");
+    expect(
+      screen.getByTestId("response-mode-option-thorough").props
+        .accessibilityLabel,
+    ).toContain("Model for thorough reasoning");
   });
 
   it("uses a three-row horizontal layout for two portrait cards", () => {
@@ -327,9 +361,11 @@ describe("ResponseModeToggle", () => {
       ).borderColor,
     ).toBe(lightColors.activeControl);
     expect(
-      (StyleSheet.flatten(responseModeToggleStyles.optionPressed) as {
-        transform?: unknown;
-      }).transform,
+      (
+        StyleSheet.flatten(responseModeToggleStyles.optionPressed) as {
+          transform?: unknown;
+        }
+      ).transform,
     ).toBeUndefined();
     expect(
       StyleSheet.flatten(
@@ -477,8 +513,7 @@ describe("ResponseModeToggle", () => {
 
   it("preserves unchanged measurements when one three-card model changes", () => {
     function ModelSwitcher() {
-      const [middleModel, setMiddleModel] =
-        React.useState("gemini-3.5-flash");
+      const [middleModel, setMiddleModel] = React.useState("gemini-3.5-flash");
 
       return (
         <>
@@ -623,7 +658,9 @@ describe("ResponseModeToggle", () => {
 
       expect(screen.queryByTestId("response-mode-list")).toBeNull();
       expect(screen.queryByTestId("response-mode-option-mode-4")).toBeNull();
-      expect(screen.getByTestId("response-mode-overflow-selector")).toBeTruthy();
+      expect(
+        screen.getByTestId("response-mode-overflow-selector"),
+      ).toBeTruthy();
       expect(
         screen.getByText(`mistral:${compact ? "feature" : "hero"}`),
       ).toBeTruthy();
@@ -679,9 +716,7 @@ describe("ResponseModeToggle", () => {
 
       expect(onSelect).toHaveBeenCalledWith("mode-2");
       await waitFor(() =>
-        expect(
-          screen.queryByTestId("response-mode-overflow-sheet"),
-        ).toBeNull(),
+        expect(screen.queryByTestId("response-mode-overflow-sheet")).toBeNull(),
       );
     },
   );
