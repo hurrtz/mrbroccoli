@@ -52,7 +52,7 @@ describe("PremiumUpgradeModal", () => {
     ).toBeTruthy();
     expect(
       screen.getByText(
-        "Switch response modes and run multi-model Uber deliberation",
+        "Switch response modes and run multi-model Model Council deliberation",
       ),
     ).toBeTruthy();
     expect(

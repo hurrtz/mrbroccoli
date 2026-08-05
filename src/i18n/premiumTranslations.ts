@@ -6,7 +6,7 @@ const en = {
   premium: "Premium",
   upgradeToPremium: "Unlock Premium",
   premiumDescription:
-    "Use cloud providers, every response mode, web search, images, Drive mode, Uber mode, past-session knowledge, and all advanced settings.",
+    "Use cloud providers, every response mode, web search, images, Drive mode, Model Council, past-session knowledge, and all advanced settings.",
   premiumBuy: "Buy Premium",
   premiumBuyPrice: ({ price }: TranslationParams) => `Buy Premium · ${price}`,
   restorePurchase: "Restore purchase",
@@ -52,7 +52,7 @@ const rawPremiumTranslations = {
     premium: "Premium",
     upgradeToPremium: "Premium freischalten",
     premiumDescription:
-      "Nutze Cloud-Anbieter, alle Antwortmodi, Websuche, Bilder, Drive-Modus, Uber-Modus, Wissen aus früheren Sitzungen und alle erweiterten Einstellungen.",
+      "Nutze Cloud-Anbieter, alle Antwortmodi, Websuche, Bilder, Drive-Modus, Übermodus, Wissen aus früheren Sitzungen und alle erweiterten Einstellungen.",
     premiumBuy: "Premium kaufen",
     premiumBuyPrice: ({ price }) => `Premium kaufen · ${price}`,
     restorePurchase: "Kauf wiederherstellen",
@@ -92,7 +92,7 @@ const rawPremiumTranslations = {
     premium: "Premium",
     upgradeToPremium: "Розблокувати Premium",
     premiumDescription:
-      "Використовуйте хмарних провайдерів, усі режими відповідей, вебпошук, зображення, режими Drive й Uber, знання з минулих сесій та всі розширені налаштування.",
+      "Використовуйте хмарних провайдерів, усі режими відповідей, вебпошук, зображення, режим Drive і Суперрежим, знання з минулих сесій та всі розширені налаштування.",
     premiumBuy: "Купити Premium",
     premiumBuyPrice: ({ price }) => `Купити Premium · ${price}`,
     restorePurchase: "Відновити покупку",
@@ -131,7 +131,7 @@ const rawPremiumTranslations = {
     premium: "प्रीमियम",
     upgradeToPremium: "प्रीमियम अनलॉक करें",
     premiumDescription:
-      "क्लाउड प्रदाता, सभी उत्तर मोड, वेब खोज, चित्र, Drive और Uber मोड, पिछली सत्र जानकारी और सभी उन्नत सेटिंग्स उपयोग करें।",
+      "क्लाउड प्रदाता, सभी उत्तर मोड, वेब खोज, चित्र, Drive मोड और सर्वोच्च मोड, पिछली सत्र जानकारी और सभी उन्नत सेटिंग्स उपयोग करें।",
     premiumBuy: "प्रीमियम खरीदें",
     premiumBuyPrice: ({ price }) => `प्रीमियम खरीदें · ${price}`,
     restorePurchase: "खरीद बहाल करें",
@@ -171,7 +171,7 @@ const rawPremiumTranslations = {
     premium: "Premium",
     upgradeToPremium: "Desbloquear Premium",
     premiumDescription:
-      "Usa proveedores en la nube, todos los modos de respuesta, búsqueda web, imágenes, modos Drive y Uber, conocimiento de sesiones anteriores y todos los ajustes avanzados.",
+      "Usa proveedores en la nube, todos los modos de respuesta, búsqueda web, imágenes, modo Drive y Modo supremo, conocimiento de sesiones anteriores y todos los ajustes avanzados.",
     premiumBuy: "Comprar Premium",
     premiumBuyPrice: ({ price }) => `Comprar Premium · ${price}`,
     restorePurchase: "Restaurar compra",
@@ -211,7 +211,7 @@ const rawPremiumTranslations = {
     premium: "Premium",
     upgradeToPremium: "Débloquer Premium",
     premiumDescription:
-      "Utilisez les fournisseurs cloud, tous les modes de réponse, la recherche web, les images, les modes Drive et Uber, les connaissances des sessions passées et tous les réglages avancés.",
+      "Utilisez les fournisseurs cloud, tous les modes de réponse, la recherche web, les images, le mode Drive et le Mode suprême, les connaissances des sessions passées et tous les réglages avancés.",
     premiumBuy: "Acheter Premium",
     premiumBuyPrice: ({ price }) => `Acheter Premium · ${price}`,
     restorePurchase: "Restaurer l’achat",
@@ -251,7 +251,7 @@ const rawPremiumTranslations = {
     premium: "Premium",
     upgradeToPremium: "Sblocca Premium",
     premiumDescription:
-      "Usa provider cloud, tutte le modalità di risposta, ricerca web, immagini, modalità Drive e Uber, conoscenza delle sessioni passate e tutte le impostazioni avanzate.",
+      "Usa provider cloud, tutte le modalità di risposta, ricerca web, immagini, modalità Drive e Modalità suprema, conoscenza delle sessioni passate e tutte le impostazioni avanzate.",
     premiumBuy: "Acquista Premium",
     premiumBuyPrice: ({ price }) => `Acquista Premium · ${price}`,
     restorePurchase: "Ripristina acquisto",
@@ -290,7 +290,7 @@ const rawPremiumTranslations = {
     premium: "Premium",
     upgradeToPremium: "Desbloquear Premium",
     premiumDescription:
-      "Use fornecedores cloud, todos os modos de resposta, pesquisa web, imagens, modos Drive e Uber, conhecimento de sessões anteriores e todas as definições avançadas.",
+      "Use fornecedores cloud, todos os modos de resposta, pesquisa web, imagens, modo Drive e Modo Supremo, conhecimento de sessões anteriores e todas as definições avançadas.",
     premiumBuy: "Comprar Premium",
     premiumBuyPrice: ({ price }) => `Comprar Premium · ${price}`,
     restorePurchase: "Restaurar compra",
@@ -329,7 +329,7 @@ const rawPremiumTranslations = {
     premium: "Premium",
     upgradeToPremium: "Desbloquear Premium",
     premiumDescription:
-      "Use provedores em nuvem, todos os modos de resposta, busca na web, imagens, modos Drive e Uber, conhecimento de sessões anteriores e todas as configurações avançadas.",
+      "Use provedores em nuvem, todos os modos de resposta, busca na web, imagens, modo Drive e Modo Supremo, conhecimento de sessões anteriores e todas as configurações avançadas.",
     premiumBuy: "Comprar Premium",
     premiumBuyPrice: ({ price }) => `Comprar Premium · ${price}`,
     restorePurchase: "Restaurar compra",
@@ -368,7 +368,7 @@ const rawPremiumTranslations = {
     premium: "Premium",
     upgradeToPremium: "Открыть Premium",
     premiumDescription:
-      "Используйте облачных провайдеров, все режимы ответа, веб-поиск, изображения, режимы Drive и Uber, знания прошлых сессий и расширенные настройки.",
+      "Используйте облачных провайдеров, все режимы ответа, веб-поиск, изображения, режим Drive и Суперрежим, знания прошлых сессий и расширенные настройки.",
     premiumBuy: "Купить Premium",
     premiumBuyPrice: ({ price }) => `Купить Premium · ${price}`,
     restorePurchase: "Восстановить покупку",
@@ -407,7 +407,7 @@ const rawPremiumTranslations = {
     premium: "高级版",
     upgradeToPremium: "解锁高级版",
     premiumDescription:
-      "使用云端提供商、全部回答模式、网页搜索、图片、Drive 与 Uber 模式、历史会话知识和所有高级设置。",
+      "使用云端提供商、全部回答模式、网页搜索、图片、Drive 模式与终极模式、历史会话知识和所有高级设置。",
     premiumBuy: "购买高级版",
     premiumBuyPrice: ({ price }) => `购买高级版 · ${price}`,
     restorePurchase: "恢复购买",
@@ -444,7 +444,7 @@ const rawPremiumTranslations = {
     premium: "Premium",
     upgradeToPremium: "فتح Premium",
     premiumDescription:
-      "استخدم مزودي السحابة وكل أوضاع الإجابة وبحث الويب والصور ووضعي Drive وUber ومعرفة الجلسات السابقة وكل الإعدادات المتقدمة.",
+      "استخدم مزودي السحابة وكل أوضاع الإجابة وبحث الويب والصور ووضع Drive والوضع الفائق ومعرفة الجلسات السابقة وكل الإعدادات المتقدمة.",
     premiumBuy: "شراء Premium",
     premiumBuyPrice: ({ price }) => `شراء Premium · ${price}`,
     restorePurchase: "استعادة الشراء",
@@ -483,7 +483,7 @@ const rawPremiumTranslations = {
     premium: "Premium",
     upgradeToPremium: "Premiumを解除",
     premiumDescription:
-      "クラウドプロバイダー、すべての回答モード、ウェブ検索、画像、Drive・Uberモード、過去セッションの知識、詳細設定を利用できます。",
+      "クラウドプロバイダー、すべての回答モード、ウェブ検索、画像、Driveモード・究極モード、過去セッションの知識、詳細設定を利用できます。",
     premiumBuy: "Premiumを購入",
     premiumBuyPrice: ({ price }) => `Premiumを購入 · ${price}`,
     restorePurchase: "購入を復元",
@@ -523,7 +523,7 @@ const rawPremiumTranslations = {
     premium: "Premium",
     upgradeToPremium: "Premium feloldása",
     premiumDescription:
-      "Használj felhőszolgáltatókat, minden válaszmódot, webes keresést, képeket, Drive és Uber módot, korábbi munkamenetek tudását és minden haladó beállítást.",
+      "Használj felhőszolgáltatókat, minden válaszmódot, webes keresést, képeket, Drive módot és Szuper módot, korábbi munkamenetek tudását és minden haladó beállítást.",
     premiumBuy: "Premium megvásárlása",
     premiumBuyPrice: ({ price }) => `Premium megvásárlása · ${price}`,
     restorePurchase: "Vásárlás visszaállítása",
@@ -562,7 +562,7 @@ const rawPremiumTranslations = {
     premium: "Premium",
     upgradeToPremium: "Odemknout Premium",
     premiumDescription:
-      "Používejte cloudové poskytovatele, všechny režimy odpovědí, webové hledání, obrázky, režimy Drive a Uber, znalosti z minulých relací a všechna pokročilá nastavení.",
+      "Používejte cloudové poskytovatele, všechny režimy odpovědí, webové hledání, obrázky, režim Drive a Superrežim, znalosti z minulých relací a všechna pokročilá nastavení.",
     premiumBuy: "Koupit Premium",
     premiumBuyPrice: ({ price }) => `Koupit Premium · ${price}`,
     restorePurchase: "Obnovit nákup",
@@ -601,7 +601,7 @@ const rawPremiumTranslations = {
     premium: "Premium",
     upgradeToPremium: "Odblokuj Premium",
     premiumDescription:
-      "Korzystaj z dostawców chmurowych, wszystkich trybów odpowiedzi, wyszukiwania w sieci, obrazów, trybów Drive i Uber, wiedzy z poprzednich sesji oraz wszystkich ustawień zaawansowanych.",
+      "Korzystaj z dostawców chmurowych, wszystkich trybów odpowiedzi, wyszukiwania w sieci, obrazów, trybu Drive i Supertrybu, wiedzy z poprzednich sesji oraz wszystkich ustawień zaawansowanych.",
     premiumBuy: "Kup Premium",
     premiumBuyPrice: ({ price }) => `Kup Premium · ${price}`,
     restorePurchase: "Przywróć zakup",
@@ -640,7 +640,7 @@ const rawPremiumTranslations = {
     premium: "Premium",
     upgradeToPremium: "Premium’u aç",
     premiumDescription:
-      "Bulut sağlayıcılarını, tüm yanıt modlarını, web aramasını, görselleri, Drive ve Uber modlarını, geçmiş oturum bilgisini ve tüm gelişmiş ayarları kullanın.",
+      "Bulut sağlayıcılarını, tüm yanıt modlarını, web aramasını, görselleri, Drive modunu ve Süper Modu, geçmiş oturum bilgisini ve tüm gelişmiş ayarları kullanın.",
     premiumBuy: "Premium satın al",
     premiumBuyPrice: ({ price }) => `Premium satın al · ${price}`,
     restorePurchase: "Satın almayı geri yükle",
@@ -680,7 +680,7 @@ const rawPremiumTranslations = {
     premium: "Premium",
     upgradeToPremium: "Lås upp Premium",
     premiumDescription:
-      "Använd molnleverantörer, alla svarslägen, webbsökning, bilder, Drive- och Uber-läge, kunskap från tidigare sessioner och alla avancerade inställningar.",
+      "Använd molnleverantörer, alla svarslägen, webbsökning, bilder, Drive-läge och Superläge, kunskap från tidigare sessioner och alla avancerade inställningar.",
     premiumBuy: "Köp Premium",
     premiumBuyPrice: ({ price }) => `Köp Premium · ${price}`,
     restorePurchase: "Återställ köp",
@@ -719,7 +719,7 @@ const rawPremiumTranslations = {
     premium: "پریمیم",
     upgradeToPremium: "پریمیم کھولیں",
     premiumDescription:
-      "کلاؤڈ فراہم کنندگان، تمام جوابی موڈ، ویب تلاش، تصاویر، Drive اور Uber موڈ، سابقہ سیشن کا علم اور تمام جدید ترتیبات استعمال کریں۔",
+      "کلاؤڈ فراہم کنندگان، تمام جوابی موڈ، ویب تلاش، تصاویر، Drive موڈ اور اعلیٰ موڈ، سابقہ سیشن کا علم اور تمام جدید ترتیبات استعمال کریں۔",
     premiumBuy: "پریمیم خریدیں",
     premiumBuyPrice: ({ price }) => `پریمیم خریدیں · ${price}`,
     restorePurchase: "خریداری بحال کریں",

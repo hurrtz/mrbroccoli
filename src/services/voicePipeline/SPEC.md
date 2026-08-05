@@ -41,7 +41,7 @@ A pipeline run receives an immutable snapshot of:
 - STT and TTS modes, models, language, voice, and explicit fallback order;
 - summary and cross-session-knowledge policy;
 - response style and conversation overrides;
-- web-search and Uber Mode configuration;
+- web-search and Model Council configuration;
 - playback policy; and
 - callbacks plus one abort signal.
 
@@ -57,7 +57,7 @@ during a long request affect the next turn, not the request already executing.
    required and allowed.
 4. Optionally retrieve source-labelled past-conversation excerpts.
 5. Decide and optionally perform web search.
-6. Optionally run Uber Mode private contributions and review rounds.
+6. Optionally run Model Council private contributions and review rounds.
 7. Stream the final local or hosted response through the context-leak guard.
 8. Queue complete paragraphs or the completed answer for optional speech.
 9. Persist the final assistant response, route metadata, usage, and turn
@@ -100,9 +100,9 @@ The heuristic receives mode, readiness, language, current query, and recent
 messages. When search is requested but the provider fails, the response may
 continue without search and records the fallback in the receipt.
 
-## Uber Mode
+## Model Council
 
-Uber Mode runs independent initial contributions, then immutable shared review
+Model Council runs independent initial contributions, then immutable shared review
 snapshots. A review round converges only when every active participant returns
 the explicit converged marker; a challenge, missing marker, or failed call keeps
 the configured review depth.

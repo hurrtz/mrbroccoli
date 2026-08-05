@@ -67,7 +67,7 @@ omitting the Uber audit and Speaking screens that are reserved for iOS.
 ## iOS ten-image order
 
 1. Premium conversation with a stable Thinking CTA
-2. Expanded Uber Mode audit
+2. Expanded Model Council audit
 3. Free conversation at rest with two completed exchanges
 4. Free on-device onboarding recommendation
 5. Conversation drawer with expanded branches

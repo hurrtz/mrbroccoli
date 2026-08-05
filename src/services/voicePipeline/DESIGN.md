@@ -35,7 +35,7 @@ flowchart TD
     Retrieve --> Search{Search decision}
     Search -->|search| SearchCall[Provider web search]
     Search -->|skip| Deliberation
-    SearchCall --> Deliberation{Uber Mode?}
+    SearchCall --> Deliberation{Model Council?}
     Deliberation -->|yes| Uber[Contributions and review rounds]
     Deliberation -->|no| Response
     Uber --> Response[Local or hosted final stream]
@@ -88,7 +88,7 @@ Only summaries carrying the current provenance marker are reused as generated
 summary state. Older unmarked memory may be displayed/edited but is not silently
 trusted as current compaction output.
 
-## Uber Mode Orchestration
+## Model Council Orchestration
 
 ```mermaid
 sequenceDiagram
@@ -137,7 +137,7 @@ selection semantics.
 ## Abort and Cleanup
 
 Abort checks sit after transcription, persistence callback, context, knowledge,
-search, Uber Mode, and final generation. A late completion cannot call
+search, Model Council, and final generation. A late completion cannot call
 `onResponseDone` after abort.
 
 The top-level `finally` records cleanup and removes temporary audio unless the

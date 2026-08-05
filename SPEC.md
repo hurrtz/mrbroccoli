@@ -75,7 +75,7 @@ setting cannot leak a network capability into Free execution.
 Premium is a permanent, non-consumable, same-platform store entitlement with
 product ID `com.tobiaswinkler.app.mrbroccoli.premium.lifetime`. It unlocks user
 provider connections, provider response modes, web search, image prompts,
-Drive Session, Uber Mode, past-conversation knowledge, portable conversation
+Drive Session, Model Council, past-conversation knowledge, portable conversation
 archives, and advanced response controls.
 
 **Decision:** The entitlement remains serverless. Apple or Google is the
@@ -119,9 +119,15 @@ boundary.
   is an additional speech-only provider.
 - Curated local Qwen models are normal response routes, not disguised hosted
   providers.
-- Uber Mode runs independent model contributions, adversarial review rounds,
-  and final synthesis. Its internal `ulra` identifiers are retained for data
-  and import stability; user-facing copy is always “Uber Mode.”
+- Model Council runs independent model contributions, adversarial review
+  rounds, and final synthesis. Its internal `ulra` identifiers are retained
+  for data and import stability.
+
+  **Decision:** The English feature name is “Model Council.” The previous
+  “Uber Mode” name collided with a well-known third-party trademark and was
+  retired from all user-facing copy before store submission; other locales
+  keep their established localized names (for example “Übermodus,”
+  “Superrežim”).
 - Optional past-conversation knowledge retrieves small, source-linked excerpts
   from other eligible conversations on device.
 
@@ -196,7 +202,7 @@ boundary.
   speech playback.
 - **Drive Session** — an opt-in stateful voice mode that automatically re-arms
   listening after a completed reply when it remains engaged.
-- **Uber Mode** — a Premium multi-model deliberation protocol with independent
+- **Model Council** — a Premium multi-model deliberation protocol with independent
   positions, shared immutable review snapshots, explicit convergence, bounded
   participant calls, and evidence-led synthesis.
 - **Conversation summary** — a compact, editable representation of older turns

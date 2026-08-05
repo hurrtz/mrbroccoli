@@ -1,6 +1,6 @@
 # Voice Session Hardware Retest
 
-Use this checklist on physical devices before releasing the hands-free voice-session changes. Capture a debug log for every failure and note the device, OS version, headset, input mode, response mode, Uber Mode configuration, and battery-saving state.
+Use this checklist on physical devices before releasing the hands-free voice-session changes. Capture a debug log for every failure and note the device, OS version, headset, input mode, response mode, Model Council configuration, and battery-saving state.
 
 ## iPhone and AirPods
 
@@ -25,7 +25,7 @@ Use this checklist on physical devices before releasing the hands-free voice-ses
 - [ ] Confirm the CTA shows the current phase on the left and the written ETA on the right.
 - [ ] Confirm the border begins exactly on the CTA outline and decreases around the complete outline without clipping or offset.
 - [ ] Repeat in portrait and landscape.
-- [ ] Confirm a normal turn and an Uber Mode turn initially show materially different estimates.
+- [ ] Confirm a normal turn and an Model Council turn initially show materially different estimates.
 - [ ] Confirm Dynamic Island, lock screen, Android foreground notification, and CTA show the same phase and approximately the same remaining time.
 - [ ] Let a turn exceed its estimate. Confirm every surface switches to `+ X s` and keeps increasing.
 - [ ] Confirm no transcript, prompt, or reply content appears in Dynamic Island, lock-screen, or notification text.

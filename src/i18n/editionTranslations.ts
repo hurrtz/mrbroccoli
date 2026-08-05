@@ -7,7 +7,7 @@ const en = {
   premiumBenefitProviders:
     "Use your cloud providers and their higher-quality models",
   premiumBenefitModes:
-    "Switch response modes and run multi-model Uber deliberation",
+    "Switch response modes and run multi-model Model Council deliberation",
   premiumBenefitTools: "Add web search, images, and cloud Drive sessions",
   premiumBenefitKnowledge:
     "Use past-session knowledge and the portable Markdown archive",
@@ -37,7 +37,7 @@ export const editionTranslations = {
     premiumBenefitProviders:
       "Nutze deine Cloud-Provider und deren hochwertigere Modelle",
     premiumBenefitModes:
-      "Wechsle Antwortmodi und starte eine Uber-Beratung mit mehreren Modellen",
+      "Wechsle Antwortmodi und starte eine Übermodus-Beratung mit mehreren Modellen",
     premiumBenefitTools:
       "Nutze Websuche, Bilder und Cloud-Sitzungen im Drive-Modus",
     premiumBenefitKnowledge:
@@ -62,7 +62,7 @@ export const editionTranslations = {
     premiumBenefitProviders:
       "Використовуйте своїх хмарних провайдерів і їхні якісніші моделі",
     premiumBenefitModes:
-      "Перемикайте режими відповідей і запускайте Uber-обговорення кількох моделей",
+      "Перемикайте режими відповідей і запускайте обговорення в Суперрежимі для кількох моделей",
     premiumBenefitTools: "Додайте вебпошук, зображення та хмарні сесії Drive",
     premiumBenefitKnowledge:
       "Використовуйте знання минулих сесій і переносний Markdown-архів",
@@ -86,7 +86,7 @@ export const editionTranslations = {
     premiumBenefitProviders:
       "अपने क्लाउड प्रदाता और उनके बेहतर मॉडल इस्तेमाल करें",
     premiumBenefitModes:
-      "उत्तर मोड बदलें और कई मॉडलों वाला Uber विचार-विमर्श चलाएँ",
+      "उत्तर मोड बदलें और कई मॉडलों वाला सर्वोच्च मोड विचार-विमर्श चलाएँ",
     premiumBenefitTools: "वेब खोज, चित्र और क्लाउड Drive सत्र जोड़ें",
     premiumBenefitKnowledge:
       "पिछले सत्रों की जानकारी और पोर्टेबल Markdown संग्रह इस्तेमाल करें",
@@ -110,7 +110,7 @@ export const editionTranslations = {
     premiumBenefitProviders:
       "Usa tus proveedores cloud y sus modelos de mayor calidad",
     premiumBenefitModes:
-      "Cambia de modo de respuesta y ejecuta deliberaciones Uber con varios modelos",
+      "Cambia de modo de respuesta y ejecuta deliberaciones del Modo supremo con varios modelos",
     premiumBenefitTools:
       "Añade búsqueda web, imágenes y sesiones Drive en la nube",
     premiumBenefitKnowledge:
@@ -135,7 +135,7 @@ export const editionTranslations = {
     premiumBenefitProviders:
       "Utilisez vos fournisseurs cloud et leurs modèles de meilleure qualité",
     premiumBenefitModes:
-      "Changez de mode de réponse et lancez une délibération Uber multimodèle",
+      "Changez de mode de réponse et lancez une délibération Mode suprême multimodèle",
     premiumBenefitTools:
       "Ajoutez recherche web, images et sessions Drive dans le cloud",
     premiumBenefitKnowledge:
@@ -160,7 +160,7 @@ export const editionTranslations = {
     premiumBenefitProviders:
       "Usa i tuoi provider cloud e i loro modelli di qualità superiore",
     premiumBenefitModes:
-      "Cambia modalità di risposta e avvia deliberazioni Uber multimodello",
+      "Cambia modalità di risposta e avvia deliberazioni della Modalità suprema multimodello",
     premiumBenefitTools:
       "Aggiungi ricerca web, immagini e sessioni Drive nel cloud",
     premiumBenefitKnowledge:
@@ -185,7 +185,7 @@ export const editionTranslations = {
     premiumBenefitProviders:
       "Use os seus fornecedores cloud e os respetivos modelos de maior qualidade",
     premiumBenefitModes:
-      "Alterne modos de resposta e execute deliberações Uber com vários modelos",
+      "Alterne modos de resposta e execute deliberações do Modo Supremo com vários modelos",
     premiumBenefitTools:
       "Adicione pesquisa web, imagens e sessões Drive na cloud",
     premiumBenefitKnowledge:
@@ -210,7 +210,7 @@ export const editionTranslations = {
     premiumBenefitProviders:
       "Use seus provedores em nuvem e os modelos de maior qualidade deles",
     premiumBenefitModes:
-      "Alterne modos de resposta e execute deliberações Uber com vários modelos",
+      "Alterne modos de resposta e execute deliberações do Modo Supremo com vários modelos",
     premiumBenefitTools:
       "Adicione busca na web, imagens e sessões Drive na nuvem",
     premiumBenefitKnowledge:
@@ -235,7 +235,7 @@ export const editionTranslations = {
     premiumBenefitProviders:
       "Используйте своих облачных провайдеров и их более качественные модели",
     premiumBenefitModes:
-      "Переключайте режимы ответа и запускайте Uber-обсуждения нескольких моделей",
+      "Переключайте режимы ответа и запускайте обсуждения в Суперрежиме для нескольких моделей",
     premiumBenefitTools:
       "Добавьте веб-поиск, изображения и облачные сеансы Drive",
     premiumBenefitKnowledge:
@@ -258,7 +258,7 @@ export const editionTranslations = {
     premiumFreeKeepsWorking:
       "免费版仍可完整使用：离线对话、历史记录、备份和手动导出均会保留。",
     premiumBenefitProviders: "使用你的云端提供商及其更高质量的模型",
-    premiumBenefitModes: "切换回复模式并运行多模型 Uber 协商",
+    premiumBenefitModes: "切换回复模式并运行多模型终极模式协商",
     premiumBenefitTools: "加入网页搜索、图片和云端 Drive 会话",
     premiumBenefitKnowledge: "使用过往会话知识和可携带的 Markdown 档案",
     freeOfflineLanguagesStep: "选择你的语言",
@@ -279,7 +279,7 @@ export const editionTranslations = {
     premiumFreeKeepsWorking:
       "يبقى الإصدار المجاني مفيدًا: تظل المحادثات بلا اتصال والسجل والنسخ الاحتياطية والتصدير اليدوي متاحة.",
     premiumBenefitProviders: "استخدم مزودي السحابة لديك ونماذجهم الأعلى جودة",
-    premiumBenefitModes: "بدّل أوضاع الرد وشغّل مداولات Uber بين عدة نماذج",
+    premiumBenefitModes: "بدّل أوضاع الرد وشغّل مداولات الوضع الفائق بين عدة نماذج",
     premiumBenefitTools: "أضف بحث الويب والصور وجلسات Drive السحابية",
     premiumBenefitKnowledge:
       "استخدم معرفة الجلسات السابقة وأرشيف Markdown القابل للنقل",
@@ -301,7 +301,7 @@ export const editionTranslations = {
     premiumFreeKeepsWorking:
       "無料版も使い続けられます。オフライン会話、履歴、バックアップ、手動エクスポートは利用可能です。",
     premiumBenefitProviders: "お使いのクラウドプロバイダーと高品質モデルを利用",
-    premiumBenefitModes: "応答モードを切り替え、複数モデルの Uber 検討を実行",
+    premiumBenefitModes: "応答モードを切り替え、複数モデルの究極モード検討を実行",
     premiumBenefitTools: "ウェブ検索、画像、クラウド Drive セッションを追加",
     premiumBenefitKnowledge:
       "過去セッションの知識と持ち運べる Markdown アーカイブを利用",
@@ -325,7 +325,7 @@ export const editionTranslations = {
     premiumBenefitProviders:
       "Használd saját felhőszolgáltatóidat és jobb minőségű modelljeiket",
     premiumBenefitModes:
-      "Válts válaszmódot, és indíts többmodelles Uber-mérlegelést",
+      "Válts válaszmódot, és indíts többmodelles Szuper mód mérlegelést",
     premiumBenefitTools:
       "Adj hozzá webes keresést, képeket és felhős Drive-meneteket",
     premiumBenefitKnowledge:
@@ -350,7 +350,7 @@ export const editionTranslations = {
     premiumBenefitProviders:
       "Používejte své cloudové poskytovatele a jejich kvalitnější modely",
     premiumBenefitModes:
-      "Přepínejte režimy odpovědí a spusťte Uber poradu více modelů",
+      "Přepínejte režimy odpovědí a spusťte poradu více modelů v Superrežimu",
     premiumBenefitTools:
       "Přidejte webové hledání, obrázky a cloudové relace Drive",
     premiumBenefitKnowledge:
@@ -375,7 +375,7 @@ export const editionTranslations = {
     premiumBenefitProviders:
       "Korzystaj z własnych dostawców chmurowych i ich lepszych modeli",
     premiumBenefitModes:
-      "Przełączaj tryby odpowiedzi i uruchamiaj narady Uber wielu modeli",
+      "Przełączaj tryby odpowiedzi i uruchamiaj narady Supertrybu wielu modeli",
     premiumBenefitTools:
       "Dodaj wyszukiwanie w sieci, obrazy i chmurowe sesje Drive",
     premiumBenefitKnowledge:
@@ -400,7 +400,7 @@ export const editionTranslations = {
     premiumBenefitProviders:
       "Kendi bulut sağlayıcılarınızı ve daha kaliteli modellerini kullanın",
     premiumBenefitModes:
-      "Yanıt modlarını değiştirin ve çok modelli Uber değerlendirmesi çalıştırın",
+      "Yanıt modlarını değiştirin ve çok modelli Süper Mod değerlendirmesi çalıştırın",
     premiumBenefitTools:
       "Web araması, görseller ve bulut Drive oturumları ekleyin",
     premiumBenefitKnowledge:
@@ -425,7 +425,7 @@ export const editionTranslations = {
     premiumBenefitProviders:
       "Använd dina molnleverantörer och deras modeller av högre kvalitet",
     premiumBenefitModes:
-      "Växla svarsläge och kör Uber-överläggning med flera modeller",
+      "Växla svarsläge och kör Superläge-överläggning med flera modeller",
     premiumBenefitTools:
       "Lägg till webbsökning, bilder och Drive-sessioner i molnet",
     premiumBenefitKnowledge:
@@ -450,7 +450,7 @@ export const editionTranslations = {
     premiumBenefitProviders:
       "اپنے کلاؤڈ فراہم کنندگان اور ان کے بہتر معیار کے ماڈل استعمال کریں",
     premiumBenefitModes:
-      "جوابی موڈ بدلیں اور متعدد ماڈلز کی Uber مشاورت چلائیں",
+      "جوابی موڈ بدلیں اور متعدد ماڈلز کی اعلیٰ موڈ مشاورت چلائیں",
     premiumBenefitTools: "ویب تلاش، تصاویر اور کلاؤڈ Drive سیشن شامل کریں",
     premiumBenefitKnowledge:
       "پچھلے سیشن کا علم اور قابل منتقلی Markdown آرکائیو استعمال کریں",

@@ -28,7 +28,7 @@ CHOOSE HOW MR BROCCOLI THINKS
 • Connect supported AI providers and models
 • Create response modes that combine a provider, model, and effort level
 • Switch between response modes directly from the home screen
-• Use Uber Mode to let several selected models answer independently, review one another over configurable rounds, and synthesize a final response
+• Use Model Council to let several selected models answer independently, review one another over configurable rounds, and synthesize a final response
 • Enable grounded web search for questions that need current information
 • Keep, revisit, and manage your conversation transcripts
 

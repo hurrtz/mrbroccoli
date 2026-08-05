@@ -146,28 +146,28 @@ export const en = {
   useResponseMode: ({ mode }) => `Use ${mode}`,
   chooseResponseModel: "Choose a model",
   responseModelCount: ({ count }) => `${count} models available`,
-  ulraMode: "Uber Mode",
-  ulraModeHomeLabel: "Show Uber Mode on the home screen",
+  ulraMode: "Model Council",
+  ulraModeHomeLabel: "Show Model Council on the home screen",
   ulraModeSettingsDescription:
     "Allow multi-model deliberation when at least two home-screen models are ready.",
   ulraModeInfo:
-    "Uber Mode asks every ready home-screen model independently. In each review round, models challenge every participant's latest position; unused rounds stop after explicit unanimous convergence. The selected model synthesizes from successful rounds while always retaining every model's latest position. The deliberation is shared with every provider involved.",
+    "Model Council asks every ready home-screen model independently. In each review round, models challenge every participant's latest position; unused rounds stop after explicit unanimous convergence. The selected model synthesizes from successful rounds while always retaining every model's latest position. The deliberation is shared with every provider involved.",
   ulraModeRounds: "Review rounds",
   ulraModeCallEstimate: ({ count }) =>
     `Up to ${count} model calls per message with the current setup.`,
   ulraModeThresholdWarning:
     "More than 4 models or 3 rounds can take a long time, consume many tokens, and hit provider context or rate limits. This is a warning only.",
-  ulraModeFirstUseTitle: "Enable Uber Mode?",
+  ulraModeFirstUseTitle: "Enable Model Council?",
   ulraModeFirstUseMessage: ({ calls, models, rounds }) =>
     `With ${models} models and up to ${rounds} review rounds, one message can make up to ${calls} model calls. It may take much longer, cost significantly more, and share the deliberation with every provider involved.`,
-  ulraModeHighRiskTitle: "Large Uber Mode run",
+  ulraModeHighRiskTitle: "Large Model Council run",
   ulraModeHighRiskMessage: ({ calls, models, rounds }) =>
     `${models} models and ${rounds} review rounds can make up to ${calls} model calls. This may take a very long time, use many tokens, and hit provider limits. Continue anyway?`,
   ulraModeEnableAction: "Enable",
   ulraModeNeedsTwoModels:
-    "Uber Mode needs at least two ready home-screen models.",
+    "Model Council needs at least two ready home-screen models.",
   ulraModeAllModelsFailed:
-    "Every Uber Mode model failed before a response could be synthesized.",
+    "Every Model Council model failed before a response could be synthesized.",
   ulraModePartialFailureNotice: ({ failed, succeeded }) =>
     `${failed} private model calls failed; the final answer used ${succeeded} successful contributions.`,
   sttTabDescription:

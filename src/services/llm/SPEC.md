@@ -54,7 +54,7 @@ the router must not guess an approximately compatible API.
 - compact active-conversation summary;
 - source-labelled past-conversation knowledge;
 - web-search context; and
-- private Uber Mode synthesis context.
+- private Model Council synthesis context.
 
 Historical, retrieved, image, search, and deliberation material is labelled as
 untrusted data. It cannot override system instructions. Internal context is not

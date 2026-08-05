@@ -7,7 +7,7 @@ import { lightColors } from "../../../src/theme/colors";
 
 const t = (key: string) =>
   ({
-    ulraMode: "Uber Mode",
+    ulraMode: "Model Council",
     webSearch: "Web Search",
   })[key] ?? key;
 

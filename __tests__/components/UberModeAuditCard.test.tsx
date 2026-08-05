@@ -64,7 +64,7 @@ describe("UberModeAuditCard", () => {
     };
     const screen = renderWithProviders(<UberModeAuditCard message={message} />);
 
-    expect(screen.getByText("Uber Mode audit")).toBeTruthy();
+    expect(screen.getByText("Model Council audit")).toBeTruthy();
     expect(
       screen.queryByText("Reviews: 1 challenged · 0 converged · 0 unmarked"),
     ).toBeNull();

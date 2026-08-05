@@ -40,7 +40,7 @@ navigation or render UI.
   `providerErrors.ts` classify failures and execute bounded retry/fallback.
 - `runtimeCapabilityOverrides.ts` persists only provider-confirmed exact
   incompatibilities.
-- `ulraMode.ts` implements private Uber Mode deliberation before final
+- `ulraMode.ts` implements private Model Council deliberation before final
   synthesis.
 
 ### Speech and voice turns

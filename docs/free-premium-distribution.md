@@ -12,7 +12,7 @@ purchase; it does not maintain separate Free and Premium builds.
 | Listening, reasoning, and speech                           | One automatically selected on-device profile, with Quick and Thorough reasoning where viable                 | All local routes and configured providers                |
 | Model setup                                                | One speaking language, automatic recommendation, optional advanced choices, and one download-and-test action | Full catalogue, providers, models, voices, and fallbacks |
 | Provider keys                                              | Never used by the effective Free runtime                                                                     | BYOK through the existing secure-store flow              |
-| Web search, images, Drive, and Uber Mode                   | Unavailable                                                                                                  | Available                                                |
+| Web search, images, Drive, and Model Council                   | Unavailable                                                                                                  | Available                                                |
 | Past-session knowledge and portable archive sync           | Unavailable                                                                                                  | Available                                                |
 | Backup import and export, privacy, theme, and app language | Available                                                                                                    | Available                                                |
 
@@ -74,7 +74,7 @@ constrained phones keep only the viable Quick route.
   equivalents. The app displays the localized store price and never hardcodes
   it in product copy.
 - Premium unlocks all current provider, response-mode, speech, search, image,
-  Drive, Uber Mode, past-session knowledge, portable archive, and
+  Drive, Model Council, past-session knowledge, portable archive, and
   advanced-settings features.
 
 The product ID is part of the entitlement contract. Do not rename or reuse it

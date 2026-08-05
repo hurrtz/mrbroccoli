@@ -478,7 +478,7 @@ describe("runUlraModeDeliberation", () => {
         language: "en",
         messages: [{ role: "user", content: "Question" }],
       }),
-    ).rejects.toThrow("Every Uber Mode model failed");
+    ).rejects.toThrow("Every Model Council model failed");
   });
 
   it("summarizes repeated failures as calls from one participant", () => {

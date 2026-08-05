@@ -114,7 +114,7 @@ Context enters a model request in explicit layers:
 3. a bounded verbatim window of recent active-conversation messages;
 4. optional source-labelled excerpts from other non-private conversations;
 5. optional web-search context;
-6. optional private Uber Mode synthesis context; and
+6. optional private Model Council synthesis context; and
 7. the current user turn and its approved image attachments.
 
 **Decision:** These layers are kept distinct so provenance and prompt-injection
