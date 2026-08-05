@@ -26,7 +26,7 @@ describe("development entitlement", () => {
     await expect(loadDevelopmentEntitlementMode()).resolves.toBe("free");
   });
 
-  it("persists Premium simulation only for the .dev identity", async () => {
+  it("persists Premium simulation for the .dev identity", async () => {
     getApplicationId.mockResolvedValue(
       "com.tobiaswinkler.app.mrbroccoli.dev",
     );
@@ -40,17 +40,18 @@ describe("development entitlement", () => {
     ).resolves.toBe("premium");
   });
 
-  it("defaults the isolated .maestro release-test identity to Premium", async () => {
+  it("defaults .maestro to Premium and permits a Free override", async () => {
     getApplicationId.mockResolvedValue(
       "com.tobiaswinkler.app.mrbroccoli.maestro",
     );
 
-    await expect(isDevelopmentAppVariant()).resolves.toBe(false);
+    await expect(isDevelopmentAppVariant()).resolves.toBe(true);
     await expect(loadDevelopmentEntitlementMode()).resolves.toBe("premium");
-    await expect(saveDevelopmentEntitlementMode("free")).resolves.toBe(false);
+    await expect(saveDevelopmentEntitlementMode("free")).resolves.toBe(true);
+    await expect(loadDevelopmentEntitlementMode()).resolves.toBe("free");
     await expect(
       AsyncStorage.getItem(DEVELOPMENT_ENTITLEMENT_MODE_STORAGE_KEY),
-    ).resolves.toBeNull();
+    ).resolves.toBe("free");
   });
 
   it("does not expose or persist an override for the release identity", async () => {
@@ -75,6 +76,7 @@ describe("development entitlement", () => {
     getApplicationId.mockResolvedValue(
       "com.tobiaswinkler.app.mrbroccoli.maestrotools",
     );
+    await expect(isDevelopmentAppVariant()).resolves.toBe(false);
     await expect(loadDevelopmentEntitlementMode()).resolves.toBeNull();
 
     getApplicationId.mockRejectedValue(new Error("native unavailable"));

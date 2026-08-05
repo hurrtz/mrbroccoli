@@ -117,9 +117,6 @@ android {
             keyPassword 'android'
         }
         release {
-            if ((findProperty('mrBroccoliMaestroVariant') ?: 'false').toBoolean()) {
-                applicationIdSuffix '.maestro'
-            }
             if (hasReleaseKeystore) {
                 storeFile rootProject.file(keystoreProperties['storeFile'])
                 storePassword keystoreProperties['storePassword']
@@ -134,6 +131,9 @@ android {
             signingConfig signingConfigs.debug
         }
         release {
+            if ((findProperty('mrBroccoliMaestroVariant') ?: 'false').toBoolean()) {
+                applicationIdSuffix '.maestro'
+            }
             if (hasReleaseKeystore) {
                 signingConfig signingConfigs.release
             }

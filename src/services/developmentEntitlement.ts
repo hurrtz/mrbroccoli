@@ -29,27 +29,33 @@ export async function getApplicationId() {
 
 export async function isDevelopmentAppVariant() {
   const applicationId = await getApplicationId();
-  return applicationId?.endsWith(DEVELOPMENT_APPLICATION_ID_SUFFIX) === true;
+  return (
+    applicationId?.endsWith(DEVELOPMENT_APPLICATION_ID_SUFFIX) === true ||
+    applicationId?.endsWith(MAESTRO_APPLICATION_ID_SUFFIX) === true
+  );
 }
 
 export async function loadDevelopmentEntitlementMode(): Promise<DevelopmentEntitlementMode | null> {
   const applicationId = await getApplicationId();
 
-  // Release UI automation uses an isolated application identity so a clean
-  // install can reach the complete Premium surface without StoreKit or Play
-  // test-account state. The production identity cannot enter this branch.
-  if (applicationId?.endsWith(MAESTRO_APPLICATION_ID_SUFFIX) === true) {
-    return "premium";
-  }
-
-  if (applicationId?.endsWith(DEVELOPMENT_APPLICATION_ID_SUFFIX) !== true) {
+  const isDevelopment =
+    applicationId?.endsWith(DEVELOPMENT_APPLICATION_ID_SUFFIX) === true;
+  const isMaestro =
+    applicationId?.endsWith(MAESTRO_APPLICATION_ID_SUFFIX) === true;
+  if (!isDevelopment && !isMaestro) {
     return null;
   }
 
   const stored = await AsyncStorage.getItem(
     DEVELOPMENT_ENTITLEMENT_MODE_STORAGE_KEY,
   );
-  return stored === "premium" ? "premium" : "free";
+  if (stored === "premium" || stored === "free") {
+    return stored;
+  }
+
+  // Release UI automation keeps its previous clean-install Premium default,
+  // while now allowing the same manual Free/Premium control as `.dev`.
+  return isMaestro ? "premium" : "free";
 }
 
 export async function saveDevelopmentEntitlementMode(

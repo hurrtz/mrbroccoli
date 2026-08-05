@@ -17,6 +17,9 @@ IOS_DESTINATION ?= generic/platform=iOS Simulator
 	coverage \
 	i18n \
 	maestro-verify \
+	store-promos-verify \
+	store-promos-ios \
+	store-promos-android \
 	license \
 	doctor \
 	dependencies-check \
@@ -46,6 +49,9 @@ help:
 		'make pre-release       Run every local release gate in quota-safe order' \
 		'make release-aab       Build, verify, and archive the signed Android release artifacts' \
 		'make maestro-verify      Verify the E2E locale and screenshot contract' \
+		'make store-promos-verify Verify the ten-image localized App Store screenshot contract' \
+		'make store-promos-ios LOCALE=de DISPLAY=6.8 Build and capture one localized iOS store set' \
+		'make store-promos-android LOCALE=de DISPLAY=phone Build and capture one localized Android store set' \
 		'make android-debug      Build a debug APK' \
 		'make android-instrumentation Run native runtime tests on one connected Android emulator' \
 		'make ios-build          Build the app for the generic iOS Simulator' \
@@ -84,6 +90,18 @@ i18n:
 maestro-verify:
 	@npm run maestro:test
 	@npm run maestro:verify
+
+store-promos-verify:
+	@npm run store-promos:test
+	@npm run store-promos:verify
+
+store-promos-ios:
+	@test -n "$(LOCALE)" || (printf '%s\n' 'LOCALE is required, for example: make store-promos-ios LOCALE=de DISPLAY=6.8' >&2; exit 1)
+	@npm run store-promos:ios -- --locale "$(LOCALE)" --display "$(or $(DISPLAY),6.8)" $(if $(UDID),--udid "$(UDID)",)
+
+store-promos-android:
+	@test -n "$(LOCALE)" || (printf '%s\n' 'LOCALE is required, for example: make store-promos-android LOCALE=de DISPLAY=phone' >&2; exit 1)
+	@npm run store-promos:android -- --locale "$(LOCALE)" --display "$(or $(DISPLAY),phone)" $(if $(UDID),--udid "$(UDID)",)
 
 license:
 	@npm run license:test

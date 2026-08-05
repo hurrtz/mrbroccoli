@@ -15,7 +15,7 @@ const en = {
   premiumUnlocked: "Premium is unlocked",
   developmentEntitlement: "Development entitlement",
   developmentEntitlementHint:
-    "Only available in .dev builds. Changes apply immediately and do not affect store purchases.",
+    "Only available in .dev and .maestro builds. Changes apply immediately and do not affect store purchases.",
   premiumErrorUnavailable:
     "The store is unavailable right now. Try again later.",
   premiumErrorFailed: "The purchase could not be completed.",
@@ -61,7 +61,7 @@ const rawPremiumTranslations = {
     premiumUnlocked: "Premium ist freigeschaltet",
     developmentEntitlement: "Entwicklungsberechtigung",
     developmentEntitlementHint:
-      "Nur in .dev-Builds verfügbar. Änderungen gelten sofort und wirken sich nicht auf Store-Käufe aus.",
+      "Nur in .dev- und .maestro-Builds verfügbar. Änderungen gelten sofort und wirken sich nicht auf Store-Käufe aus.",
     premiumErrorUnavailable:
       "Der Store ist gerade nicht verfügbar. Versuche es später erneut.",
     premiumErrorFailed: "Der Kauf konnte nicht abgeschlossen werden.",
@@ -101,7 +101,7 @@ const rawPremiumTranslations = {
     premiumUnlocked: "Premium розблоковано",
     developmentEntitlement: "Право доступу для розробки",
     developmentEntitlementHint:
-      "Доступно лише у збірках .dev. Зміни застосовуються одразу й не впливають на покупки в магазині.",
+      "Доступно лише у збірках .dev та .maestro. Зміни застосовуються одразу й не впливають на покупки в магазині.",
     premiumErrorUnavailable: "Магазин зараз недоступний. Спробуйте пізніше.",
     premiumErrorFailed: "Не вдалося завершити покупку.",
     premiumErrorPending: "Покупка очікує підтвердження.",
@@ -140,7 +140,7 @@ const rawPremiumTranslations = {
     premiumUnlocked: "प्रीमियम अनलॉक है",
     developmentEntitlement: "डेवलपमेंट अधिकार",
     developmentEntitlementHint:
-      ".dev बिल्ड में ही उपलब्ध। बदलाव तुरंत लागू होते हैं और स्टोर खरीदारी को प्रभावित नहीं करते।",
+      "केवल .dev और .maestro बिल्ड में उपलब्ध। बदलाव तुरंत लागू होते हैं और स्टोर खरीदारी को प्रभावित नहीं करते।",
     premiumErrorUnavailable:
       "स्टोर अभी उपलब्ध नहीं है। बाद में फिर कोशिश करें।",
     premiumErrorFailed: "खरीद पूरी नहीं हुई।",
@@ -180,7 +180,7 @@ const rawPremiumTranslations = {
     premiumUnlocked: "Premium está desbloqueado",
     developmentEntitlement: "Acceso de desarrollo",
     developmentEntitlementHint:
-      "Solo disponible en compilaciones .dev. Los cambios se aplican de inmediato y no afectan a las compras de la tienda.",
+      "Solo disponible en compilaciones .dev y .maestro. Los cambios se aplican de inmediato y no afectan a las compras de la tienda.",
     premiumErrorUnavailable:
       "La tienda no está disponible ahora. Inténtalo más tarde.",
     premiumErrorFailed: "No se pudo completar la compra.",
@@ -220,7 +220,7 @@ const rawPremiumTranslations = {
     premiumUnlocked: "Premium est débloqué",
     developmentEntitlement: "Accès de développement",
     developmentEntitlementHint:
-      "Disponible uniquement dans les builds .dev. Les modifications s’appliquent immédiatement et n’affectent pas les achats du Store.",
+      "Disponible uniquement dans les builds .dev et .maestro. Les modifications s’appliquent immédiatement et n’affectent pas les achats du Store.",
     premiumErrorUnavailable:
       "La boutique est indisponible. Réessayez plus tard.",
     premiumErrorFailed: "L’achat n’a pas pu être finalisé.",
@@ -260,7 +260,7 @@ const rawPremiumTranslations = {
     premiumUnlocked: "Premium è sbloccato",
     developmentEntitlement: "Accesso di sviluppo",
     developmentEntitlementHint:
-      "Disponibile solo nelle build .dev. Le modifiche si applicano subito e non influiscono sugli acquisti dello store.",
+      "Disponibile solo nelle build .dev e .maestro. Le modifiche si applicano subito e non influiscono sugli acquisti dello store.",
     premiumErrorUnavailable: "Lo store non è disponibile. Riprova più tardi.",
     premiumErrorFailed: "Impossibile completare l’acquisto.",
     premiumErrorPending: "L’acquisto è in attesa di approvazione.",
@@ -299,7 +299,7 @@ const rawPremiumTranslations = {
     premiumUnlocked: "Premium está desbloqueado",
     developmentEntitlement: "Acesso de desenvolvimento",
     developmentEntitlementHint:
-      "Disponível apenas em compilações .dev. As alterações são aplicadas imediatamente e não afetam as compras na loja.",
+      "Disponível apenas em compilações .dev e .maestro. As alterações são aplicadas imediatamente e não afetam as compras na loja.",
     premiumErrorUnavailable: "A loja não está disponível. Tente mais tarde.",
     premiumErrorFailed: "Não foi possível concluir a compra.",
     premiumErrorPending: "A compra aguarda aprovação.",
@@ -338,7 +338,7 @@ const rawPremiumTranslations = {
     premiumUnlocked: "Premium está desbloqueado",
     developmentEntitlement: "Acesso de desenvolvimento",
     developmentEntitlementHint:
-      "Disponível apenas em builds .dev. As alterações são aplicadas imediatamente e não afetam as compras na loja.",
+      "Disponível apenas em builds .dev e .maestro. As alterações são aplicadas imediatamente e não afetam as compras na loja.",
     premiumErrorUnavailable: "A loja não está disponível. Tente mais tarde.",
     premiumErrorFailed: "Não foi possível concluir a compra.",
     premiumErrorPending: "A compra aguarda aprovação.",
@@ -377,7 +377,7 @@ const rawPremiumTranslations = {
     premiumUnlocked: "Premium разблокирован",
     developmentEntitlement: "Доступ для разработки",
     developmentEntitlementHint:
-      "Доступно только в сборках .dev. Изменения применяются сразу и не влияют на покупки в магазине.",
+      "Доступно только в сборках .dev и .maestro. Изменения применяются сразу и не влияют на покупки в магазине.",
     premiumErrorUnavailable: "Магазин сейчас недоступен. Повторите позже.",
     premiumErrorFailed: "Не удалось завершить покупку.",
     premiumErrorPending: "Покупка ожидает подтверждения.",
@@ -416,7 +416,7 @@ const rawPremiumTranslations = {
     premiumUnlocked: "高级版已解锁",
     developmentEntitlement: "开发版权限",
     developmentEntitlementHint:
-      "仅在 .dev 构建中可用。更改会立即生效，且不会影响商店购买。",
+      "仅在 .dev 和 .maestro 构建中可用。更改会立即生效，且不会影响商店购买。",
     premiumErrorUnavailable: "商店当前不可用，请稍后再试。",
     premiumErrorFailed: "无法完成购买。",
     premiumErrorPending: "购买正在等待批准。",
@@ -453,7 +453,7 @@ const rawPremiumTranslations = {
     premiumUnlocked: "تم فتح Premium",
     developmentEntitlement: "استحقاق إصدار التطوير",
     developmentEntitlementHint:
-      "متاح فقط في إصدارات .dev. تُطبَّق التغييرات فورًا ولا تؤثر في مشتريات المتجر.",
+      "متاح فقط في إصدارات .dev و.maestro. تُطبَّق التغييرات فورًا ولا تؤثر في مشتريات المتجر.",
     premiumErrorUnavailable: "المتجر غير متاح الآن. حاول لاحقًا.",
     premiumErrorFailed: "تعذر إكمال الشراء.",
     premiumErrorPending: "الشراء بانتظار الموافقة.",
@@ -492,7 +492,7 @@ const rawPremiumTranslations = {
     premiumUnlocked: "Premiumが解除されました",
     developmentEntitlement: "開発用アクセス権",
     developmentEntitlementHint:
-      ".dev ビルドでのみ利用できます。変更はすぐに適用され、ストアでの購入には影響しません。",
+      ".dev および .maestro ビルドでのみ利用できます。変更はすぐに適用され、ストアでの購入には影響しません。",
     premiumErrorUnavailable:
       "ストアを利用できません。後でもう一度お試しください。",
     premiumErrorFailed: "購入を完了できませんでした。",
@@ -532,7 +532,7 @@ const rawPremiumTranslations = {
     premiumUnlocked: "Premium feloldva",
     developmentEntitlement: "Fejlesztői jogosultság",
     developmentEntitlementHint:
-      "Csak .dev buildekben érhető el. A módosítások azonnal érvénybe lépnek, és nem érintik az áruházi vásárlásokat.",
+      "Csak .dev és .maestro buildekben érhető el. A módosítások azonnal érvénybe lépnek, és nem érintik az áruházi vásárlásokat.",
     premiumErrorUnavailable: "Az áruház most nem érhető el. Próbáld később.",
     premiumErrorFailed: "A vásárlás nem fejezhető be.",
     premiumErrorPending: "A vásárlás jóváhagyásra vár.",
@@ -571,7 +571,7 @@ const rawPremiumTranslations = {
     premiumUnlocked: "Premium je odemčeno",
     developmentEntitlement: "Vývojářské oprávnění",
     developmentEntitlementHint:
-      "K dispozici pouze v sestaveních .dev. Změny se projeví okamžitě a neovlivní nákupy v obchodě.",
+      "K dispozici pouze v sestaveních .dev a .maestro. Změny se projeví okamžitě a neovlivní nákupy v obchodě.",
     premiumErrorUnavailable: "Obchod teď není dostupný. Zkuste to později.",
     premiumErrorFailed: "Nákup se nepodařilo dokončit.",
     premiumErrorPending: "Nákup čeká na schválení.",
@@ -610,7 +610,7 @@ const rawPremiumTranslations = {
     premiumUnlocked: "Premium jest odblokowane",
     developmentEntitlement: "Uprawnienie deweloperskie",
     developmentEntitlementHint:
-      "Dostępne tylko w kompilacjach .dev. Zmiany są stosowane natychmiast i nie wpływają na zakupy w sklepie.",
+      "Dostępne tylko w kompilacjach .dev i .maestro. Zmiany są stosowane natychmiast i nie wpływają na zakupy w sklepie.",
     premiumErrorUnavailable: "Sklep jest teraz niedostępny. Spróbuj później.",
     premiumErrorFailed: "Nie udało się dokończyć zakupu.",
     premiumErrorPending: "Zakup oczekuje na zatwierdzenie.",
@@ -649,7 +649,7 @@ const rawPremiumTranslations = {
     premiumUnlocked: "Premium açık",
     developmentEntitlement: "Geliştirme erişimi",
     developmentEntitlementHint:
-      "Yalnızca .dev derlemelerinde kullanılabilir. Değişiklikler hemen uygulanır ve mağaza satın alımlarını etkilemez.",
+      "Yalnızca .dev ve .maestro derlemelerinde kullanılabilir. Değişiklikler hemen uygulanır ve mağaza satın alımlarını etkilemez.",
     premiumErrorUnavailable:
       "Mağaza şu anda kullanılamıyor. Daha sonra deneyin.",
     premiumErrorFailed: "Satın alma tamamlanamadı.",
@@ -689,7 +689,7 @@ const rawPremiumTranslations = {
     premiumUnlocked: "Premium är upplåst",
     developmentEntitlement: "Utvecklarbehörighet",
     developmentEntitlementHint:
-      "Endast tillgängligt i .dev-byggen. Ändringar gäller direkt och påverkar inte köp i butiken.",
+      "Endast tillgängligt i .dev- och .maestro-byggen. Ändringar gäller direkt och påverkar inte köp i butiken.",
     premiumErrorUnavailable: "Butiken är inte tillgänglig nu. Försök senare.",
     premiumErrorFailed: "Köpet kunde inte slutföras.",
     premiumErrorPending: "Köpet väntar på godkännande.",
@@ -728,7 +728,7 @@ const rawPremiumTranslations = {
     premiumUnlocked: "پریمیم کھل گیا",
     developmentEntitlement: "ڈیولپمنٹ استحقاق",
     developmentEntitlementHint:
-      "صرف .dev بلڈز میں دستیاب ہے۔ تبدیلیاں فوراً لاگو ہوتی ہیں اور اسٹور کی خریداریوں پر اثر نہیں ڈالتیں۔",
+      "صرف .dev اور .maestro بلڈز میں دستیاب ہے۔ تبدیلیاں فوراً لاگو ہوتی ہیں اور اسٹور کی خریداریوں پر اثر نہیں ڈالتیں۔",
     premiumErrorUnavailable:
       "اسٹور ابھی دستیاب نہیں۔ بعد میں دوبارہ کوشش کریں۔",
     premiumErrorFailed: "خریداری مکمل نہیں ہو سکی۔",

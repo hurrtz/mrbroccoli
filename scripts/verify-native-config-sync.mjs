@@ -181,6 +181,11 @@ assertIncludes(
   androidBuild,
   "buildTypes {\n        debug {\n            applicationIdSuffix '.dev'",
 );
+assertIncludes(
+  "Android Maestro application ID suffix belongs to Release build type",
+  androidBuild,
+  "release {\n            if ((findProperty('mrBroccoliMaestroVariant') ?: 'false').toBoolean()) {\n                applicationIdSuffix '.maestro'",
+);
 assertExcludes(
   "Premium entitlement does not depend on __DEV__",
   premiumEntitlementContext,
