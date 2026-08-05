@@ -80,7 +80,7 @@ fi
 code_files=$(
   printf '%s\n' "$changed_files" |
     grep -E \
-      '^(app|src|android|ios|plugins|scripts|data|\.maestro)/|^(app\.json|eas\.json|package(-lock)?\.json|tsconfig[^/]*\.json|eslint\.config\.mjs|jest\.config\.js|knip\.json|metro\.config\.js|babel\.config\.js|Makefile)$' |
+      '^(app|src|android|ios|plugins|scripts|data|\.maestro|\.githooks)/|^(app\.json|eas\.json|package(-lock)?\.json|tsconfig[^/]*\.json|eslint\.config\.js|jest\.config\.js|jest\.setup\.js|knip\.json|metro\.config\.js|babel\.config\.js|Makefile)$' |
     grep -Ev '\.(md|txt)$' || true
 )
 spec_files=$(printf '%s\n' "$changed_files" | grep -E '(^|/)(SPEC|DESIGN)\.md$' || true)

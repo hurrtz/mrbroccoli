@@ -117,3 +117,25 @@ test("skips documentation-only pushes", (t) => {
   assert.equal(result.status, 0);
   assert.match(result.stdout, /no code, native, build, or script files/);
 });
+
+test("classifies toolchain configuration files as code", (t) => {
+  const toolchainFiles = [
+    "eslint.config.js",
+    "jest.setup.js",
+    ".githooks/pre-push",
+  ];
+  for (const file of toolchainFiles) {
+    const { baseline, repo } = createRepository(t);
+    mkdirSync(path.join(repo, path.dirname(file)), { recursive: true });
+    writeFileSync(path.join(repo, file), "// toolchain change\n");
+    commit(repo, `change ${file}`);
+
+    const blocked = runGate(repo, baseline);
+    assert.equal(
+      blocked.status,
+      1,
+      `${file} must require living-spec review, got: ${blocked.stdout}${blocked.stderr}`,
+    );
+    assert.match(`${blocked.stdout}\n${blocked.stderr}`, /LIVING SPEC REVIEW REQUIRED/);
+  }
+});
