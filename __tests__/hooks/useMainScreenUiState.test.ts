@@ -63,6 +63,57 @@ describe("useMainScreenUiState", () => {
     expect(action).toHaveBeenCalledTimes(1);
   });
 
+  it("runs deferred drawer actions without a native onDismiss event (Android)", () => {
+    jest.useFakeTimers();
+    try {
+      const { result } = renderHook(() => useMainScreenUiState());
+      const action = jest.fn();
+
+      act(() => {
+        result.current.setDrawerVisible(true);
+      });
+      act(() => {
+        result.current.runAfterDrawerDismiss(action);
+      });
+
+      expect(action).not.toHaveBeenCalled();
+
+      // No handleDrawerDismiss call: Android never delivers Modal onDismiss.
+      act(() => {
+        jest.advanceTimersByTime(400);
+      });
+
+      expect(action).toHaveBeenCalledTimes(1);
+    } finally {
+      jest.useRealTimers();
+    }
+  });
+
+  it("does not run a deferred drawer action twice when onDismiss also fires (iOS)", () => {
+    jest.useFakeTimers();
+    try {
+      const { result } = renderHook(() => useMainScreenUiState());
+      const action = jest.fn();
+
+      act(() => {
+        result.current.setDrawerVisible(true);
+      });
+      act(() => {
+        result.current.runAfterDrawerDismiss(action);
+      });
+      act(() => {
+        result.current.handleDrawerDismiss();
+      });
+      act(() => {
+        jest.advanceTimersByTime(400);
+      });
+
+      expect(action).toHaveBeenCalledTimes(1);
+    } finally {
+      jest.useRealTimers();
+    }
+  });
+
   it("opens and clears the memory modal state", () => {
     const { result } = renderHook(() => useMainScreenUiState());
     const conversation = {

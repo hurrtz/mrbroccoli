@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 import { getCatalogProviderIdForAppProvider } from "../../catalog/appProviders";
 import type { CatalogProviderId } from "../../catalog/types";
@@ -80,6 +80,20 @@ export function useMainScreenUiState() {
     pendingDrawerDismissActionRef.current = null;
     pendingAction?.();
   }, []);
+
+  // React Native delivers Modal onDismiss on iOS only, so the drawer's
+  // deferred actions (share thread, manage memory) would never run on
+  // Android. This fallback drains the pending action once the drawer state
+  // is hidden; the delay leaves room for the native modal teardown, and the
+  // ref is consumed atomically so an earlier iOS onDismiss wins harmlessly.
+  useEffect(() => {
+    if (drawerVisible || !pendingDrawerDismissActionRef.current) {
+      return;
+    }
+
+    const timer = setTimeout(handleDrawerDismiss, 350);
+    return () => clearTimeout(timer);
+  }, [drawerVisible, handleDrawerDismiss]);
 
   return {
     settingsVisible,
