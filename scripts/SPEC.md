@@ -32,6 +32,15 @@ and verification; platform build systems own compilation.
 
 ## Validation Layers
 
+A spend-free cloud mirror of the local gate runs in GitHub Actions
+(`.github/workflows/ci.yml`) on every push and pull request: install, native
+configuration parity, lint, dead-code checks, typechecks, script test suites,
+Jest with coverage floors, and the license/release-note/store-promo contracts.
+It needs no secrets and never builds release artifacts; device, native-build,
+and paid provider phases remain local-only. The remote run makes the gates
+enforced rather than advisory — a `--no-verify` push no longer bypasses
+validation silently.
+
 ```mermaid
 flowchart LR
     Hook[Git pre-push] --> Spec[Living-spec review]

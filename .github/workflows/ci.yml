@@ -1,0 +1,56 @@
+name: CI
+
+# Spend-free validation slice: mirrors the local `make pre-push` gate without
+# device, native-build, or paid provider phases. Requires no secrets — the
+# environment contract checks are fixture-based and release bundles are not
+# built here.
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Native configuration parity
+        run: npm run config:verify
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Dead code and dependency hygiene
+        run: npm run static:dead-code
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Script test suites
+        run: node --test scripts/*.test.mjs
+
+      - name: Jest with coverage floors
+        run: npm run test:coverage -- --runInBand --watchman=false
+
+      - name: License inventory
+        run: npm run license:verify
+
+      - name: Release note contracts
+        run: npm run release-notes:verify
+
+      - name: Store promo contracts
+        run: npm run store-promos:verify
