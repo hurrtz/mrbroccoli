@@ -108,6 +108,7 @@ function freeController(): FreeOfflineModeController {
 function renderSetup(
   controller: FreeOfflineModeController,
   callbacks: {
+    onOpenPremium?: () => void;
     onPreviewVoice?: React.ComponentProps<
       typeof FreeOfflineSetupScreen
     >["onPreviewVoice"];
@@ -119,6 +120,7 @@ function renderSetup(
   return renderWithProviders(
     <FreeOfflineSetupScreen
       controller={controller}
+      onOpenPremium={callbacks.onOpenPremium}
       onPreviewVoice={
         callbacks.onPreviewVoice ?? jest.fn(async () => undefined)
       }
@@ -176,6 +178,30 @@ describe("FreeOfflineSetupScreen", () => {
       StyleSheet.flatten(screen.getByTestId("free-offline-footer").props.style)
         .paddingBottom,
     ).toBe(24);
+  });
+
+  it("keeps a Premium escape hatch reachable, including from unavailable states", () => {
+    const onOpenPremium = jest.fn();
+    const controller = freeController();
+    const screen = renderSetup(controller, { onOpenPremium });
+
+    fireEvent.press(screen.getByTestId("free-offline-premium-link"));
+    expect(onOpenPremium).toHaveBeenCalledTimes(1);
+
+    // Unsupported hardware / failed evaluation must not trap the user with
+    // only a Retry action.
+    const unavailableController: FreeOfflineModeController = {
+      ...freeController(),
+      selection: { status: "unavailable", reason: "device" },
+      checking: false,
+    };
+    const unavailableScreen = renderSetup(unavailableController, {
+      onOpenPremium,
+    });
+    fireEvent.press(
+      unavailableScreen.getByTestId("free-offline-premium-link"),
+    );
+    expect(onOpenPremium).toHaveBeenCalledTimes(2);
   });
 
   it("offers seven languages in a dropdown and ends with one clear start action", () => {

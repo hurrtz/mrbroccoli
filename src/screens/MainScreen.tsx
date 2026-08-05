@@ -1042,6 +1042,7 @@ export function MainScreen() {
       }}
       freeOffline={{
         controller: freeOffline,
+        onOpenPremium: () => setPremiumModalVisible(true),
         onPreviewVoice: handlePreviewVoice,
         onStopPreviewVoice: stopPreviewVoice,
       }}

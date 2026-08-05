@@ -34,10 +34,12 @@ import { Picker } from "./Picker";
 
 export function FreeOfflineSetupScreen({
   controller,
+  onOpenPremium,
   onPreviewVoice,
   onStopPreviewVoice,
 }: {
   controller: FreeOfflineModeController;
+  onOpenPremium?: () => void;
   onPreviewVoice: (request: VoicePreviewRequest) => Promise<void>;
   onStopPreviewVoice: () => Promise<void>;
 }) {
@@ -366,6 +368,24 @@ export function FreeOfflineSetupScreen({
             {primaryAction.label}
           </Text>
         </Pressable>
+        {onOpenPremium ? (
+          // Escape hatch: unsupported hardware, storage failures, or users
+          // who already own provider keys must never be trapped behind the
+          // local setup with no route to the Premium purchase.
+          <Pressable
+            testID="free-offline-premium-link"
+            accessibilityRole="button"
+            onPress={onOpenPremium}
+            style={({ pressed }) => [
+              styles.premiumLink,
+              pressed ? styles.pressed : null,
+            ]}
+          >
+            <Text style={[styles.premiumLinkText, { color: colors.accent }]}>
+              {t("freeOfflinePremiumEscape")}
+            </Text>
+          </Pressable>
+        ) : null}
       </View>
     </View>
   );
@@ -426,5 +446,16 @@ const styles = StyleSheet.create({
     fontFamily: fonts.bodyMedium,
     fontSize: 16,
     lineHeight: 22,
+  },
+  premiumLink: {
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: 4,
+    minHeight: 44,
+  },
+  premiumLinkText: {
+    fontFamily: fonts.bodyMedium,
+    fontSize: 14,
+    lineHeight: 20,
   },
 });

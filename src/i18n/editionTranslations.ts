@@ -17,6 +17,7 @@ const en = {
   freeOfflineSystemVoiceNote:
     "No single downloaded voice covers this language set, so replies use the phone’s language-aware system voice. Listening and thinking stay local.",
   freeOfflineStart: "Start",
+  freeOfflinePremiumEscape: "Have provider API keys? Unlock Premium instead",
   settingsGroupConversation: "Conversation & tools",
   settingsGroupVoiceModels: "Voice & models",
   settingsGroupPrivacyApp: "Privacy & app",
@@ -47,6 +48,7 @@ export const editionTranslations = {
     freeOfflineSystemVoiceNote:
       "Keine einzelne heruntergeladene Stimme deckt diese Sprachen ab. Antworten verwenden deshalb die sprachabhängige Systemstimme des Smartphones; Hören und Denken bleiben lokal.",
     freeOfflineStart: "Start",
+    freeOfflinePremiumEscape: "Provider-API-Schlüssel vorhanden? Stattdessen Premium freischalten",
     settingsGroupConversation: "Gespräch & Werkzeuge",
     settingsGroupVoiceModels: "Stimme & Modelle",
     settingsGroupPrivacyApp: "Datenschutz & App",
@@ -70,6 +72,7 @@ export const editionTranslations = {
     freeOfflineSystemVoiceNote:
       "Жоден завантажений голос не охоплює всі ці мови, тому відповіді використовують системний голос телефону для відповідної мови. Слухання й мислення залишаються локальними.",
     freeOfflineStart: "Почати",
+    freeOfflinePremiumEscape: "Маєте API-ключі провайдера? Розблокуйте Premium",
     settingsGroupConversation: "Розмова й інструменти",
     settingsGroupVoiceModels: "Голос і моделі",
     settingsGroupPrivacyApp: "Приватність і застосунок",
@@ -93,6 +96,7 @@ export const editionTranslations = {
     freeOfflineSystemVoiceNote:
       "एक डाउनलोड की गई आवाज़ इन सभी भाषाओं को नहीं संभालती, इसलिए उत्तर फ़ोन की भाषा-अनुकूल सिस्टम आवाज़ इस्तेमाल करेंगे। सुनना और सोचना स्थानीय रहेगा।",
     freeOfflineStart: "शुरू करें",
+    freeOfflinePremiumEscape: "प्रोवाइडर API कुंजियाँ हैं? इसके बजाय Premium अनलॉक करें",
     settingsGroupConversation: "बातचीत और टूल",
     settingsGroupVoiceModels: "आवाज़ और मॉडल",
     settingsGroupPrivacyApp: "गोपनीयता और ऐप",
@@ -117,6 +121,7 @@ export const editionTranslations = {
     freeOfflineSystemVoiceNote:
       "Ninguna voz descargada cubre todos estos idiomas, así que las respuestas usan la voz del sistema adecuada para cada idioma. La escucha y el razonamiento siguen siendo locales.",
     freeOfflineStart: "Empezar",
+    freeOfflinePremiumEscape: "¿Tienes claves API de proveedor? Desbloquea Premium",
     settingsGroupConversation: "Conversación y herramientas",
     settingsGroupVoiceModels: "Voz y modelos",
     settingsGroupPrivacyApp: "Privacidad y app",
@@ -141,6 +146,7 @@ export const editionTranslations = {
     freeOfflineSystemVoiceNote:
       "Aucune voix téléchargée ne couvre toutes ces langues. Les réponses utilisent donc la voix système adaptée à chaque langue ; l’écoute et la réflexion restent locales.",
     freeOfflineStart: "Démarrer",
+    freeOfflinePremiumEscape: "Des clés API fournisseur ? Débloquez plutôt Premium",
     settingsGroupConversation: "Conversation et outils",
     settingsGroupVoiceModels: "Voix et modèles",
     settingsGroupPrivacyApp: "Confidentialité et app",
@@ -165,6 +171,7 @@ export const editionTranslations = {
     freeOfflineSystemVoiceNote:
       "Nessuna voce scaricata copre tutte queste lingue, quindi le risposte usano la voce di sistema adatta alla lingua. Ascolto e ragionamento restano locali.",
     freeOfflineStart: "Inizia",
+    freeOfflinePremiumEscape: "Hai chiavi API del provider? Sblocca Premium",
     settingsGroupConversation: "Conversazione e strumenti",
     settingsGroupVoiceModels: "Voce e modelli",
     settingsGroupPrivacyApp: "Privacy e app",
@@ -189,6 +196,7 @@ export const editionTranslations = {
     freeOfflineSystemVoiceNote:
       "Nenhuma voz transferida abrange todos estes idiomas, por isso as respostas usam a voz do sistema adequada ao idioma. A audição e o raciocínio continuam locais.",
     freeOfflineStart: "Começar",
+    freeOfflinePremiumEscape: "Tem chaves de API? Desbloqueie o Premium",
     settingsGroupConversation: "Conversa e ferramentas",
     settingsGroupVoiceModels: "Voz e modelos",
     settingsGroupPrivacyApp: "Privacidade e app",
@@ -213,6 +221,7 @@ export const editionTranslations = {
     freeOfflineSystemVoiceNote:
       "Nenhuma voz baixada cobre todos esses idiomas, então as respostas usam a voz do sistema adequada ao idioma. A escuta e o raciocínio continuam locais.",
     freeOfflineStart: "Começar",
+    freeOfflinePremiumEscape: "Tem chaves de API? Desbloqueie o Premium",
     settingsGroupConversation: "Conversa e ferramentas",
     settingsGroupVoiceModels: "Voz e modelos",
     settingsGroupPrivacyApp: "Privacidade e app",
@@ -237,6 +246,7 @@ export const editionTranslations = {
     freeOfflineSystemVoiceNote:
       "Ни один загруженный голос не охватывает все эти языки, поэтому ответы используют системный голос телефона для нужного языка. Прослушивание и мышление остаются локальными.",
     freeOfflineStart: "Начать",
+    freeOfflinePremiumEscape: "Есть API-ключи провайдера? Разблокируйте Premium",
     settingsGroupConversation: "Разговор и инструменты",
     settingsGroupVoiceModels: "Голос и модели",
     settingsGroupPrivacyApp: "Конфиденциальность и приложение",
@@ -257,6 +267,7 @@ export const editionTranslations = {
     freeOfflineSystemVoiceNote:
       "没有一个已下载语音覆盖全部所选语言，因此回复会使用手机对应语言的系统语音。聆听和思考仍在本地完成。",
     freeOfflineStart: "开始",
+    freeOfflinePremiumEscape: "已有服务商 API 密钥？改为解锁 Premium",
     settingsGroupConversation: "对话与工具",
     settingsGroupVoiceModels: "语音与模型",
     settingsGroupPrivacyApp: "隐私与应用",
@@ -278,6 +289,7 @@ export const editionTranslations = {
     freeOfflineSystemVoiceNote:
       "لا يغطي صوت منزّل واحد كل هذه اللغات، لذا تستخدم الردود صوت النظام المناسب للغة على الهاتف. يبقى الاستماع والتفكير محليين.",
     freeOfflineStart: "ابدأ",
+    freeOfflinePremiumEscape: "لديك مفاتيح API لمزوّد؟ افتح Premium بدلاً من ذلك",
     settingsGroupConversation: "المحادثة والأدوات",
     settingsGroupVoiceModels: "الصوت والنماذج",
     settingsGroupPrivacyApp: "الخصوصية والتطبيق",
@@ -299,6 +311,7 @@ export const editionTranslations = {
     freeOfflineSystemVoiceNote:
       "選択したすべての言語を扱える単一のダウンロード音声がないため、返信には言語対応のシステム音声を使います。聞き取りと思考はローカルのままです。",
     freeOfflineStart: "開始",
+    freeOfflinePremiumEscape: "プロバイダーの API キーをお持ちですか？Premium を解除",
     settingsGroupConversation: "会話とツール",
     settingsGroupVoiceModels: "音声とモデル",
     settingsGroupPrivacyApp: "プライバシーとアプリ",
@@ -323,6 +336,7 @@ export const editionTranslations = {
     freeOfflineSystemVoiceNote:
       "Egyetlen letöltött hang sem fedi le az összes nyelvet, ezért a válaszok a telefon nyelvhez illő rendszerhangját használják. A hallás és gondolkodás helyben marad.",
     freeOfflineStart: "Indítás",
+    freeOfflinePremiumEscape: "Van szolgáltatói API-kulcsod? Oldd fel a Premiumot",
     settingsGroupConversation: "Beszélgetés és eszközök",
     settingsGroupVoiceModels: "Hang és modellek",
     settingsGroupPrivacyApp: "Adatvédelem és alkalmazás",
@@ -347,6 +361,7 @@ export const editionTranslations = {
     freeOfflineSystemVoiceNote:
       "Jeden stažený hlas nepokrývá všechny tyto jazyky, proto odpovědi používají systémový hlas telefonu pro daný jazyk. Poslech a myšlení zůstávají místní.",
     freeOfflineStart: "Začít",
+    freeOfflinePremiumEscape: "Máte API klíče poskytovatele? Odemkněte Premium",
     settingsGroupConversation: "Konverzace a nástroje",
     settingsGroupVoiceModels: "Hlas a modely",
     settingsGroupPrivacyApp: "Soukromí a aplikace",
@@ -371,6 +386,7 @@ export const editionTranslations = {
     freeOfflineSystemVoiceNote:
       "Żaden pobrany głos nie obsługuje wszystkich tych języków, więc odpowiedzi użyją odpowiedniego głosu systemowego telefonu. Słuchanie i myślenie pozostają lokalne.",
     freeOfflineStart: "Rozpocznij",
+    freeOfflinePremiumEscape: "Masz klucze API dostawcy? Odblokuj Premium",
     settingsGroupConversation: "Rozmowa i narzędzia",
     settingsGroupVoiceModels: "Głos i modele",
     settingsGroupPrivacyApp: "Prywatność i aplikacja",
@@ -395,6 +411,7 @@ export const editionTranslations = {
     freeOfflineSystemVoiceNote:
       "Tek bir indirilen ses bu dillerin tümünü kapsamıyor; bu nedenle yanıtlar telefonun dile uygun sistem sesini kullanır. Dinleme ve düşünme yerel kalır.",
     freeOfflineStart: "Başlat",
+    freeOfflinePremiumEscape: "Sağlayıcı API anahtarın var mı? Bunun yerine Premium'un kilidini aç",
     settingsGroupConversation: "Konuşma ve araçlar",
     settingsGroupVoiceModels: "Ses ve modeller",
     settingsGroupPrivacyApp: "Gizlilik ve uygulama",
@@ -419,6 +436,7 @@ export const editionTranslations = {
     freeOfflineSystemVoiceNote:
       "Ingen enskild hämtad röst täcker alla språken, så svaren använder telefonens språkanpassade systemröst. Lyssnande och tänkande förblir lokalt.",
     freeOfflineStart: "Starta",
+    freeOfflinePremiumEscape: "Har du API-nycklar? Lås upp Premium i stället",
     settingsGroupConversation: "Samtal och verktyg",
     settingsGroupVoiceModels: "Röst och modeller",
     settingsGroupPrivacyApp: "Integritet och app",
@@ -442,6 +460,7 @@ export const editionTranslations = {
     freeOfflineSystemVoiceNote:
       "کوئی ایک ڈاؤن لوڈ شدہ آواز ان تمام زبانوں کا احاطہ نہیں کرتی، اس لیے جوابات فون کی زبان کے مطابق سسٹم آواز استعمال کرتے ہیں۔ سننا اور سوچنا مقامی رہتا ہے۔",
     freeOfflineStart: "شروع کریں",
+    freeOfflinePremiumEscape: "پرووائیڈر API کلیدیں ہیں؟ اس کے بجائے Premium کھولیں",
     settingsGroupConversation: "گفتگو اور ٹولز",
     settingsGroupVoiceModels: "آواز اور ماڈلز",
     settingsGroupPrivacyApp: "رازداری اور ایپ",

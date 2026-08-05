@@ -61,16 +61,21 @@ export function MainScreenPresentation({
       <Toast {...toast} />
 
       {freeOffline.controller.setupVisible ? (
-        <KeyboardAvoidingView
-          behavior={Platform.OS === "ios" ? "padding" : "height"}
-          keyboardVerticalOffset={Platform.OS === "ios" ? 64 : 0}
-          style={[
-            styles.defaultLayout,
-            isLandscape ? styles.defaultLayoutLandscape : null,
-          ]}
-        >
-          <FreeOfflineSetupScreen {...freeOffline} />
-        </KeyboardAvoidingView>
+        <>
+          <KeyboardAvoidingView
+            behavior={Platform.OS === "ios" ? "padding" : "height"}
+            keyboardVerticalOffset={Platform.OS === "ios" ? 64 : 0}
+            style={[
+              styles.defaultLayout,
+              isLandscape ? styles.defaultLayoutLandscape : null,
+            ]}
+          >
+            <FreeOfflineSetupScreen {...freeOffline} />
+          </KeyboardAvoidingView>
+          {/* The purchase path must stay reachable while setup blocks the
+              workspace; otherwise unsupported devices can never buy Premium. */}
+          <PremiumUpgradeModal {...premiumUpgrade} />
+        </>
       ) : (
         <>
           <KeyboardAvoidingView
