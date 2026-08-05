@@ -122,9 +122,16 @@ chunks update the transcript only after the context-leak guard accepts them.
 
 When playback is streaming, complete paragraphs enter the TTS queue as they
 arrive. Provider/local synthesis prefetches with bounded concurrency while an
-output chain preserves paragraph order. “Wait” playback emits synthesized
-results only after response completion. Visual Markdown is deterministically
-rendered into listenable speech before sentence chunking.
+output chain preserves paragraph order, and the native audio queue serializes
+its enqueue path so concurrent session preparation cannot reorder clips at the
+native boundary. “Wait” playback emits synthesized results only after response
+completion. Visual Markdown is deterministically rendered into listenable
+speech before sentence chunking.
+
+Native recognizer stop, abort, and file transcription carry bounded watchdogs:
+a platform recognizer that drops its terminal event settles with the latest
+transcript and is forced down instead of wedging voice capture for the rest of
+the session.
 
 Fallback routes are normalized from the user's explicit policy. A failed
 primary route may move only through that order, and diagnostics retain every

@@ -95,14 +95,29 @@ Unsupported image routes fail before a paid provider request.
 ## Streaming and Completion
 
 Hosted replies use a ten-minute inactivity timeout. Any stream activity resets
-the inactivity timer; an abort signal ends parsing and downstream callbacks.
+the inactivity timer on every streaming transport, including thinking-only
+phases; an abort signal ends parsing and downstream callbacks.
 Chunks may render immediately and feed paragraph TTS, while only the completed
 guarded response is persisted.
+
+**Decision:** Every exit path cancels the transport. The stream reader is
+cancelled when an event handler throws, and the request abort controller is
+aborted in the terminal cleanup, so an abandoned stream never keeps a provider
+generating a completion the user already paid for and will not receive.
+
+**Decision:** An error-only stream event is not stream progress. Errors are
+checked before activity is recorded so retry, effort failover, and model
+failover stay available for a turn that produced no content. In-stream error
+payloads propagate the provider's status code, and Anthropic stream error
+types map to their HTTP equivalents so an overloaded stream classifies like a
+5xx response.
 
 Empty replies, malformed streams, unsupported routes, timeout, and provider
 errors are localized and classified. Usage remains estimated token counts
 unless a route provides compatible usage metadata; provider billing is not
-inferred from those counts.
+inferred from those counts. Provider-wide quota circuits self-heal after a
+bounded pause; authentication and credit circuits persist until the key
+changes or the user re-validates.
 
 ## Resilience
 

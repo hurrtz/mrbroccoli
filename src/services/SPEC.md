@@ -113,6 +113,10 @@ integrity snapshots, debug logs, and caches. Restore validates the complete
 shape before mutation and delegates non-destructive conversation merging to the
 conversation hook.
 
+**Decision:** Export never claims silent completeness. Conversations whose
+stored body cannot be read are counted and surfaced to the user instead of
+being dropped from the backup without a trace.
+
 `conversationArchive.ts` is a separate readable AI handoff. It writes an index,
 per-conversation Markdown, and a latest pointer in an app-owned archive
 directory. It is not a lossless restore format and does not include hidden

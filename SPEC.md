@@ -162,6 +162,10 @@ boundary.
   per-provider disclosure; each attachment records which providers received it.
 - Usage is reported in tokens. The app does not present stale model-price
   estimates as user spend.
+- Every assistant response offers an in-app report action (a Google Play
+  generative-AI policy requirement). The report travels through the system
+  share sheet so the user chooses the channel and sees exactly what leaves
+  the device.
 
 ### Local models
 

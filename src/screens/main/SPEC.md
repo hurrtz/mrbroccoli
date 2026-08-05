@@ -73,7 +73,14 @@ comes from the Premium context; the screen does not infer it from the presence
 of a key or a local model.
 
 **Decision:** Switching editions must be reversible. Free-mode adaptation is a
-runtime projection, not a destructive settings migration.
+runtime projection, not a destructive settings migration. Completing Free
+setup preserves configured provider response modes alongside the local Free
+routes; the Free runtime ignores them and they return untouched with Premium.
+
+**Decision:** The Premium purchase path stays reachable while the blocking
+Free setup surface is visible. The setup footer offers a localized Premium
+escape hatch and the upgrade modal remains mounted, so unsupported hardware or
+failing downloads never strand a user without a route to Premium.
 
 ## Drive Session
 
