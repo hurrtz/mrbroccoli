@@ -112,6 +112,71 @@ describe("useNativeAudioQueuePlayback", () => {
     expect(enqueueNativeAudioQueueItem).not.toHaveBeenCalled();
   });
 
+  it("preserves source order when session preparation latency varies per clip", async () => {
+    const params = createParams();
+    params.nativeAudioQueuePendingCountRef.current = 2;
+    // First caller pays a slow native round trip (ambient-monitor stop);
+    // the second caller's session setup resolves immediately. Without
+    // serialization the second clip reaches the native queue first.
+    let releaseFirstSession: (() => void) | undefined;
+    let sessionCalls = 0;
+    params.ensureAudioQueuePlaybackSession = jest.fn(() => {
+      sessionCalls += 1;
+      if (sessionCalls === 1) {
+        return new Promise<void>((resolve) => {
+          releaseFirstSession = resolve;
+        });
+      }
+      return Promise.resolve();
+    });
+    const { result } = renderHook(() => useNativeAudioQueuePlayback(params));
+
+    await act(async () => {
+      const first = result.current.playNativeAudio(
+        "audio-1",
+        "file://clip-1.wav",
+        4,
+      );
+      const second = result.current.playNativeAudio(
+        "audio-2",
+        "file://clip-2.wav",
+        4,
+      );
+
+      // Give an unserialized second clip every chance to run ahead.
+      await Promise.resolve();
+      await Promise.resolve();
+      expect(enqueueNativeAudioQueueItem).not.toHaveBeenCalled();
+
+      releaseFirstSession?.();
+      await Promise.all([first, second]);
+    });
+
+    expect(
+      (enqueueNativeAudioQueueItem as jest.Mock).mock.calls.map(
+        ([item]) => item.itemId,
+      ),
+    ).toEqual(["audio-1", "audio-2"]);
+  });
+
+  it("continues enqueueing later clips after a failed clip", async () => {
+    const params = createParams();
+    (enqueueNativeAudioQueueItem as jest.Mock)
+      .mockRejectedValueOnce(new Error("Native enqueue failed"))
+      .mockResolvedValueOnce(true);
+    const { result } = renderHook(() => useNativeAudioQueuePlayback(params));
+
+    await act(async () => {
+      await result.current.playNativeAudio("audio-1", "file://clip-1.wav", 4);
+      await result.current.playNativeAudio("audio-2", "file://clip-2.wav", 4);
+    });
+
+    expect(enqueueNativeAudioQueueItem).toHaveBeenCalledTimes(2);
+    expect(
+      (enqueueNativeAudioQueueItem as jest.Mock).mock.calls[1][0].itemId,
+    ).toBe("audio-2");
+  });
+
   it("records playback failures, cleans queue state, and finalizes a drained queue", async () => {
     const params = createParams();
     (enqueueNativeAudioQueueItem as jest.Mock).mockRejectedValue(

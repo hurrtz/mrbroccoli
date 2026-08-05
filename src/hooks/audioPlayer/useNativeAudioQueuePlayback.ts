@@ -1,4 +1,4 @@
-import { type MutableRefObject, useCallback } from "react";
+import { type MutableRefObject, useCallback, useRef } from "react";
 import {
   enqueueNativeAudioQueueItem,
   startNativeAudioQueue,
@@ -34,7 +34,13 @@ export function useNativeAudioQueuePlayback(params: {
     updatePendingPlaybackState,
   } = params;
 
-  const playNativeAudio = useCallback(
+  // Serializes native enqueue order. Each clip awaits session preparation
+  // (including the variable-latency ambient-monitor stop) before reaching the
+  // native queue, so two concurrent playNativeAudio calls could otherwise
+  // race and enqueue out of source order.
+  const enqueueChainRef = useRef<Promise<void>>(Promise.resolve());
+
+  const playNativeAudioInner = useCallback(
     async (
       itemId: string,
       audioUri: string,
@@ -106,6 +112,22 @@ export function useNativeAudioQueuePlayback(params: {
       playbackGenerationRef,
       updatePendingPlaybackState,
     ],
+  );
+
+  const playNativeAudio = useCallback(
+    (
+      itemId: string,
+      audioUri: string,
+      generation: number,
+      diagnostics?: SpeechDiagnosticsContext,
+    ) => {
+      const run = () =>
+        playNativeAudioInner(itemId, audioUri, generation, diagnostics);
+      const chained = enqueueChainRef.current.then(run, run);
+      enqueueChainRef.current = chained;
+      return chained;
+    },
+    [playNativeAudioInner],
   );
 
   return {
