@@ -12,6 +12,7 @@ import {
   APP_DATA_BACKUP_MAX_BYTES,
   serializeAppDataBackup,
   type AppDataBackup,
+  type AppDataBackupCreation,
 } from "../../src/services/appDataBackup";
 import { ThemeProvider } from "../../src/theme/ThemeContext";
 import { DEFAULT_SETTINGS } from "../../src/types";
@@ -53,7 +54,7 @@ function createBackup(): AppDataBackup {
 function renderPage(
   overrides: {
     conversationArchive?: ConversationArchiveController;
-    onCreateAppDataBackup?: () => Promise<AppDataBackup>;
+    onCreateAppDataBackup?: () => Promise<AppDataBackupCreation>;
     onRestoreAppDataBackup?: React.ComponentProps<
       typeof DataPrivacySettingsPage
     >["onRestoreAppDataBackup"];
@@ -85,7 +86,10 @@ function renderPage(
           }
           onCreateAppDataBackup={
             overrides.onCreateAppDataBackup ??
-            jest.fn(async () => createBackup())
+            jest.fn(async () => ({
+              backup: createBackup(),
+              skippedConversationCount: 0,
+            }))
           }
           onRestoreAppDataBackup={
             overrides.onRestoreAppDataBackup ??
@@ -236,10 +240,31 @@ describe("DataPrivacySettingsPage", () => {
     expect(screen.queryByTestId("sync-conversation-archive")).toBeNull();
   });
 
+  it("warns when exported backups skipped unreadable conversations", async () => {
+    const backup = createBackup();
+    const screen = renderPage({
+      onCreateAppDataBackup: jest.fn(async () => ({
+        backup,
+        skippedConversationCount: 2,
+      })),
+    });
+
+    fireEvent.press(screen.getByTestId("export-readable-backup"));
+
+    await waitFor(() => expect(Sharing.shareAsync).toHaveBeenCalledTimes(1));
+    await waitFor(() =>
+      expect(
+        screen.getByText(
+          /2 conversations could not be read and are missing from this backup/,
+        ),
+      ).toBeTruthy(),
+    );
+  });
+
   it("retains a shared readable backup so deferred mail attachments remain readable", async () => {
     const backup = createBackup();
     const screen = renderPage({
-      onCreateAppDataBackup: jest.fn(async () => backup),
+      onCreateAppDataBackup: jest.fn(async () => ({ backup, skippedConversationCount: 0 })),
     });
 
     fireEvent.press(screen.getByTestId("export-readable-backup"));
@@ -321,7 +346,7 @@ describe("DataPrivacySettingsPage", () => {
     const encryptBackup = jest
       .spyOn(AppDataBackupService, "encryptAppDataBackup")
       .mockResolvedValue(encryptedDocument);
-    const onCreateAppDataBackup = jest.fn(async () => backup);
+    const onCreateAppDataBackup = jest.fn(async () => ({ backup, skippedConversationCount: 0 }));
     const screen = renderPage({ onCreateAppDataBackup });
 
     fireEvent.press(screen.getByTestId("export-encrypted-backup"));
@@ -395,7 +420,7 @@ describe("DataPrivacySettingsPage", () => {
           finishEncryption = resolve;
         }),
     );
-    const onCreateAppDataBackup = jest.fn(async () => backup);
+    const onCreateAppDataBackup = jest.fn(async () => ({ backup, skippedConversationCount: 0 }));
     const screen = renderPage({ onCreateAppDataBackup });
 
     fireEvent.press(screen.getByTestId("export-encrypted-backup"));

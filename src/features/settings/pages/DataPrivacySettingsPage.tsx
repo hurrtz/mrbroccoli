@@ -19,6 +19,7 @@ import {
   parseAppDataBackup,
   serializeAppDataBackup,
   type AppDataBackup,
+  type AppDataBackupCreation,
   type AppDataBackupRestoreResult,
 } from "../../../services/appDataBackup";
 import {
@@ -68,7 +69,7 @@ export function DataPrivacySettingsPage({
 }: {
   conversationArchive: ConversationArchiveController;
   isPremium: boolean;
-  onCreateAppDataBackup: () => Promise<AppDataBackup>;
+  onCreateAppDataBackup: () => Promise<AppDataBackupCreation>;
   onRestoreAppDataBackup: (
     backup: AppDataBackup,
   ) => Promise<AppDataBackupRestoreResult>;
@@ -202,7 +203,8 @@ export function DataPrivacySettingsPage({
     setRestoreResult(null);
     setStatusMessage(null);
     try {
-      const backup = await onCreateAppDataBackup();
+      const { backup, skippedConversationCount } =
+        await onCreateAppDataBackup();
       const sharedFile = await shareBackup(
         serializeAppDataBackup(backup),
         false,
@@ -214,8 +216,14 @@ export function DataPrivacySettingsPage({
           durationMs: Date.now() - startedAtMs,
           encrypted: false,
           sharedFileSizeBytes: sharedFile.sizeBytes,
+          skippedConversationCount,
         },
       });
+      if (skippedConversationCount > 0) {
+        setStatusMessage(
+          t("backupExportSkipped", { count: skippedConversationCount }),
+        );
+      }
     } catch (error) {
       recordDebugLogEvent({
         event: "backup-export-failed",
@@ -267,7 +275,8 @@ export function DataPrivacySettingsPage({
     setPassphraseError(null);
     setStatusMessage(null);
     try {
-      const backup = await onCreateAppDataBackup();
+      const { backup, skippedConversationCount } =
+        await onCreateAppDataBackup();
       const encrypted = await encryptAppDataBackup(backup, passphrase);
       const sharedFile = await shareBackup(encrypted, true);
       recordDebugLogEvent({
@@ -277,8 +286,14 @@ export function DataPrivacySettingsPage({
           durationMs: Date.now() - startedAtMs,
           encrypted: true,
           sharedFileSizeBytes: sharedFile.sizeBytes,
+          skippedConversationCount,
         },
       });
+      if (skippedConversationCount > 0) {
+        setStatusMessage(
+          t("backupExportSkipped", { count: skippedConversationCount }),
+        );
+      }
       setExportPassphraseVisible(false);
       resetPassphrase();
     } catch (error) {

@@ -145,6 +145,11 @@ const conversation: Conversation = {
 };
 
 async function createBackup() {
+  const { backup } = await createBackupCreation();
+  return backup;
+}
+
+async function createBackupCreation() {
   return createAppDataBackup({
     activeConversationId: conversation.id,
     appVersion: "2.6.0",
@@ -206,6 +211,47 @@ describe("appDataBackup", () => {
     expect(parseAppDataBackup(serialized)).toEqual(backup);
   });
 
+  it("reports conversations whose bodies could not be read instead of dropping them silently", async () => {
+    const unreadableMeta = {
+      id: "unreadable-conversation",
+      title: "Unreadable",
+      createdAt: conversation.createdAt,
+      updatedAt: conversation.updatedAt,
+      messageCount: 3,
+      providers: [],
+      providerModels: {},
+      lastModel: null,
+      lastProvider: null,
+      pinned: false,
+    };
+    const { backup, skippedConversationCount } = await createAppDataBackup({
+      activeConversationId: conversation.id,
+      appVersion: "3.0.0",
+      conversationMetas: [
+        {
+          id: conversation.id,
+          title: conversation.title,
+          createdAt: conversation.createdAt,
+          updatedAt: conversation.updatedAt,
+          messageCount: 1,
+          providers: [],
+          providerModels: {},
+          lastModel: null,
+          lastProvider: null,
+          pinned: false,
+        },
+        unreadableMeta,
+      ],
+      getConversationById: async (id) =>
+        id === conversation.id ? conversation : null,
+      settings: DEFAULT_SETTINGS,
+    });
+
+    expect(skippedConversationCount).toBe(1);
+    expect(backup.data.conversations).toHaveLength(1);
+    expect(backup.data.conversations[0]?.conversation.id).toBe(conversation.id);
+  });
+
   it("rebases stale iOS image paths before embedding backup bytes", async () => {
     const conversationWithImage: Conversation = {
       ...conversation,
@@ -235,7 +281,7 @@ describe("appDataBackup", () => {
         }
         return "aW1hZ2UtYnl0ZXM=";
       });
-    const backup = await createAppDataBackup({
+    const { backup } = await createAppDataBackup({
       activeConversationId: conversation.id,
       appVersion: "2.7.0",
       conversationMetas: [

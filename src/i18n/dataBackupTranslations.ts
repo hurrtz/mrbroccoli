@@ -41,6 +41,7 @@ type DataBackupTranslation = {
   backupTooLarge: string;
   backupDecryptFailed: string;
   backupExportFailed: string;
+  backupExportSkipped: (params: TranslationParams) => string;
   backupImportFailed: string;
   backupShareUnavailable: string;
   continue: string;
@@ -103,6 +104,8 @@ export const dataBackupTranslations = {
     backupDecryptFailed:
       "The backup could not be unlocked. Check the passphrase.",
     backupExportFailed: "The backup could not be exported.",
+    backupExportSkipped: ({ count }) =>
+          `Warning: ${count} conversations could not be read and are missing from this backup.`,
     backupImportFailed: "The backup could not be imported.",
     backupShareUnavailable: "File sharing is not available on this device.",
     continue: "Continue",
@@ -164,6 +167,8 @@ export const dataBackupTranslations = {
     backupDecryptFailed:
       "Die Sicherung konnte nicht entsperrt werden. Prüfe die Passphrase.",
     backupExportFailed: "Die Sicherung konnte nicht exportiert werden.",
+    backupExportSkipped: ({ count }) =>
+          `Warnung: ${count} Gespräche konnten nicht gelesen werden und fehlen in dieser Sicherung.`,
     backupImportFailed: "Die Sicherung konnte nicht importiert werden.",
     backupShareUnavailable:
       "Dateifreigabe ist auf diesem Gerät nicht verfügbar.",
@@ -225,6 +230,8 @@ export const dataBackupTranslations = {
     backupDecryptFailed:
       "Не вдалося розблокувати копію. Перевірте парольну фразу.",
     backupExportFailed: "Не вдалося експортувати резервну копію.",
+    backupExportSkipped: ({ count }) =>
+          `Попередження: ${count} розмов не вдалося прочитати, тому їх немає в цій резервній копії.`,
     backupImportFailed: "Не вдалося імпортувати резервну копію.",
     backupShareUnavailable: "Обмін файлами недоступний на цьому пристрої.",
     continue: "Продовжити",
@@ -283,6 +290,8 @@ export const dataBackupTranslations = {
     backupTooLarge: "यह बैकअप आयात करने के लिए बहुत बड़ा है।",
     backupDecryptFailed: "बैकअप नहीं खुल सका। पासफ़्रेज़ जाँचें।",
     backupExportFailed: "बैकअप निर्यात नहीं हो सका।",
+    backupExportSkipped: ({ count }) =>
+          `चेतावनी: ${count} वार्तालाप पढ़े नहीं जा सके और इस बैकअप में शामिल नहीं हैं।`,
     backupImportFailed: "बैकअप आयात नहीं हो सका।",
     backupShareUnavailable: "इस डिवाइस पर फ़ाइल साझा करना उपलब्ध नहीं है।",
     continue: "जारी रखें",
@@ -344,6 +353,8 @@ export const dataBackupTranslations = {
     backupDecryptFailed:
       "No se pudo desbloquear la copia. Comprueba la frase de contraseña.",
     backupExportFailed: "No se pudo exportar la copia.",
+    backupExportSkipped: ({ count }) =>
+          `Aviso: no se pudieron leer ${count} conversaciones y faltan en esta copia.`,
     backupImportFailed: "No se pudo importar la copia.",
     backupShareUnavailable:
       "El uso compartido de archivos no está disponible en este dispositivo.",
@@ -406,6 +417,8 @@ export const dataBackupTranslations = {
     backupDecryptFailed:
       "Impossible de déverrouiller la sauvegarde. Vérifiez la phrase secrète.",
     backupExportFailed: "Impossible d’exporter la sauvegarde.",
+    backupExportSkipped: ({ count }) =>
+          `Attention : ${count} conversations n’ont pas pu être lues et manquent dans cette sauvegarde.`,
     backupImportFailed: "Impossible d’importer la sauvegarde.",
     backupShareUnavailable:
       "Le partage de fichiers n’est pas disponible sur cet appareil.",
@@ -468,6 +481,8 @@ export const dataBackupTranslations = {
     backupDecryptFailed:
       "Impossibile sbloccare il backup. Controlla la passphrase.",
     backupExportFailed: "Impossibile esportare il backup.",
+    backupExportSkipped: ({ count }) =>
+          `Attenzione: ${count} conversazioni non sono state lette e mancano in questo backup.`,
     backupImportFailed: "Impossibile importare il backup.",
     backupShareUnavailable:
       "La condivisione dei file non è disponibile su questo dispositivo.",
@@ -529,6 +544,8 @@ export const dataBackupTranslations = {
     backupDecryptFailed:
       "Não foi possível desbloquear a cópia. Verifique a frase-passe.",
     backupExportFailed: "Não foi possível exportar a cópia.",
+    backupExportSkipped: ({ count }) =>
+          `Aviso: ${count} conversas não puderam ser lidas e faltam nesta cópia.`,
     backupImportFailed: "Não foi possível importar a cópia.",
     backupShareUnavailable:
       "A partilha de ficheiros não está disponível neste dispositivo.",
@@ -591,6 +608,8 @@ export const dataBackupTranslations = {
     backupDecryptFailed:
       "Não foi possível desbloquear o backup. Verifique a frase secreta.",
     backupExportFailed: "Não foi possível exportar o backup.",
+    backupExportSkipped: ({ count }) =>
+          `Aviso: ${count} conversas não puderam ser lidas e estão faltando neste backup.`,
     backupImportFailed: "Não foi possível importar o backup.",
     backupShareUnavailable:
       "O compartilhamento de arquivos não está disponível neste aparelho.",
@@ -652,6 +671,8 @@ export const dataBackupTranslations = {
     backupDecryptFailed:
       "Не удалось разблокировать копию. Проверьте парольную фразу.",
     backupExportFailed: "Не удалось экспортировать резервную копию.",
+    backupExportSkipped: ({ count }) =>
+          `Предупреждение: ${count} разговоров не удалось прочитать, они отсутствуют в этой резервной копии.`,
     backupImportFailed: "Не удалось импортировать резервную копию.",
     backupShareUnavailable: "Обмен файлами недоступен на этом устройстве.",
     continue: "Продолжить",
@@ -706,6 +727,8 @@ export const dataBackupTranslations = {
     backupTooLarge: "此备份过大，无法导入。",
     backupDecryptFailed: "无法解锁备份。请检查密码短语。",
     backupExportFailed: "无法导出备份。",
+    backupExportSkipped: ({ count }) =>
+          `警告：${count} 个对话无法读取，未包含在此备份中。`,
     backupImportFailed: "无法导入备份。",
     backupShareUnavailable: "此设备不支持文件共享。",
     continue: "继续",
@@ -762,6 +785,8 @@ export const dataBackupTranslations = {
     backupTooLarge: "هذه النسخة كبيرة جدًا ولا يمكن استيرادها.",
     backupDecryptFailed: "تعذر فتح النسخة. تحقق من عبارة المرور.",
     backupExportFailed: "تعذر تصدير النسخة الاحتياطية.",
+    backupExportSkipped: ({ count }) =>
+          `تحذير: تعذرت قراءة ${count} محادثة وهي غير موجودة في هذه النسخة الاحتياطية.`,
     backupImportFailed: "تعذر استيراد النسخة الاحتياطية.",
     backupShareUnavailable: "مشاركة الملفات غير متاحة على هذا الجهاز.",
     continue: "متابعة",
@@ -819,6 +844,8 @@ export const dataBackupTranslations = {
     backupDecryptFailed:
       "バックアップを解除できませんでした。パスフレーズを確認してください。",
     backupExportFailed: "バックアップを書き出せませんでした。",
+    backupExportSkipped: ({ count }) =>
+          `警告: ${count} 件の会話を読み取れなかったため、このバックアップに含まれていません。`,
     backupImportFailed: "バックアップを読み込めませんでした。",
     backupShareUnavailable: "この端末ではファイル共有を利用できません。",
     continue: "続ける",
@@ -878,6 +905,8 @@ export const dataBackupTranslations = {
     backupTooLarge: "Ez a mentés túl nagy az importáláshoz.",
     backupDecryptFailed: "A mentés nem oldható fel. Ellenőrizze a jelmondatot.",
     backupExportFailed: "A mentés nem exportálható.",
+    backupExportSkipped: ({ count }) =>
+          `Figyelem: ${count} beszélgetést nem sikerült beolvasni, ezek hiányoznak a mentésből.`,
     backupImportFailed: "A mentés nem importálható.",
     backupShareUnavailable: "A fájlmegosztás nem érhető el ezen az eszközön.",
     continue: "Folytatás",
@@ -938,6 +967,8 @@ export const dataBackupTranslations = {
     backupTooLarge: "Tato záloha je pro import příliš velká.",
     backupDecryptFailed: "Zálohu nelze odemknout. Zkontrolujte heslovou frázi.",
     backupExportFailed: "Zálohu se nepodařilo exportovat.",
+    backupExportSkipped: ({ count }) =>
+          `Upozornění: ${count} konverzací se nepodařilo přečíst a v této záloze chybí.`,
     backupImportFailed: "Zálohu se nepodařilo importovat.",
     backupShareUnavailable: "Sdílení souborů není na tomto zařízení dostupné.",
     continue: "Pokračovat",
@@ -997,6 +1028,8 @@ export const dataBackupTranslations = {
     backupTooLarge: "Ta kopia jest zbyt duża do zaimportowania.",
     backupDecryptFailed: "Nie udało się odblokować kopii. Sprawdź hasło.",
     backupExportFailed: "Nie udało się wyeksportować kopii.",
+    backupExportSkipped: ({ count }) =>
+          `Uwaga: nie udało się odczytać ${count} rozmów i brakuje ich w tej kopii.`,
     backupImportFailed: "Nie udało się zaimportować kopii.",
     backupShareUnavailable:
       "Udostępnianie plików nie jest dostępne na tym urządzeniu.",
@@ -1059,6 +1092,8 @@ export const dataBackupTranslations = {
     backupDecryptFailed:
       "Säkerhetskopian kunde inte låsas upp. Kontrollera lösenfrasen.",
     backupExportFailed: "Säkerhetskopian kunde inte exporteras.",
+    backupExportSkipped: ({ count }) =>
+          `Varning: ${count} konversationer kunde inte läsas och saknas i denna säkerhetskopia.`,
     backupImportFailed: "Säkerhetskopian kunde inte importeras.",
     backupShareUnavailable:
       "Fildelning är inte tillgänglig på den här enheten.",
@@ -1119,6 +1154,8 @@ export const dataBackupTranslations = {
     backupDecryptFailed:
       "Yedeğin kilidi açılamadı. Parola ifadesini kontrol edin.",
     backupExportFailed: "Yedek dışa aktarılamadı.",
+    backupExportSkipped: ({ count }) =>
+          `Uyarı: ${count} konuşma okunamadı ve bu yedekte eksik.`,
     backupImportFailed: "Yedek içe aktarılamadı.",
     backupShareUnavailable: "Bu cihazda dosya paylaşımı kullanılamıyor.",
     continue: "Devam et",
@@ -1176,6 +1213,8 @@ export const dataBackupTranslations = {
     backupTooLarge: "یہ بیک اپ درآمد کرنے کے لیے بہت بڑا ہے۔",
     backupDecryptFailed: "بیک اپ نہیں کھل سکا۔ پاس فریز چیک کریں۔",
     backupExportFailed: "بیک اپ برآمد نہیں ہو سکا۔",
+    backupExportSkipped: ({ count }) =>
+          `انتباہ: ${count} گفتگوئیں پڑھی نہیں جا سکیں اور اس بیک اپ میں شامل نہیں ہیں۔`,
     backupImportFailed: "بیک اپ درآمد نہیں ہو سکا۔",
     backupShareUnavailable: "اس آلے پر فائل شیئرنگ دستیاب نہیں ہے۔",
     continue: "جاری رکھیں",

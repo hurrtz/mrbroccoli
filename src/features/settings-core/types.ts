@@ -7,6 +7,7 @@ import type { ProviderVoiceDirectories } from "../../services/providerVoiceDirec
 import type { KokoroModelController } from "../../hooks/useKokoroModel";
 import type {
   AppDataBackup,
+  AppDataBackupCreation,
   AppDataBackupRestoreResult,
 } from "../../services/appDataBackup";
 import type { ConversationArchiveController } from "../../hooks/useConversationArchive";
@@ -68,7 +69,7 @@ export interface SettingsModalProps {
   onOpenPremium: () => void;
   conversationArchive: ConversationArchiveController;
   storePromoLocalDevicePreview?: boolean;
-  onCreateAppDataBackup: () => Promise<AppDataBackup>;
+  onCreateAppDataBackup: () => Promise<AppDataBackupCreation>;
   onRestoreAppDataBackup: (
     backup: AppDataBackup,
   ) => Promise<AppDataBackupRestoreResult>;

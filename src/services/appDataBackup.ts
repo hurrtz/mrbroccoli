@@ -90,6 +90,14 @@ export interface AppDataBackupRestoreResult {
   settingsRestored: boolean;
 }
 
+export interface AppDataBackupCreation {
+  backup: AppDataBackup;
+  // Conversations whose stored body could not be read. A backup must never
+  // silently claim completeness while dropping exactly the records that are
+  // already at risk.
+  skippedConversationCount: number;
+}
+
 export class AppDataBackupError extends Error {
   constructor(
     public readonly code:
@@ -462,7 +470,7 @@ export async function createAppDataBackup(params: {
   conversationMetas: ConversationMeta[];
   getConversationById: (id: string) => Promise<Conversation | null>;
   settings: Settings;
-}): Promise<AppDataBackup> {
+}): Promise<AppDataBackupCreation> {
   const conversations = await Promise.all(
     params.conversationMetas.map((meta) => params.getConversationById(meta.id)),
   );
@@ -527,18 +535,23 @@ export async function createAppDataBackup(params: {
     }),
   );
 
+  const exportedRecords = records.filter(
+    (record): record is AppDataBackupConversation => record !== null,
+  );
+
   return {
-    appVersion: params.appVersion,
-    data: {
-      activeConversationId: params.activeConversationId,
-      conversations: records.filter(
-        (record): record is AppDataBackupConversation => record !== null,
-      ),
-      settings: toPortableSettings(params.settings),
+    backup: {
+      appVersion: params.appVersion,
+      data: {
+        activeConversationId: params.activeConversationId,
+        conversations: exportedRecords,
+        settings: toPortableSettings(params.settings),
+      },
+      exportedAt: new Date().toISOString(),
+      format: APP_DATA_BACKUP_FORMAT,
+      version: APP_DATA_BACKUP_VERSION,
     },
-    exportedAt: new Date().toISOString(),
-    format: APP_DATA_BACKUP_FORMAT,
-    version: APP_DATA_BACKUP_VERSION,
+    skippedConversationCount: records.length - exportedRecords.length,
   };
 }
 
