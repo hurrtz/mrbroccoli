@@ -37,16 +37,24 @@ export async function readEventStream(
     }
   };
 
-  while (true) {
-    const { done, value } = await reader.read();
+  try {
+    while (true) {
+      const { done, value } = await reader.read();
 
-    if (done) {
-      buffer += decoder.decode();
+      if (done) {
+        buffer += decoder.decode();
+        await flushEventBlocks();
+        return;
+      }
+
+      buffer += decoder.decode(value, { stream: true });
       await flushEventBlocks();
-      return;
     }
-
-    buffer += decoder.decode(value, { stream: true });
-    await flushEventBlocks();
+  } finally {
+    // If onEvent threw (malformed frame, in-stream error payload, or a
+    // downstream chunk consumer), the reader would otherwise be abandoned
+    // with the connection open while the provider keeps generating. Cancel
+    // is a no-op after normal completion.
+    void reader.cancel().catch(() => undefined);
   }
 }

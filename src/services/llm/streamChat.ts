@@ -77,6 +77,7 @@ export async function streamChat({
   let timeoutId: ReturnType<typeof setTimeout> | null = null;
   let timedOut = false;
   let releaseAbortSignal: (() => void) | null = null;
+  let abortRequestTransport: (() => void) | null = null;
 
   try {
     const hasImages = messages.some(
@@ -128,6 +129,7 @@ export async function streamChat({
 
     const timeoutError = buildProviderReplyTimeoutError(provider, language);
     const requestAbortController = new AbortController();
+    abortRequestTransport = () => requestAbortController.abort();
     const provenanceStreamFilter =
       createResponseProvenanceStreamFilter(onChunk);
 
@@ -356,6 +358,10 @@ export async function streamChat({
       clearTimeout(timeoutId);
     }
 
+    // Cancel the transport on every exit path. After a completed request this
+    // is a no-op; after a stream error it stops the provider from generating
+    // (and billing) a completion nobody will receive.
+    abortRequestTransport?.();
     releaseAbortSignal?.();
   }
 }
