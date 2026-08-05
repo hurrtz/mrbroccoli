@@ -2,6 +2,97 @@
 
 These notes are specific to this repository and supplement any parent-level instructions.
 
+## Read Order
+
+Use `AGENTS.md` for workflow and collaboration rules. Use the living specs as
+the source of truth for product intent, architecture, domain rules, and the
+reasons behind the code.
+
+Use `DOCS_INDEX.md` to find the relevant chain. The index is navigation, not a
+source of truth; when it disagrees with a `SPEC.md` or `DESIGN.md`, follow the
+spec or design.
+
+Before changing code, read every `SPEC.md` and `DESIGN.md` from the repository
+root down to the nearest documented boundary. For example, work under
+`src/services/voicePipeline/` requires:
+
+1. `SPEC.md`
+2. `DESIGN.md`
+3. `src/SPEC.md`
+4. `src/services/SPEC.md`
+5. `src/services/voicePipeline/SPEC.md`
+6. `src/services/voicePipeline/DESIGN.md`
+
+Also read the applicable `AGENTS.md` files at each level when present.
+
+## Completion Checklist
+
+Before presenting implementation work as complete or creating a PR:
+
+1. Update every affected `SPEC.md` and `DESIGN.md` in the spec chain. Changes
+   to behavior, architecture, patterns, directory structure, integration
+   points, privacy boundaries, or failure handling must be reflected there.
+2. Update `AGENTS.md`, `README.md`, or operational docs when workflow, tooling,
+   setup, or collaboration guidance changes.
+3. Run validation proportionate to the change. `make pre-push` remains the
+   complete spend-free gate.
+
+## Living Specifications
+
+Permanent living documentation is co-located with stable code boundaries as
+`SPEC.md` and, only where runtime complexity warrants it, `DESIGN.md`.
+
+- `SPEC.md` explains what the boundary owns, why it exists, and what must stay
+  true.
+- `DESIGN.md` explains how a complex boundary works at runtime, including
+  orchestration, dependencies, state flow, and fallback behavior.
+- Higher-level files set broader constraints. Child files refine their parent
+  and must not restate or contradict it.
+- Keep specs sparse and high-signal. They describe stable intent and current
+  architecture, not implementation history or a chronological changelog.
+- Cross-cutting product terms, privacy rules, platform constraints, and
+  architectural decisions belong in the root `SPEC.md` or `DESIGN.md`.
+- Link critical claims to tests, schemas, or source contracts where practical.
+- All diagrams in `DESIGN.md` use Mermaid syntax.
+
+Use these markers when confidence or authority matters:
+
+| Marker | Meaning |
+| --- | --- |
+| _(none)_ | Verified fact or established pattern |
+| **Decision:** | Deliberate choice; include why and rejected alternatives |
+| **Assumption:** | Believed true but not yet validated; include failure conditions |
+| **Open question:** | Unresolved; include the owner or resolution gate |
+| **Dependency:** | External system, team, store, credential, or decision |
+
+When code contradicts a living spec, investigate before changing either. It may
+be a code defect or stale documentation. Agents may update specs to match
+observed reality, but changes to product intent or architectural constraints
+require explicit human direction.
+
+Detailed feature or bug work may use `docs/specs/<change-name>/` with
+`requirements.md`, `design.md`, and `tasks.md`. Before completing the work,
+promote durable knowledge into the nearest permanent spec. Keep a completed
+work spec only when it remains a useful worked example; otherwise remove it.
+
+## Living Spec Review On Push
+
+The repository pre-push hook runs `scripts/pre-push-spec-review.sh` before
+`make pre-push`. When pushed commits contain code, native, build, or script
+changes, it requires an explicit review of four outcomes: **modify**,
+**create**, **restructure**, and **drop**.
+
+The review is scoped to the commits in that push. Acknowledge it with either:
+
+- `SPEC_REVIEW_ACK="<justification of at least 10 characters>" git push` for a
+  one-shot local acknowledgement; or
+- a `Spec-Review: <justification>` trailer in a commit included in the push for
+  a durable audit trail.
+
+The gate skips documentation-only pushes. It forces a review decision but
+cannot determine whether the specs are correct; the Completion Checklist still
+applies.
+
 ## Project Shape
 
 - Mr Broccoli is a voice-first mobile chat app built with Expo, React Native, and Expo Router.

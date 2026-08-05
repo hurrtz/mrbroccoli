@@ -1,0 +1,57 @@
+---
+status: active
+code_paths:
+  - app/**
+dependencies:
+  - Expo Router
+  - src/context/
+  - src/screens/
+validations:
+  - npm run typecheck:app
+  - npm run config:verify
+provenance:
+  intent: history-backfilled
+  validation: source-backed
+last_validated_sha: 7db5c94
+---
+
+# App Entry Specification
+
+## Ownership
+
+`app/` owns route registration and root provider composition. It does not own
+conversation behavior, persistence, provider routing, or presentation policy.
+
+## Routes
+
+- `_layout.tsx` initializes diagnostics, gesture handling, shared settings,
+  localization, Premium entitlement, theme, typography, and the router stack.
+- `index.tsx` is the production entry and renders `MainScreen`.
+- `store-promos.tsx` is the isolated deterministic screenshot entry used only
+  by the `.maestro` application identity.
+
+**Decision:** Expo Router is the only JavaScript entry mechanism. Historical
+template `App.tsx` and bare `index.ts` stubs remain absent so there is one
+unambiguous composition path.
+
+## Provider Order
+
+Settings must load before localization and theme can consume them. Localization
+must wrap Premium and the screen tree so store and entitlement copy uses the
+selected language. Premium wraps the workspace so Free/Premium policy is
+available before feature controllers are created.
+
+## Store-Promo Isolation
+
+The promo route may select a locale and deterministic scene, but fixture state
+must remain inaccessible to the production package and `.dev` package. Runtime
+identity verification in the fixture/presentation services is the authority;
+the existence of a route alone must never enable fixtures.
+
+Evidence:
+
+- [`app/_layout.tsx`](./_layout.tsx)
+- [`app/index.tsx`](./index.tsx)
+- [`app/store-promos.tsx`](./store-promos.tsx)
+- [`../__tests__/services/storePromoFixtures.test.ts`](../__tests__/services/storePromoFixtures.test.ts)
+- [`../scripts/verify-native-config-sync.mjs`](../scripts/verify-native-config-sync.mjs)

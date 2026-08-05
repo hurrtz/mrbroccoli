@@ -1,0 +1,164 @@
+---
+status: active
+code_paths:
+  - src/services/**
+dependencies:
+  - src/constants/
+  - src/hooks/
+  - android/
+  - ios/
+validations:
+  - npm run typecheck:app
+  - npm test -- --runInBand --watchman=false __tests__/services
+provenance:
+  intent: history-backfilled
+  validation: source-and-test-backed
+last_validated_sha: 7db5c94
+---
+
+# Service Layer Specification
+
+## Ownership
+
+`src/services/` owns runtime work that is independent of a particular React
+render: provider requests, local inference, voice-turn orchestration, speech,
+web search, persistence formats, backups, diagnostics, native bridges, runtime
+resilience, and on-device capability management.
+
+Services may emit typed results, events, or errors. They must not own screen
+navigation or render UI.
+
+## Service Families
+
+### Intelligence and provider integration
+
+- `llm.ts` and `llm/` route hosted text generation and internal model tasks.
+- `localLlm.ts` runs downloaded local response models.
+- `webSearch.ts` and `webSearch/` decide provider requests and normalize cited
+  search context.
+- `providerResilience.ts`, `providerModelCandidates.ts`, and
+  `providerErrors.ts` classify failures and execute bounded retry/fallback.
+- `runtimeCapabilityOverrides.ts` persists only provider-confirmed exact
+  incompatibilities.
+- `ulraMode.ts` implements private Uber Mode deliberation before final
+  synthesis.
+
+### Speech and voice turns
+
+- `voicePipeline.ts` and `voicePipeline/` coordinate the complete turn.
+- `whisper.ts` and `whisper/` route provider STT; native and downloaded STT
+  adapters are separate.
+- `tts.ts` and `tts/` route provider TTS and speech chunking; Kokoro, local
+  Piper, and native speech use their own adapters.
+- `providerVoiceDirectory.ts` plus provider-specific directory services load
+  account-visible voices without making directory permission a prerequisite
+  for TTS.
+- audio queue, waveform, Live Activity/notification, background-turn, and
+  remote-control services isolate native modules from React components.
+
+### Local capability catalogue
+
+`localDeviceCapabilities.ts`, `localModelManager.ts`,
+`localModelPerformance.ts`, `offlineProfile.ts`, and
+`offlineProfileManager.ts` jointly own local model eligibility and Free setup.
+
+**Decision:** Selection is evidence-first:
+
+1. hard-filter definite platform, architecture, OS, language, memory, storage,
+   and runtime incompatibilities;
+2. download the exact pinned artifact and verify its SHA-256;
+3. load and benchmark that artifact on the current device; and
+4. assemble a coherent complete profile.
+
+Temporary thermal or memory pressure pauses preparation. It does not write a
+permanent incompatibility. A below-target benchmark is distinct from a failed
+model and may remain available as an advanced override.
+
+Installed models and benchmark state are device-local, excluded from backup,
+and invalidated by catalogue, artifact, runtime, OS, app, or relevant device
+changes.
+
+### Conversation context and knowledge
+
+- `conversationContext.ts` owns rolling-summary thresholds and the bounded
+  recent-message window.
+- `conversationKnowledge/` owns optional derived cross-session retrieval.
+- `turnReceipt.ts` records route, context, search, speech, and timing decisions.
+- `messageProvenance.ts` makes actual response origin part of retained context.
+
+The active conversation is canonical. Summary and knowledge layers are bounded
+context aids and must never silently replace or mutate the source transcript.
+
+### Images
+
+Image attachments are copied into app-owned document storage, resized to a
+bounded edge, limited by count and byte size, and persisted by stable ID.
+Provider request preparation resolves the current container path and loads
+bytes only after route capability and consent checks.
+
+Each attachment records `sharedWithProviders`. A new provider recipient requires
+fresh disclosure; prior consent to one provider is not consent to another.
+
+### Backup and archives
+
+`appDataBackup.ts` is the full-fidelity portability format. Version 2 embeds
+image bytes and replaces device paths with
+`mrbroccoli-backup://image/<attachment-id>` references. It supports readable
+JSON and passphrase-encrypted AES-256-GCM with bounded input size and a minimum
+passphrase length.
+
+Portable settings exclude `apiKeys` and provider-validation diagnostics.
+Backups exclude downloaded models, audio, derived knowledge/index data,
+integrity snapshots, debug logs, and caches. Restore validates the complete
+shape before mutation and delegates non-destructive conversation merging to the
+conversation hook.
+
+`conversationArchive.ts` is a separate readable AI handoff. It writes an index,
+per-conversation Markdown, and a latest pointer in an app-owned archive
+directory. It is not a lossless restore format and does not include hidden
+context, keys, or internal prompts.
+
+**Decision:** Recovery and AI handoff have separate formats because a
+human-readable archive should not be mistaken for a complete restorable backup.
+
+### Diagnostics
+
+Debug capture is bounded by time, entries, bytes, and retained file count.
+Payloads are sanitized before in-memory retention and again before persistence
+or clipboard export. Sensitive key names, credential-like strings, user text,
+and non-app stack frames are removed or fingerprinted.
+
+**Decision:** A useful diagnostic describes control flow and state transition,
+not payload content. Adding a new debug field requires an adversarial redaction
+test when it could contain user or provider data.
+
+### Premium and test fixtures
+
+`premiumEntitlement.ts` caches only an exact verified non-consumable ownership
+record. `developmentEntitlement.ts` permits simulation only under `.dev` and
+`.maestro` runtime identities. Store-promo fixtures are deterministic,
+localized, network-free, and independently restricted to `.maestro`.
+
+## Failure Rules
+
+- Aborted work must stop downstream stages and avoid late state mutation.
+- Timeouts are bounded and classified at the service that owns the external or
+  native operation.
+- A fallback must be explicit in policy and visible in diagnostics/receipts.
+- Persistence and backup failures must not delete the source data.
+- Temporary provider failure must not become a durable capability override.
+- Network-bound features must never be presented as fully local.
+
+## Deep Specs
+
+- [`voicePipeline/SPEC.md`](./voicePipeline/SPEC.md)
+- [`voicePipeline/DESIGN.md`](./voicePipeline/DESIGN.md)
+- [`llm/SPEC.md`](./llm/SPEC.md)
+- [`conversationKnowledge/SPEC.md`](./conversationKnowledge/SPEC.md)
+
+Speech details remain in focused operational references and tests until their
+directories warrant separate living designs:
+
+- [`../../docs/provider-runtime-reference.md`](../../docs/provider-runtime-reference.md)
+- [`../../docs/local-ai-options.md`](../../docs/local-ai-options.md)
+- [`../../docs/debug-logging.md`](../../docs/debug-logging.md)

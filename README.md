@@ -7,6 +7,11 @@ The app is intentionally user-key driven. No provider API keys are shipped in th
 See the [changelog](CHANGELOG.md) for user-facing release history and localized
 store notes.
 
+For product intent and architecture rationale, start with the living
+[`SPEC.md`](SPEC.md), [`DESIGN.md`](DESIGN.md), and
+[`DOCS_INDEX.md`](DOCS_INDEX.md). Follow the index to the closest subsystem
+before changing code, and update the affected spec chain with the implementation.
+
 ## Highlights
 
 - Voice-first interaction with live recording and playback states
@@ -144,8 +149,10 @@ make release-aab
 make ios-native-test
 ```
 
-`pre-push` is the fast, spend-free gate installed as the repository's Git
-pre-push hook. `prerelease-preflight` checks the complete ignored
+The repository's Git pre-push hook first requires a living-spec review for
+code-bearing commits, then runs `pre-push`, the fast, spend-free validation
+gate. The review can be recorded with a substantive `SPEC_REVIEW_ACK` or a
+`Spec-Review:` commit trailer. `prerelease-preflight` checks the complete ignored
 `.env.local` secret/signing contract before any provider request.
 `pre-release-static` then adds Expo dependency checks plus Android and iOS
 native validation, including Android instrumentation and iOS lifecycle tests

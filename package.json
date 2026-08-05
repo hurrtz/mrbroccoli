@@ -24,6 +24,7 @@
     "store-promos:test": "node --test scripts/verify-store-promos.test.mjs scripts/run-store-promos.test.mjs",
     "store-promos:ios": "node scripts/run-store-promos.mjs --platform ios",
     "store-promos:android": "node scripts/run-store-promos.mjs --platform android",
+    "spec-review:test": "node --test scripts/pre-push-spec-review.test.mjs",
     "fresh-checkout": "node scripts/run-fresh-checkout-validation.mjs",
     "fresh-checkout:test": "node --test scripts/run-fresh-checkout-validation.test.mjs",
     "license:notices:generate": "node scripts/verify-licenses.mjs --write",

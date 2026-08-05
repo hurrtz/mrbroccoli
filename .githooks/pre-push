@@ -2,4 +2,6 @@
 set -eu
 
 repository_root=$(git rev-parse --show-toplevel)
+cd "$repository_root"
+"$repository_root/scripts/pre-push-spec-review.sh"
 exec make -C "$repository_root" pre-push
