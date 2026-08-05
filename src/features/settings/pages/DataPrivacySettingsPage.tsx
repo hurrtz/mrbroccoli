@@ -244,6 +244,7 @@ export function DataPrivacySettingsPage({
     getErrorMessage,
     onCreateAppDataBackup,
     shareBackup,
+    t,
   ]);
 
   const exportEncryptedBackup = React.useCallback(async () => {

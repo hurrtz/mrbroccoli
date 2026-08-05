@@ -318,8 +318,12 @@ export function Modal({
         ]}
       >
         {maskClosable ? (
+          // Backdrop-only dismiss layers stay out of the accessibility tree
+          // (design-system SPEC); screen-reader users dismiss through the
+          // dialog's labeled actions instead of an anonymous button.
           <Pressable
-            accessibilityRole="button"
+            accessible={false}
+            importantForAccessibility="no"
             onPress={onClose}
             style={StyleSheet.absoluteFill}
           />
