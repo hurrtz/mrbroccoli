@@ -617,6 +617,8 @@ export const hi = {
   hide: "छिपाना",
   copyThread: "थ्रेड कॉपी करें",
   shareThread: "धागा साझा करें",
+  reportResponse: "इस उत्तर की रिपोर्ट करें",
+  reportResponseIntro: "Mr Broccoli से AI उत्तर रिपोर्ट। नीचे दी गई सामग्री देखें, समस्या बताएँ और यह रिपोर्ट डेवलपर को भेजें।",
   repeatReply: "उत्तर दोहराएँ",
   renameThread: "थ्रेड का नाम बदलें",
   renameThreadHint:

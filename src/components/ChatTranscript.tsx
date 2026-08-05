@@ -37,6 +37,7 @@ interface ChatTranscriptProps {
   onOpenBranches?: (branches: ConversationMeta[]) => void;
   onOpenBranchSource?: (conversationId: string, messageId: string) => void;
   onShareMessage?: (message: Message) => void;
+  onReportMessage?: (message: Message) => void;
   onRepeatMessage?: (message: Message) => void;
   onRetryMessage?: (message: Message) => void;
   onOpenSpeakingSettings?: () => void;
@@ -78,6 +79,7 @@ export function ChatTranscript({
   onOpenBranches,
   onOpenBranchSource,
   onShareMessage,
+  onReportMessage,
   onRepeatMessage,
   onRetryMessage,
   onOpenSpeakingSettings,
@@ -369,6 +371,7 @@ export function ChatTranscript({
           onOpenBranches={onOpenBranches}
           onOpenBranchSource={onOpenBranchSource}
           onShare={onShareMessage}
+          onReport={onReportMessage}
           onRepeat={onRepeatMessage}
           onRetry={onRetryMessage}
           onOpenSpeakingSettings={onOpenSpeakingSettings}

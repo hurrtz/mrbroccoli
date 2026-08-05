@@ -124,6 +124,7 @@ export function MessageActions({
   onBranch,
   onOpenBranchSource,
   onShare,
+  onReport,
   onRepeat,
   repeatState = "idle",
 }: Pick<
@@ -135,6 +136,7 @@ export function MessageActions({
   | "onBranch"
   | "onOpenBranchSource"
   | "onShare"
+  | "onReport"
   | "onRepeat"
   | "repeatState"
 >) {
@@ -164,6 +166,7 @@ export function MessageActions({
     !onBranch &&
     !(branchOrigin?.parentAvailable && onOpenBranchSource) &&
     !onShare &&
+    !onReport &&
     !onRepeat
   ) {
     return null;
@@ -298,6 +301,30 @@ export function MessageActions({
         >
           <PhosphorIcon
             name="share-alt"
+            size="control"
+            color={colors.textSecondary}
+          />
+        </TouchableOpacity>
+      ) : null}
+      {onReport && !userSecondaryActions ? (
+        // Google Play's generative-AI policy requires an in-app way to
+        // report or flag offensive model output.
+        <TouchableOpacity
+          testID={`message-report-action-${message.id}`}
+          style={[
+            styles.iconAction,
+            {
+              backgroundColor: colors.surfaceAlt,
+              borderColor: colors.border,
+            },
+          ]}
+          onPress={() => onReport(message)}
+          activeOpacity={0.88}
+          accessibilityRole="button"
+          accessibilityLabel={t("reportResponse")}
+        >
+          <PhosphorIcon
+            name="warning"
             size="control"
             color={colors.textSecondary}
           />

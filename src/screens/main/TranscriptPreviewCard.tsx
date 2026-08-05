@@ -43,6 +43,7 @@ interface TranscriptPreviewCardProps {
   onOpenStyleSheet?: () => void;
   onOpenSpeakingSettings?: () => void;
   onShareMessage?: (message: Message) => void;
+  onReportMessage?: (message: Message) => void;
   presentation?: "card" | "canvas";
   preferredHeight?: number;
   scrollEnabled?: boolean;
@@ -72,6 +73,7 @@ export function TranscriptPreviewCard({
   onOpenStyleSheet,
   onOpenSpeakingSettings,
   onShareMessage,
+  onReportMessage,
   presentation = "card",
   preferredHeight,
   scrollEnabled = false,
@@ -277,6 +279,7 @@ export function TranscriptPreviewCard({
           onRetryMessage={onRetryMessage}
           onOpenSpeakingSettings={onOpenSpeakingSettings}
           onShareMessage={onShareMessage}
+          onReportMessage={onReportMessage}
           repeatPlaybackStatus={replayPhase}
           onTailStateChange={setIsAtTranscriptTail}
           scrollToLatestRequest={scrollToLatestRequest}

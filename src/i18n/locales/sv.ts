@@ -616,6 +616,8 @@ export const sv = {
   hide: "Göm",
   copyThread: "Kopiera tråden",
   shareThread: "Dela tråd",
+  reportResponse: "Rapportera det här svaret",
+  reportResponseIntro: "AI-svarsrapport från Mr Broccoli. Granska innehållet nedan, beskriv problemet och skicka rapporten till utvecklaren.",
   repeatReply: "Upprepa svar",
   renameThread: "Byt namn på tråden",
   renameThreadHint:

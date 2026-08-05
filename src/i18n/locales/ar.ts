@@ -617,6 +617,8 @@ export const ar = {
   hide: "يخفي",
   copyThread: "نسخ الموضوع",
   shareThread: "مشاركة الموضوع",
+  reportResponse: "الإبلاغ عن هذا الرد",
+  reportResponseIntro: "بلاغ عن رد ذكاء اصطناعي من Mr Broccoli. راجع المحتوى أدناه وصف المشكلة ثم أرسل هذا البلاغ إلى المطور.",
   repeatReply: "كرر الرد",
   renameThread: "إعادة تسمية الموضوع",
   renameThreadHint:

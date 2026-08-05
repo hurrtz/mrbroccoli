@@ -632,6 +632,8 @@ export const de = {
   hide: "Ausblenden",
   copyThread: "Gespräch kopieren",
   shareThread: "Gespräch teilen",
+  reportResponse: "Diese Antwort melden",
+  reportResponseIntro: "KI-Antwortmeldung aus Mr Broccoli. Prüfe den Inhalt unten, beschreibe das Problem und sende diese Meldung an den Entwickler.",
   repeatReply: "Antwort wiederholen",
   renameThread: "Gespräch umbenennen",
   renameThreadHint:

@@ -617,6 +617,8 @@ export const fr = {
   hide: "Cacher",
   copyThread: "Copier le fil de discussion",
   shareThread: "Partager le fil de discussion",
+  reportResponse: "Signaler cette réponse",
+  reportResponseIntro: "Signalement de réponse IA depuis Mr Broccoli. Vérifiez le contenu ci-dessous, décrivez le problème et envoyez ce signalement au développeur.",
   repeatReply: "Répéter la réponse",
   renameThread: "Renommer le fil de discussion",
   renameThreadHint:

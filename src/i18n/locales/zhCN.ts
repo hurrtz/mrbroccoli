@@ -615,6 +615,8 @@ export const zhCN = {
   hide: "隐藏",
   copyThread: "复制主题",
   shareThread: "分享主题",
+  reportResponse: "举报此回答",
+  reportResponseIntro: "来自 Mr Broccoli 的 AI 回答举报。请查看以下内容，描述问题，并将此举报发送给开发者。",
   repeatReply: "重复回复",
   renameThread: "重命名线程",
   renameThreadHint:

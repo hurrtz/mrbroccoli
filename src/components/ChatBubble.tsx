@@ -54,6 +54,7 @@ export const ChatBubble = React.memo(function ChatBubble({
   onOpenBranches,
   onOpenBranchSource,
   onShare,
+  onReport,
   onRepeat,
   onRetry,
   onOpenSpeakingSettings,
@@ -78,6 +79,7 @@ export const ChatBubble = React.memo(function ChatBubble({
         onOpenBranches={onOpenBranches}
         onOpenBranchSource={onOpenBranchSource}
         onShare={onShare}
+        onReport={onReport}
         onRepeat={onRepeat}
         onRetry={onRetry}
         onOpenSpeakingSettings={onOpenSpeakingSettings}

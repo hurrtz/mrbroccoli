@@ -619,6 +619,8 @@ export const tr = {
   hide: "Gizle",
   copyThread: "Konuyu Kopyala",
   shareThread: "Konuyu Paylaş",
+  reportResponse: "Bu yanıtı bildir",
+  reportResponseIntro: "Mr Broccoli'den yapay zekâ yanıt bildirimi. Aşağıdaki içeriği inceleyin, sorunu açıklayın ve bu bildirimi geliştiriciye gönderin.",
   repeatReply: "Yanıtı Tekrarla",
   renameThread: "Konuyu Yeniden Adlandır",
   renameThreadHint:

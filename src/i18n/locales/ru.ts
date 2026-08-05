@@ -618,6 +618,8 @@ export const ru = {
   hide: "Скрывать",
   copyThread: "Копировать тему",
   shareThread: "Поделиться темой",
+  reportResponse: "Пожаловаться на этот ответ",
+  reportResponseIntro: "Жалоба на ответ ИИ из Mr Broccoli. Просмотрите содержимое ниже, опишите проблему и отправьте эту жалобу разработчику.",
   repeatReply: "Повторить ответ",
   renameThread: "Переименовать тему",
   renameThreadHint:

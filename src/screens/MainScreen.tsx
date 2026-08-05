@@ -564,6 +564,7 @@ export function MainScreen() {
     handleCopyThread,
     handleShareThread,
     handleShareMessage,
+    handleReportMessage,
     handleRenameThread,
     handleTogglePinned,
     handleTogglePrivate,
@@ -932,6 +933,9 @@ export function MainScreen() {
           onRetryMessage: handleRetryMessage,
           onShareMessage: (message) => {
             void handleShareMessage(formatMessageForCopy(message, language));
+          },
+          onReportMessage: (message) => {
+            void handleReportMessage(message);
           },
           replayPhase,
           scrollEnabled: true,

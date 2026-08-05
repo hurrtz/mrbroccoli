@@ -574,6 +574,33 @@ describe("ChatBubble", () => {
     expect(user.queryByLabelText("Repeat Reply")).toBeNull();
   });
 
+  it("offers an AI-response report action on assistant messages only", () => {
+    const onReport = jest.fn();
+    const assistantMessage = {
+      id: "assistant-report",
+      role: "assistant" as const,
+      content: "A reply the user may want to flag.",
+      model: "gpt-5.6-sol",
+      provider: "openai" as const,
+      timestamp: "2026-08-06T10:00:00.000Z",
+    };
+    const assistant = renderWithProviders(
+      <ChatBubble selectable message={assistantMessage} onReport={onReport} />,
+    );
+
+    fireEvent.press(assistant.getByLabelText("Report this response"));
+    expect(onReport).toHaveBeenCalledWith(assistantMessage);
+
+    const user = renderWithProviders(
+      <ChatBubble
+        selectable
+        message={{ ...assistantMessage, id: "user-report", role: "user" as const }}
+        onReport={onReport}
+      />,
+    );
+    expect(user.queryByLabelText("Report this response")).toBeNull();
+  });
+
   it("shows a green copy confirmation for exactly three seconds", async () => {
     jest.useFakeTimers();
     const onCopy = jest.fn(async () => true);

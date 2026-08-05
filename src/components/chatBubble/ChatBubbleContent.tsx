@@ -26,6 +26,7 @@ export function ChatBubbleContent({
   onOpenBranches,
   onOpenBranchSource,
   onShare,
+  onReport,
   onRepeat,
   onRetry,
   onOpenSpeakingSettings,
@@ -78,6 +79,7 @@ export function ChatBubbleContent({
           onBranch={onBranch}
           onOpenBranchSource={onOpenBranchSource}
           onShare={onShare}
+          onReport={onReport}
           onRepeat={onRepeat}
           repeatState={repeatState}
         />

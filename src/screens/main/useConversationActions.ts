@@ -157,6 +157,37 @@ export function useConversationActions({
     [showToast, t],
   );
 
+  // Google Play's generative-AI policy requires an in-app way to report or
+  // flag offensive model output. The serverless report travels through the
+  // system share sheet so the user chooses the channel and sees exactly what
+  // leaves the device.
+  const handleReportMessage = useCallback(
+    async (message: {
+      content: string;
+      model: string | null;
+      provider: string | null;
+    }) => {
+      const route = [message.provider, message.model]
+        .filter(Boolean)
+        .join(" · ");
+      const report = [
+        t("reportResponseIntro"),
+        route ? `Route: ${route}` : null,
+        "",
+        message.content.trim(),
+      ]
+        .filter((line) => line !== null)
+        .join("\n");
+
+      try {
+        await Share.share({ message: report });
+      } catch {
+        showToast(t("couldntShareText"), undefined, "danger");
+      }
+    },
+    [showToast, t],
+  );
+
   const handleRenameThread = useCallback(
     async (conversationId: string, nextTitle: string) => {
       await renameConversation(conversationId, nextTitle);
@@ -295,6 +326,7 @@ export function useConversationActions({
     handleCopyThread,
     handleShareThread,
     handleShareMessage,
+    handleReportMessage,
     handleRenameThread,
     handleTogglePinned,
     handleTogglePrivate,

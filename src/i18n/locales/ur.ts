@@ -615,6 +615,8 @@ export const ur = {
   hide: "چھپائیں",
   copyThread: "تھریڈ کاپی کریں۔",
   shareThread: "تھریڈ شیئر کریں۔",
+  reportResponse: "اس جواب کی اطلاع دیں",
+  reportResponseIntro: "Mr Broccoli سے AI جواب کی رپورٹ۔ نیچے دیا گیا مواد دیکھیں، مسئلہ بیان کریں اور یہ رپورٹ ڈویلپر کو بھیجیں۔",
   repeatReply: "جواب دہرائیں۔",
   renameThread: "تھریڈ کا نام تبدیل کریں۔",
   renameThreadHint:

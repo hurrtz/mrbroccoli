@@ -617,6 +617,8 @@ export const es = {
   hide: "Esconder",
   copyThread: "Copiar hilo",
   shareThread: "Compartir hilo",
+  reportResponse: "Denunciar esta respuesta",
+  reportResponseIntro: "Informe de respuesta de IA de Mr Broccoli. Revisa el contenido, describe el problema y envía este informe al desarrollador.",
   repeatReply: "Repetir respuesta",
   renameThread: "Cambiar nombre del hilo",
   renameThreadHint:

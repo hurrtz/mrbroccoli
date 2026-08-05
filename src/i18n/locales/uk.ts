@@ -638,6 +638,8 @@ export const uk = {
   hide: "Приховати",
   copyThread: "Копіювати розмову",
   shareThread: "Поділитися розмовою",
+  reportResponse: "Поскаржитися на цю відповідь",
+  reportResponseIntro: "Звіт про відповідь ШІ з Mr Broccoli. Перегляньте вміст нижче, опишіть проблему й надішліть цей звіт розробнику.",
   repeatReply: "Повторити відповідь",
   renameThread: "Перейменувати розмову",
   renameThreadHint:

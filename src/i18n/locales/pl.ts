@@ -623,6 +623,8 @@ export const pl = {
   hide: "Ukryj",
   copyThread: "Skopiuj wątek",
   shareThread: "Udostępnij wątek",
+  reportResponse: "Zgłoś tę odpowiedź",
+  reportResponseIntro: "Zgłoszenie odpowiedzi AI z Mr Broccoli. Sprawdź poniższą treść, opisz problem i wyślij to zgłoszenie do dewelopera.",
   repeatReply: "Powtórz odpowiedź",
   renameThread: "Zmień nazwę wątku",
   renameThreadHint:

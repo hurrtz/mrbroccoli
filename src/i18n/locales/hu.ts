@@ -630,6 +630,8 @@ export const hu = {
   hide: "Elrejtés",
   copyThread: "Szál másolása",
   shareThread: "Oszd meg a szálat",
+  reportResponse: "Válasz jelentése",
+  reportResponseIntro: "AI-válasz jelentése a Mr Broccoliból. Nézd át az alábbi tartalmat, írd le a problémát, és küldd el a jelentést a fejlesztőnek.",
   repeatReply: "Válasz megismétlése",
   renameThread: "Szál átnevezése",
   renameThreadHint:

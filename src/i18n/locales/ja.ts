@@ -618,6 +618,8 @@ export const ja = {
   hide: "非表示",
   copyThread: "スレッドをコピー",
   shareThread: "スレッドを共有",
+  reportResponse: "この回答を報告",
+  reportResponseIntro: "Mr Broccoli からの AI 回答報告。以下の内容を確認し、問題を記述して、この報告を開発者に送信してください。",
   repeatReply: "返信を繰り返す",
   renameThread: "スレッドの名前を変更",
   renameThreadHint:

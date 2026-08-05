@@ -616,6 +616,8 @@ export const en = {
   hide: "Hide",
   copyThread: "Copy Thread",
   shareThread: "Share Thread",
+  reportResponse: "Report this response",
+  reportResponseIntro: "AI response report from Mr Broccoli. Review the content below, describe the problem, and send this report to the developer.",
   repeatReply: "Repeat Reply",
   renameThread: "Rename Thread",
   renameThreadHint:

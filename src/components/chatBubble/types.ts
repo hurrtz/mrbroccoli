@@ -19,6 +19,7 @@ export interface ChatBubbleProps {
   onOpenBranches?: (branches: ConversationMeta[]) => void;
   onOpenBranchSource?: (conversationId: string, messageId: string) => void;
   onShare?: (message: Message) => void;
+  onReport?: (message: Message) => void;
   onRepeat?: (message: Message) => void;
   onRetry?: (message: Message) => void;
   onOpenSpeakingSettings?: () => void;

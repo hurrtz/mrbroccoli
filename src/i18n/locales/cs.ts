@@ -618,6 +618,8 @@ export const cs = {
   hide: "Skrýt",
   copyThread: "Kopírovat vlákno",
   shareThread: "Sdílet vlákno",
+  reportResponse: "Nahlásit tuto odpověď",
+  reportResponseIntro: "Hlášení odpovědi AI z Mr Broccoli. Zkontrolujte obsah níže, popište problém a odešlete toto hlášení vývojáři.",
   repeatReply: "Opakovat odpověď",
   renameThread: "Přejmenovat vlákno",
   renameThreadHint:

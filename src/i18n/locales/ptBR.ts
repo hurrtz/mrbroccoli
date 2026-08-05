@@ -617,6 +617,8 @@ export const ptBR = {
   hide: "Esconder",
   copyThread: "Copiar Tópico",
   shareThread: "Compartilhar tópico",
+  reportResponse: "Denunciar esta resposta",
+  reportResponseIntro: "Denúncia de resposta de IA do Mr Broccoli. Revise o conteúdo, descreva o problema e envie esta denúncia ao desenvolvedor.",
   repeatReply: "Repetir resposta",
   renameThread: "Renomear tópico",
   renameThreadHint:
