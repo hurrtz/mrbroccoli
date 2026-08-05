@@ -87,6 +87,44 @@ providers. They can change independently of an app release.
   incorporated into customer products, but every selected model also carries
   its provider's model-specific terms.
 
+## Open licensing gate — eSpeak NG in the sherpa runtime (2026-08-06)
+
+**Status: unresolved. Blocks proprietary store distribution until settled.**
+
+Binary inspection of the pinned `react-native-sherpa-onnx` prebuilt
+(sherpa-onnx 1.12.34) confirms that eSpeak NG is compiled into the
+distributed native runtime on both platforms:
+
+- iOS `sherpa_onnx.xcframework/ios-arm64/libsherpa-onnx.a`: 166 exported
+  eSpeak-related symbols plus runtime strings (`ESPEAK_DATA_PATH`,
+  `Failed to initialize espeak-ng with data dir`, `%s/espeak-ng-data`) and
+  piper-phonemize symbols (`PiperPhonemizeLexicon`,
+  `PiperPhonemesToIdsKokoroOrKitten`).
+- Android `sherpa-onnx-aar-extract/jni/arm64-v8a/libsherpa-onnx-jni.so` and
+  `libsherpa-onnx-c-api.so`: eSpeak strings present in both.
+
+The app exercises this code path: the Kokoro/Piper pipeline requires
+`espeak-ng-data` (`src/services/kokoroTts.ts`). Upstream eSpeak NG is
+licensed GPL-3.0-or-later, and neither `THIRD_PARTY_NOTICES.md` nor the
+module's `THIRD_PARTY_LICENSES/` directory carries an eSpeak notice; the
+license verifier only checks its declared component list and cannot detect
+the omission. FFmpeg and Shine are not affected — both are deliberately
+excluded from builds (`SHERPA_ONNX_DISABLE_FFMPEG` in `ios/Podfile`,
+`sherpaOnnxDisableFfmpeg=true` in `android/gradle.properties`).
+
+Resolution options, in rough order of preference:
+
+1. Rebuild or source a sherpa runtime whose phonemizer front end does not
+   link eSpeak NG (drops or replaces the Kokoro/Piper routes that need it).
+2. Restrict the local TTS catalogue to models that do not use the
+   eSpeak-backed lexicon, then strip the eSpeak objects from the build.
+3. Obtain a qualified legal opinion that the concrete linkage and conveyance
+   here does not trigger GPL-3.0 obligations (unlikely for static linking).
+
+Until one of these lands, store submissions must treat this as a release
+blocker; do not paper over it by adding a GPL notice, because a notice alone
+does not satisfy GPL source-conveyance obligations for a proprietary app.
+
 ## Operational rules
 
 - API keys remain device-local secure credentials. They are never committed,
