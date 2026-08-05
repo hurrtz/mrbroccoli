@@ -3,25 +3,47 @@ export const STORE_PROMO_APP_ID =
 export const STORE_PROMO_FLOW = ".maestro/flows/store-promos/ios.yaml";
 export const STORE_PROMO_FLOWS = Object.freeze({
   android: Object.freeze([
-    ".maestro/flows/store-promos/android.yaml",
-    ".maestro/flows/store-promos/android-active.yaml",
+    ".maestro/flows/store-promos/android-premium-home.yaml",
+    ".maestro/flows/store-promos/android-free.yaml",
+    ".maestro/flows/store-promos/android-premium-surfaces.yaml",
   ]),
   ios: Object.freeze([STORE_PROMO_FLOW]),
 });
-export const STORE_PROMO_SCREENSHOT_COUNT = 10;
-
-export const STORE_PROMO_SCREENSHOT_NAMES = Object.freeze([
-  "01-raw-home",
-  "02-raw-conversation-drawer",
-  "03-active-conversation",
-  "04-active-uber-audit",
-  "05-active-conversation-drawer",
-  "06-active-conversation-branches",
-  "07-premium-settings-overview",
-  "08-thinking-and-uber-mode",
-  "09-speaking-and-voices",
-  "10-data-and-privacy",
+export const STORE_PROMO_ANDROID_FLOW_SCENES = Object.freeze([
+  "premium",
+  "free",
+  "premium",
 ]);
+
+export const STORE_PROMO_SCREENSHOT_NAMES = Object.freeze({
+  android: Object.freeze([
+    "01-premium-active-conversation",
+    "02-free-conversation",
+    "03-free-onboarding",
+    "04-conversation-branches",
+    "05-premium-settings",
+    "06-premium-thinking",
+    "07-on-device-ai",
+    "08-conversation-settings",
+  ]),
+  ios: Object.freeze([
+    "01-premium-active-conversation",
+    "02-uber-mode-audit",
+    "03-free-conversation",
+    "04-free-onboarding",
+    "05-conversation-branches",
+    "06-premium-settings",
+    "07-premium-thinking",
+    "08-premium-speaking",
+    "09-on-device-ai",
+    "10-conversation-settings",
+  ]),
+});
+
+export const STORE_PROMO_SCREENSHOT_COUNTS = Object.freeze({
+  android: STORE_PROMO_SCREENSHOT_NAMES.android.length,
+  ios: STORE_PROMO_SCREENSHOT_NAMES.ios.length,
+});
 
 export const STORE_PROMO_IOS_DISPLAYS = Object.freeze({
   "6.8": {

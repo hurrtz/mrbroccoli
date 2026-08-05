@@ -4,10 +4,16 @@ import { NativeModules } from "react-native";
 import { APP_LANGUAGES } from "../../src/i18n/localeRegistry";
 import {
   buildStorePromoConversations,
-  isStorePromoApplicationId,
   seedStorePromoFixture,
   STORE_PROMO_FIXTURE_MARKER_KEY,
 } from "../../src/services/storePromoFixtures";
+import {
+  getStorePromoPipelinePhase,
+  isStorePromoApplicationId,
+  loadStorePromoScene,
+  STORE_PROMO_SCENE_STORAGE_KEY,
+} from "../../src/services/storePromoPresentation";
+import { DEVELOPMENT_ENTITLEMENT_MODE_STORAGE_KEY } from "../../src/services/developmentEntitlement";
 import {
   ACTIVE_CONVERSATION_KEY,
   META_KEY,
@@ -88,6 +94,20 @@ describe("store promo fixtures", () => {
 
     expect(storedSettings.language).toBe("de");
     expect(storedSettings.theme).toBe("light");
+    expect(storedSettings.responseModes).toEqual([
+      expect.objectContaining({
+        id: "mode-1",
+        route: expect.objectContaining({ provider: "openai" }),
+      }),
+      expect.objectContaining({
+        id: "mode-2",
+        route: expect.objectContaining({ provider: "anthropic" }),
+      }),
+      expect.objectContaining({
+        id: "mode-3",
+        route: expect.objectContaining({ provider: "gemini" }),
+      }),
+    ]);
     expect(storedSettings).not.toHaveProperty("apiKeys");
     expect(storedMetas).toHaveLength(3);
     await expect(AsyncStorage.getItem(ACTIVE_CONVERSATION_KEY)).resolves.toBe(
@@ -99,6 +119,38 @@ describe("store promo fixtures", () => {
     await expect(
       AsyncStorage.getItem(STORE_PROMO_FIXTURE_MARKER_KEY),
     ).resolves.toBe("de");
+    await expect(
+      AsyncStorage.getItem(STORE_PROMO_SCENE_STORAGE_KEY),
+    ).resolves.toBe("premium");
+    await expect(
+      AsyncStorage.getItem(DEVELOPMENT_ENTITLEMENT_MODE_STORAGE_KEY),
+    ).resolves.toBe("premium");
+  });
+
+  it("seeds a Free scene with two completed exchanges and no Uber audit", async () => {
+    getApplicationId.mockResolvedValue(
+      "com.tobiaswinkler.app.mrbroccoli.maestro",
+    );
+
+    await expect(seedStorePromoFixture("de", "free")).resolves.toBe(true);
+    const conversation = JSON.parse(
+      (await AsyncStorage.getItem(conversationKey("promo-root"))) ?? "{}",
+    ) as { messages?: { metadata?: { ulraMode?: unknown } }[] };
+
+    expect(conversation.messages).toHaveLength(4);
+    expect(
+      conversation.messages?.some((message) => message.metadata?.ulraMode),
+    ).toBe(false);
+    await expect(
+      AsyncStorage.getItem(DEVELOPMENT_ENTITLEMENT_MODE_STORAGE_KEY),
+    ).resolves.toBe("free");
+    await expect(loadStorePromoScene()).resolves.toBe("free");
+  });
+
+  it("holds only the Premium fixture in a stable non-idle CTA phase", () => {
+    expect(getStorePromoPipelinePhase("premium", "idle")).toBe("thinking");
+    expect(getStorePromoPipelinePhase("free", "idle")).toBe("idle");
+    expect(getStorePromoPipelinePhase(null, "searching")).toBe("searching");
   });
 
   it("requires the complete Maestro suffix", () => {

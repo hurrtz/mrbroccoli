@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { useWindowDimensions } from "react-native";
+import { Platform, useWindowDimensions } from "react-native";
 import { useSharedSettings } from "../context/SettingsContext";
 import { useAudioPlayer } from "../hooks/useAudioPlayer";
 import { useAudioRecorder } from "../hooks/useAudioRecorder";
@@ -44,6 +44,11 @@ import { useMainScreenImageAttachments } from "./main/useMainScreenImageAttachme
 import { formatMessageForCopy } from "../utils/conversationExport";
 import { useImagePromptSubmission } from "./main/useImagePromptSubmission";
 import { useFreeOfflineMode } from "./main/useFreeOfflineMode";
+import { useStorePromoPresentation } from "../hooks/useStorePromoPresentation";
+import {
+  applyStorePromoFreeOfflineController,
+  getStorePromoPipelinePhase,
+} from "../services/storePromoPresentation";
 
 export function MainScreen() {
   const { colors, isDark } = useTheme();
@@ -64,11 +69,24 @@ export function MainScreen() {
     restorePortableSettings,
     loaded,
   } = useSharedSettings();
-  const freeOffline = useFreeOfflineMode({
+  const storePromoPresentation = useStorePromoPresentation();
+  const storePromoScene = storePromoPresentation.scene;
+  const baseFreeOffline = useFreeOfflineMode({
     settings,
-    settingsLoaded: loaded,
+    settingsLoaded: loaded && storePromoPresentation.loaded,
+    suspended: storePromoScene === "free",
     updateSettings,
   });
+  const freeOffline = React.useMemo(
+    () =>
+      applyStorePromoFreeOfflineController(
+        baseFreeOffline,
+        settings,
+        storePromoScene,
+        Platform.OS === "ios" ? "ios" : "android",
+      ),
+    [baseFreeOffline, settings, storePromoScene],
+  );
   const runtimeSettings = freeOffline.effectiveSettings;
   const [premiumModalVisible, setPremiumModalVisible] = React.useState(false);
   const providerVoiceDirectories = useMainScreenVoiceDirectories({
@@ -212,9 +230,13 @@ export function MainScreen() {
     webSearchProvider,
     webSearchReady,
   } = routeConfiguration;
+  const premiumStorePromoActive = storePromoScene === "premium";
+  const presentationAvailableResponseModes = premiumStorePromoActive
+    ? runtimeSettings.responseModes.map(({ id }) => id)
+    : availableResponseModes;
   const isLandscape = width > height;
   const ulraMode = useUlraModeControl({
-    availableModelCount: availableResponseModes.length,
+    availableModelCount: presentationAvailableResponseModes.length,
     settings: runtimeSettings,
     t,
     updateSettings,
@@ -222,7 +244,7 @@ export function MainScreen() {
   const showStyleChip =
     loaded &&
     freeOffline.entitlement.isPremium &&
-    availableResponseModes.length > 0;
+    presentationAvailableResponseModes.length > 0;
   const mainSurfaceVisible = !(
     drawerVisible ||
     memoryVisible ||
@@ -610,6 +632,10 @@ export function MainScreen() {
   const { validateProviderCapability: handleValidateProviderCapability } =
     useProviderConnectionValidation({ language, settings });
 
+  const presentationPipelinePhase = getStorePromoPipelinePhase(
+    storePromoScene,
+    pipelinePhase,
+  );
   const {
     activeConversationTitle,
     fallbackTtsStatusLabel,
@@ -626,7 +652,7 @@ export function MainScreen() {
     isRecording,
     language,
     model,
-    pipelinePhase,
+    pipelinePhase: presentationPipelinePhase,
     player,
     provider,
     selectedSttModel,
@@ -795,7 +821,9 @@ export function MainScreen() {
         },
         routeCard: {
           activeResponseMode,
-          availableResponseModes: loaded ? availableResponseModes : [],
+          availableResponseModes: loaded
+            ? presentationAvailableResponseModes
+            : [],
           isPremium: freeOffline.entitlement.isPremium,
           offlineReady: freeOffline.freeRuntimeReady,
           onOpenSetupGuide: freeOffline.entitlement.isPremium
@@ -810,16 +838,18 @@ export function MainScreen() {
           onToggleUlraMode: ulraMode.handleToggle,
           onToggleWebSearchEnabled: handleToggleWebSearch,
           t,
-          ulraModeActive: ulraMode.active,
+          ulraModeActive: premiumStorePromoActive || ulraMode.active,
           ulraModeAvailable:
-            freeOffline.entitlement.isPremium && ulraMode.available,
+            freeOffline.entitlement.isPremium &&
+            (premiumStorePromoActive || ulraMode.available),
           webSearchEnabled: webSearchActive,
           webSearchReady: freeOffline.entitlement.isPremium && webSearchReady,
         },
         voiceStage: {
           attachments: pendingImages.attachments,
           disabled:
-            voiceInputDisabled || freeOffline.entitlement.status === "loading",
+            (!premiumStorePromoActive && voiceInputDisabled) ||
+            freeOffline.entitlement.status === "loading",
           driveAutoContinueEnabled,
           driveSilenceCountdownSeconds,
           driveSessionCanRepeat,
@@ -975,6 +1005,7 @@ export function MainScreen() {
         onCreateAppDataBackup: handleCreateAppDataBackup,
         onRestoreAppDataBackup: handleRestoreAppDataBackup,
         conversationArchive,
+        storePromoLocalDevicePreview: premiumStorePromoActive,
         onClose: closeSettings,
       }}
       setupGuide={{

@@ -10,6 +10,13 @@ the complete Play Store translations are kept in a dedicated file under
 
 ## Unreleased
 
+### Changed
+
+- Rework localized store-promotion capture into deterministic Premium and Free
+  stories. The ten iOS and eight Android images now cover populated active and
+  idle conversations, Free onboarding, expanded branches, Settings, on-device
+  AI, and per-conversation controls without making provider requests.
+
 ## 3.0.0 - 2026-08-04
 
 ### Changed

@@ -7,9 +7,19 @@ import test from "node:test";
 import {
   parseConnectedAndroidDevices,
   parseStorePromoArguments,
+  quoteAndroidShellArgument,
   readPngMetadata,
   selectLatestIosRuntime,
 } from "./run-store-promos.mjs";
+
+test("Android fixture URLs remain one device-shell argument", () => {
+  assert.equal(
+    quoteAndroidShellArgument(
+      "mrbroccoli://store-promos?locale=de&scene=premium",
+    ),
+    "'mrbroccoli://store-promos?locale=de&scene=premium'",
+  );
+});
 
 test("store promo arguments require an explicit locale", () => {
   assert.throws(() => parseStorePromoArguments([]), /--locale is required/);

@@ -14,14 +14,25 @@ import {
 import { toPublicSettings } from "../hooks/settings/storage";
 import { STORAGE_KEY } from "../hooks/settings/types";
 import {
+  normalizeFreeSpeechLanguage,
+  type SpeechLanguage,
+} from "../constants/speechLanguages";
+import {
   DEFAULT_SETTINGS,
   type Conversation,
   type Message,
   type Settings,
 } from "../types";
-import { getApplicationId } from "./developmentEntitlement";
+import {
+  DEVELOPMENT_ENTITLEMENT_MODE_STORAGE_KEY,
+  getApplicationId,
+} from "./developmentEntitlement";
+import {
+  isStorePromoApplicationId,
+  STORE_PROMO_SCENE_STORAGE_KEY,
+  type StorePromoScene,
+} from "./storePromoPresentation";
 
-const MAESTRO_APPLICATION_ID_SUFFIX = ".maestro";
 const STORE_PROMO_FIXTURE_NOW_MS = Date.parse("2026-08-05T06:09:00.000Z");
 
 export const STORE_PROMO_FIXTURE_MARKER_KEY =
@@ -416,10 +427,6 @@ function message(
   return { ...rest, timestamp: new Date(timestampMs).toISOString() };
 }
 
-export function isStorePromoApplicationId(applicationId: string | null) {
-  return applicationId?.endsWith(MAESTRO_APPLICATION_ID_SUFFIX) === true;
-}
-
 export function isStorePromoLanguage(value: unknown): value is AppLanguage {
   return (
     typeof value === "string" &&
@@ -430,6 +437,7 @@ export function isStorePromoLanguage(value: unknown): value is AppLanguage {
 export function buildStorePromoConversations(
   language: AppLanguage,
   nowMs = STORE_PROMO_FIXTURE_NOW_MS,
+  includeUlraAudit = true,
 ) {
   const copy = COPY[language];
   const minute = 60_000;
@@ -474,7 +482,7 @@ export function buildStorePromoConversations(
         model: "gpt-5.6-sol",
         provider: "openai",
         usage: usage(296, 96),
-        metadata: {
+        metadata: includeUlraAudit ? {
           ulraMode: {
             convergenceReached: true,
             contributions: [
@@ -517,7 +525,7 @@ export function buildStorePromoConversations(
             synthesisEstimatedTokens: 515,
             synthesisOmittedContributions: 0,
           },
-        },
+        } : undefined,
         timestampMs: nowMs - 4 * minute,
       }),
     ],
@@ -591,7 +599,17 @@ export function buildStorePromoConversations(
   return [root, branch, recent] as const;
 }
 
-export async function seedStorePromoFixture(language: AppLanguage) {
+function getStorePromoSpeechLanguage(language: AppLanguage): SpeechLanguage {
+  if (language === "pt-BR") {
+    return "pt-BR";
+  }
+  return normalizeFreeSpeechLanguage(language) ?? "en";
+}
+
+export async function seedStorePromoFixture(
+  language: AppLanguage,
+  scene: StorePromoScene = "premium",
+) {
   const applicationId = await getApplicationId();
   if (!isStorePromoApplicationId(applicationId)) {
     return false;
@@ -604,21 +622,46 @@ export async function seedStorePromoFixture(language: AppLanguage) {
   const storedSettings = storedSettingsRaw
     ? (JSON.parse(storedSettingsRaw) as Partial<Settings>)
     : {};
+  const speechLanguage = getStorePromoSpeechLanguage(language);
   const nextSettings: Settings = {
     ...DEFAULT_SETTINGS,
     ...storedSettings,
     apiKeys: DEFAULT_SETTINGS.apiKeys,
     language,
+    freeOnboardingLanguageInitialized: true,
+    freeOfflineSetupCompleted: true,
+    localLanguages: [speechLanguage],
+    activeResponseMode: "mode-1",
+    responseModes: [
+      {
+        id: "mode-1",
+        route: { provider: "openai", model: "gpt-5.6-sol" },
+      },
+      {
+        id: "mode-2",
+        route: { provider: "anthropic", model: "claude-sonnet-5" },
+      },
+      {
+        id: "mode-3",
+        route: { provider: "gemini", model: "gemini-3.6-flash" },
+      },
+    ],
     setupGuideDismissed: true,
     showSetupGuideShortcut: false,
     showDebugLogButton: false,
     spokenRepliesEnabled: false,
+    sttLanguage: speechLanguage,
     theme: "light",
+    ttsListenLanguages: [speechLanguage],
     ulraModeActive: true,
     ulraModeEnabled: true,
     ulraModeWarningAcknowledged: true,
   };
-  const conversations = buildStorePromoConversations(language);
+  const conversations = buildStorePromoConversations(
+    language,
+    STORE_PROMO_FIXTURE_NOW_MS,
+    scene === "premium",
+  );
   const metas = sortConversationMeta(
     conversations.map((conversation) =>
       buildConversationMetaFromConversation(conversation, {
@@ -639,6 +682,8 @@ export async function seedStorePromoFixture(language: AppLanguage) {
     [META_KEY, JSON.stringify(metas)],
     [ACTIVE_CONVERSATION_KEY, "promo-root"],
     [STORE_PROMO_FIXTURE_MARKER_KEY, language],
+    [STORE_PROMO_SCENE_STORAGE_KEY, scene],
+    [DEVELOPMENT_ENTITLEMENT_MODE_STORAGE_KEY, scene],
     ...conversations.map(
       (conversation) =>
         [conversationKey(conversation.id), JSON.stringify(conversation)] as const,

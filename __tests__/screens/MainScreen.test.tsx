@@ -95,6 +95,10 @@ jest.mock("../../src/hooks/useKokoroModel", () => ({
   })),
 }));
 
+jest.mock("../../src/hooks/useStorePromoPresentation", () => ({
+  useStorePromoPresentation: () => ({ loaded: true, scene: null }),
+}));
+
 jest.mock("../../src/context/SettingsContext", () => ({
   useSharedSettings: jest.fn(() => ({
     settings: require("../../src/types").DEFAULT_SETTINGS,

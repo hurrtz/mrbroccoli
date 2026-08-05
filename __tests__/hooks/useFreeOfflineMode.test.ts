@@ -1,6 +1,7 @@
 import { act, renderHook, waitFor } from "@testing-library/react-native";
 
 import { useFreeOfflineMode } from "../../src/screens/main/useFreeOfflineMode";
+import { probeLocalDeviceCapabilities } from "../../src/services/localDeviceCapabilities";
 import {
   getOfflineProfileReadiness,
   prepareOfflineProfile,
@@ -71,6 +72,36 @@ jest.mock("../../src/features/settings-core/useNativeVoiceOptions", () => ({
 }));
 
 describe("useFreeOfflineMode", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it("suspends device and locale side effects for deterministic presentation fixtures", async () => {
+    const updateSettings = jest.fn();
+    const { result } = renderHook(() =>
+      useFreeOfflineMode({
+        settings: {
+          ...DEFAULT_SETTINGS,
+          language: "ar",
+          localLanguages: ["en"],
+          freeOnboardingLanguageInitialized: true,
+          freeOfflineSetupCompleted: false,
+        },
+        settingsLoaded: true,
+        suspended: true,
+        updateSettings,
+      }),
+    );
+
+    await act(async () => {
+      await Promise.resolve();
+    });
+
+    expect(result.current.setupVisible).toBe(true);
+    expect(probeLocalDeviceCapabilities).not.toHaveBeenCalled();
+    expect(updateSettings).not.toHaveBeenCalled();
+  });
+
   it("keeps required onboarding visible until model readiness is verified", () => {
     const updateSettings = jest.fn();
     const { result } = renderHook(() =>

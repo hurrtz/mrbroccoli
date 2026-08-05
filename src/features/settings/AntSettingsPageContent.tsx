@@ -165,7 +165,11 @@ export function AntSettingsPageContent({
         <DrillInPage page="thinking">
           <ThinkingSettingsPage
             settings={settings}
-            llmProviders={validation.selectableLlmProviders}
+            llmProviders={
+              props.storePromoLocalDevicePreview
+                ? ["openai", "anthropic", "gemini"]
+                : validation.selectableLlmProviders
+            }
             onUpdate={onUpdate}
             onUpdateResponseModeRoute={onUpdateResponseModeRoute}
             onAddResponseMode={onAddResponseMode}
@@ -249,6 +253,7 @@ export function AntSettingsPageContent({
             settings={settings}
             isPremium={props.isPremium}
             kokoroModel={kokoroModel}
+            storePromoPreview={props.storePromoLocalDevicePreview === true}
             onUpdate={onUpdate}
             onPreviewVoice={props.onPreviewVoice}
           />

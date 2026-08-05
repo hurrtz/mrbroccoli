@@ -6,10 +6,11 @@ import { pathToFileURL } from "node:url";
 
 import {
   STORE_PROMO_ANDROID_DISPLAYS,
+  STORE_PROMO_ANDROID_FLOW_SCENES,
   STORE_PROMO_APP_ID,
   STORE_PROMO_FLOWS,
   STORE_PROMO_IOS_DISPLAYS,
-  STORE_PROMO_SCREENSHOT_COUNT,
+  STORE_PROMO_SCREENSHOT_COUNTS,
   STORE_PROMO_SCREENSHOT_NAMES,
 } from "./store-promo-config.mjs";
 import {
@@ -104,6 +105,10 @@ function runCommand(command, args, options = {}) {
     throw new Error(`${command} exited with status ${result.status}${detail}`);
   }
   return options.capture ? (result.stdout ?? "") : "";
+}
+
+export function quoteAndroidShellArgument(value) {
+  return `'${value.replaceAll("'", `'\\''`)}'`;
 }
 
 function compareRuntimeIdentifiers(left, right) {
@@ -394,8 +399,19 @@ function captureMaestroFlow({ cwd, locale, outputDirectory, platform, udid }) {
       path.join(cwd, "artifacts", "store-promos", ".maestro-runs"),
     );
     try {
+      if (platform === "android") {
+        runCommand(
+          "adb",
+          ["-s", udid, "shell", "pm", "clear", STORE_PROMO_APP_ID],
+          { cwd },
+        );
+      }
       for (const [flowIndex, flow] of STORE_PROMO_FLOWS[platform].entries()) {
-        if (platform === "android" && flowIndex === 1) {
+        if (platform === "android") {
+          const scene = STORE_PROMO_ANDROID_FLOW_SCENES[flowIndex];
+          if (!scene) {
+            throw new Error(`Missing Android fixture scene for ${flow}`);
+          }
           runCommand(
             "adb",
             [
@@ -410,7 +426,9 @@ function captureMaestroFlow({ cwd, locale, outputDirectory, platform, udid }) {
               "-c",
               "android.intent.category.BROWSABLE",
               "-d",
-              `mrbroccoli://store-promos?locale=${locale}`,
+              quoteAndroidShellArgument(
+                `mrbroccoli://store-promos?locale=${locale}&scene=${scene}`,
+              ),
               "-p",
               STORE_PROMO_APP_ID,
             ],
@@ -466,20 +484,22 @@ function collectScreenshots({ cwd, display, locale, platform, rawOutput }) {
   const byName = new Map(
     captured.map((filePath) => [path.basename(filePath, ".png"), filePath]),
   );
+  const screenshotNames = STORE_PROMO_SCREENSHOT_NAMES[platform];
+  const screenshotCount = STORE_PROMO_SCREENSHOT_COUNTS[platform];
 
-  if (captured.length !== STORE_PROMO_SCREENSHOT_COUNT) {
+  if (captured.length !== screenshotCount) {
     throw new Error(
-      `Expected ${STORE_PROMO_SCREENSHOT_COUNT} captured PNGs for ${locale}, found ${captured.length}`,
+      `Expected ${screenshotCount} captured PNGs for ${locale}, found ${captured.length}`,
     );
   }
-  for (const name of STORE_PROMO_SCREENSHOT_NAMES) {
+  for (const name of screenshotNames) {
     if (!byName.has(name)) {
       throw new Error(`Missing store screenshot ${name} for ${locale}`);
     }
   }
 
   safeResetDirectory(destination, outputRoot);
-  const screenshots = STORE_PROMO_SCREENSHOT_NAMES.map((name) => {
+  const screenshots = screenshotNames.map((name) => {
     const source = byName.get(name);
     const output = path.join(destination, `${name}.png`);
     fs.copyFileSync(source, output);

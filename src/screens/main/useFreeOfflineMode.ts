@@ -126,11 +126,17 @@ export interface FreeOfflineModeController {
 export function useFreeOfflineMode(params: {
   settings: Settings;
   settingsLoaded: boolean;
+  suspended?: boolean;
   updateSettings: (
     partial: Partial<Omit<Settings, "apiKeys" | "providerModels">>,
   ) => void;
 }): FreeOfflineModeController {
-  const { settings, settingsLoaded, updateSettings } = params;
+  const {
+    settings,
+    settingsLoaded,
+    suspended = false,
+    updateSettings,
+  } = params;
   const entitlement = usePremiumEntitlement();
   const [setupRequested, setSetupRequested] = useState(false);
   const [checking, setChecking] = useState(false);
@@ -246,7 +252,7 @@ export function useFreeOfflineMode(params: {
     : recommendedReadiness;
 
   const refresh = useCallback(async () => {
-    if (entitlement.status !== "free" || !resolvedLanguage) {
+    if (suspended || entitlement.status !== "free" || !resolvedLanguage) {
       return null;
     }
     const operation = refreshOperationRef.current + 1;
@@ -371,11 +377,13 @@ export function useFreeOfflineMode(params: {
     resolvedLanguage,
     settings.freeOfflineProfileOverrides,
     settings.freeOfflineSetupCompleted,
+    suspended,
   ]);
 
   useEffect(() => {
     if (
       !settingsLoaded ||
+      suspended ||
       entitlement.status !== "free" ||
       settings.freeOnboardingLanguageInitialized
     ) {
@@ -404,6 +412,7 @@ export function useFreeOfflineMode(params: {
     entitlement.status,
     settings.freeOnboardingLanguageInitialized,
     settingsLoaded,
+    suspended,
     updateSettings,
   ]);
 
@@ -418,6 +427,7 @@ export function useFreeOfflineMode(params: {
   useEffect(() => {
     if (
       !settingsLoaded ||
+      suspended ||
       entitlement.status !== "free" ||
       !settings.freeOnboardingLanguageInitialized ||
       !resolvedLanguage ||
@@ -451,12 +461,13 @@ export function useFreeOfflineMode(params: {
     settings.sttLanguage,
     settings.ttsListenLanguages,
     settingsLoaded,
+    suspended,
     selectedAppLanguage,
     updateSettings,
   ]);
 
   useEffect(() => {
-    if (!settingsLoaded || entitlement.status !== "free") {
+    if (!settingsLoaded || suspended || entitlement.status !== "free") {
       if (entitlement.status === "premium") {
         setSetupRequested(false);
       }
@@ -482,6 +493,7 @@ export function useFreeOfflineMode(params: {
     settings.freeOfflineSetupCompleted,
     settingsLoaded,
     resolvedLanguage,
+    suspended,
   ]);
 
   useEffect(

@@ -1,0 +1,26 @@
+appId: ${APP_ID}
+name: Google Play Free conversation and onboarding screenshots
+tags:
+  - store-promos
+  - android
+---
+# The runner opens the Free fixture using a package-targeted Android intent.
+- assertVisible:
+    id: store-promo-fixture-ready-free
+- stopApp
+- launchApp
+- setOrientation: PORTRAIT
+- assertVisible:
+    id: free-edition-status
+- assertVisible:
+    id: voice-stage-idle
+- assertVisible:
+    id: selectable-message-promo-assistant-2
+- takeScreenshot:
+    path: 02-free-conversation
+- tapOn:
+    id: free-edition-status
+- assertVisible:
+    id: onboarding-recommendation-card
+- takeScreenshot:
+    path: 03-free-onboarding

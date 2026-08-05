@@ -13,92 +13,74 @@ tags:
 - tapOn:
     text: Cancel
     optional: true
-- assertVisible:
-    id: setup-guide-card
-- tapOn:
-    id: setup-guide-not-now
-- assertVisible:
-    id: main-screen
 
-# Select the locale through the same UI customers use. The first two images
-# intentionally show a clean application before the promotional fixture is
-# installed.
-- tapOn:
-    id: main-settings-button
-- scrollUntilVisible:
-    element:
-      id: settings-overview-row-app
-    direction: DOWN
-- tapOn:
-    id: settings-overview-row-app
-- tapOn:
-    id: app-language-picker
-- scrollUntilVisible:
-    element:
-      id: ^app-language-picker-option-${LOCALE}$
-    direction: DOWN
-- runFlow:
-    when:
-      true: ${LOCALE_NEEDS_SAFE_SCROLL == 'true'}
-    commands:
-      - swipe:
-          start: 50%,80%
-          end: 50%,65%
-          duration: 400
-- tapOn:
-    id: ^app-language-picker-option-${LOCALE}$
-- assertVisible:
-    id: ^app-settings-page-${LOCALE}$
-- tapOn:
-    id: settings-close-button
-- assertVisible:
-    id: main-screen
-- takeScreenshot:
-    path: 01-raw-home
-- tapOn:
-    id: main-conversations-button
-- assertVisible:
-    id: conversation-drawer-empty-state
-- takeScreenshot:
-    path: 02-raw-conversation-drawer
-- tapOn:
-    id: conversation-drawer-close
-
-# The route is inert in production and seeds data only for the isolated
-# `.maestro` application identity.
-- openLink: mrbroccoli://store-promos?locale=${LOCALE}
+# Premium story: a deterministic completed exchange with the next turn held
+# in a stable thinking phase. No provider call is made.
+- openLink: "mrbroccoli://store-promos?locale=${LOCALE}&scene=premium"
 - tapOn:
     text: Open
     optional: true
 - assertVisible:
-    id: store-promo-fixture-ready
+    id: store-promo-fixture-ready-premium
 - stopApp
 - launchApp
 - assertVisible:
-    id: main-screen
+    id: voice-stage-thinking
 - assertVisible:
     id: selectable-message-promo-assistant-2
 - takeScreenshot:
-    path: 03-active-conversation
-- assertVisible:
-    id: uber-audit-toggle-promo-assistant-2
+    path: 01-premium-active-conversation
 - tapOn:
     id: uber-audit-toggle-promo-assistant-2
 - takeScreenshot:
-    path: 04-active-uber-audit
+    path: 02-uber-mode-audit
 
+# Free story: two complete exchanges at rest, followed by the deterministic
+# private on-device recommendation shown by the Free onboarding wizard.
+- openLink: "mrbroccoli://store-promos?locale=${LOCALE}&scene=free"
+- tapOn:
+    text: Open
+    optional: true
+- assertVisible:
+    id: store-promo-fixture-ready-free
+- stopApp
+- launchApp
+- assertVisible:
+    id: free-edition-status
+- assertVisible:
+    id: voice-stage-idle
+- assertVisible:
+    id: selectable-message-promo-assistant-2
+- takeScreenshot:
+    path: 03-free-conversation
+- tapOn:
+    id: free-edition-status
+- assertVisible:
+    id: onboarding-recommendation-card
+- takeScreenshot:
+    path: 04-free-onboarding
+
+# Return to Premium for organization and configuration surfaces.
+- openLink: "mrbroccoli://store-promos?locale=${LOCALE}&scene=premium"
+- tapOn:
+    text: Open
+    optional: true
+- assertVisible:
+    id: store-promo-fixture-ready-premium
+- stopApp
+- launchApp
+- assertVisible:
+    id: voice-stage-thinking
 - tapOn:
     id: main-conversations-button
 - assertVisible:
     id: conversation-drawer-item-promo-root
-- takeScreenshot:
-    path: 05-active-conversation-drawer
 - tapOn:
     id: conversation-branch-toggle-promo-root
 - assertVisible:
     id: conversation-drawer-item-promo-branch
 - takeScreenshot:
-    path: 06-active-conversation-branches
+    path: 05-conversation-branches
 - tapOn:
     id: conversation-drawer-close
 
@@ -107,7 +89,7 @@ tags:
 - assertVisible:
     id: settings-page-overview
 - takeScreenshot:
-    path: 07-premium-settings-overview
+    path: 06-premium-settings
 - scrollUntilVisible:
     element:
       id: settings-overview-row-thinking
@@ -117,7 +99,7 @@ tags:
 - assertVisible:
     id: settings-page-thinking
 - takeScreenshot:
-    path: 08-thinking-and-uber-mode
+    path: 07-premium-thinking
 - tapOn:
     id: settings-back-button
 - scrollUntilVisible:
@@ -129,16 +111,27 @@ tags:
 - assertVisible:
     id: settings-page-speaking
 - takeScreenshot:
-    path: 09-speaking-and-voices
+    path: 08-premium-speaking
 - tapOn:
     id: settings-back-button
 - scrollUntilVisible:
     element:
-      id: settings-overview-row-data
+      id: settings-overview-row-local
     direction: DOWN
 - tapOn:
-    id: settings-overview-row-data
+    id: settings-overview-row-local
 - assertVisible:
-    id: settings-page-data
+    id: on-device-settings-page
 - takeScreenshot:
-    path: 10-data-and-privacy
+    path: 09-on-device-ai
+- tapOn:
+    id: settings-close-button
+
+- assertVisible:
+    id: conversation-style-control
+- tapOn:
+    id: conversation-style-control
+- assertVisible:
+    id: conversation-settings-drawer
+- takeScreenshot:
+    path: 10-conversation-settings

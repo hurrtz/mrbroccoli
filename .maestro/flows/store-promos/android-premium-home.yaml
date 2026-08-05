@@ -1,0 +1,18 @@
+appId: ${APP_ID}
+name: Google Play Premium active conversation screenshot
+tags:
+  - store-promos
+  - android
+---
+# The runner opens the Premium fixture using a package-targeted Android intent.
+- assertVisible:
+    id: store-promo-fixture-ready-premium
+- stopApp
+- launchApp
+- setOrientation: PORTRAIT
+- assertVisible:
+    id: voice-stage-thinking
+- assertVisible:
+    id: selectable-message-promo-assistant-2
+- takeScreenshot:
+    path: 01-premium-active-conversation

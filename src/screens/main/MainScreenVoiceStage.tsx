@@ -96,6 +96,7 @@ export const MainScreenVoiceStage = React.memo(function MainScreenVoiceStage({
 }: MainScreenVoiceStageProps) {
   return (
     <View
+      testID={`voice-stage-${visualPhase}`}
       style={[
         styles.stageBlock,
         layout === "landscape" ? styles.stageBlockLandscape : null,

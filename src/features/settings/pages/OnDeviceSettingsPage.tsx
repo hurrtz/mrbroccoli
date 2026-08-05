@@ -1,5 +1,12 @@
 import React from "react";
-import { AccessibilityInfo, Alert, StyleSheet, Text, View } from "react-native";
+import {
+  AccessibilityInfo,
+  Alert,
+  Platform,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 
 import { Button } from "../../../design-system/NativeControls";
 import { LocalModelPerformanceSummary } from "../../../components/LocalModelPerformanceSummary";
@@ -61,6 +68,7 @@ import {
 } from "../AntSettingsPrimitives";
 import { styles } from "../styles";
 import { formatBytes } from "../../../utils/formatBytes";
+import { buildStorePromoLocalDeviceSnapshot } from "../../../services/storePromoPresentation";
 
 type BusyAction = {
   action: "download" | "remove" | "test";
@@ -97,12 +105,14 @@ export function OnDeviceSettingsPage({
   settings,
   isPremium,
   kokoroModel,
+  storePromoPreview = false,
   onUpdate,
   onPreviewVoice,
 }: {
   settings: Settings;
   isPremium: boolean;
   kokoroModel: KokoroModelController;
+  storePromoPreview?: boolean;
   onUpdate: (
     partial: Partial<Omit<Settings, "apiKeys" | "providerModels">>,
   ) => void;
@@ -110,13 +120,31 @@ export function OnDeviceSettingsPage({
 }) {
   const { colors } = useTheme();
   const { t } = useLocalization();
+  const storePromoSnapshot = React.useMemo(
+    () =>
+      storePromoPreview
+        ? buildStorePromoLocalDeviceSnapshot(
+            Platform.OS === "ios" ? "ios" : "android",
+          )
+        : null,
+    [storePromoPreview],
+  );
   const [snapshot, setSnapshot] = React.useState<LocalDeviceSnapshot | null>(
-    null,
+    storePromoSnapshot,
   );
   const [probeError, setProbeError] = React.useState<string | null>(null);
   const [nativeSpeechCapabilities, setNativeSpeechCapabilities] =
-    React.useState<NativeSpeechCapabilities | null>(null);
-  const [probing, setProbing] = React.useState(true);
+    React.useState<NativeSpeechCapabilities | null>(
+      storePromoPreview
+        ? {
+            recognitionAvailable: true,
+            onDeviceRecognitionAvailable: true,
+            targetLocaleInstalled: true,
+            nativeSttEligible: true,
+          }
+        : null,
+    );
+  const [probing, setProbing] = React.useState(!storePromoPreview);
   const [busy, setBusy] = React.useState<BusyAction | null>(null);
   const [progress, setProgress] = React.useState<
     Partial<Record<LocalModelId, LocalModelDownloadProgress>>
@@ -136,15 +164,32 @@ export function OnDeviceSettingsPage({
     });
 
   const refreshModelState = React.useCallback(async () => {
+    if (storePromoPreview) {
+      setInstalls({});
+      setBenchmarks({});
+      return;
+    }
     const [nextInstalls, nextBenchmarks] = await Promise.all([
       getLocalCatalogInstallStatuses(),
       getLocalModelBenchmarkResults(),
     ]);
     setInstalls(nextInstalls);
     setBenchmarks(nextBenchmarks);
-  }, []);
+  }, [storePromoPreview]);
 
   const runDeviceProbe = React.useCallback(async () => {
+    if (storePromoSnapshot) {
+      setSnapshot(storePromoSnapshot);
+      setNativeSpeechCapabilities({
+        recognitionAvailable: true,
+        onDeviceRecognitionAvailable: true,
+        targetLocaleInstalled: true,
+        nativeSttEligible: true,
+      });
+      setProbeError(null);
+      setProbing(false);
+      return;
+    }
     setProbing(true);
     setProbeError(null);
     try {
@@ -161,7 +206,7 @@ export function OnDeviceSettingsPage({
     } finally {
       setProbing(false);
     }
-  }, [settings.localLanguages]);
+  }, [settings.localLanguages, storePromoSnapshot]);
 
   React.useEffect(() => {
     void runDeviceProbe();

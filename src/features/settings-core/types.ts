@@ -67,6 +67,7 @@ export interface SettingsModalProps {
   ) => Promise<void>;
   onOpenPremium: () => void;
   conversationArchive: ConversationArchiveController;
+  storePromoLocalDevicePreview?: boolean;
   onCreateAppDataBackup: () => Promise<AppDataBackup>;
   onRestoreAppDataBackup: (
     backup: AppDataBackup,

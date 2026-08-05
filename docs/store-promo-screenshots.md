@@ -1,14 +1,17 @@
 # Localized store screenshots
 
-The store-promo suite captures ten ordered screenshots for every registered app
-locale. It is separate from the broader Maestro release QA gallery.
+The store-promo suite captures ten ordered iOS screenshots and eight ordered
+Android screenshots for every registered app locale. It is separate from the
+broader Maestro release QA gallery.
 
 ## Safety boundary
 
-The fixture route writes deterministic sample conversations only when the
-installed application identifier ends in `.maestro`. Production, `.dev`, and
-other application identities fail closed. The fixture contains no credentials,
-provider requests, user data, or downloaded models.
+The fixture route writes deterministic sample conversations and presentation
+state only when the installed application identifier ends in `.maestro`.
+Production, `.dev`, and other application identities fail closed. The fixture
+contains no credentials, provider requests, user data, or downloaded models.
+All assistant replies, the non-idle CTA phase, and the Free/on-device device
+recommendation are fixed mocks. No model is called while capturing images.
 
 Like `.dev`, the `.maestro` identity exposes the App Settings control that
 simulates Free or Premium access without affecting store purchases. A clean
@@ -58,21 +61,32 @@ native screenshots. Let App Store Connect derive those legacy sizes.
 
 - `phone`: Pixel 7 profile at 1080 × 2400
 
-Android images use the same localized fixture and ten-scene source set. Select
-the images required for each Google Play listing from the validated source set.
+Android images use the same localized Premium and Free fixture stories, while
+omitting the Uber audit and Speaking screens that are reserved for iOS.
 
-## Ten-image order
+## iOS ten-image order
 
-1. Clean Home
-2. Empty conversation drawer
-3. Active localized conversation
-4. Expanded Uber Mode audit
-5. Populated conversation drawer
-6. Expanded conversation branches
-7. Premium Settings overview
-8. Thinking and Uber Mode Settings
-9. Speaking and voice Settings
-10. Data and privacy Settings
+1. Premium conversation with a stable Thinking CTA
+2. Expanded Uber Mode audit
+3. Free conversation at rest with two completed exchanges
+4. Free on-device onboarding recommendation
+5. Conversation drawer with expanded branches
+6. Premium Settings overview
+7. Premium Thinking Settings
+8. Premium Speaking Settings
+9. On-device AI Settings
+10. Premium per-conversation Settings drawer
+
+## Android eight-image order
+
+1. Premium conversation with a stable Thinking CTA
+2. Free conversation at rest with two completed exchanges
+3. Free on-device onboarding recommendation
+4. Conversation drawer with expanded branches
+5. Premium Settings overview
+6. Premium Thinking Settings
+7. On-device AI Settings
+8. Premium per-conversation Settings drawer
 
 Review every image in `review-gallery.html` before upload. Automation verifies
 structure and dimensions; it does not replace native-speaker review or a visual

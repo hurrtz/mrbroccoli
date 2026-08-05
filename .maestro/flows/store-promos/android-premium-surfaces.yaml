@@ -1,0 +1,67 @@
+appId: ${APP_ID}
+name: Google Play Premium organization and settings screenshots
+tags:
+  - store-promos
+  - android
+---
+# The runner restores the Premium fixture using a package-targeted Android
+# intent before this flow.
+- assertVisible:
+    id: store-promo-fixture-ready-premium
+- stopApp
+- launchApp
+- setOrientation: PORTRAIT
+- assertVisible:
+    id: voice-stage-thinking
+- tapOn:
+    id: main-conversations-button
+- assertVisible:
+    id: conversation-drawer-item-promo-root
+- tapOn:
+    id: conversation-branch-toggle-promo-root
+- assertVisible:
+    id: conversation-drawer-item-promo-branch
+- takeScreenshot:
+    path: 04-conversation-branches
+- tapOn:
+    id: conversation-drawer-close
+
+- tapOn:
+    id: main-settings-button
+- assertVisible:
+    id: settings-page-overview
+- takeScreenshot:
+    path: 05-premium-settings
+- scrollUntilVisible:
+    element:
+      id: settings-overview-row-thinking
+    direction: DOWN
+- tapOn:
+    id: settings-overview-row-thinking
+- assertVisible:
+    id: settings-page-thinking
+- takeScreenshot:
+    path: 06-premium-thinking
+- tapOn:
+    id: settings-back-button
+- scrollUntilVisible:
+    element:
+      id: settings-overview-row-local
+    direction: DOWN
+- tapOn:
+    id: settings-overview-row-local
+- assertVisible:
+    id: on-device-settings-page
+- takeScreenshot:
+    path: 07-on-device-ai
+- tapOn:
+    id: settings-close-button
+
+- assertVisible:
+    id: conversation-style-control
+- tapOn:
+    id: conversation-style-control
+- assertVisible:
+    id: conversation-settings-drawer
+- takeScreenshot:
+    path: 08-conversation-settings
