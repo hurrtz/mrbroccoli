@@ -285,6 +285,60 @@ describe("useFreeOfflineMode", () => {
     );
   });
 
+  it("preserves persisted provider response modes through Free setup completion", async () => {
+    jest.mocked(getOfflineProfileReadiness).mockResolvedValueOnce({
+      ready: true,
+      installed: true,
+      failedModelId: null,
+      installs: {},
+      benchmarks: {},
+    });
+    const providerMode = {
+      id: "premium-openai",
+      route: {
+        provider: "openai" as const,
+        model: "gpt-5.6-sol",
+        runtime: "provider" as const,
+      },
+    };
+    const updateSettings = jest.fn();
+    const { result } = renderHook(() =>
+      useFreeOfflineMode({
+        settings: {
+          ...DEFAULT_SETTINGS,
+          responseModes: [providerMode],
+          localLanguages: ["de"],
+          ttsListenLanguages: ["de"],
+          sttLanguage: "de",
+          freeOnboardingLanguageInitialized: true,
+          freeOfflineSetupCompleted: true,
+        },
+        settingsLoaded: true,
+        updateSettings,
+      }),
+    );
+
+    await waitFor(
+      () => {
+        expect(result.current.selection?.status).toBe("ready");
+        expect(result.current.readiness?.ready).toBe(true);
+      },
+      { timeout: 2_500 },
+    );
+
+    act(() => result.current.openSetup());
+    act(() => result.current.start());
+
+    const completion = updateSettings.mock.calls.find(
+      ([partial]) => partial.freeOfflineSetupCompleted === true,
+    )?.[0];
+    expect(completion?.responseModes).toEqual([
+      expect.objectContaining({ id: "free-offline" }),
+      expect.objectContaining({ id: "free-offline-thorough" }),
+      providerMode,
+    ]);
+  });
+
   it("keeps the recommendation immutable while preserving a hidden custom draft", async () => {
     const updateSettings = jest.fn();
     const { result } = renderHook(() =>

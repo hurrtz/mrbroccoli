@@ -602,9 +602,23 @@ export function useFreeOfflineMode(params: {
         settings,
         profile,
       );
+      // Free setup must stay reversible: persisted provider response modes
+      // survive alongside the local Free routes. The Free runtime derivation
+      // ignores them, and they return untouched when Premium is restored.
+      const preservedProviderModes = settings.responseModes.filter(
+        (mode) =>
+          mode.route.runtime !== "local" &&
+          mode.route.model.trim().length > 0 &&
+          !persistedProfileSettings.responseModes.some(
+            ({ id }) => id === mode.id,
+          ),
+      );
       updateSettings({
         activeResponseMode: persistedProfileSettings.activeResponseMode,
-        responseModes: persistedProfileSettings.responseModes,
+        responseModes: [
+          ...persistedProfileSettings.responseModes,
+          ...preservedProviderModes,
+        ],
         language: persistedProfileSettings.language,
         freeOfflineSetupCompleted: true,
         freeOfflineProfileOverrides: withCustomSelections
