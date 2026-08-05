@@ -1,6 +1,10 @@
 import { ExpoSpeechRecognitionModule } from "expo-speech-recognition";
 import type { TranslationKey } from "../../i18n";
-import { buildErrorMessage, getRecognitionLocale } from "./shared";
+import {
+  buildErrorMessage,
+  getRecognitionLocale,
+  RECOGNIZED_FILE_TIMEOUT_MS,
+} from "./shared";
 import type { SttLanguage } from "../../types";
 
 interface TranscribeRecordedFileParams {
@@ -27,7 +31,23 @@ export function transcribeRecordedFile({
     latestTranscriptRef.current = "";
     finalTranscriptRef.current = "";
 
+    // A dropped end/error event must not hang file transcription forever;
+    // settle with whatever transcript arrived and release the recognizer.
+    const watchdog = setTimeout(() => {
+      const transcript =
+        finalTranscriptRef.current.trim() ||
+        latestTranscriptRef.current.trim() ||
+        null;
+      finish(transcript);
+      try {
+        ExpoSpeechRecognitionModule.abort();
+      } catch {
+        // The recognizer may already be gone; listeners are removed.
+      }
+    }, RECOGNIZED_FILE_TIMEOUT_MS);
+
     const cleanup = () => {
+      clearTimeout(watchdog);
       resultSubscription.remove();
       errorSubscription.remove();
       endSubscription.remove();

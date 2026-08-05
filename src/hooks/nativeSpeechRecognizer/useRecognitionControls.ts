@@ -10,6 +10,7 @@ import {
   getRecognitionLocale,
   MIN_RECOGNITION_DURATION_MS,
   RECOGNITION_METER_INTERVAL_MS,
+  RECOGNITION_STOP_TIMEOUT_MS,
 } from "./shared";
 import { transcribeRecordedFile } from "./transcribeRecordedFile";
 import type { RecognitionSession } from "./useRecognitionSession";
@@ -40,6 +41,7 @@ export function useRecognitionControls({
     isRecordingRef,
     latestTranscriptRef,
     nativeSessionIdRef,
+    resolvePendingStop,
     setIsRecording,
     setInputMetering,
     setLastError,
@@ -165,8 +167,23 @@ export function useRecognitionControls({
     stopRequestedRef.current = false;
 
     await new Promise<void>((resolve) => {
-      stopResolverRef.current = () => resolve();
-      stopRejectRef.current = () => resolve();
+      let watchdog: ReturnType<typeof setTimeout> | null = null;
+      const settle = () => {
+        if (watchdog) {
+          clearTimeout(watchdog);
+        }
+        resolve();
+      };
+      stopResolverRef.current = settle;
+      stopRejectRef.current = settle;
+      // The module's terminal event can be dropped by the platform; never
+      // wait on it forever.
+      watchdog = setTimeout(() => {
+        if (stopResolverRef.current !== settle) {
+          return;
+        }
+        resolvePendingStop(null);
+      }, RECOGNITION_STOP_TIMEOUT_MS);
       ExpoSpeechRecognitionModule.abort();
     });
   }, [
@@ -174,6 +191,7 @@ export function useRecognitionControls({
     clearPendingResolution,
     isRecordingRef,
     nativeSessionIdRef,
+    resolvePendingStop,
     setIsRecording,
     setInputMetering,
     stopRejectRef,
@@ -233,8 +251,39 @@ export function useRecognitionControls({
     abortRequestedRef.current = false;
 
     return new Promise<string | null>((resolve, reject) => {
-      stopResolverRef.current = resolve;
-      stopRejectRef.current = reject;
+      let watchdog: ReturnType<typeof setTimeout> | null = null;
+      const settle = (value: string | null) => {
+        if (watchdog) {
+          clearTimeout(watchdog);
+        }
+        resolve(value);
+      };
+      const fail = (error: Error) => {
+        if (watchdog) {
+          clearTimeout(watchdog);
+        }
+        reject(error);
+      };
+      stopResolverRef.current = settle;
+      stopRejectRef.current = fail;
+      // If the platform drops the end/error event, settle with whatever
+      // transcript arrived and force the recognizer down instead of wedging
+      // the capture lifecycle for the rest of the session.
+      watchdog = setTimeout(() => {
+        if (stopResolverRef.current !== settle) {
+          return;
+        }
+        const transcript =
+          finalTranscriptRef.current.trim() ||
+          latestTranscriptRef.current.trim() ||
+          null;
+        resolvePendingStop(transcript);
+        try {
+          ExpoSpeechRecognitionModule.abort();
+        } catch {
+          // The recognizer may already be gone; the session state is reset.
+        }
+      }, RECOGNITION_STOP_TIMEOUT_MS);
       ExpoSpeechRecognitionModule.stop();
     });
   }, [
@@ -244,6 +293,7 @@ export function useRecognitionControls({
     isRecordingRef,
     latestTranscriptRef,
     nativeSessionIdRef,
+    resolvePendingStop,
     setIsRecording,
     setInputMetering,
     startedAtRef,

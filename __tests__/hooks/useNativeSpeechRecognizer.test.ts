@@ -308,6 +308,71 @@ describe("useNativeSpeechRecognizer", () => {
     expect(result.current.inputMetering).toBeNull();
   });
 
+  it("settles a stop whose end event never arrives and releases the session", async () => {
+    jest.useFakeTimers({ doNotFake: ["Date"] });
+    try {
+      (isNativeWaveformAvailable as jest.Mock).mockReturnValue(false);
+      const { result } = renderHook(() => useNativeSpeechRecognizer("de"), {
+        wrapper,
+      });
+
+      await act(async () => {
+        await result.current.startRecognition();
+        emitSpeechEvent("start", {});
+      });
+
+      dateNowSpy.mockReturnValue(2_000);
+      let transcriptPromise: Promise<string | null>;
+      act(() => {
+        transcriptPromise = result.current.stopRecognition();
+        emitSpeechEvent("result", {
+          results: [{ transcript: "Hallo Watchdog" }],
+          isFinal: true,
+        });
+        // No end/error event: the platform recognizer dropped its callback.
+      });
+
+      act(() => {
+        jest.advanceTimersByTime(8_000);
+      });
+
+      await expect(transcriptPromise!).resolves.toBe("Hallo Watchdog");
+      expect(ExpoSpeechRecognitionModule.abort).toHaveBeenCalledTimes(1);
+      expect(result.current.isRecording).toBe(false);
+    } finally {
+      jest.useRealTimers();
+    }
+  });
+
+  it("settles an abort whose terminal event never arrives", async () => {
+    jest.useFakeTimers({ doNotFake: ["Date"] });
+    try {
+      (isNativeWaveformAvailable as jest.Mock).mockReturnValue(false);
+      const { result } = renderHook(() => useNativeSpeechRecognizer(), {
+        wrapper,
+      });
+
+      await act(async () => {
+        await result.current.startRecognition();
+      });
+
+      let abortPromise: Promise<void>;
+      act(() => {
+        abortPromise = result.current.abortRecognition();
+        // No end/error event arrives.
+      });
+
+      act(() => {
+        jest.advanceTimersByTime(8_000);
+      });
+
+      await expect(abortPromise!).resolves.toBeUndefined();
+      expect(result.current.isRecording).toBe(false);
+    } finally {
+      jest.useRealTimers();
+    }
+  });
+
   it("resolves an aborted system recognition session without surfacing an error", async () => {
     (isNativeWaveformAvailable as jest.Mock).mockReturnValue(false);
     const { result } = renderHook(() => useNativeSpeechRecognizer(), {

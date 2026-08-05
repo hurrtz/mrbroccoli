@@ -5,6 +5,14 @@ import { getSpeechRecognitionLocale } from "../../utils/speechLanguage";
 
 export const MIN_RECOGNITION_DURATION_MS = 300;
 export const RECOGNITION_METER_INTERVAL_MS = 150;
+// Platform recognizers can drop their terminal end/error callback (a known
+// Android speech-service failure mode). Stop and abort must never wait on
+// that event forever, or voice capture and Drive re-arm wedge for the rest
+// of the session. Mirrors the playback-side watchdog pattern.
+export const RECOGNITION_STOP_TIMEOUT_MS = 8_000;
+// File recognition processes a bounded recording; generous ceiling for slow
+// devices and long captures before the session is forcibly released.
+export const RECOGNIZED_FILE_TIMEOUT_MS = 120_000;
 
 export function getRecognitionLocale(language: SttLanguage = "auto") {
   return getSpeechRecognitionLocale(language);
