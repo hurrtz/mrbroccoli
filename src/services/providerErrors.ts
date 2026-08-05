@@ -179,6 +179,14 @@ function isRateLimitFailure(status: number, detail: string) {
 
 function isQuotaFailure(status: number, detail: string) {
   const normalized = detail.toLowerCase();
+
+  // Per-minute wording marks a self-recovering rate limit, not exhausted
+  // account quota, even when providers phrase it with quota vocabulary
+  // (e.g. Gemini "resource_exhausted ... requests per minute").
+  if (normalized.includes("per minute") || normalized.includes("per min")) {
+    return false;
+  }
+
   const explicitQuotaFailure =
     normalized.includes("current quota") ||
     normalized.includes("insufficient_quota") ||

@@ -246,6 +246,70 @@ describe("executeProviderModelRequest", () => {
     });
   });
 
+  it("expires a quota circuit after the temporary window", async () => {
+    const request = jest
+      .fn()
+      .mockRejectedValue(
+        providerError("quota", "Quota exceeded for generate content requests."),
+      );
+
+    await expect(
+      executeProviderModelRequest({
+        candidateModels: ["model-a", "model-b"],
+        capability: "llm",
+        provider: "gemini",
+        request,
+        retryDelayMs: 0,
+      }),
+    ).rejects.toThrow("quota");
+    expect(getProviderCircuitState("gemini", "llm")).toMatchObject({
+      failureKind: "quota",
+    });
+
+    const nowSpy = jest
+      .spyOn(Date, "now")
+      .mockReturnValue(Date.now() + 5 * 60_000 + 1);
+    try {
+      expect(getProviderCircuitState("gemini", "llm")).toBeNull();
+
+      const retry = jest.fn().mockResolvedValue("OK");
+      const result = await executeProviderModelRequest({
+        candidateModels: ["model-a"],
+        capability: "llm",
+        provider: "gemini",
+        request: retry,
+        retryDelayMs: 0,
+      });
+      expect(retry).toHaveBeenCalledTimes(1);
+      expect(result.value).toBe("OK");
+    } finally {
+      nowSpy.mockRestore();
+    }
+  });
+
+  it("keeps authentication circuits open past the temporary window", async () => {
+    await expect(
+      executeProviderModelRequest({
+        candidateModels: ["model-a"],
+        capability: "llm",
+        provider: "gemini",
+        request: jest.fn().mockRejectedValue(providerError("authentication")),
+        retryDelayMs: 0,
+      }),
+    ).rejects.toThrow("authentication");
+
+    const nowSpy = jest
+      .spyOn(Date, "now")
+      .mockReturnValue(Date.now() + 60 * 60_000);
+    try {
+      expect(getProviderCircuitState("gemini", "llm")).toMatchObject({
+        failureKind: "authentication",
+      });
+    } finally {
+      nowSpy.mockRestore();
+    }
+  });
+
   it("does not open a provider circuit for model-scoped quota", async () => {
     await expect(
       executeProviderModelRequest({

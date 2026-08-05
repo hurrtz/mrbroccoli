@@ -140,6 +140,28 @@ describe("buildProviderHttpError", () => {
     );
   });
 
+  it("classifies per-minute quota wording as transient rate limiting", () => {
+    const error = buildProviderHttpError({
+      provider: "gemini",
+      language: "en",
+      status: 429,
+      errorText: JSON.stringify({
+        error: {
+          message:
+            "RESOURCE_EXHAUSTED: Quota exceeded for requests per minute. Retry shortly.",
+        },
+      }),
+      action: "reply",
+    });
+
+    expect(error).toEqual(
+      expect.objectContaining<Partial<ProviderRequestError>>({
+        failureKind: "rate-limit",
+        status: 429,
+      }),
+    );
+  });
+
   it("distinguishes exhausted plan quota from transient rate limiting", () => {
     const error = buildProviderHttpError({
       provider: "gemini",

@@ -697,7 +697,23 @@ export function getProviderCircuitState(
   provider: Provider,
   capability: ResilientProviderCapability,
 ) {
-  return providerCircuits.get(providerCircuitKey(provider, capability)) ?? null;
+  const state =
+    providerCircuits.get(providerCircuitKey(provider, capability)) ?? null;
+
+  if (
+    state &&
+    state.failureKind === "quota" &&
+    Date.now() - state.openedAt >= TEMPORARY_CIRCUIT_MS
+  ) {
+    // Quota exhaustion is frequently transient (daily windows, provider-side
+    // resets, or ambiguous wording), so its circuit self-heals after a bounded
+    // pause. Authentication and credit circuits require user action and stay
+    // open until the key changes or the user re-validates.
+    clearProviderCircuit(provider, capability);
+    return null;
+  }
+
+  return state;
 }
 
 export function subscribeToProviderCircuitChanges(listener: () => void) {
