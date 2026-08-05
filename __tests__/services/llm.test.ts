@@ -412,9 +412,9 @@ describe("streamChat", () => {
     );
   });
 
-  it("surfaces errors delivered inside an OpenAI-compatible stream", async () => {
+  it("retries after an error-only stream event that produced no content", async () => {
     const encoder = new TextEncoder();
-    const stream = new ReadableStream({
+    const errorStream = new ReadableStream({
       start(controller) {
         controller.enqueue(
           encoder.encode(
@@ -424,7 +424,21 @@ describe("streamChat", () => {
         controller.close();
       },
     });
-    (fetch as jest.Mock).mockResolvedValueOnce({ ok: true, body: stream });
+    const successStream = new ReadableStream({
+      start(controller) {
+        controller.enqueue(
+          encoder.encode(
+            'data: {"choices":[{"delta":{"content":"Recovered"},"finish_reason":"stop"}]}\n\n',
+          ),
+        );
+        controller.enqueue(encoder.encode("data: [DONE]\n\n"));
+        controller.close();
+      },
+    });
+    (fetch as jest.Mock)
+      .mockResolvedValueOnce({ ok: true, body: errorStream })
+      .mockResolvedValueOnce({ ok: true, body: successStream });
+    const onDone = jest.fn();
     const onError = jest.fn();
 
     await streamChat({
@@ -437,15 +451,16 @@ describe("streamChat", () => {
       responseTone: "professional",
       language: "en",
       onChunk: () => {},
-      onDone: () => {},
+      onDone,
       onError,
     });
 
-    expect(onError).toHaveBeenCalledWith(
-      expect.objectContaining({
-        message: expect.stringContaining("rate limiting"),
-      }),
-    );
+    // The error-only first event must not count as received stream data, so
+    // the transient rate limit is retried instead of ending the turn.
+    expect(fetch).toHaveBeenCalledTimes(2);
+    expect(onError).not.toHaveBeenCalled();
+    expect(onDone).toHaveBeenCalledTimes(1);
+    expect(onDone.mock.calls[0][0]).toBe("Recovered");
     expect((fetch as jest.Mock).mock.calls[0][0]).toBe(
       "https://dashscope-us.aliyuncs.com/compatible-mode/v1/chat/completions",
     );
@@ -660,8 +675,65 @@ describe("streamChat", () => {
     expect(fetch).toHaveBeenCalledTimes(1);
     expect(onDone).not.toHaveBeenCalled();
     expect(onError).toHaveBeenCalledWith(
-      expect.objectContaining({ message: "connection failed mid-stream" }),
+      expect.objectContaining({
+        message: expect.stringContaining("connection failed mid-stream"),
+      }),
     );
+  });
+
+  it("retries an Anthropic overloaded stream error that produced no content", async () => {
+    const encoder = new TextEncoder();
+    const errorStream = new ReadableStream({
+      start(controller) {
+        controller.enqueue(
+          encoder.encode(
+            'event: error\ndata: {"type":"error","error":{"type":"overloaded_error","message":"Overloaded"}}\n\n',
+          ),
+        );
+        controller.close();
+      },
+    });
+    const successStream = new ReadableStream({
+      start(controller) {
+        controller.enqueue(
+          encoder.encode(
+            'event: content_block_delta\ndata: {"type":"content_block_delta","delta":{"type":"text_delta","text":"Recovered"}}\n\n',
+          ),
+        );
+        controller.enqueue(
+          encoder.encode(
+            'event: message_stop\ndata: {"type":"message_stop"}\n\n',
+          ),
+        );
+        controller.close();
+      },
+    });
+    (fetch as jest.Mock)
+      .mockResolvedValueOnce({ ok: true, body: errorStream })
+      .mockResolvedValueOnce({ ok: true, body: successStream });
+    const onDone = jest.fn();
+    const onError = jest.fn();
+
+    await streamChat({
+      messages: mockMessages,
+      model: "claude-fable-5",
+      provider: "anthropic",
+      apiKey: "sk-ant-test-key",
+      assistantInstructions: "",
+      responseLength: "normal",
+      responseTone: "professional",
+      language: "en",
+      onChunk: jest.fn(),
+      onDone,
+      onError,
+    });
+
+    // overloaded_error now classifies like a 5xx capacity failure, so a
+    // stream that delivered nothing is retried instead of failing the turn.
+    expect(fetch).toHaveBeenCalledTimes(2);
+    expect(onError).not.toHaveBeenCalled();
+    expect(onDone).toHaveBeenCalledTimes(1);
+    expect(onDone.mock.calls[0][0]).toBe("Recovered");
   });
 
   it("reports an error when a provider stream completes without text", async () => {

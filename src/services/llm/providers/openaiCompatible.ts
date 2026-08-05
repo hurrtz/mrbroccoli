@@ -103,6 +103,26 @@ function buildIncompleteReplyError(provider: Provider, language: AppLanguage) {
   );
 }
 
+function extractStreamErrorStatus(error: unknown) {
+  // OpenRouter and several OpenAI-compatible hosts put the upstream HTTP
+  // status in error.code (number); some use error.status. Without it, failure
+  // classification falls back to message keywords alone.
+  if (error && typeof error === "object") {
+    const candidate =
+      (error as { code?: unknown }).code ??
+      (error as { status?: unknown }).status;
+    if (
+      typeof candidate === "number" &&
+      Number.isInteger(candidate) &&
+      candidate >= 400 &&
+      candidate <= 599
+    ) {
+      return candidate;
+    }
+  }
+  return 400;
+}
+
 function isSuccessfulFinishReason(finishReason: unknown) {
   return (
     finishReason === null ||
@@ -429,16 +449,19 @@ export async function requestChatStreamWithOpenAiCompatibleTransport(params: {
     }
 
     const payload = JSON.parse(data);
-    onStreamActivity?.();
     if (payload?.error) {
+      // An error-only event is not stream progress: activity must not be
+      // recorded first, or the caller marks data as received and refuses
+      // retry/failover for a turn that produced nothing.
       throw buildProviderHttpError({
         provider,
         language,
-        status: 400,
+        status: extractStreamErrorStatus(payload.error),
         errorText: JSON.stringify(payload),
         action: "reply",
       });
     }
+    onStreamActivity?.();
 
     if (provider === "openrouter") {
       const routingMetadata = extractOpenRouterRoutingMetadata(payload, model);

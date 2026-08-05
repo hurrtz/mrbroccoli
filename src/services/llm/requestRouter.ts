@@ -188,6 +188,7 @@ export const LLM_STREAM_REQUESTERS = {
       language: params.language,
       systemPrompt: params.systemPrompt,
       onChunk: params.onChunk,
+      onStreamActivity: params.onStreamActivity,
       onAssistantContent: params.onGeminiAssistantContent,
       abortSignal: params.abortSignal,
     }),
@@ -211,6 +212,7 @@ export const LLM_STREAM_REQUESTERS = {
       language: params.language,
       systemPrompt: params.systemPrompt,
       onChunk: params.onChunk,
+      onStreamActivity: params.onStreamActivity,
       abortSignal: params.abortSignal,
     }),
 } as const;

@@ -102,6 +102,26 @@ export async function requestAnthropicChat(params: {
   );
 }
 
+const ANTHROPIC_STREAM_ERROR_STATUSES: Record<string, number> = {
+  invalid_request_error: 400,
+  authentication_error: 401,
+  billing_error: 402,
+  permission_error: 403,
+  not_found_error: 404,
+  request_too_large: 413,
+  rate_limit_error: 429,
+  api_error: 500,
+  overloaded_error: 529,
+};
+
+function anthropicStreamErrorStatus(errorType: unknown) {
+  return (
+    (typeof errorType === "string" &&
+      ANTHROPIC_STREAM_ERROR_STATUSES[errorType]) ||
+    400
+  );
+}
+
 async function requestAnthropicChatStreamOnce(params: {
   model: string;
   modelEffort?: string;
@@ -110,6 +130,7 @@ async function requestAnthropicChatStreamOnce(params: {
   language: AppLanguage;
   systemPrompt: string;
   onChunk: (text: string) => void;
+  onStreamActivity?: () => void;
   abortSignal?: AbortSignal;
 }) {
   const {
@@ -119,6 +140,7 @@ async function requestAnthropicChatStreamOnce(params: {
     apiKey,
     systemPrompt,
     onChunk,
+    onStreamActivity,
     abortSignal,
   } = params;
   let response: Awaited<ReturnType<typeof networkFetch>>;
@@ -195,12 +217,19 @@ async function requestAnthropicChatStreamOnce(params: {
     const payload = JSON.parse(data);
 
     if (type === "error") {
-      throw new Error(
-        typeof payload?.error?.message === "string"
-          ? payload.error.message
-          : "Anthropic stream failed.",
-      );
+      // Classify stream errors like their HTTP equivalents so retry and
+      // failover treat an overloaded_error the same as a 5xx response
+      // instead of a terminal unlocalized failure.
+      throw buildProviderHttpError({
+        provider: "anthropic",
+        language: params.language,
+        status: anthropicStreamErrorStatus(payload?.error?.type),
+        errorText: JSON.stringify(payload),
+        action: "reply",
+      });
     }
+
+    onStreamActivity?.();
 
     if (type === "message_delta") {
       stopReason =
@@ -253,6 +282,7 @@ export async function requestAnthropicChatStream(params: {
   language: AppLanguage;
   systemPrompt: string;
   onChunk: (text: string) => void;
+  onStreamActivity?: () => void;
   abortSignal?: AbortSignal;
 }) {
   let fullText = "";

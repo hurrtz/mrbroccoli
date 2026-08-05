@@ -251,6 +251,7 @@ export async function streamChat({
               ](
                 {
                   ...requestParams,
+                  onStreamActivity,
                   onGeminiAssistantContent: (content) => {
                     replyMetadata = {
                       ...replyMetadata,
@@ -269,7 +270,10 @@ export async function streamChat({
                 await LLM_STREAM_REQUESTERS["openai-realtime"](requestParams);
               break;
             case "anthropic":
-              fullText = await LLM_STREAM_REQUESTERS.anthropic(requestParams);
+              fullText = await LLM_STREAM_REQUESTERS.anthropic({
+                ...requestParams,
+                onStreamActivity,
+              });
               break;
             default:
               throw buildProviderNotWiredUpError(provider, language);

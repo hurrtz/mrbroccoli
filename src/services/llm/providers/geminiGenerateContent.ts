@@ -270,6 +270,7 @@ export async function requestGeminiGenerateContentChatStream(params: {
   language: AppLanguage;
   systemPrompt: string;
   onChunk: (text: string) => void;
+  onStreamActivity?: () => void;
   onAssistantContent?: (parts: GeminiAssistantContentPart[]) => void;
   abortSignal?: AbortSignal;
 }) {
@@ -344,6 +345,25 @@ export async function requestGeminiGenerateContentChatStream(params: {
     }
 
     const payload = JSON.parse(data);
+    if (payload?.error) {
+      // Streamed Gemini failures carry the HTTP status in error.code; an
+      // error-only frame is not stream progress and must classify like an
+      // HTTP failure so retry/failover can react.
+      throw buildProviderHttpError({
+        provider: params.provider,
+        language: params.language,
+        status:
+          typeof payload.error.code === "number" &&
+          Number.isInteger(payload.error.code) &&
+          payload.error.code >= 400 &&
+          payload.error.code <= 599
+            ? payload.error.code
+            : 400,
+        errorText: JSON.stringify(payload),
+        action: "reply",
+      });
+    }
+    params.onStreamActivity?.();
     finishReason = getGeminiFinishReason(payload) ?? finishReason;
     const chunkParts = extractGeminiGenerateContentParts(payload);
     assistantContent.push(...chunkParts);
