@@ -235,6 +235,38 @@ describe("Kokoro TTS service", () => {
     );
   });
 
+  it("fails Kokoro download and extraction closed on checksum mismatch", async () => {
+    await downloadKokoroModel();
+
+    const downloadOptions = mockDownloadModel.mock.calls[0][2] as {
+      onChecksumIssue?: (issue: unknown) => Promise<boolean>;
+    };
+    expect(typeof downloadOptions.onChecksumIssue).toBe("function");
+    await expect(
+      downloadOptions.onChecksumIssue?.({ reason: "CHECKSUM_MISMATCH" }),
+    ).resolves.toBe(false);
+
+    // The iOS foreground fallback extracts the archive separately; that path
+    // must reject checksum issues the same way.
+    mockDownloadModel.mockRejectedValueOnce(new Error("unknown error"));
+    mockForegroundDownload.mockImplementationOnce(() => ({
+      jobId: 11,
+      promise: Promise.resolve({
+        jobId: 11,
+        statusCode: 200,
+        bytesWritten: 147_031_220,
+      }),
+    }));
+    await downloadKokoroModel();
+    const extractOptions = mockExtractModel.mock.calls.at(-1)?.[2] as {
+      onChecksumIssue?: (issue: unknown) => Promise<boolean>;
+    };
+    expect(typeof extractOptions.onChecksumIssue).toBe("function");
+    await expect(
+      extractOptions.onChecksumIssue?.({ reason: "CHECKSUM_FAILED" }),
+    ).resolves.toBe(false);
+  });
+
   it("does not start a model download without enough installation space", async () => {
     mockGetFSInfo.mockResolvedValueOnce({
       freeSpace: 100_000_000,

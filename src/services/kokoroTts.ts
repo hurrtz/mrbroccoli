@@ -295,6 +295,9 @@ async function downloadKokoroModelInForeground(params?: {
     await extractModelByCategory(ModelCategory.Tts, KOKORO_MODEL_ID, {
       signal: params?.abortSignal,
       deleteArchiveAfterExtract: true,
+      // Checksum issues must fail closed instead of reaching the library's
+      // interactive keep-file prompt.
+      onChecksumIssue: async () => false,
       onProgress: (progress) => {
         params?.onProgress?.({
           phase: "extracting",
@@ -567,6 +570,9 @@ export async function downloadKokoroModel(params?: {
     await downloadModelByCategory(ModelCategory.Tts, KOKORO_MODEL_ID, {
       signal: params?.abortSignal,
       deleteArchiveAfterExtract: true,
+      // Checksum issues must fail closed instead of reaching the library's
+      // interactive keep-file prompt.
+      onChecksumIssue: async () => false,
       onProgress: (progress) => {
         params?.onProgress?.({
           phase: progress.phase ?? "downloading",

@@ -146,6 +146,39 @@ describe("local model manager", () => {
     expect(mockDownloadSherpaModel).not.toHaveBeenCalled();
   });
 
+  it("fails a Sherpa download closed on checksum mismatch instead of prompting", async () => {
+    const model = getLocalModel("whisper-tiny");
+    if (model.capability !== "stt") {
+      throw new Error("Whisper catalogue entry must be an STT model");
+    }
+    mockGetRemoteModel.mockResolvedValue({
+      id: model.runtimeModelId,
+      bytes: model.downloadBytes,
+      sha256: model.sha256,
+    });
+    mockDownloadSherpaModel.mockResolvedValue({ localPath: "/documents/models/whisper" });
+    mockIsSherpaModelDownloaded.mockResolvedValue(true);
+    mockListDownloadedModels.mockResolvedValue([
+      {
+        id: model.runtimeModelId,
+        bytes: model.downloadBytes,
+        sha256: model.sha256,
+      },
+    ]);
+
+    await downloadLocalModel(model.id);
+
+    const options = mockDownloadSherpaModel.mock.calls[0][2] as {
+      onChecksumIssue?: (issue: unknown) => Promise<boolean>;
+    };
+    expect(typeof options.onChecksumIssue).toBe("function");
+    // A checksum issue must always be rejected so the library deletes the
+    // artifact and throws instead of showing its interactive keep-file prompt.
+    await expect(
+      options.onChecksumIssue?.({ reason: "CHECKSUM_MISMATCH" }),
+    ).resolves.toBe(false);
+  });
+
   it("accepts an installed Sherpa model only when its manifest is pinned", async () => {
     const model = getLocalModel("whisper-tiny");
     if (model.capability !== "stt") {

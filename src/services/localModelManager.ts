@@ -219,6 +219,10 @@ export async function downloadLocalModel(
     {
       signal: options?.abortSignal,
       deleteArchiveAfterExtract: true,
+      // Never fall back to the library's interactive keep-file prompt: a
+      // checksum mismatch must always fail closed so an unverified artifact
+      // can never be recorded as installed.
+      onChecksumIssue: async () => false,
       onProgress: (progress) =>
         options?.onProgress?.({
           phase: progress.phase ?? "downloading",
