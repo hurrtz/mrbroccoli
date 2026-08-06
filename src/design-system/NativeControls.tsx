@@ -282,6 +282,10 @@ export interface DialogAction {
 
 const SHEET_MAX_HEIGHT_RATIO = 0.85;
 const SHEET_ANIMATION_DURATION = 220;
+// Slightly longer than the animation so the real completion callback always
+// wins under normal conditions; this only fires if that callback is
+// suppressed (app backgrounded mid-animation, native driver interrupted).
+const SHEET_ANIMATION_FAILSAFE_DURATION = SHEET_ANIMATION_DURATION + 100;
 
 interface DialogProps {
   children?: React.ReactNode;
@@ -369,8 +373,24 @@ export function Modal({
       }
     });
 
+    // Failsafe: the completion callback above is the normal unmount path,
+    // but it can be suppressed (app backgrounded mid-animation, native
+    // driver interrupted). Without this, a suppressed callback leaves
+    // sheetRendered stuck true forever: the sheet stays mounted, invisible
+    // and off-screen, holding the native modal stack and swallowing the
+    // Android back press. Whichever timer fires first wins; the other is a
+    // no-op because sheetRendered is already false.
+    const failsafeTimer = visible
+      ? null
+      : setTimeout(() => {
+          setSheetRendered(false);
+        }, SHEET_ANIMATION_FAILSAFE_DURATION);
+
     return () => {
       animation.stop();
+      if (failsafeTimer) {
+        clearTimeout(failsafeTimer);
+      }
     };
   }, [isSheet, reduceMotion, sheetProgress, visible]);
 

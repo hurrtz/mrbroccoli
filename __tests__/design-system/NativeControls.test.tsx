@@ -1,5 +1,5 @@
 import React from "react";
-import { StyleSheet, useWindowDimensions } from "react-native";
+import { Animated, StyleSheet, useWindowDimensions } from "react-native";
 import { act, fireEvent, render } from "@testing-library/react-native";
 
 const mockIsReduceMotionEnabled = jest.fn().mockResolvedValue(false);
@@ -352,5 +352,126 @@ describe("NativeControls", () => {
 
     expect(screen.queryByTestId("native-dialog-card")).toBeNull();
     jest.useRealTimers();
+  });
+
+  it("keeps the sheet in sync when it rotates out of the sheet layout mid-exit and back", async () => {
+    // Regression: a rotation to landscape mid-close takes the effect's
+    // isSheet=false branch, which never touches sheetProgress again (no new
+    // Animated.timing, no setValue). Only the effect's own cleanup can clear
+    // the in-flight close's failsafe timer in that branch; without it, the
+    // stale timer keeps counting down in the background and can still fire
+    // on a later render, force-unmounting a sheet a subsequent reopen just
+    // remounted. (The animation object itself is self-healing here: RN's
+    // Animated.Value stops any previously attached animation the instant a
+    // later render touches sheetProgress again via a fresh .start() or
+    // .setValue(); the plain setTimeout backing the failsafe has no such
+    // protection, which is exactly why it needs the explicit clearTimeout.)
+    jest.useFakeTimers();
+    setViewport(390, 844);
+    mockIsReduceMotionEnabled.mockResolvedValue(false);
+
+    const screen = renderControl(
+      <Modal visible layout="sheet" title="Premium">
+        Content
+      </Modal>,
+    );
+    await act(async () => {});
+
+    // Start closing while still a portrait sheet.
+    screen.rerender(
+      <ThemeProvider mode="light">
+        <Modal visible={false} layout="sheet" title="Premium">
+          Content
+        </Modal>
+      </ThemeProvider>,
+    );
+    await act(async () => {
+      jest.advanceTimersByTime(50);
+    });
+
+    // Rotate to landscape mid-close: isSheet becomes false.
+    setViewport(844, 390);
+    screen.rerender(
+      <ThemeProvider mode="light">
+        <Modal visible={false} layout="sheet" title="Premium">
+          Content
+        </Modal>
+      </ThemeProvider>,
+    );
+    await act(async () => {});
+
+    // Rotate back to portrait and reopen in the same beat.
+    setViewport(390, 844);
+    screen.rerender(
+      <ThemeProvider mode="light">
+        <Modal visible layout="sheet" title="Premium">
+          Content
+        </Modal>
+      </ThemeProvider>,
+    );
+    await act(async () => {});
+
+    // Let enough time pass for the original close animation's 220ms window
+    // to elapse, plus the failsafe margin, so a stale, uncancelled callback
+    // has every opportunity to fire and mis-unmount the reopened sheet.
+    await act(async () => {
+      jest.advanceTimersByTime(500);
+    });
+
+    expect(screen.queryByTestId("native-dialog-card")).toBeTruthy();
+    jest.useRealTimers();
+  });
+
+  it("force-unmounts the sheet on a failsafe timer when the animation callback never arrives", async () => {
+    // Regression: unmount used to be gated solely on the animation's
+    // completion callback. If that callback is suppressed (app backgrounded
+    // mid-animation, native driver interrupted), sheetRendered would stay
+    // true forever, holding the native modal stack open indefinitely.
+    jest.useFakeTimers();
+    setViewport(390, 844);
+    mockIsReduceMotionEnabled.mockResolvedValue(false);
+
+    // Simulate a suppressed completion callback: the animation "starts" but
+    // its callback is never invoked, and .stop() is a no-op spy so this
+    // double stands in for an animation that never resolves on its own.
+    const start = jest.fn();
+    const stop = jest.fn();
+    const timingSpy = jest
+      .spyOn(Animated, "timing")
+      .mockReturnValue({ start, stop } as unknown as ReturnType<
+        typeof Animated.timing
+      >);
+
+    try {
+      const screen = renderControl(
+        <Modal visible layout="sheet" title="Premium">
+          Content
+        </Modal>,
+      );
+      await act(async () => {});
+
+      screen.rerender(
+        <ThemeProvider mode="light">
+          <Modal visible={false} layout="sheet" title="Premium">
+            Content
+          </Modal>
+        </ThemeProvider>,
+      );
+      await act(async () => {});
+
+      expect(start).toHaveBeenCalled();
+      expect(screen.queryByTestId("native-dialog-card")).toBeTruthy();
+
+      // The animation's own completion callback never fires (the stub above
+      // never invokes it). Only the failsafe timer can unmount the sheet.
+      await act(async () => {
+        jest.advanceTimersByTime(400);
+      });
+
+      expect(screen.queryByTestId("native-dialog-card")).toBeNull();
+    } finally {
+      timingSpy.mockRestore();
+      jest.useRealTimers();
+    }
   });
 });
