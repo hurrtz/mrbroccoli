@@ -55,6 +55,13 @@ initial default, but must not permanently couple those settings.
   transliteration decision is recorded.
 - Provider and model brand names are not translated unless the brand supplies
   a localized name.
+- Copy that names an app store must name only the current platform's store
+  (App Store on iOS, Play Store on Android) via a literal
+  `Platform.select({ ios, default })` in the dictionary, never a helper
+  wrapper. App Review guideline 2.3.10 rejects iOS binaries containing Google
+  Play references, and platform shaking only strips the other platform's
+  string from the release bundle when the call is literal. Guarded by
+  `__tests__/i18n/premiumRestoreHint.test.ts`.
 
 ## Direction and Layout
 

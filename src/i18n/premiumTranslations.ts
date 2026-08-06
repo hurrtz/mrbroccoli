@@ -1,5 +1,12 @@
+import { Platform } from "react-native";
+
 import type { TranslationParams } from "./types";
 import { editionTranslations } from "./editionTranslations";
+
+// App Review guideline 2.3.10: each store binary may only mention its own
+// store. Platform.select is required verbatim so babel-preset-expo platform
+// shaking removes the other store's wording from the release bundle; do not
+// wrap it in a helper.
 
 const en = {
   ...editionTranslations.en,
@@ -10,8 +17,11 @@ const en = {
   premiumBuy: "Buy Premium",
   premiumBuyPrice: ({ price }: TranslationParams) => `Buy Premium · ${price}`,
   restorePurchase: "Restore purchase",
-  premiumRestoreHint:
-    "A permanent purchase is restored through the same App Store or Play Store account on this platform. No Mr Broccoli account is required.",
+  premiumRestoreHint: Platform.select({
+    ios: "A permanent purchase is restored through the same App Store account on this platform. No Mr Broccoli account is required.",
+    default:
+      "A permanent purchase is restored through the same Play Store account on this platform. No Mr Broccoli account is required.",
+  }),
   premiumUnlocked: "Premium is unlocked",
   developmentEntitlement: "Development entitlement",
   developmentEntitlementHint:
@@ -56,8 +66,11 @@ const rawPremiumTranslations = {
     premiumBuy: "Premium kaufen",
     premiumBuyPrice: ({ price }) => `Premium kaufen · ${price}`,
     restorePurchase: "Kauf wiederherstellen",
-    premiumRestoreHint:
-      "Ein dauerhafter Kauf wird über dasselbe App-Store- oder Play-Store-Konto auf dieser Plattform wiederhergestellt. Ein Mr Broccoli Konto ist nicht erforderlich.",
+    premiumRestoreHint: Platform.select({
+      ios: "Ein dauerhafter Kauf wird über dasselbe App-Store-Konto auf dieser Plattform wiederhergestellt. Ein Mr Broccoli Konto ist nicht erforderlich.",
+      default:
+        "Ein dauerhafter Kauf wird über dasselbe Play-Store-Konto auf dieser Plattform wiederhergestellt. Ein Mr Broccoli Konto ist nicht erforderlich.",
+    }),
     premiumUnlocked: "Premium ist freigeschaltet",
     developmentEntitlement: "Entwicklungsberechtigung",
     developmentEntitlementHint:
@@ -96,8 +109,11 @@ const rawPremiumTranslations = {
     premiumBuy: "Купити Premium",
     premiumBuyPrice: ({ price }) => `Купити Premium · ${price}`,
     restorePurchase: "Відновити покупку",
-    premiumRestoreHint:
-      "Постійна покупка відновлюється через той самий обліковий запис App Store або Play Store на цій платформі. Обліковий запис Mr Broccoli не потрібен.",
+    premiumRestoreHint: Platform.select({
+      ios: "Постійна покупка відновлюється через той самий обліковий запис App Store на цій платформі. Обліковий запис Mr Broccoli не потрібен.",
+      default:
+        "Постійна покупка відновлюється через той самий обліковий запис Play Store на цій платформі. Обліковий запис Mr Broccoli не потрібен.",
+    }),
     premiumUnlocked: "Premium розблоковано",
     developmentEntitlement: "Право доступу для розробки",
     developmentEntitlementHint:
@@ -135,8 +151,11 @@ const rawPremiumTranslations = {
     premiumBuy: "प्रीमियम खरीदें",
     premiumBuyPrice: ({ price }) => `प्रीमियम खरीदें · ${price}`,
     restorePurchase: "खरीद बहाल करें",
-    premiumRestoreHint:
-      "स्थायी खरीद इसी प्लेटफ़ॉर्म पर उसी App Store या Play Store खाते से बहाल होती है। Mr Broccoli खाते की जरूरत नहीं है।",
+    premiumRestoreHint: Platform.select({
+      ios: "स्थायी खरीद इसी प्लेटफ़ॉर्म पर उसी App Store खाते से बहाल होती है। Mr Broccoli खाते की जरूरत नहीं है।",
+      default:
+        "स्थायी खरीद इसी प्लेटफ़ॉर्म पर उसी Play Store खाते से बहाल होती है। Mr Broccoli खाते की जरूरत नहीं है।",
+    }),
     premiumUnlocked: "प्रीमियम अनलॉक है",
     developmentEntitlement: "डेवलपमेंट अधिकार",
     developmentEntitlementHint:
@@ -175,8 +194,11 @@ const rawPremiumTranslations = {
     premiumBuy: "Comprar Premium",
     premiumBuyPrice: ({ price }) => `Comprar Premium · ${price}`,
     restorePurchase: "Restaurar compra",
-    premiumRestoreHint:
-      "La compra permanente se restaura con la misma cuenta de App Store o Play Store en esta plataforma. No hace falta una cuenta de Mr Broccoli.",
+    premiumRestoreHint: Platform.select({
+      ios: "La compra permanente se restaura con la misma cuenta de App Store en esta plataforma. No hace falta una cuenta de Mr Broccoli.",
+      default:
+        "La compra permanente se restaura con la misma cuenta de Play Store en esta plataforma. No hace falta una cuenta de Mr Broccoli.",
+    }),
     premiumUnlocked: "Premium está desbloqueado",
     developmentEntitlement: "Acceso de desarrollo",
     developmentEntitlementHint:
@@ -215,8 +237,11 @@ const rawPremiumTranslations = {
     premiumBuy: "Acheter Premium",
     premiumBuyPrice: ({ price }) => `Acheter Premium · ${price}`,
     restorePurchase: "Restaurer l’achat",
-    premiumRestoreHint:
-      "L’achat permanent est restauré avec le même compte App Store ou Play Store sur cette plateforme. Aucun compte Mr Broccoli n’est requis.",
+    premiumRestoreHint: Platform.select({
+      ios: "L’achat permanent est restauré avec le même compte App Store sur cette plateforme. Aucun compte Mr Broccoli n’est requis.",
+      default:
+        "L’achat permanent est restauré avec le même compte Play Store sur cette plateforme. Aucun compte Mr Broccoli n’est requis.",
+    }),
     premiumUnlocked: "Premium est débloqué",
     developmentEntitlement: "Accès de développement",
     developmentEntitlementHint:
@@ -255,8 +280,11 @@ const rawPremiumTranslations = {
     premiumBuy: "Acquista Premium",
     premiumBuyPrice: ({ price }) => `Acquista Premium · ${price}`,
     restorePurchase: "Ripristina acquisto",
-    premiumRestoreHint:
-      "L’acquisto permanente viene ripristinato con lo stesso account App Store o Play Store su questa piattaforma. Non serve un account Mr Broccoli.",
+    premiumRestoreHint: Platform.select({
+      ios: "L’acquisto permanente viene ripristinato con lo stesso account App Store su questa piattaforma. Non serve un account Mr Broccoli.",
+      default:
+        "L’acquisto permanente viene ripristinato con lo stesso account Play Store su questa piattaforma. Non serve un account Mr Broccoli.",
+    }),
     premiumUnlocked: "Premium è sbloccato",
     developmentEntitlement: "Accesso di sviluppo",
     developmentEntitlementHint:
@@ -294,8 +322,11 @@ const rawPremiumTranslations = {
     premiumBuy: "Comprar Premium",
     premiumBuyPrice: ({ price }) => `Comprar Premium · ${price}`,
     restorePurchase: "Restaurar compra",
-    premiumRestoreHint:
-      "A compra permanente é restaurada com a mesma conta da App Store ou Play Store nesta plataforma. Não é necessária uma conta Mr Broccoli.",
+    premiumRestoreHint: Platform.select({
+      ios: "A compra permanente é restaurada com a mesma conta da App Store nesta plataforma. Não é necessária uma conta Mr Broccoli.",
+      default:
+        "A compra permanente é restaurada com a mesma conta da Play Store nesta plataforma. Não é necessária uma conta Mr Broccoli.",
+    }),
     premiumUnlocked: "Premium está desbloqueado",
     developmentEntitlement: "Acesso de desenvolvimento",
     developmentEntitlementHint:
@@ -333,8 +364,11 @@ const rawPremiumTranslations = {
     premiumBuy: "Comprar Premium",
     premiumBuyPrice: ({ price }) => `Comprar Premium · ${price}`,
     restorePurchase: "Restaurar compra",
-    premiumRestoreHint:
-      "A compra permanente é restaurada com a mesma conta da App Store ou Play Store nesta plataforma. Não é necessária uma conta Mr Broccoli.",
+    premiumRestoreHint: Platform.select({
+      ios: "A compra permanente é restaurada com a mesma conta da App Store nesta plataforma. Não é necessária uma conta Mr Broccoli.",
+      default:
+        "A compra permanente é restaurada com a mesma conta da Play Store nesta plataforma. Não é necessária uma conta Mr Broccoli.",
+    }),
     premiumUnlocked: "Premium está desbloqueado",
     developmentEntitlement: "Acesso de desenvolvimento",
     developmentEntitlementHint:
@@ -372,8 +406,11 @@ const rawPremiumTranslations = {
     premiumBuy: "Купить Premium",
     premiumBuyPrice: ({ price }) => `Купить Premium · ${price}`,
     restorePurchase: "Восстановить покупку",
-    premiumRestoreHint:
-      "Постоянная покупка восстанавливается через ту же учётную запись App Store или Play Store на этой платформе. Учётная запись Mr Broccoli не нужна.",
+    premiumRestoreHint: Platform.select({
+      ios: "Постоянная покупка восстанавливается через ту же учётную запись App Store на этой платформе. Учётная запись Mr Broccoli не нужна.",
+      default:
+        "Постоянная покупка восстанавливается через ту же учётную запись Play Store на этой платформе. Учётная запись Mr Broccoli не нужна.",
+    }),
     premiumUnlocked: "Premium разблокирован",
     developmentEntitlement: "Доступ для разработки",
     developmentEntitlementHint:
@@ -411,8 +448,10 @@ const rawPremiumTranslations = {
     premiumBuy: "购买高级版",
     premiumBuyPrice: ({ price }) => `购买高级版 · ${price}`,
     restorePurchase: "恢复购买",
-    premiumRestoreHint:
-      "永久购买可通过本平台上相同的 App Store 或 Play Store 帐户恢复，无需 Mr Broccoli 帐户。",
+    premiumRestoreHint: Platform.select({
+      ios: "永久购买可通过本平台上相同的 App Store 帐户恢复，无需 Mr Broccoli 帐户。",
+      default: "永久购买可通过本平台上相同的 Play Store 帐户恢复，无需 Mr Broccoli 帐户。",
+    }),
     premiumUnlocked: "高级版已解锁",
     developmentEntitlement: "开发版权限",
     developmentEntitlementHint:
@@ -448,8 +487,11 @@ const rawPremiumTranslations = {
     premiumBuy: "شراء Premium",
     premiumBuyPrice: ({ price }) => `شراء Premium · ${price}`,
     restorePurchase: "استعادة الشراء",
-    premiumRestoreHint:
-      "تُستعاد عملية الشراء الدائمة عبر حساب App Store أو Play Store نفسه على هذه المنصة، ولا يلزم حساب Mr Broccoli.",
+    premiumRestoreHint: Platform.select({
+      ios: "تُستعاد عملية الشراء الدائمة عبر حساب App Store نفسه على هذه المنصة، ولا يلزم حساب Mr Broccoli.",
+      default:
+        "تُستعاد عملية الشراء الدائمة عبر حساب Play Store نفسه على هذه المنصة، ولا يلزم حساب Mr Broccoli.",
+    }),
     premiumUnlocked: "تم فتح Premium",
     developmentEntitlement: "استحقاق إصدار التطوير",
     developmentEntitlementHint:
@@ -487,8 +529,11 @@ const rawPremiumTranslations = {
     premiumBuy: "Premiumを購入",
     premiumBuyPrice: ({ price }) => `Premiumを購入 · ${price}`,
     restorePurchase: "購入を復元",
-    premiumRestoreHint:
-      "永久購入は、このプラットフォームの同じApp StoreまたはPlay Storeアカウントで復元されます。Mr Broccoliアカウントは不要です。",
+    premiumRestoreHint: Platform.select({
+      ios: "永久購入は、このプラットフォームの同じApp Storeアカウントで復元されます。Mr Broccoliアカウントは不要です。",
+      default:
+        "永久購入は、このプラットフォームの同じPlay Storeアカウントで復元されます。Mr Broccoliアカウントは不要です。",
+    }),
     premiumUnlocked: "Premiumが解除されました",
     developmentEntitlement: "開発用アクセス権",
     developmentEntitlementHint:
@@ -527,8 +572,11 @@ const rawPremiumTranslations = {
     premiumBuy: "Premium megvásárlása",
     premiumBuyPrice: ({ price }) => `Premium megvásárlása · ${price}`,
     restorePurchase: "Vásárlás visszaállítása",
-    premiumRestoreHint:
-      "A végleges vásárlás ezen a platformon ugyanazzal az App Store- vagy Play Store-fiókkal állítható vissza. Mr Broccoli-fiók nem szükséges.",
+    premiumRestoreHint: Platform.select({
+      ios: "A végleges vásárlás ezen a platformon ugyanazzal az App Store-fiókkal állítható vissza. Mr Broccoli-fiók nem szükséges.",
+      default:
+        "A végleges vásárlás ezen a platformon ugyanazzal a Play Store-fiókkal állítható vissza. Mr Broccoli-fiók nem szükséges.",
+    }),
     premiumUnlocked: "Premium feloldva",
     developmentEntitlement: "Fejlesztői jogosultság",
     developmentEntitlementHint:
@@ -566,8 +614,11 @@ const rawPremiumTranslations = {
     premiumBuy: "Koupit Premium",
     premiumBuyPrice: ({ price }) => `Koupit Premium · ${price}`,
     restorePurchase: "Obnovit nákup",
-    premiumRestoreHint:
-      "Trvalý nákup se obnoví přes stejný účet App Store nebo Play Store na této platformě. Účet Mr Broccoli není potřeba.",
+    premiumRestoreHint: Platform.select({
+      ios: "Trvalý nákup se obnoví přes stejný účet App Store na této platformě. Účet Mr Broccoli není potřeba.",
+      default:
+        "Trvalý nákup se obnoví přes stejný účet Play Store na této platformě. Účet Mr Broccoli není potřeba.",
+    }),
     premiumUnlocked: "Premium je odemčeno",
     developmentEntitlement: "Vývojářské oprávnění",
     developmentEntitlementHint:
@@ -605,8 +656,11 @@ const rawPremiumTranslations = {
     premiumBuy: "Kup Premium",
     premiumBuyPrice: ({ price }) => `Kup Premium · ${price}`,
     restorePurchase: "Przywróć zakup",
-    premiumRestoreHint:
-      "Stały zakup jest przywracany przez to samo konto App Store lub Play Store na tej platformie. Konto Mr Broccoli nie jest wymagane.",
+    premiumRestoreHint: Platform.select({
+      ios: "Stały zakup jest przywracany przez to samo konto App Store na tej platformie. Konto Mr Broccoli nie jest wymagane.",
+      default:
+        "Stały zakup jest przywracany przez to samo konto Play Store na tej platformie. Konto Mr Broccoli nie jest wymagane.",
+    }),
     premiumUnlocked: "Premium jest odblokowane",
     developmentEntitlement: "Uprawnienie deweloperskie",
     developmentEntitlementHint:
@@ -644,8 +698,11 @@ const rawPremiumTranslations = {
     premiumBuy: "Premium satın al",
     premiumBuyPrice: ({ price }) => `Premium satın al · ${price}`,
     restorePurchase: "Satın almayı geri yükle",
-    premiumRestoreHint:
-      "Kalıcı satın alma bu platformdaki aynı App Store veya Play Store hesabıyla geri yüklenir. Mr Broccoli hesabı gerekmez.",
+    premiumRestoreHint: Platform.select({
+      ios: "Kalıcı satın alma bu platformdaki aynı App Store hesabıyla geri yüklenir. Mr Broccoli hesabı gerekmez.",
+      default:
+        "Kalıcı satın alma bu platformdaki aynı Play Store hesabıyla geri yüklenir. Mr Broccoli hesabı gerekmez.",
+    }),
     premiumUnlocked: "Premium açık",
     developmentEntitlement: "Geliştirme erişimi",
     developmentEntitlementHint:
@@ -684,8 +741,11 @@ const rawPremiumTranslations = {
     premiumBuy: "Köp Premium",
     premiumBuyPrice: ({ price }) => `Köp Premium · ${price}`,
     restorePurchase: "Återställ köp",
-    premiumRestoreHint:
-      "Det permanenta köpet återställs med samma App Store- eller Play Store-konto på denna plattform. Inget Mr Broccoli-konto krävs.",
+    premiumRestoreHint: Platform.select({
+      ios: "Det permanenta köpet återställs med samma App Store-konto på denna plattform. Inget Mr Broccoli-konto krävs.",
+      default:
+        "Det permanenta köpet återställs med samma Play Store-konto på denna plattform. Inget Mr Broccoli-konto krävs.",
+    }),
     premiumUnlocked: "Premium är upplåst",
     developmentEntitlement: "Utvecklarbehörighet",
     developmentEntitlementHint:
@@ -723,8 +783,11 @@ const rawPremiumTranslations = {
     premiumBuy: "پریمیم خریدیں",
     premiumBuyPrice: ({ price }) => `پریمیم خریدیں · ${price}`,
     restorePurchase: "خریداری بحال کریں",
-    premiumRestoreHint:
-      "مستقل خریداری اسی پلیٹ فارم پر اسی App Store یا Play Store اکاؤنٹ سے بحال ہوتی ہے۔ Mr Broccoli اکاؤنٹ درکار نہیں۔",
+    premiumRestoreHint: Platform.select({
+      ios: "مستقل خریداری اسی پلیٹ فارم پر اسی App Store اکاؤنٹ سے بحال ہوتی ہے۔ Mr Broccoli اکاؤنٹ درکار نہیں۔",
+      default:
+        "مستقل خریداری اسی پلیٹ فارم پر اسی Play Store اکاؤنٹ سے بحال ہوتی ہے۔ Mr Broccoli اکاؤنٹ درکار نہیں۔",
+    }),
     premiumUnlocked: "پریمیم کھل گیا",
     developmentEntitlement: "ڈیولپمنٹ استحقاق",
     developmentEntitlementHint:
