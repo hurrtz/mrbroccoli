@@ -133,56 +133,74 @@ describe("offline profile preparation", () => {
       ),
     );
 
-    await prepareOfflineProfile(profile, {
-      benchmarkCooldownMs: 0,
-      downloadCooldownMs: 0,
-      thermalPollIntervalMs: 0,
-    });
+    await prepareOfflineProfile(profile);
 
     expect(mockBenchmarkLocalLlm).not.toHaveBeenCalled();
     expect(mockBenchmarkLocalStt).not.toHaveBeenCalled();
     expect(mockBenchmarkLocalTts).not.toHaveBeenCalled();
   });
 
-  it("pauses before model work until thermal pressure clears", async () => {
-    const quickBenchmark = benchmark(profile.llm.id);
-    mockGetLocalModelBenchmarkResults.mockResolvedValue({
-      ...Object.fromEntries(
+  it("completes preparation while the device reports sustained pressure", async () => {
+    // Regression: the setup used to block in a cooling loop whenever low
+    // power mode, low memory, or serious thermal state was reported, so it
+    // never finished on phones with battery saver enabled.
+    mockGetLocalModelBenchmarkResults.mockResolvedValue({});
+    mockProbeLocalDeviceCapabilities.mockResolvedValue({
+      ...snapshot,
+      lowPowerMode: true,
+      thermalState: "serious",
+    });
+    const onProgress = jest.fn();
+
+    await prepareOfflineProfile(profile, { onProgress });
+
+    expect(mockBenchmarkLocalLlm).toHaveBeenCalled();
+    expect(
+      onProgress.mock.calls.some(
+        ([progress]) => progress.action === "cooling",
+      ),
+    ).toBe(false);
+  });
+
+  it("reports an inconclusive verdict for a model that missed targets under pressure", async () => {
+    mockGetLocalModelBenchmarkResults.mockResolvedValue(
+      Object.fromEntries(
         getOfflineProfileValidationModels(profile)
           .filter((model) => model.id !== profile.llm.id)
           .map((model) => [model.id, benchmark(model.id)]),
       ),
-    });
-    mockProbeLocalDeviceCapabilities
-      .mockResolvedValueOnce(snapshot)
-      .mockResolvedValueOnce({
-        ...snapshot,
-        thermalState: "serious",
-      })
-      .mockResolvedValueOnce(snapshot)
-      .mockResolvedValue(snapshot);
-    mockBenchmarkLocalLlm.mockResolvedValue(quickBenchmark);
-    const onProgress = jest.fn();
-
-    await prepareOfflineProfile(profile, {
-      benchmarkCooldownMs: 0,
-      downloadCooldownMs: 0,
-      onProgress,
-      thermalPollIntervalMs: 0,
-    });
-
-    expect(onProgress).toHaveBeenCalledWith(
-      expect.objectContaining({ action: "cooling", modelId: profile.llm.id }),
     );
-    expect(mockBenchmarkLocalLlm).toHaveBeenCalledTimes(1);
-    expect(
-      onProgress.mock.calls.findIndex(
-        ([progress]) => progress.action === "cooling",
+    mockProbeLocalDeviceCapabilities.mockResolvedValue({
+      ...snapshot,
+      thermalState: "critical",
+    });
+    mockBenchmarkLocalLlm.mockResolvedValue({
+      ...benchmark(profile.llm.id),
+      status: "below-target",
+      measuredUnderPressure: true,
+    });
+
+    await expect(prepareOfflineProfile(profile)).rejects.toThrow(
+      /could not be validated/,
+    );
+  });
+
+  it("keeps the honest slow verdict when the device was not under pressure", async () => {
+    mockGetLocalModelBenchmarkResults.mockResolvedValue(
+      Object.fromEntries(
+        getOfflineProfileValidationModels(profile)
+          .filter((model) => model.id !== profile.llm.id)
+          .map((model) => [model.id, benchmark(model.id)]),
       ),
-    ).toBeLessThan(
-      onProgress.mock.calls.findIndex(
-        ([progress]) => progress.action === "benchmarking",
-      ),
+    );
+    mockBenchmarkLocalLlm.mockResolvedValue({
+      ...benchmark(profile.llm.id),
+      status: "below-target",
+      measuredUnderPressure: false,
+    });
+
+    await expect(prepareOfflineProfile(profile)).rejects.toThrow(
+      /not fast enough/,
     );
   });
 });

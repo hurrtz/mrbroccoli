@@ -228,10 +228,12 @@ artifact. Device selection has four stages:
 3. load and benchmark the exact artifact on the current device; and
 4. construct one coherent offline profile from compatible LLM/STT/TTS routes.
 
-Temporary thermal or memory pressure pauses preparation rather than marking an
-artifact permanently incompatible. Model quality tiers and measured device
-performance influence automatic selection; explicit advanced overrides remain
-possible only for functionally viable models.
+Preparation runs regardless of transient thermal, memory, or battery-saver
+pressure; the OS throttles on its own. Pressure is recorded per benchmark, and
+a missed-target verdict measured under pressure is never persisted as a durable
+incompatibility. Model quality tiers and measured device performance influence
+automatic selection; explicit advanced overrides remain possible only for
+functionally viable models.
 
 ## Edition Enforcement
 

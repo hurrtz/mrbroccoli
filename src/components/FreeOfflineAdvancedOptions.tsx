@@ -179,8 +179,7 @@ export function FreeOfflineAdvancedOptions({
     const eligibility = snapshot
       ? evaluateLocalModelEligibility(model, snapshot)
       : null;
-    const disabled =
-      controller.preparing || !eligibility?.eligible || eligibility.retryLater;
+    const disabled = controller.preparing || !eligibility?.eligible;
     const onPress = () => {
       if (model.capability === "llm") {
         if (model.responseProfile === "thorough") {

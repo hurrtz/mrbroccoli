@@ -96,7 +96,8 @@ describe("local model performance assessment", () => {
     );
   });
 
-  it("warns instead of recommending during thermal or low-power pressure", () => {
+  it("recommends normally despite thermal or low-power pressure", () => {
+    // The OS manages transient pressure; it must not hide capable models.
     const model = getLocalModel("whisper-tiny");
 
     expect(
@@ -110,7 +111,7 @@ describe("local model performance assessment", () => {
       }),
     ).toMatchObject({
       evidence: "requirements",
-      fit: "not-recommended",
+      fit: "strong",
     });
   });
 });

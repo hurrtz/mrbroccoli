@@ -26,6 +26,7 @@ import {
 } from "../constants/localModels";
 import type { SpeechLanguage } from "../constants/speechLanguages";
 import {
+  hasLocalDeviceRuntimePressure,
   probeLocalDeviceCapabilities,
   saveLocalModelBenchmarkResult,
   type LocalModelBenchmarkResult,
@@ -505,6 +506,7 @@ export async function benchmarkKokoroModel(
       loadMs: durationMs,
       durationMs,
       realtimeFactor,
+      measuredUnderPressure: hasLocalDeviceRuntimePressure(device),
       device,
     };
     await saveLocalModelBenchmarkResult(benchmark);
@@ -519,6 +521,7 @@ export async function benchmarkKokoroModel(
       loadMs: durationMs,
       durationMs,
       detail: error instanceof Error ? error.message : String(error),
+      measuredUnderPressure: hasLocalDeviceRuntimePressure(device),
       device,
     };
     await saveLocalModelBenchmarkResult(benchmark);

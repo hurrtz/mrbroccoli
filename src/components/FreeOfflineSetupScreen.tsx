@@ -73,9 +73,6 @@ export function FreeOfflineSetupScreen({
     if (!preparationProgress) {
       return null;
     }
-    if (preparationProgress.action === "cooling") {
-      return t("freeOfflineCooling");
-    }
     const model = activeProfile
       ? getOfflineProfileModels(activeProfile).find(
           (candidate) => candidate.id === preparationProgress.modelId,
@@ -105,9 +102,7 @@ export function FreeOfflineSetupScreen({
         ? t("freeOfflineUnavailableLanguage")
         : selection.reason === "device"
           ? t("freeOfflineUnavailableDevice")
-          : selection.reason === "storage"
-            ? t("freeOfflineUnavailableStorage")
-            : t("freeOfflineUnavailableTemporary");
+          : t("freeOfflineUnavailableStorage");
   const progressModel =
     activeProfile && preparationProgress
       ? getOfflineProfileModels(activeProfile).find(
@@ -115,13 +110,11 @@ export function FreeOfflineSetupScreen({
         )
       : null;
   const progressText = preparationProgress
-    ? preparationProgress.action === "cooling"
-      ? t("freeOfflineCooling")
-      : t("freeOfflinePreparing", {
-          model: progressModel?.name ?? preparationProgress.modelId,
-          index: preparationProgress.stepIndex + 1,
-          count: preparationProgress.stepCount,
-        })
+    ? t("freeOfflinePreparing", {
+        model: progressModel?.name ?? preparationProgress.modelId,
+        index: preparationProgress.stepIndex + 1,
+        count: preparationProgress.stepCount,
+      })
     : null;
   const currentDownloadProgress =
     preparationProgress?.action === "downloading"

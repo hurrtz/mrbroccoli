@@ -50,7 +50,7 @@ function fitFromRequirements(params: {
     params.model,
     params.snapshot,
   );
-  if (!eligibility.eligible || eligibility.retryLater) {
+  if (!eligibility.eligible) {
     return "not-recommended" as const;
   }
 

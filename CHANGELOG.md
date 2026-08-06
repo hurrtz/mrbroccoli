@@ -18,6 +18,11 @@ the complete Play Store translations are kept in a dedicated file under
   dialog body now shrinks and scrolls inside the card instead.
 - The Premium restore hint now names only the current platform's store: the
   App Store on iOS and the Play Store on Android, in every language.
+- Free on-device setup no longer pauses for phone warmth, low memory, or
+  battery saver, so downloads and tests always run to completion. A model test
+  that misses its speed target while the phone is throttled or in battery
+  saver is reported as inconclusive instead of permanently marking the phone
+  too slow.
 
 ### Changed
 

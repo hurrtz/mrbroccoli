@@ -26,6 +26,9 @@ jest.mock("../../src/services/localModelManager", () => ({
 }));
 
 jest.mock("../../src/services/localDeviceCapabilities", () => ({
+  hasLocalDeviceRuntimePressure: jest.requireActual(
+    "../../src/services/localDeviceCapabilities",
+  ).hasLocalDeviceRuntimePressure,
   probeLocalDeviceCapabilities: jest.fn().mockResolvedValue({
     version: 1,
     capturedAt: "2026-08-02T00:00:00.000Z",

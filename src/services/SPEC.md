@@ -70,9 +70,15 @@ navigation or render UI.
 3. load and benchmark that artifact on the current device; and
 4. assemble a coherent complete profile.
 
-Temporary thermal or memory pressure pauses preparation. It does not write a
-permanent incompatibility. A below-target benchmark is distinct from a failed
-model and may remain available as an advanced override.
+Preparation never blocks on transient device pressure; the OS owns thermal and
+power management. **Decision:** pressure (low power mode, low memory, serious
+thermal state) is captured with each benchmark, and a non-viable verdict
+measured under pressure is reported to the user but never persisted, so a
+throttled or battery-saver run cannot durably label this device too slow. The
+earlier design paused preparation in a cooling loop instead, which left setup
+permanently stuck whenever battery saver was enabled. A below-target benchmark
+is distinct from a failed model and may remain available as an advanced
+override.
 
 Installed models and benchmark state are device-local, excluded from backup,
 and invalidated by catalogue, artifact, runtime, OS, app, or relevant device

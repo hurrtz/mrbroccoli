@@ -40,7 +40,6 @@ const en = {
   freeOfflineDownloadAndTest: "Start",
   freeOfflinePreparing: ({ model, index, count }: TranslationParams) =>
     `${model} · ${index} of ${count}`,
-  freeOfflineCooling: "Letting the phone cool down before continuing…",
   freeOfflineReady: "Your private offline setup is ready.",
   freeOfflineUnavailableLanguage:
     "No complete local setup supports this language yet.",
@@ -48,8 +47,6 @@ const en = {
     "This phone cannot safely run a complete local setup for this language.",
   freeOfflineUnavailableStorage:
     "There is not enough free storage for the complete local setup.",
-  freeOfflineUnavailableTemporary:
-    "The phone is under temporary memory, power, or heat pressure. Try again later.",
 };
 
 type PremiumTranslations = typeof en;
@@ -89,7 +86,6 @@ const rawPremiumTranslations = {
     freeOfflineDownloadAndTest: "Start",
     freeOfflinePreparing: ({ model, index, count }) =>
       `${model} · ${index} von ${count}`,
-    freeOfflineCooling: "Das Smartphone kühlt ab, bevor es weitergeht …",
     freeOfflineReady: "Deine private Offline-Kombination ist bereit.",
     freeOfflineUnavailableLanguage:
       "Noch unterstützt keine vollständige lokale Kombination diese Sprache.",
@@ -97,8 +93,6 @@ const rawPremiumTranslations = {
       "Dieses Smartphone kann für diese Sprache keine vollständige lokale Kombination sicher ausführen.",
     freeOfflineUnavailableStorage:
       "Für die vollständige lokale Kombination ist nicht genug Speicher frei.",
-    freeOfflineUnavailableTemporary:
-      "Das Smartphone steht vorübergehend unter Speicher-, Strom- oder Hitzedruck. Versuche es später erneut.",
   }),
   uk: define({
     ...editionTranslations.uk,
@@ -131,7 +125,6 @@ const rawPremiumTranslations = {
     freeOfflineDownloadAndTest: "Почати",
     freeOfflinePreparing: ({ model, index, count }) =>
       `${model} · ${index} з ${count}`,
-    freeOfflineCooling: "Телефон охолоджується перед продовженням…",
     freeOfflineReady: "Приватний офлайн-набір готовий.",
     freeOfflineUnavailableLanguage:
       "Повного локального набору для цієї мови ще немає.",
@@ -139,8 +132,6 @@ const rawPremiumTranslations = {
       "Цей телефон не може безпечно запустити повний локальний набір для цієї мови.",
     freeOfflineUnavailableStorage:
       "Недостатньо вільного місця для повного локального набору.",
-    freeOfflineUnavailableTemporary:
-      "Телефон тимчасово обмежений пам’яттю, живленням або температурою. Спробуйте пізніше.",
   }),
   hi: define({
     ...editionTranslations.hi,
@@ -174,7 +165,6 @@ const rawPremiumTranslations = {
     freeOfflineDownloadAndTest: "शुरू करें",
     freeOfflinePreparing: ({ model, index, count }) =>
       `${model} · ${index} / ${count}`,
-    freeOfflineCooling: "आगे बढ़ने से पहले फ़ोन को ठंडा होने दिया जा रहा है…",
     freeOfflineReady: "निजी ऑफ़लाइन सेट तैयार है।",
     freeOfflineUnavailableLanguage:
       "इस भाषा के लिए अभी पूरा स्थानीय सेट उपलब्ध नहीं है।",
@@ -182,8 +172,6 @@ const rawPremiumTranslations = {
       "यह फ़ोन इस भाषा के लिए पूरा स्थानीय सेट सुरक्षित रूप से नहीं चला सकता।",
     freeOfflineUnavailableStorage:
       "पूरे स्थानीय सेट के लिए पर्याप्त खाली जगह नहीं है।",
-    freeOfflineUnavailableTemporary:
-      "फ़ोन पर अभी मेमोरी, ऊर्जा या गर्मी का दबाव है। बाद में कोशिश करें।",
   }),
   es: define({
     ...editionTranslations.es,
@@ -217,7 +205,6 @@ const rawPremiumTranslations = {
     freeOfflineDownloadAndTest: "Empezar",
     freeOfflinePreparing: ({ model, index, count }) =>
       `${model} · ${index} de ${count}`,
-    freeOfflineCooling: "Dejando que el teléfono se enfríe antes de continuar…",
     freeOfflineReady: "La configuración privada sin conexión está lista.",
     freeOfflineUnavailableLanguage:
       "Todavía no hay una configuración local completa para este idioma.",
@@ -225,8 +212,6 @@ const rawPremiumTranslations = {
       "Este teléfono no puede ejecutar con seguridad una configuración local completa para este idioma.",
     freeOfflineUnavailableStorage:
       "No hay suficiente espacio libre para la configuración local completa.",
-    freeOfflineUnavailableTemporary:
-      "El teléfono tiene presión temporal de memoria, energía o temperatura. Inténtalo más tarde.",
   }),
   fr: define({
     ...editionTranslations.fr,
@@ -260,7 +245,6 @@ const rawPremiumTranslations = {
     freeOfflineDownloadAndTest: "Démarrer",
     freeOfflinePreparing: ({ model, index, count }) =>
       `${model} · ${index} sur ${count}`,
-    freeOfflineCooling: "Le téléphone refroidit avant de continuer…",
     freeOfflineReady: "Votre configuration privée hors ligne est prête.",
     freeOfflineUnavailableLanguage:
       "Aucune configuration locale complète ne prend encore en charge cette langue.",
@@ -268,8 +252,6 @@ const rawPremiumTranslations = {
       "Ce téléphone ne peut pas exécuter en toute sécurité une configuration locale complète pour cette langue.",
     freeOfflineUnavailableStorage:
       "L’espace libre est insuffisant pour la configuration locale complète.",
-    freeOfflineUnavailableTemporary:
-      "Le téléphone subit une contrainte temporaire de mémoire, d’énergie ou de température. Réessayez plus tard.",
   }),
   it: define({
     ...editionTranslations.it,
@@ -302,7 +284,6 @@ const rawPremiumTranslations = {
     freeOfflineDownloadAndTest: "Inizia",
     freeOfflinePreparing: ({ model, index, count }) =>
       `${model} · ${index} di ${count}`,
-    freeOfflineCooling: "Il telefono si sta raffreddando prima di continuare…",
     freeOfflineReady: "La configurazione privata offline è pronta.",
     freeOfflineUnavailableLanguage:
       "Nessuna configurazione locale completa supporta ancora questa lingua.",
@@ -310,8 +291,6 @@ const rawPremiumTranslations = {
       "Questo telefono non può eseguire in sicurezza una configurazione locale completa per questa lingua.",
     freeOfflineUnavailableStorage:
       "Spazio libero insufficiente per la configurazione locale completa.",
-    freeOfflineUnavailableTemporary:
-      "Il telefono è temporaneamente sotto pressione di memoria, energia o calore. Riprova più tardi.",
   }),
   pt: define({
     ...editionTranslations.pt,
@@ -344,7 +323,6 @@ const rawPremiumTranslations = {
     freeOfflineDownloadAndTest: "Começar",
     freeOfflinePreparing: ({ model, index, count }) =>
       `${model} · ${index} de ${count}`,
-    freeOfflineCooling: "A deixar o telemóvel arrefecer antes de continuar…",
     freeOfflineReady: "A configuração privada offline está pronta.",
     freeOfflineUnavailableLanguage:
       "Ainda não existe uma configuração local completa para este idioma.",
@@ -352,8 +330,6 @@ const rawPremiumTranslations = {
       "Este telefone não pode executar com segurança uma configuração local completa para este idioma.",
     freeOfflineUnavailableStorage:
       "Não há espaço livre suficiente para a configuração local completa.",
-    freeOfflineUnavailableTemporary:
-      "O telefone está temporariamente sob pressão de memória, energia ou calor. Tente mais tarde.",
   }),
   ptBR: define({
     ...editionTranslations.ptBR,
@@ -386,7 +362,6 @@ const rawPremiumTranslations = {
     freeOfflineDownloadAndTest: "Começar",
     freeOfflinePreparing: ({ model, index, count }) =>
       `${model} · ${index} de ${count}`,
-    freeOfflineCooling: "Aguardando o celular esfriar antes de continuar…",
     freeOfflineReady: "A configuração privada offline está pronta.",
     freeOfflineUnavailableLanguage:
       "Ainda não existe uma configuração local completa para este idioma.",
@@ -394,8 +369,6 @@ const rawPremiumTranslations = {
       "Este celular não pode executar com segurança uma configuração local completa para este idioma.",
     freeOfflineUnavailableStorage:
       "Não há espaço livre suficiente para a configuração local completa.",
-    freeOfflineUnavailableTemporary:
-      "O celular está temporariamente sob pressão de memória, energia ou calor. Tente mais tarde.",
   }),
   ru: define({
     ...editionTranslations.ru,
@@ -428,7 +401,6 @@ const rawPremiumTranslations = {
     freeOfflineDownloadAndTest: "Начать",
     freeOfflinePreparing: ({ model, index, count }) =>
       `${model} · ${index} из ${count}`,
-    freeOfflineCooling: "Телефон остывает перед продолжением…",
     freeOfflineReady: "Приватный офлайн-набор готов.",
     freeOfflineUnavailableLanguage:
       "Полного локального набора для этого языка пока нет.",
@@ -436,8 +408,6 @@ const rawPremiumTranslations = {
       "Этот телефон не может безопасно запустить полный локальный набор для этого языка.",
     freeOfflineUnavailableStorage:
       "Недостаточно свободного места для полного локального набора.",
-    freeOfflineUnavailableTemporary:
-      "Телефон временно ограничен памятью, питанием или температурой. Повторите позже.",
   }),
   "zh-CN": define({
     ...editionTranslations["zh-CN"],
@@ -469,14 +439,11 @@ const rawPremiumTranslations = {
     freeOfflineDownloadAndTest: "开始",
     freeOfflinePreparing: ({ model, index, count }) =>
       `${model} · ${index}/${count}`,
-    freeOfflineCooling: "正在等待手机降温后继续…",
     freeOfflineReady: "私密离线组合已准备就绪。",
     freeOfflineUnavailableLanguage: "目前没有完整的本地组合支持此语言。",
     freeOfflineUnavailableDevice:
       "此手机无法安全运行此语言所需的完整本地组合。",
     freeOfflineUnavailableStorage: "没有足够的可用空间安装完整本地组合。",
-    freeOfflineUnavailableTemporary:
-      "手机暂时受到内存、电量或温度压力，请稍后再试。",
   }),
   ar: define({
     ...editionTranslations.ar,
@@ -509,7 +476,6 @@ const rawPremiumTranslations = {
     freeOfflineDownloadAndTest: "ابدأ",
     freeOfflinePreparing: ({ model, index, count }) =>
       `${model} · ${index} من ${count}`,
-    freeOfflineCooling: "يتم تبريد الهاتف قبل المتابعة…",
     freeOfflineReady: "الإعداد الخاص دون اتصال جاهز.",
     freeOfflineUnavailableLanguage:
       "لا يوجد بعد إعداد محلي كامل يدعم هذه اللغة.",
@@ -517,8 +483,6 @@ const rawPremiumTranslations = {
       "لا يستطيع هذا الهاتف تشغيل إعداد محلي كامل لهذه اللغة بأمان.",
     freeOfflineUnavailableStorage:
       "لا توجد مساحة حرة كافية للإعداد المحلي الكامل.",
-    freeOfflineUnavailableTemporary:
-      "يتعرض الهاتف مؤقتًا لضغط الذاكرة أو الطاقة أو الحرارة. حاول لاحقًا.",
   }),
   ja: define({
     ...editionTranslations.ja,
@@ -552,7 +516,6 @@ const rawPremiumTranslations = {
     freeOfflineDownloadAndTest: "開始",
     freeOfflinePreparing: ({ model, index, count }) =>
       `${model} · ${index}/${count}`,
-    freeOfflineCooling: "続行する前に端末の温度が下がるのを待っています…",
     freeOfflineReady: "非公開オフライン構成の準備ができました。",
     freeOfflineUnavailableLanguage:
       "この言語に対応する完全なローカル構成はまだありません。",
@@ -560,8 +523,6 @@ const rawPremiumTranslations = {
       "この端末では、この言語の完全なローカル構成を安全に実行できません。",
     freeOfflineUnavailableStorage:
       "完全なローカル構成に必要な空き容量がありません。",
-    freeOfflineUnavailableTemporary:
-      "端末が一時的にメモリ、電力、熱の制約を受けています。後でもう一度お試しください。",
   }),
   hu: define({
     ...editionTranslations.hu,
@@ -594,7 +555,6 @@ const rawPremiumTranslations = {
     freeOfflineDownloadAndTest: "Indítás",
     freeOfflinePreparing: ({ model, index, count }) =>
       `${model} · ${index}/${count}`,
-    freeOfflineCooling: "A telefon lehűlésére várunk a folytatás előtt…",
     freeOfflineReady: "A privát offline beállítás kész.",
     freeOfflineUnavailableLanguage:
       "Ehhez a nyelvhez még nincs teljes helyi beállítás.",
@@ -602,8 +562,6 @@ const rawPremiumTranslations = {
       "Ez a telefon nem tud biztonságosan teljes helyi beállítást futtatni ehhez a nyelvhez.",
     freeOfflineUnavailableStorage:
       "Nincs elég szabad hely a teljes helyi beállításhoz.",
-    freeOfflineUnavailableTemporary:
-      "A telefont átmenetileg memória-, energia- vagy hőterhelés éri. Próbáld később.",
   }),
   cs: define({
     ...editionTranslations.cs,
@@ -636,7 +594,6 @@ const rawPremiumTranslations = {
     freeOfflineDownloadAndTest: "Začít",
     freeOfflinePreparing: ({ model, index, count }) =>
       `${model} · ${index} z ${count}`,
-    freeOfflineCooling: "Před pokračováním se telefon nechává vychladnout…",
     freeOfflineReady: "Soukromá offline sestava je připravena.",
     freeOfflineUnavailableLanguage:
       "Pro tento jazyk zatím není kompletní místní sestava.",
@@ -644,8 +601,6 @@ const rawPremiumTranslations = {
       "Tento telefon nemůže bezpečně spustit kompletní místní sestavu pro tento jazyk.",
     freeOfflineUnavailableStorage:
       "Pro kompletní místní sestavu není dostatek volného místa.",
-    freeOfflineUnavailableTemporary:
-      "Telefon je dočasně zatížen pamětí, napájením nebo teplotou. Zkuste to později.",
   }),
   pl: define({
     ...editionTranslations.pl,
@@ -678,7 +633,6 @@ const rawPremiumTranslations = {
     freeOfflineDownloadAndTest: "Rozpocznij",
     freeOfflinePreparing: ({ model, index, count }) =>
       `${model} · ${index} z ${count}`,
-    freeOfflineCooling: "Telefon schładza się przed kontynuowaniem…",
     freeOfflineReady: "Prywatny zestaw offline jest gotowy.",
     freeOfflineUnavailableLanguage:
       "Nie ma jeszcze pełnego zestawu lokalnego dla tego języka.",
@@ -686,8 +640,6 @@ const rawPremiumTranslations = {
       "Ten telefon nie może bezpiecznie uruchomić pełnego zestawu lokalnego dla tego języka.",
     freeOfflineUnavailableStorage:
       "Za mało wolnego miejsca na pełny zestaw lokalny.",
-    freeOfflineUnavailableTemporary:
-      "Telefon jest tymczasowo obciążony pamięcią, zasilaniem lub temperaturą. Spróbuj później.",
   }),
   tr: define({
     ...editionTranslations.tr,
@@ -721,7 +673,6 @@ const rawPremiumTranslations = {
     freeOfflineDownloadAndTest: "Başlat",
     freeOfflinePreparing: ({ model, index, count }) =>
       `${model} · ${index}/${count}`,
-    freeOfflineCooling: "Devam etmeden önce telefonun soğuması bekleniyor…",
     freeOfflineReady: "Özel çevrimdışı kurulum hazır.",
     freeOfflineUnavailableLanguage:
       "Bu dili destekleyen eksiksiz yerel kurulum henüz yok.",
@@ -729,8 +680,6 @@ const rawPremiumTranslations = {
       "Bu telefon bu dil için eksiksiz yerel kurulumu güvenle çalıştıramıyor.",
     freeOfflineUnavailableStorage:
       "Eksiksiz yerel kurulum için yeterli boş alan yok.",
-    freeOfflineUnavailableTemporary:
-      "Telefon geçici olarak bellek, güç veya ısı baskısı altında. Daha sonra deneyin.",
   }),
   sv: define({
     ...editionTranslations.sv,
@@ -763,7 +712,6 @@ const rawPremiumTranslations = {
     freeOfflineDownloadAndTest: "Starta",
     freeOfflinePreparing: ({ model, index, count }) =>
       `${model} · ${index} av ${count}`,
-    freeOfflineCooling: "Telefonen får svalna innan vi fortsätter…",
     freeOfflineReady: "Din privata offlineuppsättning är klar.",
     freeOfflineUnavailableLanguage:
       "Det finns ännu ingen komplett lokal uppsättning för det här språket.",
@@ -771,8 +719,6 @@ const rawPremiumTranslations = {
       "Telefonen kan inte säkert köra en komplett lokal uppsättning för det här språket.",
     freeOfflineUnavailableStorage:
       "Det finns inte tillräckligt med ledigt utrymme för den kompletta lokala uppsättningen.",
-    freeOfflineUnavailableTemporary:
-      "Telefonen är tillfälligt belastad av minne, ström eller värme. Försök senare.",
   }),
   ur: define({
     ...editionTranslations.ur,
@@ -806,15 +752,12 @@ const rawPremiumTranslations = {
     freeOfflineDownloadAndTest: "شروع کریں",
     freeOfflinePreparing: ({ model, index, count }) =>
       `${model} · ${index}/${count}`,
-    freeOfflineCooling: "آگے بڑھنے سے پہلے فون کو ٹھنڈا ہونے دیا جا رہا ہے…",
     freeOfflineReady: "نجی آف لائن سیٹ تیار ہے۔",
     freeOfflineUnavailableLanguage:
       "اس زبان کے لیے ابھی مکمل مقامی سیٹ دستیاب نہیں۔",
     freeOfflineUnavailableDevice:
       "یہ فون اس زبان کے لیے مکمل مقامی سیٹ محفوظ طریقے سے نہیں چلا سکتا۔",
     freeOfflineUnavailableStorage: "مکمل مقامی سیٹ کے لیے کافی خالی جگہ نہیں۔",
-    freeOfflineUnavailableTemporary:
-      "فون عارضی طور پر میموری، توانائی یا گرمی کے دباؤ میں ہے۔ بعد میں کوشش کریں۔",
   }),
 } as const;
 

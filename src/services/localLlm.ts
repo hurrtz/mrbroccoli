@@ -18,6 +18,7 @@ import { getLocalModelInstallStatus } from "./localModelManager";
 import { renderTextForSpeech } from "./speechTextRenderer";
 import { recordDebugLogEvent } from "./debugLogCapture";
 import {
+  hasLocalDeviceRuntimePressure,
   probeLocalDeviceCapabilities,
   saveLocalModelBenchmarkResult,
   type LocalModelBenchmarkResult,
@@ -456,6 +457,7 @@ export async function benchmarkLocalLlm(
       loadMs,
       durationMs,
       tokensPerSecond,
+      measuredUnderPressure: hasLocalDeviceRuntimePressure(device),
       device,
     };
     await saveLocalModelBenchmarkResult(benchmark);
@@ -469,6 +471,7 @@ export async function benchmarkLocalLlm(
       loadMs,
       durationMs: Date.now() - startedAt,
       detail: error instanceof Error ? error.message : String(error),
+      measuredUnderPressure: hasLocalDeviceRuntimePressure(device),
       device,
     };
     await saveLocalModelBenchmarkResult(benchmark);

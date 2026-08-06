@@ -37,7 +37,6 @@ export interface OfflineProfile {
   downloadBytes: number;
   installedBytes: number;
   minimumFreeStorageBytes: number;
-  retryLater: boolean;
 }
 
 export type OfflineProfileOverrides = FreeOfflineProfileOverrides;
@@ -55,7 +54,7 @@ export type OfflineProfileSelection =
   | { status: "ready"; profile: OfflineProfile }
   | {
       status: "unavailable";
-      reason: "language" | "device" | "storage" | "temporary-device-state";
+      reason: "language" | "device" | "storage";
     };
 
 function isPermanentlyEligible(
@@ -66,10 +65,7 @@ function isPermanentlyEligible(
     ...snapshot,
     freeStorageBytes: Number.MAX_SAFE_INTEGER,
   });
-  return {
-    eligible: result.eligible,
-    retryLater: result.retryLater,
-  };
+  return { eligible: result.eligible };
 }
 
 function ttsPreference(model: LocalTtsModelDefinition) {
@@ -329,19 +325,11 @@ export function selectOfflineProfile(params: {
     Boolean(thoroughCandidate) &&
     params.snapshot.freeStorageBytes >=
       thoroughFootprint.minimumFreeStorageBytes;
-  const models = includesThorough ? thoroughModels : baseModels;
   const { missingModels, installedBytes, minimumFreeStorageBytes } =
     includesThorough ? thoroughFootprint : footprint(baseModels);
 
   if (params.snapshot.freeStorageBytes < minimumFreeStorageBytes) {
     return { status: "unavailable", reason: "storage" };
-  }
-
-  const retryLater = models.some(
-    (model) => isPermanentlyEligible(model, params.snapshot).retryLater,
-  );
-  if (retryLater) {
-    return { status: "unavailable", reason: "temporary-device-state" };
   }
 
   return {
@@ -358,7 +346,6 @@ export function selectOfflineProfile(params: {
       ),
       installedBytes,
       minimumFreeStorageBytes,
-      retryLater: false,
     },
   };
 }

@@ -17,6 +17,7 @@ import {
 import { getSpeechLanguageDefinition } from "../constants/speechLanguages";
 import type { SpeechLanguage, SttLanguage } from "../types";
 import {
+  hasLocalDeviceRuntimePressure,
   probeLocalDeviceCapabilities,
   saveLocalModelBenchmarkResult,
   type LocalModelBenchmarkResult,
@@ -246,6 +247,7 @@ export async function benchmarkLocalStt(
       loadMs,
       durationMs,
       realtimeFactor,
+      measuredUnderPressure: hasLocalDeviceRuntimePressure(device),
       device,
     };
     await saveLocalModelBenchmarkResult(benchmark);
@@ -259,6 +261,7 @@ export async function benchmarkLocalStt(
       loadMs,
       durationMs: Date.now() - overallStartedAt,
       detail: error instanceof Error ? error.message : String(error),
+      measuredUnderPressure: hasLocalDeviceRuntimePressure(device),
       device,
     };
     await saveLocalModelBenchmarkResult(benchmark);
@@ -310,6 +313,7 @@ export async function benchmarkLocalTts(
       loadMs,
       durationMs,
       realtimeFactor,
+      measuredUnderPressure: hasLocalDeviceRuntimePressure(device),
       device,
     };
     await saveLocalModelBenchmarkResult(benchmark);
@@ -323,6 +327,7 @@ export async function benchmarkLocalTts(
       loadMs,
       durationMs: Date.now() - startedAt,
       detail: error instanceof Error ? error.message : String(error),
+      measuredUnderPressure: hasLocalDeviceRuntimePressure(device),
       device,
     };
     await saveLocalModelBenchmarkResult(benchmark);

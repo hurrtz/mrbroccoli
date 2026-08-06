@@ -31,11 +31,10 @@ export interface LocalDeviceSnapshot {
 }
 
 export type LocalModelEligibilityReason =
-  "platform" | "architecture" | "memory" | "storage" | "temporary-device-state";
+  "platform" | "architecture" | "memory" | "storage";
 
 export interface LocalModelEligibility {
   eligible: boolean;
-  retryLater: boolean;
   reasons: LocalModelEligibilityReason[];
 }
 
@@ -58,6 +57,12 @@ export interface LocalModelBenchmarkResult {
   tokensPerSecond?: number;
   realtimeFactor?: number;
   detail?: string;
+  /**
+   * True when the device reported low power mode, low memory, or serious
+   * thermal state while this benchmark ran. A throttled run can miss its
+   * targets on a device that is fine when idle.
+   */
+  measuredUnderPressure?: boolean;
   device: Pick<
     LocalDeviceSnapshot,
     "platform" | "architecture" | "osVersion" | "physicalMemoryBytes"
@@ -179,14 +184,11 @@ export function evaluateLocalModelEligibility(
     reasons.push("storage");
   }
 
-  const retryLater = hasLocalDeviceRuntimePressure(snapshot);
-  if (retryLater) {
-    reasons.push("temporary-device-state");
-  }
-
+  // Transient pressure (low power mode, low memory, thermal throttling) is
+  // deliberately not an eligibility reason: the OS manages it, and blocking
+  // on it left setup stuck whenever battery saver was enabled.
   return {
-    eligible: !reasons.some((reason) => reason !== "temporary-device-state"),
-    retryLater,
+    eligible: reasons.length === 0,
     reasons,
   };
 }
@@ -231,6 +233,11 @@ export async function getLocalModelBenchmarkResults() {
 export async function saveLocalModelBenchmarkResult(
   result: LocalModelBenchmarkResult,
 ) {
+  if (result.status !== "viable" && result.measuredUnderPressure) {
+    // A throttled or battery-saver run proves nothing about the model's real
+    // speed; persisting it would durably mislabel the device as too slow.
+    return;
+  }
   const state = await loadLocalModelState();
   await persistLocalModelState({
     ...state,

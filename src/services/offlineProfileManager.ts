@@ -7,7 +7,6 @@ import type { SpeechLanguage } from "../constants/speechLanguages";
 import type { SttLanguage } from "../types";
 import {
   getLocalModelBenchmarkResults,
-  hasLocalDeviceRuntimePressure,
   localModelBenchmarkMatchesDevice,
   probeLocalDeviceCapabilities,
   type LocalDeviceSnapshot,
@@ -29,9 +28,6 @@ import { benchmarkLocalStt, benchmarkLocalTts } from "./localSpeechModels";
 import { getOfflineProfileModels, type OfflineProfile } from "./offlineProfile";
 import { recordDebugLogEvent } from "./debugLogCapture";
 
-const THERMAL_RECHECK_INTERVAL_MS = 5_000;
-const BENCHMARK_COOLDOWN_MS = 5_000;
-const DOWNLOAD_COOLDOWN_MS = 2_000;
 
 export interface OfflineProfileReadiness {
   ready: boolean;
@@ -46,14 +42,14 @@ export interface OfflinePreparationProgress {
   stepIndex: number;
   stepCount: number;
   stepsRemaining: number;
-  action: "downloading" | "benchmarking" | "cooling";
+  action: "downloading" | "benchmarking";
   stepProgress: number | null;
   download?: LocalModelDownloadProgress;
 }
 
 export interface OfflinePreparationStep {
   modelId: LocalModelId;
-  action: Exclude<OfflinePreparationProgress["action"], "cooling">;
+  action: OfflinePreparationProgress["action"];
 }
 
 export function getOfflineProfileValidationModels(profile: OfflineProfile) {
@@ -214,59 +210,11 @@ function createAbortError() {
   return error;
 }
 
-async function abortableDelay(durationMs: number, signal?: AbortSignal) {
-  if (signal?.aborted) {
-    throw createAbortError();
-  }
-  if (durationMs <= 0) {
-    return;
-  }
-  await new Promise<void>((resolve, reject) => {
-    const abort = () => {
-      clearTimeout(timer);
-      signal?.removeEventListener("abort", abort);
-      reject(createAbortError());
-    };
-    const timer = setTimeout(() => {
-      signal?.removeEventListener("abort", abort);
-      resolve();
-    }, durationMs);
-    signal?.addEventListener("abort", abort, { once: true });
-  });
-}
-
-async function waitForThermalHeadroom(params: {
-  abortSignal?: AbortSignal;
-  onPressure: (snapshot: LocalDeviceSnapshot) => void;
-  onResumed: (snapshot: LocalDeviceSnapshot) => void;
-  pollIntervalMs: number;
-}) {
-  let paused = false;
-  while (true) {
-    if (params.abortSignal?.aborted) {
-      throw createAbortError();
-    }
-    const snapshot = await probeLocalDeviceCapabilities();
-    if (!hasLocalDeviceRuntimePressure(snapshot)) {
-      if (paused) {
-        params.onResumed(snapshot);
-      }
-      return snapshot;
-    }
-    paused = true;
-    params.onPressure(snapshot);
-    await abortableDelay(params.pollIntervalMs, params.abortSignal);
-  }
-}
-
 export async function prepareOfflineProfile(
   profile: OfflineProfile,
   options?: {
     abortSignal?: AbortSignal;
-    benchmarkCooldownMs?: number;
-    downloadCooldownMs?: number;
     onProgress?: (progress: OfflinePreparationProgress) => void;
-    thermalPollIntervalMs?: number;
   },
 ) {
   const models = getOfflineProfileModels(profile);
@@ -319,36 +267,6 @@ export async function prepareOfflineProfile(
         download,
       });
 
-      await waitForThermalHeadroom({
-        abortSignal: options?.abortSignal,
-        pollIntervalMs:
-          options?.thermalPollIntervalMs ?? THERMAL_RECHECK_INTERVAL_MS,
-        onPressure: (pressureSnapshot) => {
-          options?.onProgress?.(progress(null, undefined, "cooling"));
-          recordDebugLogEvent({
-            event: "offline-profile-preparation-paused",
-            level: "warn",
-            payload: {
-              lowPowerMode: pressureSnapshot.lowPowerMode,
-              memoryLow: pressureSnapshot.memoryLow,
-              modelId: model.id,
-              stepIndex,
-              thermalState: pressureSnapshot.thermalState,
-            },
-          });
-        },
-        onResumed: (resumedSnapshot) => {
-          recordDebugLogEvent({
-            event: "offline-profile-preparation-resumed",
-            payload: {
-              modelId: model.id,
-              stepIndex,
-              thermalState: resumedSnapshot.thermalState,
-            },
-          });
-        },
-      });
-
       const stepStartedAt = Date.now();
       options?.onProgress?.(
         progress(step.action === "downloading" ? 0 : null),
@@ -368,8 +286,10 @@ export async function prepareOfflineProfile(
         const benchmark = await benchmarkProfileModel(profile, model.id);
         if (benchmark.status !== "viable") {
           throw new Error(
-            benchmark.detail ||
-              `${model.name} is not fast enough on this device.`,
+            benchmark.measuredUnderPressure
+              ? `${model.name} could not be validated because the phone was busy, throttled, or in battery saver. Try again.`
+              : benchmark.detail ||
+                  `${model.name} is not fast enough on this device.`,
           );
         }
       }
@@ -381,43 +301,6 @@ export async function prepareOfflineProfile(
           durationMs: Date.now() - stepStartedAt,
           modelId: model.id,
           stepIndex,
-        },
-      });
-
-      options?.onProgress?.(progress(1, undefined, "cooling"));
-      await abortableDelay(
-        step.action === "benchmarking"
-          ? (options?.benchmarkCooldownMs ?? BENCHMARK_COOLDOWN_MS)
-          : (options?.downloadCooldownMs ?? DOWNLOAD_COOLDOWN_MS),
-        options?.abortSignal,
-      );
-      await waitForThermalHeadroom({
-        abortSignal: options?.abortSignal,
-        pollIntervalMs:
-          options?.thermalPollIntervalMs ?? THERMAL_RECHECK_INTERVAL_MS,
-        onPressure: (pressureSnapshot) => {
-          options?.onProgress?.(progress(1, undefined, "cooling"));
-          recordDebugLogEvent({
-            event: "offline-profile-step-cooling",
-            level: "warn",
-            payload: {
-              lowPowerMode: pressureSnapshot.lowPowerMode,
-              memoryLow: pressureSnapshot.memoryLow,
-              modelId: model.id,
-              stepAction: step.action,
-              thermalState: pressureSnapshot.thermalState,
-            },
-          });
-        },
-        onResumed: (resumedSnapshot) => {
-          recordDebugLogEvent({
-            event: "offline-profile-step-cooled",
-            payload: {
-              modelId: model.id,
-              stepAction: step.action,
-              thermalState: resumedSnapshot.thermalState,
-            },
-          });
         },
       });
     }
