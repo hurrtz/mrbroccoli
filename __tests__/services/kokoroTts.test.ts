@@ -51,6 +51,24 @@ const mockModelEntries = [
   isDirectory: () => name === "espeak-ng-data",
 }));
 
+const packEntry = (name: string) => ({
+  name,
+  path: `/models/kokoro/espeak-ng-data/${name}`,
+  isDirectory: () => false,
+});
+
+// The runtime finds the data directory by scanning file paths, so tests must
+// distinguish a populated espeak-ng-data from an empty one.
+let mockDataDirEntries: ReturnType<typeof packEntry>[] = [
+  packEntry("en-us.lpk"),
+];
+
+const mockReadDir = jest.fn(async (path: string) =>
+  path.endsWith("/espeak-ng-data")
+    ? mockDataDirEntries
+    : (mockModelEntries as unknown as ReturnType<typeof packEntry>[]),
+);
+
 jest.mock("react-native-sherpa-onnx/download", () => ({
   ModelCategory: { Tts: "tts" },
   isModelDownloadedByCategory: jest.fn().mockResolvedValue(true),
@@ -81,7 +99,7 @@ jest.mock("react-native-sherpa-onnx", () => ({
 
 jest.mock("@dr.pogodin/react-native-fs", () => ({
   exists: jest.fn().mockResolvedValue(true),
-  readDir: jest.fn().mockResolvedValue(mockModelEntries),
+  readDir: (path: string) => mockReadDir(path),
   copyFile: mockCopyFile,
   getFSInfo: mockGetFSInfo,
   mkdir: mockMkdir,
@@ -105,9 +123,34 @@ import {
 } from "../../src/services/kokoroTts";
 
 describe("Kokoro TTS service", () => {
+  beforeEach(() => {
+    mockDataDirEntries = [packEntry("en-us.lpk")];
+  });
+
   afterEach(async () => {
     await releaseKokoroResources();
     jest.clearAllMocks();
+  });
+
+  it("names the missing pronunciation packs instead of asking for espeak data", async () => {
+    mockDataDirEntries = [];
+
+    await expect(
+      synthesizeKokoroSpeech({
+        text: "Hello from the phone.",
+        listenLanguages: ["en"],
+        voices: { en: "af_sol", zh: "zf_001" },
+      }),
+    ).rejects.toThrow("missing its pronunciation packs");
+    expect(mockCreateTTS).not.toHaveBeenCalled();
+  });
+
+  it("fails the download when no pronunciation pack could be installed", async () => {
+    mockDataDirEntries = [];
+
+    await expect(
+      downloadKokoroModel({ phonemeLanguages: ["en"] }),
+    ).rejects.toThrow("pronunciation packs could not be installed");
   });
 
   it("finds and initializes the installed model for the selected language", async () => {

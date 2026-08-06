@@ -52,6 +52,10 @@ export type KokoroDownloadProgress = {
   progress: number;
 };
 
+// Historical name kept by the model archive and by sherpa's own detector; the
+// shipped runtime is espeak-free and fills it with libphonemize packs.
+const KOKORO_DATA_DIR_NAME = "espeak-ng-data";
+
 let activeSession: KokoroSession | null = null;
 let sessionTask = Promise.resolve();
 let synthesisTask = Promise.resolve();
@@ -120,6 +124,38 @@ function scheduleIdleRelease() {
   }, KOKORO_IDLE_RELEASE_MS);
 }
 
+async function directoryContainsAnyFile(
+  path: string,
+  depth = 0,
+): Promise<boolean> {
+  const { exists, readDir } = getFsModule();
+
+  if (!(await exists(path))) {
+    return false;
+  }
+
+  const entries = await readDir(path);
+
+  if (entries.some((entry) => !entry.isDirectory())) {
+    return true;
+  }
+
+  if (depth >= 2) {
+    return false;
+  }
+
+  for (const entry of entries) {
+    if (
+      entry.isDirectory() &&
+      (await directoryContainsAnyFile(entry.path, depth + 1))
+    ) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
 async function directoryContainsRequiredModelFiles(path: string) {
   const { exists, readDir } = getFsModule();
 
@@ -140,7 +176,7 @@ async function directoryContainsRequiredModelFiles(path: string) {
     hasModel &&
     names.has("voices.bin") &&
     names.has("tokens.txt") &&
-    names.has("espeak-ng-data") &&
+    names.has(KOKORO_DATA_DIR_NAME) &&
     names.has("lexicon-us-en.txt") &&
     names.has("lexicon-zh.txt")
   );
@@ -340,6 +376,20 @@ async function getKokoroSession(language: KokoroLanguage) {
     if (!status.rootPath) {
       throw new Error(
         "Download the Kokoro voice model before using on-device speech.",
+      );
+    }
+
+    // sherpa locates the data directory by scanning file paths for
+    // `/espeak-ng-data/`, so an empty one makes it reject the model with an
+    // eSpeak-specific message this espeak-free runtime can never satisfy.
+    // Report the real problem instead: the pronunciation packs are missing.
+    if (
+      !(await directoryContainsAnyFile(
+        `${status.rootPath}/${KOKORO_DATA_DIR_NAME}`,
+      ))
+    ) {
+      throw new Error(
+        "The Kokoro voice is missing its pronunciation packs. Download the voice again to restore them.",
       );
     }
 
@@ -612,19 +662,28 @@ export async function downloadKokoroModel(params?: {
 
   // The shipped sherpa runtime is espeak-free: phonemization resolves
   // through libphonemize, which loads its packs from the model data
-  // directory. Install the packs for the requested languages so the voice
-  // can speak them; a failure here leaves the model usable for whatever
-  // packs are already present rather than failing the download.
+  // directory. A single language failing still leaves the model usable for
+  // whatever packs are present, but the runtime rejects the model outright
+  // when the directory holds no pack at all, so that case must fail loudly
+  // here rather than surface later as a missing-espeak-ng-data error.
   if (status.rootPath && params?.phonemeLanguages?.length) {
     const { installPhonemePacks } = require("./phonemePacks") as
       typeof import("./phonemePacks");
+    const dataDir = `${status.rootPath}/${KOKORO_DATA_DIR_NAME}`;
 
     for (const language of params.phonemeLanguages) {
-      await installPhonemePacks(
-        `${status.rootPath}/espeak-ng-data`,
-        language,
-        { abortSignal: params?.abortSignal },
-      ).catch(() => undefined);
+      await installPhonemePacks(dataDir, language, {
+        abortSignal: params?.abortSignal,
+      }).catch(() => undefined);
+    }
+
+    if (
+      !params?.abortSignal?.aborted &&
+      !(await directoryContainsAnyFile(dataDir))
+    ) {
+      throw new Error(
+        "The Kokoro download finished, but its pronunciation packs could not be installed. The voice cannot speak without them.",
+      );
     }
   }
 }

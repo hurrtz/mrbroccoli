@@ -10,6 +10,14 @@ the complete Play Store translations are kept in a dedicated file under
 
 ## Unreleased
 
+### Fixed
+
+- A downloaded on-device Kokoro voice whose pronunciation packs failed to
+  install no longer reports a confusing request to copy eSpeak data into the
+  model folder. The download now fails when no pack could be installed, and
+  speaking reports the missing packs and points at downloading the voice
+  again.
+
 ## 3.1.0 - 2026-08-06
 
 ### Added
