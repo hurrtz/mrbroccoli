@@ -1,9 +1,38 @@
 import React from "react";
-import { StyleSheet } from "react-native";
+import { StyleSheet, useWindowDimensions } from "react-native";
 import { fireEvent, render } from "@testing-library/react-native";
+
+jest.mock("react-native", () => {
+  const actual = jest.requireActual("react-native");
+  const mockedUseWindowDimensions = jest.fn(() => ({
+    fontScale: 1,
+    height: 844,
+    scale: 3,
+    width: 390,
+  }));
+
+  return new Proxy(actual, {
+    get(target, property, receiver) {
+      return property === "useWindowDimensions"
+        ? mockedUseWindowDimensions
+        : Reflect.get(target, property, receiver);
+    },
+  });
+});
 
 import { Button, Modal } from "../../src/design-system/NativeControls";
 import { ThemeProvider } from "../../src/theme/ThemeContext";
+
+const mockUseWindowDimensions = jest.mocked(useWindowDimensions);
+
+function setViewport(width: number, height: number) {
+  mockUseWindowDimensions.mockReturnValue({
+    fontScale: 1,
+    height,
+    scale: 3,
+    width,
+  });
+}
 
 function renderControl(element: React.ReactElement) {
   return render(<ThemeProvider mode="light">{element}</ThemeProvider>);
@@ -108,5 +137,80 @@ describe("NativeControls", () => {
     expect(screen.getByTestId("native-dialog-action-loading")).toBeTruthy();
     fireEvent.press(action!);
     expect(onExport).not.toHaveBeenCalled();
+  });
+
+  it("pins the sheet layout to the bottom and caps it at 85% of the window", () => {
+    setViewport(390, 844);
+    const screen = renderControl(
+      <Modal visible layout="sheet" title="Premium">
+        Content
+      </Modal>,
+    );
+
+    const card = StyleSheet.flatten(
+      screen.getByTestId("native-dialog-card").props.style,
+    );
+    expect(card.maxHeight).toBeCloseTo(844 * 0.85);
+    expect(card.width).toBe("100%");
+    expect(card.maxWidth).toBe("100%");
+    expect(card.borderBottomLeftRadius).toBe(0);
+    expect(card.borderBottomRightRadius).toBe(0);
+
+    const overlay = StyleSheet.flatten(
+      screen.getByTestId("native-dialog-overlay").props.style,
+    );
+    expect(overlay.justifyContent).toBe("flex-end");
+    expect(overlay.padding).toBe(0);
+  });
+
+  it("keeps the centred dialog in landscape even when the sheet is requested", () => {
+    setViewport(844, 390);
+    const screen = renderControl(
+      <Modal visible layout="sheet" title="Premium">
+        Content
+      </Modal>,
+    );
+
+    const card = StyleSheet.flatten(
+      screen.getByTestId("native-dialog-card").props.style,
+    );
+    expect(card.maxWidth).toBe(560);
+    expect(card.maxHeight).toBe("82%");
+
+    const overlay = StyleSheet.flatten(
+      screen.getByTestId("native-dialog-overlay").props.style,
+    );
+    expect(overlay.justifyContent).toBe("center");
+  });
+
+  it("leaves the default dialog layout untouched", () => {
+    setViewport(390, 844);
+    const screen = renderControl(
+      <Modal visible title="Details">
+        Content
+      </Modal>,
+    );
+
+    const card = StyleSheet.flatten(
+      screen.getByTestId("native-dialog-card").props.style,
+    );
+    expect(card.maxWidth).toBe(560);
+    expect(card.maxHeight).toBe("82%");
+  });
+
+  it("keeps the sheet backdrop out of the accessibility tree", () => {
+    setViewport(390, 844);
+    const screen = renderControl(
+      <Modal visible layout="sheet" title="Premium">
+        Content
+      </Modal>,
+    );
+
+    const overlay = screen.getByTestId("native-dialog-overlay");
+    expect(overlay.props.accessibilityViewIsModal).toBe(true);
+
+    const backdrop = screen.getByTestId("native-dialog-backdrop");
+    expect(backdrop.props.accessible).toBe(false);
+    expect(backdrop.props.importantForAccessibility).toBe("no");
   });
 });

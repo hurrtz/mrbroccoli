@@ -7,12 +7,14 @@ import {
   Text,
   TextInput,
   View,
+  useWindowDimensions,
   type PressableProps,
   type StyleProp,
   type TextInputProps,
   type TextStyle,
   type ViewStyle,
 } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { APP_MODAL_ORIENTATIONS } from "../constants/layout";
 import { useTheme } from "../theme/ThemeContext";
@@ -275,9 +277,12 @@ export interface DialogAction {
   tone?: "default" | "success";
 }
 
+const SHEET_MAX_HEIGHT_RATIO = 0.85;
+
 interface DialogProps {
   children?: React.ReactNode;
   footer?: DialogAction[];
+  layout?: "dialog" | "sheet";
   maskClosable?: boolean;
   modalType?: string;
   onClose?: () => void;
@@ -293,6 +298,7 @@ interface DialogProps {
 export function Modal({
   children,
   footer = [],
+  layout = "dialog",
   maskClosable = true,
   onClose,
   styles,
@@ -300,6 +306,15 @@ export function Modal({
   visible,
 }: DialogProps) {
   const { colors } = useTheme();
+  const { height, width } = useWindowDimensions();
+  const insets = useSafeAreaInsets();
+  // A full-width sheet on a landscape window is a wide, short strip, and its
+  // top gap eats the height that keeps the footer actions on-screen.
+  const isSheet = layout === "sheet" && height > width;
+  const sheetMaxHeight = Math.min(
+    height * SHEET_MAX_HEIGHT_RATIO,
+    height - insets.top,
+  );
 
   return (
     <ReactNativeModal
@@ -311,9 +326,11 @@ export function Modal({
       visible={visible}
     >
       <View
+        testID="native-dialog-overlay"
         accessibilityViewIsModal
         style={[
           controlStyles.dialogOverlay,
+          isSheet ? controlStyles.sheetOverlay : null,
           { backgroundColor: colors.overlay },
         ]}
       >
@@ -322,6 +339,7 @@ export function Modal({
           // (design-system SPEC); screen-reader users dismiss through the
           // dialog's labeled actions instead of an anonymous button.
           <Pressable
+            testID="native-dialog-backdrop"
             accessible={false}
             importantForAccessibility="no"
             onPress={onClose}
@@ -332,6 +350,8 @@ export function Modal({
           testID="native-dialog-card"
           style={[
             controlStyles.dialogCard,
+            isSheet ? controlStyles.sheetCard : null,
+            isSheet ? { maxHeight: sheetMaxHeight } : null,
             {
               backgroundColor: colors.surfaceElevated,
               borderColor: colors.border,
@@ -561,5 +581,19 @@ const controlStyles = StyleSheet.create({
     minHeight: 36,
     paddingHorizontal: 12,
     paddingVertical: 8,
+  },
+  sheetCard: {
+    borderBottomLeftRadius: 0,
+    borderBottomRightRadius: 0,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    // Overrides dialogCard's 560pt cap. Set to "100%" rather than undefined,
+    // because StyleSheet.create drops undefined values instead of overriding.
+    maxWidth: "100%",
+    width: "100%",
+  },
+  sheetOverlay: {
+    justifyContent: "flex-end",
+    padding: 0,
   },
 });
