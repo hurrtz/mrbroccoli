@@ -5,6 +5,7 @@ import {
   existsSync,
   mkdirSync,
   readFileSync,
+  rmSync,
   statSync,
   writeFileSync,
 } from "node:fs";
@@ -202,6 +203,95 @@ export const ESPEAK_MARKERS = [
 export function findEspeakMarkers(contents, markers = ESPEAK_MARKERS) {
   const text = Buffer.from(contents).toString("latin1");
   return markers.filter((marker) => text.includes(marker));
+}
+
+// ONNX Runtime version-tags its exported symbols, so a library built against
+// one runtime cannot load against another. sherpa and onnxruntime resolve from
+// independent stages in the wrapper, so they can drift apart and produce an AAB
+// that passes every content check and then dies on launch with
+// `cannot locate symbol OrtGetApiBase@VERS_<x>`. Compare what is required
+// against what ships.
+export function findVersionedSymbolRequirement(symbolTable, symbol) {
+  const required = new Set();
+  const provided = new Set();
+
+  for (const line of symbolTable.split("\n")) {
+    const match = line.match(
+      new RegExp(`(\\S)\\s+${symbol}@+([A-Za-z0-9_.]+)\\s*$`),
+    );
+
+    if (!match) {
+      continue;
+    }
+
+    if (match[1] === "U") {
+      required.add(match[2]);
+    } else {
+      provided.add(match[2]);
+    }
+  }
+
+  return { provided: [...provided].sort(), required: [...required].sort() };
+}
+
+function verifyBundleNativeAbisMatch(bundle, bundleEntries) {
+  const abis = [
+    ...new Set(
+      bundleEntries
+        .filter((entry) => entry.startsWith("base/lib/"))
+        .map((entry) => entry.split("/")[2]),
+    ),
+  ].sort();
+
+  for (const abi of abis) {
+    const read = (library) => {
+      const extracted = spawnSync(
+        "unzip",
+        ["-p", bundle, `base/lib/${abi}/${library}`],
+        { maxBuffer: 1024 * 1024 * 1024 },
+      );
+
+      if (extracted.status !== 0 || !extracted.stdout) {
+        return null;
+      }
+
+      const temporary = `${bundle}.${abi}.${library}.tmp`;
+      writeFileSync(temporary, extracted.stdout);
+      const symbols = spawnSync("nm", ["-D", temporary], { encoding: "utf8" });
+      rmSync(temporary, { force: true });
+
+      return symbols.status === 0 ? symbols.stdout : null;
+    };
+
+    const consumer = read("libsherpa-onnx-jni.so");
+    const runtime = read("libonnxruntime.so");
+
+    if (!consumer || !runtime) {
+      continue;
+    }
+
+    const { required } = findVersionedSymbolRequirement(
+      consumer,
+      "OrtGetApiBase",
+    );
+    const { provided } = findVersionedSymbolRequirement(
+      runtime,
+      "OrtGetApiBase",
+    );
+
+    const unsatisfied = required.filter((version) => !provided.includes(version));
+
+    if (unsatisfied.length > 0) {
+      throw new Error(
+        `${abi}: libsherpa-onnx-jni.so requires OrtGetApiBase@${unsatisfied.join(", ")} ` +
+          `but the bundled libonnxruntime.so provides ${provided.join(", ") || "nothing"}. ` +
+          "sherpa and onnxruntime came from different sources; the app will fail to " +
+          "start. Run `npm run espeak-free:install` and rebuild.",
+      );
+    }
+  }
+
+  return abis;
 }
 
 function verifyBundleIsEspeakFree(bundle, bundleEntries) {
@@ -405,6 +495,7 @@ export async function verifyAndArchiveAndroidRelease({
   const nativeArchiveEntries = listArchiveEntries(nativeSymbols);
   verifyExternalNativeSymbols(metadata.nativeSymbolEntries, nativeArchiveEntries);
   const espeakFreeLibraryCount = verifyBundleIsEspeakFree(bundle, bundleEntries);
+  const linkedAbis = verifyBundleNativeAbisMatch(bundle, bundleEntries);
   const sizeBudget = JSON.parse(
     readFileSync(resolveFromRoot("config/release-size-budget.json"), "utf8"),
   );
@@ -481,6 +572,7 @@ export async function verifyAndArchiveAndroidRelease({
       `R8 mapping: ${BUNDLE_MAPPING_ENTRY}`,
       `Native symbols: ${metadata.nativeSymbolEntries.length} tables across ${metadata.abis.join(", ")}`,
       `espeak-free: ${espeakFreeLibraryCount} shipped libraries carry no eSpeak NG markers`,
+      `native linkage: sherpa resolves onnxruntime in ${linkedAbis.join(", ")}`,
       `AAB size: ${sizeReport.bundleBytes} bytes (arm64 native: ${sizeReport.nativeBytesByAbi["arm64-v8a"] ?? 0}; bundled ONNX: ${sizeReport.bundledOnnxBytes})`,
       `Archived: ${path.relative(cwd, archiveDirectory)}`,
       "",

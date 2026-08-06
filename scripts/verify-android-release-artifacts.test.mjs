@@ -6,6 +6,7 @@ import {
   BUNDLE_NATIVE_SYMBOL_PREFIX,
   ESPEAK_MARKERS,
   findEspeakMarkers,
+  findVersionedSymbolRequirement,
   inspectBundleMetadataEntries,
   inspectAndroidBundleSize,
   parseArchiveSizeListing,
@@ -243,5 +244,34 @@ test("detects piper's eSpeak phonemizer implementation", () => {
   assert.deepEqual(
     findEspeakMarkers(Buffer.from("piper::phonemize_eSpeak(", "latin1")),
     ["phonemize_eSpeak"],
+  );
+});
+
+test("detects an onnxruntime version the shipped sherpa cannot link against", () => {
+  // The exact mismatch that shipped in 3.1.0 (23) and crashed on launch.
+  const consumer = "                 U OrtGetApiBase@VERS_1.23.2";
+  const runtime = "00000000005af69c T OrtGetApiBase@@VERS_1.25.0";
+
+  const required = findVersionedSymbolRequirement(consumer, "OrtGetApiBase");
+  const provided = findVersionedSymbolRequirement(runtime, "OrtGetApiBase");
+
+  assert.deepEqual(required.required, ["VERS_1.23.2"]);
+  assert.deepEqual(provided.provided, ["VERS_1.25.0"]);
+  assert.deepEqual(
+    required.required.filter((v) => !provided.provided.includes(v)),
+    ["VERS_1.23.2"],
+  );
+});
+
+test("accepts a matched sherpa and onnxruntime pair", () => {
+  const consumer = "                 U OrtGetApiBase@VERS_1.23.2";
+  const runtime = "00000000008466b0 T OrtGetApiBase@@VERS_1.23.2";
+
+  const required = findVersionedSymbolRequirement(consumer, "OrtGetApiBase");
+  const provided = findVersionedSymbolRequirement(runtime, "OrtGetApiBase");
+
+  assert.deepEqual(
+    required.required.filter((v) => !provided.provided.includes(v)),
+    [],
   );
 });

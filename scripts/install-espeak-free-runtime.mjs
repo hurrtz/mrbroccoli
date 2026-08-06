@@ -61,6 +61,19 @@ const THIRD_PARTY_ANDROID_ROOT = resolve(
   wrapperRoot,
   "third_party/sherpa-onnx-prebuilt/android",
 );
+// ONNX Runtime version-tags its exported symbols, so sherpa and the runtime it
+// was compiled against are one indivisible pair. The wrapper resolves them in
+// two independent stages: staging only sherpa leaves onnxruntime resolving from
+// Maven, and the app then dies at startup on
+// `cannot locate symbol OrtGetApiBase@VERS_<fork version>`. The fork's build
+// downloads the exact runtime it links, including the libonnxruntime4j_jni.so
+// the Java bridge needs, so stage that same copy as THIRD_PARTY too.
+const THIRD_PARTY_ORT_ROOT = resolve(
+  wrapperRoot,
+  "third_party/onnxruntime_prebuilt/android",
+);
+const ORT_LIBRARIES = ["libonnxruntime.so", "libonnxruntime4j_jni.so"];
+const ORT_VERSION = "1.23.2";
 const checkOnly = process.argv.includes("--check");
 // Verifies the libraries actually present in the wrapper, i.e. what a build
 // would ship — independent of whether the fork checkout exists.
@@ -183,6 +196,30 @@ for (const { abi, libraries } of androidSources) {
     cpSync(library, resolve(target, library.split("/").pop()));
   }
 }
+
+for (const { abi } of ANDROID_ABIS) {
+  const target = resolve(THIRD_PARTY_ORT_ROOT, "jni", abi);
+  mkdirSync(target, { recursive: true });
+  for (const library of ORT_LIBRARIES) {
+    cpSync(
+      requireFile(
+        resolve(
+          forkRoot,
+          ANDROID_ABIS[0].build,
+          ORT_VERSION,
+          "jni",
+          abi,
+          library,
+        ),
+        `rebuild the Android slices so the fork downloads onnxruntime ${ORT_VERSION}`,
+      ),
+      resolve(target, library),
+    );
+  }
+}
+console.log(
+  `android third_party: onnxruntime ${ORT_VERSION} staged as the matching pair`,
+);
 
 const androidHeaderSource = requireFile(
   resolve(forkRoot, ANDROID_ABIS[0].build, "install/include/sherpa-onnx"),
