@@ -1,11 +1,29 @@
 import React from "react";
-import { StyleSheet } from "react-native";
+import { StyleSheet, useWindowDimensions } from "react-native";
 
 import { PremiumUpgradeModal } from "../../src/components/PremiumUpgradeModal";
 import { usePremiumEntitlement } from "../../src/context/PremiumEntitlementContext";
 import { renderWithProviders } from "../test-utils/renderWithProviders";
 
 const mockRecordDebugLogEvent = jest.fn();
+
+jest.mock("react-native", () => {
+  const actual = jest.requireActual("react-native");
+  const mockedUseWindowDimensions = jest.fn(() => ({
+    fontScale: 1,
+    height: 844,
+    scale: 3,
+    width: 390,
+  }));
+
+  return new Proxy(actual, {
+    get(target, property, receiver) {
+      return property === "useWindowDimensions"
+        ? mockedUseWindowDimensions
+        : Reflect.get(target, property, receiver);
+    },
+  });
+});
 
 jest.mock("../../src/context/PremiumEntitlementContext", () => ({
   usePremiumEntitlement: jest.fn(),
@@ -16,6 +34,37 @@ jest.mock("../../src/services/debugLogCapture", () => ({
 }));
 
 const mockedUsePremiumEntitlement = jest.mocked(usePremiumEntitlement);
+const mockUseWindowDimensions = jest.mocked(useWindowDimensions);
+
+function setViewport(width: number, height: number) {
+  mockUseWindowDimensions.mockReturnValue({
+    fontScale: 1,
+    height,
+    scale: 3,
+    width,
+  });
+}
+
+function mockFreeEntitlement() {
+  mockedUsePremiumEntitlement.mockReturnValue({
+    status: "free",
+    isPremium: false,
+    developmentEntitlementMode: null,
+    setDevelopmentEntitlementMode: jest.fn(async () => undefined),
+    busy: false,
+    error: null,
+    storeConnected: true,
+    storeProduct: {} as ReturnType<
+      typeof usePremiumEntitlement
+    >["storeProduct"],
+    storeProductLoading: false,
+    displayPrice: "€14.99",
+    purchasePremium: jest.fn(async () => undefined),
+    restorePremium: jest.fn(async () => undefined),
+    refreshPremium: jest.fn(async () => undefined),
+    clearError: jest.fn(),
+  });
+}
 
 describe("PremiumUpgradeModal", () => {
   beforeEach(() => {
@@ -111,5 +160,39 @@ describe("PremiumUpgradeModal", () => {
     expect(StyleSheet.flatten(scroll.props.style)).toMatchObject({
       flexShrink: 1,
     });
+  });
+
+  it("presents the upgrade surface as a bottom sheet in portrait", () => {
+    setViewport(390, 844);
+    mockFreeEntitlement();
+
+    const screen = renderWithProviders(
+      <PremiumUpgradeModal visible onClose={jest.fn()} />,
+    );
+
+    const card = StyleSheet.flatten(
+      screen.getByTestId("native-dialog-card").props.style,
+    );
+    expect(card.width).toBe("100%");
+    expect(card.borderBottomLeftRadius).toBe(0);
+  });
+
+  it("keeps the purchase and restore actions reachable in the sheet", () => {
+    setViewport(390, 844);
+    mockFreeEntitlement();
+
+    const screen = renderWithProviders(
+      <PremiumUpgradeModal visible onClose={jest.fn()} />,
+    );
+
+    expect(
+      screen.getByRole("button", { name: "Restore purchase" }),
+    ).toBeTruthy();
+    expect(screen.getByText("Buy Premium · €14.99")).toBeTruthy();
+
+    const body = StyleSheet.flatten(
+      screen.getByTestId("native-dialog-body").props.style,
+    );
+    expect(body.flexShrink).toBe(1);
   });
 });

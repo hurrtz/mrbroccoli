@@ -10,6 +10,12 @@ the complete Play Store translations are kept in a dedicated file under
 
 ## Unreleased
 
+### Changed
+
+- Present the Premium upgrade screen as a full-width sheet that rises from the
+  bottom of the display, leaving the page heading visible above it, instead of a
+  narrow centred box. In landscape it stays a centred dialog.
+
 ## 3.1.0 - 2026-08-06
 
 ### Added

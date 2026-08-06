@@ -66,6 +66,7 @@ export function PremiumUpgradeModal({
     <Modal
       visible={visible}
       onClose={onClose}
+      layout="sheet"
       maskClosable={!premium.busy}
       title={t("upgradeToPremium")}
       footer={[

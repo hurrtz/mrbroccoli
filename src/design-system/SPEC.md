@@ -49,6 +49,19 @@ framework or hiding platform behavior behind excessive abstraction.
   content scrolls inside the card instead of pushing actions off-screen.
   Dialog content that can grow tall must itself shrink (for example a
   ScrollView with `flexShrink`) so scrolling covers the full content.
+- `Modal` accepts `layout="sheet"` for surfaces that benefit from full width and
+  from leaving the page behind them partly visible. The sheet pins to the
+  bottom edge, spans the full width, and caps its height at
+  `min(85% of the window, window minus the top safe-area inset)`. It renders
+  only in portrait; in landscape the centred dialog renders instead, because a
+  full-width sheet there is a wide, short strip whose top gap costs the height
+  that keeps footer actions on-screen. The sheet rises and falls symmetrically
+  and skips both animations under reduce motion. The default layout is
+  `"dialog"`.
+- `Modal` calls `useSafeAreaInsets()` unconditionally for every layout, not
+  only `"sheet"`. Every dialog therefore depends on a `SafeAreaProvider`
+  ancestor; in this app that is supplied by Expo Router's `ExpoRoot`. Do not
+  remove that assumption without adding an explicit provider.
 - Dynamic status uses live-region or announcement behavior only at meaningful
   state changes.
 - Keyboard, safe-area, font-scale, contrast, RTL, and platform back behavior
