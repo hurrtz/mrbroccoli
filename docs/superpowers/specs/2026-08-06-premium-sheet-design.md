@@ -57,24 +57,32 @@ trade. Using window dimensions means rotation re-evaluates for free.
 
 ## Motion
 
-**Decision:** animate only the card. The React Native `Modal`'s own
-`animationType="slide"` would carry the dimmed backdrop up with the card, which
-reads wrong; the backdrop should fade while the card rises. The container keeps
-`animationType="fade"` and an `Animated.Value` drives the card's `translateY`
-from its capped height to zero over ~220ms with an ease-out, started when
-`visible` becomes true. `AntSettingsModal` already animates a modal surface
-this way.
+**Decision:** animate only the card, and animate it symmetrically. The React
+Native `Modal`'s own `animationType="slide"` would carry the dimmed backdrop up
+with the card, which reads wrong; the backdrop should fade while the card
+travels. The sheet layout therefore sets `animationType="none"` on the
+container and drives both properties from one `Animated.Value`: backdrop
+opacity 0→1 and card `translateY` from its capped height to zero, over ~220ms,
+ease-out on the way in and ease-in on the way out. The dialog layout keeps
+`animationType="fade"` exactly as today. `AntSettingsModal` already animates a
+modal surface this way.
 
-On close the existing backdrop fade carries the sheet out. Playing a slide-down
-would require holding the modal mounted after `visible` goes false, and the
-extra state is not worth a dismissal animation.
+Symmetry costs one piece of state. React Native unmounts the modal the moment
+`visible` goes false, which would cut an outward animation off, so the sheet
+keeps a `rendered` flag: `visible` turning true sets it immediately and plays
+the rise; `visible` turning false plays the fall and clears it on completion.
+The container's `visible` prop is driven by `rendered`, not by the caller's
+`visible` directly. If `visible` flips back to true mid-exit, the effect
+restarts the inward animation and `rendered` simply stays set.
 
-**Assumption:** the asymmetry between a rising open and a fading close is not
-noticeable enough to matter. If it reads as abrupt in use, the fix is a
-`rendered` state that defers unmount until the outward animation finishes.
+**Decision:** a sheet that rises on open must fall on close. Motion that only
+plays in one direction reads as a rendering glitch rather than a transition,
+and the cost is a single boolean.
 
-When `AccessibilityInfo.isReduceMotionEnabled()` reports true, the sheet appears
-at its final position with no translate.
+When `AccessibilityInfo.isReduceMotionEnabled()` reports true, both directions
+skip the animation: the sheet appears at its final position and unmounts
+immediately, so `rendered` never strands a sheet on screen waiting for motion
+that will not play.
 
 ## What must stay true
 
@@ -94,6 +102,9 @@ at its final position with no translate.
 | `__tests__/design-system/NativeControls.test.tsx` | Sheet pins to the bottom and caps at 85% in portrait |
 | | Falls back to the centred card in landscape |
 | | Backdrop stays out of the accessibility tree in sheet layout |
+| | Stays mounted while the outward animation runs after `visible` goes false, then unmounts |
+| | Reopening mid-exit keeps the sheet mounted and returns it to its resting position |
+| | Reduce motion unmounts immediately instead of waiting for motion that never plays |
 | `__tests__/components/PremiumUpgradeModal.test.tsx` | Opts into the sheet layout |
 | | Buy and Restore stay reachable — regression guard for `36f7ecf` |
 | Existing suite | The other sixteen dialogs are unchanged, proving the default is intact |
