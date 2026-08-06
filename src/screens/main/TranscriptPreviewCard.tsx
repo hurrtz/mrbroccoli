@@ -31,9 +31,11 @@ interface TranscriptPreviewCardProps {
   activeConversationBranch?: ConversationBranchOrigin;
   conversationBranches?: ConversationMeta[];
   colors: Colors;
+  imageAttachmentDisabled?: boolean;
   layout?: "portrait" | "landscape";
   messages: Message[];
   activeReplayMessageId?: string | null;
+  onAddImage?: () => void;
   onCopyMessage: (message: Message) => Promise<boolean>;
   onEditMessage?: (message: Message, content: string) => Promise<boolean>;
   onBranchMessage?: (message: Message) => Promise<boolean> | void;
@@ -61,9 +63,11 @@ export function TranscriptPreviewCard({
   activeConversationBranch,
   conversationBranches = [],
   colors,
+  imageAttachmentDisabled = false,
   layout = "portrait",
   messages,
   activeReplayMessageId = null,
+  onAddImage,
   onCopyMessage,
   onEditMessage,
   onBranchMessage,
@@ -172,7 +176,9 @@ export function TranscriptPreviewCard({
   const showScrollToLatest =
     scrollEnabled && messages.length > 0 && !isAtTranscriptTail;
   const showHeaderControls =
-    (showStyleControl && Boolean(onOpenStyleSheet)) || showScrollToLatest;
+    Boolean(onAddImage) ||
+    (showStyleControl && Boolean(onOpenStyleSheet)) ||
+    showScrollToLatest;
 
   return (
     <View
@@ -218,6 +224,17 @@ export function TranscriptPreviewCard({
 
         {showHeaderControls ? (
           <View style={styles.transcriptHeaderControls}>
+            {onAddImage ? (
+              <IconButton
+                testID="attach-image-control"
+                icon="image"
+                iconSize="control"
+                style={styles.transcriptStyleControl}
+                disabled={imageAttachmentDisabled}
+                onPress={onAddImage}
+                accessibilityLabel={t("addImage")}
+              />
+            ) : null}
             {showStyleControl && onOpenStyleSheet ? (
               <IconButton
                 testID="conversation-style-control"

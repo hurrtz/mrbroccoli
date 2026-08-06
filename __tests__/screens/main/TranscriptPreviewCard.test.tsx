@@ -177,6 +177,85 @@ describe("TranscriptPreviewCard", () => {
     expect(onOpenStyleSheet).toHaveBeenCalledTimes(1);
   });
 
+  it("offers the image attachment control in the transcript header", () => {
+    const onAddImage = jest.fn();
+    const screen = render(
+      <TranscriptPreviewCard
+        activeConversationId="conversation-1"
+        activeConversationTitle="Current conversation"
+        colors={lightColors}
+        messages={[]}
+        onAddImage={onAddImage}
+        onCopyMessage={jest.fn()}
+        onRetryMessage={jest.fn()}
+        presentation="canvas"
+        showUsageStats={false}
+        showWhenEmpty
+        t={(key) => ({ addImage: "Add image" })[key] ?? key}
+      />,
+    );
+
+    const control = screen.getByTestId("attach-image-control");
+
+    expect(control.props.accessibilityLabel).toBe("Add image");
+    expect(StyleSheet.flatten(control.props.style)).toEqual(
+      expect.objectContaining({ width: 44, height: 44 }),
+    );
+
+    fireEvent.press(control);
+
+    expect(onAddImage).toHaveBeenCalledTimes(1);
+  });
+
+  it("disables the header image control while attachments are unavailable", () => {
+    const onAddImage = jest.fn();
+    const screen = render(
+      <TranscriptPreviewCard
+        activeConversationId="conversation-1"
+        activeConversationTitle="Current conversation"
+        colors={lightColors}
+        imageAttachmentDisabled
+        messages={[]}
+        onAddImage={onAddImage}
+        onCopyMessage={jest.fn()}
+        onRetryMessage={jest.fn()}
+        presentation="canvas"
+        showUsageStats={false}
+        showWhenEmpty
+        t={(key) => ({ addImage: "Add image" })[key] ?? key}
+      />,
+    );
+
+    const control = screen.getByTestId("attach-image-control");
+
+    expect(control.props.accessibilityState).toEqual(
+      expect.objectContaining({ disabled: true }),
+    );
+
+    fireEvent.press(control);
+
+    expect(onAddImage).not.toHaveBeenCalled();
+  });
+
+  it("hides the header image control when attachments are unsupported", () => {
+    const screen = render(
+      <TranscriptPreviewCard
+        activeConversationId="conversation-1"
+        activeConversationTitle="Current conversation"
+        colors={lightColors}
+        messages={[]}
+        onCopyMessage={jest.fn()}
+        onRetryMessage={jest.fn()}
+        presentation="canvas"
+        showUsageStats={false}
+        showWhenEmpty
+        t={(key) => key}
+      />,
+    );
+
+    expect(screen.queryByTestId("attach-image-control")).toBeNull();
+  });
+
   it("uses the full header width and offers a jump to the latest message", () => {
     const screen = render(
       <TranscriptPreviewCard

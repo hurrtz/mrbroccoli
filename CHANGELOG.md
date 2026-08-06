@@ -19,6 +19,10 @@ the complete Play Store translations are kept in a dedicated file under
 
 ### Changed
 
+- Move the image attachment button from beneath the record control into the
+  transcript header, next to the conversation style and jump-to-latest
+  controls. The button no longer sits off-centre against the input page
+  indicators, and it stays in the same place in portrait and landscape.
 - Rename the deliberation feature from Uber Mode to Model Council in English
   across the app and store material. Other languages keep their established
   localized names and drop the literal `Uber` token.

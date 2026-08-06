@@ -125,12 +125,6 @@ export const voiceTextInputPagerStyles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
   },
-  imageButton: {
-    width: 44,
-    height: 44,
-    alignItems: "center",
-    justifyContent: "center",
-  },
   driveControls: {
     flexDirection: "row",
     gap: 8,

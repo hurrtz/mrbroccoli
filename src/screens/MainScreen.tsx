@@ -792,6 +792,16 @@ export function MainScreen() {
     visualPhase,
   });
 
+  const voiceStageDisabled =
+    (!premiumStorePromoActive && voiceInputDisabled) ||
+    freeOffline.entitlement.status === "loading";
+  const voiceStageActive = isActive && mainSurfaceVisible;
+  const imageAttachmentDisabled =
+    voiceStageDisabled ||
+    voiceStageActive ||
+    voiceInputDisabled ||
+    !freeOffline.entitlement.isPremium;
+
   return (
     <MainScreenPresentation
       colors={colors}
@@ -848,23 +858,16 @@ export function MainScreen() {
         },
         voiceStage: {
           attachments: pendingImages.attachments,
-          disabled:
-            (!premiumStorePromoActive && voiceInputDisabled) ||
-            freeOffline.entitlement.status === "loading",
+          disabled: voiceStageDisabled,
           driveAutoContinueEnabled,
           driveSilenceCountdownSeconds,
           driveSessionCanRepeat,
           driveVoiceActive,
           initialInputSurface: inputSurfaceRef.current,
           initialTextMessage: textMessageDraftRef.current,
-          imageAttachmentDisabled:
-            voiceInputDisabled || !freeOffline.entitlement.isPremium,
           inputMode: runtimeSettings.inputMode,
-          isActive: isActive && mainSurfaceVisible,
+          isActive: voiceStageActive,
           onInputSurfaceChange: handleInputSurfaceChange,
-          onAddImage: freeOffline.entitlement.isPremium
-            ? imagePromptSubmission.handleAddImage
-            : undefined,
           onRemoveImage: pendingImages.handleRemoveImage,
           onDriveContinue: handleContinueDriveSession,
           onDriveRepeat: handleRepeatDriveReply,
@@ -917,7 +920,11 @@ export function MainScreen() {
           activeConversationBranch: activeConversation?.branch,
           conversationBranches: conversations,
           activeReplayMessageId,
+          imageAttachmentDisabled,
           messages,
+          onAddImage: freeOffline.entitlement.isPremium
+            ? imagePromptSubmission.handleAddImage
+            : undefined,
           onCopyMessage: (message) =>
             handleCopyMessage(formatMessageForCopy(message, language)),
           onEditMessage: isBusy

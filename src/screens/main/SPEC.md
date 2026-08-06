@@ -42,6 +42,10 @@ receive already-derived state and callbacks.
   restarting recording, playback, or another request.
 - Text and image submission use the same conversation and route semantics as a
   spoken turn where their capabilities overlap.
+- The transcript header owns the image attachment action in both orientations;
+  the composer owns only the pending-attachment preview and its remove action.
+  The action stays hidden when the edition cannot attach images and disabled
+  while a turn is active.
 - Conversation, settings, status, receipt, setup, and diagnostics surfaces do
   not replace the primary workspace or mutate one another implicitly.
 

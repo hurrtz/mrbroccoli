@@ -145,8 +145,7 @@ function createProps(overrides: Record<string, unknown> = {}) {
 }
 
 describe("MainScreenVoiceStage composer", () => {
-  it("shows accessible add and remove controls for prompt images", () => {
-    const onAddImage = jest.fn();
+  it("previews prompt images without owning the add control", () => {
     const onRemoveImage = jest.fn();
     const screen = render(
       <MainScreenVoiceStage
@@ -163,20 +162,15 @@ describe("MainScreenVoiceStage composer", () => {
               sharedWithProviders: [],
             },
           ],
-          onAddImage,
           onRemoveImage,
         })}
       />,
     );
 
-    fireEvent.press(screen.getByLabelText("Add image"));
     fireEvent.press(screen.getByLabelText("Remove attached image 1"));
 
-    expect(onAddImage).toHaveBeenCalledTimes(1);
     expect(onRemoveImage).toHaveBeenCalledWith("image-1");
-    expect(
-      StyleSheet.flatten(screen.getByLabelText("Add image").props.style),
-    ).toEqual(expect.objectContaining({ width: 44, height: 44 }));
+    expect(screen.queryByLabelText("Add image")).toBeNull();
   });
 
   it("starts with a prominent full-width voice surface", () => {

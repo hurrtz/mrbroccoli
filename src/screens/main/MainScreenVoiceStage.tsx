@@ -23,12 +23,10 @@ interface MainScreenVoiceStageProps {
   initialInputSurface?: InputSurface;
   initialTextMessage?: string;
   attachments?: MessageImageAttachment[];
-  imageAttachmentDisabled?: boolean;
   inputMode: InputMode;
   isActive: boolean;
   layout?: "portrait" | "landscape";
   onInputSurfaceChange?: (surface: InputSurface) => void;
-  onAddImage?: () => void;
   onRemoveImage?: (attachmentId: string) => void;
   onDriveContinue?: () => void | Promise<void>;
   onDriveRepeat?: () => void | Promise<void>;
@@ -64,12 +62,10 @@ export const MainScreenVoiceStage = React.memo(function MainScreenVoiceStage({
   driveVoiceActive = false,
   initialInputSurface,
   initialTextMessage,
-  imageAttachmentDisabled = false,
   inputMode,
   isActive,
   layout = "portrait",
   onInputSurfaceChange,
-  onAddImage,
   onRemoveImage,
   onDriveContinue,
   onDriveRepeat,
@@ -123,12 +119,10 @@ export const MainScreenVoiceStage = React.memo(function MainScreenVoiceStage({
           driveVoiceActive={driveVoiceActive}
           initialSurface={initialInputSurface}
           initialTextMessage={initialTextMessage}
-          imageAttachmentDisabled={imageAttachmentDisabled}
           inputMode={inputMode}
           isActive={isActive}
           layout={layout}
           onInputSurfaceChange={onInputSurfaceChange}
-          onAddImage={onAddImage}
           onRemoveImage={onRemoveImage}
           onDriveContinue={onDriveContinue}
           onDriveRepeat={onDriveRepeat}

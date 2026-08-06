@@ -29,8 +29,6 @@ export function VoiceTextInputPager({
   isActive,
   layout,
   onInputSurfaceChange,
-  imageAttachmentDisabled = false,
-  onAddImage,
   onRemoveImage,
   onDriveContinue,
   onDriveRepeat,
@@ -202,25 +200,6 @@ export function VoiceTextInputPager({
 
       {showSurfaceIndicators ? (
         <View style={styles.composerToolbar}>
-          {onAddImage ? (
-            <TouchableOpacity
-              accessibilityLabel={t("addImage")}
-              accessibilityRole="button"
-              disabled={disabled || isActive || imageAttachmentDisabled}
-              onPress={onAddImage}
-              style={styles.imageButton}
-            >
-              <PhosphorIcon
-                color={
-                  disabled || isActive || imageAttachmentDisabled
-                    ? colors.textMuted
-                    : colors.textSecondary
-                }
-                name="image"
-                size="control"
-              />
-            </TouchableOpacity>
-          ) : null}
           <InputSurfaceIndicators
             activeSurface={pager.activeSurface}
             colors={colors}
