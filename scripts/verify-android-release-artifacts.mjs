@@ -184,6 +184,60 @@ export function verifySherpaJniMapping(mappingText) {
   }
 }
 
+// Runtime strings that only appear when GPL eSpeak NG (or piper-phonemize,
+// which embeds it) is linked into a library. The espeak-free gate runs before
+// Gradle, so it cannot see the wrapper resolving upstream prebuilts mid-build
+// and overwriting the installed runtime; this checks what actually ships.
+// Sherpa's own Apache-licensed sources mention "espeak" in setup hints and in
+// the espeak-free stub's diagnostic, so a naive grep false-positives. These are
+// the signals the fork's scripts/verify-espeak-free.sh treats as conclusive:
+// the data-path environment variable and default data directory that only the
+// real runtime embeds, plus piper's eSpeak phonemizer implementation.
+export const ESPEAK_MARKERS = [
+  "ESPEAK_DATA_PATH",
+  "/usr/share/espeak-ng-data",
+  "phonemize_eSpeak",
+];
+
+export function findEspeakMarkers(contents, markers = ESPEAK_MARKERS) {
+  const text = Buffer.from(contents).toString("latin1");
+  return markers.filter((marker) => text.includes(marker));
+}
+
+function verifyBundleIsEspeakFree(bundle, bundleEntries) {
+  const libraries = bundleEntries.filter(
+    (entry) => entry.startsWith("base/lib/") && entry.endsWith(".so"),
+  );
+
+  if (libraries.length === 0) {
+    throw new Error(`${bundle} contains no native libraries under base/lib/`);
+  }
+
+  const offenders = libraries.flatMap((entry) => {
+    const result = spawnSync("unzip", ["-p", bundle, entry], {
+      maxBuffer: 1024 * 1024 * 1024,
+    });
+
+    if (result.status !== 0 || !result.stdout) {
+      throw new Error(`Could not read ${entry} from ${bundle}`);
+    }
+
+    const found = findEspeakMarkers(result.stdout);
+    return found.length > 0 ? [`${entry}: ${found.join(", ")}`] : [];
+  });
+
+  if (offenders.length > 0) {
+    throw new Error(
+      "GPL eSpeak NG markers found in shipped native libraries. The build " +
+        "resolved upstream prebuilts instead of the espeak-free runtime; run " +
+        "`npm run espeak-free:install` and rebuild:\n  " +
+        offenders.join("\n  "),
+    );
+  }
+
+  return libraries.length;
+}
+
 function requireNonEmptyFile(file, label) {
   if (!existsSync(file)) {
     throw new Error(`${label} does not exist: ${file}`);
@@ -350,6 +404,7 @@ export async function verifyAndArchiveAndroidRelease({
   const metadata = inspectBundleMetadataEntries(bundleEntries);
   const nativeArchiveEntries = listArchiveEntries(nativeSymbols);
   verifyExternalNativeSymbols(metadata.nativeSymbolEntries, nativeArchiveEntries);
+  const espeakFreeLibraryCount = verifyBundleIsEspeakFree(bundle, bundleEntries);
   const sizeBudget = JSON.parse(
     readFileSync(resolveFromRoot("config/release-size-budget.json"), "utf8"),
   );
@@ -425,6 +480,7 @@ export async function verifyAndArchiveAndroidRelease({
       `Android release artifacts verified for ${appConfig.version} (${versionCode}).`,
       `R8 mapping: ${BUNDLE_MAPPING_ENTRY}`,
       `Native symbols: ${metadata.nativeSymbolEntries.length} tables across ${metadata.abis.join(", ")}`,
+      `espeak-free: ${espeakFreeLibraryCount} shipped libraries carry no eSpeak NG markers`,
       `AAB size: ${sizeReport.bundleBytes} bytes (arm64 native: ${sizeReport.nativeBytesByAbi["arm64-v8a"] ?? 0}; bundled ONNX: ${sizeReport.bundledOnnxBytes})`,
       `Archived: ${path.relative(cwd, archiveDirectory)}`,
       "",

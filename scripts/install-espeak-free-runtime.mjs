@@ -51,6 +51,16 @@ const wrapperRoot = resolve(
   process.cwd(),
   "node_modules/react-native-sherpa-onnx",
 );
+// The wrapper resolves prebuilts THIRD_PARTY -> LOCAL_SDK -> MAVEN_AAR. Writing
+// only jniLibs (LOCAL_SDK) is not enough: that stage is skipped whenever the
+// version stamp is absent or stale, and the build then falls through to the
+// upstream Maven AAR, which statically links GPL eSpeak NG and overwrites these
+// libraries in place. Staging the same artifacts as THIRD_PARTY keeps the
+// espeak-free runtime ahead of that fallback.
+const THIRD_PARTY_ANDROID_ROOT = resolve(
+  wrapperRoot,
+  "third_party/sherpa-onnx-prebuilt/android",
+);
 const checkOnly = process.argv.includes("--check");
 // Verifies the libraries actually present in the wrapper, i.e. what a build
 // would ship — independent of whether the fork checkout exists.
@@ -92,6 +102,9 @@ if (verifyInstalled) {
     ...ANDROID_ABIS.map(({ abi }) =>
       resolve(wrapperRoot, "android/src/main/jniLibs", abi,
               "libsherpa-onnx-jni.so"),
+    ),
+    ...ANDROID_ABIS.map(({ abi }) =>
+      resolve(THIRD_PARTY_ANDROID_ROOT, "jni", abi, "libsherpa-onnx-jni.so"),
     ),
     ...["ios-arm64", "ios-arm64_x86_64-simulator"].map((slice) =>
       resolve(wrapperRoot, "ios/Frameworks/sherpa_onnx.xcframework", slice,
@@ -162,6 +175,29 @@ for (const { abi, libraries } of androidSources) {
   }
   console.log(`android ${abi}: ${libraries.length} libraries installed`);
 }
+
+for (const { abi, libraries } of androidSources) {
+  const target = resolve(THIRD_PARTY_ANDROID_ROOT, "jni", abi);
+  mkdirSync(target, { recursive: true });
+  for (const library of libraries) {
+    cpSync(library, resolve(target, library.split("/").pop()));
+  }
+}
+
+const androidHeaderSource = requireFile(
+  resolve(forkRoot, ANDROID_ABIS[0].build, "install/include/sherpa-onnx"),
+  "rebuild the Android slices so the C API headers are installed",
+);
+const androidHeaderTarget = resolve(
+  THIRD_PARTY_ANDROID_ROOT,
+  "include/sherpa-onnx",
+);
+rmSync(androidHeaderTarget, { recursive: true, force: true });
+cpSync(androidHeaderSource, androidHeaderTarget, { recursive: true });
+console.log(
+  `android third_party: staged ahead of the upstream Maven AAR at ` +
+    THIRD_PARTY_ANDROID_ROOT,
+);
 
 const iosTarget = resolve(wrapperRoot, "ios/Frameworks/sherpa_onnx.xcframework");
 rmSync(iosTarget, { recursive: true, force: true });

@@ -102,6 +102,24 @@ checks the installed binaries for real eSpeak markers, and
 prebuilts into the wrapper. Language packs are pinned, checksum-verified
 artifacts installed beside the speech model (see `src/constants/phonemePacks.ts`).
 
+The installer stages the Android prebuilts as the wrapper's `THIRD_PARTY`
+source, not only in `jniLibs`. The wrapper resolves
+`THIRD_PARTY -> LOCAL_SDK -> MAVEN_AAR`, and `LOCAL_SDK` is skipped whenever its
+version stamp is absent or stale; a build that reaches `MAVEN_AAR` downloads the
+upstream sherpa-onnx AAR, which statically links eSpeak NG, and overwrites the
+installed runtime in place.
+
+**Decision:** the release gate verifies the built AAB, not only the staged
+libraries. `npm run espeak-free:verify` necessarily runs before Gradle, so it
+cannot observe a mid-build replacement;
+`scripts/verify-android-release-artifacts.mjs` therefore scans every shipped
+`base/lib/**/*.so` and fails the release on `ESPEAK_DATA_PATH`,
+`/usr/share/espeak-ng-data`, or `phonemize_eSpeak`. Rejected alternative:
+trusting the pre-build check alone, which passed on a 3.1.0 candidate whose
+bundle did contain the GPL runtime. Sherpa's own Apache-2.0 sources mention
+`espeak-ng-data` in a setup hint, so a broader match false-positives on a clean
+library.
+
 The original finding is retained below for provenance.
 
 ### Original finding

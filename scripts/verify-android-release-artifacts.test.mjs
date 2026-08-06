@@ -4,6 +4,8 @@ import test from "node:test";
 import {
   BUNDLE_MAPPING_ENTRY,
   BUNDLE_NATIVE_SYMBOL_PREFIX,
+  ESPEAK_MARKERS,
+  findEspeakMarkers,
   inspectBundleMetadataEntries,
   inspectAndroidBundleSize,
   parseArchiveSizeListing,
@@ -205,5 +207,41 @@ test("enforces bundle, arm64 native, and optional model budgets", () => {
         entries: [{ bytes: 1, path: "base/assets/kokoro/model.bin" }],
       }),
     /Kokoro model asset must not be bundled/,
+  );
+});
+
+test("detects the GPL eSpeak NG runtime in a shipped library", () => {
+  const contaminated = Buffer.concat([
+    Buffer.from([0x7f, 0x45, 0x4c, 0x46]),
+    Buffer.from("ESPEAK_DATA_PATH\0/usr/share/espeak-ng-data\0", "latin1"),
+  ]);
+
+  assert.deepEqual(findEspeakMarkers(contaminated), [
+    "ESPEAK_DATA_PATH",
+    "/usr/share/espeak-ng-data",
+  ]);
+});
+
+test("does not flag sherpa's own Apache-licensed espeak diagnostics", () => {
+  // The espeak-free build still ships this sentence from sherpa's sources; a
+  // naive "espeak-ng-data" grep would fail the release on a clean library.
+  const clean = Buffer.concat([
+    Buffer.from([0x7f, 0x45, 0x4c, 0x46]),
+    Buffer.from(
+      "You need to follow our examples to copy the espeak-ng-data directory " +
+        "from the assets folder to an external storage directory.\0" +
+        "libphonemize\0",
+      "latin1",
+    ),
+  ]);
+
+  assert.deepEqual(findEspeakMarkers(clean), []);
+});
+
+test("detects piper's eSpeak phonemizer implementation", () => {
+  assert.ok(ESPEAK_MARKERS.includes("phonemize_eSpeak"));
+  assert.deepEqual(
+    findEspeakMarkers(Buffer.from("piper::phonemize_eSpeak(", "latin1")),
+    ["phonemize_eSpeak"],
   );
 });
