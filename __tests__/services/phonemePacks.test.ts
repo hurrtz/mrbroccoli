@@ -49,36 +49,61 @@ describe("phoneme packs", () => {
       expect(pack.downloadBytes).toBeGreaterThan(0);
       expect(pack.license).not.toHaveLength(0);
       expect(getPhonemePackDownloadUrl(pack)).toBe(
-        `https://github.com/hurrtz/libphonemize/releases/download/packs-v1/${pack.id}.tar.bz2`,
+        `https://github.com/hurrtz/libphonemize/releases/download/packs-v2/${pack.id}.tar.bz2`,
       );
     }
   });
 
-  it("covers every Free conversation language", () => {
-    for (const language of ["en", "de", "fr", "es", "it", "pt", "ru"] as const) {
-      expect(getPhonemePacksForLanguage(language).length).toBeGreaterThan(0);
+  it("gives every Free conversation language a lexicon and a neural fallback", () => {
+    for (const language of [
+      "en",
+      "de",
+      "fr",
+      "es",
+      "it",
+      "pt",
+      "pt-BR",
+      "ru",
+    ] as const) {
+      const ids = getPhonemePacksForLanguage(language).map(({ id }) => id);
+      // Without the G2P pack, out-of-vocabulary words (names, brands) would
+      // be dropped from speech instead of pronounced.
+      expect(ids.some((id) => id.endsWith(".lpk"))).toBe(true);
+      expect(ids.some((id) => id.endsWith(".g2p"))).toBe(true);
+      expect(getPhonemePackDownloadBytes(language)).toBeGreaterThan(0);
     }
-    // English also installs the neural fallback for out-of-vocabulary words.
-    expect(getPhonemePacksForLanguage("en").map(({ id }) => id)).toContain(
-      "en-us.g2p",
-    );
-    expect(getPhonemePackDownloadBytes("en")).toBeGreaterThan(
-      getPhonemePackDownloadBytes("pt"),
-    );
   });
 
   it("verifies the checksum before extracting and cleans up the archive", async () => {
-    const pack = getPhonemePacksForLanguage("de")[0];
-    mockExists.mockResolvedValue(false);
-    mockHash.mockResolvedValue(pack.sha256.toUpperCase());
-    mockExists
-      .mockResolvedValueOnce(false) // install check
-      .mockResolvedValueOnce(true) // installed entry after extraction
-      .mockResolvedValueOnce(true); // archive cleanup
+    const packs = getPhonemePacksForLanguage("de");
+    const pack = packs[0];
+    // An install path reports missing on its first check and present once
+    // extraction has run; archives always exist for the cleanup step.
+    const checked = new Set<string>();
+    mockExists.mockImplementation(async (path: string) => {
+      if (path.endsWith(".tar.bz2")) {
+        return true;
+      }
+      if (checked.has(path)) {
+        return true;
+      }
+      checked.add(path);
+      return false;
+    });
+    mockHash.mockImplementation(async (path: string) =>
+      packs
+        .find(({ id }) => path.endsWith(`${id}.tar.bz2`))!
+        .sha256.toUpperCase(),
+    );
 
     await installPhonemePacks(DATA_DIR, "de");
 
-    expect(mockDownloadFile).toHaveBeenCalledWith(
+    // Every pack the language needs is installed, lexicon and G2P alike.
+    expect(mockDownloadFile).toHaveBeenCalledTimes(packs.length);
+    expect(mockExtractArchive).toHaveBeenCalledTimes(packs.length);
+
+    expect(mockDownloadFile).toHaveBeenNthCalledWith(
+      1,
       expect.objectContaining({
         fromUrl: getPhonemePackDownloadUrl(pack),
         toFile: `${DATA_DIR}/${pack.id}.tar.bz2`,
