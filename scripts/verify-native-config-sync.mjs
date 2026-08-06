@@ -405,6 +405,13 @@ assertIncludes(
   iosPodfile,
   "ENV['SHERPA_ONNX_DISABLE_FFMPEG'] = '1'",
 );
+// The package default (sherpa-onnx-ios-v1.12.34-2) ships a libsherpa-onnx.a built
+// without the C++ API, so the app fails to link against sherpa_onnx::cxx::.
+assertIncludes(
+  "iOS Sherpa prebuilt pinned to a C++ API build",
+  iosPodfile,
+  "ENV['SHERPA_ONNX_VERSION'] ||= '1.12.34-1'",
+);
 assertAllEqual(
   "iOS project deployment target",
   iosDeploymentTargets,

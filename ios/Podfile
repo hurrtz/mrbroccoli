@@ -3,6 +3,16 @@ ENV['RNS_GAMMA_ENABLED'] ||= '1'
 # Mr Broccoli only uses Sherpa for Kokoro model extraction and WAV synthesis.
 # Keep its unused FFmpeg conversion/decoding runtime out of distributable builds.
 ENV['SHERPA_ONNX_DISABLE_FFMPEG'] = '1'
+# react-native-sherpa-onnx 0.4.3 pins the prebuilt iOS artifact to
+# sherpa-onnx-ios-v1.12.34-2, whose libsherpa-onnx.a is built without the C++ API:
+# it carries no cxx-api.cc.o and zero sherpa_onnx::cxx:: symbols, while the package
+# still ships cxx-api.h and its Objective-C++ wrappers call sherpa_onnx::cxx::.
+# Linking the app therefore fails on an undefined
+# sherpa_onnx::cxx::OfflineTts::Create. The -1 build of the same upstream version
+# still contains the C++ API, so pin to it until upstream republishes a complete
+# artifact. Verify with:
+#   ar -t <slice>/libsherpa-onnx.a | grep cxx-api
+ENV['SHERPA_ONNX_VERSION'] ||= '1.12.34-1'
 require File.join(File.dirname(`node --print "require.resolve('expo/package.json')"`), "scripts/autolinking")
 require File.join(File.dirname(`node --print "require.resolve('react-native/package.json')"`), "scripts/react_native_pods")
 
