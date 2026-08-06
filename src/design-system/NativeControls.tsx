@@ -368,10 +368,6 @@ export function Modal({
         setSheetRendered(false);
       }
     });
-
-    return () => {
-      animation.stop();
-    };
   }, [isSheet, reduceMotion, sheetProgress, visible]);
 
   return (

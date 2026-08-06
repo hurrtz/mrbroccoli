@@ -52,6 +52,16 @@ function renderControl(element: React.ReactElement) {
 }
 
 describe("NativeControls", () => {
+  afterEach(() => {
+    // Reset safe area insets mock to default zero insets after each test
+    const { useSafeAreaInsets } = require("react-native-safe-area-context");
+    jest.mocked(useSafeAreaInsets).mockReturnValue({
+      bottom: 0,
+      left: 0,
+      right: 0,
+      top: 0,
+    });
+  });
   it("exposes a disabled loading button with a progress indicator", () => {
     const onPress = jest.fn();
     const screen = renderControl(
@@ -225,6 +235,30 @@ describe("NativeControls", () => {
     const backdrop = screen.getByTestId("native-dialog-backdrop");
     expect(backdrop.props.accessible).toBe(false);
     expect(backdrop.props.importantForAccessibility).toBe("no");
+  });
+
+  it("caps the sheet at window height minus top inset when insets exceed 85% threshold", () => {
+    // With insets.top = 200 and height = 844:
+    // Math.min(844 * 0.85, 844 - 200) => Math.min(717.4, 644) => 644
+    const { useSafeAreaInsets } = require("react-native-safe-area-context");
+    jest.mocked(useSafeAreaInsets).mockReturnValueOnce({
+      bottom: 0,
+      left: 0,
+      right: 0,
+      top: 200,
+    });
+
+    setViewport(390, 844);
+    const screen = renderControl(
+      <Modal visible layout="sheet" title="Premium">
+        Content
+      </Modal>,
+    );
+
+    const card = StyleSheet.flatten(
+      screen.getByTestId("native-dialog-card").props.style,
+    );
+    expect(card.maxHeight).toBe(644);
   });
 
   it("keeps the sheet mounted until the closing animation finishes", async () => {

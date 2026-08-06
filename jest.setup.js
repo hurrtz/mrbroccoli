@@ -10,6 +10,6 @@ jest.mock("react-native-safe-area-context", () => {
   const actual = jest.requireActual("react-native-safe-area-context");
   return {
     ...actual,
-    useSafeAreaInsets: () => ({ bottom: 0, left: 0, right: 0, top: 0 }),
+    useSafeAreaInsets: jest.fn(() => ({ bottom: 0, left: 0, right: 0, top: 0 })),
   };
 });
