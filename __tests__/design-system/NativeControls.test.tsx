@@ -1,5 +1,10 @@
 import React from "react";
-import { Animated, StyleSheet, useWindowDimensions } from "react-native";
+import {
+  Animated,
+  Modal as RNModal,
+  StyleSheet,
+  useWindowDimensions,
+} from "react-native";
 import { act, fireEvent, render } from "@testing-library/react-native";
 
 const mockIsReduceMotionEnabled = jest.fn().mockResolvedValue(false);
@@ -237,11 +242,87 @@ describe("NativeControls", () => {
     expect(backdrop.props.importantForAccessibility).toBe("no");
   });
 
+  it("binds the sheet card's transform to the sheet-progress animation and leaves the dialog card untransformed", () => {
+    // A fully-open sheet (mounted already visible) settles sheetProgress at
+    // 1, so a correctly wired translateY interpolates to 0 (card fully on
+    // screen). Deleting the transform block entirely removes the `transform`
+    // style key outright rather than merely changing this number, which is
+    // what this test actually pins.
+    setViewport(390, 844);
+    const sheetScreen = renderControl(
+      <Modal visible layout="sheet" title="Premium">
+        Content
+      </Modal>,
+    );
+    const sheetCard = StyleSheet.flatten(
+      sheetScreen.getByTestId("native-dialog-card").props.style,
+    );
+    expect(sheetCard.transform).toEqual([{ translateY: 0 }]);
+
+    const dialogScreen = renderControl(
+      <Modal visible title="Details">
+        Content
+      </Modal>,
+    );
+    const dialogCard = StyleSheet.flatten(
+      dialogScreen.getByTestId("native-dialog-card").props.style,
+    );
+    expect(dialogCard.transform).toBeUndefined();
+  });
+
+  it("binds the sheet overlay's opacity to the sheet-progress animation and leaves the dialog overlay untouched", () => {
+    // Same reasoning as the transform test: a fully-open mount settles
+    // sheetProgress at 1, so a correctly wired opacity binding reads 1
+    // (backdrop fully faded in). Deleting the opacity binding removes the
+    // `opacity` style key outright, which is what this test pins.
+    setViewport(390, 844);
+    const sheetScreen = renderControl(
+      <Modal visible layout="sheet" title="Premium">
+        Content
+      </Modal>,
+    );
+    const sheetOverlay = StyleSheet.flatten(
+      sheetScreen.getByTestId("native-dialog-overlay").props.style,
+    );
+    expect(sheetOverlay.opacity).toBe(1);
+
+    const dialogScreen = renderControl(
+      <Modal visible title="Details">
+        Content
+      </Modal>,
+    );
+    const dialogOverlay = StyleSheet.flatten(
+      dialogScreen.getByTestId("native-dialog-overlay").props.style,
+    );
+    expect(dialogOverlay.opacity).toBeUndefined();
+  });
+
+  it("disables the container's own animation for the sheet and keeps the dialog's fade", () => {
+    setViewport(390, 844);
+    const sheetScreen = renderControl(
+      <Modal visible layout="sheet" title="Premium">
+        Content
+      </Modal>,
+    );
+    expect(
+      sheetScreen.UNSAFE_getByType(RNModal).props.animationType,
+    ).toBe("none");
+
+    const dialogScreen = renderControl(
+      <Modal visible title="Details">
+        Content
+      </Modal>,
+    );
+    expect(
+      dialogScreen.UNSAFE_getByType(RNModal).props.animationType,
+    ).toBe("fade");
+  });
+
   it("caps the sheet at window height minus top inset when insets exceed 85% threshold", () => {
     // With insets.top = 200 and height = 844:
     // Math.min(844 * 0.85, 844 - 200) => Math.min(717.4, 644) => 644
     const { useSafeAreaInsets } = require("react-native-safe-area-context");
-    jest.mocked(useSafeAreaInsets).mockReturnValueOnce({
+    jest.mocked(useSafeAreaInsets).mockReturnValue({
       bottom: 0,
       left: 0,
       right: 0,
@@ -259,6 +340,55 @@ describe("NativeControls", () => {
       screen.getByTestId("native-dialog-card").props.style,
     );
     expect(card.maxHeight).toBe(644);
+  });
+
+  it("pads the sheet card's bottom by the home-indicator inset so footer actions clear it", () => {
+    // Regression: the sheet card inherited the dialog's flat padding: 20 and
+    // pinned flush to the window's physical bottom edge, so on devices with a
+    // bottom safe-area inset (the iOS home-indicator gesture band) the lower
+    // part of the footer buttons sat inside that band.
+    const { useSafeAreaInsets } = require("react-native-safe-area-context");
+    jest.mocked(useSafeAreaInsets).mockReturnValue({
+      bottom: 34,
+      left: 0,
+      right: 0,
+      top: 0,
+    });
+
+    setViewport(390, 844);
+    const screen = renderControl(
+      <Modal visible layout="sheet" title="Premium">
+        Content
+      </Modal>,
+    );
+
+    const card = StyleSheet.flatten(
+      screen.getByTestId("native-dialog-card").props.style,
+    );
+    expect(card.paddingBottom).toBe(54);
+  });
+
+  it("keeps the dialog layout's flat padding untouched by the bottom inset", () => {
+    const { useSafeAreaInsets } = require("react-native-safe-area-context");
+    jest.mocked(useSafeAreaInsets).mockReturnValue({
+      bottom: 34,
+      left: 0,
+      right: 0,
+      top: 0,
+    });
+
+    setViewport(390, 844);
+    const screen = renderControl(
+      <Modal visible title="Details">
+        Content
+      </Modal>,
+    );
+
+    const card = StyleSheet.flatten(
+      screen.getByTestId("native-dialog-card").props.style,
+    );
+    expect(card.padding).toBe(20);
+    expect(card.paddingBottom).toBeUndefined();
   });
 
   it("keeps the sheet mounted until the closing animation finishes", async () => {

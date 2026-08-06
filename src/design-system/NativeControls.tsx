@@ -431,6 +431,12 @@ export function Modal({
             controlStyles.dialogCard,
             isSheet ? controlStyles.sheetCard : null,
             isSheet ? { maxHeight: sheetMaxHeight } : null,
+            // dialogCard's flat padding: 20 pins the footer flush to the
+            // window edge; on devices with a home-indicator gesture band
+            // (bottom safe-area inset) that leaves the footer actions
+            // partly inside it. Only the sheet touches the physical bottom
+            // edge, so only the sheet needs the extra clearance.
+            isSheet ? { paddingBottom: 20 + insets.bottom } : null,
             isSheet
               ? {
                   transform: [

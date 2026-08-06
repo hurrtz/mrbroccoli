@@ -57,7 +57,10 @@ framework or hiding platform behavior behind excessive abstraction.
   full-width sheet there is a wide, short strip whose top gap costs the height
   that keeps footer actions on-screen. The sheet rises and falls symmetrically
   and skips both animations under reduce motion. The default layout is
-  `"dialog"`.
+  `"dialog"`. Because the sheet's card sits flush against the physical bottom
+  edge, its bottom padding adds the bottom safe-area inset on top of the
+  dialog's flat `20`, so footer actions never land inside the home-indicator
+  gesture band. The centred dialog keeps flat `20` padding on every edge.
 - `Modal` calls `useSafeAreaInsets()` unconditionally for every layout, not
   only `"sheet"`. Every dialog therefore depends on a `SafeAreaProvider`
   ancestor; in this app that is supplied by Expo Router's `ExpoRoot`. Do not
