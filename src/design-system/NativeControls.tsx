@@ -329,6 +329,7 @@ export function Modal({
           />
         ) : null}
         <View
+          testID="native-dialog-card"
           style={[
             controlStyles.dialogCard,
             {
@@ -354,7 +355,9 @@ export function Modal({
               title
             )
           ) : null}
-          <View style={controlStyles.dialogBody}>{children}</View>
+          <View testID="native-dialog-body" style={controlStyles.dialogBody}>
+            {children}
+          </View>
           {footer.length > 0 ? (
             <View style={controlStyles.dialogFooter}>
               {footer.map((action, index) => (
@@ -473,6 +476,9 @@ const controlStyles = StyleSheet.create({
     fontSize: 15,
   },
   dialogBody: {
+    // Shrinks before the title and footer so oversized content scrolls inside
+    // the capped card instead of pushing the footer actions off-screen.
+    flexShrink: 1,
     gap: 12,
   },
   dialogCard: {
@@ -482,6 +488,7 @@ const controlStyles = StyleSheet.create({
     gap: 16,
     maxHeight: "82%",
     maxWidth: 560,
+    overflow: "hidden",
     padding: 20,
     shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.24,

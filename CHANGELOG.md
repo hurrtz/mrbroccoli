@@ -10,6 +10,13 @@ the complete Play Store translations are kept in a dedicated file under
 
 ## Unreleased
 
+### Fixed
+
+- Keep dialog footer actions on-screen when a dialog's content is taller than
+  the available window. The Premium dialog's Buy and Restore purchase buttons
+  were pushed off-screen on small windows such as iPad compatibility mode; the
+  dialog body now shrinks and scrolls inside the card instead.
+
 ### Changed
 
 - Rework localized store-promotion capture into deterministic Premium and Free

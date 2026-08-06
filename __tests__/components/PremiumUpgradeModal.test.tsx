@@ -1,4 +1,5 @@
 import React from "react";
+import { StyleSheet } from "react-native";
 
 import { PremiumUpgradeModal } from "../../src/components/PremiumUpgradeModal";
 import { usePremiumEntitlement } from "../../src/context/PremiumEntitlementContext";
@@ -70,6 +71,45 @@ describe("PremiumUpgradeModal", () => {
         productLoading: false,
         status: "free",
       },
+    });
+  });
+
+  it("keeps buy and restore actions reachable with a shrinkable body", () => {
+    // Regression: App Review saw neither the purchase nor the restore button
+    // because the fixed-height body pushed the dialog footer off-screen on the
+    // smaller iPad compatibility-mode window.
+    mockedUsePremiumEntitlement.mockReturnValue({
+      status: "free",
+      isPremium: false,
+      developmentEntitlementMode: null,
+      setDevelopmentEntitlementMode: jest.fn(async () => undefined),
+      busy: false,
+      error: null,
+      storeConnected: true,
+      storeProduct: {} as ReturnType<
+        typeof usePremiumEntitlement
+      >["storeProduct"],
+      storeProductLoading: false,
+      displayPrice: "€14.99",
+      purchasePremium: jest.fn(async () => undefined),
+      restorePremium: jest.fn(async () => undefined),
+      refreshPremium: jest.fn(async () => undefined),
+      clearError: jest.fn(),
+    });
+
+    const screen = renderWithProviders(
+      <PremiumUpgradeModal visible onClose={jest.fn()} />,
+    );
+
+    expect(
+      screen.getByRole("button", { name: "Restore purchase" }),
+    ).toBeTruthy();
+    expect(
+      screen.getByRole("button", { name: "Buy Premium · €14.99" }),
+    ).toBeTruthy();
+    const scroll = screen.getByTestId("premium-upgrade-scroll");
+    expect(StyleSheet.flatten(scroll.props.style)).toMatchObject({
+      flexShrink: 1,
     });
   });
 });

@@ -1,4 +1,5 @@
 import React from "react";
+import { StyleSheet } from "react-native";
 import { fireEvent, render } from "@testing-library/react-native";
 
 import { Button, Modal } from "../../src/design-system/NativeControls";
@@ -60,6 +61,29 @@ describe("NativeControls", () => {
         expect.objectContaining({ backgroundColor: "#059669" }),
       ]),
     );
+  });
+
+  it("keeps footer actions reachable when dialog content exceeds the card cap", () => {
+    // Regression: on small windows (iPad compatibility mode) an oversized body
+    // used to push the footer actions off-screen instead of shrinking.
+    const screen = renderControl(
+      <Modal
+        visible
+        title="Tall dialog"
+        footer={[{ text: "Buy", onPress: jest.fn() }]}
+      >
+        Content
+      </Modal>,
+    );
+
+    const card = screen.getByTestId("native-dialog-card");
+    expect(StyleSheet.flatten(card.props.style)).toMatchObject({
+      overflow: "hidden",
+    });
+    const body = screen.getByTestId("native-dialog-body");
+    expect(StyleSheet.flatten(body.props.style)).toMatchObject({
+      flexShrink: 1,
+    });
   });
 
   it("disables a loading dialog action while showing progress", () => {

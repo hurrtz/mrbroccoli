@@ -100,6 +100,7 @@ export function PremiumUpgradeModal({
       ]}
     >
       <ScrollView
+        testID="premium-upgrade-scroll"
         style={styles.scroll}
         contentContainerStyle={styles.content}
         keyboardShouldPersistTaps="handled"
@@ -161,7 +162,9 @@ export function PremiumUpgradeModal({
 }
 
 const styles = StyleSheet.create({
-  scroll: { maxHeight: 520 },
+  // flexShrink lets the scroll area follow the dialog body when the capped
+  // card is smaller than 520pt, keeping the purchase footer on-screen.
+  scroll: { flexShrink: 1, maxHeight: 520 },
   content: { gap: 14 },
   heroRow: { alignItems: "center", flexDirection: "row", gap: 12 },
   heroText: { fontFamily: fonts.headline, fontSize: 22, lineHeight: 28 },
