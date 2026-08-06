@@ -10,6 +10,31 @@ the complete Play Store translations are kept in a dedicated file under
 
 ## Unreleased
 
+### Added
+
+- Report an AI response directly from its message actions. The report action
+  assembles the response, its provider route, and a report preamble into the
+  system share sheet, so the user chooses the channel and sees exactly what
+  leaves the device. Available in all 19 languages.
+
+### Changed
+
+- Rename the deliberation feature from Uber Mode to Model Council in English
+  across the app and store material. Other languages keep their established
+  localized names and drop the literal `Uber` token.
+- Replace the eSpeak NG phonemizer with the permissively licensed libphonemize
+  runtime for downloaded on-device voices. Every Free conversation language
+  now ships a pinned, checksum-verified pronunciation pack with its own neural
+  fallback, so names, brands, and other out-of-vocabulary words are pronounced
+  instead of dropped; Brazilian Portuguese gets its own pronunciations instead
+  of borrowing European Portuguese ones. Refreshed lexicons also correct
+  English stressed-schwa, Russian ч, and French nasal-vowel pronunciations. A
+  missing pack falls back to system speech rather than guessing.
+- Rework localized store-promotion capture into deterministic Premium and Free
+  stories. The ten iOS and eight Android images now cover populated active and
+  idle conversations, Free onboarding, expanded branches, Settings, on-device
+  AI, and per-conversation controls without making provider requests.
+
 ### Fixed
 
 - Keep dialog footer actions on-screen when a dialog's content is taller than
@@ -23,13 +48,37 @@ the complete Play Store translations are kept in a dedicated file under
   that misses its speed target while the phone is throttled or in battery
   saver is reported as inconclusive instead of permanently marking the phone
   too slow.
-
-### Changed
-
-- Rework localized store-promotion capture into deterministic Premium and Free
-  stories. The ten iOS and eight Android images now cover populated active and
-  idle conversations, Free onboarding, expanded branches, Settings, on-device
-  AI, and per-conversation controls without making provider requests.
+- Keep the Premium purchase reachable while Free on-device setup is running:
+  the setup screen now offers a Premium escape hatch, so unsupported hardware
+  or a failing download no longer strands the user on Retry.
+- Completing Free setup no longer erases previously configured Premium
+  response modes; they persist untouched and return with Premium.
+- Long conversation histories on Android no longer silently stop saving; the
+  local storage limit now accommodates years of history.
+- A downloaded model or voice artifact whose checksum does not match is now
+  always deleted and its install fails, instead of being kept and reported as
+  verified.
+- Cancel the provider stream when a response fails mid-turn, so the provider
+  stops generating and billing a completion that can no longer arrive.
+- A provider that reports a temporary quota problem recovers automatically
+  after the wait window instead of staying disabled for the rest of the
+  session, and per-minute rate limits are treated as transient instead of
+  exhausted quota.
+- Mid-stream provider errors now keep retry and failover available, map to
+  their real provider status, and long thinking phases are no longer treated
+  as stalled streams.
+- Backup export now reports conversations it had to skip because their stored
+  body could not be read, with a localized warning on the Data & privacy
+  screen, instead of reporting a silently incomplete backup as successful.
+- Share thread and Manage memory from the conversation drawer now work on
+  Android; both actions were silently dropped after closing the drawer.
+- Drive Mode replies no longer occasionally swap the order of their opening
+  audio clips.
+- Voice capture no longer wedges for the rest of the session when the Android
+  speech service fails to deliver its final event; stop, abort, and file
+  transcription are all bounded by watchdogs.
+- Modal backdrops are no longer exposed to screen readers as unlabeled
+  buttons; every modal keeps its labeled close action.
 
 ## 3.0.0 - 2026-08-04
 
