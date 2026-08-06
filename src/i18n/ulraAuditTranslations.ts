@@ -101,7 +101,7 @@ const rawUlraAuditTranslations = {
   fr: define({
     ulraAuditTitle: "Audit Mode suprême",
     ulraAuditSummary: ({ failed, rounds, successful }) =>
-      `${successful} réussis · ${failed} échoués · ${rounds} tours de revue`,
+      `${successful} réussis · ${failed} échoués · ${rounds} tours de révision`,
     ulraAuditConverged:
       "Tous les relecteurs actifs ont explicitement convergé.",
     ulraAuditUnresolved:
@@ -120,7 +120,7 @@ const rawUlraAuditTranslations = {
   it: define({
     ulraAuditTitle: "Audit Modalità suprema",
     ulraAuditSummary: ({ failed, rounds, successful }) =>
-      `${successful} riuscite · ${failed} fallite · ${rounds} turni di revisione`,
+      `${successful} riuscite · ${failed} fallite · ${rounds} round di revisione`,
     ulraAuditConverged:
       "Tutti i revisori attivi hanno raggiunto una convergenza esplicita.",
     ulraAuditUnresolved:
@@ -173,7 +173,7 @@ const rawUlraAuditTranslations = {
     collapseUlraAudit: "Ocultar auditoria do Modo Supremo",
   }),
   ru: define({
-    ulraAuditTitle: "Аудит Суперрежим",
+    ulraAuditTitle: "Аудит Суперрежима",
     ulraAuditSummary: ({ failed, rounds, successful }) =>
       `${successful} успешно · ${failed} неудачно · ${rounds} раундов проверки`,
     ulraAuditConverged: "Все активные рецензенты явно достигли согласия.",
@@ -187,25 +187,25 @@ const rawUlraAuditTranslations = {
       `История синтеза: ${retained} сохранено · ${omitted} пропущено · ${tokens} промежуточных токенов`,
     ulraAuditRoutes: "Маршруты участников",
     ulraAuditContract: ({ contract }) => `Контракт синтеза: ${contract}`,
-    expandUlraAudit: "Показать аудит Суперрежим",
-    collapseUlraAudit: "Скрыть аудит Суперрежим",
+    expandUlraAudit: "Показать аудит Суперрежима",
+    collapseUlraAudit: "Скрыть аудит Суперрежима",
   }),
   "zh-CN": define({
-    ulraAuditTitle: "终极模式 审计",
+    ulraAuditTitle: "终极模式审计",
     ulraAuditSummary: ({ failed, rounds, successful }) =>
-      `${successful} 次成功 · ${failed} 次失败 · ${rounds} 轮审查`,
+      `${successful} 次成功 · ${failed} 次失败 · ${rounds} 轮复核`,
     ulraAuditConverged: "所有活跃审查者均明确达成一致。",
     ulraAuditUnresolved: "尚未完全达成一致；最终回答中可能仍保留重要分歧。",
     ulraAuditCalls: ({ failed, retired, successful }) =>
       `调用：${successful} 次成功 · ${failed} 次失败 · ${retired} 名参与者退出`,
     ulraAuditReviews: ({ challenges, converged, unmarked }) =>
-      `审查：${challenges} 次质疑 · ${converged} 次一致 · ${unmarked} 次未标记`,
+      `复核：${challenges} 次质疑 · ${converged} 次一致 · ${unmarked} 次未标记`,
     ulraAuditHistory: ({ omitted, retained, tokens }) =>
-      `综合历史：保留 ${retained} 条 · 省略 ${omitted} 条 · ${tokens} 个中间词元`,
-    ulraAuditRoutes: "参与者路线",
-    ulraAuditContract: ({ contract }) => `综合契约：${contract}`,
-    expandUlraAudit: "显示 终极模式 审计",
-    collapseUlraAudit: "隐藏 终极模式 审计",
+      `综合历史：保留 ${retained} 条 · 省略 ${omitted} 条 · ${tokens} 个中间令牌`,
+    ulraAuditRoutes: "参与者路由",
+    ulraAuditContract: ({ contract }) => `综合规则：${contract}`,
+    expandUlraAudit: "显示终极模式审计",
+    collapseUlraAudit: "隐藏终极模式审计",
   }),
   ar: define({
     ulraAuditTitle: "تدقيق الوضع الفائق",
@@ -215,7 +215,7 @@ const rawUlraAuditTranslations = {
     ulraAuditUnresolved:
       "لم يتحقق توافق كامل؛ وقد يبقى خلاف جوهري في الإجابة النهائية.",
     ulraAuditCalls: ({ failed, retired, successful }) =>
-      `الاستدعاءات: ${successful} ناجحة · ${failed} فاشلة · ${retired} مشاركين متقاعدين`,
+      `الاستدعاءات: ${successful} ناجحة · ${failed} فاشلة · ${retired} مشاركين مستبعدين`,
     ulraAuditReviews: ({ challenges, converged, unmarked }) =>
       `المراجعات: ${challenges} اعتراضات · ${converged} متوافقة · ${unmarked} بلا علامة`,
     ulraAuditHistory: ({ omitted, retained, tokens }) =>
@@ -233,7 +233,7 @@ const rawUlraAuditTranslations = {
     ulraAuditUnresolved:
       "完全な収束には至っておらず、最終回答に重要な異論が残る場合があります。",
     ulraAuditCalls: ({ failed, retired, successful }) =>
-      `呼び出し：成功 ${successful} 件 · 失敗 ${failed} 件 · 離脱 ${retired} 名`,
+      `呼び出し：成功 ${successful} 件 · 失敗 ${failed} 件 · 離脱 ${retired} 件`,
     ulraAuditReviews: ({ challenges, converged, unmarked }) =>
       `レビュー：異論 ${challenges} 件 · 収束 ${converged} 件 · 未記録 ${unmarked} 件`,
     ulraAuditHistory: ({ omitted, retained, tokens }) =>
@@ -246,12 +246,12 @@ const rawUlraAuditTranslations = {
   hu: define({
     ulraAuditTitle: "Szuper mód audit",
     ulraAuditSummary: ({ failed, rounds, successful }) =>
-      `${successful} sikeres · ${failed} sikertelen · ${rounds} ellenőrzési kör`,
+      `${successful} sikeres · ${failed} sikertelen · ${rounds} felülvizsgálati kör`,
     ulraAuditConverged: "Minden aktív ellenőrző kifejezetten egyetértett.",
     ulraAuditUnresolved:
       "Nem alakult ki teljes egyetértés; a végső válaszban lényeges eltérés maradhat.",
     ulraAuditCalls: ({ failed, retired, successful }) =>
-      `Hívások: ${successful} sikeres · ${failed} sikertelen · ${retired} résztvevő visszavonva`,
+      `Hívások: ${successful} sikeres · ${failed} sikertelen · ${retired} résztvevő kiesett`,
     ulraAuditReviews: ({ challenges, converged, unmarked }) =>
       `Ellenőrzések: ${challenges} kifogás · ${converged} egyezés · ${unmarked} jelöletlen`,
     ulraAuditHistory: ({ omitted, retained, tokens }) =>
@@ -262,7 +262,7 @@ const rawUlraAuditTranslations = {
     collapseUlraAudit: "Szuper mód audit elrejtése",
   }),
   cs: define({
-    ulraAuditTitle: "Audit Superrežim",
+    ulraAuditTitle: "Audit Superrežimu",
     ulraAuditSummary: ({ failed, rounds, successful }) =>
       `${successful} úspěšných · ${failed} neúspěšných · ${rounds} kol kontroly`,
     ulraAuditConverged:
@@ -274,14 +274,14 @@ const rawUlraAuditTranslations = {
     ulraAuditReviews: ({ challenges, converged, unmarked }) =>
       `Kontroly: ${challenges} námitek · ${converged} shod · ${unmarked} bez označení`,
     ulraAuditHistory: ({ omitted, retained, tokens }) =>
-      `Historie syntézy: ${retained} zachováno · ${omitted} vynecháno · ${tokens} mezitokenů`,
+      `Historie syntézy: ${retained} zachováno · ${omitted} vynecháno · ${tokens} průběžných tokenů`,
     ulraAuditRoutes: "Trasy účastníků",
-    ulraAuditContract: ({ contract }) => `Syntézní smlouva: ${contract}`,
-    expandUlraAudit: "Zobrazit audit Superrežim",
-    collapseUlraAudit: "Skrýt audit Superrežim",
+    ulraAuditContract: ({ contract }) => `Pravidla syntézy: ${contract}`,
+    expandUlraAudit: "Zobrazit audit Superrežimu",
+    collapseUlraAudit: "Skrýt audit Superrežimu",
   }),
   pl: define({
-    ulraAuditTitle: "Audyt Supertryb",
+    ulraAuditTitle: "Audyt Supertrybu",
     ulraAuditSummary: ({ failed, rounds, successful }) =>
       `${successful} udanych · ${failed} nieudanych · ${rounds} rund przeglądu`,
     ulraAuditConverged:
@@ -296,8 +296,8 @@ const rawUlraAuditTranslations = {
       `Historia syntezy: ${retained} zachowano · ${omitted} pominięto · ${tokens} tokenów pośrednich`,
     ulraAuditRoutes: "Trasy uczestników",
     ulraAuditContract: ({ contract }) => `Kontrakt syntezy: ${contract}`,
-    expandUlraAudit: "Pokaż audyt Supertryb",
-    collapseUlraAudit: "Ukryj audyt Supertryb",
+    expandUlraAudit: "Pokaż audyt Supertrybu",
+    collapseUlraAudit: "Ukryj audyt Supertrybu",
   }),
   tr: define({
     ulraAuditTitle: "Süper Mod denetimi",
@@ -320,7 +320,7 @@ const rawUlraAuditTranslations = {
   sv: define({
     ulraAuditTitle: "Superläge-granskning",
     ulraAuditSummary: ({ failed, rounds, successful }) =>
-      `${successful} lyckade · ${failed} misslyckade · ${rounds} granskningsrundor`,
+      `${successful} lyckade · ${failed} misslyckade · ${rounds} granskningsomgångar`,
     ulraAuditConverged: "Alla aktiva granskare nådde uttrycklig samsyn.",
     ulraAuditUnresolved:
       "Full samsyn nåddes inte; väsentlig oenighet kan finnas kvar i slutsvaret.",

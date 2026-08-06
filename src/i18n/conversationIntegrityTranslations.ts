@@ -97,7 +97,7 @@ export const conversationIntegrityTranslations = {
     conversationIntegrityCouldNotLoad:
       "इस बातचीत की जाँच नहीं हो सकी। बाद में फिर कोशिश करें।",
     conversationIntegrityIssueCount: ({ count }) =>
-      `${count} संभावित रूप से खराब उत्तर मिले।`,
+      `${count} संभावित रूप से खराब ${Number(count) === 1 ? "उत्तर मिला" : "उत्तर मिले"}।`,
     conversationIntegrityRepairComplete:
       "सुधार पूरा हुआ। मूल उत्तर निर्यात या पूर्ववत करने के लिए डिवाइस पर सुरक्षित है।",
     conversationIntegrityNoIssues: "अखंडता की कोई समस्या नहीं मिली।",
@@ -165,7 +165,9 @@ export const conversationIntegrityTranslations = {
     conversationIntegrityCouldNotLoad:
       "Impossibile controllare questa conversazione. Riprova più tardi.",
     conversationIntegrityIssueCount: ({ count }) =>
-      `Trovate ${count} risposte potenzialmente danneggiate.`,
+      count === 1
+        ? "Trovata 1 risposta potenzialmente danneggiata."
+        : `Trovate ${count} risposte potenzialmente danneggiate.`,
     conversationIntegrityRepairComplete:
       "Riparazione completata. L'originale resta salvato localmente per esportarlo o annullare.",
     conversationIntegrityNoIssues: "Nessun problema di integrità rilevato.",
@@ -183,12 +185,14 @@ export const conversationIntegrityTranslations = {
     conversationIntegrity: "Integridade da conversa",
     reviewConversationIntegrity: "Rever integridade da conversa",
     conversationIntegrityDescription:
-      "Verifica as respostas guardadas para detetar contexto interno que nunca deveria ter aparecido. Nada muda sem a tua aprovação.",
+      "Verifica as respostas guardadas para detetar contexto interno que nunca deveria ter aparecido. Nada muda sem a sua aprovação.",
     conversationIntegrityChecking: "A verificar respostas guardadas…",
     conversationIntegrityCouldNotLoad:
-      "Não foi possível verificar esta conversa. Tenta novamente mais tarde.",
+      "Não foi possível verificar esta conversa. Tente novamente mais tarde.",
     conversationIntegrityIssueCount: ({ count }) =>
-      `Foram encontradas ${count} respostas possivelmente danificadas.`,
+      count === 1
+        ? "Foi encontrada 1 resposta possivelmente danificada."
+        : `Foram encontradas ${count} respostas possivelmente danificadas.`,
     conversationIntegrityRepairComplete:
       "Reparação concluída. O original fica guardado localmente para exportar ou anular.",
     conversationIntegrityNoIssues: "Não foram encontrados problemas de integridade.",
@@ -196,7 +200,7 @@ export const conversationIntegrityTranslations = {
     conversationIntegrityOriginal: "Resposta original guardada",
     conversationIntegritySuggested: "Resposta reparada sugerida",
     conversationIntegrityManualReview:
-      "Não existe uma reparação automática segura. Exporta o original e revê-o manualmente.",
+      "Não existe uma reparação automática segura. Exporte o original e reveja-o manualmente.",
     conversationIntegrityExportOriginals: "Exportar original",
     conversationIntegrityUndo: "Anular reparação",
     conversationIntegrityRepair: ({ count }) =>
@@ -211,7 +215,9 @@ export const conversationIntegrityTranslations = {
     conversationIntegrityCouldNotLoad:
       "Não foi possível verificar esta conversa. Tente novamente mais tarde.",
     conversationIntegrityIssueCount: ({ count }) =>
-      `Foram encontradas ${count} respostas possivelmente danificadas.`,
+      count === 1
+        ? "Foi encontrada 1 resposta possivelmente danificada."
+        : `Foram encontradas ${count} respostas possivelmente danificadas.`,
     conversationIntegrityRepairComplete:
       "Reparo concluído. O original fica salvo localmente para exportar ou desfazer.",
     conversationIntegrityNoIssues: "Nenhum problema de integridade foi encontrado.",
@@ -319,17 +325,17 @@ export const conversationIntegrityTranslations = {
       "Ellenőrzi a mentett asszisztensi válaszokat olyan belső kontextus után, amelynek nem lett volna szabad megjelennie. Jóváhagyásig semmi sem változik.",
     conversationIntegrityChecking: "Mentett válaszok ellenőrzése…",
     conversationIntegrityCouldNotLoad:
-      "A beszélgetést nem sikerült ellenőrizni. Próbáld újra később.",
+      "A beszélgetést nem sikerült ellenőrizni. Próbálja újra később.",
     conversationIntegrityIssueCount: ({ count }) =>
-      `${count} lehetséges sérült válasz található.`,
+      `${count} feltehetően sérült válasz található.`,
     conversationIntegrityRepairComplete:
       "A javítás kész. Az eredeti helyben marad exportáláshoz vagy visszavonáshoz.",
     conversationIntegrityNoIssues: "Nem található épségi probléma.",
-    conversationIntegrityResponse: ({ count }) => `Válasz ${count}`,
+    conversationIntegrityResponse: ({ count }) => `${count}. válasz`,
     conversationIntegrityOriginal: "Eredeti mentett válasz",
     conversationIntegritySuggested: "Javasolt javított válasz",
     conversationIntegrityManualReview:
-      "Nincs biztonságos automatikus javítás. Exportáld az eredetit, és ellenőrizd kézzel.",
+      "Nincs biztonságos automatikus javítás. Exportálja az eredetit, és ellenőrizze kézzel.",
     conversationIntegrityExportOriginals: "Eredeti exportálása",
     conversationIntegrityUndo: "Javítás visszavonása",
     conversationIntegrityRepair: ({ count }) => `${count} válasz javítása`,
@@ -387,7 +393,9 @@ export const conversationIntegrityTranslations = {
     conversationIntegrityCouldNotLoad:
       "Konversationen kunde inte kontrolleras. Försök igen senare.",
     conversationIntegrityIssueCount: ({ count }) =>
-      `${count} potentiellt skadade svar hittades.`,
+      count === 1
+        ? "1 potentiellt skadat svar hittades."
+        : `${count} potentiellt skadade svar hittades.`,
     conversationIntegrityRepairComplete:
       "Reparationen är klar. Originalet sparas lokalt för export eller ångra.",
     conversationIntegrityNoIssues: "Inga integritetsproblem hittades.",

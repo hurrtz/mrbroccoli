@@ -32,13 +32,13 @@ export const ar = {
   aboutSetting: ({ setting }) => `حول ${setting}`,
   unavailable: "غير متاح",
   selection: "اختيار",
-  chooseCompatibleProviderFirst: "اختر مزودًا متوافقًا أولاً",
+  chooseCompatibleProviderFirst: "اختر مزوّدًا متوافقًا أولاً",
   settings: "الإعدادات",
   settingsReleaseVersion: ({ version }) => `الإصدار ${version}`,
   all: "الكل",
   firstRun: "التشغيل لأول مرة",
   instructions: "تعليمات",
-  providers: "مزودو الخدمة",
+  providers: "المزوّدون",
   webSearch: "بحث الويب",
   stt: "STT",
   tts: "TTS",
@@ -64,11 +64,11 @@ export const ar = {
   setupGuideShowInSettings: "إظهار الإعداد الموجه في الإعدادات",
   setupGuideShowInSettingsSummary:
     "قم بإظهار أو إخفاء اختصار الإعداد الموجه في نظرة عامة على الإعدادات.",
-  settingsConnectionsSummary: "مفاتيح الموفر والتحقق من الصحة والقدرات.",
+  settingsConnectionsSummary: "مفاتيح المزوّدين والتحقق من الصحة والقدرات.",
   settingsThinkingSummary: "البطاقات الرئيسية والنماذج والجهد وموجه النظام.",
   settingsListeningSummary: "وضع الإدخال وتوجيه الكلام إلى النص.",
   settingsSpeakingSummary: "الردود المنطوقة، والتشغيل، والأصوات، والمعاينات.",
-  settingsSearchSummary: "مزود بحث الويب وضوابط جودة البحث.",
+  settingsSearchSummary: "مزوّد بحث الويب وضوابط جودة البحث.",
   settingsAppDiagnosticsSummary:
     "الموضوع واللغة والاستخدام وسجلات التصحيح والنشاط الحديث.",
   settingsBackToOverview: "العودة إلى النظرة العامة",
@@ -131,7 +131,7 @@ export const ar = {
   speechTranscriptionAction: "نسخ الكلام",
   speechSynthesisAction: "توليد الكلام",
   instructionsTabDescription:
-    "قم بتشكيل التوجيه المخفي الذي يوجه المساعد قبل أن يرى أي مزود الطلب.",
+    "قم بتشكيل التوجيه المخفي الذي يوجه المساعد قبل أن يطّلع أي مزوّد على الطلب.",
   providersTabDescription:
     "قم بتخزين بيانات اعتماد الخدمة الخارجية على الجهاز وقم بتكوين أوضاع الاستجابة التي تريد استخدامها.",
   webSearchTabDescription:
@@ -153,18 +153,18 @@ export const ar = {
   ulraModeSettingsDescription:
     "يتيح التشاور بين عدة نماذج عندما يكون نموذجان على الأقل من نماذج الشاشة الرئيسية جاهزين.",
   ulraModeInfo:
-    "يسأل الوضع الفائق أولاً كل نموذج جاهز على الشاشة الرئيسية بشكل مستقل. وفي كل جولة مراجعة، تتحدى النماذج أحدث موقف لكل مشارك، وتتوقف الجولات غير المستخدمة بعد تقارب صريح بالإجماع. ويجمع النموذج المحدد الإجابة النهائية من الجولات الناجحة، مع الاحتفاظ دائمًا بأحدث موقف لكل نموذج. تتم مشاركة محتوى التشاور مع جميع مزودي الخدمة المشاركين.",
+    "يسأل الوضع الفائق أولاً كل نموذج جاهز على الشاشة الرئيسية بشكل مستقل. وفي كل جولة مراجعة، تتحدى النماذج أحدث موقف لكل مشارك، وتتوقف الجولات غير المستخدمة بعد تقارب صريح بالإجماع. ويجمع النموذج المحدد الإجابة النهائية من الجولات الناجحة، مع الاحتفاظ دائمًا بأحدث موقف لكل نموذج. تتم مشاركة محتوى التشاور مع جميع المزوّدين المشاركين.",
   ulraModeRounds: "جولات المراجعة",
   ulraModeCallEstimate: ({ count }) =>
     `حتى ${count} استدعاءً للنماذج لكل رسالة بالإعداد الحالي.`,
   ulraModeThresholdWarning:
-    "قد يستغرق استخدام أكثر من 4 نماذج أو 3 جولات وقتًا طويلاً جدًا، ويستهلك رموزًا كثيرة، ويبلغ حدود السياق أو معدل الطلبات لدى المزودين. هذا تحذير فقط.",
+    "قد يستغرق استخدام أكثر من 4 نماذج أو 3 جولات وقتًا طويلاً جدًا، ويستهلك رموزًا كثيرة، ويبلغ حدود السياق أو معدل الطلبات لدى المزوّدين. هذا تحذير فقط.",
   ulraModeFirstUseTitle: "هل تريد تفعيل الوضع الفائق؟",
   ulraModeFirstUseMessage: ({ calls, models, rounds }) =>
-    `باستخدام ${models} نماذج وما يصل إلى ${rounds} جولات مراجعة، قد تنفذ الرسالة الواحدة حتى ${calls} استدعاءً للنماذج. قد تستغرق وقتًا أطول بكثير، وتكلف أكثر، وتشارك التشاور مع جميع المزودين المشاركين.`,
+    `باستخدام ${models} نماذج وما يصل إلى ${rounds} جولات مراجعة، قد تنفذ الرسالة الواحدة حتى ${calls} استدعاءً للنماذج. قد تستغرق وقتًا أطول بكثير، وتكلف أكثر، وتشارك التشاور مع جميع المزوّدين المشاركين.`,
   ulraModeHighRiskTitle: "تشغيل كبير للوضع الفائق",
   ulraModeHighRiskMessage: ({ calls, models, rounds }) =>
-    `قد تنفذ ${models} نماذج و${rounds} جولات مراجعة ما يصل إلى ${calls} استدعاءً للنماذج. قد يستغرق ذلك وقتًا طويلاً جدًا، ويستخدم رموزًا كثيرة، ويبلغ حدود المزودين. هل تريد المتابعة رغم ذلك؟`,
+    `قد تنفذ ${models} نماذج و${rounds} جولات مراجعة ما يصل إلى ${calls} استدعاءً للنماذج. قد يستغرق ذلك وقتًا طويلاً جدًا، ويستخدم رموزًا كثيرة، ويبلغ حدود المزوّدين. هل تريد المتابعة رغم ذلك؟`,
   ulraModeEnableAction: "تفعيل",
   ulraModeNeedsTwoModels:
     "يتطلب الوضع الفائق نموذجين جاهزين على الأقل في الشاشة الرئيسية.",
@@ -178,10 +178,10 @@ export const ar = {
     "التحكم عندما تبدأ الردود في التحدث وأي واجهة خلفية تتعامل مع الإخراج المنطوق.",
   brief: "مختصر",
   briefDescription:
-    "احتفظ بالإجابة بقوة. استخدم الحد الأدنى لعدد الجمل اللازمة للإجابة الكاملة على المستخدم.",
+    "اجعل الإجابة محكمة. استخدم أقل عدد من الجمل اللازم للإجابة الكاملة على المستخدم.",
   normal: "طبيعي",
   normalDescription:
-    "تهدف إلى طول استجابة متوازنة. قم بتغطية النقاط المهمة دون سحب الإجابة.",
+    "استهدف طولًا متوازنًا للرد. غطِّ النقاط المهمة دون إطالة الإجابة.",
   thorough: "شامل",
   thoroughDescription:
     "تعمق وكن شاملاً. قم بتضمين الفروق الدقيقة والتفاصيل والمقايضات والمنطق الذي يهم.",
@@ -190,8 +190,8 @@ export const ar = {
     "تحدث كمستشار كبير يطلع العميل. لغة دقيقة، خالية من العامية، ومدروسة وموثوقة.",
   casual: "غير رسمي",
   casualDescription:
-    "تحدث كصديق ذكي في المقهى. مريح وطبيعي ومحادث. التقلصات جيدة، والظلال جيدة.",
-  nerdy: "نردي",
+    "تحدث كصديق ذكي في المقهى: بأسلوب مريح وطبيعي وعفوي. لا بأس بالعبارات العامية المختصرة ولا بالاستطرادات.",
+  nerdy: "مهووس بالمعرفة",
   nerdyDescription:
     "تحدث كخبير متحمس يحب التعمق. استخدم المصطلحات التقنية بحرية، واطلع على التفاصيل، وافترض أن المستخدم قادر على مواكبة ذلك.",
   concise: "موجز",
@@ -202,30 +202,30 @@ export const ar = {
     "تحدي تفكير المستخدم. اطرح أسئلة مضادة، وقدم وجهات نظر بديلة، ولا تؤكد فقط ما قالوه. كن شريكًا في السجال، وليس آلة الموافقة.",
   eli5: "ELI5",
   eli5Description:
-    "اشرح كل شيء ببساطة قدر الإمكان. استخدم القياسات، اللغة اليومية، صفر المصطلحات. لا تفترض أي معرفة مسبقة بأي موضوع.",
+    "اشرح كل شيء بأبسط صورة ممكنة. استخدم التشبيهات واللغة اليومية دون أي مصطلحات متخصصة، ولا تفترض أي معرفة مسبقة بأي موضوع.",
   useProvider: ({ provider }) => `استخدم ${provider}`,
-  createApiKey: "أوراق اعتماد",
+  createApiKey: "بيانات الاعتماد",
   apiKey: "مفتاح API",
-  aboutThisProvider: "حول هذا المزود",
-  openRouterOnboardingTitle: "مفتاح واحد، ومقدمو خدمات متعددون",
+  aboutThisProvider: "حول هذا المزوّد",
+  openRouterOnboardingTitle: "مفتاح واحد، ومزوّدون متعددون",
   openRouterOnboardingDescription:
-    "قم بإنشاء مفتاح OpenRouter مخصص، والصقه أدناه، واستخدم النماذج المدعومة باللقطة من العديد من موفري الخدمة دون استبدال أي اتصال مباشر.",
+    "أنشئ مفتاح OpenRouter مخصصًا، والصقه أدناه، واستخدم نماذج اللقطات الثابتة من عدة مزوّدين دون استبدال أي اتصال مباشر.",
   openRouterOnboardingRoute:
-    "مسار الطلب: هذا الجهاز → OpenRouter → الموفر الرئيسي المحدد",
+    "مسار الطلب: هذا الجهاز → OpenRouter → المزوّد الأصلي المحدد",
   openRouterKeys: "مفاتيح OpenRouter",
   providerStatusInvalid: "غير صالح",
   providerStatusTesting: "اختبار",
   providerStatusConfigured: "تم تكوينه",
-  providerStatusWorking: "عمل",
+  providerStatusWorking: "يعمل",
   providerStatusNotTested: "لم يتم اختباره",
   providerStatusNotSetup: "لم يتم إعداده",
   expandProvider: ({ provider }) => `قم بتوسيع ${provider}`,
   collapseProvider: ({ provider }) => `طي ${provider}`,
-  testProviderKey: "مفتاح الاختبار",
+  testProviderKey: "اختبار المفتاح",
   testAllCapabilities: "اختبار الكل",
   apiTest: "اختبار API",
   testProviderCapability: ({ capability }) => `اختبار ${capability}`,
-  test: "امتحان",
+  test: "اختبار",
   optional: "خياري",
   providerCapability_llm: "الردود",
   providerCapability_stt: "إدخال الكلام",
@@ -233,14 +233,14 @@ export const ar = {
   providerCapability_search: "البحث على شبكة الإنترنت",
   providerCapability_voices: "مكتبة صوتية",
   providerValidationUnavailable:
-    "التحقق المباشر ليس سلكيًا لهذا المزود حتى الآن. احفظ المفتاح هنا وتحقق منه أثناء الاستخدام الفعلي.",
+    "التحقق المباشر غير متوفر لهذا المزوّد بعد. احفظ المفتاح هنا وتحقق منه أثناء الاستخدام الفعلي.",
   providerNeedsAttention: "يحتاج إلى الاهتمام",
   catalogProviderLimitsSummary: ({ summary }) => `الحدود: ${summary}`,
   catalogProviderRegionSummary: ({ summary }) => `المنطقة: ${summary}`,
   validatingKey: "جارٍ التحقق...",
   showKey: "إظهار المفتاح",
   hideKey: "إخفاء المفتاح",
-  assistantInstructions: "تعليمات مساعد",
+  assistantInstructions: "تعليمات المساعد",
   systemPrompt: "موجه النظام",
   aboutSystemPrompt: "حول موجه النظام",
   assistantInstructionsIntro:
@@ -257,7 +257,7 @@ export const ar = {
   openStyleSheet: "افتح إعدادات المحادثة",
   conversationThinkingInstructions: "تعليمات التفكير",
   conversationThinkingInstructionsDescription:
-    "أضف تعليمات بعد مطالبة النظام العالمي بهذه المحادثة.",
+    "أضف تعليمات تأتي بعد موجّه النظام العام لهذه المحادثة.",
   conversationThinkingInstructionsPlaceholder:
     "على سبيل المثال: تحدي افتراضاتي واستخدام أمثلة ملموسة.",
   ttsInstructions: "تعليمات تسليم الكلام",
@@ -293,21 +293,21 @@ export const ar = {
   driveSession: "جلسة القيادة",
   driveSessionDescription:
     "عند تشغيل المتابعة التلقائية، يبدأ التسجيل بعد كل رد منطوق. اضغط على الزر الرئيسي عند الانتهاء من التحدث.",
-  stopDriveSession: "وقفة تلقائية",
+  stopDriveSession: "إيقاف مؤقت للوضع التلقائي",
   repeatDriveReply: "كرر الأخير",
-  continueDriveSession: "استئناف تلقائي",
+  continueDriveSession: "استئناف الوضع التلقائي",
   speechToText: "الكلام إلى النص",
-  appNative: "التعرف على النظام",
+  appNative: "تعرّف النظام على الكلام",
   nativeSttDescription:
-    "استخدم أداة التعرف على الكلام الخاصة بنظام التشغيل. اعتمادًا على إعدادات الجهاز، قد يتم تشغيل التعرف على الجهاز أو من خلال خدمة النظام. لا يوجد مفتاح موفر مطلوب.",
-  provider: "مزود",
-  webSearchProvider: "مزود بحث الويب",
+    "استخدم أداة التعرف على الكلام الخاصة بنظام التشغيل. اعتمادًا على إعدادات الجهاز، قد يتم تشغيل التعرف على الجهاز أو من خلال خدمة النظام. لا حاجة إلى مفتاح مزوّد.",
+  provider: "مزوّد",
+  webSearchProvider: "مزوّد بحث الويب",
   webSearchProviderMissingHint:
-    "قم بتكوين خدمة واحدة على الأقل قادرة على البحث في بيانات الاعتماد لتمكين التأريض على الويب هنا.",
+    "قم بتكوين خدمة واحدة على الأقل قادرة على البحث في بيانات الاعتماد لتمكين الاستناد إلى الويب هنا.",
   webSearchModelHint: ({ model }) =>
-    `يستخدم ${model} خلف الكواليس للتأريض المباشر للويب.`,
+    `يستخدم ${model} خلف الكواليس للاستناد المباشر إلى الويب.`,
   webSearchHomeHint:
-    "استخدم مفتاح تبديل الشاشة الرئيسية لتشغيل أو إيقاف تشغيل التأريض للويب لهذا الموضوع.",
+    "استخدم مفتاح تبديل الشاشة الرئيسية لتشغيل الاستناد إلى الويب أو إيقافه لهذا الموضوع.",
   settingsWebSearchCompactHint:
     "يمكنك بشكل اختياري إضافة سياق الويب الجديد قبل أن يرد النموذج الرئيسي.",
   webSearchAdvanced: "ضوابط البحث المتقدمة",
@@ -324,7 +324,7 @@ export const ar = {
   webSearchSearchModeBalanced: "متوازن",
   webSearchSearchModeDeep: "عميق",
   webSearchDepth: "عمق البحث",
-  webSearchDepthStandard: "معيار",
+  webSearchDepthStandard: "قياسي",
   webSearchDepthDeep: "عميق",
   webSearchResultCount: "عدد النتائج",
   webSearchQualityHint: ({ provider }) =>
@@ -335,13 +335,13 @@ export const ar = {
   openWebSearchSettings: "افتح إعدادات بحث الويب",
   providerSttDescription:
     "استخدم خدمة خارجية تم تكوينها لنسخ صوتك قبل إرساله إلى مسار الرد.",
-  sttProvider: "مزود STT",
+  sttProvider: "مزوّد STT",
   sttProviderEnabledHint:
-    "يظهر هنا فقط الموفرون الممكّنون الذين لديهم دعم النسخ.",
+    "يظهر هنا فقط المزوّدون المفعّلون الذين يدعمون النسخ.",
   sttProviderMissingHint:
     "أضف بيانات اعتماد لخدمة تدعم STT لاختيارها هنا.",
   nativeSttHint:
-    "يعمل التعرف على النظام بشكل مستقل عن مفاتيح الموفر لديك ويمكن معالجته على الجهاز أو عن طريق خدمة الكلام الخاصة بنظام التشغيل.",
+    "يعمل تعرّف النظام على الكلام بشكل مستقل عن مفاتيح المزوّدين لديك، وقد تتم معالجته على الجهاز أو عن طريق خدمة الكلام الخاصة بنظام التشغيل.",
   replyPlayback: "تشغيل الرد",
   sentencesArrive: "وصول الفقرات",
   sentencesArriveDescription:
@@ -358,17 +358,18 @@ export const ar = {
   nativeTtsDescription:
     "استخدم محرك الكلام الخاص بالجهاز للردود المنطوقة ومعاينة الصوت.",
   kokoroTtsDescription:
-    "استخدم صوتًا عصبيًا أكثر طبيعية تمامًا على هذا الجهاز. يتم تركيب نص الرد المنطوق محليًا، بدون مفتاح موفر الكلام أو رسوم الاستخدام.",
-  kokoroVoices: "Kokoro الأصوات الموجودة على الجهاز",
+    "استخدم صوتًا عصبيًا أكثر طبيعية تمامًا على هذا الجهاز. يتم تركيب نص الرد المنطوق محليًا، بدون مفتاح مزوّد كلام أو رسوم استخدام.",
+  kokoroVoices: "أصوات Kokoro على الجهاز",
   kokoroVoicesHint: ({ size, installedSize }) =>
     `يتم تنزيل النموذج متعدد اللغات بحوالي ${size} ميغابايت ويشغل حوالي ${installedSize} ميغابايت بعد التثبيت.`,
-  kokoroModel: "Kokoro نموذج متعدد اللغات",
-  kokoroChecking: "جارٍ التحقق من الطراز الموجود على الجهاز…",
+  kokoroModel: "نموذج Kokoro متعدد اللغات",
+  kokoroChecking: "جارٍ التحقق من النموذج الموجود على الجهاز…",
   kokoroDownloading: ({ progress }) => `جاري التحميل…${progress}%`,
   kokoroExtracting: ({ progress }) => `جارٍ التثبيت… ${progress}%`,
   kokoroVerifying: "جارٍ التحقق من المحرك الصوتي...",
   kokoroInstalled: "مثبت وجاهز على هذا الجهاز.",
-  kokoroNotInstalled: "تحميل اختياري. لا يوجد مفتاح موفر مطلوب.",
+  kokoroNotInstalled:
+    "قم بتنزيل النموذج والتحقق منه قبل اختيار Kokoro أو استخدامه. لا حاجة إلى مفتاح مزوّد.",
   kokoroLanguageFallback:
     "يتحدث Kokoro حاليًا اللغة الإنجليزية والصينية المبسطة هنا. بالنسبة إلى لغات الرد المحددة الأخرى، أضف مسارًا احتياطيًا صريحًا وإلا سيتوقف الكلام مع حدوث خطأ.",
   kokoroRemoveTitle: "إزالة نموذج Kokoro؟",
@@ -383,7 +384,7 @@ export const ar = {
   expandVoiceSettings: ({ language }) => `قم بتوسيع إعدادات الصوت ${language}`,
   collapseVoiceSettings: ({ language }) =>
     `طي إعدادات الصوت ${language}`,
-  remove: "يزيل",
+  remove: "إزالة",
   voiceOutputDescription:
     "اختر محرك الكلام ولغات الاستماع والمعاينات الصوتية للردود المنطوقة.",
   localTts: "محلي",
@@ -399,11 +400,11 @@ export const ar = {
   ttsFallbackPosition: ({ position, route }) => `${position}. ${route}`,
   addFallbackRoute: ({ route }) => `إضافة احتياطي ${route}`,
   removeFallbackRoute: ({ route }) => `إزالة ${route} الاحتياطية`,
-  moveFallbackEarlier: ({ route }) => `انقل ${route} مسبقًا`,
-  moveFallbackLater: ({ route }) => `انقل ${route} لاحقًا`,
-  ttsProvider: "مزود TTS",
+  moveFallbackEarlier: ({ route }) => `انقل ${route} إلى موضع أبكر`,
+  moveFallbackLater: ({ route }) => `انقل ${route} إلى موضع لاحق`,
+  ttsProvider: "مزوّد TTS",
   ttsProviderEnabledHint:
-    "يظهر هنا فقط الموفرون الممكّنون الذين يتمتعون بدعم الرد المنطوق.",
+    "يظهر هنا فقط المزوّدون المفعّلون الذين يدعمون الرد المنطوق.",
   ttsProviderMissingHint:
     "أضف بيانات اعتماد لخدمة تدعم TTS لاختيارها هنا.",
   localTtsOrderHint:
@@ -411,12 +412,12 @@ export const ar = {
   providerTtsOrderHint:
     "تتم محاولة المسارات الاحتياطية التي تم تكوينها بشكل صريح فقط.",
   nativeTtsHint:
-    "يستخدم TTS الأصلي المكدس الصوتي للنظام ولا يتطلب مفتاح موفر.",
+    "يستخدم TTS الأصلي المكدس الصوتي للنظام ولا يتطلب مفتاح مزوّد.",
   localTtsLanguageCoverageHint:
     "تغطي الحزم المحلية حاليًا اللغة الإنجليزية والألمانية والصينية المبسطة والإسبانية والبرتغالية والهندية والفرنسية والإيطالية.",
   ttsVoice: "صوت TTS",
-  refresh: "ينعش",
-  providerVoiceDirectory: ({ provider }) => `المكتبة الصوتية ${provider}`,
+  refresh: "تحديث",
+  providerVoiceDirectory: ({ provider }) => `مكتبة أصوات ${provider}`,
   refreshProviderVoices: ({ provider }) => `تحديث أصوات ${provider}`,
   providerVoicesAvailable: ({ count, provider }) =>
     `${count} ${Number(count) === 1 ? "صوت" : "أصوات"} متاح من ${provider}.`,
@@ -426,17 +427,17 @@ export const ar = {
     "لا يمكن تحميل أصوات الحساب. يظل الصوت المدمج متاحًا.",
   providerVoicesErrorDetail: ({ detail }) => `السبب: ${detail}`,
   elevenLabsVoicesReadPermissionHint:
-    "في ElevenLabs، قم بتحرير مفتاح API هذا وقم بتمكين الأصوات → قراءة، ثم قم بالتحديث هنا.",
+    "في ElevenLabs، قم بتحرير مفتاح API هذا وفعّل الأصوات ← قراءة، ثم قم بالتحديث هنا.",
   providerVoicesLoadingHint: ({ provider }) =>
     `يقوم Mr Broccoli بتحميل الأصوات المتاحة تلقائيًا من ${provider}.`,
-  providerVoiceId: "الهوية الصوتية",
+  providerVoiceId: "معرّف الصوت",
   providerVoiceIdPlaceholder: "أدخل معرفًا صوتيًا",
   providerVoiceIdFallbackHint:
-    "يظل الإدخال اليدوي متاحًا عندما لا يمكن تحميل المكتبة الصوتية.",
+    "يظل الإدخال اليدوي متاحًا عندما لا يمكن تحميل مكتبة الأصوات.",
   providerVoiceIdRequired: ({ provider }) =>
-    `قم بتحديث مكتبة الصوت ${provider} أو أدخل معرفًا صوتيًا قبل استخدام إخراج الكلام.`,
+    `قم بتحديث مكتبة أصوات ${provider} أو أدخل معرّف صوت قبل استخدام إخراج الكلام.`,
   qwenSpeechUnavailableInUs:
-    "مسارات الكلام Qwen الحالية لـ Mr Broccoli غير متوفرة في منطقة الولايات المتحدة. اختر سنغافورة أو بكين لخطاب Qwen.",
+    "مسارات كلام Qwen الحالية في Mr Broccoli غير متوفرة في منطقة الولايات المتحدة. اختر سنغافورة أو بكين لكلام Qwen.",
   qwenApiRegion: "منطقة Qwen API",
   qwenRegionSingapore: "سنغافورة",
   qwenRegionUs: "الولايات المتحدة (فرجينيا)",
@@ -444,24 +445,24 @@ export const ar = {
   qwenRegionHint:
     "يجب أن تتطابق المنطقة المحددة مع المنطقة التي تم إنشاء مفتاح API فيها.",
   qwenRegionUsSpeechHint:
-    "تدعم مفاتيح منطقة الولايات المتحدة الدردشة والبحث على الويب هنا. تتطلب مسارات Mr Broccoli الحالية Qwen STT وTTS مفتاح سنغافورة أو بكين.",
+    "تدعم مفاتيح منطقة الولايات المتحدة الدردشة وبحث الويب هنا. تتطلب مسارات Qwen STT وTTS الحالية في Mr Broccoli مفتاح سنغافورة أو بكين.",
   providerDefaultVoiceHint:
-    "يستخدم هذا الموفر حاليًا صوته الافتراضي للمعاينة والردود المنطوقة.",
-  listenLanguages: "الاستماع اللغات",
+    "يستخدم هذا المزوّد حاليًا صوته الافتراضي للمعاينة والردود المنطوقة.",
+  listenLanguages: "لغات الاستماع",
   listenLanguagesHint:
     "اختر لغات الرد التي تريدها أن تبدو جيدة. يقوم Mr Broccoli بتجربتها بهذا الترتيب عند توجيه إخراج الكلام.",
   listenLanguagesSelected: ({ count }) =>
-    count === 1 ? "تم اختيار لغة واحدة" : `تم تحديد اللغات ${count}`,
+    count === 1 ? "تم اختيار لغة واحدة" : `تم تحديد ${count} لغات`,
   localVoicePacks: "حزم الصوت المحلية",
   localVoicePacksHint:
     "تحتفظ كل لغة بصوتها المحلي الخاص. اختر الصوت الذي تريده لتلك اللغة، ثم قم بتنزيل الحزم التي تهمك فقط.",
   localVoiceForLanguage: ({ languageLabel }) => `صوت لـ ${languageLabel}`,
-  providerVoicePreviews: "معاينة صوت الموفر",
+  providerVoicePreviews: "معاينات أصوات المزوّدين",
   providerVoicePreviewsHint:
     "اختبر مسار TTS المحدد حاليًا هنا مع نص معاينة منفصل لكل لغة رد.",
   nativeVoicePreviewSection: "معاينة الصوت الأصلي",
   nativeVoicePreviewSectionHint:
-    "يتحدث هذا مباشرة من خلال مُركِّب الكلام المدمج في الهاتف حتى تتمكن من مقارنته بأصوات الموفر التي تم تكوينها.",
+    "يتحدث هذا مباشرة من خلال مُركِّب الكلام المدمج في الهاتف حتى تتمكن من مقارنته بأصوات المزوّدين التي تم تكوينها.",
   nativeVoiceUnavailable:
     "لم يُبلغ هذا الجهاز عن أي أصوات للنظام الأصلي للمعاينة.",
   runtimeCompatibilityOverrides: "توافق وقت التشغيل",
@@ -486,11 +487,11 @@ export const ar = {
   speechDiagnosticSourcePreview: "معاينة الصوت",
   speechDiagnosticSourceUnknown: "طلب الكلام",
   speechDiagnosticRouteLine: ({ requested, actual }) =>
-    `المطلوب: ${requested} -> الفعلي: ${actual}`,
+    `المطلوب: ${requested} ← الفعلي: ${actual}`,
   speechDiagnosticStageLine: ({ stage }) => `المرحلة الأخيرة: ${stage}`,
   speechDiagnosticLanguageLine: ({ languageLabel }) =>
     `اللغة: ${languageLabel}`,
-  speechDiagnosticProviderLine: ({ provider }) => `المزود: ${provider}`,
+  speechDiagnosticProviderLine: ({ provider }) => `المزوّد: ${provider}`,
   speechDiagnosticVoiceLine: ({ voice }) => `الصوت: ${voice}`,
   localTtsPackReady: "تم تثبيته على هذا الجهاز",
   localTtsPackBroken:
@@ -498,11 +499,11 @@ export const ar = {
   localTtsPackMissing:
     "لم يتم تثبيته بعد. سيتم استخدام Cloud TTS أو صوت النظام حتى تقوم بتنزيله.",
   localTtsUnsupportedLanguageFallback:
-    "الحزمة المحلية غير متوفرة بعد لهذه اللغة. Cloud TTS أو سيتعامل معها صوت النظام.",
+    "الحزمة المحلية غير متوفرة بعد لهذه اللغة. سيتولى TTS السحابي أو صوت النظام التعامل معها.",
   downloadingLocalTtsPack: ({ progress }) =>
     `جارٍ تنزيل الحزمة المحلية... ${progress}%`,
-  download: "تحميل",
-  downloadingShort: "تحميل...",
+  download: "تنزيل",
+  downloadingShort: "جارٍ التحميل...",
   voicePreviewText: "نص معاينة الصوت",
   voicePreviewPlaceholder: "اكتب عبارة لسماع هذا الصوت.",
   voicePreviewHint:
@@ -512,7 +513,7 @@ export const ar = {
   playingPreview: "جارٍ تشغيل المعاينة...",
   systemVoice: "صوت النظام",
   spokenRepliesOff: "النص فقط",
-  noTtsProvider: "لا يوجد مزود TTS",
+  noTtsProvider: "لا يوجد مزوّد TTS",
   nothingToCopyYet: "لا يوجد شيء لنسخه بعد.",
   couldntCopyText: "تعذر نسخ هذا النص.",
   nothingToShareYet: "لا شيء للمشاركة بعد.",
@@ -537,19 +538,19 @@ export const ar = {
   configureCredentialsBeforeVoiceSession:
     "أضف بيانات الاعتماد في الإعدادات قبل بدء الجلسة الصوتية.",
   endpointCredentialFormatInvalid: ({ provider }) =>
-    `بالنسبة إلى ${provider}، أدخل عنوان URL الأساسي للموفر ومفتاح API كـ https://your-endpoint.example.com|your-api-key.`,
+    `بالنسبة إلى ${provider}، أدخل عنوان URL الأساسي للمزوّد ومفتاح API كـ https://your-endpoint.example.com|your-api-key.`,
   speechRecognitionUnavailableOnDevice:
     "التعرف على الكلام غير متوفر على هذا الجهاز.",
   debugLogLabel: "سجل",
   debugLogCaptureStarted: "بدأ تسجيل التصحيح.",
   debugLogCaptureStopped: ({ entryCount, fileName }) =>
-    `تم حفظ سجل التصحيح باسم ${fileName} ونسخه إلى الحافظة (إدخالات ${entryCount}).`,
+    `تم حفظ سجل التصحيح باسم ${fileName} ونسخه إلى الحافظة (${entryCount} إدخالات).`,
   debugLogCaptureStoppedNoClipboard: ({ entryCount, fileName }) =>
-    `تم حفظ سجل التصحيح باسم ${fileName} (إدخالات ${entryCount}).`,
+    `تم حفظ سجل التصحيح باسم ${fileName} (${entryCount} إدخالات).`,
   debugLogCaptureRecovered: ({ entryCount, fileName }) =>
-    `تم استرداد سجل التصحيح السابق ${fileName} ونسخه إلى الحافظة (إدخالات ${entryCount}).`,
+    `تم استرداد سجل التصحيح السابق ${fileName} ونسخه إلى الحافظة (${entryCount} إدخالات).`,
   debugLogCaptureRecoveredNoClipboard: ({ entryCount, fileName }) =>
-    `تم استرداد سجل التصحيح السابق ${fileName} (إدخالات ${entryCount}).`,
+    `تم استرداد سجل التصحيح السابق ${fileName} (${entryCount} إدخالات).`,
   debugLogCaptureFailed: "تعذر حفظ سجل التصحيح.",
   chooseSttBeforeVoiceSession:
     "اختر مسار STT الذي تم تكوينه في الإعدادات قبل بدء جلسة صوتية.",
@@ -581,7 +582,7 @@ export const ar = {
   localTtsPackInstalled: ({ languageLabel }) =>
     `تم تثبيت حزمة الصوت المحلية ${languageLabel}.`,
   localTtsPackInstallFailed: "تعذر تثبيت حزمة الصوت المحلية.",
-  clear: "واضح",
+  clear: "مسح",
   voiceOutput: "إخراج الصوت",
   speechReplayCache: "ذاكرة إعادة تشغيل الكلام",
   speechReplayCacheDescription:
@@ -596,47 +597,48 @@ export const ar = {
   searchingTheWeb: "البحث في الويب عن سياق جديد",
   waitingForProvider: ({ provider }) => `في انتظار ${provider}`,
   preparingVoiceWithProvider: ({ provider }) =>
-    `تحضير الصوت ببرنامج ${provider}`,
+    `تحضير الصوت عبر ${provider}`,
   deepThinkingReassurance: "الإجابات الجيدة تستغرق لحظة...",
   thinkingElapsed: ({ detail, seconds }) => `${detail} · ${seconds}s`,
-  speakingBackToYou: "التحدث إليك مرة أخرى",
+  speakingBackToYou: "جارٍ الرد عليك صوتيًا",
   freshSession: "جلسة جديدة",
   messageCount: ({ count }) =>
-    Number(count) === 1 ? "1 رسالة" : `رسائل ${count}`,
-  speechInputRoute: ({ route }) => `الكلام في: ${route}`,
+    Number(count) === 1 ? "رسالة واحدة" : `${count} رسائل`,
+  speechInputRoute: ({ route }) => `إدخال الكلام: ${route}`,
   replyModelRoute: ({ route }) => `نموذج الرد: ${route}`,
-  voiceOutputRoute: ({ route }) => `الصوت الخارجي: ${route}`,
+  voiceOutputRoute: ({ route }) => `إخراج الصوت: ${route}`,
   fallbackVoiceOutputRoute: ({ route }) => `الصوت الاحتياطي: ${route}`,
   conversation: "محادثة",
   conversationActions: "إجراءات المحادثة",
   statusDetails: "تفاصيل الحالة",
   persistenceFailure:
     "تعذر على Mr Broccoli حفظ البيانات على هذا الجهاز. أبقِ التطبيق مفتوحًا وحاول مرة أخرى؛ قد يتم فقدان التغييرات الأخيرة بعد إعادة التشغيل.",
-  show: "يعرض",
+  show: "عرض",
   showTranscript: "إظهار النص",
-  hide: "يخفي",
+  hide: "إخفاء",
   copyThread: "نسخ الموضوع",
   shareThread: "مشاركة الموضوع",
   reportResponse: "الإبلاغ عن هذا الرد",
-  reportResponseIntro: "بلاغ عن رد ذكاء اصطناعي من Mr Broccoli. راجع المحتوى أدناه وصف المشكلة ثم أرسل هذا البلاغ إلى المطور.",
+  reportResponseIntro: "بلاغ عن رد ذكاء اصطناعي من Mr Broccoli. راجع المحتوى أدناه، وصِف المشكلة، ثم أرسل هذا البلاغ إلى المطوّر.",
   repeatReply: "كرر الرد",
   renameThread: "إعادة تسمية الموضوع",
   renameThreadHint:
     "أعط هذه المحادثة عنوانًا يمكنك العثور عليه سريعًا لاحقًا.",
   threadTitle: "عنوان الموضوع",
-  noTranscriptYet: "لا يوجد نسخة بعد",
+  noTranscriptYet: "لا يوجد نص بعد",
   previewTranscriptEmptyDescription:
     "استخدم الصوت أو النص للبدء. ستظهر محادثتك هنا.",
   noConversationYet: "لا توجد محادثة بعد",
   expandedTranscriptEmptyDescription:
-    "استخدم الصوت أو النص للبدء. أغلق هذه الشاشة عندما تريد العودة إلى المسرح الرئيسي.",
+    "استخدم الصوت أو النص للبدء. أغلق هذه الشاشة عندما تريد العودة إلى الشاشة الرئيسية.",
   transcriptSelectionHint:
     "حدد أي نص رسالة مباشرة، أو قم بمشاركة ونسخ الرسائل الفردية أدناه.",
   textMessagePlaceholder: "اكتب رسالة",
   sendTextMessage: "أرسل رسالة",
   showVoiceInput: "إظهار الإدخال الصوتي",
   showTextInput: "إظهار إدخال النص",
-  usageStatsHiddenDescription: "احتفظ بتقديرات الرموز المميزة خارج النص UI.",
+  usageStatsHiddenDescription:
+    "أبقِ تقديرات الرموز المميزة خارج واجهة نص المحادثة.",
   usageStatsVisibleDescription:
     "إظهار الاستخدام المقدر للرمز المميز للردود وإجماليات المحادثات.",
   debugLogButton: "زر سجل التصحيح",
@@ -648,67 +650,67 @@ export const ar = {
     "كيفية استخدام الزر: سيؤدي تشغيله إلى البدء في التقاط السجلات. سيؤدي إيقاف تشغيله إلى إيقاف التقاط السجلات ونقل السجلات الملتقطة إلى الحافظة.",
   estimatedUsageTitle: "الاستخدام المقدر",
   estimatedUsageCounts: ({ replies, summaries }) =>
-    `ردود ${replies} · تحديثات الذاكرة ${summaries}`,
+    `${replies} ردود · ${summaries} تحديثات للذاكرة`,
   estimatedUsageConversationScope:
     "تتضمن الإجماليات كل مسار ونموذج مستخدم داخل هذه المحادثة.",
-  estimatedPromptTokens: ({ count }) => `مستعجل: ${count}`,
+  estimatedPromptTokens: ({ count }) => `الموجّه: ${count}`,
   estimatedReplyTokens: ({ count }) => `الرد: ${count}`,
   estimatedTotalTokens: ({ count }) => `الإجمالي: ${count}`,
   estimatedUsageInline: ({ prompt, completion, total }) =>
-    `EST. ${prompt} داخل · ${completion} خارج · إجمالي ${total}`,
+    `تقديري: ${prompt} إدخال · ${completion} إخراج · ${total} الإجمالي`,
   searchQuery: "استعلام البحث",
   expandWebSearchDetails: "عرض تفاصيل بحث الويب",
   collapseWebSearchDetails: "إخفاء تفاصيل بحث الويب",
   webSearchSourceCount: ({ count }) =>
     `${count} ${Number(count) === 1 ? "مصدر" : "مصادر"}`,
   sources: "مصادر",
-  openSourceLink: ({ source }) => `المصدر المفتوح: ${source}`,
-  turnReceipt: "بدوره التفاصيل",
-  expandTurnReceipt: "إظهار تفاصيل المنعطف",
-  collapseTurnReceipt: "إخفاء تفاصيل المنعطف",
+  openSourceLink: ({ source }) => `فتح المصدر: ${source}`,
+  turnReceipt: "تفاصيل الدور",
+  expandTurnReceipt: "إظهار تفاصيل الدور",
+  collapseTurnReceipt: "إخفاء تفاصيل الدور",
   turnReceiptDirect: "مباشر",
   turnReceiptRequested: "مسار الرد المطلوب",
-  turnReceiptActual: "طريق الرد الفعلي",
-  turnReceiptEffort: "السيطرة المنطقية",
-  turnReceiptProviderNative: "مزود الأصلي",
-  turnReceiptInput: "طريق الإدخال",
+  turnReceiptActual: "مسار الرد الفعلي",
+  turnReceiptEffort: "التحكم في الاستدلال",
+  turnReceiptProviderNative: "أصلي لدى المزوّد",
+  turnReceiptInput: "مسار الإدخال",
   turnReceiptSearch: "البحث على شبكة الإنترنت",
   turnReceiptVoice: "إخراج الصوت",
   turnReceiptContext: "سياق",
   turnReceiptTiming: "توقيت",
-  turnReceiptFallback: "سبب تراجعي",
+  turnReceiptFallback: "سبب اللجوء إلى الاحتياطي",
   turnReceiptVoiceInput: "صوت",
-  turnReceiptTypedInput: "كتبته",
-  turnReceiptSystemSpeech: "التعرف على كلام النظام",
+  turnReceiptTypedInput: "مكتوب",
+  turnReceiptSystemSpeech: "تعرّف النظام على الكلام",
   turnReceiptSystemVoice: "صوت النظام",
   turnReceiptSystemVoiceFallback: "صوت النظام · احتياطي",
-  turnReceiptOff: "عن",
-  turnReceiptNotConfigured: "على · لم يتم تكوينه",
-  turnReceiptFallbackWithoutSearch: "تابع دون البحث المباشر",
+  turnReceiptOff: "متوقف",
+  turnReceiptNotConfigured: "مفعّل · غير مكوّن",
+  turnReceiptFallbackWithoutSearch: "تمت المتابعة دون البحث المباشر",
   turnReceiptNotUsed: "غير مستخدم",
   turnReceiptSummaryReused: "إعادة استخدام الملخص المحفوظ",
   turnReceiptSummaryUpdated: "تم تحديث الملخص",
   turnReceiptContextFallback: "احتياطي الرسالة الأخيرة",
   turnReceiptGatewayCompression: ({ original, compressed }) =>
-    `تم ضغط البوابة ${original} إلى رسائل ${compressed}`,
+    `ضغطت البوابة ${original} إلى ${compressed} رسائل`,
   turnReceiptContextValue: ({ sent, total, summarized, state }) =>
-    `تم إرسال الرسائل السابقة ${sent}/${total} · ملخص ${summarized} حديثًا${state}`,
+    `تم إرسال ${sent}/${total} من الرسائل السابقة · تم تلخيص ${summarized} حديثًا${state}`,
   turnReceiptTimingStt: "STT",
   turnReceiptTimingContext: "سياق",
-  turnReceiptTimingSearch: "يبحث",
+  turnReceiptTimingSearch: "البحث",
   turnReceiptTimingModel: "نموذج",
   turnReceiptTimingFirstSpeech: "الكلام الأول",
   turnReceiptTimingTotal: "المجموع",
-  estimatedRouteUsageTokensOnly: ({ tokens }) => `الرموز المميزة ${tokens}`,
-  unknownUsageRoute: "طريق غير معروف",
+  estimatedRouteUsageTokensOnly: ({ tokens }) => `${tokens} رمزًا مميزًا`,
+  unknownUsageRoute: "مسار غير معروف",
   setupGuideConnectProviderTitle: "تكوين بيانات الاعتماد",
   setupGuideConnectProviderDescription:
     "أضف بيانات الاعتماد في الإعدادات، ثم اختر المسارات التي تريد استخدامها.",
-  idle: "عاطل",
+  idle: "خامل",
   yourConversationAppearsHere: "تظهر محادثتك هنا",
   defaultTranscriptEmptyDescription:
     "استخدم الصوت أو النص للبدء. سيحتفظ Mr Broccoli بالموضوع ويرد هنا.",
-  delete: "يمسح",
+  delete: "حذف",
   deleteConversationConfirmationTitle: ({ title }) => `هل تريد حذف "${title}"؟`,
   deleteConversationConfirmationMessage:
     "يؤدي هذا إلى حذف المحادثة وجميع رسائلها نهائيًا. لا يمكن التراجع عن هذا الإجراء.",
@@ -740,26 +742,26 @@ export const ar = {
   setupGuideProviderBody:
     "اختر الخدمة الخارجية التي تريد تكوينها، ثم الصق بيانات الاعتماد مع إمكانية الوصول للرد.",
   setupGuideProviderPickerLabel: "خدمة الرد",
-  setupGuideSelectProvider: "حدد مزودًا",
-  setupGuideSelectProviderFirst: "حدد مزودًا أولاً.",
+  setupGuideSelectProvider: "حدد مزوّدًا",
+  setupGuideSelectProviderFirst: "حدد مزوّدًا أولاً.",
   setupGuideApiKeyLabel: "مفتاح API",
   setupGuideApiKeyPlaceholder: "لصق بيانات الاعتماد",
-  setupGuideContinue: "يكمل",
+  setupGuideContinue: "متابعة",
   setupGuideOpenSettings: "افتح الإعدادات",
-  setupGuideBack: "خلف",
+  setupGuideBack: "رجوع",
   setupGuideValidateKey: "التحقق من صحة المفتاح",
   setupGuideApiKeyRequiredOrCancel:
     "أضف مفتاح API للمتابعة أو قم بإلغاء دليل الإعداد.",
   setupGuideProviderAndApiKeyRequiredOrCancel:
-    "اختر موفرًا وأضف مفتاح API للمتابعة أو قم بإلغاء دليل الإعداد.",
+    "اختر مزوّدًا وأضف مفتاح API للمتابعة أو قم بإلغاء دليل الإعداد.",
   setupGuideProviderKeyNeedsLlmAccess: ({ provider }) =>
     `لا تسمح بيانات اعتماد ${provider} هذه بطلبات الرد.`,
   setupGuideKokoroTitle: "أضف صوتًا طبيعيًا على الجهاز",
   setupGuideKokoroBody: ({ size }) =>
-    `اختياري: قم بتنزيل Kokoro (حوالي ${size} ميغابايت) للحصول على ردود منطوقة أكثر طبيعية بدون موفر الكلام أو رسوم الاستخدام.`,
+    `اختياري: قم بتنزيل Kokoro (حوالي ${size} ميغابايت) للحصول على ردود منطوقة أكثر طبيعية بدون مزوّد كلام أو رسوم استخدام.`,
   setupGuideKokoroLanguageNote:
     "يتحدث هذا النموذج حاليًا اللغة الإنجليزية والصينية المبسطة. قم بتكوين أي مسارات احتياطية تريدها لاحقًا في إعدادات التحدث.",
-  setupGuideKokoroDownload: "تحميل Kokoro",
+  setupGuideKokoroDownload: "تنزيل Kokoro",
   setupGuideUseKokoro: "استخدم Kokoro للردود المنطوقة",
   setupGuideUseKokoroSummary:
     "احتفظ بالتوليف على الهاتف عندما تكون لغة الرد مدعومة.",
@@ -770,12 +772,12 @@ export const ar = {
   setupGuideVoiceTestNoInputBody:
     "الإدخال الصوتي غير متاح مع هذا الإعداد. استمر في مراجعة المسارات المكتشفة، ثم اضبط إعدادات الكلام لاحقًا إذا لزم الأمر.",
   setupGuideVoiceTestTextOnlyNote:
-    "يظل هذا الاختبار نصيًا فقط لأنه لا يوجد طريق صوتي منطوق مقبول جاهز حتى الآن.",
+    "يظل هذا الاختبار نصيًا فقط لأنه لا يوجد مسار صوتي منطوق مقبول جاهز حتى الآن.",
   setupGuideVoiceTestStart: "ابدأ الاختبار",
   setupGuideVoiceTestStop: "توقف عن التسجيل",
   setupGuideVoiceTestRetry: "تشغيل مرة أخرى",
   setupGuideVoiceTestTranscribing: "جارٍ النسخ…",
-  setupGuideVoiceTestThinking: "الرد التجريبي...",
+  setupGuideVoiceTestThinking: "جارٍ اختبار الرد…",
   setupGuideVoiceTestSynthesizing: "جارٍ تحضير الصوت…",
   setupGuideVoiceTestSpeaking: "جارٍ تشغيل الرد...",
   setupGuideVoiceTestTranscript: "نص",
@@ -791,51 +793,51 @@ export const ar = {
   setupGuideSummaryTts: "تحويل النص إلى كلام",
   setupGuideSummaryWebSearch: "البحث على شبكة الإنترنت",
   setupGuideRouteProviderLlm: ({ provider }) => `تم التمكين عبر ${provider}`,
-  setupGuideRouteOnDeviceStt: "تم التمكين عبر نظام التعرف على الكلام",
+  setupGuideRouteOnDeviceStt: "تم التمكين عبر تعرّف النظام على الكلام",
   setupGuideRouteProviderStt: ({ provider }) =>
-    `تم التمكين عبر نسخ الكلام ${provider}`,
+    `تم التمكين عبر نسخ الكلام لدى ${provider}`,
   setupGuideRouteProviderTts: ({ provider }) => `تم التمكين عبر صوت ${provider}`,
-  setupGuideRouteKokoroTts: "تم التمكين عبر الصوت الموجود على الجهاز Kokoro",
+  setupGuideRouteKokoroTts: "تم التمكين عبر صوت Kokoro على الجهاز",
   setupGuideRouteLocalTts: "تم تمكينه عبر حزمة الصوت المحلية",
   setupGuideRouteUnavailable: "غير متوفر",
-  setupGuideRouteOff: "عن",
+  setupGuideRouteOff: "متوقف",
   setupGuideWebSearchAvailableOff: ({ provider }) =>
     `متاح عبر ${provider}، متوقف حاليًا`,
   setupGuideSummaryTextOnlyNote:
-    "الردود المنطوقة متوقفة حاليًا. تظل الردود في شكل نص حتى تقوم بتمكين موفر الخدمة أو الصوت المحلي.",
-  setupGuideFinish: "منتهي",
+    "الردود المنطوقة متوقفة حاليًا. تظل الردود في شكل نص حتى تقوم بتمكين مزوّد أو صوت محلي.",
+  setupGuideFinish: "تم",
   searchConversationsPlaceholder: "البحث في العناوين والنماذج ونص الرسالة",
   noMatchingConversations: "لا توجد محادثات مطابقة",
   noMatchingConversationsDescription:
     "جرّب عنوانًا أو مسارًا أو نموذجًا أو عبارة مختلفة من النص.",
   memoryModalTitle: "ذاكرة المحادثة",
   memoryModalDescription:
-    "هذا هو الملخص المضغوط الذي يتم تنفيذه بواسطة Mr Broccoli بمجرد أن يصبح الخيط طويلًا بما يكفي لضغط المنعطفات القديمة.",
+    "هذا هو الملخص المضغوط الذي يحمله Mr Broccoli معه بمجرد أن يصبح الموضوع طويلًا بما يكفي لضغط الأدوار القديمة.",
   memorySummary: "الملخص المحفوظ",
   memorySummaryEmpty:
-    "لا توجد ذاكرة مدمجة حتى الآن. بمجرد أن يصبح هذا الموضوع أطول، سيتم تلخيص المنعطفات القديمة هنا.",
+    "لا توجد ذاكرة مضغوطة حتى الآن. بمجرد أن يصبح هذا الموضوع أطول، سيتم تلخيص الأدوار القديمة هنا.",
   summarizedTurnsCount: ({ count }) =>
-    Number(count) === 1 ? "1 دورة ملخصة" : `${count} تلخيص المنعطفات`,
+    Number(count) === 1 ? "دور واحد ملخّص" : `${count} أدوار ملخّصة`,
   copyMemory: "نسخ الذاكرة",
-  forgetMemory: "ننسى الذاكرة",
+  forgetMemory: "نسيان الذاكرة",
   memoryCopied: "تم نسخ الذاكرة.",
   memoryCleared: "تم مسح ذاكرة المحادثة.",
   noConversationToManageYet: "لا توجد ذاكرة محادثة متاحة بعد.",
-  noProviderYet: "لا يوجد مزود حتى الآن",
+  noProviderYet: "لا يوجد مزوّد حتى الآن",
   noModelYet: "لا يوجد نموذج بعد",
   startedAt: "بدأت",
-  endedAt: "انتهى",
+  endedAt: "انتهت",
   pinned: "مثبت",
-  copy: "ينسخ",
-  share: "يشارك",
+  copy: "نسخ",
+  share: "مشاركة",
   rename: "إعادة تسمية",
-  pin: "دبوس",
+  pin: "تثبيت",
   unpin: "إزالة التثبيت",
-  save: "يحفظ",
-  cancel: "يلغي",
-  stop: "قف",
-  pause: "يوقف",
-  resume: "سيرة ذاتية",
+  save: "حفظ",
+  cancel: "إلغاء",
+  stop: "إيقاف",
+  pause: "إيقاف مؤقت",
+  resume: "استئناف",
   paused: "متوقف مؤقتًا",
   listening: "الاستماع",
   parsing: "النسخ",
@@ -843,15 +845,15 @@ export const ar = {
   converting: "تحويل",
   webSearchAction: "البحث على شبكة الإنترنت",
   thinking: "التفكير",
-  speaking: "تكلم",
+  speaking: "التحدث",
   pleaseWait: "انتظر من فضلك",
   yourTurn: "دورك",
   keepPressing: "استمر في الضغط",
   tapWhenDone: "اضغط عند الانتهاء",
   speechPaused: "تم إيقاف الكلام مؤقتًا",
   pausePlaybackUnavailable:
-    "لا يمكن إيقاف هذا المسار الصوتي مؤقتًا. أوقفه أو قم بالتبديل إلى الإخراج الصوتي للموفر.",
-  holdToSpeak: "عقد للتحدث",
+    "لا يمكن إيقاف هذا المسار الصوتي مؤقتًا. أوقفه أو قم بالتبديل إلى الإخراج الصوتي للمزوّد.",
+  holdToSpeak: "اضغط مطولًا للتحدث",
   tapToSpeak: "انقر للتحدث",
   tapAgainToSend: "اضغط مرة أخرى للإرسال",
   waitingForReply: "في انتظار الرد",
@@ -885,7 +887,7 @@ export const ar = {
   providerValidationSuccess: ({ provider }) => `${provider} جاهز للاستخدام.`,
   providerCapabilityValidationSuccess: ({ provider, capability }) =>
     `${provider} ${capability} يعمل.`,
-  providerValidationFailed: "فشل التحقق من صحة الموفر.",
+  providerValidationFailed: "فشل التحقق من صحة المزوّد.",
   webSearchFallback:
     "لم يكن بحث الويب متاحًا، لذلك استمر الرد بدون سياق الويب المباشر.",
   noBase64EncoderAvailable: "لا يتوفر برنامج ترميز base64.",
@@ -893,11 +895,11 @@ export const ar = {
   azureSpeechApiKeyFormat:
     "يحتاج Microsoft Azure TTS إلى بيانات اعتماد Azure Speech بتنسيق <key>|<region>، على سبيل المثال abc123|westeurope، أو تنسيق Azure المدمج <endpoint>|<api-key>|<key>|<region>.",
   nativeTtsDoesNotSynthesizeAudioFiles:
-    "لا يقوم TTS الأصلي بتجميع الملفات الصوتية.",
+    "لا يقوم TTS الأصلي بتوليف ملفات صوتية.",
   localTtsUnavailableForLanguage: ({ languageLabel }) =>
     `لا يوجد مسار صوتي محلي أو سحابي جاهز لـ ${languageLabel}.`,
   chooseTextToSpeechProviderInSettings:
-    "اختر موفر خدمة تحويل النص إلى كلام في الإعدادات.",
+    "اختر مزوّد خدمة تحويل النص إلى كلام في الإعدادات.",
   ttsNotSupportedYet: ({ provider }) => `${provider} TTS غير مدعوم حتى الآن.`,
   ttsError: ({ provider, status, errorText }) =>
     `خطأ ${provider} TTS (${status}): ${errorText}`,
@@ -907,14 +909,14 @@ export const ar = {
   sttTimeout: ({ provider }) =>
     `استغرق نسخ الكلام ${provider} وقتًا طويلاً.`,
   sttFileSizeLimitExceeded: ({ provider, model, limit }) =>
-    `${provider} ${model} يقبل فقط التسجيلات التي تصل إلى ${limit}. استخدم مقطعًا أقصر أو قم بتبديل موديلات STT.`,
+    `${provider} ${model} يقبل فقط التسجيلات التي تصل إلى ${limit}. استخدم مقطعًا أقصر أو بدّل نماذج STT.`,
   voiceInputCaptureIncomplete:
     "لا يمكن التقاط الإدخال الصوتي بشكل واضح. يرجى المحاولة مرة أخرى.",
   ttsDidNotReturnAudio: ({ provider }) =>
     `${provider} TTS لم يُرجع الصوت.`,
   nativeSttHandledInApp: "يتم التعامل مع نظام STT مباشرة في التطبيق.",
   chooseSpeechToTextProviderInSettings:
-    "اختر موفر خدمة تحويل الكلام إلى نص في الإعدادات.",
+    "اختر مزوّد خدمة تحويل الكلام إلى نص في الإعدادات.",
   sttNotSupportedYet: ({ provider }) => `${provider} STT غير مدعوم حتى الآن.`,
   providerNotWiredUpYet: ({ provider }) => `لم يتم توصيل ${provider} بعد.`,
   you: "أنت",

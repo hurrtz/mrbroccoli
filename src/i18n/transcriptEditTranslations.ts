@@ -99,7 +99,8 @@ export const transcriptEditTranslations = {
       "मूल बातचीत का पूरा संदर्भ इस शाखा तक शामिल है। शाखा-बिंदु पर लौटने के लिए टैप करें।",
     backToForkPoint: "शाखा-बिंदु पर वापस जाएँ",
     branchSourceUnavailable: "मूल शाखा उपलब्ध नहीं है",
-    branchCount: ({ count }) => `${count} शाखाएँ`,
+    branchCount: ({ count }) =>
+      Number(count) === 1 ? "1 शाखा" : `${count} शाखाएँ`,
     branchesFromMessage: "इस संदेश से बनी शाखाएँ",
   }),
   es: define({
@@ -186,16 +187,16 @@ export const transcriptEditTranslations = {
     saveAndSend: "Guardar + enviar",
     transcriptEdited: "Editado",
     createForkTitle: "Criar uma ramificação?",
-    createForkConfirmation: "Queres criar uma ramificação desta conversa?",
+    createForkConfirmation: "Quer criar uma ramificação desta conversa?",
     createFork: "Criar ramificação",
     branchFromHere: "Criar ramo a partir daqui",
     branchReady: "Novo ramo pronto. Continue com a próxima mensagem.",
     branchStartsHere: "O ramo começa aqui",
     branchOfConversation: ({ title }) => `Ramo de «${title}»`,
     branchContextKeptFrom: ({ title }) =>
-      `O contexto de «${title}» está incluído até esta ramificação. Toca para voltar ao ponto de ramificação.`,
+      `O contexto de «${title}» está incluído até esta ramificação. Toque para voltar ao ponto de ramificação.`,
     branchContextKept:
-      "Todo o contexto da conversa principal está incluído até esta ramificação. Toca para voltar ao ponto de ramificação.",
+      "Todo o contexto da conversa principal está incluído até esta ramificação. Toque para voltar ao ponto de ramificação.",
     backToForkPoint: "Voltar ao ponto de ramificação",
     branchSourceUnavailable: "Ramo original indisponível",
     branchCount: ({ count }) =>
@@ -247,7 +248,7 @@ export const transcriptEditTranslations = {
     backToForkPoint: "К точке ветвления",
     branchSourceUnavailable: "Исходная ветка недоступна",
     branchCount: ({ count }) =>
-      Number(count) === 1 ? "1 ветка" : `${count} веток`,
+      Number(count) === 1 ? "1 ветка" : `Веток: ${count}`,
     branchesFromMessage: "Ветки от этого сообщения",
   }),
   "zh-CN": define({
@@ -293,7 +294,8 @@ export const transcriptEditTranslations = {
       "تم تضمين سياق المحادثة الأصلية بالكامل حتى هذا الفرع. اضغط للعودة إلى نقطة التفرع.",
     backToForkPoint: "العودة إلى نقطة التفرع",
     branchSourceUnavailable: "الفرع الأصلي غير متاح",
-    branchCount: ({ count }) => `${count} فروع`,
+    branchCount: ({ count }) =>
+      Number(count) === 1 ? "فرع واحد" : `${count} فروع`,
     branchesFromMessage: "الفروع من هذه الرسالة",
   }),
   ja: define({
@@ -308,17 +310,17 @@ export const transcriptEditTranslations = {
     createFork: "分岐を作成",
     branchFromHere: "ここから分岐",
     branchReady:
-      "新しいブランチの準備ができました。次のメッセージを続けてください。",
-    branchStartsHere: "ブランチはここから始まります",
+      "新しい分岐の準備ができました。次のメッセージを続けてください。",
+    branchStartsHere: "分岐はここから始まります",
     branchOfConversation: ({ title }) => `「${title}」からの分岐`,
     branchContextKeptFrom: ({ title }) =>
       `「${title}」のこの分岐までの文脈が含まれています。タップすると分岐点に戻ります。`,
     branchContextKept:
       "親の会話のこの分岐までの文脈がすべて含まれています。タップすると分岐点に戻ります。",
     backToForkPoint: "分岐点に戻る",
-    branchSourceUnavailable: "元のブランチは利用できません",
-    branchCount: ({ count }) => `${count} ブランチ`,
-    branchesFromMessage: "このメッセージからのブランチ",
+    branchSourceUnavailable: "元の分岐は利用できません",
+    branchCount: ({ count }) => `${count} 件の分岐`,
+    branchesFromMessage: "このメッセージからの分岐",
   }),
   hu: define({
     correctTranscript: "Átirat javítása",
@@ -327,18 +329,18 @@ export const transcriptEditTranslations = {
       "Ez frissíti a mentett előzményeket, a keresést, az archívumot és a jövőbeli kontextust. A már létrehozott válaszok nem változnak.",
     saveAndSend: "Mentés + küldés",
     transcriptEdited: "Szerkesztve",
-    createForkTitle: "Létrehozol egy elágazást?",
+    createForkTitle: "Létrehoz egy elágazást?",
     createForkConfirmation:
-      "Szeretnél elágazást létrehozni ebből a beszélgetésből?",
+      "Szeretne elágazást létrehozni ebből a beszélgetésből?",
     createFork: "Elágazás létrehozása",
     branchFromHere: "Elágazás innen",
-    branchReady: "Az új ág kész. Folytasd a következő üzeneteddel.",
+    branchReady: "Az új ág kész. Folytassa a következő üzenetével.",
     branchStartsHere: "Az ág itt kezdődik",
     branchOfConversation: ({ title }) => `A(z) „${title}” ága`,
     branchContextKeptFrom: ({ title }) =>
-      `A(z) „${title}” kontextusa eddig az elágazásig megmaradt. Koppints az elágazási ponthoz való visszatéréshez.`,
+      `A(z) „${title}” kontextusa eddig az elágazásig megmaradt. Koppintson az elágazási ponthoz való visszatéréshez.`,
     branchContextKept:
-      "A szülőbeszélgetés teljes kontextusa eddig az elágazásig megmaradt. Koppints az elágazási ponthoz való visszatéréshez.",
+      "A szülőbeszélgetés teljes kontextusa eddig az elágazásig megmaradt. Koppintson az elágazási ponthoz való visszatéréshez.",
     backToForkPoint: "Vissza az elágazási ponthoz",
     branchSourceUnavailable: "Az eredeti ág nem érhető el",
     branchCount: ({ count }) => `${count} ág`,
@@ -364,7 +366,12 @@ export const transcriptEditTranslations = {
       "Veškerý kontext nadřazené konverzace je zahrnut až po tuto větev. Klepnutím se vrátíte k bodu větvení.",
     backToForkPoint: "Zpět k bodu větvení",
     branchSourceUnavailable: "Původní větev není dostupná",
-    branchCount: ({ count }) => `${count} větví`,
+    branchCount: ({ count }) =>
+      Number(count) === 1
+        ? "1 větev"
+        : Number(count) < 5
+          ? `${count} větve`
+          : `${count} větví`,
     branchesFromMessage: "Větve od této zprávy",
   }),
   pl: define({
@@ -387,12 +394,13 @@ export const transcriptEditTranslations = {
       "Cały kontekst rozmowy nadrzędnej jest uwzględniony do tego odgałęzienia. Dotknij, aby wrócić do punktu rozgałęzienia.",
     backToForkPoint: "Wróć do punktu rozgałęzienia",
     branchSourceUnavailable: "Oryginalna gałąź jest niedostępna",
-    branchCount: ({ count }) => `${count} gałęzi`,
+    branchCount: ({ count }) =>
+      Number(count) === 1 ? "1 gałąź" : `Gałęzie: ${count}`,
     branchesFromMessage: "Gałęzie od tej wiadomości",
   }),
   tr: define({
-    correctTranscript: "Dökümü düzelt",
-    correctTranscriptTitle: "Dökümü düzelt",
+    correctTranscript: "Transkripti düzelt",
+    correctTranscriptTitle: "Transkripti düzelt",
     correctTranscriptHint:
       "Bu işlem kaydedilen geçmişi, aramayı, arşivi ve gelecekteki bağlamı günceller. Daha önce oluşturulan yanıtlar değişmez.",
     saveAndSend: "Kaydet ve gönder",
@@ -435,7 +443,8 @@ export const transcriptEditTranslations = {
       "Hela sammanhanget från den överordnade konversationen ingår fram till denna förgrening. Tryck för att återgå till förgreningspunkten.",
     backToForkPoint: "Tillbaka till förgreningspunkten",
     branchSourceUnavailable: "Den ursprungliga grenen är inte tillgänglig",
-    branchCount: ({ count }) => `${count} grenar`,
+    branchCount: ({ count }) =>
+      Number(count) === 1 ? "1 gren" : `${count} grenar`,
     branchesFromMessage: "Grenar från detta meddelande",
   }),
   ur: define({

@@ -69,7 +69,7 @@ export const ja = {
     "ホームカード、モデル、推論レベル、システムプロンプト。",
   settingsListeningSummary: "入力モードと音声からテキストへのルーティング。",
   settingsSpeakingSummary: "読み上げ、再生方法、音声、プレビュー。",
-  settingsSearchSummary: "Web 検索プロバイダーと検索品質管理。",
+  settingsSearchSummary: "ウェブ検索プロバイダーと検索品質の設定。",
   settingsAppDiagnosticsSummary:
     "テーマ、言語、使用法、デバッグ ログ、および最近のアクティビティ。",
   settingsBackToOverview: "概要に戻る",
@@ -134,7 +134,7 @@ export const ja = {
   providersTabDescription:
     "外部サービスの認証情報をデバイスに保存し、使用する応答モードを構成します。",
   webSearchTabDescription:
-    "返信前にオプションのライブ Web コンテキストを構成します。",
+    "返信前に使用する、任意のライブなウェブコンテキストを設定します。",
   responseModes: "モデルの選択",
   aboutModelSelection: "モデル選択について",
   modelSelectionInfo:
@@ -301,23 +301,24 @@ export const ja = {
   nativeSttDescription:
     "オペレーティング システムの音声認識機能を使用します。デバイスの設定に応じて、認識はデバイス上で実行される場合もあれば、システム サービスを通じて実行される場合もあります。プロバイダーキーは必要ありません。",
   provider: "プロバイダー",
-  webSearchProvider: "Web 検索プロバイダー",
+  webSearchProvider: "ウェブ検索プロバイダー",
   webSearchProviderMissingHint:
-    "ここで Web グラウンディングを有効にするには、資格情報で少なくとも 1 つの検索可能なサービスを構成します。",
+    "ここでウェブグラウンディングを有効にするには、資格情報で少なくとも 1 つの検索可能なサービスを構成します。",
   webSearchModelHint: ({ model }) =>
-    `ライブ Web グラウンディングのために舞台裏で ${model} を使用します。`,
+    `ライブなウェブグラウンディングのために、内部で ${model} を使用します。`,
   webSearchHomeHint:
-    "ホーム画面の切り替えを使用して、このスレッドの Web グラウンディングをオンまたはオフに切り替えます。",
+    "ホーム画面の切り替えを使用して、このスレッドのウェブグラウンディングをオンまたはオフに切り替えます。",
   settingsWebSearchCompactHint:
-    "必要に応じて、メイン モデルが応答する前に新しい Web コンテキストを先頭に追加します。",
+    "必要に応じて、メインのモデルが応答する前に最新のウェブコンテキストを先頭に追加します。",
   webSearchAdvanced: "高度な検索コントロール",
   expandAdvancedSearch: "高度な検索コントロールを拡張する",
   collapseAdvancedSearch: "高度な検索コントロールを折りたたむ",
-  webSearchSetupNeeded: "ライブ Web 検索を使用するための資格情報を追加します。",
+  webSearchSetupNeeded:
+    "ライブなウェブ検索を使用するための資格情報を追加します。",
   webSearchEnabledDescription:
-    "モデルが応答する前に、新しい Web コンテキストが追加されます。",
+    "モデルが応答する前に、最新のウェブコンテキストが追加されます。",
   webSearchDisabledDescription:
-    "現在の事実が重要な場合は、このスレッドのライブ Web コンテキストを使用してください。",
+    "最新の事実が重要な場合は、このスレッドでライブなウェブコンテキストを使用してください。",
   webSearchQualityControls: "検索品質",
   webSearchSearchMode: "検索モード",
   webSearchSearchModeQuick: "クイック",
@@ -332,7 +333,7 @@ export const ja = {
   webSearchNoExtraControls: ({ provider }) =>
     `${provider} は、このアプリで追加の検索品質コントロールをまだ公開していません。`,
   setWebSearchMode: ({ mode }) => `ウェブ検索モードを ${mode} に設定します`,
-  openWebSearchSettings: "Web 検索設定を開く",
+  openWebSearchSettings: "ウェブ検索設定を開く",
   providerSttDescription:
     "設定された外部サービスを使用して、応答ルートに送信される前に音声を文字に起こします。",
   sttProvider: "STT プロバイダー",
@@ -380,26 +381,26 @@ export const ja = {
   kokoroFallbackNeeded: ({ languages }) =>
     `明示的なフォールバック ルートが ${languages} に必要です。`,
   kokoroNoSelectedLanguages:
-    "「聞く言語」で「英語」または「簡体字中国語」を選択して、ココロの音声を設定します。",
+    "「読み上げ言語」で「英語」または「簡体字中国語」を選択して、ココロの音声を設定します。",
   expandVoiceSettings: ({ language }) => `${language} 音声設定を展開します`,
   collapseVoiceSettings: ({ language }) => `${language} 音声設定を折りたたむ`,
   remove: "削除",
   voiceOutputDescription:
-    "音声エンジン、リスニング言語、音声応答の音声プレビューを選択します。",
+    "音声エンジン、読み上げ言語、読み上げ返信の音声プレビューを選択します。",
   localTts: "ローカル",
   localTtsDescription:
     "音声応答には、一致するダウンロードされたローカル音声を使用します。",
   providerTtsDescription: "選択した構成済みサービスを音声応答に使用します。",
   ttsFallbackRoutes: "フォールバック ルート",
   ttsFallbackRoutesHint:
-    "オプション。必要なルートのみを、試行する順序で追加します。ルートが話し始めると、Mr Broccoliは残りの応答の間ルート上に留まります。",
+    "オプション。必要なルートだけを、試したい順に追加します。いずれかのルートで読み上げが始まると、Mr Broccoliはその返信の間ずっと同じルートを使い続けます。",
   ttsFallbackNone:
     "フォールバックは設定されていません。音声ルートに失敗した場合はエラーを表示します。",
-  ttsFallbackPosition: ({ position, route }) => `${position}。 ${route}`,
+  ttsFallbackPosition: ({ position, route }) => `${position}. ${route}`,
   addFallbackRoute: ({ route }) => `${route} フォールバックを追加`,
   removeFallbackRoute: ({ route }) => `${route} フォールバックを削除`,
   moveFallbackEarlier: ({ route }) => `${route}を前に移動`,
-  moveFallbackLater: ({ route }) => `${route}を後で移動`,
+  moveFallbackLater: ({ route }) => `${route}を後ろに移動`,
   ttsProvider: "TTS プロバイダー",
   ttsProviderEnabledHint:
     "音声応答サポートが有効なプロバイダーのみがここに表示されます。",
@@ -414,7 +415,7 @@ export const ja = {
   localTtsLanguageCoverageHint:
     "ローカル パックは現在、英語、ドイツ語、簡体字中国語、スペイン語、ポルトガル語、ヒンディー語、フランス語、イタリア語をカバーしています。",
   ttsVoice: "TTS 音声",
-  refresh: "リフレッシュ",
+  refresh: "更新",
   providerVoiceDirectory: ({ provider }) => `${provider} 音声ライブラリ`,
   refreshProviderVoices: ({ provider }) => `${provider} の音声を更新`,
   providerVoicesAvailable: ({ count, provider }) =>
@@ -443,12 +444,12 @@ export const ja = {
   qwenRegionHint:
     "選択したリージョンは、この API キーが作成されたリージョンと一致する必要があります。",
   qwenRegionUsSpeechHint:
-    "米国地域キーは、ここでチャットと Web 検索をサポートします。Mr Broccoliの現在の Qwen STT および TTS ルートには、シンガポールまたは北京のキーが必要です。",
+    "米国リージョンのキーは、ここでチャットとウェブ検索に使用できます。Mr Broccoliの現在の Qwen STT および TTS ルートには、シンガポールまたは北京のキーが必要です。",
   providerDefaultVoiceHint:
     "このプロバイダーは現在、プレビューおよび音声応答にデフォルトの音声を使用しています。",
   listenLanguages: "読み上げ言語",
   listenLanguagesHint:
-    "聞こえの良い返信言語を選択してください。Mr Broccoliは、音声出力をルーティングするときに、この順序でそれらを試行します。",
+    "きれいに読み上げたい返信言語を選択してください。Mr Broccoliは音声出力をルーティングする際、この順序で試します。",
   listenLanguagesSelected: ({ count }) =>
     count === 1
       ? "1 つの言語が選択されました"
@@ -462,7 +463,7 @@ export const ja = {
     "現在選択されている TTS ルートを、応答言語ごとに個別のプレビュー テキストを使用してここでテストします。",
   nativeVoicePreviewSection: "ネイティブ音声プレビュー",
   nativeVoicePreviewSectionHint:
-    "これは電話機の内蔵音声合成装置を介して直接話すため、設定されたプロバイダーの音声と比較できます。",
+    "端末内蔵の音声合成エンジンで直接読み上げるため、設定したプロバイダーの音声と聞き比べることができます。",
   nativeVoiceUnavailable:
     "このデバイスはプレビュー用のネイティブ システム音声を報告しませんでした。",
   runtimeCompatibilityOverrides: "実行時の互換性",
@@ -507,7 +508,7 @@ export const ja = {
   voicePreviewPlaceholder: "この音声を聞くにはフレーズを入力してください。",
   voicePreviewHint:
     "言語モデルには何も送信せずに、現在選択されている応答音声バックエンドを使用します。",
-  previewVoice: "プレビュー音声",
+  previewVoice: "音声をプレビュー",
   generatingPreview: "プレビューを生成中...",
   playingPreview: "プレビューを再生中...",
   systemVoice: "システム音声",
@@ -563,7 +564,7 @@ export const ja = {
   maxRecordingLengthReached:
     "録音時間の上限に達しました。録音した内容を送信します。",
   sttRecordingTooLarge: ({ provider, limit }) =>
-    `その録音は ${provider} 音声テキスト変換 (最大 ${limit}) ​​には長すぎます。短いメッセージを試すか、Speech-to-Text をシステム認識に切り替えてください。`,
+    `その録音は ${provider} の音声テキスト変換には長すぎます (最大 ${limit})。短いメッセージを試すか、「音声からテキストへ」をシステム認識に切り替えてください。`,
   addProviderKeyToEnableProvider: ({ provider }) =>
     `このルートを使用する前に、設定で ${provider} の資格情報を追加してください。`,
   stopSessionBeforePreview:
@@ -599,7 +600,7 @@ export const ja = {
   preparingVoiceWithProvider: ({ provider }) =>
     `${provider} で音声を準備しています`,
   deepThinkingReassurance: "良い答えを得るには少し時間がかかります…",
-  thinkingElapsed: ({ detail, seconds }) => `${detail} · ${seconds}s`,
+  thinkingElapsed: ({ detail, seconds }) => `${detail} · ${seconds}秒`,
   speakingBackToYou: "回答を読み上げています",
   freshSession: "新しいセッション",
   messageCount: ({ count }) =>
@@ -643,9 +644,9 @@ export const ja = {
     "返信および会話の合計に対する推定トークン使用量を表示します。",
   debugLogButton: "デバッグログボタン",
   debugLogButtonHiddenDescription:
-    "キャプチャがすでに実行されている場合を除き、ホーム画面の LOG ボタンを非表示にしておきます。",
+    "キャプチャがすでに実行されている場合を除き、ホーム画面の「ログ」ボタンを非表示にしておきます。",
   debugLogButtonVisibleDescription:
-    "デバッグ キャプチャを開始および停止するためのホーム画面の [LOG] ボタンを表示します。",
+    "デバッグ キャプチャを開始および停止するためのホーム画面の「ログ」ボタンを表示します。",
   debugLogButtonUsageDescription:
     "ボタンの使用方法: ボタンをオンにすると、ログのキャプチャが開始されます。これをオフに切り替えると、ログのキャプチャが停止され、キャプチャされたログがクリップボードに移動されます。",
   estimatedUsageTitle: "推定使用量",
@@ -657,22 +658,21 @@ export const ja = {
   estimatedReplyTokens: ({ count }) => `返信: ${count}`,
   estimatedTotalTokens: ({ count }) => `合計: ${count}`,
   estimatedUsageInline: ({ prompt, completion, total }) =>
-    `推定値。 ${prompt} 入力 · ${completion} 出力 · ${total} 合計`,
+    `推定: 入力 ${prompt} · 出力 ${completion} · 合計 ${total}`,
   searchQuery: "検索クエリ",
-  expandWebSearchDetails: "Web 検索の詳細を表示",
-  collapseWebSearchDetails: "Web 検索の詳細を非表示にする",
-  webSearchSourceCount: ({ count }) =>
-    `${count} ${Number(count) === 1 ? "ソース" : "情報源"}`,
+  expandWebSearchDetails: "ウェブ検索の詳細を表示",
+  collapseWebSearchDetails: "ウェブ検索の詳細を非表示",
+  webSearchSourceCount: ({ count }) => `${count} 件の情報源`,
   sources: "情報源",
-  openSourceLink: ({ source }) => `ソースを開く: ${source}`,
+  openSourceLink: ({ source }) => `情報源を開く: ${source}`,
   turnReceipt: "ターンの詳細",
   expandTurnReceipt: "ターンの詳細を表示",
   collapseTurnReceipt: "ターンの詳細を非表示にする",
   turnReceiptDirect: "直接",
   turnReceiptRequested: "要求された応答ルート",
   turnReceiptActual: "実際の返信ルート",
-  turnReceiptEffort: "推理制御",
-  turnReceiptProviderNative: "プロバイダネイティブ",
+  turnReceiptEffort: "推論の制御",
+  turnReceiptProviderNative: "プロバイダーネイティブ",
   turnReceiptInput: "入力ルート",
   turnReceiptSearch: "ウェブ検索",
   turnReceiptVoice: "音声出力",
@@ -680,7 +680,7 @@ export const ja = {
   turnReceiptTiming: "タイミング",
   turnReceiptFallback: "フォールバック理由",
   turnReceiptVoiceInput: "音声",
-  turnReceiptTypedInput: "入力済み",
+  turnReceiptTypedInput: "テキスト入力",
   turnReceiptSystemSpeech: "システム音声認識",
   turnReceiptSystemVoice: "システム音声",
   turnReceiptSystemVoiceFallback: "システム音声・フォールバック",
@@ -688,13 +688,13 @@ export const ja = {
   turnReceiptNotConfigured: "オン · 未設定",
   turnReceiptFallbackWithoutSearch: "ライブ検索なしで続行",
   turnReceiptNotUsed: "未使用",
-  turnReceiptSummaryReused: "保存された概要が再利用される",
-  turnReceiptSummaryUpdated: "概要を更新しました",
+  turnReceiptSummaryReused: "保存済みの要約を再利用",
+  turnReceiptSummaryUpdated: "要約を更新",
   turnReceiptContextFallback: "最近のメッセージのフォールバック",
   turnReceiptGatewayCompression: ({ original, compressed }) =>
-    `ゲートウェイ圧縮 ${original} から ${compressed} メッセージ`,
+    `ゲートウェイがメッセージを ${original} 件から ${compressed} 件に圧縮`,
   turnReceiptContextValue: ({ sent, total, summarized, state }) =>
-    `${sent}/${total} 以前に送信されたメッセージ · ${summarized} 新しく要約された${state}`,
+    `過去のメッセージ ${sent}/${total} 件を送信 · ${summarized} 件を新たに要約${state}`,
   turnReceiptTimingStt: "STT",
   turnReceiptTimingContext: "コンテキスト",
   turnReceiptTimingSearch: "検索",
@@ -724,7 +724,7 @@ export const ja = {
   drawerEmptyDescription:
     "メインビューから話し始めると、Mr Broccoliが自動的にセッションを構築します。",
   setupGuideTitle: "アプリを設定する",
-  setupGuideSubtitle: "認証情報を追加し、設定でルートを選択します。",
+  setupGuideSubtitle: "資格情報を追加し、設定でルートを選択します。",
   fastestStartPreset: "最小限のセットアップ",
   fastestStartDescription:
     "利用可能な場合はデバイス音声を使用し、必要な応答ルートのみを設定します。",
@@ -732,7 +732,7 @@ export const ja = {
   fullVoiceDescription:
     "応答、文字起こし、音声出力に設定されたサービスを選択した場合は、それらのサービスを使用します。",
   setupGuideNote:
-    "次に [設定] を開いて、認証情報を貼り付けて検証できるようにします。",
+    "次に「設定」を開いて、資格情報を貼り付けて検証できるようにします。",
   useThisSetup: "この設定を使用",
   notNow: "今はしない",
   setupGuideIntroTitle: "Mr Broccoliの仕組み",
@@ -740,7 +740,7 @@ export const ja = {
     "Mr Broccoliは空白で始まります。すでに使用している外部サービスの資格情報を追加し、応答、音声入力、音声出力、およびオプションの Web コンテキストのルーティング方法を選択します。",
   setupGuideIntroNote:
     "セットアップ後、メインの音声コントロールを使用して会話を開始および停止します。現在のトランスクリプトはホーム画面で利用可能なままであり、すべてのルートは後から設定で変更できます。",
-  setupGuideProviderTitle: "認証情報の追加",
+  setupGuideProviderTitle: "資格情報の追加",
   setupGuideProviderBody:
     "構成する外部サービスを選択し、応答アクセス権を持つ資格情報を貼り付けます。",
   setupGuideProviderPickerLabel: "返信サービス",
@@ -760,14 +760,14 @@ export const ja = {
     `これらの ${provider} 資格情報では、応答リクエストは許可されません。`,
   setupGuideKokoroTitle: "自然なオンデバイス音声を追加する",
   setupGuideKokoroBody: ({ size }) =>
-    `オプション: 音声プロバイダーや使用料金なしで、はるかに自然な音声応答を得るために、Kokoro (約 ${size} MB) をダウンロードしてください。`,
+    `オプション: 音声プロバイダーや使用料金なしで、はるかに自然な音声応答を得るために、ココロ (約 ${size} MB) をダウンロードしてください。`,
   setupGuideKokoroLanguageNote:
-    "このモデルは現在、英語と簡体字中国語を話します。必要なフォールバック ルートは、後でスピーキング設定で構成します。",
+    "このモデルは現在、英語と簡体字中国語を話します。必要なフォールバック ルートは、後で音声出力の設定で構成します。",
   setupGuideKokoroDownload: "ココロをダウンロード",
   setupGuideUseKokoro: "音声応答にココロを使用する",
   setupGuideUseKokoroSummary:
-    "応答言語がサポートされている場合は常に電話で合成を続けます。",
-  setupGuideSkipKokoro: "今はスキップしてください",
+    "応答言語がサポートされている場合は、常に端末上で音声を合成します。",
+  setupGuideSkipKokoro: "今はスキップ",
   setupGuideVoiceTestTitle: "セットアップをテストする",
   setupGuideVoiceTestBody:
     "短い文を言ってください。Mr Broccoliは、マイクのアクセス、文字起こし、設定された応答ルート、および許容可能な音声ルートが利用可能な場合の音声出力をテストします。",
@@ -812,15 +812,17 @@ export const ja = {
   noMatchingConversations: "一致する会話はありません",
   noMatchingConversationsDescription:
     "トランスクリプトとは異なるタイトル、ルート、モデル、またはフレーズを試してください。",
-  memoryModalTitle: "会話記憶",
+  memoryModalTitle: "会話メモリ",
   memoryModalDescription:
     "これは、スレッドが古いターンを圧縮するのに十分な長さになると、Mr Broccoliが引き継ぐコンパクトな要約です。",
   memorySummary: "保存済みの要約",
   memorySummaryEmpty:
     "まだコンパクトなメモリがありません。このスレッドが長くなったら、古いターンはここにまとめられます。",
   summarizedTurnsCount: ({ count }) =>
-    Number(count) === 1 ? "1 要約ターン" : `${count} 要約ターン`,
-  copyMemory: "メモリのコピー",
+    Number(count) === 1
+      ? "1 件のターンを要約済み"
+      : `${count} 件のターンを要約済み`,
+  copyMemory: "メモリをコピー",
   forgetMemory: "メモリを削除",
   memoryCopied: "メモリがコピーされました。",
   memoryCleared: "会話メモリがクリアされました。",
@@ -833,7 +835,7 @@ export const ja = {
   copy: "コピー",
   share: "シェア",
   rename: "名前を変更",
-  pin: "ピン",
+  pin: "ピン留め",
   unpin: "ピンを外す",
   save: "保存",
   cancel: "キャンセル",
@@ -850,7 +852,7 @@ export const ja = {
   speaking: "読み上げ中",
   pleaseWait: "お待ちください",
   yourTurn: "あなたの番です",
-  keepPressing: "押し続ける",
+  keepPressing: "押し続けてください",
   tapWhenDone: "完了したらタップしてください",
   speechPaused: "読み上げを一時停止しています",
   pausePlaybackUnavailable:
@@ -885,14 +887,14 @@ export const ja = {
       ? `${provider} が ${action} リクエストを拒否しました: ${detail}`
       : `${provider} が ${action} リクエストを拒否しました。`,
   providerWebSearchNotRun: ({ provider }) =>
-    `${provider} は Web 検索を実行せずに応答を返しました。`,
+    `${provider} はウェブ検索を実行せずに応答を返しました。`,
   providerValidationSuccess: ({ provider }) =>
     `${provider} を使用する準備ができました。`,
   providerCapabilityValidationSuccess: ({ provider, capability }) =>
     `${provider} ${capability} は動作しています。`,
   providerValidationFailed: "プロバイダーの検証に失敗しました。",
   webSearchFallback:
-    "Web 検索が利用できなかったため、ライブ Web コンテキストなしで応答が続行されました。",
+    "ウェブ検索が利用できなかったため、ライブなウェブコンテキストなしで応答を続行しました。",
   noBase64EncoderAvailable: "利用可能なBase64エンコーダーがありません。",
   noBase64DecoderAvailable: "利用可能なBase64デコーダーがありません。",
   azureSpeechApiKeyFormat:

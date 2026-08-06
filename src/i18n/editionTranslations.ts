@@ -96,7 +96,7 @@ export const editionTranslations = {
     freeOfflineSystemVoiceNote:
       "एक डाउनलोड की गई आवाज़ इन सभी भाषाओं को नहीं संभालती, इसलिए उत्तर फ़ोन की भाषा-अनुकूल सिस्टम आवाज़ इस्तेमाल करेंगे। सुनना और सोचना स्थानीय रहेगा।",
     freeOfflineStart: "शुरू करें",
-    freeOfflinePremiumEscape: "प्रोवाइडर API कुंजियाँ हैं? इसके बजाय Premium अनलॉक करें",
+    freeOfflinePremiumEscape: "प्रदाता API कुंजियाँ हैं? इसके बजाय प्रीमियम अनलॉक करें",
     settingsGroupConversation: "बातचीत और टूल",
     settingsGroupVoiceModels: "आवाज़ और मॉडल",
     settingsGroupPrivacyApp: "गोपनीयता और ऐप",
@@ -108,7 +108,7 @@ export const editionTranslations = {
     premiumFreeKeepsWorking:
       "La versión gratuita sigue siendo útil: conserva conversaciones sin conexión, historial, copias de seguridad y exportación manual.",
     premiumBenefitProviders:
-      "Usa tus proveedores cloud y sus modelos de mayor calidad",
+      "Usa tus proveedores en la nube y sus modelos de mayor calidad",
     premiumBenefitModes:
       "Cambia de modo de respuesta y ejecuta deliberaciones del Modo supremo con varios modelos",
     premiumBenefitTools:
@@ -156,7 +156,7 @@ export const editionTranslations = {
     premiumPurchaseValue:
       "Acquisto una tantum. Nessun abbonamento o ricarico sui token; l’uso è fatturato direttamente dai tuoi provider.",
     premiumFreeKeepsWorking:
-      "La versione gratuita resta utile: conversazioni offline, cronologia, backup ed esportazione manuale rimangono disponibili.",
+      "La versione gratuita resta utilizzabile: conversazioni offline, cronologia, backup ed esportazione manuale rimangono disponibili.",
     premiumBenefitProviders:
       "Usa i tuoi provider cloud e i loro modelli di qualità superiore",
     premiumBenefitModes:
@@ -212,7 +212,7 @@ export const editionTranslations = {
     premiumBenefitModes:
       "Alterne modos de resposta e execute deliberações do Modo Supremo com vários modelos",
     premiumBenefitTools:
-      "Adicione busca na web, imagens e sessões Drive na nuvem",
+      "Adicione pesquisa na web, imagens e sessões Drive na nuvem",
     premiumBenefitKnowledge:
       "Use conhecimento de sessões anteriores e o arquivo Markdown portátil",
     freeOfflineLanguagesStep: "Escolha seu idioma",
@@ -258,9 +258,9 @@ export const editionTranslations = {
     premiumFreeKeepsWorking:
       "免费版仍可完整使用：离线对话、历史记录、备份和手动导出均会保留。",
     premiumBenefitProviders: "使用你的云端提供商及其更高质量的模型",
-    premiumBenefitModes: "切换回复模式并运行多模型终极模式协商",
+    premiumBenefitModes: "切换回复模式并运行多模型终极模式推演",
     premiumBenefitTools: "加入网页搜索、图片和云端 Drive 会话",
-    premiumBenefitKnowledge: "使用过往会话知识和可携带的 Markdown 档案",
+    premiumBenefitKnowledge: "使用过往对话知识和可携带的 Markdown 档案",
     freeOfflineLanguagesStep: "选择你的语言",
     freeOfflineModelsStep: "最适合你的配置",
     freeOfflineStartStep: "3 · 开始对话",
@@ -311,7 +311,7 @@ export const editionTranslations = {
     freeOfflineSystemVoiceNote:
       "選択したすべての言語を扱える単一のダウンロード音声がないため、返信には言語対応のシステム音声を使います。聞き取りと思考はローカルのままです。",
     freeOfflineStart: "開始",
-    freeOfflinePremiumEscape: "プロバイダーの API キーをお持ちですか？Premium を解除",
+    freeOfflinePremiumEscape: "プロバイダーの API キーをお持ちですか？Premium を解放",
     settingsGroupConversation: "会話とツール",
     settingsGroupVoiceModels: "音声とモデル",
     settingsGroupPrivacyApp: "プライバシーとアプリ",
@@ -319,24 +319,25 @@ export const editionTranslations = {
   hu: define({
     freeEdition: "Privát offline · Ingyenes",
     premiumPurchaseValue:
-      "Egyszeri vásárlás. Nincs előfizetés vagy tokenfelár; a használatot közvetlenül a szolgáltatóid számlázzák.",
+      "Egyszeri vásárlás. Nincs előfizetés vagy tokenfelár; a használatot közvetlenül az Ön szolgáltatói számlázzák.",
     premiumFreeKeepsWorking:
       "Az ingyenes változat használható marad: az offline beszélgetések, előzmények, mentések és kézi export elérhetők.",
     premiumBenefitProviders:
-      "Használd saját felhőszolgáltatóidat és jobb minőségű modelljeiket",
+      "Használja saját felhőszolgáltatóit és jobb minőségű modelljeiket",
     premiumBenefitModes:
-      "Válts válaszmódot, és indíts többmodelles Szuper mód mérlegelést",
+      "Váltson válaszmódot, és indítson többmodelles Szuper mód-mérlegelést",
     premiumBenefitTools:
-      "Adj hozzá webes keresést, képeket és felhős Drive-meneteket",
+      "Adjon hozzá webes keresést, képeket és felhős Drive-munkameneteket",
     premiumBenefitKnowledge:
-      "Használd a korábbi menetek tudását és a hordozható Markdown-archívumot",
-    freeOfflineLanguagesStep: "Válaszd ki a nyelved",
-    freeOfflineModelsStep: "A legjobb beállítás neked",
-    freeOfflineStartStep: "3 · Kezdj beszélgetni",
+      "Használja a korábbi munkamenetek tudását és a hordozható Markdown-archívumot",
+    freeOfflineLanguagesStep: "Válassza ki a nyelvét",
+    freeOfflineModelsStep: "Az Ön legjobb beállítása",
+    freeOfflineStartStep: "3 · Kezdjen beszélgetni",
     freeOfflineSystemVoiceNote:
       "Egyetlen letöltött hang sem fedi le az összes nyelvet, ezért a válaszok a telefon nyelvhez illő rendszerhangját használják. A hallás és gondolkodás helyben marad.",
     freeOfflineStart: "Indítás",
-    freeOfflinePremiumEscape: "Van szolgáltatói API-kulcsod? Oldd fel a Premiumot",
+    freeOfflinePremiumEscape:
+      "Van szolgáltatói API-kulcsa? Oldja fel inkább a Premiumot",
     settingsGroupConversation: "Beszélgetés és eszközök",
     settingsGroupVoiceModels: "Hang és modellek",
     settingsGroupPrivacyApp: "Adatvédelem és alkalmazás",
@@ -352,7 +353,7 @@ export const editionTranslations = {
     premiumBenefitModes:
       "Přepínejte režimy odpovědí a spusťte poradu více modelů v Superrežimu",
     premiumBenefitTools:
-      "Přidejte webové hledání, obrázky a cloudové relace Drive",
+      "Přidejte vyhledávání na webu, obrázky a cloudové relace Drive",
     premiumBenefitKnowledge:
       "Používejte znalosti minulých relací a přenosný archiv Markdown",
     freeOfflineLanguagesStep: "Vyberte svůj jazyk",
@@ -411,7 +412,8 @@ export const editionTranslations = {
     freeOfflineSystemVoiceNote:
       "Tek bir indirilen ses bu dillerin tümünü kapsamıyor; bu nedenle yanıtlar telefonun dile uygun sistem sesini kullanır. Dinleme ve düşünme yerel kalır.",
     freeOfflineStart: "Başlat",
-    freeOfflinePremiumEscape: "Sağlayıcı API anahtarın var mı? Bunun yerine Premium'un kilidini aç",
+    freeOfflinePremiumEscape:
+      "Sağlayıcı API anahtarlarınız var mı? Bunun yerine Premium'un kilidini açın",
     settingsGroupConversation: "Konuşma ve araçlar",
     settingsGroupVoiceModels: "Ses ve modeller",
     settingsGroupPrivacyApp: "Gizlilik ve uygulama",
@@ -444,7 +446,7 @@ export const editionTranslations = {
   ur: define({
     freeEdition: "نجی آف لائن · مفت",
     premiumPurchaseValue:
-      "ایک بار کی خریداری۔ کوئی سبسکرپشن یا ٹوکن پر اضافی قیمت نہیں؛ استعمال کا بل آپ کے فراہم کنندگان براہ راست دیتے ہیں۔",
+      "ایک بار کی خریداری۔ کوئی سبسکرپشن یا ٹوکن پر اضافی قیمت نہیں؛ استعمال کی قیمت آپ کے فراہم کنندگان براہ راست وصول کرتے ہیں۔",
     premiumFreeKeepsWorking:
       "مفت ورژن کارآمد رہتا ہے: آف لائن گفتگو، تاریخ، بیک اپ اور دستی برآمد دستیاب رہتے ہیں۔",
     premiumBenefitProviders:
@@ -460,7 +462,8 @@ export const editionTranslations = {
     freeOfflineSystemVoiceNote:
       "کوئی ایک ڈاؤن لوڈ شدہ آواز ان تمام زبانوں کا احاطہ نہیں کرتی، اس لیے جوابات فون کی زبان کے مطابق سسٹم آواز استعمال کرتے ہیں۔ سننا اور سوچنا مقامی رہتا ہے۔",
     freeOfflineStart: "شروع کریں",
-    freeOfflinePremiumEscape: "پرووائیڈر API کلیدیں ہیں؟ اس کے بجائے Premium کھولیں",
+    freeOfflinePremiumEscape:
+      "فراہم کنندہ کی API کلیدیں ہیں؟ اس کے بجائے Premium کھولیں",
     settingsGroupConversation: "گفتگو اور ٹولز",
     settingsGroupVoiceModels: "آواز اور ماڈلز",
     settingsGroupPrivacyApp: "رازداری اور ایپ",

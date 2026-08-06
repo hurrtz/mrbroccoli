@@ -44,10 +44,10 @@ export const cs = {
   tts: "TTS",
   ui: "UI",
   settingsRuntimeReadiness: "Připravenost za běhu",
-  settingsReadinessThink: "Přemýšlejte",
-  settingsReadinessListen: "Poslouchejte",
-  settingsReadinessSpeak: "Mluvte",
-  settingsReadinessSearch: "Hledat",
+  settingsReadinessThink: "Přemýšlení",
+  settingsReadinessListen: "Poslouchání",
+  settingsReadinessSpeak: "Mluvení",
+  settingsReadinessSearch: "Hledání",
   settingsReadinessReady: "Připraveno",
   settingsReadinessNeedsAttention: "Pozor",
   settingsReadinessBroken: "Nefunkční",
@@ -65,11 +65,12 @@ export const cs = {
   setupGuideShowInSettingsSummary:
     "Zobrazit nebo skrýt zástupce řízeného nastavení v přehledu Nastavení.",
   settingsConnectionsSummary: "Klíče poskytovatele, ověření a možnosti.",
-  settingsThinkingSummary: "Domovské karty, modely, úsilí a systémová výzva.",
+  settingsThinkingSummary:
+    "Domovské karty, modely, náročnost a systémová výzva.",
   settingsListeningSummary: "Režim zadávání a směrování řeči na text.",
   settingsSpeakingSummary: "Mluvené odpovědi, přehrávání, hlasy a náhledy.",
   settingsSearchSummary:
-    "Poskytovatel webového vyhledávání a kontroly kvality vyhledávání.",
+    "Poskytovatel vyhledávání na webu a ovládací prvky kvality vyhledávání.",
   settingsAppDiagnosticsSummary:
     "Téma, jazyk, použití, protokoly ladění a nedávná aktivita.",
   settingsBackToOverview: "Zpět na přehled",
@@ -86,14 +87,14 @@ export const cs = {
   model: "Model",
   effort: "Náročnost",
   effortValue: ({ effort }) => `Náročnost: ${effort}`,
-  modelEffortNone: "žádný",
+  modelEffortNone: "Žádná",
   modelEffortMinimal: "Minimální",
   modelEffortLow: "Nízká",
   modelEffortMedium: "Střední",
   modelEffortHigh: "Vysoká",
   modelEffortExtraHigh: "Extra vysoká",
   modelEffortMax: "Max",
-  modelEffortDynamic: "Dynamický",
+  modelEffortDynamic: "Dynamická",
   modelEffortDisabled: "Zakázáno",
   modelEffortEnabled: "Povoleno",
   fixed: "Pevné",
@@ -104,8 +105,8 @@ export const cs = {
   spanish: "Španělština",
   french: "Francouzština",
   italian: "Italština",
-  portuguese: "portugalština",
-  portugueseBrazil: "portugalština (Brazílie)",
+  portuguese: "Portugalština",
+  portugueseBrazil: "Portugalština (Brazílie)",
   russian: "Ruština",
   simplifiedChinese: "Zjednodušená čínština",
   arabic: "Arabština",
@@ -132,13 +133,13 @@ export const cs = {
   instructionsTabDescription:
     "Vytvářejte skryté pokyny, které řídí asistenta dříve, než jakýkoli poskytovatel uvidí požadavek.",
   providersTabDescription:
-    "Uložte přihlašovací údaje externí služby na zařízení a nakonfigurujte režimy odezvy, které chcete použít.",
+    "Uložte přihlašovací údaje externích služeb na zařízení a nakonfigurujte režimy odpovědí, které chcete používat.",
   webSearchTabDescription:
     "Před odpověďmi nakonfigurujte volitelný živý webový kontext.",
   responseModes: "Výběr modelu",
   aboutModelSelection: "O výběru modelu",
   modelSelectionInfo:
-    "Každý model karty se stane volbou na domovské obrazovce. Nakonfigurujte jeho poskytovatele, model a volitelnou úroveň úsilí a poté přepněte karty a vyberte, který model odpoví jako další.",
+    "Každá karta modelu se stane volbou na domovské obrazovce. Nakonfigurujte jejího poskytovatele, model a volitelnou úroveň náročnosti a poté přepínáním karet vyberte, který model bude odpovídat jako další.",
   responseModeItemTitle: ({ index }) => `Model ${index}`,
   addResponseMode: "Přidat model",
   removeResponseMode: "Odebrat model",
@@ -146,9 +147,10 @@ export const cs = {
     "Nejprve přidejte přihlašovací údaje. Ovládací prvky trasy zůstanou skryté, dokud nebude nakonfigurována alespoň jedna kompatibilní služba.",
   useResponseMode: ({ mode }) => `Použijte ${mode}`,
   chooseResponseModel: "Vyberte si model",
-  responseModelCount: ({ count }) => `K dispozici: ${count} modelů`,
+  responseModelCount: ({ count }) =>
+    `K dispozici: ${count} ${Number(count) === 1 ? "model" : Number(count) < 5 ? "modely" : "modelů"}`,
   ulraMode: "Superrežim",
-  ulraModeHomeLabel: "Zobrazit superrežim na domovské obrazovce",
+  ulraModeHomeLabel: "Zobrazit Superrežim na domovské obrazovce",
   ulraModeSettingsDescription:
     "Povolí společné uvažování více modelů, když jsou připraveny alespoň dva modely z domovské obrazovky.",
   ulraModeInfo:
@@ -158,17 +160,17 @@ export const cs = {
     `Při aktuálním nastavení nejvýše ${count} volání modelů na zprávu.`,
   ulraModeThresholdWarning:
     "Více než 4 modely nebo 3 kola mohou trvat velmi dlouho, spotřebovat mnoho tokenů a narazit na limity kontextu či frekvence poskytovatelů. Jde pouze o upozornění.",
-  ulraModeFirstUseTitle: "Zapnout superrežim?",
+  ulraModeFirstUseTitle: "Zapnout Superrežim?",
   ulraModeFirstUseMessage: ({ calls, models, rounds }) =>
     `Při ${models} modelech a nejvýše ${rounds} kolech kontroly může jedna zpráva provést až ${calls} volání modelů. Může trvat výrazně déle, stát podstatně více a sdílet uvažování se všemi zapojenými poskytovateli.`,
-  ulraModeHighRiskTitle: "Rozsáhlý běh superrežimu",
+  ulraModeHighRiskTitle: "Rozsáhlý běh Superrežimu",
   ulraModeHighRiskMessage: ({ calls, models, rounds }) =>
     `${models} modelů a ${rounds} kol kontroly může provést až ${calls} volání modelů. Může to trvat velmi dlouho, spotřebovat mnoho tokenů a narazit na limity poskytovatelů. Přesto pokračovat?`,
   ulraModeEnableAction: "Zapnout",
   ulraModeNeedsTwoModels:
     "Superrežim vyžaduje alespoň dva připravené modely na domovské obrazovce.",
   ulraModeAllModelsFailed:
-    "Všechny modely superrežimu selhaly dříve, než bylo možné sestavit odpověď.",
+    "Všechny modely Superrežimu selhaly dříve, než bylo možné sestavit odpověď.",
   ulraModePartialFailureNotice: ({ failed, succeeded }) =>
     `${failed} interních volání modelů selhalo; konečná odpověď využila ${succeeded} úspěšných příspěvků.`,
   sttTabDescription:
@@ -177,28 +179,28 @@ export const cs = {
     "Určete, kdy začnou mluvit odpovědi a který backend zpracovává mluvený výstup.",
   brief: "Stručný",
   briefDescription:
-    "Udržujte odpověď pevně. Použijte minimální počet vět potřebný k úplné odpovědi uživatele.",
+    "Držte odpověď stručnou. Použijte co nejméně vět, které stačí k úplnému zodpovězení dotazu uživatele.",
   normal: "Normální",
   normalDescription:
-    "Zaměřte se na vyváženou délku odezvy. Zakryjte důležité body, aniž byste odpověď přetahovali.",
+    "Zaměřte se na vyváženou délku odpovědi. Pokryjte důležité body, aniž byste odpověď zbytečně natahovali.",
   thorough: "Důkladně",
   thoroughDescription:
     "Jděte do hloubky a buďte komplexní. Zahrňte nuance, detaily, kompromisy a zdůvodnění, na kterém záleží.",
   professional: "Profesionální",
   professionalDescription:
-    "Mluvte jako senior konzultant informující klienta. Precizní jazyk, žádný slang, odměřený a směrodatný.",
+    "Mluvte jako zkušený konzultant, který informuje klienta. Precizní jazyk, žádný slang, věcný a autoritativní tón.",
   casual: "Neformální",
   casualDescription:
-    "Mluvte jako chytrý přítel v kavárně. Uvolněné, přirozené, konverzační. Kontrakce jsou v pořádku, tečny v pořádku.",
-  nerdy: "Nerdy",
+    "Mluvte jako chytrý kamarád v kavárně. Uvolněně, přirozeně, konverzačně. Hovorové obraty jsou v pořádku, odbočky od tématu také.",
+  nerdy: "Nerdovský",
   nerdyDescription:
-    "Mluvte jako nadšený odborník, který miluje jít do hloubky. Používejte odbornou terminologii volně, hledejte detaily, předpokládejte, že uživatel může držet krok.",
+    "Mluvte jako nadšený odborník, který rád jde do hloubky. Používejte odbornou terminologii bez zábran, s nadšením rozebírejte detaily a předpokládejte, že uživatel udrží krok.",
   concise: "Stručné",
   conciseDescription:
     "Buďte co nejstručnější a přitom úplní. Žádná preambule, žádná výplň, jen odpověď. Myslete ve stylu telegramu.",
-  socratic: "sokratovský",
+  socratic: "Sokratovský",
   socraticDescription:
-    "Vyzvěte myšlení uživatele. Ptejte se protiotázky, nabízejte alternativní pohledy, nejen potvrzujte, co řekli. Buďte sparing partnerem, ne strojem na ano.",
+    "Zpochybňujte uvažování uživatele. Pokládejte protiotázky, nabízejte alternativní pohledy a jen nepotvrzujte, co uživatel řekl. Buďte sparingpartnerem, ne strojem na přitakávání.",
   eli5: "ELI5",
   eli5Description:
     "Vysvětlete vše co nejjednodušeji. Používejte analogie, každodenní jazyk, nulový žargon. Nepředpokládejte žádné předchozí znalosti o žádném tématu.",
@@ -211,17 +213,17 @@ export const cs = {
     "Vytvořte vyhrazený klíč OpenRouter, vložte jej níže a používejte modely se zálohou snímků od několika poskytovatelů, aniž byste nahradili jakékoli přímé připojení.",
   openRouterOnboardingRoute:
     "Cesta požadavku: toto zařízení → OpenRouter → vybraný upstream poskytovatel",
-  openRouterKeys: "Klávesy OpenRouter",
+  openRouterKeys: "Klíče OpenRouter",
   providerStatusInvalid: "Neplatné",
   providerStatusTesting: "Testování",
   providerStatusConfigured: "Nakonfigurováno",
-  providerStatusWorking: "Práce",
+  providerStatusWorking: "Funkční",
   providerStatusNotTested: "Netestováno",
   providerStatusNotSetup: "Není nastaveno",
   expandProvider: ({ provider }) => `Rozbalte ${provider}`,
   collapseProvider: ({ provider }) => `Sbalit ${provider}`,
-  testProviderKey: "Testovací klíč",
-  testAllCapabilities: "Otestujte všechny",
+  testProviderKey: "Otestovat klíč",
+  testAllCapabilities: "Otestovat vše",
   apiTest: "Test API",
   testProviderCapability: ({ capability }) => `Test ${capability}`,
   test: "Test",
@@ -229,7 +231,7 @@ export const cs = {
   providerCapability_llm: "Odpovědi",
   providerCapability_stt: "Hlasový vstup",
   providerCapability_tts: "Hlasový výstup",
-  providerCapability_search: "vyhledávání na webu",
+  providerCapability_search: "Vyhledávání na webu",
   providerCapability_voices: "Hlasová knihovna",
   providerValidationUnavailable:
     "Ověření v reálném čase pro tohoto poskytovatele zatím není k dispozici. Uložte klíč zde a ověřte jej při skutečném používání.",
@@ -243,31 +245,31 @@ export const cs = {
   systemPrompt: "Systémová výzva",
   aboutSystemPrompt: "O systémové výzvě",
   assistantInstructionsIntro:
-    "Vytvarujte skryté navádění, které model obdrží před každou odpovědí.",
+    "Upravte skryté pokyny, které model dostane před každou odpovědí.",
   baseInstructions: "Základní pokyny",
   assistantInstructionsPlaceholder: "Definujte, jak se má asistent chovat.",
   assistantInstructionsHint:
-    "Toto je vždy předřazeno před zvolenou délkou odezvy a tónem.",
+    "Toto se vždy vloží před zvolenou délku odpovědi a tón.",
   adaptiveLength: "Adaptivní délka",
-  responseTone: "Tón odezvy",
+  responseTone: "Tón odpovědí",
   homeStyleChipLabel: ({ tone, length }) => `Styl — ${tone} · ${length}`,
   styleSheetTitle: "Nastavení konverzace",
-  styleSheetSubtitle: "Odpovědi a řeč ve tvaru pouze pro tuto konverzaci.",
+  styleSheetSubtitle: "Upravte odpovědi a řeč pouze pro tuto konverzaci.",
   openStyleSheet: "Otevřete nastavení konverzace",
-  conversationThinkingInstructions: "Návod k zamyšlení",
+  conversationThinkingInstructions: "Pokyny pro přemýšlení",
   conversationThinkingInstructionsDescription:
-    "Po výzvě globálního systému pro tuto konverzaci přidejte pokyny.",
+    "Pro tuto konverzaci přidejte pokyny za globální systémovou výzvu.",
   conversationThinkingInstructionsPlaceholder:
-    "Například: Vyzvěte mé domněnky a použijte konkrétní příklady.",
-  ttsInstructions: "Pokyny pro doručení řeči",
+    "Například: Zpochybňujte mé předpoklady a používejte konkrétní příklady.",
+  ttsInstructions: "Pokyny pro přednes řeči",
   ttsInstructionsDescription:
     "Řídit tón, tempo, přízvuk nebo přednes používané kompatibilními modely řeči.",
   conversationTtsInstructionsDescription:
-    "Po globálních hlasových pokynech pro tuto konverzaci přidejte pokyny pro doručení.",
+    "Pro tuto konverzaci přidejte pokyny k přednesu za globální hlasové pokyny.",
   ttsInstructionsPlaceholder:
     "Například: Mluvte vřele, jasně a uvolněným tempem.",
   ttsInstructionsUnsupported:
-    "Aktuální trasa řeči nepodporuje pokyny k doručení.",
+    "Aktuální trasa řeči nepodporuje pokyny k přednesu.",
   conversationVoiceDescription: ({ route }) =>
     `Vyberte hlas používaný ${route} v této konverzaci.`,
   scrollToLatest: "Přejděte na nejnovější zprávu",
@@ -289,12 +291,12 @@ export const cs = {
   toggleToTalk: "Klepnutím spustit mluvení",
   toggleToTalkDescription:
     "Jedním klepnutím spustíte nahrávání a po dokončení klepněte znovu.",
-  driveSession: "Řídit relaci",
+  driveSession: "Relace řízení",
   driveSessionDescription:
-    "Když je zapnuté automatické pokračování, nahrávání se spustí po každé vyslovené odpovědi. Až budete mluvit, klepněte na hlavní tlačítko.",
-  stopDriveSession: "Pozastavit auto",
-  repeatDriveReply: "Opakujte jako poslední",
-  continueDriveSession: "Obnovit auto",
+    "Když je zapnuté automatické pokračování, nahrávání se spustí po každé vyslovené odpovědi. Až domluvíte, klepněte na hlavní tlačítko.",
+  stopDriveSession: "Pozastavit automatiku",
+  repeatDriveReply: "Zopakovat poslední",
+  continueDriveSession: "Obnovit automatiku",
   speechToText: "Řeč na text",
   appNative: "Rozpoznávání systému",
   nativeSttDescription:
@@ -302,11 +304,11 @@ export const cs = {
   provider: "Poskytovatel",
   webSearchProvider: "Poskytovatel vyhledávání na webu",
   webSearchProviderMissingHint:
-    "Nakonfigurujte alespoň jednu službu s možností vyhledávání v přihlašovacích údajích, abyste zde povolili uzemnění webu.",
+    "Nakonfigurujte v sekci Pověření alespoň jednu službu s podporou vyhledávání, abyste zde mohli zapnout doplňování webového kontextu.",
   webSearchModelHint: ({ model }) =>
-    `Používá ${model} v zákulisí pro živé uzemnění webu.`,
+    `Na pozadí používá ${model} k doplnění aktuálního webového kontextu.`,
   webSearchHomeHint:
-    "Pomocí přepínače na domovské obrazovce zapněte nebo vypněte uzemnění webu pro toto vlákno.",
+    "Pomocí přepínače na domovské obrazovce zapněte nebo vypněte webový kontext pro toto vlákno.",
   settingsWebSearchCompactHint:
     "Volitelně před odpovědí hlavního modelu přidejte čerstvý webový kontext.",
   webSearchAdvanced: "Pokročilé ovládací prvky vyhledávání",
@@ -320,12 +322,12 @@ export const cs = {
     "Pokud jsou aktuální fakta důležitá, použijte pro toto vlákno živý webový kontext.",
   webSearchQualityControls: "Kvalita vyhledávání",
   webSearchSearchMode: "Režim vyhledávání",
-  webSearchSearchModeQuick: "Rychle",
+  webSearchSearchModeQuick: "Rychlý",
   webSearchSearchModeBalanced: "Vyvážený",
-  webSearchSearchModeDeep: "Hluboké",
+  webSearchSearchModeDeep: "Hluboký",
   webSearchDepth: "Hloubka vyhledávání",
   webSearchDepthStandard: "Standardní",
-  webSearchDepthDeep: "Hluboké",
+  webSearchDepthDeep: "Hluboká",
   webSearchResultCount: "Počet výsledků",
   webSearchQualityHint: ({ provider }) =>
     `Tyto ovládací prvky ladí, jak ${provider} shromažďuje čerstvý kontext před odpovědí.`,
@@ -335,31 +337,31 @@ export const cs = {
     `Nastavte režim vyhledávání na webu na ${mode}`,
   openWebSearchSettings: "Otevřete nastavení vyhledávání na webu",
   providerSttDescription:
-    "Použijte nakonfigurovanou externí službu k přepisu vašeho hlasu před jeho odesláním do odpovědi.",
+    "Použijte nakonfigurovanou externí službu k přepisu vašeho hlasu, než se odešle do trasy odpovědí.",
   sttProvider: "Poskytovatel STT",
   sttProviderEnabledHint:
     "Zde se zobrazují pouze povolení poskytovatelé s podporou přepisu.",
   sttProviderMissingHint:
-    "Zde přidejte přihlašovací údaje pro službu s podporou STT.",
+    "Přidejte přihlašovací údaje pro službu s podporou STT, abyste ji zde mohli vybrat.",
   nativeSttHint:
     "Rozpoznávání systému funguje nezávisle na klíčích vašeho poskytovatele a může být zpracováno v zařízení nebo hlasovou službou operačního systému.",
-  replyPlayback: "Odpovědět Přehrávání",
+  replyPlayback: "Přehrávání odpovědí",
   sentencesArrive: "Přicházejí odstavce",
   sentencesArriveDescription:
-    "Začněte mluvit, jakmile je připraven celý odstavec.",
+    "Mluvení začne, jakmile je připraven celý odstavec.",
   fullReplyFirst: "Nejprve úplná odpověď",
   fullReplyFirstDescription:
-    "Nejprve vygenerujte celou odpověď a poté ji přehrajte v jednom průchodu.",
+    "Nejprve se vygeneruje celá odpověď a poté se přehraje najednou.",
   textToSpeech: "Převod textu na řeč",
   spokenReplies: "Mluvené odpovědi",
   spokenRepliesEnabledDescription:
-    "Asistent čtení nahlas odpoví, když je k dispozici hlasová trasa.",
+    "Číst odpovědi asistenta nahlas, když je k dispozici hlasová trasa.",
   spokenRepliesDisabledDescription:
     "Ponechat odpovědi zatím pouze textové. Vaše preferovaná trasa TTS zůstane uložena na později.",
   nativeTtsDescription:
     "Pro mluvené odpovědi a hlasový náhled použijte modul řeči zařízení.",
   kokoroTtsDescription:
-    "Použijte mnohem přirozenější nervový hlas zcela na tomto zařízení. Text mluvené odpovědi je syntetizován lokálně, bez klíče poskytovatele řeči nebo poplatku za použití.",
+    "Použijte mnohem přirozenější neuronový hlas zcela na tomto zařízení. Text mluvené odpovědi je syntetizován lokálně, bez klíče poskytovatele řeči nebo poplatku za použití.",
   kokoroVoices: "Kokoro Hlasy na zařízení",
   kokoroVoicesHint: ({ size, installedSize }) =>
     `Vícejazyčný model stáhne přibližně ${size} MB a po instalaci zabere přibližně ${installedSize} MB.`,
@@ -370,16 +372,16 @@ export const cs = {
   kokoroVerifying: "Ověřování hlasového modulu…",
   kokoroInstalled: "Nainstalované a připravené na tomto zařízení.",
   kokoroNotInstalled:
-    "Volitelné stažení. Není vyžadován žádný klíč poskytovatele.",
+    "Před výběrem nebo použitím Kokoro model stáhněte a ověřte. Není vyžadován žádný klíč poskytovatele.",
   kokoroLanguageFallback:
     "Kokoro zde aktuálně mluví anglicky a zjednodušenou čínštinou. U ostatních vybraných jazyků odpovědí přidejte explicitní záložní trasu nebo se řeč zastaví s chybou.",
   kokoroRemoveTitle: "Odebrat model Kokoro?",
   kokoroRemoveBody: ({ installedSize }) =>
     `Tím se uvolní přibližně ${installedSize} MB. Model si můžete kdykoli znovu stáhnout.`,
-  removeKokoroModel: "Odstraňte model Kokoro",
-  downloadKokoroModel: "Stáhněte si model Kokoro",
+  removeKokoroModel: "Odebrat model Kokoro",
+  downloadKokoroModel: "Stáhnout model Kokoro",
   kokoroFallbackNeeded: ({ languages }) =>
-    `Pro: ${languages} je vyžadována explicitní záložní trasa.`,
+    `Explicitní záložní trasa je vyžadována pro: ${languages}.`,
   kokoroNoSelectedLanguages:
     "Chcete-li nakonfigurovat hlas Kokoro, vyberte v části Jazyky poslechu angličtinu nebo zjednodušenou čínštinu.",
   expandVoiceSettings: ({ language }) => `Rozbalte nastavení hlasu ${language}`,
@@ -396,23 +398,23 @@ export const cs = {
   ttsFallbackRoutesHint:
     "Volitelné. Přidejte pouze trasy, které chcete, v pořadí, v jakém se mají vyzkoušet. Jakmile trasa začne mluvit, Mr Broccoli na ní zůstane po zbytek odpovědi.",
   ttsFallbackNone:
-    "Není nakonfigurována žádná záloha. Místo toho se zobrazí porucha hlasu.",
+    "Není nakonfigurována žádná záložní trasa. Místo toho se zobrazí chyba hlasu.",
   ttsFallbackPosition: ({ position, route }) => `${position}. ${route}`,
-  addFallbackRoute: ({ route }) => `Přidejte záložní verzi ${route}`,
-  removeFallbackRoute: ({ route }) => `Odstraňte záložní verzi ${route}`,
-  moveFallbackEarlier: ({ route }) => `Přesuňte ${route} dříve`,
-  moveFallbackLater: ({ route }) => `Přesuňte ${route} později`,
+  addFallbackRoute: ({ route }) => `Přidat záložní trasu ${route}`,
+  removeFallbackRoute: ({ route }) => `Odebrat záložní trasu ${route}`,
+  moveFallbackEarlier: ({ route }) => `Posunout ${route} v pořadí dopředu`,
+  moveFallbackLater: ({ route }) => `Posunout ${route} v pořadí dozadu`,
   ttsProvider: "Poskytovatel TTS",
   ttsProviderEnabledHint:
     "Zde se zobrazují pouze povolení poskytovatelé s podporou mluvené odpovědi.",
   ttsProviderMissingHint:
-    "Zde přidejte přihlašovací údaje pro službu s podporou TTS.",
+    "Přidejte přihlašovací údaje pro službu s podporou TTS, abyste ji zde mohli vybrat.",
   localTtsOrderHint:
-    "Pokusí se provést pouze explicitně nakonfigurované záložní trasy.",
+    "Zkoušejí se pouze explicitně nakonfigurované záložní trasy.",
   providerTtsOrderHint:
-    "Pokusí se provést pouze explicitně nakonfigurované záložní trasy.",
+    "Zkoušejí se pouze explicitně nakonfigurované záložní trasy.",
   nativeTtsHint:
-    "Nativní TTS používá systémový hlasový zásobník a nevyžaduje klíč poskytovatele.",
+    "Nativní TTS používá systémové hlasy zařízení a nevyžaduje klíč poskytovatele.",
   localTtsLanguageCoverageHint:
     "Místní balíčky aktuálně pokrývají angličtinu, němčinu, zjednodušenou čínštinu, španělštinu, portugalštinu, hindštinu, francouzštinu a italštinu.",
   ttsVoice: "Hlas TTS",
@@ -420,7 +422,7 @@ export const cs = {
   providerVoiceDirectory: ({ provider }) => `Hlasová knihovna ${provider}`,
   refreshProviderVoices: ({ provider }) => `Obnovte hlasy ${provider}`,
   providerVoicesAvailable: ({ count, provider }) =>
-    `${provider}: ${count} hlasů k dispozici`,
+    `${provider}: k dispozici ${count} ${Number(count) === 1 ? "hlas" : Number(count) < 5 ? "hlasy" : "hlasů"}`,
   providerVoicesLoadFailed:
     "Hlasy se nepodařilo obnovit. Váš aktuální výběr se nezměnil; stále můžete zadat hlasové ID ručně.",
   providerVoicesLoadFailedWithFallback:
@@ -429,7 +431,7 @@ export const cs = {
   elevenLabsVoicesReadPermissionHint:
     "V ElevenLabs upravte tento klíč API a povolte Hlasy → Číst a poté zde obnovte.",
   providerVoicesLoadingHint: ({ provider }) =>
-    `Mr Broccoli automaticky načte dostupné hlasy ze ${provider}.`,
+    `Mr Broccoli automaticky načte dostupné hlasy od poskytovatele ${provider}.`,
   providerVoiceId: "Hlasové ID",
   providerVoiceIdPlaceholder: "Zadejte hlasové ID",
   providerVoiceIdFallbackHint:
@@ -437,7 +439,7 @@ export const cs = {
   providerVoiceIdRequired: ({ provider }) =>
     `Před použitím hlasového výstupu aktualizujte hlasovou knihovnu ${provider} nebo zadejte hlasové ID.`,
   qwenSpeechUnavailableInUs:
-    "Aktuální hlasové cesty Qwen Mr Broccoli nejsou v regionu USA dostupné. Vyberte Singapur nebo Peking pro řeč Qwen.",
+    "Aktuální hlasové trasy Qwen v aplikaci Mr Broccoli nejsou v regionu USA dostupné. Pro řeč Qwen vyberte Singapur nebo Peking.",
   qwenApiRegion: "Oblast API Qwen",
   qwenRegionSingapore: "Singapur",
   qwenRegionUs: "USA (Virginie)",
@@ -445,14 +447,18 @@ export const cs = {
   qwenRegionHint:
     "Vybraná oblast se musí shodovat s oblastí, ve které byl tento klíč API vytvořen.",
   qwenRegionUsSpeechHint:
-    "Klíče pro oblast USA zde podporují chat a vyhledávání na webu. Aktuální trasy Qwen STT a TTS Mr Broccoli vyžadují singapurský nebo pekingský klíč.",
+    "Klíče pro oblast USA zde podporují chat a vyhledávání na webu. Aktuální trasy Qwen STT a TTS v aplikaci Mr Broccoli vyžadují singapurský nebo pekingský klíč.",
   providerDefaultVoiceHint:
     "Tento poskytovatel aktuálně používá svůj výchozí hlas pro náhled a mluvené odpovědi.",
-  listenLanguages: "Poslouchejte jazyky",
+  listenLanguages: "Jazyky poslechu",
   listenLanguagesHint:
     "Vyberte jazyky odpovědí, které chcete, aby zněly dobře. Mr Broccoli je zkouší v tomto pořadí při směrování hlasového výstupu.",
   listenLanguagesSelected: ({ count }) =>
-    count === 1 ? "Vybrán 1 jazyk" : `Vybrány jazyky ${count}`,
+    Number(count) === 1
+      ? "Vybrán 1 jazyk"
+      : Number(count) < 5
+        ? `Vybrány ${count} jazyky`
+        : `Vybráno ${count} jazyků`,
   localVoicePacks: "Místní hlasové balíčky",
   localVoicePacksHint:
     "Každý jazyk si zachovává svůj vlastní místní hlas. Vyberte si hlas, který chcete pro daný jazyk, a poté si stáhněte pouze balíčky, na kterých vám skutečně záleží.",
@@ -482,12 +488,12 @@ export const cs = {
   clearSpeechDiagnosticsConfirmationTitle: "Vymazat nedávnou řečovou aktivitu?",
   clearSpeechDiagnosticsConfirmationMessage:
     "To odstraní veškerou zachycenou diagnostiku směrování řeči. Tuto akci nelze vrátit zpět.",
-  speechDiagnosticSourceConversation: "Odpověď na konverzaci",
-  speechDiagnosticSourceRepeat: "Opakujte odpověď",
+  speechDiagnosticSourceConversation: "Odpověď v konverzaci",
+  speechDiagnosticSourceRepeat: "Opakování odpovědi",
   speechDiagnosticSourcePreview: "Hlasový náhled",
   speechDiagnosticSourceUnknown: "Žádost o řeč",
   speechDiagnosticRouteLine: ({ requested, actual }) =>
-    `Požadováno: ${requested} -> Aktuální: ${actual}`,
+    `Požadováno: ${requested} -> Skutečné: ${actual}`,
   speechDiagnosticStageLine: ({ stage }) => `Nejnovější fáze: ${stage}`,
   speechDiagnosticLanguageLine: ({ languageLabel }) =>
     `Jazyk: ${languageLabel}`,
@@ -504,7 +510,7 @@ export const cs = {
     `Stahování místního balíčku... ${progress}%`,
   download: "Stáhnout",
   downloadingShort: "Načítání...",
-  voicePreviewText: "Hlasový náhled textu",
+  voicePreviewText: "Text hlasového náhledu",
   voicePreviewPlaceholder: "Chcete-li tento hlas slyšet, zadejte frázi.",
   voicePreviewHint:
     "Použije aktuálně vybraný hlasový backend odpovědi bez odeslání čehokoli do jazykového modelu.",
@@ -531,7 +537,7 @@ export const cs = {
   noReplyToRepeatYet: "Zatím žádná odpověď na přehrání.",
   threadCopied: "Vlákno zkopírováno.",
   threadRenamed: "Vlákno přejmenováno.",
-  threadPinned: "Nit připnutá.",
+  threadPinned: "Vlákno připnuto.",
   threadUnpinned: "Vlákno odepnuto.",
   addProviderKeyToUseProvider: ({ provider }) =>
     `Před použitím této trasy přidejte přihlašovací údaje pro ${provider} v Nastavení.`,
@@ -544,13 +550,13 @@ export const cs = {
   debugLogLabel: "LOG",
   debugLogCaptureStarted: "Bylo spuštěno protokolování ladění.",
   debugLogCaptureStopped: ({ entryCount, fileName }) =>
-    `Protokol ladění uložen jako ${fileName} a zkopírován do schránky (záznamy ${entryCount}).`,
+    `Protokol ladění uložen jako ${fileName} a zkopírován do schránky (počet záznamů: ${entryCount}).`,
   debugLogCaptureStoppedNoClipboard: ({ entryCount, fileName }) =>
-    `Protokol ladění uložen jako ${fileName} (záznamy ${entryCount}).`,
+    `Protokol ladění uložen jako ${fileName} (počet záznamů: ${entryCount}).`,
   debugLogCaptureRecovered: ({ entryCount, fileName }) =>
-    `Obnoven předchozí protokol ladění ${fileName} a zkopírován do schránky (položky ${entryCount}).`,
+    `Obnoven předchozí protokol ladění ${fileName} a zkopírován do schránky (počet záznamů: ${entryCount}).`,
   debugLogCaptureRecoveredNoClipboard: ({ entryCount, fileName }) =>
-    `Obnovený předchozí protokol ladění ${fileName} (položky ${entryCount}).`,
+    `Obnoven předchozí protokol ladění ${fileName} (počet záznamů: ${entryCount}).`,
   debugLogCaptureFailed: "Protokol ladění se nepodařilo uložit.",
   chooseSttBeforeVoiceSession:
     "Před zahájením hlasové relace vyberte v Nastavení nakonfigurovanou trasu STT.",
@@ -576,13 +582,13 @@ export const cs = {
   couldntPreviewVoice: "Náhled hlasu se nepodařilo zobrazit.",
   spokenRepliesDisabled: "Mluvené odpovědi jsou vypnuty v Nastavení.",
   providerVoiceFallback:
-    "Konfigurovaná hlasová trasa selhala. Tuto odpověď přepnuli na záložní hlas.",
+    "Konfigurovaná hlasová trasa selhala. Tato odpověď byla přepnuta na záložní hlas.",
   localVoiceFallback:
-    "Místní hlas byl nedostupný. Tuto odpověď přepnuli na záložní hlas.",
+    "Místní hlas byl nedostupný. Tato odpověď byla přepnuta na záložní hlas.",
   localTtsPackInstalled: ({ languageLabel }) =>
     `Nainstalován místní hlasový balíček ${languageLabel}.`,
   localTtsPackInstallFailed: "Nelze nainstalovat místní hlasový balíček.",
-  clear: "Jasný",
+  clear: "Vymazat",
   voiceOutput: "Hlasový výstup",
   speechReplayCache: "Mezipaměť přehrávání řeči",
   speechReplayCacheDescription:
@@ -591,7 +597,7 @@ export const cs = {
   speechReplayCacheCleared: "Uložené zvukové soubory byly odstraněny.",
   speechReplayCacheClearFailed: "Mezipaměť řeči se nepodařilo vymazat.",
   currentSetup: "Aktuální nastavení",
-  listeningToYourVoice: "Naslouchat svému hlasu",
+  listeningToYourVoice: "Poslouchám váš hlas",
   parsingYourVoiceInput: "Přeměna vašeho hlasu na text",
   preparingRequest: "Příprava vaší žádosti",
   searchingTheWeb: "Hledání nového kontextu na webu",
@@ -600,11 +606,15 @@ export const cs = {
     `Příprava hlasu pomocí ${provider}`,
   deepThinkingReassurance: "Dobré odpovědi zaberou chvilku…",
   thinkingElapsed: ({ detail, seconds }) => `${detail} · ${seconds}s`,
-  speakingBackToYou: "Mluvím zpět k vám",
-  freshSession: "Čerstvá relace",
+  speakingBackToYou: "Mluvím k vám",
+  freshSession: "Nová relace",
   messageCount: ({ count }) =>
-    Number(count) === 1 ? "1 zpráva" : `${count} zpráv`,
-  speechInputRoute: ({ route }) => `Řeč v: ${route}`,
+    Number(count) === 1
+      ? "1 zpráva"
+      : Number(count) < 5
+        ? `${count} zprávy`
+        : `${count} zpráv`,
+  speechInputRoute: ({ route }) => `Vstup řeči: ${route}`,
   replyModelRoute: ({ route }) => `Model odpovědi: ${route}`,
   voiceOutputRoute: ({ route }) => `Hlasový výstup: ${route}`,
   fallbackVoiceOutputRoute: ({ route }) => `Záložní hlasový výstup: ${route}`,
@@ -640,10 +650,10 @@ export const cs = {
   usageStatsHiddenDescription:
     "Udržujte odhady tokenů mimo uživatelské rozhraní přepisu.",
   usageStatsVisibleDescription:
-    "Zobrazit odhadované využití tokenu pro odpovědi a celkové počty konverzací.",
+    "Zobrazit odhadované využití tokenů pro odpovědi a souhrny za konverzaci.",
   debugLogButton: "Tlačítko protokolu ladění",
   debugLogButtonHiddenDescription:
-    "Ponechejte tlačítko LOG na domovské obrazovce skryté, pokud již není spuštěno nahrávání.",
+    "Ponechat tlačítko LOG na domovské obrazovce skryté, pokud již neběží záznam protokolů.",
   debugLogButtonVisibleDescription:
     "Zobrazit tlačítko LOG na domovské obrazovce pro spouštění a zastavování zachycování ladění.",
   debugLogButtonUsageDescription:
@@ -657,23 +667,24 @@ export const cs = {
   estimatedReplyTokens: ({ count }) => `Odpověď: ${count}`,
   estimatedTotalTokens: ({ count }) => `Celkem: ${count}`,
   estimatedUsageInline: ({ prompt, completion, total }) =>
-    `Odhad. Vstup ${prompt} · Výstup ${completion} · Celkem ${total}`,
+    `Odhad: vstup ${prompt} · výstup ${completion} · celkem ${total}`,
   searchQuery: "Vyhledávací dotaz",
   expandWebSearchDetails: "Zobrazit podrobnosti o vyhledávání na webu",
   collapseWebSearchDetails: "Skrýt podrobnosti vyhledávání na webu",
-  webSearchSourceCount: ({ count }) => `${count} zdrojů`,
+  webSearchSourceCount: ({ count }) =>
+    `${count} ${Number(count) === 1 ? "zdroj" : Number(count) < 5 ? "zdroje" : "zdrojů"}`,
   sources: "Zdroje",
-  openSourceLink: ({ source }) => `Otevřený zdroj: ${source}`,
-  turnReceipt: "Detaily odbočení",
-  expandTurnReceipt: "Zobrazit podrobnosti odbočení",
-  collapseTurnReceipt: "Skrýt podrobnosti odbočení",
+  openSourceLink: ({ source }) => `Otevřít zdroj: ${source}`,
+  turnReceipt: "Podrobnosti tahu",
+  expandTurnReceipt: "Zobrazit podrobnosti tahu",
+  collapseTurnReceipt: "Skrýt podrobnosti tahu",
   turnReceiptDirect: "Přímý",
   turnReceiptRequested: "Požadovaná trasa odpovědi",
-  turnReceiptActual: "Aktuální trasa odpovědi",
-  turnReceiptEffort: "Kontrola rozumu",
-  turnReceiptProviderNative: "poskytovatel-nativní",
+  turnReceiptActual: "Skutečná trasa odpovědi",
+  turnReceiptEffort: "Řízení uvažování",
+  turnReceiptProviderNative: "nativní u poskytovatele",
   turnReceiptInput: "Vstupní trasa",
-  turnReceiptSearch: "vyhledávání na webu",
+  turnReceiptSearch: "Vyhledávání na webu",
   turnReceiptVoice: "Hlasový výstup",
   turnReceiptContext: "Kontext",
   turnReceiptTiming: "Načasování",
@@ -687,20 +698,20 @@ export const cs = {
   turnReceiptNotConfigured: "Zapnuto · není nakonfigurováno",
   turnReceiptFallbackWithoutSearch: "Pokračování bez živého vyhledávání",
   turnReceiptNotUsed: "Nepoužito",
-  turnReceiptSummaryReused: "uložený souhrn znovu použit",
+  turnReceiptSummaryReused: "uložené shrnutí znovu použito",
   turnReceiptSummaryUpdated: "shrnutí aktualizováno",
-  turnReceiptContextFallback: "nouzová poslední zpráva",
+  turnReceiptContextFallback: "záložní použití posledních zpráv",
   turnReceiptGatewayCompression: ({ original, compressed }) =>
-    `brány komprimované zprávy ${original} na ${compressed}`,
+    `brána zkomprimovala ${original} zpráv na ${compressed}`,
   turnReceiptContextValue: ({ sent, total, summarized, state }) =>
-    `${sent}/${total} předchozí odeslané zprávy · ${summarized} nově shrnuté${state}`,
+    `${sent}/${total} předchozích zpráv odesláno · ${summarized} nově shrnuto${state}`,
   turnReceiptTimingStt: "STT",
-  turnReceiptTimingContext: "kontextu",
-  turnReceiptTimingSearch: "hledat",
+  turnReceiptTimingContext: "kontext",
+  turnReceiptTimingSearch: "hledání",
   turnReceiptTimingModel: "model",
   turnReceiptTimingFirstSpeech: "první řeč",
   turnReceiptTimingTotal: "celkem",
-  estimatedRouteUsageTokensOnly: ({ tokens }) => `Tokeny ${tokens}`,
+  estimatedRouteUsageTokensOnly: ({ tokens }) => `Tokeny: ${tokens}`,
   unknownUsageRoute: "Neznámá trasa",
   setupGuideConnectProviderTitle: "Nakonfigurujte přihlašovací údaje",
   setupGuideConnectProviderDescription:
@@ -715,7 +726,7 @@ export const cs = {
     "Tím trvale smažete konverzaci a všechny její zprávy. Tuto akci nelze vrátit zpět.",
   memory: "Paměť",
   conversations: "Konverzace",
-  drawerSubtitle: "Přeskakujte mezi živými vlákny nebo začněte novou místnost.",
+  drawerSubtitle: "Přecházejte mezi živými vlákny nebo otevřete novou místnost.",
   newSession: "Nová relace",
   noSavedConversationsYet: "Zatím žádné uložené konverzace",
   drawerEmptyDescription:
@@ -735,7 +746,7 @@ export const cs = {
   notNow: "Teď ne",
   setupGuideIntroTitle: "Jak funguje Mr Broccoli",
   setupGuideIntroBody:
-    "Mr Broccoli začíná prázdné. Přidejte přihlašovací údaje pro externí služby, které již používáte, a poté vyberte, jak budou směrovány odpovědi, hlasový vstup, mluvený výstup a volitelný webový kontext.",
+    "Mr Broccoli začíná prázdný. Přidejte přihlašovací údaje pro externí služby, které již používáte, a poté vyberte, jak budou směrovány odpovědi, hlasový vstup, mluvený výstup a volitelný webový kontext.",
   setupGuideIntroNote:
     "Po nastavení zahajte a zastavte konverzaci pomocí hlavního hlasového ovládání. Aktuální přepis zůstává k dispozici na domovské obrazovce a každou trasu lze později změnit v Nastavení.",
   setupGuideProviderTitle: "Přidat přihlašovací údaje",
@@ -760,7 +771,7 @@ export const cs = {
   setupGuideKokoroBody: ({ size }) =>
     `Volitelné: stáhněte si Kokoro (asi ${size} MB) pro mnohem přirozenější mluvené odpovědi bez poskytovatele řeči nebo poplatků za používání.`,
   setupGuideKokoroLanguageNote:
-    "Tento model aktuálně mluví anglicky a zjednodušenou čínštinou. Nakonfigurujte libovolné záložní trasy, které chcete později, v nastavení Speaking.",
+    "Tento model aktuálně mluví anglicky a zjednodušenou čínštinou. Případné záložní trasy nakonfigurujte později v nastavení Mluvení.",
   setupGuideKokoroDownload: "Stáhnout Kokoro",
   setupGuideUseKokoro: "Pro mluvené odpovědi použijte Kokoro",
   setupGuideUseKokoroSummary:
@@ -781,7 +792,7 @@ export const cs = {
   setupGuideVoiceTestSynthesizing: "Příprava hlasu…",
   setupGuideVoiceTestSpeaking: "Přehrávání odpovědi…",
   setupGuideVoiceTestTranscript: "Přepis",
-  setupGuideVoiceTestReply: "Odpovědět",
+  setupGuideVoiceTestReply: "Odpověď",
   setupGuideVoiceTestReset: "Vymažte tento výsledek",
   setupGuideVoiceInputUnavailable:
     "Hlasový vstup není pro toto nastavení na tomto zařízení dostupný.",
@@ -791,7 +802,7 @@ export const cs = {
   setupGuideSummaryLlm: "LLM",
   setupGuideSummaryStt: "Řeč na text",
   setupGuideSummaryTts: "Převod textu na řeč",
-  setupGuideSummaryWebSearch: "vyhledávání na webu",
+  setupGuideSummaryWebSearch: "Vyhledávání na webu",
   setupGuideRouteProviderLlm: ({ provider }) => `Povoleno přes ${provider}`,
   setupGuideRouteOnDeviceStt:
     "Povoleno prostřednictvím systémového rozpoznávání řeči",
@@ -799,7 +810,7 @@ export const cs = {
     `Povoleno prostřednictvím přepisu řeči ${provider}`,
   setupGuideRouteProviderTts: ({ provider }) =>
     `Povoleno prostřednictvím hlasu ${provider}`,
-  setupGuideRouteKokoroTts: "Povoleno prostřednictvím hlasu na zařízení Kokoro",
+  setupGuideRouteKokoroTts: "Povoleno prostřednictvím hlasu Kokoro na zařízení",
   setupGuideRouteLocalTts:
     "Povoleno prostřednictvím místního hlasového balíčku",
   setupGuideRouteUnavailable: "Není k dispozici",
@@ -813,16 +824,20 @@ export const cs = {
   noMatchingConversations: "Žádné odpovídající konverzace",
   noMatchingConversationsDescription:
     "Zkuste jiný název, trasu, model nebo frázi z přepisu.",
-  memoryModalTitle: "Paměť na konverzaci",
+  memoryModalTitle: "Paměť konverzace",
   memoryModalDescription:
-    "Toto je kompaktní shrnutí, které Mr Broccoli přenáší vpřed, jakmile je vlákno dostatečně dlouhé, aby stlačilo starší závity.",
+    "Toto je kompaktní shrnutí, které si Mr Broccoli přenáší dál, jakmile je vlákno dost dlouhé na to, aby se starší tahy zkomprimovaly.",
   memorySummary: "Uložené shrnutí",
   memorySummaryEmpty:
-    "Zatím žádná kompaktní paměť. Jakmile bude toto vlákno delší, budou zde shrnuty starší odbočky.",
+    "Zatím žádná kompaktní paměť. Jakmile bude toto vlákno delší, budou zde shrnuty starší tahy.",
   summarizedTurnsCount: ({ count }) =>
-    Number(count) === 1 ? "1 shrnutý tah" : `${count} shrnutých tahů`,
+    Number(count) === 1
+      ? "1 shrnutý tah"
+      : Number(count) < 5
+        ? `${count} shrnuté tahy`
+        : `${count} shrnutých tahů`,
   copyMemory: "Kopírovat paměť",
-  forgetMemory: "Zapomeňte na paměť",
+  forgetMemory: "Zapomenout paměť",
   memoryCopied: "Paměť zkopírována.",
   memoryCleared: "Paměť konverzace byla vymazána.",
   noConversationToManageYet: "Zatím není k dispozici žádná paměť konverzace.",
@@ -832,31 +847,31 @@ export const cs = {
   endedAt: "Skončilo",
   pinned: "Připnuto",
   copy: "Kopírovat",
-  share: "Sdílejte",
+  share: "Sdílet",
   rename: "Přejmenovat",
-  pin: "Pin",
+  pin: "Připnout",
   unpin: "Odepnout",
   save: "Uložit",
   cancel: "Zrušit",
-  stop: "Přestaň",
+  stop: "Zastavit",
   pause: "Pauza",
   resume: "Pokračovat",
   paused: "Pozastaveno",
   listening: "Poslouchání",
   parsing: "Přepisování",
   searching: "Hledání",
-  converting: "Konverze",
+  converting: "Převádění",
   webSearchAction: "vyhledávání na webu",
-  thinking: "myšlení",
-  speaking: "Mluvit",
+  thinking: "Přemýšlení",
+  speaking: "Mluvení",
   pleaseWait: "Čekejte prosím",
   yourTurn: "Jste na řadě",
-  keepPressing: "Tiskněte dál",
+  keepPressing: "Držte tlačítko",
   tapWhenDone: "Po dokončení klepněte",
   speechPaused: "Řeč je pozastavena",
   pausePlaybackUnavailable:
     "Tuto hlasovou trasu nelze pozastavit. Zastavte to nebo přepněte na hlasový výstup poskytovatele.",
-  holdToSpeak: "Vydržte, abyste mohli mluvit",
+  holdToSpeak: "Podržte pro mluvení",
   tapToSpeak: "Klepnutím mluvte",
   tapAgainToSend: "Opětovným klepnutím odešlete",
   waitingForReply: "Čekání na odpověď",
@@ -864,7 +879,7 @@ export const cs = {
   providerConfiguredInSettings: ({ provider }) =>
     `${provider} není nakonfigurováno v Nastavení.`,
   providerNetworkError: ({ provider, action }) =>
-    `Nelze dosáhnout ${provider} pro ${action}. Zkontrolujte připojení a zkuste to znovu.`,
+    `Nepodařilo se spojit s ${provider} pro ${action}. Zkontrolujte připojení a zkuste to znovu.`,
   providerAuthError: ({ provider, action }) =>
     `${provider} odmítl přihlašovací údaje pro ${action}. Zkontrolujte klíč API a oprávnění.`,
   providerRateLimitError: ({ provider, action }) =>
@@ -914,18 +929,18 @@ export const cs = {
     `Hlasový výstup ${provider} trval příliš dlouho.`,
   sttTimeout: ({ provider }) => `Přepis řeči ${provider} trval příliš dlouho.`,
   sttFileSizeLimitExceeded: ({ provider, model, limit }) =>
-    `${provider} ${model} přijímá pouze nahrávky do ${limit}. Použijte kratší modely klipů nebo spínačů STT.`,
+    `${provider} ${model} přijímá pouze nahrávky do ${limit}. Použijte kratší nahrávku, nebo přepněte model STT.`,
   voiceInputCaptureIncomplete:
     "Hlasový vstup se nepodařilo zachytit čistě. Zkuste to prosím znovu.",
   ttsDidNotReturnAudio: ({ provider }) => `${provider} TTS nevrátil zvuk.`,
-  nativeSttHandledInApp: "Systém STT se ovládá přímo v aplikaci.",
+  nativeSttHandledInApp: "Systémové STT je zpracováno přímo v aplikaci.",
   chooseSpeechToTextProviderInSettings:
     "V Nastavení vyberte poskytovatele převodu řeči na text.",
   sttNotSupportedYet: ({ provider }) =>
     `${provider} STT zatím není podporováno.`,
   providerNotWiredUpYet: ({ provider }) => `${provider} ještě není zapojeno.`,
-  you: "vy",
-  assistant: "asistent",
+  you: "Vy",
+  assistant: "Asistent",
   untitledConversation: "Konverzace bez názvu",
   conversationExportHeader: ({ title }) => `Konverzace: ${title}`,
   speechRecognitionPermissionNotGranted:
@@ -937,6 +952,6 @@ export const cs = {
   noSpeechDetected: "Nebyla zjištěna žádná řeč.",
   nativeSpeechRecognitionFailed: "Nativní rozpoznávání řeči selhalo.",
   couldntStartNativeSpeechRecognition:
-    "Nelze spustit rozpoznávání nativní řeči.",
+    "Nelze spustit nativní rozpoznávání řeči.",
   microphonePermissionNotGranted: "Povolení k mikrofonu nebylo uděleno",
 } satisfies TranslationDictionary;

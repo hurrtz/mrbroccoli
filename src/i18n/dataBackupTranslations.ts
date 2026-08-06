@@ -368,7 +368,7 @@ export const dataBackupTranslations = {
     conversationArchiveDescription:
       "Conservez des copies Markdown lisibles de vos conversations dans un dossier Fichiers ou Drive pour d’autres apps d’IA.",
     conversationArchiveWarning:
-      "Les fichiers sont en texte brut. Toute personne ayant accès au dossier peut les lire. La déconnexion conserve les fichiers.",
+      "Les fichiers sont en texte brut. Toute personne ayant accès au dossier peut les lire. La déconnexion arrête les mises à jour mais conserve les fichiers.",
     conversationArchiveChooseFolder: "Choisir le dossier d’archive",
     conversationArchiveChangeFolder: "Changer de dossier",
     conversationArchiveSyncNow: "Synchroniser maintenant",
@@ -432,7 +432,7 @@ export const dataBackupTranslations = {
     conversationArchiveDescription:
       "Conserva copie Markdown leggibili delle conversazioni in una cartella File o Drive per altre app di IA.",
     conversationArchiveWarning:
-      "I file sono in testo semplice. Chiunque acceda alla cartella può leggerli. La disconnessione lascia i file al loro posto.",
+      "I file sono in testo semplice. Chiunque acceda alla cartella può leggerli. La disconnessione interrompe gli aggiornamenti, ma lascia i file al loro posto.",
     conversationArchiveChooseFolder: "Scegli cartella archivio",
     conversationArchiveChangeFolder: "Cambia cartella",
     conversationArchiveSyncNow: "Sincronizza ora",
@@ -471,7 +471,7 @@ export const dataBackupTranslations = {
     encryptedBackupPassphraseTitle: "Sblocca backup crittografato",
     backupRestorePreviewTitle: "Ripristinare questo backup?",
     backupRestorePreviewMessage: ({ conversationCount, appVersion }) =>
-      `Questo backup della versione ${appVersion} contiene ${conversationCount} conversazioni e le impostazioni. I dati e le chiavi API esistenti non verranno sostituiti; i conflitti saranno aggiunti come copie.`,
+      `Questo backup della versione ${appVersion} contiene ${conversationCount} conversazioni e le impostazioni. I dati e le chiavi API esistenti non verranno sostituiti; le conversazioni in conflitto saranno aggiunte come copie.`,
     restoreBackup: "Ripristina backup",
     backupRestoreComplete: ({ restored, copied, skipped }) =>
       `Ripristinate ${restored} conversazioni (${copied} copiate per conflitti, ${skipped} già presenti). Impostazioni ripristinate; chiavi API invariate.`,
@@ -527,7 +527,7 @@ export const dataBackupTranslations = {
     backupPassphrase: "Frase-passe",
     backupPassphraseConfirm: "Confirmar frase-passe",
     backupPassphraseMinimum: ({ count }) =>
-      `Use pelo menos ${count} carateres. Guarde a frase-passe em segurança; não pode ser recuperada.`,
+      `Use pelo menos ${count} caracteres. Guarde a frase-passe em segurança; não pode ser recuperada.`,
     backupPassphrasesDoNotMatch: "As frases-passe não coincidem.",
     backupPassphraseWeak:
       "Escolha uma frase-passe menos previsível. Caracteres repetidos e sequências comuns não são seguros.",
@@ -598,7 +598,7 @@ export const dataBackupTranslations = {
     encryptedBackupPassphraseTitle: "Desbloquear backup criptografado",
     backupRestorePreviewTitle: "Restaurar este backup?",
     backupRestorePreviewMessage: ({ conversationCount, appVersion }) =>
-      `Este backup da versão ${appVersion} contém ${conversationCount} conversas e configurações. Os dados e as chaves de API existentes não serão substituídos; conflitos serão adicionados como cópias.`,
+      `Este backup da versão ${appVersion} contém ${conversationCount} conversas e configurações. Os dados e as chaves de API existentes não serão substituídos; conversas conflitantes serão adicionadas como cópias.`,
     restoreBackup: "Restaurar backup",
     backupRestoreComplete: ({ restored, copied, skipped }) =>
       `${restored} conversas restauradas (${copied} copiadas por conflitos, ${skipped} já existentes). Configurações restauradas; chaves de API inalteradas.`,
@@ -740,7 +740,7 @@ export const dataBackupTranslations = {
     conversationArchiveDescription:
       "احتفظ بنسخ Markdown مقروءة من محادثاتك في مجلد الملفات أو Drive لاستخدامها مع تطبيقات ذكاء اصطناعي أخرى.",
     conversationArchiveWarning:
-      "ملفات الأرشيف نص عادي. يمكن لأي شخص لديه وصول إلى المجلد قراءتها. قطع الاتصال لا يحذف الملفات.",
+      "ملفات الأرشيف نص عادي. يمكن لأي شخص لديه وصول إلى المجلد قراءتها. قطع الاتصال يوقف التحديثات لكنه يُبقي الملفات في مكانها.",
     conversationArchiveChooseFolder: "اختيار مجلد الأرشيف",
     conversationArchiveChangeFolder: "تغيير المجلد",
     conversationArchiveSyncNow: "المزامنة الآن",
@@ -831,7 +831,7 @@ export const dataBackupTranslations = {
     backupPassphrasesDoNotMatch: "パスフレーズが一致しません。",
     backupPassphraseWeak:
       "推測されにくいパスフレーズを選んでください。文字の繰り返しや一般的な並びは安全ではありません。",
-    encryptedBackupPassphraseTitle: "暗号化バックアップを解除",
+    encryptedBackupPassphraseTitle: "暗号化バックアップのロックを解除",
     backupRestorePreviewTitle: "このバックアップを復元しますか？",
     backupRestorePreviewMessage: ({ conversationCount, appVersion }) =>
       `バージョン ${appVersion} のバックアップには ${conversationCount} 件の会話と設定が含まれます。既存データと API キーは置き換えず、競合する会話はコピーとして追加します。`,
@@ -842,7 +842,7 @@ export const dataBackupTranslations = {
     backupUnsupported: "このバックアップのバージョンは対応していません。",
     backupTooLarge: "このバックアップは大きすぎて読み込めません。",
     backupDecryptFailed:
-      "バックアップを解除できませんでした。パスフレーズを確認してください。",
+      "バックアップのロックを解除できませんでした。パスフレーズを確認してください。",
     backupExportFailed: "バックアップを書き出せませんでした。",
     backupExportSkipped: ({ count }) =>
           `警告: ${count} 件の会話を読み取れなかったため、このバックアップに含まれていません。`,
@@ -856,9 +856,9 @@ export const dataBackupTranslations = {
       "Beállítások és beszélgetések exportálása vagy visszaállítása.",
     conversationArchive: "MI-beszélgetésarchívum",
     conversationArchiveDescription:
-      "Tárold a beszélgetések olvasható Markdown-másolatait egy Fájlok vagy Drive mappában más MI-appokhoz.",
+      "Tárolja a beszélgetések olvasható Markdown-másolatait egy Fájlok vagy Drive mappában más MI-appokhoz.",
     conversationArchiveWarning:
-      "Az archívum egyszerű szöveg. A mappához hozzáférők elolvashatják. A leválasztás nem törli a fájlokat.",
+      "Az archívum egyszerű szöveg. A mappához hozzáférők elolvashatják. A leválasztás leállítja a frissítéseket, de a fájlok a helyükön maradnak.",
     conversationArchiveChooseFolder: "Archívummappa kiválasztása",
     conversationArchiveChangeFolder: "Mappa módosítása",
     conversationArchiveSyncNow: "Szinkronizálás most",
@@ -869,7 +869,7 @@ export const dataBackupTranslations = {
     conversationArchiveNeverSynced: "Még nincs szinkronizálva",
     conversationArchiveSyncing: "Beszélgetések szinkronizálása…",
     conversationArchiveAccessLost:
-      "A mappahozzáférés elveszett. Válaszd ki újra az archívummappát.",
+      "A mappahozzáférés elveszett. Válassza ki újra az archívummappát.",
     conversationArchiveUnavailable:
       "A mappaintegráció ebben az appverzióban nem érhető el.",
     conversationArchiveSyncFailed: "A beszélgetésarchívum nem frissíthető.",
@@ -892,7 +892,7 @@ export const dataBackupTranslations = {
       `Legalább ${count} karaktert használjon. Őrizze biztonságban a jelmondatot; nem állítható vissza.`,
     backupPassphrasesDoNotMatch: "A jelmondatok nem egyeznek.",
     backupPassphraseWeak:
-      "Válassz kevésbé kiszámítható jelmondatot. Az ismétlődő karakterek és gyakori sorozatok nem biztonságosak.",
+      "Válasszon kevésbé kiszámítható jelmondatot. Az ismétlődő karakterek és gyakori sorozatok nem biztonságosak.",
     encryptedBackupPassphraseTitle: "Titkosított mentés feloldása",
     backupRestorePreviewTitle: "Visszaállítja ezt a mentést?",
     backupRestorePreviewMessage: ({ conversationCount, appVersion }) =>
@@ -919,7 +919,7 @@ export const dataBackupTranslations = {
     conversationArchiveDescription:
       "Ukládejte čitelné Markdown kopie konverzací do složky Soubory nebo Drive pro jiné AI aplikace.",
     conversationArchiveWarning:
-      "Soubory archivu jsou prostý text. Každý s přístupem ke složce je může číst. Odpojení soubory nesmaže.",
+      "Soubory archivu jsou prostý text. Každý s přístupem ke složce je může číst. Odpojení zastaví aktualizace, ale soubory ponechá na místě.",
     conversationArchiveChooseFolder: "Vybrat složku archivu",
     conversationArchiveChangeFolder: "Změnit složku",
     conversationArchiveSyncNow: "Synchronizovat nyní",
@@ -980,7 +980,7 @@ export const dataBackupTranslations = {
     conversationArchiveDescription:
       "Zapisuj czytelne kopie Markdown rozmów w folderze Pliki lub Drive do użycia w innych aplikacjach AI.",
     conversationArchiveWarning:
-      "Pliki archiwum są zwykłym tekstem. Każdy z dostępem do folderu może je przeczytać. Odłączenie nie usuwa plików.",
+      "Pliki archiwum są zwykłym tekstem. Każdy z dostępem do folderu może je przeczytać. Odłączenie zatrzymuje aktualizacje, ale pozostawia pliki na miejscu.",
     conversationArchiveChooseFolder: "Wybierz folder archiwum",
     conversationArchiveChangeFolder: "Zmień folder",
     conversationArchiveSyncNow: "Synchronizuj teraz",
@@ -1107,7 +1107,7 @@ export const dataBackupTranslations = {
     conversationArchiveDescription:
       "Konuşmaların okunabilir Markdown kopyalarını diğer yapay zekâ uygulamaları için Dosyalar veya Drive klasöründe tutun.",
     conversationArchiveWarning:
-      "Arşiv dosyaları düz metindir. Klasöre erişen herkes okuyabilir. Bağlantıyı kesmek dosyaları silmez.",
+      "Arşiv dosyaları düz metindir. Klasöre erişen herkes okuyabilir. Bağlantıyı kesmek güncellemeleri durdurur ancak dosyaları yerinde bırakır.",
     conversationArchiveChooseFolder: "Arşiv klasörü seç",
     conversationArchiveChangeFolder: "Klasörü değiştir",
     conversationArchiveSyncNow: "Şimdi eşitle",
@@ -1167,7 +1167,7 @@ export const dataBackupTranslations = {
     conversationArchiveDescription:
       "دوسری AI ایپس کے لیے گفتگو کی قابل مطالعہ Markdown نقول Files یا Drive فولڈر میں رکھیں۔",
     conversationArchiveWarning:
-      "آرکائیو فائلیں سادہ متن ہیں۔ فولڈر تک رسائی رکھنے والا کوئی بھی انہیں پڑھ سکتا ہے۔ رابطہ منقطع کرنے سے فائلیں حذف نہیں ہوں گی۔",
+      "آرکائیو فائلیں سادہ متن ہیں۔ فولڈر تک رسائی رکھنے والا کوئی بھی انہیں پڑھ سکتا ہے۔ رابطہ منقطع کرنے سے اپ ڈیٹس رک جاتی ہیں مگر فائلیں اپنی جگہ موجود رہتی ہیں۔",
     conversationArchiveChooseFolder: "آرکائیو فولڈر منتخب کریں",
     conversationArchiveChangeFolder: "فولڈر تبدیل کریں",
     conversationArchiveSyncNow: "ابھی ہم آہنگ کریں",

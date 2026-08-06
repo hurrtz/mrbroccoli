@@ -138,7 +138,7 @@ const rawPremiumTranslations = {
     premium: "प्रीमियम",
     upgradeToPremium: "प्रीमियम अनलॉक करें",
     premiumDescription:
-      "क्लाउड प्रदाता, सभी उत्तर मोड, वेब खोज, चित्र, Drive मोड और सर्वोच्च मोड, पिछली सत्र जानकारी और सभी उन्नत सेटिंग्स उपयोग करें।",
+      "क्लाउड प्रदाता, सभी उत्तर मोड, वेब खोज, चित्र, Drive मोड, सर्वोच्च मोड, पिछले सत्रों की जानकारी और सभी उन्नत सेटिंग्स उपयोग करें।",
     premiumBuy: "प्रीमियम खरीदें",
     premiumBuyPrice: ({ price }) => `प्रीमियम खरीदें · ${price}`,
     restorePurchase: "खरीद बहाल करें",
@@ -165,20 +165,20 @@ const rawPremiumTranslations = {
     freeOfflineDownloadAndTest: "शुरू करें",
     freeOfflinePreparing: ({ model, index, count }) =>
       `${model} · ${index} / ${count}`,
-    freeOfflineReady: "निजी ऑफ़लाइन सेट तैयार है।",
+    freeOfflineReady: "आपका निजी ऑफ़लाइन सेटअप तैयार है।",
     freeOfflineUnavailableLanguage:
-      "इस भाषा के लिए अभी पूरा स्थानीय सेट उपलब्ध नहीं है।",
+      "इस भाषा के लिए अभी पूरा स्थानीय सेटअप उपलब्ध नहीं है।",
     freeOfflineUnavailableDevice:
-      "यह फ़ोन इस भाषा के लिए पूरा स्थानीय सेट सुरक्षित रूप से नहीं चला सकता।",
+      "यह फ़ोन इस भाषा के लिए पूरा स्थानीय सेटअप सुरक्षित रूप से नहीं चला सकता।",
     freeOfflineUnavailableStorage:
-      "पूरे स्थानीय सेट के लिए पर्याप्त खाली जगह नहीं है।",
+      "पूरे स्थानीय सेटअप के लिए पर्याप्त खाली जगह नहीं है।",
   }),
   es: define({
     ...editionTranslations.es,
     premium: "Premium",
     upgradeToPremium: "Desbloquear Premium",
     premiumDescription:
-      "Usa proveedores en la nube, todos los modos de respuesta, búsqueda web, imágenes, modo Drive y Modo supremo, conocimiento de sesiones anteriores y todos los ajustes avanzados.",
+      "Usa proveedores en la nube, todos los modos de respuesta, búsqueda web, imágenes, modo Drive, Modo supremo, conocimiento de sesiones anteriores y todos los ajustes avanzados.",
     premiumBuy: "Comprar Premium",
     premiumBuyPrice: ({ price }) => `Comprar Premium · ${price}`,
     restorePurchase: "Restaurar compra",
@@ -218,7 +218,7 @@ const rawPremiumTranslations = {
     premium: "Premium",
     upgradeToPremium: "Débloquer Premium",
     premiumDescription:
-      "Utilisez les fournisseurs cloud, tous les modes de réponse, la recherche web, les images, le mode Drive et le Mode suprême, les connaissances des sessions passées et tous les réglages avancés.",
+      "Utilisez les fournisseurs cloud, tous les modes de réponse, la recherche web, les images, le mode Drive, le Mode suprême, les connaissances des sessions passées et tous les réglages avancés.",
     premiumBuy: "Acheter Premium",
     premiumBuyPrice: ({ price }) => `Acheter Premium · ${price}`,
     restorePurchase: "Restaurer l’achat",
@@ -258,7 +258,7 @@ const rawPremiumTranslations = {
     premium: "Premium",
     upgradeToPremium: "Sblocca Premium",
     premiumDescription:
-      "Usa provider cloud, tutte le modalità di risposta, ricerca web, immagini, modalità Drive e Modalità suprema, conoscenza delle sessioni passate e tutte le impostazioni avanzate.",
+      "Usa provider cloud, tutte le modalità di risposta, ricerca web, immagini, modalità Drive, Modalità suprema, conoscenza delle sessioni passate e tutte le impostazioni avanzate.",
     premiumBuy: "Acquista Premium",
     premiumBuyPrice: ({ price }) => `Acquista Premium · ${price}`,
     restorePurchase: "Ripristina acquisto",
@@ -278,7 +278,7 @@ const rawPremiumTranslations = {
     freeOfflineIntro:
       "Scegli la tua lingua mentre Mr Broccoli analizza questo telefono e consiglia la migliore configurazione privata di ascolto, ragionamento e voce che può eseguire in modo affidabile. Tocca Inizia per scaricare, installare e testare tutto prima della prima conversazione.",
     freeOfflineInternetDisclosure:
-      "Il download dei modelli richiede internet. Dopo l’installazione, conversazioni e sessioni gratuite restano interamente sul dispositivo.",
+      "Il download dei modelli richiede internet. Dopo l’installazione, le conversazioni e le sessioni della versione gratuita restano interamente sul dispositivo.",
     freeOfflineProfile: "La scelta migliore per te e questo telefono",
     freeOfflineDownloadSize: ({ size }) => `${size} da scaricare`,
     freeOfflineDownloadAndTest: "Inizia",
@@ -297,7 +297,7 @@ const rawPremiumTranslations = {
     premium: "Premium",
     upgradeToPremium: "Desbloquear Premium",
     premiumDescription:
-      "Use fornecedores cloud, todos os modos de resposta, pesquisa web, imagens, modo Drive e Modo Supremo, conhecimento de sessões anteriores e todas as definições avançadas.",
+      "Use fornecedores cloud, todos os modos de resposta, pesquisa web, imagens, modo Drive, Modo Supremo, conhecimento de sessões anteriores e todas as definições avançadas.",
     premiumBuy: "Comprar Premium",
     premiumBuyPrice: ({ price }) => `Comprar Premium · ${price}`,
     restorePurchase: "Restaurar compra",
@@ -315,9 +315,9 @@ const rawPremiumTranslations = {
     premiumErrorPending: "A compra aguarda aprovação.",
     freeOfflineTitle: "Modo privado no dispositivo",
     freeOfflineIntro:
-      "Escolha o seu idioma enquanto o Mr Broccoli analisa este telefone e recomenda a melhor configuração privada de audição, raciocínio e voz que consegue executar com fiabilidade. Toque em Começar para transferir, instalar e testar tudo antes da primeira conversa.",
+      "Escolha o seu idioma enquanto o Mr Broccoli analisa este telemóvel e recomenda a melhor configuração privada de escuta, raciocínio e voz que consegue executar com fiabilidade. Toque em Começar para transferir, instalar e testar tudo antes da primeira conversa.",
     freeOfflineInternetDisclosure:
-      "A transferência dos modelos necessita de internet. Depois, as conversas e sessões gratuitas ficam totalmente neste dispositivo.",
+      "A transferência dos modelos necessita de internet. Após a instalação, as conversas e sessões da versão Grátis ficam totalmente neste dispositivo.",
     freeOfflineProfile: "A melhor opção para si e para este telemóvel",
     freeOfflineDownloadSize: ({ size }) => `${size} para transferir`,
     freeOfflineDownloadAndTest: "Começar",
@@ -327,7 +327,7 @@ const rawPremiumTranslations = {
     freeOfflineUnavailableLanguage:
       "Ainda não existe uma configuração local completa para este idioma.",
     freeOfflineUnavailableDevice:
-      "Este telefone não pode executar com segurança uma configuração local completa para este idioma.",
+      "Este telemóvel não pode executar com segurança uma configuração local completa para este idioma.",
     freeOfflineUnavailableStorage:
       "Não há espaço livre suficiente para a configuração local completa.",
   }),
@@ -336,7 +336,7 @@ const rawPremiumTranslations = {
     premium: "Premium",
     upgradeToPremium: "Desbloquear Premium",
     premiumDescription:
-      "Use provedores em nuvem, todos os modos de resposta, busca na web, imagens, modo Drive e Modo Supremo, conhecimento de sessões anteriores e todas as configurações avançadas.",
+      "Use provedores em nuvem, todos os modos de resposta, pesquisa na web, imagens, modo Drive, Modo Supremo, conhecimento de sessões anteriores e todas as configurações avançadas.",
     premiumBuy: "Comprar Premium",
     premiumBuyPrice: ({ price }) => `Comprar Premium · ${price}`,
     restorePurchase: "Restaurar compra",
@@ -411,18 +411,18 @@ const rawPremiumTranslations = {
   }),
   "zh-CN": define({
     ...editionTranslations["zh-CN"],
-    premium: "高级版",
-    upgradeToPremium: "解锁高级版",
+    premium: "Premium",
+    upgradeToPremium: "解锁 Premium",
     premiumDescription:
-      "使用云端提供商、全部回答模式、网页搜索、图片、Drive 模式与终极模式、历史会话知识和所有高级设置。",
-    premiumBuy: "购买高级版",
-    premiumBuyPrice: ({ price }) => `购买高级版 · ${price}`,
+      "使用云端提供商、全部回复模式、网页搜索、图片、Drive 模式与终极模式、过往对话知识和所有高级设置。",
+    premiumBuy: "购买 Premium",
+    premiumBuyPrice: ({ price }) => `购买 Premium · ${price}`,
     restorePurchase: "恢复购买",
     premiumRestoreHint: Platform.select({
-      ios: "永久购买可通过本平台上相同的 App Store 帐户恢复，无需 Mr Broccoli 帐户。",
-      default: "永久购买可通过本平台上相同的 Play Store 帐户恢复，无需 Mr Broccoli 帐户。",
+      ios: "永久购买可通过本平台上相同的 App Store 账户恢复，无需 Mr Broccoli 账户。",
+      default: "永久购买可通过本平台上相同的 Play Store 账户恢复，无需 Mr Broccoli 账户。",
     }),
-    premiumUnlocked: "高级版已解锁",
+    premiumUnlocked: "Premium 已解锁",
     developmentEntitlement: "开发版权限",
     developmentEntitlementHint:
       "仅在 .dev 和 .maestro 构建中可用。更改会立即生效，且不会影响商店购买。",
@@ -487,18 +487,18 @@ const rawPremiumTranslations = {
   ja: define({
     ...editionTranslations.ja,
     premium: "Premium",
-    upgradeToPremium: "Premiumを解除",
+    upgradeToPremium: "Premiumを解放",
     premiumDescription:
-      "クラウドプロバイダー、すべての回答モード、ウェブ検索、画像、Driveモード・究極モード、過去セッションの知識、詳細設定を利用できます。",
+      "クラウドプロバイダー、すべての応答モード、ウェブ検索、画像、Driveモード、究極モード、過去セッションの知識、すべての詳細設定を利用できます。",
     premiumBuy: "Premiumを購入",
     premiumBuyPrice: ({ price }) => `Premiumを購入 · ${price}`,
     restorePurchase: "購入を復元",
     premiumRestoreHint: Platform.select({
-      ios: "永久購入は、このプラットフォームの同じApp Storeアカウントで復元されます。Mr Broccoliアカウントは不要です。",
+      ios: "買い切りの購入は、このプラットフォームの同じApp Storeアカウントを通じて復元されます。Mr Broccoliアカウントは不要です。",
       default:
-        "永久購入は、このプラットフォームの同じPlay Storeアカウントで復元されます。Mr Broccoliアカウントは不要です。",
+        "買い切りの購入は、このプラットフォームの同じPlay Storeアカウントを通じて復元されます。Mr Broccoliアカウントは不要です。",
     }),
-    premiumUnlocked: "Premiumが解除されました",
+    premiumUnlocked: "Premiumは解放済みです",
     developmentEntitlement: "開発用アクセス権",
     developmentEntitlementHint:
       ".dev および .maestro ビルドでのみ利用できます。変更はすぐに適用され、ストアでの購入には影響しません。",
@@ -506,7 +506,7 @@ const rawPremiumTranslations = {
       "ストアを利用できません。後でもう一度お試しください。",
     premiumErrorFailed: "購入を完了できませんでした。",
     premiumErrorPending: "購入は承認待ちです。",
-    freeOfflineTitle: "非公開オンデバイスモード",
+    freeOfflineTitle: "プライベートなオンデバイスモード",
     freeOfflineIntro:
       "言語を選ぶと、Mr Broccoliがこのスマートフォンを分析し、安定して動作する最適なプライベート聞き取り・推論・音声構成を提案します。開始をタップすると、最初の会話の前にすべてをダウンロード、インストール、テストします。",
     freeOfflineInternetDisclosure:
@@ -516,7 +516,7 @@ const rawPremiumTranslations = {
     freeOfflineDownloadAndTest: "開始",
     freeOfflinePreparing: ({ model, index, count }) =>
       `${model} · ${index}/${count}`,
-    freeOfflineReady: "非公開オフライン構成の準備ができました。",
+    freeOfflineReady: "プライベートなオフライン構成の準備ができました。",
     freeOfflineUnavailableLanguage:
       "この言語に対応する完全なローカル構成はまだありません。",
     freeOfflineUnavailableDevice:
@@ -529,7 +529,7 @@ const rawPremiumTranslations = {
     premium: "Premium",
     upgradeToPremium: "Premium feloldása",
     premiumDescription:
-      "Használj felhőszolgáltatókat, minden válaszmódot, webes keresést, képeket, Drive módot és Szuper módot, korábbi munkamenetek tudását és minden haladó beállítást.",
+      "Használjon felhőszolgáltatókat, minden válaszmódot, webes keresést, képeket, Drive módot, Szuper módot, a korábbi munkamenetek tudását és minden haladó beállítást.",
     premiumBuy: "Premium megvásárlása",
     premiumBuyPrice: ({ price }) => `Premium megvásárlása · ${price}`,
     restorePurchase: "Vásárlás visszaállítása",
@@ -542,15 +542,15 @@ const rawPremiumTranslations = {
     developmentEntitlement: "Fejlesztői jogosultság",
     developmentEntitlementHint:
       "Csak .dev és .maestro buildekben érhető el. A módosítások azonnal érvénybe lépnek, és nem érintik az áruházi vásárlásokat.",
-    premiumErrorUnavailable: "Az áruház most nem érhető el. Próbáld később.",
+    premiumErrorUnavailable: "Az áruház most nem érhető el. Próbálja később.",
     premiumErrorFailed: "A vásárlás nem fejezhető be.",
     premiumErrorPending: "A vásárlás jóváhagyásra vár.",
-    freeOfflineTitle: "Privát eszközön futó mód",
+    freeOfflineTitle: "Privát, eszközön futó mód",
     freeOfflineIntro:
-      "Válaszd ki a nyelved, miközben Mr Broccoli felméri ezt a telefont, és a megbízhatóan futtatható legjobb privát hallási, következtetési és hangbeállítást ajánlja. Az első beszélgetés előtt az Indítás gombbal tölthetsz le, telepíthetsz és tesztelhetsz mindent.",
+      "Válassza ki a nyelvét, miközben Mr Broccoli felméri ezt a telefont, és a megbízhatóan futtatható legjobb privát hallgatási, gondolkodási és hangbeállítást ajánlja. Az első beszélgetés előtt az Indítás gombbal tölthet le, telepíthet és tesztelhet mindent.",
     freeOfflineInternetDisclosure:
       "A modellek letöltéséhez internet kell. Telepítés után az ingyenes beszélgetések és munkamenetek teljesen az eszközön maradnak.",
-    freeOfflineProfile: "A legjobb választás neked és ennek a telefonnak",
+    freeOfflineProfile: "A legjobb választás Önnek és ennek a telefonnak",
     freeOfflineDownloadSize: ({ size }) => `${size} letöltés`,
     freeOfflineDownloadAndTest: "Indítás",
     freeOfflinePreparing: ({ model, index, count }) =>
@@ -568,7 +568,7 @@ const rawPremiumTranslations = {
     premium: "Premium",
     upgradeToPremium: "Odemknout Premium",
     premiumDescription:
-      "Používejte cloudové poskytovatele, všechny režimy odpovědí, webové hledání, obrázky, režim Drive a Superrežim, znalosti z minulých relací a všechna pokročilá nastavení.",
+      "Používejte cloudové poskytovatele, všechny režimy odpovědí, vyhledávání na webu, obrázky, režim Drive a Superrežim, znalosti z minulých relací a všechna pokročilá nastavení.",
     premiumBuy: "Koupit Premium",
     premiumBuyPrice: ({ price }) => `Koupit Premium · ${price}`,
     restorePurchase: "Obnovit nákup",
@@ -646,7 +646,7 @@ const rawPremiumTranslations = {
     premium: "Premium",
     upgradeToPremium: "Premium’u aç",
     premiumDescription:
-      "Bulut sağlayıcılarını, tüm yanıt modlarını, web aramasını, görselleri, Drive modunu ve Süper Modu, geçmiş oturum bilgisini ve tüm gelişmiş ayarları kullanın.",
+      "Bulut sağlayıcılarını, tüm yanıt modlarını, web aramasını, görselleri, Drive modunu, Süper Modu, geçmiş oturum bilgisini ve tüm gelişmiş ayarları kullanın.",
     premiumBuy: "Premium satın al",
     premiumBuyPrice: ({ price }) => `Premium satın al · ${price}`,
     restorePurchase: "Satın almayı geri yükle",
@@ -667,7 +667,7 @@ const rawPremiumTranslations = {
     freeOfflineIntro:
       "Dilinizi seçin. Mr Broccoli bu telefonu inceler ve güvenilir biçimde çalıştırabileceği en iyi özel dinleme, akıl yürütme ve ses kurulumunu önerir. İlk konuşmanızdan önce her şeyi indirmek, kurmak ve test etmek için Başlat’a dokunun.",
     freeOfflineInternetDisclosure:
-      "Model indirmek için internet gerekir. Kurulumdan sonra ücretsiz konuşmalar ve oturumlar tamamen bu cihazda kalır.",
+      "Model indirmek için internet gerekir. Kurulumdan sonra Ücretsiz sürümdeki konuşmalar ve oturumlar tamamen bu cihazda kalır.",
     freeOfflineProfile: "Sizin ve bu telefon için en iyi seçenek",
     freeOfflineDownloadSize: ({ size }) => `${size} indirme`,
     freeOfflineDownloadAndTest: "Başlat",
@@ -752,12 +752,13 @@ const rawPremiumTranslations = {
     freeOfflineDownloadAndTest: "شروع کریں",
     freeOfflinePreparing: ({ model, index, count }) =>
       `${model} · ${index}/${count}`,
-    freeOfflineReady: "نجی آف لائن سیٹ تیار ہے۔",
+    freeOfflineReady: "آپ کا نجی آف لائن سیٹ اپ تیار ہے۔",
     freeOfflineUnavailableLanguage:
-      "اس زبان کے لیے ابھی مکمل مقامی سیٹ دستیاب نہیں۔",
+      "اس زبان کے لیے ابھی مکمل مقامی سیٹ اپ دستیاب نہیں۔",
     freeOfflineUnavailableDevice:
-      "یہ فون اس زبان کے لیے مکمل مقامی سیٹ محفوظ طریقے سے نہیں چلا سکتا۔",
-    freeOfflineUnavailableStorage: "مکمل مقامی سیٹ کے لیے کافی خالی جگہ نہیں۔",
+      "یہ فون اس زبان کے لیے مکمل مقامی سیٹ اپ محفوظ طریقے سے نہیں چلا سکتا۔",
+    freeOfflineUnavailableStorage:
+      "مکمل مقامی سیٹ اپ کے لیے کافی خالی جگہ نہیں۔",
   }),
 } as const;
 

@@ -70,7 +70,7 @@ export const memoryEditTranslations = {
   }),
   hu: define({
     memoryEditHint:
-      "Kijavíthatod ezt a tömör emléket, mielőtt a későbbi fordulókban használatba kerül.",
+      "Ezt a tömör memóriát kijavíthatja, mielőtt a későbbi fordulókban felhasználásra kerülne.",
     memorySaved: "Memória frissítve.",
   }),
   cs: define({

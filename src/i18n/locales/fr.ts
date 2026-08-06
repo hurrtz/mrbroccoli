@@ -60,7 +60,7 @@ export const fr = {
   settingsAppDiagnostics: "Application et diagnostic",
   settingsGuidedSetup: "Configuration guidée",
   settingsGuidedSetupSummary:
-    "Vérifiez les connexions et testez l’itinéraire vocal complet.",
+    "Vérifiez les connexions et testez la route vocale complète.",
   setupGuideShowInSettings: "Afficher la configuration guidée dans Paramètres",
   setupGuideShowInSettingsSummary:
     "Affichez ou masquez le raccourci de configuration guidée dans l'aperçu des paramètres.",
@@ -80,7 +80,7 @@ export const fr = {
     "Choisissez une langue pour améliorer la reconnaissance, ou laissez l’appareil ou le fournisseur la détecter automatiquement.",
   automaticLanguage: "Automatique",
   speechLanguageUnsupportedByProvider: ({ provider, language }) =>
-    `${provider} ne prend pas officiellement en charge ${language} pour cette voie vocale.`,
+    `${provider} ne prend pas officiellement en charge ${language} pour cette route vocale.`,
   usageStats: "Statistiques d'utilisation",
   model: "Modèle",
   effort: "Effort",
@@ -354,7 +354,7 @@ export const fr = {
   spokenRepliesEnabledDescription:
     "Lire à voix haute les réponses de l'assistant lorsqu'une route vocale est disponible.",
   spokenRepliesDisabledDescription:
-    "Pour le moment, conservez les réponses uniquement sous forme de texte. Votre itinéraire TTS préféré reste enregistré pour plus tard.",
+    "Pour le moment, conservez les réponses uniquement sous forme de texte. Votre route TTS préférée reste enregistrée pour plus tard.",
   nativeTtsDescription:
     "Utilisez le moteur vocal de l'appareil pour les réponses vocales et l'aperçu vocal.",
   kokoroTtsDescription:
@@ -391,14 +391,14 @@ export const fr = {
     "Utilisez une voix locale téléchargée correspondante pour les réponses parlées.",
   providerTtsDescription:
     "Utilisez le service configuré sélectionné pour les réponses vocales.",
-  ttsFallbackRoutes: "Itinéraires de secours",
+  ttsFallbackRoutes: "Routes de secours",
   ttsFallbackRoutesHint:
-    "Facultatif. Ajoutez uniquement les itinéraires souhaités, dans l’ordre dans lequel ils doivent être essayés. Une fois qu'un itinéraire commence à parler, Mr Broccoli y reste pour le reste de la réponse.",
+    "Facultatif. Ajoutez uniquement les routes souhaitées, dans l’ordre dans lequel elles doivent être essayées. Une fois qu'une route commence à parler, Mr Broccoli y reste pour le reste de la réponse.",
   ttsFallbackNone:
-    "Aucune solution de secours n'est configurée. Un échec vocal sera affiché à la place.",
+    "Aucune route de secours n'est configurée. Un échec vocal sera affiché à la place.",
   ttsFallbackPosition: ({ position, route }) => `${position}. ${route}`,
-  addFallbackRoute: ({ route }) => `Ajouter une solution de secours ${route}`,
-  removeFallbackRoute: ({ route }) => `Supprimer la solution de secours ${route}`,
+  addFallbackRoute: ({ route }) => `Ajouter une route de secours ${route}`,
+  removeFallbackRoute: ({ route }) => `Supprimer la route de secours ${route}`,
   moveFallbackEarlier: ({ route }) => `Déplacer ${route} plus tôt`,
   moveFallbackLater: ({ route }) => `Déplacer ${route} plus tard`,
   ttsProvider: "Fournisseur TTS",
@@ -444,7 +444,7 @@ export const fr = {
   qwenRegionHint:
     "La région sélectionnée doit correspondre à la région dans laquelle cette clé API a été créée.",
   qwenRegionUsSpeechHint:
-    "Les clés de la région américaine prennent en charge le chat et la recherche sur le Web ici. Les itinéraires Qwen STT et TTS actuels de Mr Broccoli nécessitent une clé de Singapour ou de Pékin.",
+    "Les clés de la région américaine prennent en charge le chat et la recherche sur le Web ici. Les routes Qwen STT et TTS actuelles de Mr Broccoli nécessitent une clé de Singapour ou de Pékin.",
   providerDefaultVoiceHint:
     "Ce fournisseur utilise actuellement sa voix par défaut pour l'aperçu et les réponses vocales.",
   listenLanguages: "Langues d'écoute",
@@ -458,7 +458,7 @@ export const fr = {
   localVoiceForLanguage: ({ languageLabel }) => `Voix pour ${languageLabel}`,
   providerVoicePreviews: "Aperçus vocaux du fournisseur",
   providerVoicePreviewsHint:
-    "Testez ici l'itinéraire TTS actuellement sélectionné avec un texte d'aperçu distinct pour chaque langue de réponse.",
+    "Testez ici la route TTS actuellement sélectionnée avec un texte d'aperçu distinct pour chaque langue de réponse.",
   nativeVoicePreviewSection: "Aperçu vocal natif",
   nativeVoicePreviewSectionHint:
     "Celui-ci parle directement via le synthétiseur vocal intégré au téléphone afin que vous puissiez le comparer avec les voix configurées du fournisseur.",
@@ -474,7 +474,7 @@ export const fr = {
     "Les configurations précédemment désactivées pourront être réessayées. Le fournisseur peut les refuser à nouveau.",
   speechDiagnostics: "Activité vocale récente",
   speechDiagnosticsHint:
-    "Affiche les dernières demandes vocales, l'itinéraire demandé, l'itinéraire réellement utilisé et toute raison de secours.",
+    "Affiche les dernières demandes vocales, la route demandée, la route réellement utilisée et toute raison de secours.",
   clearSpeechDiagnostics: "Effacer l'activité vocale récente",
   speechDiagnosticsEmpty:
     "Aucune demande de parole récente pour le moment. Prévisualisez une voix ou écoutez une réponse pour voir les détails du routage ici.",
@@ -552,9 +552,9 @@ export const fr = {
     `Journal de débogage précédent ${fileName} récupéré (${entryCount} entrées).`,
   debugLogCaptureFailed: "Impossible d'enregistrer le journal de débogage.",
   chooseSttBeforeVoiceSession:
-    "Choisissez un itinéraire STT configuré dans Paramètres avant de démarrer une session vocale.",
+    "Choisissez une route STT configurée dans Paramètres avant de démarrer une session vocale.",
   chooseTtsBeforeSpokenReplies:
-    "Choisissez un itinéraire TTS configuré dans Paramètres avant d'utiliser les réponses vocales.",
+    "Choisissez une route TTS configurée dans Paramètres avant d'utiliser les réponses vocales.",
   stopSessionBeforeReplay:
     "Arrêtez la session vocale active avant de relire la dernière réponse.",
   couldntCatchThatTryAgain: "Je n'ai pas réussi à comprendre, réessayez.",
@@ -569,7 +569,7 @@ export const fr = {
   stopSessionBeforePreview:
     "Arrêtez la session vocale active avant de prévisualiser une voix.",
   chooseTtsToPreviewVoices:
-    "Choisissez un itinéraire TTS configuré dans Paramètres pour prévisualiser les voix.",
+    "Choisissez une route TTS configurée dans Paramètres pour prévisualiser les voix.",
   downloadSelectedLocalVoiceFirst: ({ languageLabel }) =>
     `Téléchargez d'abord la voix locale ${languageLabel} sélectionnée.`,
   couldntPreviewVoice: "Impossible de prévisualiser la voix.",
@@ -650,7 +650,7 @@ export const fr = {
   estimatedUsageCounts: ({ replies, summaries }) =>
     `${replies} réponses · ${summaries} mises à jour de la mémoire`,
   estimatedUsageConversationScope:
-    "Les totaux incluent chaque itinéraire et modèle utilisé dans cette conversation.",
+    "Les totaux incluent chaque route et chaque modèle utilisés dans cette conversation.",
   estimatedPromptTokens: ({ count }) => `Invite : ${count}`,
   estimatedReplyTokens: ({ count }) => `Réponse : ${count}`,
   estimatedTotalTokens: ({ count }) => `Total : ${count}`,
@@ -667,11 +667,11 @@ export const fr = {
   expandTurnReceipt: "Afficher les détails du tour",
   collapseTurnReceipt: "Masquer les détails du tour",
   turnReceiptDirect: "Direct",
-  turnReceiptRequested: "Itinéraire de réponse demandé",
-  turnReceiptActual: "Itinéraire de réponse réel",
+  turnReceiptRequested: "Route de réponse demandée",
+  turnReceiptActual: "Route de réponse réelle",
   turnReceiptEffort: "Contrôle du raisonnement",
   turnReceiptProviderNative: "natif du fournisseur",
-  turnReceiptInput: "Itinéraire d'entrée",
+  turnReceiptInput: "Route d'entrée",
   turnReceiptSearch: "Recherche sur le Web",
   turnReceiptVoice: "Sortie vocale",
   turnReceiptContext: "Contexte",
@@ -681,7 +681,7 @@ export const fr = {
   turnReceiptTypedInput: "Tapé",
   turnReceiptSystemSpeech: "Reconnaissance vocale du système",
   turnReceiptSystemVoice: "Voix du système",
-  turnReceiptSystemVoiceFallback: "Voix du système · solution de secours",
+  turnReceiptSystemVoiceFallback: "Voix du système · route de secours",
   turnReceiptOff: "Désactivé",
   turnReceiptNotConfigured: "Activé · non configuré",
   turnReceiptFallbackWithoutSearch: "Suite sans recherche en direct",
@@ -690,7 +690,7 @@ export const fr = {
   turnReceiptSummaryUpdated: "résumé mis à jour",
   turnReceiptContextFallback: "solution de secours pour les messages récents",
   turnReceiptGatewayCompression: ({ original, compressed }) =>
-    `passerelle compressée ${original} en messages ${compressed}`,
+    `passerelle : ${original} messages compressés en ${compressed}`,
   turnReceiptContextValue: ({ sent, total, summarized, state }) =>
     `${sent}/${total} messages précédents envoyés · ${summarized} nouvellement résumés${state}`,
   turnReceiptTimingStt: "STT",
@@ -700,10 +700,10 @@ export const fr = {
   turnReceiptTimingFirstSpeech: "première parole",
   turnReceiptTimingTotal: "total",
   estimatedRouteUsageTokensOnly: ({ tokens }) => `${tokens} jetons`,
-  unknownUsageRoute: "Itinéraire inconnu",
+  unknownUsageRoute: "Route inconnue",
   setupGuideConnectProviderTitle: "Configurer les informations d'identification",
   setupGuideConnectProviderDescription:
-    "Ajoutez des informations d'identification dans Paramètres, puis choisissez les itinéraires que vous souhaitez utiliser.",
+    "Ajoutez des informations d'identification dans Paramètres, puis choisissez les routes que vous souhaitez utiliser.",
   idle: "Inactif",
   yourConversationAppearsHere: "Votre conversation apparaît ici",
   defaultTranscriptEmptyDescription:
@@ -720,7 +720,7 @@ export const fr = {
   drawerEmptyDescription:
     "Commencez à parler à partir de la vue principale et Mr Broccoli créera automatiquement une session.",
   setupGuideTitle: "Configurer l'application",
-  setupGuideSubtitle: "Ajoutez des informations d'identification et choisissez des itinéraires dans Paramètres.",
+  setupGuideSubtitle: "Ajoutez des informations d'identification et choisissez des routes dans Paramètres.",
   fastestStartPreset: "Configuration minimale",
   fastestStartDescription:
     "Utilisez la parole de l'appareil lorsqu'elle est disponible et configurez uniquement la route de réponse dont vous avez besoin.",
@@ -735,7 +735,7 @@ export const fr = {
   setupGuideIntroBody:
     "Mr Broccoli démarre vide. Ajoutez des informations d'identification pour les services externes que vous utilisez déjà, puis choisissez la manière dont les réponses, la saisie vocale, la sortie vocale et le contexte Web facultatif sont acheminés.",
   setupGuideIntroNote:
-    "Après la configuration, utilisez la commande vocale principale pour démarrer et arrêter une conversation. La transcription actuelle reste disponible sur l'écran d'accueil et chaque itinéraire peut être modifié ultérieurement dans Paramètres.",
+    "Après la configuration, utilisez la commande vocale principale pour démarrer et arrêter une conversation. La transcription actuelle reste disponible sur l'écran d'accueil et chaque route peut être modifiée ultérieurement dans Paramètres.",
   setupGuideProviderTitle: "Ajouter des informations d'identification",
   setupGuideProviderBody:
     "Choisissez le service externe que vous souhaitez configurer, puis collez les informations d'identification avec accès aux réponses.",
@@ -766,11 +766,11 @@ export const fr = {
   setupGuideSkipKokoro: "Passer pour l'instant",
   setupGuideVoiceTestTitle: "Testez votre configuration",
   setupGuideVoiceTestBody:
-    "Dites une courte phrase. Mr Broccoli testera l'accès au microphone, la transcription, l'itinéraire de réponse configuré et la sortie vocale lorsqu'un itinéraire vocal acceptable est disponible.",
+    "Dites une courte phrase. Mr Broccoli testera l'accès au microphone, la transcription, la route de réponse configurée et la sortie vocale lorsqu'une route vocale acceptable est disponible.",
   setupGuideVoiceTestNoInputBody:
-    "La saisie vocale n'est pas disponible avec cette configuration. Continuez à examiner les itinéraires détectés, puis ajustez les paramètres vocaux plus tard si nécessaire.",
+    "La saisie vocale n'est pas disponible avec cette configuration. Continuez à examiner les routes détectées, puis ajustez les paramètres vocaux plus tard si nécessaire.",
   setupGuideVoiceTestTextOnlyNote:
-    "Ce test reste uniquement en texte car aucun itinéraire vocal acceptable n'est encore prêt.",
+    "Ce test reste uniquement en texte car aucune route vocale acceptable n'est encore prête.",
   setupGuideVoiceTestStart: "Démarrer l'essai",
   setupGuideVoiceTestStop: "Arrêter l'enregistrement",
   setupGuideVoiceTestRetry: "Relancer le test",
@@ -785,7 +785,7 @@ export const fr = {
     "La saisie vocale n'est pas disponible pour cette configuration sur cet appareil.",
   setupGuideSummaryTitle: "Configuration terminée",
   setupGuideSummaryBody:
-    "Voici l'itinéraire que Mr Broccoli utilisera avec votre configuration actuelle.",
+    "Voici la route que Mr Broccoli utilisera avec votre configuration actuelle.",
   setupGuideSummaryLlm: "LLM",
   setupGuideSummaryStt: "Parole en texte",
   setupGuideSummaryTts: "Synthèse vocale",

@@ -44,9 +44,9 @@ export const ur = {
   tts: "TTS",
   ui: "UI",
   settingsRuntimeReadiness: "رن ٹائم تیاری",
-  settingsReadinessThink: "سوچو",
-  settingsReadinessListen: "سنو",
-  settingsReadinessSpeak: "بولو",
+  settingsReadinessThink: "سوچنا",
+  settingsReadinessListen: "سننا",
+  settingsReadinessSpeak: "بولنا",
   settingsReadinessSearch: "تلاش کریں۔",
   settingsReadinessReady: "تیار",
   settingsReadinessNeedsAttention: "توجہ",
@@ -64,7 +64,7 @@ export const ur = {
   setupGuideShowInSettings: "سیٹنگز میں گائیڈڈ سیٹ اپ دکھائیں۔",
   setupGuideShowInSettingsSummary:
     "سیٹنگز کے جائزہ پر گائیڈڈ سیٹ اپ شارٹ کٹ دکھائیں یا چھپائیں۔",
-  settingsConnectionsSummary: "فراہم کنندہ کی چابیاں، توثیق، اور صلاحیتیں۔",
+  settingsConnectionsSummary: "فراہم کنندہ کی کلیدیں، توثیق، اور صلاحیتیں۔",
   settingsThinkingSummary: "ہوم کارڈز، ماڈلز، کوشش، اور سسٹم پرامپٹ۔",
   settingsListeningSummary: "ان پٹ موڈ اور اسپیچ ٹو ٹیکسٹ روٹنگ۔",
   settingsSpeakingSummary: "بولے گئے جوابات، پلے بیک، آوازیں، اور پیش نظارہ۔",
@@ -89,8 +89,8 @@ export const ur = {
   modelEffortMinimal: "کم سے کم",
   modelEffortLow: "کم",
   modelEffortMedium: "درمیانہ",
-  modelEffortHigh: "اعلی",
-  modelEffortExtraHigh: "اضافی اعلی",
+  modelEffortHigh: "اعلیٰ",
+  modelEffortExtraHigh: "اضافی اعلیٰ",
   modelEffortMax: "زیادہ سے زیادہ",
   modelEffortDynamic: "متحرک",
   modelEffortDisabled: "غیر فعال",
@@ -129,7 +129,7 @@ export const ur = {
   speechTranscriptionAction: "تقریر کی نقل",
   speechSynthesisAction: "تقریر کی ترکیب",
   instructionsTabDescription:
-    "کسی بھی فراہم کنندہ کی درخواست کو دیکھنے سے پہلے اس پوشیدہ رہنمائی کو شکل دیں جو اسسٹنٹ کو چلاتا ہے۔",
+    "کسی بھی فراہم کنندہ کی درخواست کو دیکھنے سے پہلے اس پوشیدہ رہنمائی کو شکل دیں جو اسسٹنٹ کو چلاتی ہے۔",
   providersTabDescription:
     "بیرونی سروس کی اسناد کو ڈیوائس پر اسٹور کریں اور جوابی طریقوں کو ترتیب دیں جنہیں آپ استعمال کرنا چاہتے ہیں۔",
   webSearchTabDescription:
@@ -176,31 +176,31 @@ export const ur = {
     "کنٹرول کریں کہ جواب کب بولنا شروع کریں اور کون سا بیک اینڈ بولا ہوا آؤٹ پٹ ہینڈل کرتا ہے۔",
   brief: "مختصر",
   briefDescription:
-    "جواب کو سخت رکھیں۔ استعمال کنندہ کو مکمل جواب دینے کے لیے مطلوبہ جملوں کی کم از کم تعداد کا استعمال کریں۔",
+    "جواب کو مختصر رکھیں۔ صارف کو مکمل جواب دینے کے لیے کم سے کم جملے استعمال کریں۔",
   normal: "نارمل",
   normalDescription:
-    "ایک متوازن ردعمل کی لمبائی کا مقصد۔ جواب کو گھسیٹے بغیر اہم نکات کا احاطہ کریں۔",
+    "جواب کی متوازن لمبائی رکھیں۔ جواب کو بلاوجہ کھینچے بغیر اہم نکات کا احاطہ کریں۔",
   thorough: "مکمل",
   thoroughDescription:
-    "گہرائی میں جائیں اور جامع بنیں۔ نزاکت، تفصیل، تجارت، اور اہم استدلال شامل کریں۔",
+    "گہرائی میں جائیں اور جامع بنیں۔ باریکیاں، تفصیل، فائدے نقصان کے موازنے اور اہم استدلال شامل کریں۔",
   professional: "پیشہ ورانہ",
   professionalDescription:
     "کسی سینئر کنسلٹنٹ کی طرح بات کریں جیسے کسی کلائنٹ کو بریفنگ دے رہے ہوں۔ قطعی زبان، کوئی بول چال نہیں، ماپا اور مستند۔",
   casual: "آرام دہ اور پرسکون",
   casualDescription:
-    "کافی شاپ پر ایک ہوشیار دوست کی طرح بات کریں۔ آرام دہ، قدرتی، بات چیت. سنکچن ٹھیک ہیں، ٹینجنٹ ٹھیک ہیں۔",
-  nerdy: "نردی",
+    "کافی شاپ میں کسی سمجھ دار دوست کی طرح بات کریں۔ پرسکون، فطری، بات چیت والا انداز۔ بے تکلف مخففات ٹھیک ہیں، موضوع سے ہلکی سی ہٹ بھی ٹھیک ہے۔",
+  nerdy: "نرڈی",
   nerdyDescription:
-    "ایک پرجوش ماہر کی طرح بات کریں جو گہرائی میں جانا پسند کرتا ہے۔ آزادانہ طور پر تکنیکی اصطلاحات کا استعمال کریں، تفصیلات کے بارے میں جانیں، فرض کریں کہ صارف برقرار رکھ سکتا ہے۔",
+    "ایک پرجوش ماہر کی طرح بات کریں جو گہرائی میں جانا پسند کرتا ہے۔ تکنیکی اصطلاحات کھل کر استعمال کریں، تفصیلات میں شوق سے جائیں، اور فرض کریں کہ صارف آپ کے ساتھ چل سکتا ہے۔",
   concise: "اختصار",
   conciseDescription:
-    "مکمل ہوتے ہوئے بھی جتنا ممکن ہو مختصر رہیں۔ کوئی تمہید، کوئی فلر نہیں، صرف جواب ہے۔ ٹیلیگرام کے انداز پر غور کریں۔",
+    "مکمل ہوتے ہوئے بھی جتنا ممکن ہو مختصر رہیں۔ کوئی تمہید نہیں، کوئی بھرتی نہیں، صرف جواب۔ ٹیلیگرام جیسا انداز اپنائیں۔",
   socratic: "سقراطی",
   socraticDescription:
-    "صارف کی سوچ کو چیلنج کریں۔ جوابی سوالات پوچھیں، متبادل نقطہ نظر پیش کریں، صرف ان کی بات کی تصدیق نہ کریں۔ نیزہ بازی کے ساتھی بنیں، ہاں مشین نہیں۔",
+    "صارف کی سوچ کو چیلنج کریں۔ جوابی سوالات پوچھیں، متبادل نقطہ نظر پیش کریں، صرف ان کی بات کی تصدیق نہ کریں۔ فکری مقابلے کے ساتھی بنیں، ہر بات پر ہاں کہنے والی مشین نہیں۔",
   eli5: "ELI5",
   eli5Description:
-    "ہر چیز کو جتنا آسان ہو سکے بیان کریں۔ تشبیہات، روزمرہ کی زبان، زیرو جرگن استعمال کریں۔ کسی بھی موضوع پر کوئی پیشگی علم نہ سمجھیں۔",
+    "ہر چیز کو جتنا آسان ہو سکے بیان کریں۔ تشبیہیں اور روزمرہ زبان استعمال کریں، اصطلاحی زبان بالکل نہیں۔ کسی بھی موضوع پر پیشگی علم فرض نہ کریں۔",
   useProvider: ({ provider }) => `${provider} استعمال کریں۔`,
   createApiKey: "اسناد",
   apiKey: "API کلید",
@@ -210,16 +210,16 @@ export const ur = {
     "ایک وقف شدہ OpenRouter کلید بنائیں، اسے نیچے چسپاں کریں، اور کسی بھی براہ راست کنکشن کو تبدیل کیے بغیر کئی فراہم کنندگان کے اسنیپ شاٹ سے حمایت یافتہ ماڈل استعمال کریں۔",
   openRouterOnboardingRoute:
     "درخواست کا راستہ: یہ آلہ → OpenRouter → منتخب کردہ اپ اسٹریم فراہم کنندہ",
-  openRouterKeys: "OpenRouter کیز",
+  openRouterKeys: "OpenRouter کلیدیں",
   providerStatusInvalid: "غلط",
   providerStatusTesting: "ٹیسٹنگ",
   providerStatusConfigured: "تشکیل شدہ",
-  providerStatusWorking: "کام کرنا",
+  providerStatusWorking: "کام کر رہا ہے",
   providerStatusNotTested: "ٹیسٹ نہیں کیا گیا۔",
   providerStatusNotSetup: "سیٹ اپ نہیں",
   expandProvider: ({ provider }) => `${provider} کو پھیلائیں۔`,
   collapseProvider: ({ provider }) => `${provider} کو سکیڑیں۔`,
-  testProviderKey: "ٹیسٹ کلید",
+  testProviderKey: "کلید ٹیسٹ کریں",
   testAllCapabilities: "سب کی جانچ کریں۔",
   apiTest: "API ٹیسٹ",
   testProviderCapability: ({ capability }) => `${capability} ٹیسٹ کریں۔`,
@@ -227,17 +227,17 @@ export const ur = {
   optional: "اختیاری",
   providerCapability_llm: "جوابات",
   providerCapability_stt: "اسپیچ ان پٹ",
-  providerCapability_tts: "آواز کی پیداوار",
+  providerCapability_tts: "وائس آؤٹ پٹ",
   providerCapability_search: "ویب تلاش",
   providerCapability_voices: "وائس لائبریری",
   providerValidationUnavailable:
     "لائیو توثیق اس فراہم کنندہ کے لیے ابھی تک وائرڈ نہیں ہے۔ کلید کو یہاں محفوظ کریں اور اصل استعمال کے دوران اس کی تصدیق کریں۔",
-  providerNeedsAttention: "توجہ کی ضرورت ہے؟",
+  providerNeedsAttention: "توجہ درکار ہے",
   catalogProviderLimitsSummary: ({ summary }) => `حدود: ${summary}`,
   catalogProviderRegionSummary: ({ summary }) => `علاقہ: ${summary}`,
   validatingKey: "تصدیق کر رہا ہے...",
-  showKey: "چابی دکھائیں۔",
-  hideKey: "چابی چھپائیں۔",
+  showKey: "کلید دکھائیں۔",
+  hideKey: "کلید چھپائیں۔",
   assistantInstructions: "معاون ہدایات",
   systemPrompt: "سسٹم پرامپٹ",
   aboutSystemPrompt: "سسٹم پرامپٹ کے بارے میں",
@@ -308,9 +308,9 @@ export const ur = {
     "اس تھریڈ کے لیے ویب گراؤنڈنگ کو آن یا آف کرنے کے لیے ہوم اسکرین ٹوگل کا استعمال کریں۔",
   settingsWebSearchCompactHint:
     "مرکزی ماڈل کے جوابات سے پہلے اختیاری طور پر تازہ ویب سیاق و سباق کو پیش کریں۔",
-  webSearchAdvanced: "اعلی درجے کی تلاش کے کنٹرولز",
-  expandAdvancedSearch: "اعلی درجے کی تلاش کے کنٹرول کو پھیلائیں۔",
-  collapseAdvancedSearch: "اعلی درجے کی تلاش کے کنٹرول کو ختم کریں۔",
+  webSearchAdvanced: "اعلیٰ درجے کی تلاش کے کنٹرولز",
+  expandAdvancedSearch: "اعلیٰ درجے کی تلاش کے کنٹرول کو پھیلائیں۔",
+  collapseAdvancedSearch: "اعلیٰ درجے کی تلاش کے کنٹرول کو سمیٹیں۔",
   webSearchSetupNeeded: "لائیو ویب سرچ استعمال کرنے کے لیے اسناد شامل کریں۔",
   webSearchEnabledDescription:
     "ماڈل کے جواب دینے سے پہلے تازہ ویب سیاق و سباق شامل کیا جاتا ہے۔",
@@ -340,10 +340,10 @@ export const ur = {
     "STT سپورٹ کے ساتھ کسی سروس کو یہاں منتخب کرنے کے لیے اسناد شامل کریں۔",
   nativeSttHint:
     "سسٹم کی شناخت آپ کے فراہم کنندگان کی کلیدوں سے آزادانہ طور پر کام کرتی ہے اور اس پر آلہ پر یا آپریٹنگ سسٹم کی اسپیچ سروس کے ذریعے کارروائی کی جا سکتی ہے۔",
-  replyPlayback: "پلے بیک کا جواب دیں۔",
-  sentencesArrive: "پیراگراف پہنچ گئے۔",
+  replyPlayback: "جواب کا پلے بیک",
+  sentencesArrive: "پیراگراف آتے ہی",
   sentencesArriveDescription: "مکمل پیراگراف تیار ہوتے ہی بولنا شروع کریں۔",
-  fullReplyFirst: "پہلے مکمل جواب دیں۔",
+  fullReplyFirst: "پہلے مکمل جواب",
   fullReplyFirstDescription:
     "پہلے پورا جواب تیار کریں، پھر اسے ایک پاس میں چلائیں۔",
   textToSpeech: "ٹیکسٹ ٹو اسپیچ",
@@ -355,19 +355,20 @@ export const ur = {
   nativeTtsDescription:
     "بولے گئے جوابات اور آواز کے پیش نظارہ کے لیے ڈیوائس اسپیچ انجن کا استعمال کریں۔",
   kokoroTtsDescription:
-    "اس ڈیوائس پر مکمل طور پر بہت زیادہ قدرتی اعصابی آواز کا استعمال کریں۔ بولے جانے والے جواب کے متن کو مقامی طور پر ترکیب کیا جاتا ہے، بغیر اسپیچ فراہم کرنے والی کلید یا استعمال کے چارج کے۔",
+    "اسی ڈیوائس پر مکمل طور پر کہیں زیادہ قدرتی نیورل آواز استعمال کریں۔ بولے جانے والے جواب کا متن مقامی طور پر تیار ہوتا ہے، بغیر کسی اسپیچ فراہم کنندہ کی کلید یا استعمال کے چارج کے۔",
   kokoroVoices: "Kokoro آن ڈیوائس آوازیں۔",
   kokoroVoicesHint: ({ size, installedSize }) =>
-    `کثیر لسانی ماڈل ${size} MB کے بارے میں ڈاؤن لوڈ کرتا ہے اور انسٹالیشن کے بعد تقریباً ${installedSize} MB پر قبضہ کرتا ہے۔`,
+    `کثیر لسانی ماڈل تقریباً ${size} MB ڈاؤن لوڈ کرتا ہے اور انسٹالیشن کے بعد تقریباً ${installedSize} MB جگہ لیتا ہے۔`,
   kokoroModel: "Kokoro کثیر لسانی ماڈل",
   kokoroChecking: "آن ڈیوائس ماڈل کو چیک کیا جا رہا ہے…",
   kokoroDownloading: ({ progress }) => `ڈاؤن لوڈ ہو رہا ہے… ${progress}%`,
   kokoroExtracting: ({ progress }) => `انسٹال ہو رہا ہے… ${progress}%`,
   kokoroVerifying: "صوتی انجن کی تصدیق ہو رہی ہے…",
   kokoroInstalled: "اس ڈیوائس پر انسٹال اور تیار ہے۔",
-  kokoroNotInstalled: "اختیاری ڈاؤن لوڈ۔ فراہم کنندہ کلید کی ضرورت نہیں ہے۔",
+  kokoroNotInstalled:
+    "Kokoro منتخب یا استعمال کرنے سے پہلے ماڈل ڈاؤن لوڈ اور اس کی تصدیق کریں۔ فراہم کنندہ کلید کی ضرورت نہیں ہے۔",
   kokoroLanguageFallback:
-    "Kokoro فی الحال یہاں انگریزی اور آسان چینی بولتا ہے۔ دیگر منتخب جوابی زبانوں کے لیے، ایک واضح فال بیک روٹ شامل کریں ورنہ تقریر ایک خرابی کے ساتھ رک جائے گی۔",
+    "Kokoro فی الحال یہاں انگریزی اور سادہ چینی بولتا ہے۔ دیگر منتخب جوابی زبانوں کے لیے ایک واضح فال بیک روٹ شامل کریں، ورنہ تقریر ایک خرابی کے ساتھ رک جائے گی۔",
   kokoroRemoveTitle: "Kokoro ماڈل کو ہٹائیں؟",
   kokoroRemoveBody: ({ installedSize }) =>
     `یہ تقریباً ${installedSize} MB کو آزاد کرتا ہے۔ آپ کسی بھی وقت ماڈل کو دوبارہ ڈاؤن لوڈ کر سکتے ہیں۔`,
@@ -376,14 +377,14 @@ export const ur = {
   kokoroFallbackNeeded: ({ languages }) =>
     `اس کے لیے ایک واضح فال بیک روٹ درکار ہے: ${languages}۔`,
   kokoroNoSelectedLanguages:
-    "Kokoro آواز کو ترتیب دینے کے لیے Listen Languages کے تحت انگریزی یا آسان چینی کو منتخب کریں۔",
+    "Kokoro آواز کو ترتیب دینے کے لیے «سننے کی زبانیں» کے تحت انگریزی یا سادہ چینی منتخب کریں۔",
   expandVoiceSettings: ({ language }) =>
     `${language} آواز کی ترتیبات کو پھیلائیں۔`,
   collapseVoiceSettings: ({ language }) =>
     `${language} آواز کی ترتیبات کو سکیڑیں۔`,
   remove: "ہٹا دیں۔",
   voiceOutputDescription:
-    "بولے جانے والے جوابات کے لیے اسپیچ انجن، سننے والی زبانیں اور صوتی مناظر کو چنیں۔",
+    "بولے جانے والے جوابات کے لیے اسپیچ انجن، سننے کی زبانیں اور آواز کے پیش نظارے چنیں۔",
   localTts: "مقامی",
   localTtsDescription:
     "بولے گئے جوابات کے لیے مماثل ڈاؤن لوڈ کردہ مقامی آواز کا استعمال کریں۔",
@@ -391,7 +392,7 @@ export const ur = {
     "بولے گئے جوابات کے لیے منتخب کنفیگر کردہ سروس استعمال کریں۔",
   ttsFallbackRoutes: "فال بیک کے راستے",
   ttsFallbackRoutesHint:
-    "اختیاری صرف وہ راستے شامل کریں جو آپ چاہتے ہیں، جس ترتیب سے انہیں آزمایا جانا چاہیے۔ ایک بار جب کوئی راستہ بولنا شروع کر دیتا ہے، Mr Broccoli باقی جواب کے لیے اس پر رہتا ہے۔",
+    "اختیاری۔ صرف وہی راستے شامل کریں جو آپ چاہتے ہیں، اسی ترتیب میں جس سے انہیں آزمایا جانا چاہیے۔ ایک بار جب کوئی راستہ بولنا شروع کر دے، Mr Broccoli باقی جواب کے لیے اسی پر رہتا ہے۔",
   ttsFallbackNone:
     "کوئی فال بیک کنفیگر نہیں ہے۔ اس کے بجائے آواز کی ناکامی دکھائی جائے گی۔",
   ttsFallbackPosition: ({ position, route }) => `${position} ${route}`,
@@ -409,9 +410,9 @@ export const ur = {
   providerTtsOrderHint:
     "صرف واضح طور پر تشکیل شدہ فال بیک روٹس کی کوشش کی جاتی ہے۔",
   nativeTtsHint:
-    "مقامی TTS سسٹم وائس اسٹیک استعمال کرتا ہے اور اسے فراہم کنندہ کلید کی ضرورت نہیں ہے۔",
+    "سسٹم TTS ڈیوائس کی وائس اسٹیک استعمال کرتا ہے اور اسے فراہم کنندہ کلید کی ضرورت نہیں ہے۔",
   localTtsLanguageCoverageHint:
-    "مقامی پیک میں فی الحال انگریزی، جرمن، آسان چینی، ہسپانوی، پرتگالی، ہندی، فرانسیسی اور اطالوی شامل ہیں۔",
+    "مقامی پیک میں فی الحال انگریزی، جرمن، سادہ چینی، ہسپانوی، پرتگالی، ہندی، فرانسیسی اور اطالوی شامل ہیں۔",
   ttsVoice: "ٹی ٹی ایس وائس",
   refresh: "ریفریش کریں۔",
   providerVoiceDirectory: ({ provider }) => `${provider} وائس لائبریری`,
@@ -419,7 +420,7 @@ export const ur = {
   providerVoicesAvailable: ({ count, provider }) =>
     `${provider} سے ${count} آوازیں دستیاب ہیں`,
   providerVoicesLoadFailed:
-    "آوازیں تازہ نہیں کی جا سکیں۔ آپ کا موجودہ انتخاب غیر تبدیل شدہ ہے۔ آپ اب بھی دستی طور پر صوتی شناخت درج کر سکتے ہیں۔",
+    "آوازیں تازہ نہیں کی جا سکیں۔ آپ کا موجودہ انتخاب برقرار ہے؛ آپ اب بھی دستی طور پر وائس ID درج کر سکتے ہیں۔",
   providerVoicesLoadFailedWithFallback:
     "اکاؤنٹ کی آوازیں لوڈ نہیں ہو سکیں۔ بلٹ ان آواز دستیاب رہتی ہے۔",
   providerVoicesErrorDetail: ({ detail }) => `وجہ: ${detail}`,
@@ -428,11 +429,11 @@ export const ur = {
   providerVoicesLoadingHint: ({ provider }) =>
     `Mr Broccoli دستیاب آوازوں کو ${provider} سے خود بخود لوڈ کرتا ہے۔`,
   providerVoiceId: "وائس آئی ڈی",
-  providerVoiceIdPlaceholder: "صوتی شناخت درج کریں۔",
+  providerVoiceIdPlaceholder: "وائس ID درج کریں۔",
   providerVoiceIdFallbackHint:
-    "صوتی لائبریری لوڈ نہ ہونے پر دستی اندراج دستیاب رہتا ہے۔",
+    "وائس لائبریری لوڈ نہ ہونے پر دستی اندراج دستیاب رہتا ہے۔",
   providerVoiceIdRequired: ({ provider }) =>
-    `اسپیچ آؤٹ پٹ استعمال کرنے سے پہلے ${provider} وائس لائبریری کو ریفریش کریں یا صوتی ID درج کریں۔`,
+    `اسپیچ آؤٹ پٹ استعمال کرنے سے پہلے ${provider} وائس لائبریری کو ریفریش کریں یا وائس ID درج کریں۔`,
   qwenSpeechUnavailableInUs:
     "Mr Broccoli کے موجودہ Qwen تقریر کے راستے امریکی خطے میں دستیاب نہیں ہیں۔ Qwen تقریر کے لیے سنگاپور یا بیجنگ کا انتخاب کریں۔",
   qwenApiRegion: "Qwen API علاقہ",
@@ -445,23 +446,23 @@ export const ur = {
     "یو ایس ریجن کیز یہاں چیٹ اور ویب سرچ کو سپورٹ کرتی ہیں۔ Mr Broccoli کے موجودہ Qwen STT اور TTS روٹس کے لیے سنگاپور یا بیجنگ کلید درکار ہے۔",
   providerDefaultVoiceHint:
     "یہ فراہم کنندہ فی الحال پیش نظارہ اور بولے گئے جوابات کے لیے اپنی ڈیفالٹ آواز استعمال کرتا ہے۔",
-  listenLanguages: "زبانیں سنیں۔",
+  listenLanguages: "سننے کی زبانیں",
   listenLanguagesHint:
-    "وہ جوابی زبانیں چنیں جنہیں آپ اچھی لگنا چاہتے ہیں۔ اسپیچ آؤٹ پٹ کو روٹ کرتے وقت Mr Broccoli انہیں اس ترتیب میں آزماتا ہے۔",
+    "وہ جوابی زبانیں چنیں جن کی آواز آپ اچھی چاہتے ہیں۔ اسپیچ آؤٹ پٹ کو روٹ کرتے وقت Mr Broccoli انہیں اسی ترتیب میں آزماتا ہے۔",
   listenLanguagesSelected: ({ count }) =>
     count === 1 ? "1 زبان منتخب کی گئی۔" : `${count} زبانیں منتخب کی گئیں۔`,
   localVoicePacks: "مقامی وائس پیک",
   localVoicePacksHint:
-    "ہر زبان اپنی مقامی آواز رکھتی ہے۔ اس زبان کے لیے اپنی مطلوبہ آواز کا انتخاب کریں، پھر صرف وہی پیک ڈاؤن لوڈ کریں جن کا آپ کو اصل خیال ہے۔",
+    "ہر زبان اپنی مقامی آواز رکھتی ہے۔ اس زبان کے لیے اپنی مطلوبہ آواز کا انتخاب کریں، پھر صرف وہی پیک ڈاؤن لوڈ کریں جن کی آپ کو واقعی ضرورت ہے۔",
   localVoiceForLanguage: ({ languageLabel }) => `${languageLabel} کے لیے آواز`,
-  providerVoicePreviews: "فراہم کنندہ کی آواز کے مناظر",
+  providerVoicePreviews: "فراہم کنندہ کی آواز کے پیش نظارے",
   providerVoicePreviewsHint:
     "ہر جوابی زبان کے لیے ایک علیحدہ پیش نظارہ متن کے ساتھ یہاں فی الحال منتخب کردہ TTS روٹ کی جانچ کریں۔",
-  nativeVoicePreviewSection: "مقامی آواز کا پیش نظارہ",
+  nativeVoicePreviewSection: "سسٹم آواز کا پیش نظارہ",
   nativeVoicePreviewSectionHint:
     "یہ فون کے بلٹ ان اسپیچ سنتھیسائزر کے ذریعے براہ راست بولتا ہے تاکہ آپ اس کا موازنہ فراہم کنندہ کی تشکیل شدہ آوازوں سے کر سکیں۔",
   nativeVoiceUnavailable:
-    "اس ڈیوائس نے پیش نظارہ کے لیے کسی مقامی سسٹم کی آوازوں کی اطلاع نہیں دی۔",
+    "اس ڈیوائس نے پیش نظارہ کے لیے سسٹم کی کوئی آواز دستیاب نہیں بتائی۔",
   runtimeCompatibilityOverrides: "رن ٹائم مطابقت",
   runtimeCompatibilityOverridesDescription: ({ count }) =>
     `فراہم کنندہ کی جانب سے غیر دستیاب قرار دی گئی ${count} ماڈل یا ترتیب کنفیگریشنز صرف اس ڈیوائس پر بند ہیں۔ Mr Broccoli خودکار طور پر ان سے بچتا ہے۔`,
@@ -480,11 +481,11 @@ export const ur = {
   clearSpeechDiagnosticsConfirmationMessage:
     "یہ تمام کیپچر کردہ اسپیچ روٹنگ کی تشخیص کو ہٹا دیتا ہے۔ اس کارروائی کو کالعدم نہیں کیا جا سکتا۔",
   speechDiagnosticSourceConversation: "گفتگو کا جواب",
-  speechDiagnosticSourceRepeat: "جواب دہرائیں۔",
+  speechDiagnosticSourceRepeat: "دہرایا گیا جواب",
   speechDiagnosticSourcePreview: "صوتی پیش نظارہ",
   speechDiagnosticSourceUnknown: "تقریر کی درخواست",
   speechDiagnosticRouteLine: ({ requested, actual }) =>
-    `درخواست کی گئی: ${requested} -> اصل: ${actual}`,
+    `درخواست کردہ: ${requested} ← اصل: ${actual}`,
   speechDiagnosticStageLine: ({ stage }) => `تازہ ترین مرحلہ: ${stage}`,
   speechDiagnosticLanguageLine: ({ languageLabel }) => `زبان: ${languageLabel}`,
   speechDiagnosticProviderLine: ({ provider }) => `فراہم کنندہ: ${provider}`,
@@ -503,7 +504,7 @@ export const ur = {
   voicePreviewText: "صوتی پیش نظارہ متن",
   voicePreviewPlaceholder: "اس آواز کو سننے کے لیے ایک جملہ ٹائپ کریں۔",
   voicePreviewHint:
-    "زبان کے ماڈل کو کچھ بھیجا بغیر فی الحال منتخب کردہ جوابی آواز کا بیک اینڈ استعمال کرتا ہے۔",
+    "زبان کے ماڈل کو کچھ بھیجے بغیر فی الحال منتخب کردہ جوابی آواز کا بیک اینڈ استعمال کرتا ہے۔",
   previewVoice: "پیش نظارہ آواز",
   generatingPreview: "پیش منظر تیار ہو رہا ہے...",
   playingPreview: "پیش منظر چل رہا ہے...",
@@ -519,17 +520,17 @@ export const ur = {
   retryReply: "جواب کی دوبارہ کوشش کریں۔",
   replyFailedHint:
     "دوبارہ کوشش کرنے سے پہلے آپ اوپر کوئی دوسرا ماڈل منتخب کر سکتے ہیں۔",
-  spokenReplyFailed: "جواب محفوظ کر لیا گیا، لیکن بات نہیں ہو سکی۔",
+  spokenReplyFailed: "جواب محفوظ ہو گیا، لیکن اسے بولا نہیں جا سکا۔",
   retrySpeech: "تقریر کی دوبارہ کوشش کریں۔",
   openSpeakingSettings: "بولنے کی ترتیبات",
   messageCopied: "پیغام کاپی ہو گیا۔",
   noConversationToCopyYet: "کاپی کرنے کے لیے ابھی تک کوئی گفتگو نہیں ہے۔",
   noConversationToShareYet: "اشتراک کرنے کے لیے ابھی تک کوئی بات چیت نہیں ہے۔",
-  noReplyToRepeatYet: "ری پلے کا ابھی تک کوئی جواب نہیں۔",
+  noReplyToRepeatYet: "دوبارہ چلانے کے لیے ابھی کوئی جواب نہیں ہے۔",
   threadCopied: "تھریڈ کاپی ہو گیا۔",
   threadRenamed: "تھریڈ کا نام تبدیل کر دیا گیا۔",
-  threadPinned: "دھاگہ پن کیا گیا۔",
-  threadUnpinned: "دھاگے کو ہٹا دیا گیا۔",
+  threadPinned: "تھریڈ پن کر دیا گیا۔",
+  threadUnpinned: "تھریڈ سے پن ہٹا دیا گیا۔",
   addProviderKeyToUseProvider: ({ provider }) =>
     `اس راستے کو استعمال کرنے سے پہلے ترتیبات میں ${provider} کے لیے اسناد شامل کریں۔`,
   configureCredentialsBeforeVoiceSession:
@@ -555,11 +556,11 @@ export const ur = {
     "بولے گئے جوابات استعمال کرنے سے پہلے سیٹنگز میں کنفیگرڈ TTS روٹ کا انتخاب کریں۔",
   stopSessionBeforeReplay:
     "آخری جواب کو دوبارہ چلانے سے پہلے فعال صوتی سیشن کو روک دیں۔",
-  couldntCatchThatTryAgain: "اسے نہیں پکڑ سکا، دوبارہ کوشش کریں۔",
+  couldntCatchThatTryAgain: "بات سمجھ نہیں آئی، دوبارہ کوشش کریں۔",
   couldntStartVoiceInput: "صوتی ان پٹ شروع نہیں ہو سکا۔",
   couldntProcessVoiceInput: "صوتی ان پٹ پر کارروائی نہیں ہو سکی۔",
   maxRecordingLengthReached:
-    "ریکارڈنگ کی زیادہ سے زیادہ لمبائی تک پہنچ گئی — میرے پاس جو کچھ ہے اسے بھیجنا۔",
+    "ریکارڈنگ کی زیادہ سے زیادہ لمبائی مکمل ہو گئی — جو کچھ سن لیا ہے وہ بھیجا جا رہا ہے۔",
   sttRecordingTooLarge: ({ provider, limit }) =>
     `وہ ریکارڈنگ ${provider} اسپیچ ٹو ٹیکسٹ (زیادہ سے زیادہ ${limit}) کے لیے بہت لمبی ہے۔ ایک چھوٹا پیغام آزمائیں، یا اسپیچ ٹو ٹیکسٹ کو سسٹم ریکگنیشن میں تبدیل کریں۔`,
   addProviderKeyToEnableProvider: ({ provider }) =>
@@ -589,7 +590,7 @@ export const ur = {
   speechReplayCacheClearFailed: "اسپیچ کیش صاف نہیں ہو سکا۔",
   currentSetup: "موجودہ سیٹ اپ",
   listeningToYourVoice: "آپ کی آواز سننا",
-  parsingYourVoiceInput: "اپنی آواز کو متن میں تبدیل کرنا",
+  parsingYourVoiceInput: "آپ کی آواز کو متن میں بدلا جا رہا ہے",
   preparingRequest: "آپ کی درخواست کی تیاری",
   searchingTheWeb: "تازہ سیاق و سباق کے لیے ویب پر تلاش کرنا",
   waitingForProvider: ({ provider }) => `${provider} کا انتظار ہے۔`,
@@ -597,14 +598,14 @@ export const ur = {
     `${provider} کے ساتھ آواز کی تیاری`,
   deepThinkingReassurance: "اچھے جوابات میں کچھ دیر لگتی ہے…",
   thinkingElapsed: ({ detail, seconds }) => `${detail} · ${seconds}s`,
-  speakingBackToYou: "آپ سے واپس بول رہا ہوں۔",
+  speakingBackToYou: "آپ کو جواب سنایا جا رہا ہے",
   freshSession: "تازہ سیشن",
   messageCount: ({ count }) =>
     Number(count) === 1 ? "1 پیغام" : `${count} پیغامات`,
-  speechInputRoute: ({ route }) => `اس میں تقریر: ${route}`,
+  speechInputRoute: ({ route }) => `تقریر اِن پٹ: ${route}`,
   replyModelRoute: ({ route }) => `جوابی ماڈل: ${route}`,
-  voiceOutputRoute: ({ route }) => `آواز نکالیں: ${route}`,
-  fallbackVoiceOutputRoute: ({ route }) => `فال بیک آواز: ${route}`,
+  voiceOutputRoute: ({ route }) => `آواز آؤٹ پٹ: ${route}`,
+  fallbackVoiceOutputRoute: ({ route }) => `فال بیک آواز آؤٹ پٹ: ${route}`,
   conversation: "بات چیت",
   conversationActions: "بات چیت کے اعمال",
   statusDetails: "حیثیت کی تفصیلات",
@@ -643,7 +644,7 @@ export const ur = {
   debugLogButtonVisibleDescription:
     "ڈیبگ کیپچرز شروع کرنے اور روکنے کے لیے ہوم اسکرین LOG بٹن دکھائیں۔",
   debugLogButtonUsageDescription:
-    "بٹن کا استعمال کیسے کریں: اسے ٹوگل کرنے سے لاگز کیپچر ہونا شروع ہو جائیں گے۔ اسے ٹوگل کرنے سے لاگز کیپچر کرنا بند ہو جائے گا اور کیپچر شدہ کو کلپ بورڈ میں منتقل کر دیا جائے گا۔",
+    "بٹن کا استعمال کیسے کریں: اسے آن کرنے سے لاگز کیپچر ہونا شروع ہو جاتے ہیں۔ اسے آف کرنے سے کیپچر رک جاتا ہے اور کیپچر شدہ لاگز کلپ بورڈ میں منتقل ہو جاتے ہیں۔",
   estimatedUsageTitle: "تخمینی استعمال",
   estimatedUsageCounts: ({ replies, summaries }) =>
     `${replies} جوابات · ${summaries} میموری اپ ڈیٹس`,
@@ -653,24 +654,24 @@ export const ur = {
   estimatedReplyTokens: ({ count }) => `جواب: ${count}`,
   estimatedTotalTokens: ({ count }) => `کل: ${count}`,
   estimatedUsageInline: ({ prompt, completion, total }) =>
-    `تخمینہ ${prompt} in · ${completion} آؤٹ · ${total} کل`,
+    `تخمینہ ${prompt} اِن · ${completion} آؤٹ · ${total} کل`,
   searchQuery: "تلاش کا استفسار",
   expandWebSearchDetails: "ویب تلاش کی تفصیلات دکھائیں۔",
   collapseWebSearchDetails: "ویب تلاش کی تفصیلات چھپائیں۔",
   webSearchSourceCount: ({ count }) => `${count} ذرائع`,
   sources: "ذرائع",
-  openSourceLink: ({ source }) => `اوپن سورس: ${source}`,
-  turnReceipt: "تفصیلات کو موڑ دیں۔",
-  expandTurnReceipt: "موڑ کی تفصیلات دکھائیں۔",
-  collapseTurnReceipt: "موڑ کی تفصیلات چھپائیں۔",
+  openSourceLink: ({ source }) => `ماخذ کھولیں: ${source}`,
+  turnReceipt: "باری کی تفصیلات",
+  expandTurnReceipt: "باری کی تفصیلات دکھائیں۔",
+  collapseTurnReceipt: "باری کی تفصیلات چھپائیں۔",
   turnReceiptDirect: "براہ راست",
-  turnReceiptRequested: "جوابی راستے کی درخواست کی۔",
+  turnReceiptRequested: "درخواست کردہ جوابی راستہ",
   turnReceiptActual: "اصل جواب کا راستہ",
   turnReceiptEffort: "استدلال کنٹرول",
   turnReceiptProviderNative: "فراہم کنندہ مقامی",
   turnReceiptInput: "ان پٹ روٹ",
   turnReceiptSearch: "ویب تلاش",
-  turnReceiptVoice: "آواز کی پیداوار",
+  turnReceiptVoice: "وائس آؤٹ پٹ",
   turnReceiptContext: "سیاق و سباق",
   turnReceiptTiming: "ٹائمنگ",
   turnReceiptFallback: "فال بیک وجہ",
@@ -687,9 +688,9 @@ export const ur = {
   turnReceiptSummaryUpdated: "خلاصہ اپ ڈیٹ",
   turnReceiptContextFallback: "حالیہ پیغام کا فال بیک",
   turnReceiptGatewayCompression: ({ original, compressed }) =>
-    `گیٹ وے کمپریسڈ ${original} سے ${compressed} پیغامات`,
+    `گیٹ وے نے ${original} پیغامات کو ${compressed} میں سکیڑ دیا`,
   turnReceiptContextValue: ({ sent, total, summarized, state }) =>
-    `${sent}/${total} پہلے بھیجے گئے پیغامات · ${summarized} کا خلاصہ ${state}`,
+    `${sent}/${total} سابقہ پیغامات بھیجے گئے · ${summarized} نئے خلاصہ شدہ${state}`,
   turnReceiptTimingStt: "ایس ٹی ٹی",
   turnReceiptTimingContext: "سیاق و سباق",
   turnReceiptTimingSearch: "تلاش کریں",
@@ -701,7 +702,7 @@ export const ur = {
   setupGuideConnectProviderTitle: "اسناد کو ترتیب دیں۔",
   setupGuideConnectProviderDescription:
     "ترتیبات میں اسناد شامل کریں، پھر وہ راستے منتخب کریں جنہیں آپ استعمال کرنا چاہتے ہیں۔",
-  idle: "بیکار",
+  idle: "فارغ",
   yourConversationAppearsHere: "آپ کی گفتگو یہاں ظاہر ہوتی ہے۔",
   defaultTranscriptEmptyDescription:
     "شروع کرنے کے لیے آواز یا متن کا استعمال کریں۔ Mr Broccoli تھریڈ کو برقرار رکھے گا اور یہاں جواب دے گا۔",
@@ -726,7 +727,7 @@ export const ur = {
   fullVoiceDescription:
     "جب آپ ان کا انتخاب کرتے ہیں تو جوابات، ٹرانسکرپشن، اور بولے جانے والے آؤٹ پٹ کے لیے ترتیب شدہ خدمات کا استعمال کریں۔",
   setupGuideNote:
-    "ہم اگلی سیٹنگز کھولیں گے تاکہ آپ اسناد کو پیسٹ اور ان کی توثیق کر سکیں۔",
+    "اب ہم ترتیبات کھولیں گے تاکہ آپ اسناد پیسٹ کر کے ان کی توثیق کر سکیں۔",
   useThisSetup: "اس سیٹ اپ کو استعمال کریں۔",
   notNow: "ابھی نہیں۔",
   setupGuideIntroTitle: "Mr Broccoli کیسے کام کرتا ہے۔",
@@ -756,11 +757,11 @@ export const ur = {
   setupGuideKokoroBody: ({ size }) =>
     `اختیاری: Kokoro ڈاؤن لوڈ کریں (تقریباً ${size} MB) اسپیچ فراہم کنندہ یا استعمال کے چارجز کے بغیر کہیں زیادہ فطری بولے جانے والے جوابات کے لیے۔`,
   setupGuideKokoroLanguageNote:
-    "یہ ماڈل فی الحال انگریزی اور آسان چینی بولتا ہے۔ کوئی بھی فال بیک روٹس جو آپ چاہتے ہیں بعد میں سپیکنگ سیٹنگز میں کنفیگر کریں۔",
+    "یہ ماڈل فی الحال انگریزی اور سادہ چینی بولتا ہے۔ جو فال بیک روٹس آپ چاہتے ہیں انہیں بعد میں بولنے کی ترتیبات میں کنفیگر کر لیں۔",
   setupGuideKokoroDownload: "Kokoro ڈاؤن لوڈ کریں۔",
   setupGuideUseKokoro: "بولے گئے جوابات کے لیے Kokoro استعمال کریں۔",
   setupGuideUseKokoroSummary:
-    "جب بھی جوابی زبان معاون ہو تو فون پر ترکیب رکھیں۔",
+    "جب بھی جوابی زبان سپورٹ ہو، آواز کی تیاری فون پر ہی رکھیں۔",
   setupGuideSkipKokoro: "ابھی کے لیے چھوڑ دیں۔",
   setupGuideVoiceTestTitle: "اپنے سیٹ اپ کی جانچ کریں۔",
   setupGuideVoiceTestBody:
@@ -770,14 +771,14 @@ export const ur = {
   setupGuideVoiceTestTextOnlyNote:
     "یہ ٹیسٹ صرف ٹیکسٹ ہی رہتا ہے کیونکہ ابھی تک کوئی قابل قبول بولی جانے والا صوتی راستہ تیار نہیں ہے۔",
   setupGuideVoiceTestStart: "ٹیسٹ شروع کریں۔",
-  setupGuideVoiceTestStop: "ریکارڈنگ بند کرو",
+  setupGuideVoiceTestStop: "ریکارڈنگ بند کریں",
   setupGuideVoiceTestRetry: "دوبارہ چلائیں۔",
   setupGuideVoiceTestTranscribing: "نقل ہو رہا ہے…",
   setupGuideVoiceTestThinking: "جواب کی جانچ ہو رہی ہے…",
   setupGuideVoiceTestSynthesizing: "آواز تیار ہو رہی ہے…",
   setupGuideVoiceTestSpeaking: "جواب چل رہا ہے…",
   setupGuideVoiceTestTranscript: "نقل",
-  setupGuideVoiceTestReply: "جواب دیں۔",
+  setupGuideVoiceTestReply: "جواب",
   setupGuideVoiceTestReset: "اس نتیجہ کو صاف کریں۔",
   setupGuideVoiceInputUnavailable:
     "اس آلہ پر اس سیٹ اپ کے لیے صوتی ان پٹ دستیاب نہیں ہے۔",
@@ -785,7 +786,7 @@ export const ur = {
   setupGuideSummaryBody:
     "یہ وہ راستہ ہے جو Mr Broccoli آپ کی موجودہ ترتیب کے ساتھ استعمال کرے گا۔",
   setupGuideSummaryLlm: "ایل ایل ایم",
-  setupGuideSummaryStt: "متن سے تقریر",
+  setupGuideSummaryStt: "تقریر سے متن",
   setupGuideSummaryTts: "متن سے تقریر",
   setupGuideSummaryWebSearch: "ویب تلاش",
   setupGuideRouteProviderLlm: ({ provider }) =>
@@ -810,21 +811,21 @@ export const ur = {
     "ٹرانسکرپٹ سے کوئی مختلف عنوان، راستہ، ماڈل یا جملہ آزمائیں۔",
   memoryModalTitle: "گفتگو کی یادداشت",
   memoryModalDescription:
-    "یہ ایک مختصر خلاصہ Mr Broccoli ہے جب کوئی دھاگہ پرانے موڑ کو سکیڑنے کے لیے کافی لمبا ہو جاتا ہے۔",
+    "یہ وہ مختصر خلاصہ ہے جو Mr Broccoli آگے لے کر چلتا ہے جب کوئی تھریڈ اتنا لمبا ہو جائے کہ پرانی باریوں کو سکیڑنا پڑے۔",
   memorySummary: "محفوظ کردہ خلاصہ",
   memorySummaryEmpty:
-    "ابھی تک کوئی کمپیکٹ میموری نہیں ہے۔ ایک بار جب یہ دھاگہ لمبا ہو جائے گا تو پرانے موڑ کا خلاصہ یہاں کیا جائے گا۔",
+    "ابھی تک کوئی مختصر یادداشت نہیں ہے۔ جب یہ تھریڈ لمبا ہو جائے گا تو پرانی باریوں کا خلاصہ یہاں بنے گا۔",
   summarizedTurnsCount: ({ count }) =>
-    Number(count) === 1 ? "1 خلاصہ موڑ" : `${count} کا خلاصہ موڑ`,
+    Number(count) === 1 ? "1 خلاصہ شدہ باری" : `${count} خلاصہ شدہ باریاں`,
   copyMemory: "میموری کاپی کریں۔",
-  forgetMemory: "یادداشت کو بھول جاؤ",
+  forgetMemory: "یادداشت بھول جائیں",
   memoryCopied: "میموری کاپی کر لی گئی۔",
   memoryCleared: "گفتگو کی یادداشت صاف ہو گئی۔",
   noConversationToManageYet: "ابھی تک بات چیت کی کوئی میموری دستیاب نہیں ہے۔",
   noProviderYet: "ابھی تک کوئی فراہم کنندہ نہیں ہے۔",
   noModelYet: "ابھی تک کوئی ماڈل نہیں۔",
-  startedAt: "شروع کر دیا۔",
-  endedAt: "ختم ہوا۔",
+  startedAt: "آغاز",
+  endedAt: "اختتام",
   pinned: "پن لگا ہوا",
   copy: "کاپی",
   share: "شیئر کریں۔",
@@ -833,16 +834,16 @@ export const ur = {
   unpin: "پن کھول دیں۔",
   save: "محفوظ کریں۔",
   cancel: "منسوخ کریں۔",
-  stop: "رک جاؤ",
+  stop: "روکیں",
   pause: "توقف",
   resume: "دوبارہ شروع کریں۔",
   paused: "روک دیا گیا",
   listening: "سن رہا ہے۔",
-  parsing: "نقل کرنا",
+  parsing: "نقل ہو رہی ہے",
   searching: "تلاش کر رہا ہے۔",
-  converting: "تبدیل کرنا",
+  converting: "تبدیل کیا جا رہا ہے",
   webSearchAction: "ویب تلاش",
-  thinking: "سوچنا",
+  thinking: "سوچ رہا ہے",
   speaking: "بول رہا ہے۔",
   pleaseWait: "برائے مہربانی انتظار کریں۔",
   yourTurn: "آپ کی باری",
@@ -850,12 +851,12 @@ export const ur = {
   tapWhenDone: "ہو جانے پر تھپتھپائیں۔",
   speechPaused: "تقریر موقوف ہے۔",
   pausePlaybackUnavailable:
-    "اس صوتی راستے کو روکا نہیں جا سکتا۔ اسے روکیں یا پرووائیڈر وائس آؤٹ پٹ پر سوئچ کریں۔",
-  holdToSpeak: "بات کرنے کے لئے پکڑو",
+    "اس صوتی راستے کو موقوف نہیں کیا جا سکتا۔ اسے بند کریں یا فراہم کنندہ کے وائس آؤٹ پٹ پر سوئچ کریں۔",
+  holdToSpeak: "بولنے کے لیے دبائے رکھیں",
   tapToSpeak: "بولنے کے لیے تھپتھپائیں۔",
   tapAgainToSend: "بھیجنے کے لیے دوبارہ تھپتھپائیں۔",
   waitingForReply: "جواب کا انتظار ہے۔",
-  parsingYourVoice: "آپ کی آواز کو پارس کرنا",
+  parsingYourVoice: "آپ کی آواز کو متن میں بدلا جا رہا ہے",
   providerConfiguredInSettings: ({ provider }) =>
     `${provider} ترتیبات میں کنفیگر نہیں ہے۔`,
   providerNetworkError: ({ provider, action }) =>
@@ -867,9 +868,9 @@ export const ur = {
   providerCreditsRequired: ({ provider, action }) =>
     `${provider} کو ${action} کے لیے کافی API کریڈٹ درکار ہے۔ اکاؤنٹ بیلنس اور کلید کے خرچ کی حد چیک کریں۔`,
   providerTimeoutError: ({ provider, action }) =>
-    `${provider} ${action} کے دوران بہت زیادہ وقت لگا۔ دوبارہ کوشش کریں۔`,
+    `${provider} کو ${action} کے دوران بہت زیادہ وقت لگ گیا۔ دوبارہ کوشش کریں۔`,
   providerTemporaryError: ({ provider, action }) =>
-    `${provider} کو ${action} کے دوران ایک عارضی مسئلہ تھا۔ تھوڑی دیر میں دوبارہ کوشش کریں۔`,
+    `${provider} کو ${action} کے دوران عارضی مسئلہ پیش آیا۔ تھوڑی دیر میں دوبارہ کوشش کریں۔`,
   providerEmptyReplyError: ({ provider }) =>
     `${provider} جواب واپس کیے بغیر ختم ہوگیا۔ دوبارہ کوشش کریں۔`,
   providerIncompleteReplyError: ({ provider }) =>
@@ -888,19 +889,18 @@ export const ur = {
     `${provider} ${capability} کام کر رہا ہے۔`,
   providerValidationFailed: "فراہم کنندہ کی توثیق ناکام ہوگئی۔",
   webSearchFallback:
-    "ویب تلاش دستیاب نہیں تھی، لہذا جواب براہ راست ویب سیاق و سباق کے بغیر جاری رہا۔",
-  noBase64EncoderAvailable: "کوئی بیس 64 انکوڈر دستیاب نہیں ہے۔",
-  noBase64DecoderAvailable: "کوئی بیس 64 ڈیکوڈر دستیاب نہیں ہے۔",
+    "ویب تلاش دستیاب نہیں تھی، اس لیے جواب لائیو ویب سیاق و سباق کے بغیر جاری رہا۔",
+  noBase64EncoderAvailable: "کوئی base64 انکوڈر دستیاب نہیں ہے۔",
+  noBase64DecoderAvailable: "کوئی base64 ڈیکوڈر دستیاب نہیں ہے۔",
   azureSpeechApiKeyFormat:
-    "Microsoft Azure TTS کو <key>|<region> فارمیٹ میں Azure اسپیچ کی اسناد کی ضرورت ہے، مثال کے طور پر abc123|westeurope، یا مشترکہ Azure فارمیٹ <endpoint>|<api-key>|<key>|ZXPH6",
-  nativeTtsDoesNotSynthesizeAudioFiles:
-    "مقامی TTS آڈیو فائلوں کی ترکیب نہیں کرتا ہے۔",
+    "Microsoft Azure TTS کو <key>|<region> فارمیٹ میں Azure اسپیچ کی اسناد کی ضرورت ہے، مثال کے طور پر abc123|westeurope، یا مشترکہ Azure فارمیٹ <endpoint>|<api-key>|<key>|<region>۔",
+  nativeTtsDoesNotSynthesizeAudioFiles: "سسٹم TTS آڈیو فائلیں نہیں بناتا۔",
   localTtsUnavailableForLanguage: ({ languageLabel }) =>
     `${languageLabel} کے لیے کوئی مقامی یا کلاؤڈ وائس روٹ تیار نہیں ہے۔`,
   chooseTextToSpeechProviderInSettings:
     "سیٹنگز میں ٹیکسٹ ٹو اسپیچ فراہم کنندہ کا انتخاب کریں۔",
   ttsNotSupportedYet: ({ provider }) =>
-    `${provider} TTS ابھی تک تعاون یافتہ نہیں ہے۔`,
+    `${provider} TTS ابھی سپورٹ نہیں ہے۔`,
   ttsError: ({ provider, status, errorText }) =>
     `${provider} TTS ایرر (${status}): ${errorText}`,
   ttsReplyTooLong: ({ provider }) =>
@@ -919,7 +919,7 @@ export const ur = {
   chooseSpeechToTextProviderInSettings:
     "ترتیبات میں اسپیچ ٹو ٹیکسٹ فراہم کنندہ کا انتخاب کریں۔",
   sttNotSupportedYet: ({ provider }) =>
-    `${provider} STT ابھی تک تعاون یافتہ نہیں ہے۔`,
+    `${provider} STT ابھی سپورٹ نہیں ہے۔`,
   providerNotWiredUpYet: ({ provider }) =>
     `${provider} ابھی تک وائرڈ نہیں ہوا ہے۔`,
   you: "آپ",
@@ -930,10 +930,10 @@ export const ur = {
   speechRecognitionUnavailableForDeviceLanguage:
     "موجودہ آلہ کی زبان کے لیے تقریر کی شناخت دستیاب نہیں ہے۔",
   nativeSpeechRecognitionNeedsNetwork:
-    "مقامی تقریر کی شناخت کو ابھی نیٹ ورک تک رسائی کی ضرورت ہے۔",
+    "سسٹم تقریر کی شناخت کو ابھی نیٹ ورک تک رسائی درکار ہے۔",
   noSpeechDetected: "کوئی تقریر نہیں ملی۔",
-  nativeSpeechRecognitionFailed: "مقامی تقریر کی شناخت ناکام ہو گئی۔",
+  nativeSpeechRecognitionFailed: "سسٹم تقریر کی شناخت ناکام ہو گئی۔",
   couldntStartNativeSpeechRecognition:
-    "مقامی اسپیچ کی شناخت شروع نہیں کی جا سکی۔",
+    "سسٹم اسپیچ شناخت شروع نہیں کی جا سکی۔",
   microphonePermissionNotGranted: "مائیکروفون کی اجازت نہیں دی گئی۔",
 } satisfies TranslationDictionary;

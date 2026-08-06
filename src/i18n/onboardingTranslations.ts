@@ -248,7 +248,7 @@ export const onboardingTranslations = {
     onboardingBestSetupRecordingModel: "Модель для записи",
     onboardingBestSetupSpeakingModel: "Модель для речи",
     onboardingQuickOnly: "Только быстрые ответы",
-    onboardingEstimatedTime: ({ eta }) => `Оценка настройки · ${eta}`,
+    onboardingEstimatedTime: ({ eta }) => `Примерное время настройки · ${eta}`,
     onboardingProgress: ({ percent, eta }) =>
       `${percent}% · осталось около ${eta}`,
     onboardingStepsRemaining: ({ remaining, count }) =>
@@ -337,7 +337,7 @@ export const onboardingTranslations = {
     onboardingNotRecommended: "Ehhez a telefonhoz nem ajánlott",
     onboardingSelectedAutomatically: "Automatikusan kiválasztva",
     onboardingQuickModel: "Gyors válaszok",
-    onboardingThoroughModel: "Alapos érvelés",
+    onboardingThoroughModel: "Alapos gondolkodás",
     freeHomeQuickMode: "Gyors válasz",
     freeHomeThoroughMode: "Alapos gondolkodás",
     onboardingBestSetupQuickModel: "Modell gyors válaszokhoz",
@@ -370,7 +370,7 @@ export const onboardingTranslations = {
     onboardingBestSetupRecordingModel: "Model pro nahrávání",
     onboardingBestSetupSpeakingModel: "Model pro mluvení",
     onboardingQuickOnly: "Pouze rychlé",
-    onboardingEstimatedTime: ({ eta }) => `Odhad nastavení · ${eta}`,
+    onboardingEstimatedTime: ({ eta }) => `Odhadovaná doba nastavení · ${eta}`,
     onboardingProgress: ({ percent, eta }) => `${percent} % · zbývá asi ${eta}`,
     onboardingStepsRemaining: ({ remaining, count }) =>
       `Zbývá ${remaining} z ${count} kroků`,
@@ -453,7 +453,7 @@ export const onboardingTranslations = {
       "Större modeller kan svara långsammare, använda mer minne och värma telefonen under långa sessioner. Enhetstestet måste godkännas före användning.",
   }),
   ur: define({
-    onboardingAdvancedOptions: "اعلیٰ اختیارات",
+    onboardingAdvancedOptions: "جدید اختیارات",
     onboardingSelectedSetup: "آپ کا منتخب کردہ سیٹ اپ",
     onboardingDeviceDetails: "فون کی تفصیلات",
     onboardingMatchingModels: "بہترین مقامی ماڈلز منتخب کیے جا رہے ہیں…",
@@ -465,7 +465,7 @@ export const onboardingTranslations = {
     freeHomeQuickMode: "فوری جواب",
     freeHomeThoroughMode: "گہری سوچ",
     onboardingBestSetupQuickModel: "فوری جوابات کا ماڈل",
-    onboardingBestSetupThoroughModel: "تفصیلی غور کا ماڈل",
+    onboardingBestSetupThoroughModel: "تفصیلی استدلال کا ماڈل",
     onboardingBestSetupRecordingModel: "ریکارڈنگ کا ماڈل",
     onboardingBestSetupSpeakingModel: "بولنے کا ماڈل",
     onboardingQuickOnly: "صرف فوری",

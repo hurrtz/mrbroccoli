@@ -102,7 +102,7 @@ const performanceTranslations = {
     onDevicePerformanceEstimated:
       "Estimado a partir das especificações do telemóvel",
     onDevicePerformanceStrong: "Muito adequado",
-    onDevicePerformanceClose: "No limite; testa antes de usar",
+    onDevicePerformanceClose: "No limite; teste antes de usar",
     onDevicePerformanceLoad: ({ load }: TranslationParams) =>
       `${load} ms de carregamento`,
     onDevicePerformanceHeadroom: ({ headroom }: TranslationParams) =>
@@ -181,7 +181,7 @@ const performanceTranslations = {
     onDevicePerformanceCalibrated: "A telefon tesztjeiből becsülve",
     onDevicePerformanceEstimated: "A telefon adataiból becsülve",
     onDevicePerformanceStrong: "Nagyon jó illeszkedés",
-    onDevicePerformanceClose: "Határeset; használat előtt teszteld",
+    onDevicePerformanceClose: "Határeset; használat előtt tesztelje",
     onDevicePerformanceLoad: ({ load }: TranslationParams) =>
       `${load} ms betöltés`,
     onDevicePerformanceHeadroom: ({ headroom }: TranslationParams) =>
@@ -233,7 +233,7 @@ const performanceTranslations = {
     onDevicePerformanceCalibrated:
       "Uppskattat från tester på den här telefonen",
     onDevicePerformanceEstimated: "Uppskattat från telefonens specifikationer",
-    onDevicePerformanceStrong: "Mycket bra passform",
+    onDevicePerformanceStrong: "Passar mycket bra",
     onDevicePerformanceClose: "På gränsen; testa före användning",
     onDevicePerformanceLoad: ({ load }: TranslationParams) =>
       `${load} ms inläsning`,
@@ -432,7 +432,7 @@ export const onDeviceTranslations = {
     onDeviceDeviceSummary: ({ memory, storage }) =>
       `${memory} RAM · ${storage} disponibles`,
     onDeviceNoCompatibleModels:
-      "Aucun modèle local du catalogue vérifié ne prend en charge toutes les langues choisies sur cet appareil.",
+      "Aucun modèle local du catalogue vérifié ne prend en charge toutes les langues choisies tout en étant adapté à cet appareil.",
     onDeviceThinkingModels: "Réponses locales",
     onDeviceListeningModels: "Reconnaissance vocale locale",
     onDeviceSpeakingModels: "Voix locales",
@@ -443,9 +443,9 @@ export const onDeviceTranslations = {
     onDeviceTestFailed: "Échec du test",
     onDeviceNotTested: "Pas encore testé",
     chooseOnDeviceSttModel:
-      "Choisissez dans les réglages un modèle de reconnaissance vocale sur l’appareil.",
+      "Choisissez dans Paramètres un modèle de reconnaissance vocale sur l’appareil.",
     chooseOnDeviceTtsModel:
-      "Choisissez dans les réglages un modèle vocal sur l’appareil.",
+      "Choisissez dans Paramètres un modèle vocal sur l’appareil.",
   }),
   it: define({
     ...performanceTranslations.it,
@@ -463,7 +463,7 @@ export const onDeviceTranslations = {
     onDeviceDeviceSummary: ({ memory, storage }) =>
       `${memory} RAM · ${storage} liberi`,
     onDeviceNoCompatibleModels:
-      "Nessun modello locale del catalogo verificato supporta tutte le lingue selezionate su questo dispositivo.",
+      "Nessun modello locale del catalogo curato supporta tutte le lingue selezionate ed è adatto a questo dispositivo.",
     onDeviceThinkingModels: "Risposte locali",
     onDeviceListeningModels: "Riconoscimento vocale locale",
     onDeviceSpeakingModels: "Voci locali",
@@ -484,7 +484,7 @@ export const onDeviceTranslations = {
     settingsOnDeviceSummary:
       "Modelos locais privados, verificação do dispositivo, transferências e testes.",
     onDeviceIntro:
-      "Escolhe os idiomas uma vez. O Mr Broccoli só mostrará modelos locais de escuta, raciocínio e voz adequados a este telemóvel.",
+      "Escolha os idiomas uma vez. O Mr Broccoli só mostrará modelos locais de escuta, raciocínio e voz adequados a este telemóvel.",
     onDeviceLanguages: "Idiomas da conversa",
     onDeviceLanguagesHint:
       "Cada modelo local tem de suportar todos os idiomas escolhidos. A seleção também atualiza os idiomas de escuta e resposta falada.",
@@ -494,7 +494,7 @@ export const onDeviceTranslations = {
     onDeviceDeviceSummary: ({ memory, storage }) =>
       `${memory} RAM · ${storage} livres`,
     onDeviceNoCompatibleModels:
-      "Nenhum modelo local do catálogo verificado suporta todos os idiomas escolhidos neste dispositivo.",
+      "Nenhum modelo local do catálogo verificado suporta todos os idiomas escolhidos e cabe neste dispositivo.",
     onDeviceThinkingModels: "Respostas locais",
     onDeviceListeningModels: "Reconhecimento de voz local",
     onDeviceSpeakingModels: "Vozes locais",
@@ -505,9 +505,9 @@ export const onDeviceTranslations = {
     onDeviceTestFailed: "Teste falhou",
     onDeviceNotTested: "Ainda não testado",
     chooseOnDeviceSttModel:
-      "Escolhe nas definições um modelo de reconhecimento de voz no dispositivo.",
+      "Escolha um modelo de reconhecimento de voz no dispositivo em Definições.",
     chooseOnDeviceTtsModel:
-      "Escolhe nas definições um modelo de voz no dispositivo.",
+      "Escolha um modelo de voz no dispositivo em Definições.",
   }),
   ptBR: define({
     ...performanceTranslations.ptBR,
@@ -525,7 +525,7 @@ export const onDeviceTranslations = {
     onDeviceDeviceSummary: ({ memory, storage }) =>
       `${memory} RAM · ${storage} livres`,
     onDeviceNoCompatibleModels:
-      "Nenhum modelo local do catálogo verificado aceita todos os idiomas escolhidos neste dispositivo.",
+      "Nenhum modelo local do catálogo verificado aceita todos os idiomas escolhidos e cabe neste dispositivo.",
     onDeviceThinkingModels: "Respostas locais",
     onDeviceListeningModels: "Reconhecimento de voz local",
     onDeviceSpeakingModels: "Vozes locais",
@@ -818,7 +818,7 @@ export const onDeviceTranslations = {
       "زبانیں ایک بار منتخب کریں، پھر Mr Broccoli صرف اسی فون کے لیے موزوں مقامی سننے، سوچنے اور بولنے کے ماڈلز دکھائے گا۔",
     onDeviceLanguages: "گفتگو کی زبانیں",
     onDeviceLanguagesHint:
-      "ہر مقامی ماڈل کو منتخب تمام زبانوں کی معاونت کرنا ہوگی۔ یہ انتخاب سننے اور بولے گئے جواب کی زبانیں بھی بدلتا ہے۔",
+      "ہر مقامی ماڈل کو منتخب تمام زبانوں کی معاونت کرنی ہوگی۔ یہ انتخاب سننے اور بولے گئے جواب کی زبانیں بھی بدلتا ہے۔",
     onDeviceTestDevice: "اس ڈیوائس کو دوبارہ جانچیں",
     onDeviceTestingDevice: "ڈیوائس کی جانچ جاری ہے…",
     onDeviceDeviceReady: "ڈیوائس کی جانچ مکمل",

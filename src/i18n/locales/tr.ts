@@ -27,7 +27,7 @@ export const tr = {
   ...transcriptEditTranslations.tr,
   appName: "Bay Brokoli",
   retry: "Yeniden dene",
-  dismiss: "Reddet",
+  dismiss: "Kapat",
   done: "Tamam",
   aboutSetting: ({ setting }) => `${setting} Hakkında`,
   unavailable: "Kullanılamıyor",
@@ -42,7 +42,7 @@ export const tr = {
   webSearch: "Web Araması",
   stt: "STT",
   tts: "TTS",
-  ui: "kullanıcı arayüzü",
+  ui: "Arayüz",
   settingsRuntimeReadiness: "Çalışma zamanı hazırlığı",
   settingsReadinessThink: "Düşün",
   settingsReadinessListen: "Dinle",
@@ -72,7 +72,7 @@ export const tr = {
   settingsAppDiagnosticsSummary:
     "Tema, dil, kullanım, hata ayıklama günlükleri ve son etkinlikler.",
   settingsBackToOverview: "Genel bakışa geri dön",
-  settingsOpenSection: ({ section }) => `${section}'yi açın`,
+  settingsOpenSection: ({ section }) => `${section} bölümünü aç`,
   theme: "Tema",
   language: "Dil",
   recognitionLanguage: "Tanıma dili",
@@ -80,7 +80,7 @@ export const tr = {
     "Tanıma işlemini geliştirmek için bir dil seçin veya cihaz ya da sağlayıcı tespiti için otomatik olarak bırakın.",
   automaticLanguage: "Otomatik",
   speechLanguageUnsupportedByProvider: ({ provider, language }) =>
-    `${provider}, bu konuşma yolu için ${language}'yi resmi olarak desteklemiyor.`,
+    `${provider}, bu konuşma yolu için ${language} dilini resmi olarak desteklemiyor.`,
   usageStats: "Kullanım İstatistikleri",
   model: "Model",
   effort: "Çaba",
@@ -143,9 +143,9 @@ export const tr = {
   removeResponseMode: "Modeli kaldır",
   responseModesNoConfiguredProviders:
     "Önce kimlik bilgilerini ekleyin. Rota kontrolleri, en az bir uyumlu hizmet yapılandırılana kadar gizli kalır.",
-  useResponseMode: ({ mode }) => `${mode}'yi kullanın`,
+  useResponseMode: ({ mode }) => `${mode} seçeneğini kullan`,
   chooseResponseModel: "Bir model seçin",
-  responseModelCount: ({ count }) => `${count} modelleri mevcut`,
+  responseModelCount: ({ count }) => `${count} model mevcut`,
   ulraMode: "Süper Mod",
   ulraModeHomeLabel: "Süper Modu ana ekranda göster",
   ulraModeSettingsDescription:
@@ -186,12 +186,12 @@ export const tr = {
   professional: "Profesyonel",
   professionalDescription:
     "Müşteriye brifing veren kıdemli bir danışman gibi konuşun. Kesin bir dil, argo yok, ölçülü ve otoriter.",
-  casual: "gündelik",
+  casual: "Gündelik",
   casualDescription:
-    "Kafedeki akıllı bir arkadaş gibi konuşun. Rahat, doğal, konuşkan. Kasılmalar iyi, teğetler iyi.",
+    "Kafedeki akıllı bir arkadaş gibi konuşun. Rahat, doğal, sohbet havasında. Günlük konuşma kalıpları da konudan sapmalar da sorun değil.",
   nerdy: "İnek",
   nerdyDescription:
-    "Derinlere inmeyi seven coşkulu bir uzman gibi konuşun. Teknik terminolojiyi özgürce kullanın, ayrıntılar hakkında bilgi edinin, kullanıcının gelişmeleri takip edebileceğini varsayın.",
+    "Derinlere inmeyi seven coşkulu bir uzman gibi konuşun. Teknik terimleri özgürce kullanın, ayrıntılara coşkuyla dalın, kullanıcının size ayak uydurabileceğini varsayın.",
   concise: "Kısa",
   conciseDescription:
     "Hala eksiksizken mümkün olduğunca kısa olun. Önsöz yok, dolgu yok, sadece cevap. Telgraf stilini düşünün.",
@@ -201,7 +201,7 @@ export const tr = {
   eli5: "ELI5",
   eli5Description:
     "Her şeyi olabildiğince basit bir şekilde açıklayın. Analojiler, günlük dil ve sıfır jargon kullanın. Herhangi bir konu hakkında önceden bilgi sahibi olmadığınızı varsayın.",
-  useProvider: ({ provider }) => `${provider}'yi kullanın`,
+  useProvider: ({ provider }) => `${provider} sağlayıcısını kullan`,
   createApiKey: "Kimlik bilgileri",
   apiKey: "API anahtarı",
   aboutThisProvider: "Bu sağlayıcı hakkında",
@@ -210,20 +210,20 @@ export const tr = {
     "Özel bir OpenRouter anahtarı oluşturun, aşağıya yapıştırın ve herhangi bir doğrudan bağlantıyı değiştirmeden çeşitli sağlayıcıların anlık görüntü destekli modellerini kullanın.",
   openRouterOnboardingRoute:
     "Talep yolu: bu cihaz → OpenRouter → seçilen yukarı akış sağlayıcısı",
-  openRouterKeys: "OpenRouter tuşları",
+  openRouterKeys: "OpenRouter anahtarları",
   providerStatusInvalid: "Geçersiz",
-  providerStatusTesting: "Test etme",
+  providerStatusTesting: "Test ediliyor",
   providerStatusConfigured: "Yapılandırılmış",
-  providerStatusWorking: "Çalışma",
+  providerStatusWorking: "Çalışıyor",
   providerStatusNotTested: "Test edilmedi",
   providerStatusNotSetup: "Kurulmadı",
-  expandProvider: ({ provider }) => `${provider}'yi genişletin`,
-  collapseProvider: ({ provider }) => `${provider}'yi daralt`,
-  testProviderKey: "Test anahtarı",
+  expandProvider: ({ provider }) => `${provider} bölümünü genişlet`,
+  collapseProvider: ({ provider }) => `${provider} bölümünü daralt`,
+  testProviderKey: "Anahtarı test et",
   testAllCapabilities: "Tümünü test et",
   apiTest: "API testi",
-  testProviderCapability: ({ capability }) => `${capability}'yi test edin`,
-  test: "testi",
+  testProviderCapability: ({ capability }) => `${capability} özelliğini test et`,
+  test: "Test",
   optional: "İsteğe bağlı",
   providerCapability_llm: "Yanıtlar",
   providerCapability_stt: "Konuşma girişi",
@@ -249,7 +249,7 @@ export const tr = {
   assistantInstructionsHint:
     "Bu her zaman seçilen yanıt uzunluğu ve tonun önüne eklenir.",
   adaptiveLength: "Uyarlanabilir Uzunluk",
-  responseTone: "Tepki Tonu",
+  responseTone: "Yanıt Tonu",
   homeStyleChipLabel: ({ tone, length }) => `Stil — ${tone} · ${length}`,
   styleSheetTitle: "Konuşma ayarları",
   styleSheetSubtitle:
@@ -296,18 +296,18 @@ export const tr = {
   stopDriveSession: "Otomatik duraklat",
   repeatDriveReply: "Sonuncuyu tekrarla",
   continueDriveSession: "Otomatik devam ettir",
-  speechToText: "Metne Konuşma",
+  speechToText: "Konuşmadan Metne",
   appNative: "Sistem Tanıma",
   nativeSttDescription:
     "İşletim sisteminin konuşma tanıyıcısını kullanın. Cihaz ayarlarına bağlı olarak tanıma, cihaz üzerinde veya sistem hizmeti aracılığıyla çalıştırılabilir. Sağlayıcı anahtarı gerekmez.",
-  provider: "sağlayıcı",
+  provider: "Sağlayıcı",
   webSearchProvider: "Web Arama Sağlayıcısı",
   webSearchProviderMissingHint:
-    "Burada web topraklamayı etkinleştirmek için Kimlik Bilgileri'nde en az bir arama özellikli hizmeti yapılandırın.",
+    "Burada canlı web bağlamını etkinleştirmek için Kimlik Bilgileri'nde en az bir arama özellikli hizmeti yapılandırın.",
   webSearchModelHint: ({ model }) =>
-    `Canlı web topraklaması için perde arkasında ${model}'yi kullanır.`,
+    `Canlı web bağlamı için perde arkasında ${model} modelini kullanır.`,
   webSearchHomeHint:
-    "Bu konu için web topraklamasını açmak veya kapatmak için ana ekran geçişini kullanın.",
+    "Bu konu için canlı web bağlamını açmak veya kapatmak için ana ekran geçişini kullanın.",
   settingsWebSearchCompactHint:
     "İsteğe bağlı olarak, ana model yanıt vermeden önce yeni web bağlamını başına ekleyin.",
   webSearchAdvanced: "Gelişmiş Arama Kontrolleri",
@@ -343,7 +343,7 @@ export const tr = {
     "Burada seçmek için STT desteği olan bir hizmete ilişkin kimlik bilgilerini ekleyin.",
   nativeSttHint:
     "Sistem tanıma, sağlayıcı anahtarlarınızdan bağımsız olarak çalışır ve cihaz üzerinde veya işletim sisteminin konuşma hizmeti tarafından işlenebilir.",
-  replyPlayback: "Yanıtla Oynatma",
+  replyPlayback: "Yanıt Oynatma",
   sentencesArrive: "Paragraflar Geliyor",
   sentencesArriveDescription:
     "Tam bir paragraf hazır olur olmaz konuşmaya başlayın.",
@@ -353,28 +353,29 @@ export const tr = {
   textToSpeech: "Metinden Konuşmaya",
   spokenReplies: "Sözlü Yanıtlar",
   spokenRepliesEnabledDescription:
-    "Bir ses rotası mevcut olduğunda okuma asistanının yanıtlarını yüksek sesle okuyun.",
+    "Bir ses rotası mevcut olduğunda asistan yanıtlarını sesli okuyun.",
   spokenRepliesDisabledDescription:
     "Yanıtları şimdilik yalnızca metin halinde tutun. Tercih ettiğiniz TTS rotası daha sonra kullanılmak üzere kayıtlı kalır.",
   nativeTtsDescription:
     "Sözlü yanıtlar ve ses önizlemesi için cihazın konuşma motorunu kullanın.",
   kokoroTtsDescription:
-    "Bu cihazda tamamen çok daha doğal bir sinir sesi kullanın. Sözlü yanıt metni, konuşma sağlayıcı anahtarı veya kullanım ücreti olmaksızın yerel olarak sentezlenir.",
+    "Tamamen bu cihazda çalışan çok daha doğal bir nöral ses kullanın. Sözlü yanıt metni, konuşma sağlayıcı anahtarı veya kullanım ücreti olmaksızın yerel olarak sentezlenir.",
   kokoroVoices: "Kokoro Cihaz İçi Sesler",
   kokoroVoicesHint: ({ size, installedSize }) =>
-    `Çok dilli model yaklaşık ${size} MB indirir ve kurulumdan sonra yaklaşık ${installedSize} MB'yi kaplar.`,
+    `Çok dilli model yaklaşık ${size} MB indirir ve kurulumdan sonra yaklaşık ${installedSize} MB yer kaplar.`,
   kokoroModel: "Kokoro çok dilli model",
   kokoroChecking: "Cihaz modeli kontrol ediliyor…",
   kokoroDownloading: ({ progress }) => `İndiriliyor... ${progress}%`,
   kokoroExtracting: ({ progress }) => `Yükleniyor… ${progress}%`,
   kokoroVerifying: "Ses motoru doğrulanıyor…",
   kokoroInstalled: "Bu cihaza yüklendi ve hazır.",
-  kokoroNotInstalled: "İsteğe bağlı indirme. Sağlayıcı anahtarı gerekmez.",
+  kokoroNotInstalled:
+    "Kokoro'yu seçmeden veya kullanmadan önce modeli indirip doğrulayın. Sağlayıcı anahtarı gerekmez.",
   kokoroLanguageFallback:
     "Kokoro şu anda burada İngilizce ve Basitleştirilmiş Çince konuşmaktadır. Seçilen diğer yanıt dilleri için açık bir geri dönüş yolu ekleyin, aksi takdirde konuşma bir hatayla duracaktır.",
   kokoroRemoveTitle: "Kokoro modeli kaldırılsın mı?",
   kokoroRemoveBody: ({ installedSize }) =>
-    `Bu, yaklaşık ${installedSize} MB'yi serbest bırakır. Modeli istediğiniz zaman tekrar indirebilirsiniz.`,
+    `Bu, yaklaşık ${installedSize} MB yer açar. Modeli istediğiniz zaman tekrar indirebilirsiniz.`,
   removeKokoroModel: "Kokoro modelini kaldırın",
   downloadKokoroModel: "Kokoro modelini indirin",
   kokoroFallbackNeeded: ({ languages }) =>
@@ -400,8 +401,8 @@ export const tr = {
   ttsFallbackPosition: ({ position, route }) => `${position}. ${route}`,
   addFallbackRoute: ({ route }) => `${route} yedek ekle`,
   removeFallbackRoute: ({ route }) => `${route} yedeğini kaldır`,
-  moveFallbackEarlier: ({ route }) => `${route}'yi daha erkene taşı`,
-  moveFallbackLater: ({ route }) => `${route}'yi daha sonra taşı`,
+  moveFallbackEarlier: ({ route }) => `${route} rotasını daha öne taşı`,
+  moveFallbackLater: ({ route }) => `${route} rotasını daha arkaya taşı`,
   ttsProvider: "TTS Sağlayıcısı",
   ttsProviderEnabledHint:
     "Burada yalnızca sesli yanıt desteğine sahip etkin sağlayıcılar görünür.",
@@ -412,7 +413,7 @@ export const tr = {
   providerTtsOrderHint:
     "Yalnızca açıkça yapılandırılmış geri dönüş yolları denenir.",
   nativeTtsHint:
-    "Yerel TTS, sistem ses yığınını kullanır ve sağlayıcı anahtarı gerektirmez.",
+    "Sistem TTS'si, işletim sisteminin ses yığınını kullanır ve sağlayıcı anahtarı gerektirmez.",
   localTtsLanguageCoverageHint:
     "Yerel paketler şu anda İngilizce, Almanca, Basitleştirilmiş Çince, İspanyolca, Portekizce, Hintçe, Fransızca ve İtalyancayı kapsamaktadır.",
   ttsVoice: "TTS Sesi",
@@ -429,7 +430,7 @@ export const tr = {
   elevenLabsVoicesReadPermissionHint:
     "ElevenLabs'de bu API anahtarını düzenleyin ve Sesler → Oku'yu etkinleştirin, ardından burayı yenileyin.",
   providerVoicesLoadingHint: ({ provider }) =>
-    `Mr Broccoli, mevcut sesleri ${provider}'den otomatik olarak yükler.`,
+    `Mr Broccoli, mevcut sesleri ${provider} hizmetinden otomatik olarak yükler.`,
   providerVoiceId: "Ses Kimliği",
   providerVoiceIdPlaceholder: "Bir ses kimliği girin",
   providerVoiceIdFallbackHint:
@@ -448,11 +449,11 @@ export const tr = {
     "ABD bölgesi anahtarları burada sohbeti ve web aramasını destekler. Mr Broccoli'nin mevcut Qwen STT ve TTS rotaları, Singapur veya Pekin anahtarı gerektirir.",
   providerDefaultVoiceHint:
     "Bu sağlayıcı şu anda önizleme ve sesli yanıtlar için varsayılan sesini kullanıyor.",
-  listenLanguages: "Dilleri Dinle",
+  listenLanguages: "Dinleme Dilleri",
   listenLanguagesHint:
     "Kulağa hoş gelmesini istediğiniz yanıt dillerini seçin. Mr Broccoli, konuşma çıkışını yönlendirirken bunları bu sırayla dener.",
   listenLanguagesSelected: ({ count }) =>
-    count === 1 ? "1 dil seçildi" : `${count} dilleri seçildi`,
+    count === 1 ? "1 dil seçildi" : `${count} dil seçildi`,
   localVoicePacks: "Yerel Ses Paketleri",
   localVoicePacksHint:
     "Her dil kendi yerel sesini korur. O dil için istediğiniz sesi seçin ve ardından yalnızca gerçekten önemsediğiniz paketleri indirin.",
@@ -497,9 +498,9 @@ export const tr = {
   localTtsPackBroken:
     "İndirildi, ancak bu ses bu cihazda yerel doğrulamada başarısız oldu. Yeniden indirin veya başka bir ses seçin.",
   localTtsPackMissing:
-    "Henüz kurulmadı. Siz indirene kadar Cloud TTS veya sistem sesi kullanılacaktır.",
+    "Henüz kurulmadı. Siz indirene kadar bulut TTS veya sistem sesi kullanılır.",
   localTtsUnsupportedLanguageFallback:
-    "Bu dil için henüz yerel bir paket mevcut değil. Cloud TTS veya sistem sesi bunu halledecektir.",
+    "Bu dil için henüz yerel bir paket mevcut değil. Bulut TTS veya sistem sesi bunu üstlenir.",
   downloadingLocalTtsPack: ({ progress }) =>
     `Yerel paket indiriliyor... ${progress}%`,
   download: "İndir",
@@ -539,19 +540,19 @@ export const tr = {
   configureCredentialsBeforeVoiceSession:
     "Sesli oturum başlatmadan önce Ayarlar'a kimlik bilgilerini ekleyin.",
   endpointCredentialFormatInvalid: ({ provider }) =>
-    `${provider} için sağlayıcı temel URL'sini ve API anahtarını https://uç noktanız.example.com|api-anahtarınız olarak girin.`,
+    `${provider} için sağlayıcı temel URL'sini ve API anahtarını https://uc-noktaniz.example.com|api-anahtariniz biçiminde girin.`,
   speechRecognitionUnavailableOnDevice:
     "Bu cihazda konuşma tanıma kullanılamıyor.",
   debugLogLabel: "GÜNLÜK",
   debugLogCaptureStarted: "Hata ayıklama günlüğü başlatıldı.",
   debugLogCaptureStopped: ({ entryCount, fileName }) =>
-    `Hata ayıklama günlüğü ${fileName} olarak kaydedildi ve panoya kopyalandı (${entryCount} girişleri).`,
+    `Hata ayıklama günlüğü ${fileName} olarak kaydedildi ve panoya kopyalandı (${entryCount} giriş).`,
   debugLogCaptureStoppedNoClipboard: ({ entryCount, fileName }) =>
-    `Hata ayıklama günlüğü ${fileName} (${entryCount} girişleri) olarak kaydedildi.`,
+    `Hata ayıklama günlüğü ${fileName} (${entryCount} giriş) olarak kaydedildi.`,
   debugLogCaptureRecovered: ({ entryCount, fileName }) =>
-    `Önceki hata ayıklama günlüğü ${fileName} kurtarıldı ve panoya kopyalandı (${entryCount} girişleri).`,
+    `Önceki hata ayıklama günlüğü ${fileName} kurtarıldı ve panoya kopyalandı (${entryCount} giriş).`,
   debugLogCaptureRecoveredNoClipboard: ({ entryCount, fileName }) =>
-    `Önceki hata ayıklama günlüğü ${fileName} (${entryCount} girişleri) kurtarıldı.`,
+    `Önceki hata ayıklama günlüğü ${fileName} (${entryCount} giriş) kurtarıldı.`,
   debugLogCaptureFailed: "Hata ayıklama günlüğü kaydedilemedi.",
   chooseSttBeforeVoiceSession:
     "Sesli oturum başlatmadan önce Ayarlar'da yapılandırılmış bir STT rotası seçin.",
@@ -577,9 +578,9 @@ export const tr = {
   couldntPreviewVoice: "Sesin önizlemesi yapılamadı.",
   spokenRepliesDisabled: "Sözlü yanıtlar Ayarlar'da kapatılmıştır.",
   providerVoiceFallback:
-    "Yapılandırılmış ses rotası başarısız oldu. Bu yanıtı yedek ses olarak değiştirdik.",
+    "Yapılandırılmış ses rotası başarısız oldu. Bu yanıt için yedek sese geçildi.",
   localVoiceFallback:
-    "Yerel ses kullanılamıyor. Bu yanıtı yedek ses olarak değiştirdik.",
+    "Yerel ses kullanılamıyor. Bu yanıt için yedek sese geçildi.",
   localTtsPackInstalled: ({ languageLabel }) =>
     `${languageLabel} yerel ses paketi yüklü.`,
   localTtsPackInstallFailed: "Yerel ses paketi yüklenemedi.",
@@ -592,20 +593,20 @@ export const tr = {
   speechReplayCacheCleared: "Önbellekteki konuşma dosyaları silindi.",
   speechReplayCacheClearFailed: "Konuşma önbelleği temizlenemedi.",
   currentSetup: "Mevcut Kurulum",
-  listeningToYourVoice: "Sesini dinlemek",
-  parsingYourVoiceInput: "Sesini metne dönüştürme",
+  listeningToYourVoice: "Sesiniz dinleniyor",
+  parsingYourVoiceInput: "Sesiniz metne dönüştürülüyor",
   preparingRequest: "Talebiniz hazırlanıyor",
-  searchingTheWeb: "Web'de yeni bağlam arama",
+  searchingTheWeb: "Web'de yeni bağlam aranıyor",
   waitingForProvider: ({ provider }) => `${provider} bekleniyor`,
   preparingVoiceWithProvider: ({ provider }) =>
     `${provider} ile ses hazırlanıyor`,
   deepThinkingReassurance: "İyi yanıtlar biraz zaman alır…",
-  thinkingElapsed: ({ detail, seconds }) => `${detail} · ${seconds}'ler`,
-  speakingBackToYou: "Sana karşılık vermek",
-  freshSession: "Taze oturum",
+  thinkingElapsed: ({ detail, seconds }) => `${detail} · ${seconds} sn`,
+  speakingBackToYou: "Size sesli yanıt veriliyor",
+  freshSession: "Yeni oturum",
   messageCount: ({ count }) =>
     Number(count) === 1 ? "1 mesaj" : `${count} mesaj`,
-  speechInputRoute: ({ route }) => `Konuşma yeri: ${route}`,
+  speechInputRoute: ({ route }) => `Konuşma girişi: ${route}`,
   replyModelRoute: ({ route }) => `Yanıt modeli: ${route}`,
   voiceOutputRoute: ({ route }) => `Ses çıkışı: ${route}`,
   fallbackVoiceOutputRoute: ({ route }) => `Yedek ses çıkışı: ${route}`,
@@ -639,23 +640,23 @@ export const tr = {
   showVoiceInput: "Ses girişini göster",
   showTextInput: "Metin girişini göster",
   usageStatsHiddenDescription:
-    "Belirteç tahminlerini transkript kullanıcı arayüzünün dışında tutun.",
+    "Token tahminlerini transkript arayüzünün dışında tutun.",
   usageStatsVisibleDescription:
-    "Yanıtlar ve görüşme toplamları için tahmini jeton kullanımını gösterin.",
+    "Yanıtlar ve görüşme toplamları için tahmini token kullanımını gösterin.",
   debugLogButton: "Hata Ayıklama Günlüğü Düğmesi",
   debugLogButtonHiddenDescription:
-    "Halihazırda bir yakalama işlemi yapılmadığı sürece ana ekrandaki LOG düğmesini gizli tutun.",
+    "Halihazırda bir yakalama işlemi yapılmadığı sürece ana ekrandaki GÜNLÜK düğmesini gizli tutun.",
   debugLogButtonVisibleDescription:
-    "Hata ayıklama yakalamalarını başlatmak ve durdurmak için ana ekranda LOG düğmesini gösterin.",
+    "Hata ayıklama yakalamalarını başlatmak ve durdurmak için ana ekranda GÜNLÜK düğmesini gösterin.",
   debugLogButtonUsageDescription:
     "Düğme nasıl kullanılır: düğmeyi açmak, günlükleri yakalamaya başlayacaktır. Bunu kapatmak, günlüklerin yakalanmasını durduracak ve yakalananların panoya taşınmasına neden olacaktır.",
   estimatedUsageTitle: "Tahmini Kullanım",
   estimatedUsageCounts: ({ replies, summaries }) =>
-    `${replies} yanıtları · ${summaries} bellek güncellemeleri`,
+    `${replies} yanıt · ${summaries} bellek güncellemesi`,
   estimatedUsageConversationScope:
     "Toplamlar, bu görüşmede kullanılan her rotayı ve modeli içerir.",
-  estimatedPromptTokens: ({ count }) => `Komut istemi: ${count}`,
-  estimatedReplyTokens: ({ count }) => `Cevap: ${count}`,
+  estimatedPromptTokens: ({ count }) => `İstem: ${count}`,
+  estimatedReplyTokens: ({ count }) => `Yanıt: ${count}`,
   estimatedTotalTokens: ({ count }) => `Toplam: ${count}`,
   estimatedUsageInline: ({ prompt, completion, total }) =>
     `Tahmini ${prompt} giriş · ${completion} çıkış · ${total} toplam`,
@@ -664,13 +665,13 @@ export const tr = {
   collapseWebSearchDetails: "Web arama ayrıntılarını gizle",
   webSearchSourceCount: ({ count }) => `${count} kaynak`,
   sources: "Kaynaklar",
-  openSourceLink: ({ source }) => `Açık kaynak: ${source}`,
-  turnReceipt: "Dönüş ayrıntıları",
-  expandTurnReceipt: "Dönüş ayrıntılarını göster",
-  collapseTurnReceipt: "Dönüş ayrıntılarını gizle",
+  openSourceLink: ({ source }) => `Kaynağı aç: ${source}`,
+  turnReceipt: "Tur ayrıntıları",
+  expandTurnReceipt: "Tur ayrıntılarını göster",
+  collapseTurnReceipt: "Tur ayrıntılarını gizle",
   turnReceiptDirect: "Doğrudan",
-  turnReceiptRequested: "İstenilen yanıt yolu",
-  turnReceiptActual: "Gerçek cevap rotası",
+  turnReceiptRequested: "İstenen yanıt rotası",
+  turnReceiptActual: "Gerçek yanıt rotası",
   turnReceiptEffort: "Muhakeme kontrolü",
   turnReceiptProviderNative: "sağlayıcı-yerel",
   turnReceiptInput: "Giriş rotası",
@@ -678,7 +679,7 @@ export const tr = {
   turnReceiptVoice: "Ses çıkışı",
   turnReceiptContext: "Bağlam",
   turnReceiptTiming: "Zamanlama",
-  turnReceiptFallback: "Geri çekilme nedeni",
+  turnReceiptFallback: "Geri dönüş nedeni",
   turnReceiptVoiceInput: "Ses",
   turnReceiptTypedInput: "Yazıldı",
   turnReceiptSystemSpeech: "Sistem konuşma tanıma",
@@ -692,16 +693,16 @@ export const tr = {
   turnReceiptSummaryUpdated: "özet güncellendi",
   turnReceiptContextFallback: "son mesaj geri dönüşü",
   turnReceiptGatewayCompression: ({ original, compressed }) =>
-    `ağ geçidi ${original}'yi ${compressed} iletilerine sıkıştırdı`,
+    `ağ geçidi ${original} mesajı ${compressed} mesaja sıkıştırdı`,
   turnReceiptContextValue: ({ sent, total, summarized, state }) =>
-    `${sent}/${total} gönderilen önceki mesajlar · ${summarized} yeni özetlenen${state}`,
+    `${sent}/${total} önceki mesaj gönderildi · ${summarized} yeni özetlendi${state}`,
   turnReceiptTimingStt: "STT",
   turnReceiptTimingContext: "bağlam",
   turnReceiptTimingSearch: "arama",
-  turnReceiptTimingModel: "modeli",
+  turnReceiptTimingModel: "model",
   turnReceiptTimingFirstSpeech: "ilk konuşma",
   turnReceiptTimingTotal: "toplam",
-  estimatedRouteUsageTokensOnly: ({ tokens }) => `${tokens} jetonları`,
+  estimatedRouteUsageTokensOnly: ({ tokens }) => `${tokens} token`,
   unknownUsageRoute: "Bilinmeyen rota",
   setupGuideConnectProviderTitle: "Kimlik bilgilerini yapılandırın",
   setupGuideConnectProviderDescription:
@@ -760,11 +761,11 @@ export const tr = {
     `Bu ${provider} kimlik bilgileri yanıt isteklerine izin vermiyor.`,
   setupGuideKokoroTitle: "Doğal Cihaz İçi Ses Ekleme",
   setupGuideKokoroBody: ({ size }) =>
-    `İsteğe bağlı: Konuşma sağlayıcısı veya kullanım ücreti olmadan çok daha doğal sözlü yanıtlar için Kokoro'yi (yaklaşık ${size} MB) indirin.`,
+    `İsteğe bağlı: Konuşma sağlayıcısı veya kullanım ücreti olmadan çok daha doğal sözlü yanıtlar için Kokoro'yu (yaklaşık ${size} MB) indirin.`,
   setupGuideKokoroLanguageNote:
     "Bu model şu anda İngilizce ve Basitleştirilmiş Çince konuşmaktadır. İstediğiniz geri dönüş rotalarını daha sonra Konuşma ayarlarında yapılandırın.",
-  setupGuideKokoroDownload: "Kokoro'yi indirin",
-  setupGuideUseKokoro: "Sözlü yanıtlar için Kokoro'yi kullanın",
+  setupGuideKokoroDownload: "Kokoro'yu indir",
+  setupGuideUseKokoro: "Sözlü yanıtlar için Kokoro'yu kullan",
   setupGuideUseKokoroSummary:
     "Cevap dili desteklendiğinde sentezi telefonda tutun.",
   setupGuideSkipKokoro: "Şimdilik atla",
@@ -777,21 +778,21 @@ export const tr = {
     "Henüz kabul edilebilir bir sözlü ses yolu hazır olmadığından bu test yalnızca metin olarak kalır.",
   setupGuideVoiceTestStart: "Testi başlat",
   setupGuideVoiceTestStop: "Kaydı durdur",
-  setupGuideVoiceTestRetry: "Tekrar koş",
+  setupGuideVoiceTestRetry: "Yeniden çalıştır",
   setupGuideVoiceTestTranscribing: "Metne dönüştürülüyor…",
   setupGuideVoiceTestThinking: "Yanıt test ediliyor…",
   setupGuideVoiceTestSynthesizing: "Ses hazırlanıyor…",
   setupGuideVoiceTestSpeaking: "Yanıt oynatılıyor…",
   setupGuideVoiceTestTranscript: "Transkript",
-  setupGuideVoiceTestReply: "Yanıtla",
+  setupGuideVoiceTestReply: "Yanıt",
   setupGuideVoiceTestReset: "Bu sonucu temizle",
   setupGuideVoiceInputUnavailable:
     "Bu cihazda bu kurulum için ses girişi mevcut değil.",
   setupGuideSummaryTitle: "Kurulum Tamamlandı",
   setupGuideSummaryBody:
     "İşte Mr Broccoli'nin mevcut yapılandırmanızla kullanacağı rota.",
-  setupGuideSummaryLlm: "Yüksek Lisans",
-  setupGuideSummaryStt: "Metne konuşma",
+  setupGuideSummaryLlm: "LLM",
+  setupGuideSummaryStt: "Konuşmadan metne",
   setupGuideSummaryTts: "Metinden konuşmaya",
   setupGuideSummaryWebSearch: "Web araması",
   setupGuideRouteProviderLlm: ({ provider }) =>
@@ -806,7 +807,7 @@ export const tr = {
   setupGuideRouteUnavailable: "Mevcut değil",
   setupGuideRouteOff: "Kapalı",
   setupGuideWebSearchAvailableOff: ({ provider }) =>
-    `${provider} aracılığıyla edinilebilir, şu anda kapalı`,
+    `${provider} aracılığıyla kullanılabilir, şu anda kapalı`,
   setupGuideSummaryTextOnlyNote:
     "Sözlü yanıtlar şimdilik kapalı. Bir sağlayıcıyı veya yerel sesi etkinleştirene kadar yanıtlar metinde kalır.",
   setupGuideFinish: "Bitti",
@@ -817,14 +818,14 @@ export const tr = {
     "Transkriptten farklı bir başlık, rota, model veya ifade deneyin.",
   memoryModalTitle: "Konuşma belleği",
   memoryModalDescription:
-    "Bu, bir iş parçacığı eski dönüşleri sıkıştıracak kadar uzun olduğunda Mr Broccoli'nin ileriye doğru taşıdığı kısa özettir.",
+    "Bu, bir konu eski turları sıkıştıracak kadar uzadığında Mr Broccoli'nin ileriye taşıdığı kısa özettir.",
   memorySummary: "Kaydedilen özet",
   memorySummaryEmpty:
-    "Henüz kompakt bellek yok. Bu konu uzadıkça eski dönüşler burada özetlenecektir.",
+    "Henüz kompakt bellek yok. Bu konu uzadıkça eski turlar burada özetlenecektir.",
   summarizedTurnsCount: ({ count }) =>
     Number(count) === 1 ? "1 özetlenmiş tur" : `${count} özetlenmiş tur`,
   copyMemory: "Belleği kopyala",
-  forgetMemory: "Hafızayı unut",
+  forgetMemory: "Belleği unut",
   memoryCopied: "Bellek kopyalandı.",
   memoryCleared: "Konuşma belleği temizlendi.",
   noConversationToManageYet: "Henüz konuşma belleği yok.",
@@ -850,7 +851,7 @@ export const tr = {
   converting: "Dönüştürme",
   webSearchAction: "web araması",
   thinking: "Düşünme",
-  speaking: "konuşma",
+  speaking: "Konuşma",
   pleaseWait: "Lütfen bekleyin",
   yourTurn: "Sıra sende",
   keepPressing: "Basmaya devam et",
@@ -861,16 +862,16 @@ export const tr = {
   holdToSpeak: "Konuşmak için basılı tutun",
   tapToSpeak: "Konuşmak için dokunun",
   tapAgainToSend: "Göndermek için tekrar dokunun",
-  waitingForReply: "Cevap bekliyorum",
+  waitingForReply: "Yanıt bekleniyor",
   parsingYourVoice: "Sesiniz ayrıştırılıyor",
   providerConfiguredInSettings: ({ provider }) =>
     `${provider} Ayarlar'da yapılandırılmamış.`,
   providerNetworkError: ({ provider, action }) =>
-    `${action} için ${provider}'ye ulaşılamadı. Bağlantıyı kontrol edip tekrar deneyin.`,
+    `${action} için ${provider} sağlayıcısına ulaşılamadı. Bağlantıyı kontrol edip tekrar deneyin.`,
   providerAuthError: ({ provider, action }) =>
     `${provider}, ${action} kimlik bilgilerini reddetti. API anahtarını ve izinlerini kontrol edin.`,
   providerRateLimitError: ({ provider, action }) =>
-    `${provider} şu anda ${action} hız sınırlayıcıdır. Birazdan tekrar deneyin.`,
+    `${provider} şu anda ${action} için hız sınırı uyguluyor. Birazdan tekrar deneyin.`,
   providerCreditsRequired: ({ provider, action }) =>
     `${provider}, ${action} için yeterli API kredisine ihtiyaç duyar. Hesap bakiyesini ve anahtarın harcama limitini kontrol edin.`,
   providerTimeoutError: ({ provider, action }) =>
@@ -880,9 +881,9 @@ export const tr = {
   providerEmptyReplyError: ({ provider }) =>
     `${provider} yanıt vermeden bitirdi. Tekrar deneyin.`,
   providerIncompleteReplyError: ({ provider }) =>
-    `${provider}'nin yanıtı tamamlanmadan sona erdi. Tekrar deneyin.`,
+    `${provider} yanıtı tamamlanmadan sona erdi. Tekrar deneyin.`,
   providerContextTooLong: ({ provider }) =>
-    `${provider}, görüşme çok uzun sürdüğü için yanıtı reddetti. Yeni bir konu başlatın veya isteği kısaltın.`,
+    `${provider}, görüşme çok uzadığı için yanıtı reddetti. Yeni bir konu başlatın veya isteği kısaltın.`,
   providerRequestRejected: ({ provider, action, detail }) =>
     detail
       ? `${provider}, ${action} isteğini reddetti: ${detail}`
@@ -900,7 +901,7 @@ export const tr = {
   azureSpeechApiKeyFormat:
     "Microsoft Azure TTS, <key>|<region> biçiminde Azure Konuşma kimlik bilgilerine ihtiyaç duyar; örneğin abc123|westeurope veya birleşik Azure biçimi <endpoint>|<api-key>|<key>|<region>.",
   nativeTtsDoesNotSynthesizeAudioFiles:
-    "Yerel TTS, ses dosyalarını sentezlemez.",
+    "Sistem TTS'si ses dosyalarını sentezlemez.",
   localTtsUnavailableForLanguage: ({ languageLabel }) =>
     `${languageLabel} için hazır yerel veya bulut ses rotası yok.`,
   chooseTextToSpeechProviderInSettings:
@@ -909,7 +910,7 @@ export const tr = {
   ttsError: ({ provider, status, errorText }) =>
     `${provider} TTS hatası (${status}): ${errorText}`,
   ttsReplyTooLong: ({ provider }) =>
-    `${provider} konuşma çıktısı, yanıt çok uzun olduğu için reddedildi.`,
+    `${provider} konuşma çıkışı, çok uzun olduğu için yanıtı reddetti.`,
   ttsTimeout: ({ provider }) => `${provider} konuşma çıkışı çok uzun sürdü.`,
   sttTimeout: ({ provider }) =>
     `${provider} konuşmanın transkripsiyonu çok uzun sürdü.`,
@@ -923,8 +924,8 @@ export const tr = {
     "Ayarlar'da konuşmayı metne dönüştürme sağlayıcısını seçin.",
   sttNotSupportedYet: ({ provider }) => `${provider} STT henüz desteklenmiyor.`,
   providerNotWiredUpYet: ({ provider }) =>
-    `${provider} henüz kablo bağlantısı yapılmadı.`,
-  you: "sen",
+    `${provider} entegrasyonu henüz hazır değil.`,
+  you: "Siz",
   assistant: "Asistan",
   untitledConversation: "Başlıksız görüşme",
   conversationExportHeader: ({ title }) => `Konuşma: ${title}`,
@@ -932,9 +933,9 @@ export const tr = {
   speechRecognitionUnavailableForDeviceLanguage:
     "Geçerli cihaz dilinde konuşma tanıma özelliği mevcut değil.",
   nativeSpeechRecognitionNeedsNetwork:
-    "Yerel konuşma tanımanın şu anda ağ erişimine ihtiyacı var.",
+    "Sistem konuşma tanımanın şu anda ağ erişimine ihtiyacı var.",
   noSpeechDetected: "Hiçbir konuşma algılanmadı.",
-  nativeSpeechRecognitionFailed: "Yerel konuşma tanıma başarısız oldu.",
-  couldntStartNativeSpeechRecognition: "Yerel konuşma tanıma başlatılamadı.",
+  nativeSpeechRecognitionFailed: "Sistem konuşma tanıma başarısız oldu.",
+  couldntStartNativeSpeechRecognition: "Sistem konuşma tanıma başlatılamadı.",
   microphonePermissionNotGranted: "Mikrofon izni verilmedi",
 } satisfies TranslationDictionary;

@@ -242,7 +242,7 @@ export const conversationArtifactTranslations = {
     saveAsInsight: "Mentés felismerésként",
     saveInsightTitle: "Felismerés mentése",
     saveInsightHint:
-      "Válaszd ki a jelentését, majd erősítsd meg a pontos szöveget. A mentett felismerések ehhez az üzenethez kapcsolódnak és a te felügyeleted alatt maradnak.",
+      "Válassza ki a jelentését, majd erősítse meg a pontos szöveget. A mentett felismerések ehhez az üzenethez kapcsolódnak, és az Ön felügyelete alatt maradnak.",
     savedInsights: "Mentett felismerések",
     insightSaved: "Felismerés mentve.",
     insightRemoved: "Felismerés eltávolítva.",

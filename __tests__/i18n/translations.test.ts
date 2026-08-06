@@ -54,6 +54,50 @@ describe("translations", () => {
     });
   });
 
+  it("interpolates the same parameters as English in every locale", () => {
+    const collectParameters = (formatter: (input: never) => string) => {
+      const accessed = new Set<string>();
+      const probe = new Proxy(
+        {},
+        {
+          get: (_target, property) => {
+            if (typeof property === "string") {
+              accessed.add(property);
+            }
+
+            return `«${String(property)}»`;
+          },
+        },
+      );
+
+      formatter(probe as never);
+
+      return [...accessed].sort();
+    };
+
+    Object.entries(translations).forEach(([language, dictionary]) => {
+      Object.entries(translations.en).forEach(([key, baseValue]) => {
+        if (typeof baseValue !== "function") {
+          return;
+        }
+
+        const localizedValue = dictionary[key as keyof typeof translations.en];
+
+        expect({
+          language,
+          key,
+          parameters: collectParameters(
+            localizedValue as (input: never) => string,
+          ),
+        }).toEqual({
+          language,
+          key,
+          parameters: collectParameters(baseValue as (input: never) => string),
+        });
+      });
+    });
+  });
+
   it("does not silently ship known English phrases in other locales", () => {
     const englishInterfacePhrases = [
       "push to talk",

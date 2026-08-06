@@ -303,20 +303,20 @@ export const sv = {
   provider: "Leverantör",
   webSearchProvider: "Webbsökleverantör",
   webSearchProviderMissingHint:
-    "Konfigurera minst en sökkompatibel tjänst i inloggningsuppgifter för att aktivera webbjordning här.",
+    "Konfigurera minst en sökkompatibel tjänst under Autentiseringsuppgifter för att aktivera webbförankring här.",
   webSearchModelHint: ({ model }) =>
-    `Använder ${model} bakom kulisserna för live-web jordning.`,
+    `Använder ${model} bakom kulisserna för webbförankring i realtid.`,
   webSearchHomeHint:
-    "Använd startskärmsknappen för att slå på eller av webbjordning för den här tråden.",
+    "Använd startskärmsknappen för att slå på eller av webbförankring för den här tråden.",
   settingsWebSearchCompactHint:
     "Alternativt kan du lägga till färsk webbkontext innan huvudmodellen svarar.",
   webSearchAdvanced: "Avancerade sökkontroller",
-  expandAdvancedSearch: "Utöka avancerade sökkontroller",
-  collapseAdvancedSearch: "Komprimera avancerade sökkontroller",
+  expandAdvancedSearch: "Fäll ut avancerade sökkontroller",
+  collapseAdvancedSearch: "Fäll ihop avancerade sökkontroller",
   webSearchSetupNeeded:
     "Lägg till autentiseringsuppgifter för att använda live webbsökning.",
   webSearchEnabledDescription:
-    "Nytt webbkontext läggs till innan modellen svarar.",
+    "Färsk webbkontext läggs till innan modellen svarar.",
   webSearchDisabledDescription:
     "Använd live webbkontext för den här tråden när aktuella fakta är viktiga.",
   webSearchQualityControls: "Sökkvalitet",
@@ -327,7 +327,7 @@ export const sv = {
   webSearchDepth: "Sökdjup",
   webSearchDepthStandard: "Standard",
   webSearchDepthDeep: "Djupt",
-  webSearchResultCount: "Resultaträkning",
+  webSearchResultCount: "Antal resultat",
   webSearchQualityHint: ({ provider }) =>
     `Dessa kontroller ställer in hur ${provider} samlar nytt sammanhang innan svaret.`,
   webSearchNoExtraControls: ({ provider }) =>
@@ -343,7 +343,7 @@ export const sv = {
     "Lägg till autentiseringsuppgifter för en tjänst med STT-stöd för att välja den här.",
   nativeSttHint:
     "Systemigenkänning fungerar oberoende av dina leverantörsnycklar och kan bearbetas på enheten eller av operativsystemets taltjänst.",
-  replyPlayback: "Svara Uppspelning",
+  replyPlayback: "Svarsuppspelning",
   sentencesArrive: "Stycken anländer",
   sentencesArriveDescription: "Börja tala så snart ett helt stycke är klart.",
   fullReplyFirst: "Fullständigt svar först",
@@ -359,7 +359,7 @@ export const sv = {
     "Använd enhetens talmotor för talade svar och röstförhandsgranskning.",
   kokoroTtsDescription:
     "Använd en mycket mer naturlig neural röst helt och hållet på den här enheten. Uppläst svarstext syntetiseras lokalt, utan någon nyckel för talleverantör eller användningsavgift.",
-  kokoroVoices: "Kokoro Röster på enheten",
+  kokoroVoices: "Kokoro-röster på enheten",
   kokoroVoicesHint: ({ size, installedSize }) =>
     `Den flerspråkiga modellen laddar ner cirka ${size} MB och upptar cirka ${installedSize} MB efter installationen.`,
   kokoroModel: "Kokoro flerspråkig modell",
@@ -368,7 +368,8 @@ export const sv = {
   kokoroExtracting: ({ progress }) => `Installerar... ${progress}%`,
   kokoroVerifying: "Verifierar röstmotorn...",
   kokoroInstalled: "Installerad och klar på den här enheten.",
-  kokoroNotInstalled: "Valfri nedladdning. Ingen leverantörsnyckel krävs.",
+  kokoroNotInstalled:
+    "Ladda ner och verifiera modellen innan du väljer eller använder Kokoro. Ingen leverantörsnyckel krävs.",
   kokoroLanguageFallback:
     "Kokoro talar för närvarande engelska och förenklad kinesiska här. För andra valda svarsspråk, lägg till en explicit reservrutt annars stoppas talet med ett fel.",
   kokoroRemoveTitle: "Ta bort Kokoro-modellen?",
@@ -379,11 +380,11 @@ export const sv = {
   kokoroFallbackNeeded: ({ languages }) =>
     `En explicit reservrutt krävs för: ${languages}.`,
   kokoroNoSelectedLanguages:
-    "Välj engelska eller förenklad kinesiska under Lyssna på språk för att konfigurera en Kokoro-röst.",
+    "Välj engelska eller förenklad kinesiska under Lyssningsspråk för att konfigurera en Kokoro-röst.",
   expandVoiceSettings: ({ language }) =>
     `Expandera ${language} röstinställningar`,
   collapseVoiceSettings: ({ language }) =>
-    `Komprimera ${language} röstinställningar`,
+    `Fäll ihop ${language} röstinställningar`,
   remove: "Ta bort",
   voiceOutputDescription:
     "Välj talmotor, lyssnande språk och röstförhandsvisningar för talade svar.",
@@ -406,19 +407,19 @@ export const sv = {
     "Endast aktiverade leverantörer med stöd för talat svar visas här.",
   ttsProviderMissingHint:
     "Lägg till autentiseringsuppgifter för en tjänst med TTS-support för att välja den här.",
-  localTtsOrderHint: "Endast explicit konfigurerade reservrutter görs försök.",
+  localTtsOrderHint: "Endast uttryckligen konfigurerade reservrutter provas.",
   providerTtsOrderHint:
-    "Endast explicit konfigurerade reservrutter görs försök.",
+    "Endast uttryckligen konfigurerade reservrutter provas.",
   nativeTtsHint:
     "Native TTS använder systemets röststack och kräver ingen leverantörsnyckel.",
   localTtsLanguageCoverageHint:
     "Lokala paket täcker för närvarande engelska, tyska, förenklad kinesiska, spanska, portugisiska, hindi, franska och italienska.",
-  ttsVoice: "TTS röst",
+  ttsVoice: "TTS-röst",
   refresh: "Uppdatera",
   providerVoiceDirectory: ({ provider }) => `${provider} röstbibliotek`,
   refreshProviderVoices: ({ provider }) => `Uppdatera ${provider} röster`,
   providerVoicesAvailable: ({ count, provider }) =>
-    `${count} röster tillgängliga från ${provider}`,
+    `${count} ${Number(count) === 1 ? "röst tillgänglig" : "röster tillgängliga"} från ${provider}.`,
   providerVoicesLoadFailed:
     "Röster kunde inte uppdateras. Ditt nuvarande val är oförändrat; du kan fortfarande ange ett röst-ID manuellt.",
   providerVoicesLoadFailedWithFallback:
@@ -443,10 +444,10 @@ export const sv = {
   qwenRegionHint:
     "Den valda regionen måste matcha regionen där denna API-nyckel skapades.",
   qwenRegionUsSpeechHint:
-    "USA-regionnycklar stöder chatt och webbsökning här. De nuvarande Qwen STT- och TTS-rutterna för Mr Broccoli kräver en Singapore- eller Beijing-nyckel.",
+    "USA-regionnycklar stöder chatt och webbsökning här. De nuvarande Qwen STT- och TTS-rutterna för Mr Broccoli kräver en Singapore- eller Peking-nyckel.",
   providerDefaultVoiceHint:
     "Denna leverantör använder för närvarande sin standardröst för förhandsgranskning och talade svar.",
-  listenLanguages: "Lyssna på språk",
+  listenLanguages: "Lyssningsspråk",
   listenLanguagesHint:
     "Välj de svarsspråk du vill ska låta bra. Mr Broccoli provar dem i denna ordning vid dirigering av talutgång.",
   listenLanguagesSelected: ({ count }) =>
@@ -455,7 +456,7 @@ export const sv = {
   localVoicePacksHint:
     "Varje språk behåller sin egen lokala röst. Välj den röst du vill ha för det språket och ladda sedan bara ned de paket du verkligen bryr dig om.",
   localVoiceForLanguage: ({ languageLabel }) => `Röst för ${languageLabel}`,
-  providerVoicePreviews: "Providers röstförhandsvisningar",
+  providerVoicePreviews: "Förhandsvisning av leverantörsröster",
   providerVoicePreviewsHint:
     "Testa den för närvarande valda TTS-rutten här med en separat förhandsgranskningstext för varje svarsspråk.",
   nativeVoicePreviewSection: "Förhandsgranskning av systemröst",
@@ -502,10 +503,10 @@ export const sv = {
     `Laddar ner lokalt paket... ${progress}%`,
   download: "Ladda ner",
   downloadingShort: "Laddar...",
-  voicePreviewText: "Röstförhandsgranska text",
+  voicePreviewText: "Text för röstförhandsvisning",
   voicePreviewPlaceholder: "Skriv en fras för att höra den här rösten.",
   voicePreviewHint:
-    "Använder den för närvarande valda svarsröstbackend utan att skicka något till språkmodellen.",
+    "Använder den för närvarande valda svarsröstbackenden utan att skicka något till språkmodellen.",
   previewVoice: "Förhandsgranska röst",
   generatingPreview: "Genererar förhandsgranskning...",
   playingPreview: "Förhandsvisning spelas upp...",
@@ -526,11 +527,11 @@ export const sv = {
   messageCopied: "Meddelandet har kopierats.",
   noConversationToCopyYet: "Ingen konversation att kopiera ännu.",
   noConversationToShareYet: "Ingen konversation att dela ännu.",
-  noReplyToRepeatYet: "Inget svar på repris ännu.",
+  noReplyToRepeatYet: "Inget svar att spela upp igen ännu.",
   threadCopied: "Tråden kopierad.",
   threadRenamed: "Tråden bytt namn.",
-  threadPinned: "Tråd fastnålad.",
-  threadUnpinned: "Tråd lossad.",
+  threadPinned: "Tråden fäst.",
+  threadUnpinned: "Tråden lossad.",
   addProviderKeyToUseProvider: ({ provider }) =>
     `Lägg till autentiseringsuppgifter för ${provider} i Inställningar innan du använder den här rutten.`,
   configureCredentialsBeforeVoiceSession:
@@ -538,17 +539,17 @@ export const sv = {
   endpointCredentialFormatInvalid: ({ provider }) =>
     `För ${provider} anger du leverantörens bas-URL och API-nyckel som https://ditt-slutpunkt.exempel.com|din-api-nyckel.`,
   speechRecognitionUnavailableOnDevice:
-    "Taligenkänning är inte tillgängligt på den här enheten.",
+    "Taligenkänning är inte tillgänglig på den här enheten.",
   debugLogLabel: "LOGG",
   debugLogCaptureStarted: "Felsökningsloggning startade.",
   debugLogCaptureStopped: ({ entryCount, fileName }) =>
-    `Felsökningslogg sparad som ${fileName} och kopierad till urklipp (${entryCount}-poster).`,
+    `Felsökningslogg sparad som ${fileName} och kopierad till urklipp (${entryCount} poster).`,
   debugLogCaptureStoppedNoClipboard: ({ entryCount, fileName }) =>
-    `Felsökningslogg sparad som ${fileName} (${entryCount}-poster).`,
+    `Felsökningslogg sparad som ${fileName} (${entryCount} poster).`,
   debugLogCaptureRecovered: ({ entryCount, fileName }) =>
-    `Återställde tidigare felsökningslogg ${fileName} och kopierade den till urklipp (${entryCount}-poster).`,
+    `Återställde tidigare felsökningslogg ${fileName} och kopierade den till urklipp (${entryCount} poster).`,
   debugLogCaptureRecoveredNoClipboard: ({ entryCount, fileName }) =>
-    `Återställd tidigare felsökningslogg ${fileName} (${entryCount}-poster).`,
+    `Återställde tidigare felsökningslogg ${fileName} (${entryCount} poster).`,
   debugLogCaptureFailed: "Det gick inte att spara felsökningsloggen.",
   chooseSttBeforeVoiceSession:
     "Välj en konfigurerad STT-rutt i Inställningar innan du startar en röstsession.",
@@ -585,13 +586,13 @@ export const sv = {
   voiceOutput: "Röstutgång",
   speechReplayCache: "Cache för taluppspelning",
   speechReplayCacheDescription:
-    "Leverantörsgenererat tal sparas på enheten i upp till 14 dagar, så att spela upp ett svar igen förbrukar inga nya talkrediter.",
+    "Leverantörsgenererat tal sparas på enheten i upp till 14 dagar, så det kostar inga nya talkrediter att spela upp ett svar igen.",
   clearSpeechReplayCache: "Rensa talcache",
   speechReplayCacheCleared: "De cachade talfilerna har tagits bort.",
   speechReplayCacheClearFailed: "Det gick inte att rensa talcachen.",
   currentSetup: "Aktuell inställning",
   listeningToYourVoice: "Lyssnar på din röst",
-  parsingYourVoiceInput: "Förvandla din röst till text",
+  parsingYourVoiceInput: "Omvandlar din röst till text",
   preparingRequest: "Förbereder din förfrågan",
   searchingTheWeb: "Söker på nätet efter nya sammanhang",
   waitingForProvider: ({ provider }) => `Väntar på ${provider}`,
@@ -600,10 +601,10 @@ export const sv = {
   deepThinkingReassurance: "Bra svar tar en stund...",
   thinkingElapsed: ({ detail, seconds }) => `${detail} · ${seconds}s`,
   speakingBackToYou: "Talar tillbaka till dig",
-  freshSession: "Fräsch session",
+  freshSession: "Ny session",
   messageCount: ({ count }) =>
     Number(count) === 1 ? "1 meddelande" : `${count} meddelanden`,
-  speechInputRoute: ({ route }) => `Tal i: ${route}`,
+  speechInputRoute: ({ route }) => `Tal in: ${route}`,
   replyModelRoute: ({ route }) => `Svarsmodell: ${route}`,
   voiceOutputRoute: ({ route }) => `Röst ut: ${route}`,
   fallbackVoiceOutputRoute: ({ route }) => `Reservröst ut: ${route}`,
@@ -642,17 +643,17 @@ export const sv = {
     "Visa uppskattad tokenanvändning för svar och konversationssummor.",
   debugLogButton: "Felsökningsloggknapp",
   debugLogButtonHiddenDescription:
-    "Håll hemskärmens LOG-knapp dold om inte en inspelning redan körs.",
+    "Håll startskärmens LOGG-knapp dold om inte en inspelning redan körs.",
   debugLogButtonVisibleDescription:
-    "Visa startskärmens LOG-knapp för att starta och stoppa felsökningsfångst.",
+    "Visa startskärmens LOGG-knapp för att starta och stoppa felsökningsfångst.",
   debugLogButtonUsageDescription:
-    "Så här använder du knappen: om du aktiverar den börjar loggar registreras. Om du stänger av den slutar du fånga loggar och flytta de fångade till urklippet.",
+    "Så här använder du knappen: när du slår på den börjar loggar fångas. När du stänger av den stoppas insamlingen och de fångade loggarna kopieras till urklipp.",
   estimatedUsageTitle: "Beräknad användning",
   estimatedUsageCounts: ({ replies, summaries }) =>
-    `${replies} svarar · ${summaries} minnesuppdateringar`,
+    `${replies} svar · ${summaries} minnesuppdateringar`,
   estimatedUsageConversationScope:
     "Summorna inkluderar varje rutt och modell som används i den här konversationen.",
-  estimatedPromptTokens: ({ count }) => `Uppmaning: ${count}`,
+  estimatedPromptTokens: ({ count }) => `Prompt: ${count}`,
   estimatedReplyTokens: ({ count }) => `Svar: ${count}`,
   estimatedTotalTokens: ({ count }) => `Totalt: ${count}`,
   estimatedUsageInline: ({ prompt, completion, total }) =>
@@ -660,17 +661,18 @@ export const sv = {
   searchQuery: "Sökfråga",
   expandWebSearchDetails: "Visa webbsökningsdetaljer",
   collapseWebSearchDetails: "Dölj webbsökningsdetaljer",
-  webSearchSourceCount: ({ count }) => `${count} källor`,
+  webSearchSourceCount: ({ count }) =>
+    `${count} ${Number(count) === 1 ? "källa" : "källor"}`,
   sources: "Källor",
-  openSourceLink: ({ source }) => `Öppen källkod: ${source}`,
-  turnReceipt: "Vänd detaljer",
-  expandTurnReceipt: "Visa svängdetaljer",
-  collapseTurnReceipt: "Dölj svängdetaljer",
+  openSourceLink: ({ source }) => `Öppna källa: ${source}`,
+  turnReceipt: "Turdetaljer",
+  expandTurnReceipt: "Visa turdetaljer",
+  collapseTurnReceipt: "Dölj turdetaljer",
   turnReceiptDirect: "Direkt",
   turnReceiptRequested: "Begärt svarsväg",
   turnReceiptActual: "Faktisk svarsväg",
-  turnReceiptEffort: "Resonemang kontroll",
-  turnReceiptProviderNative: "leverantör-infödd",
+  turnReceiptEffort: "Resonemangskontroll",
+  turnReceiptProviderNative: "inbyggd hos leverantören",
   turnReceiptInput: "Inmatningsrutt",
   turnReceiptSearch: "Webbsökning",
   turnReceiptVoice: "Röstutgång",
@@ -679,7 +681,7 @@ export const sv = {
   turnReceiptFallback: "Reservorsak",
   turnReceiptVoiceInput: "Röst",
   turnReceiptTypedInput: "Skrivet",
-  turnReceiptSystemSpeech: "System taligenkänning",
+  turnReceiptSystemSpeech: "Systemets taligenkänning",
   turnReceiptSystemVoice: "Systemröst",
   turnReceiptSystemVoiceFallback: "Systemröst · reserv",
   turnReceiptOff: "Av",
@@ -688,7 +690,7 @@ export const sv = {
   turnReceiptNotUsed: "Ej använd",
   turnReceiptSummaryReused: "sparad sammanfattning återanvänds",
   turnReceiptSummaryUpdated: "sammanfattningen uppdaterad",
-  turnReceiptContextFallback: "fallback av senaste meddelande",
+  turnReceiptContextFallback: "reserv med senaste meddelanden",
   turnReceiptGatewayCompression: ({ original, compressed }) =>
     `gateway komprimerade ${original} till ${compressed} meddelanden`,
   turnReceiptContextValue: ({ sent, total, summarized, state }) =>
@@ -699,7 +701,7 @@ export const sv = {
   turnReceiptTimingModel: "modell",
   turnReceiptTimingFirstSpeech: "första talet",
   turnReceiptTimingTotal: "totalt",
-  estimatedRouteUsageTokensOnly: ({ tokens }) => `${tokens} tokens`,
+  estimatedRouteUsageTokensOnly: ({ tokens }) => `${tokens} token`,
   unknownUsageRoute: "Okänd rutt",
   setupGuideConnectProviderTitle: "Konfigurera autentiseringsuppgifter",
   setupGuideConnectProviderDescription:
@@ -713,7 +715,7 @@ export const sv = {
   deleteConversationConfirmationMessage:
     "Detta tar permanent bort konversationen och alla dess meddelanden. Denna åtgärd kan inte ångras.",
   memory: "Minne",
-  conversations: "Samtal",
+  conversations: "Konversationer",
   drawerSubtitle: "Hoppa mellan live-trådar eller starta ett nytt rum.",
   newSession: "Ny session",
   noSavedConversationsYet: "Inga sparade konversationer än",
@@ -779,8 +781,8 @@ export const sv = {
   setupGuideVoiceTestThinking: "Testar svar...",
   setupGuideVoiceTestSynthesizing: "Förbereder röst...",
   setupGuideVoiceTestSpeaking: "Spelar upp svar...",
-  setupGuideVoiceTestTranscript: "Avskrift",
-  setupGuideVoiceTestReply: "Svara",
+  setupGuideVoiceTestTranscript: "Utskrift",
+  setupGuideVoiceTestReply: "Svar",
   setupGuideVoiceTestReset: "Rensa detta resultat",
   setupGuideVoiceInputUnavailable:
     "Röstinmatning är inte tillgänglig för den här konfigurationen på den här enheten.",
@@ -797,7 +799,7 @@ export const sv = {
     `Aktiverad via ${provider} taltranskription`,
   setupGuideRouteProviderTts: ({ provider }) =>
     `Aktiverad via ${provider} röst`,
-  setupGuideRouteKokoroTts: "Aktiverad via Kokoro röst på enheten",
+  setupGuideRouteKokoroTts: "Aktiverad via Kokoro-röst på enheten",
   setupGuideRouteLocalTts: "Aktiverad via lokalt röstpaket",
   setupGuideRouteUnavailable: "Ej tillgängligt",
   setupGuideRouteOff: "Av",
@@ -810,13 +812,13 @@ export const sv = {
     "Sök efter titlar, modeller och meddelandetext",
   noMatchingConversations: "Inga matchande konversationer",
   noMatchingConversationsDescription:
-    "Prova en annan titel, rutt, modell eller fras från avskriften.",
+    "Prova en annan titel, rutt, modell eller fras från utskriften.",
   memoryModalTitle: "Konversationsminne",
   memoryModalDescription:
-    "Detta är den kompakta sammanfattningen Mr Broccoli förs vidare när en tråd blir tillräckligt lång för att komprimera äldre varv.",
+    "Detta är den kompakta sammanfattning som Mr Broccoli för vidare när en tråd blir tillräckligt lång för att komprimera äldre turer.",
   memorySummary: "Sparad sammanfattning",
   memorySummaryEmpty:
-    "Inget kompakt minne ännu. När den här tråden blir längre kommer äldre svängar att sammanfattas här.",
+    "Inget kompakt minne ännu. När den här tråden blir längre kommer äldre turer att sammanfattas här.",
   summarizedTurnsCount: ({ count }) =>
     Number(count) === 1 ? "1 sammanfattad tur" : `${count} sammanfattade turer`,
   copyMemory: "Kopiera minne",
@@ -832,16 +834,16 @@ export const sv = {
   copy: "Kopiera",
   share: "Dela",
   rename: "Byt namn",
-  pin: "Pin",
+  pin: "Fäst",
   unpin: "Lossa",
   save: "Spara",
   cancel: "Avbryt",
-  stop: "Sluta",
+  stop: "Stoppa",
   pause: "Pausa",
   resume: "Återuppta",
   paused: "Pausad",
   listening: "Lyssnar",
-  parsing: "Transkribering",
+  parsing: "Transkriberar",
   searching: "Söker",
   converting: "Konverterar",
   webSearchAction: "webbsökning",
@@ -850,10 +852,10 @@ export const sv = {
   pleaseWait: "Vänta",
   yourTurn: "Din tur",
   keepPressing: "Fortsätt att trycka",
-  tapWhenDone: "Tryck på när du är klar",
-  speechPaused: "Talet pausas",
+  tapWhenDone: "Tryck när du är klar",
+  speechPaused: "Talet är pausat",
   pausePlaybackUnavailable:
-    "Den här röstrutten kan inte pausas. Stoppa det eller byt till leverantörens röstutgång.",
+    "Den här röstrutten kan inte pausas. Stoppa den eller byt till leverantörens röstutgång.",
   holdToSpeak: "Håll för att tala",
   tapToSpeak: "Tryck för att tala",
   tapAgainToSend: "Tryck igen för att skicka",
@@ -866,7 +868,7 @@ export const sv = {
   providerAuthError: ({ provider, action }) =>
     `${provider} avvisade autentiseringsuppgifterna för ${action}. Kontrollera API-nyckeln och behörigheterna.`,
   providerRateLimitError: ({ provider, action }) =>
-    `${provider} är hastighetsbegränsande ${action} just nu. Försök igen om ett ögonblick.`,
+    `${provider} hastighetsbegränsar ${action} just nu. Försök igen om ett ögonblick.`,
   providerCreditsRequired: ({ provider, action }) =>
     `${provider} behöver tillräckligt med API-kredit för ${action}. Kontrollera kontosaldot och nyckelns utgiftsgräns.`,
   providerTimeoutError: ({ provider, action }) =>
@@ -889,13 +891,13 @@ export const sv = {
     `${provider} är redo att användas.`,
   providerCapabilityValidationSuccess: ({ provider, capability }) =>
     `${provider} ${capability} fungerar.`,
-  providerValidationFailed: "Providervalideringen misslyckades.",
+  providerValidationFailed: "Leverantörsvalideringen misslyckades.",
   webSearchFallback:
     "Webbsökning var inte tillgänglig, så svaret fortsatte utan live webbkontext.",
   noBase64EncoderAvailable: "Ingen base64-kodare tillgänglig.",
   noBase64DecoderAvailable: "Ingen base64-avkodare tillgänglig.",
   azureSpeechApiKeyFormat:
-    "Microsoft Azure TTS behöver Azure Speech-referenser i formatet <key>|<region>, till exempel abc123|westeurope, eller det kombinerade Azure-formatet <endpoint>|<api-key>|<key>|<region>.",
+    "Microsoft Azure TTS behöver Azure Speech-autentiseringsuppgifter i formatet <key>|<region>, till exempel abc123|westeurope, eller det kombinerade Azure-formatet <endpoint>|<api-key>|<key>|<region>.",
   nativeTtsDoesNotSynthesizeAudioFiles:
     "Native TTS syntetiserar inte ljudfiler.",
   localTtsUnavailableForLanguage: ({ languageLabel }) =>
@@ -907,11 +909,11 @@ export const sv = {
     `${provider} TTS-fel (${status}): ${errorText}`,
   ttsReplyTooLong: ({ provider }) =>
     `${provider} talutgång avvisade svaret eftersom det var för långt.`,
-  ttsTimeout: ({ provider }) => `${provider} talutmatning tog för lång tid.`,
+  ttsTimeout: ({ provider }) => `${provider} talutgång tog för lång tid.`,
   sttTimeout: ({ provider }) =>
     `${provider} taltranskription tog för lång tid.`,
   sttFileSizeLimitExceeded: ({ provider, model, limit }) =>
-    `${provider} ${model} accepterar endast inspelningar upp till ${limit}. Använd en kortare klämma eller byt STT-modell.`,
+    `${provider} ${model} accepterar endast inspelningar upp till ${limit}. Använd ett kortare klipp eller byt STT-modell.`,
   voiceInputCaptureIncomplete:
     "Röstindata kunde inte fångas rent. Försök igen.",
   ttsDidNotReturnAudio: ({ provider }) =>
@@ -928,11 +930,11 @@ export const sv = {
   speechRecognitionPermissionNotGranted:
     "Taligenkänningstillstånd har inte beviljats.",
   speechRecognitionUnavailableForDeviceLanguage:
-    "Taligenkänning är inte tillgängligt för det aktuella enhetsspråket.",
+    "Taligenkänning är inte tillgänglig för det aktuella enhetsspråket.",
   nativeSpeechRecognitionNeedsNetwork:
-    "Inbyggt taligenkänning behöver nätverksåtkomst just nu.",
+    "Inbyggd taligenkänning behöver nätverksåtkomst just nu.",
   noSpeechDetected: "Inget tal upptäcktes.",
-  nativeSpeechRecognitionFailed: "Inbyggt taligenkänning misslyckades.",
+  nativeSpeechRecognitionFailed: "Inbyggd taligenkänning misslyckades.",
   couldntStartNativeSpeechRecognition:
     "Det gick inte att starta inbyggd taligenkänning.",
   microphonePermissionNotGranted: "Mikrofontillstånd har inte beviljats",

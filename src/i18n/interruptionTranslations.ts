@@ -72,7 +72,7 @@ export const interruptionTranslations = {
   hu: define({
     interruptedReply: "Megszakított válasz",
     replyInterruptedNotice:
-      "A válasz befejezése előtt beszélni kezdtél. A létrehozott rész megmaradt, a következő megszólalás innen folytatódik.",
+      "A válasz befejezése előtt beszélni kezdett. A létrehozott rész megmaradt, a következő megszólalás innen folytatódik.",
   }),
   cs: define({
     interruptedReply: "Přerušená odpověď",
