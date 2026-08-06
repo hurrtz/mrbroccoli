@@ -65,6 +65,16 @@ framework or hiding platform behavior behind excessive abstraction.
   only `"sheet"`. Every dialog therefore depends on a `SafeAreaProvider`
   ancestor; in this app that is supplied by Expo Router's `ExpoRoot`. Do not
   remove that assumption without adding an explicit provider.
+- **Assumption:** the sheet's motion is only partly pinned by tests. They prove
+  the animated `transform` and `opacity` are present in sheet layout, absent in
+  dialog layout, and that the container's own animation stays `"none"`, but
+  they cannot prove the values are still bound to the driving animation:
+  replacing the interpolation with a hard-coded settled value keeps every test
+  green. React Native resolves animated style reads to plain numbers before a
+  test can inspect them, and a native-driver value never advances under Jest's
+  fake timers, so closing this would mean moving the interpolation off the
+  native driver purely for testability. Verify the rise and fall visually when
+  changing it.
 - Dynamic status uses live-region or announcement behavior only at meaningful
   state changes.
 - Keyboard, safe-area, font-scale, contrast, RTL, and platform back behavior
