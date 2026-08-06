@@ -10,6 +10,8 @@ the complete Play Store translations are kept in a dedicated file under
 
 ## Unreleased
 
+## 3.1.0 - 2026-08-06
+
 ### Added
 
 - Report an AI response directly from its message actions. The report action
