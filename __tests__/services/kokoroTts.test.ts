@@ -69,6 +69,12 @@ const mockReadDir = jest.fn(async (path: string) =>
     : (mockModelEntries as unknown as ReturnType<typeof packEntry>[]),
 );
 
+const mockInstallPhonemePacks = jest.fn().mockResolvedValue(undefined);
+
+jest.mock("../../src/services/phonemePacks", () => ({
+  installPhonemePacks: (...args: unknown[]) => mockInstallPhonemePacks(...args),
+}));
+
 jest.mock("react-native-sherpa-onnx/download", () => ({
   ModelCategory: { Tts: "tts" },
   isModelDownloadedByCategory: jest.fn().mockResolvedValue(true),
@@ -151,6 +157,16 @@ describe("Kokoro TTS service", () => {
     await expect(
       downloadKokoroModel({ phonemeLanguages: ["en"] }),
     ).rejects.toThrow("pronunciation packs could not be installed");
+  });
+
+  it("installs a fallback pack when the caller names no languages", async () => {
+    await downloadKokoroModel();
+
+    expect(mockInstallPhonemePacks).toHaveBeenCalledWith(
+      "/models/kokoro/espeak-ng-data",
+      "en",
+      expect.anything(),
+    );
   });
 
   it("finds and initializes the installed model for the selected language", async () => {

@@ -56,6 +56,11 @@ export type KokoroDownloadProgress = {
 // shipped runtime is espeak-free and fills it with libphonemize packs.
 const KOKORO_DATA_DIR_NAME = "espeak-ng-data";
 
+// Minimum pack set for a speakable voice when the caller names no languages.
+// Chinese needs no pack — it resolves through the model's own lexicon-zh.txt —
+// so English alone keeps the data directory non-empty and the model loadable.
+const KOKORO_FALLBACK_PHONEME_LANGUAGES: SpeechLanguage[] = ["en"];
+
 let activeSession: KokoroSession | null = null;
 let sessionTask = Promise.resolve();
 let synthesisTask = Promise.resolve();
@@ -666,12 +671,19 @@ export async function downloadKokoroModel(params?: {
   // whatever packs are present, but the runtime rejects the model outright
   // when the directory holds no pack at all, so that case must fail loudly
   // here rather than surface later as a missing-espeak-ng-data error.
-  if (status.rootPath && params?.phonemeLanguages?.length) {
+  //
+  // Callers that download Kokoro without naming languages still need a
+  // speakable voice, so fall back to a minimum pack set rather than leaving
+  // the directory empty.
+  if (status.rootPath) {
     const { installPhonemePacks } = require("./phonemePacks") as
       typeof import("./phonemePacks");
     const dataDir = `${status.rootPath}/${KOKORO_DATA_DIR_NAME}`;
+    const languages = params?.phonemeLanguages?.length
+      ? params.phonemeLanguages
+      : KOKORO_FALLBACK_PHONEME_LANGUAGES;
 
-    for (const language of params.phonemeLanguages) {
+    for (const language of languages) {
       await installPhonemePacks(dataDir, language, {
         abortSignal: params?.abortSignal,
       }).catch(() => undefined);
