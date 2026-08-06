@@ -1,6 +1,9 @@
 import React from "react";
 import {
+  AccessibilityInfo,
   ActivityIndicator,
+  Animated,
+  Easing,
   Modal as ReactNativeModal,
   Pressable,
   StyleSheet,
@@ -278,6 +281,7 @@ export interface DialogAction {
 }
 
 const SHEET_MAX_HEIGHT_RATIO = 0.85;
+const SHEET_ANIMATION_DURATION = 220;
 
 interface DialogProps {
   children?: React.ReactNode;
@@ -316,22 +320,77 @@ export function Modal({
     height - insets.top,
   );
 
+  const [sheetRendered, setSheetRendered] = React.useState(visible);
+  const [reduceMotion, setReduceMotion] = React.useState(false);
+  const sheetProgress = React.useRef(
+    new Animated.Value(visible ? 1 : 0),
+  ).current;
+
+  React.useEffect(() => {
+    let active = true;
+    void AccessibilityInfo.isReduceMotionEnabled().then((enabled) => {
+      if (active) {
+        setReduceMotion(enabled);
+      }
+    });
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  React.useEffect(() => {
+    if (!isSheet) {
+      setSheetRendered(visible);
+      return;
+    }
+
+    if (visible) {
+      setSheetRendered(true);
+    }
+
+    // Reduce motion still has to settle the value, otherwise the deferred
+    // unmount would wait for an animation that never runs.
+    if (reduceMotion) {
+      sheetProgress.setValue(visible ? 1 : 0);
+      setSheetRendered(visible);
+      return;
+    }
+
+    const animation = Animated.timing(sheetProgress, {
+      duration: SHEET_ANIMATION_DURATION,
+      easing: visible ? Easing.out(Easing.cubic) : Easing.in(Easing.cubic),
+      toValue: visible ? 1 : 0,
+      useNativeDriver: true,
+    });
+
+    animation.start(({ finished }) => {
+      if (finished && !visible) {
+        setSheetRendered(false);
+      }
+    });
+
+    return () => {
+      animation.stop();
+    };
+  }, [isSheet, reduceMotion, sheetProgress, visible]);
+
   return (
     <ReactNativeModal
-      animationType="fade"
+      animationType={isSheet ? "none" : "fade"}
       onRequestClose={onClose}
       statusBarTranslucent
       supportedOrientations={APP_MODAL_ORIENTATIONS}
       transparent
-      visible={visible}
+      visible={isSheet ? sheetRendered : visible}
     >
-      <View
+      <Animated.View
         testID="native-dialog-overlay"
         accessibilityViewIsModal
         style={[
           controlStyles.dialogOverlay,
           isSheet ? controlStyles.sheetOverlay : null,
           { backgroundColor: colors.overlay },
+          isSheet ? { opacity: sheetProgress } : null,
         ]}
       >
         {maskClosable ? (
@@ -346,12 +405,24 @@ export function Modal({
             style={StyleSheet.absoluteFill}
           />
         ) : null}
-        <View
+        <Animated.View
           testID="native-dialog-card"
           style={[
             controlStyles.dialogCard,
             isSheet ? controlStyles.sheetCard : null,
             isSheet ? { maxHeight: sheetMaxHeight } : null,
+            isSheet
+              ? {
+                  transform: [
+                    {
+                      translateY: sheetProgress.interpolate({
+                        inputRange: [0, 1],
+                        outputRange: [sheetMaxHeight, 0],
+                      }),
+                    },
+                  ],
+                }
+              : null,
             {
               backgroundColor: colors.surfaceElevated,
               borderColor: colors.border,
@@ -429,8 +500,8 @@ export function Modal({
               ))}
             </View>
           ) : null}
-        </View>
-      </View>
+        </Animated.View>
+      </Animated.View>
     </ReactNativeModal>
   );
 }

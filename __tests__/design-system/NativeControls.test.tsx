@@ -1,6 +1,19 @@
 import React from "react";
 import { StyleSheet, useWindowDimensions } from "react-native";
-import { fireEvent, render } from "@testing-library/react-native";
+import { act, fireEvent, render } from "@testing-library/react-native";
+
+const mockIsReduceMotionEnabled = jest.fn().mockResolvedValue(false);
+
+jest.mock(
+  "react-native/Libraries/Components/AccessibilityInfo/AccessibilityInfo",
+  () => ({
+    __esModule: true,
+    default: {
+      addEventListener: jest.fn(() => ({ remove: jest.fn() })),
+      isReduceMotionEnabled: () => mockIsReduceMotionEnabled(),
+    },
+  }),
+);
 
 jest.mock("react-native", () => {
   const actual = jest.requireActual("react-native");
@@ -212,5 +225,98 @@ describe("NativeControls", () => {
     const backdrop = screen.getByTestId("native-dialog-backdrop");
     expect(backdrop.props.accessible).toBe(false);
     expect(backdrop.props.importantForAccessibility).toBe("no");
+  });
+
+  it("keeps the sheet mounted until the closing animation finishes", async () => {
+    jest.useFakeTimers();
+    setViewport(390, 844);
+    mockIsReduceMotionEnabled.mockResolvedValue(false);
+
+    const screen = renderControl(
+      <Modal visible layout="sheet" title="Premium">
+        Content
+      </Modal>,
+    );
+    await act(async () => {});
+
+    screen.rerender(
+      <ThemeProvider mode="light">
+        <Modal visible={false} layout="sheet" title="Premium">
+          Content
+        </Modal>
+      </ThemeProvider>,
+    );
+
+    expect(screen.queryByTestId("native-dialog-card")).toBeTruthy();
+
+    await act(async () => {
+      jest.advanceTimersByTime(400);
+    });
+
+    expect(screen.queryByTestId("native-dialog-card")).toBeNull();
+    jest.useRealTimers();
+  });
+
+  it("keeps the sheet mounted when it is reopened mid-exit", async () => {
+    jest.useFakeTimers();
+    setViewport(390, 844);
+    mockIsReduceMotionEnabled.mockResolvedValue(false);
+
+    const screen = renderControl(
+      <Modal visible layout="sheet" title="Premium">
+        Content
+      </Modal>,
+    );
+    await act(async () => {});
+
+    screen.rerender(
+      <ThemeProvider mode="light">
+        <Modal visible={false} layout="sheet" title="Premium">
+          Content
+        </Modal>
+      </ThemeProvider>,
+    );
+    await act(async () => {
+      jest.advanceTimersByTime(100);
+    });
+
+    screen.rerender(
+      <ThemeProvider mode="light">
+        <Modal visible layout="sheet" title="Premium">
+          Content
+        </Modal>
+      </ThemeProvider>,
+    );
+    await act(async () => {
+      jest.advanceTimersByTime(400);
+    });
+
+    expect(screen.queryByTestId("native-dialog-card")).toBeTruthy();
+    jest.useRealTimers();
+  });
+
+  it("unmounts the sheet immediately when reduce motion is enabled", async () => {
+    jest.useFakeTimers();
+    setViewport(390, 844);
+    mockIsReduceMotionEnabled.mockResolvedValue(true);
+
+    const screen = renderControl(
+      <Modal visible layout="sheet" title="Premium">
+        Content
+      </Modal>,
+    );
+    await act(async () => {});
+
+    screen.rerender(
+      <ThemeProvider mode="light">
+        <Modal visible={false} layout="sheet" title="Premium">
+          Content
+        </Modal>
+      </ThemeProvider>,
+    );
+    await act(async () => {});
+
+    expect(screen.queryByTestId("native-dialog-card")).toBeNull();
+    jest.useRealTimers();
   });
 });
