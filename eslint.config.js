@@ -79,6 +79,8 @@ module.exports = defineConfig([
     files: [
       "src/services/kokoroTts.ts",
       "src/services/networkFetch.ts",
+      "src/services/phonemePackArchive.ts",
+      "src/services/phonemePacks.ts",
       "src/services/providerResilience.ts",
     ],
     rules: {

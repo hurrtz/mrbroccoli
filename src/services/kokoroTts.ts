@@ -24,6 +24,7 @@ import {
   LOCAL_MODEL_CATALOG_VERSION,
   getLocalModel,
 } from "../constants/localModels";
+import type { SpeechLanguage } from "../constants/speechLanguages";
 import {
   probeLocalDeviceCapabilities,
   saveLocalModelBenchmarkResult,
@@ -535,6 +536,12 @@ export async function benchmarkKokoroModel(
 export async function downloadKokoroModel(params?: {
   onProgress?: (progress: KokoroDownloadProgress) => void;
   abortSignal?: AbortSignal;
+  /**
+   * Conversation languages whose libphonemize packs should be installed
+   * alongside the model. Omitting them installs no packs, leaving the voice
+   * dependent on packs already present.
+   */
+  phonemeLanguages?: SpeechLanguage[];
 }) {
   const {
     downloadModelByCategory,
@@ -598,6 +605,24 @@ export async function downloadKokoroModel(params?: {
     throw new Error(
       "The Kokoro download finished, but its model files could not be found.",
     );
+  }
+
+  // The shipped sherpa runtime is espeak-free: phonemization resolves
+  // through libphonemize, which loads its packs from the model data
+  // directory. Install the packs for the requested languages so the voice
+  // can speak them; a failure here leaves the model usable for whatever
+  // packs are already present rather than failing the download.
+  if (status.rootPath && params?.phonemeLanguages?.length) {
+    const { installPhonemePacks } = require("./phonemePacks") as
+      typeof import("./phonemePacks");
+
+    for (const language of params.phonemeLanguages) {
+      await installPhonemePacks(
+        `${status.rootPath}/espeak-ng-data`,
+        language,
+        { abortSignal: params?.abortSignal },
+      ).catch(() => undefined);
+    }
   }
 }
 

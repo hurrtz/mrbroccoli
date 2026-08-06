@@ -87,9 +87,24 @@ providers. They can change independently of an app release.
   incorporated into customer products, but every selected model also carries
   its provider's model-specific terms.
 
-## Open licensing gate — eSpeak NG in the sherpa runtime (2026-08-06)
+## Resolved licensing gate — eSpeak NG removed from the runtime (2026-08-06)
 
-**Status: unresolved. Blocks proprietary store distribution until settled.**
+**Status: resolved. The shipped runtime contains no eSpeak NG code.**
+
+The app now builds against
+[sherpa-onnx-espeak-free](https://github.com/hurrtz/sherpa-onnx-espeak-free)
+(Apache-2.0 fork of sherpa-onnx built with `SHERPA_ONNX_ENABLE_ESPEAK=OFF`)
+with phonemization routed into
+[libphonemize](https://github.com/hurrtz/libphonemize) (Apache-2.0), which
+covers every Free conversation language. `npm run espeak-free:verify`
+checks the installed binaries for real eSpeak markers, and
+`node scripts/install-espeak-free-runtime.mjs` installs the verified
+prebuilts into the wrapper. Language packs are pinned, checksum-verified
+artifacts installed beside the speech model (see `src/constants/phonemePacks.ts`).
+
+The original finding is retained below for provenance.
+
+### Original finding
 
 Binary inspection of the pinned `react-native-sherpa-onnx` prebuilt
 (sherpa-onnx 1.12.34) confirms that eSpeak NG is compiled into the
@@ -121,9 +136,9 @@ Resolution options, in rough order of preference:
 3. Obtain a qualified legal opinion that the concrete linkage and conveyance
    here does not trigger GPL-3.0 obligations (unlikely for static linking).
 
-Until one of these lands, store submissions must treat this as a release
-blocker; do not paper over it by adding a GPL notice, because a notice alone
-does not satisfy GPL source-conveyance obligations for a proprietary app.
+Resolution taken: option 1 — an espeak-free runtime rebuild plus a
+permissive phonemizer. Both live in dedicated repositories with their own
+living specs and binary verification gates.
 
 ## Operational rules
 

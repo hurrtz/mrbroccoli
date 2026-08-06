@@ -113,6 +113,20 @@ integrity snapshots, debug logs, and caches. Restore validates the complete
 shape before mutation and delegates non-destructive conversation merging to the
 conversation hook.
 
+### Phonemization runtime
+
+The shipped sherpa-onnx runtime is built without eSpeak NG (GPL-3.0);
+Kokoro and Piper text-to-phoneme conversion resolves through libphonemize
+(Apache-2.0). `scripts/install-espeak-free-runtime.mjs` installs the
+verified prebuilts into the wrapper and re-checks every binary for eSpeak
+markers before writing.
+
+**Decision:** Language packs are curated artifacts with the same integrity
+contract as the local model catalogue — pinned source, exact size, SHA-256
+verified before extraction, installed beside the speech model's data
+directory. A missing pack yields no phonemes and the turn falls back to
+system speech; the runtime never guesses pronunciations.
+
 **Decision:** Export never claims silent completeness. Conversations whose
 stored body cannot be read are counted and surfaced to the user instead of
 being dropped from the backup without a trace.

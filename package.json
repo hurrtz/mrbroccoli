@@ -29,6 +29,8 @@
     "fresh-checkout:test": "node --test scripts/run-fresh-checkout-validation.test.mjs",
     "license:notices:generate": "node scripts/verify-licenses.mjs --write",
     "license:verify": "node scripts/verify-licenses.mjs",
+    "espeak-free:install": "node scripts/install-espeak-free-runtime.mjs",
+    "espeak-free:verify": "node scripts/install-espeak-free-runtime.mjs --check",
     "license:test": "node --test scripts/verify-licenses.test.mjs",
     "release-notes:verify": "node scripts/verify-release-notes.mjs",
     "release-notes:test": "node --test scripts/verify-release-notes.test.mjs",
