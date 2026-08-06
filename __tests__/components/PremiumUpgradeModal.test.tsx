@@ -190,9 +190,14 @@ describe("PremiumUpgradeModal", () => {
     ).toBeTruthy();
     expect(screen.getByText("Buy Premium · €14.99")).toBeTruthy();
 
-    const body = StyleSheet.flatten(
-      screen.getByTestId("native-dialog-body").props.style,
+    // Sheet-specific: the card's height clamp only appears when `layout`
+    // resolves to "sheet". At a 390x844 viewport with zero safe-area insets
+    // that clamp is min(844 * 0.85, 844 - 0) = 717.4. The plain dialog layout
+    // has no maxHeight number here (it uses a percentage string), so this
+    // assertion fails if the sheet opt-in regresses.
+    const card = StyleSheet.flatten(
+      screen.getByTestId("native-dialog-card").props.style,
     );
-    expect(body.flexShrink).toBe(1);
+    expect(card.maxHeight).toBe(717.4);
   });
 });
