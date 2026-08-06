@@ -109,8 +109,8 @@
 		8A5C26011111111111111124 /* MrBroccoliAudioQueueSession.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = MrBroccoliAudioQueueSession.m; path = MrBroccoli/MrBroccoliAudioQueueSession.m; sourceTree = "<group>"; };
 		8A5C26011111111111111125 /* MrBroccoliAudioQueueCoordinator.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = MrBroccoliAudioQueueCoordinator.m; path = MrBroccoli/MrBroccoliAudioQueueCoordinator.m; sourceTree = "<group>"; };
 		AA286B85B6C04FC6940260E9 /* SplashScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = SplashScreen.storyboard; path = MrBroccoli/SplashScreen.storyboard; sourceTree = "<group>"; };
-		BB2F792C24A3F905000567C9 /* Expo.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Expo.plist; sourceTree = "<group>"; };
 		B4A100000000000000000001 /* MrBroccoli.storekit */ = {isa = PBXFileReference; lastKnownFileType = text; path = MrBroccoli/MrBroccoli.storekit; sourceTree = "<group>"; };
+		BB2F792C24A3F905000567C9 /* Expo.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Expo.plist; sourceTree = "<group>"; };
 		C01A00000000000000000011 /* MrBroccoliVoiceActivityAttributes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MrBroccoliVoiceActivityAttributes.swift; sourceTree = "<group>"; };
 		C01A00000000000000000012 /* MrBroccoliVoiceLiveActivity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MrBroccoliVoiceLiveActivity.swift; sourceTree = "<group>"; };
 		C01A00000000000000000013 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -1015,10 +1015,10 @@
 					"$(inherited)",
 				);
 				LIBRARY_SEARCH_PATHS = "$(SDKROOT)/usr/lib/swift\"$(inherited)\"";
-				MTL_ENABLE_DEBUG_INFO = NO;
 				MR_BROCCOLI_LOCAL_APP_ICON = AppIcon;
 				MR_BROCCOLI_LOCAL_BUNDLE_SUFFIX = "";
 				MR_BROCCOLI_LOCAL_DISPLAY_SUFFIX = "";
+				MTL_ENABLE_DEBUG_INFO = NO;
 				OTHER_CFLAGS = (
 					"$(inherited)",
 					"-DRCT_REMOVE_LEGACY_ARCH=1",

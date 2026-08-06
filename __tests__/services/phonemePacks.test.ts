@@ -49,7 +49,7 @@ describe("phoneme packs", () => {
       expect(pack.downloadBytes).toBeGreaterThan(0);
       expect(pack.license).not.toHaveLength(0);
       expect(getPhonemePackDownloadUrl(pack)).toBe(
-        `https://github.com/hurrtz/libphonemize/releases/download/packs-v2/${pack.id}.tar.bz2`,
+        `https://github.com/hurrtz/libphonemize/releases/download/packs-v3/${pack.id}.tar.bz2`,
       );
     }
   });
