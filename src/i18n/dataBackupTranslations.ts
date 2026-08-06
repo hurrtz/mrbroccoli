@@ -118,7 +118,7 @@ export const dataBackupTranslations = {
     conversationArchiveDescription:
       "Speichere lesbare Markdown-Kopien deiner Gespräche in einem Dateien- oder Drive-Ordner für andere KI-Apps.",
     conversationArchiveWarning:
-      "Archivdateien sind Klartext. Jede Person mit Ordnerzugriff kann sie lesen. Beim Trennen bleiben die Dateien erhalten.",
+      "Archivdateien sind Klartext. Jede Person mit Ordnerzugriff kann sie lesen. Beim Trennen enden die Aktualisierungen, die Dateien bleiben aber erhalten.",
     conversationArchiveChooseFolder: "Archivordner wählen",
     conversationArchiveChangeFolder: "Ordner ändern",
     conversationArchiveSyncNow: "Jetzt synchronisieren",
@@ -157,7 +157,7 @@ export const dataBackupTranslations = {
     encryptedBackupPassphraseTitle: "Verschlüsselte Sicherung entsperren",
     backupRestorePreviewTitle: "Diese Sicherung wiederherstellen?",
     backupRestorePreviewMessage: ({ conversationCount, appVersion }) =>
-      `Diese Sicherung aus Version ${appVersion} enthält ${conversationCount} Gespräche und App-Einstellungen. Bestehende Daten und API-Schlüssel werden nicht ersetzt; Konflikte werden als Kopien hinzugefügt.`,
+      `Diese Sicherung aus Version ${appVersion} enthält ${conversationCount} Gespräche und App-Einstellungen. Bestehende Daten und API-Schlüssel werden nicht ersetzt; in Konflikt stehende Gespräche werden als Kopien hinzugefügt.`,
     restoreBackup: "Sicherung wiederherstellen",
     backupRestoreComplete: ({ restored, copied, skipped }) =>
       `${restored} Gespräche wiederhergestellt (${copied} wegen Konflikten kopiert, ${skipped} bereits vorhanden). Einstellungen wurden wiederhergestellt; API-Schlüssel blieben unverändert.`,
@@ -180,7 +180,7 @@ export const dataBackupTranslations = {
       "Експортуйте або відновлюйте налаштування й розмови.",
     conversationArchive: "Архів розмов для ШІ",
     conversationArchiveDescription:
-      "Зберігайте читабельні Markdown-копії розмов у папці Files або Drive для інших застосунків ШІ.",
+      "Зберігайте читабельні Markdown-копії розмов у папці «Файли» або Drive для інших застосунків ШІ.",
     conversationArchiveWarning:
       "Файли архіву є звичайним текстом. Їх може прочитати кожен із доступом до папки. Після від’єднання файли залишаться.",
     conversationArchiveChooseFolder: "Вибрати папку архіву",

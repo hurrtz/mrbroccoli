@@ -65,7 +65,7 @@ export const sv = {
     "Visa eller dölj den guidade konfigurationsgenvägen i inställningsöversikten.",
   settingsConnectionsSummary: "Leverantörsnycklar, validering och funktioner.",
   settingsThinkingSummary:
-    "Hemkort, modeller, ansträngning och systemuppmaning.",
+    "Hemkort, modeller, ansträngning och systemprompt.",
   settingsListeningSummary: "Inmatningsläge och tal-till-text-dirigering.",
   settingsSpeakingSummary:
     "Talade svar, uppspelning, röster och förhandsvisningar.",
@@ -107,7 +107,7 @@ export const sv = {
   portuguese: "portugisiska",
   portugueseBrazil: "portugisiska (Brasilien)",
   russian: "ryska",
-  simplifiedChinese: "Förenklad kinesiska",
+  simplifiedChinese: "förenklad kinesiska",
   arabic: "arabiska",
   japanese: "japanska",
   hungarian: "ungerska",
@@ -133,7 +133,8 @@ export const sv = {
     "Forma den dolda vägledningen som styr assistenten innan någon leverantör ser förfrågan.",
   providersTabDescription:
     "Lagra autentiseringsuppgifter för extern tjänst på enheten och konfigurera de svarslägen du vill använda.",
-  webSearchTabDescription: "Konfigurera valfritt live webbkontext före svar.",
+  webSearchTabDescription:
+    "Konfigurera valfri webbkontext i realtid före svar.",
   responseModes: "Modellval",
   aboutModelSelection: "Om modellval",
   modelSelectionInfo:
@@ -145,7 +146,7 @@ export const sv = {
     "Lägg till autentiseringsuppgifter först. Ruttkontroller förblir dolda tills minst en kompatibel tjänst har konfigurerats.",
   useResponseMode: ({ mode }) => `Använd ${mode}`,
   chooseResponseModel: "Välj en modell",
-  responseModelCount: ({ count }) => `${count}-modeller tillgängliga`,
+  responseModelCount: ({ count }) => `${count} modeller tillgängliga`,
   ulraMode: "Superläge",
   ulraModeHomeLabel: "Visa Superläge på startskärmen",
   ulraModeSettingsDescription:
@@ -176,7 +177,7 @@ export const sv = {
     "Styr när svar börjar tala och vilken backend som hanterar talad utdata.",
   brief: "Kort",
   briefDescription:
-    "Håll svaret noggrant. Använd det minsta antal meningar som behövs för att svara användaren fullt ut.",
+    "Håll svaret kort och stramt. Använd det minsta antal meningar som behövs för att svara användaren fullt ut.",
   normal: "Normal",
   normalDescription:
     "Sträva efter en balanserad svarslängd. Täck de viktiga punkterna utan att dra ut svaret.",
@@ -186,12 +187,12 @@ export const sv = {
   professional: "Professionell",
   professionalDescription:
     "Tala som en senior konsult som informerar en kund. Exakt språk, ingen slang, mätt och auktoritativ.",
-  casual: "Casual",
+  casual: "Avslappnad",
   casualDescription:
-    "Prata som en smart vän på ett kafé. Avslappnad, naturlig, konverserande. Sammandragningar är bra, tangenter är bra.",
+    "Prata som en smart vän på ett kafé. Avslappnat, naturligt, samtalston. Sammandragningar är okej, utvikningar är okej.",
   nerdy: "Nördigt",
   nerdyDescription:
-    "Tala som en entusiastisk expert som älskar att gå på djupet. Använd teknisk terminologi fritt, nörd med detaljer, anta att användaren kan hänga med.",
+    "Tala som en entusiastisk expert som älskar att gå på djupet. Använd teknisk terminologi fritt, nörda ner dig i detaljerna och anta att användaren hänger med.",
   concise: "Kortfattad",
   conciseDescription:
     "Var så kort som möjligt samtidigt som du är komplett. Ingen ingress, ingen fyllnadstext, bara svaret. Tänk telegramstil.",
@@ -202,7 +203,7 @@ export const sv = {
   eli5Description:
     "Förklara allt så enkelt som möjligt. Använd analogier, vardagsspråk, noll jargong. Antag inga förkunskaper om något ämne.",
   useProvider: ({ provider }) => `Använd ${provider}`,
-  createApiKey: "Inloggningsuppgifter",
+  createApiKey: "Autentiseringsuppgifter",
   apiKey: "API-nyckel",
   aboutThisProvider: "Om denna leverantör",
   openRouterOnboardingTitle: "En nyckel, flera leverantörer",
@@ -210,16 +211,16 @@ export const sv = {
     "Skapa en dedikerad OpenRouter-nyckel, klistra in den nedan och använd ögonblicksbildsbaserade modeller från flera leverantörer utan att ersätta någon direkt anslutning.",
   openRouterOnboardingRoute:
     "Sökväg för begäran: denna enhet → OpenRouter → vald uppströmsleverantör",
-  openRouterKeys: "OpenRouter nycklar",
+  openRouterKeys: "OpenRouter-nycklar",
   providerStatusInvalid: "Ogiltig",
   providerStatusTesting: "Testning",
   providerStatusConfigured: "Konfigurerad",
-  providerStatusWorking: "Arbetar",
+  providerStatusWorking: "Fungerar",
   providerStatusNotTested: "Ej testad",
-  providerStatusNotSetup: "Ej inställd",
+  providerStatusNotSetup: "Ej konfigurerad",
   expandProvider: ({ provider }) => `Expandera ${provider}`,
-  collapseProvider: ({ provider }) => `Komprimera ${provider}`,
-  testProviderKey: "Testnyckel",
+  collapseProvider: ({ provider }) => `Fäll ihop ${provider}`,
+  testProviderKey: "Testa nyckeln",
   testAllCapabilities: "Testa alla",
   apiTest: "API-test",
   testProviderCapability: ({ capability }) => `Testa ${capability}`,
@@ -238,9 +239,9 @@ export const sv = {
   validatingKey: "Validerar...",
   showKey: "Visa nyckel",
   hideKey: "Dölj nyckel",
-  assistantInstructions: "Assistent instruktioner",
+  assistantInstructions: "Assistentinstruktioner",
   systemPrompt: "Systemprompt",
-  aboutSystemPrompt: "Om systemuppmaningen",
+  aboutSystemPrompt: "Om systemprompten",
   assistantInstructionsIntro:
     "Forma den dolda vägledningen som modellen får före varje svar.",
   baseInstructions: "Grundinstruktioner",
@@ -253,9 +254,9 @@ export const sv = {
   styleSheetTitle: "Konversationsinställningar",
   styleSheetSubtitle: "Forma svar och tal endast för denna konversation.",
   openStyleSheet: "Öppna konversationsinställningar",
-  conversationThinkingInstructions: "Tänkande instruktioner",
+  conversationThinkingInstructions: "Instruktioner för tänkande",
   conversationThinkingInstructionsDescription:
-    "Lägg till instruktioner efter den globala systemuppmaningen för den här konversationen.",
+    "Lägg till instruktioner efter den globala systemprompten för den här konversationen.",
   conversationThinkingInstructionsPlaceholder:
     "Till exempel: Utmana mina antaganden och använd konkreta exempel.",
   ttsInstructions: "Instruktioner för talleverans",
@@ -286,7 +287,7 @@ export const sv = {
   pushToTalk: "Tryck för att prata",
   pushToTalkDescription:
     "Håll ned huvudknappen medan du talar och släpp sedan för att skicka.",
-  toggleToTalk: "Växla till Tala",
+  toggleToTalk: "Växla för att prata",
   toggleToTalkDescription:
     "Tryck en gång för att börja spela in och tryck igen när du är klar.",
   driveSession: "Körläge",

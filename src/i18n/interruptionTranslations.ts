@@ -12,7 +12,7 @@ export const interruptionTranslations = {
   de: define({
     interruptedReply: "Unterbrochene Antwort",
     replyInterruptedNotice:
-      "Du hast gesprochen, bevor diese Antwort fertig war. Der erzeugte Teil wurde behalten und dein nächster Beitrag setzt hier fort.",
+      "Du hast gesprochen, bevor diese Antwort fertig war. Der erzeugte Teil wurde behalten und dein nächster Beitrag knüpft hier an.",
   }),
   uk: define({
     interruptedReply: "Перервана відповідь",

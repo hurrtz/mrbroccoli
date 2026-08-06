@@ -127,7 +127,7 @@ export const hi = {
   languageCoverage: ({ note }) => `भाषा कवरेज: ${note}`,
   recordingLimits: ({ note }) => `रिकॉर्डिंग सीमाएँ: ${note}`,
   catalogProviderPricingSummary: ({ summary }) => `मूल्य: ${summary}`,
-  replyGenerationAction: "उत्तर पीढ़ी",
+  replyGenerationAction: "उत्तर निर्माण",
   speechTranscriptionAction: "भाषण प्रतिलेखन",
   speechSynthesisAction: "वाक् संश्लेषण",
   instructionsTabDescription:
@@ -187,11 +187,11 @@ export const hi = {
     "गहराई तक जाएं और व्यापक बनें। बारीकियाँ, विवरण, समझौता और वह तर्क शामिल करें जो मायने रखता है।",
   professional: "पेशेवर",
   professionalDescription:
-    "किसी ग्राहक को जानकारी देने वाले वरिष्ठ सलाहकार की तरह बोलें। सटीक भाषा, कोई गाली-गलौज नहीं, नपी-तुली और आधिकारिक।",
+    "किसी ग्राहक को जानकारी देने वाले वरिष्ठ सलाहकार की तरह बोलें। सटीक भाषा, कोई स्लैंग नहीं, नपी-तुली और आधिकारिक।",
   casual: "अनौपचारिक",
   casualDescription:
-    "कॉफ़ी शॉप में एक स्मार्ट मित्र की तरह बोलें। निश्चिंत, स्वाभाविक, संवादी। संकुचन ठीक हैं, स्पर्श रेखाएँ ठीक हैं।",
-  nerdy: "बेवकूफ",
+    "कॉफ़ी शॉप में किसी समझदार दोस्त की तरह बोलें। सहज, स्वाभाविक, बातचीत जैसा। छोटे बोलचाल के रूप ठीक हैं, विषय से थोड़ा भटकना भी ठीक है।",
+  nerdy: "नर्डी",
   nerdyDescription:
     "एक उत्साही विशेषज्ञ की तरह बोलें जो गहराई तक जाना पसंद करता है। तकनीकी शब्दावली का स्वतंत्र रूप से उपयोग करें, विवरणों के बारे में जानें, मान लें कि उपयोगकर्ता जानकारी रख सकता है।",
   concise: "संक्षिप्त",
@@ -199,12 +199,12 @@ export const hi = {
     "पूर्ण होते हुए भी यथासंभव संक्षिप्त रहें। कोई प्रस्तावना नहीं, कोई पूरक नहीं, बस उत्तर। टेलीग्राम शैली में सोचें.",
   socratic: "सुकराती",
   socraticDescription:
-    "उपयोगकर्ता की सोच को चुनौती दें. प्रति-प्रश्न पूछें, वैकल्पिक दृष्टिकोण प्रस्तुत करें, केवल उन्होंने जो कहा उसकी पुष्टि न करें। एक झगड़ालू भागीदार बनें, हां-मशीन नहीं।",
+    "उपयोगकर्ता की सोच को चुनौती दें। प्रति-प्रश्न पूछें, वैकल्पिक दृष्टिकोण रखें, केवल उनकी बात की पुष्टि न करें। बहस का साथी बनें, हाँ-में-हाँ मिलाने वाली मशीन नहीं।",
   eli5: "ELI5",
   eli5Description:
     "हर चीज़ को यथासंभव सरलता से समझाएँ। उपमाओं, रोजमर्रा की भाषा, शून्य शब्दजाल का प्रयोग करें। किसी भी विषय पर कोई पूर्व ज्ञान न मानें।",
   useProvider: ({ provider }) => `${provider} का प्रयोग करें`,
-  createApiKey: "साख",
+  createApiKey: "क्रेडेंशियल",
   apiKey: "API कुंजी",
   aboutThisProvider: "इस प्रदाता के बारे में",
   openRouterOnboardingTitle: "एक कुंजी, एकाधिक प्रदाता",
@@ -219,19 +219,19 @@ export const hi = {
   providerStatusWorking: "कार्यरत",
   providerStatusNotTested: "परीक्षण नहीं किया गया",
   providerStatusNotSetup: "सेट अप नहीं",
-  expandProvider: ({ provider }) => `विस्तृत करें${provider}`,
+  expandProvider: ({ provider }) => `${provider} विस्तृत करें`,
   collapseProvider: ({ provider }) => `संक्षिप्त करें ${provider}`,
-  testProviderKey: "परीक्षण कुंजी",
+  testProviderKey: "कुंजी का परीक्षण करें",
   testAllCapabilities: "सभी का परीक्षण करें",
   apiTest: "API परीक्षण",
-  testProviderCapability: ({ capability }) => `परीक्षण ${capability}`,
-  test: "परीक्षा",
+  testProviderCapability: ({ capability }) => `${capability} का परीक्षण करें`,
+  test: "परीक्षण",
   optional: "वैकल्पिक",
   providerCapability_llm: "जवाब",
   providerCapability_stt: "भाषण इनपुट",
   providerCapability_tts: "ध्वनि आउटपुट",
   providerCapability_search: "वेब खोज",
-  providerCapability_voices: "आवाज पुस्तकालय",
+  providerCapability_voices: "वॉयस लाइब्रेरी",
   providerValidationUnavailable:
     "इस प्रदाता के लिए लाइव सत्यापन अभी तक वायर्ड नहीं किया गया है। कुंजी को यहां सहेजें और वास्तविक उपयोग के दौरान इसे सत्यापित करें।",
   providerNeedsAttention: "ध्यान देने की जरूरत है",
@@ -257,7 +257,7 @@ export const hi = {
   openStyleSheet: "वार्तालाप सेटिंग खोलें",
   conversationThinkingInstructions: "सोच निर्देश",
   conversationThinkingInstructionsDescription:
-    "इस वार्तालाप के लिए वैश्विक सिस्टम संकेत के बाद निर्देश जोड़ें।",
+    "इस वार्तालाप के लिए वैश्विक सिस्टम प्रॉम्प्ट के बाद निर्देश जोड़ें।",
   conversationThinkingInstructionsPlaceholder:
     "उदाहरण के लिए: मेरी धारणाओं को चुनौती दें और ठोस उदाहरणों का उपयोग करें।",
   ttsInstructions: "भाषण वितरण निर्देश",
@@ -272,7 +272,7 @@ export const hi = {
   conversationVoiceDescription: ({ route }) =>
     `इस बातचीत में ${route} द्वारा इस्तेमाल की गई आवाज़ चुनें।`,
   scrollToLatest: "नवीनतम संदेश तक स्क्रॉल करें",
-  conversationTitleGenerate: "स्वतः-उत्पन्न शीर्षक",
+  conversationTitleGenerate: "शीर्षक स्वतः बनाएँ",
   conversationTitleGenerating: "शीर्षक जनरेट किया जा रहा है...",
   conversationTitleGenerated: "बातचीत का नाम बदल दिया गया.",
   conversationTitleNeedsContent:
@@ -284,7 +284,7 @@ export const hi = {
     "शीर्षक निर्माण में बहुत अधिक समय लगा. कृपया पुन: प्रयास करें।",
   inputMode: "इनपुट मोड",
   voiceInput: "ध्वनि इनपुट",
-  pushToTalk: "बात करने के लिए धक्का",
+  pushToTalk: "दबाकर बोलें",
   pushToTalkDescription:
     "बोलते समय मुख्य बटन दबाए रखें, फिर भेजने के लिए छोड़ दें।",
   toggleToTalk: "बात करने के लिए टॉगल करें",
@@ -293,8 +293,8 @@ export const hi = {
   driveSession: "ड्राइव सत्र",
   driveSessionDescription:
     "जब स्वचालित निरंतरता चालू होती है, तो प्रत्येक बोले गए उत्तर के बाद रिकॉर्डिंग शुरू हो जाती है। जब आपका बोलना समाप्त हो जाए तो मुख्य बटन पर टैप करें।",
-  stopDriveSession: "स्वतः रोकें",
-  repeatDriveReply: "अंतिम बार दोहराएँ",
+  stopDriveSession: "ऑटो रोकें",
+  repeatDriveReply: "अंतिम उत्तर दोहराएँ",
   continueDriveSession: "ऑटो फिर से शुरू करें",
   speechToText: "भाषण से पाठ तक",
   appNative: "सिस्टम पहचान",
@@ -320,10 +320,10 @@ export const hi = {
     "जब वर्तमान तथ्य महत्वपूर्ण हों तो इस थ्रेड के लिए लाइव वेब संदर्भ का उपयोग करें।",
   webSearchQualityControls: "खोज गुणवत्ता",
   webSearchSearchMode: "खोज मोड",
-  webSearchSearchModeQuick: "जल्दी",
+  webSearchSearchModeQuick: "त्वरित",
   webSearchSearchModeBalanced: "संतुलित",
   webSearchSearchModeDeep: "गहरा",
-  webSearchDepth: "गहराई खोजें",
+  webSearchDepth: "खोज गहराई",
   webSearchDepthStandard: "मानक",
   webSearchDepthDeep: "गहरा",
   webSearchResultCount: "परिणाम गणना",
@@ -349,7 +349,7 @@ export const hi = {
   fullReplyFirst: "पूर्ण उत्तर पहले",
   fullReplyFirstDescription:
     "पहले संपूर्ण उत्तर तैयार करें, फिर उसे एक बार में चलाएँ।",
-  textToSpeech: "भाषण के पाठ",
+  textToSpeech: "पाठ से भाषण",
   spokenReplies: "मौखिक उत्तर",
   spokenRepliesEnabledDescription:
     "ध्वनि मार्ग उपलब्ध होने पर सहायक उत्तरों को ज़ोर से पढ़ें।",
@@ -368,7 +368,8 @@ export const hi = {
   kokoroExtracting: ({ progress }) => `इंस्टाल किया जा रहा है… ${progress}%`,
   kokoroVerifying: "ध्वनि इंजन का सत्यापन किया जा रहा है...",
   kokoroInstalled: "इस डिवाइस पर इंस्टॉल और तैयार है.",
-  kokoroNotInstalled: "वैकल्पिक डाउनलोड. किसी प्रदाता कुंजी की आवश्यकता नहीं है.",
+  kokoroNotInstalled:
+    "Kokoro चुनने या उपयोग करने से पहले मॉडल डाउनलोड और सत्यापित करें। किसी प्रदाता कुंजी की आवश्यकता नहीं है।",
   kokoroLanguageFallback:
     "Kokoro वर्तमान में यहां अंग्रेजी और सरलीकृत चीनी भाषा बोलता है। अन्य चयनित उत्तर भाषाओं के लिए, एक स्पष्ट फ़ॉलबैक रूट जोड़ें अन्यथा भाषण एक त्रुटि के साथ बंद हो जाएगा।",
   kokoroRemoveTitle: "Kokoro मॉडल निकालें?",
@@ -383,7 +384,7 @@ export const hi = {
   expandVoiceSettings: ({ language }) => `${language} ध्वनि सेटिंग विस्तृत करें`,
   collapseVoiceSettings: ({ language }) =>
     `${language} ध्वनि सेटिंग संक्षिप्त करें`,
-  remove: "निकालना",
+  remove: "हटाएँ",
   voiceOutputDescription:
     "बोले गए उत्तरों के लिए वाक् इंजन, सुनने की भाषाएँ और ध्वनि पूर्वावलोकन चुनें।",
   localTts: "स्थानीय",
@@ -415,7 +416,7 @@ export const hi = {
   localTtsLanguageCoverageHint:
     "स्थानीय पैक में वर्तमान में अंग्रेजी, जर्मन, सरलीकृत चीनी, स्पेनिश, पुर्तगाली, हिंदी, फ्रेंच और इतालवी शामिल हैं।",
   ttsVoice: "TTS आवाज",
-  refresh: "ताज़ा करना",
+  refresh: "रीफ़्रेश करें",
   providerVoiceDirectory: ({ provider }) => `${provider} वॉयस लाइब्रेरी`,
   refreshProviderVoices: ({ provider }) => `${provider} आवाजें ताज़ा करें`,
   providerVoicesAvailable: ({ count, provider }) =>

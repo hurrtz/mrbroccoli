@@ -322,7 +322,7 @@ export const onDeviceTranslations = {
     chooseOnDeviceSttModel:
       "Wähle in den Einstellungen ein Modell zur Spracherkennung auf dem Gerät aus.",
     chooseOnDeviceTtsModel:
-      "Wähle in den Einstellungen ein Sprachmodell auf dem Gerät aus.",
+      "Wähle in den Einstellungen ein Modell zur Sprachausgabe auf dem Gerät aus.",
   }),
   uk: define({
     ...performanceTranslations.uk,

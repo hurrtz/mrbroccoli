@@ -63,7 +63,7 @@ export const conversationKnowledgeTranslations = {
     markConversationPrivate: "Als privat markieren",
     includeConversationInKnowledge: "Für früheres Wissen zulassen",
     privateConversationDescription:
-      "Private Gespräche behalten ihr eigenes Sitzungsgedächtnis, tragen aber nie zum Wissen aus früheren Gesprächen bei.",
+      "Private Gespräche behalten ihren eigenen Gesprächsspeicher, tragen aber nie zum Wissen aus früheren Gesprächen bei.",
     conversationMarkedPrivate: "Gespräch als privat markiert",
     conversationIncludedInKnowledge: "Gespräch kann zu früherem Wissen beitragen",
     knowledgeReferences: "Frühere Gespräche",
@@ -84,7 +84,7 @@ export const conversationKnowledgeTranslations = {
     usePastConversationKnowledgeDescription:
       "Створює похідний локальний індекс і знаходить кілька доречних уривків для кожного запиту.",
     pastConversationKnowledgeDisclosure:
-      "Індексування та пошук відбуваються на цьому пристрої. Знайдені уривки надсилаються постачальнику моделі разом із запитом. Вимкнення видаляє похідний індекс. Приватні розмови ніколи не індексуються.",
+      "Індексування та пошук відбуваються на цьому пристрої. Знайдені уривки надсилаються провайдеру моделі разом із запитом. Вимкнення видаляє похідний індекс. Приватні розмови ніколи не індексуються.",
     privateConversation: "Приватна розмова",
     markConversationPrivate: "Позначити приватною",
     includeConversationInKnowledge: "Дозволити в попередніх знаннях",
@@ -93,13 +93,13 @@ export const conversationKnowledgeTranslations = {
     conversationMarkedPrivate: "Розмову позначено приватною",
     conversationIncludedInKnowledge: "Розмова може додаватися до попередніх знань",
     knowledgeReferences: "Попередні розмови",
-    knowledgeSourceCount: ({ count }) => `${count} джерел`,
+    knowledgeSourceCount: ({ count }) => `Джерел: ${count}`,
     knowledgeUserAuthoredOnly: "Лише повідомлення користувача",
     knowledgeMatchStrong: "Висока відповідність",
     knowledgeMatchRelated: "Пов’язана відповідність",
     expandKnowledgeDetails: "Показати джерела з попередніх розмов",
     collapseKnowledgeDetails: "Сховати джерела з попередніх розмов",
-    turnReceiptPastKnowledge: ({ count }) => `попередні знання · ${count} джерел`,
+    turnReceiptPastKnowledge: ({ count }) => `попередні знання · джерел: ${count}`,
     turnReceiptTimingKnowledge: "пам’ять",
   },
   hi: {

@@ -44,9 +44,9 @@ const rawUlraAuditTranslations = {
     collapseUlraAudit: "Übermodus-Prüfpfad ausblenden",
   }),
   uk: define({
-    ulraAuditTitle: "Аудит Суперрежим",
+    ulraAuditTitle: "Аудит Суперрежиму",
     ulraAuditSummary: ({ failed, rounds, successful }) =>
-      `${successful} успішно · ${failed} невдало · ${rounds} раундів перевірки`,
+      `${successful} успішно · ${failed} невдало · ${rounds} раундів перегляду`,
     ulraAuditConverged: "Усі активні рецензенти явно дійшли згоди.",
     ulraAuditUnresolved:
       "Повної згоди не досягнуто; у фінальній відповіді можуть залишатися суттєві розбіжності.",
@@ -58,8 +58,8 @@ const rawUlraAuditTranslations = {
       `Історія синтезу: ${retained} збережено · ${omitted} пропущено · ${tokens} проміжних токенів`,
     ulraAuditRoutes: "Маршрути учасників",
     ulraAuditContract: ({ contract }) => `Контракт синтезу: ${contract}`,
-    expandUlraAudit: "Показати аудит Суперрежим",
-    collapseUlraAudit: "Сховати аудит Суперрежим",
+    expandUlraAudit: "Показати аудит Суперрежиму",
+    collapseUlraAudit: "Сховати аудит Суперрежиму",
   }),
   hi: define({
     ulraAuditTitle: "सर्वोच्च मोड ऑडिट",

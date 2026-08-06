@@ -49,12 +49,12 @@ export const onboardingTranslations = {
     onboardingBestSetupRecordingModel: "Modell für Aufnahmen",
     onboardingBestSetupSpeakingModel: "Modell zum Sprechen",
     onboardingQuickOnly: "Nur schnell",
-    onboardingEstimatedTime: ({ eta }) => `Geschätzte Einrichtung · ${eta}`,
+    onboardingEstimatedTime: ({ eta }) => `Geschätzte Einrichtungszeit · ${eta}`,
     onboardingProgress: ({ percent, eta }) => `${percent} % · noch etwa ${eta}`,
     onboardingStepsRemaining: ({ remaining, count }) =>
       `${remaining} von ${count} Schritten verbleiben`,
     onboardingModelCaution:
-      "Größere Modelle können langsamer antworten, mehr Speicher nutzen und das Smartphone bei langen Sitzungen erwärmen. Vor der Nutzung muss der Gerätetest bestehen.",
+      "Größere Modelle können langsamer antworten, mehr Speicher nutzen und das Smartphone bei langen Sitzungen erwärmen. Vor der Nutzung muss der Gerätetest bestanden werden.",
   }),
   uk: define({
     onboardingAdvancedOptions: "Розширені параметри",

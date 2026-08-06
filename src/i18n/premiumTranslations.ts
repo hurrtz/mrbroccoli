@@ -64,9 +64,9 @@ const rawPremiumTranslations = {
     premiumBuyPrice: ({ price }) => `Premium kaufen · ${price}`,
     restorePurchase: "Kauf wiederherstellen",
     premiumRestoreHint: Platform.select({
-      ios: "Ein dauerhafter Kauf wird über dasselbe App-Store-Konto auf dieser Plattform wiederhergestellt. Ein Mr Broccoli Konto ist nicht erforderlich.",
+      ios: "Ein dauerhafter Kauf wird über dasselbe App-Store-Konto auf dieser Plattform wiederhergestellt. Ein Mr-Broccoli-Konto ist nicht erforderlich.",
       default:
-        "Ein dauerhafter Kauf wird über dasselbe Play-Store-Konto auf dieser Plattform wiederhergestellt. Ein Mr Broccoli Konto ist nicht erforderlich.",
+        "Ein dauerhafter Kauf wird über dasselbe Play-Store-Konto auf dieser Plattform wiederhergestellt. Ein Mr-Broccoli-Konto ist nicht erforderlich.",
     }),
     premiumUnlocked: "Premium ist freigeschaltet",
     developmentEntitlement: "Entwicklungsberechtigung",

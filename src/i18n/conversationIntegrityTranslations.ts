@@ -69,7 +69,7 @@ export const conversationIntegrityTranslations = {
     conversationIntegrity: "Цілісність розмови",
     reviewConversationIntegrity: "Перевірити цілісність розмови",
     conversationIntegrityDescription:
-      "Перевіряє збережені відповіді асистента на внутрішній контекст, який не мав з'явитися. Нічого не зміниться без вашого підтвердження.",
+      "Перевіряє збережені відповіді асистента на внутрішній контекст, який не мав з’явитися. Нічого не зміниться без вашого підтвердження.",
     conversationIntegrityChecking: "Перевірка збережених відповідей…",
     conversationIntegrityCouldNotLoad:
       "Не вдалося перевірити цю розмову. Спробуйте пізніше.",

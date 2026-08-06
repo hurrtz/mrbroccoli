@@ -37,6 +37,14 @@ the complete Play Store translations are kept in a dedicated file under
 
 ### Fixed
 
+- Correct machine-translation defects in the German, French, Ukrainian,
+  Arabic, Spanish, Hindi, Japanese, Portuguese, Brazilian Portuguese, and
+  Swedish interface copy. The worst cases changed meaning rather than only
+  reading awkwardly: speech-to-text and text-to-speech instructions named the
+  opposite feature, "web grounding" appeared as electrical earthing, "Resume"
+  became the word for a curriculum vitae, "Back" became the body part, and the
+  debug LOG button was named after a wooden log. Action buttons, live status
+  labels, and counted plurals now follow each language's own conventions.
 - Keep dialog footer actions on-screen when a dialog's content is taller than
   the available window. The Premium dialog's Buy and Restore purchase buttons
   were pushed off-screen on small windows such as iPad compatibility mode; the

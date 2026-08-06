@@ -56,8 +56,8 @@ export const transcriptEditTranslations = {
     branchesFromMessage: "Zweige ab dieser Nachricht",
   }),
   uk: define({
-    correctTranscript: "Виправити транскрипт",
-    correctTranscriptTitle: "Виправити транскрипт",
+    correctTranscript: "Виправити стенограму",
+    correctTranscriptTitle: "Виправити стенограму",
     correctTranscriptHint:
       "Це оновить збережену історію, пошук, архів і майбутній контекст. Уже створені відповіді не зміняться.",
     saveAndSend: "Зберегти й надіслати",
@@ -76,7 +76,7 @@ export const transcriptEditTranslations = {
     backToForkPoint: "До точки відгалуження",
     branchSourceUnavailable: "Початкова гілка недоступна",
     branchCount: ({ count }) =>
-      Number(count) === 1 ? "1 гілка" : `${count} гілок`,
+      Number(count) === 1 ? "1 гілка" : `Гілок: ${count}`,
     branchesFromMessage: "Гілки від цього повідомлення",
   }),
   hi: define({

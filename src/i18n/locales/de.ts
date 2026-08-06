@@ -26,13 +26,13 @@ export const de = {
   ...premiumTranslations.de,
   ...transcriptEditTranslations.de,
   appName: "Mr. Brokkoli",
-  retry: "Noch mal",
+  retry: "Erneut versuchen",
   dismiss: "Schließen",
   done: "Fertig",
   aboutSetting: ({ setting }) => `Mehr über ${setting}`,
-  unavailable: "Gibt's nich",
+  unavailable: "Nicht verfügbar",
   selection: "Auswahl",
-  chooseCompatibleProviderFirst: "Wähle zuerst nen geeigneten Anbieter",
+  chooseCompatibleProviderFirst: "Wähle zuerst einen kompatiblen Anbieter",
   settings: "Einstellungen",
   settingsReleaseVersion: ({ version }) => `Version ${version}`,
   all: "Alle",
@@ -64,7 +64,7 @@ export const de = {
   setupGuideShowInSettings: "Geführte Einrichtung anzeigen",
   setupGuideShowInSettingsSummary:
     "Blendet die geführte Einrichtung in der Einstellungsübersicht ein oder aus.",
-  settingsConnectionsSummary: "Provider-Keys, Prüfung und Fähigkeiten.",
+  settingsConnectionsSummary: "Anbieter-Keys, Prüfung und Fähigkeiten.",
   settingsThinkingSummary:
     "Homescreen-Karten, Modelle, Aufwand und Systemprompt.",
   settingsListeningSummary: "Eingabemodus und Sprache-zu-Text-Routing.",
@@ -72,7 +72,7 @@ export const de = {
     "Gesprochene Antworten, Wiedergabe, Stimmen und Vorschau.",
   settingsSearchSummary: "Websuche-Anbieter und Regler für die Suchqualität.",
   settingsAppDiagnosticsSummary:
-    "Design, Sprache, Nutzung, Debug-Logs und letzte Aktivität.",
+    "Design, Sprache, Nutzung, Debug-Logs und letzte Sprachaktivität.",
   settingsBackToOverview: "Zurück zur Übersicht",
   settingsOpenSection: ({ section }) => `${section} öffnen`,
   theme: "Design",
@@ -240,8 +240,8 @@ export const de = {
   catalogProviderLimitsSummary: ({ summary }) => `Limits: ${summary}`,
   catalogProviderRegionSummary: ({ summary }) => `Regionen: ${summary}`,
   validatingKey: "Prüfe …",
-  showKey: "API-Key anzeigen",
-  hideKey: "API-Key ausblenden",
+  showKey: "API-Schlüssel anzeigen",
+  hideKey: "API-Schlüssel ausblenden",
   assistantInstructions: "Assistent-Anweisungen",
   systemPrompt: "Systemprompt",
   aboutSystemPrompt: "Über den Systemprompt",
@@ -266,13 +266,13 @@ export const de = {
     "Zum Beispiel: Hinterfrage meine Annahmen und nutze konkrete Beispiele.",
   ttsInstructions: "Anweisungen zur Sprachausgabe",
   ttsInstructionsDescription:
-    "Steuere Ton, Tempo, Akzent oder Ausdruck kompatibler Sprachmodelle.",
+    "Steuere Ton, Tempo, Akzent oder Ausdruck kompatibler Sprachausgabe-Modelle.",
   conversationTtsInstructionsDescription:
     "Ergänze die globalen Sprachanweisungen für dieses Gespräch.",
   ttsInstructionsPlaceholder:
     "Zum Beispiel: Sprich freundlich, klar und in ruhigem Tempo.",
   ttsInstructionsUnsupported:
-    "Die aktuelle Sprachausgabe unterstützt keine Ausführungsanweisungen.",
+    "Die aktuelle Sprachroute unterstützt keine Anweisungen zur Sprachausgabe.",
   conversationVoiceDescription: ({ route }) =>
     `Wähle die Stimme von ${route} für dieses Gespräch.`,
   scrollToLatest: "Zur neuesten Nachricht scrollen",
@@ -304,15 +304,15 @@ export const de = {
   speechToText: "Sprache zu Text",
   appNative: "Systemerkennung",
   nativeSttDescription:
-    "Verwende die Spracherkennung des Betriebssystems. Je nach Geräteeinstellung läuft sie lokal oder über den Systemdienst. Kein API-Key nötig.",
+    "Verwende die Spracherkennung des Betriebssystems. Je nach Geräteeinstellung läuft sie lokal oder über den Systemdienst. Kein API-Schlüssel nötig.",
   provider: "Anbieter",
   webSearchProvider: "Websuche-Anbieter",
   webSearchProviderMissingHint:
-    "Richte unter Zugangsdaten mindestens einen suchfähigen Dienst ein, damit Web-Grundierung hier verfügbar ist.",
+    "Richte unter Zugangsdaten mindestens einen suchfähigen Dienst ein, damit hier frischer Web-Kontext verfügbar ist.",
   webSearchModelHint: ({ model }) =>
     `Verwendet im Hintergrund ${model} für die Live-Webrecherche.`,
   webSearchHomeHint:
-    "Nutze den Homescreen-Schalter, um Web-Grundierung für dieses Gespräch ein- oder auszuschalten.",
+    "Nutze den Homescreen-Schalter, um Web-Kontext für dieses Gespräch ein- oder auszuschalten.",
   settingsWebSearchCompactHint:
     "Optional wird vor der eigentlichen Antwort frischer Web-Kontext eingefügt.",
   webSearchAdvanced: "Erweiterte Suchregler",
@@ -347,7 +347,7 @@ export const de = {
   sttProviderMissingHint:
     "Füge Zugangsdaten für einen Dienst mit STT-Unterstützung hinzu, um ihn hier auszuwählen.",
   nativeSttHint:
-    "Die Systemerkennung funktioniert unabhängig von deinen API-Keys und kann lokal oder über den Spracherkennungsdienst des Betriebssystems laufen.",
+    "Die Systemerkennung funktioniert unabhängig von deinen API-Schlüsseln und kann lokal oder über den Spracherkennungsdienst des Betriebssystems laufen.",
   replyPlayback: "Wiedergabe",
   sentencesArrive: "Absatzweise",
   sentencesArriveDescription:
@@ -362,9 +362,9 @@ export const de = {
   spokenRepliesDisabledDescription:
     "Halte Antworten vorerst textbasiert. Deine bevorzugte TTS-Route bleibt für später gespeichert.",
   nativeTtsDescription:
-    "Verwende die Sprachausgabe des Geräts für die Sprachausgabe.",
+    "Verwende die Sprachausgabe des Geräts für gesprochene Antworten und die Stimmvorschau.",
   kokoroTtsDescription:
-    "Nutze eine deutlich natürlichere neuronale Stimme vollständig auf diesem Gerät. Der Antworttext wird lokal vertont – ohne API-Key oder Nutzungskosten für einen Sprachanbieter.",
+    "Nutze eine deutlich natürlichere neuronale Stimme vollständig auf diesem Gerät. Der Antworttext wird lokal vertont – ohne API-Schlüssel oder Nutzungskosten für einen Sprachanbieter.",
   kokoroVoices: "Kokoro-Stimmen auf dem Gerät",
   kokoroVoicesHint: ({ size, installedSize }) =>
     `Das mehrsprachige Modell lädt etwa ${size} MB herunter und belegt nach der Installation ungefähr ${installedSize} MB.`,
@@ -375,7 +375,7 @@ export const de = {
   kokoroVerifying: "Prüfe die Sprachengine…",
   kokoroInstalled: "Auf diesem Gerät installiert und einsatzbereit.",
   kokoroNotInstalled:
-    "Lade das Modell herunter und prüfe es, bevor du Kokoro auswählst oder verwendest. Kein API-Key erforderlich.",
+    "Lade das Modell herunter und prüfe es, bevor du Kokoro auswählst oder verwendest. Kein API-Schlüssel erforderlich.",
   kokoroLanguageFallback:
     "Kokoro spricht hier derzeit Englisch und vereinfachtes Chinesisch. Füge für andere ausgewählte Antwortsprachen ausdrücklich eine Ausweichroute hinzu, sonst endet die Sprachausgabe mit einem Fehler.",
   kokoroRemoveTitle: "Kokoro-Modell entfernen?",
@@ -419,7 +419,7 @@ export const de = {
   providerTtsOrderHint:
     "Nur ausdrücklich konfigurierte Ausweichrouten werden versucht.",
   nativeTtsHint:
-    "Native TTS nutzt die Systemstimmen des Geräts und benötigt keinen API-Key.",
+    "Native TTS nutzt die Systemstimmen des Geräts und benötigt keinen API-Schlüssel.",
   localTtsLanguageCoverageHint:
     "Lokale Sprachpakete decken derzeit Englisch, Deutsch, vereinfachtes Chinesisch, Spanisch, Portugiesisch, Hindi, Französisch und Italienisch ab.",
   ttsVoice: "TTS-Stimme",
@@ -434,7 +434,7 @@ export const de = {
     "Die persönlichen Stimmen konnten nicht geladen werden. Die integrierte Stimme bleibt verfügbar.",
   providerVoicesErrorDetail: ({ detail }) => `Grund: ${detail}`,
   elevenLabsVoicesReadPermissionHint:
-    "Aktiviere für diesen API-Key in ElevenLabs „Voices → Read“ und aktualisiere die Stimmen anschließend hier.",
+    "Aktiviere für diesen API-Schlüssel in ElevenLabs „Voices → Read“ und aktualisiere die Stimmen anschließend hier.",
   providerVoicesLoadingHint: ({ provider }) =>
     `Mr Broccoli lädt verfügbare Stimmen automatisch von ${provider}.`,
   providerVoiceId: "Stimmen-ID",
@@ -450,7 +450,7 @@ export const de = {
   qwenRegionUs: "USA (Virginia)",
   qwenRegionBeijing: "China (Peking)",
   qwenRegionHint:
-    "Die ausgewählte Region muss der Region entsprechen, in der dieser API-Key erstellt wurde.",
+    "Die ausgewählte Region muss der Region entsprechen, in der dieser API-Schlüssel erstellt wurde.",
   qwenRegionUsSpeechHint:
     "Keys aus der US-Region unterstützen hier Chat und Websuche. Die aktuellen Qwen-Routen von Mr Broccoli für Spracherkennung und -ausgabe benötigen einen Key aus Singapur oder Peking.",
   providerDefaultVoiceHint:
@@ -480,13 +480,13 @@ export const de = {
     "Laufzeitkompatibilität löschen?",
   clearRuntimeCompatibilityOverridesConfirmationMessage:
     "Zuvor deaktivierte Konfigurationen können erneut versucht werden. Ein Anbieter kann sie erneut ablehnen.",
-  speechDiagnostics: "Letzte Aktivität",
+  speechDiagnostics: "Letzte Sprachaktivität",
   speechDiagnosticsHint:
     "Zeigt die letzten Sprachanfragen, die angefragte Route, die tatsächlich genutzte Route und den Grund für einen Fallback.",
   clearSpeechDiagnostics: "Letzte Sprachaktivität leeren",
   speechDiagnosticsEmpty:
     "Noch keine aktuellen Aktivitäten. Teste eine Stimme oder spiele eine Antwort ab, um hier Routing-Details zu sehen.",
-  clearSpeechDiagnosticsConfirmationTitle: "Letzte Aktivität leeren?",
+  clearSpeechDiagnosticsConfirmationTitle: "Letzte Sprachaktivität leeren?",
   clearSpeechDiagnosticsConfirmationMessage:
     "Dadurch werden alle erfassten Diagnoseinformationen zum Sprach-Routing gelöscht. Diese Aktion kann nicht rückgängig gemacht werden.",
   speechDiagnosticSourceConversation: "Antwort aus dem Gespräch",
@@ -575,7 +575,7 @@ export const de = {
   maxRecordingLengthReached:
     "Maximale Aufnahmelänge erreicht – ich sende, was ich habe.",
   sttRecordingTooLarge: ({ provider, limit }) =>
-    `Diese Aufnahme ist zu lang für die Spr-zu-Text-Funktion von ${provider} (max. ${limit}). Probier eine kürzere Nachricht oder stell Sprache-zu-Text auf Systemerkennung um.`,
+    `Diese Aufnahme ist zu lang für die Sprache-zu-Text-Funktion von ${provider} (max. ${limit}). Probier eine kürzere Nachricht oder stell Sprache-zu-Text auf Systemerkennung um.`,
   addProviderKeyToEnableProvider: ({ provider }) =>
     `Füge in den Einstellungen Zugangsdaten für ${provider} hinzu, bevor du diese Route nutzt.`,
   stopSessionBeforePreview:
@@ -614,14 +614,14 @@ export const de = {
     `Bereite Stimme mit ${provider} vor`,
   deepThinkingReassurance: "Gute Antworten brauchen einen Moment …",
   thinkingElapsed: ({ detail, seconds }) => `${detail} · ${seconds}s`,
-  speakingBackToYou: "Antwortet dir",
+  speakingBackToYou: "Ich lese dir die Antwort vor",
   freshSession: "Neues Gespräch",
   messageCount: ({ count }) =>
     Number(count) === 1 ? "1 Nachricht" : `${count} Nachrichten`,
   speechInputRoute: ({ route }) => `Sprache rein: ${route}`,
   replyModelRoute: ({ route }) => `Antwortmodell: ${route}`,
   voiceOutputRoute: ({ route }) => `Stimme raus: ${route}`,
-  fallbackVoiceOutputRoute: ({ route }) => `Fallback Stimme raus: ${route}`,
+  fallbackVoiceOutputRoute: ({ route }) => `Ersatzstimme raus: ${route}`,
   conversation: "Gespräch",
   conversationActions: "Gesprächsaktionen",
   statusDetails: "Statusdetails",
@@ -691,7 +691,7 @@ export const de = {
   turnReceiptVoice: "Sprachausgabe",
   turnReceiptContext: "Kontext",
   turnReceiptTiming: "Zeiten",
-  turnReceiptFallback: "Grund für Rückfall",
+  turnReceiptFallback: "Grund für Fallback",
   turnReceiptVoiceInput: "Sprache",
   turnReceiptTypedInput: "Getippt",
   turnReceiptSystemSpeech: "System-Spracherkennung",
@@ -703,7 +703,7 @@ export const de = {
   turnReceiptNotUsed: "Nicht verwendet",
   turnReceiptSummaryReused: "gespeicherte Zusammenfassung verwendet",
   turnReceiptSummaryUpdated: "Zusammenfassung aktualisiert",
-  turnReceiptContextFallback: "Rückfall auf aktuelle Beiträge",
+  turnReceiptContextFallback: "Fallback auf letzte Nachrichten",
   turnReceiptGatewayCompression: ({ original, compressed }) =>
     `Gateway komprimierte ${original} auf ${compressed} Beiträge`,
   turnReceiptContextValue: ({ sent, total, summarized, state }) =>
@@ -730,7 +730,7 @@ export const de = {
   memory: "Speicher",
   conversations: "Gespräche",
   drawerSubtitle: "Wechsle zwischen Gesprächen oder beginne ein neues.",
-  newSession: "Neue Sitzung",
+  newSession: "Neues Gespräch",
   noSavedConversationsYet: "Noch keine gespeicherten Gespräche",
   drawerEmptyDescription:
     "Sprich in der Hauptansicht los. Mr Broccoli erstellt automatisch ein neues Gespräch.",
@@ -765,9 +765,9 @@ export const de = {
   setupGuideBack: "Zurück",
   setupGuideValidateKey: "Key prüfen",
   setupGuideApiKeyRequiredOrCancel:
-    "Gib einen API-Key ein, um fortzufahren, oder brich den Einrichtungsassistenten ab.",
+    "Gib einen API-Schlüssel ein, um fortzufahren, oder brich den Einrichtungsassistenten ab.",
   setupGuideProviderAndApiKeyRequiredOrCancel:
-    "Wähle einen Anbieter aus und gib einen API-Key ein, um fortzufahren, oder brich den Einrichtungsassistenten ab.",
+    "Wähle einen Anbieter aus und gib einen API-Schlüssel ein, um fortzufahren, oder brich den Einrichtungsassistenten ab.",
   setupGuideProviderKeyNeedsLlmAccess: ({ provider }) =>
     `Diese Zugangsdaten für ${provider} erlauben keine Antwortanfragen.`,
   setupGuideKokoroTitle: "Natürliche Stimme auf dem Gerät",
@@ -858,7 +858,7 @@ export const de = {
   resume: "Fortsetzen",
   paused: "Pausiert",
   listening: "Hört zu",
-  parsing: "Transkribiere",
+  parsing: "Transkribiert",
   searching: "Sucht",
   converting: "Wandelt um",
   webSearchAction: "Websuche",

@@ -138,7 +138,7 @@ export const ja = {
   responseModes: "モデルの選択",
   aboutModelSelection: "モデル選択について",
   modelSelectionInfo:
-    "各モデルカードはホーム画面での選択肢になります。プロバイダー、モデル、およびオプションのエフォート レベルを設定し、カードを切り替えて次にどのモデルが応答するかを選択します。",
+    "各モデルカードはホーム画面での選択肢になります。プロバイダー、モデル、および任意の推論レベルを設定し、カードを切り替えて次にどのモデルが応答するかを選択します。",
   responseModeItemTitle: ({ index }) => `モデル ${index}`,
   addResponseMode: "モデルを追加",
   removeResponseMode: "モデルを削除",
@@ -195,10 +195,10 @@ export const ja = {
     "深く掘り下げるのが大好きな熱心な専門家のように話します。専門用語を自由に使用し、詳細に興味を持って、ユーザーがついていけると想定してください。",
   concise: "簡潔",
   conciseDescription:
-    "完成した状態でできるだけ簡潔にします。前置きや補足はなく、答えだけです。電報のスタイルを考えてみましょう。",
+    "完全さを保ちつつ、できるだけ簡潔にします。前置きや余計な言葉はなく、答えだけ。電報のようなスタイルです。",
   socratic: "ソクラテス",
   socraticDescription:
-    "ユーザーの思考に挑戦します。彼らの言ったことをただ肯定するだけでなく、逆質問をし、別の視点を提供しましょう。イエスマシンではなく、スパーリングパートナーになりましょう。",
+    "ユーザーの思考に挑みます。発言をただ肯定するのではなく、逆質問をし、別の視点を示しましょう。イエスマンではなく、スパーリングパートナーになりましょう。",
   eli5: "ELI5",
   eli5Description:
     "すべてをできるだけ簡単に説明してください。比喩を使用し、日常的な言葉を使用し、専門用語は使用しません。どのトピックについても予備知識がないことを前提としています。",
@@ -212,15 +212,15 @@ export const ja = {
   openRouterOnboardingRoute:
     "リクエスト パス: このデバイス → OpenRouter → 選択した上流プロバイダー",
   openRouterKeys: "OpenRouter キー",
-  providerStatusInvalid: "無効です",
-  providerStatusTesting: "テスト",
+  providerStatusInvalid: "無効",
+  providerStatusTesting: "テスト中",
   providerStatusConfigured: "設定済み",
   providerStatusWorking: "正常",
   providerStatusNotTested: "テストされていません",
   providerStatusNotSetup: "セットアップされていません",
   expandProvider: ({ provider }) => `${provider} を展開`,
   collapseProvider: ({ provider }) => `${provider}を折りたたむ`,
-  testProviderKey: "テストキー",
+  testProviderKey: "キーをテスト",
   testAllCapabilities: "すべてをテスト",
   apiTest: "API テスト",
   testProviderCapability: ({ capability }) => `${capability}をテスト`,
@@ -249,11 +249,11 @@ export const ja = {
     "アシスタントがどのように動作するかを定義します。",
   assistantInstructionsHint:
     "これは常に、選択した応答の長さとトーンの前に追加されます。",
-  adaptiveLength: "自動調整",
+  adaptiveLength: "応答の長さ",
   responseTone: "応答のトーン",
   homeStyleChipLabel: ({ tone, length }) => `スタイル — ${tone} · ${length}`,
   styleSheetTitle: "会話設定",
-  styleSheetSubtitle: "この会話のみの返信と音声を作成します。",
+  styleSheetSubtitle: "この会話に限り、返信と読み上げのスタイルを調整します。",
   openStyleSheet: "会話設定を開く",
   conversationThinkingInstructions: "思考の指示",
   conversationThinkingInstructionsDescription:
@@ -264,7 +264,7 @@ export const ja = {
   ttsInstructionsDescription:
     "互換性のある音声モデルで使用されるトーン、ペース、アクセント、または話し方をガイドします。",
   conversationTtsInstructionsDescription:
-    "この会話のグローバル音声指示の後に配信指示を追加します。",
+    "この会話用に、グローバルな音声指示の後に話し方の指示を追加します。",
   ttsInstructionsPlaceholder:
     "例: 温かく、はっきりと、リラックスしたペースで話します。",
   ttsInstructionsUnsupported:
@@ -287,7 +287,7 @@ export const ja = {
   pushToTalk: "プッシュトゥトーク",
   pushToTalkDescription:
     "話している間メインボタンを押したままにし、放して送信します。",
-  toggleToTalk: "タップして話す",
+  toggleToTalk: "タップで切り替えて話す",
   toggleToTalkDescription:
     "一度タップして録音を開始し、完了したらもう一度タップします。",
   driveSession: "ドライブモード",
@@ -321,11 +321,11 @@ export const ja = {
   webSearchQualityControls: "検索品質",
   webSearchSearchMode: "検索モード",
   webSearchSearchModeQuick: "クイック",
-  webSearchSearchModeBalanced: "バランスのとれた",
-  webSearchSearchModeDeep: "深い",
+  webSearchSearchModeBalanced: "バランス",
+  webSearchSearchModeDeep: "ディープ",
   webSearchDepth: "検索深度",
   webSearchDepthStandard: "標準",
-  webSearchDepthDeep: "深い",
+  webSearchDepthDeep: "ディープ",
   webSearchResultCount: "結果数",
   webSearchQualityHint: ({ provider }) =>
     `これらのコントロールは、${provider} が応答前に新しいコンテキストを収集する方法を調整します。`,
@@ -369,7 +369,7 @@ export const ja = {
   kokoroVerifying: "音声エンジンを検証しています…",
   kokoroInstalled: "このデバイスにインストールされ、準備が完了しました。",
   kokoroNotInstalled:
-    "オプションのダウンロード。プロバイダーキーは必要ありません。",
+    "ココロを選択・使用する前に、モデルをダウンロードして検証してください。プロバイダーキーは必要ありません。",
   kokoroLanguageFallback:
     "ココロは現在ここで英語と簡体字中国語を話します。他の選択した応答言語の場合は、明示的なフォールバック ルートを追加しないと、音声がエラーで停止します。",
   kokoroRemoveTitle: "ココロモデルを削除しますか?",

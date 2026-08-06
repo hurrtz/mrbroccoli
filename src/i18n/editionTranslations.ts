@@ -31,11 +31,11 @@ export const editionTranslations = {
   de: define({
     freeEdition: "Privat & offline · Kostenlos",
     premiumPurchaseValue:
-      "Einmaliger Kauf. Kein Abo und kein Token-Aufschlag; die Nutzung wird direkt von deinen Providern abgerechnet.",
+      "Einmaliger Kauf. Kein Abo und kein Token-Aufschlag; die Nutzung wird direkt von deinen Anbietern abgerechnet.",
     premiumFreeKeepsWorking:
       "Kostenlos bleibt nutzbar: Offline-Gespräche, Verlauf, Backups und manueller Export bleiben verfügbar.",
     premiumBenefitProviders:
-      "Nutze deine Cloud-Provider und deren hochwertigere Modelle",
+      "Nutze deine Cloud-Anbieter und deren hochwertigere Modelle",
     premiumBenefitModes:
       "Wechsle Antwortmodi und starte eine Übermodus-Beratung mit mehreren Modellen",
     premiumBenefitTools:
@@ -48,7 +48,7 @@ export const editionTranslations = {
     freeOfflineSystemVoiceNote:
       "Keine einzelne heruntergeladene Stimme deckt diese Sprachen ab. Antworten verwenden deshalb die sprachabhängige Systemstimme des Smartphones; Hören und Denken bleiben lokal.",
     freeOfflineStart: "Start",
-    freeOfflinePremiumEscape: "Provider-API-Schlüssel vorhanden? Stattdessen Premium freischalten",
+    freeOfflinePremiumEscape: "Anbieter-API-Schlüssel vorhanden? Stattdessen Premium freischalten",
     settingsGroupConversation: "Gespräch & Werkzeuge",
     settingsGroupVoiceModels: "Stimme & Modelle",
     settingsGroupPrivacyApp: "Datenschutz & App",
@@ -56,13 +56,13 @@ export const editionTranslations = {
   uk: define({
     freeEdition: "Приватно й офлайн · Безкоштовно",
     premiumPurchaseValue:
-      "Одноразова покупка. Без підписки й націнки на токени; використання оплачують безпосередньо вашим провайдерам.",
+      "Одноразова покупка. Без підписки й націнки на токени; за використання ви платите безпосередньо своїм провайдерам.",
     premiumFreeKeepsWorking:
       "Безкоштовна версія залишається корисною: офлайн-розмови, історія, резервні копії та ручний експорт доступні.",
     premiumBenefitProviders:
       "Використовуйте своїх хмарних провайдерів і їхні якісніші моделі",
     premiumBenefitModes:
-      "Перемикайте режими відповідей і запускайте обговорення в Суперрежимі для кількох моделей",
+      "Перемикайте режими відповідей і запускайте обговорення в Суперрежимі з кількома моделями",
     premiumBenefitTools: "Додайте вебпошук, зображення та хмарні сесії Drive",
     premiumBenefitKnowledge:
       "Використовуйте знання минулих сесій і переносний Markdown-архів",
