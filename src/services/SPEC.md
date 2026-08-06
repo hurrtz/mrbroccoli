@@ -121,6 +121,13 @@ Kokoro and Piper text-to-phoneme conversion resolves through libphonemize
 verified prebuilts into the wrapper and re-checks every binary for eSpeak
 markers before writing.
 
+**Decision:** The espeak-free runtime is a build-time prerequisite, not an
+optional local convenience. `node_modules` is untracked, so a plain install
+restores the upstream espeak-linked prebuilts; a postinstall hook reinstalls
+the espeak-free libraries whenever the fork checkout is present, and
+`make espeak-free-verify` fails the release gate when the libraries a build
+would ship still carry eSpeak markers.
+
 **Decision:** Language packs are curated artifacts with the same integrity
 contract as the local model catalogue — pinned source, exact size, SHA-256
 verified before extraction, installed beside the speech model's data

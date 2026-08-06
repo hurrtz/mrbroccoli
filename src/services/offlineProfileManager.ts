@@ -3,6 +3,7 @@ import {
   type LocalModelId,
   type LocalTtsModelId,
 } from "../constants/localModels";
+import type { SpeechLanguage } from "../constants/speechLanguages";
 import type { SttLanguage } from "../types";
 import {
   getLocalModelBenchmarkResults,
@@ -175,9 +176,12 @@ async function downloadProfileModel(
   options: {
     abortSignal?: AbortSignal;
     onProgress?: (progress: LocalModelDownloadProgress) => void;
+    phonemeLanguages?: SpeechLanguage[];
   },
 ) {
   if (modelId === "kokoro-multilingual") {
+    // The espeak-free runtime phonemizes through libphonemize, so the
+    // profile's languages must bring their packs with the voice.
     await downloadKokoroModel(options);
     return;
   }
@@ -358,6 +362,7 @@ export async function prepareOfflineProfile(
           abortSignal: options?.abortSignal,
           onProgress: (download) =>
             options?.onProgress?.(progress(download.progress, download)),
+          phonemeLanguages: profile.languages,
         });
       } else {
         const benchmark = await benchmarkProfileModel(profile, model.id);

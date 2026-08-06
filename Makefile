@@ -7,6 +7,7 @@ IOS_DESTINATION ?= generic/platform=iOS Simulator
 
 .PHONY: \
 	help \
+	espeak-free-verify \
 	hooks-install \
 	worktree-check \
 	fresh-checkout \
@@ -165,8 +166,13 @@ prerelease-preflight:
 
 # The spend-free phase is intentionally separate from the later live-provider
 # and Maestro phase. It is safe to rerun while developing the release suite.
+espeak-free-verify:
+	@echo "== espeak-free runtime (no GPL eSpeak NG in shipped libraries)"
+	npm run espeak-free:verify
+
 pre-release-static:
 	@$(MAKE) prerelease-preflight
+	@$(MAKE) espeak-free-verify
 	@$(MAKE) fresh-checkout
 	@$(MAKE) doctor
 	@$(MAKE) dependencies-check

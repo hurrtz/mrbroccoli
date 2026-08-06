@@ -52,8 +52,22 @@ const wrapperRoot = resolve(
   "node_modules/react-native-sherpa-onnx",
 );
 const checkOnly = process.argv.includes("--check");
+// Verifies the libraries actually present in the wrapper, i.e. what a build
+// would ship — independent of whether the fork checkout exists.
+const verifyInstalled = process.argv.includes("--verify-installed");
+// postinstall runs everywhere, including machines and CI images that have no
+// fork checkout. There it reports and exits cleanly; the release gate is
+// where a missing espeak-free runtime must be fatal.
+const optional = process.argv.includes("--optional");
 
 function fail(message) {
+  if (optional) {
+    console.warn(
+      `espeak-free runtime: ${message}\n  skipping (optional); run ` +
+        `npm run espeak-free:install before building for distribution`,
+    );
+    process.exit(0);
+  }
   console.error(`espeak-free runtime: ${message}`);
   process.exit(1);
 }
@@ -71,6 +85,34 @@ function requireFile(path, hint) {
     fail(`missing ${path}\n  ${hint}`);
   }
   return path;
+}
+
+if (verifyInstalled) {
+  const installed = [
+    ...ANDROID_ABIS.map(({ abi }) =>
+      resolve(wrapperRoot, "android/src/main/jniLibs", abi,
+              "libsherpa-onnx-jni.so"),
+    ),
+    ...["ios-arm64", "ios-arm64_x86_64-simulator"].map((slice) =>
+      resolve(wrapperRoot, "ios/Frameworks/sherpa_onnx.xcframework", slice,
+              "libsherpa-onnx.a"),
+    ),
+  ];
+  const missing = installed.filter((path) => !existsSync(path));
+  if (missing.length > 0) {
+    console.error(
+      "espeak-free runtime: the wrapper is missing expected libraries:\n  " +
+        missing.join("\n  ") +
+        "\n  run: npm run espeak-free:install",
+    );
+    process.exit(1);
+  }
+  verify(installed);
+  console.log(
+    `espeak-free runtime: ${installed.length} installed libraries carry no ` +
+      "eSpeak NG markers",
+  );
+  process.exit(0);
 }
 
 const androidSources = ANDROID_ABIS.map(({ abi, build }) => ({
