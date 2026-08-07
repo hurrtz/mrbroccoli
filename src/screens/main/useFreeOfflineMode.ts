@@ -44,6 +44,7 @@ import {
   type OfflinePreparationProgress,
   type OfflineProfileReadiness,
 } from "../../services/offlineProfileManager";
+import { useKeepAwakeWhile } from "../../hooks/useKeepAwakeWhile";
 import type { Settings } from "../../types";
 
 const ASSUMED_SETUP_DOWNLOAD_BYTES_PER_SECOND = 1.5 * 1024 * 1024;
@@ -144,6 +145,12 @@ export function useFreeOfflineMode(params: {
     "device" | "models" | "plan" | null
   >(null);
   const [preparing, setPreparing] = useState(false);
+  // Downloading and benchmarking a complete on-device profile runs far longer
+  // than any default screen timeout, and setup cannot finish in the
+  // background: a sleeping phone aborted the download and left the user
+  // restarting it. Hold the lock only while preparation is actually running,
+  // and the effect releases it on completion, failure, or cancellation.
+  useKeepAwakeWhile(preparing, "mrbroccoli-offline-setup");
   const [preparationProgress, setPreparationProgress] =
     useState<OfflinePreparationProgress | null>(null);
   const [preparationEtaSeconds, setPreparationEtaSeconds] = useState<

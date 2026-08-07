@@ -63,6 +63,12 @@ jest.mock("../../src/services/nativeSpeechCapabilities", () => ({
   })),
 }));
 
+const mockUseKeepAwakeWhile = jest.fn();
+
+jest.mock("../../src/hooks/useKeepAwakeWhile", () => ({
+  useKeepAwakeWhile: (...args: unknown[]) => mockUseKeepAwakeWhile(...args),
+}));
+
 jest.mock("../../src/features/settings-core/useNativeVoiceOptions", () => ({
   useNativeVoiceOptions: () => ({
     nativeVoiceOptions: [],
@@ -74,6 +80,29 @@ jest.mock("../../src/features/settings-core/useNativeVoiceOptions", () => ({
 describe("useFreeOfflineMode", () => {
   beforeEach(() => {
     jest.clearAllMocks();
+  });
+
+  it("holds the screen awake for the whole preparation, not by default", () => {
+    // Downloading and benchmarking a profile outlasts any default screen
+    // timeout, and a sleeping phone aborted the download mid-setup.
+    renderHook(() =>
+      useFreeOfflineMode({
+        settings: {
+          ...DEFAULT_SETTINGS,
+          freeOnboardingLanguageInitialized: true,
+          freeOfflineSetupCompleted: false,
+          localLanguages: ["en"],
+        },
+        settingsLoaded: true,
+        suspended: true,
+        updateSettings: jest.fn(),
+      }),
+    );
+
+    expect(mockUseKeepAwakeWhile).toHaveBeenCalledWith(
+      false,
+      "mrbroccoli-offline-setup",
+    );
   });
 
   it("suspends device and locale side effects for deterministic presentation fixtures", async () => {

@@ -14,6 +14,10 @@ the complete Play Store translations are kept in a dedicated file under
 
 ### Fixed
 
+- Keep the screen awake while on-device setup downloads and tests its models.
+  The phone could fall asleep partway through and abort the download, leaving
+  setup to be started over. The screen now stays on until preparation
+  finishes, fails, or is cancelled.
 - Install the pronunciation packs that the downloadable on-device voice needs.
   They never arrived on iPhone and iPad, so installing the voice ended in an
   unexplained failure while Settings still listed the voice as present but
