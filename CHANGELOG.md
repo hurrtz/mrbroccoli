@@ -10,8 +10,18 @@ the complete Play Store translations are kept in a dedicated file under
 
 ## Unreleased
 
+## 3.1.1 - 2026-08-07
+
 ### Fixed
 
+- Install the pronunciation packs that the downloadable on-device voice needs.
+  They never arrived on iPhone and iPad, so installing the voice ended in an
+  unexplained failure while Settings still listed the voice as present but
+  missing its pronunciation pack.
+- Keep the app responsive while a downloadable on-device voice speaks. A long
+  spoken answer, in particular a deliberated one, could leave the screen
+  unresponsive until it finished: the transcript still scrolled but no control
+  reacted. Speech is now produced away from the interface.
 - A downloaded on-device Kokoro voice whose pronunciation packs failed to
   install no longer reports a confusing request to copy eSpeak data into the
   model folder. The download now fails when no pack could be installed, and
