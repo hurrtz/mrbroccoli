@@ -683,10 +683,23 @@ export async function downloadKokoroModel(params?: {
       ? params.phonemeLanguages
       : KOKORO_FALLBACK_PHONEME_LANGUAGES;
 
+    const { recordDebugLogEvent } = require("./debugLogCapture") as
+      typeof import("./debugLogCapture");
+
     for (const language of languages) {
+      // A swallowed failure here is why an empty pack directory used to
+      // surface as an unexplained "download failed": the per-language error
+      // never reached a log, so the only visible symptom was the guard below
+      // throwing. Keep tolerating a single language failing, but say so.
       await installPhonemePacks(dataDir, language, {
         abortSignal: params?.abortSignal,
-      }).catch(() => undefined);
+      }).catch((error: unknown) => {
+        recordDebugLogEvent({
+          event: "kokoro-phoneme-pack-failed",
+          level: "warn",
+          payload: { error, language },
+        });
+      });
     }
 
     if (

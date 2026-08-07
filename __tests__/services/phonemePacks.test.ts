@@ -121,6 +121,35 @@ describe("phoneme packs", () => {
     expect(mockUnlink).toHaveBeenCalledWith(`${DATA_DIR}/${pack.id}.tar.bz2`);
   });
 
+  it("downloads packs in the foreground on every platform", async () => {
+    // The iOS background NSURLSession never delivered these packs, leaving an
+    // empty pack directory that failed the whole Kokoro install. The model
+    // archive downloads in the foreground and succeeds on iOS, and these packs
+    // succeeded on Android where the flag was already false.
+    const packs = getPhonemePacksForLanguage("de");
+    const checked = new Set<string>();
+    mockExists.mockImplementation(async (path: string) => {
+      if (path.endsWith(".tar.bz2")) {
+        return true;
+      }
+      if (checked.has(path)) {
+        return true;
+      }
+      checked.add(path);
+      return false;
+    });
+    mockHash.mockImplementation(async (path: string) =>
+      packs.find(({ id }) => path.endsWith(`${id}.tar.bz2`))!.sha256,
+    );
+
+    await installPhonemePacks(DATA_DIR, "de");
+
+    expect(mockDownloadFile).toHaveBeenCalled();
+    for (const call of mockDownloadFile.mock.calls) {
+      expect(call[0]).toMatchObject({ background: false });
+    }
+  });
+
   it("fails closed on a checksum mismatch and never extracts", async () => {
     mockExists.mockResolvedValue(false);
     mockHash.mockResolvedValue("0".repeat(64));

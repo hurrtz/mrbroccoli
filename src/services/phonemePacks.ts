@@ -1,4 +1,3 @@
-import { Platform } from "react-native";
 
 import {
   getPhonemePackDownloadUrl,
@@ -90,9 +89,19 @@ async function installPack(
   }
 
   const task = downloadFile({
+    // Foreground on every platform. The iOS background NSURLSession never
+    // delivered these packs: the model archive in kokoroTts downloads with
+    // `background: false` and succeeds on iOS, the same pack download
+    // succeeds on Android where this flag was already false, and the pinned
+    // assets serve correctly (HTTP 200, exact size and digest). The packs
+    // were the only download here opting into the background session, and
+    // iOS the only platform where they failed — leaving an empty pack
+    // directory that failed the whole Kokoro install. Packs are small and
+    // the user is watching a progress bar, so a background session buys
+    // nothing here.
     fromUrl: getPhonemePackDownloadUrl(pack),
     toFile: archivePath,
-    background: Platform.OS === "ios",
+    background: false,
     discretionary: false,
     progress: ({ bytesWritten, contentLength }) => {
       params?.onProgress?.({
