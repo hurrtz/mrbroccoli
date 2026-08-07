@@ -1,11 +1,28 @@
 const mockDestroy = jest.fn().mockResolvedValue(undefined);
-const mockGenerateSpeech = jest.fn().mockResolvedValue({
-  samples: [0, 0.25, -0.25],
-  sampleRate: 24_000,
-});
-const mockCreateTTS = jest.fn().mockResolvedValue({
+const mockCancelSpeechStream = jest.fn().mockResolvedValue(undefined);
+// Synthesis runs through the streaming engine so the neural inference stays
+// off the JS thread; the one-shot call blocks it on both platforms.
+const mockGenerateSpeechStream = jest
+  .fn()
+  .mockImplementation(
+    async (
+      _text: string,
+      _options: unknown,
+      handlers: {
+        onChunk?: (chunk: { samples: number[]; sampleRate: number }) => void;
+        onEnd?: (event: { cancelled: boolean }) => void;
+      },
+    ) => {
+      handlers.onChunk?.({ samples: [0, 0.25], sampleRate: 24_000 });
+      handlers.onChunk?.({ samples: [-0.25], sampleRate: 24_000 });
+      handlers.onEnd?.({ cancelled: false });
+      return { stop: jest.fn() };
+    },
+  );
+const mockCreateStreamingTTS = jest.fn().mockResolvedValue({
+  cancelSpeechStream: mockCancelSpeechStream,
   destroy: mockDestroy,
-  generateSpeech: mockGenerateSpeech,
+  generateSpeechStream: mockGenerateSpeechStream,
 });
 const mockSaveAudioToFile = jest.fn().mockResolvedValue(undefined);
 const mockDeleteAsync = jest.fn().mockResolvedValue(undefined);
@@ -95,7 +112,7 @@ jest.mock("react-native-sherpa-onnx/download", () => ({
 }));
 
 jest.mock("react-native-sherpa-onnx/tts", () => ({
-  createTTS: mockCreateTTS,
+  createStreamingTTS: mockCreateStreamingTTS,
   saveAudioToFile: mockSaveAudioToFile,
 }));
 
@@ -148,7 +165,7 @@ describe("Kokoro TTS service", () => {
         voices: { en: "af_sol", zh: "zf_001" },
       }),
     ).rejects.toThrow("missing its pronunciation packs");
-    expect(mockCreateTTS).not.toHaveBeenCalled();
+    expect(mockCreateStreamingTTS).not.toHaveBeenCalled();
   });
 
   it("fails the download when no pronunciation pack could be installed", async () => {
@@ -188,16 +205,17 @@ describe("Kokoro TTS service", () => {
       "/models/kokoro/lexicon-us-en.txt",
       "/models/kokoro/lexicon.txt",
     );
-    expect(mockCreateTTS).toHaveBeenCalledWith(
+    expect(mockCreateStreamingTTS).toHaveBeenCalledWith(
       expect.objectContaining({
         modelType: "kokoro",
         numThreads: 2,
         provider: "cpu",
       }),
     );
-    expect(mockGenerateSpeech).toHaveBeenCalledWith(
+    expect(mockGenerateSpeechStream).toHaveBeenCalledWith(
       "Hello from the phone.",
       expect.objectContaining({ sid: 1 }),
+      expect.objectContaining({ onChunk: expect.any(Function) }),
     );
     expect(mockSaveAudioToFile).toHaveBeenCalledWith(
       expect.objectContaining({ sampleRate: 24_000 }),

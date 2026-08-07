@@ -32,8 +32,19 @@ import {
   type LocalModelBenchmarkResult,
 } from "./localDeviceCapabilities";
 
+// Streaming rather than one-shot. The wrapper's generateTts runs the neural
+// inference inline on the calling thread on both platforms — no dispatch on
+// iOS (SherpaOnnx+TTS.mm) and no executor on Android (SherpaOnnxTtsHelper.kt,
+// whose executor covers initialization only) — so a one-shot call froze the
+// whole app for the duration of synthesis: dead buttons, a stuck CTA, and a
+// debug capture that could not even be saved. generateSpeechStream is the
+// same work behind dispatch_async / a dedicated Thread. Chunks are
+// accumulated here and written as one file, so playback ordering and every
+// caller downstream are unchanged.
 type KokoroEngine = Awaited<
-  ReturnType<(typeof import("react-native-sherpa-onnx/tts"))["createTTS"]>
+  ReturnType<
+    (typeof import("react-native-sherpa-onnx/tts"))["createStreamingTTS"]
+  >
 >;
 
 type KokoroSession = {
@@ -399,9 +410,9 @@ async function getKokoroSession(language: KokoroLanguage) {
     }
 
     await configureModelLexicon(status.rootPath, language);
-    const { createTTS } = getTtsModule();
+    const { createStreamingTTS } = getTtsModule();
     const { fileModelPath } = getSherpaModule();
-    const engine = await createTTS({
+    const engine = await createStreamingTTS({
       modelPath: fileModelPath(status.rootPath),
       modelType: "kokoro",
       numThreads: 2,
@@ -459,14 +470,47 @@ export async function synthesizeKokoroSpeech(params: {
       assertNotAborted(params.abortSignal);
       const session = await getKokoroSession(language);
       assertNotAborted(params.abortSignal);
-      const audio = await session.engine.generateSpeech(
-        normalizeText(params.text),
-        {
-          sid: voice.sid,
-          speed: 1,
-          silenceScale: 0.2,
-        },
-      );
+      const audio = await new Promise<{
+        samples: number[];
+        sampleRate: number;
+      }>((resolve, reject) => {
+        const samples: number[] = [];
+        let sampleRate = 0;
+
+        void session.engine
+          .generateSpeechStream(
+            normalizeText(params.text),
+            {
+              sid: voice.sid,
+              speed: 1,
+              silenceScale: 0.2,
+            },
+            {
+              onChunk: (chunk) => {
+                sampleRate = chunk.sampleRate || sampleRate;
+                for (const sample of chunk.samples) {
+                  samples.push(sample);
+                }
+              },
+              onEnd: (event) => {
+                if (event.cancelled) {
+                  reject(new Error("Kokoro synthesis was cancelled."));
+                  return;
+                }
+
+                resolve({ sampleRate, samples });
+              },
+              onError: (event) => {
+                reject(
+                  new Error(
+                    `Kokoro synthesis failed: ${event.message ?? "unknown error"}`,
+                  ),
+                );
+              },
+            },
+          )
+          .catch(reject);
+      });
       assertNotAborted(params.abortSignal);
 
       if (!audio.samples.length || !audio.sampleRate) {
