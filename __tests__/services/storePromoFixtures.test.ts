@@ -1,4 +1,5 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as SQLite from "expo-sqlite";
 import { NativeModules } from "react-native";
 
 import { APP_LANGUAGES } from "../../src/i18n/localeRegistry";
@@ -15,11 +16,17 @@ import {
 } from "../../src/services/storePromoPresentation";
 import { DEVELOPMENT_ENTITLEMENT_MODE_STORAGE_KEY } from "../../src/services/developmentEntitlement";
 import {
-  ACTIVE_CONVERSATION_KEY,
-  META_KEY,
-  conversationKey,
+  readActiveConversationId,
+  readConversation,
+  readStoredConversationMetas,
+  resetConversationStorageForTests,
 } from "../../src/hooks/conversations/storage";
+
 import { STORAGE_KEY } from "../../src/hooks/settings/types";
+
+// Imported like application code; `jest.requireMock` would hand back a second
+// copy of the mock with its own database.
+const sqliteMock = SQLite as unknown as { __reset: () => void };
 
 jest.mock("expo-secure-store", () => ({
   deleteItemAsync: jest.fn(() => Promise.resolve()),
@@ -33,6 +40,8 @@ describe("store promo fixtures", () => {
   beforeEach(async () => {
     jest.clearAllMocks();
     await AsyncStorage.clear();
+    sqliteMock.__reset();
+    resetConversationStorageForTests();
     NativeModules.MrBroccoliDiagnostics = { getApplicationId };
   });
 
@@ -88,9 +97,7 @@ describe("store promo fixtures", () => {
     const storedSettings = JSON.parse(
       (await AsyncStorage.getItem(STORAGE_KEY)) ?? "{}",
     ) as Record<string, unknown>;
-    const storedMetas = JSON.parse(
-      (await AsyncStorage.getItem(META_KEY)) ?? "[]",
-    ) as unknown[];
+    const storedMetas = await readStoredConversationMetas();
 
     expect(storedSettings.language).toBe("de");
     expect(storedSettings.theme).toBe("light");
@@ -110,12 +117,8 @@ describe("store promo fixtures", () => {
     ]);
     expect(storedSettings).not.toHaveProperty("apiKeys");
     expect(storedMetas).toHaveLength(3);
-    await expect(AsyncStorage.getItem(ACTIVE_CONVERSATION_KEY)).resolves.toBe(
-      "promo-root",
-    );
-    await expect(
-      AsyncStorage.getItem(conversationKey("promo-root")),
-    ).resolves.not.toBeNull();
+    await expect(readActiveConversationId()).resolves.toBe("promo-root");
+    await expect(readConversation("promo-root")).resolves.not.toBeNull();
     await expect(
       AsyncStorage.getItem(STORE_PROMO_FIXTURE_MARKER_KEY),
     ).resolves.toBe("de");
@@ -133,9 +136,7 @@ describe("store promo fixtures", () => {
     );
 
     await expect(seedStorePromoFixture("de", "free")).resolves.toBe(true);
-    const conversation = JSON.parse(
-      (await AsyncStorage.getItem(conversationKey("promo-root"))) ?? "{}",
-    ) as { messages?: { metadata?: { ulraMode?: unknown } }[] };
+    const conversation = await readConversation("promo-root");
 
     expect(conversation.messages).toHaveLength(4);
     expect(

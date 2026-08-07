@@ -1,4 +1,3 @@
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Conversation, ConversationMeta } from "../../types";
 import { reportPersistenceAlert } from "../../services/persistenceAlerts";
 import { recordDebugLogEvent } from "../../services/debugLogCapture";
@@ -7,22 +6,31 @@ import {
   resolveConversationImageAttachmentUris,
 } from "../../services/imageAttachmentFiles";
 import {
+  ACTIVE_CONVERSATION_STATE_KEY,
+  deleteConversationRow,
+  readAppStateValue,
+  readConversationMetaRows,
+  readConversationRow,
+  resetConversationDatabaseForTests,
+  runInConversationTransaction,
+  updateConversationMetaRows,
+  upsertConversationRow,
+  writeAppStateValue,
+} from "../../services/conversationStore";
+import { migrateConversationsFromAsyncStorage } from "../../services/conversationStore/migration";
+import {
   buildConversationMetaFromConversation,
   normalizeConversationMeta,
   sortConversationMeta,
 } from "./meta";
 
-export const META_KEY = "@mrbroccoli/conversations";
-export const ACTIVE_CONVERSATION_KEY = "@mrbroccoli/active_conversation";
+type StorageScope = "conversation" | "metadata" | "active-conversation" | "migration";
 
-const mutationQueues = new Map<string, Promise<void>>();
-
-function reportStorageFailure(key: string, operation: string, error: unknown) {
-  const storageScope = key === META_KEY
-    ? "metadata"
-    : key === ACTIVE_CONVERSATION_KEY
-      ? "active-conversation"
-      : "conversation";
+function reportStorageFailure(
+  storageScope: StorageScope,
+  operation: string,
+  error: unknown,
+) {
   recordDebugLogEvent({
     event: "persistence-operation-failed",
     level: "warn",
@@ -33,117 +41,144 @@ function reportStorageFailure(key: string, operation: string, error: unknown) {
       storageScope,
     },
   });
-  console.error(`[conversation-storage] ${operation} failed for ${key}`, error);
+  console.error(`[conversation-storage] ${operation} failed (${storageScope})`, error);
   reportPersistenceAlert("conversations", operation);
 }
 
-function enqueueMutation(
-  key: string,
-  operationName: string,
-  operation: () => Promise<void>,
-) {
-  const previous = mutationQueues.get(key) ?? Promise.resolve();
-  const queued = previous
-    .catch(() => undefined)
-    .then(operation)
+let readyPromise: Promise<void> | null = null;
+
+/**
+ * Runs the one-time AsyncStorage import before the first read or write.
+ *
+ * A failed migration is reported and swallowed rather than rethrown. The
+ * transaction has already rolled back, so SQLite is merely empty while the
+ * legacy keys remain intact; surfacing an empty list and retrying next launch
+ * loses nothing, whereas propagating the error would break hydration outright.
+ */
+function ensureReady() {
+  readyPromise ??= migrateConversationsFromAsyncStorage()
+    .then(() => undefined)
     .catch((error) => {
-      reportStorageFailure(key, operationName, error);
+      reportStorageFailure("migration", "migrate", error);
+      // Clear the cache so the next call retries instead of remembering failure.
+      readyPromise = null;
     });
 
-  mutationQueues.set(key, queued);
-  void queued.then(() => {
-    if (mutationQueues.get(key) === queued) {
-      mutationQueues.delete(key);
-    }
-  });
-
-  return queued;
-}
-
-async function awaitPendingMutation(key: string) {
-  await mutationQueues.get(key);
-}
-
-export function conversationKey(id: string) {
-  return `@mrbroccoli/conversation/${id}`;
+  return readyPromise;
 }
 
 export async function readConversation(id: string) {
-  const key = conversationKey(id);
   try {
-    await awaitPendingMutation(key);
-    const raw = await AsyncStorage.getItem(key);
+    await ensureReady();
+    const row = await readConversationRow(id);
 
-    if (!raw) {
+    if (!row) {
       return null;
     }
 
-    return resolveConversationImageAttachmentUris(
-      JSON.parse(raw) as Conversation,
-    );
+    return resolveConversationImageAttachmentUris(row.conversation);
   } catch (error) {
-    reportStorageFailure(key, "read", error);
+    reportStorageFailure("conversation", "read", error);
     return null;
   }
 }
 
 export async function readStoredConversationMetas() {
   try {
-    await awaitPendingMutation(META_KEY);
-    const raw = await AsyncStorage.getItem(META_KEY);
-
-    if (!raw) {
-      return [];
-    }
-
-    return JSON.parse(raw) as ConversationMeta[];
+    await ensureReady();
+    return await readConversationMetaRows();
   } catch (error) {
-    reportStorageFailure(META_KEY, "read", error);
+    reportStorageFailure("metadata", "read", error);
     return [];
   }
 }
 
 export async function readActiveConversationId() {
   try {
-    await awaitPendingMutation(ACTIVE_CONVERSATION_KEY);
-    const storedId = await AsyncStorage.getItem(ACTIVE_CONVERSATION_KEY);
+    await ensureReady();
+    const storedId = await readAppStateValue(ACTIVE_CONVERSATION_STATE_KEY);
     return storedId?.trim() || null;
   } catch (error) {
-    reportStorageFailure(ACTIVE_CONVERSATION_KEY, "read active conversation", error);
+    reportStorageFailure("active-conversation", "read active conversation", error);
     return null;
   }
 }
 
-export function saveConversation(conversation: Conversation) {
-  const key = conversationKey(conversation.id);
-  const serialized = JSON.stringify(
-    relativizeConversationImageAttachmentUris(conversation),
-  );
-  return enqueueMutation(key, "save", () => AsyncStorage.setItem(key, serialized));
+export async function saveConversation(conversation: Conversation) {
+  try {
+    await ensureReady();
+    const document = JSON.stringify(
+      relativizeConversationImageAttachmentUris(conversation),
+    );
+
+    await runInConversationTransaction((database) =>
+      upsertConversationRow(database, {
+        conversation,
+        document,
+        // Only consulted when the row is new; an existing row keeps the
+        // metadata its callers own, including pinned state.
+        initialMeta: buildConversationMetaFromConversation(conversation),
+      }),
+    );
+  } catch (error) {
+    reportStorageFailure("conversation", "save", error);
+  }
 }
 
-export function removeConversation(id: string) {
-  const key = conversationKey(id);
-  return enqueueMutation(key, "remove", () => AsyncStorage.removeItem(key));
+export async function removeConversation(id: string) {
+  try {
+    await ensureReady();
+    await runInConversationTransaction((database) =>
+      deleteConversationRow(database, id),
+    );
+  } catch (error) {
+    reportStorageFailure("conversation", "remove", error);
+  }
 }
 
-export function persistActiveConversationId(id: string | null) {
-  return enqueueMutation(ACTIVE_CONVERSATION_KEY, "save active conversation", () =>
-    id
-      ? AsyncStorage.setItem(ACTIVE_CONVERSATION_KEY, id)
-      : AsyncStorage.removeItem(ACTIVE_CONVERSATION_KEY),
-  );
+export async function persistActiveConversationId(id: string | null) {
+  try {
+    await ensureReady();
+    await writeAppStateValue(ACTIVE_CONVERSATION_STATE_KEY, id);
+  } catch (error) {
+    reportStorageFailure(
+      "active-conversation",
+      "save active conversation",
+      error,
+    );
+  }
 }
 
+/**
+ * Sorts and returns metadata synchronously while the write settles in the
+ * background. Callers feed the return value straight into React state, so it
+ * must stay synchronous.
+ */
 export function persistConversationMeta(metas: ConversationMeta[]) {
-  const sortedMetas = sortConversationMeta(
-    metas.map(normalizeConversationMeta),
-  );
-  const serialized = JSON.stringify(sortedMetas);
-  void enqueueMutation(META_KEY, "save metadata", () =>
-    AsyncStorage.setItem(META_KEY, serialized),
-  );
+  const sortedMetas = sortConversationMeta(metas.map(normalizeConversationMeta));
+
+  void (async () => {
+    try {
+      await ensureReady();
+      await runInConversationTransaction((database) =>
+        updateConversationMetaRows(database, sortedMetas),
+      );
+    } catch (error) {
+      reportStorageFailure("metadata", "save metadata", error);
+    }
+  })();
+
   return sortedMetas;
+}
+
+/**
+ * Test seam: clears the database handle and the one-time migration guard
+ * together. Resetting only one of them leaves a suite either reading a stale
+ * store or skipping the migration it meant to exercise.
+ */
+export function resetConversationStorageForTests() {
+  readyPromise = null;
+  resetConversationDatabaseForTests();
 }
 
 export async function hydrateConversationMeta(meta: ConversationMeta) {

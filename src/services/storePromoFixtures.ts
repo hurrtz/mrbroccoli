@@ -5,12 +5,9 @@ import {
   buildConversationMetaFromConversation,
   sortConversationMeta,
 } from "../hooks/conversations/meta";
-import {
-  ACTIVE_CONVERSATION_KEY,
-  META_KEY,
-  conversationKey,
-  readStoredConversationMetas,
-} from "../hooks/conversations/storage";
+import { persistActiveConversationId } from "../hooks/conversations/storage";
+import { relativizeConversationImageAttachmentUris } from "./imageAttachmentFiles";
+import { replaceAllConversationRows } from "./conversationStore";
 import { toPublicSettings } from "../hooks/settings/storage";
 import { STORAGE_KEY } from "../hooks/settings/types";
 import {
@@ -615,10 +612,9 @@ export async function seedStorePromoFixture(
     return false;
   }
 
-  const [storedSettingsRaw, previousMetas] = await Promise.all([
-    AsyncStorage.getItem(STORAGE_KEY),
-    readStoredConversationMetas(),
-  ]);
+  // The previous run's conversations no longer need collecting: the fixture
+  // replaces the whole table rather than deleting a list of keys.
+  const storedSettingsRaw = await AsyncStorage.getItem(STORAGE_KEY);
   const storedSettings = storedSettingsRaw
     ? (JSON.parse(storedSettingsRaw) as Partial<Settings>)
     : {};
@@ -670,25 +666,27 @@ export async function seedStorePromoFixture(
       }),
     ),
   );
-  const previousConversationKeys = previousMetas.map(({ id }) =>
-    conversationKey(id),
-  );
+  const metaById = new Map(metas.map((meta) => [meta.id, meta] as const));
 
-  if (previousConversationKeys.length > 0) {
-    await AsyncStorage.multiRemove(previousConversationKeys);
-  }
+  // Conversations live in SQLite, so the fixture replaces the table wholesale
+  // rather than clearing the previous run's AsyncStorage keys. Settings and the
+  // promo markers stay in AsyncStorage.
   await AsyncStorage.multiSet([
     [STORAGE_KEY, JSON.stringify(toPublicSettings(nextSettings))],
-    [META_KEY, JSON.stringify(metas)],
-    [ACTIVE_CONVERSATION_KEY, "promo-root"],
     [STORE_PROMO_FIXTURE_MARKER_KEY, language],
     [STORE_PROMO_SCENE_STORAGE_KEY, scene],
     [DEVELOPMENT_ENTITLEMENT_MODE_STORAGE_KEY, scene],
-    ...conversations.map(
-      (conversation) =>
-        [conversationKey(conversation.id), JSON.stringify(conversation)] as const,
-    ),
   ]);
+  await replaceAllConversationRows(
+    conversations.map((conversation) => ({
+      conversation,
+      document: JSON.stringify(
+        relativizeConversationImageAttachmentUris(conversation),
+      ),
+      meta: metaById.get(conversation.id) ?? buildConversationMetaFromConversation(conversation),
+    })),
+  );
+  await persistActiveConversationId("promo-root");
 
   return true;
 }

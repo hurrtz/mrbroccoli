@@ -122,7 +122,11 @@ applies.
 
 - Public settings are stored under the AsyncStorage key `@mrbroccoli/settings`.
 - Provider API keys are stored separately in `expo-secure-store` using the `mrbroccoli.provider_key.<provider>` prefix.
-- Conversations are stored under the AsyncStorage key `@mrbroccoli/conversations` plus per-conversation keys `@mrbroccoli/conversation/<id>`.
+- Conversations are stored in SQLite (`mr-broccoli-conversations.db`) through
+  `src/services/conversationStore/`, which also performs a one-time import from
+  the former AsyncStorage keys. Those legacy keys are deliberately left in place
+  for one release as a recovery path. The derived knowledge index keeps its own
+  separate database so an indexing failure can never roll back a message write.
 - Do not move provider API keys into AsyncStorage or any plain-text project config.
 - App-data backups contain portable public settings and complete conversation
   records. They must never contain provider API keys, validation diagnostics,

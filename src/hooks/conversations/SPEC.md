@@ -4,9 +4,9 @@ code_paths:
   - src/hooks/useConversations.ts
   - src/hooks/conversations/**
 dependencies:
+  - src/services/conversationStore/
   - src/services/conversationKnowledge/
   - src/services/imageAttachmentFiles.ts
-  - AsyncStorage
 validations:
   - npm test -- --runInBand --watchman=false __tests__/hooks/useConversations.test.ts __tests__/utils/conversationBranches.test.ts __tests__/services/appDataBackup.test.ts
   - npm run typecheck:app
@@ -22,13 +22,18 @@ last_validated_sha: 7db5c94
 
 `useConversations` is the public owner of conversation hydration, selection,
 search, mutations, branches, privacy, integrity repair, and backup restore.
-This directory owns canonical AsyncStorage access and metadata derivation.
+This directory owns the hook-facing store API and metadata derivation.
 
 ## Storage Shape
 
-- `@mrbroccoli/conversations` stores the sorted lightweight metadata list.
-- `@mrbroccoli/conversation/<id>` stores each complete conversation.
-- `@mrbroccoli/active_conversation` stores the selected conversation ID.
+Conversations are held in SQLite by
+[`../../services/conversationStore/`](../../services/conversationStore/SPEC.md),
+which owns the schema, transaction discipline, and the one-time import from the
+former AsyncStorage keys. This directory owns the hook-facing API over it.
+
+- One row per conversation carries the complete record, its metadata, and
+  mirrored ordering columns.
+- The active conversation ID lives in the store's `app_state` table.
 - Image attachment URIs are persisted relative to the app-owned document
   location and resolved against the current container when loaded.
 
@@ -36,9 +41,14 @@ Metadata provides fast drawer rendering and search orientation. Full records
 hydrate only when needed. Derived metadata must be rebuildable from a complete
 conversation record.
 
-Writes are serialized per key. A missing or unreadable conversation does not
+Writes are serialized and transactional, so an operation spanning several
+records is never half-applied. A missing or unreadable conversation does not
 crash hydration; it is reported through the persistence alert path and handled
 as unavailable state.
+
+**Decision:** `storage.ts` keeps its previous function signatures. Hydration,
+mutations, search, and backup restore were written against them, so holding the
+boundary steady kept the store swap out of a 1,200-line mutation surface.
 
 ## Conversation Mutations
 

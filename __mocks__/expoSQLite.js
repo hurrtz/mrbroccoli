@@ -13,6 +13,16 @@
 // working SQL by default, and a suite that prefers hand-built fixtures can
 // still override any single method with `mockImplementation` --
 // `conversationKnowledge.test.ts` does exactly that.
+//
+// Reach this module the way application code does:
+//
+//     import * as SQLite from "expo-sqlite";
+//     (SQLite as unknown as { __reset: () => void }).__reset();
+//
+// NOT through `jest.requireMock("expo-sqlite")`, which hands back a second
+// instance of this module holding its own separate database. Resetting that
+// copy leaves the one under test untouched, so rows survive into the next
+// test and failures surface far from their cause.
 const { DatabaseSync } = require("node:sqlite");
 
 // One database backs every name. The app opens two files (conversations and

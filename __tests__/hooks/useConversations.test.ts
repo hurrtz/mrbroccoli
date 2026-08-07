@@ -1,10 +1,14 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as FileSystem from "expo-file-system/legacy";
+import * as SQLite from "expo-sqlite";
 import { renderHook, act, waitFor } from "@testing-library/react-native";
 import { useConversations } from "../../src/hooks/useConversations";
+import { getConversationDatabase } from "../../src/services/conversationStore";
 import {
   readConversation,
+  readStoredConversationMetas,
   removeConversation,
+  resetConversationStorageForTests,
   saveConversation,
 } from "../../src/hooks/conversations/storage";
 import type { Conversation } from "../../src/types";
@@ -24,6 +28,10 @@ jest.mock("react-native-uuid", () => ({
 describe("useConversations", () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    // Conversations live in a module-level SQLite store, so without this every
+    // test inherits the rows the previous one wrote.
+    (SQLite as unknown as { __reset: () => void }).__reset();
+    resetConversationStorageForTests();
     mockUuidCounter = 0;
     (AsyncStorage.getItem as jest.Mock).mockImplementation(() =>
       Promise.resolve(null),
@@ -280,11 +288,9 @@ describe("useConversations", () => {
       result.current.conversations.find(({ id }) => id === legacyBranch.id)
         ?.branch,
     ).toEqual(result.current.activeConversation?.branch);
-    await waitFor(() => {
-      const restoredParent = JSON.parse(
-        stored.get(`@mrbroccoli/conversation/${parent.id}`) ?? "{}",
-      ) as Conversation;
-      expect(restoredParent.knowledgeExcludedConversationIds).toContain(
+    await waitFor(async () => {
+      const restoredParent = await readConversation(parent.id);
+      expect(restoredParent?.knowledgeExcludedConversationIds).toContain(
         legacyBranch.id,
       );
     });
@@ -366,11 +372,9 @@ describe("useConversations", () => {
       expect.arrayContaining(["stored-before-launch", createdConversationId]),
     );
 
-    await waitFor(() => {
-      const persistedMetas = JSON.parse(
-        stored.get("@mrbroccoli/conversations") ?? "[]",
-      );
-      expect(persistedMetas.map(({ id }: { id: string }) => id)).toEqual(
+    await waitFor(async () => {
+      const persistedMetas = await readStoredConversationMetas();
+      expect(persistedMetas.map(({ id }) => id)).toEqual(
         expect.arrayContaining(["stored-before-launch", createdConversationId]),
       );
     });
@@ -389,21 +393,41 @@ describe("useConversations", () => {
       id: "second-selection",
       title: "Second",
     };
-    let releaseFirstRead: (value: string) => void = () => undefined;
-    let releaseSecondRead: (value: string) => void = () => undefined;
-    (AsyncStorage.getItem as jest.Mock).mockImplementation((key: string) => {
-      if (key === "@mrbroccoli/conversation/first-selection") {
-        return new Promise<string>((resolve) => {
-          releaseFirstRead = resolve;
-        });
-      }
-      if (key === "@mrbroccoli/conversation/second-selection") {
-        return new Promise<string>((resolve) => {
-          releaseSecondRead = resolve;
-        });
-      }
-      return Promise.resolve(null);
+    await saveConversation(firstConversation);
+    await saveConversation(secondConversation);
+
+    // Hold both row reads open so the selections can be released in the wrong
+    // order on purpose. The gate now sits on the SQLite read rather than on
+    // AsyncStorage.
+    let releaseFirstRead: () => void = () => undefined;
+    let releaseSecondRead: () => void = () => undefined;
+    // Both gates are created before the mock can reach them, so releasing one
+    // can never race ahead of its resolver being assigned.
+    const firstGate = new Promise<void>((resolve) => {
+      releaseFirstRead = resolve;
     });
+    const secondGate = new Promise<void>((resolve) => {
+      releaseSecondRead = resolve;
+    });
+    let firstReadEntered = false;
+    let secondReadEntered = false;
+    const database = await getConversationDatabase();
+    const readRow = database.getFirstAsync as jest.Mock;
+    const passThrough = readRow.getMockImplementation()!;
+    readRow.mockImplementation(async (sql: string, ...params: unknown[]) => {
+      if (sql.includes("FROM conversations WHERE id = ?")) {
+        if (params[0] === "first-selection") {
+          firstReadEntered = true;
+          await firstGate;
+        }
+        if (params[0] === "second-selection") {
+          secondReadEntered = true;
+          await secondGate;
+        }
+      }
+      return passThrough(sql, ...params);
+    });
+
     const { result } = renderHook(() => useConversations());
 
     let firstSelection = Promise.resolve();
@@ -414,21 +438,18 @@ describe("useConversations", () => {
     });
 
     await waitFor(() => {
-      expect(AsyncStorage.getItem).toHaveBeenCalledWith(
-        "@mrbroccoli/conversation/first-selection",
-      );
-      expect(AsyncStorage.getItem).toHaveBeenCalledWith(
-        "@mrbroccoli/conversation/second-selection",
-      );
+      expect(firstReadEntered).toBe(true);
+      expect(secondReadEntered).toBe(true);
     });
     await act(async () => {
-      releaseSecondRead(JSON.stringify(secondConversation));
+      releaseSecondRead();
       await secondSelection;
     });
     await act(async () => {
-      releaseFirstRead(JSON.stringify(firstConversation));
+      releaseFirstRead();
       await firstSelection;
     });
+    readRow.mockImplementation(passThrough);
 
     expect(result.current.activeConversation?.id).toBe("second-selection");
   });
@@ -506,11 +527,9 @@ describe("useConversations", () => {
       id: "test-uuid-2",
       title: "Imported conversation",
     });
-    expect(
-      JSON.parse(
-        stored.get(`@mrbroccoli/conversation/${localConversation.id}`)!,
-      ),
-    ).toMatchObject({
+    await expect(
+      readConversation(localConversation.id),
+    ).resolves.toMatchObject({
       id: localConversation.id,
       title: "Local conversation",
     });
@@ -830,10 +849,9 @@ describe("useConversations", () => {
         voice: "nova",
       },
     });
-    expect(AsyncStorage.setItem).toHaveBeenCalledWith(
-      `@mrbroccoli/conversation/${firstId}`,
-      expect.stringContaining('"responseLength":"thorough"'),
-    );
+    await expect(readConversation(firstId)).resolves.toMatchObject({
+      settings: { responseLength: "thorough" },
+    });
   });
 
   it("updates a stored message in place", async () => {
@@ -1209,10 +1227,9 @@ describe("useConversations", () => {
       "User prefers concise answers and is planning a launch.",
     );
     expect(result.current.activeConversation?.summarizedMessageCount).toBe(4);
-    expect(AsyncStorage.setItem).toHaveBeenCalledWith(
-      "@mrbroccoli/conversation/test-uuid-1",
-      expect.stringContaining('"summarizedMessageCount":4'),
-    );
+    await expect(readConversation("test-uuid-1")).resolves.toMatchObject({
+      summarizedMessageCount: 4,
+    });
   });
 
   it("lets the user correct saved compact memory without changing its scope", async () => {
@@ -1540,12 +1557,10 @@ describe("useConversations", () => {
     expect(result.current.conversations[0]).toEqual(
       expect.objectContaining({ id: conversationId, isPrivate: true }),
     );
-    await waitFor(() => {
-      expect(
-        JSON.parse(
-          stored.get(`@mrbroccoli/conversation/${conversationId}`) ?? "{}",
-        ),
-      ).toEqual(expect.objectContaining({ isPrivate: true }));
+    await waitFor(async () => {
+      await expect(readConversation(conversationId!)).resolves.toEqual(
+        expect.objectContaining({ isPrivate: true }),
+      );
     });
   });
 
@@ -1578,29 +1593,25 @@ describe("useConversations", () => {
   });
 
   it("serializes conversation writes so an older save cannot win the race", async () => {
-    const stored = new Map<string, string>();
+    // The store queues writes behind one another, so a slow first save must
+    // hold the second back rather than letting it land and be overwritten.
     let releaseFirstWrite: () => void = () => undefined;
+    const firstWriteGate = new Promise<void>((resolve) => {
+      releaseFirstWrite = resolve;
+    });
     let conversationWriteCount = 0;
-    const key = "@mrbroccoli/conversation/ordered-writes";
-    (AsyncStorage.setItem as jest.Mock).mockImplementation(
-      async (writeKey: string, value: string) => {
-        if (writeKey !== key) {
-          stored.set(writeKey, value);
-          return;
-        }
-
+    const database = await getConversationDatabase();
+    const writeRow = database.runAsync as jest.Mock;
+    const passThroughWrite = writeRow.getMockImplementation()!;
+    writeRow.mockImplementation(async (sql: string, ...params: unknown[]) => {
+      if (sql.includes("INSERT INTO conversations")) {
         conversationWriteCount += 1;
         if (conversationWriteCount === 1) {
-          await new Promise<void>((resolve) => {
-            releaseFirstWrite = resolve;
-          });
+          await firstWriteGate;
         }
-        stored.set(writeKey, value);
-      },
-    );
-    (AsyncStorage.getItem as jest.Mock).mockImplementation(
-      async (readKey: string) => stored.get(readKey) ?? null,
-    );
+      }
+      return passThroughWrite(sql, ...params);
+    });
     const base: Conversation = {
       id: "ordered-writes",
       title: "Ordering",
@@ -1625,13 +1636,17 @@ describe("useConversations", () => {
 
     const firstSave = saveConversation(base);
     const newestSave = saveConversation(newest);
-    await Promise.resolve();
-    await Promise.resolve();
-    await Promise.resolve();
 
+    // Only the first write may be in flight while the gate is held; the second
+    // has to wait its turn instead of racing past and being overwritten.
+    await waitFor(() => {
+      expect(conversationWriteCount).toBe(1);
+    });
+    await new Promise((resolve) => setImmediate(resolve));
     expect(conversationWriteCount).toBe(1);
     releaseFirstWrite();
     await Promise.all([firstSave, newestSave]);
+    writeRow.mockImplementation(passThroughWrite);
 
     await expect(readConversation(base.id)).resolves.toEqual(newest);
   });
@@ -1677,9 +1692,14 @@ describe("useConversations", () => {
 
     await saveConversation(conversation);
 
-    const serialized = JSON.parse(
-      stored.get("@mrbroccoli/conversation/portable-image-path") ?? "{}",
-    ) as Conversation;
+    // Read the raw document column: the point is that the URI is stored
+    // relative to the container, which `readConversation` deliberately undoes.
+    const database = await getConversationDatabase();
+    const row = await database.getFirstAsync<{ document: string }>(
+      "SELECT document FROM conversations WHERE id = ?",
+      conversation.id,
+    );
+    const serialized = JSON.parse(row?.document ?? "{}") as Conversation;
     expect(serialized.messages[0]?.attachments?.[0]?.uri).toBe(
       "message-images/image-1.jpg",
     );
