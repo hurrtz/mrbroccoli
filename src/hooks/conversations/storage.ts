@@ -125,6 +125,39 @@ export async function saveConversation(conversation: Conversation) {
   }
 }
 
+/**
+ * Writes several conversations in one transaction.
+ *
+ * Branching and backup restore each touch more than one record: a branch also
+ * rewrites its family's knowledge exclusions, and a restore imports a whole
+ * set. Saving them one at a time would leave a family half-updated, or an
+ * import half-applied, if the app died midway.
+ */
+export async function saveConversationsAtomically(conversations: Conversation[]) {
+  if (conversations.length === 0) {
+    return;
+  }
+
+  try {
+    await ensureReady();
+    const prepared = conversations.map((conversation) => ({
+      conversation,
+      document: JSON.stringify(
+        relativizeConversationImageAttachmentUris(conversation),
+      ),
+      initialMeta: buildConversationMetaFromConversation(conversation),
+    }));
+
+    await runInConversationTransaction(async (database) => {
+      for (const entry of prepared) {
+        await upsertConversationRow(database, entry);
+      }
+    });
+  } catch (error) {
+    reportStorageFailure("conversation", "save batch", error);
+  }
+}
+
 export async function removeConversation(id: string) {
   try {
     await ensureReady();

@@ -31,6 +31,7 @@ import {
   readConversation,
   removeConversation,
   saveConversation,
+  saveConversationsAtomically,
 } from "./storage";
 import {
   removeConversationKnowledge,
@@ -707,18 +708,20 @@ export function useConversationMutations(params: {
       };
       const meta = buildConversationMetaFromConversation(conversation);
 
-      await Promise.all([
-        saveConversation(conversation),
-        ...familyIds.map(async (familyConversationId) => {
+      // Read the family first, then write the branch and every updated sibling
+      // in one transaction. Saving them separately could leave a family whose
+      // members disagree about which conversations to exclude from retrieval.
+      const familyUpdates = await Promise.all(
+        familyIds.map(async (familyConversationId) => {
           const familyConversation =
             familyConversationId === currentConversation.id
               ? currentConversation
               : await readConversation(familyConversationId);
           if (!familyConversation) {
-            return;
+            return null;
           }
 
-          await saveConversation({
+          return {
             ...familyConversation,
             knowledgeExcludedConversationIds: [
               ...new Set([
@@ -727,8 +730,12 @@ export function useConversationMutations(params: {
                 conversationId,
               ]),
             ],
-          });
+          };
         }),
+      );
+      await saveConversationsAtomically([
+        conversation,
+        ...familyUpdates.filter((entry) => entry !== null),
       ]);
       setConversations((previous) => persistMetas([meta, ...previous]));
       setActiveConversationValue(conversation);
@@ -920,6 +927,7 @@ export function useConversationMutations(params: {
 
       const usedIds = new Set(existingMetasById.keys());
       const restoredMetas: ConversationMeta[] = [];
+      const restoredConversations: Conversation[] = [];
       const restoredByOriginalId = new Map<string, Conversation>();
       const pendingRestores: {
         originalId: string;
@@ -1008,18 +1016,25 @@ export function useConversationMutations(params: {
               }
             : {}),
         };
-        await saveConversation(restoredConversation);
-        if (
-          pastConversationKnowledgeEnabled &&
-          !restoredConversation.isPrivate
-        ) {
-          void syncConversationKnowledge(restoredConversation, true);
-        }
+        restoredConversations.push(restoredConversation);
         restoredMetas.push({
           ...buildConversationMetaFromConversation(restoredConversation),
           pinned: pending.pinned,
         });
         restoredByOriginalId.set(pending.originalId, restoredConversation);
+      }
+
+      // One transaction for the whole import. Writing record by record could
+      // leave a restore half-applied, with branch references pointing at
+      // conversations that never landed.
+      await saveConversationsAtomically(restoredConversations);
+
+      if (pastConversationKnowledgeEnabled) {
+        for (const restoredConversation of restoredConversations) {
+          if (!restoredConversation.isPrivate) {
+            void syncConversationKnowledge(restoredConversation, true);
+          }
+        }
       }
 
       if (restoredMetas.length > 0) {

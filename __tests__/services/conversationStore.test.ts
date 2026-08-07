@@ -10,6 +10,7 @@ import {
   removeConversation,
   resetConversationStorageForTests,
   saveConversation,
+  saveConversationsAtomically,
 } from "../../src/hooks/conversations/storage";
 import { buildConversationMetaFromConversation } from "../../src/hooks/conversations/meta";
 import {
@@ -174,6 +175,46 @@ describe("conversation store", () => {
 
       await persistActiveConversationId(null);
       await expect(readActiveConversationId()).resolves.toBeNull();
+    });
+  });
+
+  describe("batch writes", () => {
+    it("writes several conversations in one transaction", async () => {
+      await saveConversationsAtomically([
+        createConversation("c1"),
+        createConversation("c2"),
+        createConversation("c3"),
+      ]);
+
+      const metas = await readStoredConversationMetas();
+      expect(metas.map((meta) => meta.id).sort()).toEqual(["c1", "c2", "c3"]);
+    });
+
+    it("stores none of the batch when one record fails", async () => {
+      // Branching rewrites a whole family and restore imports a whole set.
+      // A partial write would leave branch references pointing at
+      // conversations that never landed.
+      const database = await getConversationDatabase();
+      const writeRow = database.runAsync as jest.Mock;
+      const passThrough = writeRow.getMockImplementation()!;
+      writeRow.mockImplementation(async (sql: string, ...params: unknown[]) => {
+        if (sql.includes("INSERT INTO conversations") && params[0] === "c2") {
+          throw new Error("disk full");
+        }
+        return passThrough(sql, ...params);
+      });
+
+      await saveConversationsAtomically([
+        createConversation("c1"),
+        createConversation("c2"),
+      ]);
+      writeRow.mockImplementation(passThrough);
+
+      await expect(readStoredConversationMetas()).resolves.toEqual([]);
+    });
+
+    it("ignores an empty batch", async () => {
+      await expect(saveConversationsAtomically([])).resolves.toBeUndefined();
     });
   });
 
