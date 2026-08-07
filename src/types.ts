@@ -171,8 +171,7 @@ export interface Settings {
   providerValidationResults: ProviderValidationResults;
   language: AppLanguage;
   theme: ThemeMode;
-  setupGuideDismissed: boolean;
-  showSetupGuideShortcut: boolean;
+  introDismissed: boolean;
   freeOnboardingLanguageInitialized: boolean;
   freeOfflineSetupCompleted: boolean;
   freeOfflineProfileOverrides: FreeOfflineProfileOverrides;
@@ -472,8 +471,7 @@ export const DEFAULT_SETTINGS: Settings = {
   providerValidationResults: {},
   language: "en",
   theme: "system",
-  setupGuideDismissed: false,
-  showSetupGuideShortcut: true,
+  introDismissed: false,
   freeOnboardingLanguageInitialized: false,
   freeOfflineSetupCompleted: false,
   freeOfflineProfileOverrides: {},

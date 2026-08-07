@@ -9,6 +9,7 @@ import { imagePromptTranslations } from "../imagePromptTranslations";
 import { memoryEditTranslations } from "../memoryEditTranslations";
 import { onDeviceTranslations } from "../onDeviceTranslations";
 import { onboardingTranslations } from "../onboardingTranslations";
+import { introTranslations } from "../introTranslations";
 import { premiumTranslations } from "../premiumTranslations";
 import { transcriptEditTranslations } from "../transcriptEditTranslations";
 
@@ -23,6 +24,7 @@ export const fr = {
   ...memoryEditTranslations.fr,
   ...onDeviceTranslations.fr,
   ...onboardingTranslations.fr,
+  ...introTranslations.fr,
   ...premiumTranslations.fr,
   ...transcriptEditTranslations.fr,
   appName: "M. Brocoli",

@@ -1,6 +1,7 @@
 import React from "react";
 import { View } from "react-native";
 
+import { IntroBanner } from "../../components/IntroBanner";
 import type { Colors } from "../../theme/colors";
 import { MainScreenRouteCard } from "./MainScreenRouteCard";
 import { MainScreenRouteControls } from "./MainScreenRouteControls";
@@ -11,6 +12,7 @@ import { styles } from "./styles";
 
 interface MainScreenWorkspaceProps {
   colors: Colors;
+  introBanner: Omit<React.ComponentProps<typeof IntroBanner>, "colors">;
   isLandscape: boolean;
   routeCard: Omit<
     React.ComponentProps<typeof MainScreenRouteCard>,
@@ -36,6 +38,7 @@ interface MainScreenWorkspaceProps {
 
 export function MainScreenWorkspace({
   colors,
+  introBanner,
   isLandscape,
   routeCard,
   routeControls,
@@ -58,6 +61,7 @@ export function MainScreenWorkspace({
           style={styles.landscapeLeftColumn}
         >
           <MainScreenTopBar colors={colors} {...landscapeTopBar} />
+          <IntroBanner colors={colors} {...introBanner} />
 
           <MainScreenRouteCard
             colors={colors}
@@ -117,6 +121,7 @@ export function MainScreenWorkspace({
       <MainScreenTopBar colors={colors} {...topBar} />
 
       <View style={styles.workspaceBody}>
+        <IntroBanner colors={colors} {...introBanner} />
         <MainScreenRouteCard colors={colors} {...routeCard} />
 
         <MainScreenRouteControls colors={colors} {...routeControls} />

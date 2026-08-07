@@ -7,24 +7,17 @@ interface MainScreenSurfaceActionsParams {
   handleClearMemory: () => Promise<void>;
   handleCopyMemory: () => Promise<void>;
   handleCopyThread: (conversationId?: string) => Promise<void>;
-  handleFinishSetupGuide: () => Promise<void>;
   handleGenerateTitle: () => Promise<void>;
-  handleOpenSettingsFromSummary: () => Promise<void>;
   handleRenameThread: (
     conversationId: string,
     nextTitle: string,
   ) => Promise<void>;
   handleShareThread: (conversationId?: string) => Promise<void>;
-  handleValidateProviderKey: () => Promise<boolean>;
   openMemory: (conversationId?: string) => Promise<void>;
   openSettings: (focusProvider?: Provider, focusTab?: SettingsTab) => void;
   runAfterDrawerDismiss: (action: () => void) => void;
   setDrawerVisible: (visible: boolean) => void;
   setStyleSheetVisible: (visible: boolean) => void;
-  setupGuideVoiceTest: {
-    handleAction: () => Promise<void>;
-    reset: (stopPlayback: boolean) => Promise<void>;
-  };
   updateSettings: (partial: Partial<Settings>) => void;
   webSearchActive: boolean;
 }
@@ -33,25 +26,17 @@ export function useMainScreenSurfaceActions({
   handleClearMemory,
   handleCopyMemory,
   handleCopyThread,
-  handleFinishSetupGuide,
   handleGenerateTitle,
-  handleOpenSettingsFromSummary,
   handleRenameThread,
   handleShareThread,
-  handleValidateProviderKey,
   openMemory,
   openSettings,
   runAfterDrawerDismiss,
   setDrawerVisible,
   setStyleSheetVisible,
-  setupGuideVoiceTest,
   updateSettings,
   webSearchActive,
 }: MainScreenSurfaceActionsParams) {
-  const {
-    handleAction: handleSetupGuideVoiceTest,
-    reset: resetSetupGuideVoiceTest,
-  } = setupGuideVoiceTest;
   const handleOpenDrawer = useCallback(() => {
     setDrawerVisible(true);
   }, [setDrawerVisible]);
@@ -81,27 +66,6 @@ export function useMainScreenSurfaceActions({
   const handleAutoRenameConversation = useCallback(() => {
     void handleGenerateTitle();
   }, [handleGenerateTitle]);
-  const handleValidateSetupGuideProviderKey = useCallback(() => {
-    void handleValidateProviderKey();
-  }, [handleValidateProviderKey]);
-  const handleSetupGuideVoiceTestAction = useCallback(() => {
-    void handleSetupGuideVoiceTest();
-  }, [handleSetupGuideVoiceTest]);
-  const handleResetSetupGuideVoiceTest = useCallback(() => {
-    void resetSetupGuideVoiceTest(true);
-  }, [resetSetupGuideVoiceTest]);
-  const handleFinishSetupGuidePress = useCallback(() => {
-    void handleFinishSetupGuide();
-  }, [handleFinishSetupGuide]);
-  const handleOpenSettingsFromSetupGuide = useCallback(() => {
-    void handleOpenSettingsFromSummary();
-  }, [handleOpenSettingsFromSummary]);
-  const handleSetupGuideShortcutVisibilityChange = useCallback(
-    (visible: boolean) => {
-      updateSettings({ showSetupGuideShortcut: visible });
-    },
-    [updateSettings],
-  );
   const handleCopyMemoryPress = useCallback(() => {
     void handleCopyMemory();
   }, [handleCopyMemory]);
@@ -144,20 +108,14 @@ export function useMainScreenSurfaceActions({
     handleCloseDrawer,
     handleCopyDrawerThread,
     handleCopyMemoryPress,
-    handleFinishSetupGuidePress,
     handleManageDrawerMemory,
     handleOpenConversationSettings,
     handleOpenDrawer,
     handleOpenMainSettings,
     handleOpenProviderSettings,
-    handleOpenSettingsFromSetupGuide,
     handleOpenSpeakingSettings,
     handleRenameDrawerThread,
-    handleResetSetupGuideVoiceTest,
-    handleSetupGuideShortcutVisibilityChange,
-    handleSetupGuideVoiceTestAction,
     handleShareDrawerThread,
     handleToggleWebSearch,
-    handleValidateSetupGuideProviderKey,
   };
 }

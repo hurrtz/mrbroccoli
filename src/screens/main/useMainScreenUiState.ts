@@ -12,7 +12,6 @@ export function useMainScreenUiState() {
   const [settingsFocusTab, setSettingsFocusTab] = useState<SettingsTab | undefined>();
   const [drawerVisible, setDrawerVisible] = useState(false);
   const [statusDetailsVisible, setStatusDetailsVisible] = useState(false);
-  const [setupGuideVisible, setSetupGuideVisible] = useState(false);
   const [memoryConversation, setMemoryConversation] =
     useState<Conversation | null>(null);
   const [memoryVisible, setMemoryVisible] = useState(false);
@@ -101,11 +100,9 @@ export function useMainScreenUiState() {
     settingsFocusTab,
     drawerVisible,
     statusDetailsVisible,
-    setupGuideVisible,
     memoryConversation,
     memoryVisible,
     setDrawerVisible,
-    setSetupGuideVisible,
     setMemoryConversation,
     openSettings,
     openCatalogSettings,

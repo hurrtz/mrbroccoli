@@ -195,13 +195,12 @@ export function normalizeStoredScalarSettings(
   | "localLanguages"
   | "localSttModelId"
   | "localTtsModelId"
-  | "setupGuideDismissed"
+  | "introDismissed"
   | "freeOnboardingLanguageInitialized"
   | "freeOfflineSetupCompleted"
   | "freeOfflineProfileOverrides"
   | "nativeSttRequiresOnDevice"
   | "nativeTtsVoiceId"
-  | "showSetupGuideShortcut"
   | "showUsageStats"
   | "showDebugLogButton"
   | "pastConversationKnowledgeEnabled"
@@ -308,8 +307,8 @@ export function normalizeStoredScalarSettings(
       storedSettings?.localTtsModelId,
       "tts",
     ),
-    setupGuideDismissed: getStoredBoolean(
-      storedSettings?.setupGuideDismissed,
+    introDismissed: getStoredBoolean(
+      storedSettings?.introDismissed,
       hasConfiguredKeys,
     ),
     freeOnboardingLanguageInitialized: getStoredBoolean(
@@ -331,10 +330,6 @@ export function normalizeStoredScalarSettings(
       typeof storedSettings?.nativeTtsVoiceId === "string"
         ? storedSettings.nativeTtsVoiceId
         : DEFAULT_SETTINGS.nativeTtsVoiceId,
-    showSetupGuideShortcut: getStoredBoolean(
-      storedSettings?.showSetupGuideShortcut,
-      DEFAULT_SETTINGS.showSetupGuideShortcut,
-    ),
     showUsageStats: getStoredBoolean(
       storedSettings?.showUsageStats,
       DEFAULT_SETTINGS.showUsageStats,

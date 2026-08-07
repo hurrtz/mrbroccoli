@@ -363,8 +363,6 @@ function applyFreeRuntimeBoundaries(settings: Settings): Settings {
     responseLength: "normal",
     responseTone: "professional",
     showUsageStats: false,
-    setupGuideDismissed: true,
-    showSetupGuideShortcut: false,
     pastConversationKnowledgeEnabled: false,
     ulraModeEnabled: false,
     ulraModeActive: false,

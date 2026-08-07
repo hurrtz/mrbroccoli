@@ -103,6 +103,10 @@ applies.
 ## Main Architecture
 
 - `src/screens/MainScreen.tsx` is the main composition root. It wires focused hooks and services into the workspace and secondary surfaces; recording, transcription, LLM, playback, setup, and persistence behavior live outside the screen component.
+- `src/components/IntroBanner.tsx` and `src/components/introFlow/` are the
+  first-run introduction. The blocking setup wizards were removed; the app
+  opens directly into the workspace and the intro sheet also opens at its final
+  step when a turn is attempted with no usable route.
 - `src/features/settings/AntSettingsModal.tsx` is the configuration entry point. Its historical `Ant` prefix remains for import stability, but the app no longer depends on Ant Design. Navigation/frame concerns live in `AntSettingsFrame.tsx`; page routing lives in `AntSettingsPageContent.tsx`; reusable non-visual settings logic lives in `src/features/settings-core/`.
 - Shared buttons, inputs, lists, dialogs, and tags live in `src/design-system/NativeControls.tsx`; settings cards, fields, and pickers live under `src/features/settings/settings-primitives/`. Keep these React Native-owned controls dependency-light and accessible.
 - `src/components/ResponseModeToggle.tsx` is the home-screen response-route selector. Its one-, two-, three-, and overflow-route layouts live under `src/components/responseModeToggle/`.

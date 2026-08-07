@@ -54,7 +54,7 @@ describe("useSettings", () => {
     expect(result.current.settings).toEqual(DEFAULT_SETTINGS);
     expect(result.current.settings.showUsageStats).toBe(false);
     expect(result.current.settings.showDebugLogButton).toBe(false);
-    expect(result.current.settings.showSetupGuideShortcut).toBe(true);
+    expect(result.current.settings.introDismissed).toBe(false);
     expect(result.current.settings.ulraModeEnabled).toBe(true);
     expect(result.current.settings.ulraModeActive).toBe(false);
     expect(result.current.settings.ulraModeRounds).toBe(2);
@@ -203,8 +203,7 @@ describe("useSettings", () => {
 
   it("loads saved settings from AsyncStorage", async () => {
     const saved = { ...DEFAULT_SETTINGS, lastProvider: "anthropic" as const };
-    delete (saved as Partial<typeof saved>).setupGuideDismissed;
-    delete (saved as Partial<typeof saved>).showSetupGuideShortcut;
+    delete (saved as Partial<typeof saved>).introDismissed;
     (AsyncStorage.getItem as jest.Mock).mockResolvedValueOnce(
       JSON.stringify(saved),
     );
@@ -230,8 +229,9 @@ describe("useSettings", () => {
       gemini: "gemini-test-key",
       xai: "xai-test",
     });
-    expect(result.current.settings.setupGuideDismissed).toBe(true);
-    expect(result.current.settings.showSetupGuideShortcut).toBe(true);
+    // An install that already has provider keys has nothing to be introduced
+    // to, so the banner starts dismissed.
+    expect(result.current.settings.introDismissed).toBe(true);
     expect(SecureStore.deleteItemAsync).toHaveBeenCalledWith(
       "mrbroccoli.provider_key.bytedance-doubao-seed",
     );
@@ -737,11 +737,11 @@ describe("useSettings", () => {
     ]);
   });
 
-  it("keeps the setup guide available for brand-new installs without keys", async () => {
+  it("shows the intro banner on a brand-new install", async () => {
     const { result } = renderHook(() => useSettings());
     await flushSettingsLoad();
 
-    expect(result.current.settings.setupGuideDismissed).toBe(false);
+    expect(result.current.settings.introDismissed).toBe(false);
   });
 
   it.each(APP_LANGUAGES)(

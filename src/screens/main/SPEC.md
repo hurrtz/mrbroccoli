@@ -81,10 +81,30 @@ runtime projection, not a destructive settings migration. Completing Free
 setup preserves configured provider response modes alongside the local Free
 routes; the Free runtime ignores them and they return untouched with Premium.
 
-**Decision:** The Premium purchase path stays reachable while the blocking
-Free setup surface is visible. The setup footer offers a localized Premium
-escape hatch and the upgrade modal remains mounted, so unsupported hardware or
-failing downloads never strand a user without a route to Premium.
+## Onboarding
+
+There is no blocking setup surface. A new install opens directly into the
+workspace, with a dismissible intro banner above it that opens a four-step
+sheet: what the app is, the three ways to power it, an audio example, and a
+choice between connecting a provider and installing on-device models.
+
+The same sheet opens at its final step whenever a turn is attempted with no
+usable route, so the microphone is never a dead end. Provider keys are entered
+in the settings provider panel and local models are managed on the on-device
+settings page; onboarding routes to those surfaces rather than duplicating
+them.
+
+**Decision:** Setup stopped being a gate. Requiring a multi-gigabyte download
+before the app could be seen made the setup cost the first impression. The
+trade is that a user can now reach a microphone with nothing configured, which
+the contextual entry point exists to answer.
+
+**Decision:** An install that already has provider keys starts with the banner
+dismissed. It has nothing to be introduced to.
+
+**Decision:** The audio example is bundled rather than generated. It carries a
+visible pre-recorded label and never plays automatically, so it cannot be read
+as what the user's own configuration will produce.
 
 ## Drive Session
 

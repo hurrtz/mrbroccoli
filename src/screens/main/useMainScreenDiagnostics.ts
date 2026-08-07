@@ -41,7 +41,6 @@ interface MainScreenDiagnosticsState {
   responseTone: AssistantResponseTone;
   settingsFocusCatalogProviderId: string | null;
   settingsVisible: boolean;
-  setupGuideVisible: boolean;
   spokenRepliesEnabled: boolean;
   statusDetailsVisible: boolean;
   sttMode: SttBackendMode;
@@ -191,10 +190,4 @@ export function useMainScreenDiagnostics(state: MainScreenDiagnosticsState) {
     });
   }, [state.memoryConversationId, state.memoryVisible]);
 
-  useEffect(() => {
-    recordDebugLogEvent({
-      event: "setup-guide-visibility-changed",
-      payload: { visible: state.setupGuideVisible },
-    });
-  }, [state.setupGuideVisible]);
 }

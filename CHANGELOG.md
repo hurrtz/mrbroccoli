@@ -10,6 +10,14 @@ the complete Play Store translations are kept in a dedicated file under
 
 ## Unreleased
 
+- Replaced the setup wizards with an introduction you can skip. The app now
+  opens straight into the workspace, with a dismissible banner offering a short
+  four-step tour and a choice between connecting your own provider or
+  installing the on-device models.
+- Conversations are now stored in a database rather than in individual files.
+  Branching, deleting, and restoring a backup either complete or leave nothing
+  behind, instead of being able to stop halfway.
+
 ## 3.1.1 - 2026-08-07
 
 ### Fixed

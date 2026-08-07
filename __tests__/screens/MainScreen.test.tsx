@@ -381,14 +381,15 @@ jest.mock("../../src/features/settings/AntSettingsModal", () => ({
   },
 }));
 
-jest.mock("../../src/components/SetupGuideModal", () => ({
-  SetupGuideModal: ({ visible }: { visible: boolean }) => {
+jest.mock("../../src/components/introFlow/IntroFlowSheet", () => ({
+  INTRO_STEPS: ["what", "how", "hear", "start"],
+  IntroFlowSheet: ({ visible, step }: { visible: boolean; step: string }) => {
     const React = require("react");
     const { Text } = require("react-native");
     return React.createElement(
       Text,
       null,
-      visible ? "setup:open" : "setup:closed",
+      visible ? `intro:${step}` : "intro:closed",
     );
   },
 }));
@@ -423,33 +424,6 @@ jest.mock("../../src/components/Toast", () => ({
 
 jest.mock("../../src/screens/main/useProviderAvailabilityGuards", () => ({
   useProviderAvailabilityGuards: jest.fn(),
-}));
-
-jest.mock("../../src/screens/main/useSetupGuideController", () => ({
-  useSetupGuideController: jest.fn(() => ({
-    currentValidationState: { status: "idle" },
-    handleBack: jest.fn(),
-    handleContinueFromIntro: jest.fn(),
-    handleContinueFromProvider: jest.fn(),
-    handleContinueFromVoiceTest: jest.fn(),
-    handleDismissSetupGuide: jest.fn(),
-    handleFinishSetupGuide: jest.fn(),
-    handleOpenSetupGuide: jest.fn(),
-    handleOpenSettingsFromSummary: jest.fn(),
-    handleProviderApiKeyChange: jest.fn(),
-    handleSelectProvider: jest.fn(),
-    handleValidateProviderKey: jest.fn(),
-    openedFromSettings: false,
-    providerOptions: [],
-    resolvedRoutes: {},
-    selectedProvider: null,
-    selectedProviderApiKey: "",
-    step: "intro",
-    voiceTest: {
-      handleAction: jest.fn(),
-      reset: jest.fn(),
-    },
-  })),
 }));
 
 jest.mock("../../src/screens/main/useVoiceSessionController", () => ({

@@ -107,7 +107,7 @@ describe("useFreeOfflineMode", () => {
 
   it("suspends device and locale side effects for deterministic presentation fixtures", async () => {
     const updateSettings = jest.fn();
-    const { result } = renderHook(() =>
+    renderHook(() =>
       useFreeOfflineMode({
         settings: {
           ...DEFAULT_SETTINGS,
@@ -126,7 +126,6 @@ describe("useFreeOfflineMode", () => {
       await Promise.resolve();
     });
 
-    expect(result.current.setupVisible).toBe(true);
     expect(probeLocalDeviceCapabilities).not.toHaveBeenCalled();
     expect(updateSettings).not.toHaveBeenCalled();
   });
@@ -148,7 +147,9 @@ describe("useFreeOfflineMode", () => {
       }),
     );
 
-    expect(result.current.setupVisible).toBe(true);
+    // Preparation is no longer gated behind a takeover screen, but the Free
+    // runtime still must not report itself ready until readiness is verified.
+    expect(result.current.freeRuntimeReady).toBe(false);
     updateSettings.mockClear();
 
     act(() => result.current.start());
@@ -156,7 +157,7 @@ describe("useFreeOfflineMode", () => {
     expect(updateSettings).not.toHaveBeenCalledWith({
       freeOfflineSetupCompleted: true,
     });
-    expect(result.current.setupVisible).toBe(true);
+    expect(result.current.freeRuntimeReady).toBe(false);
   });
 
   it("normalizes legacy multi-language Free settings to one supported language", async () => {
@@ -296,7 +297,6 @@ describe("useFreeOfflineMode", () => {
       { timeout: 2_500 },
     );
 
-    act(() => result.current.openSetup());
     act(() => result.current.start());
 
     const completion = updateSettings.mock.calls.find(
@@ -355,7 +355,6 @@ describe("useFreeOfflineMode", () => {
       { timeout: 2_500 },
     );
 
-    act(() => result.current.openSetup());
     act(() => result.current.start());
 
     const completion = updateSettings.mock.calls.find(
@@ -415,32 +414,16 @@ describe("useFreeOfflineMode", () => {
         : null,
     ).toBe("qwen3-0.6b-q8");
 
-    act(() => result.current.openSetup());
-    expect(result.current.advancedOptionsEnabled).toBe(false);
-    expect(
-      result.current.selection?.status === "ready"
-        ? result.current.selection.profile.llm.id
-        : null,
-    ).toBe("granite-4.0-1b-q4");
-
-    act(() => result.current.setAdvancedOptionsEnabled(true));
+    // The blocking wizard used to show the recommendation until the user opted
+    // into advanced options. Without it there is only runtime, where a stored
+    // override has always applied -- but the recommendation must still be
+    // computed and left untouched, because it is what a reset falls back to.
     act(() => result.current.selectKokoroVoice("af_bella"));
-    expect(
-      result.current.selection?.status === "ready"
-        ? result.current.selection.profile.llm.id
-        : null,
-    ).toBe("qwen3-0.6b-q8");
-
-    act(() => result.current.setAdvancedOptionsEnabled(false));
     expect(result.current.selectedKokoroVoice).toBe("af_bella");
-    expect(
-      result.current.selection?.status === "ready"
-        ? result.current.selection.profile.llm.id
-        : null,
+    expect(result.current.recommendedSelection?.status === "ready"
+      ? result.current.recommendedSelection.profile.llm.id
+      : null,
     ).toBe("granite-4.0-1b-q4");
-
-    act(() => result.current.setAdvancedOptionsEnabled(true));
-    expect(result.current.selectedKokoroVoice).toBe("af_bella");
     expect(
       result.current.customSelection?.status === "ready"
         ? result.current.customSelection.profile.llm.id
@@ -457,17 +440,6 @@ describe("useFreeOfflineMode", () => {
       expect.any(Object),
     );
 
-    act(() => result.current.setAdvancedOptionsEnabled(false));
-    jest.mocked(prepareOfflineProfile).mockClear();
-    await act(async () => {
-      await result.current.prepare();
-    });
-    expect(jest.mocked(prepareOfflineProfile)).toHaveBeenLastCalledWith(
-      expect.objectContaining({
-        llm: expect.objectContaining({ id: "granite-4.0-1b-q4" }),
-      }),
-      expect.any(Object),
-    );
 
     act(() => result.current.setAdvancedOptionsEnabled(true));
     expect(

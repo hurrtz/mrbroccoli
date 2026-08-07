@@ -84,7 +84,6 @@ export interface FreeOfflineModeController {
   entitlement: ReturnType<typeof usePremiumEntitlement>;
   freeRuntimeReady: boolean;
   setupVisible: boolean;
-  openSetup: () => void;
   checking: boolean;
   evaluationStage: "device" | "models" | "plan" | null;
   preparing: boolean;
@@ -139,7 +138,6 @@ export function useFreeOfflineMode(params: {
     updateSettings,
   } = params;
   const entitlement = usePremiumEntitlement();
-  const [setupRequested, setSetupRequested] = useState(false);
   const [checking, setChecking] = useState(false);
   const [evaluationStage, setEvaluationStage] = useState<
     "device" | "models" | "plan" | null
@@ -232,10 +230,12 @@ export function useFreeOfflineMode(params: {
         : null,
     [resolvedLanguage],
   );
-  const setupVisible =
-    settingsLoaded &&
-    entitlement.status === "free" &&
-    (setupRequested || !settings.freeOfflineSetupCompleted);
+  // Setup no longer takes over the screen, so nothing is "visible" here any
+  // more. The field is retained because it still shapes the Free runtime: it
+  // gated the wizard's live voice preview, and the store promo controller reads
+  // it to describe a prepared device. Preparation is now reached from the intro
+  // sheet or from Settings.
+  const setupVisible = false;
   const { nativeVoiceOptions, selectedNativeVoice, setSelectedNativeVoice } =
     useNativeVoiceOptions({
       visible: setupVisible,
@@ -475,9 +475,6 @@ export function useFreeOfflineMode(params: {
 
   useEffect(() => {
     if (!settingsLoaded || suspended || entitlement.status !== "free") {
-      if (entitlement.status === "premium") {
-        setSetupRequested(false);
-      }
       return;
     }
     if (!resolvedLanguage) {
@@ -595,14 +592,6 @@ export function useFreeOfflineMode(params: {
     },
     [],
   );
-  const openSetup = useCallback(() => {
-    setSelectedLanguage(storedLanguage);
-    setAdvancedOptionsEnabledState(false);
-    setSelectedKokoroVoice(settings.kokoroVoices.en);
-    completedInitialEvaluationRef.current = false;
-    setSetupRequested(true);
-  }, [settings.kokoroVoices.en, storedLanguage]);
-
   const completeSetup = useCallback(
     (profile: OfflineProfile, withCustomSelections: boolean) => {
       const persistedProfileSettings = applyOfflineProfileToSettings(
@@ -650,7 +639,6 @@ export function useFreeOfflineMode(params: {
             : DEFAULT_KOKORO_VOICES.en,
         },
       });
-      setSetupRequested(false);
     },
     [
       recommendedNativeVoice,
@@ -816,7 +804,6 @@ export function useFreeOfflineMode(params: {
       entitlement.status === "premium" ||
       (entitlement.status === "free" && readiness?.ready === true),
     setupVisible,
-    openSetup,
     checking,
     evaluationStage,
     preparing,

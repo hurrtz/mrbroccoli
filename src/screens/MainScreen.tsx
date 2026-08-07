@@ -34,7 +34,6 @@ import { usePreviewVoiceController } from "./main/usePreviewVoiceController";
 import { usePersistenceFailureAlert } from "./main/usePersistenceFailureAlert";
 import { useProviderAvailabilityGuards } from "./main/useProviderAvailabilityGuards";
 import { useProviderConnectionValidation } from "./main/useProviderConnectionValidation";
-import { useSetupGuideController } from "./main/useSetupGuideController";
 import { useTextTurnSubmitController } from "./main/useTextTurnSubmitController";
 import { useVoiceSessionController } from "./main/useVoiceSessionController";
 import { useUlraModeControl } from "./main/useUlraModeControl";
@@ -44,6 +43,7 @@ import { useMainScreenImageAttachments } from "./main/useMainScreenImageAttachme
 import { formatMessageForCopy } from "../utils/conversationExport";
 import { useImagePromptSubmission } from "./main/useImagePromptSubmission";
 import { useFreeOfflineMode } from "./main/useFreeOfflineMode";
+import type { IntroStep } from "../components/introFlow/IntroFlowSheet";
 import { useStorePromoPresentation } from "../hooks/useStorePromoPresentation";
 import {
   applyStorePromoFreeOfflineController,
@@ -88,6 +88,17 @@ export function MainScreen() {
     [baseFreeOffline, settings, storePromoScene],
   );
   const runtimeSettings = freeOffline.effectiveSettings;
+
+  // The intro replaces the blocking wizards. It opens from the banner, and
+  // also whenever a turn is attempted with no usable route -- otherwise a new
+  // user can reach a microphone that silently does nothing.
+  const [introStep, setIntroStep] = React.useState<IntroStep | null>(null);
+  const openIntro = React.useCallback(() => setIntroStep("what"), []);
+  const openIntroAtStart = React.useCallback(() => setIntroStep("start"), []);
+  const closeIntro = React.useCallback(() => setIntroStep(null), []);
+  const dismissIntroBanner = React.useCallback(() => {
+    updateSettings({ introDismissed: true });
+  }, [updateSettings]);
   const [premiumModalVisible, setPremiumModalVisible] = React.useState(false);
   const providerVoiceDirectories = useMainScreenVoiceDirectories({
     loaded,
@@ -188,11 +199,9 @@ export function MainScreen() {
     settingsFocusTab,
     drawerVisible,
     statusDetailsVisible,
-    setupGuideVisible,
     memoryConversation,
     memoryVisible,
     setDrawerVisible,
-    setSetupGuideVisible,
     setMemoryConversation,
     openSettings,
     closeSettings,
@@ -249,7 +258,6 @@ export function MainScreen() {
     drawerVisible ||
     memoryVisible ||
     settingsVisible ||
-    setupGuideVisible ||
     statusDetailsVisible ||
     styleSheetVisible ||
     freeOffline.setupVisible ||
@@ -452,44 +460,6 @@ export function MainScreen() {
   });
 
   const {
-    handleDismissSetupGuide,
-    handleBack,
-    handleContinueFromIntro,
-    handleSelectProvider,
-    handleProviderApiKeyChange,
-    handleValidateProviderKey,
-    handleContinueFromProvider,
-    handleToggleKokoro,
-    handleDownloadKokoro,
-    handleContinueFromKokoro,
-    handleContinueFromVoiceTest,
-    handleFinishSetupGuide,
-    handleOpenSettingsFromSummary,
-    openedFromSettings: setupGuideOpenedFromSettings,
-    step: setupGuideStep,
-    providerOptions: setupGuideProviderOptions,
-    selectedProvider: setupGuideSelectedProvider,
-    selectedProviderApiKey: setupGuideSelectedProviderApiKey,
-    currentValidationState: setupGuideValidationState,
-    resolvedRoutes: setupGuideResolvedRoutes,
-    voiceTest: setupGuideVoiceTest,
-    useKokoro: setupGuideUseKokoro,
-  } = useSetupGuideController({
-    kokoroModel,
-    loaded: loaded && freeOffline.entitlement.isPremium,
-    nativeStt,
-    openSettings,
-    player,
-    recorder,
-    setSetupGuideVisible,
-    setupGuideVisible,
-    setupGuideDismissed: runtimeSettings.setupGuideDismissed,
-    settings: runtimeSettings,
-    updateApiKey,
-    updateSettings,
-  });
-
-  const {
     driveAutoContinueEnabled,
     driveSilenceCountdownSeconds,
     driveSessionCanRepeat,
@@ -672,37 +642,27 @@ export function MainScreen() {
     handleCloseDrawer,
     handleCopyDrawerThread,
     handleCopyMemoryPress,
-    handleFinishSetupGuidePress,
     handleManageDrawerMemory,
     handleOpenConversationSettings,
     handleOpenDrawer,
     handleOpenMainSettings,
     handleOpenProviderSettings,
-    handleOpenSettingsFromSetupGuide,
     handleOpenSpeakingSettings,
     handleRenameDrawerThread,
-    handleResetSetupGuideVoiceTest,
-    handleSetupGuideShortcutVisibilityChange,
-    handleSetupGuideVoiceTestAction,
     handleShareDrawerThread,
     handleToggleWebSearch,
-    handleValidateSetupGuideProviderKey,
   } = useMainScreenSurfaceActions({
     handleClearMemory,
     handleCopyMemory,
     handleCopyThread,
-    handleFinishSetupGuide,
     handleGenerateTitle,
-    handleOpenSettingsFromSummary,
     handleRenameThread,
     handleShareThread,
-    handleValidateProviderKey,
     openMemory,
     openSettings,
     runAfterDrawerDismiss,
     setDrawerVisible,
     setStyleSheetVisible,
-    setupGuideVoiceTest,
     updateSettings,
     webSearchActive,
   });
@@ -782,7 +742,6 @@ export function MainScreen() {
     responseTone,
     settingsFocusCatalogProviderId: settingsFocusCatalogProviderId ?? null,
     settingsVisible,
-    setupGuideVisible,
     spokenRepliesEnabled: runtimeSettings.spokenRepliesEnabled,
     statusDetailsVisible,
     sttMode: runtimeSettings.sttMode,
@@ -814,8 +773,33 @@ export function MainScreen() {
         onRetry: toast?.onRetry,
         tone: toast?.tone,
       }}
+      intro={{
+        colors,
+        language: settings.language,
+        onClose: closeIntro,
+        onConnectProvider: () => {
+          closeIntro();
+          handleOpenProviderSettings();
+        },
+        onInstallLocal: () => {
+          closeIntro();
+          void freeOffline.start();
+        },
+        onStepChange: setIntroStep,
+        step: introStep ?? "what",
+        t,
+        visible: introStep !== null,
+      }}
       workspace={{
         colors,
+        introBanner: {
+          onDismiss: dismissIntroBanner,
+          onOpen: openIntro,
+          t,
+          // Hidden once dismissed, and never shown over a store-promo capture.
+          visible:
+            loaded && !runtimeSettings.introDismissed && !storePromoScene,
+        },
         isLandscape,
         topBar: {
           brandName: t("appName"),
@@ -839,7 +823,7 @@ export function MainScreen() {
           offlineReady: freeOffline.freeRuntimeReady,
           onOpenSetupGuide: freeOffline.entitlement.isPremium
             ? handleOpenProviderSettings
-            : freeOffline.openSetup,
+            : openIntroAtStart,
           onSelectResponseMode: handleResponseModeChange,
           responseModes: runtimeSettings.responseModes,
           t,
@@ -880,7 +864,7 @@ export function MainScreen() {
           onResolvePromptBlock:
             freeOffline.entitlement.status === "free" &&
             !freeOffline.freeRuntimeReady
-              ? freeOffline.openSetup
+              ? openIntroAtStart
               : handleOpenSpeakingSettings,
           onSubmitTextMessage: handleSubmitTextMessage,
           onTextMessageChange: handleTextMessageChange,
@@ -1018,44 +1002,6 @@ export function MainScreen() {
         conversationArchive,
         storePromoLocalDevicePreview: premiumStorePromoActive,
         onClose: closeSettings,
-      }}
-      setupGuide={{
-        visible: setupGuideVisible && freeOffline.entitlement.isPremium,
-        step: setupGuideStep,
-        providerOptions: setupGuideProviderOptions,
-        selectedProvider: setupGuideSelectedProvider,
-        selectedProviderApiKey: setupGuideSelectedProviderApiKey,
-        currentValidationState: setupGuideValidationState,
-        resolvedRoutes: setupGuideResolvedRoutes,
-        voiceTest: setupGuideVoiceTest,
-        kokoroModel,
-        useKokoro: setupGuideUseKokoro,
-        onSelectProvider: handleSelectProvider,
-        onChangeProviderApiKey: handleProviderApiKeyChange,
-        onDismiss: handleDismissSetupGuide,
-        onBack: handleBack,
-        onContinueFromIntro: handleContinueFromIntro,
-        onValidateProviderKey: handleValidateSetupGuideProviderKey,
-        onContinueFromProvider: handleContinueFromProvider,
-        onToggleKokoro: handleToggleKokoro,
-        onDownloadKokoro: handleDownloadKokoro,
-        onContinueFromKokoro: handleContinueFromKokoro,
-        onVoiceTestAction: handleSetupGuideVoiceTestAction,
-        onResetVoiceTest: handleResetSetupGuideVoiceTest,
-        onContinueFromVoiceTest: handleContinueFromVoiceTest,
-        onFinish: handleFinishSetupGuidePress,
-        onOpenSettings: handleOpenSettingsFromSetupGuide,
-        showSettingsShortcutOption: setupGuideOpenedFromSettings,
-        settingsShortcutVisible:
-          freeOffline.entitlement.isPremium && settings.showSetupGuideShortcut,
-        onChangeSettingsShortcutVisible:
-          handleSetupGuideShortcutVisibilityChange,
-      }}
-      freeOffline={{
-        controller: freeOffline,
-        onOpenPremium: () => setPremiumModalVisible(true),
-        onPreviewVoice: handlePreviewVoice,
-        onStopPreviewVoice: stopPreviewVoice,
       }}
       premiumUpgrade={{
         visible: premiumModalVisible,

@@ -76,8 +76,15 @@ describe("MainScreenWorkspace streaming isolation", () => {
       showWhenEmpty: true,
       t,
     };
+    const introBannerProps = {
+      onDismiss: jest.fn(),
+      onOpen: jest.fn(),
+      t: ((key: string) => key) as never,
+      visible: false,
+    };
     const workspaceProps = {
       colors: lightColors,
+      introBanner: introBannerProps,
       isLandscape: false,
       topBar: {
         brandName: "Mr Broccoli",
@@ -168,6 +175,12 @@ describe("MainScreenWorkspace streaming isolation", () => {
     const screen = render(
       <MainScreenWorkspace
         colors={lightColors}
+        introBanner={{
+          onDismiss: jest.fn(),
+          onOpen: jest.fn(),
+          t: ((key: string) => key) as never,
+          visible: false,
+        }}
         isLandscape
         topBar={{
           brandName: "Mr Broccoli",
