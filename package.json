@@ -3,6 +3,9 @@
   "version": "3.1.1",
   "license": "UNLICENSED",
   "main": "expo-router/entry",
+  "engines": {
+    "node": ">=22.5.0"
+  },
   "scripts": {
     "start": "expo start",
     "android": "expo run:android",
@@ -37,8 +40,8 @@
     "release-notes:test": "node --test scripts/verify-release-notes.test.mjs",
     "version:bump": "node scripts/bump-version.mjs",
     "pretest": "npm run config:verify",
-    "test": "jest",
-    "test:coverage": "jest --coverage",
+    "test": "NODE_OPTIONS=--disable-warning=ExperimentalWarning jest",
+    "test:coverage": "NODE_OPTIONS=--disable-warning=ExperimentalWarning jest --coverage",
     "lint": "eslint app src __tests__ __mocks__ data plugins scripts --max-warnings=0",
     "static:dead-code": "knip --include files,dependencies,unlisted,unresolved,cycles --reporter compact",
     "static:verify": "npm run lint && npm run static:dead-code",

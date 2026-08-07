@@ -302,6 +302,14 @@ applies.
 - `npm run test:coverage -- --runInBand --watchman=false` measures the complete
   `src/` tree, including unimported files, and enforces the checked-in global
   floor. The local pre-push gate runs this coverage command.
+- `__mocks__/expoSQLite.js` runs real SQLite through Node's built-in
+  `node:sqlite`, so suites exercise actual statements, transactions, and
+  foreign keys instead of canned return values. This sets the repository's
+  Node floor at 22.5; `package.json` `engines` records it. A suite that
+  prefers hand-built fixtures can still override any single method with
+  `mockImplementation`. Keep `__tests__/mocks/expoSQLiteMock.test.ts` passing:
+  it is what proves the mock still executes SQL rather than quietly answering
+  every read with an empty result.
 - Use the repository `Makefile` as the local CI entry point. Install the
   versioned hook with `make hooks-install`; `make pre-push` is the spend-free
   push gate, and `make pre-release-static` is the spend-free native/static
