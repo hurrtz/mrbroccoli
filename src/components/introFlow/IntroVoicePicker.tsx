@@ -194,7 +194,7 @@ const styles = StyleSheet.create({
   },
   select: {
     alignItems: "center",
-    borderRadius: introRadius.pill,
+    borderRadius: introRadius.control,
     borderWidth: StyleSheet.hairlineWidth,
     flex: 1,
     flexDirection: "row",

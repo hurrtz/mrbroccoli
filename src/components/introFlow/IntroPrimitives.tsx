@@ -114,7 +114,7 @@ export function IntroPoint({
   );
 }
 
-/** Primary/secondary action. Fully rounded, matching the app's own controls. */
+/** Primary/secondary action, cornered like the app's own buttons. */
 export function IntroButton({
   label,
   onPress,
@@ -171,7 +171,7 @@ const styles = StyleSheet.create({
   },
   button: {
     alignItems: "center",
-    borderRadius: introRadius.pill,
+    borderRadius: introRadius.control,
     borderWidth: StyleSheet.hairlineWidth,
     flexDirection: "row",
     gap: 8,

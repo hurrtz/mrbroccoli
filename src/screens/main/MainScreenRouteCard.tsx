@@ -95,8 +95,8 @@ export const MainScreenRouteCard = React.memo(function MainScreenRouteCard({
             styles.providerEmptyState,
             compact ? styles.providerEmptyStateCompact : null,
             {
-              backgroundColor: colors.surfaceElevated,
-              borderColor: colors.border,
+              backgroundColor: colors.surfaceRaised,
+              borderColor: colors.surfaceRaisedBorder,
             },
           ]}
           onPress={onOpenSetupGuide}
@@ -110,7 +110,7 @@ export const MainScreenRouteCard = React.memo(function MainScreenRouteCard({
                 styles.providerEmptyBadge,
                 {
                   backgroundColor: colors.backgroundSecondary,
-                  borderColor: colors.border,
+                  borderColor: colors.surfaceRaisedBorder,
                 },
               ]}
             >

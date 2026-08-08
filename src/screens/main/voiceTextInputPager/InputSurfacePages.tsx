@@ -220,7 +220,12 @@ function TextInputSurface({
         styles.textSurface,
         {
           backgroundColor: colors.surfaceElevated,
-          borderColor: textFocused ? colors.accent : colors.borderStrong,
+          // Green at rest, not only on focus: this is the other half of the
+          // primary action, and the voice control it pages between is green
+          // whenever it can be used. A neutral outline left the composer
+          // looking secondary to a control the user may never reach, and it is
+          // the composer that carries the workspace when voice cannot.
+          borderColor: textFocused ? colors.activeControl : colors.accent,
           shadowColor: textFocused ? colors.glowStrong : colors.glow,
         },
       ]}

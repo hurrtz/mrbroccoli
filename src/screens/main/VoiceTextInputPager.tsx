@@ -53,6 +53,7 @@ export function VoiceTextInputPager({
   t,
   visualPhase,
   voiceInputUnavailableMessage = null,
+  voiceSurfaceUnusable = false,
 }: VoiceTextInputPagerProps) {
   const pager = useInputSurfacePager({
     disabled,
@@ -63,6 +64,7 @@ export function VoiceTextInputPager({
     onSubmitTextMessage,
     onTextMessageChange,
     submissionDisabled: Boolean(promptBlockedMessage),
+    voiceSurfaceUnusable,
   });
   const showSurfaceIndicators =
     layout !== "landscape" || inputMode !== "drive-session";

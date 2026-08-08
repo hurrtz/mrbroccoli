@@ -13,9 +13,7 @@ the complete Play Store translations are kept in a dedicated file under
 - The introduction is now a full screen you can swipe through in either
   direction, covering what the app needs to run, what is optional and why, and
   what Premium adds. It opens with a spoken example in your language, and the
-  speaking step lets you hear any of the app's languages before deciding. Its
-  last page can turn off the banner on the home screen, which you can bring
-  back under App & diagnostics.
+  speaking step lets you hear any of the app's languages before deciding.
 - Every action in the introduction now opens the settings page that does the
   work. Choosing to install the on-device model opens the page that downloads
   and verifies it, rather than closing the introduction with nothing to show
@@ -42,9 +40,12 @@ the complete Play Store translations are kept in a dedicated file under
 
 - Play an example again after switching the introduction's language. The first
   language change left every later example silent with nothing to indicate why.
-- Start on the message field whenever the voice control cannot be used, and
+- Show the message field whenever the voice control cannot be pressed, and
   explain on the control itself why, instead of leaving it looking ready to
-  press.
+  press. The message field now carries a green outline in both themes, matching
+  the voice control it sits beside.
+- Lift the credentials card clear of the background in dark mode, where it
+  previously read as dark on dark.
 
 ## 3.1.1 - 2026-08-07
 

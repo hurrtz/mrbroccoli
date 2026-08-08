@@ -4,6 +4,11 @@ export const lightColors = {
   surface: "#FFFFFF",
   surfaceAlt: "#EFEEE9",
   surfaceElevated: "#FFFFFF",
+  // A card that has to read as sitting above the canvas. In light the white is
+  // already a step up from the warm background; in dark the lift has to come
+  // from lightness, because a shadow on a near-black canvas is invisible.
+  surfaceRaised: "#FFFFFF",
+  surfaceRaisedBorder: "#D9D7D1",
   text: "#1A1D24",
   textSecondary: "#5D6B7A",
   textMuted: "#5D6B7A",
@@ -43,6 +48,8 @@ export const darkColors = {
   surface: "#1D2025",
   surfaceAlt: "#20242A",
   surfaceElevated: "#1D2025",
+  surfaceRaised: "#262B33",
+  surfaceRaisedBorder: "#3B424D",
   text: "#EDF1F5",
   textSecondary: "#8B97A8",
   textMuted: "#8B97A8",

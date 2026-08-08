@@ -18,6 +18,7 @@ interface UseInputSurfacePagerParams {
   onSubmitTextMessage: (text: string) => void;
   onTextMessageChange?: (text: string) => void;
   submissionDisabled?: boolean;
+  voiceSurfaceUnusable?: boolean;
 }
 
 export function useInputSurfacePager({
@@ -29,6 +30,7 @@ export function useInputSurfacePager({
   onSubmitTextMessage,
   onTextMessageChange,
   submissionDisabled = false,
+  voiceSurfaceUnusable = false,
 }: UseInputSurfacePagerParams) {
   const { width: windowWidth } = useWindowDimensions();
   const textInputRef = React.useRef<TextInput>(null);
@@ -83,6 +85,22 @@ export function useInputSurfacePager({
       Keyboard.dismiss();
     }
   }, [isActive]);
+
+  // Routes settle after the pager has mounted, so the initial surface alone
+  // cannot answer for them: at first paint nothing is known yet and the voice
+  // control looks fine. Moving on the transition catches the moment it turns
+  // out to be unpressable.
+  //
+  // Only on the transition, and without recording a preference: the user may
+  // still swipe back to see the control and why it is unavailable, and should
+  // not be dragged out of it.
+  const wasVoiceSurfaceUnusableRef = React.useRef(voiceSurfaceUnusable);
+  React.useEffect(() => {
+    if (voiceSurfaceUnusable && !wasVoiceSurfaceUnusableRef.current) {
+      setActiveSurface("text");
+    }
+    wasVoiceSurfaceUnusableRef.current = voiceSurfaceUnusable;
+  }, [voiceSurfaceUnusable]);
 
   const handleLayout = React.useCallback((event: LayoutChangeEvent) => {
     const nextWidth = Math.round(event.nativeEvent.layout.width);

@@ -806,13 +806,21 @@ export function MainScreen() {
     speechInputUnavailable && !promptBlockedMessage
       ? t("speechInputUnavailableHint")
       : null;
-  // The voice control is dead when it carries a block with no action behind
-  // it, or when nothing can hear the user. Either way the composer is the only
-  // way in, so the workspace opens on it rather than on a control that cannot
-  // be pressed.
+  // The workspace opens on the composer whenever the voice control cannot be
+  // pressed: no route at all, nothing that can hear the user, or a block with
+  // no action behind it. Landing on a dead control says the app is broken; the
+  // composer at least shows what to do.
+  //
+  // Gated on settled state because the surface is chosen once, when the pager
+  // mounts. Conversations and entitlement both start unresolved, and reading
+  // that moment as "unusable" would strand every launch on the composer.
+  const inputRoutesSettled =
+    loaded && conversationsLoaded && freeOffline.entitlement.status !== "loading";
   const voiceSurfaceUnusable =
-    Boolean(voiceInputUnavailableMessage) ||
-    Boolean(promptBlockedMessage && !promptBlockedActionEnabled);
+    inputRoutesSettled &&
+    (voiceStageDisabled ||
+      Boolean(voiceInputUnavailableMessage) ||
+      Boolean(promptBlockedMessage && !promptBlockedActionEnabled));
 
   return (
     <MainScreenPresentation
@@ -965,6 +973,7 @@ export function MainScreen() {
           t,
           visualPhase,
           voiceInputUnavailableMessage,
+          voiceSurfaceUnusable,
         },
         transcript: {
           activeConversationId: activeConversation?.id ?? null,

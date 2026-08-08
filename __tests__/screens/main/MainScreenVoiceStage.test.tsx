@@ -308,6 +308,20 @@ describe("MainScreenVoiceStage composer", () => {
     expect(onSubmitTextMessage).toHaveBeenCalledWith("Typed instead of spoken");
   });
 
+  it("keeps the composer outlined in the accent, not only when focused", () => {
+    // The voice control it pages between is green whenever it can be used, and
+    // the composer carries the workspace when voice cannot. A neutral outline
+    // left it looking like the lesser half.
+    const screen = render(<MainScreenVoiceStage {...createProps({})} />);
+
+    fireEvent.press(screen.getByLabelText("Show text input"));
+    const surface = StyleSheet.flatten(
+      screen.getByTestId("text-input-surface").props.style,
+    );
+
+    expect(surface.borderColor).toBe(lightColors.accent);
+  });
+
   it("shows installation progress directly on both disabled prompt CTAs", () => {
     const onPress = jest.fn();
     const onSubmitTextMessage = jest.fn();

@@ -268,6 +268,7 @@ jest.mock("../../src/screens/main/MainScreenVoiceStage", () => ({
   },
   MainScreenVoiceStage: ({
     disabled,
+    initialInputSurface,
     onAddImage,
     onResolvePromptBlock,
     promptBlockedActionLabel,
@@ -275,6 +276,7 @@ jest.mock("../../src/screens/main/MainScreenVoiceStage", () => ({
     promptBlockedProgress,
   }: {
     disabled?: boolean;
+    initialInputSurface?: string;
     onAddImage?: () => void;
     onResolvePromptBlock?: () => void;
     promptBlockedActionLabel?: string | null;
@@ -291,6 +293,7 @@ jest.mock("../../src/screens/main/MainScreenVoiceStage", () => ({
         null,
         disabled ? "voice-stage:disabled" : "voice-stage:enabled",
       ),
+      React.createElement(Text, null, `surface:${initialInputSurface ?? "voice"}`),
       onAddImage
         ? React.createElement(Text, null, "image-action")
         : null,
@@ -498,6 +501,11 @@ const { usePremiumEntitlement } = jest.requireMock(
   "../../src/context/PremiumEntitlementContext",
 ) as {
   usePremiumEntitlement: jest.Mock;
+};
+const { useNativeSpeechRecognizer } = jest.requireMock(
+  "../../src/hooks/useNativeSpeechRecognizer",
+) as {
+  useNativeSpeechRecognizer: jest.Mock;
 };
 
 function createSharedSettingsValue(settingsOverrides: Partial<Settings> = {}) {
@@ -893,6 +901,22 @@ describe("MainScreen", () => {
     expect(updateSettings).not.toHaveBeenCalledWith(
       expect.objectContaining({ introDismissed: true }),
     );
+  });
+
+  it("opens on the composer when the voice control cannot be pressed", () => {
+    // Landing on a dead round button says the app is broken. The composer at
+    // least shows what to do. The device can hear the user here -- what is
+    // missing is anything to answer with, which disables the control on its
+    // own.
+    useNativeSpeechRecognizer.mockReturnValue({
+      isAvailable: true,
+      isRecording: false,
+      waveformVariant: "bars",
+    });
+    const screen = renderWithProviders(<MainScreen />);
+
+    expect(screen.getByText("voice-stage:disabled")).toBeTruthy();
+    expect(screen.getByText("surface:text")).toBeTruthy();
   });
 
   it("hides the debug log action by default", () => {

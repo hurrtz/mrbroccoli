@@ -42,10 +42,15 @@ receive already-derived state and callbacks.
   restarting recording, playback, or another request.
 - Text and image submission use the same conversation and route semantics as a
   spoken turn where their capabilities overlap.
-- When the voice control cannot be used -- nothing can hear the user, or it
-  carries a block with no action behind it -- the workspace opens on the
+- When the voice control cannot be pressed -- no route at all, nothing that can
+  hear the user, or a block with no action behind it -- the workspace shows the
   composer and the control retires carrying the reason. A control the user
-  cannot press is not the one to land them on.
+  cannot press is not the one to land them on. Routes settle after the pager
+  mounts, so this reacts to the transition rather than only seeding the initial
+  surface; it moves the user once and does not fight a later swipe back.
+- The composer is outlined in the accent at rest, not only when focused. It is
+  the other half of the primary action, and it carries the workspace whenever
+  voice cannot.
 - A message telling someone to type must leave typing working. This separates
   an unusable voice route from a prompt block, which stops both routes.
 - Controls that cannot be used at all are absent rather than disabled: Web

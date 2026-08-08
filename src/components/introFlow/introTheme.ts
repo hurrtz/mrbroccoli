@@ -85,12 +85,13 @@ export const introBannerTheme = {
 } as const;
 
 /**
- * Generously rounded throughout, matching the app's own controls: fully
- * rounded actions, and paper that is round enough to read as a card rather
- * than a boxed-in region.
+ * Restrained corners, matching the app's own cards and fields rather than the
+ * pill-shaped controls an earlier version used. `pill` remains for the genuinely
+ * circular controls -- the play button and the header actions -- where the shape
+ * is the control rather than a style.
  */
 export const introRadius = {
-  panel: 24,
-  control: 18,
+  panel: 14,
+  control: 10,
   pill: 999,
 } as const;
