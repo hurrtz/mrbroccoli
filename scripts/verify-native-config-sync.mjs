@@ -376,6 +376,29 @@ assertIncludes(
   `>${appConfig.name} Dev</string>`,
 );
 assertIncludes("iOS URL scheme", iosInfo, `<string>${scheme}</string>`);
+
+// Background audio is what keeps an authorized voice turn speaking after the
+// user leaves the app, and it is the exact key App Review asks about under
+// guideline 2.5.4. It reached the plist as an expo-audio plugin default rather
+// than a stated intent, which is how it went unnoticed; assert both sides so
+// neither the declaration nor the capability can drift away silently.
+const backgroundPlaybackEnabled = (appConfig.plugins ?? []).some(
+  (plugin) =>
+    Array.isArray(plugin) &&
+    plugin[0] === "expo-audio" &&
+    plugin[1]?.enableBackgroundPlayback === true,
+);
+assertEqual(
+  "expo-audio background playback declared in app.json",
+  backgroundPlaybackEnabled,
+  true,
+);
+assertIncludes(
+  "iOS background audio mode",
+  iosInfo,
+  "<key>UIBackgroundModes</key>",
+);
+assertIncludes("iOS background audio mode value", iosInfo, "<string>audio</string>");
 assertIncludes(
   "Android URL scheme",
   androidManifest,

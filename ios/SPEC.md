@@ -63,6 +63,14 @@ conversation, edition, provider, or fallback policy.
   advance or resurrect a cleared queue.
 - Background continuation exists only for an active user-authorized voice turn
   and ends on completion, cancellation, terminal failure, or expiry.
+
+**Dependency:** `UIBackgroundModes: [audio]` is what allows that continuation,
+and App Review asks about it under guideline 2.5.4 because the capability is
+invisible until a turn is already speaking. It is declared deliberately through
+the `expo-audio` plugin in `app.json` rather than inherited from that plugin's
+default, and `scripts/verify-native-config-sync.mjs` asserts the declaration and
+the Info.plist agree. `docs/app-review-background-audio.md` carries the reply
+and the recording steps.
 - Live Activity actions are idempotent and converge on the same controller
   commands used by the visible app.
 - Waveform analysis emits bounded levels and never turns audio samples into

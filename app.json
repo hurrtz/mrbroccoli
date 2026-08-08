@@ -13,7 +13,13 @@
       "./plugins/withKokoroBackgroundDownload",
       "expo-font",
       "expo-asset",
-      "expo-audio",
+      [
+        "expo-audio",
+        {
+          "enableBackgroundPlayback": true,
+          "enableBackgroundRecording": false
+        }
+      ],
       [
         "expo-image-picker",
         {
