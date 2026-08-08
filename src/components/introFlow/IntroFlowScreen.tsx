@@ -10,15 +10,16 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { StatusBar } from "expo-status-bar";
 
+import { useTheme } from "../../theme/ThemeContext";
+
 import { PhosphorIcon } from "../../design-system/PhosphorIcon";
 import type { AppLanguage } from "../../i18n/localeRegistry";
 import type { TranslateFn } from "../../screens/main/shared";
 import { IntroStepper } from "./IntroStepper";
 import { INTRO_STEP_CONTENT, INTRO_STEPS } from "./introSteps";
-import { introRadius, introTheme } from "./introTheme";
+import { introRadius, useIntroTheme } from "./introTheme";
 
 interface IntroFlowScreenProps {
-  bannerDismissed: boolean;
   language: AppLanguage;
   onClose: () => void;
   onConnectProvider: () => void;
@@ -26,7 +27,6 @@ interface IntroFlowScreenProps {
   onOpenPremium: () => void;
   onOpenStt: () => void;
   onOpenTts: () => void;
-  onSetBannerDismissed: (dismissed: boolean) => void;
   t: TranslateFn;
   visible: boolean;
 }
@@ -45,7 +45,6 @@ interface IntroFlowScreenProps {
  * runs in both directions -- a one-way path made the last step a dead end.
  */
 export function IntroFlowScreen({
-  bannerDismissed,
   language,
   onClose,
   onConnectProvider,
@@ -53,10 +52,11 @@ export function IntroFlowScreen({
   onOpenPremium,
   onOpenStt,
   onOpenTts,
-  onSetBannerDismissed,
   t,
   visible,
 }: IntroFlowScreenProps) {
+  const theme = useIntroTheme();
+  const { isDark } = useTheme();
   const { width } = useWindowDimensions();
   const [index, setIndex] = React.useState(0);
   const pagerRef = React.useRef<ScrollView>(null);
@@ -89,10 +89,8 @@ export function IntroFlowScreen({
       presentationStyle="fullScreen"
       visible={visible}
     >
-      {/* The canvas is dark in both themes, so the status bar has to be light
-          regardless of what the app is set to. */}
-      <StatusBar style="light" />
-      <View style={styles.root}>
+      <StatusBar style={isDark ? "light" : "dark"} />
+      <View style={[styles.root, { backgroundColor: theme.canvas }]}>
         <SafeAreaView edges={["top", "bottom"]} style={styles.safeArea}>
           <View style={styles.header}>
             <Pressable
@@ -102,11 +100,15 @@ export function IntroFlowScreen({
               disabled={isFirst}
               hitSlop={8}
               onPress={() => goTo(index - 1)}
-              style={[styles.headerButton, isFirst ? styles.headerHidden : null]}
+              style={[
+                styles.headerButton,
+                { backgroundColor: theme.panel, borderColor: theme.border },
+                isFirst ? styles.headerHidden : null,
+              ]}
               testID="intro-back"
             >
               <PhosphorIcon
-                color={introTheme.textSecondary}
+                color={theme.textSecondary}
                 name="left"
                 size="control"
               />
@@ -124,11 +126,14 @@ export function IntroFlowScreen({
               accessibilityRole="button"
               hitSlop={8}
               onPress={onClose}
-              style={styles.headerButton}
+              style={[
+                styles.headerButton,
+                { backgroundColor: theme.panel, borderColor: theme.border },
+              ]}
               testID="intro-close"
             >
               <PhosphorIcon
-                color={introTheme.textSecondary}
+                color={theme.textSecondary}
                 name="close"
                 size="control"
               />
@@ -162,14 +167,12 @@ export function IntroFlowScreen({
                   style={{ width }}
                 >
                   <StepContent
-                    bannerDismissed={bannerDismissed}
                     language={language}
                     onConnectProvider={onConnectProvider}
                     onInstallLocal={onInstallLocal}
                     onOpenPremium={onOpenPremium}
                     onOpenStt={onOpenStt}
                     onOpenTts={onOpenTts}
-                    onSetBannerDismissed={onSetBannerDismissed}
                     t={t}
                   />
                 </ScrollView>
@@ -189,12 +192,15 @@ export function IntroFlowScreen({
                 onPress={() => goTo(index + 1)}
                 style={({ pressed }) => [
                   styles.primary,
-                  { opacity: pressed ? 0.85 : 1 },
+                  {
+                    backgroundColor: theme.accent,
+                    opacity: pressed ? 0.85 : 1,
+                  },
                 ]}
                 testID="intro-next"
               >
                 <PhosphorIcon
-                  color={introTheme.onAccent}
+                  color={theme.onAccent}
                   name="right"
                   size="navigation"
                 />
@@ -226,8 +232,6 @@ const styles = StyleSheet.create({
   },
   headerButton: {
     alignItems: "center",
-    backgroundColor: introTheme.panel,
-    borderColor: introTheme.border,
     borderRadius: introRadius.pill,
     borderWidth: StyleSheet.hairlineWidth,
     height: 40,
@@ -248,14 +252,12 @@ const styles = StyleSheet.create({
   },
   primary: {
     alignItems: "center",
-    backgroundColor: introTheme.accent,
     borderRadius: introRadius.pill,
     height: 58,
     justifyContent: "center",
     width: 58,
   },
   root: {
-    backgroundColor: introTheme.canvas,
     flex: 1,
   },
   safeArea: {

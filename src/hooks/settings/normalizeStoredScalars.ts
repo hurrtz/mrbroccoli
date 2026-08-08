@@ -196,6 +196,7 @@ export function normalizeStoredScalarSettings(
   | "localSttModelId"
   | "localTtsModelId"
   | "introDismissed"
+  | "introOpened"
   | "freeOnboardingLanguageInitialized"
   | "freeOfflineSetupCompleted"
   | "freeOfflineProfileOverrides"
@@ -309,6 +310,12 @@ export function normalizeStoredScalarSettings(
     ),
     introDismissed: getStoredBoolean(
       storedSettings?.introDismissed,
+      hasConfiguredKeys,
+    ),
+    // An install that arrives with keys has effectively been through setup, so
+    // it may dismiss the banner without first being asked to read it.
+    introOpened: getStoredBoolean(
+      storedSettings?.introOpened,
       hasConfiguredKeys,
     ),
     freeOnboardingLanguageInitialized: getStoredBoolean(

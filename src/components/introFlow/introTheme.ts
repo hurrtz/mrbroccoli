@@ -1,67 +1,96 @@
+import { useMemo } from "react";
+
+import type { Colors } from "../../theme/colors";
+import { useTheme } from "../../theme/ThemeContext";
+
 /**
- * A self-contained palette for the introduction.
+ * The introduction's palette, derived from whichever theme the app is in.
  *
- * The app is warm white with green accents. The introduction deliberately is
- * not: it reads as a place rather than a screen, so a first-time user
- * recognises it as an aside they can leave, and so the workspace behind it
- * still feels like the destination.
- *
- * **Decision:** These values do not follow the light/dark theme. The
- * introduction is the same surface in both, because its job is to be
- * unmistakably distinct from whatever it sits on top of. Every colour needed
- * is therefore defined here rather than pulled from `theme/colors`.
+ * **Decision:** The introduction follows the app's light or dark theme rather
+ * than carrying a fixed one. An earlier version was permanently dark so it
+ * would read as a distinct place; in a light app that landed as two products
+ * stitched together. Distinctness now belongs to the one surface that has to
+ * interrupt -- the workspace banner -- and the flow behind it is simply the app.
  */
-export const introTheme = {
-  /** Deep neutral canvas, warm enough not to read as pure black. */
-  canvas: "#14161A",
-  /** Slightly lifted panel for grouped content. */
-  panel: "#1B1E24",
-  /** Pressed/selected state for a panel. */
-  panelActive: "#232830",
-  /** Hairline borders: visible on the canvas without drawing attention. */
-  border: "#2A2F38",
-  borderStrong: "#3A414D",
+export function getIntroTheme(colors: Colors, isDark: boolean) {
+  return {
+    canvas: colors.background,
+    panel: colors.surface,
+    panelActive: colors.surfaceAlt,
+    border: colors.border,
+    borderStrong: colors.borderStrong,
 
-  text: "#F2F5F8",
-  textSecondary: "#A3AEBD",
-  textMuted: "#6F7B8B",
+    text: colors.text,
+    textSecondary: colors.textSecondary,
+    textMuted: colors.textMuted,
 
-  /** The app's green, lifted for contrast against the dark canvas. */
-  accent: "#5DC17D",
-  accentSoft: "rgba(93, 193, 125, 0.14)",
-  accentBorder: "rgba(93, 193, 125, 0.32)",
-  onAccent: "#0E1013",
+    accent: colors.accent,
+    accentSoft: colors.accentSoft,
+    accentBorder: colors.accent,
+    onAccent: colors.onAccent,
 
-  /**
-   * Warm sand, taken from the reference input.
-   *
-   * A control at rest shows only a hairline in this tone; selecting it fills
-   * the whole control with the soft variant. That is what makes a chosen
-   * option read as chosen from across the screen rather than by inspecting a
-   * border, and it keeps selection distinct from the green accent, which means
-   * "the thing to press next".
-   */
-  sand: "#D9C7A7",
-  sandSoft: "rgba(217, 199, 167, 0.13)",
-  sandBorder: "rgba(217, 199, 167, 0.30)",
-  onSand: "#17140E",
+    /**
+     * Warm sand for a chosen option: at rest a hairline, once chosen a fill
+     * across the whole control, which is what makes a selection readable from
+     * across the screen. It stays distinct from the green accent, which means
+     * "the thing to press next" rather than "the thing you picked".
+     *
+     * Light needs a deeper tone than dark: the pale sand that reads as warm on
+     * a near-black canvas disappears into a near-white one.
+     */
+    sand: isDark ? "#D9C7A7" : "#8A6A33",
+    sandSoft: isDark ? "rgba(217, 199, 167, 0.13)" : "rgba(138, 106, 51, 0.09)",
+    sandBorder: isDark
+      ? "rgba(217, 199, 167, 0.30)"
+      : "rgba(138, 106, 51, 0.34)",
+    onSand: isDark ? "#17140E" : "#FFFFFF",
 
-  /** Optional-step marker: present but never competing with the accent. */
-  muted: "#7C8798",
-  mutedSoft: "rgba(124, 135, 152, 0.14)",
+    muted: colors.textMuted,
+    mutedSoft: isDark ? "rgba(139, 151, 168, 0.14)" : "rgba(93, 107, 122, 0.10)",
 
-  /** Premium is the one place a second hue is allowed. */
-  premium: "#C9A227",
-  premiumSoft: "rgba(201, 162, 39, 0.14)",
-  premiumBorder: "rgba(201, 162, 39, 0.34)",
+    premium: isDark ? "#C9A227" : "#8A6A12",
+    premiumSoft: isDark ? "rgba(201, 162, 39, 0.14)" : "rgba(138, 106, 18, 0.10)",
+    premiumBorder: isDark
+      ? "rgba(201, 162, 39, 0.34)"
+      : "rgba(138, 106, 18, 0.32)",
+    onPremium: "#FFFFFF",
+  };
+}
+
+export type IntroTheme = ReturnType<typeof getIntroTheme>;
+
+/** The active introduction palette. Every intro surface derives its own. */
+export function useIntroTheme(): IntroTheme {
+  const { colors, isDark } = useTheme();
+  return useMemo(() => getIntroTheme(colors, isDark), [colors, isDark]);
+}
+
+/**
+ * The workspace banner's own palette, and the one place a second hue is used.
+ *
+ * **Decision:** The banner is deliberately not the app's colours. It is the
+ * single thing on a first launch that must not read as furniture, and it keeps
+ * that job now that the flow behind it follows the theme. Violet carries it in
+ * both light and dark without going black, which read as a system notice rather
+ * than an invitation.
+ */
+export const introBannerTheme = {
+  canvas: "#5B21B6",
+  glow: "rgba(167, 139, 250, 0.30)",
+  text: "#FFFFFF",
+  textSecondary: "rgba(237, 233, 254, 0.86)",
+  dismiss: "rgba(237, 233, 254, 0.72)",
+  action: "#FFFFFF",
+  onAction: "#4C1D95",
 } as const;
 
 /**
- * Radii tuned to the ElevenLabs input the design references: generously
- * rounded panels, fully rounded controls.
+ * Generously rounded throughout, matching the app's own controls: fully
+ * rounded actions, and paper that is round enough to read as a card rather
+ * than a boxed-in region.
  */
 export const introRadius = {
-  panel: 20,
-  control: 14,
+  panel: 24,
+  control: 18,
   pill: 999,
 } as const;

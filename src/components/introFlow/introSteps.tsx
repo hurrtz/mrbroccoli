@@ -7,15 +7,15 @@ import type { TranslateFn } from "../../screens/main/shared";
 import { fonts } from "../../theme/typography";
 import { getIntroClip } from "./introClips";
 import {
-  IntroBadge,
   IntroBody,
   IntroButton,
-  IntroCheckbox,
+  IntroDivider,
   IntroPanel,
+  IntroPanelDivider,
   IntroPoint,
   IntroTitle,
 } from "./IntroPrimitives";
-import { introRadius, introTheme } from "./introTheme";
+import { introRadius, useIntroTheme } from "./introTheme";
 import { IntroVoicePicker } from "./IntroVoicePicker";
 import { useIntroPlayback } from "./useIntroPlayback";
 
@@ -30,14 +30,12 @@ export const INTRO_STEPS = [
 export type IntroStep = (typeof INTRO_STEPS)[number];
 
 export interface IntroStepProps {
-  bannerDismissed: boolean;
   language: AppLanguage;
   onConnectProvider: () => void;
   onInstallLocal: () => void;
   onOpenPremium: () => void;
   onOpenStt: () => void;
   onOpenTts: () => void;
-  onSetBannerDismissed: (dismissed: boolean) => void;
   t: TranslateFn;
 }
 
@@ -50,6 +48,7 @@ export interface IntroStepProps {
  * starting by itself is startling.
  */
 function WelcomeStep({ language, t }: IntroStepProps) {
+  const theme = useIntroTheme();
   const { playing, toggle } = useIntroPlayback(getIntroClip(language));
 
   return (
@@ -61,27 +60,28 @@ function WelcomeStep({ language, t }: IntroStepProps) {
         style={({ pressed }) => [
           styles.hero,
           {
-            backgroundColor: playing ? introTheme.panelActive : introTheme.accent,
-            borderColor: playing ? introTheme.accent : "transparent",
+            backgroundColor: playing ? theme.panelActive : theme.accent,
+            borderColor: playing ? theme.accent : "transparent",
+            shadowColor: theme.accent,
             transform: [{ scale: pressed ? 0.97 : 1 }],
           },
         ]}
         testID="intro-welcome-play"
       >
         <PhosphorIcon
-          color={playing ? introTheme.accent : introTheme.onAccent}
+          color={playing ? theme.accent : theme.onAccent}
           name={playing ? "pause" : "audio"}
           size="hero"
         />
       </Pressable>
 
-      <Text style={styles.heroCaption}>
+      <Text style={[styles.heroCaption, { color: theme.accent }]}>
         {playing ? t("introWelcomePlaying") : t("introWelcomePlay")}
       </Text>
 
       <View style={styles.welcomeText}>
-        <IntroTitle align="center">{t("introWelcomeTitle")}</IntroTitle>
-        <IntroBody align="center">{t("introWelcomeBody")}</IntroBody>
+        <IntroTitle>{t("introWelcomeTitle")}</IntroTitle>
+        <IntroBody>{t("introWelcomeBody")}</IntroBody>
       </View>
     </View>
   );
@@ -106,7 +106,7 @@ function RequirementsStep({ t }: IntroStepProps) {
           icon="cpu"
           title={t("introNeedsLlmTitle")}
         />
-        <View style={styles.divider} />
+        <IntroPanelDivider />
         <IntroPoint
           body={t("introNeedsSttBody")}
           icon="mic"
@@ -128,7 +128,6 @@ function RequirementsStep({ t }: IntroStepProps) {
 function LlmStep({ onConnectProvider, onInstallLocal, t }: IntroStepProps) {
   return (
     <View style={styles.stack}>
-      <IntroBadge tone="accent">{t("introRequired")}</IntroBadge>
       <IntroTitle>{t("introLlmTitle")}</IntroTitle>
       <IntroBody>{t("introLlmBody")}</IntroBody>
 
@@ -144,17 +143,20 @@ function LlmStep({ onConnectProvider, onInstallLocal, t }: IntroStepProps) {
           onPress={onInstallLocal}
           testID="intro-install-local"
         />
-        <View style={styles.divider} />
+        <IntroPanelDivider />
         <IntroPoint
           body={t("introLlmProviderBody")}
           icon="key"
           title={t("introLlmProviderTitle")}
+          tone="premium"
         />
+        {/* Provider keys are a Premium capability, so this carries the Premium
+            tone and leads where the capability is actually obtained. */}
         <IntroButton
           label={t("introStartProvider")}
           onPress={onConnectProvider}
           testID="intro-connect-provider"
-          tone="secondary"
+          tone="premium"
         />
       </IntroPanel>
     </View>
@@ -165,8 +167,8 @@ function LlmStep({ onConnectProvider, onInstallLocal, t }: IntroStepProps) {
 function SttStep({ onOpenStt, t }: IntroStepProps) {
   return (
     <View style={styles.stack}>
-      <IntroBadge>{t("introOptional")}</IntroBadge>
       <IntroTitle>{t("introSttTitle")}</IntroTitle>
+      <IntroDivider label={t("introOptional")} />
       <IntroBody>{t("introSttBody")}</IntroBody>
 
       <IntroPanel>
@@ -175,7 +177,7 @@ function SttStep({ onOpenStt, t }: IntroStepProps) {
           icon="mic"
           title={t("introSttWhyTitle")}
         />
-        <View style={styles.divider} />
+        <IntroPanelDivider />
         <IntroPoint
           body={t("introSttSkipBody")}
           icon="edit"
@@ -200,17 +202,22 @@ function SttStep({ onOpenStt, t }: IntroStepProps) {
  * the picker sits directly under the claim.
  */
 function TtsStep({ language, onOpenTts, t }: IntroStepProps) {
+  const theme = useIntroTheme();
   return (
     <View style={styles.stack}>
-      <IntroBadge>{t("introOptional")}</IntroBadge>
       <IntroTitle>{t("introTtsTitle")}</IntroTitle>
+      <IntroDivider label={t("introOptional")} />
       <IntroBody>{t("introTtsBody")}</IntroBody>
 
       <IntroPanel>
-        <Text style={styles.panelLabel}>{t("introTtsListenLabel")}</Text>
+        <Text style={[styles.panelLabel, { color: theme.text }]}>
+          {t("introTtsListenLabel")}
+        </Text>
         <IntroVoicePicker language={language} t={t} />
-        <Text style={styles.panelHint}>{t("introHearDisclaimer")}</Text>
-        <View style={styles.divider} />
+        <Text style={[styles.panelHint, { color: theme.textMuted }]}>
+          {t("introHearDisclaimer")}
+        </Text>
+        <IntroPanelDivider />
         <IntroPoint
           body={t("introTtsSkipBody")}
           icon="sound"
@@ -229,12 +236,7 @@ function TtsStep({ language, onOpenTts, t }: IntroStepProps) {
 }
 
 /** Step six: what paying buys, stated as capability rather than as a plea. */
-function PremiumStep({
-  bannerDismissed,
-  onOpenPremium,
-  onSetBannerDismissed,
-  t,
-}: IntroStepProps) {
+function PremiumStep({ onOpenPremium, t }: IntroStepProps) {
   return (
     <View style={styles.stack}>
       <IntroTitle>{t("introWrapTitle")}</IntroTitle>
@@ -273,16 +275,6 @@ function PremiumStep({
         testID="intro-open-premium"
         tone="premium"
       />
-
-      {/* Someone who has read to the end has taken the tour; keeping the
-          invitation on their workspace afterwards is nagging. Reversible from
-          the app settings page. */}
-      <IntroCheckbox
-        checked={bannerDismissed}
-        label={t("introHideBanner")}
-        onChange={onSetBannerDismissed}
-        testID="intro-hide-banner"
-      />
     </View>
   );
 }
@@ -300,10 +292,6 @@ export const INTRO_STEP_CONTENT: Record<
 };
 
 const styles = StyleSheet.create({
-  divider: {
-    backgroundColor: introTheme.border,
-    height: StyleSheet.hairlineWidth,
-  },
   hero: {
     alignItems: "center",
     borderRadius: introRadius.pill,
@@ -311,26 +299,22 @@ const styles = StyleSheet.create({
     elevation: 12,
     height: 148,
     justifyContent: "center",
-    shadowColor: introTheme.accent,
     shadowOffset: { height: 8, width: 0 },
     shadowOpacity: 0.28,
     shadowRadius: 24,
     width: 148,
   },
   heroCaption: {
-    color: introTheme.accent,
     fontFamily: fonts.bodyMedium,
     fontSize: 14,
     letterSpacing: 0.3,
   },
   panelHint: {
-    color: introTheme.textMuted,
     fontFamily: fonts.body,
     fontSize: 12,
     lineHeight: 17,
   },
   panelLabel: {
-    color: introTheme.text,
     fontFamily: fonts.bodyMedium,
     fontSize: 15,
   },

@@ -1,7 +1,7 @@
 import React from "react";
 import { Pressable, StyleSheet, View } from "react-native";
 
-import { introTheme } from "./introTheme";
+import { useIntroTheme } from "./introTheme";
 import type { TranslateFn } from "../../screens/main/shared";
 
 interface IntroStepperProps {
@@ -23,6 +23,7 @@ interface IntroStepperProps {
  * visually quiet without becoming hard to hit.
  */
 export function IntroStepper({ count, index, onSelect, t }: IntroStepperProps) {
+  const theme = useIntroTheme();
   return (
     <View
       accessibilityRole="tablist"
@@ -52,10 +53,10 @@ export function IntroStepper({ count, index, onSelect, t }: IntroStepperProps) {
                 current ? styles.markerCurrent : null,
                 {
                   backgroundColor: current
-                    ? introTheme.accent
+                    ? theme.accent
                     : visited
-                      ? introTheme.borderStrong
-                      : introTheme.border,
+                      ? theme.borderStrong
+                      : theme.border,
                 },
               ]}
             />

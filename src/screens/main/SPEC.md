@@ -42,14 +42,22 @@ receive already-derived state and callbacks.
   restarting recording, playback, or another request.
 - Text and image submission use the same conversation and route semantics as a
   spoken turn where their capabilities overlap.
-- When nothing on the device can hear the user, the workspace opens on the
-  composer and the voice control retires carrying the reason. This is distinct
-  from a prompt block, which stops both routes: a message telling someone to
-  type must leave typing working.
+- When the voice control cannot be used -- nothing can hear the user, or it
+  carries a block with no action behind it -- the workspace opens on the
+  composer and the control retires carrying the reason. A control the user
+  cannot press is not the one to land them on.
+- A message telling someone to type must leave typing working. This separates
+  an unusable voice route from a prompt block, which stops both routes.
+- Controls that cannot be used at all are absent rather than disabled: Web
+  Search without a configured provider, and image attachment on a route that
+  cannot accept one. A switch that cannot move reads as broken, and the reason
+  it cannot move lives in Settings. Controls that are only briefly unavailable,
+  such as during an active turn, stay visible and disabled.
+- Web Search sits below the primary action rather than above it. It changes how
+  the next turn is answered, so it is a note on that action rather than a
+  setting to pass through on the way in.
 - The transcript header owns the image attachment action in both orientations;
   the composer owns only the pending-attachment preview and its remove action.
-  The action stays hidden when the edition cannot attach images and disabled
-  while a turn is active.
 - Conversation, settings, status, receipt, setup, and diagnostics surfaces do
   not replace the primary workspace or mutate one another implicitly.
 
@@ -92,10 +100,11 @@ workspace, with a dismissible intro banner above it that opens a six-step
 full-screen introduction: the greeting, what setup actually requires, the one
 requirement, the two optional pieces, and what Premium adds.
 
-The banner and the introduction carry their own dark palette rather than the
-app theme. The workspace is warm white with green accents, so a first-time user
-recognises the introduction as an aside they can leave, and the workspace still
-reads as the destination.
+**Decision:** The introduction follows the app's light or dark theme. Only the
+workspace banner keeps a palette of its own -- violet, in both themes -- because
+it is the one surface that has to interrupt. An earlier version made the whole
+flow permanently dark so it would read as a distinct place; in a light app that
+landed as two products stitched together.
 
 **Decision:** Steps are walkable in both directions -- by swiping, from the
 stepper, and from the header back control -- and the stepper draws dots with a
@@ -108,10 +117,19 @@ which retires on the last step.
 
 **Decision:** The last step ends at the close control rather than offering its
 own "start using the app" action. A second exit next to the one already in the
-header says the flow is something to escape. It instead carries a checkbox that
-hides the workspace banner, reversible from App & diagnostics: someone who has
-read to the end has taken the tour, and keeping the invitation on their
-workspace afterwards is nagging.
+header says the flow is something to escape.
+
+**Decision:** The banner offers no dismissal until the introduction has been
+opened at least once, and a completed purchase removes it outright. An exit
+available before the card has ever been read makes getting rid of it the
+easiest thing to do on a first launch; after a purchase the invitation has
+nothing left to invite. It stays reversible from App & diagnostics.
+
+**Decision:** Optional steps mark themselves with a rule carrying the word
+rather than a pill above the heading. A badge competed with the heading and
+read as a status on the step; a rule states the same thing in the reading order
+it belongs to. Headings are centred, because each step is a single column with
+nothing beside it.
 
 **Decision:** Speech steps are marked optional and say why skipping is safe --
 typing replaces listening, and the device's own voice replaces speaking. The
@@ -124,6 +142,12 @@ usable route, so the microphone is never a dead end. Provider keys are entered
 in the settings provider panel and local models are managed on the on-device
 settings page; onboarding routes to those surfaces rather than duplicating
 them.
+
+**Decision:** The provider route leads to the purchase rather than to the
+provider page, because provider keys are a Premium capability. The purchase
+sheet opens over the introduction and leaving it without buying returns to the
+step it was opened from: backing out of a purchase should not also cost someone
+the introduction they were part-way through.
 
 **Decision:** Every onboarding action opens the settings page that owns the
 work, not settings in general. The download action in particular opens the

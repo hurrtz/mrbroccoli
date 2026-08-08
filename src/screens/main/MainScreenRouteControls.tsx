@@ -43,8 +43,10 @@ export const MainScreenRouteControls = React.memo(
     const webSearchValue = webSearchAvailable && webSearchEnabled;
     const showUlraMode =
       layout === "portrait" && ulraModeAvailable && Boolean(onToggleUlraMode);
-    const showWebSearchControl =
-      showWebSearch && (layout === "portrait" || webSearchAvailable);
+    // Hidden rather than shown greyed out. A switch that cannot move reads as
+    // a broken control, and the reason it cannot move lives in Settings, not
+    // next to it.
+    const showWebSearchControl = showWebSearch && webSearchAvailable;
 
     if (!showWebSearchControl && !showUlraMode) {
       return null;

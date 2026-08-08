@@ -42,11 +42,9 @@ function renderScreen(
     onClose: jest.fn(),
     onConnectProvider: jest.fn(),
     onInstallLocal: jest.fn(),
-    bannerDismissed: false,
     onOpenPremium: jest.fn(),
     onOpenStt: jest.fn(),
     onOpenTts: jest.fn(),
-    onSetBannerDismissed: jest.fn(),
     t,
     visible: true,
     ...overrides,
@@ -57,10 +55,33 @@ function renderScreen(
 describe("IntroBanner", () => {
   it("stays out of the tree once dismissed", () => {
     const { queryByTestId } = render(
-      <IntroBanner onDismiss={jest.fn()} onOpen={jest.fn()} t={t} visible={false} />,
+      <IntroBanner
+        onDismiss={jest.fn()}
+        onOpen={jest.fn()}
+        showDismiss
+        t={t}
+        visible={false}
+      />,
     );
 
     expect(queryByTestId("intro-banner")).toBeNull();
+  });
+
+  it("offers no way out until the invitation has been taken up once", () => {
+    // An exit available before the card has ever been read makes getting rid
+    // of it the easiest thing to do on a first launch.
+    const { queryByTestId, getByTestId } = render(
+      <IntroBanner
+        onDismiss={jest.fn()}
+        onOpen={jest.fn()}
+        showDismiss={false}
+        t={t}
+        visible
+      />,
+    );
+
+    expect(queryByTestId("intro-banner-dismiss")).toBeNull();
+    expect(getByTestId("intro-banner")).toBeTruthy();
   });
 
   it("separates opening the introduction from dismissing it", () => {
@@ -69,7 +90,13 @@ describe("IntroBanner", () => {
     const onDismiss = jest.fn();
     const onOpen = jest.fn();
     const { getByTestId } = render(
-      <IntroBanner onDismiss={onDismiss} onOpen={onOpen} t={t} visible />,
+      <IntroBanner
+        onDismiss={onDismiss}
+        onOpen={onOpen}
+        showDismiss
+        t={t}
+        visible
+      />,
     );
 
     fireEvent.press(getByTestId("intro-banner-dismiss"));
@@ -132,15 +159,15 @@ describe("IntroFlowScreen", () => {
     expect(getByTestId("intro-close")).toBeTruthy();
   });
 
-  it("hides the home-screen invitation from the last step", () => {
-    // Someone who read to the end has taken the tour; keeping the invitation
-    // afterwards is nagging.
-    const { getByTestId, props } = renderScreen();
+  it("ends at the close control rather than a second way out", () => {
+    // The header already carries an exit. A second one on the last step reads
+    // as something to escape rather than something that finished.
+    const { getByTestId, queryByTestId } = renderScreen();
     fireEvent.press(getByTestId("intro-stepper-dot-5"));
 
-    fireEvent.press(getByTestId("intro-hide-banner"));
-
-    expect(props.onSetBannerDismissed).toHaveBeenCalledWith(true);
+    expect(queryByTestId("intro-hide-banner")).toBeNull();
+    expect(queryByTestId("intro-next")).toBeNull();
+    expect(getByTestId("intro-close")).toBeTruthy();
   });
 
   it("jumps to any step from the stepper", () => {

@@ -71,7 +71,9 @@ describe("MainScreenRouteControls", () => {
     expect(onToggleWebSearchEnabled).toHaveBeenCalledTimes(2);
   });
 
-  it("stays visible but is visually and functionally disabled when search is not configured", () => {
+  it("leaves the row entirely when search is not configured", () => {
+    // A switch that cannot move reads as a broken control, and the reason it
+    // cannot move lives in Settings rather than beside it.
     const onToggleWebSearchEnabled = jest.fn();
     const screen = render(
       <MainScreenRouteControls
@@ -82,25 +84,9 @@ describe("MainScreenRouteControls", () => {
       />,
     );
 
-    const searchControl = screen.getByTestId("route-web-search-container");
-    const nativeSwitch = screen.UNSAFE_getByType(NativeSwitch);
-    const containerStyle = StyleSheet.flatten(
-      screen.getByTestId("route-web-search-container").props.style,
-    );
-
-    expect(screen.getByText("Web Search")).toBeTruthy();
-    expect(containerStyle.opacity).toBe(0.52);
-    expect(searchControl.props.accessibilityState).toEqual({
-      checked: false,
-      disabled: true,
-    });
-    expect(nativeSwitch.props.disabled).toBe(true);
-    expect(nativeSwitch.props.onValueChange).toBeUndefined();
-    expect(nativeSwitch.props.value).toBe(false);
-
-    fireEvent.press(screen.getByTestId("route-web-search-label"));
-    fireEvent.press(nativeSwitch);
-    expect(onToggleWebSearchEnabled).not.toHaveBeenCalled();
+    expect(screen.queryByTestId("route-web-search-container")).toBeNull();
+    expect(screen.queryByText("Web Search")).toBeNull();
+    expect(screen.queryByTestId("route-controls-row")).toBeNull();
   });
 
   it("adds breathing room above Web Search in landscape", () => {

@@ -6,6 +6,8 @@ import { MainScreen } from "../../src/screens/MainScreen";
 import { DEFAULT_SETTINGS, type Settings } from "../../src/types";
 import { getDefaultModelForProvider } from "../../src/utils/responseModes";
 import { renderWithProviders } from "../test-utils/renderWithProviders";
+import { LocalizationProvider } from "../../src/i18n";
+import { ThemeProvider } from "../../src/theme/ThemeContext";
 
 jest.mock("../../src/context/PremiumEntitlementContext", () => ({
   usePremiumEntitlement: jest.fn(() => ({
@@ -382,10 +384,29 @@ jest.mock("../../src/features/settings/AntSettingsModal", () => ({
 }));
 
 jest.mock("../../src/components/introFlow/IntroFlowScreen", () => ({
-  IntroFlowScreen: ({ visible }: { visible: boolean }) => {
+  IntroFlowScreen: ({
+    visible,
+    onConnectProvider,
+  }: {
+    visible: boolean;
+    onConnectProvider: () => void;
+  }) => {
     const React = require("react");
-    const { Text } = require("react-native");
-    return React.createElement(Text, null, visible ? "intro:open" : "intro:closed");
+    const { Pressable, Text } = require("react-native");
+    return React.createElement(
+      React.Fragment,
+      null,
+      React.createElement(
+        Text,
+        null,
+        visible ? "intro:open" : "intro:closed",
+      ),
+      React.createElement(
+        Pressable,
+        { testID: "stub-intro-connect-provider", onPress: onConnectProvider },
+        React.createElement(Text, null, "connect"),
+      ),
+    );
   },
 }));
 
@@ -548,9 +569,7 @@ describe("MainScreen", () => {
     );
 
     expect(screen.getByText("route-card")).toBeTruthy();
-    expect(
-      screen.getByTestId("route-web-search-container").props.accessibilityState,
-    ).toEqual({ checked: false, disabled: true });
+    expect(screen.queryByTestId("route-web-search-container")).toBeNull();
     expect(inputSection.getByText("voice-stage:disabled")).toBeTruthy();
     expect(
       StyleSheet.flatten(
@@ -608,7 +627,9 @@ describe("MainScreen", () => {
     expect(screen.queryByText("image-action")).toBeNull();
   });
 
-  it("keeps Web Search visible but disabled when its provider has no key", () => {
+  it("leaves Web Search out entirely when its provider has no key", () => {
+    // Shown greyed out it reads as a broken switch; the reason it cannot move
+    // is in Settings, not on the workspace.
     useSharedSettings.mockReturnValue(
       createSharedSettingsValue({
         webSearchProvider: "openai",
@@ -617,10 +638,7 @@ describe("MainScreen", () => {
 
     const screen = renderWithProviders(<MainScreen />);
 
-    expect(screen.getByTestId("route-web-search-container")).toBeTruthy();
-    expect(
-      screen.getByTestId("route-web-search-container").props.accessibilityState,
-    ).toEqual({ checked: false, disabled: true });
+    expect(screen.queryByTestId("route-web-search-container")).toBeNull();
   });
 
   it("turns an active automatic web-search route off from the main switch", () => {
@@ -791,6 +809,90 @@ describe("MainScreen", () => {
 
     fireEvent.press(screen.getByText("Done"));
     expect(screen.getByText("settings:open")).toBeTruthy();
+  });
+
+  it("opens the purchase sheet over the introduction without closing it", () => {
+    // Provider keys are Premium, so the provider route leads to the purchase.
+    // Backing out of that purchase has to leave the reader where they were,
+    // rather than costing them the introduction they were part-way through.
+    usePremiumEntitlement.mockReturnValue({
+      busy: false,
+      clearError: jest.fn(),
+      displayPrice: null,
+      error: null,
+      isPremium: false,
+      purchasePremium: jest.fn(async () => undefined),
+      refreshPremium: jest.fn(async () => undefined),
+      restorePremium: jest.fn(async () => undefined),
+      status: "free",
+      storeConnected: true,
+      storeProduct: null,
+      storeProductLoading: false,
+    });
+    const screen = renderWithProviders(<MainScreen />);
+
+    fireEvent.press(screen.getByTestId("intro-banner"));
+    expect(screen.getByText("intro:open")).toBeTruthy();
+
+    fireEvent.press(screen.getByTestId("stub-intro-connect-provider"));
+
+    expect(screen.getByText("Unlock Premium")).toBeTruthy();
+    expect(screen.getByText("intro:open")).toBeTruthy();
+
+    fireEvent.press(screen.getByText("Done"));
+    expect(screen.getByText("intro:open")).toBeTruthy();
+  });
+
+  it("does not treat entitlement resolving at launch as a purchase", () => {
+    // Entitlement arrives asynchronously, so an owner's launch goes free ->
+    // premium with no sheet in sight. Reading that as a purchase dismissed the
+    // banner on every launch and wrote settings mid-mount.
+    const updateSettings = jest.fn();
+    usePremiumEntitlement.mockReturnValue({
+      busy: false,
+      clearError: jest.fn(),
+      displayPrice: null,
+      error: null,
+      isPremium: false,
+      purchasePremium: jest.fn(async () => undefined),
+      refreshPremium: jest.fn(async () => undefined),
+      restorePremium: jest.fn(async () => undefined),
+      status: "free",
+      storeConnected: true,
+      storeProduct: null,
+      storeProductLoading: false,
+    });
+    useSharedSettings.mockReturnValue({
+      ...createSharedSettingsValue(),
+      updateSettings,
+    });
+    const screen = renderWithProviders(<MainScreen />);
+
+    usePremiumEntitlement.mockReturnValue({
+      busy: false,
+      clearError: jest.fn(),
+      displayPrice: null,
+      error: null,
+      isPremium: true,
+      purchasePremium: jest.fn(async () => undefined),
+      refreshPremium: jest.fn(async () => undefined),
+      restorePremium: jest.fn(async () => undefined),
+      status: "premium",
+      storeConnected: true,
+      storeProduct: null,
+      storeProductLoading: false,
+    });
+    screen.rerender(
+      <ThemeProvider mode="light">
+        <LocalizationProvider language="en">
+          <MainScreen />
+        </LocalizationProvider>
+      </ThemeProvider>,
+    );
+
+    expect(updateSettings).not.toHaveBeenCalledWith(
+      expect.objectContaining({ introDismissed: true }),
+    );
   });
 
   it("hides the debug log action by default", () => {

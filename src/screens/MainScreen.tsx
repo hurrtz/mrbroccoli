@@ -94,12 +94,32 @@ export function MainScreen() {
   // also whenever a turn is attempted with no usable route -- otherwise a new
   // user can reach a microphone that silently does nothing.
   const [introVisible, setIntroVisible] = React.useState(false);
-  const openIntro = React.useCallback(() => setIntroVisible(true), []);
+  const openIntro = React.useCallback(() => {
+    setIntroVisible(true);
+    updateSettings({ introOpened: true });
+  }, [updateSettings]);
   const closeIntro = React.useCallback(() => setIntroVisible(false), []);
   const dismissIntroBanner = React.useCallback(() => {
     updateSettings({ introDismissed: true });
   }, [updateSettings]);
   const [premiumModalVisible, setPremiumModalVisible] = React.useState(false);
+  // A purchase is the one outcome that ends the introduction on its own: the
+  // reader has decided, and the invitation has nothing left to invite. Closing
+  // the purchase sheet without buying leaves them where they were.
+  const wasPremiumRef = React.useRef<boolean | null>(null);
+  const isPremiumNow = freeOffline.entitlement.isPremium;
+  React.useEffect(() => {
+    const wasPremium = wasPremiumRef.current;
+    wasPremiumRef.current = isPremiumNow;
+    // Only while the sheet is open. Entitlement also resolves from false to
+    // premium during boot, and treating that as a purchase would dismiss the
+    // banner on every launch for someone who already owns Premium.
+    if (wasPremium === false && isPremiumNow && premiumModalVisible) {
+      setPremiumModalVisible(false);
+      setIntroVisible(false);
+      updateSettings({ introDismissed: true });
+    }
+  }, [isPremiumNow, premiumModalVisible, updateSettings]);
   const providerVoiceDirectories = useMainScreenVoiceDirectories({
     loaded,
     settings: runtimeSettings,
@@ -766,11 +786,33 @@ export function MainScreen() {
     (!premiumStorePromoActive && voiceInputDisabled) ||
     freeOffline.entitlement.status === "loading";
   const voiceStageActive = isActive && mainSurfaceVisible;
-  const imageAttachmentDisabled =
-    voiceStageDisabled ||
-    voiceStageActive ||
-    voiceInputDisabled ||
-    !freeOffline.entitlement.isPremium;
+  // Hidden rather than disabled when the route cannot take an image at all;
+  // disabled only for the moments it is briefly unavailable.
+  const imageAttachmentAvailable =
+    freeOffline.entitlement.isPremium && !voiceInputDisabled;
+  const imageAttachmentDisabled = voiceStageDisabled || voiceStageActive;
+
+  const freeRuntimeBlocked =
+    freeOffline.entitlement.status === "free" && !freeOffline.freeRuntimeReady;
+  const promptBlockedActionEnabled =
+    freeRuntimeBlocked && !freeOffline.checking && !freeOffline.preparing;
+  const promptBlockedMessage = freeRuntimeBlocked
+    ? t("freeOfflineIntro")
+    : kokoroPromptBlockMessage;
+  // Only when nothing else already owns the control: a Free runtime that is
+  // still downloading, or a missing Kokoro voice, are both about a step the
+  // user is mid-way through and outrank the general hint.
+  const voiceInputUnavailableMessage =
+    speechInputUnavailable && !promptBlockedMessage
+      ? t("speechInputUnavailableHint")
+      : null;
+  // The voice control is dead when it carries a block with no action behind
+  // it, or when nothing can hear the user. Either way the composer is the only
+  // way in, so the workspace opens on it rather than on a control that cannot
+  // be pressed.
+  const voiceSurfaceUnusable =
+    Boolean(voiceInputUnavailableMessage) ||
+    Boolean(promptBlockedMessage && !promptBlockedActionEnabled);
 
   return (
     <MainScreenPresentation
@@ -785,12 +827,18 @@ export function MainScreen() {
         tone: toast?.tone,
       }}
       intro={{
-        bannerDismissed: runtimeSettings.introDismissed,
         language: settings.language,
         onClose: closeIntro,
+        // Provider keys are Premium, so a Free reader is sent to the purchase
+        // sheet rather than to a page that would only tell them no. The sheet
+        // opens over the introduction; see onClose on premiumUpgrade.
         onConnectProvider: () => {
+          if (!freeOffline.entitlement.isPremium) {
+            setPremiumModalVisible(true);
+            return;
+          }
           closeIntro();
-          openSettings(undefined, "providers");
+          openSettings(undefined, "providers", "connections");
         },
         onInstallLocal: () => {
           closeIntro();
@@ -799,7 +847,6 @@ export function MainScreen() {
           openSettings(undefined, undefined, "local");
         },
         onOpenPremium: () => {
-          closeIntro();
           setPremiumModalVisible(true);
         },
         onOpenStt: () => {
@@ -818,9 +865,6 @@ export function MainScreen() {
             freeOffline.entitlement.isPremium ? "speaking" : "local",
           );
         },
-        onSetBannerDismissed: (dismissed: boolean) => {
-          updateSettings({ introDismissed: dismissed });
-        },
         t,
         visible: introVisible,
       }}
@@ -829,6 +873,7 @@ export function MainScreen() {
         introBanner: {
           onDismiss: dismissIntroBanner,
           onOpen: openIntro,
+          showDismiss: runtimeSettings.introOpened,
           t,
           // Hidden once dismissed, and never shown over a store-promo capture.
           visible:
@@ -881,7 +926,7 @@ export function MainScreen() {
           driveSilenceCountdownSeconds,
           driveSessionCanRepeat,
           driveVoiceActive,
-          initialInputSurface: speechInputUnavailable
+          initialInputSurface: voiceSurfaceUnusable
             ? "text"
             : inputSurfaceRef.current,
           initialTextMessage: textMessageDraftRef.current,
@@ -897,54 +942,29 @@ export function MainScreen() {
           onPressOut: handlePressOut,
           onInterruptPlayback: handleInterruptPlayback,
           onStopPlayback: handleStopPlayback,
-          onResolvePromptBlock:
-            freeOffline.entitlement.status === "free" &&
-            !freeOffline.freeRuntimeReady
-              ? openIntro
-              : handleOpenSpeakingSettings,
+          onResolvePromptBlock: freeRuntimeBlocked
+            ? openIntro
+            : handleOpenSpeakingSettings,
           onSubmitTextMessage: handleSubmitTextMessage,
           onTextMessageChange: handleTextMessageChange,
           playbackPaused: player.isPlaybackPaused,
-          promptBlockedActionEnabled:
-            freeOffline.entitlement.status === "free" &&
-            !freeOffline.freeRuntimeReady &&
-            !freeOffline.checking &&
-            !freeOffline.preparing,
-          promptBlockedActionLabel:
-            freeOffline.entitlement.status === "free" &&
-            !freeOffline.freeRuntimeReady
-              ? freeOffline.checking || freeOffline.preparing
-                ? t("onDeviceTestingDevice")
-                : t("freeOfflineDownloadAndTest")
-              : kokoroPromptBlockActionLabel,
-          promptBlockedMessage:
-            freeOffline.entitlement.status === "free" &&
-            !freeOffline.freeRuntimeReady
-              ? t("freeOfflineIntro")
-              : kokoroPromptBlockMessage,
-          promptBlockedProgress:
-            freeOffline.entitlement.status === "free" &&
-            !freeOffline.freeRuntimeReady
-              ? null
-              : kokoroPromptBlockProgress,
+          promptBlockedActionEnabled,
+          promptBlockedActionLabel: freeRuntimeBlocked
+            ? freeOffline.checking || freeOffline.preparing
+              ? t("onDeviceTestingDevice")
+              : t("freeOfflineDownloadAndTest")
+            : kokoroPromptBlockActionLabel,
+          promptBlockedMessage,
+          promptBlockedProgress: freeRuntimeBlocked
+            ? null
+            : kokoroPromptBlockProgress,
           recordingMaxMs: maxRecordingMs,
           recordingStartedAtMs,
           speechStartProgress: phaseProgress?.speechStart ?? null,
           statusTitle: statusDisplay.actionLabel,
           t,
           visualPhase,
-          // Only when nothing else already owns the control: a Free runtime that
-          // is still downloading, or a missing Kokoro voice, are both about a
-          // step the user is mid-way through and outrank the general hint.
-          voiceInputUnavailableMessage:
-            speechInputUnavailable &&
-            !(
-              freeOffline.entitlement.status === "free" &&
-              !freeOffline.freeRuntimeReady
-            ) &&
-            !kokoroPromptBlockMessage
-              ? t("speechInputUnavailableHint")
-              : null,
+          voiceInputUnavailableMessage,
         },
         transcript: {
           activeConversationId: activeConversation?.id ?? null,
@@ -954,7 +974,7 @@ export function MainScreen() {
           activeReplayMessageId,
           imageAttachmentDisabled,
           messages,
-          onAddImage: freeOffline.entitlement.isPremium
+          onAddImage: imageAttachmentAvailable
             ? imagePromptSubmission.handleAddImage
             : undefined,
           onCopyMessage: (message) =>

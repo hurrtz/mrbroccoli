@@ -1,5 +1,5 @@
 import React from "react";
-import { render } from "@testing-library/react-native";
+import { render, within } from "@testing-library/react-native";
 import { StyleSheet } from "react-native";
 
 import { MainScreenWorkspace } from "../../../src/screens/main/MainScreenWorkspace";
@@ -79,6 +79,7 @@ describe("MainScreenWorkspace streaming isolation", () => {
     const introBannerProps = {
       onDismiss: jest.fn(),
       onOpen: jest.fn(),
+      showDismiss: true,
       t: ((key: string) => key) as never,
       visible: false,
     };
@@ -154,6 +155,13 @@ describe("MainScreenWorkspace streaming isolation", () => {
     expect(mockVoicePagerRenderCount).toBe(1);
     expect(mockTranscriptRenderCount).toBe(1);
     expect(t.mock.calls.filter(([key]) => key === "webSearch")).toHaveLength(2);
+    // Web Search sits under the control it modifies: it changes how the next
+    // turn is answered, not something to pass through on the way in.
+    expect(
+      within(screen.getByTestId("portrait-input-section")).getByTestId(
+        "route-controls-row",
+      ),
+    ).toBeTruthy();
 
     screen.rerender(
       <MainScreenWorkspace
@@ -178,6 +186,7 @@ describe("MainScreenWorkspace streaming isolation", () => {
         introBanner={{
           onDismiss: jest.fn(),
           onOpen: jest.fn(),
+          showDismiss: true,
           t: ((key: string) => key) as never,
           visible: false,
         }}

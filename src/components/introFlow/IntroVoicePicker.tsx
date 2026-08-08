@@ -7,7 +7,7 @@ import type { AppLanguage } from "../../i18n/localeRegistry";
 import type { TranslateFn } from "../../screens/main/shared";
 import { fonts } from "../../theme/typography";
 import { getIntroClip } from "./introClips";
-import { introRadius, introTheme } from "./introTheme";
+import { introRadius, useIntroTheme } from "./introTheme";
 import { useIntroPlayback } from "./useIntroPlayback";
 
 interface IntroVoicePickerProps {
@@ -27,6 +27,7 @@ interface IntroVoicePickerProps {
  * derives from the store the install came from, falling back to English.
  */
 export function IntroVoicePicker({ language, t }: IntroVoicePickerProps) {
+  const theme = useIntroTheme();
   const [selected, setSelected] = React.useState<AppLanguage>(language);
   const [pickerOpen, setPickerOpen] = React.useState(false);
 
@@ -51,24 +52,33 @@ export function IntroVoicePicker({ language, t }: IntroVoicePickerProps) {
           accessibilityLabel={getAppLocale(selected).nativeName}
           accessibilityRole="button"
           onPress={() => setPickerOpen(true)}
-          style={styles.select}
+          style={[
+            styles.select,
+            {
+              backgroundColor: theme.sandSoft,
+              borderColor: theme.sandBorder,
+            },
+          ]}
           testID="intro-voice-select"
         >
-          <Text numberOfLines={1} style={styles.selectLabel}>
+          <Text numberOfLines={1} style={[styles.selectLabel, { color: theme.text }]}>
             {getAppLocale(selected).nativeName}
           </Text>
-          <PhosphorIcon color={introTheme.textMuted} name="down" size="compact" />
+          <PhosphorIcon color={theme.textMuted} name="down" size="compact" />
         </Pressable>
 
         <Pressable
           accessibilityLabel={playing ? t("introHearStop") : t("introHearPlay")}
           accessibilityRole="button"
           onPress={toggle}
-          style={({ pressed }) => [styles.play, { opacity: pressed ? 0.82 : 1 }]}
+          style={({ pressed }) => [
+            styles.play,
+            { backgroundColor: theme.accent, opacity: pressed ? 0.82 : 1 },
+          ]}
           testID="intro-voice-play"
         >
           <PhosphorIcon
-            color={introTheme.onAccent}
+            color={theme.onAccent}
             name={playing ? "pause" : "audio"}
             size="control"
           />
@@ -87,8 +97,14 @@ export function IntroVoicePicker({ language, t }: IntroVoicePickerProps) {
           onPress={() => setPickerOpen(false)}
           style={styles.backdrop}
         />
-        <View style={styles.sheet} testID="intro-voice-options">
-          <Text style={styles.sheetTitle}>{t("introVoicePickerTitle")}</Text>
+        <View
+          style={[
+            styles.sheet,
+            { backgroundColor: theme.panel, borderColor: theme.border },
+          ]}
+          testID="intro-voice-options"
+        >
+          <Text style={[styles.sheetTitle, { color: theme.text }]}>{t("introVoicePickerTitle")}</Text>
           <ScrollView contentContainerStyle={styles.sheetList}>
             {APP_LANGUAGES.map((option) => {
               const active = option === selected;
@@ -98,20 +114,32 @@ export function IntroVoicePicker({ language, t }: IntroVoicePickerProps) {
                   accessibilityState={{ selected: active }}
                   key={option}
                   onPress={() => handleSelect(option)}
-                  style={[styles.option, active ? styles.optionActive : null]}
+                  style={[
+                    styles.option,
+                    active
+                      ? {
+                          backgroundColor: theme.sandSoft,
+                          borderColor: theme.sandBorder,
+                          borderWidth: StyleSheet.hairlineWidth,
+                        }
+                      : null,
+                  ]}
                   testID={`intro-voice-option-${option}`}
                 >
                   <Text
                     style={[
                       styles.optionLabel,
-                      active ? styles.optionLabelActive : null,
+                      { color: theme.textSecondary },
+                      active
+                        ? { color: theme.sand, fontFamily: fonts.bodyMedium }
+                        : null,
                     ]}
                   >
                     {getAppLocale(option).nativeName}
                   </Text>
                   {active ? (
                     <PhosphorIcon
-                      color={introTheme.sand}
+                      color={theme.sand}
                       name="check"
                       size="compact"
                     />
@@ -146,25 +174,14 @@ const styles = StyleSheet.create({
     minHeight: 48,
     paddingHorizontal: 16,
   },
-  optionActive: {
-    // The reference input fills a chosen control edge to edge rather than
-    // marking it; that is what makes the selection readable at a glance.
-    backgroundColor: introTheme.sandSoft,
-    borderColor: introTheme.sandBorder,
-    borderWidth: StyleSheet.hairlineWidth,
-  },
+  // A chosen option fills edge to edge rather than being marked, which is what
+  // makes the selection readable at a glance.
   optionLabel: {
-    color: introTheme.textSecondary,
     fontFamily: fonts.body,
     fontSize: 16,
   },
-  optionLabelActive: {
-    color: introTheme.sand,
-    fontFamily: fonts.bodyMedium,
-  },
   play: {
     alignItems: "center",
-    backgroundColor: introTheme.accent,
     borderRadius: introRadius.pill,
     height: 52,
     justifyContent: "center",
@@ -177,8 +194,6 @@ const styles = StyleSheet.create({
   },
   select: {
     alignItems: "center",
-    backgroundColor: introTheme.sandSoft,
-    borderColor: introTheme.sandBorder,
     borderRadius: introRadius.pill,
     borderWidth: StyleSheet.hairlineWidth,
     flex: 1,
@@ -189,14 +204,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 18,
   },
   selectLabel: {
-    color: introTheme.text,
     flex: 1,
     fontFamily: fonts.bodyMedium,
     fontSize: 16,
   },
   sheet: {
-    backgroundColor: introTheme.panel,
-    borderColor: introTheme.border,
     borderRadius: introRadius.panel,
     borderWidth: StyleSheet.hairlineWidth,
     marginHorizontal: 24,
@@ -209,7 +221,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
   },
   sheetTitle: {
-    color: introTheme.text,
     fontFamily: fonts.display,
     fontSize: 15,
     marginBottom: 8,

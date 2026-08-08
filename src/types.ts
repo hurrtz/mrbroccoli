@@ -172,6 +172,8 @@ export interface Settings {
   language: AppLanguage;
   theme: ThemeMode;
   introDismissed: boolean;
+  /** Whether the introduction has ever been opened from the banner. */
+  introOpened: boolean;
   freeOnboardingLanguageInitialized: boolean;
   freeOfflineSetupCompleted: boolean;
   freeOfflineProfileOverrides: FreeOfflineProfileOverrides;
@@ -472,6 +474,7 @@ export const DEFAULT_SETTINGS: Settings = {
   language: "en",
   theme: "system",
   introDismissed: false,
+  introOpened: false,
   freeOnboardingLanguageInitialized: false,
   freeOfflineSetupCompleted: false,
   freeOfflineProfileOverrides: {},

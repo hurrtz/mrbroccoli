@@ -70,12 +70,6 @@ export function MainScreenWorkspace({
             {...routeCard}
           />
 
-          <MainScreenRouteControls
-            colors={colors}
-            layout="landscape"
-            {...routeControls}
-          />
-
           <View
             testID="landscape-stage-area"
             style={[
@@ -89,6 +83,11 @@ export function MainScreenWorkspace({
               colors={colors}
               layout="landscape"
               {...voiceStage}
+            />
+            <MainScreenRouteControls
+              colors={colors}
+              layout="landscape"
+              {...routeControls}
             />
           </View>
         </View>
@@ -124,14 +123,16 @@ export function MainScreenWorkspace({
         <IntroBanner {...introBanner} />
         <MainScreenRouteCard colors={colors} {...routeCard} />
 
-        <MainScreenRouteControls colors={colors} {...routeControls} />
-
         <View
           testID="portrait-conversation-stack"
           style={styles.portraitConversationStack}
         >
           <View testID="portrait-input-section">
             <MainScreenVoiceStage colors={colors} {...voiceStage} />
+            {/* Below the control it modifies: it changes how the next turn is
+                answered, so it reads as a note on that action rather than as a
+                setting the user must pass through first. */}
+            <MainScreenRouteControls colors={colors} {...routeControls} />
           </View>
 
           <View

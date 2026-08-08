@@ -3,71 +3,52 @@ import { Pressable, StyleSheet, Text, View } from "react-native";
 
 import { PhosphorIcon } from "../../design-system/PhosphorIcon";
 import { fonts, textStyles } from "../../theme/typography";
-import { introRadius, introTheme } from "./introTheme";
+import { introRadius, useIntroTheme } from "./introTheme";
 
 type IconName = React.ComponentProps<typeof PhosphorIcon>["name"];
 
 /**
  * Step heading. Uses the same headline face as the conversation drawer so the
- * introduction reads as part of the app despite its own palette.
+ * introduction reads as part of the app.
+ *
+ * Headings are centred: every step is a single column of content with nothing
+ * beside it, and a left-aligned heading over centred content read as a form.
  */
-export function IntroTitle({
-  align = "left",
-  children,
-}: {
-  align?: "center" | "left";
-  children: React.ReactNode;
-}) {
-  return <Text style={[styles.title, { textAlign: align }]}>{children}</Text>;
+export function IntroTitle({ children }: { children: React.ReactNode }) {
+  const theme = useIntroTheme();
+  return (
+    <Text style={[styles.title, { color: theme.text }]}>{children}</Text>
+  );
 }
 
-export function IntroBody({
-  align = "left",
-  children,
-}: {
-  align?: "center" | "left";
-  children: React.ReactNode;
-}) {
-  return <Text style={[styles.body, { textAlign: align }]}>{children}</Text>;
+export function IntroBody({ children }: { children: React.ReactNode }) {
+  const theme = useIntroTheme();
+  return (
+    <Text style={[styles.body, { color: theme.textSecondary }]}>{children}</Text>
+  );
 }
 
 /**
- * Marks a step as required or optional.
+ * Marks a step as optional, as a rule with the word set into it.
  *
- * Optional steps still matter -- speech makes the app markedly better -- so the
- * badge states the fact without discouraging, and the surrounding copy carries
- * the argument.
+ * A pill above the heading competed with the heading for the eye and read as a
+ * status badge on the step. As a divider it does the same job in the reading
+ * order it belongs to -- a note about what follows, not a label on the title.
  */
-export function IntroBadge({
-  tone = "neutral",
-  children,
-}: {
-  tone?: "accent" | "neutral" | "premium";
-  children: React.ReactNode;
-}) {
-  const palette = {
-    accent: [introTheme.accentSoft, introTheme.accentBorder, introTheme.accent],
-    neutral: [introTheme.mutedSoft, introTheme.border, introTheme.muted],
-    premium: [
-      introTheme.premiumSoft,
-      introTheme.premiumBorder,
-      introTheme.premium,
-    ],
-  }[tone];
-
+export function IntroDivider({ label }: { label: string }) {
+  const theme = useIntroTheme();
   return (
-    <View
-      style={[
-        styles.badge,
-        { backgroundColor: palette[0], borderColor: palette[1] },
-      ]}
-    >
-      <Text style={[styles.badgeLabel, { color: palette[2] }]}>{children}</Text>
+    <View style={styles.divider}>
+      <View style={[styles.dividerRule, { backgroundColor: theme.border }]} />
+      <Text style={[styles.dividerLabel, { color: theme.textMuted }]}>
+        {label}
+      </Text>
+      <View style={[styles.dividerRule, { backgroundColor: theme.border }]} />
     </View>
   );
 }
 
-/** Grouped content on a lifted surface, matching the referenced input field. */
+/** Grouped content on its own paper. */
 export function IntroPanel({
   children,
   style,
@@ -75,7 +56,26 @@ export function IntroPanel({
   children: React.ReactNode;
   style?: object;
 }) {
-  return <View style={[styles.panel, style]}>{children}</View>;
+  const theme = useIntroTheme();
+  return (
+    <View
+      style={[
+        styles.panel,
+        { backgroundColor: theme.panel, borderColor: theme.border },
+        style,
+      ]}
+    >
+      {children}
+    </View>
+  );
+}
+
+/** A hairline between grouped points inside a panel. */
+export function IntroPanelDivider() {
+  const theme = useIntroTheme();
+  return (
+    <View style={[styles.panelDivider, { backgroundColor: theme.border }]} />
+  );
 }
 
 /** A single fact or benefit with a leading glyph. */
@@ -90,10 +90,11 @@ export function IntroPoint({
   body?: string;
   tone?: "accent" | "neutral" | "premium";
 }) {
+  const theme = useIntroTheme();
   const color = {
-    accent: introTheme.accent,
-    neutral: introTheme.muted,
-    premium: introTheme.premium,
+    accent: theme.accent,
+    neutral: theme.muted,
+    premium: theme.premium,
   }[tone];
 
   return (
@@ -102,65 +103,18 @@ export function IntroPoint({
         <PhosphorIcon color={color} name={icon} size="compact" />
       </View>
       <View style={styles.pointText}>
-        <Text style={styles.pointTitle}>{title}</Text>
-        {body ? <Text style={styles.pointBody}>{body}</Text> : null}
+        <Text style={[styles.pointTitle, { color: theme.text }]}>{title}</Text>
+        {body ? (
+          <Text style={[styles.pointBody, { color: theme.textSecondary }]}>
+            {body}
+          </Text>
+        ) : null}
       </View>
     </View>
   );
 }
 
-/**
- * A checkbox on the dark canvas.
- *
- * Selected state fills the whole control in sand rather than only marking the
- * box, following the reference input: at rest a hairline, once chosen a filled
- * surface that reads from across the screen.
- */
-export function IntroCheckbox({
-  checked,
-  label,
-  onChange,
-  testID,
-}: {
-  checked: boolean;
-  label: string;
-  onChange: (next: boolean) => void;
-  testID?: string;
-}) {
-  return (
-    <Pressable
-      accessibilityRole="checkbox"
-      accessibilityState={{ checked }}
-      onPress={() => onChange(!checked)}
-      style={({ pressed }) => [
-        styles.checkbox,
-        {
-          backgroundColor: checked ? introTheme.sandSoft : "transparent",
-          borderColor: checked ? introTheme.sandBorder : introTheme.border,
-          opacity: pressed ? 0.85 : 1,
-        },
-      ]}
-      testID={testID}
-    >
-      <View
-        style={[
-          styles.checkboxBox,
-          {
-            backgroundColor: checked ? introTheme.sand : "transparent",
-            borderColor: checked ? introTheme.sand : introTheme.borderStrong,
-          },
-        ]}
-      >
-        {checked ? (
-          <PhosphorIcon color={introTheme.onSand} name="check" size="inline" />
-        ) : null}
-      </View>
-      <Text style={styles.checkboxLabel}>{label}</Text>
-    </Pressable>
-  );
-}
-
-/** Primary/secondary action. Fully rounded, echoing the reference controls. */
+/** Primary/secondary action. Fully rounded, matching the app's own controls. */
 export function IntroButton({
   label,
   onPress,
@@ -174,14 +128,19 @@ export function IntroButton({
   icon?: IconName;
   testID?: string;
 }) {
+  const theme = useIntroTheme();
   const filled = tone !== "secondary";
   const background =
     tone === "premium"
-      ? introTheme.premium
+      ? theme.premium
       : tone === "primary"
-        ? introTheme.accent
+        ? theme.accent
         : "transparent";
-  const labelColor = filled ? introTheme.onAccent : introTheme.text;
+  const labelColor = filled
+    ? tone === "premium"
+      ? theme.onPremium
+      : theme.onAccent
+    : theme.text;
 
   return (
     <Pressable
@@ -191,7 +150,7 @@ export function IntroButton({
         styles.button,
         {
           backgroundColor: background,
-          borderColor: filled ? "transparent" : introTheme.borderStrong,
+          borderColor: filled ? "transparent" : theme.borderStrong,
           opacity: pressed ? 0.82 : 1,
         },
       ]}
@@ -204,48 +163,11 @@ export function IntroButton({
 }
 
 const styles = StyleSheet.create({
-  badge: {
-    alignSelf: "flex-start",
-    borderRadius: introRadius.pill,
-    borderWidth: StyleSheet.hairlineWidth,
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-  },
-  badgeLabel: {
-    fontFamily: fonts.bodyMedium,
-    fontSize: 11,
-    letterSpacing: 0.6,
-    textTransform: "uppercase",
-  },
   body: {
-    color: introTheme.textSecondary,
     fontFamily: fonts.body,
     fontSize: 16,
     lineHeight: 24,
-  },
-  checkbox: {
-    alignItems: "center",
-    borderRadius: introRadius.control,
-    borderWidth: StyleSheet.hairlineWidth,
-    flexDirection: "row",
-    gap: 12,
-    minHeight: 52,
-    paddingHorizontal: 14,
-  },
-  checkboxBox: {
-    alignItems: "center",
-    borderRadius: 6,
-    borderWidth: 1.5,
-    height: 22,
-    justifyContent: "center",
-    width: 22,
-  },
-  checkboxLabel: {
-    color: introTheme.text,
-    flex: 1,
-    fontFamily: fonts.body,
-    fontSize: 14,
-    lineHeight: 19,
+    textAlign: "center",
   },
   button: {
     alignItems: "center",
@@ -261,13 +183,29 @@ const styles = StyleSheet.create({
     fontFamily: fonts.bodyMedium,
     fontSize: 16,
   },
+  divider: {
+    alignItems: "center",
+    flexDirection: "row",
+    gap: 12,
+  },
+  dividerLabel: {
+    fontFamily: fonts.bodyMedium,
+    fontSize: 11,
+    letterSpacing: 0.8,
+    textTransform: "uppercase",
+  },
+  dividerRule: {
+    flex: 1,
+    height: StyleSheet.hairlineWidth,
+  },
   panel: {
-    backgroundColor: introTheme.panel,
-    borderColor: introTheme.border,
     borderRadius: introRadius.panel,
     borderWidth: StyleSheet.hairlineWidth,
     gap: 16,
     padding: 18,
+  },
+  panelDivider: {
+    height: StyleSheet.hairlineWidth,
   },
   point: {
     alignItems: "flex-start",
@@ -275,7 +213,6 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   pointBody: {
-    color: introTheme.textSecondary,
     fontFamily: fonts.body,
     fontSize: 14,
     lineHeight: 20,
@@ -293,16 +230,15 @@ const styles = StyleSheet.create({
     gap: 3,
   },
   pointTitle: {
-    color: introTheme.text,
     fontFamily: fonts.bodyMedium,
     fontSize: 15,
     lineHeight: 21,
   },
   title: {
     ...textStyles.screenTitle,
-    color: introTheme.text,
     // 30 left longer headings breaking with a single word on line two.
     fontSize: 27,
     lineHeight: 33,
+    textAlign: "center",
   },
 });

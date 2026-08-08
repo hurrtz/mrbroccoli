@@ -19,7 +19,17 @@ the complete Play Store translations are kept in a dedicated file under
 - Every action in the introduction now opens the settings page that does the
   work. Choosing to install the on-device model opens the page that downloads
   and verifies it, rather than closing the introduction with nothing to show
-  for it.
+  for it. Connecting your own provider opens the Premium purchase over the
+  introduction, so backing out of the purchase leaves you on the page you were
+  reading.
+- The introduction now follows your light or dark theme instead of always being
+  dark. The invitation on the home screen keeps a colour of its own so it still
+  stands out, and it only offers to be dismissed once you have opened it at
+  least once. Buying Premium removes it.
+- Web Search now sits under the button it affects rather than above it, and
+  controls that cannot be used at all — Web Search with no provider configured,
+  and attaching an image on a route that cannot take one — are left out rather
+  than shown greyed out.
 - Replaced the setup wizards with an introduction you can skip. The app now
   opens straight into the workspace, with a dismissible banner offering a short
   tour and a choice between connecting your own provider or installing the
@@ -32,9 +42,9 @@ the complete Play Store translations are kept in a dedicated file under
 
 - Play an example again after switching the introduction's language. The first
   language change left every later example silent with nothing to indicate why.
-- Start on the message field when no speech recognition is set up, and explain
-  on the voice control why it is unavailable instead of leaving it looking
-  ready to press.
+- Start on the message field whenever the voice control cannot be used, and
+  explain on the control itself why, instead of leaving it looking ready to
+  press.
 
 ## 3.1.1 - 2026-08-07
 
