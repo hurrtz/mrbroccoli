@@ -1,5 +1,5 @@
 import React from "react";
-import { fireEvent, render, waitFor } from "@testing-library/react-native";
+import { fireEvent, waitFor } from "@testing-library/react-native";
 
 /**
  * The wake lock used to live on the Free setup wizard. Removing the wizard
@@ -19,11 +19,19 @@ jest.mock("expo-keep-awake", () => ({
 }));
 
 let mockResolveDownload: (() => void) | undefined;
+let mockDownloadSignal: AbortSignal | undefined;
 const mockDownloadLocalModel = jest.fn(
-  () =>
-    new Promise<string>((resolve) => {
+  (_modelId: string, options?: { abortSignal?: AbortSignal }) => {
+    mockDownloadSignal = options?.abortSignal;
+    return new Promise<string>((resolve, reject) => {
       mockResolveDownload = () => resolve("/models/local");
-    }),
+      options?.abortSignal?.addEventListener("abort", () => {
+        const error = new Error("Download aborted");
+        error.name = "AbortError";
+        reject(error);
+      });
+    });
+  },
 );
 
 jest.mock("../../src/services/localModelManager", () => ({
@@ -129,6 +137,7 @@ function renderPage() {
 beforeEach(() => {
   jest.clearAllMocks();
   mockResolveDownload = undefined;
+  mockDownloadSignal = undefined;
 });
 
 describe("on-device model downloads", () => {
@@ -158,6 +167,41 @@ describe("on-device model downloads", () => {
 
     mockResolveDownload?.();
 
+    await waitFor(() =>
+      expect(mockDeactivateKeepAwake).toHaveBeenCalledWith(
+        "mrbroccoli-on-device-models",
+      ),
+    );
+  });
+
+  it("turns the running download into a way out of it", async () => {
+    // A multi-gigabyte transfer with no way to stop it is its own trap, and
+    // the service has accepted an abort signal all along.
+    const firstLlm = LOCAL_MODEL_CATALOG.find(
+      (model) => model.capability === "llm" && model.id !== "kokoro-multilingual",
+    );
+    const screen = renderPage();
+    const downloadButton = await waitFor(() =>
+      screen.getAllByTestId(`on-device-download-${firstLlm?.id}`)[0],
+    );
+
+    fireEvent.press(downloadButton);
+
+    const cancelButton = await waitFor(() =>
+      screen.getAllByTestId(`on-device-cancel-${firstLlm?.id}`)[0],
+    );
+    expect(mockDownloadSignal?.aborted).toBe(false);
+
+    fireEvent.press(cancelButton);
+
+    expect(mockDownloadSignal?.aborted).toBe(true);
+    // Back to an offer to download, and no failure alert for a choice the
+    // user made deliberately.
+    await waitFor(() =>
+      expect(
+        screen.getAllByTestId(`on-device-download-${firstLlm?.id}`)[0],
+      ).toBeTruthy(),
+    );
     await waitFor(() =>
       expect(mockDeactivateKeepAwake).toHaveBeenCalledWith(
         "mrbroccoli-on-device-models",

@@ -78,6 +78,10 @@ type BusyAction = {
 
 const CAPABILITY_ORDER = ["llm", "stt", "tts"] as const;
 
+function isAbortError(error: unknown) {
+  return error instanceof Error && error.name === "AbortError";
+}
+
 function testStatusKey(result?: LocalModelBenchmarkResult) {
   switch (result?.status) {
     case "viable":
@@ -152,6 +156,9 @@ export function OnDeviceSettingsPage({
   // aborts the transfer and leaves the whole download to start over. This page
   // is where that work happens now that the setup wizard is gone; the wake
   // lock that used to cover it moved with the wizard and stopped applying.
+  // Held so the running transfer can be stopped from the control that started
+  // it; a multi-gigabyte download with no way out is its own trap.
+  const downloadAbortRef = React.useRef<AbortController | null>(null);
   useKeepAwakeWhile(
     busy?.action === "download" || busy?.action === "test",
     "mrbroccoli-on-device-models",
@@ -281,16 +288,21 @@ export function OnDeviceSettingsPage({
   ]);
 
   const handleDownload = async (model: LocalModelDefinition) => {
+    const abortController = new AbortController();
+    downloadAbortRef.current = abortController;
     setBusy({ action: "download", modelId: model.id });
     AccessibilityInfo.announceForAccessibility(t("downloadingShort"));
     try {
       if (model.id === "kokoro-multilingual") {
-        const completed = await kokoroModel.download();
+        const completed = await kokoroModel.download({
+          signal: abortController.signal,
+        });
         if (!completed) {
           return;
         }
       } else {
         await downloadLocalModel(model.id, {
+          abortSignal: abortController.signal,
           onProgress: (next) =>
             setProgress((current) => ({ ...current, [model.id]: next })),
         });
@@ -300,14 +312,27 @@ export function OnDeviceSettingsPage({
         `${model.name}: ${t("settingsReadinessReady")}`,
       );
     } catch (error) {
-      Alert.alert(
-        model.name,
-        error instanceof Error ? error.message : String(error),
-      );
+      // Cancelling is an outcome the user chose, not a failure to report back
+      // to them. The service already removed the partial file.
+      if (!isAbortError(error) && !abortController.signal.aborted) {
+        Alert.alert(
+          model.name,
+          error instanceof Error ? error.message : String(error),
+        );
+      }
+      await refreshModelState();
     } finally {
+      if (downloadAbortRef.current === abortController) {
+        downloadAbortRef.current = null;
+      }
       setBusy(null);
       setProgress((current) => ({ ...current, [model.id]: undefined }));
     }
+  };
+
+  const handleCancelDownload = () => {
+    downloadAbortRef.current?.abort();
+    AccessibilityInfo.announceForAccessibility(t("onDeviceDownloadCancelled"));
   };
 
   const handleRemove = async (model: LocalModelDefinition) => {
@@ -552,14 +577,23 @@ export function OnDeviceSettingsPage({
         ) : null}
         <View style={localStyles.actions}>
           {!install?.verified ? (
-            <Button
-              size="small"
-              loading={modelBusy && busy?.action === "download"}
-              onPress={() => void handleDownload(model)}
-              testID={`on-device-download-${model.id}`}
-            >
-              <Text style={{ color: colors.accent }}>{t("download")}</Text>
-            </Button>
+            modelBusy && busy?.action === "download" ? (
+              <Button
+                size="small"
+                onPress={handleCancelDownload}
+                testID={`on-device-cancel-${model.id}`}
+              >
+                <Text style={{ color: colors.danger }}>{t("cancel")}</Text>
+              </Button>
+            ) : (
+              <Button
+                size="small"
+                onPress={() => void handleDownload(model)}
+                testID={`on-device-download-${model.id}`}
+              >
+                <Text style={{ color: colors.accent }}>{t("download")}</Text>
+              </Button>
+            )
           ) : (
             <>
               <Button

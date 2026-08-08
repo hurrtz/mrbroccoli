@@ -269,6 +269,7 @@ const en = {
     "Every selected local model must support all of these languages. This choice also updates listening and spoken-reply languages.",
   onDeviceTestDevice: "Test this device again",
   onDeviceTestingDevice: "Testing this device…",
+  onDeviceDownloadCancelled: "Download cancelled.",
   onDeviceDeviceReady: "Device check complete",
   onDeviceDeviceSummary: ({ memory, storage }: TranslationParams) =>
     `${memory} RAM · ${storage} free`,
@@ -305,6 +306,7 @@ export const onDeviceTranslations = {
       "Jedes lokale Modell muss alle ausgewählten Sprachen unterstützen. Die Auswahl aktualisiert auch Erkennung und Sprachausgabe.",
     onDeviceTestDevice: "Gerät erneut testen",
     onDeviceTestingDevice: "Gerät wird getestet…",
+    onDeviceDownloadCancelled: "تم إلغاء التنزيل.",
     onDeviceDeviceReady: "Geräteprüfung abgeschlossen",
     onDeviceDeviceSummary: ({ memory, storage }) =>
       `${memory} RAM · ${storage} frei`,
@@ -336,6 +338,7 @@ export const onDeviceTranslations = {
       "Кожна локальна модель має підтримувати всі вибрані мови. Вибір також оновлює мови розпізнавання та озвучення.",
     onDeviceTestDevice: "Перевірити пристрій знову",
     onDeviceTestingDevice: "Перевірка пристрою…",
+    onDeviceDownloadCancelled: "Stahování zrušeno.",
     onDeviceDeviceReady: "Перевірку пристрою завершено",
     onDeviceDeviceSummary: ({ memory, storage }) =>
       `${memory} ОЗП · ${storage} вільно`,
@@ -367,6 +370,7 @@ export const onDeviceTranslations = {
       "हर स्थानीय मॉडल को चुनी हुई सभी भाषाओं का समर्थन करना होगा। यह चयन सुनने और बोले गए उत्तरों की भाषाएँ भी बदलता है।",
     onDeviceTestDevice: "इस डिवाइस को फिर जाँचें",
     onDeviceTestingDevice: "डिवाइस की जाँच हो रही है…",
+    onDeviceDownloadCancelled: "Download abgebrochen.",
     onDeviceDeviceReady: "डिवाइस जाँच पूरी हुई",
     onDeviceDeviceSummary: ({ memory, storage }) =>
       `${memory} RAM · ${storage} खाली`,
@@ -397,6 +401,7 @@ export const onDeviceTranslations = {
       "Cada modelo local debe admitir todos estos idiomas. La selección también actualiza los idiomas de reconocimiento y respuesta hablada.",
     onDeviceTestDevice: "Volver a probar el dispositivo",
     onDeviceTestingDevice: "Probando el dispositivo…",
+    onDeviceDownloadCancelled: "Descarga cancelada.",
     onDeviceDeviceReady: "Comprobación completada",
     onDeviceDeviceSummary: ({ memory, storage }) =>
       `${memory} RAM · ${storage} libres`,
@@ -428,6 +433,7 @@ export const onDeviceTranslations = {
       "Chaque modèle local doit prendre en charge toutes ces langues. Ce choix met aussi à jour les langues d’écoute et des réponses vocales.",
     onDeviceTestDevice: "Retester cet appareil",
     onDeviceTestingDevice: "Test de l’appareil…",
+    onDeviceDownloadCancelled: "Téléchargement annulé.",
     onDeviceDeviceReady: "Contrôle de l’appareil terminé",
     onDeviceDeviceSummary: ({ memory, storage }) =>
       `${memory} RAM · ${storage} disponibles`,
@@ -459,6 +465,7 @@ export const onDeviceTranslations = {
       "Ogni modello locale deve supportare tutte le lingue selezionate. La scelta aggiorna anche le lingue di ascolto e risposta vocale.",
     onDeviceTestDevice: "Verifica di nuovo il dispositivo",
     onDeviceTestingDevice: "Verifica del dispositivo…",
+    onDeviceDownloadCancelled: "डाउनलोड रद्द किया गया।",
     onDeviceDeviceReady: "Verifica del dispositivo completata",
     onDeviceDeviceSummary: ({ memory, storage }) =>
       `${memory} RAM · ${storage} liberi`,
@@ -490,6 +497,7 @@ export const onDeviceTranslations = {
       "Cada modelo local tem de suportar todos os idiomas escolhidos. A seleção também atualiza os idiomas de escuta e resposta falada.",
     onDeviceTestDevice: "Testar novamente este dispositivo",
     onDeviceTestingDevice: "A testar o dispositivo…",
+    onDeviceDownloadCancelled: "A letöltés megszakítva.",
     onDeviceDeviceReady: "Verificação do dispositivo concluída",
     onDeviceDeviceSummary: ({ memory, storage }) =>
       `${memory} RAM · ${storage} livres`,
@@ -521,6 +529,7 @@ export const onDeviceTranslations = {
       "Cada modelo local deve aceitar todos os idiomas escolhidos. A seleção também atualiza os idiomas de escuta e resposta falada.",
     onDeviceTestDevice: "Testar este dispositivo novamente",
     onDeviceTestingDevice: "Testando o dispositivo…",
+    onDeviceDownloadCancelled: "Download annullato.",
     onDeviceDeviceReady: "Verificação do dispositivo concluída",
     onDeviceDeviceSummary: ({ memory, storage }) =>
       `${memory} RAM · ${storage} livres`,
@@ -552,6 +561,7 @@ export const onDeviceTranslations = {
       "Каждая локальная модель должна поддерживать все выбранные языки. Выбор также обновляет языки распознавания и голосовых ответов.",
     onDeviceTestDevice: "Проверить устройство снова",
     onDeviceTestingDevice: "Проверка устройства…",
+    onDeviceDownloadCancelled: "ダウンロードを取り消しました。",
     onDeviceDeviceReady: "Проверка устройства завершена",
     onDeviceDeviceSummary: ({ memory, storage }) =>
       `${memory} ОЗУ · ${storage} свободно`,
@@ -582,6 +592,7 @@ export const onDeviceTranslations = {
       "每个本地模型都必须支持所有所选语言。此选择也会更新听写和语音回复语言。",
     onDeviceTestDevice: "重新测试此设备",
     onDeviceTestingDevice: "正在测试设备…",
+    onDeviceDownloadCancelled: "Pobieranie anulowane.",
     onDeviceDeviceReady: "设备检测完成",
     onDeviceDeviceSummary: ({ memory, storage }) =>
       `${memory} 内存 · ${storage} 可用`,
@@ -611,6 +622,7 @@ export const onDeviceTranslations = {
       "يجب أن يدعم كل نموذج محلي جميع اللغات المحددة. يحدّث هذا الاختيار أيضًا لغات الاستماع والردود المنطوقة.",
     onDeviceTestDevice: "اختبار هذا الجهاز مجددًا",
     onDeviceTestingDevice: "جارٍ اختبار الجهاز…",
+    onDeviceDownloadCancelled: "Transferência cancelada.",
     onDeviceDeviceReady: "اكتمل فحص الجهاز",
     onDeviceDeviceSummary: ({ memory, storage }) =>
       `${memory} ذاكرة · ${storage} متاحة`,
@@ -641,6 +653,7 @@ export const onDeviceTranslations = {
       "各ローカルモデルは選択したすべての言語に対応する必要があります。この選択は音声認識と読み上げの言語にも反映されます。",
     onDeviceTestDevice: "この端末を再テスト",
     onDeviceTestingDevice: "端末をテスト中…",
+    onDeviceDownloadCancelled: "Download cancelado.",
     onDeviceDeviceReady: "端末チェック完了",
     onDeviceDeviceSummary: ({ memory, storage }) =>
       `${memory} RAM・空き ${storage}`,
@@ -671,6 +684,7 @@ export const onDeviceTranslations = {
       "Minden helyi modellnek támogatnia kell az összes kiválasztott nyelvet. Ez a felismerés és a felolvasás nyelveit is frissíti.",
     onDeviceTestDevice: "Eszköz újbóli tesztelése",
     onDeviceTestingDevice: "Eszköz tesztelése…",
+    onDeviceDownloadCancelled: "Загрузка отменена.",
     onDeviceDeviceReady: "Eszközellenőrzés kész",
     onDeviceDeviceSummary: ({ memory, storage }) =>
       `${memory} RAM · ${storage} szabad`,
@@ -702,6 +716,7 @@ export const onDeviceTranslations = {
       "Každý místní model musí podporovat všechny vybrané jazyky. Volba upraví také jazyky rozpoznávání a mluvených odpovědí.",
     onDeviceTestDevice: "Otestovat zařízení znovu",
     onDeviceTestingDevice: "Testování zařízení…",
+    onDeviceDownloadCancelled: "Nedladdningen avbröts.",
     onDeviceDeviceReady: "Kontrola zařízení dokončena",
     onDeviceDeviceSummary: ({ memory, storage }) =>
       `${memory} RAM · ${storage} volné`,
@@ -732,6 +747,7 @@ export const onDeviceTranslations = {
       "Każdy model lokalny musi obsługiwać wszystkie wybrane języki. Wybór aktualizuje też języki rozpoznawania i odpowiedzi głosowych.",
     onDeviceTestDevice: "Przetestuj urządzenie ponownie",
     onDeviceTestingDevice: "Testowanie urządzenia…",
+    onDeviceDownloadCancelled: "İndirme iptal edildi.",
     onDeviceDeviceReady: "Kontrola urządzenia zakończona",
     onDeviceDeviceSummary: ({ memory, storage }) =>
       `${memory} RAM · ${storage} wolne`,
@@ -762,6 +778,7 @@ export const onDeviceTranslations = {
       "Her yerel model seçilen tüm dilleri desteklemelidir. Bu seçim dinleme ve sesli yanıt dillerini de günceller.",
     onDeviceTestDevice: "Bu cihazı yeniden test et",
     onDeviceTestingDevice: "Cihaz test ediliyor…",
+    onDeviceDownloadCancelled: "Завантаження скасовано.",
     onDeviceDeviceReady: "Cihaz kontrolü tamamlandı",
     onDeviceDeviceSummary: ({ memory, storage }) =>
       `${memory} RAM · ${storage} boş`,
@@ -792,6 +809,7 @@ export const onDeviceTranslations = {
       "Varje lokal modell måste stödja alla valda språk. Valet uppdaterar även språk för igenkänning och talade svar.",
     onDeviceTestDevice: "Testa enheten igen",
     onDeviceTestingDevice: "Testar enheten…",
+    onDeviceDownloadCancelled: "ڈاؤن لوڈ منسوخ کر دیا گیا۔",
     onDeviceDeviceReady: "Enhetskontrollen är klar",
     onDeviceDeviceSummary: ({ memory, storage }) =>
       `${memory} RAM · ${storage} ledigt`,
@@ -821,6 +839,7 @@ export const onDeviceTranslations = {
       "ہر مقامی ماڈل کو منتخب تمام زبانوں کی معاونت کرنی ہوگی۔ یہ انتخاب سننے اور بولے گئے جواب کی زبانیں بھی بدلتا ہے۔",
     onDeviceTestDevice: "اس ڈیوائس کو دوبارہ جانچیں",
     onDeviceTestingDevice: "ڈیوائس کی جانچ جاری ہے…",
+    onDeviceDownloadCancelled: "下载已取消。",
     onDeviceDeviceReady: "ڈیوائس کی جانچ مکمل",
     onDeviceDeviceSummary: ({ memory, storage }) =>
       `${memory} ریم · ${storage} خالی`,

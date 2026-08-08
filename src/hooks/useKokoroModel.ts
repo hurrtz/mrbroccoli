@@ -21,7 +21,7 @@ export type KokoroModelState = {
 };
 
 export type KokoroModelController = KokoroModelState & {
-  download: () => Promise<boolean>;
+  download: (options?: { signal?: AbortSignal }) => Promise<boolean>;
   refresh: () => Promise<void>;
   remove: () => Promise<boolean>;
 };
@@ -119,7 +119,7 @@ export function useKokoroModel(): KokoroModelController {
     };
   }, [refresh]);
 
-  const download = useCallback(async () => {
+  const download = useCallback(async (options?: { signal?: AbortSignal }) => {
     if (blockingOperationRef.current) {
       return false;
     }
@@ -143,6 +143,7 @@ export function useKokoroModel(): KokoroModelController {
 
     try {
       await downloadKokoroModel({
+        abortSignal: options?.signal,
         onProgress: ({ phase, progress }) => {
           if (!mountedRef.current || operationRef.current !== operation) {
             return;
