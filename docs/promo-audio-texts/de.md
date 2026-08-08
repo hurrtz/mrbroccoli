@@ -20,6 +20,10 @@ Conventions that matter once this is spoken aloud:
 - Recordings are generated from the approved text here. Audio is invisible to
   a diff, so a mistranslation inside a clip cannot be caught by reading one —
   this file is where the wording gets reviewed.
+- Word counts are not comparable across languages. Turkish and the Slavic
+  languages say the same thing in far fewer, longer words than English; Hindi
+  and Urdu in more. Match the spoken **duration** of the other clips, not the
+  count — and do not pad a text to hit a number.
 
 ---
 

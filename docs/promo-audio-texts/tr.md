@@ -20,6 +20,10 @@ Conventions that matter once this is spoken aloud:
 - Recordings are generated from the approved text here. Audio is invisible to
   a diff, so a mistranslation inside a clip cannot be caught by reading one —
   this file is where the wording gets reviewed.
+- Word counts are not comparable across languages. Turkish and the Slavic
+  languages say the same thing in far fewer, longer words than English; Hindi
+  and Urdu in more. Match the spoken **duration** of the other clips, not the
+  count — and do not pad a text to hit a number.
 
 ---
 
@@ -101,8 +105,24 @@ _Not generated yet._
 
 > Bu uygulama aslında nasıl çalışıyor?
 
-**Answer**
+**Answer** (343 words)
 
-_Not generated yet._
+Sen konuşuyorsun, Mr Broccoli söylediğini metne çeviriyor, seçtiğin modele gönderiyor ve sonra cevabı sana sesli olarak okuyor. Döngünün tamamı bu. Farkı yaratan şey, ortada ne duracağına senin karar vermen ve bu kararla ilgili hiçbir şeyin senden gizlenmemesi.
+
+Bunu çalıştırmanın üç yolu var ve bunlar gerçekten farklı tercihler, aynı şeyin kademeleri değil.
+
+Birincisi, zaten sahip olduğun bir sağlayıcının anahtarını kullanmak: OpenAI, Anthropic, Google ve birkaçı daha. Onların en iyi modellerini, kendi uygulamalarında alacağın modellerin aynısını alıyorsun ve kullandığın kadarını doğrudan onlara ödüyorsun. Mr Broccoli o paraya hiç dokunmuyor ve üzerine hiçbir şey eklemiyor.
+
+İkincisi, tamamen bu telefonda çalışan modelleri indirmek. İlk seferinde biraz zaman alıyor ve yer kaplıyor, ama sonrasında hiçbir şeye mal olmuyor ve şebeke olmadan da çalışıyor: uçakta, metroda, her yerde. Bu modeller buluttakilerden daha küçük, dolayısıyla zor akıl yürütmede daha zayıflar. Uygulama bunu sana açıkça söylüyor, aksini varmış gibi göstermiyor.
+
+Üçüncüsü, telefonunun zaten sahip olduğu ses. Kurduğun andan itibaren çalışıyor.
+
+Bunları karıştırabilirsin de. Düşünmeyi en iyi modellerden biri yapar, okumayı telefonunun kendi sesi. Ya da yerel bir model, gerçekten iyi bir sesle. Düşünmek ve konuşmak ayrı tercihler.
+
+Gizlilik konusunda, rahat olanı değil kesin olanı söyleyeyim. Konuşmaların bu cihazda saklanıyor ve hiçbir yerde bir Mr Broccoli sunucusu yok. Hesap yok, senkronizasyon yok, sızabilecek bir şey yok. Ama bulut modeli kullandığında söylediklerin o sağlayıcıya gidiyor, onun koşullarıyla, tıpkı kendi uygulamasında gideceği gibi. Bu uygulamanın garantisi şu: oraya gidiyor ve başka hiçbir yere gitmiyor, ve her tek mesajda hangi yolun cevap verdiğini görebiliyorsun.
+
+Bilmeye değer son şey: Mr Broccoli hızlı olmaktansa doğru olmayı tercih ediyor. Çoğu sesli asistan, cevap daha erken gelsin diye seni sessizce daha zayıf bir modele geçiriyor ve bunu hiç öğrenmiyorsun. Bu öyle yapmıyor. Düşünülmüş bir cevap istersen, düşünülmüş bir cevabın gerektirdiği süreyi alıyor ve bu sırada ne yaptığını sana gösteriyor: düşünüyor, arıyor, konuşuyor. Seni sessizlikle ve dönen bir simgeyle bırakmak yerine. İstediğin an sözünü kesebilirsin. Aynı soruyu başka bir modele tekrar sorup iki cevabı karşılaştırabilirsin de.
+
+Ve bunların hiçbiri kalıcı değil. Sağlayıcıyı, modeli ya da sesi istediğin an değiştirebilirsin, konuşmanın ortasında bile, ve konuşma yeni seçimle olduğu gibi devam eder.
 
 ---

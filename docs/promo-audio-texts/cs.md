@@ -20,6 +20,10 @@ Conventions that matter once this is spoken aloud:
 - Recordings are generated from the approved text here. Audio is invisible to
   a diff, so a mistranslation inside a clip cannot be caught by reading one —
   this file is where the wording gets reviewed.
+- Word counts are not comparable across languages. Turkish and the Slavic
+  languages say the same thing in far fewer, longer words than English; Hindi
+  and Urdu in more. Match the spoken **duration** of the other clips, not the
+  count — and do not pad a text to hit a number.
 
 ---
 
@@ -101,8 +105,24 @@ _Not generated yet._
 
 > Jak vlastně tahle aplikace funguje?
 
-**Answer**
+**Answer** (394 words)
 
-_Not generated yet._
+Ty mluvíš a Mr Broccoli převede to, co jsi řekl, na text, pošle to modelu, který sis vybral, a pak ti odpověď přečte nahlas. To je celá smyčka. Rozdíl je v tom, že o tom, co sedí uprostřed, rozhoduješ ty, a nic z toho rozhodnutí se před tebou neskrývá.
+
+Pohánět to jde třemi způsoby, a jsou to opravdu různé kompromisy, ne stupně téhož.
+
+První je použít klíč od poskytovatele, kterého už máš: OpenAI, Anthropic, Google a několik dalších. Dostaneš jejich nejlepší modely, ty samé, které bys měl v jejich vlastních aplikacích, a platíš přímo jim za to, co spotřebuješ. Mr Broccoli se těch peněz nikdy nedotkne a nic si nepřirazí.
+
+Druhý je stáhnout modely, které běží celé v tomhle telefonu. Poprvé to chvíli trvá a zabere to místo, ale potom to nestojí vůbec nic a funguje to bez signálu: v letadle, v metru, kdekoli. Tyhle modely jsou menší než ty v cloudu, takže na složité uvažování stačí hůř. Aplikace ti to řekne, místo aby předstírala opak.
+
+Třetí je prostě hlas, který tvůj telefon už má, a funguje od chvíle, kdy aplikaci nainstaluješ.
+
+Můžeš to i míchat. Špičkový model přemýšlí a hlas tvého telefonu předčítá. Nebo lokální model s kvalitním hlasem. Přemýšlení a mluvení jsou oddělená rozhodnutí.
+
+K soukromí, tady je přesná verze místo té pohodlné. Tvoje konverzace zůstávají v tomhle zařízení a nikde neexistuje žádný server Mr Broccoli. Žádný účet, žádná synchronizace, nic, co by mohlo uniknout. Když ale použiješ cloudový model, to, co řekneš, jde k tomu poskytovateli, za jeho podmínek, přesně tak, jako by šlo v jeho vlastní aplikaci. Co tahle aplikace zaručuje, je, že to jde tam a nikam jinam, a že u každé jednotlivé zprávy vidíš, která cesta ji zodpověděla.
+
+Poslední věc, kterou stojí za to vědět, je, že Mr Broccoli je radši přesný než rychlý. Většina hlasových asistentů tě potichu přepne na slabší model, aby odpověď přišla dřív, a ty se to nikdy nedozvíš. Tenhle to nedělá. Když chceš promyšlenou odpověď, vezme si na ni čas, který promyšlená odpověď potřebuje, a přitom ti ukazuje, co zrovna dělá: přemýšlí, hledá, mluví. Místo aby tě nechal s tichem a točícím se kolečkem. Přerušit můžeš kdykoli. A stejnou otázku můžeš položit znovu jinému modelu a obě odpovědi porovnat.
+
+A nic z toho není napevno. Poskytovatele, model i hlas můžeš změnit kdykoli, klidně uprostřed rozhovoru, a rozhovor prostě pokračuje s tou novou volbou.
 
 ---
