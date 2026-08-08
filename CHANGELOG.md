@@ -10,6 +10,9 @@ the complete Play Store translations are kept in a dedicated file under
 
 ## Unreleased
 
+- The introduction's spoken examples are now fetched from the App Store or
+  Play Store when you ask to hear one, instead of shipping inside the app. Only
+  the language you open is downloaded.
 - Replaced the setup wizards with an introduction you can skip. The app now
   opens straight into the workspace, with a dismissible banner offering a short
   four-step tour and a choice between connecting your own provider or

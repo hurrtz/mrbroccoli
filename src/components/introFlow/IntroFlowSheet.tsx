@@ -5,7 +5,7 @@ import { Modal } from "../../design-system/NativeControls";
 import { PhosphorIcon } from "../../design-system/PhosphorIcon";
 import type { Colors } from "../../theme/colors";
 import type { TranslateFn } from "../../screens/main/shared";
-import { getIntroClip } from "./introClips";
+import { IntroHearStep } from "./IntroHearStep";
 import type { AppLanguage } from "../../i18n/localeRegistry";
 
 export const INTRO_STEPS = ["what", "how", "hear", "start"] as const;
@@ -129,37 +129,6 @@ export function IntroFlowSheet({
         ) : null}
       </ScrollView>
     </Modal>
-  );
-}
-
-function IntroHearStep({
-  colors,
-  language,
-  t,
-}: {
-  colors: Colors;
-  language: AppLanguage;
-  t: TranslateFn;
-}) {
-  const clip = getIntroClip(language);
-
-  return (
-    <View style={styles.list}>
-      <Text style={[styles.body, { color: colors.textSecondary }]}>
-        {t("introHearBody")}
-      </Text>
-      {clip ? null : (
-        <Text
-          style={[styles.disclaimer, { color: colors.textMuted }]}
-          testID="intro-hear-unavailable"
-        >
-          {t("introHearUnavailable")}
-        </Text>
-      )}
-      <Text style={[styles.disclaimer, { color: colors.textMuted }]}>
-        {t("introHearDisclaimer")}
-      </Text>
-    </View>
   );
 }
 

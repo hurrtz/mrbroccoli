@@ -70,6 +70,8 @@ coverage/
 !/ios/MrBroccoli/MrBroccoliNativeWaveform.swift
 !/ios/MrBroccoli/MrBroccoliNativeWaveformView.swift
 !/ios/MrBroccoli/MrBroccoliNativeWaveformBridge.m
+!/ios/MrBroccoli/MrBroccoliIntroAssetPacks.swift
+!/ios/MrBroccoli/MrBroccoliIntroAssetPacksBridge.m
 !/ios/MrBroccoli/MrBroccoliVoiceLiveActivity.swift
 !/ios/MrBroccoli/MrBroccoliVoiceLiveActivityBridge.m
 !/ios/MrBroccoli/Info.plist
@@ -100,6 +102,9 @@ coverage/
 !/android/gradlew
 !/android/gradlew.bat
 !/android/settings.gradle
+# Play Asset Delivery packs for the intro audio, one Gradle module per language.
+!/android/intro_audio_*/
+!/android/intro_audio_*/**
 !/android/app/
 /android/app/*
 !/android/app/build.gradle

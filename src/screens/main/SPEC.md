@@ -102,9 +102,11 @@ the contextual entry point exists to answer.
 **Decision:** An install that already has provider keys starts with the banner
 dismissed. It has nothing to be introduced to.
 
-**Decision:** The audio example is bundled rather than generated. It carries a
-visible pre-recorded label and never plays automatically, so it cannot be read
-as what the user's own configuration will produce.
+**Decision:** The audio example is delivered by the store rather than bundled.
+See [`../../services/introAssetPacks/SPEC.md`](../../services/introAssetPacks/SPEC.md).
+It carries a visible pre-recorded label and never plays automatically, so it
+cannot be read as what the user's own configuration will produce, and it
+downloads only when someone asks to hear it.
 
 ## Drive Session
 

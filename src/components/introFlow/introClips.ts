@@ -1,29 +1,49 @@
 import type { AppLanguage } from "../../i18n/localeRegistry";
+import {
+  ensureIntroClip,
+  getDownloadedIntroClip,
+  isIntroAssetPackDeliverySupported,
+} from "../../services/introAssetPacks";
 
 /**
- * Bundled audio examples for the intro sheet, one per interface language.
+ * Resolves the intro sheet's audio example for a language.
  *
- * Android splits bundled resources by language, but iOS ships every
- * localization to every device, so the clip count is the binding constraint on
- * app size rather than the number of locales. One clip per language stays
- * comfortably inside `config/release-size-budget.json`; adding more is a
- * size-budget decision, not a code change.
+ * Clips are not bundled. Every interface language has one and any user opens
+ * one or two, so they are delivered as store-hosted asset packs -- Background
+ * Assets on iOS, Play Asset Delivery on Android -- and fetched on request.
  *
- * A language with no recording yet falls back to the transcript alone. The
- * spoken script lives in the locale dictionaries (`introHearTranscript`
- * content), so wording stays reviewable by the translation tooling -- audio is
- * invisible to a diff, and a mistranslation baked into a recording cannot be
- * caught by reading one.
+ * Three states matter to the sheet:
+ *
+ * - a clip already on the device, playable immediately;
+ * - a clip that can be fetched, offered behind an explicit action so nobody
+ *   downloads audio they did not ask for;
+ * - no clip at all, where the transcript stands in. That covers unsupported
+ *   platforms, a device below iOS 26, a sideloaded build, and every language
+ *   whose recording does not exist yet.
  */
-export type IntroClip = {
-  module: number;
-};
+export type IntroClipAvailability =
+  | { kind: "ready"; uri: string }
+  | { kind: "fetchable" }
+  | { kind: "unavailable" };
 
-// Populated per locale as recordings are produced. English ships first so a
-// first run always has something to play, including offline and for languages
-// outside the registered nineteen.
-const INTRO_CLIPS: Partial<Record<AppLanguage, IntroClip>> = {};
+export async function getIntroClipAvailability(
+  language: AppLanguage,
+): Promise<IntroClipAvailability> {
+  if (!(await isIntroAssetPackDeliverySupported())) {
+    return { kind: "unavailable" };
+  }
 
-export function getIntroClip(language: AppLanguage): IntroClip | null {
-  return INTRO_CLIPS[language] ?? INTRO_CLIPS.en ?? null;
+  const downloaded = await getDownloadedIntroClip(language);
+  return downloaded ? { kind: "ready", uri: downloaded } : { kind: "fetchable" };
+}
+
+/**
+ * Downloads the language's pack when needed and returns a playable URI.
+ *
+ * Resolves null rather than throwing on any failure. The example is optional,
+ * so a missing pack or an interrupted download degrades to the transcript
+ * instead of surfacing an error.
+ */
+export function fetchIntroClip(language: AppLanguage) {
+  return ensureIntroClip(language);
 }

@@ -98,6 +98,11 @@ android {
     compileSdk rootProject.ext.compileSdkVersion
 
     namespace 'com.tobiaswinkler.app.mrbroccoli'
+
+    // Intro audio ships as on-demand asset packs rather than inside the app.
+    // Google hosts them; the app fetches only the language a user opens.
+    assetPacks = [':intro_audio_en', ':intro_audio_de']
+
     defaultConfig {
         missingDimensionStrategy "platform", "play"
         applicationId 'com.tobiaswinkler.app.mrbroccoli'
@@ -225,6 +230,8 @@ tasks.configureEach { task ->
 
 dependencies {
     implementation "io.github.hyochan.openiap:openiap-google:3.0.0"
+    // Play Asset Delivery: fetches the intro audio pack for the user's language.
+    implementation "com.google.android.play:asset-delivery:2.3.0"
     // The version of react-native is set by the React Native Gradle Plugin
     implementation("com.facebook.react:react-android")
     implementation("com.google.android.material:material:1.14.0")

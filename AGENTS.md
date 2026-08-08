@@ -104,7 +104,11 @@ applies.
 
 - `src/screens/MainScreen.tsx` is the main composition root. It wires focused hooks and services into the workspace and secondary surfaces; recording, transcription, LLM, playback, setup, and persistence behavior live outside the screen component.
 - `src/components/IntroBanner.tsx` and `src/components/introFlow/` are the
-  first-run introduction. The blocking setup wizards were removed; the app
+  first-run introduction. Its audio examples are delivered as store-hosted
+  asset packs through `src/services/introAssetPacks/` -- Background Assets on
+  iOS (feature floor 26, app stays 16.4) and Play Asset Delivery on Android.
+  Adding a language means a recording, a script in `introScripts.ts`, an
+  `android/intro_audio_<lang>/` Gradle module, and an upload to both stores. The blocking setup wizards were removed; the app
   opens directly into the workspace and the intro sheet also opens at its final
   step when a turn is attempted with no usable route.
 - `src/features/settings/AntSettingsModal.tsx` is the configuration entry point. Its historical `Ant` prefix remains for import stability, but the app no longer depends on Ant Design. Navigation/frame concerns live in `AntSettingsFrame.tsx`; page routing lives in `AntSettingsPageContent.tsx`; reusable non-visual settings logic lives in `src/features/settings-core/`.

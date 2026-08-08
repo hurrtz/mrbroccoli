@@ -15,6 +15,7 @@ class MrBroccoliNativeWaveformPackage : ReactPackage {
       MrBroccoliBackupCryptoModule(reactContext),
       MrBroccoliDiagnosticsModule(reactContext),
       MrBroccoliVoiceLiveActivityModule(reactContext),
+      MrBroccoliIntroAssetPacksModule(reactContext),
     )
 
   override fun createViewManagers(

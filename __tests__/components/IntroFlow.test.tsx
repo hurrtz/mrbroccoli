@@ -1,5 +1,24 @@
 import React from "react";
-import { fireEvent, render } from "@testing-library/react-native";
+import { fireEvent, render, waitFor } from "@testing-library/react-native";
+
+const mockPlayer = {
+  pause: jest.fn(),
+  play: jest.fn(),
+  seekTo: jest.fn(),
+};
+let mockPlaying = false;
+
+jest.mock("expo-audio", () => ({
+  useAudioPlayer: jest.fn(() => mockPlayer),
+  useAudioPlayerStatus: jest.fn(() => ({ playing: mockPlaying })),
+}));
+
+const assetPacks = {
+  isSupported: jest.fn(() => Promise.resolve(false)),
+  ensurePack: jest.fn(() => Promise.resolve(null)),
+  getLocalPath: jest.fn(() => Promise.resolve(null)),
+  removePack: jest.fn(() => Promise.resolve()),
+};
 
 import { IntroBanner } from "../../src/components/IntroBanner";
 import {
@@ -9,7 +28,18 @@ import {
 } from "../../src/components/introFlow/IntroFlowSheet";
 import { lightColors } from "../../src/theme/colors";
 
+import { NativeModules } from "react-native";
+import { resetIntroAssetPackSupportForTests } from "../../src/services/introAssetPacks";
+
 const t = ((key: string) => key) as never;
+
+beforeEach(() => {
+  jest.clearAllMocks();
+  mockPlaying = false;
+  resetIntroAssetPackSupportForTests();
+  (NativeModules as Record<string, unknown>).MrBroccoliIntroAssetPacks =
+    assetPacks;
+});
 
 function renderSheet(overrides: Partial<React.ComponentProps<typeof IntroFlowSheet>> = {}) {
   const props = {
@@ -86,10 +116,51 @@ describe("IntroFlowSheet", () => {
     expect(getByText("introHearDisclaimer")).toBeTruthy();
   });
 
-  it("falls back to the transcript when a language has no recording", () => {
-    const { getByTestId } = renderSheet({ step: "hear", language: "hu" });
+  it("shows the transcript for a language that has a script", () => {
+    const { getByTestId } = renderSheet({ step: "hear" });
 
-    expect(getByTestId("intro-hear-unavailable")).toBeTruthy();
+    expect(getByTestId("intro-hear-transcript")).toBeTruthy();
+  });
+
+  it("says so when the platform cannot deliver a clip", async () => {
+    // Covers an unsupported platform, a device below iOS 26, a sideloaded
+    // build, and a language whose pack was never uploaded.
+    assetPacks.isSupported.mockResolvedValue(false);
+    const { getByTestId } = renderSheet({ step: "hear" });
+
+    await waitFor(() => {
+      expect(getByTestId("intro-hear-unavailable")).toBeTruthy();
+    });
+  });
+
+  it("offers playback without downloading when the clip is already present", async () => {
+    assetPacks.isSupported.mockResolvedValue(true);
+    assetPacks.getLocalPath.mockResolvedValue("/packs/intro-en.m4a");
+    const { getByTestId } = renderSheet({ step: "hear" });
+
+    await waitFor(() => {
+      expect(getByTestId("intro-hear-play")).toBeTruthy();
+    });
+    expect(assetPacks.ensurePack).not.toHaveBeenCalled();
+  });
+
+  it("downloads only when the user asks to hear it", async () => {
+    // An optional example must never spend someone's data unprompted.
+    assetPacks.isSupported.mockResolvedValue(true);
+    assetPacks.getLocalPath.mockResolvedValue(null);
+    assetPacks.ensurePack.mockResolvedValue("/packs/intro-en.m4a");
+    const { getByTestId } = renderSheet({ step: "hear" });
+
+    await waitFor(() => {
+      expect(getByTestId("intro-hear-play")).toBeTruthy();
+    });
+    expect(assetPacks.ensurePack).not.toHaveBeenCalled();
+
+    fireEvent.press(getByTestId("intro-hear-play"));
+
+    await waitFor(() => {
+      expect(assetPacks.ensurePack).toHaveBeenCalledTimes(1);
+    });
   });
 
   it("offers both a provider and an on-device path on the final step", () => {
