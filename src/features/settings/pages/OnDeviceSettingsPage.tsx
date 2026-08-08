@@ -17,6 +17,7 @@ import {
   type LocalModelDefinition,
   type LocalModelId,
 } from "../../../constants/localModels";
+import { useKeepAwakeWhile } from "../../../hooks/useKeepAwakeWhile";
 import { useLocalization } from "../../../i18n";
 import type { KokoroModelController } from "../../../hooks/useKokoroModel";
 import {
@@ -146,6 +147,15 @@ export function OnDeviceSettingsPage({
     );
   const [probing, setProbing] = React.useState(!storePromoPreview);
   const [busy, setBusy] = React.useState<BusyAction | null>(null);
+  // Downloading a multi-gigabyte model, and benchmarking it afterwards, both
+  // run far longer than any default screen timeout, and a sleeping phone
+  // aborts the transfer and leaves the whole download to start over. This page
+  // is where that work happens now that the setup wizard is gone; the wake
+  // lock that used to cover it moved with the wizard and stopped applying.
+  useKeepAwakeWhile(
+    busy?.action === "download" || busy?.action === "test",
+    "mrbroccoli-on-device-models",
+  );
   const [progress, setProgress] = React.useState<
     Partial<Record<LocalModelId, LocalModelDownloadProgress>>
   >({});
@@ -546,6 +556,7 @@ export function OnDeviceSettingsPage({
               size="small"
               loading={modelBusy && busy?.action === "download"}
               onPress={() => void handleDownload(model)}
+              testID={`on-device-download-${model.id}`}
             >
               <Text style={{ color: colors.accent }}>{t("download")}</Text>
             </Button>
