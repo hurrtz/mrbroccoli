@@ -24,14 +24,22 @@ import { AntSettingsFrame } from "./AntSettingsFrame";
 type DrillInSettingsPage = Exclude<SettingsPage, "overview">;
 
 function getInitialSettingsPage({
+  focusPage,
   focusProvider,
   focusCatalogProviderId,
   focusTab,
   isPremium,
 }: Pick<
   SettingsModalProps,
-  "focusProvider" | "focusCatalogProviderId" | "focusTab"
+  "focusPage" | "focusProvider" | "focusCatalogProviderId" | "focusTab"
 > & { isPremium: boolean }): SettingsPage {
+  // An explicit target wins over the tab mapping, so a caller can deep-link to
+  // a page the tabs do not name -- on-device models in particular. A Free
+  // caller asking for a Premium page still lands on the overview rather than a
+  // locked screen.
+  if (focusPage && (isPremium || !isPremiumSettingsPage(focusPage))) {
+    return focusPage;
+  }
   if (!isPremium) {
     return "overview";
   }
@@ -67,6 +75,7 @@ export const AntSettingsModal = React.memo(function AntSettingsModal(
     focusProvider,
     focusCatalogProviderId,
     focusTab,
+    focusPage,
     onPreviewVoice,
     onStopPreviewVoice,
     onValidateProviderCapability,
@@ -81,6 +90,7 @@ export const AntSettingsModal = React.memo(function AntSettingsModal(
   const entrance = React.useRef(new Animated.Value(0)).current;
   const [activePage, setActivePage] = React.useState<SettingsPage>(() =>
     getInitialSettingsPage({
+      focusPage,
       focusProvider,
       focusCatalogProviderId,
       focusTab,
@@ -166,6 +176,7 @@ export const AntSettingsModal = React.memo(function AntSettingsModal(
 
     setActivePage(
       getInitialSettingsPage({
+        focusPage,
         focusProvider,
         focusCatalogProviderId,
         focusTab,
@@ -180,6 +191,7 @@ export const AntSettingsModal = React.memo(function AntSettingsModal(
   }, [
     entrance,
     focusCatalogProviderId,
+    focusPage,
     focusProvider,
     focusTab,
     isPremium,

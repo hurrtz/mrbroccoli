@@ -53,6 +53,13 @@ controls.
 **Decision:** Edition checks exist both in navigation visibility and page
 routing. Hiding a row is not an authorization boundary.
 
+Callers may name a landing page directly, which is how the introduction reaches
+the on-device page the tabs do not name. The landing page is recomputed each
+time the modal opens and a Free caller naming a Premium page lands on the
+overview, so a deep link can never become a way past the edition boundary. A
+closed modal clears its focus target: the next plain open would otherwise
+inherit wherever the last deep link went.
+
 ## Readiness and Validation
 
 Settings readiness is capability-specific. One provider key may validly support
@@ -82,8 +89,8 @@ capability healthy. The UI shows the capability that was actually tested.
   profile choices, and advanced viable overrides.
 - Search: search mode, provider, and provider-specific options.
 - Data & privacy: knowledge privacy, backup/restore, and Premium archives.
-- App & diagnostics: appearance, debug capture access, runtime overrides,
-  release information, and isolated entitlement simulation.
+- App & diagnostics: appearance, intro banner visibility, debug capture access,
+  runtime overrides, release information, and isolated entitlement simulation.
 
 ## Interaction Rules
 

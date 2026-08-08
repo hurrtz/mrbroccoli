@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 import { getCatalogProviderIdForAppProvider } from "../../catalog/appProviders";
 import type { CatalogProviderId } from "../../catalog/types";
-import type { SettingsTab } from "../../features/settings-core/types";
+import type { SettingsPage, SettingsTab } from "../../features/settings-core/types";
 import { Conversation, Provider } from "../../types";
 
 export function useMainScreenUiState() {
@@ -10,6 +10,7 @@ export function useMainScreenUiState() {
   const [settingsFocusCatalogProviderId, setSettingsFocusCatalogProviderId] =
     useState<CatalogProviderId | undefined>();
   const [settingsFocusTab, setSettingsFocusTab] = useState<SettingsTab | undefined>();
+  const [settingsFocusPage, setSettingsFocusPage] = useState<SettingsPage | undefined>();
   const [drawerVisible, setDrawerVisible] = useState(false);
   const [statusDetailsVisible, setStatusDetailsVisible] = useState(false);
   const [memoryConversation, setMemoryConversation] =
@@ -18,12 +19,19 @@ export function useMainScreenUiState() {
   const pendingDrawerDismissActionRef = useRef<null | (() => void)>(null);
 
   const openSettings = useCallback(
-    (focusProvider?: Provider, focusTab?: SettingsTab) => {
-    setSettingsFocusCatalogProviderId(
-      focusProvider ? getCatalogProviderIdForAppProvider(focusProvider) : undefined,
-    );
-    setSettingsFocusTab(focusTab);
-    setSettingsVisible(true);
+    (
+      focusProvider?: Provider,
+      focusTab?: SettingsTab,
+      focusPage?: SettingsPage,
+    ) => {
+      setSettingsFocusCatalogProviderId(
+        focusProvider
+          ? getCatalogProviderIdForAppProvider(focusProvider)
+          : undefined,
+      );
+      setSettingsFocusTab(focusTab);
+      setSettingsFocusPage(focusPage);
+      setSettingsVisible(true);
     },
     [],
   );
@@ -32,6 +40,7 @@ export function useMainScreenUiState() {
     (focusCatalogProviderId?: CatalogProviderId) => {
       setSettingsFocusCatalogProviderId(focusCatalogProviderId);
       setSettingsFocusTab(undefined);
+      setSettingsFocusPage(undefined);
       setSettingsVisible(true);
     },
     [],
@@ -41,6 +50,10 @@ export function useMainScreenUiState() {
     setSettingsVisible(false);
     setSettingsFocusCatalogProviderId(undefined);
     setSettingsFocusTab(undefined);
+    // The modal recomputes its landing page every time it becomes visible, so a
+    // focus target left behind here would send the next plain open to whatever
+    // page the last deep link chose.
+    setSettingsFocusPage(undefined);
   }, []);
 
   const openMemoryConversation = useCallback((conversation: Conversation) => {
@@ -98,6 +111,7 @@ export function useMainScreenUiState() {
     settingsVisible,
     settingsFocusCatalogProviderId,
     settingsFocusTab,
+    settingsFocusPage,
     drawerVisible,
     statusDetailsVisible,
     memoryConversation,

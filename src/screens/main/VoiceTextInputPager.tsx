@@ -52,6 +52,7 @@ export function VoiceTextInputPager({
   statusLabel,
   t,
   visualPhase,
+  voiceInputUnavailableMessage = null,
 }: VoiceTextInputPagerProps) {
   const pager = useInputSurfacePager({
     disabled,
@@ -107,6 +108,7 @@ export function VoiceTextInputPager({
           textMessage={pager.textMessage}
           textSubmitDisabled={pager.textSubmitDisabled}
           trackAnimatedStyle={pager.trackAnimatedStyle}
+          voiceInputUnavailableMessage={voiceInputUnavailableMessage}
         />
         {isActive ? (
           <View style={styles.activeActionOverlay}>

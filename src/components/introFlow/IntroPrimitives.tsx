@@ -109,6 +109,57 @@ export function IntroPoint({
   );
 }
 
+/**
+ * A checkbox on the dark canvas.
+ *
+ * Selected state fills the whole control in sand rather than only marking the
+ * box, following the reference input: at rest a hairline, once chosen a filled
+ * surface that reads from across the screen.
+ */
+export function IntroCheckbox({
+  checked,
+  label,
+  onChange,
+  testID,
+}: {
+  checked: boolean;
+  label: string;
+  onChange: (next: boolean) => void;
+  testID?: string;
+}) {
+  return (
+    <Pressable
+      accessibilityRole="checkbox"
+      accessibilityState={{ checked }}
+      onPress={() => onChange(!checked)}
+      style={({ pressed }) => [
+        styles.checkbox,
+        {
+          backgroundColor: checked ? introTheme.sandSoft : "transparent",
+          borderColor: checked ? introTheme.sandBorder : introTheme.border,
+          opacity: pressed ? 0.85 : 1,
+        },
+      ]}
+      testID={testID}
+    >
+      <View
+        style={[
+          styles.checkboxBox,
+          {
+            backgroundColor: checked ? introTheme.sand : "transparent",
+            borderColor: checked ? introTheme.sand : introTheme.borderStrong,
+          },
+        ]}
+      >
+        {checked ? (
+          <PhosphorIcon color={introTheme.onSand} name="check" size="inline" />
+        ) : null}
+      </View>
+      <Text style={styles.checkboxLabel}>{label}</Text>
+    </Pressable>
+  );
+}
+
 /** Primary/secondary action. Fully rounded, echoing the reference controls. */
 export function IntroButton({
   label,
@@ -171,6 +222,30 @@ const styles = StyleSheet.create({
     fontFamily: fonts.body,
     fontSize: 16,
     lineHeight: 24,
+  },
+  checkbox: {
+    alignItems: "center",
+    borderRadius: introRadius.control,
+    borderWidth: StyleSheet.hairlineWidth,
+    flexDirection: "row",
+    gap: 12,
+    minHeight: 52,
+    paddingHorizontal: 14,
+  },
+  checkboxBox: {
+    alignItems: "center",
+    borderRadius: 6,
+    borderWidth: 1.5,
+    height: 22,
+    justifyContent: "center",
+    width: 22,
+  },
+  checkboxLabel: {
+    color: introTheme.text,
+    flex: 1,
+    fontFamily: fonts.body,
+    fontSize: 14,
+    lineHeight: 19,
   },
   button: {
     alignItems: "center",

@@ -42,8 +42,11 @@ function renderScreen(
     onClose: jest.fn(),
     onConnectProvider: jest.fn(),
     onInstallLocal: jest.fn(),
+    bannerDismissed: false,
     onOpenPremium: jest.fn(),
-    onOpenSpeaking: jest.fn(),
+    onOpenStt: jest.fn(),
+    onOpenTts: jest.fn(),
+    onSetBannerDismissed: jest.fn(),
     t,
     visible: true,
     ...overrides,
@@ -105,16 +108,39 @@ describe("IntroFlowScreen", () => {
   it("walks forward and back through the steps", () => {
     // A one-way flow made the last step a dead end: someone could neither
     // check what they had skipped nor revisit a decision.
+    const { getByTestId } = renderScreen();
+
+    fireEvent.press(getByTestId("intro-next"));
+    fireEvent.press(getByTestId("intro-next"));
+    expect(getByTestId("intro-stepper-dot-2").props.accessibilityState.selected)
+      .toBe(true);
+
+    fireEvent.press(getByTestId("intro-back"));
+    fireEvent.press(getByTestId("intro-back"));
+    expect(getByTestId("intro-stepper-dot-0").props.accessibilityState.selected)
+      .toBe(true);
+  });
+
+  it("retires the forward action on the last step", () => {
+    // The close control is the single way out from there; a second one would
+    // just be another button that means "leave".
     const { getByTestId, queryByTestId } = renderScreen();
 
-    fireEvent.press(getByTestId("intro-next"));
-    fireEvent.press(getByTestId("intro-next"));
-    expect(getByTestId("intro-install-local")).toBeTruthy();
+    fireEvent.press(getByTestId("intro-stepper-dot-5"));
 
-    fireEvent.press(getByTestId("intro-back"));
-    fireEvent.press(getByTestId("intro-back"));
-    expect(getByTestId("intro-welcome-play")).toBeTruthy();
-    expect(queryByTestId("intro-install-local")).toBeNull();
+    expect(queryByTestId("intro-next")).toBeNull();
+    expect(getByTestId("intro-close")).toBeTruthy();
+  });
+
+  it("hides the home-screen invitation from the last step", () => {
+    // Someone who read to the end has taken the tour; keeping the invitation
+    // afterwards is nagging.
+    const { getByTestId, props } = renderScreen();
+    fireEvent.press(getByTestId("intro-stepper-dot-5"));
+
+    fireEvent.press(getByTestId("intro-hide-banner"));
+
+    expect(props.onSetBannerDismissed).toHaveBeenCalledWith(true);
   });
 
   it("jumps to any step from the stepper", () => {
@@ -165,14 +191,23 @@ describe("IntroFlowScreen", () => {
     ).toBe(true);
   });
 
-  it("closes from the final step and from the close control", () => {
+  it("closes from the close control", () => {
     const { getByTestId, props } = renderScreen();
 
     fireEvent.press(getByTestId("intro-close"));
-    expect(props.onClose).toHaveBeenCalledTimes(1);
 
-    fireEvent.press(getByTestId("intro-stepper-dot-5"));
-    fireEvent.press(getByTestId("intro-next"));
-    expect(props.onClose).toHaveBeenCalledTimes(2);
+    expect(props.onClose).toHaveBeenCalledTimes(1);
+  });
+
+  it("routes speech settings separately for listening and speaking", () => {
+    const { getByTestId, props } = renderScreen();
+
+    fireEvent.press(getByTestId("intro-stepper-dot-3"));
+    fireEvent.press(getByTestId("intro-open-stt"));
+    expect(props.onOpenStt).toHaveBeenCalledTimes(1);
+
+    fireEvent.press(getByTestId("intro-stepper-dot-4"));
+    fireEvent.press(getByTestId("intro-open-tts"));
+    expect(props.onOpenTts).toHaveBeenCalledTimes(1);
   });
 });

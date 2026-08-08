@@ -50,6 +50,7 @@ interface MainScreenVoiceStageProps {
   statusTitle: string;
   t: TranslateFn;
   visualPhase: VoiceVisualPhase;
+  voiceInputUnavailableMessage?: string | null;
 }
 
 export const MainScreenVoiceStage = React.memo(function MainScreenVoiceStage({
@@ -89,6 +90,7 @@ export const MainScreenVoiceStage = React.memo(function MainScreenVoiceStage({
   statusTitle,
   t,
   visualPhase,
+  voiceInputUnavailableMessage = null,
 }: MainScreenVoiceStageProps) {
   return (
     <View
@@ -146,6 +148,7 @@ export const MainScreenVoiceStage = React.memo(function MainScreenVoiceStage({
           statusLabel={statusTitle}
           t={t}
           visualPhase={visualPhase}
+          voiceInputUnavailableMessage={voiceInputUnavailableMessage}
         />
       </View>
     </View>

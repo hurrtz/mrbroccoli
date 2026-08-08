@@ -42,6 +42,10 @@ receive already-derived state and callbacks.
   restarting recording, playback, or another request.
 - Text and image submission use the same conversation and route semantics as a
   spoken turn where their capabilities overlap.
+- When nothing on the device can hear the user, the workspace opens on the
+  composer and the voice control retires carrying the reason. This is distinct
+  from a prompt block, which stops both routes: a message telling someone to
+  type must leave typing working.
 - The transcript header owns the image attachment action in both orientations;
   the composer owns only the pending-attachment preview and its remove action.
   The action stays hidden when the edition cannot attach images and disabled
@@ -93,12 +97,21 @@ app theme. The workspace is warm white with green accents, so a first-time user
 recognises the introduction as an aside they can leave, and the workspace still
 reads as the destination.
 
-**Decision:** Steps are walkable in both directions, from the footer and from
-the stepper, and the stepper draws dots with a dash for the current position
-rather than a "step 4 of 6" label. A one-way flow made the last step a dead
-end: someone there could neither check what they had skipped nor revisit a
-decision, and a counter said where they were but nothing about what they had
-passed.
+**Decision:** Steps are walkable in both directions -- by swiping, from the
+stepper, and from the header back control -- and the stepper draws dots with a
+dash for the current position rather than a "step 4 of 6" label. A one-way flow
+made the last step a dead end: someone there could neither check what they had
+skipped nor revisit a decision, and a counter said where they were but nothing
+about what they had passed. Back sits in the header beside the close control
+because both are ways out of the flow; the footer carries only forward motion,
+which retires on the last step.
+
+**Decision:** The last step ends at the close control rather than offering its
+own "start using the app" action. A second exit next to the one already in the
+header says the flow is something to escape. It instead carries a checkbox that
+hides the workspace banner, reversible from App & diagnostics: someone who has
+read to the end has taken the tour, and keeping the invitation on their
+workspace afterwards is nagging.
 
 **Decision:** Speech steps are marked optional and say why skipping is safe --
 typing replaces listening, and the device's own voice replaces speaking. The
@@ -111,6 +124,14 @@ usable route, so the microphone is never a dead end. Provider keys are entered
 in the settings provider panel and local models are managed on the on-device
 settings page; onboarding routes to those surfaces rather than duplicating
 them.
+
+**Decision:** Every onboarding action opens the settings page that owns the
+work, not settings in general. The download action in particular opens the
+on-device page instead of starting a headless download: that page owns
+progress, verification and failure, and a download with no visible surface
+looks like a button that did nothing. A Free caller asking for a Premium page
+lands on the settings overview rather than a locked screen, so the speech steps
+route Free users to the on-device page.
 
 **Decision:** Setup stopped being a gate. Requiring a multi-gigabyte download
 before the app could be seen made the setup cost the first impression. The
@@ -131,6 +152,12 @@ so it cannot be read as what the user's own configuration will produce. Every
 clip is loudness-matched to -16 LUFS; the delivered recordings spanned -15.0 to
 -30.3 LUFS, and without matching a listener would strain at one language and be
 startled by the next.
+
+**Dependency:** The app holds no audio session while idle, so the voice pipeline
+owns the device rather than keeping it open. Example playback activates the
+session on demand and holds it across a language change: releasing the previous
+player would otherwise tear the session down and silence the clip the next one
+was about to play, with no error surfacing anywhere.
 
 ## Drive Session
 

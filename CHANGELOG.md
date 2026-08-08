@@ -10,17 +10,31 @@ the complete Play Store translations are kept in a dedicated file under
 
 ## Unreleased
 
-- The introduction is now a full screen you can walk through in either
+- The introduction is now a full screen you can swipe through in either
   direction, covering what the app needs to run, what is optional and why, and
   what Premium adds. It opens with a spoken example in your language, and the
-  speaking step lets you hear any of the app's languages before deciding.
+  speaking step lets you hear any of the app's languages before deciding. Its
+  last page can turn off the banner on the home screen, which you can bring
+  back under App & diagnostics.
+- Every action in the introduction now opens the settings page that does the
+  work. Choosing to install the on-device model opens the page that downloads
+  and verifies it, rather than closing the introduction with nothing to show
+  for it.
 - Replaced the setup wizards with an introduction you can skip. The app now
   opens straight into the workspace, with a dismissible banner offering a short
-  four-step tour and a choice between connecting your own provider or
-  installing the on-device models.
+  tour and a choice between connecting your own provider or installing the
+  on-device models.
 - Conversations are now stored in a database rather than in individual files.
   Branching, deleting, and restoring a backup either complete or leave nothing
   behind, instead of being able to stop halfway.
+
+### Fixed
+
+- Play an example again after switching the introduction's language. The first
+  language change left every later example silent with nothing to indicate why.
+- Start on the message field when no speech recognition is set up, and explain
+  on the voice control why it is unavailable instead of leaving it looking
+  ready to press.
 
 ## 3.1.1 - 2026-08-07
 

@@ -10,6 +10,7 @@ import {
   IntroBadge,
   IntroBody,
   IntroButton,
+  IntroCheckbox,
   IntroPanel,
   IntroPoint,
   IntroTitle,
@@ -29,11 +30,14 @@ export const INTRO_STEPS = [
 export type IntroStep = (typeof INTRO_STEPS)[number];
 
 export interface IntroStepProps {
+  bannerDismissed: boolean;
   language: AppLanguage;
   onConnectProvider: () => void;
   onInstallLocal: () => void;
   onOpenPremium: () => void;
-  onOpenSpeaking: () => void;
+  onOpenStt: () => void;
+  onOpenTts: () => void;
+  onSetBannerDismissed: (dismissed: boolean) => void;
   t: TranslateFn;
 }
 
@@ -158,7 +162,7 @@ function LlmStep({ onConnectProvider, onInstallLocal, t }: IntroStepProps) {
 }
 
 /** Step four: speech in. Optional, but the app is built around it. */
-function SttStep({ onOpenSpeaking, t }: IntroStepProps) {
+function SttStep({ onOpenStt, t }: IntroStepProps) {
   return (
     <View style={styles.stack}>
       <IntroBadge>{t("introOptional")}</IntroBadge>
@@ -180,7 +184,7 @@ function SttStep({ onOpenSpeaking, t }: IntroStepProps) {
         />
         <IntroButton
           label={t("introOpenSpeaking")}
-          onPress={onOpenSpeaking}
+          onPress={onOpenStt}
           testID="intro-open-stt"
           tone="secondary"
         />
@@ -195,7 +199,7 @@ function SttStep({ onOpenSpeaking, t }: IntroStepProps) {
  * Claiming the app sounds good is worth less than letting someone hear it, so
  * the picker sits directly under the claim.
  */
-function TtsStep({ language, onOpenSpeaking, t }: IntroStepProps) {
+function TtsStep({ language, onOpenTts, t }: IntroStepProps) {
   return (
     <View style={styles.stack}>
       <IntroBadge>{t("introOptional")}</IntroBadge>
@@ -215,7 +219,7 @@ function TtsStep({ language, onOpenSpeaking, t }: IntroStepProps) {
         />
         <IntroButton
           label={t("introOpenSpeaking")}
-          onPress={onOpenSpeaking}
+          onPress={onOpenTts}
           testID="intro-open-tts"
           tone="secondary"
         />
@@ -225,10 +229,14 @@ function TtsStep({ language, onOpenSpeaking, t }: IntroStepProps) {
 }
 
 /** Step six: what paying buys, stated as capability rather than as a plea. */
-function PremiumStep({ onOpenPremium, t }: IntroStepProps) {
+function PremiumStep({
+  bannerDismissed,
+  onOpenPremium,
+  onSetBannerDismissed,
+  t,
+}: IntroStepProps) {
   return (
     <View style={styles.stack}>
-      <IntroBadge tone="premium">{t("premium")}</IntroBadge>
       <IntroTitle>{t("introWrapTitle")}</IntroTitle>
       <IntroBody>{t("introWrapBody")}</IntroBody>
 
@@ -264,6 +272,16 @@ function PremiumStep({ onOpenPremium, t }: IntroStepProps) {
         onPress={onOpenPremium}
         testID="intro-open-premium"
         tone="premium"
+      />
+
+      {/* Someone who has read to the end has taken the tour; keeping the
+          invitation on their workspace afterwards is nagging. Reversible from
+          the app settings page. */}
+      <IntroCheckbox
+        checked={bannerDismissed}
+        label={t("introHideBanner")}
+        onChange={onSetBannerDismissed}
+        testID="intro-hide-banner"
       />
     </View>
   );

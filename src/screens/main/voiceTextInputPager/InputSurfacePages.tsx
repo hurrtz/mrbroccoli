@@ -35,6 +35,12 @@ interface InputSurfacePagesProps {
   statusLabel: string;
   submissionDisabled: boolean;
   t: TranslateFn;
+  /**
+   * Set when nothing can hear the user. Unlike `submissionDisabled`, this
+   * retires only the voice control: the whole point of the message is to send
+   * the user to the composer, so typing has to stay live behind it.
+   */
+  voiceInputUnavailableMessage: string | null;
   textFocused: boolean;
   textInputGesture: GestureType;
   textInputRef: React.RefObject<TextInput | null>;
@@ -58,6 +64,7 @@ function VoiceInputSurface({
   promptBlockedProgress,
   statusLabel,
   submissionDisabled,
+  voiceInputUnavailableMessage,
 }: Pick<
   InputSurfacePagesProps,
   | "colors"
@@ -72,17 +79,24 @@ function VoiceInputSurface({
   | "promptBlockedProgress"
   | "statusLabel"
   | "submissionDisabled"
+  | "voiceInputUnavailableMessage"
 >) {
   const canResolvePromptBlock =
     promptBlockedActionEnabled && Boolean(onResolvePromptBlock);
   const actionDisabled =
-    disabled || (submissionDisabled && !canResolvePromptBlock);
+    disabled ||
+    Boolean(voiceInputUnavailableMessage) ||
+    (submissionDisabled && !canResolvePromptBlock);
   const handlePress = canResolvePromptBlock ? onResolvePromptBlock : onPress;
+  // A resolvable block keeps its own call to action; the unavailable message
+  // only fills the control when there is nothing else to say there.
+  const surfaceLabel =
+    promptBlockedActionLabel ?? voiceInputUnavailableMessage;
 
   return (
     <GestureTouchableOpacity
       testID="voice-input-surface"
-      accessibilityLabel={promptBlockedActionLabel ?? statusLabel}
+      accessibilityLabel={surfaceLabel ?? statusLabel}
       accessibilityRole="button"
       accessibilityState={{ disabled: actionDisabled }}
       accessibilityValue={
@@ -121,11 +135,11 @@ function VoiceInputSurface({
         },
       ]}
     >
-      {promptBlockedActionLabel ? (
+      {surfaceLabel ? (
         <Text
           testID="voice-input-blocked-status"
           accessibilityLiveRegion="polite"
-          numberOfLines={1}
+          numberOfLines={2}
           style={[
             styles.blockedActionLabel,
             {
@@ -135,7 +149,7 @@ function VoiceInputSurface({
             },
           ]}
         >
-          {promptBlockedActionLabel}
+          {surfaceLabel}
         </Text>
       ) : (
         <View

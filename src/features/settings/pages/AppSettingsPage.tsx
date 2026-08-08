@@ -160,6 +160,26 @@ export function AppSettingsPage({
             onChange={(value) => onUpdate({ showUsageStats: value === "show" })}
           />
         ) : null}
+        {/* The introduction can be dismissed from its own last step, so this is
+            the way back to it. */}
+        <AntRadioSection<"show" | "hide">
+          label={t("introBannerSetting")}
+          testID="settings-intro-banner"
+          options={[
+            {
+              value: "show",
+              label: t("show"),
+              description: t("introBannerSettingVisibleDescription"),
+            },
+            {
+              value: "hide",
+              label: t("hide"),
+              description: t("introBannerSettingHiddenDescription"),
+            },
+          ]}
+          value={settings.introDismissed ? "hide" : "show"}
+          onChange={(value) => onUpdate({ introDismissed: value === "hide" })}
+        />
         <AntRadioSection<"show" | "hide">
           label={t("debugLogButton")}
           testID="settings-debug-log-button"

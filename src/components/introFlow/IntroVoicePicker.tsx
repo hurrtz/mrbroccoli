@@ -111,7 +111,7 @@ export function IntroVoicePicker({ language, t }: IntroVoicePickerProps) {
                   </Text>
                   {active ? (
                     <PhosphorIcon
-                      color={introTheme.accent}
+                      color={introTheme.sand}
                       name="check"
                       size="compact"
                     />
@@ -147,7 +147,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
   },
   optionActive: {
-    backgroundColor: introTheme.panelActive,
+    // The reference input fills a chosen control edge to edge rather than
+    // marking it; that is what makes the selection readable at a glance.
+    backgroundColor: introTheme.sandSoft,
+    borderColor: introTheme.sandBorder,
+    borderWidth: StyleSheet.hairlineWidth,
   },
   optionLabel: {
     color: introTheme.textSecondary,
@@ -155,7 +159,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   optionLabelActive: {
-    color: introTheme.text,
+    color: introTheme.sand,
     fontFamily: fonts.bodyMedium,
   },
   play: {
@@ -173,8 +177,8 @@ const styles = StyleSheet.create({
   },
   select: {
     alignItems: "center",
-    backgroundColor: introTheme.panelActive,
-    borderColor: introTheme.border,
+    backgroundColor: introTheme.sandSoft,
+    borderColor: introTheme.sandBorder,
     borderRadius: introRadius.pill,
     borderWidth: StyleSheet.hairlineWidth,
     flex: 1,

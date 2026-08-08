@@ -269,6 +269,45 @@ describe("MainScreenVoiceStage composer", () => {
     expect(onSubmitTextMessage).not.toHaveBeenCalled();
   });
 
+  it("retires the voice control when nothing can hear the user, but keeps typing live", () => {
+    const onPress = jest.fn();
+    const onSubmitTextMessage = jest.fn();
+    const voiceInputUnavailableMessage =
+      "No speech recognition is set up yet, so type your message instead.";
+    const screen = render(
+      <MainScreenVoiceStage
+        {...createProps({
+          onPress,
+          onSubmitTextMessage,
+          voiceInputUnavailableMessage,
+        })}
+      />,
+    );
+
+    const surface = screen.getByTestId("voice-input-surface");
+    expect(surface.props.accessibilityState).toEqual({ disabled: true });
+    expect(surface.props.accessibilityLabel).toBe(voiceInputUnavailableMessage);
+    expect(screen.getByTestId("voice-input-blocked-status").props.children).toBe(
+      voiceInputUnavailableMessage,
+    );
+
+    fireEvent.press(surface);
+    expect(onPress).not.toHaveBeenCalled();
+
+    // The message tells the user to type, so the composer must still work --
+    // this is what separates it from a prompt block, which stops both routes.
+    fireEvent.press(screen.getByLabelText("Show text input"));
+    const input = screen.getByPlaceholderText("Type a message");
+    expect(input.props.editable).toBe(true);
+    fireEvent.changeText(input, "Typed instead of spoken");
+    expect(
+      screen.getByLabelText("Send message").props.accessibilityState,
+    ).toEqual({ disabled: false });
+
+    fireEvent.press(screen.getByTestId("voice-text-primary-action"));
+    expect(onSubmitTextMessage).toHaveBeenCalledWith("Typed instead of spoken");
+  });
+
   it("shows installation progress directly on both disabled prompt CTAs", () => {
     const onPress = jest.fn();
     const onSubmitTextMessage = jest.fn();

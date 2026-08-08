@@ -32,6 +32,20 @@ export const introTheme = {
   accentBorder: "rgba(93, 193, 125, 0.32)",
   onAccent: "#0E1013",
 
+  /**
+   * Warm sand, taken from the reference input.
+   *
+   * A control at rest shows only a hairline in this tone; selecting it fills
+   * the whole control with the soft variant. That is what makes a chosen
+   * option read as chosen from across the screen rather than by inspecting a
+   * border, and it keeps selection distinct from the green accent, which means
+   * "the thing to press next".
+   */
+  sand: "#D9C7A7",
+  sandSoft: "rgba(217, 199, 167, 0.13)",
+  sandBorder: "rgba(217, 199, 167, 0.30)",
+  onSand: "#17140E",
+
   /** Optional-step marker: present but never competing with the accent. */
   muted: "#7C8798",
   mutedSoft: "rgba(124, 135, 152, 0.14)",

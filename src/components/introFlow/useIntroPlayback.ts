@@ -17,7 +17,10 @@ import {
  * the session open for a screen that is usually silent.
  */
 export function useIntroPlayback(source: number) {
-  const player = useAudioPlayer(source);
+  // keepAudioSessionActive matters when the language changes: that releases the
+  // previous player, and with the default the release tears the audio session
+  // down again -- silently killing the clip the new player was about to play.
+  const player = useAudioPlayer(source, { keepAudioSessionActive: true });
   const status = useAudioPlayerStatus(player);
   const playing = status.playing;
 

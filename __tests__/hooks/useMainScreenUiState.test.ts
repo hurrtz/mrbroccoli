@@ -41,6 +41,28 @@ describe("useMainScreenUiState", () => {
     expect(result.current.settingsFocusCatalogProviderId).toBeUndefined();
   });
 
+  it("clears a deep-linked settings page so the next plain open lands on the overview", () => {
+    const { result } = renderHook(() => useMainScreenUiState());
+
+    act(() => {
+      result.current.openSettings(undefined, undefined, "local");
+    });
+
+    expect(result.current.settingsFocusPage).toBe("local");
+
+    act(() => {
+      result.current.closeSettings();
+    });
+
+    expect(result.current.settingsFocusPage).toBeUndefined();
+
+    act(() => {
+      result.current.openCatalogSettings("openai");
+    });
+
+    expect(result.current.settingsFocusPage).toBeUndefined();
+  });
+
   it("defers drawer actions until dismissal when the drawer is open", () => {
     const { result } = renderHook(() => useMainScreenUiState());
     const action = jest.fn();

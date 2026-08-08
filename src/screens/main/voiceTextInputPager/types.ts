@@ -46,4 +46,9 @@ export interface VoiceTextInputPagerProps {
   statusLabel: string;
   t: TranslateFn;
   visualPhase: VoiceVisualPhase;
+  /**
+   * Retires the voice control when no route can hear the user, without
+   * blocking the composer the message points them to.
+   */
+  voiceInputUnavailableMessage?: string | null;
 }

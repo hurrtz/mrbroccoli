@@ -38,11 +38,13 @@ import { useTextTurnSubmitController } from "./main/useTextTurnSubmitController"
 import { useVoiceSessionController } from "./main/useVoiceSessionController";
 import { useUlraModeControl } from "./main/useUlraModeControl";
 import { getKokoroPromptBlockState } from "./main/kokoroPromptBlockState";
+import { isSpeechInputUnavailable } from "./main/speechInputAvailability";
 import { useMainScreenDataBackup } from "./main/useMainScreenDataBackup";
 import { useMainScreenImageAttachments } from "./main/useMainScreenImageAttachments";
 import { formatMessageForCopy } from "../utils/conversationExport";
 import { useImagePromptSubmission } from "./main/useImagePromptSubmission";
 import { useFreeOfflineMode } from "./main/useFreeOfflineMode";
+import { hasProviderCredentialForCapability } from "../utils/providerCredentials";
 import { useStorePromoPresentation } from "../hooks/useStorePromoPresentation";
 import {
   applyStorePromoFreeOfflineController,
@@ -195,6 +197,7 @@ export function MainScreen() {
     settingsVisible,
     settingsFocusCatalogProviderId,
     settingsFocusTab,
+    settingsFocusPage,
     drawerVisible,
     statusDetailsVisible,
     memoryConversation,
@@ -311,6 +314,16 @@ export function MainScreen() {
     runtimeSettings.sttMode === "native"
       ? nativeStt.isRecording
       : recorder.isRecording;
+  const speechInputUnavailable = isSpeechInputUnavailable({
+    hasProviderCredential: sttProvider
+      ? hasProviderCredentialForCapability(sttProvider, sttApiKey, "stt")
+      : false,
+    nativeRecognizerAvailable: nativeStt.isAvailable,
+    selectedLocalSttModel: Boolean(selectedSttModel),
+    sttMode: runtimeSettings.sttMode,
+    sttProvider,
+  });
+
   const recordingStartedAtMs = React.useMemo(
     () => (isRecording ? Date.now() : null),
     [isRecording],
@@ -772,23 +785,41 @@ export function MainScreen() {
         tone: toast?.tone,
       }}
       intro={{
+        bannerDismissed: runtimeSettings.introDismissed,
         language: settings.language,
         onClose: closeIntro,
         onConnectProvider: () => {
           closeIntro();
-          handleOpenProviderSettings();
+          openSettings(undefined, "providers");
         },
         onInstallLocal: () => {
           closeIntro();
-          void freeOffline.start();
+          // The on-device page owns downloading, progress and verification;
+          // firing a headless download here would leave it invisible.
+          openSettings(undefined, undefined, "local");
         },
         onOpenPremium: () => {
           closeIntro();
           setPremiumModalVisible(true);
         },
-        onOpenSpeaking: () => {
+        onOpenStt: () => {
           closeIntro();
-          handleOpenSpeakingSettings();
+          openSettings(
+            undefined,
+            "stt",
+            freeOffline.entitlement.isPremium ? "listening" : "local",
+          );
+        },
+        onOpenTts: () => {
+          closeIntro();
+          openSettings(
+            undefined,
+            "tts",
+            freeOffline.entitlement.isPremium ? "speaking" : "local",
+          );
+        },
+        onSetBannerDismissed: (dismissed: boolean) => {
+          updateSettings({ introDismissed: dismissed });
         },
         t,
         visible: introVisible,
@@ -850,7 +881,9 @@ export function MainScreen() {
           driveSilenceCountdownSeconds,
           driveSessionCanRepeat,
           driveVoiceActive,
-          initialInputSurface: inputSurfaceRef.current,
+          initialInputSurface: speechInputUnavailable
+            ? "text"
+            : inputSurfaceRef.current,
           initialTextMessage: textMessageDraftRef.current,
           inputMode: runtimeSettings.inputMode,
           isActive: voiceStageActive,
@@ -900,6 +933,18 @@ export function MainScreen() {
           statusTitle: statusDisplay.actionLabel,
           t,
           visualPhase,
+          // Only when nothing else already owns the control: a Free runtime that
+          // is still downloading, or a missing Kokoro voice, are both about a
+          // step the user is mid-way through and outrank the general hint.
+          voiceInputUnavailableMessage:
+            speechInputUnavailable &&
+            !(
+              freeOffline.entitlement.status === "free" &&
+              !freeOffline.freeRuntimeReady
+            ) &&
+            !kokoroPromptBlockMessage
+              ? t("speechInputUnavailableHint")
+              : null,
         },
         transcript: {
           activeConversationId: activeConversation?.id ?? null,
@@ -973,6 +1018,7 @@ export function MainScreen() {
         ttsStatusLabel,
       }}
       settingsModal={{
+        focusPage: settingsFocusPage,
         visible: settingsVisible,
         suspended: premiumModalVisible,
         settings,

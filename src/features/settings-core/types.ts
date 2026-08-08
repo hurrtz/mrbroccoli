@@ -36,6 +36,8 @@ export interface SettingsModalProps {
   focusProvider?: Provider;
   focusCatalogProviderId?: CatalogProviderId;
   focusTab?: SettingsTab;
+  /** Direct page target, used by the introduction's deep links. */
+  focusPage?: SettingsPage;
   onUpdate: (
     partial: Partial<Omit<Settings, "apiKeys" | "providerModels">>,
   ) => void;
