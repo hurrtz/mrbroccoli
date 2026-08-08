@@ -1,4 +1,7 @@
-import { getLocalModel } from "../../src/constants/localModels";
+import {
+  getLocalModel,
+  getLocalModelsForLanguages,
+} from "../../src/constants/localModels";
 import {
   applyOfflineProfileToSettings,
   applyUnavailableFreeSettings,
@@ -48,6 +51,7 @@ function readyProfile(language: "en" | "de" | "zh-CN") {
 function benchmark(
   modelId: LocalModelBenchmarkResult["modelId"],
   status: LocalModelBenchmarkResult["status"],
+  extra: Partial<LocalModelBenchmarkResult> = {},
 ): LocalModelBenchmarkResult {
   const snapshot = device();
   return {
@@ -58,6 +62,7 @@ function benchmark(
     loadMs: 10,
     durationMs: 10,
     device: snapshot,
+    ...extra,
   };
 }
 
@@ -285,6 +290,50 @@ describe("free offline profile selection", () => {
     if (result.status === "ready") {
       expect(result.profile.llm.id).toBe("granite-4.0-1b-q4");
       expect(result.profile.thoroughLlm?.id).toBe("qwen3-4b-q4");
+    }
+  });
+
+  it("does not hold a throttled run against the phone", () => {
+    // A result recorded in battery saver describes the moment, not the device.
+    // Counting it as evidence disqualified the model permanently, and once
+    // every candidate had one the app declared the phone unable to run a local
+    // setup at all -- across restarts, because benchmarks are persisted.
+    // Every candidate for the language, so the selector has nothing left to
+    // fall back to if throttled results are counted against the phone.
+    const underPressure = Object.fromEntries(
+      (["llm", "stt", "tts"] as const)
+        .flatMap((capability) => getLocalModelsForLanguages(capability, ["en"]))
+        .map((model) => [
+          model.id,
+          benchmark(model.id, "failed", { measuredUnderPressure: true }),
+        ]),
+    );
+
+    const result = selectOfflineProfile({
+      languages: ["en"],
+      snapshot: device(),
+      benchmarks: underPressure,
+    });
+
+    expect(result.status).toBe("ready");
+  });
+
+  it("still rules out a model that failed while the phone was idle", () => {
+    const result = selectOfflineProfile({
+      languages: ["en"],
+      snapshot: device(),
+      installedModelIds: new Set(["ministral-3-3b-reasoning-q4"]),
+      benchmarks: {
+        "ministral-3-3b-reasoning-q4": benchmark(
+          "ministral-3-3b-reasoning-q4",
+          "failed",
+        ),
+      },
+    });
+
+    expect(result.status).toBe("ready");
+    if (result.status === "ready") {
+      expect(result.profile.llm.id).not.toBe("ministral-3-3b-reasoning-q4");
     }
   });
 

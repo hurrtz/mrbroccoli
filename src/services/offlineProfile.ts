@@ -79,12 +79,25 @@ function modelSafetyReserve(model: LocalModelDefinition) {
   );
 }
 
+/**
+ * Whether a model has been shown not to work on this phone.
+ *
+ * A result recorded while the phone was throttled, low on memory, or in
+ * battery saver says nothing about the phone: it describes the moment. Those
+ * results are persisted like any other, so counting them as evidence let a
+ * single run under battery saver disqualify a model permanently -- and once
+ * every candidate had one, the app told the user their phone could not run a
+ * local setup at all, and kept saying so across restarts.
+ */
 function hasCurrentBenchmarkFailure(params: {
   model: LocalModelDefinition;
   snapshot: LocalDeviceSnapshot;
   benchmarks?: Partial<Record<LocalModelId, LocalModelBenchmarkResult>>;
 }) {
   const benchmark = params.benchmarks?.[params.model.id];
+  if (benchmark?.measuredUnderPressure) {
+    return false;
+  }
   return (
     localModelBenchmarkMatchesDevice(benchmark, params.snapshot) &&
     (benchmark?.status === "below-target" || benchmark?.status === "failed")
@@ -105,8 +118,9 @@ function modelPreference(params: {
     ? benchmark
     : undefined;
   const knownFailure =
-    currentBenchmark?.status === "below-target" ||
-    currentBenchmark?.status === "failed";
+    !currentBenchmark?.measuredUnderPressure &&
+    (currentBenchmark?.status === "below-target" ||
+      currentBenchmark?.status === "failed");
   const installed = params.installedModelIds?.has(params.model.id) === true;
 
   return (
