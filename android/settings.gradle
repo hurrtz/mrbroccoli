@@ -36,25 +36,4 @@ rootProject.name = 'MrBroccoli'
 expoAutolinking.useExpoVersionCatalog()
 
 include ':app'
-
-// Play Asset Delivery packs: one per intro-audio language, delivered on demand.
-include ':intro_audio_en'
-include ':intro_audio_de'
-include ':intro_audio_uk'
-include ':intro_audio_hi'
-include ':intro_audio_es'
-include ':intro_audio_fr'
-include ':intro_audio_it'
-include ':intro_audio_pt'
-include ':intro_audio_pt_BR'
-include ':intro_audio_ru'
-include ':intro_audio_zh_CN'
-include ':intro_audio_ar'
-include ':intro_audio_ja'
-include ':intro_audio_hu'
-include ':intro_audio_cs'
-include ':intro_audio_pl'
-include ':intro_audio_tr'
-include ':intro_audio_sv'
-include ':intro_audio_ur'
 includeBuild(expoAutolinking.reactNativeGradlePlugin)

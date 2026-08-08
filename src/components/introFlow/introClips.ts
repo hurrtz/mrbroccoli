@@ -1,49 +1,54 @@
 import type { AppLanguage } from "../../i18n/localeRegistry";
-import {
-  ensureIntroClip,
-  getDownloadedIntroClip,
-  isIntroAssetPackDeliverySupported,
-} from "../../services/introAssetPacks";
 
 /**
- * Resolves the intro sheet's audio example for a language.
+ * Bundled audio examples for the intro sheet, one per interface language.
  *
- * Clips are not bundled. Every interface language has one and any user opens
- * one or two, so they are delivered as store-hosted asset packs -- Background
- * Assets on iOS, Play Asset Delivery on Android -- and fetched on request.
+ * All nineteen ship inside the app. The complete set is roughly twenty-one
+ * megabytes of mono AAC, which is small enough that store-hosted on-demand
+ * delivery would have cost an iOS app extension and a Play Core dependency to
+ * save an amount nobody would notice.
  *
- * Three states matter to the sheet:
+ * **Decision:** Bundled rather than delivered. On-demand packs were built and
+ * removed once the content settled at one message per language instead of six;
+ * the machinery only pays for itself at a scale this feature no longer has.
  *
- * - a clip already on the device, playable immediately;
- * - a clip that can be fetched, offered behind an explicit action so nobody
- *   downloads audio they did not ask for;
- * - no clip at all, where the transcript stands in. That covers unsupported
- *   platforms, a device below iOS 26, a sideloaded build, and every language
- *   whose recording does not exist yet.
+ * Consequence: every install carries all nineteen. Metro's asset pipeline has
+ * no concept of Android resource qualifiers, so Play cannot language-split
+ * these, and iOS never could. That is the accepted trade for keeping the
+ * feature pure TypeScript.
+ *
+ * The spoken text for each clip lives in `introScripts.ts`, and
+ * `docs/promo-audio-texts/<lang>.md` records which provider voiced it.
  */
-export type IntroClipAvailability =
-  | { kind: "ready"; uri: string }
-  | { kind: "fetchable" }
-  | { kind: "unavailable" };
-
-export async function getIntroClipAvailability(
-  language: AppLanguage,
-): Promise<IntroClipAvailability> {
-  if (!(await isIntroAssetPackDeliverySupported())) {
-    return { kind: "unavailable" };
-  }
-
-  const downloaded = await getDownloadedIntroClip(language);
-  return downloaded ? { kind: "ready", uri: downloaded } : { kind: "fetchable" };
-}
+const INTRO_CLIPS: Record<AppLanguage, number> = {
+  en: require("../../../assets/intro-audio/intro-en.m4a"),
+  de: require("../../../assets/intro-audio/intro-de.m4a"),
+  uk: require("../../../assets/intro-audio/intro-uk.m4a"),
+  hi: require("../../../assets/intro-audio/intro-hi.m4a"),
+  es: require("../../../assets/intro-audio/intro-es.m4a"),
+  fr: require("../../../assets/intro-audio/intro-fr.m4a"),
+  it: require("../../../assets/intro-audio/intro-it.m4a"),
+  pt: require("../../../assets/intro-audio/intro-pt.m4a"),
+  "pt-BR": require("../../../assets/intro-audio/intro-pt-BR.m4a"),
+  ru: require("../../../assets/intro-audio/intro-ru.m4a"),
+  "zh-CN": require("../../../assets/intro-audio/intro-zh-CN.m4a"),
+  ar: require("../../../assets/intro-audio/intro-ar.m4a"),
+  ja: require("../../../assets/intro-audio/intro-ja.m4a"),
+  hu: require("../../../assets/intro-audio/intro-hu.m4a"),
+  cs: require("../../../assets/intro-audio/intro-cs.m4a"),
+  pl: require("../../../assets/intro-audio/intro-pl.m4a"),
+  tr: require("../../../assets/intro-audio/intro-tr.m4a"),
+  sv: require("../../../assets/intro-audio/intro-sv.m4a"),
+  ur: require("../../../assets/intro-audio/intro-ur.m4a"),
+};
 
 /**
- * Downloads the language's pack when needed and returns a playable URI.
+ * Returns the packaged clip for a language.
  *
- * Resolves null rather than throwing on any failure. The example is optional,
- * so a missing pack or an interrupted download degrades to the transcript
- * instead of surfacing an error.
+ * Every interface language has one, so this cannot fail. A locale outside the
+ * registered nineteen never reaches here -- the app resolves it to one of them
+ * before the sheet renders.
  */
-export function fetchIntroClip(language: AppLanguage) {
-  return ensureIntroClip(language);
+export function getIntroClip(language: AppLanguage) {
+  return INTRO_CLIPS[language] ?? INTRO_CLIPS.en;
 }

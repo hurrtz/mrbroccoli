@@ -161,13 +161,13 @@ living specs and binary verification gates.
 ## Open question — redistributing generated speech (2026-08-08)
 
 **Open question:** The intro audio examples are TTS output from third-party
-providers, redistributed inside the application rather than generated at
-runtime from a user's own key. Currently Alibaba Qwen (`qwen3-tts-flash`) for
+providers, bundled inside the application rather than generated at runtime from
+a user's own key. Currently Alibaba Qwen (`qwen3-tts-flash`) for
 nine languages and ElevenLabs (`Eleven v3`) for ten;
 `docs/promo-audio-texts/<lang>.md` records which voiced each.
 
 Runtime synthesis with a user's key is covered by that user's agreement with
-the provider. Shipping the resulting audio as an app asset is a distribution
+the provider. Shipping the resulting audio inside every install is a distribution
 question, and both providers gate commercial and redistribution rights on plan
 tier. The ElevenLabs clips were generated on pay-as-you-go credits rather than
 a subscription, which is the case most likely to carry restrictions.

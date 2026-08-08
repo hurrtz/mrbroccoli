@@ -1,16 +1,12 @@
 import React from "react";
-import { ActivityIndicator, Pressable, StyleSheet, Text, View } from "react-native";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 import { useAudioPlayer, useAudioPlayerStatus } from "expo-audio";
 
 import { PhosphorIcon } from "../../design-system/PhosphorIcon";
 import type { Colors } from "../../theme/colors";
 import type { TranslateFn } from "../../screens/main/shared";
 import type { AppLanguage } from "../../i18n/localeRegistry";
-import {
-  fetchIntroClip,
-  getIntroClipAvailability,
-  type IntroClipAvailability,
-} from "./introClips";
+import { getIntroClip } from "./introClips";
 import { getIntroScript } from "./introScripts";
 
 interface IntroHearStepProps {
@@ -22,68 +18,35 @@ interface IntroHearStepProps {
 /**
  * The intro sheet's audio example.
  *
- * The clip is delivered by the store rather than bundled, so it may need
- * downloading. That happens only when the user presses play -- an example is
- * not worth spending someone's data on unasked. The transcript is always
- * present, so this step is useful even when no audio exists at all.
+ * The clip ships inside the app, so it plays immediately and works offline --
+ * there is no download, and no state in which it is unavailable. It never
+ * autoplays: a voice starting unprompted is startling, and this sheet can open
+ * anywhere.
+ *
+ * The transcript sits alongside it, which keeps the step useful with the sound
+ * off and gives screen readers the same content.
  */
 export function IntroHearStep({ colors, language, t }: IntroHearStepProps) {
-  const [availability, setAvailability] = React.useState<IntroClipAvailability>({
-    kind: "unavailable",
-  });
-  const [uri, setUri] = React.useState<string | null>(null);
-  const [fetching, setFetching] = React.useState(false);
-
-  const player = useAudioPlayer(uri ? { uri } : null);
+  const player = useAudioPlayer(getIntroClip(language));
   const status = useAudioPlayerStatus(player);
   const playing = status.playing;
-
-  React.useEffect(() => {
-    let cancelled = false;
-
-    void (async () => {
-      const next = await getIntroClipAvailability(language);
-      if (cancelled) {
-        return;
-      }
-      setAvailability(next);
-      setUri(next.kind === "ready" ? next.uri : null);
-    })();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [language]);
+  const script = getIntroScript(language);
 
   const handlePress = React.useCallback(() => {
     if (playing) {
       player.pause();
       return;
     }
-
-    if (uri) {
+    // Restart rather than resume: someone pressing play after it finished
+    // expects the example from the top, not the last half second.
+    if (status.didJustFinish || status.currentTime >= status.duration) {
       player.seekTo(0);
-      player.play();
-      return;
     }
+    player.play();
+  }, [player, playing, status]);
 
-    setFetching(true);
-    void (async () => {
-      const fetched = await fetchIntroClip(language);
-      setFetching(false);
-      if (!fetched) {
-        // The pack could not be delivered. Fall back to the transcript rather
-        // than reporting a failure over an optional example.
-        setAvailability({ kind: "unavailable" });
-        return;
-      }
-      setUri(fetched);
-      setAvailability({ kind: "ready", uri: fetched });
-    })();
-  }, [language, player, playing, uri]);
-
-  const canPlay = availability.kind !== "unavailable";
-  const script = getIntroScript(language);
+  // Leaving the step must stop playback; the sheet can be dismissed mid-clip.
+  React.useEffect(() => () => player.pause(), [player]);
 
   return (
     <View style={styles.container}>
@@ -91,40 +54,25 @@ export function IntroHearStep({ colors, language, t }: IntroHearStepProps) {
         {t("introHearBody")}
       </Text>
 
-      {canPlay ? (
-        <Pressable
-          accessibilityLabel={playing ? t("introHearStop") : t("introHearPlay")}
-          accessibilityRole="button"
-          accessibilityState={{ busy: fetching, disabled: fetching }}
-          disabled={fetching}
-          onPress={handlePress}
-          style={[
-            styles.play,
-            { backgroundColor: colors.surfaceAlt, borderColor: colors.border },
-          ]}
-          testID="intro-hear-play"
-        >
-          {fetching ? (
-            <ActivityIndicator color={colors.accent} />
-          ) : (
-            <PhosphorIcon
-              color={colors.accent}
-              name={playing ? "pause" : "audio"}
-              size="navigation"
-            />
-          )}
-          <Text style={[styles.playLabel, { color: colors.text }]}>
-            {playing ? t("introHearStop") : t("introHearPlay")}
-          </Text>
-        </Pressable>
-      ) : (
-        <Text
-          style={[styles.disclaimer, { color: colors.textMuted }]}
-          testID="intro-hear-unavailable"
-        >
-          {t("introHearUnavailable")}
+      <Pressable
+        accessibilityLabel={playing ? t("introHearStop") : t("introHearPlay")}
+        accessibilityRole="button"
+        onPress={handlePress}
+        style={[
+          styles.play,
+          { backgroundColor: colors.surfaceAlt, borderColor: colors.border },
+        ]}
+        testID="intro-hear-play"
+      >
+        <PhosphorIcon
+          color={colors.accent}
+          name={playing ? "pause" : "audio"}
+          size="navigation"
+        />
+        <Text style={[styles.playLabel, { color: colors.text }]}>
+          {playing ? t("introHearStop") : t("introHearPlay")}
         </Text>
-      )}
+      </Pressable>
 
       {script ? (
         <>

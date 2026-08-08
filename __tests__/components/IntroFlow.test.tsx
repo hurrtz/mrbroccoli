@@ -1,5 +1,5 @@
 import React from "react";
-import { fireEvent, render, waitFor } from "@testing-library/react-native";
+import { fireEvent, render } from "@testing-library/react-native";
 
 const mockPlayer = {
   pause: jest.fn(),
@@ -7,18 +7,19 @@ const mockPlayer = {
   seekTo: jest.fn(),
 };
 let mockPlaying = false;
+let mockStatus: Record<string, unknown> = {};
 
 jest.mock("expo-audio", () => ({
   useAudioPlayer: jest.fn(() => mockPlayer),
-  useAudioPlayerStatus: jest.fn(() => ({ playing: mockPlaying })),
+  useAudioPlayerStatus: jest.fn(() => ({
+    playing: mockPlaying,
+    didJustFinish: false,
+    currentTime: 0,
+    duration: 180,
+    ...mockStatus,
+  })),
 }));
 
-const assetPacks = {
-  isSupported: jest.fn(() => Promise.resolve(false)),
-  ensurePack: jest.fn(() => Promise.resolve(null)),
-  getLocalPath: jest.fn(() => Promise.resolve(null)),
-  removePack: jest.fn(() => Promise.resolve()),
-};
 
 import { IntroBanner } from "../../src/components/IntroBanner";
 import {
@@ -28,17 +29,12 @@ import {
 } from "../../src/components/introFlow/IntroFlowSheet";
 import { lightColors } from "../../src/theme/colors";
 
-import { NativeModules } from "react-native";
-import { resetIntroAssetPackSupportForTests } from "../../src/services/introAssetPacks";
-
 const t = ((key: string) => key) as never;
 
 beforeEach(() => {
   jest.clearAllMocks();
   mockPlaying = false;
-  resetIntroAssetPackSupportForTests();
-  (NativeModules as Record<string, unknown>).MrBroccoliIntroAssetPacks =
-    assetPacks;
+  mockStatus = {};
 });
 
 function renderSheet(overrides: Partial<React.ComponentProps<typeof IntroFlowSheet>> = {}) {
@@ -122,45 +118,33 @@ describe("IntroFlowSheet", () => {
     expect(getByTestId("intro-hear-transcript")).toBeTruthy();
   });
 
-  it("says so when the platform cannot deliver a clip", async () => {
-    // Covers an unsupported platform, a device below iOS 26, a sideloaded
-    // build, and a language whose pack was never uploaded.
-    assetPacks.isSupported.mockResolvedValue(false);
-    const { getByTestId } = renderSheet({ step: "hear" });
-
-    await waitFor(() => {
-      expect(getByTestId("intro-hear-unavailable")).toBeTruthy();
-    });
+  it("offers playback for every language without a download", async () => {
+    // Clips ship inside the app, so there is no unavailable state and no
+    // fetching -- the control is there the moment the step renders.
+    for (const language of ["en", "de", "ja", "ur"] as const) {
+      const { getByTestId, unmount } = renderSheet({ step: "hear", language });
+      expect(getByTestId("intro-hear-play")).toBeTruthy();
+      unmount();
+    }
   });
 
-  it("offers playback without downloading when the clip is already present", async () => {
-    assetPacks.isSupported.mockResolvedValue(true);
-    assetPacks.getLocalPath.mockResolvedValue("/packs/intro-en.m4a");
+  it("restarts rather than resumes once the clip has finished", () => {
+    // Someone pressing play after it ended wants the example from the top.
+    mockStatus = { playing: false, didJustFinish: true, currentTime: 180, duration: 180 };
     const { getByTestId } = renderSheet({ step: "hear" });
-
-    await waitFor(() => {
-      expect(getByTestId("intro-hear-play")).toBeTruthy();
-    });
-    expect(assetPacks.ensurePack).not.toHaveBeenCalled();
-  });
-
-  it("downloads only when the user asks to hear it", async () => {
-    // An optional example must never spend someone's data unprompted.
-    assetPacks.isSupported.mockResolvedValue(true);
-    assetPacks.getLocalPath.mockResolvedValue(null);
-    assetPacks.ensurePack.mockResolvedValue("/packs/intro-en.m4a");
-    const { getByTestId } = renderSheet({ step: "hear" });
-
-    await waitFor(() => {
-      expect(getByTestId("intro-hear-play")).toBeTruthy();
-    });
-    expect(assetPacks.ensurePack).not.toHaveBeenCalled();
 
     fireEvent.press(getByTestId("intro-hear-play"));
 
-    await waitFor(() => {
-      expect(assetPacks.ensurePack).toHaveBeenCalledTimes(1);
-    });
+    expect(mockPlayer.seekTo).toHaveBeenCalledWith(0);
+    expect(mockPlayer.play).toHaveBeenCalled();
+  });
+
+  it("stops playback when the step goes away", () => {
+    // The sheet can be dismissed mid-clip; the voice must not outlive it.
+    const { unmount } = renderSheet({ step: "hear" });
+    unmount();
+
+    expect(mockPlayer.pause).toHaveBeenCalled();
   });
 
   it("offers both a provider and an on-device path on the final step", () => {

@@ -102,11 +102,17 @@ the contextual entry point exists to answer.
 **Decision:** An install that already has provider keys starts with the banner
 dismissed. It has nothing to be introduced to.
 
-**Decision:** The audio example is delivered by the store rather than bundled.
-See [`../../services/introAssetPacks/SPEC.md`](../../services/introAssetPacks/SPEC.md).
-It carries a visible pre-recorded label and never plays automatically, so it
-cannot be read as what the user's own configuration will produce, and it
-downloads only when someone asks to hear it.
+**Decision:** The audio examples are bundled, one per interface language,
+roughly twenty-one megabytes in total. Store-hosted on-demand delivery was
+built and removed: it cost an iOS app extension and a Play Core dependency to
+save an amount nobody would notice once the content settled at one message per
+language instead of six. Every install carries all nineteen.
+
+Each clip carries a visible pre-recorded label and never plays automatically,
+so it cannot be read as what the user's own configuration will produce. Every
+clip is loudness-matched to -16 LUFS; the delivered recordings spanned -15.0 to
+-30.3 LUFS, and without matching a listener would strain at one language and be
+startled by the next.
 
 ## Drive Session
 

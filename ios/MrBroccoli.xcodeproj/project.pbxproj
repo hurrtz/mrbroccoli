@@ -40,8 +40,6 @@
 		C01A00000000000000000006 /* MrBroccoliVoiceLiveActivityBridge.m in Sources */ = {isa = PBXBuildFile; fileRef = C01A00000000000000000016 /* MrBroccoliVoiceLiveActivityBridge.m */; };
 		D1A600000000000000000001 /* MrBroccoliDiagnostics.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1A600000000000000000011 /* MrBroccoliDiagnostics.swift */; };
 		D1A600000000000000000002 /* MrBroccoliDiagnosticsBridge.m in Sources */ = {isa = PBXBuildFile; fileRef = D1A600000000000000000012 /* MrBroccoliDiagnosticsBridge.m */; };
-		D1A600000000000000000101 /* MrBroccoliIntroAssetPacks.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1A600000000000000000111 /* MrBroccoliIntroAssetPacks.swift */; };
-		D1A600000000000000000102 /* MrBroccoliIntroAssetPacksBridge.m in Sources */ = {isa = PBXBuildFile; fileRef = D1A600000000000000000112 /* MrBroccoliIntroAssetPacksBridge.m */; };
 		D2A600000000000000000001 /* MrBroccoliWaveformInterruptionPolicy.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2A600000000000000000011 /* MrBroccoliWaveformInterruptionPolicy.swift */; };
 		E1B700000000000000000001 /* MrBroccoliBackupCrypto.m in Sources */ = {isa = PBXBuildFile; fileRef = E1B700000000000000000011 /* MrBroccoliBackupCrypto.m */; };
 		E1B700000000000000000002 /* MrBroccoliArchiveDirectory.m in Sources */ = {isa = PBXBuildFile; fileRef = E1B700000000000000000012 /* MrBroccoliArchiveDirectory.m */; };
@@ -123,8 +121,6 @@
 		CF5165F0FF79A69CD834CE27 /* Pods-MrBroccoliTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-MrBroccoliTests.release.xcconfig"; path = "Target Support Files/Pods-MrBroccoliTests/Pods-MrBroccoliTests.release.xcconfig"; sourceTree = "<group>"; };
 		D1A600000000000000000011 /* MrBroccoliDiagnostics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = MrBroccoliDiagnostics.swift; path = MrBroccoli/MrBroccoliDiagnostics.swift; sourceTree = "<group>"; };
 		D1A600000000000000000012 /* MrBroccoliDiagnosticsBridge.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = MrBroccoliDiagnosticsBridge.m; path = MrBroccoli/MrBroccoliDiagnosticsBridge.m; sourceTree = "<group>"; };
-		D1A600000000000000000111 /* MrBroccoliIntroAssetPacks.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = MrBroccoliIntroAssetPacks.swift; path = MrBroccoli/MrBroccoliIntroAssetPacks.swift; sourceTree = "<group>"; };
-		D1A600000000000000000112 /* MrBroccoliIntroAssetPacksBridge.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = MrBroccoliIntroAssetPacksBridge.m; path = MrBroccoli/MrBroccoliIntroAssetPacksBridge.m; sourceTree = "<group>"; };
 		D2A600000000000000000011 /* MrBroccoliWaveformInterruptionPolicy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MrBroccoliWaveformInterruptionPolicy.swift; sourceTree = "<group>"; };
 		E1B700000000000000000011 /* MrBroccoliBackupCrypto.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = MrBroccoliBackupCrypto.m; path = MrBroccoli/MrBroccoliBackupCrypto.m; sourceTree = "<group>"; };
 		E1B700000000000000000012 /* MrBroccoliArchiveDirectory.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = MrBroccoliArchiveDirectory.m; path = MrBroccoli/MrBroccoliArchiveDirectory.m; sourceTree = "<group>"; };
@@ -175,8 +171,6 @@
 				F11748412D0307B40044C1D9 /* AppDelegate.swift */,
 				D1A600000000000000000011 /* MrBroccoliDiagnostics.swift */,
 				D1A600000000000000000012 /* MrBroccoliDiagnosticsBridge.m */,
-				D1A600000000000000000111 /* MrBroccoliIntroAssetPacks.swift */,
-				D1A600000000000000000112 /* MrBroccoliIntroAssetPacksBridge.m */,
 				E1B700000000000000000011 /* MrBroccoliBackupCrypto.m */,
 				E1B700000000000000000012 /* MrBroccoliArchiveDirectory.m */,
 				C01A00000000000000000015 /* MrBroccoliVoiceLiveActivity.swift */,
@@ -679,8 +673,6 @@
 				F11748422D0307B40044C1D9 /* AppDelegate.swift in Sources */,
 				D1A600000000000000000001 /* MrBroccoliDiagnostics.swift in Sources */,
 				D1A600000000000000000002 /* MrBroccoliDiagnosticsBridge.m in Sources */,
-				D1A600000000000000000101 /* MrBroccoliIntroAssetPacks.swift in Sources */,
-				D1A600000000000000000102 /* MrBroccoliIntroAssetPacksBridge.m in Sources */,
 				E1B700000000000000000001 /* MrBroccoliBackupCrypto.m in Sources */,
 				E1B700000000000000000002 /* MrBroccoliArchiveDirectory.m in Sources */,
 				C01A00000000000000000004 /* MrBroccoliVoiceActivityAttributes.swift in Sources */,

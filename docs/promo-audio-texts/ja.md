@@ -2,10 +2,9 @@
 
 Spoken examples for the intro sheet.
 
-Each language ships one clip as a store-hosted asset pack — Background
-Assets on iOS, Play Asset Delivery on Android — fetched only when a user
-asks to hear it. See
-[`src/services/introAssetPacks/SPEC.md`](../../src/services/introAssetPacks/SPEC.md).
+Each language ships one clip bundled in the app at
+`assets/intro-audio/intro-<lang>.m4a`, normalized to -16 LUFS so no language
+is noticeably louder or quieter than another.
 
 The first five prompts were each answered by a different frontier model, so
 the set demonstrates range rather than one vendor. The sixth is written for
