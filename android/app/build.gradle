@@ -101,7 +101,27 @@ android {
 
     // Intro audio ships as on-demand asset packs rather than inside the app.
     // Google hosts them; the app fetches only the language a user opens.
-    assetPacks = [':intro_audio_en', ':intro_audio_de']
+    assetPacks = [
+        ':intro_audio_en',
+        ':intro_audio_de',
+        ':intro_audio_uk',
+        ':intro_audio_hi',
+        ':intro_audio_es',
+        ':intro_audio_fr',
+        ':intro_audio_it',
+        ':intro_audio_pt',
+        ':intro_audio_pt_BR',
+        ':intro_audio_ru',
+        ':intro_audio_zh_CN',
+        ':intro_audio_ar',
+        ':intro_audio_ja',
+        ':intro_audio_hu',
+        ':intro_audio_cs',
+        ':intro_audio_pl',
+        ':intro_audio_tr',
+        ':intro_audio_sv',
+        ':intro_audio_ur'
+    ]
 
     defaultConfig {
         missingDimensionStrategy "platform", "play"

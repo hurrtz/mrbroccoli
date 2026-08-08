@@ -1,0 +1,16 @@
+// Play Asset Delivery pack for the pt-BR intro audio example.
+//
+// One pack per language, delivered on demand. A user opens one or two
+// languages, so bundling all of them would put roughly twenty megabytes of
+// audio into every install for content almost nobody plays. Google hosts these
+// and serves them when the app asks.
+plugins {
+    id 'com.android.asset-pack'
+}
+
+assetPack {
+    packName = "intro_audio_pt_BR"
+    dynamicDelivery {
+        deliveryType = "on-demand"
+    }
+}

@@ -158,6 +158,24 @@ Resolution taken: option 1 — an espeak-free runtime rebuild plus a
 permissive phonemizer. Both live in dedicated repositories with their own
 living specs and binary verification gates.
 
+## Open question — redistributing generated speech (2026-08-08)
+
+**Open question:** The intro audio examples are TTS output from third-party
+providers, redistributed inside the application rather than generated at
+runtime from a user's own key. Currently Alibaba Qwen (`qwen3-tts-flash`) for
+nine languages and ElevenLabs (`Eleven v3`) for ten;
+`docs/promo-audio-texts/<lang>.md` records which voiced each.
+
+Runtime synthesis with a user's key is covered by that user's agreement with
+the provider. Shipping the resulting audio as an app asset is a distribution
+question, and both providers gate commercial and redistribution rights on plan
+tier. The ElevenLabs clips were generated on pay-as-you-go credits rather than
+a subscription, which is the case most likely to carry restrictions.
+
+Resolve before the clips ship. This is the same class of issue as the eSpeak NG
+finding: a licence obligation attached to something inside the distributable,
+not to how it was produced.
+
 ## Operational rules
 
 - API keys remain device-local secure credentials. They are never committed,

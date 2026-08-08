@@ -101,6 +101,8 @@ _Not generated yet._
 
 **Model:** written for this app, not model-generated
 
+**Voiced by:** Alibaba Qwen `qwen3-tts-flash` — this is the clip the intro sheet plays.
+
 **Prompt**
 
 > 这个应用到底是怎么运作的？

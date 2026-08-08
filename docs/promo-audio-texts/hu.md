@@ -101,6 +101,8 @@ _Not generated yet._
 
 **Model:** written for this app, not model-generated
 
+**Voiced by:** ElevenLabs `Eleven v3` — this is the clip the intro sheet plays.
+
 **Prompt**
 
 > Hogyan működik ez az alkalmazás?

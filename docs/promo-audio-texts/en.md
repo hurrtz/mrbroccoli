@@ -161,6 +161,8 @@ What looks like wasteful redundancy is usually a living map of history, contact,
 
 **Model:** written for this app, not model-generated
 
+**Voiced by:** ElevenLabs `Eleven v3` — this is the clip the intro sheet plays.
+
 **Prompt**
 
 > How does this application work?

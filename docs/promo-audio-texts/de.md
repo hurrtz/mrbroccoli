@@ -167,6 +167,8 @@ Am Ende spiegelt dieser Reichtum wider, dass Sprache kein sauberes logisches Sys
 
 **Model:** written for this app, not model-generated
 
+**Voiced by:** Alibaba Qwen `qwen3-tts-flash` — this is the clip the intro sheet plays.
+
 **Prompt**
 
 > Wie funktioniert diese App eigentlich?
