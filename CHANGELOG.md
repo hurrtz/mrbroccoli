@@ -10,8 +10,10 @@ the complete Play Store translations are kept in a dedicated file under
 
 ## Unreleased
 
-- The introduction now includes a spoken example in every one of the app's
-  languages, playable offline.
+- The introduction is now a full screen you can walk through in either
+  direction, covering what the app needs to run, what is optional and why, and
+  what Premium adds. It opens with a spoken example in your language, and the
+  speaking step lets you hear any of the app's languages before deciding.
 - Replaced the setup wizards with an introduction you can skip. The app now
   opens straight into the workspace, with a dismissible banner offering a short
   four-step tour and a choice between connecting your own provider or

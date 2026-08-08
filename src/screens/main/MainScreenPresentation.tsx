@@ -4,7 +4,7 @@ import { StatusBar } from "expo-status-bar";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { ConversationDrawer } from "../../components/ConversationDrawer";
-import { IntroFlowSheet } from "../../components/introFlow/IntroFlowSheet";
+import { IntroFlowScreen } from "../../components/introFlow/IntroFlowScreen";
 import { ConversationMemoryModal } from "../../components/ConversationMemoryModal";
 import { PremiumUpgradeModal } from "../../components/PremiumUpgradeModal";
 import { Toast } from "../../components/Toast";
@@ -19,7 +19,7 @@ interface MainScreenPresentationProps {
   colors: Colors;
   conversationDrawer: React.ComponentProps<typeof ConversationDrawer>;
   conversationMemory: React.ComponentProps<typeof ConversationMemoryModal>;
-  intro: React.ComponentProps<typeof IntroFlowSheet>;
+  intro: React.ComponentProps<typeof IntroFlowScreen>;
   isDark: boolean;
   isLandscape: boolean;
   premiumUpgrade: React.ComponentProps<typeof PremiumUpgradeModal>;
@@ -77,7 +77,7 @@ export function MainScreenPresentation({
       <PremiumUpgradeModal {...premiumUpgrade} />
       <ConversationMemoryModal {...conversationMemory} />
       <ConversationDrawer {...conversationDrawer} />
-      <IntroFlowSheet {...intro} />
+      <IntroFlowScreen {...intro} />
     </SafeAreaView>
   );
 }

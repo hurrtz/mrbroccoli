@@ -84,9 +84,27 @@ routes; the Free runtime ignores them and they return untouched with Premium.
 ## Onboarding
 
 There is no blocking setup surface. A new install opens directly into the
-workspace, with a dismissible intro banner above it that opens a four-step
-sheet: what the app is, the three ways to power it, an audio example, and a
-choice between connecting a provider and installing on-device models.
+workspace, with a dismissible intro banner above it that opens a six-step
+full-screen introduction: the greeting, what setup actually requires, the one
+requirement, the two optional pieces, and what Premium adds.
+
+The banner and the introduction carry their own dark palette rather than the
+app theme. The workspace is warm white with green accents, so a first-time user
+recognises the introduction as an aside they can leave, and the workspace still
+reads as the destination.
+
+**Decision:** Steps are walkable in both directions, from the footer and from
+the stepper, and the stepper draws dots with a dash for the current position
+rather than a "step 4 of 6" label. A one-way flow made the last step a dead
+end: someone there could neither check what they had skipped nor revisit a
+decision, and a counter said where they were but nothing about what they had
+passed.
+
+**Decision:** Speech steps are marked optional and say why skipping is safe --
+typing replaces listening, and the device's own voice replaces speaking. The
+speaking step carries a language picker over the bundled examples, because
+letting someone hear the app in their own language argues for setting it up
+better than a claim does.
 
 The same sheet opens at its final step whenever a turn is attempted with no
 usable route, so the microphone is never a dead end. Provider keys are entered

@@ -1,15 +1,17 @@
 import React from "react";
 import { fireEvent, render } from "@testing-library/react-native";
 
-const mockPlayer = {
-  pause: jest.fn(),
-  play: jest.fn(),
-  seekTo: jest.fn(),
-};
+const mockPlayer = { pause: jest.fn(), play: jest.fn(), seekTo: jest.fn() };
 let mockPlaying = false;
 let mockStatus: Record<string, unknown> = {};
 
+jest.mock("expo-status-bar", () => ({
+  StatusBar: () => null,
+}));
+
 jest.mock("expo-audio", () => ({
+  setAudioModeAsync: jest.fn(() => Promise.resolve()),
+  setIsAudioActiveAsync: jest.fn(() => Promise.resolve()),
   useAudioPlayer: jest.fn(() => mockPlayer),
   useAudioPlayerStatus: jest.fn(() => ({
     playing: mockPlaying,
@@ -20,14 +22,9 @@ jest.mock("expo-audio", () => ({
   })),
 }));
 
-
 import { IntroBanner } from "../../src/components/IntroBanner";
-import {
-  INTRO_STEPS,
-  IntroFlowSheet,
-  type IntroStep,
-} from "../../src/components/introFlow/IntroFlowSheet";
-import { lightColors } from "../../src/theme/colors";
+import { IntroFlowScreen } from "../../src/components/introFlow/IntroFlowScreen";
+import { INTRO_STEPS } from "../../src/components/introFlow/introSteps";
 
 const t = ((key: string) => key) as never;
 
@@ -37,32 +34,27 @@ beforeEach(() => {
   mockStatus = {};
 });
 
-function renderSheet(overrides: Partial<React.ComponentProps<typeof IntroFlowSheet>> = {}) {
+function renderScreen(
+  overrides: Partial<React.ComponentProps<typeof IntroFlowScreen>> = {},
+) {
   const props = {
-    colors: lightColors,
     language: "en" as const,
     onClose: jest.fn(),
     onConnectProvider: jest.fn(),
     onInstallLocal: jest.fn(),
-    onStepChange: jest.fn(),
-    step: "what" as IntroStep,
+    onOpenPremium: jest.fn(),
+    onOpenSpeaking: jest.fn(),
     t,
     visible: true,
     ...overrides,
   };
-  return { ...render(<IntroFlowSheet {...props} />), props };
+  return { ...render(<IntroFlowScreen {...props} />), props };
 }
 
 describe("IntroBanner", () => {
   it("stays out of the tree once dismissed", () => {
     const { queryByTestId } = render(
-      <IntroBanner
-        colors={lightColors}
-        onDismiss={jest.fn()}
-        onOpen={jest.fn()}
-        t={t}
-        visible={false}
-      />,
+      <IntroBanner onDismiss={jest.fn()} onOpen={jest.fn()} t={t} visible={false} />,
     );
 
     expect(queryByTestId("intro-banner")).toBeNull();
@@ -70,98 +62,117 @@ describe("IntroBanner", () => {
 
   it("separates opening the introduction from dismissing it", () => {
     // The banner replaced a wizard that could not be skipped. Dismissing has to
-    // be a distinct target from opening, or a user trying to get rid of it ends
-    // up inside the flow instead.
+    // be a distinct target, or someone trying to get rid of it ends up inside.
     const onDismiss = jest.fn();
     const onOpen = jest.fn();
     const { getByTestId } = render(
-      <IntroBanner
-        colors={lightColors}
-        onDismiss={onDismiss}
-        onOpen={onOpen}
-        t={t}
-        visible
-      />,
+      <IntroBanner onDismiss={onDismiss} onOpen={onOpen} t={t} visible />,
     );
 
     fireEvent.press(getByTestId("intro-banner-dismiss"));
     expect(onDismiss).toHaveBeenCalledTimes(1);
     expect(onOpen).not.toHaveBeenCalled();
 
-    fireEvent.press(getByTestId("intro-banner-open"));
+    fireEvent.press(getByTestId("intro-banner"));
     expect(onOpen).toHaveBeenCalledTimes(1);
   });
 });
 
-describe("IntroFlowSheet", () => {
-  it("renders four steps", () => {
-    expect(INTRO_STEPS).toEqual(["what", "how", "hear", "start"]);
-  });
-
-  it("reports its position in the flow", () => {
-    const { getByText } = renderSheet({ step: "hear" });
-
-    expect(getByText("introStepOfTotal")).toBeTruthy();
-  });
-
-  it("labels the audio example as pre-recorded", () => {
-    // The clip is generated with a frontier model and a paid voice, so it must
-    // never read as what this user's own configuration will produce.
-    const { getByText } = renderSheet({ step: "hear" });
-
-    expect(getByText("introHearDisclaimer")).toBeTruthy();
-  });
-
-  it("shows the transcript for a language that has a script", () => {
-    const { getByTestId } = renderSheet({ step: "hear" });
-
-    expect(getByTestId("intro-hear-transcript")).toBeTruthy();
-  });
-
-  it("offers playback for every language without a download", async () => {
-    // Clips ship inside the app, so there is no unavailable state and no
-    // fetching -- the control is there the moment the step renders.
-    for (const language of ["en", "de", "ja", "ur"] as const) {
-      const { getByTestId, unmount } = renderSheet({ step: "hear", language });
-      expect(getByTestId("intro-hear-play")).toBeTruthy();
-      unmount();
-    }
-  });
-
-  it("restarts rather than resumes once the clip has finished", () => {
-    // Someone pressing play after it ended wants the example from the top.
-    mockStatus = { playing: false, didJustFinish: true, currentTime: 180, duration: 180 };
-    const { getByTestId } = renderSheet({ step: "hear" });
-
-    fireEvent.press(getByTestId("intro-hear-play"));
-
-    expect(mockPlayer.seekTo).toHaveBeenCalledWith(0);
-    expect(mockPlayer.play).toHaveBeenCalled();
-  });
-
-  it("stops playback when the step goes away", () => {
-    // The sheet can be dismissed mid-clip; the voice must not outlive it.
-    const { unmount } = renderSheet({ step: "hear" });
-    unmount();
-
-    expect(mockPlayer.pause).toHaveBeenCalled();
-  });
-
-  it("offers both a provider and an on-device path on the final step", () => {
-    // This step is also where a user lands after tapping the microphone with
-    // nothing configured, so neither route may be missing.
-    const { getByTestId, props } = renderSheet({ step: "start" });
-
-    fireEvent.press(getByTestId("intro-start-provider"));
-    expect(props.onConnectProvider).toHaveBeenCalledTimes(1);
-
-    fireEvent.press(getByTestId("intro-start-local"));
-    expect(props.onInstallLocal).toHaveBeenCalledTimes(1);
+describe("IntroFlowScreen", () => {
+  it("covers the six setup steps in order", () => {
+    expect(INTRO_STEPS).toEqual([
+      "welcome",
+      "requirements",
+      "llm",
+      "stt",
+      "tts",
+      "premium",
+    ]);
   });
 
   it("renders nothing while hidden", () => {
-    const { queryByTestId } = renderSheet({ visible: false });
+    const { queryByTestId } = renderScreen({ visible: false });
 
     expect(queryByTestId("intro-flow-content")).toBeNull();
+  });
+
+  it("opens on the greeting with its play control", () => {
+    const { getByTestId } = renderScreen();
+
+    expect(getByTestId("intro-welcome-play")).toBeTruthy();
+  });
+
+  it("walks forward and back through the steps", () => {
+    // A one-way flow made the last step a dead end: someone could neither
+    // check what they had skipped nor revisit a decision.
+    const { getByTestId, queryByTestId } = renderScreen();
+
+    fireEvent.press(getByTestId("intro-next"));
+    fireEvent.press(getByTestId("intro-next"));
+    expect(getByTestId("intro-install-local")).toBeTruthy();
+
+    fireEvent.press(getByTestId("intro-back"));
+    fireEvent.press(getByTestId("intro-back"));
+    expect(getByTestId("intro-welcome-play")).toBeTruthy();
+    expect(queryByTestId("intro-install-local")).toBeNull();
+  });
+
+  it("jumps to any step from the stepper", () => {
+    const { getByTestId } = renderScreen();
+
+    fireEvent.press(getByTestId("intro-stepper-dot-5"));
+
+    expect(getByTestId("intro-open-premium")).toBeTruthy();
+  });
+
+  it("cannot go back from the first step", () => {
+    const { getByTestId } = renderScreen();
+
+    fireEvent.press(getByTestId("intro-back"));
+
+    expect(getByTestId("intro-welcome-play")).toBeTruthy();
+  });
+
+  it("offers both routes to the one requirement", () => {
+    const { getByTestId, props } = renderScreen();
+    fireEvent.press(getByTestId("intro-stepper-dot-2"));
+
+    fireEvent.press(getByTestId("intro-install-local"));
+    expect(props.onInstallLocal).toHaveBeenCalledTimes(1);
+
+    fireEvent.press(getByTestId("intro-connect-provider"));
+    expect(props.onConnectProvider).toHaveBeenCalledTimes(1);
+  });
+
+  it("lets a listener switch the example language", () => {
+    // Claiming the app sounds good is worth less than letting someone hear it,
+    // in whichever language they actually speak.
+    const { getByTestId } = renderScreen();
+    fireEvent.press(getByTestId("intro-stepper-dot-4"));
+
+    fireEvent.press(getByTestId("intro-voice-select"));
+
+    expect(getByTestId("intro-voice-option-ja")).toBeTruthy();
+  });
+
+  it("defaults the example to the interface language", () => {
+    const { getByTestId } = renderScreen({ language: "de" });
+    fireEvent.press(getByTestId("intro-stepper-dot-4"));
+    fireEvent.press(getByTestId("intro-voice-select"));
+
+    expect(
+      getByTestId("intro-voice-option-de").props.accessibilityState.selected,
+    ).toBe(true);
+  });
+
+  it("closes from the final step and from the close control", () => {
+    const { getByTestId, props } = renderScreen();
+
+    fireEvent.press(getByTestId("intro-close"));
+    expect(props.onClose).toHaveBeenCalledTimes(1);
+
+    fireEvent.press(getByTestId("intro-stepper-dot-5"));
+    fireEvent.press(getByTestId("intro-next"));
+    expect(props.onClose).toHaveBeenCalledTimes(2);
   });
 });

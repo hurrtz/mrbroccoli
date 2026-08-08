@@ -12,7 +12,7 @@ import { styles } from "./styles";
 
 interface MainScreenWorkspaceProps {
   colors: Colors;
-  introBanner: Omit<React.ComponentProps<typeof IntroBanner>, "colors">;
+  introBanner: React.ComponentProps<typeof IntroBanner>;
   isLandscape: boolean;
   routeCard: Omit<
     React.ComponentProps<typeof MainScreenRouteCard>,
@@ -61,7 +61,7 @@ export function MainScreenWorkspace({
           style={styles.landscapeLeftColumn}
         >
           <MainScreenTopBar colors={colors} {...landscapeTopBar} />
-          <IntroBanner colors={colors} {...introBanner} />
+          <IntroBanner {...introBanner} />
 
           <MainScreenRouteCard
             colors={colors}
@@ -121,7 +121,7 @@ export function MainScreenWorkspace({
       <MainScreenTopBar colors={colors} {...topBar} />
 
       <View style={styles.workspaceBody}>
-        <IntroBanner colors={colors} {...introBanner} />
+        <IntroBanner {...introBanner} />
         <MainScreenRouteCard colors={colors} {...routeCard} />
 
         <MainScreenRouteControls colors={colors} {...routeControls} />

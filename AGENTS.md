@@ -104,7 +104,10 @@ applies.
 
 - `src/screens/MainScreen.tsx` is the main composition root. It wires focused hooks and services into the workspace and secondary surfaces; recording, transcription, LLM, playback, setup, and persistence behavior live outside the screen component.
 - `src/components/IntroBanner.tsx` and `src/components/introFlow/` are the
-  first-run introduction. Its audio examples are bundled under
+  first-run introduction: a dark banner over the workspace opening a six-step
+  full-screen flow. `introTheme.ts` holds its palette, deliberately independent
+  of the light/dark app theme, and `useIntroPlayback.ts` activates the audio
+  session the voice pipeline leaves off while idle. Its audio examples are bundled under
   `assets/intro-audio/intro-<lang>.m4a`, one per interface language. Adding a
   language means a recording normalized to -16 LUFS, an entry in
   `introClips.ts`, and a script in `introScripts.ts`;

@@ -43,7 +43,6 @@ import { useMainScreenImageAttachments } from "./main/useMainScreenImageAttachme
 import { formatMessageForCopy } from "../utils/conversationExport";
 import { useImagePromptSubmission } from "./main/useImagePromptSubmission";
 import { useFreeOfflineMode } from "./main/useFreeOfflineMode";
-import type { IntroStep } from "../components/introFlow/IntroFlowSheet";
 import { useStorePromoPresentation } from "../hooks/useStorePromoPresentation";
 import {
   applyStorePromoFreeOfflineController,
@@ -92,10 +91,9 @@ export function MainScreen() {
   // The intro replaces the blocking wizards. It opens from the banner, and
   // also whenever a turn is attempted with no usable route -- otherwise a new
   // user can reach a microphone that silently does nothing.
-  const [introStep, setIntroStep] = React.useState<IntroStep | null>(null);
-  const openIntro = React.useCallback(() => setIntroStep("what"), []);
-  const openIntroAtStart = React.useCallback(() => setIntroStep("start"), []);
-  const closeIntro = React.useCallback(() => setIntroStep(null), []);
+  const [introVisible, setIntroVisible] = React.useState(false);
+  const openIntro = React.useCallback(() => setIntroVisible(true), []);
+  const closeIntro = React.useCallback(() => setIntroVisible(false), []);
   const dismissIntroBanner = React.useCallback(() => {
     updateSettings({ introDismissed: true });
   }, [updateSettings]);
@@ -774,7 +772,6 @@ export function MainScreen() {
         tone: toast?.tone,
       }}
       intro={{
-        colors,
         language: settings.language,
         onClose: closeIntro,
         onConnectProvider: () => {
@@ -785,10 +782,16 @@ export function MainScreen() {
           closeIntro();
           void freeOffline.start();
         },
-        onStepChange: setIntroStep,
-        step: introStep ?? "what",
+        onOpenPremium: () => {
+          closeIntro();
+          setPremiumModalVisible(true);
+        },
+        onOpenSpeaking: () => {
+          closeIntro();
+          handleOpenSpeakingSettings();
+        },
         t,
-        visible: introStep !== null,
+        visible: introVisible,
       }}
       workspace={{
         colors,
@@ -823,7 +826,7 @@ export function MainScreen() {
           offlineReady: freeOffline.freeRuntimeReady,
           onOpenSetupGuide: freeOffline.entitlement.isPremium
             ? handleOpenProviderSettings
-            : openIntroAtStart,
+            : openIntro,
           onSelectResponseMode: handleResponseModeChange,
           responseModes: runtimeSettings.responseModes,
           t,
@@ -864,7 +867,7 @@ export function MainScreen() {
           onResolvePromptBlock:
             freeOffline.entitlement.status === "free" &&
             !freeOffline.freeRuntimeReady
-              ? openIntroAtStart
+              ? openIntro
               : handleOpenSpeakingSettings,
           onSubmitTextMessage: handleSubmitTextMessage,
           onTextMessageChange: handleTextMessageChange,

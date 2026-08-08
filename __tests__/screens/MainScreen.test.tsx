@@ -381,16 +381,11 @@ jest.mock("../../src/features/settings/AntSettingsModal", () => ({
   },
 }));
 
-jest.mock("../../src/components/introFlow/IntroFlowSheet", () => ({
-  INTRO_STEPS: ["what", "how", "hear", "start"],
-  IntroFlowSheet: ({ visible, step }: { visible: boolean; step: string }) => {
+jest.mock("../../src/components/introFlow/IntroFlowScreen", () => ({
+  IntroFlowScreen: ({ visible }: { visible: boolean }) => {
     const React = require("react");
     const { Text } = require("react-native");
-    return React.createElement(
-      Text,
-      null,
-      visible ? `intro:${step}` : "intro:closed",
-    );
+    return React.createElement(Text, null, visible ? "intro:open" : "intro:closed");
   },
 }));
 
