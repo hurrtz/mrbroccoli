@@ -48,6 +48,19 @@ the complete Play Store translations are kept in a dedicated file under
 
 ### Fixed
 
+- Keep a model download running when the phone sleeps or you leave the app. The
+  transfer ran only while the app was in front, so a screen timeout under
+  battery saver dropped a multi-gigabyte download after about a minute, and
+  switching to another app dropped it at once. Downloads now hold the screen
+  awake and continue in the background until they finish.
+- A running download can now be cancelled from the button that started it,
+  instead of only by clearing app data.
+- Stop a single test run under battery saver from ruling out on-device setup
+  for good. A model tested while the phone was throttled or in power saving was
+  recorded as too slow for the phone permanently, and once every candidate had
+  been tested that way the app reported that the phone could not run a local
+  setup at all, and kept reporting it after a restart. Those results are now
+  retried rather than held against the phone.
 - Play an example again after switching the introduction's language. The first
   language change left every later example silent with nothing to indicate why.
 - Show the message field whenever the voice control cannot be pressed, and

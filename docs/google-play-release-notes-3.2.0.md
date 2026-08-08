@@ -1,95 +1,95 @@
 <en-US>
-The setup wizards are gone. The app now opens straight into the conversation, and a short introduction explains what it needs to run, what is optional, and what Premium adds. It opens with a spoken example in your language, and you can hear the app in any of its 19 languages before setting speech up. Every step leads to the settings page that does the work. Conversations now live in a database, so branching, deleting, and restoring a backup can no longer stop halfway.
+The setup wizards are gone. The app opens straight into the conversation, and a short introduction explains what it needs to run, what is optional, and what Premium adds, with a spoken example in any of its 19 languages. On-device model downloads now keep running when the screen sleeps or you leave the app, can be cancelled, and one test in battery saver no longer rules your phone out for good. Conversations moved to a database.
 </en-US>
 
 <ar>
-اختفت معالجات الإعداد. يفتح التطبيق الآن على المحادثة مباشرة، ومقدّمة قصيرة تشرح ما يلزم لتشغيله وما هو اختياري وما تضيفه النسخة المميزة. تبدأ بمثال منطوق بلغتك، ويمكنك سماع التطبيق بأي من لغاته الـ19 قبل إعداد الصوت. كل خطوة تقود إلى صفحة الإعدادات التي تنجز العمل. تُحفظ المحادثات الآن في قاعدة بيانات، فلم يعد التفريع والحذف واستعادة النسخة الاحتياطية يتوقف في منتصفه.
+اختفت معالجات الإعداد. يفتح التطبيق على المحادثة مباشرة، ومقدّمة قصيرة تشرح ما يلزم لتشغيله وما هو اختياري وما تضيفه النسخة المميزة، مع مثال منطوق بأي من لغاته الـ19. تنزيلات النماذج تستمر الآن عند إطفاء الشاشة أو مغادرة التطبيق، ويمكن إلغاؤها، ولم يعد اختبار واحد في وضع توفير الطاقة يستبعد هاتفك نهائيًا. انتقلت المحادثات إلى قاعدة بيانات.
 </ar>
 
 <cs-CZ>
-Průvodci nastavením zmizeli. Aplikace se teď otevře rovnou do konverzace a krátký úvod vysvětlí, co potřebuje k běhu, co je volitelné a co přidává Premium. Začíná mluvenou ukázkou ve tvém jazyce a aplikaci si můžeš poslechnout v kterémkoli z 19 jazyků, než nastavíš řeč. Každý krok vede na tu stránku nastavení, která věc skutečně udělá. Konverzace jsou nově v databázi, takže větvení, mazání ani obnova zálohy už se nezastaví v půlce.
+Průvodci nastavením zmizeli. Aplikace se otevře rovnou do konverzace a krátký úvod vysvětlí, co potřebuje k běhu, co je volitelné a co přidává Premium, s mluvenou ukázkou v kterémkoli z 19 jazyků. Stahování modelů teď pokračuje i při zhasnuté obrazovce nebo po přepnutí aplikace, jde zrušit a jeden test v úsporném režimu už telefon nevyřadí natrvalo. Konverzace jsou v databázi.
 </cs-CZ>
 
 <de-DE>
-Die Einrichtungsassistenten sind weg. Die App öffnet jetzt direkt das Gespräch, und eine kurze Einführung erklärt, was sie zum Laufen braucht, was optional ist und was Premium hinzufügt. Sie beginnt mit einem gesprochenen Beispiel in deiner Sprache, und du kannst die App in allen 19 Sprachen hören, bevor du Sprache einrichtest. Jeder Schritt führt auf die passende Einstellungsseite. Gespräche liegen jetzt in einer Datenbank: Verzweigen, Löschen und Wiederherstellen bricht nicht mehr ab.
+Die Einrichtungsassistenten sind weg. Die App öffnet direkt das Gespräch, und eine kurze Einführung erklärt, was sie braucht, was optional ist und was Premium hinzufügt – mit gesprochenem Beispiel in allen 19 Sprachen. Modell-Downloads laufen jetzt weiter, wenn der Bildschirm ausgeht oder du die App verlässt, lassen sich abbrechen, und ein Test im Energiesparmodus schließt dein Telefon nicht mehr dauerhaft aus.
 </de-DE>
 
 <en-AU>
-The setup wizards are gone. The app now opens straight into the conversation, and a short introduction explains what it needs to run, what is optional, and what Premium adds. It opens with a spoken example in your language, and you can hear the app in any of its 19 languages before setting speech up. Every step leads to the settings page that does the work. Conversations now live in a database, so branching, deleting, and restoring a backup can no longer stop halfway.
+The setup wizards are gone. The app opens straight into the conversation, and a short introduction explains what it needs to run, what is optional, and what Premium adds, with a spoken example in any of its 19 languages. On-device model downloads now keep running when the screen sleeps or you leave the app, can be cancelled, and one test in battery saver no longer rules your phone out for good. Conversations moved to a database.
 </en-AU>
 
 <en-CA>
-The setup wizards are gone. The app now opens straight into the conversation, and a short introduction explains what it needs to run, what is optional, and what Premium adds. It opens with a spoken example in your language, and you can hear the app in any of its 19 languages before setting speech up. Every step leads to the settings page that does the work. Conversations now live in a database, so branching, deleting, and restoring a backup can no longer stop halfway.
+The setup wizards are gone. The app opens straight into the conversation, and a short introduction explains what it needs to run, what is optional, and what Premium adds, with a spoken example in any of its 19 languages. On-device model downloads now keep running when the screen sleeps or you leave the app, can be cancelled, and one test in battery saver no longer rules your phone out for good. Conversations moved to a database.
 </en-CA>
 
 <en-GB>
-The setup wizards are gone. The app now opens straight into the conversation, and a short introduction explains what it needs to run, what is optional, and what Premium adds. It opens with a spoken example in your language, and you can hear the app in any of its 19 languages before setting speech up. Every step leads to the settings page that does the work. Conversations now live in a database, so branching, deleting, and restoring a backup can no longer stop halfway.
+The setup wizards are gone. The app opens straight into the conversation, and a short introduction explains what it needs to run, what is optional, and what Premium adds, with a spoken example in any of its 19 languages. On-device model downloads now keep running when the screen sleeps or you leave the app, can be cancelled, and one test in battery saver no longer rules your phone out for good. Conversations moved to a database.
 </en-GB>
 
 <es-ES>
-Se acabaron los asistentes de configuración. La app abre directamente en la conversación y una breve introducción explica qué necesita para funcionar, qué es opcional y qué añade Premium. Empieza con un ejemplo hablado en tu idioma y puedes oír la app en cualquiera de sus 19 idiomas antes de configurar la voz. Cada paso lleva a la página de ajustes que hace el trabajo. Las conversaciones ya viven en una base de datos, así que ramificar, borrar y restaurar una copia no se queda a medias.
+Se acabaron los asistentes de configuración. La app abre directamente en la conversación y una breve introducción explica qué necesita, qué es opcional y qué añade Premium, con un ejemplo hablado en cualquiera de sus 19 idiomas. Las descargas de modelos siguen ahora con la pantalla apagada o al salir de la app, pueden cancelarse, y una prueba en ahorro de batería ya no descarta tu teléfono para siempre.
 </es-ES>
 
 <es-US>
-Se acabaron los asistentes de configuración. La app abre directamente en la conversación y una breve introducción explica qué necesita para funcionar, qué es opcional y qué agrega Premium. Empieza con un ejemplo hablado en tu idioma y puedes oír la app en cualquiera de sus 19 idiomas antes de configurar la voz. Cada paso lleva a la página de ajustes que hace el trabajo. Las conversaciones ya viven en una base de datos, así que ramificar, borrar y restaurar una copia no se queda a medias.
+Se acabaron los asistentes de configuración. La app abre directamente en la conversación y una breve introducción explica qué necesita, qué es opcional y qué agrega Premium, con un ejemplo hablado en cualquiera de sus 19 idiomas. Las descargas de modelos siguen ahora con la pantalla apagada o al salir de la app, pueden cancelarse, y una prueba en ahorro de batería ya no descarta tu teléfono para siempre.
 </es-US>
 
 <fr-CA>
-Fini les assistants de configuration. L'app s'ouvre maintenant directement sur la conversation, et une courte introduction explique ce qu'il lui faut pour fonctionner, ce qui est facultatif et ce qu'ajoute Premium. Elle commence par un exemple parlé dans ta langue, et tu peux entendre l'app dans ses 19 langues avant de configurer la voix. Chaque étape mène à la bonne page de réglages. Les conversations sont dans une base de données : ramifier, supprimer et restaurer ne s'arrête plus à mi-chemin.
+Fini les assistants de configuration. L'app s'ouvre directement sur la conversation, et une courte introduction explique ce qu'il lui faut, ce qui est facultatif et ce qu'ajoute Premium, avec un exemple parlé dans ses 19 langues. Les téléchargements de modèles continuent maintenant écran éteint ou app quittée, peuvent être annulés, et un test en économie d'énergie n'écarte plus ton téléphone.
 </fr-CA>
 
 <fr-FR>
-Fini les assistants de configuration. L'app s'ouvre maintenant directement sur la conversation, et une courte introduction explique ce qu'il lui faut pour fonctionner, ce qui est facultatif et ce qu'ajoute Premium. Elle commence par un exemple parlé dans ta langue, et tu peux entendre l'app dans ses 19 langues avant de configurer la voix. Chaque étape mène à la bonne page de réglages. Les conversations sont dans une base de données : ramifier, supprimer et restaurer ne s'arrête plus à mi-chemin.
+Fini les assistants de configuration. L'app s'ouvre directement sur la conversation, et une courte introduction explique ce qu'il lui faut, ce qui est facultatif et ce qu'ajoute Premium, avec un exemple parlé dans ses 19 langues. Les téléchargements de modèles continuent maintenant écran éteint ou app quittée, peuvent être annulés, et un test en économie d'énergie n'écarte plus ton téléphone.
 </fr-FR>
 
 <hi-IN>
-सेटअप विज़ार्ड हट गए हैं। ऐप अब सीधे बातचीत पर खुलता है, और एक छोटा परिचय बताता है कि चलने के लिए क्या ज़रूरी है, क्या वैकल्पिक है और प्रीमियम क्या जोड़ता है। यह आपकी भाषा में एक बोले हुए उदाहरण से शुरू होता है, और आवाज़ सेट करने से पहले आप ऐप को उसकी 19 भाषाओं में से किसी में भी सुन सकते हैं। हर चरण उसी सेटिंग पेज पर ले जाता है जो काम करता है। बातचीत अब डेटाबेस में रहती है, इसलिए शाखा बनाना, हटाना और बैकअप बहाल करना बीच में नहीं रुकता।
+सेटअप विज़ार्ड हट गए हैं। ऐप सीधे बातचीत पर खुलता है, और एक छोटा परिचय बताता है कि क्या ज़रूरी है, क्या वैकल्पिक है और प्रीमियम क्या जोड़ता है — इसकी 19 भाषाओं में बोले हुए उदाहरण के साथ। मॉडल डाउनलोड अब स्क्रीन बंद होने या ऐप छोड़ने पर भी चलते रहते हैं, रद्द किए जा सकते हैं, और बैटरी सेवर में एक टेस्ट अब आपके फ़ोन को हमेशा के लिए बाहर नहीं करता।
 </hi-IN>
 
 <hu-HU>
-A beállítási varázslók eltűntek. Az alkalmazás most egyenesen a beszélgetésre nyílik, egy rövid bevezető pedig elmondja, mi kell a működéséhez, mi az, ami nem kötelező, és mit ad hozzá a Prémium. Beszélt példával indul a te nyelveden, és a beszéd beállítása előtt mind a 19 nyelven meghallgathatod. Minden lépés arra a beállítási oldalra visz, amelyik el is végzi a dolgot. A beszélgetések mostantól adatbázisban vannak, így az elágazás, a törlés és a visszaállítás nem áll meg félúton.
+A beállítási varázslók eltűntek. Az alkalmazás egyenesen a beszélgetésre nyílik, egy rövid bevezető pedig elmondja, mi kell hozzá, mi nem kötelező, és mit ad a Prémium – beszélt példával mind a 19 nyelven. A modellletöltések most kikapcsolt képernyővel és az appból kilépve is futnak, megszakíthatók, és egyetlen energiatakarékos teszt nem zárja ki véglegesen a telefonodat.
 </hu-HU>
 
 <it-IT>
-Le procedure guidate di configurazione non ci sono più. L'app ora si apre direttamente sulla conversazione e una breve introduzione spiega cosa serve per farla funzionare, cosa è facoltativo e cosa aggiunge Premium. Inizia con un esempio parlato nella tua lingua e puoi sentire l'app in tutte le sue 19 lingue prima di configurare la voce. Ogni passo porta alla pagina di impostazioni giusta. Le conversazioni ora stanno in un database: ramificare, eliminare e ripristinare non si ferma a metà.
+Le procedure guidate di configurazione non ci sono più. L'app si apre direttamente sulla conversazione e una breve introduzione spiega cosa serve, cosa è facoltativo e cosa aggiunge Premium, con un esempio parlato in tutte le sue 19 lingue. I download dei modelli proseguono ora a schermo spento o uscendo dall'app, si possono annullare, e un test in risparmio energetico non esclude più il telefono.
 </it-IT>
 
 <ja-JP>
-セットアップウィザードはなくなりました。アプリは会話画面から直接始まり、短い紹介が、動かすのに何が必要か、何が任意か、プレミアムで何が増えるかを説明します。あなたの言語の音声例から始まり、音声を設定する前に19言語すべてで聞くことができます。どの手順も、実際に作業を行う設定ページへ進みます。会話はデータベースに保存されるようになったので、分岐・削除・バックアップの復元が途中で止まることはありません。
+セットアップウィザードはなくなりました。アプリは会話画面から直接始まり、短い紹介が必要なもの、任意のもの、プレミアムで増えるものを説明します。19言語すべてで音声例を聞けます。モデルのダウンロードは画面が消えてもアプリを離れても続き、取り消すこともでき、省電力中の一度のテストで端末が恒久的に除外されることもなくなりました。会話はデータベースに保存されます。
 </ja-JP>
 
 <pl-PL>
-Kreatory konfiguracji zniknęły. Aplikacja otwiera się teraz od razu na rozmowie, a krótkie wprowadzenie wyjaśnia, czego potrzebuje do działania, co jest opcjonalne i co dodaje Premium. Zaczyna się od mówionego przykładu w twoim języku, a przed skonfigurowaniem mowy możesz posłuchać aplikacji w każdym z 19 języków. Każdy krok prowadzi na właściwą stronę ustawień. Rozmowy są teraz w bazie danych, więc rozgałęzianie, usuwanie i przywracanie kopii nie zatrzyma się w połowie.
+Kreatory konfiguracji zniknęły. Aplikacja otwiera się od razu na rozmowie, a krótkie wprowadzenie wyjaśnia, czego potrzebuje, co jest opcjonalne i co dodaje Premium, z mówionym przykładem w każdym z 19 języków. Pobieranie modeli działa teraz przy wygaszonym ekranie i po wyjściu z aplikacji, można je anulować, a jeden test w trybie oszczędzania nie wyklucza już telefonu na stałe.
 </pl-PL>
 
 <pt-BR>
-Os assistentes de configuração acabaram. O app agora abre direto na conversa, e uma breve introdução explica o que ele precisa para funcionar, o que é opcional e o que o Premium acrescenta. Começa com um exemplo falado no seu idioma, e você pode ouvir o app em qualquer um dos seus 19 idiomas antes de configurar a voz. Cada passo leva à página de ajustes que faz o trabalho. As conversas agora ficam em um banco de dados, então ramificar, excluir e restaurar não para no meio.
+Os assistentes de configuração acabaram. O app abre direto na conversa, e uma breve introdução explica o que ele precisa, o que é opcional e o que o Premium acrescenta, com um exemplo falado em qualquer um dos 19 idiomas. Os downloads de modelos agora continuam com a tela apagada ou ao sair do app, podem ser cancelados, e um teste no modo economia não descarta mais seu telefone.
 </pt-BR>
 
 <pt-PT>
-Os assistentes de configuração acabaram. A aplicação abre agora diretamente na conversa, e uma breve introdução explica o que precisa para funcionar, o que é opcional e o que o Premium acrescenta. Começa com um exemplo falado no teu idioma, e podes ouvir a aplicação em qualquer um dos seus 19 idiomas antes de configurares a voz. Cada passo leva à página de definições que faz o trabalho. As conversas ficam agora numa base de dados, por isso ramificar, apagar e restaurar não para a meio.
+Os assistentes de configuração acabaram. A aplicação abre diretamente na conversa, e uma breve introdução explica o que precisa, o que é opcional e o que o Premium acrescenta, com um exemplo falado em qualquer um dos 19 idiomas. As transferências de modelos continuam agora com o ecrã apagado ou ao sair da aplicação, podem ser canceladas, e um teste em poupança de energia já não exclui o telemóvel.
 </pt-PT>
 
 <ru-RU>
-Мастера настройки исчезли. Приложение теперь открывается сразу на разговоре, а короткое введение объясняет, что нужно для работы, что необязательно и что добавляет Premium. Оно начинается с озвученного примера на твоём языке, и перед настройкой речи приложение можно послушать на любом из 19 языков. Каждый шаг ведёт на ту страницу настроек, которая и делает дело. Разговоры теперь в базе данных, поэтому ветвление, удаление и восстановление копии не останавливаются на полпути.
+Мастера настройки исчезли. Приложение открывается сразу на разговоре, а короткое введение объясняет, что нужно, что необязательно и что добавляет Premium, с озвученным примером на любом из 19 языков. Загрузка моделей теперь продолжается при погасшем экране и после выхода из приложения, её можно отменить, а один тест в режиме энергосбережения больше не исключает телефон навсегда.
 </ru-RU>
 
 <sv-SE>
-Installationsguiderna är borta. Appen öppnas nu direkt i samtalet, och en kort introduktion förklarar vad den behöver för att fungera, vad som är valfritt och vad Premium lägger till. Den börjar med ett talat exempel på ditt språk, och du kan höra appen på alla dess 19 språk innan du ställer in tal. Varje steg leder till den inställningssida som faktiskt gör jobbet. Samtalen ligger nu i en databas, så att förgrena, radera och återställa en säkerhetskopia inte kan stanna halvvägs.
+Installationsguiderna är borta. Appen öppnas direkt i samtalet, och en kort introduktion förklarar vad som behövs, vad som är valfritt och vad Premium lägger till, med ett talat exempel på alla 19 språk. Modellnedladdningar fortsätter nu med släckt skärm eller när du lämnar appen, går att avbryta, och ett test i batterisparläge utesluter inte längre telefonen för gott.
 </sv-SE>
 
 <tr-TR>
-Kurulum sihirbazları kalktı. Uygulama artık doğrudan sohbete açılıyor ve kısa bir tanıtım çalışması için nelerin gerektiğini, nelerin isteğe bağlı olduğunu ve Premium'un ne kattığını anlatıyor. Kendi dilinde sesli bir örnekle başlıyor ve konuşmayı ayarlamadan önce uygulamayı 19 dilinin herhangi birinde dinleyebilirsin. Her adım, işi gerçekten yapan ayar sayfasına götürüyor. Sohbetler artık bir veritabanında; dallandırma, silme ve yedeği geri yükleme yarıda kalmıyor.
+Kurulum sihirbazları kalktı. Uygulama doğrudan sohbete açılıyor ve kısa bir tanıtım neyin gerektiğini, neyin isteğe bağlı olduğunu ve Premium'un ne kattığını anlatıyor; 19 dilin herhangi birinde sesli örnek var. Model indirmeleri artık ekran kapalıyken ya da uygulamadan çıkınca da sürüyor, iptal edilebiliyor ve pil tasarrufundaki tek bir test telefonunu kalıcı olarak elemiyor.
 </tr-TR>
 
 <uk>
-Майстрів налаштування більше немає. Застосунок тепер відкривається одразу на розмові, а короткий вступ пояснює, що потрібно для роботи, що необовʼязкове і що додає Premium. Він починається з озвученого прикладу твоєю мовою, і перед налаштуванням мовлення застосунок можна послухати будь-якою з 19 мов. Кожен крок веде на ту сторінку налаштувань, яка справді виконує роботу. Розмови тепер у базі даних, тож розгалуження, видалення й відновлення копії не спиняються на півдорозі.
+Майстрів налаштування більше немає. Застосунок відкривається одразу на розмові, а короткий вступ пояснює, що потрібно, що необовʼязкове і що додає Premium, з озвученим прикладом будь-якою з 19 мов. Завантаження моделей тепер триває з вимкненим екраном і після виходу із застосунку, його можна скасувати, а один тест в режимі енергозбереження більше не виключає телефон назавжди.
 </uk>
 
 <ur>
-سیٹ اپ وزرڈز ختم ہو گئے۔ ایپ اب سیدھا گفتگو پر کھلتی ہے، اور ایک مختصر تعارف بتاتا ہے کہ چلنے کے لیے کیا درکار ہے، کیا اختیاری ہے اور پریمیم کیا شامل کرتا ہے۔ یہ آپ کی زبان میں بولی گئی مثال سے شروع ہوتا ہے، اور آواز ترتیب دینے سے پہلے آپ ایپ کو اس کی 19 زبانوں میں سے کسی میں بھی سن سکتے ہیں۔ ہر مرحلہ اسی سیٹنگز صفحے پر لے جاتا ہے جو کام کرتا ہے۔ گفتگو اب ڈیٹابیس میں رہتی ہے، اس لیے شاخ بنانا، حذف کرنا اور بیک اپ بحال کرنا بیچ میں نہیں رکتا۔
+سیٹ اپ وزرڈز ختم ہو گئے۔ ایپ سیدھا گفتگو پر کھلتی ہے، اور ایک مختصر تعارف بتاتا ہے کہ کیا درکار ہے، کیا اختیاری ہے اور پریمیم کیا شامل کرتا ہے، اس کی 19 زبانوں میں سے کسی میں بولی گئی مثال کے ساتھ۔ ماڈل ڈاؤن لوڈ اب اسکرین بند ہونے یا ایپ چھوڑنے پر بھی جاری رہتے ہیں، منسوخ کیے جا سکتے ہیں، اور بیٹری سیور میں ایک ٹیسٹ اب آپ کے فون کو ہمیشہ کے لیے خارج نہیں کرتا۔
 </ur>
 
 <zh-CN>
-设置向导没有了。应用现在直接打开对话，一段简短的介绍会说明它运行需要什么、哪些是可选的，以及高级版增加了什么。介绍以你所用语言的语音示例开始，在设置语音之前，你可以用它的 19 种语言中的任意一种听听效果。每一步都会带你到真正完成这件事的设置页面。对话现在保存在数据库中，因此分支、删除和恢复备份不会再中途停下。
+设置向导没有了。应用直接打开对话，一段简短的介绍会说明运行需要什么、哪些是可选的，以及高级版增加了什么，并可用 19 种语言中的任意一种听到语音示例。设备端模型下载现在在息屏或离开应用后仍会继续，可以取消，而且省电模式下的一次测试不再永久排除你的手机。对话保存在数据库中。
 </zh-CN>
