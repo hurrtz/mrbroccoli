@@ -65,6 +65,14 @@ framework or hiding platform behavior behind excessive abstraction.
   only `"sheet"`. Every dialog therefore depends on a `SafeAreaProvider`
   ancestor; in this app that is supplied by Expo Router's `ExpoRoot`. Do not
   remove that assumption without adding an explicit provider.
+- That ancestor only reaches surfaces presented inside the root window. A
+  React Native `Modal` with `presentationStyle="fullScreen"` is its own view
+  controller on iOS, outside it, where insets resolve to zero: a header lands
+  under the Dynamic Island and a footer under the home indicator. Every
+  full-screen modal therefore mounts its own `SafeAreaProvider`, seeded with
+  `initialWindowMetrics` so the first frame is not empty while it measures.
+  Transparent dialogs are presented over the root window and need none of
+  this, which is why only the two full-screen surfaces carry it.
 - **Assumption:** the sheet's motion is only partly pinned by tests. They prove
   the animated `transform` and `opacity` are present in sheet layout, absent in
   dialog layout, and that the container's own animation stays `"none"`, but

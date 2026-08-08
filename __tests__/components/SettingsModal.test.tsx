@@ -43,6 +43,10 @@ const NativeDialogType = NativeDialog as unknown as React.ComponentType<any>;
 const hiddenIconQuery = { includeHiddenElements: true } as const;
 
 jest.mock("react-native-safe-area-context", () => ({
+  initialWindowMetrics: null,
+  // Screens presented in a full-screen modal carry their own provider, because
+  // the app-level one does not reach into that view controller on iOS.
+  SafeAreaProvider: ({ children }: React.PropsWithChildren) => children,
   SafeAreaView: ({ children, ...props }: React.PropsWithChildren) => {
     const React = require("react");
     const { View } = require("react-native");
