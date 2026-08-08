@@ -10,31 +10,41 @@ the complete Play Store translations are kept in a dedicated file under
 
 ## Unreleased
 
-- The introduction is now a full screen you can swipe through in either
-  direction, covering what the app needs to run, what is optional and why, and
-  what Premium adds. It opens with a spoken example in your language, and the
-  speaking step lets you hear any of the app's languages before deciding.
-- Every action in the introduction now opens the settings page that does the
-  work. Choosing to install the on-device model opens the page that downloads
-  and verifies it, rather than closing the introduction with nothing to show
-  for it. Connecting your own provider opens the Premium purchase over the
-  introduction, so backing out of the purchase leaves you on the page you were
-  reading.
-- The introduction now follows your light or dark theme instead of always being
-  dark. The invitation on the home screen keeps a colour of its own so it still
-  stands out, and it only offers to be dismissed once you have opened it at
-  least once. Buying Premium removes it.
-- Web Search now sits under the button it affects rather than above it, and
-  controls that cannot be used at all — Web Search with no provider configured,
-  and attaching an image on a route that cannot take one — are left out rather
-  than shown greyed out.
-- Replaced the setup wizards with an introduction you can skip. The app now
-  opens straight into the workspace, with a dismissible banner offering a short
-  tour and a choice between connecting your own provider or installing the
-  on-device models.
+## 3.2.0 - 2026-08-08
+
+### Added
+
+- A six-step introduction, reachable from a dismissible invitation above your
+  conversation. It covers what the app needs to run, what is optional and why,
+  and what Premium adds, and you can swipe through it in either direction or
+  leave at any point. It opens with a spoken example in your language, and the
+  speaking step lets you hear the app in any of its nineteen languages before
+  deciding whether to set speech up. The examples are part of the app, so they
+  work offline and on first launch.
+
+### Changed
+
+- Replaced the setup wizards. The app now opens straight into the workspace
+  instead of requiring a multi-gigabyte download before anything can be seen.
+  Setting up on-device models or your own provider is still one action away,
+  and the introduction opens by itself if a turn is attempted with nothing
+  configured, so the microphone is never a dead end.
 - Conversations are now stored in a database rather than in individual files.
   Branching, deleting, and restoring a backup either complete or leave nothing
   behind, instead of being able to stop halfway.
+- Every action in the introduction opens the settings page that does the work.
+  Choosing to install the on-device model opens the page that downloads and
+  verifies it, rather than closing the introduction with nothing to show for
+  it. Connecting your own provider opens the Premium purchase over the
+  introduction, so backing out of the purchase leaves you where you were.
+- The introduction follows your light or dark theme. The invitation on the home
+  screen keeps a colour of its own so it still stands out, and it only offers
+  to be dismissed once you have opened it at least once. Buying Premium removes
+  it. You can bring it back under App & diagnostics.
+- Web Search now sits under the button it affects rather than above it, and
+  controls that cannot be used at all -- Web Search with no provider configured,
+  and attaching an image on a route that cannot take one -- are left out rather
+  than shown greyed out.
 
 ### Fixed
 
