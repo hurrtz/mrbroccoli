@@ -8,6 +8,9 @@ import { fireEvent, waitFor } from "@testing-library/react-native";
  * lock to the surface that actually downloads.
  */
 
+const mockBeginDownload = jest.fn(() => Promise.resolve(true));
+const mockEndDownload = jest.fn(() => Promise.resolve(true));
+
 const mockActivateKeepAwake = jest.fn(() => Promise.resolve());
 const mockDeactivateKeepAwake = jest.fn(() => Promise.resolve());
 
@@ -36,7 +39,9 @@ const mockDownloadLocalModel = jest.fn(
 
 jest.mock("../../src/services/localModelManager", () => ({
   downloadLocalModel: (...args: unknown[]) =>
-    mockDownloadLocalModel(...(args as [])),
+    mockDownloadLocalModel(
+      ...(args as [string, { abortSignal?: AbortSignal }?]),
+    ),
   removeLocalModel: jest.fn(() => Promise.resolve()),
 }));
 
@@ -109,6 +114,17 @@ import { OnDeviceSettingsPage } from "../../src/features/settings/pages/OnDevice
 import { LOCAL_MODEL_CATALOG } from "../../src/constants/localModels";
 import { DEFAULT_SETTINGS } from "../../src/types";
 import { renderWithProviders } from "../test-utils/renderWithProviders";
+import { NativeModules, Platform } from "react-native";
+
+// The hook reads the module and the platform at call time, so installing the
+// stub here is enough and avoids mocking the bridge itself.
+(
+  NativeModules as unknown as Record<string, unknown>
+).MrBroccoliModelDownload = {
+  beginDownload: (...args: unknown[]) => mockBeginDownload(...(args as [])),
+  endDownload: (...args: unknown[]) => mockEndDownload(...(args as [])),
+};
+Object.defineProperty(Platform, "OS", { configurable: true, value: "android" });
 
 const kokoroModel = {
   installed: false,
@@ -143,7 +159,7 @@ beforeEach(() => {
 describe("on-device model downloads", () => {
   it("holds the wake lock for as long as a download runs", async () => {
     const firstLlm = LOCAL_MODEL_CATALOG.find(
-      (model) => model.capability === "llm" && model.id !== "kokoro-multilingual",
+      (model) => model.capability === "llm",
     );
     expect(firstLlm).toBeTruthy();
 
@@ -174,11 +190,32 @@ describe("on-device model downloads", () => {
     );
   });
 
+  it("runs the transfer under a foreground service so leaving the app cannot kill it", async () => {
+    // A wake lock only answers a sleeping screen while the app is in front.
+    // Switching away killed the transfer instantly.
+    const firstLlm = LOCAL_MODEL_CATALOG.find(
+      (model) => model.capability === "llm",
+    );
+    const screen = renderPage();
+    const downloadButton = await waitFor(() =>
+      screen.getAllByTestId(`on-device-download-${firstLlm?.id}`)[0],
+    );
+
+    fireEvent.press(downloadButton);
+
+    await waitFor(() => expect(mockBeginDownload).toHaveBeenCalled());
+    expect(mockEndDownload).not.toHaveBeenCalled();
+
+    mockResolveDownload?.();
+
+    await waitFor(() => expect(mockEndDownload).toHaveBeenCalled());
+  });
+
   it("turns the running download into a way out of it", async () => {
     // A multi-gigabyte transfer with no way to stop it is its own trap, and
     // the service has accepted an abort signal all along.
     const firstLlm = LOCAL_MODEL_CATALOG.find(
-      (model) => model.capability === "llm" && model.id !== "kokoro-multilingual",
+      (model) => model.capability === "llm",
     );
     const screen = renderPage();
     const downloadButton = await waitFor(() =>

@@ -270,6 +270,8 @@ const en = {
   onDeviceTestDevice: "Test this device again",
   onDeviceTestingDevice: "Testing this device…",
   onDeviceDownloadCancelled: "Download cancelled.",
+  onDeviceDownloadServiceTitle: "Downloading a model",
+  onDeviceDownloadServiceBody: "Keep this running until it finishes.",
   onDeviceDeviceReady: "Device check complete",
   onDeviceDeviceSummary: ({ memory, storage }: TranslationParams) =>
     `${memory} RAM · ${storage} free`,
@@ -307,6 +309,8 @@ export const onDeviceTranslations = {
     onDeviceTestDevice: "Gerät erneut testen",
     onDeviceTestingDevice: "Gerät wird getestet…",
     onDeviceDownloadCancelled: "تم إلغاء التنزيل.",
+    onDeviceDownloadServiceTitle: "تنزيل نموذج",
+    onDeviceDownloadServiceBody: "أبقِ هذا يعمل حتى ينتهي.",
     onDeviceDeviceReady: "Geräteprüfung abgeschlossen",
     onDeviceDeviceSummary: ({ memory, storage }) =>
       `${memory} RAM · ${storage} frei`,
@@ -339,6 +343,8 @@ export const onDeviceTranslations = {
     onDeviceTestDevice: "Перевірити пристрій знову",
     onDeviceTestingDevice: "Перевірка пристрою…",
     onDeviceDownloadCancelled: "Stahování zrušeno.",
+    onDeviceDownloadServiceTitle: "Stahování modelu",
+    onDeviceDownloadServiceBody: "Nech to běžet, dokud neskončí.",
     onDeviceDeviceReady: "Перевірку пристрою завершено",
     onDeviceDeviceSummary: ({ memory, storage }) =>
       `${memory} ОЗП · ${storage} вільно`,
@@ -371,6 +377,8 @@ export const onDeviceTranslations = {
     onDeviceTestDevice: "इस डिवाइस को फिर जाँचें",
     onDeviceTestingDevice: "डिवाइस की जाँच हो रही है…",
     onDeviceDownloadCancelled: "Download abgebrochen.",
+    onDeviceDownloadServiceTitle: "Modell wird geladen",
+    onDeviceDownloadServiceBody: "Lass das laufen, bis es fertig ist.",
     onDeviceDeviceReady: "डिवाइस जाँच पूरी हुई",
     onDeviceDeviceSummary: ({ memory, storage }) =>
       `${memory} RAM · ${storage} खाली`,
@@ -402,6 +410,8 @@ export const onDeviceTranslations = {
     onDeviceTestDevice: "Volver a probar el dispositivo",
     onDeviceTestingDevice: "Probando el dispositivo…",
     onDeviceDownloadCancelled: "Descarga cancelada.",
+    onDeviceDownloadServiceTitle: "Descargando un modelo",
+    onDeviceDownloadServiceBody: "Déjalo en marcha hasta que termine.",
     onDeviceDeviceReady: "Comprobación completada",
     onDeviceDeviceSummary: ({ memory, storage }) =>
       `${memory} RAM · ${storage} libres`,
@@ -434,6 +444,8 @@ export const onDeviceTranslations = {
     onDeviceTestDevice: "Retester cet appareil",
     onDeviceTestingDevice: "Test de l’appareil…",
     onDeviceDownloadCancelled: "Téléchargement annulé.",
+    onDeviceDownloadServiceTitle: "Téléchargement d'un modèle",
+    onDeviceDownloadServiceBody: "Laisse-le tourner jusqu'à la fin.",
     onDeviceDeviceReady: "Contrôle de l’appareil terminé",
     onDeviceDeviceSummary: ({ memory, storage }) =>
       `${memory} RAM · ${storage} disponibles`,
@@ -466,6 +478,8 @@ export const onDeviceTranslations = {
     onDeviceTestDevice: "Verifica di nuovo il dispositivo",
     onDeviceTestingDevice: "Verifica del dispositivo…",
     onDeviceDownloadCancelled: "डाउनलोड रद्द किया गया।",
+    onDeviceDownloadServiceTitle: "मॉडल डाउनलोड हो रहा है",
+    onDeviceDownloadServiceBody: "इसे पूरा होने तक चलने दें।",
     onDeviceDeviceReady: "Verifica del dispositivo completata",
     onDeviceDeviceSummary: ({ memory, storage }) =>
       `${memory} RAM · ${storage} liberi`,
@@ -498,6 +512,8 @@ export const onDeviceTranslations = {
     onDeviceTestDevice: "Testar novamente este dispositivo",
     onDeviceTestingDevice: "A testar o dispositivo…",
     onDeviceDownloadCancelled: "A letöltés megszakítva.",
+    onDeviceDownloadServiceTitle: "Modell letöltése",
+    onDeviceDownloadServiceBody: "Hagyd futni, amíg be nem fejeződik.",
     onDeviceDeviceReady: "Verificação do dispositivo concluída",
     onDeviceDeviceSummary: ({ memory, storage }) =>
       `${memory} RAM · ${storage} livres`,
@@ -530,6 +546,8 @@ export const onDeviceTranslations = {
     onDeviceTestDevice: "Testar este dispositivo novamente",
     onDeviceTestingDevice: "Testando o dispositivo…",
     onDeviceDownloadCancelled: "Download annullato.",
+    onDeviceDownloadServiceTitle: "Download di un modello",
+    onDeviceDownloadServiceBody: "Lascialo in esecuzione fino al termine.",
     onDeviceDeviceReady: "Verificação do dispositivo concluída",
     onDeviceDeviceSummary: ({ memory, storage }) =>
       `${memory} RAM · ${storage} livres`,
@@ -562,6 +580,8 @@ export const onDeviceTranslations = {
     onDeviceTestDevice: "Проверить устройство снова",
     onDeviceTestingDevice: "Проверка устройства…",
     onDeviceDownloadCancelled: "ダウンロードを取り消しました。",
+    onDeviceDownloadServiceTitle: "モデルをダウンロード中",
+    onDeviceDownloadServiceBody: "完了するまでそのままにしてください。",
     onDeviceDeviceReady: "Проверка устройства завершена",
     onDeviceDeviceSummary: ({ memory, storage }) =>
       `${memory} ОЗУ · ${storage} свободно`,
@@ -593,6 +613,8 @@ export const onDeviceTranslations = {
     onDeviceTestDevice: "重新测试此设备",
     onDeviceTestingDevice: "正在测试设备…",
     onDeviceDownloadCancelled: "Pobieranie anulowane.",
+    onDeviceDownloadServiceTitle: "Pobieranie modelu",
+    onDeviceDownloadServiceBody: "Zostaw to, aż się zakończy.",
     onDeviceDeviceReady: "设备检测完成",
     onDeviceDeviceSummary: ({ memory, storage }) =>
       `${memory} 内存 · ${storage} 可用`,
@@ -623,6 +645,8 @@ export const onDeviceTranslations = {
     onDeviceTestDevice: "اختبار هذا الجهاز مجددًا",
     onDeviceTestingDevice: "جارٍ اختبار الجهاز…",
     onDeviceDownloadCancelled: "Transferência cancelada.",
+    onDeviceDownloadServiceTitle: "A transferir um modelo",
+    onDeviceDownloadServiceBody: "Deixa a decorrer até terminar.",
     onDeviceDeviceReady: "اكتمل فحص الجهاز",
     onDeviceDeviceSummary: ({ memory, storage }) =>
       `${memory} ذاكرة · ${storage} متاحة`,
@@ -654,6 +678,8 @@ export const onDeviceTranslations = {
     onDeviceTestDevice: "この端末を再テスト",
     onDeviceTestingDevice: "端末をテスト中…",
     onDeviceDownloadCancelled: "Download cancelado.",
+    onDeviceDownloadServiceTitle: "Baixando um modelo",
+    onDeviceDownloadServiceBody: "Deixe rodando até terminar.",
     onDeviceDeviceReady: "端末チェック完了",
     onDeviceDeviceSummary: ({ memory, storage }) =>
       `${memory} RAM・空き ${storage}`,
@@ -685,6 +711,8 @@ export const onDeviceTranslations = {
     onDeviceTestDevice: "Eszköz újbóli tesztelése",
     onDeviceTestingDevice: "Eszköz tesztelése…",
     onDeviceDownloadCancelled: "Загрузка отменена.",
+    onDeviceDownloadServiceTitle: "Загрузка модели",
+    onDeviceDownloadServiceBody: "Не закрывайте, пока не завершится.",
     onDeviceDeviceReady: "Eszközellenőrzés kész",
     onDeviceDeviceSummary: ({ memory, storage }) =>
       `${memory} RAM · ${storage} szabad`,
@@ -717,6 +745,8 @@ export const onDeviceTranslations = {
     onDeviceTestDevice: "Otestovat zařízení znovu",
     onDeviceTestingDevice: "Testování zařízení…",
     onDeviceDownloadCancelled: "Nedladdningen avbröts.",
+    onDeviceDownloadServiceTitle: "Laddar ner en modell",
+    onDeviceDownloadServiceBody: "Låt det vara igång tills det är klart.",
     onDeviceDeviceReady: "Kontrola zařízení dokončena",
     onDeviceDeviceSummary: ({ memory, storage }) =>
       `${memory} RAM · ${storage} volné`,
@@ -748,6 +778,8 @@ export const onDeviceTranslations = {
     onDeviceTestDevice: "Przetestuj urządzenie ponownie",
     onDeviceTestingDevice: "Testowanie urządzenia…",
     onDeviceDownloadCancelled: "İndirme iptal edildi.",
+    onDeviceDownloadServiceTitle: "Model indiriliyor",
+    onDeviceDownloadServiceBody: "Bitene kadar çalışır durumda bırak.",
     onDeviceDeviceReady: "Kontrola urządzenia zakończona",
     onDeviceDeviceSummary: ({ memory, storage }) =>
       `${memory} RAM · ${storage} wolne`,
@@ -779,6 +811,8 @@ export const onDeviceTranslations = {
     onDeviceTestDevice: "Bu cihazı yeniden test et",
     onDeviceTestingDevice: "Cihaz test ediliyor…",
     onDeviceDownloadCancelled: "Завантаження скасовано.",
+    onDeviceDownloadServiceTitle: "Завантаження моделі",
+    onDeviceDownloadServiceBody: "Залиште це, доки не завершиться.",
     onDeviceDeviceReady: "Cihaz kontrolü tamamlandı",
     onDeviceDeviceSummary: ({ memory, storage }) =>
       `${memory} RAM · ${storage} boş`,
@@ -810,6 +844,8 @@ export const onDeviceTranslations = {
     onDeviceTestDevice: "Testa enheten igen",
     onDeviceTestingDevice: "Testar enheten…",
     onDeviceDownloadCancelled: "ڈاؤن لوڈ منسوخ کر دیا گیا۔",
+    onDeviceDownloadServiceTitle: "ماڈل ڈاؤن لوڈ ہو رہا ہے",
+    onDeviceDownloadServiceBody: "اسے مکمل ہونے تک چلنے دیں۔",
     onDeviceDeviceReady: "Enhetskontrollen är klar",
     onDeviceDeviceSummary: ({ memory, storage }) =>
       `${memory} RAM · ${storage} ledigt`,
@@ -840,6 +876,8 @@ export const onDeviceTranslations = {
     onDeviceTestDevice: "اس ڈیوائس کو دوبارہ جانچیں",
     onDeviceTestingDevice: "ڈیوائس کی جانچ جاری ہے…",
     onDeviceDownloadCancelled: "下载已取消。",
+    onDeviceDownloadServiceTitle: "正在下载模型",
+    onDeviceDownloadServiceBody: "请保持运行直到完成。",
     onDeviceDeviceReady: "ڈیوائس کی جانچ مکمل",
     onDeviceDeviceSummary: ({ memory, storage }) =>
       `${memory} ریم · ${storage} خالی`,

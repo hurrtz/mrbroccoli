@@ -154,6 +154,15 @@ sheet opens over the introduction and leaving it without buying returns to the
 step it was opened from: backing out of a purchase should not also cost someone
 the introduction they were part-way through.
 
+**Decision:** A model download holds a screen wake lock and runs under an
+Android `dataSync` foreground service for its whole duration, and can be
+cancelled from the control that started it. Downloads run inside the app
+process, including the ones the speech runtime fetches for itself, so Doze,
+battery saver, and an app switch each cut a multi-gigabyte transfer within
+about a minute. The wake lock alone only answers a sleeping screen while the
+app is in front. iOS needs no service: its long transfers already run on a
+background URL session.
+
 **Decision:** Every onboarding action opens the settings page that owns the
 work, not settings in general. The download action in particular opens the
 on-device page instead of starting a headless download: that page owns

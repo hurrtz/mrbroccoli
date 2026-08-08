@@ -18,6 +18,7 @@ import {
   type LocalModelId,
 } from "../../../constants/localModels";
 import { useKeepAwakeWhile } from "../../../hooks/useKeepAwakeWhile";
+import { useModelDownloadService } from "../../../hooks/useModelDownloadService";
 import { useLocalization } from "../../../i18n";
 import type { KokoroModelController } from "../../../hooks/useKokoroModel";
 import {
@@ -163,6 +164,13 @@ export function OnDeviceSettingsPage({
     busy?.action === "download" || busy?.action === "test",
     "mrbroccoli-on-device-models",
   );
+  // The wake lock only answers a sleeping screen while the app is in front.
+  // Leaving the app, or Doze under battery saver, cuts the transfer within
+  // about a minute, so the download also runs under a foreground service.
+  useModelDownloadService(busy?.action === "download", {
+    body: t("onDeviceDownloadServiceBody"),
+    title: t("onDeviceDownloadServiceTitle"),
+  });
   const [progress, setProgress] = React.useState<
     Partial<Record<LocalModelId, LocalModelDownloadProgress>>
   >({});

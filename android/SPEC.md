@@ -44,6 +44,12 @@ the shared layer; Kotlin modules expose narrow native capabilities.
   provide microphone/file signal levels and native rendering behavior.
 - `MrBroccoliVoiceTurnService` owns the foreground-service lifetime required
   for background voice-turn continuation and notification controls.
+- `MrBroccoliModelDownloadService` and its module keep the process running
+  while an on-device model downloads. It is a separate `dataSync` service
+  rather than a mode of the voice-turn service: the two have unrelated
+  lifetimes, and a download must not inherit media or microphone types it does
+  not use. Notification copy is passed in from JavaScript, which is where the
+  user's language lives.
 - `MrBroccoliVoiceLiveActivityModule` bridges native notification state and
   remote voice actions.
 - `MrBroccoliDiagnosticsModule` exposes device facts needed for local-model
