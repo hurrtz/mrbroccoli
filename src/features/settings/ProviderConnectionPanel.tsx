@@ -9,7 +9,11 @@ import {
   View,
 } from "react-native";
 
-import { SafeAreaView } from "react-native-safe-area-context";
+import {
+  initialWindowMetrics,
+  SafeAreaProvider,
+  SafeAreaView,
+} from "react-native-safe-area-context";
 import { Button, Input, List } from "../../design-system/NativeControls";
 
 import { getCatalogProviderEntry } from "../../catalog";
@@ -174,58 +178,63 @@ export function ProviderAboutModal({
       supportedOrientations={APP_MODAL_ORIENTATIONS}
       onRequestClose={onClose}
     >
-      <SafeAreaView
-        testID="provider-about-modal"
-        edges={["top", "right", "bottom", "left"]}
-        accessibilityViewIsModal
-        style={[
-          styles.providerAboutModal,
-          { backgroundColor: colors.background },
-        ]}
-      >
-        <View
+      {/* Its own provider: a fullScreen modal is a separate view controller on
+          iOS, where the app-level provider does not reach and insets read as
+          zero. */}
+      <SafeAreaProvider initialMetrics={initialWindowMetrics}>
+        <SafeAreaView
+          testID="provider-about-modal"
+          edges={["top", "right", "bottom", "left"]}
+          accessibilityViewIsModal
           style={[
-            styles.providerAboutHeader,
-            { borderBottomColor: colors.border },
+            styles.providerAboutModal,
+            { backgroundColor: colors.background },
           ]}
         >
-          <Text
-            accessibilityRole="header"
-            style={[styles.providerAboutTitle, { color: colors.text }]}
+          <View
+            style={[
+              styles.providerAboutHeader,
+              { borderBottomColor: colors.border },
+            ]}
           >
-            {`${PROVIDER_LABELS[provider]} · ${t("aboutThisProvider")}`}
-          </Text>
-          <IconButton
-            accessibilityLabel={t("dismiss")}
-            iconNode={
-              <PhosphorIcon
-                name="close"
-                size="control"
-                color={colors.textSecondary}
-              />
-            }
-            onPress={onClose}
-          />
-        </View>
-        <ScrollView
-          testID="provider-about-scroll"
-          style={styles.providerAboutScroll}
-          contentContainerStyle={styles.providerAboutContent}
-          showsVerticalScrollIndicator
-        >
-          {[...summaryLines, ...activeModels].map((line) => (
             <Text
-              key={line}
-              style={[
-                styles.providerAboutText,
-                { color: colors.textSecondary },
-              ]}
+              accessibilityRole="header"
+              style={[styles.providerAboutTitle, { color: colors.text }]}
             >
-              {line}
+              {`${PROVIDER_LABELS[provider]} · ${t("aboutThisProvider")}`}
             </Text>
-          ))}
-        </ScrollView>
-      </SafeAreaView>
+            <IconButton
+              accessibilityLabel={t("dismiss")}
+              iconNode={
+                <PhosphorIcon
+                  name="close"
+                  size="control"
+                  color={colors.textSecondary}
+                />
+              }
+              onPress={onClose}
+            />
+          </View>
+          <ScrollView
+            testID="provider-about-scroll"
+            style={styles.providerAboutScroll}
+            contentContainerStyle={styles.providerAboutContent}
+            showsVerticalScrollIndicator
+          >
+            {[...summaryLines, ...activeModels].map((line) => (
+              <Text
+                key={line}
+                style={[
+                  styles.providerAboutText,
+                  { color: colors.textSecondary },
+                ]}
+              >
+                {line}
+              </Text>
+            ))}
+          </ScrollView>
+        </SafeAreaView>
+      </SafeAreaProvider>
     </Modal>
   );
 }

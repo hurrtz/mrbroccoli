@@ -1,0 +1,103 @@
+{
+  "projectId": "c94072aa-f6df-4483-895f-f7a1209025f8",
+  "shape": "package",
+  "pkg": "mrbroccoli",
+  "globalName": "MrBroccoli",
+  "srcDir": "../src",
+  "tsconfig": "tsconfig.designsync.json",
+  "cssEntry": "tokens.css",
+  "readmeHeader": ".design-sync/conventions.md",
+  "extraFonts": ["fonts.css"],
+  "guidelinesGlob": [
+    "../docs/product-experience-redesign.md",
+    "../docs/native-controls.md",
+    "../src/design-system/SPEC.md",
+    "../src/features/settings/SPEC.md"
+  ],
+  "docsDir": "docs",
+  "docsMap": {
+    "ChatBubble": "docs/ChatBubble.md",
+    "ChatTranscript": "docs/ChatTranscript.md",
+    "MessageImageAttachments": "docs/MessageImageAttachments.md",
+    "ConversationDrawer": "docs/ConversationDrawer.md",
+    "ConversationMemoryModal": "docs/ConversationMemoryModal.md",
+    "AppWordmark": "docs/AppWordmark.md",
+    "IntroBanner": "docs/IntroBanner.md",
+    "Picker": "docs/Picker.md",
+    "PremiumUpgradeModal": "docs/PremiumUpgradeModal.md",
+    "ResponseModeToggle": "docs/ResponseModeToggle.md",
+    "Toast": "docs/Toast.md",
+    "ProviderIcon": "docs/ProviderIcon.md",
+    "LocalModelPerformanceSummary": "docs/LocalModelPerformanceSummary.md"
+  },
+  "provider": {
+    "component": "ThemeProvider",
+    "props": { "mode": "dark" },
+    "inner": {
+      "component": "LocalizationProvider",
+      "props": { "language": "en" },
+      "inner": {
+        "component": "SafeAreaProvider",
+        "inner": { "component": "PremiumEntitlementProvider" }
+      }
+    }
+  },
+  "overrides": {
+    "Modal": { "cardMode": "single", "viewport": "420x900" },
+    "ConversationDrawer": { "cardMode": "single", "viewport": "390x844" },
+    "ConversationMemoryModal": { "cardMode": "single", "viewport": "390x844" },
+    "PremiumUpgradeModal": { "cardMode": "single", "viewport": "390x844" },
+    "Toast": { "cardMode": "column" }
+  },
+  "libOverrides": {
+    "bundle.mjs": "resolveExtensions so React Native .web.js platform variants win, as Metro does",
+    "previews.mjs": "same resolveExtensions for the preview compile pass, which builds its own esbuild options",
+    "dts.mjs": "filters React Native View/Pressable/Text base props, which otherwise bury each component's own API under 60+ inherited native props"
+  },
+  "componentSrcMap": {
+    "ThemeProvider": null,
+    "LocalizationProvider": null,
+    "SafeAreaProvider": null,
+    "PremiumEntitlementProvider": null,
+    "View": null,
+    "Text": null,
+    "ScrollView": null,
+    "Pressable": null,
+    "Image": null,
+    "StyleSheet": null,
+
+    "Button": "../src/design-system/NativeControls.tsx",
+    "Input": "../src/design-system/NativeControls.tsx",
+    "List": "../src/design-system/NativeControls.tsx",
+    "Modal": "../src/design-system/NativeControls.tsx",
+    "Tag": "../src/design-system/NativeControls.tsx",
+    "IconButton": "../src/design-system/IconButton.tsx",
+    "PhosphorIcon": "../src/design-system/PhosphorIcon.tsx",
+
+    "AntSettingsCard": "../src/features/settings/settings-primitives/SettingsCards.tsx",
+    "AntDisclosureCard": "../src/features/settings/settings-primitives/SettingsCards.tsx",
+    "AntButtonLabel": "../src/features/settings/settings-primitives/SettingsCards.tsx",
+    "AntSectionIntro": "../src/features/settings/settings-primitives/SettingsCards.tsx",
+    "AntRadioSection": "../src/features/settings/settings-primitives/SettingsCards.tsx",
+    "AntSwitchRow": "../src/features/settings/settings-primitives/SettingsFields.tsx",
+    "AntNumberInputRow": "../src/features/settings/settings-primitives/SettingsFields.tsx",
+    "AntTextArea": "../src/features/settings/settings-primitives/SettingsFields.tsx",
+    "AntPickerRow": "../src/features/settings/settings-primitives/SettingsPickerControls.tsx",
+    "AntPickerRows": "../src/features/settings/settings-primitives/SettingsPickerControls.tsx",
+    "AntPickerSection": "../src/features/settings/settings-primitives/SettingsPickerControls.tsx",
+
+    "AppWordmark": "../src/components/AppWordmark.tsx",
+    "ChatBubble": "../src/components/ChatBubble.tsx",
+    "ChatTranscript": "../src/components/ChatTranscript.tsx",
+    "ConversationDrawer": "../src/components/ConversationDrawer.tsx",
+    "ConversationMemoryModal": "../src/components/ConversationMemoryModal.tsx",
+    "IntroBanner": "../src/components/IntroBanner.tsx",
+    "LocalModelPerformanceSummary": "../src/components/LocalModelPerformanceSummary.tsx",
+    "MessageImageAttachments": "../src/components/MessageImageAttachments.tsx",
+    "Picker": "../src/components/Picker.tsx",
+    "PremiumUpgradeModal": "../src/components/PremiumUpgradeModal.tsx",
+    "ProviderIcon": "../src/components/ProviderIcon.tsx",
+    "ResponseModeToggle": "../src/components/ResponseModeToggle.tsx",
+    "Toast": "../src/components/Toast.tsx"
+  }
+}

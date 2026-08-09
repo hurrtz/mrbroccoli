@@ -196,10 +196,18 @@ export function useFreeOfflineMode(params: {
         ) ?? FREE_SPEECH_LANGUAGE_OPTIONS[0],
     [settings.localLanguages],
   );
-  const [selectedLanguage, setSelectedLanguage] = useState<
-    FreeSpeechLanguage | null
-  >(() => (settings.freeOfflineSetupCompleted ? storedLanguage : null));
-  const previousStoredLanguageRef = useRef(storedLanguage);
+  // Only bridges setup, where a language has been chosen but the profile it
+  // implies has not been built yet. It is not a copy of the setting.
+  const [pendingLanguage, setPendingLanguage] =
+    useState<FreeSpeechLanguage | null>(null);
+  // Once a profile exists the setting is the language, read straight through.
+  // This used to be state mirroring `settings.localLanguages`, synchronised by
+  // an effect, which left it one render behind the projection effect that
+  // resolves from it: after a Settings-page change the projection still held
+  // the previous language and wrote it back, and the two alternated forever.
+  // Deriving during render removes the lag, because there is only one value.
+  const selectedLanguage: FreeSpeechLanguage | null =
+    settings.freeOfflineSetupCompleted ? storedLanguage : pendingLanguage;
   const resolvedLanguage = useMemo(() => {
     if (!selectedLanguage) {
       return null;
@@ -424,14 +432,6 @@ export function useFreeOfflineMode(params: {
   ]);
 
   useEffect(() => {
-    if (previousStoredLanguageRef.current === storedLanguage) {
-      return;
-    }
-    previousStoredLanguageRef.current = storedLanguage;
-    setSelectedLanguage(storedLanguage);
-  }, [storedLanguage]);
-
-  useEffect(() => {
     if (
       !settingsLoaded ||
       suspended ||
@@ -527,7 +527,7 @@ export function useFreeOfflineMode(params: {
       setAdvancedOptionsEnabledState(false);
       setSelectedNativeVoice("");
       setSelectedKokoroVoice(DEFAULT_KOKORO_VOICES.en);
-      setSelectedLanguage(language);
+      setPendingLanguage(language);
       updateSettings({
         freeOnboardingLanguageInitialized: true,
         freeOfflineSetupCompleted: false,

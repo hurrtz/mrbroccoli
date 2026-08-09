@@ -116,6 +116,7 @@
     "parse-png": "^2.1.0",
     "react-dom": "19.2.3",
     "react-native-svg-transformer": "^1.5.3",
+    "react-native-web": "^0.21.2",
     "react-test-renderer": "19.2.3",
     "typescript": "~6.0.3",
     "ws": "^8.21.1"

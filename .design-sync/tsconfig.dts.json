@@ -1,0 +1,22 @@
+{
+  // Declaration-only build feeding design-sync's prop extraction.
+  //
+  // The converter reads `<Name>Props` out of a .d.ts tree; Mr Broccoli ships
+  // no library build, so without this every component's contract degrades to
+  // `[key: string]: unknown` and the design agent has no API to code against.
+  //
+  // Emits type declarations only — no JS, no effect on any app build. Run it
+  // through .design-sync/gen-types.mjs, which also keeps the version in
+  // .design-sync/package.json in step with the app's.
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "noEmit": false,
+    "declaration": true,
+    "emitDeclarationOnly": true,
+    "declarationMap": false,
+    "skipLibCheck": true,
+    "outDir": "./.cache/types",
+    "rootDir": ".."
+  },
+  "include": ["./entry.tsx", "../src/**/*.ts", "../src/**/*.tsx"]
+}

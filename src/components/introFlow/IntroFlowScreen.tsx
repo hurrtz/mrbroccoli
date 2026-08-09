@@ -7,7 +7,11 @@ import {
   useWindowDimensions,
   View,
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import {
+  initialWindowMetrics,
+  SafeAreaProvider,
+  SafeAreaView,
+} from "react-native-safe-area-context";
 import { StatusBar } from "expo-status-bar";
 
 import { useTheme } from "../../theme/ThemeContext";
@@ -90,125 +94,132 @@ export function IntroFlowScreen({
       visible={visible}
     >
       <StatusBar style={isDark ? "light" : "dark"} />
-      <View style={[styles.root, { backgroundColor: theme.canvas }]}>
-        <SafeAreaView edges={["top", "bottom"]} style={styles.safeArea}>
-          <View style={styles.header}>
-            <Pressable
-              accessibilityLabel={t("introBack")}
-              accessibilityRole="button"
-              accessibilityState={{ disabled: isFirst }}
-              disabled={isFirst}
-              hitSlop={8}
-              onPress={() => goTo(index - 1)}
-              style={[
-                styles.headerButton,
-                { backgroundColor: theme.panel, borderColor: theme.border },
-                isFirst ? styles.headerHidden : null,
-              ]}
-              testID="intro-back"
-            >
-              <PhosphorIcon
-                color={theme.textSecondary}
-                name="left"
-                size="control"
-              />
-            </Pressable>
-
-            <IntroStepper
-              count={INTRO_STEPS.length}
-              index={index}
-              onSelect={goTo}
-              t={t}
-            />
-
-            <Pressable
-              accessibilityLabel={t("introBannerDismiss")}
-              accessibilityRole="button"
-              hitSlop={8}
-              onPress={onClose}
-              style={[
-                styles.headerButton,
-                { backgroundColor: theme.panel, borderColor: theme.border },
-              ]}
-              testID="intro-close"
-            >
-              <PhosphorIcon
-                color={theme.textSecondary}
-                name="close"
-                size="control"
-              />
-            </Pressable>
-          </View>
-
-          <ScrollView
-            horizontal
-            onMomentumScrollEnd={(event) => {
-              setIndex(
-                Math.round(
-                  event.nativeEvent.contentOffset.x / Math.max(1, width),
-                ),
-              );
-            }}
-            pagingEnabled
-            ref={pagerRef}
-            showsHorizontalScrollIndicator={false}
-            testID="intro-flow-content"
-          >
-            {INTRO_STEPS.map((step) => {
-              const StepContent = INTRO_STEP_CONTENT[step];
-              return (
-                <ScrollView
-                  contentContainerStyle={[
-                    styles.page,
-                    step === "welcome" ? styles.pageFill : null,
-                  ]}
-                  key={step}
-                  showsVerticalScrollIndicator={false}
-                  style={{ width }}
-                >
-                  <StepContent
-                    language={language}
-                    onConnectProvider={onConnectProvider}
-                    onInstallLocal={onInstallLocal}
-                    onOpenPremium={onOpenPremium}
-                    onOpenStt={onOpenStt}
-                    onOpenTts={onOpenTts}
-                    t={t}
-                  />
-                </ScrollView>
-              );
-            })}
-          </ScrollView>
-
-          <View style={styles.footer}>
-            {/* The last step ends at the close control rather than offering a
-                second way out, so the forward action simply retires there. */}
-            {isLast ? (
-              <View style={styles.footerSpacer} />
-            ) : (
+      {/* A fullScreen modal is its own view controller on iOS, outside the
+          provider Expo Router mounts, so insets resolved to zero there: the
+          header sat under the Dynamic Island and the footer under the home
+          indicator. The flow carries its own provider so it measures the
+          window it is actually presented in. */}
+      <SafeAreaProvider initialMetrics={initialWindowMetrics}>
+        <View style={[styles.root, { backgroundColor: theme.canvas }]}>
+          <SafeAreaView edges={["top", "bottom"]} style={styles.safeArea}>
+            <View style={styles.header}>
               <Pressable
-                accessibilityLabel={t("introNext")}
+                accessibilityLabel={t("introBack")}
                 accessibilityRole="button"
-                onPress={() => goTo(index + 1)}
-                style={({ pressed }) => [
-                  styles.primary,
-                  {
-                    backgroundColor: theme.accent,
-                    opacity: pressed ? 0.85 : 1,
-                  },
+                accessibilityState={{ disabled: isFirst }}
+                disabled={isFirst}
+                hitSlop={8}
+                onPress={() => goTo(index - 1)}
+                style={[
+                  styles.headerButton,
+                  { backgroundColor: theme.panel, borderColor: theme.border },
+                  isFirst ? styles.headerHidden : null,
                 ]}
-                testID="intro-next"
+                testID="intro-back"
               >
                 <PhosphorIcon
-                  color={theme.onAccent}
-                  name="right"
-                  size="navigation"
+                  color={theme.textSecondary}
+                  name="left"
+                  size="control"
                 />
               </Pressable>
-            )}
-          </View>
-        </SafeAreaView>
-      </View>
+
+              <IntroStepper
+                count={INTRO_STEPS.length}
+                index={index}
+                onSelect={goTo}
+                t={t}
+              />
+
+              <Pressable
+                accessibilityLabel={t("introBannerDismiss")}
+                accessibilityRole="button"
+                hitSlop={8}
+                onPress={onClose}
+                style={[
+                  styles.headerButton,
+                  { backgroundColor: theme.panel, borderColor: theme.border },
+                ]}
+                testID="intro-close"
+              >
+                <PhosphorIcon
+                  color={theme.textSecondary}
+                  name="close"
+                  size="control"
+                />
+              </Pressable>
+            </View>
+
+            <ScrollView
+              horizontal
+              onMomentumScrollEnd={(event) => {
+                setIndex(
+                  Math.round(
+                    event.nativeEvent.contentOffset.x / Math.max(1, width),
+                  ),
+                );
+              }}
+              pagingEnabled
+              ref={pagerRef}
+              showsHorizontalScrollIndicator={false}
+              testID="intro-flow-content"
+            >
+              {INTRO_STEPS.map((step) => {
+                const StepContent = INTRO_STEP_CONTENT[step];
+                return (
+                  <ScrollView
+                    contentContainerStyle={[
+                      styles.page,
+                      step === "welcome" ? styles.pageFill : null,
+                    ]}
+                    key={step}
+                    showsVerticalScrollIndicator={false}
+                    style={{ width }}
+                  >
+                    <StepContent
+                      language={language}
+                      onConnectProvider={onConnectProvider}
+                      onInstallLocal={onInstallLocal}
+                      onOpenPremium={onOpenPremium}
+                      onOpenStt={onOpenStt}
+                      onOpenTts={onOpenTts}
+                      t={t}
+                    />
+                  </ScrollView>
+                );
+              })}
+            </ScrollView>
+
+            <View style={styles.footer}>
+              {/* The last step ends at the close control rather than offering a
+                second way out, so the forward action simply retires there. */}
+              {isLast ? (
+                <View style={styles.footerSpacer} />
+              ) : (
+                <Pressable
+                  accessibilityLabel={t("introNext")}
+                  accessibilityRole="button"
+                  onPress={() => goTo(index + 1)}
+                  style={({ pressed }) => [
+                    styles.primary,
+                    {
+                      backgroundColor: theme.accent,
+                      opacity: pressed ? 0.85 : 1,
+                    },
+                  ]}
+                  testID="intro-next"
+                >
+                  <PhosphorIcon
+                    color={theme.onAccent}
+                    name="right"
+                    size="navigation"
+                  />
+                </Pressable>
+              )}
+            </View>
+          </SafeAreaView>
+        </View>
+      </SafeAreaProvider>
     </Modal>
   );
 }

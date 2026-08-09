@@ -1,0 +1,56 @@
+/* Brand faces for design-sync. The app loads these natively through
+ * expo-font (src/design-system/AppFontProvider.tsx); a browser needs
+ * @font-face instead. The family names must match the `fontFamily` values in
+ * src/theme/typography.ts exactly — react-native-web passes them straight
+ * through to CSS, so a rename here silently drops every component to a
+ * fallback face.
+ *
+ * Sources are the same .ttf files the native app bundles, from the
+ * @expo-google-fonts packages already in the lockfile. Outfit and Unica One
+ * are both SIL Open Font License 1.1.
+ */
+
+@font-face {
+  font-family: "UnicaOne_400Regular";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("../node_modules/@expo-google-fonts/unica-one/400Regular/UnicaOne_400Regular.ttf")
+    format("truetype");
+}
+
+@font-face {
+  font-family: "Outfit_400Regular";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("../node_modules/@expo-google-fonts/outfit/400Regular/Outfit_400Regular.ttf")
+    format("truetype");
+}
+
+@font-face {
+  font-family: "Outfit_500Medium";
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("../node_modules/@expo-google-fonts/outfit/500Medium/Outfit_500Medium.ttf")
+    format("truetype");
+}
+
+@font-face {
+  font-family: "Outfit_600SemiBold";
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("../node_modules/@expo-google-fonts/outfit/600SemiBold/Outfit_600SemiBold.ttf")
+    format("truetype");
+}
+
+@font-face {
+  font-family: "Outfit_700Bold";
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("../node_modules/@expo-google-fonts/outfit/700Bold/Outfit_700Bold.ttf")
+    format("truetype");
+}

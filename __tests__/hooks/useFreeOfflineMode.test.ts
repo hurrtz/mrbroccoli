@@ -105,6 +105,61 @@ describe("useFreeOfflineMode", () => {
     );
   });
 
+  it("projects the language the user just chose, not the one it held", async () => {
+    // `selectedLanguage` used to be state mirroring `settings.localLanguages`,
+    // synchronised by an effect. That left it one render behind the projection
+    // effect that resolves from it, so on the render after a Settings-page
+    // change the projection still read the previous language and wrote it back
+    // -- and the two effects then alternated forever. On device that showed as
+    // the selector switching on its own, the interface re-localising each
+    // pass, and enough re-renders to starve the JS thread.
+    //
+    // Two snapshots are enough to catch it: a settled Spanish profile, then
+    // exactly what the Settings picker writes when German is chosen.
+    const updateSettings = jest.fn();
+    const spanish: Settings = {
+      ...DEFAULT_SETTINGS,
+      language: "es",
+      localLanguages: ["es"],
+      ttsListenLanguages: ["es"],
+      sttLanguage: "es",
+      freeOnboardingLanguageInitialized: true,
+      freeOfflineSetupCompleted: true,
+    };
+    const { rerender } = renderHook(
+      ({ settings }: { settings: Settings }) =>
+        useFreeOfflineMode({ settings, settingsLoaded: true, updateSettings }),
+      { initialProps: { settings: spanish } },
+    );
+
+    await act(async () => {
+      await Promise.resolve();
+    });
+    updateSettings.mockClear();
+
+    // The picker writes the speech languages and leaves the interface language
+    // alone; it does not touch setup completion.
+    rerender({
+      settings: {
+        ...spanish,
+        localLanguages: ["de"],
+        ttsListenLanguages: ["de"],
+        sttLanguage: "de",
+      },
+    });
+    await act(async () => {
+      await Promise.resolve();
+    });
+
+    const written = updateSettings.mock.calls.map(([partial]) => partial);
+    expect(written.length).toBeGreaterThan(0);
+    // Every write follows the user. Writing Spanish back is the stale mirror.
+    for (const partial of written) {
+      expect(partial.localLanguages).toEqual(["de"]);
+      expect(partial.language).toBe("de");
+    }
+  });
+
   it("suspends device and locale side effects for deterministic presentation fixtures", async () => {
     const updateSettings = jest.fn();
     renderHook(() =>

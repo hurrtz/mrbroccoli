@@ -1,0 +1,42 @@
+{
+  // Converter-only tsconfig. Never read by Metro, Expo, `npm run typecheck`,
+  // or any app build — only by design-sync's esbuild pass via cfg.tsconfig.
+  //
+  // Mr Broccoli is an iOS/Android-only Expo app, so its components import the
+  // React Native module contract. claude.ai/design renders in a browser, so
+  // the bundle needs a browser implementation of that same contract:
+  //
+  //   react-native            -> react-native-web (devDependency, ~0.21, the
+  //                              version expo/bundledNativeModules.json pins
+  //                              for SDK 57)
+  //
+  // Platform-extension resolution (`./findNodeHandle` -> `findNodeHandle.web.js`)
+  // is NOT handled here — it cannot be, because the converter's paths plugin
+  // matches on the specifier alone and the reached set contains collisions. It
+  // is handled by the node_modules overlay that .design-sync/gen-web-modules.mjs
+  // builds; pass that overlay as --node-modules.
+  "compilerOptions": {
+    "baseUrl": "..",
+    "paths": {
+      "react-native": ["./.design-sync/shims/react-native.js"],
+
+      // Native-only edges some packages declare but never render on web.
+      // Left alone, esbuild follows them into react-native's Flow-typed
+      // source and fails to parse it.
+      "react-native/Libraries/Utilities/codegenNativeComponent": [
+        "./.design-sync/shims/codegenNativeComponent.js"
+      ],
+      "react-native/assets-registry": [
+        "./.design-sync/shims/assets-registry.js"
+      ],
+      "react-native/assets-registry/registry": [
+        "./.design-sync/shims/assets-registry.js"
+      ],
+
+      // In-App Purchase module. Needed because PremiumEntitlementProvider is in
+      // the preview provider chain and the real module resolves a native module
+      // at import time. See the shim's header.
+      "expo-iap": ["./.design-sync/shims/expo-iap.js"]
+    }
+  }
+}

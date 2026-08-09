@@ -11,5 +11,10 @@ jest.mock("react-native-safe-area-context", () => {
   return {
     ...actual,
     useSafeAreaInsets: jest.fn(() => ({ bottom: 0, left: 0, right: 0, top: 0 })),
+    // The real provider withholds its children until a native layout event
+    // reports insets, which never arrives under test. Screens presented in a
+    // full-screen modal carry their own provider, so without this they render
+    // as an empty shell.
+    SafeAreaProvider: ({ children }) => children,
   };
 });
