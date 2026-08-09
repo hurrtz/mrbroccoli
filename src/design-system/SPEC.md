@@ -100,6 +100,15 @@ their official brand geometry.
 defines the touch target. Conflating the two produces inaccessible compact
 buttons.
 
+**Decision:** A map key is a meaning, not a glyph name, so a later change of
+glyph does not rename every call site. One glyph carrying two meanings makes two
+different things look identical on screen;
+`__tests__/design-system/PhosphorIcon.test.tsx` fails on any new collision.
+
+**Open question:** `control` and `sliders` both draw `SlidersHorizontalIcon`, so
+"open style sheet" and "App & diagnostics" are indistinguishable. Resolving it
+means choosing a different glyph for one of them. Owner decision.
+
 ## Styling Rules
 
 - Theme colors come from `src/theme/`; shared controls do not embed

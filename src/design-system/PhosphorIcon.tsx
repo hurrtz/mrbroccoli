@@ -6,6 +6,7 @@ import {
   ArrowLeftIcon,
   ArrowRightIcon,
   ArrowUpIcon,
+  BrainIcon,
   BugIcon,
   CaretDownIcon,
   CaretLeftIcon,
@@ -57,6 +58,7 @@ import {
   StopIcon,
   TrashIcon,
   TrayIcon,
+  UsersThreeIcon,
   WarningCircleIcon,
   WarningIcon,
   WaveformIcon,
@@ -83,6 +85,9 @@ const PHOSPHOR_ICONS = {
   "arrow-right": ArrowRightIcon,
   "arrow-up": ArrowUpIcon,
   audio: WaveformIcon,
+  // The thinking phase of a turn. Distinct from `cpu`, which marks on-device
+  // execution rather than the model reasoning.
+  brain: BrainIcon,
   check: CheckIcon,
   "check-circle": CheckCircleIcon,
   "checkbox-checked": CheckSquareIcon,
@@ -90,6 +95,9 @@ const PHOSPHOR_ICONS = {
   close: XIcon,
   control: SlidersHorizontalIcon,
   copy: CopyIcon,
+  // Model Council: several models answering the same question. The key is the
+  // meaning, not the glyph, so a later change of glyph does not rename it.
+  council: UsersThreeIcon,
   "customer-service": HeadsetIcon,
   delete: TrashIcon,
   down: CaretDownIcon,

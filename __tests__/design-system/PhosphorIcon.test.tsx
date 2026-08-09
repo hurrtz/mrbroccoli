@@ -55,6 +55,58 @@ describe("Phosphor icon system", () => {
     expect(StyleSheet.flatten(icon.props.style).height).toBe(24);
   });
 
+  it.each(["brain", "council"] as const)(
+    "renders the %s glyph through the shared wrapper",
+    (name) => {
+      const screen = render(
+        <PhosphorIcon name={name} size="prominent" color="#123456" />,
+      );
+      const icon = screen.UNSAFE_getByProps({
+        testID: `phosphor-icon-${name}`,
+      });
+
+      expect(icon.props.weight).toBe("regular");
+      expect(StyleSheet.flatten(icon.props.style).width).toBe(
+        ICON_SIZE.prominent,
+      );
+    },
+  );
+
+  it("never lets one glyph carry two meanings", () => {
+    // The map is the app's semantic layer over Phosphor: a key is a meaning,
+    // not a glyph name. Two keys on one glyph means two things look identical
+    // on screen, so this freezes the one known collision and fails on any new
+    // one.
+    const wrapper = fs.readFileSync(
+      path.join(root, "src/design-system/PhosphorIcon.tsx"),
+      "utf8",
+    );
+    const body = wrapper.slice(
+      wrapper.indexOf("const PHOSPHOR_ICONS = {"),
+      wrapper.indexOf("} satisfies Record<string, Icon>"),
+    );
+    const glyphsByName = new Map<string, string[]>();
+
+    for (const [, key, glyph] of body.matchAll(
+      /^\s{2}"?([a-z-]+)"?:\s*([A-Za-z]+Icon),$/gm,
+    )) {
+      glyphsByName.set(glyph, [...(glyphsByName.get(glyph) ?? []), key]);
+    }
+
+    expect(glyphsByName.size).toBeGreaterThan(50);
+    expect(glyphsByName.get("BrainIcon")).toEqual(["brain"]);
+    expect(glyphsByName.get("UsersThreeIcon")).toEqual(["council"]);
+
+    const collisions = [...glyphsByName.entries()]
+      .filter(([, keys]) => keys.length > 1)
+      .map(([glyph, keys]) => `${glyph}: ${keys.join(", ")}`);
+
+    // Known and reported to the owner: "App & diagnostics" and "open style
+    // sheet" draw the same sliders. Resolving it means changing one of the two
+    // glyphs, which is a design decision rather than a migration one.
+    expect(collisions).toEqual(["SlidersHorizontalIcon: control, sliders"]);
+  });
+
   it("keeps every application glyph regular and on the shared wrapper", () => {
     const packageJson = JSON.parse(
       fs.readFileSync(path.join(root, "package.json"), "utf8"),
