@@ -1,0 +1,6 @@
+{
+  "name": "mrbroccoli",
+  "version": "3.2.0",
+  "private": true,
+  "types": "./.cache/types/.design-sync/entry.d.ts"
+}

@@ -430,6 +430,37 @@ applies.
   remains download-only and must never appear in an application bundle. Raise
   a budget only after documenting and reviewing the concrete size increase.
 
+## Design System Sync
+
+`.design-sync/` holds the inputs that publish this app's design system to
+claude.ai/design, so the design agent composes screens from the real
+components instead of generic ones. It is build tooling only.
+
+- **Nothing here may affect the shipped app.** Mr Broccoli is iOS/Android only,
+  and claude.ai/design renders in a browser, so the sync bundles `src/` through
+  `react-native-web`. That bridge lives entirely in `.design-sync/`: a
+  converter-only `tsconfig.designsync.json`, shims, and three declared forks of
+  the sync tool's own lib scripts. Metro's graph, the release artifacts, and
+  `app.json` `platforms` are untouched.
+- `react-native-web` is a **devDependency**, pinned to the version
+  `expo/bundledNativeModules.json` names for the current SDK so Expo Doctor and
+  dependency alignment stay green. It is an optional peer of `expo` and
+  `expo-router`, so it appears in `THIRD_PARTY_NOTICES.md` production output
+  even though no file under `app/` or `src/` imports it.
+- When a browser render disagrees with the device, **fix it in `.design-sync/`,
+  never in `src/`**. Several react-native-web translation gaps have already been
+  worked around this way; changing app code to compensate for a browser-only
+  artifact would alter what ships to users for no native benefit.
+- Read `.design-sync/NOTES.md` before re-running a sync. It records the forks
+  and why each exists, the approaches that were tried and rejected, the render
+  warnings that are benign, and what can silently go stale.
+- Re-run with `/design-sync`. Regenerate its derived inputs first
+  (`node .design-sync/gen-types.mjs`, `node .design-sync/gen-tokens.mjs`);
+  `tokens.css` is generated from `src/theme/` and must never be hand-edited.
+- After changing anything here, re-run `npm run typecheck` and
+  `npm run static:verify` — keeping `make pre-push` green is this directory's
+  main risk to the repository.
+
 ## Licensing And Provider Terms
 
 - The original app code and assets are proprietary under `LICENSE`; this never
