@@ -11,7 +11,7 @@ what worked.
 | 3 — Five new components | Complete |
 | 4 — Runtime readiness | Complete, but the phase's premise did not hold |
 | 5 — Home screen | Partial: the route byline ships; the orb does not |
-| 6 — Sweep | Not started |
+| 6 — Sweep | Automated checks in place; no device verification |
 
 ---
 
@@ -269,23 +269,33 @@ This is a large change to a shipping home screen, and doing it badly is worse
 than not doing it yet. I stopped at a green checkpoint rather than leaving a
 half-swapped workspace behind.
 
-### Phase 6 not started
+### Phase 6 has its automated half only
 
-The RTL pass, the largest-text pass and the contrast sweep all need the migrated
-screens to exist first. The contrast findings in §3.1 and §3.2 came out of
-Phases 1 and 4 rather than a systematic sweep.
+`__tests__/design-system/orbCompositionSweep.test.ts` checks all seven migrated
+components for the three failures that can be caught without a device: a hard
+side (`paddingLeft`, `marginRight` and friends, which React Native does not flip
+for a right-to-left locale), an opt-out of Dynamic Type, and a hex literal in a
+component. `__tests__/theme/colors.test.ts` checks the readiness dots against
+the canvas, the surface *and* the tinted surface, and the orb's turn ring
+against its own track.
+
+**None of it has been seen on a device.** RTL direction, the largest system text
+size and both appearances still need eyes, and the orb half of Phase 5 has to
+land before that sweep is worth running on the home screen.
 
 Note also that `AGENTS.md` now requires any Maestro regression flow to be
 registered in `scripts/verify-maestro-suite.mjs` and counted in
-`scripts/verify-maestro-artifacts.mjs`; an unregistered flow never runs.
+`scripts/verify-maestro-artifacts.mjs`; an unregistered flow never runs and
+reads as coverage that does not exist.
 
 ---
 
 ## 6. Verification
 
-Every phase above was committed with `npx tsc --noEmit` clean,
-`npm run static:verify` clean (ESLint at zero warnings plus Knip), and the full
-Jest suite green — 1713 passing, 1 skipped, at the last full run.
+Every commit was made with `npx tsc --noEmit` clean, `npm run static:verify`
+clean (ESLint at zero tolerated warnings plus Knip), and the full Jest suite
+green — **1760 passing, 1 skipped** at the last full run.
 
 No device or simulator verification has been run. Nothing here has been seen on
-a phone.
+a phone, in either appearance, in either orientation, or in a right-to-left
+locale.
