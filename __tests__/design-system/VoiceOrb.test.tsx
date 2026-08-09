@@ -27,7 +27,18 @@ describe("VoiceOrb geometry", () => {
   // The orb went oval below ~107pt: the core is a proportion of the whole orb
   // while the rings shrink by fixed bands, so the proportion overtook the ring
   // holding it. Every size has to stay circular.
-  const sizes = [106, 107, 108, MIN_ORB_DIAMETER, 150, 156, MAX_ORB_DIAMETER];
+  // 84 is the landscape floor the workspace passes, 96 the portrait one, and
+  // 106–108 straddle the size the core used to overtake its ring at.
+  const sizes = [
+    84,
+    MIN_ORB_DIAMETER,
+    106,
+    107,
+    108,
+    150,
+    156,
+    MAX_ORB_DIAMETER,
+  ];
 
   it.each(sizes)("keeps the core inside its parent ring at %ipt", (size) => {
     const geometry = getOrbGeometry(size);
@@ -49,13 +60,20 @@ describe("VoiceOrb geometry", () => {
     expect(geometry.turnRadius).toBeGreaterThan(geometry.phaseRadius);
   });
 
-  it("clamps a measured container to the legible range", () => {
+  it("clamps a measured container to the range it draws in", () => {
     expect(resolveOrbDiameter(40)).toBe(MIN_ORB_DIAMETER);
     expect(resolveOrbDiameter(600)).toBe(MAX_ORB_DIAMETER);
     expect(resolveOrbDiameter(150)).toBe(150);
     // No measurement yet: fall back to the largest rather than to zero, so the
     // first frame is not a collapsed orb.
     expect(resolveOrbDiameter(null)).toBe(MAX_ORB_DIAMETER);
+  });
+
+  it("takes a narrower range so a landscape column can shrink it", () => {
+    // Shrinking is the correct response to a shorter column. Overflowing onto
+    // the controls beneath it is not.
+    expect(resolveOrbDiameter(300, 84, 150)).toBe(150);
+    expect(resolveOrbDiameter(60, 84, 150)).toBe(84);
   });
 
   it("derives the diameter from the space available, not from a constant", () => {

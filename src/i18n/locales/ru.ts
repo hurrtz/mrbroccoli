@@ -10,6 +10,7 @@ import { memoryEditTranslations } from "../memoryEditTranslations";
 import { onDeviceTranslations } from "../onDeviceTranslations";
 import { onboardingTranslations } from "../onboardingTranslations";
 import { introTranslations } from "../introTranslations";
+import { workspaceTranslations } from "../workspaceTranslations";
 import { premiumTranslations } from "../premiumTranslations";
 import { transcriptEditTranslations } from "../transcriptEditTranslations";
 
@@ -25,6 +26,7 @@ export const ru = {
   ...onDeviceTranslations.ru,
   ...onboardingTranslations.ru,
   ...introTranslations.ru,
+  ...workspaceTranslations.ru,
   ...premiumTranslations.ru,
   ...transcriptEditTranslations.ru,
   appName: "Мистер Брокколи",

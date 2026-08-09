@@ -40,11 +40,15 @@ const TINT_ALPHA = 0.16;
 const HALO_BAND = 8;
 
 /**
- * Below roughly this diameter the rings stop being legible and
- * `PhaseAwareVoiceAction` is the right control instead. Above the maximum the
- * orb stops reading as a control and starts reading as a background.
+ * The orb's own range. The maximum is where it stops reading as a control and
+ * starts reading as a background; the minimum is the smallest the kit composes
+ * it at before the column has to give up on it entirely.
+ *
+ * Both are overridable, because a landscape column is shorter than a portrait
+ * one and shrinking the orb is the correct response to that -- pushing it over
+ * its neighbours is not.
  */
-export const MIN_ORB_DIAMETER = 120;
+export const MIN_ORB_DIAMETER = 96;
 export const MAX_ORB_DIAMETER = 196;
 
 function clampUnit(value: number | undefined) {
@@ -87,19 +91,21 @@ export function getOrbGeometry(diameter: number) {
 }
 
 /**
- * Clamps a container's measurement to the range the orb stays legible in. A
- * container narrower than the minimum should render `PhaseAwareVoiceAction`
- * instead of shrinking this control past the point the rings can be read.
+ * Clamps a container's measurement to the range the orb draws in.
+ *
+ * With no measurement yet it falls back to the maximum rather than to zero, so
+ * the first frame is a whole orb rather than a collapsed one.
  */
-export function resolveOrbDiameter(available: number | null | undefined) {
+export function resolveOrbDiameter(
+  available: number | null | undefined,
+  minimum: number = MIN_ORB_DIAMETER,
+  maximum: number = MAX_ORB_DIAMETER,
+) {
   if (!available || !Number.isFinite(available)) {
-    return MAX_ORB_DIAMETER;
+    return maximum;
   }
 
-  return Math.max(
-    MIN_ORB_DIAMETER,
-    Math.min(MAX_ORB_DIAMETER, Math.floor(available)),
-  );
+  return Math.max(minimum, Math.min(maximum, Math.floor(available)));
 }
 
 /** An arc of a ring. `sweep` is 0–1 of a full lap; `startTurns` rotates it. */
@@ -151,6 +157,8 @@ function Arc({
  */
 export function VoiceOrb({
   label,
+  maxDiameter = MAX_ORB_DIAMETER,
+  minDiameter = MIN_ORB_DIAMETER,
   onPress,
   overtime = 0,
   phase = "idle",
@@ -162,6 +170,10 @@ export function VoiceOrb({
 }: {
   /** Accessible name. Says what tapping does, matching the visible status. */
   label: string;
+  /** The range the measured diameter is clamped to. A landscape column is
+   * shorter, so it passes a smaller pair rather than overflowing. */
+  maxDiameter?: number;
+  minDiameter?: number;
   onPress?: () => void;
   /** 0–1 past the estimate. Above 0 both rings fill with red as the turn runs. */
   overtime?: number;
@@ -187,8 +199,11 @@ export function VoiceOrb({
   }, []);
 
   const geometry = useMemo(
-    () => getOrbGeometry(size ?? resolveOrbDiameter(available)),
-    [available, size],
+    () =>
+      getOrbGeometry(
+        size ?? resolveOrbDiameter(available, minDiameter, maxDiameter),
+      ),
+    [available, maxDiameter, minDiameter, size],
   );
 
   const ink = getPhaseColor(phase, colors);

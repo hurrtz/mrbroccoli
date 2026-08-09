@@ -10,6 +10,7 @@ import { memoryEditTranslations } from "../memoryEditTranslations";
 import { onDeviceTranslations } from "../onDeviceTranslations";
 import { onboardingTranslations } from "../onboardingTranslations";
 import { introTranslations } from "../introTranslations";
+import { workspaceTranslations } from "../workspaceTranslations";
 import { premiumTranslations } from "../premiumTranslations";
 import { transcriptEditTranslations } from "../transcriptEditTranslations";
 
@@ -25,6 +26,7 @@ export const hu = {
   ...onDeviceTranslations.hu,
   ...onboardingTranslations.hu,
   ...introTranslations.hu,
+  ...workspaceTranslations.hu,
   ...premiumTranslations.hu,
   ...transcriptEditTranslations.hu,
   appName: "Brokkoli úr",
