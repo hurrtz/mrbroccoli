@@ -31,6 +31,10 @@ framework or hiding platform behavior behind excessive abstraction.
 - `PhosphorIcon.tsx` is the application glyph boundary and maps semantic sizes
   to Phosphor's regular-weight icons.
 - `AppFontProvider.tsx` owns app-font loading and the typography provider.
+- `VoiceOrb.tsx`, `OrbSatellite.tsx`, `WorkspaceStatusLine.tsx`,
+  `ConversationSettingsSummary.tsx`, and `TranscriptHandle.tsx` own the orb
+  composition the workspace is built from. `voicePhase.ts` maps a
+  `VoiceVisualPhase` to the colour and glyph every one of them shares.
 - Settings-specific cards, fields, and pickers remain in
   `src/features/settings/settings-primitives/`; promote them here only when
   their contract is truly cross-feature.
@@ -108,6 +112,28 @@ different things look identical on screen;
 **Open question:** `control` and `sliders` both draw `SlidersHorizontalIcon`, so
 "open style sheet" and "App & diagnostics" are indistinguishable. Resolving it
 means choosing a different glyph for one of them. Owner decision.
+
+## Orb Composition
+
+`VoiceOrb` is the workspace's single loud element; never render two in one view.
+
+- The orb sizes itself to the space it is given rather than to a constant per
+  layout. It measures its container and clamps to
+  `[MIN_ORB_DIAMETER, MAX_ORB_DIAMETER]`. A container narrower than the minimum
+  should render `PhaseAwareVoiceAction` instead, which stays correct wherever
+  the voice action sits in a bar rather than owning the screen.
+- Ring bands are fixed while the core is a proportion, so `getOrbGeometry`
+  clamps the core to the ring holding it. Without that clamp the proportion
+  overtakes its ring below about 107pt and the orb stops being circular.
+- At rest neither ring means anything, so the idle orb draws a plain halo
+  rather than two empty tracks, which would claim a turn was running.
+- The glyph says what tapping does, not what the machine is doing. The phase is
+  carried by the ring colour and stated in words by `WorkspaceStatusLine`.
+
+**Decision:** these components take their copy as props rather than translating
+internally, because this directory holds no strings. It also makes the accessible
+name and the visible state one value: `TranscriptHandle` picks both from a single
+`empty` test, and `VoiceOrb` requires the label the status line already shows.
 
 ## Styling Rules
 
