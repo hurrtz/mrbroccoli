@@ -186,6 +186,46 @@ describe("theme colors", () => {
   });
 
   it.each([
+    ["light", lightColors],
+    ["dark", darkColors],
+  ] as const)(
+    "keeps every %s readiness dot legible on the surface it sits on",
+    (_mode, colors) => {
+      // A meaning-carrying non-text element needs 3:1. Runtime readiness draws
+      // its dots straight onto the settings canvas, and cards sit on it, so the
+      // dot has to clear the bar against both rather than against the canvas
+      // alone -- a colour tuned against one and reused on the other is exactly
+      // how the four dark failures in the design system happened.
+      const dots = [
+        colors.success,
+        colors.premium,
+        colors.danger,
+        colors.textMuted,
+      ];
+
+      for (const dot of dots) {
+        expect(contrastRatio(dot, colors.background)).toBeGreaterThanOrEqual(3);
+        expect(contrastRatio(dot, colors.surface)).toBeGreaterThanOrEqual(3);
+        expect(contrastRatio(dot, colors.surfaceAlt)).toBeGreaterThanOrEqual(3);
+      }
+    },
+  );
+
+  it.each([
+    ["light", lightColors],
+    ["dark", darkColors],
+  ] as const)(
+    "keeps the %s turn ring distinguishable from its own track",
+    (_mode, colors) => {
+      // The orb's outer ring is drawn in a neutral so it reads as time rather
+      // than as another phase, which only works if the two separate.
+      expect(
+        contrastRatio(colors.turnInk, colors.turnTrack),
+      ).toBeGreaterThanOrEqual(3);
+    },
+  );
+
+  it.each([
     [lightColors.activeControl, lightColors.onActiveControl],
     [darkColors.activeControl, darkColors.onActiveControl],
     [lightColors.bubbleUser, lightColors.onPrimary],
