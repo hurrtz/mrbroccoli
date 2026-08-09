@@ -907,6 +907,7 @@ export function MainScreen() {
             ? presentationAvailableResponseModes
             : [],
           isPremium: freeOffline.entitlement.isPremium,
+          language,
           offlineReady: freeOffline.freeRuntimeReady,
           onOpenSetupGuide: freeOffline.entitlement.isPremium
             ? handleOpenProviderSettings

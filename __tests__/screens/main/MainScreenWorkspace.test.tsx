@@ -10,16 +10,18 @@ import {
   type ResponseMode,
 } from "../../../src/types";
 
-let mockRouteToggleRenderCount = 0;
+let mockRouteBylineRenderCount = 0;
 let mockTranscriptRenderCount = 0;
 let mockVoicePagerRenderCount = 0;
 
-jest.mock("../../../src/components/ResponseModeToggle", () => ({
-  ResponseModeToggle: () => {
+// The home screen states its route as a byline now. ResponseModeToggle is still
+// exported and still tested, but it is no longer what this screen renders.
+jest.mock("../../../src/components/RouteByline", () => ({
+  RouteByline: () => {
     const React = require("react");
     const { Text } = require("react-native");
-    mockRouteToggleRenderCount += 1;
-    return React.createElement(Text, null, "response-mode-toggle");
+    mockRouteBylineRenderCount += 1;
+    return React.createElement(Text, null, "route-byline");
   },
 }));
 
@@ -43,7 +45,7 @@ jest.mock("../../../src/screens/main/TranscriptPreviewCard", () => ({
 
 describe("MainScreenWorkspace streaming isolation", () => {
   beforeEach(() => {
-    mockRouteToggleRenderCount = 0;
+    mockRouteBylineRenderCount = 0;
     mockTranscriptRenderCount = 0;
     mockVoicePagerRenderCount = 0;
   });
@@ -98,6 +100,7 @@ describe("MainScreenWorkspace streaming isolation", () => {
         activeResponseMode,
         availableResponseModes: [activeResponseMode],
         isPremium: true,
+        language: "en" as const,
         offlineReady: false,
         onOpenSetupGuide,
         onSelectResponseMode,
@@ -151,7 +154,7 @@ describe("MainScreenWorkspace streaming isolation", () => {
       />,
     );
 
-    expect(mockRouteToggleRenderCount).toBe(1);
+    expect(mockRouteBylineRenderCount).toBe(1);
     expect(mockVoicePagerRenderCount).toBe(1);
     expect(mockTranscriptRenderCount).toBe(1);
     expect(t.mock.calls.filter(([key]) => key === "webSearch")).toHaveLength(2);
@@ -173,7 +176,7 @@ describe("MainScreenWorkspace streaming isolation", () => {
       />,
     );
 
-    expect(mockRouteToggleRenderCount).toBe(1);
+    expect(mockRouteBylineRenderCount).toBe(1);
     expect(mockVoicePagerRenderCount).toBe(1);
     expect(mockTranscriptRenderCount).toBe(2);
     expect(t.mock.calls.filter(([key]) => key === "webSearch")).toHaveLength(2);
@@ -202,6 +205,7 @@ describe("MainScreenWorkspace streaming isolation", () => {
           activeResponseMode: DEFAULT_SETTINGS.activeResponseMode,
           availableResponseModes: [],
           isPremium: true,
+          language: "en" as const,
           offlineReady: false,
           onOpenSetupGuide: jest.fn(),
           onSelectResponseMode: jest.fn(),

@@ -48,13 +48,14 @@ describe("MainScreenRouteCard", () => {
         onOpenSetupGuide={jest.fn()}
         onSelectResponseMode={jest.fn()}
         responseModes={responseModes}
+        language="en"
         t={t}
       />,
     );
 
     const modelRow = within(screen.getByTestId("response-mode-row"));
 
-    expect(modelRow.getByTestId("response-mode-list")).toBeTruthy();
+    expect(modelRow.getByTestId("route-byline")).toBeTruthy();
     expect(screen.queryByTestId("route-utility-row")).toBeNull();
     expect(screen.queryByTestId("route-style-control")).toBeNull();
     expect(screen.queryByTestId("route-web-search-control")).toBeNull();
@@ -72,6 +73,7 @@ describe("MainScreenRouteCard", () => {
         onOpenSetupGuide={onOpenSetupGuide}
         onSelectResponseMode={jest.fn()}
         responseModes={responseModes}
+        language="en"
         t={t}
       />,
     );
@@ -92,6 +94,7 @@ describe("MainScreenRouteCard", () => {
         onOpenSetupGuide={jest.fn()}
         onSelectResponseMode={jest.fn()}
         responseModes={responseModes}
+        language="en"
         t={t}
       />,
     );
@@ -114,6 +117,7 @@ describe("MainScreenRouteCard", () => {
         onOpenSetupGuide={onOpenSetupGuide}
         onSelectResponseMode={jest.fn()}
         responseModes={responseModes}
+        language="en"
         t={t}
       />,
     );
@@ -139,6 +143,7 @@ describe("MainScreenRouteCard", () => {
         onOpenSetupGuide={onOpenSetupGuide}
         onSelectResponseMode={jest.fn()}
         responseModes={responseModes}
+        language="en"
         t={t}
       />,
     );

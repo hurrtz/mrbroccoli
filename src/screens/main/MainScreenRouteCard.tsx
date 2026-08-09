@@ -9,10 +9,12 @@ import {
 
 import { PhosphorIcon } from "../../design-system/PhosphorIcon";
 
-import { ResponseModeToggle } from "../../components/ResponseModeToggle";
+import { RouteByline } from "../../components/RouteByline";
+import { ResponseModeSheet } from "../../components/responseModeToggle/ResponseModeSheet";
 import { Colors } from "../../theme/colors";
-import { ResponseMode, ResponseModeSelections } from "../../types";
+import { AppLanguage, ResponseMode, ResponseModeSelections } from "../../types";
 
+import { getRouteBylineModel } from "./routeBylineModel";
 import { TranslateFn } from "./shared";
 import { styles } from "./styles";
 
@@ -22,6 +24,9 @@ interface MainScreenRouteCardProps {
   colors: Colors;
   compact?: boolean;
   isPremium: boolean;
+  /** Passed rather than read from context: this stays a memoized presentation
+   * component, and it already takes its translate function the same way. */
+  language: AppLanguage;
   offlineReady: boolean;
   onOpenSetupGuide: () => void;
   onSelectResponseMode: (mode: ResponseMode) => void;
@@ -36,6 +41,7 @@ export const MainScreenRouteCard = React.memo(function MainScreenRouteCard({
   colors,
   compact = false,
   isPremium,
+  language,
   offlineReady,
   onOpenSetupGuide,
   onSelectResponseMode,
@@ -43,6 +49,13 @@ export const MainScreenRouteCard = React.memo(function MainScreenRouteCard({
   style,
   t,
 }: MainScreenRouteCardProps) {
+  const [routeSheetOpen, setRouteSheetOpen] = React.useState(false);
+  const openRouteSheet = React.useCallback(() => setRouteSheetOpen(true), []);
+  const closeRouteSheet = React.useCallback(() => setRouteSheetOpen(false), []);
+  const activeMode =
+    responseModes.find(({ id }) => id === activeResponseMode) ??
+    responseModes[0];
+
   return (
     <View
       style={[
@@ -78,15 +91,29 @@ export const MainScreenRouteCard = React.memo(function MainScreenRouteCard({
           <PhosphorIcon name="right" size="inline" color={colors.textMuted} />
         </TouchableOpacity>
       ) : null}
-      {availableResponseModes.length > 0 ? (
+      {availableResponseModes.length > 0 && activeMode ? (
         <View testID="response-mode-row" style={styles.routeModeRow}>
-          <ResponseModeToggle
-            compact={compact}
-            selected={activeResponseMode}
-            onSelect={onSelectResponseMode}
-            modes={responseModes}
-            readyModes={availableResponseModes}
+          {/* One line at every route count. The list of routes lives in the
+              sheet the byline opens, not in the workspace. */}
+          <RouteByline
+            {...getRouteBylineModel(activeMode, language, t)}
+            onPress={openRouteSheet}
+            switchable={responseModes.length > 1}
           />
+          {/* Mounted only while it is open. The sheet runs its own exit and
+              calls back when the animation finishes, so it is still mounted
+              for the whole of it. */}
+          {routeSheetOpen ? (
+            <ResponseModeSheet
+              compact={compact}
+              modes={responseModes}
+              onClose={closeRouteSheet}
+              onSelect={onSelectResponseMode}
+              open
+              readyModes={availableResponseModes}
+              selected={activeResponseMode}
+            />
+          ) : null}
         </View>
       ) : !isPremium ? null : (
         <TouchableOpacity
