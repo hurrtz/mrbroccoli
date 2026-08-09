@@ -156,10 +156,13 @@ function Arc({
  * another.
  */
 export function VoiceOrb({
+  disabled = false,
   label,
   maxDiameter = MAX_ORB_DIAMETER,
   minDiameter = MIN_ORB_DIAMETER,
   onPress,
+  onPressIn,
+  onPressOut,
   overtime = 0,
   phase = "idle",
   phaseProgress = 0,
@@ -168,6 +171,7 @@ export function VoiceOrb({
   testID,
   turnProgress = 0,
 }: {
+  disabled?: boolean;
   /** Accessible name. Says what tapping does, matching the visible status. */
   label: string;
   /** The range the measured diameter is clamped to. A landscape column is
@@ -175,6 +179,9 @@ export function VoiceOrb({
   maxDiameter?: number;
   minDiameter?: number;
   onPress?: () => void;
+  /** Push-to-talk holds the control rather than tapping it. */
+  onPressIn?: () => void;
+  onPressOut?: () => void;
   /** 0–1 past the estimate. Above 0 both rings fill with red as the turn runs. */
   overtime?: number;
   phase?: VoiceVisualPhase;
@@ -225,13 +232,16 @@ export function VoiceOrb({
       <Pressable
         accessibilityLabel={label}
         accessibilityRole="button"
-        disabled={!onPress}
+        accessibilityState={{ disabled }}
+        disabled={disabled || (!onPress && !onPressIn)}
         onPress={onPress}
+        onPressIn={onPressIn}
+        onPressOut={onPressOut}
         style={({ pressed }) => [
           styles.centre,
           {
             height: geometry.diameter,
-            opacity: pressed ? 0.72 : 1,
+            opacity: disabled ? 0.45 : pressed ? 0.72 : 1,
             width: geometry.diameter,
           },
         ]}
