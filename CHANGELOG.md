@@ -10,6 +10,15 @@ the complete Play Store translations are kept in a dedicated file under
 
 ## Unreleased
 
+### Changed
+
+- Recoloured the stages of a spoken turn. Green now marks both ends — when you
+  are talking and when you are being talked to — and the stages in between
+  travel out through teal, blue and indigo to violet while the model is
+  thinking hardest, then back through teal as the reply is prepared. The light
+  and dark sets are drawn separately rather than one being a lightened copy of
+  the other, so each holds against its own background.
+
 ## 3.2.0 - 2026-08-08
 
 ### Added

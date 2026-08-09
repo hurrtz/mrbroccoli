@@ -101,6 +101,17 @@ recording-dependent work, search, model requests, deliberation, and speech
 queueing. The pipeline reports semantic phase changes through callbacks; the
 screen maps those events to visual state and accessibility announcements.
 
+**Decision:** The phase palette in `src/theme/colors.ts` is a palindrome. Green
+sits at recording and at speaking because green means the user; between them the
+machine travels out through teal, blue and indigo to violet at the deepest
+thinking and returns through teal as speech is prepared. `transcribing` and
+`synthesizing` therefore resolve to one value, as do `recordingTrack` and
+`speaking`. Each appearance is authored independently rather than derived by
+brightening the other, and recording changes technique as well as value: a dark
+wash over the warm canvas in light, a solid darker green in dark, because a wash
+cannot register on a near-black canvas. Colour is never the only carrier — the
+phase glyph and the announced label state the same phase.
+
 **Decision:** Failed provider transcription retains the captured audio for
 recovery when the user did not abort. Successful or intentionally aborted turns
 clean up temporary captured audio.

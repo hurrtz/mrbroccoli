@@ -1,3 +1,16 @@
+/**
+ * The voice pipeline's phase ramp is a palindrome, and green sits at both ends
+ * because green means *you*: you are talking, then you are being talked to.
+ * Between them the machine travels one way out through teal, blue and indigo to
+ * violet at the deepest thinking, then returns through teal as speech is
+ * prepared. `transcribing` and `synthesizing` are therefore the same value, as
+ * are `recordingTrack` and `speaking`.
+ *
+ * **Decision:** each appearance is authored rather than derived. The dark set is
+ * not the light set brightened; light needs denser, darker tones to hold against
+ * a warm off-white, dark needs lighter and more luminous ones against a warm
+ * near-black.
+ */
 export const lightColors = {
   background: "#FCFBF8",
   backgroundSecondary: "#FCFBF8",
@@ -19,14 +32,22 @@ export const lightColors = {
   activeControlIcon: "#FFFFFF",
   activeControlIconBackground: "#FFFFFF1F",
   inactiveControlBorder: "#D9D7D1",
-  phaseRecording: "rgba(3, 7, 18, 0.08)",
-  phaseRecordingTrack: "#44A055",
-  phaseTranscribing: "#47BD9A",
-  phaseThinkingBriefly: "#4DA6FF",
-  phaseSearching: "#8B5CF6",
-  phaseThinking: "#6D28D9",
-  phaseSynthesizing: "#B5E61D",
-  phaseSpeaking: "#059669",
+  // Recording is a wash rather than a fill in light: a dark veil over the warm
+  // canvas, so the level reads without a second saturated green next to the
+  // accent. Dark inverts the technique and uses a solid darker green instead,
+  // because a dark veil on a near-black canvas is invisible.
+  phaseRecording: "rgba(3, 7, 18, 0.14)",
+  phaseRecordingTrack: "#2E9E52",
+  phaseTranscribing: "#2FA39B",
+  phaseThinkingBriefly: "#3A8FD0",
+  phaseSearching: "#4A67CC",
+  phaseThinking: "#6A4CC4",
+  phaseSynthesizing: "#2FA39B",
+  phaseSpeaking: "#2E9E52",
+  // The turn ring behind the phase ring: how far through the whole turn we are
+  // against its estimate. Muted on purpose -- the phase carries the colour.
+  turnTrack: "#EFEEE9",
+  turnInk: "#5D6B7A",
   bubbleUser: "#44A055",
   onAccent: "#FFFFFF",
   onPrimary: "#030712",
@@ -60,14 +81,16 @@ export const darkColors = {
   activeControlIcon: "#16181D",
   activeControlIconBackground: "#16181D1F",
   inactiveControlBorder: "#2A2F37",
-  phaseRecording: "#329F59",
+  phaseRecording: "#1E6B3A",
   phaseRecordingTrack: "#5DC17D",
-  phaseTranscribing: "#2DD4BF",
-  phaseThinkingBriefly: "#60A5FA",
-  phaseSearching: "#A78BFA",
-  phaseThinking: "#E879F9",
-  phaseSynthesizing: "#A3E635",
-  phaseSpeaking: "#10B981",
+  phaseTranscribing: "#4FD1C5",
+  phaseThinkingBriefly: "#6BB2F5",
+  phaseSearching: "#8093F0",
+  phaseThinking: "#A78BFA",
+  phaseSynthesizing: "#4FD1C5",
+  phaseSpeaking: "#5DC17D",
+  turnTrack: "#262B33",
+  turnInk: "#8B97A8",
   bubbleUser: "#5DC17D",
   onAccent: "#FFFFFF",
   onPrimary: "#111827",

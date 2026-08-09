@@ -46,13 +46,16 @@ describe("theme colors", () => {
       success: "#059669",
       danger: "#DC2626",
       dangerFill: "#DC2626",
-      phaseRecordingTrack: "#44A055",
-      phaseTranscribing: "#47BD9A",
-      phaseThinkingBriefly: "#4DA6FF",
-      phaseSearching: "#8B5CF6",
-      phaseThinking: "#6D28D9",
-      phaseSynthesizing: "#B5E61D",
-      phaseSpeaking: "#059669",
+      phaseRecording: "rgba(3, 7, 18, 0.14)",
+      phaseRecordingTrack: "#2E9E52",
+      phaseTranscribing: "#2FA39B",
+      phaseThinkingBriefly: "#3A8FD0",
+      phaseSearching: "#4A67CC",
+      phaseThinking: "#6A4CC4",
+      phaseSynthesizing: "#2FA39B",
+      phaseSpeaking: "#2E9E52",
+      turnTrack: "#EFEEE9",
+      turnInk: "#5D6B7A",
     });
   });
 
@@ -70,14 +73,62 @@ describe("theme colors", () => {
       inactiveControlBorder: "#2A2F37",
       success: "#10B981",
       danger: "#F87171",
+      phaseRecording: "#1E6B3A",
       phaseRecordingTrack: "#5DC17D",
-      phaseTranscribing: "#2DD4BF",
-      phaseThinkingBriefly: "#60A5FA",
-      phaseSearching: "#A78BFA",
-      phaseThinking: "#E879F9",
-      phaseSynthesizing: "#A3E635",
-      phaseSpeaking: "#10B981",
+      phaseTranscribing: "#4FD1C5",
+      phaseThinkingBriefly: "#6BB2F5",
+      phaseSearching: "#8093F0",
+      phaseThinking: "#A78BFA",
+      phaseSynthesizing: "#4FD1C5",
+      phaseSpeaking: "#5DC17D",
+      turnTrack: "#262B33",
+      turnInk: "#8B97A8",
     });
+  });
+
+  it.each([
+    ["light", lightColors],
+    ["dark", darkColors],
+  ] as const)(
+    "keeps the %s phase ramp a palindrome around the deepest thinking",
+    (_mode, colors) => {
+      // Green means "you" at both ends -- you are talking, then you are being
+      // talked to -- and the machine's outward and return legs mirror.
+      expect(colors.phaseSpeaking).toBe(colors.phaseRecordingTrack);
+      expect(colors.phaseSynthesizing).toBe(colors.phaseTranscribing);
+    },
+  );
+
+  it("authors each appearance rather than brightening one from the other", () => {
+    const lightRamp = [
+      lightColors.phaseRecordingTrack,
+      lightColors.phaseTranscribing,
+      lightColors.phaseThinkingBriefly,
+      lightColors.phaseSearching,
+      lightColors.phaseThinking,
+    ];
+    const darkRamp = [
+      darkColors.phaseRecordingTrack,
+      darkColors.phaseTranscribing,
+      darkColors.phaseThinkingBriefly,
+      darkColors.phaseSearching,
+      darkColors.phaseThinking,
+    ];
+
+    for (const [index, lightPhase] of lightRamp.entries()) {
+      expect(darkRamp[index]).not.toBe(lightPhase);
+      // Dark is the more luminous set against its near-black canvas.
+      expect(relativeLuminance(darkRamp[index])).toBeGreaterThan(
+        relativeLuminance(lightPhase),
+      );
+    }
+  });
+
+  it("keeps recording a wash in light and a solid fill in dark", () => {
+    // The technique differs per appearance, not just the value: a dark veil
+    // over the warm canvas cannot register on a warm near-black one.
+    expect(lightColors.phaseRecording).toMatch(/^rgba\(/);
+    expect(darkColors.phaseRecording).toMatch(/^#[0-9A-F]{6}$/);
   });
 
   it.each([
