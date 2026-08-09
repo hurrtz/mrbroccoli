@@ -61,6 +61,10 @@ export const lightColors = {
   success: "#059669",
   danger: "#DC2626",
   dangerFill: "#DC2626",
+  // Premium's gold, and the "needs attention" state that borrows it. Light
+  // needs the deeper tone: the gold that reads as warm on a near-black canvas
+  // washes out on a near-white one.
+  premium: "#8A6A12",
 };
 
 export const darkColors = {
@@ -104,6 +108,7 @@ export const darkColors = {
   success: "#10B981",
   danger: "#F87171",
   dangerFill: "#F87171",
+  premium: "#C9A227",
 };
 
 export type Colors = typeof lightColors;

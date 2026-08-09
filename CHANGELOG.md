@@ -10,6 +10,13 @@ the complete Play Store translations are kept in a dedicated file under
 
 ## Unreleased
 
+### Added
+
+- Settings now opens with a line showing whether the app can think, listen,
+  speak and search, and each one opens the setting behind it. A filled or
+  hollow dot carries the state alongside its colour, so the four are still
+  distinguishable if you cannot separate the hues.
+
 ### Changed
 
 - Recoloured the stages of a spoken turn. Green now marks both ends — when you

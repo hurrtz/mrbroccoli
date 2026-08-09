@@ -11,12 +11,17 @@ import {
 } from "../../design-system/PhosphorIcon";
 import { useTheme } from "../../theme/ThemeContext";
 import { fonts } from "../../theme/typography";
+import type { SettingsReadiness } from "../settings-core/readiness";
 import {
   isPremiumSettingsPage,
   type SettingsPage,
 } from "../settings-core/types";
 
 import { AntSettingsCard } from "./AntSettingsPrimitives";
+import {
+  RuntimeReadiness,
+  type ReadinessStep,
+} from "./settings-primitives/RuntimeReadiness";
 import { styles } from "./styles";
 
 type DrillInSettingsPage = Exclude<SettingsPage, "overview">;
@@ -110,14 +115,24 @@ const overviewGroups = [
   },
 ];
 
+/** The settings page each capability opens. */
+const READINESS_PAGES = {
+  listen: "listening",
+  search: "search",
+  speak: "speaking",
+  think: "thinking",
+} as const satisfies Record<ReadinessStep, DrillInSettingsPage>;
+
 export function AntSettingsOverview({
   isPremium,
   onOpenPage,
   onOpenPremium,
+  readiness,
 }: {
   isPremium: boolean;
   onOpenPage: (page: DrillInSettingsPage) => void;
   onOpenPremium: () => void;
+  readiness: SettingsReadiness;
 }) {
   const { colors } = useTheme();
   const { isRtl, t } = useLocalization();
@@ -136,6 +151,15 @@ export function AntSettingsOverview({
 
   return (
     <View testID="settings-page-overview" style={styles.overview}>
+      {/* Directly on the surface, with no card and no heading: four dots with
+          words beside them read as status without being told they are status,
+          and a container makes a small line of text look like a section. */}
+      <RuntimeReadiness
+        onSelect={(step) => onOpenPage(READINESS_PAGES[step])}
+        readiness={readiness}
+        t={t}
+      />
+
       {isPremium ? (
         <AntSettingsCard
           testID="settings-edition-card"

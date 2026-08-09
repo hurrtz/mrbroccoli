@@ -15,7 +15,19 @@ function overviewProps() {
     isPremium: true,
     onOpenPage: jest.fn(),
     onOpenPremium: jest.fn(),
-  };
+    readiness: {
+      listen: {
+        state: "ready",
+        summaryKey: "settingsReadinessReady",
+      },
+      search: { state: "off", summaryKey: "settingsReadinessOff" },
+      speak: {
+        state: "attention",
+        summaryKey: "settingsReadinessNeedsAttention",
+      },
+      think: { state: "ready", summaryKey: "settingsReadinessReady" },
+    },
+  } satisfies React.ComponentProps<typeof AntSettingsOverview>;
 }
 
 describe("AntSettingsOverview", () => {
@@ -112,6 +124,7 @@ describe("AntSettingsOverview", () => {
       <ThemeProvider mode="light">
         <LocalizationProvider language="en">
           <AntSettingsOverview
+            {...overviewProps()}
             isPremium={false}
             onOpenPage={onOpenPage}
             onOpenPremium={onOpenPremium}

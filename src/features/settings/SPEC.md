@@ -78,6 +78,21 @@ speech while lacking voice-directory permission or a working LLM route.
 **Decision:** A successful generic provider check does not make every provider
 capability healthy. The UI shows the capability that was actually tested.
 
+`RuntimeReadiness` renders that readiness on the settings overview: think,
+listen, speak and search on one line, each a 44pt target opening the page behind
+it. Premium gating stays where it already is -- a free edition reaches
+`LockedSettingsPage`, so the line needs no edition branch of its own.
+
+**Decision:** the four are not connected. Hairlines between them read as a
+progress stepper, which promises a sequence; these are independent capabilities
+and nothing is step 1 of 4. It also carries no card and no heading, because a
+container around a small line of text makes it look like a section of the page.
+
+**Decision:** state is carried by the dot's colour *and* by whether it is filled,
+so the four separate without colour. Labels stay in body ink: the gold that marks
+"attention" measures 4.35:1 on a tinted surface, under AA, and the state is
+already spoken in the accessible name.
+
 ## Page Ownership
 
 - Connections: credentials, provider capability health, and connection tests.

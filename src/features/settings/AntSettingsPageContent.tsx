@@ -4,8 +4,10 @@ import {
   type SettingsModalProps,
   type SettingsPage,
 } from "../settings-core/types";
+import { getSettingsReadiness } from "../settings-core/readiness";
 import { useProviderValidationState } from "../settings-core/useProviderValidationState";
 import { useSettingsController } from "../settings-core/useSettingsController";
+import { isKokoroModelReady } from "../../utils/kokoroModelReadiness";
 import { Provider, TtsListenLanguage } from "../../types";
 import { AntSettingsOverview } from "./AntSettingsOverview";
 import { AppSettingsPage } from "./pages/AppSettingsPage";
@@ -108,6 +110,27 @@ export function AntSettingsPageContent({
     settings,
   } = props;
 
+  // Above the early return: the overview is not the only page rendered here,
+  // and a hook cannot be conditional.
+  const readiness = React.useMemo(
+    () =>
+      getSettingsReadiness(settings, {
+        kokoroInstalled: isKokoroModelReady(kokoroModel),
+        llmProviders: validation.selectableLlmProviders,
+        searchProviders: validation.selectableSearchProviders,
+        sttProviders: validation.selectableSttProviders,
+        ttsProviders: validation.selectableTtsProviders,
+      }),
+    [
+      kokoroModel,
+      settings,
+      validation.selectableLlmProviders,
+      validation.selectableSearchProviders,
+      validation.selectableSttProviders,
+      validation.selectableTtsProviders,
+    ],
+  );
+
   if (
     !props.isPremium &&
     activePage !== "overview" &&
@@ -128,6 +151,7 @@ export function AntSettingsPageContent({
           isPremium={props.isPremium}
           onOpenPage={onOpenPage}
           onOpenPremium={props.onOpenPremium}
+          readiness={readiness}
         />
       );
     case "connections":

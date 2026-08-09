@@ -48,7 +48,10 @@ export function getIntroTheme(colors: Colors, isDark: boolean) {
     muted: colors.textMuted,
     mutedSoft: isDark ? "rgba(139, 151, 168, 0.14)" : "rgba(93, 107, 122, 0.10)",
 
-    premium: isDark ? "#C9A227" : "#8A6A12",
+    // The ink itself is now a theme colour, because runtime readiness borrows
+    // it for "needs attention" outside the introduction. The soft fill and
+    // border stay here: they exist only for intro surfaces.
+    premium: colors.premium,
     premiumSoft: isDark ? "rgba(201, 162, 39, 0.14)" : "rgba(138, 106, 18, 0.10)",
     premiumBorder: isDark
       ? "rgba(201, 162, 39, 0.34)"
