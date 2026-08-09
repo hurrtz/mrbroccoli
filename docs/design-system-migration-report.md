@@ -169,6 +169,20 @@ system font setting, but it is worth a look at the largest accessibility size.
 
 Untouched, and still needs an owner decision: bar indicator, carets, or both.
 
+Worth knowing before deciding: the kit's portrait workspace puts a 44pt caret on
+each side of the orb *and* uses them as the whole pager affordance, while the
+app ships the two-bar indicator below the composer. They are not additive as
+drawn — the carets sit in the orb's row and eat 96pt of its width, which is why
+the kit's orb measures `useFitSize(196, 96, 96)`.
+
+### 3.9 The orb's minimum disagrees with its own prompt
+
+`VoiceOrb.prompt.md` says the rings stop being legible below about 120 and to
+use `PhaseAwareVoiceAction` instead. The kit composes the orb at a minimum of
+**96** in portrait and **84** in landscape. I followed the kit, since it is the
+composition that actually has to fit, and made the range a prop. The geometry
+clamp that keeps the orb circular is independent and is tested at 84.
+
 ---
 
 ## 4. Where the goal document and the codebase disagree
@@ -197,9 +211,37 @@ already handled: `AntSettingsPageContent` routes a free edition to
 
 ## 5. What I could not do, and why
 
-### Phase 5 is incomplete
+### Phase 5 is incomplete, and the orb half has a real obstacle
 
-The byline replacement is complete. The orb replacement is not. What remains:
+The byline replacement is complete. The orb replacement is not, and it is worth
+being precise about why rather than calling it "large".
+
+**`VoiceOrb` cannot replace `PhaseAwareVoiceAction` one-for-one.** I tried the
+direct swap — orb as the pager's voice page, orb as the active overlay — and
+sixteen tests in `__tests__/screens/main/MainScreenVoiceStage.test.tsx` failed.
+They were not layout assertions. They cover behaviour the docked bar owns and
+the design system's orb contract does not mention:
+
+- the recording-capacity fill, continued from the actual recording start
+- the adaptive speech timeline and its red overtime layer
+- phase changes announced without announcing every ETA tick
+- pause and resume on the primary action with a **separate** Stop action
+- the increasingly urgent Drive silence countdown
+- the blocked-prompt call to action, and the on-device setup action it becomes
+
+In the design system's own kit, most of this has somewhere else to live:
+`WorkspaceStatusLine` carries the phase title and the detail line, and the
+satellite row carries the secondary actions. So the replacement is not "swap the
+control" — it is "build the composition, and re-home the behaviour the bar
+currently carries alone". Doing the first without the second is a regression in
+accessibility announcements and in playback control, which is why the attempt
+was reverted rather than committed with the tests updated.
+
+Kept from the attempt, because both are correct independently: `VoiceOrb` now
+has `onPressIn`/`onPressOut`/`disabled`, and `src/screens/main/orbProgress.ts`
+maps `VoicePhaseProgress` onto the orb's two rings and its overtime.
+
+What remains:
 
 1. **Recompose the workspace around the orb.** `MainScreenWorkspace` currently
    renders top bar → intro banner → route card → voice stage + route controls →
@@ -207,17 +249,21 @@ The byline replacement is complete. The orb replacement is not. What remains:
    row under it, `WorkspaceStatusLine` and `ConversationSettingsSummary` around
    it, and the transcript demoted to `TranscriptHandle` plus a drawer, in both
    orientations.
-2. **Replace the docked `PhaseAwareVoiceAction`.** It is rendered as an overlay
-   inside `VoiceTextInputPager` when a turn is active, so the swap has to keep
-   the pager, its bar indicator, and the composer geometry intact — all values
-   the goal explicitly says to preserve.
-3. **New copy in nineteen languages.** The orb's per-phase accessible names, the
-   transcript handle's empty and counted names, and the settings-summary label.
-   The four readiness capability labels and four state words already existed;
-   these do not.
+2. **Re-home what the docked bar carries** — the six behaviours listed above —
+   onto the status line, the satellite row and a separate stop control, then
+   replace `PhaseAwareVoiceAction` in `VoiceTextInputPager`'s active overlay.
+   The pager, its bar indicator and the composer geometry all stay: the goal
+   names those values explicitly.
+3. **A transcript drawer.** There is no expanded transcript surface to reuse —
+   `TranscriptPreviewCard` has only `card` and `canvas` presentations — so the
+   drawer `TranscriptHandle` opens has to be built.
 4. **Update the existing suites** that assert the current workspace
    (`MainScreenWorkspace.test.tsx`, `MainScreenVoiceStage.test.tsx`,
    `TranscriptPreviewCard` coverage and others).
+
+The copy is **done**: `src/i18n/workspaceTranslations.ts` carries the six new
+strings in all nineteen languages, and the satellite labels, phase words and
+`showTranscript` were already there.
 
 This is a large change to a shipping home screen, and doing it badly is worse
 than not doing it yet. I stopped at a green checkpoint rather than leaving a
