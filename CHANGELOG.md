@@ -19,6 +19,10 @@ the complete Play Store translations are kept in a dedicated file under
 
 ### Changed
 
+- The home screen now states which model answers next as a single line rather
+  than a row of cards, and it reads the same way whether you have one route
+  configured or ten. Tapping it opens the full list. Landscape and portrait get
+  the same one line.
 - Recoloured the stages of a spoken turn. Green now marks both ends — when you
   are talking and when you are being talked to — and the stages in between
   travel out through teal, blue and indigo to violet while the model is

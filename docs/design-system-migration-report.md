@@ -10,7 +10,7 @@ what worked.
 | 2 — Iconography | Complete |
 | 3 — Five new components | Complete |
 | 4 — Runtime readiness | Complete, but the phase's premise did not hold |
-| 5 — Home screen | Partial: `RouteByline` built and tested, not yet wired |
+| 5 — Home screen | Partial: the route byline ships; the orb does not |
 | 6 — Sweep | Not started |
 
 ---
@@ -48,8 +48,12 @@ surface, with no card and no connectors.
 
 ### Phase 5 — Home screen (partial)
 
-`src/components/RouteByline.tsx` built and tested. **Not yet wired into the
-home screen.** See §5.
+`RouteByline` replaces `ResponseModeToggle` on the home screen. Its route sheet
+was extracted from `ResponseModeOverflowSelector` into `ResponseModeSheet` so
+both triggers can open it; the selector's own nineteen tests pass unchanged.
+`ResponseModeToggle` is untouched and still exported.
+
+**The orb replacement is not done.** See §5.
 
 ---
 
@@ -195,30 +199,23 @@ already handled: `AntSettingsPageContent` routes a free edition to
 
 ### Phase 5 is incomplete
 
-`RouteByline` is built, tested and committed. Neither replacement is wired into
-the home screen. What remains:
+The byline replacement is complete. The orb replacement is not. What remains:
 
-1. **Swap `ResponseModeToggle` for `RouteByline`** in
-   `src/screens/main/MainScreenRouteCard.tsx`, and give the byline a route
-   sheet. The sheet already exists inside
-   `src/components/responseModeToggle/ResponseModeOverflowSelector.tsx` but is
-   welded to its own trigger, so it needs extracting into a shared component
-   without changing `ResponseModeToggle`'s behaviour.
-2. **Recompose the workspace around the orb.** `MainScreenWorkspace` currently
+1. **Recompose the workspace around the orb.** `MainScreenWorkspace` currently
    renders top bar → intro banner → route card → voice stage + route controls →
    transcript pane. The orb composition needs the orb centred, the satellite
    row under it, `WorkspaceStatusLine` and `ConversationSettingsSummary` around
    it, and the transcript demoted to `TranscriptHandle` plus a drawer, in both
    orientations.
-3. **Replace the docked `PhaseAwareVoiceAction`.** It is rendered as an overlay
+2. **Replace the docked `PhaseAwareVoiceAction`.** It is rendered as an overlay
    inside `VoiceTextInputPager` when a turn is active, so the swap has to keep
    the pager, its bar indicator, and the composer geometry intact — all values
    the goal explicitly says to preserve.
-4. **New copy in nineteen languages.** The orb's per-phase accessible names, the
+3. **New copy in nineteen languages.** The orb's per-phase accessible names, the
    transcript handle's empty and counted names, and the settings-summary label.
    The four readiness capability labels and four state words already existed;
    these do not.
-5. **Update the existing suites** that assert the current workspace
+4. **Update the existing suites** that assert the current workspace
    (`MainScreenWorkspace.test.tsx`, `MainScreenVoiceStage.test.tsx`,
    `TranscriptPreviewCard` coverage and others).
 
