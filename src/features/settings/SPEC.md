@@ -65,6 +65,14 @@ inherit wherever the last deep link went.
 Settings readiness is capability-specific. One provider key may validly support
 speech while lacking voice-directory permission or a working LLM route.
 
+The Premium overview surfaces derived readiness as `RuntimeReadiness`: the four
+capabilities (think, listen, speak, search) on one quiet line, each a 44pt
+target opening the page that configures it. It is deliberately not a stepper —
+the four are independent, so there are no connectors, no card, and no heading.
+Colour lives in the dot (ready fills green, broken fills red, attention draws a
+hollow gold ring, off a hollow muted ring); the label stays in body ink and the
+accessible name carries the state word, so the states separate without colour.
+
 - Connection health is tracked independently for LLM, STT, TTS, search, and
   voice discovery.
 - Picker options derive from the runtime manifest and device runtime overrides.

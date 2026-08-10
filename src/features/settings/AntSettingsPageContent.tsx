@@ -6,7 +6,15 @@ import {
 } from "../settings-core/types";
 import { useProviderValidationState } from "../settings-core/useProviderValidationState";
 import { useSettingsController } from "../settings-core/useSettingsController";
+import { getSettingsReadiness } from "../settings-core/readiness";
 import { Provider, TtsListenLanguage } from "../../types";
+import {
+  PROVIDER_LLM_SUPPORT,
+  PROVIDER_ORDER,
+  PROVIDER_STT_SUPPORT,
+  PROVIDER_TTS_SUPPORT,
+} from "../../constants/models";
+import { WEB_SEARCH_PROVIDER_IDS } from "../../constants/webSearch";
 import { AntSettingsOverview } from "./AntSettingsOverview";
 import { AppSettingsPage } from "./pages/AppSettingsPage";
 import { ConnectionsSettingsPage } from "./pages/ConnectionsSettingsPage";
@@ -128,6 +136,19 @@ export function AntSettingsPageContent({
           isPremium={props.isPremium}
           onOpenPage={onOpenPage}
           onOpenPremium={props.onOpenPremium}
+          readiness={getSettingsReadiness(settings, {
+            llmProviders: PROVIDER_ORDER.filter(
+              (provider) => PROVIDER_LLM_SUPPORT[provider] === "provider",
+            ),
+            sttProviders: PROVIDER_ORDER.filter(
+              (provider) => PROVIDER_STT_SUPPORT[provider] === "provider",
+            ),
+            ttsProviders: PROVIDER_ORDER.filter(
+              (provider) => PROVIDER_TTS_SUPPORT[provider] === "provider",
+            ),
+            searchProviders: [...WEB_SEARCH_PROVIDER_IDS],
+            kokoroInstalled: kokoroModel.installed,
+          })}
         />
       );
     case "connections":

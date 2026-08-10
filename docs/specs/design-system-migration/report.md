@@ -108,3 +108,41 @@ empty tracks, and overtime fills both rings with red.
   the screen will pass.
 - No changelog entry yet: nothing here is user-visible until Phase 5 mounts
   the components.
+
+## Phase 4 — Runtime readiness
+
+### Applied
+
+- `RuntimeReadiness` in `src/features/settings/settings-primitives/`, mounted
+  on the Premium settings overview between the edition card and the groups.
+  States derive from the existing `settings-core/readiness.ts` model; the
+  capability lists come from the runtime manifest and `kokoroInstalled` from
+  the Kokoro controller the settings modal already holds.
+- The "connected step chain" existed only as dead styles — nothing mounted it,
+  and a test pinned the grid's absence. The `readinessGrid`/`readinessStep*`
+  blocks (22pt circles, 2pt connector lines) were removed from
+  `features/settings/styles.ts`; the absence assertion stays and the new
+  line's presence is asserted beside it.
+- `premium` gold promoted into `src/theme/colors.ts` (light `#8A6A12`, dark
+  `#C9A227`, from `tokens/colors.css`), with a test pinning ≥3:1 non-text
+  contrast on canvas and card in both appearances. `introTheme.ts` keeps its
+  own copy on purpose — its palette is deliberately independent.
+- No new locale keys: the four labels, four state words, and the "Open
+  {section}" hint all existed in all nineteen dictionaries. The accessible
+  name composes label + state word from the same status object that draws the
+  dot, honouring the one-source rule.
+- Large text (fontScale ≥ 1.35) stacks the line into a column, matching the
+  intent of the removed grid's large-text variant.
+
+### Disagreements
+
+- The design maps `attention` to premium gold and itself flags gold doing
+  double duty as "paid" and "needs attention" as the weak point, suggesting a
+  dedicated warning token. Followed the design as specified; the token
+  question stays with the owner.
+- Kit README's "68pt minimum header" vs `--mb-header-min-height: 62px`: the
+  settings header is confirmed at 68 in `features/settings/styles.ts`, so the
+  kit README and the app agree. The token's 62 matches no header found in the
+  app; it appears to describe a different (possibly composed) surface. No
+  conflict in shipped geometry; nothing changed. **Open question:** which
+  surface the 62px token refers to.

@@ -89,56 +89,6 @@ export const styles = StyleSheet.create({
     fontSize: 14,
     lineHeight: 20,
   },
-  readinessGrid: {
-    flexDirection: "row",
-  },
-  readinessGridLargeText: {
-    flexDirection: "column",
-    gap: 8,
-  },
-  readinessStepLabel: {
-    fontFamily: fonts.bodyMedium,
-    fontSize: 12,
-    lineHeight: 16,
-    fontWeight: "500",
-    textAlign: "center",
-  },
-  readinessStepLabelLargeText: {
-    flex: 1,
-    textAlign: "auto",
-  },
-  readinessStep: {
-    flex: 1,
-    alignItems: "center",
-    gap: 6,
-  },
-  readinessStepLargeText: {
-    flexDirection: "row",
-    justifyContent: "flex-start",
-    minHeight: 44,
-    paddingHorizontal: 4,
-  },
-  readinessStepTrack: {
-    width: "100%",
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  readinessStepTrackLargeText: {
-    flex: 0,
-    width: 28,
-  },
-  readinessStepLine: {
-    flex: 1,
-    height: 2,
-  },
-  readinessStepCircle: {
-    width: 22,
-    height: 22,
-    borderRadius: 11,
-    borderWidth: 2,
-    alignItems: "center",
-    justifyContent: "center",
-  },
   sectionCards: {
     gap: 10,
   },

@@ -15,8 +15,13 @@ import {
   isPremiumSettingsPage,
   type SettingsPage,
 } from "../settings-core/types";
+import type { SettingsReadiness } from "../settings-core/readiness";
 
 import { AntSettingsCard } from "./AntSettingsPrimitives";
+import {
+  RuntimeReadiness,
+  type ReadinessStep,
+} from "./settings-primitives/RuntimeReadiness";
 import { styles } from "./styles";
 
 type DrillInSettingsPage = Exclude<SettingsPage, "overview">;
@@ -110,14 +115,24 @@ const overviewGroups = [
   },
 ];
 
+/** Each capability opens the page that configures it. */
+const READINESS_PAGE: Record<ReadinessStep, DrillInSettingsPage> = {
+  think: "thinking",
+  listen: "listening",
+  speak: "speaking",
+  search: "search",
+};
+
 export function AntSettingsOverview({
   isPremium,
   onOpenPage,
   onOpenPremium,
+  readiness,
 }: {
   isPremium: boolean;
   onOpenPage: (page: DrillInSettingsPage) => void;
   onOpenPremium: () => void;
+  readiness: SettingsReadiness;
 }) {
   const { colors } = useTheme();
   const { isRtl, t } = useLocalization();
@@ -162,6 +177,13 @@ export function AntSettingsOverview({
             </View>
           </View>
         </AntSettingsCard>
+      ) : null}
+
+      {isPremium ? (
+        <RuntimeReadiness
+          onSelect={(step) => onOpenPage(READINESS_PAGE[step])}
+          readiness={readiness}
+        />
       ) : null}
 
       {visibleGroups.map((group) => (

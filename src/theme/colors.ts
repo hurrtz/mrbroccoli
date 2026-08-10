@@ -35,6 +35,11 @@ export const lightColors = {
   // The orb's whole-turn ring against its estimate.
   turnTrack: "#EFEEE9",
   turnInk: "#5D6B7A",
+  // Paid capability has one colour everywhere. Light needs a deeper gold than
+  // dark: the tone that reads warm on a near-black canvas disappears into a
+  // near-white one. The intro flow keeps its own copy on purpose — its palette
+  // is deliberately independent of the app theme.
+  premium: "#8A6A12",
   bubbleUser: "#44A055",
   onAccent: "#FFFFFF",
   onPrimary: "#030712",
@@ -80,6 +85,7 @@ export const darkColors = {
   phaseSpeaking: "#5DC17D",
   turnTrack: "#262B33",
   turnInk: "#8B97A8",
+  premium: "#C9A227",
   bubbleUser: "#5DC17D",
   onAccent: "#FFFFFF",
   onPrimary: "#111827",

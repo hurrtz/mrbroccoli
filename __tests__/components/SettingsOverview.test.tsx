@@ -15,6 +15,12 @@ function overviewProps() {
     isPremium: true,
     onOpenPage: jest.fn(),
     onOpenPremium: jest.fn(),
+    readiness: {
+      think: { state: "ready", summaryKey: "settingsReadinessReady" },
+      listen: { state: "attention", summaryKey: "settingsReadinessNeedsAttention" },
+      speak: { state: "ready", summaryKey: "settingsReadinessReady" },
+      search: { state: "off", summaryKey: "settingsReadinessOff" },
+    } as const,
   };
 }
 
@@ -36,6 +42,22 @@ describe("AntSettingsOverview", () => {
     expect(screen.getByText("Voice & models")).toBeTruthy();
     expect(screen.getByText("Privacy & app")).toBeTruthy();
     expect(screen.queryByTestId("settings-readiness-grid")).toBeNull();
+    expect(screen.getByTestId("settings-readiness-line")).toBeTruthy();
+  });
+
+  it("opens the setting behind a readiness capability", () => {
+    const props = overviewProps();
+    const screen = render(
+      <ThemeProvider mode="light">
+        <LocalizationProvider language="en">
+          <AntSettingsOverview {...props} />
+        </LocalizationProvider>
+      </ThemeProvider>,
+    );
+
+    fireEvent.press(screen.getByTestId("settings-readiness-listen"));
+
+    expect(props.onOpenPage).toHaveBeenCalledWith("listening");
   });
 
   it("omits the retired guided setup card", () => {
@@ -112,6 +134,7 @@ describe("AntSettingsOverview", () => {
       <ThemeProvider mode="light">
         <LocalizationProvider language="en">
           <AntSettingsOverview
+            {...overviewProps()}
             isPremium={false}
             onOpenPage={onOpenPage}
             onOpenPremium={onOpenPremium}
@@ -121,6 +144,7 @@ describe("AntSettingsOverview", () => {
     );
 
     expect(screen.queryByTestId("settings-readiness-grid")).toBeNull();
+    expect(screen.queryByTestId("settings-readiness-line")).toBeNull();
     expect(
       screen.queryByTestId("settings-overview-row-connections"),
     ).toBeNull();

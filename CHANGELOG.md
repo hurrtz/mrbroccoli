@@ -10,6 +10,12 @@ the complete Play Store translations are kept in a dedicated file under
 
 ## Unreleased
 
+### Added
+
+- The Premium settings overview shows at a glance whether the app can think,
+  listen, speak, and search: four dots with their state, each opening the
+  setting behind it.
+
 ### Changed
 
 - The voice pipeline's phase colours follow the approved design system's new
