@@ -1,0 +1,7 @@
+/* Minimal global resets. The design system styles components inline from
+   tokens; this only makes an unstyled page read as Mr Broccoli. */
+html,body{margin:0;padding:0}
+body{background:var(--mb-color-background);color:var(--mb-color-text);font-family:var(--mb-text-body-family);font-size:var(--mb-text-body-size);line-height:var(--mb-text-body-line-height);-webkit-font-smoothing:antialiased}
+*,*::before,*::after{box-sizing:border-box}
+a{color:var(--mb-color-accent);text-decoration:none}
+a:hover{color:var(--mb-color-active-control);text-decoration:underline}
