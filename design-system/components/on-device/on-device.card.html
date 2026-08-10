@@ -1,0 +1,24 @@
+<!-- @dsCard group="Components" viewport="700x330" name="On-device performance" subtitle="Evidence, verdict, then the numbers" -->
+<!DOCTYPE html><html data-theme="light"><head><meta charset="utf-8">
+<link rel="stylesheet" href="../../styles.css">
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script src="../../_ds_bundle.js"></script>
+<style>body{padding:16px;background:var(--mb-color-background)}.row{padding:12px 14px;border:1px solid var(--mb-color-border);border-radius:var(--mb-radius-control);background:var(--mb-color-surface-elevated);margin-bottom:8px}.name{font-family:var(--mb-font-display);font-weight:600;font-size:15px;margin-bottom:4px}</style>
+</head><body><div id="root"></div>
+<script type="text/babel">
+const { LocalModelPerformanceSummary } = window.MrBroccoliDesignSystem_62d510;
+const rows = [
+  ["Qwen 2.5 1.5B","Measured","Viable",["14.2 tok/s","Load 1.8 s","Headroom 2.4×"]],
+  ["Whisper small","Calibrated","Likely",["0.42–0.58 RTF","Headroom 1.6×"]],
+  ["Kokoro 82M","Estimated","Close",["0.71 RTF","Headroom 1.1×"]],
+];
+ReactDOM.createRoot(document.getElementById("root")).render(
+  <div>{rows.map(([name,evidence,fit,details])=>
+    <div className="row" key={name}>
+      <div className="name">{name}</div>
+      <LocalModelPerformanceSummary evidence={evidence} fit={fit} details={details} />
+    </div>)}</div>
+);
+</script></body></html>

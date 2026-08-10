@@ -162,3 +162,11 @@ ds-bundle/
 .design-sync/.cache/
 .design-sync/learnings/
 .design-sync/node_modules
+
+# design-system/ (the vendored mirror) — bulk assets and generated files.
+# _adherence.oxlintrc.json is superseded by _ds_manifest.json; its rules are
+# recorded in the AGENTS.md "Vendored Design System" section.
+/design-system/explorations/
+/design-system/uploads/
+/design-system/_ds_bundle.js
+/design-system/_adherence.oxlintrc.json

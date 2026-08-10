@@ -1,0 +1,56 @@
+<!-- @dsCard group="Components" viewport="700x700" name="Settings primitives" subtitle="Cards, rows, pickers and radio sections" -->
+<!DOCTYPE html><html data-theme="light"><head><meta charset="utf-8">
+<link rel="stylesheet" href="../../styles.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/regular/style.css">
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script src="../../_ds_bundle.js"></script>
+<style>body{padding:16px;background:var(--mb-color-background)}</style>
+</head><body><div id="root"></div>
+<script type="text/babel">
+const { AntSectionIntro, AntSettingsCard, AntDisclosureCard, AntSwitchRow, AntNumberInputRow,
+        AntRadioSection, AntPickerSection, AntPickerRow, AntTextArea, AntButtonLabel,
+        Button, IconButton, Input, PhosphorIcon, RuntimeReadiness } = window.MrBroccoliDesignSystem_62d510;
+function Demo(){
+  const [speak,setSpeak]=React.useState(true);
+  const [rounds,setRounds]=React.useState(2);
+  const [theme,setTheme]=React.useState("system");
+  const [route,setRoute]=React.useState("device");
+  const [open,setOpen]=React.useState(true);
+  return <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:16,alignItems:"start"}}>
+    <div style={{display:"flex",flexDirection:"column",gap:12}}>
+      <AntSectionIntro title="Speaking" description="Spoken replies, playback, voices, and previews." />
+      <AntSettingsCard title="Voice replies" headerExtra={<IconButton icon="info-circle" accessibilityLabel="About voice replies" />}
+        footer={<Button size="small"><AntButtonLabel color="var(--mb-color-accent)" icon="sound" label="Preview" /></Button>}>
+        <AntSwitchRow label="Speak answers" description="Replies are read aloud paragraph by paragraph." value={speak} onChange={setSpeak} />
+        <AntNumberInputRow label="Review rounds" value={rounds} onChange={setRounds} />
+      </AntSettingsCard>
+      <AntDisclosureCard expanded={open} onToggle={()=>setOpen(!open)} toggleAccessibilityLabel="Show OpenAI settings"
+        header={<span style={{display:"flex",alignItems:"center",gap:12}}>
+          <PhosphorIcon name="key" size="control" color="var(--mb-color-accent)" />
+          <span style={{fontFamily:"var(--mb-font-display)",fontWeight:600,fontSize:16}}>OpenAI</span>
+        </span>}>
+        <Input type="password" value="sk-live-8f2c" onChange={()=>{}} allowClear />
+      </AntDisclosureCard>
+    </div>
+    <div style={{display:"flex",flexDirection:"column",gap:12}}>
+      <AntRadioSection label="Theme" value={theme} onChange={setTheme}
+        options={[{value:"light",label:"Light"},{value:"dark",label:"Dark"},{value:"system",label:"System"}]} />
+      <AntPickerSection title="Speech to text" helperText="Recognition runs on the device unless a provider is chosen.">
+        <AntPickerRow label="Route" value={route} onChange={setRoute}
+          options={[{value:"device",label:"On device"},{value:"provider",label:"Provider"}]} />
+        <AntPickerRow label="Recognition language" value="auto" onChange={()=>{}}
+          options={[{value:"auto",label:"Automatic"},{value:"en",label:"English"},{value:"de",label:"German"}]} />
+      </AntPickerSection>
+      <AntSettingsCard title="System prompt">
+        <AntTextArea value="Answer plainly. Written to be read aloud." placeholder="Answer plainly." onChange={()=>{}} />
+      </AntSettingsCard>
+      <div>
+        <RuntimeReadiness readiness={{think:"ready",listen:"attention",speak:"broken",search:"off"}} onSelect={()=>{}} />
+      </div>
+    </div>
+  </div>;
+}
+ReactDOM.createRoot(document.getElementById("root")).render(<Demo />);
+</script></body></html>

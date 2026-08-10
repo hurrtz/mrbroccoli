@@ -1,0 +1,36 @@
+<!-- @dsCard group="Components" viewport="700x560" name="Overlays" subtitle="Dialog, bottom sheet and the three toast tones" -->
+<!DOCTYPE html><html data-theme="light"><head><meta charset="utf-8">
+<link rel="stylesheet" href="../../styles.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/regular/style.css">
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script src="../../_ds_bundle.js"></script>
+<style>body{padding:16px}.stage{position:relative;height:200px;border:1px solid var(--mb-color-border);border-radius:var(--mb-radius-card);overflow:hidden;background:var(--mb-color-background)}.lbl{font-family:var(--mb-font-mono);font-size:10px;letter-spacing:.9px;text-transform:uppercase;color:var(--mb-color-text-muted);margin:0 0 6px}</style>
+</head><body><div id="root"></div>
+<script type="text/babel">
+const { Modal, Toast } = window.MrBroccoliDesignSystem_62d510;
+ReactDOM.createRoot(document.getElementById("root")).render(
+  <div style={{display:"flex",flexDirection:"column",gap:14}}>
+    <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:14}}>
+      <div><p className="lbl">Dialog</p><div className="stage">
+        <Modal inline visible title="Delete conversation?" maskClosable={false}
+          footer={[{text:"Cancel",onPress:()=>{}},{text:"Delete",onPress:()=>{},tone:"success"}]}>
+          <p style={{margin:0,fontSize:15,lineHeight:"22px",color:"var(--mb-color-text-secondary)"}}>This removes the conversation and its attachments from this device.</p>
+        </Modal>
+      </div></div>
+      <div><p className="lbl">Sheet</p><div className="stage">
+        <Modal inline visible layout="sheet" title="Response style" maskClosable={false}
+          footer={[{text:"Done",onPress:()=>{},tone:"success"}]}>
+          <p style={{margin:0,fontSize:15,lineHeight:"22px",color:"var(--mb-color-text-secondary)"}}>Rounded only at the top, pinned to the bottom edge.</p>
+        </Modal>
+      </div></div>
+    </div>
+    <div><p className="lbl">Toast</p><div style={{display:"flex",flexDirection:"column",gap:10}}>
+      <Toast inline tone="info" message="Backup saved to Files." onDismiss={()=>{}} />
+      <Toast inline tone="success" message="Key validated." onDismiss={()=>{}} />
+      <Toast inline tone="danger" message="OpenAI rejected the key." onRetry={()=>{}} onDismiss={()=>{}} />
+    </div></div>
+  </div>
+);
+</script></body></html>

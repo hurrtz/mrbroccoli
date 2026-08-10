@@ -1,0 +1,21 @@
+/* Motion is short, functional and cancellable. Sheets rise and fall
+   symmetrically; toasts fade and drop 20px; phase colour cross-fades.
+   Everything is skipped under reduce motion. */
+:root{
+  --mb-duration-press:0ms; /* @kind other */
+  --mb-duration-toast:200ms; /* @kind other */
+  --mb-duration-sheet:220ms; /* @kind other */
+  --mb-duration-phase:280ms; /* @kind other */
+  --mb-ease-sheet-in:cubic-bezier(0.33,1,0.68,1); /* @kind other */
+  --mb-ease-sheet-out:cubic-bezier(0.32,0,0.67,0); /* @kind other */
+  --mb-ease-linear:linear; /* @kind other */
+
+  --mb-press-opacity:0.72; /* @kind other */
+  --mb-press-opacity-control:0.68; /* @kind other */
+  --mb-press-scale:0.985; /* @kind other */
+  --mb-disabled-opacity:0.5; /* @kind other */
+  --mb-disabled-opacity-icon:0.45; /* @kind other */
+}
+@media (prefers-reduced-motion:reduce){
+  :root{--mb-duration-toast:0ms; /* @kind other */ --mb-duration-sheet:0ms; /* @kind other */ --mb-duration-phase:0ms; /* @kind other */}
+}

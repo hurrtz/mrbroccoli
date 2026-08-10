@@ -1,0 +1,35 @@
+<!-- @dsCard group="Components" viewport="700x580" name="Chat" subtitle="Message rows, transcript empty state, drawer rows" -->
+<!DOCTYPE html><html data-theme="light"><head><meta charset="utf-8">
+<link rel="stylesheet" href="../../styles.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/regular/style.css">
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script src="../../_ds_bundle.js"></script>
+<style>body{padding:16px;background:var(--mb-color-background)}.lbl{font-family:var(--mb-font-mono);font-size:10px;letter-spacing:.9px;text-transform:uppercase;color:var(--mb-color-text-muted);margin:0 0 6px}</style>
+</head><body><div id="root"></div>
+<script type="text/babel">
+const { ChatBubble, ChatTranscript, ConversationDrawerItem } = window.MrBroccoliDesignSystem_62d510;
+const base = "../../assets/providers";
+ReactDOM.createRoot(document.getElementById("root")).render(
+  <div style={{display:"grid",gridTemplateColumns:"1.1fr 1fr",gap:16,alignItems:"start"}}>
+    <div><p className="lbl">ChatBubble</p>
+      <ChatBubble role="user" timestamp="09.08.26 · 14:11" text="When does the tide turn in Lisbon?" />
+      <ChatBubble role="assistant" provider="anthropic" model="Claude Sonnet 4.5" timestamp="09.08.26 · 14:12"
+        text="High water is at 15:40 today, and the tide turns roughly every six hours after that."
+        actions={[{icon:"copy",label:"Copy"},{icon:"redo",label:"Repeat"},{icon:"branch",label:"Branch"},{icon:"share-alt",label:"Share"}]} />
+      <p className="lbl" style={{marginTop:12}}>ChatTranscript · empty</p>
+      <div style={{border:"1px solid var(--mb-color-border)",borderRadius:"var(--mb-radius-dialog)",background:"var(--mb-color-surface)"}}>
+        <ChatTranscript isEmpty emptyTitle="No messages yet" emptyDescription="Hold the microphone and ask something." />
+      </div>
+    </div>
+    <div><p className="lbl">ConversationDrawerItem</p>
+      <div style={{border:"1px solid var(--mb-color-border)",borderRadius:"var(--mb-radius-dialog)",background:"var(--mb-color-surface)",overflow:"hidden"}}>
+        <ConversationDrawerItem title="Tide tables" active pinned providers={["anthropic"]} models={["Claude Sonnet 4.5"]} messageCount={12} updatedAt="09.08.26 · 14:12" hasBranches assetBase={base} />
+        <ConversationDrawerItem title="Loaf timing" depth={1} providers={["openai"]} models={["GPT-5"]} messageCount={4} updatedAt="08.08.26 · 09:03" assetBase={base} />
+        <ConversationDrawerItem title="Insurance letter" isPrivate providers={["mistral"]} models={["Mistral Large"]} messageCount={7} updatedAt="06.08.26 · 21:44" assetBase={base} />
+      </div>
+    </div>
+  </div>
+);
+</script></body></html>

@@ -1,0 +1,30 @@
+<!-- @dsCard group="Components" viewport="700x260" name="Picker and intro banner" subtitle="The workspace dropdown, and the one violet surface in the product" -->
+<!DOCTYPE html><html data-theme="light"><head><meta charset="utf-8">
+<link rel="stylesheet" href="../../styles.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/regular/style.css">
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script src="../../_ds_bundle.js"></script>
+<style>body{padding:16px;background:var(--mb-color-background)}.lbl{font-family:var(--mb-font-mono);font-size:10px;letter-spacing:.9px;text-transform:uppercase;color:var(--mb-color-text-muted);margin:0 0 6px}</style>
+</head><body><div id="root"></div>
+<script type="text/babel">
+const { AppWordmark, ResponseModeToggle, PhaseAwareVoiceAction, Picker, IntroBanner, IconButton } = window.MrBroccoliDesignSystem_62d510;
+const base = "../../assets/providers";
+const modes = [
+  { id:"a", provider:"openai", providerLabel:"OpenAI", modelLabel:"GPT-5", effortLabel:"Medium" },
+  { id:"b", provider:"anthropic", providerLabel:"Anthropic", modelLabel:"Claude Sonnet 4.5", effortLabel:"High" },
+  { id:"c", local:true, modelLabel:"On device", effortLabel:"Fixed" },
+];
+function Demo(){
+  const [mode,setMode]=React.useState("b");
+  return <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:16,alignItems:"start"}}>
+    <div><p className="lbl">Picker</p>
+      <Picker label="Voice" value="heart" dropdownLabel="Selection" onChange={()=>{}}
+        options={[{value:"heart",label:"Heart · American female"},{value:"river",label:"River · British female"}]} /></div>
+    <div><p className="lbl">IntroBanner</p>
+      <IntroBanner title="New here?" body="A short introduction to voice-first answers." action="Start" /></div>
+  </div>;
+}
+ReactDOM.createRoot(document.getElementById("root")).render(<Demo />);
+</script></body></html>
