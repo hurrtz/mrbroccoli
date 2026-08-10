@@ -1,0 +1,28 @@
+/* Modest shapes: never pill, never sharp. Controls and rows 8–12,
+   dialogs and sheets 16–20, sheets round only their top corners.
+   Borders do the work that elevation does elsewhere. */
+:root{
+  --mb-radius-chip:6px;
+  --mb-radius-tag:8px;
+  --mb-radius-control:10px;
+  --mb-radius-icon-button:12px;
+  --mb-radius-card:12px;
+  --mb-radius-panel:14px;
+  --mb-radius-dialog:16px;
+  --mb-radius-voice-stage:17px;
+  --mb-radius-picker-modal:18px;
+  --mb-radius-sheet-top:20px;
+  --mb-radius-style-sheet-top:24px;
+
+  --mb-border-hairline:1px;
+  --mb-border-width:1px;
+  --mb-border-strong-width:2px;
+  --mb-message-rail-width:3px;
+
+  /* Elevation is a light step in dark and a white card in light; the shadow is
+     a whisper on both, never the thing that separates a surface. */
+  --mb-shadow-dialog:0 8px 24px var(--mb-color-glow);
+  --mb-shadow-sheet:0 -12px 30px var(--mb-color-glow);
+  --mb-shadow-toast:0 18px 18px var(--mb-color-glow);
+  --mb-shadow-none:none;
+}
