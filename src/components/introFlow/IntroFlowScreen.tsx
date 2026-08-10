@@ -20,10 +20,12 @@ import { PhosphorIcon } from "../../design-system/PhosphorIcon";
 import type { AppLanguage } from "../../i18n/localeRegistry";
 import type { TranslateFn } from "../../screens/main/shared";
 import { IntroStepper } from "./IntroStepper";
+import type { AutoSetupJobState } from "../autoSetup/types";
 import { INTRO_STEP_CONTENT, INTRO_STEPS } from "./introSteps";
 import { introRadius, useIntroTheme } from "./introTheme";
 
 interface IntroFlowScreenProps {
+  autoSetup: AutoSetupJobState;
   language: AppLanguage;
   onClose: () => void;
   onConnectProvider: () => void;
@@ -49,6 +51,7 @@ interface IntroFlowScreenProps {
  * runs in both directions -- a one-way path made the last step a dead end.
  */
 export function IntroFlowScreen({
+  autoSetup,
   language,
   onClose,
   onConnectProvider,
@@ -177,6 +180,7 @@ export function IntroFlowScreen({
                     style={{ width }}
                   >
                     <StepContent
+                      autoSetup={autoSetup}
                       language={language}
                       onConnectProvider={onConnectProvider}
                       onInstallLocal={onInstallLocal}

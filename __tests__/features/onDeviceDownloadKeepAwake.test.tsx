@@ -115,6 +115,7 @@ import { LOCAL_MODEL_CATALOG } from "../../src/constants/localModels";
 import { DEFAULT_SETTINGS } from "../../src/types";
 import { renderWithProviders } from "../test-utils/renderWithProviders";
 import { NativeModules, Platform } from "react-native";
+import { createAutoSetupJob } from "../test-utils/autoSetupJobFixture";
 
 // The hook reads the module and the platform at call time, so installing the
 // stub here is enough and avoids mocking the bridge itself.
@@ -142,6 +143,7 @@ function renderPage() {
   return renderWithProviders(
     <OnDeviceSettingsPage
       isPremium={false}
+      autoSetup={createAutoSetupJob()}
       kokoroModel={kokoroModel}
       onPreviewVoice={jest.fn(() => Promise.resolve())}
       onUpdate={jest.fn()}

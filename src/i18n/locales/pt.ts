@@ -12,6 +12,7 @@ import { onboardingTranslations } from "../onboardingTranslations";
 import { introTranslations } from "../introTranslations";
 import { premiumTranslations } from "../premiumTranslations";
 import { transcriptEditTranslations } from "../transcriptEditTranslations";
+import { autoSetupTranslations } from "../autoSetupTranslations";
 import { workspaceTranslations } from "../workspaceTranslations";
 
 export const pt = {
@@ -29,6 +30,7 @@ export const pt = {
   ...premiumTranslations.pt,
   ...transcriptEditTranslations.pt,
   ...workspaceTranslations.pt,
+  ...autoSetupTranslations.pt,
   appName: "Sr. Brócolo",
   retry: "Tentar novamente",
   dismiss: "Fechar",

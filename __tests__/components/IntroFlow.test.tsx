@@ -25,6 +25,7 @@ jest.mock("expo-audio", () => ({
 import { IntroBanner } from "../../src/components/IntroBanner";
 import { IntroFlowScreen } from "../../src/components/introFlow/IntroFlowScreen";
 import { INTRO_STEPS } from "../../src/components/introFlow/introSteps";
+import { createAutoSetupJob } from "../test-utils/autoSetupJobFixture";
 
 const t = ((key: string) => key) as never;
 
@@ -38,6 +39,7 @@ function renderScreen(
   overrides: Partial<React.ComponentProps<typeof IntroFlowScreen>> = {},
 ) {
   const props = {
+    autoSetup: createAutoSetupJob(),
     language: "en" as const,
     onClose: jest.fn(),
     onConnectProvider: jest.fn(),
@@ -109,10 +111,13 @@ describe("IntroBanner", () => {
 });
 
 describe("IntroFlowScreen", () => {
-  it("covers the six setup steps in order", () => {
+  it("covers the seven setup steps in order", () => {
+    // The auto step sits after requirements and before the manual routes,
+    // because the manual routes are the fallback now.
     expect(INTRO_STEPS).toEqual([
       "welcome",
       "requirements",
+      "auto",
       "llm",
       "stt",
       "tts",
@@ -153,7 +158,7 @@ describe("IntroFlowScreen", () => {
     // just be another button that means "leave".
     const { getByTestId, queryByTestId } = renderScreen();
 
-    fireEvent.press(getByTestId("intro-stepper-dot-5"));
+    fireEvent.press(getByTestId("intro-stepper-dot-6"));
 
     expect(queryByTestId("intro-next")).toBeNull();
     expect(getByTestId("intro-close")).toBeTruthy();
@@ -163,7 +168,7 @@ describe("IntroFlowScreen", () => {
     // The header already carries an exit. A second one on the last step reads
     // as something to escape rather than something that finished.
     const { getByTestId, queryByTestId } = renderScreen();
-    fireEvent.press(getByTestId("intro-stepper-dot-5"));
+    fireEvent.press(getByTestId("intro-stepper-dot-6"));
 
     expect(queryByTestId("intro-hide-banner")).toBeNull();
     expect(queryByTestId("intro-next")).toBeNull();
@@ -173,7 +178,7 @@ describe("IntroFlowScreen", () => {
   it("jumps to any step from the stepper", () => {
     const { getByTestId } = renderScreen();
 
-    fireEvent.press(getByTestId("intro-stepper-dot-5"));
+    fireEvent.press(getByTestId("intro-stepper-dot-6"));
 
     expect(getByTestId("intro-open-premium")).toBeTruthy();
   });

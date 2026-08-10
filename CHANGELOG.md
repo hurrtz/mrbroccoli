@@ -12,6 +12,12 @@ the complete Play Store translations are kept in a dedicated file under
 
 ### Added
 
+- Automatic on-device setup: one tap measures what your phone can run, shows
+  the models it would install — one to think, one to listen, one to speak —
+  and downloads only after you have seen the list. The install keeps running
+  if you leave the screen, a quiet row on the home screen leads back to it,
+  and a failure keeps everything that finished so retrying resumes instead of
+  starting over. The introduction gains this as its own step.
 - The Premium settings overview shows at a glance whether the app can think,
   listen, speak, and search: four dots with their state, each opening the
   setting behind it.

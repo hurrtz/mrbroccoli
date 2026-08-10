@@ -38,6 +38,7 @@ import {
   disableRuntimeCapabilityConfiguration,
   resetRuntimeCapabilityOverridesForTests,
 } from "../../src/services/runtimeCapabilityOverrides";
+import { createAutoSetupJob } from "../test-utils/autoSetupJobFixture";
 
 const NativeDialogType = NativeDialog as unknown as React.ComponentType<any>;
 const hiddenIconQuery = { includeHiddenElements: true } as const;
@@ -128,6 +129,7 @@ function renderSettingsModal(
           isPremium
           developmentEntitlementMode={null}
           settings={DEFAULT_SETTINGS}
+          autoSetup={createAutoSetupJob()}
           kokoroModel={kokoroModel}
           providerVoiceDirectories={{}}
           onUpdate={jest.fn()}

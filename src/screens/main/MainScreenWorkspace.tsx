@@ -2,6 +2,7 @@ import React from "react";
 import { StyleSheet, useWindowDimensions, View } from "react-native";
 
 import { IntroBanner } from "../../components/IntroBanner";
+import { BackgroundTaskBar } from "../../design-system/BackgroundTaskBar";
 import { ConversationSettingsSummary } from "../../design-system/ConversationSettingsSummary";
 import { OrbSatellite } from "../../design-system/OrbSatellite";
 import { TranscriptHandle } from "../../design-system/TranscriptHandle";
@@ -141,6 +142,11 @@ function WorkspaceSatellites({
 }
 
 interface MainScreenWorkspaceProps {
+  /** The one row reporting work the user started somewhere else. */
+  backgroundTask: Omit<
+    React.ComponentProps<typeof BackgroundTaskBar>,
+    "style"
+  > | null;
   colors: Colors;
   introBanner: React.ComponentProps<typeof IntroBanner>;
   isLandscape: boolean;
@@ -200,6 +206,7 @@ function getLastAssistantMessage(messages: Message[]): Message | null {
 }
 
 export function MainScreenWorkspace({
+  backgroundTask,
   colors,
   introBanner,
   isLandscape,
@@ -260,6 +267,9 @@ export function MainScreenWorkspace({
       <View style={styles.landscapeShell}>
         <View testID="landscape-left-pane" style={styles.landscapeLeftColumn}>
           <MainScreenTopBar colors={colors} {...landscapeTopBar} />
+
+          {/* In landscape the row belongs in the left pane, above the byline. */}
+          {backgroundTask ? <BackgroundTaskBar {...backgroundTask} /> : null}
 
           <MainScreenRouteCard
             colors={colors}
@@ -339,6 +349,7 @@ export function MainScreenWorkspace({
 
       <View style={styles.workspaceBody}>
         <IntroBanner {...introBanner} />
+        {backgroundTask ? <BackgroundTaskBar {...backgroundTask} /> : null}
         <MainScreenRouteCard colors={colors} {...routeCard} />
         <ConversationSettingsSummary
           accessibilityLabel={settingsSummary.accessibilityLabel}

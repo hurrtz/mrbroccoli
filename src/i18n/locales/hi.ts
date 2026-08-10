@@ -12,6 +12,7 @@ import { onboardingTranslations } from "../onboardingTranslations";
 import { introTranslations } from "../introTranslations";
 import { premiumTranslations } from "../premiumTranslations";
 import { transcriptEditTranslations } from "../transcriptEditTranslations";
+import { autoSetupTranslations } from "../autoSetupTranslations";
 import { workspaceTranslations } from "../workspaceTranslations";
 
 export const hi = {
@@ -29,6 +30,7 @@ export const hi = {
   ...premiumTranslations.hi,
   ...transcriptEditTranslations.hi,
   ...workspaceTranslations.hi,
+  ...autoSetupTranslations.hi,
   appName: "मिस्टर ब्रोकली",
   retry: "पुन: प्रयास करें",
   dismiss: "बंद करें",

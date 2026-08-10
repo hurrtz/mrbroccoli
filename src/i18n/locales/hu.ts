@@ -12,6 +12,7 @@ import { onboardingTranslations } from "../onboardingTranslations";
 import { introTranslations } from "../introTranslations";
 import { premiumTranslations } from "../premiumTranslations";
 import { transcriptEditTranslations } from "../transcriptEditTranslations";
+import { autoSetupTranslations } from "../autoSetupTranslations";
 import { workspaceTranslations } from "../workspaceTranslations";
 
 export const hu = {
@@ -29,6 +30,7 @@ export const hu = {
   ...premiumTranslations.hu,
   ...transcriptEditTranslations.hu,
   ...workspaceTranslations.hu,
+  ...autoSetupTranslations.hu,
   appName: "Brokkoli úr",
   retry: "Próbálja újra",
   dismiss: "Bezárás",

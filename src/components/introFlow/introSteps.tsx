@@ -2,6 +2,8 @@ import React from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
 import { PhosphorIcon } from "../../design-system/PhosphorIcon";
+import { AutoSetupCard } from "../autoSetup/AutoSetupCard";
+import type { AutoSetupJobState } from "../autoSetup/types";
 import type { AppLanguage } from "../../i18n/localeRegistry";
 import type { TranslateFn } from "../../screens/main/shared";
 import { fonts } from "../../theme/typography";
@@ -19,9 +21,13 @@ import { introRadius, useIntroTheme } from "./introTheme";
 import { IntroVoicePicker } from "./IntroVoicePicker";
 import { useIntroPlayback } from "./useIntroPlayback";
 
+// The auto step sits before the manual routes because the manual routes are
+// the fallback now: someone who takes the tap never needs the three screens
+// that follow, and someone who declines has lost a swipe.
 export const INTRO_STEPS = [
   "welcome",
   "requirements",
+  "auto",
   "llm",
   "stt",
   "tts",
@@ -30,6 +36,8 @@ export const INTRO_STEPS = [
 export type IntroStep = (typeof INTRO_STEPS)[number];
 
 export interface IntroStepProps {
+  /** The automatic setup job shared with settings and the home screen. */
+  autoSetup: AutoSetupJobState;
   language: AppLanguage;
   onConnectProvider: () => void;
   onInstallLocal: () => void;
@@ -279,12 +287,33 @@ function PremiumStep({ onOpenPremium, t }: IntroStepProps) {
   );
 }
 
+/**
+ * The automatic setup step. The card's own header is hidden here: the step
+ * title and body already say what it is, and a second heading inside the card
+ * would read as a card about a card.
+ */
+function AutoStep({ autoSetup, onInstallLocal, t }: IntroStepProps) {
+  return (
+    <View style={styles.stack}>
+      <IntroTitle>{t("introAutoTitle")}</IntroTitle>
+      <IntroBody>{t("introAutoBody")}</IntroBody>
+      <AutoSetupCard
+        job={autoSetup}
+        onManual={onInstallLocal}
+        showHeader={false}
+        t={t}
+      />
+    </View>
+  );
+}
+
 export const INTRO_STEP_CONTENT: Record<
   IntroStep,
   (props: IntroStepProps) => React.ReactElement
 > = {
   welcome: WelcomeStep,
   requirements: RequirementsStep,
+  auto: AutoStep,
   llm: LlmStep,
   stt: SttStep,
   tts: TtsStep,

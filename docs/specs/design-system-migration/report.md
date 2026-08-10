@@ -206,3 +206,67 @@ empty tracks, and overtime fills both rings with red.
 - `MainScreen` still passes `onInterruptPlayback`/`onStopPlayback` into the
   voice stage for the retained bar's contract even though the orb path uses
   them from the satellites row; harmless duplication kept for the bar's sake.
+
+## Phase 6 — Automatic on-device setup
+
+### The spike came back positive
+
+The goal instructs stopping if the catalogue cannot answer "which of these
+will run on this phone". It can: `selectOfflineProfile` already picks one
+LLM, one STT and one TTS from per-model device requirements,
+`automaticPriority`, language filtering and benchmarks, and
+`prepareOfflineProfile` already implements the install queue with
+skip-verified resume, abort, and per-step progress. Phase 6 is presentation
+plus one job controller over machinery that existed.
+
+### Applied
+
+- `AutoSetupCard`, `AutoSetupPlanRow`, `InstallProgressBar` under
+  `src/components/autoSetup/`; `BackgroundTaskBar` in `src/design-system/`.
+- `useAutoSetupJob` at the composition root: the job lives above every screen
+  that shows it. Offer → scanning (staged ~2.5s reveal of real readings) →
+  proposal → installing → done | failed; install is only reachable from a
+  seen proposal; retry re-runs `prepareOfflineProfile`, which skips verified
+  models — resume, not restart. Keep-awake held while installing; the
+  existing per-model download path already runs under the Android foreground
+  service.
+- The introduction gains the `auto` step after `requirements`; `INTRO_STEPS`
+  is seven ids and `IntroStepper` took the count without changes. On-device
+  AI settings leads with the full card; the home screen shows the
+  `BackgroundTaskBar` while installing or failed, tapping through to the
+  On-device page, with no dismiss control on purpose.
+- On success the profile is applied with configured provider modes preserved,
+  the same reversibility rule as Free setup.
+- Roughly forty new strings in all nineteen locales via a shared
+  `autoSetupTranslations` module, with formatted (reorderable) time and step
+  readings.
+
+### Translation decisions
+
+- **The RN card is always controlled.** The web card's self-driving demo mode
+  exists for specimens; an install that must survive leaving the screen needs
+  the host to own the clock, so the demo mode was not ported.
+- **The proposal shows total size but no pre-install time estimate.** The
+  design's "about 4 min on Wi-Fi" before any transfer would be a number the
+  app has not measured. The time reading appears once installing, from the
+  same estimator the Free flow uses, and counts down against reality.
+- **The queue reads download and test steps only.** The design inserts
+  "Preparing"/"Verifying" bookend steps; the app's queue emits real steps
+  (per-model download, per-model benchmark) and inventing two more would
+  decouple the reading from the work.
+- **Toast suppression is surface-level.** The rule is card-or-toast, never
+  both; the app suppresses the toast while the introduction or the settings
+  modal is open. Detecting the exact settings *page* would mean lifting the
+  modal's internal navigation state; with settings open on another page the
+  outcome is currently not toasted. **Open question** for the owner whether
+  that narrower case warrants the refactor.
+- A capability the selection routes to the device's own recognizer or voice
+  shows as a plan row named with the existing native-route labels rather than
+  a model and size — the honest answer to the §4 question about phones that
+  cannot run all three jobs, pending the owner's ruling.
+
+### For the owner (goal §4)
+
+- Metered-connection retry behaviour is unchanged: retry is manual.
+- The proposal's language comes from the interface language; a multilingual
+  listener may want the plan to cover `localLanguages` instead.

@@ -12,6 +12,7 @@ import { onboardingTranslations } from "../onboardingTranslations";
 import { introTranslations } from "../introTranslations";
 import { premiumTranslations } from "../premiumTranslations";
 import { transcriptEditTranslations } from "../transcriptEditTranslations";
+import { autoSetupTranslations } from "../autoSetupTranslations";
 import { workspaceTranslations } from "../workspaceTranslations";
 
 export const pl = {
@@ -29,6 +30,7 @@ export const pl = {
   ...premiumTranslations.pl,
   ...transcriptEditTranslations.pl,
   ...workspaceTranslations.pl,
+  ...autoSetupTranslations.pl,
   appName: "Pan Brokuł",
   retry: "Spróbuj ponownie",
   dismiss: "Odrzuć",

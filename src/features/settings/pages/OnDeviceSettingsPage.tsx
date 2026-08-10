@@ -9,6 +9,8 @@ import {
 } from "react-native";
 
 import { Button } from "../../../design-system/NativeControls";
+import { AutoSetupCard } from "../../../components/autoSetup/AutoSetupCard";
+import type { AutoSetupJobState } from "../../../components/autoSetup/types";
 import { LocalModelPerformanceSummary } from "../../../components/LocalModelPerformanceSummary";
 import {
   LOCAL_MODEL_CATALOG,
@@ -108,6 +110,7 @@ function capabilityTitleKey(capability: LocalModelCapability) {
 }
 
 export function OnDeviceSettingsPage({
+  autoSetup,
   settings,
   isPremium,
   kokoroModel,
@@ -115,6 +118,7 @@ export function OnDeviceSettingsPage({
   onUpdate,
   onPreviewVoice,
 }: {
+  autoSetup: AutoSetupJobState;
   settings: Settings;
   isPremium: boolean;
   kokoroModel: KokoroModelController;
@@ -746,6 +750,11 @@ export function OnDeviceSettingsPage({
 
   return (
     <View testID="on-device-settings-page" style={styles.sectionPageStack}>
+      {/* On-device AI leads with the automatic card: one tap that measures
+          the device, proposes a set, and installs it. The manual catalogue
+          below remains the expert route. */}
+      <AutoSetupCard job={autoSetup} t={t} />
+
       <View style={styles.sectionGroup}>
         <AntSectionIntro title={t("settingsOnDevice")} />
         <AntSettingsCard>

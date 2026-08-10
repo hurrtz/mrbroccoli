@@ -2,6 +2,7 @@ import React from "react";
 import * as Speech from "expo-speech";
 import { TextInput } from "react-native";
 
+import type { AutoSetupJobState } from "../../components/autoSetup/types";
 import type { CatalogProviderId } from "../../catalog/types";
 import type { ProviderVoiceDirectories } from "../../services/providerVoiceDirectory";
 import type { KokoroModelController } from "../../hooks/useKokoroModel";
@@ -26,6 +27,8 @@ import {
 export interface SettingsModalProps {
   visible: boolean;
   suspended?: boolean;
+  /** The automatic on-device setup job; On-device AI leads with its card. */
+  autoSetup: AutoSetupJobState;
   isPremium: boolean;
   developmentEntitlementMode: DevelopmentEntitlementMode | null;
   onSetDevelopmentEntitlementMode: (

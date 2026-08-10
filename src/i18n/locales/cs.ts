@@ -12,6 +12,7 @@ import { onboardingTranslations } from "../onboardingTranslations";
 import { introTranslations } from "../introTranslations";
 import { premiumTranslations } from "../premiumTranslations";
 import { transcriptEditTranslations } from "../transcriptEditTranslations";
+import { autoSetupTranslations } from "../autoSetupTranslations";
 import { workspaceTranslations } from "../workspaceTranslations";
 
 export const cs = {
@@ -29,6 +30,7 @@ export const cs = {
   ...premiumTranslations.cs,
   ...transcriptEditTranslations.cs,
   ...workspaceTranslations.cs,
+  ...autoSetupTranslations.cs,
   appName: "Pan Brokolice",
   retry: "Zkuste to znovu",
   dismiss: "Zavřít",

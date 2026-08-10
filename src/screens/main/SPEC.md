@@ -124,9 +124,22 @@ routes; the Free runtime ignores them and they return untouched with Premium.
 ## Onboarding
 
 There is no blocking setup surface. A new install opens directly into the
-workspace, with a dismissible intro banner above it that opens a six-step
-full-screen introduction: the greeting, what setup actually requires, the one
-requirement, the two optional pieces, and what Premium adds.
+workspace, with a dismissible intro banner above it that opens a seven-step
+full-screen introduction: the greeting, what setup actually requires, the
+automatic one-tap setup, the one requirement, the two optional pieces, and
+what Premium adds.
+
+The automatic setup step carries the shared `AutoSetupCard` with its header
+hidden — the step title and body already say what it is. The job behind it
+lives above every screen that shows it (`useAutoSetupJob` at the composition
+root): the introduction's step, the top of On-device AI settings, and the
+home-screen `BackgroundTaskBar` are three views of one state, so leaving the
+introduction mid-install keeps the download running and reachable. Its six
+states run offer → scanning → proposal → installing → done or failed; nothing
+downloads before the proposal has been seen; the staged ~2.5s measurement
+reveals only real device readings; a failure keeps completed models and retry
+resumes the queue rather than starting over; and the outcome is announced by
+the card where the card is visible, by a toast anywhere else — never both.
 
 **Decision:** The introduction follows the app's light or dark theme. Only the
 workspace banner keeps a palette of its own -- violet, in both themes -- because

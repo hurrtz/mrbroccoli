@@ -18,6 +18,7 @@ import {
   getConversationTtsControlState,
   getMainScreenRouteConfiguration,
 } from "./main/mainScreenRouteConfiguration";
+import { useAutoSetupJob } from "./main/useAutoSetupJob";
 import { useConversationActions } from "./main/useConversationActions";
 import { useConversationTitleGenerator } from "./main/useConversationTitleGenerator";
 import { useConversationSettings } from "./main/useConversationSettings";
@@ -357,6 +358,27 @@ export function MainScreen() {
   );
   const { dismissToast, showToast, toast } = useMainScreenToastController();
   usePersistenceFailureAlert(showToast, t);
+  // Where the outcome is announced depends on where the user is: the auto
+  // setup card states it in full in the introduction and on the On-device
+  // page, and the toast carries it anywhere else. Never both — two
+  // announcements of one event read as two events.
+  const autoSetupSurfacesVisibleRef = React.useRef(false);
+  autoSetupSurfacesVisibleRef.current = introVisible || settingsVisible;
+  const autoSetup = useAutoSetupJob({
+    onOutcome: (outcome) => {
+      if (autoSetupSurfacesVisibleRef.current) {
+        return;
+      }
+      if (outcome === "done") {
+        showToast(t("autoSetupDoneTitle"), undefined, "success");
+      } else {
+        showToast(t("autoSetupBarFailed"), undefined, "danger");
+      }
+    },
+    settings,
+    t,
+    updateSettings,
+  });
   const showImageError = React.useCallback(
     (message: string) => showToast(message, undefined, "danger"),
     [showToast],
@@ -842,6 +864,7 @@ export function MainScreen() {
         tone: toast?.tone,
       }}
       intro={{
+        autoSetup,
         language: settings.language,
         onClose: closeIntro,
         // Provider keys are Premium, so a Free reader is sent to the purchase
@@ -884,6 +907,32 @@ export function MainScreen() {
         visible: introVisible,
       }}
       workspace={{
+        backgroundTask:
+          autoSetup.state === "installing" || autoSetup.state === "failed"
+            ? {
+                accessibilityLabel: `${
+                  autoSetup.state === "failed"
+                    ? t("autoSetupBarFailed")
+                    : t("autoSetupBarInstalling")
+                }. ${t("autoSetupBarOpen")}`,
+                detail:
+                  autoSetup.state === "failed"
+                    ? t("autoSetupBarFailedDetail")
+                    : [
+                        autoSetup.reading?.stepLabel,
+                        autoSetup.reading?.remaining,
+                      ]
+                        .filter(Boolean)
+                        .join(" · "),
+                fraction: autoSetup.fraction,
+                onPress: () => openSettings(undefined, undefined, "local"),
+                title:
+                  autoSetup.state === "failed"
+                    ? t("autoSetupBarFailed")
+                    : t("autoSetupBarInstalling"),
+                tone: autoSetup.state === "failed" ? "danger" : "progress",
+              }
+            : null,
         colors,
         introBanner: {
           onDismiss: dismissIntroBanner,
@@ -1097,6 +1146,7 @@ export function MainScreen() {
         ttsStatusLabel,
       }}
       settingsModal={{
+        autoSetup,
         focusPage: settingsFocusPage,
         visible: settingsVisible,
         suspended: premiumModalVisible,

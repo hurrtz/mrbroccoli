@@ -271,6 +271,7 @@ export function AntSettingsPageContent({
       return (
         <DrillInPage page="local">
           <OnDeviceSettingsPage
+            autoSetup={props.autoSetup}
             settings={settings}
             isPremium={props.isPremium}
             kokoroModel={kokoroModel}

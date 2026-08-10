@@ -12,6 +12,7 @@ import { onboardingTranslations } from "../onboardingTranslations";
 import { introTranslations } from "../introTranslations";
 import { premiumTranslations } from "../premiumTranslations";
 import { transcriptEditTranslations } from "../transcriptEditTranslations";
+import { autoSetupTranslations } from "../autoSetupTranslations";
 import { workspaceTranslations } from "../workspaceTranslations";
 
 export const ja = {
@@ -29,6 +30,7 @@ export const ja = {
   ...premiumTranslations.ja,
   ...transcriptEditTranslations.ja,
   ...workspaceTranslations.ja,
+  ...autoSetupTranslations.ja,
   appName: "ミスター・ブロッコリー",
   retry: "再試行",
   dismiss: "閉じる",
