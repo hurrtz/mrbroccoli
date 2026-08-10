@@ -1,0 +1,40 @@
+<!-- @dsCard group="Components" viewport="700x570" name="Introduction" subtitle="The first-run banner and the six-step flow it opens" -->
+<!DOCTYPE html><html data-theme="light"><head><meta charset="utf-8">
+<link rel="stylesheet" href="../../styles.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/regular/style.css">
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script src="../../_ds_bundle.js"></script>
+<style>body{margin:0;padding:14px;display:flex;gap:14px;align-items:stretch;height:542px;box-sizing:border-box}.pane{flex:1;min-width:0;padding:12px;border-radius:14px;display:flex;flex-direction:column;gap:12px;overflow:hidden}</style>
+</head><body>
+<div class="pane" data-theme="light" style="background:#FCFBF8;border:1px solid #D9D7D1"><div id="light" style="display:flex;flex-direction:column;gap:12px;min-height:0"></div></div>
+<div class="pane" data-theme="dark" style="background:#16181D;border:1px solid #2C3138"><div id="dark" style="display:flex;flex-direction:column;gap:12px;min-height:0"></div></div>
+<script type="text/babel">
+const { IntroBanner, IntroTitle, IntroBody, IntroDivider, IntroPanel, IntroPanelDivider,
+        IntroPoint, IntroButton, IntroStepper } = window.MrBroccoliDesignSystem_62d510;
+
+function IntroSpecimen(){
+  return <>
+    <IntroBanner title="New here?" body="See what Mr Broccoli does and pick how to power it." action="Take a look" />
+    <IntroStepper count={6} index={2} />
+    <div style={{display:"flex",flexDirection:"column",gap:10,minHeight:0,overflow:"hidden"}}>
+      <IntroTitle style={{fontSize:20,lineHeight:"25px"}}>Pick something to think with</IntroTitle>
+      <IntroDivider label="Optional" />
+      <IntroPanel style={{gap:12,padding:14}}>
+        <IntroPoint icon="download" title="Run it on this phone" body="One download, then it costs nothing." />
+        <IntroPanelDivider />
+        <IntroPoint icon="key" title="Use a provider you already have" tone="premium" />
+      </IntroPanel>
+      <div style={{display:"flex",gap:8}}>
+        <IntroButton label="Install" icon="download" style={{flex:1,minHeight:44,padding:"0 14px",fontSize:14}} />
+        <IntroButton label="Connect" tone="premium" style={{flex:1,minHeight:44,padding:"0 14px",fontSize:14}} />
+        <IntroButton label="Later" tone="secondary" style={{flex:1,minHeight:44,padding:"0 14px",fontSize:14}} />
+      </div>
+    </div>
+  </>;
+}
+ReactDOM.createRoot(document.getElementById("light")).render(<IntroSpecimen />);
+ReactDOM.createRoot(document.getElementById("dark")).render(<IntroSpecimen />);
+</script>
+</body></html>

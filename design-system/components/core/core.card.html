@@ -1,0 +1,54 @@
+<!-- @dsCard group="Components" viewport="700x470" name="Core controls" subtitle="Button, IconButton, Input, TextArea, Tag, PhosphorIcon" -->
+<!DOCTYPE html><html data-theme="light"><head><meta charset="utf-8">
+<link rel="stylesheet" href="../../styles.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/regular/style.css">
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script src="../../_ds_bundle.js"></script>
+<style>body{padding:16px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}.row{display:flex;flex-wrap:wrap;align-items:center;gap:8px}.lbl{font-family:var(--mb-font-mono);font-size:10px;letter-spacing:.9px;text-transform:uppercase;color:var(--mb-color-text-muted);margin-bottom:6px}</style>
+</head><body><div id="root"></div>
+<script type="text/babel">
+const { Button, IconButton, Input, TextArea, Tag, PhosphorIcon, AntButtonLabel } = window.MrBroccoliDesignSystem_62d510;
+function Demo(){
+  const [key,setKey]=React.useState("sk-live-8f2c");
+  const [tag,setTag]=React.useState("stt");
+  return <div style={{display:"flex",flexDirection:"column",gap:16}}>
+    <div><div className="lbl">Button</div><div className="row">
+      <Button type="primary"><AntButtonLabel color="var(--mb-color-on-active-control)" icon="sound" label="Preview voice" /></Button>
+      <Button><AntButtonLabel color="var(--mb-color-accent)" icon="reload" label="Validate" /></Button>
+      <Button type="warning"><AntButtonLabel color="var(--mb-color-on-danger)" icon="delete" label="Delete" /></Button>
+      <Button size="small"><AntButtonLabel color="var(--mb-color-accent)" icon="plus" label="Add model" /></Button>
+      <Button loading type="primary"><AntButtonLabel color="var(--mb-color-on-active-control)" label="Saving" /></Button>
+      <Button disabled><AntButtonLabel color="var(--mb-color-accent)" label="Disabled" /></Button>
+    </div></div>
+    <div className="grid">
+      <div><div className="lbl">IconButton</div><div className="row">
+        <IconButton icon="menu" accessibilityLabel="Conversations" />
+        <IconButton icon="setting" accessibilityLabel="Settings" />
+        <IconButton icon="bug" active accessibilityLabel="Debug log" />
+        <IconButton icon="close" disabled accessibilityLabel="Close" />
+      </div></div>
+      <div><div className="lbl">Tag</div><div className="row">
+        {["all","stt","tts","ui"].map(v=><Tag key={v} selected={tag===v} onChange={()=>setTag(v)}>{v.toUpperCase()}</Tag>)}
+      </div></div>
+    </div>
+    <div className="grid">
+      <div><div className="lbl">Input</div>
+        <Input type="password" value={key} onChange={setKey} allowClear suffix={<IconButton icon="eye" accessibilityLabel="Show key" />} />
+      </div>
+      <div><div className="lbl">TextArea</div>
+        <TextArea value={"Answer plainly. No lists."} onChange={()=>{}} style={{minHeight:76,maxHeight:76}} />
+      </div>
+    </div>
+    <div><div className="lbl">PhosphorIcon · semantic sizes</div><div className="row" style={{gap:14}}>
+      {["inline","compact","control","navigation","prominent","feature","hero"].map(s=>
+        <PhosphorIcon key={s} name="mic" size={s} color="var(--mb-color-accent)" />)}
+      <span style={{width:12}} />
+      {["message","key","global","robot","waveform"].map((n,i)=>
+        <PhosphorIcon key={i} name={n==="waveform"?"audio":n} size="navigation" color="var(--mb-color-text-secondary)" />)}
+    </div></div>
+  </div>;
+}
+ReactDOM.createRoot(document.getElementById("root")).render(<Demo />);
+</script></body></html>
