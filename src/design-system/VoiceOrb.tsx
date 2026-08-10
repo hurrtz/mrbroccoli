@@ -12,7 +12,7 @@ import Svg, { Circle } from "react-native-svg";
 import { getAccessibleForeground } from "../theme/colors";
 import { useTheme } from "../theme/ThemeContext";
 import type { VoiceVisualPhase } from "../types";
-import { PhosphorIcon } from "./PhosphorIcon";
+import { PhosphorIcon, type PhosphorIconName } from "./PhosphorIcon";
 import { getPhaseColor, getPhaseGlyph } from "./voicePhase";
 
 /**
@@ -157,6 +157,7 @@ function Arc({
  */
 export function VoiceOrb({
   disabled = false,
+  glyph,
   label,
   maxDiameter = MAX_ORB_DIAMETER,
   minDiameter = MIN_ORB_DIAMETER,
@@ -172,6 +173,9 @@ export function VoiceOrb({
   turnProgress = 0,
 }: {
   disabled?: boolean;
+  /** Overrides the phase's default glyph, for a phase whose action has two
+   * states -- speaking pauses, but a paused reply resumes. */
+  glyph?: PhosphorIconName;
   /** Accessible name. Says what tapping does, matching the visible status. */
   label: string;
   /** The range the measured diameter is clamped to. A landscape column is
@@ -335,7 +339,7 @@ export function VoiceOrb({
           >
             <PhosphorIcon
               color={getAccessibleForeground(ink)}
-              name={getPhaseGlyph(phase)}
+              name={glyph ?? getPhaseGlyph(phase)}
               size="hero"
             />
           </View>

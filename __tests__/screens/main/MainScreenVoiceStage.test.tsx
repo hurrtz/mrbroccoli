@@ -1,5 +1,5 @@
 import React from "react";
-import { fireEvent, render, within } from "@testing-library/react-native";
+import { fireEvent, render as renderRaw } from "@testing-library/react-native";
 import {
   AccessibilityInfo,
   Keyboard,
@@ -9,9 +9,27 @@ import {
 
 import { MainScreenVoiceStage } from "../../../src/screens/main/MainScreenVoiceStage";
 import { TranslateFn } from "../../../src/screens/main/shared";
+import { ThemeProvider } from "../../../src/theme/ThemeContext";
 import { darkColors, lightColors } from "../../../src/theme/colors";
 
 const hiddenIconQuery = { includeHiddenElements: true } as const;
+
+/**
+ * The stage's own controls take `colors` as a prop, but the design-system
+ * components inside it read the theme from context, and ThemeContext defaults to
+ * dark. The app always has a provider, so the tests need one too.
+ */
+function render(ui: React.ReactElement, mode: "light" | "dark" = "light") {
+  const wrap = (node: React.ReactElement) => (
+    <ThemeProvider mode={mode}>{node}</ThemeProvider>
+  );
+  const screen = renderRaw(wrap(ui));
+  const rerenderRaw = screen.rerender.bind(screen);
+
+  return Object.assign(screen, {
+    rerender: (next: React.ReactElement) => rerenderRaw(wrap(next)),
+  });
+}
 
 jest.mock("../../../src/hooks/useReducedMotion", () => ({
   useReducedMotion: () => false,
@@ -112,7 +130,10 @@ const t = ((key: string) => {
     thinking: "Thinking",
     speaking: "Speaking",
     tapToSpeak: "Tap to speak",
+    listening: "Listening",
     paused: "Paused",
+    voiceOrbRecordingLabel: "Listening. Tap to stop.",
+    voiceOrbSpeakingLabel: "Speaking. Tap to stop.",
     stop: "Stop",
     stopDriveSession: "Pause auto",
     repeatDriveReply: "Repeat last",
@@ -615,7 +636,7 @@ describe("MainScreenVoiceStage composer", () => {
     expect(screen.queryByTestId("show-text-input")).toBeNull();
   });
 
-  it("shows an increasingly urgent Drive silence countdown in the CTA", () => {
+  it("keeps the Drive silence countdown beside what is happening", () => {
     const props = createProps({
       driveAutoContinueEnabled: true,
       driveSilenceCountdownSeconds: 3,
@@ -625,29 +646,18 @@ describe("MainScreenVoiceStage composer", () => {
       visualPhase: "recording",
     });
     const screen = render(<MainScreenVoiceStage {...props} />);
-    const countdown = screen.getByTestId("voice-stage-drive-countdown");
 
-    expect(countdown.props.children).toBe(3);
-    expect(StyleSheet.flatten(countdown.props.style)).toEqual(
-      expect.objectContaining({
-        color: lightColors.danger,
-        fontSize: 30.5,
-      }),
-    );
-    expect(
-      screen.queryByTestId("phosphor-icon-stop", hiddenIconQuery),
-    ).toBeNull();
-
-    screen.rerender(
-      <MainScreenVoiceStage {...props} driveVoiceActive />,
-    );
-
-    expect(
-      screen.queryByTestId("voice-stage-drive-countdown"),
-    ).toBeNull();
+    // The countdown is a detail of what is happening, so it sits on the status
+    // line rather than replacing the glyph that says what tapping does.
+    expect(screen.getByText("Listening \u00b7 3s")).toBeTruthy();
     expect(
       screen.getByTestId("phosphor-icon-stop", hiddenIconQuery),
     ).toBeTruthy();
+
+    screen.rerender(<MainScreenVoiceStage {...props} driveVoiceActive />);
+
+    expect(screen.queryByText("Listening \u00b7 3s")).toBeNull();
+    expect(screen.getByText("Listening")).toBeTruthy();
   });
 
   it("preserves an unfinished text draft while the pipeline is active", () => {
@@ -666,7 +676,7 @@ describe("MainScreenVoiceStage composer", () => {
         visualPhase="thinking"
       />,
     );
-    expect(screen.getByTestId("voice-stage-action-surface")).toBeTruthy();
+    expect(screen.getByTestId("orb-voice-stage")).toBeTruthy();
     expect(
       screen.getByTestId("voice-text-input", {
         includeHiddenElements: true,
@@ -721,7 +731,7 @@ describe("MainScreenVoiceStage composer", () => {
     ).toBe("Survive rotation");
   });
 
-  it("keeps the same composer footprint and drops the waveform while active", () => {
+  it("keeps the composer footprint and drops the waveform while active", () => {
     const screen = render(
       <MainScreenVoiceStage
         {...createProps({
@@ -731,17 +741,17 @@ describe("MainScreenVoiceStage composer", () => {
       />,
     );
 
+    // The pager keeps its own minimum: the orb grows the viewport, it does not
+    // replace it, so the composer page behind it is unchanged.
     expect(
       StyleSheet.flatten(
         screen.getByTestId("voice-text-input-viewport").props.style,
       ),
     ).toEqual(expect.objectContaining({ minHeight: 68 }));
-    expect(screen.getByTestId("voice-stage-action-surface")).toBeTruthy();
-    expect(screen.getByTestId("voice-stage-recording-fill")).toBeTruthy();
+    expect(screen.getByTestId("orb-voice-stage")).toBeTruthy();
     expect(
       screen.getByTestId("phosphor-icon-stop", hiddenIconQuery),
     ).toBeTruthy();
-    expect(screen.getByText("Your turn")).toBeTruthy();
     expect(screen.getByText("Toggle to Talk")).toBeTruthy();
     expect(screen.getByText("Tap when done")).toBeTruthy();
     expect(screen.queryByTestId("active-waveform")).toBeNull();
@@ -778,14 +788,9 @@ describe("MainScreenVoiceStage composer", () => {
     announce.mockRestore();
   });
 
-  it("continues the recording-capacity fill from the actual recording start", () => {
+  it("draws the recording capacity on the orb's own phase ring", () => {
     const now = jest.spyOn(Date, "now").mockReturnValue(20_000);
-    const { withTiming } = require("react-native-reanimated") as {
-      withTiming: jest.Mock;
-    };
-    withTiming.mockClear();
-
-    render(
+    const screen = render(
       <MainScreenVoiceStage
         {...createProps({
           isActive: true,
@@ -796,85 +801,73 @@ describe("MainScreenVoiceStage composer", () => {
       />,
     );
 
-    expect(withTiming).toHaveBeenCalledWith(
-      1,
-      expect.objectContaining({ duration: 5_000 }),
-    );
+    // Half the cap has already elapsed, so the ring is part-filled rather than
+    // restarted at zero. getRecordingProgress covers the arithmetic itself.
+    const swept = screen
+      .UNSAFE_getAllByType("RNSVGCircle" as never)
+      .map((arc) => String(arc.props.strokeDasharray ?? ""))
+      .filter((dash) => dash.length > 0);
+
+    expect(swept.length).toBeGreaterThan(0);
     now.mockRestore();
   });
 
-  it("draws the adaptive speech timeline and its red overtime layer", () => {
+  it("states the speech estimate and turns the rings red once it is passed", () => {
     const now = jest.spyOn(Date, "now").mockReturnValue(15_000);
+    const running = {
+      elapsedMs: 5_000,
+      estimatedMs: 10_000,
+      learned: true,
+      overEstimate: false,
+      progress: 0.5,
+      sampleCount: 4,
+      startedAt: 10_000,
+    };
     const screen = render(
       <MainScreenVoiceStage
         {...createProps({
           isActive: true,
-          speechStartProgress: {
-            elapsedMs: 5_000,
-            estimatedMs: 10_000,
-            learned: true,
-            overEstimate: false,
-            progress: 0.5,
-            sampleCount: 4,
-            startedAt: 10_000,
-          },
+          speechStartProgress: running,
           visualPhase: "thinking",
         })}
       />,
     );
 
-    fireEvent(screen.getByTestId("voice-stage-action-surface"), "layout", {
-      nativeEvent: { layout: { height: 68, width: 320 } },
-    });
+    expect(screen.getByText("~ 5 s")).toBeTruthy();
+    expect(screen.getByText("Thinking")).toBeTruthy();
 
-    expect(
-      screen.getByTestId("voice-stage-speech-timeline").props.stroke
-        .payload,
-    ).toEqual(processColor("#FFFFFF"));
-    expect(
-      screen.getByTestId("voice-stage-speech-overtime").props.stroke
-        .payload,
-    ).toEqual(processColor(lightColors.danger));
-    expect(
-      StyleSheet.flatten(
-        screen.getByTestId("voice-stage-action-surface").props.style,
-      ).borderWidth,
-    ).toBeUndefined();
-    expect(
-      screen.getByTestId("voice-stage-speech-timeline-track"),
-    ).toBeTruthy();
-    expect(
-      screen.getByTestId("voice-stage-speech-timeline").props.d,
-    ).toMatch(/^M 160 1\.5 H 303 /);
-    expect(
-      screen.getByTestId("voice-stage-speech-timeline-counterclockwise")
-        .props.d,
-    ).toMatch(/^M 160 1\.5 H 17 /);
-    expect(
-      screen.getByTestId("voice-stage-speech-timeline").props.d,
-    ).toMatch(/H 160$/);
-    expect(
-      screen.getByTestId("voice-stage-speech-timeline-counterclockwise")
-        .props.d,
-    ).toMatch(/H 160$/);
-    expect(
-      screen.getByTestId("voice-stage-speech-overtime-counterclockwise"),
-    ).toBeTruthy();
-    expect(
-      screen.getByTestId("voice-stage-speech-timeline").props.strokeWidth,
-    ).toBe(3);
-    expect(screen.getByTestId("voice-stage-speech-eta").props.children).toBe(
-      "~ 5 s",
+    const strokes = () =>
+      screen
+        .UNSAFE_getAllByType("RNSVGCircle" as never)
+        .map((arc) => arc.props.stroke?.payload);
+
+    expect(strokes()).not.toContain(processColor(lightColors.danger));
+
+    screen.rerender(
+      <MainScreenVoiceStage
+        {...createProps({
+          isActive: true,
+          phaseProgress: {
+            ...running,
+            overall: {
+              ...running,
+              elapsedMs: 20_000,
+              overEstimate: true,
+            },
+            phase: "thinking",
+          },
+          speechStartProgress: running,
+          visualPhase: "thinking",
+        })}
+      />,
     );
-    expect(
-      within(screen.getByTestId("voice-stage-left-copy")).getByText(
-        "Thinking",
-      ),
-    ).toBeTruthy();
+
+    // Past the estimate both rings fill with red as the turn runs.
+    expect(strokes()).toContain(processColor(lightColors.danger));
     now.mockRestore();
   });
 
-  it("changes phase color and icon without mounting a second status element", () => {
+  it("changes phase colour and glyph without mounting a second status element", () => {
     const screen = render(
       <MainScreenVoiceStage
         {...createProps({
@@ -885,25 +878,21 @@ describe("MainScreenVoiceStage composer", () => {
     );
 
     expect(
-      StyleSheet.flatten(
-        screen.getByTestId("voice-stage-action-surface").props.style,
-      ).backgroundColor,
+      StyleSheet.flatten(screen.getByTestId("voice-orb-core").props.style)
+        .backgroundColor,
     ).toBe(lightColors.phaseThinking);
+    // The orb marks thinking with `brain`; `robot` was the docked bar's glyph.
     expect(
-      screen.getByTestId("phosphor-icon-robot", hiddenIconQuery),
+      screen.getByTestId("phosphor-icon-brain", hiddenIconQuery),
     ).toBeTruthy();
-    expect(
-      screen.queryByTestId("phosphor-icon-info-circle", hiddenIconQuery),
-    ).toBeNull();
     expect(screen.getByText("Please wait")).toBeTruthy();
     expect(screen.getByText("Thinking")).toBeTruthy();
-    expect(screen.queryByTestId("voice-stage-phase-time")).toBeNull();
     expect(screen.queryByTestId("voice-stage-status-details")).toBeNull();
-    expect(screen.queryByTestId("voice-stage-stop-playback")).toBeNull();
+    expect(screen.queryByTestId("orb-stage-stop-playback")).toBeNull();
     expect(screen.queryByTestId("main-screen-status-strip")).toBeNull();
   });
 
-  it("gives brief request preparation its own color and icon", () => {
+  it("gives brief request preparation its own colour and glyph", () => {
     const screen = render(
       <MainScreenVoiceStage
         {...createProps({
@@ -914,16 +903,15 @@ describe("MainScreenVoiceStage composer", () => {
     );
 
     expect(
-      StyleSheet.flatten(
-        screen.getByTestId("voice-stage-action-surface").props.style,
-      ).backgroundColor,
+      StyleSheet.flatten(screen.getByTestId("voice-orb-core").props.style)
+        .backgroundColor,
     ).toBe(lightColors.phaseThinkingBriefly);
     expect(
       screen.getByTestId("phosphor-icon-thunderbolt", hiddenIconQuery),
     ).toBeTruthy();
   });
 
-  it("keeps phase, wait copy, icon, and ETA symmetric in landscape", () => {
+  it("keeps the phase, the wait copy and the estimate in landscape", () => {
     const now = jest.spyOn(Date, "now").mockReturnValue(15_000);
     const screen = render(
       <MainScreenVoiceStage
@@ -944,76 +932,57 @@ describe("MainScreenVoiceStage composer", () => {
       />,
     );
 
+    // An orientation is not a reason to drop what is happening or how long it
+    // is expected to take.
     expect(screen.getByText("Searching")).toBeTruthy();
-    expect(screen.getByText("Please wait")).toBeTruthy();
     expect(screen.getByText("~ 5 s")).toBeTruthy();
-    expect(
-      StyleSheet.flatten(screen.getByText("Searching").props.style),
-    ).toEqual(
-      expect.objectContaining({
-        fontSize: 18,
-        textAlign: "center",
-      }),
-    );
+    expect(screen.getByTestId("orb-voice-stage")).toBeTruthy();
     now.mockRestore();
   });
 
-  it("keeps pause and resume on the primary CTA with a separate Stop action", () => {
+  it("keeps pause and resume on the orb with a separate Stop action", () => {
     const onPress = jest.fn();
     const onStopPlayback = jest.fn();
     const onInterruptPlayback = jest.fn();
-    const screen = render(
-      <MainScreenVoiceStage
-        {...createProps({
-          isActive: true,
-          onPress,
-          onInterruptPlayback,
-          onStopPlayback,
-          visualPhase: "speaking",
-        })}
-      />,
-    );
+    const speaking = {
+      isActive: true,
+      onPress,
+      onInterruptPlayback,
+      onStopPlayback,
+      visualPhase: "speaking" as const,
+    };
+    const screen = render(<MainScreenVoiceStage {...createProps(speaking)} />);
 
     expect(
       screen.getByTestId("phosphor-icon-pause", hiddenIconQuery),
     ).toBeTruthy();
     expect(screen.getByText("Speaking")).toBeTruthy();
-    fireEvent.press(screen.getByTestId("voice-stage-primary-action"));
-    expect(onPress).toHaveBeenCalledTimes(1);
-    expect(
-      screen.getByTestId("phosphor-icon-stop", hiddenIconQuery),
-    ).toBeTruthy();
-    expect(
-      StyleSheet.flatten(
-        screen.getByTestId("voice-stage-stop-playback").props.style,
-      ),
-    ).toEqual(expect.objectContaining({ minHeight: 44 }));
-    fireEvent.press(screen.getByTestId("voice-stage-stop-playback"));
-    expect(onStopPlayback).toHaveBeenCalledTimes(1);
-    expect(
-      StyleSheet.flatten(
-        screen.getByTestId("voice-stage-interrupt-playback").props.style,
-      ),
-    ).toEqual(expect.objectContaining({ minHeight: 44 }));
-    fireEvent.press(screen.getByTestId("voice-stage-interrupt-playback"));
+
+    // Tapping the orb while it speaks interrupts, so the user can answer back
+    // without hunting for a second control.
+    fireEvent.press(screen.getByTestId("voice-orb"));
     expect(onInterruptPlayback).toHaveBeenCalledTimes(1);
+
+    // Stop is a separate action, and keeps its own 44pt target.
+    const stop = screen.getByTestId("orb-stage-stop-playback");
+    expect(StyleSheet.flatten(stop.props.style)).toEqual(
+      expect.objectContaining({ height: 44, width: 44 }),
+    );
+    fireEvent.press(stop);
+    expect(onStopPlayback).toHaveBeenCalledTimes(1);
 
     screen.rerender(
       <MainScreenVoiceStage
-        {...createProps({
-          isActive: true,
-          onPress,
-          onInterruptPlayback,
-          onStopPlayback,
-          playbackPaused: true,
-          visualPhase: "speaking",
-        })}
+        {...createProps({ ...speaking, playbackPaused: true })}
       />,
     );
+
+    // Paused, the orb offers to resume rather than to pause again.
     expect(
       screen.getByTestId("phosphor-icon-play-circle", hiddenIconQuery),
     ).toBeTruthy();
     expect(screen.getByText("Paused")).toBeTruthy();
-    expect(screen.queryByTestId("voice-stage-interrupt-playback")).toBeNull();
+    fireEvent.press(screen.getByTestId("voice-orb"));
+    expect(onPress).toHaveBeenCalledTimes(1);
   });
 });

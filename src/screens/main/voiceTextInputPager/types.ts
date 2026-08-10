@@ -1,6 +1,7 @@
 import {
   InputMode,
   MessageImageAttachment,
+  VoicePhaseProgress,
   VoiceTimingProgress,
   VoiceVisualPhase,
 } from "../../../types";
@@ -42,6 +43,8 @@ export interface VoiceTextInputPagerProps {
   promptBlockedProgress?: number | null;
   recordingMaxMs: number;
   recordingStartedAtMs?: number | null;
+  /** The pipeline's timing. Drives the orb's rings and its overtime. */
+  phaseProgress?: VoicePhaseProgress | null;
   speechStartProgress?: VoiceTimingProgress | null;
   statusLabel: string;
   t: TranslateFn;

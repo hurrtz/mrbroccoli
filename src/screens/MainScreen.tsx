@@ -967,6 +967,7 @@ export function MainScreen() {
           promptBlockedProgress: freeRuntimeBlocked
             ? null
             : kokoroPromptBlockProgress,
+          phaseProgress,
           recordingMaxMs: maxRecordingMs,
           recordingStartedAtMs,
           speechStartProgress: phaseProgress?.speechStart ?? null,

@@ -1,7 +1,7 @@
 import { PhosphorIcon } from "../../design-system/PhosphorIcon";
 import React from "react";
 import { Text, TouchableOpacity, View } from "react-native";
-import { PhaseAwareVoiceAction } from "./PhaseAwareVoiceAction";
+import { OrbVoiceStage } from "./OrbVoiceStage";
 import { MessageImageAttachments } from "../../components/MessageImageAttachments";
 import { DriveSessionControls } from "./voiceTextInputPager/DriveSessionControls";
 import { InputSurfaceIndicators } from "./voiceTextInputPager/InputSurfaceIndicators";
@@ -41,6 +41,7 @@ export function VoiceTextInputPager({
   onResolvePromptBlock,
   onSubmitTextMessage,
   onTextMessageChange,
+  phaseProgress = null,
   playbackPaused,
   promptBlockedActionEnabled = false,
   promptBlockedActionLabel = null,
@@ -114,7 +115,7 @@ export function VoiceTextInputPager({
         />
         {isActive ? (
           <View style={styles.activeActionOverlay}>
-            <PhaseAwareVoiceAction
+            <OrbVoiceStage
               colors={colors}
               driveSilenceCountdownSeconds={driveSilenceCountdownSeconds}
               driveVoiceActive={driveVoiceActive}
@@ -125,6 +126,7 @@ export function VoiceTextInputPager({
               onPressOut={onPressOut}
               onInterruptPlayback={onInterruptPlayback}
               onStopPlayback={onStopPlayback}
+              phaseProgress={phaseProgress}
               playbackPaused={playbackPaused}
               recordingMaxMs={recordingMaxMs}
               recordingStartedAtMs={recordingStartedAtMs}

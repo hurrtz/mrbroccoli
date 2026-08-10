@@ -23,6 +23,26 @@ function clampUnit(value: number) {
  * each phase completing. Past the estimate `overtime` grows towards a full lap,
  * which is what turns both rings red.
  */
+/**
+ * How far through the recording cap a running recording is.
+ *
+ * Measured from the moment recording actually started rather than from the
+ * moment this was first drawn, so returning to a turn already in progress picks
+ * the fill up where it is instead of restarting it at zero.
+ */
+export function getRecordingProgress(
+  nowMs: number,
+  startedAtMs: number | null | undefined,
+  recordingMaxMs: number,
+) {
+  if (!startedAtMs) {
+    return 0;
+  }
+
+  // A cap under a second would make the ring finish before it could be read.
+  return clampUnit((nowMs - startedAtMs) / Math.max(1_000, recordingMaxMs));
+}
+
 export function getOrbProgress(
   progress: VoicePhaseProgress | null | undefined,
 ): OrbProgress {

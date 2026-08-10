@@ -5,6 +5,7 @@ import { Colors } from "../../theme/colors";
 import {
   InputMode,
   MessageImageAttachment,
+  VoicePhaseProgress,
   VoiceTimingProgress,
   VoiceVisualPhase,
 } from "../../types";
@@ -39,6 +40,7 @@ interface MainScreenVoiceStageProps {
   onResolvePromptBlock?: () => void;
   onSubmitTextMessage: (text: string) => void;
   onTextMessageChange?: (text: string) => void;
+  phaseProgress?: VoicePhaseProgress | null;
   playbackPaused?: boolean;
   promptBlockedActionEnabled?: boolean;
   promptBlockedActionLabel?: string | null;
@@ -80,6 +82,7 @@ export const MainScreenVoiceStage = React.memo(function MainScreenVoiceStage({
   onResolvePromptBlock,
   onSubmitTextMessage,
   onTextMessageChange,
+  phaseProgress = null,
   playbackPaused = false,
   promptBlockedActionEnabled = false,
   promptBlockedActionLabel = null,
@@ -139,6 +142,7 @@ export const MainScreenVoiceStage = React.memo(function MainScreenVoiceStage({
           onResolvePromptBlock={onResolvePromptBlock}
           onSubmitTextMessage={onSubmitTextMessage}
           onTextMessageChange={onTextMessageChange}
+          phaseProgress={phaseProgress}
           playbackPaused={playbackPaused}
           promptBlockedActionEnabled={promptBlockedActionEnabled}
           promptBlockedActionLabel={promptBlockedActionLabel}
