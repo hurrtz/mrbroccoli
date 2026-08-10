@@ -461,6 +461,27 @@ components instead of generic ones. It is build tooling only.
   `npm run static:verify` — keeping `make pre-push` green is this directory's
   main risk to the repository.
 
+## Vendored Design System
+
+`design-system/` is a byte-faithful copy of the approved claude.ai/design
+project. It is the source of truth for product design intent; `src/` is the
+implementation of that intent, and the two are reconciled deliberately.
+
+- **It is a mirror, not app code.** Nothing under `app/` or `src/` imports it,
+  and it ships in no bundle. Its React is browser React, not React Native.
+- **Do not hand-edit it.** Design changes are made in the claude.ai/design
+  project and re-imported. A local edit is silently lost on the next import and
+  makes the copy stop being evidence of what was approved.
+- It sits outside every gate on purpose: `tsconfig.json` `include` names only
+  `app/**` and `src/**`, and no Knip `project` glob covers it. That is what lets
+  it hold browser JSX without breaking `make pre-push`.
+- `_adherence.oxlintrc.json` is the machine-readable half of the contract: every
+  component's declared props, its enum-valued props, and the complete token list
+  with kinds. Check drift against that file rather than against prose.
+- `.design-sync/` and this directory point in opposite directions.
+  `.design-sync/` publishes `src/` outward so the design agent composes from
+  real components; `design-system/` is what came back.
+
 ## Licensing And Provider Terms
 
 - The original app code and assets are proprietary under `LICENSE`; this never
