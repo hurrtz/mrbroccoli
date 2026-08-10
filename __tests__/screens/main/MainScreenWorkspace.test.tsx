@@ -44,6 +44,7 @@ function createWorkspaceProps(t: jest.Mock) {
   const activeResponseMode =
     DEFAULT_SETTINGS.activeResponseMode as ResponseMode;
   return {
+    backgroundTask: null,
     colors: lightColors,
     introBanner: {
       onDismiss: jest.fn(),

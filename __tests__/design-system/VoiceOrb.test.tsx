@@ -1,5 +1,5 @@
 import React from "react";
-import { StyleSheet } from "react-native";
+import { StyleSheet, type StyleProp, type ViewStyle } from "react-native";
 import { render } from "@testing-library/react-native";
 import { Circle } from "react-native-svg";
 
@@ -18,8 +18,8 @@ function renderOrb(
   );
 }
 
-function flatten(style: unknown) {
-  return StyleSheet.flatten(style as Parameters<typeof StyleSheet.flatten>[0]);
+function flatten(style: unknown): ViewStyle {
+  return StyleSheet.flatten(style as StyleProp<ViewStyle>);
 }
 
 describe("VoiceOrb", () => {
