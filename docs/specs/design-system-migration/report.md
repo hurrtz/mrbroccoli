@@ -270,3 +270,71 @@ plus one job controller over machinery that existed.
 - Metered-connection retry behaviour is unchanged: retry is manual.
 - The proposal's language comes from the interface language; a multilingual
   listener may want the plan to cover `localLanguages` instead.
+
+## Phase 7 — Sweep
+
+### Contrast, automated
+
+`__tests__/theme/designSystemContrast.test.ts` checks every pairing the
+migrated surfaces actually use — ink against the surface it sits on, both
+appearances, 3:1 graphical and 4.5:1 text. It caught three real findings:
+
+- **Fixed:** the auto-setup card's filled action used the design's raw
+  accent with white ink — 3.28:1 in light, 2.24:1 in dark, both under the
+  text floor. It now uses the app's own `activeControl`/`onActiveControl`
+  pairing (4.62 / 7.94), which is exactly what that pairing exists for.
+- **Reported, design-owned:** the light transcribing/synthesizing teal
+  `#2FA39B` measures 2.97:1 on the canvas — a hairline miss of the 3:1
+  graphical floor, in a hex Phase 1 was instructed to take verbatim. Its
+  bookend pairing means one corrected hex fixes two phases.
+- **Reported, pre-existing:** the light accent-on-accentSoft glyph pairing
+  (2.87:1) that the satellite toggle wells inherit is the same pairing
+  `IconButton` has always used; changing it is an app-wide decision, not a
+  migration one.
+
+Both reported shortfalls are pinned in a dedicated test block that fails the
+moment a palette change fixes them, prompting their promotion into the main
+sweep.
+
+### RTL and large text, audited statically; device sweep deferred
+
+- Every new component lays out with direction-agnostic flexbox and start/end
+  spacing; the only left/right literals are symmetric (sheet corner radii,
+  the task bar's full-width progress line). Time and step readings are
+  formatted through locale functions, so RTL locales can reorder them.
+- Large text: `RuntimeReadiness` stacks to a column at fontScale ≥ 1.35;
+  truncating labels keep their full accessible names.
+- The on-device visual sweep — every touched screen in one RTL locale and at
+  the largest text size — is deliberately not simulated here: the repository
+  runs exactly that matrix (every registered language, dark mode, increased
+  contrast, accessibility-large text, VoiceOver/TalkBack) in
+  `make pre-release-maestro`, and its review gallery remains the visual
+  verdict before release.
+
+## What could not be done, and why
+
+- Pixel-verification against the running app (both appearances, both
+  orientations, RTL, large text) needs the device gates above; everything
+  checkable without a device or paid quota has an automated check.
+- The blocked/unavailable voice states, barge-in during speech, and the
+  landscape composer have no design-system equivalent; each kept the app's
+  behaviour and is recorded under its phase.
+
+## Owner decisions collected across all phases
+
+1. Premium reads two ways: the intro banner is violet, Premium gold (parked
+   in the goal; unchanged).
+2. Pager: bar indicator ships; carets remain optional.
+3. Gold doing double duty as "paid" and "needs attention" — dedicated warning
+   token question (Phase 4).
+4. Whether the settings summary line gains a third noun for voice (Phase 5).
+5. Transcript-handle relative-time reading, deferred with reasons (Phase 5).
+6. Toast suppression granularity while settings is open on another page
+   (Phase 6).
+7. Proposal language scope: interface language vs `localLanguages` (Phase 6).
+8. Metered-connection auto-retry (goal §4; unchanged, manual).
+9. The two light-appearance contrast shortfalls above (Phase 7).
+10. The `--mb-header-min-height: 62px` token matches no surface found in the
+    app (Phase 1/4 note).
+11. `sand`/`premium`/intro-banner token placement: global in the design,
+    scoped to `introTheme.ts` (plus the promoted `premium`) in the app.

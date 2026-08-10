@@ -37,7 +37,10 @@ function CardAction({
 }) {
   const { colors } = useTheme();
   const filled = tone === "primary";
-  const ink = filled ? colors.onAccent : colors.text;
+  // The app's filled-control pairing, not the raw accent: the deeper
+  // activeControl green is what keeps this label above the 4.5:1 text floor
+  // in both appearances.
+  const ink = filled ? colors.onActiveControl : colors.text;
 
   return (
     <Pressable
@@ -47,7 +50,7 @@ function CardAction({
       style={({ pressed }) => [
         styles.action,
         {
-          backgroundColor: filled ? colors.accent : "transparent",
+          backgroundColor: filled ? colors.activeControl : "transparent",
           borderColor: filled ? "transparent" : colors.borderStrong,
         },
         pressed ? styles.pressed : null,
