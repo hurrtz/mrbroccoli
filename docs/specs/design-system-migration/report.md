@@ -67,3 +67,44 @@ The whole map was audited programmatically. One glyph resolves from two keys:
   `PhaseAwareVoiceAction` bar and uses `brain` only on `VoiceOrb` — verified in
   the design sources, so both glyphs deliberately coexist and neither was
   rewired in this phase.
+
+## Phase 3 — The five new components
+
+### Applied
+
+`VoiceOrb`, `OrbSatellite`, `ConversationSettingsSummary`,
+`WorkspaceStatusLine`, and `TranscriptHandle` in `src/design-system/`, each
+with a suite covering both appearances, geometry, and accessibility. The orb
+is tested measurably circular at 120/196/220pt, its core clamps to the ring
+below the ~107pt crossover, the idle orb draws the plain halo rather than two
+empty tracks, and overtime fills both rings with red.
+
+### Translation decisions (web → React Native)
+
+- **Conic gradients have no RN equivalent.** The rings are `react-native-svg`
+  arcs: a full track circle plus a progress arc via dash-array, rotated so
+  progress starts at 12 o'clock; the overtime tail is an arc ending at
+  12 o'clock that grows backwards, exactly the conic the design draws.
+- **SVG attributes beat styles in react-native-svg**, the opposite of CSS, so
+  the design's trick of scaling the orb glyph with a style override cannot
+  work. `PhosphorIcon` gained an explicit `visualSize` escape hatch, documented
+  in `src/design-system/SPEC.md` and `AGENTS.md` as the second deliberate
+  exception to the semantic size scale (the first is `ProviderIcon`).
+- **The design's English fallback strings do not exist in RN.** The `.d.ts`
+  contracts make `label` optional with per-phase English fallbacks and build
+  aria labels from counts internally; the nineteen-language rule forbids both.
+  Every user-facing string is a required prop translated by the caller:
+  `VoiceOrb.label`, `TranscriptHandle.emptyLabel`/`accessibilityLabel`,
+  `ConversationSettingsSummary.accessibilityLabel`, and
+  `WorkspaceStatusLine.info` became `{ accessibilityLabel, onPress }` so the
+  control cannot render unlabelled. This is a deliberate contract deviation;
+  the visual geometry is unchanged.
+- The 16% `color-mix` tint is computed as an rgba of the phase ink at 0.16.
+
+### Not done here, deliberately
+
+- The screen-side measurement that derives the orb diameter (trap 2) belongs
+  to Phase 5's layout; the component takes `size` and is tested at the sizes
+  the screen will pass.
+- No changelog entry yet: nothing here is user-visible until Phase 5 mounts
+  the components.

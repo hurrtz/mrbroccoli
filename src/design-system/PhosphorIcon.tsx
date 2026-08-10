@@ -167,19 +167,26 @@ export function PhosphorIcon({
   color,
   name,
   size = "control",
+  visualSize,
   style,
   testID,
 }: {
   color: string;
   name: PhosphorIconName;
   size?: IconSize;
+  /**
+   * The voice orb's deliberate exception to the semantic scale: its glyph is
+   * a fixed proportion of a measured diameter, so no static token can name
+   * it. Everything else uses the semantic sizes.
+   */
+  visualSize?: number;
   style?: StyleProp<ViewStyle | Omit<TextStyle, "cursor">>;
   testID?: string;
 }) {
   const Glyph = PHOSPHOR_ICONS[
     name
   ] as React.ComponentType<DecorativeIconProps>;
-  const resolvedSize = resolveIconSize(size);
+  const resolvedSize = visualSize ?? resolveIconSize(size);
 
   return (
     <Glyph

@@ -225,7 +225,9 @@ applies.
   with Phosphor's regular weight and its semantic size scale; do not import
   another icon font or use raw numeric glyph sizes. The nine official
   provider-brand SVGs in `ProviderIcon.tsx` are the deliberate exception and
-  use the same semantic visual-size tokens.
+  use the same semantic visual-size tokens. The voice orb is the second
+  deliberate exception: its glyph is a fixed proportion of a measured
+  diameter and passes that number through `PhosphorIcon`'s `visualSize`.
 - Modal content must isolate screen-reader focus; backdrop-only dismissal
   layers stay out of the accessibility tree and every modal retains a labeled
   close action.

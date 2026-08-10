@@ -28,6 +28,11 @@ framework or hiding platform behavior behind excessive abstraction.
 - `NativeControls.tsx` owns shared buttons, text inputs, list rows, dialogs,
   tags, switches, and related control primitives.
 - `IconButton.tsx` owns the standard icon-only interactive control.
+- `VoiceOrb.tsx`, `OrbSatellite.tsx`, `ConversationSettingsSummary.tsx`,
+  `WorkspaceStatusLine.tsx`, and `TranscriptHandle.tsx` own the orb-centred
+  workspace controls introduced by the approved design system. They are
+  presentation-only: every string arrives translated from the caller, and the
+  orb's diameter is passed in by the screen that measured its space.
 - `PhosphorIcon.tsx` is the application glyph boundary and maps semantic sizes
   to Phosphor's regular-weight icons.
 - `AppFontProvider.tsx` owns app-font loading and the typography provider.
@@ -92,9 +97,11 @@ framework or hiding platform behavior behind excessive abstraction.
 
 Application glyphs use `PhosphorIcon` with regular weight and semantic size
 tokens. Raw numeric glyph sizes and direct imports from another icon family are
-not supported. The official provider-brand SVGs in `ProviderIcon.tsx` are the
-intentional exception; they use the same semantic visual-size scale but retain
-their official brand geometry.
+not supported. Two intentional exceptions exist: the official provider-brand
+SVGs in `ProviderIcon.tsx` use the semantic visual-size scale but retain their
+official brand geometry, and the voice orb passes its proportionally computed
+glyph size through `PhosphorIcon`'s `visualSize`, because the orb's diameter is
+measured at runtime and no static token can name a proportion of it.
 
 **Decision:** Semantic icon size describes visual importance, while the control
 defines the touch target. Conflating the two produces inaccessible compact
