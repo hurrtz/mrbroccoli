@@ -46,13 +46,16 @@ describe("theme colors", () => {
       success: "#059669",
       danger: "#DC2626",
       dangerFill: "#DC2626",
-      phaseRecordingTrack: "#44A055",
-      phaseTranscribing: "#47BD9A",
-      phaseThinkingBriefly: "#4DA6FF",
-      phaseSearching: "#8B5CF6",
-      phaseThinking: "#6D28D9",
-      phaseSynthesizing: "#B5E61D",
-      phaseSpeaking: "#059669",
+      phaseRecording: "rgba(3, 7, 18, 0.14)",
+      phaseRecordingTrack: "#2E9E52",
+      phaseTranscribing: "#2FA39B",
+      phaseThinkingBriefly: "#3A8FD0",
+      phaseSearching: "#4A67CC",
+      phaseThinking: "#6A4CC4",
+      phaseSynthesizing: "#2FA39B",
+      phaseSpeaking: "#2E9E52",
+      turnTrack: "#EFEEE9",
+      turnInk: "#5D6B7A",
     });
   });
 
@@ -70,15 +73,32 @@ describe("theme colors", () => {
       inactiveControlBorder: "#2A2F37",
       success: "#10B981",
       danger: "#F87171",
+      phaseRecording: "#1E6B3A",
       phaseRecordingTrack: "#5DC17D",
-      phaseTranscribing: "#2DD4BF",
-      phaseThinkingBriefly: "#60A5FA",
-      phaseSearching: "#A78BFA",
-      phaseThinking: "#E879F9",
-      phaseSynthesizing: "#A3E635",
-      phaseSpeaking: "#10B981",
+      phaseTranscribing: "#4FD1C5",
+      phaseThinkingBriefly: "#6BB2F5",
+      phaseSearching: "#8093F0",
+      phaseThinking: "#A78BFA",
+      phaseSynthesizing: "#4FD1C5",
+      phaseSpeaking: "#5DC17D",
+      turnTrack: "#262B33",
+      turnInk: "#8B97A8",
     });
   });
+
+  it.each([
+    ["light", lightColors],
+    ["dark", darkColors],
+  ] as const)(
+    "keeps the %s phase ramp symmetric at its bookends",
+    (_mode, colors) => {
+      // The ramp is green at both ends of a turn: synthesizing mirrors
+      // transcribing and speaking mirrors the recording track, so the colour
+      // travels out to violet and back rather than ending somewhere new.
+      expect(colors.phaseSynthesizing).toBe(colors.phaseTranscribing);
+      expect(colors.phaseSpeaking).toBe(colors.phaseRecordingTrack);
+    },
+  );
 
   it.each([
     [

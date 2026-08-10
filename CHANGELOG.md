@@ -10,6 +10,13 @@ the complete Play Store translations are kept in a dedicated file under
 
 ## Unreleased
 
+### Changed
+
+- The voice pipeline's phase colours follow the approved design system's new
+  ramp: green at recording and speaking, travelling through teal and blue to
+  violet at the deepest thinking and back, with a set tuned separately for
+  each appearance.
+
 ## 3.2.0 - 2026-08-08
 
 ### Added
