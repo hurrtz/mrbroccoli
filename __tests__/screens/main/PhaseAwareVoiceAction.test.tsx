@@ -78,6 +78,7 @@ function createProps(
   return {
     colors: lightColors,
     inputMode: "toggle-to-talk" as const,
+    layout: "portrait" as const,
     onInterruptPlayback: jest.fn(),
     onPress: jest.fn(),
     onPressIn: jest.fn(),
