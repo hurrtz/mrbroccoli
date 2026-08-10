@@ -27,22 +27,15 @@ export const voiceTextInputPagerStyles = StyleSheet.create({
   page: {
     justifyContent: "center",
   },
+  // The orb is the whole surface now, so the bar's fill, border and radius are
+  // gone: the control is its own shape. The page keeps a minimum so the pager
+  // does not collapse before the orb has measured itself.
   voiceSurface: {
     width: "100%",
     minHeight: 68,
-    borderRadius: 17,
-    borderWidth: 1,
-    flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    paddingHorizontal: 20,
-  },
-  voiceIcon: {
-    width: 42,
-    height: 42,
-    borderRadius: 21,
-    alignItems: "center",
-    justifyContent: "center",
+    gap: 8,
   },
   blockedActionLabel: {
     ...textStyles.compactAction,

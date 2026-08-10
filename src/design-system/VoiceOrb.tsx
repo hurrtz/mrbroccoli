@@ -156,6 +156,7 @@ function Arc({
  * another.
  */
 export function VoiceOrb({
+  accessibilityValue,
   disabled = false,
   glyph,
   label,
@@ -172,6 +173,9 @@ export function VoiceOrb({
   testID,
   turnProgress = 0,
 }: {
+  /** Progress a screen reader can read out, for a control that is waiting on
+   * something measurable -- a model install, for instance. */
+  accessibilityValue?: { max: number; min: number; now: number };
   disabled?: boolean;
   /** Overrides the phase's default glyph, for a phase whose action has two
    * states -- speaking pauses, but a paused reply resumes. */
@@ -237,6 +241,7 @@ export function VoiceOrb({
         accessibilityLabel={label}
         accessibilityRole="button"
         accessibilityState={{ disabled }}
+        accessibilityValue={accessibilityValue}
         disabled={disabled || (!onPress && !onPressIn)}
         onPress={onPress}
         onPressIn={onPressIn}

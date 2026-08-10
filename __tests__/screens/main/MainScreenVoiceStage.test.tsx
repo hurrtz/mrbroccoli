@@ -10,7 +10,11 @@ import {
 import { MainScreenVoiceStage } from "../../../src/screens/main/MainScreenVoiceStage";
 import { TranslateFn } from "../../../src/screens/main/shared";
 import { ThemeProvider } from "../../../src/theme/ThemeContext";
-import { darkColors, lightColors } from "../../../src/theme/colors";
+import {
+  darkColors,
+  getAccessibleForeground,
+  lightColors,
+} from "../../../src/theme/colors";
 
 const hiddenIconQuery = { includeHiddenElements: true } as const;
 
@@ -194,7 +198,7 @@ describe("MainScreenVoiceStage composer", () => {
     expect(screen.queryByLabelText("Add image")).toBeNull();
   });
 
-  it("starts with a prominent full-width voice surface", () => {
+  it("starts with the orb at rest as the voice control", () => {
     const onPress = jest.fn();
     const screen = render(
       <MainScreenVoiceStage {...createProps({ onPress })} />,
@@ -202,32 +206,22 @@ describe("MainScreenVoiceStage composer", () => {
 
     expect(screen.getByTestId("voice-input-surface")).toBeTruthy();
     expect(screen.getByLabelText("Tap to speak")).toBeTruthy();
+    // The name is spoken, not drawn: the status line carries the words.
     expect(screen.queryByText("Tap to speak")).toBeNull();
+    // At rest the glyph says what tapping does, and the core takes the accent
+    // rather than a phase colour, because no phase is running.
     expect(
-      screen.getByTestId("phosphor-icon-audio", hiddenIconQuery),
+      screen.getByTestId("phosphor-icon-mic", hiddenIconQuery),
     ).toBeTruthy();
     expect(
-      StyleSheet.flatten(screen.getByTestId("voice-input-surface").props.style),
-    ).toEqual(
-      expect.objectContaining({
-        backgroundColor: lightColors.activeControl,
-        minHeight: 68,
-        width: "100%",
-      }),
-    );
-    expect(
-      StyleSheet.flatten(
-        screen.getByTestId("phosphor-icon-audio", hiddenIconQuery).props.style,
-      )
-        .color,
-    ).toBe(lightColors.activeControlIcon);
-    expect(
-      StyleSheet.flatten(screen.getByTestId("voice-input-icon").props.style)
+      StyleSheet.flatten(screen.getByTestId("voice-orb-core").props.style)
         .backgroundColor,
-    ).toBe(lightColors.activeControlIconBackground);
+    ).toBe(lightColors.accent);
     expect(
       screen.getByLabelText("Show voice input").props.accessibilityState,
     ).toEqual({ disabled: false, selected: true });
+
+    // The pager and its indicator are untouched by the orb.
     expect(
       StyleSheet.flatten(screen.getByLabelText("Show voice input").props.style),
     ).toEqual(expect.objectContaining({ height: 44, width: 44 }));
@@ -346,7 +340,7 @@ describe("MainScreenVoiceStage composer", () => {
   it("shows installation progress directly on both disabled prompt CTAs", () => {
     const onPress = jest.fn();
     const onSubmitTextMessage = jest.fn();
-    const progressLabel = "Installing… 42%";
+    const progressLabel = "Installing\u2026 42%";
     const screen = render(
       <MainScreenVoiceStage
         {...createProps({
@@ -363,15 +357,13 @@ describe("MainScreenVoiceStage composer", () => {
     expect(screen.getByTestId("voice-input-blocked-status").props.children).toBe(
       progressLabel,
     );
+    // The orb still reports the measurable progress it is waiting on.
     expect(
       screen.getByTestId("voice-input-surface").props.accessibilityValue,
     ).toEqual({ min: 0, max: 100, now: 42 });
     expect(
       screen.getByTestId("voice-input-surface").props.accessibilityLabel,
     ).toBe(progressLabel);
-    expect(
-      screen.queryByTestId("phosphor-icon-audio", hiddenIconQuery),
-    ).toBeNull();
 
     fireEvent.press(screen.getByTestId("voice-input-surface"));
     expect(onPress).not.toHaveBeenCalled();
@@ -383,17 +375,6 @@ describe("MainScreenVoiceStage composer", () => {
     expect(
       screen.getByTestId("voice-text-primary-action").props.accessibilityValue,
     ).toEqual({ min: 0, max: 100, now: 42 });
-    expect(
-      StyleSheet.flatten(
-        screen.getByTestId("voice-text-primary-action").props.style,
-      ),
-    ).toEqual(
-      expect.objectContaining({
-        minWidth: 116,
-        width: "auto",
-      }),
-    );
-
     fireEvent.press(screen.getByTestId("voice-text-primary-action"));
     expect(onSubmitTextMessage).not.toHaveBeenCalled();
   });
@@ -439,22 +420,20 @@ describe("MainScreenVoiceStage composer", () => {
   it("preserves the dark-mode voice control treatment", () => {
     const screen = render(
       <MainScreenVoiceStage {...createProps({ colors: darkColors })} />,
+      "dark",
     );
 
+    // Both appearances are real: the orb resolves its own colours through the
+    // theme rather than inheriting whatever the light set happens to be.
     expect(
-      StyleSheet.flatten(screen.getByTestId("voice-input-surface").props.style)
+      StyleSheet.flatten(screen.getByTestId("voice-orb-core").props.style)
         .backgroundColor,
-    ).toBe(darkColors.activeControl);
+    ).toBe(darkColors.accent);
     expect(
       StyleSheet.flatten(
-        screen.getByTestId("phosphor-icon-audio", hiddenIconQuery).props.style,
-      )
-        .color,
-    ).toBe(darkColors.activeControlIcon);
-    expect(
-      StyleSheet.flatten(screen.getByTestId("voice-input-icon").props.style)
-        .backgroundColor,
-    ).toBe(darkColors.activeControlIconBackground);
+        screen.getByTestId("phosphor-icon-mic", hiddenIconQuery).props.style,
+      ).color,
+    ).toBe(getAccessibleForeground(darkColors.accent));
   });
 
   it("moves to a visually separate full-width text composer", () => {

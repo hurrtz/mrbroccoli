@@ -1,11 +1,8 @@
 import { PhosphorIcon } from "../../../design-system/PhosphorIcon";
+import { VoiceOrb } from "../../../design-system/VoiceOrb";
 import React from "react";
 import { Text, TextInput, TouchableOpacity, View } from "react-native";
-import {
-  GestureDetector,
-  GestureType,
-  TouchableOpacity as GestureTouchableOpacity,
-} from "react-native-gesture-handler";
+import { GestureDetector, GestureType } from "react-native-gesture-handler";
 import Animated from "react-native-reanimated";
 import { Colors } from "../../../theme/colors";
 import { InputMode } from "../../../types";
@@ -93,48 +90,27 @@ function VoiceInputSurface({
   const surfaceLabel =
     promptBlockedActionLabel ?? voiceInputUnavailableMessage;
 
+  const holdToTalk = inputMode === "push-to-talk" && !canResolvePromptBlock;
+
   return (
-    <GestureTouchableOpacity
-      testID="voice-input-surface"
-      accessibilityLabel={surfaceLabel ?? statusLabel}
-      accessibilityRole="button"
-      accessibilityState={{ disabled: actionDisabled }}
-      accessibilityValue={
-        promptBlockedProgress !== null
-          ? {
-              min: 0,
-              max: 100,
-              now: Math.round(promptBlockedProgress * 100),
-            }
-          : undefined
-      }
-      activeOpacity={0.84}
-      disabled={actionDisabled}
-      onPress={
-        inputMode === "push-to-talk" && !canResolvePromptBlock
-          ? undefined
-          : handlePress
-      }
-      onPressIn={
-        inputMode === "push-to-talk" && !canResolvePromptBlock
-          ? onPressIn
-          : undefined
-      }
-      onPressOut={
-        inputMode === "push-to-talk" && !canResolvePromptBlock
-          ? onPressOut
-          : undefined
-      }
-      style={[
-        styles.voiceSurface,
-        {
-          backgroundColor: actionDisabled
-            ? colors.surfaceAlt
-            : colors.activeControl,
-          borderColor: actionDisabled ? colors.border : colors.activeControl,
-        },
-      ]}
-    >
+    <View style={styles.voiceSurface} testID="voice-input-page">
+      {/* The orb is the control itself rather than a glyph inside a bar, so it
+          takes the press handlers directly. Push-to-talk holds it; every other
+          input mode taps it. */}
+      <VoiceOrb
+        accessibilityValue={
+          promptBlockedProgress !== null
+            ? { max: 100, min: 0, now: Math.round(promptBlockedProgress * 100) }
+            : undefined
+        }
+        disabled={actionDisabled}
+        label={surfaceLabel ?? statusLabel}
+        onPress={holdToTalk ? undefined : handlePress}
+        onPressIn={holdToTalk ? onPressIn : undefined}
+        onPressOut={holdToTalk ? onPressOut : undefined}
+        phase="idle"
+        testID="voice-input-surface"
+      />
       {surfaceLabel ? (
         <Text
           testID="voice-input-blocked-status"
@@ -142,35 +118,13 @@ function VoiceInputSurface({
           numberOfLines={2}
           style={[
             styles.blockedActionLabel,
-            {
-              color: canResolvePromptBlock
-                ? colors.activeControlIcon
-                : colors.textMuted,
-            },
+            { color: canResolvePromptBlock ? colors.accent : colors.textMuted },
           ]}
         >
           {surfaceLabel}
         </Text>
-      ) : (
-        <View
-          testID="voice-input-icon"
-          style={[
-            styles.voiceIcon,
-            {
-              backgroundColor: actionDisabled
-                ? colors.surfaceElevated
-                : colors.activeControlIconBackground,
-            },
-          ]}
-        >
-          <PhosphorIcon
-            name="audio"
-            size="navigation"
-            color={actionDisabled ? colors.textMuted : colors.activeControlIcon}
-          />
-        </View>
-      )}
-    </GestureTouchableOpacity>
+      ) : null}
+    </View>
   );
 }
 
