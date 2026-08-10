@@ -6,6 +6,7 @@ import {
   ArrowLeftIcon,
   ArrowRightIcon,
   ArrowUpIcon,
+  BrainIcon,
   BugIcon,
   CaretDownIcon,
   CaretLeftIcon,
@@ -57,6 +58,7 @@ import {
   StopIcon,
   TrashIcon,
   TrayIcon,
+  UsersThreeIcon,
   WarningCircleIcon,
   WarningIcon,
   WaveformIcon,
@@ -103,8 +105,14 @@ const PHOSPHOR_ICONS = {
   "file-text": FileTextIcon,
   "folder-open": FolderOpenIcon,
   global: GlobeHemisphereWestIcon,
+  // The thinking phase's glyph on the voice orb. The surviving voice-action
+  // bar keeps "robot"; the two deliberately coexist.
+  brain: BrainIcon,
   branch: GitBranchIcon,
   bug: BugIcon,
+  // Model Council. The key is the meaning, not the glyph name — matches the
+  // design system's icon map, which also keys UsersThree as "council".
+  council: UsersThreeIcon,
   headphones: HeadphonesIcon,
   inbox: TrayIcon,
   image: ImageIcon,

@@ -39,6 +39,21 @@ describe("Phosphor icon system", () => {
     expect(MIN_ICON_TOUCH_TARGET).toBe(44);
   });
 
+  it.each(["brain", "council"] as const)(
+    "renders the design system's %s glyph",
+    (name) => {
+      const screen = render(
+        <PhosphorIcon name={name} size="control" color="#123456" />,
+      );
+      const icon = screen.UNSAFE_getByProps({
+        testID: `phosphor-icon-${name}`,
+      });
+
+      expect(StyleSheet.flatten(icon.props.style).width).toBe(20);
+      expect(icon.props.weight).toBe("regular");
+    },
+  );
+
   it("renders decorative Phosphor glyphs with semantic sizing", () => {
     const screen = render(
       <PhosphorIcon name="info-circle" size="navigation" color="#123456" />,

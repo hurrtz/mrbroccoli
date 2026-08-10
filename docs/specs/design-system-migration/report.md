@@ -41,3 +41,29 @@ on what is uncertain, not what worked.
 - Settings kit README states a 68pt minimum header; `tokens/spacing.css` says
   `--mb-header-min-height: 62px`. Likely two different headers (main vs
   settings). Verify at Phase 4/5 against `features/settings/styles.ts`.
+
+## Phase 2 — Iconography
+
+### Applied
+
+- `brain` (thinking phase, used by the orb from Phase 3) and `council`
+  (Model Council, keyed by meaning exactly as the design system keys it) added
+  to `src/design-system/PhosphorIcon.tsx`, with render tests.
+- No CDN reference copied anywhere; the native `phosphor-react-native` package
+  serves both glyphs, and the existing test suite enforces that every glyph
+  stays regular-weight and on the shared wrapper.
+
+### Duplicate audit
+
+The whole map was audited programmatically. One glyph resolves from two keys:
+
+- `SlidersHorizontalIcon` ← `control` (used by `TranscriptPreviewCard`) and
+  `sliders` (used by `AntSettingsOverview`). Both mean "adjust settings" — the
+  same meaning under two names, so it does not violate the rule that no glyph
+  may mean two different things. Consolidating to one key would be a
+  no-visual-change cleanup; left for the owner since neither key is named in
+  the migration.
+- The design keeps `robot` for the thinking phase on the surviving
+  `PhaseAwareVoiceAction` bar and uses `brain` only on `VoiceOrb` — verified in
+  the design sources, so both glyphs deliberately coexist and neither was
+  rewired in this phase.
