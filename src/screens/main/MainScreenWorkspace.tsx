@@ -7,6 +7,7 @@ import { MainScreenRouteCard } from "./MainScreenRouteCard";
 import { MainScreenRouteControls } from "./MainScreenRouteControls";
 import { MainScreenTopBar } from "./MainScreenTopBar";
 import { MainScreenVoiceStage } from "./MainScreenVoiceStage";
+import { TranscriptDrawer } from "./TranscriptDrawer";
 import { TranscriptPreviewCard } from "./TranscriptPreviewCard";
 import { styles } from "./styles";
 
@@ -135,19 +136,12 @@ export function MainScreenWorkspace({
             <MainScreenRouteControls colors={colors} {...routeControls} />
           </View>
 
-          <View
-            testID="portrait-transcript-pane"
-            style={styles.portraitTranscriptPane}
-          >
-            <TranscriptPreviewCard
-              colors={colors}
-              presentation="canvas"
-              style={styles.workspaceTranscript}
-              {...transcript}
-            />
-          </View>
         </View>
       </View>
+
+      {/* Flush to the bottom edge with no side padding, so it reads as a drawer
+          to pull rather than a card floating above one. */}
+      <TranscriptDrawer colors={colors} t={transcript.t} transcript={transcript} />
     </>
   );
 }

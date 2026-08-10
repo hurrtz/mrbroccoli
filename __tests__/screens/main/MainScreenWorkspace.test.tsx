@@ -156,7 +156,10 @@ describe("MainScreenWorkspace streaming isolation", () => {
 
     expect(mockRouteBylineRenderCount).toBe(1);
     expect(mockVoicePagerRenderCount).toBe(1);
-    expect(mockTranscriptRenderCount).toBe(1);
+    // The transcript is behind the handle now, so the workspace does not pay
+    // to render it until it is opened.
+    expect(mockTranscriptRenderCount).toBe(0);
+    expect(screen.getByTestId("transcript-handle")).toBeTruthy();
     expect(t.mock.calls.filter(([key]) => key === "webSearch")).toHaveLength(2);
     // Web Search sits under the control it modifies: it changes how the next
     // turn is answered, not something to pass through on the way in.
@@ -178,7 +181,7 @@ describe("MainScreenWorkspace streaming isolation", () => {
 
     expect(mockRouteBylineRenderCount).toBe(1);
     expect(mockVoicePagerRenderCount).toBe(1);
-    expect(mockTranscriptRenderCount).toBe(2);
+    expect(mockTranscriptRenderCount).toBe(0);
     expect(t.mock.calls.filter(([key]) => key === "webSearch")).toHaveLength(2);
   });
 

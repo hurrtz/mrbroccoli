@@ -572,9 +572,6 @@ describe("MainScreen", () => {
   it("renders the shell with the route card", () => {
     const screen = renderWithProviders(<MainScreen />);
     const inputSection = within(screen.getByTestId("portrait-input-section"));
-    const transcriptPane = within(
-      screen.getByTestId("portrait-transcript-pane"),
-    );
 
     expect(screen.getByText("route-card")).toBeTruthy();
     expect(screen.queryByTestId("route-web-search-control")).toBeNull();
@@ -584,10 +581,10 @@ describe("MainScreen", () => {
         screen.getByTestId("portrait-conversation-stack").props.style,
       ).marginTop,
     ).toBe(6);
-    expect(
-      transcriptPane.getByText("transcript-preview:empty-visible"),
-    ).toBeTruthy();
-    expect(transcriptPane.queryByTestId("portrait-pane-divider")).toBeNull();
+    // A fresh session shows the handle's own empty state rather than an empty
+    // transcript filling the workspace.
+    expect(screen.getByTestId("transcript-handle")).toBeTruthy();
+    expect(screen.queryByText("transcript-preview:empty-visible")).toBeNull();
     expect(screen.getByText("settings:closed")).toBeTruthy();
     expect(screen.getByText("drawer:closed")).toBeTruthy();
     expect(screen.getByText("open-drawer")).toBeTruthy();
@@ -962,6 +959,10 @@ describe("MainScreen", () => {
     const screen = renderWithProviders(<MainScreen />);
 
     expect(screen.getByText("route-card")).toBeTruthy();
+    // The transcript, and the style control in its header, live behind the
+    // handle now rather than filling the workspace.
+    expect(screen.queryByText("transcript-style-control")).toBeNull();
+    fireEvent.press(screen.getByTestId("transcript-handle"));
     expect(screen.getByText("transcript-style-control")).toBeTruthy();
   });
 
