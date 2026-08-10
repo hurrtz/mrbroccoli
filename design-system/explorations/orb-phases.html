@@ -1,0 +1,168 @@
+<!-- @dsCard group="Explorations" viewport="1180x760" name="Orb phases" subtitle="Glyph and colour for each phase of a turn" -->
+<!DOCTYPE html><html data-theme="light"><head><meta charset="utf-8"><title>Orb phases and palettes</title>
+<link rel="stylesheet" href="../styles.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/regular/style.css">
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script src="../_ds_bundle.js"></script>
+<style>
+body{margin:0;padding:28px;background:#8f8d86;font-family:var(--mb-font-body)}
+h1{font-family:var(--mb-font-headline);font-size:26px;letter-spacing:-.25px;color:#16181D;margin:0 0 4px}
+.sub{font-size:14px;line-height:20px;color:#33342f;margin:0 0 24px;max-width:860px}
+h2{font-family:var(--mb-font-display);font-weight:600;font-size:17px;color:#16181D;margin:26px 0 2px}
+.note{font-size:13px;line-height:19px;color:#33342f;margin:0 0 14px;max-width:880px}
+.strip{display:flex;gap:10px;flex-wrap:wrap;padding:16px;border-radius:16px;background:var(--mb-color-background)}
+.cellcap{font-family:var(--mb-font-mono);font-size:9px;letter-spacing:.7px;text-transform:uppercase;color:var(--mb-color-text-muted);text-align:center;margin-top:8px}
+.hex{font-family:var(--mb-font-mono);font-size:9px;color:var(--mb-color-text-muted);text-align:center;display:block}
+.cap{font-family:var(--mb-font-mono);font-size:9px;letter-spacing:.9px;text-transform:uppercase;color:#2b2c2e;margin:0 0 6px 2px}
+</style>
+</head><body>
+<h1>The orb, every phase</h1>
+<p class="sub">Eight states across three palettes. Idle keeps a touch of green in all of them &mdash; it is the one state that says &ldquo;this is a good thing to press&rdquo;. The recording state carries the elapsed sweep; the rest are flat.</p>
+<div id="root"></div>
+<script type="text/babel">
+const { PhosphorIcon } = window.MrBroccoliDesignSystem_62d510;
+
+function luminance(hex){
+  const c = hex.replace("#","").match(/.{2}/g);
+  if(!c||c.length!==3) return 0;
+  const [r,g,b]=c.map((p)=>{const v=parseInt(p,16)/255;return v<=0.04045?v/12.92:Math.pow((v+0.055)/1.055,2.4);});
+  return r*0.2126+g*0.7152+b*0.0722;
+}
+function contrast(a,b){const hi=Math.max(luminance(a),luminance(b));const lo=Math.min(luminance(a),luminance(b));return (hi+0.05)/(lo+0.05);}
+function foregroundFor(bg){return contrast(bg,"#030712")>contrast(bg,"#FFFFFF")?"#030712":"#FFFFFF";}
+function softFor(hex,alpha){
+  const c=hex.replace("#","").match(/.{2}/g).map((p)=>parseInt(p,16));
+  return "rgba("+c[0]+","+c[1]+","+c[2]+","+alpha+")";
+}
+
+const PHASES = [
+  ["idle","Idle","mic"],
+  ["recording","Recording","stop"],
+  ["transcribing","Transcribing","file-text"],
+  ["thinkingBriefly","Thinking briefly","thunderbolt"],
+  ["searching","Searching","global"],
+  ["thinking","Thinking","robot"],
+  ["synthesizing","Synthesizing","customer-service"],
+  ["speaking","Speaking","pause"],
+];
+
+const PALETTES = [
+  { id:"shipped", name:"1 · As shipped",
+    note:"The current phase palette. Seven hues with no shared direction — legible per phase, but the sequence does not read as a journey, and synthesizing's lime sits oddly beside the greens.",
+    colors:{ idle:"#44A055", recording:"#44A055", transcribing:"#47BD9A", thinkingBriefly:"#4DA6FF",
+             searching:"#8B5CF6", thinking:"#6D28D9", synthesizing:"#B5E61D", speaking:"#059669" } },
+  { id:"bookends", name:"2 · Green bookends, cool middle",
+    note:"Green means you: you are talking (recording), and you are being talked to (speaking). Everything in between is the machine working, and it travels in one direction — teal, blue, indigo, violet at the deepest thinking, then back through teal as speech is prepared. The turn reads as an arc rather than a shuffle.",
+    colors:{ idle:"#3E9E5B", recording:"#2E9E52", transcribing:"#3FA9A2", thinkingBriefly:"#3E90D4",
+             searching:"#4E6FD2", thinking:"#6A4FCB", synthesizing:"#3FA9A2", speaking:"#2E9E52" } },
+  { id:"depth", name:"3 · One hue, deepening",
+    note:"A single blue-green that darkens and cools as the work deepens, with green only at idle and at the two ends. The calmest of the three and the least legible: two adjacent phases differ only in value, so a glance tells you roughly how deep the turn is, not exactly where.",
+    colors:{ idle:"#44A055", recording:"#3E9C5E", transcribing:"#2F8F86", thinkingBriefly:"#2A7FA0",
+             searching:"#2A6DAF", thinking:"#2C58AE", synthesizing:"#2F86A0", speaking:"#35995F" } },
+];
+
+function Orb({ size = 104, color, icon, progress }){
+  const foreground = foregroundFor(color);
+  const halo = progress !== undefined
+    ? "conic-gradient(rgba(3,7,18,0.10) " + Math.round(progress*360) + "deg, rgba(0,0,0,0) 0), " + softFor(color,0.16)
+    : softFor(color,0.16);
+  return <div style={{width:size,height:size,borderRadius:size/2,display:"flex",alignItems:"center",justifyContent:"center",
+    background:halo,boxShadow:"0 0 0 1px var(--mb-color-border)"}}>
+    <div style={{width:size*0.72,height:size*0.72,borderRadius:size,display:"flex",alignItems:"center",justifyContent:"center",
+      background:color,boxShadow:"0 0 0 6px "+softFor(color,0.20)}}>
+      <PhosphorIcon name={icon} size="feature" color={foreground} style={{fontSize:size*0.28,width:size*0.28,height:size*0.28}} />
+    </div>
+  </div>;
+}
+
+function PaletteRow({ palette, theme = "light" }){
+  return <div className="strip" data-theme={theme}>
+    {PHASES.map(([key,label,icon])=>
+      <div key={key} style={{width:118}}>
+        <div style={{display:"flex",justifyContent:"center"}}>
+          <Orb color={palette.colors[key]} icon={icon} progress={key==="recording"?0.42:undefined} />
+        </div>
+        <div className="cellcap">{label}</div>
+        <span className="hex">{palette.colors[key]}</span>
+      </div>)}
+  </div>;
+}
+
+/* Council icon candidates. The app's map has no glyph for "several models
+   deliberate", so this is a proposed addition, not a substitution. */
+const COUNCIL = [
+  ["users-three","users-three","Three figures. Reads as a group deciding — closest to the word."],
+  ["circles-three","circles-three","Three overlapping discs. Abstract, no human metaphor, sits well beside cpu."],
+  ["scales","scales","Weighing positions against each other. Says deliberation, but also says legal."],
+  ["strategy","strategy","Pieces on a board. Says planning more than consensus."],
+];
+
+function Glyph({ name, size = 32 }){
+  return <i className={"ph ph-" + name} aria-hidden="true"
+    style={{fontSize:size,lineHeight:1,width:size,height:size,display:"inline-flex",alignItems:"center",justifyContent:"center",color:"var(--mb-color-text)"}} />;
+}
+
+function Satellite({ icon, phosphor, label, active, shape = "plain" }){
+  const body = phosphor ? <Glyph name={phosphor} size={20} /> : <PhosphorIcon name={icon} size="control" color={active?"var(--mb-color-accent)":"var(--mb-color-text-secondary)"} />;
+  return <div style={{display:"flex",flexDirection:"column",alignItems:"center",gap:4,width:64}}>
+    <span style={{width:44,height:44,borderRadius:shape==="pill"?22:"var(--mb-radius-icon-button)",
+      display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",
+      border:"1px solid "+(active?"var(--mb-color-accent)":shape==="pill"?"var(--mb-color-border)":"transparent"),
+      background:active?"var(--mb-color-accent-soft)":"transparent"}}>{body}</span>
+    <span style={{fontFamily:"var(--mb-font-mono)",fontSize:9,letterSpacing:"0.75px",textTransform:"uppercase",
+      color:active?"var(--mb-color-accent)":"var(--mb-color-text-muted)"}}>{label}</span>
+  </div>;
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<>
+  {PALETTES.map((palette)=>
+    <div key={palette.id}>
+      <h2>{palette.name}</h2>
+      <p className="note">{palette.note}</p>
+      <PaletteRow palette={palette} />
+      <div style={{height:10}} />
+      <PaletteRow palette={palette} theme="dark" />
+    </div>)}
+
+  <h2>A mark for Model Council</h2>
+  <p className="note">`robot` is already the thinking phase, so Council needs its own. None of these are in the app&rsquo;s current icon map &mdash; adding one glyph is a small, deliberate extension rather than a substitution.</p>
+  <div className="strip" style={{gap:24}}>
+    {COUNCIL.map(([id,name,why])=>
+      <div key={id} style={{width:200,display:"flex",flexDirection:"column",alignItems:"center",gap:8}}>
+        <Glyph name={name} />
+        <span className="cellcap">{name}</span>
+        <span style={{fontFamily:"var(--mb-font-body)",fontSize:12,lineHeight:"17px",color:"var(--mb-color-text-secondary)",textAlign:"center"}}>{why}</span>
+      </div>)}
+  </div>
+
+  <h2>Where the image control belongs</h2>
+  <p className="note">Image is momentary, Council and Web are persistent. Drawing all three identically is the same mistake the transcript header made. Two ways to separate them.</p>
+  <div className="strip" style={{gap:32,alignItems:"flex-start"}}>
+    <div>
+      <p className="cap">a · one action, two toggles</p>
+      <div style={{display:"flex",alignItems:"flex-start",gap:8}}>
+        <Satellite icon="image" label="Image" />
+        <span style={{width:1,height:44,background:"var(--mb-color-border)",margin:"0 6px"}} />
+        <Satellite phosphor="users-three" label="Council" active />
+        <Satellite icon="global" label="Web" active shape="pill" />
+      </div>
+      <p style={{fontFamily:"var(--mb-font-body)",fontSize:12,lineHeight:"17px",color:"var(--mb-color-text-secondary)",maxWidth:260,marginTop:10}}>
+        A hairline separates the action from the state. The toggles carry a visible track; Image does not.
+      </p>
+    </div>
+    <div>
+      <p className="cap">b · image moves into the composer</p>
+      <div style={{display:"flex",alignItems:"flex-start",gap:8}}>
+        <Satellite phosphor="users-three" label="Council" active />
+        <Satellite icon="global" label="Web" active shape="pill" />
+      </div>
+      <p style={{fontFamily:"var(--mb-font-body)",fontSize:12,lineHeight:"17px",color:"var(--mb-color-text-secondary)",maxWidth:280,marginTop:10}}>
+        Only the two toggles sit under the orb. Image lives inside the text composer, and on the voice page it appears as a thumbnail strip above the orb once something is attached. Fewer controls at rest, and attaching an image becomes a thing you do to a message rather than a mode you set.
+      </p>
+    </div>
+  </div>
+</>);
+</script>
+</body></html>

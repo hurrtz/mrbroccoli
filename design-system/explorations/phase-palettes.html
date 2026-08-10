@@ -1,0 +1,199 @@
+<!-- @dsCard group="Explorations" viewport="1180x900" name="Phase palettes" subtitle="Three ramps for the voice pipeline; bookends chosen" -->
+<!DOCTYPE html><html data-theme="light"><head><meta charset="utf-8"><title>Phase palettes — light and dark</title>
+<link rel="stylesheet" href="../styles.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/regular/style.css">
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script src="../_ds_bundle.js"></script>
+<style>
+body{margin:0;padding:28px;background:#8f8d86;font-family:var(--mb-font-body)}
+h1{font-family:var(--mb-font-headline);font-size:26px;letter-spacing:-.25px;color:#16181D;margin:0 0 4px}
+.sub{font-size:14px;line-height:20px;color:#2a2b26;margin:0 0 24px;max-width:880px}
+h2{font-family:var(--mb-font-display);font-weight:600;font-size:17px;color:#16181D;margin:26px 0 2px}
+.note{font-size:13px;line-height:19px;color:#2a2b26;margin:0 0 12px;max-width:900px}
+.strip{display:flex;gap:8px;flex-wrap:nowrap;padding:16px;border-radius:16px}
+.lab{font-family:var(--mb-font-mono);font-size:9px;letter-spacing:.7px;text-transform:uppercase;text-align:center;margin-top:8px;display:block}
+.hex{font-family:var(--mb-font-mono);font-size:9px;text-align:center;display:block}
+.cap{font-family:var(--mb-font-mono);font-size:9px;letter-spacing:.9px;text-transform:uppercase;color:#1f201c;margin:0 0 6px 2px}
+</style>
+</head><body>
+<h1>Phase palette A, with over time</h1>
+<p class="sub">Bookends, authored twice &mdash; darker and denser for the warm off-white canvas, lighter and more luminous for the warm near-black. The orb carries two rings: the inner one sweeps through the current phase in that phase&rsquo;s own colour pushed harder, the outer one sweeps through the whole expected turn in a neutral grey, so it reads as time rather than as another phase.</p>
+<div id="root"></div>
+<script type="text/babel">
+const PHASES = [
+  ["idle","Idle","microphone"],
+  ["recording","Recording","stop"],
+  ["transcribing","Transcribing","file-text"],
+  ["thinkingBriefly","Brief","lightning"],
+  ["searching","Searching","globe-hemisphere-west"],
+  ["thinking","Thinking","brain"],
+  ["synthesizing","Synthesizing","headset"],
+  ["speaking","Speaking","pause"],
+];
+
+const RAMPS = [
+  { id:"shipped", name:"As shipped, for comparison",
+    note:"Seven hues with no shared direction, and the dark set is largely the light set brightened. Synthesizing's lime is the outlier in both appearances.",
+    light:{ idle:"#44A055", recording:"#44A055", transcribing:"#47BD9A", thinkingBriefly:"#4DA6FF",
+            searching:"#8B5CF6", thinking:"#6D28D9", synthesizing:"#B5E61D", speaking:"#059669" },
+    sweepLight:"rgba(3,7,18,0.08)", sweepDark:"#329F59",
+    dark:{ idle:"#5DC17D", recording:"#5DC17D", transcribing:"#2DD4BF", thinkingBriefly:"#60A5FA",
+           searching:"#A78BFA", thinking:"#E879F9", synthesizing:"#A3E635", speaking:"#10B981" } },
+
+  { id:"bookends", name:"A · Bookends",
+    note:"Green means you: you are talking, then you are being talked to. Between them the machine travels one way — teal, blue, indigo, violet at the deepest thinking — and comes back through teal as speech is prepared. Light values are held dark enough to carry a white glyph; dark values are lifted so they read on the near-black canvas without glowing.",
+    light:{ idle:"#3E9E5B", recording:"#2E9E52", transcribing:"#2FA39B", thinkingBriefly:"#3A8FD0",
+            searching:"#4A67CC", thinking:"#6A4CC4", synthesizing:"#2FA39B", speaking:"#2E9E52" },
+    sweepLight:"rgba(3,7,18,0.14)", sweepDark:"#1E6B3A",
+    dark:{ idle:"#5DC17D", recording:"#5DC17D", transcribing:"#4FD1C5", thinkingBriefly:"#6BB2F5",
+           searching:"#8093F0", thinking:"#A78BFA", synthesizing:"#4FD1C5", speaking:"#5DC17D" } },
+
+  { id:"depth", name:"B · One hue, deepening",
+    note:"A single blue-green that cools and darkens as the work deepens, with green only at idle and the two ends. The calmest option and the least precise: a glance tells you roughly how deep the turn is, not exactly which phase.",
+    light:{ idle:"#44A055", recording:"#3E9C5E", transcribing:"#2F8F86", thinkingBriefly:"#2A7FA0",
+            searching:"#2A6DAF", thinking:"#2C58AE", synthesizing:"#2F86A0", speaking:"#35995F" },
+    sweepLight:"rgba(3,7,18,0.14)", sweepDark:"#1F6B45",
+    dark:{ idle:"#5DC17D", recording:"#5AC08A", transcribing:"#47BFB2", thinkingBriefly:"#4FA8CC",
+           searching:"#5A97DA", thinking:"#6E8BE0", synthesizing:"#4FB6C9", speaking:"#5DC17D" } },
+
+  { id:"muted", name:"C · Low chroma",
+    note:"The same seven distinctions at a fraction of the saturation, so no phase ever makes the screen loud. Closest to the restraint the rest of the system is built on, and the hardest to tell apart at a glance across a room.",
+    light:{ idle:"#4A9A5F", recording:"#4A9A5F", transcribing:"#468C86", thinkingBriefly:"#4A7E9E",
+            searching:"#5A6E9E", thinking:"#6B5F9B", synthesizing:"#5E8B7E", speaking:"#3F8F63" },
+    sweepLight:"rgba(3,7,18,0.14)", sweepDark:"#2A6B44",
+    dark:{ idle:"#6FBE87", recording:"#6FBE87", transcribing:"#6BB3AD", thinkingBriefly:"#6E9CC0",
+           searching:"#7E8CC4", thinking:"#9280C0", synthesizing:"#7EB39F", speaking:"#66B685" } },
+];
+
+function luminance(hex){
+  const c=hex.replace("#","").match(/.{2}/g);
+  if(!c||c.length!==3) return 0;
+  const [r,g,b]=c.map((p)=>{const v=parseInt(p,16)/255;return v<=0.04045?v/12.92:Math.pow((v+0.055)/1.055,2.4);});
+  return r*0.2126+g*0.7152+b*0.0722;
+}
+function contrast(a,b){const hi=Math.max(luminance(a),luminance(b));const lo=Math.min(luminance(a),luminance(b));return (hi+0.05)/(lo+0.05);}
+function foregroundFor(bg){return contrast(bg,"#030712")>contrast(bg,"#FFFFFF")?"#030712":"#FFFFFF";}
+function soft(hex,alpha){
+  const c=hex.replace("#","").match(/.{2}/g).map((p)=>parseInt(p,16));
+  return "rgba("+c[0]+","+c[1]+","+c[2]+","+alpha+")";
+}
+
+/* The phase sweep is the phase's own colour pushed harder: more saturated, and
+   moved away from the canvas so elapsed reads against the track it sits on. */
+function vivid(hex, dark){
+  const [r,g,b]=hex.replace("#","").match(/.{2}/g).map((p)=>parseInt(p,16)/255);
+  const max=Math.max(r,g,b), min=Math.min(r,g,b), l=(max+min)/2;
+  let h=0, s=0;
+  if(max!==min){
+    const d=max-min;
+    s = l>0.5 ? d/(2-max-min) : d/(max+min);
+    if(max===r) h=((g-b)/d+(g<b?6:0));
+    else if(max===g) h=(b-r)/d+2;
+    else h=(r-g)/d+4;
+    h*=60;
+  }
+  const S=Math.min(1, s*1.45);
+  const L=dark ? Math.min(0.72, l*1.28) : Math.max(0.24, l*0.72);
+  return "hsl("+Math.round(h)+", "+Math.round(S*100)+"%, "+Math.round(L*100)+"%)";
+}
+
+function Glyph({ name, size, color }){
+  return <i className={"ph ph-"+name} aria-hidden="true"
+    style={{fontSize:size,lineHeight:1,width:size,height:size,color,display:"inline-flex",alignItems:"center",justifyContent:"center"}} />;
+}
+
+function Orb({ size=96, color, icon, phaseProgress=0, turnProgress=0, overtime=0, danger, ink, border, dark, canvas, turnTrack, turnInk }){
+  const fg = foregroundFor(color);
+  // Outer ring: how far through the whole turn, in a neutral ink so it reads as
+  // time rather than phase. Inner ring: how far through this phase, in the
+  // phase's own colour pushed harder. The inner track closes with an opaque
+  // canvas layer so the outer arc cannot bleed through it.
+  // Over estimate the outer ring is binary: the whole turn is late, or it is not.
+  // Magnitude is the inner ring's job, so this one fills solid rather than
+  // sweeping a remainder that would collapse its visible mass.
+  const turnOver = Math.max(0, turnProgress - 1);
+  const outer = turnOver > 0
+    ? "linear-gradient("+danger+", "+danger+")"
+    : "conic-gradient("+turnInk+" "+Math.round(turnProgress*360)+"deg, rgba(0,0,0,0) 0), linear-gradient("+turnTrack+", "+turnTrack+")";
+  // Over time: the phase sweep has closed the ring and the phase is still
+  // running, so a danger arc sweeps a second lap over the completed one.
+  // The base is an opaque background-color so the outer arc cannot bleed
+  // through; the tint is an image layer, since a colour is only legal as the
+  // final layer of the `background` shorthand.
+  const tint = overtime > 0 ? vivid(color,dark) : soft(color,0.16);
+  // Over time, the ring inverts: solid danger with the *remaining* fraction
+  // swept in the track ink, so red coverage grows with lateness and a full lap
+  // over estimate is a fully red ring.
+  const sweepInk = overtime > 0 ? ink : vivid(color,dark);
+  const sweepDeg = Math.round((overtime > 0 ? 1 - Math.min(1,overtime) : phaseProgress) * 360);
+  const innerBase = overtime > 0 ? danger : tint;
+  const innerImage = "conic-gradient("+sweepInk+" "+sweepDeg+"deg, rgba(0,0,0,0) 0), linear-gradient("+innerBase+", "+innerBase+")";
+  return <div style={{width:size,height:size,borderRadius:size/2,display:"flex",alignItems:"center",justifyContent:"center",
+    backgroundColor:canvas,backgroundImage:outer,boxShadow:"0 0 0 1px "+border}}>
+    <div style={{width:size*0.86,height:size*0.86,borderRadius:size,display:"flex",alignItems:"center",justifyContent:"center",
+      backgroundColor:canvas,backgroundImage:innerImage,boxShadow:"0 0 0 1.5px "+canvas}}>
+      <div style={{width:size*0.72,height:size*0.72,borderRadius:size,display:"flex",alignItems:"center",justifyContent:"center",
+        background:color}}>
+        <Glyph name={icon} size={size*0.26} color={fg} />
+      </div>
+    </div>
+  </div>;
+}
+
+/* Where each phase sits in a whole turn, and how far through itself it is. */
+const TURN = { idle:0, recording:0.10, transcribing:0.24, thinkingBriefly:0.36,
+  searching:0.52, thinking:0.70, synthesizing:0.86, speaking:0.96 };
+const WITHIN = { idle:0, recording:0.42, transcribing:0.55, thinkingBriefly:0.30,
+  searching:0.66, thinking:0.45, synthesizing:0.72, speaking:0.38 };
+
+function Row({ colors, canvas, text, muted, border, dark, turnTrack, turnInk, danger, ink, cells }){
+  const list = cells || PHASES;
+  return <div className="strip" style={{background:canvas}}>
+    {list.map(([key,label,icon,over])=>
+      <div key={label} style={{flex:"1 1 0",minWidth:0}}>
+        <div style={{display:"flex",justifyContent:"center"}}>
+          <Orb color={colors[key]} icon={icon} border={border} dark={dark} canvas={canvas} danger={danger} ink={ink}
+            turnTrack={turnTrack} turnInk={turnInk}
+            phaseProgress={over ? 1 : WITHIN[key]} overtime={over || 0}
+            turnProgress={over ? TURN[key] + over * (1 - TURN[key]) * 1.7 : TURN[key]} />
+        </div>
+        <span className="lab" style={{color:text}}>{label}</span>
+        <span className="hex" style={{color:muted}}>{colors[key]}</span>
+      </div>)}
+  </div>;
+}
+
+const OVERTIME = [
+  ["thinking","Just over","brain",0.18],
+  ["thinking","Well over","brain",0.55],
+  ["thinking","Twice the estimate","brain",1],
+  ["searching","Search over time","globe-hemisphere-west",0.4],
+  ["synthesizing","Synthesis over time","headset",0.7],
+];
+
+ReactDOM.createRoot(document.getElementById("root")).render(<>
+  {RAMPS.filter((r)=>r.id==="shipped"||r.id==="bookends").map((ramp)=>
+    <div key={ramp.id}>
+      <h2>{ramp.name}</h2>
+      <p className="note">{ramp.note}</p>
+      <p className="cap">Light · #FCFBF8 · phase sweep: own hue, +45% saturation, −28% lightness · turn sweep #5D6B7A</p>
+      <Row colors={ramp.light} canvas="#FCFBF8" text="#1A1D24" muted="#5D6B7A" border="#D9D7D1"
+        turnTrack="#EFEEE9" turnInk="#5D6B7A" danger="#DC2626" ink="#EFEEE9" />
+      <p className="cap" style={{marginTop:10}}>Dark · #16181D · phase sweep: own hue, +45% saturation, +28% lightness · turn sweep #8B97A8</p>
+      <Row colors={ramp.dark} canvas="#16181D" text="#EDF1F5" muted="#8B97A8" border="#2C3138" dark
+        turnTrack="#262B33" turnInk="#8B97A8" danger="#F87171" ink="#262B33" />
+    </div>)}
+
+  <h2>Over time</h2>
+  <p className="note">When the phase sweep closes the ring and the phase is still running, the ring inverts: it fills red and the fraction still owed is swept back in the track colour, so red coverage grows with lateness and a full lap past the estimate is a fully red ring. The outer ring answers a simpler question &mdash; the whole turn is either past its estimate or it is not &mdash; so it advances as an arc until that moment and then fills solid. Magnitude stays the inner ring&rsquo;s job.</p>
+  <p className="cap">Light</p>
+  <Row colors={RAMPS[1].light} cells={OVERTIME} canvas="#FCFBF8" text="#1A1D24" muted="#5D6B7A" border="#D9D7D1"
+    turnTrack="#EFEEE9" turnInk="#5D6B7A" danger="#DC2626" ink="#EFEEE9" />
+  <p className="cap" style={{marginTop:10}}>Dark</p>
+  <Row colors={RAMPS[1].dark} cells={OVERTIME} canvas="#16181D" text="#EDF1F5" muted="#8B97A8" border="#2C3138" dark
+    turnTrack="#262B33" turnInk="#8B97A8" danger="#F87171" ink="#262B33" />
+</>);
+</script>
+</body></html>

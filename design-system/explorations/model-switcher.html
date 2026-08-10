@@ -1,0 +1,244 @@
+<!-- @dsCard group="Explorations" viewport="1180x820" name="Model switcher" subtitle="Superseded — route cards versus the one-line byline" -->
+<!DOCTYPE html><html data-theme="light"><head><meta charset="utf-8"><title>Model switcher — candidates</title>
+<link rel="stylesheet" href="../styles.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/regular/style.css">
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script src="../_ds_bundle.js"></script>
+<style>
+body{margin:0;padding:28px;background:#8f8d86;font-family:var(--mb-font-body)}
+h1{font-family:var(--mb-font-headline);font-size:26px;letter-spacing:-.25px;color:#16181D;margin:0 0 4px}
+.sub{font-size:14px;line-height:20px;color:#33342f;margin:0 0 26px;max-width:760px}
+h2{font-family:var(--mb-font-display);font-weight:600;font-size:17px;color:#16181D;margin:26px 0 2px}
+.note{font-size:13px;line-height:19px;color:#33342f;margin:0 0 12px;max-width:820px}
+.row{display:flex;gap:14px;flex-wrap:wrap}
+.cell{width:390px;border-radius:16px;overflow:hidden;background:var(--mb-color-background);border:1px solid rgba(0,0,0,.2)}
+.cap{font-family:var(--mb-font-mono);font-size:9px;letter-spacing:.9px;text-transform:uppercase;color:#2b2c2e;margin:0 0 6px 2px}
+.pad{padding:12px 16px 16px}
+</style>
+</head><body>
+<h1>Model switcher — one control at every count</h1>
+<p class="sub">Each candidate is shown directly above the real 68pt call to action, because that adjacency is the whole problem. Columns are 1, 2, 3 and 5 configured models. The dots read <strong>effort</strong>, not model count, and the number of dots is the model&rsquo;s own scale &mdash; four steps on GPT-5, three on Sonnet. A model with no selectable effort is <strong>Normal</strong> and shows no dots at all.</p>
+<div id="root"></div>
+<script type="text/babel">
+const { ProviderIcon, PhaseAwareVoiceAction, PhosphorIcon, IconButton, AppWordmark } = window.MrBroccoliDesignSystem_62d510;
+const A = "../assets/providers";
+
+const LADDER = [
+  { provider:"openai", providerLabel:"OpenAI", name:"GPT-5 mini", effort:"Low", levels:["Minimal","Low","Medium","High"] },
+  { provider:"anthropic", providerLabel:"Anthropic", name:"Claude Sonnet 4.5", effort:"Medium", levels:["Low","Medium","High"] },
+  { provider:"openai", providerLabel:"OpenAI", name:"GPT-5", effort:"High", levels:["Minimal","Low","Medium","High"] },
+  { provider:"gemini", providerLabel:"Gemini", name:"Gemini 2.5 Pro", effort:"High", levels:["Low","Medium","High"] },
+  { provider:"mistral", providerLabel:"Mistral", name:"Mistral Large", effort:"Normal", levels:[] },
+];
+const at = (count) => LADDER.slice(0, count);
+
+/* The dots are the model's OWN effort scale, so the count varies per model.
+   A model with no selectable effort is "Normal" and shows no dots at all —
+   a single dot would say nothing. */
+function EffortDots({ levels = [], effort, marginLeft = 8 }){
+  const index = levels.indexOf(effort);
+  if (levels.length < 2 || index < 0) return null;
+  return <span aria-hidden="true" style={{display:"inline-flex",alignItems:"center",gap:4,marginLeft}}>
+    {levels.map((_,i)=>
+      <span key={i} style={{width:5,height:5,borderRadius:3,background:i<=index?"var(--mb-color-accent)":"var(--mb-color-border-strong)"}} />)}
+  </span>;
+}
+
+/* A — byline: no container at all. The mark carries the prominence. */
+function Byline({ count, index }){
+  const m = at(count)[index];
+  return <div role="button" style={{display:"flex",alignItems:"center",gap:12,minHeight:44,cursor:"pointer"}}>
+    <ProviderIcon provider={m.provider} label={m.providerLabel} size="feature" color="var(--mb-color-text)" assetBase={A} />
+    <span style={{flex:1,minWidth:0,display:"flex",flexDirection:"column",gap:1}}>
+      <span style={{fontFamily:"var(--mb-font-display)",fontWeight:600,fontSize:15,lineHeight:"20px",color:"var(--mb-color-text)",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{m.name}</span>
+      <span style={{display:"flex",alignItems:"center",fontFamily:"var(--mb-font-mono)",fontSize:11,lineHeight:"16px",color:"var(--mb-color-text-muted)"}}>
+        {m.effort}<EffortDots levels={m.levels} effort={m.effort} />
+      </span>
+    </span>
+    {count>1 ? <PhosphorIcon name="down" size="compact" color="var(--mb-color-text-muted)" /> : null}
+  </div>;
+}
+
+/* B — quiet row: contained, but half the CTA's height, no fill, control radius. */
+function QuietRow({ count, index }){
+  const m = at(count)[index];
+  return <div role="button" style={{display:"flex",alignItems:"center",gap:12,minHeight:46,padding:"0 14px",cursor:"pointer",
+    background:"var(--mb-color-surface-alt)",border:"1px solid var(--mb-color-border)",borderRadius:"var(--mb-radius-control)"}}>
+    <ProviderIcon provider={m.provider} label={m.providerLabel} size="control" color="var(--mb-color-text-secondary)" assetBase={A} />
+    <span style={{flex:1,minWidth:0,fontFamily:"var(--mb-font-display)",fontWeight:600,fontSize:15,lineHeight:"20px",color:"var(--mb-color-text)",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{m.name}</span>
+    <span style={{display:"flex",alignItems:"center",fontFamily:"var(--mb-font-mono)",fontSize:11,color:"var(--mb-color-text-muted)"}}>{m.effort}<EffortDots levels={m.levels} effort={m.effort} marginLeft={6} /></span>
+    {count>1 ? <PhosphorIcon name="down" size="compact" color="var(--mb-color-text-muted)" /> : null}
+  </div>;
+}
+
+/* C — top-bar chip: the route replaces the wordmark; the body holds nothing but the CTA. */
+function TopBarChip({ count, index }){
+  const m = at(count)[index];
+  return <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",minHeight:62}}>
+    <IconButton icon="menu" accessibilityLabel="Conversations" />
+    <span role="button" style={{display:"inline-flex",alignItems:"center",gap:8,minHeight:44,padding:"0 12px",cursor:"pointer",
+      borderRadius:999,border:"1px solid var(--mb-color-border)",background:"var(--mb-color-surface)"}}>
+      <ProviderIcon provider={m.provider} label={m.providerLabel} size="compact" color="var(--mb-color-text)" assetBase={A} />
+      <span style={{fontFamily:"var(--mb-font-display)",fontWeight:600,fontSize:14,color:"var(--mb-color-text)",maxWidth:150,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{m.name}</span>
+      <EffortDots levels={m.levels} effort={m.effort} marginLeft={0} />
+      {count>1 ? <PhosphorIcon name="down" size="inline" color="var(--mb-color-text-muted)" /> : null}
+    </span>
+    <IconButton icon="setting" accessibilityLabel="Settings" />
+  </div>;
+}
+
+const CTA = () => <PhaseAwareVoiceAction visualPhase="idle" prompt="Ask anything." title="Tap to talk" />;
+
+function Cell({ Candidate, count, index, showBar }){
+  return <div className="cell"><div className="pad">
+    {showBar ? null : <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",minHeight:62,marginBottom:2}}>
+      <IconButton icon="menu" accessibilityLabel="Conversations" />
+      <AppWordmark />
+      <IconButton icon="setting" accessibilityLabel="Settings" />
+    </div>}
+    <Candidate count={count} index={index} />
+    <div style={{height:70,margin:"10px 0",border:"1px dashed var(--mb-color-border)",borderRadius:"var(--mb-radius-dialog)",
+      display:"flex",alignItems:"center",justifyContent:"center",fontFamily:"var(--mb-font-mono)",fontSize:10,
+      letterSpacing:".9px",textTransform:"uppercase",color:"var(--mb-color-text-muted)"}}>transcript</div>
+    <CTA />
+  </div></div>;
+}
+
+function Group({ title, note, Candidate, showBar }){
+  const counts = [1,2,3,5];
+  // Each column also steps up the effort ladder, so the columns differ on the
+  // axis the dots now encode rather than only on model count.
+  const selectedIndex = { 1:0, 2:1, 3:2, 5:4 };
+  return <>
+    <h2>{title}</h2><p className="note">{note}</p>
+    <div className="row">{counts.map((c)=>
+      <div key={c}><p className="cap">{c} model{c>1?"s":""} · {at(c)[selectedIndex[c]].effort.toLowerCase()}</p>
+        <Cell Candidate={Candidate} count={c} index={selectedIndex[c]} showBar={showBar} /></div>)}
+    </div>
+  </>;
+}
+
+function BalanceRow({ variant, m }){
+  const mark = m.local
+    ? <PhosphorIcon name="cpu" size="feature" color="var(--mb-color-text)" />
+    : <ProviderIcon provider={m.provider} label={m.providerLabel} size="feature" color="var(--mb-color-text)" assetBase={A} />;
+  const name = <span style={{fontFamily:"var(--mb-font-display)",fontWeight:600,fontSize:15,lineHeight:"20px",color:"var(--mb-color-text)",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{m.name}</span>;
+  const effortWord = <span style={{fontFamily:"var(--mb-font-mono)",fontSize:11,lineHeight:"16px",color:"var(--mb-color-text-muted)"}}>{m.effort}</span>;
+  const caret = m.switchable ? <PhosphorIcon name="down" size="compact" color="var(--mb-color-text-muted)" /> : null;
+
+  if (variant === "a1") {
+    return <div style={{display:"flex",alignItems:"center",gap:12,minHeight:44}}>
+      {mark}
+      <span style={{flex:1,minWidth:0,display:"flex",flexDirection:"column",gap:1}}>
+        {name}
+        <span style={{display:"flex",alignItems:"center"}}>{effortWord}<EffortDots levels={m.levels} effort={m.effort} /></span>
+      </span>
+      {caret}
+    </div>;
+  }
+  if (variant === "a2") {
+    return <div style={{display:"flex",alignItems:"center",gap:12,minHeight:44}}>
+      {mark}
+      <span style={{flex:1,minWidth:0}}>{name}</span>
+      <span style={{display:"flex",alignItems:"center",gap:8,flexShrink:0}}>{effortWord}<EffortDots levels={m.levels} effort={m.effort} marginLeft={0} />{caret}</span>
+    </div>;
+  }
+  if (variant === "a3") {
+    return <div style={{display:"flex",alignItems:"center",gap:12,minHeight:44}}>
+      {mark}
+      <span style={{flex:1,minWidth:0}}>{name}</span>
+      <span style={{display:"flex",flexDirection:"column",alignItems:"flex-end",gap:2,flexShrink:0}}>
+        {effortWord}<EffortDots levels={m.levels} effort={m.effort} marginLeft={0} />
+      </span>
+      {caret}
+    </div>;
+  }
+  return <div style={{display:"flex",alignItems:"center",gap:12,minHeight:48,paddingBottom:8,borderBottom:"1px solid var(--mb-color-border)"}}>
+    {mark}
+    <span style={{flex:1,minWidth:0}}>{name}</span>
+    <span style={{display:"flex",alignItems:"center",gap:8,flexShrink:0}}>{effortWord}<EffortDots levels={m.levels} effort={m.effort} marginLeft={0} />{caret}</span>
+  </div>;
+}
+
+function Balance(){
+  const variants = [
+    ["a1","As drawn — effort under the name"],
+    ["a2","Effort anchored right, one line"],
+    ["a3","Effort right, dots beneath it"],
+    ["a4","Right-anchored, closed with a hairline"],
+  ];
+  const rows = [
+    { ...LADDER[1], switchable:true },
+    { ...LADDER[4], switchable:false },
+  ];
+  return <>
+    <h2>Rebalancing candidate A</h2>
+    <p className="note">The byline is left-weighted, and worst at one model where the caret disappears and the whole right half empties. Each variant is shown with a switchable model and with the single-model case that has no caret at all.</p>
+    <div className="row">{variants.map(([variant,label])=>
+      <div key={variant} style={{width:390}}><p className="cap">{label}</p>
+        <div className="cell"><div className="pad">
+          {rows.map((m,i)=><div key={i} style={{marginBottom:i===0?10:0}}><BalanceRow variant={variant} m={m} /></div>)}
+          <div style={{height:10}} />
+          <CTA />
+        </div></div>
+      </div>)}
+    </div>
+  </>;
+}
+
+function Dark(){
+  return <>
+    <h2>Dark, and landscape column width</h2>
+    <p className="note">The landscape left column is roughly 300pt wide after gutters. All three candidates are one line tall in both orientations, which the current cards are not.</p>
+    <div className="row" data-theme="dark">
+      <div><p className="cap" style={{color:"#e6e4dd"}}>A · byline</p><Cell Candidate={Byline} count={3} index={1} /></div>
+      <div><p className="cap" style={{color:"#e6e4dd"}}>B · quiet row</p><Cell Candidate={QuietRow} count={3} index={1} /></div>
+      <div><p className="cap" style={{color:"#e6e4dd"}}>C · top-bar chip</p><Cell Candidate={TopBarChip} count={3} index={1} showBar /></div>
+      <div style={{width:300}}><p className="cap" style={{color:"#e6e4dd"}}>A · landscape column</p>
+        <div className="cell" style={{width:300}}><div className="pad"><Byline count={5} index={4} /><CTA /></div></div></div>
+    </div>
+    <h2>Effort scales differ per model</h2>
+    <p className="note">The dot count is the model&rsquo;s own ladder, so it varies. A model that exposes no effort control reads &ldquo;Normal&rdquo; with no dots — one dot would carry no information.</p>
+    <div className="row">
+      {[
+        { provider:"openai", label:"OpenAI", name:"GPT-5", effort:"Minimal", levels:["Minimal","Low","Medium","High"] },
+        { provider:"openai", label:"OpenAI", name:"GPT-5", effort:"High", levels:["Minimal","Low","Medium","High"] },
+        { provider:"anthropic", label:"Anthropic", name:"Claude Sonnet 4.5", effort:"Low", levels:["Low","Medium","High"] },
+        { provider:"anthropic", label:"Anthropic", name:"Claude Sonnet 4.5", effort:"High", levels:["Low","Medium","High"] },
+        { provider:"mistral", label:"Mistral", name:"Mistral Large", effort:"Normal", levels:[] },
+        { local:true, label:"On device", name:"On device · Qwen 2.5 1.5B", effort:"Normal", levels:[] },
+      ].map((m,i)=>
+        <div key={i} style={{width:250}}>
+          <div className="cell" style={{width:250}}><div className="pad" style={{padding:"12px 16px"}}>
+            <div style={{display:"flex",alignItems:"center",gap:12,minHeight:44}}>
+              {m.local
+                ? <PhosphorIcon name="cpu" size="feature" color="var(--mb-color-text)" />
+                : <ProviderIcon provider={m.provider} label={m.label} size="feature" color="var(--mb-color-text)" assetBase={A} />}
+              <span style={{flex:1,minWidth:0,display:"flex",flexDirection:"column",gap:1}}>
+                <span style={{fontFamily:"var(--mb-font-display)",fontWeight:600,fontSize:15,lineHeight:"20px",color:"var(--mb-color-text)",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{m.name}</span>
+                <span style={{display:"flex",alignItems:"center",fontFamily:"var(--mb-font-mono)",fontSize:11,lineHeight:"16px",color:"var(--mb-color-text-muted)"}}>
+                  {m.effort}<EffortDots levels={m.levels} effort={m.effort} />
+                </span>
+              </span>
+              <PhosphorIcon name="down" size="compact" color="var(--mb-color-text-muted)" />
+            </div>
+          </div></div>
+        </div>)}
+    </div>
+  </>;
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<>
+  <Group title="A · Byline — no container" showBar={false} Candidate={Byline}
+    note="The switcher stops being a button. A 32pt provider mark carries the prominence; the type is left-aligned against the canvas with no fill and no border. At one model there is no caret &mdash; it reads as a credit line, not a dead control. Nothing here can be mistaken for the filled, centred, full-bleed CTA." />
+  <Group title="B · Quiet row — contained, deliberately subordinate" showBar={false} Candidate={QuietRow}
+    note="Option 1 done carefully: 46pt against the CTA's 68, surface-alt instead of accent, 10px radius instead of 17, left-aligned instead of centred. Still two stacked rectangles — judge whether the four differences are enough separation for you." />
+  <Group title="C · Top-bar chip — moved out of the stack entirely" showBar Candidate={TopBarChip}
+    note="The route replaces the wordmark in the top bar, so it is never adjacent to the CTA and the confusion cannot arise. Costs you the wordmark and caps the model name at about 150pt, which is tight in German or Japanese." />
+  <Balance />
+  <Dark />
+</>);
+</script>
+</body></html>

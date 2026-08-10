@@ -1,0 +1,240 @@
+<!-- @dsCard group="Explorations" viewport="1180x1420" name="Runtime readiness" subtitle="Six unobtrusive treatments, no container, no heading" -->
+<!DOCTYPE html><html data-theme="light"><head><meta charset="utf-8"><title>Runtime readiness — unobtrusive</title>
+<link rel="stylesheet" href="../styles.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/regular/style.css">
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script src="../_ds_bundle.js"></script>
+<style>
+body{margin:0;padding:28px;background:#8f8d86;font-family:var(--mb-font-body)}
+h1{font-family:var(--mb-font-headline);font-size:26px;letter-spacing:-.25px;color:#16181D;margin:0 0 4px}
+.sub{font-size:14px;line-height:20px;color:#2b2c2e;margin:0 0 6px;max-width:900px}
+h2{font-family:var(--mb-font-display);font-weight:600;font-size:17px;color:#16181D;margin:26px 0 2px}
+.note{font-size:13px;line-height:19px;color:#2b2c2e;margin:0 0 12px;max-width:900px}
+.row{display:flex;gap:14px;flex-wrap:wrap;align-items:flex-start}
+.cap{font-family:var(--mb-font-mono);font-size:9px;letter-spacing:.9px;text-transform:uppercase;color:#2b2c2e;margin:0 0 6px 2px}
+.pane{width:372px;padding:16px;border-radius:20px;background:var(--mb-color-background);display:flex;flex-direction:column;gap:10px}
+</style>
+</head><body>
+<h1>Runtime readiness, unobtrusive</h1>
+<p class="sub">No container and no heading. The readiness sits directly on the settings background, above the first card, and has to earn its space at a glance without becoming a widget. Each treatment is shown under a real settings row so its weight can be judged against what surrounds it.</p>
+<p class="sub">The mixed state now carries all four the source defines &mdash; ready, attention, broken and off &mdash; because broken is where the treatments diverge most.</p>
+<div id="root"></div>
+<script type="text/babel">
+const { PhosphorIcon } = window.MrBroccoliDesignSystem_62d510;
+
+/* Straight from settings-core/readiness.ts. */
+const STEPS = [
+  { key: "think", label: "Think", icon: "robot" },
+  { key: "listen", label: "Listen", icon: "audio" },
+  { key: "speak", label: "Speak", icon: "sound" },
+  { key: "search", label: "Search", icon: "search" },
+];
+const WORD = { ready: "Ready", attention: "Attention", broken: "Broken", off: "Off" };
+const INK = {
+  ready: "var(--mb-color-success)",
+  attention: "var(--mb-color-premium)",
+  broken: "var(--mb-color-danger)",
+  off: "var(--mb-color-text-muted)",
+};
+const MIXED = { think: "ready", listen: "attention", speak: "broken", search: "off" };
+const ALL_READY = { think: "ready", listen: "ready", speak: "ready", search: "ready" };
+
+/* The shipped grid never colours text — gold on the warm off-white lands at
+   4.35:1, under AA. Colour lives in the dot, ring or rule; words stay in ink. */
+const TEXT = "var(--mb-color-text)";
+const small = { fontFamily: "var(--mb-font-body)", fontSize: 12, lineHeight: "16px" };
+const smallMedium = { fontFamily: "var(--mb-font-body-medium)", fontWeight: 500, fontSize: 12, lineHeight: "16px" };
+
+function Dot({ state, size = 7 }){
+  const filled = state === "ready" || state === "broken";
+  return <span style={{ width: size, height: size, borderRadius: size / 2, flexShrink: 0,
+    background: filled ? INK[state] : "transparent", boxShadow: "inset 0 0 0 1.5px " + INK[state] }} />;
+}
+
+/* A — one line of dots and labels. */
+function InlineDots({ state }){
+  return <div style={{ display: "flex", alignItems: "center", gap: 14, minHeight: 24, padding: "0 4px" }}>
+    {STEPS.map((step) => (
+      <span key={step.key} aria-label={step.label + ". " + WORD[state[step.key]]}
+        style={{ display: "flex", alignItems: "center", gap: 6 }}>
+        <Dot state={state[step.key]} />
+        <span style={{ ...small, color: TEXT }}>{step.label}</span>
+      </span>
+    ))}
+  </div>;
+}
+
+/* B — a rule under each label carries the state. */
+function UnderlinedLabels({ state }){
+  return <div style={{ display: "flex", gap: 10, padding: "0 4px" }}>
+    {STEPS.map((step) => (
+      <span key={step.key} aria-label={step.label + ". " + WORD[state[step.key]]}
+        style={{ flex: 1, minWidth: 0, display: "flex", flexDirection: "column", gap: 5 }}>
+        <span style={{ ...small, color: TEXT }}>{step.label}</span>
+        <span style={{ height: 2, borderRadius: 1,
+          background: state[step.key] === "off" ? "transparent" : INK[state[step.key]],
+          boxShadow: state[step.key] === "off" ? "inset 0 0 0 1px " + INK.off : "none" }} />
+      </span>
+    ))}
+  </div>;
+}
+
+/* C — one thin bar, four parts, labels beneath. */
+function ThinBar({ state }){
+  return <div style={{ display: "flex", flexDirection: "column", gap: 6, padding: "0 4px" }}>
+    <div style={{ display: "flex", gap: 2 }} role="group" aria-label="Runtime readiness">
+      {STEPS.map((step) => (
+        <span key={step.key} aria-label={step.label + ". " + WORD[state[step.key]]}
+          style={{ flex: 1, height: 4, borderRadius: 2,
+            background: state[step.key] === "off" ? "transparent" : INK[state[step.key]],
+            boxShadow: state[step.key] === "off" ? "inset 0 0 0 1px " + INK.off : "none" }} />
+      ))}
+    </div>
+    <div style={{ display: "flex", gap: 2 }}>
+      {STEPS.map((step) => (
+        <span key={step.key} style={{ ...small, flex: 1, textAlign: "center", color: TEXT }}>{step.label}</span>
+      ))}
+    </div>
+  </div>;
+}
+
+/* D — a sentence, and nothing else. */
+function Sentence({ state }){
+  const broken = STEPS.filter((s) => state[s.key] === "broken");
+  const attention = STEPS.filter((s) => state[s.key] === "attention");
+  const off = STEPS.filter((s) => state[s.key] === "off");
+  const list = (steps) => steps.map((s) => s.label).join(" and ");
+  const parts = [];
+  if (broken.length) parts.push(list(broken) + " cannot run");
+  if (attention.length) parts.push(list(attention) + (attention.length > 1 ? " need a look" : " needs a look"));
+  if (off.length) parts.push(list(off) + (off.length > 1 ? " are off" : " is off"));
+  const worst = broken.length ? "broken" : attention.length ? "attention" : off.length ? "off" : "ready";
+  return <div role={parts.length ? "button" : undefined} tabIndex={parts.length ? 0 : undefined}
+    style={{ display: "flex", alignItems: "center", gap: 8, minHeight: 44, margin: "-10px 0", padding: "0 4px",
+      cursor: parts.length ? "pointer" : "default" }}>
+    <Dot state={worst} />
+    <span style={{ ...small, flex: 1, minWidth: 0, color: TEXT }}>
+      {parts.length ? parts.join(". ") + "." : "Every route is ready."}</span>
+    {parts.length ? <PhosphorIcon name="right" size="inline" color="var(--mb-color-text-secondary)" /> : null}
+  </div>;
+}
+
+/* E — the route glyphs, with the state as a ring around each. */
+function GlyphRow({ state }){
+  return <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "0 4px" }}>
+    {STEPS.map((step) => {
+      const s = state[step.key];
+      return <span key={step.key} aria-label={step.label + ". " + WORD[s]}
+        style={{ width: 30, height: 30, borderRadius: 15, display: "flex", alignItems: "center", justifyContent: "center",
+          border: "1.5px solid " + INK[s], background: "transparent" }}>
+        <PhosphorIcon name={step.icon} size="inline" color={TEXT} />
+      </span>;
+    })}
+    <span style={{ ...small, color: "var(--mb-color-text-secondary)", marginLeft: 2 }}>
+      {STEPS.filter((s) => state[s.key] === "ready").length} of 4 ready</span>
+  </div>;
+}
+
+/* F — only the routes that are not ready say anything. */
+function ExceptionsOnly({ state }){
+  const trouble = STEPS.filter((s) => state[s.key] !== "ready");
+  if (!trouble.length) {
+    return <div style={{ display: "flex", alignItems: "center", gap: 8, minHeight: 24, padding: "0 4px" }}>
+      <Dot state="ready" />
+      <span style={{ ...small, color: TEXT }}>Every route is ready.</span>
+    </div>;
+  }
+  return <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap", padding: "0 4px", margin: "-9px 0" }}>
+    {trouble.map((step) => (
+      <span key={step.key} role="button" tabIndex={0}
+        aria-label={step.label + ". " + WORD[state[step.key]] + ". Open settings."}
+        style={{ height: 44, display: "flex", alignItems: "center", cursor: "pointer" }}>
+        <span style={{ display: "flex", alignItems: "center", gap: 6, minHeight: 26, padding: "0 9px",
+          borderRadius: "var(--mb-radius-control)", border: "1px solid " + INK[state[step.key]] }}>
+          <Dot state={state[step.key]} size={6} />
+          <span style={{ ...smallMedium, color: TEXT }}>{step.label}</span>
+          <span style={{ ...small, color: "var(--mb-color-text-secondary)" }}>{WORD[state[step.key]]}</span>
+        </span>
+      </span>
+    ))}
+  </div>;
+}
+
+/* G — A's line, with each route a target into its own setting. */
+function InlineDotsTappable({ state, hint }){
+  return <div style={{ display: "flex", alignItems: "center", gap: 4, margin: "-10px 0", padding: "0 4px" }}>
+    {STEPS.map((step) => {
+      const s = state[step.key];
+      return <span key={step.key} role="button" tabIndex={0}
+        aria-label={step.label + ". " + WORD[s] + ". Open " + step.label.toLowerCase() + " settings."}
+        style={{ height: 44, display: "flex", alignItems: "center", gap: 6, padding: "0 6px", cursor: "pointer",
+          borderRadius: "var(--mb-radius-control)",
+          background: hint === "tint" ? "var(--mb-color-surface)" : "transparent",
+          border: hint === "tint" ? "1px solid var(--mb-color-border)" : "1px solid transparent" }}>
+        <Dot state={s} />
+        <span style={{ ...small, color: TEXT,
+          textDecoration: hint === "underline" ? "underline" : "none",
+          textDecorationColor: "var(--mb-color-text-muted)",
+          textDecorationThickness: 1,
+          textUnderlineOffset: 3 }}>{step.label}</span>
+      </span>;
+    })}
+  </div>;
+}
+
+const TREATMENTS = [
+  { id: "A", name: "Inline dots", note: "One line: a dot and a label for each route.", Component: InlineDots },
+  { id: "B", name: "Underlined labels", note: "The label stays in ink; a 2pt rule beneath it carries the state.", Component: UnderlinedLabels },
+  { id: "C", name: "Thin bar", note: "One 4pt bar in four parts, labels beneath.", Component: ThinBar },
+  { id: "D", name: "Sentence", note: "One line of plain copy, tappable when something needs a look.", Component: Sentence },
+  { id: "E", name: "Glyph row", note: "The glyph each route owns, ringed in its state, with a count.", Component: GlyphRow },
+  { id: "F", name: "Exceptions only", note: "Nothing but the routes that are not ready.", Component: ExceptionsOnly },
+];
+
+/* A real settings row, so each treatment can be judged against its neighbour. */
+function ContextCard(){
+  return <div style={{ display: "flex", alignItems: "center", gap: 12, minHeight: 60, padding: "0 14px",
+    borderRadius: "var(--mb-radius-card)", border: "1px solid var(--mb-color-border)", background: "var(--mb-color-surface)" }}>
+    <PhosphorIcon name="audio" size="control" color="var(--mb-color-text-secondary)" />
+    <span style={{ flex: 1, minWidth: 0, display: "flex", flexDirection: "column" }}>
+      <span style={{ fontFamily: "var(--mb-font-body-medium)", fontWeight: 500, fontSize: 15, lineHeight: "20px", color: TEXT }}>Voice</span>
+      <span style={{ fontFamily: "var(--mb-font-body)", fontSize: 13, lineHeight: "18px", color: "var(--mb-color-text-secondary)" }}>Input mode and speech-to-text routing.</span>
+    </span>
+    <PhosphorIcon name="right" size="inline" color="var(--mb-color-text-muted)" />
+  </div>;
+}
+
+function Pane({ theme, children }){
+  return <div className="pane" data-theme={theme}>{children}<ContextCard /></div>;
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<>
+  {TREATMENTS.map(({ id, name, note, Component }) => (
+    <React.Fragment key={id}>
+      <h2>{id} · {name}</h2>
+      <p className="note">{note}</p>
+      <div className="row">
+        <div><p className="cap">Mixed · light</p><Pane theme="light"><Component state={MIXED} /></Pane></div>
+        <div><p className="cap">All ready · light</p><Pane theme="light"><Component state={ALL_READY} /></Pane></div>
+        <div><p className="cap" style={{color:"#e6e4dd"}}>Mixed · dark</p><Pane theme="dark"><Component state={MIXED} /></Pane></div>
+      </div>
+    </React.Fragment>
+  ))}
+
+  <h2>G · Inline dots, tappable</h2>
+  <p className="note">A&rsquo;s line with E&rsquo;s behaviour: each route is a 44pt target that opens its own setting. The dot and label sit unchanged inside it, so the visual weight is A&rsquo;s. What differs is how much the row admits to being tappable &mdash; nothing at all, an underline under each label, or a hairline container per route.</p>
+  <div className="row">
+    <div><p className="cap">No hint · light</p><Pane theme="light"><InlineDotsTappable state={MIXED} /></Pane></div>
+    <div><p className="cap">Underline · light</p><Pane theme="light"><InlineDotsTappable state={MIXED} hint="underline" /></Pane></div>
+    <div><p className="cap">Hairline box · light</p><Pane theme="light"><InlineDotsTappable state={MIXED} hint="tint" /></Pane></div>
+  </div>
+  <div className="row" style={{marginTop:14}}>
+    <div><p className="cap" style={{color:"#e6e4dd"}}>No hint · dark</p><Pane theme="dark"><InlineDotsTappable state={MIXED} /></Pane></div>
+    <div><p className="cap" style={{color:"#e6e4dd"}}>Hairline box · dark</p><Pane theme="dark"><InlineDotsTappable state={MIXED} hint="tint" /></Pane></div>
+    <div><p className="cap" style={{color:"#e6e4dd"}}>All ready · dark</p><Pane theme="dark"><InlineDotsTappable state={ALL_READY} /></Pane></div>
+  </div>
+</>);
+</script>
+</body></html>

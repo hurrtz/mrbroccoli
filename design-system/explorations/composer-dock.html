@@ -1,0 +1,158 @@
+<!-- @dsCard group="Explorations" viewport="1180x820" name="Composer dock" subtitle="Superseded — how text input reaches the home screen" -->
+<!DOCTYPE html><html data-theme="light"><head><meta charset="utf-8"><title>Composer dock — candidates</title>
+<link rel="stylesheet" href="../styles.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/regular/style.css">
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script src="../_ds_bundle.js"></script>
+<style>
+body{margin:0;padding:28px;background:#8f8d86;font-family:var(--mb-font-body)}
+h1{font-family:var(--mb-font-headline);font-size:26px;letter-spacing:-.25px;color:#16181D;margin:0 0 4px}
+.sub{font-size:14px;line-height:20px;color:#33342f;margin:0 0 24px;max-width:820px}
+h2{font-family:var(--mb-font-display);font-weight:600;font-size:17px;color:#16181D;margin:26px 0 2px}
+.note{font-size:13px;line-height:19px;color:#33342f;margin:0 0 12px;max-width:860px}
+.row{display:flex;gap:14px;flex-wrap:wrap;align-items:flex-start}
+.cell{width:390px;border-radius:16px;overflow:hidden;background:var(--mb-color-background);border:1px solid rgba(0,0,0,.2)}
+.cell.land{width:700px}
+.cap{font-family:var(--mb-font-mono);font-size:9px;letter-spacing:.9px;text-transform:uppercase;color:#2b2c2e;margin:0 0 6px 2px}
+.pad{padding:12px 16px 14px;display:flex;flex-direction:column;height:430px}
+.pad.land{height:300px}
+</style>
+</head><body>
+<h1>The composer dock</h1>
+<p class="sub">Today text input hides behind a horizontal swipe with two dots as its only affordance, and image attach lives in the transcript header rather than beside the composer. These candidates put both in one dock and give the quick adjustments a visible home directly above it. Attach is drawn as an image glyph, not a plus — images are the only attachment the app takes.</p>
+<div id="root"></div>
+<script type="text/babel">
+const { PhaseAwareVoiceAction, PhosphorIcon, IconButton, RouteByline, ChatBubble, MessageImageAttachments } = window.MrBroccoliDesignSystem_62d510;
+const A = "../assets/providers";
+
+/* The quick-adjust strip: what the next answer will sound like, always visible.
+   The whole strip is one 44pt target that opens the style sheet. */
+function AdjustStrip({ items = ["Balanced","Brief","Heart","Web search on"] }){
+  return <div role="button" aria-label={"Response style. " + items.join(", ")}
+    style={{display:"flex",alignItems:"center",gap:6,minHeight:44,overflowX:"auto",cursor:"pointer"}}>
+    <PhosphorIcon name="control" size="compact" color="var(--mb-color-text-muted)" />
+    {items.map((item)=>
+      <span key={item} style={{flexShrink:0,height:28,display:"inline-flex",alignItems:"center",padding:"0 10px",
+        borderRadius:"var(--mb-radius-tag)",border:"1px solid var(--mb-color-border)",background:"var(--mb-color-surface)",
+        fontFamily:"var(--mb-font-body)",fontSize:12,lineHeight:"16px",color:"var(--mb-color-text-secondary)",whiteSpace:"nowrap"}}>{item}</span>)}
+    <PhosphorIcon name="right" size="inline" color="var(--mb-color-text-muted)" />
+  </div>;
+}
+
+function Attachment(){
+  const dot = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='88' height='66'%3E%3Crect width='88' height='66' fill='%23c9c6bd'/%3E%3C/svg%3E";
+  return <MessageImageAttachments compact attachments={[{ id:"a1", uri: dot }]} onRemove={()=>{}} />;
+}
+
+const plus = <IconButton icon="image" accessibilityLabel="Add image" />;
+const field = (text) => <span style={{flex:1,minWidth:0,minHeight:44,display:"flex",alignItems:"center",padding:"10px 12px",
+  borderRadius:"var(--mb-radius-control)",border:"1px solid var(--mb-color-border)",background:"var(--mb-color-surface)",
+  fontFamily:"var(--mb-font-body)",fontSize:15,lineHeight:"21px",color:text?"var(--mb-color-text)":"var(--mb-color-text-muted)",
+  overflowWrap:"anywhere"}}>{text || "Type a message"}</span>;
+
+/* 1 — round mic at the trailing edge; the field sits between + and mic. */
+function DockRoundMic({ turn, text }){
+  if (turn) return <PhaseAwareVoiceAction visualPhase="recording" prompt="Your turn." title="Tap to talk" detail="Tap when done." recordingProgress={.42} />;
+  return <div style={{display:"flex",alignItems:"flex-end",gap:8}}>
+    {plus}{field(text)}
+    <span role="button" aria-label={text ? "Send" : "Hold to talk"} style={{width:56,height:56,borderRadius:28,flexShrink:0,background:"var(--mb-color-accent)",
+      display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer"}}>
+      <PhosphorIcon name={text ? "arrow-up" : "mic"} size="prominent" color="var(--mb-color-on-active-control)" />
+    </span>
+  </div>;
+}
+
+/* 2 — the 68pt phase bar keeps its full width and sits under a slim text row. */
+function DockBarBelow({ turn, text }){
+  return <div style={{display:"flex",flexDirection:"column",gap:8}}>
+    <div style={{display:"flex",alignItems:"flex-end",gap:8}}>{plus}{field(text)}
+      <IconButton icon="arrow-up" accessibilityLabel="Send" iconColor={text?"var(--mb-color-accent)":"var(--mb-color-text-muted)"} />
+    </div>
+    <PhaseAwareVoiceAction visualPhase={turn?"recording":"idle"} prompt={turn?"Your turn.":"Ask anything."}
+      title={turn?"Tap to talk":"Tap to talk"} detail={turn?"Tap when done.":null} recordingProgress={turn?.42:0} />
+  </div>;
+}
+
+/* 3 — voice clearly primary; typing is a labelled control that expands inline. */
+function DockVoiceFirst({ turn, text }){
+  if (text) return <div style={{display:"flex",alignItems:"flex-end",gap:8}}>
+    {plus}{field(text)}
+    <IconButton icon="arrow-up" accessibilityLabel="Send" iconColor="var(--mb-color-accent)" />
+    <IconButton icon="mic" accessibilityLabel="Talk instead" />
+  </div>;
+  return <div style={{display:"flex",alignItems:"center",gap:8}}>
+    {plus}
+    <span style={{flex:1,minWidth:0}}>
+      <PhaseAwareVoiceAction visualPhase={turn?"recording":"idle"} prompt={turn?"Your turn.":"Ask anything."}
+        title="Tap to talk" detail={turn?"Tap when done.":null} recordingProgress={turn?.42:0} />
+    </span>
+    <IconButton icon="edit" accessibilityLabel="Type instead" />
+  </div>;
+}
+
+function Cell({ Dock, turn, text, attachment, land }){
+  return <div className={land?"cell land":"cell"}><div className={land?"pad land":"pad"}>
+    <RouteByline provider="anthropic" providerLabel="Anthropic" modelName="Claude Sonnet 4.5"
+      effort="Medium" effortLevels={["Low","Medium","High"]} assetBase={A} />
+    <div style={{flex:1,minHeight:0,overflow:"hidden",paddingTop:10}}>
+      <ChatBubble role="user" timestamp="09.08.26 · 14:11" text="When does the tide turn in Lisbon today?" />
+      <ChatBubble role="assistant" provider="anthropic" model="Claude Sonnet 4.5" timestamp="09.08.26 · 14:12"
+        text="High water is at 15:40 today, and the tide turns roughly every six hours after that." assetBase={A} />
+    </div>
+    {attachment ? <Attachment /> : null}
+    <AdjustStrip />
+    <div style={{marginTop:4}}><Dock turn={turn} text={text} /></div>
+  </div></div>;
+}
+
+/* Landscape is a two-pane split: controls in a narrow left column, transcript
+   in its own pane. The dock has to survive ~300pt, which is the real test. */
+function LandCell({ Dock }){
+  return <div className="cell land"><div className="pad land" style={{flexDirection:"row",padding:"12px 12px 14px"}}>
+    <div style={{flex:"0.9 1 0",minWidth:0,paddingRight:12,display:"flex",flexDirection:"column"}}>
+      <RouteByline provider="anthropic" providerLabel="Anthropic" modelName="Claude Sonnet 4.5"
+        effort="Medium" effortLevels={["Low","Medium","High"]} assetBase={A} />
+      <div style={{flex:1}} />
+      <AdjustStrip items={["Balanced","Brief","Heart"]} />
+      <div style={{marginTop:4}}><Dock /></div>
+    </div>
+    <div style={{width:1,alignSelf:"stretch",background:"var(--mb-color-border)"}} />
+    <div style={{flex:1,minWidth:0,paddingLeft:12,overflow:"hidden"}}>
+      <ChatBubble role="user" timestamp="09.08.26 · 14:11" text="When does the tide turn in Lisbon today?" />
+      <ChatBubble role="assistant" provider="anthropic" model="Claude Sonnet 4.5" timestamp="09.08.26 · 14:12"
+        text="High water is at 15:40 today, and the tide turns roughly every six hours after that." assetBase={A} />
+    </div>
+  </div></div>;
+}
+
+function Group({ title, note, Dock }){
+  return <>
+    <h2>{title}</h2><p className="note">{note}</p>
+    <div className="row">
+      <div><p className="cap">At rest</p><Cell Dock={Dock} /></div>
+      <div><p className="cap">Typing · field grows</p><Cell Dock={Dock} text="Will the weather hold for the weekend, and does the wind drop after Tuesday" /></div>
+      <div><p className="cap">Recording</p><Cell Dock={Dock} turn /></div>
+      <div><p className="cap">Image attached</p><Cell Dock={Dock} attachment /></div>
+    </div>
+  </>;
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<>
+  <Group title="1 · Round mic in the dock" Dock={DockRoundMic}
+    note="Text and voice are both visible at rest with no gesture to discover. The mic is a 56pt disc — the only round, filled object on the screen — and it expands into the full-width phase bar the moment a turn starts, so the phase colour identity survives. Attach is an image glyph rather than a plus: images are the only thing the app accepts, and a plus promises a menu that does not exist." />
+  <Group title="2 · Phase bar keeps its full width" Dock={DockBarBelow}
+    note="Closest to what ships today: the 68pt bar is untouched and a slim text row is added above it. Nothing is hidden, but the dock is now two rows tall — roughly 120pt of the screen before the safe area — and there are two send affordances on screen at once." />
+  <Group title="3 · Voice first, typing on request" Dock={DockVoiceFirst}
+    note="Voice stays unambiguously primary; typing is a labelled 44pt control rather than a hidden swipe. The typing column shows the state after that control is tapped — the field takes the row and the mic falls back to an icon button. Cheapest change from today, but at rest a user who cannot speak still has to go looking." />
+  <h2>Landscape</h2>
+  <p className="note">The two-pane split, where the left column is roughly 300pt after gutters. Candidate 1 stays one row; candidate 2 is two rows and takes most of what the column has left.</p>
+  <div className="row">
+    <div><p className="cap">1 · round mic</p><LandCell Dock={DockRoundMic} /></div>
+    <div><p className="cap">2 · bar below</p><LandCell Dock={DockBarBelow} /></div>
+    <div data-theme="dark"><p className="cap" style={{color:"#e6e4dd"}}>1 · dark</p><LandCell Dock={DockRoundMic} /></div>
+  </div>
+</>);
+</script>
+</body></html>
