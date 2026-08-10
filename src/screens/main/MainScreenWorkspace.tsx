@@ -7,6 +7,7 @@ import { MainScreenRouteCard } from "./MainScreenRouteCard";
 import { MainScreenRouteControls } from "./MainScreenRouteControls";
 import { MainScreenTopBar } from "./MainScreenTopBar";
 import { MainScreenVoiceStage } from "./MainScreenVoiceStage";
+import { ConversationSettingsSummary } from "../../design-system/ConversationSettingsSummary";
 import { TranscriptDrawer } from "./TranscriptDrawer";
 import { TranscriptPreviewCard } from "./TranscriptPreviewCard";
 import { styles } from "./styles";
@@ -27,6 +28,12 @@ interface MainScreenWorkspaceProps {
     React.ComponentProps<typeof MainScreenTopBar>,
     "colors"
   >;
+  /** The conversation's settings as one line, and what opens them. */
+  settingsSummary?: {
+    accessibilityLabel: string;
+    onPress?: () => void;
+    summary: string;
+  };
   transcript: Omit<
     React.ComponentProps<typeof TranscriptPreviewCard>,
     "colors" | "layout" | "presentation" | "style"
@@ -43,6 +50,7 @@ export function MainScreenWorkspace({
   isLandscape,
   routeCard,
   routeControls,
+  settingsSummary,
   topBar,
   transcript,
   voiceStage,
@@ -70,6 +78,15 @@ export function MainScreenWorkspace({
             style={styles.heroCardLandscape}
             {...routeCard}
           />
+
+        {settingsSummary?.summary ? (
+          <ConversationSettingsSummary
+            accessibilityLabel={settingsSummary.accessibilityLabel}
+            onPress={settingsSummary.onPress}
+            summary={settingsSummary.summary}
+            testID="conversation-settings-summary"
+          />
+        ) : null}
 
           <View
             testID="landscape-stage-area"
@@ -123,6 +140,14 @@ export function MainScreenWorkspace({
       <View style={styles.workspaceBody}>
         <IntroBanner {...introBanner} />
         <MainScreenRouteCard colors={colors} {...routeCard} />
+        {settingsSummary?.summary ? (
+          <ConversationSettingsSummary
+            accessibilityLabel={settingsSummary.accessibilityLabel}
+            onPress={settingsSummary.onPress}
+            summary={settingsSummary.summary}
+            testID="conversation-settings-summary"
+          />
+        ) : null}
 
         <View
           testID="portrait-conversation-stack"

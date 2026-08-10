@@ -13,6 +13,7 @@ import { getTtsFallbackRoutes } from "../constants/ttsFallback";
 import { useLocalization } from "../i18n";
 import { useTheme } from "../theme/ThemeContext";
 import { MainScreenPresentation } from "./main/MainScreenPresentation";
+import { getConversationSettingsSummary } from "./main/conversationSettingsSummary";
 import { getMainScreenViewModel } from "./main/mainScreenViewModel";
 import {
   getConversationTtsControlState,
@@ -927,6 +928,16 @@ export function MainScreen() {
             (premiumStorePromoActive || ulraMode.available),
           webSearchEnabled: webSearchActive,
           webSearchReady: freeOffline.entitlement.isPremium && webSearchReady,
+        },
+        settingsSummary: {
+          accessibilityLabel: t("conversationSettingsLabel"),
+          onPress: handleOpenConversationSettings,
+          summary: getConversationSettingsSummary({
+            responseLength,
+            responseTone,
+            t,
+            voiceLabel: selectedTtsVoice,
+          }),
         },
         voiceStage: {
           attachments: pendingImages.attachments,
