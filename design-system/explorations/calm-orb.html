@@ -1,0 +1,269 @@
+<!-- @dsCard group="Explorations" viewport="1180x900" name="Central orb, resolved" subtitle="Settings as a sentence, satellites, the pager pages" -->
+<!DOCTYPE html><html data-theme="light"><head><meta charset="utf-8"><title>Central orb — resolved</title>
+<link rel="stylesheet" href="../styles.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/regular/style.css">
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script src="../_ds_bundle.js"></script>
+<style>
+body{margin:0;padding:28px;background:#8f8d86;font-family:var(--mb-font-body)}
+h1{font-family:var(--mb-font-headline);font-size:26px;letter-spacing:-.25px;color:#16181D;margin:0 0 4px}
+.sub{font-size:14px;line-height:20px;color:#33342f;margin:0 0 24px;max-width:840px}
+h2{font-family:var(--mb-font-display);font-weight:600;font-size:17px;color:#16181D;margin:24px 0 2px}
+.note{font-size:13px;line-height:19px;color:#33342f;margin:0 0 12px;max-width:860px}
+.row{display:flex;gap:16px;flex-wrap:wrap;align-items:flex-start}
+.cap{font-family:var(--mb-font-mono);font-size:9px;letter-spacing:.9px;text-transform:uppercase;color:#2b2c2e;margin:0 0 6px 2px}
+.device{width:372px;height:700px;border-radius:34px;overflow:hidden;position:relative;background:var(--mb-color-background);box-shadow:0 18px 44px rgba(0,0,0,.3);border:1px solid rgba(0,0,0,.25)}
+.screen{position:absolute;inset:0;display:flex;flex-direction:column}
+.body{flex:1;min-height:0;display:flex;flex-direction:column;padding:0 16px 12px}
+</style>
+</head><body>
+<h1>Central orb, resolved</h1>
+<p class="sub">Candidate 1 taken further: the settings row becomes a sentence, the orb sits alone with three labelled controls beneath it, and the swipe indicator moves up to the thing it swipes.</p>
+<div id="root"></div>
+<script type="text/babel">
+const { PhosphorIcon, IconButton, AppWordmark, RouteByline } = window.MrBroccoliDesignSystem_62d510;
+const A = "../assets/providers";
+
+/* Same map the ported PhaseAwareVoiceAction uses. Concatenating the phase name
+   silently mis-resolves — recording's colour is the track, not the sweep fill. */
+const PHASE_TOKEN = {
+  recording:"--mb-color-phase-recording-track", transcribing:"--mb-color-phase-transcribing",
+  "thinking-briefly":"--mb-color-phase-thinking-briefly", searching:"--mb-color-phase-searching",
+  thinking:"--mb-color-phase-thinking", synthesizing:"--mb-color-phase-synthesizing",
+  speaking:"--mb-color-phase-speaking", idle:"--mb-color-accent",
+};
+
+/* Same rule the bar uses: pick the foreground by measured contrast. The DS
+   helper is lowercase and so not on the window namespace, so it lives here. */
+function luminance(hex){
+  const channels = hex.replace("#","").match(/.{2}/g);
+  if (!channels || channels.length !== 3) return 0;
+  const [r,g,b] = channels.map((part)=>{
+    const value = parseInt(part,16)/255;
+    return value <= 0.04045 ? value/12.92 : Math.pow((value+0.055)/1.055, 2.4);
+  });
+  return r*0.2126 + g*0.7152 + b*0.0722;
+}
+function contrast(a,b){
+  const high = Math.max(luminance(a),luminance(b));
+  const low = Math.min(luminance(a),luminance(b));
+  return (high+0.05)/(low+0.05);
+}
+function getAccessibleForeground(background){
+  return contrast(background,"#030712") > contrast(background,"#FFFFFF") ? "#030712" : "#FFFFFF";
+}
+
+function TopBar(){
+  return <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",minHeight:62,paddingTop:8,paddingBottom:10}}>
+    <IconButton icon="menu" accessibilityLabel="Conversations" />
+    <AppWordmark />
+    <IconButton icon="setting" accessibilityLabel="Settings" />
+  </div>;
+}
+
+function Byline(){
+  return <RouteByline provider="openai" providerLabel="OpenAI" modelName="GPT-5" effort="Extra high"
+    effortLevels={["Minimal","Low","Medium","High","Extra high"]} assetBase={A} />;
+}
+
+/* The conversation's settings as a sentence, with one control beside it.
+   One line of muted text is quieter than any number of chips. */
+function SettingsSummary({ text = "Balanced · Brief · Heart" }){
+  return <div style={{display:"flex",alignItems:"center",gap:8,minHeight:44}}>
+    <span style={{flex:1,minWidth:0,fontFamily:"var(--mb-font-body)",fontSize:13,lineHeight:"19px",
+      color:"var(--mb-color-text-secondary)",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{text}</span>
+    <IconButton icon="control" accessibilityLabel="Conversation settings" />
+  </div>;
+}
+
+/* An action reads as a bare glyph; a state reads as a bordered pill that fills
+   when it is on. Same 44pt target, different species. */
+function Satellite({ icon, phosphor, label, accessibilityLabel, active, kind = "action" }){
+  const toggle = kind === "toggle";
+  const tint = active ? "var(--mb-color-accent)" : "var(--mb-color-text-secondary)";
+  return <div style={{display:"flex",flexDirection:"column",alignItems:"center",gap:4,width:64}}>
+    <span role={toggle ? "switch" : "button"} aria-checked={toggle ? !!active : undefined}
+      aria-label={accessibilityLabel || label}
+      style={{width:44,height:44,borderRadius:toggle?22:"var(--mb-radius-icon-button)",cursor:"pointer",
+        display:"flex",alignItems:"center",justifyContent:"center",
+        border:"1px solid "+(toggle?(active?"var(--mb-color-accent)":"var(--mb-color-border)"):"transparent"),
+        background:toggle&&active?"var(--mb-color-accent-soft)":"transparent"}}>
+      {phosphor ? <Glyph name={phosphor} size={20} color={tint} />
+        : <PhosphorIcon name={icon} size="control" color={tint} />}
+    </span>
+    <span style={{fontFamily:"var(--mb-font-mono)",fontSize:9,letterSpacing:"0.75px",textTransform:"uppercase",
+      color:active?"var(--mb-color-accent)":"var(--mb-color-text-muted)",textAlign:"center"}}>{label}</span>
+  </div>;
+}
+
+/* Glyphs the app's icon map does not carry yet. `brain` and `users-three` are
+   deliberate additions: `robot` moves to speaking, so thinking and the council
+   both need their own mark. */
+function Glyph({ name, size = 20, color = "currentColor" }){
+  return <i className={"ph ph-" + name} aria-hidden="true"
+    style={{fontSize:size,lineHeight:1,width:size,height:size,flexShrink:0,color,
+      display:"inline-flex",alignItems:"center",justifyContent:"center"}} />;
+}
+
+const PHASE_GLYPH = {
+  recording:"stop", transcribing:"file-text", "thinking-briefly":"lightning", searching:"globe-hemisphere-west",
+  thinking:"brain", synthesizing:"headset", speaking:"pause", idle:"microphone",
+};
+
+function Orb({ size = 196, phase, recordingProgress = 0, label = "Tap to speak. Fresh session." }){
+  const ref = React.useRef(null);
+  const [resolved, setResolved] = React.useState("#44A055");
+  const token = PHASE_TOKEN[phase || "idle"];
+  React.useEffect(()=>{
+    if (!ref.current) return;
+    const value = getComputedStyle(ref.current).getPropertyValue(token).trim();
+    if (value) setResolved(value);
+  },[token]);
+  const foreground = getAccessibleForeground(resolved);
+  const soft = "color-mix(in srgb, " + resolved + " 16%, transparent)";
+  // Elapsed is a translucent wash over a constant ring, the same two-layer
+  // relationship the bar uses — so the ring stays a ring at every value.
+  const halo = phase === "recording"
+    ? "conic-gradient(var(--mb-color-phase-recording) " + Math.round(recordingProgress*360) + "deg, rgba(0,0,0,0) 0), " + soft
+    : soft;
+  return <div ref={ref} role="button" aria-label={label} tabIndex={0}
+    aria-valuenow={phase==="recording" ? Math.round(recordingProgress*100) : undefined}
+    style={{width:size,height:size,borderRadius:size/2,display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",
+      background:halo,boxShadow:"0 0 0 1px var(--mb-color-border)"}}>
+    <div style={{width:size*0.72,height:size*0.72,borderRadius:size,display:"flex",alignItems:"center",justifyContent:"center",
+      background:resolved,boxShadow:"0 0 0 8px " + soft}}>
+      <Glyph name={PHASE_GLYPH[phase || "idle"]} size={size*0.3} color={foreground} />
+    </div>
+  </div>;
+}
+
+/* The composer fills the orb's slot, so both pages weigh the same.
+   Geometry from voiceTextInputPagerStyles.textSurface / .sendButton. */
+function TextComposer({ text, height = 196 }){
+  return <div style={{width:"100%",height,display:"flex",alignItems:"flex-end",gap:10,
+    paddingLeft:16,paddingRight:9,paddingTop:12,paddingBottom:9,
+    borderRadius:15,border:"1.5px solid var(--mb-color-accent)",background:"var(--mb-color-surface)",
+    boxShadow:"0 4px 12px var(--mb-color-glow)"}}>
+    <span style={{flex:1,minWidth:0,alignSelf:"stretch",overflow:"hidden",
+      fontFamily:"var(--mb-text-body-family)",fontSize:"var(--mb-text-body-size)",lineHeight:"var(--mb-text-body-line-height)",
+      color:text?"var(--mb-color-text)":"var(--mb-color-text-muted)",overflowWrap:"anywhere"}}>{text || "Type a message"}</span>
+    <span role="button" aria-label="Send" style={{width:46,height:46,borderRadius:23,flexShrink:0,
+      background:text?"var(--mb-color-bubble-user)":"var(--mb-color-surface-alt)",
+      display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer"}}>
+      <PhosphorIcon name="arrow-up" size="control" color={text?"var(--mb-color-on-primary)":"var(--mb-color-text-muted)"} />
+    </span>
+  </div>;
+}
+
+function StatusLine({ title = "Tap to speak", detail = "Fresh session", phase }){
+  const dot = phase ? "var(" + PHASE_TOKEN[phase] + ")" : "var(--mb-color-accent)";
+  return <div style={{display:"flex",alignItems:"center",gap:12,minHeight:44}}>
+    <span style={{width:8,height:8,borderRadius:4,background:dot,flexShrink:0}} />
+    <span style={{flex:1,minWidth:0,display:"flex",flexDirection:"column"}}>
+      <span style={{fontFamily:"var(--mb-font-display)",fontWeight:600,fontSize:16,lineHeight:"21px",color:"var(--mb-color-text)"}}>{title}</span>
+      <span style={{fontFamily:"var(--mb-font-mono)",fontSize:11,lineHeight:"16px",color:"var(--mb-color-text-muted)"}}>{detail}</span>
+    </span>
+    <IconButton icon="info-circle" accessibilityLabel="Session details" />
+  </div>;
+}
+
+/* The swipe affordance lives beside the thing that swipes: a caret on each
+   flank, the one pointing at the other page lit, the other spent. */
+function SwipeArrow({ direction, enabled, label }){
+  return <span role="button" aria-label={label} aria-disabled={!enabled}
+    style={{width:44,height:44,flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center",
+      cursor:enabled?"pointer":"default",opacity:enabled?1:0.22}}>
+    <PhosphorIcon name={direction} size="control" color="var(--mb-color-text-muted)" />
+  </span>;
+}
+
+function TranscriptHandle({ count = 4 }){
+  return <div role="button" aria-label={"Show transcript. " + count + " messages"}
+    style={{display:"flex",flexDirection:"column",alignItems:"center",gap:8,minHeight:44,justifyContent:"center",cursor:"pointer"}}>
+    <span style={{width:38,height:4,borderRadius:2,background:"var(--mb-color-border-strong)"}} />
+    <span style={{fontFamily:"var(--mb-font-mono)",fontSize:11,letterSpacing:"0.75px",textTransform:"uppercase",color:"var(--mb-color-text-muted)"}}>Show transcript</span>
+  </div>;
+}
+
+const PHASE_COPY = {
+  recording:["Listening","Tap the orb when done"],
+  transcribing:["Parsing","Please wait"],
+  "thinking-briefly":["Thinking","Please wait"],
+  searching:["Searching","Please wait"],
+  thinking:["Thinking","Please wait"],
+  synthesizing:["Converting","Please wait"],
+  speaking:["Speaking","Tap the orb to stop"],
+};
+
+function Screen({ page = "voice", phase, recordingProgress = 0, text, council, web = true }){
+  const ORB = 196;
+  const voice = page === "voice";
+  return <div className="screen"><div className="body">
+    <TopBar /><Byline /><SettingsSummary />
+    <div style={{flex:1,minHeight:0,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:16}}>
+      {/* A fixed slot the height of the orb, so the icons below never move. */}
+      <div style={{height:ORB,width:"100%",display:"flex",alignItems:"center",justifyContent:"center",gap:2}}>
+        <SwipeArrow direction="left" enabled={!voice} label="Show voice input" />
+        <div style={{flex:1,minWidth:0,display:"flex",alignItems:"center",justifyContent:"center"}}>
+          {voice
+            ? <Orb size={ORB} phase={phase} recordingProgress={recordingProgress}
+                label={phase ? PHASE_COPY[phase][0] + ". " + PHASE_COPY[phase][1] + "." : "Tap to speak. Fresh session."} />
+            : <TextComposer text={text} height={ORB} />}
+        </div>
+        <SwipeArrow direction="right" enabled={voice} label="Show text input" />
+      </div>
+      <div style={{display:"flex",alignItems:"flex-start",justifyContent:"center",gap:8}}>
+        <Satellite icon="image" label="Image" accessibilityLabel="Add image" />
+        <span style={{width:1,height:44,background:"var(--mb-color-border)",margin:"0 6px"}} />
+        <Satellite phosphor="users-three" label="Council" kind="toggle" active={council} accessibilityLabel="Model Council" />
+        <Satellite icon="search" label="Web" kind="toggle" active={web} accessibilityLabel="Web search" />
+      </div>
+    </div>
+    <StatusLine phase={phase} title={phase ? PHASE_COPY[phase][0] : voice ? "Tap to speak" : "Type and send"}
+      detail={phase ? PHASE_COPY[phase][1] : "Fresh session"} />
+    <TranscriptHandle />
+  </div></div>;
+}
+
+function Frame({ theme = "light", ...props }){
+  return <div className="device" data-theme={theme}><Screen {...props} /></div>;
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<>
+  <h2>The two pager pages</h2>
+  <p className="note">A caret on each flank replaces the indicator at the bottom &mdash; it sits beside the thing that swipes, and the lit one points at the page you are not on. The composer now fills the orb&rsquo;s slot exactly, so the two pages weigh the same and the controls beneath never move.</p>
+  <div className="row">
+    <div><p className="cap">Voice · at rest</p><Frame /></div>
+    <div><p className="cap">Voice · recording</p><Frame phase="recording" recordingProgress={0.42} /></div>
+    <div><p className="cap">Text · empty</p><Frame page="text" /></div>
+    <div><p className="cap">Text · typing</p><Frame page="text" text="Will the weather hold for the weekend, and does the wind drop after Tuesday" /></div>
+  </div>
+
+  <h2>Every phase, in place</h2>
+  <p className="note">The same screen through one full turn. The orb takes the phase colour, the glyph follows it, and the status line says what is happening — so the screen is readable from across a room without reading a word.</p>
+  <div className="row">
+    <div><p className="cap">Recording · 42%</p><Frame phase="recording" recordingProgress={0.42} /></div>
+    <div><p className="cap">Transcribing</p><Frame phase="transcribing" /></div>
+    <div><p className="cap">Thinking briefly</p><Frame phase="thinking-briefly" /></div>
+    <div><p className="cap">Searching</p><Frame phase="searching" /></div>
+  </div>
+  <div className="row" style={{marginTop:14}}>
+    <div><p className="cap">Thinking</p><Frame phase="thinking" /></div>
+    <div><p className="cap">Synthesizing</p><Frame phase="synthesizing" /></div>
+    <div><p className="cap">Speaking</p><Frame phase="speaking" /></div>
+    <div data-theme="dark"><p className="cap" style={{color:"#e6e4dd"}}>Searching · dark</p><Frame theme="dark" phase="searching" /></div>
+  </div>
+
+  <h2>The three controls</h2>
+  <p className="note">Image is an action, so it stays a bare glyph. Council and Web are state, so they read as pills that fill when on, and a hairline separates the two species. Council takes <code>users-three</code> and thinking takes <code>brain</code>, freeing <code>robot</code> for the speaking phase.</p>
+  <div className="row">
+    <div><p className="cap">Council and web on</p><Frame council web /></div>
+    <div><p className="cap">Both off</p><Frame web={false} /></div>
+    <div data-theme="dark"><p className="cap" style={{color:"#e6e4dd"}}>Voice · dark</p><Frame theme="dark" council /></div>
+    <div data-theme="dark"><p className="cap" style={{color:"#e6e4dd"}}>Text · dark</p><Frame theme="dark" page="text" /></div>
+  </div>
+</>);
+</script>
+</body></html>

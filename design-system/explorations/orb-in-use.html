@@ -1,0 +1,336 @@
+<!-- @dsCard group="Explorations" viewport="1180x900" name="Orb in use" subtitle="A conversation in progress, the transcript handle, landscape" -->
+<!DOCTYPE html><html data-theme="light"><head><meta charset="utf-8"><title>Orb in use — conversation, drawer, landscape</title>
+<link rel="stylesheet" href="../styles.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/regular/style.css">
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script src="../_ds_bundle.js"></script>
+<style>
+body{margin:0;padding:28px;background:#8f8d86;font-family:var(--mb-font-body)}
+h1{font-family:var(--mb-font-headline);font-size:26px;letter-spacing:-.25px;color:#16181D;margin:0 0 4px}
+.sub{font-size:14px;line-height:20px;color:#33342f;margin:0 0 24px;max-width:860px}
+h2{font-family:var(--mb-font-display);font-weight:600;font-size:17px;color:#16181D;margin:26px 0 2px}
+.note{font-size:13px;line-height:19px;color:#33342f;margin:0 0 12px;max-width:880px}
+.row{display:flex;gap:16px;flex-wrap:wrap;align-items:flex-start}
+.cap{font-family:var(--mb-font-mono);font-size:9px;letter-spacing:.9px;text-transform:uppercase;color:#2b2c2e;margin:0 0 6px 2px}
+.device{width:372px;height:700px;border-radius:34px;overflow:hidden;position:relative;background:var(--mb-color-background);box-shadow:0 18px 44px rgba(0,0,0,.3);border:1px solid rgba(0,0,0,.25)}
+.device.land{width:700px;height:372px}
+.screen{position:absolute;inset:0;display:flex;flex-direction:column}
+.body{flex:1;min-height:0;display:flex;flex-direction:column;padding:0 16px 12px}
+</style>
+</head><body>
+<h1>The orb in use</h1>
+<p class="sub">Everything so far showed a fresh session. This is the state people actually live in: a conversation already running, the transcript one gesture away, and the same composition in landscape.</p>
+<div id="root"></div>
+<script type="text/babel">
+const { PhosphorIcon, IconButton, AppWordmark, RouteByline, ChatBubble, ChatTranscript } = window.MrBroccoliDesignSystem_62d510;
+const A = "../assets/providers";
+
+const PHASE_TOKEN = {
+  recording:"--mb-color-phase-recording-track", transcribing:"--mb-color-phase-transcribing",
+  "thinking-briefly":"--mb-color-phase-thinking-briefly", searching:"--mb-color-phase-searching",
+  thinking:"--mb-color-phase-thinking", synthesizing:"--mb-color-phase-synthesizing",
+  speaking:"--mb-color-phase-speaking", idle:"--mb-color-accent",
+};
+const PHASE_GLYPH = {
+  recording:"stop", transcribing:"file-text", "thinking-briefly":"lightning", searching:"globe-hemisphere-west",
+  thinking:"brain", synthesizing:"headset", speaking:"pause", idle:"microphone",
+};
+const PHASE_COPY = {
+  recording:["Listening","Tap the orb when done"],
+  speaking:["Speaking","Tap the orb to stop"],
+};
+
+function luminance(hex){
+  const c=hex.replace("#","").match(/.{2}/g);
+  if(!c||c.length!==3) return 0;
+  const [r,g,b]=c.map((p)=>{const v=parseInt(p,16)/255;return v<=0.04045?v/12.92:Math.pow((v+0.055)/1.055,2.4);});
+  return r*0.2126+g*0.7152+b*0.0722;
+}
+function contrast(a,b){const hi=Math.max(luminance(a),luminance(b));const lo=Math.min(luminance(a),luminance(b));return (hi+0.05)/(lo+0.05);}
+function getAccessibleForeground(bg){return contrast(bg,"#030712")>contrast(bg,"#FFFFFF")?"#030712":"#FFFFFF";}
+
+function Glyph({ name, size = 20, color = "currentColor" }){
+  return <i className={"ph ph-" + name} aria-hidden="true"
+    style={{fontSize:size,lineHeight:1,width:size,height:size,flexShrink:0,color,
+      display:"inline-flex",alignItems:"center",justifyContent:"center"}} />;
+}
+
+function TopBar(){
+  return <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",minHeight:62,paddingTop:8,paddingBottom:10}}>
+    <IconButton icon="menu" accessibilityLabel="Conversations" />
+    <AppWordmark />
+    <IconButton icon="setting" accessibilityLabel="Settings" />
+  </div>;
+}
+
+function Byline(){
+  return <RouteByline provider="openai" providerLabel="OpenAI" modelName="GPT-5" effort="Extra high"
+    effortLevels={["Minimal","Low","Medium","High","Extra high"]} assetBase={A} />;
+}
+
+function SettingsSummary({ text = "Balanced · Brief · Heart" }){
+  return <div style={{display:"flex",alignItems:"center",gap:8,minHeight:44}}>
+    <span style={{flex:1,minWidth:0,fontFamily:"var(--mb-font-body)",fontSize:13,lineHeight:"19px",
+      color:"var(--mb-color-text-secondary)",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{text}</span>
+    <IconButton icon="control" accessibilityLabel="Conversation settings" />
+  </div>;
+}
+
+function Satellite({ icon, phosphor, label, accessibilityLabel, active, kind = "action" }){
+  const toggle = kind === "toggle";
+  const tint = active ? "var(--mb-color-accent)" : "var(--mb-color-text-secondary)";
+  return <div style={{display:"flex",flexDirection:"column",alignItems:"center",gap:4,width:64}}>
+    <span role={toggle ? "switch" : "button"} aria-checked={toggle ? !!active : undefined}
+      aria-label={accessibilityLabel || label}
+      style={{width:44,height:44,borderRadius:toggle?22:"var(--mb-radius-icon-button)",cursor:"pointer",
+        display:"flex",alignItems:"center",justifyContent:"center",
+        border:"1px solid "+(toggle?(active?"var(--mb-color-accent)":"var(--mb-color-border)"):"transparent"),
+        background:toggle&&active?"var(--mb-color-accent-soft)":"transparent"}}>
+      {phosphor ? <Glyph name={phosphor} size={20} color={tint} /> : <PhosphorIcon name={icon} size="control" color={tint} />}
+    </span>
+    <span style={{fontFamily:"var(--mb-font-mono)",fontSize:9,letterSpacing:"0.75px",textTransform:"uppercase",
+      color:"var(--mb-color-text-secondary)",textAlign:"center"}}>{label}</span>
+  </div>;
+}
+
+function Orb({ size = 196, phase, recordingProgress = 0, label }){
+  const ref = React.useRef(null);
+  const [resolved, setResolved] = React.useState("#44A055");
+  const token = PHASE_TOKEN[phase || "idle"];
+  React.useEffect(()=>{
+    if (!ref.current) return;
+    const value = getComputedStyle(ref.current).getPropertyValue(token).trim();
+    if (value) setResolved(value);
+  },[token]);
+  const foreground = getAccessibleForeground(resolved);
+  const soft = "color-mix(in srgb, " + resolved + " 16%, transparent)";
+  const halo = phase === "recording"
+    ? "conic-gradient(var(--mb-color-phase-recording) " + Math.round(recordingProgress*360) + "deg, rgba(0,0,0,0) 0), " + soft
+    : soft;
+  return <div ref={ref} role="button" aria-label={label} tabIndex={0}
+    style={{width:size,height:size,borderRadius:size/2,display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",
+      background:halo,boxShadow:"0 0 0 1px var(--mb-color-border)"}}>
+    <div style={{width:size*0.72,height:size*0.72,borderRadius:size,display:"flex",alignItems:"center",justifyContent:"center",
+      background:resolved,boxShadow:"0 0 0 8px " + soft}}>
+      <Glyph name={PHASE_GLYPH[phase || "idle"]} size={size*0.3} color={foreground} />
+    </div>
+  </div>;
+}
+
+function StatusLine({ title, detail, phase }){
+  const dot = phase ? "var(" + PHASE_TOKEN[phase] + ")" : "var(--mb-color-accent)";
+  return <div style={{display:"flex",alignItems:"center",gap:12,minHeight:44}}>
+    <span style={{width:8,height:8,borderRadius:4,background:dot,flexShrink:0}} />
+    <span style={{flex:1,minWidth:0,display:"flex",flexDirection:"column"}}>
+      <span style={{fontFamily:"var(--mb-font-display)",fontWeight:600,fontSize:16,lineHeight:"21px",color:"var(--mb-color-text)"}}>{title}</span>
+      <span style={{fontFamily:"var(--mb-font-mono)",fontSize:11,lineHeight:"16px",color:"var(--mb-color-text-muted)",
+        overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{detail}</span>
+    </span>
+    <IconButton icon="info-circle" accessibilityLabel="Session details" />
+  </div>;
+}
+
+function SwipeArrow({ direction, enabled, label }){
+  return <span role="button" aria-label={label} aria-disabled={!enabled}
+    style={{width:44,height:44,flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center",
+      cursor:enabled?"pointer":"default",opacity:enabled?1:0.22}}>
+    <PhosphorIcon name={direction} size="control" color="var(--mb-color-text-muted)" />
+  </span>;
+}
+
+const LAST_REPLY = "High water is at 15:40 today, and the tide turns roughly every six hours after that.";
+
+/* Three ways to let a running conversation show through the handle. */
+function Handle({ variant = "count", count = 12, fresh = false }){
+  const messages = fresh ? 0 : count;
+  const announce = messages === 0 ? "Show transcript. No messages yet." : "Show transcript. " + messages + " messages";
+  const grip = <span style={{width:38,height:4,borderRadius:2,background:"var(--mb-color-border-strong)"}} />;
+  const label = <span style={{fontFamily:"var(--mb-font-mono)",fontSize:11,letterSpacing:"0.75px",
+    textTransform:"uppercase",color:"var(--mb-color-text-muted)"}}>Show transcript</span>;
+  if (variant === "count") {
+    return <div role="button" aria-label={announce}
+      style={{display:"flex",flexDirection:"column",alignItems:"center",gap:8,minHeight:44,justifyContent:"center",cursor:"pointer"}}>
+      {grip}
+      <span style={{fontFamily:"var(--mb-font-mono)",fontSize:11,letterSpacing:"0.75px",textTransform:"uppercase",
+        color:"var(--mb-color-text-muted)"}}>{messages} messages</span>
+    </div>;
+  }
+  if (variant === "preview") {
+    return <div role="button" aria-label={announce}
+      style={{display:"flex",flexDirection:"column",alignItems:"center",gap:6,minHeight:44,justifyContent:"center",cursor:"pointer",width:"100%"}}>
+      {grip}
+      <span style={{width:"100%",textAlign:"center",fontFamily:"var(--mb-font-body)",fontSize:13,lineHeight:"19px",
+        color:"var(--mb-color-text-secondary)",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{LAST_REPLY}</span>
+      {label}
+    </div>;
+  }
+  if (variant === "card") {
+    return <div role="button" aria-label={announce}
+      style={{cursor:"pointer",padding:"10px 16px 14px",borderRadius:"var(--mb-radius-sheet-top) var(--mb-radius-sheet-top) 0 0",
+        border:"1px solid var(--mb-color-surface-raised-border)",borderBottom:"none",background:"var(--mb-color-surface-raised)"}}>
+      <span style={{display:"block",width:38,height:4,borderRadius:2,margin:"0 auto 10px",background:"var(--mb-color-border-strong)"}} />
+      {fresh ? (
+        <span style={{display:"block",fontFamily:"var(--mb-font-mono)",fontSize:11,letterSpacing:"0.75px",textTransform:"uppercase",
+          color:"var(--mb-color-text-muted)",textAlign:"center"}}>No messages yet</span>
+      ) : (
+        <>
+          <span style={{display:"block",fontFamily:"var(--mb-font-mono)",fontSize:10,letterSpacing:"0.6px",textTransform:"uppercase",
+            color:"var(--mb-color-text-muted)",marginBottom:3}}>GPT-5 · 2 min ago</span>
+          <span style={{display:"block",fontFamily:"var(--mb-font-body)",fontSize:13,lineHeight:"19px",color:"var(--mb-color-text-secondary)",
+            overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{LAST_REPLY}</span>
+        </>
+      )}
+    </div>;
+  }
+  return null;
+}
+
+function Screen({ phase, recordingProgress = 0, handle = "count", council, web = true, fresh = false, escapeHandle }){
+  const ORB = 196;
+  const copy = phase ? PHASE_COPY[phase] : null;
+  return <div className="screen">
+    <div className="body" style={escapeHandle?{paddingBottom:0}:null}>
+      <TopBar /><Byline /><SettingsSummary />
+      <div style={{flex:1,minHeight:0,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:16}}>
+        <div style={{height:ORB,width:"100%",display:"flex",alignItems:"center",justifyContent:"center",gap:2}}>
+          <SwipeArrow direction="left" enabled={false} label="Show voice input" />
+          <div style={{flex:1,minWidth:0,display:"flex",alignItems:"center",justifyContent:"center"}}>
+            <Orb size={ORB} phase={phase} recordingProgress={recordingProgress}
+              label={copy ? copy[0] + ". " + copy[1] + "." : "Tap to speak. Continue the conversation."} />
+          </div>
+          <SwipeArrow direction="right" enabled label="Show text input" />
+        </div>
+        <div style={{display:"flex",alignItems:"flex-start",justifyContent:"center",gap:8}}>
+          <Satellite icon="image" label="Image" accessibilityLabel="Add image" />
+          <span style={{width:1,height:44,background:"var(--mb-color-border)",margin:"0 6px"}} />
+          <Satellite phosphor="users-three" label="Council" kind="toggle" active={council} accessibilityLabel="Model Council" />
+          <Satellite icon="search" label="Web" kind="toggle" active={web} accessibilityLabel="Web search" />
+        </div>
+      </div>
+      <StatusLine phase={phase}
+        title={copy ? copy[0] : "Tap to speak"}
+        detail={copy ? copy[1] : fresh ? "Fresh session" : "Tide tables · 12 messages · 2 min ago"} />
+      {escapeHandle ? null : <Handle variant={handle} fresh={fresh} />}
+    </div>
+    {escapeHandle ? <Handle variant={handle} fresh={fresh} /> : null}
+  </div>;
+}
+
+/* What the handle opens: a sheet over the workspace, the orb still reachable. */
+function DrawerScreen(){
+  const messages = [
+    { id:"m1", role:"user", timestamp:"09.08.26 · 14:11", text:"When does the tide turn in Lisbon today?" },
+    { id:"m2", role:"assistant", provider:"openai", model:"GPT-5", timestamp:"09.08.26 · 14:12", text:LAST_REPLY },
+    { id:"m3", role:"user", timestamp:"09.08.26 · 14:16", text:"And is the wind dropping?" },
+    { id:"m4", role:"assistant", provider:"openai", model:"GPT-5", timestamp:"09.08.26 · 14:17",
+      text:"Yes. It eases to under twelve knots from the north-west by late afternoon and stays there through Tuesday." },
+  ];
+  return <div className="screen">
+    <div className="body" style={{paddingBottom:0}}>
+      <TopBar /><Byline /><SettingsSummary />
+      <div style={{flex:1}} />
+    </div>
+    <div style={{position:"absolute",inset:0,background:"var(--mb-color-overlay)"}} />
+    <div style={{position:"absolute",left:0,right:0,bottom:0,height:"85%",display:"flex",flexDirection:"column",
+      borderRadius:"var(--mb-radius-sheet-top) var(--mb-radius-sheet-top) 0 0",background:"var(--mb-color-surface)",
+      border:"1px solid var(--mb-color-border)",borderBottom:"none",boxShadow:"var(--mb-shadow-sheet)",overflow:"hidden"}}>
+      <div style={{display:"flex",alignItems:"center",gap:12,minHeight:52,padding:"0 14px",
+        borderBottom:"1px solid var(--mb-color-border)"}}>
+        <span style={{flex:1,minWidth:0,fontFamily:"var(--mb-font-display)",fontWeight:600,fontSize:15,lineHeight:"20px",color:"var(--mb-color-text)"}}>Tide tables</span>
+        <IconButton icon="close" accessibilityLabel="Hide transcript" />
+      </div>
+      <ChatTranscript style={{flex:1,padding:"10px 12px 18px"}}>
+        {messages.map((m)=><ChatBubble key={m.id} {...m} assetBase={A}
+          actions={m.role==="assistant"?[{icon:"copy",label:"Copy"},{icon:"redo",label:"Repeat"},{icon:"branch",label:"Branch"}]:null} />)}
+      </ChatTranscript>
+    </div>
+  </div>;
+}
+
+/* Landscape sheds what it does not need: no swipe pager, no attach, no settings
+   sentence. What is left is one big control and three icon buttons. */
+function LandscapeScreen(){
+  const ORB = 150;
+  return <div className="screen">
+    <div style={{flex:1,minHeight:0,display:"flex",padding:"0 12px 8px"}}>
+      <div style={{flex:"0.9 1 0",minWidth:0,paddingRight:12,display:"flex",flexDirection:"column"}}>
+        <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",minHeight:62,paddingTop:8,paddingBottom:10}}>
+          <IconButton icon="menu" accessibilityLabel="Conversations" />
+          <AppWordmark />
+          <IconButton icon="setting" accessibilityLabel="Settings" />
+        </div>
+        <Byline />
+        <div style={{flex:1,minHeight:0,position:"relative",display:"flex",alignItems:"center",justifyContent:"center",paddingTop:8}}>
+          <Orb size={ORB} label="Tap to speak. Continue the conversation." />
+          <div style={{position:"absolute",right:0,top:"50%",transform:"translateY(-50%)",display:"flex",flexDirection:"column",gap:8}}>
+            <LandscapeControl icon="control" label="Conversation settings" />
+            <LandscapeControl phosphor="users-three" label="Model Council" toggle />
+            <LandscapeControl icon="search" label="Web search" toggle active />
+          </div>
+        </div>
+        <StatusLine title="Tap to speak" detail="Tide tables · 12 messages" />
+      </div>
+      <div style={{width:1,alignSelf:"stretch",background:"var(--mb-color-border)"}} />
+      <div style={{flex:1,minWidth:0,paddingLeft:12,paddingTop:10,display:"flex",flexDirection:"column",minHeight:0}}>
+        <ChatTranscript style={{flex:1,paddingBottom:8}}>
+          <ChatBubble role="user" timestamp="09.08.26 · 14:11" text="When does the tide turn in Lisbon today?" />
+          <ChatBubble role="assistant" provider="openai" model="GPT-5" timestamp="09.08.26 · 14:12" text={LAST_REPLY} assetBase={A} />
+        </ChatTranscript>
+      </div>
+    </div>
+  </div>;
+}
+
+/* Icon-only in landscape: the column has no room for labels, so the name lives
+   on the control rather than under it. */
+function LandscapeControl({ icon, phosphor, label, toggle, active }){
+  const tint = active ? "var(--mb-color-accent)" : "var(--mb-color-text-secondary)";
+  return <span role={toggle?"switch":"button"} aria-checked={toggle?!!active:undefined} aria-label={label}
+    style={{width:44,height:44,borderRadius:toggle?22:"var(--mb-radius-icon-button)",cursor:"pointer",
+      display:"flex",alignItems:"center",justifyContent:"center",
+      border:"1px solid "+(toggle?(active?"var(--mb-color-accent)":"var(--mb-color-border)"):"transparent"),
+      background:toggle&&active?"var(--mb-color-accent-soft)":"transparent"}}>
+    {phosphor ? <Glyph name={phosphor} size={20} color={tint} /> : <PhosphorIcon name={icon} size="control" color={tint} />}
+  </span>;
+}
+
+function Frame({ theme = "light", land, children, ...props }){
+  return <div className={land?"device land":"device"} data-theme={theme}>
+    {children || <Screen {...props} />}
+  </div>;
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<>
+  <h2>A conversation already running</h2>
+  <p className="note">Three ways to let twelve messages show through. The status line carries the conversation name and age in all of them; what differs is how much the last reply is allowed to say. <strong>c</strong> is the direction &mdash; it names the model and the age, gives one line of the answer, and reads as the top edge of a drawer rather than a control.</p>
+  <div className="row">
+    <div><p className="cap">c · peeking card — chosen</p><Frame handle="card" escapeHandle /></div>
+    <div><p className="cap">c · fresh session</p><Frame handle="card" escapeHandle fresh /></div>
+    <div><p className="cap">c · speaking</p><Frame handle="card" escapeHandle phase="speaking" /></div>
+    <div data-theme="dark"><p className="cap" style={{color:"#e6e4dd"}}>c · dark</p><Frame theme="dark" handle="card" escapeHandle /></div>
+  </div>
+  <p className="note" style={{marginTop:14}}>The two it beat, for the record.</p>
+  <div className="row">
+    <div><p className="cap">a · count only</p><Frame handle="count" /></div>
+    <div><p className="cap">b · last reply, one line</p><Frame handle="preview" /></div>
+  </div>
+
+  <h2>What the handle opens</h2>
+  <p className="note">A sheet over the workspace rather than a new screen, so the route and settings stay visible above it and dismissing returns you to the orb. The header carries only the conversation name and a close control &mdash; attach stays under the orb, where it is reachable from both pager pages.</p>
+  <div className="row">
+    <div><p className="cap">Transcript open</p><Frame><DrawerScreen /></Frame></div>
+    <div data-theme="dark"><p className="cap" style={{color:"#e6e4dd"}}>Transcript open · dark</p><Frame theme="dark"><DrawerScreen /></Frame></div>
+    <div data-theme="dark"><p className="cap" style={{color:"#e6e4dd"}}>In conversation · dark</p><Frame theme="dark" handle="preview" /></div>
+  </div>
+
+  <h2>Landscape</h2>
+  <p className="note">Landscape sheds what it does not need: no swipe pager, no attach control, no settings sentence &mdash; and because the right pane has room, the transcript stops hiding. The orb sits centred in its column at 150pt, with the three icon buttons pinned to the column&rsquo;s right edge.</p>
+  <div className="row">
+    <div><p className="cap">Landscape</p><Frame land><LandscapeScreen /></Frame></div>
+    <div data-theme="dark"><p className="cap" style={{color:"#e6e4dd"}}>Landscape · dark</p><Frame land theme="dark"><LandscapeScreen /></Frame></div>
+  </div>
+</>);
+</script>
+</body></html>

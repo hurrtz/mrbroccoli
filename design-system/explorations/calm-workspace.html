@@ -1,0 +1,183 @@
+<!-- @dsCard group="Explorations" viewport="1180x900" name="Calm workspace" subtitle="Three compositions, back toward the original central orb" -->
+<!DOCTYPE html><html data-theme="light"><head><meta charset="utf-8"><title>Calm workspace — compositions</title>
+<link rel="stylesheet" href="../styles.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/regular/style.css">
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script src="../_ds_bundle.js"></script>
+<style>
+body{margin:0;padding:28px;background:#8f8d86;font-family:var(--mb-font-body)}
+h1{font-family:var(--mb-font-headline);font-size:26px;letter-spacing:-.25px;color:#16181D;margin:0 0 4px}
+.sub{font-size:14px;line-height:20px;color:#33342f;margin:0 0 24px;max-width:840px}
+h2{font-family:var(--mb-font-display);font-weight:600;font-size:17px;color:#16181D;margin:24px 0 2px}
+.note{font-size:13px;line-height:19px;color:#33342f;margin:0 0 12px;max-width:860px}
+.row{display:flex;gap:16px;flex-wrap:wrap;align-items:flex-start}
+.cap{font-family:var(--mb-font-mono);font-size:9px;letter-spacing:.9px;text-transform:uppercase;color:#2b2c2e;margin:0 0 6px 2px}
+.device{width:372px;height:700px;border-radius:34px;overflow:hidden;position:relative;background:var(--mb-color-background);box-shadow:0 18px 44px rgba(0,0,0,.3);border:1px solid rgba(0,0,0,.25)}
+.device.land{width:700px;height:372px}
+.screen{position:absolute;inset:0;display:flex;flex-direction:column}
+.body{flex:1;min-height:0;display:flex;flex-direction:column;padding:0 16px 12px}
+</style>
+</head><body>
+<h1>A calmer workspace</h1>
+<p class="sub">Back toward the original: one loud thing, a lot of quiet, and the transcript suggested rather than shown. The chip strip is replaced by the single row the first design had &mdash; one style control and one switch, contained, not five loose chips.</p>
+<div id="root"></div>
+<script type="text/babel">
+const { PhaseAwareVoiceAction, PhosphorIcon, IconButton, AppWordmark, RouteByline } = window.MrBroccoliDesignSystem_62d510;
+const A = "../assets/providers";
+
+function TopBar(){
+  return <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",minHeight:62,paddingTop:8,paddingBottom:10}}>
+    <IconButton icon="menu" accessibilityLabel="Conversations" />
+    <AppWordmark />
+    <IconButton icon="setting" accessibilityLabel="Settings" />
+  </div>;
+}
+
+function Byline(){
+  return <RouteByline provider="openai" providerLabel="OpenAI" modelName="GPT-5" effort="Extra high"
+    effortLevels={["Minimal","Low","Medium","High","Extra high"]} assetBase={A} />;
+}
+
+/* The shipping control is a bare 44pt row: label plus switch, no container.
+   Source: MainScreenRouteControls.tsx styles.searchControl / searchLabel. */
+function AdjustRow(){
+  return <div style={{display:"flex",alignItems:"center",gap:12,marginTop:10}}>
+    <div role="button" aria-label="Response style. Balanced, Brief"
+      style={{flex:1,minWidth:0,display:"flex",alignItems:"center",gap:10,minHeight:44,padding:"0 12px",cursor:"pointer",
+        borderRadius:"var(--mb-radius-control)",border:"1px solid var(--mb-color-border)",background:"var(--mb-color-surface)"}}>
+      <PhosphorIcon name="control" size="compact" color="var(--mb-color-text-secondary)" />
+      <span style={{flex:1,minWidth:0,fontFamily:"var(--mb-font-body)",fontSize:14,color:"var(--mb-color-text)",
+        overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>Balanced · Brief</span>
+      <PhosphorIcon name="right" size="inline" color="var(--mb-color-text-muted)" />
+    </div>
+    <div role="switch" aria-checked="true" aria-label="Web search"
+      style={{height:44,display:"flex",alignItems:"center",gap:4,cursor:"pointer",flexShrink:0}}>
+      <span style={{minWidth:78,textAlign:"right",fontFamily:"var(--mb-font-body)",fontSize:12,lineHeight:"16px",color:"var(--mb-color-text-secondary)"}}>Web search</span>
+      <span style={{width:51,height:31,borderRadius:16,padding:2,background:"var(--mb-color-accent)",display:"flex",justifyContent:"flex-end",alignItems:"center",flexShrink:0}}>
+        <span style={{width:27,height:27,borderRadius:14,background:"#FFFFFF",boxShadow:"0 1px 3px rgba(0,0,0,0.22)"}} />
+      </span>
+    </div>
+  </div>;
+}
+
+/* The orb: the control is the shape, so the round form is earned here. */
+function Orb({ size = 200, label = "Tap to speak. Fresh session." }){
+  return <div role="button" aria-label={label} tabIndex={0}
+    style={{width:size,height:size,borderRadius:size/2,display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",
+    background:"var(--mb-color-accent-soft)",boxShadow:"0 0 0 1px var(--mb-color-border)"}}>
+    <div style={{width:size*0.72,height:size*0.72,borderRadius:size,display:"flex",alignItems:"center",justifyContent:"center",
+      background:"var(--mb-color-accent)",boxShadow:"0 0 0 8px var(--mb-color-glow-strong)"}}>
+      <PhosphorIcon name="mic" size="hero" color="var(--mb-color-on-active-control)" style={{fontSize:size*0.3,width:size*0.3,height:size*0.3}} />
+    </div>
+  </div>;
+}
+
+function StatusLine({ title = "Tap to speak", detail = "Fresh session" }){
+  return <div style={{display:"flex",alignItems:"center",gap:12,minHeight:44}}>
+    <span style={{width:8,height:8,borderRadius:4,background:"var(--mb-color-accent)",flexShrink:0}} />
+    <span style={{flex:1,minWidth:0,display:"flex",flexDirection:"column"}}>
+      <span style={{fontFamily:"var(--mb-font-display)",fontWeight:600,fontSize:16,lineHeight:"21px",color:"var(--mb-color-text)"}}>{title}</span>
+      <span style={{fontFamily:"var(--mb-font-mono)",fontSize:11,lineHeight:"16px",color:"var(--mb-color-text-muted)"}}>{detail}</span>
+    </span>
+    <IconButton icon="info-circle" accessibilityLabel="Session details" />
+  </div>;
+}
+
+/* The transcript is suggested, not shown. */
+function TranscriptHandle(){
+  return <div role="button" aria-label="Show transcript"
+    style={{display:"flex",flexDirection:"column",alignItems:"center",gap:8,minHeight:44,justifyContent:"center",cursor:"pointer"}}>
+    <span style={{width:38,height:4,borderRadius:2,background:"var(--mb-color-border-strong)"}} />
+    <span style={{fontFamily:"var(--mb-font-mono)",fontSize:11,letterSpacing:"0.75px",textTransform:"uppercase",color:"var(--mb-color-text-muted)"}}>Show transcript</span>
+  </div>;
+}
+
+function TranscriptPeek(){
+  return <div role="button" aria-label="Show transcript. 4 messages"
+    style={{marginTop:8,padding:"10px 16px 16px",cursor:"pointer",
+      borderRadius:"var(--mb-radius-sheet-top) var(--mb-radius-sheet-top) 0 0",
+      border:"1px solid var(--mb-color-border)",borderBottom:"none",background:"var(--mb-color-surface)"}}>
+    <span style={{display:"block",width:38,height:4,borderRadius:2,margin:"0 auto 10px",background:"var(--mb-color-border-strong)"}} />
+    <span style={{display:"block",fontFamily:"var(--mb-font-body)",fontSize:13,lineHeight:"19px",color:"var(--mb-color-text-secondary)",
+      overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>High water is at 15:40 today, and the tide turns roughly every six hours.</span>
+  </div>;
+}
+
+/* The pager dots: small and elegant, as in the shipping app. */
+function PagerDots({ active = 0 }){
+  return <div style={{display:"flex",alignItems:"center",justifyContent:"center",gap:6,minHeight:20,marginTop:8}}>
+    {[0,1].map((i)=><span key={i} style={{width:6,height:6,borderRadius:3,
+      background:i===active?"var(--mb-color-accent)":"var(--mb-color-border-strong)"}} />)}
+  </div>;
+}
+
+/* 1 — the original: a central orb, the transcript a handle at the very bottom. */
+function CalmOrb(){
+  return <div className="screen"><div className="body">
+    <TopBar /><Byline /><AdjustRow />
+    <div style={{flex:1,minHeight:0,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:24}}>
+      <Orb />
+    </div>
+    <StatusLine />
+    <PagerDots />
+    <TranscriptHandle />
+  </div></div>;
+}
+
+/* 2 — the bottom band belongs to the CTA: edge to edge, bottom-most,
+   rounded only at the top so it reads as the floor of the screen. */
+function CalmBand(){
+  return <div className="screen">
+    <div className="body" style={{paddingBottom:0}}>
+      <TopBar /><Byline /><AdjustRow />
+      <div style={{flex:1,minHeight:0,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center"}}>
+        <StatusLine />
+      </div>
+      <TranscriptHandle />
+      <PagerDots />
+    </div>
+    <PhaseAwareVoiceAction visualPhase="idle" prompt="Ask anything." title="Tap to talk"
+      style={{minHeight:140,borderRadius:"var(--mb-radius-style-sheet-top) var(--mb-radius-style-sheet-top) 0 0"}} />
+  </div>;
+}
+
+/* 3 — orb in the open middle, full-width bar docked below, transcript peeking. */
+function CalmHybrid(){
+  return <div className="screen">
+    <div className="body" style={{paddingBottom:0}}>
+      <TopBar /><Byline /><AdjustRow />
+      <div style={{flex:1,minHeight:0,display:"flex",alignItems:"center",justifyContent:"center"}}>
+        <Orb size={168} />
+      </div>
+      <StatusLine />
+      <PhaseAwareVoiceAction visualPhase="idle" prompt="Ask anything." title="Tap to talk" />
+      <PagerDots />
+    </div>
+    <TranscriptPeek />
+  </div>;
+}
+
+function Frame({ Screen, theme }){
+  return <div className="device" data-theme={theme}><Screen /></div>;
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<>
+  <h2>Three compositions</h2>
+  <p className="note">All three keep the top third quiet: wordmark, one-line route byline, one row of two contained controls. What differs is where the loud thing sits and how much the transcript is allowed to say.</p>
+  <div className="row">
+    <div><p className="cap">1 · central orb</p><Frame Screen={CalmOrb} theme="light" /></div>
+    <div><p className="cap">2 · bottom band reserved</p><Frame Screen={CalmBand} theme="light" /></div>
+    <div><p className="cap">3 · orb and band</p><Frame Screen={CalmHybrid} theme="light" /></div>
+  </div>
+  <h2>Dark</h2>
+  <p className="note">The original was dark-first. These are the same three in the dark appearance.</p>
+  <div className="row">
+    <div><p className="cap" style={{color:"#e6e4dd"}}>1</p><Frame Screen={CalmOrb} theme="dark" /></div>
+    <div><p className="cap" style={{color:"#e6e4dd"}}>2</p><Frame Screen={CalmBand} theme="dark" /></div>
+    <div><p className="cap" style={{color:"#e6e4dd"}}>3</p><Frame Screen={CalmHybrid} theme="dark" /></div>
+  </div>
+</>);
+</script>
+</body></html>
