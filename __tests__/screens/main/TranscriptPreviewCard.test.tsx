@@ -177,6 +177,49 @@ describe("TranscriptPreviewCard", () => {
     expect(onOpenStyleSheet).toHaveBeenCalledTimes(1);
   });
 
+  it("applies a preferred height as the flex basis so the sheet cannot collapse it", () => {
+    // Regression: the shell's flex: 1 sets flexBasis: 0, which beats a plain
+    // height inside a flex parent. In the transcript sheet's auto-height
+    // dialog body that resolved the card to zero height and the transcript
+    // vanished behind the sheet title and footer.
+    const screen = render(
+      <TranscriptPreviewCard
+        activeConversationId="conversation-1"
+        activeConversationTitle="Current conversation"
+        colors={lightColors}
+        messages={[
+          {
+            id: "message-1",
+            role: "assistant",
+            content: "Reply",
+            model: "gpt-5.4",
+            provider: "openai",
+            timestamp: "2026-07-21T12:00:00.000Z",
+          },
+        ]}
+        onCopyMessage={jest.fn()}
+        onRetryMessage={jest.fn()}
+        preferredHeight={480}
+        presentation="card"
+        showUsageStats={false}
+        showWhenEmpty
+        t={(key) => key}
+      />,
+    );
+
+    expect(
+      StyleSheet.flatten(
+        screen.getByTestId("transcript-preview-card").props.style,
+      ),
+    ).toEqual(
+      expect.objectContaining({
+        flexBasis: 480,
+        flexGrow: 0,
+        flexShrink: 1,
+      }),
+    );
+  });
+
   it("offers the image attachment control in the transcript header", () => {
     const onAddImage = jest.fn();
     const screen = render(

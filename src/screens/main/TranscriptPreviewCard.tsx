@@ -187,7 +187,15 @@ export function TranscriptPreviewCard({
         styles.transcriptShell,
         usesCanvasPresentation ? styles.transcriptShellCanvas : null,
         usesPortraitCanvas ? styles.transcriptShellPortraitCanvas : null,
-        preferredHeight ? { height: preferredHeight } : null,
+        // transcriptShell's flex: 1 means flexBasis: 0, and in a flex parent
+        // Yoga lets flexBasis beat height on the main axis. Inside an
+        // auto-height parent (the sheet dialog body) there is no free space
+        // to grow into, so a plain height here resolves to zero and the
+        // transcript vanishes. Setting the basis itself keeps the requested
+        // height while still letting the capped sheet shrink the card.
+        preferredHeight
+          ? { flexBasis: preferredHeight, flexGrow: 0, flexShrink: 1 }
+          : null,
         style,
         {
           backgroundColor: usesCanvasPresentation

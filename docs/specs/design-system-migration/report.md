@@ -362,3 +362,50 @@ once per cold start (store billing absent on the emulator).
     app (Phase 1/4 note).
 11. `sand`/`premium`/intro-banner token placement: global in the design,
     scoped to `introTheme.ts` (plus the promoted `premium`) in the app.
+
+## Cross-platform verification (Android + iOS)
+
+A second device pass compared both platforms against the design system as
+the status quo: the premium fixture scene on the Android emulator (route
+byline with effort dots, route picker sheet, credential-guard toast,
+conversation settings summary, status line, transcript handle, settings
+overview with the live readiness line, On-device page, landscape split
+view, dark appearance) and the dev build on the iOS simulator (portrait
+and landscape, dark appearance, empty-conversation workspace). Orb ring
+geometry was measured from screenshots by scanline: track ~5.3 dp, gap
+~2.7 dp, phase ring ~5 dp, halo ~7.3 dp, core ~116 dp at S≈166 dp —
+matching the specimen's 6/3/6/8/72% within rounding. The premium promo
+scene stages the thinking phase through `getStorePromoPhase`, which gave
+the tinted-core, brain-glyph, and status-dot renders a deterministic
+on-device check in both appearances.
+
+One defect found and fixed:
+
+- **The transcript sheet opened empty.** Title and "Hide transcript"
+  footer rendered with zero messages between them, on both platforms,
+  while the handle preview showed content. `transcriptShell` carries
+  `flex: 1`, i.e. `flexBasis: 0`, and inside a flex parent Yoga lets
+  `flexBasis` beat a plain `height` on the main axis. The sheet dialog's
+  auto-height body has no free space to distribute, so the card resolved
+  to zero height and `overflow: hidden` swallowed the clipped children.
+  The `preferredHeight` prop now sets `flexBasis` itself (grow 0,
+  shrink 1), keeping the requested height in an auto-height parent while
+  still letting a capped sheet shrink the card. A style-contract
+  regression test pins the basis semantics — the failure was invisible
+  to RNTL because a zero-height view still "contains" its children.
+  Verified on the rebuilt Android fixture APK (full transcript, message
+  actions, scrolling) and the iOS dev client (empty state centred in a
+  full-height card).
+
+Verification hygiene note: the iOS check initially kept rendering the
+collapsed sheet because a long-running `expo start` instance predating
+the migration served a stale module graph to warm clients while
+fresh query combinations got current code. Restarting Metro resolved
+it; screenshots alone cannot distinguish a stale bundle from a wrong
+fix — the accessibility-frame dump (`idb ui describe-all`) was the
+reliable signal.
+
+The pass also repaired two type errors that had slipped into test files
+(`VoiceOrb.test.tsx` flatten typing, `MainScreenWorkspace.test.tsx`
+missing required `backgroundTask` prop) — Jest compiles through Babel
+and never sees them, so `npm run typecheck` is the only gate that does.
