@@ -12,6 +12,7 @@ import { onboardingTranslations } from "../onboardingTranslations";
 import { introTranslations } from "../introTranslations";
 import { premiumTranslations } from "../premiumTranslations";
 import { transcriptEditTranslations } from "../transcriptEditTranslations";
+import { workspaceTranslations } from "../workspaceTranslations";
 
 export const pt = {
   ...conversationArtifactTranslations.pt,
@@ -27,6 +28,7 @@ export const pt = {
   ...introTranslations.pt,
   ...premiumTranslations.pt,
   ...transcriptEditTranslations.pt,
+  ...workspaceTranslations.pt,
   appName: "Sr. Brócolo",
   retry: "Tentar novamente",
   dismiss: "Fechar",

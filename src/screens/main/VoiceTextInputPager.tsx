@@ -1,8 +1,9 @@
 import { PhosphorIcon } from "../../design-system/PhosphorIcon";
 import React from "react";
-import { Text, TouchableOpacity, View } from "react-native";
-import { PhaseAwareVoiceAction } from "./PhaseAwareVoiceAction";
+import { AccessibilityInfo, Text, TouchableOpacity, View } from "react-native";
+import { VoiceOrb } from "../../design-system/VoiceOrb";
 import { MessageImageAttachments } from "../../components/MessageImageAttachments";
+import { useOrbTurnProgress } from "./useOrbTurnProgress";
 import { DriveSessionControls } from "./voiceTextInputPager/DriveSessionControls";
 import { InputSurfaceIndicators } from "./voiceTextInputPager/InputSurfaceIndicators";
 import { InputSurfacePages } from "./voiceTextInputPager/InputSurfacePages";
@@ -36,8 +37,6 @@ export function VoiceTextInputPager({
   onPress,
   onPressIn,
   onPressOut,
-  onInterruptPlayback,
-  onStopPlayback,
   onResolvePromptBlock,
   onSubmitTextMessage,
   onTextMessageChange,
@@ -49,12 +48,20 @@ export function VoiceTextInputPager({
   recordingMaxMs,
   recordingStartedAtMs,
   speechStartProgress,
+  maxOrbSize,
   statusLabel,
   t,
   visualPhase,
   voiceInputUnavailableMessage = null,
   voiceSurfaceUnusable = false,
 }: VoiceTextInputPagerProps) {
+  const [viewportHeight, setViewportHeight] = React.useState(0);
+  // The orb takes the space the column actually leaves it, clamped to its
+  // ceiling and a floor below which the rings stop being legible.
+  const stageSize = Math.max(
+    96,
+    Math.min(maxOrbSize, viewportHeight || maxOrbSize),
+  );
   const pager = useInputSurfacePager({
     disabled,
     initialSurface,
@@ -68,6 +75,37 @@ export function VoiceTextInputPager({
   });
   const showSurfaceIndicators =
     layout !== "landscape" || inputMode !== "drive-session";
+  const progress = useOrbTurnProgress({
+    recordingMaxMs,
+    recordingStartedAtMs: recordingStartedAtMs ?? null,
+    speechStartProgress: speechStartProgress ?? null,
+    visualPhase,
+  });
+  const showDriveCountdown =
+    inputMode === "drive-session" &&
+    visualPhase === "recording" &&
+    !driveVoiceActive &&
+    driveSilenceCountdownSeconds !== null;
+  // Announce phase boundaries, not animation frames — the orb replaces the
+  // bar that used to own this announcement.
+  const previousVisualPhase = React.useRef(visualPhase);
+  React.useEffect(() => {
+    if (previousVisualPhase.current === visualPhase) {
+      return;
+    }
+    previousVisualPhase.current = visualPhase;
+    AccessibilityInfo.announceForAccessibility(statusLabel);
+  }, [statusLabel, visualPhase]);
+
+  const handleViewportLayout = (
+    event: Parameters<typeof pager.handleLayout>[0],
+  ) => {
+    pager.handleLayout(event);
+    const nextHeight = Math.round(event.nativeEvent.layout.height);
+    setViewportHeight((currentHeight) =>
+      Math.abs(currentHeight - nextHeight) >= 1 ? nextHeight : currentHeight,
+    );
+  };
 
   return (
     <View style={styles.root}>
@@ -80,8 +118,8 @@ export function VoiceTextInputPager({
       />
       <View
         testID="voice-text-input-viewport"
-        onLayout={pager.handleLayout}
-        style={styles.viewport}
+        onLayout={handleViewportLayout}
+        style={styles.viewportFlexible}
       >
         <InputSurfacePages
           activeSurface={pager.activeSurface}
@@ -101,6 +139,7 @@ export function VoiceTextInputPager({
           promptBlockedActionEnabled={promptBlockedActionEnabled}
           promptBlockedActionLabel={promptBlockedActionLabel}
           promptBlockedProgress={promptBlockedProgress}
+          stageSize={stageSize}
           statusLabel={statusLabel}
           submissionDisabled={Boolean(promptBlockedMessage)}
           t={t}
@@ -113,25 +152,37 @@ export function VoiceTextInputPager({
           voiceInputUnavailableMessage={voiceInputUnavailableMessage}
         />
         {isActive ? (
-          <View style={styles.activeActionOverlay}>
-            <PhaseAwareVoiceAction
-              colors={colors}
-              driveSilenceCountdownSeconds={driveSilenceCountdownSeconds}
-              driveVoiceActive={driveVoiceActive}
-              inputMode={inputMode}
-              layout={layout}
-              onPress={onPress}
-              onPressIn={onPressIn}
-              onPressOut={onPressOut}
-              onInterruptPlayback={onInterruptPlayback}
-              onStopPlayback={onStopPlayback}
-              playbackPaused={playbackPaused}
-              recordingMaxMs={recordingMaxMs}
-              recordingStartedAtMs={recordingStartedAtMs}
-              speechStartProgress={speechStartProgress}
-              statusLabel={statusLabel}
-              t={t}
-              visualPhase={visualPhase}
+          <View
+            style={[styles.activeActionOverlay, styles.activeOrbOverlay]}
+            testID={`voice-stage-${visualPhase}-orb`}
+          >
+            <VoiceOrb
+              coreLabel={
+                showDriveCountdown
+                  ? String(driveSilenceCountdownSeconds)
+                  : undefined
+              }
+              coreLabelColor={
+                showDriveCountdown &&
+                driveSilenceCountdownSeconds !== null &&
+                driveSilenceCountdownSeconds <= 3
+                  ? colors.danger
+                  : undefined
+              }
+              label={statusLabel}
+              onPress={inputMode === "push-to-talk" ? undefined : onPress}
+              onPressIn={inputMode === "push-to-talk" ? onPressIn : undefined}
+              onPressOut={inputMode === "push-to-talk" ? onPressOut : undefined}
+              overtime={progress.overtime}
+              phase={visualPhase}
+              phaseProgress={
+                visualPhase === "speaking" && playbackPaused
+                  ? 0
+                  : progress.phaseProgress
+              }
+              size={stageSize}
+              testID="voice-orb-active"
+              turnProgress={progress.turnProgress}
             />
           </View>
         ) : null}

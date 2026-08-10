@@ -28,6 +28,8 @@ export function OrbSatellite({
   accessibilityLabel,
   kind = "action",
   active = false,
+  compact = false,
+  disabled = false,
   onPress,
   style,
   testID,
@@ -41,6 +43,10 @@ export function OrbSatellite({
   kind?: "action" | "toggle";
   /** Only meaningful for toggles. */
   active?: boolean;
+  /** Icon-only, for a column with no room for labels. The name stays spoken. */
+  compact?: boolean;
+  /** Briefly unavailable, such as during an active turn. Absent when never usable. */
+  disabled?: boolean;
   onPress?: () => void;
   style?: StyleProp<ViewStyle>;
   testID?: string;
@@ -50,11 +56,14 @@ export function OrbSatellite({
   const tint = active ? colors.accent : colors.textSecondary;
 
   return (
-    <View style={[styles.column, style]}>
+    <View style={[compact ? null : styles.column, style]}>
       <Pressable
         accessibilityLabel={accessibilityLabel ?? label}
         accessibilityRole={toggle ? "switch" : "button"}
-        accessibilityState={toggle ? { checked: !!active } : undefined}
+        accessibilityState={
+          toggle ? { checked: !!active, disabled } : { disabled }
+        }
+        disabled={disabled}
         onPress={onPress}
         style={[
           styles.well,
@@ -65,17 +74,20 @@ export function OrbSatellite({
                 backgroundColor: active ? colors.accentSoft : "transparent",
               }
             : styles.actionWell,
+          disabled ? styles.disabled : null,
         ]}
         testID={testID ?? `orb-satellite-${icon}`}
       >
         <PhosphorIcon color={tint} name={icon} size="control" />
       </Pressable>
-      <Text
-        numberOfLines={1}
-        style={[styles.label, { color: colors.textSecondary }]}
-      >
-        {label}
-      </Text>
+      {compact ? null : (
+        <Text
+          numberOfLines={1}
+          style={[styles.label, { color: colors.textSecondary }]}
+        >
+          {label}
+        </Text>
+      )}
     </View>
   );
 }
@@ -103,5 +115,8 @@ const styles = StyleSheet.create({
     letterSpacing: 0.75,
     textAlign: "center",
     textTransform: "uppercase",
+  },
+  disabled: {
+    opacity: 0.45,
   },
 });

@@ -7,6 +7,7 @@ import {
   TouchableOpacity as GestureTouchableOpacity,
 } from "react-native-gesture-handler";
 import Animated from "react-native-reanimated";
+import { VoiceOrb } from "../../../design-system/VoiceOrb";
 import { Colors } from "../../../theme/colors";
 import { InputMode } from "../../../types";
 import { TranslateFn } from "../shared";
@@ -32,6 +33,7 @@ interface InputSurfacePagesProps {
   promptBlockedActionEnabled: boolean;
   promptBlockedActionLabel: string | null;
   promptBlockedProgress: number | null;
+  stageSize: number;
   statusLabel: string;
   submissionDisabled: boolean;
   t: TranslateFn;
@@ -62,6 +64,7 @@ function VoiceInputSurface({
   promptBlockedActionEnabled,
   promptBlockedActionLabel,
   promptBlockedProgress,
+  stageSize,
   statusLabel,
   submissionDisabled,
   voiceInputUnavailableMessage,
@@ -77,6 +80,7 @@ function VoiceInputSurface({
   | "promptBlockedActionEnabled"
   | "promptBlockedActionLabel"
   | "promptBlockedProgress"
+  | "stageSize"
   | "statusLabel"
   | "submissionDisabled"
   | "voiceInputUnavailableMessage"
@@ -93,84 +97,104 @@ function VoiceInputSurface({
   const surfaceLabel =
     promptBlockedActionLabel ?? voiceInputUnavailableMessage;
 
+  // The blocked and unavailable states are not in the design system's orb —
+  // a mute orb would hide the one thing worth saying there. They keep the
+  // labelled bar, centred in the orb's slot so the controls below never move.
+  if (surfaceLabel || actionDisabled) {
+    return (
+      <GestureTouchableOpacity
+        testID="voice-input-surface"
+        accessibilityLabel={surfaceLabel ?? statusLabel}
+        accessibilityRole="button"
+        accessibilityState={{ disabled: actionDisabled }}
+        accessibilityValue={
+          promptBlockedProgress !== null
+            ? {
+                min: 0,
+                max: 100,
+                now: Math.round(promptBlockedProgress * 100),
+              }
+            : undefined
+        }
+        activeOpacity={0.84}
+        disabled={actionDisabled && !canResolvePromptBlock}
+        onPress={
+          inputMode === "push-to-talk" && !canResolvePromptBlock
+            ? undefined
+            : handlePress
+        }
+        onPressIn={
+          inputMode === "push-to-talk" && !canResolvePromptBlock
+            ? onPressIn
+            : undefined
+        }
+        onPressOut={
+          inputMode === "push-to-talk" && !canResolvePromptBlock
+            ? onPressOut
+            : undefined
+        }
+        style={[
+          styles.voiceSurface,
+          {
+            backgroundColor: actionDisabled
+              ? colors.surfaceAlt
+              : colors.activeControl,
+            borderColor: actionDisabled ? colors.border : colors.activeControl,
+          },
+        ]}
+      >
+        {surfaceLabel ? (
+          <Text
+            testID="voice-input-blocked-status"
+            accessibilityLiveRegion="polite"
+            numberOfLines={2}
+            style={[
+              styles.blockedActionLabel,
+              {
+                color: canResolvePromptBlock
+                  ? colors.activeControlIcon
+                  : colors.textMuted,
+              },
+            ]}
+          >
+            {surfaceLabel}
+          </Text>
+        ) : (
+          <View
+            testID="voice-input-icon"
+            style={[
+              styles.voiceIcon,
+              {
+                backgroundColor: actionDisabled
+                  ? colors.surfaceElevated
+                  : colors.activeControlIconBackground,
+              },
+            ]}
+          >
+            <PhosphorIcon
+              name="audio"
+              size="navigation"
+              color={
+                actionDisabled ? colors.textMuted : colors.activeControlIcon
+              }
+            />
+          </View>
+        )}
+      </GestureTouchableOpacity>
+    );
+  }
+
   return (
-    <GestureTouchableOpacity
-      testID="voice-input-surface"
-      accessibilityLabel={surfaceLabel ?? statusLabel}
-      accessibilityRole="button"
-      accessibilityState={{ disabled: actionDisabled }}
-      accessibilityValue={
-        promptBlockedProgress !== null
-          ? {
-              min: 0,
-              max: 100,
-              now: Math.round(promptBlockedProgress * 100),
-            }
-          : undefined
-      }
-      activeOpacity={0.84}
-      disabled={actionDisabled}
-      onPress={
-        inputMode === "push-to-talk" && !canResolvePromptBlock
-          ? undefined
-          : handlePress
-      }
-      onPressIn={
-        inputMode === "push-to-talk" && !canResolvePromptBlock
-          ? onPressIn
-          : undefined
-      }
-      onPressOut={
-        inputMode === "push-to-talk" && !canResolvePromptBlock
-          ? onPressOut
-          : undefined
-      }
-      style={[
-        styles.voiceSurface,
-        {
-          backgroundColor: actionDisabled
-            ? colors.surfaceAlt
-            : colors.activeControl,
-          borderColor: actionDisabled ? colors.border : colors.activeControl,
-        },
-      ]}
-    >
-      {surfaceLabel ? (
-        <Text
-          testID="voice-input-blocked-status"
-          accessibilityLiveRegion="polite"
-          numberOfLines={2}
-          style={[
-            styles.blockedActionLabel,
-            {
-              color: canResolvePromptBlock
-                ? colors.activeControlIcon
-                : colors.textMuted,
-            },
-          ]}
-        >
-          {surfaceLabel}
-        </Text>
-      ) : (
-        <View
-          testID="voice-input-icon"
-          style={[
-            styles.voiceIcon,
-            {
-              backgroundColor: actionDisabled
-                ? colors.surfaceElevated
-                : colors.activeControlIconBackground,
-            },
-          ]}
-        >
-          <PhosphorIcon
-            name="audio"
-            size="navigation"
-            color={actionDisabled ? colors.textMuted : colors.activeControlIcon}
-          />
-        </View>
-      )}
-    </GestureTouchableOpacity>
+    <View style={styles.orbSlot} testID="voice-input-surface">
+      <VoiceOrb
+        label={statusLabel}
+        onPress={inputMode === "push-to-talk" ? undefined : handlePress}
+        onPressIn={inputMode === "push-to-talk" ? onPressIn : undefined}
+        onPressOut={inputMode === "push-to-talk" ? onPressOut : undefined}
+        size={stageSize}
+        testID="voice-orb-idle"
+      />
+    </View>
   );
 }
 

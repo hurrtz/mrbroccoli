@@ -43,6 +43,13 @@ export interface VoiceTextInputPagerProps {
   recordingMaxMs: number;
   recordingStartedAtMs?: number | null;
   speechStartProgress?: VoiceTimingProgress | null;
+  /**
+   * The orb's ceiling — 196 in portrait, 150 in landscape. The pager measures
+   * the space the column actually leaves its viewport and fits the orb to it,
+   * so anything that shortens the column simply makes the orb smaller instead
+   * of pushing it over its neighbours.
+   */
+  maxOrbSize: number;
   statusLabel: string;
   t: TranslateFn;
   visualPhase: VoiceVisualPhase;

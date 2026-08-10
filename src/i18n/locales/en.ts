@@ -12,6 +12,7 @@ import { onboardingTranslations } from "../onboardingTranslations";
 import { introTranslations } from "../introTranslations";
 import { premiumTranslations } from "../premiumTranslations";
 import { transcriptEditTranslations } from "../transcriptEditTranslations";
+import { workspaceTranslations } from "../workspaceTranslations";
 
 export const en = {
   ...conversationArtifactTranslations.en,
@@ -27,6 +28,7 @@ export const en = {
   ...introTranslations.en,
   ...premiumTranslations.en,
   ...transcriptEditTranslations.en,
+  ...workspaceTranslations.en,
   appName: "Mr Broccoli",
   retry: "Retry",
   dismiss: "Dismiss",

@@ -26,6 +26,8 @@ interface MainScreenVoiceStageProps {
   inputMode: InputMode;
   isActive: boolean;
   layout?: "portrait" | "landscape";
+  /** The orb's ceiling: 196 in portrait, 150 in landscape. */
+  maxOrbSize: number;
   onInputSurfaceChange?: (surface: InputSurface) => void;
   onRemoveImage?: (attachmentId: string) => void;
   onDriveContinue?: () => void | Promise<void>;
@@ -67,6 +69,7 @@ export const MainScreenVoiceStage = React.memo(function MainScreenVoiceStage({
   inputMode,
   isActive,
   layout = "portrait",
+  maxOrbSize,
   onInputSurfaceChange,
   onRemoveImage,
   onDriveContinue,
@@ -126,6 +129,7 @@ export const MainScreenVoiceStage = React.memo(function MainScreenVoiceStage({
           inputMode={inputMode}
           isActive={isActive}
           layout={layout}
+          maxOrbSize={maxOrbSize}
           onInputSurfaceChange={onInputSurfaceChange}
           onRemoveImage={onRemoveImage}
           onDriveContinue={onDriveContinue}

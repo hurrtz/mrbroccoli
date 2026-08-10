@@ -114,7 +114,16 @@ been requested.
 Secondary surfaces are coordinated centrally so modal focus, dismissal, and
 back behavior remain deterministic. Opening one mutually exclusive modal closes
 the previous one through an explicit surface action. Conversation drawers may
-remain contextual, but no hidden surface owns authoritative app data.
+remain contextual, but no hidden surface owns authoritative app data. The
+route-picker and transcript sheets follow the same rule: their visibility
+lives in `useMainScreenUiState`, not inside the workspace tree.
+
+The orb's ring values come from `useOrbTurnProgress`, which re-renders on a
+coarse tick and reads the clock at render time: recording fills the inner ring
+against the capture cap, the speech-start estimate drives the outer ring, and
+overtime past the estimate fills both with red. Processing phases carry no
+per-phase estimate, so their inner ring deliberately rests on the phase tint
+rather than faking a fraction.
 
 ## Evidence
 

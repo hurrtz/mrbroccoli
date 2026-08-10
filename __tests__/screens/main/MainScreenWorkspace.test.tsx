@@ -3,6 +3,7 @@ import { render, within } from "@testing-library/react-native";
 import { StyleSheet } from "react-native";
 
 import { MainScreenWorkspace } from "../../../src/screens/main/MainScreenWorkspace";
+import { ThemeProvider } from "../../../src/theme/ThemeContext";
 import { lightColors } from "../../../src/theme/colors";
 import {
   DEFAULT_SETTINGS,
@@ -10,16 +11,15 @@ import {
   type ResponseMode,
 } from "../../../src/types";
 
-let mockRouteToggleRenderCount = 0;
-let mockTranscriptRenderCount = 0;
+let mockRouteBylineRenderCount = 0;
 let mockVoicePagerRenderCount = 0;
 
-jest.mock("../../../src/components/ResponseModeToggle", () => ({
-  ResponseModeToggle: () => {
+jest.mock("../../../src/screens/main/MainScreenRouteByline", () => ({
+  MainScreenRouteByline: () => {
     const React = require("react");
     const { Text } = require("react-native");
-    mockRouteToggleRenderCount += 1;
-    return React.createElement(Text, null, "response-mode-toggle");
+    mockRouteBylineRenderCount += 1;
+    return React.createElement(Text, null, "route-byline");
   },
 }));
 
@@ -36,94 +36,122 @@ jest.mock("../../../src/screens/main/TranscriptPreviewCard", () => ({
   TranscriptPreviewCard: () => {
     const React = require("react");
     const { Text } = require("react-native");
-    mockTranscriptRenderCount += 1;
     return React.createElement(Text, null, "transcript-preview");
   },
 }));
 
-describe("MainScreenWorkspace streaming isolation", () => {
-  beforeEach(() => {
-    mockRouteToggleRenderCount = 0;
-    mockTranscriptRenderCount = 0;
-    mockVoicePagerRenderCount = 0;
-  });
-
-  it("does not rerender static controls when only transcript messages change", () => {
-    const activeResponseMode =
-      DEFAULT_SETTINGS.activeResponseMode as ResponseMode;
-    const onOpenDrawer = jest.fn();
-    const onOpenSettings = jest.fn();
-    const onOpenSetupGuide = jest.fn();
-    const onSelectResponseMode = jest.fn();
-    const onToggleWebSearchEnabled = jest.fn();
-    const onPress = jest.fn();
-    const onPressIn = jest.fn();
-    const onPressOut = jest.fn();
-    const onSubmitTextMessage = jest.fn();
-    const onCopyMessage = jest.fn(async () => true);
-    const onRetryMessage = jest.fn();
-    const t = jest.fn((key: string) => key);
-    const transcriptBase = {
-      activeConversationId: "conversation-1",
-      activeConversationTitle: "Streaming test",
-      activeReplayMessageId: null,
-      onCopyMessage,
-      onRetryMessage,
-      replayPhase: "idle" as const,
-      scrollEnabled: true,
-      showStyleControl: true,
-      showUsageStats: false,
-      showWhenEmpty: true,
-      t,
-    };
-    const introBannerProps = {
+function createWorkspaceProps(t: jest.Mock) {
+  const activeResponseMode =
+    DEFAULT_SETTINGS.activeResponseMode as ResponseMode;
+  return {
+    colors: lightColors,
+    introBanner: {
       onDismiss: jest.fn(),
       onOpen: jest.fn(),
       showDismiss: true,
       t: ((key: string) => key) as never,
       visible: false,
-    };
-    const workspaceProps = {
-      colors: lightColors,
-      introBanner: introBannerProps,
-      isLandscape: false,
-      topBar: {
-        brandName: "Mr Broccoli",
-        drawerLabel: "Conversations",
-        onOpenDrawer,
-        onOpenSettings,
-        settingsLabel: "Settings",
-      },
-      routeCard: {
-        activeResponseMode,
-        availableResponseModes: [activeResponseMode],
-        isPremium: true,
-        offlineReady: false,
-        onOpenSetupGuide,
-        onSelectResponseMode,
-        responseModes: DEFAULT_SETTINGS.responseModes,
-        t,
-      },
-      routeControls: {
-        onToggleWebSearchEnabled,
-        t,
-        webSearchEnabled: true,
-        webSearchReady: true,
-      },
-      voiceStage: {
-        inputMode: DEFAULT_SETTINGS.inputMode,
-        isActive: true,
-        onPress,
-        onPressIn,
-        onPressOut,
-        onStopPlayback: jest.fn(),
-        onSubmitTextMessage,
-        recordingMaxMs: 60_000,
-        statusTitle: "Thinking",
-        t,
-        visualPhase: "thinking" as const,
-      },
-    };
+    },
+    isLandscape: false,
+    routeCard: {
+      activeResponseMode,
+      availableResponseModes: [activeResponseMode],
+      isPremium: true,
+      offlineReady: false,
+      onOpenRoutePicker: jest.fn(),
+      onOpenSetupGuide: jest.fn(),
+      responseModes: DEFAULT_SETTINGS.responseModes,
+      t,
+    },
+    routePicker: {
+      modes: DEFAULT_SETTINGS.responseModes,
+      onClose: jest.fn(),
+      onSelect: jest.fn(),
+      readyModes: [activeResponseMode],
+      selected: activeResponseMode,
+      visible: false,
+    },
+    satellites: {
+      councilActive: false,
+      councilAvailable: true,
+      disabled: false,
+      imageAvailable: true,
+      imageDisabled: false,
+      onAddImage: jest.fn(),
+      onInterruptPlayback: jest.fn(),
+      onStopPlayback: jest.fn(),
+      onToggleCouncil: jest.fn(),
+      onToggleWeb: jest.fn(),
+      t,
+      webActive: true,
+      webAvailable: true,
+    },
+    settingsSummary: {
+      accessibilityLabel: "Conversation settings",
+      onPress: jest.fn(),
+      summary: "Balanced · Brief",
+    },
+    statusLine: {
+      detailActive: "Working through the answer",
+      detailIdle: "Streaming test · 1 message",
+      onInfo: jest.fn(),
+      sessionDetailsLabel: "Session details",
+      titleActive: "Thinking",
+      titleIdleText: "Type and send",
+      titleIdleVoice: "Tap to speak",
+    },
+    topBar: {
+      brandName: "Mr Broccoli",
+      drawerLabel: "Conversations",
+      onOpenDrawer: jest.fn(),
+      onOpenSettings: jest.fn(),
+      settingsLabel: "Settings",
+    },
+    transcriptSheet: {
+      countLabel: "1 message",
+      emptyLabel: "No messages yet",
+      hideLabel: "Hide transcript",
+      onClose: jest.fn(),
+      onOpen: jest.fn(),
+      showLabel: "Show transcript",
+      title: "Streaming test",
+      visible: false,
+    },
+    visualPhase: "thinking" as const,
+    voiceStage: {
+      inputMode: DEFAULT_SETTINGS.inputMode,
+      isActive: true,
+      onPress: jest.fn(),
+      onPressIn: jest.fn(),
+      onPressOut: jest.fn(),
+      onStopPlayback: jest.fn(),
+      onSubmitTextMessage: jest.fn(),
+      recordingMaxMs: 60_000,
+      statusTitle: "Thinking",
+      t,
+      visualPhase: "thinking" as const,
+    },
+  };
+}
+
+function renderWorkspace(ui: React.ReactElement) {
+  const screen = render(<ThemeProvider mode="light">{ui}</ThemeProvider>);
+  return {
+    ...screen,
+    rerender: (next: React.ReactElement) =>
+      screen.rerender(<ThemeProvider mode="light">{next}</ThemeProvider>),
+  };
+}
+
+describe("MainScreenWorkspace streaming isolation", () => {
+  beforeEach(() => {
+    mockRouteBylineRenderCount = 0;
+    mockVoicePagerRenderCount = 0;
+  });
+
+  it("does not rerender static controls when only transcript messages change", () => {
+    const t = jest.fn((key: string) => key);
+    const workspaceProps = createWorkspaceProps(t);
     const storedMessage: Message = {
       id: "message-1",
       role: "user",
@@ -140,8 +168,21 @@ describe("MainScreenWorkspace streaming isolation", () => {
       provider: "openai",
       timestamp: "2026-07-24T08:00:01.000Z",
     };
+    const transcriptBase = {
+      activeConversationId: "conversation-1",
+      activeConversationTitle: "Streaming test",
+      activeReplayMessageId: null,
+      onCopyMessage: jest.fn(async () => true),
+      onRetryMessage: jest.fn(),
+      replayPhase: "idle" as const,
+      scrollEnabled: true,
+      showStyleControl: true,
+      showUsageStats: false,
+      showWhenEmpty: true,
+      t,
+    };
 
-    const screen = render(
+    const screen = renderWorkspace(
       <MainScreenWorkspace
         {...workspaceProps}
         transcript={{
@@ -151,15 +192,12 @@ describe("MainScreenWorkspace streaming isolation", () => {
       />,
     );
 
-    expect(mockRouteToggleRenderCount).toBe(1);
+    expect(mockRouteBylineRenderCount).toBe(1);
     expect(mockVoicePagerRenderCount).toBe(1);
-    expect(mockTranscriptRenderCount).toBe(1);
-    expect(t.mock.calls.filter(([key]) => key === "webSearch")).toHaveLength(2);
-    // Web Search sits under the control it modifies: it changes how the next
-    // turn is answered, not something to pass through on the way in.
+    // The satellites sit with the input they modify, under the orb.
     expect(
       within(screen.getByTestId("portrait-input-section")).getByTestId(
-        "route-controls-row",
+        "workspace-satellites",
       ),
     ).toBeTruthy();
 
@@ -173,70 +211,40 @@ describe("MainScreenWorkspace streaming isolation", () => {
       />,
     );
 
-    expect(mockRouteToggleRenderCount).toBe(1);
+    expect(mockRouteBylineRenderCount).toBe(1);
     expect(mockVoicePagerRenderCount).toBe(1);
-    expect(mockTranscriptRenderCount).toBe(2);
-    expect(t.mock.calls.filter(([key]) => key === "webSearch")).toHaveLength(2);
+    // The handle keeps reading from the live message list.
+    expect(screen.getByText("Hello there")).toBeTruthy();
   });
 
   it("top-aligns the complete Drive control stack in constrained landscape", () => {
-    const screen = render(
+    const t = jest.fn((key: string) => key);
+    const workspaceProps = createWorkspaceProps(t);
+    const screen = renderWorkspace(
       <MainScreenWorkspace
-        colors={lightColors}
-        introBanner={{
-          onDismiss: jest.fn(),
-          onOpen: jest.fn(),
-          showDismiss: true,
-          t: ((key: string) => key) as never,
-          visible: false,
-        }}
+        {...workspaceProps}
         isLandscape
-        topBar={{
-          brandName: "Mr Broccoli",
-          drawerLabel: "Conversations",
-          onOpenDrawer: jest.fn(),
-          onOpenSettings: jest.fn(),
-          settingsLabel: "Settings",
-        }}
-        routeCard={{
-          activeResponseMode: DEFAULT_SETTINGS.activeResponseMode,
-          availableResponseModes: [],
-          isPremium: true,
-          offlineReady: false,
-          onOpenSetupGuide: jest.fn(),
-          onSelectResponseMode: jest.fn(),
-          responseModes: DEFAULT_SETTINGS.responseModes,
-          t: jest.fn((key: string) => key),
-        }}
-        routeControls={{
-          t: jest.fn((key: string) => key),
-        }}
-        voiceStage={{
-          inputMode: "drive-session",
-          isActive: false,
-          onPress: jest.fn(),
-          onPressIn: jest.fn(),
-          onPressOut: jest.fn(),
-          onStopPlayback: jest.fn(),
-          onSubmitTextMessage: jest.fn(),
-          recordingMaxMs: 60_000,
-          statusTitle: "Drive",
-          t: jest.fn((key: string) => key),
-          visualPhase: "idle",
-        }}
         transcript={{
           activeConversationId: null,
           activeConversationTitle: "Untitled",
           activeReplayMessageId: null,
           messages: [],
-          onCopyMessage: jest.fn(),
+          onCopyMessage: jest.fn(async () => true),
           onRetryMessage: jest.fn(),
           replayPhase: "idle",
           scrollEnabled: true,
           showStyleControl: false,
           showUsageStats: false,
           showWhenEmpty: true,
-          t: jest.fn((key: string) => key),
+          t,
+        }}
+        visualPhase="idle"
+        voiceStage={{
+          ...workspaceProps.voiceStage,
+          inputMode: "drive-session",
+          isActive: false,
+          statusTitle: "Drive",
+          visualPhase: "idle",
         }}
       />,
     );

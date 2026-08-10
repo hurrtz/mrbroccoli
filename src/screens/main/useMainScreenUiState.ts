@@ -13,6 +13,8 @@ export function useMainScreenUiState() {
   const [settingsFocusPage, setSettingsFocusPage] = useState<SettingsPage | undefined>();
   const [drawerVisible, setDrawerVisible] = useState(false);
   const [statusDetailsVisible, setStatusDetailsVisible] = useState(false);
+  const [routePickerVisible, setRoutePickerVisible] = useState(false);
+  const [transcriptSheetVisible, setTranscriptSheetVisible] = useState(false);
   const [memoryConversation, setMemoryConversation] =
     useState<Conversation | null>(null);
   const [memoryVisible, setMemoryVisible] = useState(false);
@@ -74,6 +76,22 @@ export function useMainScreenUiState() {
     setStatusDetailsVisible(false);
   }, []);
 
+  const openRoutePicker = useCallback(() => {
+    setRoutePickerVisible(true);
+  }, []);
+
+  const closeRoutePicker = useCallback(() => {
+    setRoutePickerVisible(false);
+  }, []);
+
+  const openTranscriptSheet = useCallback(() => {
+    setTranscriptSheetVisible(true);
+  }, []);
+
+  const closeTranscriptSheet = useCallback(() => {
+    setTranscriptSheetVisible(false);
+  }, []);
+
   const runAfterDrawerDismiss = useCallback(
     (action: () => void) => {
       if (!drawerVisible) {
@@ -113,7 +131,9 @@ export function useMainScreenUiState() {
     settingsFocusTab,
     settingsFocusPage,
     drawerVisible,
+    routePickerVisible,
     statusDetailsVisible,
+    transcriptSheetVisible,
     memoryConversation,
     memoryVisible,
     setDrawerVisible,
@@ -125,6 +145,10 @@ export function useMainScreenUiState() {
     closeMemory,
     openStatusDetails,
     closeStatusDetails,
+    openRoutePicker,
+    closeRoutePicker,
+    openTranscriptSheet,
+    closeTranscriptSheet,
     runAfterDrawerDismiss,
     handleDrawerDismiss,
   };

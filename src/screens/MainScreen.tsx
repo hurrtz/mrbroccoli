@@ -219,7 +219,9 @@ export function MainScreen() {
     settingsFocusTab,
     settingsFocusPage,
     drawerVisible,
+    routePickerVisible,
     statusDetailsVisible,
+    transcriptSheetVisible,
     memoryConversation,
     memoryVisible,
     setDrawerVisible,
@@ -228,7 +230,12 @@ export function MainScreen() {
     closeSettings,
     openMemoryConversation,
     closeMemory,
+    openStatusDetails,
     closeStatusDetails,
+    openRoutePicker,
+    closeRoutePicker,
+    openTranscriptSheet,
+    closeTranscriptSheet,
     runAfterDrawerDismiss,
     handleDrawerDismiss,
   } = useMainScreenUiState();
@@ -908,25 +915,68 @@ export function MainScreen() {
             : [],
           isPremium: freeOffline.entitlement.isPremium,
           offlineReady: freeOffline.freeRuntimeReady,
+          onOpenRoutePicker: openRoutePicker,
           onOpenSetupGuide: freeOffline.entitlement.isPremium
             ? handleOpenProviderSettings
             : openIntro,
-          onSelectResponseMode: handleResponseModeChange,
           responseModes: runtimeSettings.responseModes,
           t,
         },
-        routeControls: {
-          showWebSearch: freeOffline.entitlement.isPremium,
-          onToggleUlraMode: ulraMode.handleToggle,
-          onToggleWebSearchEnabled: handleToggleWebSearch,
-          t,
-          ulraModeActive: premiumStorePromoActive || ulraMode.active,
-          ulraModeAvailable:
+        routePicker: {
+          modes: runtimeSettings.responseModes,
+          onClose: closeRoutePicker,
+          onSelect: handleResponseModeChange,
+          readyModes: loaded ? presentationAvailableResponseModes : [],
+          selected: activeResponseMode,
+          visible: routePickerVisible,
+        },
+        satellites: {
+          councilActive: premiumStorePromoActive || ulraMode.active,
+          councilAvailable:
             freeOffline.entitlement.isPremium &&
             (premiumStorePromoActive || ulraMode.available),
-          webSearchEnabled: webSearchActive,
-          webSearchReady: freeOffline.entitlement.isPremium && webSearchReady,
+          disabled: voiceStageActive,
+          imageAvailable: imageAttachmentAvailable,
+          imageDisabled: imageAttachmentDisabled,
+          onAddImage: imagePromptSubmission.handleAddImage,
+          onInterruptPlayback: handleInterruptPlayback,
+          onStopPlayback: handleStopPlayback,
+          onToggleCouncil: ulraMode.handleToggle,
+          onToggleWeb: handleToggleWebSearch,
+          t,
+          webActive: webSearchActive,
+          webAvailable:
+            freeOffline.entitlement.isPremium &&
+            webSearchReady &&
+            Boolean(handleToggleWebSearch),
         },
+        settingsSummary: {
+          accessibilityLabel: t("openStyleSheet"),
+          onPress: handleOpenConversationSettings,
+          summary: `${t(responseTone)} · ${t(responseLength)}`,
+        },
+        statusLine: {
+          detailActive: statusDisplay.statusDetail,
+          detailIdle: `${activeConversationTitle} · ${
+            statusDisplay.messageCountLabel ?? t("freshSession")
+          }`,
+          onInfo: openStatusDetails,
+          sessionDetailsLabel: t("workspaceSessionDetails"),
+          titleActive: statusDisplay.statusTitle,
+          titleIdleText: t("workspaceTypeAndSend"),
+          titleIdleVoice: statusDisplay.actionLabel,
+        },
+        transcriptSheet: {
+          countLabel: statusDisplay.messageCountLabel,
+          emptyLabel: t("workspaceNoMessagesYet"),
+          hideLabel: t("workspaceHideTranscript"),
+          onClose: closeTranscriptSheet,
+          onOpen: openTranscriptSheet,
+          showLabel: t("showTranscript"),
+          title: activeConversationTitle,
+          visible: transcriptSheetVisible,
+        },
+        visualPhase,
         voiceStage: {
           attachments: pendingImages.attachments,
           disabled: voiceStageDisabled,

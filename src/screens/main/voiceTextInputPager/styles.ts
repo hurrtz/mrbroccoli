@@ -5,6 +5,8 @@ export const PAGE_GAP = 32;
 
 export const voiceTextInputPagerStyles = StyleSheet.create({
   root: {
+    flex: 1,
+    minHeight: 0,
     width: "100%",
     gap: 2,
   },
@@ -14,9 +16,17 @@ export const voiceTextInputPagerStyles = StyleSheet.create({
     overflow: "hidden",
     position: "relative",
   },
+  viewportFlexible: {
+    flex: 1,
+    minHeight: 96,
+    overflow: "hidden",
+    position: "relative",
+    width: "100%",
+  },
   track: {
     flexDirection: "row",
     gap: PAGE_GAP,
+    height: "100%",
   },
   trackCovered: {
     opacity: 0,
@@ -24,8 +34,19 @@ export const voiceTextInputPagerStyles = StyleSheet.create({
   activeActionOverlay: {
     ...StyleSheet.absoluteFill,
   },
-  page: {
+  activeOrbOverlay: {
+    alignItems: "center",
     justifyContent: "center",
+  },
+  page: {
+    height: "100%",
+    justifyContent: "center",
+  },
+  orbSlot: {
+    alignItems: "center",
+    flex: 1,
+    justifyContent: "center",
+    width: "100%",
   },
   voiceSurface: {
     width: "100%",

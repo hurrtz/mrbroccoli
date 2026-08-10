@@ -12,6 +12,7 @@ import { onboardingTranslations } from "../onboardingTranslations";
 import { introTranslations } from "../introTranslations";
 import { premiumTranslations } from "../premiumTranslations";
 import { transcriptEditTranslations } from "../transcriptEditTranslations";
+import { workspaceTranslations } from "../workspaceTranslations";
 
 export const ru = {
   ...conversationArtifactTranslations.ru,
@@ -27,6 +28,7 @@ export const ru = {
   ...introTranslations.ru,
   ...premiumTranslations.ru,
   ...transcriptEditTranslations.ru,
+  ...workspaceTranslations.ru,
   appName: "Мистер Брокколи",
   retry: "Повторить попытку",
   dismiss: "Закрыть",

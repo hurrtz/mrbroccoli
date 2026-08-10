@@ -146,3 +146,63 @@ empty tracks, and overtime fills both rings with red.
   app; it appears to describe a different (possibly composed) surface. No
   conflict in shipped geometry; nothing changed. **Open question:** which
   surface the 62px token refers to.
+
+## Phase 5 — The home screen
+
+### Applied
+
+- `RouteByline` (`MainScreenRouteByline`) replaces `ResponseModeToggle` on the
+  home screen: one line at every model count, the model's own effort scale as
+  dots, a credit line when only one model is configured, and `RoutePickerSheet`
+  for switching. The free-edition chip and the provider empty state stay.
+- The orb replaces the docked bar as the primary action. The pager keeps its
+  two pages, its bar indicator (carets remain the owner question the goal
+  already parks), its gesture, and the composer geometry untouched; only the
+  voice page changed. The pager measures its viewport and fits the orb
+  (min 96, ceiling 196/150), so the intro banner shrinks the orb naturally.
+- `ConversationSettingsSummary` states tone · length under the byline and
+  opens the conversation style sheet. Voice was left out of the line: the app
+  has no stable short voice noun across its routing modes; question for the
+  owner whether to add one.
+- `WorkspaceStatusLine` with the phase dot and the session-details entry;
+  `TranscriptHandle` + a portrait transcript sheet reusing the full
+  `TranscriptPreviewCard` (copy, branch, edit, replay all intact). Landscape
+  keeps the transcript inline, with the intro banner in the right pane per the
+  kit's reasoning.
+- Satellites: image (momentary), Council (`ulraMode`, "Model Council") and Web
+  as toggles, availability rules unchanged (absent when never usable, disabled
+  during a turn). Nineteen-locale keys added for the six new strings via a
+  shared `workspaceTranslations` module.
+
+### Translation decisions
+
+- **Blocked and unavailable voice states keep the labelled bar** in the orb's
+  slot. The design has no blocked orb, and a mute orb would hide the one thing
+  worth saying; the bar centres in the same slot so nothing moves.
+- **Stop and barge-in during speech move to the satellites row.** The bar
+  carried them as sub-controls; the orb has one press (pause/resume as
+  before). The design gives speech only "tap to stop" — that would delete the
+  app's barge-in capability, so the row keeps both, appearing only while
+  speaking.
+- **Drive Session's silence countdown renders in the orb core** in place of
+  the glyph, red at three seconds, exactly as the bar did.
+- **The pager survives in landscape.** The kit sheds it ("no second input
+  page"), but the app's contract routes users to the composer whenever voice
+  cannot be pressed — removing text input in landscape would break that.
+- **The orb's inner ring rests on the phase tint during processing phases.**
+  The app has no per-phase estimates, only the speech-start estimate driving
+  the outer ring; faking inner progress would violate the "real readings only"
+  instinct the goal applies elsewhere.
+- **The transcript handle's meta shows the model name without "2 min ago".**
+  A relative-time system is nineteen new plural-aware keys and a ticking
+  clock; deferred, and noted for the owner.
+
+### For the owner
+
+- Pager carets versus bar indicator: unchanged, bar indicator ships (§4 of the
+  goal already parks this).
+- Whether the settings summary line should include a third noun (voice), and
+  what it should be per route.
+- `MainScreen` still passes `onInterruptPlayback`/`onStopPlayback` into the
+  voice stage for the retained bar's contract even though the orb path uses
+  them from the satellites row; harmless duplication kept for the bar's sake.

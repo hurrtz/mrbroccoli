@@ -57,6 +57,11 @@ export const styles = StyleSheet.create({
     flex: 1,
     minHeight: 0,
   },
+  portraitInputSection: {
+    flex: 1,
+    minHeight: 0,
+    gap: 16,
+  },
   landscapeShell: {
     flex: 1,
     flexDirection: "row",
@@ -199,6 +204,8 @@ export const styles = StyleSheet.create({
     fontFamily: fonts.mono,
   },
   stageBlock: {
+    flex: 1,
+    minHeight: 0,
     width: "100%",
     paddingTop: 0,
     paddingBottom: 0,
@@ -281,6 +288,8 @@ export const styles = StyleSheet.create({
     paddingBottom: 18,
   },
   voiceDock: {
+    flex: 1,
+    minHeight: 0,
     borderRadius: 0,
     borderWidth: 0,
     padding: 0,

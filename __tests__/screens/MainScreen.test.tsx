@@ -572,9 +572,6 @@ describe("MainScreen", () => {
   it("renders the shell with the route card", () => {
     const screen = renderWithProviders(<MainScreen />);
     const inputSection = within(screen.getByTestId("portrait-input-section"));
-    const transcriptPane = within(
-      screen.getByTestId("portrait-transcript-pane"),
-    );
 
     expect(screen.getByText("route-card")).toBeTruthy();
     expect(screen.queryByTestId("route-web-search-container")).toBeNull();
@@ -584,10 +581,11 @@ describe("MainScreen", () => {
         screen.getByTestId("portrait-conversation-stack").props.style,
       ).marginTop,
     ).toBe(6);
-    expect(
-      transcriptPane.getByText("transcript-preview:empty-visible"),
-    ).toBeTruthy();
-    expect(transcriptPane.queryByTestId("portrait-pane-divider")).toBeNull();
+    // The transcript demotes to a peeking handle; the full transcript opens
+    // as a sheet over the workspace rather than living inline.
+    expect(screen.getByTestId("transcript-handle")).toBeTruthy();
+    expect(screen.queryByTestId("transcript-preview")).toBeNull();
+    expect(screen.getByTestId("workspace-status-line")).toBeTruthy();
     expect(screen.getByText("settings:closed")).toBeTruthy();
     expect(screen.getByText("drawer:closed")).toBeTruthy();
     expect(screen.getByText("open-drawer")).toBeTruthy();
@@ -660,7 +658,7 @@ describe("MainScreen", () => {
     });
     useSharedSettings.mockReturnValue(sharedSettings);
     const screen = renderWithProviders(<MainScreen />);
-    const searchControl = screen.getByTestId("route-web-search-container");
+    const searchControl = screen.getByTestId("satellite-web");
 
     expect(searchControl.props.accessibilityState.checked).toBe(true);
     fireEvent.press(searchControl);
@@ -942,7 +940,7 @@ describe("MainScreen", () => {
     expect(screen.getByText("route-card")).toBeTruthy();
   });
 
-  it("renders the style control in the conversation header when a provider is configured", () => {
+  it("states the conversation's quick settings as one line with its control", () => {
     const provider = DEFAULT_SETTINGS.responseModes[0].route.provider;
     const route = {
       provider,
@@ -962,7 +960,11 @@ describe("MainScreen", () => {
     const screen = renderWithProviders(<MainScreen />);
 
     expect(screen.getByText("route-card")).toBeTruthy();
-    expect(screen.getByText("transcript-style-control")).toBeTruthy();
+    expect(screen.getByTestId("conversation-settings-summary")).toBeTruthy();
+    expect(
+      screen.getByTestId("conversation-settings-summary-control").props
+        .accessibilityLabel,
+    ).toBe("Open conversation settings");
   });
 
   it("uses the balanced two-pane landscape hierarchy", () => {
@@ -1000,7 +1002,7 @@ describe("MainScreen", () => {
     ).toBe(0.9);
     expect(screen.getByTestId("landscape-pane-divider")).toBeTruthy();
     expect(
-      screen.getByTestId("route-web-search-container").props.accessibilityState,
+      leftPane.getByTestId("satellite-web").props.accessibilityState,
     ).toEqual({ checked: false, disabled: false });
     expect(leftPane.queryByTestId("route-style-control")).toBeNull();
     expect(leftPane.queryByText("status-strip")).toBeNull();

@@ -9,10 +9,10 @@ import {
 
 import { PhosphorIcon } from "../../design-system/PhosphorIcon";
 
-import { ResponseModeToggle } from "../../components/ResponseModeToggle";
 import { Colors } from "../../theme/colors";
 import { ResponseMode, ResponseModeSelections } from "../../types";
 
+import { MainScreenRouteByline } from "./MainScreenRouteByline";
 import { TranslateFn } from "./shared";
 import { styles } from "./styles";
 
@@ -23,8 +23,8 @@ interface MainScreenRouteCardProps {
   compact?: boolean;
   isPremium: boolean;
   offlineReady: boolean;
+  onOpenRoutePicker: () => void;
   onOpenSetupGuide: () => void;
-  onSelectResponseMode: (mode: ResponseMode) => void;
   responseModes: ResponseModeSelections;
   style?: StyleProp<ViewStyle>;
   t: TranslateFn;
@@ -37,12 +37,16 @@ export const MainScreenRouteCard = React.memo(function MainScreenRouteCard({
   compact = false,
   isPremium,
   offlineReady,
+  onOpenRoutePicker,
   onOpenSetupGuide,
-  onSelectResponseMode,
   responseModes,
   style,
   t,
 }: MainScreenRouteCardProps) {
+  const activeMode =
+    responseModes.find((mode) => mode.id === activeResponseMode) ??
+    responseModes[0];
+
   return (
     <View
       style={[
@@ -78,14 +82,12 @@ export const MainScreenRouteCard = React.memo(function MainScreenRouteCard({
           <PhosphorIcon name="right" size="inline" color={colors.textMuted} />
         </TouchableOpacity>
       ) : null}
-      {availableResponseModes.length > 0 ? (
+      {availableResponseModes.length > 0 && activeMode ? (
         <View testID="response-mode-row" style={styles.routeModeRow}>
-          <ResponseModeToggle
-            compact={compact}
-            selected={activeResponseMode}
-            onSelect={onSelectResponseMode}
-            modes={responseModes}
-            readyModes={availableResponseModes}
+          <MainScreenRouteByline
+            mode={activeMode}
+            onPress={onOpenRoutePicker}
+            switchable={availableResponseModes.length > 1}
           />
         </View>
       ) : !isPremium ? null : (

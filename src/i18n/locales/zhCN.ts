@@ -12,6 +12,7 @@ import { onboardingTranslations } from "../onboardingTranslations";
 import { introTranslations } from "../introTranslations";
 import { premiumTranslations } from "../premiumTranslations";
 import { transcriptEditTranslations } from "../transcriptEditTranslations";
+import { workspaceTranslations } from "../workspaceTranslations";
 
 export const zhCN = {
   ...conversationArtifactTranslations["zh-CN"],
@@ -27,6 +28,7 @@ export const zhCN = {
   ...introTranslations["zh-CN"],
   ...premiumTranslations["zh-CN"],
   ...transcriptEditTranslations["zh-CN"],
+  ...workspaceTranslations["zh-CN"],
   appName: "西兰花先生",
   retry: "重试",
   dismiss: "关闭",

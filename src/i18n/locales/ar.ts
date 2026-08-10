@@ -12,6 +12,7 @@ import { onboardingTranslations } from "../onboardingTranslations";
 import { introTranslations } from "../introTranslations";
 import { premiumTranslations } from "../premiumTranslations";
 import { transcriptEditTranslations } from "../transcriptEditTranslations";
+import { workspaceTranslations } from "../workspaceTranslations";
 
 export const ar = {
   ...conversationArtifactTranslations.ar,
@@ -27,6 +28,7 @@ export const ar = {
   ...introTranslations.ar,
   ...premiumTranslations.ar,
   ...transcriptEditTranslations.ar,
+  ...workspaceTranslations.ar,
   appName: "السيد بروكلي",
   retry: "أعد المحاولة",
   dismiss: "إغلاق",

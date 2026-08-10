@@ -31,11 +31,31 @@ receive already-derived state and callbacks.
 
 ## User Contract
 
-- The primary action always represents the current voice phase: idle,
-  recording, transcribing, brief thinking, searching, thinking, synthesizing,
-  or speaking.
+- The primary action is the voice orb, the workspace's one loud element. It
+  always represents the current voice phase: idle, recording, transcribing,
+  brief thinking, searching, thinking, synthesizing, or speaking. Two
+  concentric rings carry two clocks — the inner one the current phase against
+  itself, the outer one the whole turn against its speech-start estimate; past
+  the estimate both fill with red. At rest the orb draws a plain halo, not two
+  empty tracks. The orb is sized from the space the column actually leaves it,
+  clamped between 96pt and its ceiling (196 portrait, 150 landscape), so the
+  intro banner or a landscape split simply makes it smaller.
+- When the voice route is blocked or unavailable, the labelled bar replaces
+  the orb in its slot: a mute orb would hide the one thing worth saying there.
+- The route byline above the stage states who answers the next turn and at
+  what effort — one line at every model count, with the model list in a sheet
+  opened from it. With a single configured model it becomes a credit line.
+  `ResponseModeToggle` and `PhaseAwareVoiceAction` remain in the codebase,
+  correct anywhere a picker grid or a docked bar is wanted.
+- The conversation's quick settings read as one muted line under the byline,
+  with a single control opening the conversation style sheet.
+- The status line under the orb pairs a phase dot with what is happening and
+  what the conversation is; its info control opens the session details.
 - The transcript remains the durable record. Streaming text may be projected as
   a temporary assistant message, but only persisted messages become history.
+  In portrait the transcript demotes to a peeking handle at the bottom edge
+  and opens as a sheet over the workspace; in landscape it stays inline in the
+  right pane.
 - Provider, model, listening, speaking, fallback, and usage labels describe the
   effective route, not merely the last picker interaction.
 - A user can interrupt or cancel an active turn without a late callback
@@ -58,10 +78,13 @@ receive already-derived state and callbacks.
   cannot accept one. A switch that cannot move reads as broken, and the reason
   it cannot move lives in Settings. Controls that are only briefly unavailable,
   such as during an active turn, stay visible and disabled.
-- Web Search sits below the primary action rather than above it. It changes how
-  the next turn is answered, so it is a note on that action rather than a
-  setting to pass through on the way in.
-- The transcript header owns the image attachment action in both orientations;
+- The satellites — image attach, Model Council, and Web Search — sit in a row
+  under the orb. They change how the next turn is answered, so they read as
+  notes on that action rather than settings to pass through on the way in.
+  Toggles carry a round well that tints when on; momentary actions stay
+  borderless. During speech the row also carries the stop and barge-in
+  actions, because the orb has one press.
+- The satellites own the image attachment entry point in both orientations;
   the composer owns only the pending-attachment preview and its remove action.
 - Conversation, settings, status, receipt, setup, and diagnostics surfaces do
   not replace the primary workspace or mutate one another implicitly.

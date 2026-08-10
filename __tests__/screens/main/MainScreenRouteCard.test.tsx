@@ -37,7 +37,8 @@ const responseModes = [
 ];
 
 describe("MainScreenRouteCard", () => {
-  it("renders only the unobstructed model-card row when routes are available", () => {
+  it("renders the route byline when routes are available", () => {
+    const onOpenRoutePicker = jest.fn();
     const screen = renderWithProviders(
       <MainScreenRouteCard
         activeResponseMode="mode-1"
@@ -45,8 +46,8 @@ describe("MainScreenRouteCard", () => {
         colors={lightColors}
         isPremium
         offlineReady={false}
+        onOpenRoutePicker={onOpenRoutePicker}
         onOpenSetupGuide={jest.fn()}
-        onSelectResponseMode={jest.fn()}
         responseModes={responseModes}
         t={t}
       />,
@@ -54,10 +55,32 @@ describe("MainScreenRouteCard", () => {
 
     const modelRow = within(screen.getByTestId("response-mode-row"));
 
-    expect(modelRow.getByTestId("response-mode-list")).toBeTruthy();
+    expect(modelRow.getByTestId("route-byline")).toBeTruthy();
     expect(screen.queryByTestId("route-utility-row")).toBeNull();
     expect(screen.queryByTestId("route-style-control")).toBeNull();
     expect(screen.queryByTestId("route-web-search-control")).toBeNull();
+    fireEvent.press(modelRow.getByTestId("route-byline"));
+    expect(onOpenRoutePicker).toHaveBeenCalledTimes(1);
+  });
+
+  it("becomes a credit line with a single configured model", () => {
+    const onOpenRoutePicker = jest.fn();
+    const screen = renderWithProviders(
+      <MainScreenRouteCard
+        activeResponseMode="mode-1"
+        availableResponseModes={["mode-1"]}
+        colors={lightColors}
+        isPremium
+        offlineReady={false}
+        onOpenRoutePicker={onOpenRoutePicker}
+        onOpenSetupGuide={jest.fn()}
+        responseModes={responseModes}
+        t={t}
+      />,
+    );
+
+    fireEvent.press(screen.getByTestId("route-byline"));
+    expect(onOpenRoutePicker).not.toHaveBeenCalled();
   });
 
   it("opens provider setup from the empty state", () => {
@@ -69,8 +92,8 @@ describe("MainScreenRouteCard", () => {
         colors={lightColors}
         isPremium
         offlineReady={false}
+        onOpenRoutePicker={jest.fn()}
         onOpenSetupGuide={onOpenSetupGuide}
-        onSelectResponseMode={jest.fn()}
         responseModes={responseModes}
         t={t}
       />,
@@ -89,8 +112,8 @@ describe("MainScreenRouteCard", () => {
         compact
         isPremium
         offlineReady={false}
+        onOpenRoutePicker={jest.fn()}
         onOpenSetupGuide={jest.fn()}
-        onSelectResponseMode={jest.fn()}
         responseModes={responseModes}
         t={t}
       />,
@@ -111,8 +134,8 @@ describe("MainScreenRouteCard", () => {
         colors={lightColors}
         isPremium={false}
         offlineReady
+        onOpenRoutePicker={jest.fn()}
         onOpenSetupGuide={onOpenSetupGuide}
-        onSelectResponseMode={jest.fn()}
         responseModes={responseModes}
         t={t}
       />,
@@ -136,8 +159,8 @@ describe("MainScreenRouteCard", () => {
         colors={lightColors}
         isPremium={false}
         offlineReady={false}
+        onOpenRoutePicker={jest.fn()}
         onOpenSetupGuide={onOpenSetupGuide}
-        onSelectResponseMode={jest.fn()}
         responseModes={responseModes}
         t={t}
       />,

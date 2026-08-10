@@ -12,6 +12,7 @@ import { onboardingTranslations } from "../onboardingTranslations";
 import { introTranslations } from "../introTranslations";
 import { premiumTranslations } from "../premiumTranslations";
 import { transcriptEditTranslations } from "../transcriptEditTranslations";
+import { workspaceTranslations } from "../workspaceTranslations";
 
 export const tr = {
   ...conversationArtifactTranslations.tr,
@@ -27,6 +28,7 @@ export const tr = {
   ...introTranslations.tr,
   ...premiumTranslations.tr,
   ...transcriptEditTranslations.tr,
+  ...workspaceTranslations.tr,
   appName: "Bay Brokoli",
   retry: "Yeniden dene",
   dismiss: "Kapat",

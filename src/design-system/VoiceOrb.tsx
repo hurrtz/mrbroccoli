@@ -2,6 +2,7 @@ import React from "react";
 import {
   Pressable,
   StyleSheet,
+  Text,
   View,
   type StyleProp,
   type ViewStyle,
@@ -167,7 +168,12 @@ export function VoiceOrb({
   overtime = 0,
   size = 196,
   label,
+  coreLabel,
+  coreLabelColor,
   onPress,
+  onPressIn,
+  onPressOut,
+  disabled = false,
   style,
   testID,
 }: {
@@ -183,7 +189,16 @@ export function VoiceOrb({
   size?: number;
   /** Accessible name, translated by the caller. */
   label: string;
+  /**
+   * Replaces the glyph in the core — the Drive Session silence countdown.
+   * Everything else shows the phase glyph.
+   */
+  coreLabel?: string;
+  coreLabelColor?: string;
   onPress?: () => void;
+  onPressIn?: () => void;
+  onPressOut?: () => void;
+  disabled?: boolean;
   style?: StyleProp<ViewStyle>;
   testID?: string;
 }) {
@@ -212,7 +227,11 @@ export function VoiceOrb({
     <Pressable
       accessibilityLabel={label}
       accessibilityRole="button"
+      accessibilityState={{ disabled }}
+      disabled={disabled}
       onPress={onPress}
+      onPressIn={onPressIn}
+      onPressOut={onPressOut}
       style={[styles.centre, { width: size, height: size }, style]}
       testID={testID ?? "voice-orb"}
     >
@@ -293,11 +312,26 @@ export function VoiceOrb({
           ]}
           testID="voice-orb-core"
         >
-          <PhosphorIcon
-            color={foreground}
-            name={getPhaseIcon(phase)}
-            visualSize={iconSide}
-          />
+          {coreLabel ? (
+            <Text
+              style={[
+                styles.coreLabel,
+                {
+                  color: coreLabelColor ?? foreground,
+                  fontSize: Math.max(20, Math.round(iconSide * 0.6)),
+                },
+              ]}
+              testID="voice-orb-core-label"
+            >
+              {coreLabel}
+            </Text>
+          ) : (
+            <PhosphorIcon
+              color={foreground}
+              name={getPhaseIcon(phase)}
+              visualSize={iconSide}
+            />
+          )}
         </View>
       </View>
     </Pressable>
@@ -311,5 +345,10 @@ const styles = StyleSheet.create({
   },
   quietFill: {
     position: "absolute",
+  },
+  coreLabel: {
+    fontVariant: ["tabular-nums"],
+    fontWeight: "600",
+    textAlign: "center",
   },
 });

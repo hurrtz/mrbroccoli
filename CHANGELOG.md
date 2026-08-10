@@ -18,6 +18,16 @@ the complete Play Store translations are kept in a dedicated file under
 
 ### Changed
 
+- The home screen is rebuilt around a central voice orb. Two rings show the
+  current phase and the whole turn against its estimate — running late fills
+  them red — and the orb sizes itself to the space the screen leaves it. The
+  model switcher becomes one quiet line naming who answers next, opening a
+  sheet to change it; your conversation's style reads as a line of text with
+  one control; image, Model Council, and Web Search sit as small labelled
+  controls under the orb; and the transcript peeks above the bottom edge,
+  opening as a sheet over the workspace. In landscape the transcript stays
+  beside the orb, as before.
+
 - The voice pipeline's phase colours follow the approved design system's new
   ramp: green at recording and speaking, travelling through teal and blue to
   violet at the deepest thinking and back, with a set tuned separately for

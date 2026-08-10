@@ -48,7 +48,9 @@ describe("OrbSatellite", () => {
     const flat = StyleSheet.flatten(well.props.style);
 
     expect(well.props.accessibilityRole).toBe("switch");
-    expect(well.props.accessibilityState).toEqual({ checked: true });
+    expect(well.props.accessibilityState).toEqual(
+      expect.objectContaining({ checked: true, disabled: false }),
+    );
     expect(flat.borderRadius).toBe(22);
     expect(flat.borderColor).toBe(lightColors.accent);
     expect(flat.backgroundColor).toBe(lightColors.accentSoft);

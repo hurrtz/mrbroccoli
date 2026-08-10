@@ -12,6 +12,7 @@ import { onboardingTranslations } from "../onboardingTranslations";
 import { introTranslations } from "../introTranslations";
 import { premiumTranslations } from "../premiumTranslations";
 import { transcriptEditTranslations } from "../transcriptEditTranslations";
+import { workspaceTranslations } from "../workspaceTranslations";
 
 export const ptBR = {
   ...conversationArtifactTranslations.ptBR,
@@ -27,6 +28,7 @@ export const ptBR = {
   ...introTranslations.ptBR,
   ...premiumTranslations.ptBR,
   ...transcriptEditTranslations.ptBR,
+  ...workspaceTranslations.ptBR,
   appName: "Sr. Brócolis",
   retry: "Tentar novamente",
   dismiss: "Fechar",
