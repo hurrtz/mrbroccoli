@@ -97,6 +97,7 @@ export function useAutoSetupJob({
   const [failedModelId, setFailedModelId] = useState<LocalModelId | null>(
     null,
   );
+  const [errorKind, setErrorKind] = useState<"scan" | "install" | null>(null);
   const [doneModelIds, setDoneModelIds] = useState<Set<LocalModelId>>(
     () => new Set(),
   );
@@ -121,6 +122,7 @@ export function useAutoSetupJob({
     setPhase("scanning");
     setScanned(0);
     setFailedModelId(null);
+    setErrorKind(null);
     setDoneModelIds(new Set());
     revealTimersRef.current.forEach(clearTimeout);
     revealTimersRef.current = FACT_REVEAL_MS.map((ms, index) =>
@@ -136,8 +138,14 @@ export function useAutoSetupJob({
         const language = isSpeechLanguage(settings.language)
           ? settings.language
           : ("en" as const);
-        const [nextSnapshot, installs, nextBenchmarks] = await Promise.all([
-          probeLocalDeviceCapabilities(),
+        // The snapshot lands first, so the readings the reveal shows are on
+        // screen while the rest of the check still runs.
+        const nextSnapshot = await probeLocalDeviceCapabilities();
+        if (!mountedRef.current) {
+          return;
+        }
+        setSnapshot(nextSnapshot);
+        const [installs, nextBenchmarks] = await Promise.all([
           getLocalCatalogInstallStatuses(),
           getLocalModelBenchmarkResults(),
         ]);
@@ -161,7 +169,6 @@ export function useAutoSetupJob({
           benchmarks: nextBenchmarks,
           nativeSttEligible: nativeSpeech.nativeSttEligible,
         });
-        setSnapshot(nextSnapshot);
         setBenchmarks(nextBenchmarks);
         setScanned(FACT_REVEAL_MS.length);
         if (selection.status === "ready") {
@@ -169,10 +176,12 @@ export function useAutoSetupJob({
           setPhase("proposal");
         } else {
           setProfile(null);
+          setErrorKind("scan");
           setPhase("failed");
         }
       } catch {
         if (mountedRef.current) {
+          setErrorKind("scan");
           setPhase("failed");
         }
       }
@@ -275,6 +284,7 @@ export function useAutoSetupJob({
           return;
         }
         setFailedModelId((current) => current ?? progressModelId(progress));
+        setErrorKind("install");
         setPhase("failed");
         onOutcome("failed");
       }
@@ -432,6 +442,7 @@ export function useAutoSetupJob({
     snapshot,
     totalSizeLabel,
     reading,
+    errorKind,
     errorDetail: null,
     running: phase === "installing",
     start,

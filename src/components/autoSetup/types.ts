@@ -50,6 +50,12 @@ export interface AutoSetupJobState {
   snapshot: LocalDeviceSnapshot | null;
   totalSizeLabel: string;
   reading: AutoSetupStepReading | null;
+  /**
+   * What failed: the scan (nothing fits or the measurement broke — no plan
+   * exists) or the install (a seen plan stopped part-way). The two need
+   * different words and different retries.
+   */
+  errorKind: "scan" | "install" | null;
   errorDetail: string | null;
   running: boolean;
   start: () => void;

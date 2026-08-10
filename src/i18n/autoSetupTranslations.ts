@@ -23,6 +23,9 @@ const en = {
   autoSetupDoneTitle: "Ready",
   autoSetupDoneBody:
     "The chosen models are installed and selected. Replies, speech input and voice output now work with no network connection.",
+  autoSetupScanFailedTitle: "No suitable set for this phone",
+  autoSetupScanFailedDetail:
+    "The check finished without finding models this phone can run. Nothing was downloaded, and the manual catalogue below stays available.",
   autoSetupFailedTitle: "Install did not finish",
   autoSetupFailedDetail:
     "The download stopped before it finished. Nothing was left half-installed.",
@@ -86,6 +89,9 @@ export const autoSetupTranslations = {
     autoSetupDoneTitle: "جاهز",
     autoSetupDoneBody:
       "تم تثبيت النماذج المختارة وتحديدها. تعمل الردود وإدخال الكلام والصوت الآن دون اتصال بالشبكة.",
+    autoSetupScanFailedTitle: "لا توجد مجموعة مناسبة لهذا الهاتف",
+    autoSetupScanFailedDetail:
+      "انتهى الفحص دون العثور على نماذج يمكن لهذا الهاتف تشغيلها. لم يتم تنزيل أي شيء، ويبقى الاختيار اليدوي أدناه متاحًا.",
     autoSetupFailedTitle: "لم يكتمل التثبيت",
     autoSetupFailedDetail:
       "توقف التنزيل قبل اكتماله. لم يُترك أي شيء نصف مثبّت.",
@@ -132,6 +138,9 @@ export const autoSetupTranslations = {
     autoSetupDoneTitle: "Připraveno",
     autoSetupDoneBody:
       "Vybrané modely jsou nainstalované a zvolené. Odpovědi, hlasový vstup i hlasový výstup nyní fungují bez připojení k síti.",
+    autoSetupScanFailedTitle: "Pro tento telefon není vhodná sada",
+    autoSetupScanFailedDetail:
+      "Kontrola skončila bez nalezení modelů, které tento telefon zvládne. Nic se nestáhlo a ruční výběr níže zůstává dostupný.",
     autoSetupFailedTitle: "Instalace se nedokončila",
     autoSetupFailedDetail:
       "Stahování se zastavilo před dokončením. Nic nezůstalo napůl nainstalované.",
@@ -178,6 +187,9 @@ export const autoSetupTranslations = {
     autoSetupDoneTitle: "Bereit",
     autoSetupDoneBody:
       "Die gewählten Modelle sind installiert und ausgewählt. Antworten, Spracheingabe und Sprachausgabe funktionieren jetzt ohne Netzverbindung.",
+    autoSetupScanFailedTitle: "Kein passendes Set für dieses Telefon",
+    autoSetupScanFailedDetail:
+      "Die Prüfung fand keine Modelle, die dieses Telefon ausführen kann. Nichts wurde heruntergeladen, und die manuelle Auswahl darunter bleibt verfügbar.",
     autoSetupFailedTitle: "Installation nicht abgeschlossen",
     autoSetupFailedDetail:
       "Der Download stoppte vor dem Ende. Nichts blieb halb installiert zurück.",
@@ -224,6 +236,9 @@ export const autoSetupTranslations = {
     autoSetupDoneTitle: "Listo",
     autoSetupDoneBody:
       "Los modelos elegidos están instalados y seleccionados. Las respuestas, la entrada de voz y la salida de voz ya funcionan sin conexión.",
+    autoSetupScanFailedTitle: "No hay un conjunto adecuado para este teléfono",
+    autoSetupScanFailedDetail:
+      "La comprobación terminó sin encontrar modelos que este teléfono pueda ejecutar. No se descargó nada y la elección manual de abajo sigue disponible.",
     autoSetupFailedTitle: "La instalación no terminó",
     autoSetupFailedDetail:
       "La descarga se detuvo antes de terminar. Nada quedó a medio instalar.",
@@ -270,6 +285,9 @@ export const autoSetupTranslations = {
     autoSetupDoneTitle: "Prêt",
     autoSetupDoneBody:
       "Les modèles choisis sont installés et sélectionnés. Les réponses, l'entrée vocale et la sortie vocale fonctionnent désormais sans connexion.",
+    autoSetupScanFailedTitle: "Aucun ensemble adapté à ce téléphone",
+    autoSetupScanFailedDetail:
+      "La vérification s'est terminée sans trouver de modèles que ce téléphone peut exécuter. Rien n'a été téléchargé, et le choix manuel ci-dessous reste disponible.",
     autoSetupFailedTitle: "Installation inachevée",
     autoSetupFailedDetail:
       "Le téléchargement s'est arrêté avant la fin. Rien n'est resté à moitié installé.",
@@ -316,6 +334,9 @@ export const autoSetupTranslations = {
     autoSetupDoneTitle: "तैयार",
     autoSetupDoneBody:
       "चुने गए मॉडल इंस्टॉल और चयनित हैं। जवाब, वाक् इनपुट और वाक् आउटपुट अब बिना नेटवर्क के काम करते हैं।",
+    autoSetupScanFailedTitle: "इस फ़ोन के लिए कोई उपयुक्त सेट नहीं",
+    autoSetupScanFailedDetail:
+      "जाँच पूरी हुई पर ऐसा कोई मॉडल नहीं मिला जिसे यह फ़ोन चला सके। कुछ भी डाउनलोड नहीं हुआ, और नीचे का मैनुअल चयन उपलब्ध है।",
     autoSetupFailedTitle: "इंस्टॉल पूरा नहीं हुआ",
     autoSetupFailedDetail:
       "डाउनलोड पूरा होने से पहले रुक गया। कुछ भी आधा-इंस्टॉल नहीं छोड़ा गया।",
@@ -362,6 +383,9 @@ export const autoSetupTranslations = {
     autoSetupDoneTitle: "Kész",
     autoSetupDoneBody:
       "A kiválasztott modellek telepítve és beállítva. A válaszok, a beszédbevitel és a hangkimenet mostantól hálózat nélkül működnek.",
+    autoSetupScanFailedTitle: "Nincs megfelelő készlet ehhez a telefonhoz",
+    autoSetupScanFailedDetail:
+      "Az ellenőrzés nem talált olyan modelleket, amelyeket ez a telefon futtatni tud. Semmi sem töltődött le, és a lenti kézi választás elérhető marad.",
     autoSetupFailedTitle: "A telepítés nem fejeződött be",
     autoSetupFailedDetail:
       "A letöltés a vége előtt megállt. Semmi sem maradt félig telepítve.",
@@ -408,6 +432,9 @@ export const autoSetupTranslations = {
     autoSetupDoneTitle: "Pronto",
     autoSetupDoneBody:
       "I modelli scelti sono installati e selezionati. Risposte, input vocale e output vocale ora funzionano senza rete.",
+    autoSetupScanFailedTitle: "Nessun set adatto a questo telefono",
+    autoSetupScanFailedDetail:
+      "Il controllo è terminato senza trovare modelli che questo telefono possa eseguire. Non è stato scaricato nulla e la scelta manuale qui sotto resta disponibile.",
     autoSetupFailedTitle: "Installazione non completata",
     autoSetupFailedDetail:
       "Il download si è fermato prima della fine. Nulla è rimasto installato a metà.",
@@ -454,6 +481,9 @@ export const autoSetupTranslations = {
     autoSetupDoneTitle: "準備完了",
     autoSetupDoneBody:
       "選ばれたモデルはインストールされ選択されました。返答・音声入力・音声出力がネットワークなしで動作します。",
+    autoSetupScanFailedTitle: "この端末に合うセットがありません",
+    autoSetupScanFailedDetail:
+      "チェックは完了しましたが、この端末で動かせるモデルは見つかりませんでした。何もダウンロードされておらず、下の手動選択は引き続き使えます。",
     autoSetupFailedTitle: "インストールが完了しませんでした",
     autoSetupFailedDetail:
       "ダウンロードは完了前に停止しました。中途半端な状態は残っていません。",
@@ -500,6 +530,9 @@ export const autoSetupTranslations = {
     autoSetupDoneTitle: "Gotowe",
     autoSetupDoneBody:
       "Wybrane modele są zainstalowane i wybrane. Odpowiedzi, wejście głosowe i wyjście głosowe działają teraz bez sieci.",
+    autoSetupScanFailedTitle: "Brak odpowiedniego zestawu dla tego telefonu",
+    autoSetupScanFailedDetail:
+      "Kontrola zakończyła się bez znalezienia modeli, które ten telefon może uruchomić. Nic nie pobrano, a ręczny wybór poniżej pozostaje dostępny.",
     autoSetupFailedTitle: "Instalacja nie została ukończona",
     autoSetupFailedDetail:
       "Pobieranie zatrzymało się przed końcem. Nic nie zostało w połowie zainstalowane.",
@@ -546,6 +579,9 @@ export const autoSetupTranslations = {
     autoSetupDoneTitle: "Pronto",
     autoSetupDoneBody:
       "Os modelos escolhidos estão instalados e selecionados. As respostas, a entrada de voz e a saída de voz funcionam agora sem rede.",
+    autoSetupScanFailedTitle: "Nenhum conjunto adequado para este telemóvel",
+    autoSetupScanFailedDetail:
+      "A verificação terminou sem encontrar modelos que este telemóvel consiga executar. Nada foi transferido e a escolha manual abaixo continua disponível.",
     autoSetupFailedTitle: "A instalação não terminou",
     autoSetupFailedDetail:
       "A transferência parou antes do fim. Nada ficou meio instalado.",
@@ -592,6 +628,9 @@ export const autoSetupTranslations = {
     autoSetupDoneTitle: "Pronto",
     autoSetupDoneBody:
       "Os modelos escolhidos estão instalados e selecionados. Respostas, entrada de voz e saída de voz agora funcionam sem rede.",
+    autoSetupScanFailedTitle: "Nenhum conjunto adequado para este celular",
+    autoSetupScanFailedDetail:
+      "A verificação terminou sem encontrar modelos que este celular consiga executar. Nada foi baixado e a escolha manual abaixo continua disponível.",
     autoSetupFailedTitle: "A instalação não terminou",
     autoSetupFailedDetail:
       "O download parou antes do fim. Nada ficou instalado pela metade.",
@@ -638,6 +677,9 @@ export const autoSetupTranslations = {
     autoSetupDoneTitle: "Готово",
     autoSetupDoneBody:
       "Выбранные модели установлены и выбраны. Ответы, голосовой ввод и голосовой вывод теперь работают без сети.",
+    autoSetupScanFailedTitle: "Нет подходящего набора для этого телефона",
+    autoSetupScanFailedDetail:
+      "Проверка завершилась, не найдя моделей, которые может запустить этот телефон. Ничего не было загружено, а ручной выбор ниже остаётся доступным.",
     autoSetupFailedTitle: "Установка не завершена",
     autoSetupFailedDetail:
       "Загрузка остановилась до завершения. Ничего не осталось установленным наполовину.",
@@ -684,6 +726,9 @@ export const autoSetupTranslations = {
     autoSetupDoneTitle: "Klar",
     autoSetupDoneBody:
       "De valda modellerna är installerade och valda. Svar, röstinmatning och röstutmatning fungerar nu utan nätverk.",
+    autoSetupScanFailedTitle: "Ingen lämplig uppsättning för den här telefonen",
+    autoSetupScanFailedDetail:
+      "Kontrollen hittade inga modeller som den här telefonen klarar. Inget laddades ner, och det manuella valet nedan finns kvar.",
     autoSetupFailedTitle: "Installationen slutfördes inte",
     autoSetupFailedDetail:
       "Nedladdningen stannade före slutet. Inget lämnades halvinstallerat.",
@@ -730,6 +775,9 @@ export const autoSetupTranslations = {
     autoSetupDoneTitle: "Hazır",
     autoSetupDoneBody:
       "Seçilen modeller kuruldu ve seçildi. Yanıtlar, ses girişi ve ses çıkışı artık ağ bağlantısı olmadan çalışıyor.",
+    autoSetupScanFailedTitle: "Bu telefona uygun bir küme yok",
+    autoSetupScanFailedDetail:
+      "Denetim, bu telefonun çalıştırabileceği model bulamadan bitti. Hiçbir şey indirilmedi ve aşağıdaki elle seçim kullanılabilir durumda.",
     autoSetupFailedTitle: "Kurulum tamamlanmadı",
     autoSetupFailedDetail:
       "İndirme bitmeden durdu. Hiçbir şey yarım kurulmuş bırakılmadı.",
@@ -776,6 +824,9 @@ export const autoSetupTranslations = {
     autoSetupDoneTitle: "Готово",
     autoSetupDoneBody:
       "Вибрані моделі встановлено й вибрано. Відповіді, голосове введення та голосовий вивід тепер працюють без мережі.",
+    autoSetupScanFailedTitle: "Немає підхожого набору для цього телефона",
+    autoSetupScanFailedDetail:
+      "Перевірка завершилася, не знайшовши моделей, які може запустити цей телефон. Нічого не завантажено, а ручний вибір нижче лишається доступним.",
     autoSetupFailedTitle: "Установлення не завершено",
     autoSetupFailedDetail:
       "Завантаження зупинилося до завершення. Нічого не залишилося встановленим наполовину.",
@@ -822,6 +873,9 @@ export const autoSetupTranslations = {
     autoSetupDoneTitle: "تیار",
     autoSetupDoneBody:
       "منتخب ماڈل انسٹال اور منتخب ہو چکے ہیں۔ جواب، صوتی اِن پٹ اور صوتی آؤٹ پٹ اب بغیر نیٹ ورک کے کام کرتے ہیں۔",
+    autoSetupScanFailedTitle: "اس فون کے لیے کوئی موزوں سیٹ نہیں",
+    autoSetupScanFailedDetail:
+      "جانچ مکمل ہوئی مگر ایسا کوئی ماڈل نہیں ملا جو یہ فون چلا سکے۔ کچھ بھی ڈاؤن لوڈ نہیں ہوا، اور نیچے دستی انتخاب دستیاب ہے۔",
     autoSetupFailedTitle: "انسٹال مکمل نہیں ہوا",
     autoSetupFailedDetail:
       "ڈاؤن لوڈ مکمل ہونے سے پہلے رک گیا۔ کچھ بھی آدھا انسٹال نہیں چھوڑا گیا۔",
@@ -868,6 +922,9 @@ export const autoSetupTranslations = {
     autoSetupDoneTitle: "就绪",
     autoSetupDoneBody:
       "所选模型已安装并选定。回复、语音输入和语音输出现在无需网络即可使用。",
+    autoSetupScanFailedTitle: "没有适合这部手机的组合",
+    autoSetupScanFailedDetail:
+      "检测已完成，但没有找到这部手机能运行的模型。没有下载任何内容，下方的手动选择仍然可用。",
     autoSetupFailedTitle: "安装未完成",
     autoSetupFailedDetail: "下载在完成前停止。没有留下半安装的内容。",
     autoSetupFailedRowNote: "在完成前停止。未安装。",

@@ -14,6 +14,7 @@ export function createAutoSetupJob(
     snapshot: null,
     totalSizeLabel: "0 MB",
     reading: null,
+    errorKind: null,
     errorDetail: null,
     running: false,
     start: jest.fn(),

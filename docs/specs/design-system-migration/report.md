@@ -320,7 +320,31 @@ sweep.
   landscape composer have no design-system equivalent; each kept the app's
   behaviour and is recorded under its phase.
 
-## Owner decisions collected across all phases
+## Emulator verification (Android)
+
+A device pass on the project AVD (2 GB, arm64) exercised the recomposed home
+screen in both appearances and orientations, the seven-step introduction, the
+auto-setup scan, the transcript sheet, settings, and the On-device page, plus
+`make android-instrumentation`. It found and fixed three defects:
+
+- **The scan's staged reveal showed nothing.** The device snapshot only
+  landed with the verdict, so the reveal ticked over an empty list. The
+  snapshot now lands first and the readings appear one at a time (verified
+  on-device: memory, storage, processors revealed mid-scan).
+- **A failed scan wore the install-failure words.** "Install did not finish /
+  The download stopped" on a phone where nothing was ever downloaded. Scan
+  failures now carry their own copy in all nineteen locales ("No suitable set
+  for this phone…"), drop the phantom plan rows, and their retry re-runs the
+  scan.
+- **A failed scan leaked onto the home screen as a background task.** The
+  task bar reported "On-device install stopped" for a job that never ran;
+  it now appears only while installing or after an install-phase failure.
+
+The 2 GB emulator legitimately fails selection — every catalogue LLM needs
+more memory — which is exactly the honest-failure path the goal's §4
+question describes, now with honest words. Known environment condition, not
+migration-related: the debug build logs `Cannot find native module 'ExpoIap'`
+once per cold start (store billing absent on the emulator).
 
 1. Premium reads two ways: the intro banner is violet, Premium gold (parked
    in the goal; unchanged).

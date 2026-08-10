@@ -907,8 +907,11 @@ export function MainScreen() {
         visible: introVisible,
       }}
       workspace={{
+        // The row reports work the user started somewhere else. A failed
+        // scan is not that: nothing was running, so nothing is reported.
         backgroundTask:
-          autoSetup.state === "installing" || autoSetup.state === "failed"
+          autoSetup.state === "installing" ||
+          (autoSetup.state === "failed" && autoSetup.errorKind === "install")
             ? {
                 accessibilityLabel: `${
                   autoSetup.state === "failed"

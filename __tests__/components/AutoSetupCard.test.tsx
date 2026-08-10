@@ -123,6 +123,18 @@ describe("AutoSetupCard", () => {
     ).toBe("autoSetupQueuedNote");
     expect(screen.getByText("autoSetupRetry")).toBeTruthy();
   });
+
+  it("gives a failed scan its own words and no phantom plan", () => {
+    const screen = renderCard({
+      job: createAutoSetupJob({ state: "failed", errorKind: "scan" }),
+    });
+
+    // A scan that found nothing must not claim a download stopped.
+    expect(screen.getByText("autoSetupScanFailedTitle")).toBeTruthy();
+    expect(screen.getByText("autoSetupScanFailedDetail")).toBeTruthy();
+    expect(screen.queryByText("autoSetupFailedTitle")).toBeNull();
+    expect(screen.getByText("autoSetupRetry")).toBeTruthy();
+  });
 });
 
 describe("BackgroundTaskBar", () => {

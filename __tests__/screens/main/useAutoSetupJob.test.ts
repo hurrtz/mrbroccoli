@@ -141,6 +141,9 @@ describe("useAutoSetupJob", () => {
     });
     expect(rendered.result.current.scanned).toBeGreaterThanOrEqual(1);
     expect(rendered.result.current.scanned).toBeLessThan(4);
+    // The readings must exist while the reveal runs — the snapshot lands
+    // before the settle, not with the verdict.
+    expect(rendered.result.current.facts.length).toBeGreaterThan(0);
 
     await act(async () => {
       jest.advanceTimersByTime(3000);
@@ -269,6 +272,9 @@ describe("useAutoSetupJob", () => {
     });
 
     expect(rendered.result.current.state).toBe("failed");
+    // A failed scan is not a failed install: no plan was ever shown, so the
+    // card must not say a download stopped.
+    expect(rendered.result.current.errorKind).toBe("scan");
     expect(mockPrepare).not.toHaveBeenCalled();
   });
 });

@@ -335,12 +335,20 @@ export function AutoSetupCard({
       {job.state === "failed" ? (
         <>
           <Verdict
-            body={job.errorDetail ?? t("autoSetupFailedDetail")}
-            title={t("autoSetupFailedTitle")}
+            body={
+              job.errorKind === "scan"
+                ? t("autoSetupScanFailedDetail")
+                : (job.errorDetail ?? t("autoSetupFailedDetail"))
+            }
+            title={
+              job.errorKind === "scan"
+                ? t("autoSetupScanFailedTitle")
+                : t("autoSetupFailedTitle")
+            }
             tone="danger"
           />
-          {divider}
-          {planRows}
+          {job.errorKind === "scan" ? null : divider}
+          {job.errorKind === "scan" ? null : planRows}
           <CardAction
             icon="reload"
             label={t("autoSetupRetry")}
