@@ -80,6 +80,31 @@ receive already-derived state and callbacks.
 - The active conversation is snapshotted for a turn. A completion must not be
   written into a different conversation selected while work was in flight.
 
+### The workspace is built around the orb
+
+Portrait reads top to bottom: top bar, introduction banner, `RouteByline`,
+`ConversationSettingsSummary`, the voice stage, the satellite row, and
+`TranscriptHandle` flush to the bottom edge. Landscape keeps its two panes and
+keeps the transcript in the second one.
+
+- `OrbVoiceStage` is the voice control on this screen, at rest and while a turn
+  runs. `PhaseAwareVoiceAction` is retained and unchanged, with its own tests: it
+  is still the right control anywhere the voice action sits in a bar rather than
+  owning the screen.
+- The orb's two rings are the turn's two clocks. Recording capacity is the phase
+  ring, measured from when recording actually started; the turn against its
+  estimate is the outer ring; past the estimate both fill with red. Nothing
+  draws a second progress indicator for the same clock.
+- Words belong to `WorkspaceStatusLine`. A value that changes every second --
+  the speech estimate, the Drive countdown -- is a detail there, never an
+  announcement: phases are announced once each.
+- `TranscriptDrawer` opens over the workspace rather than replacing it, so the
+  route and the settings stay visible while the conversation is read.
+
+**Decision:** the pager between voice and text, its two-bar indicator and the
+composer's geometry are preserved exactly. The orb replaced what sat on the
+stage, not the way the stage is reached.
+
 ## Effective Edition Behavior
 
 Free mode is a complete offline experience rather than Premium with random

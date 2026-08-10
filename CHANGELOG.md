@@ -19,6 +19,18 @@ the complete Play Store translations are kept in a dedicated file under
 
 ### Changed
 
+- Rebuilt the home screen around the voice control. It sits in the centre as a
+  circle with two rings: the inner one fills through the current stage of a
+  turn, the outer one through the whole turn against how long it usually takes,
+  and both turn red once it runs late. Tapping it while it speaks interrupts so
+  you can answer back, and Stop is its own button. Recording still shows how
+  much of the recording limit is left, now on the ring itself.
+- The transcript moved to a drawer that peeks above the bottom edge, showing the
+  last reply and opening over the workspace rather than replacing it, so the
+  model you are about to use stays visible while you read.
+- Web Search and Model Council became labelled round buttons under the voice
+  control instead of a strip of switches, and the tone, length and voice for
+  this conversation now read as one line of text above it.
 - The home screen now states which model answers next as a single line rather
   than a row of cards, and it reads the same way whether you have one route
   configured or ten. Tapping it opens the full list. Landscape and portrait get

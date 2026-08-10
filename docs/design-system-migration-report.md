@@ -10,7 +10,7 @@ what worked.
 | 2 — Iconography | Complete |
 | 3 — Five new components | Complete |
 | 4 — Runtime readiness | Complete, but the phase's premise did not hold |
-| 5 — Home screen | Partial: the route byline ships; the orb does not |
+| 5 — Home screen | Complete |
 | 6 — Sweep | Automated checks in place; no device verification |
 
 ---
@@ -46,14 +46,24 @@ the map's own convention that a key is a meaning rather than a glyph name.
 `RuntimeReadiness` added and rendered on the settings overview, on the neutral
 surface, with no card and no connectors.
 
-### Phase 5 — Home screen (partial)
+### Phase 5 — Home screen
 
-`RouteByline` replaces `ResponseModeToggle` on the home screen. Its route sheet
-was extracted from `ResponseModeOverflowSelector` into `ResponseModeSheet` so
-both triggers can open it; the selector's own nineteen tests pass unchanged.
-`ResponseModeToggle` is untouched and still exported.
+Both replacements ship.
 
-**The orb replacement is not done.** See §5.
+`RouteByline` replaces `ResponseModeToggle`. Its route sheet was extracted from
+`ResponseModeOverflowSelector` into `ResponseModeSheet` so both triggers can open
+it; the selector's own nineteen tests pass unchanged.
+
+`OrbVoiceStage` replaces the docked `PhaseAwareVoiceAction` bar, at rest and
+while a turn runs. The bar's two progress drawings became the orb's two rings,
+its words became `WorkspaceStatusLine`, and its stop action became a satellite.
+The per-question switches became satellites, the conversation's settings became
+a sentence, and the transcript became `TranscriptHandle` plus a drawer that
+opens over the workspace.
+
+Both replaced components are retained and exported. `PhaseAwareVoiceAction` now
+has its own test file — it previously had none, having been covered only through
+a screen that no longer renders it.
 
 ---
 
@@ -211,63 +221,40 @@ already handled: `AntSettingsPageContent` routes a free edition to
 
 ## 5. What I could not do, and why
 
-### Phase 5 is incomplete, and the orb half has a real obstacle
+### What the orb replacement actually cost
 
-The byline replacement is complete. The orb replacement is not, and it is worth
-being precise about why rather than calling it "large".
+Worth recording, because the first attempt at it was wrong.
 
-**`VoiceOrb` cannot replace `PhaseAwareVoiceAction` one-for-one.** I tried the
-direct swap — orb as the pager's voice page, orb as the active overlay — and
-sixteen tests in `__tests__/screens/main/MainScreenVoiceStage.test.tsx` failed.
-They were not layout assertions. They cover behaviour the docked bar owns and
-the design system's orb contract does not mention:
+Swapping `VoiceOrb` into the docked bar's slot on its own broke sixteen tests,
+and they were not layout assertions. `PhaseAwareVoiceAction` owned behaviour the
+design system's orb contract never mentions: the recording-capacity fill, the
+adaptive speech timeline and its overtime layer, throttled phase announcements,
+pause and resume with a separate Stop, and the Drive silence countdown.
 
-- the recording-capacity fill, continued from the actual recording start
-- the adaptive speech timeline and its red overtime layer
-- phase changes announced without announcing every ETA tick
-- pause and resume on the primary action with a **separate** Stop action
-- the increasingly urgent Drive silence countdown
-- the blocked-prompt call to action, and the on-device setup action it becomes
+The design system's kit is a mock — it says so — and its phase script never runs
+late, so it had nowhere to put any of that. The answer was not to drop it but to
+notice that the orb's two rings *are* the bar's two progress drawings, and that
+`WorkspaceStatusLine` is where its words go. Everything survived:
 
-In the design system's own kit, most of this has somewhere else to live:
-`WorkspaceStatusLine` carries the phase title and the detail line, and the
-satellite row carries the secondary actions. So the replacement is not "swap the
-control" — it is "build the composition, and re-home the behaviour the bar
-currently carries alone". Doing the first without the second is a regression in
-accessibility announcements and in playback control, which is why the attempt
-was reverted rather than committed with the tests updated.
+| The bar drew | It is now |
+| --- | --- |
+| a fill sweeping its width | the orb's phase ring |
+| a timeline traced round its border | the orb's turn ring, and `overtime` |
+| the phase title, prompt and ETA | `WorkspaceStatusLine` |
+| the Drive countdown, in growing digits | the status line's detail |
+| a Stop action inside the bar | an `OrbSatellite` |
+| tap-to-interrupt while speaking | the orb itself |
 
-Kept from the attempt, because both are correct independently: `VoiceOrb` now
-has `onPressIn`/`onPressOut`/`disabled`, and `src/screens/main/orbProgress.ts`
-maps `VoicePhaseProgress` onto the orb's two rings and its overtime.
+The first attempt was reverted rather than committed with its tests deleted. The
+second kept the behaviour and rewrote the tests around where it now lives.
 
-What remains:
+### The retained components would have gone quiet
 
-1. **Recompose the workspace around the orb.** `MainScreenWorkspace` currently
-   renders top bar → intro banner → route card → voice stage + route controls →
-   transcript pane. The orb composition needs the orb centred, the satellite
-   row under it, `WorkspaceStatusLine` and `ConversationSettingsSummary` around
-   it, and the transcript demoted to `TranscriptHandle` plus a drawer, in both
-   orientations.
-2. **Re-home what the docked bar carries** — the six behaviours listed above —
-   onto the status line, the satellite row and a separate stop control, then
-   replace `PhaseAwareVoiceAction` in `VoiceTextInputPager`'s active overlay.
-   The pager, its bar indicator and the composer geometry all stay: the goal
-   names those values explicitly.
-3. **A transcript drawer.** There is no expanded transcript surface to reuse —
-   `TranscriptPreviewCard` has only `card` and `canvas` presentations — so the
-   drawer `TranscriptHandle` opens has to be built.
-4. **Update the existing suites** that assert the current workspace
-   (`MainScreenWorkspace.test.tsx`, `MainScreenVoiceStage.test.tsx`,
-   `TranscriptPreviewCard` coverage and others).
-
-The copy is **done**: `src/i18n/workspaceTranslations.ts` carries the six new
-strings in all nineteen languages, and the satellite labels, phase words and
-`showTranscript` were already there.
-
-This is a large change to a shipping home screen, and doing it badly is worse
-than not doing it yet. I stopped at a green checkpoint rather than leaving a
-half-swapped workspace behind.
+`PhaseAwareVoiceAction` had **no tests of its own**. It was covered entirely
+through `MainScreenVoiceStage`, so the moment it stopped being that screen's
+control it would have become unverified code that the goal nonetheless requires
+be kept. Knip caught it as an unused file, which is what surfaced this. It now
+has its own suite covering the behaviour listed above.
 
 ### Phase 6 has its automated half only
 
