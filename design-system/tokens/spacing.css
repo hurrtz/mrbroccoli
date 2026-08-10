@@ -1,0 +1,31 @@
+/* Spacing follows the values the app actually uses, not a snapped 4/8 grid.
+   Gutters are 16 in portrait, 12 in landscape; card padding is 16/14. */
+:root{
+  --mb-space-1:2px;
+  --mb-space-2:4px;
+  --mb-space-3:6px;
+  --mb-space-4:8px;
+  --mb-space-5:10px;
+  --mb-space-6:12px;
+  --mb-space-7:14px;
+  --mb-space-8:16px;
+  --mb-space-9:18px;
+  --mb-space-10:20px;
+  --mb-space-12:24px;
+
+  --mb-gutter-portrait:16px;
+  --mb-gutter-landscape:12px;
+  --mb-card-padding-x:16px;
+  --mb-card-padding-y:14px;
+  --mb-dialog-padding:20px;
+  --mb-content-max-width:760px;
+  --mb-drawer-max-width:520px;
+  --mb-dialog-max-width:560px;
+
+  /* Accessibility floor. Icons never define the touch target. */
+  --mb-touch-target:44px;
+  --mb-row-min-height:46px;
+  --mb-switch-row-min-height:58px;
+  --mb-header-min-height:62px;
+  --mb-voice-stage-min-height:68px;
+}

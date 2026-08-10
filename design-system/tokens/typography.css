@@ -1,0 +1,68 @@
+/* Type roles are the API. Pick a role by meaning first, then add layout.
+   Every role carries family, size, line-height, weight and letter-spacing. */
+:root{
+  --mb-font-headline:"Unica One","Outfit",system-ui,sans-serif;
+  --mb-font-display:"Outfit",system-ui,sans-serif;
+  --mb-font-display-heavy:"Outfit",system-ui,sans-serif;
+  --mb-font-body:"Outfit",system-ui,sans-serif;
+  --mb-font-body-medium:"Outfit",system-ui,sans-serif;
+  --mb-font-mono:Menlo,ui-monospace,SFMono-Regular,monospace;
+
+  --mb-text-screen-title-family:var(--mb-font-headline);
+  --mb-text-screen-title-size:26px;
+  --mb-text-screen-title-line-height:32px;
+  --mb-text-screen-title-weight:400;
+  --mb-text-screen-title-tracking:-0.25px;
+
+  --mb-text-section-title-family:var(--mb-font-headline);
+  --mb-text-section-title-size:18px;
+  --mb-text-section-title-line-height:24px;
+  --mb-text-section-title-weight:400;
+  --mb-text-section-title-tracking:-0.1px;
+
+  --mb-text-subsection-title-family:var(--mb-font-display);
+  --mb-text-subsection-title-size:15px;
+  --mb-text-subsection-title-line-height:20px;
+  --mb-text-subsection-title-weight:600;
+
+  --mb-text-body-family:var(--mb-font-body);
+  --mb-text-body-size:15px;
+  --mb-text-body-line-height:22px;
+  --mb-text-body-weight:400;
+
+  --mb-text-supporting-family:var(--mb-font-body);
+  --mb-text-supporting-size:13px;
+  --mb-text-supporting-line-height:19px;
+  --mb-text-supporting-weight:400;
+
+  --mb-text-caption-family:var(--mb-font-body);
+  --mb-text-caption-size:12px;
+  --mb-text-caption-line-height:17px;
+  --mb-text-caption-weight:400;
+
+  --mb-text-control-label-family:var(--mb-font-mono);
+  --mb-text-control-label-size:11px;
+  --mb-text-control-label-line-height:15px;
+  --mb-text-control-label-weight:600;
+  --mb-text-control-label-tracking:0.75px;
+
+  --mb-text-control-value-family:var(--mb-font-display);
+  --mb-text-control-value-size:15px;
+  --mb-text-control-value-line-height:20px;
+  --mb-text-control-value-weight:600;
+
+  --mb-text-action-family:var(--mb-font-display);
+  --mb-text-action-size:14px;
+  --mb-text-action-line-height:18px;
+  --mb-text-action-weight:600;
+
+  --mb-text-compact-action-family:var(--mb-font-display);
+  --mb-text-compact-action-size:13px;
+  --mb-text-compact-action-line-height:17px;
+  --mb-text-compact-action-weight:600;
+
+  --mb-text-metadata-family:var(--mb-font-mono);
+  --mb-text-metadata-size:11px;
+  --mb-text-metadata-line-height:16px;
+  --mb-text-metadata-weight:400;
+}

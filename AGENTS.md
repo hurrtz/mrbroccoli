@@ -461,6 +461,36 @@ components instead of generic ones. It is build tooling only.
   `npm run static:verify` — keeping `make pre-push` green is this directory's
   main risk to the repository.
 
+## Vendored Design System
+
+`design-system/` is a byte-faithful copy of the approved claude.ai/design
+project. It is the source of truth for product design intent; `src/` is the
+implementation of that intent, and the two are reconciled deliberately.
+
+- **It is a mirror, not app code.** Nothing under `app/` or `src/` imports it,
+  and it ships in no bundle. Its React is browser React, not React Native.
+- **Do not hand-edit it.** Design changes are made in the claude.ai/design
+  project and re-imported. A local edit is silently lost on the next import and
+  makes the copy stop being evidence of what was approved.
+- It sits outside every gate on purpose: `tsconfig.json` `include` names only
+  `app/**` and `src/**`, and no Knip `project` glob covers it. That is what lets
+  it hold browser JSX without breaking `make pre-push`.
+- `_ds_manifest.json` is the machine-readable half of the contract: every
+  component with its source path, and every token with its value, kind, and
+  defining file. Check drift against that file rather than against prose.
+- The design system's three adherence rules, kept here because the config that
+  encoded them is not committed and no tool in this repository runs it:
+  - Import components from `index.js`, never from component internals.
+  - No raw hex colors; use a design-system color token via `var()`.
+  - No raw `px` values; use a design-system spacing token via `var()`.
+- The import's bulk and generated parts are gitignored: `uploads/`,
+  `explorations/`, `_ds_bundle.js`, and `_adherence.oxlintrc.json`. The
+  adherence config holds empty component entries and a subset of token names
+  with no values, so `_ds_manifest.json` supersedes it entirely.
+- `.design-sync/` and this directory point in opposite directions.
+  `.design-sync/` publishes `src/` outward so the design agent composes from
+  real components; `design-system/` is what came back.
+
 ## Licensing And Provider Terms
 
 - The original app code and assets are proprietary under `LICENSE`; this never

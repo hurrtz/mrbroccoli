@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<!-- @template name="Settings page" description="A Mr Broccoli settings page: runtime readiness, then quiet grouping cards of rows." -->
+<helmet>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/regular/style.css">
+<script src="./ds-base.js"></script>
+<style>body{margin:0;background:#8f8d86}</style>
+</helmet>
+<div data-theme="{{ appearance }}" style="min-height:100vh;background:var(--mb-color-background);display:flex;justify-content:center;font-family:var(--mb-font-body)">
+<div style="width:390px;min-height:100vh;display:flex;flex-direction:column;box-sizing:border-box">
+<div style="display:flex;align-items:center;justify-content:center;position:relative;min-height:52px;padding:0 14px;border-bottom:1px solid var(--mb-color-border)">
+<span style="font-family:var(--mb-font-headline);font-size:20px;letter-spacing:0.5px;color:var(--mb-color-text)">Settings</span>
+<span style="position:absolute;right:10px;display:flex">
+<x-import component-from-global-scope="MrBroccoliDesignSystem_62d510.IconButton" icon="close" accessibility-label="Close settings" hint-size="44px,44px"></x-import>
+</span>
+</div>
+<div style="flex:1;min-height:0;overflow:auto;padding:16px 16px 24px;display:flex;flex-direction:column;gap:16px">
+<x-import component-from-global-scope="MrBroccoliDesignSystem_62d510.RuntimeReadiness" readiness="{{ readiness }}" hint-size="100%,44px"></x-import>
+<span style="font-family:var(--mb-font-mono);font-size:11px;letter-spacing:0.75px;text-transform:uppercase;color:var(--mb-color-text-muted)">Conversation &amp; tools</span>
+<x-import component-from-global-scope="MrBroccoliDesignSystem_62d510.AntSettingsCard" hint-size="100%,180px">
+<x-import component-from-global-scope="MrBroccoliDesignSystem_62d510.AntPickerRow" label="Response style" value="Balanced" options="{{ styleOptions }}" onChange="{{ noop }}" standalone="{{ true }}" hint-size="100%,60px"></x-import>
+<x-import component-from-global-scope="MrBroccoliDesignSystem_62d510.AntPickerRow" label="Reply length" value="Brief" options="{{ lengthOptions }}" onChange="{{ noop }}" standalone="{{ true }}" hint-size="100%,60px"></x-import>
+<x-import component-from-global-scope="MrBroccoliDesignSystem_62d510.AntSwitchRow" label="Web search" description="Let the model look things up before it answers." value="{{ searchOn }}" onChange="{{ noop }}" hint-size="100%,64px"></x-import>
+</x-import>
+<span style="font-family:var(--mb-font-mono);font-size:11px;letter-spacing:0.75px;text-transform:uppercase;color:var(--mb-color-text-muted)">Speech</span>
+<x-import component-from-global-scope="MrBroccoliDesignSystem_62d510.AntSettingsCard" title="Listening" hint-size="100%,150px">
+<x-import component-from-global-scope="MrBroccoliDesignSystem_62d510.AntPickerRow" label="Transcription" value="On device" options="{{ transcriptionOptions }}" onChange="{{ noop }}" standalone="{{ true }}" hint-size="100%,60px"></x-import>
+<x-import component-from-global-scope="MrBroccoliDesignSystem_62d510.AntSwitchRow" label="Send on silence" description="Stop recording after a pause and send." value="{{ autoSend }}" onChange="{{ noop }}" hint-size="100%,64px"></x-import>
+</x-import>
+</div>
+</div>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:390,&quot;height&quot;:844},&quot;appearance&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;light&quot;,&quot;dark&quot;],&quot;default&quot;:&quot;light&quot;,&quot;tsType&quot;:&quot;\&quot;light\&quot; | \&quot;dark\&quot;&quot;,&quot;section&quot;:&quot;Appearance&quot;},&quot;searchOn&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;State&quot;},&quot;autoSend&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;State&quot;},&quot;thinkReady&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;State&quot;}}">
+class Component extends DCLogic {
+  renderVals() {
+    return {
+      appearance: this.props.appearance ?? "light",
+      searchOn: this.props.searchOn ?? true,
+      autoSend: this.props.autoSend ?? false,
+      styleOptions: [
+        { value: "Balanced", label: "Balanced" },
+        { value: "Nerdy", label: "Nerdy" },
+        { value: "Warm", label: "Warm" },
+      ],
+      lengthOptions: [
+        { value: "Brief", label: "Brief" },
+        { value: "Normal", label: "Normal" },
+        { value: "Thorough", label: "Thorough" },
+      ],
+      transcriptionOptions: [
+        { value: "On device", label: "On device" },
+        { value: "Deepgram", label: "Deepgram" },
+        { value: "OpenAI", label: "OpenAI" },
+      ],
+      noop: () => {},
+      readiness: {
+        think: this.props.thinkReady === false ? "attention" : "ready",
+        listen: "ready",
+        speak: "attention",
+        search: this.props.searchOn === false ? "off" : "ready",
+      },
+    };
+  }
+}
+</script>
+</body>
+</html>

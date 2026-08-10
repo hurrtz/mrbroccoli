@@ -1,0 +1,32 @@
+<!-- @dsCard group="Components" viewport="700x250" name="List" subtitle="Rows with thumb, brief and trailing extra" -->
+<!DOCTYPE html><html data-theme="light"><head><meta charset="utf-8">
+<link rel="stylesheet" href="../../styles.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/regular/style.css">
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script src="../../_ds_bundle.js"></script>
+<style>body{padding:16px}</style>
+</head><body><div id="root"></div>
+<script type="text/babel">
+const { List, ListItem, PhosphorIcon } = window.MrBroccoliDesignSystem_62d510;
+const chevron = <PhosphorIcon name="right" size="compact" color="var(--mb-color-text-muted)" />;
+const rows = [
+  ["Connections","Provider keys, validation, and capabilities.","key"],
+  ["Listening","Input mode and speech-to-text routing.","mic"],
+  ["Speaking","Spoken replies, playback, voices, and previews.","sound"],
+];
+ReactDOM.createRoot(document.getElementById("root")).render(
+  <div style={{border:"1px solid var(--mb-color-border)",borderRadius:"var(--mb-radius-card)",background:"var(--mb-color-surface-elevated)",overflow:"hidden"}}>
+    <List>
+      {rows.map(([title,brief,icon],index)=>
+        <ListItem key={title} onClick={()=>{}} thumb={<PhosphorIcon name={icon} size="control" color="var(--mb-color-text-secondary)" />} extra={chevron}
+          style={{borderBottom:index<rows.length-1?"1px solid var(--mb-color-border)":"none"}}>
+          {title}
+          <ListItem.Brief>{brief}</ListItem.Brief>
+        </ListItem>
+      )}
+    </List>
+  </div>
+);
+</script></body></html>
