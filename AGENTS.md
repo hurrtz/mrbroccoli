@@ -491,6 +491,19 @@ implementation of that intent, and the two are reconciled deliberately.
   `.design-sync/` publishes `src/` outward so the design agent composes from
   real components; `design-system/` is what came back.
 
+Three sync directions exist between this repository and the claude.ai/design
+project. Only the first is automated.
+
+| Direction | How it works |
+| --- | --- |
+| `src/` → design project | `/design-sync`. Builds `src/` through `react-native-web`, regenerates types and tokens, and uploads. The repository is authoritative for component reality: props, tokens, behavior. |
+| design project → `design-system/` | Re-import. The `DesignSync` tool's `list_files` and `get_file` read every remote path; `get_file` caps at 256 KiB and binaries round-trip poorly. The design project is authoritative for design intent: explorations, prompts, guidelines. |
+| design project → `src/` | Not automatable. The design project holds browser React; `src/` is React Native. Changes arrive as intent and are implemented by hand against `migration-goal.md` and each component's `.prompt.md`. |
+
+**Dependency:** the design project id lives in `.design-sync/config.json`.
+Confirm it with the `DesignSync` `get_project` method before syncing; a stale
+id fails only once a push is already under way.
+
 ## Licensing And Provider Terms
 
 - The original app code and assets are proprietary under `LICENSE`; this never
