@@ -1,5 +1,5 @@
 import React from "react";
-import { Platform, StyleSheet, Switch as NativeSwitch } from "react-native";
+import { StyleSheet } from "react-native";
 import { fireEvent, render } from "@testing-library/react-native";
 
 import { MainScreenRouteControls } from "../../../src/screens/main/MainScreenRouteControls";
@@ -12,11 +12,10 @@ const t = (key: string) =>
   })[key] ?? key;
 
 describe("MainScreenRouteControls", () => {
-  it("right-aligns and optically centers the platform-native web-search control", () => {
+  it("draws the per-question switches as satellites under the orb", () => {
     const onToggleWebSearchEnabled = jest.fn();
     const screen = render(
       <MainScreenRouteControls
-        colors={lightColors}
         onToggleWebSearchEnabled={onToggleWebSearchEnabled}
         t={t}
         webSearchEnabled
@@ -27,48 +26,20 @@ describe("MainScreenRouteControls", () => {
     const rowStyle = StyleSheet.flatten(
       screen.getByTestId("route-controls-row").props.style,
     );
-    const searchControl = screen.getByTestId("route-web-search-container");
-    const nativeSwitch = screen.UNSAFE_getByType(NativeSwitch);
-    const searchLabelStyle = StyleSheet.flatten(
-      screen.getByTestId("route-web-search-label").props.style,
-    );
+    const control = screen.getByTestId("route-web-search-control");
 
-    expect(rowStyle.justifyContent).toBe("flex-end");
-    expect(rowStyle.marginTop).toBe(-6);
-    expect(searchLabelStyle).toEqual(
-      expect.objectContaining({
-        includeFontPadding: false,
-        textAlignVertical: "center",
-      }),
+    // A centred row of 44pt targets under the orb, not a right-aligned strip
+    // of chips beside it.
+    expect(rowStyle.justifyContent).toBe("center");
+    expect(StyleSheet.flatten(control.props.style)).toEqual(
+      expect.objectContaining({ height: 44, width: 44 }),
     );
-    expect(searchLabelStyle.transform).toBeUndefined();
-    expect(searchControl.props.accessibilityRole).toBe("switch");
-    expect(searchControl.props.accessibilityState).toEqual({
-      checked: true,
-      disabled: false,
-    });
-    expect(nativeSwitch.props.disabled).toBe(false);
-    expect(nativeSwitch.props.value).toBe(true);
-    expect(nativeSwitch.props.trackColor).toEqual({
-      false: lightColors.borderStrong,
-      true:
-        Platform.OS === "android" ? lightColors.accentSoft : lightColors.accent,
-    });
-    expect(nativeSwitch.props.thumbColor).toBe(
-      Platform.OS === "android" ? lightColors.accent : undefined,
-    );
-    expect(nativeSwitch.props.ios_backgroundColor).toBe(
-      lightColors.borderStrong,
-    );
-    expect(nativeSwitch.props.accessible).toBe(false);
-    expect(nativeSwitch.props.pointerEvents).toBe("none");
-    expect(nativeSwitch.props.onValueChange).toBeUndefined();
+    expect(control.props.accessibilityRole).toBe("switch");
+    expect(control.props.accessibilityState.checked).toBe(true);
+    expect(control.props.accessibilityLabel).toBe("Web Search");
 
-    fireEvent.press(screen.getByTestId("route-web-search-label"));
+    fireEvent.press(control);
     expect(onToggleWebSearchEnabled).toHaveBeenCalledTimes(1);
-
-    fireEvent.press(nativeSwitch);
-    expect(onToggleWebSearchEnabled).toHaveBeenCalledTimes(2);
   });
 
   it("leaves the row entirely when search is not configured", () => {
@@ -89,10 +60,9 @@ describe("MainScreenRouteControls", () => {
     expect(screen.queryByTestId("route-controls-row")).toBeNull();
   });
 
-  it("adds breathing room above Web Search in landscape", () => {
+  it("tightens the satellite row in landscape", () => {
     const screen = render(
       <MainScreenRouteControls
-        colors={lightColors}
         layout="landscape"
         onToggleWebSearchEnabled={jest.fn()}
         t={t}
@@ -102,8 +72,8 @@ describe("MainScreenRouteControls", () => {
 
     expect(
       StyleSheet.flatten(screen.getByTestId("route-controls-row").props.style)
-        .marginTop,
-    ).toBe(6);
+        .paddingTop,
+    ).toBe(4);
   });
 
   it("omits an unavailable Web Search control from constrained landscape layouts", () => {
@@ -135,11 +105,10 @@ describe("MainScreenRouteControls", () => {
     expect(screen.queryByTestId("route-web-search-container")).toBeNull();
   });
 
-  it("shows the Uber Mode switch on the portrait left side only", () => {
+  it("shows Model Council as a satellite in portrait only", () => {
     const onToggleUlraMode = jest.fn();
-    const screen = render(
+    const portrait = render(
       <MainScreenRouteControls
-        colors={lightColors}
         onToggleUlraMode={onToggleUlraMode}
         onToggleWebSearchEnabled={jest.fn()}
         t={t}
@@ -148,31 +117,19 @@ describe("MainScreenRouteControls", () => {
         webSearchReady
       />,
     );
+    const council = portrait.getByTestId("route-ulra-mode-control");
 
+    expect(council.props.accessibilityRole).toBe("switch");
+    expect(council.props.accessibilityState.checked).toBe(true);
+    // The label stays neutral in both states; the well carries the state.
     expect(
-      StyleSheet.flatten(screen.getByTestId("route-controls-row").props.style)
-        .justifyContent,
-    ).toBe("space-between");
-    expect(
-      screen.getByTestId("route-ulra-mode-container").props.accessibilityState,
-    ).toEqual({ checked: true });
-    expect(
-      screen.getByTestId("route-ulra-mode-container").children[0],
-    ).toMatchObject({
-      props: { testID: "route-ulra-mode-control" },
-    });
-    expect(
-      StyleSheet.flatten(
-        screen.getByTestId("route-ulra-mode-label").props.style,
-      ).textAlign,
-    ).toBe("left");
-
-    fireEvent.press(screen.getByTestId("route-ulra-mode-label"));
+      portrait.getByText("Model Council", { includeHiddenElements: true }),
+    ).toBeTruthy();
+    fireEvent.press(council);
     expect(onToggleUlraMode).toHaveBeenCalledTimes(1);
 
-    screen.rerender(
+    const landscape = render(
       <MainScreenRouteControls
-        colors={lightColors}
         layout="landscape"
         onToggleUlraMode={onToggleUlraMode}
         onToggleWebSearchEnabled={jest.fn()}
@@ -182,6 +139,8 @@ describe("MainScreenRouteControls", () => {
         webSearchReady
       />,
     );
-    expect(screen.queryByTestId("route-ulra-mode-container")).toBeNull();
+
+    // The landscape column has no room for it.
+    expect(landscape.queryByTestId("route-ulra-mode-control")).toBeNull();
   });
 });

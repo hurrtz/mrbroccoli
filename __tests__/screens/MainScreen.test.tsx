@@ -577,7 +577,7 @@ describe("MainScreen", () => {
     );
 
     expect(screen.getByText("route-card")).toBeTruthy();
-    expect(screen.queryByTestId("route-web-search-container")).toBeNull();
+    expect(screen.queryByTestId("route-web-search-control")).toBeNull();
     expect(inputSection.getByText("voice-stage:disabled")).toBeTruthy();
     expect(
       StyleSheet.flatten(
@@ -646,7 +646,7 @@ describe("MainScreen", () => {
 
     const screen = renderWithProviders(<MainScreen />);
 
-    expect(screen.queryByTestId("route-web-search-container")).toBeNull();
+    expect(screen.queryByTestId("route-web-search-control")).toBeNull();
   });
 
   it("turns an active automatic web-search route off from the main switch", () => {
@@ -660,7 +660,7 @@ describe("MainScreen", () => {
     });
     useSharedSettings.mockReturnValue(sharedSettings);
     const screen = renderWithProviders(<MainScreen />);
-    const searchControl = screen.getByTestId("route-web-search-container");
+    const searchControl = screen.getByTestId("route-web-search-control");
 
     expect(searchControl.props.accessibilityState.checked).toBe(true);
     fireEvent.press(searchControl);
@@ -1000,8 +1000,9 @@ describe("MainScreen", () => {
     ).toBe(0.9);
     expect(screen.getByTestId("landscape-pane-divider")).toBeTruthy();
     expect(
-      screen.getByTestId("route-web-search-container").props.accessibilityState,
-    ).toEqual({ checked: false, disabled: false });
+      screen.getByTestId("route-web-search-control").props.accessibilityState
+        .checked,
+    ).toBe(false);
     expect(leftPane.queryByTestId("route-style-control")).toBeNull();
     expect(leftPane.queryByText("status-strip")).toBeNull();
     expect(leftPane.queryByText("toggle-debug-log")).toBeNull();
