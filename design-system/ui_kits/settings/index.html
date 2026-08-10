@@ -1,0 +1,60 @@
+<!-- @dsCard group="Mr Broccoli settings" viewport="1180x800" name="Settings" subtitle="The eight-page settings modal, premium and free editions" -->
+<!DOCTYPE html><html data-theme="light"><head><meta charset="utf-8"><title>Mr Broccoli — settings</title>
+<link rel="stylesheet" href="../../styles.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/regular/style.css">
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script src="../../_ds_bundle.js"></script>
+<script src="data.js"></script>
+<style>
+body{margin:0;padding:24px;background:#8f8d86;font-family:var(--mb-font-body)}
+.row{display:flex;gap:20px;flex-wrap:wrap;align-items:flex-start}
+.cap{font-family:var(--mb-font-mono);font-size:9px;letter-spacing:.9px;text-transform:uppercase;color:#2b2c2e;margin:0 0 6px 2px}
+.device{width:372px;height:740px;border-radius:34px;overflow:hidden;position:relative;transform:translateZ(0);background:var(--mb-color-background);box-shadow:0 18px 44px rgba(0,0,0,.3);border:1px solid rgba(0,0,0,.25)}
+</style>
+</head><body>
+<div id="root"></div>
+<script type="text/babel" src="SettingsFrame.jsx"></script>
+<script type="text/babel" src="AutoSetup.jsx"></script>
+<script type="text/babel" src="SettingsOverview.jsx"></script>
+<script type="text/babel" src="PagesConversation.jsx"></script>
+<script type="text/babel" src="PagesVoice.jsx"></script>
+<script type="text/babel" src="PagesPrivacy.jsx"></script>
+<script type="text/babel">
+const PAGES = {
+  connections: window.ConnectionsPage,
+  thinking: window.ThinkingPage,
+  search: window.SearchPage,
+  listening: window.ListeningPage,
+  speaking: window.SpeakingPage,
+  local: window.OnDevicePage,
+  data: window.DataPrivacyPage,
+  app: window.AppPage,
+};
+
+function SettingsApp({ isPremium, failInstall }) {
+  const [page, setPage] = React.useState("overview");
+  const auto = window.useAutoSetupFlow({ failAt: failInstall ? 0.55 : undefined });
+  const back = () => setPage("overview");
+  const close = () => setPage("overview");
+  if (page === "overview") {
+    return <window.SettingsOverview isPremium={isPremium} onOpenPage={setPage} onOpenPremium={() => {}} onClose={close} />;
+  }
+  const Page = PAGES[page];
+  return <Page onBack={back} onClose={close} auto={auto} />;
+}
+
+function Frame({ theme, isPremium, failInstall }) {
+  return <div className="device" data-theme={theme}><SettingsApp isPremium={isPremium} failInstall={failInstall} /></div>;
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(
+  <div className="row">
+    <div><p className="cap">Premium · light</p><Frame theme="light" isPremium={true} /></div>
+    <div><p className="cap" style={{color:"#e6e4dd"}}>Premium · dark</p><Frame theme="dark" isPremium={true} /></div>
+    <div><p className="cap" style={{color:"#e6e4dd"}}>Free edition · dark</p><Frame theme="dark" isPremium={false} /></div>
+  </div>
+);
+</script>
+</body></html>
