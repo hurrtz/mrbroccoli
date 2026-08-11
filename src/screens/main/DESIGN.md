@@ -125,6 +125,11 @@ overtime past the estimate fills both with red. Processing phases carry no
 per-phase estimate, so their inner ring deliberately rests on the phase tint
 rather than faking a fraction.
 
+The workspace owns the status label for the active input surface. Capability
+checks may make the pager move from voice to text after mount; the workspace
+mirrors that automatic move for its label without sending it through the
+remembered-surface callback. A later user swipe still owns both states.
+
 ## Evidence
 
 - [`mainScreenViewModel.ts`](./mainScreenViewModel.ts) — route labels, transcript

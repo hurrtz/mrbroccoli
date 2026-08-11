@@ -67,7 +67,9 @@ receive already-derived state and callbacks.
   composer and the control retires carrying the reason. A control the user
   cannot press is not the one to land them on. Routes settle after the pager
   mounts, so this reacts to the transition rather than only seeding the initial
-  surface; it moves the user once and does not fight a later swipe back.
+  surface; it moves the user once and does not fight a later swipe back. The
+  idle status follows that automatic move while the user's remembered surface
+  preference remains unchanged.
 - The composer is outlined in the accent at rest, not only when focused. It is
   the other half of the primary action, and it carries the workspace whenever
   voice cannot.

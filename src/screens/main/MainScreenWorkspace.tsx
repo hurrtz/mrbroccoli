@@ -234,6 +234,16 @@ export function MainScreenWorkspace({
     [onInputSurfaceChange],
   );
 
+  // Route capability checks settle after the workspace mounts. The pager
+  // moves to the composer when voice becomes unusable, so keep the status
+  // label on the same surface without recording that automatic move as the
+  // user's preference.
+  React.useEffect(() => {
+    if (voiceStage.voiceSurfaceUnusable) {
+      setSurface("text");
+    }
+  }, [voiceStage.voiceSurfaceUnusable]);
+
   const isActive = visualPhase !== "idle";
   const speaking = visualPhase === "speaking";
   const lastAssistant = getLastAssistantMessage(transcript.messages);

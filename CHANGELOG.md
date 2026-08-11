@@ -39,6 +39,12 @@ the complete Play Store translations are kept in a dedicated file under
   violet at the deepest thinking and back, with a set tuned separately for
   each appearance.
 
+### Fixed
+
+- Keep the home-screen instruction in sync when capability checks move from
+  the unavailable voice control to the message field, so it says to type
+  instead of still saying to speak.
+
 ## 3.2.0 - 2026-08-08
 
 ### Added

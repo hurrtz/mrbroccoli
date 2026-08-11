@@ -255,4 +255,60 @@ describe("MainScreenWorkspace streaming isolation", () => {
         .justifyContent,
     ).toBe("flex-start");
   });
+
+  it("keeps the idle status aligned when settled routes move to the composer", () => {
+    const t = jest.fn((key: string) => key);
+    const workspaceProps = createWorkspaceProps(t);
+    const onInputSurfaceChange = jest.fn();
+    const transcript = {
+      activeConversationId: null,
+      activeConversationTitle: "Untitled",
+      activeReplayMessageId: null,
+      messages: [],
+      onCopyMessage: jest.fn(async () => true),
+      onRetryMessage: jest.fn(),
+      replayPhase: "idle" as const,
+      scrollEnabled: true,
+      showStyleControl: false,
+      showUsageStats: false,
+      showWhenEmpty: true,
+      t,
+    };
+    const screen = renderWorkspace(
+      <MainScreenWorkspace
+        {...workspaceProps}
+        transcript={transcript}
+        visualPhase="idle"
+        voiceStage={{
+          ...workspaceProps.voiceStage,
+          isActive: false,
+          onInputSurfaceChange,
+          visualPhase: "idle",
+          voiceSurfaceUnusable: false,
+        }}
+      />,
+    );
+
+    expect(screen.getByText("Tap to speak")).toBeTruthy();
+
+    screen.rerender(
+      <MainScreenWorkspace
+        {...workspaceProps}
+        transcript={transcript}
+        visualPhase="idle"
+        voiceStage={{
+          ...workspaceProps.voiceStage,
+          initialInputSurface: "text",
+          isActive: false,
+          onInputSurfaceChange,
+          visualPhase: "idle",
+          voiceSurfaceUnusable: true,
+        }}
+      />,
+    );
+
+    expect(screen.getByText("Type and send")).toBeTruthy();
+    expect(screen.queryByText("Tap to speak")).toBeNull();
+    expect(onInputSurfaceChange).not.toHaveBeenCalled();
+  });
 });
