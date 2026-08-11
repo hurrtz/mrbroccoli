@@ -347,8 +347,8 @@ export function MainScreen() {
     hasProviderCredential: sttProvider
       ? hasProviderCredentialForCapability(sttProvider, sttApiKey, "stt")
       : false,
+    localSttModelId: runtimeSettings.localSttModelId,
     nativeRecognizerAvailable: nativeStt.isAvailable,
-    selectedLocalSttModel: Boolean(selectedSttModel),
     sttMode: runtimeSettings.sttMode,
     sttProvider,
   });

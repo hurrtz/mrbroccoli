@@ -2,8 +2,8 @@ import { Settings } from "../../types";
 
 interface IsSpeechInputUnavailableParams {
   hasProviderCredential: boolean;
+  localSttModelId: Settings["localSttModelId"];
   nativeRecognizerAvailable: boolean;
-  selectedLocalSttModel: boolean;
   sttMode: Settings["sttMode"];
   sttProvider: string | null | undefined;
 }
@@ -22,8 +22,8 @@ interface IsSpeechInputUnavailableParams {
  */
 export function isSpeechInputUnavailable({
   hasProviderCredential,
+  localSttModelId,
   nativeRecognizerAvailable,
-  selectedLocalSttModel,
   sttMode,
   sttProvider,
 }: IsSpeechInputUnavailableParams): boolean {
@@ -32,7 +32,7 @@ export function isSpeechInputUnavailable({
   }
 
   if (sttMode === "local") {
-    return !selectedLocalSttModel;
+    return !localSttModelId;
   }
 
   return !sttProvider || !hasProviderCredential;

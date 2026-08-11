@@ -36,10 +36,23 @@ const sttModel = {
 
 const mockSelect = jest.fn();
 const mockPrepare = jest.fn();
+const mockGetBenchmarks = jest.fn();
+const mockGetInstallStatuses = jest.fn();
 
 jest.mock("../../../src/services/localDeviceCapabilities", () => ({
   probeLocalDeviceCapabilities: jest.fn(async () => snapshot),
-  getLocalModelBenchmarkResults: jest.fn(async () => ({})),
+  getLocalModelBenchmarkResults: (...args: unknown[]) =>
+    mockGetBenchmarks(...args),
+  localModelBenchmarkMatchesDevice: (
+    benchmark: { device?: typeof snapshot } | undefined,
+    device: typeof snapshot,
+  ) =>
+    Boolean(
+      benchmark?.device?.platform === device.platform &&
+        benchmark.device.architecture === device.architecture &&
+        benchmark.device.osVersion === device.osVersion &&
+        benchmark.device.physicalMemoryBytes === device.physicalMemoryBytes,
+    ),
 }));
 
 jest.mock("../../../src/services/nativeSpeechCapabilities", () => ({
@@ -75,7 +88,16 @@ jest.mock("../../../src/services/offlineProfile", () => ({
 }));
 
 jest.mock("../../../src/services/offlineProfileManager", () => ({
-  getLocalCatalogInstallStatuses: jest.fn(async () => ({})),
+  getLocalCatalogInstallStatuses: (...args: unknown[]) =>
+    mockGetInstallStatuses(...args),
+  getOfflineProfileValidationModels: (profile: {
+    llm: unknown;
+    stt?: unknown;
+    tts?: unknown;
+  }) =>
+    [profile.llm, profile.stt, profile.tts].filter(
+      (model) => model != null,
+    ),
   prepareOfflineProfile: (...args: unknown[]) => mockPrepare(...args),
 }));
 
@@ -114,6 +136,8 @@ describe("useAutoSetupJob", () => {
       profile: { llm: llmModel, stt: sttModel, languages: ["en"] },
     });
     mockPrepare.mockReset().mockResolvedValue(undefined);
+    mockGetBenchmarks.mockReset().mockResolvedValue({});
+    mockGetInstallStatuses.mockReset().mockResolvedValue({});
   });
 
   afterEach(() => {
@@ -256,6 +280,101 @@ describe("useAutoSetupJob", () => {
     expect(mockPrepare).toHaveBeenCalledTimes(2);
     expect(mockPrepare.mock.calls[1][0]).toBe(mockPrepare.mock.calls[0][0]);
     expect(rendered.result.current.state).toBe("done");
+  });
+
+  it("rescans for a fallback after this phone rejects the proposed model", async () => {
+    const fallbackModel = {
+      ...llmModel,
+      id: "qwen3.5-0.8b-q8",
+      name: "Qwen 3.5 0.8B",
+    };
+    mockSelect
+      .mockReturnValueOnce({
+        status: "ready",
+        profile: { llm: llmModel, stt: sttModel, languages: ["en"] },
+      })
+      .mockReturnValueOnce({
+        status: "ready",
+        profile: { llm: fallbackModel, stt: sttModel, languages: ["en"] },
+      });
+    const failedBenchmark = {
+      modelId: llmModel.id,
+      catalogVersion: 2,
+      testedAt: "2026-08-10T00:01:00.000Z",
+      status: "failed",
+      loadMs: 0,
+      durationMs: 25,
+      measuredUnderPressure: false,
+      device: snapshot,
+    };
+    mockPrepare.mockImplementationOnce(
+      async (
+        _profile: unknown,
+        options?: {
+          onProgress?: (progress: {
+            modelId: string;
+            stepIndex: number;
+            stepCount: number;
+            stepsRemaining: number;
+            action: "benchmarking";
+            stepProgress: null;
+          }) => void;
+        },
+      ) => {
+        options?.onProgress?.({
+          modelId: llmModel.id,
+          stepIndex: 2,
+          stepCount: 4,
+          stepsRemaining: 2,
+          action: "benchmarking",
+          stepProgress: null,
+        });
+        mockGetBenchmarks.mockResolvedValue({
+          [llmModel.id]: failedBenchmark,
+        });
+        throw new Error("Failed to load model");
+      },
+    );
+    mockGetInstallStatuses.mockResolvedValue({
+      [llmModel.id]: { installed: true, path: "/models/llm", verified: true },
+      [sttModel.id]: { installed: true, path: "/models/stt", verified: true },
+    });
+    const { rendered } = renderJob();
+
+    act(() => rendered.result.current.start());
+    await act(async () => {
+      jest.advanceTimersByTime(1000);
+    });
+    await act(async () => {
+      jest.advanceTimersByTime(4000);
+    });
+    await act(async () => {
+      rendered.result.current.install();
+    });
+    await act(async () => {
+      await Promise.resolve();
+    });
+
+    expect(rendered.result.current.state).toBe("failed");
+    expect(rendered.result.current.errorDetail).toBe("onDeviceTestFailed");
+    expect(rendered.result.current.plan[0]).toMatchObject({
+      failed: true,
+      installed: true,
+    });
+
+    act(() => rendered.result.current.retry());
+    expect(rendered.result.current.state).toBe("scanning");
+    expect(mockPrepare).toHaveBeenCalledTimes(1);
+    await act(async () => {
+      jest.advanceTimersByTime(1000);
+    });
+    await act(async () => {
+      jest.advanceTimersByTime(4000);
+    });
+
+    expect(rendered.result.current.state).toBe("proposal");
+    expect(rendered.result.current.plan[0].model?.id).toBe(fallbackModel.id);
+    expect(mockSelect).toHaveBeenCalledTimes(2);
   });
 
   it("fails the scan honestly when nothing can run on this phone", async () => {

@@ -124,6 +124,29 @@ describe("AutoSetupCard", () => {
     expect(screen.getByText("autoSetupRetry")).toBeTruthy();
   });
 
+  it("reports a model test failure instead of calling it an unfinished download", () => {
+    const screen = renderCard({
+      job: createAutoSetupJob({
+        state: "failed",
+        errorDetail: "onDeviceTestFailed",
+        plan: [
+          {
+            role: "think",
+            roleLabel: "THINKING",
+            name: "Granite 4.0 1B",
+            active: false,
+            installed: true,
+            failed: true,
+          },
+        ],
+      }),
+    });
+
+    expect(screen.getAllByText("onDeviceTestFailed")).toHaveLength(2);
+    expect(screen.queryByText("autoSetupFailedDetail")).toBeNull();
+    expect(screen.queryByText("autoSetupFailedRowNote")).toBeNull();
+  });
+
   it("gives a failed scan its own words and no phantom plan", () => {
     const screen = renderCard({
       job: createAutoSetupJob({ state: "failed", errorKind: "scan" }),

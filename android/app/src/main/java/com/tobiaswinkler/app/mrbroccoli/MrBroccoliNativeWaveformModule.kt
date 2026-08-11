@@ -40,14 +40,13 @@ class MrBroccoliNativeWaveformModule(
     reactApplicationContext.getSystemService(Context.AUDIO_SERVICE) as AudioManager
   }
 
-  private var recorder: MediaRecorder? = null
+  private var recorder: MrBroccoliPcmWaveRecorder? = null
   private var activeSessionId: String? = null
   private var activeOutputFile: File? = null
   @Volatile private var ambientMonitorRunning = false
   @Volatile private var ambientSessionId: String? = null
   private var ambientRecorder: AudioRecord? = null
   private var ambientThread: Thread? = null
-  private var levelRunnable: Runnable? = null
   private var audioDeviceCallback: AudioDeviceCallback? = null
   private var previousAudioMode: Int? = null
   private var previousSpeakerphoneOn: Boolean? = null
@@ -91,23 +90,21 @@ class MrBroccoliNativeWaveformModule(
         outputFile.parentFile?.mkdirs()
         configureCommunicationRouteLocked()
 
-        val nextRecorder =
-          if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            MediaRecorder(reactApplicationContext)
-          } else {
-            @Suppress("DEPRECATION")
-            MediaRecorder()
+        val nextRecorder = MrBroccoliPcmWaveRecorder(outputFile) { metering ->
+          mainHandler.post {
+            synchronized(lock) {
+              if (activeSessionId == sessionId && recorder != null) {
+                emitLevelEvent(sessionId, metering)
+              }
+            }
           }
-
-        configureRecorder(nextRecorder, outputFile)
-        nextRecorder.prepare()
+        }
         nextRecorder.start()
 
         recorder = nextRecorder
         activeSessionId = sessionId
         activeOutputFile = outputFile
         startAudioRouteUpdatesLocked(sessionId)
-        startLevelUpdatesLocked(sessionId, nextRecorder)
         emitLifecycleEvent(
           type = "started",
           sessionId = sessionId,
@@ -152,14 +149,10 @@ class MrBroccoliNativeWaveformModule(
 
       try {
         currentRecorder.stop()
-        currentRecorder.reset()
-        currentRecorder.release()
-
         recorder = null
         activeSessionId = null
         activeOutputFile = null
         stopAudioRouteUpdatesLocked()
-        stopLevelUpdatesLocked()
         restoreCommunicationRouteLocked()
         emitLifecycleEvent(
           type = "stopped",
@@ -363,20 +356,6 @@ class MrBroccoliNativeWaveformModule(
     super.invalidate()
   }
 
-  private fun configureRecorder(recorder: MediaRecorder, outputFile: File) {
-    // VOICE_RECOGNITION follows Android's active communication input route
-    // without applying the stronger call processing used by
-    // VOICE_COMMUNICATION. This keeps AirPods/headset microphones usable for
-    // transcription while preserving speech quality.
-    recorder.setAudioSource(MediaRecorder.AudioSource.VOICE_RECOGNITION)
-    recorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4)
-    recorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC)
-    recorder.setAudioChannels(1)
-    recorder.setAudioSamplingRate(16_000)
-    recorder.setAudioEncodingBitRate(64_000)
-    recorder.setOutputFile(outputFile.absolutePath)
-  }
-
   private fun resolveOutputFile(outputUri: String?): File {
     if (!outputUri.isNullOrBlank()) {
       val parsed = Uri.parse(outputUri)
@@ -392,7 +371,7 @@ class MrBroccoliNativeWaveformModule(
       }
     }
 
-    val fileName = "native-waveform-${System.currentTimeMillis()}.m4a"
+    val fileName = MrBroccoliPcmWaveFile.defaultFileName(System.currentTimeMillis())
     return File(reactApplicationContext.cacheDir, fileName)
   }
 
@@ -404,25 +383,8 @@ class MrBroccoliNativeWaveformModule(
     activeSessionId = null
     activeOutputFile = null
     stopAudioRouteUpdatesLocked()
-    stopLevelUpdatesLocked()
-
     if (currentRecorder != null) {
-      try {
-        currentRecorder.stop()
-      } catch (_: RuntimeException) {
-      } catch (_: IllegalStateException) {
-      }
-
-      try {
-        currentRecorder.reset()
-      } catch (_: RuntimeException) {
-      } catch (_: IllegalStateException) {
-      }
-
-      try {
-        currentRecorder.release()
-      } catch (_: RuntimeException) {
-      }
+      runCatching { currentRecorder.cancel() }
     }
 
     if (deleteOutput) {
@@ -529,48 +491,6 @@ class MrBroccoliNativeWaveformModule(
     previousSpeakerphoneOn = null
     legacyBluetoothScoStarted = false
     communicationRouteConfigured = false
-  }
-
-  private fun startLevelUpdatesLocked(
-    sessionId: String,
-    activeRecorder: MediaRecorder,
-  ) {
-    stopLevelUpdatesLocked()
-
-    val runnable = object : Runnable {
-      override fun run() {
-        val metering = synchronized(lock) {
-          if (
-            recorder !== activeRecorder ||
-            activeSessionId != sessionId
-          ) {
-            null
-          } else {
-            val amplitude =
-              try {
-                activeRecorder.maxAmplitude
-              } catch (_: RuntimeException) {
-                0
-              }
-
-            if (amplitude <= 0) {
-              -160.0
-            } else {
-              (20.0 * log10(amplitude.toDouble() / 32_767.0))
-                .coerceIn(-160.0, 0.0)
-            }
-          }
-        }
-
-        if (metering != null) {
-          emitLevelEvent(sessionId, metering)
-          mainHandler.postDelayed(this, 150)
-        }
-      }
-    }
-
-    levelRunnable = runnable
-    mainHandler.post(runnable)
   }
 
   private fun startAmbientLevelUpdatesLocked(
@@ -687,11 +607,6 @@ class MrBroccoliNativeWaveformModule(
       }
       emitEvent(payload)
     }
-  }
-
-  private fun stopLevelUpdatesLocked() {
-    levelRunnable?.let(mainHandler::removeCallbacks)
-    levelRunnable = null
   }
 
   private fun emitLifecycleEvent(type: String, sessionId: String, file: File? = null) {

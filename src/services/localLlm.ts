@@ -14,6 +14,10 @@ import type {
   UsageEstimate,
 } from "../types";
 import { buildSystemPrompt } from "./llm/prompts";
+import {
+  createResponseProvenanceStreamFilter,
+  stripLeadingResponseProvenanceMarker,
+} from "./llm/messageProvenance";
 import { getLocalModelInstallStatus } from "./localModelManager";
 import { renderTextForSpeech } from "./speechTextRenderer";
 import { recordDebugLogEvent } from "./debugLogCapture";
@@ -130,9 +134,12 @@ export function sanitizeLocalResponseText(
     .replace(/<think\b[^>]*>[\s\S]*?<\/think\s*>/giu, " ")
     .replace(/<think\b[^>]*>[\s\S]*$/giu, " ")
     .replace(/<\/?think\b[^>]*>/giu, " ");
+  const withoutEchoedProvenance = stripLeadingResponseProvenanceMarker(
+    withoutPrivateReasoning,
+  );
   return renderTextForSpeech(
     stripLeadingMarkdownTitle(
-      withoutPrivateReasoning,
+      withoutEchoedProvenance,
       options.streaming === true,
     ),
   );
@@ -247,8 +254,11 @@ async function getContext(model: LocalLlmModelDefinition) {
       n_threads: Math.max(2, Math.min(6, 4)),
       n_gpu_layers: Platform.OS === "ios" ? 99 : 0,
       flash_attn_type: Platform.OS === "ios" ? "on" : "off",
-      cache_type_k: "q8_0",
-      cache_type_v: "q8_0",
+      // llama.cpp rejects a quantized V cache when Flash Attention is off.
+      // Android is CPU-only here, so use its supported default cache types;
+      // iOS can keep the smaller quantized cache with Metal Flash Attention.
+      cache_type_k: Platform.OS === "ios" ? "q8_0" : "f16",
+      cache_type_v: Platform.OS === "ios" ? "q8_0" : "f16",
       use_mmap: true,
       use_mlock: false,
       no_extra_bufts: true,
@@ -301,6 +311,10 @@ export async function streamLocalChat(params: {
       responseTone: params.responseTone,
       language: params.language,
       currentModel: model.name,
+      // Local history is passed without hosted-provider provenance markers.
+      // Smaller on-device models otherwise sometimes answer with the example
+      // marker itself instead of the requested content.
+      includeResponseProvenance: false,
       conversationSummary: params.conversationSummary,
       pastConversationKnowledge: params.pastConversationKnowledge,
       spokenParagraphStreaming: params.spokenParagraphStreaming,
@@ -325,6 +339,9 @@ export async function streamLocalChat(params: {
       const completionTokenLimit = maxReplyTokens(
         params.responseLength,
         thinkingEnabled,
+      );
+      const provenanceStreamFilter = createResponseProvenanceStreamFilter(
+        params.onChunk,
       );
       let streamedVisibleText = "";
       const streamParsedContent = (content: string) => {
@@ -364,7 +381,7 @@ export async function streamLocalChat(params: {
               streamParsedContent(content);
             }
           } else if (token) {
-            params.onChunk(token);
+            provenanceStreamFilter.push(token);
           }
         },
       );
@@ -372,6 +389,9 @@ export async function streamLocalChat(params: {
         const error = new Error("Local response generation was cancelled.");
         error.name = "AbortError";
         throw error;
+      }
+      if (!thinkingEnabled) {
+        provenanceStreamFilter.flush();
       }
       const fullText = sanitizeLocalResponseText(result.content || result.text);
       if (!fullText) {

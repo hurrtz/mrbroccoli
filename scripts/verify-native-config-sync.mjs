@@ -509,6 +509,11 @@ assertIncludes(
   "-keep class com.facebook.react.turbomodule.** { *; }",
 );
 assertIncludes(
+  "Android Sherpa TTS JNI callback R8 keep rules",
+  androidProguardRules,
+  "-keep class com.sherpaonnx.SherpaOnnxTtsHelper$* { *; }",
+);
+assertIncludes(
   "Android diagnostics module implementation",
   androidDiagnostics,
   "getHistoricalProcessExitReasons",

@@ -41,6 +41,20 @@ the complete Play Store translations are kept in a dedicated file under
 
 ### Fixed
 
+- Let downloaded response models initialize and answer normally on Android,
+  without exposing an internal response-history label, and stop optimized
+  Release builds from crashing when Kokoro begins speaking. Automatic setup
+  retry now selects another compatible model after a real device-test failure
+  instead of repeating the failed model or describing its completed download
+  as unfinished. Android one-tap setup now uses compact Piper speech instead of
+  starting an unbounded Kokoro benchmark; Kokoro remains available as an
+  explicit advanced choice.
+- Make the home microphone immediately use the downloaded speech recognizer
+  selected by automatic setup instead of incorrectly treating the provider
+  speech-model picker as the local readiness signal.
+- Record Android microphone turns as mono 16 kHz PCM WAV audio so downloaded
+  speech recognition can read the same capture that provider routes receive,
+  instead of failing every local voice turn on the recorder's AAC/M4A file.
 - Keep the home-screen instruction in sync when capability checks move from
   the unavailable voice control to the message field, so it says to type
   instead of still saying to speak.

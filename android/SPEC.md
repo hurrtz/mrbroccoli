@@ -72,6 +72,9 @@ conversation policy.
 - Audio focus, routing changes, permission loss, and app lifecycle transitions
   produce explicit state rather than silently continuing with a different
   route.
+- Native microphone turns are captured once as mono 16 kHz PCM WAV. The same
+  file must remain readable by downloaded Sherpa STT and provider upload routes,
+  while waveform metering is derived from that PCM stream.
 - Waveform sampling is bounded and must not retain user audio as diagnostics.
 
 ## Release Artifact Contract
@@ -82,6 +85,8 @@ Android Release builds:
 - never fall back to the debug signing key;
 - enable R8 minification and resource shrinking;
 - retain the reviewed optimized rules baseline;
+- retain Sherpa's JNI-visible Kotlin TTS callback classes and boxed `invoke`
+  signature across R8 optimization;
 - emit `SYMBOL_TABLE` native symbols and the R8 mapping;
 - exclude downloadable Kokoro, Whisper, Piper, and Qwen model payloads;
 - run without Expo dotenv loading; and

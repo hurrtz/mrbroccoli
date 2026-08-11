@@ -67,7 +67,7 @@ function benchmark(
 }
 
 describe("free offline profile selection", () => {
-  it("selects a complete quality-first English profile", () => {
+  it("selects a compact English voice for automatic Android setup", () => {
     const result = selectOfflineProfile({
       languages: ["en"],
       snapshot: device(),
@@ -80,6 +80,43 @@ describe("free offline profile selection", () => {
         "ministral-3-3b-reasoning-q4",
       );
       expect(result.profile.stt.id).toBe("parakeet-tdt-0.6b-v3-int8");
+      expect(result.profile.tts?.id).toBe("piper-en-us-kristin");
+    }
+  });
+
+  it("keeps Kokoro as the quality-first automatic English voice on iOS", () => {
+    const result = selectOfflineProfile({
+      languages: ["en"],
+      snapshot: device({ platform: "ios", architecture: "arm64" }),
+    });
+
+    expect(result.status).toBe("ready");
+    if (result.status === "ready") {
+      expect(result.profile.tts?.id).toBe("kokoro-multilingual");
+    }
+  });
+
+  it("uses the system voice instead of automatically running Kokoro on Android", () => {
+    const result = selectOfflineProfile({
+      languages: ["zh-CN"],
+      snapshot: device(),
+    });
+
+    expect(result.status).toBe("ready");
+    if (result.status === "ready") {
+      expect(result.profile.tts).toBeNull();
+    }
+  });
+
+  it("honors an explicit Kokoro selection on Android", () => {
+    const result = selectOfflineProfile({
+      languages: ["en"],
+      snapshot: device(),
+      overrides: { ttsModelId: "kokoro-multilingual" },
+    });
+
+    expect(result.status).toBe("ready");
+    if (result.status === "ready") {
       expect(result.profile.tts?.id).toBe("kokoro-multilingual");
     }
   });
@@ -250,7 +287,7 @@ describe("free offline profile selection", () => {
         "ministral-3-3b-reasoning-q4",
       );
       expect(result.profile.stt?.id).toBe("parakeet-tdt-0.6b-v3-int8");
-      expect(result.profile.tts?.id).toBe("kokoro-multilingual");
+      expect(result.profile.tts?.id).toBe("piper-en-us-kristin");
     }
   });
 
@@ -269,7 +306,7 @@ describe("free offline profile selection", () => {
     if (result.status === "ready") {
       expect(result.profile.llm.id).toBe("granite-4.0-1b-q4");
       expect(result.profile.stt?.id).toBe("parakeet-tdt-0.6b-v3-int8");
-      expect(result.profile.tts?.id).toBe("kokoro-multilingual");
+      expect(result.profile.tts?.id).toBe("piper-en-us-kristin");
     }
   });
 

@@ -160,7 +160,7 @@ export function AutoSetupCard({
       return t("autoSetupDownloadingNote");
     }
     if (current === "failed") {
-      return t("autoSetupFailedRowNote");
+      return job.errorDetail ?? t("autoSetupFailedRowNote");
     }
     if (current === "skipped") {
       return t("autoSetupQueuedNote");

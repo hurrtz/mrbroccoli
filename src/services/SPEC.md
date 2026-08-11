@@ -56,6 +56,11 @@ navigation or render UI.
 - audio queue, waveform, Live Activity/notification, background-turn, and
   remote-control services isolate native modules from React components.
 
+Android microphone capture crosses that bridge as mono 16 kHz PCM WAV. The
+downloaded Sherpa file recognizer requires a wave-readable input, so the native
+recorder must not return AAC data under either an M4A or WAV name. Provider STT
+receives the same valid capture through the shared pipeline.
+
 ### Local capability catalogue
 
 `localDeviceCapabilities.ts`, `localModelManager.ts`,
@@ -79,6 +84,30 @@ earlier design paused preparation in a cooling loop instead, which left setup
 permanently stuck whenever battery saver was enabled. A below-target benchmark
 is distinct from a failed model and may remain available as an advanced
 override.
+
+Local LLM contexts use Metal Flash Attention with quantized KV caches on iOS.
+The Android route is CPU-only and uses F16 KV caches: llama.cpp requires Flash
+Attention for a quantized V cache and otherwise rejects the context before the
+first token can be generated.
+
+Local prompts omit the hosted-route provenance-marker instruction because the
+local history path carries plain visible message content. Echoed marker-shaped
+output is stripped from both the stream and completed reply as a defensive
+boundary; it must never become the visible assistant answer.
+
+Kokoro's Android TTS callback crosses a JNI signature boundary that expects a
+boxed `Integer`. The Release R8 rules retain the wrapper's anonymous callback
+classes so optimization cannot rewrite the `invoke(FloatArray)` method and
+abort ART during local speech generation.
+
+**Decision:** One-tap Android setup does not select Kokoro automatically. A
+compact Piper voice is used when the language has one, otherwise setup keeps
+the phone's language-aware system voice. Kokoro remains an explicit advanced
+choice on Android and the quality-first automatic choice on iOS. Physical
+Android validation showed that synthesis could continue inside the native
+runtime long after the benchmark deadline, and that work has no safe abort
+boundary; timing out only the JavaScript promise would leave the app competing
+with an orphaned native inference job.
 
 Installed models and benchmark state are device-local, excluded from backup,
 and invalidated by catalogue, artifact, runtime, OS, app, or relevant device

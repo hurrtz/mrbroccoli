@@ -12,6 +12,11 @@
 # and field names. Renaming either side makes ART abort inside GetObjectField.
 -keep class com.k2fsa.sherpa.onnx.** { *; }
 
+# sherpa-onnx JNI also calls the boxed FloatArray callback created by the React
+# Native TTS wrapper via invoke([F)Ljava/lang/Integer;. R8 must not merge or
+# rewrite that anonymous callback class or the Release app aborts in ART.
+-keep class com.sherpaonnx.SherpaOnnxTtsHelper$* { *; }
+
 # llama.rn installs its JSI bindings and resolves optimized native variants
 # through these Java entry points.
 -keep class com.rnllama.** { *; }

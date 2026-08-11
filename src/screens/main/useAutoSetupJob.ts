@@ -9,6 +9,7 @@ import { useKeepAwakeWhile } from "../../hooks/useKeepAwakeWhile";
 import {
   probeLocalDeviceCapabilities,
   getLocalModelBenchmarkResults,
+  localModelBenchmarkMatchesDevice,
   type LocalDeviceSnapshot,
   type LocalModelBenchmarkResult,
 } from "../../services/localDeviceCapabilities";
@@ -21,6 +22,7 @@ import {
 } from "../../services/offlineProfile";
 import {
   getLocalCatalogInstallStatuses,
+  getOfflineProfileValidationModels,
   prepareOfflineProfile,
   type OfflinePreparationProgress,
 } from "../../services/offlineProfileManager";
@@ -98,10 +100,12 @@ export function useAutoSetupJob({
     null,
   );
   const [errorKind, setErrorKind] = useState<"scan" | "install" | null>(null);
+  const [errorDetail, setErrorDetail] = useState<string | null>(null);
   const [doneModelIds, setDoneModelIds] = useState<Set<LocalModelId>>(
     () => new Set(),
   );
   const abortRef = useRef<AbortController | null>(null);
+  const progressRef = useRef<OfflinePreparationProgress | null>(null);
   const revealTimersRef = useRef<ReturnType<typeof setTimeout>[]>([]);
   const mountedRef = useRef(true);
 
@@ -123,7 +127,9 @@ export function useAutoSetupJob({
     setScanned(0);
     setFailedModelId(null);
     setErrorKind(null);
+    setErrorDetail(null);
     setDoneModelIds(new Set());
+    progressRef.current = null;
     revealTimersRef.current.forEach(clearTimeout);
     revealTimersRef.current = FACT_REVEAL_MS.map((ms, index) =>
       setTimeout(() => {
@@ -198,6 +204,8 @@ export function useAutoSetupJob({
     setPhase("installing");
     setFailedModelId(null);
     setProgress(null);
+    setErrorDetail(null);
+    progressRef.current = null;
     const abortController = new AbortController();
     abortRef.current = abortController;
 
@@ -216,6 +224,7 @@ export function useAutoSetupJob({
         await prepareOfflineProfile(profile, {
           abortSignal: abortController.signal,
           onProgress: (nextProgress) => {
+            progressRef.current = nextProgress;
             if (!mountedRef.current) {
               return;
             }
@@ -283,13 +292,41 @@ export function useAutoSetupJob({
         if ((error as Error | null)?.name === "AbortError") {
           return;
         }
-        setFailedModelId((current) => current ?? progressModelId(progress));
+        const [latestInstalls, latestBenchmarks] = await Promise.all([
+          getLocalCatalogInstallStatuses().catch(() => null),
+          getLocalModelBenchmarkResults().catch(() => benchmarks),
+        ]);
+        if (!mountedRef.current) {
+          return;
+        }
+        const failedId = progressModelId(progressRef.current);
+        if (latestInstalls) {
+          setDoneModelIds(
+            new Set(
+              getOfflineProfileModels(profile)
+                .filter((model) => latestInstalls[model.id]?.verified)
+                .map((model) => model.id),
+            ),
+          );
+        }
+        setBenchmarks(latestBenchmarks);
+        setFailedModelId(failedId);
+        setErrorDetail(
+          failedId &&
+            snapshot &&
+            isDurableBenchmarkFailure(
+              latestBenchmarks[failedId],
+              snapshot,
+            )
+            ? t("onDeviceTestFailed")
+            : null,
+        );
         setErrorKind("install");
         setPhase("failed");
         onOutcome("failed");
       }
     })();
-  }, [benchmarks, onOutcome, profile, progress, settings, snapshot, updateSettings]);
+  }, [benchmarks, onOutcome, profile, settings, snapshot, t, updateSettings]);
 
   const install = useCallback(() => {
     if (phase !== "proposal") {
@@ -306,8 +343,20 @@ export function useAutoSetupJob({
       start();
       return;
     }
+    if (
+      snapshot &&
+      getOfflineProfileValidationModels(profile).some((model) =>
+        isDurableBenchmarkFailure(benchmarks[model.id], snapshot),
+      )
+    ) {
+      // A retry cannot make a model that this phone already proved unusable
+      // fit the same profile. Re-run selection so the persisted benchmark can
+      // propose the next viable model, while keeping verified downloads.
+      start();
+      return;
+    }
     runInstall();
-  }, [phase, profile, runInstall, start]);
+  }, [benchmarks, phase, profile, runInstall, snapshot, start]);
 
   const finish = useCallback(() => {
     setPhase("offer");
@@ -443,13 +492,24 @@ export function useAutoSetupJob({
     totalSizeLabel,
     reading,
     errorKind,
-    errorDetail: null,
+    errorDetail,
     running: phase === "installing",
     start,
     install,
     retry,
     finish,
   };
+}
+
+function isDurableBenchmarkFailure(
+  benchmark: LocalModelBenchmarkResult | undefined,
+  snapshot: LocalDeviceSnapshot,
+) {
+  return (
+    localModelBenchmarkMatchesDevice(benchmark, snapshot) &&
+    benchmark?.measuredUnderPressure !== true &&
+    (benchmark?.status === "below-target" || benchmark?.status === "failed")
+  );
 }
 
 function progressModelId(

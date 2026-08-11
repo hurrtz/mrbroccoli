@@ -204,6 +204,10 @@ language checks occur before execution.
 - Native recognition is preferred when it satisfies the selected on-device
   policy.
 - Downloaded speech models are selected from the curated local catalogue.
+- Android native capture writes mono 16 kHz PCM WAV so the captured file is a
+  valid input to both downloaded Sherpa recognition and provider speech routes;
+  metering is derived from the same PCM stream without retaining it in
+  diagnostics.
 - Provider routes reuse the provider key but retain independent model,
   language, timeout, and validation behavior.
 - TTS transforms visual response text into speakable text before chunking.

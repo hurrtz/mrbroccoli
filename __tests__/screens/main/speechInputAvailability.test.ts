@@ -2,8 +2,8 @@ import { isSpeechInputUnavailable } from "../../../src/screens/main/speechInputA
 
 const base = {
   hasProviderCredential: false,
+  localSttModelId: null,
   nativeRecognizerAvailable: false,
-  selectedLocalSttModel: false,
   sttMode: "native" as const,
   sttProvider: null,
 };
@@ -22,14 +22,14 @@ describe("isSpeechInputUnavailable", () => {
     expect(
       isSpeechInputUnavailable({
         ...base,
-        selectedLocalSttModel: false,
+        localSttModelId: null,
         sttMode: "local",
       }),
     ).toBe(true);
     expect(
       isSpeechInputUnavailable({
         ...base,
-        selectedLocalSttModel: true,
+        localSttModelId: "whisper-small",
         sttMode: "local",
       }),
     ).toBe(false);
@@ -69,6 +69,7 @@ describe("isSpeechInputUnavailable", () => {
       isSpeechInputUnavailable({
         ...base,
         hasProviderCredential: true,
+        localSttModelId: null,
         sttMode: "local",
         sttProvider: "openai",
       }),
@@ -76,7 +77,7 @@ describe("isSpeechInputUnavailable", () => {
     expect(
       isSpeechInputUnavailable({
         ...base,
-        selectedLocalSttModel: true,
+        localSttModelId: "whisper-small",
         sttMode: "provider",
         sttProvider: "openai",
       }),

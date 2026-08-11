@@ -162,6 +162,20 @@ function preferredAutomaticCandidates<T extends LocalModelDefinition>(
   );
 }
 
+function preferredAutomaticTtsCandidates(
+  models: LocalTtsModelDefinition[],
+  params: {
+    snapshot: LocalDeviceSnapshot;
+    benchmarks?: Partial<Record<LocalModelId, LocalModelBenchmarkResult>>;
+  },
+) {
+  const platformCandidates =
+    params.snapshot.platform === "android"
+      ? models.filter((model) => model.sherpaModelType !== "kokoro")
+      : models;
+  return preferredAutomaticCandidates(platformCandidates, params);
+}
+
 export function selectOfflineProfile(params: {
   languages: readonly SpeechLanguage[];
   snapshot: LocalDeviceSnapshot;
@@ -226,7 +240,7 @@ export function selectOfflineProfile(params: {
     viableStt,
     automaticCandidateOptions,
   );
-  const automaticTts = preferredAutomaticCandidates(
+  const automaticTts = preferredAutomaticTtsCandidates(
     viableTts,
     automaticCandidateOptions,
   );
