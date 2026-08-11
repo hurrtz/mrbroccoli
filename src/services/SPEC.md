@@ -176,7 +176,9 @@ test when it could contain user or provider data.
 `premiumEntitlement.ts` caches only an exact verified non-consumable ownership
 record. `developmentEntitlement.ts` permits simulation only under `.dev` and
 `.maestro` runtime identities. Store-promo fixtures are deterministic,
-localized, network-free, and independently restricted to `.maestro`.
+localized, network-free, and independently restricted to `.maestro`. Their
+optional voice-orb presentation state is validated and stored separately from
+runtime voice state; production phase and progress remain pipeline-derived.
 
 ## Failure Rules
 

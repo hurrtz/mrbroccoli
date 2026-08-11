@@ -9,11 +9,76 @@ tags:
     permissions:
       all: allow
 - assertVisible:
-    id: setup-guide-card
+    id: main-screen
+- assertVisible:
+    id: intro-banner
 - takeScreenshot:
-    path: ${PLATFORM}/smoke/setup-guide-intro
+    path: ${PLATFORM}/smoke/intro-banner-home
 - tapOn:
-    id: setup-guide-not-now
+    id: intro-banner
+- assertVisible:
+    id: intro-flow-content
+- assertVisible:
+    id: intro-welcome-play
+- takeScreenshot:
+    path: ${PLATFORM}/smoke/intro-01-welcome
+- tapOn:
+    id: intro-welcome-play
+- extendedWaitUntil:
+    visible: "Playing — tap to stop"
+    timeout: 3000
+- takeScreenshot:
+    path: ${PLATFORM}/smoke/intro-01-audio-playing
+- tapOn:
+    id: intro-welcome-play
+- swipe:
+    direction: LEFT
+- assertVisible: "What you actually need"
+- takeScreenshot:
+    path: ${PLATFORM}/smoke/intro-02-requirements
+- tapOn:
+    id: intro-next
+- assertVisible:
+    id: auto-setup-card
+- takeScreenshot:
+    path: ${PLATFORM}/smoke/intro-03-auto-setup
+- tapOn:
+    id: intro-stepper-dot-3
+- assertVisible: "Pick something to think with"
+- takeScreenshot:
+    path: ${PLATFORM}/smoke/intro-04-thinking-route
+- tapOn:
+    id: intro-stepper-dot-4
+- assertVisible: "Let it hear you"
+- takeScreenshot:
+    path: ${PLATFORM}/smoke/intro-05-listening
+- tapOn:
+    id: intro-stepper-dot-5
+- assertVisible: "Let it speak back"
+- takeScreenshot:
+    path: ${PLATFORM}/smoke/intro-06-speaking
+- tapOn:
+    id: intro-stepper-dot-6
+- assertVisible: "That is everything"
+- assertVisible:
+    id: intro-done
+- takeScreenshot:
+    path: ${PLATFORM}/smoke/intro-07-premium
+- tapOn:
+    id: intro-back
+- assertVisible: "Let it speak back"
+- tapOn:
+    id: intro-stepper-dot-6
+- tapOn:
+    id: intro-done
+- assertVisible:
+    id: main-screen
+- tapOn:
+    id: intro-banner
+- assertVisible:
+    id: intro-welcome-play
+- tapOn:
+    id: intro-close
 - assertVisible:
     id: main-screen
 - takeScreenshot:

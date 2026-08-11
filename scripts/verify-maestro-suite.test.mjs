@@ -15,6 +15,12 @@ import {
   localeNeedsSafeScroll,
   runFlow,
 } from "./run-maestro-suite.mjs";
+import {
+  getOrbFixtureOpenCommand,
+  getOrbFixtureStopCommand,
+  ORB_MATRIX,
+  parseOrbMatrixArguments,
+} from "./run-orb-matrix.mjs";
 
 test("derives the complete locale order from the TypeScript registry", () => {
   const languages = readAppLanguages();
@@ -44,6 +50,66 @@ test("counts only explicit screenshot commands", () => {
 `),
     2,
   );
+});
+
+test("defines the complete deterministic orb boundary matrix", () => {
+  assert.equal(ORB_MATRIX.length, 10);
+  assert.deepEqual(ORB_MATRIX[0], ["01-idle-zero", "idle", 0, 0, 0]);
+  assert.deepEqual(ORB_MATRIX.at(-1), [
+    "10-thinking-overtime-full",
+    "thinking",
+    1,
+    1,
+    1,
+  ]);
+});
+
+test("package-targets Android orb fixture URLs without a chooser", () => {
+  const command = getOrbFixtureOpenCommand({
+    appId: "com.example.maestro",
+    platform: "android",
+    udid: "emulator-5554",
+    url: "mrbroccoli://store-promos?phase=idle&overtime=0",
+  });
+
+  assert.equal(command[0], "adb");
+  assert.deepEqual(command[1].slice(-3), [
+    "'mrbroccoli://store-promos?phase=idle&overtime=0'",
+    "-p",
+    "com.example.maestro",
+  ]);
+  assert.equal(command[1].at(-1), "com.example.maestro");
+  assert.deepEqual(
+    getOrbFixtureStopCommand({
+      appId: "com.example.maestro",
+      platform: "android",
+      udid: "emulator-5554",
+    }),
+    [
+      "adb",
+      [
+        "-s",
+        "emulator-5554",
+        "shell",
+        "am",
+        "force-stop",
+        "com.example.maestro",
+      ],
+    ],
+  );
+});
+
+test("requires a supported platform and explicit orb target", () => {
+  assert.deepEqual(
+    parseOrbMatrixArguments(["--platform", "ios", "--udid", "IOS-UDID"]),
+    {
+      appId: "com.tobiaswinkler.app.mrbroccoli.maestro",
+      outputDirectory: null,
+      platform: "ios",
+      udid: "IOS-UDID",
+    },
+  );
+  assert.throws(() => parseOrbMatrixArguments(["--platform", "web"]), /Usage/);
 });
 
 test("only nudges lower iOS locale rows into the safe tap area", () => {

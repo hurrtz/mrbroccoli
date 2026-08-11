@@ -1,0 +1,19 @@
+appId: ${APP_ID}
+name: Voice orb ${SCREENSHOT_NAME}
+tags:
+  - runtime
+  - orb
+---
+# The runner package-targets the fixture URL before Maestro starts. This avoids
+# Android's chooser when production and development builds are also installed.
+- assertVisible:
+    id: store-promo-fixture-ready-premium
+- stopApp
+- launchApp
+- setOrientation: PORTRAIT
+- assertVisible:
+    id: voice-stage-${PHASE}
+- assertVisible:
+    id: ${ORB_ID}
+- takeScreenshot:
+    path: ${PLATFORM}/orb/${SCREENSHOT_NAME}

@@ -1,5 +1,5 @@
 appId: ${APP_ID}
-name: Drive mode with three routes in landscape
+name: Drive mode with three-route picker in landscape
 tags:
   - visual
   - layout
@@ -11,11 +11,9 @@ tags:
       all: allow
 - setOrientation: PORTRAIT
 - assertVisible:
-    id: setup-guide-card
-- tapOn:
-    id: setup-guide-not-now
-- assertVisible:
     id: main-screen
+- assertVisible:
+    id: intro-banner
 
 # A harmless placeholder credential exercises the normal route derivation
 # without making a provider request. State and Keychain are cleared per run.
@@ -44,13 +42,24 @@ tags:
 - tapOn:
     id: settings-close-button
 
-# Confirm all three derived routes are rendered before and after rotation.
+# The approved workspace exposes one active-route byline. Open its picker to
+# prove all three derived routes, then close it through the active route.
 - assertVisible:
-    id: response-mode-option-mode-1
+    id: route-byline
+- tapOn:
+    id: route-byline
 - assertVisible:
-    id: response-mode-option-mode-2
+    id: route-picker-list
 - assertVisible:
-    id: response-mode-option-mode-3
+    id: route-picker-row-mode-1
+- assertVisible:
+    id: route-picker-row-mode-2
+- assertVisible:
+    id: route-picker-row-mode-3
+- takeScreenshot:
+    path: ${PLATFORM}/visual/drive-three-routes-picker-portrait
+- tapOn:
+    id: route-picker-row-mode-1
 - assertVisible:
     id: drive-session-controls
 - takeScreenshot:
@@ -61,11 +70,7 @@ tags:
 - assertVisible:
     id: landscape-right-pane
 - assertVisible:
-    id: response-mode-option-mode-1
-- assertVisible:
-    id: response-mode-option-mode-2
-- assertVisible:
-    id: response-mode-option-mode-3
+    id: route-byline
 - assertVisible:
     id: drive-session-controls
 - takeScreenshot:

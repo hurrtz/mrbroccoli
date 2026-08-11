@@ -46,6 +46,7 @@ interface GetMainScreenViewModelParams {
   sttProvider: Provider | null;
   t: TranslateFn;
   ttsProvider: Provider | null;
+  visualPhaseOverride?: VoiceVisualPhase | null;
 }
 
 export function getMainScreenViewModel({
@@ -64,6 +65,7 @@ export function getMainScreenViewModel({
   sttProvider,
   t,
   ttsProvider,
+  visualPhaseOverride = null,
 }: GetMainScreenViewModelParams) {
   const responseRoute = getResponseModeRoute(settings);
   const localLlmModel =
@@ -138,7 +140,7 @@ export function getMainScreenViewModel({
           )
           .join(" → ");
 
-  const visualPhase: VoiceVisualPhase = isRecording
+  const runtimeVisualPhase: VoiceVisualPhase = isRecording
     ? "recording"
     : pipelinePhase === "transcribing"
       ? "transcribing"
@@ -156,6 +158,7 @@ export function getMainScreenViewModel({
                 : pipelinePhase === "thinking"
                   ? "thinking"
                   : "idle";
+  const visualPhase = visualPhaseOverride ?? runtimeVisualPhase;
   const isActive = visualPhase !== "idle";
 
   const baseMessages = activeConversation?.messages || [];

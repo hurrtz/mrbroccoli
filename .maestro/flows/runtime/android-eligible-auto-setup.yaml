@@ -1,0 +1,57 @@
+appId: ${APP_ID}
+name: Android eligible automatic on-device setup
+tags:
+  - runtime
+  - android
+  - physical-device
+---
+- launchApp:
+    clearState: true
+    clearKeychain: true
+    permissions:
+      all: allow
+- assertVisible:
+    id: main-screen
+- tapOn:
+    id: intro-banner
+- tapOn:
+    id: intro-stepper-dot-2
+- assertVisible:
+    id: auto-setup-card
+- tapOn: "Check this phone"
+- extendedWaitUntil:
+    visible: "Download and install"
+    timeout: 30000
+- assertVisible: "Recommended for this phone"
+- takeScreenshot:
+    path: android-physical/runtime/auto-setup-proposal
+- tapOn: "Download and install"
+- takeScreenshot:
+    path: android-physical/runtime/auto-setup-installing
+- extendedWaitUntil:
+    visible: "Ready"
+    timeout: 1200000
+- assertVisible: "Installed and selected."
+- assertVisible: "Replies, speech input and voice output now work with no network connection."
+- takeScreenshot:
+    path: android-physical/runtime/auto-setup-ready
+- tapOn: "Done"
+- tapOn:
+    id: intro-close
+- assertVisible:
+    id: main-screen
+- tapOn:
+    id: main-settings-button
+- assertVisible:
+    id: settings-page-overview
+- scrollUntilVisible:
+    element:
+      id: settings-overview-row-local
+    direction: DOWN
+- tapOn:
+    id: settings-overview-row-local
+- assertVisible:
+    id: on-device-settings-page
+- assertVisible: "Installed and available"
+- takeScreenshot:
+    path: android-physical/runtime/on-device-settings-installed

@@ -7,18 +7,30 @@ import {
   seedStorePromoFixture,
 } from "../src/services/storePromoFixtures";
 import {
+  isStorePromoOrbPresentation,
   isStorePromoScene,
+  type StorePromoOrbPresentation,
 } from "../src/services/storePromoPresentation";
 
 type FixtureState = "loading" | "ready" | "denied" | "error";
 
 export default function StorePromosFixtureRoute() {
-  const { locale, scene } = useLocalSearchParams<{
+  const { locale, overtime, phase, phaseProgress, scene, turnProgress } = useLocalSearchParams<{
     locale?: string | string[];
+    overtime?: string | string[];
+    phase?: string | string[];
+    phaseProgress?: string | string[];
     scene?: string | string[];
+    turnProgress?: string | string[];
   }>();
-  const requestedLocale = Array.isArray(locale) ? locale[0] : locale;
-  const requestedScene = Array.isArray(scene) ? scene[0] : scene;
+  const first = (value: string | string[] | undefined) =>
+    Array.isArray(value) ? value[0] : value;
+  const requestedLocale = first(locale);
+  const requestedScene = first(scene);
+  const requestedPhase = first(phase);
+  const requestedPhaseProgress = first(phaseProgress);
+  const requestedTurnProgress = first(turnProgress);
+  const requestedOvertime = first(overtime);
   const [state, setState] = useState<FixtureState>("loading");
 
   useEffect(() => {
@@ -33,10 +45,34 @@ export default function StorePromosFixtureRoute() {
         return;
       }
 
+      const hasOrbField = [
+        requestedPhase,
+        requestedPhaseProgress,
+        requestedTurnProgress,
+        requestedOvertime,
+      ].some(
+        (value) => value !== undefined,
+      );
+      let requestedOrb: StorePromoOrbPresentation | null = null;
+      if (hasOrbField) {
+        const candidate: unknown = {
+          phase: requestedPhase,
+          phaseProgress: Number(requestedPhaseProgress),
+          turnProgress: Number(requestedTurnProgress),
+          overtime: Number(requestedOvertime),
+        };
+        if (!isStorePromoOrbPresentation(candidate)) {
+          setState("error");
+          return;
+        }
+        requestedOrb = candidate;
+      }
+
       try {
         const seeded = await seedStorePromoFixture(
           requestedLocale,
           requestedScene,
+          requestedOrb,
         );
         if (!cancelled) {
           setState(seeded ? "ready" : "denied");
@@ -51,7 +87,14 @@ export default function StorePromosFixtureRoute() {
     return () => {
       cancelled = true;
     };
-  }, [requestedLocale, requestedScene]);
+  }, [
+    requestedLocale,
+    requestedOvertime,
+    requestedPhase,
+    requestedPhaseProgress,
+    requestedScene,
+    requestedTurnProgress,
+  ]);
 
   if (state === "denied") {
     return <Redirect href="/" />;

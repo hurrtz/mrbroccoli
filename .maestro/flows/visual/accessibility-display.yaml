@@ -11,13 +11,11 @@ tags:
       all: allow
 - setOrientation: PORTRAIT
 - assertVisible:
-    id: setup-guide-card
-- takeScreenshot:
-    path: ${PLATFORM}/accessibility/setup-guide
-- tapOn:
-    id: setup-guide-not-now
-- assertVisible:
     id: main-screen
+- assertVisible:
+    id: intro-banner
+- takeScreenshot:
+    path: ${PLATFORM}/accessibility/intro-banner-home
 - takeScreenshot:
     path: ${PLATFORM}/accessibility/home
 - tapOn:
@@ -34,10 +32,11 @@ tags:
     id: settings-page-overview
 - takeScreenshot:
     path: ${PLATFORM}/accessibility/settings-overview
-- scrollUntilVisible:
-    element:
-      id: settings-overview-row-app
-    direction: DOWN
+- repeat:
+    times: 12
+    commands:
+      - swipe:
+          direction: UP
 - takeScreenshot:
     path: ${PLATFORM}/accessibility/settings-overview-bottom
 - tapOn:

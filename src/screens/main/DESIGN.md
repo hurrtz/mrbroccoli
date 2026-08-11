@@ -125,6 +125,11 @@ overtime past the estimate fills both with red. Processing phases carry no
 per-phase estimate, so their inner ring deliberately rests on the phase tint
 rather than faking a fraction.
 
+The isolated `.maestro` screenshot identity may replace the visual phase and
+both ring fractions with validated deterministic values. That override enters
+at the presentation boundary after the live hook still runs, never mutates the
+pipeline, and is unavailable to production and development identities.
+
 The workspace owns the status label for the active input surface. Capability
 checks may make the pager move from voice to text after mount; the workspace
 mirrors that automatic move for its label without sending it through the

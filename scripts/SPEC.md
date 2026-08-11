@@ -58,6 +58,17 @@ flowchart LR
 `make pre-push` is spend-free and non-interactive. Live provider calls and
 Maestro device work must never be hidden in the Git hook.
 
+The cross-platform Maestro suite starts from cleared app state and verifies
+the current first-run contract: the app opens directly into the workspace with
+the optional introduction banner. It must not wait for a retired blocking
+setup wizard before exercising settings, locales, layout, or accessibility.
+The checked-in runtime flows also hold every voice-orb phase and ring boundary
+deterministically under the isolated fixture identity, and prove honest
+low-memory automatic-setup failure and retry on Android without downloading a
+model. A separate physical-device flow accepts a real proposal, waits through
+download, checksum verification, and benchmarks, then verifies the selected
+models in Settings; it is never part of an emulator or Git-hook run.
+
 ## Living-Spec Review
 
 The pre-push hook first runs `pre-push-spec-review.sh` over the commits actually
@@ -80,6 +91,8 @@ the architectural answer for the author.
   input; they do not depend on the caller's shell directory accidentally.
 - Checks are deterministic and testable with fixture repositories or injected
   command runners.
+- Native configuration parity includes Release-only R8/JNI invariants whose
+  absence cannot be exercised by the Debug instrumentation build.
 - Non-zero exit means the requested evidence was not produced. Missing tools,
   devices, credentials, symbols, mappings, or reports are failures when the
   target promises them.

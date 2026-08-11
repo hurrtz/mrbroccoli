@@ -1,13 +1,18 @@
 const REQUIRED_HOME_CONTROLS = [
   { id: "main-conversations-button", label: "Conversations" },
   { id: "main-settings-button", label: "Settings" },
+  { id: "intro-banner", label: "New here?" },
   {
     id: "provider-empty-state",
     label:
       "Configure credentials. Add credentials in Settings, then choose the routes you want to use.",
   },
-  { id: "route-web-search-container", label: "Web Search" },
-  { id: "voice-input-surface", label: "Tap to speak", descendant: true },
+  { id: "transcript-handle", label: "Show transcript. No messages yet" },
+  {
+    id: "conversation-settings-summary-control",
+    label: "Open conversation settings",
+  },
+  { id: "workspace-status-info", label: "Session details" },
   { id: "show-voice-input", label: "Show voice input" },
   { id: "show-text-input", label: "Show text input" },
 ];

@@ -156,6 +156,36 @@ describe("getMainScreenViewModel", () => {
     expect(viewModel.visualPhase).toBe("speaking");
   });
 
+  it("keeps deterministic fixture phase and status presentation aligned", () => {
+    const viewModel = getMainScreenViewModel({
+      activeConversation: null,
+      isRecording: false,
+      language: "en",
+      model: "gpt-5.4",
+      pipelinePhase: "thinking",
+      player: {
+        isActivelyPlaying: false,
+        isPlaybackPaused: false,
+        isPlaying: false,
+      },
+      provider: "openai",
+      selectedSttModel: "",
+      selectedTtsModel: "",
+      selectedTtsVoice: "",
+      settings: DEFAULT_SETTINGS,
+      streamingText: "",
+      sttProvider: null,
+      t,
+      ttsProvider: null,
+      visualPhaseOverride: "recording",
+    });
+
+    expect(viewModel.visualPhase).toBe("recording");
+    expect(viewModel.isActive).toBe(true);
+    expect(viewModel.statusDisplay.statusTitle).toBe("listening");
+    expect(viewModel.statusDisplay.statusDetail).toBe("listeningToYourVoice");
+  });
+
   it("does not expose the default model route when no reply provider is configured", () => {
     const viewModel = getMainScreenViewModel({
       activeConversation: null,

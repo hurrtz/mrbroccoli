@@ -26,7 +26,9 @@ import {
 } from "./developmentEntitlement";
 import {
   isStorePromoApplicationId,
+  STORE_PROMO_ORB_STORAGE_KEY,
   STORE_PROMO_SCENE_STORAGE_KEY,
+  type StorePromoOrbPresentation,
   type StorePromoScene,
 } from "./storePromoPresentation";
 
@@ -606,6 +608,7 @@ function getStorePromoSpeechLanguage(language: AppLanguage): SpeechLanguage {
 export async function seedStorePromoFixture(
   language: AppLanguage,
   scene: StorePromoScene = "premium",
+  orb: StorePromoOrbPresentation | null = null,
 ) {
   const applicationId = await getApplicationId();
   if (!isStorePromoApplicationId(applicationId)) {
@@ -673,6 +676,7 @@ export async function seedStorePromoFixture(
   await AsyncStorage.multiSet([
     [STORAGE_KEY, JSON.stringify(toPublicSettings(nextSettings))],
     [STORE_PROMO_FIXTURE_MARKER_KEY, language],
+    [STORE_PROMO_ORB_STORAGE_KEY, JSON.stringify(orb)],
     [STORE_PROMO_SCENE_STORAGE_KEY, scene],
     [DEVELOPMENT_ENTITLEMENT_MODE_STORAGE_KEY, scene],
   ]);

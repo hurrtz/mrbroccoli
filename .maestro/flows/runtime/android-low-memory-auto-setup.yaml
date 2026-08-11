@@ -1,0 +1,41 @@
+appId: ${APP_ID}
+name: Android low-memory automatic setup
+tags:
+  - runtime
+  - android
+---
+- launchApp:
+    clearState: true
+    clearKeychain: true
+    permissions:
+      all: allow
+- assertVisible:
+    id: main-screen
+- tapOn:
+    id: intro-banner
+- tapOn:
+    id: intro-stepper-dot-2
+- assertVisible:
+    id: auto-setup-card
+- tapOn: "Check this phone"
+- extendedWaitUntil:
+    visible: "No suitable set for this phone"
+    timeout: 15000
+- assertVisible: "Try again"
+- assertVisible:
+    id: auto-setup-manual
+- takeScreenshot:
+    path: android/runtime/auto-setup-ineligible-first-scan
+- tapOn: "Try again"
+- extendedWaitUntil:
+    visible: "No suitable set for this phone"
+    timeout: 15000
+- takeScreenshot:
+    path: android/runtime/auto-setup-ineligible-retry
+- tapOn:
+    id: auto-setup-manual
+- assertVisible:
+    id: on-device-settings-page
+- assertVisible: "No suitable set for this phone"
+- takeScreenshot:
+    path: android/runtime/auto-setup-settings-handoff

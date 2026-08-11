@@ -851,6 +851,32 @@ describe("MainScreenVoiceStage composer", () => {
     now.mockRestore();
   });
 
+  it("uses deterministic isolated-fixture ring values when supplied", () => {
+    const screen = renderStage(
+      <MainScreenVoiceStage
+        {...createProps({
+          isActive: true,
+          orbProgressOverride: {
+            phaseProgress: 0.25,
+            turnProgress: 0.5,
+            overtime: 0.75,
+          },
+          visualPhase: "thinking",
+        })}
+      />,
+    );
+
+    const circles = screen.UNSAFE_getAllByType(Circle);
+    expect(
+      circles.filter((circle) => circle.props.stroke === lightColors.danger),
+    ).toHaveLength(2);
+    expect(
+      circles
+        .filter((circle) => circle.props.stroke === lightColors.danger)
+        .every((circle) => Array.isArray(circle.props.strokeDasharray)),
+    ).toBe(true);
+  });
+
   it("changes phase color and icon without mounting a second status element", () => {
     const screen = renderStage(
       <MainScreenVoiceStage

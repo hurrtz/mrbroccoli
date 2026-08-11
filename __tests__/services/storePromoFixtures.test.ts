@@ -11,7 +11,10 @@ import {
 import {
   getStorePromoPipelinePhase,
   isStorePromoApplicationId,
+  isStorePromoOrbPresentation,
+  loadStorePromoOrbPresentation,
   loadStorePromoScene,
+  STORE_PROMO_ORB_STORAGE_KEY,
   STORE_PROMO_SCENE_STORAGE_KEY,
 } from "../../src/services/storePromoPresentation";
 import { DEVELOPMENT_ENTITLEMENT_MODE_STORAGE_KEY } from "../../src/services/developmentEntitlement";
@@ -152,6 +155,71 @@ describe("store promo fixtures", () => {
     expect(getStorePromoPipelinePhase("premium", "idle")).toBe("thinking");
     expect(getStorePromoPipelinePhase("free", "idle")).toBe("idle");
     expect(getStorePromoPipelinePhase(null, "searching")).toBe("searching");
+  });
+
+  it("seeds and loads deterministic orb progress only for the isolated identity", async () => {
+    getApplicationId.mockResolvedValue(
+      "com.tobiaswinkler.app.mrbroccoli.maestro",
+    );
+    const orb = {
+      phase: "thinking" as const,
+      phaseProgress: 0.25,
+      turnProgress: 0.5,
+      overtime: 0.75,
+    };
+
+    await expect(seedStorePromoFixture("en", "premium", orb)).resolves.toBe(
+      true,
+    );
+    await expect(loadStorePromoOrbPresentation()).resolves.toEqual(orb);
+
+    await expect(seedStorePromoFixture("en", "premium")).resolves.toBe(true);
+    await expect(
+      AsyncStorage.getItem(STORE_PROMO_ORB_STORAGE_KEY),
+    ).resolves.toBe("null");
+    await expect(loadStorePromoOrbPresentation()).resolves.toBeNull();
+  });
+
+  it("rejects malformed or out-of-range orb fixture values", () => {
+    expect(
+      isStorePromoOrbPresentation({
+        phase: "recording",
+        phaseProgress: 0,
+        turnProgress: 1,
+        overtime: 0.5,
+      }),
+    ).toBe(true);
+    expect(
+      isStorePromoOrbPresentation({
+        phase: "preparing",
+        phaseProgress: 0,
+        turnProgress: 0,
+        overtime: 0,
+      }),
+    ).toBe(false);
+    expect(
+      isStorePromoOrbPresentation({
+        phase: "thinking",
+        phaseProgress: 1.01,
+        turnProgress: 0,
+        overtime: 0,
+      }),
+    ).toBe(false);
+  });
+
+  it("does not load an orb fixture for the production identity", async () => {
+    getApplicationId.mockResolvedValue("com.tobiaswinkler.app.mrbroccoli");
+    await AsyncStorage.setItem(
+      STORE_PROMO_ORB_STORAGE_KEY,
+      JSON.stringify({
+        phase: "thinking",
+        phaseProgress: 1,
+        turnProgress: 1,
+        overtime: 1,
+      }),
+    );
+
+    await expect(loadStorePromoOrbPresentation()).resolves.toBeNull();
   });
 
   it("requires the complete Maestro suffix", () => {

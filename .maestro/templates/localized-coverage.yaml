@@ -9,11 +9,9 @@ tags:
     permissions:
       all: allow
 - assertVisible:
-    id: setup-guide-card
-- tapOn:
-    id: setup-guide-not-now
-- assertVisible:
     id: main-screen
+- assertVisible:
+    id: intro-banner
 
 # Select the locale through the same settings surface a customer uses.
 - tapOn:

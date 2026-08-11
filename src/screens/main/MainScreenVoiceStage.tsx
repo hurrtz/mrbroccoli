@@ -12,6 +12,7 @@ import {
 import { TranslateFn } from "./shared";
 import { styles } from "./styles";
 import { InputSurface, VoiceTextInputPager } from "./VoiceTextInputPager";
+import type { OrbTurnProgress } from "./useOrbTurnProgress";
 
 interface MainScreenVoiceStageProps {
   colors: Colors;
@@ -41,6 +42,7 @@ interface MainScreenVoiceStageProps {
   onResolvePromptBlock?: () => void;
   onSubmitTextMessage: (text: string) => void;
   onTextMessageChange?: (text: string) => void;
+  orbProgressOverride?: OrbTurnProgress | null;
   playbackPaused?: boolean;
   promptBlockedActionEnabled?: boolean;
   promptBlockedActionLabel?: string | null;
@@ -83,6 +85,7 @@ export const MainScreenVoiceStage = React.memo(function MainScreenVoiceStage({
   onResolvePromptBlock,
   onSubmitTextMessage,
   onTextMessageChange,
+  orbProgressOverride = null,
   playbackPaused = false,
   promptBlockedActionEnabled = false,
   promptBlockedActionLabel = null,
@@ -143,6 +146,7 @@ export const MainScreenVoiceStage = React.memo(function MainScreenVoiceStage({
           onResolvePromptBlock={onResolvePromptBlock}
           onSubmitTextMessage={onSubmitTextMessage}
           onTextMessageChange={onTextMessageChange}
+          orbProgressOverride={orbProgressOverride}
           playbackPaused={playbackPaused}
           promptBlockedActionEnabled={promptBlockedActionEnabled}
           promptBlockedActionLabel={promptBlockedActionLabel}

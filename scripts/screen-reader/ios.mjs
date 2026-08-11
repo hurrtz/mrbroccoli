@@ -81,6 +81,28 @@ function rebootSimulator(execute, cwd, udid) {
   execute("xcrun", ["simctl", "bootstatus", udid, "-b"], { cwd });
 }
 
+export function launchSimulatorApp(
+  execute,
+  cwd,
+  udid,
+  appId,
+  pause = wait,
+) {
+  const launchArguments = ["simctl", "launch", udid, appId];
+  const firstAttempt = execute("xcrun", launchArguments, {
+    allowFailure: true,
+    capture: true,
+    cwd,
+  });
+  if (firstAttempt.status === 0) {
+    return;
+  }
+
+  execute("xcrun", ["simctl", "bootstatus", udid, "-b"], { cwd });
+  pause(1_500);
+  execute("xcrun", launchArguments, { cwd });
+}
+
 export function runIosScreenReaderCheck({
   appId,
   cwd,
@@ -108,7 +130,7 @@ export function runIosScreenReaderCheck({
       writeBoolean(execute, cwd, udid, key, true);
     }
     rebootSimulator(execute, cwd, udid);
-    execute("xcrun", ["simctl", "launch", udid, appId], { cwd });
+    launchSimulatorApp(execute, cwd, udid, appId);
     wait(1_500);
 
     const enabled = readPreference(

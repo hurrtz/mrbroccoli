@@ -5,49 +5,32 @@ import {
   flattenHierarchy,
   validateScreenReaderHierarchy,
 } from "./run-screen-reader-check.mjs";
+import { launchSimulatorApp } from "./screen-reader/ios.mjs";
 
 const requiredControls = [
   ["main-conversations-button", "Conversations"],
   ["main-settings-button", "Settings"],
+  ["intro-banner", "New here?"],
   [
     "provider-empty-state",
     "Configure credentials. Add credentials in Settings, then choose the routes you want to use.",
   ],
-  ["route-web-search-container", "Web Search"],
-  ["voice-input-surface", "Tap to speak"],
+  ["transcript-handle", "Show transcript. No messages yet"],
+  ["conversation-settings-summary-control", "Open conversation settings"],
+  ["workspace-status-info", "Session details"],
   ["show-voice-input", "Show voice input"],
   ["show-text-input", "Show text input"],
 ];
 
 function hierarchyWithControls(overrides = []) {
-  const children = requiredControls.map(([id, label]) =>
-    id === "voice-input-surface"
-      ? {
-          attributes: {
-            accessibilityText: "",
-            clickable: "true",
-            "resource-id": id,
-          },
-          children: [
-            {
-              attributes: {
-                accessibilityText: label,
-                clickable: "true",
-                "resource-id": "",
-              },
-              children: [],
-            },
-          ],
-        }
-      : {
-          attributes: {
-            accessibilityText: label,
-            clickable: "true",
-            "resource-id": id,
-          },
-          children: [],
-        },
-  );
+  const children = requiredControls.map(([id, label]) => ({
+    attributes: {
+      accessibilityText: label,
+      clickable: "true",
+      "resource-id": id,
+    },
+    children: [],
+  }));
   children.push(...overrides);
   return { attributes: {}, children };
 }
@@ -108,5 +91,38 @@ test("rejects missing labels, non-interactive controls, and exposed icons", () =
   assert.equal(
     result.errors.some((error) => error.includes("phosphor-icon-close")),
     true,
+  );
+});
+
+test("retries an iOS app launch after the simulator reports a transient failure", () => {
+  const calls = [];
+  const pauses = [];
+  let launchAttempts = 0;
+  const execute = (command, args, options) => {
+    calls.push({ args, command, options });
+    if (args[1] === "launch") {
+      launchAttempts += 1;
+      return { status: launchAttempts === 1 ? 124 : 0 };
+    }
+    return { status: 0 };
+  };
+
+  launchSimulatorApp(
+    execute,
+    "/repo",
+    "simulator-udid",
+    "com.example.app",
+    (milliseconds) => pauses.push(milliseconds),
+  );
+
+  assert.equal(launchAttempts, 2);
+  assert.deepEqual(pauses, [1_500]);
+  assert.deepEqual(
+    calls.map(({ args }) => args.slice(0, 2)),
+    [
+      ["simctl", "launch"],
+      ["simctl", "bootstatus"],
+      ["simctl", "launch"],
+    ],
   );
 });

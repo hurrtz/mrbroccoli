@@ -6,6 +6,7 @@ import {
 } from "../../../types";
 import { Colors } from "../../../theme/colors";
 import { TranslateFn } from "../shared";
+import type { OrbTurnProgress } from "../useOrbTurnProgress";
 
 export type InputSurface = "voice" | "text";
 
@@ -35,6 +36,8 @@ export interface VoiceTextInputPagerProps {
   onResolvePromptBlock?: () => void;
   onSubmitTextMessage: (text: string) => void;
   onTextMessageChange?: (text: string) => void;
+  /** Deterministic isolated-fixture values; production derives these live. */
+  orbProgressOverride?: OrbTurnProgress | null;
   playbackPaused?: boolean;
   promptBlockedActionEnabled?: boolean;
   promptBlockedActionLabel?: string | null;

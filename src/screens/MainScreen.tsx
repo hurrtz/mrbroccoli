@@ -72,6 +72,7 @@ export function MainScreen() {
     loaded,
   } = useSharedSettings();
   const storePromoPresentation = useStorePromoPresentation();
+  const storePromoOrbPresentation = storePromoPresentation.orb;
   const storePromoScene = storePromoPresentation.scene;
   const baseFreeOffline = useFreeOfflineMode({
     settings,
@@ -694,6 +695,7 @@ export function MainScreen() {
     sttProvider,
     t,
     ttsProvider,
+    visualPhaseOverride: storePromoOrbPresentation?.phase,
   });
   const {
     handleAutoRenameConversation,
@@ -1057,6 +1059,7 @@ export function MainScreen() {
             : handleOpenSpeakingSettings,
           onSubmitTextMessage: handleSubmitTextMessage,
           onTextMessageChange: handleTextMessageChange,
+          orbProgressOverride: storePromoOrbPresentation,
           playbackPaused: player.isPlaybackPaused,
           promptBlockedActionEnabled,
           promptBlockedActionLabel: freeRuntimeBlocked

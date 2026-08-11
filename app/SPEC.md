@@ -43,10 +43,12 @@ available before feature controllers are created.
 
 ## Store-Promo Isolation
 
-The promo route may select a locale and deterministic scene, but fixture state
-must remain inaccessible to the production package and `.dev` package. Runtime
-identity verification in the fixture/presentation services is the authority;
-the existence of a route alone must never enable fixtures.
+The promo route may select a locale, deterministic scene, and bounded voice-orb
+phase/progress values, but fixture state must remain inaccessible to the
+production package and `.dev` package. Runtime identity verification in the
+fixture/presentation services is the authority; the existence of a route alone
+must never enable fixtures. Every orb fraction is validated within zero and one
+before it can replace the live presentation clock.
 
 Evidence:
 

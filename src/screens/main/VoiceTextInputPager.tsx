@@ -40,6 +40,7 @@ export function VoiceTextInputPager({
   onResolvePromptBlock,
   onSubmitTextMessage,
   onTextMessageChange,
+  orbProgressOverride = null,
   playbackPaused,
   promptBlockedActionEnabled = false,
   promptBlockedActionLabel = null,
@@ -75,12 +76,13 @@ export function VoiceTextInputPager({
   });
   const showSurfaceIndicators =
     layout !== "landscape" || inputMode !== "drive-session";
-  const progress = useOrbTurnProgress({
+  const derivedProgress = useOrbTurnProgress({
     recordingMaxMs,
     recordingStartedAtMs: recordingStartedAtMs ?? null,
     speechStartProgress: speechStartProgress ?? null,
     visualPhase,
   });
+  const progress = orbProgressOverride ?? derivedProgress;
   const showDriveCountdown =
     inputMode === "drive-session" &&
     visualPhase === "recording" &&
