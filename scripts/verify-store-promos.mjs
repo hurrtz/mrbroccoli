@@ -79,11 +79,15 @@ export function validateStorePromoSetup(cwd = process.cwd()) {
       "voice-stage-thinking",
       "voice-stage-idle",
       "free-edition-status",
-      "onboarding-recommendation-card",
-      "selectable-message-promo-assistant-2",
+      "intro-stepper-dot-2",
+      "auto-setup-card",
+      "transcript-handle",
       "conversation-drawer-item-promo-branch",
       "settings-page-thinking",
+      "settings-modal-title",
+      "settings-close-button",
       "on-device-settings-page",
+      "conversation-settings-summary-control",
       "conversation-settings-drawer",
     ]) {
       if (!combinedFlow.includes(selector)) {
@@ -94,10 +98,25 @@ export function validateStorePromoSetup(cwd = process.cwd()) {
     }
     if (
       platform === "ios" &&
-      (!combinedFlow.includes("uber-audit-toggle-promo-assistant-2") ||
+      (!combinedFlow.includes("selectable-message-promo-assistant-2") ||
+        !combinedFlow.includes("uber-audit-toggle-promo-assistant-2") ||
         !combinedFlow.includes("settings-page-speaking"))
     ) {
       errors.push("iOS store screenshot flow is missing its Premium-only surfaces");
+    }
+    if (platform === "ios" && !combinedFlow.includes("intro-close")) {
+      errors.push(
+        "iOS store screenshot flow does not close onboarding before reseeding fixtures",
+      );
+    }
+    if (
+      platform === "ios" &&
+      combinedFlow.indexOf("transcript-handle") >
+        combinedFlow.indexOf("selectable-message-promo-assistant-2")
+    ) {
+      errors.push(
+        "iOS store screenshot flow must open the transcript before using message actions",
+      );
     }
     if (!combinedFlow.includes("store-promo-fixture-ready")) {
       errors.push(

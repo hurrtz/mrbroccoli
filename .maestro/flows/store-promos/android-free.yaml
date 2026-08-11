@@ -15,12 +15,16 @@ tags:
 - assertVisible:
     id: voice-stage-idle
 - assertVisible:
-    id: selectable-message-promo-assistant-2
+    id: transcript-handle
 - takeScreenshot:
     path: 02-free-conversation
 - tapOn:
     id: free-edition-status
 - assertVisible:
-    id: onboarding-recommendation-card
+    id: intro-flow-content
+- tapOn:
+    id: intro-stepper-dot-2
+- assertVisible:
+    id: auto-setup-card
 - takeScreenshot:
     path: 03-free-onboarding

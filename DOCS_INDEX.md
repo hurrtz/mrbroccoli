@@ -21,6 +21,13 @@ authoritative documents.
 - `README.md` and `docs/` — operational setup and focused reference material.
 - `CHANGELOG.md` — user-visible release history, not architecture authority.
 
+## Active Cross-Cutting Goal
+
+- [`docs/specs/design-system-reconciliation/requirements.md`](./docs/specs/design-system-reconciliation/requirements.md)
+  defines the current design-system and native-runtime reconciliation goal;
+  its sibling `design.md`, `tasks.md`, and `matrix.md` hold the execution model
+  and live evidence status.
+
 ## Stable Boundaries
 
 | Area | Path | Read First | Deeper Design |

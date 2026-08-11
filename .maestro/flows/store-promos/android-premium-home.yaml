@@ -13,6 +13,6 @@ tags:
 - assertVisible:
     id: voice-stage-thinking
 - assertVisible:
-    id: selectable-message-promo-assistant-2
+    id: transcript-handle
 - takeScreenshot:
     path: 01-premium-active-conversation
