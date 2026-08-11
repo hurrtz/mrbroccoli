@@ -94,7 +94,10 @@ capability healthy. The UI shows the capability that was actually tested.
 - Speaking: spoken reply behavior, native/local/provider voice, instructions,
   previews, and explicit fallback order.
 - On-device: device assessment, curated artifacts, download/test/removal, Free
-  profile choices, and advanced viable overrides.
+  profile choices, and advanced viable overrides. Its Local responses, local
+  speech recognition, and local voices catalogues are collapsed by default so
+  the device assessment and chosen languages stay legible; starting a download
+  expands the owning catalogue to keep progress and recovery visible.
 - Search: search mode, provider, and provider-specific options.
 - Data & privacy: knowledge privacy, backup/restore, and Premium archives.
 - App & diagnostics: appearance, intro banner visibility, debug capture access,

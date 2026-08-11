@@ -158,7 +158,9 @@ export function SpeakingSettingsPage({
         text: t("download"),
         onPress: () => {
           onUpdate({ ttsMode: "kokoro" });
-          void kokoroModel.download();
+          void kokoroModel.download({
+            phonemeLanguages: settings.localLanguages,
+          });
         },
       },
     ]);

@@ -95,7 +95,7 @@ export function LocalModelPerformanceSummary({
 
   return (
     <View
-      testID={`on-device-performance-${model.id}`}
+      testID={`on-device-performance-${model.id}-${assessment.evidence}`}
       accessibilityLabel={`${t(sourceKey)}. ${t(fitKey)}. ${details.join(". ")}`}
       style={styles.container}
     >

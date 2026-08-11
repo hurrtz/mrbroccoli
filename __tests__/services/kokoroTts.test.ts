@@ -78,6 +78,7 @@ const packEntry = (name: string) => ({
 // distinguish a populated espeak-ng-data from an empty one.
 let mockDataDirEntries: ReturnType<typeof packEntry>[] = [
   packEntry("en-us.lpk"),
+  packEntry("en-us.g2p"),
 ];
 
 const mockReadDir = jest.fn(async (path: string) =>
@@ -87,8 +88,14 @@ const mockReadDir = jest.fn(async (path: string) =>
 );
 
 const mockInstallPhonemePacks = jest.fn().mockResolvedValue(undefined);
+const mockArePhonemePacksInstalled = jest.fn(async () =>
+  mockDataDirEntries.some((entry) => entry.name === "en-us.lpk") &&
+  mockDataDirEntries.some((entry) => entry.name === "en-us.g2p"),
+);
 
 jest.mock("../../src/services/phonemePacks", () => ({
+  arePhonemePacksInstalled: (...args: unknown[]) =>
+    mockArePhonemePacksInstalled(...args),
   installPhonemePacks: (...args: unknown[]) => mockInstallPhonemePacks(...args),
 }));
 
@@ -147,7 +154,7 @@ import {
 
 describe("Kokoro TTS service", () => {
   beforeEach(() => {
-    mockDataDirEntries = [packEntry("en-us.lpk")];
+    mockDataDirEntries = [packEntry("en-us.lpk"), packEntry("en-us.g2p")];
   });
 
   afterEach(async () => {
@@ -168,12 +175,12 @@ describe("Kokoro TTS service", () => {
     expect(mockCreateStreamingTTS).not.toHaveBeenCalled();
   });
 
-  it("fails the download when no pronunciation pack could be installed", async () => {
+  it("fails the download when no required pronunciation pack could be installed", async () => {
     mockDataDirEntries = [];
 
     await expect(
       downloadKokoroModel({ phonemeLanguages: ["en"] }),
-    ).rejects.toThrow("pronunciation packs could not be installed");
+    ).rejects.toThrow("required pronunciation packs could not be installed");
   });
 
   it("installs a fallback pack when the caller names no languages", async () => {
@@ -231,6 +238,10 @@ describe("Kokoro TTS service", () => {
   });
 
   it("reports progress while downloading and removes the model explicitly", async () => {
+    const { isModelDownloadedByCategory } = jest.requireMock(
+      "react-native-sherpa-onnx/download",
+    ) as { isModelDownloadedByCategory: jest.Mock };
+    isModelDownloadedByCategory.mockResolvedValueOnce(false);
     mockDownloadModel.mockImplementationOnce(
       async (
         _category: string,
@@ -263,6 +274,10 @@ describe("Kokoro TTS service", () => {
   });
 
   it("falls back to a foreground iOS download when the background session fails", async () => {
+    const { isModelDownloadedByCategory } = jest.requireMock(
+      "react-native-sherpa-onnx/download",
+    ) as { isModelDownloadedByCategory: jest.Mock };
+    isModelDownloadedByCategory.mockResolvedValueOnce(false);
     mockDownloadModel.mockRejectedValueOnce(new Error("unknown error"));
     mockForegroundDownload.mockImplementationOnce(
       (options: {
@@ -313,6 +328,10 @@ describe("Kokoro TTS service", () => {
   });
 
   it("fails Kokoro download and extraction closed on checksum mismatch", async () => {
+    const { isModelDownloadedByCategory } = jest.requireMock(
+      "react-native-sherpa-onnx/download",
+    ) as { isModelDownloadedByCategory: jest.Mock };
+    isModelDownloadedByCategory.mockResolvedValueOnce(false);
     await downloadKokoroModel();
 
     const downloadOptions = mockDownloadModel.mock.calls[0][2] as {
@@ -325,6 +344,7 @@ describe("Kokoro TTS service", () => {
 
     // The iOS foreground fallback extracts the archive separately; that path
     // must reject checksum issues the same way.
+    isModelDownloadedByCategory.mockResolvedValueOnce(false);
     mockDownloadModel.mockRejectedValueOnce(new Error("unknown error"));
     mockForegroundDownload.mockImplementationOnce(() => ({
       jobId: 11,
@@ -345,6 +365,10 @@ describe("Kokoro TTS service", () => {
   });
 
   it("does not start a model download without enough installation space", async () => {
+    const { isModelDownloadedByCategory } = jest.requireMock(
+      "react-native-sherpa-onnx/download",
+    ) as { isModelDownloadedByCategory: jest.Mock };
+    isModelDownloadedByCategory.mockResolvedValueOnce(false);
     mockGetFSInfo.mockResolvedValueOnce({
       freeSpace: 100_000_000,
       freeSpaceEx: 100_000_000,

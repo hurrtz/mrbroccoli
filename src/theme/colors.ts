@@ -40,6 +40,9 @@ export const lightColors = {
   // near-white one. The intro flow keeps its own copy on purpose — its palette
   // is deliberately independent of the app theme.
   premium: "#8A6A12",
+  premiumSoft: "rgba(138, 106, 18, 0.10)",
+  premiumBorder: "rgba(138, 106, 18, 0.32)",
+  onPremium: "#FFFFFF",
   bubbleUser: "#44A055",
   onAccent: "#FFFFFF",
   onPrimary: "#030712",
@@ -86,6 +89,9 @@ export const darkColors = {
   turnTrack: "#262B33",
   turnInk: "#8B97A8",
   premium: "#C9A227",
+  premiumSoft: "rgba(201, 162, 39, 0.14)",
+  premiumBorder: "rgba(201, 162, 39, 0.34)",
+  onPremium: "#1A1405",
   bubbleUser: "#5DC17D",
   onAccent: "#FFFFFF",
   onPrimary: "#111827",

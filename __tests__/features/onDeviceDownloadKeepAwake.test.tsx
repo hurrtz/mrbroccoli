@@ -152,6 +152,19 @@ function renderPage() {
   );
 }
 
+async function getLlmDownloadButton(
+  screen: ReturnType<typeof renderPage>,
+  modelId: string,
+) {
+  const disclosure = await waitFor(() =>
+    screen.getByTestId("on-device-llm-disclosure-header-control"),
+  );
+  fireEvent.press(disclosure);
+  return waitFor(() =>
+    screen.getAllByTestId(`on-device-download-${modelId}`)[0],
+  );
+}
+
 beforeEach(() => {
   jest.clearAllMocks();
   mockResolveDownload = undefined;
@@ -159,6 +172,22 @@ beforeEach(() => {
 });
 
 describe("on-device model downloads", () => {
+  it("keeps local model catalogues collapsed until the user opens one", async () => {
+    const firstLlm = LOCAL_MODEL_CATALOG.find(
+      (model) => model.capability === "llm",
+    );
+    expect(firstLlm).toBeTruthy();
+
+    const screen = renderPage();
+    await waitFor(() =>
+      screen.getByTestId("on-device-llm-disclosure-header-control"),
+    );
+    expect(screen.queryByTestId(`on-device-download-${firstLlm!.id}`)).toBeNull();
+
+    const downloadButton = await getLlmDownloadButton(screen, firstLlm!.id);
+    expect(downloadButton).toBeTruthy();
+  });
+
   it("holds the wake lock for as long as a download runs", async () => {
     const firstLlm = LOCAL_MODEL_CATALOG.find(
       (model) => model.capability === "llm",
@@ -166,9 +195,7 @@ describe("on-device model downloads", () => {
     expect(firstLlm).toBeTruthy();
 
     const screen = renderPage();
-    const downloadButton = await waitFor(() =>
-      screen.getAllByTestId(`on-device-download-${firstLlm?.id}`)[0],
-    );
+    const downloadButton = await getLlmDownloadButton(screen, firstLlm!.id);
 
     expect(mockActivateKeepAwake).not.toHaveBeenCalled();
 
@@ -199,9 +226,7 @@ describe("on-device model downloads", () => {
       (model) => model.capability === "llm",
     );
     const screen = renderPage();
-    const downloadButton = await waitFor(() =>
-      screen.getAllByTestId(`on-device-download-${firstLlm?.id}`)[0],
-    );
+    const downloadButton = await getLlmDownloadButton(screen, firstLlm!.id);
 
     fireEvent.press(downloadButton);
 
@@ -220,9 +245,7 @@ describe("on-device model downloads", () => {
       (model) => model.capability === "llm",
     );
     const screen = renderPage();
-    const downloadButton = await waitFor(() =>
-      screen.getAllByTestId(`on-device-download-${firstLlm?.id}`)[0],
-    );
+    const downloadButton = await getLlmDownloadButton(screen, firstLlm!.id);
 
     fireEvent.press(downloadButton);
 

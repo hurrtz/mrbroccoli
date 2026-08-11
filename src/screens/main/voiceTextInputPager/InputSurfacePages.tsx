@@ -20,6 +20,7 @@ interface InputSurfacePagesProps {
   onPress: () => void;
   onPressIn: () => void;
   onPressOut: () => void;
+  onSelectSurface: (surface: InputSurface) => void;
   onSubmitTextMessage: () => void;
   onTextFocusChange: (focused: boolean) => void;
   onTextMessageChange: (text: string) => void;
@@ -39,6 +40,44 @@ interface InputSurfacePagesProps {
   trackAnimatedStyle: ReturnType<
     typeof useInputSurfaceGesture
   >["trackAnimatedStyle"];
+}
+
+function SurfaceChevron({
+  colors,
+  direction,
+  disabled,
+  onPress,
+  t,
+}: {
+  colors: Colors;
+  direction: "left" | "right";
+  disabled: boolean;
+  onPress: () => void;
+  t: TranslateFn;
+}) {
+  const showVoice = direction === "left";
+
+  return (
+    <TouchableOpacity
+      testID={showVoice ? "show-voice-input" : "show-text-input"}
+      accessibilityLabel={t(showVoice ? "showVoiceInput" : "showTextInput")}
+      accessibilityRole="button"
+      accessibilityState={{ disabled }}
+      activeOpacity={0.7}
+      disabled={disabled}
+      onPress={onPress}
+      style={[
+        styles.surfaceChevron,
+        disabled ? styles.surfaceChevronDisabled : null,
+      ]}
+    >
+      <PhosphorIcon
+        name={direction}
+        size="control"
+        color={colors.textSecondary}
+      />
+    </TouchableOpacity>
+  );
 }
 
 function VoiceInputSurface({
@@ -188,8 +227,14 @@ function TextInputSurface({
 }
 
 export function InputSurfacePages(props: InputSurfacePagesProps) {
-  const { activeSurface, isActive, pageWidth, panGesture, trackAnimatedStyle } =
-    props;
+  const {
+    activeSurface,
+    isActive,
+    onSelectSurface,
+    pageWidth,
+    panGesture,
+    trackAnimatedStyle,
+  } = props;
 
   return (
     <GestureDetector gesture={panGesture}>
@@ -212,7 +257,25 @@ export function InputSurfacePages(props: InputSurfacePagesProps) {
           }
           style={[styles.page, { width: pageWidth }]}
         >
-          <VoiceInputSurface {...props} />
+          <View style={styles.inputSwitchRow}>
+            <SurfaceChevron
+              direction="left"
+              colors={props.colors}
+              disabled
+              onPress={() => onSelectSurface("voice")}
+              t={props.t}
+            />
+            <View style={styles.inputSwitchSurface}>
+              <VoiceInputSurface {...props} />
+            </View>
+            <SurfaceChevron
+              direction="right"
+              colors={props.colors}
+              disabled={isActive || props.disabled}
+              onPress={() => onSelectSurface("text")}
+              t={props.t}
+            />
+          </View>
         </View>
 
         <View
@@ -222,7 +285,25 @@ export function InputSurfacePages(props: InputSurfacePagesProps) {
           }
           style={[styles.page, { width: pageWidth }]}
         >
-          <TextInputSurface {...props} />
+          <View style={styles.inputSwitchRow}>
+            <SurfaceChevron
+              direction="left"
+              colors={props.colors}
+              disabled={isActive || props.disabled}
+              onPress={() => onSelectSurface("voice")}
+              t={props.t}
+            />
+            <View style={styles.inputSwitchSurface}>
+              <TextInputSurface {...props} />
+            </View>
+            <SurfaceChevron
+              direction="right"
+              colors={props.colors}
+              disabled
+              onPress={() => onSelectSurface("text")}
+              t={props.t}
+            />
+          </View>
         </View>
       </Animated.View>
     </GestureDetector>

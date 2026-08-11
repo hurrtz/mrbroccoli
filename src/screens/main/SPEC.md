@@ -40,6 +40,12 @@ receive already-derived state and callbacks.
   empty tracks. The orb is sized from the space the column actually leaves it,
   clamped between 96pt and its ceiling (196 portrait, 150 landscape), so the
   intro banner or a landscape split simply makes it smaller.
+- In portrait, left and right 44pt chevrons flank the measured orb. They make
+  the voice/text pager discoverable without competing with the voice action;
+  the inactive direction is visually quiet and unavailable directions remain
+  disabled. Image attach, Model Council, and Web Search stay in the satellite
+  row below the stage and show their unavailable state instead of changing the
+  workspace geometry.
 - The orb remains in its measured slot even when a route is blocked or
   unavailable. It becomes disabled with the translated reason as its accessible
   name; an explicit notice beneath the stage is the only setup action and
@@ -68,16 +74,17 @@ receive already-derived state and callbacks.
 - Text and image submission use the same conversation and route semantics as a
   spoken turn where their capabilities overlap.
 - The pager always opens on voice. The composer stays available through its
-  labelled 44pt page control and horizontal gesture, but route readiness never
+  labelled 44pt chevrons and horizontal gesture, but route readiness never
   automatically pages the workspace to text. The composer is outlined in the
   accent at rest, not only when focused.
 - A message telling someone to type must leave typing working. This separates
   an unusable voice route from a prompt block, which stops both routes.
-- Controls that cannot be used at all are absent rather than disabled: Web
-  Search without a configured provider, and image attachment on a route that
-  cannot accept one. A switch that cannot move reads as broken, and the reason
-  it cannot move lives in Settings. Controls that are only briefly unavailable,
-  such as during an active turn, stay visible and disabled.
+- Controls that cannot be used at all stay visible but disabled when they are
+  part of the fixed home-stage composition: Web Search without a configured
+  provider and image attachment on a route that cannot accept one. Their
+  accessibility label states why, and Settings owns the remedy. Controls that
+  are only briefly unavailable, such as during an active turn, also stay
+  visible and disabled.
 - The satellites — image attach, Model Council, and Web Search — sit in a row
   under the orb. They change how the next turn is answered, so they read as
   notes on that action rather than settings to pass through on the way in.

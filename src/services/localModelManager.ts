@@ -6,6 +6,7 @@ import {
   type LocalModelId,
   type LocalTtsModelDefinition,
 } from "../constants/localModels";
+import { Platform } from "react-native";
 import { arePhonemePacksInstalled, installPhonemePacks } from "./phonemePacks";
 
 export type LocalModelDownloadProgress = {
@@ -83,9 +84,11 @@ function normalizeProgress(value: number) {
   return Math.max(0, Math.min(1, value));
 }
 
-async function assertPinnedSherpaMetadata(model: LocalModelDefinition) {
+async function assertPinnedSherpaMetadata(
+  model: LocalModelDefinition,
+): Promise<{ archiveExt: "tar.bz2" | "onnx" }> {
   if (model.runtime !== "sherpa-onnx") {
-    return;
+    throw new Error(`${model.name} is not a Sherpa model.`);
   }
   const { getModelByIdByCategory, refreshModelsByCategory } =
     getDownloadModule();
@@ -105,6 +108,131 @@ async function assertPinnedSherpaMetadata(model: LocalModelDefinition) {
     throw new Error(
       `${model.name} changed upstream. Mr Broccoli will not download an unreviewed artifact.`,
     );
+  }
+
+  return { archiveExt: remote.archiveExt };
+}
+
+async function getVerifiedSherpaArtifactPath(
+  model: Exclude<LocalModelDefinition, LocalLlmModelDefinition>,
+) {
+  const {
+    getLocalModelPathByCategory,
+    isModelDownloadedByCategory,
+    listDownloadedModelsByCategory,
+  } = getDownloadModule();
+  const category = getSherpaCategory(model);
+  const installed = await isModelDownloadedByCategory(
+    category,
+    model.runtimeModelId,
+  );
+  if (!installed) {
+    return { installed: false, path: null, verified: false };
+  }
+
+  const downloaded = await listDownloadedModelsByCategory(category);
+  const manifestModel = downloaded.find(
+    (candidate) => candidate.id === model.runtimeModelId,
+  );
+  const verified =
+    manifestModel?.bytes === model.downloadBytes &&
+    manifestModel.sha256?.toLowerCase() === model.sha256.toLowerCase();
+  const path = verified
+    ? await getLocalModelPathByCategory(category, model.runtimeModelId)
+    : null;
+
+  return { installed: true, path, verified: path !== null };
+}
+
+async function downloadSherpaModelInForeground(
+  model: Exclude<LocalModelDefinition, LocalLlmModelDefinition>,
+  archiveExt: "tar.bz2" | "onnx",
+  options?: {
+    abortSignal?: AbortSignal;
+    onProgress?: (progress: LocalModelDownloadProgress) => void;
+  },
+) {
+  if (archiveExt !== "tar.bz2") {
+    throw new Error(
+      `${model.name} uses an unsupported local archive format: ${archiveExt}.`,
+    );
+  }
+
+  const {
+    deleteIncompleteDownload,
+    extractModelByCategory,
+    getDownloadStorageBase,
+  } = getDownloadModule();
+  const { downloadFile, exists, mkdir, stopDownload, unlink } = getFsModule();
+  const category = getSherpaCategory(model);
+  const storageRoot = await getDownloadStorageBase();
+  const modelDirectory = `${storageRoot}/sherpa-onnx/models/${category}`;
+  const archivePath = `${modelDirectory}/${model.runtimeModelId}.${archiveExt}`;
+
+  await deleteIncompleteDownload(category, model.runtimeModelId);
+  await mkdir(modelDirectory, { NSURLIsExcludedFromBackupKey: true });
+  if (await exists(archivePath)) {
+    await unlink(archivePath);
+  }
+
+  const task = downloadFile({
+    // The Sherpa package uses a background NSURLSession. It can stop iOS
+    // Piper downloads without delivering a useful failure to the app. The
+    // foreground route is the same verified/extraction path used by Kokoro,
+    // so a retry stays visible and can report the actual problem.
+    fromUrl: model.downloadUrl,
+    toFile: archivePath,
+    background: false,
+    discretionary: false,
+    progressDivider: 1,
+    progressInterval: 250,
+    readTimeout: 120_000,
+    progress: ({ bytesWritten, contentLength }) => {
+      const totalBytes = contentLength > 0 ? contentLength : model.downloadBytes;
+      options?.onProgress?.({
+        phase: "downloading",
+        progress:
+          totalBytes > 0
+            ? normalizeProgress(bytesWritten / totalBytes)
+            : 0,
+      });
+    },
+  });
+  const abort = () => stopDownload(task.jobId);
+  options?.abortSignal?.addEventListener("abort", abort, { once: true });
+
+  try {
+    const result = await task.promise;
+    if (options?.abortSignal?.aborted) {
+      const error = new Error("Download aborted");
+      error.name = "AbortError";
+      throw error;
+    }
+    if (result.statusCode < 200 || result.statusCode >= 300) {
+      throw new Error(`${model.name} download failed with HTTP ${result.statusCode}.`);
+    }
+    const extracted = await extractModelByCategory(
+      category,
+      model.runtimeModelId,
+      {
+        signal: options?.abortSignal,
+        deleteArchiveAfterExtract: true,
+        onChecksumIssue: async () => false,
+        onProgress: (progress) =>
+          options?.onProgress?.({
+            phase: progress.phase ?? "extracting",
+            progress: normalizeProgress(progress.percent / 100),
+          }),
+      },
+    );
+    return extracted.localPath;
+  } catch (error) {
+    if (await exists(archivePath)) {
+      await unlink(archivePath).catch(() => undefined);
+    }
+    throw error;
+  } finally {
+    options?.abortSignal?.removeEventListener("abort", abort);
   }
 }
 
@@ -127,37 +255,16 @@ export async function getLocalModelInstallStatus(
     };
   }
 
-  const {
-    getLocalModelPathByCategory,
-    isModelDownloadedByCategory,
-    listDownloadedModelsByCategory,
-  } = getDownloadModule();
-  const category = getSherpaCategory(model);
-  const installed = await isModelDownloadedByCategory(
-    category,
-    model.runtimeModelId,
-  );
-  const downloaded = installed
-    ? await listDownloadedModelsByCategory(category)
-    : [];
-  const manifestModel = downloaded.find(
-    (candidate) => candidate.id === model.runtimeModelId,
-  );
-  const artifactVerified =
-    installed &&
-    manifestModel?.bytes === model.downloadBytes &&
-    manifestModel.sha256?.toLowerCase() === model.sha256.toLowerCase();
-  const artifactPath = artifactVerified
-    ? await getLocalModelPathByCategory(category, model.runtimeModelId)
-    : null;
+  const artifact = await getVerifiedSherpaArtifactPath(model);
+  const artifactPath = artifact.path;
   const verified =
-    artifactVerified &&
+    artifact.verified &&
     artifactPath !== null &&
     (!needsPhonemePacks(model) ||
       (await hasRequiredPhonemePacks(model, artifactPath)));
   const path = verified ? artifactPath : null;
 
-  return { installed, path, verified };
+  return { installed: artifact.installed, path, verified };
 }
 
 async function downloadLlmModel(
@@ -250,29 +357,54 @@ export async function downloadLocalModel(
     return downloadLlmModel(model, options);
   }
 
-  await assertPinnedSherpaMetadata(model);
-  const { downloadModelByCategory } = getDownloadModule();
-  const result = await downloadModelByCategory(
-    getSherpaCategory(model),
-    model.runtimeModelId,
-    {
-      signal: options?.abortSignal,
-      deleteArchiveAfterExtract: true,
-      // Never fall back to the library's interactive keep-file prompt: a
-      // checksum mismatch must always fail closed so an unverified artifact
-      // can never be recorded as installed.
-      onChecksumIssue: async () => false,
-      onProgress: (progress) =>
-        options?.onProgress?.({
-          phase: progress.phase ?? "downloading",
-          progress: normalizeProgress(progress.percent / 100),
-        }),
-    },
-  );
+  const remote = await assertPinnedSherpaMetadata(model);
+  let artifact = await getVerifiedSherpaArtifactPath(model);
+  let modelPath = artifact.path;
+
+  // Retrying a voice whose auxiliary pronunciation packs failed must repair
+  // just those packs. Re-downloading a verified model archive wastes data and
+  // can make an otherwise recoverable install look permanently broken.
+  if (!artifact.verified || !modelPath) {
+    const { downloadModelByCategory } = getDownloadModule();
+    try {
+      const result = await downloadModelByCategory(
+        getSherpaCategory(model),
+        model.runtimeModelId,
+        {
+          signal: options?.abortSignal,
+          deleteArchiveAfterExtract: true,
+          // Never fall back to the library's interactive keep-file prompt: a
+          // checksum mismatch must always fail closed so an unverified artifact
+          // can never be recorded as installed.
+          onChecksumIssue: async () => false,
+          onProgress: (progress) =>
+            options?.onProgress?.({
+              phase: progress.phase ?? "downloading",
+              progress: normalizeProgress(progress.percent / 100),
+            }),
+        },
+      );
+      modelPath = result.localPath;
+    } catch (error) {
+      if (
+        Platform.OS !== "ios" ||
+        options?.abortSignal?.aborted ||
+        (error instanceof Error && error.name === "AbortError")
+      ) {
+        throw error;
+      }
+      modelPath = await downloadSherpaModelInForeground(
+        model,
+        remote.archiveExt,
+        options,
+      );
+    }
+    artifact = await getVerifiedSherpaArtifactPath(model);
+  }
   if (needsPhonemePacks(model)) {
     await installRequiredPhonemePacks(
       model,
-      result.localPath,
+      modelPath,
       options?.abortSignal,
     );
   }
@@ -282,7 +414,7 @@ export async function downloadLocalModel(
       `${model.name} installed but did not match the pinned artifact.`,
     );
   }
-  return result.localPath;
+  return modelPath;
 }
 
 export async function removeLocalModel(modelId: LocalModelId) {

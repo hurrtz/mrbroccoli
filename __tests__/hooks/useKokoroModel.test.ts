@@ -3,7 +3,7 @@ import { act, renderHook, waitFor } from "@testing-library/react-native";
 
 jest.mock("../../src/services/kokoroTts", () => ({
   downloadKokoroModel: jest.fn(),
-  getKokoroInstallStatus: jest.fn(),
+  getKokoroInstallReadiness: jest.fn(),
   installKokoroLifecycleGuard: jest.fn(() => jest.fn()),
   removeKokoroModel: jest.fn(),
   verifyKokoroModel: jest.fn(),
@@ -12,7 +12,7 @@ jest.mock("../../src/services/kokoroTts", () => ({
 import { useKokoroModel } from "../../src/hooks/useKokoroModel";
 import {
   downloadKokoroModel,
-  getKokoroInstallStatus,
+  getKokoroInstallReadiness,
   verifyKokoroModel,
 } from "../../src/services/kokoroTts";
 
@@ -42,9 +42,10 @@ describe("useKokoroModel", () => {
         appStateListener = listener as (state: string) => void;
         return { remove: jest.fn() };
       });
-    jest.mocked(getKokoroInstallStatus).mockResolvedValue({
+    jest.mocked(getKokoroInstallReadiness).mockResolvedValue({
       installed: false,
       rootPath: null,
+      verified: false,
     });
     const deferredDownload = createDeferred();
     jest.mocked(downloadKokoroModel).mockReturnValue(deferredDownload.promise);
@@ -70,7 +71,7 @@ describe("useKokoroModel", () => {
       await Promise.resolve();
     });
 
-    expect(getKokoroInstallStatus).toHaveBeenCalledTimes(1);
+    expect(getKokoroInstallReadiness).toHaveBeenCalledTimes(1);
 
     await act(async () => {
       deferredDownload.resolve();

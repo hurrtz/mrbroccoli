@@ -81,12 +81,17 @@ async function installPack(
     onProgress?: (progress: PhonemePackProgress) => void;
   },
 ) {
-  const { downloadFile, exists, hash, unlink } = getFsModule();
-  const archivePath = `${dataDir}/${pack.id}.tar.bz2`;
+  const { downloadFile, exists, hash, mkdir, unlink } = getFsModule();
+  // The native extractor clears its target before it opens the archive. Keep
+  // the archive next to, never inside, the live data directory.
+  const downloadDirectory = `${dataDir}.downloads`;
+  const archivePath = `${downloadDirectory}/${pack.id}.tar.bz2`;
 
   if (params?.abortSignal?.aborted) {
     throw new Error("Phoneme pack installation was cancelled.");
   }
+
+  await mkdir(downloadDirectory, { NSURLIsExcludedFromBackupKey: true });
 
   const task = downloadFile({
     // Foreground on every platform. The iOS background NSURLSession never
@@ -148,7 +153,7 @@ async function installPack(
 
     const { extractPhonemePackArchive } = require("./phonemePackArchive") as
       typeof import("./phonemePackArchive");
-    await extractPhonemePackArchive(archivePath, dataDir);
+    await extractPhonemePackArchive(archivePath, dataDir, pack.installedEntry);
 
     if (!(await exists(packInstallPath(dataDir, pack)))) {
       throw new Error(
@@ -174,8 +179,14 @@ export async function installPhonemePacks(
     onProgress?: (progress: PhonemePackProgress) => void;
   },
 ) {
-  const { exists } = getFsModule();
+  const { exists, mkdir } = getFsModule();
   const packs = getPhonemePacksForLanguage(language);
+
+  // Piper archives from upstream do not consistently include this otherwise
+  // empty directory. Creating it here makes the auxiliary assets an atomic
+  // part of a voice installation instead of failing after the model archive
+  // has already been accepted.
+  await mkdir(dataDir, { NSURLIsExcludedFromBackupKey: true });
 
   for (const pack of packs) {
     if (await exists(packInstallPath(dataDir, pack))) {

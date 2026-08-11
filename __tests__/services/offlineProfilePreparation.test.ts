@@ -30,9 +30,10 @@ jest.mock("../../src/services/localModelManager", () => ({
 jest.mock("../../src/services/kokoroTts", () => ({
   benchmarkKokoroModel: jest.fn(),
   downloadKokoroModel: jest.fn(async () => undefined),
-  getKokoroInstallStatus: jest.fn(async () => ({
+  getKokoroInstallReadiness: jest.fn(async () => ({
     installed: false,
     rootPath: null,
+    verified: false,
   })),
 }));
 

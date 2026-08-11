@@ -155,15 +155,15 @@ export function AntSettingsOverview({
         <AntSettingsCard
           testID="settings-edition-card"
           style={{
-            backgroundColor: colors.accentSoft,
-            borderColor: colors.borderStrong,
+            backgroundColor: colors.premiumSoft,
+            borderColor: colors.premiumBorder,
           }}
         >
           <View style={styles.setupCardBody}>
             <PhosphorIcon
               name="check-circle"
               size="prominent"
-              color={colors.success}
+              color={colors.premium}
             />
             <View style={styles.setupCopy}>
               <Text style={[styles.setupTitle, { color: colors.text }]}>
@@ -282,8 +282,8 @@ export function AntSettingsOverview({
         >
           <AntSettingsCard
             style={{
-              backgroundColor: colors.surfaceAlt,
-              borderColor: colors.border,
+              backgroundColor: colors.premiumSoft,
+              borderColor: colors.premiumBorder,
             }}
           >
             <View style={styles.setupCardBody}>
@@ -297,7 +297,22 @@ export function AntSettingsOverview({
                   {t("premiumDescription")}
                 </Text>
               </View>
-              <PhosphorIcon name="lock" size="control" color={colors.accent} />
+              <View
+                style={[
+                  styles.premiumUpgradeAction,
+                  { backgroundColor: colors.premium },
+                ]}
+                accessible={false}
+              >
+                <Text
+                  style={[
+                    styles.premiumUpgradeActionText,
+                    { color: colors.onPremium },
+                  ]}
+                >
+                  {t("upgradeToPremium")}
+                </Text>
+              </View>
             </View>
           </AntSettingsCard>
         </Pressable>

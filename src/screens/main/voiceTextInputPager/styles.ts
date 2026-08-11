@@ -42,6 +42,30 @@ export const voiceTextInputPagerStyles = StyleSheet.create({
     height: "100%",
     justifyContent: "center",
   },
+  inputSwitchRow: {
+    alignItems: "center",
+    flexDirection: "row",
+    gap: 2,
+    height: "100%",
+    width: "100%",
+  },
+  inputSwitchSurface: {
+    alignItems: "center",
+    flex: 1,
+    height: "100%",
+    justifyContent: "center",
+    minWidth: 0,
+  },
+  surfaceChevron: {
+    alignItems: "center",
+    flexShrink: 0,
+    height: 44,
+    justifyContent: "center",
+    width: 44,
+  },
+  surfaceChevronDisabled: {
+    opacity: 0.22,
+  },
   orbSlot: {
     alignItems: "center",
     flex: 1,
@@ -50,12 +74,12 @@ export const voiceTextInputPagerStyles = StyleSheet.create({
   },
   textSurface: {
     width: "100%",
-    minHeight: 68,
-    maxHeight: 116,
+    height: "100%",
+    minHeight: 96,
     borderRadius: 15,
     borderWidth: 1.5,
     flexDirection: "row",
-    alignItems: "center",
+    alignItems: "flex-end",
     gap: 10,
     paddingLeft: 16,
     paddingRight: 9,
@@ -71,9 +95,10 @@ export const voiceTextInputPagerStyles = StyleSheet.create({
     minHeight: 24,
     maxHeight: 96,
     paddingVertical: 0,
-    textAlignVertical: "center",
+    textAlignVertical: "top",
   },
   textInputWrap: {
+    alignSelf: "stretch",
     flex: 1,
   },
   sendButton: {
@@ -104,19 +129,6 @@ export const voiceTextInputPagerStyles = StyleSheet.create({
   promptBlockedAction: {
     ...textStyles.compactAction,
   },
-  pageIndicators: {
-    flex: 1,
-    height: 44,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 0,
-  },
-  composerToolbar: {
-    minHeight: 44,
-    flexDirection: "row",
-    alignItems: "center",
-  },
   driveControls: {
     flexDirection: "row",
     gap: 8,
@@ -139,27 +151,5 @@ export const voiceTextInputPagerStyles = StyleSheet.create({
     lineHeight: 15,
     fontWeight: "600",
     textAlign: "center",
-  },
-  pageIndicatorTarget: {
-    width: 44,
-    height: 44,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  pageIndicator: {
-    height: 4,
-    borderRadius: 2,
-  },
-  pageIndicatorLeading: {
-    transform: [{ translateX: 12 }],
-  },
-  pageIndicatorTrailing: {
-    transform: [{ translateX: -12 }],
-  },
-  pageIndicatorSelected: {
-    width: 16,
-  },
-  pageIndicatorIdle: {
-    width: 5,
   },
 });

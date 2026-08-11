@@ -134,9 +134,14 @@ at the presentation boundary after the live hook still runs, never mutates the
 pipeline, and is unavailable to production and development identities.
 
 The workspace owns the status label for the active input surface. The pager
-opens on voice and only a deliberate page-control press or horizontal gesture
+opens on voice and only a deliberate 44pt chevron press or horizontal gesture
 moves it to text; capability checks disable the orb and surface an explicit
 settings notice without changing the selected surface or opening onboarding.
+The portrait pager reserves one central stage sized by the orb ceiling, so the
+text composer replaces the orb rather than adding a second competing call to
+action. Its two chevrons remain outside that stage. The three satellite slots
+remain mounted below it and receive their enabled state independently, keeping
+the stage stable as route capabilities change.
 
 ## Evidence
 

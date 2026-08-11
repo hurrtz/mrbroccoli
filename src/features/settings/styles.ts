@@ -108,6 +108,20 @@ export const styles = StyleSheet.create({
     paddingBottom: 4,
     textAlign: "center",
   },
+  premiumUpgradeAction: {
+    alignItems: "center",
+    alignSelf: "stretch",
+    borderRadius: 10,
+    justifyContent: "center",
+    minHeight: 44,
+    paddingHorizontal: 16,
+  },
+  premiumUpgradeActionText: {
+    fontFamily: fonts.display,
+    fontSize: 14,
+    fontWeight: "600",
+    lineHeight: 18,
+  },
   sectionIcon: {
     width: 34,
     alignItems: "center",

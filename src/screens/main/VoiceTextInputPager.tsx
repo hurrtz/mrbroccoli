@@ -5,13 +5,9 @@ import { VoiceOrb } from "../../design-system/VoiceOrb";
 import { MessageImageAttachments } from "../../components/MessageImageAttachments";
 import { useOrbTurnProgress } from "./useOrbTurnProgress";
 import { DriveSessionControls } from "./voiceTextInputPager/DriveSessionControls";
-import { InputSurfaceIndicators } from "./voiceTextInputPager/InputSurfaceIndicators";
 import { InputSurfacePages } from "./voiceTextInputPager/InputSurfacePages";
 import { voiceTextInputPagerStyles as styles } from "./voiceTextInputPager/styles";
-import {
-  InputSurface,
-  VoiceTextInputPagerProps,
-} from "./voiceTextInputPager/types";
+import { VoiceTextInputPagerProps } from "./voiceTextInputPager/types";
 import { useInputSurfacePager } from "./voiceTextInputPager/useInputSurfacePager";
 
 export type { InputSurface } from "./voiceTextInputPager/types";
@@ -55,12 +51,14 @@ export function VoiceTextInputPager({
   voiceInputUnavailableMessage = null,
 }: VoiceTextInputPagerProps) {
   const [viewportHeight, setViewportHeight] = React.useState(0);
-  // The orb takes the space the column actually leaves it, clamped to its
-  // ceiling and a floor below which the rings stop being legible.
-  const stageSize = Math.max(
-    96,
-    Math.min(maxOrbSize, viewportHeight || maxOrbSize),
-  );
+  // The resolved exploration fixes the portrait slot at 196pt. It keeps the
+  // orb visually primary and lets its satellites stay in a stable place;
+  // shrinking it to incidental whitespace was what made the home screen look
+  // empty on tall phones. Landscape still measures the constrained pane.
+  const stageSize =
+    layout === "portrait"
+      ? maxOrbSize
+      : Math.max(96, Math.min(maxOrbSize, viewportHeight || maxOrbSize));
   const pager = useInputSurfacePager({
     disabled,
     initialSurface,
@@ -71,8 +69,6 @@ export function VoiceTextInputPager({
     onTextMessageChange,
     submissionDisabled: Boolean(promptBlockedMessage),
   });
-  const showSurfaceIndicators =
-    layout !== "landscape" || inputMode !== "drive-session";
   const derivedProgress = useOrbTurnProgress({
     recordingMaxMs,
     recordingStartedAtMs: recordingStartedAtMs ?? null,
@@ -129,6 +125,7 @@ export function VoiceTextInputPager({
           onPress={onPress}
           onPressIn={onPressIn}
           onPressOut={onPressOut}
+          onSelectSurface={pager.selectSurface}
           onSubmitTextMessage={pager.handleSubmitTextMessage}
           onTextFocusChange={pager.setTextFocused}
           onTextMessageChange={pager.handleTextMessageChange}
@@ -270,17 +267,6 @@ export function VoiceTextInputPager({
         />
       ) : null}
 
-      {showSurfaceIndicators ? (
-        <View style={styles.composerToolbar}>
-          <InputSurfaceIndicators
-            activeSurface={pager.activeSurface}
-            colors={colors}
-            disabled={isActive}
-            onSelect={(surface: InputSurface) => pager.selectSurface(surface)}
-            t={t}
-          />
-        </View>
-      ) : null}
     </View>
   );
 }

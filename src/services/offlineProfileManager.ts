@@ -14,7 +14,7 @@ import {
 } from "./localDeviceCapabilities";
 import {
   downloadKokoroModel,
-  getKokoroInstallStatus,
+  getKokoroInstallReadiness,
   benchmarkKokoroModel,
 } from "./kokoroTts";
 import { benchmarkLocalLlm } from "./localLlm";
@@ -125,23 +125,32 @@ export function evaluateOfflineProfileReadiness(params: {
   };
 }
 
-async function getInstallStatus(modelId: LocalModelId) {
+async function getInstallStatus(
+  modelId: LocalModelId,
+  phonemeLanguages?: SpeechLanguage[],
+) {
   if (modelId === "kokoro-multilingual") {
-    const status = await getKokoroInstallStatus();
+    const status = await getKokoroInstallReadiness({ phonemeLanguages });
     return {
       installed: status.installed,
       path: status.rootPath,
-      verified: status.installed && Boolean(status.rootPath),
+      verified: status.verified,
     } satisfies LocalModelInstallStatus;
   }
   return getLocalModelInstallStatus(modelId);
 }
 
-export async function getLocalCatalogInstallStatuses() {
+export async function getLocalCatalogInstallStatuses(options?: {
+  phonemeLanguages?: SpeechLanguage[];
+}) {
   return Object.fromEntries(
     await Promise.all(
       LOCAL_MODEL_CATALOG.map(
-        async (model) => [model.id, await getInstallStatus(model.id)] as const,
+        async (model) =>
+          [
+            model.id,
+            await getInstallStatus(model.id, options?.phonemeLanguages),
+          ] as const,
       ),
     ),
   ) as Partial<Record<LocalModelId, LocalModelInstallStatus>>;
@@ -154,7 +163,8 @@ export async function getOfflineProfileReadiness(
   const [installEntries, benchmarks] = await Promise.all([
     Promise.all(
       getOfflineProfileModels(profile).map(
-        async (model) => [model.id, await getInstallStatus(model.id)] as const,
+        async (model) =>
+          [model.id, await getInstallStatus(model.id, profile.languages)] as const,
       ),
     ),
     getLocalModelBenchmarkResults(),
@@ -221,7 +231,8 @@ export async function prepareOfflineProfile(
   const [installEntries, benchmarks, snapshot] = await Promise.all([
     Promise.all(
       models.map(
-        async (model) => [model.id, await getInstallStatus(model.id)] as const,
+        async (model) =>
+          [model.id, await getInstallStatus(model.id, profile.languages)] as const,
       ),
     ),
     getLocalModelBenchmarkResults(),

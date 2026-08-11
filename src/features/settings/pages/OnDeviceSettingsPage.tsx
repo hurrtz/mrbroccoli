@@ -67,6 +67,7 @@ import {
 import { AntListenLanguageSelector } from "../AntListenLanguageSelector";
 import {
   AntPickerRow,
+  AntDisclosureCard,
   AntSectionIntro,
   AntSettingsCard,
 } from "../AntSettingsPrimitives";
@@ -80,6 +81,14 @@ type BusyAction = {
 };
 
 const CAPABILITY_ORDER = ["llm", "stt", "tts"] as const;
+
+type CapabilityDisclosureState = Record<LocalModelCapability, boolean>;
+
+const INITIAL_CAPABILITY_DISCLOSURES: CapabilityDisclosureState = {
+  llm: false,
+  stt: false,
+  tts: false,
+};
 
 function isAbortError(error: unknown) {
   return error instanceof Error && error.name === "AbortError";
@@ -156,6 +165,10 @@ export function OnDeviceSettingsPage({
     );
   const [probing, setProbing] = React.useState(!storePromoPreview);
   const [busy, setBusy] = React.useState<BusyAction | null>(null);
+  const [expandedCapabilities, setExpandedCapabilities] =
+    React.useState<CapabilityDisclosureState>(
+      INITIAL_CAPABILITY_DISCLOSURES,
+    );
   // Downloading a multi-gigabyte model, and benchmarking it afterwards, both
   // run far longer than any default screen timeout, and a sleeping phone
   // aborts the transfer and leaves the whole download to start over. This page
@@ -199,12 +212,14 @@ export function OnDeviceSettingsPage({
       return;
     }
     const [nextInstalls, nextBenchmarks] = await Promise.all([
-      getLocalCatalogInstallStatuses(),
+      getLocalCatalogInstallStatuses({
+        phonemeLanguages: settings.localLanguages,
+      }),
       getLocalModelBenchmarkResults(),
     ]);
     setInstalls(nextInstalls);
     setBenchmarks(nextBenchmarks);
-  }, [storePromoPreview]);
+  }, [settings.localLanguages, storePromoPreview]);
 
   const runDeviceProbe = React.useCallback(async () => {
     if (storePromoSnapshot) {
@@ -241,6 +256,23 @@ export function OnDeviceSettingsPage({
     void runDeviceProbe();
     void refreshModelState();
   }, [refreshModelState, runDeviceProbe]);
+
+  React.useEffect(() => {
+    if (!busy) {
+      return;
+    }
+    const capability = LOCAL_MODEL_CATALOG.find(
+      (model) => model.id === busy.modelId,
+    )?.capability;
+    if (!capability) {
+      return;
+    }
+    setExpandedCapabilities((current) =>
+      current[capability]
+        ? current
+        : { ...current, [capability]: true },
+    );
+  }, [busy]);
 
   const toggleLanguage = (language: SpeechLanguage) => {
     const nextSettings = getLocalLanguageSettingsUpdate(
@@ -308,6 +340,7 @@ export function OnDeviceSettingsPage({
       if (model.id === "kokoro-multilingual") {
         const completed = await kokoroModel.download({
           signal: abortController.signal,
+          phonemeLanguages: settings.localLanguages,
         });
         if (!completed) {
           return;
@@ -612,6 +645,7 @@ export function OnDeviceSettingsPage({
                 size="small"
                 loading={modelBusy && busy?.action === "test"}
                 onPress={() => void handleTest(model)}
+                testID={`on-device-test-${model.id}`}
               >
                 <Text style={{ color: colors.accent }}>{t("test")}</Text>
               </Button>
@@ -620,6 +654,7 @@ export function OnDeviceSettingsPage({
                 type={isModelSelected(model) ? "ghost" : "primary"}
                 disabled={!canUse || isModelSelected(model)}
                 onPress={() => handleUse(model)}
+                testID={`on-device-use-${model.id}`}
               >
                 <Text
                   style={{
@@ -635,6 +670,7 @@ export function OnDeviceSettingsPage({
                 size="small"
                 loading={modelBusy && busy?.action === "remove"}
                 onPress={() => void handleRemove(model)}
+                testID={`on-device-remove-${model.id}`}
               >
                 <Text style={{ color: colors.danger }}>{t("remove")}</Text>
               </Button>
@@ -661,6 +697,14 @@ export function OnDeviceSettingsPage({
               })
             }
           />
+        ) : null}
+        {model.id === "kokoro-multilingual" && kokoroModel.error ? (
+          <Text
+            accessibilityRole="alert"
+            style={[localStyles.meta, { color: colors.danger }]}
+          >
+            {kokoroModel.error}
+          </Text>
         ) : null}
       </AntSettingsCard>
     );
@@ -829,14 +873,34 @@ export function OnDeviceSettingsPage({
         if (models.length === 0) {
           return null;
         }
+        const title = t(capabilityTitleKey(capability));
+        const expanded = expandedCapabilities[capability];
         return (
-          <View key={capability} style={styles.sectionGroup}>
-            <AntSectionIntro title={t(capabilityTitleKey(capability))} />
+          <AntDisclosureCard
+            key={capability}
+            expanded={expanded}
+            header={
+              <Text
+                accessibilityRole="header"
+                style={[styles.sectionTitle, { color: colors.text }]}
+              >
+                {title}
+              </Text>
+            }
+            onToggle={() =>
+              setExpandedCapabilities((current) => ({
+                ...current,
+                [capability]: !current[capability],
+              }))
+            }
+            testID={`on-device-${capability}-disclosure`}
+            toggleAccessibilityLabel={title}
+          >
             {capability === "stt" || capability === "tts"
               ? renderNativeRoute(capability)
               : null}
             {models.map(renderModel)}
-          </View>
+          </AntDisclosureCard>
         );
       })}
     </View>

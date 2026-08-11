@@ -25,6 +25,11 @@ import {
   getLocalModel,
 } from "../constants/localModels";
 import type { SpeechLanguage } from "../constants/speechLanguages";
+import { getPhonemePacksForLanguage } from "../constants/phonemePacks";
+import {
+  arePhonemePacksInstalled,
+  installPhonemePacks,
+} from "./phonemePacks";
 import {
   hasLocalDeviceRuntimePressure,
   probeLocalDeviceCapabilities,
@@ -56,6 +61,10 @@ type KokoroSession = {
 export type KokoroInstallStatus = {
   installed: boolean;
   rootPath: string | null;
+};
+
+export type KokoroInstallReadiness = KokoroInstallStatus & {
+  verified: boolean;
 };
 
 export type KokoroDownloadProgress = {
@@ -138,38 +147,6 @@ function scheduleIdleRelease() {
   idleReleaseTimer = setTimeout(() => {
     void releaseKokoroResources();
   }, KOKORO_IDLE_RELEASE_MS);
-}
-
-async function directoryContainsAnyFile(
-  path: string,
-  depth = 0,
-): Promise<boolean> {
-  const { exists, readDir } = getFsModule();
-
-  if (!(await exists(path))) {
-    return false;
-  }
-
-  const entries = await readDir(path);
-
-  if (entries.some((entry) => !entry.isDirectory())) {
-    return true;
-  }
-
-  if (depth >= 2) {
-    return false;
-  }
-
-  for (const entry of entries) {
-    if (
-      entry.isDirectory() &&
-      (await directoryContainsAnyFile(entry.path, depth + 1))
-    ) {
-      return true;
-    }
-  }
-
-  return false;
 }
 
 async function directoryContainsRequiredModelFiles(path: string) {
@@ -257,6 +234,54 @@ export async function getKokoroInstallStatus(): Promise<KokoroInstallStatus> {
   return {
     installed: rootPath !== null,
     rootPath,
+  };
+}
+
+function getRequiredKokoroPhonemeLanguages(
+  phonemeLanguages?: SpeechLanguage[],
+) {
+  const languages =
+    phonemeLanguages?.length
+      ? phonemeLanguages
+      : KOKORO_FALLBACK_PHONEME_LANGUAGES;
+  return [...new Set(languages)].filter(
+    (language) => getPhonemePacksForLanguage(language).length > 0,
+  );
+}
+
+async function hasRequiredKokoroPhonemePacks(
+  rootPath: string,
+  phonemeLanguages?: SpeechLanguage[],
+) {
+  const languages = getRequiredKokoroPhonemeLanguages(phonemeLanguages);
+  return Promise.all(
+    languages.map((language) =>
+      arePhonemePacksInstalled(
+        `${rootPath}/${KOKORO_DATA_DIR_NAME}`,
+        language,
+      ),
+    ),
+  ).then((statuses) => statuses.every(Boolean));
+}
+
+/**
+ * The archive alone is not a usable Kokoro installation. English speech also
+ * needs its libphonemize packs, so callers that offer the model to a user
+ * must ask for readiness rather than only its downloaded root.
+ */
+export async function getKokoroInstallReadiness(params?: {
+  phonemeLanguages?: SpeechLanguage[];
+}): Promise<KokoroInstallReadiness> {
+  const status = await getKokoroInstallStatus();
+  return {
+    ...status,
+    verified:
+      status.installed &&
+      Boolean(status.rootPath) &&
+      (await hasRequiredKokoroPhonemePacks(
+        status.rootPath ?? "",
+        params?.phonemeLanguages,
+      )),
   };
 }
 
@@ -400,8 +425,10 @@ async function getKokoroSession(language: KokoroLanguage) {
     // eSpeak-specific message this espeak-free runtime can never satisfy.
     // Report the real problem instead: the pronunciation packs are missing.
     if (
-      !(await directoryContainsAnyFile(
+      language === "en" &&
+      !(await arePhonemePacksInstalled(
         `${status.rootPath}/${KOKORO_DATA_DIR_NAME}`,
+        "en",
       ))
     ) {
       throw new Error(
@@ -553,10 +580,11 @@ export async function synthesizeKokoroSpeech(params: {
   }
 }
 
-export async function verifyKokoroModel() {
+export async function verifyKokoroModel(params?: { language?: KokoroLanguage }) {
+  const language = params?.language ?? "en";
   const result = await synthesizeKokoroSpeech({
-    text: "Hello from Mr Broccoli.",
-    listenLanguages: ["en"],
+    text: language === "zh" ? "你好，我是 Mr Broccoli。" : "Hello from Mr Broccoli.",
+    listenLanguages: [language === "zh" ? "zh-CN" : "en"],
     voices: DEFAULT_KOKORO_VOICES,
   });
   const info = await getInfoAsync(result.fileUri);
@@ -640,68 +668,75 @@ export async function downloadKokoroModel(params?: {
   abortSignal?: AbortSignal;
   /**
    * Conversation languages whose libphonemize packs should be installed
-   * alongside the model. Omitting them installs no packs, leaving the voice
-   * dependent on packs already present.
+   * alongside the model. Omitting them installs the minimum English pack set
+   * so an independently downloaded voice is immediately speakable.
    */
   phonemeLanguages?: SpeechLanguage[];
 }) {
-  const {
-    downloadModelByCategory,
-    getModelByIdByCategory,
-    ModelCategory,
-    refreshModelsByCategory,
-  } = getDownloadModule();
-  const { getFSInfo } = getFsModule();
-  const storage = await getFSInfo().catch(() => null);
-  const freeBytes = storage
-    ? Number(storage.freeSpaceEx || storage.freeSpace)
-    : Number.NaN;
-  const requiredBytes = Math.ceil(
-    (KOKORO_MODEL_DOWNLOAD_BYTES + KOKORO_MODEL_INSTALLED_BYTES) * 1.15,
+  const requiredLanguages = getRequiredKokoroPhonemeLanguages(
+    params?.phonemeLanguages,
   );
+  let status = await getKokoroInstallStatus();
 
-  if (Number.isFinite(freeBytes) && freeBytes < requiredBytes) {
-    throw new Error(
-      `Kokoro needs about ${Math.ceil(requiredBytes / 1024 / 1024)} MB of free space while it installs.`,
+  if (!status.installed) {
+    const {
+      downloadModelByCategory,
+      getModelByIdByCategory,
+      ModelCategory,
+      refreshModelsByCategory,
+    } = getDownloadModule();
+    const { getFSInfo } = getFsModule();
+    const storage = await getFSInfo().catch(() => null);
+    const freeBytes = storage
+      ? Number(storage.freeSpaceEx || storage.freeSpace)
+      : Number.NaN;
+    const requiredBytes = Math.ceil(
+      (KOKORO_MODEL_DOWNLOAD_BYTES + KOKORO_MODEL_INSTALLED_BYTES) * 1.15,
     );
-  }
 
-  await refreshModelsByCategory(ModelCategory.Tts);
-  const model = await getModelByIdByCategory(
-    ModelCategory.Tts,
-    KOKORO_MODEL_ID,
-  );
-  if (!model) {
-    throw new Error("The Kokoro model is not available for download.");
-  }
-  assertPinnedKokoroMetadata(model);
-  try {
-    await downloadModelByCategory(ModelCategory.Tts, KOKORO_MODEL_ID, {
-      signal: params?.abortSignal,
-      deleteArchiveAfterExtract: true,
-      // Checksum issues must fail closed instead of reaching the library's
-      // interactive keep-file prompt.
-      onChecksumIssue: async () => false,
-      onProgress: (progress) => {
-        params?.onProgress?.({
-          phase: progress.phase ?? "downloading",
-          progress: Math.max(0, Math.min(1, progress.percent / 100)),
-        });
-      },
-    });
-  } catch (error) {
-    if (
-      Platform.OS !== "ios" ||
-      params?.abortSignal?.aborted ||
-      (error instanceof Error && error.name === "AbortError")
-    ) {
-      throw error;
+    if (Number.isFinite(freeBytes) && freeBytes < requiredBytes) {
+      throw new Error(
+        `Kokoro needs about ${Math.ceil(requiredBytes / 1024 / 1024)} MB of free space while it installs.`,
+      );
     }
 
-    await downloadKokoroModelInForeground(params);
-  }
+    await refreshModelsByCategory(ModelCategory.Tts);
+    const model = await getModelByIdByCategory(
+      ModelCategory.Tts,
+      KOKORO_MODEL_ID,
+    );
+    if (!model) {
+      throw new Error("The Kokoro model is not available for download.");
+    }
+    assertPinnedKokoroMetadata(model);
+    try {
+      await downloadModelByCategory(ModelCategory.Tts, KOKORO_MODEL_ID, {
+        signal: params?.abortSignal,
+        deleteArchiveAfterExtract: true,
+        // Checksum issues must fail closed instead of reaching the library's
+        // interactive keep-file prompt.
+        onChecksumIssue: async () => false,
+        onProgress: (progress) => {
+          params?.onProgress?.({
+            phase: progress.phase ?? "downloading",
+            progress: Math.max(0, Math.min(1, progress.percent / 100)),
+          });
+        },
+      });
+    } catch (error) {
+      if (
+        Platform.OS !== "ios" ||
+        params?.abortSignal?.aborted ||
+        (error instanceof Error && error.name === "AbortError")
+      ) {
+        throw error;
+      }
 
-  const status = await getKokoroInstallStatus();
+      await downloadKokoroModelInForeground(params);
+    }
+
+    status = await getKokoroInstallStatus();
+  }
 
   if (!status.installed) {
     throw new Error(
@@ -709,49 +744,23 @@ export async function downloadKokoroModel(params?: {
     );
   }
 
-  // The shipped sherpa runtime is espeak-free: phonemization resolves
-  // through libphonemize, which loads its packs from the model data
-  // directory. A single language failing still leaves the model usable for
-  // whatever packs are present, but the runtime rejects the model outright
-  // when the directory holds no pack at all, so that case must fail loudly
-  // here rather than surface later as a missing-espeak-ng-data error.
-  //
-  // Callers that download Kokoro without naming languages still need a
-  // speakable voice, so fall back to a minimum pack set rather than leaving
-  // the directory empty.
   if (status.rootPath) {
-    const { installPhonemePacks } = require("./phonemePacks") as
-      typeof import("./phonemePacks");
     const dataDir = `${status.rootPath}/${KOKORO_DATA_DIR_NAME}`;
-    const languages = params?.phonemeLanguages?.length
-      ? params.phonemeLanguages
-      : KOKORO_FALLBACK_PHONEME_LANGUAGES;
-
-    const { recordDebugLogEvent } = require("./debugLogCapture") as
-      typeof import("./debugLogCapture");
-
-    for (const language of languages) {
-      // A swallowed failure here is why an empty pack directory used to
-      // surface as an unexplained "download failed": the per-language error
-      // never reached a log, so the only visible symptom was the guard below
-      // throwing. Keep tolerating a single language failing, but say so.
+    for (const language of requiredLanguages) {
       await installPhonemePacks(dataDir, language, {
         abortSignal: params?.abortSignal,
-      }).catch((error: unknown) => {
-        recordDebugLogEvent({
-          event: "kokoro-phoneme-pack-failed",
-          level: "warn",
-          payload: { error, language },
-        });
       });
     }
 
     if (
       !params?.abortSignal?.aborted &&
-      !(await directoryContainsAnyFile(dataDir))
+      !(await hasRequiredKokoroPhonemePacks(
+        status.rootPath,
+        params?.phonemeLanguages,
+      ))
     ) {
       throw new Error(
-        "The Kokoro download finished, but its pronunciation packs could not be installed. The voice cannot speak without them.",
+        "The Kokoro download finished, but its required pronunciation packs could not be installed. The voice cannot speak without them.",
       );
     }
   }

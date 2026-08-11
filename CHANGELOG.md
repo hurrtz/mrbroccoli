@@ -46,6 +46,13 @@ the complete Play Store translations are kept in a dedicated file under
 - Voice-orb progress rings now interpolate on the native animation thread, so
   recording, turn estimates, and late red tails stay smooth while answers
   stream in.
+- The portrait home stage now gives the voice orb its full approved size, with
+  visible left/right input chevrons and a stable Image, Model Council, and Web
+  Search row beneath it. On-device model catalogues now collapse their local
+  responses, recognition, and voices sections until needed, keeping the page
+  compact while automatically opening the section that owns an active download.
+- The settings overview adopts the approved green on-device and gold Premium
+  card treatments.
 
 ### Fixed
 
@@ -75,6 +82,11 @@ the complete Play Store translations are kept in a dedicated file under
   accepted, avoiding intermittent local-voice failures on iPhone. A successful
   automatic install now records its completed profile for that later
   revalidation.
+- Repair local speech installs on iPhone: Kokoro now verifies its pronunciation
+  packs before it is offered as usable, and Piper/Kokoro pack archives extract
+  safely without deleting their own source or an already-installed companion
+  pack. Retrying a failed Piper archive uses a foreground iOS download, so the
+  installed model and its speech data recover together.
 
 ## 3.2.0 - 2026-08-08
 

@@ -1,0 +1,79 @@
+appId: ${APP_ID}
+name: On-device English voice installation and synthesis
+tags:
+  - runtime
+  - on-device
+  - voice
+---
+- launchApp:
+    clearState: true
+    clearKeychain: true
+    permissions:
+      all: allow
+- tapOn:
+    id: main-settings-button
+- scrollUntilVisible:
+    element:
+      id: settings-overview-row-local
+    direction: DOWN
+- tapOn:
+    id: settings-overview-row-local
+- scrollUntilVisible:
+    element:
+      id: on-device-tts-disclosure
+    direction: DOWN
+- tapOn:
+    id: on-device-tts-disclosure
+- scrollUntilVisible:
+    element:
+      id: on-device-download-kokoro-multilingual
+    direction: DOWN
+- tapOn:
+    id: on-device-download-kokoro-multilingual
+- extendedWaitUntil:
+    visible:
+      id: on-device-test-kokoro-multilingual
+    timeout: 180000
+- tapOn:
+    id: on-device-test-kokoro-multilingual
+- extendedWaitUntil:
+    visible:
+      id: on-device-performance-kokoro-multilingual-measured
+    timeout: 120000
+- scrollUntilVisible:
+    element:
+      id: on-device-download-piper-en-us-kristin
+    direction: DOWN
+# The development client can show Expo's warning tray over the lower card
+# actions. Release builds do not include it; close it here so this native
+# download test still reaches the model control.
+- tapOn:
+    point: 93%, 92%
+- tapOn:
+    id: on-device-download-piper-en-us-kristin
+- extendedWaitUntil:
+    visible:
+      id: on-device-test-piper-en-us-kristin
+    timeout: 180000
+- tapOn:
+    id: on-device-test-piper-en-us-kristin
+- extendedWaitUntil:
+    visible:
+      id: on-device-performance-piper-en-us-kristin-measured
+    timeout: 120000
+- scrollUntilVisible:
+    element:
+      id: on-device-download-piper-en-us-norman
+    direction: DOWN
+- tapOn:
+    id: on-device-download-piper-en-us-norman
+- extendedWaitUntil:
+    visible:
+      id: on-device-test-piper-en-us-norman
+    timeout: 180000
+- tapOn:
+    id: on-device-test-piper-en-us-norman
+- extendedWaitUntil:
+    visible:
+      id: on-device-performance-piper-en-us-norman-measured
+    timeout: 120000

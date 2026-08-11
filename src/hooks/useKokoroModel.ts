@@ -1,9 +1,10 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { AppState } from "react-native";
+import type { SpeechLanguage } from "../constants/speechLanguages";
 
 import {
   downloadKokoroModel,
-  getKokoroInstallStatus,
+  getKokoroInstallReadiness,
   installKokoroLifecycleGuard,
   removeKokoroModel,
   verifyKokoroModel,
@@ -21,7 +22,10 @@ export type KokoroModelState = {
 };
 
 export type KokoroModelController = KokoroModelState & {
-  download: (options?: { signal?: AbortSignal }) => Promise<boolean>;
+  download: (options?: {
+    signal?: AbortSignal;
+    phonemeLanguages?: SpeechLanguage[];
+  }) => Promise<boolean>;
   refresh: () => Promise<void>;
   remove: () => Promise<boolean>;
 };
@@ -66,23 +70,27 @@ export function useKokoroModel(): KokoroModelController {
     });
 
     try {
-      const status = await getKokoroInstallStatus();
+      const status = await getKokoroInstallReadiness();
 
       if (!mountedRef.current || operationRef.current !== operation) {
         return;
       }
 
-      setState((current) => ({
+      setState({
         installed: status.installed,
-        verified: status.installed ? current.verified : false,
+        verified: status.verified,
         busy: null,
         phase: null,
         progress: status.installed ? 1 : 0,
         error: null,
-      }));
+      });
       recordDebugLogEvent({
         event: "kokoro-install-status-check-completed",
-        payload: { installed: status.installed, operation },
+        payload: {
+          installed: status.installed,
+          verified: status.verified,
+          operation,
+        },
       });
     } catch (error) {
       if (!mountedRef.current || operationRef.current !== operation) {
@@ -119,7 +127,10 @@ export function useKokoroModel(): KokoroModelController {
     };
   }, [refresh]);
 
-  const download = useCallback(async (options?: { signal?: AbortSignal }) => {
+  const download = useCallback(async (options?: {
+    signal?: AbortSignal;
+    phonemeLanguages?: SpeechLanguage[];
+  }) => {
     if (blockingOperationRef.current) {
       return false;
     }
@@ -144,6 +155,7 @@ export function useKokoroModel(): KokoroModelController {
     try {
       await downloadKokoroModel({
         abortSignal: options?.signal,
+        phonemeLanguages: options?.phonemeLanguages,
         onProgress: ({ phase, progress }) => {
           if (!mountedRef.current || operationRef.current !== operation) {
             return;
@@ -181,7 +193,13 @@ export function useKokoroModel(): KokoroModelController {
         event: "kokoro-verification-started",
         payload: { operation },
       });
-      await verifyKokoroModel();
+      await verifyKokoroModel({
+        language:
+          options?.phonemeLanguages?.includes("en") === false &&
+          options?.phonemeLanguages?.includes("zh-CN")
+            ? "zh"
+            : "en",
+      });
 
       if (!mountedRef.current || operationRef.current !== operation) {
         return false;
@@ -207,8 +225,9 @@ export function useKokoroModel(): KokoroModelController {
         payload: { error, operation },
       });
       if (mountedRef.current && operationRef.current === operation) {
-        const status = await getKokoroInstallStatus().catch(() => ({
+        const status = await getKokoroInstallReadiness().catch(() => ({
           installed: false,
+          verified: false,
         }));
 
         if (!mountedRef.current || operationRef.current !== operation) {
@@ -217,7 +236,7 @@ export function useKokoroModel(): KokoroModelController {
 
         setState({
           installed: status.installed,
-          verified: false,
+          verified: status.verified,
           busy: null,
           phase: null,
           progress: status.installed ? 1 : 0,

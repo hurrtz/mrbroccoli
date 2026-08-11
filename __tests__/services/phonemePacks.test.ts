@@ -12,6 +12,8 @@ import {
 const mockExists = jest.fn();
 const mockDownloadFile = jest.fn();
 const mockHash = jest.fn();
+const mockMkdir = jest.fn();
+const mockMoveFile = jest.fn();
 const mockUnlink = jest.fn();
 const mockExtractArchive = jest.fn();
 
@@ -19,6 +21,8 @@ jest.mock("@dr.pogodin/react-native-fs", () => ({
   downloadFile: (...args: unknown[]) => mockDownloadFile(...args),
   exists: (...args: unknown[]) => mockExists(...args),
   hash: (...args: unknown[]) => mockHash(...args),
+  mkdir: (...args: unknown[]) => mockMkdir(...args),
+  moveFile: (...args: unknown[]) => mockMoveFile(...args),
   unlink: (...args: unknown[]) => mockUnlink(...args),
 }));
 
@@ -40,6 +44,8 @@ describe("phoneme packs", () => {
       promise: Promise.resolve({ statusCode: 200 }),
     });
     mockUnlink.mockResolvedValue(undefined);
+    mockMoveFile.mockResolvedValue(undefined);
+    mockMkdir.mockResolvedValue(undefined);
     mockExtractArchive.mockResolvedValue({});
   });
 
@@ -84,6 +90,9 @@ describe("phoneme packs", () => {
       if (path.endsWith(".tar.bz2")) {
         return true;
       }
+      if (path.includes(".extract-")) {
+        return true;
+      }
       if (checked.has(path)) {
         return true;
       }
@@ -98,6 +107,10 @@ describe("phoneme packs", () => {
 
     await installPhonemePacks(DATA_DIR, "de");
 
+    expect(mockMkdir).toHaveBeenCalledWith(DATA_DIR, {
+      NSURLIsExcludedFromBackupKey: true,
+    });
+
     // Every pack the language needs is installed, lexicon and G2P alike.
     expect(mockDownloadFile).toHaveBeenCalledTimes(packs.length);
     expect(mockExtractArchive).toHaveBeenCalledTimes(packs.length);
@@ -106,19 +119,25 @@ describe("phoneme packs", () => {
       1,
       expect.objectContaining({
         fromUrl: getPhonemePackDownloadUrl(pack),
-        toFile: `${DATA_DIR}/${pack.id}.tar.bz2`,
+        toFile: `${DATA_DIR}.downloads/${pack.id}.tar.bz2`,
       }),
     );
     expect(mockHash).toHaveBeenCalledWith(
-      `${DATA_DIR}/${pack.id}.tar.bz2`,
+      `${DATA_DIR}.downloads/${pack.id}.tar.bz2`,
       "sha256",
     );
     expect(mockExtractArchive).toHaveBeenCalledWith(
       expect.objectContaining({ format: "tar.bz2" }),
-      DATA_DIR,
+      expect.stringContaining(`${DATA_DIR}.extract-`),
       expect.objectContaining({ force: true }),
     );
-    expect(mockUnlink).toHaveBeenCalledWith(`${DATA_DIR}/${pack.id}.tar.bz2`);
+    expect(mockMoveFile).toHaveBeenCalledWith(
+      expect.stringContaining(`/${pack.id}`),
+      `${DATA_DIR}/${pack.id}`,
+    );
+    expect(mockUnlink).toHaveBeenCalledWith(
+      `${DATA_DIR}.downloads/${pack.id}.tar.bz2`,
+    );
   });
 
   it("downloads packs in the foreground on every platform", async () => {
@@ -130,6 +149,9 @@ describe("phoneme packs", () => {
     const checked = new Set<string>();
     mockExists.mockImplementation(async (path: string) => {
       if (path.endsWith(".tar.bz2")) {
+        return true;
+      }
+      if (path.includes(".extract-")) {
         return true;
       }
       if (checked.has(path)) {

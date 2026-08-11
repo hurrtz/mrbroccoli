@@ -1,0 +1,63 @@
+appId: ${APP_ID}
+name: On-device local thinking and listening baseline
+tags:
+  - runtime
+  - on-device
+---
+- launchApp:
+    clearState: true
+    clearKeychain: true
+    permissions:
+      all: allow
+- tapOn:
+    id: "main-settings-button"
+- scrollUntilVisible:
+    element:
+      id: "settings-overview-row-local"
+    direction: DOWN
+- tapOn:
+    id: "settings-overview-row-local"
+- scrollUntilVisible:
+    element:
+      id: "on-device-llm-disclosure"
+    direction: DOWN
+- tapOn:
+    id: "on-device-llm-disclosure"
+- scrollUntilVisible:
+    element:
+      id: "on-device-download-qwen3-0.6b-q8"
+    direction: DOWN
+- tapOn:
+    id: "on-device-download-qwen3-0.6b-q8"
+- extendedWaitUntil:
+    visible:
+      id: "on-device-test-qwen3-0.6b-q8"
+    timeout: 240000
+- tapOn:
+    id: "on-device-test-qwen3-0.6b-q8"
+- extendedWaitUntil:
+    visible:
+      id: "on-device-performance-qwen3-0.6b-q8-measured"
+    timeout: 180000
+- scrollUntilVisible:
+    element:
+      id: "on-device-stt-disclosure"
+    direction: DOWN
+- tapOn:
+    id: "on-device-stt-disclosure"
+- scrollUntilVisible:
+    element:
+      id: "on-device-download-whisper-tiny"
+    direction: DOWN
+- tapOn:
+    id: "on-device-download-whisper-tiny"
+- extendedWaitUntil:
+    visible:
+      id: "on-device-test-whisper-tiny"
+    timeout: 180000
+- tapOn:
+    id: "on-device-test-whisper-tiny"
+- extendedWaitUntil:
+    visible:
+      id: "on-device-performance-whisper-tiny-measured"
+    timeout: 180000

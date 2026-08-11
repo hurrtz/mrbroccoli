@@ -174,6 +174,14 @@ pack in their own `espeak-ng-data` directory before the model is reported
 verified. A model archive alone is not a usable Piper installation; this check
 prevents an iPhone from selecting a voice that cannot phonemize.
 
+Pack archives download beside the live data directory and extract into a
+temporary sibling directory. The sherpa extractor may replace its target, so
+only the verified pack entry is moved into the live directory after extraction.
+This preserves already-installed companion packs and prevents an extractor
+from deleting its own source archive. On iOS, small language packs use the
+foreground download session so an interrupted background session cannot leave a
+speech model apparently installed without its pronunciation data.
+
 Kokoro's data directory keeps its historical `espeak-ng-data` name because
 both the model archive and sherpa's detector rely on it, but this runtime
 fills it with libphonemize packs. sherpa locates that directory by scanning

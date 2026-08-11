@@ -1,0 +1,39 @@
+appId: ${APP_ID}
+name: On-device model catalog disclosures
+tags:
+  - runtime
+  - on-device
+---
+- launchApp:
+    clearState: true
+    clearKeychain: true
+    permissions:
+      all: allow
+- assertVisible:
+    id: main-screen
+- tapOn:
+    id: main-settings-button
+- assertVisible:
+    id: settings-page-overview
+- scrollUntilVisible:
+    element:
+      id: settings-overview-row-local
+    direction: DOWN
+- tapOn:
+    id: settings-overview-row-local
+- assertVisible:
+    id: on-device-settings-page
+- scrollUntilVisible:
+    element:
+      id: on-device-llm-disclosure
+    direction: DOWN
+- assertVisible:
+    id: on-device-llm-disclosure
+- assertVisible:
+    id: on-device-stt-disclosure
+- assertVisible:
+    id: on-device-tts-disclosure
+- assertNotVisible: "Qwen3 0.6B"
+- tapOn:
+    id: on-device-llm-disclosure
+- assertVisible: "Qwen3 0.6B"

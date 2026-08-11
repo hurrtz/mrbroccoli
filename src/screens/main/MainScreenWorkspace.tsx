@@ -61,7 +61,6 @@ function WorkspaceSatellites({
   webActive,
   webAvailable,
 }: WorkspaceSatellitesProps) {
-  const showToggles = councilAvailable || webAvailable;
   const divider = (
     <View
       style={[
@@ -79,47 +78,41 @@ function WorkspaceSatellites({
       ]}
       testID="workspace-satellites"
     >
-      {imageAvailable ? (
-        <OrbSatellite
-          accessibilityLabel={t("addImage")}
-          compact={compact}
-          disabled={imageDisabled}
-          icon="image"
-          label={t("workspaceImageLabel")}
-          onPress={onAddImage}
-          testID="satellite-image"
-        />
-      ) : null}
-      {imageAvailable && showToggles ? divider : null}
-      {councilAvailable ? (
-        <OrbSatellite
-          accessibilityLabel={t("ulraMode")}
-          active={councilActive}
-          compact={compact}
-          disabled={disabled}
-          icon="council"
-          kind="toggle"
-          label={t("workspaceCouncilLabel")}
-          onPress={onToggleCouncil}
-          testID="satellite-council"
-        />
-      ) : null}
-      {webAvailable ? (
-        <OrbSatellite
-          accessibilityLabel={t("webSearch")}
-          active={webActive}
-          compact={compact}
-          disabled={disabled}
-          icon="search"
-          kind="toggle"
-          label={t("workspaceWebLabel")}
-          onPress={onToggleWeb}
-          testID="satellite-web"
-        />
-      ) : null}
+      <OrbSatellite
+        accessibilityLabel={t("addImage")}
+        compact={compact}
+        disabled={imageDisabled || !imageAvailable}
+        icon="image"
+        label={t("workspaceImageLabel")}
+        onPress={imageAvailable ? onAddImage : undefined}
+        testID="satellite-image"
+      />
+      {divider}
+      <OrbSatellite
+        accessibilityLabel={t("ulraMode")}
+        active={councilActive}
+        compact={compact}
+        disabled={disabled || !councilAvailable}
+        icon="council"
+        kind="toggle"
+        label={t("workspaceCouncilLabel")}
+        onPress={councilAvailable ? onToggleCouncil : undefined}
+        testID="satellite-council"
+      />
+      <OrbSatellite
+        accessibilityLabel={t("webSearch")}
+        active={webActive}
+        compact={compact}
+        disabled={disabled || !webAvailable}
+        icon="search"
+        kind="toggle"
+        label={t("workspaceWebLabel")}
+        onPress={webAvailable ? onToggleWeb : undefined}
+        testID="satellite-web"
+      />
       {speaking ? (
         <>
-          {imageAvailable || showToggles ? divider : null}
+          {divider}
           <OrbSatellite
             accessibilityLabel={t("stop")}
             compact={compact}

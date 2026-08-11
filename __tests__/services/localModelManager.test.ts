@@ -11,6 +11,9 @@ const mockDownloadFile = jest.fn();
 const mockRefreshModels = jest.fn();
 const mockGetRemoteModel = jest.fn();
 const mockDownloadSherpaModel = jest.fn();
+const mockDeleteIncompleteDownload = jest.fn();
+const mockExtractSherpaModel = jest.fn();
+const mockGetDownloadStorageBase = jest.fn();
 const mockDeleteSherpaModel = jest.fn();
 const mockIsSherpaModelDownloaded = jest.fn();
 const mockListDownloadedModels = jest.fn();
@@ -34,8 +37,14 @@ jest.mock("@dr.pogodin/react-native-fs", () => ({
 jest.mock("react-native-sherpa-onnx/download", () => ({
   ModelCategory: { Stt: "stt", Tts: "tts" },
   deleteModelByCategory: (...args: unknown[]) => mockDeleteSherpaModel(...args),
+  deleteIncompleteDownload: (...args: unknown[]) =>
+    mockDeleteIncompleteDownload(...args),
   downloadModelByCategory: (...args: unknown[]) =>
     mockDownloadSherpaModel(...args),
+  extractModelByCategory: (...args: unknown[]) =>
+    mockExtractSherpaModel(...args),
+  getDownloadStorageBase: (...args: unknown[]) =>
+    mockGetDownloadStorageBase(...args),
   getLocalModelPathByCategory: (...args: unknown[]) =>
     mockGetLocalSherpaPath(...args),
   getModelByIdByCategory: (...args: unknown[]) => mockGetRemoteModel(...args),
@@ -60,6 +69,7 @@ import {
   downloadLocalModel,
   getLocalModelInstallStatus,
 } from "../../src/services/localModelManager";
+import { Platform } from "react-native";
 
 describe("local model manager", () => {
   beforeEach(() => {
@@ -70,6 +80,11 @@ describe("local model manager", () => {
     mockWriteFile.mockResolvedValue(undefined);
     mockRefreshModels.mockResolvedValue([]);
     mockDeleteSherpaModel.mockResolvedValue(undefined);
+    mockDeleteIncompleteDownload.mockResolvedValue(undefined);
+    mockExtractSherpaModel.mockResolvedValue({
+      localPath: "/documents/models/whisper",
+    });
+    mockGetDownloadStorageBase.mockResolvedValue("/documents");
     mockGetLocalSherpaPath.mockResolvedValue("/documents/models/whisper");
     mockArePhonemePacksInstalled.mockResolvedValue(true);
     mockInstallPhonemePacks.mockResolvedValue(undefined);
@@ -169,7 +184,9 @@ describe("local model manager", () => {
     mockDownloadSherpaModel.mockResolvedValue({
       localPath: "/documents/models/whisper",
     });
-    mockIsSherpaModelDownloaded.mockResolvedValue(true);
+    mockIsSherpaModelDownloaded
+      .mockResolvedValueOnce(false)
+      .mockResolvedValue(true);
     mockListDownloadedModels.mockResolvedValue([
       {
         id: model.runtimeModelId,
@@ -271,5 +288,64 @@ describe("local model manager", () => {
       "en",
       { abortSignal: abortController.signal },
     );
+  });
+
+  it("retries a failed iOS Piper archive in the foreground", async () => {
+    const model = getLocalModel("piper-en-us-kristin");
+    if (model.capability !== "tts") {
+      throw new Error("Kristin must remain a Piper TTS model");
+    }
+    const originalPlatform = Platform.OS;
+    Object.defineProperty(Platform, "OS", { configurable: true, value: "ios" });
+    try {
+      mockGetRemoteModel.mockResolvedValue({
+        id: model.runtimeModelId,
+        archiveExt: "tar.bz2",
+        bytes: model.downloadBytes,
+        sha256: model.sha256,
+      });
+      mockDownloadSherpaModel.mockRejectedValue(new Error("unknown error"));
+      mockDownloadFile.mockReturnValue({
+        jobId: 9,
+        promise: Promise.resolve({ statusCode: 200 }),
+      });
+      mockExists.mockResolvedValue(false);
+      mockIsSherpaModelDownloaded
+        .mockResolvedValueOnce(false)
+        .mockResolvedValue(true);
+      mockListDownloadedModels.mockResolvedValue([
+        {
+          id: model.runtimeModelId,
+          bytes: model.downloadBytes,
+          sha256: model.sha256,
+        },
+      ]);
+      mockGetLocalSherpaPath.mockResolvedValue("/documents/models/kristin");
+      mockExtractSherpaModel.mockResolvedValue({
+        localPath: "/documents/models/kristin",
+      });
+
+      await expect(downloadLocalModel(model.id)).resolves.toBe(
+        "/documents/models/kristin",
+      );
+
+      expect(mockDownloadFile).toHaveBeenCalledWith(
+        expect.objectContaining({
+          background: false,
+          fromUrl: model.downloadUrl,
+          toFile: expect.stringContaining(`${model.runtimeModelId}.tar.bz2`),
+        }),
+      );
+      expect(mockExtractSherpaModel).toHaveBeenCalledWith(
+        "tts",
+        model.runtimeModelId,
+        expect.objectContaining({ deleteArchiveAfterExtract: true }),
+      );
+    } finally {
+      Object.defineProperty(Platform, "OS", {
+        configurable: true,
+        value: originalPlatform,
+      });
+    }
   });
 });

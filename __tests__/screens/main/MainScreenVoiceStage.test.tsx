@@ -200,23 +200,13 @@ describe("MainScreenVoiceStage composer", () => {
     ).toBe(lightColors.accent);
     expect(
       screen.getByLabelText("Show voice input").props.accessibilityState,
-    ).toEqual({ disabled: false, selected: true });
+    ).toEqual({ disabled: true });
     expect(
       StyleSheet.flatten(screen.getByLabelText("Show voice input").props.style),
     ).toEqual(expect.objectContaining({ height: 44, width: 44 }));
     expect(
       StyleSheet.flatten(screen.getByLabelText("Show text input").props.style),
     ).toEqual(expect.objectContaining({ height: 44, width: 44 }));
-    expect(
-      StyleSheet.flatten(
-        screen.getByTestId("voice-input-indicator").props.style,
-      ),
-    ).toEqual(expect.objectContaining({ transform: [{ translateX: 12 }] }));
-    expect(
-      StyleSheet.flatten(
-        screen.getByTestId("text-input-indicator").props.style,
-      ),
-    ).toEqual(expect.objectContaining({ transform: [{ translateX: -12 }] }));
 
     fireEvent.press(orb);
     expect(onPress).toHaveBeenCalledTimes(1);
@@ -421,12 +411,13 @@ describe("MainScreenVoiceStage composer", () => {
 
     expect(
       screen.getByLabelText("Show text input").props.accessibilityState,
-    ).toEqual({ disabled: false, selected: true });
+    ).toEqual({ disabled: true });
     expect(
       StyleSheet.flatten(screen.getByTestId("text-input-surface").props.style),
     ).toEqual(
       expect.objectContaining({
-        minHeight: 68,
+        height: "100%",
+        minHeight: 96,
         width: "100%",
       }),
     );
@@ -458,7 +449,7 @@ describe("MainScreenVoiceStage composer", () => {
       expect.objectContaining({
         minHeight: 24,
         paddingVertical: 0,
-        textAlignVertical: "center",
+        textAlignVertical: "top",
       }),
     );
     expect(
@@ -578,8 +569,8 @@ describe("MainScreenVoiceStage composer", () => {
     );
 
     expect(screen.getByTestId("drive-session-controls")).toBeTruthy();
-    expect(screen.queryByTestId("show-voice-input")).toBeNull();
-    expect(screen.queryByTestId("show-text-input")).toBeNull();
+    expect(screen.getByTestId("show-voice-input")).toBeTruthy();
+    expect(screen.getByTestId("show-text-input")).toBeTruthy();
   });
 
   it("shows an increasingly urgent Drive silence countdown in the CTA", () => {
@@ -635,7 +626,7 @@ describe("MainScreenVoiceStage composer", () => {
     );
     expect(
       screen.getByLabelText("Show text input").props.accessibilityState,
-    ).toEqual({ disabled: false, selected: true });
+    ).toEqual({ disabled: true });
   });
 
   it("restores the selected surface and draft after a layout remount", () => {
@@ -671,7 +662,7 @@ describe("MainScreenVoiceStage composer", () => {
 
     expect(
       secondScreen.getByLabelText("Show text input").props.accessibilityState,
-    ).toEqual({ disabled: false, selected: true });
+    ).toEqual({ disabled: true });
     expect(
       secondScreen.getByPlaceholderText("Type a message").props.value,
     ).toBe("Survive rotation");
@@ -702,8 +693,9 @@ describe("MainScreenVoiceStage composer", () => {
     ).toBeTruthy();
     expect(screen.queryByTestId("active-waveform")).toBeNull();
     expect(
-      screen.getByLabelText("Show voice input").props.accessibilityState,
-    ).toEqual({ disabled: true, selected: true });
+      screen.getAllByTestId("show-voice-input", hiddenIconQuery)[0].props
+        .accessibilityState,
+    ).toEqual({ disabled: true });
   });
 
   it("announces voice pipeline phase changes without announcing every ETA tick", () => {
