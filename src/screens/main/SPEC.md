@@ -156,11 +156,9 @@ made the last step a dead end: someone there could neither check what they had
 skipped nor revisit a decision, and a counter said where they were but nothing
 about what they had passed. Back sits in the header beside the close control
 because both are ways out of the flow; the footer carries only forward motion,
-which retires on the last step.
-
-**Decision:** The last step ends at the close control rather than offering its
-own "start using the app" action. A second exit next to the one already in the
-header says the flow is something to escape.
+which becomes a labelled Done action on the last step. The final action stays
+where forward motion has lived throughout the flow; removing it left an empty
+gap that looked like a missing control rather than a deliberate ending.
 
 **Decision:** The banner offers no dismissal until the introduction has been
 opened at least once, and a completed purchase removes it outright. An exit

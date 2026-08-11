@@ -1,4 +1,4 @@
-// Copy for the first-run intro banner and its six-step introduction.
+// Copy for the first-run intro banner and its seven-step introduction.
 //
 // The blocking setup wizards were removed, so this is what a new user meets
 // instead: the real workspace, plus an offer to explain it. The wording sells

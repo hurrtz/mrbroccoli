@@ -153,26 +153,24 @@ describe("IntroFlowScreen", () => {
       .toBe(true);
   });
 
-  it("retires the forward action on the last step", () => {
-    // The close control is the single way out from there; a second one would
-    // just be another button that means "leave".
+  it("turns the forward action into a visible completion action", () => {
+    // The approved flow keeps the action in its established footer position:
+    // an empty gap looked like a missing control rather than a finished flow.
     const { getByTestId, queryByTestId } = renderScreen();
 
     fireEvent.press(getByTestId("intro-stepper-dot-6"));
 
     expect(queryByTestId("intro-next")).toBeNull();
+    expect(getByTestId("intro-done").props.accessibilityLabel).toBe("done");
     expect(getByTestId("intro-close")).toBeTruthy();
   });
 
-  it("ends at the close control rather than a second way out", () => {
-    // The header already carries an exit. A second one on the last step reads
-    // as something to escape rather than something that finished.
-    const { getByTestId, queryByTestId } = renderScreen();
+  it("closes from the completion action on the last step", () => {
+    const { getByTestId, props } = renderScreen();
     fireEvent.press(getByTestId("intro-stepper-dot-6"));
+    fireEvent.press(getByTestId("intro-done"));
 
-    expect(queryByTestId("intro-hide-banner")).toBeNull();
-    expect(queryByTestId("intro-next")).toBeNull();
-    expect(getByTestId("intro-close")).toBeTruthy();
+    expect(props.onClose).toHaveBeenCalledTimes(1);
   });
 
   it("jumps to any step from the stepper", () => {

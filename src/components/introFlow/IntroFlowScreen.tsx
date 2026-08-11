@@ -40,11 +40,11 @@ interface IntroFlowScreenProps {
 /**
  * The introduction, as a full screen rather than a sheet.
  *
- * Six steps: what the app is, what setup actually requires, the one thing that
- * is required, the two things that are not, and what Premium adds. It owns the
- * whole display because it is the only thing a first-time user should be
- * dealing with, and it carries its own dark palette so it reads as a place to
- * visit rather than a layer over the workspace.
+ * Seven steps: what the app is, what setup actually requires, the automatic
+ * setup offer, the one thing that is required, the two things that are not,
+ * and what Premium adds. It owns the whole display because it is the only
+ * thing a first-time user should be dealing with, and follows the active app
+ * appearance so it remains part of the same product.
  *
  * Steps live in a horizontally paged scroll view, so they can be swiped as well
  * as driven from the header arrow and the stepper. Every route through the flow
@@ -195,31 +195,25 @@ export function IntroFlowScreen({
             </ScrollView>
 
             <View style={styles.footer}>
-              {/* The last step ends at the close control rather than offering a
-                second way out, so the forward action simply retires there. */}
-              {isLast ? (
-                <View style={styles.footerSpacer} />
-              ) : (
-                <Pressable
-                  accessibilityLabel={t("introNext")}
-                  accessibilityRole="button"
-                  onPress={() => goTo(index + 1)}
-                  style={({ pressed }) => [
-                    styles.primary,
-                    {
-                      backgroundColor: theme.accent,
-                      opacity: pressed ? 0.85 : 1,
-                    },
-                  ]}
-                  testID="intro-next"
-                >
-                  <PhosphorIcon
-                    color={theme.onAccent}
-                    name="right"
-                    size="navigation"
-                  />
-                </Pressable>
-              )}
+              <Pressable
+                accessibilityLabel={isLast ? t("done") : t("introNext")}
+                accessibilityRole="button"
+                onPress={isLast ? onClose : () => goTo(index + 1)}
+                style={({ pressed }) => [
+                  styles.primary,
+                  {
+                    backgroundColor: theme.accent,
+                    opacity: pressed ? 0.85 : 1,
+                  },
+                ]}
+                testID={isLast ? "intro-done" : "intro-next"}
+              >
+                <PhosphorIcon
+                  color={theme.onAccent}
+                  name={isLast ? "check" : "right"}
+                  size="navigation"
+                />
+              </Pressable>
             </View>
           </SafeAreaView>
         </View>
@@ -233,9 +227,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingBottom: 10,
     paddingTop: 10,
-  },
-  footerSpacer: {
-    height: 58,
   },
   header: {
     alignItems: "center",
