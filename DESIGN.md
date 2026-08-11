@@ -229,6 +229,8 @@ artifact. Device selection has four stages:
 1. filter hard incompatibilities using platform, architecture, OS, language,
    memory, and storage;
 2. download from the pinned source and verify SHA-256 before installation;
+   Piper VITS voices also install their pinned libphonemize language pack before
+   they are reported usable;
 3. load and benchmark the exact artifact on the current device; and
 4. construct one coherent offline profile from compatible LLM/STT/TTS routes.
 

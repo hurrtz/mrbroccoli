@@ -42,7 +42,6 @@ export interface VoiceTextInputPagerProps {
   promptBlockedActionEnabled?: boolean;
   promptBlockedActionLabel?: string | null;
   promptBlockedMessage?: string | null;
-  promptBlockedProgress?: number | null;
   recordingMaxMs: number;
   recordingStartedAtMs?: number | null;
   speechStartProgress?: VoiceTimingProgress | null;
@@ -61,10 +60,4 @@ export interface VoiceTextInputPagerProps {
    * blocking the composer the message points them to.
    */
   voiceInputUnavailableMessage?: string | null;
-  /**
-   * Moves the pager to the composer when the voice control turns out to be
-   * unpressable. Distinct from the initial surface, which is decided before
-   * routes have settled.
-   */
-  voiceSurfaceUnusable?: boolean;
 }

@@ -39,6 +39,7 @@ describe("useOrbTurnProgress", () => {
     expect(result.current.phaseProgress).toBeCloseTo(0.5);
     expect(result.current.turnProgress).toBe(0);
     expect(result.current.overtime).toBe(0);
+    expect(result.current.phaseProgressTiming).toEqual({ durationMs: 5_000 });
   });
 
   it("tracks the whole turn against the speech-start estimate", () => {
@@ -66,6 +67,11 @@ describe("useOrbTurnProgress", () => {
     // No per-phase estimate exists for processing phases, so the inner ring
     // rests on the phase tint rather than faking a fraction.
     expect(result.current.phaseProgress).toBe(0);
+    expect(result.current.turnProgressTiming).toEqual({ durationMs: 5_000 });
+    expect(result.current.overtimeTiming).toEqual({
+      delayMs: 5_000,
+      durationMs: 10_000,
+    });
   });
 
   it("rises into overtime once the estimate is passed", () => {
@@ -90,6 +96,7 @@ describe("useOrbTurnProgress", () => {
 
     expect(result.current.turnProgress).toBe(1);
     expect(result.current.overtime).toBeCloseTo(0.5);
+    expect(result.current.overtimeTiming).toEqual({ durationMs: 5_000 });
   });
 
   it("holds a full turn ring while speaking", () => {

@@ -3,6 +3,23 @@ import { StyleSheet, type StyleProp, type ViewStyle } from "react-native";
 import { render } from "@testing-library/react-native";
 import { Circle } from "react-native-svg";
 
+jest.mock("react-native-reanimated", () => {
+  const { View } = require("react-native");
+  return {
+    __esModule: true,
+    default: {
+      View,
+      createAnimatedComponent: (component: unknown) => component,
+    },
+    cancelAnimation: jest.fn(),
+    Easing: { linear: jest.fn() },
+    useAnimatedProps: (factory: () => unknown) => factory(),
+    useSharedValue: (value: unknown) => ({ value }),
+    withDelay: jest.fn(() => 0),
+    withTiming: jest.fn((value: unknown) => value),
+  };
+});
+
 import { VoiceOrb } from "../../src/design-system/VoiceOrb";
 import { ThemeProvider } from "../../src/theme/ThemeContext";
 import { darkColors, lightColors } from "../../src/theme/colors";
@@ -23,19 +40,16 @@ function flatten(style: unknown): ViewStyle {
 }
 
 describe("VoiceOrb", () => {
-  it.each([120, 196, 220])(
-    "stays measurably circular at %dpt",
-    (size) => {
-      const screen = renderOrb({ size });
-      const orb = flatten(screen.getByTestId("voice-orb").props.style);
-      const core = flatten(screen.getByTestId("voice-orb-core").props.style);
+  it.each([120, 196, 220])("stays measurably circular at %dpt", (size) => {
+    const screen = renderOrb({ size });
+    const orb = flatten(screen.getByTestId("voice-orb").props.style);
+    const core = flatten(screen.getByTestId("voice-orb-core").props.style);
 
-      expect(orb.width).toBe(size);
-      expect(orb.height).toBe(size);
-      expect(core.width).toBe(core.height);
-      expect(core.borderRadius).toBe((core.width as number) / 2);
-    },
-  );
+    expect(orb.width).toBe(size);
+    expect(orb.height).toBe(size);
+    expect(core.width).toBe(core.height);
+    expect(core.borderRadius).toBe((core.width as number) / 2);
+  });
 
   it("clamps the core to the ring holding it below the crossover", () => {
     // Below ~107pt the 72% proportion overtakes the inner ring's hole

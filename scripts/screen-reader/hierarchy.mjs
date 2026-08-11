@@ -3,9 +3,9 @@ const REQUIRED_HOME_CONTROLS = [
   { id: "main-settings-button", label: "Settings" },
   { id: "intro-banner", label: "New here?" },
   {
-    id: "provider-empty-state",
+    id: "prompt-blocked-notice",
     label:
-      "Configure credentials. Add credentials in Settings, then choose the routes you want to use.",
+      "Add credentials in Settings before starting a voice session. Configure credentials",
   },
   { id: "transcript-handle", label: "Show transcript. No messages yet" },
   {

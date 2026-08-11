@@ -4,7 +4,9 @@ import {
   type LocalLlmModelDefinition,
   type LocalModelDefinition,
   type LocalModelId,
+  type LocalTtsModelDefinition,
 } from "../constants/localModels";
+import { arePhonemePacksInstalled, installPhonemePacks } from "./phonemePacks";
 
 export type LocalModelDownloadProgress = {
   phase: "downloading" | "extracting" | "verifying";
@@ -32,6 +34,37 @@ function getDownloadModule() {
 function getSherpaCategory(model: LocalModelDefinition) {
   const { ModelCategory } = getDownloadModule();
   return model.capability === "stt" ? ModelCategory.Stt : ModelCategory.Tts;
+}
+
+function needsPhonemePacks(
+  model: LocalModelDefinition,
+): model is LocalTtsModelDefinition {
+  return model.capability === "tts" && model.sherpaModelType === "vits";
+}
+
+async function hasRequiredPhonemePacks(
+  model: LocalTtsModelDefinition,
+  modelPath: string,
+) {
+  const language = model.languages[0];
+  if (!language) {
+    return false;
+  }
+  return arePhonemePacksInstalled(`${modelPath}/espeak-ng-data`, language);
+}
+
+async function installRequiredPhonemePacks(
+  model: LocalTtsModelDefinition,
+  modelPath: string,
+  abortSignal?: AbortSignal,
+) {
+  const language = model.languages[0];
+  if (!language) {
+    throw new Error(`${model.name} does not declare a speech language.`);
+  }
+  await installPhonemePacks(`${modelPath}/espeak-ng-data`, language, {
+    abortSignal,
+  });
 }
 
 function llmPaths(model: LocalLlmModelDefinition) {
@@ -110,13 +143,19 @@ export async function getLocalModelInstallStatus(
   const manifestModel = downloaded.find(
     (candidate) => candidate.id === model.runtimeModelId,
   );
-  const verified =
+  const artifactVerified =
     installed &&
     manifestModel?.bytes === model.downloadBytes &&
     manifestModel.sha256?.toLowerCase() === model.sha256.toLowerCase();
-  const path = verified
+  const artifactPath = artifactVerified
     ? await getLocalModelPathByCategory(category, model.runtimeModelId)
     : null;
+  const verified =
+    artifactVerified &&
+    artifactPath !== null &&
+    (!needsPhonemePacks(model) ||
+      (await hasRequiredPhonemePacks(model, artifactPath)));
+  const path = verified ? artifactPath : null;
 
   return { installed, path, verified };
 }
@@ -230,6 +269,13 @@ export async function downloadLocalModel(
         }),
     },
   );
+  if (needsPhonemePacks(model)) {
+    await installRequiredPhonemePacks(
+      model,
+      result.localPath,
+      options?.abortSignal,
+    );
+  }
   const status = await getLocalModelInstallStatus(model.id);
   if (!status.verified) {
     throw new Error(

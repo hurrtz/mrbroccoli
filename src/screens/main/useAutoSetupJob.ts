@@ -23,6 +23,7 @@ import {
 import {
   getLocalCatalogInstallStatuses,
   getOfflineProfileValidationModels,
+  evaluateOfflineProfileReadiness,
   prepareOfflineProfile,
   type OfflinePreparationProgress,
 } from "../../services/offlineProfileManager";
@@ -93,12 +94,11 @@ export function useAutoSetupJob({
     Partial<Record<LocalModelId, LocalModelBenchmarkResult>>
   >({});
   const [profile, setProfile] = useState<OfflineProfile | null>(null);
-  const [progress, setProgress] =
-    useState<OfflinePreparationProgress | null>(null);
-  const [etaSeconds, setEtaSeconds] = useState<number | null>(null);
-  const [failedModelId, setFailedModelId] = useState<LocalModelId | null>(
+  const [progress, setProgress] = useState<OfflinePreparationProgress | null>(
     null,
   );
+  const [etaSeconds, setEtaSeconds] = useState<number | null>(null);
+  const [failedModelId, setFailedModelId] = useState<LocalModelId | null>(null);
   const [errorKind, setErrorKind] = useState<"scan" | "install" | null>(null);
   const [errorDetail, setErrorDetail] = useState<string | null>(null);
   const [doneModelIds, setDoneModelIds] = useState<Set<LocalModelId>>(
@@ -108,6 +108,11 @@ export function useAutoSetupJob({
   const progressRef = useRef<OfflinePreparationProgress | null>(null);
   const revealTimersRef = useRef<ReturnType<typeof setTimeout>[]>([]);
   const mountedRef = useRef(true);
+  const restoredCompletedProfileRef = useRef(false);
+  const hasStoredLocalRoute = settings.responseModes.some(
+    (mode) =>
+      mode.route.runtime === "local" && Boolean(mode.route.localModelId),
+  );
 
   useEffect(() => {
     mountedRef.current = true;
@@ -122,77 +127,117 @@ export function useAutoSetupJob({
 
   useKeepAwakeWhile(phase === "installing", "mrbroccoli-auto-setup");
 
-  const start = useCallback(() => {
-    setPhase("scanning");
-    setScanned(0);
-    setFailedModelId(null);
-    setErrorKind(null);
-    setErrorDetail(null);
-    setDoneModelIds(new Set());
-    progressRef.current = null;
-    revealTimersRef.current.forEach(clearTimeout);
-    revealTimersRef.current = FACT_REVEAL_MS.map((ms, index) =>
-      setTimeout(() => {
-        if (mountedRef.current) {
-          setScanned(index + 1);
-        }
-      }, ms),
-    );
+  const scan = useCallback(
+    (restoreCompletedProfile = false) => {
+      setPhase("scanning");
+      setScanned(0);
+      setFailedModelId(null);
+      setErrorKind(null);
+      setErrorDetail(null);
+      setDoneModelIds(new Set());
+      progressRef.current = null;
+      revealTimersRef.current.forEach(clearTimeout);
+      revealTimersRef.current = FACT_REVEAL_MS.map((ms, index) =>
+        setTimeout(() => {
+          if (mountedRef.current) {
+            setScanned(index + 1);
+          }
+        }, ms),
+      );
 
-    void (async () => {
-      try {
-        const language = isSpeechLanguage(settings.language)
-          ? settings.language
-          : ("en" as const);
-        // The snapshot lands first, so the readings the reveal shows are on
-        // screen while the rest of the check still runs.
-        const nextSnapshot = await probeLocalDeviceCapabilities();
-        if (!mountedRef.current) {
-          return;
+      void (async () => {
+        try {
+          const language = isSpeechLanguage(settings.language)
+            ? settings.language
+            : ("en" as const);
+          // The snapshot lands first, so the readings the reveal shows are on
+          // screen while the rest of the check still runs.
+          const nextSnapshot = await probeLocalDeviceCapabilities();
+          if (!mountedRef.current) {
+            return;
+          }
+          setSnapshot(nextSnapshot);
+          const [installs, nextBenchmarks] = await Promise.all([
+            getLocalCatalogInstallStatuses(),
+            getLocalModelBenchmarkResults(),
+          ]);
+          const [nativeSpeech] = await Promise.all([
+            probeNativeSpeechCapabilities(language),
+            // The verdict must not land before the user has finished reading.
+            new Promise((resolve) => setTimeout(resolve, SCAN_SETTLE_MS)),
+          ]);
+          if (!mountedRef.current) {
+            return;
+          }
+          const installedModelIds = new Set(
+            Object.entries(installs)
+              .filter(([, status]) => status?.verified)
+              .map(([modelId]) => modelId as LocalModelId),
+          );
+          const selection = selectOfflineProfile({
+            languages: [language],
+            snapshot: nextSnapshot,
+            installedModelIds,
+            benchmarks: nextBenchmarks,
+            nativeSttEligible: nativeSpeech.nativeSttEligible,
+          });
+          setBenchmarks(nextBenchmarks);
+          setScanned(FACT_REVEAL_MS.length);
+          if (selection.status === "ready") {
+            setProfile(selection.profile);
+            const readiness = evaluateOfflineProfileReadiness({
+              profile: selection.profile,
+              snapshot: nextSnapshot,
+              installs,
+              benchmarks: nextBenchmarks,
+            });
+            setDoneModelIds(
+              new Set(
+                getOfflineProfileModels(selection.profile)
+                  .filter((model) => installs[model.id]?.verified)
+                  .map((model) => model.id),
+              ),
+            );
+            setPhase(
+              restoreCompletedProfile && readiness.ready ? "done" : "proposal",
+            );
+          } else {
+            setProfile(null);
+            setErrorKind("scan");
+            setPhase("failed");
+          }
+        } catch {
+          if (mountedRef.current) {
+            setErrorKind("scan");
+            setPhase("failed");
+          }
         }
-        setSnapshot(nextSnapshot);
-        const [installs, nextBenchmarks] = await Promise.all([
-          getLocalCatalogInstallStatuses(),
-          getLocalModelBenchmarkResults(),
-        ]);
-        const [nativeSpeech] = await Promise.all([
-          probeNativeSpeechCapabilities(language),
-          // The verdict must not land before the user has finished reading.
-          new Promise((resolve) => setTimeout(resolve, SCAN_SETTLE_MS)),
-        ]);
-        if (!mountedRef.current) {
-          return;
-        }
-        const installedModelIds = new Set(
-          Object.entries(installs)
-            .filter(([, status]) => status?.verified)
-            .map(([modelId]) => modelId as LocalModelId),
-        );
-        const selection = selectOfflineProfile({
-          languages: [language],
-          snapshot: nextSnapshot,
-          installedModelIds,
-          benchmarks: nextBenchmarks,
-          nativeSttEligible: nativeSpeech.nativeSttEligible,
-        });
-        setBenchmarks(nextBenchmarks);
-        setScanned(FACT_REVEAL_MS.length);
-        if (selection.status === "ready") {
-          setProfile(selection.profile);
-          setPhase("proposal");
-        } else {
-          setProfile(null);
-          setErrorKind("scan");
-          setPhase("failed");
-        }
-      } catch {
-        if (mountedRef.current) {
-          setErrorKind("scan");
-          setPhase("failed");
-        }
-      }
-    })();
-  }, [settings.language]);
+      })();
+    },
+    [settings.language],
+  );
+
+  const start = useCallback(() => {
+    scan(false);
+  }, [scan]);
+
+  // A completed profile is persisted independently from this presentation
+  // hook. On a later app launch the card must restore its Ready verdict after
+  // checking the installed artifacts and benchmarks, rather than inviting the
+  // person to download an already-complete setup again. Older automatic
+  // installs wrote their local route before the completion marker existed, so
+  // that route is also sufficient to repair the persisted verdict once.
+  useEffect(() => {
+    if (
+      (!settings.freeOfflineSetupCompleted && !hasStoredLocalRoute) ||
+      restoredCompletedProfileRef.current ||
+      phase !== "offer"
+    ) {
+      return;
+    }
+    restoredCompletedProfileRef.current = true;
+    scan(true);
+  }, [hasStoredLocalRoute, phase, scan, settings.freeOfflineSetupCompleted]);
 
   const runInstall = useCallback(() => {
     if (!profile) {
@@ -270,6 +315,10 @@ export function useAutoSetupJob({
         );
         updateSettings({
           ...applied,
+          // This marker is what makes the next card mount revalidate the
+          // completed profile instead of inviting the person to start over.
+          freeOfflineSetupCompleted: true,
+          freeOfflineProfileOverrides: {},
           responseModes: [
             ...applied.responseModes,
             ...preservedProviderModes.filter(
@@ -314,10 +363,7 @@ export function useAutoSetupJob({
         setErrorDetail(
           failedId &&
             snapshot &&
-            isDurableBenchmarkFailure(
-              latestBenchmarks[failedId],
-              snapshot,
-            )
+            isDurableBenchmarkFailure(latestBenchmarks[failedId], snapshot)
             ? t("onDeviceTestFailed")
             : null,
         );
@@ -357,12 +403,6 @@ export function useAutoSetupJob({
     }
     runInstall();
   }, [benchmarks, phase, profile, runInstall, snapshot, start]);
-
-  const finish = useCallback(() => {
-    setPhase("offer");
-    setProgress(null);
-    setEtaSeconds(null);
-  }, []);
 
   const facts = useMemo(() => {
     if (!snapshot) {
@@ -483,6 +523,7 @@ export function useAutoSetupJob({
 
   return {
     state: phase,
+    downloadBytes: profile?.downloadBytes ?? 0,
     fraction,
     scanned,
     facts,
@@ -497,7 +538,6 @@ export function useAutoSetupJob({
     start,
     install,
     retry,
-    finish,
   };
 }
 

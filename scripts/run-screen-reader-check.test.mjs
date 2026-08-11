@@ -12,8 +12,8 @@ const requiredControls = [
   ["main-settings-button", "Settings"],
   ["intro-banner", "New here?"],
   [
-    "provider-empty-state",
-    "Configure credentials. Add credentials in Settings, then choose the routes you want to use.",
+    "prompt-blocked-notice",
+    "Add credentials in Settings before starting a voice session. Configure credentials",
   ],
   ["transcript-handle", "Show transcript. No messages yet"],
   ["conversation-settings-summary-control", "Open conversation settings"],

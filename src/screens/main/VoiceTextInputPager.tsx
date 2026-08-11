@@ -45,7 +45,6 @@ export function VoiceTextInputPager({
   promptBlockedActionEnabled = false,
   promptBlockedActionLabel = null,
   promptBlockedMessage = null,
-  promptBlockedProgress = null,
   recordingMaxMs,
   recordingStartedAtMs,
   speechStartProgress,
@@ -54,7 +53,6 @@ export function VoiceTextInputPager({
   t,
   visualPhase,
   voiceInputUnavailableMessage = null,
-  voiceSurfaceUnusable = false,
 }: VoiceTextInputPagerProps) {
   const [viewportHeight, setViewportHeight] = React.useState(0);
   // The orb takes the space the column actually leaves it, clamped to its
@@ -72,7 +70,6 @@ export function VoiceTextInputPager({
     onSubmitTextMessage,
     onTextMessageChange,
     submissionDisabled: Boolean(promptBlockedMessage),
-    voiceSurfaceUnusable,
   });
   const showSurfaceIndicators =
     layout !== "landscape" || inputMode !== "drive-session";
@@ -132,15 +129,12 @@ export function VoiceTextInputPager({
           onPress={onPress}
           onPressIn={onPressIn}
           onPressOut={onPressOut}
-          onResolvePromptBlock={onResolvePromptBlock}
           onSubmitTextMessage={pager.handleSubmitTextMessage}
           onTextFocusChange={pager.setTextFocused}
           onTextMessageChange={pager.handleTextMessageChange}
           pageWidth={pager.pageWidth}
           panGesture={pager.panGesture}
-          promptBlockedActionEnabled={promptBlockedActionEnabled}
-          promptBlockedActionLabel={promptBlockedActionLabel}
-          promptBlockedProgress={promptBlockedProgress}
+          promptBlockedMessage={promptBlockedMessage}
           stageSize={stageSize}
           statusLabel={statusLabel}
           submissionDisabled={Boolean(promptBlockedMessage)}
@@ -176,30 +170,51 @@ export function VoiceTextInputPager({
               onPressIn={inputMode === "push-to-talk" ? onPressIn : undefined}
               onPressOut={inputMode === "push-to-talk" ? onPressOut : undefined}
               overtime={progress.overtime}
+              overtimeTiming={progress.overtimeTiming}
               phase={visualPhase}
               phaseProgress={
                 visualPhase === "speaking" && playbackPaused
                   ? 0
                   : progress.phaseProgress
               }
+              phaseProgressTiming={
+                visualPhase === "speaking" && playbackPaused
+                  ? undefined
+                  : progress.phaseProgressTiming
+              }
               size={stageSize}
               testID="voice-orb-active"
               turnProgress={progress.turnProgress}
+              turnProgressTiming={progress.turnProgressTiming}
             />
           </View>
         ) : null}
       </View>
 
-      {promptBlockedMessage && !promptBlockedActionLabel ? (
+      {promptBlockedMessage ? (
         <TouchableOpacity
           testID="prompt-blocked-notice"
-          accessibilityLabel={`${promptBlockedMessage} ${t(
-            "openSpeakingSettings",
-          )}`}
-          accessibilityRole={onResolvePromptBlock ? "button" : "text"}
-          activeOpacity={onResolvePromptBlock ? 0.76 : 1}
-          disabled={!onResolvePromptBlock}
-          onPress={onResolvePromptBlock}
+          accessibilityLabel={
+            onResolvePromptBlock && promptBlockedActionEnabled
+              ? `${promptBlockedMessage} ${
+                  promptBlockedActionLabel ?? t("openSpeakingSettings")
+                }`
+              : promptBlockedMessage
+          }
+          accessibilityRole={
+            onResolvePromptBlock && promptBlockedActionEnabled
+              ? "button"
+              : "text"
+          }
+          activeOpacity={
+            onResolvePromptBlock && promptBlockedActionEnabled ? 0.76 : 1
+          }
+          disabled={!onResolvePromptBlock || !promptBlockedActionEnabled}
+          onPress={
+            onResolvePromptBlock && promptBlockedActionEnabled
+              ? onResolvePromptBlock
+              : undefined
+          }
           style={[
             styles.promptBlockedNotice,
             {
@@ -224,15 +239,15 @@ export function VoiceTextInputPager({
             >
               {promptBlockedMessage}
             </Text>
-            {onResolvePromptBlock ? (
+            {onResolvePromptBlock && promptBlockedActionEnabled ? (
               <Text
                 style={[styles.promptBlockedAction, { color: colors.accent }]}
               >
-                {t("openSpeakingSettings")}
+                {promptBlockedActionLabel ?? t("openSpeakingSettings")}
               </Text>
             ) : null}
           </View>
-          {onResolvePromptBlock ? (
+          {onResolvePromptBlock && promptBlockedActionEnabled ? (
             <PhosphorIcon
               name="right"
               size="compact"

@@ -271,17 +271,17 @@ jest.mock("../../src/screens/main/MainScreenVoiceStage", () => ({
     initialInputSurface,
     onAddImage,
     onResolvePromptBlock,
+    promptBlockedActionEnabled,
     promptBlockedActionLabel,
     promptBlockedMessage,
-    promptBlockedProgress,
   }: {
     disabled?: boolean;
     initialInputSurface?: string;
     onAddImage?: () => void;
     onResolvePromptBlock?: () => void;
+    promptBlockedActionEnabled?: boolean;
     promptBlockedActionLabel?: string | null;
     promptBlockedMessage?: string | null;
-    promptBlockedProgress?: number | null;
   }) => {
     const React = require("react");
     const { Text, TouchableOpacity, View } = require("react-native");
@@ -293,23 +293,32 @@ jest.mock("../../src/screens/main/MainScreenVoiceStage", () => ({
         null,
         disabled ? "voice-stage:disabled" : "voice-stage:enabled",
       ),
-      React.createElement(Text, null, `surface:${initialInputSurface ?? "voice"}`),
-      onAddImage
-        ? React.createElement(Text, null, "image-action")
-        : null,
-      promptBlockedMessage && !promptBlockedActionLabel
+      React.createElement(
+        Text,
+        null,
+        `surface:${initialInputSurface ?? "voice"}`,
+      ),
+      onAddImage ? React.createElement(Text, null, "image-action") : null,
+      promptBlockedMessage
         ? React.createElement(
             TouchableOpacity,
-            { onPress: onResolvePromptBlock },
+            {
+              disabled: !promptBlockedActionEnabled,
+              onPress: promptBlockedActionEnabled
+                ? onResolvePromptBlock
+                : undefined,
+            },
             React.createElement(Text, null, promptBlockedMessage),
-            React.createElement(Text, null, "resolve-prompt-block"),
+            promptBlockedActionEnabled
+              ? React.createElement(Text, null, "resolve-prompt-block")
+              : null,
           )
         : null,
       promptBlockedActionLabel
         ? React.createElement(
             Text,
             null,
-            `prompt-blocked-action:${promptBlockedActionLabel}:${promptBlockedProgress}`,
+            `prompt-blocked-action:${promptBlockedActionLabel}`,
           )
         : null,
     );
@@ -399,11 +408,7 @@ jest.mock("../../src/components/introFlow/IntroFlowScreen", () => ({
     return React.createElement(
       React.Fragment,
       null,
-      React.createElement(
-        Text,
-        null,
-        visible ? "intro:open" : "intro:closed",
-      ),
+      React.createElement(Text, null, visible ? "intro:open" : "intro:closed"),
       React.createElement(
         Pressable,
         { testID: "stub-intro-connect-provider", onPress: onConnectProvider },
@@ -734,7 +739,7 @@ describe("MainScreen", () => {
     const screen = renderWithProviders(<MainScreen />);
 
     expect(
-      screen.getByText("prompt-blocked-action:Installing… 42%:0.42"),
+      screen.getByText("prompt-blocked-action:Installing… 42%"),
     ).toBeTruthy();
   });
 
@@ -901,11 +906,9 @@ describe("MainScreen", () => {
     );
   });
 
-  it("opens on the composer when the voice control cannot be pressed", () => {
-    // Landing on a dead round button says the app is broken. The composer at
-    // least shows what to do. The device can hear the user here -- what is
-    // missing is anything to answer with, which disables the control on its
-    // own.
+  it("keeps the orb visible when no route is usable", () => {
+    // The explicit setup notice explains the state; the stable primary
+    // affordance must not turn into a legacy composer at startup.
     useNativeSpeechRecognizer.mockReturnValue({
       isAvailable: true,
       isRecording: false,
@@ -914,7 +917,15 @@ describe("MainScreen", () => {
     const screen = renderWithProviders(<MainScreen />);
 
     expect(screen.getByText("voice-stage:disabled")).toBeTruthy();
-    expect(screen.getByText("surface:text")).toBeTruthy();
+    expect(screen.getByText("surface:voice")).toBeTruthy();
+    expect(
+      screen.getByText(
+        "Add credentials in Settings before starting a voice session.",
+      ),
+    ).toBeTruthy();
+    expect(
+      screen.getByText("prompt-blocked-action:Configure credentials"),
+    ).toBeTruthy();
   });
 
   it("hides the debug log action by default", () => {

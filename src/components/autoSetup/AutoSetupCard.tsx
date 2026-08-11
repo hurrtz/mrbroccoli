@@ -9,14 +9,14 @@ import {
   type ViewStyle,
 } from "react-native";
 
-import { PhosphorIcon, type PhosphorIconName } from "../../design-system/PhosphorIcon";
+import {
+  PhosphorIcon,
+  type PhosphorIconName,
+} from "../../design-system/PhosphorIcon";
 import type { TranslateFn } from "../../screens/main/shared";
 import { useTheme } from "../../theme/ThemeContext";
 import { fonts } from "../../theme/typography";
-import {
-  AutoSetupPlanRow,
-  type AutoSetupRowState,
-} from "./AutoSetupPlanRow";
+import { AutoSetupPlanRow, type AutoSetupRowState } from "./AutoSetupPlanRow";
 import { InstallProgressBar } from "./InstallProgressBar";
 import type {
   AutoSetupJobPlanItem,
@@ -282,7 +282,11 @@ export function AutoSetupCard({
           </Text>
           <CardAction
             icon="download"
-            label={t("autoSetupInstallAction")}
+            label={
+              job.downloadBytes > 0
+                ? t("autoSetupInstallAction")
+                : t("autoSetupStart")
+            }
             onPress={job.install}
           />
           {onManual ? (
@@ -293,7 +297,12 @@ export function AutoSetupCard({
               style={styles.textAction}
               testID="auto-setup-manual"
             >
-              <Text style={[styles.textActionLabel, { color: colors.textSecondary }]}>
+              <Text
+                style={[
+                  styles.textActionLabel,
+                  { color: colors.textSecondary },
+                ]}
+              >
                 {t("autoSetupManual")}
               </Text>
             </Pressable>
@@ -326,9 +335,6 @@ export function AutoSetupCard({
           />
           {divider}
           {planRows}
-          {job.finish ? (
-            <CardAction icon="check" label={t("done")} onPress={job.finish} />
-          ) : null}
         </>
       ) : null}
 
@@ -362,7 +368,12 @@ export function AutoSetupCard({
               style={styles.textAction}
               testID="auto-setup-manual"
             >
-              <Text style={[styles.textActionLabel, { color: colors.textSecondary }]}>
+              <Text
+                style={[
+                  styles.textActionLabel,
+                  { color: colors.textSecondary },
+                ]}
+              >
                 {t("autoSetupManual")}
               </Text>
             </Pressable>

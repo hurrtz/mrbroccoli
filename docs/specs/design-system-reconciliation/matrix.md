@@ -92,21 +92,33 @@ data, not separate visual components.
 
 ## Run evidence — 2026-08-11
 
-- Android exact Release specimen: eight of eight flows passed on
-  `emulator-5554`; artifacts are under
-  `artifacts/store-promos/android/phone/en/`. The post-fix Free screenshot
-  proves the text composer and “Type and send” status agree.
-- iOS exact Release specimen: ten of ten flows passed on the iPhone 17 Pro iOS
-  26.4 simulator; artifacts are under
-  `artifacts/store-promos/ios/6.3/en/` at the required 1206×2622 pixels.
-- Both runs exercised current accessibility identifiers for transcript access,
-  the introduction auto-setup step, settings titles, close actions, and the
-  conversation-settings drawer.
-- Manual raster review found no release-blocking defect in these English light
-  portrait scenes after the workspace status fix. The iOS Thinking header
-  remains a comparison item because its raster framing differs from adjacent
-  settings captures even though its title and close-action visibility checks
-  pass.
+### Reopened regression batch (current worktree)
+
+- Source and focused native-presentation tests now cover an orb-first blocked
+  startup, text submission that cannot route into introduction, absent Free
+  edition status link, centred requirements step, persisted Ready revalidation,
+  Piper phoneme-pack verification, and UI-thread orb clocks.
+- Android `emulator-5554` exact Release matrix passed: 19 UI languages with 36
+  captures each, 13 smoke captures, three-route landscape, dark/high-contrast/
+  large-text, and TalkBack hierarchy. The 708 screenshots are under
+  `artifacts/maestro/release/android/`.
+- iOS exact Release matrix passed on the iPhone 14 Plus iOS 26.3 simulator
+  (`47F04ABD-CC99-400C-BFE8-61658B927D67`): the equivalent 708 screenshots,
+  including the landscape assertion, and VoiceOver hierarchy evidence are
+  under `artifacts/maestro/release/ios/` and
+  `artifacts/maestro/release/screen-reader/ios/`. The iPhone 17 Pro iOS 26.4
+  simulator's automation driver reported a successful orientation change while
+  leaving app content portrait; the same flow passed on 26.3, so 26.4 was not
+  accepted as evidence for this batch.
+- Manual review of the current Android and iOS contact sheets, the landscape
+  flow, and Arabic/Urdu home screens found no clipping, overlap, missing
+  content, or RTL-direction defect. The home screenshot confirms the central
+  orb and direct inline Settings action rather than a composer or legacy CTA.
+- A fresh physical Android smoke run remains blocked by the attached Pixel 4a
+  lock screen (`mWakefulness=Dozing`); no lock-screen bypass was attempted.
+  Therefore `verify-maestro-artifacts` correctly rejects the current artifact
+  set solely for its missing 13 physical screenshots. Earlier physical evidence
+  is retained as history, not substituted for this exact Release run.
 - No paid provider or quota-consuming request was made.
 
 ## Final repository verification — 2026-08-11

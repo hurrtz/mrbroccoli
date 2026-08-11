@@ -67,9 +67,7 @@ jest.mock("react-native-reanimated", () => {
     useAnimatedProps: (factory: () => unknown) => factory(),
     useAnimatedStyle: (factory: () => unknown) => factory(),
     useSharedValue: (value: unknown) => ({ value }),
-    withDelay: jest.fn(
-      (_delay: number, animation: unknown) => animation,
-    ),
+    withDelay: jest.fn(() => 0),
     withSpring: (
       value: unknown,
       _configuration: unknown,
@@ -236,18 +234,19 @@ describe("MainScreenVoiceStage composer", () => {
           onPress,
           onResolvePromptBlock,
           onSubmitTextMessage,
+          promptBlockedActionEnabled: true,
           promptBlockedMessage,
         })}
       />,
     );
 
     expect(
-      screen.getByTestId("voice-input-surface").props.accessibilityState,
+      screen.getByTestId("voice-orb-idle").props.accessibilityState,
     ).toEqual({ disabled: true });
     expect(screen.getByText(promptBlockedMessage)).toBeTruthy();
     expect(screen.getByText("Speaking settings")).toBeTruthy();
 
-    fireEvent.press(screen.getByTestId("voice-input-surface"));
+    fireEvent.press(screen.getByTestId("voice-orb-idle"));
     expect(onPress).not.toHaveBeenCalled();
 
     fireEvent.press(screen.getByTestId("prompt-blocked-notice"));
@@ -280,14 +279,12 @@ describe("MainScreenVoiceStage composer", () => {
       />,
     );
 
-    const surface = screen.getByTestId("voice-input-surface");
-    expect(surface.props.accessibilityState).toEqual({ disabled: true });
-    expect(surface.props.accessibilityLabel).toBe(voiceInputUnavailableMessage);
-    expect(screen.getByTestId("voice-input-blocked-status").props.children).toBe(
-      voiceInputUnavailableMessage,
-    );
+    const orb = screen.getByTestId("voice-orb-idle");
+    expect(orb.props.accessibilityState).toEqual({ disabled: true });
+    expect(orb.props.accessibilityLabel).toBe(voiceInputUnavailableMessage);
+    expect(screen.getByTestId("voice-input-surface")).toBeTruthy();
 
-    fireEvent.press(surface);
+    fireEvent.press(orb);
     expect(onPress).not.toHaveBeenCalled();
 
     // The message tells the user to type, so the composer must still work --
@@ -318,7 +315,7 @@ describe("MainScreenVoiceStage composer", () => {
     expect(surface.borderColor).toBe(lightColors.accent);
   });
 
-  it("shows installation progress directly on both disabled prompt CTAs", () => {
+  it("keeps the orb in place while a prompt is blocked", () => {
     const onPress = jest.fn();
     const onSubmitTextMessage = jest.fn();
     const progressLabel = "Installing… 42%";
@@ -327,53 +324,32 @@ describe("MainScreenVoiceStage composer", () => {
         {...createProps({
           onPress,
           onSubmitTextMessage,
-          promptBlockedActionLabel: progressLabel,
+          promptBlockedActionEnabled: true,
+          promptBlockedActionLabel: "Open on-device settings",
           promptBlockedMessage: progressLabel,
-          promptBlockedProgress: 0.42,
         })}
       />,
     );
 
-    expect(screen.queryByTestId("prompt-blocked-notice")).toBeNull();
-    expect(screen.getByTestId("voice-input-blocked-status").props.children).toBe(
-      progressLabel,
-    );
+    expect(screen.getByTestId("prompt-blocked-notice")).toBeTruthy();
+    expect(screen.getByTestId("voice-orb-idle")).toBeTruthy();
     expect(
-      screen.getByTestId("voice-input-surface").props.accessibilityValue,
-    ).toEqual({ min: 0, max: 100, now: 42 });
-    expect(
-      screen.getByTestId("voice-input-surface").props.accessibilityLabel,
-    ).toBe(progressLabel);
-    expect(
-      screen.queryByTestId("phosphor-icon-audio", hiddenIconQuery),
-    ).toBeNull();
+      screen.getByTestId("voice-orb-idle").props.accessibilityState,
+    ).toEqual({ disabled: true });
 
-    fireEvent.press(screen.getByTestId("voice-input-surface"));
+    fireEvent.press(screen.getByTestId("voice-orb-idle"));
     expect(onPress).not.toHaveBeenCalled();
 
     fireEvent.press(screen.getByLabelText("Show text input"));
-    expect(screen.getByTestId("text-input-blocked-status").props.children).toBe(
-      progressLabel,
-    );
     expect(
-      screen.getByTestId("voice-text-primary-action").props.accessibilityValue,
-    ).toEqual({ min: 0, max: 100, now: 42 });
-    expect(
-      StyleSheet.flatten(
-        screen.getByTestId("voice-text-primary-action").props.style,
-      ),
-    ).toEqual(
-      expect.objectContaining({
-        minWidth: 116,
-        width: "auto",
-      }),
-    );
+      screen.getByTestId("voice-text-primary-action").props.accessibilityState,
+    ).toEqual({ disabled: true });
 
     fireEvent.press(screen.getByTestId("voice-text-primary-action"));
     expect(onSubmitTextMessage).not.toHaveBeenCalled();
   });
 
-  it("turns a blocked Free prompt CTA into an on-device setup action", () => {
+  it("opens on-device setup only from the explicit blocked notice", () => {
     const onPress = jest.fn();
     const onResolvePromptBlock = jest.fn();
     const onSubmitTextMessage = jest.fn();
@@ -392,10 +368,10 @@ describe("MainScreenVoiceStage composer", () => {
     );
 
     expect(
-      screen.getByTestId("voice-input-surface").props.accessibilityState,
-    ).toEqual({ disabled: false });
-    fireEvent.press(screen.getByTestId("voice-input-surface"));
-    expect(onResolvePromptBlock).toHaveBeenCalledTimes(1);
+      screen.getByTestId("voice-orb-idle").props.accessibilityState,
+    ).toEqual({ disabled: true });
+    fireEvent.press(screen.getByTestId("voice-orb-idle"));
+    expect(onResolvePromptBlock).not.toHaveBeenCalled();
     expect(onPress).not.toHaveBeenCalled();
 
     fireEvent.press(screen.getByLabelText("Show text input"));
@@ -405,10 +381,13 @@ describe("MainScreenVoiceStage composer", () => {
     );
     expect(
       screen.getByTestId("voice-text-primary-action").props.accessibilityState,
-    ).toEqual({ disabled: false });
+    ).toEqual({ disabled: true });
     fireEvent.press(screen.getByTestId("voice-text-primary-action"));
-    expect(onResolvePromptBlock).toHaveBeenCalledTimes(2);
+    expect(onResolvePromptBlock).not.toHaveBeenCalled();
     expect(onSubmitTextMessage).not.toHaveBeenCalled();
+
+    fireEvent.press(screen.getByTestId("prompt-blocked-notice"));
+    expect(onResolvePromptBlock).toHaveBeenCalledTimes(1);
   });
 
   it("preserves the dark-mode voice control treatment", () => {
@@ -470,9 +449,7 @@ describe("MainScreenVoiceStage composer", () => {
       .mockImplementation(() => undefined);
     const onSubmitTextMessage = jest.fn();
     const screen = renderStage(
-      <MainScreenVoiceStage
-        {...createProps({ onSubmitTextMessage })}
-      />,
+      <MainScreenVoiceStage {...createProps({ onSubmitTextMessage })} />,
     );
 
     fireEvent.press(screen.getByLabelText("Show text input"));
@@ -625,9 +602,7 @@ describe("MainScreenVoiceStage composer", () => {
       screen.queryByTestId("phosphor-icon-stop", hiddenIconQuery),
     ).toBeNull();
 
-    screen.rerender(
-      <MainScreenVoiceStage {...props} driveVoiceActive />,
-    );
+    screen.rerender(<MainScreenVoiceStage {...props} driveVoiceActive />);
 
     expect(screen.queryByTestId("voice-orb-core-label")).toBeNull();
     expect(
@@ -645,11 +620,7 @@ describe("MainScreenVoiceStage composer", () => {
     );
 
     screen.rerender(
-      <MainScreenVoiceStage
-        {...props}
-        isActive
-        visualPhase="thinking"
-      />,
+      <MainScreenVoiceStage {...props} isActive visualPhase="thinking" />,
     );
     expect(screen.getByTestId("voice-orb-active")).toBeTruthy();
     expect(
@@ -815,13 +786,13 @@ describe("MainScreenVoiceStage composer", () => {
     );
 
     // Half way through the estimate: the outer ring draws turn ink over the
-    // turn track, and nothing is red yet.
+    // turn track. The pre-mounted late arcs have a full dash offset until the
+    // UI-thread delay expires, so they are visually absent here.
     let strokes = screen
       .UNSAFE_getAllByType(Circle)
       .map((circle) => circle.props.stroke);
     expect(strokes).toContain(lightColors.turnInk);
     expect(strokes).toContain(lightColors.turnTrack);
-    expect(strokes).not.toContain(lightColors.danger);
 
     // A full estimate past the deadline: both rings carry the red tail.
     now.mockReturnValue(30_000);

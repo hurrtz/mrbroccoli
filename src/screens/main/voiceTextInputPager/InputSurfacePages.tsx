@@ -1,11 +1,7 @@
 import { PhosphorIcon } from "../../../design-system/PhosphorIcon";
 import React from "react";
-import { Text, TextInput, TouchableOpacity, View } from "react-native";
-import {
-  GestureDetector,
-  GestureType,
-  TouchableOpacity as GestureTouchableOpacity,
-} from "react-native-gesture-handler";
+import { TextInput, TouchableOpacity, View } from "react-native";
+import { GestureDetector, GestureType } from "react-native-gesture-handler";
 import Animated from "react-native-reanimated";
 import { VoiceOrb } from "../../../design-system/VoiceOrb";
 import { Colors } from "../../../theme/colors";
@@ -24,24 +20,16 @@ interface InputSurfacePagesProps {
   onPress: () => void;
   onPressIn: () => void;
   onPressOut: () => void;
-  onResolvePromptBlock?: () => void;
   onSubmitTextMessage: () => void;
   onTextFocusChange: (focused: boolean) => void;
   onTextMessageChange: (text: string) => void;
   pageWidth: number;
   panGesture: GestureType;
-  promptBlockedActionEnabled: boolean;
-  promptBlockedActionLabel: string | null;
-  promptBlockedProgress: number | null;
+  promptBlockedMessage: string | null;
   stageSize: number;
   statusLabel: string;
   submissionDisabled: boolean;
   t: TranslateFn;
-  /**
-   * Set when nothing can hear the user. Unlike `submissionDisabled`, this
-   * retires only the voice control: the whole point of the message is to send
-   * the user to the composer, so typing has to stay live behind it.
-   */
   voiceInputUnavailableMessage: string | null;
   textFocused: boolean;
   textInputGesture: GestureType;
@@ -54,143 +42,52 @@ interface InputSurfacePagesProps {
 }
 
 function VoiceInputSurface({
-  colors,
   disabled,
   inputMode,
   onPress,
   onPressIn,
   onPressOut,
-  onResolvePromptBlock,
-  promptBlockedActionEnabled,
-  promptBlockedActionLabel,
-  promptBlockedProgress,
+  promptBlockedMessage,
   stageSize,
   statusLabel,
   submissionDisabled,
   voiceInputUnavailableMessage,
 }: Pick<
   InputSurfacePagesProps,
-  | "colors"
   | "disabled"
   | "inputMode"
   | "onPress"
   | "onPressIn"
   | "onPressOut"
-  | "onResolvePromptBlock"
-  | "promptBlockedActionEnabled"
-  | "promptBlockedActionLabel"
-  | "promptBlockedProgress"
+  | "promptBlockedMessage"
   | "stageSize"
   | "statusLabel"
   | "submissionDisabled"
   | "voiceInputUnavailableMessage"
 >) {
-  const canResolvePromptBlock =
-    promptBlockedActionEnabled && Boolean(onResolvePromptBlock);
   const actionDisabled =
-    disabled ||
-    Boolean(voiceInputUnavailableMessage) ||
-    (submissionDisabled && !canResolvePromptBlock);
-  const handlePress = canResolvePromptBlock ? onResolvePromptBlock : onPress;
-  // A resolvable block keeps its own call to action; the unavailable message
-  // only fills the control when there is nothing else to say there.
-  const surfaceLabel =
-    promptBlockedActionLabel ?? voiceInputUnavailableMessage;
-
-  // The blocked and unavailable states are not in the design system's orb —
-  // a mute orb would hide the one thing worth saying there. They keep the
-  // labelled bar, centred in the orb's slot so the controls below never move.
-  if (surfaceLabel || actionDisabled) {
-    return (
-      <GestureTouchableOpacity
-        testID="voice-input-surface"
-        accessibilityLabel={surfaceLabel ?? statusLabel}
-        accessibilityRole="button"
-        accessibilityState={{ disabled: actionDisabled }}
-        accessibilityValue={
-          promptBlockedProgress !== null
-            ? {
-                min: 0,
-                max: 100,
-                now: Math.round(promptBlockedProgress * 100),
-              }
-            : undefined
-        }
-        activeOpacity={0.84}
-        disabled={actionDisabled && !canResolvePromptBlock}
-        onPress={
-          inputMode === "push-to-talk" && !canResolvePromptBlock
-            ? undefined
-            : handlePress
-        }
-        onPressIn={
-          inputMode === "push-to-talk" && !canResolvePromptBlock
-            ? onPressIn
-            : undefined
-        }
-        onPressOut={
-          inputMode === "push-to-talk" && !canResolvePromptBlock
-            ? onPressOut
-            : undefined
-        }
-        style={[
-          styles.voiceSurface,
-          {
-            backgroundColor: actionDisabled
-              ? colors.surfaceAlt
-              : colors.activeControl,
-            borderColor: actionDisabled ? colors.border : colors.activeControl,
-          },
-        ]}
-      >
-        {surfaceLabel ? (
-          <Text
-            testID="voice-input-blocked-status"
-            accessibilityLiveRegion="polite"
-            numberOfLines={2}
-            style={[
-              styles.blockedActionLabel,
-              {
-                color: canResolvePromptBlock
-                  ? colors.activeControlIcon
-                  : colors.textMuted,
-              },
-            ]}
-          >
-            {surfaceLabel}
-          </Text>
-        ) : (
-          <View
-            testID="voice-input-icon"
-            style={[
-              styles.voiceIcon,
-              {
-                backgroundColor: actionDisabled
-                  ? colors.surfaceElevated
-                  : colors.activeControlIconBackground,
-              },
-            ]}
-          >
-            <PhosphorIcon
-              name="audio"
-              size="navigation"
-              color={
-                actionDisabled ? colors.textMuted : colors.activeControlIcon
-              }
-            />
-          </View>
-        )}
-      </GestureTouchableOpacity>
-    );
-  }
+    disabled || Boolean(voiceInputUnavailableMessage) || submissionDisabled;
+  // Setup and availability reasons belong beside the orb, never in place of
+  // it. The orb remains the stable primary affordance and does not secretly
+  // become an introduction shortcut when no route is usable.
+  const surfaceLabel = voiceInputUnavailableMessage ?? promptBlockedMessage;
 
   return (
     <View style={styles.orbSlot} testID="voice-input-surface">
       <VoiceOrb
-        label={statusLabel}
-        onPress={inputMode === "push-to-talk" ? undefined : handlePress}
-        onPressIn={inputMode === "push-to-talk" ? onPressIn : undefined}
-        onPressOut={inputMode === "push-to-talk" ? onPressOut : undefined}
+        disabled={actionDisabled}
+        label={surfaceLabel ?? statusLabel}
+        onPress={
+          actionDisabled || inputMode === "push-to-talk" ? undefined : onPress
+        }
+        onPressIn={
+          actionDisabled || inputMode === "push-to-talk" ? undefined : onPressIn
+        }
+        onPressOut={
+          actionDisabled || inputMode === "push-to-talk"
+            ? undefined
+            : onPressOut
+        }
         size={stageSize}
         testID="voice-orb-idle"
       />
@@ -204,10 +101,6 @@ function TextInputSurface({
   onSubmitTextMessage,
   onTextFocusChange,
   onTextMessageChange,
-  onResolvePromptBlock,
-  promptBlockedActionEnabled,
-  promptBlockedActionLabel,
-  promptBlockedProgress,
   t,
   textFocused,
   textInputGesture,
@@ -221,10 +114,6 @@ function TextInputSurface({
   | "onSubmitTextMessage"
   | "onTextFocusChange"
   | "onTextMessageChange"
-  | "onResolvePromptBlock"
-  | "promptBlockedActionEnabled"
-  | "promptBlockedActionLabel"
-  | "promptBlockedProgress"
   | "t"
   | "textFocused"
   | "textInputGesture"
@@ -232,10 +121,7 @@ function TextInputSurface({
   | "textMessage"
   | "textSubmitDisabled"
 >) {
-  const canResolvePromptBlock =
-    promptBlockedActionEnabled && Boolean(onResolvePromptBlock);
-  const primaryActionDisabled =
-    disabled || (textSubmitDisabled && !canResolvePromptBlock);
+  const primaryActionDisabled = disabled || textSubmitDisabled;
 
   return (
     <View
@@ -276,26 +162,14 @@ function TextInputSurface({
       </View>
       <TouchableOpacity
         testID="voice-text-primary-action"
-        accessibilityLabel={promptBlockedActionLabel ?? t("sendTextMessage")}
+        accessibilityLabel={t("sendTextMessage")}
         accessibilityRole="button"
         accessibilityState={{ disabled: primaryActionDisabled }}
-        accessibilityValue={
-          promptBlockedProgress !== null
-            ? {
-                min: 0,
-                max: 100,
-                now: Math.round(promptBlockedProgress * 100),
-              }
-            : undefined
-        }
         disabled={primaryActionDisabled}
-        onPress={
-          canResolvePromptBlock ? onResolvePromptBlock : onSubmitTextMessage
-        }
+        onPress={onSubmitTextMessage}
         activeOpacity={0.8}
         style={[
           styles.sendButton,
-          promptBlockedActionLabel ? styles.sendButtonBlockedStatus : null,
           {
             backgroundColor: primaryActionDisabled
               ? colors.surfaceAlt
@@ -303,29 +177,11 @@ function TextInputSurface({
           },
         ]}
       >
-        {promptBlockedActionLabel ? (
-          <Text
-            testID="text-input-blocked-status"
-            accessibilityLiveRegion="polite"
-            numberOfLines={1}
-            style={[
-              styles.blockedActionLabel,
-              {
-                color: canResolvePromptBlock
-                  ? colors.onPrimary
-                  : colors.textMuted,
-              },
-            ]}
-          >
-            {promptBlockedActionLabel}
-          </Text>
-        ) : (
-          <PhosphorIcon
-            name="arrow-up"
-            size="control"
-            color={primaryActionDisabled ? colors.textMuted : colors.onPrimary}
-          />
-        )}
+        <PhosphorIcon
+          name="arrow-up"
+          size="control"
+          color={primaryActionDisabled ? colors.textMuted : colors.onPrimary}
+        />
       </TouchableOpacity>
     </View>
   );

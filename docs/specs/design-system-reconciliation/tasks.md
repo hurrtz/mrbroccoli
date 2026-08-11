@@ -65,6 +65,24 @@
 - [x] Publish the final evidence matrix, intentional deviations, remaining
   blockers, commits, and artifact paths to the repository report and Obsidian.
 
+## Reopened regression batch — 2026-08-11
+
+- [x] Trace the startup CTA/composer and text-submit diversion through the
+  workspace pager and `MainScreen`; restore the stable orb and direct blocked
+  notices to the owning On-device settings page.
+- [x] Remove the Free edition status link from the route selector, centre the
+  sparse requirements introduction step, and restore persisted completed
+  automatic setup as Ready only after current install/benchmark revalidation.
+- [x] Make Piper VITS verification include its required phoneme pack and move
+  orb estimate and overtime clocks from a 200ms JS tick to the UI thread.
+- [x] Add focused regressions for each changed behavior and pass TypeScript and
+  static analysis.
+- [ ] Capture the remaining fresh Pixel 4a Release smoke flow. The current
+  Android-emulator and iOS-simulator matrices have passed; the connected Pixel
+  4a is screen-locked and must be unlocked before its 13 screenshots can be
+  captured. Physical-iPhone local-model acceptance remains subject to the
+  existing developer-image/signing prerequisite.
+
 ## Completed batches
 
 ### 2026-08-11 — English portrait emulator/simulator baseline

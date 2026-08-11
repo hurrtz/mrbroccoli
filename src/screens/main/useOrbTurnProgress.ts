@@ -1,15 +1,26 @@
-import { useEffect, useState } from "react";
-
 import type { VoiceTimingProgress, VoiceVisualPhase } from "../../types";
+
+export interface OrbRingTiming {
+  /** The remaining native-animation time for this clock. */
+  durationMs: number;
+  /** Optional delay before the clock begins, used for overtime. */
+  delayMs?: number;
+}
 
 export interface OrbTurnProgress {
   phaseProgress: number;
   turnProgress: number;
   overtime: number;
+  phaseProgressTiming?: OrbRingTiming;
+  turnProgressTiming?: OrbRingTiming;
+  overtimeTiming?: OrbRingTiming;
 }
 
-const IDLE: OrbTurnProgress = { phaseProgress: 0, turnProgress: 0, overtime: 0 };
-const TICK_MS = 200;
+const IDLE: OrbTurnProgress = {
+  phaseProgress: 0,
+  turnProgress: 0,
+  overtime: 0,
+};
 
 function clamp01(value: number) {
   return Math.max(0, Math.min(1, value));
@@ -36,27 +47,7 @@ export function useOrbTurnProgress({
   speechStartProgress: VoiceTimingProgress | null;
   visualPhase: VoiceVisualPhase;
 }): OrbTurnProgress {
-  // The interval only forces re-renders; every fraction reads the clock at
-  // render time, so a prop change is never stuck on a stale tick.
-  const [, setTick] = useState(0);
   const nowMs = Date.now();
-  const ticking =
-    visualPhase === "recording" ||
-    (visualPhase !== "idle" &&
-      visualPhase !== "speaking" &&
-      Boolean(speechStartProgress));
-
-  useEffect(() => {
-    if (!ticking) {
-      return;
-    }
-
-    const timer = setInterval(
-      () => setTick((current) => current + 1),
-      TICK_MS,
-    );
-    return () => clearInterval(timer);
-  }, [ticking]);
 
   if (visualPhase === "idle") {
     return IDLE;
@@ -65,10 +56,16 @@ export function useOrbTurnProgress({
   if (visualPhase === "recording") {
     const startedAt = recordingStartedAtMs ?? nowMs;
     const safeMax = Math.max(1000, recordingMaxMs);
+    const elapsedMs = Math.max(0, nowMs - startedAt);
+    const phaseProgress = clamp01(elapsedMs / safeMax);
     return {
-      phaseProgress: clamp01((nowMs - startedAt) / safeMax),
+      phaseProgress,
       turnProgress: 0,
       overtime: 0,
+      phaseProgressTiming:
+        phaseProgress < 1
+          ? { durationMs: Math.max(0, safeMax - elapsedMs) }
+          : undefined,
     };
   }
 
@@ -82,9 +79,24 @@ export function useOrbTurnProgress({
 
   const estimatedMs = Math.max(1000, speechStartProgress.estimatedMs);
   const elapsedMs = Math.max(0, nowMs - speechStartProgress.startedAt);
+  const turnProgress = clamp01(elapsedMs / estimatedMs);
+  const overtime = clamp01((elapsedMs - estimatedMs) / estimatedMs);
+  const beforeEstimate = elapsedMs < estimatedMs;
   return {
     phaseProgress: 0,
-    turnProgress: clamp01(elapsedMs / estimatedMs),
-    overtime: clamp01((elapsedMs - estimatedMs) / estimatedMs),
+    turnProgress,
+    overtime,
+    turnProgressTiming:
+      turnProgress < 1
+        ? { durationMs: Math.max(0, estimatedMs - elapsedMs) }
+        : undefined,
+    overtimeTiming: beforeEstimate
+      ? {
+          delayMs: Math.max(0, estimatedMs - elapsedMs),
+          durationMs: estimatedMs,
+        }
+      : overtime < 1
+        ? { durationMs: Math.max(0, estimatedMs * (1 - overtime)) }
+        : undefined,
   };
 }

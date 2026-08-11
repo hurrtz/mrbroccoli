@@ -62,7 +62,9 @@ function WelcomeStep({ language, t }: IntroStepProps) {
   return (
     <View style={styles.welcome}>
       <Pressable
-        accessibilityLabel={playing ? t("introHearStop") : t("introWelcomePlay")}
+        accessibilityLabel={
+          playing ? t("introHearStop") : t("introWelcomePlay")
+        }
         accessibilityRole="button"
         onPress={toggle}
         style={({ pressed }) => [
@@ -104,7 +106,10 @@ function WelcomeStep({ language, t }: IntroStepProps) {
  */
 function RequirementsStep({ t }: IntroStepProps) {
   return (
-    <View style={styles.stack}>
+    <View
+      style={[styles.stack, styles.requirements]}
+      testID="intro-requirements-step"
+    >
       <IntroTitle>{t("introNeedsTitle")}</IntroTitle>
       <IntroBody>{t("introNeedsBody")}</IntroBody>
 
@@ -346,6 +351,10 @@ const styles = StyleSheet.create({
   panelLabel: {
     fontFamily: fonts.bodyMedium,
     fontSize: 15,
+  },
+  requirements: {
+    flex: 1,
+    justifyContent: "center",
   },
   stack: {
     gap: 14,

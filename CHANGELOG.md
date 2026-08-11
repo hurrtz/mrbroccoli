@@ -38,6 +38,14 @@ the complete Play Store translations are kept in a dedicated file under
   ramp: green at recording and speaking, travelling through teal and blue to
   violet at the deepest thinking and back, with a set tuned separately for
   each appearance.
+- Home always opens on the voice orb. Text remains one deliberate swipe or
+  page-control away, while a blocked route gives a direct On-device settings
+  notice instead of turning the orb into an older CTA or opening the
+  introduction. The Free edition label and the empty credential card are no
+  longer shown above the model byline.
+- Voice-orb progress rings now interpolate on the native animation thread, so
+  recording, turn estimates, and late red tails stay smooth while answers
+  stream in.
 
 ### Fixed
 
@@ -61,6 +69,12 @@ the complete Play Store translations are kept in a dedicated file under
 - Finish the seven-step introduction with a clear, labelled Done action in the
   same place as its Next control instead of leaving an empty footer that looks
   like a missing button.
+- Restore a completed on-device profile as Ready after it has been revalidated,
+  rather than offering to download models that are already present. Piper
+  downloads now include their required phoneme packs before the voice is
+  accepted, avoiding intermittent local-voice failures on iPhone. A successful
+  automatic install now records its completed profile for that later
+  revalidation.
 
 ## 3.2.0 - 2026-08-08
 

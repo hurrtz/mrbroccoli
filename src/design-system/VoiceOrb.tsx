@@ -8,6 +8,14 @@ import {
   type ViewStyle,
 } from "react-native";
 import Svg, { Circle } from "react-native-svg";
+import Animated, {
+  cancelAnimation,
+  Easing,
+  useAnimatedProps,
+  useSharedValue,
+  withDelay,
+  withTiming,
+} from "react-native-reanimated";
 
 import type { VoiceVisualPhase } from "../types";
 import { getAccessibleForeground, type Colors } from "../theme/colors";
@@ -62,6 +70,15 @@ const BAND = 6;
 const GAP = 3;
 const TINT_ALPHA = 0.16;
 const HALO_RING = 8;
+const AnimatedCircle = Animated.createAnimatedComponent(Circle);
+
+/** A UI-thread clock that continues between semantic pipeline updates. */
+export interface VoiceOrbRingTiming {
+  /** Remaining time before the ring reaches its next complete state. */
+  durationMs: number;
+  /** Optional delay before the clock starts, used for the overtime tail. */
+  delayMs?: number;
+}
 
 function clamp01(value: number | undefined): number {
   if (!value || !Number.isFinite(value)) {
@@ -90,66 +107,131 @@ function ProgressRing({
   trackColor,
   progressColor,
   progress,
+  progressTiming,
   tailColor,
   tail,
+  tailTiming,
 }: {
   centre: number;
   radius: number;
   trackColor: string;
   progressColor?: string;
   progress?: number;
+  progressTiming?: VoiceOrbRingTiming;
   /** Overtime: a tail of this fraction fills backwards from 12 o'clock. */
   tailColor?: string;
   tail?: number;
+  tailTiming?: VoiceOrbRingTiming;
 }) {
   const circumference = 2 * Math.PI * radius;
-  const rings: React.ReactNode[] = [
-    <Circle
-      key="track"
-      cx={centre}
-      cy={centre}
-      r={radius}
-      stroke={trackColor}
-      strokeWidth={BAND}
-      fill="none"
-    />,
-  ];
+  const progressClock = useRingClock(progress, progressTiming);
+  const tailClock = useRingClock(tail, tailTiming);
+  const progressVisibility = useRingVisibility(
+    Boolean(tailColor && (tail || tailTiming)),
+    tailTiming?.delayMs,
+  );
+  const progressAnimatedProps = useAnimatedProps(() => ({
+    strokeDashoffset: circumference * (1 - progressClock.value),
+    strokeOpacity: progressVisibility.value,
+  }));
+  const tailAnimatedProps = useAnimatedProps(() => ({
+    strokeDashoffset: circumference * (1 - tailClock.value),
+  }));
 
-  if (tailColor && tail) {
-    // The red tail ends at 12 o'clock and grows backwards as the turn runs
-    // late: conic(track 0..remaining, danger remaining..360).
-    const tailLength = clamp01(tail) * circumference;
-    const startDeg = (1 - clamp01(tail)) * 360 - 90;
-    rings.push(
+  return (
+    <>
       <Circle
-        key="tail"
         cx={centre}
         cy={centre}
         r={radius}
-        stroke={tailColor}
+        stroke={trackColor}
         strokeWidth={BAND}
         fill="none"
-        strokeDasharray={[tailLength, circumference]}
-        transform={`rotate(${startDeg} ${centre} ${centre})`}
-      />,
-    );
-  } else if (progressColor && progress) {
-    rings.push(
-      <Circle
-        key="progress"
-        cx={centre}
-        cy={centre}
-        r={radius}
-        stroke={progressColor}
-        strokeWidth={BAND}
-        fill="none"
-        strokeDasharray={[clamp01(progress) * circumference, circumference]}
-        transform={`rotate(-90 ${centre} ${centre})`}
-      />,
-    );
-  }
+      />
+      {progressColor && (progress || progressTiming) ? (
+        <AnimatedCircle
+          animatedProps={progressAnimatedProps}
+          cx={centre}
+          cy={centre}
+          r={radius}
+          stroke={progressColor}
+          strokeWidth={BAND}
+          fill="none"
+          strokeDasharray={[circumference, circumference]}
+          transform={`rotate(-90 ${centre} ${centre})`}
+        />
+      ) : null}
+      {tailColor && (tail || tailTiming) ? (
+        // A counter-clockwise circle makes the late tail advance backwards
+        // from twelve o'clock while its value is animated off the JS thread.
+        <AnimatedCircle
+          animatedProps={tailAnimatedProps}
+          cx={centre}
+          cy={centre}
+          r={radius}
+          stroke={tailColor}
+          strokeWidth={BAND}
+          fill="none"
+          strokeDasharray={[circumference, circumference]}
+          transform={`rotate(90 ${centre} ${centre})`}
+        />
+      ) : null}
+    </>
+  );
+}
 
-  return <>{rings}</>;
+function useRingClock(
+  value: number | undefined,
+  timing: VoiceOrbRingTiming | undefined,
+) {
+  const clock = useSharedValue(clamp01(value));
+  const durationMs = timing?.durationMs;
+  const delayMs = timing?.delayMs;
+
+  React.useEffect(() => {
+    cancelAnimation(clock);
+    clock.value = clamp01(value);
+    if (durationMs === undefined || clock.value >= 1) {
+      return () => cancelAnimation(clock);
+    }
+
+    const animation = withTiming(1, {
+      duration: Math.max(0, Math.round(durationMs)),
+      easing: Easing.linear,
+    });
+    clock.value = delayMs
+      ? withDelay(Math.max(0, Math.round(delayMs)), animation)
+      : animation;
+    return () => cancelAnimation(clock);
+  }, [clock, delayMs, durationMs, value]);
+
+  return clock;
+}
+
+/**
+ * When an estimate expires the approved design swaps the completed ink for a
+ * track plus a red tail. Schedule that discrete swap with the same UI-thread
+ * deadline as the tail so JavaScript does not need to wake up at the boundary.
+ */
+function useRingVisibility(hidden: boolean, delayMs: number | undefined) {
+  const initiallyHidden = hidden && !delayMs;
+  const visibility = useSharedValue(initiallyHidden ? 0 : 1);
+
+  React.useEffect(() => {
+    cancelAnimation(visibility);
+    visibility.value = 1;
+    if (!hidden) {
+      return () => cancelAnimation(visibility);
+    }
+
+    const hide = withTiming(0, { duration: 1, easing: Easing.linear });
+    visibility.value = delayMs
+      ? withDelay(Math.max(0, Math.round(delayMs)), hide)
+      : hide;
+    return () => cancelAnimation(visibility);
+  }, [delayMs, hidden, visibility]);
+
+  return visibility;
 }
 
 /**
@@ -164,8 +246,11 @@ function ProgressRing({
 export function VoiceOrb({
   phase = "idle",
   phaseProgress = 0,
+  phaseProgressTiming,
   turnProgress = 0,
+  turnProgressTiming,
   overtime = 0,
+  overtimeTiming,
   size = 196,
   label,
   coreLabel,
@@ -181,10 +266,16 @@ export function VoiceOrb({
   phase?: VoiceVisualPhase;
   /** 0–1 through the current phase. Drives the inner ring. */
   phaseProgress?: number;
+  /** UI-thread interpolation for the current phase ring. */
+  phaseProgressTiming?: VoiceOrbRingTiming;
   /** 0–1 through the whole turn against its estimate. Drives the outer ring. */
   turnProgress?: number;
+  /** UI-thread interpolation for the whole-turn ring. */
+  turnProgressTiming?: VoiceOrbRingTiming;
   /** 0–1 past the estimate. Above 0 both rings fill with red as the turn runs. */
   overtime?: number;
+  /** UI-thread interpolation for the late-turn tail. */
+  overtimeTiming?: VoiceOrbRingTiming;
   /** Diameter in points. The screen measures its space and passes it down. */
   size?: number;
   /** Accessible name, translated by the caller. */
@@ -209,7 +300,10 @@ export function VoiceOrb({
   const foreground = getAccessibleForeground(ink);
   const late = clamp01(overtime);
   const quiet =
-    phase === "idle" && !clamp01(turnProgress) && !clamp01(phaseProgress) && !late;
+    phase === "idle" &&
+    !clamp01(turnProgress) &&
+    !clamp01(phaseProgress) &&
+    !late;
 
   // The rings shrink by fixed bands while the core shrinks by proportion, so
   // below ~107pt the proportion would overtake the ring holding it. The core
@@ -259,8 +353,10 @@ export function VoiceOrb({
               trackColor={colors.turnTrack}
               progressColor={colors.turnInk}
               progress={turnProgress}
-              tailColor={late > 0 ? colors.danger : undefined}
+              progressTiming={turnProgressTiming}
+              tailColor={late > 0 || overtimeTiming ? colors.danger : undefined}
               tail={late}
+              tailTiming={overtimeTiming}
             />
             <ProgressRing
               centre={centre}
@@ -268,8 +364,10 @@ export function VoiceOrb({
               trackColor={tint}
               progressColor={ink}
               progress={phaseProgress}
-              tailColor={late > 0 ? colors.danger : undefined}
+              progressTiming={phaseProgressTiming}
+              tailColor={late > 0 || overtimeTiming ? colors.danger : undefined}
               tail={late}
+              tailTiming={overtimeTiming}
             />
           </>
         )}

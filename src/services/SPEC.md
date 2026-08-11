@@ -169,6 +169,11 @@ verified before extraction, installed beside the speech model's data
 directory. A missing pack yields no phonemes and the turn falls back to
 system speech; the runtime never guesses pronunciations.
 
+Kokoro and every Piper VITS download install and verify the required language
+pack in their own `espeak-ng-data` directory before the model is reported
+verified. A model archive alone is not a usable Piper installation; this check
+prevents an iPhone from selecting a voice that cannot phonemize.
+
 Kokoro's data directory keeps its historical `espeak-ng-data` name because
 both the model archive and sherpa's detector rely on it, but this runtime
 fills it with libphonemize packs. sherpa locates that directory by scanning

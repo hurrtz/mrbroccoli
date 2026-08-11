@@ -118,22 +118,25 @@ remain contextual, but no hidden surface owns authoritative app data. The
 route-picker and transcript sheets follow the same rule: their visibility
 lives in `useMainScreenUiState`, not inside the workspace tree.
 
-The orb's ring values come from `useOrbTurnProgress`, which re-renders on a
-coarse tick and reads the clock at render time: recording fills the inner ring
-against the capture cap, the speech-start estimate drives the outer ring, and
-overtime past the estimate fills both with red. Processing phases carry no
-per-phase estimate, so their inner ring deliberately rests on the phase tint
-rather than faking a fraction.
+`useOrbTurnProgress` takes one clock snapshot whenever semantic voice state
+changes, then supplies the remaining linear durations to `VoiceOrb`. The orb
+uses Reanimated UI-thread clocks for recording, whole-turn estimate, and late
+tail progress, so both rings stay smooth while streamed text updates compete on
+the JS thread. Recording fills the inner ring against the capture cap, the
+speech-start estimate drives the outer ring, and the estimated deadline swaps
+completed ink for the approved track plus red tail without a JS timer.
+Processing phases carry no per-phase estimate, so their inner ring deliberately
+rests on the phase tint rather than faking a fraction.
 
 The isolated `.maestro` screenshot identity may replace the visual phase and
 both ring fractions with validated deterministic values. That override enters
 at the presentation boundary after the live hook still runs, never mutates the
 pipeline, and is unavailable to production and development identities.
 
-The workspace owns the status label for the active input surface. Capability
-checks may make the pager move from voice to text after mount; the workspace
-mirrors that automatic move for its label without sending it through the
-remembered-surface callback. A later user swipe still owns both states.
+The workspace owns the status label for the active input surface. The pager
+opens on voice and only a deliberate page-control press or horizontal gesture
+moves it to text; capability checks disable the orb and surface an explicit
+settings notice without changing the selected surface or opening onboarding.
 
 ## Evidence
 

@@ -38,6 +38,7 @@ const mockSelect = jest.fn();
 const mockPrepare = jest.fn();
 const mockGetBenchmarks = jest.fn();
 const mockGetInstallStatuses = jest.fn();
+const mockEvaluateReadiness = jest.fn();
 
 jest.mock("../../../src/services/localDeviceCapabilities", () => ({
   probeLocalDeviceCapabilities: jest.fn(async () => snapshot),
@@ -49,9 +50,9 @@ jest.mock("../../../src/services/localDeviceCapabilities", () => ({
   ) =>
     Boolean(
       benchmark?.device?.platform === device.platform &&
-        benchmark.device.architecture === device.architecture &&
-        benchmark.device.osVersion === device.osVersion &&
-        benchmark.device.physicalMemoryBytes === device.physicalMemoryBytes,
+      benchmark.device.architecture === device.architecture &&
+      benchmark.device.osVersion === device.osVersion &&
+      benchmark.device.physicalMemoryBytes === device.physicalMemoryBytes,
     ),
 }));
 
@@ -68,9 +69,7 @@ jest.mock("../../../src/services/offlineProfile", () => ({
     stt?: unknown;
     tts?: unknown;
   }) =>
-    [profile.llm, profile.stt, profile.tts].filter(
-      (model) => model != null,
-    ),
+    [profile.llm, profile.stt, profile.tts].filter((model) => model != null),
   applyOfflineProfileToSettings: (settings: Settings) => ({
     ...settings,
     responseModes: [
@@ -95,9 +94,9 @@ jest.mock("../../../src/services/offlineProfileManager", () => ({
     stt?: unknown;
     tts?: unknown;
   }) =>
-    [profile.llm, profile.stt, profile.tts].filter(
-      (model) => model != null,
-    ),
+    [profile.llm, profile.stt, profile.tts].filter((model) => model != null),
+  evaluateOfflineProfileReadiness: (...args: unknown[]) =>
+    mockEvaluateReadiness(...args),
   prepareOfflineProfile: (...args: unknown[]) => mockPrepare(...args),
 }));
 
@@ -114,13 +113,13 @@ jest.mock("../../../src/screens/main/useFreeOfflineMode", () => ({
 const t = ((key: string, values?: Record<string, string | number>) =>
   values ? `${key}:${JSON.stringify(values)}` : key) as TranslateFn;
 
-function renderJob() {
+function renderJob(settings = DEFAULT_SETTINGS) {
   const onOutcome = jest.fn();
   const updateSettings = jest.fn();
   const rendered = renderHook(() =>
     useAutoSetupJob({
       onOutcome,
-      settings: DEFAULT_SETTINGS,
+      settings,
       t,
       updateSettings,
     }),
@@ -138,6 +137,7 @@ describe("useAutoSetupJob", () => {
     mockPrepare.mockReset().mockResolvedValue(undefined);
     mockGetBenchmarks.mockReset().mockResolvedValue({});
     mockGetInstallStatuses.mockReset().mockResolvedValue({});
+    mockEvaluateReadiness.mockReset().mockReturnValue({ ready: false });
   });
 
   afterEach(() => {
@@ -151,6 +151,71 @@ describe("useAutoSetupJob", () => {
     act(() => rendered.result.current.install());
     expect(rendered.result.current.state).toBe("offer");
     expect(mockPrepare).not.toHaveBeenCalled();
+  });
+
+  it("restores a persisted complete setup as ready after revalidating it", async () => {
+    mockGetInstallStatuses.mockResolvedValue({
+      [llmModel.id]: { installed: true, path: "/models/qwen", verified: true },
+      [sttModel.id]: {
+        installed: true,
+        path: "/models/whisper",
+        verified: true,
+      },
+    });
+    mockEvaluateReadiness.mockReturnValue({ ready: true });
+    const { rendered } = renderJob({
+      ...DEFAULT_SETTINGS,
+      freeOfflineSetupCompleted: true,
+    });
+
+    expect(rendered.result.current.state).toBe("scanning");
+    await act(async () => {
+      jest.advanceTimersByTime(1_000);
+    });
+    await act(async () => {
+      jest.advanceTimersByTime(4_000);
+    });
+
+    expect(mockEvaluateReadiness).toHaveBeenCalledTimes(1);
+    expect(rendered.result.current.state).toBe("done");
+    expect(rendered.result.current.downloadBytes).toBe(0);
+  });
+
+  it("repairs a legacy local route that was saved before its completion marker", async () => {
+    mockGetInstallStatuses.mockResolvedValue({
+      [llmModel.id]: { installed: true, path: "/models/qwen", verified: true },
+      [sttModel.id]: {
+        installed: true,
+        path: "/models/whisper",
+        verified: true,
+      },
+    });
+    mockEvaluateReadiness.mockReturnValue({ ready: true });
+    const { rendered } = renderJob({
+      ...DEFAULT_SETTINGS,
+      activeResponseMode: "free-local",
+      responseModes: [
+        {
+          id: "free-local",
+          route: {
+            runtime: "local",
+            localModelId: "qwen3-0.6b-q8",
+            provider: "openai",
+            model: "Qwen3 0.6B",
+          },
+        },
+      ],
+    });
+
+    await act(async () => {
+      jest.advanceTimersByTime(1_000);
+    });
+    await act(async () => {
+      jest.advanceTimersByTime(4_000);
+    });
+
+    expect(mockEvaluateReadiness).toHaveBeenCalledTimes(1);
+    expect(rendered.result.current.state).toBe("done");
   });
 
   it("reveals the device facts one at a time and settles on the proposal", async () => {
@@ -233,6 +298,7 @@ describe("useAutoSetupJob", () => {
     // Applied while preserving configured provider modes — reversible, like
     // Free setup.
     const applied = updateSettings.mock.calls[0][0];
+    expect(applied.freeOfflineSetupCompleted).toBe(true);
     expect(
       applied.responseModes.some(
         (mode: { route: { runtime?: string } }) =>

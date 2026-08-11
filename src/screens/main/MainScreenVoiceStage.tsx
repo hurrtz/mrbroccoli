@@ -47,7 +47,6 @@ interface MainScreenVoiceStageProps {
   promptBlockedActionEnabled?: boolean;
   promptBlockedActionLabel?: string | null;
   promptBlockedMessage?: string | null;
-  promptBlockedProgress?: number | null;
   recordingMaxMs: number;
   recordingStartedAtMs?: number | null;
   speechStartProgress?: VoiceTimingProgress | null;
@@ -55,7 +54,6 @@ interface MainScreenVoiceStageProps {
   t: TranslateFn;
   visualPhase: VoiceVisualPhase;
   voiceInputUnavailableMessage?: string | null;
-  voiceSurfaceUnusable?: boolean;
 }
 
 export const MainScreenVoiceStage = React.memo(function MainScreenVoiceStage({
@@ -90,7 +88,6 @@ export const MainScreenVoiceStage = React.memo(function MainScreenVoiceStage({
   promptBlockedActionEnabled = false,
   promptBlockedActionLabel = null,
   promptBlockedMessage = null,
-  promptBlockedProgress = null,
   recordingMaxMs,
   recordingStartedAtMs = null,
   speechStartProgress = null,
@@ -98,7 +95,6 @@ export const MainScreenVoiceStage = React.memo(function MainScreenVoiceStage({
   t,
   visualPhase,
   voiceInputUnavailableMessage = null,
-  voiceSurfaceUnusable = false,
 }: MainScreenVoiceStageProps) {
   return (
     <View
@@ -122,9 +118,7 @@ export const MainScreenVoiceStage = React.memo(function MainScreenVoiceStage({
           colors={colors}
           disabled={disabled}
           driveAutoContinueEnabled={driveAutoContinueEnabled}
-          driveSilenceCountdownSeconds={
-            driveSilenceCountdownSeconds
-          }
+          driveSilenceCountdownSeconds={driveSilenceCountdownSeconds}
           driveSessionCanRepeat={driveSessionCanRepeat}
           driveVoiceActive={driveVoiceActive}
           initialSurface={initialInputSurface}
@@ -151,7 +145,6 @@ export const MainScreenVoiceStage = React.memo(function MainScreenVoiceStage({
           promptBlockedActionEnabled={promptBlockedActionEnabled}
           promptBlockedActionLabel={promptBlockedActionLabel}
           promptBlockedMessage={promptBlockedMessage}
-          promptBlockedProgress={promptBlockedProgress}
           recordingMaxMs={recordingMaxMs}
           recordingStartedAtMs={recordingStartedAtMs}
           speechStartProgress={speechStartProgress}
@@ -159,7 +152,6 @@ export const MainScreenVoiceStage = React.memo(function MainScreenVoiceStage({
           t={t}
           visualPhase={visualPhase}
           voiceInputUnavailableMessage={voiceInputUnavailableMessage}
-          voiceSurfaceUnusable={voiceSurfaceUnusable}
         />
       </View>
     </View>

@@ -40,11 +40,16 @@ receive already-derived state and callbacks.
   empty tracks. The orb is sized from the space the column actually leaves it,
   clamped between 96pt and its ceiling (196 portrait, 150 landscape), so the
   intro banner or a landscape split simply makes it smaller.
-- When the voice route is blocked or unavailable, the labelled bar replaces
-  the orb in its slot: a mute orb would hide the one thing worth saying there.
+- The orb remains in its measured slot even when a route is blocked or
+  unavailable. It becomes disabled with the translated reason as its accessible
+  name; an explicit notice beneath the stage is the only setup action and
+  opens the owning settings page. A turn control or text submission never opens
+  the introduction.
 - The route byline above the stage states who answers the next turn and at
   what effort — one line at every model count, with the model list in a sheet
-  opened from it. With a single configured model it becomes a credit line.
+  opened from it. With a single configured model it becomes a credit line;
+  when no route is usable it renders nothing rather than another credential or
+  setup card.
   `ResponseModeToggle` and `PhaseAwareVoiceAction` remain in the codebase,
   correct anywhere a picker grid or a docked bar is wanted.
 - The conversation's quick settings read as one muted line under the byline,
@@ -62,17 +67,10 @@ receive already-derived state and callbacks.
   restarting recording, playback, or another request.
 - Text and image submission use the same conversation and route semantics as a
   spoken turn where their capabilities overlap.
-- When the voice control cannot be pressed -- no route at all, nothing that can
-  hear the user, or a block with no action behind it -- the workspace shows the
-  composer and the control retires carrying the reason. A control the user
-  cannot press is not the one to land them on. Routes settle after the pager
-  mounts, so this reacts to the transition rather than only seeding the initial
-  surface; it moves the user once and does not fight a later swipe back. The
-  idle status follows that automatic move while the user's remembered surface
-  preference remains unchanged.
-- The composer is outlined in the accent at rest, not only when focused. It is
-  the other half of the primary action, and it carries the workspace whenever
-  voice cannot.
+- The pager always opens on voice. The composer stays available through its
+  labelled 44pt page control and horizontal gesture, but route readiness never
+  automatically pages the workspace to text. The composer is outlined in the
+  accent at rest, not only when focused.
 - A message telling someone to type must leave typing working. This separates
   an unusable voice route from a prompt block, which stops both routes.
 - Controls that cannot be used at all are absent rather than disabled: Web
@@ -139,12 +137,18 @@ home-screen `BackgroundTaskBar` are three views of one state, so leaving the
 introduction mid-install keeps the download running and reachable. Its six
 states run offer → scanning → proposal → installing → done or failed; nothing
 downloads before the proposal has been seen; the staged ~2.5s measurement
-reveals only real device readings; a transfer failure keeps completed models
-and retry resumes the queue rather than starting over. When a model instead
-fails its device benchmark, retry re-runs selection so the durable result can
-propose the next viable model without discarding verified downloads. The
-outcome is announced by the card where the card is visible, by a toast anywhere
-else — never both.
+  reveals only real device readings; a transfer failure keeps completed models
+  and retry resumes the queue rather than starting over. A persisted completed
+  profile is rechecked against pinned installs and current-device benchmarks on
+  the next launch; a ready profile restores the card's Ready verdict, while a
+  stale benchmark proposes testing only. Completing the automatic install
+  persists that same completion marker, so this revalidation path also applies
+  after a later app launch. A zero-byte proposal uses neutral setup
+  wording rather than claiming it will download again. When a model instead
+  fails its device benchmark, retry re-runs selection so the durable result can
+  propose the next viable model without discarding verified downloads. The
+  outcome is announced by the card where the card is visible, by a toast anywhere
+  else — never both.
 
 **Decision:** The introduction follows the app's light or dark theme. Only the
 workspace banner keeps a palette of its own -- violet, in both themes -- because
@@ -181,11 +185,10 @@ speaking step carries a language picker over the bundled examples, because
 letting someone hear the app in their own language argues for setting it up
 better than a claim does.
 
-The same sheet opens at its final step whenever a turn is attempted with no
-usable route, so the microphone is never a dead end. Provider keys are entered
-in the settings provider panel and local models are managed on the on-device
-settings page; onboarding routes to those surfaces rather than duplicating
-them.
+The introduction is opened from its banner, never as a side effect of attempting
+a turn. Provider keys are entered in the settings provider panel and local
+models are managed on the on-device settings page; blocked-route notices route
+there rather than duplicating setup or hijacking the introduction.
 
 Speech-input readiness follows the selected backend. The local route reads
 `localSttModelId` directly; provider picker state is not evidence that a

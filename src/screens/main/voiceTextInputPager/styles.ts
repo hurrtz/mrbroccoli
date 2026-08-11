@@ -48,27 +48,6 @@ export const voiceTextInputPagerStyles = StyleSheet.create({
     justifyContent: "center",
     width: "100%",
   },
-  voiceSurface: {
-    width: "100%",
-    minHeight: 68,
-    borderRadius: 17,
-    borderWidth: 1,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    paddingHorizontal: 20,
-  },
-  voiceIcon: {
-    width: 42,
-    height: 42,
-    borderRadius: 21,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  blockedActionLabel: {
-    ...textStyles.compactAction,
-    textAlign: "center",
-  },
   textSurface: {
     width: "100%",
     minHeight: 68,
@@ -103,14 +82,6 @@ export const voiceTextInputPagerStyles = StyleSheet.create({
     borderRadius: 23,
     alignItems: "center",
     justifyContent: "center",
-  },
-  sendButtonBlockedStatus: {
-    width: "auto",
-    minWidth: 116,
-    maxWidth: "65%",
-    borderRadius: 15,
-    flexShrink: 1,
-    paddingHorizontal: 12,
   },
   promptBlockedNotice: {
     minHeight: 44,

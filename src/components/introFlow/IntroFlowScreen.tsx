@@ -173,7 +173,9 @@ export function IntroFlowScreen({
                   <ScrollView
                     contentContainerStyle={[
                       styles.page,
-                      step === "welcome" ? styles.pageFill : null,
+                      step === "welcome" || step === "requirements"
+                        ? styles.pageFill
+                        : null,
                     ]}
                     key={step}
                     showsVerticalScrollIndicator={false}

@@ -114,68 +114,6 @@ export const styles = StyleSheet.create({
   routeModeRow: {
     width: "100%",
   },
-  freeEditionStatus: {
-    alignItems: "center",
-    flexDirection: "row",
-    gap: 8,
-    minHeight: 44,
-    paddingHorizontal: 4,
-  },
-  freeEditionStatusCompact: {
-    minHeight: 44,
-  },
-  freeEditionLabel: {
-    flex: 1,
-    fontFamily: fonts.bodyMedium,
-    fontSize: 13,
-    lineHeight: 18,
-  },
-  providerEmptyState: {
-    borderRadius: 14,
-    borderWidth: 1,
-    minHeight: 96,
-    paddingHorizontal: 16,
-    paddingVertical: 14,
-    justifyContent: "center",
-    gap: 6,
-  },
-  providerEmptyStateCompact: {
-    minHeight: 0,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    gap: 4,
-  },
-  providerEmptyHeader: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    gap: 12,
-  },
-  providerEmptyBadge: {
-    flexDirection: "row",
-    alignItems: "center",
-    alignSelf: "flex-start",
-    gap: 8,
-    paddingHorizontal: 10,
-    paddingVertical: 8,
-    borderRadius: 999,
-    borderWidth: 1,
-  },
-  providerEmptyBadgeText: {
-    fontSize: 11,
-    letterSpacing: 1,
-    textTransform: "uppercase",
-    fontFamily: fonts.mono,
-  },
-  providerEmptyTitle: {
-    fontSize: 14,
-    fontFamily: fonts.display,
-  },
-  providerEmptyText: {
-    fontSize: 12,
-    lineHeight: 18,
-    fontFamily: fonts.body,
-  },
   eyebrow: {
     fontSize: 11,
     letterSpacing: 1.2,

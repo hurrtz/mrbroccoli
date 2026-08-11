@@ -1,5 +1,6 @@
 import React from "react";
 import { fireEvent, render } from "@testing-library/react-native";
+import { StyleSheet } from "react-native";
 
 const mockPlayer = { pause: jest.fn(), play: jest.fn(), seekTo: jest.fn() };
 let mockPlaying = false;
@@ -144,13 +145,15 @@ describe("IntroFlowScreen", () => {
 
     fireEvent.press(getByTestId("intro-next"));
     fireEvent.press(getByTestId("intro-next"));
-    expect(getByTestId("intro-stepper-dot-2").props.accessibilityState.selected)
-      .toBe(true);
+    expect(
+      getByTestId("intro-stepper-dot-2").props.accessibilityState.selected,
+    ).toBe(true);
 
     fireEvent.press(getByTestId("intro-back"));
     fireEvent.press(getByTestId("intro-back"));
-    expect(getByTestId("intro-stepper-dot-0").props.accessibilityState.selected)
-      .toBe(true);
+    expect(
+      getByTestId("intro-stepper-dot-0").props.accessibilityState.selected,
+    ).toBe(true);
   });
 
   it("turns the forward action into a visible completion action", () => {
@@ -179,6 +182,15 @@ describe("IntroFlowScreen", () => {
     fireEvent.press(getByTestId("intro-stepper-dot-6"));
 
     expect(getByTestId("intro-open-premium")).toBeTruthy();
+  });
+
+  it("uses the available height to centre the requirements step on large screens", () => {
+    const { getByTestId } = renderScreen();
+    fireEvent.press(getByTestId("intro-stepper-dot-1"));
+
+    expect(
+      StyleSheet.flatten(getByTestId("intro-requirements-step").props.style),
+    ).toEqual(expect.objectContaining({ flex: 1, justifyContent: "center" }));
   });
 
   it("cannot go back from the first step", () => {

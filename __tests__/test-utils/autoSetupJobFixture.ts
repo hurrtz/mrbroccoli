@@ -6,6 +6,7 @@ export function createAutoSetupJob(
 ): AutoSetupJobState {
   return {
     state: "offer",
+    downloadBytes: 0,
     fraction: 0,
     scanned: 0,
     facts: [],
@@ -20,7 +21,6 @@ export function createAutoSetupJob(
     start: jest.fn(),
     install: jest.fn(),
     retry: jest.fn(),
-    finish: jest.fn(),
     ...overrides,
   };
 }

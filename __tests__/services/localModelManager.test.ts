@@ -15,6 +15,8 @@ const mockDeleteSherpaModel = jest.fn();
 const mockIsSherpaModelDownloaded = jest.fn();
 const mockListDownloadedModels = jest.fn();
 const mockGetLocalSherpaPath = jest.fn();
+const mockArePhonemePacksInstalled = jest.fn();
+const mockInstallPhonemePacks = jest.fn();
 
 jest.mock("@dr.pogodin/react-native-fs", () => ({
   DocumentDirectoryPath: "/documents",
@@ -44,6 +46,12 @@ jest.mock("react-native-sherpa-onnx/download", () => ({
   refreshModelsByCategory: (...args: unknown[]) => mockRefreshModels(...args),
 }));
 
+jest.mock("../../src/services/phonemePacks", () => ({
+  arePhonemePacksInstalled: (...args: unknown[]) =>
+    mockArePhonemePacksInstalled(...args),
+  installPhonemePacks: (...args: unknown[]) => mockInstallPhonemePacks(...args),
+}));
+
 import {
   getLocalModel,
   LOCAL_MODEL_CATALOG_VERSION,
@@ -63,6 +71,8 @@ describe("local model manager", () => {
     mockRefreshModels.mockResolvedValue([]);
     mockDeleteSherpaModel.mockResolvedValue(undefined);
     mockGetLocalSherpaPath.mockResolvedValue("/documents/models/whisper");
+    mockArePhonemePacksInstalled.mockResolvedValue(true);
+    mockInstallPhonemePacks.mockResolvedValue(undefined);
   });
 
   it("only trusts a local LLM when its pinned verification marker matches", async () => {
@@ -156,7 +166,9 @@ describe("local model manager", () => {
       bytes: model.downloadBytes,
       sha256: model.sha256,
     });
-    mockDownloadSherpaModel.mockResolvedValue({ localPath: "/documents/models/whisper" });
+    mockDownloadSherpaModel.mockResolvedValue({
+      localPath: "/documents/models/whisper",
+    });
     mockIsSherpaModelDownloaded.mockResolvedValue(true);
     mockListDownloadedModels.mockResolvedValue([
       {
@@ -198,5 +210,66 @@ describe("local model manager", () => {
       path: "/documents/models/whisper",
       verified: true,
     });
+  });
+
+  it("does not report Piper as ready until its phoneme packs are installed", async () => {
+    const model = getLocalModel("piper-en-us-kristin");
+    if (model.capability !== "tts") {
+      throw new Error("Kristin must remain a Piper TTS model");
+    }
+    mockIsSherpaModelDownloaded.mockResolvedValue(true);
+    mockListDownloadedModels.mockResolvedValue([
+      {
+        id: model.runtimeModelId,
+        bytes: model.downloadBytes,
+        sha256: model.sha256,
+      },
+    ]);
+    mockGetLocalSherpaPath.mockResolvedValue("/documents/models/kristin");
+    mockArePhonemePacksInstalled.mockResolvedValue(false);
+
+    await expect(getLocalModelInstallStatus(model.id)).resolves.toEqual({
+      installed: true,
+      path: null,
+      verified: false,
+    });
+    expect(mockArePhonemePacksInstalled).toHaveBeenCalledWith(
+      "/documents/models/kristin/espeak-ng-data",
+      "en",
+    );
+  });
+
+  it("installs Piper phoneme packs before accepting a completed download", async () => {
+    const model = getLocalModel("piper-en-us-kristin");
+    if (model.capability !== "tts") {
+      throw new Error("Kristin must remain a Piper TTS model");
+    }
+    mockGetRemoteModel.mockResolvedValue({
+      id: model.runtimeModelId,
+      bytes: model.downloadBytes,
+      sha256: model.sha256,
+    });
+    mockDownloadSherpaModel.mockResolvedValue({
+      localPath: "/documents/models/kristin",
+    });
+    mockIsSherpaModelDownloaded.mockResolvedValue(true);
+    mockListDownloadedModels.mockResolvedValue([
+      {
+        id: model.runtimeModelId,
+        bytes: model.downloadBytes,
+        sha256: model.sha256,
+      },
+    ]);
+    mockGetLocalSherpaPath.mockResolvedValue("/documents/models/kristin");
+    const abortController = new AbortController();
+
+    await expect(
+      downloadLocalModel(model.id, { abortSignal: abortController.signal }),
+    ).resolves.toBe("/documents/models/kristin");
+    expect(mockInstallPhonemePacks).toHaveBeenCalledWith(
+      "/documents/models/kristin/espeak-ng-data",
+      "en",
+      { abortSignal: abortController.signal },
+    );
   });
 });

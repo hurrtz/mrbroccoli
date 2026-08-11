@@ -92,9 +92,9 @@ export function MainScreen() {
   );
   const runtimeSettings = freeOffline.effectiveSettings;
 
-  // The intro replaces the blocking wizards. It opens from the banner, and
-  // also whenever a turn is attempted with no usable route -- otherwise a new
-  // user can reach a microphone that silently does nothing.
+  // The introduction is an explicit secondary surface opened from its banner.
+  // A blocked turn points to the relevant settings page rather than hijacking
+  // a voice or text action into the information flow.
   const [introVisible, setIntroVisible] = React.useState(false);
   const openIntro = React.useCallback(() => {
     setIntroVisible(true);
@@ -198,7 +198,6 @@ export function MainScreen() {
   const {
     actionLabel: kokoroPromptBlockActionLabel,
     message: kokoroPromptBlockMessage,
-    progress: kokoroPromptBlockProgress,
   } = getKokoroPromptBlockState({
     kokoroModel,
     verifiedByOfflineProfile:
@@ -825,11 +824,19 @@ export function MainScreen() {
 
   const freeRuntimeBlocked =
     freeOffline.entitlement.status === "free" && !freeOffline.freeRuntimeReady;
-  const promptBlockedActionEnabled =
-    freeRuntimeBlocked && !freeOffline.checking && !freeOffline.preparing;
+  const providerRouteBlocked =
+    loaded &&
+    freeOffline.entitlement.isPremium &&
+    presentationAvailableResponseModes.length === 0 &&
+    !kokoroPromptBlockMessage;
+  const promptBlockedActionEnabled = freeRuntimeBlocked
+    ? !freeOffline.checking && !freeOffline.preparing
+    : providerRouteBlocked || Boolean(kokoroPromptBlockMessage);
   const promptBlockedMessage = freeRuntimeBlocked
     ? t("freeOfflineIntro")
-    : kokoroPromptBlockMessage;
+    : providerRouteBlocked
+      ? t("configureCredentialsBeforeVoiceSession")
+      : kokoroPromptBlockMessage;
   // Only when nothing else already owns the control: a Free runtime that is
   // still downloading, or a missing Kokoro voice, are both about a step the
   // user is mid-way through and outrank the general hint.
@@ -837,22 +844,6 @@ export function MainScreen() {
     speechInputUnavailable && !promptBlockedMessage
       ? t("speechInputUnavailableHint")
       : null;
-  // The workspace opens on the composer whenever the voice control cannot be
-  // pressed: no route at all, nothing that can hear the user, or a block with
-  // no action behind it. Landing on a dead control says the app is broken; the
-  // composer at least shows what to do.
-  //
-  // Gated on settled state because the surface is chosen once, when the pager
-  // mounts. Conversations and entitlement both start unresolved, and reading
-  // that moment as "unusable" would strand every launch on the composer.
-  const inputRoutesSettled =
-    loaded && conversationsLoaded && freeOffline.entitlement.status !== "loading";
-  const voiceSurfaceUnusable =
-    inputRoutesSettled &&
-    (voiceStageDisabled ||
-      Boolean(voiceInputUnavailableMessage) ||
-      Boolean(promptBlockedMessage && !promptBlockedActionEnabled));
-
   return (
     <MainScreenPresentation
       colors={colors}
@@ -967,12 +958,7 @@ export function MainScreen() {
           availableResponseModes: loaded
             ? presentationAvailableResponseModes
             : [],
-          isPremium: freeOffline.entitlement.isPremium,
-          offlineReady: freeOffline.freeRuntimeReady,
           onOpenRoutePicker: openRoutePicker,
-          onOpenSetupGuide: freeOffline.entitlement.isPremium
-            ? handleOpenProviderSettings
-            : openIntro,
           responseModes: runtimeSettings.responseModes,
           t,
         },
@@ -1038,9 +1024,7 @@ export function MainScreen() {
           driveSilenceCountdownSeconds,
           driveSessionCanRepeat,
           driveVoiceActive,
-          initialInputSurface: voiceSurfaceUnusable
-            ? "text"
-            : inputSurfaceRef.current,
+          initialInputSurface: inputSurfaceRef.current,
           initialTextMessage: textMessageDraftRef.current,
           inputMode: runtimeSettings.inputMode,
           isActive: voiceStageActive,
@@ -1055,8 +1039,10 @@ export function MainScreen() {
           onInterruptPlayback: handleInterruptPlayback,
           onStopPlayback: handleStopPlayback,
           onResolvePromptBlock: freeRuntimeBlocked
-            ? openIntro
-            : handleOpenSpeakingSettings,
+            ? () => openSettings(undefined, undefined, "local")
+            : providerRouteBlocked
+              ? handleOpenProviderSettings
+              : handleOpenSpeakingSettings,
           onSubmitTextMessage: handleSubmitTextMessage,
           onTextMessageChange: handleTextMessageChange,
           orbProgressOverride: storePromoOrbPresentation,
@@ -1066,11 +1052,10 @@ export function MainScreen() {
             ? freeOffline.checking || freeOffline.preparing
               ? t("onDeviceTestingDevice")
               : t("freeOfflineDownloadAndTest")
-            : kokoroPromptBlockActionLabel,
+            : providerRouteBlocked
+              ? t("setupGuideConnectProviderTitle")
+              : kokoroPromptBlockActionLabel,
           promptBlockedMessage,
-          promptBlockedProgress: freeRuntimeBlocked
-            ? null
-            : kokoroPromptBlockProgress,
           recordingMaxMs: maxRecordingMs,
           recordingStartedAtMs,
           speechStartProgress: phaseProgress?.speechStart ?? null,
@@ -1078,7 +1063,6 @@ export function MainScreen() {
           t,
           visualPhase,
           voiceInputUnavailableMessage,
-          voiceSurfaceUnusable,
         },
         transcript: {
           activeConversationId: activeConversation?.id ?? null,

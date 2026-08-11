@@ -64,7 +64,10 @@ function WorkspaceSatellites({
   const showToggles = councilAvailable || webAvailable;
   const divider = (
     <View
-      style={[workspaceStyles.satelliteDivider, { backgroundColor: colors.border }]}
+      style={[
+        workspaceStyles.satelliteDivider,
+        { backgroundColor: colors.border },
+      ]}
     />
   );
 
@@ -150,15 +153,11 @@ interface MainScreenWorkspaceProps {
   colors: Colors;
   introBanner: React.ComponentProps<typeof IntroBanner>;
   isLandscape: boolean;
-  routeCard: Omit<
-    React.ComponentProps<typeof MainScreenRouteCard>,
-    "colors" | "compact" | "style"
-  >;
+  routeCard: Omit<React.ComponentProps<typeof MainScreenRouteCard>, "style"> & {
+    t: TranslateFn;
+  };
   routePicker: Omit<React.ComponentProps<typeof RoutePickerSheet>, "t">;
-  satellites: Omit<
-    WorkspaceSatellitesProps,
-    "colors" | "compact" | "speaking"
-  >;
+  satellites: Omit<WorkspaceSatellitesProps, "colors" | "compact" | "speaking">;
   settingsSummary: {
     accessibilityLabel: string;
     onPress: () => void;
@@ -234,16 +233,6 @@ export function MainScreenWorkspace({
     [onInputSurfaceChange],
   );
 
-  // Route capability checks settle after the workspace mounts. The pager
-  // moves to the composer when voice becomes unusable, so keep the status
-  // label on the same surface without recording that automatic move as the
-  // user's preference.
-  React.useEffect(() => {
-    if (voiceStage.voiceSurfaceUnusable) {
-      setSurface("text");
-    }
-  }, [voiceStage.voiceSurfaceUnusable]);
-
   const isActive = visualPhase !== "idle";
   const speaking = visualPhase === "speaking";
   const lastAssistant = getLastAssistantMessage(transcript.messages);
@@ -271,6 +260,7 @@ export function MainScreenWorkspace({
     onToggleDebugLog: _onToggleDebugLog,
     ...landscapeTopBar
   } = topBar;
+  const { t: routePickerTranslate, ...routeCardProps } = routeCard;
 
   if (isLandscape) {
     return (
@@ -282,10 +272,8 @@ export function MainScreenWorkspace({
           {backgroundTask ? <BackgroundTaskBar {...backgroundTask} /> : null}
 
           <MainScreenRouteCard
-            colors={colors}
-            compact
             style={styles.heroCardLandscape}
-            {...routeCard}
+            {...routeCardProps}
           />
           <ConversationSettingsSummary
             accessibilityLabel={settingsSummary.accessibilityLabel}
@@ -348,7 +336,7 @@ export function MainScreenWorkspace({
           />
         </View>
 
-        <RoutePickerSheet t={routeCard.t} {...routePicker} />
+        <RoutePickerSheet t={routePickerTranslate} {...routePicker} />
       </View>
     );
   }
@@ -360,7 +348,7 @@ export function MainScreenWorkspace({
       <View style={styles.workspaceBody}>
         <IntroBanner {...introBanner} />
         {backgroundTask ? <BackgroundTaskBar {...backgroundTask} /> : null}
-        <MainScreenRouteCard colors={colors} {...routeCard} />
+        <MainScreenRouteCard {...routeCardProps} />
         <ConversationSettingsSummary
           accessibilityLabel={settingsSummary.accessibilityLabel}
           onPress={settingsSummary.onPress}
@@ -372,7 +360,10 @@ export function MainScreenWorkspace({
           testID="portrait-conversation-stack"
           style={styles.portraitConversationStack}
         >
-          <View testID="portrait-input-section" style={styles.portraitInputSection}>
+          <View
+            testID="portrait-input-section"
+            style={styles.portraitInputSection}
+          >
             <MainScreenVoiceStage
               colors={colors}
               maxOrbSize={196}
@@ -411,7 +402,9 @@ export function MainScreenWorkspace({
       />
 
       <Modal
-        footer={[{ text: transcriptSheet.hideLabel, onPress: transcriptSheet.onClose }]}
+        footer={[
+          { text: transcriptSheet.hideLabel, onPress: transcriptSheet.onClose },
+        ]}
         layout="sheet"
         onClose={transcriptSheet.onClose}
         title={transcriptSheet.title}
@@ -425,7 +418,7 @@ export function MainScreenWorkspace({
         />
       </Modal>
 
-      <RoutePickerSheet t={routeCard.t} {...routePicker} />
+      <RoutePickerSheet t={routePickerTranslate} {...routePicker} />
     </>
   );
 }

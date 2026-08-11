@@ -8,12 +8,7 @@ import type {
 } from "../../services/localDeviceCapabilities";
 
 export type AutoSetupPhase =
-  | "offer"
-  | "scanning"
-  | "proposal"
-  | "installing"
-  | "done"
-  | "failed";
+  "offer" | "scanning" | "proposal" | "installing" | "done" | "failed";
 
 export interface AutoSetupJobPlanItem {
   role: "think" | "listen" | "speak";
@@ -40,6 +35,8 @@ export interface AutoSetupStepReading {
  */
 export interface AutoSetupJobState {
   state: AutoSetupPhase;
+  /** Bytes still needed for the proposed profile; zero means testing only. */
+  downloadBytes: number;
   /** 0–1 across the whole install queue. */
   fraction: number;
   /** How many device facts have been revealed so far. */
@@ -61,5 +58,4 @@ export interface AutoSetupJobState {
   start: () => void;
   install: () => void;
   retry: () => void;
-  finish?: () => void;
 }

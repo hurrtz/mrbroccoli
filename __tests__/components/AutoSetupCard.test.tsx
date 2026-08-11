@@ -54,6 +54,7 @@ describe("AutoSetupCard", () => {
   it("installs only from a seen proposal, with the manual route beside it", () => {
     const job = createAutoSetupJob({
       state: "proposal",
+      downloadBytes: 1,
       totalSizeLabel: "1.2 GB",
       plan: [
         {
@@ -77,6 +78,29 @@ describe("AutoSetupCard", () => {
     expect(job.install).toHaveBeenCalledTimes(1);
     fireEvent.press(screen.getByTestId("auto-setup-manual"));
     expect(onManual).toHaveBeenCalledTimes(1);
+  });
+
+  it("re-checks an already-downloaded profile without promising another download", () => {
+    const job = createAutoSetupJob({
+      state: "proposal",
+      downloadBytes: 0,
+      plan: [
+        {
+          role: "think",
+          roleLabel: "THINKING",
+          name: "Qwen3 0.6B",
+          active: false,
+          installed: true,
+          failed: false,
+        },
+      ],
+    });
+    const screen = renderCard({ job });
+
+    expect(screen.getByText("autoSetupStart")).toBeTruthy();
+    expect(screen.queryByText("autoSetupInstallAction")).toBeNull();
+    fireEvent.press(screen.getByText("autoSetupStart"));
+    expect(job.install).toHaveBeenCalledTimes(1);
   });
 
   it("marks the failed row and keeps what finished in place", () => {
@@ -112,15 +136,15 @@ describe("AutoSetupCard", () => {
       }),
     });
 
-    expect(
-      screen.getByTestId("auto-setup-row-think-note").props.children,
-    ).toBe("autoSetupInstalledNote");
+    expect(screen.getByTestId("auto-setup-row-think-note").props.children).toBe(
+      "autoSetupInstalledNote",
+    );
     expect(
       screen.getByTestId("auto-setup-row-listen-note").props.children,
     ).toBe("autoSetupFailedRowNote");
-    expect(
-      screen.getByTestId("auto-setup-row-speak-note").props.children,
-    ).toBe("autoSetupQueuedNote");
+    expect(screen.getByTestId("auto-setup-row-speak-note").props.children).toBe(
+      "autoSetupQueuedNote",
+    );
     expect(screen.getByText("autoSetupRetry")).toBeTruthy();
   });
 
