@@ -40,6 +40,7 @@ import { benchmarkLocalLlm } from "../../../services/localLlm";
 import {
   benchmarkLocalStt,
   benchmarkLocalTts,
+  getLocalTtsBenchmarkText,
 } from "../../../services/localSpeechModels";
 import { benchmarkKokoroModel } from "../../../services/kokoroTts";
 import { getLocalCatalogInstallStatuses } from "../../../services/offlineProfileManager";
@@ -472,7 +473,12 @@ export function OnDeviceSettingsPage({
             mode: "local",
             modelId: model.id,
             previewLanguage,
-            text: "Hello from Mr Broccoli.",
+            // Piper voices are language-specific. The benchmark has already
+            // proved this voice with the selected language; replay that same
+            // sample rather than immediately asking a Russian/Italian/etc.
+            // voice to synthesize English and turning a successful test into
+            // a native generation error.
+            text: getLocalTtsBenchmarkText(previewLanguage),
           });
         }
       }

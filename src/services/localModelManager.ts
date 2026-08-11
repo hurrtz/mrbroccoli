@@ -86,7 +86,10 @@ function normalizeProgress(value: number) {
 
 async function assertPinnedSherpaMetadata(
   model: LocalModelDefinition,
-): Promise<{ archiveExt: "tar.bz2" | "onnx" }> {
+): Promise<{
+  archiveExt: "tar.bz2" | "onnx";
+  requiresPinnedInstall: boolean;
+}> {
   if (model.runtime !== "sherpa-onnx") {
     throw new Error(`${model.name} is not a Sherpa model.`);
   }
@@ -101,16 +104,23 @@ async function assertPinnedSherpaMetadata(
       `${model.name} is not present in the pinned runtime catalogue.`,
     );
   }
-  if (
-    remote.bytes !== model.downloadBytes ||
-    remote.sha256?.toLowerCase() !== model.sha256.toLowerCase()
-  ) {
+  if (remote.bytes !== model.downloadBytes) {
     throw new Error(
       `${model.name} changed upstream. Mr Broccoli will not download an unreviewed artifact.`,
     );
   }
 
-  return { archiveExt: remote.archiveExt };
+  // The registry is useful for availability and archive shape, but its
+  // release-wide checksum file can lag an individual GitHub asset. The
+  // catalogue's URL, size and SHA-256 remain the app's reviewable contract;
+  // a conflicting registry checksum therefore takes the direct pinned path,
+  // which hashes the downloaded bytes before extraction. If the actual asset
+  // changed, that hash check still fails closed.
+  return {
+    archiveExt: remote.archiveExt,
+    requiresPinnedInstall:
+      remote.sha256?.toLowerCase() !== model.sha256.toLowerCase(),
+  };
 }
 
 async function getVerifiedSherpaArtifactPath(
@@ -158,16 +168,22 @@ async function downloadSherpaModelInForeground(
     );
   }
 
+  const { deleteIncompleteDownload, getDownloadStorageBase, getLocalModelPathByCategory } =
+    getDownloadModule();
   const {
-    deleteIncompleteDownload,
-    extractModelByCategory,
-    getDownloadStorageBase,
-  } = getDownloadModule();
-  const { downloadFile, exists, mkdir, stopDownload, unlink } = getFsModule();
+    downloadFile,
+    exists,
+    hash,
+    mkdir,
+    stopDownload,
+    unlink,
+    writeFile,
+  } = getFsModule();
   const category = getSherpaCategory(model);
   const storageRoot = await getDownloadStorageBase();
   const modelDirectory = `${storageRoot}/sherpa-onnx/models/${category}`;
   const archivePath = `${modelDirectory}/${model.runtimeModelId}.${archiveExt}`;
+  const installDirectory = `${modelDirectory}/${model.runtimeModelId}`;
 
   await deleteIncompleteDownload(category, model.runtimeModelId);
   await mkdir(modelDirectory, { NSURLIsExcludedFromBackupKey: true });
@@ -211,21 +227,67 @@ async function downloadSherpaModelInForeground(
     if (result.statusCode < 200 || result.statusCode >= 300) {
       throw new Error(`${model.name} download failed with HTTP ${result.statusCode}.`);
     }
-    const extracted = await extractModelByCategory(
-      category,
-      model.runtimeModelId,
+    const digest = (await hash(archivePath, "sha256")).toLowerCase();
+    if (digest !== model.sha256.toLowerCase()) {
+      throw new Error(`${model.name} failed its SHA-256 integrity check.`);
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-require-imports -- keep the service import-safe in Jest and unsupported native builds
+    const { extractArchive } = require("react-native-sherpa-onnx/extraction") as
+      typeof import("react-native-sherpa-onnx/extraction");
+    const extracted = await extractArchive(
       {
+        modelId: model.runtimeModelId,
+        archivePath,
+        format: "tar.bz2",
+      },
+      installDirectory,
+      {
+        force: true,
         signal: options?.abortSignal,
-        deleteArchiveAfterExtract: true,
-        onChecksumIssue: async () => false,
         onProgress: (progress) =>
           options?.onProgress?.({
-            phase: progress.phase ?? "extracting",
+            phase: "extracting",
             progress: normalizeProgress(progress.percent / 100),
           }),
       },
     );
-    return extracted.localPath;
+    if (!extracted.success) {
+      throw new Error(
+        `${model.name} extraction failed${extracted.reason ? `: ${extracted.reason}` : "."}`,
+      );
+    }
+    if (
+      extracted.sha256 &&
+      extracted.sha256.toLowerCase() !== model.sha256.toLowerCase()
+    ) {
+      throw new Error(`${model.name} failed its SHA-256 integrity check.`);
+    }
+
+    const now = new Date().toISOString();
+    const manifestModel = {
+      archiveExt,
+      bytes: model.downloadBytes,
+      category,
+      displayName: model.name,
+      downloadUrl: model.downloadUrl,
+      id: model.runtimeModelId,
+      sha256: model.sha256,
+    };
+    await writeFile(`${installDirectory}/.ready`, "ready", "utf8");
+    await writeFile(
+      `${installDirectory}/manifest.json`,
+      JSON.stringify({
+        downloadedAt: now,
+        lastUsed: now,
+        model: manifestModel,
+      }),
+      "utf8",
+    );
+    return (
+      (await getLocalModelPathByCategory(category, model.runtimeModelId)) ??
+      installDirectory
+    );
   } catch (error) {
     if (await exists(archivePath)) {
       await unlink(archivePath).catch(() => undefined);
@@ -366,38 +428,46 @@ export async function downloadLocalModel(
   // can make an otherwise recoverable install look permanently broken.
   if (!artifact.verified || !modelPath) {
     const { downloadModelByCategory } = getDownloadModule();
-    try {
-      const result = await downloadModelByCategory(
-        getSherpaCategory(model),
-        model.runtimeModelId,
-        {
-          signal: options?.abortSignal,
-          deleteArchiveAfterExtract: true,
-          // Never fall back to the library's interactive keep-file prompt: a
-          // checksum mismatch must always fail closed so an unverified artifact
-          // can never be recorded as installed.
-          onChecksumIssue: async () => false,
-          onProgress: (progress) =>
-            options?.onProgress?.({
-              phase: progress.phase ?? "downloading",
-              progress: normalizeProgress(progress.percent / 100),
-            }),
-        },
-      );
-      modelPath = result.localPath;
-    } catch (error) {
-      if (
-        Platform.OS !== "ios" ||
-        options?.abortSignal?.aborted ||
-        (error instanceof Error && error.name === "AbortError")
-      ) {
-        throw error;
-      }
+    if (remote.requiresPinnedInstall) {
       modelPath = await downloadSherpaModelInForeground(
         model,
         remote.archiveExt,
         options,
       );
+    } else {
+      try {
+        const result = await downloadModelByCategory(
+          getSherpaCategory(model),
+          model.runtimeModelId,
+          {
+            signal: options?.abortSignal,
+            deleteArchiveAfterExtract: true,
+            // Never fall back to the library's interactive keep-file prompt: a
+            // checksum mismatch must always fail closed so an unverified artifact
+            // can never be recorded as installed.
+            onChecksumIssue: async () => false,
+            onProgress: (progress) =>
+              options?.onProgress?.({
+                phase: progress.phase ?? "downloading",
+                progress: normalizeProgress(progress.percent / 100),
+              }),
+          },
+        );
+        modelPath = result.localPath;
+      } catch (error) {
+        if (
+          Platform.OS !== "ios" ||
+          options?.abortSignal?.aborted ||
+          (error instanceof Error && error.name === "AbortError")
+        ) {
+          throw error;
+        }
+        modelPath = await downloadSherpaModelInForeground(
+          model,
+          remote.archiveExt,
+          options,
+        );
+      }
     }
     artifact = await getVerifiedSherpaArtifactPath(model);
   }

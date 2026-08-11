@@ -65,6 +65,7 @@ export function AntListenLanguageSelector({
           }}
         >
           <List.Item
+            testID="on-device-language-selection"
             extra={
               <View style={styles.pickerValueRow}>
                 <Text

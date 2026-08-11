@@ -19,7 +19,7 @@ describe("AntListenLanguageSelector", () => {
       </LocalizationProvider>,
     );
 
-    fireEvent.press(screen.getByLabelText("Listen Languages"));
+    fireEvent.press(screen.getByTestId("on-device-language-selection"));
 
     const languageRows = screen.getAllByRole("checkbox");
     expect(languageRows[0].props.accessibilityState).toEqual({ checked: true });
@@ -44,7 +44,7 @@ describe("AntListenLanguageSelector", () => {
       </LocalizationProvider>,
     );
 
-    fireEvent.press(screen.getByLabelText("Listen Languages"));
+    fireEvent.press(screen.getByTestId("on-device-language-selection"));
 
     const languageRows = screen.getAllByRole("radio");
     expect(languageRows).toHaveLength(2);

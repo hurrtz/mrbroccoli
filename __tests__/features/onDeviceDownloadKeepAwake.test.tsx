@@ -64,8 +64,11 @@ jest.mock("../../src/services/localDeviceCapabilities", () => ({
   ),
 }));
 
+const mockGetLocalCatalogInstallStatuses = jest.fn(() => Promise.resolve({}));
+
 jest.mock("../../src/services/offlineProfileManager", () => ({
-  getLocalCatalogInstallStatuses: jest.fn(() => Promise.resolve({})),
+  getLocalCatalogInstallStatuses: (...args: unknown[]) =>
+    mockGetLocalCatalogInstallStatuses(...args),
 }));
 
 jest.mock("../../src/services/offlineProfile", () => ({
@@ -88,6 +91,9 @@ jest.mock("../../src/services/localLlm", () => ({
 }));
 
 jest.mock("../../src/services/localSpeechModels", () => ({
+  getLocalTtsBenchmarkText: jest.requireActual(
+    "../../src/services/localSpeechModels",
+  ).getLocalTtsBenchmarkText,
   benchmarkLocalStt: jest.fn(() => Promise.resolve({ status: "viable" })),
   benchmarkLocalTts: jest.fn(() => Promise.resolve({ status: "viable" })),
 }));
@@ -139,15 +145,20 @@ const kokoroModel = {
   refresh: jest.fn(() => Promise.resolve()),
 } as never;
 
-function renderPage() {
+function renderPage(params?: {
+  onPreviewVoice?: jest.Mock;
+  settings?: typeof DEFAULT_SETTINGS;
+}) {
   return renderWithProviders(
     <OnDeviceSettingsPage
       isPremium={false}
       autoSetup={createAutoSetupJob()}
       kokoroModel={kokoroModel}
-      onPreviewVoice={jest.fn(() => Promise.resolve())}
+      onPreviewVoice={
+        params?.onPreviewVoice ?? jest.fn(() => Promise.resolve())
+      }
       onUpdate={jest.fn()}
-      settings={DEFAULT_SETTINGS}
+      settings={params?.settings ?? DEFAULT_SETTINGS}
     />,
   );
 }
@@ -169,6 +180,7 @@ beforeEach(() => {
   jest.clearAllMocks();
   mockResolveDownload = undefined;
   mockDownloadSignal = undefined;
+  mockGetLocalCatalogInstallStatuses.mockResolvedValue({});
 });
 
 describe("on-device model downloads", () => {
@@ -268,6 +280,43 @@ describe("on-device model downloads", () => {
       expect(mockDeactivateKeepAwake).toHaveBeenCalledWith(
         "mrbroccoli-on-device-models",
       ),
+    );
+  });
+
+  it("replays a tested Piper voice in its selected language", async () => {
+    // Piper's Russian voices accept Russian phonemes only. A former English
+    // post-benchmark preview made an otherwise successful test report a
+    // native TTS failure.
+    const onPreviewVoice = jest.fn(() => Promise.resolve());
+    mockGetLocalCatalogInstallStatuses.mockResolvedValue({
+      "piper-ru-ru-dmitri": {
+        installed: true,
+        path: "/models/piper-ru-ru-dmitri",
+        verified: true,
+      },
+    });
+    const screen = renderPage({
+      onPreviewVoice,
+      settings: { ...DEFAULT_SETTINGS, localLanguages: ["ru"] },
+    });
+
+    const disclosure = await waitFor(() =>
+      screen.getByTestId("on-device-tts-disclosure-header-control"),
+    );
+    fireEvent.press(disclosure);
+    const testButton = await waitFor(() =>
+      screen.getAllByTestId("on-device-test-piper-ru-ru-dmitri")[0],
+    );
+
+    fireEvent.press(testButton);
+
+    await waitFor(() =>
+      expect(onPreviewVoice).toHaveBeenCalledWith({
+        mode: "local",
+        modelId: "piper-ru-ru-dmitri",
+        previewLanguage: "ru",
+        text: "Привет от Mr Broccoli.",
+      }),
     );
   });
 });

@@ -1,4 +1,7 @@
 import {
+  LOCAL_MODEL_CATALOG_VERSION,
+} from "../../src/constants/localModels";
+import {
   getOfflineProfileModels,
   selectOfflineProfile,
 } from "../../src/services/offlineProfile";
@@ -43,7 +46,7 @@ function benchmark(
 ): LocalModelBenchmarkResult {
   return {
     modelId,
-    catalogVersion: 2,
+    catalogVersion: LOCAL_MODEL_CATALOG_VERSION,
     testedAt: "2026-08-02T00:00:00.000Z",
     status,
     loadMs: 10,

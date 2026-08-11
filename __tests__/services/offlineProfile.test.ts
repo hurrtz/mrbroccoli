@@ -1,4 +1,5 @@
 import {
+  LOCAL_MODEL_CATALOG_VERSION,
   getLocalModel,
   getLocalModelsForLanguages,
 } from "../../src/constants/localModels";
@@ -56,7 +57,7 @@ function benchmark(
   const snapshot = device();
   return {
     modelId,
-    catalogVersion: 2,
+    catalogVersion: LOCAL_MODEL_CATALOG_VERSION,
     testedAt: snapshot.capturedAt,
     status,
     loadMs: 10,

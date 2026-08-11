@@ -111,7 +111,8 @@ with an orphaned native inference job.
 
 Installed models and benchmark state are device-local, excluded from backup,
 and invalidated by catalogue, artifact, runtime, OS, app, or relevant device
-changes.
+changes. Updating any checked-in artifact pin increments the catalogue version,
+so a previous artifact can never retain a benchmark verdict after replacement.
 
 ### Conversation context and knowledge
 
@@ -173,6 +174,14 @@ Kokoro and every Piper VITS download install and verify the required language
 pack in their own `espeak-ng-data` directory before the model is reported
 verified. A model archive alone is not a usable Piper installation; this check
 prevents an iPhone from selecting a voice that cannot phonemize.
+
+The runtime registry is used to discover a matching model and archive shape,
+but the checked-in URL, size, and digest remain the installation authority. If
+the registry's release-wide checksum lags a reviewed asset, iOS downloads that
+exact artifact in the foreground, hashes it before extraction, and writes the
+same pinned manifest locally only after native extraction reports success. Any
+asset that does not match the checked-in hash or cannot extract still fails
+closed.
 
 Pack archives download beside the live data directory and extract into a
 temporary sibling directory. The sherpa extractor may replace its target, so

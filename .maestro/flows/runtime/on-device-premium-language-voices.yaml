@@ -1,0 +1,85 @@
+appId: ${APP_ID}
+name: On-device Premium language voice pair
+tags:
+  - runtime
+  - on-device
+  - voice
+  - premium
+---
+- launchApp:
+    clearState: true
+    clearKeychain: true
+    permissions:
+      all: allow
+- tapOn:
+    id: main-settings-button
+- scrollUntilVisible:
+    element:
+      id: settings-overview-row-app
+    direction: DOWN
+- tapOn:
+    id: settings-overview-row-app
+- scrollUntilVisible:
+    element:
+      id: development-entitlement-mode
+    direction: DOWN
+- tapOn:
+    id: development-entitlement-mode-premium
+# Changing the development entitlement intentionally returns Settings to its
+# overview: the available pages change with the edition.
+- scrollUntilVisible:
+    element:
+      id: settings-overview-row-local
+    direction: DOWN
+- tapOn:
+    id: settings-overview-row-local
+- scrollUntilVisible:
+    element:
+      id: on-device-language-selection
+    direction: DOWN
+- tapOn:
+    id: on-device-language-selection
+- tapOn: ${LANGUAGE_LABEL}
+- tapOn: "English"
+- tapOn: "Done"
+- scrollUntilVisible:
+    element:
+      id: on-device-tts-disclosure
+    direction: DOWN
+- tapOn:
+    id: on-device-tts-disclosure
+- scrollUntilVisible:
+    element:
+      id: on-device-download-${VOICE_ONE}
+    direction: DOWN
+- tapOn:
+    id: on-device-download-${VOICE_ONE}
+- extendedWaitUntil:
+    visible:
+      id: on-device-test-${VOICE_ONE}
+    timeout: 180000
+- tapOn:
+    id: on-device-test-${VOICE_ONE}
+- extendedWaitUntil:
+    visible:
+      id: on-device-performance-${VOICE_ONE}-measured
+    timeout: 120000
+- waitForAnimationToEnd
+- scrollUntilVisible:
+    element:
+      id: on-device-download-${VOICE_TWO}
+    direction: DOWN
+- tapOn:
+    point: 93%, 92%
+- tapOn:
+    id: on-device-download-${VOICE_TWO}
+- extendedWaitUntil:
+    visible:
+      id: on-device-test-${VOICE_TWO}
+    timeout: 180000
+- tapOn:
+    id: on-device-test-${VOICE_TWO}
+- extendedWaitUntil:
+    visible:
+      id: on-device-performance-${VOICE_TWO}-measured
+    timeout: 120000

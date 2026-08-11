@@ -5,7 +5,9 @@ import {
 
 // Increment only when existing artifact or benchmark contracts change. Adding a
 // new model must not invalidate verified downloads and benchmarks for others.
-export const LOCAL_MODEL_CATALOG_VERSION = 2;
+// Increment when any pinned artifact changes so an older benchmark cannot be
+// reused for its replacement bytes.
+export const LOCAL_MODEL_CATALOG_VERSION = 3;
 
 export type LocalModelCapability = "llm" | "stt" | "tts";
 export type LocalModelRuntime = "llama-rn" | "sherpa-onnx";
@@ -683,7 +685,7 @@ export const LOCAL_MODEL_CATALOG = [
     languages: ["pt-BR"],
     downloadBytes: 21_336_772,
     installedBytes: 32_000_000,
-    sha256: "05386120a50ee0c46e246bd0b9ad1c7b3116606b3f0c037db8ee4dd5dda712c5",
+    sha256: "dbc8b1d7d729fd417ea78a350ed35696c928770ac93513d3f507bd4e88eee3fd",
     license: "CC0-1.0",
     sourceUrl: "https://huggingface.co/rhasspy/piper-voices",
     downloadUrl:

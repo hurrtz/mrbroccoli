@@ -13,6 +13,7 @@ const mockGetRemoteModel = jest.fn();
 const mockDownloadSherpaModel = jest.fn();
 const mockDeleteIncompleteDownload = jest.fn();
 const mockExtractSherpaModel = jest.fn();
+const mockExtractArchive = jest.fn();
 const mockGetDownloadStorageBase = jest.fn();
 const mockDeleteSherpaModel = jest.fn();
 const mockIsSherpaModelDownloaded = jest.fn();
@@ -55,6 +56,10 @@ jest.mock("react-native-sherpa-onnx/download", () => ({
   refreshModelsByCategory: (...args: unknown[]) => mockRefreshModels(...args),
 }));
 
+jest.mock("react-native-sherpa-onnx/extraction", () => ({
+  extractArchive: (...args: unknown[]) => mockExtractArchive(...args),
+}));
+
 jest.mock("../../src/services/phonemePacks", () => ({
   arePhonemePacksInstalled: (...args: unknown[]) =>
     mockArePhonemePacksInstalled(...args),
@@ -84,6 +89,7 @@ describe("local model manager", () => {
     mockExtractSherpaModel.mockResolvedValue({
       localPath: "/documents/models/whisper",
     });
+    mockExtractArchive.mockResolvedValue({ success: true });
     mockGetDownloadStorageBase.mockResolvedValue("/documents");
     mockGetLocalSherpaPath.mockResolvedValue("/documents/models/whisper");
     mockArePhonemePacksInstalled.mockResolvedValue(true);
@@ -154,21 +160,82 @@ describe("local model manager", () => {
     });
   });
 
-  it("refuses a Sherpa model when refreshed upstream metadata changed", async () => {
-    const model = getLocalModel("whisper-tiny");
-    if (model.capability !== "stt") {
-      throw new Error("Whisper catalogue entry must be an STT model");
+  it("uses the direct pinned install when a registry checksum is stale", async () => {
+    const model = getLocalModel("piper-pt-pt-tugao");
+    if (model.capability !== "tts") {
+      throw new Error("Tugão must remain a Piper TTS model");
     }
     mockGetRemoteModel.mockResolvedValue({
       id: model.runtimeModelId,
       bytes: model.downloadBytes,
       sha256: "0".repeat(64),
+      archiveExt: "tar.bz2",
+    });
+    mockExists.mockResolvedValue(false);
+    mockHash.mockResolvedValue(model.sha256);
+    mockDownloadFile.mockReturnValue({
+      jobId: 10,
+      promise: Promise.resolve({ statusCode: 200 }),
+    });
+    mockIsSherpaModelDownloaded
+      .mockResolvedValueOnce(false)
+      .mockResolvedValue(true);
+    mockListDownloadedModels.mockResolvedValue([
+      {
+        id: model.runtimeModelId,
+        bytes: model.downloadBytes,
+        sha256: model.sha256,
+      },
+    ]);
+    mockGetLocalSherpaPath.mockResolvedValue("/documents/models/tugao");
+
+    await expect(downloadLocalModel(model.id)).resolves.toBe(
+      "/documents/models/tugao",
+    );
+    expect(mockDownloadSherpaModel).not.toHaveBeenCalled();
+    expect(mockHash).toHaveBeenCalledWith(
+      expect.stringContaining(`${model.runtimeModelId}.tar.bz2`),
+      "sha256",
+    );
+    expect(mockExtractArchive).toHaveBeenCalledWith(
+      expect.objectContaining({
+        archivePath: expect.stringContaining(
+          `${model.runtimeModelId}.tar.bz2`,
+        ),
+        modelId: model.runtimeModelId,
+      }),
+      expect.stringContaining(model.runtimeModelId),
+      expect.objectContaining({ force: true }),
+    );
+  });
+
+  it("does not mark a direct pinned install ready when extraction fails", async () => {
+    const model = getLocalModel("piper-pt-pt-tugao");
+    if (model.capability !== "tts") {
+      throw new Error("Tugão must remain a Piper TTS model");
+    }
+    mockGetRemoteModel.mockResolvedValue({
+      id: model.runtimeModelId,
+      bytes: model.downloadBytes,
+      sha256: "0".repeat(64),
+      archiveExt: "tar.bz2",
+    });
+    mockExists.mockResolvedValue(false);
+    mockHash.mockResolvedValue(model.sha256);
+    mockDownloadFile.mockReturnValue({
+      jobId: 10,
+      promise: Promise.resolve({ statusCode: 200 }),
+    });
+    mockIsSherpaModelDownloaded.mockResolvedValue(false);
+    mockExtractArchive.mockResolvedValue({
+      success: false,
+      reason: "archive is corrupt",
     });
 
     await expect(downloadLocalModel(model.id)).rejects.toThrow(
-      "changed upstream",
+      "Tugão extraction failed: archive is corrupt",
     );
-    expect(mockDownloadSherpaModel).not.toHaveBeenCalled();
+    expect(mockWriteFile).not.toHaveBeenCalled();
   });
 
   it("fails a Sherpa download closed on checksum mismatch instead of prompting", async () => {
@@ -321,9 +388,7 @@ describe("local model manager", () => {
         },
       ]);
       mockGetLocalSherpaPath.mockResolvedValue("/documents/models/kristin");
-      mockExtractSherpaModel.mockResolvedValue({
-        localPath: "/documents/models/kristin",
-      });
+      mockHash.mockResolvedValue(model.sha256);
 
       await expect(downloadLocalModel(model.id)).resolves.toBe(
         "/documents/models/kristin",
@@ -336,10 +401,10 @@ describe("local model manager", () => {
           toFile: expect.stringContaining(`${model.runtimeModelId}.tar.bz2`),
         }),
       );
-      expect(mockExtractSherpaModel).toHaveBeenCalledWith(
-        "tts",
-        model.runtimeModelId,
-        expect.objectContaining({ deleteArchiveAfterExtract: true }),
+      expect(mockExtractArchive).toHaveBeenCalledWith(
+        expect.objectContaining({ modelId: model.runtimeModelId }),
+        expect.stringContaining(model.runtimeModelId),
+        expect.objectContaining({ force: true }),
       );
     } finally {
       Object.defineProperty(Platform, "OS", {

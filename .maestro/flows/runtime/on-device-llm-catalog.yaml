@@ -1,0 +1,122 @@
+appId: ${APP_ID}
+name: On-device response model catalogue
+tags:
+  - runtime
+  - on-device
+  - expensive-local-download
+---
+- launchApp:
+    clearState: true
+    clearKeychain: true
+    permissions:
+      all: allow
+- tapOn:
+    id: main-settings-button
+- scrollUntilVisible:
+    element:
+      id: settings-overview-row-local
+    direction: DOWN
+- tapOn:
+    id: settings-overview-row-local
+- scrollUntilVisible:
+    element:
+      id: on-device-llm-disclosure
+    direction: DOWN
+- tapOn:
+    id: on-device-llm-disclosure
+- scrollUntilVisible:
+    element:
+      id: on-device-download-qwen3-0.6b-q8
+    direction: DOWN
+- tapOn:
+    id: on-device-download-qwen3-0.6b-q8
+- extendedWaitUntil:
+    visible:
+      id: on-device-test-qwen3-0.6b-q8
+    timeout: 240000
+- tapOn:
+    id: on-device-test-qwen3-0.6b-q8
+- extendedWaitUntil:
+    visible:
+      id: on-device-performance-qwen3-0.6b-q8-measured
+    timeout: 180000
+- scrollUntilVisible:
+    element:
+      id: on-device-download-qwen3.5-0.8b-q8
+    direction: DOWN
+- tapOn:
+    id: on-device-download-qwen3.5-0.8b-q8
+- extendedWaitUntil:
+    visible:
+      id: on-device-test-qwen3.5-0.8b-q8
+    timeout: 240000
+- tapOn:
+    id: on-device-test-qwen3.5-0.8b-q8
+- extendedWaitUntil:
+    visible:
+      id: on-device-performance-qwen3.5-0.8b-q8-measured
+    timeout: 180000
+- scrollUntilVisible:
+    element:
+      id: on-device-download-granite-4.0-1b-q4
+    direction: DOWN
+- tapOn:
+    id: on-device-download-granite-4.0-1b-q4
+- extendedWaitUntil:
+    visible:
+      id: on-device-test-granite-4.0-1b-q4
+    timeout: 240000
+- tapOn:
+    id: on-device-test-granite-4.0-1b-q4
+- extendedWaitUntil:
+    visible:
+      id: on-device-performance-granite-4.0-1b-q4-measured
+    timeout: 180000
+- scrollUntilVisible:
+    element:
+      id: on-device-download-qwen3-1.7b-q8
+    direction: DOWN
+- tapOn:
+    id: on-device-download-qwen3-1.7b-q8
+- extendedWaitUntil:
+    visible:
+      id: on-device-test-qwen3-1.7b-q8
+    timeout: 300000
+- tapOn:
+    id: on-device-test-qwen3-1.7b-q8
+- extendedWaitUntil:
+    visible:
+      id: on-device-performance-qwen3-1.7b-q8-measured
+    timeout: 240000
+- scrollUntilVisible:
+    element:
+      id: on-device-download-ministral-3-3b-reasoning-q4
+    direction: DOWN
+- tapOn:
+    id: on-device-download-ministral-3-3b-reasoning-q4
+- extendedWaitUntil:
+    visible:
+      id: on-device-test-ministral-3-3b-reasoning-q4
+    timeout: 300000
+- tapOn:
+    id: on-device-test-ministral-3-3b-reasoning-q4
+- extendedWaitUntil:
+    visible:
+      id: on-device-performance-ministral-3-3b-reasoning-q4-measured
+    timeout: 300000
+- scrollUntilVisible:
+    element:
+      id: on-device-download-qwen3-4b-q4
+    direction: DOWN
+- tapOn:
+    id: on-device-download-qwen3-4b-q4
+- extendedWaitUntil:
+    visible:
+      id: on-device-test-qwen3-4b-q4
+    timeout: 300000
+- tapOn:
+    id: on-device-test-qwen3-4b-q4
+- extendedWaitUntil:
+    visible:
+      id: on-device-performance-qwen3-4b-q4-measured
+    timeout: 300000

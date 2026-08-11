@@ -1,0 +1,122 @@
+appId: ${APP_ID}
+name: On-device recognition model catalogue
+tags:
+  - runtime
+  - on-device
+  - expensive-local-download
+---
+- launchApp:
+    clearState: true
+    clearKeychain: true
+    permissions:
+      all: allow
+- tapOn:
+    id: main-settings-button
+- scrollUntilVisible:
+    element:
+      id: settings-overview-row-local
+    direction: DOWN
+- tapOn:
+    id: settings-overview-row-local
+- scrollUntilVisible:
+    element:
+      id: on-device-stt-disclosure
+    direction: DOWN
+- tapOn:
+    id: on-device-stt-disclosure
+- scrollUntilVisible:
+    element:
+      id: on-device-download-whisper-tiny
+    direction: DOWN
+- tapOn:
+    id: on-device-download-whisper-tiny
+- extendedWaitUntil:
+    visible:
+      id: on-device-test-whisper-tiny
+    timeout: 180000
+- tapOn:
+    id: on-device-test-whisper-tiny
+- extendedWaitUntil:
+    visible:
+      id: on-device-performance-whisper-tiny-measured
+    timeout: 180000
+- scrollUntilVisible:
+    element:
+      id: on-device-download-whisper-base
+    direction: DOWN
+- tapOn:
+    id: on-device-download-whisper-base
+- extendedWaitUntil:
+    visible:
+      id: on-device-test-whisper-base
+    timeout: 240000
+- tapOn:
+    id: on-device-test-whisper-base
+- extendedWaitUntil:
+    visible:
+      id: on-device-performance-whisper-base-measured
+    timeout: 180000
+- scrollUntilVisible:
+    element:
+      id: on-device-download-whisper-small
+    direction: DOWN
+- tapOn:
+    id: on-device-download-whisper-small
+- extendedWaitUntil:
+    visible:
+      id: on-device-test-whisper-small
+    timeout: 240000
+- tapOn:
+    id: on-device-test-whisper-small
+- extendedWaitUntil:
+    visible:
+      id: on-device-performance-whisper-small-measured
+    timeout: 240000
+- scrollUntilVisible:
+    element:
+      id: on-device-download-omnilingual-asr-300m
+    direction: DOWN
+- tapOn:
+    id: on-device-download-omnilingual-asr-300m
+- extendedWaitUntil:
+    visible:
+      id: on-device-test-omnilingual-asr-300m
+    timeout: 240000
+- tapOn:
+    id: on-device-test-omnilingual-asr-300m
+- extendedWaitUntil:
+    visible:
+      id: on-device-performance-omnilingual-asr-300m-measured
+    timeout: 240000
+- scrollUntilVisible:
+    element:
+      id: on-device-download-parakeet-tdt-0.6b-v3-int8
+    direction: DOWN
+- tapOn:
+    id: on-device-download-parakeet-tdt-0.6b-v3-int8
+- extendedWaitUntil:
+    visible:
+      id: on-device-test-parakeet-tdt-0.6b-v3-int8
+    timeout: 300000
+- tapOn:
+    id: on-device-test-parakeet-tdt-0.6b-v3-int8
+- extendedWaitUntil:
+    visible:
+      id: on-device-performance-parakeet-tdt-0.6b-v3-int8-measured
+    timeout: 300000
+- scrollUntilVisible:
+    element:
+      id: on-device-download-qwen3-asr-0.6b-int8
+    direction: DOWN
+- tapOn:
+    id: on-device-download-qwen3-asr-0.6b-int8
+- extendedWaitUntil:
+    visible:
+      id: on-device-test-qwen3-asr-0.6b-int8
+    timeout: 300000
+- tapOn:
+    id: on-device-test-qwen3-asr-0.6b-int8
+- extendedWaitUntil:
+    visible:
+      id: on-device-performance-qwen3-asr-0.6b-int8-measured
+    timeout: 300000

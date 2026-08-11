@@ -21,6 +21,19 @@ describe("local model catalogue", () => {
     }
   });
 
+  it("pins the reviewed upstream Faber artifact", () => {
+    // The upstream release replaced this asset without changing its filename
+    // or byte length. Keeping its reviewed digest explicit makes that drift a
+    // deliberate catalogue update rather than an unchecked download.
+    expect(
+      LOCAL_MODEL_CATALOG.find(({ id }) => id === "piper-pt-br-faber"),
+    ).toMatchObject({
+      downloadBytes: 21_336_772,
+      sha256:
+        "dbc8b1d7d729fd417ea78a350ed35696c928770ac93513d3f507bd4e88eee3fd",
+    });
+  });
+
   it("requires one selected model to support every chosen language", () => {
     expect(
       getLocalModelsForLanguages("tts", ["en", "de"]).map(({ id }) => id),

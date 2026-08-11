@@ -1,5 +1,6 @@
 import {
   LOCAL_MODEL_CATALOG,
+  LOCAL_MODEL_CATALOG_VERSION,
   getLocalModel,
 } from "../../src/constants/localModels";
 import type {
@@ -32,7 +33,7 @@ function benchmark(
 ): LocalModelBenchmarkResult {
   return {
     modelId,
-    catalogVersion: 2,
+    catalogVersion: LOCAL_MODEL_CATALOG_VERSION,
     testedAt: "2026-08-04T00:00:00.000Z",
     status: "viable",
     loadMs: 420,
