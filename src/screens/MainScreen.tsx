@@ -237,6 +237,8 @@ export function MainScreen() {
     closeRoutePicker,
     openTranscriptSheet,
     closeTranscriptSheet,
+    runAfterTranscriptDismiss,
+    handleTranscriptDismiss,
     runAfterDrawerDismiss,
     handleDrawerDismiss,
   } = useMainScreenUiState();
@@ -727,6 +729,12 @@ export function MainScreen() {
     updateSettings,
     webSearchActive,
   });
+  const handleOpenTranscriptConversationSettings = React.useCallback(() => {
+    runAfterTranscriptDismiss(handleOpenConversationSettings);
+  }, [handleOpenConversationSettings, runAfterTranscriptDismiss]);
+  const handleOpenTranscriptSpeakingSettings = React.useCallback(() => {
+    runAfterTranscriptDismiss(handleOpenSpeakingSettings);
+  }, [handleOpenSpeakingSettings, runAfterTranscriptDismiss]);
 
   useBatteryDiagnostics({
     isActive,
@@ -1011,6 +1019,7 @@ export function MainScreen() {
           emptyLabel: t("workspaceNoMessagesYet"),
           hideLabel: t("workspaceHideTranscript"),
           onClose: closeTranscriptSheet,
+          onDismiss: handleTranscriptDismiss,
           onOpen: openTranscriptSheet,
           showLabel: t("showTranscript"),
           title: activeConversationTitle,
@@ -1082,8 +1091,8 @@ export function MainScreen() {
             : (message, content) => editUserMessage(message.id, content),
           onBranchMessage: isBusy ? undefined : handleBranchMessage,
           onSelectBranchConversation: isBusy ? undefined : selectConversation,
-          onOpenSpeakingSettings: handleOpenSpeakingSettings,
-          onOpenStyleSheet: handleOpenConversationSettings,
+          onOpenSpeakingSettings: handleOpenTranscriptSpeakingSettings,
+          onOpenStyleSheet: handleOpenTranscriptConversationSettings,
           onRepeatMessage: (message) => {
             void handleRepeatMessage(message);
           },

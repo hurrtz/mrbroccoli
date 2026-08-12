@@ -117,6 +117,11 @@ the previous one through an explicit surface action. Conversation drawers may
 remain contextual, but no hidden surface owns authoritative app data. The
 route-picker and transcript sheets follow the same rule: their visibility
 lives in `useMainScreenUiState`, not inside the workspace tree.
+When a transcript action targets conversation or Speaking settings, UI state
+hides the sheet and queues the target until the native dismissal callback.
+Because React Native does not deliver that callback on Android, a bounded
+post-animation fallback drains the same single-consumer queue there. This keeps
+two sibling native modals from being presented concurrently.
 
 `useOrbTurnProgress` takes one clock snapshot whenever semantic voice state
 changes, then supplies the remaining linear durations to `VoiceOrb`. The orb

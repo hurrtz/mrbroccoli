@@ -294,6 +294,7 @@ interface DialogProps {
   maskClosable?: boolean;
   modalType?: string;
   onClose?: () => void;
+  onDismiss?: () => void;
   styles?: {
     buttonText?: StyleProp<TextStyle>;
     header?: StyleProp<TextStyle>;
@@ -309,6 +310,7 @@ export function Modal({
   layout = "dialog",
   maskClosable = true,
   onClose,
+  onDismiss,
   styles,
   title,
   visible,
@@ -397,6 +399,7 @@ export function Modal({
   return (
     <ReactNativeModal
       animationType={isSheet ? "none" : "fade"}
+      onDismiss={onDismiss}
       onRequestClose={onClose}
       statusBarTranslucent
       supportedOrientations={APP_MODAL_ORIENTATIONS}

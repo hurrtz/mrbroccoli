@@ -2,15 +2,22 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 import { getCatalogProviderIdForAppProvider } from "../../catalog/appProviders";
 import type { CatalogProviderId } from "../../catalog/types";
-import type { SettingsPage, SettingsTab } from "../../features/settings-core/types";
+import type {
+  SettingsPage,
+  SettingsTab,
+} from "../../features/settings-core/types";
 import { Conversation, Provider } from "../../types";
 
 export function useMainScreenUiState() {
   const [settingsVisible, setSettingsVisible] = useState(false);
   const [settingsFocusCatalogProviderId, setSettingsFocusCatalogProviderId] =
     useState<CatalogProviderId | undefined>();
-  const [settingsFocusTab, setSettingsFocusTab] = useState<SettingsTab | undefined>();
-  const [settingsFocusPage, setSettingsFocusPage] = useState<SettingsPage | undefined>();
+  const [settingsFocusTab, setSettingsFocusTab] = useState<
+    SettingsTab | undefined
+  >();
+  const [settingsFocusPage, setSettingsFocusPage] = useState<
+    SettingsPage | undefined
+  >();
   const [drawerVisible, setDrawerVisible] = useState(false);
   const [statusDetailsVisible, setStatusDetailsVisible] = useState(false);
   const [routePickerVisible, setRoutePickerVisible] = useState(false);
@@ -19,6 +26,7 @@ export function useMainScreenUiState() {
     useState<Conversation | null>(null);
   const [memoryVisible, setMemoryVisible] = useState(false);
   const pendingDrawerDismissActionRef = useRef<null | (() => void)>(null);
+  const pendingTranscriptDismissActionRef = useRef<null | (() => void)>(null);
 
   const openSettings = useCallback(
     (
@@ -92,6 +100,25 @@ export function useMainScreenUiState() {
     setTranscriptSheetVisible(false);
   }, []);
 
+  const runAfterTranscriptDismiss = useCallback(
+    (action: () => void) => {
+      if (!transcriptSheetVisible) {
+        action();
+        return;
+      }
+
+      pendingTranscriptDismissActionRef.current = action;
+      setTranscriptSheetVisible(false);
+    },
+    [transcriptSheetVisible],
+  );
+
+  const handleTranscriptDismiss = useCallback(() => {
+    const pendingAction = pendingTranscriptDismissActionRef.current;
+    pendingTranscriptDismissActionRef.current = null;
+    pendingAction?.();
+  }, []);
+
   const runAfterDrawerDismiss = useCallback(
     (action: () => void) => {
       if (!drawerVisible) {
@@ -125,6 +152,18 @@ export function useMainScreenUiState() {
     return () => clearTimeout(timer);
   }, [drawerVisible, handleDrawerDismiss]);
 
+  // The design-system sheet keeps its native Modal mounted through the exit
+  // animation. iOS reports the real dismissal; Android needs this fallback
+  // before another sibling Modal may be presented safely.
+  useEffect(() => {
+    if (transcriptSheetVisible || !pendingTranscriptDismissActionRef.current) {
+      return;
+    }
+
+    const timer = setTimeout(handleTranscriptDismiss, 350);
+    return () => clearTimeout(timer);
+  }, [handleTranscriptDismiss, transcriptSheetVisible]);
+
   return {
     settingsVisible,
     settingsFocusCatalogProviderId,
@@ -149,6 +188,8 @@ export function useMainScreenUiState() {
     closeRoutePicker,
     openTranscriptSheet,
     closeTranscriptSheet,
+    runAfterTranscriptDismiss,
+    handleTranscriptDismiss,
     runAfterDrawerDismiss,
     handleDrawerDismiss,
   };

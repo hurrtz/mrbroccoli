@@ -102,6 +102,17 @@ describe("NativeControls", () => {
     expect(onDone).toHaveBeenCalledTimes(1);
   });
 
+  it("forwards native dismissal so sibling modal transitions can be sequenced", () => {
+    const onDismiss = jest.fn();
+    const screen = renderControl(
+      <Modal visible layout="sheet" onDismiss={onDismiss} title="Transcript">
+        Content
+      </Modal>,
+    );
+
+    expect(screen.UNSAFE_getByType(RNModal).props.onDismiss).toBe(onDismiss);
+  });
+
   it("renders an inviting success action without changing its semantics", () => {
     const screen = renderControl(
       <Modal
@@ -304,18 +315,18 @@ describe("NativeControls", () => {
         Content
       </Modal>,
     );
-    expect(
-      sheetScreen.UNSAFE_getByType(RNModal).props.animationType,
-    ).toBe("none");
+    expect(sheetScreen.UNSAFE_getByType(RNModal).props.animationType).toBe(
+      "none",
+    );
 
     const dialogScreen = renderControl(
       <Modal visible title="Details">
         Content
       </Modal>,
     );
-    expect(
-      dialogScreen.UNSAFE_getByType(RNModal).props.animationType,
-    ).toBe("fade");
+    expect(dialogScreen.UNSAFE_getByType(RNModal).props.animationType).toBe(
+      "fade",
+    );
   });
 
   it("caps the sheet at window height minus top inset when insets exceed 85% threshold", () => {

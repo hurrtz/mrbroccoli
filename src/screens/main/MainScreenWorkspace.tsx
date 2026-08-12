@@ -175,6 +175,7 @@ interface MainScreenWorkspaceProps {
     emptyLabel: string;
     hideLabel: string;
     onClose: () => void;
+    onDismiss: () => void;
     onOpen: () => void;
     showLabel: string;
     title: string;
@@ -400,6 +401,7 @@ export function MainScreenWorkspace({
         ]}
         layout="sheet"
         onClose={transcriptSheet.onClose}
+        onDismiss={transcriptSheet.onDismiss}
         title={transcriptSheet.title}
         visible={transcriptSheet.visible}
       >

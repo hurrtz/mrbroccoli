@@ -56,6 +56,9 @@ the complete Play Store translations are kept in a dedicated file under
 
 ### Fixed
 
+- Open conversation or Speaking settings from the transcript without freezing
+  iPhone: the transcript sheet now finishes dismissing before the next settings
+  surface is presented.
 - Make Tap to Speak and Drive Session treat an orb tap as one toggle instead of
   immediately stopping the recording as a too-short hold. Swiping from the orb
   to the message field also leaves the keyboard closed until the field is

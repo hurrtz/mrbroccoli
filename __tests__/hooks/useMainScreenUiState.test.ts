@@ -29,9 +29,7 @@ describe("useMainScreenUiState", () => {
     });
 
     expect(result.current.settingsVisible).toBe(true);
-    expect(result.current.settingsFocusCatalogProviderId).toBe(
-      "z-ai-zhipu-ai",
-    );
+    expect(result.current.settingsFocusCatalogProviderId).toBe("z-ai-zhipu-ai");
 
     act(() => {
       result.current.closeSettings();
@@ -127,6 +125,72 @@ describe("useMainScreenUiState", () => {
         result.current.handleDrawerDismiss();
       });
       act(() => {
+        jest.advanceTimersByTime(400);
+      });
+
+      expect(action).toHaveBeenCalledTimes(1);
+    } finally {
+      jest.useRealTimers();
+    }
+  });
+
+  it("defers transcript actions until the native sheet has dismissed", () => {
+    const { result } = renderHook(() => useMainScreenUiState());
+    const action = jest.fn();
+
+    act(() => {
+      result.current.openTranscriptSheet();
+    });
+    act(() => {
+      result.current.runAfterTranscriptDismiss(action);
+    });
+
+    expect(action).not.toHaveBeenCalled();
+    expect(result.current.transcriptSheetVisible).toBe(false);
+
+    act(() => {
+      result.current.handleTranscriptDismiss();
+    });
+
+    expect(action).toHaveBeenCalledTimes(1);
+  });
+
+  it("runs deferred transcript actions without a native onDismiss event (Android)", () => {
+    jest.useFakeTimers();
+    try {
+      const { result } = renderHook(() => useMainScreenUiState());
+      const action = jest.fn();
+
+      act(() => {
+        result.current.openTranscriptSheet();
+      });
+      act(() => {
+        result.current.runAfterTranscriptDismiss(action);
+      });
+      act(() => {
+        jest.advanceTimersByTime(400);
+      });
+
+      expect(action).toHaveBeenCalledTimes(1);
+    } finally {
+      jest.useRealTimers();
+    }
+  });
+
+  it("does not run a transcript action twice when iOS dismissal beats the fallback", () => {
+    jest.useFakeTimers();
+    try {
+      const { result } = renderHook(() => useMainScreenUiState());
+      const action = jest.fn();
+
+      act(() => {
+        result.current.openTranscriptSheet();
+      });
+      act(() => {
+        result.current.runAfterTranscriptDismiss(action);
+      });
+      act(() => {
+        result.current.handleTranscriptDismiss();
         jest.advanceTimersByTime(400);
       });
 

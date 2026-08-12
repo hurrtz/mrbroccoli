@@ -66,7 +66,9 @@ receive already-derived state and callbacks.
   a temporary assistant message, but only persisted messages become history.
   In portrait the transcript demotes to a peeking handle at the bottom edge
   and opens as a sheet over the workspace; in landscape it stays inline in the
-  right pane.
+  right pane. Actions inside the portrait sheet that open conversation or
+  Speaking settings dismiss the transcript completely before presenting the
+  sibling modal.
 - Provider, model, listening, speaking, fallback, and usage labels describe the
   effective route, not merely the last picker interaction.
 - A user can interrupt or cancel an active turn without a late callback

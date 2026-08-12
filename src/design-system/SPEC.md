@@ -56,6 +56,10 @@ framework or hiding platform behavior behind excessive abstraction.
 - Controls expose role, label, state, hint, and value where applicable.
 - Modals isolate screen-reader focus, keep backdrop-only dismiss layers out of
   the accessibility tree, and retain a labelled close action.
+- `Modal` forwards the native dismissal callback. Callers that replace one
+  modal with a sibling surface wait for that callback on iOS and provide their
+  own Android fallback; hiding React state alone does not prove the native view
+  controller has left the modal stack.
 - Dialog footer actions stay on-screen regardless of content height: the card
   clips overflow and the body shrinks before the title and footer, so oversized
   content scrolls inside the card instead of pushing actions off-screen.

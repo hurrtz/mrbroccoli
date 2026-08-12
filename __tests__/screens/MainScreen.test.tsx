@@ -1,6 +1,10 @@
 import React from "react";
-import { StyleSheet, useWindowDimensions } from "react-native";
-import { fireEvent, waitFor, within } from "@testing-library/react-native";
+import {
+  Modal as RNModal,
+  StyleSheet,
+  useWindowDimensions,
+} from "react-native";
+import { act, fireEvent, waitFor, within } from "@testing-library/react-native";
 
 import { MainScreen } from "../../src/screens/MainScreen";
 import { DEFAULT_SETTINGS, type Settings } from "../../src/types";
@@ -327,14 +331,16 @@ jest.mock("../../src/screens/main/MainScreenVoiceStage", () => ({
 
 jest.mock("../../src/screens/main/TranscriptPreviewCard", () => ({
   TranscriptPreviewCard: ({
-    showStyleControl,
+    onOpenSpeakingSettings,
+    onOpenStyleSheet,
     showWhenEmpty,
   }: {
-    showStyleControl?: boolean;
+    onOpenSpeakingSettings?: () => void;
+    onOpenStyleSheet?: () => void;
     showWhenEmpty?: boolean;
   }) => {
     const React = require("react");
-    const { Text, View } = require("react-native");
+    const { Text, TouchableOpacity, View } = require("react-native");
     return React.createElement(
       View,
       { testID: "transcript-preview" },
@@ -345,8 +351,25 @@ jest.mock("../../src/screens/main/TranscriptPreviewCard", () => ({
           ? "transcript-preview:empty-visible"
           : "transcript-preview",
       ),
-      showStyleControl
-        ? React.createElement(Text, null, "transcript-style-control")
+      onOpenStyleSheet
+        ? React.createElement(
+            TouchableOpacity,
+            {
+              testID: "transcript-open-style",
+              onPress: onOpenStyleSheet,
+            },
+            React.createElement(Text, null, "transcript-style-control"),
+          )
+        : null,
+      onOpenSpeakingSettings
+        ? React.createElement(
+            TouchableOpacity,
+            {
+              testID: "transcript-open-speaking-settings",
+              onPress: onOpenSpeakingSettings,
+            },
+            React.createElement(Text, null, "transcript-speaking-settings"),
+          )
         : null,
     );
   },
@@ -807,6 +830,44 @@ describe("MainScreen", () => {
     expect(screen.getByText("settings:open")).toBeTruthy();
     expect(screen.queryByText("guided-setup-shortcut")).toBeNull();
     expect(screen.getByText("drawer:open")).toBeTruthy();
+  });
+
+  it("dismisses the transcript sheet before opening conversation settings", () => {
+    const screen = renderWithProviders(<MainScreen />);
+
+    fireEvent.press(screen.getByTestId("transcript-handle"));
+    const transcriptModal = screen
+      .UNSAFE_getAllByType(RNModal)
+      .find((modal) => typeof modal.props.onDismiss === "function");
+    expect(transcriptModal).toBeDefined();
+
+    fireEvent.press(screen.getByTestId("transcript-open-style"));
+    expect(screen.queryByTestId("conversation-settings-header")).toBeNull();
+
+    act(() => {
+      transcriptModal?.props.onDismiss();
+    });
+
+    expect(screen.getByTestId("conversation-settings-header")).toBeTruthy();
+  });
+
+  it("dismisses the transcript sheet before opening Speaking settings", () => {
+    const screen = renderWithProviders(<MainScreen />);
+
+    fireEvent.press(screen.getByTestId("transcript-handle"));
+    const transcriptModal = screen
+      .UNSAFE_getAllByType(RNModal)
+      .find((modal) => typeof modal.props.onDismiss === "function");
+    expect(transcriptModal).toBeDefined();
+
+    fireEvent.press(screen.getByTestId("transcript-open-speaking-settings"));
+    expect(screen.getByText("settings:closed")).toBeTruthy();
+
+    act(() => {
+      transcriptModal?.props.onDismiss();
+    });
+
+    expect(screen.getByText("settings:open")).toBeTruthy();
   });
 
   it("returns to Settings after presenting the Premium purchase", () => {

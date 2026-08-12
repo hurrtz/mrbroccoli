@@ -110,6 +110,7 @@ function createWorkspaceProps(t: jest.Mock) {
       emptyLabel: "No messages yet",
       hideLabel: "Hide transcript",
       onClose: jest.fn(),
+      onDismiss: jest.fn(),
       onOpen: jest.fn(),
       showLabel: "Show transcript",
       title: "Streaming test",
