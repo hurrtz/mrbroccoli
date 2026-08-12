@@ -51,12 +51,13 @@ shared design system and settings primitives.
 
 ## Edition Boundary
 
-Free and Premium users see the same seven-page overview. Listening exposes
-system and viable downloaded routes to both editions; Free sees provider
-recognition routes as locked ghost rows followed by one Premium band. The pages
-listed by `PREMIUM_SETTINGS_PAGES` still render an upgrade explanation for Free
-instead of exposing their controls. Data & privacy, App & diagnostics, and the
-direct on-device catalogue remain available to both editions.
+Free and Premium users see the same seven-page overview. Connections, Search,
+and Listening keep the same route structure in both editions: Free sees cloud
+provider routes as locked ghost rows followed by one Premium band, while still
+retaining usable local or disabled choices. The pages listed by
+`PREMIUM_SETTINGS_PAGES` still render an upgrade explanation for Free instead
+of exposing their controls. Data & privacy, App & diagnostics, and the direct
+on-device catalogue remain available to both editions.
 
 **Decision:** Edition checks live in page routing or within a route group;
 overview visibility is never an authorization boundary.
@@ -96,7 +97,10 @@ capability healthy. The UI shows the capability that was actually tested.
 
 ## Page Ownership
 
-- Connections: credentials, provider capability health, and connection tests.
+- Connections: one manifest-ordered provider list with capability and health
+  summaries. Premium opens credentials, provider information, and
+  capability-specific connection tests in a modal sheet; Free keeps every
+  provider visible as a locked route.
 - Thinking: response modes, provider/local route, model, and supported effort.
 - Listening: input mode, conversation languages, and a unified system, local,
   or provider recognition route group. Downloaded local models cannot be
@@ -108,7 +112,9 @@ capability healthy. The UI shows the capability that was actually tested.
   speech recognition, and local voices catalogues are collapsed by default so
   the device assessment and chosen languages stay legible; starting a download
   expands the owning catalogue to keep progress and recovery visible.
-- Search: search mode, provider, and provider-specific options.
+- Search: a Nobody route plus search-provider routes, with result count, depth,
+  and provider-specific search mode shown only for the active route. Nobody
+  remains usable in both editions; Free keeps provider routes visibly locked.
 - Data & privacy: knowledge privacy, backup/restore, and Premium archives.
 - App & diagnostics: appearance, intro banner visibility, debug capture access,
   runtime overrides, release information, and isolated entitlement simulation.
@@ -131,6 +137,9 @@ capability healthy. The UI shows the capability that was actually tested.
   nesting a separate card around every row. Route choices expose native radio
   semantics; local-model removal remains an explicit swipe action. Removing a
   selected speech model atomically returns that capability to its system route.
+- Provider connection rows expose capability and aggregate health at a glance;
+  credential inputs and detailed validation belong to the selected provider's
+  focus-isolated sheet rather than expanding the overview list in place.
 - `PremiumBand` is the one deliberately decorative Settings primitive. Its
   gradients and sheen use theme tokens, its upgrade action remains at least 44
   points, and Reduce Motion disables the recurring sheen animation.

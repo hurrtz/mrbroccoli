@@ -21,6 +21,7 @@ const en = {
   settingsGroupConversation: "Conversation",
   settingsGroupVoiceModels: "Voice",
   settingsGroupPrivacyApp: "Privacy & app",
+  webSearchNobody: "Nobody",
 };
 
 type EditionTranslations = typeof en;
@@ -53,6 +54,7 @@ export const editionTranslations = {
     settingsGroupConversation: "Gespräch",
     settingsGroupVoiceModels: "Stimme",
     settingsGroupPrivacyApp: "Datenschutz & App",
+    webSearchNobody: "Niemand",
   }),
   uk: define({
     freeEdition: "Приватно й офлайн · Безкоштовно",
@@ -77,6 +79,7 @@ export const editionTranslations = {
     settingsGroupConversation: "Розмова",
     settingsGroupVoiceModels: "Голос",
     settingsGroupPrivacyApp: "Приватність і застосунок",
+    webSearchNobody: "Ніхто",
   }),
   hi: define({
     freeEdition: "निजी ऑफ़लाइन · मुफ़्त",
@@ -102,6 +105,7 @@ export const editionTranslations = {
     settingsGroupConversation: "बातचीत",
     settingsGroupVoiceModels: "आवाज़",
     settingsGroupPrivacyApp: "गोपनीयता और ऐप",
+    webSearchNobody: "कोई नहीं",
   }),
   es: define({
     freeEdition: "Privado sin conexión · Gratis",
@@ -128,6 +132,7 @@ export const editionTranslations = {
     settingsGroupConversation: "Conversación",
     settingsGroupVoiceModels: "Voz",
     settingsGroupPrivacyApp: "Privacidad y app",
+    webSearchNobody: "Nadie",
   }),
   fr: define({
     freeEdition: "Privé hors ligne · Gratuit",
@@ -154,6 +159,7 @@ export const editionTranslations = {
     settingsGroupConversation: "Conversation",
     settingsGroupVoiceModels: "Voix",
     settingsGroupPrivacyApp: "Confidentialité et app",
+    webSearchNobody: "Personne",
   }),
   it: define({
     freeEdition: "Privato offline · Gratis",
@@ -179,6 +185,7 @@ export const editionTranslations = {
     settingsGroupConversation: "Conversazione",
     settingsGroupVoiceModels: "Voce",
     settingsGroupPrivacyApp: "Privacy e app",
+    webSearchNobody: "Nessuno",
   }),
   pt: define({
     freeEdition: "Privado offline · Grátis",
@@ -204,6 +211,7 @@ export const editionTranslations = {
     settingsGroupConversation: "Conversa",
     settingsGroupVoiceModels: "Voz",
     settingsGroupPrivacyApp: "Privacidade e app",
+    webSearchNobody: "Ninguém",
   }),
   ptBR: define({
     freeEdition: "Privado offline · Grátis",
@@ -229,6 +237,7 @@ export const editionTranslations = {
     settingsGroupConversation: "Conversa",
     settingsGroupVoiceModels: "Voz",
     settingsGroupPrivacyApp: "Privacidade e app",
+    webSearchNobody: "Ninguém",
   }),
   ru: define({
     freeEdition: "Приватно и офлайн · Бесплатно",
@@ -255,6 +264,7 @@ export const editionTranslations = {
     settingsGroupConversation: "Разговор",
     settingsGroupVoiceModels: "Голос",
     settingsGroupPrivacyApp: "Конфиденциальность и приложение",
+    webSearchNobody: "Никто",
   }),
   "zh-CN": define({
     freeEdition: "私密离线 · 免费",
@@ -276,6 +286,7 @@ export const editionTranslations = {
     settingsGroupConversation: "对话",
     settingsGroupVoiceModels: "语音",
     settingsGroupPrivacyApp: "隐私与应用",
+    webSearchNobody: "无人",
   }),
   ar: define({
     freeEdition: "خاص بلا اتصال · مجاني",
@@ -300,6 +311,7 @@ export const editionTranslations = {
     settingsGroupConversation: "المحادثة",
     settingsGroupVoiceModels: "الصوت",
     settingsGroupPrivacyApp: "الخصوصية والتطبيق",
+    webSearchNobody: "لا أحد",
   }),
   ja: define({
     freeEdition: "プライベート・オフライン · 無料",
@@ -324,6 +336,7 @@ export const editionTranslations = {
     settingsGroupConversation: "会話",
     settingsGroupVoiceModels: "音声",
     settingsGroupPrivacyApp: "プライバシーとアプリ",
+    webSearchNobody: "誰も選ばない",
   }),
   hu: define({
     freeEdition: "Privát offline · Ingyenes",
@@ -350,6 +363,7 @@ export const editionTranslations = {
     settingsGroupConversation: "Beszélgetés",
     settingsGroupVoiceModels: "Hang",
     settingsGroupPrivacyApp: "Adatvédelem és alkalmazás",
+    webSearchNobody: "Senki",
   }),
   cs: define({
     freeEdition: "Soukromě offline · Zdarma",
@@ -375,6 +389,7 @@ export const editionTranslations = {
     settingsGroupConversation: "Konverzace",
     settingsGroupVoiceModels: "Hlas",
     settingsGroupPrivacyApp: "Soukromí a aplikace",
+    webSearchNobody: "Nikdo",
   }),
   pl: define({
     freeEdition: "Prywatnie offline · Bezpłatnie",
@@ -400,6 +415,7 @@ export const editionTranslations = {
     settingsGroupConversation: "Rozmowa",
     settingsGroupVoiceModels: "Głos",
     settingsGroupPrivacyApp: "Prywatność i aplikacja",
+    webSearchNobody: "Nikt",
   }),
   tr: define({
     freeEdition: "Özel çevrimdışı · Ücretsiz",
@@ -426,6 +442,7 @@ export const editionTranslations = {
     settingsGroupConversation: "Konuşma",
     settingsGroupVoiceModels: "Ses",
     settingsGroupPrivacyApp: "Gizlilik ve uygulama",
+    webSearchNobody: "Hiç kimse",
   }),
   sv: define({
     freeEdition: "Privat offline · Gratis",
@@ -451,6 +468,7 @@ export const editionTranslations = {
     settingsGroupConversation: "Samtal",
     settingsGroupVoiceModels: "Röst",
     settingsGroupPrivacyApp: "Integritet och app",
+    webSearchNobody: "Ingen",
   }),
   ur: define({
     freeEdition: "نجی آف لائن · مفت",
@@ -476,5 +494,6 @@ export const editionTranslations = {
     settingsGroupConversation: "گفتگو",
     settingsGroupVoiceModels: "آواز",
     settingsGroupPrivacyApp: "رازداری اور ایپ",
+    webSearchNobody: "کوئی نہیں",
   }),
 } as const;

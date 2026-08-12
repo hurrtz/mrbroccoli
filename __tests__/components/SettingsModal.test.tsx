@@ -15,7 +15,7 @@ import {
   within,
 } from "@testing-library/react-native";
 import { AntSettingsModal as SettingsModal } from "../../src/features/settings/AntSettingsModal";
-import { PROVIDER_LABELS } from "../../src/constants/models";
+import { PROVIDER_ORDER } from "../../src/constants/models";
 import {
   List,
   Modal as NativeDialog,
@@ -26,7 +26,6 @@ import { lightColors } from "../../src/theme/colors";
 import {
   type AppLanguage,
   DEFAULT_SETTINGS,
-  type Provider,
   type Settings,
 } from "../../src/types";
 import { useSpeechDiagnostics } from "../../src/hooks/useSpeechDiagnostics";
@@ -222,7 +221,6 @@ describe("SettingsModal", () => {
     fireEvent.press(screen.getByText("Connections"));
 
     await waitFor(() => {
-      expect(screen.queryByText("Back to overview")).toBeNull();
       expect(screen.getByLabelText("Back to overview")).toBeTruthy();
       expect(
         screen.getByTestId("phosphor-icon-arrow-left", hiddenIconQuery),
@@ -232,8 +230,10 @@ describe("SettingsModal", () => {
       );
       expect(screen.getAllByText("Connections")).toHaveLength(1);
       expect(
-        screen.queryByText("Provider keys, validation, and capabilities."),
-      ).toBeNull();
+        screen.getByText("Provider keys, validation, and capabilities."),
+      ).toBeTruthy();
+      expect(screen.getByTestId("connections-settings-page")).toBeTruthy();
+      expect(screen.getByText("Providers")).toBeTruthy();
       expect(screen.queryByPlaceholderText("Search services")).toBeNull();
       expect(screen.queryByText("System Prompt")).toBeNull();
     });
@@ -267,6 +267,54 @@ describe("SettingsModal", () => {
       checked: false,
       disabled: true,
     });
+  });
+
+  it("keeps provider routes visible but locked in Free Connections", async () => {
+    const onOpenPremium = jest.fn();
+    const screen = renderSettingsModal({ isPremium: false, onOpenPremium });
+
+    fireEvent.press(screen.getByTestId("settings-overview-row-connections"));
+
+    await waitFor(() => {
+      expect(screen.getByTestId("connections-settings-page")).toBeTruthy();
+    });
+    expect(screen.getByLabelText("OpenAI").props.accessibilityState).toEqual({
+      checked: false,
+      disabled: true,
+    });
+    expect(screen.queryByTestId("provider-connection-sheet-openai")).toBeNull();
+
+    fireEvent.press(screen.getByLabelText("Unlock Premium"));
+    expect(onOpenPremium).toHaveBeenCalledTimes(1);
+  });
+
+  it("keeps Nobody usable and provider routes locked in Free Search", async () => {
+    const onOpenPremium = jest.fn();
+    const onUpdate = jest.fn();
+    const screen = renderSettingsModal({
+      isPremium: false,
+      onOpenPremium,
+      onUpdate,
+    });
+
+    fireEvent.press(screen.getByTestId("settings-overview-row-search"));
+
+    await waitFor(() => {
+      expect(screen.getByTestId("search-settings-page")).toBeTruthy();
+    });
+    expect(screen.getByLabelText("Nobody").props.accessibilityState).toEqual({
+      checked: true,
+      disabled: false,
+    });
+    expect(screen.getByLabelText("OpenAI").props.accessibilityState).toEqual({
+      checked: false,
+      disabled: true,
+    });
+
+    fireEvent.press(screen.getByLabelText("Nobody"));
+    expect(onUpdate).toHaveBeenCalledWith({ webSearchMode: "off" });
+    fireEvent.press(screen.getByLabelText("Unlock Premium"));
+    expect(onOpenPremium).toHaveBeenCalledTimes(1);
   });
 
   it("shows the same seven sections on the Free overview", async () => {
@@ -703,7 +751,7 @@ describe("SettingsModal", () => {
     });
   });
 
-  it("sorts provider connections alphabetically", async () => {
+  it("keeps provider connections in runtime-manifest order", async () => {
     const screen = renderSettingsModal();
 
     fireEvent.press(screen.getByText("Connections"));
@@ -717,10 +765,8 @@ describe("SettingsModal", () => {
       .map((row) =>
         String(row.props.testID).replace("provider-vault-row-", ""),
       );
-    const expectedProviders = (
-      Object.keys(DEFAULT_SETTINGS.apiKeys) as Provider[]
-    ).sort((left, right) =>
-      PROVIDER_LABELS[left].localeCompare(PROVIDER_LABELS[right]),
+    const expectedProviders = PROVIDER_ORDER.filter((provider) =>
+      Object.hasOwn(DEFAULT_SETTINGS.apiKeys, provider),
     );
 
     expect(renderedProviders).toEqual(expectedProviders);
@@ -743,12 +789,14 @@ describe("SettingsModal", () => {
     const screen = renderSettingsModal({ focusProvider: "openai" });
 
     await waitFor(() => {
-      expect(screen.queryByText("Back to overview")).toBeNull();
       expect(screen.getByLabelText("Back to overview")).toBeTruthy();
       expect(screen.getByTestId("settings-modal-title").props.children).toBe(
         "Connections",
       );
-      expect(screen.getByText("OpenAI")).toBeTruthy();
+      expect(screen.getAllByText("OpenAI").length).toBeGreaterThan(1);
+      expect(
+        screen.getByTestId("provider-connection-sheet-openai"),
+      ).toBeTruthy();
       expect(screen.getByText("Test all")).toBeTruthy();
       expect(screen.getByLabelText("Test LLM")).toBeTruthy();
       expect(
@@ -760,18 +808,17 @@ describe("SettingsModal", () => {
     });
   });
 
-  it("keeps provider capabilities in the card footer", async () => {
+  it("shows capabilities and health in each provider row", async () => {
     const screen = renderSettingsModal({ focusProvider: "openai" });
 
     await waitFor(() => {
       expect(screen.getByTestId("provider-vault-row-openai")).toBeTruthy();
     });
 
-    const header = screen.getByTestId("provider-vault-row-openai");
+    const card = screen.getByTestId("provider-card-openai");
     const headerControl = screen.getByTestId(
       "provider-card-openai-header-control",
     );
-    const footer = screen.getByTestId("provider-capability-footer-openai");
 
     fireEvent(headerControl, "pressIn");
     expect(
@@ -779,21 +826,12 @@ describe("SettingsModal", () => {
     ).toBeUndefined();
     fireEvent(headerControl, "pressOut");
 
-    expect(
-      within(header).queryByTestId("provider-capability-pill-openai-llm"),
-    ).toBeNull();
-    expect(
-      within(footer).getByTestId("provider-capability-pill-openai-llm"),
-    ).toBeTruthy();
-    const capabilityPill = within(footer).getByTestId(
-      "provider-capability-pill-openai-llm",
+    expect(within(card).getByText("LLM · STT · TTS · Web Search")).toBeTruthy();
+    expect(within(card).getByTestId("provider-health-openai")).toBeTruthy();
+    expect(headerControl.props.accessibilityLabel).toContain(
+      "LLM · STT · TTS · Web Search",
     );
-    expect(capabilityPill.props.accessibilityRole).toBe("text");
-    expect(
-      capabilityPill.findAll(
-        (node) => typeof node.props.onPress === "function",
-      ),
-    ).toHaveLength(0);
+    expect(headerControl.props.accessibilityLabel).toContain("Not set up");
   });
 
   it("opens provider details from the card header info action", async () => {
@@ -814,7 +852,7 @@ describe("SettingsModal", () => {
     });
   });
 
-  it("orders provider actions and sections around the disclosure content", async () => {
+  it("orders provider actions and sections in the provider sheet", async () => {
     const provider = "alibaba-qwen-dashscope";
     const screen = renderSettingsModal({ focusProvider: provider });
 
@@ -835,15 +873,15 @@ describe("SettingsModal", () => {
     );
     expect(StyleSheet.flatten(regionHint.props.style).fontSize).toBe(12);
 
-    const card = screen.getByTestId(`provider-card-${provider}`);
+    const sheet = screen.getByTestId(`provider-connection-sheet-${provider}`);
     const expectedActionLabels = [
       "Credentials: Alibaba / Qwen",
       "About this provider: Alibaba / Qwen",
-      "Collapse Alibaba / Qwen",
+      "Dismiss",
     ];
     const actionLabels = [
       ...new Set(
-        card
+        sheet
           .findAll(
             (node) =>
               typeof node.props.accessibilityLabel === "string" &&
@@ -984,12 +1022,14 @@ describe("SettingsModal", () => {
 
     await waitFor(() => {
       expect(
-        screen.getByTestId("provider-vault-row-gemini").props
+        screen.getByTestId("provider-card-gemini-header-control").props
           .accessibilityLabel,
       ).toContain("Working");
       expect(
-        screen.queryByTestId("provider-capability-footer-gemini"),
-      ).toBeNull();
+        within(screen.getByTestId("provider-card-gemini")).getByTestId(
+          "provider-health-gemini",
+        ).props.accessibilityLabel,
+      ).toBe("Working");
     });
   });
 
@@ -1083,18 +1123,21 @@ describe("SettingsModal", () => {
 
     await waitFor(() => {
       expect(screen.getByText("OpenAI")).toBeTruthy();
-      const openAiRow = screen.getByTestId("provider-vault-row-openai");
+      const openAiRow = screen.getByTestId(
+        "provider-card-openai-header-control",
+      );
       expect(openAiRow.props.accessibilityLabel).toContain("Not tested");
-      expect(screen.queryByText("Configured")).toBeNull();
-      expect(screen.queryByText("Configured 1")).toBeNull();
-      expect(screen.queryByText("check")).toBeNull();
-      expect(screen.queryByText("Not set up")).toBeNull();
-      expect(screen.queryByText("minus")).toBeNull();
+      expect(
+        within(screen.getByTestId("provider-card-openai")).getByText(
+          "Not tested",
+        ),
+      ).toBeTruthy();
     });
   });
 
   it("shows a persisted validation success in green", async () => {
     const screen = renderSettingsModal({
+      focusProvider: "openai",
       settings: {
         ...DEFAULT_SETTINGS,
         apiKeys: {
@@ -1112,11 +1155,12 @@ describe("SettingsModal", () => {
       },
     });
 
-    fireEvent.press(screen.getByText("Connections"));
-
     await waitFor(() => {
-      const llmPill = screen.getByTestId("provider-capability-pill-openai-llm");
-      expect(llmPill.props.accessibilityLabel).toBe("LLM: Working");
+      expect(
+        within(
+          screen.getByTestId("provider-capability-row-openai-llm"),
+        ).getByText(/^Working/),
+      ).toBeTruthy();
     });
   });
 
@@ -1144,8 +1188,11 @@ describe("SettingsModal", () => {
 
     await waitFor(() => {
       expect(screen.getByText(new RegExp(errorMessage))).toBeTruthy();
-      const llmPill = screen.getByTestId("provider-capability-pill-openai-llm");
-      expect(llmPill.props.accessibilityLabel).toBe("LLM: Invalid");
+      expect(
+        within(
+          screen.getByTestId("provider-capability-row-openai-llm"),
+        ).getByText(new RegExp(`^Invalid · ${errorMessage}`)),
+      ).toBeTruthy();
     });
   });
 
@@ -1187,9 +1234,16 @@ describe("SettingsModal", () => {
           model: expect.any(String),
         }),
       );
-      const llmPill = screen.getByTestId("provider-capability-pill-openai-llm");
-      expect(llmPill.props.accessibilityLabel).toBe("LLM: Working");
-      expect(screen.queryByText("Invalid")).toBeNull();
+      expect(
+        within(
+          screen.getByTestId("provider-capability-row-openai-llm"),
+        ).getByText(/^Working/),
+      ).toBeTruthy();
+      expect(
+        within(
+          screen.getByTestId("provider-capability-row-openai-llm"),
+        ).queryByText("Invalid"),
+      ).toBeNull();
     });
   });
 
@@ -1214,6 +1268,8 @@ describe("SettingsModal", () => {
           ...DEFAULT_SETTINGS.apiKeys,
           openai: "test-key",
         },
+        webSearchMode: "on",
+        webSearchProvider: "openai",
       },
     });
 
@@ -1294,16 +1350,18 @@ describe("SettingsModal", () => {
       expect(screen.getByTestId("settings-modal-title").props.children).toBe(
         "Search",
       );
+      expect(screen.getByTestId("search-settings-page")).toBeTruthy();
       expect(screen.getByText("Web Search Provider")).toBeTruthy();
-      expect(screen.getByText("Advanced Search Controls")).toBeTruthy();
+      expect(screen.getByTestId("settings-search-route-nobody")).toBeTruthy();
+      expect(screen.getByLabelText("OpenAI").props.accessibilityState).toEqual({
+        checked: true,
+        disabled: false,
+      });
+      expect(screen.getByText("Search Quality")).toBeTruthy();
+      expect(screen.getByTestId("web-search-result-limit")).toBeTruthy();
+      expect(screen.getByTestId("web-search-search-mode")).toBeTruthy();
       expect(screen.queryByLabelText("About Web Search Provider")).toBeNull();
       expect(screen.queryByText("Model Selection")).toBeNull();
-    });
-
-    fireEvent.press(screen.getByText("Advanced Search Controls"));
-
-    await waitFor(() => {
-      expect(screen.getByText("Search Mode")).toBeTruthy();
     });
 
     fireEvent.press(screen.getByLabelText("Back to overview"));
@@ -1723,17 +1781,20 @@ describe("SettingsModal", () => {
 
     await waitFor(() => {
       expect(
-        screen.getByTestId("provider-capability-pill-elevenlabs-stt").props
-          .accessibilityLabel,
-      ).toBe("STT: Working");
+        within(
+          screen.getByTestId("provider-capability-row-elevenlabs-stt"),
+        ).getByText("Working"),
+      ).toBeTruthy();
       expect(
-        screen.getByTestId("provider-capability-pill-elevenlabs-tts").props
-          .accessibilityLabel,
-      ).toBe("TTS: Working");
+        within(
+          screen.getByTestId("provider-capability-row-elevenlabs-tts"),
+        ).getByText("Working"),
+      ).toBeTruthy();
       expect(
-        screen.getByTestId("provider-capability-pill-elevenlabs-voices").props
-          .accessibilityLabel,
-      ).toBe("Voice library: Invalid");
+        within(
+          screen.getByTestId("provider-capability-row-elevenlabs-voices"),
+        ).getByText(/Invalid · Missing voices_read permission/),
+      ).toBeTruthy();
       expect(screen.getByText(/Missing voices_read permission/)).toBeTruthy();
       expect(screen.getAllByText("Working").length).toBeGreaterThanOrEqual(2);
       expect(

@@ -170,6 +170,8 @@ export function AntSettingsPageContent({
             settings={settings}
             focusProvider={focusProvider}
             focusCatalogProviderId={focusCatalogProviderId}
+            isPremium={props.isPremium}
+            onOpenPremium={props.onOpenPremium}
             getProviderHealthState={validation.getHealthState}
             getProviderCapabilityHealthState={
               validation.getCapabilityHealthState
@@ -276,6 +278,9 @@ export function AntSettingsPageContent({
       return (
         <DrillInPage page="search">
           <SearchSettingsPage
+            allSearchProviders={WEB_SEARCH_PROVIDER_IDS}
+            isPremium={props.isPremium}
+            onOpenPremium={props.onOpenPremium}
             settings={settings}
             searchProviders={validation.selectableSearchProviders}
             onUpdate={onUpdate}

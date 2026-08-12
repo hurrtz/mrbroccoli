@@ -1,8 +1,7 @@
 import React from "react";
-import { Text, View } from "react-native";
+import { View } from "react-native";
 
-import { List } from "../../../design-system/NativeControls";
-
+import { PROVIDER_LABELS } from "../../../constants/models";
 import {
   WEB_SEARCH_DEPTH_VALUES,
   WEB_SEARCH_RESULT_LIMIT_VALUES,
@@ -13,46 +12,35 @@ import {
   type WebSearchProviderSettings,
 } from "../../../constants/webSearch";
 import { useLocalization } from "../../../i18n";
-import { useTheme } from "../../../theme/ThemeContext";
-import { fonts } from "../../../theme/typography";
 import type { Settings } from "../../../types";
-import { buildProviderPickerOptions } from "../../settings-core/providerPickerOptions";
 
-import {
-  AntDisclosureCard,
-  AntPickerRow,
-  AntPickerRows,
-  AntPickerSection,
-  AntSectionIntro,
-  AntSettingsCard,
-} from "../AntSettingsPrimitives";
-import { AntSettingsInfoButton } from "../AntSettingsInfoButton";
+import { PremiumBand } from "../settings-primitives/PremiumBand";
+import { RouteOptionRow } from "../settings-primitives/RouteOptionRow";
+import { SettingsChoiceRow } from "../settings-primitives/SettingsChoiceRow";
+import { SettingsGroup } from "../settings-primitives/SettingsGroup";
 import { styles } from "../styles";
 
 export function SearchSettingsPage({
-  settings,
-  searchProviders,
+  allSearchProviders,
+  isPremium,
+  onOpenPremium,
   onUpdate,
+  searchProviders,
+  settings,
 }: {
+  allSearchProviders: readonly WebSearchProvider[];
+  isPremium: boolean;
+  onOpenPremium: () => void;
   settings: Settings;
   searchProviders: WebSearchProvider[];
   onUpdate: (
     partial: Partial<Omit<Settings, "apiKeys" | "providerModels">>,
   ) => void;
 }) {
-  const { colors } = useTheme();
   const { t } = useLocalization();
-  const [advancedExpanded, setAdvancedExpanded] = React.useState(false);
+  const visibleProviders = isPremium ? searchProviders : allSearchProviders;
   const selectedWebSearchProvider =
-    settings.webSearchProvider ?? searchProviders[0] ?? null;
-  const pickerOptions = buildProviderPickerOptions(
-    searchProviders,
-    selectedWebSearchProvider,
-    t("providerNeedsAttention"),
-  );
-  const selectedProviderLabel =
-    pickerOptions.find((option) => option.value === selectedWebSearchProvider)
-      ?.label ?? selectedWebSearchProvider;
+    settings.webSearchMode === "on" ? settings.webSearchProvider : null;
   const selectedProviderSettings = selectedWebSearchProvider
     ? normalizeWebSearchProviderSettings(
         selectedWebSearchProvider,
@@ -86,183 +74,112 @@ export function SearchSettingsPage({
     ],
   );
 
-  if (searchProviders.length === 0) {
-    return (
-      <View style={styles.pageStack}>
-        <AntSectionIntro
-          title={t("webSearch")}
-          extra={
-            <AntSettingsInfoButton
-              accessibilityLabel={t("aboutSetting", {
-                setting: t("webSearch"),
-              })}
-              title={t("webSearch")}
-            >
-              {t("settingsWebSearchCompactHint")}
-            </AntSettingsInfoButton>
-          }
-        />
-        <AntSettingsCard>
-          <Text style={[styles.helperText, { color: colors.textSecondary }]}>
-            {t("webSearchSetupNeeded")}
-          </Text>
-        </AntSettingsCard>
-      </View>
-    );
-  }
-
-  const hasAdvancedControls =
-    controlSupport.resultLimit ||
-    controlSupport.depth ||
-    controlSupport.searchMode;
-
   return (
-    <View style={styles.pageStack}>
-      <AntSectionIntro
-        title={t("webSearch")}
-        extra={
-          <AntSettingsInfoButton
-            accessibilityLabel={t("aboutSetting", {
-              setting: t("webSearch"),
-            })}
-            title={t("webSearch")}
-          >
-            <View style={styles.infoModalContent}>
-              <Text
-                style={[styles.helperText, { color: colors.textSecondary }]}
-              >
-                {t("settingsWebSearchCompactHint")}
-              </Text>
-              <Text
-                style={[styles.helperText, { color: colors.textSecondary }]}
-              >
-                {t("webSearchHomeHint")}
-              </Text>
-            </View>
-          </AntSettingsInfoButton>
-        }
-      />
-      <AntPickerSection
+    <View testID="search-settings-page" style={styles.sectionPageStack}>
+      <SettingsGroup
         title={t("webSearchProvider")}
-        helperText={
-          pickerOptions.length === 0
+        footer={
+          isPremium && searchProviders.length === 0
             ? t("webSearchProviderMissingHint")
-            : undefined
+            : t("settingsWebSearchCompactHint")
         }
       >
-        {selectedWebSearchProvider ? (
-          <AntPickerRow
-            label={t("provider")}
-            value={selectedWebSearchProvider}
-            options={pickerOptions}
-            disabled={pickerOptions.length === 0}
-            onChange={(value) =>
-              onUpdate({ webSearchProvider: value as WebSearchProvider })
+        <RouteOptionRow
+          testID="settings-search-route-nobody"
+          label={t("webSearchNobody")}
+          last={visibleProviders.length === 0 && isPremium}
+          meta={t("webSearchDisabledDescription")}
+          selected={settings.webSearchMode === "off"}
+          onSelect={() => onUpdate({ webSearchMode: "off" })}
+        />
+        {visibleProviders.map((provider, index) => (
+          <RouteOptionRow
+            key={provider}
+            testID={`settings-search-route-provider-${provider}`}
+            label={PROVIDER_LABELS[provider]}
+            locked={!isPremium}
+            last={index === visibleProviders.length - 1 && isPremium}
+            meta={`${t("provider")} · ${t("apiKey")}`}
+            selected={selectedWebSearchProvider === provider}
+            onSelect={() =>
+              onUpdate({
+                webSearchMode: "on",
+                webSearchProvider: provider,
+              })
             }
           />
-        ) : (
-          <List.Item
-            styles={{
-              Line: {
-                borderBottomWidth: 0,
-              },
-              Content: {
-                color: colors.textSecondary,
-                fontFamily: fonts.body,
-                fontSize: 15,
-              },
-            }}
-          >
-            {t("webSearchProviderMissingHint")}
-          </List.Item>
-        )}
-      </AntPickerSection>
+        ))}
+        {!isPremium ? (
+          <PremiumBand
+            actionLabel={t("upgradeToPremium")}
+            copy={t("premiumBenefitTools")}
+            onPress={onOpenPremium}
+            premiumLabel={t("premium")}
+          />
+        ) : null}
+      </SettingsGroup>
 
-      {hasAdvancedControls && selectedProviderSettings ? (
-        <AntDisclosureCard
-          expanded={advancedExpanded}
-          onToggle={() => setAdvancedExpanded((current) => !current)}
-          header={
-            <Text style={[styles.fieldLabel, { color: colors.text }]}>
-              {t("webSearchAdvanced")}
-            </Text>
-          }
-          headerExtra={
-            <AntSettingsInfoButton
-              accessibilityLabel={t("aboutSetting", {
-                setting: t("webSearchAdvanced"),
-              })}
-              title={t("webSearchAdvanced")}
-            >
-              {t("webSearchQualityHint", {
-                provider: selectedProviderLabel,
-              })}
-            </AntSettingsInfoButton>
-          }
-          toggleAccessibilityLabel={t(
-            advancedExpanded
-              ? "collapseAdvancedSearch"
-              : "expandAdvancedSearch",
-          )}
-          contentStyle={styles.fullBleedCardContent}
+      {selectedWebSearchProvider && selectedProviderSettings ? (
+        <SettingsGroup
+          testID="settings-search-quality"
+          title={t("webSearchQualityControls")}
+          footer={t("webSearchQualityHint", {
+            provider: PROVIDER_LABELS[selectedWebSearchProvider],
+          })}
         >
-          <AntPickerRows>
-            {controlSupport.resultLimit ? (
-              <AntPickerRow
-                label={t("webSearchResultCount")}
-                value={String(selectedProviderSettings.resultLimit)}
-                options={WEB_SEARCH_RESULT_LIMIT_VALUES.map((value) => ({
-                  value: String(value),
-                  label: String(value),
-                }))}
-                onChange={(value) =>
-                  updateProviderSettings({
-                    resultLimit: Number(value) as 3 | 5 | 8,
-                  })
-                }
-              />
-            ) : null}
-            {controlSupport.depth ? (
-              <AntPickerRow
-                label={t("webSearchDepth")}
-                value={selectedProviderSettings.depth}
-                options={WEB_SEARCH_DEPTH_VALUES.map((value) => ({
-                  value,
-                  label:
-                    value === "deep"
-                      ? t("webSearchDepthDeep")
-                      : t("webSearchDepthStandard"),
-                }))}
-                onChange={(value) =>
-                  updateProviderSettings({
-                    depth: value as WebSearchProviderSettings["depth"],
-                  })
-                }
-              />
-            ) : null}
-            {controlSupport.searchMode ? (
-              <AntPickerRow
-                label={t("webSearchSearchMode")}
-                value={selectedProviderSettings.searchMode}
-                options={WEB_SEARCH_SEARCH_MODE_VALUES.map((value) => ({
-                  value,
-                  label:
-                    value === "quick"
-                      ? t("webSearchSearchModeQuick")
-                      : value === "deep"
-                        ? t("webSearchSearchModeDeep")
-                        : t("webSearchSearchModeBalanced"),
-                }))}
-                onChange={(value) =>
-                  updateProviderSettings({
-                    searchMode:
-                      value as WebSearchProviderSettings["searchMode"],
-                  })
-                }
-              />
-            ) : null}
-          </AntPickerRows>
-        </AntDisclosureCard>
+          <SettingsChoiceRow
+            testID="web-search-result-limit"
+            icon="line-chart"
+            label={t("webSearchResultCount")}
+            options={WEB_SEARCH_RESULT_LIMIT_VALUES.map((value) => ({
+              value: String(value),
+              label: String(value),
+            }))}
+            value={String(selectedProviderSettings.resultLimit)}
+            onChange={(value) =>
+              updateProviderSettings({
+                resultLimit: Number(value) as 3 | 5 | 8,
+              })
+            }
+            last={!controlSupport.depth && !controlSupport.searchMode}
+          />
+          {controlSupport.depth ? (
+            <SettingsChoiceRow
+              testID="web-search-depth"
+              icon="search"
+              label={t("webSearchDepth")}
+              options={WEB_SEARCH_DEPTH_VALUES.map((value) => ({
+                value,
+                label:
+                  value === "deep"
+                    ? t("webSearchDepthDeep")
+                    : t("webSearchDepthStandard"),
+              }))}
+              value={selectedProviderSettings.depth}
+              onChange={(depth) => updateProviderSettings({ depth })}
+              last={!controlSupport.searchMode}
+            />
+          ) : null}
+          {controlSupport.searchMode ? (
+            <SettingsChoiceRow
+              testID="web-search-search-mode"
+              icon="sliders"
+              label={t("webSearchSearchMode")}
+              options={WEB_SEARCH_SEARCH_MODE_VALUES.map((value) => ({
+                value,
+                label:
+                  value === "quick"
+                    ? t("webSearchSearchModeQuick")
+                    : value === "deep"
+                      ? t("webSearchSearchModeDeep")
+                      : t("webSearchSearchModeBalanced"),
+              }))}
+              value={selectedProviderSettings.searchMode}
+              onChange={(searchMode) => updateProviderSettings({ searchMode })}
+              last
+            />
+          ) : null}
+        </SettingsGroup>
       ) : null}
     </View>
   );
