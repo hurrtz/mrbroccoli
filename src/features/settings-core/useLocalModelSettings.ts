@@ -181,12 +181,19 @@ export function useLocalModelSettings({
     setProbing(true);
     setProbeError(null);
     try {
-      const [nextSnapshot, nextNativeSpeechCapabilities] = await Promise.all([
-        probeLocalDeviceCapabilities(),
-        probeNativeSpeechCapabilities(settings.localLanguages[0] ?? "en"),
-      ]);
+      const nextSnapshot = await probeLocalDeviceCapabilities();
       setSnapshot(nextSnapshot);
-      setNativeSpeechCapabilities(nextNativeSpeechCapabilities);
+      try {
+        setNativeSpeechCapabilities(
+          await probeNativeSpeechCapabilities(
+            settings.localLanguages[0] ?? "en",
+          ),
+        );
+      } catch {
+        // Native recognition eligibility is independent of downloadable model
+        // eligibility. A missing recognizer must not hide local STT/TTS routes.
+        setNativeSpeechCapabilities(null);
+      }
     } catch (error) {
       setProbeError(error instanceof Error ? error.message : String(error));
       setSnapshot(null);
@@ -427,6 +434,7 @@ export function useLocalModelSettings({
           return;
         }
         onUpdate({
+          spokenRepliesEnabled: true,
           ...(model.id === "kokoro-multilingual"
             ? { localTtsModelId: null, ttsMode: "kokoro" as const }
             : { localTtsModelId: model.id, ttsMode: "local" as const }),
@@ -446,8 +454,16 @@ export function useLocalModelSettings({
       if (model.capability === "tts") {
         onUpdate(
           model.id === "kokoro-multilingual"
-            ? { localTtsModelId: null, ttsMode: "kokoro" }
-            : { localTtsModelId: model.id, ttsMode: "local" },
+            ? {
+                localTtsModelId: null,
+                spokenRepliesEnabled: true,
+                ttsMode: "kokoro",
+              }
+            : {
+                localTtsModelId: model.id,
+                spokenRepliesEnabled: true,
+                ttsMode: "local",
+              },
         );
         return;
       }
@@ -493,10 +509,6 @@ export function useLocalModelSettings({
             selectedFreeProfile.thoroughLlm?.id === model.id
           );
         }
-        if (model.capability === "stt") {
-          return selectedFreeProfile.stt?.id === model.id;
-        }
-        return selectedFreeProfile.tts?.id === model.id;
       }
       if (model.capability === "llm") {
         return settings.responseModes.some(
@@ -538,6 +550,7 @@ export function useLocalModelSettings({
       onUpdate({
         ttsMode: "native",
         localTtsModelId: null,
+        spokenRepliesEnabled: true,
         ...(!isPremium
           ? {
               freeOfflineProfileOverrides: {

@@ -45,16 +45,16 @@ shared design system and settings primitives.
   inset-row vocabulary used by the approved native Settings design:
   `SettingsGroup`, `SettingsRow`, `SettingsChoiceRow`,
   `SettingsMultiChoiceRow`, `RouteOptionRow`, `LocalModelRouteGroup`,
-  `IconAction`, and `PremiumBand`.
+  `VoicePickerSheet`, `IconAction`, and `PremiumBand`.
 - `settings-core/` owns reusable non-visual normalization, readiness,
   validation, voice-preview, local-model lifecycle, and controller behavior.
 
 ## Edition Boundary
 
 Free and Premium users see the same seven-page overview. Connections, Search,
-and Listening keep the same route structure in both editions: Free sees cloud
-provider routes as locked ghost rows followed by one Premium band, while still
-retaining usable local or disabled choices. The pages listed by
+Listening, and Speaking keep the same route structure in both editions: Free
+sees cloud provider routes as locked ghost rows followed by one Premium band,
+while still retaining usable local or disabled choices. The pages listed by
 `PREMIUM_SETTINGS_PAGES` still render an upgrade explanation for Free instead
 of exposing their controls. Data & privacy, App & diagnostics, and the direct
 on-device catalogue remain available to both editions.
@@ -105,8 +105,13 @@ capability healthy. The UI shows the capability that was actually tested.
 - Listening: input mode, conversation languages, and a unified system, local,
   or provider recognition route group. Downloaded local models cannot be
   selected until a successful device benchmark marks them viable.
-- Speaking: spoken reply behavior, native/local/provider voice, instructions,
-  previews, and explicit fallback order.
+- Speaking: playback timing and provider-supported delivery instructions,
+  followed by one native/local/provider route group. A selected route exposes
+  its model and voice as inset subrows; voice selection opens one searchable,
+  focus-isolated sheet whose rows can preview the exact voice without first
+  changing the saved selection. Download, cancel, benchmark, selection, and
+  swipe-removal for local voices stay in this route group. Speech replay-cache
+  removal is the only Storage action on this page.
 - On-device: device assessment, curated artifacts, download/test/removal, Free
   profile choices, and advanced viable overrides. Its Local responses, local
   speech recognition, and local voices catalogues are collapsed by default so
@@ -122,6 +127,9 @@ capability healthy. The UI shows the capability that was actually tested.
 ## Interaction Rules
 
 - Picker sheets remain above their parent modal.
+- Speaking always retains one active speech route. The retired spoken-replies
+  toggle is migrated to enabled, while the runtime continues to honor only
+  explicitly persisted fallback policies and never invents a hidden fallback.
 - Single- and multi-choice rows open bottom sheets, retain native radio or
   checkbox semantics, isolate screen-reader focus, and keep a labelled close or
   Done action.

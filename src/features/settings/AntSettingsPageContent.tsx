@@ -8,7 +8,6 @@ import { useProviderValidationState } from "../settings-core/useProviderValidati
 import { useSettingsController } from "../settings-core/useSettingsController";
 import { useLocalModelSettings } from "../settings-core/useLocalModelSettings";
 import { getSettingsReadiness } from "../settings-core/readiness";
-import { Provider, TtsListenLanguage } from "../../types";
 import {
   PROVIDER_LLM_SUPPORT,
   PROVIDER_ORDER,
@@ -117,7 +116,9 @@ export function AntSettingsPageContent({
     settings,
   } = props;
   const localModels = useLocalModelSettings({
-    active: props.visible && activePage === "listening",
+    active:
+      props.visible &&
+      (activePage === "listening" || activePage === "speaking"),
     isPremium: props.isPremium,
     kokoroModel,
     onPreviewVoice: props.onPreviewVoice,
@@ -236,41 +237,23 @@ export function AntSettingsPageContent({
       return (
         <DrillInPage page="speaking">
           <SpeakingSettingsPage
-            settings={settings}
-            kokoroModel={kokoroModel}
-            selectableTtsProviders={validation.selectableTtsProviders}
-            ttsLanguageNote={controller.ttsLanguageNote}
-            selectedPreviewProvider={controller.selectedPreviewProvider}
-            selectedPreviewProviderModelOptions={
-              controller.selectedPreviewProviderModelOptions
-            }
-            selectedPreviewProviderModel={
-              controller.selectedPreviewProviderModel
-            }
-            providerPreviewTexts={controller.providerPreviewTexts}
             activePreview={controller.activePreview}
-            nativeVoiceOptions={controller.nativeVoiceOptions}
-            selectedNativeVoice={controller.selectedNativeVoice}
-            nativePreviewText={controller.nativePreviewText}
-            kokoroPreviewTexts={controller.kokoroPreviewTexts}
+            allTtsProviders={PROVIDER_ORDER.filter(
+              (provider) => PROVIDER_TTS_SUPPORT[provider] === "provider",
+            )}
+            isPremium={props.isPremium}
+            localModels={localModels}
+            onOpenPremium={props.onOpenPremium}
+            settings={settings}
+            selectableTtsProviders={validation.selectableTtsProviders}
             onUpdate={onUpdate}
             onUpdateProviderTtsModel={onUpdateProviderTtsModel}
             onUpdateProviderTtsVoice={onUpdateProviderTtsVoice}
             providerVoiceDirectories={providerVoiceDirectories}
-            onStopPreviewVoice={controller.stopActivePreview}
-            onSetProviderPreviewText={(
-              provider: Provider,
-              language: TtsListenLanguage,
-              text: string,
-            ) => controller.setProviderPreviewText(provider, language, text)}
-            onSetNativePreviewText={controller.setNativePreviewText}
-            onSetKokoroPreviewText={controller.setKokoroPreviewText}
             onPreviewProviderVoice={controller.handlePreviewProviderVoice}
             onPreviewNativeVoice={controller.handlePreviewNativeVoice}
             onPreviewKokoroVoice={controller.handlePreviewKokoroVoice}
-            onSelectNativeVoice={controller.setSelectedNativeVoice}
             onTextInputFocus={controller.handleTextInputFocus}
-            onToggleListenLanguage={controller.toggleListenLanguage}
           />
         </DrillInPage>
       );

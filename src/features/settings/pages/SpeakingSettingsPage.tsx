@@ -1,175 +1,408 @@
-import React, { useState } from "react";
-import { Alert, StyleSheet, Text, View } from "react-native";
+import React from "react";
+import {
+  Alert,
+  Modal,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import { Button } from "../../../design-system/NativeControls";
-
-import { providerTtsModelSupportsInstructions } from "../../../constants/models";
-import { getLocalModel } from "../../../constants/localModels";
-import { getTtsFallbackRoutes } from "../../../constants/ttsFallback";
-import type { KokoroModelController } from "../../../hooks/useKokoroModel";
+import { getKokoroLanguage, getKokoroVoiceOptions } from "../../../constants/kokoro";
+import { APP_MODAL_ORIENTATIONS } from "../../../constants/layout";
+import {
+  PROVIDER_DEFAULT_TTS_MODELS,
+  PROVIDER_DEFAULT_TTS_VOICES,
+  PROVIDER_LABELS,
+  getProviderTtsModelOptions,
+  getProviderTtsVoiceOptions,
+  providerRequiresTtsVoice,
+  providerTtsModelSupportsInstructions,
+  providerUsesTtsVoiceDirectory,
+} from "../../../constants/models";
+import { IconButton } from "../../../design-system/IconButton";
+import { Input } from "../../../design-system/NativeControls";
+import type { LocalModelDefinition } from "../../../constants/localModels";
 import { useLocalization } from "../../../i18n";
 import { clearProviderTtsAudioCache } from "../../../services/providerTtsAudioCache";
-import type { ProviderVoiceDirectories } from "../../../services/providerVoiceDirectory";
+import type {
+  ProviderVoice,
+  ProviderVoiceDirectories,
+} from "../../../services/providerVoiceDirectory";
 import { useTheme } from "../../../theme/ThemeContext";
+import { fonts } from "../../../theme/typography";
 import type {
   KokoroLanguage,
   Provider,
   ReplyPlayback,
   Settings,
-  TtsBackendMode,
   TtsListenLanguage,
 } from "../../../types";
-import { isKokoroModelReady } from "../../../utils/kokoroModelReadiness";
-import { buildProviderPickerOptions } from "../../settings-core/providerPickerOptions";
+import type { LocalModelSettingsController } from "../../settings-core/useLocalModelSettings";
 import type {
   PreviewButtonPhase,
-  ProviderPreviewTexts,
   TextInputFocusHandler,
 } from "../../settings-core/types";
 
-import { AntKokoroVoiceSection } from "../AntKokoroVoiceSection";
-import { AntListenLanguageSelector } from "../AntListenLanguageSelector";
-import { AntProviderVoiceSection } from "../AntProviderVoiceSection";
-import { AntSettingsInfoButton } from "../AntSettingsInfoButton";
-import {
-  AntNativeVoiceSection,
-  AntTtsFallbackSection,
-} from "../AntTtsSections";
-import {
-  AntButtonLabel,
-  AntPickerRow,
-  AntPickerSection,
-  AntRadioSection,
-  AntSectionIntro,
-  AntSettingsCard,
-  AntSwitchRow,
-  AntTextArea,
-} from "../AntSettingsPrimitives";
 import { styles } from "../styles";
+import { LocalModelRouteGroup } from "../settings-primitives/LocalModelRouteGroup";
+import { SettingsChoiceRow } from "../settings-primitives/SettingsChoiceRow";
+import { SettingsGroup } from "../settings-primitives/SettingsGroup";
+import { SettingsRow } from "../settings-primitives/SettingsRow";
+import {
+  VoicePickerSheet,
+  type VoicePickerOption,
+} from "../settings-primitives/VoicePickerSheet";
+
+type VoicePickerRoute =
+  | { kind: "native" }
+  | { kind: "kokoro"; language: KokoroLanguage }
+  | { kind: "provider"; provider: Provider };
+
+function providerVoiceMeta(voice: ProviderVoice) {
+  const parts = [
+    "accent" in voice ? voice.accent : null,
+    "gender" in voice ? voice.gender : null,
+    "tone" in voice ? voice.tone : null,
+    "language" in voice ? voice.language : null,
+    "languages" in voice ? voice.languages.join(", ") : null,
+    "category" in voice ? voice.category : null,
+    "isCustom" in voice && voice.isCustom ? "Custom" : null,
+  ].filter((part): part is string => Boolean(part));
+  return [...new Set(parts)].join(" · ");
+}
+
+function getProviderVoicePickerOptions(params: {
+  provider: Provider;
+  model: string;
+  language: Settings["language"];
+  directory: ProviderVoiceDirectories[Provider];
+  selectedVoice: string;
+}): VoicePickerOption[] {
+  const fallbackOptions = getProviderTtsVoiceOptions(
+    params.provider,
+    params.language,
+    params.model,
+  ).map((voice) => ({ value: voice.id, label: voice.label }));
+  const directoryOptions = params.directory?.voices.map((voice) => ({
+    value: voice.value,
+    label: voice.name,
+    meta: providerVoiceMeta(voice) || undefined,
+  }));
+  const options = directoryOptions?.length ? directoryOptions : fallbackOptions;
+
+  if (
+    params.selectedVoice &&
+    !options.some((option) => option.value === params.selectedVoice)
+  ) {
+    return [
+      { value: params.selectedVoice, label: params.selectedVoice },
+      ...options,
+    ];
+  }
+  return options;
+}
+
+function InstructionsSheet({
+  onChange,
+  onClose,
+  onTextInputFocus,
+  value,
+  visible,
+}: {
+  onChange: (value: string) => void;
+  onClose: () => void;
+  onTextInputFocus: TextInputFocusHandler;
+  value: string;
+  visible: boolean;
+}) {
+  const { colors } = useTheme();
+  const { t } = useLocalization();
+  const insets = useSafeAreaInsets();
+
+  return (
+    <Modal
+      animationType="slide"
+      onRequestClose={onClose}
+      statusBarTranslucent
+      supportedOrientations={APP_MODAL_ORIENTATIONS}
+      transparent
+      visible={visible}
+    >
+      <View accessibilityViewIsModal style={pageStyles.overlay}>
+        <Pressable
+          accessible={false}
+          onPress={onClose}
+          style={[StyleSheet.absoluteFill, { backgroundColor: colors.overlay }]}
+        />
+        <View
+          style={[
+            pageStyles.instructionsSheet,
+            {
+              backgroundColor: colors.background,
+              borderColor: colors.border,
+              paddingBottom: Math.max(18, insets.bottom + 10),
+            },
+          ]}
+        >
+          <View
+            style={[
+              pageStyles.handle,
+              { backgroundColor: colors.borderStrong },
+            ]}
+          />
+          <View style={pageStyles.sheetHeader}>
+            <Text
+              accessibilityRole="header"
+              style={[pageStyles.sheetTitle, { color: colors.text }]}
+            >
+              {t("ttsInstructions")}
+            </Text>
+            <IconButton
+              icon="close"
+              accessibilityLabel={t("done")}
+              onPress={onClose}
+            />
+          </View>
+          <Text
+            style={[pageStyles.instructionsHint, { color: colors.textMuted }]}
+          >
+            {t("ttsInstructionsDescription")}
+          </Text>
+          <Input.TextArea
+            testID="speaking-instructions-input"
+            value={value}
+            placeholder={t("ttsInstructionsPlaceholder")}
+            placeholderTextColor={colors.textMuted}
+            onFocus={onTextInputFocus}
+            onChangeText={onChange}
+            rows={5}
+            styles={{ container: pageStyles.instructionsInput }}
+          />
+        </View>
+      </View>
+    </Modal>
+  );
+}
 
 export function SpeakingSettingsPage({
-  settings,
-  selectableTtsProviders,
-  ttsLanguageNote,
-  selectedPreviewProvider,
-  selectedPreviewProviderModelOptions,
-  selectedPreviewProviderModel,
-  providerPreviewTexts,
   activePreview,
-  nativeVoiceOptions,
-  selectedNativeVoice,
-  nativePreviewText,
-  kokoroModel,
-  kokoroPreviewTexts,
+  allTtsProviders,
+  isPremium,
+  localModels,
+  onOpenPremium,
+  onPreviewKokoroVoice,
+  onPreviewNativeVoice,
+  onPreviewProviderVoice,
+  onTextInputFocus,
   onUpdate,
   onUpdateProviderTtsModel,
   onUpdateProviderTtsVoice,
   providerVoiceDirectories,
-  onStopPreviewVoice,
-  onSetProviderPreviewText,
-  onSetNativePreviewText,
-  onSetKokoroPreviewText,
-  onPreviewProviderVoice,
-  onPreviewNativeVoice,
-  onPreviewKokoroVoice,
-  onSelectNativeVoice,
-  onTextInputFocus,
-  onToggleListenLanguage,
+  selectableTtsProviders,
+  settings,
 }: {
-  settings: Settings;
-  selectableTtsProviders: Provider[];
-  ttsLanguageNote: string | null;
-  selectedPreviewProvider: Provider | null;
-  selectedPreviewProviderModelOptions: { id: string; name: string }[];
-  selectedPreviewProviderModel: string;
-  providerPreviewTexts: ProviderPreviewTexts;
   activePreview: { id: string; phase: PreviewButtonPhase } | null;
-  nativeVoiceOptions: { value: string; label: string }[];
-  selectedNativeVoice: string;
-  nativePreviewText: string;
-  kokoroModel: KokoroModelController;
-  kokoroPreviewTexts: Record<KokoroLanguage, string>;
+  allTtsProviders: Provider[];
+  isPremium: boolean;
+  localModels: LocalModelSettingsController;
+  onOpenPremium: () => void;
+  onPreviewKokoroVoice: (
+    language: KokoroLanguage,
+    voice?: string,
+  ) => Promise<void>;
+  onPreviewNativeVoice: (voice?: string) => Promise<void>;
+  onPreviewProviderVoice: (
+    provider: Provider,
+    language: TtsListenLanguage,
+    voice?: string,
+  ) => Promise<void>;
+  onTextInputFocus: TextInputFocusHandler;
   onUpdate: (
     partial: Partial<Omit<Settings, "apiKeys" | "providerModels">>,
   ) => void;
   onUpdateProviderTtsModel: (provider: Provider, model: string) => void;
   onUpdateProviderTtsVoice: (provider: Provider, voice: string) => void;
   providerVoiceDirectories: ProviderVoiceDirectories;
-  onStopPreviewVoice: () => Promise<void>;
-  onSetProviderPreviewText: (
-    provider: Provider,
-    language: TtsListenLanguage,
-    text: string,
-  ) => void;
-  onSetNativePreviewText: (text: string) => void;
-  onSetKokoroPreviewText: (language: KokoroLanguage, text: string) => void;
-  onPreviewProviderVoice: (
-    provider: Provider,
-    previewLanguage: TtsListenLanguage,
-  ) => Promise<void>;
-  onPreviewNativeVoice: () => Promise<void>;
-  onPreviewKokoroVoice: (language: KokoroLanguage) => Promise<void>;
-  onSelectNativeVoice: (voiceId: string) => void;
-  onTextInputFocus: TextInputFocusHandler;
-  onToggleListenLanguage: (language: TtsListenLanguage) => void;
+  selectableTtsProviders: Provider[];
+  settings: Settings;
 }) {
-  const { colors } = useTheme();
-  const { t } = useLocalization();
-  const [isClearingSpeechCache, setIsClearingSpeechCache] = useState(false);
-  const ttsProviderOptions = buildProviderPickerOptions(
-    selectableTtsProviders,
-    settings.ttsProvider,
-    t("providerNeedsAttention"),
+  const { language, t } = useLocalization();
+  const [instructionsVisible, setInstructionsVisible] = React.useState(false);
+  const [voicePicker, setVoicePicker] = React.useState<VoicePickerRoute | null>(
+    null,
   );
-  const instructionsSupported =
-    selectedPreviewProvider !== null &&
-    providerTtsModelSupportsInstructions(
-      selectedPreviewProvider,
-      selectedPreviewProviderModel,
-    );
-  const fallbackRoutes = getTtsFallbackRoutes(
-    settings.ttsFallbackPolicy,
-    settings.ttsMode,
+  const [isClearingSpeechCache, setIsClearingSpeechCache] =
+    React.useState(false);
+  const previewLanguage = settings.ttsListenLanguages[0] ?? "en";
+  const providerModel = (provider: Provider) =>
+    settings.providerTtsModels[provider] ||
+    PROVIDER_DEFAULT_TTS_MODELS[provider] ||
+    getProviderTtsModelOptions(provider)[0]?.id ||
+    "";
+  const selectedProvider =
+    settings.ttsMode === "provider" ? settings.ttsProvider : null;
+  const selectedProviderModel = selectedProvider
+    ? providerModel(selectedProvider)
+    : "";
+  const instructionsSupported = Boolean(
+    selectedProvider &&
+      providerTtsModelSupportsInstructions(
+        selectedProvider,
+        selectedProviderModel,
+      ),
   );
-  const providerRouteActive =
-    settings.ttsMode === "provider" || fallbackRoutes.includes("provider");
-  const nativeRouteActive =
-    settings.ttsMode === "native" || fallbackRoutes.includes("native");
-  const kokoroRouteActive =
-    settings.ttsMode === "kokoro" || fallbackRoutes.includes("kokoro");
-  const kokoroModelReady = isKokoroModelReady(kokoroModel);
-  const showKokoroSection =
-    kokoroRouteActive ||
-    kokoroModel.busy === "downloading" ||
-    kokoroModel.busy === "verifying" ||
-    kokoroModel.error !== null;
-  const handleTtsModeChange = (value: TtsBackendMode) => {
-    if (value !== "kokoro" || kokoroModelReady) {
-      onUpdate({ ttsMode: value });
-      return;
-    }
+  const kokoroLanguage =
+    settings.localLanguages.map(getKokoroLanguage).find(Boolean) ?? "en";
 
-    Alert.alert("Kokoro", t("kokoroNotInstalled"), [
-      {
-        text: t("cancel"),
-        style: "cancel",
-      },
-      {
-        text: t("download"),
-        onPress: () => {
-          onUpdate({ ttsMode: "kokoro" });
-          void kokoroModel.download({
-            phonemeLanguages: settings.localLanguages,
-          });
-        },
-      },
-    ]);
+  const voiceRouteTitle = voicePicker
+    ? voicePicker.kind === "native"
+      ? t("systemVoice")
+      : voicePicker.kind === "kokoro"
+        ? "Kokoro"
+        : PROVIDER_LABELS[voicePicker.provider]
+    : t("ttsVoice");
+  let voiceOptions: VoicePickerOption[] = [];
+  let selectedVoice = "";
+  let directoryStatus: string | null = null;
+  let refreshVoices: (() => void) | undefined;
+
+  if (voicePicker?.kind === "native") {
+    voiceOptions = localModels.nativeVoiceOptions;
+    selectedVoice = localModels.selectedNativeVoice;
+  } else if (voicePicker?.kind === "kokoro") {
+    voiceOptions = getKokoroVoiceOptions(voicePicker.language, language);
+    selectedVoice = settings.kokoroVoices[voicePicker.language];
+  } else if (voicePicker?.kind === "provider") {
+    const provider = voicePicker.provider;
+    const directory = providerVoiceDirectories[provider];
+    selectedVoice =
+      settings.providerTtsVoices[provider] ||
+      PROVIDER_DEFAULT_TTS_VOICES[provider] ||
+      "";
+    voiceOptions = getProviderVoicePickerOptions({
+      provider,
+      model: providerModel(provider),
+      language,
+      directory,
+      selectedVoice,
+    });
+    if (providerUsesTtsVoiceDirectory(provider) && directory) {
+      refreshVoices = () => void directory.refresh();
+      directoryStatus =
+        directory.status === "loading" || directory.status === "refreshing"
+          ? t("providerVoicesLoadingHint", {
+              provider: PROVIDER_LABELS[provider],
+            })
+          : directory.status === "error"
+            ? [
+                t(
+                  getProviderTtsVoiceOptions(
+                    provider,
+                    language,
+                    providerModel(provider),
+                  ).length > 0
+                    ? "providerVoicesLoadFailedWithFallback"
+                    : "providerVoicesLoadFailed",
+                ),
+                directory.error
+                  ? t("providerVoicesErrorDetail", {
+                      detail: directory.error.message,
+                    })
+                  : null,
+                provider === "elevenlabs" &&
+                directory.error?.message.toLocaleLowerCase().includes(
+                  "voices_read",
+                )
+                  ? t("elevenLabsVoicesReadPermissionHint")
+                  : null,
+              ]
+                .filter(Boolean)
+                .join("\n")
+            : null;
+    }
+  }
+
+  const selectedVoiceLabel = (options: readonly VoicePickerOption[], value: string) =>
+    options.find((option) => option.value === value)?.label || value;
+  const providerVoiceRow = (provider: Provider) => {
+    const model = providerModel(provider);
+    const directory = providerVoiceDirectories[provider];
+    const voice =
+      settings.providerTtsVoices[provider] ||
+      PROVIDER_DEFAULT_TTS_VOICES[provider] ||
+      "";
+    const options = getProviderVoicePickerOptions({
+      provider,
+      model,
+      language,
+      directory,
+      selectedVoice: voice,
+    });
+    if (
+      !providerRequiresTtsVoice(provider) &&
+      !providerUsesTtsVoiceDirectory(provider) &&
+      options.length === 0
+    ) {
+      return null;
+    }
+    return (
+      <SettingsRow
+        testID={`settings-tts-provider-${provider}-voice`}
+        label={t("ttsVoice")}
+        last
+        value={selectedVoiceLabel(options, voice)}
+        onPress={() => setVoicePicker({ kind: "provider", provider })}
+      />
+    );
   };
+  const kokoroVoiceRow = (model: LocalModelDefinition) =>
+    model.id === "kokoro-multilingual" ? (
+      <SettingsRow
+        testID="settings-tts-kokoro-voice"
+        label={t("ttsVoice")}
+        last
+        value={selectedVoiceLabel(
+          getKokoroVoiceOptions(kokoroLanguage, language),
+          settings.kokoroVoices[kokoroLanguage],
+        )}
+        onPress={() =>
+          setVoicePicker({ kind: "kokoro", language: kokoroLanguage })
+        }
+      />
+    ) : null;
+
+  const handleVoiceSelect = (voice: string) => {
+    if (voicePicker?.kind === "native") {
+      localModels.selectNativeVoice(voice);
+    } else if (voicePicker?.kind === "kokoro") {
+      onUpdate({
+        kokoroVoices: {
+          ...settings.kokoroVoices,
+          [voicePicker.language]: voice,
+        },
+      });
+    } else if (voicePicker?.kind === "provider") {
+      onUpdateProviderTtsVoice(voicePicker.provider, voice);
+    }
+  };
+  const handleVoicePreview = (voice: string) => {
+    if (voicePicker?.kind === "native") {
+      void onPreviewNativeVoice(voice);
+    } else if (voicePicker?.kind === "kokoro") {
+      void onPreviewKokoroVoice(voicePicker.language, voice);
+    } else if (voicePicker?.kind === "provider") {
+      void onPreviewProviderVoice(voicePicker.provider, previewLanguage, voice);
+    }
+  };
+  const busyVoice = voiceOptions.find((option) =>
+    activePreview?.id.endsWith(`:${option.value}`),
+  )?.value;
   const handleClearSpeechCache = async () => {
     if (isClearingSpeechCache) {
       return;
     }
-
     setIsClearingSpeechCache(true);
     try {
       await clearProviderTtsAudioCache();
@@ -182,253 +415,160 @@ export function SpeakingSettingsPage({
   };
 
   return (
-    <View style={styles.sectionPageStack}>
-      <View style={styles.sectionGroup}>
-        <AntSectionIntro
-          title={t("voiceOutput")}
-          extra={
-            <AntSettingsInfoButton
-              accessibilityLabel={t("aboutSetting", {
-                setting: t("voiceOutput"),
-              })}
-              title={t("voiceOutput")}
-            >
-              {t("voiceOutputDescription")}
-            </AntSettingsInfoButton>
-          }
-        />
-
-        <AntSettingsCard>
-          <AntSwitchRow
-            label={t("spokenReplies")}
-            value={settings.spokenRepliesEnabled}
-            onChange={(value) => onUpdate({ spokenRepliesEnabled: value })}
-          />
-        </AntSettingsCard>
-
-        <AntListenLanguageSelector
-          selectedLanguages={settings.ttsListenLanguages}
-          onToggleLanguage={onToggleListenLanguage}
-        />
-
-        <AntRadioSection<ReplyPlayback>
-          label={t("replyPlayback")}
+    <View testID="speaking-settings-page" style={styles.sectionPageStack}>
+      <SettingsGroup title={t("speakingPlayback")}>
+        <SettingsChoiceRow<ReplyPlayback>
+          testID="reply-playback-picker"
+          icon="play-circle"
+          label={t("startSpeaking")}
           options={[
-            {
-              value: "stream",
-              label: t("sentencesArrive"),
-              description: t("sentencesArriveDescription"),
-            },
-            {
-              value: "wait",
-              label: t("fullReplyFirst"),
-              description: t("fullReplyFirstDescription"),
-            },
+            { value: "stream", label: t("sentencesArrive") },
+            { value: "wait", label: t("fullReplyFirst") },
           ]}
           value={settings.replyPlayback}
-          onChange={(value) => onUpdate({ replyPlayback: value })}
+          onChange={(replyPlayback) => onUpdate({ replyPlayback })}
         />
-
-        <AntRadioSection<TtsBackendMode>
-          label={t("textToSpeech")}
-          options={[
-            {
-              value: "native",
-              label: t("systemVoice"),
-              description: t("nativeTtsDescription"),
-            },
-            {
-              value: "kokoro",
-              label: "Kokoro",
-              description: t("kokoroTtsDescription"),
-            },
-            {
-              value: "provider",
-              label: t("provider"),
-              description: t("providerTtsDescription"),
-            },
-            {
-              value: "local",
-              label: t("settingsOnDevice"),
-              description: t("settingsOnDeviceSummary"),
-              disabled: !settings.localTtsModelId,
-            },
-          ]}
-          value={settings.ttsMode}
-          onChange={handleTtsModeChange}
-        />
-
-        <AntTtsFallbackSection settings={settings} onUpdate={onUpdate} />
-      </View>
-
-      {settings.ttsMode === "local" && settings.localTtsModelId ? (
-        <AntPickerSection title={t("onDeviceSpeakingModels")}>
-          <AntPickerRow
-            label={t("model")}
-            value={settings.localTtsModelId}
-            options={[
-              {
-                value: settings.localTtsModelId,
-                label: getLocalModel(settings.localTtsModelId).name,
-              },
-            ]}
-            onChange={() => undefined}
-          />
-        </AntPickerSection>
-      ) : null}
-
-      {providerRouteActive ? (
-        <>
-          <AntPickerSection
-            title={t("ttsProvider")}
-            description={
-              <View style={styles.infoModalContent}>
-                <Text
-                  style={[styles.helperText, { color: colors.textSecondary }]}
-                >
-                  {t("ttsProviderEnabledHint")}
-                </Text>
-                {ttsLanguageNote ? (
-                  <Text
-                    style={[styles.helperText, { color: colors.textSecondary }]}
-                  >
-                    {t("languageCoverage", { note: ttsLanguageNote })}
-                  </Text>
-                ) : null}
-              </View>
-            }
-          >
-            <AntPickerRow
-              testID="tts-provider-picker"
-              label={
-                ttsProviderOptions.length > 1 ? t("ttsProvider") : undefined
-              }
-              value={settings.ttsProvider ?? ""}
-              options={ttsProviderOptions}
-              disabled={ttsProviderOptions.length === 0}
-              onChange={(value) => onUpdate({ ttsProvider: value as Provider })}
-            />
-            {selectedPreviewProvider &&
-            selectedPreviewProviderModelOptions.length > 0 ? (
-              <AntPickerRow
-                label={t("model")}
-                value={selectedPreviewProviderModel}
-                options={selectedPreviewProviderModelOptions.map((model) => ({
-                  value: model.id,
-                  label: model.name,
-                }))}
-                onChange={(value) =>
-                  onUpdateProviderTtsModel(selectedPreviewProvider, value)
-                }
-              />
-            ) : null}
-          </AntPickerSection>
-
-          <AntSettingsCard
-            title={t("ttsInstructions")}
-            headerExtra={
-              <AntSettingsInfoButton
-                accessibilityLabel={t("aboutSetting", {
-                  setting: t("ttsInstructions"),
-                })}
-                title={t("ttsInstructions")}
-              >
-                {t("ttsInstructionsDescription")}
-              </AntSettingsInfoButton>
-            }
-          >
-            {!instructionsSupported ? (
-              <Text
-                style={[styles.helperText, { color: colors.textSecondary }]}
-              >
-                {t("ttsInstructionsUnsupported")}
-              </Text>
-            ) : null}
-            <AntTextArea
-              value={settings.ttsInstructions}
-              placeholder={t("ttsInstructionsPlaceholder")}
-              disabled={!instructionsSupported}
-              onFocus={onTextInputFocus}
-              onChange={(value) => onUpdate({ ttsInstructions: value })}
-            />
-          </AntSettingsCard>
-
-          <AntProviderVoiceSection
-            provider={selectedPreviewProvider}
-            selectedLanguages={settings.ttsListenLanguages}
-            settings={settings}
-            previewTexts={providerPreviewTexts}
-            activePreview={activePreview}
-            onSetPreviewText={onSetProviderPreviewText}
-            onPreviewProvider={onPreviewProviderVoice}
-            onStopPreview={onStopPreviewVoice}
-            onUpdateProviderTtsVoice={onUpdateProviderTtsVoice}
-            providerVoiceDirectories={providerVoiceDirectories}
-            onTextInputFocus={onTextInputFocus}
-          />
-        </>
-      ) : null}
-
-      {nativeRouteActive ? (
-        <AntNativeVoiceSection
-          voiceOptions={nativeVoiceOptions}
-          selectedVoice={selectedNativeVoice}
-          previewText={nativePreviewText}
-          activePreview={activePreview}
-          onSelectVoice={onSelectNativeVoice}
-          onSetPreviewText={onSetNativePreviewText}
-          onPreview={onPreviewNativeVoice}
-          onStopPreview={onStopPreviewVoice}
-          onTextInputFocus={onTextInputFocus}
-        />
-      ) : null}
-
-      {showKokoroSection ? (
-        <AntKokoroVoiceSection
-          settings={settings}
-          model={kokoroModel}
-          previewTexts={kokoroPreviewTexts}
-          activePreview={activePreview}
-          onUpdateVoice={(previewLanguage, voice) =>
-            onUpdate({
-              kokoroVoices: {
-                ...settings.kokoroVoices,
-                [previewLanguage]: voice,
-              },
-            })
+        <SettingsRow
+          testID="speaking-instructions-row"
+          icon="edit"
+          label={t("ttsInstructions")}
+          last
+          disabled={!instructionsSupported}
+          supporting={
+            instructionsSupported ? undefined : t("ttsInstructionsUnsupported")
           }
-          onSetPreviewText={onSetKokoroPreviewText}
-          onPreview={onPreviewKokoroVoice}
-          onStopPreview={onStopPreviewVoice}
-          onTextInputFocus={onTextInputFocus}
+          value={
+            settings.ttsInstructions.trim()
+              ? t("providerStatusConfigured")
+              : t("settingsReadinessOff")
+          }
+          onPress={() => setInstructionsVisible(true)}
         />
-      ) : null}
+      </SettingsGroup>
 
-      <AntSettingsCard title={t("speechReplayCache")}>
-        <Text style={[styles.helperText, { color: colors.textSecondary }]}>
-          {t("speechReplayCacheDescription")}
-        </Text>
-        <Button
+      <LocalModelRouteGroup
+        capability="tts"
+        title={t("whoSpeaks")}
+        footer={t("voiceOutputDescription")}
+        freeProviderRoutes={allTtsProviders}
+        isPremium={isPremium}
+        localModels={localModels}
+        localSub={kokoroVoiceRow}
+        nativeSub={
+          localModels.nativeVoiceOptions.length > 0 ? (
+            <SettingsRow
+              testID="settings-tts-native-voice"
+              label={t("ttsVoice")}
+              last
+              value={selectedVoiceLabel(
+                localModels.nativeVoiceOptions,
+                localModels.selectedNativeVoice,
+              )}
+              onPress={() => setVoicePicker({ kind: "native" })}
+            />
+          ) : null
+        }
+        onOpenPremium={onOpenPremium}
+        premiumCopy={t("premiumDescription")}
+        settings={settings}
+        providerRoutes={selectableTtsProviders.map((provider) => ({
+          provider,
+          model: providerModel(provider),
+          modelOptions: getProviderTtsModelOptions(provider),
+          selected:
+            settings.ttsMode === "provider" &&
+            settings.ttsProvider === provider,
+          sub: providerVoiceRow(provider),
+          onModelChange: (model: string) =>
+            onUpdateProviderTtsModel(provider, model),
+          onSelect: () =>
+            onUpdate({
+              spokenRepliesEnabled: true,
+              ttsMode: "provider",
+              ttsProvider: provider,
+            }),
+        }))}
+      />
+
+      <SettingsGroup
+        title={t("autoSetupFactStorage")}
+        footer={t("speechReplayCacheDescription")}
+      >
+        <SettingsRow
           testID="clear-speech-replay-cache"
-          size="small"
-          type="ghost"
+          control={null}
+          danger
           disabled={isClearingSpeechCache}
-          style={StyleSheet.flatten([
-            styles.compactButton,
-            { alignSelf: "flex-start", borderColor: colors.border },
-          ])}
-          onPress={() => {
-            void handleClearSpeechCache();
-          }}
-          accessibilityLabel={t("clearSpeechReplayCache")}
-        >
-          <AntButtonLabel
-            color={colors.accent}
-            icon="delete"
-            label={t("clearSpeechReplayCache")}
-          />
-        </Button>
-      </AntSettingsCard>
+          icon="delete"
+          label={t("clearSpeechReplayCache")}
+          last
+          onPress={() => void handleClearSpeechCache()}
+        />
+      </SettingsGroup>
+
+      <InstructionsSheet
+        visible={instructionsVisible}
+        value={settings.ttsInstructions}
+        onTextInputFocus={onTextInputFocus}
+        onChange={(ttsInstructions) => onUpdate({ ttsInstructions })}
+        onClose={() => setInstructionsVisible(false)}
+      />
+      <VoicePickerSheet
+        testID="speaking-voice-picker"
+        visible={voicePicker !== null}
+        title={voiceRouteTitle}
+        options={voiceOptions}
+        value={selectedVoice}
+        busyValue={busyVoice}
+        directoryStatus={directoryStatus}
+        onRefresh={refreshVoices}
+        onSelect={handleVoiceSelect}
+        onPreview={handleVoicePreview}
+        onClose={() => setVoicePicker(null)}
+      />
     </View>
   );
 }
+
+const pageStyles = StyleSheet.create({
+  overlay: {
+    flex: 1,
+    justifyContent: "flex-end",
+  },
+  instructionsSheet: {
+    borderTopLeftRadius: 22,
+    borderTopRightRadius: 22,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderBottomWidth: 0,
+  },
+  handle: {
+    width: 38,
+    height: 4,
+    borderRadius: 2,
+    alignSelf: "center",
+    marginTop: 10,
+  },
+  sheetHeader: {
+    minHeight: 58,
+    paddingLeft: 18,
+    paddingRight: 8,
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  sheetTitle: {
+    flex: 1,
+    fontFamily: fonts.display,
+    fontSize: 17,
+    lineHeight: 22,
+  },
+  instructionsHint: {
+    marginHorizontal: 18,
+    marginBottom: 10,
+    fontFamily: fonts.body,
+    fontSize: 12,
+    lineHeight: 17,
+  },
+  instructionsInput: {
+    marginHorizontal: 18,
+  },
+});

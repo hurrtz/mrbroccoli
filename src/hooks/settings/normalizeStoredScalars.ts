@@ -288,10 +288,10 @@ export function normalizeStoredScalarSettings(
       REPLY_PLAYBACK_OPTIONS,
       DEFAULT_SETTINGS.replyPlayback,
     ),
-    spokenRepliesEnabled: getStoredBoolean(
-      storedSettings?.spokenRepliesEnabled,
-      DEFAULT_SETTINGS.spokenRepliesEnabled,
-    ),
+    // Speaking always has exactly one route in the current product model.
+    // Migrate the retired text-only toggle forward instead of leaving users
+    // silently stuck with a hidden false value.
+    spokenRepliesEnabled: true,
     ttsListenLanguages: getStoredTtsListenLanguages(
       storedSettings?.ttsListenLanguages,
       language,

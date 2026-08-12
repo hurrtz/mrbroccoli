@@ -97,7 +97,6 @@ export type SettingsPage =
 
 export const PREMIUM_SETTINGS_PAGES = [
   "thinking",
-  "speaking",
 ] as const satisfies readonly SettingsPage[];
 
 export function isPremiumSettingsPage(page: SettingsPage) {

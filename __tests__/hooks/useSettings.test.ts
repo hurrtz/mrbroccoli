@@ -166,6 +166,20 @@ describe("useSettings", () => {
     });
   });
 
+  it("migrates the retired text-only toggle to an active speaking route", async () => {
+    (AsyncStorage.getItem as jest.Mock).mockResolvedValueOnce(
+      JSON.stringify({
+        ...DEFAULT_SETTINGS,
+        spokenRepliesEnabled: false,
+      }),
+    );
+
+    const { result } = renderHook(() => useSettings());
+    await flushSettingsLoad();
+
+    expect(result.current.settings.spokenRepliesEnabled).toBe(true);
+  });
+
   it("preserves large Uber Mode rounds without imposing a product cap", async () => {
     (AsyncStorage.getItem as jest.Mock).mockResolvedValueOnce(
       JSON.stringify({

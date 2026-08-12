@@ -69,8 +69,19 @@ the complete Play Store translations are kept in a dedicated file under
   uses a clear Nobody route followed by provider routes and shows quality
   controls only for the active provider; both pages preserve the same structure
   in Free while cloud routes remain visibly locked.
+- Speaking now follows the same single-route design: playback and delivery
+  instructions lead into one System, downloaded, or provider voice list.
+  Download and device-test actions stay beside local voices, selected routes
+  expose a searchable voice sheet with exact-voice previews, and replay-cache
+  cleanup lives in its own Storage group. Free keeps the same page with cloud
+  voices visibly locked, and old text-only settings migrate to an active speech
+  route.
 
 ### Fixed
+
+- Keep compatible downloaded speech models visible when the system recognizer
+  cannot report its own on-device eligibility, and show only the speech route
+  the app will actually use in Free mode.
 
 - Open conversation or Speaking settings from the transcript without freezing
   iPhone: the transcript sheet now finishes dismissing before the next settings

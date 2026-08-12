@@ -40,14 +40,11 @@ function getInitialSettingsPage({
   if (focusPage && (isPremium || !isPremiumSettingsPage(focusPage))) {
     return focusPage;
   }
-  if (!isPremium) {
-    return "overview";
-  }
   if (focusProvider || focusCatalogProviderId || focusTab === "providers") {
     return "connections";
   }
   if (focusTab === "instructions") {
-    return "thinking";
+    return isPremium ? "thinking" : "overview";
   }
   if (focusTab === "stt") {
     return "listening";

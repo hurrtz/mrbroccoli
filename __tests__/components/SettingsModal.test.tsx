@@ -1,7 +1,6 @@
 import React from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {
-  Alert,
   FlatList,
   Modal as NativeModal,
   Platform,
@@ -38,6 +37,10 @@ import {
   resetRuntimeCapabilityOverridesForTests,
 } from "../../src/services/runtimeCapabilityOverrides";
 import { createAutoSetupJob } from "../test-utils/autoSetupJobFixture";
+import { getLocalCatalogInstallStatuses } from "../../src/services/offlineProfileManager";
+import {
+  getLocalModelBenchmarkResults,
+} from "../../src/services/localDeviceCapabilities";
 
 const NativeDialogType = NativeDialog as unknown as React.ComponentType<any>;
 const hiddenIconQuery = { includeHiddenElements: true } as const;
@@ -95,6 +98,32 @@ jest.mock("../../src/services/speech/diagnostics", () => ({
 jest.mock("../../src/services/offlineProfileManager", () => ({
   getLocalCatalogInstallStatuses: jest.fn(async () => ({})),
 }));
+
+jest.mock("../../src/services/localDeviceCapabilities", () => {
+  const actual = jest.requireActual(
+    "../../src/services/localDeviceCapabilities",
+  );
+  return {
+    ...actual,
+    getLocalModelBenchmarkResults: jest.fn(async () => ({})),
+    probeLocalDeviceCapabilities: jest.fn(async () => ({
+      version: 1,
+      capturedAt: "2026-08-13T08:00:00.000Z",
+      platform: "ios",
+      physicalMemoryBytes: 8 * 1024 ** 3,
+      availableMemoryBytes: 6 * 1024 ** 3,
+      freeStorageBytes: 48 * 1024 ** 3,
+      totalStorageBytes: 128 * 1024 ** 3,
+      processorCount: 8,
+      activeProcessorCount: 8,
+      architecture: "arm64",
+      osVersion: "26.6",
+      lowPowerMode: false,
+      memoryLow: false,
+      thermalState: "nominal",
+    })),
+  };
+});
 
 jest.mock("../../src/components/ProviderIcon", () => ({
   ProviderIcon: ({ label, provider }: { label?: string; provider: string }) => {
@@ -175,6 +204,8 @@ describe("SettingsModal", () => {
     await AsyncStorage.removeItem(RUNTIME_CAPABILITY_OVERRIDES_STORAGE_KEY);
     resetRuntimeCapabilityOverridesForTests();
     jest.mocked(useSpeechDiagnostics).mockReturnValue([]);
+    jest.mocked(getLocalCatalogInstallStatuses).mockResolvedValue({});
+    jest.mocked(getLocalModelBenchmarkResults).mockResolvedValue({});
     jest.restoreAllMocks();
   });
 
@@ -498,14 +529,10 @@ describe("SettingsModal", () => {
     });
   });
 
-  it("offers the optional Kokoro model and downloads it from Speaking settings", async () => {
+  it("downloads optional local voices from the unified Speaking route list", async () => {
     const download = jest.fn(async () => true);
     const screen = renderSettingsModal({
       focusTab: "tts",
-      settings: {
-        ...DEFAULT_SETTINGS,
-        ttsMode: "kokoro",
-      },
       kokoroModel: {
         installed: false,
         verified: false,
@@ -520,41 +547,34 @@ describe("SettingsModal", () => {
     });
 
     await waitFor(() => {
-      expect(screen.getByText("Kokoro On-device Voices")).toBeTruthy();
-      expect(
-        screen.queryByText(
-          "The multilingual model downloads about 140 MB and occupies about 211 MB after installation.",
-        ),
-      ).toBeNull();
-      expect(
-        screen.getByText(
-          "Download and verify the model before selecting or using Kokoro. No provider key is required.",
-        ),
-      ).toBeTruthy();
-      expect(screen.getByTestId("kokoro-language-card-en")).toBeTruthy();
-      expect(screen.queryByText("TTS Voice")).toBeNull();
+      expect(screen.getByText("Playback")).toBeTruthy();
+      expect(screen.getByText("Who speaks")).toBeTruthy();
+      expect(screen.getByTestId("settings-tts-route-kokoro-multilingual")).toBeTruthy();
+      expect(screen.getByTestId("settings-tts-route-piper-en-us-kristin")).toBeTruthy();
+      expect(screen.queryByText("Spoken Replies")).toBeNull();
+      expect(screen.queryByText("Fallback routes")).toBeNull();
     });
 
-    fireEvent.press(screen.getByLabelText("About Kokoro On-device Voices"));
-    expect(
-      screen.getByText(
-        "The multilingual model downloads about 140 MB and occupies about 211 MB after installation.",
-      ),
-    ).toBeTruthy();
-    act(() =>
-      screen.UNSAFE_getByType(NativeDialogType).props.footer[0].onPress(),
+    fireEvent.press(
+      screen.getByTestId("local-model-download-kokoro-multilingual"),
     );
-
-    fireEvent.press(screen.getByLabelText("Expand English voice settings"));
-    expect(screen.getByText("TTS Voice")).toBeTruthy();
-
-    fireEvent.press(screen.getByLabelText("Download the Kokoro model"));
-    expect(download).toHaveBeenCalledTimes(1);
+    await waitFor(() => expect(download).toHaveBeenCalledTimes(1));
   });
 
-  it("shows Kokoro removal above Settings and removes only after confirmation", async () => {
-    const remove = jest.fn(async () => true);
-    const alert = jest.spyOn(Alert, "alert");
+  it("opens a searchable Kokoro voice sheet and previews the tapped voice", async () => {
+    jest.mocked(getLocalCatalogInstallStatuses).mockResolvedValue({
+      "kokoro-multilingual": {
+        installed: true,
+        path: "/models/kokoro",
+        verified: true,
+      },
+    });
+    jest.mocked(getLocalModelBenchmarkResults).mockResolvedValue({
+      "kokoro-multilingual": {
+        status: "viable",
+      },
+    } as never);
+    const onPreviewVoice = jest.fn(async () => undefined);
     const screen = renderSettingsModal({
       focusTab: "tts",
       settings: {
@@ -570,185 +590,92 @@ describe("SettingsModal", () => {
         error: null,
         download: jest.fn(async () => true),
         refresh: jest.fn(async () => undefined),
-        remove,
-      },
-    });
-
-    await waitFor(() => {
-      expect(screen.getByLabelText("Remove the Kokoro model")).toBeTruthy();
-    });
-
-    fireEvent.press(screen.getByLabelText("Remove the Kokoro model"));
-
-    expect(alert).toHaveBeenCalledWith(
-      "Remove the Kokoro model?",
-      "This frees about 211 MB. You can download the model again at any time.",
-      expect.any(Array),
-    );
-    expect(remove).not.toHaveBeenCalled();
-
-    const buttons = alert.mock.calls[0][2];
-    const removeButton = buttons?.find((button) => button.text === "Remove");
-
-    act(() => {
-      removeButton?.onPress?.();
-    });
-
-    expect(remove).toHaveBeenCalledTimes(1);
-  });
-
-  it("selects Kokoro before its async download completes", async () => {
-    let finishDownload: (installed: boolean) => void = () => undefined;
-    const download = jest.fn(
-      () =>
-        new Promise<boolean>((resolve) => {
-          finishDownload = resolve;
-        }),
-    );
-    const onUpdate = jest.fn();
-    const alert = jest.spyOn(Alert, "alert");
-    const screen = renderSettingsModal({
-      focusTab: "tts",
-      settings: {
-        ...DEFAULT_SETTINGS,
-        ttsMode: "native",
-      },
-      kokoroModel: {
-        installed: false,
-        verified: false,
-        busy: null,
-        phase: null,
-        progress: 0,
-        error: null,
-        download,
-        refresh: jest.fn(async () => undefined),
         remove: jest.fn(async () => true),
       },
-      onUpdate,
+      onPreviewVoice,
     });
 
     await waitFor(() => {
-      expect(screen.getByText("Kokoro")).toBeTruthy();
+      expect(screen.getByTestId("settings-tts-kokoro-voice")).toBeTruthy();
     });
+    fireEvent.press(screen.getByTestId("settings-tts-kokoro-voice"));
+    expect(screen.getByTestId("speaking-voice-picker-search")).toBeTruthy();
+    expect(
+      screen.getAllByText("Maple · American female").length,
+    ).toBeGreaterThan(0);
 
-    fireEvent.press(screen.getByText("Kokoro"));
-
-    expect(onUpdate).not.toHaveBeenCalled();
-    expect(alert).toHaveBeenCalledWith(
-      "Kokoro",
-      "Download and verify the model before selecting or using Kokoro. No provider key is required.",
-      expect.any(Array),
+    fireEvent.press(screen.getByTestId("speaking-voice-picker-preview-af_sol"));
+    await waitFor(() =>
+      expect(onPreviewVoice).toHaveBeenCalledWith(
+        expect.objectContaining({
+          mode: "kokoro",
+          voice: "af_sol",
+        }),
+        expect.any(Object),
+      ),
     );
-
-    const buttons = alert.mock.calls[0][2];
-    const downloadButton = buttons?.find(
-      (button) => button.text === "Download",
-    );
-
-    act(() => {
-      downloadButton?.onPress?.();
-    });
-
-    expect(download).toHaveBeenCalledTimes(1);
-    expect(onUpdate).toHaveBeenCalledWith({ ttsMode: "kokoro" });
-
-    await act(async () => {
-      finishDownload(true);
-      await Promise.resolve();
-    });
   });
 
-  it("keeps provider fallbacks empty until the user adds one", async () => {
+  it("edits delivery instructions in a focused sheet only for a supporting route", async () => {
     const onUpdate = jest.fn();
     const screen = renderSettingsModal({
       focusTab: "tts",
       settings: {
         ...DEFAULT_SETTINGS,
+        apiKeys: {
+          ...DEFAULT_SETTINGS.apiKeys,
+          openai: "configured-openai-key",
+        },
         ttsMode: "provider",
-      },
-      onUpdate,
-    });
-
-    await waitFor(() => {
-      expect(screen.getByText("Fallback routes")).toBeTruthy();
-      expect(
-        screen.getByText(
-          "No fallback is configured. A voice failure will be shown instead.",
-        ),
-      ).toBeTruthy();
-    });
-
-    fireEvent.press(screen.getByLabelText("Add Kokoro fallback"));
-
-    expect(onUpdate).toHaveBeenCalledWith({
-      ttsFallbackPolicy: {
-        provider: ["kokoro"],
-        kokoro: [],
-        local: [],
-      },
-    });
-  });
-
-  it("shows and reorders both explicit provider fallback routes", async () => {
-    const onUpdate = jest.fn();
-    const screen = renderSettingsModal({
-      focusTab: "tts",
-      settings: {
-        ...DEFAULT_SETTINGS,
-        ttsMode: "provider",
-        ttsFallbackPolicy: {
-          provider: ["kokoro", "native"],
-          kokoro: [],
-          local: [],
+        ttsProvider: "openai",
+        providerTtsModels: {
+          ...DEFAULT_SETTINGS.providerTtsModels,
+          openai: "gpt-4o-mini-tts",
         },
       },
       onUpdate,
     });
 
     await waitFor(() => {
-      expect(screen.getByText("1. Kokoro")).toBeTruthy();
-      expect(screen.getByText("2. System voice")).toBeTruthy();
+      expect(
+        screen.getByTestId("speaking-instructions-row").props
+          .accessibilityState,
+      ).toMatchObject({ disabled: false });
     });
-
-    fireEvent.press(screen.getByLabelText("Move System voice earlier"));
-
+    expect(screen.queryByTestId("speaking-instructions-input")).toBeNull();
+    fireEvent.press(screen.getByTestId("speaking-instructions-row"));
+    fireEvent.changeText(
+      screen.getByTestId("speaking-instructions-input"),
+      "Speak warmly.",
+    );
     expect(onUpdate).toHaveBeenCalledWith({
-      ttsFallbackPolicy: {
-        provider: ["native", "kokoro"],
-        kokoro: [],
-        local: [],
-      },
+      ttsInstructions: "Speak warmly.",
     });
   });
 
-  it("offers provider and native fallbacks for Kokoro but none for native speech", async () => {
-    const kokoroScreen = renderSettingsModal({
+  it("keeps the Speaking structure visible to Free users with provider routes locked", async () => {
+    const screen = renderSettingsModal({
       focusTab: "tts",
-      settings: {
-        ...DEFAULT_SETTINGS,
-        ttsMode: "kokoro",
-      },
+      isPremium: false,
     });
 
     await waitFor(() => {
-      expect(kokoroScreen.getByLabelText("Add Provider fallback")).toBeTruthy();
+      expect(screen.getByText("Playback")).toBeTruthy();
+      expect(screen.getByText("Who speaks")).toBeTruthy();
       expect(
-        kokoroScreen.getByLabelText("Add System voice fallback"),
+        screen.getByTestId("settings-tts-route-provider-openai"),
       ).toBeTruthy();
+      expect(screen.getByText("Unlock Premium")).toBeTruthy();
     });
-    kokoroScreen.unmount();
-
-    const nativeScreen = renderSettingsModal({
-      focusTab: "tts",
-      settings: {
-        ...DEFAULT_SETTINGS,
-        ttsMode: "native",
-      },
-    });
-
-    await waitFor(() => {
-      expect(nativeScreen.queryByText("Fallback routes")).toBeNull();
-    });
+    expect(
+      screen.getByLabelText("OpenAI").props.accessibilityState,
+    ).toMatchObject({ disabled: true });
+    expect(
+      screen.getByLabelText("System voice").props.accessibilityState,
+    ).toMatchObject({ checked: true });
+    expect(
+      screen.getByLabelText("Kokoro · On-device AI").props.accessibilityState,
+    ).toMatchObject({ checked: false });
   });
 
   it("keeps provider connections in runtime-manifest order", async () => {
@@ -1545,37 +1472,21 @@ describe("SettingsModal", () => {
     });
 
     await waitFor(() => {
-      expect(screen.getAllByText("TTS Provider")).toHaveLength(1);
-      expect(screen.getByText("Mistral voice library")).toBeTruthy();
-      expect(screen.getByText("2 voices available from Mistral.")).toBeTruthy();
-      expect(screen.getByText("Calm Guide · calm-guide")).toBeTruthy();
+      expect(
+        screen.getByTestId("settings-tts-provider-mistral-voice"),
+      ).toBeTruthy();
+      expect(screen.getByText("Calm Guide")).toBeTruthy();
     });
 
-    expect(
-      StyleSheet.flatten(
-        screen.getByTestId("tts-provider-picker-value").props.style,
-      ).textAlign,
-    ).toBe("right");
-    const providerVoicePicker = screen.getByTestId(
-      "provider-tts-voice-picker-mistral",
-    );
-    expect(
-      StyleSheet.flatten(providerVoicePicker.props.style).marginHorizontal,
-    ).toBe(0);
+    fireEvent.press(screen.getByTestId("settings-tts-provider-mistral-voice"));
+    expect(screen.getByText("2 voices available from Mistral.")).toBeTruthy();
+    expect(screen.getByText("Studio Voice")).toBeTruthy();
 
-    fireEvent.press(screen.getByLabelText("Expand English voice settings"));
-    expect(
-      screen.getByLabelText("Collapse English voice settings"),
-    ).toBeTruthy();
-
-    fireEvent.press(screen.getByTestId("mistral-voices-refresh"));
+    fireEvent.press(screen.getByTestId("speaking-voice-picker-refresh"));
     expect(onRefreshMistralVoices).toHaveBeenCalledTimes(1);
 
-    fireEvent.press(providerVoicePicker);
     fireEvent.press(
-      screen.getByTestId(
-        "provider-tts-voice-picker-mistral-option-studio-voice",
-      ),
+      screen.getByTestId("speaking-voice-picker-option-studio-voice"),
     );
 
     expect(onUpdateProviderTtsVoice).toHaveBeenCalledWith(
@@ -1584,7 +1495,7 @@ describe("SettingsModal", () => {
     );
   });
 
-  it("keeps manual Mistral slug entry available after directory errors", async () => {
+  it("keeps the current Mistral voice available after directory errors", async () => {
     const onUpdateProviderTtsVoice = jest.fn();
     const screen = renderSettingsModal({
       focusTab: "tts",
@@ -1596,6 +1507,10 @@ describe("SettingsModal", () => {
         },
         ttsMode: "provider",
         ttsProvider: "mistral",
+        providerTtsVoices: {
+          ...DEFAULT_SETTINGS.providerTtsVoices,
+          mistral: "custom-voice",
+        },
       },
       providerVoiceDirectories: {
         mistral: {
@@ -1608,24 +1523,18 @@ describe("SettingsModal", () => {
       onUpdateProviderTtsVoice,
     });
 
-    await waitFor(() => {
+    await waitFor(() =>
       expect(
-        screen.getByText(
-          "Voices could not be refreshed. Your current selection is unchanged; you can still enter a voice ID manually.",
-        ),
-      ).toBeTruthy();
-      expect(screen.getByPlaceholderText("Enter a voice ID")).toBeTruthy();
-    });
-
-    fireEvent.changeText(
-      screen.getByPlaceholderText("Enter a voice ID"),
-      " custom-voice ",
+        screen.getByTestId("settings-tts-provider-mistral-voice"),
+      ).toBeTruthy(),
     );
-
-    expect(onUpdateProviderTtsVoice).toHaveBeenCalledWith(
-      "mistral",
-      "custom-voice",
-    );
+    fireEvent.press(screen.getByTestId("settings-tts-provider-mistral-voice"));
+    expect(screen.getAllByText("custom-voice").length).toBeGreaterThan(0);
+    expect(
+      screen.getByText(/Voices could not be refreshed/),
+    ).toBeTruthy();
+    expect(screen.getByText(/Reason: Network unavailable/)).toBeTruthy();
+    expect(onUpdateProviderTtsVoice).not.toHaveBeenCalled();
   });
 
   it("offers discovered ElevenLabs account voices and refreshes them", async () => {
@@ -1680,20 +1589,23 @@ describe("SettingsModal", () => {
       onUpdateProviderTtsVoice,
     });
 
-    await waitFor(() => {
-      expect(screen.getByText("ElevenLabs voice library")).toBeTruthy();
+    await waitFor(() =>
       expect(
-        screen.getByText("2 voices available from ElevenLabs."),
-      ).toBeTruthy();
-      expect(screen.getByText("Alex · British · male")).toBeTruthy();
-    });
+        screen.getByTestId("settings-tts-provider-elevenlabs-voice"),
+      ).toBeTruthy(),
+    );
+    fireEvent.press(
+      screen.getByTestId("settings-tts-provider-elevenlabs-voice"),
+    );
+    expect(screen.getByText("2 voices available from ElevenLabs.")).toBeTruthy();
+    expect(screen.getAllByText("Alex").length).toBeGreaterThan(0);
+    expect(screen.getByText("British · male · premade")).toBeTruthy();
 
-    fireEvent.press(screen.getByTestId("elevenlabs-voices-refresh"));
+    fireEvent.press(screen.getByTestId("speaking-voice-picker-refresh"));
     expect(refresh).toHaveBeenCalledTimes(1);
 
-    fireEvent.press(screen.getByTestId("provider-tts-voice-picker-elevenlabs"));
     fireEvent.press(
-      screen.getByTestId("provider-tts-voice-picker-elevenlabs-option-voice-2"),
+      screen.getByTestId("speaking-voice-picker-option-voice-2"),
     );
 
     expect(onUpdateProviderTtsVoice).toHaveBeenCalledWith(
@@ -1728,23 +1640,18 @@ describe("SettingsModal", () => {
       },
     });
 
-    await waitFor(() => {
-      expect(screen.getByText("Rachel (built-in)")).toBeTruthy();
+    await waitFor(() =>
       expect(
-        screen.getByText(
-          "Account voices could not be loaded. The built-in voice remains available.",
-        ),
-      ).toBeTruthy();
-      expect(
-        screen.getByText("Reason: Missing voices_read permission"),
-      ).toBeTruthy();
-      expect(
-        screen.getByText(
-          "In ElevenLabs, edit this API key and enable Voices → Read, then refresh here.",
-        ),
-      ).toBeTruthy();
-      expect(screen.queryByPlaceholderText("Enter a voice ID")).toBeNull();
-    });
+        screen.getByTestId("settings-tts-provider-elevenlabs-voice"),
+      ).toBeTruthy(),
+    );
+    fireEvent.press(
+      screen.getByTestId("settings-tts-provider-elevenlabs-voice"),
+    );
+    expect(screen.getAllByText("Rachel (built-in)").length).toBeGreaterThan(0);
+    expect(screen.getByText(/Account voices could not be loaded/)).toBeTruthy();
+    expect(screen.getByText(/Reason: Missing voices_read permission/)).toBeTruthy();
+    expect(screen.getByText(/enable Voices → Read/)).toBeTruthy();
   });
 
   it("shows partial ElevenLabs permissions per capability without failing usable speech", async () => {

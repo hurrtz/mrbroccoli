@@ -208,6 +208,11 @@ language checks occur before execution.
 - Native recognition is preferred when it satisfies the selected on-device
   policy.
 - Downloaded speech models are selected from the curated local catalogue.
+- Speaking Settings renders System, compatible downloaded voices, and enabled
+  providers as one radio group. Local downloads and benchmarks happen in that
+  group, while the selected route's voice opens a searchable modal list with
+  exact-voice preview. A native-recognition eligibility failure cannot suppress
+  otherwise compatible downloadable STT or TTS models.
 - Android native capture writes mono 16 kHz PCM WAV so the captured file is a
   valid input to both downloaded Sherpa recognition and provider speech routes;
   metering is derived from the same PCM stream without retaining it in
@@ -221,9 +226,11 @@ language checks occur before execution.
 - Explicit paragraph pauses provide stable cadence without relying on
   engine-specific whitespace behavior.
 
-**Decision:** Voice character must never change silently. Provider and local
-fallbacks are ordered user choices, and each attempt is represented in speech
-diagnostics and the turn receipt.
+**Decision:** Voice character must never change silently. The current Settings
+surface offers one primary voice route and no fallback editor. If an older
+install carries an explicit ordered fallback policy, the runtime preserves it
+and represents each attempt in speech diagnostics and the turn receipt; it
+never creates an implicit fallback.
 
 ## On-Device Capability Design
 

@@ -52,7 +52,7 @@ describe("useVoicePreviewState", () => {
     });
 
     expect(hook.result.current.activePreview).toEqual({
-      id: "native",
+      id: "native:Samantha",
       phase: "playing",
     });
 
@@ -161,7 +161,7 @@ describe("useVoicePreviewState", () => {
     });
 
     expect(hook.result.current.activePreview).toEqual({
-      id: "kokoro:en",
+      id: "kokoro:en:af_maple",
       phase: "generating",
     });
 

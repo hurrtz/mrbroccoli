@@ -8,6 +8,7 @@ import { PremiumBand } from "../../src/features/settings/settings-primitives/Pre
 import { RouteOptionRow } from "../../src/features/settings/settings-primitives/RouteOptionRow";
 import { SettingsGroup } from "../../src/features/settings/settings-primitives/SettingsGroup";
 import { SettingsRow } from "../../src/features/settings/settings-primitives/SettingsRow";
+import { VoicePickerSheet } from "../../src/features/settings/settings-primitives/VoicePickerSheet";
 import { getLocalModel } from "../../src/constants/localModels";
 import { LocalizationProvider } from "../../src/i18n";
 import { ThemeProvider } from "../../src/theme/ThemeContext";
@@ -144,6 +145,34 @@ describe("settings design primitives", () => {
     ).toMatchObject({ height: 36, width: 36 });
     fireEvent.press(screen.getByTestId("test-model"));
     expect(onPress).toHaveBeenCalledTimes(1);
+  });
+
+  it("searches, selects, and previews voices inside the modal route picker", () => {
+    const onSelect = jest.fn();
+    const onPreview = jest.fn();
+    const screen = wrap(
+      <VoicePickerSheet
+        visible
+        testID="voice-picker"
+        title="Kokoro"
+        options={[
+          { value: "maple", label: "Maple", meta: "American · female" },
+          { value: "vale", label: "Vale", meta: "British · female" },
+        ]}
+        value="maple"
+        onClose={jest.fn()}
+        onSelect={onSelect}
+        onPreview={onPreview}
+      />,
+    );
+
+    fireEvent.changeText(screen.getByTestId("voice-picker-search"), "British");
+    expect(screen.queryByText("Maple")).toBeNull();
+    expect(screen.getByText("Vale")).toBeTruthy();
+    fireEvent.press(screen.getByTestId("voice-picker-option-vale"));
+    fireEvent.press(screen.getByTestId("voice-picker-preview-vale"));
+    expect(onSelect).toHaveBeenCalledWith("vale");
+    expect(onPreview).toHaveBeenCalledWith("vale");
   });
 
   it("keeps an installed local route unselectable until its device test passes", () => {

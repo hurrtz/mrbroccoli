@@ -106,6 +106,9 @@ boundary.
   or a capability-gated provider route.
 - Spoken replies may use system speech, downloaded Kokoro/Piper speech, or a
   capability-gated provider route.
+- Speaking Settings always keeps one speech route selected. Stored installs
+  from the retired text-only toggle migrate back to enabled spoken replies;
+  the transcript remains available independently of that voice route.
 - On iOS, native local-speech extraction accepts only empty, `.` or `./`
   archive-root records. Every data-bearing entry must be a relative regular
   file or directory with no traversal or links; direct validation runs before
@@ -120,8 +123,9 @@ boundary.
   NG data. Its iOS wrapper must treat a failed native TTS-engine creation as a
   recoverable JavaScript error, including when the wrapper object exists but
   its underlying engine handle is null.
-- TTS fallback routes are explicit, ordered, and opt-in. System speech has no
-  hidden fallback.
+- TTS fallback routes are explicit, ordered, and opt-in. The runtime may honor
+  a previously persisted policy, but current Settings does not expose a
+  fallback editor, and System speech has no hidden fallback.
 - Drive Session re-arms capture only through its explicit session state and is
   designed for hands-free use, interruption, background continuation, and
   native remote controls.

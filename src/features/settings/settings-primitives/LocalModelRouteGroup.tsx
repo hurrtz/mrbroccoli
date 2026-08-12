@@ -21,6 +21,7 @@ export type ProviderRouteOption = {
   model: string;
   modelOptions?: readonly { id: string; name: string }[];
   selected: boolean;
+  sub?: React.ReactNode;
   onModelChange?: (model: string) => void;
   onSelect: () => void;
 };
@@ -133,7 +134,9 @@ export function LocalModelRouteGroup({
   footer,
   freeProviderRoutes,
   isPremium,
+  localSub,
   localModels,
+  nativeSub,
   onOpenPremium,
   premiumCopy,
   providerRoutes,
@@ -144,7 +147,9 @@ export function LocalModelRouteGroup({
   footer: string;
   freeProviderRoutes: readonly Provider[];
   isPremium: boolean;
+  localSub?: (model: LocalModelDefinition) => React.ReactNode;
   localModels: LocalModelSettingsController;
+  nativeSub?: React.ReactNode;
   onOpenPremium: () => void;
   premiumCopy: string;
   providerRoutes: readonly ProviderRouteOption[];
@@ -186,6 +191,7 @@ export function LocalModelRouteGroup({
         }
         selected={nativeSelected}
         onSelect={() => localModels.selectNativeRoute(capability)}
+        sub={nativeSelected ? nativeSub : null}
         last={++rowIndex === finalRowCount && isPremium}
       />
       {models.map((model) => {
@@ -210,6 +216,7 @@ export function LocalModelRouteGroup({
             }
             onSelect={() => localModels.selectModel(model)}
             removeLabel={`${t("remove")}: ${model.name}`}
+            sub={localModels.isModelSelected(model) ? localSub?.(model) : null}
             last={++rowIndex === finalRowCount && isPremium}
           />
         );
@@ -232,21 +239,25 @@ export function LocalModelRouteGroup({
           selected={route.selected}
           onSelect={route.onSelect}
           sub={
-            route.selected &&
-            route.model &&
-            route.modelOptions?.length &&
-            route.onModelChange ? (
-              <SettingsChoiceRow
-                testID={`settings-${capability}-provider-${route.provider}-model`}
-                label={t("model")}
-                last
-                options={route.modelOptions.map(({ id, name }) => ({
-                  value: id,
-                  label: name,
-                }))}
-                value={route.model}
-                onChange={route.onModelChange}
-              />
+            route.selected ? (
+              <>
+                {route.model &&
+                route.modelOptions?.length &&
+                route.onModelChange ? (
+                  <SettingsChoiceRow
+                    testID={`settings-${capability}-provider-${route.provider}-model`}
+                    label={t("model")}
+                    last={!route.sub}
+                    options={route.modelOptions.map(({ id, name }) => ({
+                      value: id,
+                      label: name,
+                    }))}
+                    value={route.model}
+                    onChange={route.onModelChange}
+                  />
+                ) : null}
+                {route.sub}
+              </>
             ) : null
           }
           last={++rowIndex === finalRowCount && isPremium}

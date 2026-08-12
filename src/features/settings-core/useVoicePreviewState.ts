@@ -123,8 +123,13 @@ export function useVoicePreviewState(params: {
   );
 
   const handlePreviewProviderVoice = useCallback(
-    async (provider: Provider, previewLanguage: TtsListenLanguage) => {
+    async (
+      provider: Provider,
+      previewLanguage: TtsListenLanguage,
+      voiceOverride?: string,
+    ) => {
       const selectedVoice =
+        voiceOverride ||
         settings.providerTtsVoices[provider] ||
         PROVIDER_DEFAULT_TTS_VOICES[provider] ||
         getProviderTtsVoiceOptions(
@@ -135,14 +140,17 @@ export function useVoicePreviewState(params: {
         )[0]?.id ||
         "";
 
-      await handleExactPreview(`provider:${provider}:${previewLanguage}`, {
+      await handleExactPreview(
+        `provider:${provider}:${previewLanguage}:${selectedVoice}`,
+        {
         text: providerPreviewTexts[provider][previewLanguage],
         mode: "provider",
         provider,
         voice: selectedVoice,
         instructions: settings.ttsInstructions,
         previewLanguage,
-      });
+        },
+      );
     },
     [
       handleExactPreview,
@@ -154,11 +162,12 @@ export function useVoicePreviewState(params: {
     ],
   );
 
-  const handlePreviewNativeVoice = useCallback(async () => {
-    await handleExactPreview("native", {
+  const handlePreviewNativeVoice = useCallback(async (voiceOverride?: string) => {
+    const voice = voiceOverride || selectedNativeVoice || undefined;
+    await handleExactPreview(`native:${voice ?? "default"}`, {
       text: nativePreviewText,
       mode: "native",
-      nativeVoice: selectedNativeVoice || undefined,
+      nativeVoice: voice,
       previewLanguage: settings.ttsListenLanguages[0] ?? "en",
     });
   }, [
@@ -169,12 +178,13 @@ export function useVoicePreviewState(params: {
   ]);
 
   const handlePreviewKokoroVoice = useCallback(
-    async (previewLanguage: KokoroLanguage) => {
-      await handleExactPreview(`kokoro:${previewLanguage}`, {
+    async (previewLanguage: KokoroLanguage, voiceOverride?: string) => {
+      const voice = voiceOverride || settings.kokoroVoices[previewLanguage];
+      await handleExactPreview(`kokoro:${previewLanguage}:${voice}`, {
         text: kokoroPreviewTexts[previewLanguage],
         mode: "kokoro",
         language: previewLanguage,
-        voice: settings.kokoroVoices[previewLanguage],
+        voice,
       });
     },
     [handleExactPreview, kokoroPreviewTexts, settings.kokoroVoices],
