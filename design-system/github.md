@@ -10,7 +10,7 @@ date: 2026-08-10
 - Added automatic on-device setup: `AutoSetupCard`, `AutoSetupPlanRow`, `InstallProgress`, `BackgroundTaskBar`.
 - `IntroFlow` gained an `auto` step — `INTRO_STEPS` is seven ids, not six.
 - On-device AI settings leads with the automatic card; the catalogue section is now "Installed and available".
-- `migration-goal.md` gained phase 6 for this feature; the old blanket "do not touch on-device downloads" is now an explicit exception.
+- Design docs restructured: normative spec now lives in `guidelines/surfaces/*.md`; `migration-goal.md` and `explorations/` retired after absorption.
 
 ## Sync history
 
@@ -36,7 +36,7 @@ date: 2026-08-10
 | `components/chat/**` | `src/components/ChatBubble.tsx`, `ChatTranscript.tsx`, `MessageImageAttachments.tsx`, `conversationDrawer/ConversationDrawerItem.tsx` |
 | `components/brand/ProviderIcon.jsx` | `src/components/ProviderIcon.tsx`, `assets/providers/` |
 | `components/on-device/LocalModelPerformanceSummary.jsx` | `src/components/LocalModelPerformanceSummary.tsx` |
-| `components/on-device/AutoSetup*`, `InstallProgress.jsx` | New — no upstream source. Implement per `migration-goal.md` phase 6 against `src/features/settings/pages/OnDevicePage`, the on-device model catalogue and the download machinery. |
+| `components/on-device/AutoSetup*`, `InstallProgress.jsx` | New — no upstream source. Implement per `guidelines/surfaces/on-device.md` against `src/features/settings/pages/OnDevicePage`, the on-device model catalogue and the download machinery. |
 | `components/workspace/BackgroundTaskBar.jsx` | New — no upstream source. Home screen, `src/screens/main/**`. |
 | `components/intro/IntroFlow.jsx` `auto` step | New — no upstream source. `src/features/intro/**`. |
 | `ui_kits/mobile-app/**` | `src/screens/main/**`, `src/features/settings/pages/**` |

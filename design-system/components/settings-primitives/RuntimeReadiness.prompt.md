@@ -17,7 +17,7 @@ Never tint the label to match its dot. Gold on the warm off-white measures 4.35:
 
 ## No affordance chrome
 
-The rows carry no underline, border or fill. On a settings screen everything is tappable, and the line's whole value is that it is quiet — link chrome spends exactly what it is there to provide. Explored in `explorations/runtime-readiness.html`, where the underlined and boxed variants sit beside this one.
+The rows carry no underline, border or fill. On a settings screen everything is tappable, and the line's whole value is that it is quiet — link chrome spends exactly what it is there to provide. Underlined and boxed variants were explored and rejected; the reasoning is summarised in `guidelines/surfaces/settings.md`.
 
 ## Not a stepper, and not in a card
 

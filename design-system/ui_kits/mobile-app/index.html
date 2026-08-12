@@ -19,6 +19,7 @@ body{margin:0;background:#8f8d86;display:flex;align-items:flex-start;justify-con
 </head><body>
 <div><p class="caption">Light</p><div class="device" id="light" data-theme="light"></div></div>
 <div><p class="caption">Dark</p><div class="device" id="dark" data-theme="dark"></div></div>
+<div><p class="caption">In conversation · transcript open</p><div class="device" id="conversation" data-theme="dark"></div></div>
 <div><p class="caption">Landscape</p><div class="device land" id="landscape" data-theme="light"></div></div>
 <script type="text/babel" src="./Workspace.jsx"></script>
 <script type="text/babel" src="../settings/SettingsFrame.jsx"></script>
@@ -34,7 +35,7 @@ const SETTINGS_PAGES = () => ({
   listening: window.ListeningPage, speaking: window.SpeakingPage, local: window.OnDevicePage,
   data: window.DataPrivacyPage, app: window.AppPage,
 });
-function App({ initialRoute, failInstall }){
+function App({ initialRoute, failInstall, initialTranscript }){
   const [route,setRoute]=React.useState(initialRoute||"workspace");
   const [conversation,setConversation]=React.useState(window.MB_DATA.conversations[0]);
   const [toast,setToast]=React.useState(null);
@@ -54,7 +55,7 @@ function App({ initialRoute, failInstall }){
     <div className="status"><span>9:41</span><span>Mr Broccoli</span><span>100%</span></div>
     <div className="screen">
       {route==="workspace" ? <window.Workspace conversationTitle={conversation.title} toast={toast}
-        onDismissToast={()=>setToast(null)} auto={auto} introVisible={intro} onIntroVisible={setIntro}
+        onDismissToast={()=>setToast(null)} auto={auto} introVisible={intro} onIntroVisible={setIntro} initialTranscript={initialTranscript}
         onOpenLocalModels={()=>{setIntro(false);setRoute("local");}}
         onOpenDrawer={()=>setRoute("drawer")} onOpenSettings={()=>setRoute("settings")} /> : null}
       {route==="drawer" ? <window.ConversationDrawerScreen activeId={conversation.id}
@@ -69,6 +70,7 @@ function App({ initialRoute, failInstall }){
 }
 ReactDOM.createRoot(document.getElementById("light")).render(<App initialRoute="workspace" />);
 ReactDOM.createRoot(document.getElementById("dark")).render(<App initialRoute="local" failInstall />);
+ReactDOM.createRoot(document.getElementById("conversation")).render(<App initialRoute="workspace" initialTranscript />);
 ReactDOM.createRoot(document.getElementById("landscape")).render(<>
   <div className="status"><span>9:41</span><span>Mr Broccoli</span><span>100%</span></div>
   <div className="screen"><window.LandscapeWorkspace conversationTitle="Tide tables" onOpenDrawer={()=>{}} onOpenSettings={()=>{}} /></div>

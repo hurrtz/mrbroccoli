@@ -1,7 +1,7 @@
 const { AppWordmark, IconButton, PhosphorIcon, RouteByline, VoiceOrb, OrbSatellite,
         ConversationSettingsSummary, WorkspaceStatusLine, TranscriptHandle,
         ChatBubble, ChatTranscript, Toast, Modal, ProviderIcon, BackgroundTaskBar,
-        IntroBanner, IntroFlow } = window.MrBroccoliDesignSystem_62d510;
+        IntroBanner, IntroFlow, RoutePicker, Composer } = window.MrBroccoliDesignSystem_62d510;
 
 const ASSETS = "../../assets/providers";
 const ORB = 196;
@@ -43,37 +43,6 @@ const PHASE_SCRIPT = [
   { phase: "speaking", title: "Speaking", detail: "Tap the orb to stop", ms: 2600, turn: 1 },
 ];
 
-/** The sheet the byline opens. Escalation is a list, cheapest at the top. */
-function RoutePicker({ visible, onClose, modes, selected, onSelect }) {
-  return (
-    <Modal inline visible={visible} onClose={onClose} layout="sheet" title="Answer the next turn with"
-      footer={[{ text: "Done", onPress: onClose }]}>
-      <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-        {modes.map((mode) => {
-          const active = mode.id === selected;
-          return (
-            <div key={mode.id} role="radio" aria-checked={active} onClick={() => { onSelect(mode.id); onClose(); }}
-              style={{ display: "flex", alignItems: "center", gap: 12, minHeight: 60, padding: "10px 12px", cursor: "pointer",
-                borderRadius: "var(--mb-radius-panel)",
-                border: "1px solid " + (active ? "var(--mb-color-border-strong)" : "var(--mb-color-border)"),
-                background: active ? "var(--mb-color-accent-soft)" : "var(--mb-color-surface)" }}>
-              {mode.local
-                ? <PhosphorIcon name="cpu" size="feature" color="var(--mb-color-text)" />
-                : <ProviderIcon provider={mode.provider} label={mode.providerLabel} size="feature" color="var(--mb-color-text)" assetBase={ASSETS} />}
-              <span style={{ flex: 1, minWidth: 0, display: "flex", flexDirection: "column", gap: 1 }}>
-                <span style={{ fontFamily: "var(--mb-font-body)", fontSize: 10, lineHeight: "13px", fontWeight: 600, letterSpacing: "0.6px", textTransform: "uppercase", color: "var(--mb-color-text-secondary)" }}>{mode.providerLabel}</span>
-                <span style={{ fontFamily: "var(--mb-font-display)", fontWeight: 600, fontSize: 15, lineHeight: "20px", color: "var(--mb-color-text)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{mode.modelLabel}</span>
-                <span style={{ fontFamily: "var(--mb-font-mono)", fontSize: 11, lineHeight: "16px", color: "var(--mb-color-text-muted)" }}>{mode.effortLabel}</span>
-              </span>
-              {active ? <PhosphorIcon name="check" size="control" color="var(--mb-color-accent)" /> : null}
-            </div>
-          );
-        })}
-      </div>
-    </Modal>
-  );
-}
-
 function useTurnScript(onCommit) {
   const [step, setStep] = React.useState(-1);
   const [progress, setProgress] = React.useState(0);
@@ -111,29 +80,6 @@ function SwipeArrow({ direction, enabled, label, onPress }) {
         cursor: enabled ? "pointer" : "default", opacity: enabled ? 1 : 0.22 }}>
       <PhosphorIcon name={direction} size="control" color="var(--mb-color-text-muted)" />
     </span>
-  );
-}
-
-/** Page two of the pager. Fills the orb's slot so the controls below never move. */
-function TextComposer({ value, onChange, onSend, height = ORB }) {
-  return (
-    <div style={{ width: "100%", height, display: "flex", flexDirection: "column", justifyContent: "flex-end",
-      borderRadius: 15, borderWidth: 1.5, borderStyle: "solid", borderColor: "var(--mb-color-accent)",
-      background: "var(--mb-color-surface)", padding: "8px 9px 8px 16px", gap: 10,
-      boxShadow: "0 4px 12px var(--mb-color-glow)" }}>
-      <textarea value={value} onChange={(event) => onChange(event.target.value)} placeholder="Type a message"
-        aria-label="Message"
-        style={{ flex: 1, minHeight: 24, width: "100%", resize: "none", border: "none", outline: "none", background: "transparent",
-          fontFamily: "var(--mb-font-body)", fontSize: 15, lineHeight: "21px", color: "var(--mb-color-text)", padding: 0 }} />
-      <div style={{ display: "flex", justifyContent: "flex-end" }}>
-        <span role="button" aria-label="Send" onClick={value ? onSend : undefined}
-          style={{ width: 46, height: 46, borderRadius: 23, flexShrink: 0, cursor: value ? "pointer" : "default",
-            display: "flex", alignItems: "center", justifyContent: "center",
-            background: value ? "var(--mb-color-accent)" : "var(--mb-color-surface-alt)" }}>
-          <PhosphorIcon name="arrow-up" size="control" color={value ? "var(--mb-color-on-active-control)" : "var(--mb-color-text-muted)"} />
-        </span>
-      </div>
-    </div>
   );
 }
 
@@ -200,14 +146,14 @@ function AutoSetupIndicator({ auto, onOpen }) {
   return null;
 }
 
-function Workspace({ onOpenDrawer, onOpenSettings, onOpenLocalModels, conversationTitle, toast, onDismissToast, auto, introVisible, onIntroVisible }) {
+function Workspace({ onOpenDrawer, onOpenSettings, onOpenLocalModels, conversationTitle, toast, onDismissToast, auto, introVisible, onIntroVisible, initialTranscript }) {
   const conversation = useConversation();
   const turn = useTurnScript(conversation.commit);
   const [surface, setSurface] = React.useState("voice");
   const [draft, setDraft] = React.useState("");
   const [council, setCouncil] = React.useState(false);
   const [web, setWeb] = React.useState(true);
-  const [transcript, setTranscript] = React.useState(false);
+  const [transcript, setTranscript] = React.useState(!!initialTranscript);
   const [banner, setBanner] = React.useState(true);
   const [localIntro, setLocalIntro] = React.useState(false);
   const intro = introVisible === undefined ? localIntro : introVisible;
@@ -245,7 +191,7 @@ function Workspace({ onOpenDrawer, onOpenSettings, onOpenLocalModels, conversati
               {surface === "voice"
                 ? <VoiceOrb size={orbSize} phase={turn.current ? turn.current.phase : "idle"}
                     phaseProgress={turn.phaseProgress} turnProgress={turn.turnProgress} onPress={turn.start} />
-                : <TextComposer value={draft} onChange={setDraft} onSend={send} height={orbSize} />}
+                : <Composer value={draft} onChange={setDraft} onSend={send} height={orbSize} />}
             </div>
             <SwipeArrow direction="right" enabled={surface === "voice"} label="Show text input" onPress={() => setSurface("text")} />
           </div>
@@ -271,7 +217,7 @@ function Workspace({ onOpenDrawer, onOpenSettings, onOpenLocalModels, conversati
         preview={last ? last.text : null} onPress={() => setTranscript(true)} />
 
       <RoutePicker visible={conversation.picking} onClose={() => conversation.setPicking(false)}
-        modes={window.MB_DATA.modes} selected={conversation.mode} onSelect={conversation.setMode} />
+        routes={window.MB_DATA.modes} selected={conversation.mode} onSelect={conversation.setMode} assetBase={ASSETS} />
 
       <TranscriptSheet visible={transcript} title={conversationTitle}
         messages={conversation.messages} onClose={() => setTranscript(false)} />
@@ -366,7 +312,7 @@ function LandscapeWorkspace({ onOpenDrawer, onOpenSettings, onOpenLocalModels, c
         </ChatTranscript>
       </div>
       <RoutePicker visible={conversation.picking} onClose={() => conversation.setPicking(false)}
-        modes={window.MB_DATA.modes} selected={conversation.mode} onSelect={conversation.setMode} />
+        routes={window.MB_DATA.modes} selected={conversation.mode} onSelect={conversation.setMode} assetBase={ASSETS} />
 
       <IntroFlow visible={intro} onClose={() => setIntro(false)} onOpenStt={onOpenSettings} onOpenTts={onOpenSettings} />
     </div>
