@@ -69,6 +69,12 @@ settings, history, setup, receipts, and diagnostics are secondary surfaces so
 the default experience remains voice-first even though expert controls remain
 available.
 
+Native secondary surfaces never present a sibling modal during teardown. A
+cross-surface action queues its destination, dismisses any nested sheet and its
+parent in order, then drains the queue from the native dismissal callback; a
+bounded timer supplies the equivalent handoff on Android, where React Native
+does not deliver `Modal.onDismiss`.
+
 ## Voice-Turn Flow
 
 ```mermaid

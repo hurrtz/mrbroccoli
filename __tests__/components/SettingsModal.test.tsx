@@ -155,6 +155,7 @@ function renderSettingsModal(
         <SettingsModal
           visible
           isPremium
+          archivedConversationCount={0}
           developmentEntitlementMode={null}
           settings={DEFAULT_SETTINGS}
           autoSetup={createAutoSetupJob()}
@@ -173,6 +174,7 @@ function renderSettingsModal(
           onStopPreviewVoice={jest.fn(async () => undefined)}
           onValidateProviderCapability={jest.fn(async () => undefined)}
           onOpenPremium={jest.fn()}
+          onOpenArchivedConversations={jest.fn()}
           onSetDevelopmentEntitlementMode={jest.fn(async () => undefined)}
           conversationArchive={{
             chooseDirectory: jest.fn(async () => undefined),
@@ -372,7 +374,7 @@ describe("SettingsModal", () => {
     expect(screen.queryByTestId("settings-overview-row-local")).toBeNull();
   });
 
-  it("keeps Free data and app settings focused on usable controls", async () => {
+  it("keeps the complete Data and App structure visible in Free", async () => {
     const onUpdate = jest.fn();
     const screen = renderSettingsModal({ isPremium: false, onUpdate });
 
@@ -381,9 +383,10 @@ describe("SettingsModal", () => {
     await waitFor(() => {
       expect(screen.getByText("App data backup")).toBeTruthy();
     });
-    expect(screen.queryByText("Past conversation knowledge")).toBeNull();
-    expect(screen.queryByText("AI conversation archive")).toBeNull();
-    expect(screen.queryByText("Unlock Premium")).toBeNull();
+    expect(screen.getByText("Past conversation knowledge")).toBeTruthy();
+    expect(screen.getByText("Archived conversations")).toBeTruthy();
+    expect(screen.getByText("Storage · 0 MB in models")).toBeTruthy();
+    expect(screen.getByText("Premium")).toBeTruthy();
 
     fireEvent.press(screen.getByLabelText("Back to overview"));
     fireEvent.press(screen.getByTestId("settings-overview-row-app"));
@@ -393,13 +396,13 @@ describe("SettingsModal", () => {
     });
     expect(screen.getByText("Theme")).toBeTruthy();
     expect(screen.getByText("Recent Speech Activity")).toBeTruthy();
-    expect(screen.queryByText("Usage Stats")).toBeNull();
-    expect(screen.getByLabelText("About Debug Log Button")).toBeTruthy();
-    fireEvent.press(screen.getByTestId("settings-debug-log-button-show"));
+    expect(screen.getByText("Usage stats in transcripts")).toBeTruthy();
+    expect(screen.getByText("Automatic setup")).toBeTruthy();
+    fireEvent.press(screen.getByTestId("settings-debug-log-button"));
     expect(onUpdate).toHaveBeenCalledWith({ showDebugLogButton: true });
     expect(
-      screen.queryByTestId("runtime-compatibility-overrides-section"),
-    ).toBeNull();
+      screen.getByTestId("runtime-compatibility-overrides-section"),
+    ).toBeTruthy();
   });
 
   it("lets Free users disconnect an archive configured before downgrade", async () => {
@@ -422,11 +425,12 @@ describe("SettingsModal", () => {
     fireEvent.press(screen.getByTestId("settings-overview-row-data"));
 
     await waitFor(() => {
-      expect(
-        screen.getByTestId("disconnect-conversation-archive"),
-      ).toBeTruthy();
+      expect(screen.getByTestId("archived-conversations-row")).toBeTruthy();
     });
-    expect(screen.queryByText("Unlock Premium")).toBeNull();
+    fireEvent.press(screen.getByTestId("archived-conversations-row"));
+    expect(
+      screen.getByTestId("disconnect-conversation-archive"),
+    ).toBeTruthy();
 
     fireEvent.press(screen.getByTestId("disconnect-conversation-archive"));
     expect(disconnect).toHaveBeenCalledTimes(1);
@@ -439,13 +443,14 @@ describe("SettingsModal", () => {
 
     await waitFor(() => {
       expect(screen.getByText("App data backup")).toBeTruthy();
-      expect(screen.getByTestId("export-readable-backup")).toBeTruthy();
       expect(screen.getByTestId("export-encrypted-backup")).toBeTruthy();
       expect(screen.getByTestId("import-app-data-backup")).toBeTruthy();
       expect(
         screen.getByText(/Provider API keys are never included/),
       ).toBeTruthy();
     });
+    fireEvent.press(screen.getByTestId("export-encrypted-backup"));
+    expect(screen.getByTestId("export-readable-backup")).toBeTruthy();
   });
 
   it("routes Android system back through settings navigation before closing", async () => {
@@ -1301,8 +1306,8 @@ describe("SettingsModal", () => {
       expect(screen.getByText("Theme")).toBeTruthy();
       expect(screen.getByTestId("app-settings-page-en")).toBeTruthy();
       expect(screen.getByTestId("app-language-picker")).toBeTruthy();
-      expect(screen.getByText("Usage Stats")).toBeTruthy();
-      expect(screen.getByLabelText("About Debug Log Button")).toBeTruthy();
+      expect(screen.getByText("Usage stats in transcripts")).toBeTruthy();
+      expect(screen.getByText("Debug Log Button")).toBeTruthy();
       expect(
         screen.queryByText(
           "How to use the button: toggling it on will start capturing logs. Toggling it off will stop capturing logs and move the captured ones into the clipboard.",
@@ -1318,10 +1323,8 @@ describe("SettingsModal", () => {
       APP_LANGUAGE_OPTIONS,
     );
     expect(screen.getByTestId("app-language-picker-option-uk")).toBeTruthy();
-    fireEvent.press(screen.getByTestId("app-language-picker-close"));
-    expect(
-      StyleSheet.flatten(languagePicker!.props.style).marginHorizontal,
-    ).toBe(0);
+    fireEvent.press(screen.getByTestId("app-language-picker-option-en"));
+    expect(screen.queryByTestId("app-language-picker-sheet")).toBeNull();
   });
 
   it("shows the entitlement simulator only for a .dev app variant", async () => {
@@ -1347,14 +1350,20 @@ describe("SettingsModal", () => {
     fireEvent.press(developmentScreen.getByLabelText("Open App & diagnostics"));
     await waitFor(() => {
       expect(
-        developmentScreen.getByTestId("development-entitlement-mode-free").props
-          .accessibilityState,
-      ).toEqual({ checked: true, disabled: false });
+        developmentScreen.getByTestId("development-entitlement-mode"),
+      ).toBeTruthy();
     });
-    expect(developmentScreen.getByText("Development entitlement")).toBeTruthy();
+    expect(
+      developmentScreen.getAllByText("Development entitlement").length,
+    ).toBeGreaterThan(0);
 
     fireEvent.press(
-      developmentScreen.getByTestId("development-entitlement-mode-premium"),
+      developmentScreen.getByTestId("development-entitlement-mode"),
+    );
+    fireEvent.press(
+      developmentScreen.getByTestId(
+        "development-entitlement-mode-option-premium",
+      ),
     );
     expect(onSetDevelopmentEntitlementMode).toHaveBeenCalledWith("premium");
   });
@@ -1737,6 +1746,7 @@ describe("SettingsModal", () => {
     await waitFor(() => {
       expect(screen.getByText("Recent Speech Activity")).toBeTruthy();
     });
+    fireEvent.press(screen.getByTestId("speech-diagnostics-row"));
 
     const clearAction = screen.getByLabelText("Clear recent speech activity");
     expect(
@@ -1800,9 +1810,12 @@ describe("SettingsModal", () => {
 
     await waitFor(() => {
       expect(screen.getByText("Runtime compatibility")).toBeTruthy();
-      expect(
-        screen.getByText("OpenAI · LLM · gpt-5.6-sol · high"),
-      ).toBeTruthy();
+    });
+    fireEvent.press(
+      screen.getByTestId("runtime-compatibility-overrides-section"),
+    );
+    await waitFor(() => {
+      expect(screen.getByText("LLM · gpt-5.6-sol · high")).toBeTruthy();
     });
 
     fireEvent.press(screen.getByLabelText("Clear runtime compatibility"));
@@ -1818,7 +1831,7 @@ describe("SettingsModal", () => {
     });
     await waitFor(() => {
       expect(
-        screen.queryByText("OpenAI · LLM · gpt-5.6-sol · high"),
+        screen.queryByText("LLM · gpt-5.6-sol · high"),
       ).toBeNull();
     });
   });

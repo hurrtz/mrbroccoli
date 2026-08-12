@@ -26,6 +26,7 @@ import { useConversationIntegrityController } from "./conversationDrawer/useConv
 
 export const ConversationDrawer = React.memo(function ConversationDrawer({
   visible,
+  archivedInitiallyExpanded = false,
   conversations,
   activeId,
   onSearchConversations,
@@ -145,6 +146,7 @@ export const ConversationDrawer = React.memo(function ConversationDrawer({
           <ConversationDrawerList
             activeId={activeId}
             allConversations={conversations}
+            archivedInitiallyExpanded={archivedInitiallyExpanded}
             compact={isLandscape}
             conversations={controller.visibleConversations}
             searchQuery={controller.searchQuery}

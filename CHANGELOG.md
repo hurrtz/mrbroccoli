@@ -76,6 +76,11 @@ the complete Play Store translations are kept in a dedicated file under
   cleanup lives in its own Storage group. Free keeps the same page with cloud
   voices visibly locked, and old text-only settings migrate to an active speech
   route.
+- Data & privacy now follows the approved grouped layout for conversation
+  knowledge, archived conversations, backup and restore, and downloaded-model
+  storage. App & diagnostics now brings automatic setup, appearance, home-screen
+  switches, speech diagnostics, and runtime compatibility into the same compact
+  row-and-sheet vocabulary.
 
 ### Fixed
 
@@ -86,6 +91,9 @@ the complete Play Store translations are kept in a dedicated file under
 - Open conversation or Speaking settings from the transcript without freezing
   iPhone: the transcript sheet now finishes dismissing before the next settings
   surface is presented.
+- Open Archived conversations from Data & privacy without freezing iPhone: the
+  archive sheet and Settings now finish dismissing in order before the sessions
+  drawer opens with Archived expanded.
 - Make Tap to Speak and Drive Session treat an orb tap as one toggle instead of
   immediately stopping the recording as a too-short hold. Swiping from the orb
   to the message field also leaves the keyboard closed until the field is

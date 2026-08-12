@@ -3,6 +3,7 @@ import type { ConversationIntegrityInspection } from "../../services/conversatio
 
 export interface ConversationDrawerProps {
   visible: boolean;
+  archivedInitiallyExpanded?: boolean;
   conversations: ConversationMeta[];
   activeId: string | null;
   onSearchConversations: (query: string) => Promise<ConversationMeta[]>;

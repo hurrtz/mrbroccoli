@@ -74,7 +74,9 @@ receive already-derived state and callbacks.
   and opens as a sheet over the workspace; in landscape it stays inline in the
   right pane. Actions inside the portrait sheet that open conversation or
   Speaking settings dismiss the transcript completely before presenting the
-  sibling modal.
+  sibling modal. The same sequencing applies in reverse: Data & privacy closes
+  its archive sheet and Settings before opening the sessions drawer at the
+  expanded Archived group.
 - Provider, model, listening, speaking, fallback, and usage labels describe the
   effective route, not merely the last picker interaction.
 - A user can interrupt or cancel an active turn without a late callback
@@ -153,8 +155,9 @@ The automatic setup step carries the shared `AutoSetupCard` with its header
 hidden — the step title and body already say what it is. The job behind it
 lives above every screen that shows it (`useAutoSetupJob` at the composition
 root): the introduction's step, the top of On-device AI settings, and the
-home-screen `BackgroundTaskBar` are three views of one state, so leaving the
-introduction mid-install keeps the download running and reachable. Its six
+App & diagnostics setup group plus the home-screen `BackgroundTaskBar` are
+views of one state, so leaving the introduction mid-install keeps the download
+running and reachable. Its six
 states run offer → scanning → proposal → installing → done or failed; nothing
 downloads before the proposal has been seen; the staged ~2.5s measurement
   reveals only real device readings; a transfer failure keeps completed models
@@ -295,7 +298,9 @@ row fill, never a branch rail. Each row shows only title, pin/privacy state,
 date, visible message count, and one provider mark per model. Forks retain a
 small link to their root session. Search stays docked at the bottom, and the
 row action sheet owns automatic naming, archive, privacy, memory, integrity,
-share/copy, and destructive actions.
+share/copy, and destructive actions. Data & privacy may open the drawer with
+Archived already expanded; this is an explicit landing state, not a persisted
+change to the user's normal drawer layout.
 
 Branching creates a new conversation through the conversation hook; the screen
 must not splice or overwrite the current transcript. Deleting or restoring a

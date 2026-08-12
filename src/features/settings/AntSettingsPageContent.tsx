@@ -118,7 +118,9 @@ export function AntSettingsPageContent({
   const localModels = useLocalModelSettings({
     active:
       props.visible &&
-      (activePage === "listening" || activePage === "speaking"),
+      (activePage === "listening" ||
+        activePage === "speaking" ||
+        activePage === "data"),
     isPremium: props.isPremium,
     kokoroModel,
     onPreviewVoice: props.onPreviewVoice,
@@ -288,7 +290,7 @@ export function AntSettingsPageContent({
       return (
         <DrillInPage page="app">
           <AppSettingsPage
-            isPremium={props.isPremium}
+            autoSetup={props.autoSetup}
             developmentEntitlementMode={props.developmentEntitlementMode}
             settings={settings}
             speechDiagnostics={controller.speechDiagnostics}
@@ -303,10 +305,15 @@ export function AntSettingsPageContent({
       return (
         <DrillInPage page="data">
           <DataPrivacySettingsPage
+            archivedConversationCount={props.archivedConversationCount}
             isPremium={props.isPremium}
+            localModels={localModels}
             settings={settings}
             onUpdate={onUpdate}
             onOpenPremium={props.onOpenPremium}
+            onOpenArchivedConversations={
+              props.onOpenArchivedConversations
+            }
             conversationArchive={props.conversationArchive}
             onCreateAppDataBackup={props.onCreateAppDataBackup}
             onRestoreAppDataBackup={props.onRestoreAppDataBackup}

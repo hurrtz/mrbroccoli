@@ -61,6 +61,55 @@ describe("useMainScreenUiState", () => {
     expect(result.current.settingsFocusPage).toBeUndefined();
   });
 
+  it("defers settings actions until the native modal has dismissed", () => {
+    const { result } = renderHook(() => useMainScreenUiState());
+    const action = jest.fn();
+
+    act(() => result.current.openSettings());
+    act(() => result.current.runAfterSettingsDismiss(action));
+
+    expect(result.current.settingsVisible).toBe(false);
+    expect(action).not.toHaveBeenCalled();
+
+    act(() => result.current.handleSettingsDismiss());
+    expect(action).toHaveBeenCalledTimes(1);
+  });
+
+  it("runs deferred settings actions without a native onDismiss event", () => {
+    jest.useFakeTimers();
+    try {
+      const { result } = renderHook(() => useMainScreenUiState());
+      const action = jest.fn();
+
+      act(() => result.current.openSettings());
+      act(() => result.current.runAfterSettingsDismiss(action));
+      act(() => jest.advanceTimersByTime(400));
+
+      expect(action).toHaveBeenCalledTimes(1);
+    } finally {
+      jest.useRealTimers();
+    }
+  });
+
+  it("does not run a settings action twice when iOS dismissal beats the fallback", () => {
+    jest.useFakeTimers();
+    try {
+      const { result } = renderHook(() => useMainScreenUiState());
+      const action = jest.fn();
+
+      act(() => result.current.openSettings());
+      act(() => result.current.runAfterSettingsDismiss(action));
+      act(() => {
+        result.current.handleSettingsDismiss();
+        jest.advanceTimersByTime(400);
+      });
+
+      expect(action).toHaveBeenCalledTimes(1);
+    } finally {
+      jest.useRealTimers();
+    }
+  });
+
   it("defers drawer actions until dismissal when the drawer is open", () => {
     const { result } = renderHook(() => useMainScreenUiState());
     const action = jest.fn();

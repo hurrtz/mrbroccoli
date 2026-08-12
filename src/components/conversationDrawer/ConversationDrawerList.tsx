@@ -13,6 +13,7 @@ import { styles } from "./styles";
 interface ConversationDrawerListProps {
   activeId: string | null;
   allConversations?: ConversationMeta[];
+  archivedInitiallyExpanded?: boolean;
   compact?: boolean;
   conversations: ConversationMeta[];
   searchQuery: string;
@@ -116,6 +117,7 @@ export function buildConversationDrawerEntries(params: {
 
 export function ConversationDrawerList({
   activeId,
+  archivedInitiallyExpanded = false,
   compact = false,
   conversations,
   allConversations = conversations,
@@ -126,7 +128,9 @@ export function ConversationDrawerList({
 }: ConversationDrawerListProps) {
   const { colors } = useTheme();
   const { locale, t } = useLocalization();
-  const [archivedOpen, setArchivedOpen] = React.useState(false);
+  const [archivedOpen, setArchivedOpen] = React.useState(
+    archivedInitiallyExpanded,
+  );
   const activeIsArchived = conversations.some(
     ({ archived, id }) => id === activeId && archived,
   );

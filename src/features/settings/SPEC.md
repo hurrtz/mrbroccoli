@@ -45,7 +45,8 @@ shared design system and settings primitives.
   inset-row vocabulary used by the approved native Settings design:
   `SettingsGroup`, `SettingsRow`, `SettingsChoiceRow`,
   `SettingsMultiChoiceRow`, `RouteOptionRow`, `LocalModelRouteGroup`,
-  `VoicePickerSheet`, `IconAction`, and `PremiumBand`.
+  `VoicePickerSheet`, `SettingsSheet`, `SettingsSwitch`,
+  `SettingsPillAction`, `IconAction`, and `PremiumBand`.
 - `settings-core/` owns reusable non-visual normalization, readiness,
   validation, voice-preview, local-model lifecycle, and controller behavior.
 
@@ -120,13 +121,21 @@ capability healthy. The UI shows the capability that was actually tested.
 - Search: a Nobody route plus search-provider routes, with result count, depth,
   and provider-specific search mode shown only for the active route. Nobody
   remains usable in both editions; Free keeps provider routes visibly locked.
-- Data & privacy: knowledge privacy, backup/restore, and Premium archives.
-- App & diagnostics: appearance, intro banner visibility, debug capture access,
-  runtime overrides, release information, and isolated entitlement simulation.
+- Data & privacy: the knowledge opt-in, archived-conversation entry point,
+  portable archive management, encrypted/readable backup and restore, and a
+  storage janitor that may remove or cancel local models without duplicating
+  their download and selection controls.
+- App & diagnostics: the shared automatic-setup job, appearance, intro and
+  transcript-usage visibility, debug capture access, speech diagnostics,
+  runtime overrides, and isolated entitlement simulation.
 
 ## Interaction Rules
 
 - Picker sheets remain above their parent modal.
+- A Settings action that opens a sibling modal first dismisses every nested
+  Settings sheet, then the Settings modal, and presents the destination only
+  after native dismissal. Android drains both handoffs through bounded
+  fallbacks because it does not deliver `Modal.onDismiss`.
 - Speaking always retains one active speech route. The retired spoken-replies
   toggle is migrated to enabled, while the runtime continues to honor only
   explicitly persisted fallback policies and never invents a hidden fallback.

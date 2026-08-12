@@ -287,6 +287,32 @@ describe("ConversationDrawer", () => {
     expect(visibleConversationIds()).toEqual(["two", "one", "archived"]);
   });
 
+  it("can open directly with archived sessions expanded", () => {
+    const archived: ConversationMeta = {
+      ...conversations[0],
+      id: "archived",
+      title: "Old research",
+      archived: true,
+    };
+    const screen = renderWithProviders(
+      <ConversationDrawerList
+        activeId="one"
+        archivedInitiallyExpanded
+        conversations={[conversations[0], archived]}
+        searchQuery=""
+        onDeleteConversation={jest.fn()}
+        onOpenActionConversation={jest.fn()}
+        onSelectConversation={jest.fn()}
+      />,
+    );
+
+    expect(
+      screen.getByTestId("conversation-section-archived").props
+        .accessibilityState,
+    ).toMatchObject({ expanded: true });
+    expect(screen.getByText("Old research")).toBeTruthy();
+  });
+
   it("tightens the empty state for a landscape drawer", () => {
     const screen = renderWithProviders(
       <ConversationDrawerList

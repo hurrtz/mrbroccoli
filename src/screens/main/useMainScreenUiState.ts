@@ -25,6 +25,7 @@ export function useMainScreenUiState() {
   const [memoryConversation, setMemoryConversation] =
     useState<Conversation | null>(null);
   const [memoryVisible, setMemoryVisible] = useState(false);
+  const pendingSettingsDismissActionRef = useRef<null | (() => void)>(null);
   const pendingDrawerDismissActionRef = useRef<null | (() => void)>(null);
   const pendingTranscriptDismissActionRef = useRef<null | (() => void)>(null);
 
@@ -64,6 +65,25 @@ export function useMainScreenUiState() {
     // focus target left behind here would send the next plain open to whatever
     // page the last deep link chose.
     setSettingsFocusPage(undefined);
+  }, []);
+
+  const runAfterSettingsDismiss = useCallback(
+    (action: () => void) => {
+      if (!settingsVisible) {
+        action();
+        return;
+      }
+
+      pendingSettingsDismissActionRef.current = action;
+      closeSettings();
+    },
+    [closeSettings, settingsVisible],
+  );
+
+  const handleSettingsDismiss = useCallback(() => {
+    const pendingAction = pendingSettingsDismissActionRef.current;
+    pendingSettingsDismissActionRef.current = null;
+    pendingAction?.();
   }, []);
 
   const openMemoryConversation = useCallback((conversation: Conversation) => {
@@ -144,6 +164,15 @@ export function useMainScreenUiState() {
   // is hidden; the delay leaves room for the native modal teardown, and the
   // ref is consumed atomically so an earlier iOS onDismiss wins harmlessly.
   useEffect(() => {
+    if (settingsVisible || !pendingSettingsDismissActionRef.current) {
+      return;
+    }
+
+    const timer = setTimeout(handleSettingsDismiss, 350);
+    return () => clearTimeout(timer);
+  }, [handleSettingsDismiss, settingsVisible]);
+
+  useEffect(() => {
     if (drawerVisible || !pendingDrawerDismissActionRef.current) {
       return;
     }
@@ -180,6 +209,8 @@ export function useMainScreenUiState() {
     openSettings,
     openCatalogSettings,
     closeSettings,
+    runAfterSettingsDismiss,
+    handleSettingsDismiss,
     openMemoryConversation,
     closeMemory,
     openStatusDetails,

@@ -72,6 +72,8 @@ export interface SettingsModalProps {
     capability: ProviderCapability,
   ) => Promise<void>;
   onOpenPremium: () => void;
+  archivedConversationCount: number;
+  onOpenArchivedConversations: () => void;
   conversationArchive: ConversationArchiveController;
   storePromoLocalDevicePreview?: boolean;
   onCreateAppDataBackup: () => Promise<AppDataBackupCreation>;
@@ -79,6 +81,7 @@ export interface SettingsModalProps {
     backup: AppDataBackup,
   ) => Promise<AppDataBackupRestoreResult>;
   onClose: () => void;
+  onDismiss?: () => void;
 }
 
 export type SettingsTab =

@@ -122,6 +122,11 @@ hides the sheet and queues the target until the native dismissal callback.
 Because React Native does not deliver that callback on Android, a bounded
 post-animation fallback drains the same single-consumer queue there. This keeps
 two sibling native modals from being presented concurrently.
+Data & privacy uses the same protocol in two stages when Archived conversations
+is selected: its nested archive sheet dismisses before invoking the
+Settings-to-drawer action, then Settings dismisses before the drawer opens with
+Archived initially expanded. Each stage consumes its pending callback once, so
+an iOS dismissal and the Android fallback cannot open the destination twice.
 
 `ChatTranscript` owns one expanded message ID. A conversation-key change clears
 it so restored history opens folded; appending a new message to the same

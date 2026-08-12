@@ -165,6 +165,10 @@ export function MainScreen() {
         .map((conversation) => conversation.id),
     [conversations],
   );
+  const archivedConversationCount = React.useMemo(
+    () => conversations.filter((conversation) => conversation.archived).length,
+    [conversations],
+  );
   const routeConfiguration = React.useMemo(
     () => getMainScreenRouteConfiguration(runtimeSettings, conversationsLoaded),
     [conversationsLoaded, runtimeSettings],
@@ -210,6 +214,8 @@ export function MainScreen() {
   });
 
   const [styleSheetVisible, setStyleSheetVisible] = React.useState(false);
+  const [drawerArchivedOnOpen, setDrawerArchivedOnOpen] =
+    React.useState(false);
   const {
     handleInputSurfaceChange,
     handleTextMessageChange,
@@ -231,6 +237,8 @@ export function MainScreen() {
     setMemoryConversation,
     openSettings,
     closeSettings,
+    runAfterSettingsDismiss,
+    handleSettingsDismiss,
     openMemoryConversation,
     closeMemory,
     openStatusDetails,
@@ -744,6 +752,20 @@ export function MainScreen() {
   const handleOpenTranscriptSpeakingSettings = React.useCallback(() => {
     runAfterTranscriptDismiss(handleOpenSpeakingSettings);
   }, [handleOpenSpeakingSettings, runAfterTranscriptDismiss]);
+  const handleOpenArchivedConversations = React.useCallback(() => {
+    runAfterSettingsDismiss(() => {
+      setDrawerArchivedOnOpen(true);
+      setDrawerVisible(true);
+    });
+  }, [runAfterSettingsDismiss, setDrawerVisible]);
+  const handleCloseConversationDrawer = React.useCallback(() => {
+    setDrawerArchivedOnOpen(false);
+    handleCloseDrawer();
+  }, [handleCloseDrawer]);
+  const handleConversationDrawerDismiss = React.useCallback(() => {
+    setDrawerArchivedOnOpen(false);
+    handleDrawerDismiss();
+  }, [handleDrawerDismiss]);
 
   useBatteryDiagnostics({
     isActive,
@@ -1159,6 +1181,7 @@ export function MainScreen() {
         ttsStatusLabel,
       }}
       settingsModal={{
+        archivedConversationCount,
         autoSetup,
         focusPage: settingsFocusPage,
         visible: settingsVisible,
@@ -1188,11 +1211,13 @@ export function MainScreen() {
         onOpenPremium: () => {
           setPremiumModalVisible(true);
         },
+        onOpenArchivedConversations: handleOpenArchivedConversations,
         onCreateAppDataBackup: handleCreateAppDataBackup,
         onRestoreAppDataBackup: handleRestoreAppDataBackup,
         conversationArchive,
         storePromoLocalDevicePreview: premiumStorePromoActive,
         onClose: closeSettings,
+        onDismiss: handleSettingsDismiss,
       }}
       premiumUpgrade={{
         visible: premiumModalVisible,
@@ -1209,6 +1234,7 @@ export function MainScreen() {
         onClose: closeMemory,
       }}
       conversationDrawer={{
+        archivedInitiallyExpanded: drawerArchivedOnOpen,
         visible: drawerVisible,
         conversations,
         activeId: activeConversation?.id || null,
@@ -1233,8 +1259,8 @@ export function MainScreen() {
           void handleTogglePrivate(id);
         },
         onDelete: handleDeleteConversation,
-        onClose: handleCloseDrawer,
-        onDismiss: handleDrawerDismiss,
+        onClose: handleCloseConversationDrawer,
+        onDismiss: handleConversationDrawerDismiss,
       }}
     />
   );

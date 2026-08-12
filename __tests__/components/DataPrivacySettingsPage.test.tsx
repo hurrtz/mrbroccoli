@@ -17,6 +17,7 @@ import {
 import { ThemeProvider } from "../../src/theme/ThemeContext";
 import { DEFAULT_SETTINGS } from "../../src/types";
 import type { ConversationArchiveController } from "../../src/hooks/useConversationArchive";
+import type { LocalModelSettingsController } from "../../src/features/settings-core/useLocalModelSettings";
 
 const NativeDialogType = NativeDialog as unknown as React.ComponentType<any>;
 
@@ -61,16 +62,35 @@ function renderPage(
     onUpdate?: React.ComponentProps<typeof DataPrivacySettingsPage>["onUpdate"];
     isPremium?: boolean;
     onOpenPremium?: () => void;
+    onOpenArchivedConversations?: () => void;
+    archivedConversationCount?: number;
+    localModels?: LocalModelSettingsController;
   } = {},
 ) {
+  const localModels =
+    overrides.localModels ??
+    ({
+      benchmarks: {},
+      busy: null,
+      cancelDownload: jest.fn(),
+      installs: {},
+      kokoroModel: { progress: 0 },
+      progress: {},
+      removeModel: jest.fn(async () => undefined),
+    } as unknown as LocalModelSettingsController);
   return render(
     <ThemeProvider mode="light">
       <LocalizationProvider language="en">
         <DataPrivacySettingsPage
+          archivedConversationCount={overrides.archivedConversationCount ?? 0}
           isPremium={overrides.isPremium ?? true}
+          localModels={localModels}
           settings={DEFAULT_SETTINGS}
           onUpdate={overrides.onUpdate ?? jest.fn()}
           onOpenPremium={overrides.onOpenPremium ?? jest.fn()}
+          onOpenArchivedConversations={
+            overrides.onOpenArchivedConversations ?? jest.fn()
+          }
           conversationArchive={
             overrides.conversationArchive ?? {
               chooseDirectory: jest.fn(async () => undefined),
@@ -112,6 +132,17 @@ function getVisibleModal(screen: ReturnType<typeof render>) {
     .find((modal) => modal.props.visible);
 }
 
+function openArchiveSheet(screen: ReturnType<typeof render>) {
+  fireEvent.press(screen.getByTestId("archived-conversations-row"));
+  expect(screen.getByTestId("archive-settings-sheet")).toBeTruthy();
+}
+
+function openReadableExport(screen: ReturnType<typeof render>) {
+  fireEvent.press(screen.getByTestId("export-encrypted-backup"));
+  expect(getVisibleModal(screen)?.props.title).toBe("Protect this backup");
+  fireEvent.press(screen.getByTestId("export-readable-backup"));
+}
+
 describe("DataPrivacySettingsPage", () => {
   beforeEach(() => {
     jest.clearAllMocks();
@@ -139,7 +170,10 @@ describe("DataPrivacySettingsPage", () => {
     const screen = renderPage({ onUpdate });
     const toggle = screen.getByLabelText("Use past conversation knowledge");
 
-    expect(toggle.props.value).toBe(false);
+    expect(toggle.props.accessibilityState).toEqual({
+      checked: false,
+      disabled: false,
+    });
     expect(
       screen.getByText(/Retrieved excerpts are sent to the model provider/),
     ).toBeTruthy();
@@ -147,7 +181,7 @@ describe("DataPrivacySettingsPage", () => {
       screen.getByText(/Private conversations are never indexed/),
     ).toBeTruthy();
 
-    fireEvent(toggle, "valueChange", true);
+    fireEvent.press(toggle);
 
     expect(onUpdate).toHaveBeenCalledWith({
       pastConversationKnowledgeEnabled: true,
@@ -167,6 +201,8 @@ describe("DataPrivacySettingsPage", () => {
       syncing: false,
     };
     const screen = renderPage({ conversationArchive });
+
+    openArchiveSheet(screen);
 
     expect(screen.getByText("AI conversation archive")).toBeTruthy();
     expect(screen.getByText("Folder: Mr Broccoli Archive")).toBeTruthy();
@@ -197,6 +233,8 @@ describe("DataPrivacySettingsPage", () => {
       },
     });
 
+    openArchiveSheet(screen);
+
     expect(screen.getByRole("alert").props.children).toBe(
       "Folder access was lost. Choose the archive folder again.",
     );
@@ -204,18 +242,22 @@ describe("DataPrivacySettingsPage", () => {
     expect(chooseDirectory).toHaveBeenCalledTimes(1);
   });
 
-  it("hides Premium knowledge and archive operations in Free", () => {
+  it("keeps Premium knowledge and archive routes visible but gated in Free", () => {
     const onOpenPremium = jest.fn();
     const screen = renderPage({ isPremium: false, onOpenPremium });
 
     expect(
-      screen.queryByLabelText("Use past conversation knowledge"),
-    ).toBeNull();
+      screen.getByLabelText("Use past conversation knowledge"),
+    ).toBeTruthy();
+    expect(screen.queryByTestId("past-conversation-knowledge-switch")).toBeNull();
+    fireEvent.press(screen.getByLabelText("Use past conversation knowledge"));
+
+    openArchiveSheet(screen);
     expect(
       screen.queryByTestId("choose-conversation-archive-folder"),
     ).toBeNull();
-    expect(screen.queryByText("Unlock Premium")).toBeNull();
-    expect(onOpenPremium).not.toHaveBeenCalled();
+    fireEvent.press(screen.getByLabelText("AI conversation archive"));
+    expect(onOpenPremium).toHaveBeenCalledTimes(2);
   });
 
   it("still lets a Free user disconnect a previously configured archive", () => {
@@ -235,9 +277,66 @@ describe("DataPrivacySettingsPage", () => {
       },
     });
 
+    openArchiveSheet(screen);
     fireEvent.press(screen.getByTestId("disconnect-conversation-archive"));
     expect(disconnect).toHaveBeenCalledTimes(1);
     expect(screen.queryByTestId("sync-conversation-archive")).toBeNull();
+  });
+
+  it("opens archived conversations only after the archive sheet dismisses", () => {
+    jest.useFakeTimers();
+    try {
+      const onOpenArchivedConversations = jest.fn();
+      const screen = renderPage({
+        archivedConversationCount: 3,
+        onOpenArchivedConversations,
+      });
+
+      expect(screen.getByText("3")).toBeTruthy();
+      openArchiveSheet(screen);
+      fireEvent.press(screen.getByTestId("open-archived-conversations"));
+
+      expect(onOpenArchivedConversations).not.toHaveBeenCalled();
+      act(() => jest.advanceTimersByTime(400));
+      expect(onOpenArchivedConversations).toHaveBeenCalledTimes(1);
+    } finally {
+      jest.useRealTimers();
+    }
+  });
+
+  it("removes installed models and cancels in-progress downloads from storage", () => {
+    const removeModel = jest.fn(async () => undefined);
+    const cancelDownload = jest.fn();
+    const localModels = {
+      benchmarks: {},
+      busy: { action: "download", modelId: "whisper-tiny" },
+      cancelDownload,
+      installs: {
+        "qwen3-0.6b-q8": {
+          installed: true,
+          path: "/models/qwen3-0.6b-q8",
+          verified: true,
+        },
+      },
+      kokoroModel: { progress: 0 },
+      progress: { "whisper-tiny": { progress: 0.4 } },
+      removeModel,
+    } as unknown as LocalModelSettingsController;
+    const screen = renderPage({ localModels });
+
+    expect(screen.getByText("Qwen3 0.6B")).toBeTruthy();
+    expect(screen.getByText("Whisper Tiny")).toBeTruthy();
+    fireEvent.press(
+      screen.getByTestId("model-storage-action-qwen3-0.6b-q8"),
+    );
+    fireEvent.press(
+      screen.getByTestId("model-storage-action-whisper-tiny"),
+    );
+
+    expect(removeModel).toHaveBeenCalledWith(
+      expect.objectContaining({ id: "qwen3-0.6b-q8" }),
+    );
+    expect(cancelDownload).toHaveBeenCalledTimes(1);
   });
 
   it("warns when exported backups skipped unreadable conversations", async () => {
@@ -249,7 +348,7 @@ describe("DataPrivacySettingsPage", () => {
       })),
     });
 
-    fireEvent.press(screen.getByTestId("export-readable-backup"));
+    openReadableExport(screen);
 
     await waitFor(() => expect(Sharing.shareAsync).toHaveBeenCalledTimes(1));
     await waitFor(() =>
@@ -267,7 +366,7 @@ describe("DataPrivacySettingsPage", () => {
       onCreateAppDataBackup: jest.fn(async () => ({ backup, skippedConversationCount: 0 })),
     });
 
-    fireEvent.press(screen.getByTestId("export-readable-backup"));
+    openReadableExport(screen);
 
     await waitFor(() => expect(Sharing.shareAsync).toHaveBeenCalledTimes(1));
     const sharedPath = jest.mocked(Sharing.shareAsync).mock.calls[0][0];
@@ -525,13 +624,14 @@ describe("DataPrivacySettingsPage", () => {
       }),
     });
 
-    fireEvent.press(screen.getByTestId("export-readable-backup"));
+    openReadableExport(screen);
     await waitFor(() => {
       expect(screen.getByRole("alert").props.children).toBe(
         "File sharing is not available on this device.",
       );
     });
     expect(Sharing.shareAsync).not.toHaveBeenCalled();
+    act(() => getVisibleModal(screen)?.props.onClose());
 
     const backup = createBackup();
     jest.mocked(DocumentPicker.getDocumentAsync).mockResolvedValue({

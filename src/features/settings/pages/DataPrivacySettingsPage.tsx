@@ -9,6 +9,10 @@ import * as Sharing from "expo-sharing";
 import { useLocalization } from "../../../i18n";
 import type { ConversationArchiveController } from "../../../hooks/useConversationArchive";
 import {
+  LOCAL_MODEL_CATALOG,
+  type LocalModelDefinition,
+} from "../../../constants/localModels";
+import {
   APP_DATA_BACKUP_MAX_BYTES,
   APP_DATA_BACKUP_MIN_PASSPHRASE_LENGTH,
   AppDataBackupError,
@@ -29,17 +33,18 @@ import {
 import { recordDebugLogEvent } from "../../../services/debugLogCapture";
 import { useTheme } from "../../../theme/ThemeContext";
 import { fonts } from "../../../theme/typography";
-import {
-  AntButtonLabel,
-  AntSectionIntro,
-  AntSettingsCard,
-} from "../AntSettingsPrimitives";
+import { AntButtonLabel } from "../AntSettingsPrimitives";
 import { styles } from "../styles";
 import type { Settings } from "../../../types";
 import {
-  ConversationArchiveSection,
-  PastConversationKnowledgeSection,
+  ArchiveSettingsSheet,
+  ConversationKnowledgeGroup,
 } from "./dataPrivacy/DataPrivacyKnowledgeSections";
+import type { LocalModelSettingsController } from "../../settings-core/useLocalModelSettings";
+import { formatBytes } from "../../../utils/formatBytes";
+import { SettingsGroup } from "../settings-primitives/SettingsGroup";
+import { SettingsPillAction } from "../settings-primitives/SettingsPillAction";
+import { SettingsRow } from "../settings-primitives/SettingsRow";
 
 type BusyState =
   | "export-encrypted"
@@ -47,6 +52,109 @@ type BusyState =
   | "import"
   | "restore"
   | null;
+
+function getModelCapabilityLabel(
+  model: LocalModelDefinition,
+  t: ReturnType<typeof useLocalization>["t"],
+) {
+  switch (model.capability) {
+    case "llm":
+      return t("settingsThinking");
+    case "stt":
+      return t("settingsListening");
+    case "tts":
+      return t("settingsSpeaking");
+  }
+}
+
+function ModelStorageGroup({
+  localModels,
+}: {
+  localModels: LocalModelSettingsController;
+}) {
+  const { t } = useLocalization();
+  const storedModels = LOCAL_MODEL_CATALOG.filter(
+    (model) =>
+      localModels.installs[model.id]?.verified === true ||
+      (localModels.busy?.modelId === model.id &&
+        localModels.busy.action === "download"),
+  );
+  const totalBytes = storedModels.reduce((total, model) => {
+    if (localModels.installs[model.id]?.verified) {
+      return total + model.installedBytes;
+    }
+    const progress =
+      model.id === "kokoro-multilingual"
+        ? localModels.kokoroModel.progress
+        : (localModels.progress[model.id]?.progress ?? 0);
+    return total + Math.round(model.downloadBytes * progress);
+  }, 0);
+
+  return (
+    <SettingsGroup
+      testID="model-storage-group"
+      title={t("modelStorageTitle", { size: formatBytes(totalBytes) })}
+      footer={t("modelStorageFooter")}
+    >
+      {storedModels.length === 0 ? (
+        <SettingsRow
+          icon="cpu"
+          label={t("noDownloadedModels")}
+          last
+          control={null}
+        />
+      ) : (
+        storedModels.map((model, index) => {
+          const downloading =
+            localModels.busy?.modelId === model.id &&
+            localModels.busy.action === "download";
+          const removing =
+            localModels.busy?.modelId === model.id &&
+            localModels.busy.action === "remove";
+          const fraction =
+            model.id === "kokoro-multilingual"
+              ? localModels.kokoroModel.progress
+              : (localModels.progress[model.id]?.progress ?? 0);
+          const size = formatBytes(
+            localModels.installs[model.id]?.verified
+              ? model.installedBytes
+              : model.downloadBytes,
+          );
+          const supporting = [
+            getModelCapabilityLabel(model, t),
+            size,
+            downloading ? `${Math.round(fraction * 100)}%` : null,
+          ]
+            .filter(Boolean)
+            .join(" · ");
+
+          return (
+            <SettingsRow
+              key={model.id}
+              testID={`model-storage-${model.id}`}
+              label={model.name}
+              supporting={supporting}
+              last={index === storedModels.length - 1}
+              control={
+                <SettingsPillAction
+                  danger
+                  disabled={removing}
+                  label={t(downloading ? "cancel" : "remove")}
+                  onPress={
+                    downloading
+                      ? localModels.cancelDownload
+                      : () => void localModels.removeModel(model)
+                  }
+                  testID={`model-storage-action-${model.id}`}
+                />
+              }
+            />
+          );
+        })
+      )}
+    </SettingsGroup>
+  );
+}
 
 function getBackupFileName(encrypted: boolean) {
   const timestamp = new Date()
@@ -59,20 +167,26 @@ function getBackupFileName(encrypted: boolean) {
 }
 
 export function DataPrivacySettingsPage({
+  archivedConversationCount,
   conversationArchive,
   isPremium,
+  localModels,
   onCreateAppDataBackup,
+  onOpenArchivedConversations,
   onOpenPremium,
   onRestoreAppDataBackup,
   settings,
   onUpdate,
 }: {
+  archivedConversationCount: number;
   conversationArchive: ConversationArchiveController;
   isPremium: boolean;
+  localModels: LocalModelSettingsController;
   onCreateAppDataBackup: () => Promise<AppDataBackupCreation>;
   onRestoreAppDataBackup: (
     backup: AppDataBackup,
   ) => Promise<AppDataBackupRestoreResult>;
+  onOpenArchivedConversations: () => void;
   onOpenPremium: () => void;
   settings: Settings;
   onUpdate: (partial: Partial<Settings>) => void;
@@ -98,6 +212,7 @@ export function DataPrivacySettingsPage({
   const [restoreResult, setRestoreResult] =
     React.useState<AppDataBackupRestoreResult | null>(null);
   const [statusMessage, setStatusMessage] = React.useState<string | null>(null);
+  const [archiveSheetVisible, setArchiveSheetVisible] = React.useState(false);
   const busyRef = React.useRef<BusyState>(null);
 
   const beginOperation = React.useCallback(
@@ -224,6 +339,8 @@ export function DataPrivacySettingsPage({
           t("backupExportSkipped", { count: skippedConversationCount }),
         );
       }
+      setExportPassphraseVisible(false);
+      resetPassphrase();
     } catch (error) {
       recordDebugLogEvent({
         event: "backup-export-failed",
@@ -243,6 +360,7 @@ export function DataPrivacySettingsPage({
     endOperation,
     getErrorMessage,
     onCreateAppDataBackup,
+    resetPassphrase,
     shareBackup,
     t,
   ]);
@@ -457,116 +575,83 @@ export function DataPrivacySettingsPage({
   ]);
 
   return (
-    <View style={styles.sectionPageStack}>
-      {isPremium ? (
-        <>
-          <PastConversationKnowledgeSection
-            isPremium
-            onOpenPremium={onOpenPremium}
-            onUpdate={onUpdate}
-            settings={settings}
-          />
-          <ConversationArchiveSection
-            conversationArchive={conversationArchive}
-            isPremium
-          />
-        </>
+    <View testID="data-privacy-settings-page" style={styles.sectionPageStack}>
+      <ConversationKnowledgeGroup
+        isPremium={isPremium}
+        onOpenPremium={onOpenPremium}
+        onUpdate={onUpdate}
+        settings={settings}
+      />
+
+      <SettingsGroup title={t("archiveSession")}>
+        <SettingsRow
+          testID="archived-conversations-row"
+          icon="inbox"
+          label={t("archivedConversations")}
+          last
+          value={String(archivedConversationCount)}
+          onPress={() => setArchiveSheetVisible(true)}
+        />
+      </SettingsGroup>
+
+      <SettingsGroup
+        testID="backup-settings-group"
+        title={t("dataBackup")}
+        footer={`${t("encryptedBackupHint")} ${t("dataBackupKeysExcluded")}`}
+      >
+        <SettingsRow
+          testID="export-encrypted-backup"
+          disabled={busy !== null}
+          icon="export"
+          label={t("exportEncryptedBackup")}
+          onPress={() => {
+            resetPassphrase();
+            setExportPassphraseVisible(true);
+          }}
+        />
+        <SettingsRow
+          testID="import-app-data-backup"
+          disabled={busy !== null}
+          icon="download"
+          label={t("importBackup")}
+          last
+          onPress={() => void chooseBackup()}
+        />
+      </SettingsGroup>
+
+      {restoreResult ? (
+        <Text
+          testID="backup-restore-result"
+          accessibilityLiveRegion="polite"
+          style={[styles.helperText, { color: colors.success }]}
+        >
+          {t("backupRestoreComplete", {
+            restored: restoreResult.conversationsRestored,
+            copied: restoreResult.conversationsCopied,
+            skipped: restoreResult.conversationsSkipped,
+          })}
+        </Text>
+      ) : null}
+      {statusMessage ? (
+        <Text
+          accessibilityRole="alert"
+          style={[styles.helperText, { color: colors.danger }]}
+        >
+          {statusMessage}
+        </Text>
       ) : null}
 
-      {!isPremium && conversationArchive.configured ? (
-        <ConversationArchiveSection
-          conversationArchive={conversationArchive}
-          isPremium={false}
-        />
-      ) : null}
+      <ModelStorageGroup localModels={localModels} />
 
-      <View style={styles.sectionGroup}>
-        <AntSectionIntro
-          title={t("dataBackup")}
-          description={t("dataBackupDescription")}
-        />
-        <AntSettingsCard>
-          <Text style={[styles.helperText, { color: colors.textSecondary }]}>
-            {t("dataBackupKeysExcluded")}
-          </Text>
-          <View style={styles.dataBackupActions}>
-            <Button
-              testID="export-readable-backup"
-              disabled={busy !== null}
-              loading={busy === "export-readable"}
-              onPress={() => void exportReadableBackup()}
-              style={styles.dataBackupButton}
-            >
-              <AntButtonLabel
-                color={colors.text}
-                icon="export"
-                label={t("exportReadableBackup")}
-              />
-            </Button>
-            <Text style={[styles.warningText, { color: colors.danger }]}>
-              {t("readableBackupWarning")}
-            </Text>
-            <Button
-              testID="export-encrypted-backup"
-              disabled={busy !== null}
-              loading={busy === "export-encrypted"}
-              onPress={() => {
-                resetPassphrase();
-                setExportPassphraseVisible(true);
-              }}
-              style={styles.dataBackupButton}
-            >
-              <AntButtonLabel
-                color={colors.text}
-                icon="lock"
-                label={t("exportEncryptedBackup")}
-              />
-            </Button>
-            <Text style={[styles.helperText, { color: colors.textMuted }]}>
-              {t("encryptedBackupHint")}
-            </Text>
-          </View>
-        </AntSettingsCard>
-      </View>
-
-      <View style={styles.sectionGroup}>
-        <AntSectionIntro title={t("importBackup")} />
-        <AntSettingsCard>
-          <Button
-            testID="import-app-data-backup"
-            disabled={busy !== null}
-            loading={busy === "import"}
-            onPress={() => void chooseBackup()}
-            style={styles.dataBackupButton}
-          >
-            <AntButtonLabel
-              color={colors.text}
-              icon="folder-open"
-              label={t("importBackup")}
-            />
-          </Button>
-          {restoreResult ? (
-            <Text
-              testID="backup-restore-result"
-              style={[styles.helperText, { color: colors.success }]}
-            >
-              {t("backupRestoreComplete", {
-                restored: restoreResult.conversationsRestored,
-                copied: restoreResult.conversationsCopied,
-                skipped: restoreResult.conversationsSkipped,
-              })}
-            </Text>
-          ) : null}
-          {statusMessage ? (
-            <Text
-              accessibilityRole="alert"
-              style={[styles.helperText, { color: colors.danger }]}
-            >
-              {statusMessage}
-            </Text>
-          ) : null}
-        </AntSettingsCard>
-      </View>
+      <ArchiveSettingsSheet
+        archivedConversationCount={archivedConversationCount}
+        conversationArchive={conversationArchive}
+        isPremium={isPremium}
+        onClose={() => setArchiveSheetVisible(false)}
+        onOpenArchivedConversations={onOpenArchivedConversations}
+        onOpenPremium={onOpenPremium}
+        visible={archiveSheetVisible}
+      />
 
       <Modal
         visible={exportPassphraseVisible}
@@ -646,6 +731,22 @@ export function DataPrivacySettingsPage({
               {passphraseError}
             </Text>
           ) : null}
+          <Text style={[styles.warningText, { color: colors.danger }]}>
+            {t("readableBackupWarning")}
+          </Text>
+          <Button
+            testID="export-readable-backup"
+            disabled={busy !== null}
+            loading={busy === "export-readable"}
+            onPress={() => void exportReadableBackup()}
+            style={styles.dataBackupButton}
+          >
+            <AntButtonLabel
+              color={colors.text}
+              icon="export"
+              label={t("exportReadableBackup")}
+            />
+          </Button>
         </View>
       </Modal>
 

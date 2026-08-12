@@ -307,6 +307,7 @@ export const AntSettingsModal = React.memo(function AntSettingsModal(
       animationType="none"
       hardwareAccelerated
       navigationBarTranslucent
+      onDismiss={props.onDismiss}
       onRequestClose={handleBack}
       statusBarTranslucent
       transparent
