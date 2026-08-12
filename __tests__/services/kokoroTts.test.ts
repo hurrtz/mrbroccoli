@@ -88,14 +88,15 @@ const mockReadDir = jest.fn(async (path: string) =>
 );
 
 const mockInstallPhonemePacks = jest.fn().mockResolvedValue(undefined);
-const mockArePhonemePacksInstalled = jest.fn(async () =>
-  mockDataDirEntries.some((entry) => entry.name === "en-us.lpk") &&
-  mockDataDirEntries.some((entry) => entry.name === "en-us.g2p"),
+const mockArePhonemePacksInstalled = jest.fn(
+  async (_dataDir: string, _language: string) =>
+    mockDataDirEntries.some((entry) => entry.name === "en-us.lpk") &&
+    mockDataDirEntries.some((entry) => entry.name === "en-us.g2p"),
 );
 
 jest.mock("../../src/services/phonemePacks", () => ({
-  arePhonemePacksInstalled: (...args: unknown[]) =>
-    mockArePhonemePacksInstalled(...args),
+  arePhonemePacksInstalled: (dataDir: string, language: string) =>
+    mockArePhonemePacksInstalled(dataDir, language),
   installPhonemePacks: (...args: unknown[]) => mockInstallPhonemePacks(...args),
 }));
 

@@ -64,11 +64,13 @@ jest.mock("../../src/services/localDeviceCapabilities", () => ({
   ),
 }));
 
-const mockGetLocalCatalogInstallStatuses = jest.fn(() => Promise.resolve({}));
+const mockGetLocalCatalogInstallStatuses = jest.fn(
+  (_options?: { phonemeLanguages?: string[] }) => Promise.resolve({}),
+);
 
 jest.mock("../../src/services/offlineProfileManager", () => ({
-  getLocalCatalogInstallStatuses: (...args: unknown[]) =>
-    mockGetLocalCatalogInstallStatuses(...args),
+  getLocalCatalogInstallStatuses: (options?: { phonemeLanguages?: string[] }) =>
+    mockGetLocalCatalogInstallStatuses(options),
 }));
 
 jest.mock("../../src/services/offlineProfile", () => ({
