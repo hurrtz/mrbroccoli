@@ -6,6 +6,7 @@ import {
 } from "../settings-core/types";
 import { useProviderValidationState } from "../settings-core/useProviderValidationState";
 import { useSettingsController } from "../settings-core/useSettingsController";
+import { useLocalModelSettings } from "../settings-core/useLocalModelSettings";
 import { getSettingsReadiness } from "../settings-core/readiness";
 import { Provider, TtsListenLanguage } from "../../types";
 import {
@@ -115,6 +116,15 @@ export function AntSettingsPageContent({
     providerVoiceDirectories,
     settings,
   } = props;
+  const localModels = useLocalModelSettings({
+    active: props.visible && activePage === "listening",
+    isPremium: props.isPremium,
+    kokoroModel,
+    onPreviewVoice: props.onPreviewVoice,
+    onUpdate,
+    settings,
+    storePromoPreview: props.storePromoLocalDevicePreview,
+  });
 
   if (
     !props.isPremium &&
@@ -133,6 +143,7 @@ export function AntSettingsPageContent({
     case "overview":
       return (
         <AntSettingsOverview
+          getProviderHealthState={validation.getHealthState}
           isPremium={props.isPremium}
           onOpenPage={onOpenPage}
           onOpenPremium={props.onOpenPremium}
@@ -149,6 +160,7 @@ export function AntSettingsPageContent({
             searchProviders: [...WEB_SEARCH_PROVIDER_IDS],
             kokoroInstalled: kokoroModel.installed,
           })}
+          settings={settings}
         />
       );
     case "connections":
@@ -202,14 +214,17 @@ export function AntSettingsPageContent({
       return (
         <DrillInPage page="listening">
           <ListeningSettingsPage
+            allSttProviders={PROVIDER_ORDER.filter(
+              (provider) => PROVIDER_STT_SUPPORT[provider] === "provider",
+            )}
+            isPremium={props.isPremium}
+            localModels={localModels}
+            onOpenPremium={props.onOpenPremium}
             settings={settings}
             selectableSttProviders={validation.selectableSttProviders}
             selectedSttProviderModelOptions={
               controller.selectedSttProviderModelOptions
             }
-            selectedSttProviderModel={controller.selectedSttProviderModel}
-            sttLanguageNote={controller.sttLanguageNote}
-            sttLimitNote={controller.sttLimitNote}
             onUpdate={onUpdate}
             onUpdateProviderSttModel={onUpdateProviderSttModel}
           />

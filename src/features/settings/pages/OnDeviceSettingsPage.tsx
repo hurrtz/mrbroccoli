@@ -60,11 +60,11 @@ import type {
 } from "../../../types";
 import { MAX_RESPONSE_MODES } from "../../../constants/providers/defaults";
 import { FREE_SPEECH_LANGUAGE_OPTIONS } from "../../../constants/speechLanguages";
-import { getLocalLanguageSettingsUpdate } from "../../settings-core/onDevice";
 import {
-  deriveResponseModesForProvider,
-  getNextResponseModeId,
-} from "../../../utils/responseModes";
+  getLocalLanguageSettingsUpdate,
+  getLocalModelRemovalSettingsUpdate,
+} from "../../settings-core/onDevice";
+import { getNextResponseModeId } from "../../../utils/responseModes";
 import { AntListenLanguageSelector } from "../AntListenLanguageSelector";
 import {
   AntPickerRow,
@@ -167,9 +167,7 @@ export function OnDeviceSettingsPage({
   const [probing, setProbing] = React.useState(!storePromoPreview);
   const [busy, setBusy] = React.useState<BusyAction | null>(null);
   const [expandedCapabilities, setExpandedCapabilities] =
-    React.useState<CapabilityDisclosureState>(
-      INITIAL_CAPABILITY_DISCLOSURES,
-    );
+    React.useState<CapabilityDisclosureState>(INITIAL_CAPABILITY_DISCLOSURES);
   // Downloading a multi-gigabyte model, and benchmarking it afterwards, both
   // run far longer than any default screen timeout, and a sleeping phone
   // aborts the transfer and leaves the whole download to start over. This page
@@ -269,9 +267,7 @@ export function OnDeviceSettingsPage({
       return;
     }
     setExpandedCapabilities((current) =>
-      current[capability]
-        ? current
-        : { ...current, [capability]: true },
+      current[capability] ? current : { ...current, [capability]: true },
     );
   }, [busy]);
 
@@ -392,35 +388,7 @@ export function OnDeviceSettingsPage({
       } else {
         await removeLocalModel(model.id);
       }
-      const nextSettings: Partial<
-        Omit<Settings, "apiKeys" | "providerModels">
-      > = {};
-      if (settings.localSttModelId === model.id) {
-        nextSettings.localSttModelId = null;
-        nextSettings.sttMode = "native";
-      }
-      if (settings.localTtsModelId === model.id) {
-        nextSettings.localTtsModelId = null;
-        nextSettings.ttsMode = "native";
-      }
-      if (model.capability === "llm") {
-        let responseModes = settings.responseModes.filter(
-          ({ route }) => route.localModelId !== model.id,
-        );
-        if (responseModes.length === 0) {
-          responseModes = deriveResponseModesForProvider(
-            settings.lastProvider,
-            1,
-          );
-        }
-        nextSettings.responseModes = responseModes;
-        if (
-          !responseModes.some(({ id }) => id === settings.activeResponseMode)
-        ) {
-          nextSettings.activeResponseMode = responseModes[0].id;
-        }
-      }
-      onUpdate(nextSettings);
+      onUpdate(getLocalModelRemovalSettingsUpdate(settings, model));
       await refreshModelState();
     } catch (error) {
       Alert.alert(

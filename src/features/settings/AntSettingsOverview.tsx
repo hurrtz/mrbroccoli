@@ -1,104 +1,87 @@
 import React from "react";
-import { Pressable, Text, View } from "react-native";
-
-import { List } from "../../design-system/NativeControls";
+import { StyleSheet, Text, View } from "react-native";
 
 import appConfig from "../../../app.json";
-import { useLocalization } from "../../i18n";
+import { getLocalModel } from "../../constants/localModels";
+import {
+  getProviderModelName,
+  PROVIDER_LABELS,
+  PROVIDER_ORDER,
+} from "../../constants/models";
+import { IconButton } from "../../design-system/IconButton";
 import {
   PhosphorIcon,
   type PhosphorIconName,
 } from "../../design-system/PhosphorIcon";
+import { useLocalization } from "../../i18n";
+import { APP_LANGUAGE_OPTIONS } from "../../i18n/localeRegistry";
 import { useTheme } from "../../theme/ThemeContext";
 import { fonts } from "../../theme/typography";
-import {
-  isPremiumSettingsPage,
-  type SettingsPage,
-} from "../settings-core/types";
+import type { Settings } from "../../types";
 import type { SettingsReadiness } from "../settings-core/readiness";
+import type { ProviderHealthState, SettingsPage } from "../settings-core/types";
 
-import { AntSettingsCard } from "./AntSettingsPrimitives";
+import { PremiumBand } from "./settings-primitives/PremiumBand";
 import {
   RuntimeReadiness,
   type ReadinessStep,
 } from "./settings-primitives/RuntimeReadiness";
-import { styles } from "./styles";
+import { SettingsGroup } from "./settings-primitives/SettingsGroup";
+import { SettingsRow } from "./settings-primitives/SettingsRow";
 
 type DrillInSettingsPage = Exclude<SettingsPage, "overview">;
+type OverviewPage = Exclude<DrillInSettingsPage, "local">;
 
 type OverviewRow = {
-  page: DrillInSettingsPage;
+  page: OverviewPage;
   titleKey:
     | "settingsConnections"
     | "settingsThinking"
     | "settingsListening"
     | "settingsSpeaking"
-    | "settingsOnDevice"
     | "settingsSearch"
     | "settingsDataPrivacy"
     | "settingsAppDiagnostics";
-  summaryKey:
-    | "settingsConnectionsSummary"
-    | "settingsThinkingSummary"
-    | "settingsListeningSummary"
-    | "settingsSpeakingSummary"
-    | "settingsOnDeviceSummary"
-    | "settingsSearchSummary"
-    | "settingsDataPrivacySummary"
-    | "settingsAppDiagnosticsSummary";
   icon: PhosphorIconName;
 };
 
-const overviewRows: OverviewRow[] = [
-  {
+const overviewRows: Record<OverviewPage, OverviewRow> = {
+  connections: {
     page: "connections",
     titleKey: "settingsConnections",
-    summaryKey: "settingsConnectionsSummary",
     icon: "key",
   },
-  {
+  thinking: {
     page: "thinking",
     titleKey: "settingsThinking",
-    summaryKey: "settingsThinkingSummary",
     icon: "robot",
   },
-  {
-    page: "listening",
-    titleKey: "settingsListening",
-    summaryKey: "settingsListeningSummary",
-    icon: "audio",
-  },
-  {
-    page: "speaking",
-    titleKey: "settingsSpeaking",
-    summaryKey: "settingsSpeakingSummary",
-    icon: "sound",
-  },
-  {
-    page: "local",
-    titleKey: "settingsOnDevice",
-    summaryKey: "settingsOnDeviceSummary",
-    icon: "cpu",
-  },
-  {
+  search: {
     page: "search",
     titleKey: "settingsSearch",
-    summaryKey: "settingsSearchSummary",
     icon: "search",
   },
-  {
+  listening: {
+    page: "listening",
+    titleKey: "settingsListening",
+    icon: "audio",
+  },
+  speaking: {
+    page: "speaking",
+    titleKey: "settingsSpeaking",
+    icon: "sound",
+  },
+  data: {
     page: "data",
     titleKey: "settingsDataPrivacy",
-    summaryKey: "settingsDataPrivacySummary",
     icon: "safety-certificate",
   },
-  {
+  app: {
     page: "app",
     titleKey: "settingsAppDiagnostics",
-    summaryKey: "settingsAppDiagnosticsSummary",
     icon: "sliders",
   },
-];
+};
 
 const overviewGroups = [
   {
@@ -107,7 +90,7 @@ const overviewGroups = [
   },
   {
     titleKey: "settingsGroupVoiceModels" as const,
-    pages: ["listening", "speaking", "local"] as const,
+    pages: ["listening", "speaking"] as const,
   },
   {
     titleKey: "settingsGroupPrivacyApp" as const,
@@ -116,211 +99,299 @@ const overviewGroups = [
 ];
 
 /** Each capability opens the page that configures it. */
-const READINESS_PAGE: Record<ReadinessStep, DrillInSettingsPage> = {
+const READINESS_PAGE: Record<ReadinessStep, OverviewPage> = {
   think: "thinking",
   listen: "listening",
   speak: "speaking",
   search: "search",
 };
 
+function getHealthLabel(
+  state: ProviderHealthState,
+  t: ReturnType<typeof useLocalization>["t"],
+) {
+  switch (state) {
+    case "healthy":
+      return t("providerStatusWorking");
+    case "configured":
+      return t("providerStatusNotTested");
+    case "failing":
+      return t("providerStatusInvalid");
+    case "unconfigured":
+    case "validating":
+      return t("providerStatusTesting");
+  }
+}
+
+function getInputModeLabel(
+  settings: Settings,
+  t: ReturnType<typeof useLocalization>["t"],
+) {
+  switch (settings.inputMode) {
+    case "push-to-talk":
+      return t("pushToTalk");
+    case "toggle-to-talk":
+      return t("toggleToTalk");
+    case "drive-session":
+      return t("driveSession");
+  }
+}
+
+function getThemeLabel(
+  settings: Settings,
+  t: ReturnType<typeof useLocalization>["t"],
+) {
+  switch (settings.theme) {
+    case "light":
+      return t("light");
+    case "dark":
+      return t("dark");
+    case "system":
+      return t("system");
+  }
+}
+
+function getResponseModeLabel(settings: Settings, isPremium: boolean) {
+  const modes = isPremium
+    ? settings.responseModes
+    : settings.responseModes.filter((mode) => mode.route.runtime === "local");
+  return modes
+    .map(({ route }) =>
+      route.runtime === "local" && route.localModelId
+        ? getLocalModel(route.localModelId).name
+        : getProviderModelName(route.provider, route.model),
+    )
+    .filter(Boolean)
+    .slice(0, 3)
+    .join(" · ");
+}
+
+function getListeningRouteLabel(
+  settings: Settings,
+  t: ReturnType<typeof useLocalization>["t"],
+) {
+  if (settings.sttMode === "local" && settings.localSttModelId) {
+    return getLocalModel(settings.localSttModelId).name;
+  }
+  if (settings.sttMode === "provider" && settings.sttProvider) {
+    return [
+      PROVIDER_LABELS[settings.sttProvider],
+      settings.providerSttModels[settings.sttProvider],
+    ]
+      .filter(Boolean)
+      .join(" · ");
+  }
+  return t("appNative");
+}
+
+function getSpeakingRouteLabel(
+  settings: Settings,
+  t: ReturnType<typeof useLocalization>["t"],
+) {
+  if (settings.ttsMode === "kokoro") {
+    const language = settings.localLanguages.includes("zh-CN") ? "zh" : "en";
+    return ["Kokoro", settings.kokoroVoices[language]]
+      .filter(Boolean)
+      .join(" · ");
+  }
+  if (settings.ttsMode === "local" && settings.localTtsModelId) {
+    return getLocalModel(settings.localTtsModelId).name;
+  }
+  if (settings.ttsMode === "provider" && settings.ttsProvider) {
+    return [
+      PROVIDER_LABELS[settings.ttsProvider],
+      settings.providerTtsVoices[settings.ttsProvider],
+    ]
+      .filter(Boolean)
+      .join(" · ");
+  }
+  return t("systemVoice");
+}
+
+function getOverviewState({
+  getProviderHealthState,
+  isPremium,
+  page,
+  settings,
+  t,
+}: {
+  getProviderHealthState: (
+    provider: keyof Settings["apiKeys"],
+  ) => ProviderHealthState;
+  isPremium: boolean;
+  page: OverviewPage;
+  settings: Settings;
+  t: ReturnType<typeof useLocalization>["t"];
+}) {
+  switch (page) {
+    case "connections": {
+      if (!isPremium) {
+        return t("premium");
+      }
+      const configured = PROVIDER_ORDER.filter(
+        (provider) => settings.apiKeys[provider]?.trim().length > 0,
+      );
+      return configured.length > 0
+        ? configured
+            .slice(0, 3)
+            .map(
+              (provider) =>
+                `${PROVIDER_LABELS[provider]} ${getHealthLabel(
+                  getProviderHealthState(provider),
+                  t,
+                ).toLocaleLowerCase()}`,
+            )
+            .join(" · ")
+        : t("providerStatusNotSetup");
+    }
+    case "thinking":
+      return (
+        getResponseModeLabel(settings, isPremium) || t("providerStatusNotSetup")
+      );
+    case "search":
+      if (!isPremium) {
+        return t("premium");
+      }
+      return settings.webSearchMode === "on" && settings.webSearchProvider
+        ? `${PROVIDER_LABELS[settings.webSearchProvider]} · ${
+            settings.webSearchProviderSettings[settings.webSearchProvider]
+              .resultLimit
+          }`
+        : t("settingsReadinessOff");
+    case "listening":
+      return `${getInputModeLabel(settings, t)} · ${getListeningRouteLabel(
+        settings,
+        t,
+      )}`;
+    case "speaking":
+      return `${getSpeakingRouteLabel(settings, t)} · ${t(
+        settings.replyPlayback === "stream"
+          ? "sentencesArrive"
+          : "fullReplyFirst",
+      )}`;
+    case "data":
+      return `${t("pastConversationKnowledge")} · ${t(
+        settings.pastConversationKnowledgeEnabled ? "show" : "hide",
+      )}`;
+    case "app": {
+      const languageLabel =
+        APP_LANGUAGE_OPTIONS.find(({ value }) => value === settings.language)
+          ?.label ?? settings.language;
+      return `${getThemeLabel(settings, t)} · ${languageLabel}`;
+    }
+  }
+}
+
 export function AntSettingsOverview({
+  getProviderHealthState,
   isPremium,
   onOpenPage,
   onOpenPremium,
   readiness,
+  settings,
 }: {
+  getProviderHealthState: (
+    provider: keyof Settings["apiKeys"],
+  ) => ProviderHealthState;
   isPremium: boolean;
-  onOpenPage: (page: DrillInSettingsPage) => void;
+  onOpenPage: (page: OverviewPage) => void;
   onOpenPremium: () => void;
   readiness: SettingsReadiness;
+  settings: Settings;
 }) {
   const { colors } = useTheme();
-  const { isRtl, t } = useLocalization();
-  const drillInIcon = isRtl ? "left" : "right";
-  const visibleOverviewRows = isPremium
-    ? overviewRows
-    : overviewRows.filter((row) => !isPremiumSettingsPage(row.page));
-  const visibleGroups = overviewGroups
-    .map((group) => ({
-      ...group,
-      rows: group.pages
-        .map((page) => visibleOverviewRows.find((row) => row.page === page))
-        .filter((row): row is OverviewRow => Boolean(row)),
-    }))
-    .filter((group) => group.rows.length > 0);
+  const { t } = useLocalization();
+  const [showPremiumCard, setShowPremiumCard] = React.useState(true);
 
   return (
-    <View testID="settings-page-overview" style={styles.overview}>
-      {isPremium ? (
-        <AntSettingsCard
+    <View testID="settings-page-overview" style={localStyles.overview}>
+      {isPremium && showPremiumCard ? (
+        <View
           testID="settings-edition-card"
-          style={{
-            backgroundColor: colors.premiumSoft,
-            borderColor: colors.premiumBorder,
-          }}
+          style={[
+            localStyles.premiumCard,
+            {
+              backgroundColor: colors.premiumSoft,
+              borderColor: colors.premiumBorder,
+            },
+          ]}
         >
-          <View style={styles.setupCardBody}>
-            <PhosphorIcon
-              name="check-circle"
-              size="prominent"
-              color={colors.premium}
-            />
-            <View style={styles.setupCopy}>
-              <Text style={[styles.setupTitle, { color: colors.text }]}>
-                {t("premiumUnlocked")}
-              </Text>
-              <Text
-                style={[styles.setupSummary, { color: colors.textSecondary }]}
-              >
-                {t("premiumDescription")}
-              </Text>
-            </View>
+          <PhosphorIcon
+            name="check-circle"
+            size="prominent"
+            color={colors.premium}
+          />
+          <View style={localStyles.premiumCopy}>
+            <Text style={[localStyles.premiumTitle, { color: colors.text }]}>
+              {t("premiumUnlocked")}
+            </Text>
+            <Text
+              style={[
+                localStyles.premiumSupporting,
+                { color: colors.textSecondary },
+              ]}
+            >
+              {t("premiumDescription")}
+            </Text>
           </View>
-        </AntSettingsCard>
-      ) : null}
-
-      {isPremium ? (
-        <RuntimeReadiness
-          onSelect={(step) => onOpenPage(READINESS_PAGE[step])}
-          readiness={readiness}
-        />
-      ) : null}
-
-      {visibleGroups.map((group) => (
-        <View key={group.titleKey} style={styles.overviewGroup}>
-          <Text
-            style={[styles.overviewGroupTitle, { color: colors.textMuted }]}
-          >
-            {t(group.titleKey)}
-          </Text>
-          <View style={styles.sectionCards}>
-            {group.rows.map((row) => (
-              <AntSettingsCard
-                key={row.page}
-                contentStyle={styles.fullBleedCardContent}
-              >
-                <List.Item
-                  testID={`settings-overview-row-${row.page}`}
-                  multipleLine
-                  wrap
-                  thumb={
-                    <View
-                      testID={`settings-overview-icon-${row.page}`}
-                      style={styles.sectionIcon}
-                    >
-                      <PhosphorIcon
-                        name={row.icon}
-                        size="prominent"
-                        color={
-                          !isPremium && row.page === "local"
-                            ? colors.accent
-                            : colors.text
-                        }
-                      />
-                    </View>
-                  }
-                  extra={
-                    <PhosphorIcon
-                      name={drillInIcon}
-                      size="control"
-                      color={colors.textMuted}
-                    />
-                  }
-                  onPress={() => onOpenPage(row.page)}
-                  accessibilityRole="button"
-                  accessibilityLabel={t("settingsOpenSection", {
-                    section: t(row.titleKey),
-                  })}
-                  styles={{
-                    Item: {
-                      backgroundColor:
-                        !isPremium && row.page === "local"
-                          ? colors.accentSoft
-                          : colors.surfaceElevated,
-                    },
-                    Line: {
-                      borderBottomWidth: 0,
-                      paddingVertical: 12,
-                    },
-                    Content: {
-                      color: colors.text,
-                      fontFamily: fonts.bodyMedium,
-                      fontSize: 16,
-                      fontWeight: "600",
-                    },
-                    Extra: {
-                      paddingStart: 10,
-                    },
-                  }}
-                >
-                  {t(row.titleKey)}
-                  <List.Item.Brief
-                    wrap
-                    style={{
-                      color: colors.textSecondary,
-                      fontFamily: fonts.body,
-                      fontSize: 13,
-                      lineHeight: 19,
-                    }}
-                  >
-                    {t(row.summaryKey)}
-                  </List.Item.Brief>
-                </List.Item>
-              </AntSettingsCard>
-            ))}
-          </View>
+          <IconButton
+            icon="close"
+            accessibilityLabel={t("dismiss")}
+            onPress={() => setShowPremiumCard(false)}
+          />
         </View>
+      ) : null}
+
+      <RuntimeReadiness
+        onSelect={(step) => onOpenPage(READINESS_PAGE[step])}
+        readiness={readiness}
+      />
+
+      {overviewGroups.map((group) => (
+        <SettingsGroup key={group.titleKey} title={t(group.titleKey)}>
+          {group.pages.map((page, index) => {
+            const row = overviewRows[page];
+            return (
+              <SettingsRow
+                key={page}
+                testID={`settings-overview-row-${page}`}
+                accessibilityLabel={t("settingsOpenSection", {
+                  section: t(row.titleKey),
+                })}
+                icon={row.icon}
+                label={t(row.titleKey)}
+                supporting={getOverviewState({
+                  getProviderHealthState,
+                  isPremium,
+                  page,
+                  settings,
+                  t,
+                })}
+                last={index === group.pages.length - 1}
+                onPress={() => onOpenPage(page)}
+              />
+            );
+          })}
+        </SettingsGroup>
       ))}
 
       {!isPremium ? (
-        <Pressable
+        <View
           testID="settings-premium-upgrade"
-          onPress={onOpenPremium}
-          accessibilityRole="button"
-          accessibilityLabel={t("upgradeToPremium")}
-          style={({ pressed }) => (pressed ? styles.pressedControl : undefined)}
+          style={[localStyles.bandClip, { borderColor: colors.premiumBorder }]}
         >
-          <AntSettingsCard
-            style={{
-              backgroundColor: colors.premiumSoft,
-              borderColor: colors.premiumBorder,
-            }}
-          >
-            <View style={styles.setupCardBody}>
-              <View style={styles.setupCopy}>
-                <Text style={[styles.setupTitle, { color: colors.text }]}>
-                  {t("upgradeToPremium")}
-                </Text>
-                <Text
-                  style={[styles.setupSummary, { color: colors.textSecondary }]}
-                >
-                  {t("premiumDescription")}
-                </Text>
-              </View>
-              <View
-                style={[
-                  styles.premiumUpgradeAction,
-                  { backgroundColor: colors.premium },
-                ]}
-                accessible={false}
-              >
-                <Text
-                  style={[
-                    styles.premiumUpgradeActionText,
-                    { color: colors.onPremium },
-                  ]}
-                >
-                  {t("upgradeToPremium")}
-                </Text>
-              </View>
-            </View>
-          </AntSettingsCard>
-        </Pressable>
+          <PremiumBand
+            actionLabel={t("upgradeToPremium")}
+            copy={t("premiumDescription")}
+            onPress={onOpenPremium}
+            premiumLabel={t("premium")}
+          />
+        </View>
       ) : null}
 
       <Text
         testID="settings-release-version"
-        style={[styles.releaseVersion, { color: colors.textMuted }]}
+        style={[localStyles.releaseVersion, { color: colors.textMuted }]}
       >
         {t("settingsReleaseVersion", {
           version: appConfig.expo.version,
@@ -329,3 +400,46 @@ export function AntSettingsOverview({
     </View>
   );
 }
+
+const localStyles = StyleSheet.create({
+  overview: {
+    gap: 14,
+  },
+  premiumCard: {
+    borderRadius: 12,
+    borderWidth: StyleSheet.hairlineWidth,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    flexDirection: "row",
+    alignItems: "flex-start",
+    gap: 12,
+  },
+  premiumCopy: {
+    flex: 1,
+    minWidth: 0,
+    paddingTop: 2,
+  },
+  premiumTitle: {
+    fontFamily: fonts.display,
+    fontSize: 16,
+    lineHeight: 22,
+  },
+  premiumSupporting: {
+    marginTop: 3,
+    fontFamily: fonts.body,
+    fontSize: 14,
+    lineHeight: 20,
+  },
+  bandClip: {
+    borderRadius: 12,
+    borderWidth: StyleSheet.hairlineWidth,
+    overflow: "hidden",
+  },
+  releaseVersion: {
+    paddingBottom: 4,
+    fontFamily: fonts.mono,
+    fontSize: 11,
+    lineHeight: 16,
+    textAlign: "center",
+  },
+});

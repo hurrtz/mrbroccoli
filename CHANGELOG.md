@@ -60,6 +60,10 @@ the complete Play Store translations are kept in a dedicated file under
   compact while automatically opening the section that owns an active download.
 - The settings overview adopts the approved green on-device and gold Premium
   card treatments.
+- Settings now presents the same seven-section map to Free and Premium users,
+  with live state beneath every row. Listening uses compact input and language
+  sheets plus one system/local/provider route list; Free users can choose usable
+  on-device recognition while provider routes remain visibly locked.
 
 ### Fixed
 
@@ -85,6 +89,8 @@ the complete Play Store translations are kept in a dedicated file under
   rejects its model. The licence-safe Kokoro/Piper runtime now accepts its
   verified pronunciation-pack layout and returns a normal error if a future
   engine cannot initialize.
+- Return Speaking to the system voice when the selected Kokoro download is
+  removed, instead of leaving a now-missing local voice selected.
 - Let downloaded response models initialize and answer normally on Android,
   without exposing an internal response-history label, and stop optimized
   Release builds from crashing when Kokoro begins speaking. Automatic setup

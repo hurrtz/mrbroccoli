@@ -201,7 +201,7 @@ describe("SettingsModal", () => {
       expect(screen.queryByTestId("settings-header-gradient")).toBeNull();
       expect(screen.queryByTestId("settings-modal-gradient")).toBeNull();
       expect(
-        screen.getByTestId("phosphor-icon-close", hiddenIconQuery),
+        screen.getAllByTestId("phosphor-icon-close", hiddenIconQuery).length,
       ).toBeTruthy();
       expect(
         screen.getAllByTestId("phosphor-icon-right", hiddenIconQuery).length,
@@ -249,37 +249,48 @@ describe("SettingsModal", () => {
     });
   });
 
-  it("opens on-device model downloads directly for Free users", async () => {
+  it("opens local listening choices in place for Free users", async () => {
     const onOpenPremium = jest.fn();
     const screen = renderSettingsModal({ isPremium: false, onOpenPremium });
 
-    fireEvent.press(screen.getByTestId("settings-overview-row-local"));
+    fireEvent.press(screen.getByTestId("settings-overview-row-listening"));
 
     await waitFor(() => {
-      expect(screen.getByTestId("settings-page-local")).toBeTruthy();
+      expect(screen.getByTestId("listening-settings-page")).toBeTruthy();
     });
     expect(onOpenPremium).not.toHaveBeenCalled();
+    expect(screen.getByTestId("settings-stt-route-native")).toBeTruthy();
+    expect(
+      screen.getByTestId("settings-stt-route-provider-openai"),
+    ).toBeTruthy();
+    expect(screen.getByLabelText("OpenAI").props.accessibilityState).toEqual({
+      checked: false,
+      disabled: true,
+    });
   });
 
-  it("shows only usable sections on the Free overview", async () => {
+  it("shows the same seven sections on the Free overview", async () => {
     const screen = renderSettingsModal({ isPremium: false });
 
     await waitFor(() => {
-      expect(screen.getByTestId("settings-overview-row-local")).toBeTruthy();
+      expect(
+        screen.getByTestId("settings-overview-row-connections"),
+      ).toBeTruthy();
     });
-    expect(screen.getByTestId("settings-overview-row-data")).toBeTruthy();
-    expect(screen.getByTestId("settings-overview-row-app")).toBeTruthy();
     expect(screen.getByTestId("settings-premium-upgrade")).toBeTruthy();
 
     for (const page of [
       "connections",
       "thinking",
+      "search",
       "listening",
       "speaking",
-      "search",
+      "data",
+      "app",
     ]) {
-      expect(screen.queryByTestId(`settings-overview-row-${page}`)).toBeNull();
+      expect(screen.getByTestId(`settings-overview-row-${page}`)).toBeTruthy();
     }
+    expect(screen.queryByTestId("settings-overview-row-local")).toBeNull();
   });
 
   it("keeps Free data and app settings focused on usable controls", async () => {
@@ -1363,9 +1374,11 @@ describe("SettingsModal", () => {
     expect(onSetDevelopmentEntitlementMode).toHaveBeenCalledWith("premium");
   });
 
-  it("keeps Voice Input free of a redundant heading info action", async () => {
+  it("uses compact Input rows and the unified listening route picker", async () => {
+    const onUpdate = jest.fn();
     const screen = renderSettingsModal({
       focusTab: "stt",
+      onUpdate,
       settings: {
         ...DEFAULT_SETTINGS,
         apiKeys: {
@@ -1383,51 +1396,44 @@ describe("SettingsModal", () => {
       );
       expect(screen.getByText("Voice Input")).toBeTruthy();
       expect(screen.queryByLabelText("About Voice Input")).toBeNull();
-      expect(screen.getByLabelText("About Input Mode")).toBeTruthy();
-      expect(screen.getByLabelText("About Speech to Text")).toBeTruthy();
       expect(
-        screen.getByTestId("stt-provider-picker-value").props.children,
-      ).toBe("Google");
+        screen.getByTestId("input-mode-picker").props.accessibilityLabel,
+      ).toBe("Input Mode. Toggle to Talk");
+      expect(screen.getByTestId("conversation-languages-picker")).toBeTruthy();
+      expect(screen.getByLabelText("Google").props.accessibilityState).toEqual({
+        checked: true,
+        disabled: false,
+      });
+      expect(
+        screen.getByTestId("settings-stt-provider-gemini-model"),
+      ).toBeTruthy();
     });
 
-    expect(
-      StyleSheet.flatten(
-        screen.getByTestId("stt-provider-picker-value").props.style,
-      ).textAlign,
-    ).toBe("right");
-
-    fireEvent.press(screen.getByLabelText("About Input Mode"));
-    expect(screen.UNSAFE_getByType(NativeDialogType).props).toMatchObject({
-      modalType: "modal",
-      title: "Input Mode",
-      visible: true,
+    fireEvent.press(screen.getByTestId("input-mode-picker"));
+    await waitFor(() => {
+      expect(screen.getByTestId("input-mode-picker-sheet")).toBeTruthy();
     });
-    expect(
-      screen.getByText(
-        "Hold the main button while speaking, then release to send.",
-      ),
-    ).toBeTruthy();
+    fireEvent.press(
+      screen.getByTestId("input-mode-picker-option-push-to-talk"),
+    );
+    expect(onUpdate).toHaveBeenCalledWith({ inputMode: "push-to-talk" });
 
-    fireEvent.press(screen.getByText("Done"));
+    fireEvent.press(screen.getByTestId("conversation-languages-picker"));
     await waitFor(() => {
       expect(
-        screen.queryByText(
-          "Hold the main button while speaking, then release to send.",
-        ),
-      ).toBeNull();
+        screen.getByTestId("conversation-languages-picker-sheet"),
+      ).toBeTruthy();
     });
-
-    fireEvent.press(screen.getByLabelText("About Speech to Text"));
-    expect(screen.UNSAFE_getByType(NativeDialogType).props).toMatchObject({
-      modalType: "modal",
-      title: "Speech to Text",
-      visible: true,
-    });
-    expect(
-      screen.getByText(
-        "Use the operating system's speech recognizer. Depending on device settings, recognition may run on-device or through the system service. No provider key is required.",
-      ),
-    ).toBeTruthy();
+    fireEvent.press(
+      screen.getByTestId("conversation-languages-picker-option-de"),
+    );
+    expect(onUpdate).toHaveBeenCalledWith(
+      expect.objectContaining({
+        localLanguages: ["en", "de"],
+        sttLanguage: "auto",
+        ttsListenLanguages: ["en", "de"],
+      }),
+    );
   });
 
   it("offers discovered Mistral voice slugs and refreshes the directory", async () => {

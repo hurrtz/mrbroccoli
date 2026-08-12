@@ -3,26 +3,21 @@ import { Pressable, StyleSheet, View } from "react-native";
 import { fireEvent, render } from "@testing-library/react-native";
 
 import { IconAction } from "../../src/features/settings/settings-primitives/IconAction";
+import { LocalModelRouteGroup } from "../../src/features/settings/settings-primitives/LocalModelRouteGroup";
 import { PremiumBand } from "../../src/features/settings/settings-primitives/PremiumBand";
 import { RouteOptionRow } from "../../src/features/settings/settings-primitives/RouteOptionRow";
 import { SettingsGroup } from "../../src/features/settings/settings-primitives/SettingsGroup";
 import { SettingsRow } from "../../src/features/settings/settings-primitives/SettingsRow";
+import { getLocalModel } from "../../src/constants/localModels";
 import { LocalizationProvider } from "../../src/i18n";
 import { ThemeProvider } from "../../src/theme/ThemeContext";
 import { lightColors } from "../../src/theme/colors";
+import { DEFAULT_SETTINGS } from "../../src/types";
+import type { LocalModelSettingsController } from "../../src/features/settings-core/useLocalModelSettings";
 
 jest.mock("../../src/hooks/useReducedMotion", () => ({
   useReducedMotion: () => true,
 }));
-
-jest.mock("expo-linear-gradient", () => {
-  const React = require("react");
-  const { View } = require("react-native");
-  return {
-    LinearGradient: ({ children, ...props }: React.PropsWithChildren<object>) =>
-      React.createElement(View, props, children),
-  };
-});
 
 jest.mock("react-native-gesture-handler", () => {
   const actual = jest.requireActual("react-native-gesture-handler");
@@ -75,6 +70,7 @@ describe("settings design primitives", () => {
           testID="open-row"
           icon="robot"
           label="Thinking"
+          supporting="Two answering models"
           value="2 models"
           onPress={onOpen}
         />
@@ -93,7 +89,7 @@ describe("settings design primitives", () => {
 
     expect(
       StyleSheet.flatten(screen.getByTestId("open-row").props.style).minHeight,
-    ).toBe(52);
+    ).toBe(64);
     fireEvent.press(screen.getByTestId("open-row"));
     fireEvent.press(screen.getByTestId("nested-control"));
     expect(onOpen).toHaveBeenCalledTimes(1);
@@ -148,6 +144,55 @@ describe("settings design primitives", () => {
     ).toMatchObject({ height: 36, width: 36 });
     fireEvent.press(screen.getByTestId("test-model"));
     expect(onPress).toHaveBeenCalledTimes(1);
+  });
+
+  it("keeps an installed local route unselectable until its device test passes", () => {
+    const model = getLocalModel("whisper-tiny");
+    const testModel = jest.fn();
+    const screen = wrap(
+      <LocalModelRouteGroup
+        capability="stt"
+        title="Who listens"
+        footer="Choose a recognition route."
+        freeProviderRoutes={[]}
+        isPremium
+        localModels={
+          {
+            benchmarks: {},
+            busy: null,
+            cancelDownload: jest.fn(),
+            compatibleModels: [model],
+            downloadModel: jest.fn(),
+            installs: {
+              [model.id]: {
+                installed: true,
+                path: "/models/whisper-tiny",
+                verified: true,
+              },
+            },
+            isModelSelected: jest.fn(() => false),
+            kokoroModel: { progress: 0 },
+            nativeSpeechCapabilities: { nativeSttEligible: true },
+            progress: {},
+            removeModel: jest.fn(),
+            selectModel: jest.fn(),
+            selectNativeRoute: jest.fn(),
+            testModel,
+          } as unknown as LocalModelSettingsController
+        }
+        onOpenPremium={jest.fn()}
+        premiumCopy="Premium routes"
+        providerRoutes={[]}
+        settings={DEFAULT_SETTINGS}
+      />,
+    );
+
+    expect(
+      screen.getByLabelText("Whisper Tiny · On-device AI").props
+        .accessibilityState,
+    ).toEqual({ checked: false, disabled: true });
+    fireEvent.press(screen.getByTestId("local-model-test-whisper-tiny"));
+    expect(testModel).toHaveBeenCalledWith(model);
   });
 
   it("uses the premium gradient tokens and keeps its upgrade action operable", () => {

@@ -1,26 +1,32 @@
 import React from "react";
 import { StyleSheet } from "react-native";
-import { fireEvent, render } from "@testing-library/react-native";
+import { fireEvent, render, within } from "@testing-library/react-native";
 
 import appConfig from "../../app.json";
 import { AntSettingsOverview } from "../../src/features/settings/AntSettingsOverview";
 import { LocalizationProvider } from "../../src/i18n";
 import { ThemeProvider } from "../../src/theme/ThemeContext";
 import { lightColors } from "../../src/theme/colors";
+import { DEFAULT_SETTINGS } from "../../src/types";
 
 const hiddenIconQuery = { includeHiddenElements: true } as const;
 
 function overviewProps() {
   return {
+    getProviderHealthState: jest.fn(() => "healthy" as const),
     isPremium: true,
     onOpenPage: jest.fn(),
     onOpenPremium: jest.fn(),
     readiness: {
       think: { state: "ready", summaryKey: "settingsReadinessReady" },
-      listen: { state: "attention", summaryKey: "settingsReadinessNeedsAttention" },
+      listen: {
+        state: "attention",
+        summaryKey: "settingsReadinessNeedsAttention",
+      },
       speak: { state: "ready", summaryKey: "settingsReadinessReady" },
       search: { state: "off", summaryKey: "settingsReadinessOff" },
     } as const,
+    settings: DEFAULT_SETTINGS,
   };
 }
 
@@ -38,8 +44,8 @@ describe("AntSettingsOverview", () => {
       screen.getByTestId("phosphor-icon-check-circle", hiddenIconQuery),
     ).toBeTruthy();
     expect(screen.getByText("Premium is unlocked")).toBeTruthy();
-    expect(screen.getByText("Conversation & tools")).toBeTruthy();
-    expect(screen.getByText("Voice & models")).toBeTruthy();
+    expect(screen.getByText("Conversation")).toBeTruthy();
+    expect(screen.getByText("Voice")).toBeTruthy();
     expect(screen.getByText("Privacy & app")).toBeTruthy();
     expect(screen.queryByTestId("settings-readiness-grid")).toBeNull();
     expect(screen.getByTestId("settings-readiness-line")).toBeTruthy();
@@ -87,7 +93,7 @@ describe("AntSettingsOverview", () => {
     );
   });
 
-  it("shows larger section icons without bordered icon containers", () => {
+  it("uses equal live-state rows from the seven-page design", () => {
     const screen = render(
       <ThemeProvider mode="light">
         <LocalizationProvider language="en">
@@ -96,19 +102,16 @@ describe("AntSettingsOverview", () => {
       </ThemeProvider>,
     );
 
-    const iconContainer = screen.getByTestId(
-      "settings-overview-icon-connections",
-    );
-    const containerStyle = StyleSheet.flatten(iconContainer.props.style);
+    const connections = screen.getByTestId("settings-overview-row-connections");
     const iconStyle = StyleSheet.flatten(
       screen.getByTestId("phosphor-icon-key", hiddenIconQuery).props.style,
     );
 
-    expect(containerStyle.width).toBe(34);
-    expect(containerStyle.borderWidth).toBeUndefined();
-    expect(iconStyle.width).toBe(28);
-    expect(iconStyle.height).toBe(28);
-    expect(iconStyle.color).toBe(lightColors.text);
+    expect(StyleSheet.flatten(connections.props.style).minHeight).toBe(64);
+    expect(within(connections).getByText("Not set up")).toBeTruthy();
+    expect(iconStyle.width).toBe(20);
+    expect(iconStyle.height).toBe(20);
+    expect(iconStyle.color).toBe(lightColors.textSecondary);
   });
 
   it("omits the redundant Free edition card", () => {
@@ -122,12 +125,12 @@ describe("AntSettingsOverview", () => {
 
     expect(screen.queryByTestId("settings-edition-card")).toBeNull();
     expect(screen.queryByText("Private Offline · Free")).toBeNull();
-    expect(screen.queryByText("Conversation & tools")).toBeNull();
-    expect(screen.getByText("Voice & models")).toBeTruthy();
+    expect(screen.getByText("Conversation")).toBeTruthy();
+    expect(screen.getByText("Voice")).toBeTruthy();
     expect(screen.getByText("Privacy & app")).toBeTruthy();
   });
 
-  it("keeps Free focused on usable sections and routes upgrades through one action", () => {
+  it("keeps the same seven pages for Free and routes the band through one action", () => {
     const onOpenPremium = jest.fn();
     const onOpenPage = jest.fn();
     const screen = render(
@@ -144,13 +147,36 @@ describe("AntSettingsOverview", () => {
     );
 
     expect(screen.queryByTestId("settings-readiness-grid")).toBeNull();
-    expect(screen.queryByTestId("settings-readiness-line")).toBeNull();
-    expect(
-      screen.queryByTestId("settings-overview-row-connections"),
-    ).toBeNull();
-    fireEvent.press(screen.getByTestId("settings-premium-upgrade"));
+    expect(screen.getByTestId("settings-readiness-line")).toBeTruthy();
+    for (const page of [
+      "connections",
+      "thinking",
+      "search",
+      "listening",
+      "speaking",
+      "data",
+      "app",
+    ]) {
+      expect(screen.getByTestId(`settings-overview-row-${page}`)).toBeTruthy();
+    }
+    expect(screen.getAllByText("Premium").length).toBeGreaterThan(0);
+    fireEvent.press(screen.getByLabelText("Unlock Premium"));
     expect(onOpenPremium).toHaveBeenCalledTimes(1);
     fireEvent.press(screen.getByTestId("settings-overview-row-data"));
     expect(onOpenPage).toHaveBeenCalledWith("data");
+  });
+
+  it("lets Premium dismiss the one-time edition card", () => {
+    const screen = render(
+      <ThemeProvider mode="light">
+        <LocalizationProvider language="en">
+          <AntSettingsOverview {...overviewProps()} />
+        </LocalizationProvider>
+      </ThemeProvider>,
+    );
+
+    fireEvent.press(screen.getByLabelText("Dismiss"));
+    expect(screen.queryByTestId("settings-edition-card")).toBeNull();
+    expect(screen.getByTestId("settings-readiness-line")).toBeTruthy();
   });
 });

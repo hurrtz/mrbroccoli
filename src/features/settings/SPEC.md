@@ -21,8 +21,11 @@ last_validated_sha: 7db5c94
 ## Purpose
 
 Settings exposes deep control without placing provider machinery on the main
-conversation surface. It covers connections, response routes, listening,
-speaking, on-device models, search, data/privacy, and app diagnostics.
+conversation surface. Its overview has seven primary pages: Connections,
+Thinking, Search, Listening, Speaking, Data & privacy, and App & diagnostics.
+The on-device model catalogue remains available as a direct setup target while
+model acquisition and selection are also presented in the stage that uses each
+model.
 
 The historical `Ant` filename prefix remains for import stability. The app does
 not depend on Ant Design; controls are React Native-owned and come from the
@@ -33,35 +36,37 @@ shared design system and settings primitives.
 - `AntSettingsModal.tsx` owns modal lifecycle and page navigation.
 - `AntSettingsFrame.tsx` owns the accessible frame, title, back/close actions,
   keyboard behavior, and focus containment.
-- `AntSettingsPageContent.tsx` routes pages and enforces edition access.
-- `AntSettingsOverview.tsx` groups pages into Conversation, Voice & models, and
-  Privacy & app.
+- `AntSettingsPageContent.tsx` routes pages, enforces edition access, and owns
+  the modal-scoped local-model controller.
+- `AntSettingsOverview.tsx` groups the seven primary pages into Conversation,
+  Voice, and Privacy & app, with a live summary on every row.
 - `pages/` owns one drill-in product area per file.
 - `settings-primitives/` owns cards, fields, picker controls, and the compact
   inset-row vocabulary used by the approved native Settings design:
-  `SettingsGroup`, `SettingsRow`, `RouteOptionRow`, `IconAction`, and
-  `PremiumBand`.
+  `SettingsGroup`, `SettingsRow`, `SettingsChoiceRow`,
+  `SettingsMultiChoiceRow`, `RouteOptionRow`, `LocalModelRouteGroup`,
+  `IconAction`, and `PremiumBand`.
 - `settings-core/` owns reusable non-visual normalization, readiness,
-  validation, voice-preview, and controller behavior.
+  validation, voice-preview, local-model lifecycle, and controller behavior.
 
 ## Edition Boundary
 
-Free users can access On-device, Data & privacy, and App & diagnostics.
-Connections, Thinking, Listening, Speaking, and Search are Premium pages.
+Free and Premium users see the same seven-page overview. Listening exposes
+system and viable downloaded routes to both editions; Free sees provider
+recognition routes as locked ghost rows followed by one Premium band. The pages
+listed by `PREMIUM_SETTINGS_PAGES` still render an upgrade explanation for Free
+instead of exposing their controls. Data & privacy, App & diagnostics, and the
+direct on-device catalogue remain available to both editions.
 
-The overview hides Premium-only rows for Free. Direct navigation to a locked
-page still renders an upgrade explanation rather than exposing the underlying
-controls.
+**Decision:** Edition checks live in page routing or within a route group;
+overview visibility is never an authorization boundary.
 
-**Decision:** Edition checks exist both in navigation visibility and page
-routing. Hiding a row is not an authorization boundary.
-
-Callers may name a landing page directly, which is how the introduction reaches
-the on-device page the tabs do not name. The landing page is recomputed each
-time the modal opens and a Free caller naming a Premium page lands on the
-overview, so a deep link can never become a way past the edition boundary. A
-closed modal clears its focus target: the next plain open would otherwise
-inherit wherever the last deep link went.
+Callers may name a landing page directly, which is how setup reaches the
+on-device catalogue the overview does not name. The landing page is recomputed
+each time the modal opens and a Free caller naming a page-level Premium target
+lands on the overview, so a deep link can never become a way past the edition
+boundary. A closed modal clears its focus target: the next plain open would
+otherwise inherit wherever the last deep link went.
 
 ## Readiness and Validation
 
@@ -93,7 +98,9 @@ capability healthy. The UI shows the capability that was actually tested.
 
 - Connections: credentials, provider capability health, and connection tests.
 - Thinking: response modes, provider/local route, model, and supported effort.
-- Listening: native, local, or provider recognition and language.
+- Listening: input mode, conversation languages, and a unified system, local,
+  or provider recognition route group. Downloaded local models cannot be
+  selected until a successful device benchmark marks them viable.
 - Speaking: spoken reply behavior, native/local/provider voice, instructions,
   previews, and explicit fallback order.
 - On-device: device assessment, curated artifacts, download/test/removal, Free
@@ -109,6 +116,9 @@ capability healthy. The UI shows the capability that was actually tested.
 ## Interaction Rules
 
 - Picker sheets remain above their parent modal.
+- Single- and multi-choice rows open bottom sheets, retain native radio or
+  checkbox semantics, isolate screen-reader focus, and keep a labelled close or
+  Done action.
 - Modal content isolates screen-reader focus and always provides a labelled
   close action.
 - Dynamic validation, download, and preview state is announced only on
@@ -119,7 +129,8 @@ capability healthy. The UI shows the capability that was actually tested.
   tokens.
 - Settings groups use one bordered inset surface with row dividers rather than
   nesting a separate card around every row. Route choices expose native radio
-  semantics; local-model removal remains an explicit swipe action.
+  semantics; local-model removal remains an explicit swipe action. Removing a
+  selected speech model atomically returns that capability to its system route.
 - `PremiumBand` is the one deliberately decorative Settings primitive. Its
   gradients and sheen use theme tokens, its upgrade action remains at least 44
   points, and Reduce Motion disables the recurring sheen animation.

@@ -1,4 +1,8 @@
-import { getLocalLanguageSettingsUpdate } from "../../src/features/settings-core/onDevice";
+import { getLocalModel } from "../../src/constants/localModels";
+import {
+  getLocalLanguageSettingsUpdate,
+  getLocalModelRemovalSettingsUpdate,
+} from "../../src/features/settings-core/onDevice";
 import { DEFAULT_SETTINGS, type Settings } from "../../src/types";
 
 function settings(overrides: Partial<Settings> = {}): Settings {
@@ -68,6 +72,46 @@ describe("on-device language settings", () => {
     ).toMatchObject({
       localLanguages: ["en", "de"],
       ttsMode: "native",
+    });
+  });
+});
+
+describe("on-device model removal settings", () => {
+  it("returns to the system voice after removing selected Kokoro", () => {
+    expect(
+      getLocalModelRemovalSettingsUpdate(
+        settings({ ttsMode: "kokoro" }),
+        getLocalModel("kokoro-multilingual"),
+      ),
+    ).toMatchObject({
+      localTtsModelId: null,
+      ttsMode: "native",
+    });
+  });
+
+  it("removes a selected local response route and activates its fallback", () => {
+    const localMode = {
+      id: "mode-2",
+      route: {
+        runtime: "local" as const,
+        localModelId: "qwen3-0.6b-q8" as const,
+        provider: "openai" as const,
+        model: "Qwen3 0.6B",
+      },
+    };
+    const providerMode = DEFAULT_SETTINGS.responseModes[0];
+
+    expect(
+      getLocalModelRemovalSettingsUpdate(
+        settings({
+          activeResponseMode: localMode.id,
+          responseModes: [providerMode, localMode],
+        }),
+        getLocalModel("qwen3-0.6b-q8"),
+      ),
+    ).toMatchObject({
+      activeResponseMode: providerMode.id,
+      responseModes: [providerMode],
     });
   });
 });

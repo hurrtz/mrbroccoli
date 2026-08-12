@@ -1,6 +1,7 @@
 import {
   getLocalModel,
   localModelSupportsLanguages,
+  type LocalModelDefinition,
 } from "../../constants/localModels";
 import type { Settings, SpeechLanguage } from "../../types";
 import { deriveResponseModesForProvider } from "../../utils/responseModes";
@@ -73,6 +74,40 @@ export function getLocalLanguageSettingsUpdate(
     );
   });
   if (responseModes.length !== settings.responseModes.length) {
+    if (responseModes.length === 0) {
+      responseModes = deriveResponseModesForProvider(settings.lastProvider, 1);
+    }
+    nextSettings.responseModes = responseModes;
+    if (!responseModes.some(({ id }) => id === settings.activeResponseMode)) {
+      nextSettings.activeResponseMode = responseModes[0].id;
+    }
+  }
+
+  return nextSettings;
+}
+
+export function getLocalModelRemovalSettingsUpdate(
+  settings: Settings,
+  model: LocalModelDefinition,
+): Partial<Omit<Settings, "apiKeys" | "providerModels">> {
+  const nextSettings: Partial<Omit<Settings, "apiKeys" | "providerModels">> =
+    {};
+
+  if (settings.localSttModelId === model.id) {
+    nextSettings.localSttModelId = null;
+    nextSettings.sttMode = "native";
+  }
+  if (
+    settings.localTtsModelId === model.id ||
+    (model.id === "kokoro-multilingual" && settings.ttsMode === "kokoro")
+  ) {
+    nextSettings.localTtsModelId = null;
+    nextSettings.ttsMode = "native";
+  }
+  if (model.capability === "llm") {
+    let responseModes = settings.responseModes.filter(
+      ({ route }) => route.localModelId !== model.id,
+    );
     if (responseModes.length === 0) {
       responseModes = deriveResponseModesForProvider(settings.lastProvider, 1);
     }

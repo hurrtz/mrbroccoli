@@ -82,12 +82,7 @@ export interface SettingsModalProps {
 }
 
 export type SettingsTab =
-  | "instructions"
-  | "providers"
-  | "web"
-  | "stt"
-  | "tts"
-  | "ui";
+  "instructions" | "providers" | "web" | "stt" | "tts" | "ui";
 
 export type SettingsPage =
   | "overview"
@@ -103,7 +98,6 @@ export type SettingsPage =
 export const PREMIUM_SETTINGS_PAGES = [
   "connections",
   "thinking",
-  "listening",
   "speaking",
   "search",
 ] as const satisfies readonly SettingsPage[];
@@ -133,11 +127,7 @@ export type ProviderValidationStates = Partial<
 >;
 
 export type ProviderHealthState =
-  | "unconfigured"
-  | "configured"
-  | "validating"
-  | "healthy"
-  | "failing";
+  "unconfigured" | "configured" | "validating" | "healthy" | "failing";
 
 export type PreviewButtonPhase = "idle" | "generating" | "playing";
 

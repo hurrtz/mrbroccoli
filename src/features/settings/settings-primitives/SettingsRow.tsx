@@ -26,6 +26,7 @@ export function SettingsRow({
   label,
   last = false,
   onPress,
+  supporting,
   testID,
   value,
 }: {
@@ -39,6 +40,7 @@ export function SettingsRow({
   label: string;
   last?: boolean;
   onPress?: () => void;
+  supporting?: string;
   testID?: string;
   value?: string;
 }) {
@@ -59,11 +61,21 @@ export function SettingsRow({
   const content = (
     <>
       {icon ? (
-        <PhosphorIcon name={icon} size="compact" color={iconColor} />
+        <PhosphorIcon name={icon} size="control" color={iconColor} />
       ) : null}
-      <Text numberOfLines={1} style={[styles.label, { color: labelColor }]}>
-        {label}
-      </Text>
+      <View style={styles.copy}>
+        <Text numberOfLines={1} style={[styles.label, { color: labelColor }]}>
+          {label}
+        </Text>
+        {supporting ? (
+          <Text
+            numberOfLines={1}
+            style={[styles.supporting, { color: colors.textSecondary }]}
+          >
+            {supporting}
+          </Text>
+        ) : null}
+      </View>
       {value ? (
         <Text
           numberOfLines={1}
@@ -90,6 +102,7 @@ export function SettingsRow({
         testID={testID}
         style={[
           styles.row,
+          supporting ? styles.rowWithSupporting : null,
           { borderBottomColor: colors.border },
           last ? styles.last : null,
           disabled ? styles.disabled : null,
@@ -111,6 +124,7 @@ export function SettingsRow({
       onPress={onPress}
       style={({ pressed }) => [
         styles.row,
+        supporting ? styles.rowWithSupporting : null,
         { borderBottomColor: colors.border },
         last ? styles.last : null,
         pressed ? { backgroundColor: colors.surfaceAlt } : null,
@@ -131,18 +145,30 @@ const styles = StyleSheet.create({
     gap: 12,
     borderBottomWidth: StyleSheet.hairlineWidth,
   },
+  rowWithSupporting: {
+    minHeight: 64,
+    paddingVertical: 8,
+  },
   last: {
     borderBottomWidth: 0,
   },
   disabled: {
     opacity: 0.45,
   },
-  label: {
+  copy: {
     flex: 1,
     minWidth: 0,
+  },
+  label: {
     fontFamily: fonts.bodyMedium,
     fontSize: 15,
     lineHeight: 20,
+  },
+  supporting: {
+    marginTop: 2,
+    fontFamily: fonts.body,
+    fontSize: 12,
+    lineHeight: 17,
   },
   value: {
     maxWidth: "44%",
