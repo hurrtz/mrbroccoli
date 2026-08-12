@@ -1,6 +1,6 @@
 # Surface: automatic on-device setup
 
-The normative description of the auto-setup flow. Components: `components/on-device/`. It appears in two places — step `auto` of the introduction and the top of On-device AI settings — and it is the same card in both, so a user who starts it in one place recognises it in the other.
+The normative description of the auto-setup flow. Components: `components/on-device/`. It appears in two places — step `auto` of the introduction and the top of App & diagnostics settings — and it is the same card in both, so a user who starts it in one place recognises it in the other.
 
 ## The pieces
 
@@ -25,7 +25,7 @@ The card appears in two places and the home-screen row is a third view of the sa
 
 ## Announcing the outcome
 
-Where the outcome is announced depends on where the user is. In the introduction or on the On-device AI page, the card states it in full and there is **no toast**. Anywhere else, a `Toast` — success, or danger with a retry action. **Never both**: two announcements of one event read as two events.
+Where the outcome is announced depends on where the user is. In the introduction or on the App & diagnostics page, the card states it in full and there is **no toast**. Anywhere else, a `Toast` — success, or danger with a retry action. **Never both**: two announcements of one event read as two events.
 
 ## `BackgroundTaskBar`
 

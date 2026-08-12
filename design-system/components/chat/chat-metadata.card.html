@@ -10,11 +10,12 @@
 </head><body><div id="root"></div>
 <script type="text/babel">
 const { ChatBubble, TurnReceiptCard, WebSearchReferences, UberModeAuditCard, UsageCard, PipelineNotices, ReplyFailureCard, MessageBranchIndicator, ConversationMemoryModal } = window.MrBroccoliDesignSystem_62d510;
+const base = "../../assets/providers";
 ReactDOM.createRoot(document.getElementById("root")).render(
   <div style={{display:"grid",gridTemplateColumns:"1.1fr 1fr",gap:16,alignItems:"start"}}>
     <div>
       <p className="lbl">Receipt · search · usage · branches, in place</p>
-      <ChatBubble role="assistant" provider="anthropic" model="Claude Sonnet 4.5" timestamp="09.08.26 · 14:12"
+      <ChatBubble role="assistant" provider="anthropic" model="Claude Sonnet 4.5" timestamp="09.08.26 · 14:12" assetBase={base}
         text="High water is at 15:40 today. Six departures run on Saturday; two sources note weather cancellations.">
         <MessageBranchIndicator branchesLabel="2 branches" onOpenBranches={() => {}} />
         <WebSearchReferences countLabel="3 sources" defaultExpanded query="lisbon tide table saturday"
@@ -29,7 +30,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(
         <UsageCard text="~1.2k prompt · 480 completion · ~1.7k total" />
       </ChatBubble>
       <p className="lbl" style={{marginTop:12}}>Council audit · pipeline notice</p>
-      <ChatBubble role="assistant" provider="openai" model="Council of 3" timestamp="09.08.26 · 14:15"
+      <ChatBubble role="assistant" provider="openai" model="Council of 3" timestamp="09.08.26 · 14:15" assetBase={base}
         text="All three models agree the schedule holds.">
         <UberModeAuditCard summary="2 rounds · 7 calls · 0 failed" defaultExpanded
           outcome="Convergence reached after round 2."

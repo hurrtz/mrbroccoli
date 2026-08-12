@@ -4,7 +4,7 @@ screen that started it — today, an on-device model install.
 ```jsx
 <BackgroundTaskBar title="Installing on-device AI"
   detail="Step 3 of 5 · about 2 min left" fraction={0.46}
-  onPress={() => openSettingsPage("local")} />
+  onPress={() => openSettingsPage("app")} />
 ```
 
 It sits under the top bar, above the route byline, and it always leads to the

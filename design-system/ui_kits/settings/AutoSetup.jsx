@@ -3,7 +3,7 @@ const { AUTO_SETUP_PLAN, AutoSetupStepReading } = window.MrBroccoliDesignSystem_
 /**
  * The install clock, owned above every screen that shows it.
  *
- * The introduction, the On-device AI page and the home-screen row are three
+ * The introduction, the App & diagnostics page and the home-screen row are three
  * views of one job, so the job cannot live in any of them. Real timings differ —
  * the check is milliseconds, the download is minutes — but the shape is the
  * same: measure, propose, install, and a failure that leaves the finished

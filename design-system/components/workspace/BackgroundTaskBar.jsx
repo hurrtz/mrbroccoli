@@ -38,7 +38,7 @@ export function BackgroundTaskBar({
     <div
       role="button"
       tabIndex={0}
-      aria-label={title + ". " + detail + ". Open on-device AI settings."}
+      aria-label={title + ". " + detail + ". Open settings."}
       onClick={onPress}
       style={{
         position: "relative", display: "flex", alignItems: "center", gap: 10,

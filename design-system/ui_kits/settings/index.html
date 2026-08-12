@@ -1,4 +1,4 @@
-<!-- @dsCard group="Mr Broccoli settings" viewport="1180x800" name="Settings" subtitle="The eight-page settings modal, premium and free editions" -->
+<!-- @dsCard group="Mr Broccoli settings" viewport="1180x800" name="Settings" subtitle="The seven-page settings modal — same structure in both editions" -->
 <!DOCTYPE html><html data-theme="light"><head><meta charset="utf-8"><title>Mr Broccoli — settings</title>
 <link rel="stylesheet" href="../../styles.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/regular/style.css">
@@ -28,7 +28,6 @@ const PAGES = {
   search: window.SearchPage,
   listening: window.ListeningPage,
   speaking: window.SpeakingPage,
-  local: window.OnDevicePage,
   data: window.DataPrivacyPage,
   app: window.AppPage,
 };
@@ -42,7 +41,7 @@ function SettingsApp({ isPremium, failInstall }) {
     return <window.SettingsOverview isPremium={isPremium} onOpenPage={setPage} onOpenPremium={() => {}} onClose={close} />;
   }
   const Page = PAGES[page];
-  return <Page onBack={back} onClose={close} auto={auto} />;
+  return <Page onBack={back} onClose={close} auto={auto} isPremium={isPremium} />;
 }
 
 function Frame({ theme, isPremium, failInstall }) {

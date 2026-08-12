@@ -1,21 +1,24 @@
+export interface ConversationDrawerModel {
+  /** Provider id, e.g. "anthropic". One entry per model — a provider running two models appears twice. */
+  provider: string;
+}
+
 export interface ConversationDrawerItemProps {
   title: string;
-  /** Provider ids used in this conversation; one row each, paired with models. */
-  providers?: string[];
-  models?: string[];
+  /** One entry per model taking part; renders one provider mark each, duplicates included. */
+  models?: ConversationDrawerModel[];
   messageCount?: number;
-  /** Pre-formatted date and time. */
+  /** Pre-formatted date, no time of day (e.g. "09.08.26"). */
   updatedAt?: string;
+  /** Root session title. Present on forked sessions; renders the tappable root tag on its own row. */
+  forkOf?: string;
   active?: boolean;
   pinned?: boolean;
   isPrivate?: boolean;
-  hasBranches?: boolean;
-  expanded?: boolean;
-  /** Branch depth, indenting 14pt per level and capped at 4. */
-  depth?: number;
   onSelect?: () => void;
   onOpenActions?: () => void;
-  onToggleBranches?: () => void;
+  /** Jump to the root session; fired by the fork tag (44pt touch target). */
+  onOpenRoot?: () => void;
   assetBase?: string;
 }
 

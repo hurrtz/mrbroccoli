@@ -10,14 +10,14 @@ One product: the **Mr Broccoli mobile app** (Expo / React Native, iOS and Androi
 | --- | --- |
 | `guidelines/foundations.md` | Color, type, shape, motion, layout, accessibility, iconography |
 | `guidelines/content.md` | Voice and copy rules |
-| `guidelines/surfaces/` | **The normative spec, one document per screen**: `workspace.md`, `settings.md`, `intro.md`, `on-device.md`, `chat.md` |
+| `guidelines/surfaces/` | **The normative spec, one document per screen**: `workspace.md`, `settings.md`, `intro.md`, `on-device.md`, `chat.md`, plus `announcements.md` for cross-screen interruption rules |
 | `guidelines/*.card.html` | Foundation specimen cards |
 | `styles.css` | The entry point consumers link. Imports only. |
 | `tokens/` | `fonts`, `colors`, `typography`, `spacing`, `shape`, `motion`, `base` |
 | `components/` | The React primitives, grouped by concern — each with `.jsx`, `.d.ts` (normative props contract) and `.prompt.md` (usage) |
 | `templates/` | Starting folders a consuming project copies |
 | `ui_kits/mobile-app/` | Click-through recreation of the workspace |
-| `ui_kits/settings/` | The eight-page settings modal, premium and free |
+| `ui_kits/settings/` | The seven-page settings modal — same structure in both editions |
 | `ui_kits/intro/` | The seven-step introduction walkthrough |
 | `assets/` | Fonts (Unica One, Outfit), 47 provider SVGs, app icons |
 | `SKILL.md` | Agent-skill entry point |
@@ -35,9 +35,9 @@ One product: the **Mr Broccoli mobile app** (Expo / React Native, iOS and Androi
 **Core** — `Button`, `IconButton`, `Input`, `TextArea`, `Tag`, `PhosphorIcon`.
 **List** — `List`, `ListItem` (with `ListItem.Brief`).
 **Overlays** — `Modal`, `Toast`.
-**Settings primitives** — `AntSettingsCard`, `AntDisclosureCard`, `AntButtonLabel`, `AntSectionIntro`, `AntRadioSection`, `AntSwitchRow`, `AntNumberInputRow`, `AntTextArea`, `AntPickerRow`, `AntPickerRows`, `AntPickerSection`, `RuntimeReadiness`.
+**Settings primitives** — `SettingsGroup`, `SettingsRow`, `RouteOptionRow`, `IconAction`, `PremiumBand`, `RuntimeReadiness`; superseded Ant recreation retained where still mounted: `AntSettingsCard`, `AntDisclosureCard`, `AntButtonLabel`, `AntSectionIntro`, `AntRadioSection`, `AntSwitchRow`, `AntNumberInputRow`, `AntTextArea`, `AntPickerRow`, `AntPickerRows`, `AntPickerSection`.
 **Workspace** — `AppWordmark`, `RouteByline`, `RoutePicker`, `Composer`, `Picker`, `ResponseModeToggle`, `PhaseAwareVoiceAction`, `IntroBanner`, `PremiumUpgradeModal`, `VoiceOrb`, `OrbSatellite`, `ConversationSettingsSummary`, `WorkspaceStatusLine`, `TranscriptHandle`, `BackgroundTaskBar`.
-**Chat** — `ChatBubble`, `ChatTranscript`, `ConversationDrawerItem`, `MessageImageAttachments`, `TurnReceiptCard`, `WebSearchReferences`, `UsageCard`, `UberModeAuditCard`, `ReplyFailureCard`, `PipelineNotices`, `MessageBranchIndicator`, `ConversationMemoryModal`.
+**Chat** — `ChatBubble`, `ChatTranscript`, `TranscriptMessage`, `ConversationDrawerItem`, `ConversationActionSheet`, `ConversationRenameModal`, `ConversationIntegrityModal`, `MessageImageAttachments`, `TurnReceiptCard`, `WebSearchReferences`, `UsageCard`, `UberModeAuditCard`, `ReplyFailureCard`, `PipelineNotices`, `MessageBranchIndicator`, `ConversationMemoryModal`.
 **Brand** — `ProviderIcon`.
 **Introduction** — `IntroFlow`, `IntroStepper`, `IntroPanel`, `IntroPoint`, `IntroButton`, `IntroTitle`, `IntroBody`, `IntroDivider`, `IntroVoicePicker`.
 **On-device** — `LocalModelPerformanceSummary`, `AutoSetupCard`, `AutoSetupPlanRow`, `InstallProgress`.

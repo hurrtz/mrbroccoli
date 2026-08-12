@@ -5,10 +5,12 @@ window.MB_DATA = {
     { id: "local", local: true, providerLabel: "On device", modelLabel: "On device · Qwen 2.5 1.5B", effortLabel: "Normal", effortLevels: [] },
   ],
   conversations: [
-    { id: "c1", title: "Tide tables", providers: ["anthropic"], models: ["Claude Sonnet 4.5"], messageCount: 12, updatedAt: "09.08.26 · 14:12", pinned: true, hasBranches: true },
-    { id: "c2", title: "Sourdough timing", providers: ["openai"], models: ["GPT-5 mini"], messageCount: 6, updatedAt: "08.08.26 · 09:03" },
-    { id: "c3", title: "Insurance letter", providers: ["mistral"], models: ["Mistral Large"], messageCount: 7, updatedAt: "06.08.26 · 21:44", isPrivate: true },
-    { id: "c4", title: "Portuguese phrases", providers: ["gemini"], models: ["Gemini 2.5 Pro"], messageCount: 21, updatedAt: "04.08.26 · 18:20" },
+    { id: "c1", title: "Tide tables", models: [{ provider: "anthropic" }], messageCount: 12, updatedAt: "09.08.26", pinned: true },
+    { id: "c2", title: "Sourdough timing", models: [{ provider: "openai" }], messageCount: 6, updatedAt: "08.08.26" },
+    { id: "b1", title: "Rye experiment", forkOf: "Sourdough timing", models: [{ provider: "openai" }], messageCount: 3, updatedAt: "08.08.26" },
+    { id: "c3", title: "Insurance letter", models: [{ provider: "mistral" }], messageCount: 7, updatedAt: "06.08.26", isPrivate: true },
+    { id: "c4", title: "Portuguese phrases", models: [{ provider: "gemini" }], messageCount: 21, updatedAt: "04.08.26" },
+    { id: "a1", title: "Flat hunt 2025", archived: true, models: [{ provider: "anthropic" }], messageCount: 88, updatedAt: "12.11.25" },
   ],
   messages: [
     { id: "m1", role: "user", timestamp: "09.08.26 · 14:11", text: "When does the tide turn in Lisbon today?" },

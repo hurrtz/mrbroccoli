@@ -6,7 +6,7 @@ The normative description of the first-launch walkthrough. Living demo: `ui_kits
 
 Seven, in order: welcome, what setup actually requires, **automatic on-device setup (`auto`)**, the one requirement (`llm`), speech in, speech out, Premium — `INTRO_STEPS = ["welcome", "requirements", "auto", "llm", "stt", "tts", "premium"]`. `auto` sits after `requirements` and before `llm` because the manual routes are the fallback now — someone who takes the tap never needs the three screens that follow, and someone who declines has lost a swipe. `IntroStepper` takes any count without changes.
 
-On the `auto` step the `AutoSetupCard`'s own header is hidden: the step title and body already say what it is. See `guidelines/surfaces/on-device.md` for the card itself.
+On the `auto` step the `AutoSetupCard`'s own header is hidden: the step title and body already say what it is. See `guidelines/surfaces/on-device.md` for the card itself. The `auto` step also carries the **device probe** ("Test this device", with the memory · storage readout) — moved here from settings when the On-device page was retired (`guidelines/surfaces/settings.md`): capability is a first-launch question, so the walkthrough answers it.
 
 ## Navigation
 

@@ -1,6 +1,6 @@
 One tap that measures the phone, proposes on-device models for thinking,
 listening and speaking, and installs them. The same card appears in the
-introduction and in On-device AI settings.
+introduction and in App & diagnostics settings.
 
 ```jsx
 // Self-driving: fine for a specimen or a single screen.

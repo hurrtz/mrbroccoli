@@ -15,7 +15,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(
   <div style={{display:"grid",gridTemplateColumns:"1.1fr 1fr",gap:16,alignItems:"start"}}>
     <div><p className="lbl">ChatBubble</p>
       <ChatBubble role="user" timestamp="09.08.26 · 14:11" text="When does the tide turn in Lisbon?" />
-      <ChatBubble role="assistant" provider="anthropic" model="Claude Sonnet 4.5" timestamp="09.08.26 · 14:12"
+      <ChatBubble role="assistant" provider="anthropic" model="Claude Sonnet 4.5" timestamp="09.08.26 · 14:12" assetBase={base}
         text="High water is at 15:40 today, and the tide turns roughly every six hours after that."
         actions={[{icon:"copy",label:"Copy"},{icon:"redo",label:"Repeat"},{icon:"branch",label:"Branch"},{icon:"share-alt",label:"Share"}]} />
       <p className="lbl" style={{marginTop:12}}>ChatTranscript · empty</p>
@@ -25,9 +25,9 @@ ReactDOM.createRoot(document.getElementById("root")).render(
     </div>
     <div><p className="lbl">ConversationDrawerItem</p>
       <div style={{border:"1px solid var(--mb-color-border)",borderRadius:"var(--mb-radius-dialog)",background:"var(--mb-color-surface)",overflow:"hidden"}}>
-        <ConversationDrawerItem title="Tide tables" active pinned providers={["anthropic"]} models={["Claude Sonnet 4.5"]} messageCount={12} updatedAt="09.08.26 · 14:12" hasBranches assetBase={base} />
-        <ConversationDrawerItem title="Loaf timing" depth={1} providers={["openai"]} models={["GPT-5"]} messageCount={4} updatedAt="08.08.26 · 09:03" assetBase={base} />
-        <ConversationDrawerItem title="Insurance letter" isPrivate providers={["mistral"]} models={["Mistral Large"]} messageCount={7} updatedAt="06.08.26 · 21:44" assetBase={base} />
+        <ConversationDrawerItem title="Tide tables" active pinned models={[{provider:"anthropic"},{provider:"openai"}]} messageCount={12} updatedAt="09.08.26" assetBase={base} />
+        <ConversationDrawerItem title="Shortlist vote" forkOf="Naming the boat" models={[{provider:"openai"},{provider:"anthropic"}]} messageCount={5} updatedAt="08.08.26" assetBase={base} />
+        <ConversationDrawerItem title="Insurance letter" isPrivate models={[{provider:"mistral"}]} messageCount={7} updatedAt="06.08.26" assetBase={base} />
       </div>
     </div>
   </div>

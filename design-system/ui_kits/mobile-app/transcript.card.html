@@ -1,0 +1,97 @@
+<!-- @dsCard group="Mr Broccoli app" viewport="1260x800" name="Transcript in context" subtitle="The transcript drawer, spoken-script: session-aware fold, meta disclosure, swipe to remove" -->
+<!DOCTYPE html><html data-theme="light"><head><meta charset="utf-8"><title>Mr Broccoli — transcript</title>
+<link rel="stylesheet" href="../../styles.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/regular/style.css">
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script src="../../_ds_bundle.js"></script>
+<style>
+body{margin:0;padding:24px;background:#8f8d86;display:flex;gap:24px;flex-wrap:wrap;align-items:flex-start;justify-content:center;font-family:var(--mb-font-body)}
+.cap{font-family:var(--mb-font-mono);font-size:10px;letter-spacing:.9px;text-transform:uppercase;color:#2a2b2e;margin:0 0 8px 4px}
+.cap.d{color:#e6e4dd}
+.device{width:372px;height:720px;border-radius:34px;overflow:hidden;position:relative;transform:translateZ(0);background:var(--mb-color-background);box-shadow:0 18px 44px rgba(0,0,0,.32);border:1px solid rgba(0,0,0,.25)}
+</style>
+</head><body>
+<div><p class="cap">Ongoing · latest expanded, actions visible</p><div class="device" id="ongoing" data-theme="light"></div></div>
+<div><p class="cap">Swipe to remove · drops it from future context</p><div class="device" id="swipe" data-theme="light"></div></div>
+<div><p class="cap d">Dark · metrics disclosure open</p><div class="device" id="dark" data-theme="dark"></div></div>
+<script type="text/babel">
+const { IconButton, TranscriptMessage, PhosphorIcon } = window.MrBroccoliDesignSystem_62d510;
+const base = "../../assets/providers";
+const noop = () => {};
+const ACTIONS = [{icon:"branch",label:"Branch here"},{icon:"copy",label:"Copy"},{icon:"share-alt",label:"Share"},{icon:"sound",label:"Speak again"}];
+const MSGS = [
+  { role: "user", time: "14:11", paragraphs: ["When does the tide turn in Lisbon on Saturday?"] },
+  { role: "assistant", provider: "anthropic", model: "Claude Sonnet 4.5", time: "14:12",
+    paragraphs: [
+      "High water is at 15:40 on Saturday, and the tide turns roughly every six hours after that.",
+      "If you want slack water for the crossing itself, aim for the window between 15:10 and 16:10 — the current through the narrows drops to under half a knot there.",
+      "After dark the ebb picks up considerably, so the comfortable return window closes around 20:30.",
+    ],
+    meta: "3 sources · OpenRouter · 6.4 s",
+    metrics: [
+      { label: "Turn", value: "Anthropic · Claude Sonnet 4.5 · High" },
+      { label: "Timing", value: "stt 0.8 s · search 1.2 s · model 4.1 s · total 6.4 s" },
+      { label: "Tokens in", value: "1,214" }, { label: "Tokens out", value: "482" }, { label: "Tokens total", value: "1,696" },
+      { label: "Web search", value: "1 query · 3 sources kept" },
+    ] },
+  { role: "user", time: "14:14", paragraphs: ["Is a Saturday sail realistic at all?"], swipeDemo: true },
+  { role: "assistant", council: ["anthropic", "openai", "mistral"], provider: "openai", time: "14:15",
+    paragraphs: [
+      "All three models agree: the schedule holds, but plan the return before the evening wind picks up.",
+      "The dissenting note came on gusts — one model weights the afternoon forecast higher and suggests reefing early.",
+    ],
+    meta: "Council · 2 rounds · 7 calls",
+    metrics: [
+      { label: "Council", value: "#1 Claude Sonnet 4.5 · #2 GPT-5 · #3 Mistral Large" },
+      { label: "Calls", value: "7 successful · 0 failed · 1 challenge" },
+      { label: "Tokens total", value: "9,420" },
+    ] },
+  { role: "user", time: "14:18", paragraphs: ["And the last ferry back?"] },
+  { role: "assistant", provider: "anthropic", model: "Claude Sonnet 4.5", time: "14:19",
+    paragraphs: [
+      "The last ferry leaves Cacilhas at 23:35 on Saturdays; the one before it at 22:50 is the safer bet if you are sailing back first.",
+      "If you miss both, the night bus 52 runs until 2:00 from the same square.",
+    ],
+    meta: "OpenRouter · 3.1 s",
+    metrics: [{ label: "Turn", value: "Anthropic · Claude Sonnet 4.5 · Normal" }, { label: "Tokens total", value: "1,100" }] },
+];
+function Row({ m, i, ongoing, swipe, metricsOpenIndex }){
+  const [open, setOpen] = React.useState(!!(ongoing && i === MSGS.length - 1));
+  const [statsOpen, setStatsOpen] = React.useState(i === metricsOpenIndex);
+  const row = <TranscriptMessage role={m.role} paragraphs={m.paragraphs} model={m.model} provider={m.provider} council={m.council}
+    time={m.time} expanded={open} onToggle={() => setOpen(!open)} meta={m.meta} metrics={m.metrics}
+    metricsOpen={statsOpen} onToggleMetrics={() => setStatsOpen(!statsOpen)}
+    actions={ACTIONS} last={i === MSGS.length - 1} assetBase={base} />;
+  if (!(swipe && m.swipeDemo)) return row;
+  return <div style={{position:"relative",overflow:"hidden"}}>
+    <div style={{position:"absolute",top:0,right:0,bottom:0,width:96,background:"var(--mb-color-danger)",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:4}}>
+      <PhosphorIcon name="delete" size="compact" color="#FFF7F5" />
+      <span style={{fontFamily:"var(--mb-font-display)",fontWeight:600,fontSize:12,color:"#FFF7F5"}}>Remove</span>
+    </div>
+    <div style={{transform:"translateX(-96px)",background:"var(--mb-color-background)",boxShadow:"6px 0 14px rgba(0,0,0,.12)"}}>{row}</div>
+  </div>;
+}
+function Screen({ ongoing, swipe, metricsOpenIndex }){
+  return <div style={{display:"flex",flexDirection:"column",height:"100%",background:"var(--mb-color-overlay)"}}>
+    <div style={{height:56,flexShrink:0}}></div>
+    <div style={{flex:1,minHeight:0,display:"flex",flexDirection:"column",background:"var(--mb-color-background)",borderRadius:"var(--mb-radius-sheet-top) var(--mb-radius-sheet-top) 0 0",border:"1px solid var(--mb-color-surface-raised-border)",borderBottom:"none",boxShadow:"var(--mb-shadow-sheet)"}}>
+      <div style={{flexShrink:0,padding:"10px 8px 8px 18px",borderBottom:"1px solid var(--mb-color-border)"}}>
+        <span style={{display:"block",width:38,height:4,borderRadius:2,margin:"0 auto 8px",background:"var(--mb-color-border-strong)"}}></span>
+        <div style={{display:"flex",alignItems:"center",gap:8}}>
+          <span style={{flex:1,minWidth:0,fontFamily:"var(--mb-font-headline)",fontSize:17,letterSpacing:"-0.2px",color:"var(--mb-color-text)",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>Tide tables</span>
+          <IconButton icon="close" accessibilityLabel="Hide transcript" />
+        </div>
+      </div>
+      <div style={{flex:1,overflowY:"auto",padding:"6px 18px 24px"}}>
+        {MSGS.map((m,i)=><Row key={i} m={m} i={i} ongoing={ongoing} swipe={swipe} metricsOpenIndex={metricsOpenIndex} />)}
+      </div>
+    </div>
+  </div>;
+}
+ReactDOM.createRoot(document.getElementById("ongoing")).render(<Screen ongoing />);
+ReactDOM.createRoot(document.getElementById("swipe")).render(<Screen swipe />);
+ReactDOM.createRoot(document.getElementById("dark")).render(<Screen metricsOpenIndex={3} />);
+</script>
+</body></html>

@@ -9,7 +9,7 @@ date: 2026-08-10
 
 - Added automatic on-device setup: `AutoSetupCard`, `AutoSetupPlanRow`, `InstallProgress`, `BackgroundTaskBar`.
 - `IntroFlow` gained an `auto` step — `INTRO_STEPS` is seven ids, not six.
-- On-device AI settings leads with the automatic card; the catalogue section is now "Installed and available".
+- Settings restructured: seven pages, stage-page route pickers own model lifecycle, the On-device AI page is retired (probe → introduction, languages → Listening, storage → Data & privacy, auto-setup → App & diagnostics).
 - Design docs restructured: normative spec now lives in `guidelines/surfaces/*.md`; `migration-goal.md` and `explorations/` retired after absorption.
 
 ## Sync history

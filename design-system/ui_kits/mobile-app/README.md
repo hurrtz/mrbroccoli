@@ -10,7 +10,10 @@ Three frames render side by side — light portrait, dark portrait, and landscap
 | --- | --- |
 | `index.html` | The three device shells and the route between screens |
 | `Workspace.jsx` | `MainScreenPresentation` — top bar, banner, byline, settings sentence, orb, satellites, status line, transcript handle; `Workspace` (portrait) and `LandscapeWorkspace` (two-pane) |
-| `ConversationDrawerScreen.jsx` | `ConversationDrawer` — search, new conversation, branch rows |
+| `ConversationDrawerScreen.jsx` | `ConversationDrawer` — flat session list, fork tags, section bands, archived group, bottom search |
+| `sessions.card.html` | The drawer as its own card, both appearances plus the landscape panel |
+| `transcript.card.html` | The transcript drawer, spoken-script: fold, meta disclosure, swipe to remove |
+| `premium.card.html` | The upgrade journey: offer and unlocked states |
 | `../settings/*` | Settings is its own kit; loaded for the settings route |
 | `../intro/*` | The introduction is its own kit; opened from the banner |
 | `data.js` | Fixture conversations, models, providers and settings sections |

@@ -1,192 +1,106 @@
-const { AntSectionIntro, AntSettingsCard, AntSwitchRow, AntPickerSection, AntPickerRow,
-        AntPickerRows, AntRadioSection, AntButtonLabel, Button, IconButton, PhosphorIcon,
-        LocalModelPerformanceSummary, AutoSetupCard } = window.MrBroccoliDesignSystem_62d510;
+const { SettingsGroup, SettingsRow, RouteOptionRow, IconAction, PremiumBand, PhosphorIcon } = window.MrBroccoliDesignSystem_62d510;
 
-/** Providers the user has connected that can do this job — the pages receive
-    selectableSttProviders / selectableTtsProviders, never the full set. */
-function capableProviders(capability) {
-  return window.MB_SETTINGS.providers
-    .filter((provider) => provider.capabilities.includes(capability))
-    .map((provider) => ({ value: provider.label, label: provider.label }));
+/** Kit-local switch (visual only). */
+function KitSwitch({ on }) {
+  const [state, setState] = React.useState(!!on);
+  return (
+    <span role="switch" aria-checked={state ? "true" : "false"} onClick={(e) => { e.stopPropagation(); setState(!state); }}
+      style={{ width: 46, height: 28, borderRadius: 14, flexShrink: 0, position: "relative", cursor: "pointer", background: state ? "var(--mb-color-accent)" : "var(--mb-color-border-strong)", transition: "background .15s" }}>
+      <span style={{ position: "absolute", top: 2, left: state ? 20 : 2, width: 24, height: 24, borderRadius: 12, background: "#fff", boxShadow: "0 1px 3px rgba(0,0,0,.25)", transition: "left .15s" }} />
+    </span>
+  );
+}
+window.KitSwitch = KitSwitch;
+
+/** The searchable voice picker sheet — scales to provider catalogues with dozens of voices. */
+function VoiceSheet({ onClose }) {
+  return (
+    <div style={{ position: "absolute", inset: 0, zIndex: 5, display: "flex", flexDirection: "column", justifyContent: "flex-end", background: "var(--mb-color-overlay)" }}>
+      <div onClick={onClose} style={{ position: "absolute", inset: 0 }} />
+      <div style={{ position: "relative", display: "flex", flexDirection: "column", maxHeight: "78%", background: "var(--mb-color-background)", borderRadius: "var(--mb-radius-sheet-top) var(--mb-radius-sheet-top) 0 0", border: "1px solid var(--mb-color-surface-raised-border)", borderBottom: "none", boxShadow: "var(--mb-shadow-sheet)" }}>
+        <div style={{ flexShrink: 0, padding: "10px 18px 10px" }}>
+          <span style={{ display: "block", width: 38, height: 4, borderRadius: 2, margin: "0 auto 10px", background: "var(--mb-color-border-strong)" }} />
+          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <span style={{ flex: 1, fontFamily: "var(--mb-font-headline)", fontSize: 17, letterSpacing: "-0.2px", color: "var(--mb-color-text)" }}>Voice · Kokoro</span>
+            <span style={{ fontFamily: "var(--mb-font-mono)", fontSize: 10, letterSpacing: ".4px", color: "var(--mb-color-text-muted)" }}>54 voices</span>
+          </div>
+          <div style={{ display: "flex", alignItems: "center", gap: 9, minHeight: 44, marginTop: 8, padding: "0 13px", borderRadius: 99, border: "1px solid var(--mb-color-border)", background: "var(--mb-color-surface)" }}>
+            <PhosphorIcon name="search" size="compact" color="var(--mb-color-text-muted)" />
+            <span style={{ fontFamily: "var(--mb-text-body-family)", fontSize: 14, color: "var(--mb-color-text-muted)" }}>Search voices</span>
+          </div>
+        </div>
+        <div style={{ flex: 1, minHeight: 0, overflowY: "auto", padding: "0 6px 18px 18px" }}>
+          {window.MB_SETTINGS.voices.map((voice, index) => (
+            <div key={voice.n} role="button" aria-pressed={voice.on ? "true" : "false"} style={{ display: "flex", alignItems: "center", gap: 11, minHeight: 50, cursor: "pointer", borderBottom: index === window.MB_SETTINGS.voices.length - 1 ? "none" : "1px solid var(--mb-color-border)" }}>
+              <span style={{ width: 20, height: 20, borderRadius: 10, flexShrink: 0, border: "2px solid " + (voice.on ? "var(--mb-color-accent)" : "var(--mb-color-border-strong)"), display: "flex", alignItems: "center", justifyContent: "center" }}>
+                {voice.on ? <span style={{ width: 10, height: 10, borderRadius: 5, background: "var(--mb-color-accent)" }} /> : null}
+              </span>
+              <span style={{ flex: 1, minWidth: 0, display: "flex", alignItems: "baseline", gap: 8 }}>
+                <span style={{ fontFamily: "var(--mb-font-body-medium)", fontWeight: 500, fontSize: 14, color: "var(--mb-color-text)" }}>{voice.n}</span>
+                <span style={{ fontFamily: "var(--mb-text-body-family)", fontSize: 12, color: "var(--mb-color-text-secondary)" }}>{voice.d}</span>
+              </span>
+              <span role="button" aria-label={"Test " + voice.n} style={{ width: 44, height: 44, cursor: "pointer", display: "inline-flex", alignItems: "center", justifyContent: "center" }}>
+                <PhosphorIcon name="play-circle" size="control" color="var(--mb-color-accent)" />
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
 }
 
-/** Listening — input mode, recognition language, speech-to-text route. */
+/** Listening — input + the unified "Who listens" picker with every lifecycle state. */
 function ListeningPage({ onBack, onClose }) {
-  const [mode, setMode] = React.useState("push-to-talk");
-  const [route, setRoute] = React.useState("native");
-  const [language, setLanguage] = React.useState("auto");
-  const [sttProvider, setSttProvider] = React.useState("OpenAI");
-  const [sttModel, setSttModel] = React.useState("whisper-1");
   return (
     <window.SettingsFrame title="Listening" onBack={onBack} onClose={onClose}>
-      <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-        <AntSectionIntro title="Voice Input" />
-        <AntRadioSection
-          label="Input Mode"
-          value={mode}
-          onChange={setMode}
-          options={[
-            { value: "push-to-talk", label: "Push to Talk", description: "Hold the button while you speak, release to send." },
-            { value: "toggle-to-talk", label: "Toggle to Talk", description: "Tap once to start, tap again when you are finished." },
-            { value: "drive-session", label: "Drive Session", description: "Hands-free turns that continue until you stop them." },
-          ]}
-        />
-        <AntPickerSection title="Recognition language" helperText="Choose a language to improve recognition, or leave it automatic for device or provider detection.">
-          <AntPickerRow label="Language" value={language} onChange={setLanguage}
-            options={[{ value: "auto", label: "Automatic" }, { value: "en", label: "English" }, { value: "de", label: "German" }, { value: "ar", label: "Arabic" }]} />
-        </AntPickerSection>
-        <AntRadioSection
-          label="Speech to Text"
-          value={route}
-          onChange={setRoute}
-          options={[
-            { value: "native", label: "System Recognition", description: "The operating system transcribes on the device." },
-            { value: "provider", label: "Provider", description: "Audio is sent to a provider you have connected." },
-            { value: "local", label: "On-device AI", description: "Models that run without a network connection." },
-          ]}
-        />
-        {route === "provider" ? (
-          <AntPickerSection title="STT Provider">
-            <AntPickerRows>
-              <AntPickerRow label="Provider" value={sttProvider} options={capableProviders("STT")}
-                onChange={(value) => { setSttProvider(value); setSttModel(window.MB_SETTINGS.sttModels[value][0]); }} />
-              <AntPickerRow label="Model" value={sttModel}
-                options={(window.MB_SETTINGS.sttModels[sttProvider] || []).map((value) => ({ value, label: value }))}
-                onChange={setSttModel} />
-            </AntPickerRows>
-          </AntPickerSection>
-        ) : null}
-      </div>
+      <SettingsGroup title="Input" footer="The languages you speak. Recognition follows them, and on-device models, voices and recognisers are offered to match — adding a language downloads what it needs." style={{ padding: 0 }}>
+        <SettingsRow icon="mic" label="Input mode" value="Push to talk" />
+        <SettingsRow icon="global" label="Languages" value="English, German" last />
+      </SettingsGroup>
+      <SettingsGroup title="Who listens" footer="One choice across every runtime. A radio unlocks only after a viable test — testing is the egg, and it cracks when a model fails. Removing an installed model is a swipe. Provider routes appear once connected under Connections." style={{ padding: 0 }}>
+        {window.MB_SETTINGS.listenModels.map((model, index) => (
+          <RouteOptionRow key={model.id} selected={!!model.selected} disabled={!!model.disabled}
+            label={model.label} meta={model.meta} action={window.modelAction(model.action)}
+            last={index === window.MB_SETTINGS.listenModels.length - 1} />
+        ))}
+      </SettingsGroup>
     </window.SettingsFrame>
   );
 }
 
-/** Speaking — spoken replies, playback, text-to-speech route, replay cache. */
-function SpeakingPage({ onBack, onClose }) {
-  const [spoken, setSpoken] = React.useState(true);
-  const [wait, setWait] = React.useState(false);
-  const [route, setRoute] = React.useState("local");
-  const [ttsProvider, setTtsProvider] = React.useState("ElevenLabs");
-  const [ttsModel, setTtsModel] = React.useState("eleven_turbo_v2_5");
+/** Speaking — playback + the unified "Who speaks" picker; free edition ghosts the provider routes. */
+function SpeakingPage({ onBack, onClose, isPremium = true }) {
+  const [voiceSheet, setVoiceSheet] = React.useState(false);
+  const voiceRow = (
+    <div role="button" onClick={() => setVoiceSheet(true)} style={{ display: "flex", alignItems: "center", gap: 10, minHeight: 44, cursor: "pointer" }}>
+      <span style={{ fontFamily: "var(--mb-text-body-family)", fontSize: 14, color: "var(--mb-color-text-secondary)" }}>Voice</span><span style={{ flex: 1 }} />
+      <span style={{ fontFamily: "var(--mb-font-body-medium)", fontWeight: 500, fontSize: 14, color: "var(--mb-color-text)" }}>Heart</span>
+      <PhosphorIcon name="right" size="inline" color="var(--mb-color-text-muted)" />
+    </div>
+  );
   return (
     <window.SettingsFrame title="Speaking" onBack={onBack} onClose={onClose}>
-      <window.SectionPage>
-        <window.SectionGroup>
-          <AntSectionIntro title="Voice Output" extra={<IconButton icon="info-circle" accessibilityLabel="About voice output" onClick={() => {}} />} />
-          <AntSettingsCard>
-            <AntSwitchRow label="Spoken Replies" description="Replies are read aloud paragraph by paragraph." value={spoken} onChange={setSpoken} />
-          </AntSettingsCard>
-          <AntRadioSection
-            label="Reply Playback"
-            value={wait ? "complete" : "streaming"}
-            onChange={(value) => setWait(value === "complete")}
-            options={[
-              { value: "streaming", label: "As it arrives", description: "Each paragraph is spoken as soon as it is ready." },
-              { value: "complete", label: "When complete", description: "Playback starts once the whole answer has arrived." },
-            ]}
-          />
-        </window.SectionGroup>
-
-        <window.SectionGroup>
-          <AntRadioSection
-            label="Text to Speech"
-            value={route}
-            onChange={setRoute}
-            options={[
-              { value: "system", label: "System voice", description: "The operating system speaks with its own voices." },
-              { value: "local", label: "On-device AI", description: "Kokoro runs on the device with no network." },
-              { value: "provider", label: "Provider", description: "Text is sent to a provider you have connected." },
-            ]}
-          />
-          {route === "local" ? (
-            <AntPickerSection title="Local voices">
-              <AntPickerRow label="Voice" value="heart" onChange={() => {}}
-                options={[{ value: "heart", label: "Heart · American female" }, { value: "river", label: "River · British female" }, { value: "puck", label: "Puck · American male" }]} />
-            </AntPickerSection>
-          ) : null}
-          {route === "provider" ? (
-            <AntPickerSection title="TTS Provider">
-              <AntPickerRows>
-                <AntPickerRow label="Provider" value={ttsProvider} options={capableProviders("TTS")}
-                  onChange={(value) => { setTtsProvider(value); setTtsModel(window.MB_SETTINGS.ttsModels[value][0]); }} />
-                <AntPickerRow label="Model" value={ttsModel}
-                  options={(window.MB_SETTINGS.ttsModels[ttsProvider] || []).map((value) => ({ value, label: value }))}
-                  onChange={setTtsModel} />
-              </AntPickerRows>
-            </AntPickerSection>
-          ) : null}
-        </window.SectionGroup>
-
-        <window.SectionGroup>
-          <AntSettingsCard title="Speech replay cache">
-            <window.HelperText>Spoken replies are kept on the device so they can be replayed without synthesising again.</window.HelperText>
-            <div style={{ alignSelf: "flex-start" }}>
-              <Button size="small"><AntButtonLabel color="var(--mb-color-danger)" icon="delete" label="Clear speech replay cache" /></Button>
-            </div>
-          </AntSettingsCard>
-        </window.SectionGroup>
-      </window.SectionPage>
+      <SettingsGroup title="Playback" style={{ padding: 0 }}>
+        <SettingsRow icon="play-circle" label="Start speaking" value="As it arrives" />
+        <SettingsRow icon="edit" label="Speaking instructions" value="Off" last />
+      </SettingsGroup>
+      <SettingsGroup title="Who speaks" footer="One choice across every runtime. On-device downloads happen right here; provider routes appear once their key is connected under Connections." style={{ padding: 0 }}>
+        {window.MB_SETTINGS.speakModels.map((model, index) => {
+          const last = index === window.MB_SETTINGS.speakModels.length - 1 && isPremium;
+          if (model.providerOnly && !isPremium) return <RouteOptionRow key={model.id} locked label={model.label} meta={model.meta} last={false} />;
+          return <RouteOptionRow key={model.id} selected={!!model.selected} disabled={!!model.disabled}
+            label={model.label} meta={model.meta} action={window.modelAction(model.action)}
+            sub={model.voice ? voiceRow : null} last={last} />;
+        })}
+        {!isPremium ? <PremiumBand copy="Provider voices run on your own keys. One purchase, no subscription." /> : null}
+      </SettingsGroup>
+      <SettingsGroup title="Storage" footer="Spoken replies are kept so they can be replayed without synthesising again." style={{ padding: 0 }}>
+        <SettingsRow icon="delete" label="Clear speech replay cache" danger control={null} last />
+      </SettingsGroup>
+      {voiceSheet ? <VoiceSheet onClose={() => setVoiceSheet(false)} /> : null}
     </window.SettingsFrame>
   );
 }
 
-/**
- * On-device AI — automatic setup first, then the catalogue, install state and
- * languages.
- *
- * The automatic card leads because the page is otherwise a list of decisions a
- * new user has no way to make: three model names, three sizes and three
- * verdicts. Anyone who already knows what they want scrolls past it, which costs
- * them one swipe.
- */
-function OnDevicePage({ onBack, onClose, auto }) {
-  const [busy, setBusy] = React.useState(null);
-  return (
-    <window.SettingsFrame title="On-device AI" onBack={onBack} onClose={onClose}>
-      <window.SectionPage>
-        <window.SectionGroup>
-          <AntSectionIntro title="Automatic setup" description="One tap measures this phone and installs a set that fits it." />
-          <AutoSetupCard showHeader={false} {...(auto ? auto.cardProps : {})} />
-        </window.SectionGroup>
-
-        <window.SectionGroup>
-          <AntSectionIntro title="Installed and available" description="Models that run without a network connection." />
-          {window.MB_SETTINGS.localModels.map((model) => (
-            <AntSettingsCard key={model.id} title={model.name}
-              headerExtra={<PhosphorIcon name={model.state === "installed" ? "check-circle" : "download"} size="control" color={model.state === "installed" ? "var(--mb-color-success)" : "var(--mb-color-text-muted)"} />}>
-              <div style={{ display: "flex", gap: 7, flexWrap: "wrap" }}>
-                <window.CapabilityTag>{model.capability}</window.CapabilityTag>
-                <window.CapabilityTag>{model.size}</window.CapabilityTag>
-              </div>
-              {model.state === "installed" ? (
-                <LocalModelPerformanceSummary evidence="Measured" fit="Viable" details={["14.2 tok/s", "Load 1.8 s", "Headroom 2.4×"]} />
-              ) : (
-                <window.HelperText>Not installed. Downloading keeps the model on the device permanently.</window.HelperText>
-              )}
-              <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-                {model.state === "installed" ? (
-                  <React.Fragment>
-                    <Button size="small" onClick={() => setBusy(model.id)}><AntButtonLabel color="var(--mb-color-accent)" icon="thunderbolt" label={busy === model.id ? "Testing…" : "Test"} /></Button>
-                    <Button size="small"><AntButtonLabel color="var(--mb-color-danger)" icon="delete" label="Remove" /></Button>
-                  </React.Fragment>
-                ) : (
-                  <Button size="small" type="primary"><AntButtonLabel color="var(--mb-color-on-active-control)" icon="download" label="Download" /></Button>
-                )}
-              </div>
-            </AntSettingsCard>
-          ))}
-        </window.SectionGroup>
-
-        <window.SectionGroup>
-          <AntSectionIntro title="Conversation languages" />
-          <AntPickerSection helperText="On-device models carry their own languages. Adding one downloads the matching voice and recogniser.">
-            <AntPickerRow label="Languages" value="en" onChange={() => {}}
-              options={[{ value: "en", label: "English" }, { value: "de", label: "English, German" }, { value: "ar", label: "English, Arabic" }]} />
-          </AntPickerSection>
-        </window.SectionGroup>
-      </window.SectionPage>
-    </window.SettingsFrame>
-  );
-}
-
-Object.assign(window, { ListeningPage, SpeakingPage, OnDevicePage });
+Object.assign(window, { ListeningPage, SpeakingPage, VoiceSheet });

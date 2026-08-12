@@ -12,7 +12,7 @@ export const PHOSPHOR_ICONS = {
   "customer-service": "headset", delete: "trash", down: "caret-down", download: "download-simple",
   edit: "pencil-simple", "ellipsis-vertical": "dots-three-vertical", "exclamation-circle": "warning-circle",
   export: "export", eye: "eye", "eye-invisible": "eye-slash", "file-text": "file-text", "folder-open": "folder-open",
-  global: "globe-hemisphere-west", branch: "git-branch", bug: "bug", headphones: "headphones", inbox: "tray",
+  global: "globe-hemisphere-west", branch: "arrows-split", bug: "bug", headphones: "headphones", inbox: "tray",
   image: "image", "info-circle": "info", key: "key", left: "caret-left", "line-chart": "chart-line-up",
   loading: "spinner-gap", lock: "lock", menu: "list", message: "chat-circle", mic: "microphone", pause: "pause",
   "play-circle": "play-circle", plus: "plus", pushpin: "push-pin", redo: "repeat", "radio-selected": "radio-button",
@@ -20,7 +20,7 @@ export const PHOSPHOR_ICONS = {
   "safety-certificate": "shield-check", search: "magnifying-glass", send: "paper-plane-tilt", setting: "gear",
   "share-alt": "share-network", sliders: "sliders-horizontal", sound: "speaker-high", stop: "stop",
   thunderbolt: "lightning", up: "caret-up", warning: "warning", cpu: "cpu",
-  brain: "brain", council: "users-three",
+  brain: "brain", council: "users-three", egg: "egg", "egg-cracked": "egg-crack",
 };
 
 export function resolveIconSize(size) {

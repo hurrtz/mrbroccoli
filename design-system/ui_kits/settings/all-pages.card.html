@@ -1,0 +1,55 @@
+<!-- @dsCard group="Mr Broccoli settings" viewport="1660x1700" name="All settings pages" subtitle="All seven pages plus both overviews, laid out — no clicking required" -->
+<!DOCTYPE html><html data-theme="light"><head><meta charset="utf-8"><title>Mr Broccoli — all settings pages</title>
+<link rel="stylesheet" href="../../styles.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/regular/style.css">
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script src="../../_ds_bundle.js"></script>
+<script src="data.js"></script>
+<style>
+body{margin:0;padding:24px;background:#8f8d86;font-family:var(--mb-font-body)}
+.row{display:flex;gap:20px;flex-wrap:wrap;align-items:flex-start}
+.cap{font-family:var(--mb-font-mono);font-size:9px;letter-spacing:.9px;text-transform:uppercase;color:#2b2c2e;margin:14px 0 6px 2px}
+.cap.d{color:#e6e4dd}
+.device{width:372px;height:740px;border-radius:34px;overflow:hidden;position:relative;transform:translateZ(0);background:var(--mb-color-background);box-shadow:0 18px 44px rgba(0,0,0,.3);border:1px solid rgba(0,0,0,.25)}
+</style>
+</head><body>
+<div id="root"></div>
+<script type="text/babel" src="SettingsFrame.jsx"></script>
+<script type="text/babel" src="AutoSetup.jsx"></script>
+<script type="text/babel" src="SettingsOverview.jsx"></script>
+<script type="text/babel" src="PagesConversation.jsx"></script>
+<script type="text/babel" src="PagesVoice.jsx"></script>
+<script type="text/babel" src="PagesPrivacy.jsx"></script>
+<script type="text/babel">
+const noop = () => {};
+function Cell({ caption, theme = "light", children }){
+  return <div><p className={theme === "dark" ? "cap d" : "cap"}>{caption}</p>
+    <div className="device" data-theme={theme}>{children}</div></div>;
+}
+function Page({ Component, isPremium = true }){
+  const auto = window.useAutoSetupFlow ? window.useAutoSetupFlow({}) : undefined;
+  return <Component onBack={noop} onClose={noop} auto={auto} isPremium={isPremium} />;
+}
+ReactDOM.createRoot(document.getElementById("root")).render(<>
+  <div className="row">
+    <Cell caption="Overview · premium · light"><window.SettingsOverview isPremium onOpenPage={noop} onOpenPremium={noop} onClose={noop} /></Cell>
+    <Cell caption="Overview · free edition · dark" theme="dark"><window.SettingsOverview isPremium={false} onOpenPage={noop} onOpenPremium={noop} onClose={noop} /></Cell>
+    <Cell caption="Connections · premium"><Page Component={window.ConnectionsPage} /></Cell>
+    <Cell caption="Thinking · premium" theme="dark"><Page Component={window.ThinkingPage} /></Cell>
+  </div>
+  <div className="row">
+    <Cell caption="Listening · every lifecycle state"><Page Component={window.ListeningPage} /></Cell>
+    <Cell caption="Speaking · premium" theme="dark"><Page Component={window.SpeakingPage} /></Cell>
+    <Cell caption="Speaking · free — ghosted + gold band"><Page Component={window.SpeakingPage} isPremium={false} /></Cell>
+    <Cell caption="Search · premium" theme="dark"><Page Component={window.SearchPage} /></Cell>
+  </div>
+  <div className="row">
+    <Cell caption="Data &amp; privacy — incl. model storage"><Page Component={window.DataPrivacyPage} /></Cell>
+    <Cell caption="App &amp; diagnostics" theme="dark"><Page Component={window.AppPage} /></Cell>
+    <Cell caption="Connections · free — same page, locked"><Page Component={window.ConnectionsPage} isPremium={false} /></Cell>
+  </div>
+</>);
+</script>
+</body></html>

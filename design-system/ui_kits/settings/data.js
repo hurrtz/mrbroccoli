@@ -2,48 +2,71 @@ window.MB_SETTINGS = {
   version: "3.2.0",
   // settings-core/readiness.ts: think, listen, speak, search — ready, attention, broken, off.
   readiness: { think: "ready", listen: "ready", speak: "attention", search: "off" },
+  // 7 pages, 3 groups — no Device page: lifecycle lives in the stage pages, storage under Data & privacy.
   groups: [
-    { title: "Conversation & tools", pages: ["connections", "thinking", "search"] },
-    { title: "Voice & models", pages: ["listening", "speaking", "local"] },
+    { title: "Conversation", pages: ["connections", "thinking", "search"] },
+    { title: "Voice", pages: ["listening", "speaking"] },
     { title: "Privacy & app", pages: ["data", "app"] },
   ],
-  // Order, icons and summaries are the overviewRows table in AntSettingsOverview.tsx.
+  // Overview rows report LIVE STATE, not page descriptions.
   rows: {
-    connections: { icon: "key", title: "Connections", summary: "Provider keys, validation, and capabilities.", premium: true },
-    thinking: { icon: "robot", title: "Thinking", summary: "Home cards, models, effort, and system prompt.", premium: true },
-    listening: { icon: "audio", title: "Listening", summary: "Input mode and speech-to-text routing.", premium: true },
-    speaking: { icon: "sound", title: "Speaking", summary: "Spoken replies, playback, voices, and previews.", premium: true },
-    local: { icon: "cpu", title: "On-device AI", summary: "Models that run without a network connection." },
-    search: { icon: "search", title: "Search", summary: "Web search provider and search quality controls.", premium: true },
-    data: { icon: "safety-certificate", title: "Data & privacy", summary: "Backups, archives, and past conversation knowledge." },
-    app: { icon: "sliders", title: "App & diagnostics", summary: "Theme, language, usage, debug logs, and recent activity." },
+    connections: { icon: "key", title: "Connections", premium: true, state: "OpenAI, Anthropic working · Mistral failing" },
+    thinking: { icon: "robot", title: "Thinking", premium: true, state: "GPT-5 · Claude Sonnet 4.5 · Qwen on device" },
+    search: { icon: "search", title: "Search", premium: true, state: "OpenAI · 5 results per query" },
+    listening: { icon: "audio", title: "Listening", premium: true, state: "Push to talk · Whisper Small on device" },
+    speaking: { icon: "sound", title: "Speaking", premium: true, state: "Kokoro · Heart · as it arrives" },
+    data: { icon: "safety-certificate", title: "Data & privacy", state: "Knowledge on · 2.8 GB in models" },
+    app: { icon: "sliders", title: "App & diagnostics", state: "Dark · English" },
   },
+  // Free-edition live state (same pages, different contents).
+  freeRows: {
+    connections: { state: "Part of Premium" },
+    thinking: { state: "Qwen on device" },
+    search: { state: "Part of Premium" },
+    listening: { state: "Push to talk · Whisper Small on device" },
+    speaking: { state: "Kokoro · Heart · as it arrives" },
+  },
+  // Connected providers only — unconnected ones never appear in stage pickers.
   providers: [
-    { id: "openai", label: "OpenAI", health: "healthy", capabilities: ["LLM", "STT", "TTS"] },
-    { id: "anthropic", label: "Anthropic", health: "configured", capabilities: ["LLM"] },
-    { id: "elevenlabs", label: "ElevenLabs", health: "none", capabilities: ["TTS", "Voice library"] },
-    { id: "mistral", label: "Mistral AI", health: "failing", capabilities: ["LLM"] },
-    { id: "groq", label: "Groq", health: "healthy", capabilities: ["LLM", "STT"] },
+    { id: "openai", label: "OpenAI", health: "healthy", capabilities: "Replies · listening · speaking · search" },
+    { id: "anthropic", label: "Anthropic", health: "healthy", capabilities: "Replies" },
+    { id: "elevenlabs", label: "ElevenLabs", health: "none", capabilities: "Speaking · voice library" },
+    { id: "mistral", label: "Mistral AI", health: "failing", capabilities: "Replies" },
+    { id: "groq", label: "Groq", health: "configured", capabilities: "Replies · listening" },
   ],
-  // getProviderLlmModelOptions shape: the models each connected provider offers.
-  providerModels: {
-    OpenAI: ["GPT-5", "GPT-5 mini", "o4-mini"],
-    Anthropic: ["Claude Sonnet 4.5", "Claude Opus 4.1", "Claude Haiku 4"],
-    "Mistral AI": ["Mistral Large", "Mistral Small 3"],
-    Groq: ["llama-3.3-70b", "llama-3.1-8b"],
-    "On device": ["Qwen 2.5 1.5B", "Llama 3.2 1B"],
-  },
-  sttModels: { OpenAI: ["whisper-1", "gpt-4o-transcribe"], Groq: ["whisper-large-v3"] },
-  ttsModels: { ElevenLabs: ["eleven_turbo_v2_5", "eleven_multilingual_v2"], OpenAI: ["gpt-4o-mini-tts"] },
-  responseModes: [
-    { id: 1, provider: "openai", providerLabel: "OpenAI", model: "GPT-5", effort: "Extra high" },
-    { id: 2, provider: "anthropic", providerLabel: "Anthropic", model: "Claude Sonnet 4.5", effort: "Medium" },
-    { id: 3, local: true, providerLabel: "On device", model: "Qwen 2.5 1.5B", effort: "Normal" },
+  // Thinking slots (response modes): coexisting, switched from the home byline.
+  slots: [
+    { n: 1, name: "GPT-5", meta: "OpenAI · via provider · effort Extra high" },
+    { n: 2, name: "Claude Sonnet 4.5", meta: "Anthropic · via provider · effort Medium" },
+    { n: 3, name: "Qwen 2.5 1.5B", meta: "On this device · 934 MB · effort Normal" },
   ],
-  localModels: [
-    { id: "qwen", name: "Qwen 2.5 1.5B", capability: "Replies", size: "934 MB", state: "installed" },
-    { id: "whisper", name: "Whisper Small", capability: "Speech input", size: "466 MB", state: "installed" },
-    { id: "kokoro", name: "Kokoro 82M", capability: "Voice output", size: "312 MB", state: "available" },
+  // On-device model catalogue with every lifecycle state.
+  listenModels: [
+    { id: "sys", route: true, label: "System recognition", meta: "The phone transcribes · on-device when the system offers it" },
+    { id: "whisper", label: "Whisper Small · on this device", meta: "Tested · viable · 466 MB · update available", selected: true, action: "update" },
+    { id: "whisper-xl", label: "Whisper Large v3 Turbo · on this device", meta: "Downloading · 62% of 1.6 GB", disabled: true, action: "cancel" },
+    { id: "moonshine", label: "Moonshine Tiny · on this device", meta: "Installed · not tested yet", disabled: true, action: "test" },
+    { id: "vosk", label: "Vosk Small · on this device", meta: "Testing on this phone…", disabled: true, action: "testing" },
+    { id: "nemo", label: "Nemo Parakeet · on this device", meta: "Tested · below target on this phone — not selectable", disabled: true, action: "retest" },
+    { id: "turbo-xl", label: "Whisper Turbo XL · on this device", meta: "Not installed · 2.4 GB", disabled: true, action: "download" },
+    { id: "openai-stt", label: "OpenAI · whisper-1", meta: "Via provider · your key" },
+  ],
+  speakModels: [
+    { id: "sys", label: "System voice", meta: "The phone's own voices · no download, no cost" },
+    { id: "kokoro", label: "Kokoro 82M · on this device", meta: "Installed · 312 MB · no audio leaves the phone", selected: true, voice: "Heart" },
+    { id: "piper", label: "Piper · Thorsten · on this device", meta: "Not installed · 76 MB", disabled: true, action: "download" },
+    { id: "elevenlabs", label: "ElevenLabs", meta: "Via provider · your key · model and voice chosen when selected", providerOnly: true },
+  ],
+  voices: [
+    { n: "Heart", d: "American · female", on: true }, { n: "Bella", d: "American · female" }, { n: "Puck", d: "American · male" },
+    { n: "River", d: "British · female" }, { n: "Fable", d: "British · male" }, { n: "Nicole", d: "Australian · female" },
+    { n: "Thorsten", d: "German · male" }, { n: "Amélie", d: "French · female" },
+  ],
+  storage: [
+    { name: "Qwen 2.5 1.5B", cap: "Thinking", size: "934 MB", state: "installed" },
+    { name: "Whisper Small", cap: "Listening", size: "466 MB", state: "installed" },
+    { name: "Whisper Large v3 Turbo", cap: "Listening", size: "1.6 GB · 62%", state: "downloading" },
+    { name: "Kokoro 82M", cap: "Speaking", size: "312 MB", state: "installed" },
   ],
   speechActivity: [
     { at: "14:12:08", route: "OpenAI · whisper-1", detail: "Transcribed 4.2 s in 610 ms" },

@@ -1,6 +1,6 @@
 const { AppWordmark, IconButton, PhosphorIcon, RouteByline, VoiceOrb, OrbSatellite,
         ConversationSettingsSummary, WorkspaceStatusLine, TranscriptHandle,
-        ChatBubble, ChatTranscript, Toast, Modal, ProviderIcon, BackgroundTaskBar,
+        ChatBubble, ChatTranscript, TranscriptMessage, Toast, Modal, ProviderIcon, BackgroundTaskBar,
         IntroBanner, IntroFlow, RoutePicker, Composer } = window.MrBroccoliDesignSystem_62d510;
 
 const ASSETS = "../../assets/providers";
@@ -104,6 +104,15 @@ function Byline({ conversation }) {
   );
 }
 
+/** One spoken-script row with kit-local fold state; the latest message arrives expanded. */
+function TranscriptRow({ message, isLast }) {
+  const [open, setOpen] = React.useState(isLast);
+  return <TranscriptMessage role={message.role} paragraphs={message.paragraphs || [message.text]}
+    model={message.model} provider={message.provider} council={message.council} time={message.timestamp}
+    expanded={open} onToggle={() => setOpen(!open)} meta={message.meta} last={isLast} assetBase={ASSETS}
+    actions={message.role === "assistant" ? [{ icon: "branch", label: "Branch here" }, { icon: "copy", label: "Copy" }, { icon: "share-alt", label: "Share" }, { icon: "sound", label: "Speak again" }] : null} />;
+}
+
 /** The sheet the handle opens: over the workspace, not a new screen. */
 function TranscriptSheet({ visible, title, messages, onClose }) {
   if (!visible) return null;
@@ -111,18 +120,20 @@ function TranscriptSheet({ visible, title, messages, onClose }) {
     <React.Fragment>
       <div onClick={onClose} style={{ position: "absolute", inset: 0, background: "var(--mb-color-overlay)" }} />
       <div style={{ position: "absolute", left: 0, right: 0, bottom: 0, height: "85%", display: "flex", flexDirection: "column",
-        borderRadius: "var(--mb-radius-sheet-top) var(--mb-radius-sheet-top) 0 0", background: "var(--mb-color-surface)",
-        border: "1px solid var(--mb-color-border)", borderBottom: "none", boxShadow: "var(--mb-shadow-sheet)", overflow: "hidden" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 12, minHeight: 52, padding: "0 14px", borderBottom: "1px solid var(--mb-color-border)" }}>
-          <span style={{ flex: 1, minWidth: 0, fontFamily: "var(--mb-font-display)", fontWeight: 600, fontSize: 15, lineHeight: "20px", color: "var(--mb-color-text)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{title}</span>
-          <IconButton icon="close" accessibilityLabel="Hide transcript" onClick={onClose} />
+        borderRadius: "var(--mb-radius-sheet-top) var(--mb-radius-sheet-top) 0 0", background: "var(--mb-color-background)",
+        border: "1px solid var(--mb-color-surface-raised-border)", borderBottom: "none", boxShadow: "var(--mb-shadow-sheet)", overflow: "hidden" }}>
+        <div style={{ flexShrink: 0, padding: "10px 8px 8px 14px", borderBottom: "1px solid var(--mb-color-border)" }}>
+          <span style={{ display: "block", width: 38, height: 4, borderRadius: 2, margin: "0 auto 8px", background: "var(--mb-color-border-strong)" }} />
+          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+            <span style={{ flex: 1, minWidth: 0, fontFamily: "var(--mb-font-headline)", fontSize: 17, letterSpacing: "-0.2px", color: "var(--mb-color-text)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{title}</span>
+            <IconButton icon="close" accessibilityLabel="Hide transcript" onClick={onClose} />
+          </div>
         </div>
-        <ChatTranscript style={{ flex: 1, padding: "10px 12px 18px" }}>
-          {messages.map((message) => (
-            <ChatBubble key={message.id} {...message} assetBase={ASSETS}
-              actions={message.role === "assistant" ? [{ icon: "copy", label: "Copy" }, { icon: "redo", label: "Repeat" }, { icon: "branch", label: "Branch" }] : null} />
+        <div style={{ flex: 1, overflowY: "auto", padding: "6px 16px 20px" }}>
+          {messages.map((message, index) => (
+            <TranscriptRow key={message.id} message={message} isLast={index === messages.length - 1} />
           ))}
-        </ChatTranscript>
+        </div>
       </div>
     </React.Fragment>
   );
@@ -305,9 +316,8 @@ function LandscapeWorkspace({ onOpenDrawer, onOpenSettings, onOpenLocalModels, c
           showDismiss={introOpened} onDismiss={() => setBanner(false)}
           onOpen={() => { setIntro(true); setIntroOpened(true); }} />
         <ChatTranscript style={{ flex: 1, paddingBottom: 8 }}>
-          {conversation.messages.map((message) => (
-            <ChatBubble key={message.id} {...message} assetBase={ASSETS}
-              actions={message.role === "assistant" ? [{ icon: "copy", label: "Copy" }, { icon: "redo", label: "Repeat" }, { icon: "branch", label: "Branch" }] : null} />
+          {conversation.messages.map((message, index) => (
+            <TranscriptRow key={message.id} message={message} isLast={index === conversation.messages.length - 1} />
           ))}
         </ChatTranscript>
       </div>

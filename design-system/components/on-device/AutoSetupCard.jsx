@@ -14,7 +14,7 @@ export const AUTO_SETUP_COPY = {
   scanNote: "A few seconds. Nothing leaves the device.",
 
   proposalLabel: "Recommended for this phone",
-  proposalNote: "You can change any of it later in On-device AI.",
+  proposalNote: "You can change any of it later in Settings.",
   install: "Download and install",
   manual: "Choose manually instead",
 
@@ -191,8 +191,8 @@ function Fact({ label, value }) {
  * One tap that measures the device, proposes a set of on-device models, and
  * installs them.
  *
- * Six states, one card, the same card in the introduction and in On-device AI
- * settings — a user who starts this in the walkthrough and finds it again in
+ * Six states, one card, the same card in the introduction and in settings
+ * (App & diagnostics) — a user who starts this in the walkthrough and finds it again in
  * settings should be looking at the thing they left, not a second design of it.
  *
  * The measuring pause is deliberate and about two and a half seconds long. The
