@@ -102,6 +102,10 @@ the architectural answer for the author.
   and failure.
 - Generated evidence belongs under ignored `artifacts/`; checked-in source
   files remain the configuration authority.
+- The espeak-free installer also applies the reviewed iOS archive-helper patch:
+  it skips only tar-root records that are empty or normalize to `.` before the
+  wrapper's canonical child-path traversal guard. A clean dependency install
+  must receive this patch before a native iOS build.
 
 ## Release Rules
 

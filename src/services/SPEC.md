@@ -191,6 +191,12 @@ from deleting its own source archive. On iOS, small language packs use the
 foreground download session so an interrupted background session cannot leave a
 speech model apparently installed without its pronunciation data.
 
+On iOS, standard tar archives can contain no-op root records with an empty path
+or a path that normalizes to `.`. The native extractor skips only those records
+before enforcing its canonical child-path traversal guard for every
+data-bearing entry; a path that can escape the installation target still fails
+closed.
+
 Kokoro's data directory keeps its historical `espeak-ng-data` name because
 both the model archive and sherpa's detector rely on it, but this runtime
 fills it with libphonemize packs. sherpa locates that directory by scanning

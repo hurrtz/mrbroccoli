@@ -87,6 +87,9 @@ the complete Play Store translations are kept in a dedicated file under
   safely without deleting their own source or an already-installed companion
   pack. Retrying a failed Piper archive uses a foreground iOS download, so the
   installed model and its speech data recover together.
+- Let the iOS native extractor skip valid archive-root records while retaining
+  its traversal protection, so Kokoro can finish installing its pronunciation
+  packs on iPhone.
 - Repair the full local-voice catalogue: the app now handles a stale runtime
   checksum only by directly hashing the reviewed archive, re-pins the updated
   Brazilian Portuguese Faber voice, and replays every tested Piper voice in

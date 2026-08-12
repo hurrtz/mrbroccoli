@@ -106,6 +106,9 @@ boundary.
   or a capability-gated provider route.
 - Spoken replies may use system speech, downloaded Kokoro/Piper speech, or a
   capability-gated provider route.
+- On iOS, native local-speech extraction accepts only harmless archive-root
+  records that normalize to `.` and retains canonical traversal protection
+  before downloaded speech data is eligible for verification.
 - TTS fallback routes are explicit, ordered, and opt-in. System speech has no
   hidden fallback.
 - Drive Session re-arms capture only through its explicit session state and is

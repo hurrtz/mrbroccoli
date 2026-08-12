@@ -50,6 +50,9 @@ TypeScript owns product policy; native modules expose focused capabilities.
   passphrase-encrypted portable backups.
 - `MrBroccoliArchiveDirectory` exposes the user-visible archive destination
   while preserving app-owned file lifecycle.
+- The Sherpa archive helper skips only records that are empty or normalize to
+  `.` at a tar archive's root; all remaining entries must pass its canonical
+  child-path traversal check before downloaded speech data is written.
 
 **Decision:** Native code owns Apple lifecycle mechanics, not independent
 conversation, edition, provider, or fallback policy.

@@ -23,12 +23,19 @@ import {
   cpSync,
   existsSync,
   mkdirSync,
+  readFileSync,
   readdirSync,
   rmSync,
   statSync,
+  writeFileSync,
 } from "node:fs";
 import { homedir } from "node:os";
 import { resolve } from "node:path";
+
+import {
+  applyIosArchiveRootEntryPatch,
+  hasIosArchiveRootEntryGuard,
+} from "./espeak-free-runtime-patch.mjs";
 
 const ANDROID_ABIS = [
   { abi: "arm64-v8a", build: "build-android-arm64-v8a" },
@@ -50,6 +57,10 @@ const forkRoot =
 const wrapperRoot = resolve(
   process.cwd(),
   "node_modules/react-native-sherpa-onnx",
+);
+const IOS_ARCHIVE_HELPER = resolve(
+  wrapperRoot,
+  "ios/archive/sherpa-onnx-archive-helper.mm",
 );
 // The wrapper resolves prebuilts THIRD_PARTY -> LOCAL_SDK -> MAVEN_AAR. Writing
 // only jniLibs (LOCAL_SDK) is not enough: that stage is skipped whenever the
@@ -113,15 +124,23 @@ function requireFile(path, hint) {
 if (verifyInstalled) {
   const installed = [
     ...ANDROID_ABIS.map(({ abi }) =>
-      resolve(wrapperRoot, "android/src/main/jniLibs", abi,
-              "libsherpa-onnx-jni.so"),
+      resolve(
+        wrapperRoot,
+        "android/src/main/jniLibs",
+        abi,
+        "libsherpa-onnx-jni.so",
+      ),
     ),
     ...ANDROID_ABIS.map(({ abi }) =>
       resolve(THIRD_PARTY_ANDROID_ROOT, "jni", abi, "libsherpa-onnx-jni.so"),
     ),
     ...["ios-arm64", "ios-arm64_x86_64-simulator"].map((slice) =>
-      resolve(wrapperRoot, "ios/Frameworks/sherpa_onnx.xcframework", slice,
-              "libsherpa-onnx.a"),
+      resolve(
+        wrapperRoot,
+        "ios/Frameworks/sherpa_onnx.xcframework",
+        slice,
+        "libsherpa-onnx.a",
+      ),
     ),
   ];
   const missing = installed.filter((path) => !existsSync(path));
@@ -130,6 +149,20 @@ if (verifyInstalled) {
       "espeak-free runtime: the wrapper is missing expected libraries:\n  " +
         missing.join("\n  ") +
         "\n  run: npm run espeak-free:install",
+    );
+    process.exit(1);
+  }
+  const helperSource = readFileSync(
+    requireFile(
+      IOS_ARCHIVE_HELPER,
+      "reinstall react-native-sherpa-onnx, then run npm run espeak-free:install",
+    ),
+    "utf8",
+  );
+  if (!hasIosArchiveRootEntryGuard(helperSource)) {
+    console.error(
+      "espeak-free runtime: the iOS archive helper is missing the root-entry guard; " +
+        "run npm run espeak-free:install",
     );
     process.exit(1);
   }
@@ -167,7 +200,10 @@ if (iosLibraries.length === 0) {
   fail(`no slices found in ${iosSource}`);
 }
 
-verify([...androidSources.flatMap(({ libraries }) => libraries), ...iosLibraries]);
+verify([
+  ...androidSources.flatMap(({ libraries }) => libraries),
+  ...iosLibraries,
+]);
 
 if (checkOnly) {
   console.log(
@@ -178,6 +214,21 @@ if (checkOnly) {
 
 if (!existsSync(wrapperRoot)) {
   fail(`wrapper not installed at ${wrapperRoot}; run npm install first`);
+}
+
+const originalIosArchiveHelper = readFileSync(
+  requireFile(
+    IOS_ARCHIVE_HELPER,
+    "reinstall react-native-sherpa-onnx, then run npm run espeak-free:install",
+  ),
+  "utf8",
+);
+const patchedIosArchiveHelper = applyIosArchiveRootEntryPatch(
+  originalIosArchiveHelper,
+);
+if (patchedIosArchiveHelper !== originalIosArchiveHelper) {
+  writeFileSync(IOS_ARCHIVE_HELPER, patchedIosArchiveHelper);
+  console.log("ios: archive root-entry guard installed");
 }
 
 for (const { abi, libraries } of androidSources) {
@@ -236,7 +287,10 @@ console.log(
     THIRD_PARTY_ANDROID_ROOT,
 );
 
-const iosTarget = resolve(wrapperRoot, "ios/Frameworks/sherpa_onnx.xcframework");
+const iosTarget = resolve(
+  wrapperRoot,
+  "ios/Frameworks/sherpa_onnx.xcframework",
+);
 rmSync(iosTarget, { recursive: true, force: true });
 cpSync(iosSource, iosTarget, { recursive: true });
 const installedSlices = readdirSync(iosTarget).filter((entry) =>
@@ -245,10 +299,6 @@ const installedSlices = readdirSync(iosTarget).filter((entry) =>
 console.log(`ios: ${installedSlices.length} slices installed`);
 
 verify(
-  installedSlices.map((slice) =>
-    resolve(iosTarget, slice, "libsherpa-onnx.a"),
-  ),
+  installedSlices.map((slice) => resolve(iosTarget, slice, "libsherpa-onnx.a")),
 );
-console.log(
-  "espeak-free runtime installed; rebuild native apps to pick it up",
-);
+console.log("espeak-free runtime installed; rebuild native apps to pick it up");

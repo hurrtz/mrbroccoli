@@ -141,6 +141,7 @@ ios-native-test:
 pre-push:
 	@$(MAKE) worktree-check
 	@node --test scripts/makefile-contract.test.mjs
+	@node --test scripts/espeak-free-runtime-patch.test.mjs
 	@npm run spec-review:test
 	@npm run ios:standalone:test
 	@npm run prerelease:env:test
