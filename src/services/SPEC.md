@@ -191,11 +191,14 @@ from deleting its own source archive. On iOS, small language packs use the
 foreground download session so an interrupted background session cannot leave a
 speech model apparently installed without its pronunciation data.
 
-On iOS, standard tar archives can contain no-op root records with an empty path
-or a path that normalizes to `.`. The native extractor skips only those records
-before enforcing its canonical child-path traversal guard for every
-data-bearing entry; a path that can escape the installation target still fails
-closed.
+On iOS, standard tar archives can contain no-op root records with an empty
+path, `.`, or `./`; the native extractor skips only those forms. Every
+data-bearing entry must be a relative regular file or directory without parent
+traversal, symbolic links, or hard links. The helper rejects unsafe
+archive-relative paths before rewriting accepted entries under its absolute
+target, while libarchive's symlink protection applies while writing. Unsafe
+paths therefore fail closed without rejecting valid language-pack archives
+through string-prefix path handling or incompatible archive-writer flags.
 
 Kokoro's data directory keeps its historical `espeak-ng-data` name because
 both the model archive and sherpa's detector rely on it, but this runtime

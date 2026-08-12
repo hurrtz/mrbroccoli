@@ -234,6 +234,14 @@ artifact. Device selection has four stages:
 3. load and benchmark the exact artifact on the current device; and
 4. construct one coherent offline profile from compatible LLM/STT/TTS routes.
 
+On iOS, Sherpa extracts speech archives with an explicit safe-entry policy:
+empty, `.` and `./` root records are ignored; every other entry must be a
+relative regular file or directory without parent traversal, symbolic links, or
+hard links. Direct validation rejects unsafe archive paths before the helper
+rewrites accepted entries under its absolute installation directory, while
+libarchive's symlink protection applies when data is written. This avoids
+string-prefix checks and incompatible archive-writer path flags.
+
 Preparation runs regardless of transient thermal, memory, or battery-saver
 pressure; the OS throttles on its own. Pressure is recorded per benchmark, and
 a missed-target verdict measured under pressure is never persisted as a durable

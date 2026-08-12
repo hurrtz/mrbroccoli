@@ -90,6 +90,10 @@ the complete Play Store translations are kept in a dedicated file under
 - Let the iOS native extractor skip valid archive-root records while retaining
   its traversal protection, so Kokoro can finish installing its pronunciation
   packs on iPhone.
+- Replace the iOS extractor's brittle canonical-string path check and
+  incompatible archive-writer path flags with direct validation of relative
+  regular archive entries, so valid Kokoro and Piper pronunciation packs
+  install on iPhone without weakening traversal or link protection.
 - Repair the full local-voice catalogue: the app now handles a stale runtime
   checksum only by directly hashing the reviewed archive, re-pins the updated
   Brazilian Portuguese Faber voice, and replays every tested Piper voice in

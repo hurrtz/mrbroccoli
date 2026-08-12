@@ -33,8 +33,8 @@ import { homedir } from "node:os";
 import { resolve } from "node:path";
 
 import {
-  applyIosArchiveRootEntryPatch,
-  hasIosArchiveRootEntryGuard,
+  applyIosArchiveEntryValidationPatch,
+  hasIosArchiveEntryValidationGuard,
 } from "./espeak-free-runtime-patch.mjs";
 
 const ANDROID_ABIS = [
@@ -159,9 +159,9 @@ if (verifyInstalled) {
     ),
     "utf8",
   );
-  if (!hasIosArchiveRootEntryGuard(helperSource)) {
+  if (!hasIosArchiveEntryValidationGuard(helperSource)) {
     console.error(
-      "espeak-free runtime: the iOS archive helper is missing the root-entry guard; " +
+      "espeak-free runtime: the iOS archive helper is missing the entry-validation guard; " +
         "run npm run espeak-free:install",
     );
     process.exit(1);
@@ -223,12 +223,12 @@ const originalIosArchiveHelper = readFileSync(
   ),
   "utf8",
 );
-const patchedIosArchiveHelper = applyIosArchiveRootEntryPatch(
+const patchedIosArchiveHelper = applyIosArchiveEntryValidationPatch(
   originalIosArchiveHelper,
 );
 if (patchedIosArchiveHelper !== originalIosArchiveHelper) {
   writeFileSync(IOS_ARCHIVE_HELPER, patchedIosArchiveHelper);
-  console.log("ios: archive root-entry guard installed");
+  console.log("ios: archive entry-validation guard installed");
 }
 
 for (const { abi, libraries } of androidSources) {
