@@ -26,6 +26,7 @@ interface UseConversationActionsParams {
   renameConversation: ConversationsApi["renameConversation"];
   toggleConversationPinned: ConversationsApi["toggleConversationPinned"];
   toggleConversationPrivate: ConversationsApi["toggleConversationPrivate"];
+  toggleConversationArchived: ConversationsApi["toggleConversationArchived"];
   clearConversationMemory: ConversationsApi["clearConversationMemory"];
   updateConversationMemory: ConversationsApi["updateConversationMemory"];
   deleteConversation: ConversationsApi["deleteConversation"];
@@ -46,6 +47,7 @@ export function useConversationActions({
   renameConversation,
   toggleConversationPinned,
   toggleConversationPrivate,
+  toggleConversationArchived,
   clearConversationMemory,
   updateConversationMemory,
   deleteConversation,
@@ -197,8 +199,8 @@ export function useConversationActions({
   );
 
   const handleTogglePinned = useCallback(
-    (conversationId: string) => {
-      const pinned = toggleConversationPinned(conversationId);
+    async (conversationId: string) => {
+      const pinned = await toggleConversationPinned(conversationId);
       showToast(
         pinned ? t("threadPinned") : t("threadUnpinned"),
         undefined,
@@ -206,6 +208,21 @@ export function useConversationActions({
       );
     },
     [showToast, t, toggleConversationPinned],
+  );
+
+  const handleToggleArchived = useCallback(
+    async (conversationId: string) => {
+      const archived = await toggleConversationArchived(conversationId);
+      if (archived === null) {
+        return;
+      }
+      showToast(
+        archived ? t("threadArchived") : t("threadUnarchived"),
+        undefined,
+        "success",
+      );
+    },
+    [showToast, t, toggleConversationArchived],
   );
 
   const handleTogglePrivate = useCallback(
@@ -330,6 +347,7 @@ export function useConversationActions({
     handleRenameThread,
     handleTogglePinned,
     handleTogglePrivate,
+    handleToggleArchived,
     handleSelectConversation,
     handleStartNewSession,
     handleDeleteConversation,

@@ -602,6 +602,7 @@ export interface Conversation {
   knowledgeExcludedConversationIds?: string[];
   branch?: ConversationBranchOrigin;
   isPrivate?: boolean;
+  archived?: boolean;
 }
 
 export interface ConversationBranchResult {
@@ -624,4 +625,5 @@ export interface ConversationMeta {
   branch?: ConversationBranchOrigin;
   branchSchemaVersion?: 2;
   isPrivate?: boolean;
+  archived?: boolean;
 }

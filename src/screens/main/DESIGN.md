@@ -123,6 +123,14 @@ Because React Native does not deliver that callback on Android, a bounded
 post-animation fallback drains the same single-consumer queue there. This keeps
 two sibling native modals from being presented concurrently.
 
+`ChatTranscript` owns one expanded message ID. A conversation-key change clears
+it so restored history opens folded; appending a new message to the same
+conversation moves expansion to that latest row. `TranscriptMessage` owns the
+script-row presentation and local metrics disclosure, while canonical removal
+flows back through `useConversations`. The sessions drawer projects persisted
+metadata into flat Pinned, Earlier, and Archived sections; branch provenance is
+kept as a root-session link rather than encoded as visual tree rails.
+
 `useOrbTurnProgress` takes one clock snapshot whenever semantic voice state
 changes, then supplies the remaining linear durations to `VoiceOrb`. The orb
 uses Reanimated UI-thread clocks for recording, whole-turn estimate, and late

@@ -19,6 +19,8 @@ export interface ConversationDrawerProps {
   onRenameThread: (id: string, title: string) => void;
   onTogglePinned: (id: string) => void;
   onTogglePrivate: (id: string) => void;
+  onToggleArchived: (id: string) => void;
+  onAutoName: (id: string) => void;
   onNewSession: () => Promise<void> | void;
   onDelete: (id: string) => void;
   onClose: () => void;

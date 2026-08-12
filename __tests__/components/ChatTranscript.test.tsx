@@ -52,7 +52,8 @@ describe("ChatTranscript follow-tail scrolling", () => {
 
     expect(
       StyleSheet.flatten(
-        screen.getByTestId("empty-transcript-icon", hiddenIconQuery).props.style,
+        screen.getByTestId("empty-transcript-icon", hiddenIconQuery).props
+          .style,
       ),
     ).toEqual(
       expect.objectContaining({
@@ -101,6 +102,49 @@ describe("ChatTranscript follow-tail scrolling", () => {
       viewPosition: 0.35,
     });
     scrollToIndex.mockRestore();
+  });
+
+  it("expands only a newly arriving message and refolds restored sessions", () => {
+    const onCopyMessage = jest.fn();
+    const initialMessages = [
+      message(
+        "assistant-1",
+        "This stored answer is deliberately long enough to have a folded transcript state when the conversation is first opened. It stays folded until someone chooses to inspect it.",
+      ),
+    ];
+    const renderTranscript = (conversationId: string, messages: Message[]) => (
+      <ThemeProvider mode="light">
+        <LocalizationProvider language="en">
+          <ChatTranscript
+            conversationId={conversationId}
+            messages={messages}
+            onCopyMessage={onCopyMessage}
+          />
+        </LocalizationProvider>
+      </ThemeProvider>
+    );
+    const screen = render(renderTranscript("conversation-1", initialMessages));
+
+    expect(screen.queryByLabelText("Copy")).toBeNull();
+
+    const messagesWithNewReply = [
+      ...initialMessages,
+      message(
+        "assistant-2",
+        "This answer just arrived and therefore opens as the active script row while every earlier message remains folded above it.",
+      ),
+    ];
+    screen.rerender(renderTranscript("conversation-1", messagesWithNewReply));
+
+    expect(screen.getAllByLabelText("Copy")).toHaveLength(1);
+    expect(
+      screen.getByTestId("transcript-toggle-assistant-2").props
+        .accessibilityState,
+    ).toEqual({ expanded: true });
+
+    screen.rerender(renderTranscript("conversation-2", messagesWithNewReply));
+
+    expect(screen.queryByLabelText("Copy")).toBeNull();
   });
 
   it("treats small native layout offsets as still being at the tail", () => {

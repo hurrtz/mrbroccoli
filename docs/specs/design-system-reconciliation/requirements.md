@@ -46,7 +46,7 @@ The following flows must work end to end where the target supports them:
   cancellation, failure, resume without re-download, and final profile use;
 - manual local-model catalogue, download, checksum verification, benchmark,
   selection, test, removal, storage reporting, and device-specific readiness;
-- Settings overview and all eight pages, Free/Premium gating, pickers, dialogs,
+- Settings overview and all seven pages, Free/Premium gating, pickers, dialogs,
   validation, backup/restore entry points, diagnostics, and persistence;
 - voice/text pager, route byline and picker, conversation settings, image,
   Search and Model Council controls, conversation drawer, transcript sheet,

@@ -38,6 +38,7 @@ describe("useConversationActions", () => {
         renameConversation: jest.fn(),
         toggleConversationPinned: jest.fn(),
         toggleConversationPrivate: jest.fn(),
+        toggleConversationArchived: jest.fn(),
         clearConversationMemory: jest.fn(),
         updateConversationMemory: jest.fn(),
         deleteConversation: jest.fn(),
@@ -78,6 +79,7 @@ describe("useConversationActions", () => {
         renameConversation: jest.fn(),
         toggleConversationPinned: jest.fn(),
         toggleConversationPrivate: jest.fn(),
+        toggleConversationArchived: jest.fn(),
         clearConversationMemory: jest.fn(),
         updateConversationMemory: jest.fn(),
         deleteConversation: jest.fn(),
@@ -123,6 +125,7 @@ describe("useConversationActions", () => {
         renameConversation: jest.fn(),
         toggleConversationPinned: jest.fn(),
         toggleConversationPrivate: jest.fn(),
+        toggleConversationArchived: jest.fn(),
         clearConversationMemory: jest.fn(),
         updateConversationMemory: jest.fn(),
         deleteConversation,
@@ -179,6 +182,7 @@ describe("useConversationActions", () => {
         renameConversation: jest.fn(),
         toggleConversationPinned: jest.fn(),
         toggleConversationPrivate: jest.fn(),
+        toggleConversationArchived: jest.fn(),
         clearConversationMemory: jest.fn(),
         updateConversationMemory: jest.fn(),
         deleteConversation: jest.fn(),
@@ -237,6 +241,7 @@ describe("useConversationActions", () => {
         renameConversation: jest.fn(),
         toggleConversationPinned: jest.fn(),
         toggleConversationPrivate: jest.fn(),
+        toggleConversationArchived: jest.fn(),
         clearConversationMemory: jest.fn(),
         updateConversationMemory: jest.fn(),
         deleteConversation: jest.fn(),
@@ -292,6 +297,7 @@ describe("useConversationActions", () => {
         renameConversation: jest.fn(),
         toggleConversationPinned: jest.fn(),
         toggleConversationPrivate: jest.fn(),
+        toggleConversationArchived: jest.fn(),
         clearConversationMemory,
         updateConversationMemory: jest.fn(),
         deleteConversation: jest.fn(),
@@ -347,6 +353,7 @@ describe("useConversationActions", () => {
         renameConversation: jest.fn(),
         toggleConversationPinned: jest.fn(),
         toggleConversationPrivate: jest.fn(),
+        toggleConversationArchived: jest.fn(),
         clearConversationMemory: jest.fn(),
         updateConversationMemory,
         deleteConversation: jest.fn(),
@@ -376,5 +383,4 @@ describe("useConversationActions", () => {
       "success",
     );
   });
-
 });

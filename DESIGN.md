@@ -156,7 +156,11 @@ boundary avoids scattering compatibility defaults through UI and service code.
 
 Conversation metadata is loaded first for fast drawers and search. Full records
 hydrate lazily. Each record owns messages, per-conversation overrides, summary,
-branch origin, privacy state, usage events, and knowledge exclusions.
+branch origin, privacy and archive state, usage events, and knowledge
+exclusions. Removing an individual message is a canonical record mutation: it
+also invalidates the compact summary and integrity-repair snapshot, removes
+app-owned attachments, rebuilds drawer metadata, and resynchronizes eligible
+derived knowledge.
 
 Branches copy messages only through a selected checkpoint, assign new message
 and attachment IDs, preserve applicable conversation settings and privacy, and

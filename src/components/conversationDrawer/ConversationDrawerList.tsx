@@ -1,19 +1,18 @@
 import React from "react";
-import { FlatList, Text, View } from "react-native";
+import { FlatList, Text, TouchableOpacity, View } from "react-native";
 
 import { PhosphorIcon } from "../../design-system/PhosphorIcon";
-
 import { useLocalization } from "../../i18n";
 import { useTheme } from "../../theme/ThemeContext";
-import { ConversationMeta } from "../../types";
+import type { ConversationMeta } from "../../types";
 
 import { formatConversationDateTime } from "./formatConversationDateTime";
 import { ConversationDrawerItem } from "./ConversationDrawerItem";
 import { styles } from "./styles";
-import { buildConversationBranchRows } from "../../utils/conversationBranches";
 
 interface ConversationDrawerListProps {
   activeId: string | null;
+  allConversations?: ConversationMeta[];
   compact?: boolean;
   conversations: ConversationMeta[];
   searchQuery: string;
@@ -22,10 +21,104 @@ interface ConversationDrawerListProps {
   onSelectConversation: (conversationId: string) => void;
 }
 
+type DrawerListEntry =
+  | {
+      kind: "section";
+      id: "pinned" | "earlier" | "archived";
+      label: string;
+      count?: number;
+      expanded?: boolean;
+      separated: boolean;
+    }
+  | {
+      kind: "conversation";
+      id: string;
+      conversation: ConversationMeta;
+      rootTitle?: string;
+    };
+
+export function buildConversationDrawerEntries(params: {
+  conversations: ConversationMeta[];
+  allConversations: ConversationMeta[];
+  archivedExpanded: boolean;
+  pinnedLabel: string;
+  earlierLabel: string;
+  archivedLabel: string;
+}): DrawerListEntry[] {
+  const {
+    conversations,
+    allConversations,
+    archivedExpanded,
+    pinnedLabel,
+    earlierLabel,
+    archivedLabel,
+  } = params;
+  const titleById = new Map(
+    allConversations.map(({ id, title }) => [id, title] as const),
+  );
+  const pinned = conversations.filter(
+    (conversation) => !conversation.archived && conversation.pinned,
+  );
+  const earlier = conversations.filter(
+    (conversation) => !conversation.archived && !conversation.pinned,
+  );
+  const archived = conversations.filter(
+    (conversation) => conversation.archived,
+  );
+  const entries: DrawerListEntry[] = [];
+  const addRows = (rows: ConversationMeta[]) => {
+    for (const conversation of rows) {
+      entries.push({
+        kind: "conversation",
+        id: conversation.id,
+        conversation,
+        rootTitle: conversation.branch
+          ? titleById.get(conversation.branch.rootConversationId)
+          : undefined,
+      });
+    }
+  };
+
+  if (pinned.length > 0) {
+    entries.push({
+      kind: "section",
+      id: "pinned",
+      label: pinnedLabel,
+      separated: false,
+    });
+    addRows(pinned);
+  }
+  if (earlier.length > 0) {
+    entries.push({
+      kind: "section",
+      id: "earlier",
+      label: earlierLabel,
+      separated: pinned.length > 0,
+    });
+    addRows(earlier);
+  }
+  if (archived.length > 0) {
+    entries.push({
+      kind: "section",
+      id: "archived",
+      label: archivedLabel,
+      count: archived.length,
+      expanded: archivedExpanded,
+      separated: pinned.length > 0 || earlier.length > 0,
+    });
+    if (archivedExpanded) {
+      addRows(archived);
+    }
+  }
+
+  return entries;
+}
+
 export function ConversationDrawerList({
   activeId,
   compact = false,
   conversations,
+  allConversations = conversations,
   searchQuery,
   onDeleteConversation,
   onOpenActionConversation,
@@ -33,80 +126,52 @@ export function ConversationDrawerList({
 }: ConversationDrawerListProps) {
   const { colors } = useTheme();
   const { locale, t } = useLocalization();
-  const [expansionOverrides, setExpansionOverrides] = React.useState<
-    ReadonlyMap<string, boolean>
-  >(new Map());
-  const expandedConversationIds = React.useMemo(() => {
-    if (searchQuery.trim()) {
-      return new Set(conversations.map(({ id }) => id));
-    }
-
-    const byId = new Map(
-      conversations.map((conversation) => [conversation.id, conversation]),
-    );
-    const activeAncestors = new Set<string>();
-    let current = activeId ? byId.get(activeId) : undefined;
-    const visited = new Set<string>();
-    while (current?.branch?.parentConversationId && !visited.has(current.id)) {
-      visited.add(current.id);
-      const parentId = current.branch.parentConversationId;
-      activeAncestors.add(parentId);
-      current = byId.get(parentId);
-    }
-
-    const expanded = new Set<string>();
-    for (const conversation of conversations) {
-      const override = expansionOverrides.get(conversation.id);
-      if (override ?? activeAncestors.has(conversation.id)) {
-        expanded.add(conversation.id);
-      }
-    }
-    return expanded;
-  }, [activeId, conversations, expansionOverrides, searchQuery]);
-  const branchRows = React.useMemo(
-    () => buildConversationBranchRows(conversations, expandedConversationIds),
-    [conversations, expandedConversationIds],
+  const [archivedOpen, setArchivedOpen] = React.useState(false);
+  const activeIsArchived = conversations.some(
+    ({ archived, id }) => id === activeId && archived,
   );
-
-  const toggleBranchExpanded = React.useCallback(
-    (conversationId: string, isExpanded: boolean) => {
-      setExpansionOverrides((current) => {
-        const next = new Map(current);
-        next.set(conversationId, !isExpanded);
-        return next;
-      });
-    },
-    [],
+  const archivedExpanded =
+    archivedOpen || activeIsArchived || Boolean(searchQuery.trim());
+  const entries = React.useMemo(
+    () =>
+      buildConversationDrawerEntries({
+        conversations,
+        allConversations,
+        archivedExpanded,
+        pinnedLabel: t("pinned"),
+        earlierLabel: t("earlierSessions"),
+        archivedLabel: t("archivedSessions"),
+      }),
+    [allConversations, archivedExpanded, conversations, t],
   );
 
   return (
     <FlatList
-      data={branchRows}
-      keyExtractor={(item) => item.conversation.id}
-      contentContainerStyle={styles.list}
+      testID="conversation-drawer-list"
+      style={styles.listView}
+      data={entries}
+      keyExtractor={(item) => `${item.kind}-${item.id}`}
+      contentContainerStyle={[
+        styles.list,
+        entries.length === 0 ? styles.listEmpty : null,
+      ]}
       ListEmptyComponent={
         <View
           testID="conversation-drawer-empty-state"
-          style={[
-            styles.emptyState,
-            compact ? styles.emptyStateCompact : null,
-            {
-              backgroundColor: colors.surfaceElevated,
-              borderColor: colors.border,
-            },
-          ]}
+          style={[styles.emptyState, compact ? styles.emptyStateCompact : null]}
         >
           <View
             style={[
               styles.emptyIcon,
               compact ? styles.emptyIconCompact : null,
-              {
-                backgroundColor: colors.accentSoft,
-                borderColor: colors.border,
-              },
+              { borderColor: colors.border },
             ]}
           >
-            <PhosphorIcon name="message" size="control" color={colors.accent} />
+            <PhosphorIcon
+              name="inbox"
+              size="navigation"
+              color={colors.textSecondary}
+            />
           </View>
           <Text
             style={[
@@ -132,17 +197,65 @@ export function ConversationDrawerList({
           </Text>
         </View>
       }
-      renderItem={({ item }) => (
-        <ConversationDrawerItem
-          row={item}
-          active={item.conversation.id === activeId}
-          formatDateTime={(iso) => formatConversationDateTime(iso, locale)}
-          onDelete={onDeleteConversation}
-          onOpenActionConversation={onOpenActionConversation}
-          onSelectConversation={onSelectConversation}
-          onToggleBranchExpanded={toggleBranchExpanded}
-        />
-      )}
+      renderItem={({ item }) => {
+        if (item.kind === "section") {
+          const isArchived = item.id === "archived";
+          const label = isArchived
+            ? `${item.label} · ${item.count ?? 0}`
+            : item.label;
+          return (
+            <TouchableOpacity
+              testID={`conversation-section-${item.id}`}
+              disabled={!isArchived}
+              activeOpacity={0.82}
+              onPress={() => setArchivedOpen((current) => !current)}
+              accessibilityRole={isArchived ? "button" : "header"}
+              accessibilityState={
+                isArchived ? { expanded: item.expanded } : undefined
+              }
+              style={[
+                styles.sectionBand,
+                item.separated ? styles.sectionBandSeparated : null,
+                {
+                  backgroundColor: colors.surfaceRaised,
+                  borderColor: colors.border,
+                },
+              ]}
+            >
+              <Text
+                style={[
+                  styles.sectionBandText,
+                  { color: colors.textSecondary },
+                ]}
+              >
+                {label}
+              </Text>
+              {isArchived ? (
+                <View style={styles.sectionBandToggle}>
+                  <PhosphorIcon
+                    name={item.expanded ? "up" : "down"}
+                    size="compact"
+                    color={colors.textSecondary}
+                  />
+                </View>
+              ) : null}
+            </TouchableOpacity>
+          );
+        }
+
+        return (
+          <ConversationDrawerItem
+            conversation={item.conversation}
+            rootTitle={item.rootTitle}
+            active={item.conversation.id === activeId}
+            formatDate={(iso) => formatConversationDateTime(iso, locale)}
+            onDelete={onDeleteConversation}
+            onOpenActionConversation={onOpenActionConversation}
+            onOpenRoot={onSelectConversation}
+            onSelectConversation={onSelectConversation}
+          />
+        );
+      }}
     />
   );
 }

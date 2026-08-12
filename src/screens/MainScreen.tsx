@@ -141,9 +141,11 @@ export function MainScreen() {
     updateConversationSettings,
     clearConversationMemory,
     renameConversation,
+    removeMessage,
     repairConversationIntegrity,
     toggleConversationPinned,
     toggleConversationPrivate,
+    toggleConversationArchived,
     undoConversationIntegrityRepair,
     searchConversations,
     deleteConversation,
@@ -600,6 +602,7 @@ export function MainScreen() {
     handleRenameThread,
     handleTogglePinned,
     handleTogglePrivate,
+    handleToggleArchived,
     handleDeleteConversation,
     handleSelectConversation,
     handleStartNewSession,
@@ -614,6 +617,7 @@ export function MainScreen() {
     renameConversation,
     toggleConversationPinned,
     toggleConversationPrivate,
+    toggleConversationArchived,
     clearConversationMemory,
     updateConversationMemory,
     deleteConversation,
@@ -627,22 +631,27 @@ export function MainScreen() {
     t,
   });
 
-  const { canGenerateTitle, handleGenerateTitle, isGeneratingTitle } =
-    useConversationTitleGenerator({
-      activeConversation,
-      apiKey: providerApiKey,
-      language,
-      model,
-      modelEffort,
-      provider,
-      providerReady:
-        freeOffline.entitlement.isPremium &&
-        !localLlmModelId &&
-        !voiceInputDisabled,
-      renameConversation,
-      showToast,
-      t,
-    });
+  const {
+    canGenerateTitle,
+    handleGenerateTitle,
+    handleGenerateTitleForConversation,
+    isGeneratingTitle,
+  } = useConversationTitleGenerator({
+    activeConversation,
+    apiKey: providerApiKey,
+    getConversationById,
+    language,
+    model,
+    modelEffort,
+    provider,
+    providerReady:
+      freeOffline.entitlement.isPremium &&
+      !localLlmModelId &&
+      !voiceInputDisabled,
+    renameConversation,
+    showToast,
+    t,
+  });
 
   const handleResponseModeChange = useMainScreenResponseModeSelection({
     activeResponseMode,
@@ -1097,6 +1106,11 @@ export function MainScreen() {
             void handleRepeatMessage(message);
           },
           onRetryMessage: handleRetryMessage,
+          onRemoveMessage: isBusy
+            ? undefined
+            : (message) => {
+                void removeMessage(message.id);
+              },
           onShareMessage: (message) => {
             void handleShareMessage(formatMessageForCopy(message, language));
           },
@@ -1209,6 +1223,8 @@ export function MainScreen() {
         onExportIntegrityOriginals: handleShareMessage,
         onRenameThread: handleRenameDrawerThread,
         onTogglePinned: handleTogglePinned,
+        onToggleArchived: handleToggleArchived,
+        onAutoName: handleGenerateTitleForConversation,
         onNewSession: () => {
           pendingImages.clearAttachments();
           void handleStartNewSession();

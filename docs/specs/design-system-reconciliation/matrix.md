@@ -9,10 +9,22 @@ functional acceptance. Device verdicts are added as the goal progresses.
 | Design component | React Native implementation | Baseline |
 | --- | --- | --- |
 | `ProviderIcon` | `src/components/ProviderIcon.tsx` | mapped |
-| `ChatBubble` | `src/components/ChatBubble.tsx` and `src/components/chatBubble/` | mapped |
+| `ChatBubble` | `src/components/ChatBubble.tsx` and `src/components/chatBubble/` | retained legacy composition; no longer the transcript row |
 | `ChatTranscript` | `src/components/ChatTranscript.tsx` | mapped |
+| `TranscriptMessage` | `src/components/TranscriptMessage.tsx` | mapped to folded script row; unit acceptance passed |
+| `ConversationActionSheet` | `src/components/conversationDrawer/ConversationActionSheet.tsx` | mapped |
 | `ConversationDrawerItem` | `src/components/conversationDrawer/ConversationDrawerItem.tsx` | mapped |
+| `ConversationIntegrityModal` | `src/components/conversationDrawer/ConversationIntegrityModal.tsx` | mapped |
+| `ConversationMemoryModal` | `src/components/ConversationMemoryModal.tsx` | mapped |
+| `ConversationRenameModal` | `src/components/conversationDrawer/ConversationRenameModal.tsx` | mapped |
+| `MessageBranchIndicator` | `src/components/chatBubble/MessageBranchIndicator.tsx` | mapped |
 | `MessageImageAttachments` | `src/components/MessageImageAttachments.tsx` | mapped |
+| `PipelineNotices` | `src/components/chatBubble/PipelineNotices.tsx` | mapped |
+| `ReplyFailureCard` | `src/components/chatBubble/ReplyFailureCard.tsx` | mapped |
+| `TurnReceiptCard` | `src/components/chatBubble/TurnReceiptCard.tsx` | retained detail composition; transcript consolidates it |
+| `UberModeAuditCard` | `src/components/chatBubble/UberModeAuditCard.tsx` | retained detail composition; transcript consolidates it |
+| `UsageCard` | `src/components/chatBubble/UsageCard.tsx` | retained detail composition; transcript consolidates it |
+| `WebSearchReferences` | `src/components/chatBubble/WebSearchReferences.tsx` | retained detail composition; transcript consolidates it |
 | `Button` | `src/design-system/NativeControls.tsx` | mapped |
 | `IconButton` | `src/design-system/IconButton.tsx` | mapped |
 | `Input` | `src/design-system/NativeControls.tsx` | mapped |
@@ -47,9 +59,15 @@ functional acceptance. Device verdicts are added as the goal progresses.
 | `AntSettingsCard` | `src/features/settings/settings-primitives/SettingsCards.tsx` | mapped |
 | `AntSwitchRow` | `src/features/settings/settings-primitives/SettingsFields.tsx` | mapped |
 | `AntTextArea` | `src/features/settings/settings-primitives/SettingsFields.tsx` | mapped |
+| `IconAction` | not yet implemented as the approved settings primitive | missing |
+| `PremiumBand` | not yet implemented as the approved settings primitive | missing |
+| `RouteOptionRow` | not yet implemented as the approved settings primitive | missing |
 | `RuntimeReadiness` | `src/features/settings/settings-primitives/RuntimeReadiness.tsx` | mapped |
+| `SettingsGroup` | not yet implemented as the approved settings primitive | missing |
+| `SettingsRow` | not yet implemented as the approved settings primitive | missing |
 | `AppWordmark` | `src/components/AppWordmark.tsx` | mapped |
 | `BackgroundTaskBar` | `src/design-system/BackgroundTaskBar.tsx` | mapped |
+| `Composer` | `src/screens/main/voiceTextInputPager/InputSurfacePages.tsx` | mapped through native composer composition |
 | `ConversationSettingsSummary` | `src/design-system/ConversationSettingsSummary.tsx` | mapped |
 | `IntroBanner` | `src/components/IntroBanner.tsx` | mapped |
 | `OrbSatellite` | `src/design-system/OrbSatellite.tsx` | mapped |
@@ -58,13 +76,14 @@ functional acceptance. Device verdicts are added as the goal progresses.
 | `PremiumUpgradeModal` | `src/components/PremiumUpgradeModal.tsx` | mapped |
 | `ResponseModeToggle` | `src/components/ResponseModeToggle.tsx` | mapped, retained off-home |
 | `RouteByline` | `src/screens/main/MainScreenRouteByline.tsx` | mapped, native composition name differs |
+| `RoutePicker` | `src/screens/main/RoutePickerSheet.tsx` | mapped, native composition name differs |
 | `TranscriptHandle` | `src/design-system/TranscriptHandle.tsx` | mapped |
 | `VoiceOrb` | `src/design-system/VoiceOrb.tsx` and `src/screens/main/useOrbTurnProgress.ts` | mapped |
 | `WorkspaceStatusLine` | `src/design-system/WorkspaceStatusLine.tsx` | mapped |
 
 ## Manifest data exports
 
-The remaining entries in the 64-export manifest are contracts or specimen
+The remaining entries in the 83-export manifest are contracts or specimen
 data, not separate visual components.
 
 | Design export | Native authority | Baseline |
@@ -85,8 +104,8 @@ data, not separate visual components.
 | Orb states and progress rings | pass: ten deterministic phases/boundaries | pass: real recording, transcribing, thinking, speaking plus deterministic overtime | pass: ten deterministic phases/boundaries | full-overtime isolated fixture pass; real turn blocked |
 | Introduction and audio | pass: seven steps, swipe, bundled audio, Back/Done/reopen/close | pass: same 13-scene smoke | pass: same 13-scene smoke | first-launch banner captured; interaction not automated |
 | Automatic setup | pass: honest low-memory rejection, retry, manual hand-off | pass: Qwen and Whisper viable; Piper failure excluded on retry; system-voice profile Ready | presentation and controller tests pass | blocked by signing/memory entitlement prerequisite |
-| Settings overview and eight pages | pass across 19 locales | overview/App/on-device navigation pass | pass across 19 locales | first-launch Settings entry visible; interaction not automated |
-| Transcript, drawer, route picker, chat actions | deterministic scenes and route-picker landscape pass | pass: smoke, local text turn, local voice turn, persisted transcript | deterministic scenes and route-picker landscape pass | not automated |
+| Settings overview and seven pages | prior eight-page revision passed; current revision pending | prior overview/App/on-device navigation passed; current revision pending | prior eight-page revision passed; current revision pending | first-launch Settings entry visible; current revision pending |
+| Transcript, drawer, route picker, chat actions | current source/unit parity; native revalidation pending | prior local-turn evidence only; current revision pending | current source/unit parity; native revalidation pending | current revision pending |
 | RTL and accessibility-large text | Arabic/Urdu plus large-text pass | representative smoke pass | Arabic/Urdu plus large-text pass | not automated |
 | Native audio/model/lifecycle tests | Android instrumentation pass | pass: interrupted transfer recovery plus real PCM-WAV capture, local Whisper/Qwen, system playback | iOS native tests pass | blocked |
 

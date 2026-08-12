@@ -87,6 +87,8 @@ function renderConversationDrawer(
       onRenameThread={jest.fn()}
       onTogglePinned={jest.fn()}
       onTogglePrivate={jest.fn()}
+      onToggleArchived={jest.fn()}
+      onAutoName={jest.fn()}
       onNewSession={jest.fn(async () => undefined)}
       onDelete={jest.fn()}
       onClose={jest.fn()}
@@ -142,6 +144,12 @@ describe("ConversationDrawer", () => {
     expect(
       screen.getAllByTestId("phosphor-icon-ellipsis-vertical", hiddenIconQuery),
     ).toHaveLength(2);
+    expect(
+      StyleSheet.flatten(
+        screen.getByTestId("conversation-drawer-new-session").props.style,
+      ),
+    ).toEqual(expect.objectContaining({ height: 44, borderRadius: 22 }));
+    expect(screen.getByTestId("conversation-drawer-search-dock")).toBeTruthy();
   });
 
   it("exposes every conversation action as a labeled button", async () => {
@@ -153,6 +161,8 @@ describe("ConversationDrawer", () => {
       for (const label of [
         "Pin",
         "Rename",
+        "Name automatically",
+        "Archive",
         "Memory",
         "Review conversation integrity",
         "Share",
@@ -182,7 +192,10 @@ describe("ConversationDrawer", () => {
       expect(
         screen
           .UNSAFE_getByType(FlatList)
-          .props.data.map(
+          .props.data.filter(
+            (entry: { kind: string }) => entry.kind === "conversation",
+          )
+          .map(
             ({ conversation }: { conversation: ConversationMeta }) =>
               conversation,
           ),
@@ -190,11 +203,13 @@ describe("ConversationDrawer", () => {
     });
   });
 
-  it("renders related conversations as a Git-style branch tree", () => {
+  it("renders forks as flat rows with a root-session tag", () => {
+    const onSelectConversation = jest.fn();
     const child: ConversationMeta = {
       ...conversations[1],
       id: "child",
       title: "Branched explanation",
+      pinned: false,
       branch: {
         rootConversationId: "one",
         parentConversationId: "one",
@@ -211,62 +226,40 @@ describe("ConversationDrawer", () => {
         searchQuery=""
         onDeleteConversation={jest.fn()}
         onOpenActionConversation={jest.fn()}
-        onSelectConversation={jest.fn()}
+        onSelectConversation={onSelectConversation}
       />,
     );
-    const rows = screen.UNSAFE_getByType(FlatList).props.data;
+    const rows = screen
+      .UNSAFE_getByType(FlatList)
+      .props.data.filter(
+        (entry: { kind: string }) => entry.kind === "conversation",
+      );
 
     expect(
       rows.map(
-        ({
-          conversation,
-          depth,
-        }: {
-          conversation: ConversationMeta;
-          depth: number;
-        }) => [conversation.id, depth],
+        ({ conversation }: { conversation: ConversationMeta }) =>
+          conversation.id,
       ),
-    ).toEqual([
-      ["one", 0],
-      ["child", 1],
-    ]);
-    expect(screen.getByTestId("conversation-branch-rail-one")).toBeTruthy();
-    expect(screen.getByTestId("conversation-branch-rail-child")).toBeTruthy();
-    expect(screen.getByText("Branch of “Morning briefing”")).toBeTruthy();
-    expect(
-      screen.getByTestId("conversation-branch-toggle-one").props
-        .accessibilityState,
-    ).toEqual({ expanded: true });
+    ).toEqual(["child", "one"]);
+    expect(screen.queryByTestId("conversation-branch-rail-one")).toBeNull();
+    expect(screen.queryByTestId("conversation-branch-toggle-one")).toBeNull();
+    expect(screen.getAllByText("Morning briefing")).toHaveLength(2);
 
-    fireEvent.press(screen.getByTestId("conversation-branch-toggle-one"));
-    expect(
-      screen
-        .UNSAFE_getByType(FlatList)
-        .props.data.map(
-          ({ conversation }: { conversation: ConversationMeta }) =>
-            conversation.id,
-        ),
-    ).toEqual(["one"]);
+    fireEvent.press(screen.getByTestId("conversation-drawer-root-child"));
+    expect(onSelectConversation).toHaveBeenCalledWith("one");
   });
 
-  it("collapses inactive branch families by default and expands them on demand", () => {
-    const child: ConversationMeta = {
-      ...conversations[1],
-      id: "child",
-      title: "Branched explanation",
-      branch: {
-        rootConversationId: "one",
-        parentConversationId: "one",
-        parentMessageId: "message-2",
-        branchMessageId: "child-message-2",
-        kind: "continue-from-message",
-        createdAt: "2026-03-20T08:20:00.000Z",
-      },
+  it("groups pinned and earlier sessions while keeping archived sessions collapsed", () => {
+    const archived: ConversationMeta = {
+      ...conversations[0],
+      id: "archived",
+      title: "Old research",
+      archived: true,
     };
     const screen = renderWithProviders(
       <ConversationDrawerList
         activeId="one"
-        conversations={[child, conversations[0]]}
+        conversations={[conversations[1], conversations[0], archived]}
         searchQuery=""
         onDeleteConversation={jest.fn()}
         onOpenActionConversation={jest.fn()}
@@ -274,24 +267,24 @@ describe("ConversationDrawer", () => {
       />,
     );
 
-    expect(
+    const visibleConversationIds = () =>
       screen
         .UNSAFE_getByType(FlatList)
-        .props.data.map(
+        .props.data.filter(
+          (entry: { kind: string }) => entry.kind === "conversation",
+        )
+        .map(
           ({ conversation }: { conversation: ConversationMeta }) =>
             conversation.id,
-        ),
-    ).toEqual(["one"]);
+        );
 
-    fireEvent.press(screen.getByTestId("conversation-branch-toggle-one"));
-    expect(
-      screen
-        .UNSAFE_getByType(FlatList)
-        .props.data.map(
-          ({ conversation }: { conversation: ConversationMeta }) =>
-            conversation.id,
-        ),
-    ).toEqual(["one", "child"]);
+    expect(screen.getByText("Pinned")).toBeTruthy();
+    expect(screen.getByText("Earlier")).toBeTruthy();
+    expect(screen.getByText("Archived · 1")).toBeTruthy();
+    expect(visibleConversationIds()).toEqual(["two", "one"]);
+
+    fireEvent.press(screen.getByTestId("conversation-section-archived"));
+    expect(visibleConversationIds()).toEqual(["two", "one", "archived"]);
   });
 
   it("tightens the empty state for a landscape drawer", () => {
@@ -350,6 +343,25 @@ describe("ConversationDrawer", () => {
     );
 
     expect(onTogglePrivate).toHaveBeenCalledWith("one");
+  });
+
+  it("archives and automatically names a conversation from its action sheet", async () => {
+    const onToggleArchived = jest.fn();
+    const onAutoName = jest.fn();
+    const screen = renderConversationDrawer({
+      onToggleArchived,
+      onAutoName,
+    });
+
+    fireEvent.press(screen.getByTestId("conversation-drawer-menu-one"));
+    fireEvent.press(
+      await screen.findByTestId("conversation-action-toggle-archive"),
+    );
+    expect(onToggleArchived).toHaveBeenCalledWith("one");
+
+    fireEvent.press(screen.getByTestId("conversation-drawer-menu-one"));
+    fireEvent.press(await screen.findByTestId("conversation-action-auto-name"));
+    expect(onAutoName).toHaveBeenCalledWith("one");
   });
 
   it("previews, exports, and repairs a damaged assistant response", async () => {

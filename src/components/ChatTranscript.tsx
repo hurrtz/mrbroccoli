@@ -11,7 +11,7 @@ import {
   ViewStyle,
 } from "react-native";
 import { PhosphorIcon } from "../design-system/PhosphorIcon";
-import { ChatBubble } from "./ChatBubble";
+import { TranscriptMessage } from "./TranscriptMessage";
 import { useLocalization } from "../i18n";
 import { useTheme } from "../theme/ThemeContext";
 import { fonts } from "../theme/typography";
@@ -40,6 +40,7 @@ interface ChatTranscriptProps {
   onReportMessage?: (message: Message) => void;
   onRepeatMessage?: (message: Message) => void;
   onRetryMessage?: (message: Message) => void;
+  onRemoveMessage?: (message: Message) => void;
   onOpenSpeakingSettings?: () => void;
   activeRepeatMessageId?: string | null;
   repeatPlaybackStatus?: "idle" | "preparing" | "speaking";
@@ -71,7 +72,7 @@ export function ChatTranscript({
   contentContainerStyle,
   scrollEnabled = true,
   onCopyMessage,
-  onEditMessage,
+  onEditMessage: _onEditMessage,
   onBranchMessage,
   branchChildrenByMessageId,
   branchOrigin,
@@ -79,9 +80,10 @@ export function ChatTranscript({
   onOpenBranches,
   onOpenBranchSource,
   onShareMessage,
-  onReportMessage,
+  onReportMessage: _onReportMessage,
   onRepeatMessage,
   onRetryMessage,
+  onRemoveMessage,
   onOpenSpeakingSettings,
   activeRepeatMessageId = null,
   repeatPlaybackStatus = "idle",
@@ -107,6 +109,15 @@ export function ChatTranscript({
     () => conversationId ?? messages[0]?.id ?? "empty-conversation",
     [conversationId, messages],
   );
+  const latestMessageId = messages.at(-1)?.id ?? null;
+  const [expandedMessageId, setExpandedMessageId] = React.useState<
+    string | null
+  >(null);
+  const transcriptFoldStateRef = useRef({
+    conversationKey,
+    latestMessageId,
+    messageCount: messages.length,
+  });
   const latestUserMessageId = useMemo(() => {
     for (let index = messages.length - 1; index >= 0; index -= 1) {
       if (messages[index].role === "user") {
@@ -123,6 +134,41 @@ export function ChatTranscript({
   const resolvedEmptyTitle = emptyTitle ?? t("yourConversationAppearsHere");
   const resolvedEmptyDescription =
     emptyDescription ?? t("defaultTranscriptEmptyDescription");
+
+  useEffect(() => {
+    const previous = transcriptFoldStateRef.current;
+    transcriptFoldStateRef.current = {
+      conversationKey,
+      latestMessageId,
+      messageCount: messages.length,
+    };
+
+    if (previous.conversationKey !== conversationKey) {
+      // Opening a saved session always starts with its script folded. New
+      // messages in that same session expand as they arrive below.
+      setExpandedMessageId(null);
+      return;
+    }
+
+    if (
+      latestMessageId &&
+      latestMessageId !== previous.latestMessageId &&
+      messages.length > previous.messageCount
+    ) {
+      setExpandedMessageId(latestMessageId);
+    } else if (
+      expandedMessageId &&
+      !messages.some(({ id }) => id === expandedMessageId)
+    ) {
+      setExpandedMessageId(null);
+    }
+  }, [
+    conversationKey,
+    expandedMessageId,
+    latestMessageId,
+    messages,
+    messages.length,
+  ]);
 
   const setTailState = useCallback(
     (isAtTail: boolean) => {
@@ -352,9 +398,16 @@ export function ChatTranscript({
       style={styles.listView}
       data={messages}
       keyExtractor={(item) => item.id}
-      renderItem={({ item }) => (
-        <ChatBubble
+      renderItem={({ item, index }) => (
+        <TranscriptMessage
           message={item}
+          expanded={expandedMessageId === item.id}
+          last={index === messages.length - 1}
+          onToggle={() =>
+            setExpandedMessageId((current) =>
+              current === item.id ? null : item.id,
+            )
+          }
           branchChildren={branchChildrenByMessageId?.get(item.id)}
           branchOrigin={
             branchOrigin && branchOrigin.branchMessageId === item.id
@@ -366,14 +419,13 @@ export function ChatTranscript({
               : undefined
           }
           onCopy={onCopyMessage}
-          onEdit={onEditMessage}
           onBranch={onBranchMessage}
           onOpenBranches={onOpenBranches}
           onOpenBranchSource={onOpenBranchSource}
           onShare={onShareMessage}
-          onReport={onReportMessage}
           onRepeat={onRepeatMessage}
           onRetry={onRetryMessage}
+          onRemove={onRemoveMessage}
           onOpenSpeakingSettings={onOpenSpeakingSettings}
           repeatState={
             activeRepeatMessageId === item.id ? repeatPlaybackStatus : "idle"

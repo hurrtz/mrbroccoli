@@ -527,12 +527,12 @@ describe("useConversations", () => {
       id: "test-uuid-2",
       title: "Imported conversation",
     });
-    await expect(
-      readConversation(localConversation.id),
-    ).resolves.toMatchObject({
-      id: localConversation.id,
-      title: "Local conversation",
-    });
+    await expect(readConversation(localConversation.id)).resolves.toMatchObject(
+      {
+        id: localConversation.id,
+        title: "Local conversation",
+      },
+    );
   });
 
   it("remaps branch ancestry when a backup family is restored as copies", async () => {
@@ -1518,6 +1518,109 @@ describe("useConversations", () => {
     expect(result.current.conversations[0]?.title).toBe("First");
     expect(result.current.conversations[0]?.pinned).toBe(true);
     expect(result.current.conversations[1]?.title).toBe("Second");
+  });
+
+  it("archives sessions persistently and unarchives them when pinned", async () => {
+    const { result } = renderHook(() => useConversations());
+
+    await act(async () => {
+      result.current.createConversation("Archive this session");
+    });
+    const conversationId = result.current.activeConversation?.id;
+
+    await act(async () => {
+      await result.current.toggleConversationArchived(conversationId!);
+    });
+
+    expect(result.current.activeConversation?.archived).toBe(true);
+    expect(result.current.conversations[0]).toEqual(
+      expect.objectContaining({ archived: true, pinned: false }),
+    );
+
+    await act(async () => {
+      await result.current.toggleConversationPinned(conversationId!);
+    });
+
+    expect(result.current.activeConversation?.archived).toBe(false);
+    expect(result.current.conversations[0]).toEqual(
+      expect.objectContaining({ archived: false, pinned: true }),
+    );
+    await expect(readConversation(conversationId!)).resolves.toEqual(
+      expect.objectContaining({ archived: false }),
+    );
+  });
+
+  it("removes a transcript message and invalidates its derived state", async () => {
+    const { result } = renderHook(() =>
+      useConversations({ pastConversationKnowledgeEnabled: true }),
+    );
+
+    await act(async () => {
+      result.current.createConversation("Remove one message");
+    });
+    const conversationId = result.current.activeConversation?.id ?? "";
+    let assistantMessageId = "";
+    await act(async () => {
+      result.current.addMessage({
+        role: "user",
+        content: "Keep this question",
+        model: null,
+        provider: null,
+      });
+      assistantMessageId =
+        result.current.addMessage({
+          role: "assistant",
+          content: "Remove this answer",
+          attachments: [
+            {
+              id: "removed-message-image",
+              kind: "image",
+              uri: "file:///documents/message-images/removed-message-image.jpg",
+              mimeType: "image/jpeg",
+              width: 100,
+              height: 100,
+              byteSize: 100,
+              sharedWithProviders: ["openai"],
+            },
+          ],
+          model: "gpt-5.4",
+          provider: "openai",
+        })?.id ?? "";
+      result.current.updateConversationContextSummary("Stale summary", 2);
+    });
+
+    await act(async () => {
+      await result.current.removeMessage(assistantMessageId);
+    });
+
+    expect(result.current.activeConversation?.contextSummary).toBeUndefined();
+    expect(
+      result.current.activeConversation?.summarizedMessageCount,
+    ).toBeUndefined();
+    expect(result.current.activeConversation?.messages).toEqual([
+      expect.objectContaining({ content: "Keep this question" }),
+    ]);
+    expect(result.current.conversations[0]).toEqual(
+      expect.objectContaining({
+        lastModel: null,
+        lastProvider: null,
+        messageCount: 1,
+        providerModels: {},
+        providers: [],
+      }),
+    );
+    await expect(readConversation(conversationId)).resolves.toEqual(
+      expect.objectContaining({
+        messages: [expect.objectContaining({ content: "Keep this question" })],
+      }),
+    );
+    expect(FileSystem.deleteAsync).toHaveBeenCalledWith(
+      "file:///documents/message-images/removed-message-image.jpg",
+      { idempotent: true },
+    );
+    expect(AsyncStorage.removeItem).toHaveBeenCalledWith(
+      `@mrbroccoli/conversation-integrity-repair/${conversationId}`,
+    );
   });
 
   it("persists private status without removing in-session memory", async () => {

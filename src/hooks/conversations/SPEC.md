@@ -58,12 +58,19 @@ boundary steady kept the store swap out of a 1,200-line mutation surface.
 - Editing a user message is allowed only for non-empty changed text. It marks
   `editedAt` and removes the compact summary because that summary may describe
   superseded content.
+- Removing a message deletes its app-owned attachments, clears compact summary
+  state and any integrity-repair snapshot, rebuilds provider/message metadata,
+  and resynchronizes eligible derived knowledge. Removing the final
+  provider-authored message must not leave that route in drawer metadata.
 - Per-conversation length, tone, LLM instructions, TTS instructions, and voice
   override global defaults without mutating them.
 - Deleting a conversation also deletes its derived knowledge rows, integrity
   repair snapshot, and app-owned image files.
 - Private state is canonical conversation data and immediately controls derived
   knowledge indexing.
+- Archive state is canonical conversation data. Archiving removes a session
+  from the everyday pinned section; pinning an archived session restores it to
+  the active groups before applying the pin.
 
 ## Branching
 
@@ -83,8 +90,9 @@ truncating the original.
 
 Branch kinds distinguish an edited prompt, an alternative answer requested
 from an unedited user prompt, and continuation after an assistant checkpoint.
-The drawer renders the recursive parent/child graph with cycle protection and
-explicit expansion state.
+The drawer remains a flat recency list rather than a recursive tree. A fork
+keeps its persisted lineage and exposes a root-session link, while exact
+checkpoint navigation remains in the transcript.
 
 ## Search and Knowledge Synchronization
 

@@ -64,6 +64,12 @@ receive already-derived state and callbacks.
   what the conversation is; its info control opens the session details.
 - The transcript remains the durable record. Streaming text may be projected as
   a temporary assistant message, but only persisted messages become history.
+  It reads as one continuous script with a fixed speaker margin, provider or
+  user identity, and a quiet connecting line rather than separate message
+  cards. Opening an existing conversation folds every row; only a newly
+  arriving row opens automatically. Copy, branch, share, replay, and full turn
+  metrics appear only on an open row, while compact metadata remains visible
+  when usage details are enabled. Swiping a row exposes explicit removal.
   In portrait the transcript demotes to a peeking handle at the bottom edge
   and opens as a sheet over the workspace; in landscape it stays inline in the
   right pane. Actions inside the portrait sheet that open conversation or
@@ -282,6 +288,14 @@ screen-reader-accessible state.
 Per-conversation instructions, style, speech behavior, privacy, title, memory,
 and route overrides belong to the active conversation. Global settings remain
 defaults for new conversations unless an explicit product rule says otherwise.
+
+The sessions drawer is flat and recency-first. Pinned and Archived sessions
+live in collapsible groups around the everyday Earlier list; active state is a
+row fill, never a branch rail. Each row shows only title, pin/privacy state,
+date, visible message count, and one provider mark per model. Forks retain a
+small link to their root session. Search stays docked at the bottom, and the
+row action sheet owns automatic naming, archive, privacy, memory, integrity,
+share/copy, and destructive actions.
 
 Branching creates a new conversation through the conversation hook; the screen
 must not splice or overwrite the current transcript. Deleting or restoring a

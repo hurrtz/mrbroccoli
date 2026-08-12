@@ -254,6 +254,7 @@ export function useConversationMutations(params: {
         lastProvider: initialProvider,
         pinned: false,
         isPrivate: false,
+        archived: false,
       };
 
       setConversations((previous) => persistMetas([meta, ...previous]));
@@ -550,6 +551,67 @@ export function useConversationMutations(params: {
     },
     [
       activeConversationRef,
+      persistMetas,
+      setActiveConversationValue,
+      setConversations,
+    ],
+  );
+
+  const removeMessage = useCallback(
+    async (messageId: string) => {
+      const currentConversation = activeConversationRef.current;
+      const removedMessage = currentConversation?.messages.find(
+        (message) => message.id === messageId,
+      );
+
+      if (!currentConversation || !removedMessage) {
+        return false;
+      }
+
+      const updatedAt = new Date().toISOString();
+      const updatedConversation: Conversation = {
+        ...currentConversation,
+        updatedAt,
+        messages: currentConversation.messages.filter(
+          (message) => message.id !== messageId,
+        ),
+      };
+      delete updatedConversation.contextSummary;
+      delete updatedConversation.summarizedMessageCount;
+
+      await saveConversation(updatedConversation);
+      await Promise.all([
+        deleteImageAttachments(removedMessage.attachments ?? []),
+        removeConversationIntegrityRepairSnapshot(currentConversation.id),
+      ]);
+      setActiveConversationValue(updatedConversation);
+      setConversations((previous) =>
+        persistMetas(
+          previous.map((meta) =>
+            meta.id === updatedConversation.id
+              ? buildConversationMetaFromConversation(updatedConversation, {
+                  ...meta,
+                  // Removing the final provider-authored message must not
+                  // leave its route represented in the drawer metadata.
+                  providers: [],
+                  providerModels: {},
+                  lastModel: null,
+                  lastProvider: null,
+                })
+              : meta,
+          ),
+        ),
+      );
+
+      if (pastConversationKnowledgeEnabled && !updatedConversation.isPrivate) {
+        await syncConversationKnowledge(updatedConversation, true);
+      }
+
+      return true;
+    },
+    [
+      activeConversationRef,
+      pastConversationKnowledgeEnabled,
       persistMetas,
       setActiveConversationValue,
       setConversations,
@@ -1119,8 +1181,15 @@ export function useConversationMutations(params: {
   );
 
   const toggleConversationPinned = useCallback(
-    (id: string) => {
-      let nextPinned = false;
+    async (id: string) => {
+      const target = conversationMetas.find(
+        (conversation) => conversation.id === id,
+      );
+      if (!target) {
+        return false;
+      }
+      const nextPinned = !target.pinned;
+      const wasArchived = Boolean(target.archived);
 
       setConversations((previous) =>
         persistMetas(
@@ -1129,18 +1198,39 @@ export function useConversationMutations(params: {
               return conversation;
             }
 
-            nextPinned = !conversation.pinned;
             return {
               ...conversation,
               pinned: nextPinned,
+              ...(nextPinned && wasArchived ? { archived: false } : {}),
             };
           }),
         ),
       );
 
+      if (nextPinned && wasArchived) {
+        const currentConversation = await getConversationById(id);
+        if (currentConversation?.archived) {
+          const updatedConversation = {
+            ...currentConversation,
+            archived: false,
+          };
+          await saveConversation(updatedConversation);
+          if (activeConversationRef.current?.id === id) {
+            setActiveConversationValue(updatedConversation);
+          }
+        }
+      }
+
       return nextPinned;
     },
-    [persistMetas, setConversations],
+    [
+      activeConversationRef,
+      conversationMetas,
+      getConversationById,
+      persistMetas,
+      setActiveConversationValue,
+      setConversations,
+    ],
   );
 
   const toggleConversationPrivate = useCallback(
@@ -1194,6 +1284,54 @@ export function useConversationMutations(params: {
     ],
   );
 
+  const toggleConversationArchived = useCallback(
+    async (id: string) => {
+      const currentConversation =
+        activeConversationRef.current?.id === id
+          ? activeConversationRef.current
+          : await getConversationById(id);
+
+      if (!currentConversation) {
+        return null;
+      }
+
+      const archived = !currentConversation.archived;
+      const updatedConversation: Conversation = {
+        ...currentConversation,
+        archived,
+      };
+
+      await saveConversation(updatedConversation);
+      if (activeConversationRef.current?.id === id) {
+        setActiveConversationValue(updatedConversation);
+      }
+
+      setConversations((previous) =>
+        persistMetas(
+          previous.map((conversation) =>
+            conversation.id === id
+              ? {
+                  ...conversation,
+                  archived,
+                  // Archived sessions leave the everyday pinned section.
+                  pinned: archived ? false : conversation.pinned,
+                }
+              : conversation,
+          ),
+        ),
+      );
+
+      return archived;
+    },
+    [
+      activeConversationRef,
+      getConversationById,
+      persistMetas,
+      setActiveConversationValue,
+      setConversations,
+    ],
+  );
+
   const clearActiveConversation = useCallback(() => {
     selectionRequestRef.current += 1;
     setActiveConversationValue(null);
@@ -1211,10 +1349,12 @@ export function useConversationMutations(params: {
     getConversationById,
     inspectConversationIntegrity,
     renameConversation,
+    removeMessage,
     repairConversationIntegrity,
     selectConversation,
     toggleConversationPinned,
     toggleConversationPrivate,
+    toggleConversationArchived,
     undoConversationIntegrityRepair,
     updateMessage,
     updateConversationMemory,

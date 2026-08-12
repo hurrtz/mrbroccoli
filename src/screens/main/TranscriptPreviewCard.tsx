@@ -42,6 +42,7 @@ interface TranscriptPreviewCardProps {
   onSelectBranchConversation?: (conversationId: string) => Promise<void> | void;
   onRepeatMessage?: (message: Message) => void;
   onRetryMessage: (message: Message) => void;
+  onRemoveMessage?: (message: Message) => void;
   onOpenStyleSheet?: () => void;
   onOpenSpeakingSettings?: () => void;
   onShareMessage?: (message: Message) => void;
@@ -74,6 +75,7 @@ export function TranscriptPreviewCard({
   onSelectBranchConversation,
   onRepeatMessage,
   onRetryMessage,
+  onRemoveMessage,
   onOpenStyleSheet,
   onOpenSpeakingSettings,
   onShareMessage,
@@ -302,6 +304,7 @@ export function TranscriptPreviewCard({
           }
           onRepeatMessage={onRepeatMessage}
           onRetryMessage={onRetryMessage}
+          onRemoveMessage={onRemoveMessage}
           onOpenSpeakingSettings={onOpenSpeakingSettings}
           onShareMessage={onShareMessage}
           onReportMessage={onReportMessage}
@@ -463,7 +466,6 @@ export function TranscriptPreviewCard({
           ))}
         </View>
       </Modal>
-
     </View>
   );
 }

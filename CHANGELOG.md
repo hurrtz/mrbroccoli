@@ -24,6 +24,13 @@ the complete Play Store translations are kept in a dedicated file under
 
 ### Changed
 
+- Sessions now use a flat, recency-first drawer with collapsible Pinned,
+  Earlier, and Archived groups, a bottom search field, compact provider marks,
+  root-session links for forks, and one action sheet for naming, pinning,
+  privacy, memory, integrity, sharing, archiving, and deletion. The transcript
+  now reads as a continuous script instead of stacked cards: saved messages
+  open folded, a newly arriving message opens in place, details and actions
+  expand on demand, and a swipe can remove an individual message.
 - The home screen is rebuilt around a central voice orb. Two rings show the
   current phase and the whole turn against its estimate — running late fills
   them red — and the orb sizes itself to the space the screen leaves it. The

@@ -20,6 +20,8 @@ interface ConversationActionSheetProps {
   onShareThread: (conversationId: string) => void;
   onTogglePinned: (conversationId: string) => void;
   onTogglePrivate: (conversationId: string) => void;
+  onToggleArchived: (conversationId: string) => void;
+  onAutoName: (conversationId: string) => void;
 }
 
 export function ConversationActionSheet({
@@ -33,6 +35,8 @@ export function ConversationActionSheet({
   onShareThread,
   onTogglePinned,
   onTogglePrivate,
+  onToggleArchived,
+  onAutoName,
 }: ConversationActionSheetProps) {
   const { colors } = useTheme();
   const { t } = useLocalization();
@@ -166,6 +170,64 @@ export function ConversationActionSheet({
         </TouchableOpacity>
 
         <TouchableOpacity
+          testID="conversation-action-auto-name"
+          style={[
+            styles.actionSheetRow,
+            {
+              backgroundColor: colors.surfaceElevated,
+              borderColor: colors.border,
+            },
+          ]}
+          onPress={() => {
+            onAutoName(conversation.id);
+            onClose();
+          }}
+          activeOpacity={0.88}
+          accessibilityRole="button"
+          accessibilityLabel={t("nameConversationAutomatically")}
+        >
+          <PhosphorIcon
+            name="thunderbolt"
+            size="compact"
+            color={colors.textSecondary}
+          />
+          <Text style={[styles.actionSheetRowText, { color: colors.text }]}>
+            {t("nameConversationAutomatically")}
+          </Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          testID="conversation-action-toggle-archive"
+          style={[
+            styles.actionSheetRow,
+            {
+              backgroundColor: colors.surfaceElevated,
+              borderColor: colors.border,
+            },
+          ]}
+          onPress={() => {
+            onToggleArchived(conversation.id);
+            onClose();
+          }}
+          activeOpacity={0.88}
+          accessibilityRole="button"
+          accessibilityLabel={
+            conversation.archived ? t("unarchiveSession") : t("archiveSession")
+          }
+        >
+          <PhosphorIcon
+            name="inbox"
+            size="compact"
+            color={colors.textSecondary}
+          />
+          <Text style={[styles.actionSheetRowText, { color: colors.text }]}>
+            {conversation.archived
+              ? t("unarchiveSession")
+              : t("archiveSession")}
+          </Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
           testID="conversation-action-review-integrity"
           style={[
             styles.actionSheetRow,
@@ -208,7 +270,7 @@ export function ConversationActionSheet({
           accessibilityLabel={t("memory")}
         >
           <PhosphorIcon
-            name="inbox"
+            name="brain"
             size="compact"
             color={colors.textSecondary}
           />

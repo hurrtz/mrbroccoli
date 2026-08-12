@@ -9,6 +9,9 @@ import type { ShowToastFn, TranslateFn } from "./shared";
 type RenameConversation = ReturnType<
   typeof useConversations
 >["renameConversation"];
+type GetConversationById = ReturnType<
+  typeof useConversations
+>["getConversationById"];
 
 const CONVERSATION_TITLE_TIMEOUT_MS = 45_000;
 
@@ -20,6 +23,7 @@ interface UseConversationTitleGeneratorParams {
   modelEffort?: string;
   provider: Provider;
   providerReady: boolean;
+  getConversationById: GetConversationById;
   renameConversation: RenameConversation;
   showToast: ShowToastFn;
   t: TranslateFn;
@@ -33,6 +37,7 @@ export function useConversationTitleGenerator({
   modelEffort,
   provider,
   providerReady,
+  getConversationById,
   renameConversation,
   showToast,
   t,
@@ -62,121 +67,137 @@ export function useConversationTitleGenerator({
   const canGenerateTitle =
     providerReady && hasConversationContent && !isGeneratingTitle;
 
-  const handleGenerateTitle = useCallback(async () => {
-    const conversation = activeConversation;
+  const handleGenerateTitleForConversation = useCallback(
+    async (conversationId?: string) => {
+      const conversation = conversationId
+        ? activeConversation?.id === conversationId
+          ? activeConversation
+          : await getConversationById(conversationId)
+        : activeConversation;
+      const conversationHasContent =
+        conversation?.messages.some((message) => message.content.trim()) ??
+        false;
 
-    if (!conversation || !hasConversationContent) {
-      showToast(t("conversationTitleNeedsContent"));
-      return;
-    }
-
-    if (!providerReady) {
-      showToast(t("conversationTitleNeedsProvider"));
-      return;
-    }
-
-    requestRef.current?.abort();
-    const request = new AbortController();
-    let timedOut = false;
-    const timeout = setTimeout(() => {
-      timedOut = true;
-      request.abort();
-    }, CONVERSATION_TITLE_TIMEOUT_MS);
-    requestRef.current = request;
-    setIsGeneratingTitle(true);
-
-    recordDebugLogEvent({
-      event: "conversation-title-generation-started",
-      payload: {
-        conversationId: conversation.id,
-        messageCount: conversation.messages.length,
-        model,
-        provider,
-      },
-    });
-
-    try {
-      const title = await generateConversationTitle({
-        messages: conversation.messages,
-        contextSummary: conversation.contextSummary,
-        summarizedMessageCount: conversation.summarizedMessageCount,
-        model,
-        modelEffort,
-        provider,
-        apiKey,
-        language,
-        abortSignal: request.signal,
-      });
-
-      if (
-        request.signal.aborted ||
-        activeConversationIdRef.current !== conversation.id
-      ) {
+      if (!conversation || !conversationHasContent) {
+        showToast(t("conversationTitleNeedsContent"));
         return;
       }
 
-      await renameConversation(conversation.id, title);
-      showToast(t("conversationTitleGenerated"), undefined, "success");
+      if (!providerReady) {
+        showToast(t("conversationTitleNeedsProvider"));
+        return;
+      }
+
+      requestRef.current?.abort();
+      const request = new AbortController();
+      let timedOut = false;
+      const timeout = setTimeout(() => {
+        timedOut = true;
+        request.abort();
+      }, CONVERSATION_TITLE_TIMEOUT_MS);
+      requestRef.current = request;
+      setIsGeneratingTitle(true);
+
       recordDebugLogEvent({
-        event: "conversation-title-generation-completed",
+        event: "conversation-title-generation-started",
         payload: {
           conversationId: conversation.id,
+          messageCount: conversation.messages.length,
           model,
           provider,
         },
       });
-    } catch (error) {
-      const aborted =
-        request.signal.aborted ||
-        (error instanceof Error && error.name === "AbortError");
 
-      if (aborted && !timedOut) {
-        return;
-      }
-
-      recordDebugLogEvent({
-        event: "conversation-title-generation-failed",
-        level: "error",
-        payload: {
-          conversationId: conversation.id,
-          error,
+      try {
+        const title = await generateConversationTitle({
+          messages: conversation.messages,
+          contextSummary: conversation.contextSummary,
+          summarizedMessageCount: conversation.summarizedMessageCount,
           model,
+          modelEffort,
           provider,
-        },
-      });
-      showToast(
-        t(
-          timedOut
-            ? "conversationTitleGenerationTimedOut"
-            : "conversationTitleGenerationFailed",
-        ),
-        undefined,
-        "danger",
-      );
-    } finally {
-      clearTimeout(timeout);
-      if (requestRef.current === request) {
-        requestRef.current = null;
-        setIsGeneratingTitle(false);
+          apiKey,
+          language,
+          abortSignal: request.signal,
+        });
+
+        if (
+          request.signal.aborted ||
+          (!conversationId &&
+            activeConversationIdRef.current !== conversation.id)
+        ) {
+          return;
+        }
+
+        await renameConversation(conversation.id, title);
+        showToast(t("conversationTitleGenerated"), undefined, "success");
+        recordDebugLogEvent({
+          event: "conversation-title-generation-completed",
+          payload: {
+            conversationId: conversation.id,
+            model,
+            provider,
+          },
+        });
+      } catch (error) {
+        const aborted =
+          request.signal.aborted ||
+          (error instanceof Error && error.name === "AbortError");
+
+        if (aborted && !timedOut) {
+          return;
+        }
+
+        recordDebugLogEvent({
+          event: "conversation-title-generation-failed",
+          level: "error",
+          payload: {
+            conversationId: conversation.id,
+            error,
+            model,
+            provider,
+          },
+        });
+        showToast(
+          t(
+            timedOut
+              ? "conversationTitleGenerationTimedOut"
+              : "conversationTitleGenerationFailed",
+          ),
+          undefined,
+          "danger",
+        );
+      } finally {
+        clearTimeout(timeout);
+        if (requestRef.current === request) {
+          requestRef.current = null;
+          setIsGeneratingTitle(false);
+        }
       }
-    }
-  }, [
-    activeConversation,
-    apiKey,
-    hasConversationContent,
-    language,
-    model,
-    modelEffort,
-    provider,
-    providerReady,
-    renameConversation,
-    showToast,
-    t,
-  ]);
+    },
+    [
+      activeConversation,
+      apiKey,
+      getConversationById,
+      language,
+      model,
+      modelEffort,
+      provider,
+      providerReady,
+      renameConversation,
+      showToast,
+      t,
+    ],
+  );
+  const handleGenerateTitle = useCallback(
+    () => handleGenerateTitleForConversation(),
+    [handleGenerateTitleForConversation],
+  );
 
   return {
     canGenerateTitle,
     handleGenerateTitle,
+    handleGenerateTitleForConversation,
     isGeneratingTitle,
   };
 }

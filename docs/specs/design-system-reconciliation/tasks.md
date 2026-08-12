@@ -8,8 +8,8 @@
   READMEs, root living specs, and current Obsidian project context.
 - [x] Discover the four requested device classes and record immediate access
   blockers.
-- [x] Create the 64-export component/contract mapping and screen/flow coverage
-  matrix.
+- [x] Create the original 64-export component/contract mapping and screen/flow
+  coverage matrix.
 - [x] Capture exact installed build identities and replace stale builds before
   accepting screenshots or behavior. The isolated Release identity is proven
   on both simulators, the Pixel 4a, and the fallback physical iPhone. The
@@ -82,6 +82,20 @@
   4a is screen-locked and must be unlocked before its 13 screenshots can be
   captured. Physical-iPhone local-model acceptance remains subject to the
   existing developer-image/signing prerequisite.
+
+## Reopened design revision — 2026-08-13
+
+- [x] Re-inventory the expanded 83-export design manifest and identify the new
+  sessions, transcript, settings-row, and Premium-band contracts.
+- [x] Reconcile the sessions drawer to the flat Pinned/Earlier/Archived model,
+  root-session links, compact provider marks, bottom search, and complete
+  action sheet.
+- [x] Reconcile transcript messages to the folded script-row model, compact and
+  expanded metadata, expanded-only actions, and swipe removal.
+- [ ] Reconcile the seven-page settings hierarchy and its new row/group route
+  primitives.
+- [ ] Rebuild the exact Release apps and repeat native visual and interaction
+  acceptance for every changed surface.
 
 ## Completed batches
 

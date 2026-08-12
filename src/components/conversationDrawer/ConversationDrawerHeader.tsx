@@ -1,26 +1,19 @@
 import React from "react";
 import { Text, TextInput, TouchableOpacity, View } from "react-native";
-
-import { PhosphorIcon } from "../../design-system/PhosphorIcon";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+import { PhosphorIcon } from "../../design-system/PhosphorIcon";
 import { useLocalization } from "../../i18n";
 import { useTheme } from "../../theme/ThemeContext";
 
 import { styles } from "./styles";
 
 interface ConversationDrawerHeaderProps {
-  searchQuery: string;
-  onChangeSearchQuery: (value: string) => void;
-  onClearSearch: () => void;
   onClose: () => void;
   onNewSession: () => void;
 }
 
 export function ConversationDrawerHeader({
-  searchQuery,
-  onChangeSearchQuery,
-  onClearSearch,
   onClose,
   onNewSession,
 }: ConversationDrawerHeaderProps) {
@@ -29,62 +22,90 @@ export function ConversationDrawerHeader({
   const insets = useSafeAreaInsets();
 
   return (
-    <>
-      <View
-        style={[
-          styles.header,
-          {
-            borderBottomColor: colors.border,
-            paddingTop: Math.max(insets.top, 12) + 8,
-          },
-        ]}
+    <View
+      style={[
+        styles.header,
+        {
+          borderBottomColor: colors.border,
+          paddingTop: Math.max(insets.top, 8) + 8,
+        },
+      ]}
+    >
+      <TouchableOpacity
+        testID="conversation-drawer-close"
+        style={styles.headerIconButton}
+        onPress={onClose}
+        accessibilityRole="button"
+        accessibilityLabel={t("dismiss")}
       >
-        <View style={styles.headerControlSpacer} />
-        <View style={styles.headerCopy}>
-          <Text
-            numberOfLines={1}
-            ellipsizeMode="tail"
-            maxFontSizeMultiplier={1.4}
-            accessibilityRole="header"
-            style={[styles.title, { color: colors.text }]}
-          >
-            {t("conversations")}
-          </Text>
-        </View>
-        <TouchableOpacity
-          testID="conversation-drawer-close"
-          style={[
-            styles.closeButton,
-            {
-              backgroundColor: colors.surfaceElevated,
-            },
-          ]}
-          onPress={onClose}
-          accessibilityRole="button"
-          accessibilityLabel={t("dismiss")}
+        <PhosphorIcon
+          name="close"
+          size="control"
+          color={colors.textSecondary}
+        />
+      </TouchableOpacity>
+      <View style={styles.headerCopy}>
+        <Text
+          numberOfLines={1}
+          ellipsizeMode="tail"
+          maxFontSizeMultiplier={1.4}
+          accessibilityRole="header"
+          style={[styles.title, { color: colors.text }]}
         >
-          <PhosphorIcon
-            name="close"
-            size="control"
-            color={colors.textSecondary}
-          />
-        </TouchableOpacity>
+          {t("conversations")}
+        </Text>
       </View>
-
       <TouchableOpacity
         testID="conversation-drawer-new-session"
-        activeOpacity={0.92}
+        activeOpacity={0.88}
         onPress={onNewSession}
         accessibilityRole="button"
         accessibilityLabel={t("newSession")}
-        style={[styles.newSession, { backgroundColor: colors.bubbleUser }]}
+        style={[
+          styles.newSessionButton,
+          {
+            backgroundColor: colors.accent,
+            shadowColor: colors.glow,
+          },
+        ]}
       >
-        <PhosphorIcon name="plus" size="compact" color={colors.onPrimary} />
-        <Text style={[styles.newSessionText, { color: colors.onPrimary }]}>
-          {t("newSession")}
-        </Text>
+        <PhosphorIcon
+          name="plus"
+          size="control"
+          color={colors.onActiveControl}
+        />
       </TouchableOpacity>
+    </View>
+  );
+}
 
+interface ConversationDrawerSearchProps {
+  searchQuery: string;
+  onChangeSearchQuery: (value: string) => void;
+  onClearSearch: () => void;
+}
+
+export function ConversationDrawerSearch({
+  searchQuery,
+  onChangeSearchQuery,
+  onClearSearch,
+}: ConversationDrawerSearchProps) {
+  const { colors } = useTheme();
+  const { t } = useLocalization();
+  const insets = useSafeAreaInsets();
+
+  return (
+    <View
+      testID="conversation-drawer-search-dock"
+      style={[
+        styles.searchDock,
+        {
+          backgroundColor: colors.background,
+          borderTopColor: colors.border,
+          paddingBottom: Math.max(insets.bottom, 16),
+        },
+      ]}
+    >
       <View
         style={[
           styles.searchShell,
@@ -94,7 +115,6 @@ export function ConversationDrawerHeader({
           },
         ]}
       >
-        <PhosphorIcon name="search" size="compact" color={colors.textMuted} />
         <TextInput
           testID="conversation-drawer-search-input"
           value={searchQuery}
@@ -103,6 +123,7 @@ export function ConversationDrawerHeader({
           placeholderTextColor={colors.textMuted}
           selectionColor={colors.accent}
           style={[styles.searchInput, { color: colors.text }]}
+          returnKeyType="search"
         />
         {searchQuery.trim() ? (
           <TouchableOpacity
@@ -119,8 +140,16 @@ export function ConversationDrawerHeader({
               color={colors.textSecondary}
             />
           </TouchableOpacity>
-        ) : null}
+        ) : (
+          <View style={styles.searchIcon} pointerEvents="none">
+            <PhosphorIcon
+              name="search"
+              size="compact"
+              color={colors.textMuted}
+            />
+          </View>
+        )}
       </View>
-    </>
+    </View>
   );
 }

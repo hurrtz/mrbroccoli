@@ -1,7 +1,9 @@
 import React from "react";
 import {
   Alert,
+  KeyboardAvoidingView,
   Modal,
+  Platform,
   TouchableOpacity,
   View,
   useWindowDimensions,
@@ -11,7 +13,10 @@ import { useLocalization } from "../i18n";
 import { useTheme } from "../theme/ThemeContext";
 import { ConversationActionSheet } from "./conversationDrawer/ConversationActionSheet";
 import { ConversationIntegrityModal } from "./conversationDrawer/ConversationIntegrityModal";
-import { ConversationDrawerHeader } from "./conversationDrawer/ConversationDrawerHeader";
+import {
+  ConversationDrawerHeader,
+  ConversationDrawerSearch,
+} from "./conversationDrawer/ConversationDrawerHeader";
 import { ConversationDrawerList } from "./conversationDrawer/ConversationDrawerList";
 import { ConversationRenameModal } from "./conversationDrawer/ConversationRenameModal";
 import { styles } from "./conversationDrawer/styles";
@@ -35,6 +40,8 @@ export const ConversationDrawer = React.memo(function ConversationDrawer({
   onRenameThread,
   onTogglePinned,
   onTogglePrivate,
+  onToggleArchived,
+  onAutoName,
   onNewSession,
   onDelete,
   onClose,
@@ -116,7 +123,8 @@ export const ConversationDrawer = React.memo(function ConversationDrawer({
       supportedOrientations={APP_MODAL_ORIENTATIONS}
     >
       <View style={styles.container}>
-        <View
+        <KeyboardAvoidingView
+          behavior={Platform.OS === "ios" ? "padding" : "height"}
           style={[
             styles.drawer,
             {
@@ -125,20 +133,18 @@ export const ConversationDrawer = React.memo(function ConversationDrawer({
               borderRightWidth: isLandscape ? 1 : 0,
             },
             {
-              backgroundColor: colors.surface,
+              backgroundColor: colors.background,
               borderRightColor: colors.border,
             },
           ]}
         >
           <ConversationDrawerHeader
-            searchQuery={controller.searchQuery}
-            onChangeSearchQuery={controller.setSearchQuery}
-            onClearSearch={controller.clearSearch}
             onClose={onClose}
             onNewSession={controller.handleNewSession}
           />
           <ConversationDrawerList
             activeId={activeId}
+            allConversations={conversations}
             compact={isLandscape}
             conversations={controller.visibleConversations}
             searchQuery={controller.searchQuery}
@@ -146,7 +152,12 @@ export const ConversationDrawer = React.memo(function ConversationDrawer({
             onOpenActionConversation={controller.openActionConversation}
             onSelectConversation={controller.handleSelectConversation}
           />
-        </View>
+          <ConversationDrawerSearch
+            searchQuery={controller.searchQuery}
+            onChangeSearchQuery={controller.setSearchQuery}
+            onClearSearch={controller.clearSearch}
+          />
+        </KeyboardAvoidingView>
         {isLandscape ? (
           <TouchableOpacity
             style={[styles.backdrop, { backgroundColor: colors.overlay }]}
@@ -168,6 +179,8 @@ export const ConversationDrawer = React.memo(function ConversationDrawer({
         onShareThread={onShareThread}
         onTogglePinned={onTogglePinned}
         onTogglePrivate={onTogglePrivate}
+        onToggleArchived={onToggleArchived}
+        onAutoName={onAutoName}
       />
       <ConversationRenameModal
         visible={controller.editingConversationId !== null}

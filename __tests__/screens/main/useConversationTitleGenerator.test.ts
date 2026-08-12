@@ -40,6 +40,9 @@ function createParams(activeConversation: Conversation | null = conversation) {
     modelEffort: "low",
     provider: "openai" as const,
     providerReady: true,
+    getConversationById: jest.fn(async (id: string) =>
+      id === activeConversation?.id ? activeConversation : null,
+    ),
     renameConversation: jest.fn(async () => undefined),
     showToast: jest.fn(),
     t: (key: string) => key,
@@ -138,6 +141,32 @@ describe("useConversationTitleGenerator", () => {
       "conversationTitleGenerationFailed",
       undefined,
       "danger",
+    );
+  });
+
+  it("can name a non-active conversation from the sessions drawer", async () => {
+    const drawerConversation = {
+      ...conversation,
+      id: "conversation-2",
+      title: "Another title",
+    };
+    const params = createParams();
+    params.getConversationById.mockResolvedValueOnce(drawerConversation);
+    mockGenerateConversationTitle.mockResolvedValueOnce("Drawer title");
+    const { result } = renderHook(() => useConversationTitleGenerator(params));
+
+    await act(async () => {
+      await result.current.handleGenerateTitleForConversation(
+        drawerConversation.id,
+      );
+    });
+
+    expect(params.getConversationById).toHaveBeenCalledWith(
+      drawerConversation.id,
+    );
+    expect(params.renameConversation).toHaveBeenCalledWith(
+      drawerConversation.id,
+      "Drawer title",
     );
   });
 });
