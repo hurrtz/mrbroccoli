@@ -37,7 +37,10 @@ shared design system and settings primitives.
 - `AntSettingsOverview.tsx` groups pages into Conversation, Voice & models, and
   Privacy & app.
 - `pages/` owns one drill-in product area per file.
-- `settings-primitives/` owns cards, fields, and picker controls.
+- `settings-primitives/` owns cards, fields, picker controls, and the compact
+  inset-row vocabulary used by the approved native Settings design:
+  `SettingsGroup`, `SettingsRow`, `RouteOptionRow`, `IconAction`, and
+  `PremiumBand`.
 - `settings-core/` owns reusable non-visual normalization, readiness,
   validation, voice-preview, and controller behavior.
 
@@ -114,6 +117,12 @@ capability healthy. The UI shows the capability that was actually tested.
   or primary actions to disappear.
 - Every page uses semantic colors, centralized typography, and shared icon
   tokens.
+- Settings groups use one bordered inset surface with row dividers rather than
+  nesting a separate card around every row. Route choices expose native radio
+  semantics; local-model removal remains an explicit swipe action.
+- `PremiumBand` is the one deliberately decorative Settings primitive. Its
+  gradients and sheen use theme tokens, its upgrade action remains at least 44
+  points, and Reduce Motion disables the recurring sheen animation.
 
 ## Change Contract
 

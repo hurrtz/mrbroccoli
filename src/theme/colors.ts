@@ -43,6 +43,13 @@ export const lightColors = {
   premiumSoft: "rgba(138, 106, 18, 0.10)",
   premiumBorder: "rgba(138, 106, 18, 0.32)",
   onPremium: "#FFFFFF",
+  premiumGradientStart: "#E3B84C",
+  premiumGradientEnd: "#A07C1F",
+  premiumGradientSoftStart: "rgba(200, 160, 40, 0.16)",
+  premiumGradientSoftMiddle: "rgba(200, 160, 40, 0.05)",
+  premiumGradientSoftEnd: "rgba(200, 160, 40, 0.18)",
+  premiumForeground: "#FFF9E8",
+  premiumSheen: "rgba(255, 246, 214, 0.50)",
   bubbleUser: "#44A055",
   onAccent: "#FFFFFF",
   onPrimary: "#030712",
@@ -92,6 +99,13 @@ export const darkColors = {
   premiumSoft: "rgba(201, 162, 39, 0.14)",
   premiumBorder: "rgba(201, 162, 39, 0.34)",
   onPremium: "#1A1405",
+  premiumGradientStart: "#E3B84C",
+  premiumGradientEnd: "#A07C1F",
+  premiumGradientSoftStart: "rgba(201, 162, 39, 0.18)",
+  premiumGradientSoftMiddle: "rgba(201, 162, 39, 0.06)",
+  premiumGradientSoftEnd: "rgba(201, 162, 39, 0.20)",
+  premiumForeground: "#FFF9E8",
+  premiumSheen: "rgba(255, 246, 214, 0.42)",
   bubbleUser: "#5DC17D",
   onAccent: "#FFFFFF",
   onPrimary: "#111827",
@@ -123,9 +137,7 @@ function relativeLuminance(hexColor: string) {
   }
 
   const [red, green, blue] = channels.map((channel) =>
-    channel <= 0.04045
-      ? channel / 12.92
-      : ((channel + 0.055) / 1.055) ** 2.4,
+    channel <= 0.04045 ? channel / 12.92 : ((channel + 0.055) / 1.055) ** 2.4,
   );
 
   return red * 0.2126 + green * 0.7152 + blue * 0.0722;
