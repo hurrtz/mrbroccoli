@@ -29,6 +29,24 @@ export const IOS_ARCHIVE_DISK_OPTIONS = `  archive_write_disk_set_options(
           ARCHIVE_EXTRACT_FFLAGS | ARCHIVE_EXTRACT_SECURE_SYMLINKS);
 `;
 
+// `OfflineTts::Create` returns a wrapper object even when the underlying C
+// handle is null. The upstream optional check therefore succeeds and the
+// subsequent SampleRate call dereferences null on iOS. Keep the native module
+// recoverable: surface the failed engine creation to JavaScript instead.
+export const IOS_TTS_NULL_HANDLE_GUARD = `        if (!pImpl->tts.has_value() || pImpl->tts->Get() == nullptr) {
+            result.error = "TTS: Failed to create OfflineTts instance (e.g. missing espeak-ng data or invalid model)";
+            LOGE("%s", result.error.c_str());
+            return result;
+        }
+`;
+
+const IOS_TTS_OPTIONAL_ONLY_GUARD = `        if (!pImpl->tts.has_value()) {
+            result.error = "TTS: Failed to create OfflineTts instance (e.g. missing espeak-ng data or invalid model)";
+            LOGE("%s", result.error.c_str());
+            return result;
+        }
+`;
+
 const IOS_ARCHIVE_DISK_OPTIONS_WITH_NODOTDOT = `  archive_write_disk_set_options(
       disk,
       ARCHIVE_EXTRACT_TIME | ARCHIVE_EXTRACT_PERM | ARCHIVE_EXTRACT_ACL |
@@ -121,4 +139,20 @@ export function applyIosArchiveEntryValidationPatch(source) {
     );
   }
   return patched.replace(OLD_DISK_OPTIONS, IOS_ARCHIVE_DISK_OPTIONS);
+}
+
+export function hasIosTtsNullHandleGuard(source) {
+  return source.includes(IOS_TTS_NULL_HANDLE_GUARD);
+}
+
+export function applyIosTtsNullHandlePatch(source) {
+  if (hasIosTtsNullHandleGuard(source)) {
+    return source;
+  }
+  if (!source.includes(IOS_TTS_OPTIONAL_ONLY_GUARD)) {
+    throw new Error(
+      "Unsupported react-native-sherpa-onnx TTS wrapper; expected the OfflineTts optional guard",
+    );
+  }
+  return source.replace(IOS_TTS_OPTIONAL_ONLY_GUARD, IOS_TTS_NULL_HANDLE_GUARD);
 }

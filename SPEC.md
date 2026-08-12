@@ -111,6 +111,11 @@ boundary.
   file or directory with no traversal or links; direct validation runs before
   the helper rewrites accepted entries beneath its absolute destination, and
   libarchive's symlink protection applies while writing.
+- The licence-safe local-speech runtime uses libphonemize language packs in
+  the models' historical `espeak-ng-data` directory; it does not ship eSpeak
+  NG data. Its iOS wrapper must treat a failed native TTS-engine creation as a
+  recoverable JavaScript error, including when the wrapper object exists but
+  its underlying engine handle is null.
 - TTS fallback routes are explicit, ordered, and opt-in. System speech has no
   hidden fallback.
 - Drive Session re-arms capture only through its explicit session state and is

@@ -34,7 +34,9 @@ import { resolve } from "node:path";
 
 import {
   applyIosArchiveEntryValidationPatch,
+  applyIosTtsNullHandlePatch,
   hasIosArchiveEntryValidationGuard,
+  hasIosTtsNullHandleGuard,
 } from "./espeak-free-runtime-patch.mjs";
 
 const ANDROID_ABIS = [
@@ -61,6 +63,10 @@ const wrapperRoot = resolve(
 const IOS_ARCHIVE_HELPER = resolve(
   wrapperRoot,
   "ios/archive/sherpa-onnx-archive-helper.mm",
+);
+const IOS_TTS_WRAPPER = resolve(
+  wrapperRoot,
+  "ios/tts/sherpa-onnx-tts-wrapper.mm",
 );
 // The wrapper resolves prebuilts THIRD_PARTY -> LOCAL_SDK -> MAVEN_AAR. Writing
 // only jniLibs (LOCAL_SDK) is not enough: that stage is skipped whenever the
@@ -166,6 +172,20 @@ if (verifyInstalled) {
     );
     process.exit(1);
   }
+  const ttsWrapperSource = readFileSync(
+    requireFile(
+      IOS_TTS_WRAPPER,
+      "reinstall react-native-sherpa-onnx, then run npm run espeak-free:install",
+    ),
+    "utf8",
+  );
+  if (!hasIosTtsNullHandleGuard(ttsWrapperSource)) {
+    console.error(
+      "espeak-free runtime: the iOS TTS wrapper is missing the null-handle guard; " +
+        "run npm run espeak-free:install",
+    );
+    process.exit(1);
+  }
   verify(installed);
   console.log(
     `espeak-free runtime: ${installed.length} installed libraries carry no ` +
@@ -229,6 +249,19 @@ const patchedIosArchiveHelper = applyIosArchiveEntryValidationPatch(
 if (patchedIosArchiveHelper !== originalIosArchiveHelper) {
   writeFileSync(IOS_ARCHIVE_HELPER, patchedIosArchiveHelper);
   console.log("ios: archive entry-validation guard installed");
+}
+
+const originalIosTtsWrapper = readFileSync(
+  requireFile(
+    IOS_TTS_WRAPPER,
+    "reinstall react-native-sherpa-onnx, then run npm run espeak-free:install",
+  ),
+  "utf8",
+);
+const patchedIosTtsWrapper = applyIosTtsNullHandlePatch(originalIosTtsWrapper);
+if (patchedIosTtsWrapper !== originalIosTtsWrapper) {
+  writeFileSync(IOS_TTS_WRAPPER, patchedIosTtsWrapper);
+  console.log("ios: TTS null-handle guard installed");
 }
 
 for (const { abi, libraries } of androidSources) {

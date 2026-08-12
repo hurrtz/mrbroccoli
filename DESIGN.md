@@ -276,6 +276,13 @@ the operating system or lifecycle requires them:
 Native changes require platform tests and a fresh native build. Expo Go cannot
 validate these boundaries.
 
+The installed Sherpa runtime is the licence-safe libphonemize variant. Its
+model validation accepts the curated pack-only `espeak-ng-data` directory, and
+the patched iOS TTS wrapper checks both its optional C++ wrapper and its
+underlying engine handle before querying engine properties. A failed native
+engine creation therefore returns through the JavaScript error path instead of
+terminating the process.
+
 ## Diagnostics and Failure Design
 
 Operational events carry IDs, phases, durations, provider/model identifiers,

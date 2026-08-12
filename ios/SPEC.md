@@ -66,6 +66,10 @@ conversation, edition, provider, or fallback policy.
   route changes.
 - Queue callbacks are generation-safe: completion from an obsolete item cannot
   advance or resurrect a cleared queue.
+- The Sherpa iOS TTS bridge checks both its optional TTS wrapper and its
+  underlying engine handle before calling engine properties. A rejected local
+  model returns an initialization error to TypeScript; it must never
+  dereference a null native handle.
 - Background continuation exists only for an active user-authorized voice turn
   and ends on completion, cancellation, terminal failure, or expiry.
 

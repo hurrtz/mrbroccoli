@@ -107,7 +107,10 @@ the architectural answer for the author.
   regular files or directories without traversal or links; direct validation
   runs before the helper rewrites accepted relative paths under its absolute
   target, and libarchive's symlink protection applies while writing. A clean
-  dependency install must receive this patch before a native iOS build.
+  dependency install must receive this patch before a native iOS build. It also
+  patches the Sherpa TTS wrapper to reject either an absent wrapper or a null
+  underlying engine before reading its sample rate, turning a native-model
+  initialization failure into a recoverable JavaScript error.
 
 ## Release Rules
 

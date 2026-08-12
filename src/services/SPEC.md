@@ -202,11 +202,11 @@ through string-prefix path handling or incompatible archive-writer flags.
 
 Kokoro's data directory keeps its historical `espeak-ng-data` name because
 both the model archive and sherpa's detector rely on it, but this runtime
-fills it with libphonemize packs. sherpa locates that directory by scanning
-file paths, so a directory holding no pack is invisible to it and the model
-is rejected with an eSpeak-specific message this runtime can never satisfy.
-An install that ends with no pack therefore fails at download time, and
-synthesis refuses to start with an error naming the packs rather than eSpeak.
+fills it with libphonemize packs. The espeak-free native configuration accepts
+that pack-only layout; upstream eSpeak configurations retain their upstream
+table checks. A directory holding no pack is still invalid: installation fails
+before the model is marked ready, and synthesis names the missing packs rather
+than offering an eSpeak requirement this runtime can never satisfy.
 
 **Decision:** Export never claims silent completeness. Conversations whose
 stored body cannot be read are counted and surfaced to the user instead of

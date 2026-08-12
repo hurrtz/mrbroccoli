@@ -4,8 +4,11 @@ import test from "node:test";
 import {
   IOS_ARCHIVE_DISK_OPTIONS,
   IOS_ARCHIVE_ENTRY_VALIDATION_GUARD,
+  IOS_TTS_NULL_HANDLE_GUARD,
   applyIosArchiveEntryValidationPatch,
+  applyIosTtsNullHandlePatch,
   hasIosArchiveEntryValidationGuard,
+  hasIosTtsNullHandleGuard,
 } from "./espeak-free-runtime-patch.mjs";
 
 const UPSTREAM_HELPER_FRAGMENT = `  NSString *canonicalTarget = [[targetPath stringByStandardizingPath] stringByAppendingString:@"/"];
@@ -128,4 +131,29 @@ test("iOS archive patch upgrades the prior root-entry guard", () => {
   const upgraded = applyIosArchiveEntryValidationPatch(legacyPatched);
   assert.equal(hasIosArchiveEntryValidationGuard(upgraded), true);
   assert.equal(upgraded.includes(LEGACY_GUARD), false);
+});
+
+test("iOS TTS patch rejects a null OfflineTts handle before querying it", () => {
+  const upstream = `        if (!pImpl->tts.has_value()) {
+            result.error = "TTS: Failed to create OfflineTts instance (e.g. missing espeak-ng data or invalid model)";
+            LOGE("%s", result.error.c_str());
+            return result;
+        }
+
+        pImpl->initialized = true;
+        LOGI("TTS: Sample rate: %d Hz", pImpl->tts.value().SampleRate());
+`;
+  const patched = applyIosTtsNullHandlePatch(upstream);
+
+  assert.equal(hasIosTtsNullHandleGuard(patched), true);
+  assert.ok(patched.includes(IOS_TTS_NULL_HANDLE_GUARD));
+  assert.ok(
+    patched.indexOf("pImpl->tts->Get() == nullptr") <
+      patched.indexOf("SampleRate()"),
+  );
+  assert.equal(applyIosTtsNullHandlePatch(patched), patched);
+  assert.throws(
+    () => applyIosTtsNullHandlePatch("unrelated native source"),
+    /Unsupported react-native-sherpa-onnx TTS wrapper/,
+  );
 });

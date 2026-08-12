@@ -56,6 +56,10 @@ the complete Play Store translations are kept in a dedicated file under
 
 ### Fixed
 
+- Prevent iPhone local-voice tests from crashing when a native speech engine
+  rejects its model. The licence-safe Kokoro/Piper runtime now accepts its
+  verified pronunciation-pack layout and returns a normal error if a future
+  engine cannot initialize.
 - Let downloaded response models initialize and answer normally on Android,
   without exposing an internal response-history label, and stop optimized
   Release builds from crashing when Kokoro begins speaking. Automatic setup
