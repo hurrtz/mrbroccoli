@@ -108,9 +108,17 @@ the architectural answer for the author.
   runs before the helper rewrites accepted relative paths under its absolute
   target, and libarchive's symlink protection applies while writing. A clean
   dependency install must receive this patch before a native iOS build. It also
-  patches the Sherpa TTS wrapper to reject either an absent wrapper or a null
-  underlying engine before reading its sample rate, turning a native-model
-  initialization failure into a recoverable JavaScript error.
+  corrects the helper's payload-write check: libarchive returns the
+  `ARCHIVE_OK` zero status on success, not the number of requested bytes. The
+  patch also resolves the already-created output directory before entry paths
+  are composed, allowing iOS's system `/var` container alias without weakening
+  archive-entry link checks. The script also patches the Sherpa TTS wrapper to
+  reject either an absent wrapper or a null underlying engine before reading
+  its sample rate, turning a native-model initialization failure into a
+  recoverable JavaScript error. Runtime verification rejects native archives
+  that still contain upstream VITS checks for eSpeak's monolithic data files;
+  their presence proves the archive predates the libphonemize pack-only
+  contract even when its licence scan is otherwise clean.
 
 ## Release Rules
 

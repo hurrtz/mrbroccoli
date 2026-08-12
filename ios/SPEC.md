@@ -54,7 +54,11 @@ TypeScript owns product policy; native modules expose focused capabilities.
   all remaining entries must be relative regular files or directories without
   traversal or links. Archive-relative validation happens before the helper
   rewrites an accepted entry below its absolute target; libarchive's symlink
-  protection applies while downloaded speech data is written.
+  protection applies while downloaded speech data is written. Its payload
+  writer uses libarchive status semantics: `ARCHIVE_OK` (zero) is success and
+  must not be compared with the requested payload size. It resolves the
+  already-created destination before composing entry paths so iOS's `/var`
+  container alias passes secure symlink checks without accepting archive links.
 
 **Decision:** Native code owns Apple lifecycle mechanics, not independent
 conversation, edition, provider, or fallback policy.
@@ -100,8 +104,10 @@ or deliver them.
 ## Verification
 
 - `MrBroccoliNativeLifecycleTests` exercises playback, audio-session
-  interruption, background-turn, waveform, and queue race behavior on exactly
-  one booted simulator selected by the release tooling.
+  interruption, background-turn, waveform, queue race behavior, and a real
+  non-empty Sherpa tar.bz2 payload write through both direct and symlink-aliased
+  container paths on exactly one booted simulator selected by the release
+  tooling.
 - Maestro Release validation covers every registered interface locale, known
   landscape layout, accessibility display modes, and VoiceOver hierarchy.
 - Store-promo automation builds the `.maestro` identity and captures

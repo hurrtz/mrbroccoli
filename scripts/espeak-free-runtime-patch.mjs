@@ -2,6 +2,17 @@
 // Keep this source patch separate from the binary installer so it is small,
 // deterministic, and regression-testable without depending on node_modules.
 
+// A libphonemize build must not retain upstream VITS validation for eSpeak's
+// four monolithic data files. Their presence proves the native archive predates
+// the pack-only runtime contract even if its linked libraries are otherwise
+// licence-clean.
+export const LEGACY_VITS_DATA_VALIDATION_MARKER =
+  "does not exist. Please check --vits-data-dir";
+
+export function hasLegacyVitsDataValidation(artifact) {
+  return artifact.includes(LEGACY_VITS_DATA_VALIDATION_MARKER);
+}
+
 export const IOS_ARCHIVE_ENTRY_VALIDATION_GUARD = `    // libarchive may expose the archive root as an empty or dot entry. It has
     // no output path; skip it. Every other entry must be a relative,
     // regular file or directory without parent traversal before libarchive writes it.
@@ -28,6 +39,30 @@ export const IOS_ARCHIVE_DISK_OPTIONS = `  archive_write_disk_set_options(
       ARCHIVE_EXTRACT_TIME | ARCHIVE_EXTRACT_PERM | ARCHIVE_EXTRACT_ACL |
           ARCHIVE_EXTRACT_FFLAGS | ARCHIVE_EXTRACT_SECURE_SYMLINKS);
 `;
+
+// `archive_write_data_block` uses archive status semantics. The bundled
+// libarchive returns `ARCHIVE_OK` (`0`) for a successful block, not the number
+// of bytes requested by the caller.
+export const IOS_ARCHIVE_DATA_WRITE_GUARD = `      if (writeResult != ARCHIVE_OK) {
+`;
+
+// React Native exposes iOS container paths through the `/var` system alias.
+// Resolve the already-created destination before libarchive's secure symlink
+// checks so that alias is not mistaken for an archive-controlled link.
+export const IOS_ARCHIVE_REALPATH_INCLUDE = `#include <cstdlib>
+`;
+export const IOS_ARCHIVE_RESOLVED_TARGET = `  char *resolvedTarget = realpath([targetPath fileSystemRepresentation], nullptr);
+  if (!resolvedTarget) {
+    return @{ @"success": @NO, @"reason": @"Failed to resolve target directory" };
+  }
+  NSString *resolvedTargetPath = [NSString stringWithUTF8String:resolvedTarget];
+  free(resolvedTarget);
+  if (!resolvedTargetPath) {
+    return @{ @"success": @NO, @"reason": @"Failed to decode resolved target directory" };
+  }
+`;
+export const IOS_ARCHIVE_RESOLVED_FULL_PATH =
+  "    NSString *fullPath = [resolvedTargetPath stringByAppendingPathComponent:entryPath];\n";
 
 // `OfflineTts::Create` returns a wrapper object even when the underlying C
 // handle is null. The upstream optional check therefore succeeds and the
@@ -81,11 +116,84 @@ const CANONICAL_TARGET_LINE =
   "  NSString *canonicalTarget = [[targetPath stringByStandardizingPath] stringByAppendingString:@\"/\"];\n";
 const OLD_DISK_OPTIONS =
   "  archive_write_disk_set_options(disk, ARCHIVE_EXTRACT_TIME | ARCHIVE_EXTRACT_PERM | ARCHIVE_EXTRACT_ACL | ARCHIVE_EXTRACT_FFLAGS);\n";
+const PREVIOUS_ARCHIVE_DATA_WRITE_GUARD =
+  "      if (writeResult < 0 || static_cast<size_t>(writeResult) != size) {\n";
+const PREVIOUS_ARCHIVE_RESOLVED_TARGET =
+  "  NSString *resolvedTargetPath = [targetPath stringByResolvingSymlinksInPath];\n";
+const FILE_ATTRIBUTES_LINE =
+  "  NSDictionary *fileAttributes = [fileManager attributesOfItemAtPath:sourcePath error:nil];\n";
+const CSTDIO_INCLUDE = "#include <cstdio>\n";
+
+function applyIosArchiveDataWritePatch(source) {
+  if (source.includes(IOS_ARCHIVE_DATA_WRITE_GUARD)) {
+    return source;
+  }
+  if (source.includes(PREVIOUS_ARCHIVE_DATA_WRITE_GUARD)) {
+    return source.replace(
+      PREVIOUS_ARCHIVE_DATA_WRITE_GUARD,
+      IOS_ARCHIVE_DATA_WRITE_GUARD,
+    );
+  }
+  throw new Error(
+    "Unsupported react-native-sherpa-onnx archive helper; expected the data write guard",
+  );
+}
+
+function applyIosArchiveResolvedTargetPatch(source) {
+  let patched = source;
+  if (!patched.includes(IOS_ARCHIVE_REALPATH_INCLUDE)) {
+    if (!patched.includes(CSTDIO_INCLUDE)) {
+      throw new Error(
+        "Unsupported react-native-sherpa-onnx archive helper; expected the C stdio include",
+      );
+    }
+    patched = patched.replace(
+      CSTDIO_INCLUDE,
+      `${CSTDIO_INCLUDE}${IOS_ARCHIVE_REALPATH_INCLUDE}`,
+    );
+  }
+  if (!patched.includes(IOS_ARCHIVE_RESOLVED_TARGET)) {
+    if (patched.includes(PREVIOUS_ARCHIVE_RESOLVED_TARGET)) {
+      patched = patched.replace(
+        PREVIOUS_ARCHIVE_RESOLVED_TARGET,
+        IOS_ARCHIVE_RESOLVED_TARGET,
+      );
+    } else if (!patched.includes(FILE_ATTRIBUTES_LINE)) {
+      throw new Error(
+        "Unsupported react-native-sherpa-onnx archive helper; expected the archive attributes lookup",
+      );
+    } else {
+      patched = patched.replace(
+        FILE_ATTRIBUTES_LINE,
+        `${IOS_ARCHIVE_RESOLVED_TARGET}\n${FILE_ATTRIBUTES_LINE}`,
+      );
+    }
+  }
+  if (patched.includes(FULL_PATH_LINE)) {
+    return patched.replace(FULL_PATH_LINE, IOS_ARCHIVE_RESOLVED_FULL_PATH);
+  }
+  if (patched.includes(IOS_ARCHIVE_RESOLVED_FULL_PATH)) {
+    return patched;
+  }
+  throw new Error(
+    "Unsupported react-native-sherpa-onnx archive helper; expected the archive output path",
+  );
+}
+
+function applyIosArchiveCompatibilityPatches(source) {
+  return applyIosArchiveResolvedTargetPatch(
+    applyIosArchiveDataWritePatch(source),
+  );
+}
 
 export function hasIosArchiveEntryValidationGuard(source) {
   return (
     source.includes(IOS_ARCHIVE_ENTRY_VALIDATION_GUARD) &&
-    source.includes(IOS_ARCHIVE_DISK_OPTIONS)
+    source.includes(IOS_ARCHIVE_DISK_OPTIONS) &&
+    source.includes(IOS_ARCHIVE_DATA_WRITE_GUARD) &&
+    source.includes(IOS_ARCHIVE_REALPATH_INCLUDE) &&
+    source.includes(IOS_ARCHIVE_RESOLVED_TARGET) &&
+    source.includes(IOS_ARCHIVE_RESOLVED_FULL_PATH)
   );
 }
 
@@ -93,6 +201,7 @@ export function applyIosArchiveEntryValidationPatch(source) {
   if (hasIosArchiveEntryValidationGuard(source)) {
     return source;
   }
+
   if (
     source.includes(IOS_ARCHIVE_ENTRY_VALIDATION_GUARD) &&
     (source.includes(
@@ -101,7 +210,7 @@ export function applyIosArchiveEntryValidationPatch(source) {
       source.includes(IOS_ARCHIVE_DISK_OPTIONS_WITH_NOABSOLUTEPATHS) ||
       source.includes(IOS_ARCHIVE_DISK_OPTIONS_WITH_NODOTDOT))
   ) {
-    return source
+    const upgraded = source
       .replace(
         IOS_ARCHIVE_DISK_OPTIONS_WITH_NODOTDOT_AND_NOABSOLUTEPATHS,
         IOS_ARCHIVE_DISK_OPTIONS,
@@ -114,6 +223,16 @@ export function applyIosArchiveEntryValidationPatch(source) {
         IOS_ARCHIVE_DISK_OPTIONS_WITH_NODOTDOT,
         IOS_ARCHIVE_DISK_OPTIONS,
       );
+    return applyIosArchiveCompatibilityPatches(upgraded);
+  }
+
+  if (source.includes(IOS_ARCHIVE_ENTRY_VALIDATION_GUARD)) {
+    if (!source.includes(IOS_ARCHIVE_DISK_OPTIONS)) {
+      throw new Error(
+        "Unsupported react-native-sherpa-onnx archive helper; expected the disk extraction options",
+      );
+    }
+    return applyIosArchiveCompatibilityPatches(source);
   }
   const blockStart = source.indexOf(ENTRY_PATH_LINE);
   const blockEnd = source.indexOf(SET_PATHNAME_LINE, blockStart);
@@ -138,7 +257,8 @@ export function applyIosArchiveEntryValidationPatch(source) {
       "Unsupported react-native-sherpa-onnx archive helper; expected the disk extraction options",
     );
   }
-  return patched.replace(OLD_DISK_OPTIONS, IOS_ARCHIVE_DISK_OPTIONS);
+  patched = patched.replace(OLD_DISK_OPTIONS, IOS_ARCHIVE_DISK_OPTIONS);
+  return applyIosArchiveCompatibilityPatches(patched);
 }
 
 export function hasIosTtsNullHandleGuard(source) {

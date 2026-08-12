@@ -2,16 +2,27 @@ import assert from "node:assert/strict";
 import test from "node:test";
 
 import {
+  IOS_ARCHIVE_DATA_WRITE_GUARD,
   IOS_ARCHIVE_DISK_OPTIONS,
   IOS_ARCHIVE_ENTRY_VALIDATION_GUARD,
+  IOS_ARCHIVE_REALPATH_INCLUDE,
+  IOS_ARCHIVE_RESOLVED_FULL_PATH,
+  IOS_ARCHIVE_RESOLVED_TARGET,
   IOS_TTS_NULL_HANDLE_GUARD,
+  LEGACY_VITS_DATA_VALIDATION_MARKER,
   applyIosArchiveEntryValidationPatch,
   applyIosTtsNullHandlePatch,
   hasIosArchiveEntryValidationGuard,
   hasIosTtsNullHandleGuard,
+  hasLegacyVitsDataValidation,
 } from "./espeak-free-runtime-patch.mjs";
 
-const UPSTREAM_HELPER_FRAGMENT = `  NSString *canonicalTarget = [[targetPath stringByStandardizingPath] stringByAppendingString:@"/"];
+const PREVIOUS_FOUNDATION_RESOLVED_TARGET =
+  "  NSString *resolvedTargetPath = [targetPath stringByResolvingSymlinksInPath];\n";
+
+const UPSTREAM_HELPER_FRAGMENT = `#include <cstdio>
+  NSString *canonicalTarget = [[targetPath stringByStandardizingPath] stringByAppendingString:@"/"];
+  NSDictionary *fileAttributes = [fileManager attributesOfItemAtPath:sourcePath error:nil];
   archive_write_disk_set_options(disk, ARCHIVE_EXTRACT_TIME | ARCHIVE_EXTRACT_PERM | ARCHIVE_EXTRACT_ACL | ARCHIVE_EXTRACT_FFLAGS);
     const char *currentPath = archive_entry_pathname(entry);
     NSString *entryPath = currentPath ? [NSString stringWithUTF8String:currentPath] : @"";
@@ -21,6 +32,10 @@ const UPSTREAM_HELPER_FRAGMENT = `  NSString *canonicalTarget = [[targetPath str
       return @{ @"success": @NO, @"reason": @"Blocked path traversal" };
     }
     archive_entry_set_pathname(entry, [fullPath UTF8String]);
+    la_ssize_t writeResult = archive_write_data_block(disk, buff, size, offset);
+      if (writeResult != ARCHIVE_OK) {
+      return @{ @"success": @NO, @"reason": @"Failed to write data" };
+    }
 `;
 
 const LEGACY_GUARD = `    // libarchive may expose the archive root as an empty or dot entry. It has
@@ -30,6 +45,16 @@ const LEGACY_GUARD = `    // libarchive may expose the archive root as an empty 
       continue;
     }
 `;
+
+test("runtime verification rejects pre-pack-only VITS validators", () => {
+  const staleArchive = Buffer.from(
+    `native bytes '%s/phontab' ${LEGACY_VITS_DATA_VALIDATION_MARKER}`,
+  );
+  const currentArchive = Buffer.from("native bytes libphonemize-g2p");
+
+  assert.equal(hasLegacyVitsDataValidation(staleArchive), true);
+  assert.equal(hasLegacyVitsDataValidation(currentArchive), false);
+});
 
 test("iOS archive patch permits only safe relative archive entries", () => {
   const patched = applyIosArchiveEntryValidationPatch(UPSTREAM_HELPER_FRAGMENT);
@@ -64,6 +89,14 @@ test("iOS archive patch permits only safe relative archive entries", () => {
   assert.equal(patched.includes("canonicalTarget"), false);
   assert.equal(patched.includes("[fullPath hasPrefix:"), false);
   assert.ok(patched.includes(IOS_ARCHIVE_DISK_OPTIONS));
+  assert.ok(patched.includes(IOS_ARCHIVE_DATA_WRITE_GUARD));
+  assert.ok(patched.includes(IOS_ARCHIVE_REALPATH_INCLUDE));
+  assert.ok(patched.includes(IOS_ARCHIVE_RESOLVED_TARGET));
+  assert.ok(patched.includes(IOS_ARCHIVE_RESOLVED_FULL_PATH));
+  assert.equal(
+    patched.includes("static_cast<size_t>(writeResult) != size"),
+    false,
+  );
   assert.equal(
     patched.includes("ARCHIVE_EXTRACT_SECURE_NOABSOLUTEPATHS"),
     false,
@@ -71,7 +104,7 @@ test("iOS archive patch permits only safe relative archive entries", () => {
   assert.equal(patched.includes("ARCHIVE_EXTRACT_SECURE_NODOTDOT"), false);
   assert.ok(
     patched.includes(
-      "NSString *fullPath = [targetPath stringByAppendingPathComponent:entryPath];",
+      "NSString *fullPath = [resolvedTargetPath stringByAppendingPathComponent:entryPath];",
     ),
   );
 });
@@ -131,6 +164,45 @@ test("iOS archive patch upgrades the prior root-entry guard", () => {
   const upgraded = applyIosArchiveEntryValidationPatch(legacyPatched);
   assert.equal(hasIosArchiveEntryValidationGuard(upgraded), true);
   assert.equal(upgraded.includes(LEGACY_GUARD), false);
+});
+
+test("iOS archive patch accepts zero as a successful data-block write", () => {
+  const guardedWithLegacyDataWriteCheck = applyIosArchiveEntryValidationPatch(
+    UPSTREAM_HELPER_FRAGMENT,
+  ).replace(
+    IOS_ARCHIVE_DATA_WRITE_GUARD,
+    "      if (writeResult < 0 || static_cast<size_t>(writeResult) != size) {\n",
+  );
+
+  const upgraded = applyIosArchiveEntryValidationPatch(
+    guardedWithLegacyDataWriteCheck,
+  );
+
+  assert.equal(hasIosArchiveEntryValidationGuard(upgraded), true);
+  assert.ok(upgraded.includes(IOS_ARCHIVE_DATA_WRITE_GUARD));
+  assert.equal(
+    upgraded.includes("static_cast<size_t>(writeResult) != size"),
+    false,
+  );
+});
+
+test("iOS archive patch resolves system container symlink aliases", () => {
+  const guardedWithUnresolvedTarget = applyIosArchiveEntryValidationPatch(
+    UPSTREAM_HELPER_FRAGMENT,
+  ).replace(
+    IOS_ARCHIVE_RESOLVED_TARGET,
+    PREVIOUS_FOUNDATION_RESOLVED_TARGET,
+  );
+
+  const upgraded = applyIosArchiveEntryValidationPatch(
+    guardedWithUnresolvedTarget,
+  );
+
+  assert.equal(hasIosArchiveEntryValidationGuard(upgraded), true);
+  assert.ok(upgraded.includes(IOS_ARCHIVE_RESOLVED_TARGET));
+  assert.ok(upgraded.includes(IOS_ARCHIVE_RESOLVED_FULL_PATH));
+  assert.ok(upgraded.includes(IOS_ARCHIVE_REALPATH_INCLUDE));
+  assert.equal(upgraded.includes("stringByResolvingSymlinksInPath"), false);
 });
 
 test("iOS TTS patch rejects a null OfflineTts handle before querying it", () => {

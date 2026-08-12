@@ -37,6 +37,7 @@ import {
   applyIosTtsNullHandlePatch,
   hasIosArchiveEntryValidationGuard,
   hasIosTtsNullHandleGuard,
+  hasLegacyVitsDataValidation,
 } from "./espeak-free-runtime-patch.mjs";
 
 const ANDROID_ABIS = [
@@ -118,6 +119,16 @@ function verify(paths) {
   execFileSync(resolve(forkRoot, "scripts/verify-espeak-free.sh"), paths, {
     stdio: "inherit",
   });
+  const staleVitsValidators = paths.filter((path) =>
+    hasLegacyVitsDataValidation(readFileSync(path)),
+  );
+  if (staleVitsValidators.length > 0) {
+    fail(
+      "native runtime predates pack-only VITS validation:\n  " +
+        staleVitsValidators.join("\n  ") +
+        "\n  rebuild sherpa-onnx-espeak-free before installing",
+    );
+  }
 }
 
 function requireFile(path, hint) {

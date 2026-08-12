@@ -56,6 +56,13 @@ the complete Play Store translations are kept in a dedicated file under
 
 ### Fixed
 
+- Let the downloaded Kristin and Norman Piper voices initialize against their
+  verified libphonemize packs. Native build verification now rejects an older
+  speech archive that still expects eSpeak's absent monolithic data files.
+- Let iPhone Kokoro downloads extract their model files: the native archive
+  helper now accepts libarchive's successful zero payload status instead of
+  mistaking it for a short write and resolves iOS's system container-path alias
+  before applying secure symlink checks.
 - Prevent iPhone local-voice tests from crashing when a native speech engine
   rejects its model. The licence-safe Kokoro/Piper runtime now accepts its
   verified pronunciation-pack layout and returns a normal error if a future

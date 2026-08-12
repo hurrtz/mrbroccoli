@@ -199,6 +199,14 @@ archive-relative paths before rewriting accepted entries under its absolute
 target, while libarchive's symlink protection applies while writing. Unsafe
 paths therefore fail closed without rejecting valid language-pack archives
 through string-prefix path handling or incompatible archive-writer flags.
+The native data-write result uses libarchive status semantics: `ARCHIVE_OK`
+(zero) means a successful block and must not be compared with the requested
+payload size. This keeps a verified non-empty Kokoro or Piper file from being
+rejected at its first payload block.
+The native helper resolves the already-created output directory before
+composing entry paths. This canonicalizes iOS's system `/var` container alias
+for libarchive's secure symlink checks while preserving the rejection of links
+and traversal supplied by an archive.
 
 Kokoro's data directory keeps its historical `espeak-ng-data` name because
 both the model archive and sherpa's detector rely on it, but this runtime

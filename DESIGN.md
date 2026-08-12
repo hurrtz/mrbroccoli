@@ -242,6 +242,16 @@ rewrites accepted entries under its absolute installation directory, while
 libarchive's symlink protection applies when data is written. This avoids
 string-prefix checks and incompatible archive-writer path flags.
 
+The native data writer treats libarchive's `la_ssize_t` result as an archive
+status, not as a byte count. The bundled libarchive returns `ARCHIVE_OK` (zero)
+for a successful data block, so comparing that result with the requested block
+size would reject every valid, non-empty model file immediately after download.
+Before composing output paths, the helper also resolves the already-created
+destination directory. React Native reports iOS app containers through the
+system `/var` alias; resolving it prevents secure symlink checks from confusing
+that platform-owned alias with an archive-controlled link. Entry validation and
+libarchive's protection still reject links supplied by the archive.
+
 Preparation runs regardless of transient thermal, memory, or battery-saver
 pressure; the OS throttles on its own. Pressure is recorded per benchmark, and
 a missed-target verdict measured under pressure is never persisted as a durable
