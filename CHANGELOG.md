@@ -56,6 +56,10 @@ the complete Play Store translations are kept in a dedicated file under
 
 ### Fixed
 
+- Stop a hosted response request that returns no activity for five minutes,
+  instead of leaving the turn waiting for the longer streaming-inactivity
+  window. Once a slow response starts streaming, its existing longer window is
+  preserved.
 - Let the downloaded Kristin and Norman Piper voices initialize against their
   verified libphonemize packs. Native build verification now rejects an older
   speech archive that still expects eSpeak's absent monolithic data files.

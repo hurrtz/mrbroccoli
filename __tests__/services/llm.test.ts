@@ -6,7 +6,10 @@ import {
   streamChat,
   validateProviderConnection,
 } from "../../src/services/llm";
-import { LLM_REPLY_INACTIVITY_TIMEOUT_MS } from "../../src/services/llm/streamChat";
+import {
+  LLM_INITIAL_REPLY_TIMEOUT_MS,
+  LLM_REPLY_INACTIVITY_TIMEOUT_MS,
+} from "../../src/services/llm/streamChat";
 import { requestRealtimeChatViaWebSocket } from "../../src/services/llm/providers/openaiRealtime";
 import { resetProviderModelHealthForTests } from "../../src/services/providerResilience";
 import {
@@ -774,7 +777,7 @@ describe("streamChat", () => {
     );
   });
 
-  it("times out stalled reply generation requests", async () => {
+  it("times out reply generation that never returns initial activity", async () => {
     jest.useFakeTimers();
     let requestSignal: AbortSignal | undefined;
     (fetch as jest.Mock).mockImplementation((_url, options) => {
@@ -806,16 +809,17 @@ describe("streamChat", () => {
         onError,
       });
 
+      expect(LLM_INITIAL_REPLY_TIMEOUT_MS).toBe(5 * 60_000);
       expect(LLM_REPLY_INACTIVITY_TIMEOUT_MS).toBe(10 * 60_000);
 
-      await jest.advanceTimersByTimeAsync(5 * 60_000);
+      await jest.advanceTimersByTimeAsync(4 * 60_000);
 
       expect(onDone).not.toHaveBeenCalled();
       expect(requestSignal).toBeDefined();
       expect(requestSignal?.aborted).toBe(false);
       expect(onError).not.toHaveBeenCalled();
 
-      await jest.advanceTimersByTimeAsync(5 * 60_000);
+      await jest.advanceTimersByTimeAsync(60_000);
       await promise;
 
       expect(onDone).not.toHaveBeenCalled();

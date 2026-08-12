@@ -94,9 +94,12 @@ Unsupported image routes fail before a paid provider request.
 
 ## Streaming and Completion
 
-Hosted replies use a ten-minute inactivity timeout. Any stream activity resets
-the inactivity timer on every streaming transport, including thinking-only
-phases; an abort signal ends parsing and downstream callbacks.
+Hosted replies allow up to five minutes for their first stream activity, so a
+transport that accepts a request but never returns data cannot hold a turn
+indefinitely. After activity begins, replies use a ten-minute inactivity
+timeout. Any stream activity resets that timer on every streaming transport,
+including thinking-only phases; an abort signal ends parsing and downstream
+callbacks.
 Chunks may render immediately and feed paragraph TTS, while only the completed
 guarded response is persisted.
 

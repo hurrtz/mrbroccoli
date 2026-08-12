@@ -20,6 +20,7 @@ import {
 } from "./requestRouter";
 import type { StreamChatParams } from "./types";
 
+export const LLM_INITIAL_REPLY_TIMEOUT_MS = 5 * 60_000;
 export const LLM_REPLY_INACTIVITY_TIMEOUT_MS = 10 * 60_000;
 const LOCAL_ANDROID_DEV_API_KEY = "sk-test-android-local-dev";
 
@@ -145,7 +146,7 @@ export async function streamChat({
 
     let rejectTimeout: ((reason?: unknown) => void) | null = null;
     let receivedStreamData = false;
-    const armTimeout = () => {
+    const armTimeout = (timeoutMs: number) => {
       if (timeoutId) {
         clearTimeout(timeoutId);
       }
@@ -154,7 +155,7 @@ export async function streamChat({
         timedOut = true;
         rejectTimeout?.(timeoutError);
         requestAbortController.abort();
-      }, LLM_REPLY_INACTIVITY_TIMEOUT_MS);
+      }, timeoutMs);
     };
     const onStreamActivity = () => {
       if (timedOut) {
@@ -162,7 +163,7 @@ export async function streamChat({
       }
 
       receivedStreamData = true;
-      armTimeout();
+      armTimeout(LLM_REPLY_INACTIVITY_TIMEOUT_MS);
     };
     const onChunkWithTimeout = (text: string) => {
       if (timedOut) {
@@ -297,7 +298,7 @@ export async function streamChat({
       rejectTimeout = reject;
     });
 
-    armTimeout();
+    armTimeout(LLM_INITIAL_REPLY_TIMEOUT_MS);
     const resolvedRequest = await Promise.race([
       requestPromise,
       timeoutPromise,
