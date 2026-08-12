@@ -56,6 +56,10 @@ the complete Play Store translations are kept in a dedicated file under
 
 ### Fixed
 
+- Make Tap to Speak and Drive Session treat an orb tap as one toggle instead of
+  immediately stopping the recording as a too-short hold. Swiping from the orb
+  to the message field also leaves the keyboard closed until the field is
+  deliberately focused.
 - Stop a hosted response request that returns no activity for five minutes,
   instead of leaving the turn waiting for the longer streaming-inactivity
   window. Once a slow response starts streaming, its existing longer window is

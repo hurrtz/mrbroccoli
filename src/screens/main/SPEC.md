@@ -76,7 +76,12 @@ receive already-derived state and callbacks.
 - The pager always opens on voice. The composer stays available through its
   labelled 44pt chevrons and horizontal gesture, but route readiness never
   automatically pages the workspace to text. The composer is outlined in the
-  accent at rest, not only when focused.
+  accent at rest, not only when focused. A chevron selection may focus the
+  composer as an explicit text action; swiping to it preserves keyboard state
+  and never opens the keyboard by itself.
+- Push-to-talk alone owns press-in and press-out recording boundaries. Toggle
+  and Drive modes receive one completed orb press per tap; they must not also
+  start on press-in and stop on press-out.
 - A message telling someone to type must leave typing working. This separates
   an unusable voice route from a prompt block, which stops both routes.
 - Controls that cannot be used at all stay visible but disabled when they are

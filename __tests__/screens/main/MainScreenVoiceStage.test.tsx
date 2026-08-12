@@ -1,5 +1,5 @@
 import React from "react";
-import { fireEvent, render } from "@testing-library/react-native";
+import { act, fireEvent, render } from "@testing-library/react-native";
 import { AccessibilityInfo, Keyboard, StyleSheet } from "react-native";
 
 import { Circle } from "react-native-svg";
@@ -19,15 +19,29 @@ jest.mock("react-native-gesture-handler", () => {
   const React = require("react");
   const { View } = require("react-native");
   const createGesture = (kind: "native" | "pan") => {
+    const callbacks: Record<string, (...args: unknown[]) => void> = {};
     const gesture = {
+      callbacks,
       kind,
       activeOffsetX: () => gesture,
       disallowInterruption: () => gesture,
       failOffsetY: () => gesture,
-      onEnd: () => gesture,
-      onFinalize: () => gesture,
-      onStart: () => gesture,
-      onUpdate: () => gesture,
+      onEnd: (callback: (...args: unknown[]) => void) => {
+        callbacks.onEnd = callback;
+        return gesture;
+      },
+      onFinalize: (callback: (...args: unknown[]) => void) => {
+        callbacks.onFinalize = callback;
+        return gesture;
+      },
+      onStart: (callback: (...args: unknown[]) => void) => {
+        callbacks.onStart = callback;
+        return gesture;
+      },
+      onUpdate: (callback: (...args: unknown[]) => void) => {
+        callbacks.onUpdate = callback;
+        return gesture;
+      },
       simultaneousWithExternalGesture: () => gesture,
     };
     return gesture;
@@ -42,11 +56,14 @@ jest.mock("react-native-gesture-handler", () => {
       gesture,
     }: {
       children: React.ReactNode;
-      gesture: { kind: "native" | "pan" };
+      gesture: {
+        callbacks: Record<string, (...args: unknown[]) => void>;
+        kind: "native" | "pan";
+      };
     }) =>
       React.createElement(
         View,
-        { testID: `${gesture.kind}-gesture-detector` },
+        { gesture, testID: `${gesture.kind}-gesture-detector` },
         children,
       ),
     TouchableOpacity: require("react-native").TouchableOpacity,
@@ -495,6 +512,56 @@ describe("MainScreenVoiceStage composer", () => {
     fireEvent(action, "pressOut");
     expect(onPressIn).toHaveBeenCalledTimes(1);
     expect(onPressOut).toHaveBeenCalledTimes(1);
+  });
+
+  it.each(["toggle-to-talk", "drive-session"] as const)(
+    "treats one %s orb tap as one toggle instead of a zero-length hold",
+    (inputMode) => {
+      const onPress = jest.fn();
+      const onPressIn = jest.fn();
+      const onPressOut = jest.fn();
+      const screen = renderStage(
+        <MainScreenVoiceStage
+          {...createProps({ inputMode, onPress, onPressIn, onPressOut })}
+        />,
+      );
+
+      const orb = screen.getByTestId("voice-orb-idle");
+      expect(orb.props.onPressIn).toBeUndefined();
+      expect(orb.props.onPressOut).toBeUndefined();
+      fireEvent.press(orb);
+
+      expect(onPressIn).not.toHaveBeenCalled();
+      expect(onPressOut).not.toHaveBeenCalled();
+      expect(onPress).toHaveBeenCalledTimes(1);
+    },
+  );
+
+  it("does not focus the text composer when a swipe selects it", () => {
+    const requestFrame = jest
+      .spyOn(global, "requestAnimationFrame")
+      .mockImplementation(() => 0);
+    const onInputSurfaceChange = jest.fn();
+    const screen = renderStage(
+      <MainScreenVoiceStage
+        {...createProps({ onInputSurfaceChange })}
+      />,
+    );
+    fireEvent(screen.getByTestId("voice-text-input-viewport"), "layout", {
+      nativeEvent: { layout: { width: 320 } },
+    });
+    requestFrame.mockClear();
+
+    const gesture = screen.getByTestId("pan-gesture-detector").props.gesture;
+    act(() => {
+      gesture.callbacks.onStart();
+      gesture.callbacks.onUpdate({ translationX: -220 });
+      gesture.callbacks.onEnd({ velocityX: 0 });
+    });
+
+    expect(onInputSurfaceChange).toHaveBeenCalledWith("text");
+    expect(requestFrame).not.toHaveBeenCalled();
+    requestFrame.mockRestore();
   });
 
   it("uses Drive controls only for automatic continuation", () => {

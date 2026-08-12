@@ -120,12 +120,10 @@ function VoiceInputSurface({
           actionDisabled || inputMode === "push-to-talk" ? undefined : onPress
         }
         onPressIn={
-          actionDisabled || inputMode === "push-to-talk" ? undefined : onPressIn
+          actionDisabled || inputMode !== "push-to-talk" ? undefined : onPressIn
         }
         onPressOut={
-          actionDisabled || inputMode === "push-to-talk"
-            ? undefined
-            : onPressOut
+          actionDisabled || inputMode !== "push-to-talk" ? undefined : onPressOut
         }
         size={stageSize}
         testID="voice-orb-idle"

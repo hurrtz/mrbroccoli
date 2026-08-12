@@ -94,7 +94,7 @@ export function useInputSurfaceGesture({
 
           if (reducedMotion) {
             trackTranslateX.value = targetX;
-            runOnJS(applySurface)(nextSurface, nextSurface === "text");
+            runOnJS(applySurface)(nextSurface, false);
             return;
           }
 
@@ -107,7 +107,7 @@ export function useInputSurfaceGesture({
             },
             (finished) => {
               if (finished) {
-                runOnJS(applySurface)(nextSurface, nextSurface === "text");
+                runOnJS(applySurface)(nextSurface, false);
               }
             },
           );
