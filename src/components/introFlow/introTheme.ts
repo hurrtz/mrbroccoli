@@ -74,6 +74,11 @@ export function useIntroTheme(): IntroTheme {
  */
 export const introBannerTheme = {
   canvas: "#5B21B6",
+  gradientStart: "#4C1D95",
+  gradientEnd: "#6D28D9",
+  shadow: "rgba(109, 40, 217, 0.45)",
+  sheen: "rgba(255, 255, 255, 0.28)",
+  playRing: "rgba(255, 255, 255, 0.5)",
   glow: "rgba(167, 139, 250, 0.30)",
   text: "#FFFFFF",
   textSecondary: "rgba(237, 233, 254, 0.86)",

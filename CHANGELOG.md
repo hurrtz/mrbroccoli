@@ -24,6 +24,10 @@ the complete Play Store translations are kept in a dedicated file under
   pressed, the sessions search field matches the standard input shape, the
   background install row tints its border and finished states from its tone,
   and toast tints follow the design system's strengths in both appearances.
+- The introduction banner is now the approved violet gradient row: a play
+  glyph in a hairline circle announces the spoken walkthrough, setup-focused
+  copy replaces "New here?", a quiet chevron replaces the white action pill,
+  and the slow sheen it shares with the Premium band invites without shouting.
 - Fixed successful local transcription crashing the iOS Release app when its
   JavaScript runtime does not provide relative-time formatting.
 - Fixed provider connection sheets occasionally freezing while returning to

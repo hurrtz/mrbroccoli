@@ -17,9 +17,9 @@ const rawIntroTranslations = {
     introBannerSettingVisibleDescription: "The invitation to the introduction appears above your conversation.",
     introBannerSettingHiddenDescription: "The introduction stays available from settings only.",
     speechInputUnavailableHint: "No speech recognition is set up yet, so type your message instead.",
-    introBannerTitle: "New here?",
-    introBannerBody: "See what Mr Broccoli does and pick how to power it.",
-    introBannerAction: "Take a look",
+    introBannerTitle: "Set up Mr Broccoli",
+    introBannerBody:
+      "A minute of setup gets him thinking, hearing you and speaking back.",
     introBannerDismiss: "Dismiss introduction",
     introStepOfTotal: ({ step, total }: TranslationParams) =>
       `Step ${step} of ${total}`,
@@ -119,9 +119,9 @@ const rawIntroTranslations = {
     introBannerSettingVisibleDescription: "تظهر الدعوة إلى المقدمة أعلى محادثتك.",
     introBannerSettingHiddenDescription: "تبقى المقدمة متاحة من الإعدادات فقط.",
     speechInputUnavailableHint: "لم يتم إعداد التعرّف على الكلام بعد، لذا اكتب رسالتك بدلًا من ذلك.",
-    introBannerTitle: "هل أنت جديد هنا؟",
-    introBannerBody: "اطّلع على ما يفعله Mr Broccoli واختر كيفية تشغيله.",
-    introBannerAction: "ألقِ نظرة",
+    introBannerTitle: "قم بإعداد Mr Broccoli",
+    introBannerBody:
+      "دقيقة واحدة من الإعداد تجعله يفكّر ويسمعك ويرد عليك بصوته.",
     introBannerDismiss: "إغلاق المقدمة",
     introStepOfTotal: ({ step, total }: TranslationParams) =>
       `الخطوة ${step} من ${total}`,
@@ -204,9 +204,9 @@ const rawIntroTranslations = {
     introBannerSettingVisibleDescription: "Pozvánka k úvodu se zobrazuje nad konverzací.",
     introBannerSettingHiddenDescription: "Úvod zůstává dostupný jen z nastavení.",
     speechInputUnavailableHint: "Rozpoznávání řeči zatím není nastavené, takže zprávu napiš.",
-    introBannerTitle: "Jste tu nově?",
-    introBannerBody: "Podívejte se, co Mr Broccoli umí, a vyberte pohon.",
-    introBannerAction: "Podívat se",
+    introBannerTitle: "Nastavte si Mr Broccoli",
+    introBannerBody:
+      "Minuta nastavení a začne přemýšlet, poslouchat vás a odpovídat nahlas.",
     introBannerDismiss: "Zavřít úvod",
     introStepOfTotal: ({ step, total }: TranslationParams) =>
       `Krok ${step} z ${total}`,
@@ -289,10 +289,9 @@ const rawIntroTranslations = {
     introBannerSettingVisibleDescription: "Der Hinweis auf die Einführung erscheint über deinem Gespräch.",
     introBannerSettingHiddenDescription: "Die Einführung bleibt nur über die Einstellungen erreichbar.",
     speechInputUnavailableHint: "Es ist noch keine Spracherkennung eingerichtet — tippe deine Nachricht stattdessen.",
-    introBannerTitle: "Neu hier?",
+    introBannerTitle: "Mr Broccoli einrichten",
     introBannerBody:
-      "Sieh dir an, was Mr Broccoli kann, und wähle den Antrieb.",
-    introBannerAction: "Ansehen",
+      "Eine Minute Einrichtung, und er denkt, hört dich und spricht zurück.",
     introBannerDismiss: "Einführung schließen",
     introStepOfTotal: ({ step, total }: TranslationParams) =>
       `Schritt ${step} von ${total}`,
@@ -379,9 +378,9 @@ const rawIntroTranslations = {
     introBannerSettingVisibleDescription: "La invitación a la introducción aparece encima de tu conversación.",
     introBannerSettingHiddenDescription: "La introducción sigue disponible solo desde los ajustes.",
     speechInputUnavailableHint: "Todavía no hay reconocimiento de voz configurado, así que escribe tu mensaje.",
-    introBannerTitle: "¿Es tu primera vez?",
-    introBannerBody: "Mira qué hace Mr Broccoli y elige cómo alimentarlo.",
-    introBannerAction: "Echar un vistazo",
+    introBannerTitle: "Configura Mr Broccoli",
+    introBannerBody:
+      "Un minuto de configuración y ya piensa, te escucha y te responde con voz.",
     introBannerDismiss: "Cerrar la introducción",
     introStepOfTotal: ({ step, total }: TranslationParams) =>
       `Paso ${step} de ${total}`,
@@ -468,10 +467,9 @@ const rawIntroTranslations = {
     introBannerSettingVisibleDescription: "L'invitation à l'introduction apparaît au-dessus de ta conversation.",
     introBannerSettingHiddenDescription: "L'introduction reste accessible uniquement depuis les réglages.",
     speechInputUnavailableHint: "Aucune reconnaissance vocale n'est encore configurée, écris ton message à la place.",
-    introBannerTitle: "Vous débutez ?",
+    introBannerTitle: "Configurez Mr Broccoli",
     introBannerBody:
-      "Découvrez ce que fait Mr Broccoli et choisissez sa motorisation.",
-    introBannerAction: "Jeter un œil",
+      "Une minute de configuration et il pense, vous écoute et vous répond à voix haute.",
     introBannerDismiss: "Fermer l'introduction",
     introStepOfTotal: ({ step, total }: TranslationParams) =>
       `Étape ${step} sur ${total}`,
@@ -558,10 +556,9 @@ const rawIntroTranslations = {
     introBannerSettingVisibleDescription: "परिचय का न्योता आपकी बातचीत के ऊपर दिखता है।",
     introBannerSettingHiddenDescription: "परिचय सिर्फ़ सेटिंग से उपलब्ध रहता है।",
     speechInputUnavailableHint: "अभी कोई वाक् पहचान सेट नहीं है, इसलिए अपना संदेश टाइप करें।",
-    introBannerTitle: "यहाँ नए हैं?",
+    introBannerTitle: "Mr Broccoli सेट करें",
     introBannerBody:
-      "देखें Mr Broccoli क्या करता है और चुनें कि इसे कैसे चलाना है।",
-    introBannerAction: "एक नज़र डालें",
+      "एक मिनट के सेटअप से वह सोचने, आपको सुनने और बोलकर जवाब देने लगता है।",
     introBannerDismiss: "परिचय बंद करें",
     introStepOfTotal: ({ step, total }: TranslationParams) =>
       `चरण ${step} / ${total}`,
@@ -647,10 +644,9 @@ const rawIntroTranslations = {
     introBannerSettingVisibleDescription: "A bevezetőre hívó kártya a beszélgetés fölött jelenik meg.",
     introBannerSettingHiddenDescription: "A bevezető csak a beállításokból marad elérhető.",
     speechInputUnavailableHint: "Még nincs beszédfelismerés beállítva, ezért gépeld be az üzenetet.",
-    introBannerTitle: "Most jársz itt először?",
+    introBannerTitle: "Állítsd be a Mr Broccolit",
     introBannerBody:
-      "Nézd meg, mit tud a Mr Broccoli, és válaszd ki, mi hajtsa.",
-    introBannerAction: "Megnézem",
+      "Egy perc beállítás, és már gondolkodik, hall téged és hangosan válaszol.",
     introBannerDismiss: "Bevezető bezárása",
     introStepOfTotal: ({ step, total }: TranslationParams) =>
       `${step}. lépés a(z) ${total}-ból`,
@@ -736,9 +732,9 @@ const rawIntroTranslations = {
     introBannerSettingVisibleDescription: "L'invito all'introduzione compare sopra la conversazione.",
     introBannerSettingHiddenDescription: "L'introduzione resta disponibile solo dalle impostazioni.",
     speechInputUnavailableHint: "Non è ancora configurato il riconoscimento vocale, quindi scrivi il messaggio.",
-    introBannerTitle: "Sei nuovo qui?",
-    introBannerBody: "Guarda cosa fa Mr Broccoli e scegli come alimentarlo.",
-    introBannerAction: "Dai un'occhiata",
+    introBannerTitle: "Configura Mr Broccoli",
+    introBannerBody:
+      "Un minuto di configurazione e lui pensa, ti ascolta e ti risponde a voce.",
     introBannerDismiss: "Chiudi l'introduzione",
     introStepOfTotal: ({ step, total }: TranslationParams) =>
       `Passo ${step} di ${total}`,
@@ -825,9 +821,9 @@ const rawIntroTranslations = {
     introBannerSettingVisibleDescription: "はじめにへの案内が会話の上に表示されます。",
     introBannerSettingHiddenDescription: "はじめには設定からのみ開けます。",
     speechInputUnavailableHint: "音声認識がまだ設定されていないので、メッセージを入力してください。",
-    introBannerTitle: "はじめてですか？",
-    introBannerBody: "Mr Broccoli でできることを見て、動かし方を選びましょう。",
-    introBannerAction: "見てみる",
+    introBannerTitle: "Mr Broccoli をセットアップ",
+    introBannerBody:
+      "1分のセットアップで、考え、聞き取り、声で答えるようになります。",
     introBannerDismiss: "紹介を閉じる",
     introStepOfTotal: ({ step, total }: TranslationParams) =>
       `ステップ ${step} / ${total}`,
@@ -912,9 +908,9 @@ const rawIntroTranslations = {
     introBannerSettingVisibleDescription: "Zaproszenie do wprowadzenia pojawia się nad rozmową.",
     introBannerSettingHiddenDescription: "Wprowadzenie pozostaje dostępne tylko z ustawień.",
     speechInputUnavailableHint: "Rozpoznawanie mowy nie jest jeszcze skonfigurowane, więc napisz wiadomość.",
-    introBannerTitle: "Pierwszy raz tutaj?",
-    introBannerBody: "Zobacz, co potrafi Mr Broccoli, i wybierz napęd.",
-    introBannerAction: "Rzuć okiem",
+    introBannerTitle: "Skonfiguruj Mr Broccoli",
+    introBannerBody:
+      "Minuta konfiguracji i już myśli, słucha cię i odpowiada na głos.",
     introBannerDismiss: "Zamknij wprowadzenie",
     introStepOfTotal: ({ step, total }: TranslationParams) =>
       `Krok ${step} z ${total}`,
@@ -1000,9 +996,9 @@ const rawIntroTranslations = {
     introBannerSettingVisibleDescription: "O convite para a introdução aparece acima da tua conversa.",
     introBannerSettingHiddenDescription: "A introdução fica disponível apenas nas definições.",
     speechInputUnavailableHint: "Ainda não há reconhecimento de voz configurado, por isso escreve a tua mensagem.",
-    introBannerTitle: "É a primeira vez aqui?",
-    introBannerBody: "Veja o que o Mr Broccoli faz e escolha como alimentá-lo.",
-    introBannerAction: "Dar uma vista de olhos",
+    introBannerTitle: "Configure o Mr Broccoli",
+    introBannerBody:
+      "Um minuto de configuração e ele passa a pensar, a ouvi-lo e a responder em voz alta.",
     introBannerDismiss: "Fechar a introdução",
     introStepOfTotal: ({ step, total }: TranslationParams) =>
       `Passo ${step} de ${total}`,
@@ -1088,9 +1084,9 @@ const rawIntroTranslations = {
     introBannerSettingVisibleDescription: "O convite para a introdução aparece acima da sua conversa.",
     introBannerSettingHiddenDescription: "A introdução fica disponível apenas nas configurações.",
     speechInputUnavailableHint: "Ainda não há reconhecimento de voz configurado, então digite sua mensagem.",
-    introBannerTitle: "É novo por aqui?",
-    introBannerBody: "Veja o que o Mr Broccoli faz e escolha como alimentá-lo.",
-    introBannerAction: "Dar uma olhada",
+    introBannerTitle: "Configure o Mr Broccoli",
+    introBannerBody:
+      "Um minuto de configuração e ele pensa, ouve você e responde em voz alta.",
     introBannerDismiss: "Fechar a introdução",
     introStepOfTotal: ({ step, total }: TranslationParams) =>
       `Etapa ${step} de ${total}`,
@@ -1176,10 +1172,9 @@ const rawIntroTranslations = {
     introBannerSettingVisibleDescription: "Приглашение к знакомству появляется над разговором.",
     introBannerSettingHiddenDescription: "Знакомство остаётся доступным только из настроек.",
     speechInputUnavailableHint: "Распознавание речи ещё не настроено, поэтому напечатай сообщение.",
-    introBannerTitle: "Впервые здесь?",
+    introBannerTitle: "Настройте Mr Broccoli",
     introBannerBody:
-      "Посмотрите, что умеет Mr Broccoli, и выберите, на чём его запустить.",
-    introBannerAction: "Посмотреть",
+      "Минута настройки — и он думает, слышит вас и отвечает вслух.",
     introBannerDismiss: "Закрыть знакомство",
     introStepOfTotal: ({ step, total }: TranslationParams) =>
       `Шаг ${step} из ${total}`,
@@ -1265,9 +1260,9 @@ const rawIntroTranslations = {
     introBannerSettingVisibleDescription: "Inbjudan till introduktionen visas ovanför samtalet.",
     introBannerSettingHiddenDescription: "Introduktionen finns kvar bara via inställningarna.",
     speechInputUnavailableHint: "Ingen taligenkänning är inställd än, så skriv ditt meddelande i stället.",
-    introBannerTitle: "Ny här?",
-    introBannerBody: "Se vad Mr Broccoli gör och välj vad som ska driva den.",
-    introBannerAction: "Ta en titt",
+    introBannerTitle: "Ställ in Mr Broccoli",
+    introBannerBody:
+      "En minuts installation och han tänker, hör dig och svarar högt.",
     introBannerDismiss: "Stäng introduktionen",
     introStepOfTotal: ({ step, total }: TranslationParams) =>
       `Steg ${step} av ${total}`,
@@ -1353,10 +1348,9 @@ const rawIntroTranslations = {
     introBannerSettingVisibleDescription: "Tanıtım daveti konuşmanın üstünde görünür.",
     introBannerSettingHiddenDescription: "Tanıtıma yalnızca ayarlardan ulaşılır.",
     speechInputUnavailableHint: "Henüz konuşma tanıma ayarlanmadı, bu yüzden mesajını yaz.",
-    introBannerTitle: "Burada yeni misiniz?",
+    introBannerTitle: "Mr Broccoli'yi kurun",
     introBannerBody:
-      "Mr Broccoli'nin ne yaptığını görün ve nasıl çalışacağını seçin.",
-    introBannerAction: "Bir bakın",
+      "Bir dakikalık kurulumla düşünmeye, sizi duymaya ve sesli yanıt vermeye başlar.",
     introBannerDismiss: "Tanıtımı kapat",
     introStepOfTotal: ({ step, total }: TranslationParams) =>
       `Adım ${step} / ${total}`,
@@ -1442,10 +1436,9 @@ const rawIntroTranslations = {
     introBannerSettingVisibleDescription: "Запрошення до знайомства зʼявляється над розмовою.",
     introBannerSettingHiddenDescription: "Знайомство лишається доступним лише з налаштувань.",
     speechInputUnavailableHint: "Розпізнавання мовлення ще не налаштовано, тож надрукуй повідомлення.",
-    introBannerTitle: "Ви тут уперше?",
+    introBannerTitle: "Налаштуйте Mr Broccoli",
     introBannerBody:
-      "Подивіться, що вміє Mr Broccoli, і оберіть, на чому його запустити.",
-    introBannerAction: "Поглянути",
+      "Хвилина налаштування — і він думає, чує вас і відповідає вголос.",
     introBannerDismiss: "Закрити знайомство",
     introStepOfTotal: ({ step, total }: TranslationParams) =>
       `Крок ${step} з ${total}`,
@@ -1531,10 +1524,9 @@ const rawIntroTranslations = {
     introBannerSettingVisibleDescription: "تعارف کی دعوت آپ کی گفتگو کے اوپر ظاہر ہوتی ہے۔",
     introBannerSettingHiddenDescription: "تعارف صرف ترتیبات سے دستیاب رہتا ہے۔",
     speechInputUnavailableHint: "ابھی تقریر کی شناخت ترتیب نہیں دی گئی، اس لیے اپنا پیغام لکھیں۔",
-    introBannerTitle: "یہاں نئے ہیں؟",
+    introBannerTitle: "Mr Broccoli سیٹ اپ کریں",
     introBannerBody:
-      "دیکھیں Mr Broccoli کیا کرتا ہے اور منتخب کریں کہ اسے کیسے چلانا ہے۔",
-    introBannerAction: "ایک نظر ڈالیں",
+      "ایک منٹ کے سیٹ اپ سے وہ سوچنے، آپ کو سننے اور بول کر جواب دینے لگتا ہے۔",
     introBannerDismiss: "تعارف بند کریں",
     introStepOfTotal: ({ step, total }: TranslationParams) =>
       `مرحلہ ${step} از ${total}`,
@@ -1620,9 +1612,9 @@ const rawIntroTranslations = {
     introBannerSettingVisibleDescription: "介绍入口会显示在对话上方。",
     introBannerSettingHiddenDescription: "介绍只保留在设置中。",
     speechInputUnavailableHint: "还没有设置语音识别，请改用打字。",
-    introBannerTitle: "第一次来？",
-    introBannerBody: "看看 Mr Broccoli 能做什么，并选择用什么来驱动它。",
-    introBannerAction: "看一看",
+    introBannerTitle: "设置 Mr Broccoli",
+    introBannerBody:
+      "一分钟设置，他就能思考、听懂你并开口回答。",
     introBannerDismiss: "关闭介绍",
     introStepOfTotal: ({ step, total }: TranslationParams) =>
       `第 ${step} 步，共 ${total} 步`,

@@ -87,6 +87,32 @@ describe("IntroBanner", () => {
     expect(getByTestId("intro-banner")).toBeTruthy();
   });
 
+  it("draws the spoken-walkthrough affordance instead of an action pill", () => {
+    // The walkthrough is spoken, so a play glyph in a hairline circle carries
+    // the invitation; the row ends in a quiet chevron, never a second CTA.
+    const { getByTestId, queryByText } = render(
+      <IntroBanner
+        onDismiss={jest.fn()}
+        onOpen={jest.fn()}
+        showDismiss={false}
+        t={t}
+        visible
+      />,
+    );
+
+    expect(queryByText("introBannerAction")).toBeNull();
+    expect(
+      StyleSheet.flatten(getByTestId("intro-banner-play-ring").props.style),
+    ).toEqual(
+      expect.objectContaining({
+        width: 40,
+        height: 40,
+        borderWidth: 1,
+        borderColor: "rgba(255, 255, 255, 0.5)",
+      }),
+    );
+  });
+
   it("separates opening the introduction from dismissing it", () => {
     // The banner replaced a wizard that could not be skipped. Dismissing has to
     // be a distinct target, or someone trying to get rid of it ends up inside.
@@ -129,10 +155,9 @@ describe("IntroBanner", () => {
     );
 
     expect(queryByText("introBannerBody")).toBeNull();
-    expect(queryByText("introBannerAction")).toBeNull();
-    expect(StyleSheet.flatten(getByTestId("intro-banner").props.style)).toEqual(
-      expect.objectContaining({ minHeight: 48 }),
-    );
+    expect(
+      StyleSheet.flatten(getByTestId("intro-banner-surface").props.style),
+    ).toEqual(expect.objectContaining({ minHeight: 48 }));
     expect(
       StyleSheet.flatten(getByTestId("intro-banner-dismiss").props.style),
     ).toEqual(expect.objectContaining({ height: 44, width: 44 }));
