@@ -40,6 +40,8 @@ the complete Play Store translations are kept in a dedicated file under
 - In landscape, a setup notice no longer paints its full paragraph over the
   status line and shortcut ring; the left pane always shows the compact
   single-row action, with the complete message kept for screen readers.
+- Conversation forks now use a splitting-paths glyph everywhere instead of
+  the developer-flavored git-branch symbol.
 
 ### Changed
 

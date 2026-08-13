@@ -5,6 +5,7 @@ import {
   ArrowDownIcon,
   ArrowLeftIcon,
   ArrowRightIcon,
+  ArrowsSplitIcon,
   ArrowUpIcon,
   BrainIcon,
   BugIcon,
@@ -31,7 +32,6 @@ import {
   FolderOpenIcon,
   GearIcon,
   GlobeHemisphereWestIcon,
-  GitBranchIcon,
   HeadphonesIcon,
   HeadsetIcon,
   InfoIcon,
@@ -113,7 +113,9 @@ const PHOSPHOR_ICONS = {
   // The thinking phase's glyph on the voice orb. The surviving voice-action
   // bar keeps "robot"; the two deliberately coexist.
   brain: BrainIcon,
-  branch: GitBranchIcon,
+  // The DS maps the semantic branch name to arrows-split: a conversation
+  // fork is a path splitting, not a developer's git operation.
+  branch: ArrowsSplitIcon,
   bug: BugIcon,
   // Model Council. The key is the meaning, not the glyph name — matches the
   // design system's icon map, which also keys UsersThree as "council".

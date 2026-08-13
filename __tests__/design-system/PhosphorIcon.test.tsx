@@ -54,6 +54,22 @@ describe("Phosphor icon system", () => {
     },
   );
 
+  it("draws a conversation fork as a splitting path, not a git branch", () => {
+    // The design system's semantic `branch` name maps to arrows-split;
+    // the git-branch glyph reads developer-only in message actions.
+    const {
+      ArrowsSplitIcon,
+    } = require("phosphor-react-native") as typeof import("phosphor-react-native");
+    const screen = render(
+      <PhosphorIcon name="branch" size="compact" color="#123456" />,
+    );
+    const icon = screen.UNSAFE_getByProps({
+      testID: "phosphor-icon-branch",
+    });
+
+    expect(icon.type).toBe(ArrowsSplitIcon);
+  });
+
   it("renders decorative Phosphor glyphs with semantic sizing", () => {
     const screen = render(
       <PhosphorIcon name="info-circle" size="navigation" color="#123456" />,
