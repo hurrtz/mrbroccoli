@@ -2,6 +2,7 @@ import React from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {
   FlatList,
+  Keyboard,
   Modal as NativeModal,
   Platform,
   StyleSheet,
@@ -744,6 +745,9 @@ describe("SettingsModal", () => {
   });
 
   it("opens Connections when a focus provider is supplied", async () => {
+    const dismissKeyboard = jest
+      .spyOn(Keyboard, "dismiss")
+      .mockImplementation(() => undefined);
     const screen = renderSettingsModal({ focusProvider: "openai" });
 
     await waitFor(() => {
@@ -771,11 +775,14 @@ describe("SettingsModal", () => {
     fireEvent.press(screen.getByTestId("provider-connection-close-openai"));
 
     await waitFor(() => {
+      expect(dismissKeyboard).toHaveBeenCalledTimes(1);
       expect(
         screen.queryByTestId("provider-connection-sheet-openai"),
       ).toBeNull();
       expect(screen.getByTestId("settings-back-button")).toBeTruthy();
     });
+
+    dismissKeyboard.mockRestore();
   });
 
   it("shows capabilities and health in each provider row", async () => {

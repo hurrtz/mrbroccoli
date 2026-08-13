@@ -10,6 +10,9 @@ the complete Play Store translations are kept in a dedicated file under
 
 ## Unreleased
 
+- Fixed provider connection sheets occasionally failing to return to Settings
+  when closed with the iOS keyboard visible.
+
 ### Added
 
 - Automatic on-device setup: one tap measures what your phone can run, shows

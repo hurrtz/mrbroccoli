@@ -1,5 +1,6 @@
 import React from "react";
 import {
+  Keyboard,
   Linking,
   Modal,
   Pressable,
@@ -193,6 +194,11 @@ function ProviderConnectionSheet({
     setVisibleApiKey(false);
   }, [provider]);
 
+  const handleClose = React.useCallback(() => {
+    Keyboard.dismiss();
+    onClose();
+  }, [onClose]);
+
   if (!provider) {
     return null;
   }
@@ -202,7 +208,7 @@ function ProviderConnectionSheet({
   return (
     <Modal
       animationType="slide"
-      onRequestClose={onClose}
+      onRequestClose={handleClose}
       statusBarTranslucent
       supportedOrientations={APP_MODAL_ORIENTATIONS}
       transparent
@@ -217,7 +223,7 @@ function ProviderConnectionSheet({
           accessible={false}
           accessibilityElementsHidden
           importantForAccessibility="no"
-          onPress={onClose}
+          onPress={handleClose}
           style={[StyleSheet.absoluteFill, { backgroundColor: colors.overlay }]}
         />
         <View
@@ -282,7 +288,7 @@ function ProviderConnectionSheet({
               icon="close"
               testID={`provider-connection-close-${provider}`}
               accessibilityLabel={t("dismiss")}
-              onPress={onClose}
+              onPress={handleClose}
             />
           </View>
           <ScrollView

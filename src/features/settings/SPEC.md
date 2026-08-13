@@ -146,6 +146,9 @@ capability healthy. The UI shows the capability that was actually tested.
   alert that obscures the setting it describes.
 - Text inputs preserve keyboard-safe layout and should not cause page headers
   or primary actions to disappear.
+- Provider credential sheets release secure-field focus before any close path
+  dismisses the nested modal, so the parent Settings page remains interactive
+  while the keyboard is visible.
 - Every page uses semantic colors, centralized typography, and shared icon
   tokens.
 - Free local-model changes are applied as one ready profile. A stage may record
