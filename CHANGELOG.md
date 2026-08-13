@@ -49,6 +49,9 @@ the complete Play Store translations are kept in a dedicated file under
   button, with earlier turns emerging from a blur where the platform draws
   it. Screen readers hear only the crisp question, the play button, and the
   language switch.
+- The walkthrough's manual setup now shows the recommended on-device models
+  inline with their real install and test state, so every route is judgeable
+  at a glance; "More models…" is the only hand-off to a settings page.
 - The voice orb steps down a size while the setup banner is on screen instead
   of squeezing the rest of the home screen.
 - The Settings overview's Connections summary names at most two providers and

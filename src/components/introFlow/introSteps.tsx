@@ -1,8 +1,22 @@
 import React from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
+import {
+  LOCAL_MODEL_CATALOG,
+  type LocalModelDefinition,
+  type LocalModelId,
+} from "../../constants/localModels";
+import {
+  SPEECH_LANGUAGE_REGISTRY,
+  type SpeechLanguage,
+} from "../../constants/speechLanguages";
 import { PhosphorIcon } from "../../design-system/PhosphorIcon";
 import { SettingsSwitch } from "../../features/settings/settings-primitives/SettingsSwitch";
+import type { LocalModelBenchmarkResult } from "../../services/localDeviceCapabilities";
+import { getLocalModelBenchmarkResults } from "../../services/localDeviceCapabilities";
+import type { LocalModelInstallStatus } from "../../services/localModelManager";
+import { getLocalCatalogInstallStatuses } from "../../services/offlineProfileManager";
+import { formatBytes } from "../../utils/formatBytes";
 import { AutoSetupCard } from "../autoSetup/AutoSetupCard";
 import type { AutoSetupJobState } from "../autoSetup/types";
 import type { AppLanguage } from "../../i18n/localeRegistry";
@@ -385,6 +399,77 @@ function ManualGroup({
   );
 }
 
+interface IntroModelState {
+  installs: Partial<Record<LocalModelId, LocalModelInstallStatus>>;
+  benchmarks: Partial<Record<LocalModelId, LocalModelBenchmarkResult>>;
+}
+
+/**
+ * The manual catalogue shows real install and test state so every route is
+ * judgeable at a glance. Reads only; the model lifecycle stays on the
+ * owning settings pages.
+ */
+function useIntroModelState(refreshKey: string) {
+  const [state, setState] = React.useState<IntroModelState | null>(null);
+  React.useEffect(() => {
+    let cancelled = false;
+    void Promise.all([
+      getLocalCatalogInstallStatuses(),
+      getLocalModelBenchmarkResults(),
+    ])
+      .then(([installs, benchmarks]) => {
+        if (!cancelled) {
+          setState({ benchmarks, installs });
+        }
+      })
+      .catch(() => undefined);
+    return () => {
+      cancelled = true;
+    };
+  }, [refreshKey]);
+  return state;
+}
+
+function introSpeechLanguage(language: AppLanguage): SpeechLanguage {
+  return language in SPEECH_LANGUAGE_REGISTRY
+    ? (language as SpeechLanguage)
+    : "en";
+}
+
+function recommendedIntroModels(
+  capability: LocalModelDefinition["capability"],
+  speech: SpeechLanguage,
+) {
+  return LOCAL_MODEL_CATALOG.filter(
+    (model) =>
+      model.capability === capability &&
+      model.catalogTier === "recommended" &&
+      (capability !== "tts" ||
+        (model.languages as readonly SpeechLanguage[]).includes(speech)),
+  ).slice(0, 2);
+}
+
+function introModelMeta(
+  model: LocalModelDefinition,
+  state: IntroModelState | null,
+  t: TranslateFn,
+) {
+  const install = state?.installs[model.id];
+  if (!install?.installed || !install.verified) {
+    return `${t("introNotInstalled")} · ${formatBytes(model.downloadBytes)}`;
+  }
+  const status = state?.benchmarks[model.id]?.status;
+  const key =
+    status === "viable"
+      ? ("onDeviceViable" as const)
+      : status === "below-target"
+        ? ("onDeviceBelowTarget" as const)
+        : status === "failed"
+          ? ("onDeviceTestFailed" as const)
+          : ("onDeviceNotTested" as const);
+  return `${t(key)} · ${formatBytes(model.installedBytes)}`;
+}
+
 /**
  * Step two: one setup screen with a single green path.
  *
@@ -394,6 +479,7 @@ function ManualGroup({
  */
 function SetupStep({
   autoSetup,
+  language,
   onConnectProvider,
   onInstallLocal,
   onOpenStt,
@@ -402,6 +488,9 @@ function SetupStep({
 }: IntroStepProps) {
   const theme = useIntroTheme();
   const [manualOpen, setManualOpen] = React.useState(false);
+  const speechLanguage = introSpeechLanguage(language);
+  // Re-read after the auto job finishes: its installs change the rows.
+  const modelState = useIntroModelState(autoSetup.state);
 
   return (
     <View style={styles.stack} testID="intro-setup-step">
@@ -479,14 +568,27 @@ function SetupStep({
             {t("introManualTitle")}
           </Text>
 
+          {/* Every route at a glance: the system route, the recommended
+              on-device models with their real install state, and the
+              provider path. "More models" is the only hand-off per group. */}
           <ManualGroup label={t("introGlyphListen")} t={t} theme={theme}>
             <ManualRow
               label={t("introManualPhoneRoute")}
               selected
               theme={theme}
             />
+            {recommendedIntroModels("stt", speechLanguage).map((model) => (
+              <ManualRow
+                key={model.id}
+                label={model.name}
+                meta={introModelMeta(model, modelState, t)}
+                onPress={onOpenStt}
+                testID={`intro-manual-model-${model.id}`}
+                theme={theme}
+              />
+            ))}
             <ManualRow
-              label={t("introChooseModel")}
+              label={t("introMoreModels")}
               last
               onPress={onOpenStt}
               testID="intro-manual-stt"
@@ -500,8 +602,18 @@ function SetupStep({
             t={t}
             theme={theme}
           >
+            {recommendedIntroModels("llm", speechLanguage).map((model) => (
+              <ManualRow
+                key={model.id}
+                label={model.name}
+                meta={introModelMeta(model, modelState, t)}
+                onPress={onInstallLocal}
+                testID={`intro-manual-model-${model.id}`}
+                theme={theme}
+              />
+            ))}
             <ManualRow
-              label={t("introChooseModel")}
+              label={t("introMoreModels")}
               onPress={onInstallLocal}
               testID="intro-manual-llm"
               theme={theme}
@@ -522,8 +634,18 @@ function SetupStep({
               selected
               theme={theme}
             />
+            {recommendedIntroModels("tts", speechLanguage).map((model) => (
+              <ManualRow
+                key={model.id}
+                label={model.name}
+                meta={introModelMeta(model, modelState, t)}
+                onPress={onOpenTts}
+                testID={`intro-manual-model-${model.id}`}
+                theme={theme}
+              />
+            ))}
             <ManualRow
-              label={t("introChooseModel")}
+              label={t("introMoreModels")}
               last
               onPress={onOpenTts}
               testID="intro-manual-tts"

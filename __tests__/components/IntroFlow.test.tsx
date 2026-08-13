@@ -386,6 +386,23 @@ describe("IntroFlowScreen", () => {
     expect(getByTestId("intro-manual-tts")).toBeTruthy();
   });
 
+  it("inlines the recommended models with their install state at a glance", () => {
+    // The catalogue shows concrete routes on this screen — no second layer
+    // of drawers to even see what exists. "More models" is the only
+    // hand-off per group.
+    const { getByTestId, getByText, getAllByText } = renderScreen();
+
+    fireEvent.press(getByTestId("intro-manual-switch"));
+    expect(getByTestId("intro-manual-model-whisper-tiny")).toBeTruthy();
+    expect(getByTestId("intro-manual-model-qwen3-0.6b-q8")).toBeTruthy();
+    expect(getByText("Whisper Tiny")).toBeTruthy();
+    // Nothing is installed in the test environment, so every model row
+    // carries the not-installed line with its download size.
+    expect(getAllByText(/introNotInstalled · /).length).toBeGreaterThanOrEqual(
+      4,
+    );
+  });
+
   it("routes manual acquisition to the owning settings pages", () => {
     const { getByTestId, props } = renderScreen();
 

@@ -274,8 +274,12 @@ without consuming its display interval and starts its four-second clock only
 after that surface closes. Newer notices still replace older ones.
 
 The introduction is opened from its banner, never as a side effect of attempting
-a turn. Provider keys are entered under Connections; manual local LLM, STT, and
-TTS acquisition belongs to Thinking, Listening, and Speaking respectively.
+a turn. The manual catalogue shows every route at a glance — the system route,
+the recommended-tier on-device models with their real install and test state,
+and the provider path — so the default decision is judgeable on that screen;
+"More models" is the only hand-off per group. Provider keys are entered under
+Connections; manual local LLM, STT, and TTS acquisition belongs to Thinking,
+Listening, and Speaking respectively.
 Blocked Free-runtime notices lead to the shared automatic setup under App &
 diagnostics rather than duplicating setup or hijacking the introduction.
 

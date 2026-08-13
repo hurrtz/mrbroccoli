@@ -45,6 +45,8 @@ const rawIntroTranslations = {
     introToFirstWord: "to first word",
     introReplay: "Replay",
     introChooseModel: "Choose a model",
+    introMoreModels: "More models…",
+    introNotInstalled: "Not installed",
     introProviderLocked: "A provider you already use",
     introManualPhoneRoute: "Your phone",
     introStepOfTotal: ({ step, total }: TranslationParams) =>
@@ -173,6 +175,8 @@ const rawIntroTranslations = {
     introToFirstWord: "حتى أول كلمة",
     introReplay: "إعادة التشغيل",
     introChooseModel: "اختيار نموذج",
+    introMoreModels: "المزيد من النماذج…",
+    introNotInstalled: "غير مثبت",
     introProviderLocked: "مزوّد تستخدمه بالفعل",
     introManualPhoneRoute: "هاتفك",
     introStepOfTotal: ({ step, total }: TranslationParams) =>
@@ -284,6 +288,8 @@ const rawIntroTranslations = {
     introToFirstWord: "do prvního slova",
     introReplay: "Přehrát znovu",
     introChooseModel: "Vybrat model",
+    introMoreModels: "Další modely…",
+    introNotInstalled: "Nenainstalováno",
     introProviderLocked: "Poskytovatel, kterého už používáte",
     introManualPhoneRoute: "Váš telefon",
     introStepOfTotal: ({ step, total }: TranslationParams) =>
@@ -395,6 +401,8 @@ const rawIntroTranslations = {
     introToFirstWord: "bis zum ersten Wort",
     introReplay: "Erneut abspielen",
     introChooseModel: "Modell auswählen",
+    introMoreModels: "Weitere Modelle…",
+    introNotInstalled: "Nicht installiert",
     introProviderLocked: "Ein Anbieter, den du schon nutzt",
     introManualPhoneRoute: "Dein Telefon",
     introStepOfTotal: ({ step, total }: TranslationParams) =>
@@ -510,6 +518,8 @@ const rawIntroTranslations = {
     introToFirstWord: "hasta la primera palabra",
     introReplay: "Repetir",
     introChooseModel: "Elegir un modelo",
+    introMoreModels: "Más modelos…",
+    introNotInstalled: "No instalado",
     introProviderLocked: "Un proveedor que ya usas",
     introManualPhoneRoute: "Tu teléfono",
     introStepOfTotal: ({ step, total }: TranslationParams) =>
@@ -625,6 +635,8 @@ const rawIntroTranslations = {
     introToFirstWord: "jusqu'au premier mot",
     introReplay: "Réécouter",
     introChooseModel: "Choisir un modèle",
+    introMoreModels: "Plus de modèles…",
+    introNotInstalled: "Non installé",
     introProviderLocked: "Un fournisseur que vous utilisez déjà",
     introManualPhoneRoute: "Votre téléphone",
     introStepOfTotal: ({ step, total }: TranslationParams) =>
@@ -740,6 +752,8 @@ const rawIntroTranslations = {
     introToFirstWord: "पहले शब्द तक",
     introReplay: "फिर सुनें",
     introChooseModel: "मॉडल चुनें",
+    introMoreModels: "और मॉडल…",
+    introNotInstalled: "इंस्टॉल नहीं है",
     introProviderLocked: "एक प्रोवाइडर जिसे आप पहले से इस्तेमाल करते हैं",
     introManualPhoneRoute: "आपका फ़ोन",
     introStepOfTotal: ({ step, total }: TranslationParams) =>
@@ -854,6 +868,8 @@ const rawIntroTranslations = {
     introToFirstWord: "az első szóig",
     introReplay: "Újra lejátszás",
     introChooseModel: "Modell kiválasztása",
+    introMoreModels: "További modellek…",
+    introNotInstalled: "Nincs telepítve",
     introProviderLocked: "Egy szolgáltató, amit már használsz",
     introManualPhoneRoute: "A telefonod",
     introStepOfTotal: ({ step, total }: TranslationParams) =>
@@ -968,6 +984,8 @@ const rawIntroTranslations = {
     introToFirstWord: "alla prima parola",
     introReplay: "Riascolta",
     introChooseModel: "Scegli un modello",
+    introMoreModels: "Altri modelli…",
+    introNotInstalled: "Non installato",
     introProviderLocked: "Un provider che usi già",
     introManualPhoneRoute: "Il tuo telefono",
     introStepOfTotal: ({ step, total }: TranslationParams) =>
@@ -1083,6 +1101,8 @@ const rawIntroTranslations = {
     introToFirstWord: "最初の一言まで",
     introReplay: "もう一度再生",
     introChooseModel: "モデルを選ぶ",
+    introMoreModels: "その他のモデル…",
+    introNotInstalled: "未インストール",
     introProviderLocked: "すでに使っているプロバイダー",
     introManualPhoneRoute: "この電話",
     introStepOfTotal: ({ step, total }: TranslationParams) =>
@@ -1196,6 +1216,8 @@ const rawIntroTranslations = {
     introToFirstWord: "do pierwszego słowa",
     introReplay: "Odtwórz ponownie",
     introChooseModel: "Wybierz model",
+    introMoreModels: "Więcej modeli…",
+    introNotInstalled: "Nie zainstalowano",
     introProviderLocked: "Dostawca, z którego już korzystasz",
     introManualPhoneRoute: "Twój telefon",
     introStepOfTotal: ({ step, total }: TranslationParams) =>
@@ -1310,6 +1332,8 @@ const rawIntroTranslations = {
     introToFirstWord: "até à primeira palavra",
     introReplay: "Repetir",
     introChooseModel: "Escolher um modelo",
+    introMoreModels: "Mais modelos…",
+    introNotInstalled: "Não instalado",
     introProviderLocked: "Um fornecedor que já utiliza",
     introManualPhoneRoute: "O seu telemóvel",
     introStepOfTotal: ({ step, total }: TranslationParams) =>
@@ -1424,6 +1448,8 @@ const rawIntroTranslations = {
     introToFirstWord: "até a primeira palavra",
     introReplay: "Repetir",
     introChooseModel: "Escolher um modelo",
+    introMoreModels: "Mais modelos…",
+    introNotInstalled: "Não instalado",
     introProviderLocked: "Um provedor que você já usa",
     introManualPhoneRoute: "Seu telefone",
     introStepOfTotal: ({ step, total }: TranslationParams) =>
@@ -1538,6 +1564,8 @@ const rawIntroTranslations = {
     introToFirstWord: "до первого слова",
     introReplay: "Повторить",
     introChooseModel: "Выбрать модель",
+    introMoreModels: "Другие модели…",
+    introNotInstalled: "Не установлено",
     introProviderLocked: "Провайдер, которым вы уже пользуетесь",
     introManualPhoneRoute: "Ваш телефон",
     introStepOfTotal: ({ step, total }: TranslationParams) =>
@@ -1652,6 +1680,8 @@ const rawIntroTranslations = {
     introToFirstWord: "till första ordet",
     introReplay: "Spela igen",
     introChooseModel: "Välj en modell",
+    introMoreModels: "Fler modeller…",
+    introNotInstalled: "Inte installerad",
     introProviderLocked: "En leverantör du redan använder",
     introManualPhoneRoute: "Din telefon",
     introStepOfTotal: ({ step, total }: TranslationParams) =>
@@ -1766,6 +1796,8 @@ const rawIntroTranslations = {
     introToFirstWord: "ilk kelimeye kadar",
     introReplay: "Yeniden çal",
     introChooseModel: "Bir model seç",
+    introMoreModels: "Daha fazla model…",
+    introNotInstalled: "Yüklü değil",
     introProviderLocked: "Zaten kullandığın bir sağlayıcı",
     introManualPhoneRoute: "Telefonun",
     introStepOfTotal: ({ step, total }: TranslationParams) =>
@@ -1880,6 +1912,8 @@ const rawIntroTranslations = {
     introToFirstWord: "до першого слова",
     introReplay: "Повторити",
     introChooseModel: "Вибрати модель",
+    introMoreModels: "Інші моделі…",
+    introNotInstalled: "Не встановлено",
     introProviderLocked: "Провайдер, яким ви вже користуєтесь",
     introManualPhoneRoute: "Ваш телефон",
     introStepOfTotal: ({ step, total }: TranslationParams) =>
@@ -1994,6 +2028,8 @@ const rawIntroTranslations = {
     introToFirstWord: "پہلے لفظ تک",
     introReplay: "دوبارہ سنیں",
     introChooseModel: "ماڈل منتخب کریں",
+    introMoreModels: "مزید ماڈلز…",
+    introNotInstalled: "انسٹال نہیں ہے",
     introProviderLocked: "ایک فراہم کنندہ جو آپ پہلے سے استعمال کرتے ہیں",
     introManualPhoneRoute: "آپ کا فون",
     introStepOfTotal: ({ step, total }: TranslationParams) =>
@@ -2108,6 +2144,8 @@ const rawIntroTranslations = {
     introToFirstWord: "到第一个词",
     introReplay: "重播",
     introChooseModel: "选择模型",
+    introMoreModels: "更多模型…",
+    introNotInstalled: "未安装",
     introProviderLocked: "你已在使用的提供商",
     introManualPhoneRoute: "你的手机",
     introStepOfTotal: ({ step, total }: TranslationParams) =>
