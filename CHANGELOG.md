@@ -42,6 +42,10 @@ the complete Play Store translations are kept in a dedicated file under
   single-row action, with the complete message kept for screen readers.
 - Conversation forks now use a splitting-paths glyph everywhere instead of
   the developer-flavored git-branch symbol.
+- The walkthrough's back and close controls are now bare glyphs on their
+  44-point targets — no filled circles — and back is a full arrow.
+- The voice orb steps down a size while the setup banner is on screen instead
+  of squeezing the rest of the home screen.
 
 ### Changed
 

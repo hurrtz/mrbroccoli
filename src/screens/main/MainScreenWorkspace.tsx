@@ -372,7 +372,9 @@ export function MainScreenWorkspace({
           >
             <MainScreenVoiceStage
               colors={colors}
-              maxOrbSize={196}
+              // The banner row borrows vertical room from the stage; the orb
+              // steps down rather than squeezing the caption or satellites.
+              maxOrbSize={introBanner.visible ? 156 : 196}
               {...voiceStage}
               onInputSurfaceChange={handleSurfaceChange}
             />

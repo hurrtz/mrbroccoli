@@ -28,7 +28,7 @@ interface MainScreenVoiceStageProps {
   inputMode: InputMode;
   isActive: boolean;
   layout?: "portrait" | "landscape";
-  /** The orb's ceiling: 196 in portrait, 150 in landscape. */
+  /** The orb's ceiling: 196 in portrait (156 under the intro banner), 150 in landscape. */
   maxOrbSize: number;
   onInputSurfaceChange?: (surface: InputSurface) => void;
   onRemoveImage?: (attachmentId: string) => void;

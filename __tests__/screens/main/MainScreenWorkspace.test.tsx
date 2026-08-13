@@ -46,8 +46,10 @@ jest.mock("../../../src/screens/main/MainScreenRouteByline", () => ({
 jest.mock("../../../src/screens/main/VoiceTextInputPager", () => ({
   VoiceTextInputPager: ({
     compactPromptNotice = false,
+    maxOrbSize,
   }: {
     compactPromptNotice?: boolean;
+    maxOrbSize?: number;
   }) => {
     const React = require("react");
     const { Text } = require("react-native");
@@ -55,6 +57,7 @@ jest.mock("../../../src/screens/main/VoiceTextInputPager", () => ({
     return React.createElement(
       Text,
       {
+        accessibilityHint: String(maxOrbSize),
         accessibilityValue: {
           text: compactPromptNotice ? "compact" : "regular",
         },
@@ -286,6 +289,45 @@ describe("MainScreenWorkspace streaming isolation", () => {
     ).toEqual({ text: "compact" });
     expect(screen.getByTestId("workspace-status-line")).toBeTruthy();
     expect(screen.getByTestId("landscape-right-pane")).toBeTruthy();
+  });
+
+  it("steps the orb ceiling down while the intro banner is visible", () => {
+    const t = jest.fn((key: string) => key);
+    const workspaceProps = createWorkspaceProps(t);
+    const transcript = {
+      activeConversationId: null,
+      activeReplayMessageId: null,
+      messages: [],
+      onCopyMessage: jest.fn(async () => true),
+      onRetryMessage: jest.fn(),
+      replayPhase: "idle" as const,
+      scrollEnabled: true,
+      showUsageStats: false,
+      showWhenEmpty: true,
+      t,
+    };
+    const screen = renderWorkspace(
+      <MainScreenWorkspace
+        {...workspaceProps}
+        introBanner={{ ...workspaceProps.introBanner, visible: true }}
+        transcript={transcript}
+      />,
+    );
+
+    expect(
+      screen.getByTestId("voice-text-input-pager").props.accessibilityHint,
+    ).toBe("156");
+
+    screen.rerender(
+      <MainScreenWorkspace
+        {...workspaceProps}
+        introBanner={{ ...workspaceProps.introBanner, visible: false }}
+        transcript={transcript}
+      />,
+    );
+    expect(
+      screen.getByTestId("voice-text-input-pager").props.accessibilityHint,
+    ).toBe("196");
   });
 
   it("compacts the blocked-route notice in landscape at normal text size", () => {
