@@ -4,7 +4,7 @@ import { PhosphorIcon } from "../core/PhosphorIcon";
 /** The gold premium offer band — gradient badge, sweeping sheen, one Upgrade action. The one deliberately fancy surface. */
 export function PremiumBand({ copy, actionLabel = "Upgrade", onPress }) {
   return (
-    <div style={{ position: "relative", overflow: "hidden", display: "flex", alignItems: "center", gap: 12, minHeight: 64, padding: "12px 14px", borderTop: "1px solid var(--mb-color-premium-border, rgba(160,124,31,.4))", background: "linear-gradient(120deg, rgba(200,160,40,.16), rgba(200,160,40,.05) 45%, rgba(200,160,40,.18))" }}>
+    <div style={{ position: "relative", overflow: "hidden", display: "flex", alignItems: "center", gap: 12, minHeight: 64, padding: "12px 14px", background: "linear-gradient(120deg, rgba(200,160,40,.16), rgba(200,160,40,.05) 45%, rgba(200,160,40,.18))" }}>
       <span aria-hidden="true" style={{ position: "absolute", top: 0, left: "-30%", width: "32%", height: "100%", background: "linear-gradient(105deg, transparent, rgba(255,246,214,.5), transparent)", transform: "skewX(-18deg)", animation: "mb-sheen 3.2s ease-in-out infinite" }} />
       <style>{"@keyframes mb-sheen{0%,55%{left:-32%}85%,100%{left:130%}}"}</style>
       <span style={{ width: 36, height: 36, borderRadius: 18, flexShrink: 0, display: "inline-flex", alignItems: "center", justifyContent: "center", background: "linear-gradient(150deg, #E3B84C, #A07C1F)", boxShadow: "0 2px 8px rgba(160,124,31,.4)" }}>

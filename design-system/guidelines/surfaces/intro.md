@@ -1,27 +1,33 @@
 # Surface: the introduction
 
-The normative description of the first-launch walkthrough. Living demo: `ui_kits/intro/`. Components: `components/intro/`.
+The normative description of the first-launch walkthrough. Living demo: `ui_kits/intro/`. Component: `components/intro/IntroFlow.jsx` (steps, copy defaults, manual catalogue, gating).
 
 ## Steps
 
-Seven, in order: welcome, what setup actually requires, **automatic on-device setup (`auto`)**, the one requirement (`llm`), speech in, speech out, Premium — `INTRO_STEPS = ["welcome", "requirements", "auto", "llm", "stt", "tts", "premium"]`. `auto` sits after `requirements` and before `llm` because the manual routes are the fallback now — someone who takes the tap never needs the three screens that follow, and someone who declines has lost a swipe. `IntroStepper` takes any count without changes.
+Three — `INTRO_STEPS = ["welcome", "setup", "try"]` — replacing the earlier seven-page wizard (2026-08): a walkthrough that demonstrates instead of describing, one setup screen with a single green path, and a live test where the user judges the result. The old requirements / auto / llm / stt / tts / premium pages collapse into step 2; premium appears nowhere in the flow (the first premium surface a new user meets is the settings overview, after the app has proven itself).
 
-On the `auto` step the `AutoSetupCard`'s own header is hidden: the step title and body already say what it is. See `guidelines/surfaces/on-device.md` for the card itself. The `auto` step also carries the **device probe** ("Test this device", with the memory · storage readout) — moved here from settings when the On-device page was retired (`guidelines/surfaces/settings.md`): capability is a first-launch question, so the walkthrough answers it.
+## First-run integrity
 
-## Navigation
+On a first run there is no close control — the three steps are the way in. Step 2's forward action stays disabled until a reasoning model is actually running (the one hard requirement; speech routes default to the system). Step 3 ends in a full-width **Done** that stays disabled until one successful test turn. A re-entry (`firstRun={false}`) restores the close control on steps 1–2 and unlocks both gates; step 3 never shows close — Done is the exit. Navigation controls are borderless bare glyphs (44pt targets): `back` (arrow-left), `close` (x), the accent forward orb.
 
-Every step is reachable from the header stepper as well as the arrows; the last step's forward action becomes a finish action. Upstream, `IntroFlowScreen.tsx` puts the steps in a horizontally paged `ScrollView`, so they can also be swiped; the web kit renders only the current step, so arrows and stepper are the whole navigation there — the gesture is what is missing, not a direction.
+## Step 1 · Welcome
 
-## Header targets
+Under the headline, the **stored intro session** emerges from blur (4 → 2.4 → 1.1 px, plus a mask fade): three earlier turns in the app's messenger anatomy, culminating in the crisp query *"Prove it, Mr Broccoli — say hello in your own voice."* The centered play button answers it with the localized recording (`intro-<lang>.m4a`, 19 languages); the delicate language switch sits beneath, and switching must swap the on-screen dialogue with the audio so the pairing holds. After play, the whitespace takes a `···`-separated **informational voice note** (off-device partner voice vs on-device difference — no premium pitch). The blurred turns are `aria-hidden`; user bubbles use the accent-soft tint, not filled accent. The dialogue is not theater: it ships as a real stored session. **Open decision (owner):** when that session appears in the conversations drawer — from day one, or only after the user first opens it from here (designer's lean: the latter).
 
-The app's `headerButton` style is 40×40, below the 44pt minimum. The circle stays drawn at 40 so the header looks identical, but the button around it is 44×44 with a −2 margin. This is the system's precedent for visual-smaller-than-target controls; follow it rather than inventing a second approach.
+## Step 2 · Don't panic
+
+Title "Don't panic", body "One required download and it works.", hairline divider. The uncontained hero: "Let's get you started", the promise in prose (measuring first — nothing downloads unseen), the three pipeline glyphs (**He listens · He thinks · He answers** — persona pronoun per `guidelines/content.md`), and one green **Set up automatically** button that hands off to the auto-setup job (any non-idle state renders `AutoSetupCard`, `showHeader={false}`; the device probe lives inside that job's measure step). Beneath, right-aligned: **"Show manual setup"** in regular body type with an OS-native switch — off by default, reset on every open. Toggled on, a "Manual setup" headline introduces the pipeline-ordered groups, each captioned with a right-aligned Required/Optional tag pill and built from the settings primitives (`RouteOptionRow` + `IconAction`): system routes are plain "Your phone" rows (selected, no meta), models carry name + "Not installed · size" + the download squircle, the provider route is a locked ghost. The settings lifecycle applies verbatim: download → test → radio unlocks; removal by swipe.
+
+## Step 3 · Try it out!
+
+Body: "Your setup is running — ask something and hear how he answers. Not happy with it? Step back, change it, try again." Divider, then the **ephemeral test**: hold-to-talk mic (76pt, "Hold to talk" beneath), the user's words transcribed as an accent-soft bubble, the spoken reply as an incoming bubble, and a meta row "**2.4 s to first word · 🔊 Replay**" (latency = release-to-speech; the number that improves when routes change). Nothing is saved. A turn that completes unlocks Done. Integration note: the test turn runs on the user's configured model — free and local on the default path; show a caution only if a provider key is already active.
 
 ## The banner (`IntroBanner`)
 
-The route into the walkthrough from the home screen. Violet `#5B21B6`, fixed in both appearances — on a first launch it must not read as part of the furniture; it is the only surface in the product that does not follow the theme. Its dismiss control is withheld until the user has opened the intro at least once: on first launch the banner is the only route in, and a close button beside an unread offer invites removing it unseen. In landscape it collapses to a single 48pt row with the title centred. While it is up, the orb steps down from 196 to 156 so the column still fits.
+The route into the walkthrough from the home screen. Violet, fixed in both appearances — on a first launch it must not read as part of the furniture; it is the only surface in the product that does not follow the theme. Settled anatomy (2026-08): a violet gradient row (`--mb-color-intro-banner-grad-a/-b`) with a plain play glyph in a hairline circle — the walkthrough is spoken, and the affordance says so — setup-focused copy ("Set up Mr Broccoli" / "A minute of setup gets him thinking, hearing you and speaking back."), a trailing chevron, and the slow sheen shared with `PremiumBand` (the product's two invitation surfaces; nothing else animates as ornament). The whole banner is one pressable. Its dismiss control is withheld until the user has opened the intro at least once. In landscape it collapses to a single 48pt row. While it is up, the orb steps down from 196 to 156 so the column still fits.
 
-**Open decision (owner):** Premium reads two ways — the introduction banner is violet, the Premium button is gold. One of them is wrong; the decision is parked.
+**Resolved (owner, 2026-08):** the violet/gold tension — the banner stays violet (attention), premium is gold everywhere else. The two never mean the same thing: violet invites setup, gold invites purchase.
 
-## Audio examples
+## Superseded
 
-The speech steps carry play controls and a language picker for the 19 localised intro recordings (`intro-<lang>.m4a`). In the web kit the controls toggle state only; no clip plays.
+The seven-step wizard (welcome / requirements / auto / llm / stt / tts / premium), its `IntroPanel`/`IntroPoint`/`IntroDivider`/`IntroButton` step layouts, and `IntroVoicePicker` are superseded by this design. The primitives remain compiled for specimen cards and ad-hoc use until the app migration retires them. Upstream `IntroFlowScreen.tsx` swipe-paging maps to three pages now.

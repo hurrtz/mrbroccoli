@@ -1,4 +1,4 @@
-<!-- @dsCard group="Mr Broccoli app" viewport="820x1150" name="Mobile app" subtitle="Voice-first workspace, conversations and settings, portrait and landscape, both appearances" -->
+<!-- @dsCard group="Mr Broccoli app" viewport="820x1850" name="Mobile app" subtitle="Voice-first workspace incl. drive session, conversations and settings, portrait and landscape" -->
 <!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><title>Mr Broccoli — mobile app</title>
 <link rel="stylesheet" href="../../styles.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/regular/style.css">
@@ -19,6 +19,7 @@ body{margin:0;background:#8f8d86;display:flex;align-items:flex-start;justify-con
 </head><body>
 <div><p class="caption">Light</p><div class="device" id="light" data-theme="light"></div></div>
 <div><p class="caption">Dark</p><div class="device" id="dark" data-theme="dark"></div></div>
+<div><p class="caption">Drive session · controls above the dock</p><div class="device" id="drive" data-theme="light"></div></div>
 <div><p class="caption">In conversation · transcript open</p><div class="device" id="conversation" data-theme="dark"></div></div>
 <div><p class="caption">Landscape</p><div class="device land" id="landscape" data-theme="light"></div></div>
 <script type="text/babel" src="./Workspace.jsx"></script>
@@ -32,10 +33,10 @@ body{margin:0;background:#8f8d86;display:flex;align-items:flex-start;justify-con
 <script type="text/babel">
 const SETTINGS_PAGES = () => ({
   connections: window.ConnectionsPage, thinking: window.ThinkingPage, search: window.SearchPage,
-  listening: window.ListeningPage, speaking: window.SpeakingPage, local: window.OnDevicePage,
+  listening: window.ListeningPage, speaking: window.SpeakingPage,
   data: window.DataPrivacyPage, app: window.AppPage,
 });
-function App({ initialRoute, failInstall, initialTranscript }){
+function App({ initialRoute, failInstall, initialTranscript, driveMode }){
   const [route,setRoute]=React.useState(initialRoute||"workspace");
   const [conversation,setConversation]=React.useState(window.MB_DATA.conversations[0]);
   const [toast,setToast]=React.useState(null);
@@ -45,7 +46,7 @@ function App({ initialRoute, failInstall, initialTranscript }){
   // already stated in full, and a toast on top of it would say it twice.
   const place=React.useRef({route,intro});
   place.current={route,intro};
-  const elsewhere=()=>place.current.route!=="local"&&!place.current.intro;
+  const elsewhere=()=>place.current.route!=="app"&&!place.current.intro;
   const auto=window.useAutoSetupFlow({
     failAt: failInstall?0.55:undefined,
     onFinished:()=>{ if(elsewhere()) setToast({tone:"success",message:"On-device AI is ready. Three models installed."}); },
@@ -56,7 +57,7 @@ function App({ initialRoute, failInstall, initialTranscript }){
     <div className="screen">
       {route==="workspace" ? <window.Workspace conversationTitle={conversation.title} toast={toast}
         onDismissToast={()=>setToast(null)} auto={auto} introVisible={intro} onIntroVisible={setIntro} initialTranscript={initialTranscript}
-        onOpenLocalModels={()=>{setIntro(false);setRoute("local");}}
+        onOpenLocalModels={()=>{setIntro(false);setRoute("app");}} driveMode={driveMode}
         onOpenDrawer={()=>setRoute("drawer")} onOpenSettings={()=>setRoute("settings")} /> : null}
       {route==="drawer" ? <window.ConversationDrawerScreen activeId={conversation.id}
         onSelect={(next)=>{setConversation(next);setRoute("workspace");}}
@@ -69,7 +70,8 @@ function App({ initialRoute, failInstall, initialTranscript }){
   </>;
 }
 ReactDOM.createRoot(document.getElementById("light")).render(<App initialRoute="workspace" />);
-ReactDOM.createRoot(document.getElementById("dark")).render(<App initialRoute="local" failInstall />);
+ReactDOM.createRoot(document.getElementById("dark")).render(<App initialRoute="app" failInstall />);
+ReactDOM.createRoot(document.getElementById("drive")).render(<App initialRoute="workspace" driveMode />);
 ReactDOM.createRoot(document.getElementById("conversation")).render(<App initialRoute="workspace" initialTranscript />);
 ReactDOM.createRoot(document.getElementById("landscape")).render(<>
   <div className="status"><span>9:41</span><span>Mr Broccoli</span><span>100%</span></div>

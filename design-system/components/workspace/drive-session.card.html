@@ -1,0 +1,34 @@
+<!-- @dsCard group="Components" viewport="880x460" name="Drive session controls" subtitle="Pause/Resume toggle with live fill, repeat, and the silence countdown" -->
+<!DOCTYPE html><html><head><meta charset="utf-8"><title>Drive session controls</title>
+<link rel="stylesheet" href="../../styles.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/regular/style.css">
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script src="../../_ds_bundle.js"></script>
+<style>
+body{margin:0;padding:20px;background:#8f8d86;display:flex;gap:20px;flex-wrap:wrap;font-family:var(--mb-font-body)}
+.pane{flex:1;min-width:380px;border-radius:16px;padding:18px;display:flex;flex-direction:column;gap:14px;background:var(--mb-color-background)}
+.lbl{font-family:var(--mb-font-mono);font-size:9px;letter-spacing:.9px;text-transform:uppercase;color:var(--mb-color-text-muted);margin:0}
+</style>
+</head><body>
+<div class="pane" data-theme="light" id="light"></div>
+<div class="pane" data-theme="dark" id="dark"></div>
+<script type="text/babel">
+const { DriveSessionControls } = window.MrBroccoliDesignSystem_62d510;
+function Specimen(){
+  return <>
+    <p className="lbl">Live · silence counting down</p>
+    <DriveSessionControls running canRepeat countdownSeconds={4} />
+    <p className="lbl">Live · listening</p>
+    <DriveSessionControls running canRepeat />
+    <p className="lbl">Paused · repeat available</p>
+    <DriveSessionControls running={false} canRepeat />
+    <p className="lbl">Pipeline busy</p>
+    <DriveSessionControls running disabled />
+  </>;
+}
+ReactDOM.createRoot(document.getElementById("light")).render(<Specimen />);
+ReactDOM.createRoot(document.getElementById("dark")).render(<Specimen />);
+</script>
+</body></html>

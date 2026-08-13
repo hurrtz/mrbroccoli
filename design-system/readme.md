@@ -18,7 +18,7 @@ One product: the **Mr Broccoli mobile app** (Expo / React Native, iOS and Androi
 | `templates/` | Starting folders a consuming project copies |
 | `ui_kits/mobile-app/` | Click-through recreation of the workspace |
 | `ui_kits/settings/` | The seven-page settings modal — same structure in both editions |
-| `ui_kits/intro/` | The seven-step introduction walkthrough |
+| `ui_kits/intro/` | The three-step introduction: welcome, setup, ephemeral test |
 | `assets/` | Fonts (Unica One, Outfit), 47 provider SVGs, app icons |
 | `SKILL.md` | Agent-skill entry point |
 | `github.md` | Source-repository association |
@@ -36,7 +36,7 @@ One product: the **Mr Broccoli mobile app** (Expo / React Native, iOS and Androi
 **List** — `List`, `ListItem` (with `ListItem.Brief`).
 **Overlays** — `Modal`, `Toast`.
 **Settings primitives** — `SettingsGroup`, `SettingsRow`, `RouteOptionRow`, `IconAction`, `PremiumBand`, `RuntimeReadiness`; superseded Ant recreation retained where still mounted: `AntSettingsCard`, `AntDisclosureCard`, `AntButtonLabel`, `AntSectionIntro`, `AntRadioSection`, `AntSwitchRow`, `AntNumberInputRow`, `AntTextArea`, `AntPickerRow`, `AntPickerRows`, `AntPickerSection`.
-**Workspace** — `AppWordmark`, `RouteByline`, `RoutePicker`, `Composer`, `Picker`, `ResponseModeToggle`, `PhaseAwareVoiceAction`, `IntroBanner`, `PremiumUpgradeModal`, `VoiceOrb`, `OrbSatellite`, `ConversationSettingsSummary`, `WorkspaceStatusLine`, `TranscriptHandle`, `BackgroundTaskBar`.
+**Workspace** — `AppWordmark`, `RouteByline`, `RoutePicker`, `Composer`, `Picker`, `ResponseModeToggle`, `PhaseAwareVoiceAction`, `IntroBanner`, `PremiumUpgradeModal`, `DriveSessionControls`, `VoiceOrb`, `OrbSatellite`, `ConversationSettingsSummary`, `WorkspaceStatusLine`, `TranscriptHandle`, `BackgroundTaskBar`.
 **Chat** — `ChatBubble`, `ChatTranscript`, `TranscriptMessage`, `ConversationDrawerItem`, `ConversationActionSheet`, `ConversationRenameModal`, `ConversationIntegrityModal`, `MessageImageAttachments`, `TurnReceiptCard`, `WebSearchReferences`, `UsageCard`, `UberModeAuditCard`, `ReplyFailureCard`, `PipelineNotices`, `MessageBranchIndicator`, `ConversationMemoryModal`.
 **Brand** — `ProviderIcon`.
 **Introduction** — `IntroFlow`, `IntroStepper`, `IntroPanel`, `IntroPoint`, `IntroButton`, `IntroTitle`, `IntroBody`, `IntroDivider`, `IntroVoicePicker`.

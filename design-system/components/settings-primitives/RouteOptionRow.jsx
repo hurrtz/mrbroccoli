@@ -14,7 +14,9 @@ export function RouteOptionRow({ selected = false, disabled = false, locked = fa
           <span style={{ display: "block", fontFamily: "var(--mb-font-body-medium)", fontWeight: 500, fontSize: 15, color: "var(--mb-color-text)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{label}</span>
           {meta ? <span style={{ display: "block", marginTop: 2, fontFamily: "var(--mb-font-mono)", fontSize: 10, letterSpacing: ".4px", color: "var(--mb-color-text-muted)" }}>{meta}</span> : null}
         </span>
-        <PhosphorIcon name="lock" size="compact" color="var(--mb-color-text-muted)" />
+        <span aria-hidden="true" style={{ width: 44, height: 44, margin: "-7px -8px -7px 0", flexShrink: 0, display: "inline-flex", alignItems: "center", justifyContent: "center" }}>
+          <PhosphorIcon name="lock" size="compact" color="var(--mb-color-text-muted)" />
+        </span>
       </div>
     );
   }

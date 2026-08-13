@@ -1,16 +1,14 @@
-The seven-step introduction that `IntroBanner` opens — the app's only onboarding, and never a blocking wizard.
+The three-step introduction that `IntroBanner` opens — the app's only onboarding, never a blocking wizard.
 
 ```jsx
-<IntroBanner title="New here?" body="See what Mr Broccoli does and pick how to power it."
-  action="Take a look" onOpen={() => setIntro(true)} />
-<IntroFlow visible={intro} onClose={() => setIntro(false)} autoSetup={auto.cardProps}
-  onInstallLocal={openOnDevice} onConnectProvider={openConnections} onOpenPremium={openPremium} />
+<IntroBanner onOpen={() => setIntro(true)} />
+<IntroFlow visible={intro} onClose={() => setIntro(false)}
+  autoSetup={auto.cardProps} thinkingReady={llmRunning}
+  onPressMic={startTestTurn} onChangeLanguage={cycleIntroLanguage} />
 ```
 
-Seven steps in this order: the greeting, the honest shape of setup, the offer to pick and install on-device models automatically, the one requirement, speech in, speech out, and what Premium adds. The order is the argument — it tells someone how little is actually required, offers to do that little for them, and only then mentions anything they could buy.
+Steps: **welcome** (the stored intro session emerges from blur under the headline; play answers the crisp query "Prove it, Mr Broccoli — say hello in your own voice."; after play, an informational voice note fills the whitespace), **setup** ("Don't panic" — one green "Set up automatically" action; "Show manual setup" switch reveals the pipeline-ordered groups He listens / He thinks / He answers built from `RouteOptionRow` + `IconAction`), **try** (ephemeral test: hold to talk, own words transcribed, spoken reply with "2.4 s to first word · Replay", full-width Done).
 
-The automatic-setup step carries `AutoSetupCard` with its header hidden, since the step title already says what it is. Pass `autoSetup` when the install must survive the introduction closing; leave it out and the card drives itself.
+First-run integrity (`firstRun`, default true): no close control anywhere; step 2's forward orb stays disabled until `thinkingReady`; Done stays disabled until one test turn exists. Re-entry (`firstRun={false}`) restores close on steps 1–2 (never step 3 — Done is the exit) and unlocks both gates. The manual switch resets to off on every open.
 
-It fills its container and follows the app's appearance rather than carrying its own. Every step is reachable in both directions, from the header stepper as well as the arrows; a one-way path made the last step a dead end.
-
-Pass `copy` to translate. `onConnectProvider` and `onOpenPremium` receive the step they were invoked from, so a cancelled purchase can hand the reader back where they were instead of restarting.
+Persona: Mr Broccoli is a "he" (see guidelines/content.md); premium appears nowhere in the flow. Copy defaults are canonical — override `copy` only to translate, and swap the on-screen dialogue with the audio language so the "say hello" pairing holds.

@@ -27,3 +27,11 @@ How Mr Broccoli writes. These rules apply to UI copy, settings summaries, warnin
 **Nineteen languages, including right-to-left.** English strings are the shortest of the set. Never build a layout that depends on an English string's length, and never truncate a label to make a row fit; the rows grow instead. Every new string needs a key in every locale file. Formatted values (times, counts) are composed by the formatter, not concatenated, so RTL locales can reorder them.
 
 **Accessible name and visible state come from one value.** A component must never show "no messages" while announcing "12 messages". Derive the label and the text from a single source — this failure occurred three separate times during the system's own construction.
+
+## Premium honesty
+
+Premium unlocks bring-your-own-key routes; it includes no models, voices or credits. Detail copy (upgrade sheet, locked sections, the voice note after the intro’s play button) always states "your own key". Teaser copy (the gold band) may name capabilities without the caveat, because every teaser opens the sheet that carries it.
+
+## Persona pronoun
+
+Mr Broccoli is a "he", never an "it": "he listens", "he thinks", "he answers", "gets him thinking". Applies to every surface that speaks about the app — onboarding, banner, settings copy alike. The app still says "I" when speaking as itself.

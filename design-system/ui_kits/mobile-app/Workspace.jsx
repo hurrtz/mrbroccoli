@@ -1,7 +1,7 @@
 const { AppWordmark, IconButton, PhosphorIcon, RouteByline, VoiceOrb, OrbSatellite,
         ConversationSettingsSummary, WorkspaceStatusLine, TranscriptHandle,
         ChatBubble, ChatTranscript, TranscriptMessage, Toast, Modal, ProviderIcon, BackgroundTaskBar,
-        IntroBanner, IntroFlow, RoutePicker, Composer } = window.MrBroccoliDesignSystem_62d510;
+        IntroBanner, IntroFlow, RoutePicker, Composer, DriveSessionControls } = window.MrBroccoliDesignSystem_62d510;
 
 const ASSETS = "../../assets/providers";
 const ORB = 196;
@@ -157,7 +157,7 @@ function AutoSetupIndicator({ auto, onOpen }) {
   return null;
 }
 
-function Workspace({ onOpenDrawer, onOpenSettings, onOpenLocalModels, conversationTitle, toast, onDismissToast, auto, introVisible, onIntroVisible, initialTranscript }) {
+function Workspace({ onOpenDrawer, onOpenSettings, onOpenLocalModels, conversationTitle, toast, onDismissToast, auto, introVisible, onIntroVisible, initialTranscript , driveMode = false }) {
   const conversation = useConversation();
   const turn = useTurnScript(conversation.commit);
   const [surface, setSurface] = React.useState("voice");
@@ -170,6 +170,7 @@ function Workspace({ onOpenDrawer, onOpenSettings, onOpenLocalModels, conversati
   const intro = introVisible === undefined ? localIntro : introVisible;
   const setIntro = onIntroVisible || setLocalIntro;
   const [introOpened, setIntroOpened] = React.useState(false);
+  const [driveAuto, setDriveAuto] = React.useState(true);
 
   const [stageRef, orbSize] = useFitSize(ORB, 96, 96);
 
@@ -185,8 +186,7 @@ function Workspace({ onOpenDrawer, onOpenSettings, onOpenLocalModels, conversati
           <IconButton icon="setting" accessibilityLabel="Settings" onClick={onOpenSettings} />
         </div>
 
-        <IntroBanner visible={banner} title="New here?"
-          body="See what Mr Broccoli does and pick how to power it." action="Take a look"
+        <IntroBanner visible={banner}
           showDismiss={introOpened} onDismiss={() => setBanner(false)}
           onOpen={() => { setIntro(true); setIntroOpened(true); }} />
 
@@ -217,6 +217,9 @@ function Workspace({ onOpenDrawer, onOpenSettings, onOpenLocalModels, conversati
           </div>
         </div>
 
+        {driveMode && DriveSessionControls ? <div style={{ padding: "0 16px 2px" }}>
+          <DriveSessionControls running={driveAuto} canRepeat onToggle={() => setDriveAuto(!driveAuto)} onRepeat={() => {}} />
+        </div> : null}
         <WorkspaceStatusLine phase={turn.current ? turn.current.phase : "idle"}
           title={turn.current ? turn.current.title : surface === "text" ? "Type and send" : "Tap to speak"}
           detail={turn.current ? turn.current.detail : conversationTitle + " · " + conversation.messages.length + " messages"}
@@ -311,8 +314,7 @@ function LandscapeWorkspace({ onOpenDrawer, onOpenSettings, onOpenLocalModels, c
       </div>
       <div style={{ width: 1, alignSelf: "stretch", background: "var(--mb-color-border)" }} />
       <div style={{ flex: 1, minWidth: 0, paddingLeft: 12, paddingTop: 10, display: "flex", flexDirection: "column", minHeight: 0 }}>
-        <IntroBanner visible={banner} compact title="New here?"
-          body="See what Mr Broccoli does and pick how to power it." action="Take a look"
+        <IntroBanner visible={banner} compact
           showDismiss={introOpened} onDismiss={() => setBanner(false)}
           onOpen={() => { setIntro(true); setIntroOpened(true); }} />
         <ChatTranscript style={{ flex: 1, paddingBottom: 8 }}>

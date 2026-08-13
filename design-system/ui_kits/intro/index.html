@@ -1,4 +1,4 @@
-<!-- @dsCard group="Mr Broccoli app" viewport="820x760" name="Introduction" subtitle="The seven-step walkthrough, both appearances" -->
+<!-- @dsCard group="Mr Broccoli app" viewport="1220x760" name="Introduction" subtitle="The three-step first run: welcome, setup, ephemeral test" -->
 <!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><title>Mr Broccoli — introduction</title>
 <link rel="stylesheet" href="../../styles.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/regular/style.css">
@@ -14,18 +14,19 @@ body{margin:0;background:#8f8d86;display:flex;align-items:flex-start;justify-con
 .screen{position:absolute;inset:26px 0 0;overflow:hidden}
 </style>
 </head><body>
-<div><p class="caption">Welcome · light</p><div class="device" id="light" data-theme="light"></div></div>
-<div><p class="caption">Automatic setup · dark</p><div class="device" id="dark" data-theme="dark"></div></div>
+<div><p class="caption">1 · Welcome · light</p><div class="device" id="one" data-theme="light"></div></div>
+<div><p class="caption">2 · Don't panic · dark</p><div class="device" id="two" data-theme="dark"></div></div>
+<div><p class="caption">3 · Try it out (after a turn) · light</p><div class="device" id="three" data-theme="light"></div></div>
 <script type="text/babel">
 const { IntroFlow } = window.MrBroccoliDesignSystem_62d510;
-function Frame({ initialStep }){
+function Frame({ ...props }){
   return <>
     <div className="status"><span>9:41</span><span>Mr Broccoli</span><span>100%</span></div>
-    <div className="screen"><IntroFlow visible initialStep={initialStep}
-      onClose={()=>{}} onConnectProvider={()=>{}} onInstallLocal={()=>{}} onOpenPremium={()=>{}} onOpenStt={()=>{}} onOpenTts={()=>{}} /></div>
+    <div className="screen"><IntroFlow visible onClose={()=>{}} {...props} /></div>
   </>;
 }
-ReactDOM.createRoot(document.getElementById("light")).render(<Frame initialStep={0} />);
-ReactDOM.createRoot(document.getElementById("dark")).render(<Frame initialStep={2} />);
+ReactDOM.createRoot(document.getElementById("one")).render(<Frame initialStep={0} />);
+ReactDOM.createRoot(document.getElementById("two")).render(<Frame initialStep={1} />);
+ReactDOM.createRoot(document.getElementById("three")).render(<Frame initialStep={2} demoTurn={{question:"How long would it take me to count to a million?",answer:"About 23 days without sleeping — one number a second, and the long numbers slow you down.",latency:"2.4 s"}} />);
 </script>
 </body></html>

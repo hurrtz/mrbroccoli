@@ -6,6 +6,7 @@ branch: main
 date: 2026-08-10
 
 ### Updated in this project
+- Introduction redesigned to three steps (welcome with stored intro session, "Don’t panic" setup, ephemeral test with gated Done); IntroFlow, intro kit and intro.md rebuilt; banner and persona-pronoun rules already recorded.
 
 - Added automatic on-device setup: `AutoSetupCard`, `AutoSetupPlanRow`, `InstallProgress`, `BackgroundTaskBar`.
 - `IntroFlow` gained an `auto` step — `INTRO_STEPS` is seven ids, not six.

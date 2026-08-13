@@ -7,14 +7,14 @@ export const MIN_ICON_TOUCH_TARGET = 44;
 /** The application glyph boundary. Semantic names only — never a raw Phosphor class. */
 export const PHOSPHOR_ICONS = {
   "arrow-down": "arrow-down", "arrow-left": "arrow-left", "arrow-right": "arrow-right", "arrow-up": "arrow-up",
-  audio: "waveform", check: "check", "check-circle": "check-circle", "checkbox-checked": "check-square",
+  audio: "waveform", back: "arrow-left", check: "check", "check-circle": "check-circle", "checkbox-checked": "check-square",
   "checkbox-unchecked": "square", close: "x", control: "sliders-horizontal", copy: "copy",
   "customer-service": "headset", delete: "trash", down: "caret-down", download: "download-simple",
   edit: "pencil-simple", "ellipsis-vertical": "dots-three-vertical", "exclamation-circle": "warning-circle",
   export: "export", eye: "eye", "eye-invisible": "eye-slash", "file-text": "file-text", "folder-open": "folder-open",
   global: "globe-hemisphere-west", branch: "arrows-split", bug: "bug", headphones: "headphones", inbox: "tray",
   image: "image", "info-circle": "info", key: "key", left: "caret-left", "line-chart": "chart-line-up",
-  loading: "spinner-gap", lock: "lock", menu: "list", message: "chat-circle", mic: "microphone", pause: "pause",
+  loading: "spinner-gap", lock: "lock", menu: "list", message: "chat-circle", mic: "microphone", pause: "pause", play: "play",
   "play-circle": "play-circle", plus: "plus", pushpin: "push-pin", redo: "repeat", "radio-selected": "radio-button",
   "radio-unselected": "circle", reload: "arrow-clockwise", right: "caret-right", robot: "robot",
   "safety-certificate": "shield-check", search: "magnifying-glass", send: "paper-plane-tilt", setting: "gear",

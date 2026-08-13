@@ -1,14 +1,15 @@
 export interface IntroBannerProps {
-  title: string;
-  body: string;
-  /** The call to action inside the white pill. */
-  action: string;
+  /** Defaults to "Set up Mr Broccoli". */
+  title?: string;
+  /** Defaults to "A minute of setup gets him thinking, hearing you and speaking back.". */
+  body?: string;
   /** The dismiss control. Withhold it until the user has opened the intro at least once — see IntroBanner.prompt.md. */
   showDismiss?: boolean;
+  /** The whole banner is one pressable; the play circle is an affordance, not a separate target. */
   onOpen?: () => void;
   onDismiss?: () => void;
   visible?: boolean;
-  /** A single 48pt row instead of the card — centred title only. For landscape, where the full card takes nearly half the column. `body` and `action` are dropped. */
+  /** Single 48pt row for landscape. */
   compact?: boolean;
 }
 

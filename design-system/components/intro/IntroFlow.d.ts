@@ -1,37 +1,59 @@
-import React from "react";
+export type IntroStep = "welcome" | "setup" | "try";
+export declare const INTRO_STEPS: IntroStep[];
+export declare const INTRO_COPY: Record<string, string>;
 
-/** The seven step ids, in order. */
-export const INTRO_STEPS: string[];
+export interface IntroManualRow {
+  id: string;
+  label: string;
+  /** Mono meta: install state · size, or provider attribution. Omit for system routes. */
+  meta?: string;
+  selected?: boolean;
+  /** Radio dimmed until the model has tested viable (settings lifecycle). */
+  disabled?: boolean;
+  /** Free-edition ghost with lock glyph. */
+  locked?: boolean;
+  /** "download" renders the IconAction download squircle. */
+  action?: "download" | null;
+}
+export interface IntroManualGroup {
+  label: string;
+  required?: boolean;
+  rows: IntroManualRow[];
+}
+/** Pipeline-ordered defaults: He listens · He thinks (required) · He answers. */
+export declare const DEFAULT_MANUAL_GROUPS: IntroManualGroup[];
 
-/** English defaults for every string the flow renders. */
-export const INTRO_COPY: Record<string, string>;
+export interface IntroTestTurn {
+  question: string;
+  answer: string;
+  /** Release-to-first-word latency, e.g. "2.4 s". */
+  latency: string;
+}
+/** The sample turn a preview mic-press produces when onPressMic is not wired. */
+export declare const DEMO_TURN: IntroTestTurn;
 
-/**
- * The seven-step introduction the workspace banner opens: what the app is, what
- * setup requires, the offer to set the device up automatically, the one
- * requirement, the two optional parts, and Premium.
- */
 export interface IntroFlowProps {
   visible?: boolean;
-  /** Step to open on. A fresh open passes 0; a return from purchase passes the step it left. */
   initialStep?: number;
-  /** Overrides for any INTRO_COPY key. Merge, not replace. */
-  copy?: Partial<Record<string, string>>;
-  /**
-   * Props for the automatic-setup step's card. Omit and the card runs itself;
-   * pass state, fraction, scanned and handlers when the install has to keep
-   * running after the introduction is closed.
-   */
-  autoSetup?: Record<string, unknown>;
+  /** First run: no close control, gated forward (step 2) and Done (step 3). Re-entry (false) relaxes all three. */
+  firstRun?: boolean;
+  /** True once a reasoning model is actually running — unlocks step 2's forward action. */
+  thinkingReady?: boolean;
+  /** Show step 3 with this turn already taken (unlocks Done). */
+  demoTurn?: IntroTestTurn | null;
+  /** String overrides merged over INTRO_COPY (translation). */
+  copy?: Record<string, string>;
+  /** AutoSetupCard cardProps; the hero button calls autoSetup.onStart, and any non-idle state renders the card. */
+  autoSetup?: object;
+  manualGroups?: IntroManualGroup[];
+  /** Display label of the intro-recording language, e.g. "English". */
+  language?: string;
+  onChangeLanguage?: () => void;
   onClose?: () => void;
-  /** Receives the step it was invoked from, so a cancelled purchase can return there. */
-  onConnectProvider?: (step: number) => void;
-  onInstallLocal?: () => void;
-  /** Receives the step it was invoked from, so a cancelled purchase can return there. */
-  onOpenPremium?: (step: number) => void;
-  onOpenStt?: () => void;
-  onOpenTts?: () => void;
+  /** Wire the real hold-to-talk; unwired, a press shows DEMO_TURN. */
+  onPressMic?: () => void;
+  onSelectRoute?: (rowId: string) => void;
+  onDownloadModel?: (rowId: string) => void;
   style?: React.CSSProperties;
 }
-
-export function IntroFlow(props: IntroFlowProps): JSX.Element | null;
+export declare function IntroFlow(props: IntroFlowProps): JSX.Element | null;

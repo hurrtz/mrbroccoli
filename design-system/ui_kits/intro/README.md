@@ -1,17 +1,9 @@
-# Mr Broccoli — introduction UI kit
+# Mr Broccoli — introduction kit
 
-The seven-step first-launch walkthrough, standalone. The surface is specified in `guidelines/surfaces/intro.md`; the components are `components/intro/`. This kit exists so the walkthrough can be reviewed without clicking through the workspace kit — the workspace kit still opens the same `IntroFlow` from its banner.
-
-## Files
+The three-step first run: a welcome that demonstrates (the stored intro session under blur, play as proof), "Don't panic" setup (one green automatic action, manual catalogue behind a switch), and the ephemeral "Try it out!" test with gated Done. The spec lives in `guidelines/surfaces/intro.md`; the component is `components/intro/IntroFlow.jsx`.
 
 | File | What it is |
 | --- | --- |
-| `index.html` | Two frames: the welcome step in light, the automatic-setup step (`auto`, step 3 of 7) in dark |
+| `index.html` | Three frames: welcome (light), setup (dark), test-after-a-turn (light) |
 
-## What is interactive
-
-Every step is reachable from the header stepper and the arrows; the last step's forward action becomes a finish action. The automatic-setup card runs itself here (no host `state` passed — specimen mode), so tapping "Set up automatically" plays the whole measure → propose → install flow inside the step.
-
-## Web adaptations
-
-Same as the workspace kit: no swipe gesture (the app's paged `ScrollView` is what is missing), audio examples toggle state without playing a clip, and the manual routes' actions close the flow rather than opening real settings.
+What's interactive: step navigation (arrows + stepper), play (reveals the voice note), the manual-setup switch, and the step-3 mic — pressing it shows the sample turn and unlocks Done. First-run gating is live: step 2's forward orb is disabled (`thinkingReady` unset), and there is no close control anywhere.

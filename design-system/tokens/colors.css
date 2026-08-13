@@ -153,6 +153,9 @@
   --mb-color-premium-border:var(--mb-light-premium-border);
   --mb-color-on-premium:var(--mb-light-on-premium);
   --mb-color-intro-banner:#5B21B6;
+  --mb-color-intro-banner-grad-a:#4C1D95;
+  --mb-color-intro-banner-grad-b:#6D28D9;
+  --mb-color-intro-banner-shadow:rgba(109,40,217,0.45);
   --mb-color-intro-banner-glow:rgba(167,139,250,0.30);
   --mb-color-intro-banner-text:#FFFFFF;
   --mb-color-intro-banner-text-secondary:rgba(237,233,254,0.86);

@@ -67,3 +67,9 @@ Landscape sheds what it does not need: no swipe pager, no attach control, no set
 ## Kept unchanged
 
 `ResponseModeToggle` and `PhaseAwareVoiceAction` remain in the system and the codebase. They are still correct anywhere the voice action sits in a bar rather than owning the screen. The orb composition is a replacement on this one screen, not a deletion.
+
+## Drive mode
+
+The third input mode ("Drive Session", premium): hands-free voice activity detection against an ambient acoustic profile, a 10-second silence window with spoken countdown cues, auto-submit, auto-continue. While active, `DriveSessionControls` sits directly above the composer: **Repeat last** plus one fixed-position **Pause/Resume toggle** whose accent fill means the loop is live; the silence countdown appears as a "Sends in N…" chip over the toggle (and is spoken, as upstream). Headset/car remote buttons map to the same two actions; the orb keeps working as the manual press.
+
+**Deliberate departure from upstream:** `DriveSessionControls.tsx` ships three equal buttons (Pause auto · Repeat last · Resume auto) with pause/resume as a pair, one always disabled. The system replaces the pair with the single fixed-position toggle — positions never swap, the fill state reads at arm's length, the freed width pays for 14px labels, and the countdown (which upstream surfaces to the pager but never draws) gets an on-screen home.
