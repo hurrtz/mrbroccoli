@@ -101,20 +101,25 @@ function WelcomeStep({ language, t }: IntroStepProps) {
     <View style={styles.welcome} testID="intro-welcome-step">
       <IntroTitle>{t("introWelcomeTitle")}</IntroTitle>
 
-      {/* The dialogue is decorative context for sighted users; the crisp query
-          below carries the meaning, so the faded turns stay out of the
-          accessibility tree. */}
-      <View accessible={false} importantForAccessibility="no-hide-descendants">
-        <View style={styles.dialogueStack}>
-          <View style={styles.dialogueFar}>
+      {/* The dialogue hugs the bottom of its zone so it ends just above the
+          play button. The blurred earlier turns are decoration and stay out
+          of the accessibility tree; the crisp query is the question the play
+          button answers, so it is announced. */}
+      <View style={styles.dialogueZone}>
+        <View
+          accessible={false}
+          importantForAccessibility="no-hide-descendants"
+          style={styles.dialogueStack}
+        >
+          <View style={styles.dialogueFar} testID="intro-dialogue-far">
             <Bubble theme={theme}>{preview.introDialogueFar}</Bubble>
           </View>
-          <View style={styles.dialogueMid}>
+          <View style={styles.dialogueMid} testID="intro-dialogue-mid">
             <Bubble mine theme={theme}>
               {preview.introDialogueQuestion}
             </Bubble>
           </View>
-          <View style={styles.dialogueNear}>
+          <View style={styles.dialogueNear} testID="intro-dialogue-near">
             <Bubble theme={theme}>{preview.introDialogueNear}</Bubble>
           </View>
         </View>
@@ -661,13 +666,19 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 18,
     borderWidth: 1,
   },
+  // Earlier turns emerge from blur toward the crisp query. RN's filter blur
+  // renders where the platform supports it; the opacity ladder carries the
+  // same depth cue everywhere else.
   dialogueFar: {
+    filter: [{ blur: 4 }],
     opacity: 0.5,
   },
   dialogueMid: {
+    filter: [{ blur: 2.4 }],
     opacity: 0.65,
   },
   dialogueNear: {
+    filter: [{ blur: 1.1 }],
     opacity: 0.85,
   },
   dialogueQuery: {
@@ -675,6 +686,10 @@ const styles = StyleSheet.create({
   },
   dialogueStack: {
     gap: 9,
+  },
+  dialogueZone: {
+    flex: 1,
+    justifyContent: "flex-end",
   },
   divider: {
     height: 1,
@@ -958,7 +973,6 @@ const styles = StyleSheet.create({
   },
   welcomeCentre: {
     alignItems: "center",
-    flex: 1,
     gap: 14,
     justifyContent: "center",
     paddingBottom: 10,

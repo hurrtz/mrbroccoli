@@ -80,7 +80,7 @@ const rawIntroTranslations = {
     introVoicePickerTitle: "Choose a language",
     introVoicePickerHint: "Hear the example in another language",
 
-    introWelcomeTitle: "Welcome to Mr Broccoli",
+    introWelcomeTitle: "Welcome",
     introWelcomePlay: "Hear what it sounds like",
     introWelcomePlaying: "Playing — tap to stop",
     introWelcomeBody:
@@ -206,7 +206,7 @@ const rawIntroTranslations = {
     introVoicePickerTitle: "اختر لغة",
     introVoicePickerHint: "استمع إلى المثال بلغة أخرى",
 
-    introWelcomeTitle: "مرحبًا بك في Mr Broccoli",
+    introWelcomeTitle: "مرحبًا بك",
     introWelcomePlay: "استمع كيف يبدو",
     introWelcomePlaying: "قيد التشغيل — اضغط للإيقاف",
     introWelcomeBody: "تحدّث بشكل طبيعي واحصل على إجابة تستحق الاستماع. الشاشات التالية توضّح ما يحتاجه التطبيق ليعمل وما يستطيع فعله. تستغرق دقيقة، ويمكنك الخروج في أي وقت.",
@@ -317,7 +317,7 @@ const rawIntroTranslations = {
     introVoicePickerTitle: "Vyber jazyk",
     introVoicePickerHint: "Poslechnout ukázku v jiném jazyce",
 
-    introWelcomeTitle: "Vítej v Mr Broccoli",
+    introWelcomeTitle: "Vítej",
     introWelcomePlay: "Poslechni si, jak to zní",
     introWelcomePlaying: "Přehrává se — klepnutím zastavíš",
     introWelcomeBody: "Mluv přirozeně a dostaneš odpověď, kterou stojí za to poslouchat. Další obrazovky ukážou, co aplikace potřebuje k běhu a co umí. Zabere to minutu a kdykoli můžeš odejít.",
@@ -432,7 +432,7 @@ const rawIntroTranslations = {
     introVoicePickerTitle: "Sprache wählen",
     introVoicePickerHint: "Das Beispiel in einer anderen Sprache hören",
 
-    introWelcomeTitle: "Willkommen bei Mr Broccoli",
+    introWelcomeTitle: "Willkommen",
     introWelcomePlay: "Hör dir an, wie es klingt",
     introWelcomePlaying: "Läuft — zum Stoppen tippen",
     introWelcomeBody: "Sprich einfach drauflos und bekomm eine Antwort, die das Zuhören wert ist. Die nächsten Seiten zeigen, was die App zum Laufen braucht und was sie kann. Dauert eine Minute, und du kannst jederzeit abbrechen.",
@@ -547,7 +547,7 @@ const rawIntroTranslations = {
     introVoicePickerTitle: "Elige un idioma",
     introVoicePickerHint: "Escucha el ejemplo en otro idioma",
 
-    introWelcomeTitle: "Te damos la bienvenida a Mr Broccoli",
+    introWelcomeTitle: "Te damos la bienvenida",
     introWelcomePlay: "Escucha cómo suena",
     introWelcomePlaying: "Sonando — toca para parar",
     introWelcomeBody: "Habla con naturalidad y recibe una respuesta que merece la pena escuchar. Las siguientes pantallas explican qué necesita la app para funcionar y qué sabe hacer. Es un minuto, y puedes salir cuando quieras.",
@@ -662,7 +662,7 @@ const rawIntroTranslations = {
     introVoicePickerTitle: "Choisis une langue",
     introVoicePickerHint: "Écouter l'exemple dans une autre langue",
 
-    introWelcomeTitle: "Bienvenue dans Mr Broccoli",
+    introWelcomeTitle: "Bienvenue",
     introWelcomePlay: "Écoute ce que ça donne",
     introWelcomePlaying: "En cours — touche pour arrêter",
     introWelcomeBody: "Parle naturellement et reçois une réponse qui vaut la peine d'être écoutée. Les écrans suivants montrent ce dont l'app a besoin pour fonctionner et ce qu'elle sait faire. Ça prend une minute, et tu peux partir quand tu veux.",
@@ -776,7 +776,7 @@ const rawIntroTranslations = {
     introVoicePickerTitle: "भाषा चुनें",
     introVoicePickerHint: "उदाहरण किसी और भाषा में सुनें",
 
-    introWelcomeTitle: "Mr Broccoli में आपका स्वागत है",
+    introWelcomeTitle: "आपका स्वागत है",
     introWelcomePlay: "सुनिए यह कैसा लगता है",
     introWelcomePlaying: "चल रहा है — रोकने के लिए टैप करें",
     introWelcomeBody: "स्वाभाविक रूप से बोलिए और ऐसा जवाब पाइए जिसे सुनना सार्थक हो। अगली स्क्रीनें बताती हैं कि ऐप को चलने के लिए क्या चाहिए और यह क्या कर सकता है। एक मिनट लगेगा, और आप जब चाहें बाहर निकल सकते हैं।",
@@ -890,7 +890,7 @@ const rawIntroTranslations = {
     introVoicePickerTitle: "Válassz nyelvet",
     introVoicePickerHint: "Hallgasd meg a példát másik nyelven",
 
-    introWelcomeTitle: "Üdv a Mr Broccoliban",
+    introWelcomeTitle: "Üdv",
     introWelcomePlay: "Hallgasd meg, hogyan szól",
     introWelcomePlaying: "Szól — koppints a leállításhoz",
     introWelcomeBody: "Beszélj természetesen, és kapj olyan választ, amit érdemes végighallgatni. A következő képernyők megmutatják, mire van szüksége az alkalmazásnak és mit tud. Egy perc az egész, és bármikor kiléphetsz.",
@@ -1005,7 +1005,7 @@ const rawIntroTranslations = {
     introVoicePickerTitle: "Scegli una lingua",
     introVoicePickerHint: "Ascolta l'esempio in un'altra lingua",
 
-    introWelcomeTitle: "Benvenuto in Mr Broccoli",
+    introWelcomeTitle: "Benvenuto",
     introWelcomePlay: "Senti come suona",
     introWelcomePlaying: "In riproduzione — tocca per fermare",
     introWelcomeBody: "Parla in modo naturale e ricevi una risposta che vale la pena ascoltare. Le prossime schermate mostrano cosa serve all'app per funzionare e cosa sa fare. Ci vuole un minuto, e puoi uscire quando vuoi.",
@@ -1118,7 +1118,7 @@ const rawIntroTranslations = {
     introVoicePickerTitle: "言語を選ぶ",
     introVoicePickerHint: "別の言語で例を聞く",
 
-    introWelcomeTitle: "Mr Broccoli へようこそ",
+    introWelcomeTitle: "ようこそ",
     introWelcomePlay: "どんな声か聞いてみる",
     introWelcomePlaying: "再生中 — タップで停止",
     introWelcomeBody: "自然に話しかけると、聞く価値のある答えが返ってきます。次の画面では、このアプリを動かすのに必要なものと、できることを紹介します。1 分ほどで、いつでも途中でやめられます。",
@@ -1232,7 +1232,7 @@ const rawIntroTranslations = {
     introVoicePickerTitle: "Wybierz język",
     introVoicePickerHint: "Posłuchaj przykładu w innym języku",
 
-    introWelcomeTitle: "Witaj w Mr Broccoli",
+    introWelcomeTitle: "Witaj",
     introWelcomePlay: "Posłuchaj, jak to brzmi",
     introWelcomePlaying: "Odtwarzanie — dotknij, by zatrzymać",
     introWelcomeBody: "Mów naturalnie i dostań odpowiedź, której warto posłuchać. Kolejne ekrany pokazują, czego aplikacja potrzebuje do działania i co potrafi. Zajmie to minutę, a wyjść możesz w każdej chwili.",
@@ -1346,7 +1346,7 @@ const rawIntroTranslations = {
     introVoicePickerTitle: "Escolhe um idioma",
     introVoicePickerHint: "Ouvir o exemplo noutro idioma",
 
-    introWelcomeTitle: "Bem-vindo ao Mr Broccoli",
+    introWelcomeTitle: "Bem-vindo",
     introWelcomePlay: "Ouve como soa",
     introWelcomePlaying: "A reproduzir — toca para parar",
     introWelcomeBody: "Fala naturalmente e recebe uma resposta que vale a pena ouvir. Os próximos ecrãs mostram do que a aplicação precisa para funcionar e o que sabe fazer. Demora um minuto, e podes sair quando quiseres.",
@@ -1460,7 +1460,7 @@ const rawIntroTranslations = {
     introVoicePickerTitle: "Escolha um idioma",
     introVoicePickerHint: "Ouvir o exemplo em outro idioma",
 
-    introWelcomeTitle: "Boas-vindas ao Mr Broccoli",
+    introWelcomeTitle: "Boas-vindas",
     introWelcomePlay: "Ouça como soa",
     introWelcomePlaying: "Tocando — toque para parar",
     introWelcomeBody: "Fale naturalmente e receba uma resposta que vale a pena ouvir. As próximas telas mostram do que o app precisa para funcionar e o que ele sabe fazer. Leva um minuto, e você pode sair quando quiser.",
@@ -1574,7 +1574,7 @@ const rawIntroTranslations = {
     introVoicePickerTitle: "Выбери язык",
     introVoicePickerHint: "Послушать пример на другом языке",
 
-    introWelcomeTitle: "Добро пожаловать в Mr Broccoli",
+    introWelcomeTitle: "Добро пожаловать",
     introWelcomePlay: "Послушай, как это звучит",
     introWelcomePlaying: "Играет — нажми, чтобы остановить",
     introWelcomeBody: "Говори естественно и получай ответ, который стоит послушать. Следующие экраны покажут, что нужно приложению для работы и что оно умеет. Это займёт минуту, и выйти можно в любой момент.",
@@ -1688,7 +1688,7 @@ const rawIntroTranslations = {
     introVoicePickerTitle: "Välj ett språk",
     introVoicePickerHint: "Hör exemplet på ett annat språk",
 
-    introWelcomeTitle: "Välkommen till Mr Broccoli",
+    introWelcomeTitle: "Välkommen",
     introWelcomePlay: "Hör hur det låter",
     introWelcomePlaying: "Spelas — tryck för att stoppa",
     introWelcomeBody: "Prata naturligt och få tillbaka ett svar som är värt att lyssna på. Nästa skärmar visar vad appen behöver för att fungera och vad den kan. Det tar en minut, och du kan lämna när du vill.",
@@ -1802,7 +1802,7 @@ const rawIntroTranslations = {
     introVoicePickerTitle: "Bir dil seç",
     introVoicePickerHint: "Örneği başka bir dilde dinle",
 
-    introWelcomeTitle: "Mr Broccoli'ye hoş geldin",
+    introWelcomeTitle: "Hoş geldin",
     introWelcomePlay: "Nasıl duyulduğunu dinle",
     introWelcomePlaying: "Çalıyor — durdurmak için dokun",
     introWelcomeBody: "Doğal biçimde konuş ve dinlemeye değer bir cevap al. Sonraki ekranlar uygulamanın çalışmak için neye ihtiyacı olduğunu ve neler yapabildiğini gösteriyor. Bir dakika sürer, istediğin an çıkabilirsin.",
@@ -1916,7 +1916,7 @@ const rawIntroTranslations = {
     introVoicePickerTitle: "Обери мову",
     introVoicePickerHint: "Послухати приклад іншою мовою",
 
-    introWelcomeTitle: "Вітаємо в Mr Broccoli",
+    introWelcomeTitle: "Вітаємо",
     introWelcomePlay: "Послухай, як це звучить",
     introWelcomePlaying: "Грає — торкнись, щоб зупинити",
     introWelcomeBody: "Говори природно й отримуй відповідь, яку варто послухати. Наступні екрани покажуть, що потрібно застосунку для роботи і що він уміє. Це займе хвилину, і вийти можна будь-коли.",
@@ -2030,7 +2030,7 @@ const rawIntroTranslations = {
     introVoicePickerTitle: "زبان منتخب کریں",
     introVoicePickerHint: "مثال کسی اور زبان میں سنیں",
 
-    introWelcomeTitle: "Mr Broccoli میں خوش آمدید",
+    introWelcomeTitle: "خوش آمدید",
     introWelcomePlay: "سنیں کہ یہ کیسا لگتا ہے",
     introWelcomePlaying: "چل رہا ہے — روکنے کے لیے ٹیپ کریں",
     introWelcomeBody: "قدرتی انداز میں بولیں اور ایسا جواب پائیں جو سننے کے قابل ہو۔ اگلی اسکرینیں بتاتی ہیں کہ ایپ کو چلنے کے لیے کیا چاہیے اور یہ کیا کر سکتی ہے۔ ایک منٹ لگے گا، اور آپ جب چاہیں نکل سکتے ہیں۔",
@@ -2141,7 +2141,7 @@ const rawIntroTranslations = {
     introVoicePickerTitle: "选择语言",
     introVoicePickerHint: "用其他语言听这段示例",
 
-    introWelcomeTitle: "欢迎使用 Mr Broccoli",
+    introWelcomeTitle: "欢迎",
     introWelcomePlay: "听听它是什么声音",
     introWelcomePlaying: "播放中 — 点按停止",
     introWelcomeBody: "自然地说话，得到一个值得听完的回答。接下来几屏会说明这款应用运行需要什么、能做什么。大约一分钟，你随时可以离开。",

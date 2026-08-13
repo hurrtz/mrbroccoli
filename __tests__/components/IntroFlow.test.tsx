@@ -214,6 +214,39 @@ describe("IntroFlowScreen", () => {
     expect(getByTestId("intro-welcome-language")).toBeTruthy();
   });
 
+  it("blurs the earlier turns while announcing only the crisp query", () => {
+    // The three faded turns are decoration: hidden from assistive tech and
+    // stepped through the blur/opacity ladder. The crisp query is the
+    // question the play button answers, so it stays announced.
+    const { getByTestId } = renderScreen();
+    const hidden = { includeHiddenElements: true } as const;
+
+    const far = StyleSheet.flatten(
+      getByTestId("intro-dialogue-far", hidden).props.style,
+    );
+    const mid = StyleSheet.flatten(
+      getByTestId("intro-dialogue-mid", hidden).props.style,
+    );
+    const near = StyleSheet.flatten(
+      getByTestId("intro-dialogue-near", hidden).props.style,
+    );
+    expect(far).toEqual(
+      expect.objectContaining({ filter: [{ blur: 4 }], opacity: 0.5 }),
+    );
+    expect(mid).toEqual(
+      expect.objectContaining({ filter: [{ blur: 2.4 }], opacity: 0.65 }),
+    );
+    expect(near).toEqual(
+      expect.objectContaining({ filter: [{ blur: 1.1 }], opacity: 0.85 }),
+    );
+
+    // The decorative far turn is unreachable without opting into hidden
+    // elements; the crisp query is announced normally.
+    const { queryByText, getByText } = renderScreen();
+    expect(queryByText("Broccoli comes from the Italian broccolo", { exact: false })).toBeNull();
+    expect(getByText("How does this application work?")).toBeTruthy();
+  });
+
   it("keeps bare borderless nav glyphs on 44 point targets", () => {
     // The intro's nav controls are naked glyphs — no filled circles — and
     // back is a full arrow, not a chevron.
