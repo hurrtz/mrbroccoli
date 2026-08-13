@@ -206,7 +206,12 @@ export function validateMaestroSuite(cwd = process.cwd()) {
 
   for (const selector of [
     "API key: Anthropic",
-    "input-mode-picker-drive-session",
+    'visible: "Cancel"',
+    "Not tested",
+    "hideKeyboard",
+    "input-mode-picker",
+    "input-mode-picker-option-drive-session",
+    "provider-connection-close-anthropic",
     "route-byline",
     "route-picker-list",
     "route-picker-row-mode-1",

@@ -755,6 +755,9 @@ describe("SettingsModal", () => {
       expect(
         screen.getByTestId("provider-connection-sheet-openai"),
       ).toBeTruthy();
+      expect(
+        screen.getByTestId("provider-connection-close-openai"),
+      ).toBeTruthy();
       expect(screen.getByText("Test all")).toBeTruthy();
       expect(screen.getByLabelText("Test LLM")).toBeTruthy();
       expect(
@@ -763,6 +766,15 @@ describe("SettingsModal", () => {
         ),
       ).toBeNull();
       expect(screen.queryByText("System Prompt")).toBeNull();
+    });
+
+    fireEvent.press(screen.getByTestId("provider-connection-close-openai"));
+
+    await waitFor(() => {
+      expect(
+        screen.queryByTestId("provider-connection-sheet-openai"),
+      ).toBeNull();
+      expect(screen.getByTestId("settings-back-button")).toBeTruthy();
     });
   });
 

@@ -280,6 +280,7 @@ function ProviderConnectionSheet({
             />
             <IconButton
               icon="close"
+              testID={`provider-connection-close-${provider}`}
               accessibilityLabel={t("dismiss")}
               onPress={onClose}
             />

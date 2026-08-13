@@ -62,6 +62,10 @@ The cross-platform Maestro suite starts from cleared app state and verifies
 the current first-run contract: the app opens directly into the workspace with
 the optional introduction banner. It must not wait for a retired blocking
 setup wizard before exercising settings, locales, layout, or accessibility.
+Flows that edit nested Settings sheets dismiss the software keyboard and, on
+platforms where that action leaves the modal open, the owning sheet before
+navigating the parent frame, so system input overlays cannot consume the next
+app control.
 The checked-in runtime flows also hold every voice-orb phase and ring boundary
 deterministically under the isolated fixture identity, and prove honest
 low-memory automatic-setup failure and retry on Android without downloading a

@@ -25,18 +25,39 @@ tags:
     id: provider-card-anthropic-header-control
 - assertVisible: "API key: Anthropic"
 - tapOn: "API key: Anthropic"
+- runFlow:
+    when:
+      visible: "Cancel"
+    commands:
+      - tapOn: "Cancel"
 - inputText: visual-test-only
-- pressKey: ENTER
+- assertVisible: "Not tested"
+- runFlow:
+    when:
+      true: ${PLATFORM == 'android'}
+    commands:
+      - hideKeyboard
+- runFlow:
+    when:
+      visible:
+        id: provider-connection-close-anthropic
+    commands:
+      - tapOn:
+          id: provider-connection-close-anthropic
+- assertVisible:
+    id: settings-back-button
 - tapOn:
     id: settings-back-button
 
 # Select Drive mode through the real settings surface.
 - tapOn:
     id: settings-overview-row-listening
-- assertVisible:
-    id: input-mode-picker-drive-session
 - tapOn:
-    id: input-mode-picker-drive-session
+    id: input-mode-picker
+- assertVisible:
+    id: input-mode-picker-option-drive-session
+- tapOn:
+    id: input-mode-picker-option-drive-session
 - tapOn:
     id: settings-back-button
 - tapOn:
