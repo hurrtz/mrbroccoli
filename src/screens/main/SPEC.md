@@ -62,7 +62,12 @@ receive already-derived state and callbacks.
 - In portrait, the conversation's quick settings read as one muted
   tone-length-voice line under the byline, with a single control opening the
   conversation style sheet. Landscape omits this line to preserve the two-pane
-  stage.
+  stage. At accessibility-large text, portrait keeps that labelled control but
+  omits the decorative sentence, uses the title-only introduction banner, and
+  makes the satellite row icon-only. This preserves the complete blocked-route
+  warning, status, and transcript affordance without overlap. Landscape keeps
+  the same interactions and the warning's complete accessible name, but the
+  constrained blocked-route card shows only its actionable label.
 - The status line under the orb pairs a phase dot with what is happening and
   what the conversation is; while idle it names the conversation and its
   relative age. Its info control opens the session details.

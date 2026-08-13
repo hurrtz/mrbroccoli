@@ -1,6 +1,6 @@
 import React from "react";
 import { fireEvent, render, within } from "@testing-library/react-native";
-import { StyleSheet } from "react-native";
+import { StyleSheet, useWindowDimensions } from "react-native";
 
 import { MainScreenWorkspace } from "../../../src/screens/main/MainScreenWorkspace";
 import { ThemeProvider } from "../../../src/theme/ThemeContext";
@@ -14,6 +14,26 @@ import {
 let mockRouteBylineRenderCount = 0;
 let mockVoicePagerRenderCount = 0;
 
+jest.mock("react-native", () => {
+  const actual = jest.requireActual("react-native");
+  const mockedUseWindowDimensions = jest.fn(() => ({
+    fontScale: 1,
+    height: 932,
+    scale: 3,
+    width: 430,
+  }));
+
+  return new Proxy(actual, {
+    get(target, property, receiver) {
+      return property === "useWindowDimensions"
+        ? mockedUseWindowDimensions
+        : Reflect.get(target, property, receiver);
+    },
+  });
+});
+
+const mockUseWindowDimensions = jest.mocked(useWindowDimensions);
+
 jest.mock("../../../src/screens/main/MainScreenRouteByline", () => ({
   MainScreenRouteByline: () => {
     const React = require("react");
@@ -24,11 +44,24 @@ jest.mock("../../../src/screens/main/MainScreenRouteByline", () => ({
 }));
 
 jest.mock("../../../src/screens/main/VoiceTextInputPager", () => ({
-  VoiceTextInputPager: () => {
+  VoiceTextInputPager: ({
+    compactPromptNotice = false,
+  }: {
+    compactPromptNotice?: boolean;
+  }) => {
     const React = require("react");
     const { Text } = require("react-native");
     mockVoicePagerRenderCount += 1;
-    return React.createElement(Text, null, "voice-text-input-pager");
+    return React.createElement(
+      Text,
+      {
+        accessibilityValue: {
+          text: compactPromptNotice ? "compact" : "regular",
+        },
+        testID: "voice-text-input-pager",
+      },
+      "voice-text-input-pager",
+    );
   },
 }));
 
@@ -147,6 +180,112 @@ describe("MainScreenWorkspace streaming isolation", () => {
   beforeEach(() => {
     mockRouteBylineRenderCount = 0;
     mockVoicePagerRenderCount = 0;
+    mockUseWindowDimensions.mockReturnValue({
+      fontScale: 1,
+      height: 932,
+      scale: 3,
+      width: 430,
+    });
+  });
+
+  it("compacts optional portrait chrome for accessibility-large text", () => {
+    mockUseWindowDimensions.mockReturnValue({
+      fontScale: 2.35,
+      height: 932,
+      scale: 3,
+      width: 430,
+    });
+    const t = jest.fn((key: string) => key);
+    const workspaceProps = createWorkspaceProps(t);
+    const screen = renderWorkspace(
+      <MainScreenWorkspace
+        {...workspaceProps}
+        introBanner={{ ...workspaceProps.introBanner, visible: true }}
+        transcript={{
+          activeConversationId: null,
+          activeReplayMessageId: null,
+          messages: [],
+          onCopyMessage: jest.fn(async () => true),
+          onRetryMessage: jest.fn(),
+          replayPhase: "idle",
+          scrollEnabled: true,
+          showUsageStats: false,
+          showWhenEmpty: true,
+          t,
+        }}
+        visualPhase="idle"
+        voiceStage={{
+          ...workspaceProps.voiceStage,
+          isActive: false,
+          promptBlockedActionEnabled: true,
+          promptBlockedActionLabel: "Configure credentials",
+          promptBlockedMessage:
+            "Add credentials in Settings before starting a voice session.",
+          statusTitle: "Tap to speak",
+          visualPhase: "idle",
+        }}
+      />,
+    );
+
+    expect(screen.getByTestId("intro-banner")).toBeTruthy();
+    expect(screen.queryByTestId("intro-banner-open")).toBeNull();
+    expect(screen.queryByText("Balanced · Brief")).toBeNull();
+    expect(
+      screen.getByTestId("conversation-settings-summary-control").props
+        .accessibilityLabel,
+    ).toBe("Conversation settings");
+    expect(
+      within(screen.getByTestId("workspace-satellites")).queryByText(
+        "workspaceImageLabel",
+      ),
+    ).toBeNull();
+    expect(screen.getByText("Tap to speak")).toBeTruthy();
+  });
+
+  it("compacts the blocked-route notice in accessibility-large landscape", () => {
+    mockUseWindowDimensions.mockReturnValue({
+      fontScale: 2.35,
+      height: 440,
+      scale: 3,
+      width: 956,
+    });
+    const t = jest.fn((key: string) => key);
+    const workspaceProps = createWorkspaceProps(t);
+    const screen = renderWorkspace(
+      <MainScreenWorkspace
+        {...workspaceProps}
+        isLandscape
+        transcript={{
+          activeConversationId: null,
+          activeReplayMessageId: null,
+          messages: [],
+          onCopyMessage: jest.fn(async () => true),
+          onRetryMessage: jest.fn(),
+          replayPhase: "idle",
+          scrollEnabled: true,
+          showUsageStats: false,
+          showWhenEmpty: true,
+          t,
+        }}
+        visualPhase="idle"
+        voiceStage={{
+          ...workspaceProps.voiceStage,
+          isActive: false,
+          promptBlockedActionEnabled: true,
+          promptBlockedActionLabel: "Configure credentials",
+          promptBlockedMessage:
+            "Add credentials in Settings before starting a voice session.",
+          statusTitle: "Tap to speak",
+          visualPhase: "idle",
+        }}
+      />,
+    );
+
+    expect(
+      screen.getByTestId("voice-text-input-pager").props.accessibilityValue,
+    ).toEqual({ text: "compact" });
+    expect(screen.getByTestId("workspace-status-line")).toBeTruthy();
+    expect(screen.getByTestId("landscape-right-pane")).toBeTruthy();
   });
 
   it("does not rerender static controls when only transcript messages change", () => {

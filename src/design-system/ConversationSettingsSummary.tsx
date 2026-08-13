@@ -21,6 +21,7 @@ export function ConversationSettingsSummary({
   summary,
   onPress,
   accessibilityLabel,
+  compact = false,
   style,
   testID,
 }: {
@@ -29,19 +30,26 @@ export function ConversationSettingsSummary({
   onPress: () => void;
   /** Accessible name for the control, translated by the caller. */
   accessibilityLabel: string;
+  /** Icon-only form for a vertically constrained accessibility layout. */
+  compact?: boolean;
   style?: StyleProp<ViewStyle>;
   testID?: string;
 }) {
   const { colors } = useTheme();
 
   return (
-    <View style={[styles.row, style]} testID={testID}>
-      <Text
-        numberOfLines={1}
-        style={[styles.summary, { color: colors.textSecondary }]}
-      >
-        {summary}
-      </Text>
+    <View
+      style={[styles.row, compact ? styles.rowCompact : null, style]}
+      testID={testID}
+    >
+      {compact ? null : (
+        <Text
+          numberOfLines={1}
+          style={[styles.summary, { color: colors.textSecondary }]}
+        >
+          {summary}
+        </Text>
+      )}
       <IconButton
         accessibilityLabel={accessibilityLabel}
         icon="control"
@@ -58,6 +66,9 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     gap: 8,
     minHeight: MIN_ICON_TOUCH_TARGET,
+  },
+  rowCompact: {
+    justifyContent: "flex-end",
   },
   summary: {
     flex: 1,

@@ -11,6 +11,8 @@ import type { OrbTurnProgress } from "../useOrbTurnProgress";
 export type InputSurface = "voice" | "text";
 
 export interface VoiceTextInputPagerProps {
+  /** Show only the actionable blocked-route label in constrained layouts. */
+  compactPromptNotice?: boolean;
   colors: Colors;
   disabled: boolean;
   driveAutoContinueEnabled?: boolean;

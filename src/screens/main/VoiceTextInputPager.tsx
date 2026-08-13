@@ -15,6 +15,7 @@ export type { InputSurface } from "./voiceTextInputPager/types";
 export function VoiceTextInputPager({
   attachments = [],
   colors,
+  compactPromptNotice = false,
   disabled,
   driveAutoContinueEnabled = false,
   driveSilenceCountdownSeconds = null,
@@ -83,6 +84,10 @@ export function VoiceTextInputPager({
     visualPhase === "recording" &&
     !driveVoiceActive &&
     driveSilenceCountdownSeconds !== null;
+  const showCompactPromptAction =
+    compactPromptNotice &&
+    Boolean(onResolvePromptBlock) &&
+    promptBlockedActionEnabled;
   // Announce phase boundaries, not animation frames — the orb replaces the
   // bar that used to own this announcement.
   const previousVisualPhase = React.useRef(visualPhase);
@@ -235,13 +240,23 @@ export function VoiceTextInputPager({
               accessibilityLiveRegion="assertive"
               accessibilityRole="alert"
               style={[
-                styles.promptBlockedText,
-                { color: colors.textSecondary },
+                showCompactPromptAction
+                  ? styles.promptBlockedAction
+                  : styles.promptBlockedText,
+                {
+                  color: showCompactPromptAction
+                    ? colors.accent
+                    : colors.textSecondary,
+                },
               ]}
             >
-              {promptBlockedMessage}
+              {showCompactPromptAction
+                ? (promptBlockedActionLabel ?? t("openSpeakingSettings"))
+                : promptBlockedMessage}
             </Text>
-            {onResolvePromptBlock && promptBlockedActionEnabled ? (
+            {!showCompactPromptAction &&
+            onResolvePromptBlock &&
+            promptBlockedActionEnabled ? (
               <Text
                 style={[styles.promptBlockedAction, { color: colors.accent }]}
               >

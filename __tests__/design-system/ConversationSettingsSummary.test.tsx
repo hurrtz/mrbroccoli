@@ -55,4 +55,19 @@ describe("ConversationSettingsSummary", () => {
     fireEvent.press(control);
     expect(onPress).toHaveBeenCalledTimes(1);
   });
+
+  it("keeps the labelled control while omitting the sentence when compact", () => {
+    const screen = renderSummary({ compact: true });
+
+    expect(screen.queryByText("Balanced · Brief · Heart")).toBeNull();
+    expect(
+      screen.getByTestId("conversation-settings-summary-control").props
+        .accessibilityLabel,
+    ).toBe("Conversation settings");
+    expect(
+      StyleSheet.flatten(
+        screen.getByTestId("conversation-settings-summary").props.style,
+      ).justifyContent,
+    ).toBe("flex-end");
+  });
 });

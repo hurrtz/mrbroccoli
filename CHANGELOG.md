@@ -12,6 +12,8 @@ the complete Play Store translations are kept in a dedicated file under
 
 - Fixed provider connection sheets occasionally freezing while returning to
   Settings by sequencing iOS keyboard and sheet dismissal.
+- Fixed the iOS home screen overlapping its blocked-route warning, status,
+  voice controls, and transcript at accessibility-large text sizes.
 
 ### Added
 

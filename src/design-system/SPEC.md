@@ -33,6 +33,9 @@ framework or hiding platform behavior behind excessive abstraction.
   workspace controls introduced by the approved design system. They are
   presentation-only: every string arrives translated from the caller, and the
   orb's diameter is passed in by the screen that measured its space.
+  `OrbSatellite` and `ConversationSettingsSummary` also expose icon-only compact
+  forms that preserve their labelled 44-point control when the owning layout
+  cannot safely render optional visible copy.
 - `PhosphorIcon.tsx` is the application glyph boundary and maps semantic sizes
   to Phosphor's regular-weight icons.
 - `AppFontProvider.tsx` owns app-font loading and the typography provider.

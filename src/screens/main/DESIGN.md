@@ -168,6 +168,16 @@ enabled state independently, keeping the stage stable as route capabilities
 change. Landscape uses the same measurement under its lower ceiling, retains
 only Council and Web below the orb, and omits the portrait settings sentence.
 
+When the native font scale reaches the accessibility-large range, the portrait
+composition switches optional chrome to its existing compact forms: the
+introduction becomes title-only, the conversation-settings sentence becomes
+its labelled control, and satellites become icon-only. The blocked-route
+notice, orb, semantic status, and transcript handle remain visible and keep
+their normal accessible names; the adaptation removes no interaction.
+Landscape applies the same threshold to the blocked-route card: its full
+message remains the control's accessible name while the visible card contracts
+to the actionable label, leaving the inline transcript and status unobscured.
+
 The portrait transcript handle derives the latest assistant model and
 localized relative age in `mainScreenViewModel.ts`. Its sheet owns the only
 conversation title and close action; `TranscriptPreviewCard` owns only the

@@ -21,6 +21,8 @@ import type { InputSurface } from "./VoiceTextInputPager";
 import type { TranslateFn } from "./shared";
 import { styles } from "./styles";
 
+const ACCESSIBILITY_COMPACT_FONT_SCALE = 1.8;
+
 interface WorkspaceSatellitesProps {
   colors: Colors;
   compact?: boolean;
@@ -221,7 +223,9 @@ export function MainScreenWorkspace({
   visualPhase,
   voiceStage,
 }: MainScreenWorkspaceProps) {
-  const { height: windowHeight } = useWindowDimensions();
+  const { fontScale, height: windowHeight } = useWindowDimensions();
+  const useAccessibilityCompactLayout =
+    fontScale >= ACCESSIBILITY_COMPACT_FONT_SCALE;
   const [surface, setSurface] = React.useState<InputSurface>(
     voiceStage.initialInputSurface ?? "voice",
   );
@@ -290,6 +294,7 @@ export function MainScreenWorkspace({
               layout="landscape"
               maxOrbSize={150}
               {...voiceStage}
+              compactPromptNotice={useAccessibilityCompactLayout}
               onInputSurfaceChange={handleSurfaceChange}
             />
             <WorkspaceSatellites
@@ -340,11 +345,15 @@ export function MainScreenWorkspace({
       <MainScreenTopBar colors={colors} {...topBar} />
 
       <View style={styles.workspaceBody}>
-        <IntroBanner {...introBanner} />
+        <IntroBanner
+          {...introBanner}
+          compact={useAccessibilityCompactLayout || introBanner.compact}
+        />
         {backgroundTask ? <BackgroundTaskBar {...backgroundTask} /> : null}
         <MainScreenRouteCard {...routeCardProps} />
         <ConversationSettingsSummary
           accessibilityLabel={settingsSummary.accessibilityLabel}
+          compact={useAccessibilityCompactLayout}
           onPress={settingsSummary.onPress}
           summary={settingsSummary.summary}
           testID="conversation-settings-summary"
@@ -366,6 +375,7 @@ export function MainScreenWorkspace({
             />
             <WorkspaceSatellites
               colors={colors}
+              compact={useAccessibilityCompactLayout}
               speaking={speaking}
               {...satellites}
             />

@@ -16,6 +16,7 @@ import type { OrbTurnProgress } from "./useOrbTurnProgress";
 
 interface MainScreenVoiceStageProps {
   colors: Colors;
+  compactPromptNotice?: boolean;
   disabled?: boolean;
   driveAutoContinueEnabled?: boolean;
   driveSilenceCountdownSeconds?: number | null;
@@ -59,6 +60,7 @@ interface MainScreenVoiceStageProps {
 export const MainScreenVoiceStage = React.memo(function MainScreenVoiceStage({
   attachments = [],
   colors,
+  compactPromptNotice = false,
   disabled = false,
   driveAutoContinueEnabled = false,
   driveSilenceCountdownSeconds = null,
@@ -116,6 +118,7 @@ export const MainScreenVoiceStage = React.memo(function MainScreenVoiceStage({
         <VoiceTextInputPager
           attachments={attachments}
           colors={colors}
+          compactPromptNotice={compactPromptNotice}
           disabled={disabled}
           driveAutoContinueEnabled={driveAutoContinueEnabled}
           driveSilenceCountdownSeconds={driveSilenceCountdownSeconds}

@@ -283,6 +283,29 @@ describe("MainScreenVoiceStage composer", () => {
     expect(onSubmitTextMessage).not.toHaveBeenCalled();
   });
 
+  it("keeps the full blocked-route name while compacting its visible copy", () => {
+    const promptBlockedMessage =
+      "Add credentials in Settings before starting a voice session.";
+    const promptBlockedActionLabel = "Configure credentials";
+    const screen = renderStage(
+      <MainScreenVoiceStage
+        {...createProps({
+          compactPromptNotice: true,
+          onResolvePromptBlock: jest.fn(),
+          promptBlockedActionEnabled: true,
+          promptBlockedActionLabel,
+          promptBlockedMessage,
+        })}
+      />,
+    );
+
+    expect(screen.queryByText(promptBlockedMessage)).toBeNull();
+    expect(screen.getByText(promptBlockedActionLabel)).toBeTruthy();
+    expect(
+      screen.getByTestId("prompt-blocked-notice").props.accessibilityLabel,
+    ).toBe(`${promptBlockedMessage} ${promptBlockedActionLabel}`);
+  });
+
   it("retires the voice control when nothing can hear the user, but keeps typing live", () => {
     const onPress = jest.fn();
     const onSubmitTextMessage = jest.fn();
