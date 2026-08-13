@@ -1,5 +1,5 @@
 import React from "react";
-import { render, within } from "@testing-library/react-native";
+import { fireEvent, render, within } from "@testing-library/react-native";
 import { StyleSheet } from "react-native";
 
 import { MainScreenWorkspace } from "../../../src/screens/main/MainScreenWorkspace";
@@ -109,6 +109,7 @@ function createWorkspaceProps(t: jest.Mock) {
       countLabel: "1 message",
       emptyLabel: "No messages yet",
       hideLabel: "Hide transcript",
+      meta: "GPT-5.4 · now",
       onClose: jest.fn(),
       onDismiss: jest.fn(),
       onOpen: jest.fn(),
@@ -169,13 +170,11 @@ describe("MainScreenWorkspace streaming isolation", () => {
     };
     const transcriptBase = {
       activeConversationId: "conversation-1",
-      activeConversationTitle: "Streaming test",
       activeReplayMessageId: null,
       onCopyMessage: jest.fn(async () => true),
       onRetryMessage: jest.fn(),
       replayPhase: "idle" as const,
       scrollEnabled: true,
-      showStyleControl: true,
       showUsageStats: false,
       showWhenEmpty: true,
       t,
@@ -214,6 +213,7 @@ describe("MainScreenWorkspace streaming isolation", () => {
     expect(mockVoicePagerRenderCount).toBe(1);
     // The handle keeps reading from the live message list.
     expect(screen.getByText("Hello there")).toBeTruthy();
+    expect(screen.getByText("GPT-5.4 · now")).toBeTruthy();
   });
 
   it("top-aligns the complete Drive control stack in constrained landscape", () => {
@@ -225,14 +225,12 @@ describe("MainScreenWorkspace streaming isolation", () => {
         isLandscape
         transcript={{
           activeConversationId: null,
-          activeConversationTitle: "Untitled",
           activeReplayMessageId: null,
           messages: [],
           onCopyMessage: jest.fn(async () => true),
           onRetryMessage: jest.fn(),
           replayPhase: "idle",
           scrollEnabled: true,
-          showStyleControl: false,
           showUsageStats: false,
           showWhenEmpty: true,
           t,
@@ -252,5 +250,42 @@ describe("MainScreenWorkspace streaming isolation", () => {
       StyleSheet.flatten(screen.getByTestId("landscape-stage-area").props.style)
         .justifyContent,
     ).toBe("flex-start");
+    expect(screen.queryByTestId("conversation-settings-summary")).toBeNull();
+    expect(screen.queryByTestId("satellite-image")).toBeNull();
+    expect(screen.getByTestId("satellite-council")).toBeTruthy();
+    expect(screen.getByTestId("satellite-web")).toBeTruthy();
+  });
+
+  it("opens the portrait transcript with one title and an icon close action", () => {
+    const t = jest.fn((key: string) => key);
+    const workspaceProps = createWorkspaceProps(t);
+    const onClose = jest.fn();
+    const screen = renderWorkspace(
+      <MainScreenWorkspace
+        {...workspaceProps}
+        transcript={{
+          activeConversationId: "conversation-1",
+          activeReplayMessageId: null,
+          messages: [],
+          onCopyMessage: jest.fn(async () => true),
+          onRetryMessage: jest.fn(),
+          replayPhase: "idle",
+          scrollEnabled: true,
+          showUsageStats: false,
+          showWhenEmpty: true,
+          t,
+        }}
+        transcriptSheet={{
+          ...workspaceProps.transcriptSheet,
+          onClose,
+          visible: true,
+        }}
+      />,
+    );
+
+    expect(screen.getAllByText("Streaming test")).toHaveLength(1);
+    expect(screen.queryByText("Hide transcript")).toBeNull();
+    fireEvent.press(screen.getByTestId("transcript-sheet-close"));
+    expect(onClose).toHaveBeenCalledTimes(1);
   });
 });

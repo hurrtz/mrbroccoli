@@ -1,4 +1,7 @@
-import { getMainScreenViewModel } from "../../../src/screens/main/mainScreenViewModel";
+import {
+  formatRelativeAge,
+  getMainScreenViewModel,
+} from "../../../src/screens/main/mainScreenViewModel";
 import { Conversation, DEFAULT_SETTINGS, Settings } from "../../../src/types";
 
 function t(key: any, params?: Record<string, string | number | undefined>) {
@@ -101,6 +104,20 @@ describe("getMainScreenViewModel", () => {
     expect(viewModel.fallbackTtsStatusLabel).toBe("Kokoro → systemVoice");
     expect(viewModel.routeModelLabel).toContain("GPT-5.4");
     expect(viewModel.activeConversationTitle).toBe("Planning");
+    expect(viewModel.conversationStatusDetail).toContain("Planning · ");
+    expect(viewModel.transcriptHandleMeta).toContain("GPT-5.4 · ");
+  });
+
+  it("formats localized relative ages and ignores invalid timestamps", () => {
+    const now = Date.parse("2026-08-12T14:30:00.000Z");
+
+    expect(
+      formatRelativeAge("2026-08-12T14:28:00.000Z", "en", now),
+    ).toBe("2 min. ago");
+    expect(
+      formatRelativeAge("2026-08-12T14:28:00.000Z", "de", now),
+    ).toBe("vor 2 Min.");
+    expect(formatRelativeAge("not-a-date", "en", now)).toBeNull();
   });
 
   it("shows synthesis rather than speaking while audio is only pending", () => {

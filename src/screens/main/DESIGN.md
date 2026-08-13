@@ -117,8 +117,8 @@ the previous one through an explicit surface action. Conversation drawers may
 remain contextual, but no hidden surface owns authoritative app data. The
 route-picker and transcript sheets follow the same rule: their visibility
 lives in `useMainScreenUiState`, not inside the workspace tree.
-When a transcript action targets conversation or Speaking settings, UI state
-hides the sheet and queues the target until the native dismissal callback.
+When a transcript replay action targets Speaking settings, UI state hides the
+sheet and queues the target until the native dismissal callback.
 Because React Native does not deliver that callback on Android, a bounded
 post-animation fallback drains the same single-consumer queue there. This keeps
 two sibling native modals from being presented concurrently.
@@ -158,11 +158,22 @@ settings notice without changing the selected surface or opening onboarding.
 The chevron is an explicit text-entry action and focuses the composer after its
 transition. A horizontal swipe changes only the visible page, preserving focus
 and keyboard state so the workspace does not jump vertically at gesture end.
-The portrait pager reserves one central stage sized by the orb ceiling, so the
-text composer replaces the orb rather than adding a second competing call to
-action. Its two chevrons remain outside that stage. The three satellite slots
-remain mounted below it and receive their enabled state independently, keeping
-the stage stable as route capabilities change.
+The portrait pager measures one central stage and derives the largest orb that
+fits its height and the width between the two 44pt chevrons, clamped from 96pt
+to the portrait ceiling. The text composer replaces the orb rather than adding
+a second competing call to action. Chevron selection and swipe settling use a
+220ms timing transition; no workspace pager motion springs or bounces. The
+three portrait satellite slots remain mounted below it and receive their
+enabled state independently, keeping the stage stable as route capabilities
+change. Landscape uses the same measurement under its lower ceiling, retains
+only Council and Web below the orb, and omits the portrait settings sentence.
+
+The portrait transcript handle derives the latest assistant model and
+localized relative age in `mainScreenViewModel.ts`. Its sheet owns the only
+conversation title and close action; `TranscriptPreviewCard` owns only the
+scrolling script and message actions, so it cannot duplicate image, style, or
+sheet-dismiss controls. Landscape mounts that same headerless transcript
+content directly in the right pane.
 
 ## Evidence
 

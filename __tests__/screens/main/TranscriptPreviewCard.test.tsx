@@ -1,12 +1,10 @@
 import React from "react";
 
-import { act, fireEvent, render, waitFor } from "@testing-library/react-native";
+import { fireEvent, render, waitFor } from "@testing-library/react-native";
 import { Alert, StyleSheet } from "react-native";
 
 import { TranscriptPreviewCard } from "../../../src/screens/main/TranscriptPreviewCard";
 import { lightColors } from "../../../src/theme/colors";
-
-let mockTailStateChange: ((isAtTail: boolean) => void) | null = null;
 
 jest.mock("../../../src/components/ChatTranscript", () => ({
   ChatTranscript: ({
@@ -16,7 +14,6 @@ jest.mock("../../../src/components/ChatTranscript", () => ({
     messageSelectionEnabled,
     onRepeatMessage,
     onShareMessage,
-    onTailStateChange,
     scrollToLatestRequest,
     branchChildrenByMessageId,
     onOpenBranches,
@@ -48,14 +45,12 @@ jest.mock("../../../src/components/ChatTranscript", () => ({
     messageSelectionEnabled?: boolean;
     onRepeatMessage?: () => void;
     onShareMessage?: () => void;
-    onTailStateChange?: (isAtTail: boolean) => void;
     scrollToLatestRequest?: number;
     branchChildrenByMessageId?: ReadonlyMap<string, unknown[]>;
     onOpenBranches?: (branches: unknown[]) => void;
   }) => {
     const React = require("react");
     const { Pressable, Text, View } = require("react-native");
-    mockTailStateChange = onTailStateChange ?? null;
     return React.createElement(
       View,
       null,
@@ -100,20 +95,14 @@ jest.mock("../../../src/components/ChatTranscript", () => ({
 }));
 
 describe("TranscriptPreviewCard", () => {
-  beforeEach(() => {
-    mockTailStateChange = null;
-  });
-
   afterEach(() => {
     jest.restoreAllMocks();
   });
 
-  it("keeps message actions on the home transcript without an expand control", () => {
-    const onOpenStyleSheet = jest.fn();
+  it("keeps message actions without duplicating sheet or workspace controls", () => {
     const screen = render(
       <TranscriptPreviewCard
         activeConversationId="conversation-1"
-        activeConversationTitle="Current conversation"
         colors={lightColors}
         messages={[
           {
@@ -128,23 +117,14 @@ describe("TranscriptPreviewCard", () => {
         onCopyMessage={jest.fn()}
         onRepeatMessage={jest.fn()}
         onRetryMessage={jest.fn()}
-        onOpenStyleSheet={onOpenStyleSheet}
         onShareMessage={jest.fn()}
         presentation="canvas"
-        showStyleControl
         showUsageStats={false}
         showWhenEmpty
-        t={(key) =>
-          ({
-            conversation: "Conversation",
-            openStyleSheet: "Open conversation settings",
-          })[key] ?? key
-        }
+        t={(key) => key}
       />,
     );
 
-    expect(screen.getByText("Current conversation")).toBeTruthy();
-    expect(screen.queryByText("Conversation")).toBeNull();
     expect(
       screen.getByText("actions:true:true:selection:true:latest:0"),
     ).toBeTruthy();
@@ -158,23 +138,11 @@ describe("TranscriptPreviewCard", () => {
         backgroundColor: "transparent",
         borderRadius: 0,
         borderWidth: 0,
-        overflow: "visible",
       }),
     );
-    expect(
-      StyleSheet.flatten(
-        screen.getByTestId("transcript-preview-header").props.style,
-      ),
-    ).toEqual(
-      expect.objectContaining({
-        marginHorizontal: -16,
-        borderTopWidth: 1,
-        borderTopColor: lightColors.border,
-      }),
-    );
-    fireEvent.press(screen.getByTestId("conversation-style-control"));
-
-    expect(onOpenStyleSheet).toHaveBeenCalledTimes(1);
+    expect(screen.queryByTestId("transcript-preview-header")).toBeNull();
+    expect(screen.queryByTestId("attach-image-control")).toBeNull();
+    expect(screen.queryByTestId("conversation-style-control")).toBeNull();
   });
 
   it("applies a preferred height as the flex basis so the sheet cannot collapse it", () => {
@@ -185,7 +153,6 @@ describe("TranscriptPreviewCard", () => {
     const screen = render(
       <TranscriptPreviewCard
         activeConversationId="conversation-1"
-        activeConversationTitle="Current conversation"
         colors={lightColors}
         messages={[
           {
@@ -218,171 +185,6 @@ describe("TranscriptPreviewCard", () => {
         flexShrink: 1,
       }),
     );
-  });
-
-  it("offers the image attachment control in the transcript header", () => {
-    const onAddImage = jest.fn();
-    const screen = render(
-      <TranscriptPreviewCard
-        activeConversationId="conversation-1"
-        activeConversationTitle="Current conversation"
-        colors={lightColors}
-        messages={[]}
-        onAddImage={onAddImage}
-        onCopyMessage={jest.fn()}
-        onRetryMessage={jest.fn()}
-        presentation="canvas"
-        showUsageStats={false}
-        showWhenEmpty
-        t={(key) => ({ addImage: "Add image" })[key] ?? key}
-      />,
-    );
-
-    const control = screen.getByTestId("attach-image-control");
-
-    expect(control.props.accessibilityLabel).toBe("Add image");
-    expect(StyleSheet.flatten(control.props.style)).toEqual(
-      expect.objectContaining({ width: 44, height: 44 }),
-    );
-
-    fireEvent.press(control);
-
-    expect(onAddImage).toHaveBeenCalledTimes(1);
-  });
-
-  it("disables the header image control while attachments are unavailable", () => {
-    const onAddImage = jest.fn();
-    const screen = render(
-      <TranscriptPreviewCard
-        activeConversationId="conversation-1"
-        activeConversationTitle="Current conversation"
-        colors={lightColors}
-        imageAttachmentDisabled
-        messages={[]}
-        onAddImage={onAddImage}
-        onCopyMessage={jest.fn()}
-        onRetryMessage={jest.fn()}
-        presentation="canvas"
-        showUsageStats={false}
-        showWhenEmpty
-        t={(key) => ({ addImage: "Add image" })[key] ?? key}
-      />,
-    );
-
-    const control = screen.getByTestId("attach-image-control");
-
-    expect(control.props.accessibilityState).toEqual(
-      expect.objectContaining({ disabled: true }),
-    );
-
-    fireEvent.press(control);
-
-    expect(onAddImage).not.toHaveBeenCalled();
-  });
-
-  it("hides the header image control when attachments are unsupported", () => {
-    const screen = render(
-      <TranscriptPreviewCard
-        activeConversationId="conversation-1"
-        activeConversationTitle="Current conversation"
-        colors={lightColors}
-        messages={[]}
-        onCopyMessage={jest.fn()}
-        onRetryMessage={jest.fn()}
-        presentation="canvas"
-        showUsageStats={false}
-        showWhenEmpty
-        t={(key) => key}
-      />,
-    );
-
-    expect(screen.queryByTestId("attach-image-control")).toBeNull();
-  });
-
-  it("uses the full header width and offers a jump to the latest message", () => {
-    const screen = render(
-      <TranscriptPreviewCard
-        activeConversationId="conversation-1"
-        activeConversationTitle="A deliberately long conversation title that should use the available header width"
-        colors={lightColors}
-        messages={[
-          {
-            id: "message-1",
-            role: "assistant",
-            content: "Reply",
-            model: "gpt-5.4",
-            provider: "openai",
-            timestamp: "2026-07-21T12:00:00.000Z",
-          },
-        ]}
-        onCopyMessage={jest.fn()}
-        onRetryMessage={jest.fn()}
-        onOpenStyleSheet={jest.fn()}
-        presentation="canvas"
-        scrollEnabled
-        showStyleControl
-        showUsageStats={false}
-        showWhenEmpty
-        t={(key) =>
-          ({
-            openStyleSheet: "Open conversation settings",
-            scrollToLatest: "Scroll to latest message",
-          })[key] ?? key
-        }
-      />,
-    );
-
-    expect(
-      StyleSheet.flatten(
-        screen.getByTestId("transcript-header-copy").props.style,
-      ),
-    ).toEqual(
-      expect.objectContaining({
-        flexGrow: 1,
-        flexShrink: 1,
-        minWidth: 0,
-      }),
-    );
-    expect(
-      StyleSheet.flatten(screen.getByTestId("transcript-title").props.style)
-        .width,
-    ).toBe("100%");
-
-    act(() => {
-      mockTailStateChange?.(false);
-    });
-
-    const jumpControl = screen.getByLabelText("Scroll to latest message");
-    expect(jumpControl).toBeTruthy();
-    fireEvent.press(jumpControl);
-
-    expect(
-      screen.getByText("actions:false:false:selection:true:latest:1"),
-    ).toBeTruthy();
-    expect(screen.queryByLabelText("Scroll to latest message")).toBeNull();
-  });
-
-  it("keeps the landscape transcript header within its pane", () => {
-    const screen = render(
-      <TranscriptPreviewCard
-        activeConversationTitle="Current conversation"
-        colors={lightColors}
-        layout="landscape"
-        messages={[]}
-        onCopyMessage={jest.fn()}
-        onRetryMessage={jest.fn()}
-        showUsageStats={false}
-        showWhenEmpty
-        t={(key) => key}
-      />,
-    );
-
-    const headerStyle = StyleSheet.flatten(
-      screen.getByTestId("transcript-preview-header").props.style,
-    );
-
-    expect(headerStyle.marginHorizontal).toBeUndefined();
-    expect(headerStyle.borderTopWidth).toBeUndefined();
   });
 
   it("edits a user transcript with an explicit future-context warning", async () => {

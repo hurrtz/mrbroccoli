@@ -1,5 +1,5 @@
 import React from "react";
-import { StyleSheet, useWindowDimensions, View } from "react-native";
+import { StyleSheet, Text, useWindowDimensions, View } from "react-native";
 
 import { IntroBanner } from "../../components/IntroBanner";
 import { BackgroundTaskBar } from "../../design-system/BackgroundTaskBar";
@@ -7,8 +7,10 @@ import { ConversationSettingsSummary } from "../../design-system/ConversationSet
 import { OrbSatellite } from "../../design-system/OrbSatellite";
 import { TranscriptHandle } from "../../design-system/TranscriptHandle";
 import { WorkspaceStatusLine } from "../../design-system/WorkspaceStatusLine";
+import { IconButton } from "../../design-system/IconButton";
 import { Modal } from "../../design-system/NativeControls";
 import type { Colors } from "../../theme/colors";
+import { fonts } from "../../theme/typography";
 import type { Message, VoiceVisualPhase } from "../../types";
 import { MainScreenRouteCard } from "./MainScreenRouteCard";
 import { MainScreenTopBar } from "./MainScreenTopBar";
@@ -78,16 +80,20 @@ function WorkspaceSatellites({
       ]}
       testID="workspace-satellites"
     >
-      <OrbSatellite
-        accessibilityLabel={t("addImage")}
-        compact={compact}
-        disabled={imageDisabled || !imageAvailable}
-        icon="image"
-        label={t("workspaceImageLabel")}
-        onPress={imageAvailable ? onAddImage : undefined}
-        testID="satellite-image"
-      />
-      {divider}
+      {!compact ? (
+        <>
+          <OrbSatellite
+            accessibilityLabel={t("addImage")}
+            compact={compact}
+            disabled={imageDisabled || !imageAvailable}
+            icon="image"
+            label={t("workspaceImageLabel")}
+            onPress={imageAvailable ? onAddImage : undefined}
+            testID="satellite-image"
+          />
+          {divider}
+        </>
+      ) : null}
       <OrbSatellite
         accessibilityLabel={t("ulraMode")}
         active={councilActive}
@@ -174,6 +180,7 @@ interface MainScreenWorkspaceProps {
     countLabel: string | null;
     emptyLabel: string;
     hideLabel: string;
+    meta: string | null;
     onClose: () => void;
     onDismiss: () => void;
     onOpen: () => void;
@@ -269,13 +276,6 @@ export function MainScreenWorkspace({
             style={styles.heroCardLandscape}
             {...routeCardProps}
           />
-          <ConversationSettingsSummary
-            accessibilityLabel={settingsSummary.accessibilityLabel}
-            onPress={settingsSummary.onPress}
-            summary={settingsSummary.summary}
-            testID="conversation-settings-summary"
-          />
-
           <View
             testID="landscape-stage-area"
             style={[
@@ -388,7 +388,7 @@ export function MainScreenWorkspace({
         accessibilityLabel={handleAccessibilityLabel}
         emptyLabel={transcriptSheet.emptyLabel}
         messageCount={messageCount}
-        meta={lastAssistant?.model ?? undefined}
+        meta={transcriptSheet.meta ?? undefined}
         onPress={transcriptSheet.onOpen}
         preview={lastAssistant?.content.trim()}
         style={workspaceStyles.transcriptHandle}
@@ -396,19 +396,48 @@ export function MainScreenWorkspace({
       />
 
       <Modal
-        footer={[
-          { text: transcriptSheet.hideLabel, onPress: transcriptSheet.onClose },
-        ]}
         layout="sheet"
         onClose={transcriptSheet.onClose}
         onDismiss={transcriptSheet.onDismiss}
-        title={transcriptSheet.title}
+        title={
+          <View
+            style={[
+              workspaceStyles.transcriptSheetHeader,
+              { borderBottomColor: colors.border },
+            ]}
+          >
+            <View
+              style={[
+                workspaceStyles.transcriptSheetGrip,
+                { backgroundColor: colors.borderStrong },
+              ]}
+            />
+            <View style={workspaceStyles.transcriptSheetTitleRow}>
+              <Text
+                accessibilityRole="header"
+                numberOfLines={1}
+                style={[
+                  workspaceStyles.transcriptSheetTitle,
+                  { color: colors.text },
+                ]}
+              >
+                {transcriptSheet.title}
+              </Text>
+              <IconButton
+                accessibilityLabel={transcriptSheet.hideLabel}
+                icon="close"
+                onPress={transcriptSheet.onClose}
+                testID="transcript-sheet-close"
+              />
+            </View>
+          </View>
+        }
         visible={transcriptSheet.visible}
       >
         <TranscriptPreviewCard
           colors={colors}
-          preferredHeight={Math.round(windowHeight * 0.6)}
-          presentation="card"
+          preferredHeight={Math.round(windowHeight * 0.75)}
+          presentation="canvas"
           {...transcript}
         />
       </Modal>
@@ -437,5 +466,33 @@ const workspaceStyles = StyleSheet.create({
   },
   transcriptHandle: {
     marginHorizontal: 0,
+  },
+  transcriptSheetHeader: {
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    marginHorizontal: -20,
+    marginTop: -10,
+    paddingBottom: 8,
+    paddingHorizontal: 8,
+  },
+  transcriptSheetGrip: {
+    alignSelf: "center",
+    borderRadius: 2,
+    height: 4,
+    marginBottom: 8,
+    width: 38,
+  },
+  transcriptSheetTitleRow: {
+    alignItems: "center",
+    flexDirection: "row",
+    gap: 12,
+    paddingLeft: 6,
+  },
+  transcriptSheetTitle: {
+    flex: 1,
+    fontFamily: fonts.display,
+    fontSize: 17,
+    letterSpacing: -0.2,
+    lineHeight: 22,
+    minWidth: 0,
   },
 });

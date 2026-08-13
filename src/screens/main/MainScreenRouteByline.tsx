@@ -35,7 +35,7 @@ export function MainScreenRouteByline({
   switchable: boolean;
 }) {
   const { colors } = useTheme();
-  const { language } = useLocalization();
+  const { language, t } = useLocalization();
   const route = mode.route;
   const local = route.runtime === "local" && Boolean(route.localModelId);
   const modelName = local
@@ -45,6 +45,8 @@ export function MainScreenRouteByline({
   const effortOptions = local
     ? []
     : getModelEffortOptions(route.provider, route.model);
+  const displayedEffortLabel =
+    effortOptions.length === 0 ? t("normal") : (effortLabel ?? t("normal"));
   const effortLabels = effortOptions.map((option) =>
     getModelEffortOptionLabel(option, language),
   );
@@ -54,7 +56,7 @@ export function MainScreenRouteByline({
   return (
     <Pressable
       accessibilityLabel={
-        effortLabel ? `${modelName}. ${effortLabel}` : modelName
+        `${modelName}. ${displayedEffortLabel}`
       }
       accessibilityRole={switchable ? "button" : undefined}
       disabled={!switchable}
@@ -79,15 +81,13 @@ export function MainScreenRouteByline({
         {modelName}
       </Text>
       <View style={styles.trailing}>
-        {effortLabel ? (
-          <Text
-            numberOfLines={1}
-            style={[styles.effort, { color: colors.textMuted }]}
-            testID="route-byline-effort"
-          >
-            {effortLabel}
-          </Text>
-        ) : null}
+        <Text
+          numberOfLines={1}
+          style={[styles.effort, { color: colors.textMuted }]}
+          testID="route-byline-effort"
+        >
+          {displayedEffortLabel}
+        </Text>
         {showDots ? (
           <View
             accessibilityElementsHidden

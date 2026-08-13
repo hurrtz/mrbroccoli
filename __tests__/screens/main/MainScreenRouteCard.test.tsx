@@ -60,6 +60,31 @@ describe("MainScreenRouteCard", () => {
     expect(onOpenRoutePicker).not.toHaveBeenCalled();
   });
 
+  it("labels routes without an effort control as Normal without dots", () => {
+    const localMode = {
+      id: "mode-1" as const,
+      route: {
+        runtime: "local" as const,
+        localModelId: "qwen3-0.6b-q8" as const,
+        provider: "openai" as const,
+        model: "Qwen3 0.6B",
+      },
+    };
+    const screen = renderWithProviders(
+      <MainScreenRouteCard
+        activeResponseMode="mode-1"
+        availableResponseModes={["mode-1"]}
+        onOpenRoutePicker={jest.fn()}
+        responseModes={[localMode]}
+      />,
+    );
+
+    expect(screen.getByTestId("route-byline-effort").props.children).toBe(
+      "Normal",
+    );
+    expect(screen.queryByTestId("route-byline-effort-dots")).toBeNull();
+  });
+
   it("removes the old provider card when no route is ready", () => {
     const screen = renderWithProviders(
       <MainScreenRouteCard

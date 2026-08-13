@@ -92,6 +92,10 @@
   action sheet.
 - [x] Reconcile transcript messages to the folded script-row model, compact and
   expanded metadata, expanded-only actions, and swipe removal.
+- [x] Reconcile the workspace revision: measured portrait orb, timing-only
+  pager motion, explicit Normal effort, tone/length/voice summary, relative-age
+  status and handle copy, constrained landscape controls, and the single-header
+  transcript sheet.
 - [ ] Reconcile the seven-page settings hierarchy and its new row/group route
   primitives. Overview, Connections, Search, Listening, Speaking, Data,
   App, and the replacement Thinking implementation are source-complete;

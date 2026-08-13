@@ -332,11 +332,9 @@ jest.mock("../../src/screens/main/MainScreenVoiceStage", () => ({
 jest.mock("../../src/screens/main/TranscriptPreviewCard", () => ({
   TranscriptPreviewCard: ({
     onOpenSpeakingSettings,
-    onOpenStyleSheet,
     showWhenEmpty,
   }: {
     onOpenSpeakingSettings?: () => void;
-    onOpenStyleSheet?: () => void;
     showWhenEmpty?: boolean;
   }) => {
     const React = require("react");
@@ -351,16 +349,6 @@ jest.mock("../../src/screens/main/TranscriptPreviewCard", () => ({
           ? "transcript-preview:empty-visible"
           : "transcript-preview",
       ),
-      onOpenStyleSheet
-        ? React.createElement(
-            TouchableOpacity,
-            {
-              testID: "transcript-open-style",
-              onPress: onOpenStyleSheet,
-            },
-            React.createElement(Text, null, "transcript-style-control"),
-          )
-        : null,
       onOpenSpeakingSettings
         ? React.createElement(
             TouchableOpacity,
@@ -832,23 +820,12 @@ describe("MainScreen", () => {
     expect(screen.getByText("drawer:open")).toBeTruthy();
   });
 
-  it("dismisses the transcript sheet before opening conversation settings", () => {
+  it("does not duplicate conversation settings inside the transcript sheet", () => {
     const screen = renderWithProviders(<MainScreen />);
 
     fireEvent.press(screen.getByTestId("transcript-handle"));
-    const transcriptModal = screen
-      .UNSAFE_getAllByType(RNModal)
-      .find((modal) => typeof modal.props.onDismiss === "function");
-    expect(transcriptModal).toBeDefined();
-
-    fireEvent.press(screen.getByTestId("transcript-open-style"));
+    expect(screen.queryByTestId("transcript-open-style")).toBeNull();
     expect(screen.queryByTestId("conversation-settings-header")).toBeNull();
-
-    act(() => {
-      transcriptModal?.props.onDismiss();
-    });
-
-    expect(screen.getByTestId("conversation-settings-header")).toBeTruthy();
   });
 
   it("dismisses the transcript sheet before opening Speaking settings", () => {
@@ -1034,6 +1011,9 @@ describe("MainScreen", () => {
     expect(screen.getByText("route-card")).toBeTruthy();
     expect(screen.getByTestId("conversation-settings-summary")).toBeTruthy();
     expect(
+      screen.getByText("Professional · Normal · System voice"),
+    ).toBeTruthy();
+    expect(
       screen.getByTestId("conversation-settings-summary-control").props
         .accessibilityLabel,
     ).toBe("Open conversation settings");
@@ -1080,7 +1060,9 @@ describe("MainScreen", () => {
     expect(leftPane.queryByText("status-strip")).toBeNull();
     expect(leftPane.queryByText("toggle-debug-log")).toBeNull();
     expect(screen.queryByTestId("landscape-status-area")).toBeNull();
+    expect(leftPane.queryByTestId("conversation-settings-summary")).toBeNull();
+    expect(leftPane.queryByTestId("satellite-image")).toBeNull();
     expect(rightPane.getByTestId("transcript-preview")).toBeTruthy();
-    expect(rightPane.getByText("transcript-style-control")).toBeTruthy();
+    expect(rightPane.queryByText("transcript-style-control")).toBeNull();
   });
 });

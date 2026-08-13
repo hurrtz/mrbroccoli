@@ -10,7 +10,6 @@ import {
 } from "react-native";
 
 import { ChatTranscript } from "../../components/ChatTranscript";
-import { IconButton } from "../../design-system/IconButton";
 import { PhosphorIcon } from "../../design-system/PhosphorIcon";
 import { Input, Modal } from "../../design-system/NativeControls";
 import { Colors } from "../../theme/colors";
@@ -27,15 +26,12 @@ import { styles } from "./styles";
 
 interface TranscriptPreviewCardProps {
   activeConversationId?: string | null;
-  activeConversationTitle?: string;
   activeConversationBranch?: ConversationBranchOrigin;
   conversationBranches?: ConversationMeta[];
   colors: Colors;
-  imageAttachmentDisabled?: boolean;
   layout?: "portrait" | "landscape";
   messages: Message[];
   activeReplayMessageId?: string | null;
-  onAddImage?: () => void;
   onCopyMessage: (message: Message) => Promise<boolean>;
   onEditMessage?: (message: Message, content: string) => Promise<boolean>;
   onBranchMessage?: (message: Message) => Promise<boolean> | void;
@@ -43,7 +39,6 @@ interface TranscriptPreviewCardProps {
   onRepeatMessage?: (message: Message) => void;
   onRetryMessage: (message: Message) => void;
   onRemoveMessage?: (message: Message) => void;
-  onOpenStyleSheet?: () => void;
   onOpenSpeakingSettings?: () => void;
   onShareMessage?: (message: Message) => void;
   onReportMessage?: (message: Message) => void;
@@ -52,7 +47,6 @@ interface TranscriptPreviewCardProps {
   scrollEnabled?: boolean;
   replayPhase?: "idle" | "preparing" | "speaking";
   showUsageStats: boolean;
-  showStyleControl?: boolean;
   showWhenEmpty?: boolean;
   style?: StyleProp<ViewStyle>;
   t: TranslateFn;
@@ -60,15 +54,12 @@ interface TranscriptPreviewCardProps {
 
 export function TranscriptPreviewCard({
   activeConversationId,
-  activeConversationTitle,
   activeConversationBranch,
   conversationBranches = [],
   colors,
-  imageAttachmentDisabled = false,
   layout = "portrait",
   messages,
   activeReplayMessageId = null,
-  onAddImage,
   onCopyMessage,
   onEditMessage,
   onBranchMessage,
@@ -76,7 +67,6 @@ export function TranscriptPreviewCard({
   onRepeatMessage,
   onRetryMessage,
   onRemoveMessage,
-  onOpenStyleSheet,
   onOpenSpeakingSettings,
   onShareMessage,
   onReportMessage,
@@ -85,13 +75,10 @@ export function TranscriptPreviewCard({
   scrollEnabled = false,
   replayPhase = "idle",
   showUsageStats,
-  showStyleControl = false,
   showWhenEmpty = false,
   style,
   t,
 }: TranscriptPreviewCardProps) {
-  const [isAtTranscriptTail, setIsAtTranscriptTail] = useState(true);
-  const [scrollToLatestRequest, setScrollToLatestRequest] = useState(0);
   const [editingMessage, setEditingMessage] = useState<Message | null>(null);
   const [editingText, setEditingText] = useState("");
   const [savingCorrection, setSavingCorrection] = useState<
@@ -148,7 +135,6 @@ export function TranscriptPreviewCard({
   };
 
   useEffect(() => {
-    setIsAtTranscriptTail(true);
     setEditingMessage(null);
     setEditingText("");
     setSavingCorrection(null);
@@ -174,21 +160,12 @@ export function TranscriptPreviewCard({
 
   const usesCanvasPresentation =
     layout === "landscape" || presentation === "canvas";
-  const usesPortraitCanvas = layout === "portrait" && presentation === "canvas";
-  const showScrollToLatest =
-    scrollEnabled && messages.length > 0 && !isAtTranscriptTail;
-  const showHeaderControls =
-    Boolean(onAddImage) ||
-    (showStyleControl && Boolean(onOpenStyleSheet)) ||
-    showScrollToLatest;
-
   return (
     <View
       testID="transcript-preview-card"
       style={[
         styles.transcriptShell,
         usesCanvasPresentation ? styles.transcriptShellCanvas : null,
-        usesPortraitCanvas ? styles.transcriptShellPortraitCanvas : null,
         // transcriptShell's flex: 1 means flexBasis: 0, and in a flex parent
         // Yoga lets flexBasis beat height on the main axis. Inside an
         // auto-height parent (the sheet dialog body) there is no free space
@@ -208,70 +185,6 @@ export function TranscriptPreviewCard({
         },
       ]}
     >
-      <View
-        testID="transcript-preview-header"
-        style={[
-          styles.transcriptHeader,
-          usesPortraitCanvas ? styles.transcriptHeaderPortraitCanvas : null,
-          {
-            borderBottomColor: colors.border,
-            borderTopColor: colors.border,
-          },
-        ]}
-      >
-        <View
-          testID="transcript-header-copy"
-          style={styles.transcriptHeaderCopy}
-        >
-          <Text
-            testID="transcript-title"
-            numberOfLines={1}
-            style={[styles.transcriptTitle, { color: colors.text }]}
-          >
-            {activeConversationTitle ?? t("freshSession")}
-          </Text>
-        </View>
-
-        {showHeaderControls ? (
-          <View style={styles.transcriptHeaderControls}>
-            {onAddImage ? (
-              <IconButton
-                testID="attach-image-control"
-                icon="image"
-                iconSize="control"
-                style={styles.transcriptStyleControl}
-                disabled={imageAttachmentDisabled}
-                onPress={onAddImage}
-                accessibilityLabel={t("addImage")}
-              />
-            ) : null}
-            {showStyleControl && onOpenStyleSheet ? (
-              <IconButton
-                testID="conversation-style-control"
-                icon="control"
-                iconSize="control"
-                style={styles.transcriptStyleControl}
-                onPress={onOpenStyleSheet}
-                accessibilityLabel={t("openStyleSheet")}
-              />
-            ) : null}
-            {showScrollToLatest ? (
-              <IconButton
-                testID="scroll-to-latest-control"
-                icon="down"
-                iconSize="control"
-                style={styles.transcriptStyleControl}
-                onPress={() => {
-                  setIsAtTranscriptTail(true);
-                  setScrollToLatestRequest((request) => request + 1);
-                }}
-                accessibilityLabel={t("scrollToLatest")}
-              />
-            ) : null}
-          </View>
-        ) : null}
-      </View>
-
       <View style={styles.transcriptBody}>
         <ChatTranscript
           conversationId={activeConversationId}
@@ -309,8 +222,6 @@ export function TranscriptPreviewCard({
           onShareMessage={onShareMessage}
           onReportMessage={onReportMessage}
           repeatPlaybackStatus={replayPhase}
-          onTailStateChange={setIsAtTranscriptTail}
-          scrollToLatestRequest={scrollToLatestRequest}
           scrollToMessageRequest={
             branchNavigationTarget?.conversationId === activeConversationId
               ? branchNavigationTarget

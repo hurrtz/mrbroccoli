@@ -54,14 +54,18 @@ receive already-derived state and callbacks.
 - The route byline above the stage states who answers the next turn and at
   what effort — one line at every model count, with the model list in a sheet
   opened from it. With a single configured model it becomes a credit line;
+  routes without an adjustable effort read `Normal` without effort dots;
   when no route is usable it renders nothing rather than another credential or
   setup card.
   `ResponseModeToggle` and `PhaseAwareVoiceAction` remain in the codebase,
   correct anywhere a picker grid or a docked bar is wanted.
-- The conversation's quick settings read as one muted line under the byline,
-  with a single control opening the conversation style sheet.
+- In portrait, the conversation's quick settings read as one muted
+  tone-length-voice line under the byline, with a single control opening the
+  conversation style sheet. Landscape omits this line to preserve the two-pane
+  stage.
 - The status line under the orb pairs a phase dot with what is happening and
-  what the conversation is; its info control opens the session details.
+  what the conversation is; while idle it names the conversation and its
+  relative age. Its info control opens the session details.
 - The transcript remains the durable record. Streaming text may be projected as
   a temporary assistant message, but only persisted messages become history.
   It reads as one continuous script with a fixed speaker margin, provider or
@@ -71,10 +75,13 @@ receive already-derived state and callbacks.
   metrics appear only on an open row, while compact metadata remains visible
   when usage details are enabled. Swiping a row exposes explicit removal.
   In portrait the transcript demotes to a peeking handle at the bottom edge
-  and opens as a sheet over the workspace; in landscape it stays inline in the
-  right pane. Actions inside the portrait sheet that open conversation or
-  Speaking settings dismiss the transcript completely before presenting the
-  sibling modal. The same sequencing applies in reverse: Data & privacy closes
+  whose metadata names the latest model and relative age. It opens as a sheet
+  over the workspace with one grip, conversation title, and labelled close
+  action; it does not repeat image or conversation-setting controls and has no
+  footer close action. In landscape it stays inline in the right pane. Actions
+  inside the portrait sheet that open Speaking settings dismiss the transcript
+  completely before presenting the sibling modal. The same sequencing applies
+  in reverse: Data & privacy closes
   its archive sheet and Settings before opening the sessions drawer at the
   expanded Archived group.
 - Provider, model, listening, speaking, fallback, and usage labels describe the
@@ -101,13 +108,15 @@ receive already-derived state and callbacks.
   are only briefly unavailable, such as during an active turn, also stay
   visible and disabled.
 - The satellites — image attach, Model Council, and Web Search — sit in a row
-  under the orb. They change how the next turn is answered, so they read as
-  notes on that action rather than settings to pass through on the way in.
+  under the portrait orb. They change how the next turn is answered, so they
+  read as notes on that action rather than settings to pass through on the way in.
   Toggles carry a round well that tints when on; momentary actions stay
   borderless. During speech the row also carries the stop and barge-in
   actions, because the orb has one press.
-- The satellites own the image attachment entry point in both orientations;
-  the composer owns only the pending-attachment preview and its remove action.
+- Landscape retains the Council and Web toggles but omits image attachment and
+  the portrait quick-settings sentence. The portrait Image satellite owns the
+  attachment entry point; the composer owns only the pending-attachment preview
+  and its remove action.
 - Conversation, settings, status, receipt, setup, and diagnostics surfaces do
   not replace the primary workspace or mutate one another implicitly.
 

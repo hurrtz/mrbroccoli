@@ -168,46 +168,6 @@ export const styles = StyleSheet.create({
     borderRadius: 0,
     borderWidth: 0,
   },
-  transcriptShellPortraitCanvas: {
-    overflow: "visible",
-  },
-  transcriptHeader: {
-    minHeight: 52,
-    paddingHorizontal: 14,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    zIndex: 2,
-  },
-  transcriptHeaderPortraitCanvas: {
-    marginHorizontal: -PORTRAIT_HORIZONTAL_GUTTER,
-    borderTopWidth: 1,
-  },
-  transcriptHeaderCopy: {
-    flexGrow: 1,
-    flexShrink: 1,
-    minWidth: 0,
-  },
-  transcriptHeaderControls: {
-    flexDirection: "row",
-    alignItems: "center",
-    flexShrink: 0,
-    marginLeft: 8,
-    gap: 4,
-  },
-  transcriptStyleControl: {
-    width: 44,
-    height: 44,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  transcriptTitle: {
-    width: "100%",
-    fontSize: 15,
-    lineHeight: 20,
-    fontFamily: fonts.display,
-  },
   transcriptBody: {
     flex: 1,
     minHeight: 0,

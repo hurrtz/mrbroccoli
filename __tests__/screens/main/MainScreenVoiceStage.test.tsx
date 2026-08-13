@@ -229,6 +229,18 @@ describe("MainScreenVoiceStage composer", () => {
     expect(onPress).toHaveBeenCalledTimes(1);
   });
 
+  it("measures the portrait orb from the available stage", () => {
+    const screen = renderStage(<MainScreenVoiceStage {...createProps()} />);
+
+    fireEvent(screen.getByTestId("voice-text-input-viewport"), "layout", {
+      nativeEvent: { layout: { height: 148, width: 320 } },
+    });
+
+    expect(
+      StyleSheet.flatten(screen.getByTestId("voice-orb-idle").props.style),
+    ).toEqual(expect.objectContaining({ height: 148, width: 148 }));
+  });
+
   it("blocks prompt CTAs when the selected voice route is unavailable", () => {
     const onPress = jest.fn();
     const onResolvePromptBlock = jest.fn();
@@ -551,6 +563,10 @@ describe("MainScreenVoiceStage composer", () => {
       nativeEvent: { layout: { width: 320 } },
     });
     requestFrame.mockClear();
+    const { withTiming } = jest.requireMock("react-native-reanimated") as {
+      withTiming: jest.Mock;
+    };
+    withTiming.mockClear();
 
     const gesture = screen.getByTestId("pan-gesture-detector").props.gesture;
     act(() => {
@@ -561,6 +577,11 @@ describe("MainScreenVoiceStage composer", () => {
 
     expect(onInputSurfaceChange).toHaveBeenCalledWith("text");
     expect(requestFrame).not.toHaveBeenCalled();
+    expect(withTiming).toHaveBeenCalledWith(
+      -352,
+      { duration: 220 },
+      expect.any(Function),
+    );
     requestFrame.mockRestore();
   });
 

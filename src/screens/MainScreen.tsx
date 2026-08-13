@@ -10,6 +10,8 @@ import { useVoicePipeline } from "../hooks/useVoicePipeline";
 import { useBatteryDiagnostics } from "../hooks/useBatteryDiagnostics";
 import { useKokoroModel } from "../hooks/useKokoroModel";
 import { getTtsFallbackRoutes } from "../constants/ttsFallback";
+import { getKokoroVoiceOptions } from "../constants/kokoro";
+import { getLocalModel } from "../constants/localModels";
 import { useLocalization } from "../i18n";
 import { useTheme } from "../theme/ThemeContext";
 import { MainScreenPresentation } from "./main/MainScreenPresentation";
@@ -290,10 +292,6 @@ export function MainScreen() {
     t,
     updateSettings,
   });
-  const showStyleChip =
-    loaded &&
-    freeOffline.entitlement.isPremium &&
-    presentationAvailableResponseModes.length > 0;
   const mainSurfaceVisible = !(
     drawerVisible ||
     memoryVisible ||
@@ -349,6 +347,50 @@ export function MainScreen() {
     conversationTtsVoiceOptions,
     ttsInstructionsSupported,
   } = conversationTtsControlState;
+  const settingsSummaryVoice = React.useMemo(() => {
+    if (!runtimeSettings.spokenRepliesEnabled) {
+      return t("spokenRepliesOff");
+    }
+
+    if (runtimeSettings.ttsMode === "native") {
+      return (
+        freeOffline.nativeVoiceOptions.find(
+          ({ value }) => value === runtimeSettings.nativeTtsVoiceId,
+        )?.label ?? t("systemVoice")
+      );
+    }
+
+    if (runtimeSettings.ttsMode === "kokoro") {
+      return (
+        getKokoroVoiceOptions("en", language).find(
+          ({ value }) => value === runtimeSettings.kokoroVoices.en,
+        )?.label ?? "Kokoro"
+      );
+    }
+
+    if (runtimeSettings.ttsMode === "local") {
+      return runtimeSettings.localTtsModelId
+        ? getLocalModel(runtimeSettings.localTtsModelId).name
+        : t("noTtsProvider");
+    }
+
+    return (
+      conversationTtsVoiceOptions.find(
+        ({ value }) => value === selectedTtsVoice,
+      )?.label ?? selectedTtsVoice
+    );
+  }, [
+    conversationTtsVoiceOptions,
+    freeOffline.nativeVoiceOptions,
+    language,
+    runtimeSettings.kokoroVoices.en,
+    runtimeSettings.localTtsModelId,
+    runtimeSettings.nativeTtsVoiceId,
+    runtimeSettings.spokenRepliesEnabled,
+    runtimeSettings.ttsMode,
+    selectedTtsVoice,
+    t,
+  ]);
   const isRecording =
     runtimeSettings.sttMode === "native"
       ? nativeStt.isRecording
@@ -687,6 +729,7 @@ export function MainScreen() {
   );
   const {
     activeConversationTitle,
+    conversationStatusDetail,
     fallbackTtsStatusLabel,
     isActive,
     lastAssistantReply,
@@ -695,6 +738,7 @@ export function MainScreen() {
     statusDisplay,
     sttStatusLabel,
     ttsStatusLabel,
+    transcriptHandleMeta,
     visualPhase,
   } = getMainScreenViewModel({
     activeConversation,
@@ -745,9 +789,6 @@ export function MainScreen() {
     updateSettings,
     webSearchActive,
   });
-  const handleOpenTranscriptConversationSettings = React.useCallback(() => {
-    runAfterTranscriptDismiss(handleOpenConversationSettings);
-  }, [handleOpenConversationSettings, runAfterTranscriptDismiss]);
   const handleOpenTranscriptSpeakingSettings = React.useCallback(() => {
     runAfterTranscriptDismiss(handleOpenSpeakingSettings);
   }, [handleOpenSpeakingSettings, runAfterTranscriptDismiss]);
@@ -1021,13 +1062,11 @@ export function MainScreen() {
         settingsSummary: {
           accessibilityLabel: t("openStyleSheet"),
           onPress: handleOpenConversationSettings,
-          summary: `${t(responseTone)} · ${t(responseLength)}`,
+          summary: `${t(responseTone)} · ${t(responseLength)} · ${settingsSummaryVoice}`,
         },
         statusLine: {
           detailActive: statusDisplay.statusDetail,
-          detailIdle: `${activeConversationTitle} · ${
-            statusDisplay.messageCountLabel ?? t("freshSession")
-          }`,
+          detailIdle: conversationStatusDetail,
           onInfo: openStatusDetails,
           sessionDetailsLabel: t("workspaceSessionDetails"),
           titleActive: statusDisplay.statusTitle,
@@ -1038,6 +1077,7 @@ export function MainScreen() {
           countLabel: statusDisplay.messageCountLabel,
           emptyLabel: t("workspaceNoMessagesYet"),
           hideLabel: t("workspaceHideTranscript"),
+          meta: transcriptHandleMeta,
           onClose: closeTranscriptSheet,
           onDismiss: handleTranscriptDismiss,
           onOpen: openTranscriptSheet,
@@ -1095,15 +1135,10 @@ export function MainScreen() {
         },
         transcript: {
           activeConversationId: activeConversation?.id ?? null,
-          activeConversationTitle,
           activeConversationBranch: activeConversation?.branch,
           conversationBranches: conversations,
           activeReplayMessageId,
-          imageAttachmentDisabled,
           messages,
-          onAddImage: imageAttachmentAvailable
-            ? imagePromptSubmission.handleAddImage
-            : undefined,
           onCopyMessage: (message) =>
             handleCopyMessage(formatMessageForCopy(message, language)),
           onEditMessage: isBusy
@@ -1112,7 +1147,6 @@ export function MainScreen() {
           onBranchMessage: isBusy ? undefined : handleBranchMessage,
           onSelectBranchConversation: isBusy ? undefined : selectConversation,
           onOpenSpeakingSettings: handleOpenTranscriptSpeakingSettings,
-          onOpenStyleSheet: handleOpenTranscriptConversationSettings,
           onRepeatMessage: (message) => {
             void handleRepeatMessage(message);
           },
@@ -1130,7 +1164,6 @@ export function MainScreen() {
           },
           replayPhase,
           scrollEnabled: true,
-          showStyleControl: showStyleChip,
           showUsageStats: runtimeSettings.showUsageStats,
           showWhenEmpty: true,
           t,

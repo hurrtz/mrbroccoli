@@ -24,7 +24,6 @@ export function VoiceTextInputPager({
   initialTextMessage = "",
   inputMode,
   isActive,
-  layout,
   onInputSurfaceChange,
   onRemoveImage,
   onDriveContinue,
@@ -51,14 +50,6 @@ export function VoiceTextInputPager({
   voiceInputUnavailableMessage = null,
 }: VoiceTextInputPagerProps) {
   const [viewportHeight, setViewportHeight] = React.useState(0);
-  // The resolved exploration fixes the portrait slot at 196pt. It keeps the
-  // orb visually primary and lets its satellites stay in a stable place;
-  // shrinking it to incidental whitespace was what made the home screen look
-  // empty on tall phones. Landscape still measures the constrained pane.
-  const stageSize =
-    layout === "portrait"
-      ? maxOrbSize
-      : Math.max(96, Math.min(maxOrbSize, viewportHeight || maxOrbSize));
   const pager = useInputSurfacePager({
     disabled,
     initialSurface,
@@ -69,6 +60,17 @@ export function VoiceTextInputPager({
     onTextMessageChange,
     submissionDisabled: Boolean(promptBlockedMessage),
   });
+  // The orb is the largest circle that fits between the two 44pt surface
+  // controls and inside the measured stage. The clamp preserves a useful tap
+  // target on constrained windows without hard-coding one portrait size.
+  const stageSize = Math.max(
+    96,
+    Math.min(
+      maxOrbSize,
+      viewportHeight || maxOrbSize,
+      Math.max(96, pager.pageWidth - 92),
+    ),
+  );
   const derivedProgress = useOrbTurnProgress({
     recordingMaxMs,
     recordingStartedAtMs: recordingStartedAtMs ?? null,
@@ -97,6 +99,9 @@ export function VoiceTextInputPager({
   ) => {
     pager.handleLayout(event);
     const nextHeight = Math.round(event.nativeEvent.layout.height);
+    if (!Number.isFinite(nextHeight) || nextHeight <= 0) {
+      return;
+    }
     setViewportHeight((currentHeight) =>
       Math.abs(currentHeight - nextHeight) >= 1 ? nextHeight : currentHeight,
     );

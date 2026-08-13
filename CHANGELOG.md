@@ -38,8 +38,11 @@ the complete Play Store translations are kept in a dedicated file under
   sheet to change it; your conversation's style reads as a line of text with
   one control; image, Model Council, and Web Search sit as small labelled
   controls under the orb; and the transcript peeks above the bottom edge,
-  opening as a sheet over the workspace. In landscape the transcript stays
-  beside the orb, as before.
+  opening as a sheet over the workspace with a single compact header. Model
+  and conversation ages now stay visible in the quiet status areas, and the
+  conversation line includes its voice. In landscape the transcript stays
+  beside the orb while portrait-only image and conversation controls stay out
+  of the constrained pane.
 
 - The voice pipeline's phase colours follow the approved design system's new
   ramp: green at recording and speaking, travelling through teal and blue to

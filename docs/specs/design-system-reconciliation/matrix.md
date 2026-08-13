@@ -68,18 +68,18 @@ functional acceptance. Device verdicts are added as the goal progresses.
 | `AppWordmark` | `src/components/AppWordmark.tsx` | mapped |
 | `BackgroundTaskBar` | `src/design-system/BackgroundTaskBar.tsx` | mapped |
 | `Composer` | `src/screens/main/voiceTextInputPager/InputSurfacePages.tsx` | mapped through native composer composition |
-| `ConversationSettingsSummary` | `src/design-system/ConversationSettingsSummary.tsx` | mapped |
+| `ConversationSettingsSummary` | `src/design-system/ConversationSettingsSummary.tsx` | source/unit parity; portrait-only workspace ownership |
 | `IntroBanner` | `src/components/IntroBanner.tsx` | mapped |
 | `OrbSatellite` | `src/design-system/OrbSatellite.tsx` | mapped |
 | `PhaseAwareVoiceAction` | `src/screens/main/PhaseAwareVoiceAction.tsx` | mapped, retained off-home |
 | `Picker` | `src/components/Picker.tsx` | mapped |
 | `PremiumUpgradeModal` | `src/components/PremiumUpgradeModal.tsx` | mapped |
 | `ResponseModeToggle` | `src/components/ResponseModeToggle.tsx` | mapped, retained off-home |
-| `RouteByline` | `src/screens/main/MainScreenRouteByline.tsx` | mapped, native composition name differs |
+| `RouteByline` | `src/screens/main/MainScreenRouteByline.tsx` | source/unit parity; native composition name differs |
 | `RoutePicker` | `src/screens/main/RoutePickerSheet.tsx` | mapped, native composition name differs |
-| `TranscriptHandle` | `src/design-system/TranscriptHandle.tsx` | mapped |
-| `VoiceOrb` | `src/design-system/VoiceOrb.tsx` and `src/screens/main/useOrbTurnProgress.ts` | mapped |
-| `WorkspaceStatusLine` | `src/design-system/WorkspaceStatusLine.tsx` | mapped |
+| `TranscriptHandle` | `src/design-system/TranscriptHandle.tsx` | source/unit parity; latest model and localized relative age |
+| `VoiceOrb` | `src/design-system/VoiceOrb.tsx` and `src/screens/main/useOrbTurnProgress.ts` | source/unit parity; measured stage and timing-only pager motion |
+| `WorkspaceStatusLine` | `src/design-system/WorkspaceStatusLine.tsx` | source/unit parity; idle conversation age derived by view model |
 
 ## Manifest data exports
 
@@ -99,8 +99,8 @@ data, not separate visual components.
 
 | Surface or flow | Android emulator | Physical Android | iOS simulator | Physical iPhone |
 | --- | --- | --- | --- | --- |
-| Workspace, light/dark portrait | pass: default plus dark/high-contrast/large text | pass: isolated Release smoke | pass: default plus dark/high-contrast/large text | launch pass on fallback iPhone; Wi-Fi target blocked |
-| Workspace landscape | pass: split panes and active route byline | pass: smoke rotation | pass: split panes and active route byline | not automated |
+| Workspace, light/dark portrait | current source/unit parity; rebuilt native revalidation pending | prior isolated Release smoke; current revision pending | current source/unit parity; rebuilt native revalidation pending | prior launch pass on fallback iPhone; current revision pending |
+| Workspace landscape | current source/unit parity; rebuilt native revalidation pending | prior smoke rotation; current revision pending | current source/unit parity; rebuilt native revalidation pending | not automated |
 | Orb states and progress rings | pass: ten deterministic phases/boundaries | pass: real recording, transcribing, thinking, speaking plus deterministic overtime | pass: ten deterministic phases/boundaries | full-overtime isolated fixture pass; real turn blocked |
 | Introduction and audio | pass: seven steps, swipe, bundled audio, Back/Done/reopen/close | pass: same 13-scene smoke | pass: same 13-scene smoke | first-launch banner captured; interaction not automated |
 | Automatic setup | pass: honest low-memory rejection, retry, manual hand-off | pass: Qwen and Whisper viable; Piper failure excluded on retry; system-voice profile Ready | presentation and controller tests pass | blocked by signing/memory entitlement prerequisite |

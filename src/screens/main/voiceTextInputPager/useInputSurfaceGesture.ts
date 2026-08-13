@@ -4,7 +4,6 @@ import {
   runOnJS,
   useAnimatedStyle,
   useSharedValue,
-  withSpring,
   withTiming,
 } from "react-native-reanimated";
 import { useReducedMotion } from "../../../hooks/useReducedMotion";
@@ -98,13 +97,9 @@ export function useInputSurfaceGesture({
             return;
           }
 
-          trackTranslateX.value = withSpring(
+          trackTranslateX.value = withTiming(
             targetX,
-            {
-              damping: 22,
-              mass: 0.72,
-              stiffness: 230,
-            },
+            { duration: 220 },
             (finished) => {
               if (finished) {
                 runOnJS(applySurface)(nextSurface, false);
@@ -121,11 +116,7 @@ export function useInputSurfaceGesture({
             -activeSurfaceIndex.value * pageStrideShared.value;
           trackTranslateX.value = reducedMotion
             ? targetX
-            : withSpring(targetX, {
-                damping: 22,
-                mass: 0.72,
-                stiffness: 230,
-              });
+            : withTiming(targetX, { duration: 220 });
         }),
     [
       activeSurfaceIndex,
