@@ -311,6 +311,7 @@ export const uk = {
   stopDriveSession: "Призупинити автопродовження",
   repeatDriveReply: "Повторити останню",
   continueDriveSession: "Відновити автопродовження",
+  driveSendsIn: ({ seconds }) => `Надсилання через ${seconds}…`,
   speechToText: "Розпізнавання мовлення",
   appNative: "Системне розпізнавання",
   nativeSttDescription:

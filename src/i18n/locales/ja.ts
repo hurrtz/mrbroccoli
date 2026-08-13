@@ -302,6 +302,7 @@ export const ja = {
   stopDriveSession: "自動継続を停止",
   repeatDriveReply: "最後の回答を繰り返す",
   continueDriveSession: "自動継続を再開",
+  driveSendsIn: ({ seconds }) => `${seconds}秒後に送信…`,
   speechToText: "音声からテキストへ",
   appNative: "システム認識",
   nativeSttDescription:

@@ -302,6 +302,7 @@ export const fr = {
   stopDriveSession: "Suspendre le mode auto",
   repeatDriveReply: "Répéter la dernière réponse",
   continueDriveSession: "Reprendre le mode auto",
+  driveSendsIn: ({ seconds }) => `Envoi dans ${seconds}…`,
   speechToText: "Parole en texte",
   appNative: "Reconnaissance du système",
   nativeSttDescription:

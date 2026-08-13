@@ -300,6 +300,7 @@ export const ur = {
   stopDriveSession: "آٹو موقوف کریں۔",
   repeatDriveReply: "آخری دہرائیں۔",
   continueDriveSession: "آٹو دوبارہ شروع کریں۔",
+  driveSendsIn: ({ seconds }) => `${seconds} میں بھیجا جائے گا…`,
   speechToText: "تقریر سے متن",
   appNative: "سسٹم کی پہچان",
   nativeSttDescription:

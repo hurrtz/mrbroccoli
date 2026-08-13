@@ -106,7 +106,10 @@ jest.mock("react-native-reanimated", () => {
   };
 });
 
-const t = ((key: string) => {
+const t = ((key: string, params?: Record<string, unknown>) => {
+  if (key === "driveSendsIn") {
+    return `Sends in ${params?.seconds}…`;
+  }
   const copy: Record<string, string> = {
     textMessagePlaceholder: "Type a message",
     sendTextMessage: "Send message",
@@ -648,23 +651,31 @@ describe("MainScreenVoiceStage composer", () => {
     );
 
     fireEvent.press(screen.getByTestId("voice-input-surface"));
-    fireEvent.press(screen.getByTestId("drive-session-stop"));
+    fireEvent.press(screen.getByTestId("drive-session-toggle"));
     fireEvent.press(screen.getByTestId("drive-session-repeat"));
-    fireEvent.press(screen.getByTestId("drive-session-continue"));
 
     expect(onPress).toHaveBeenCalledTimes(1);
     expect(onDriveStop).toHaveBeenCalledTimes(1);
     expect(onDriveRepeat).toHaveBeenCalledTimes(1);
     expect(onDriveContinue).not.toHaveBeenCalled();
+    // While the loop is live, the fixed-position toggle fills with the accent
+    // and reads as the pause action.
     expect(
-      screen.getByTestId("drive-session-stop").props.accessibilityState,
-    ).toEqual({ disabled: false });
+      screen.getByTestId("drive-session-toggle").props.accessibilityState,
+    ).toEqual({ disabled: false, selected: true });
     expect(
-      screen.getByTestId("drive-session-continue").props.accessibilityState,
-    ).toEqual({ disabled: true });
+      screen.getByTestId("drive-session-toggle").props.accessibilityLabel,
+    ).toBe("Pause auto");
     expect(
-      StyleSheet.flatten(screen.getByTestId("drive-session-stop").props.style),
-    ).toEqual(expect.objectContaining({ minHeight: 48 }));
+      StyleSheet.flatten(
+        screen.getByTestId("drive-session-toggle").props.style,
+      ),
+    ).toEqual(
+      expect.objectContaining({
+        minHeight: 48,
+        backgroundColor: lightColors.accent,
+      }),
+    );
 
     screen.rerender(
       <MainScreenVoiceStage
@@ -679,14 +690,42 @@ describe("MainScreenVoiceStage composer", () => {
         })}
       />,
     );
-    fireEvent.press(screen.getByTestId("drive-session-continue"));
+    // Paused: the same control in the same slot resumes; positions never swap.
+    expect(
+      screen.getByTestId("drive-session-toggle").props.accessibilityLabel,
+    ).toBe("Resume auto");
+    fireEvent.press(screen.getByTestId("drive-session-toggle"));
     expect(onDriveContinue).toHaveBeenCalledTimes(1);
+    expect(onDriveStop).toHaveBeenCalledTimes(1);
     expect(
-      screen.getByTestId("drive-session-stop").props.accessibilityState,
-    ).toEqual({ disabled: true });
-    expect(
-      screen.getByTestId("drive-session-continue").props.accessibilityState,
-    ).toEqual({ disabled: false });
+      screen.getByTestId("drive-session-toggle").props.accessibilityState,
+    ).toEqual({ disabled: false, selected: false });
+  });
+
+  it("shows the silence countdown as a chip above the live toggle", () => {
+    const screen = renderStage(
+      <MainScreenVoiceStage
+        {...createProps({
+          driveAutoContinueEnabled: true,
+          driveSilenceCountdownSeconds: 4,
+          inputMode: "drive-session",
+        })}
+      />,
+    );
+
+    expect(screen.getByTestId("drive-session-countdown")).toBeTruthy();
+    expect(screen.getByText("Sends in 4…")).toBeTruthy();
+
+    screen.rerender(
+      <MainScreenVoiceStage
+        {...createProps({
+          driveAutoContinueEnabled: false,
+          driveSilenceCountdownSeconds: 4,
+          inputMode: "drive-session",
+        })}
+      />,
+    );
+    expect(screen.queryByTestId("drive-session-countdown")).toBeNull();
   });
 
   it("reserves constrained landscape Drive mode for hands-free controls", () => {

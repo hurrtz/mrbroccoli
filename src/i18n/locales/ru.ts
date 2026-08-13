@@ -303,6 +303,7 @@ export const ru = {
   stopDriveSession: "Пауза авто",
   repeatDriveReply: "Повторить последний",
   continueDriveSession: "Возобновить авто",
+  driveSendsIn: ({ seconds }) => `Отправка через ${seconds}…`,
   speechToText: "Речь в текст",
   appNative: "Системное распознавание",
   nativeSttDescription:

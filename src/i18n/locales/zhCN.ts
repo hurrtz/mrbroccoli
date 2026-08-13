@@ -300,6 +300,7 @@ export const zhCN = {
   stopDriveSession: "暂停自动",
   repeatDriveReply: "重复最后一次",
   continueDriveSession: "恢复自动",
+  driveSendsIn: ({ seconds }) => `${seconds} 秒后发送…`,
   speechToText: "语音转文字",
   appNative: "系统识别",
   nativeSttDescription:

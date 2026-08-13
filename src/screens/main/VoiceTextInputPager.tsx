@@ -279,6 +279,7 @@ export function VoiceTextInputPager({
           autoContinueEnabled={driveAutoContinueEnabled}
           canRepeat={driveSessionCanRepeat}
           colors={colors}
+          countdownSeconds={driveSilenceCountdownSeconds}
           disabled={disabled || Boolean(promptBlockedMessage)}
           onContinue={onDriveContinue}
           onRepeat={onDriveRepeat}

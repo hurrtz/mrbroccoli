@@ -302,6 +302,7 @@ export const ar = {
   stopDriveSession: "إيقاف مؤقت للوضع التلقائي",
   repeatDriveReply: "كرر الأخير",
   continueDriveSession: "استئناف الوضع التلقائي",
+  driveSendsIn: ({ seconds }) => `الإرسال بعد ${seconds}…`,
   speechToText: "الكلام إلى النص",
   appNative: "تعرّف النظام على الكلام",
   nativeSttDescription:

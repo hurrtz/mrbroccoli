@@ -303,6 +303,7 @@ export const cs = {
   stopDriveSession: "Pozastavit automatiku",
   repeatDriveReply: "Zopakovat poslední",
   continueDriveSession: "Obnovit automatiku",
+  driveSendsIn: ({ seconds }) => `Odešle se za ${seconds}…`,
   speechToText: "Řeč na text",
   appNative: "Rozpoznávání systému",
   nativeSttDescription:

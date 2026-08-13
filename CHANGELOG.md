@@ -28,6 +28,9 @@ the complete Play Store translations are kept in a dedicated file under
   glyph in a hairline circle announces the spoken walkthrough, setup-focused
   copy replaces "New here?", a quiet chevron replaces the white action pill,
   and the slow sheen it shares with the Premium band invites without shouting.
+- Drive Session's three-button row is now Repeat plus one fixed-position
+  Pause/Resume toggle whose green fill means the loop is live, and the silence
+  countdown appears on screen as a "Sends in N…" chip above it.
 - Fixed successful local transcription crashing the iOS Release app when its
   JavaScript runtime does not provide relative-time formatting.
 - Fixed provider connection sheets occasionally freezing while returning to

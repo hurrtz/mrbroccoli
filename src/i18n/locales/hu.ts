@@ -307,6 +307,7 @@ export const hu = {
   stopDriveSession: "Automatikus folytatás leállítása",
   repeatDriveReply: "Utolsó válasz ismétlése",
   continueDriveSession: "Automatikus folytatás újraindítása",
+  driveSendsIn: ({ seconds }) => `Küldés ${seconds} múlva…`,
   speechToText: "Beszéd szöveggé",
   appNative: "Rendszerfelismerés",
   nativeSttDescription:

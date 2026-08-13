@@ -302,6 +302,7 @@ export const hi = {
   stopDriveSession: "ऑटो रोकें",
   repeatDriveReply: "अंतिम उत्तर दोहराएँ",
   continueDriveSession: "ऑटो फिर से शुरू करें",
+  driveSendsIn: ({ seconds }) => `${seconds} में भेजा जाएगा…`,
   speechToText: "भाषण से पाठ तक",
   appNative: "सिस्टम पहचान",
   nativeSttDescription:

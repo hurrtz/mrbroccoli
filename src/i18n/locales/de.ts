@@ -307,6 +307,7 @@ export const de = {
   stopDriveSession: "Automatik pausieren",
   repeatDriveReply: "Letzte wiederholen",
   continueDriveSession: "Automatik fortsetzen",
+  driveSendsIn: ({ seconds }) => `Sendet in ${seconds}…`,
   speechToText: "Sprache zu Text",
   appNative: "Systemerkennung",
   nativeSttDescription:

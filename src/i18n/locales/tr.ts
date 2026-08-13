@@ -302,6 +302,7 @@ export const tr = {
   stopDriveSession: "Otomatik duraklat",
   repeatDriveReply: "Sonuncuyu tekrarla",
   continueDriveSession: "Otomatik devam ettir",
+  driveSendsIn: ({ seconds }) => `${seconds} saniye içinde gönderilir…`,
   speechToText: "Konuşmadan Metne",
   appNative: "Sistem Tanıma",
   nativeSttDescription:

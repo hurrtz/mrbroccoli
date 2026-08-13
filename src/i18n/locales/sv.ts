@@ -302,6 +302,7 @@ export const sv = {
   stopDriveSession: "Pausa auto",
   repeatDriveReply: "Upprepa sist",
   continueDriveSession: "Återuppta auto",
+  driveSendsIn: ({ seconds }) => `Skickas om ${seconds}…`,
   speechToText: "Tal till text",
   appNative: "Systemigenkänning",
   nativeSttDescription:

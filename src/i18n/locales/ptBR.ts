@@ -302,6 +302,7 @@ export const ptBR = {
   stopDriveSession: "Pausar automático",
   repeatDriveReply: "Repetir última",
   continueDriveSession: "Retomar automático",
+  driveSendsIn: ({ seconds }) => `Envia em ${seconds}…`,
   speechToText: "Fala para Texto",
   appNative: "Reconhecimento do Sistema",
   nativeSttDescription:
