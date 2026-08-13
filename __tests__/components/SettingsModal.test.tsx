@@ -805,14 +805,20 @@ describe("SettingsModal", () => {
     const dismissKeyboard = jest
       .spyOn(Keyboard, "dismiss")
       .mockImplementation(() => undefined);
+    const addKeyboardListener = Keyboard.addListener.bind(Keyboard);
     const removeKeyboardListener = jest.fn();
     let keyboardDidHide: (() => void) | null = null;
     jest.spyOn(Keyboard, "addListener").mockImplementation((event, listener) => {
+      const subscription = addKeyboardListener(event, listener);
       if (event === "keyboardDidHide") {
         keyboardDidHide = listener as () => void;
-        return { remove: removeKeyboardListener };
+        const removeSubscription = subscription.remove.bind(subscription);
+        subscription.remove = () => {
+          removeKeyboardListener();
+          removeSubscription();
+        };
       }
-      return { remove: jest.fn() };
+      return subscription;
     });
     const screen = renderSettingsModal({ focusProvider: "openai" });
 
