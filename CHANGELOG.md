@@ -27,6 +27,10 @@ the complete Play Store translations are kept in a dedicated file under
 
 ### Changed
 
+- Thinking, Listening, Speaking, Search, and Connections now use the approved
+  job-first headings and guidance throughout Settings, including an explicit
+  device-keychain boundary for provider credentials and accurate home-route
+  wording for answering models.
 - The introduction now uses full 44-point header and picker controls, marks
   automatic setup as Recommended, and contracts its invitation to a stable
   title-only row in landscape. Setup completion and failure stay reachable in

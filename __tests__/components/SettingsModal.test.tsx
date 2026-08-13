@@ -262,7 +262,9 @@ describe("SettingsModal", () => {
       );
       expect(screen.getAllByText("Connections")).toHaveLength(1);
       expect(
-        screen.getByText("Provider keys, validation, and capabilities."),
+        screen.getByText(
+          "Keys stay in the device keychain and are sent only to their own provider.",
+        ),
       ).toBeTruthy();
       expect(screen.getByTestId("connections-settings-page")).toBeTruthy();
       expect(screen.getByText("Providers")).toBeTruthy();
@@ -291,6 +293,12 @@ describe("SettingsModal", () => {
       expect(screen.getByTestId("listening-settings-page")).toBeTruthy();
     });
     expect(onOpenPremium).not.toHaveBeenCalled();
+    expect(screen.getByText("Who listens")).toBeTruthy();
+    expect(
+      screen.getByText(
+        "One choice across every runtime. A radio unlocks only after a viable test — testing is the egg, and it cracks when a model fails. Removing an installed model is a swipe. Provider routes appear once connected under Connections.",
+      ),
+    ).toBeTruthy();
     expect(screen.getByTestId("settings-stt-route-native")).toBeTruthy();
     expect(
       screen.getByTestId("settings-stt-route-provider-openai"),
@@ -1260,7 +1268,12 @@ describe("SettingsModal", () => {
       expect(screen.getByTestId("settings-modal-title").props.children).toBe(
         "Thinking",
       );
-      expect(screen.getByText("Model Selection")).toBeTruthy();
+      expect(screen.getByText("Answering models")).toBeTruthy();
+      expect(
+        screen.getByText(
+          "Up to four; the home screen switches who answers the next turn. A model you don't have yet is downloaded or connected right here.",
+        ),
+      ).toBeTruthy();
       expect(screen.getAllByText("System Prompt")).toHaveLength(2);
       expect(screen.queryByText("Provider")).toBeNull();
       expect(screen.getByTestId("thinking-slot-mode-1")).toBeTruthy();
@@ -1271,6 +1284,9 @@ describe("SettingsModal", () => {
 
     fireEvent.press(screen.getByTestId("thinking-slot-mode-1"));
     expect(screen.getByTestId("thinking-slot-sheet")).toBeTruthy();
+    expect(
+      screen.getByText("Switchable from the home screen byline."),
+    ).toBeTruthy();
     expect(screen.getByTestId("thinking-slot-provider")).toBeTruthy();
     expect(screen.getByTestId("thinking-slot-model")).toBeTruthy();
     expect(screen.getByTestId("thinking-remove-model")).toBeTruthy();
@@ -1300,7 +1316,12 @@ describe("SettingsModal", () => {
         "Search",
       );
       expect(screen.getByTestId("search-settings-page")).toBeTruthy();
-      expect(screen.getByText("Web Search Provider")).toBeTruthy();
+      expect(screen.getByText("Who searches")).toBeTruthy();
+      expect(
+        screen.getByText(
+          "Search runs inside an answer when the model decides it needs the web. Providers appear once connected under Connections.",
+        ),
+      ).toBeTruthy();
       expect(screen.getByTestId("settings-search-route-nobody")).toBeTruthy();
       expect(screen.getByLabelText("OpenAI").props.accessibilityState).toEqual({
         checked: true,
@@ -1310,7 +1331,7 @@ describe("SettingsModal", () => {
       expect(screen.getByTestId("web-search-result-limit")).toBeTruthy();
       expect(screen.getByTestId("web-search-search-mode")).toBeTruthy();
       expect(screen.queryByLabelText("About Web Search Provider")).toBeNull();
-      expect(screen.queryByText("Model Selection")).toBeNull();
+      expect(screen.queryByText("Answering models")).toBeNull();
     });
 
     fireEvent.press(screen.getByLabelText("Back to overview"));

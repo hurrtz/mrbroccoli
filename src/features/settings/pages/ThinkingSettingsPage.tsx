@@ -441,8 +441,8 @@ export function ThinkingSettingsPage({
     <View testID="thinking-settings-page" style={styles.sectionPageStack}>
       <SettingsGroup
         testID="model-selection-section"
-        title={t("responseModes")}
-        footer={t("modelSelectionInfo")}
+        title={t("answeringModels")}
+        footer={t("answeringModelsFooter")}
       >
         {visibleModes.map((mode, index) => (
           <AnsweringModelRow
@@ -545,7 +545,7 @@ export function ThinkingSettingsPage({
         {currentMode && sheet?.kind === "slot" && sheet.view === "slot" ? (
           <>
             <Text style={[pageStyles.sheetHint, { color: colors.textMuted }]}>
-              {t("modelSelectionInfo")}
+              {t("answeringModelSheetHint")}
             </Text>
             <SettingsGroup>
               <SettingsRow

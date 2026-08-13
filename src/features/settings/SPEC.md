@@ -96,14 +96,16 @@ capability healthy. The UI shows the capability that was actually tested.
 - Connections: one manifest-ordered provider list with capability and health
   summaries. Premium opens credentials, provider information, and
   capability-specific connection tests in a modal sheet; Free keeps every
-  provider visible as a locked route.
-- Thinking: up to four numbered coexisting answering-model slots. Each opens a
-  focused sheet for provider/local route, exact model, and that model's effort
-  ladder. Local acquisition, benchmark, selection, and swipe-removal happen in
-  the model chooser; Model Council and the system prompt live in quiet sheets.
-- Listening: input mode, conversation languages, and a unified system, local,
-  or provider recognition route group. Downloaded local models cannot be
-  selected until a successful device benchmark marks them viable.
+  provider visible as a locked route. Its footer states the security boundary:
+  keys remain in the device keychain and are sent only to their own provider.
+- Thinking: the `Answering models` group owns up to four numbered coexisting
+  answering-model slots. Each opens a focused sheet for provider/local route,
+  exact model, and that model's effort ladder. Local acquisition, benchmark,
+  selection, and swipe-removal happen in the model chooser; Model Council and
+  the system prompt live in quiet sheets.
+- Listening: input mode, conversation languages, and one `Who listens`
+  system, local, or provider recognition route group. Downloaded local models
+  cannot be selected until a successful device benchmark marks them viable.
 - Speaking: playback timing and provider-supported delivery instructions,
   followed by one native/local/provider route group. A selected route exposes
   its model and voice as inset subrows; voice selection opens one searchable,
@@ -111,8 +113,9 @@ capability healthy. The UI shows the capability that was actually tested.
   changing the saved selection. Download, cancel, benchmark, selection, and
   swipe-removal for local voices stay in this route group. Speech replay-cache
   removal is the only Storage action on this page.
-- Search: a Nobody route plus search-provider routes, with result count, depth,
-  and provider-specific search mode shown only for the active route. Nobody
+- Search: one `Who searches` group with a Nobody route plus search-provider
+  routes, with result count, depth, and provider-specific search mode shown
+  only for the active route. Nobody
   remains usable in both editions; Free keeps provider routes visibly locked.
 - Data & privacy: the knowledge opt-in, archived-conversation entry point,
   portable archive management, encrypted/readable backup and restore, and a

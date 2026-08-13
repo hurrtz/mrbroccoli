@@ -93,8 +93,8 @@ export function ListeningSettingsPage({
 
       <LocalModelRouteGroup
         capability="stt"
-        title={t("speechToText")}
-        footer={t("providerSttDescription")}
+        title={t("whoListens")}
+        footer={t("whoListensFooter")}
         freeProviderRoutes={allSttProviders}
         isPremium={isPremium}
         localModels={localModels}

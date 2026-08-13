@@ -77,12 +77,8 @@ export function SearchSettingsPage({
   return (
     <View testID="search-settings-page" style={styles.sectionPageStack}>
       <SettingsGroup
-        title={t("webSearchProvider")}
-        footer={
-          isPremium && searchProviders.length === 0
-            ? t("webSearchProviderMissingHint")
-            : t("settingsWebSearchCompactHint")
-        }
+        title={t("whoSearches")}
+        footer={t("whoSearchesFooter")}
       >
         <RouteOptionRow
           testID="settings-search-route-nobody"

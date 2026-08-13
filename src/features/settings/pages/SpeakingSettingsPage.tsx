@@ -461,7 +461,7 @@ export function SpeakingSettingsPage({
       <LocalModelRouteGroup
         capability="tts"
         title={t("whoSpeaks")}
-        footer={t("voiceOutputDescription")}
+        footer={t("whoSpeaksFooter")}
         freeProviderRoutes={allTtsProviders}
         isPremium={isPremium}
         localModels={localModels}

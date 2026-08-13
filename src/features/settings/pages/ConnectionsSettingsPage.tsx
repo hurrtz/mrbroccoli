@@ -388,7 +388,7 @@ export function ConnectionsSettingsPage({
     <View testID="connections-settings-page" style={styles.sectionPageStack}>
       <SettingsGroup
         title={t("providers")}
-        footer={t("settingsConnectionsSummary")}
+        footer={t("connectionsProviderFooter")}
       >
         {providers.map((provider, index) => {
           const capabilities = getProviderCapabilities(provider);

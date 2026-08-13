@@ -38,6 +38,20 @@ const en = {
   usageStatsInTranscripts: "Usage stats in transcripts",
   settingsGroupPrivacyApp: "Privacy & app",
   webSearchNobody: "Nobody",
+  answeringModels: "Answering models",
+  answeringModelsFooter:
+    "Up to four; the home screen switches who answers the next turn. A model you don't have yet is downloaded or connected right here.",
+  answeringModelSheetHint: "Switchable from the home screen byline.",
+  whoListens: "Who listens",
+  whoListensFooter:
+    "One choice across every runtime. A radio unlocks only after a viable test — testing is the egg, and it cracks when a model fails. Removing an installed model is a swipe. Provider routes appear once connected under Connections.",
+  whoSpeaksFooter:
+    "One choice across every runtime. On-device downloads happen right here; provider routes appear once their key is connected under Connections.",
+  whoSearches: "Who searches",
+  whoSearchesFooter:
+    "Search runs inside an answer when the model decides it needs the web. Providers appear once connected under Connections.",
+  connectionsProviderFooter:
+    "Keys stay in the device keychain and are sent only to their own provider.",
 };
 
 type EditionTranslations = typeof en;
@@ -84,6 +98,21 @@ export const editionTranslations = {
     usageStatsInTranscripts: "Nutzungsstatistik in Transkripten",
     settingsGroupPrivacyApp: "Datenschutz & App",
     webSearchNobody: "Niemand",
+    answeringModels: "Antwortende Modelle",
+    answeringModelsFooter:
+      "Bis zu vier; auf dem Startbildschirm wechselst du, wer als Nächstes antwortet. Ein fehlendes Modell wird direkt hier heruntergeladen oder verbunden.",
+    answeringModelSheetHint:
+      "Über die Zeile auf dem Startbildschirm wechselbar.",
+    whoListens: "Wer hört zu",
+    whoListensFooter:
+      "Eine Auswahl für jede Laufzeit. Sie wird erst nach einem erfolgreichen Test freigeschaltet; bei einem Fehler bekommt das Test-Ei einen Riss. Installierte Modelle lassen sich per Wisch entfernen. Anbieter-Routen erscheinen nach der Verbindung unter Verbindungen.",
+    whoSpeaksFooter:
+      "Eine Auswahl für jede Laufzeit. Downloads auf dem Gerät erfolgen direkt hier; Anbieter-Routen erscheinen, sobald ihr Schlüssel unter Verbindungen hinterlegt ist.",
+    whoSearches: "Wer sucht",
+    whoSearchesFooter:
+      "Die Suche läuft innerhalb einer Antwort, wenn das Modell das Web benötigt. Anbieter erscheinen nach der Verbindung unter Verbindungen.",
+    connectionsProviderFooter:
+      "Schlüssel bleiben im Geräteschlüsselbund und werden nur an den jeweiligen Anbieter gesendet.",
   }),
   uk: define({
     freeEdition: "Приватно й офлайн · Безкоштовно",
@@ -122,6 +151,21 @@ export const editionTranslations = {
     usageStatsInTranscripts: "Статистика використання в транскриптах",
     settingsGroupPrivacyApp: "Приватність і застосунок",
     webSearchNobody: "Ніхто",
+    answeringModels: "Моделі, що відповідають",
+    answeringModelsFooter:
+      "До чотирьох; на головному екрані можна змінити, хто відповість наступним. Відсутню модель можна завантажити або підключити тут.",
+    answeringModelSheetHint:
+      "Перемикається через рядок на головному екрані.",
+    whoListens: "Хто слухає",
+    whoListensFooter:
+      "Один вибір для всіх середовищ. Вибір відкривається лише після успішної перевірки; якщо модель не працює, тестове яйце тріскається. Встановлену модель можна видалити свайпом. Маршрути провайдерів з’являються після підключення в розділі «Підключення».",
+    whoSpeaksFooter:
+      "Один вибір для всіх середовищ. Моделі на пристрої завантажуються тут; маршрути провайдерів з’являються після додавання ключа в розділі «Підключення».",
+    whoSearches: "Хто шукає",
+    whoSearchesFooter:
+      "Пошук виконується всередині відповіді, коли моделі потрібен веб. Провайдери з’являються після підключення в розділі «Підключення».",
+    connectionsProviderFooter:
+      "Ключі зберігаються у сховищі ключів пристрою й надсилаються лише відповідному провайдеру.",
   }),
   hi: define({
     freeEdition: "निजी ऑफ़लाइन · मुफ़्त",
@@ -161,6 +205,20 @@ export const editionTranslations = {
     usageStatsInTranscripts: "ट्रांसक्रिप्ट में उपयोग आँकड़े",
     settingsGroupPrivacyApp: "गोपनीयता और ऐप",
     webSearchNobody: "कोई नहीं",
+    answeringModels: "उत्तर देने वाले मॉडल",
+    answeringModelsFooter:
+      "अधिकतम चार; होम स्क्रीन से तय करें कि अगला उत्तर कौन देगा। जो मॉडल अभी नहीं है, उसे यहीं डाउनलोड या कनेक्ट करें।",
+    answeringModelSheetHint: "होम स्क्रीन की बाइलाइन से बदला जा सकता है।",
+    whoListens: "कौन सुनता है",
+    whoListensFooter:
+      "हर रनटाइम के लिए एक चयन। सफल जाँच के बाद ही रेडियो खुलता है; मॉडल विफल हो तो जाँच वाला अंडा चटक जाता है। इंस्टॉल मॉडल को स्वाइप से हटाएँ। प्रदाता रूट कनेक्शन में जुड़ने के बाद दिखते हैं।",
+    whoSpeaksFooter:
+      "हर रनटाइम के लिए एक चयन। ऑन-डिवाइस डाउनलोड यहीं होते हैं; प्रदाता रूट की कनेक्शन में जुड़ने के बाद दिखते हैं।",
+    whoSearches: "कौन खोजता है",
+    whoSearchesFooter:
+      "जब मॉडल को वेब की ज़रूरत होती है, खोज उत्तर के भीतर चलती है। प्रदाता कनेक्शन में जुड़ने के बाद दिखते हैं।",
+    connectionsProviderFooter:
+      "कुंजियाँ डिवाइस की कीचेन में रहती हैं और केवल अपने प्रदाता को भेजी जाती हैं।",
   }),
   es: define({
     freeEdition: "Privado sin conexión · Gratis",
@@ -201,6 +259,21 @@ export const editionTranslations = {
     usageStatsInTranscripts: "Estadísticas de uso en transcripciones",
     settingsGroupPrivacyApp: "Privacidad y app",
     webSearchNobody: "Nadie",
+    answeringModels: "Modelos que responden",
+    answeringModelsFooter:
+      "Hasta cuatro; desde la pantalla de inicio eliges quién responde el siguiente turno. Los modelos que aún no tengas se descargan o conectan aquí.",
+    answeringModelSheetHint:
+      "Se puede cambiar desde la línea de ruta de la pantalla de inicio.",
+    whoListens: "Quién escucha",
+    whoListensFooter:
+      "Una opción para todos los entornos. La selección solo se desbloquea tras una prueba válida; si el modelo falla, el huevo de prueba se agrieta. Desliza para eliminar un modelo instalado. Las rutas de proveedores aparecen al conectarlas en Conexiones.",
+    whoSpeaksFooter:
+      "Una opción para todos los entornos. Las descargas en el dispositivo se hacen aquí; las rutas de proveedores aparecen cuando conectas su clave en Conexiones.",
+    whoSearches: "Quién busca",
+    whoSearchesFooter:
+      "La búsqueda se ejecuta dentro de una respuesta cuando el modelo necesita la web. Los proveedores aparecen al conectarlos en Conexiones.",
+    connectionsProviderFooter:
+      "Las claves permanecen en el llavero del dispositivo y solo se envían a su proveedor.",
   }),
   fr: define({
     freeEdition: "Privé hors ligne · Gratuit",
@@ -241,6 +314,21 @@ export const editionTranslations = {
     usageStatsInTranscripts: "Statistiques d’usage dans les transcriptions",
     settingsGroupPrivacyApp: "Confidentialité et app",
     webSearchNobody: "Personne",
+    answeringModels: "Modèles qui répondent",
+    answeringModelsFooter:
+      "Jusqu’à quatre ; l’écran d’accueil choisit qui répond au prochain tour. Un modèle manquant se télécharge ou se connecte ici.",
+    answeringModelSheetHint:
+      "Modifiable depuis la ligne de routage de l’écran d’accueil.",
+    whoListens: "Qui écoute",
+    whoListensFooter:
+      "Un seul choix pour tous les environnements. La sélection ne s’active qu’après un test concluant ; si le modèle échoue, l’œuf de test se fissure. Balayez pour supprimer un modèle installé. Les routes fournisseur apparaissent après connexion dans Connexions.",
+    whoSpeaksFooter:
+      "Un seul choix pour tous les environnements. Les téléchargements sur l’appareil se font ici ; les routes fournisseur apparaissent dès que leur clé est connectée dans Connexions.",
+    whoSearches: "Qui cherche",
+    whoSearchesFooter:
+      "La recherche s’exécute dans une réponse quand le modèle a besoin du Web. Les fournisseurs apparaissent après connexion dans Connexions.",
+    connectionsProviderFooter:
+      "Les clés restent dans le trousseau de l’appareil et ne sont envoyées qu’à leur propre fournisseur.",
   }),
   it: define({
     freeEdition: "Privato offline · Gratis",
@@ -280,6 +368,21 @@ export const editionTranslations = {
     usageStatsInTranscripts: "Statistiche d’uso nelle trascrizioni",
     settingsGroupPrivacyApp: "Privacy e app",
     webSearchNobody: "Nessuno",
+    answeringModels: "Modelli che rispondono",
+    answeringModelsFooter:
+      "Fino a quattro; dalla schermata Home scegli chi risponde al prossimo turno. Un modello mancante viene scaricato o collegato qui.",
+    answeringModelSheetHint:
+      "Selezionabile dalla riga di instradamento nella schermata Home.",
+    whoListens: "Chi ascolta",
+    whoListensFooter:
+      "Una scelta per ogni ambiente. La selezione si sblocca solo dopo un test valido; se il modello fallisce, l’uovo di test si incrina. Scorri per rimuovere un modello installato. Le route dei provider appaiono dopo il collegamento in Connessioni.",
+    whoSpeaksFooter:
+      "Una scelta per ogni ambiente. I download sul dispositivo avvengono qui; le route dei provider appaiono quando la loro chiave è collegata in Connessioni.",
+    whoSearches: "Chi cerca",
+    whoSearchesFooter:
+      "La ricerca avviene all’interno di una risposta quando il modello necessita del Web. I provider appaiono dopo il collegamento in Connessioni.",
+    connectionsProviderFooter:
+      "Le chiavi restano nel portachiavi del dispositivo e vengono inviate solo al rispettivo provider.",
   }),
   pt: define({
     freeEdition: "Privado offline · Grátis",
@@ -319,6 +422,21 @@ export const editionTranslations = {
     usageStatsInTranscripts: "Estatísticas de utilização nas transcrições",
     settingsGroupPrivacyApp: "Privacidade e app",
     webSearchNobody: "Ninguém",
+    answeringModels: "Modelos que respondem",
+    answeringModelsFooter:
+      "Até quatro; no ecrã inicial escolhe quem responde a seguir. Um modelo em falta é transferido ou ligado aqui.",
+    answeringModelSheetHint:
+      "Pode ser alterado na linha de encaminhamento do ecrã inicial.",
+    whoListens: "Quem ouve",
+    whoListensFooter:
+      "Uma escolha para todos os ambientes. A seleção só fica disponível após um teste válido; se o modelo falhar, o ovo de teste racha. Deslize para remover um modelo instalado. As rotas dos fornecedores aparecem depois da ligação em Ligações.",
+    whoSpeaksFooter:
+      "Uma escolha para todos os ambientes. As transferências no dispositivo acontecem aqui; as rotas dos fornecedores aparecem quando a chave é ligada em Ligações.",
+    whoSearches: "Quem pesquisa",
+    whoSearchesFooter:
+      "A pesquisa ocorre dentro da resposta quando o modelo precisa da Web. Os fornecedores aparecem depois da ligação em Ligações.",
+    connectionsProviderFooter:
+      "As chaves ficam no porta-chaves do dispositivo e só são enviadas ao respetivo fornecedor.",
   }),
   ptBR: define({
     freeEdition: "Privado offline · Grátis",
@@ -358,6 +476,21 @@ export const editionTranslations = {
     usageStatsInTranscripts: "Estatísticas de uso nas transcrições",
     settingsGroupPrivacyApp: "Privacidade e app",
     webSearchNobody: "Ninguém",
+    answeringModels: "Modelos que respondem",
+    answeringModelsFooter:
+      "Até quatro; na tela inicial você escolhe quem responde o próximo turno. Um modelo que ainda não existe é baixado ou conectado aqui.",
+    answeringModelSheetHint:
+      "Pode ser alterado pela linha de rota da tela inicial.",
+    whoListens: "Quem ouve",
+    whoListensFooter:
+      "Uma escolha para todos os ambientes. A seleção só é liberada após um teste válido; se o modelo falhar, o ovo de teste racha. Deslize para remover um modelo instalado. As rotas dos provedores aparecem depois da conexão em Conexões.",
+    whoSpeaksFooter:
+      "Uma escolha para todos os ambientes. Os downloads no dispositivo acontecem aqui; as rotas dos provedores aparecem quando a chave é conectada em Conexões.",
+    whoSearches: "Quem pesquisa",
+    whoSearchesFooter:
+      "A pesquisa acontece dentro da resposta quando o modelo precisa da Web. Os provedores aparecem depois da conexão em Conexões.",
+    connectionsProviderFooter:
+      "As chaves ficam no chaveiro do dispositivo e só são enviadas ao respectivo provedor.",
   }),
   ru: define({
     freeEdition: "Приватно и офлайн · Бесплатно",
@@ -398,6 +531,21 @@ export const editionTranslations = {
     usageStatsInTranscripts: "Статистика использования в расшифровках",
     settingsGroupPrivacyApp: "Конфиденциальность и приложение",
     webSearchNobody: "Никто",
+    answeringModels: "Модели, которые отвечают",
+    answeringModelsFooter:
+      "До четырёх; на главном экране можно выбрать, кто ответит следующим. Недостающую модель можно скачать или подключить здесь.",
+    answeringModelSheetHint:
+      "Переключается через строку маршрута на главном экране.",
+    whoListens: "Кто слушает",
+    whoListensFooter:
+      "Один выбор для всех сред. Выбор доступен только после успешной проверки; при сбое модели тестовое яйцо трескается. Установленную модель можно удалить свайпом. Маршруты провайдеров появляются после подключения в разделе «Подключения».",
+    whoSpeaksFooter:
+      "Один выбор для всех сред. Модели для устройства скачиваются здесь; маршруты провайдеров появляются после добавления ключа в разделе «Подключения».",
+    whoSearches: "Кто ищет",
+    whoSearchesFooter:
+      "Поиск выполняется внутри ответа, когда модели нужен Интернет. Провайдеры появляются после подключения в разделе «Подключения».",
+    connectionsProviderFooter:
+      "Ключи остаются в связке ключей устройства и отправляются только соответствующему провайдеру.",
   }),
   "zh-CN": define({
     freeEdition: "私密离线 · 免费",
@@ -433,6 +581,20 @@ export const editionTranslations = {
     usageStatsInTranscripts: "转录中的使用统计",
     settingsGroupPrivacyApp: "隐私与应用",
     webSearchNobody: "无人",
+    answeringModels: "回答模型",
+    answeringModelsFooter:
+      "最多四个；可在主屏幕切换下一轮由谁回答。尚未拥有的模型可直接在这里下载或连接。",
+    answeringModelSheetHint: "可从主屏幕的路线栏切换。",
+    whoListens: "谁来聆听",
+    whoListensFooter:
+      "所有运行环境共用一个选择。只有通过可用性测试后才能选择；模型失败时，测试蛋会裂开。已安装模型可滑动移除。提供商路线在“连接”中接入后出现。",
+    whoSpeaksFooter:
+      "所有运行环境共用一个选择。设备端模型直接在这里下载；提供商路线在“连接”中加入密钥后出现。",
+    whoSearches: "谁来搜索",
+    whoSearchesFooter:
+      "当模型需要网页时，搜索会在回答过程中运行。提供商在“连接”中接入后出现。",
+    connectionsProviderFooter:
+      "密钥保留在设备钥匙串中，并且只发送给对应的提供商。",
   }),
   ar: define({
     freeEdition: "خاص بلا اتصال · مجاني",
@@ -471,6 +633,21 @@ export const editionTranslations = {
     usageStatsInTranscripts: "إحصاءات الاستخدام في النصوص",
     settingsGroupPrivacyApp: "الخصوصية والتطبيق",
     webSearchNobody: "لا أحد",
+    answeringModels: "نماذج الإجابة",
+    answeringModelsFooter:
+      "حتى أربعة؛ من الشاشة الرئيسية تختار من يجيب في الدور التالي. يُنزّل النموذج غير المتوفر أو يُوصل هنا مباشرة.",
+    answeringModelSheetHint:
+      "يمكن تبديله من سطر المسار في الشاشة الرئيسية.",
+    whoListens: "من يستمع",
+    whoListensFooter:
+      "اختيار واحد لكل بيئات التشغيل. لا يتاح الاختيار إلا بعد اختبار ناجح؛ وعند فشل النموذج تتشقق بيضة الاختبار. اسحب لإزالة نموذج مثبت. تظهر مسارات المزودين بعد توصيلها في الاتصالات.",
+    whoSpeaksFooter:
+      "اختيار واحد لكل بيئات التشغيل. تتم تنزيلات الجهاز هنا؛ وتظهر مسارات المزودين عند توصيل مفاتيحها في الاتصالات.",
+    whoSearches: "من يبحث",
+    whoSearchesFooter:
+      "يعمل البحث داخل الإجابة عندما يحتاج النموذج إلى الويب. يظهر المزودون بعد توصيلهم في الاتصالات.",
+    connectionsProviderFooter:
+      "تبقى المفاتيح في سلسلة مفاتيح الجهاز ولا تُرسل إلا إلى مزودها.",
   }),
   ja: define({
     freeEdition: "プライベート・オフライン · 無料",
@@ -509,6 +686,21 @@ export const editionTranslations = {
     usageStatsInTranscripts: "文字起こしに利用統計を表示",
     settingsGroupPrivacyApp: "プライバシーとアプリ",
     webSearchNobody: "誰も選ばない",
+    answeringModels: "回答するモデル",
+    answeringModelsFooter:
+      "最大4つ。ホーム画面で次の応答を担当するモデルを切り替えます。未導入のモデルはここでダウンロードまたは接続できます。",
+    answeringModelSheetHint:
+      "ホーム画面のルート表示から切り替えられます。",
+    whoListens: "聞き取る方法",
+    whoListensFooter:
+      "すべての実行環境から1つを選びます。利用可能なテストに合格すると選択でき、失敗時はテストの卵にひびが入ります。インストール済みモデルはスワイプで削除できます。プロバイダー経路は「接続」で設定すると表示されます。",
+    whoSpeaksFooter:
+      "すべての実行環境から1つを選びます。端末上のダウンロードはここで行い、プロバイダー経路は「接続」でキーを設定すると表示されます。",
+    whoSearches: "検索する方法",
+    whoSearchesFooter:
+      "モデルがウェブを必要と判断すると、回答の中で検索が実行されます。プロバイダーは「接続」で設定すると表示されます。",
+    connectionsProviderFooter:
+      "キーは端末のキーチェーンに保存され、対応するプロバイダーにのみ送信されます。",
   }),
   hu: define({
     freeEdition: "Privát offline · Ingyenes",
@@ -549,6 +741,21 @@ export const editionTranslations = {
     usageStatsInTranscripts: "Használati statisztika az átiratokban",
     settingsGroupPrivacyApp: "Adatvédelem és alkalmazás",
     webSearchNobody: "Senki",
+    answeringModels: "Válaszoló modellek",
+    answeringModelsFooter:
+      "Legfeljebb négy; a kezdőképernyőn váltható, ki válaszoljon legközelebb. A hiányzó modell itt tölthető le vagy kapcsolható össze.",
+    answeringModelSheetHint:
+      "A kezdőképernyő útvonal-sorából váltható.",
+    whoListens: "Ki hallgat",
+    whoListensFooter:
+      "Egy választás minden futtatási környezethez. A választás csak sikeres teszt után nyílik meg; hiba esetén a teszttojás megreped. A telepített modell csúsztatással törölhető. A szolgáltatói útvonalak a Kapcsolatok alatt jelennek meg csatlakoztatás után.",
+    whoSpeaksFooter:
+      "Egy választás minden futtatási környezethez. Az eszközre töltés itt történik; a szolgáltatói útvonalak a kulcs Kapcsolatok alatti hozzáadása után jelennek meg.",
+    whoSearches: "Ki keres",
+    whoSearchesFooter:
+      "A keresés a válaszon belül fut, amikor a modellnek szüksége van a webre. A szolgáltatók a Kapcsolatok alatt jelennek meg csatlakoztatás után.",
+    connectionsProviderFooter:
+      "A kulcsok az eszköz kulcstartójában maradnak, és csak a saját szolgáltatójukhoz kerülnek.",
   }),
   cs: define({
     freeEdition: "Soukromě offline · Zdarma",
@@ -588,6 +795,21 @@ export const editionTranslations = {
     usageStatsInTranscripts: "Statistiky využití v přepisech",
     settingsGroupPrivacyApp: "Soukromí a aplikace",
     webSearchNobody: "Nikdo",
+    answeringModels: "Odpovídající modely",
+    answeringModelsFooter:
+      "Až čtyři; na domovské obrazovce lze přepnout, kdo odpoví jako další. Chybějící model se stáhne nebo připojí přímo zde.",
+    answeringModelSheetHint:
+      "Lze přepnout z řádku trasy na domovské obrazovce.",
+    whoListens: "Kdo poslouchá",
+    whoListensFooter:
+      "Jedna volba pro všechna prostředí. Výběr se odemkne až po úspěšném testu; při selhání modelu testovací vejce praskne. Nainstalovaný model odstraníte přejetím. Trasy poskytovatelů se objeví po připojení v části Připojení.",
+    whoSpeaksFooter:
+      "Jedna volba pro všechna prostředí. Stahování do zařízení probíhá zde; trasy poskytovatelů se objeví po přidání klíče v části Připojení.",
+    whoSearches: "Kdo hledá",
+    whoSearchesFooter:
+      "Vyhledávání běží uvnitř odpovědi, když model potřebuje web. Poskytovatelé se objeví po připojení v části Připojení.",
+    connectionsProviderFooter:
+      "Klíče zůstávají v klíčence zařízení a odesílají se pouze příslušnému poskytovateli.",
   }),
   pl: define({
     freeEdition: "Prywatnie offline · Bezpłatnie",
@@ -627,6 +849,21 @@ export const editionTranslations = {
     usageStatsInTranscripts: "Statystyki użycia w transkrypcjach",
     settingsGroupPrivacyApp: "Prywatność i aplikacja",
     webSearchNobody: "Nikt",
+    answeringModels: "Modele odpowiadające",
+    answeringModelsFooter:
+      "Maksymalnie cztery; na ekranie głównym wybierasz, kto odpowie następny. Brakujący model można pobrać lub połączyć tutaj.",
+    answeringModelSheetHint:
+      "Można przełączyć z wiersza trasy na ekranie głównym.",
+    whoListens: "Kto słucha",
+    whoListensFooter:
+      "Jeden wybór dla wszystkich środowisk. Wybór odblokowuje się dopiero po udanym teście; po awarii modelu jajko testowe pęka. Zainstalowany model usuwa się przesunięciem. Trasy dostawców pojawiają się po połączeniu w sekcji Połączenia.",
+    whoSpeaksFooter:
+      "Jeden wybór dla wszystkich środowisk. Pobieranie na urządzenie odbywa się tutaj; trasy dostawców pojawiają się po dodaniu klucza w sekcji Połączenia.",
+    whoSearches: "Kto wyszukuje",
+    whoSearchesFooter:
+      "Wyszukiwanie działa wewnątrz odpowiedzi, gdy model potrzebuje sieci. Dostawcy pojawiają się po połączeniu w sekcji Połączenia.",
+    connectionsProviderFooter:
+      "Klucze pozostają w pęku kluczy urządzenia i są wysyłane wyłącznie do właściwego dostawcy.",
   }),
   tr: define({
     freeEdition: "Özel çevrimdışı · Ücretsiz",
@@ -667,6 +904,21 @@ export const editionTranslations = {
     usageStatsInTranscripts: "Dökümlerde kullanım istatistikleri",
     settingsGroupPrivacyApp: "Gizlilik ve uygulama",
     webSearchNobody: "Hiç kimse",
+    answeringModels: "Yanıtlayan modeller",
+    answeringModelsFooter:
+      "En fazla dört; sıradaki yanıtı kimin vereceği ana ekrandan değiştirilir. Eksik bir model burada indirilir veya bağlanır.",
+    answeringModelSheetHint:
+      "Ana ekrandaki rota satırından değiştirilebilir.",
+    whoListens: "Kim dinliyor",
+    whoListensFooter:
+      "Tüm çalışma ortamları için tek seçim. Seçim yalnızca başarılı bir testten sonra açılır; model başarısız olursa test yumurtası çatlar. Yüklü modeli kaydırarak kaldırın. Sağlayıcı rotaları Bağlantılar altında bağlandıktan sonra görünür.",
+    whoSpeaksFooter:
+      "Tüm çalışma ortamları için tek seçim. Cihaza indirmeler burada yapılır; sağlayıcı rotaları anahtarları Bağlantılar altında bağlandığında görünür.",
+    whoSearches: "Kim arıyor",
+    whoSearchesFooter:
+      "Model web'e ihtiyaç duyduğunda arama yanıtın içinde çalışır. Sağlayıcılar Bağlantılar altında bağlandıktan sonra görünür.",
+    connectionsProviderFooter:
+      "Anahtarlar cihazın anahtar zincirinde kalır ve yalnızca kendi sağlayıcısına gönderilir.",
   }),
   sv: define({
     freeEdition: "Privat offline · Gratis",
@@ -706,6 +958,21 @@ export const editionTranslations = {
     usageStatsInTranscripts: "Användningsstatistik i transkript",
     settingsGroupPrivacyApp: "Integritet och app",
     webSearchNobody: "Ingen",
+    answeringModels: "Svarande modeller",
+    answeringModelsFooter:
+      "Upp till fyra; på startskärmen byter du vem som svarar nästa gång. En modell du saknar hämtas eller ansluts här.",
+    answeringModelSheetHint:
+      "Kan bytas från ruttraden på startskärmen.",
+    whoListens: "Vem lyssnar",
+    whoListensFooter:
+      "Ett val för alla körmiljöer. Valet låses upp först efter ett godkänt test; om modellen misslyckas spricker testägget. Ta bort en installerad modell med en svepning. Leverantörsrutter visas när de anslutits under Anslutningar.",
+    whoSpeaksFooter:
+      "Ett val för alla körmiljöer. Hämtningar på enheten sker här; leverantörsrutter visas när deras nyckel anslutits under Anslutningar.",
+    whoSearches: "Vem söker",
+    whoSearchesFooter:
+      "Sökningen körs inuti ett svar när modellen behöver webben. Leverantörer visas när de anslutits under Anslutningar.",
+    connectionsProviderFooter:
+      "Nycklarna stannar i enhetens nyckelring och skickas bara till sin egen leverantör.",
   }),
   ur: define({
     freeEdition: "نجی آف لائن · مفت",
@@ -745,5 +1012,20 @@ export const editionTranslations = {
     usageStatsInTranscripts: "نقل میں استعمال کے اعداد و شمار",
     settingsGroupPrivacyApp: "رازداری اور ایپ",
     webSearchNobody: "کوئی نہیں",
+    answeringModels: "جواب دینے والے ماڈلز",
+    answeringModelsFooter:
+      "زیادہ سے زیادہ چار؛ ہوم اسکرین سے بدلیں کہ اگلا جواب کون دے۔ جو ماڈل موجود نہ ہو اسے یہیں ڈاؤن لوڈ یا مربوط کریں۔",
+    answeringModelSheetHint:
+      "ہوم اسکرین کی روٹ سطر سے تبدیل کیا جا سکتا ہے۔",
+    whoListens: "کون سنتا ہے",
+    whoListensFooter:
+      "ہر رن ٹائم کے لیے ایک انتخاب۔ کامیاب جانچ کے بعد ہی انتخاب کھلتا ہے؛ ماڈل ناکام ہو تو جانچ کا انڈا چٹخ جاتا ہے۔ نصب ماڈل کو سوائپ سے ہٹائیں۔ فراہم کنندہ روٹس کنکشنز میں مربوط ہونے کے بعد دکھتے ہیں۔",
+    whoSpeaksFooter:
+      "ہر رن ٹائم کے لیے ایک انتخاب۔ آن ڈیوائس ڈاؤن لوڈ یہیں ہوتے ہیں؛ فراہم کنندہ روٹس کیز کنکشنز میں مربوط ہونے کے بعد دکھتے ہیں۔",
+    whoSearches: "کون تلاش کرتا ہے",
+    whoSearchesFooter:
+      "جب ماڈل کو ویب کی ضرورت ہو تو تلاش جواب کے اندر چلتی ہے۔ فراہم کنندگان کنکشنز میں مربوط ہونے کے بعد دکھتے ہیں۔",
+    connectionsProviderFooter:
+      "کلیدیں ڈیوائس کی کی چین میں رہتی ہیں اور صرف اپنے فراہم کنندہ کو بھیجی جاتی ہیں۔",
   }),
 } as const;
