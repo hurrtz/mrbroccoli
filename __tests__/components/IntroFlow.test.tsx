@@ -214,21 +214,23 @@ describe("IntroFlowScreen", () => {
     expect(getByTestId("intro-welcome-language")).toBeTruthy();
   });
 
-  it("keeps 44 point header targets around the approved 40 point faces", () => {
-    const { getByTestId } = renderScreen({ firstRun: false });
+  it("keeps bare borderless nav glyphs on 44 point targets", () => {
+    // The intro's nav controls are naked glyphs — no filled circles — and
+    // back is a full arrow, not a chevron.
+    const screen = renderScreen({ firstRun: false });
+    const { getByTestId, queryByTestId } = screen;
 
     expect(StyleSheet.flatten(getByTestId("intro-back").props.style)).toEqual(
       expect.objectContaining({ height: 44, margin: -2, width: 44 }),
     );
-    expect(
-      StyleSheet.flatten(getByTestId("intro-back-face").props.style),
-    ).toEqual(expect.objectContaining({ height: 40, width: 40 }));
     expect(StyleSheet.flatten(getByTestId("intro-close").props.style)).toEqual(
       expect.objectContaining({ height: 44, margin: -2, width: 44 }),
     );
+    expect(queryByTestId("intro-back-face")).toBeNull();
+    expect(queryByTestId("intro-close-face")).toBeNull();
     expect(
-      StyleSheet.flatten(getByTestId("intro-close-face").props.style),
-    ).toEqual(expect.objectContaining({ height: 40, width: 40 }));
+      screen.UNSAFE_getByProps({ testID: "phosphor-icon-arrow-left" }),
+    ).toBeTruthy();
   });
 
   it("withholds every close control on a first run", () => {

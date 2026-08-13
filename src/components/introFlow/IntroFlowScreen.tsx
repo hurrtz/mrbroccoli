@@ -143,19 +143,13 @@ export function IntroFlowScreen({
                 ]}
                 testID="intro-back"
               >
-                <View
-                  style={[
-                    styles.headerButtonFace,
-                    { backgroundColor: theme.panel, borderColor: theme.border },
-                  ]}
-                  testID="intro-back-face"
-                >
-                  <PhosphorIcon
-                    color={theme.textSecondary}
-                    name="left"
-                    size="control"
-                  />
-                </View>
+                {/* Bare glyph on the 44pt target: the intro's nav controls
+                    carry no filled faces, and back is a full arrow. */}
+                <PhosphorIcon
+                  color={theme.textSecondary}
+                  name="arrow-left"
+                  size="navigation"
+                />
               </Pressable>
 
               <IntroStepper
@@ -173,22 +167,11 @@ export function IntroFlowScreen({
                   style={styles.headerButton}
                   testID="intro-close"
                 >
-                  <View
-                    style={[
-                      styles.headerButtonFace,
-                      {
-                        backgroundColor: theme.panel,
-                        borderColor: theme.border,
-                      },
-                    ]}
-                    testID="intro-close-face"
-                  >
-                    <PhosphorIcon
-                      color={theme.textSecondary}
-                      name="close"
-                      size="control"
-                    />
-                  </View>
+                  <PhosphorIcon
+                    color={theme.textSecondary}
+                    name="close"
+                    size="navigation"
+                  />
                 </Pressable>
               ) : (
                 <View
@@ -332,14 +315,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     margin: -2,
     width: 44,
-  },
-  headerButtonFace: {
-    alignItems: "center",
-    borderRadius: introRadius.pill,
-    borderWidth: StyleSheet.hairlineWidth,
-    height: 40,
-    justifyContent: "center",
-    width: 40,
   },
   headerHidden: {
     opacity: 0,
