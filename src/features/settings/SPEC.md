@@ -106,6 +106,13 @@ capability healthy. The UI shows the capability that was actually tested.
 - Listening: input mode, conversation languages, and one `Who listens`
   system, local, or provider recognition route group. Downloaded local models
   cannot be selected until a successful device benchmark marks them viable.
+- **Decision:** a below-target benchmark is non-viable everywhere a local
+  model can be picked (Listening, Speaking, Thinking): the radio stays
+  locked and the row's detail line states the result. Rejected alternative:
+  selectable-with-warning — voice-pipeline latency is the product's core
+  promise, and a knowingly slow route would degrade the primary experience
+  behind a warning most users would not reread. `isLocalModelViable` encodes
+  the rule once for every route group.
 - Speaking: playback timing and provider-supported delivery instructions,
   followed by one native/local/provider route group. A selected route exposes
   its model and voice as inset subrows; voice selection opens one searchable,
