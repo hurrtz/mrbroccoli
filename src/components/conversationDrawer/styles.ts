@@ -316,8 +316,8 @@ export const styles = StyleSheet.create({
     paddingHorizontal: 18,
   },
   searchShell: {
-    minHeight: 48,
-    borderRadius: 12,
+    minHeight: 46,
+    borderRadius: 10,
     borderWidth: 1,
     paddingLeft: 12,
     flexDirection: "row",

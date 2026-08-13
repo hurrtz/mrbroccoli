@@ -9,6 +9,7 @@ import {
 import { PhosphorIcon } from "../design-system/PhosphorIcon";
 import { useLocalization } from "../i18n";
 import { useTheme } from "../theme/ThemeContext";
+import { withAlpha } from "../theme/colors";
 import { fonts } from "../theme/typography";
 import type { ToastTone } from "../types";
 
@@ -102,9 +103,9 @@ export function Toast({
         : colors.accent;
   const toneBackground =
     tone === "danger"
-      ? `${colors.danger}12`
+      ? withAlpha(colors.danger, 0.12)
       : tone === "success"
-        ? `${colors.success}18`
+        ? withAlpha(colors.success, 0.12)
         : colors.accentSoft;
 
   return (

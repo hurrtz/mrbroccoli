@@ -2,6 +2,7 @@ import {
   darkColors,
   getAccessibleForeground,
   lightColors,
+  withAlpha,
 } from "../../src/theme/colors";
 
 function relativeLuminance(hexColor: string) {
@@ -177,5 +178,16 @@ describe("theme colors", () => {
     [darkColors.dangerFill, darkColors.onDanger],
   ])("keeps filled action text readable", (background, foreground) => {
     expect(contrastRatio(background, foreground)).toBeGreaterThanOrEqual(4.5);
+  });
+});
+
+describe("withAlpha", () => {
+  it("converts six-digit hex tokens to translucent rgba", () => {
+    expect(withAlpha("#DC2626", 0.12)).toBe("rgba(220, 38, 38, 0.12)");
+    expect(withAlpha(lightColors.success, 0.09)).toBe("rgba(5, 150, 105, 0.09)");
+  });
+
+  it("returns already-translucent tokens unchanged", () => {
+    expect(withAlpha("rgba(3, 7, 18, 0.14)", 0.3)).toBe("rgba(3, 7, 18, 0.14)");
   });
 });

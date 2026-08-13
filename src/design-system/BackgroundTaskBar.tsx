@@ -9,6 +9,7 @@ import {
 } from "react-native";
 
 import { useTheme } from "../theme/ThemeContext";
+import { withAlpha } from "../theme/colors";
 import { fonts } from "../theme/typography";
 import { PhosphorIcon, type PhosphorIconName } from "./PhosphorIcon";
 
@@ -67,8 +68,8 @@ export function BackgroundTaskBar({
         styles.bar,
         {
           backgroundColor:
-            tone === "progress" ? colors.accentSoft : colors.surfaceAlt,
-          borderColor: ink,
+            tone === "progress" ? colors.accentSoft : withAlpha(ink, 0.09),
+          borderColor: withAlpha(ink, 0.3),
         },
         style,
       ]}
@@ -88,7 +89,9 @@ export function BackgroundTaskBar({
       </View>
       <PhosphorIcon color={colors.textMuted} name="right" size="compact" />
       {tone === "progress" ? (
-        <View style={[styles.trackLine, { backgroundColor: colors.border }]}>
+        <View
+          style={[styles.trackLine, { backgroundColor: withAlpha(ink, 0.18) }]}
+        >
           <View
             style={[
               styles.trackFill,

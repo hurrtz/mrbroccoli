@@ -137,7 +137,7 @@ export function SettingsRow({
         supporting ? styles.rowWithSupporting : null,
         { borderBottomColor: colors.border },
         last ? styles.last : null,
-        pressed ? { backgroundColor: colors.surfaceAlt } : null,
+        pressed ? styles.pressed : null,
         disabled ? styles.disabled : null,
       ]}
     >
@@ -162,8 +162,11 @@ const styles = StyleSheet.create({
   last: {
     borderBottomWidth: 0,
   },
+  pressed: {
+    opacity: 0.72,
+  },
   disabled: {
-    opacity: 0.45,
+    opacity: 0.5,
   },
   copy: {
     flex: 1,

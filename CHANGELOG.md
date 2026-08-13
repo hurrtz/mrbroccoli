@@ -19,6 +19,11 @@ the complete Play Store translations are kept in a dedicated file under
 - The empty transcript now shows the conversation glyph in a quiet circle with
   the design system's type sizes, the transcript sheet title uses the headline
   face and opens taller, and turn metrics align to the standard label column.
+- The home screen's setup notice no longer draws a red border around its
+  invitation; the warning glyph alone carries the tone. Settings rows dim while
+  pressed, the sessions search field matches the standard input shape, the
+  background install row tints its border and finished states from its tone,
+  and toast tints follow the design system's strengths in both appearances.
 - Fixed successful local transcription crashing the iOS Release app when its
   JavaScript runtime does not provide relative-time formatting.
 - Fixed provider connection sheets occasionally freezing while returning to

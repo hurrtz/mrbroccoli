@@ -226,7 +226,7 @@ export function VoiceTextInputPager({
             styles.promptBlockedNotice,
             {
               backgroundColor: colors.surfaceAlt,
-              borderColor: colors.danger,
+              borderColor: colors.border,
             },
           ]}
         >

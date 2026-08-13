@@ -123,6 +123,25 @@ export const darkColors = {
 
 export type Colors = typeof lightColors;
 
+/**
+ * A translucent tint of a theme color. Handles 6-digit hex tokens; any other
+ * format (already-translucent rgba tokens) is returned unchanged, because
+ * layering alpha on alpha would produce a tint no design value specifies.
+ */
+export function withAlpha(color: string, alpha: number) {
+  const channels = /^#([0-9a-fA-F]{6})$/.exec(color)?.[1];
+
+  if (!channels) {
+    return color;
+  }
+
+  const red = Number.parseInt(channels.slice(0, 2), 16);
+  const green = Number.parseInt(channels.slice(2, 4), 16);
+  const blue = Number.parseInt(channels.slice(4, 6), 16);
+
+  return `rgba(${red}, ${green}, ${blue}, ${alpha})`;
+}
+
 const LIGHT_PHASE_FOREGROUND = "#FFFFFF";
 const DARK_PHASE_FOREGROUND = "#030712";
 
