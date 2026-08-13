@@ -1,5 +1,5 @@
 appId: ${APP_ID}
-name: On-device model catalog disclosures
+name: Stage-owned on-device model catalogs
 tags:
   - runtime
   - on-device
@@ -15,25 +15,48 @@ tags:
     id: main-settings-button
 - assertVisible:
     id: settings-page-overview
+
+# Thinking owns local response models.
 - scrollUntilVisible:
     element:
-      id: settings-overview-row-local
+      id: settings-overview-row-thinking
     direction: DOWN
 - tapOn:
-    id: settings-overview-row-local
+    id: settings-overview-row-thinking
 - assertVisible:
-    id: on-device-settings-page
+    id: settings-page-thinking
+- tapOn:
+    id: thinking-add-model
+- assertVisible:
+    id: thinking-add-sheet
+- assertVisible:
+    id: thinking-local-model-qwen3-0.6b-q8
+- tapOn: "Dismiss"
+- tapOn:
+    id: settings-back-button
+
+# Listening owns local recognition models.
 - scrollUntilVisible:
     element:
-      id: on-device-llm-disclosure
+      id: settings-overview-row-listening
     direction: DOWN
-- assertVisible:
-    id: on-device-llm-disclosure
-- assertVisible:
-    id: on-device-stt-disclosure
-- assertVisible:
-    id: on-device-tts-disclosure
-- assertNotVisible: "Qwen3 0.6B"
 - tapOn:
-    id: on-device-llm-disclosure
-- assertVisible: "Qwen3 0.6B"
+    id: settings-overview-row-listening
+- assertVisible:
+    id: settings-page-listening
+- assertVisible:
+    id: settings-stt-route-whisper-tiny
+- tapOn:
+    id: settings-back-button
+
+# Speaking owns local voices.
+- scrollUntilVisible:
+    element:
+      id: settings-overview-row-speaking
+    direction: DOWN
+- tapOn:
+    id: settings-overview-row-speaking
+- assertVisible:
+    id: settings-page-speaking
+- assertVisible:
+    id: settings-tts-route-kokoro-multilingual

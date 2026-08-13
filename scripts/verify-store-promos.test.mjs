@@ -13,6 +13,13 @@ test("the checked-in store-promo setup is complete", () => {
   assert.deepEqual(result.errors, []);
   assert.equal(result.languages.length, 19);
   assert.deepEqual(result.screenshotNames, STORE_PROMO_SCREENSHOT_NAMES);
+  assert.ok(result.screenshotNames.android.includes("07-automatic-setup"));
+  assert.ok(result.screenshotNames.ios.includes("09-automatic-setup"));
+  assert.ok(
+    Object.values(result.screenshotNames)
+      .flat()
+      .every((name) => !name.includes("on-device-ai")),
+  );
 });
 
 test("screenshot name extraction preserves capture order", () => {

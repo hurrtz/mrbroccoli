@@ -71,7 +71,13 @@ deterministically under the isolated fixture identity, and prove honest
 low-memory automatic-setup failure and retry on Android without downloading a
 model. A separate physical-device flow accepts a real proposal, waits through
 download, checksum verification, and benchmarks, then verifies the selected
-models in Settings; it is never part of an emulator or Git-hook run.
+Thinking route and Data & privacy storage inventory; it is never part of an
+emulator or Git-hook run. Local-model catalogue flows follow the product's
+stage ownership: Thinking for response models, Listening for recognition, and
+Speaking for voices. Verified models expose a stable viable-state selector so
+device tests wait for the real benchmark result rather than translated copy.
+The verifier scans every checked-in Maestro YAML file and rejects selectors
+from the retired standalone Device page.
 
 ## Living-Spec Review
 

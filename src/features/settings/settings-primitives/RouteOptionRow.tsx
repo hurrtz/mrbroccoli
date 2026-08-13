@@ -15,6 +15,7 @@ export function RouteOptionRow({
   last = false,
   locked = false,
   meta,
+  metaTestID,
   onRemove,
   onSelect,
   removeLabel,
@@ -29,6 +30,7 @@ export function RouteOptionRow({
   last?: boolean;
   locked?: boolean;
   meta?: string;
+  metaTestID?: string;
   onRemove?: () => void;
   onSelect?: () => void;
   removeLabel?: string;
@@ -105,6 +107,7 @@ export function RouteOptionRow({
             </Text>
             {meta ? (
               <Text
+                testID={metaTestID}
                 style={[
                   styles.meta,
                   { color: error ? colors.danger : colors.textMuted },

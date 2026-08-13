@@ -21,6 +21,33 @@ export const MAESTRO_ANDROID_AUTO_SETUP_FLOW =
 export const MAESTRO_ANDROID_ELIGIBLE_AUTO_SETUP_FLOW =
   ".maestro/flows/runtime/android-eligible-auto-setup.yaml";
 
+export const RETIRED_MAESTRO_SELECTORS = Object.freeze([
+  "settings-overview-row-local",
+  "on-device-settings-page",
+  "on-device-llm-disclosure",
+  "on-device-stt-disclosure",
+  "on-device-tts-disclosure",
+  "on-device-language-selection",
+  "on-device-download-",
+  "on-device-test-",
+  "on-device-performance-",
+]);
+
+export function findRetiredMaestroSelectors(source) {
+  return RETIRED_MAESTRO_SELECTORS.filter((selector) =>
+    source.includes(selector),
+  );
+}
+
+function readCheckedInMaestroSource(cwd) {
+  const root = path.join(cwd, ".maestro");
+  return fs
+    .readdirSync(root, { recursive: true })
+    .filter((entry) => /\.ya?ml$/.test(String(entry)))
+    .map((entry) => fs.readFileSync(path.join(root, String(entry)), "utf8"))
+    .join("\n");
+}
+
 const REQUIRED_LOCALIZED_SELECTORS = [
   "app-language-picker-option-${LOCALE}",
   "app-settings-page-${LOCALE}",
@@ -191,18 +218,12 @@ export function validateMaestroSuite(cwd = process.cwd()) {
     androidEligibleAutoSetupFlowPath,
     "utf8",
   );
-  const maestroSource = [
-    localizedFlow,
-    smokeFlow,
-    layoutFlow,
-    accessibilityFlow,
-    screenReaderFlow,
-    orbFlow,
-    orbRunner,
-    androidAutoSetupFlow,
-    androidEligibleAutoSetupFlow,
-    fs.readFileSync(configPath, "utf8"),
-  ].join("\n");
+  const checkedInMaestroSource = readCheckedInMaestroSource(cwd);
+  const maestroSource = [checkedInMaestroSource, orbRunner].join("\n");
+
+  for (const selector of findRetiredMaestroSelectors(checkedInMaestroSource)) {
+    errors.push(`Maestro flows still reference retired selector: ${selector}`);
+  }
 
   for (const selector of [
     "API key: Anthropic",
@@ -230,8 +251,8 @@ export function validateMaestroSuite(cwd = process.cwd()) {
     "Recommended for this phone",
     "Download and install",
     "Installed and selected.",
-    "on-device-settings-page",
-    "Installed and available",
+    "thinking-slot-mode-1",
+    "model-storage-group",
   ]) {
     if (!androidEligibleAutoSetupFlow.includes(selector)) {
       errors.push(
@@ -276,7 +297,8 @@ export function validateMaestroSuite(cwd = process.cwd()) {
     "No suitable set for this phone",
     "Try again",
     "auto-setup-manual",
-    "on-device-settings-page",
+    "settings-page-thinking",
+    "thinking-add-model",
   ]) {
     if (!androidAutoSetupFlow.includes(selector)) {
       errors.push(

@@ -247,6 +247,11 @@ function LocalLlmRows({
             label={model.name}
             last={index === candidates.length - 1}
             meta={getLocalModelMeta(model, localModels, t)}
+            metaTestID={
+              isLocalModelViable(model, localModels)
+                ? `local-model-viable-${model.id}`
+                : undefined
+            }
             onRemove={
               installed && !busy
                 ? () => void localModels.removeModel(model)

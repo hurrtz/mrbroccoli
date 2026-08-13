@@ -636,6 +636,12 @@ describe("SettingsModal", () => {
     });
 
     await waitFor(() => {
+      expect(
+        screen.getByTestId("local-model-viable-kokoro-multilingual"),
+      ).toBeTruthy();
+    });
+
+    await waitFor(() => {
       expect(screen.getByTestId("settings-tts-kokoro-voice")).toBeTruthy();
     });
     fireEvent.press(screen.getByTestId("settings-tts-kokoro-voice"));

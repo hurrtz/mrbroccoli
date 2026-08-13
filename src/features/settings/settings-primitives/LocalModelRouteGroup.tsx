@@ -227,6 +227,9 @@ export function LocalModelRouteGroup({
             error={Boolean(localModels.errors?.[model.id])}
             label={`${model.name} · ${t("settingsOnDevice")}`}
             meta={getLocalModelMeta(model, localModels, t)}
+            metaTestID={
+              viable ? `local-model-viable-${model.id}` : undefined
+            }
             selected={localModels.isModelSelected(model)}
             onRemove={
               install?.verified && !modelBusy

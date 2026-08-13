@@ -35,7 +35,8 @@ tags:
 - tapOn:
     id: auto-setup-manual
 - assertVisible:
-    id: on-device-settings-page
-- assertVisible: "No suitable set for this phone"
+    id: settings-page-thinking
+- assertVisible:
+    id: thinking-add-model
 - takeScreenshot:
-    path: android/runtime/auto-setup-settings-handoff
+    path: android/runtime/auto-setup-thinking-handoff

@@ -14,35 +14,31 @@ tags:
     id: main-settings-button
 - scrollUntilVisible:
     element:
-      id: settings-overview-row-local
+      id: settings-overview-row-speaking
     direction: DOWN
 - tapOn:
-    id: settings-overview-row-local
+    id: settings-overview-row-speaking
+- assertVisible:
+    id: settings-page-speaking
 - scrollUntilVisible:
     element:
-      id: on-device-tts-disclosure
+      id: local-model-download-kokoro-multilingual
     direction: DOWN
 - tapOn:
-    id: on-device-tts-disclosure
-- scrollUntilVisible:
-    element:
-      id: on-device-download-kokoro-multilingual
-    direction: DOWN
-- tapOn:
-    id: on-device-download-kokoro-multilingual
+    id: local-model-download-kokoro-multilingual
 - extendedWaitUntil:
     visible:
-      id: on-device-test-kokoro-multilingual
+      id: local-model-test-kokoro-multilingual
     timeout: 180000
 - tapOn:
-    id: on-device-test-kokoro-multilingual
+    id: local-model-test-kokoro-multilingual
 - extendedWaitUntil:
     visible:
-      id: on-device-performance-kokoro-multilingual-measured
+      id: local-model-viable-kokoro-multilingual
     timeout: 120000
 - scrollUntilVisible:
     element:
-      id: on-device-download-piper-en-us-kristin
+      id: local-model-download-piper-en-us-kristin
     direction: DOWN
 # The development client can show Expo's warning tray over the lower card
 # actions. Release builds do not include it; close it here so this native
@@ -50,30 +46,30 @@ tags:
 - tapOn:
     point: 93%, 92%
 - tapOn:
-    id: on-device-download-piper-en-us-kristin
+    id: local-model-download-piper-en-us-kristin
 - extendedWaitUntil:
     visible:
-      id: on-device-test-piper-en-us-kristin
+      id: local-model-test-piper-en-us-kristin
     timeout: 180000
 - tapOn:
-    id: on-device-test-piper-en-us-kristin
+    id: local-model-test-piper-en-us-kristin
 - extendedWaitUntil:
     visible:
-      id: on-device-performance-piper-en-us-kristin-measured
+      id: local-model-viable-piper-en-us-kristin
     timeout: 120000
 - scrollUntilVisible:
     element:
-      id: on-device-download-piper-en-us-norman
+      id: local-model-download-piper-en-us-norman
     direction: DOWN
 - tapOn:
-    id: on-device-download-piper-en-us-norman
+    id: local-model-download-piper-en-us-norman
 - extendedWaitUntil:
     visible:
-      id: on-device-test-piper-en-us-norman
+      id: local-model-test-piper-en-us-norman
     timeout: 180000
 - tapOn:
-    id: on-device-test-piper-en-us-norman
+    id: local-model-test-piper-en-us-norman
 - extendedWaitUntil:
     visible:
-      id: on-device-performance-piper-en-us-norman-measured
+      id: local-model-viable-piper-en-us-norman
     timeout: 120000

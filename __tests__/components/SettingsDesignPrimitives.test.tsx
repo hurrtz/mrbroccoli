@@ -105,6 +105,7 @@ describe("settings design primitives", () => {
         testID="local-route"
         label="On device"
         meta="Ready"
+        metaTestID="local-route-ready"
         selected
         onSelect={onSelect}
         onRemove={onRemove}
@@ -113,6 +114,9 @@ describe("settings design primitives", () => {
     );
 
     const radio = screen.getByLabelText("On device");
+    expect(screen.getByTestId("local-route-ready").props.children).toBe(
+      "Ready",
+    );
     expect(radio.props.accessibilityState).toEqual({
       checked: true,
       disabled: false,

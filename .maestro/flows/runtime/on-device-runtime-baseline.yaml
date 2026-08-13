@@ -13,51 +13,56 @@ tags:
     id: "main-settings-button"
 - scrollUntilVisible:
     element:
-      id: "settings-overview-row-local"
+      id: "settings-overview-row-thinking"
     direction: DOWN
 - tapOn:
-    id: "settings-overview-row-local"
+    id: "settings-overview-row-thinking"
+- assertVisible:
+    id: "settings-page-thinking"
+- tapOn:
+    id: "thinking-add-model"
+- assertVisible:
+    id: "thinking-add-sheet"
 - scrollUntilVisible:
     element:
-      id: "on-device-llm-disclosure"
+      id: "local-model-download-qwen3-0.6b-q8"
     direction: DOWN
 - tapOn:
-    id: "on-device-llm-disclosure"
-- scrollUntilVisible:
-    element:
-      id: "on-device-download-qwen3-0.6b-q8"
-    direction: DOWN
-- tapOn:
-    id: "on-device-download-qwen3-0.6b-q8"
+    id: "local-model-download-qwen3-0.6b-q8"
 - extendedWaitUntil:
     visible:
-      id: "on-device-test-qwen3-0.6b-q8"
+      id: "local-model-test-qwen3-0.6b-q8"
     timeout: 240000
 - tapOn:
-    id: "on-device-test-qwen3-0.6b-q8"
+    id: "local-model-test-qwen3-0.6b-q8"
 - extendedWaitUntil:
     visible:
-      id: "on-device-performance-qwen3-0.6b-q8-measured"
+      id: "local-model-viable-qwen3-0.6b-q8"
     timeout: 180000
+- tapOn: "Dismiss"
+- tapOn:
+    id: "settings-back-button"
 - scrollUntilVisible:
     element:
-      id: "on-device-stt-disclosure"
+      id: "settings-overview-row-listening"
     direction: DOWN
 - tapOn:
-    id: "on-device-stt-disclosure"
+    id: "settings-overview-row-listening"
+- assertVisible:
+    id: "settings-page-listening"
 - scrollUntilVisible:
     element:
-      id: "on-device-download-whisper-tiny"
+      id: "local-model-download-whisper-tiny"
     direction: DOWN
 - tapOn:
-    id: "on-device-download-whisper-tiny"
+    id: "local-model-download-whisper-tiny"
 - extendedWaitUntil:
     visible:
-      id: "on-device-test-whisper-tiny"
+      id: "local-model-test-whisper-tiny"
     timeout: 180000
 - tapOn:
-    id: "on-device-test-whisper-tiny"
+    id: "local-model-test-whisper-tiny"
 - extendedWaitUntil:
     visible:
-      id: "on-device-performance-whisper-tiny-measured"
+      id: "local-model-viable-whisper-tiny"
     timeout: 180000

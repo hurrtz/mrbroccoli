@@ -23,7 +23,7 @@ export const STORE_PROMO_SCREENSHOT_NAMES = Object.freeze({
     "04-conversation-branches",
     "05-premium-settings",
     "06-premium-thinking",
-    "07-on-device-ai",
+    "07-automatic-setup",
     "08-conversation-settings",
   ]),
   ios: Object.freeze([
@@ -35,7 +35,7 @@ export const STORE_PROMO_SCREENSHOT_NAMES = Object.freeze({
     "06-premium-settings",
     "07-premium-thinking",
     "08-premium-speaking",
-    "09-on-device-ai",
+    "09-automatic-setup",
     "10-conversation-settings",
   ]),
 });

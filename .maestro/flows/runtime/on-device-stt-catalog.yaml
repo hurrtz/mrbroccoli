@@ -14,109 +14,105 @@ tags:
     id: main-settings-button
 - scrollUntilVisible:
     element:
-      id: settings-overview-row-local
+      id: settings-overview-row-listening
     direction: DOWN
 - tapOn:
-    id: settings-overview-row-local
+    id: settings-overview-row-listening
+- assertVisible:
+    id: settings-page-listening
 - scrollUntilVisible:
     element:
-      id: on-device-stt-disclosure
+      id: local-model-download-whisper-tiny
     direction: DOWN
 - tapOn:
-    id: on-device-stt-disclosure
-- scrollUntilVisible:
-    element:
-      id: on-device-download-whisper-tiny
-    direction: DOWN
-- tapOn:
-    id: on-device-download-whisper-tiny
+    id: local-model-download-whisper-tiny
 - extendedWaitUntil:
     visible:
-      id: on-device-test-whisper-tiny
+      id: local-model-test-whisper-tiny
     timeout: 180000
 - tapOn:
-    id: on-device-test-whisper-tiny
+    id: local-model-test-whisper-tiny
 - extendedWaitUntil:
     visible:
-      id: on-device-performance-whisper-tiny-measured
+      id: local-model-viable-whisper-tiny
     timeout: 180000
 - scrollUntilVisible:
     element:
-      id: on-device-download-whisper-base
+      id: local-model-download-whisper-base
     direction: DOWN
 - tapOn:
-    id: on-device-download-whisper-base
+    id: local-model-download-whisper-base
 - extendedWaitUntil:
     visible:
-      id: on-device-test-whisper-base
+      id: local-model-test-whisper-base
     timeout: 240000
 - tapOn:
-    id: on-device-test-whisper-base
+    id: local-model-test-whisper-base
 - extendedWaitUntil:
     visible:
-      id: on-device-performance-whisper-base-measured
+      id: local-model-viable-whisper-base
     timeout: 180000
 - scrollUntilVisible:
     element:
-      id: on-device-download-whisper-small
+      id: local-model-download-whisper-small
     direction: DOWN
 - tapOn:
-    id: on-device-download-whisper-small
+    id: local-model-download-whisper-small
 - extendedWaitUntil:
     visible:
-      id: on-device-test-whisper-small
+      id: local-model-test-whisper-small
     timeout: 240000
 - tapOn:
-    id: on-device-test-whisper-small
+    id: local-model-test-whisper-small
 - extendedWaitUntil:
     visible:
-      id: on-device-performance-whisper-small-measured
-    timeout: 240000
-- scrollUntilVisible:
-    element:
-      id: on-device-download-omnilingual-asr-300m
-    direction: DOWN
-- tapOn:
-    id: on-device-download-omnilingual-asr-300m
-- extendedWaitUntil:
-    visible:
-      id: on-device-test-omnilingual-asr-300m
-    timeout: 240000
-- tapOn:
-    id: on-device-test-omnilingual-asr-300m
-- extendedWaitUntil:
-    visible:
-      id: on-device-performance-omnilingual-asr-300m-measured
+      id: local-model-viable-whisper-small
     timeout: 240000
 - scrollUntilVisible:
     element:
-      id: on-device-download-parakeet-tdt-0.6b-v3-int8
+      id: local-model-download-omnilingual-asr-300m
     direction: DOWN
 - tapOn:
-    id: on-device-download-parakeet-tdt-0.6b-v3-int8
+    id: local-model-download-omnilingual-asr-300m
 - extendedWaitUntil:
     visible:
-      id: on-device-test-parakeet-tdt-0.6b-v3-int8
+      id: local-model-test-omnilingual-asr-300m
+    timeout: 240000
+- tapOn:
+    id: local-model-test-omnilingual-asr-300m
+- extendedWaitUntil:
+    visible:
+      id: local-model-viable-omnilingual-asr-300m
+    timeout: 240000
+- scrollUntilVisible:
+    element:
+      id: local-model-download-parakeet-tdt-0.6b-v3-int8
+    direction: DOWN
+- tapOn:
+    id: local-model-download-parakeet-tdt-0.6b-v3-int8
+- extendedWaitUntil:
+    visible:
+      id: local-model-test-parakeet-tdt-0.6b-v3-int8
     timeout: 300000
 - tapOn:
-    id: on-device-test-parakeet-tdt-0.6b-v3-int8
+    id: local-model-test-parakeet-tdt-0.6b-v3-int8
 - extendedWaitUntil:
     visible:
-      id: on-device-performance-parakeet-tdt-0.6b-v3-int8-measured
+      id: local-model-viable-parakeet-tdt-0.6b-v3-int8
     timeout: 300000
 - scrollUntilVisible:
     element:
-      id: on-device-download-qwen3-asr-0.6b-int8
+      id: local-model-download-qwen3-asr-0.6b-int8
     direction: DOWN
 - tapOn:
-    id: on-device-download-qwen3-asr-0.6b-int8
+    id: local-model-download-qwen3-asr-0.6b-int8
 - extendedWaitUntil:
     visible:
-      id: on-device-test-qwen3-asr-0.6b-int8
+      id: local-model-test-qwen3-asr-0.6b-int8
     timeout: 300000
 - tapOn:
-    id: on-device-test-qwen3-asr-0.6b-int8
+    id: local-model-test-qwen3-asr-0.6b-int8
 - extendedWaitUntil:
     visible:
-      id: on-device-performance-qwen3-asr-0.6b-int8-measured
+      id: local-model-viable-qwen3-asr-0.6b-int8
     timeout: 300000

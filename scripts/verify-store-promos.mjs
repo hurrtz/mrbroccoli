@@ -2,7 +2,10 @@ import fs from "node:fs";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
 
-import { readAppLanguages } from "./verify-maestro-suite.mjs";
+import {
+  findRetiredMaestroSelectors,
+  readAppLanguages,
+} from "./verify-maestro-suite.mjs";
 import {
   STORE_PROMO_ANDROID_DISPLAYS,
   STORE_PROMO_ANDROID_FLOW_SCENES,
@@ -58,6 +61,11 @@ export function validateStorePromoSetup(cwd = process.cwd()) {
       readStorePromoScreenshotNames(flow),
     );
     const combinedFlow = platformFlows.join("\n");
+    for (const selector of findRetiredMaestroSelectors(combinedFlow)) {
+      errors.push(
+        `${platform} store screenshot flow references retired selector: ${selector}`,
+      );
+    }
     screenshotNames[platform] = platformScreenshotNames;
     if (
       platformScreenshotNames.length !==
@@ -84,9 +92,10 @@ export function validateStorePromoSetup(cwd = process.cwd()) {
       "transcript-handle",
       "conversation-drawer-item-promo-branch",
       "settings-page-thinking",
+      "settings-page-app",
+      "automatic-setup-group",
       "settings-modal-title",
       "settings-close-button",
-      "on-device-settings-page",
       "conversation-settings-summary-control",
       "conversation-settings-drawer",
     ]) {

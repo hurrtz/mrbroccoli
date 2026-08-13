@@ -14,37 +14,43 @@ tags:
     id: main-settings-button
 - scrollUntilVisible:
     element:
-      id: settings-overview-row-local
+      id: settings-overview-row-listening
     direction: DOWN
 - tapOn:
-    id: settings-overview-row-local
+    id: settings-overview-row-listening
+- assertVisible:
+    id: settings-page-listening
 - scrollUntilVisible:
     element:
-      id: on-device-language-selection
+      id: conversation-languages-picker
     direction: DOWN
 - tapOn:
-    id: on-device-language-selection
+    id: conversation-languages-picker
 - tapOn: ${LANGUAGE_LABEL}
 - tapOn: "Done"
+- tapOn:
+    id: settings-back-button
 - scrollUntilVisible:
     element:
-      id: on-device-tts-disclosure
+      id: settings-overview-row-speaking
     direction: DOWN
 - tapOn:
-    id: on-device-tts-disclosure
+    id: settings-overview-row-speaking
+- assertVisible:
+    id: settings-page-speaking
 - scrollUntilVisible:
     element:
-      id: on-device-download-${VOICE}
+      id: local-model-download-${VOICE}
     direction: DOWN
 - tapOn:
-    id: on-device-download-${VOICE}
+    id: local-model-download-${VOICE}
 - extendedWaitUntil:
     visible:
-      id: on-device-test-${VOICE}
+      id: local-model-test-${VOICE}
     timeout: 180000
 - tapOn:
-    id: on-device-test-${VOICE}
+    id: local-model-test-${VOICE}
 - extendedWaitUntil:
     visible:
-      id: on-device-performance-${VOICE}-measured
+      id: local-model-viable-${VOICE}
     timeout: 120000

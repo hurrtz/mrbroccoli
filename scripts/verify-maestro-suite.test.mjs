@@ -6,6 +6,7 @@ import test from "node:test";
 
 import {
   countScreenshots,
+  findRetiredMaestroSelectors,
   readAppLanguages,
   readAppLocaleOptions,
   validateMaestroSuite,
@@ -49,6 +50,20 @@ test("counts only explicit screenshot commands", () => {
     path: two
 `),
     2,
+  );
+});
+
+test("rejects selectors from the retired standalone Device page", () => {
+  assert.deepEqual(
+    findRetiredMaestroSelectors(`
+- tapOn:
+    id: settings-overview-row-local
+- assertVisible:
+    id: on-device-settings-page
+- tapOn:
+    id: local-model-download-whisper-tiny
+`),
+    ["settings-overview-row-local", "on-device-settings-page"],
   );
 });
 

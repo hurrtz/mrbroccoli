@@ -50,18 +50,22 @@ tags:
     id: settings-back-button
 - scrollUntilVisible:
     element:
-      id: settings-overview-row-local
+      id: settings-overview-row-app
     direction: DOWN
 - tapOn:
-    id: settings-overview-row-local
+    id: settings-overview-row-app
 - assertVisible:
-    id: on-device-settings-page
+    id: settings-page-app
+- assertVisible:
+    id: automatic-setup-group
+- assertVisible:
+    id: auto-setup-card
 - assertVisible:
     id: settings-modal-title
 - assertVisible:
     id: settings-close-button
 - takeScreenshot:
-    path: 07-on-device-ai
+    path: 07-automatic-setup
 - tapOn:
     id: settings-close-button
 

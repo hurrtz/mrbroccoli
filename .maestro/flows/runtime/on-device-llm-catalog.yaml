@@ -14,109 +14,109 @@ tags:
     id: main-settings-button
 - scrollUntilVisible:
     element:
-      id: settings-overview-row-local
+      id: settings-overview-row-thinking
     direction: DOWN
 - tapOn:
-    id: settings-overview-row-local
+    id: settings-overview-row-thinking
+- assertVisible:
+    id: settings-page-thinking
+- tapOn:
+    id: thinking-add-model
+- assertVisible:
+    id: thinking-add-sheet
 - scrollUntilVisible:
     element:
-      id: on-device-llm-disclosure
+      id: local-model-download-qwen3-0.6b-q8
     direction: DOWN
 - tapOn:
-    id: on-device-llm-disclosure
-- scrollUntilVisible:
-    element:
-      id: on-device-download-qwen3-0.6b-q8
-    direction: DOWN
-- tapOn:
-    id: on-device-download-qwen3-0.6b-q8
+    id: local-model-download-qwen3-0.6b-q8
 - extendedWaitUntil:
     visible:
-      id: on-device-test-qwen3-0.6b-q8
+      id: local-model-test-qwen3-0.6b-q8
     timeout: 240000
 - tapOn:
-    id: on-device-test-qwen3-0.6b-q8
+    id: local-model-test-qwen3-0.6b-q8
 - extendedWaitUntil:
     visible:
-      id: on-device-performance-qwen3-0.6b-q8-measured
+      id: local-model-viable-qwen3-0.6b-q8
     timeout: 180000
 - scrollUntilVisible:
     element:
-      id: on-device-download-qwen3.5-0.8b-q8
+      id: local-model-download-qwen3.5-0.8b-q8
     direction: DOWN
 - tapOn:
-    id: on-device-download-qwen3.5-0.8b-q8
+    id: local-model-download-qwen3.5-0.8b-q8
 - extendedWaitUntil:
     visible:
-      id: on-device-test-qwen3.5-0.8b-q8
+      id: local-model-test-qwen3.5-0.8b-q8
     timeout: 240000
 - tapOn:
-    id: on-device-test-qwen3.5-0.8b-q8
+    id: local-model-test-qwen3.5-0.8b-q8
 - extendedWaitUntil:
     visible:
-      id: on-device-performance-qwen3.5-0.8b-q8-measured
+      id: local-model-viable-qwen3.5-0.8b-q8
     timeout: 180000
 - scrollUntilVisible:
     element:
-      id: on-device-download-granite-4.0-1b-q4
+      id: local-model-download-granite-4.0-1b-q4
     direction: DOWN
 - tapOn:
-    id: on-device-download-granite-4.0-1b-q4
+    id: local-model-download-granite-4.0-1b-q4
 - extendedWaitUntil:
     visible:
-      id: on-device-test-granite-4.0-1b-q4
+      id: local-model-test-granite-4.0-1b-q4
     timeout: 240000
 - tapOn:
-    id: on-device-test-granite-4.0-1b-q4
+    id: local-model-test-granite-4.0-1b-q4
 - extendedWaitUntil:
     visible:
-      id: on-device-performance-granite-4.0-1b-q4-measured
+      id: local-model-viable-granite-4.0-1b-q4
     timeout: 180000
 - scrollUntilVisible:
     element:
-      id: on-device-download-qwen3-1.7b-q8
+      id: local-model-download-qwen3-1.7b-q8
     direction: DOWN
 - tapOn:
-    id: on-device-download-qwen3-1.7b-q8
+    id: local-model-download-qwen3-1.7b-q8
 - extendedWaitUntil:
     visible:
-      id: on-device-test-qwen3-1.7b-q8
+      id: local-model-test-qwen3-1.7b-q8
     timeout: 300000
 - tapOn:
-    id: on-device-test-qwen3-1.7b-q8
+    id: local-model-test-qwen3-1.7b-q8
 - extendedWaitUntil:
     visible:
-      id: on-device-performance-qwen3-1.7b-q8-measured
+      id: local-model-viable-qwen3-1.7b-q8
     timeout: 240000
 - scrollUntilVisible:
     element:
-      id: on-device-download-ministral-3-3b-reasoning-q4
+      id: local-model-download-ministral-3-3b-reasoning-q4
     direction: DOWN
 - tapOn:
-    id: on-device-download-ministral-3-3b-reasoning-q4
+    id: local-model-download-ministral-3-3b-reasoning-q4
 - extendedWaitUntil:
     visible:
-      id: on-device-test-ministral-3-3b-reasoning-q4
+      id: local-model-test-ministral-3-3b-reasoning-q4
     timeout: 300000
 - tapOn:
-    id: on-device-test-ministral-3-3b-reasoning-q4
+    id: local-model-test-ministral-3-3b-reasoning-q4
 - extendedWaitUntil:
     visible:
-      id: on-device-performance-ministral-3-3b-reasoning-q4-measured
+      id: local-model-viable-ministral-3-3b-reasoning-q4
     timeout: 300000
 - scrollUntilVisible:
     element:
-      id: on-device-download-qwen3-4b-q4
+      id: local-model-download-qwen3-4b-q4
     direction: DOWN
 - tapOn:
-    id: on-device-download-qwen3-4b-q4
+    id: local-model-download-qwen3-4b-q4
 - extendedWaitUntil:
     visible:
-      id: on-device-test-qwen3-4b-q4
+      id: local-model-test-qwen3-4b-q4
     timeout: 300000
 - tapOn:
-    id: on-device-test-qwen3-4b-q4
+    id: local-model-test-qwen3-4b-q4
 - extendedWaitUntil:
     visible:
-      id: on-device-performance-qwen3-4b-q4-measured
+      id: local-model-viable-qwen3-4b-q4
     timeout: 300000

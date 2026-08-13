@@ -46,12 +46,31 @@ tags:
     id: settings-page-overview
 - scrollUntilVisible:
     element:
-      id: settings-overview-row-local
+      id: settings-overview-row-thinking
     direction: DOWN
 - tapOn:
-    id: settings-overview-row-local
+    id: settings-overview-row-thinking
 - assertVisible:
-    id: on-device-settings-page
-- assertVisible: "Installed and available"
+    id: settings-page-thinking
+- assertVisible:
+    id: thinking-slot-mode-1
 - takeScreenshot:
-    path: android-physical/runtime/on-device-settings-installed
+    path: android-physical/runtime/thinking-model-installed
+- tapOn:
+    id: settings-back-button
+- scrollUntilVisible:
+    element:
+      id: settings-overview-row-data
+    direction: DOWN
+- tapOn:
+    id: settings-overview-row-data
+- assertVisible:
+    id: settings-page-data
+- scrollUntilVisible:
+    element:
+      id: model-storage-group
+    direction: DOWN
+- assertVisible:
+    id: model-storage-group
+- takeScreenshot:
+    path: android-physical/runtime/model-storage-installed
