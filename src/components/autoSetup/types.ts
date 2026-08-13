@@ -29,7 +29,7 @@ export interface AutoSetupStepReading {
 
 /**
  * The automatic setup job as its three surfaces see it: the introduction's
- * auto step, the top of On-device AI settings, and the home-screen task bar
+ * auto step, the App & diagnostics setup section, and the home-screen task bar
  * are all views of this one state, which lives above every screen that shows
  * it.
  */

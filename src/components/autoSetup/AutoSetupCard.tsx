@@ -97,7 +97,7 @@ function Verdict({
 /**
  * One tap that measures the device, proposes a set of on-device models, and
  * installs them. Six states, one card, the same card in the introduction and
- * in On-device AI settings.
+ * in the App & diagnostics setup section.
  *
  * Unlike the design system's web card, this one is always controlled: the
  * install has to keep running after the screen that started it is gone, so

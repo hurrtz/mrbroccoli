@@ -57,11 +57,11 @@ const en = {
   autoSetupBarInstalling: "Installing on-device AI",
   autoSetupBarFailed: "On-device install stopped",
   autoSetupBarFailedDetail: "Tap to see what failed",
-  autoSetupBarOpen: "Open on-device AI settings",
+  autoSetupBarOpen: "Open automatic setup",
   introAutoTitle: "One tap to set it up",
   introRecommended: "Recommended",
   introAutoBody:
-    "Mr Broccoli measures what this phone can run, shows you what it would install, and only then downloads. The manual routes on the next steps stay available.",
+    "Mr Broccoli measures what this phone can run, shows you what he would install, and only then downloads. The manual routes on the next steps stay available.",
   onDeviceCatalogInstalled: "Installed and available",
 };
 
@@ -113,7 +113,7 @@ export const autoSetupTranslations = {
     autoSetupBarInstalling: "جارٍ تثبيت الذكاء على الجهاز",
     autoSetupBarFailed: "توقف التثبيت على الجهاز",
     autoSetupBarFailedDetail: "انقر لمعرفة ما فشل",
-    autoSetupBarOpen: "افتح إعدادات الذكاء على الجهاز",
+    autoSetupBarOpen: "فتح الإعداد التلقائي",
     introAutoTitle: "إعداد بنقرة واحدة",
     introRecommended: "موصى به",
     introAutoBody:
@@ -164,7 +164,7 @@ export const autoSetupTranslations = {
     autoSetupBarInstalling: "Instaluje se AI v zařízení",
     autoSetupBarFailed: "Instalace v zařízení se zastavila",
     autoSetupBarFailedDetail: "Klepnutím zjistíte, co selhalo",
-    autoSetupBarOpen: "Otevřít nastavení AI v zařízení",
+    autoSetupBarOpen: "Otevřít automatické nastavení",
     introAutoTitle: "Nastavení jedním klepnutím",
     introRecommended: "Doporučeno",
     introAutoBody:
@@ -217,11 +217,11 @@ export const autoSetupTranslations = {
     autoSetupBarInstalling: "KI auf dem Gerät wird installiert",
     autoSetupBarFailed: "Installation auf dem Gerät gestoppt",
     autoSetupBarFailedDetail: "Antippen, um zu sehen, was fehlschlug",
-    autoSetupBarOpen: "Einstellungen für KI auf dem Gerät öffnen",
+    autoSetupBarOpen: "Automatische Einrichtung öffnen",
     introAutoTitle: "Einrichtung mit einem Tipp",
     introRecommended: "Empfohlen",
     introAutoBody:
-      "Mr Broccoli misst, was dieses Telefon leisten kann, zeigt, was es installieren würde, und lädt erst dann herunter. Die manuellen Wege der nächsten Schritte bleiben verfügbar.",
+      "Mr Broccoli misst, was dieses Telefon leisten kann, zeigt, was er installieren würde, und lädt erst dann herunter. Die manuellen Wege der nächsten Schritte bleiben verfügbar.",
     onDeviceCatalogInstalled: "Installiert und verfügbar",
   }),
   es: define({
@@ -268,7 +268,7 @@ export const autoSetupTranslations = {
     autoSetupBarInstalling: "Instalando IA en el dispositivo",
     autoSetupBarFailed: "Instalación en el dispositivo detenida",
     autoSetupBarFailedDetail: "Toca para ver qué falló",
-    autoSetupBarOpen: "Abrir ajustes de IA en el dispositivo",
+    autoSetupBarOpen: "Abrir la configuración automática",
     introAutoTitle: "Configúralo con un toque",
     introRecommended: "Recomendado",
     introAutoBody:
@@ -321,7 +321,7 @@ export const autoSetupTranslations = {
     autoSetupBarInstalling: "Installation de l'IA sur l'appareil",
     autoSetupBarFailed: "Installation sur l'appareil arrêtée",
     autoSetupBarFailedDetail: "Touchez pour voir ce qui a échoué",
-    autoSetupBarOpen: "Ouvrir les réglages IA sur l'appareil",
+    autoSetupBarOpen: "Ouvrir la configuration automatique",
     introAutoTitle: "Une touche pour tout configurer",
     introRecommended: "Recommandé",
     introAutoBody:
@@ -371,7 +371,7 @@ export const autoSetupTranslations = {
     autoSetupBarInstalling: "डिवाइस पर AI इंस्टॉल हो रहा है",
     autoSetupBarFailed: "डिवाइस पर इंस्टॉल रुक गया",
     autoSetupBarFailedDetail: "क्या विफल हुआ देखने के लिए टैप करें",
-    autoSetupBarOpen: "डिवाइस पर AI सेटिंग खोलें",
+    autoSetupBarOpen: "स्वचालित सेटअप खोलें",
     introAutoTitle: "एक टैप में सेटअप",
     introRecommended: "अनुशंसित",
     introAutoBody:
@@ -422,7 +422,7 @@ export const autoSetupTranslations = {
     autoSetupBarInstalling: "Eszközön futó AI telepítése",
     autoSetupBarFailed: "Az eszközön futó telepítés megállt",
     autoSetupBarFailedDetail: "Koppintson, hogy lássa, mi hibázott",
-    autoSetupBarOpen: "Eszközön futó AI beállításainak megnyitása",
+    autoSetupBarOpen: "Automatikus beállítás megnyitása",
     introAutoTitle: "Beállítás egyetlen koppintással",
     introRecommended: "Ajánlott",
     introAutoBody:
@@ -474,7 +474,7 @@ export const autoSetupTranslations = {
     autoSetupBarInstalling: "Installazione dell'IA sul dispositivo",
     autoSetupBarFailed: "Installazione sul dispositivo interrotta",
     autoSetupBarFailedDetail: "Tocca per vedere cosa è fallito",
-    autoSetupBarOpen: "Apri le impostazioni IA sul dispositivo",
+    autoSetupBarOpen: "Apri la configurazione automatica",
     introAutoTitle: "Configurazione con un tocco",
     introRecommended: "Consigliato",
     introAutoBody:
@@ -524,7 +524,7 @@ export const autoSetupTranslations = {
     autoSetupBarInstalling: "オンデバイスAIをインストール中",
     autoSetupBarFailed: "オンデバイスのインストールが停止",
     autoSetupBarFailedDetail: "タップして失敗内容を確認",
-    autoSetupBarOpen: "オンデバイスAI設定を開く",
+    autoSetupBarOpen: "自動セットアップを開く",
     introAutoTitle: "ワンタップでセットアップ",
     introRecommended: "おすすめ",
     introAutoBody:
@@ -576,7 +576,7 @@ export const autoSetupTranslations = {
     autoSetupBarInstalling: "Instalowanie AI na urządzeniu",
     autoSetupBarFailed: "Instalacja na urządzeniu zatrzymana",
     autoSetupBarFailedDetail: "Dotknij, aby zobaczyć, co się nie powiodło",
-    autoSetupBarOpen: "Otwórz ustawienia AI na urządzeniu",
+    autoSetupBarOpen: "Otwórz automatyczną konfigurację",
     introAutoTitle: "Konfiguracja jednym dotknięciem",
     introRecommended: "Polecane",
     introAutoBody:
@@ -626,7 +626,7 @@ export const autoSetupTranslations = {
     autoSetupBarInstalling: "A instalar IA no dispositivo",
     autoSetupBarFailed: "Instalação no dispositivo parada",
     autoSetupBarFailedDetail: "Toque para ver o que falhou",
-    autoSetupBarOpen: "Abrir definições de IA no dispositivo",
+    autoSetupBarOpen: "Abrir a configuração automática",
     introAutoTitle: "Configuração num toque",
     introRecommended: "Recomendado",
     introAutoBody:
@@ -676,7 +676,7 @@ export const autoSetupTranslations = {
     autoSetupBarInstalling: "Instalando IA no dispositivo",
     autoSetupBarFailed: "Instalação no dispositivo parou",
     autoSetupBarFailedDetail: "Toque para ver o que falhou",
-    autoSetupBarOpen: "Abrir configurações de IA no dispositivo",
+    autoSetupBarOpen: "Abrir a configuração automática",
     introAutoTitle: "Configure com um toque",
     introRecommended: "Recomendado",
     introAutoBody:
@@ -728,7 +728,7 @@ export const autoSetupTranslations = {
     autoSetupBarInstalling: "Установка ИИ на устройстве",
     autoSetupBarFailed: "Установка на устройстве остановлена",
     autoSetupBarFailedDetail: "Нажмите, чтобы узнать, что не удалось",
-    autoSetupBarOpen: "Открыть настройки ИИ на устройстве",
+    autoSetupBarOpen: "Открыть автоматическую настройку",
     introAutoTitle: "Настройка одним касанием",
     introRecommended: "Рекомендуется",
     introAutoBody:
@@ -778,7 +778,7 @@ export const autoSetupTranslations = {
     autoSetupBarInstalling: "Installerar AI på enheten",
     autoSetupBarFailed: "Installationen på enheten stannade",
     autoSetupBarFailedDetail: "Tryck för att se vad som misslyckades",
-    autoSetupBarOpen: "Öppna inställningar för AI på enheten",
+    autoSetupBarOpen: "Öppna automatisk installation",
     introAutoTitle: "Installera med ett tryck",
     introRecommended: "Rekommenderas",
     introAutoBody:
@@ -829,7 +829,7 @@ export const autoSetupTranslations = {
     autoSetupBarInstalling: "Cihaz üzerinde YZ kuruluyor",
     autoSetupBarFailed: "Cihaz üzerindeki kurulum durdu",
     autoSetupBarFailedDetail: "Neyin başarısız olduğunu görmek için dokunun",
-    autoSetupBarOpen: "Cihaz üzerinde YZ ayarlarını aç",
+    autoSetupBarOpen: "Otomatik kurulumu aç",
     introAutoTitle: "Tek dokunuşla kurulum",
     introRecommended: "Önerilen",
     introAutoBody:
@@ -881,7 +881,7 @@ export const autoSetupTranslations = {
     autoSetupBarInstalling: "Установлення ШІ на пристрої",
     autoSetupBarFailed: "Установлення на пристрої зупинено",
     autoSetupBarFailedDetail: "Торкніться, щоб побачити, що не вдалося",
-    autoSetupBarOpen: "Відкрити налаштування ШІ на пристрої",
+    autoSetupBarOpen: "Відкрити автоматичне налаштування",
     introAutoTitle: "Налаштування одним дотиком",
     introRecommended: "Рекомендовано",
     introAutoBody:
@@ -931,7 +931,7 @@ export const autoSetupTranslations = {
     autoSetupBarInstalling: "آلے پر AI انسٹال ہو رہا ہے",
     autoSetupBarFailed: "آلے پر انسٹال رک گیا",
     autoSetupBarFailedDetail: "کیا ناکام ہوا دیکھنے کے لیے تھپتھپائیں",
-    autoSetupBarOpen: "آلے پر AI کی ترتیبات کھولیں",
+    autoSetupBarOpen: "خودکار سیٹ اپ کھولیں",
     introAutoTitle: "ایک ٹیپ میں سیٹ اپ",
     introRecommended: "تجویز کردہ",
     introAutoBody:
@@ -980,7 +980,7 @@ export const autoSetupTranslations = {
     autoSetupBarInstalling: "正在安装设备端 AI",
     autoSetupBarFailed: "设备端安装已停止",
     autoSetupBarFailedDetail: "点按查看失败原因",
-    autoSetupBarOpen: "打开设备端 AI 设置",
+    autoSetupBarOpen: "打开自动设置",
     introAutoTitle: "一键完成设置",
     introRecommended: "推荐",
     introAutoBody:

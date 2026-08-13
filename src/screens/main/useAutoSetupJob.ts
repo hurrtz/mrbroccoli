@@ -65,7 +65,7 @@ function formatRemaining(t: TranslateFn, seconds: number): string {
 
 /**
  * The automatic on-device setup job. It lives above every screen that shows
- * it — the introduction's auto step, the top of On-device AI settings, and
+ * it — the introduction's auto step, the App & diagnostics setup section, and
  * the home-screen task bar are three views of this one state — so leaving a
  * screen never stops the install.
  *
