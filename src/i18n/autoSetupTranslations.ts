@@ -13,7 +13,7 @@ const en = {
   autoSetupScanning: "Measuring this phone",
   autoSetupScanNote: "A few seconds. Nothing leaves the device.",
   autoSetupProposalLabel: "Recommended for this phone",
-  autoSetupProposalNote: "You can change any of it later in On-device AI.",
+  autoSetupProposalNote: "You can change any of it later in Settings.",
   autoSetupInstallAction: "Download and install",
   autoSetupManual: "Choose manually instead",
   autoSetupInstallingNote: "The download continues if you leave this screen.",
@@ -79,7 +79,7 @@ export const autoSetupTranslations = {
     autoSetupScanning: "جارٍ قياس هذا الهاتف",
     autoSetupScanNote: "بضع ثوانٍ. لا يغادر أي شيء الجهاز.",
     autoSetupProposalLabel: "موصى به لهذا الهاتف",
-    autoSetupProposalNote: "يمكنك تغيير أي منها لاحقًا في الذكاء على الجهاز.",
+    autoSetupProposalNote: "يمكنك تغيير أي منها لاحقًا في الإعدادات.",
     autoSetupInstallAction: "تنزيل وتثبيت",
     autoSetupManual: "الاختيار يدويًا بدلًا من ذلك",
     autoSetupInstallingNote: "يستمر التنزيل إذا غادرت هذه الشاشة.",
@@ -130,7 +130,7 @@ export const autoSetupTranslations = {
     autoSetupScanNote: "Pár sekund. Nic neopouští zařízení.",
     autoSetupProposalLabel: "Doporučeno pro tento telefon",
     autoSetupProposalNote:
-      "Cokoli z toho můžete později změnit v AI v zařízení.",
+      "Cokoli z toho můžete později změnit v Nastavení.",
     autoSetupInstallAction: "Stáhnout a nainstalovat",
     autoSetupManual: "Raději vybrat ručně",
     autoSetupInstallingNote: "Stahování pokračuje, i když obrazovku opustíte.",
@@ -182,7 +182,7 @@ export const autoSetupTranslations = {
     autoSetupScanNote: "Ein paar Sekunden. Nichts verlässt das Gerät.",
     autoSetupProposalLabel: "Für dieses Telefon empfohlen",
     autoSetupProposalNote:
-      "Alles davon lässt sich später unter KI auf dem Gerät ändern.",
+      "Alles davon lässt sich später in den Einstellungen ändern.",
     autoSetupInstallAction: "Herunterladen und installieren",
     autoSetupManual: "Lieber manuell wählen",
     autoSetupInstallingNote:
@@ -234,7 +234,7 @@ export const autoSetupTranslations = {
     autoSetupScanNote: "Unos segundos. Nada sale del dispositivo.",
     autoSetupProposalLabel: "Recomendado para este teléfono",
     autoSetupProposalNote:
-      "Puedes cambiar cualquier cosa después en IA en el dispositivo.",
+      "Puedes cambiar cualquier cosa después en Ajustes.",
     autoSetupInstallAction: "Descargar e instalar",
     autoSetupManual: "Elegir manualmente",
     autoSetupInstallingNote: "La descarga continúa si sales de esta pantalla.",
@@ -286,7 +286,7 @@ export const autoSetupTranslations = {
     autoSetupScanNote: "Quelques secondes. Rien ne quitte l'appareil.",
     autoSetupProposalLabel: "Recommandé pour ce téléphone",
     autoSetupProposalNote:
-      "Vous pourrez tout changer plus tard dans IA sur l'appareil.",
+      "Vous pourrez tout changer plus tard dans les Paramètres.",
     autoSetupInstallAction: "Télécharger et installer",
     autoSetupManual: "Choisir manuellement",
     autoSetupInstallingNote:
@@ -337,7 +337,7 @@ export const autoSetupTranslations = {
     autoSetupScanning: "इस फ़ोन को मापा जा रहा है",
     autoSetupScanNote: "कुछ सेकंड। कुछ भी डिवाइस से बाहर नहीं जाता।",
     autoSetupProposalLabel: "इस फ़ोन के लिए अनुशंसित",
-    autoSetupProposalNote: "आप बाद में डिवाइस पर AI में इसे बदल सकते हैं।",
+    autoSetupProposalNote: "आप बाद में सेटिंग्स में इसे बदल सकते हैं।",
     autoSetupInstallAction: "डाउनलोड और इंस्टॉल करें",
     autoSetupManual: "स्वयं चुनें",
     autoSetupInstallingNote: "स्क्रीन छोड़ने पर भी डाउनलोड जारी रहता है।",
@@ -387,7 +387,7 @@ export const autoSetupTranslations = {
     autoSetupScanning: "A telefon mérése",
     autoSetupScanNote: "Néhány másodperc. Semmi sem hagyja el a készüléket.",
     autoSetupProposalLabel: "Ehhez a telefonhoz ajánlott",
-    autoSetupProposalNote: "Bármit később módosíthat az Eszközön futó AI-ban.",
+    autoSetupProposalNote: "Bármit később módosíthat a Beállításokban.",
     autoSetupInstallAction: "Letöltés és telepítés",
     autoSetupManual: "Inkább kézzel választok",
     autoSetupInstallingNote:
@@ -440,7 +440,7 @@ export const autoSetupTranslations = {
     autoSetupScanNote: "Qualche secondo. Nulla lascia il dispositivo.",
     autoSetupProposalLabel: "Consigliato per questo telefono",
     autoSetupProposalNote:
-      "Potrai cambiare tutto più tardi in IA sul dispositivo.",
+      "Potrai cambiare tutto più tardi nelle Impostazioni.",
     autoSetupInstallAction: "Scarica e installa",
     autoSetupManual: "Preferisco scegliere manualmente",
     autoSetupInstallingNote: "Il download continua se lasci questa schermata.",
@@ -490,7 +490,7 @@ export const autoSetupTranslations = {
     autoSetupScanning: "この端末を測定中",
     autoSetupScanNote: "数秒です。端末の外には何も出ません。",
     autoSetupProposalLabel: "この端末へのおすすめ",
-    autoSetupProposalNote: "後からオンデバイスAIでいつでも変更できます。",
+    autoSetupProposalNote: "後から設定でいつでも変更できます。",
     autoSetupInstallAction: "ダウンロードしてインストール",
     autoSetupManual: "自分で選ぶ",
     autoSetupInstallingNote: "この画面を離れてもダウンロードは続きます。",
@@ -541,7 +541,7 @@ export const autoSetupTranslations = {
     autoSetupScanNote: "Kilka sekund. Nic nie opuszcza urządzenia.",
     autoSetupProposalLabel: "Zalecane dla tego telefonu",
     autoSetupProposalNote:
-      "Wszystko możesz później zmienić w AI na urządzeniu.",
+      "Wszystko możesz później zmienić w Ustawieniach.",
     autoSetupInstallAction: "Pobierz i zainstaluj",
     autoSetupManual: "Wolę wybrać ręcznie",
     autoSetupInstallingNote:
@@ -592,7 +592,7 @@ export const autoSetupTranslations = {
     autoSetupScanning: "A medir este telemóvel",
     autoSetupScanNote: "Alguns segundos. Nada sai do dispositivo.",
     autoSetupProposalLabel: "Recomendado para este telemóvel",
-    autoSetupProposalNote: "Pode alterar tudo mais tarde em IA no dispositivo.",
+    autoSetupProposalNote: "Pode alterar tudo mais tarde nas Definições.",
     autoSetupInstallAction: "Transferir e instalar",
     autoSetupManual: "Prefiro escolher manualmente",
     autoSetupInstallingNote: "A transferência continua se sair deste ecrã.",
@@ -642,7 +642,7 @@ export const autoSetupTranslations = {
     autoSetupScanning: "Medindo este celular",
     autoSetupScanNote: "Alguns segundos. Nada sai do dispositivo.",
     autoSetupProposalLabel: "Recomendado para este celular",
-    autoSetupProposalNote: "Você pode mudar tudo depois em IA no dispositivo.",
+    autoSetupProposalNote: "Você pode mudar tudo depois nas Configurações.",
     autoSetupInstallAction: "Baixar e instalar",
     autoSetupManual: "Prefiro escolher manualmente",
     autoSetupInstallingNote: "O download continua se você sair desta tela.",
@@ -693,7 +693,7 @@ export const autoSetupTranslations = {
     autoSetupScanNote: "Несколько секунд. Ничего не покидает устройство.",
     autoSetupProposalLabel: "Рекомендовано для этого телефона",
     autoSetupProposalNote:
-      "Всё это можно позже изменить в разделе ИИ на устройстве.",
+      "Всё это можно позже изменить в настройках.",
     autoSetupInstallAction: "Скачать и установить",
     autoSetupManual: "Выбрать вручную",
     autoSetupInstallingNote:
@@ -744,7 +744,7 @@ export const autoSetupTranslations = {
     autoSetupScanning: "Mäter den här telefonen",
     autoSetupScanNote: "Några sekunder. Inget lämnar enheten.",
     autoSetupProposalLabel: "Rekommenderas för den här telefonen",
-    autoSetupProposalNote: "Allt kan ändras senare i AI på enheten.",
+    autoSetupProposalNote: "Allt kan ändras senare i Inställningar.",
     autoSetupInstallAction: "Ladda ner och installera",
     autoSetupManual: "Välj manuellt i stället",
     autoSetupInstallingNote: "Nedladdningen fortsätter om du lämnar skärmen.",
@@ -795,7 +795,7 @@ export const autoSetupTranslations = {
     autoSetupScanNote: "Birkaç saniye. Hiçbir şey cihazdan çıkmaz.",
     autoSetupProposalLabel: "Bu telefon için önerilen",
     autoSetupProposalNote:
-      "Hepsini daha sonra Cihaz üzerinde YZ bölümünden değiştirebilirsiniz.",
+      "Hepsini daha sonra Ayarlar bölümünden değiştirebilirsiniz.",
     autoSetupInstallAction: "İndir ve kur",
     autoSetupManual: "Elle seçmeyi tercih ederim",
     autoSetupInstallingNote: "Bu ekrandan ayrılsanız da indirme devam eder.",
@@ -846,7 +846,7 @@ export const autoSetupTranslations = {
     autoSetupScanNote: "Кілька секунд. Ніщо не залишає пристрій.",
     autoSetupProposalLabel: "Рекомендовано для цього телефона",
     autoSetupProposalNote:
-      "Усе це можна змінити пізніше в розділі ШІ на пристрої.",
+      "Усе це можна змінити пізніше в налаштуваннях.",
     autoSetupInstallAction: "Завантажити й установити",
     autoSetupManual: "Вибрати вручну",
     autoSetupInstallingNote:
@@ -897,7 +897,7 @@ export const autoSetupTranslations = {
     autoSetupScanning: "اس فون کی پیمائش جاری ہے",
     autoSetupScanNote: "چند سیکنڈ۔ کچھ بھی آلے سے باہر نہیں جاتا۔",
     autoSetupProposalLabel: "اس فون کے لیے تجویز کردہ",
-    autoSetupProposalNote: "آپ بعد میں آلے پر AI میں کچھ بھی بدل سکتے ہیں۔",
+    autoSetupProposalNote: "آپ بعد میں ترتیبات میں کچھ بھی بدل سکتے ہیں۔",
     autoSetupInstallAction: "ڈاؤن لوڈ اور انسٹال کریں",
     autoSetupManual: "خود منتخب کریں",
     autoSetupInstallingNote: "اسکرین چھوڑنے پر بھی ڈاؤن لوڈ جاری رہتا ہے۔",
@@ -947,7 +947,7 @@ export const autoSetupTranslations = {
     autoSetupScanning: "正在测量这部手机",
     autoSetupScanNote: "只需几秒。任何数据都不会离开设备。",
     autoSetupProposalLabel: "为这部手机推荐",
-    autoSetupProposalNote: "之后可随时在设备端 AI 中更改。",
+    autoSetupProposalNote: "之后可随时在设置中更改。",
     autoSetupInstallAction: "下载并安装",
     autoSetupManual: "改为手动选择",
     autoSetupInstallingNote: "离开此屏幕后下载仍会继续。",

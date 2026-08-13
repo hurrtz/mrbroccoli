@@ -306,7 +306,7 @@ export const ja = {
   speechToText: "音声からテキストへ",
   appNative: "システム認識",
   nativeSttDescription:
-    "オペレーティング システムの音声認識機能を使用します。デバイスの設定に応じて、認識はデバイス上で実行される場合もあれば、システム サービスを通じて実行される場合もあります。プロバイダーキーは必要ありません。",
+    "オペレーティング システムの音声認識機能を使用します。",
   provider: "プロバイダー",
   webSearchProvider: "ウェブ検索プロバイダー",
   webSearchProviderMissingHint:

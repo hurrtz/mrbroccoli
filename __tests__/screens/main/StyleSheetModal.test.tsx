@@ -231,14 +231,14 @@ describe("StyleSheetModal", () => {
     expect(onTtsVoiceChange).toHaveBeenCalledWith("nova");
   });
 
-  it("disables TTS instructions for unsupported speech models", () => {
-    const { getByTestId, getByText } = setup({
+  it("explains unsupported TTS instructions with a line, not a dead field", () => {
+    // A ghost textarea invites typing into a field the route ignores; the
+    // explanatory sentence carries the state alone.
+    const { queryByTestId, getByText } = setup({
       ttsInstructionsSupported: false,
     });
 
-    expect(getByTestId("conversation-tts-instructions").props.editable).toBe(
-      false,
-    );
+    expect(queryByTestId("conversation-tts-instructions")).toBeNull();
     expect(
       getByText(
         "The current speech route does not support delivery instructions.",

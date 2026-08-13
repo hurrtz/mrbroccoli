@@ -306,7 +306,7 @@ export const fr = {
   speechToText: "Parole en texte",
   appNative: "Reconnaissance du système",
   nativeSttDescription:
-    "Utilisez la reconnaissance vocale du système d'exploitation. En fonction des paramètres de l'appareil, la reconnaissance peut s'exécuter sur l'appareil ou via le service système. Aucune clé de fournisseur n’est requise.",
+    "Utilisez la reconnaissance vocale du système d'exploitation.",
   provider: "Fournisseur",
   webSearchProvider: "Fournisseur de recherche Web",
   webSearchProviderMissingHint:

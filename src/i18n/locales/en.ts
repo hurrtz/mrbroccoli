@@ -304,7 +304,7 @@ export const en = {
   speechToText: "Speech to Text",
   appNative: "System Recognition",
   nativeSttDescription:
-    "Use the operating system's speech recognizer. Depending on device settings, recognition may run on-device or through the system service. No provider key is required.",
+    "Use the operating system's speech recognizer.",
   provider: "Provider",
   webSearchProvider: "Web Search Provider",
   webSearchProviderMissingHint:
@@ -350,10 +350,10 @@ export const en = {
   nativeSttHint:
     "System recognition works independently of your provider keys and may be processed on-device or by the operating system's speech service.",
   replyPlayback: "Reply Playback",
-  sentencesArrive: "Paragraphs Arrive",
+  sentencesArrive: "Paragraphs arrive",
   sentencesArriveDescription:
     "Start speaking as soon as a complete paragraph is ready.",
-  fullReplyFirst: "Full Reply First",
+  fullReplyFirst: "Full reply first",
   fullReplyFirstDescription:
     "Generate the entire answer first, then play it in one pass.",
   textToSpeech: "Text to Speech",

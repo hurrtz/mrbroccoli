@@ -720,7 +720,7 @@ describe("SettingsModal", () => {
       screen.getByLabelText("System voice").props.accessibilityState,
     ).toMatchObject({ checked: true });
     expect(
-      screen.getByLabelText("Kokoro · On-device AI").props.accessibilityState,
+      screen.getByLabelText("Kokoro").props.accessibilityState,
     ).toMatchObject({ checked: false });
   });
 

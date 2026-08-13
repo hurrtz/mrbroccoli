@@ -306,7 +306,7 @@ export const sv = {
   speechToText: "Tal till text",
   appNative: "Systemigenkänning",
   nativeSttDescription:
-    "Använd operativsystemets taligenkännare. Beroende på enhetsinställningar kan igenkänning köras på enheten eller via systemtjänsten. Ingen leverantörsnyckel krävs.",
+    "Använd operativsystemets taligenkännare.",
   provider: "Leverantör",
   webSearchProvider: "Webbsökleverantör",
   webSearchProviderMissingHint:

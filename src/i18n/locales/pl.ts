@@ -308,7 +308,7 @@ export const pl = {
   speechToText: "Mowa na tekst",
   appNative: "Rozpoznawanie systemowe",
   nativeSttDescription:
-    "Użyj modułu rozpoznawania mowy systemu operacyjnego. W zależności od ustawień urządzenia rozpoznawanie może odbywać się na urządzeniu lub za pośrednictwem usługi systemowej. Nie jest wymagany żaden klucz dostawcy.",
+    "Użyj modułu rozpoznawania mowy systemu operacyjnego.",
   provider: "Dostawca",
   webSearchProvider: "Dostawca wyszukiwania internetowego",
   webSearchProviderMissingHint:

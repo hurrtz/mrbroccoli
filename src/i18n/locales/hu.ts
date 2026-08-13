@@ -311,7 +311,7 @@ export const hu = {
   speechToText: "Beszéd szöveggé",
   appNative: "Rendszerfelismerés",
   nativeSttDescription:
-    "Használja az operációs rendszer beszédfelismerőjét. Az eszköz beállításaitól függően a felismerés futhat az eszközön vagy a rendszerszolgáltatáson keresztül. Nincs szükség szolgáltatói kulcsra.",
+    "Használja az operációs rendszer beszédfelismerőjét.",
   provider: "Szolgáltató",
   webSearchProvider: "Webes keresőszolgáltató",
   webSearchProviderMissingHint:

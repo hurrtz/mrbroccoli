@@ -46,6 +46,13 @@ the complete Play Store translations are kept in a dedicated file under
   44-point targets — no filled circles — and back is a full arrow.
 - The voice orb steps down a size while the setup banner is on screen instead
   of squeezing the rest of the home screen.
+- Copy no longer references the retired "On-device AI" page: the setup note
+  points at Settings, and on-device model rows drop the "· On-device AI"
+  suffix since their meta line already says where they run. The system
+  recognition route describes itself in one sentence, reply-playback options
+  read in sentence case, echoed voice names are capitalized, and a speech
+  route that cannot take delivery instructions explains that in one line
+  instead of showing a dead text box.
 
 ### Changed
 

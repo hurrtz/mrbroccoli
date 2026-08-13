@@ -306,7 +306,7 @@ export const tr = {
   speechToText: "Konuşmadan Metne",
   appNative: "Sistem Tanıma",
   nativeSttDescription:
-    "İşletim sisteminin konuşma tanıyıcısını kullanın. Cihaz ayarlarına bağlı olarak tanıma, cihaz üzerinde veya sistem hizmeti aracılığıyla çalıştırılabilir. Sağlayıcı anahtarı gerekmez.",
+    "İşletim sisteminin konuşma tanıyıcısını kullanın.",
   provider: "Sağlayıcı",
   webSearchProvider: "Web Arama Sağlayıcısı",
   webSearchProviderMissingHint:

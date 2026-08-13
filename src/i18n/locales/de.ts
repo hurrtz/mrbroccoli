@@ -311,7 +311,7 @@ export const de = {
   speechToText: "Sprache zu Text",
   appNative: "Systemerkennung",
   nativeSttDescription:
-    "Verwende die Spracherkennung des Betriebssystems. Je nach Geräteeinstellung läuft sie lokal oder über den Systemdienst. Kein API-Schlüssel nötig.",
+    "Verwende die Spracherkennung des Betriebssystems.",
   provider: "Anbieter",
   webSearchProvider: "Websuche-Anbieter",
   webSearchProviderMissingHint:

@@ -225,7 +225,7 @@ export function LocalModelRouteGroup({
             }
             disabled={!viable || modelBusy}
             error={Boolean(localModels.errors?.[model.id])}
-            label={`${model.name} · ${t("settingsOnDevice")}`}
+            label={model.name}
             meta={getLocalModelMeta(model, localModels, t)}
             metaTestID={
               viable ? `local-model-viable-${model.id}` : undefined

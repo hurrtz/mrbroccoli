@@ -307,7 +307,7 @@ export const cs = {
   speechToText: "Řeč na text",
   appNative: "Rozpoznávání systému",
   nativeSttDescription:
-    "Použijte rozpoznávač řeči operačního systému. V závislosti na nastavení zařízení může rozpoznávání běžet na zařízení nebo prostřednictvím systémové služby. Není vyžadován žádný klíč poskytovatele.",
+    "Použijte rozpoznávač řeči operačního systému.",
   provider: "Poskytovatel",
   webSearchProvider: "Poskytovatel vyhledávání na webu",
   webSearchProviderMissingHint:

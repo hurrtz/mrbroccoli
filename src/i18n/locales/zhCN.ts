@@ -304,7 +304,7 @@ export const zhCN = {
   speechToText: "语音转文字",
   appNative: "系统识别",
   nativeSttDescription:
-    "使用操作系统的语音识别器。根据设备设置，识别可以在设备上运行或通过系统服务运行。不需要提供商密钥。",
+    "使用操作系统的语音识别器。",
   provider: "提供商",
   webSearchProvider: "网页搜索提供商",
   webSearchProviderMissingHint:

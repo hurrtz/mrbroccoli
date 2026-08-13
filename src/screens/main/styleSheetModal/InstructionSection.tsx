@@ -49,26 +49,29 @@ export function InstructionSection({
       >
         {description}
       </Text>
-      <TextInput
-        testID={inputTestID}
-        value={value}
-        onChangeText={onChange}
-        editable={editable}
-        multiline
-        placeholder={placeholder}
-        placeholderTextColor={colors.textMuted}
-        selectionColor={colors.accent}
-        textAlignVertical="top"
-        style={[
-          styles.styleSheetInstructionInput,
-          {
-            backgroundColor: colors.surfaceElevated,
-            borderColor: colors.border,
-            color: colors.text,
-            opacity: editable ? 1 : 0.55,
-          },
-        ]}
-      />
+      {/* When the route cannot take instructions, the explanatory line above
+          carries it alone — a dead ghost textarea only invites typing into
+          a field that does nothing. */}
+      {editable ? (
+        <TextInput
+          testID={inputTestID}
+          value={value}
+          onChangeText={onChange}
+          multiline
+          placeholder={placeholder}
+          placeholderTextColor={colors.textMuted}
+          selectionColor={colors.accent}
+          textAlignVertical="top"
+          style={[
+            styles.styleSheetInstructionInput,
+            {
+              backgroundColor: colors.surfaceElevated,
+              borderColor: colors.border,
+              color: colors.text,
+            },
+          ]}
+        />
+      ) : null}
     </View>
   );
 }

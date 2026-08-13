@@ -306,7 +306,7 @@ export const pt = {
   speechToText: "Fala para Texto",
   appNative: "Reconhecimento do Sistema",
   nativeSttDescription:
-    "Utilize o reconhecedor de fala do sistema operativo. Dependendo das definições do dispositivo, o reconhecimento pode ser executado no dispositivo ou através do serviço do sistema. Nenhuma chave de fornecedor é necessária.",
+    "Utilize o reconhecedor de fala do sistema operativo.",
   provider: "Fornecedor",
   webSearchProvider: "Fornecedor de pesquisa na Web",
   webSearchProviderMissingHint:

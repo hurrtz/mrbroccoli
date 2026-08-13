@@ -151,6 +151,16 @@ function getThemeLabel(
   }
 }
 
+/**
+ * Voice ids are stored lowercase ("cosmo"); echoes read as names, so the
+ * first letter comes up. Opaque provider ids pass through unchanged.
+ */
+function displayVoiceName(voice: string | undefined) {
+  return voice
+    ? voice.charAt(0).toLocaleUpperCase() + voice.slice(1)
+    : voice;
+}
+
 function getResponseModeLabel(settings: Settings, isPremium: boolean) {
   const modes = isPremium
     ? settings.responseModes
@@ -190,7 +200,7 @@ function getSpeakingRouteLabel(
 ) {
   if (settings.ttsMode === "kokoro") {
     const language = settings.localLanguages.includes("zh-CN") ? "zh" : "en";
-    return ["Kokoro", settings.kokoroVoices[language]]
+    return ["Kokoro", displayVoiceName(settings.kokoroVoices[language])]
       .filter(Boolean)
       .join(" · ");
   }
@@ -200,7 +210,7 @@ function getSpeakingRouteLabel(
   if (settings.ttsMode === "provider" && settings.ttsProvider) {
     return [
       PROVIDER_LABELS[settings.ttsProvider],
-      settings.providerTtsVoices[settings.ttsProvider],
+      displayVoiceName(settings.providerTtsVoices[settings.ttsProvider]),
     ]
       .filter(Boolean)
       .join(" · ");

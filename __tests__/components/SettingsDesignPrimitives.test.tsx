@@ -249,7 +249,7 @@ describe("settings design primitives", () => {
     );
 
     expect(
-      screen.getByLabelText("Whisper Tiny · On-device AI").props
+      screen.getByLabelText("Whisper Tiny").props
         .accessibilityState,
     ).toEqual({ checked: false, disabled: true });
     fireEvent.press(screen.getByTestId("local-model-test-whisper-tiny"));
