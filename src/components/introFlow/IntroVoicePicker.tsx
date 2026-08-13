@@ -1,5 +1,12 @@
 import React from "react";
-import { Modal, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import {
+  Modal,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 
 import { PhosphorIcon } from "../../design-system/PhosphorIcon";
 import { APP_LANGUAGES, getAppLocale } from "../../i18n/localeRegistry";
@@ -61,7 +68,10 @@ export function IntroVoicePicker({ language, t }: IntroVoicePickerProps) {
           ]}
           testID="intro-voice-select"
         >
-          <Text numberOfLines={1} style={[styles.selectLabel, { color: theme.text }]}>
+          <Text
+            numberOfLines={1}
+            style={[styles.selectLabel, { color: theme.text }]}
+          >
             {getAppLocale(selected).nativeName}
           </Text>
           <PhosphorIcon color={theme.textMuted} name="down" size="compact" />
@@ -98,13 +108,31 @@ export function IntroVoicePicker({ language, t }: IntroVoicePickerProps) {
           style={styles.backdrop}
         />
         <View
+          accessibilityViewIsModal
           style={[
             styles.sheet,
             { backgroundColor: theme.panel, borderColor: theme.border },
           ]}
           testID="intro-voice-options"
         >
-          <Text style={[styles.sheetTitle, { color: theme.text }]}>{t("introVoicePickerTitle")}</Text>
+          <View style={styles.sheetHeader}>
+            <Text style={[styles.sheetTitle, { color: theme.text }]}>
+              {t("introVoicePickerTitle")}
+            </Text>
+            <Pressable
+              accessibilityLabel={t("dismiss")}
+              accessibilityRole="button"
+              onPress={() => setPickerOpen(false)}
+              style={styles.sheetClose}
+              testID="intro-voice-close"
+            >
+              <PhosphorIcon
+                color={theme.textSecondary}
+                name="close"
+                size="compact"
+              />
+            </Pressable>
+          </View>
           <ScrollView contentContainerStyle={styles.sheetList}>
             {APP_LANGUAGES.map((option) => {
               const active = option === selected;
@@ -215,15 +243,27 @@ const styles = StyleSheet.create({
     marginVertical: "auto",
     maxHeight: "70%",
     paddingBottom: 10,
-    paddingTop: 18,
+    paddingTop: 8,
+  },
+  sheetClose: {
+    alignItems: "center",
+    height: 44,
+    justifyContent: "center",
+    width: 44,
+  },
+  sheetHeader: {
+    alignItems: "center",
+    flexDirection: "row",
+    minHeight: 44,
+    paddingEnd: 8,
+    paddingStart: 18,
   },
   sheetList: {
     paddingHorizontal: 8,
   },
   sheetTitle: {
+    flex: 1,
     fontFamily: fonts.display,
     fontSize: 15,
-    marginBottom: 8,
-    paddingHorizontal: 18,
   },
 });

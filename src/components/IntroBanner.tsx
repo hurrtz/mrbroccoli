@@ -7,6 +7,7 @@ import { fonts } from "../theme/typography";
 import type { TranslateFn } from "../screens/main/shared";
 
 interface IntroBannerProps {
+  compact?: boolean;
   onDismiss: () => void;
   onOpen: () => void;
   showDismiss: boolean;
@@ -22,10 +23,11 @@ interface IntroBannerProps {
  * the app's palette: violet makes it unmistakably not part of the furniture on
  * a first launch, in either theme.
  *
- * The whole card opens the introduction. Dismissal is a distinct, smaller
+ * The whole card opens the introduction. Dismissal is a distinct 44 point
  * target -- someone reaching to get rid of it should not land inside the flow.
  */
 export function IntroBanner({
+  compact = false,
   onDismiss,
   onOpen,
   showDismiss,
@@ -36,16 +38,48 @@ export function IntroBanner({
     return null;
   }
 
+  if (compact) {
+    return (
+      <Pressable
+        accessibilityLabel={t("introBannerTitle")}
+        accessibilityRole="button"
+        onPress={onOpen}
+        style={({ pressed }) => [
+          styles.compactCard,
+          showDismiss ? styles.compactCardWithDismiss : null,
+          { opacity: pressed ? 0.9 : 1 },
+        ]}
+        testID="intro-banner"
+      >
+        <Text numberOfLines={1} style={styles.compactTitle}>
+          {t("introBannerTitle")}
+        </Text>
+        {showDismiss ? (
+          <Pressable
+            accessibilityLabel={t("introBannerDismiss")}
+            accessibilityRole="button"
+            onPress={onDismiss}
+            style={styles.compactDismiss}
+            testID="intro-banner-dismiss"
+          >
+            <PhosphorIcon
+              color={introBannerTheme.dismiss}
+              name="close"
+              size="compact"
+            />
+          </Pressable>
+        ) : null}
+      </Pressable>
+    );
+  }
+
   return (
     <Pressable
       accessibilityHint={t("introBannerBody")}
       accessibilityLabel={t("introBannerTitle")}
       accessibilityRole="button"
       onPress={onOpen}
-      style={({ pressed }) => [
-        styles.card,
-        { transform: [{ scale: pressed ? 0.99 : 1 }] },
-      ]}
+      style={({ pressed }) => [styles.card, { opacity: pressed ? 0.9 : 1 }]}
       testID="intro-banner"
     >
       <View accessible={false} style={styles.glow} />
@@ -63,7 +97,6 @@ export function IntroBanner({
           <Pressable
             accessibilityLabel={t("introBannerDismiss")}
             accessibilityRole="button"
-            hitSlop={10}
             onPress={onDismiss}
             style={styles.dismiss}
             testID="intro-banner-dismiss"
@@ -123,13 +156,44 @@ const styles = StyleSheet.create({
     overflow: "hidden",
     padding: 18,
   },
+  compactCard: {
+    alignItems: "center",
+    backgroundColor: introBannerTheme.canvas,
+    borderRadius: introRadius.control,
+    flexDirection: "row",
+    gap: 10,
+    marginBottom: 8,
+    minHeight: 48,
+    overflow: "hidden",
+    paddingHorizontal: 14,
+  },
+  compactCardWithDismiss: {
+    paddingEnd: 6,
+    paddingStart: 60,
+  },
+  compactDismiss: {
+    alignItems: "center",
+    flexShrink: 0,
+    height: 44,
+    justifyContent: "center",
+    width: 44,
+  },
+  compactTitle: {
+    color: introBannerTheme.text,
+    flex: 1,
+    fontFamily: fonts.bodyMedium,
+    fontSize: 14,
+    lineHeight: 19,
+    minWidth: 0,
+    textAlign: "center",
+  },
   dismiss: {
     alignItems: "center",
-    height: 32,
+    height: 44,
     justifyContent: "center",
-    marginRight: -6,
-    marginTop: -6,
-    width: 32,
+    marginRight: -12,
+    marginTop: -12,
+    width: 44,
   },
   // A soft bloom lifting the flat violet. Decorative only, so it stays out of
   // the accessibility tree.

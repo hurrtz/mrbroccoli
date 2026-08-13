@@ -44,7 +44,7 @@ export function appendNoticeMetadata(
 }
 
 export function useVoiceTurnMessageState(updateMessage: UpdateMessage) {
-  const ttsFallbackToastShownRef = useRef(false);
+  const ttsFallbackNoticeRecordedRef = useRef(false);
   const lastUserMessageIdRef = useRef<string | null>(null);
   const lastAssistantMessageIdRef = useRef<string | null>(null);
   const assistantHasTurnReceiptRef = useRef(false);
@@ -92,7 +92,7 @@ export function useVoiceTurnMessageState(updateMessage: UpdateMessage) {
 
   const resetTurnMessageState = useCallback(
     (existingUserMessageId?: string) => {
-      ttsFallbackToastShownRef.current = false;
+      ttsFallbackNoticeRecordedRef.current = false;
       lastUserMessageIdRef.current = existingUserMessageId ?? null;
       lastAssistantMessageIdRef.current = null;
       assistantHasTurnReceiptRef.current = false;
@@ -106,50 +106,42 @@ export function useVoiceTurnMessageState(updateMessage: UpdateMessage) {
     [clearReplyFailure],
   );
 
-  const queueAssistantNotice = useCallback(
-    (notice: MessagePipelineNotice) => {
-      pendingAssistantNoticesRef.current = [
-        ...pendingAssistantNoticesRef.current,
-        notice,
-      ];
-    },
-    [],
-  );
+  const queueAssistantNotice = useCallback((notice: MessagePipelineNotice) => {
+    pendingAssistantNoticesRef.current = [
+      ...pendingAssistantNoticesRef.current,
+      notice,
+    ];
+  }, []);
 
-  const consumeAssistantMetadata = useCallback(
-    (metadata?: MessageMetadata) => {
-      const pendingNotices = pendingAssistantNoticesRef.current;
-      const pendingReceiptUpdates = pendingTurnReceiptUpdatesRef.current;
-      pendingAssistantNoticesRef.current = [];
-      pendingTurnReceiptUpdatesRef.current = [];
+  const consumeAssistantMetadata = useCallback((metadata?: MessageMetadata) => {
+    const pendingNotices = pendingAssistantNoticesRef.current;
+    const pendingReceiptUpdates = pendingTurnReceiptUpdatesRef.current;
+    pendingAssistantNoticesRef.current = [];
+    pendingTurnReceiptUpdatesRef.current = [];
 
-      const metadataWithNotices = pendingNotices.reduce(
-        (currentMetadata, notice) =>
-          appendNoticeMetadata(currentMetadata, notice),
-        metadata,
-      );
+    const metadataWithNotices = pendingNotices.reduce(
+      (currentMetadata, notice) =>
+        appendNoticeMetadata(currentMetadata, notice),
+      metadata,
+    );
 
-      if (!metadataWithNotices?.turnReceipt) {
-        assistantHasTurnReceiptRef.current = false;
-        return metadataWithNotices;
-      }
+    if (!metadataWithNotices?.turnReceipt) {
+      assistantHasTurnReceiptRef.current = false;
+      return metadataWithNotices;
+    }
 
-      assistantHasTurnReceiptRef.current = true;
-      return {
-        ...metadataWithNotices,
-        turnReceipt: pendingReceiptUpdates.reduce(
-          (receipt, update) => update(receipt),
-          metadataWithNotices.turnReceipt,
-        ),
-      };
-    },
-    [],
-  );
+    assistantHasTurnReceiptRef.current = true;
+    return {
+      ...metadataWithNotices,
+      turnReceipt: pendingReceiptUpdates.reduce(
+        (receipt, update) => update(receipt),
+        metadataWithNotices.turnReceipt,
+      ),
+    };
+  }, []);
 
   const updateAssistantTurnReceipt = useCallback(
-    (
-      update: (receipt: MessageTurnReceipt) => MessageTurnReceipt,
-    ) => {
+    (update: (receipt: MessageTurnReceipt) => MessageTurnReceipt) => {
       const assistantMessageId = lastAssistantMessageIdRef.current;
       if (!assistantMessageId) {
         pendingTurnReceiptUpdatesRef.current = [
@@ -198,12 +190,12 @@ export function useVoiceTurnMessageState(updateMessage: UpdateMessage) {
 
   const recordTtsFallbackNotice = useCallback(
     (notice: MessagePipelineNotice) => {
-      if (ttsFallbackToastShownRef.current) {
+      if (ttsFallbackNoticeRecordedRef.current) {
         return false;
       }
 
       recordAssistantNotice(notice);
-      ttsFallbackToastShownRef.current = true;
+      ttsFallbackNoticeRecordedRef.current = true;
       return true;
     },
     [recordAssistantNotice],

@@ -223,4 +223,24 @@ describe("BackgroundTaskBar", () => {
 
     expect(screen.queryByTestId("background-task-bar-fill")).toBeNull();
   });
+
+  it("announces a completed job in the persistent success row", () => {
+    const screen = render(
+      <ThemeProvider mode="light">
+        <BackgroundTaskBar
+          accessibilityLabel="Ready. Open on-device AI settings."
+          detail="Installed and selected."
+          fraction={1}
+          onPress={jest.fn()}
+          title="Ready"
+          tone="success"
+        />
+      </ThemeProvider>,
+    );
+
+    expect(screen.getByTestId("background-task-bar").props).toEqual(
+      expect.objectContaining({ accessibilityLiveRegion: "polite" }),
+    );
+    expect(screen.queryByTestId("background-task-bar-fill")).toBeNull();
+  });
 });

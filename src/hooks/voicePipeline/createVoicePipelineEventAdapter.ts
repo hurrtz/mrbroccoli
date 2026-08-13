@@ -13,7 +13,6 @@ import type { PipelinePhase, UseVoicePipelineParams } from "./types";
 import type { useLatencyProgressController } from "./useLatencyProgressController";
 import type { useStreamingTextScheduler } from "./useStreamingTextScheduler";
 import {
-  formatNoticeToast,
   getUnexpectedIssueDetail,
   type useVoiceTurnMessageState,
 } from "./useVoiceTurnMessageState";
@@ -37,7 +36,6 @@ type EventAdapterParams = Pick<
   | "selectedTtsModel"
   | "selectedTtsVoice"
   | "localTtsModelId"
-  | "showToast"
   | "spokenRepliesEnabled"
   | "sttMode"
   | "sttProvider"
@@ -105,7 +103,6 @@ export function createVoicePipelineEventAdapter({
   localTtsModelId,
   setPipelinePhase,
   setStreamingText,
-  showToast,
   spokenRepliesEnabled,
   state,
   sttMode,
@@ -302,9 +299,7 @@ export function createVoicePipelineEventAdapter({
       });
       messageState.lastUserMessageIdRef.current = userMessage?.id ?? null;
       if (userMessage && attachments?.length) {
-        onAttachmentsAccepted?.(
-          attachments.map((attachment) => attachment.id),
-        );
+        onAttachmentsAccepted?.(attachments.map((attachment) => attachment.id));
       }
       return runConversationId;
     },
@@ -372,7 +367,6 @@ export function createVoicePipelineEventAdapter({
         payload: { error },
       });
       messageState.queueAssistantNotice(notice);
-      showToast(formatNoticeToast(notice), undefined, "danger");
     },
     onLlmStart: handleLlmStarted,
     onUlraModeComplete: ({ outcome }) => {
@@ -582,7 +576,6 @@ export function createVoicePipelineEventAdapter({
           fallbackReason: notice.detail ?? notice.message,
         },
       }));
-      showToast(formatNoticeToast(notice), undefined, "danger");
     },
     onError,
   };

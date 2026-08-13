@@ -96,6 +96,10 @@
   pager motion, explicit Normal effort, tone/length/voice summary, relative-age
   status and handle copy, constrained landscape controls, and the single-header
   transcript sheet.
+- [x] Reconcile onboarding and announcement ownership: 44-point introduction
+  controls, the Recommended setup divider, compact landscape invitation,
+  Premium gold treatment, modal focus isolation, toast suspension behind
+  secondary surfaces, setup task rows, and reply-owned fallback notices.
 - [ ] Reconcile the seven-page settings hierarchy and its new row/group route
   primitives. Overview, Connections, Search, Listening, Speaking, Data,
   App, and the replacement Thinking implementation are source-complete;

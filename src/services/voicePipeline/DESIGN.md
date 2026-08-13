@@ -152,14 +152,17 @@ their timers and release listeners or abort-linking functions in their own
 | STT fails or returns empty | no model request; preserve non-aborted audio |
 | Summary update fails | continue with bounded recent messages |
 | Knowledge retrieval fails | continue without cross-session excerpts |
-| Web search fails | continue without search and mark fallback |
+| Web search fails | continue without search and persist an inline assistant notice |
 | Some Uber participants fail | continue with successful routes; report degraded/retired outcome |
 | All Uber participants fail | final synthesis cannot proceed normally |
 | Primary LLM route fails | bounded candidate fallback or user-visible error |
-| TTS route fails | follow explicit fallback order or keep readable text reply |
+| TTS route fails | follow explicit fallback order or keep readable text reply, with an inline assistant notice |
 | Abort occurs | stop downstream publication and clean up |
 
 No degradation path may fabricate success metadata or hide the actual route.
+Assistant-owned degradation notices are durable transcript metadata rather than
+global toasts, preventing one failure from being announced twice or detached
+from the reply it affected.
 
 ## Evidence
 

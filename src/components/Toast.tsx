@@ -15,6 +15,8 @@ import type { ToastTone } from "../types";
 interface ToastProps {
   message: string;
   visible: boolean;
+  /** Keep a pending workspace toast behind a focused sheet until it closes. */
+  suspended?: boolean;
   onDismiss: () => void;
   onRetry?: () => void;
   duration?: number;
@@ -27,6 +29,7 @@ export function Toast({
   onDismiss,
   onRetry,
   duration = 4000,
+  suspended = false,
   tone = "info",
 }: ToastProps) {
   const { colors } = useTheme();
@@ -39,7 +42,9 @@ export function Toast({
     opacity.stopAnimation();
     translateY.stopAnimation();
 
-    if (visible) {
+    const presented = visible && !suspended;
+
+    if (presented) {
       Animated.parallel([
         Animated.timing(opacity, {
           duration: 200,
@@ -85,9 +90,9 @@ export function Toast({
       opacity.stopAnimation();
       translateY.stopAnimation();
     };
-  }, [duration, onDismiss, onRetry, opacity, translateY, visible]);
+  }, [duration, onDismiss, onRetry, opacity, suspended, translateY, visible]);
 
-  if (!visible) return null;
+  if (!visible || suspended) return null;
 
   const toneColor =
     tone === "danger"

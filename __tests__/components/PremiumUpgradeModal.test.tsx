@@ -111,6 +111,17 @@ describe("PremiumUpgradeModal", () => {
       ),
     ).toBeTruthy();
     expect(screen.getByText("Buy Premium · €14.99")).toBeTruthy();
+    const premiumIcon = screen.getByTestId("phosphor-icon-thunderbolt", {
+      includeHiddenElements: true,
+    });
+    expect(premiumIcon.props.color).toBe("#8A6A12");
+    const valueCard = StyleSheet.flatten(
+      screen.getByTestId("premium-value-card").props.style,
+    );
+    expect(valueCard).toMatchObject({
+      backgroundColor: "rgba(138, 106, 18, 0.10)",
+      borderColor: "rgba(138, 106, 18, 0.32)",
+    });
     expect(mockRecordDebugLogEvent).toHaveBeenCalledWith({
       event: "premium-upgrade-dialog-presented",
       payload: {

@@ -258,7 +258,6 @@ export function useVoiceCaptureHandler({
         localTtsModelId,
         setPipelinePhase,
         setStreamingText,
-        showToast,
         spokenRepliesEnabled,
         state,
         sttMode,

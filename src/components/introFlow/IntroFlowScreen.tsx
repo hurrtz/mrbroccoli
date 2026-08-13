@@ -111,20 +111,26 @@ export function IntroFlowScreen({
                 accessibilityRole="button"
                 accessibilityState={{ disabled: isFirst }}
                 disabled={isFirst}
-                hitSlop={8}
                 onPress={() => goTo(index - 1)}
                 style={[
                   styles.headerButton,
-                  { backgroundColor: theme.panel, borderColor: theme.border },
                   isFirst ? styles.headerHidden : null,
                 ]}
                 testID="intro-back"
               >
-                <PhosphorIcon
-                  color={theme.textSecondary}
-                  name="left"
-                  size="control"
-                />
+                <View
+                  style={[
+                    styles.headerButtonFace,
+                    { backgroundColor: theme.panel, borderColor: theme.border },
+                  ]}
+                  testID="intro-back-face"
+                >
+                  <PhosphorIcon
+                    color={theme.textSecondary}
+                    name="left"
+                    size="control"
+                  />
+                </View>
               </Pressable>
 
               <IntroStepper
@@ -137,19 +143,23 @@ export function IntroFlowScreen({
               <Pressable
                 accessibilityLabel={t("introBannerDismiss")}
                 accessibilityRole="button"
-                hitSlop={8}
                 onPress={onClose}
-                style={[
-                  styles.headerButton,
-                  { backgroundColor: theme.panel, borderColor: theme.border },
-                ]}
+                style={styles.headerButton}
                 testID="intro-close"
               >
-                <PhosphorIcon
-                  color={theme.textSecondary}
-                  name="close"
-                  size="control"
-                />
+                <View
+                  style={[
+                    styles.headerButtonFace,
+                    { backgroundColor: theme.panel, borderColor: theme.border },
+                  ]}
+                  testID="intro-close-face"
+                >
+                  <PhosphorIcon
+                    color={theme.textSecondary}
+                    name="close"
+                    size="control"
+                  />
+                </View>
               </Pressable>
             </View>
 
@@ -239,6 +249,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: 18,
   },
   headerButton: {
+    alignItems: "center",
+    height: 44,
+    justifyContent: "center",
+    margin: -2,
+    width: 44,
+  },
+  headerButtonFace: {
     alignItems: "center",
     borderRadius: introRadius.pill,
     borderWidth: StyleSheet.hairlineWidth,

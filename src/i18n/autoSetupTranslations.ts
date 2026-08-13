@@ -49,8 +49,7 @@ const en = {
   autoSetupSecondsLeft: ({ seconds }: { seconds?: string | number }) =>
     `about ${seconds} s left`,
   autoSetupAlmostDone: "almost done",
-  autoSetupTotalSize: ({ size }: { size?: string | number }) =>
-    `${size} total`,
+  autoSetupTotalSize: ({ size }: { size?: string | number }) => `${size} total`,
   autoSetupFactMemory: "Memory",
   autoSetupFactStorage: "Storage",
   autoSetupFactProcessors: "Processors",
@@ -60,6 +59,7 @@ const en = {
   autoSetupBarFailedDetail: "Tap to see what failed",
   autoSetupBarOpen: "Open on-device AI settings",
   introAutoTitle: "One tap to set it up",
+  introRecommended: "Recommended",
   introAutoBody:
     "Mr Broccoli measures what this phone can run, shows you what it would install, and only then downloads. The manual routes on the next steps stay available.",
   onDeviceCatalogInstalled: "Installed and available",
@@ -115,6 +115,7 @@ export const autoSetupTranslations = {
     autoSetupBarFailedDetail: "انقر لمعرفة ما فشل",
     autoSetupBarOpen: "افتح إعدادات الذكاء على الجهاز",
     introAutoTitle: "إعداد بنقرة واحدة",
+    introRecommended: "موصى به",
     introAutoBody:
       "يقيس Mr Broccoli ما يمكن لهذا الهاتف تشغيله، ويعرض ما سيثبته، ثم ينزّله بعد موافقتك فقط. تبقى الطرق اليدوية في الخطوات التالية متاحة.",
     onDeviceCatalogInstalled: "مثبّت ومتاح",
@@ -128,7 +129,8 @@ export const autoSetupTranslations = {
     autoSetupScanning: "Měření tohoto telefonu",
     autoSetupScanNote: "Pár sekund. Nic neopouští zařízení.",
     autoSetupProposalLabel: "Doporučeno pro tento telefon",
-    autoSetupProposalNote: "Cokoli z toho můžete později změnit v AI v zařízení.",
+    autoSetupProposalNote:
+      "Cokoli z toho můžete později změnit v AI v zařízení.",
     autoSetupInstallAction: "Stáhnout a nainstalovat",
     autoSetupManual: "Raději vybrat ručně",
     autoSetupInstallingNote: "Stahování pokračuje, i když obrazovku opustíte.",
@@ -164,6 +166,7 @@ export const autoSetupTranslations = {
     autoSetupBarFailedDetail: "Klepnutím zjistíte, co selhalo",
     autoSetupBarOpen: "Otevřít nastavení AI v zařízení",
     introAutoTitle: "Nastavení jedním klepnutím",
+    introRecommended: "Doporučeno",
     introAutoBody:
       "Mr Broccoli změří, co tento telefon zvládne, ukáže, co by nainstaloval, a teprve potom stahuje. Ruční cesty v dalších krocích zůstávají dostupné.",
     onDeviceCatalogInstalled: "Nainstalované a dostupné",
@@ -172,15 +175,18 @@ export const autoSetupTranslations = {
     autoSetupTitle: "Automatische Einrichtung",
     autoSetupBody:
       "Mr Broccoli kann messen, was dieses Telefon leisten kann, und dann ein Modell zum Denken, eines zum Zuhören und eines zum Sprechen auswählen.",
-    autoSetupOfferNote: "Nichts wird heruntergeladen, bevor Sie die Liste gesehen haben.",
+    autoSetupOfferNote:
+      "Nichts wird heruntergeladen, bevor Sie die Liste gesehen haben.",
     autoSetupStart: "Dieses Telefon prüfen",
     autoSetupScanning: "Dieses Telefon wird vermessen",
     autoSetupScanNote: "Ein paar Sekunden. Nichts verlässt das Gerät.",
     autoSetupProposalLabel: "Für dieses Telefon empfohlen",
-    autoSetupProposalNote: "Alles davon lässt sich später unter KI auf dem Gerät ändern.",
+    autoSetupProposalNote:
+      "Alles davon lässt sich später unter KI auf dem Gerät ändern.",
     autoSetupInstallAction: "Herunterladen und installieren",
     autoSetupManual: "Lieber manuell wählen",
-    autoSetupInstallingNote: "Der Download läuft weiter, wenn Sie diesen Bildschirm verlassen.",
+    autoSetupInstallingNote:
+      "Der Download läuft weiter, wenn Sie diesen Bildschirm verlassen.",
     autoSetupDownloadingNote: "Wird heruntergeladen.",
     autoSetupQueuedNote: "Wartet, bis es an der Reihe ist.",
     autoSetupInstalledNote: "Installiert und ausgewählt.",
@@ -213,6 +219,7 @@ export const autoSetupTranslations = {
     autoSetupBarFailedDetail: "Antippen, um zu sehen, was fehlschlug",
     autoSetupBarOpen: "Einstellungen für KI auf dem Gerät öffnen",
     introAutoTitle: "Einrichtung mit einem Tipp",
+    introRecommended: "Empfohlen",
     introAutoBody:
       "Mr Broccoli misst, was dieses Telefon leisten kann, zeigt, was es installieren würde, und lädt erst dann herunter. Die manuellen Wege der nächsten Schritte bleiben verfügbar.",
     onDeviceCatalogInstalled: "Installiert und verfügbar",
@@ -226,7 +233,8 @@ export const autoSetupTranslations = {
     autoSetupScanning: "Midiendo este teléfono",
     autoSetupScanNote: "Unos segundos. Nada sale del dispositivo.",
     autoSetupProposalLabel: "Recomendado para este teléfono",
-    autoSetupProposalNote: "Puedes cambiar cualquier cosa después en IA en el dispositivo.",
+    autoSetupProposalNote:
+      "Puedes cambiar cualquier cosa después en IA en el dispositivo.",
     autoSetupInstallAction: "Descargar e instalar",
     autoSetupManual: "Elegir manualmente",
     autoSetupInstallingNote: "La descarga continúa si sales de esta pantalla.",
@@ -262,6 +270,7 @@ export const autoSetupTranslations = {
     autoSetupBarFailedDetail: "Toca para ver qué falló",
     autoSetupBarOpen: "Abrir ajustes de IA en el dispositivo",
     introAutoTitle: "Configúralo con un toque",
+    introRecommended: "Recomendado",
     introAutoBody:
       "Mr Broccoli mide lo que este teléfono puede ejecutar, muestra lo que instalaría y solo entonces descarga. Las rutas manuales de los pasos siguientes siguen disponibles.",
     onDeviceCatalogInstalled: "Instalado y disponible",
@@ -270,15 +279,18 @@ export const autoSetupTranslations = {
     autoSetupTitle: "Configuration automatique",
     autoSetupBody:
       "Mr Broccoli peut mesurer ce que ce téléphone est capable d'exécuter, puis choisir un modèle pour réfléchir, un pour vous écouter et un pour vous répondre à voix haute.",
-    autoSetupOfferNote: "Rien n'est téléchargé avant que vous ayez vu la liste.",
+    autoSetupOfferNote:
+      "Rien n'est téléchargé avant que vous ayez vu la liste.",
     autoSetupStart: "Vérifier ce téléphone",
     autoSetupScanning: "Mesure de ce téléphone",
     autoSetupScanNote: "Quelques secondes. Rien ne quitte l'appareil.",
     autoSetupProposalLabel: "Recommandé pour ce téléphone",
-    autoSetupProposalNote: "Vous pourrez tout changer plus tard dans IA sur l'appareil.",
+    autoSetupProposalNote:
+      "Vous pourrez tout changer plus tard dans IA sur l'appareil.",
     autoSetupInstallAction: "Télécharger et installer",
     autoSetupManual: "Choisir manuellement",
-    autoSetupInstallingNote: "Le téléchargement continue si vous quittez cet écran.",
+    autoSetupInstallingNote:
+      "Le téléchargement continue si vous quittez cet écran.",
     autoSetupDownloadingNote: "Téléchargement.",
     autoSetupQueuedNote: "En attente de son tour.",
     autoSetupInstalledNote: "Installé et sélectionné.",
@@ -311,6 +323,7 @@ export const autoSetupTranslations = {
     autoSetupBarFailedDetail: "Touchez pour voir ce qui a échoué",
     autoSetupBarOpen: "Ouvrir les réglages IA sur l'appareil",
     introAutoTitle: "Une touche pour tout configurer",
+    introRecommended: "Recommandé",
     introAutoBody:
       "Mr Broccoli mesure ce que ce téléphone peut exécuter, montre ce qu'il installerait, puis seulement télécharge. Les parcours manuels des étapes suivantes restent disponibles.",
     onDeviceCatalogInstalled: "Installé et disponible",
@@ -360,6 +373,7 @@ export const autoSetupTranslations = {
     autoSetupBarFailedDetail: "क्या विफल हुआ देखने के लिए टैप करें",
     autoSetupBarOpen: "डिवाइस पर AI सेटिंग खोलें",
     introAutoTitle: "एक टैप में सेटअप",
+    introRecommended: "अनुशंसित",
     introAutoBody:
       "Mr Broccoli मापता है कि यह फ़ोन क्या चला सकता है, दिखाता है कि वह क्या इंस्टॉल करेगा, और उसके बाद ही डाउनलोड करता है। अगले चरणों के मैनुअल रास्ते उपलब्ध रहते हैं।",
     onDeviceCatalogInstalled: "इंस्टॉल और उपलब्ध",
@@ -376,7 +390,8 @@ export const autoSetupTranslations = {
     autoSetupProposalNote: "Bármit később módosíthat az Eszközön futó AI-ban.",
     autoSetupInstallAction: "Letöltés és telepítés",
     autoSetupManual: "Inkább kézzel választok",
-    autoSetupInstallingNote: "A letöltés folytatódik, ha elhagyja ezt a képernyőt.",
+    autoSetupInstallingNote:
+      "A letöltés folytatódik, ha elhagyja ezt a képernyőt.",
     autoSetupDownloadingNote: "Letöltés.",
     autoSetupQueuedNote: "A sorára vár.",
     autoSetupInstalledNote: "Telepítve és kiválasztva.",
@@ -409,6 +424,7 @@ export const autoSetupTranslations = {
     autoSetupBarFailedDetail: "Koppintson, hogy lássa, mi hibázott",
     autoSetupBarOpen: "Eszközön futó AI beállításainak megnyitása",
     introAutoTitle: "Beállítás egyetlen koppintással",
+    introRecommended: "Ajánlott",
     introAutoBody:
       "A Mr Broccoli megméri, mit bír el ez a telefon, megmutatja, mit telepítene, és csak azután tölt le. A következő lépések kézi útjai elérhetők maradnak.",
     onDeviceCatalogInstalled: "Telepítve és elérhető",
@@ -417,12 +433,14 @@ export const autoSetupTranslations = {
     autoSetupTitle: "Configurazione automatica",
     autoSetupBody:
       "Mr Broccoli può misurare cosa riesce a eseguire questo telefono, poi scegliere un modello per pensare, uno per ascoltarti e uno per risponderti a voce.",
-    autoSetupOfferNote: "Non viene scaricato nulla finché non hai visto l'elenco.",
+    autoSetupOfferNote:
+      "Non viene scaricato nulla finché non hai visto l'elenco.",
     autoSetupStart: "Controlla questo telefono",
     autoSetupScanning: "Misurazione del telefono",
     autoSetupScanNote: "Qualche secondo. Nulla lascia il dispositivo.",
     autoSetupProposalLabel: "Consigliato per questo telefono",
-    autoSetupProposalNote: "Potrai cambiare tutto più tardi in IA sul dispositivo.",
+    autoSetupProposalNote:
+      "Potrai cambiare tutto più tardi in IA sul dispositivo.",
     autoSetupInstallAction: "Scarica e installa",
     autoSetupManual: "Preferisco scegliere manualmente",
     autoSetupInstallingNote: "Il download continua se lasci questa schermata.",
@@ -458,6 +476,7 @@ export const autoSetupTranslations = {
     autoSetupBarFailedDetail: "Tocca per vedere cosa è fallito",
     autoSetupBarOpen: "Apri le impostazioni IA sul dispositivo",
     introAutoTitle: "Configurazione con un tocco",
+    introRecommended: "Consigliato",
     introAutoBody:
       "Mr Broccoli misura cosa può eseguire questo telefono, mostra cosa installerebbe e solo allora scarica. I percorsi manuali dei passi successivi restano disponibili.",
     onDeviceCatalogInstalled: "Installato e disponibile",
@@ -507,6 +526,7 @@ export const autoSetupTranslations = {
     autoSetupBarFailedDetail: "タップして失敗内容を確認",
     autoSetupBarOpen: "オンデバイスAI設定を開く",
     introAutoTitle: "ワンタップでセットアップ",
+    introRecommended: "おすすめ",
     introAutoBody:
       "Mr Broccoli はこの端末で動くものを測定し、何をインストールするかを示してから初めてダウンロードします。次のステップの手動ルートも引き続き使えます。",
     onDeviceCatalogInstalled: "インストール済みで利用可能",
@@ -520,10 +540,12 @@ export const autoSetupTranslations = {
     autoSetupScanning: "Pomiar telefonu",
     autoSetupScanNote: "Kilka sekund. Nic nie opuszcza urządzenia.",
     autoSetupProposalLabel: "Zalecane dla tego telefonu",
-    autoSetupProposalNote: "Wszystko możesz później zmienić w AI na urządzeniu.",
+    autoSetupProposalNote:
+      "Wszystko możesz później zmienić w AI na urządzeniu.",
     autoSetupInstallAction: "Pobierz i zainstaluj",
     autoSetupManual: "Wolę wybrać ręcznie",
-    autoSetupInstallingNote: "Pobieranie trwa nawet po opuszczeniu tego ekranu.",
+    autoSetupInstallingNote:
+      "Pobieranie trwa nawet po opuszczeniu tego ekranu.",
     autoSetupDownloadingNote: "Pobieranie.",
     autoSetupQueuedNote: "Czeka na swoją kolej.",
     autoSetupInstalledNote: "Zainstalowano i wybrano.",
@@ -556,6 +578,7 @@ export const autoSetupTranslations = {
     autoSetupBarFailedDetail: "Dotknij, aby zobaczyć, co się nie powiodło",
     autoSetupBarOpen: "Otwórz ustawienia AI na urządzeniu",
     introAutoTitle: "Konfiguracja jednym dotknięciem",
+    introRecommended: "Polecane",
     introAutoBody:
       "Mr Broccoli mierzy, co ten telefon może uruchomić, pokazuje, co zainstaluje, i dopiero wtedy pobiera. Ręczne ścieżki w kolejnych krokach pozostają dostępne.",
     onDeviceCatalogInstalled: "Zainstalowane i dostępne",
@@ -605,6 +628,7 @@ export const autoSetupTranslations = {
     autoSetupBarFailedDetail: "Toque para ver o que falhou",
     autoSetupBarOpen: "Abrir definições de IA no dispositivo",
     introAutoTitle: "Configuração num toque",
+    introRecommended: "Recomendado",
     introAutoBody:
       "O Mr Broccoli mede o que este telemóvel consegue executar, mostra o que instalaria e só depois transfere. Os caminhos manuais dos passos seguintes continuam disponíveis.",
     onDeviceCatalogInstalled: "Instalado e disponível",
@@ -654,6 +678,7 @@ export const autoSetupTranslations = {
     autoSetupBarFailedDetail: "Toque para ver o que falhou",
     autoSetupBarOpen: "Abrir configurações de IA no dispositivo",
     introAutoTitle: "Configure com um toque",
+    introRecommended: "Recomendado",
     introAutoBody:
       "O Mr Broccoli mede o que este celular pode executar, mostra o que instalaria e só então baixa. Os caminhos manuais das próximas etapas continuam disponíveis.",
     onDeviceCatalogInstalled: "Instalado e disponível",
@@ -667,10 +692,12 @@ export const autoSetupTranslations = {
     autoSetupScanning: "Измерение телефона",
     autoSetupScanNote: "Несколько секунд. Ничего не покидает устройство.",
     autoSetupProposalLabel: "Рекомендовано для этого телефона",
-    autoSetupProposalNote: "Всё это можно позже изменить в разделе ИИ на устройстве.",
+    autoSetupProposalNote:
+      "Всё это можно позже изменить в разделе ИИ на устройстве.",
     autoSetupInstallAction: "Скачать и установить",
     autoSetupManual: "Выбрать вручную",
-    autoSetupInstallingNote: "Загрузка продолжится, если вы покинете этот экран.",
+    autoSetupInstallingNote:
+      "Загрузка продолжится, если вы покинете этот экран.",
     autoSetupDownloadingNote: "Загрузка.",
     autoSetupQueuedNote: "Ждёт своей очереди.",
     autoSetupInstalledNote: "Установлено и выбрано.",
@@ -703,6 +730,7 @@ export const autoSetupTranslations = {
     autoSetupBarFailedDetail: "Нажмите, чтобы узнать, что не удалось",
     autoSetupBarOpen: "Открыть настройки ИИ на устройстве",
     introAutoTitle: "Настройка одним касанием",
+    introRecommended: "Рекомендуется",
     introAutoBody:
       "Mr Broccoli измеряет, что может запустить этот телефон, показывает, что установит, и только потом загружает. Ручные пути на следующих шагах остаются доступными.",
     onDeviceCatalogInstalled: "Установлено и доступно",
@@ -752,6 +780,7 @@ export const autoSetupTranslations = {
     autoSetupBarFailedDetail: "Tryck för att se vad som misslyckades",
     autoSetupBarOpen: "Öppna inställningar för AI på enheten",
     introAutoTitle: "Installera med ett tryck",
+    introRecommended: "Rekommenderas",
     introAutoBody:
       "Mr Broccoli mäter vad den här telefonen klarar, visar vad som skulle installeras och laddar först därefter ner. De manuella vägarna i nästa steg finns kvar.",
     onDeviceCatalogInstalled: "Installerat och tillgängligt",
@@ -765,7 +794,8 @@ export const autoSetupTranslations = {
     autoSetupScanning: "Bu telefon ölçülüyor",
     autoSetupScanNote: "Birkaç saniye. Hiçbir şey cihazdan çıkmaz.",
     autoSetupProposalLabel: "Bu telefon için önerilen",
-    autoSetupProposalNote: "Hepsini daha sonra Cihaz üzerinde YZ bölümünden değiştirebilirsiniz.",
+    autoSetupProposalNote:
+      "Hepsini daha sonra Cihaz üzerinde YZ bölümünden değiştirebilirsiniz.",
     autoSetupInstallAction: "İndir ve kur",
     autoSetupManual: "Elle seçmeyi tercih ederim",
     autoSetupInstallingNote: "Bu ekrandan ayrılsanız da indirme devam eder.",
@@ -801,6 +831,7 @@ export const autoSetupTranslations = {
     autoSetupBarFailedDetail: "Neyin başarısız olduğunu görmek için dokunun",
     autoSetupBarOpen: "Cihaz üzerinde YZ ayarlarını aç",
     introAutoTitle: "Tek dokunuşla kurulum",
+    introRecommended: "Önerilen",
     introAutoBody:
       "Mr Broccoli bu telefonun neyi çalıştırabileceğini ölçer, neyi kuracağını gösterir ve ancak ondan sonra indirir. Sonraki adımlardaki elle kurulum yolları kullanılabilir kalır.",
     onDeviceCatalogInstalled: "Kurulu ve kullanılabilir",
@@ -814,10 +845,12 @@ export const autoSetupTranslations = {
     autoSetupScanning: "Вимірювання телефона",
     autoSetupScanNote: "Кілька секунд. Ніщо не залишає пристрій.",
     autoSetupProposalLabel: "Рекомендовано для цього телефона",
-    autoSetupProposalNote: "Усе це можна змінити пізніше в розділі ШІ на пристрої.",
+    autoSetupProposalNote:
+      "Усе це можна змінити пізніше в розділі ШІ на пристрої.",
     autoSetupInstallAction: "Завантажити й установити",
     autoSetupManual: "Вибрати вручну",
-    autoSetupInstallingNote: "Завантаження триватиме, якщо ви залишите цей екран.",
+    autoSetupInstallingNote:
+      "Завантаження триватиме, якщо ви залишите цей екран.",
     autoSetupDownloadingNote: "Завантаження.",
     autoSetupQueuedNote: "Чекає своєї черги.",
     autoSetupInstalledNote: "Установлено й вибрано.",
@@ -850,6 +883,7 @@ export const autoSetupTranslations = {
     autoSetupBarFailedDetail: "Торкніться, щоб побачити, що не вдалося",
     autoSetupBarOpen: "Відкрити налаштування ШІ на пристрої",
     introAutoTitle: "Налаштування одним дотиком",
+    introRecommended: "Рекомендовано",
     introAutoBody:
       "Mr Broccoli вимірює, що може запустити цей телефон, показує, що встановить, і лише потім завантажує. Ручні шляхи на наступних кроках лишаються доступними.",
     onDeviceCatalogInstalled: "Установлено й доступно",
@@ -899,6 +933,7 @@ export const autoSetupTranslations = {
     autoSetupBarFailedDetail: "کیا ناکام ہوا دیکھنے کے لیے تھپتھپائیں",
     autoSetupBarOpen: "آلے پر AI کی ترتیبات کھولیں",
     introAutoTitle: "ایک ٹیپ میں سیٹ اپ",
+    introRecommended: "تجویز کردہ",
     introAutoBody:
       "Mr Broccoli ناپتا ہے کہ یہ فون کیا چلا سکتا ہے، دکھاتا ہے کہ وہ کیا انسٹال کرے گا، اور صرف اس کے بعد ڈاؤن لوڈ کرتا ہے۔ اگلے مراحل کے دستی راستے دستیاب رہتے ہیں۔",
     onDeviceCatalogInstalled: "انسٹال شدہ اور دستیاب",
@@ -947,6 +982,7 @@ export const autoSetupTranslations = {
     autoSetupBarFailedDetail: "点按查看失败原因",
     autoSetupBarOpen: "打开设备端 AI 设置",
     introAutoTitle: "一键完成设置",
+    introRecommended: "推荐",
     introAutoBody:
       "Mr Broccoli 会测量这部手机能运行什么，展示将要安装的内容，然后才开始下载。后续步骤中的手动方式仍然可用。",
     onDeviceCatalogInstalled: "已安装且可用",

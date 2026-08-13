@@ -24,6 +24,13 @@ the complete Play Store translations are kept in a dedicated file under
 
 ### Changed
 
+- The introduction now uses full 44-point header and picker controls, marks
+  automatic setup as Recommended, and contracts its invitation to a stable
+  title-only row in landscape. Setup completion and failure stay reachable in
+  the home task row, transient notices wait behind open sheets, Premium uses
+  its gold treatment consistently, and speech or search fallbacks remain with
+  the reply they affected instead of appearing again as global alerts.
+
 - Sessions now use a flat, recency-first drawer with collapsible Pinned,
   Earlier, and Archived groups, a bottom search field, compact provider marks,
   root-session links for forks, and one action sheet for naming, pinning,

@@ -7,9 +7,11 @@ import {
 import { act, fireEvent, waitFor, within } from "@testing-library/react-native";
 
 import { MainScreen } from "../../src/screens/MainScreen";
+import * as autoSetupJobModule from "../../src/screens/main/useAutoSetupJob";
 import { DEFAULT_SETTINGS, type Settings } from "../../src/types";
 import { getDefaultModelForProvider } from "../../src/utils/responseModes";
 import { renderWithProviders } from "../test-utils/renderWithProviders";
+import { createAutoSetupJob } from "../test-utils/autoSetupJobFixture";
 import { LocalizationProvider } from "../../src/i18n";
 import { ThemeProvider } from "../../src/theme/ThemeContext";
 
@@ -607,6 +609,28 @@ describe("MainScreen", () => {
     expect(screen.getByText("open-drawer")).toBeTruthy();
   });
 
+  it("reports off-screen automatic setup completion in the task row", () => {
+    let reportOutcome: ((outcome: "done" | "failed") => void) | undefined;
+    const autoSetupSpy = jest
+      .spyOn(autoSetupJobModule, "useAutoSetupJob")
+      .mockImplementation((params) => {
+        reportOutcome = params.onOutcome;
+        return createAutoSetupJob({ fraction: 1, state: "done" });
+      });
+
+    try {
+      const screen = renderWithProviders(<MainScreen />);
+      expect(screen.queryByTestId("background-task-bar")).toBeNull();
+
+      act(() => reportOutcome?.("done"));
+
+      expect(screen.getByTestId("background-task-bar")).toBeTruthy();
+      expect(screen.getByText("Ready")).toBeTruthy();
+    } finally {
+      autoSetupSpy.mockRestore();
+    }
+  });
+
   it("uses the effective profile language for local response generation", () => {
     useVoicePipeline.mockClear();
     useSharedSettings.mockReturnValue(
@@ -1062,6 +1086,9 @@ describe("MainScreen", () => {
     expect(screen.queryByTestId("landscape-status-area")).toBeNull();
     expect(leftPane.queryByTestId("conversation-settings-summary")).toBeNull();
     expect(leftPane.queryByTestId("satellite-image")).toBeNull();
+    expect(
+      StyleSheet.flatten(rightPane.getByTestId("intro-banner").props.style),
+    ).toEqual(expect.objectContaining({ minHeight: 48 }));
     expect(rightPane.getByTestId("transcript-preview")).toBeTruthy();
     expect(rightPane.queryByText("transcript-style-control")).toBeNull();
   });

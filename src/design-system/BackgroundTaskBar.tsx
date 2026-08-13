@@ -60,6 +60,7 @@ export function BackgroundTaskBar({
   return (
     <Pressable
       accessibilityLabel={accessibilityLabel}
+      accessibilityLiveRegion={tone === "progress" ? undefined : "polite"}
       accessibilityRole="button"
       onPress={onPress}
       style={[
@@ -87,9 +88,7 @@ export function BackgroundTaskBar({
       </View>
       <PhosphorIcon color={colors.textMuted} name="right" size="compact" />
       {tone === "progress" ? (
-        <View
-          style={[styles.trackLine, { backgroundColor: colors.border }]}
-        >
+        <View style={[styles.trackLine, { backgroundColor: colors.border }]}>
           <View
             style={[
               styles.trackFill,

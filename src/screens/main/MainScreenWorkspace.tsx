@@ -321,7 +321,7 @@ export function MainScreenWorkspace({
         />
 
         <View testID="landscape-right-pane" style={styles.landscapeRightColumn}>
-          <IntroBanner {...introBanner} />
+          <IntroBanner compact {...introBanner} />
           <TranscriptPreviewCard
             colors={colors}
             layout="landscape"

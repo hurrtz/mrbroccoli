@@ -179,8 +179,11 @@ downloads before the proposal has been seen; the staged ~2.5s measurement
   wording rather than claiming it will download again. When a model instead
   fails its device benchmark, retry re-runs selection so the durable result can
   propose the next viable model without discarding verified downloads. The
-  outcome is announced by the card where the card is visible, by a toast anywhere
-  else — never both.
+  outcome is announced by the card where the card is visible and by the home
+  `BackgroundTaskBar` otherwise — never both. The completed home row remains
+  available briefly so its destination is actionable; install failure remains
+  there until the user opens setup or retries. Setup progress and outcomes do
+  not use transient toasts.
 
 **Decision:** The introduction follows the app's light or dark theme. Only the
 workspace banner keeps a palette of its own -- violet, in both themes -- because
@@ -198,6 +201,9 @@ because both are ways out of the flow; the footer carries only forward motion,
 which becomes a labelled Done action on the last step. The final action stays
 where forward motion has lived throughout the flow; removing it left an empty
 gap that looked like a missing control rather than a deliberate ending.
+Header controls expose 44-point touch targets around 40-point visual faces.
+The speaking-language picker isolates assistive focus, excludes its backdrop
+from the accessibility tree, and retains a labelled 44-point close action.
 
 **Decision:** The banner offers no dismissal until the introduction has been
 opened at least once, and a completed purchase removes it outright. An exit
@@ -209,13 +215,23 @@ nothing left to invite. It stays reversible from App & diagnostics.
 rather than a pill above the heading. A badge competed with the heading and
 read as a status on the step; a rule states the same thing in the reading order
 it belongs to. Headings are centred, because each step is a single column with
-nothing beside it.
+nothing beside it. The automatic setup step uses the same rule with
+"Recommended" so its priority is stated without presenting it as mandatory.
 
 **Decision:** Speech steps are marked optional and say why skipping is safe --
 typing replaces listening, and the device's own voice replaces speaking. The
 speaking step carries a language picker over the bundled examples, because
 letting someone hear the app in their own language argues for setting it up
 better than a claim does.
+
+In landscape, the workspace invitation contracts to the approved 48-point,
+title-only banner so the voice stage remains stable. Portrait keeps the full
+title, explanation, action, and eligible dismiss control.
+
+Transient toasts belong only to the main workspace layer. If a sheet, drawer,
+introduction, or full-screen secondary surface is open, one pending toast waits
+without consuming its display interval and starts its four-second clock only
+after that surface closes. Newer notices still replace older ones.
 
 The introduction is opened from its banner, never as a side effect of attempting
 a turn. Provider keys are entered under Connections; manual local LLM, STT, and

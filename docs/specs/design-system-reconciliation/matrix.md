@@ -19,7 +19,7 @@ functional acceptance. Device verdicts are added as the goal progresses.
 | `ConversationRenameModal` | `src/components/conversationDrawer/ConversationRenameModal.tsx` | mapped |
 | `MessageBranchIndicator` | `src/components/chatBubble/MessageBranchIndicator.tsx` | mapped |
 | `MessageImageAttachments` | `src/components/MessageImageAttachments.tsx` | mapped |
-| `PipelineNotices` | `src/components/chatBubble/PipelineNotices.tsx` | mapped |
+| `PipelineNotices` | `src/components/chatBubble/PipelineNotices.tsx` | source/unit parity; search and speech degradation retained inline without duplicate toast |
 | `ReplyFailureCard` | `src/components/chatBubble/ReplyFailureCard.tsx` | mapped |
 | `TurnReceiptCard` | `src/components/chatBubble/TurnReceiptCard.tsx` | retained detail composition; transcript consolidates it |
 | `UberModeAuditCard` | `src/components/chatBubble/UberModeAuditCard.tsx` | retained detail composition; transcript consolidates it |
@@ -33,13 +33,13 @@ functional acceptance. Device verdicts are added as the goal progresses.
 | `PhosphorIcon` | `src/design-system/PhosphorIcon.tsx` | mapped |
 | `IntroBody` | `src/components/introFlow/IntroPrimitives.tsx` | mapped |
 | `IntroButton` | `src/components/introFlow/IntroPrimitives.tsx` | mapped |
-| `IntroDivider` | `src/components/introFlow/IntroPrimitives.tsx` | mapped |
-| `IntroFlow` | `src/components/introFlow/IntroFlowScreen.tsx` | mapped |
+| `IntroDivider` | `src/components/introFlow/IntroPrimitives.tsx` | source/unit parity; Optional and Recommended reading-order rules |
+| `IntroFlow` | `src/components/introFlow/IntroFlowScreen.tsx` | source/unit parity; 40-point faces within 44-point targets |
 | `IntroPanel` | `src/components/introFlow/IntroPrimitives.tsx` | mapped |
 | `IntroPoint` | `src/components/introFlow/IntroPrimitives.tsx` | mapped |
 | `IntroStepper` | `src/components/introFlow/IntroStepper.tsx` | mapped |
 | `IntroTitle` | `src/components/introFlow/IntroPrimitives.tsx` | mapped |
-| `IntroVoicePicker` | `src/components/introFlow/IntroVoicePicker.tsx` | mapped |
+| `IntroVoicePicker` | `src/components/introFlow/IntroVoicePicker.tsx` | source/unit parity; isolated modal focus and labelled 44-point close action |
 | `List` | `src/design-system/NativeControls.tsx` | mapped |
 | `ListItem` | `List.Item` in `src/design-system/NativeControls.tsx` | mapped |
 | `AutoSetupCard` | `src/components/autoSetup/AutoSetupCard.tsx` | mapped |
@@ -47,7 +47,7 @@ functional acceptance. Device verdicts are added as the goal progresses.
 | `InstallProgress` | `src/components/autoSetup/InstallProgressBar.tsx` | mapped, native name differs |
 | `LocalModelPerformanceSummary` | `src/components/LocalModelPerformanceSummary.tsx` | mapped |
 | `Modal` | `src/design-system/NativeControls.tsx` | mapped |
-| `Toast` | `src/components/Toast.tsx` | mapped |
+| `Toast` | `src/components/Toast.tsx` | source/unit parity; pending interval is suspended behind secondary surfaces |
 | `AntButtonLabel` | `src/features/settings/settings-primitives/SettingsCards.tsx` | mapped |
 | `AntDisclosureCard` | `src/features/settings/settings-primitives/SettingsCards.tsx` | mapped |
 | `AntNumberInputRow` | `src/features/settings/settings-primitives/SettingsFields.tsx` | mapped |
@@ -66,14 +66,14 @@ functional acceptance. Device verdicts are added as the goal progresses.
 | `SettingsGroup` | `src/features/settings/settings-primitives/SettingsGroup.tsx` | mapped |
 | `SettingsRow` | `src/features/settings/settings-primitives/SettingsRow.tsx` | mapped |
 | `AppWordmark` | `src/components/AppWordmark.tsx` | mapped |
-| `BackgroundTaskBar` | `src/design-system/BackgroundTaskBar.tsx` | mapped |
+| `BackgroundTaskBar` | `src/design-system/BackgroundTaskBar.tsx` | source/unit parity; automatic setup progress, success, and failure ownership |
 | `Composer` | `src/screens/main/voiceTextInputPager/InputSurfacePages.tsx` | mapped through native composer composition |
 | `ConversationSettingsSummary` | `src/design-system/ConversationSettingsSummary.tsx` | source/unit parity; portrait-only workspace ownership |
-| `IntroBanner` | `src/components/IntroBanner.tsx` | mapped |
+| `IntroBanner` | `src/components/IntroBanner.tsx` | source/unit parity; full portrait and 48-point title-only landscape forms |
 | `OrbSatellite` | `src/design-system/OrbSatellite.tsx` | mapped |
 | `PhaseAwareVoiceAction` | `src/screens/main/PhaseAwareVoiceAction.tsx` | mapped, retained off-home |
 | `Picker` | `src/components/Picker.tsx` | mapped |
-| `PremiumUpgradeModal` | `src/components/PremiumUpgradeModal.tsx` | mapped |
+| `PremiumUpgradeModal` | `src/components/PremiumUpgradeModal.tsx` | source/unit parity; Premium gold hero, benefits, and value band |
 | `ResponseModeToggle` | `src/components/ResponseModeToggle.tsx` | mapped, retained off-home |
 | `RouteByline` | `src/screens/main/MainScreenRouteByline.tsx` | source/unit parity; native composition name differs |
 | `RoutePicker` | `src/screens/main/RoutePickerSheet.tsx` | mapped, native composition name differs |

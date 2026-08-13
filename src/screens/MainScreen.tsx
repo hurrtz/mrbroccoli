@@ -294,10 +294,13 @@ export function MainScreen() {
   });
   const mainSurfaceVisible = !(
     drawerVisible ||
+    introVisible ||
     memoryVisible ||
+    routePickerVisible ||
     settingsVisible ||
     statusDetailsVisible ||
     styleSheetVisible ||
+    transcriptSheetVisible ||
     freeOffline.setupVisible ||
     premiumModalVisible
   );
@@ -411,27 +414,34 @@ export function MainScreen() {
   );
   const { dismissToast, showToast, toast } = useMainScreenToastController();
   usePersistenceFailureAlert(showToast, t);
-  // Where the outcome is announced depends on where the user is: the auto
-  // setup card states it in full in the introduction and on the On-device
-  // page, and the toast carries it anywhere else. Never both — two
-  // announcements of one event read as two events.
+  // Where the outcome is announced depends on where the user is: the card
+  // states it in full in the introduction and Settings, while the workspace
+  // uses the persistent task row. Long-running work never jumps surfaces into
+  // a transient toast.
   const autoSetupSurfacesVisibleRef = React.useRef(false);
   autoSetupSurfacesVisibleRef.current = introVisible || settingsVisible;
+  const [autoSetupDoneBarVisible, setAutoSetupDoneBarVisible] =
+    React.useState(false);
   const autoSetup = useAutoSetupJob({
     onOutcome: (outcome) => {
       if (autoSetupSurfacesVisibleRef.current) {
         return;
       }
       if (outcome === "done") {
-        showToast(t("autoSetupDoneTitle"), undefined, "success");
-      } else {
-        showToast(t("autoSetupBarFailed"), undefined, "danger");
+        setAutoSetupDoneBarVisible(true);
       }
     },
     settings,
     t,
     updateSettings,
   });
+  React.useEffect(() => {
+    if (!autoSetupDoneBarVisible) {
+      return;
+    }
+    const timer = setTimeout(() => setAutoSetupDoneBarVisible(false), 8_000);
+    return () => clearTimeout(timer);
+  }, [autoSetupDoneBarVisible]);
   const showImageError = React.useCallback(
     (message: string) => showToast(message, undefined, "danger"),
     [showToast],
@@ -933,6 +943,7 @@ export function MainScreen() {
         visible: Boolean(toast),
         onDismiss: dismissToast,
         onRetry: toast?.onRetry,
+        suspended: !mainSurfaceVisible,
         tone: toast?.tone,
       }}
       intro={{
@@ -973,29 +984,44 @@ export function MainScreen() {
         // scan is not that: nothing was running, so nothing is reported.
         backgroundTask:
           autoSetup.state === "installing" ||
-          (autoSetup.state === "failed" && autoSetup.errorKind === "install")
+          (autoSetup.state === "failed" && autoSetup.errorKind === "install") ||
+          (autoSetup.state === "done" && autoSetupDoneBarVisible)
             ? {
                 accessibilityLabel: `${
-                  autoSetup.state === "failed"
-                    ? t("autoSetupBarFailed")
-                    : t("autoSetupBarInstalling")
+                  autoSetup.state === "done"
+                    ? t("autoSetupDoneTitle")
+                    : autoSetup.state === "failed"
+                      ? t("autoSetupBarFailed")
+                      : t("autoSetupBarInstalling")
                 }. ${t("autoSetupBarOpen")}`,
                 detail:
-                  autoSetup.state === "failed"
-                    ? t("autoSetupBarFailedDetail")
-                    : [
-                        autoSetup.reading?.stepLabel,
-                        autoSetup.reading?.remaining,
-                      ]
-                        .filter(Boolean)
-                        .join(" · "),
+                  autoSetup.state === "done"
+                    ? t("autoSetupInstalledNote")
+                    : autoSetup.state === "failed"
+                      ? t("autoSetupBarFailedDetail")
+                      : [
+                          autoSetup.reading?.stepLabel,
+                          autoSetup.reading?.remaining,
+                        ]
+                          .filter(Boolean)
+                          .join(" · "),
                 fraction: autoSetup.fraction,
-                onPress: () => openSettings(undefined, undefined, "app"),
+                onPress: () => {
+                  setAutoSetupDoneBarVisible(false);
+                  openSettings(undefined, undefined, "app");
+                },
                 title:
-                  autoSetup.state === "failed"
-                    ? t("autoSetupBarFailed")
-                    : t("autoSetupBarInstalling"),
-                tone: autoSetup.state === "failed" ? "danger" : "progress",
+                  autoSetup.state === "done"
+                    ? t("autoSetupDoneTitle")
+                    : autoSetup.state === "failed"
+                      ? t("autoSetupBarFailed")
+                      : t("autoSetupBarInstalling"),
+                tone:
+                  autoSetup.state === "done"
+                    ? "success"
+                    : autoSetup.state === "failed"
+                      ? "danger"
+                      : "progress",
               }
             : null,
         colors,

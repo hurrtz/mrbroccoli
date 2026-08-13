@@ -341,7 +341,8 @@ describe("useVoicePipeline", () => {
   it("stops scheduling replay chunks after the first terminal TTS failure", async () => {
     const longReply = Array.from(
       { length: 80 },
-      () => "This sentence should be synthesized only after earlier chunks succeed.",
+      () =>
+        "This sentence should be synthesized only after earlier chunks succeed.",
     ).join(" ");
     const params = createParams({
       ttsMode: "provider",
@@ -472,10 +473,7 @@ describe("useVoicePipeline", () => {
     let replayPromise!: Promise<void>;
 
     act(() => {
-      replayPromise = result.current.playReplyText(
-        "Replay this",
-        "message-1",
-      );
+      replayPromise = result.current.playReplyText("Replay this", "message-1");
     });
 
     await waitFor(() => {
@@ -1367,6 +1365,59 @@ describe("useVoicePipeline", () => {
     expect(result.current.phaseProgress).toBeNull();
   });
 
+  it("keeps a web-search fallback inside the assistant row without a toast", async () => {
+    const params = createParams({ spokenRepliesEnabled: false });
+    (params.addMessage as jest.Mock)
+      .mockReturnValueOnce({
+        id: "user-1",
+        role: "user",
+        content: "What happened today?",
+        model: null,
+        provider: null,
+        timestamp: "2026-08-13T08:00:00.000Z",
+      })
+      .mockReturnValueOnce({
+        id: "assistant-1",
+        role: "assistant",
+        content: "A reply without live context",
+        model: "gpt-5.4",
+        provider: "openai",
+        timestamp: "2026-08-13T08:00:01.000Z",
+      });
+    (runVoicePipeline as jest.Mock).mockImplementation(
+      async ({ callbacks }: any) => {
+        callbacks.onTranscription("What happened today?");
+        callbacks.onWebSearchFallback(new Error("Search timed out"));
+        callbacks.onResponseDone("A reply without live context");
+        return "What happened today?";
+      },
+    );
+
+    const { result } = renderHook(() => useVoicePipeline(params));
+
+    await act(async () => {
+      await result.current.handleVoiceCaptureDone({
+        audioUri: "file://capture.wav",
+      });
+    });
+
+    expect(params.addMessage).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        metadata: {
+          notices: [
+            {
+              stage: "web-search",
+              level: "warning",
+              message: translate("en", "webSearchFallback"),
+              detail: "Search timed out",
+            },
+          ],
+        },
+      }),
+    );
+    expect(params.showToast).not.toHaveBeenCalled();
+  });
+
   it("stores a durable assistant notice when provider TTS falls back", async () => {
     const params = createParams();
     (params.addMessage as jest.Mock)
@@ -1431,6 +1482,7 @@ describe("useVoicePipeline", () => {
         },
       }),
     );
+    expect(params.showToast).not.toHaveBeenCalled();
   });
 
   it("stores a durable STT failure notice inside an existing conversation", async () => {

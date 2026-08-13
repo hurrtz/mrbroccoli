@@ -301,6 +301,7 @@ function AutoStep({ autoSetup, onInstallLocal, t }: IntroStepProps) {
   return (
     <View style={styles.stack}>
       <IntroTitle>{t("introAutoTitle")}</IntroTitle>
+      <IntroDivider label={t("introRecommended")} />
       <IntroBody>{t("introAutoBody")}</IntroBody>
       <AutoSetupCard
         job={autoSetup}

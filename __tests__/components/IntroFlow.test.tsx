@@ -108,6 +108,38 @@ describe("IntroBanner", () => {
 
     fireEvent.press(getByTestId("intro-banner"));
     expect(onOpen).toHaveBeenCalledTimes(1);
+
+    expect(
+      StyleSheet.flatten(getByTestId("intro-banner-dismiss").props.style),
+    ).toEqual(expect.objectContaining({ height: 44, width: 44 }));
+  });
+
+  it("collapses to the approved title-only row in landscape", () => {
+    const onDismiss = jest.fn();
+    const onOpen = jest.fn();
+    const { getByTestId, queryByText } = render(
+      <IntroBanner
+        compact
+        onDismiss={onDismiss}
+        onOpen={onOpen}
+        showDismiss
+        t={t}
+        visible
+      />,
+    );
+
+    expect(queryByText("introBannerBody")).toBeNull();
+    expect(queryByText("introBannerAction")).toBeNull();
+    expect(StyleSheet.flatten(getByTestId("intro-banner").props.style)).toEqual(
+      expect.objectContaining({ minHeight: 48 }),
+    );
+    expect(
+      StyleSheet.flatten(getByTestId("intro-banner-dismiss").props.style),
+    ).toEqual(expect.objectContaining({ height: 44, width: 44 }));
+
+    fireEvent.press(getByTestId("intro-banner-dismiss"));
+    expect(onDismiss).toHaveBeenCalledTimes(1);
+    expect(onOpen).not.toHaveBeenCalled();
   });
 });
 
@@ -136,6 +168,23 @@ describe("IntroFlowScreen", () => {
     const { getByTestId } = renderScreen();
 
     expect(getByTestId("intro-welcome-play")).toBeTruthy();
+  });
+
+  it("keeps 44 point header targets around the approved 40 point faces", () => {
+    const { getByTestId } = renderScreen();
+
+    expect(StyleSheet.flatten(getByTestId("intro-back").props.style)).toEqual(
+      expect.objectContaining({ height: 44, margin: -2, width: 44 }),
+    );
+    expect(
+      StyleSheet.flatten(getByTestId("intro-back-face").props.style),
+    ).toEqual(expect.objectContaining({ height: 40, width: 40 }));
+    expect(StyleSheet.flatten(getByTestId("intro-close").props.style)).toEqual(
+      expect.objectContaining({ height: 44, margin: -2, width: 44 }),
+    );
+    expect(
+      StyleSheet.flatten(getByTestId("intro-close-face").props.style),
+    ).toEqual(expect.objectContaining({ height: 40, width: 40 }));
   });
 
   it("walks forward and back through the steps", () => {
@@ -212,6 +261,13 @@ describe("IntroFlowScreen", () => {
     expect(props.onConnectProvider).toHaveBeenCalledTimes(1);
   });
 
+  it("marks the automatic setup route as recommended", () => {
+    const { getByTestId, getByText } = renderScreen();
+    fireEvent.press(getByTestId("intro-stepper-dot-2"));
+
+    expect(getByText("introRecommended")).toBeTruthy();
+  });
+
   it("lets a listener switch the example language", () => {
     // Claiming the app sounds good is worth less than letting someone hear it,
     // in whichever language they actually speak.
@@ -221,6 +277,12 @@ describe("IntroFlowScreen", () => {
     fireEvent.press(getByTestId("intro-voice-select"));
 
     expect(getByTestId("intro-voice-option-ja")).toBeTruthy();
+    expect(
+      getByTestId("intro-voice-options").props.accessibilityViewIsModal,
+    ).toBe(true);
+    expect(
+      StyleSheet.flatten(getByTestId("intro-voice-close").props.style),
+    ).toEqual(expect.objectContaining({ height: 44, width: 44 }));
   });
 
   it("defaults the example to the interface language", () => {

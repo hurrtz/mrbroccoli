@@ -100,6 +100,11 @@ The heuristic receives mode, readiness, language, current query, and recent
 messages. When search is requested but the provider fails, the response may
 continue without search and records the fallback in the receipt.
 
+Turn-owned degradation remains attached to the assistant reply. Web-search
+fallback and TTS fallback are persisted as `PipelineNotices` metadata and do
+not also emit global toasts; the transcript must remain the durable explanation
+after the transient workspace state has passed.
+
 ## Model Council
 
 Model Council runs independent initial contributions, then immutable shared review

@@ -110,7 +110,7 @@ export function PremiumUpgradeModal({
           <PhosphorIcon
             name={premium.isPremium ? "check-circle" : "thunderbolt"}
             size="feature"
-            color={premium.isPremium ? colors.success : colors.accent}
+            color={premium.isPremium ? colors.success : colors.premium}
           />
           <Text style={[styles.heroText, { color: colors.text }]}>
             {premium.isPremium ? t("premiumUnlocked") : t("premium")}
@@ -125,7 +125,7 @@ export function PremiumUpgradeModal({
               <PhosphorIcon
                 name={benefit.icon}
                 size="control"
-                color={colors.accent}
+                color={colors.premium}
               />
               <Text style={[styles.benefitText, { color: colors.text }]}>
                 {benefit.label}
@@ -136,8 +136,12 @@ export function PremiumUpgradeModal({
         <View
           style={[
             styles.valueCard,
-            { backgroundColor: colors.accentSoft, borderColor: colors.border },
+            {
+              backgroundColor: colors.premiumSoft,
+              borderColor: colors.premiumBorder,
+            },
           ]}
+          testID="premium-value-card"
         >
           <Text style={[styles.valueText, { color: colors.text }]}>
             {t("premiumPurchaseValue")}
