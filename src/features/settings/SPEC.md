@@ -150,8 +150,10 @@ capability healthy. The UI shows the capability that was actually tested.
 - Text inputs preserve keyboard-safe layout and should not cause page headers
   or primary actions to disappear.
 - Provider credential sheets release secure-field focus before any close path
-  dismisses the nested modal, so the parent Settings page remains interactive
-  while the keyboard is visible.
+  dismisses the nested modal. On iOS, a visible keyboard must finish its
+  `keyboardDidHide` transition before the sheet unmounts; a bounded fallback
+  completes the close if UIKit omits that event. This keeps the parent Settings
+  page interactive and avoids overlapping keyboard and modal teardown.
 - Every page uses semantic colors, centralized typography, and shared icon
   tokens.
 - Free local-model changes are applied as one ready profile. A stage may record

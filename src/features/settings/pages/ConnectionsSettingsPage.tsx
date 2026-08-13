@@ -3,6 +3,7 @@ import {
   Keyboard,
   Linking,
   Modal,
+  Platform,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -44,6 +45,8 @@ import { PremiumBand } from "../settings-primitives/PremiumBand";
 import { RouteOptionRow } from "../settings-primitives/RouteOptionRow";
 import { SettingsGroup } from "../settings-primitives/SettingsGroup";
 import { styles } from "../styles";
+
+const IOS_KEYBOARD_DISMISS_FALLBACK_MS = 1_000;
 
 type ProviderActions = {
   canValidateCapability: (
@@ -189,15 +192,68 @@ function ProviderConnectionSheet({
   const { t } = useLocalization();
   const insets = useSafeAreaInsets();
   const [visibleApiKey, setVisibleApiKey] = React.useState(false);
+  const closingRef = React.useRef(false);
+  const keyboardHideSubscriptionRef = React.useRef<{
+    remove: () => void;
+  } | null>(null);
+  const closeFallbackRef = React.useRef<ReturnType<
+    typeof setTimeout
+  > | null>(null);
 
   React.useEffect(() => {
     setVisibleApiKey(false);
   }, [provider]);
 
-  const handleClose = React.useCallback(() => {
-    Keyboard.dismiss();
+  const finishClose = React.useCallback(() => {
+    if (!closingRef.current) {
+      return;
+    }
+
+    closingRef.current = false;
+    keyboardHideSubscriptionRef.current?.remove();
+    keyboardHideSubscriptionRef.current = null;
+    if (closeFallbackRef.current !== null) {
+      clearTimeout(closeFallbackRef.current);
+      closeFallbackRef.current = null;
+    }
     onClose();
   }, [onClose]);
+
+  const handleClose = React.useCallback(() => {
+    if (closingRef.current) {
+      return;
+    }
+
+    if (Platform.OS !== "ios" || !Keyboard.isVisible()) {
+      Keyboard.dismiss();
+      onClose();
+      return;
+    }
+
+    closingRef.current = true;
+    keyboardHideSubscriptionRef.current = Keyboard.addListener(
+      "keyboardDidHide",
+      finishClose,
+    );
+    closeFallbackRef.current = setTimeout(
+      finishClose,
+      IOS_KEYBOARD_DISMISS_FALLBACK_MS,
+    );
+    Keyboard.dismiss();
+  }, [finishClose, onClose]);
+
+  React.useEffect(
+    () => () => {
+      closingRef.current = false;
+      keyboardHideSubscriptionRef.current?.remove();
+      keyboardHideSubscriptionRef.current = null;
+      if (closeFallbackRef.current !== null) {
+        clearTimeout(closeFallbackRef.current);
+        closeFallbackRef.current = null;
+      }
+    },
+    [],
+  );
 
   if (!provider) {
     return null;

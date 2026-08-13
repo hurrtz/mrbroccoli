@@ -799,6 +799,48 @@ describe("SettingsModal", () => {
     dismissKeyboard.mockRestore();
   });
 
+  it("waits for the iOS keyboard to hide before dismissing a provider sheet", async () => {
+    jest.replaceProperty(Platform, "OS", "ios");
+    jest.spyOn(Keyboard, "isVisible").mockReturnValue(true);
+    const dismissKeyboard = jest
+      .spyOn(Keyboard, "dismiss")
+      .mockImplementation(() => undefined);
+    const removeKeyboardListener = jest.fn();
+    let keyboardDidHide: (() => void) | null = null;
+    jest.spyOn(Keyboard, "addListener").mockImplementation((event, listener) => {
+      if (event === "keyboardDidHide") {
+        keyboardDidHide = listener as () => void;
+        return { remove: removeKeyboardListener };
+      }
+      return { remove: jest.fn() };
+    });
+    const screen = renderSettingsModal({ focusProvider: "openai" });
+
+    await waitFor(() => {
+      expect(
+        screen.getByTestId("provider-connection-sheet-openai"),
+      ).toBeTruthy();
+    });
+
+    fireEvent.press(screen.getByTestId("provider-connection-close-openai"));
+
+    expect(dismissKeyboard).toHaveBeenCalledTimes(1);
+    expect(
+      screen.getByTestId("provider-connection-sheet-openai"),
+    ).toBeTruthy();
+    expect(keyboardDidHide).not.toBeNull();
+
+    act(() => keyboardDidHide?.());
+
+    await waitFor(() => {
+      expect(
+        screen.queryByTestId("provider-connection-sheet-openai"),
+      ).toBeNull();
+    });
+    expect(removeKeyboardListener).toHaveBeenCalledTimes(1);
+    expect(screen.getByTestId("settings-back-button")).toBeTruthy();
+  });
+
   it("shows capabilities and health in each provider row", async () => {
     const screen = renderSettingsModal({ focusProvider: "openai" });
 
