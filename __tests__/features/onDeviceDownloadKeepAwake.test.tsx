@@ -35,12 +35,14 @@ jest.mock("expo-keep-awake", () => ({
 }));
 
 let mockResolveDownload: (() => void) | undefined;
+let mockRejectDownload: ((error: Error) => void) | undefined;
 let mockDownloadSignal: AbortSignal | undefined;
 const mockDownloadLocalModel = jest.fn(
   (_modelId: string, options?: { abortSignal?: AbortSignal }) => {
     mockDownloadSignal = options?.abortSignal;
     return new Promise<string>((resolve, reject) => {
       mockResolveDownload = () => resolve("/models/local");
+      mockRejectDownload = reject;
       options?.abortSignal?.addEventListener("abort", () => {
         const error = new Error("Download aborted");
         error.name = "AbortError";
@@ -138,7 +140,7 @@ jest.mock("../../src/features/settings-core/useNativeVoiceOptions", () => ({
 import { LOCAL_MODEL_CATALOG } from "../../src/constants/localModels";
 import { DEFAULT_SETTINGS } from "../../src/types";
 import { renderWithProviders } from "../test-utils/renderWithProviders";
-import { NativeModules, Platform, Pressable, View } from "react-native";
+import { NativeModules, Platform, Pressable, Text, View } from "react-native";
 import { useLocalModelSettings } from "../../src/features/settings-core/useLocalModelSettings";
 import { LocalModelAction } from "../../src/features/settings/settings-primitives/LocalModelRouteGroup";
 
@@ -188,6 +190,9 @@ function renderPage(params?: {
     return (
       <View>
         <LocalModelAction localModels={localModels} model={model} />
+        <Text testID="local-model-error">
+          {localModels.errors[model.id]?.message ?? ""}
+        </Text>
         <Pressable
           testID="select-local-model"
           onPress={() => localModels.selectModel(model)}
@@ -208,6 +213,7 @@ async function getLlmDownloadButton(
 beforeEach(() => {
   jest.clearAllMocks();
   mockResolveDownload = undefined;
+  mockRejectDownload = undefined;
   mockDownloadSignal = undefined;
   mockGetLocalCatalogInstallStatuses.mockResolvedValue({});
   mockGetLocalModelBenchmarkResults.mockResolvedValue({});
@@ -309,6 +315,26 @@ describe("on-device model downloads", () => {
         "mrbroccoli-on-device-models",
       ),
     );
+  });
+
+  it("keeps a download failure on the model instead of opening an alert", async () => {
+    const firstLlm = LOCAL_MODEL_CATALOG.find(
+      (model) => model.capability === "llm",
+    )!;
+    const screen = renderPage();
+    fireEvent.press(await getLlmDownloadButton(screen, firstLlm.id));
+    await waitFor(() => expect(mockRejectDownload).toBeDefined());
+
+    mockRejectDownload?.(new Error("Archive verification failed"));
+
+    await waitFor(() =>
+      expect(screen.getByTestId("local-model-error").props.children).toBe(
+        "Archive verification failed",
+      ),
+    );
+    expect(
+      screen.getByTestId(`local-model-download-${firstLlm.id}`),
+    ).toBeTruthy();
   });
 
   it("replays a tested Piper voice in its selected language", async () => {

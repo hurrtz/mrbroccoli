@@ -3,6 +3,7 @@ import { StyleSheet } from "react-native";
 import { fonts } from "../../theme/typography";
 
 export const styles = StyleSheet.create({
+  modalRoot: { flex: 1 },
   container: { flex: 1, flexDirection: "row" },
   drawer: {
     width: "100%",
@@ -14,39 +15,47 @@ export const styles = StyleSheet.create({
   inlineActionOverlay: {
     ...StyleSheet.absoluteFill,
     justifyContent: "flex-end",
-    paddingHorizontal: 16,
-    paddingBottom: 16,
     zIndex: 10,
   },
   inlineActionBackdrop: {
     ...StyleSheet.absoluteFill,
   },
   actionSheet: {
-    maxHeight: "90%",
-    borderRadius: 16,
+    maxHeight: "85%",
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
     borderWidth: 1,
-    shadowOffset: { width: 0, height: 18 },
-    shadowOpacity: 0.16,
-    shadowRadius: 30,
+    borderBottomWidth: 0,
+    shadowOffset: { width: 0, height: -8 },
+    shadowOpacity: 0.12,
+    shadowRadius: 24,
     elevation: 10,
   },
   actionSheetContent: {
-    padding: 18,
-    gap: 10,
+    padding: 20,
+    gap: 8,
   },
   actionSheetTitle: {
     fontSize: 18,
-    lineHeight: 22,
+    lineHeight: 24,
     fontFamily: fonts.display,
   },
+  actionSheetHeader: {
+    alignItems: "center",
+    flexDirection: "row",
+    gap: 12,
+  },
+  actionSheetHeaderCopy: {
+    flex: 1,
+    minWidth: 0,
+  },
   actionSheetMeta: {
-    fontSize: 13,
-    lineHeight: 18,
-    fontFamily: fonts.body,
-    marginBottom: 4,
+    fontSize: 11,
+    lineHeight: 16,
+    fontFamily: fonts.mono,
   },
   actionSheetRow: {
-    minHeight: 46,
+    minHeight: 48,
     borderRadius: 10,
     borderWidth: 1,
     paddingHorizontal: 14,
@@ -58,8 +67,8 @@ export const styles = StyleSheet.create({
     marginTop: 4,
   },
   actionSheetRowText: {
-    fontSize: 14,
-    fontFamily: fonts.display,
+    fontSize: 15,
+    fontFamily: fonts.bodyMedium,
   },
   inlineRenameOverlay: {
     ...StyleSheet.absoluteFill,

@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import {
-  Alert,
   Pressable,
   StyleProp,
   StyleSheet,
@@ -123,15 +122,7 @@ export function TranscriptPreviewCard({
       return;
     }
 
-    Alert.alert(t("createForkTitle"), t("createForkConfirmation"), [
-      { text: t("cancel"), style: "cancel" },
-      {
-        text: t("createFork"),
-        onPress: () => {
-          void onBranchMessage(message);
-        },
-      },
-    ]);
+    void onBranchMessage(message);
   };
 
   useEffect(() => {

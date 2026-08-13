@@ -1,5 +1,4 @@
-import { useCallback } from "react";
-import { Alert } from "react-native";
+import { useCallback, useState } from "react";
 
 import { recordDebugLogEvent } from "../../services/debugLogCapture";
 import type { Settings } from "../../types";
@@ -29,6 +28,13 @@ export function useUlraModeControl({
   t: TranslateFn;
   updateSettings: (partial: Partial<Settings>) => void;
 }) {
+  const [confirmation, setConfirmation] = useState<{
+    calls: number;
+    message: string;
+    models: number;
+    rounds: number;
+    title: string;
+  } | null>(null);
   const available =
     settings.ulraModeEnabled && availableModelCount > 1;
   const active = available && settings.ulraModeActive;
@@ -69,11 +75,9 @@ export function useUlraModeControl({
       !settings.ulraModeWarningAcknowledged ||
       exceedsWarningThreshold
     ) {
-      Alert.alert(
-        exceedsWarningThreshold
-          ? t("ulraModeHighRiskTitle")
-          : t("ulraModeFirstUseTitle"),
-        t(
+      setConfirmation({
+        calls,
+        message: t(
           exceedsWarningThreshold
             ? "ulraModeHighRiskMessage"
             : "ulraModeFirstUseMessage",
@@ -83,17 +87,12 @@ export function useUlraModeControl({
             rounds: settings.ulraModeRounds,
           },
         ),
-        [
-          {
-            text: t("cancel"),
-            style: "cancel",
-          },
-          {
-            text: t("ulraModeEnableAction"),
-            onPress: acknowledgeAndEnable,
-          },
-        ],
-      );
+        models: availableModelCount,
+        rounds: settings.ulraModeRounds,
+        title: exceedsWarningThreshold
+          ? t("ulraModeHighRiskTitle")
+          : t("ulraModeFirstUseTitle"),
+      });
       return;
     }
 
@@ -108,9 +107,32 @@ export function useUlraModeControl({
     updateSettings,
   ]);
 
+  const cancelConfirmation = useCallback(() => setConfirmation(null), []);
+  const confirmEnable = useCallback(() => {
+    if (!confirmation) {
+      return;
+    }
+    recordDebugLogEvent({
+      event: "ulra-mode-enabled-from-home",
+      payload: {
+        calls: confirmation.calls,
+        models: confirmation.models,
+        rounds: confirmation.rounds,
+      },
+    });
+    updateSettings({
+      ulraModeActive: true,
+      ulraModeWarningAcknowledged: true,
+    });
+    setConfirmation(null);
+  }, [confirmation, updateSettings]);
+
   return {
     active,
     available,
+    cancelConfirmation,
+    confirmation,
+    confirmEnable,
     handleToggle,
   };
 }

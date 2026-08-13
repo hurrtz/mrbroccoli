@@ -1,7 +1,7 @@
 import React from "react";
 
 import { fireEvent, render, waitFor } from "@testing-library/react-native";
-import { Alert, StyleSheet } from "react-native";
+import { StyleSheet } from "react-native";
 
 import { TranscriptPreviewCard } from "../../../src/screens/main/TranscriptPreviewCard";
 import { lightColors } from "../../../src/theme/colors";
@@ -296,10 +296,7 @@ describe("TranscriptPreviewCard", () => {
     });
   });
 
-  it("confirms the standalone fork action before creating a branch", () => {
-    const alertSpy = jest
-      .spyOn(Alert, "alert")
-      .mockImplementation(() => undefined);
+  it("creates a fork directly from the expanded message action", () => {
     const onBranchMessage = jest.fn(async () => true);
     const screen = render(
       <TranscriptPreviewCard
@@ -333,19 +330,6 @@ describe("TranscriptPreviewCard", () => {
     );
 
     fireEvent.press(screen.getByText("Request branch"));
-    expect(onBranchMessage).not.toHaveBeenCalled();
-    expect(alertSpy).toHaveBeenCalledWith(
-      "Create a fork?",
-      "Do you want to create a fork of this conversation?",
-      expect.arrayContaining([
-        expect.objectContaining({ text: "Cancel", style: "cancel" }),
-        expect.objectContaining({ text: "Create fork" }),
-      ]),
-    );
-
-    alertSpy.mock.calls[0]?.[2]
-      ?.find(({ text }) => text === "Create fork")
-      ?.onPress?.();
     expect(onBranchMessage).toHaveBeenCalledWith(
       expect.objectContaining({ id: "message-1" }),
     );

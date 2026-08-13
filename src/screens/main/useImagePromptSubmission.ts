@@ -1,5 +1,4 @@
-import { useCallback, useMemo } from "react";
-import { Alert } from "react-native";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { PROVIDER_LABELS } from "../../constants/models";
 import type { VoiceCaptureRequest } from "../../hooks/useVoicePipeline";
@@ -56,6 +55,33 @@ export function useImagePromptSubmission(params: {
     updater: (message: Message) => Message,
   ) => Message | null;
 }) {
+  const [consent, setConsent] = useState<{
+    message: string;
+    title: string;
+  } | null>(null);
+  const consentResolverRef = useRef<((confirmed: boolean) => void) | null>(
+    null,
+  );
+  const settleConsent = useCallback((confirmed: boolean) => {
+    const resolve = consentResolverRef.current;
+    consentResolverRef.current = null;
+    setConsent(null);
+    resolve?.(confirmed);
+  }, []);
+  const requestConsent = useCallback((title: string, message: string) => {
+    consentResolverRef.current?.(false);
+    return new Promise<boolean>((resolve) => {
+      consentResolverRef.current = resolve;
+      setConsent({ message, title });
+    });
+  }, []);
+  useEffect(
+    () => () => {
+      consentResolverRef.current?.(false);
+      consentResolverRef.current = null;
+    },
+    [],
+  );
   const unsupportedRoute = useMemo(
     () =>
       !params.imagesEnabled
@@ -158,28 +184,14 @@ export function useImagePromptSubmission(params: {
         hasNewRecipient &&
         (hasHistoricalImage || recipientProviders.length > 1)
       ) {
-        const confirmed = await new Promise<boolean>((resolve) => {
-          Alert.alert(
-            params.t("imageProviderConsentTitle"),
-            params.t("imageProviderConsentMessage", {
-              providers: recipientProviders
-                .map((recipient) => PROVIDER_LABELS[recipient])
-                .join(", "),
-            }),
-            [
-              {
-                text: params.t("dismiss"),
-                style: "cancel",
-                onPress: () => resolve(false),
-              },
-              {
-                text: params.t("imageProviderConsentConfirm"),
-                onPress: () => resolve(true),
-              },
-            ],
-            { cancelable: false },
-          );
-        });
+        const confirmed = await requestConsent(
+          params.t("imageProviderConsentTitle"),
+          params.t("imageProviderConsentMessage", {
+            providers: recipientProviders
+              .map((recipient) => PROVIDER_LABELS[recipient])
+              .join(", "),
+          }),
+        );
         if (!confirmed) {
           await cleanupCapturedAudio(request.audioUri);
           return;
@@ -216,7 +228,7 @@ export function useImagePromptSubmission(params: {
         messagesOverride,
       });
     },
-    [params, unsupportedRoute],
+    [params, requestConsent, unsupportedRoute],
   );
 
   const handleRecordedVoiceCaptureDone = useCallback(
@@ -231,6 +243,9 @@ export function useImagePromptSubmission(params: {
   );
 
   return {
+    cancelConsent: () => settleConsent(false),
+    confirmConsent: () => settleConsent(true),
+    consent,
     handleAddImage,
     handleRecordedVoiceCaptureDone,
     handleVoiceCaptureDone,

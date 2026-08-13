@@ -100,6 +100,10 @@
   controls, the Recommended setup divider, compact landscape invitation,
   Premium gold treatment, modal focus isolation, toast suspension behind
   secondary surfaces, setup task rows, and reply-owned fallback notices.
+- [x] Reconcile dialogs and action ownership: app-owned image-source, privacy,
+  and Model Council disclosures; direct non-destructive transcript branching;
+  row-owned Settings outcomes; modal focus isolation; hidden dismissal
+  backdrops; and explicit close actions.
 - [ ] Reconcile the seven-page settings hierarchy and its new row/group route
   primitives. Overview, Connections, Search, Listening, Speaking, Data,
   App, and the replacement Thinking implementation are source-complete;

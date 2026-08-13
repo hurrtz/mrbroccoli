@@ -2,6 +2,7 @@ import React from "react";
 import { ScrollView, Text, TouchableOpacity, View } from "react-native";
 
 import { PhosphorIcon } from "../../design-system/PhosphorIcon";
+import { IconButton } from "../../design-system/IconButton";
 
 import { useLocalization } from "../../i18n";
 import { useTheme } from "../../theme/ThemeContext";
@@ -48,6 +49,7 @@ export function ConversationActionSheet({
   return (
     <View style={styles.inlineActionOverlay} pointerEvents="box-none">
       <TouchableOpacity
+        testID="conversation-action-backdrop"
         style={[
           styles.inlineActionBackdrop,
           { backgroundColor: colors.overlay },
@@ -55,6 +57,8 @@ export function ConversationActionSheet({
         activeOpacity={1}
         onPress={onClose}
         accessible={false}
+        accessibilityElementsHidden
+        importantForAccessibility="no"
       />
       <ScrollView
         accessibilityViewIsModal
@@ -69,14 +73,26 @@ export function ConversationActionSheet({
           },
         ]}
       >
-        <Text style={[styles.actionSheetTitle, { color: colors.text }]}>
-          {conversation.title}
-        </Text>
-        <Text style={[styles.actionSheetMeta, { color: colors.textSecondary }]}>
-          {t("messageCount", {
-            count: conversation.messageCount ?? 0,
-          })}
-        </Text>
+        <View style={styles.actionSheetHeader}>
+          <View style={styles.actionSheetHeaderCopy}>
+            <Text style={[styles.actionSheetTitle, { color: colors.text }]}>
+              {conversation.title}
+            </Text>
+            <Text
+              style={[styles.actionSheetMeta, { color: colors.textSecondary }]}
+            >
+              {t("messageCount", {
+                count: conversation.messageCount ?? 0,
+              })}
+            </Text>
+          </View>
+          <IconButton
+            accessibilityLabel={t("dismiss")}
+            icon="close"
+            onPress={onClose}
+            testID="conversation-action-close"
+          />
+        </View>
 
         <TouchableOpacity
           testID="conversation-action-toggle-pin"

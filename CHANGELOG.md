@@ -30,6 +30,11 @@ the complete Play Store translations are kept in a dedicated file under
   the home task row, transient notices wait behind open sheets, Premium uses
   its gold treatment consistently, and speech or search fallbacks remain with
   the reply they affected instead of appearing again as global alerts.
+- Image source choice, provider-sharing consent, and Model Council cost
+  warnings now use app-owned sheets and dialogs. Local-model and speech-cache
+  outcomes remain on their owning Settings rows, transcript branching starts
+  directly, and modal backdrops stay out of screen-reader navigation while
+  every modal retains an explicit close action.
 
 - Sessions now use a flat, recency-first drawer with collapsible Pinned,
   Earlier, and Archived groups, a bottom search field, compact provider marks,

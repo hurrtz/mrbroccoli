@@ -11,6 +11,8 @@ import { Toast } from "../../components/Toast";
 import { AntSettingsModal } from "../../features/settings/AntSettingsModal";
 import { Colors } from "../../theme/colors";
 import { MainScreenWorkspace } from "./MainScreenWorkspace";
+import { DisclosureDialog } from "./DisclosureDialog";
+import { ImageSourceSheet } from "./ImageSourceSheet";
 import { StatusDetailsModal } from "./StatusDetailsModal";
 import { StyleSheetModal } from "./StyleSheetModal";
 import { styles } from "./styles";
@@ -19,7 +21,10 @@ interface MainScreenPresentationProps {
   colors: Colors;
   conversationDrawer: React.ComponentProps<typeof ConversationDrawer>;
   conversationMemory: React.ComponentProps<typeof ConversationMemoryModal>;
+  councilDisclosure: React.ComponentProps<typeof DisclosureDialog>;
+  imageConsent: React.ComponentProps<typeof DisclosureDialog>;
   intro: React.ComponentProps<typeof IntroFlowScreen>;
+  imageSource: React.ComponentProps<typeof ImageSourceSheet>;
   isDark: boolean;
   isLandscape: boolean;
   premiumUpgrade: React.ComponentProps<typeof PremiumUpgradeModal>;
@@ -34,7 +39,10 @@ export function MainScreenPresentation({
   colors,
   conversationDrawer,
   conversationMemory,
+  councilDisclosure,
+  imageConsent,
   intro,
+  imageSource,
   isDark,
   isLandscape,
   premiumUpgrade,
@@ -70,6 +78,10 @@ export function MainScreenPresentation({
       >
         <MainScreenWorkspace {...workspace} />
       </KeyboardAvoidingView>
+
+      <ImageSourceSheet {...imageSource} />
+      <DisclosureDialog {...councilDisclosure} />
+      <DisclosureDialog {...imageConsent} />
 
       <StyleSheetModal {...styleSheet} />
       <StatusDetailsModal {...statusDetails} />

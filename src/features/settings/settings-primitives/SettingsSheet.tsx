@@ -55,6 +55,8 @@ export function SettingsSheet({
       >
         <Pressable
           accessible={false}
+          accessibilityElementsHidden
+          importantForAccessibility="no"
           onPress={onClose}
           style={[StyleSheet.absoluteFill, { backgroundColor: colors.overlay }]}
         />

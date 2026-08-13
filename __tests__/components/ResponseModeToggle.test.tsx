@@ -10,6 +10,8 @@ import { responseModeToggleStyles } from "../../src/components/responseModeToggl
 import { lightColors } from "../../src/theme/colors";
 import { renderWithProviders } from "../test-utils/renderWithProviders";
 
+const hiddenElementQuery = { includeHiddenElements: true } as const;
+
 jest.mock("../../src/components/ProviderIcon", () => ({
   ProviderIcon: ({ provider, size }: { provider: string; size: string }) => {
     const React = require("react");
@@ -688,6 +690,18 @@ describe("ResponseModeToggle", () => {
       expect(
         screen.getByTestId("response-mode-overflow-backdrop-motion"),
       ).toBeTruthy();
+      expect(
+        screen.getByTestId(
+          "response-mode-overflow-backdrop",
+          hiddenElementQuery,
+        ).props,
+      ).toEqual(
+        expect.objectContaining({
+          accessible: false,
+          accessibilityElementsHidden: true,
+          importantForAccessibility: "no",
+        }),
+      );
       expect(
         screen.getByTestId("response-mode-overflow-sheet-motion"),
       ).toBeTruthy();

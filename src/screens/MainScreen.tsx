@@ -216,6 +216,7 @@ export function MainScreen() {
   });
 
   const [styleSheetVisible, setStyleSheetVisible] = React.useState(false);
+  const [imageSourceVisible, setImageSourceVisible] = React.useState(false);
   const [drawerArchivedOnOpen, setDrawerArchivedOnOpen] = React.useState(false);
   const {
     handleInputSurfaceChange,
@@ -292,18 +293,6 @@ export function MainScreen() {
     t,
     updateSettings,
   });
-  const mainSurfaceVisible = !(
-    drawerVisible ||
-    introVisible ||
-    memoryVisible ||
-    routePickerVisible ||
-    settingsVisible ||
-    statusDetailsVisible ||
-    styleSheetVisible ||
-    transcriptSheetVisible ||
-    freeOffline.setupVisible ||
-    premiumModalVisible
-  );
   const {
     assistantInstructions,
     effectiveTtsInstructions,
@@ -449,6 +438,7 @@ export function MainScreen() {
 
   const pendingImages = useMainScreenImageAttachments({
     disabled: voiceInputDisabled || !freeOffline.entitlement.isPremium,
+    onOpenSourcePicker: () => setImageSourceVisible(true),
     showError: showImageError,
     t,
   });
@@ -546,6 +536,21 @@ export function MainScreen() {
     t,
     updateMessage,
   });
+  const mainSurfaceVisible = !(
+    drawerVisible ||
+    imageSourceVisible ||
+    Boolean(imagePromptSubmission.consent) ||
+    introVisible ||
+    memoryVisible ||
+    Boolean(ulraMode.confirmation) ||
+    routePickerVisible ||
+    settingsVisible ||
+    statusDetailsVisible ||
+    styleSheetVisible ||
+    transcriptSheetVisible ||
+    freeOffline.setupVisible ||
+    premiumModalVisible
+  );
   const promptSubmissionBlockMessage =
     kokoroPromptBlockMessage ?? imagePromptSubmission.imageInputBlockMessage;
   const handleVoiceCaptureDone = imagePromptSubmission.handleVoiceCaptureDone;
@@ -936,6 +941,28 @@ export function MainScreen() {
   return (
     <MainScreenPresentation
       colors={colors}
+      councilDisclosure={{
+        cancelLabel: t("cancel"),
+        confirmLabel: t("ulraModeEnableAction"),
+        message: ulraMode.confirmation?.message ?? "",
+        onCancel: ulraMode.cancelConfirmation,
+        onConfirm: ulraMode.confirmEnable,
+        testID: "model-council-disclosure-message",
+        title: ulraMode.confirmation?.title ?? t("ulraMode"),
+        visible: Boolean(ulraMode.confirmation),
+      }}
+      imageConsent={{
+        cancelLabel: t("dismiss"),
+        confirmLabel: t("imageProviderConsentConfirm"),
+        message: imagePromptSubmission.consent?.message ?? "",
+        onCancel: imagePromptSubmission.cancelConsent,
+        onConfirm: imagePromptSubmission.confirmConsent,
+        testID: "image-provider-consent-message",
+        title:
+          imagePromptSubmission.consent?.title ??
+          t("imageProviderConsentTitle"),
+        visible: Boolean(imagePromptSubmission.consent),
+      }}
       isDark={isDark}
       isLandscape={isLandscape}
       toast={{
@@ -978,6 +1005,13 @@ export function MainScreen() {
         },
         t,
         visible: introVisible,
+      }}
+      imageSource={{
+        onChooseFromPhotos: () => void pendingImages.chooseFromPhotos(),
+        onClose: () => setImageSourceVisible(false),
+        onTakePhoto: () => void pendingImages.takePhoto(),
+        t,
+        visible: imageSourceVisible,
       }}
       workspace={{
         // The row reports work the user started somewhere else. A failed

@@ -102,6 +102,7 @@ export function IntroVoicePicker({ language, t }: IntroVoicePickerProps) {
         visible={pickerOpen}
       >
         <Pressable
+          accessible={false}
           accessibilityElementsHidden
           importantForAccessibility="no-hide-descendants"
           onPress={() => setPickerOpen(false)}

@@ -89,9 +89,12 @@ export function LocalModelAction({
   if (benchmark?.status === "viable") {
     return null;
   }
+  const testFailed =
+    benchmark?.status === "failed" ||
+    localModels.errors?.[model.id]?.action === "test";
   return (
     <IconAction
-      icon={benchmark ? "egg-cracked" : "egg"}
+      icon={testFailed ? "egg-cracked" : "egg"}
       label={t("test")}
       onPress={() => void localModels.testModel(model)}
       testID={`local-model-test-${model.id}`}
@@ -105,11 +108,16 @@ export function getLocalModelMeta(
   t: ReturnType<typeof useLocalization>["t"],
 ) {
   const install = localModels.installs[model.id];
+  const error = localModels.errors?.[model.id];
   const busy = localModels.busy?.modelId === model.id;
   const downloadProgress =
     model.id === "kokoro-multilingual"
       ? localModels.kokoroModel.progress
       : localModels.progress[model.id]?.progress;
+
+  if (error) {
+    return `${t("settingsReadinessBroken")} · ${error.message}`;
+  }
 
   if (busy && localModels.busy?.action === "download") {
     return `${t("downloadingShort")} · ${Math.round(
@@ -216,6 +224,7 @@ export function LocalModelRouteGroup({
               <LocalModelAction localModels={localModels} model={model} />
             }
             disabled={!viable || modelBusy}
+            error={Boolean(localModels.errors?.[model.id])}
             label={`${model.name} · ${t("settingsOnDevice")}`}
             meta={getLocalModelMeta(model, localModels, t)}
             selected={localModels.isModelSelected(model)}

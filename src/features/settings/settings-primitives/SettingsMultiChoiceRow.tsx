@@ -74,6 +74,8 @@ export function SettingsMultiChoiceRow<T extends string>({
         >
           <Pressable
             accessible={false}
+            accessibilityElementsHidden
+            importantForAccessibility="no"
             onPress={() => setVisible(false)}
             style={[
               StyleSheet.absoluteFill,

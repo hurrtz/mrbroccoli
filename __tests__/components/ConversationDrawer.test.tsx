@@ -359,6 +359,23 @@ describe("ConversationDrawer", () => {
     expect(onRenameThread).toHaveBeenCalledWith("one", "Renamed briefing");
   });
 
+  it("keeps the action-sheet backdrop decorative and provides an explicit close action", async () => {
+    const screen = renderConversationDrawer();
+
+    fireEvent.press(screen.getByTestId("conversation-drawer-menu-one"));
+
+    const backdrop = await screen.findByTestId(
+      "conversation-action-backdrop",
+      hiddenIconQuery,
+    );
+    expect(backdrop.props.accessible).toBe(false);
+    expect(backdrop.props.accessibilityElementsHidden).toBe(true);
+    expect(backdrop.props.importantForAccessibility).toBe("no");
+
+    fireEvent.press(screen.getByTestId("conversation-action-close"));
+    expect(screen.queryByTestId("conversation-action-rename")).toBeNull();
+  });
+
   it("marks a conversation private from its action sheet", async () => {
     const onTogglePrivate = jest.fn();
     const screen = renderConversationDrawer({ onTogglePrivate });

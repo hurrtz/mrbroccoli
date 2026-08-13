@@ -136,9 +136,14 @@ capability healthy. The UI shows the capability that was actually tested.
   checkbox semantics, isolate screen-reader focus, and keep a labelled close or
   Done action.
 - Modal content isolates screen-reader focus and always provides a labelled
-  close action.
+  close action. Backdrop-only dismissal layers remain outside the
+  accessibility tree.
 - Dynamic validation, download, and preview state is announced only on
   meaningful changes.
+- A local-model download, removal, or benchmark failure remains on the owning
+  route row until that model action is retried. Speech replay-cache completion
+  or failure remains on its Storage row. Neither outcome opens a platform
+  alert that obscures the setting it describes.
 - Text inputs preserve keyboard-safe layout and should not cause page headers
   or primary actions to disappear.
 - Every page uses semantic colors, centralized typography, and shared icon

@@ -121,87 +121,92 @@ export const ConversationDrawer = React.memo(function ConversationDrawer({
       transparent
       animationType="fade"
       onDismiss={onDismiss}
+      onRequestClose={onClose}
       supportedOrientations={APP_MODAL_ORIENTATIONS}
     >
-      <View style={styles.container}>
-        <KeyboardAvoidingView
-          behavior={Platform.OS === "ios" ? "padding" : "height"}
-          style={[
-            styles.drawer,
-            {
-              maxWidth: drawerMaxWidth,
-              width: isLandscape ? "44%" : "100%",
-              borderRightWidth: isLandscape ? 1 : 0,
-            },
-            {
-              backgroundColor: colors.background,
-              borderRightColor: colors.border,
-            },
-          ]}
-        >
-          <ConversationDrawerHeader
-            onClose={onClose}
-            onNewSession={controller.handleNewSession}
-          />
-          <ConversationDrawerList
-            activeId={activeId}
-            allConversations={conversations}
-            archivedInitiallyExpanded={archivedInitiallyExpanded}
-            compact={isLandscape}
-            conversations={controller.visibleConversations}
-            searchQuery={controller.searchQuery}
-            onDeleteConversation={handleDelete}
-            onOpenActionConversation={controller.openActionConversation}
-            onSelectConversation={controller.handleSelectConversation}
-          />
-          <ConversationDrawerSearch
-            searchQuery={controller.searchQuery}
-            onChangeSearchQuery={controller.setSearchQuery}
-            onClearSearch={controller.clearSearch}
-          />
-        </KeyboardAvoidingView>
-        {isLandscape ? (
-          <TouchableOpacity
-            style={[styles.backdrop, { backgroundColor: colors.overlay }]}
-            activeOpacity={1}
-            onPress={onClose}
-            accessible={false}
-          />
-        ) : null}
-      </View>
+      <View accessibilityViewIsModal style={styles.modalRoot}>
+        <View style={styles.container}>
+          <KeyboardAvoidingView
+            behavior={Platform.OS === "ios" ? "padding" : "height"}
+            style={[
+              styles.drawer,
+              {
+                maxWidth: drawerMaxWidth,
+                width: isLandscape ? "44%" : "100%",
+                borderRightWidth: isLandscape ? 1 : 0,
+              },
+              {
+                backgroundColor: colors.background,
+                borderRightColor: colors.border,
+              },
+            ]}
+          >
+            <ConversationDrawerHeader
+              onClose={onClose}
+              onNewSession={controller.handleNewSession}
+            />
+            <ConversationDrawerList
+              activeId={activeId}
+              allConversations={conversations}
+              archivedInitiallyExpanded={archivedInitiallyExpanded}
+              compact={isLandscape}
+              conversations={controller.visibleConversations}
+              searchQuery={controller.searchQuery}
+              onDeleteConversation={handleDelete}
+              onOpenActionConversation={controller.openActionConversation}
+              onSelectConversation={controller.handleSelectConversation}
+            />
+            <ConversationDrawerSearch
+              searchQuery={controller.searchQuery}
+              onChangeSearchQuery={controller.setSearchQuery}
+              onClearSearch={controller.clearSearch}
+            />
+          </KeyboardAvoidingView>
+          {isLandscape ? (
+            <TouchableOpacity
+              style={[styles.backdrop, { backgroundColor: colors.overlay }]}
+              activeOpacity={1}
+              onPress={onClose}
+              accessible={false}
+              accessibilityElementsHidden
+              importantForAccessibility="no"
+            />
+          ) : null}
+        </View>
 
-      <ConversationActionSheet
-        conversation={controller.actionConversation}
-        onClose={controller.closeActionModal}
-        onCopyThread={onCopyThread}
-        onDelete={handleDelete}
-        onManageMemory={onManageMemory}
-        onReviewIntegrity={handleReviewIntegrity}
-        onOpenRenameModal={controller.openRenameModal}
-        onShareThread={onShareThread}
-        onTogglePinned={onTogglePinned}
-        onTogglePrivate={onTogglePrivate}
-        onToggleArchived={onToggleArchived}
-        onAutoName={onAutoName}
-      />
-      <ConversationRenameModal
-        visible={controller.editingConversationId !== null}
-        editingTitle={controller.editingTitle}
-        onChangeEditingTitle={controller.setEditingTitle}
-        onClose={controller.closeRenameModal}
-        onSubmit={controller.submitRename}
-      />
-      <ConversationIntegrityModal
-        busy={integrityController.busy}
-        conversation={integrityController.conversation}
-        failed={integrityController.failed}
-        inspection={integrityController.inspection}
-        loading={integrityController.loading}
-        onClose={integrityController.close}
-        onExportOriginals={onExportIntegrityOriginals}
-        onRepair={integrityController.repair}
-        onUndo={integrityController.undo}
-      />
+        <ConversationActionSheet
+          conversation={controller.actionConversation}
+          onClose={controller.closeActionModal}
+          onCopyThread={onCopyThread}
+          onDelete={handleDelete}
+          onManageMemory={onManageMemory}
+          onReviewIntegrity={handleReviewIntegrity}
+          onOpenRenameModal={controller.openRenameModal}
+          onShareThread={onShareThread}
+          onTogglePinned={onTogglePinned}
+          onTogglePrivate={onTogglePrivate}
+          onToggleArchived={onToggleArchived}
+          onAutoName={onAutoName}
+        />
+        <ConversationRenameModal
+          visible={controller.editingConversationId !== null}
+          editingTitle={controller.editingTitle}
+          onChangeEditingTitle={controller.setEditingTitle}
+          onClose={controller.closeRenameModal}
+          onSubmit={controller.submitRename}
+        />
+        <ConversationIntegrityModal
+          busy={integrityController.busy}
+          conversation={integrityController.conversation}
+          failed={integrityController.failed}
+          inspection={integrityController.inspection}
+          loading={integrityController.loading}
+          onClose={integrityController.close}
+          onExportOriginals={onExportIntegrityOriginals}
+          onRepair={integrityController.repair}
+          onUndo={integrityController.undo}
+        />
+      </View>
     </Modal>
   );
 });

@@ -1,4 +1,3 @@
-import { Alert } from "react-native";
 import { act, renderHook } from "@testing-library/react-native";
 
 import { useImagePromptSubmission } from "../../../src/screens/main/useImagePromptSubmission";
@@ -29,7 +28,6 @@ describe("useImagePromptSubmission", () => {
 
   it("requires consent before sending a new image to multiple providers", async () => {
     const runVoiceCapture = jest.fn(async () => undefined);
-    jest.spyOn(Alert, "alert").mockImplementation(() => undefined);
     const { result } = renderHook(() =>
       useImagePromptSubmission({
         activeConversation: null,
@@ -54,9 +52,9 @@ describe("useImagePromptSubmission", () => {
         transcriptionOverride: "What is this?",
       });
     });
-    const buttons = jest.mocked(Alert.alert).mock.calls[0][2];
+    expect(result.current.consent?.title).toBe("imageProviderConsentTitle");
     await act(async () => {
-      buttons?.[1].onPress?.();
+      result.current.confirmConsent();
       await submission;
     });
 
@@ -109,7 +107,6 @@ describe("useImagePromptSubmission", () => {
   it("authorizes images from an explicit fork instead of stale active history", async () => {
     const runVoiceCapture = jest.fn(async () => undefined);
     const updateMessage = jest.fn(() => null);
-    jest.spyOn(Alert, "alert").mockImplementation(() => undefined);
     const forkContextMessage = {
       id: "fork-context",
       role: "user" as const,
@@ -164,9 +161,9 @@ describe("useImagePromptSubmission", () => {
         transcriptionOverride: forkPromptMessage.content,
       });
     });
-    const buttons = jest.mocked(Alert.alert).mock.calls[0][2];
+    expect(result.current.consent).not.toBeNull();
     await act(async () => {
-      buttons?.[1].onPress?.();
+      result.current.confirmConsent();
       await submission;
     });
 

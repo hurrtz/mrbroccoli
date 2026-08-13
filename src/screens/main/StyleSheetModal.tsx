@@ -93,6 +93,8 @@ export const StyleSheetModal = React.memo(function StyleSheetModal({
           onPress={onClose}
           activeOpacity={1}
           accessible={false}
+          accessibilityElementsHidden
+          importantForAccessibility="no"
         />
         <SafeAreaView
           testID="conversation-settings-drawer"

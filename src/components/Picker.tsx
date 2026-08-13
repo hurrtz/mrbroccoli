@@ -114,6 +114,8 @@ export function Picker({
         <View style={styles.overlay} accessibilityViewIsModal>
           <Pressable
             accessible={false}
+            accessibilityElementsHidden
+            importantForAccessibility="no"
             onPress={() => setOpen(false)}
             style={StyleSheet.absoluteFill}
           />

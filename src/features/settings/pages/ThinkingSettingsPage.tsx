@@ -243,6 +243,7 @@ function LocalLlmRows({
               <LocalModelAction localModels={localModels} model={model} />
             }
             disabled={!isLocalModelViable(model, localModels) || busy}
+            error={Boolean(localModels.errors?.[model.id])}
             label={model.name}
             last={index === candidates.length - 1}
             meta={getLocalModelMeta(model, localModels, t)}

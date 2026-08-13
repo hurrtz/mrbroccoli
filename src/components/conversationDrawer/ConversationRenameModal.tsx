@@ -38,6 +38,8 @@ export function ConversationRenameModal({
         activeOpacity={1}
         onPress={onClose}
         accessible={false}
+        accessibilityElementsHidden
+        importantForAccessibility="no"
       />
       <View
         accessibilityViewIsModal

@@ -1,6 +1,5 @@
 import * as FileSystem from "expo-file-system/legacy";
 import * as ImagePicker from "expo-image-picker";
-import { Alert } from "react-native";
 import { act, renderHook, waitFor } from "@testing-library/react-native";
 
 import { useMainScreenImageAttachments } from "../../../src/screens/main/useMainScreenImageAttachments";
@@ -22,7 +21,7 @@ describe("useMainScreenImageAttachments", () => {
   });
 
   it("uses the platform photo picker and retains accepted image files", async () => {
-    jest.spyOn(Alert, "alert").mockImplementation(() => undefined);
+    const onOpenSourcePicker = jest.fn();
     jest.mocked(ImagePicker.launchImageLibraryAsync).mockResolvedValue({
       canceled: false,
       assets: [
@@ -38,15 +37,16 @@ describe("useMainScreenImageAttachments", () => {
     const { result, unmount } = renderHook(() =>
       useMainScreenImageAttachments({
         disabled: false,
+        onOpenSourcePicker,
         showError: jest.fn(),
         t,
       }),
     );
 
     act(() => result.current.handleAddImage());
-    const buttons = jest.mocked(Alert.alert).mock.calls[0][2];
+    expect(onOpenSourcePicker).toHaveBeenCalledTimes(1);
     await act(async () => {
-      buttons?.[1].onPress?.();
+      await result.current.chooseFromPhotos();
     });
     await waitFor(() => expect(result.current.attachments).toHaveLength(1));
 
@@ -84,6 +84,7 @@ describe("useMainScreenImageAttachments", () => {
     );
     const props = {
       disabled: false,
+      onOpenSourcePicker: jest.fn(),
       showError: jest.fn(),
       t,
     };

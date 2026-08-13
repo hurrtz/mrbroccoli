@@ -1,6 +1,6 @@
 import React from "react";
 import {
-  Alert,
+  AccessibilityInfo,
   Modal,
   Pressable,
   StyleSheet,
@@ -133,6 +133,8 @@ function InstructionsSheet({
       <View accessibilityViewIsModal style={pageStyles.overlay}>
         <Pressable
           accessible={false}
+          accessibilityElementsHidden
+          importantForAccessibility="no"
           onPress={onClose}
           style={[StyleSheet.absoluteFill, { backgroundColor: colors.overlay }]}
         />
@@ -235,6 +237,9 @@ export function SpeakingSettingsPage({
   );
   const [isClearingSpeechCache, setIsClearingSpeechCache] =
     React.useState(false);
+  const [speechCacheOutcome, setSpeechCacheOutcome] = React.useState<
+    "success" | "error" | null
+  >(null);
   const previewLanguage = settings.ttsListenLanguages[0] ?? "en";
   const providerModel = (provider: Provider) =>
     settings.providerTtsModels[provider] ||
@@ -404,11 +409,18 @@ export function SpeakingSettingsPage({
       return;
     }
     setIsClearingSpeechCache(true);
+    setSpeechCacheOutcome(null);
     try {
       await clearProviderTtsAudioCache();
-      Alert.alert(t("speechReplayCache"), t("speechReplayCacheCleared"));
+      setSpeechCacheOutcome("success");
+      AccessibilityInfo.announceForAccessibility(
+        t("speechReplayCacheCleared"),
+      );
     } catch {
-      Alert.alert(t("speechReplayCache"), t("speechReplayCacheClearFailed"));
+      setSpeechCacheOutcome("error");
+      AccessibilityInfo.announceForAccessibility(
+        t("speechReplayCacheClearFailed"),
+      );
     } finally {
       setIsClearingSpeechCache(false);
     }
@@ -503,6 +515,16 @@ export function SpeakingSettingsPage({
           label={t("clearSpeechReplayCache")}
           last
           onPress={() => void handleClearSpeechCache()}
+          supporting={
+            speechCacheOutcome === "success"
+              ? t("speechReplayCacheCleared")
+              : speechCacheOutcome === "error"
+                ? t("speechReplayCacheClearFailed")
+                : undefined
+          }
+          supportingTone={
+            speechCacheOutcome === "error" ? "danger" : "default"
+          }
         />
       </SettingsGroup>
 

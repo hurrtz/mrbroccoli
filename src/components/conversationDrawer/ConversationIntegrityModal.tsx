@@ -77,6 +77,8 @@ export function ConversationIntegrityModal({
         activeOpacity={1}
         onPress={busy ? undefined : onClose}
         accessible={false}
+        accessibilityElementsHidden
+        importantForAccessibility="no"
       />
       <View
         accessibilityViewIsModal

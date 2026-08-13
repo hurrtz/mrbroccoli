@@ -67,6 +67,7 @@ export const ConversationMemoryModal = React.memo(
         visible={visible}
         transparent
         animationType="fade"
+        onRequestClose={onClose}
         supportedOrientations={APP_MODAL_ORIENTATIONS}
       >
         <View
@@ -83,6 +84,8 @@ export const ConversationMemoryModal = React.memo(
             activeOpacity={1}
             onPress={onClose}
             accessible={false}
+            accessibilityElementsHidden
+            importantForAccessibility="no"
           />
           <View
             accessibilityViewIsModal

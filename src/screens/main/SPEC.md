@@ -84,12 +84,25 @@ receive already-derived state and callbacks.
   in reverse: Data & privacy closes
   its archive sheet and Settings before opening the sessions drawer at the
   expanded Archived group.
+- Branching a transcript message is a non-destructive action and begins
+  immediately from that row; it does not interpose a platform confirmation.
+  Destructive conversation deletion remains the one action that uses the
+  platform alert contract.
 - Provider, model, listening, speaking, fallback, and usage labels describe the
   effective route, not merely the last picker interaction.
 - A user can interrupt or cancel an active turn without a late callback
   restarting recording, playback, or another request.
 - Text and image submission use the same conversation and route semantics as a
   spoken turn where their capabilities overlap.
+- Adding an image opens an app-owned source sheet. Camera or photo-library
+  presentation waits until that sheet has completed native dismissal on iOS
+  and uses a bounded Android fallback, so native pickers never compete with an
+  existing modal controller. A fresh image-provider recipient still requires
+  explicit app-owned disclosure before the turn continues.
+- Model Council first-use and high-call-count warnings are app-owned,
+  non-dismissible disclosures with explicit cancel and enable actions. They
+  suppress workspace toasts while visible and must preserve the exact model,
+  round, and call count that the user reviewed.
 - The pager always opens on voice. The composer stays available through its
   labelled 44pt chevrons and horizontal gesture, but route readiness never
   automatically pages the workspace to text. The composer is outlined in the

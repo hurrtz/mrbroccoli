@@ -188,8 +188,9 @@ export function AntPickerRow({
           style={styles.pickerModalOverlay}
         >
           <Pressable
-            accessibilityLabel={t("dismiss")}
-            accessibilityRole="button"
+            accessible={false}
+            accessibilityElementsHidden
+            importantForAccessibility="no"
             onPress={() => closePicker("overlay")}
             style={[
               StyleSheet.absoluteFill,

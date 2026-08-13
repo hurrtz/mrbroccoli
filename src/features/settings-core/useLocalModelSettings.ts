@@ -1,5 +1,5 @@
 import React from "react";
-import { AccessibilityInfo, Alert, Platform } from "react-native";
+import { AccessibilityInfo, Platform } from "react-native";
 
 import {
   LOCAL_MODEL_CATALOG,
@@ -63,6 +63,11 @@ import { useNativeVoiceOptions } from "./useNativeVoiceOptions";
 export type LocalModelBusyAction = {
   action: "download" | "remove" | "test";
   modelId: LocalModelId;
+};
+
+export type LocalModelActionError = {
+  action: LocalModelBusyAction["action"];
+  message: string;
 };
 
 function isAbortError(error: unknown) {
@@ -136,6 +141,9 @@ export function useLocalModelSettings({
   >({});
   const [benchmarks, setBenchmarks] = React.useState<
     Partial<Record<LocalModelId, LocalModelBenchmarkResult>>
+  >({});
+  const [errors, setErrors] = React.useState<
+    Partial<Record<LocalModelId, LocalModelActionError>>
   >({});
   const downloadAbortRef = React.useRef<AbortController | null>(null);
 
@@ -314,6 +322,7 @@ export function useLocalModelSettings({
     async (model: LocalModelDefinition) => {
       const abortController = new AbortController();
       downloadAbortRef.current = abortController;
+      setErrors((current) => ({ ...current, [model.id]: undefined }));
       setBusy({ action: "download", modelId: model.id });
       AccessibilityInfo.announceForAccessibility(t("downloadingShort"));
       try {
@@ -338,9 +347,13 @@ export function useLocalModelSettings({
         );
       } catch (error) {
         if (!isAbortError(error) && !abortController.signal.aborted) {
-          Alert.alert(
-            model.name,
-            error instanceof Error ? error.message : String(error),
+          const message = error instanceof Error ? error.message : String(error);
+          setErrors((current) => ({
+            ...current,
+            [model.id]: { action: "download", message },
+          }));
+          AccessibilityInfo.announceForAccessibility(
+            `${model.name}: ${message}`,
           );
         }
         await refreshModelState();
@@ -362,6 +375,7 @@ export function useLocalModelSettings({
 
   const removeModel = React.useCallback(
     async (model: LocalModelDefinition) => {
+      setErrors((current) => ({ ...current, [model.id]: undefined }));
       setBusy({ action: "remove", modelId: model.id });
       try {
         if (model.id === "kokoro-multilingual") {
@@ -375,9 +389,13 @@ export function useLocalModelSettings({
         onUpdate(getLocalModelRemovalSettingsUpdate(settings, model));
         await refreshModelState();
       } catch (error) {
-        Alert.alert(
-          model.name,
-          error instanceof Error ? error.message : String(error),
+        const message = error instanceof Error ? error.message : String(error);
+        setErrors((current) => ({
+          ...current,
+          [model.id]: { action: "remove", message },
+        }));
+        AccessibilityInfo.announceForAccessibility(
+          `${model.name}: ${message}`,
         );
       } finally {
         setBusy(null);
@@ -388,6 +406,7 @@ export function useLocalModelSettings({
 
   const testModel = React.useCallback(
     async (model: LocalModelDefinition) => {
+      setErrors((current) => ({ ...current, [model.id]: undefined }));
       setBusy({ action: "test", modelId: model.id });
       try {
         let result: LocalModelBenchmarkResult;
@@ -437,9 +456,13 @@ export function useLocalModelSettings({
           }
         }
       } catch (error) {
-        Alert.alert(
-          model.name,
-          error instanceof Error ? error.message : String(error),
+        const message = error instanceof Error ? error.message : String(error);
+        setErrors((current) => ({
+          ...current,
+          [model.id]: { action: "test", message },
+        }));
+        AccessibilityInfo.announceForAccessibility(
+          `${model.name}: ${message}`,
         );
       } finally {
         setBusy(null);
@@ -598,6 +621,7 @@ export function useLocalModelSettings({
     cancelDownload,
     compatibleModels,
     downloadModel,
+    errors,
     freeLanguageOptions: FREE_SPEECH_LANGUAGE_OPTIONS,
     installs,
     isModelSelected,

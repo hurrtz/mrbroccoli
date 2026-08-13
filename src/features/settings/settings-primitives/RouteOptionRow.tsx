@@ -10,6 +10,7 @@ import { fonts } from "../../../theme/typography";
 export function RouteOptionRow({
   action,
   disabled = false,
+  error = false,
   label,
   last = false,
   locked = false,
@@ -23,6 +24,7 @@ export function RouteOptionRow({
 }: {
   action?: React.ReactNode;
   disabled?: boolean;
+  error?: boolean;
   label: string;
   last?: boolean;
   locked?: boolean;
@@ -102,7 +104,12 @@ export function RouteOptionRow({
               {label}
             </Text>
             {meta ? (
-              <Text style={[styles.meta, { color: colors.textMuted }]}>
+              <Text
+                style={[
+                  styles.meta,
+                  { color: error ? colors.danger : colors.textMuted },
+                ]}
+              >
                 {meta}
               </Text>
             ) : null}

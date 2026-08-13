@@ -12,7 +12,7 @@ functional acceptance. Device verdicts are added as the goal progresses.
 | `ChatBubble` | `src/components/ChatBubble.tsx` and `src/components/chatBubble/` | retained legacy composition; no longer the transcript row |
 | `ChatTranscript` | `src/components/ChatTranscript.tsx` | mapped |
 | `TranscriptMessage` | `src/components/TranscriptMessage.tsx` | mapped to folded script row; unit acceptance passed |
-| `ConversationActionSheet` | `src/components/conversationDrawer/ConversationActionSheet.tsx` | mapped |
+| `ConversationActionSheet` | `src/components/conversationDrawer/ConversationActionSheet.tsx` | source/unit parity; bottom sheet geometry, 48-point rows, hidden backdrop, and labelled close action |
 | `ConversationDrawerItem` | `src/components/conversationDrawer/ConversationDrawerItem.tsx` | mapped |
 | `ConversationIntegrityModal` | `src/components/conversationDrawer/ConversationIntegrityModal.tsx` | mapped |
 | `ConversationMemoryModal` | `src/components/ConversationMemoryModal.tsx` | mapped |
@@ -46,7 +46,7 @@ functional acceptance. Device verdicts are added as the goal progresses.
 | `AutoSetupPlanRow` | `src/components/autoSetup/AutoSetupPlanRow.tsx` | mapped |
 | `InstallProgress` | `src/components/autoSetup/InstallProgressBar.tsx` | mapped, native name differs |
 | `LocalModelPerformanceSummary` | `src/components/LocalModelPerformanceSummary.tsx` | mapped |
-| `Modal` | `src/design-system/NativeControls.tsx` | mapped |
+| `Modal` | `src/design-system/NativeControls.tsx` | source/unit parity; focus isolation, hidden dismissal backdrops, explicit close actions, and dismissal-before-sibling hand-offs |
 | `Toast` | `src/components/Toast.tsx` | source/unit parity; pending interval is suspended behind secondary surfaces |
 | `AntButtonLabel` | `src/features/settings/settings-primitives/SettingsCards.tsx` | mapped |
 | `AntDisclosureCard` | `src/features/settings/settings-primitives/SettingsCards.tsx` | mapped |

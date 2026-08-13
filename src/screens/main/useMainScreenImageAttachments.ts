@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Alert } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 
 import {
@@ -12,10 +11,11 @@ import type { TranslateFn } from "./shared";
 
 export function useMainScreenImageAttachments(params: {
   disabled: boolean;
+  onOpenSourcePicker: () => void;
   showError: (message: string) => void;
   t: TranslateFn;
 }) {
-  const { disabled, showError, t } = params;
+  const { disabled, onOpenSourcePicker, showError, t } = params;
   const [attachments, setAttachments] = useState<MessageImageAttachment[]>([]);
   const attachmentsRef = useRef(attachments);
   const disabledRef = useRef(disabled);
@@ -133,15 +133,8 @@ export function useMainScreenImageAttachments(params: {
       );
       return;
     }
-    Alert.alert(t("chooseImageSource"), undefined, [
-      { text: t("takePhoto"), onPress: () => void takePhoto() },
-      {
-        text: t("chooseFromPhotos"),
-        onPress: () => void chooseFromPhotos(),
-      },
-      { text: t("dismiss"), style: "cancel" },
-    ]);
-  }, [chooseFromPhotos, showError, t, takePhoto]);
+    onOpenSourcePicker();
+  }, [onOpenSourcePicker, showError, t]);
 
   const handleRemoveImage = useCallback((attachmentId: string) => {
     const current = attachmentsRef.current;
@@ -186,9 +179,11 @@ export function useMainScreenImageAttachments(params: {
 
   return {
     attachments,
+    chooseFromPhotos,
     clearAttachments,
     handleAddImage,
     handleAttachmentsAccepted,
     handleRemoveImage,
+    takePhoto,
   };
 }

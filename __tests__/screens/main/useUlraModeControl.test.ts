@@ -1,5 +1,4 @@
 import { act, renderHook } from "@testing-library/react-native";
-import { Alert } from "react-native";
 
 import {
   getUlraModeCallCount,
@@ -23,7 +22,6 @@ describe("useUlraModeControl", () => {
 
   it("asks for informed consent the first time it is enabled", () => {
     const updateSettings = jest.fn();
-    const alert = jest.spyOn(Alert, "alert").mockImplementation();
     const { result } = renderHook(() =>
       useUlraModeControl({
         availableModelCount: 3,
@@ -36,9 +34,13 @@ describe("useUlraModeControl", () => {
 
     act(() => result.current.handleToggle());
 
-    expect(alert).toHaveBeenCalledTimes(1);
-    const buttons = alert.mock.calls[0]?.[2];
-    act(() => buttons?.[1]?.onPress?.());
+    expect(result.current.confirmation).toMatchObject({
+      calls: 10,
+      models: 3,
+      rounds: 2,
+      title: expect.stringContaining("ulraModeFirstUseTitle"),
+    });
+    act(() => result.current.confirmEnable());
     expect(updateSettings).toHaveBeenCalledWith({
       ulraModeActive: true,
       ulraModeWarningAcknowledged: true,
@@ -47,7 +49,6 @@ describe("useUlraModeControl", () => {
 
   it("warns again for a large configuration without blocking it", () => {
     const updateSettings = jest.fn();
-    const alert = jest.spyOn(Alert, "alert").mockImplementation();
     const { result } = renderHook(() =>
       useUlraModeControl({
         availableModelCount: 10,
@@ -63,11 +64,29 @@ describe("useUlraModeControl", () => {
 
     act(() => result.current.handleToggle());
 
-    expect(alert.mock.calls[0]?.[0]).toBe("ulraModeHighRiskTitle");
-    act(() => alert.mock.calls[0]?.[2]?.[1]?.onPress?.());
+    expect(result.current.confirmation?.title).toBe("ulraModeHighRiskTitle");
+    act(() => result.current.confirmEnable());
     expect(updateSettings).toHaveBeenCalledWith(
       expect.objectContaining({ ulraModeActive: true }),
     );
+  });
+
+  it("leaves Model Council off when disclosure is cancelled", () => {
+    const updateSettings = jest.fn();
+    const { result } = renderHook(() =>
+      useUlraModeControl({
+        availableModelCount: 3,
+        settings: DEFAULT_SETTINGS,
+        t: (key) => key,
+        updateSettings,
+      }),
+    );
+
+    act(() => result.current.handleToggle());
+    act(() => result.current.cancelConfirmation());
+
+    expect(result.current.confirmation).toBeNull();
+    expect(updateSettings).not.toHaveBeenCalled();
   });
 
   it("hides and deactivates the control when fewer than two models are ready", () => {

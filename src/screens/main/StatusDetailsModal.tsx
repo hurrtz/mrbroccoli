@@ -66,6 +66,8 @@ export const StatusDetailsModal = React.memo(function StatusDetailsModal({
           onPress={onClose}
           activeOpacity={1}
           accessible={false}
+          accessibilityElementsHidden
+          importantForAccessibility="no"
         />
         <View
           style={[

@@ -78,7 +78,13 @@ export function AntSettingsFrame({
           },
         ]}
       />
-      <Pressable style={styles.backdrop} onPress={onClose} accessible={false} />
+      <Pressable
+        accessibilityElementsHidden
+        accessible={false}
+        importantForAccessibility="no"
+        onPress={onClose}
+        style={styles.backdrop}
+      />
       <Animated.View
         style={[
           styles.modal,

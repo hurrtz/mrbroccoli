@@ -383,8 +383,9 @@ export function ResponseModeOverflowSelector({
           >
             <Pressable
               testID="response-mode-overflow-backdrop"
-              accessibilityLabel={t("dismiss")}
-              accessibilityRole="button"
+              accessible={false}
+              accessibilityElementsHidden
+              importantForAccessibility="no"
               onPress={closeSheet}
               style={StyleSheet.absoluteFill}
             />

@@ -121,6 +121,7 @@ function ModelStorageGroup({
               : model.downloadBytes,
           );
           const supporting = [
+            localModels.errors?.[model.id]?.message,
             getModelCapabilityLabel(model, t),
             size,
             downloading ? `${Math.round(fraction * 100)}%` : null,
@@ -134,6 +135,9 @@ function ModelStorageGroup({
               testID={`model-storage-${model.id}`}
               label={model.name}
               supporting={supporting}
+              supportingTone={
+                localModels.errors?.[model.id] ? "danger" : "default"
+              }
               last={index === storedModels.length - 1}
               control={
                 <SettingsPillAction
