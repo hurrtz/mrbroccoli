@@ -99,15 +99,39 @@ data, not separate visual components.
 
 | Surface or flow | Android emulator | Physical Android | iOS simulator | Physical iPhone |
 | --- | --- | --- | --- | --- |
-| Workspace, light/dark portrait | current source/unit parity; rebuilt native revalidation pending | prior isolated Release smoke; current revision pending | current source/unit parity; rebuilt native revalidation pending | prior launch pass on fallback iPhone; current revision pending |
-| Workspace landscape | current source/unit parity; rebuilt native revalidation pending | prior smoke rotation; current revision pending | current source/unit parity; rebuilt native revalidation pending | not automated |
+| Workspace, light/dark portrait | exact Release pass | exact Release smoke pass | exact Release pass plus post-fix accessibility-large pass | prior launch pass on fallback iPhone; current local-model acceptance blocked |
+| Workspace landscape | exact Release pass | exact Release smoke rotation pass | exact Release pass plus post-fix accessibility-large pass | not automated |
 | Orb states and progress rings | pass: ten deterministic phases/boundaries | pass: real recording, transcribing, thinking, speaking plus deterministic overtime | pass: ten deterministic phases/boundaries | full-overtime isolated fixture pass; real turn blocked |
 | Introduction and audio | pass: seven steps, swipe, bundled audio, Back/Done/reopen/close | pass: same 13-scene smoke | pass: same 13-scene smoke | first-launch banner captured; interaction not automated |
 | Automatic setup | pass: honest low-memory rejection, retry, manual hand-off | pass: Qwen and Whisper viable; Piper failure excluded on retry; system-voice profile Ready | presentation and controller tests pass | blocked by signing/memory entitlement prerequisite |
-| Settings overview and seven pages | prior eight-page revision passed; current revision pending | prior overview/App/on-device navigation passed; current revision pending | prior eight-page revision passed; current revision pending | first-launch Settings entry visible; current revision pending |
-| Transcript, drawer, route picker, chat actions | current source/unit parity; native revalidation pending | prior local-turn evidence only; current revision pending | current source/unit parity; native revalidation pending | current revision pending |
-| RTL and accessibility-large text | Arabic/Urdu plus large-text pass | representative smoke pass | Arabic/Urdu plus large-text pass | not automated |
+| Settings overview and seven pages | exact Release pass across every page | representative exact Release smoke pass | exact Release pass across every page | first-launch Settings entry visible; current revision not accepted |
+| Transcript, drawer, route picker, chat actions | exact Release pass | representative exact Release smoke pass | exact Release pass | current revision not accepted |
+| RTL and accessibility-large text | 19-locale sweep and accessibility pass | representative exact Release smoke pass | 19-locale sweep plus post-fix accessibility pass | not automated |
 | Native audio/model/lifecycle tests | Android instrumentation pass | pass: interrupted transfer recovery plus real PCM-WAV capture, local Whisper/Qwen, system playback | iOS native tests pass | blocked |
+
+## Run evidence — 2026-08-13
+
+- The exact Release matrix passed on Android emulator `emulator-5554`, the USB
+  Pixel 4a `09081JEC210280`, and the iPhone 17 Pro Max iOS 26.5 simulator
+  `D6B394CE-F257-4496-B7AC-DD6F09A1C318`. It verified 1,429 screenshots: 708
+  per simulator platform plus 13 physical-Android smoke captures.
+- Both simulator platforms completed all 19 registered UI languages with 36
+  captures per language, the introduction smoke, three-route landscape,
+  dark/high-contrast/accessibility-large layouts, and TalkBack or VoiceOver
+  hierarchy checks covering nine labelled home controls.
+- Manual review covered all 38 locale contact sheets and the general flow
+  sheets. The only new defect was an iOS accessibility-large overlap in the
+  constrained workspace. Commit `363a71d3` gives compact chrome and the blocked
+  route card stable accessible names; the rebuilt iOS Release app then passed
+  the targeted eight-scene accessibility flow in portrait and landscape.
+- Commit `2b227949` corrected the Settings keyboard regression test to model a
+  native React Native subscription. The complete spend-free `make pre-push`
+  gate then passed with 197 suites and 1,846 tests passing (1 intentionally
+  skipped), plus TypeScript, ESLint/Knip, coverage, native-config parity,
+  license, and diff-hygiene checks.
+- Physical-iPhone local-model acceptance remains blocked by the existing
+  developer-image/signing/entitlement prerequisite. No paid provider request,
+  release, push, or store action was performed.
 
 ## Run evidence — 2026-08-11
 

@@ -77,11 +77,10 @@
   orb estimate and overtime clocks from a 200ms JS tick to the UI thread.
 - [x] Add focused regressions for each changed behavior and pass TypeScript and
   static analysis.
-- [ ] Capture the remaining fresh Pixel 4a Release smoke flow. The current
-  Android-emulator and iOS-simulator matrices have passed; the connected Pixel
-  4a is screen-locked and must be unlocked before its 13 screenshots can be
-  captured. Physical-iPhone local-model acceptance remains subject to the
-  existing developer-image/signing prerequisite.
+- [x] Capture the fresh Pixel 4a Release smoke flow. The exact Release matrix
+  now includes all 13 physical-device screenshots alongside the Android-
+  emulator and iOS-simulator evidence. Physical-iPhone local-model acceptance
+  remains subject to the existing developer-image/signing prerequisite.
 
 ## Reopened design revision — 2026-08-13
 
@@ -104,12 +103,13 @@
   and Model Council disclosures; direct non-destructive transcript branching;
   row-owned Settings outcomes; modal focus isolation; hidden dismissal
   backdrops; and explicit close actions.
-- [ ] Reconcile the seven-page settings hierarchy and its new row/group route
+- [x] Reconcile the seven-page settings hierarchy and its new row/group route
   primitives. Overview, Connections, Search, Listening, Speaking, Data,
-  App, and the replacement Thinking implementation are source-complete;
-  rebuilt native visual/interaction acceptance remains open.
-- [ ] Rebuild the exact Release apps and repeat native visual and interaction
-  acceptance for every changed surface.
+  App, and the replacement Thinking implementation passed rebuilt native
+  visual and interaction acceptance on Android and iOS.
+- [x] Rebuild the exact Release apps and repeat native visual and interaction
+  acceptance for every changed surface, including all 19 locale sheets and the
+  post-fix iOS accessibility-large flow.
 
 ## Completed batches
 
