@@ -80,10 +80,35 @@ export function formatRelativeAge(
                 ? [30 * 24 * 60 * 60, "month"]
                 : [365 * 24 * 60 * 60, "year"];
 
-  return new Intl.RelativeTimeFormat(language, {
-    numeric: "auto",
-    style: "short",
-  }).format(Math.round(deltaSeconds / divisor), unit);
+  if (typeof Intl.RelativeTimeFormat === "function") {
+    return new Intl.RelativeTimeFormat(language, {
+      numeric: "auto",
+      style: "short",
+    }).format(Math.round(deltaSeconds / divisor), unit);
+  }
+
+  const date = new Date(timestampMs);
+  const now = new Date(nowMs);
+  const isSameDay =
+    date.getFullYear() === now.getFullYear() &&
+    date.getMonth() === now.getMonth() &&
+    date.getDate() === now.getDate();
+  const isSameYear = date.getFullYear() === now.getFullYear();
+
+  try {
+    return new Intl.DateTimeFormat(
+      language,
+      isSameDay
+        ? { hour: "numeric", minute: "2-digit" }
+        : {
+            day: "numeric",
+            month: "short",
+            ...(isSameYear ? {} : { year: "numeric" as const }),
+          },
+    ).format(date);
+  } catch {
+    return date.toISOString().slice(0, 16).replace("T", " ");
+  }
 }
 
 export function getMainScreenViewModel({

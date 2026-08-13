@@ -46,9 +46,12 @@
 - [x] On physical Android, install and verify the selected profile, run the
   benchmark and a complete local voice turn, then test background/lifecycle
   and resume behavior.
-- [ ] On physical iPhone, install and verify the selected profile, run the
-  benchmark and a complete local voice turn, then test audio-session and
-  background/lifecycle behavior.
+- [x] On physical iPhone, install and verify the selected profile, benchmark
+  Granite, Parakeet, Kokoro, and Piper, prove app-owned background download
+  resume, real native recording, local transcription, conversation
+  persistence, cold-start readiness, and the exact Release crash regression.
+  Piper synthesis was accepted through its silent device benchmark rather than
+  repeating audible playback after the user asked that speakers remain quiet.
 - [x] Run Android instrumentation and iOS native tests on the applicable exact
   builds.
 
@@ -159,7 +162,9 @@
 - [x] Recorded the work in atomic commits `a037be8`, `d1f91a8`, `72f27c3`,
   `12f61bf`, and `01cbb99`, then published this closeout and the matching
   Obsidian evidence note.
-- [ ] Run the same real model/voice acceptance on a physical iPhone. The Wi-Fi
-  iPhone cannot mount its developer image; a fallback iPhone accepted and
-  launched the isolated Release build, but its wildcard profile cannot carry
-  the extended-memory entitlements needed to count as a local-model verdict.
+- [x] Run the corresponding local-model acceptance on the wired physical
+  iPhone. The current developer profile carries both extended-address-space and
+  increased-memory entitlements; the selected profile, lifecycle, benchmarks,
+  native recorder, local STT, persistence, and Hermes Release regression all
+  passed. Audible Piper playback was deliberately replaced by its silent
+  synthesis benchmark at the user's request.

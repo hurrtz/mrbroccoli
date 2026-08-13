@@ -70,7 +70,9 @@ receive already-derived state and callbacks.
   constrained blocked-route card shows only its actionable label.
 - The status line under the orb pairs a phase dot with what is happening and
   what the conversation is; while idle it names the conversation and its
-  relative age. Its info control opens the session details.
+  localized relative age. Runtimes without relative-time formatting fall back
+  to a localized compact timestamp instead of failing the workspace. Its info
+  control opens the session details.
 - The transcript remains the durable record. Streaming text may be projected as
   a temporary assistant message, but only persisted messages become history.
   It reads as one continuous script with a fixed speaker margin, provider or
@@ -80,13 +82,14 @@ receive already-derived state and callbacks.
   metrics appear only on an open row, while compact metadata remains visible
   when usage details are enabled. Swiping a row exposes explicit removal.
   In portrait the transcript demotes to a peeking handle at the bottom edge
-  whose metadata names the latest model and relative age. It opens as a sheet
-  over the workspace with one grip, conversation title, and labelled close
-  action; it does not repeat image or conversation-setting controls and has no
-  footer close action. In landscape it stays inline in the right pane. Actions
-  inside the portrait sheet that open Speaking settings dismiss the transcript
-  completely before presenting the sibling modal. The same sequencing applies
-  in reverse: Data & privacy closes
+  whose metadata names the latest model and localized age, with the same safe
+  timestamp fallback on runtimes without relative-time formatting. It opens as
+  a sheet over the workspace with one grip, conversation title, and labelled
+  close action; it does not repeat image or conversation-setting controls and
+  has no footer close action. In landscape it stays inline in the right pane.
+  Actions inside the portrait sheet that open Speaking settings dismiss the
+  transcript completely before presenting the sibling modal. The same
+  sequencing applies in reverse: Data & privacy closes
   its archive sheet and Settings before opening the sessions drawer at the
   expanded Archived group.
 - Branching a transcript message is a non-destructive action and begins

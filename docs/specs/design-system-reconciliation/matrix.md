@@ -77,9 +77,9 @@ functional acceptance. Device verdicts are added as the goal progresses.
 | `ResponseModeToggle` | `src/components/ResponseModeToggle.tsx` | mapped, retained off-home |
 | `RouteByline` | `src/screens/main/MainScreenRouteByline.tsx` | source/unit parity; native composition name differs |
 | `RoutePicker` | `src/screens/main/RoutePickerSheet.tsx` | mapped, native composition name differs |
-| `TranscriptHandle` | `src/design-system/TranscriptHandle.tsx` | source/unit parity; latest model and localized relative age |
+| `TranscriptHandle` | `src/design-system/TranscriptHandle.tsx` | source/unit/device parity; latest model and localized relative age, with a compact localized timestamp fallback when Hermes omits relative-time formatting |
 | `VoiceOrb` | `src/design-system/VoiceOrb.tsx` and `src/screens/main/useOrbTurnProgress.ts` | source/unit parity; measured stage and timing-only pager motion |
-| `WorkspaceStatusLine` | `src/design-system/WorkspaceStatusLine.tsx` | source/unit parity; idle conversation age derived by view model |
+| `WorkspaceStatusLine` | `src/design-system/WorkspaceStatusLine.tsx` | source/unit/device parity; idle conversation age derived by a non-throwing view model formatter |
 
 ## Manifest data exports
 
@@ -99,15 +99,15 @@ data, not separate visual components.
 
 | Surface or flow | Android emulator | Physical Android | iOS simulator | Physical iPhone |
 | --- | --- | --- | --- | --- |
-| Workspace, light/dark portrait | exact Release pass | exact Release smoke pass | exact Release pass plus post-fix accessibility-large pass | prior launch pass on fallback iPhone; current local-model acceptance blocked |
+| Workspace, light/dark portrait | exact Release pass | exact Release smoke pass | exact Release pass plus post-fix accessibility-large pass | current exact Release pass with selected local profile and persisted local transcript |
 | Workspace landscape | exact Release pass | exact Release smoke rotation pass | exact Release pass plus post-fix accessibility-large pass | not automated |
-| Orb states and progress rings | pass: ten deterministic phases/boundaries | pass: real recording, transcribing, thinking, speaking plus deterministic overtime | pass: ten deterministic phases/boundaries | full-overtime isolated fixture pass; real turn blocked |
+| Orb states and progress rings | pass: ten deterministic phases/boundaries | pass: real recording, transcribing, thinking, speaking plus deterministic overtime | pass: ten deterministic phases/boundaries | pass: isolated overtime plus real native recording and local transcription; audible playback intentionally replaced by silent Piper benchmark |
 | Introduction and audio | pass: seven steps, swipe, bundled audio, Back/Done/reopen/close | pass: same 13-scene smoke | pass: same 13-scene smoke | first-launch banner captured; interaction not automated |
-| Automatic setup | pass: honest low-memory rejection, retry, manual hand-off | pass: Qwen and Whisper viable; Piper failure excluded on retry; system-voice profile Ready | presentation and controller tests pass | blocked by signing/memory entitlement prerequisite |
-| Settings overview and seven pages | exact Release pass across every page | representative exact Release smoke pass | exact Release pass across every page | first-launch Settings entry visible; current revision not accepted |
-| Transcript, drawer, route picker, chat actions | exact Release pass | representative exact Release smoke pass | exact Release pass | current revision not accepted |
+| Automatic setup | pass: honest low-memory rejection, retry, manual hand-off | pass: Qwen and Whisper viable; Piper failure excluded on retry; system-voice profile Ready | presentation and controller tests pass | pass: app-owned background transfer/resume proved; SHA-verified artifacts completed the slow transfer; Granite, Parakeet, and Piper viable, Kokoro honestly below target |
+| Settings overview and seven pages | exact Release pass across every page | representative exact Release smoke pass | exact Release pass across every page | representative current Release overview/Speaking/profile/cold-start pass |
+| Transcript, drawer, route picker, chat actions | exact Release pass | representative exact Release smoke pass | exact Release pass | current Release transcript creation, persisted status, and timestamp fallback pass |
 | RTL and accessibility-large text | 19-locale sweep and accessibility pass | representative exact Release smoke pass | 19-locale sweep plus post-fix accessibility pass | not automated |
-| Native audio/model/lifecycle tests | Android instrumentation pass | pass: interrupted transfer recovery plus real PCM-WAV capture, local Whisper/Qwen, system playback | iOS native tests pass | blocked |
+| Native audio/model/lifecycle tests | Android instrumentation pass | pass: interrupted transfer recovery plus real PCM-WAV capture, local Whisper/Qwen, system playback | iOS native tests pass | pass: background download continuation, cold readiness, native PCM recording, local Parakeet STT, Granite/Parakeet/Piper benchmarks, and exact Hermes Release regression |
 
 ## Run evidence — 2026-08-13
 
@@ -129,9 +129,30 @@ data, not separate visual components.
   gate then passed with 197 suites and 1,846 tests passing (1 intentionally
   skipped), plus TypeScript, ESLint/Knip, coverage, native-config parity,
   license, and diff-hygiene checks.
-- Physical-iPhone local-model acceptance remains blocked by the existing
-  developer-image/signing/entitlement prerequisite. No paid provider request,
-  release, push, or store action was performed.
+- The wired iPhone 17 Pro Max on iOS 26.6 accepted the current standalone
+  Release `.dev` app with extended-address-space and increased-memory
+  entitlements. Its app-managed Parakeet download continued while backgrounded
+  and resumed the same setup job. Because the connection delivered only about
+  15 KB/s, exact SHA-verified model archives were then side-loaded into the app
+  container to complete runtime acceptance without misrepresenting that step
+  as an app download.
+- Granite 4.0 1B passed at 44.04 tok/s with 2.9x memory headroom; Parakeet
+  passed at 0.189 realtime factor with 1.9x headroom; Piper Kristin passed at
+  0.540 realtime factor and remained Ready after a cold launch. Kokoro ran
+  correctly but reported its 2.057 realtime factor below the 1.5 target, so it
+  remained an honest non-viable choice for this phone.
+- The first successful physical local transcription exposed a Release-only
+  Hermes crash: `Intl.RelativeTimeFormat` was absent when the new conversation
+  timestamp rendered. A regression test first reproduced the missing API,
+  `mainScreenViewModel.ts` gained a localized compact date/time fallback, and
+  the freshly rebuilt physical Release app then transcribed a checksum-verified
+  fixture, persisted the conversation, and rendered `10:49 AM` without a
+  crash. Evidence is under
+  `artifacts/design-system-reconciliation/current/ios-physical/2026-08-13-local-profile/`.
+- Audible end-to-end Piper replay was not repeated after the user asked that
+  the speakers remain quiet; synthesis is covered by the physical Piper
+  benchmark and the integrated native playback gates. No paid provider
+  request, release, push, or store action was performed.
 
 ## Run evidence — 2026-08-11
 

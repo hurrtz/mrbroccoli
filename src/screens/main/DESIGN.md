@@ -179,11 +179,14 @@ message remains the control's accessible name while the visible card contracts
 to the actionable label, leaving the inline transcript and status unobscured.
 
 The portrait transcript handle derives the latest assistant model and
-localized relative age in `mainScreenViewModel.ts`. Its sheet owns the only
-conversation title and close action; `TranscriptPreviewCard` owns only the
-scrolling script and message actions, so it cannot duplicate image, style, or
-sheet-dismiss controls. Landscape mounts that same headerless transcript
-content directly in the right pane.
+localized relative age in `mainScreenViewModel.ts`. The formatter feature-tests
+`Intl.RelativeTimeFormat` because some Hermes Release runtimes omit it; those
+runtimes receive a compact localized time or date from `Intl.DateTimeFormat`
+instead, with an ISO timestamp as the last non-throwing fallback. Its sheet
+owns the only conversation title and close action; `TranscriptPreviewCard`
+owns only the scrolling script and message actions, so it cannot duplicate
+image, style, or sheet-dismiss controls. Landscape mounts that same headerless
+transcript content directly in the right pane.
 
 ## Evidence
 

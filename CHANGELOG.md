@@ -10,6 +10,8 @@ the complete Play Store translations are kept in a dedicated file under
 
 ## Unreleased
 
+- Fixed successful local transcription crashing the iOS Release app when its
+  JavaScript runtime does not provide relative-time formatting.
 - Fixed provider connection sheets occasionally freezing while returning to
   Settings by sequencing iOS keyboard and sheet dismissal.
 - Fixed the iOS home screen overlapping its blocked-route warning, status,

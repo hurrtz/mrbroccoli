@@ -120,6 +120,35 @@ describe("getMainScreenViewModel", () => {
     expect(formatRelativeAge("not-a-date", "en", now)).toBeNull();
   });
 
+  it("falls back to a localized timestamp when relative time is unavailable", () => {
+    const descriptor = Object.getOwnPropertyDescriptor(
+      Intl,
+      "RelativeTimeFormat",
+    );
+    const timestamp = "2026-08-12T14:28:00.000Z";
+    const now = Date.parse("2026-08-12T14:30:00.000Z");
+
+    Object.defineProperty(Intl, "RelativeTimeFormat", {
+      configurable: true,
+      value: undefined,
+    });
+
+    try {
+      expect(formatRelativeAge(timestamp, "en", now)).toBe(
+        new Intl.DateTimeFormat("en", {
+          hour: "numeric",
+          minute: "2-digit",
+        }).format(new Date(timestamp)),
+      );
+    } finally {
+      if (descriptor) {
+        Object.defineProperty(Intl, "RelativeTimeFormat", descriptor);
+      } else {
+        Reflect.deleteProperty(Intl, "RelativeTimeFormat");
+      }
+    }
+  });
+
   it("shows synthesis rather than speaking while audio is only pending", () => {
     const viewModel = getMainScreenViewModel({
       activeConversation: null,
