@@ -241,18 +241,22 @@ function getOverviewState({
       const configured = PROVIDER_ORDER.filter(
         (provider) => settings.apiKeys[provider]?.trim().length > 0,
       );
-      return configured.length > 0
-        ? configured
-            .slice(0, 3)
-            .map(
-              (provider) =>
-                `${PROVIDER_LABELS[provider]} ${getHealthLabel(
-                  getProviderHealthState(provider),
-                  t,
-                ).toLocaleLowerCase()}`,
-            )
-            .join(" · ")
-        : t("providerStatusNotSetup");
+      if (configured.length === 0) {
+        return t("providerStatusNotSetup");
+      }
+      // Two named statuses stay legible; a third would truncate mid-word,
+      // so everything past the second collapses into a count.
+      const named = configured
+        .slice(0, 2)
+        .map(
+          (provider) =>
+            `${PROVIDER_LABELS[provider]} ${getHealthLabel(
+              getProviderHealthState(provider),
+              t,
+            ).toLocaleLowerCase()}`,
+        );
+      const overflow = configured.length - named.length;
+      return [...named, ...(overflow > 0 ? [`+${overflow}`] : [])].join(" · ");
     }
     case "thinking":
       return (

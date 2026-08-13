@@ -46,6 +46,8 @@ the complete Play Store translations are kept in a dedicated file under
   44-point targets — no filled circles — and back is a full arrow.
 - The voice orb steps down a size while the setup banner is on screen instead
   of squeezing the rest of the home screen.
+- The Settings overview's Connections summary names at most two providers and
+  counts the rest ("+2") instead of truncating a third name mid-word.
 - Copy no longer references the retired "On-device AI" page: the setup note
   points at Settings, and on-device model rows drop the "· On-device AI"
   suffix since their meta line already says where they run. The system

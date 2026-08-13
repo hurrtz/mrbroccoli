@@ -31,6 +31,39 @@ function overviewProps() {
 }
 
 describe("AntSettingsOverview", () => {
+  it("summarizes many connections as two named statuses plus a count", () => {
+    // Three joined status phrases truncate mid-word in the row; the third
+    // and later providers collapse into "+N".
+    const props = overviewProps();
+    const screen = render(
+      <ThemeProvider mode="light">
+        <LocalizationProvider language="en">
+          <AntSettingsOverview
+            {...props}
+            getProviderHealthState={jest.fn(() => "configured" as const)}
+            settings={{
+              ...DEFAULT_SETTINGS,
+              apiKeys: {
+                ...DEFAULT_SETTINGS.apiKeys,
+                openai: "sk-a",
+                anthropic: "sk-b",
+                gemini: "sk-c",
+                mistral: "sk-d",
+              },
+            }}
+          />
+        </LocalizationProvider>
+      </ThemeProvider>,
+    );
+
+    const connections = screen.getByTestId("settings-overview-row-connections");
+    expect(
+      within(connections).getByText(
+        "OpenAI not tested · Anthropic not tested · +2",
+      ),
+    ).toBeTruthy();
+  });
+
   it("leads with the current edition and task-oriented groups", () => {
     const screen = render(
       <ThemeProvider mode="light">
