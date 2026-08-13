@@ -210,14 +210,16 @@ function TextInputSurface({
           {
             backgroundColor: primaryActionDisabled
               ? colors.surfaceAlt
-              : colors.bubbleUser,
+              : colors.accent,
           },
         ]}
       >
         <PhosphorIcon
           name="arrow-up"
           size="control"
-          color={primaryActionDisabled ? colors.textMuted : colors.onPrimary}
+          color={
+            primaryActionDisabled ? colors.textMuted : colors.onActiveControl
+          }
         />
       </TouchableOpacity>
     </View>

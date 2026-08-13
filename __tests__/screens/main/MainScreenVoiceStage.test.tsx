@@ -357,6 +357,26 @@ describe("MainScreenVoiceStage composer", () => {
     expect(surface.borderColor).toBe(lightColors.accent);
   });
 
+  it("fills the enabled send control with the accent and caps the field at 116", () => {
+    // Design-system composer contract: 46pt circular send in the accent with
+    // on-active-control ink, and the text field capped at 116pt.
+    const screen = renderStage(
+      <MainScreenVoiceStage {...createProps({})} />,
+    );
+
+    fireEvent.press(screen.getByLabelText("Show text input"));
+    const input = screen.getByPlaceholderText("Type a message");
+    expect(StyleSheet.flatten(input.props.style).maxHeight).toBe(116);
+
+    fireEvent.changeText(input, "Ready to send");
+    const send = StyleSheet.flatten(
+      screen.getByTestId("voice-text-primary-action").props.style,
+    );
+    expect(send.backgroundColor).toBe(lightColors.accent);
+    expect(send.width).toBe(46);
+    expect(send.borderRadius).toBe(23);
+  });
+
   it("keeps the orb in place while a prompt is blocked", () => {
     const onPress = jest.fn();
     const onSubmitTextMessage = jest.fn();

@@ -13,6 +13,9 @@ the complete Play Store translations are kept in a dedicated file under
 - Fixed the session details, conversation settings, and voice picker scrims
   using a fixed light dimming color instead of the theme's overlay, so they
   now match every other modal in both light and dark appearance.
+- The composer's send arrow now uses the white on-accent ink from the design
+  system instead of near-black, and the text field grows to 116 points before
+  scrolling.
 - Fixed successful local transcription crashing the iOS Release app when its
   JavaScript runtime does not provide relative-time formatting.
 - Fixed provider connection sheets occasionally freezing while returning to

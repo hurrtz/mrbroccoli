@@ -93,7 +93,7 @@ export const voiceTextInputPagerStyles = StyleSheet.create({
     ...textStyles.body,
     flex: 1,
     minHeight: 24,
-    maxHeight: 96,
+    maxHeight: 116,
     paddingVertical: 0,
     textAlignVertical: "top",
   },
