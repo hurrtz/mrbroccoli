@@ -30,7 +30,7 @@ import { SettingsGroup } from "./settings-primitives/SettingsGroup";
 import { SettingsRow } from "./settings-primitives/SettingsRow";
 
 type DrillInSettingsPage = Exclude<SettingsPage, "overview">;
-type OverviewPage = Exclude<DrillInSettingsPage, "local">;
+type OverviewPage = DrillInSettingsPage;
 
 type OverviewRow = {
   page: OverviewPage;

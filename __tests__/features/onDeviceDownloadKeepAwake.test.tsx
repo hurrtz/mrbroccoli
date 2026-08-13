@@ -3,9 +3,9 @@ import { fireEvent, waitFor } from "@testing-library/react-native";
 
 /**
  * The wake lock used to live on the Free setup wizard. Removing the wizard
- * moved downloading to this page and silently left the lock behind, so a
- * sleeping phone aborted multi-gigabyte downloads again. These tests pin the
- * lock to the surface that actually downloads.
+ * moved downloading into the stage pages and silently left the lock behind,
+ * so a sleeping phone aborted multi-gigabyte downloads again. These tests pin
+ * the lock to the shared lifecycle controller those pages mount.
  */
 
 const mockBeginDownload = jest.fn(() => Promise.resolve(true));
@@ -13,6 +13,19 @@ const mockEndDownload = jest.fn(() => Promise.resolve(true));
 
 const mockActivateKeepAwake = jest.fn(() => Promise.resolve());
 const mockDeactivateKeepAwake = jest.fn(() => Promise.resolve());
+const mockGetLocalCatalogInstallStatuses = jest.fn(
+  (_options?: { phonemeLanguages?: string[] }) => Promise.resolve({}),
+);
+const mockGetLocalModelBenchmarkResults = jest.fn(() => Promise.resolve({}));
+const mockSelectOfflineProfile = jest.fn((_params?: unknown) => ({
+  status: "unavailable",
+}));
+const mockGetAppliedOfflineProfileSettingsUpdate = jest.fn(
+  (_settings?: unknown, _profile?: unknown, _overrides?: unknown) => ({}),
+);
+const mockEvaluateOfflineProfileReadiness = jest.fn((_params?: unknown) => ({
+  ready: false,
+}));
 
 jest.mock("expo-keep-awake", () => ({
   activateKeepAwakeAsync: (...args: unknown[]) =>
@@ -50,7 +63,7 @@ jest.mock("../../src/services/localDeviceCapabilities", () => ({
     eligible: true,
     reason: null,
   })),
-  getLocalModelBenchmarkResults: jest.fn(() => Promise.resolve({})),
+  getLocalModelBenchmarkResults: () => mockGetLocalModelBenchmarkResults(),
   probeLocalDeviceCapabilities: jest.fn(() =>
     Promise.resolve({
       platform: "android",
@@ -64,17 +77,21 @@ jest.mock("../../src/services/localDeviceCapabilities", () => ({
   ),
 }));
 
-const mockGetLocalCatalogInstallStatuses = jest.fn(
-  (_options?: { phonemeLanguages?: string[] }) => Promise.resolve({}),
-);
-
 jest.mock("../../src/services/offlineProfileManager", () => ({
+  evaluateOfflineProfileReadiness: (params: unknown) =>
+    mockEvaluateOfflineProfileReadiness(params),
   getLocalCatalogInstallStatuses: (options?: { phonemeLanguages?: string[] }) =>
     mockGetLocalCatalogInstallStatuses(options),
 }));
 
 jest.mock("../../src/services/offlineProfile", () => ({
-  selectOfflineProfile: jest.fn(() => ({ status: "unavailable" })),
+  getAppliedOfflineProfileSettingsUpdate: (
+    settings: unknown,
+    profile: unknown,
+    overrides?: unknown,
+  ) =>
+    mockGetAppliedOfflineProfileSettingsUpdate(settings, profile, overrides),
+  selectOfflineProfile: (params: unknown) => mockSelectOfflineProfile(params),
 }));
 
 jest.mock("../../src/services/nativeSpeechCapabilities", () => ({
@@ -118,21 +135,20 @@ jest.mock("../../src/features/settings-core/useNativeVoiceOptions", () => ({
   }),
 }));
 
-import { OnDeviceSettingsPage } from "../../src/features/settings/pages/OnDeviceSettingsPage";
 import { LOCAL_MODEL_CATALOG } from "../../src/constants/localModels";
 import { DEFAULT_SETTINGS } from "../../src/types";
 import { renderWithProviders } from "../test-utils/renderWithProviders";
-import { NativeModules, Platform } from "react-native";
-import { createAutoSetupJob } from "../test-utils/autoSetupJobFixture";
+import { NativeModules, Platform, Pressable, View } from "react-native";
+import { useLocalModelSettings } from "../../src/features/settings-core/useLocalModelSettings";
+import { LocalModelAction } from "../../src/features/settings/settings-primitives/LocalModelRouteGroup";
 
 // The hook reads the module and the platform at call time, so installing the
 // stub here is enough and avoids mocking the bridge itself.
-(
-  NativeModules as unknown as Record<string, unknown>
-).MrBroccoliModelDownload = {
-  beginDownload: (...args: unknown[]) => mockBeginDownload(...(args as [])),
-  endDownload: (...args: unknown[]) => mockEndDownload(...(args as [])),
-};
+(NativeModules as unknown as Record<string, unknown>).MrBroccoliModelDownload =
+  {
+    beginDownload: (...args: unknown[]) => mockBeginDownload(...(args as [])),
+    endDownload: (...args: unknown[]) => mockEndDownload(...(args as [])),
+  };
 Object.defineProperty(Platform, "OS", { configurable: true, value: "android" });
 
 const kokoroModel = {
@@ -148,34 +164,45 @@ const kokoroModel = {
 } as never;
 
 function renderPage(params?: {
+  modelId?: (typeof LOCAL_MODEL_CATALOG)[number]["id"];
   onPreviewVoice?: jest.Mock;
+  onUpdate?: jest.Mock;
   settings?: typeof DEFAULT_SETTINGS;
 }) {
-  return renderWithProviders(
-    <OnDeviceSettingsPage
-      isPremium={false}
-      autoSetup={createAutoSetupJob()}
-      kokoroModel={kokoroModel}
-      onPreviewVoice={
-        params?.onPreviewVoice ?? jest.fn(() => Promise.resolve())
-      }
-      onUpdate={jest.fn()}
-      settings={params?.settings ?? DEFAULT_SETTINGS}
-    />,
+  const model = LOCAL_MODEL_CATALOG.find(
+    (candidate) => candidate.id === (params?.modelId ?? "qwen3-0.6b-q8"),
   );
+  if (!model) {
+    throw new Error("Missing local-model test fixture.");
+  }
+  function LifecycleHarness() {
+    const localModels = useLocalModelSettings({
+      active: true,
+      isPremium: false,
+      kokoroModel,
+      onPreviewVoice:
+        params?.onPreviewVoice ?? jest.fn(() => Promise.resolve()),
+      onUpdate: params?.onUpdate ?? jest.fn(),
+      settings: params?.settings ?? DEFAULT_SETTINGS,
+    });
+    return (
+      <View>
+        <LocalModelAction localModels={localModels} model={model} />
+        <Pressable
+          testID="select-local-model"
+          onPress={() => localModels.selectModel(model)}
+        />
+      </View>
+    );
+  }
+  return renderWithProviders(<LifecycleHarness />);
 }
 
 async function getLlmDownloadButton(
   screen: ReturnType<typeof renderPage>,
   modelId: string,
 ) {
-  const disclosure = await waitFor(() =>
-    screen.getByTestId("on-device-llm-disclosure-header-control"),
-  );
-  fireEvent.press(disclosure);
-  return waitFor(() =>
-    screen.getAllByTestId(`on-device-download-${modelId}`)[0],
-  );
+  return waitFor(() => screen.getByTestId(`local-model-download-${modelId}`));
 }
 
 beforeEach(() => {
@@ -183,21 +210,20 @@ beforeEach(() => {
   mockResolveDownload = undefined;
   mockDownloadSignal = undefined;
   mockGetLocalCatalogInstallStatuses.mockResolvedValue({});
+  mockGetLocalModelBenchmarkResults.mockResolvedValue({});
+  mockSelectOfflineProfile.mockReturnValue({ status: "unavailable" });
+  mockEvaluateOfflineProfileReadiness.mockReturnValue({ ready: false });
+  mockGetAppliedOfflineProfileSettingsUpdate.mockReturnValue({});
 });
 
 describe("on-device model downloads", () => {
-  it("keeps local model catalogues collapsed until the user opens one", async () => {
+  it("offers acquisition through the stage-owned lifecycle action", async () => {
     const firstLlm = LOCAL_MODEL_CATALOG.find(
       (model) => model.capability === "llm",
     );
     expect(firstLlm).toBeTruthy();
 
     const screen = renderPage();
-    await waitFor(() =>
-      screen.getByTestId("on-device-llm-disclosure-header-control"),
-    );
-    expect(screen.queryByTestId(`on-device-download-${firstLlm!.id}`)).toBeNull();
-
     const downloadButton = await getLlmDownloadButton(screen, firstLlm!.id);
     expect(downloadButton).toBeTruthy();
   });
@@ -264,7 +290,7 @@ describe("on-device model downloads", () => {
     fireEvent.press(downloadButton);
 
     const cancelButton = await waitFor(() =>
-      screen.getAllByTestId(`on-device-cancel-${firstLlm?.id}`)[0],
+      screen.getByTestId(`local-model-cancel-${firstLlm?.id}`),
     );
     expect(mockDownloadSignal?.aborted).toBe(false);
 
@@ -275,7 +301,7 @@ describe("on-device model downloads", () => {
     // user made deliberately.
     await waitFor(() =>
       expect(
-        screen.getAllByTestId(`on-device-download-${firstLlm?.id}`)[0],
+        screen.getByTestId(`local-model-download-${firstLlm?.id}`),
       ).toBeTruthy(),
     );
     await waitFor(() =>
@@ -298,16 +324,13 @@ describe("on-device model downloads", () => {
       },
     });
     const screen = renderPage({
+      modelId: "piper-ru-ru-dmitri",
       onPreviewVoice,
       settings: { ...DEFAULT_SETTINGS, localLanguages: ["ru"] },
     });
 
-    const disclosure = await waitFor(() =>
-      screen.getByTestId("on-device-tts-disclosure-header-control"),
-    );
-    fireEvent.press(disclosure);
     const testButton = await waitFor(() =>
-      screen.getAllByTestId("on-device-test-piper-ru-ru-dmitri")[0],
+      screen.getByTestId("local-model-test-piper-ru-ru-dmitri"),
     );
 
     fireEvent.press(testButton);
@@ -318,6 +341,69 @@ describe("on-device model downloads", () => {
         modelId: "piper-ru-ru-dmitri",
         previewLanguage: "ru",
         text: "Привет от Mr Broccoli.",
+      }),
+    );
+  });
+
+  it("persists a Free local selection only through a complete ready profile", async () => {
+    const onUpdate = jest.fn();
+    const llm = LOCAL_MODEL_CATALOG.find(
+      (model) => model.id === "qwen3-0.6b-q8",
+    )!;
+    const stt = LOCAL_MODEL_CATALOG.find(
+      (model) => model.id === "whisper-tiny",
+    )!;
+    const profile = {
+      languages: ["en"],
+      llm,
+      thoroughLlm: null,
+      stt,
+      tts: null,
+    };
+    mockGetLocalCatalogInstallStatuses.mockResolvedValue({
+      [llm.id]: { installed: true, path: "/models/llm", verified: true },
+      [stt.id]: { installed: true, path: "/models/stt", verified: true },
+    });
+    mockGetLocalModelBenchmarkResults.mockResolvedValue({
+      [llm.id]: { status: "viable" },
+      [stt.id]: { status: "viable" },
+    });
+    (mockSelectOfflineProfile as jest.Mock).mockReturnValue({
+      status: "ready",
+      profile,
+    });
+    mockEvaluateOfflineProfileReadiness.mockReturnValue({ ready: true });
+    (mockGetAppliedOfflineProfileSettingsUpdate as jest.Mock).mockReturnValue({
+      activeResponseMode: "free-offline",
+      freeOfflineSetupCompleted: true,
+      responseModes: [
+        {
+          id: "free-offline",
+          route: {
+            runtime: "local",
+            localModelId: llm.id,
+            provider: "openai",
+            model: llm.name,
+          },
+        },
+      ],
+    });
+
+    const screen = renderPage({ modelId: llm.id, onUpdate });
+    await waitFor(() =>
+      expect(mockGetLocalCatalogInstallStatuses).toHaveBeenCalled(),
+    );
+    fireEvent.press(screen.getByTestId("select-local-model"));
+
+    expect(mockGetAppliedOfflineProfileSettingsUpdate).toHaveBeenCalledWith(
+      DEFAULT_SETTINGS,
+      profile,
+      { quickLlmModelId: llm.id },
+    );
+    expect(onUpdate).toHaveBeenCalledWith(
+      expect.objectContaining({
+        activeResponseMode: "free-offline",
+        freeOfflineSetupCompleted: true,
       }),
     );
   });

@@ -70,8 +70,9 @@ jest.mock("../../../src/services/offlineProfile", () => ({
     tts?: unknown;
   }) =>
     [profile.llm, profile.stt, profile.tts].filter((model) => model != null),
-  applyOfflineProfileToSettings: (settings: Settings) => ({
-    ...settings,
+  getAppliedOfflineProfileSettingsUpdate: (settings: Settings) => ({
+    activeResponseMode: "free-local",
+    freeOfflineSetupCompleted: true,
     responseModes: [
       {
         id: "free-local",
@@ -82,6 +83,7 @@ jest.mock("../../../src/services/offlineProfile", () => ({
           model: "Qwen3 0.6B",
         },
       },
+      ...settings.responseModes,
     ],
   }),
 }));

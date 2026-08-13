@@ -64,6 +64,14 @@ the complete Play Store translations are kept in a dedicated file under
   with live state beneath every row. Listening uses compact input and language
   sheets plus one system/local/provider route list; Free users can choose usable
   on-device recognition while provider routes remain visibly locked.
+- Thinking now uses four numbered answering-model slots with focused provider,
+  model, and effort sheets. Local response models download, test, select, and
+  swipe-remove in that page; Model Council and the system prompt move into
+  quiet sheets. The retired On-device page is gone: setup lives under App &
+  diagnostics, speech models live under Listening and Speaking, and storage
+  cleanup lives under Data & privacy. Free local choices become active only as
+  a complete installed and tested profile, preventing Settings from claiming a
+  route is in use while the runtime remains blocked.
 - Connections now uses one manifest-ordered provider list with capability and
   health summaries, opening credentials and tests in a focused sheet. Search
   uses a clear Nobody route followed by provider routes and shows quality

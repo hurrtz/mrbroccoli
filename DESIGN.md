@@ -251,6 +251,13 @@ artifact. Device selection has four stages:
 3. load and benchmark the exact artifact on the current device; and
 4. construct one coherent offline profile from compatible LLM/STT/TTS routes.
 
+Manual model management is distributed across the owning stage pages rather
+than exposed through a second device control plane: Thinking owns local LLMs,
+Listening owns local STT, Speaking owns local TTS, and Data & privacy owns
+removal-only storage cleanup. For Free, a stage-page choice is promoted to the
+persisted runtime only after the resulting complete profile passes the same
+install and current-device benchmark readiness check as automatic setup.
+
 On iOS, Sherpa extracts speech archives with an explicit safe-entry policy:
 empty, `.` and `./` root records are ignored; every other entry must be a
 relative regular file or directory without parent traversal, symbolic links, or

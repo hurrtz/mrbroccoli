@@ -38,9 +38,7 @@ import {
 } from "../../src/services/runtimeCapabilityOverrides";
 import { createAutoSetupJob } from "../test-utils/autoSetupJobFixture";
 import { getLocalCatalogInstallStatuses } from "../../src/services/offlineProfileManager";
-import {
-  getLocalModelBenchmarkResults,
-} from "../../src/services/localDeviceCapabilities";
+import { getLocalModelBenchmarkResults } from "../../src/services/localDeviceCapabilities";
 
 const NativeDialogType = NativeDialog as unknown as React.ComponentType<any>;
 const hiddenIconQuery = { includeHiddenElements: true } as const;
@@ -302,6 +300,32 @@ describe("SettingsModal", () => {
     });
   });
 
+  it("keeps Thinking's local model lifecycle usable and locks hosted routes in place for Free", async () => {
+    const onOpenPremium = jest.fn();
+    const screen = renderSettingsModal({ isPremium: false, onOpenPremium });
+
+    fireEvent.press(screen.getByTestId("settings-overview-row-thinking"));
+
+    await waitFor(() => {
+      expect(screen.getByTestId("thinking-settings-page")).toBeTruthy();
+    });
+    expect(onOpenPremium).not.toHaveBeenCalled();
+
+    fireEvent.press(screen.getByTestId("thinking-add-model"));
+
+    await waitFor(() => {
+      expect(screen.getByTestId("thinking-local-models")).toBeTruthy();
+      expect(screen.getByTestId("thinking-provider-openai")).toBeTruthy();
+    });
+    expect(screen.getByLabelText("OpenAI").props.accessibilityState).toEqual({
+      checked: false,
+      disabled: true,
+    });
+    expect(
+      screen.getAllByTestId(/^local-model-download-/).length,
+    ).toBeGreaterThan(0);
+  });
+
   it("keeps provider routes visible but locked in Free Connections", async () => {
     const onOpenPremium = jest.fn();
     const screen = renderSettingsModal({ isPremium: false, onOpenPremium });
@@ -428,9 +452,7 @@ describe("SettingsModal", () => {
       expect(screen.getByTestId("archived-conversations-row")).toBeTruthy();
     });
     fireEvent.press(screen.getByTestId("archived-conversations-row"));
-    expect(
-      screen.getByTestId("disconnect-conversation-archive"),
-    ).toBeTruthy();
+    expect(screen.getByTestId("disconnect-conversation-archive")).toBeTruthy();
 
     fireEvent.press(screen.getByTestId("disconnect-conversation-archive"));
     expect(disconnect).toHaveBeenCalledTimes(1);
@@ -554,8 +576,12 @@ describe("SettingsModal", () => {
     await waitFor(() => {
       expect(screen.getByText("Playback")).toBeTruthy();
       expect(screen.getByText("Who speaks")).toBeTruthy();
-      expect(screen.getByTestId("settings-tts-route-kokoro-multilingual")).toBeTruthy();
-      expect(screen.getByTestId("settings-tts-route-piper-en-us-kristin")).toBeTruthy();
+      expect(
+        screen.getByTestId("settings-tts-route-kokoro-multilingual"),
+      ).toBeTruthy();
+      expect(
+        screen.getByTestId("settings-tts-route-piper-en-us-kristin"),
+      ).toBeTruthy();
       expect(screen.queryByText("Spoken Replies")).toBeNull();
       expect(screen.queryByText("Fallback routes")).toBeNull();
     });
@@ -1216,64 +1242,36 @@ describe("SettingsModal", () => {
         "Thinking",
       );
       expect(screen.getByText("Model Selection")).toBeTruthy();
-      expect(screen.getByText("System Prompt")).toBeTruthy();
+      expect(screen.getAllByText("System Prompt")).toHaveLength(2);
       expect(screen.queryByText("Provider")).toBeNull();
-      expect(screen.getAllByText("OpenAI").length).toBeGreaterThan(0);
+      expect(screen.getByTestId("thinking-slot-mode-1")).toBeTruthy();
+      expect(screen.getByTestId("thinking-add-model")).toBeTruthy();
       expect(screen.queryByText("Adaptive Length")).toBeNull();
       expect(screen.queryByText("Response Tone")).toBeNull();
     });
 
-    expect(
-      StyleSheet.flatten(
-        screen.getByTestId("settings-model-provider-mode-1-value").props.style,
-      ).textAlign,
-    ).toBe("right");
-    expect(
-      StyleSheet.flatten(
-        screen.getByTestId("thinking-settings-page").props.style,
-      ).gap,
-    ).toBe(24);
-    expect(
-      StyleSheet.flatten(screen.getByTestId("system-prompt-editor").props.style)
-        .width,
-    ).toBe("100%");
-    expect(screen.queryByText("Remove model")).toBeNull();
-    expect(screen.getAllByLabelText("Remove model").length).toBeGreaterThan(0);
+    fireEvent.press(screen.getByTestId("thinking-slot-mode-1"));
+    expect(screen.getByTestId("thinking-slot-sheet")).toBeTruthy();
+    expect(screen.getByTestId("thinking-slot-provider")).toBeTruthy();
+    expect(screen.getByTestId("thinking-slot-model")).toBeTruthy();
+    expect(screen.getByTestId("thinking-remove-model")).toBeTruthy();
+    fireEvent.press(screen.getAllByLabelText("Dismiss").at(-1)!);
+
     expect(
       screen.queryByText(
         "Shape the hidden guidance the model receives before every reply.",
       ),
     ).toBeNull();
 
-    const modelSelectionInfoButton = screen.getByLabelText(
-      "About model selection",
-    );
-    fireEvent.press(modelSelectionInfoButton);
-    let infoModal = screen.UNSAFE_getByType(NativeDialogType);
-    expect(infoModal.props.visible).toBe(true);
-    expect(infoModal.props.title).toBe("Model Selection");
-    expect(
-      screen.getByText(
-        "Each model card becomes a choice on the home screen. Configure its provider, model, and optional effort level, then switch cards to choose which model answers next.",
-      ),
-    ).toBeTruthy();
-    act(() => infoModal.props.footer[0].onPress());
-    expect(screen.UNSAFE_queryByType(NativeDialogType)).toBeNull();
-
-    const systemPromptInfoButton = screen.getByLabelText(
-      "About the system prompt",
-    );
-    fireEvent.press(systemPromptInfoButton);
-    infoModal = screen.UNSAFE_getByType(NativeDialogType);
-    expect(infoModal.props.visible).toBe(true);
-    expect(infoModal.props.title).toBe("System Prompt");
+    fireEvent.press(screen.getByTestId("thinking-system-prompt-row"));
+    expect(screen.getByTestId("thinking-system-prompt-sheet")).toBeTruthy();
     expect(
       screen.getByText(
         "Shape the hidden guidance the model receives before every reply.",
       ),
     ).toBeTruthy();
-    act(() => infoModal.props.footer[0].onPress());
-    expect(screen.UNSAFE_queryByType(NativeDialogType)).toBeNull();
+    expect(screen.getByTestId("system-prompt-editor")).toBeTruthy();
+    fireEvent.press(screen.getAllByLabelText("Dismiss").at(-1)!);
 
     fireEvent.press(screen.getByLabelText("Back to overview"));
     fireEvent.press(screen.getByLabelText("Open Search"));
@@ -1539,9 +1537,7 @@ describe("SettingsModal", () => {
     );
     fireEvent.press(screen.getByTestId("settings-tts-provider-mistral-voice"));
     expect(screen.getAllByText("custom-voice").length).toBeGreaterThan(0);
-    expect(
-      screen.getByText(/Voices could not be refreshed/),
-    ).toBeTruthy();
+    expect(screen.getByText(/Voices could not be refreshed/)).toBeTruthy();
     expect(screen.getByText(/Reason: Network unavailable/)).toBeTruthy();
     expect(onUpdateProviderTtsVoice).not.toHaveBeenCalled();
   });
@@ -1606,16 +1602,16 @@ describe("SettingsModal", () => {
     fireEvent.press(
       screen.getByTestId("settings-tts-provider-elevenlabs-voice"),
     );
-    expect(screen.getByText("2 voices available from ElevenLabs.")).toBeTruthy();
+    expect(
+      screen.getByText("2 voices available from ElevenLabs."),
+    ).toBeTruthy();
     expect(screen.getAllByText("Alex").length).toBeGreaterThan(0);
     expect(screen.getByText("British · male · premade")).toBeTruthy();
 
     fireEvent.press(screen.getByTestId("speaking-voice-picker-refresh"));
     expect(refresh).toHaveBeenCalledTimes(1);
 
-    fireEvent.press(
-      screen.getByTestId("speaking-voice-picker-option-voice-2"),
-    );
+    fireEvent.press(screen.getByTestId("speaking-voice-picker-option-voice-2"));
 
     expect(onUpdateProviderTtsVoice).toHaveBeenCalledWith(
       "elevenlabs",
@@ -1659,7 +1655,9 @@ describe("SettingsModal", () => {
     );
     expect(screen.getAllByText("Rachel (built-in)").length).toBeGreaterThan(0);
     expect(screen.getByText(/Account voices could not be loaded/)).toBeTruthy();
-    expect(screen.getByText(/Reason: Missing voices_read permission/)).toBeTruthy();
+    expect(
+      screen.getByText(/Reason: Missing voices_read permission/),
+    ).toBeTruthy();
     expect(screen.getByText(/enable Voices → Read/)).toBeTruthy();
   });
 
@@ -1830,9 +1828,7 @@ describe("SettingsModal", () => {
       await clearAction.onPress();
     });
     await waitFor(() => {
-      expect(
-        screen.queryByText("LLM · gpt-5.6-sol · high"),
-      ).toBeNull();
+      expect(screen.queryByText("LLM · gpt-5.6-sol · high")).toBeNull();
     });
   });
 });

@@ -23,9 +23,10 @@ last_validated_sha: 7db5c94
 Settings exposes deep control without placing provider machinery on the main
 conversation surface. Its overview has seven primary pages: Connections,
 Thinking, Search, Listening, Speaking, Data & privacy, and App & diagnostics.
-The on-device model catalogue remains available as a direct setup target while
-model acquisition and selection are also presented in the stage that uses each
-model.
+There is no standalone device page. On-device acquisition and selection belong
+to the stage that uses each model, bulk setup belongs to App & diagnostics and
+the introduction, languages belong to Listening, and model cleanup belongs to
+Data & privacy.
 
 The historical `Ant` filename prefix remains for import stability. The app does
 not depend on Ant Design; controls are React Native-owned and come from the
@@ -52,23 +53,17 @@ shared design system and settings primitives.
 
 ## Edition Boundary
 
-Free and Premium users see the same seven-page overview. Connections, Search,
-Listening, and Speaking keep the same route structure in both editions: Free
-sees cloud provider routes as locked ghost rows followed by one Premium band,
-while still retaining usable local or disabled choices. The pages listed by
-`PREMIUM_SETTINGS_PAGES` still render an upgrade explanation for Free instead
-of exposing their controls. Data & privacy, App & diagnostics, and the direct
-on-device catalogue remain available to both editions.
+Free and Premium users see the same seven-page overview and the same structure
+inside every page. Free sees cloud provider routes and Premium-only controls as
+locked rows followed by a Premium band, while system and on-device routes stay
+fully usable. Premium unlocks those controls in place.
 
 **Decision:** Edition checks live in page routing or within a route group;
 overview visibility is never an authorization boundary.
 
-Callers may name a landing page directly, which is how setup reaches the
-on-device catalogue the overview does not name. The landing page is recomputed
-each time the modal opens and a Free caller naming a page-level Premium target
-lands on the overview, so a deep link can never become a way past the edition
-boundary. A closed modal clears its focus target: the next plain open would
-otherwise inherit wherever the last deep link went.
+Callers may name any of the seven landing pages directly. The target is
+recomputed each time the modal opens, and a closed modal clears it so the next
+plain open cannot inherit the preceding deep link.
 
 ## Readiness and Validation
 
@@ -102,7 +97,10 @@ capability healthy. The UI shows the capability that was actually tested.
   summaries. Premium opens credentials, provider information, and
   capability-specific connection tests in a modal sheet; Free keeps every
   provider visible as a locked route.
-- Thinking: response modes, provider/local route, model, and supported effort.
+- Thinking: up to four numbered coexisting answering-model slots. Each opens a
+  focused sheet for provider/local route, exact model, and that model's effort
+  ladder. Local acquisition, benchmark, selection, and swipe-removal happen in
+  the model chooser; Model Council and the system prompt live in quiet sheets.
 - Listening: input mode, conversation languages, and a unified system, local,
   or provider recognition route group. Downloaded local models cannot be
   selected until a successful device benchmark marks them viable.
@@ -113,11 +111,6 @@ capability healthy. The UI shows the capability that was actually tested.
   changing the saved selection. Download, cancel, benchmark, selection, and
   swipe-removal for local voices stay in this route group. Speech replay-cache
   removal is the only Storage action on this page.
-- On-device: device assessment, curated artifacts, download/test/removal, Free
-  profile choices, and advanced viable overrides. Its Local responses, local
-  speech recognition, and local voices catalogues are collapsed by default so
-  the device assessment and chosen languages stay legible; starting a download
-  expands the owning catalogue to keep progress and recovery visible.
 - Search: a Nobody route plus search-provider routes, with result count, depth,
   and provider-specific search mode shown only for the active route. Nobody
   remains usable in both editions; Free keeps provider routes visibly locked.
@@ -150,6 +143,11 @@ capability healthy. The UI shows the capability that was actually tested.
   or primary actions to disappear.
 - Every page uses semantic colors, centralized typography, and shared icon
   tokens.
+- Free local-model changes are applied as one ready profile. A stage may record
+  a pending preference while a required artifact is absent or untested, but it
+  must not display or persist that choice as the active Free runtime until the
+  complete LLM/STT/TTS profile is installed and viable. Hosted slots survive
+  Free mode for entitlement restoration, within the same four-slot limit.
 - Settings groups use one bordered inset surface with row dividers rather than
   nesting a separate card around every row. Route choices expose native radio
   semantics; local-model removal remains an explicit swipe action. Removing a

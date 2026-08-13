@@ -43,10 +43,10 @@ describe("useMainScreenUiState", () => {
     const { result } = renderHook(() => useMainScreenUiState());
 
     act(() => {
-      result.current.openSettings(undefined, undefined, "local");
+      result.current.openSettings(undefined, undefined, "thinking");
     });
 
-    expect(result.current.settingsFocusPage).toBe("local");
+    expect(result.current.settingsFocusPage).toBe("thinking");
 
     act(() => {
       result.current.closeSettings();

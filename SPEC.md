@@ -91,6 +91,8 @@ boundary.
 - Voice, text, and image-assisted turns share one conversation model.
 - A response mode is a stable user-facing slot whose route selects a provider
   model or a local model and, where supported, a reasoning-effort option.
+- Thinking exposes at most four coexisting response-mode slots so their order
+  remains a legible home-screen choice across native layouts.
 - Changing response modes inside a conversation preserves the conversation
   context; each assistant message records the route that actually answered.
 - Long threads use a rolling summary plus a bounded recent window instead of

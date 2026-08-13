@@ -1,9 +1,5 @@
 import React from "react";
-import {
-  isPremiumSettingsPage,
-  type SettingsModalProps,
-  type SettingsPage,
-} from "../settings-core/types";
+import type { SettingsModalProps, SettingsPage } from "../settings-core/types";
 import { useProviderValidationState } from "../settings-core/useProviderValidationState";
 import { useSettingsController } from "../settings-core/useSettingsController";
 import { useLocalModelSettings } from "../settings-core/useLocalModelSettings";
@@ -23,14 +19,8 @@ import { ListeningSettingsPage } from "./pages/ListeningSettingsPage";
 import { SearchSettingsPage } from "./pages/SearchSettingsPage";
 import { SpeakingSettingsPage } from "./pages/SpeakingSettingsPage";
 import { ThinkingSettingsPage } from "./pages/ThinkingSettingsPage";
-import { OnDeviceSettingsPage } from "./pages/OnDeviceSettingsPage";
 import { styles } from "./styles";
-import { Text, View } from "react-native";
-import { Button } from "../../design-system/NativeControls";
-import { useLocalization } from "../../i18n";
-import { useTheme } from "../../theme/ThemeContext";
-import { fonts } from "../../theme/typography";
-import { AntSettingsCard } from "./AntSettingsPrimitives";
+import { View } from "react-native";
 
 interface AntSettingsPageContentProps {
   activePage: SettingsPage;
@@ -52,43 +42,6 @@ function DrillInPage({
     <View testID={`settings-page-${page}`} style={styles.drillInPage}>
       {children}
     </View>
-  );
-}
-
-function LockedSettingsPage({
-  onOpenPremium,
-  page,
-}: {
-  onOpenPremium: () => void;
-  page: Exclude<SettingsPage, "overview">;
-}) {
-  const { colors } = useTheme();
-  const { t } = useLocalization();
-  return (
-    <DrillInPage page={page}>
-      <AntSettingsCard>
-        <Text
-          style={{
-            color: colors.textSecondary,
-            fontFamily: fonts.body,
-            fontSize: 15,
-            lineHeight: 22,
-          }}
-        >
-          {t("premiumDescription")}
-        </Text>
-        <Button type="primary" onPress={onOpenPremium}>
-          <Text
-            style={{
-              color: colors.onActiveControl,
-              fontFamily: fonts.bodyMedium,
-            }}
-          >
-            {t("upgradeToPremium")}
-          </Text>
-        </Button>
-      </AntSettingsCard>
-    </DrillInPage>
   );
 }
 
@@ -118,7 +71,8 @@ export function AntSettingsPageContent({
   const localModels = useLocalModelSettings({
     active:
       props.visible &&
-      (activePage === "listening" ||
+      (activePage === "thinking" ||
+        activePage === "listening" ||
         activePage === "speaking" ||
         activePage === "data"),
     isPremium: props.isPremium,
@@ -128,19 +82,6 @@ export function AntSettingsPageContent({
     settings,
     storePromoPreview: props.storePromoLocalDevicePreview,
   });
-
-  if (
-    !props.isPremium &&
-    activePage !== "overview" &&
-    isPremiumSettingsPage(activePage)
-  ) {
-    return (
-      <LockedSettingsPage
-        onOpenPremium={props.onOpenPremium}
-        page={activePage}
-      />
-    );
-  }
 
   switch (activePage) {
     case "overview":
@@ -202,6 +143,11 @@ export function AntSettingsPageContent({
       return (
         <DrillInPage page="thinking">
           <ThinkingSettingsPage
+            allLlmProviders={PROVIDER_ORDER.filter(
+              (provider) => PROVIDER_LLM_SUPPORT[provider] === "provider",
+            )}
+            isPremium={props.isPremium}
+            localModels={localModels}
             settings={settings}
             llmProviders={
               props.storePromoLocalDevicePreview
@@ -211,7 +157,9 @@ export function AntSettingsPageContent({
             onUpdate={onUpdate}
             onUpdateResponseModeRoute={onUpdateResponseModeRoute}
             onAddResponseMode={onAddResponseMode}
+            onOpenPremium={props.onOpenPremium}
             onRemoveResponseMode={onRemoveResponseMode}
+            onTextInputFocus={controller.handleTextInputFocus}
           />
         </DrillInPage>
       );
@@ -272,20 +220,6 @@ export function AntSettingsPageContent({
           />
         </DrillInPage>
       );
-    case "local":
-      return (
-        <DrillInPage page="local">
-          <OnDeviceSettingsPage
-            autoSetup={props.autoSetup}
-            settings={settings}
-            isPremium={props.isPremium}
-            kokoroModel={kokoroModel}
-            storePromoPreview={props.storePromoLocalDevicePreview === true}
-            onUpdate={onUpdate}
-            onPreviewVoice={props.onPreviewVoice}
-          />
-        </DrillInPage>
-      );
     case "app":
       return (
         <DrillInPage page="app">
@@ -311,9 +245,7 @@ export function AntSettingsPageContent({
             settings={settings}
             onUpdate={onUpdate}
             onOpenPremium={props.onOpenPremium}
-            onOpenArchivedConversations={
-              props.onOpenArchivedConversations
-            }
+            onOpenArchivedConversations={props.onOpenArchivedConversations}
             conversationArchive={props.conversationArchive}
             onCreateAppDataBackup={props.onCreateAppDataBackup}
             onRestoreAppDataBackup={props.onRestoreAppDataBackup}

@@ -154,8 +154,8 @@ what Premium adds.
 The automatic setup step carries the shared `AutoSetupCard` with its header
 hidden — the step title and body already say what it is. The job behind it
 lives above every screen that shows it (`useAutoSetupJob` at the composition
-root): the introduction's step, the top of On-device AI settings, and the
-App & diagnostics setup group plus the home-screen `BackgroundTaskBar` are
+root): the introduction's step and the App & diagnostics setup group plus the
+home-screen `BackgroundTaskBar` are
 views of one state, so leaving the introduction mid-install keeps the download
 running and reachable. Its six
 states run offer → scanning → proposal → installing → done or failed; nothing
@@ -209,9 +209,10 @@ letting someone hear the app in their own language argues for setting it up
 better than a claim does.
 
 The introduction is opened from its banner, never as a side effect of attempting
-a turn. Provider keys are entered in the settings provider panel and local
-models are managed on the on-device settings page; blocked-route notices route
-there rather than duplicating setup or hijacking the introduction.
+a turn. Provider keys are entered under Connections; manual local LLM, STT, and
+TTS acquisition belongs to Thinking, Listening, and Speaking respectively.
+Blocked Free-runtime notices lead to the shared automatic setup under App &
+diagnostics rather than duplicating setup or hijacking the introduction.
 
 Speech-input readiness follows the selected backend. The local route reads
 `localSttModelId` directly; provider picker state is not evidence that a
@@ -234,12 +235,10 @@ app is in front. iOS needs no service: its long transfers already run on a
 background URL session.
 
 **Decision:** Every onboarding action opens the settings page that owns the
-work, not settings in general. The download action in particular opens the
-on-device page instead of starting a headless download: that page owns
-progress, verification and failure, and a download with no visible surface
-looks like a button that did nothing. A Free caller asking for a Premium page
-lands on the settings overview rather than a locked screen, so the speech steps
-route Free users to the on-device page.
+work, not settings in general. Manual response, recognition, and voice actions
+open Thinking, Listening, and Speaking, where download progress, verification,
+and failure remain visible. The background automatic-setup row opens App &
+diagnostics, the page that owns that shared job.
 
 **Decision:** Setup stopped being a gate. Requiring a multi-gigabyte download
 before the app could be seen made the setup cost the first impression. The

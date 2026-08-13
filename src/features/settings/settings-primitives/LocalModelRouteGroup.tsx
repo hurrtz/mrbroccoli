@@ -42,7 +42,7 @@ function benchmarkLabelKey(
   }
 }
 
-function ModelAction({
+export function LocalModelAction({
   localModels,
   model,
 }: {
@@ -99,7 +99,7 @@ function ModelAction({
   );
 }
 
-function getModelMeta(
+export function getLocalModelMeta(
   model: LocalModelDefinition,
   localModels: LocalModelSettingsController,
   t: ReturnType<typeof useLocalization>["t"],
@@ -127,6 +127,16 @@ function getModelMeta(
   return `${t(benchmarkLabelKey(model, localModels))} · ${formatBytes(
     model.installedBytes,
   )}`;
+}
+
+export function isLocalModelViable(
+  model: LocalModelDefinition,
+  localModels: LocalModelSettingsController,
+) {
+  return (
+    localModels.installs[model.id]?.verified === true &&
+    localModels.benchmarks[model.id]?.status === "viable"
+  );
 }
 
 export function LocalModelRouteGroup({
@@ -196,18 +206,18 @@ export function LocalModelRouteGroup({
       />
       {models.map((model) => {
         const install = localModels.installs[model.id];
-        const viable =
-          install?.verified === true &&
-          localModels.benchmarks[model.id]?.status === "viable";
+        const viable = isLocalModelViable(model, localModels);
         const modelBusy = localModels.busy?.modelId === model.id;
         return (
           <RouteOptionRow
             key={model.id}
             testID={`settings-${capability}-route-${model.id}`}
-            action={<ModelAction localModels={localModels} model={model} />}
+            action={
+              <LocalModelAction localModels={localModels} model={model} />
+            }
             disabled={!viable || modelBusy}
             label={`${model.name} · ${t("settingsOnDevice")}`}
-            meta={getModelMeta(model, localModels, t)}
+            meta={getLocalModelMeta(model, localModels, t)}
             selected={localModels.isModelSelected(model)}
             onRemove={
               install?.verified && !modelBusy

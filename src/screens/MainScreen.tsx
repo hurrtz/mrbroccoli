@@ -214,8 +214,7 @@ export function MainScreen() {
   });
 
   const [styleSheetVisible, setStyleSheetVisible] = React.useState(false);
-  const [drawerArchivedOnOpen, setDrawerArchivedOnOpen] =
-    React.useState(false);
+  const [drawerArchivedOnOpen, setDrawerArchivedOnOpen] = React.useState(false);
   const {
     handleInputSurfaceChange,
     handleTextMessageChange,
@@ -912,28 +911,18 @@ export function MainScreen() {
         },
         onInstallLocal: () => {
           closeIntro();
-          // The on-device page owns downloading, progress and verification;
-          // firing a headless download here would leave it invisible.
-          openSettings(undefined, undefined, "local");
+          openSettings(undefined, undefined, "thinking");
         },
         onOpenPremium: () => {
           setPremiumModalVisible(true);
         },
         onOpenStt: () => {
           closeIntro();
-          openSettings(
-            undefined,
-            "stt",
-            freeOffline.entitlement.isPremium ? "listening" : "local",
-          );
+          openSettings(undefined, "stt", "listening");
         },
         onOpenTts: () => {
           closeIntro();
-          openSettings(
-            undefined,
-            "tts",
-            freeOffline.entitlement.isPremium ? "speaking" : "local",
-          );
+          openSettings(undefined, "tts", "speaking");
         },
         t,
         visible: introVisible,
@@ -960,7 +949,7 @@ export function MainScreen() {
                         .filter(Boolean)
                         .join(" · "),
                 fraction: autoSetup.fraction,
-                onPress: () => openSettings(undefined, undefined, "local"),
+                onPress: () => openSettings(undefined, undefined, "app"),
                 title:
                   autoSetup.state === "failed"
                     ? t("autoSetupBarFailed")
@@ -1079,7 +1068,7 @@ export function MainScreen() {
           onInterruptPlayback: handleInterruptPlayback,
           onStopPlayback: handleStopPlayback,
           onResolvePromptBlock: freeRuntimeBlocked
-            ? () => openSettings(undefined, undefined, "local")
+            ? () => openSettings(undefined, undefined, "app")
             : providerRouteBlocked
               ? handleOpenProviderSettings
               : handleOpenSpeakingSettings,

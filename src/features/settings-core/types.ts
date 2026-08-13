@@ -27,7 +27,7 @@ import {
 export interface SettingsModalProps {
   visible: boolean;
   suspended?: boolean;
-  /** The automatic on-device setup job; On-device AI leads with its card. */
+  /** The automatic on-device setup job shown under App & diagnostics. */
   autoSetup: AutoSetupJobState;
   isPremium: boolean;
   developmentEntitlementMode: DevelopmentEntitlementMode | null;
@@ -93,18 +93,9 @@ export type SettingsPage =
   | "thinking"
   | "listening"
   | "speaking"
-  | "local"
   | "search"
   | "data"
   | "app";
-
-export const PREMIUM_SETTINGS_PAGES = [
-  "thinking",
-] as const satisfies readonly SettingsPage[];
-
-export function isPremiumSettingsPage(page: SettingsPage) {
-  return (PREMIUM_SETTINGS_PAGES as readonly SettingsPage[]).includes(page);
-}
 
 export type TextInputFocusHandler = NonNullable<
   React.ComponentProps<typeof TextInput>["onFocus"]

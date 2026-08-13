@@ -59,12 +59,12 @@ functional acceptance. Device verdicts are added as the goal progresses.
 | `AntSettingsCard` | `src/features/settings/settings-primitives/SettingsCards.tsx` | mapped |
 | `AntSwitchRow` | `src/features/settings/settings-primitives/SettingsFields.tsx` | mapped |
 | `AntTextArea` | `src/features/settings/settings-primitives/SettingsFields.tsx` | mapped |
-| `IconAction` | not yet implemented as the approved settings primitive | missing |
-| `PremiumBand` | not yet implemented as the approved settings primitive | missing |
-| `RouteOptionRow` | not yet implemented as the approved settings primitive | missing |
+| `IconAction` | `src/features/settings/settings-primitives/IconAction.tsx` | mapped |
+| `PremiumBand` | `src/features/settings/settings-primitives/PremiumBand.tsx` | mapped |
+| `RouteOptionRow` | `src/features/settings/settings-primitives/RouteOptionRow.tsx` | mapped |
 | `RuntimeReadiness` | `src/features/settings/settings-primitives/RuntimeReadiness.tsx` | mapped |
-| `SettingsGroup` | not yet implemented as the approved settings primitive | missing |
-| `SettingsRow` | not yet implemented as the approved settings primitive | missing |
+| `SettingsGroup` | `src/features/settings/settings-primitives/SettingsGroup.tsx` | mapped |
+| `SettingsRow` | `src/features/settings/settings-primitives/SettingsRow.tsx` | mapped |
 | `AppWordmark` | `src/components/AppWordmark.tsx` | mapped |
 | `BackgroundTaskBar` | `src/design-system/BackgroundTaskBar.tsx` | mapped |
 | `Composer` | `src/screens/main/voiceTextInputPager/InputSurfacePages.tsx` | mapped through native composer composition |

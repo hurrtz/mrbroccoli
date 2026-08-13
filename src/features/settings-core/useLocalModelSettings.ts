@@ -36,8 +36,15 @@ import {
   probeNativeSpeechCapabilities,
   type NativeSpeechCapabilities,
 } from "../../services/nativeSpeechCapabilities";
-import { getLocalCatalogInstallStatuses } from "../../services/offlineProfileManager";
-import { selectOfflineProfile } from "../../services/offlineProfile";
+import {
+  evaluateOfflineProfileReadiness,
+  getLocalCatalogInstallStatuses,
+} from "../../services/offlineProfileManager";
+import {
+  getAppliedOfflineProfileSettingsUpdate,
+  selectOfflineProfile,
+  type OfflineProfileOverrides,
+} from "../../services/offlineProfile";
 import { benchmarkKokoroModel } from "../../services/kokoroTts";
 import { buildStorePromoLocalDeviceSnapshot } from "../../services/storePromoPresentation";
 import type {
@@ -222,32 +229,62 @@ export function useLocalModelSettings({
     );
   }, [settings.localLanguages, snapshot]);
 
-  const selectedFreeProfile = React.useMemo(() => {
-    if (isPremium || !snapshot) {
-      return null;
-    }
-    const result = selectOfflineProfile({
-      languages: settings.localLanguages,
-      snapshot,
-      installedModelIds: new Set(
-        Object.entries(installs)
-          .filter(([, status]) => status?.verified)
-          .map(([modelId]) => modelId as LocalModelId),
-      ),
+  const getReadyFreeProfileUpdate = React.useCallback(
+    (overrides: OfflineProfileOverrides) => {
+      if (isPremium || !snapshot) {
+        return null;
+      }
+      const selection = selectOfflineProfile({
+        languages: settings.localLanguages,
+        snapshot,
+        installedModelIds: new Set(
+          Object.entries(installs)
+            .filter(([, status]) => status?.verified)
+            .map(([modelId]) => modelId as LocalModelId),
+        ),
+        benchmarks,
+        overrides,
+        nativeSttEligible: nativeSpeechCapabilities?.nativeSttEligible,
+      });
+      if (selection.status !== "ready") {
+        return null;
+      }
+      const readiness = evaluateOfflineProfileReadiness({
+        profile: selection.profile,
+        snapshot,
+        installs,
+        benchmarks,
+      });
+      return readiness.ready
+        ? getAppliedOfflineProfileSettingsUpdate(
+            settings,
+            selection.profile,
+            overrides,
+          )
+        : null;
+    },
+    [
       benchmarks,
-      overrides: settings.freeOfflineProfileOverrides,
-      nativeSttEligible: nativeSpeechCapabilities?.nativeSttEligible,
-    });
-    return result.status === "ready" ? result.profile : null;
-  }, [
-    benchmarks,
-    installs,
-    isPremium,
-    nativeSpeechCapabilities?.nativeSttEligible,
-    settings.freeOfflineProfileOverrides,
-    settings.localLanguages,
-    snapshot,
-  ]);
+      installs,
+      isPremium,
+      nativeSpeechCapabilities?.nativeSttEligible,
+      settings,
+      snapshot,
+    ],
+  );
+
+  const applyFreeOverrides = React.useCallback(
+    (overrides: OfflineProfileOverrides) => {
+      const readyUpdate = getReadyFreeProfileUpdate(overrides);
+      onUpdate(
+        readyUpdate ?? {
+          freeOfflineSetupCompleted: false,
+          freeOfflineProfileOverrides: overrides,
+        },
+      );
+    },
+    [getReadyFreeProfileUpdate, onUpdate],
+  );
 
   const toggleLanguage = React.useCallback(
     (language: SpeechLanguage) => {
@@ -416,30 +453,18 @@ export function useLocalModelSettings({
       if (!isPremium) {
         const current = settings.freeOfflineProfileOverrides;
         if (model.capability === "llm") {
-          onUpdate({
-            freeOfflineProfileOverrides:
-              model.responseProfile === "thorough"
-                ? { ...current, thoroughLlmModelId: model.id }
-                : { ...current, quickLlmModelId: model.id },
-          });
+          applyFreeOverrides(
+            model.responseProfile === "thorough"
+              ? { ...current, thoroughLlmModelId: model.id }
+              : { ...current, quickLlmModelId: model.id },
+          );
           return;
         }
         if (model.capability === "stt") {
-          onUpdate({
-            sttMode: "local",
-            nativeSttRequiresOnDevice: false,
-            localSttModelId: model.id,
-            freeOfflineProfileOverrides: { ...current, sttModelId: model.id },
-          });
+          applyFreeOverrides({ ...current, sttModelId: model.id });
           return;
         }
-        onUpdate({
-          spokenRepliesEnabled: true,
-          ...(model.id === "kokoro-multilingual"
-            ? { localTtsModelId: null, ttsMode: "kokoro" as const }
-            : { localTtsModelId: model.id, ttsMode: "local" as const }),
-          freeOfflineProfileOverrides: { ...current, ttsModelId: model.id },
-        });
+        applyFreeOverrides({ ...current, ttsModelId: model.id });
         return;
       }
 
@@ -497,19 +522,11 @@ export function useLocalModelSettings({
         responseModes: [...settings.responseModes, { id, route }],
       });
     },
-    [isPremium, onUpdate, settings],
+    [applyFreeOverrides, isPremium, onUpdate, settings],
   );
 
   const isModelSelected = React.useCallback(
     (model: LocalModelDefinition) => {
-      if (!isPremium && selectedFreeProfile) {
-        if (model.capability === "llm") {
-          return (
-            selectedFreeProfile.llm.id === model.id ||
-            selectedFreeProfile.thoroughLlm?.id === model.id
-          );
-        }
-      }
       if (model.capability === "llm") {
         return settings.responseModes.some(
           ({ id, route }) =>
@@ -526,24 +543,30 @@ export function useLocalModelSettings({
         ? settings.ttsMode === "kokoro"
         : settings.ttsMode === "local" && settings.localTtsModelId === model.id;
     },
-    [isPremium, selectedFreeProfile, settings],
+    [settings],
   );
 
   const selectNativeRoute = React.useCallback(
     (capability: "stt" | "tts") => {
       if (capability === "stt") {
+        if (!isPremium) {
+          applyFreeOverrides({
+            ...settings.freeOfflineProfileOverrides,
+            sttModelId: null,
+          });
+          return;
+        }
         onUpdate({
           sttMode: "native",
-          nativeSttRequiresOnDevice: !isPremium,
+          nativeSttRequiresOnDevice: false,
           localSttModelId: null,
-          ...(!isPremium
-            ? {
-                freeOfflineProfileOverrides: {
-                  ...settings.freeOfflineProfileOverrides,
-                  sttModelId: null,
-                },
-              }
-            : {}),
+        });
+        return;
+      }
+      if (!isPremium) {
+        applyFreeOverrides({
+          ...settings.freeOfflineProfileOverrides,
+          ttsModelId: null,
         });
         return;
       }
@@ -551,17 +574,14 @@ export function useLocalModelSettings({
         ttsMode: "native",
         localTtsModelId: null,
         spokenRepliesEnabled: true,
-        ...(!isPremium
-          ? {
-              freeOfflineProfileOverrides: {
-                ...settings.freeOfflineProfileOverrides,
-                ttsModelId: null,
-              },
-            }
-          : {}),
       });
     },
-    [isPremium, onUpdate, settings.freeOfflineProfileOverrides],
+    [
+      applyFreeOverrides,
+      isPremium,
+      onUpdate,
+      settings.freeOfflineProfileOverrides,
+    ],
   );
 
   const selectNativeVoice = React.useCallback(

@@ -10,6 +10,7 @@ import {
   getAppLanguageForFreeSpeechLanguage,
   type SpeechLanguage,
 } from "../constants/speechLanguages";
+import { MAX_RESPONSE_MODES } from "../constants/providers/defaults";
 import { createRuntimeProviderStringRecord } from "../constants/providers/runtimeState";
 import {
   getDefaultAssistantInstructions,
@@ -458,11 +459,47 @@ export function applyOfflineProfileToSettings(
   };
 }
 
+/**
+ * Persist the operational parts of a ready Free profile without erasing the
+ * person's Premium provider configuration. Free ignores the preserved hosted
+ * slots at runtime; they return after upgrade or entitlement restoration.
+ */
+export function getAppliedOfflineProfileSettingsUpdate(
+  settings: Settings,
+  profile: OfflineProfile,
+  overrides: OfflineProfileOverrides = settings.freeOfflineProfileOverrides,
+): Partial<Omit<Settings, "apiKeys" | "providerModels">> {
+  const applied = applyOfflineProfileToSettings(settings, profile);
+  const preservedProviderModes = settings.responseModes
+    .filter(
+      (mode) =>
+        mode.route.runtime !== "local" &&
+        mode.route.model.trim().length > 0 &&
+        !applied.responseModes.some(({ id }) => id === mode.id),
+    )
+    .slice(0, Math.max(0, MAX_RESPONSE_MODES - applied.responseModes.length));
+
+  return {
+    activeResponseMode: applied.activeResponseMode,
+    responseModes: [...applied.responseModes, ...preservedProviderModes],
+    language: applied.language,
+    freeOfflineSetupCompleted: true,
+    freeOfflineProfileOverrides: overrides,
+    sttMode: applied.sttMode,
+    nativeSttRequiresOnDevice: applied.nativeSttRequiresOnDevice,
+    localSttModelId: applied.localSttModelId,
+    sttLanguage: applied.sttLanguage,
+    localLanguages: applied.localLanguages,
+    ttsMode: applied.ttsMode,
+    localTtsModelId: applied.localTtsModelId,
+    ttsListenLanguages: applied.ttsListenLanguages,
+  };
+}
+
 export function applyUnavailableFreeSettings(settings: Settings): Settings {
   const persistedResponseModes = settings.freeOfflineSetupCompleted
     ? settings.responseModes.filter(
-        ({ route }) =>
-          route.runtime === "local" && Boolean(route.localModelId),
+        ({ route }) => route.runtime === "local" && Boolean(route.localModelId),
       )
     : [];
   if (persistedResponseModes.length > 0) {

@@ -30,6 +30,7 @@ import {
 import {
   applyOfflineProfileToSettings,
   applyUnavailableFreeSettings,
+  getAppliedOfflineProfileSettingsUpdate,
   getOfflineProfileModels,
   selectOfflineProfile,
   type OfflineProfile,
@@ -259,12 +260,8 @@ export function useFreeOfflineMode(params: {
   const recommendedNativeVoice = nativeVoiceOptions[0]?.value ?? "";
   const useCustomProfile = !setupVisible || advancedOptionsEnabled;
   useCustomProfileRef.current = useCustomProfile;
-  const selection = useCustomProfile
-    ? customSelection
-    : recommendedSelection;
-  const readiness = useCustomProfile
-    ? customReadiness
-    : recommendedReadiness;
+  const selection = useCustomProfile ? customSelection : recommendedSelection;
+  const readiness = useCustomProfile ? customReadiness : recommendedReadiness;
 
   const refresh = useCallback(async () => {
     if (suspended || entitlement.status !== "free" || !resolvedLanguage) {
@@ -345,11 +342,9 @@ export function useFreeOfflineMode(params: {
               nextSnapshot,
             )
           : null;
-      const [nextRecommendedReadiness, nextCustomReadiness] =
-        await Promise.all([
-          recommendedReadinessPromise,
-          customReadinessPromise,
-        ]);
+      const [nextRecommendedReadiness, nextCustomReadiness] = await Promise.all(
+        [recommendedReadinessPromise, customReadinessPromise],
+      );
 
       if (refreshOperationRef.current !== operation) {
         return null;
@@ -586,49 +581,16 @@ export function useFreeOfflineMode(params: {
     },
     [setSelectedNativeVoice],
   );
-  const selectKokoroVoice = useCallback(
-    (voiceId: string) => {
-      setSelectedKokoroVoice(voiceId);
-    },
-    [],
-  );
+  const selectKokoroVoice = useCallback((voiceId: string) => {
+    setSelectedKokoroVoice(voiceId);
+  }, []);
   const completeSetup = useCallback(
     (profile: OfflineProfile, withCustomSelections: boolean) => {
-      const persistedProfileSettings = applyOfflineProfileToSettings(
-        settings,
-        profile,
-      );
-      // Free setup must stay reversible: persisted provider response modes
-      // survive alongside the local Free routes. The Free runtime derivation
-      // ignores them, and they return untouched when Premium is restored.
-      const preservedProviderModes = settings.responseModes.filter(
-        (mode) =>
-          mode.route.runtime !== "local" &&
-          mode.route.model.trim().length > 0 &&
-          !persistedProfileSettings.responseModes.some(
-            ({ id }) => id === mode.id,
-          ),
-      );
+      const overrides = withCustomSelections
+        ? settings.freeOfflineProfileOverrides
+        : {};
       updateSettings({
-        activeResponseMode: persistedProfileSettings.activeResponseMode,
-        responseModes: [
-          ...persistedProfileSettings.responseModes,
-          ...preservedProviderModes,
-        ],
-        language: persistedProfileSettings.language,
-        freeOfflineSetupCompleted: true,
-        freeOfflineProfileOverrides: withCustomSelections
-          ? settings.freeOfflineProfileOverrides
-          : {},
-        sttMode: persistedProfileSettings.sttMode,
-        nativeSttRequiresOnDevice:
-          persistedProfileSettings.nativeSttRequiresOnDevice,
-        localSttModelId: persistedProfileSettings.localSttModelId,
-        sttLanguage: persistedProfileSettings.sttLanguage,
-        localLanguages: persistedProfileSettings.localLanguages,
-        ttsMode: persistedProfileSettings.ttsMode,
-        localTtsModelId: persistedProfileSettings.localTtsModelId,
-        ttsListenLanguages: persistedProfileSettings.ttsListenLanguages,
+        ...getAppliedOfflineProfileSettingsUpdate(settings, profile, overrides),
         nativeTtsVoiceId: withCustomSelections
           ? selectedNativeVoice
           : recommendedNativeVoice,
@@ -713,7 +675,15 @@ export function useFreeOfflineMode(params: {
       setPreparationProgress(null);
       setPreparationEtaSeconds(null);
     }
-  }, [benchmarks, completeSetup, installs, preparing, refresh, selection, snapshot]);
+  }, [
+    benchmarks,
+    completeSetup,
+    installs,
+    preparing,
+    refresh,
+    selection,
+    snapshot,
+  ]);
 
   const recommendedEstimatedSetupSeconds = useMemo(
     () =>

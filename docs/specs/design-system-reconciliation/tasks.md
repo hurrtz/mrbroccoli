@@ -93,7 +93,9 @@
 - [x] Reconcile transcript messages to the folded script-row model, compact and
   expanded metadata, expanded-only actions, and swipe removal.
 - [ ] Reconcile the seven-page settings hierarchy and its new row/group route
-  primitives.
+  primitives. Overview, Connections, Search, Listening, Speaking, Data,
+  App, and the replacement Thinking implementation are source-complete;
+  rebuilt native visual/interaction acceptance remains open.
 - [ ] Rebuild the exact Release apps and repeat native visual and interaction
   acceptance for every changed surface.
 

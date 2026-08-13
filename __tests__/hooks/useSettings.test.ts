@@ -1307,7 +1307,7 @@ describe("useSettings", () => {
     expect(result.current.settings.webSearchMode).toBe("off");
   });
 
-  it("adds response modes up to ten and selects the new mode", async () => {
+  it("adds response modes up to the shared limit and selects the new mode", async () => {
     const { result } = renderHook(() => useSettings());
     await flushSettingsLoad();
 
@@ -1320,8 +1320,9 @@ describe("useSettings", () => {
     expect(result.current.settings.responseModes).toHaveLength(
       MAX_RESPONSE_MODES,
     );
-    expect(result.current.settings.responseModes[9].id).toBe("mode-10");
-    expect(result.current.settings.activeResponseMode).toBe("mode-10");
+    const finalMode = result.current.settings.responseModes.at(-1);
+    expect(finalMode?.id).toBe(`mode-${MAX_RESPONSE_MODES}`);
+    expect(result.current.settings.activeResponseMode).toBe(finalMode?.id);
   });
 
   it("suggests a distinct configured provider when adding a response mode", async () => {

@@ -17,7 +17,7 @@ import { probeNativeSpeechCapabilities } from "../../services/nativeSpeechCapabi
 import {
   getOfflineProfileModels,
   selectOfflineProfile,
-  applyOfflineProfileToSettings,
+  getAppliedOfflineProfileSettingsUpdate,
   type OfflineProfile,
 } from "../../services/offlineProfile";
 import {
@@ -306,28 +306,9 @@ export function useAutoSetupJob({
         if (!mountedRef.current) {
           return;
         }
-        // "Installed and selected": apply the profile while preserving the
-        // configured provider modes, exactly as Free setup does — automatic
-        // setup must stay reversible.
-        const applied = applyOfflineProfileToSettings(settings, profile);
-        const preservedProviderModes = settings.responseModes.filter(
-          (mode) => mode.route.runtime !== "local",
-        );
         updateSettings({
-          ...applied,
-          // This marker is what makes the next card mount revalidate the
-          // completed profile instead of inviting the person to start over.
-          freeOfflineSetupCompleted: true,
+          ...getAppliedOfflineProfileSettingsUpdate(settings, profile, {}),
           freeOfflineProfileOverrides: {},
-          responseModes: [
-            ...applied.responseModes,
-            ...preservedProviderModes.filter(
-              (mode) =>
-                !applied.responseModes.some(
-                  (appliedMode) => appliedMode.id === mode.id,
-                ),
-            ),
-          ],
         });
         setDoneModelIds(
           new Set(getOfflineProfileModels(profile).map((model) => model.id)),

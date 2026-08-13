@@ -44,8 +44,9 @@ The following flows must work end to end where the target supports them:
 - automatic on-device setup from both introduction and Settings, including real
   readings, proposal-before-install, background continuation, progress,
   cancellation, failure, resume without re-download, and final profile use;
-- manual local-model catalogue, download, checksum verification, benchmark,
-  selection, test, removal, storage reporting, and device-specific readiness;
+- stage-owned local-model catalogues, download, checksum verification,
+  benchmark, selection, test, removal, storage reporting, and device-specific
+  readiness;
 - Settings overview and all seven pages, Free/Premium gating, pickers, dialogs,
   validation, backup/restore entry points, diagnostics, and persistence;
 - voice/text pager, route byline and picker, conversation settings, image,

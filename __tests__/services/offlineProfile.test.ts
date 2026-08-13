@@ -6,6 +6,7 @@ import {
 import {
   applyOfflineProfileToSettings,
   applyUnavailableFreeSettings,
+  getAppliedOfflineProfileSettingsUpdate,
   selectOfflineProfile,
 } from "../../src/services/offlineProfile";
 import type {
@@ -419,6 +420,34 @@ describe("free offline profile selection", () => {
     expect(effective.activeResponseMode).toBe("free-offline-thorough");
   });
 
+  it("persists one ready Free profile while preserving hosted slots within the four-slot limit", () => {
+    const providerModes = Array.from({ length: 4 }, (_, index) => ({
+      id: `hosted-${index + 1}`,
+      route: {
+        provider: "openai" as const,
+        model: "gpt-5.5-2026-04-23",
+      },
+    }));
+
+    const update = getAppliedOfflineProfileSettingsUpdate(
+      { ...DEFAULT_SETTINGS, responseModes: providerModes },
+      readyProfile("de"),
+      { thoroughLlmModelId: "ministral-3-3b-reasoning-q4" },
+    );
+
+    expect(update.freeOfflineSetupCompleted).toBe(true);
+    expect(update.responseModes).toHaveLength(4);
+    expect(
+      update.responseModes?.filter(({ route }) => route.runtime === "local"),
+    ).toHaveLength(2);
+    expect(
+      update.responseModes?.filter(({ route }) => route.runtime !== "local"),
+    ).toHaveLength(2);
+    expect(update.freeOfflineProfileOverrides).toEqual({
+      thoroughLlmModelId: "ministral-3-3b-reasoning-q4",
+    });
+  });
+
   it("keeps one Quick route when memory or storage cannot support Thorough", () => {
     const selection = selectOfflineProfile({
       languages: ["de"],
@@ -451,9 +480,9 @@ describe("free offline profile selection", () => {
       "free-offline",
       "free-offline-thorough",
     ]);
-    expect(effective.responseModes.map(({ route }) => route.localModelId)).toEqual(
-      ["granite-4.0-1b-q4", "ministral-3-3b-reasoning-q4"],
-    );
+    expect(
+      effective.responseModes.map(({ route }) => route.localModelId),
+    ).toEqual(["granite-4.0-1b-q4", "ministral-3-3b-reasoning-q4"]);
   });
 
   it("keeps Qwen3 0.6B as a constrained-device fallback", () => {

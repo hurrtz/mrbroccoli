@@ -3,11 +3,7 @@ import { Animated, Modal, Platform, useWindowDimensions } from "react-native";
 
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import {
-  isPremiumSettingsPage,
-  type SettingsModalProps,
-  type SettingsPage,
-} from "../settings-core/types";
+import type { SettingsModalProps, SettingsPage } from "../settings-core/types";
 import { useProviderValidationState } from "../settings-core/useProviderValidationState";
 import { useSettingsController } from "../settings-core/useSettingsController";
 import { useLocalization } from "../../i18n";
@@ -28,23 +24,18 @@ function getInitialSettingsPage({
   focusProvider,
   focusCatalogProviderId,
   focusTab,
-  isPremium,
 }: Pick<
   SettingsModalProps,
   "focusPage" | "focusProvider" | "focusCatalogProviderId" | "focusTab"
-> & { isPremium: boolean }): SettingsPage {
-  // An explicit target wins over the tab mapping, so a caller can deep-link to
-  // a page the tabs do not name -- on-device models in particular. A Free
-  // caller asking for a Premium page still lands on the overview rather than a
-  // locked screen.
-  if (focusPage && (isPremium || !isPremiumSettingsPage(focusPage))) {
+>): SettingsPage {
+  if (focusPage) {
     return focusPage;
   }
   if (focusProvider || focusCatalogProviderId || focusTab === "providers") {
     return "connections";
   }
   if (focusTab === "instructions") {
-    return isPremium ? "thinking" : "overview";
+    return "thinking";
   }
   if (focusTab === "stt") {
     return "listening";
@@ -67,7 +58,6 @@ export const AntSettingsModal = React.memo(function AntSettingsModal(
   const {
     visible,
     suspended = false,
-    isPremium,
     settings,
     focusProvider,
     focusCatalogProviderId,
@@ -91,7 +81,6 @@ export const AntSettingsModal = React.memo(function AntSettingsModal(
       focusProvider,
       focusCatalogProviderId,
       focusTab,
-      isPremium,
     }),
   );
   const [validationToastMessage, setValidationToastMessage] = React.useState<
@@ -177,7 +166,6 @@ export const AntSettingsModal = React.memo(function AntSettingsModal(
         focusProvider,
         focusCatalogProviderId,
         focusTab,
-        isPremium,
       }),
     );
     Animated.timing(entrance, {
@@ -191,7 +179,6 @@ export const AntSettingsModal = React.memo(function AntSettingsModal(
     focusPage,
     focusProvider,
     focusTab,
-    isPremium,
     visible,
   ]);
 
@@ -226,8 +213,6 @@ export const AntSettingsModal = React.memo(function AntSettingsModal(
           return t("settingsListening");
         case "speaking":
           return t("settingsSpeaking");
-        case "local":
-          return t("settingsOnDevice");
         case "search":
           return t("settingsSearch");
         case "data":
@@ -248,10 +233,6 @@ export const AntSettingsModal = React.memo(function AntSettingsModal(
           event: "settings-page-open-requested",
           payload: { from: activePage, to: page },
         });
-        if (!isPremium && isPremiumSettingsPage(page)) {
-          props.onOpenPremium();
-          return;
-        }
         setActivePage(page);
       }}
       onValidationStart={() => setValidationToastMessage(null)}
