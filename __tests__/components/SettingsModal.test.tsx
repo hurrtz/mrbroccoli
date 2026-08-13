@@ -1332,7 +1332,12 @@ describe("SettingsModal", () => {
     expect(screen.UNSAFE_getByType(FlatList).props.data).toEqual(
       APP_LANGUAGE_OPTIONS,
     );
+    expect(screen.getByTestId("app-language-picker-close")).toBeTruthy();
     expect(screen.getByTestId("app-language-picker-option-uk")).toBeTruthy();
+    fireEvent.press(screen.getByTestId("app-language-picker-close"));
+    expect(screen.queryByTestId("app-language-picker-sheet")).toBeNull();
+
+    fireEvent.press(languagePicker);
     fireEvent.press(screen.getByTestId("app-language-picker-option-en"));
     expect(screen.queryByTestId("app-language-picker-sheet")).toBeNull();
   });

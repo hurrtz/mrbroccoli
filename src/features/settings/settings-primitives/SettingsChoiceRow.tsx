@@ -104,6 +104,7 @@ export function SettingsChoiceRow<T extends string>({
               </Text>
               <IconButton
                 icon="close"
+                testID={testID ? `${testID}-close` : undefined}
                 accessibilityLabel={t("dismiss")}
                 onPress={() => setVisible(false)}
               />
