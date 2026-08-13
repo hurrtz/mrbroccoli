@@ -681,7 +681,7 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   metricLabel: {
-    width: 88,
+    width: 76,
     flexShrink: 0,
     fontFamily: fonts.mono,
     fontSize: 10,

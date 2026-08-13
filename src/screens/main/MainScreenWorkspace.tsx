@@ -446,7 +446,7 @@ export function MainScreenWorkspace({
       >
         <TranscriptPreviewCard
           colors={colors}
-          preferredHeight={Math.round(windowHeight * 0.75)}
+          preferredHeight={Math.round(windowHeight * 0.85)}
           presentation="canvas"
           {...transcript}
         />
@@ -499,7 +499,7 @@ const workspaceStyles = StyleSheet.create({
   },
   transcriptSheetTitle: {
     flex: 1,
-    fontFamily: fonts.display,
+    fontFamily: fonts.headline,
     fontSize: 17,
     letterSpacing: -0.2,
     lineHeight: 22,

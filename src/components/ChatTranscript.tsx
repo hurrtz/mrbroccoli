@@ -441,12 +441,23 @@ export function ChatTranscript({
       ]}
       ListEmptyComponent={
         <View style={styles.emptyCard}>
-          <PhosphorIcon
-            testID="empty-transcript-icon"
-            name="info-circle"
-            size="navigation"
-            color={colors.textSecondary}
-          />
+          <View
+            testID="empty-transcript-well"
+            style={[
+              styles.emptyIconWell,
+              {
+                backgroundColor: colors.surface,
+                borderColor: colors.border,
+              },
+            ]}
+          >
+            <PhosphorIcon
+              testID="empty-transcript-icon"
+              name="message"
+              size="navigation"
+              color={colors.textSecondary}
+            />
+          </View>
           <Text style={[styles.emptyTitle, { color: colors.text }]}>
             {resolvedEmptyTitle}
           </Text>
@@ -500,21 +511,30 @@ const styles = StyleSheet.create({
     paddingBottom: 18,
   },
   emptyCard: {
-    paddingHorizontal: 26,
-    paddingVertical: 22,
+    paddingHorizontal: 20,
+    paddingVertical: 26,
     alignItems: "center",
     gap: 12,
     marginVertical: 8,
   },
+  emptyIconWell: {
+    width: 46,
+    height: 46,
+    borderRadius: 23,
+    borderWidth: 1,
+    alignItems: "center",
+    justifyContent: "center",
+  },
   emptyTitle: {
-    fontSize: 17,
+    fontSize: 18,
     lineHeight: 24,
     textAlign: "center",
     fontFamily: fonts.display,
   },
   emptyDescription: {
-    fontSize: 13,
-    lineHeight: 19,
+    fontSize: 14,
+    lineHeight: 21,
     textAlign: "center",
+    maxWidth: 360,
   },
 });

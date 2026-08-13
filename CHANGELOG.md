@@ -16,6 +16,9 @@ the complete Play Store translations are kept in a dedicated file under
 - The composer's send arrow now uses the white on-accent ink from the design
   system instead of near-black, and the text field grows to 116 points before
   scrolling.
+- The empty transcript now shows the conversation glyph in a quiet circle with
+  the design system's type sizes, the transcript sheet title uses the headline
+  face and opens taller, and turn metrics align to the standard label column.
 - Fixed successful local transcription crashing the iOS Release app when its
   JavaScript runtime does not provide relative-time formatting.
 - Fixed provider connection sheets occasionally freezing while returning to

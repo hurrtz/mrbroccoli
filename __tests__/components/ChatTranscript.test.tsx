@@ -62,6 +62,23 @@ describe("ChatTranscript follow-tail scrolling", () => {
         height: 24,
       }),
     );
+
+    // Design-system empty state: the message glyph sits in a quiet 46pt
+    // circle well on the surface color.
+    expect(
+      StyleSheet.flatten(
+        screen.getByTestId("empty-transcript-well", hiddenIconQuery).props
+          .style,
+      ),
+    ).toEqual(
+      expect.objectContaining({
+        width: 46,
+        height: 46,
+        borderRadius: 23,
+        borderWidth: 1,
+        backgroundColor: lightColors.surface,
+      }),
+    );
   });
 
   it("calculates the distance from the visible viewport to the tail", () => {
