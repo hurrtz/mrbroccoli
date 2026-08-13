@@ -48,12 +48,10 @@ export function getIntroTheme(colors: Colors, isDark: boolean) {
     muted: colors.textMuted,
     mutedSoft: isDark ? "rgba(139, 151, 168, 0.14)" : "rgba(93, 107, 122, 0.10)",
 
-    premium: isDark ? "#C9A227" : "#8A6A12",
-    premiumSoft: isDark ? "rgba(201, 162, 39, 0.14)" : "rgba(138, 106, 18, 0.10)",
-    premiumBorder: isDark
-      ? "rgba(201, 162, 39, 0.34)"
-      : "rgba(138, 106, 18, 0.32)",
-    onPremium: "#FFFFFF",
+    premium: colors.premium,
+    premiumSoft: colors.premiumSoft,
+    premiumBorder: colors.premiumBorder,
+    onPremium: colors.onPremium,
   };
 }
 

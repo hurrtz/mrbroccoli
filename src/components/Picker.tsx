@@ -111,7 +111,11 @@ export function Picker({
         supportedOrientations={APP_MODAL_ORIENTATIONS}
         onRequestClose={() => setOpen(false)}
       >
-        <View style={styles.overlay} accessibilityViewIsModal>
+        <View
+          testID="pickerOverlay"
+          style={[styles.overlay, { backgroundColor: colors.overlay }]}
+          accessibilityViewIsModal
+        >
           <Pressable
             accessible={false}
             accessibilityElementsHidden
@@ -244,7 +248,6 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "rgba(0,0,0,0.5)",
   },
   list: {
     width: "80%",

@@ -10,6 +10,9 @@ the complete Play Store translations are kept in a dedicated file under
 
 ## Unreleased
 
+- Fixed the session details, conversation settings, and voice picker scrims
+  using a fixed light dimming color instead of the theme's overlay, so they
+  now match every other modal in both light and dark appearance.
 - Fixed successful local transcription crashing the iOS Release app when its
   JavaScript runtime does not provide relative-time formatting.
 - Fixed provider connection sheets occasionally freezing while returning to

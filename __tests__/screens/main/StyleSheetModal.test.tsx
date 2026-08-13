@@ -40,6 +40,15 @@ describe("StyleSheetModal", () => {
     return { ...utils, onAutoRenameConversation, onChange, onClose };
   }
 
+  it("uses the theme overlay token for its backdrop scrim", () => {
+    const { getByTestId } = setup();
+    expect(
+      StyleSheet.flatten(getByTestId("styleSheetOverlay").props.style),
+    ).toEqual(
+      expect.objectContaining({ backgroundColor: "rgba(13, 15, 18, 0.46)" }),
+    );
+  });
+
   it("renders title, subtitle, and active option descriptions", () => {
     const { getByText } = setup();
     expect(getByText("Conversation settings").props.numberOfLines).toBe(1);

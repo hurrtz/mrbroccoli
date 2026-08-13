@@ -59,7 +59,8 @@ export const StatusDetailsModal = React.memo(function StatusDetailsModal({
     >
       <SafeAreaView
         accessibilityViewIsModal
-        style={styles.statusDetailsOverlay}
+        testID="statusDetailsOverlay"
+        style={[styles.statusDetailsOverlay, { backgroundColor: colors.overlay }]}
       >
         <TouchableOpacity
           style={StyleSheet.absoluteFill}

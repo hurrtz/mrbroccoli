@@ -515,7 +515,6 @@ export const styles = StyleSheet.create({
     gap: 8,
   },
   deleteText: {
-    color: "#FFFFFF",
     fontSize: 13,
     fontFamily: fonts.display,
   },

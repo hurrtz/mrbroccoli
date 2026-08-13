@@ -86,7 +86,10 @@ export const StyleSheetModal = React.memo(function StyleSheetModal({
       supportedOrientations={APP_MODAL_ORIENTATIONS}
       statusBarTranslucent
     >
-      <View style={styles.styleSheetOverlay}>
+      <View
+        testID="styleSheetOverlay"
+        style={[styles.styleSheetOverlay, { backgroundColor: colors.overlay }]}
+      >
         <TouchableOpacity
           testID="styleSheetBackdrop"
           style={StyleSheet.absoluteFill}

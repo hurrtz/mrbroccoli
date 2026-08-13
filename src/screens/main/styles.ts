@@ -199,7 +199,6 @@ export const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     paddingHorizontal: 20,
-    backgroundColor: "rgba(0,0,0,0.16)",
   },
   statusDetailsCard: {
     width: "100%",
@@ -267,7 +266,6 @@ export const styles = StyleSheet.create({
   styleSheetOverlay: {
     flex: 1,
     justifyContent: "flex-end",
-    backgroundColor: "rgba(0,0,0,0.16)",
   },
   styleSheetCard: {
     width: "100%",

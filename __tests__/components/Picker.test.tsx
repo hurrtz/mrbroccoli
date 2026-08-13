@@ -1,8 +1,32 @@
 import React from "react";
+import { StyleSheet } from "react-native";
 import { fireEvent } from "@testing-library/react-native";
 
 import { Picker } from "../../src/components/Picker";
+import { lightColors } from "../../src/theme/colors";
 import { renderWithProviders } from "../test-utils/renderWithProviders";
+
+describe("Picker theming", () => {
+  it("uses the theme overlay token for the options scrim", () => {
+    const screen = renderWithProviders(
+      <Picker
+        label="Provider"
+        value="openai"
+        options={[
+          { label: "OpenAI", value: "openai" },
+          { label: "Anthropic", value: "anthropic" },
+        ]}
+        onChange={jest.fn()}
+      />,
+    );
+    fireEvent.press(screen.getByLabelText("Provider. OpenAI"));
+    expect(
+      StyleSheet.flatten(screen.getByTestId("pickerOverlay").props.style),
+    ).toEqual(
+      expect.objectContaining({ backgroundColor: lightColors.overlay }),
+    );
+  });
+});
 
 describe("Picker accessibility", () => {
   it("exposes the trigger, modal, choices, and close action semantically", () => {
