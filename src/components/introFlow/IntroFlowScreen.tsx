@@ -4,6 +4,7 @@ import {
   Pressable,
   ScrollView,
   StyleSheet,
+  Text,
   useWindowDimensions,
   View,
 } from "react-native";
@@ -19,53 +20,73 @@ import { useTheme } from "../../theme/ThemeContext";
 import { PhosphorIcon } from "../../design-system/PhosphorIcon";
 import type { AppLanguage } from "../../i18n/localeRegistry";
 import type { TranslateFn } from "../../screens/main/shared";
+import { fonts } from "../../theme/typography";
 import { IntroStepper } from "./IntroStepper";
 import type { AutoSetupJobState } from "../autoSetup/types";
-import { INTRO_STEP_CONTENT, INTRO_STEPS } from "./introSteps";
+import {
+  INTRO_STEP_CONTENT,
+  INTRO_STEPS,
+  type IntroTestTurnState,
+} from "./introSteps";
 import { introRadius, useIntroTheme } from "./introTheme";
 
 interface IntroFlowScreenProps {
   autoSetup: AutoSetupJobState;
+  /** True until the introduction has been completed once on this install. */
+  firstRun: boolean;
   language: AppLanguage;
   onClose: () => void;
+  /** Done on the last step: closes the flow and records completion. */
+  onComplete: () => void;
   onConnectProvider: () => void;
   onInstallLocal: () => void;
-  onOpenPremium: () => void;
   onOpenStt: () => void;
   onOpenTts: () => void;
   t: TranslateFn;
+  testTurn: IntroTestTurnState;
+  /** Whether a reasoning model is actually running — step two's gate. */
+  thinkingReady: boolean;
   visible: boolean;
 }
 
 /**
  * The introduction, as a full screen rather than a sheet.
  *
- * Seven steps: what the app is, what setup actually requires, the automatic
- * setup offer, the one thing that is required, the two things that are not,
- * and what Premium adds. It owns the whole display because it is the only
- * thing a first-time user should be dealing with, and follows the active app
- * appearance so it remains part of the same product.
+ * Three steps: a welcome that demonstrates instead of describing, one setup
+ * screen with a single green path, and a live test where the user judges the
+ * result. It owns the whole display because it is the only thing a first-time
+ * user should be dealing with, and follows the active app appearance so it
+ * remains part of the same product.
  *
- * Steps live in a horizontally paged scroll view, so they can be swiped as well
- * as driven from the header arrow and the stepper. Every route through the flow
- * runs in both directions -- a one-way path made the last step a dead end.
+ * First-run integrity: on a first run there is no close control -- the three
+ * steps are the way in. Step two's forward action stays disabled until a
+ * reasoning model is actually running, and step three ends in a Done that
+ * stays disabled until one successful test turn. A re-entry restores the
+ * close control on steps one and two and unlocks both gates; step three never
+ * shows close -- Done is the exit.
  */
 export function IntroFlowScreen({
   autoSetup,
+  firstRun,
   language,
   onClose,
+  onComplete,
   onConnectProvider,
   onInstallLocal,
-  onOpenPremium,
   onOpenStt,
   onOpenTts,
   t,
+  testTurn,
+  thinkingReady,
   visible,
 }: IntroFlowScreenProps) {
   const theme = useIntroTheme();
   const { isDark } = useTheme();
   const { width } = useWindowDimensions();
   const [index, setIndex] = React.useState(0);
+  // Remounts the steps on each open so per-step state -- the manual switch,
+  // the played flag, the preview language -- resets with the flow.
+  const [openNonce, setOpenNonce] = React.useState(0);
   const pagerRef = React.useRef<ScrollView>(null);
 
   // A fresh open starts at the beginning; a reopened introduction should not
@@ -73,6 +94,7 @@ export function IntroFlowScreen({
   React.useEffect(() => {
     if (visible) {
       setIndex(0);
+      setOpenNonce((nonce) => nonce + 1);
       pagerRef.current?.scrollTo({ animated: false, x: 0 });
     }
   }, [visible]);
@@ -88,11 +110,14 @@ export function IntroFlowScreen({
 
   const isFirst = index === 0;
   const isLast = index === INTRO_STEPS.length - 1;
+  const showClose = !firstRun && !isLast;
+  const forwardDisabled = index === 1 && firstRun && !thinkingReady;
+  const doneDisabled = firstRun && !testTurn.turn;
 
   return (
     <Modal
       animationType="slide"
-      onRequestClose={onClose}
+      onRequestClose={firstRun ? undefined : onClose}
       presentationStyle="fullScreen"
       visible={visible}
     >
@@ -140,27 +165,38 @@ export function IntroFlowScreen({
                 t={t}
               />
 
-              <Pressable
-                accessibilityLabel={t("introBannerDismiss")}
-                accessibilityRole="button"
-                onPress={onClose}
-                style={styles.headerButton}
-                testID="intro-close"
-              >
-                <View
-                  style={[
-                    styles.headerButtonFace,
-                    { backgroundColor: theme.panel, borderColor: theme.border },
-                  ]}
-                  testID="intro-close-face"
+              {showClose ? (
+                <Pressable
+                  accessibilityLabel={t("introBannerDismiss")}
+                  accessibilityRole="button"
+                  onPress={onClose}
+                  style={styles.headerButton}
+                  testID="intro-close"
                 >
-                  <PhosphorIcon
-                    color={theme.textSecondary}
-                    name="close"
-                    size="control"
-                  />
-                </View>
-              </Pressable>
+                  <View
+                    style={[
+                      styles.headerButtonFace,
+                      {
+                        backgroundColor: theme.panel,
+                        borderColor: theme.border,
+                      },
+                    ]}
+                    testID="intro-close-face"
+                  >
+                    <PhosphorIcon
+                      color={theme.textSecondary}
+                      name="close"
+                      size="control"
+                    />
+                  </View>
+                </Pressable>
+              ) : (
+                <View
+                  accessibilityElementsHidden
+                  importantForAccessibility="no"
+                  style={styles.headerButton}
+                />
+              )}
             </View>
 
             <ScrollView
@@ -183,11 +219,11 @@ export function IntroFlowScreen({
                   <ScrollView
                     contentContainerStyle={[
                       styles.page,
-                      step === "welcome" || step === "requirements"
+                      step === "welcome" || step === "try"
                         ? styles.pageFill
                         : null,
                     ]}
-                    key={step}
+                    key={`${step}-${openNonce}`}
                     showsVerticalScrollIndicator={false}
                     style={{ width }}
                   >
@@ -196,37 +232,63 @@ export function IntroFlowScreen({
                       language={language}
                       onConnectProvider={onConnectProvider}
                       onInstallLocal={onInstallLocal}
-                      onOpenPremium={onOpenPremium}
                       onOpenStt={onOpenStt}
                       onOpenTts={onOpenTts}
                       t={t}
+                      testTurn={testTurn}
                     />
                   </ScrollView>
                 );
               })}
             </ScrollView>
 
-            <View style={styles.footer}>
-              <Pressable
-                accessibilityLabel={isLast ? t("done") : t("introNext")}
-                accessibilityRole="button"
-                onPress={isLast ? onClose : () => goTo(index + 1)}
-                style={({ pressed }) => [
-                  styles.primary,
-                  {
-                    backgroundColor: theme.accent,
-                    opacity: pressed ? 0.85 : 1,
-                  },
-                ]}
-                testID={isLast ? "intro-done" : "intro-next"}
-              >
-                <PhosphorIcon
-                  color={theme.onAccent}
-                  name={isLast ? "check" : "right"}
-                  size="navigation"
-                />
-              </Pressable>
-            </View>
+            {isLast ? (
+              <View style={styles.doneFooter}>
+                <Pressable
+                  accessibilityLabel={t("done")}
+                  accessibilityRole="button"
+                  accessibilityState={{ disabled: doneDisabled }}
+                  disabled={doneDisabled}
+                  onPress={onComplete}
+                  style={({ pressed }) => [
+                    styles.done,
+                    {
+                      backgroundColor: theme.accent,
+                      opacity: doneDisabled ? 0.4 : pressed ? 0.85 : 1,
+                    },
+                  ]}
+                  testID="intro-done"
+                >
+                  <Text style={[styles.doneLabel, { color: theme.onAccent }]}>
+                    {t("done")}
+                  </Text>
+                </Pressable>
+              </View>
+            ) : (
+              <View style={styles.footer}>
+                <Pressable
+                  accessibilityLabel={t("introNext")}
+                  accessibilityRole="button"
+                  accessibilityState={{ disabled: forwardDisabled }}
+                  disabled={forwardDisabled}
+                  onPress={() => goTo(index + 1)}
+                  style={({ pressed }) => [
+                    styles.primary,
+                    {
+                      backgroundColor: theme.accent,
+                      opacity: forwardDisabled ? 0.4 : pressed ? 0.85 : 1,
+                    },
+                  ]}
+                  testID="intro-next"
+                >
+                  <PhosphorIcon
+                    color={theme.onAccent}
+                    name="right"
+                    size="navigation"
+                  />
+                </Pressable>
+              </View>
+            )}
           </SafeAreaView>
         </View>
       </SafeAreaProvider>
@@ -235,6 +297,22 @@ export function IntroFlowScreen({
 }
 
 const styles = StyleSheet.create({
+  done: {
+    alignItems: "center",
+    borderRadius: introRadius.control + 2,
+    justifyContent: "center",
+    minHeight: 50,
+    width: "100%",
+  },
+  doneFooter: {
+    paddingBottom: 14,
+    paddingHorizontal: 22,
+    paddingTop: 6,
+  },
+  doneLabel: {
+    fontFamily: fonts.display,
+    fontSize: 15,
+  },
   footer: {
     alignItems: "center",
     paddingBottom: 10,

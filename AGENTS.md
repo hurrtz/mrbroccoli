@@ -104,20 +104,25 @@ applies.
 
 - `src/screens/MainScreen.tsx` is the main composition root. It wires focused hooks and services into the workspace and secondary surfaces; recording, transcription, LLM, playback, setup, and persistence behavior live outside the screen component.
 - `src/components/IntroBanner.tsx` and `src/components/introFlow/` are the
-  first-run introduction: a violet banner over the workspace opening a
-  seven-step full-screen flow, including the automatic on-device setup step
-  backed by `src/screens/main/useAutoSetupJob.ts` and the shared card under
-  `src/components/autoSetup/`. `introTheme.ts` derives the flow palette from
-  the light/dark app theme while keeping the banner deliberately distinct, and
-  `useIntroPlayback.ts` activates the audio
-  session the voice pipeline leaves off while idle. Its audio examples are bundled under
-  `assets/intro-audio/intro-<lang>.m4a`, one per interface language. Adding a
-  language means a recording normalized to -16 LUFS, an entry in
-  `introClips.ts`, and a script in `introScripts.ts`;
-  `docs/promo-audio-texts/<lang>.md` holds the source text and records which
-  provider voiced it. The blocking setup wizards were removed; the app
-  opens directly into the workspace and the intro sheet also opens at its final
-  step when a turn is attempted with no usable route.
+  first-run introduction: a violet gradient banner row over the workspace
+  opening a three-step full-screen walkthrough (welcome, setup, live test),
+  with the automatic on-device setup step backed by
+  `src/screens/main/useAutoSetupJob.ts` and the shared card under
+  `src/components/autoSetup/`. The final step runs an ephemeral test turn
+  through `src/screens/main/useIntroTestTurn.ts` — a real voice-pipeline run
+  with local-only callbacks, so nothing is persisted. First-run integrity
+  (`settings.introCompleted`) withholds the close control and gates the setup
+  and test steps until completed once. `introTheme.ts` derives the flow
+  palette from the light/dark app theme while keeping the banner deliberately
+  distinct, and `useIntroPlayback.ts` activates the audio session the voice
+  pipeline leaves off while idle. Its audio examples are bundled under
+  `assets/intro-audio/intro-<lang>.m4a`, one per interface language; the
+  welcome step's on-screen dialogue must state the question each recording
+  actually answers, per language. Adding a language means a recording
+  normalized to -16 LUFS, an entry in `introClips.ts`, and localized dialogue
+  keys in `introTranslations.ts`; `docs/promo-audio-texts/<lang>.md` holds the
+  source text and records which provider voiced it. The blocking setup wizards
+  were removed; the app opens directly into the workspace.
 - `src/features/settings/AntSettingsModal.tsx` is the configuration entry point. Its historical `Ant` prefix remains for import stability, but the app no longer depends on Ant Design. Navigation/frame concerns live in `AntSettingsFrame.tsx`; page routing lives in `AntSettingsPageContent.tsx`; reusable non-visual settings logic lives in `src/features/settings-core/`.
 - Shared buttons, inputs, lists, dialogs, and tags live in `src/design-system/NativeControls.tsx`; settings cards, fields, and pickers live under `src/features/settings/settings-primitives/`. Keep these React Native-owned controls dependency-light and accessible.
 - `src/screens/main/MainScreenRouteByline.tsx` is the home-screen route selector: one line stating who answers the next turn and at what effort, opening `RoutePickerSheet.tsx`. `src/components/ResponseModeToggle.tsx` (with its layouts under `src/components/responseModeToggle/`) is retained for surfaces that want the picker grid, but no longer mounts on the home screen.

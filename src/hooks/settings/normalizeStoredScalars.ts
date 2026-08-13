@@ -197,6 +197,7 @@ export function normalizeStoredScalarSettings(
   | "localTtsModelId"
   | "introDismissed"
   | "introOpened"
+  | "introCompleted"
   | "freeOnboardingLanguageInitialized"
   | "freeOfflineSetupCompleted"
   | "freeOfflineProfileOverrides"
@@ -316,6 +317,10 @@ export function normalizeStoredScalarSettings(
     // it may dismiss the banner without first being asked to read it.
     introOpened: getStoredBoolean(
       storedSettings?.introOpened,
+      hasConfiguredKeys,
+    ),
+    introCompleted: getStoredBoolean(
+      storedSettings?.introCompleted,
       hasConfiguredKeys,
     ),
     freeOnboardingLanguageInitialized: getStoredBoolean(

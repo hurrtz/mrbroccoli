@@ -41,14 +41,24 @@ function renderScreen(
 ) {
   const props = {
     autoSetup: createAutoSetupJob(),
+    firstRun: true,
     language: "en" as const,
     onClose: jest.fn(),
+    onComplete: jest.fn(),
     onConnectProvider: jest.fn(),
     onInstallLocal: jest.fn(),
-    onOpenPremium: jest.fn(),
     onOpenStt: jest.fn(),
     onOpenTts: jest.fn(),
     t,
+    testTurn: {
+      onPressIn: jest.fn(),
+      onPressOut: jest.fn(),
+      onReplay: jest.fn(),
+      phase: "idle" as const,
+      replaying: false,
+      turn: null,
+    },
+    thinkingReady: true,
     visible: true,
     ...overrides,
   };
@@ -167,20 +177,27 @@ describe("IntroBanner", () => {
     expect(onOpen).not.toHaveBeenCalled();
   });
 });
-
 describe("IntroFlowScreen", () => {
-  it("covers the seven setup steps in order", () => {
-    // The auto step sits after requirements and before the manual routes,
-    // because the manual routes are the fallback now.
-    expect(INTRO_STEPS).toEqual([
-      "welcome",
-      "requirements",
-      "auto",
-      "llm",
-      "stt",
-      "tts",
-      "premium",
-    ]);
+  function createTestTurn(
+    overrides: Partial<
+      React.ComponentProps<typeof IntroFlowScreen>["testTurn"]
+    > = {},
+  ) {
+    return {
+      onPressIn: jest.fn(),
+      onPressOut: jest.fn(),
+      onReplay: jest.fn(),
+      phase: "idle" as const,
+      replaying: false,
+      turn: null,
+      ...overrides,
+    };
+  }
+
+  it("covers the three walkthrough steps in order", () => {
+    // A walkthrough that demonstrates instead of describing: welcome, one
+    // setup screen with a single green path, then the live test.
+    expect(INTRO_STEPS).toEqual(["welcome", "setup", "try"]);
   });
 
   it("renders nothing while hidden", () => {
@@ -189,14 +206,16 @@ describe("IntroFlowScreen", () => {
     expect(queryByTestId("intro-flow-content")).toBeNull();
   });
 
-  it("opens on the greeting with its play control", () => {
+  it("opens on the stored dialogue with its play control", () => {
     const { getByTestId } = renderScreen();
 
+    expect(getByTestId("intro-welcome-step")).toBeTruthy();
     expect(getByTestId("intro-welcome-play")).toBeTruthy();
+    expect(getByTestId("intro-welcome-language")).toBeTruthy();
   });
 
   it("keeps 44 point header targets around the approved 40 point faces", () => {
-    const { getByTestId } = renderScreen();
+    const { getByTestId } = renderScreen({ firstRun: false });
 
     expect(StyleSheet.flatten(getByTestId("intro-back").props.style)).toEqual(
       expect.objectContaining({ height: 44, margin: -2, width: 44 }),
@@ -212,10 +231,74 @@ describe("IntroFlowScreen", () => {
     ).toEqual(expect.objectContaining({ height: 40, width: 40 }));
   });
 
+  it("withholds every close control on a first run", () => {
+    // On a first run the three steps are the way in; Done is the only exit,
+    // and it stays disabled until a test turn has completed.
+    const { queryByTestId, getByTestId } = renderScreen({ firstRun: true });
+
+    expect(queryByTestId("intro-close")).toBeNull();
+    fireEvent.press(getByTestId("intro-next"));
+    expect(queryByTestId("intro-close")).toBeNull();
+  });
+
+  it("gates the setup step's forward action on a running reasoning model", () => {
+    const { getByTestId, props } = renderScreen({
+      firstRun: true,
+      thinkingReady: false,
+    });
+
+    // Step one forward is free; step two's is the hard requirement.
+    fireEvent.press(getByTestId("intro-next"));
+    expect(
+      getByTestId("intro-next").props.accessibilityState,
+    ).toEqual({ disabled: true });
+    fireEvent.press(getByTestId("intro-next"));
+    expect(props.onClose).not.toHaveBeenCalled();
+  });
+
+  it("unlocks Done only after one completed test turn on a first run", () => {
+    const withoutTurn = renderScreen({ firstRun: true });
+    fireEvent.press(withoutTurn.getByTestId("intro-next"));
+    fireEvent.press(withoutTurn.getByTestId("intro-next"));
+    expect(
+      withoutTurn.getByTestId("intro-done").props.accessibilityState,
+    ).toEqual({ disabled: true });
+    fireEvent.press(withoutTurn.getByTestId("intro-done"));
+    expect(withoutTurn.props.onComplete).not.toHaveBeenCalled();
+
+    const withTurn = renderScreen({
+      firstRun: true,
+      testTurn: createTestTurn({
+        turn: {
+          answer: "About 23 days.",
+          latencyLabel: "2.4 s",
+          question: "How long to a million?",
+        },
+      }),
+    });
+    fireEvent.press(withTurn.getByTestId("intro-next"));
+    fireEvent.press(withTurn.getByTestId("intro-next"));
+    fireEvent.press(withTurn.getByTestId("intro-done"));
+    expect(withTurn.props.onComplete).toHaveBeenCalledTimes(1);
+  });
+
+  it("restores close on a re-entry, but never on the final step", () => {
+    const { getByTestId, queryByTestId, props } = renderScreen({
+      firstRun: false,
+    });
+
+    expect(getByTestId("intro-close")).toBeTruthy();
+    fireEvent.press(getByTestId("intro-next"));
+    expect(getByTestId("intro-close")).toBeTruthy();
+    fireEvent.press(getByTestId("intro-next"));
+    expect(queryByTestId("intro-close")).toBeNull();
+    // Done is the exit, and a re-entry has no gate on it.
+    fireEvent.press(getByTestId("intro-done"));
+    expect(props.onComplete).toHaveBeenCalledTimes(1);
+  });
+
   it("walks forward and back through the steps", () => {
-    // A one-way flow made the last step a dead end: someone could neither
-    // check what they had skipped nor revisit a decision.
-    const { getByTestId } = renderScreen();
+    const { getByTestId } = renderScreen({ firstRun: false });
 
     fireEvent.press(getByTestId("intro-next"));
     fireEvent.press(getByTestId("intro-next"));
@@ -230,113 +313,88 @@ describe("IntroFlowScreen", () => {
     ).toBe(true);
   });
 
-  it("turns the forward action into a visible completion action", () => {
-    // The approved flow keeps the action in its established footer position:
-    // an empty gap looked like a missing control rather than a finished flow.
-    const { getByTestId, queryByTestId } = renderScreen();
-
-    fireEvent.press(getByTestId("intro-stepper-dot-6"));
-
-    expect(queryByTestId("intro-next")).toBeNull();
-    expect(getByTestId("intro-done").props.accessibilityLabel).toBe("done");
-    expect(getByTestId("intro-close")).toBeTruthy();
-  });
-
-  it("closes from the completion action on the last step", () => {
-    const { getByTestId, props } = renderScreen();
-    fireEvent.press(getByTestId("intro-stepper-dot-6"));
-    fireEvent.press(getByTestId("intro-done"));
-
-    expect(props.onClose).toHaveBeenCalledTimes(1);
-  });
-
-  it("jumps to any step from the stepper", () => {
-    const { getByTestId } = renderScreen();
-
-    fireEvent.press(getByTestId("intro-stepper-dot-6"));
-
-    expect(getByTestId("intro-open-premium")).toBeTruthy();
-  });
-
-  it("uses the available height to centre the requirements step on large screens", () => {
-    const { getByTestId } = renderScreen();
-    fireEvent.press(getByTestId("intro-stepper-dot-1"));
-
-    expect(
-      StyleSheet.flatten(getByTestId("intro-requirements-step").props.style),
-    ).toEqual(expect.objectContaining({ flex: 1, justifyContent: "center" }));
-  });
-
   it("cannot go back from the first step", () => {
     const { getByTestId } = renderScreen();
 
-    fireEvent.press(getByTestId("intro-back"));
-
-    expect(getByTestId("intro-welcome-play")).toBeTruthy();
+    expect(getByTestId("intro-back").props.accessibilityState).toEqual({
+      disabled: true,
+    });
   });
 
-  it("offers both routes to the one requirement", () => {
-    const { getByTestId, props } = renderScreen();
+  it("jumps to any step from the stepper", () => {
+    const { getByTestId } = renderScreen({ firstRun: false });
+
     fireEvent.press(getByTestId("intro-stepper-dot-2"));
+    expect(
+      getByTestId("intro-stepper-dot-2").props.accessibilityState.selected,
+    ).toBe(true);
+  });
 
-    fireEvent.press(getByTestId("intro-install-local"));
+  it("offers the single green path and hides the manual catalogue", () => {
+    const { getByTestId, queryByTestId, props } = renderScreen();
+
+    expect(getByTestId("intro-auto-start")).toBeTruthy();
+    expect(queryByTestId("intro-manual-catalogue")).toBeNull();
+
+    fireEvent.press(getByTestId("intro-auto-start"));
+    expect(props.autoSetup.start).toHaveBeenCalledTimes(1);
+  });
+
+  it("reveals the pipeline-ordered manual catalogue behind its switch", () => {
+    const { getByTestId } = renderScreen();
+
+    fireEvent.press(getByTestId("intro-manual-switch"));
+    expect(getByTestId("intro-manual-catalogue")).toBeTruthy();
+    expect(getByTestId("intro-manual-stt")).toBeTruthy();
+    expect(getByTestId("intro-manual-llm")).toBeTruthy();
+    expect(getByTestId("intro-manual-provider")).toBeTruthy();
+    expect(getByTestId("intro-manual-tts")).toBeTruthy();
+  });
+
+  it("routes manual acquisition to the owning settings pages", () => {
+    const { getByTestId, props } = renderScreen();
+
+    fireEvent.press(getByTestId("intro-manual-switch"));
+    fireEvent.press(getByTestId("intro-manual-llm"));
+    fireEvent.press(getByTestId("intro-manual-stt"));
+    fireEvent.press(getByTestId("intro-manual-tts"));
+    fireEvent.press(getByTestId("intro-manual-provider"));
+
     expect(props.onInstallLocal).toHaveBeenCalledTimes(1);
-
-    fireEvent.press(getByTestId("intro-connect-provider"));
+    expect(props.onOpenStt).toHaveBeenCalledTimes(1);
+    expect(props.onOpenTts).toHaveBeenCalledTimes(1);
     expect(props.onConnectProvider).toHaveBeenCalledTimes(1);
   });
 
-  it("marks the automatic setup route as recommended", () => {
-    const { getByTestId, getByText } = renderScreen();
-    fireEvent.press(getByTestId("intro-stepper-dot-2"));
+  it("drives the hold-to-talk test through press in and out", () => {
+    const testTurn = createTestTurn();
+    const { getByTestId } = renderScreen({ testTurn });
 
-    expect(getByText("introRecommended")).toBeTruthy();
+    const mic = getByTestId("intro-try-mic");
+    fireEvent(mic, "pressIn");
+    fireEvent(mic, "pressOut");
+
+    expect(testTurn.onPressIn).toHaveBeenCalledTimes(1);
+    expect(testTurn.onPressOut).toHaveBeenCalledTimes(1);
   });
 
-  it("lets a listener switch the example language", () => {
-    // Claiming the app sounds good is worth less than letting someone hear it,
-    // in whichever language they actually speak.
-    const { getByTestId } = renderScreen();
-    fireEvent.press(getByTestId("intro-stepper-dot-4"));
-
-    fireEvent.press(getByTestId("intro-voice-select"));
-
-    expect(getByTestId("intro-voice-option-ja")).toBeTruthy();
-    expect(
-      getByTestId("intro-voice-options").props.accessibilityViewIsModal,
-    ).toBe(true);
-    expect(
-      StyleSheet.flatten(getByTestId("intro-voice-close").props.style),
-    ).toEqual(expect.objectContaining({ height: 44, width: 44 }));
-  });
-
-  it("defaults the example to the interface language", () => {
-    const { getByTestId } = renderScreen({ language: "de" });
-    fireEvent.press(getByTestId("intro-stepper-dot-4"));
-    fireEvent.press(getByTestId("intro-voice-select"));
+  it("shows the completed test turn with its latency and replay", () => {
+    const testTurn = createTestTurn({
+      turn: {
+        answer: "About 23 days without sleeping.",
+        latencyLabel: "2.4 s",
+        question: "How long would it take me to count to a million?",
+      },
+    });
+    const { getByTestId, getByText } = renderScreen({ testTurn });
 
     expect(
-      getByTestId("intro-voice-option-de").props.accessibilityState.selected,
-    ).toBe(true);
-  });
+      getByText("How long would it take me to count to a million?"),
+    ).toBeTruthy();
+    expect(getByText("About 23 days without sleeping.")).toBeTruthy();
+    expect(getByText(/2.4 s/)).toBeTruthy();
 
-  it("closes from the close control", () => {
-    const { getByTestId, props } = renderScreen();
-
-    fireEvent.press(getByTestId("intro-close"));
-
-    expect(props.onClose).toHaveBeenCalledTimes(1);
-  });
-
-  it("routes speech settings separately for listening and speaking", () => {
-    const { getByTestId, props } = renderScreen();
-
-    fireEvent.press(getByTestId("intro-stepper-dot-3"));
-    fireEvent.press(getByTestId("intro-open-stt"));
-    expect(props.onOpenStt).toHaveBeenCalledTimes(1);
-
-    fireEvent.press(getByTestId("intro-stepper-dot-4"));
-    fireEvent.press(getByTestId("intro-open-tts"));
-    expect(props.onOpenTts).toHaveBeenCalledTimes(1);
+    fireEvent.press(getByTestId("intro-try-replay"));
+    expect(testTurn.onReplay).toHaveBeenCalledTimes(1);
   });
 });

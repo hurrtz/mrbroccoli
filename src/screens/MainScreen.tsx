@@ -21,6 +21,7 @@ import {
   getMainScreenRouteConfiguration,
 } from "./main/mainScreenRouteConfiguration";
 import { useAutoSetupJob } from "./main/useAutoSetupJob";
+import { useIntroTestTurn } from "./main/useIntroTestTurn";
 import { useConversationActions } from "./main/useConversationActions";
 import { useConversationTitleGenerator } from "./main/useConversationTitleGenerator";
 import { useConversationSettings } from "./main/useConversationSettings";
@@ -103,6 +104,12 @@ export function MainScreen() {
     updateSettings({ introOpened: true });
   }, [updateSettings]);
   const closeIntro = React.useCallback(() => setIntroVisible(false), []);
+  // Done on the last step is the completion that ends first-run integrity:
+  // afterwards the flow regains its close control and drops both gates.
+  const completeIntro = React.useCallback(() => {
+    setIntroVisible(false);
+    updateSettings({ introCompleted: true });
+  }, [updateSettings]);
   const dismissIntroBanner = React.useCallback(() => {
     updateSettings({ introDismissed: true });
   }, [updateSettings]);
@@ -514,6 +521,43 @@ export function MainScreen() {
   });
 
   const isBusy = pipelinePhase !== "idle";
+
+  const introTestTurn = useIntroTestTurn({
+    active: introVisible,
+    getRouteParams: () => ({
+      assistantInstructions,
+      kokoroVoices: runtimeSettings.kokoroVoices,
+      language: runtimeSettings.language,
+      localLlmModelId,
+      localSttModelId: runtimeSettings.localSttModelId,
+      localTtsModelId: runtimeSettings.localTtsModelId,
+      model,
+      modelEffort,
+      provider,
+      providerApiKey,
+      replyPlayback: runtimeSettings.replyPlayback,
+      responseLength,
+      responseTone,
+      spokenRepliesEnabled: runtimeSettings.spokenRepliesEnabled,
+      sttApiKey,
+      sttLanguage: runtimeSettings.sttLanguage,
+      sttMode: runtimeSettings.sttMode,
+      sttModel: selectedSttModel,
+      sttProvider,
+      ttsApiKey,
+      ttsInstructions: effectiveTtsInstructions,
+      ttsListenLanguages: runtimeSettings.ttsListenLanguages,
+      ttsMode: runtimeSettings.ttsMode,
+      ttsModel: selectedTtsModel,
+      ttsProvider,
+      ttsVoice:
+        runtimeSettings.ttsMode === "kokoro"
+          ? runtimeSettings.kokoroVoices.en
+          : selectedTtsVoice,
+    }),
+    player,
+    t,
+  });
 
   const imageRoutes = React.useMemo(
     () => [
@@ -975,8 +1019,10 @@ export function MainScreen() {
       }}
       intro={{
         autoSetup,
+        firstRun: !settings.introCompleted,
         language: settings.language,
         onClose: closeIntro,
+        onComplete: completeIntro,
         // Provider keys are Premium, so a Free reader is sent to the purchase
         // sheet rather than to a page that would only tell them no. The sheet
         // opens over the introduction; see onClose on premiumUpgrade.
@@ -992,9 +1038,6 @@ export function MainScreen() {
           closeIntro();
           openSettings(undefined, undefined, "thinking");
         },
-        onOpenPremium: () => {
-          setPremiumModalVisible(true);
-        },
         onOpenStt: () => {
           closeIntro();
           openSettings(undefined, "stt", "listening");
@@ -1004,6 +1047,8 @@ export function MainScreen() {
           openSettings(undefined, "tts", "speaking");
         },
         t,
+        testTurn: introTestTurn,
+        thinkingReady: loaded && !freeRuntimeBlocked && !providerRouteBlocked,
         visible: introVisible,
       }}
       imageSource={{

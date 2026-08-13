@@ -1087,7 +1087,9 @@ describe("MainScreen", () => {
     expect(leftPane.queryByTestId("conversation-settings-summary")).toBeNull();
     expect(leftPane.queryByTestId("satellite-image")).toBeNull();
     expect(
-      StyleSheet.flatten(rightPane.getByTestId("intro-banner").props.style),
+      StyleSheet.flatten(
+        rightPane.getByTestId("intro-banner-surface").props.style,
+      ),
     ).toEqual(expect.objectContaining({ minHeight: 48 }));
     expect(rightPane.getByTestId("transcript-preview")).toBeTruthy();
     expect(rightPane.queryByText("transcript-style-control")).toBeNull();

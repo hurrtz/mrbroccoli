@@ -31,6 +31,16 @@ the complete Play Store translations are kept in a dedicated file under
 - Drive Session's three-button row is now Repeat plus one fixed-position
   Pause/Resume toggle whose green fill means the loop is live, and the silence
   countdown appears on screen as a "Sends in N…" chip above it.
+
+### Changed
+
+- The introduction is now three steps instead of seven: a welcome where a
+  stored dialogue is answered by the localized recording in your language, one
+  setup screen with a single automatic path and an optional manual catalogue,
+  and a live hold-to-talk test of your own setup whose reply is spoken back
+  with its response time — nothing from the test is saved. On a first run the
+  walkthrough completes before it can be closed; reopening it later is
+  unrestricted.
 - Fixed successful local transcription crashing the iOS Release app when its
   JavaScript runtime does not provide relative-time formatting.
 - Fixed provider connection sheets occasionally freezing while returning to

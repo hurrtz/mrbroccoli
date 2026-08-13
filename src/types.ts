@@ -174,6 +174,12 @@ export interface Settings {
   introDismissed: boolean;
   /** Whether the introduction has ever been opened from the banner. */
   introOpened: boolean;
+  /**
+   * Whether the introduction has been walked to its Done action once. Until
+   * then the flow keeps its first-run integrity: no close control, and the
+   * setup and test gates stay armed.
+   */
+  introCompleted: boolean;
   freeOnboardingLanguageInitialized: boolean;
   freeOfflineSetupCompleted: boolean;
   freeOfflineProfileOverrides: FreeOfflineProfileOverrides;
@@ -475,6 +481,7 @@ export const DEFAULT_SETTINGS: Settings = {
   theme: "system",
   introDismissed: false,
   introOpened: false,
+  introCompleted: false,
   freeOnboardingLanguageInitialized: false,
   freeOfflineSetupCompleted: false,
   freeOfflineProfileOverrides: {},

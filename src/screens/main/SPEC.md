@@ -176,10 +176,34 @@ routes; the Free runtime ignores them and they return untouched with Premium.
 ## Onboarding
 
 There is no blocking setup surface. A new install opens directly into the
-workspace, with a dismissible intro banner above it that opens a seven-step
-full-screen introduction: the greeting, what setup actually requires, the
-automatic one-tap setup, the one requirement, the two optional pieces, and
-what Premium adds.
+workspace, with a dismissible intro banner above it that opens a three-step
+full-screen introduction: a welcome that demonstrates instead of describing,
+one setup screen with a single green path, and a live test where the user
+judges the result.
+
+**Decision:** The three steps replace the earlier seven-page wizard (design
+system, owner-resolved 2026-08). Premium appears nowhere in the flow — the
+first Premium surface a new user meets is the settings overview, after the
+app has proven itself. The welcome step shows a stored dialogue whose crisp
+final question is the question the bundled recording actually answers, in
+every language; switching the language swaps the on-screen dialogue and the
+audio together so the pairing holds. The manual catalogue behind the
+setup step's switch renders real route state and hands acquisition to the
+owning stage pages (Thinking, Listening, Speaking); the fully inline
+download-test-unlock lifecycle inside the flow remains an open follow-up.
+
+**Decision:** First-run integrity: until the introduction has been completed
+once (`introCompleted`), the flow offers no close control, step two's forward
+action stays disabled until a reasoning model is actually running, and step
+three's Done stays disabled until one ephemeral test turn has completed. A
+re-entry restores close on steps one and two and unlocks both gates; step
+three never shows close — Done is the exit.
+
+**Decision:** The test turn is ephemeral by construction: it runs one real
+voice-pipeline turn on the user's configured routes with an empty history and
+callbacks that hold only local state, so nothing reaches the conversation
+store. The number shown is release-to-speech latency — the figure that
+improves when routes change.
 
 The automatic setup step carries the shared `AutoSetupCard` with its header
 hidden — the step title and body already say what it is. The job behind it
@@ -223,8 +247,8 @@ which becomes a labelled Done action on the last step. The final action stays
 where forward motion has lived throughout the flow; removing it left an empty
 gap that looked like a missing control rather than a deliberate ending.
 Header controls expose 44-point touch targets around 40-point visual faces.
-The speaking-language picker isolates assistive focus, excludes its backdrop
-from the accessibility tree, and retains a labelled 44-point close action.
+The welcome step's language picker isolates assistive focus and excludes its
+backdrop from the accessibility tree.
 
 **Decision:** The banner offers no dismissal until the introduction has been
 opened at least once, and a completed purchase removes it outright. An exit
@@ -232,18 +256,13 @@ available before the card has ever been read makes getting rid of it the
 easiest thing to do on a first launch; after a purchase the invitation has
 nothing left to invite. It stays reversible from App & diagnostics.
 
-**Decision:** Optional steps mark themselves with a rule carrying the word
-rather than a pill above the heading. A badge competed with the heading and
-read as a status on the step; a rule states the same thing in the reading order
-it belongs to. Headings are centred, because each step is a single column with
-nothing beside it. The automatic setup step uses the same rule with
-"Recommended" so its priority is stated without presenting it as mandatory.
-
-**Decision:** Speech steps are marked optional and say why skipping is safe --
-typing replaces listening, and the device's own voice replaces speaking. The
-speaking step carries a language picker over the bundled examples, because
-letting someone hear the app in their own language argues for setting it up
-better than a claim does.
+**Decision:** Headings are centred, because each step is a single column with
+nothing beside it. In the setup step's manual catalogue, each pipeline group
+carries a Required or Optional tag pill on its caption — the required group is
+the one hard requirement, and the optional groups say what already covers
+them: the phone's own recognizer and voice. The welcome step carries the
+language picker over the bundled examples, because letting someone hear the
+app in their own language argues for setting it up better than a claim does.
 
 In landscape, the workspace invitation contracts to the approved 48-point,
 title-only banner so the voice stage remains stable. Portrait keeps the full
