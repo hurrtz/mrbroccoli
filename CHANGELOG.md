@@ -37,6 +37,9 @@ the complete Play Store translations are kept in a dedicated file under
   describes what it actually does, the Thinking page's Premium bands carry
   short copy about their own sections, and provider health chips use the
   design system's flat rectangular shape.
+- In landscape, a setup notice no longer paints its full paragraph over the
+  status line and shortcut ring; the left pane always shows the compact
+  single-row action, with the complete message kept for screen readers.
 
 ### Changed
 

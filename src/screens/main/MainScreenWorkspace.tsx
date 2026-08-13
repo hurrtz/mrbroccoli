@@ -294,7 +294,10 @@ export function MainScreenWorkspace({
               layout="landscape"
               maxOrbSize={150}
               {...voiceStage}
-              compactPromptNotice={useAccessibilityCompactLayout}
+              // The left pane cannot fit the full notice paragraph above the
+              // status line at any font scale, so landscape always takes the
+              // single-row action variant.
+              compactPromptNotice
               onInputSurfaceChange={handleSurfaceChange}
             />
             <WorkspaceSatellites

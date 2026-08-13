@@ -288,6 +288,52 @@ describe("MainScreenWorkspace streaming isolation", () => {
     expect(screen.getByTestId("landscape-right-pane")).toBeTruthy();
   });
 
+  it("compacts the blocked-route notice in landscape at normal text size", () => {
+    // The landscape left pane is height-constrained at any font scale; the
+    // full notice paragraph overflows the stage area onto the status line.
+    mockUseWindowDimensions.mockReturnValue({
+      fontScale: 1,
+      height: 440,
+      scale: 3,
+      width: 956,
+    });
+    const t = jest.fn((key: string) => key);
+    const workspaceProps = createWorkspaceProps(t);
+    const screen = renderWorkspace(
+      <MainScreenWorkspace
+        {...workspaceProps}
+        isLandscape
+        transcript={{
+          activeConversationId: null,
+          activeReplayMessageId: null,
+          messages: [],
+          onCopyMessage: jest.fn(async () => true),
+          onRetryMessage: jest.fn(),
+          replayPhase: "idle",
+          scrollEnabled: true,
+          showUsageStats: false,
+          showWhenEmpty: true,
+          t,
+        }}
+        visualPhase="idle"
+        voiceStage={{
+          ...workspaceProps.voiceStage,
+          isActive: false,
+          promptBlockedActionEnabled: true,
+          promptBlockedActionLabel: "Start",
+          promptBlockedMessage:
+            "Choose your language while Mr Broccoli checks this phone.",
+          statusTitle: "Tap to speak",
+          visualPhase: "idle",
+        }}
+      />,
+    );
+
+    expect(
+      screen.getByTestId("voice-text-input-pager").props.accessibilityValue,
+    ).toEqual({ text: "compact" });
+  });
+
   it("does not rerender static controls when only transcript messages change", () => {
     const t = jest.fn((key: string) => key);
     const workspaceProps = createWorkspaceProps(t);
