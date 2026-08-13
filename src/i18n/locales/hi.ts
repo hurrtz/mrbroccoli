@@ -325,6 +325,8 @@ export const hi = {
     "मॉडल के उत्तर देने से पहले ताज़ा वेब संदर्भ जोड़ा जाता है।",
   webSearchDisabledDescription:
     "जब वर्तमान तथ्य महत्वपूर्ण हों तो इस थ्रेड के लिए लाइव वेब संदर्भ का उपयोग करें।",
+  webSearchNobodyDescription:
+    "कोई वेब अनुरोध नहीं। वह मॉडल की जानकारी से जवाब देता है।",
   webSearchQualityControls: "खोज गुणवत्ता",
   webSearchSearchMode: "खोज मोड",
   webSearchSearchModeQuick: "त्वरित",

@@ -326,6 +326,8 @@ export const sv = {
     "Färsk webbkontext läggs till innan modellen svarar.",
   webSearchDisabledDescription:
     "Använd live webbkontext för den här tråden när aktuella fakta är viktiga.",
+  webSearchNobodyDescription:
+    "Inga webbförfrågningar. Han svarar utifrån vad modellen vet.",
   webSearchQualityControls: "Sökkvalitet",
   webSearchSearchMode: "Sökläge",
   webSearchSearchModeQuick: "Snabbt",

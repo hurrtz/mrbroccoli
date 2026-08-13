@@ -326,6 +326,8 @@ export const tr = {
     "Model yanıt vermeden önce yeni web içeriği eklenir.",
   webSearchDisabledDescription:
     "Güncel gerçekler önemli olduğunda bu başlık için canlı web içeriğini kullanın.",
+  webSearchNobodyDescription:
+    "Web isteği yok. Modelin bildikleriyle yanıtlar.",
   webSearchQualityControls: "Arama Kalitesi",
   webSearchSearchMode: "Arama Modu",
   webSearchSearchModeQuick: "Hızlı",

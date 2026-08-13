@@ -325,6 +325,8 @@ export const ar = {
     "تتم إضافة سياق ويب جديد قبل أن يرد النموذج.",
   webSearchDisabledDescription:
     "استخدم سياق الويب المباشر لهذا الموضوع عندما تكون الحقائق الحالية مهمة.",
+  webSearchNobodyDescription:
+    "لا طلبات ويب. يجيب مما يعرفه النموذج.",
   webSearchQualityControls: "جودة البحث",
   webSearchSearchMode: "وضع البحث",
   webSearchSearchModeQuick: "سريع",

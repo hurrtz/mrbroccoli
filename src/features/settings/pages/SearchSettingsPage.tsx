@@ -84,7 +84,7 @@ export function SearchSettingsPage({
           testID="settings-search-route-nobody"
           label={t("webSearchNobody")}
           last={visibleProviders.length === 0 && isPremium}
-          meta={t("webSearchDisabledDescription")}
+          description={t("webSearchNobodyDescription")}
           selected={settings.webSearchMode === "off"}
           onSelect={() => onUpdate({ webSearchMode: "off" })}
         />

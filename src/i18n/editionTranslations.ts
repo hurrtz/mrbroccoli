@@ -8,6 +8,10 @@ const en = {
     "Free remains usable: offline conversations, history, backups, and manual export stay available.",
   premiumBenefitProviders:
     "Use your cloud providers and their higher-quality models",
+  premiumCouncilBandCopy:
+    "Model Council deliberates across your own provider keys.",
+  premiumPromptBandCopy:
+    "Shape the system prompt for your own provider models.",
   premiumBenefitModes:
     "Switch response modes and run multi-model Model Council deliberation",
   premiumBenefitTools: "Add web search, images, and cloud Drive sessions",
@@ -67,6 +71,10 @@ export const editionTranslations = {
       "Kostenlos bleibt nutzbar: Offline-Gespräche, Verlauf, Backups und manueller Export bleiben verfügbar.",
     premiumBenefitProviders:
       "Nutze deine Cloud-Anbieter und deren hochwertigere Modelle",
+    premiumCouncilBandCopy:
+      "Der Modellrat berät über deine eigenen Anbieterschlüssel.",
+    premiumPromptBandCopy:
+      "Gestalte den System-Prompt für deine eigenen Anbieter-Modelle.",
     premiumBenefitModes:
       "Wechsle Antwortmodi und starte eine Übermodus-Beratung mit mehreren Modellen",
     premiumBenefitTools:
@@ -122,6 +130,10 @@ export const editionTranslations = {
       "Безкоштовна версія залишається корисною: офлайн-розмови, історія, резервні копії та ручний експорт доступні.",
     premiumBenefitProviders:
       "Використовуйте своїх хмарних провайдерів і їхні якісніші моделі",
+    premiumCouncilBandCopy:
+      "Рада моделей радиться через ваші власні ключі провайдерів.",
+    premiumPromptBandCopy:
+      "Формуйте системний промпт для моделей ваших провайдерів.",
     premiumBenefitModes:
       "Перемикайте режими відповідей і запускайте обговорення в Суперрежимі з кількома моделями",
     premiumBenefitTools: "Додайте вебпошук, зображення та хмарні сесії Drive",
@@ -175,6 +187,10 @@ export const editionTranslations = {
       "मुफ़्त संस्करण उपयोगी रहता है: ऑफ़लाइन बातचीत, इतिहास, बैकअप और मैन्युअल निर्यात उपलब्ध रहते हैं।",
     premiumBenefitProviders:
       "अपने क्लाउड प्रदाता और उनके बेहतर मॉडल इस्तेमाल करें",
+    premiumCouncilBandCopy:
+      "मॉडल काउंसिल आपकी अपनी प्रोवाइडर कुंजियों से विचार-विमर्श करती है।",
+    premiumPromptBandCopy:
+      "अपने प्रोवाइडर मॉडलों के लिए सिस्टम प्रॉम्प्ट तैयार करें।",
     premiumBenefitModes:
       "उत्तर मोड बदलें और कई मॉडलों वाला सर्वोच्च मोड विचार-विमर्श चलाएँ",
     premiumBenefitTools: "वेब खोज, चित्र और क्लाउड Drive सत्र जोड़ें",
@@ -228,6 +244,10 @@ export const editionTranslations = {
       "La versión gratuita sigue siendo útil: conserva conversaciones sin conexión, historial, copias de seguridad y exportación manual.",
     premiumBenefitProviders:
       "Usa tus proveedores en la nube y sus modelos de mayor calidad",
+    premiumCouncilBandCopy:
+      "El Consejo de Modelos delibera con tus propias claves de proveedor.",
+    premiumPromptBandCopy:
+      "Da forma al prompt del sistema para tus propios modelos de proveedor.",
     premiumBenefitModes:
       "Cambia de modo de respuesta y ejecuta deliberaciones del Modo supremo con varios modelos",
     premiumBenefitTools:
@@ -283,6 +303,10 @@ export const editionTranslations = {
       "La version gratuite reste utile : conversations hors ligne, historique, sauvegardes et export manuel restent disponibles.",
     premiumBenefitProviders:
       "Utilisez vos fournisseurs cloud et leurs modèles de meilleure qualité",
+    premiumCouncilBandCopy:
+      "Le Conseil des modèles délibère avec vos propres clés de fournisseur.",
+    premiumPromptBandCopy:
+      "Façonnez le prompt système pour vos propres modèles de fournisseur.",
     premiumBenefitModes:
       "Changez de mode de réponse et lancez une délibération Mode suprême multimodèle",
     premiumBenefitTools:
@@ -338,6 +362,10 @@ export const editionTranslations = {
       "La versione gratuita resta utilizzabile: conversazioni offline, cronologia, backup ed esportazione manuale rimangono disponibili.",
     premiumBenefitProviders:
       "Usa i tuoi provider cloud e i loro modelli di qualità superiore",
+    premiumCouncilBandCopy:
+      "Il Consiglio dei modelli delibera con le tue chiavi provider.",
+    premiumPromptBandCopy:
+      "Modella il prompt di sistema per i tuoi modelli provider.",
     premiumBenefitModes:
       "Cambia modalità di risposta e avvia deliberazioni della Modalità suprema multimodello",
     premiumBenefitTools:
@@ -392,6 +420,10 @@ export const editionTranslations = {
       "A versão gratuita continua útil: conversas offline, histórico, cópias de segurança e exportação manual permanecem disponíveis.",
     premiumBenefitProviders:
       "Use os seus fornecedores cloud e os respetivos modelos de maior qualidade",
+    premiumCouncilBandCopy:
+      "O Conselho de Modelos delibera com as suas próprias chaves de fornecedor.",
+    premiumPromptBandCopy:
+      "Molde o prompt de sistema para os seus próprios modelos de fornecedor.",
     premiumBenefitModes:
       "Alterne modos de resposta e execute deliberações do Modo Supremo com vários modelos",
     premiumBenefitTools:
@@ -446,6 +478,10 @@ export const editionTranslations = {
       "A versão grátis continua útil: conversas offline, histórico, backups e exportação manual permanecem disponíveis.",
     premiumBenefitProviders:
       "Use seus provedores em nuvem e os modelos de maior qualidade deles",
+    premiumCouncilBandCopy:
+      "O Conselho de Modelos delibera com as suas próprias chaves de provedor.",
+    premiumPromptBandCopy:
+      "Molde o prompt de sistema para os seus próprios modelos de provedor.",
     premiumBenefitModes:
       "Alterne modos de resposta e execute deliberações do Modo Supremo com vários modelos",
     premiumBenefitTools:
@@ -500,6 +536,10 @@ export const editionTranslations = {
       "Бесплатная версия остаётся полезной: офлайн-разговоры, история, резервные копии и ручной экспорт доступны.",
     premiumBenefitProviders:
       "Используйте своих облачных провайдеров и их более качественные модели",
+    premiumCouncilBandCopy:
+      "Совет моделей совещается через ваши собственные ключи провайдеров.",
+    premiumPromptBandCopy:
+      "Настройте системный промпт для моделей ваших провайдеров.",
     premiumBenefitModes:
       "Переключайте режимы ответа и запускайте обсуждения в Суперрежиме для нескольких моделей",
     premiumBenefitTools:
@@ -554,6 +594,10 @@ export const editionTranslations = {
     premiumFreeKeepsWorking:
       "免费版仍可完整使用：离线对话、历史记录、备份和手动导出均会保留。",
     premiumBenefitProviders: "使用你的云端提供商及其更高质量的模型",
+    premiumCouncilBandCopy:
+      "模型议会使用你自己的提供商密钥进行商议。",
+    premiumPromptBandCopy:
+      "为你自己的提供商模型定制系统提示词。",
     premiumBenefitModes: "切换回复模式并运行多模型终极模式推演",
     premiumBenefitTools: "加入网页搜索、图片和云端 Drive 会话",
     premiumBenefitKnowledge: "使用过往对话知识和可携带的 Markdown 档案",
@@ -603,6 +647,10 @@ export const editionTranslations = {
     premiumFreeKeepsWorking:
       "يبقى الإصدار المجاني مفيدًا: تظل المحادثات بلا اتصال والسجل والنسخ الاحتياطية والتصدير اليدوي متاحة.",
     premiumBenefitProviders: "استخدم مزودي السحابة لديك ونماذجهم الأعلى جودة",
+    premiumCouncilBandCopy:
+      "مجلس النماذج يتداول عبر مفاتيح المزودين الخاصة بك.",
+    premiumPromptBandCopy:
+      "صِغ موجه النظام لنماذج مزوديك الخاصة.",
     premiumBenefitModes:
       "بدّل أوضاع الرد وشغّل مداولات الوضع الفائق بين عدة نماذج",
     premiumBenefitTools: "أضف بحث الويب والصور وجلسات Drive السحابية",
@@ -656,6 +704,10 @@ export const editionTranslations = {
     premiumFreeKeepsWorking:
       "無料版も使い続けられます。オフライン会話、履歴、バックアップ、手動エクスポートは利用可能です。",
     premiumBenefitProviders: "お使いのクラウドプロバイダーと高品質モデルを利用",
+    premiumCouncilBandCopy:
+      "モデル評議会は、あなた自身のプロバイダーキーで審議します。",
+    premiumPromptBandCopy:
+      "自分のプロバイダーモデル向けにシステムプロンプトを調整できます。",
     premiumBenefitModes:
       "応答モードを切り替え、複数モデルの究極モード検討を実行",
     premiumBenefitTools: "ウェブ検索、画像、クラウド Drive セッションを追加",
@@ -710,6 +762,10 @@ export const editionTranslations = {
       "Az ingyenes változat használható marad: az offline beszélgetések, előzmények, mentések és kézi export elérhetők.",
     premiumBenefitProviders:
       "Használja saját felhőszolgáltatóit és jobb minőségű modelljeiket",
+    premiumCouncilBandCopy:
+      "A Modelltanács a saját szolgáltatói kulcsaiddal tanácskozik.",
+    premiumPromptBandCopy:
+      "Alakítsd a rendszerpromptot a saját szolgáltatói modelljeidhez.",
     premiumBenefitModes:
       "Váltson válaszmódot, és indítson többmodelles Szuper mód-mérlegelést",
     premiumBenefitTools:
@@ -765,6 +821,10 @@ export const editionTranslations = {
       "Bezplatná verze zůstává užitečná: offline konverzace, historie, zálohy a ruční export zůstávají dostupné.",
     premiumBenefitProviders:
       "Používejte své cloudové poskytovatele a jejich kvalitnější modely",
+    premiumCouncilBandCopy:
+      "Rada modelů rokuje přes vaše vlastní klíče poskytovatelů.",
+    premiumPromptBandCopy:
+      "Upravte systémový prompt pro modely vašich poskytovatelů.",
     premiumBenefitModes:
       "Přepínejte režimy odpovědí a spusťte poradu více modelů v Superrežimu",
     premiumBenefitTools:
@@ -819,6 +879,10 @@ export const editionTranslations = {
       "Wersja bezpłatna pozostaje użyteczna: rozmowy offline, historia, kopie zapasowe i ręczny eksport są nadal dostępne.",
     premiumBenefitProviders:
       "Korzystaj z własnych dostawców chmurowych i ich lepszych modeli",
+    premiumCouncilBandCopy:
+      "Rada modeli obraduje na twoich własnych kluczach dostawców.",
+    premiumPromptBandCopy:
+      "Kształtuj prompt systemowy dla modeli twoich dostawców.",
     premiumBenefitModes:
       "Przełączaj tryby odpowiedzi i uruchamiaj narady Supertrybu wielu modeli",
     premiumBenefitTools:
@@ -873,6 +937,10 @@ export const editionTranslations = {
       "Ücretsiz sürüm kullanılabilir kalır: çevrimdışı konuşmalar, geçmiş, yedekler ve elle dışa aktarma sunulur.",
     premiumBenefitProviders:
       "Kendi bulut sağlayıcılarınızı ve daha kaliteli modellerini kullanın",
+    premiumCouncilBandCopy:
+      "Model Konseyi kendi sağlayıcı anahtarlarınla müzakere eder.",
+    premiumPromptBandCopy:
+      "Kendi sağlayıcı modellerin için sistem istemini biçimlendir.",
     premiumBenefitModes:
       "Yanıt modlarını değiştirin ve çok modelli Süper Mod değerlendirmesi çalıştırın",
     premiumBenefitTools:
@@ -928,6 +996,10 @@ export const editionTranslations = {
       "Gratisversionen förblir användbar: offline-samtal, historik, säkerhetskopior och manuell export finns kvar.",
     premiumBenefitProviders:
       "Använd dina molnleverantörer och deras modeller av högre kvalitet",
+    premiumCouncilBandCopy:
+      "Modellrådet överlägger med dina egna leverantörsnycklar.",
+    premiumPromptBandCopy:
+      "Utforma systemprompten för dina egna leverantörsmodeller.",
     premiumBenefitModes:
       "Växla svarsläge och kör Superläge-överläggning med flera modeller",
     premiumBenefitTools:
@@ -982,6 +1054,10 @@ export const editionTranslations = {
       "مفت ورژن کارآمد رہتا ہے: آف لائن گفتگو، تاریخ، بیک اپ اور دستی برآمد دستیاب رہتے ہیں۔",
     premiumBenefitProviders:
       "اپنے کلاؤڈ فراہم کنندگان اور ان کے بہتر معیار کے ماڈل استعمال کریں",
+    premiumCouncilBandCopy:
+      "ماڈل کونسل آپ کی اپنی فراہم کنندہ کلیدوں سے مشاورت کرتی ہے۔",
+    premiumPromptBandCopy:
+      "اپنے فراہم کنندہ ماڈلز کے لیے سسٹم پرامپٹ ترتیب دیں۔",
     premiumBenefitModes:
       "جوابی موڈ بدلیں اور متعدد ماڈلز کی اعلیٰ موڈ مشاورت چلائیں",
     premiumBenefitTools: "ویب تلاش، تصاویر اور کلاؤڈ Drive سیشن شامل کریں",

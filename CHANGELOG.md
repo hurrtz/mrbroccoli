@@ -32,6 +32,12 @@ the complete Play Store translations are kept in a dedicated file under
   Pause/Resume toggle whose green fill means the loop is live, and the silence
   countdown appears on screen as a "Sends in N…" chip above it.
 
+- Settings route pickers now set prose about a route in the reading face and
+  keep the mono face for machine facts, the "Nobody" web-search route
+  describes what it actually does, the Thinking page's Premium bands carry
+  short copy about their own sections, and provider health chips use the
+  design system's flat rectangular shape.
+
 ### Changed
 
 - The introduction is now three steps instead of seven: a welcome where a

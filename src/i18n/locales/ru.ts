@@ -326,6 +326,8 @@ export const ru = {
     "Свежий веб-контекст добавляется перед ответом модели.",
   webSearchDisabledDescription:
     "Используйте живой веб-контекст для этой темы, когда текущие факты имеют значение.",
+  webSearchNobodyDescription:
+    "Без веб-запросов. Отвечает тем, что знает модель.",
   webSearchQualityControls: "Качество поиска",
   webSearchSearchMode: "Режим поиска",
   webSearchSearchModeQuick: "Быстрый",

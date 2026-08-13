@@ -309,7 +309,7 @@ function ProviderRows({
       {!isPremium ? (
         <PremiumBand
           actionLabel={t("upgradeToPremium")}
-          copy={t("premiumDescription")}
+          copy={t("premiumBenefitProviders")}
           onPress={onOpenPremium}
           premiumLabel={t("premium")}
         />
@@ -505,7 +505,7 @@ export function ThinkingSettingsPage({
         {!isPremium ? (
           <PremiumBand
             actionLabel={t("upgradeToPremium")}
-            copy={t("premiumDescription")}
+            copy={t("premiumCouncilBandCopy")}
             onPress={onOpenPremium}
             premiumLabel={t("premium")}
           />
@@ -534,7 +534,7 @@ export function ThinkingSettingsPage({
         {!isPremium ? (
           <PremiumBand
             actionLabel={t("upgradeToPremium")}
-            copy={t("premiumDescription")}
+            copy={t("premiumPromptBandCopy")}
             onPress={onOpenPremium}
             premiumLabel={t("premium")}
           />

@@ -326,6 +326,8 @@ export const ja = {
     "モデルが応答する前に、最新のウェブコンテキストが追加されます。",
   webSearchDisabledDescription:
     "最新の事実が重要な場合は、このスレッドでライブなウェブコンテキストを使用してください。",
+  webSearchNobodyDescription:
+    "ウェブへのリクエストはありません。モデルの知識から答えます。",
   webSearchQualityControls: "検索品質",
   webSearchSearchMode: "検索モード",
   webSearchSearchModeQuick: "クイック",

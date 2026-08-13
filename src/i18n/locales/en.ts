@@ -323,6 +323,8 @@ export const en = {
     "Fresh web context is added before the model replies.",
   webSearchDisabledDescription:
     "Use live web context for this thread when current facts matter.",
+  webSearchNobodyDescription:
+    "No web requests. He answers from what the model knows.",
   webSearchQualityControls: "Search Quality",
   webSearchSearchMode: "Search Mode",
   webSearchSearchModeQuick: "Quick",

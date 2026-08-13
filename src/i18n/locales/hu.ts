@@ -331,6 +331,8 @@ export const hu = {
     "Friss webes környezet kerül hozzáadásra, mielőtt a modell válaszolna.",
   webSearchDisabledDescription:
     "Használjon élő webes környezetet ehhez a szálhoz, ha az aktuális tények számítanak.",
+  webSearchNobodyDescription:
+    "Nincs webes kérés. Abból válaszol, amit a modell tud.",
   webSearchQualityControls: "Keresési minőség",
   webSearchSearchMode: "Keresési mód",
   webSearchSearchModeQuick: "Gyors",

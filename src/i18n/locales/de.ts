@@ -331,6 +331,8 @@ export const de = {
     "Vor der Modellantwort wird frischer Web-Kontext ergänzt.",
   webSearchDisabledDescription:
     "Nutze Live-Web-Kontext, wenn aktuelle Fakten wichtig sind.",
+  webSearchNobodyDescription:
+    "Keine Web-Anfragen. Er antwortet aus dem Wissen des Modells.",
   webSearchQualityControls: "Suchqualität",
   webSearchSearchMode: "Suchmodus",
   webSearchSearchModeQuick: "Schnell",

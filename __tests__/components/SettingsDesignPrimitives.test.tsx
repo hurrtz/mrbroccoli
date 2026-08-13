@@ -127,6 +127,34 @@ describe("settings design primitives", () => {
     expect(onRemove).toHaveBeenCalledTimes(1);
   });
 
+  it("keeps prose descriptions in the body face and machine facts in mono", () => {
+    // Mono is reserved for terse machine facts; sentences about a route read
+    // in the supporting face so the pickers do not become mono paragraph soup.
+    const screen = wrap(
+      <RouteOptionRow
+        testID="native-route"
+        label="System Recognition"
+        description="Use the operating system's speech recognizer."
+        meta="466 MB"
+        metaTestID="native-route-meta"
+        selected
+        onSelect={jest.fn()}
+      />,
+    );
+
+    const description = screen.getByText(
+      "Use the operating system's speech recognizer.",
+    );
+    const descriptionStyle = StyleSheet.flatten(description.props.style);
+    expect(descriptionStyle.fontFamily).toBe("Outfit_400Regular");
+    expect(descriptionStyle.fontSize).toBe(12);
+
+    const meta = StyleSheet.flatten(
+      screen.getByTestId("native-route-meta").props.style,
+    );
+    expect(meta.fontSize).toBe(10);
+  });
+
   it("gives icon actions a 44pt target around a 36pt well", () => {
     const onPress = jest.fn();
     const screen = wrap(

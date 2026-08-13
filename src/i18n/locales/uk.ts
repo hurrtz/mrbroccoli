@@ -335,6 +335,8 @@ export const uk = {
     "Перед відповіддю моделі додається актуальний вебконтекст.",
   webSearchDisabledDescription:
     "Використовуйте актуальний вебконтекст у цій розмові, коли важливі свіжі дані.",
+  webSearchNobodyDescription:
+    "Без вебзапитів. Відповідає з того, що знає модель.",
   webSearchQualityControls: "Якість пошуку",
   webSearchSearchMode: "Режим пошуку",
   webSearchSearchModeQuick: "Швидкий",

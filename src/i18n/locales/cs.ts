@@ -327,6 +327,8 @@ export const cs = {
     "Před odpovědí modelu je přidán nový webový kontext.",
   webSearchDisabledDescription:
     "Pokud jsou aktuální fakta důležitá, použijte pro toto vlákno živý webový kontext.",
+  webSearchNobodyDescription:
+    "Žádné webové požadavky. Odpovídá z toho, co model zná.",
   webSearchQualityControls: "Kvalita vyhledávání",
   webSearchSearchMode: "Režim vyhledávání",
   webSearchSearchModeQuick: "Rychlý",

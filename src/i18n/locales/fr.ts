@@ -325,6 +325,8 @@ export const fr = {
     "Un nouveau contexte Web est ajouté avant que le modèle ne réponde.",
   webSearchDisabledDescription:
     "Utilisez le contexte Web en direct pour ce fil de discussion lorsque les faits actuels comptent.",
+  webSearchNobodyDescription:
+    "Aucune requête web. Il répond avec ce que le modèle sait.",
   webSearchQualityControls: "Qualité de la recherche",
   webSearchSearchMode: "Mode de recherche",
   webSearchSearchModeQuick: "Rapide",

@@ -328,6 +328,8 @@ export const pl = {
     "Przed odpowiedzią modelu dodawany jest świeży kontekst sieciowy.",
   webSearchDisabledDescription:
     "Jeśli aktualne fakty mają znaczenie, użyj aktywnego kontekstu sieciowego w tym wątku.",
+  webSearchNobodyDescription:
+    "Bez zapytań do sieci. Odpowiada z wiedzy modelu.",
   webSearchQualityControls: "Jakość wyszukiwania",
   webSearchSearchMode: "Tryb wyszukiwania",
   webSearchSearchModeQuick: "Szybki",

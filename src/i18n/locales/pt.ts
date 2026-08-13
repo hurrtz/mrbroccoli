@@ -325,6 +325,8 @@ export const pt = {
     "Novo contexto web é adicionado antes de o modelo responder.",
   webSearchDisabledDescription:
     "Utilize o contexto da web ao vivo para este tópico quando os factos atuais são importantes.",
+  webSearchNobodyDescription:
+    "Sem pedidos à web. Responde com o que o modelo sabe.",
   webSearchQualityControls: "Qualidade de pesquisa",
   webSearchSearchMode: "Modo de pesquisa",
   webSearchSearchModeQuick: "Rápido",

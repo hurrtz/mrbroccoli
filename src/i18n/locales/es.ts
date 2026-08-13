@@ -327,6 +327,8 @@ export const es = {
     "Se agrega contexto web nuevo antes de que el modelo responda.",
   webSearchDisabledDescription:
     "Utilice el contexto web en vivo para este hilo cuando los hechos actuales sean importantes.",
+  webSearchNobodyDescription:
+    "Sin solicitudes web. Responde con lo que el modelo sabe.",
   webSearchQualityControls: "Calidad de búsqueda",
   webSearchSearchMode: "Modo de búsqueda",
   webSearchSearchModeQuick: "Rápido",

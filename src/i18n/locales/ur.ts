@@ -323,6 +323,8 @@ export const ur = {
     "ماڈل کے جواب دینے سے پہلے تازہ ویب سیاق و سباق شامل کیا جاتا ہے۔",
   webSearchDisabledDescription:
     "اس تھریڈ کے لیے لائیو ویب سیاق و سباق استعمال کریں جب موجودہ حقائق اہم ہوں۔",
+  webSearchNobodyDescription:
+    "کوئی ویب درخواست نہیں۔ وہ ماڈل کے علم سے جواب دیتا ہے۔",
   webSearchQualityControls: "تلاش کا معیار",
   webSearchSearchMode: "سرچ موڈ",
   webSearchSearchModeQuick: "جلدی",

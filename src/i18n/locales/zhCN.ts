@@ -323,6 +323,8 @@ export const zhCN = {
     "在模型回复之前添加新的 Web 上下文。",
   webSearchDisabledDescription:
     "当信息时效性很重要时，可为此对话启用实时网络上下文。",
+  webSearchNobodyDescription:
+    "不发出网络请求。他凭模型已有的知识回答。",
   webSearchQualityControls: "搜索质量",
   webSearchSearchMode: "搜索模式",
   webSearchSearchModeQuick: "快速",

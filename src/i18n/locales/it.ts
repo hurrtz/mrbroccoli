@@ -328,6 +328,8 @@ export const it = {
     "Un nuovo contesto web viene aggiunto prima che il modello risponda.",
   webSearchDisabledDescription:
     "Utilizza il contesto web live per questa discussione quando i fatti attuali contano.",
+  webSearchNobodyDescription:
+    "Nessuna richiesta web. Risponde con ciò che il modello sa.",
   webSearchQualityControls: "Qualità della ricerca",
   webSearchSearchMode: "Modalità di ricerca",
   webSearchSearchModeQuick: "Rapida",

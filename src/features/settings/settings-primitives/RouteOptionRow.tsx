@@ -9,6 +9,7 @@ import { fonts } from "../../../theme/typography";
 
 export function RouteOptionRow({
   action,
+  description,
   disabled = false,
   error = false,
   label,
@@ -24,6 +25,8 @@ export function RouteOptionRow({
   testID,
 }: {
   action?: React.ReactNode;
+  /** Prose about the route, in the supporting face. Machine facts go in meta. */
+  description?: string;
   disabled?: boolean;
   error?: boolean;
   label: string;
@@ -105,6 +108,13 @@ export function RouteOptionRow({
             >
               {label}
             </Text>
+            {description ? (
+              <Text
+                style={[styles.description, { color: colors.textSecondary }]}
+              >
+                {description}
+              </Text>
+            ) : null}
             {meta ? (
               <Text
                 testID={metaTestID}
@@ -174,6 +184,12 @@ const styles = StyleSheet.create({
     fontFamily: fonts.bodyMedium,
     fontSize: 15,
     lineHeight: 20,
+  },
+  description: {
+    marginTop: 2,
+    fontFamily: fonts.body,
+    fontSize: 12,
+    lineHeight: 17,
   },
   meta: {
     marginTop: 2,

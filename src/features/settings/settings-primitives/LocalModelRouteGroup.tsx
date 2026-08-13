@@ -202,7 +202,7 @@ export function LocalModelRouteGroup({
         testID={`settings-${capability}-route-native`}
         disabled={nativeDisabled}
         label={capability === "stt" ? t("appNative") : t("systemVoice")}
-        meta={
+        description={
           capability === "stt"
             ? t("nativeSttDescription")
             : t("nativeTtsDescription")
@@ -249,14 +249,17 @@ export function LocalModelRouteGroup({
           testID={`settings-${capability}-route-provider-${route.provider}`}
           label={PROVIDER_LABELS[route.provider]}
           locked={!isPremium}
-          meta={
+          description={
             route.model
-              ? `${t("provider")} · ${route.model}`
+              ? undefined
               : t(
                   capability === "stt"
                     ? "providerSttDescription"
                     : "providerTtsDescription",
                 )
+          }
+          meta={
+            route.model ? `${t("provider")} · ${route.model}` : undefined
           }
           selected={route.selected}
           onSelect={route.onSelect}
