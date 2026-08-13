@@ -48,6 +48,9 @@ the complete Play Store translations are kept in a dedicated file under
   of squeezing the rest of the home screen.
 - The Settings overview's Connections summary names at most two providers and
   counts the rest ("+2") instead of truncating a third name mid-word.
+- The session actions sheet is now one grouped card with hairline dividers
+  instead of an outlined card per action, and forked sessions gain a
+  "Show root conversation" action that jumps to the original session.
 - Copy no longer references the retired "On-device AI" page: the setup note
   points at Settings, and on-device model rows drop the "· On-device AI"
   suffix since their meta line already says where they run. The system

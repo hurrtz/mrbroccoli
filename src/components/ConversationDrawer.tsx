@@ -177,6 +177,7 @@ export const ConversationDrawer = React.memo(function ConversationDrawer({
         <ConversationActionSheet
           conversation={controller.actionConversation}
           onClose={controller.closeActionModal}
+          onOpenRoot={controller.handleSelectConversation}
           onCopyThread={onCopyThread}
           onDelete={handleDelete}
           onManageMemory={onManageMemory}

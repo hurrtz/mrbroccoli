@@ -54,17 +54,20 @@ export const styles = StyleSheet.create({
     lineHeight: 16,
     fontFamily: fonts.mono,
   },
+  actionSheetGroup: {
+    borderRadius: 12,
+    borderWidth: 1,
+    overflow: "hidden",
+  },
   actionSheetRow: {
     minHeight: 48,
-    borderRadius: 10,
-    borderWidth: 1,
     paddingHorizontal: 14,
     flexDirection: "row",
     alignItems: "center",
     gap: 12,
   },
-  actionSheetDeleteRow: {
-    marginTop: 4,
+  actionSheetRowDivider: {
+    borderBottomWidth: StyleSheet.hairlineWidth,
   },
   actionSheetRowText: {
     fontSize: 15,

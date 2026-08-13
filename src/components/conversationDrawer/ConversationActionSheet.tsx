@@ -1,11 +1,15 @@
 import React from "react";
 import { ScrollView, Text, TouchableOpacity, View } from "react-native";
 
-import { PhosphorIcon } from "../../design-system/PhosphorIcon";
+import {
+  PhosphorIcon,
+  type PhosphorIconName,
+} from "../../design-system/PhosphorIcon";
 import { IconButton } from "../../design-system/IconButton";
 
 import { useLocalization } from "../../i18n";
 import { useTheme } from "../../theme/ThemeContext";
+import { Colors } from "../../theme/colors";
 import { ConversationMeta } from "../../types";
 
 import { styles } from "./styles";
@@ -16,6 +20,7 @@ interface ConversationActionSheetProps {
   onCopyThread: (conversationId: string) => void;
   onDelete: (conversationId: string) => void;
   onManageMemory: (conversationId: string) => void;
+  onOpenRoot?: (conversationId: string) => void;
   onReviewIntegrity: (conversation: ConversationMeta) => void;
   onOpenRenameModal: (conversation: ConversationMeta) => void;
   onShareThread: (conversationId: string) => void;
@@ -25,12 +30,52 @@ interface ConversationActionSheetProps {
   onAutoName: (conversationId: string) => void;
 }
 
+function ActionRow({
+  accessibilityHint,
+  colors,
+  danger = false,
+  icon,
+  label,
+  last = false,
+  onPress,
+  testID,
+}: {
+  accessibilityHint?: string;
+  colors: Colors;
+  danger?: boolean;
+  icon: PhosphorIconName;
+  label: string;
+  last?: boolean;
+  onPress: () => void;
+  testID?: string;
+}) {
+  const ink = danger ? colors.danger : colors.textSecondary;
+  return (
+    <TouchableOpacity
+      testID={testID}
+      style={[
+        styles.actionSheetRow,
+        last ? null : [styles.actionSheetRowDivider, { borderBottomColor: colors.border }],
+      ]}
+      onPress={onPress}
+      activeOpacity={0.88}
+      accessibilityRole="button"
+      accessibilityLabel={label}
+      accessibilityHint={accessibilityHint}
+    >
+      <PhosphorIcon name={icon} size="compact" color={ink} />
+      <Text style={[styles.actionSheetRowText, { color: ink }]}>{label}</Text>
+    </TouchableOpacity>
+  );
+}
+
 export function ConversationActionSheet({
   conversation,
   onClose,
   onCopyThread,
   onDelete,
   onManageMemory,
+  onOpenRoot,
   onReviewIntegrity,
   onOpenRenameModal,
   onShareThread,
@@ -45,6 +90,8 @@ export function ConversationActionSheet({
   if (!conversation) {
     return null;
   }
+
+  const rootConversationId = conversation.branch?.rootConversationId;
 
   return (
     <View style={styles.inlineActionOverlay} pointerEvents="box-none">
@@ -94,288 +141,132 @@ export function ConversationActionSheet({
           />
         </View>
 
-        <TouchableOpacity
-          testID="conversation-action-toggle-pin"
+        {/* One grouped card with hairline dividers; each action is a row,
+            not its own outlined island. */}
+        <View
           style={[
-            styles.actionSheetRow,
+            styles.actionSheetGroup,
             {
               backgroundColor: colors.surfaceElevated,
               borderColor: colors.border,
             },
           ]}
-          onPress={() => {
-            onTogglePinned(conversation.id);
-            onClose();
-          }}
-          activeOpacity={0.88}
-          accessibilityRole="button"
-          accessibilityLabel={conversation.pinned ? t("unpin") : t("pin")}
         >
-          <PhosphorIcon
-            name="pushpin"
-            size="compact"
-            color={colors.textSecondary}
+          {rootConversationId && onOpenRoot ? (
+            <ActionRow
+              colors={colors}
+              icon="branch"
+              label={t("showRootConversation")}
+              onPress={() => {
+                onOpenRoot(rootConversationId);
+                onClose();
+              }}
+              testID="conversation-action-show-root"
+            />
+          ) : null}
+          <ActionRow
+            colors={colors}
+            icon="pushpin"
+            label={conversation.pinned ? t("unpin") : t("pin")}
+            onPress={() => {
+              onTogglePinned(conversation.id);
+              onClose();
+            }}
+            testID="conversation-action-toggle-pin"
           />
-          <Text
-            style={[styles.actionSheetRowText, { color: colors.textSecondary }]}
-          >
-            {conversation.pinned ? t("unpin") : t("pin")}
-          </Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          testID="conversation-action-toggle-private"
-          style={[
-            styles.actionSheetRow,
-            {
-              backgroundColor: colors.surfaceElevated,
-              borderColor: colors.border,
-            },
-          ]}
-          onPress={() => {
-            onTogglePrivate(conversation.id);
-            onClose();
-          }}
-          activeOpacity={0.88}
-          accessibilityRole="button"
-          accessibilityLabel={
-            conversation.isPrivate
-              ? t("includeConversationInKnowledge")
-              : t("markConversationPrivate")
-          }
-          accessibilityHint={t("privateConversationDescription")}
-        >
-          <PhosphorIcon
-            name={conversation.isPrivate ? "global" : "lock"}
-            size="compact"
-            color={colors.textSecondary}
+          <ActionRow
+            accessibilityHint={t("privateConversationDescription")}
+            colors={colors}
+            icon={conversation.isPrivate ? "global" : "lock"}
+            label={
+              conversation.isPrivate
+                ? t("includeConversationInKnowledge")
+                : t("markConversationPrivate")
+            }
+            onPress={() => {
+              onTogglePrivate(conversation.id);
+              onClose();
+            }}
+            testID="conversation-action-toggle-private"
           />
-          <Text
-            style={[styles.actionSheetRowText, { color: colors.textSecondary }]}
-          >
-            {conversation.isPrivate
-              ? t("includeConversationInKnowledge")
-              : t("markConversationPrivate")}
-          </Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          testID="conversation-action-rename"
-          style={[
-            styles.actionSheetRow,
-            {
-              backgroundColor: colors.surfaceElevated,
-              borderColor: colors.border,
-            },
-          ]}
-          onPress={() => onOpenRenameModal(conversation)}
-          activeOpacity={0.88}
-          accessibilityRole="button"
-          accessibilityLabel={t("rename")}
-        >
-          <PhosphorIcon
-            name="edit"
-            size="compact"
-            color={colors.textSecondary}
+          <ActionRow
+            colors={colors}
+            icon="edit"
+            label={t("rename")}
+            onPress={() => onOpenRenameModal(conversation)}
+            testID="conversation-action-rename"
           />
-          <Text
-            style={[styles.actionSheetRowText, { color: colors.textSecondary }]}
-          >
-            {t("rename")}
-          </Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          testID="conversation-action-auto-name"
-          style={[
-            styles.actionSheetRow,
-            {
-              backgroundColor: colors.surfaceElevated,
-              borderColor: colors.border,
-            },
-          ]}
-          onPress={() => {
-            onAutoName(conversation.id);
-            onClose();
-          }}
-          activeOpacity={0.88}
-          accessibilityRole="button"
-          accessibilityLabel={t("nameConversationAutomatically")}
-        >
-          <PhosphorIcon
-            name="thunderbolt"
-            size="compact"
-            color={colors.textSecondary}
+          <ActionRow
+            colors={colors}
+            icon="thunderbolt"
+            label={t("nameConversationAutomatically")}
+            onPress={() => {
+              onAutoName(conversation.id);
+              onClose();
+            }}
+            testID="conversation-action-auto-name"
           />
-          <Text style={[styles.actionSheetRowText, { color: colors.text }]}>
-            {t("nameConversationAutomatically")}
-          </Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          testID="conversation-action-toggle-archive"
-          style={[
-            styles.actionSheetRow,
-            {
-              backgroundColor: colors.surfaceElevated,
-              borderColor: colors.border,
-            },
-          ]}
-          onPress={() => {
-            onToggleArchived(conversation.id);
-            onClose();
-          }}
-          activeOpacity={0.88}
-          accessibilityRole="button"
-          accessibilityLabel={
-            conversation.archived ? t("unarchiveSession") : t("archiveSession")
-          }
-        >
-          <PhosphorIcon
-            name="inbox"
-            size="compact"
-            color={colors.textSecondary}
+          <ActionRow
+            colors={colors}
+            icon="inbox"
+            label={
+              conversation.archived
+                ? t("unarchiveSession")
+                : t("archiveSession")
+            }
+            onPress={() => {
+              onToggleArchived(conversation.id);
+              onClose();
+            }}
+            testID="conversation-action-toggle-archive"
           />
-          <Text style={[styles.actionSheetRowText, { color: colors.text }]}>
-            {conversation.archived
-              ? t("unarchiveSession")
-              : t("archiveSession")}
-          </Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          testID="conversation-action-review-integrity"
-          style={[
-            styles.actionSheetRow,
-            {
-              backgroundColor: colors.surfaceElevated,
-              borderColor: colors.border,
-            },
-          ]}
-          onPress={() => onReviewIntegrity(conversation)}
-          activeOpacity={0.88}
-          accessibilityRole="button"
-          accessibilityLabel={t("reviewConversationIntegrity")}
-        >
-          <PhosphorIcon
-            name="safety-certificate"
-            size="compact"
-            color={colors.textSecondary}
+          <ActionRow
+            colors={colors}
+            icon="safety-certificate"
+            label={t("reviewConversationIntegrity")}
+            onPress={() => onReviewIntegrity(conversation)}
+            testID="conversation-action-review-integrity"
           />
-          <Text
-            style={[styles.actionSheetRowText, { color: colors.textSecondary }]}
-          >
-            {t("reviewConversationIntegrity")}
-          </Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={[
-            styles.actionSheetRow,
-            {
-              backgroundColor: colors.surfaceElevated,
-              borderColor: colors.border,
-            },
-          ]}
-          onPress={() => {
-            onManageMemory(conversation.id);
-            onClose();
-          }}
-          activeOpacity={0.88}
-          accessibilityRole="button"
-          accessibilityLabel={t("memory")}
-        >
-          <PhosphorIcon
-            name="brain"
-            size="compact"
-            color={colors.textSecondary}
+          <ActionRow
+            colors={colors}
+            icon="brain"
+            label={t("memory")}
+            onPress={() => {
+              onManageMemory(conversation.id);
+              onClose();
+            }}
           />
-          <Text
-            style={[styles.actionSheetRowText, { color: colors.textSecondary }]}
-          >
-            {t("memory")}
-          </Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={[
-            styles.actionSheetRow,
-            {
-              backgroundColor: colors.surfaceElevated,
-              borderColor: colors.border,
-            },
-          ]}
-          onPress={() => {
-            onShareThread(conversation.id);
-            onClose();
-          }}
-          activeOpacity={0.88}
-          accessibilityRole="button"
-          accessibilityLabel={t("share")}
-        >
-          <PhosphorIcon
-            name="share-alt"
-            size="compact"
-            color={colors.textSecondary}
+          <ActionRow
+            colors={colors}
+            icon="share-alt"
+            label={t("share")}
+            onPress={() => {
+              onShareThread(conversation.id);
+              onClose();
+            }}
           />
-          <Text
-            style={[styles.actionSheetRowText, { color: colors.textSecondary }]}
-          >
-            {t("share")}
-          </Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={[
-            styles.actionSheetRow,
-            {
-              backgroundColor: colors.surfaceElevated,
-              borderColor: colors.border,
-            },
-          ]}
-          onPress={() => {
-            onCopyThread(conversation.id);
-            onClose();
-          }}
-          activeOpacity={0.88}
-          accessibilityRole="button"
-          accessibilityLabel={t("copy")}
-        >
-          <PhosphorIcon
-            name="copy"
-            size="compact"
-            color={colors.textSecondary}
+          <ActionRow
+            colors={colors}
+            icon="copy"
+            label={t("copy")}
+            onPress={() => {
+              onCopyThread(conversation.id);
+              onClose();
+            }}
           />
-          <Text
-            style={[styles.actionSheetRowText, { color: colors.textSecondary }]}
-          >
-            {t("copy")}
-          </Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          testID="conversation-action-delete"
-          style={[
-            styles.actionSheetRow,
-            styles.actionSheetDeleteRow,
-            {
-              backgroundColor: colors.surfaceElevated,
-              borderColor: colors.border,
-            },
-          ]}
-          onPress={() => {
-            onDelete(conversation.id);
-            onClose();
-          }}
-          activeOpacity={0.88}
-          accessibilityRole="button"
-          accessibilityLabel={t("delete")}
-        >
-          <PhosphorIcon name="delete" size="compact" color={colors.danger} />
-          <Text style={[styles.actionSheetRowText, { color: colors.danger }]}>
-            {t("delete")}
-          </Text>
-        </TouchableOpacity>
+          <ActionRow
+            colors={colors}
+            danger
+            icon="delete"
+            label={t("delete")}
+            last
+            onPress={() => {
+              onDelete(conversation.id);
+              onClose();
+            }}
+            testID="conversation-action-delete"
+          />
+        </View>
       </ScrollView>
     </View>
   );
