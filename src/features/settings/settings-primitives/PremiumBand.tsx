@@ -157,8 +157,8 @@ const styles = StyleSheet.create({
   },
   badge: {
     width: 36,
-    height: 36,
-    borderRadius: 18,
+    minHeight: 44,
+    borderRadius: 10,
     flexShrink: 0,
     alignItems: "center",
     justifyContent: "center",
@@ -191,10 +191,10 @@ const styles = StyleSheet.create({
     flexShrink: 0,
   },
   action: {
-    minHeight: 36,
+    minHeight: 44,
     paddingHorizontal: 15,
     paddingVertical: 7,
-    borderRadius: 18,
+    borderRadius: 10,
     alignItems: "center",
     justifyContent: "center",
     shadowOpacity: 0.45,

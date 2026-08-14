@@ -382,7 +382,8 @@ describe("MainScreenVoiceStage composer", () => {
     );
     expect(send.backgroundColor).toBe(lightColors.accent);
     expect(send.width).toBe(46);
-    expect(send.borderRadius).toBe(23);
+    // Squircle, not a circle: only the orb and the intro play CTA are round.
+    expect(send.borderRadius).toBe(12);
   });
 
   it("keeps the orb in place while a prompt is blocked", () => {

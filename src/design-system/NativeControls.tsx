@@ -664,12 +664,15 @@ const controlStyles = StyleSheet.create({
     gap: 8,
     justifyContent: "center",
   },
+  // One commit button: the full-width primary action is 48pt on the control
+  // radius wherever it appears, dialogs included.
   dialogAction: {
     alignItems: "center",
-    borderRadius: 8,
+    borderRadius: 10,
     flexDirection: "row",
     gap: 8,
-    minHeight: 44,
+    justifyContent: "center",
+    minHeight: 48,
     paddingHorizontal: 14,
     paddingVertical: 11,
   },
@@ -698,10 +701,7 @@ const controlStyles = StyleSheet.create({
     width: "88%",
   },
   dialogFooter: {
-    flexDirection: "row",
-    flexWrap: "wrap",
     gap: 8,
-    justifyContent: "flex-end",
   },
   dialogOverlay: {
     alignItems: "center",
@@ -753,7 +753,7 @@ const controlStyles = StyleSheet.create({
     opacity: 0.72,
   },
   smallButton: {
-    minHeight: 40,
+    minHeight: 44,
     paddingHorizontal: 12,
     paddingVertical: 8,
   },

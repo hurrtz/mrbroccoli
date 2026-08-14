@@ -34,6 +34,13 @@ the complete Play Store translations are kept in a dedicated file under
   opened: the orb already states the phase, the transcript handle names the
   latest model and age, and Settings lists the routes. Screen readers still
   hear every phase change announced.
+- Controls take one shape across the app: the composer's send, the new-session
+  button, the toast dismiss and the Council and Web toggles are squircles like
+  every other control, leaving the voice orb and the walkthrough's play button
+  as the only round ones. Compact buttons that were pill-shaped — Upgrade, the
+  language switch — take the control shape, and no button is under 44 points
+  any more. Dialog actions stack full width at the standard 48-point height
+  instead of crowding into a right-aligned row.
 - Session actions now open as a compact menu anchored at the row's own button
   instead of a dimmed bottom sheet: pin, archive and privacy together, then
   rename and automatic naming, then share and copy, with delete last and alone.

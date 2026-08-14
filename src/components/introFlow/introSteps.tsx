@@ -868,10 +868,10 @@ const styles = StyleSheet.create({
   },
   languageChip: {
     alignItems: "center",
-    borderRadius: 99,
+    borderRadius: 10,
     flexDirection: "row",
     gap: 5,
-    minHeight: 32,
+    minHeight: 44,
     paddingHorizontal: 10,
     paddingVertical: 5,
   },

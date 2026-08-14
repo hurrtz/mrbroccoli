@@ -149,7 +149,7 @@ export const styles = StyleSheet.create({
   newSessionButton: {
     width: 44,
     height: 44,
-    borderRadius: 22,
+    borderRadius: 12,
     alignItems: "center",
     justifyContent: "center",
     shadowOffset: { width: 0, height: 2 },

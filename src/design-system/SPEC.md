@@ -115,6 +115,18 @@ framework or hiding platform behavior behind excessive abstraction.
 - Keyboard, safe-area, font-scale, contrast, RTL, and platform back behavior
   are part of the control contract.
 
+## Control Shape and Size
+
+- Every control is a squircle on the radius scale. Two exceptions, both about
+  the voice: the workspace orb and the introduction's play action. Toggles
+  included — state reads from border and fill, not from shape.
+- Pills belong to things that are not buttons: status tags, selection chips,
+  the fork tag, stepper dots, badges. Every button takes the control radius.
+- One commit button: the full-width primary action is 48pt on the control
+  radius wherever it appears, dialog footers included, where actions stack
+  full width rather than sitting right-aligned in a row.
+- 44 is the floor for every control, `Button size="small"` included.
+
 ## Icon Contract
 
 Application glyphs use `PhosphorIcon` with regular weight and semantic size

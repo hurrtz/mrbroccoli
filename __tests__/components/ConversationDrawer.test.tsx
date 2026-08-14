@@ -154,7 +154,7 @@ describe("ConversationDrawer", () => {
       StyleSheet.flatten(
         screen.getByTestId("conversation-drawer-new-session").props.style,
       ),
-    ).toEqual(expect.objectContaining({ height: 44, borderRadius: 22 }));
+    ).toEqual(expect.objectContaining({ height: 44, borderRadius: 12 }));
     // Header controls sit 14pt apart and the docked search keeps the kit's
     // 26pt clearance even without a bottom safe-area inset.
     expect(

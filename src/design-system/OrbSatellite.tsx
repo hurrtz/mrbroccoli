@@ -78,7 +78,7 @@ export function OrbSatellite({
           styles.well,
           toggle
             ? {
-                borderRadius: MIN_ICON_TOUCH_TARGET / 2,
+                borderRadius: 12,
                 borderColor: active ? colors.accent : colors.border,
                 backgroundColor: active ? colors.accentSoft : "transparent",
               }

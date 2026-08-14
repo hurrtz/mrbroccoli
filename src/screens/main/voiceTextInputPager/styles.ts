@@ -104,7 +104,7 @@ export const voiceTextInputPagerStyles = StyleSheet.create({
   sendButton: {
     width: 46,
     height: 46,
-    borderRadius: 23,
+    borderRadius: 12,
     alignItems: "center",
     justifyContent: "center",
   },
