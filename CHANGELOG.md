@@ -34,6 +34,9 @@ the complete Play Store translations are kept in a dedicated file under
   opened: the orb already states the phase, the transcript handle names the
   latest model and age, and Settings lists the routes. Screen readers still
   hear every phase change announced.
+- Landscape keeps the conversation-settings control after all: it floats over
+  the stage's top-right corner as an icon, so the orb owns the whole column
+  between the route line and the controls beneath it.
 - The route line names the effort instead of plotting it: the dot ladder beside
   the model is gone, since the word already says it.
 - Controls take one shape across the app: the composer's send, the new-session

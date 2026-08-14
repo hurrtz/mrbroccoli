@@ -526,7 +526,16 @@ describe("MainScreenWorkspace streaming isolation", () => {
       StyleSheet.flatten(screen.getByTestId("landscape-stage-area").props.style)
         .justifyContent,
     ).toBe("flex-start");
-    expect(screen.queryByTestId("conversation-settings-summary")).toBeNull();
+    // Landscape keeps the settings control, floated over the stage's
+    // top-right corner as an icon so the words cost the orb no height.
+    expect(
+      StyleSheet.flatten(
+        screen.getByTestId("conversation-settings-summary").props.style,
+      ),
+    ).toEqual(
+      expect.objectContaining({ position: "absolute", right: 0, top: 0 }),
+    );
+    expect(screen.queryByText("Balanced · Brief")).toBeNull();
     expect(screen.queryByTestId("satellite-image")).toBeNull();
     expect(screen.getByTestId("satellite-council")).toBeTruthy();
     expect(screen.getByTestId("satellite-web")).toBeTruthy();

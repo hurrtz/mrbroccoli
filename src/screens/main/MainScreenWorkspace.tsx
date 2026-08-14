@@ -295,6 +295,17 @@ export function MainScreenWorkspace({
                 : null,
             ]}
           >
+            {/* The words cost the orb height this narrow column cannot spare,
+                so the control floats over the stage's top-right corner and the
+                orb owns everything between the byline and the control row. */}
+            <ConversationSettingsSummary
+              accessibilityLabel={settingsSummary.accessibilityLabel}
+              compact
+              onPress={settingsSummary.onPress}
+              style={workspaceStyles.landscapeSettingsControl}
+              summary={settingsSummary.summary}
+              testID="conversation-settings-summary"
+            />
             <MainScreenVoiceStage
               colors={colors}
               layout="landscape"
@@ -455,6 +466,12 @@ const workspaceStyles = StyleSheet.create({
   },
   transcriptHandle: {
     marginHorizontal: 0,
+  },
+  landscapeSettingsControl: {
+    position: "absolute",
+    right: 0,
+    top: 0,
+    zIndex: 1,
   },
   // A 44pt grab-and-close target around the 38x4 handle.
   transcriptSheetCard: {

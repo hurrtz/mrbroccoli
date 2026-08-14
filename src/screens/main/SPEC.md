@@ -69,8 +69,9 @@ receive already-derived state and callbacks.
   correct anywhere a picker grid or a docked bar is wanted.
 - In portrait, the conversation's quick settings read as one muted
   tone-length-voice line under the byline, with a single control opening the
-  conversation style sheet. Landscape omits this line to preserve the two-pane
-  stage. At accessibility-large text, portrait keeps that labelled control but
+  conversation style sheet. Landscape floats that control over the stage's
+  top-right corner as an icon instead of giving it a row: the words cost the
+  orb height the narrow column cannot spare. At accessibility-large text, portrait keeps that labelled control but
   omits the decorative sentence, uses the title-only introduction banner, and
   makes the satellite row icon-only. This preserves the complete blocked-route
   warning, status, and transcript affordance without overlap. Landscape keeps
