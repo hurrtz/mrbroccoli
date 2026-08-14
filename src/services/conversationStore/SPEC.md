@@ -21,8 +21,8 @@ provenance:
 The authoritative store for conversation records. Conversations previously
 lived in AsyncStorage across three key families, so any operation spanning more
 than one key could be interrupted halfway. Branching, backup restore, deletion,
-and integrity repair are all multi-record operations, and a crash between two
-writes left metadata describing records that no longer matched.
+and active-selection changes are multi-record operations, and a crash between
+two writes left metadata describing records that no longer matched.
 
 SQLite makes those operations atomic. This boundary owns the schema, the
 transaction discipline, and the one-time import from AsyncStorage.

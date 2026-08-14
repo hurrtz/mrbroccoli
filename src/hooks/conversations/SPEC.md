@@ -21,8 +21,8 @@ last_validated_sha: 7db5c94
 ## Ownership
 
 `useConversations` is the public owner of conversation hydration, selection,
-search, mutations, branches, privacy, integrity repair, and backup restore.
-This directory owns the hook-facing store API and metadata derivation.
+search, mutations, branches, privacy, and backup restore. This directory owns
+the hook-facing store API and metadata derivation.
 
 ## Storage Shape
 
@@ -59,13 +59,13 @@ boundary steady kept the store swap out of a 1,200-line mutation surface.
   `editedAt` and removes the compact summary because that summary may describe
   superseded content.
 - Removing a message deletes its app-owned attachments, clears compact summary
-  state and any integrity-repair snapshot, rebuilds provider/message metadata,
-  and resynchronizes eligible derived knowledge. Removing the final
+  state, rebuilds provider/message metadata, and resynchronizes eligible
+  derived knowledge. Removing the final
   provider-authored message must not leave that route in drawer metadata.
 - Per-conversation length, tone, LLM instructions, TTS instructions, and voice
   override global defaults without mutating them.
-- Deleting a conversation also deletes its derived knowledge rows, integrity
-  repair snapshot, and app-owned image files.
+- Deleting a conversation also deletes its derived knowledge rows and
+  app-owned image files.
 - Private state is canonical conversation data and immediately controls derived
   knowledge indexing.
 - Archive state is canonical conversation data. Archiving removes a session
@@ -104,12 +104,6 @@ private, and caller exclusions remain ineligible at query time.
 
 **Decision:** Canonical data never depends on the derived index. Indexing may
 fail or be rebuilt without losing conversations.
-
-## Integrity Repair
-
-Integrity inspection detects recoverable conversation anomalies. Repair keeps
-a reversible snapshot, applies the bounded correction, and exposes undo. Repair
-state is operational and is removed when the conversation is deleted.
 
 ## Restore Contract
 

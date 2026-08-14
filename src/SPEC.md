@@ -26,21 +26,21 @@ and presentation so changes can be validated at the closest reliable layer.
 
 ## Stable Boundaries
 
-| Boundary | Ownership |
-| --- | --- |
-| `catalog/` | Typed access to imported provider research data |
-| `components/` | Reusable product components and focused subcomponents |
-| `constants/` | Curated runtime manifests, defaults, model catalogues, and static policies |
-| `context/` | Root settings and Premium React contexts |
-| `design-system/` | Dependency-light native controls, typography, and icon semantics |
-| `features/` | Complete secondary surfaces, currently Settings and its shared core |
-| `hooks/` | React lifecycle controllers plus settings/conversation persistence adapters |
-| `i18n/` | Locale registry, typed translation schema, and all dictionaries |
-| `screens/` | Main workspace composition and presentation |
-| `services/` | Provider, local-model, speech, backup, diagnostic, and native-bridge runtime work |
-| `theme/` | Semantic color and theme context |
-| `types.ts` | Canonical public settings, conversation, message, route, receipt, and phase types |
-| `utils/` | Pure cross-boundary transformations with a clear existing owner |
+| Boundary         | Ownership                                                                         |
+| ---------------- | --------------------------------------------------------------------------------- |
+| `catalog/`       | Typed access to imported provider research data                                   |
+| `components/`    | Reusable product components and focused subcomponents                             |
+| `constants/`     | Curated runtime manifests, defaults, model catalogues, and static policies        |
+| `context/`       | Root settings and Premium React contexts                                          |
+| `design-system/` | Dependency-light native controls, typography, and icon semantics                  |
+| `features/`      | Complete secondary surfaces, currently Settings and its shared core               |
+| `hooks/`         | React lifecycle controllers plus settings/conversation persistence adapters       |
+| `i18n/`          | Locale registry, typed translation schema, and all dictionaries                   |
+| `screens/`       | Main workspace composition and presentation                                       |
+| `services/`      | Provider, local-model, speech, backup, diagnostic, and native-bridge runtime work |
+| `theme/`         | Semantic color and theme context                                                  |
+| `types.ts`       | Canonical public settings, conversation, message, route, receipt, and phase types |
+| `utils/`         | Pure cross-boundary transformations with a clear existing owner                   |
 
 ## Dependency Direction
 
@@ -69,8 +69,8 @@ be reasoned about and tested independently of the full render tree.
   response-mode validation, settings readiness, request services, and release
   matrix to remain aligned.
 - Changing `Conversation` or `Message` requires metadata normalization,
-  backup/restore validation, archive formatting, integrity checks, knowledge
-  indexing, and tests to be reviewed.
+  backup/restore validation, archive formatting, knowledge indexing, and tests
+  to be reviewed.
 - User-visible copy changes require all registered dictionaries.
 - Any privacy-sensitive payload must cross its sanitizer or allow-list before
   storage, logs, clipboard, provider requests, or export.

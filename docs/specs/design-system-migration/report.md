@@ -1,5 +1,10 @@
 # Design-system migration report
 
+> Historical implementation record. It describes the migration-time design
+> and code snapshot, not the current approved design contract. Use
+> `design-system/_ds_manifest.json`, the living specs, and
+> `docs/specs/design-system-reconciliation/` for current parity.
+
 Working report for the migration described in `design-system/migration-goal.md`.
 Grows with each phase; §5 of the goal defines the final shape. Spend the words
 on what is uncertain, not what worked.
@@ -19,12 +24,12 @@ on what is uncertain, not what worked.
 
 ### Value disagreements found and how each was resolved
 
-| Token(s) | App | Design | Resolution |
-| --- | --- | --- | --- |
-| All phase colours (light, and dark except `phaseRecordingTrack`) | pre-redesign ramp | bookends ramp | Design wins — phase 1 names these explicitly; taken verbatim |
-| `sand*`, `premium*`, `mutedSoft`, intro-banner family | scoped to `src/components/introFlow/introTheme.ts` | global `--mb-color-*` tokens | **Values identical; placement differs.** Left scoped. Whether they should be promoted to `src/theme/` is an owner question; revisit when Phase 4 needs premium gold outside the intro |
-| `activeControlIcon`, `activeControlIconBackground` | present | absent | App wins — kept; consumed by `PhaseAwareVoiceAction`, which survives the migration |
-| `controlLabel` uppercase | baked into the text role | not in the token (applied at use sites) | No value change; noted so nobody "fixes" it |
+| Token(s)                                                         | App                                                | Design                                  | Resolution                                                                                                                                                                            |
+| ---------------------------------------------------------------- | -------------------------------------------------- | --------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| All phase colours (light, and dark except `phaseRecordingTrack`) | pre-redesign ramp                                  | bookends ramp                           | Design wins — phase 1 names these explicitly; taken verbatim                                                                                                                          |
+| `sand*`, `premium*`, `mutedSoft`, intro-banner family            | scoped to `src/components/introFlow/introTheme.ts` | global `--mb-color-*` tokens            | **Values identical; placement differs.** Left scoped. Whether they should be promoted to `src/theme/` is an owner question; revisit when Phase 4 needs premium gold outside the intro |
+| `activeControlIcon`, `activeControlIconBackground`               | present                                            | absent                                  | App wins — kept; consumed by `PhaseAwareVoiceAction`, which survives the migration                                                                                                    |
+| `controlLabel` uppercase                                         | baked into the text role                           | not in the token (applied at use sites) | No value change; noted so nobody "fixes" it                                                                                                                                           |
 
 ### Not changed, deliberately
 
@@ -256,7 +261,7 @@ plus one job controller over machinery that existed.
   decouple the reading from the work.
 - **Toast suppression is surface-level.** The rule is card-or-toast, never
   both; the app suppresses the toast while the introduction or the settings
-  modal is open. Detecting the exact settings *page* would mean lifting the
+  modal is open. Detecting the exact settings _page_ would mean lifting the
   modal's internal navigation state; with settings open on another page the
   outcome is currently not toasted. **Open question** for the owner whether
   that narrower case warrants the refactor.

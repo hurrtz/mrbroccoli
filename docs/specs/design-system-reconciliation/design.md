@@ -1,82 +1,98 @@
-# Design-system and runtime reconciliation design
+# Design-system reconciliation design
 
-## Approach
+## Evidence model
 
-The goal uses four evidence layers. A higher layer may reveal a problem that a
-lower layer cannot, and no lower layer substitutes for the layer above it.
+Every matrix row uses one of these statuses:
 
-1. **Contract inventory** — map the design manifest, tokens, prompts, and kit
-   screens to native components, call sites, state owners, and existing tests.
-2. **Deterministic presentation** — render fixture-controlled states on Android
-   and iOS and compare them with the corresponding design-system component or
-   kit definition.
-3. **Interactive native flows** — drive the real app through navigation,
-   persistence, permissions, cancellation, failure, retry, rotation, theme,
-   locale, and accessibility changes.
-4. **Physical capability proof** — exercise real microphones, recognizers,
-   local-model runtimes, playback, background work, memory pressure, and
-   lifecycle transitions on eligible Android and iPhone hardware.
+| Status               | Meaning                                                                                                             |
+| -------------------- | ------------------------------------------------------------------------------------------------------------------- |
+| `mapped`             | The native owner is located; no visual or functional verdict follows.                                               |
+| `pending-validation` | A mapped implementation or fix still lacks some acceptance evidence, most often exact-SHA native and visual review. |
+| `blocked-owner`      | Product or design authority must resolve a material choice before implementation can be accepted.                   |
+| `accepted@<sha>`     | The stated evidence passed for that exact immutable SHA and scope only.                                             |
+| `retired`            | The name is absent from the current manifest and current app references; it is not a parity target.                 |
+
+Do not upgrade `mapped` because a unit test exists, or carry an
+`accepted@<sha>` verdict onto a descendant commit or dirty worktree.
+
+## Mapping method
+
+The 63 manifest entries map in four ways:
+
+1. **Direct component** — for example `ProviderIcon` to
+   `src/components/ProviderIcon.tsx`.
+2. **Native composition with a deliberate name difference** — for example
+   `AnchoredMenu` to `ConversationActionMenu`, `InstallProgress` to
+   `InstallProgressBar`, and `RoutePicker` to `RoutePickerSheet`.
+3. **Shared primitive host** — `Button`, `Input`, `TextArea`, `Tag`, `List`,
+   `ListItem`, and `Modal` live in `NativeControls.tsx`.
+4. **Runtime or localized contract** — specimen constants such as
+   `INTRO_COPY`, `DEFAULT_MANUAL_GROUPS`, `DEMO_TURN`, `AUTO_SETUP_PLAN`, and
+   `AUTO_SETUP_FACTS` map to locale dictionaries, catalogues, hooks, and live
+   device readings rather than copied fixture values.
+
+Retired names and historical `Ant*` names never receive compatibility rows.
+The matrix records the current owner instead.
+
+## Reconciliation loop
 
 ```mermaid
 flowchart LR
-    DS[Vendored design system] --> Inventory[Component and screen inventory]
-    Specs[Living specs] --> Inventory
-    Inventory --> Fixtures[Deterministic native fixtures]
-    Fixtures --> Emulator[Android emulator and iOS simulator]
-    Emulator --> Physical[Physical Android and iPhone]
-    Physical --> Verdict[Evidence matrix and reconciliation verdict]
-    Verdict --> Fix[Focused fix plus regression test]
-    Fix --> Fixtures
+    Manifest[63-entry manifest] --> Map[Native source and state owner]
+    Surfaces[Design surfaces and contracts] --> Compare[State-by-state comparison]
+    Specs[Living behavior specs] --> Compare
+    Map --> Compare
+    Compare --> Fix[Focused implementation and regression]
+    Fix --> Freeze[Frozen clean SHA]
+    Freeze --> Gates[Type, static, Jest, native gates]
+    Gates --> Devices[Exact-SHA simulator and physical-device runs]
+    Devices --> Review[Accessibility trees and manual image review]
+    Review --> Verdict[Scoped accepted-at-SHA verdict]
 ```
 
-## Mapping record
+The current implementation passed `Freeze` and the spend-free `Gates` at
+`db1d59b4c8ff56fea3ee8ab66cb1ba57c2174ffa`. The loop stops before `Devices`:
+no rebuilt exact-SHA simulator matrix or physical-device review was performed,
+so source candidates remain `pending-validation` rather than accepted.
 
-Each design component or screen records:
+## Native proof
 
-- design source, prompt, type contract, and relevant token definitions;
-- native implementation and every production call site;
-- owning state/hook/service for interactive behavior;
-- existing unit, integration, native, and Maestro coverage;
-- required fixture/live states and device targets;
-- parity status: `match`, `intentional-native-deviation`, `missing`, `defect`, or
-  `blocked`, with evidence.
+Deterministic fixtures cover every representable state on an Android emulator
+and iOS simulator. Real flows cover navigation, persistence, permissions,
+cancellation, retry, rotation, themes, locale, text size, and screen-reader
+focus. Physical Android and iPhone runs additionally cover microphone and
+recognizer behavior, local model installation and benchmark, synthesis and
+playback, background/lifecycle transitions, and memory constraints.
 
-Intentional native deviations require a functional or platform reason and must
-preserve the approved visual hierarchy. They are not silently accepted because
-React Native differs from the web specimen.
+Compare hierarchy, geometry, tokens, copy, state, touch target, and
+accessibility semantics—not browser pixels. Platform font rasterization may
+differ; missing content, wrong ownership, wrong dimensions, or unusable native
+interaction may not.
 
-## Test surfaces
+## Authority conflicts
 
-- Use the existing `.maestro` fixture identity for deterministic Free/Premium,
-  phase, conversation, and settings states.
-- Extend Maestro only where accessibility IDs and deterministic state make the
-  flow reliable. Native instrumentation remains responsible for audio,
-  waveform, foreground-service, playback, and lifecycle races.
-- Use development builds for real onboarding and local-model flows. Never use
-  Expo Go as native evidence.
-- Capture the native accessibility tree beside screenshots when layout alone
-  cannot prove visibility or focus.
-- Compare geometry and semantic state, not browser rasterization. Platform font
-  rendering and native control rasterization are allowed to differ; tokens,
-  hierarchy, dimensions, state, copy, and accessibility are not.
+When vendored sources disagree, keep the conflict visible and request an owner
+decision or upstream correction. Current known examples include:
+
+- `workspace.md` both says `ResponseModeToggle` remains and later says it was
+  deleted; the manifest and app agree it is deleted.
+- Workspace material disagrees on circular versus squircle composer geometry,
+  and on grip-only versus named transcript-sheet chrome; the specific current
+  component/surface contract and app mapping are retained pending upstream
+  cleanup.
+- `Toast.jsx` has no accent stripe while its prompt and announcements prose
+  still describe one; the current component geometry is the implementation
+  target and the prose needs correction.
+- The intro kit uses an exclamation in “Try it out!” while the content charter
+  bans exclamation marks; the app follows the charter pending design cleanup.
+
+These conflicts are not permission to edit the vendored mirror or silently
+invent a third contract.
 
 ## Run records
 
-Each run writes beneath
-`artifacts/design-system-reconciliation/<commit>/<target>/<run-id>/`:
-
-- `manifest.json` with build/device/environment facts;
-- `screenshots/` and, where supported, accessibility hierarchy dumps;
-- sanitized test logs;
-- a concise `verdict.md` listing passes, defects, and blockers.
-
-No credentials, prompts, transcripts, provider bodies, or model output are
-retained in these artifacts.
-
-## Fix discipline
-
-Work in coherent batches by boundary: foundations, workspace/orb, introduction,
-settings, on-device setup/models, chat/conversations, then cross-cutting
-accessibility and lifecycle. Trace every failed interaction from its screen
-entry point through controller/hook, service/native boundary, persistence, and
-configuration before changing code.
+Write sanitized evidence under
+`artifacts/design-system-reconciliation/<sha>/<target>/<run-id>/`. Each run has
+a machine-readable manifest, logs, screenshots and accessibility trees where
+available, and a reviewed verdict. Artifact sets without an exact source SHA
+remain historical material but cannot satisfy this goal.

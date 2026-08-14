@@ -1,269 +1,174 @@
 # Design-system reconciliation matrix
 
-Status vocabulary: `mapped` means the production implementation and primary
-test boundary have been located; it does not yet mean native visual or
-functional acceptance. Device verdicts are added as the goal progresses.
+Audit implementation: `db1d59b4c8ff56fea3ee8ab66cb1ba57c2174ffa`, after
+the 63-entry vendored design update at
+`2bc0da877ddf20b0a56696a519bce7cd0bce6151`. The manifest SHA-256 is
+`b8f6f5f0c7013be81f5f8c544786f297c0f169d3dc3b4eda6e26923a0cf3174a`.
 
-## Components
+`mapped` locates current ownership only. `pending-validation` marks a visible
+candidate awaiting rebuilt native apps and image review. The spend-free gate
+is green for the implementation SHA; no current row is accepted by static
+evidence alone.
 
-| Design component | React Native implementation | Baseline |
-| --- | --- | --- |
-| `ProviderIcon` | `src/components/ProviderIcon.tsx` | mapped |
-| `ChatBubble` | `src/components/ChatBubble.tsx` and `src/components/chatBubble/` | retained legacy composition; no longer the transcript row |
-| `ChatTranscript` | `src/components/ChatTranscript.tsx` | mapped |
-| `TranscriptMessage` | `src/components/TranscriptMessage.tsx` | mapped to folded script row; unit acceptance passed |
-| `ConversationActionSheet` | `src/components/conversationDrawer/ConversationActionSheet.tsx` | source/unit parity; bottom sheet geometry, 48-point rows, hidden backdrop, and labelled close action |
-| `ConversationDrawerItem` | `src/components/conversationDrawer/ConversationDrawerItem.tsx` | mapped |
-| `ConversationIntegrityModal` | `src/components/conversationDrawer/ConversationIntegrityModal.tsx` | mapped |
-| `ConversationMemoryModal` | `src/components/ConversationMemoryModal.tsx` | mapped |
-| `ConversationRenameModal` | `src/components/conversationDrawer/ConversationRenameModal.tsx` | mapped |
-| `MessageBranchIndicator` | `src/components/chatBubble/MessageBranchIndicator.tsx` | mapped |
-| `MessageImageAttachments` | `src/components/MessageImageAttachments.tsx` | mapped |
-| `PipelineNotices` | `src/components/chatBubble/PipelineNotices.tsx` | source/unit parity; search and speech degradation retained inline without duplicate toast |
-| `ReplyFailureCard` | `src/components/chatBubble/ReplyFailureCard.tsx` | mapped |
-| `TurnReceiptCard` | `src/components/chatBubble/TurnReceiptCard.tsx` | retained detail composition; transcript consolidates it |
-| `UberModeAuditCard` | `src/components/chatBubble/UberModeAuditCard.tsx` | retained detail composition; transcript consolidates it |
-| `UsageCard` | `src/components/chatBubble/UsageCard.tsx` | retained detail composition; transcript consolidates it |
-| `WebSearchReferences` | `src/components/chatBubble/WebSearchReferences.tsx` | retained detail composition; transcript consolidates it |
-| `Button` | `src/design-system/NativeControls.tsx` | mapped |
-| `IconButton` | `src/design-system/IconButton.tsx` | mapped |
-| `Input` | `src/design-system/NativeControls.tsx` | mapped |
-| `TextArea` | `Input.TextArea` in `src/design-system/NativeControls.tsx` | mapped |
-| `Tag` | `src/design-system/NativeControls.tsx` | mapped |
-| `PhosphorIcon` | `src/design-system/PhosphorIcon.tsx` | mapped |
-| `IntroBody` | `src/components/introFlow/IntroPrimitives.tsx` | mapped |
-| `IntroButton` | `src/components/introFlow/IntroPrimitives.tsx` | mapped |
-| `IntroDivider` | `src/components/introFlow/IntroPrimitives.tsx` | source/unit parity; Optional and Recommended reading-order rules |
-| `IntroFlow` | `src/components/introFlow/IntroFlowScreen.tsx` | source/unit parity; 40-point faces within 44-point targets |
-| `IntroPanel` | `src/components/introFlow/IntroPrimitives.tsx` | mapped |
-| `IntroPoint` | `src/components/introFlow/IntroPrimitives.tsx` | mapped |
-| `IntroStepper` | `src/components/introFlow/IntroStepper.tsx` | mapped |
-| `IntroTitle` | `src/components/introFlow/IntroPrimitives.tsx` | mapped |
-| `IntroVoicePicker` | `src/components/introFlow/IntroVoicePicker.tsx` | source/unit parity; isolated modal focus and labelled 44-point close action |
-| `List` | `src/design-system/NativeControls.tsx` | mapped |
-| `ListItem` | `List.Item` in `src/design-system/NativeControls.tsx` | mapped |
-| `AutoSetupCard` | `src/components/autoSetup/AutoSetupCard.tsx` | mapped |
-| `AutoSetupPlanRow` | `src/components/autoSetup/AutoSetupPlanRow.tsx` | mapped |
-| `InstallProgress` | `src/components/autoSetup/InstallProgressBar.tsx` | mapped, native name differs |
-| `LocalModelPerformanceSummary` | `src/components/LocalModelPerformanceSummary.tsx` | mapped |
-| `Modal` | `src/design-system/NativeControls.tsx` | source/unit parity; focus isolation, hidden dismissal backdrops, explicit close actions, and dismissal-before-sibling hand-offs |
-| `Toast` | `src/components/Toast.tsx` | source/unit parity; pending interval is suspended behind secondary surfaces |
-| `AntButtonLabel` | `src/features/settings/settings-primitives/SettingsCards.tsx` | mapped |
-| `AntDisclosureCard` | `src/features/settings/settings-primitives/SettingsCards.tsx` | mapped |
-| `AntNumberInputRow` | `src/features/settings/settings-primitives/SettingsFields.tsx` | mapped |
-| `AntPickerRow` | `src/features/settings/settings-primitives/SettingsPickerControls.tsx` | mapped |
-| `AntPickerRows` | `src/features/settings/settings-primitives/SettingsPickerControls.tsx` | mapped |
-| `AntPickerSection` | `src/features/settings/settings-primitives/SettingsPickerControls.tsx` | mapped |
-| `AntRadioSection` | `src/features/settings/settings-primitives/SettingsCards.tsx` | mapped |
-| `AntSectionIntro` | `src/features/settings/settings-primitives/SettingsCards.tsx` | mapped |
-| `AntSettingsCard` | `src/features/settings/settings-primitives/SettingsCards.tsx` | mapped |
-| `AntSwitchRow` | `src/features/settings/settings-primitives/SettingsFields.tsx` | mapped |
-| `AntTextArea` | `src/features/settings/settings-primitives/SettingsFields.tsx` | mapped |
-| `IconAction` | `src/features/settings/settings-primitives/IconAction.tsx` | mapped |
-| `PremiumBand` | `src/features/settings/settings-primitives/PremiumBand.tsx` | mapped |
-| `RouteOptionRow` | `src/features/settings/settings-primitives/RouteOptionRow.tsx` | mapped |
-| `RuntimeReadiness` | `src/features/settings/settings-primitives/RuntimeReadiness.tsx` | mapped |
-| `SettingsGroup` | `src/features/settings/settings-primitives/SettingsGroup.tsx` | mapped |
-| `SettingsRow` | `src/features/settings/settings-primitives/SettingsRow.tsx` | mapped |
-| `AppWordmark` | `src/components/AppWordmark.tsx` | mapped |
-| `BackgroundTaskBar` | `src/design-system/BackgroundTaskBar.tsx` | source/unit parity; automatic setup progress, success, and failure ownership |
-| `Composer` | `src/screens/main/voiceTextInputPager/InputSurfacePages.tsx` | mapped through native composer composition |
-| `ConversationSettingsSummary` | `src/design-system/ConversationSettingsSummary.tsx` | source/unit parity; portrait-only workspace ownership |
-| `IntroBanner` | `src/components/IntroBanner.tsx` | source/unit parity; full portrait and 48-point title-only landscape forms |
-| `OrbSatellite` | `src/design-system/OrbSatellite.tsx` | mapped |
-| `PhaseAwareVoiceAction` | `src/screens/main/PhaseAwareVoiceAction.tsx` | mapped, retained off-home |
-| `Picker` | `src/components/Picker.tsx` | mapped |
-| `PremiumUpgradeModal` | `src/components/PremiumUpgradeModal.tsx` | source/unit parity; Premium gold hero, benefits, and value band |
-| `ResponseModeToggle` | `src/components/ResponseModeToggle.tsx` | mapped, retained off-home |
-| `RouteByline` | `src/screens/main/MainScreenRouteByline.tsx` | source/unit parity; native composition name differs |
-| `RoutePicker` | `src/screens/main/RoutePickerSheet.tsx` | mapped, native composition name differs |
-| `TranscriptHandle` | `src/design-system/TranscriptHandle.tsx` | source/unit/device parity; latest model and localized relative age, with a compact localized timestamp fallback when Hermes omits relative-time formatting |
-| `VoiceOrb` | `src/design-system/VoiceOrb.tsx` and `src/screens/main/useOrbTurnProgress.ts` | source/unit parity; measured stage and timing-only pager motion |
-| `WorkspaceStatusLine` | `src/design-system/WorkspaceStatusLine.tsx` | source/unit/device parity; idle conversation age derived by a non-throwing view model formatter |
+## Manifest entries: 63 of 63
 
-## Manifest data exports
+### Brand (1)
 
-The remaining entries in the 83-export manifest are contracts or specimen
-data, not separate visual components.
+| Entry          | Design source                       | Native authority                  | Current audit status |
+| -------------- | ----------------------------------- | --------------------------------- | -------------------- |
+| `ProviderIcon` | `components/brand/ProviderIcon.jsx` | `src/components/ProviderIcon.tsx` | mapped               |
 
-| Design export | Native authority | Baseline |
-| --- | --- | --- |
-| `ICON_SIZE`, `MIN_ICON_TOUCH_TARGET`, `PHOSPHOR_ICONS` | `src/design-system/PhosphorIcon.tsx` | mapped; compare semantic scale and key set |
-| `INTRO_STEPS`, `INTRO_COPY` | `src/components/introFlow/introSteps.tsx` plus localized dictionaries | mapped; native copy must stay localized |
-| `INTRO_LANGUAGES` | locale registry and `src/components/introFlow/IntroVoicePicker.tsx` | mapped |
-| `AUTO_SETUP_COPY` | `src/i18n/autoSetupTranslations.ts` | mapped; native copy must stay localized |
-| `AUTO_SETUP_PLAN`, `AUTO_SETUP_FACTS`, `AutoSetupStepReading` | `src/screens/main/useAutoSetupJob.ts`, `src/components/autoSetup/types.ts`, and live device diagnostics | mapped; native values must be real rather than specimen data |
-| `brandFonts` | `src/theme/typography.ts` and `src/design-system/AppFontProvider.tsx` | mapped |
+### Chat (13)
 
-## Screen and flow verdicts
+| Entry                     | Design source                                 | Native authority                                                                                                 | Current audit status                                      |
+| ------------------------- | --------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------- |
+| `ChatBubble`              | `components/chat/ChatBubble.jsx`              | `src/components/ChatBubble.tsx`; `src/components/chatBubble/`                                                    | mapped                                                    |
+| `ChatTranscript`          | `components/chat/ChatTranscript.jsx`          | `src/components/ChatTranscript.tsx`                                                                              | pending-validation: empty-state geometry changed          |
+| `ConversationDrawerItem`  | `components/chat/ConversationDrawerItem.jsx`  | `src/components/conversationDrawer/ConversationDrawerItem.tsx`; list composition in `ConversationDrawerList.tsx` | pending-validation: drawer composition/styles changed     |
+| `ConversationRenameModal` | `components/chat/ConversationRenameModal.jsx` | `src/components/conversationDrawer/ConversationRenameModal.tsx`                                                  | mapped                                                    |
+| `MessageBranchIndicator`  | `components/chat/MessageBranchIndicator.jsx`  | `src/components/chatBubble/MessageBranchIndicator.tsx`                                                           | pending-validation: 30pt tag inside 44pt target           |
+| `MessageImageAttachments` | `components/chat/MessageImageAttachments.jsx` | `src/components/MessageImageAttachments.tsx`                                                                     | pending-validation: remove-well geometry changed          |
+| `PipelineNotices`         | `components/chat/PipelineNotices.jsx`         | `src/components/chatBubble/PipelineNotices.tsx`; shared `chatBubble/styles.ts`                                   | pending-validation: flat ruled rail and recovery controls |
+| `ReplyFailureCard`        | `components/chat/ReplyFailureCard.jsx`        | `src/components/chatBubble/ReplyFailureCard.tsx`; shared `chatBubble/styles.ts`                                  | pending-validation: flat danger rail and retry control    |
+| `TranscriptMessage`       | `components/chat/TranscriptMessage.jsx`       | `src/components/TranscriptMessage.tsx`                                                                           | pending-validation: disclosure target changed             |
+| `TurnReceiptCard`         | `components/chat/TurnReceiptCard.jsx`         | `src/components/chatBubble/TurnReceiptCard.tsx`                                                                  | mapped; standalone detail contract retained               |
+| `UberModeAuditCard`       | `components/chat/UberModeAuditCard.jsx`       | `src/components/chatBubble/UberModeAuditCard.tsx`                                                                | mapped; standalone detail contract retained               |
+| `UsageCard`               | `components/chat/UsageCard.jsx`               | `src/components/chatBubble/UsageCard.tsx`                                                                        | mapped; standalone detail contract retained               |
+| `WebSearchReferences`     | `components/chat/WebSearchReferences.jsx`     | `src/components/chatBubble/WebSearchReferences.tsx`                                                              | mapped; standalone detail contract retained               |
 
-| Surface or flow | Android emulator | Physical Android | iOS simulator | Physical iPhone |
-| --- | --- | --- | --- | --- |
-| Workspace, light/dark portrait | exact Release pass | exact Release smoke pass | exact Release pass plus post-fix accessibility-large pass | current exact Release pass with selected local profile and persisted local transcript |
-| Workspace landscape | exact Release pass | exact Release smoke rotation pass | exact Release pass plus post-fix accessibility-large pass | not automated |
-| Orb states and progress rings | pass: ten deterministic phases/boundaries | pass: real recording, transcribing, thinking, speaking plus deterministic overtime | pass: ten deterministic phases/boundaries | pass: isolated overtime plus real native recording and local transcription; audible playback intentionally replaced by silent Piper benchmark |
-| Introduction and audio | pass: seven steps, swipe, bundled audio, Back/Done/reopen/close | pass: same 13-scene smoke | pass: same 13-scene smoke | first-launch banner captured; interaction not automated |
-| Automatic setup | pass: honest low-memory rejection, retry, manual hand-off | pass: Qwen and Whisper viable; Piper failure excluded on retry; system-voice profile Ready | presentation and controller tests pass | pass: app-owned background transfer/resume proved; SHA-verified artifacts completed the slow transfer; Granite, Parakeet, and Piper viable, Kokoro honestly below target |
-| Settings overview and seven pages | exact Release pass across every page | representative exact Release smoke pass | exact Release pass across every page | representative current Release overview/Speaking/profile/cold-start pass |
-| Transcript, drawer, route picker, chat actions | exact Release pass | representative exact Release smoke pass | exact Release pass | current Release transcript creation, persisted status, and timestamp fallback pass |
-| RTL and accessibility-large text | 19-locale sweep and accessibility pass | representative exact Release smoke pass | 19-locale sweep plus post-fix accessibility pass | not automated |
-| Native audio/model/lifecycle tests | Android instrumentation pass | pass: interrupted transfer recovery plus real PCM-WAV capture, local Whisper/Qwen, system playback | iOS native tests pass | pass: background download continuation, cold readiness, native PCM recording, local Parakeet STT, Granite/Parakeet/Piper benchmarks, and exact Hermes Release regression |
+### Core (10)
 
-## Run evidence — 2026-08-13
+| Entry                   | Design source                      | Native authority                       | Current audit status                      |
+| ----------------------- | ---------------------------------- | -------------------------------------- | ----------------------------------------- |
+| `Button`                | `components/core/Button.jsx`       | `src/design-system/NativeControls.tsx` | pending-validation: 48pt current geometry |
+| `IconButton`            | `components/core/IconButton.jsx`   | `src/design-system/IconButton.tsx`     | mapped                                    |
+| `Input`                 | `components/core/Input.jsx`        | `src/design-system/NativeControls.tsx` | mapped                                    |
+| `ICON_SIZE`             | `components/core/PhosphorIcon.jsx` | `src/design-system/PhosphorIcon.tsx`   | mapped to semantic icon scale             |
+| `MIN_ICON_TOUCH_TARGET` | `components/core/PhosphorIcon.jsx` | `src/design-system/PhosphorIcon.tsx`   | mapped to 44pt target contract            |
+| `PHOSPHOR_ICONS`        | `components/core/PhosphorIcon.jsx` | `src/design-system/PhosphorIcon.tsx`   | mapped to native glyph registry           |
+| `PhosphorIcon`          | `components/core/PhosphorIcon.jsx` | `src/design-system/PhosphorIcon.tsx`   | mapped                                    |
+| `Switch`                | `components/core/Switch.jsx`       | `src/design-system/Switch.tsx`         | mapped                                    |
+| `Tag`                   | `components/core/Tag.jsx`          | `src/design-system/NativeControls.tsx` | pending-validation: 44pt current target   |
+| `TextArea`              | `components/core/TextArea.jsx`     | `src/design-system/NativeControls.tsx` | mapped                                    |
 
-- The exact Release matrix passed on Android emulator `emulator-5554`, the USB
-  Pixel 4a `09081JEC210280`, and the iPhone 17 Pro Max iOS 26.5 simulator
-  `D6B394CE-F257-4496-B7AC-DD6F09A1C318`. It verified 1,429 screenshots: 708
-  per simulator platform plus 13 physical-Android smoke captures.
-- Both simulator platforms completed all 19 registered UI languages with 36
-  captures per language, the introduction smoke, three-route landscape,
-  dark/high-contrast/accessibility-large layouts, and TalkBack or VoiceOver
-  hierarchy checks covering nine labelled home controls.
-- Manual review covered all 38 locale contact sheets and the general flow
-  sheets. The only new defect was an iOS accessibility-large overlap in the
-  constrained workspace. Commit `363a71d3` gives compact chrome and the blocked
-  route card stable accessible names; the rebuilt iOS Release app then passed
-  the targeted eight-scene accessibility flow in portrait and landscape.
-- Commit `2b227949` corrected the Settings keyboard regression test to model a
-  native React Native subscription. The complete spend-free `make pre-push`
-  gate then passed with 197 suites and 1,846 tests passing (1 intentionally
-  skipped), plus TypeScript, ESLint/Knip, coverage, native-config parity,
-  license, and diff-hygiene checks.
-- The wired iPhone 17 Pro Max on iOS 26.6 accepted the current standalone
-  Release `.dev` app with extended-address-space and increased-memory
-  entitlements. Its app-managed Parakeet download continued while backgrounded
-  and resumed the same setup job. Because the connection delivered only about
-  15 KB/s, exact SHA-verified model archives were then side-loaded into the app
-  container to complete runtime acceptance without misrepresenting that step
-  as an app download.
-- Granite 4.0 1B passed at 44.04 tok/s with 2.9x memory headroom; Parakeet
-  passed at 0.189 realtime factor with 1.9x headroom; Piper Kristin passed at
-  0.540 realtime factor and remained Ready after a cold launch. Kokoro ran
-  correctly but reported its 2.057 realtime factor below the 1.5 target, so it
-  remained an honest non-viable choice for this phone.
-- The first successful physical local transcription exposed a Release-only
-  Hermes crash: `Intl.RelativeTimeFormat` was absent when the new conversation
-  timestamp rendered. A regression test first reproduced the missing API,
-  `mainScreenViewModel.ts` gained a localized compact date/time fallback, and
-  the freshly rebuilt physical Release app then transcribed a checksum-verified
-  fixture, persisted the conversation, and rendered `10:49 AM` without a
-  crash. Evidence is under
-  `artifacts/design-system-reconciliation/current/ios-physical/2026-08-13-local-profile/`.
-- Audible end-to-end Piper replay was not repeated after the user asked that
-  the speakers remain quiet; synthesis is covered by the physical Piper
-  benchmark and the integrated native playback gates. No paid provider
-  request, release, push, or store action was performed.
+### Introduction (8)
 
-## Run evidence — 2026-08-11
+| Entry                   | Design source                       | Native authority                                                                                                                             | Current audit status                                                             |
+| ----------------------- | ----------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------- |
+| `IntroBody`             | `components/intro/IntroBody.jsx`    | `src/components/introFlow/IntroPrimitives.tsx`                                                                                               | pending-validation: primitive file was reduced to retained exports               |
+| `INTRO_STEPS`           | `components/intro/IntroFlow.jsx`    | `src/components/introFlow/introSteps.tsx`                                                                                                    | mapped: exactly `welcome`, `setup`, `try`                                        |
+| `INTRO_COPY`            | `components/intro/IntroFlow.jsx`    | `src/i18n/introTranslations.ts`; `src/components/introFlow/introSteps.tsx`                                                                   | mapped; welcome/hero/try copy blocked-owner                                      |
+| `DEFAULT_MANUAL_GROUPS` | `components/intro/IntroFlow.jsx`    | live manual catalogue in `src/components/introFlow/introSteps.tsx`, backed by local-model and speech catalogues plus install/benchmark state | mapped; specimen rows are not copied constants                                   |
+| `DEMO_TURN`             | `components/intro/IntroFlow.jsx`    | `src/screens/main/useIntroTestTurn.ts`; try-step rendering in `src/components/introFlow/introSteps.tsx`                                      | pending-validation: native path uses a real ephemeral turn, not fixture output   |
+| `IntroFlow`             | `components/intro/IntroFlow.jsx`    | `src/components/introFlow/IntroFlowScreen.tsx`                                                                                               | pending-validation: navigation/control geometry and concurrent test-turn changes |
+| `IntroStepper`          | `components/intro/IntroStepper.jsx` | `src/components/introFlow/IntroStepper.tsx`                                                                                                  | pending-validation: 44pt step targets                                            |
+| `IntroTitle`            | `components/intro/IntroTitle.jsx`   | `src/components/introFlow/IntroPrimitives.tsx`                                                                                               | pending-validation: retained primitive file changed                              |
 
-### Reopened regression batch (current worktree)
+### List (2)
 
-- Source and focused native-presentation tests now cover an orb-first blocked
-  startup, text submission that cannot route into introduction, absent Free
-  edition status link, centred requirements step, persisted Ready revalidation,
-  Piper phoneme-pack verification, and UI-thread orb clocks.
-- Android `emulator-5554` exact Release matrix passed: 19 UI languages with 36
-  captures each, 13 smoke captures, three-route landscape, dark/high-contrast/
-  large-text, and TalkBack hierarchy. The 708 screenshots are under
-  `artifacts/maestro/release/android/`.
-- iOS exact Release matrix passed on the iPhone 14 Plus iOS 26.3 simulator
-  (`47F04ABD-CC99-400C-BFE8-61658B927D67`): the equivalent 708 screenshots,
-  including the landscape assertion, and VoiceOver hierarchy evidence are
-  under `artifacts/maestro/release/ios/` and
-  `artifacts/maestro/release/screen-reader/ios/`. The iPhone 17 Pro iOS 26.4
-  simulator's automation driver reported a successful orientation change while
-  leaving app content portrait; the same flow passed on 26.3, so 26.4 was not
-  accepted as evidence for this batch.
-- Manual review of the current Android and iOS contact sheets, the landscape
-  flow, and Arabic/Urdu home screens found no clipping, overlap, missing
-  content, or RTL-direction defect. The home screenshot confirms the central
-  orb and direct inline Settings action rather than a composer or legacy CTA.
-- A fresh physical Android smoke run remains blocked by the attached Pixel 4a
-  lock screen (`mWakefulness=Dozing`); no lock-screen bypass was attempted.
-  Therefore `verify-maestro-artifacts` correctly rejects the current artifact
-  set solely for its missing 13 physical screenshots. Earlier physical evidence
-  is retained as history, not substituted for this exact Release run.
-- No paid provider or quota-consuming request was made.
+| Entry      | Design source                  | Native authority                       | Current audit status |
+| ---------- | ------------------------------ | -------------------------------------- | -------------------- |
+| `List`     | `components/list/List.jsx`     | `src/design-system/NativeControls.tsx` | mapped               |
+| `ListItem` | `components/list/ListItem.jsx` | `src/design-system/NativeControls.tsx` | mapped               |
 
-## Final repository verification — 2026-08-11
+### On-device setup (8)
 
-- Atomic implementation and tooling commits are `a037be8`, `d1f91a8`,
-  `72f27c3`, `12f61bf`, and `01cbb99`; this report is the documentation
-  closeout that follows them.
-- The complete spend-free `make pre-push` gate passed after the native and
-  application fixes: static checks, TypeScript, 193 passing Jest suites, 1,783
-  passing tests, and the checked-in global coverage floor.
-- `make android-unit`, `make android-instrumentation`, and
-  `make ios-native-test` passed on the applicable emulator/simulator targets.
-- `make fresh-checkout` then passed from a clean detached checkout of
-  `01cbb99695a0b20d613f80dea82403df0f467067`, proving the result does not rely
-  on ignored dependencies or the working tree.
-- No paid provider or quota-consuming request was made, and no release or push
-  was performed as part of this goal.
+| Entry                          | Design source                                           | Native authority                                                                                | Current audit status                                               |
+| ------------------------------ | ------------------------------------------------------- | ----------------------------------------------------------------------------------------------- | ------------------------------------------------------------------ |
+| `AUTO_SETUP_COPY`              | `components/on-device/AutoSetupCard.jsx`                | `src/i18n/autoSetupTranslations.ts` and registered locale dictionaries                          | mapped; localized rather than copied                               |
+| `AUTO_SETUP_PLAN`              | `components/on-device/AutoSetupCard.jsx`                | real profile plan in `src/screens/main/useAutoSetupJob.ts`; `src/components/autoSetup/types.ts` | pending-validation: concurrent setup-job changes                   |
+| `AUTO_SETUP_FACTS`             | `components/on-device/AutoSetupCard.jsx`                | live device facts in `src/screens/main/useAutoSetupJob.ts`                                      | pending-validation: real readings, never specimen numbers          |
+| `AutoSetupStepReading`         | `components/on-device/AutoSetupCard.jsx`                | type in `src/components/autoSetup/types.ts`; value in `src/screens/main/useAutoSetupJob.ts`     | pending-validation: concurrent job changes                         |
+| `AutoSetupCard`                | `components/on-device/AutoSetupCard.jsx`                | `src/components/autoSetup/AutoSetupCard.tsx`                                                    | pending-validation: cancellation controls and job behavior changed |
+| `AutoSetupPlanRow`             | `components/on-device/AutoSetupPlanRow.jsx`             | `src/components/autoSetup/AutoSetupPlanRow.tsx`                                                 | mapped                                                             |
+| `InstallProgress`              | `components/on-device/InstallProgress.jsx`              | `src/components/autoSetup/InstallProgressBar.tsx`                                               | mapped; native name differs                                        |
+| `LocalModelPerformanceSummary` | `components/on-device/LocalModelPerformanceSummary.jsx` | `src/components/LocalModelPerformanceSummary.tsx`                                               | mapped                                                             |
 
-## Expanded Release evidence — 2026-08-11
+### Overlays (3)
 
-- The Android and iOS locale sweeps each passed 19 languages with 36 explicit
-  captures per language (684 per platform). The review contact sheets are
-  `artifacts/design-system-reconciliation/current/android/localized-contact-sheet.png`
-  and the corresponding `ios/` path. No clipping, overlap, missing section, or
-  incorrect RTL direction was found in the reviewed sheets.
-- The current introduction smoke passed with 13 captures each on the Android
-  emulator, iOS simulator, and Pixel 4a. The three-row review sheet is
-  `artifacts/design-system-reconciliation/current/smoke-contact-sheet.png`.
-  It covers the banner, all seven steps, playing bundled audio, Back, Done,
-  reopen/close, App settings, and landscape.
-- Layout passed three explicit scenes per simulator platform. Dark mode,
-  increased contrast, and accessibility-large text passed eight captures per
-  platform. TalkBack and VoiceOver were active and exposed the same nine
-  labelled home controls; evidence is under
-  `artifacts/maestro/reconciliation/screen-reader/`.
-- The ten-state orb matrix passed from exact isolated Release builds on both
-  simulator platforms. The reviewed montages under
-  `artifacts/design-system-reconciliation/current/{android,ios}/orb-matrix-final/`
-  cover idle, recording, transcribing, short thinking, search, full thinking,
-  synthesis, speaking, and half/full overtime.
-- Android instrumentation passed on `emulator-5554`; iOS native tests passed on
-  `A57F05FB-C492-4E7A-9AA7-2B542FC9D289`. Seventeen focused suites also passed
-  235 tests covering onboarding, automatic setup, local model management and
-  benchmarks, voice pipeline, orb timing, STT, and TTS.
-- The Pixel 4a accepted the current isolated Release APK and passed all 13 smoke
-  scenes. After a USB-interrupted transfer was cleaned and retried, Qwen3.5
-  0.8B measured 8.34 tok/s, 1489 ms load, and 1.4x memory headroom; Whisper
-  Small measured 0.89 realtime factor, 4709 ms load, and 1.1x headroom. Piper
-  failed its device test without crashing, retry excluded the durable failure,
-  and automatic setup reached Ready with Qwen, Whisper, and system speech.
-- The completed profile produced a persisted local text reply in 48 seconds and
-  a real physical microphone turn in 44 seconds. The first microphone attempt
-  proved that Android AAC/M4A capture could not enter Sherpa's file recognizer;
-  after switching native capture to mono 16 kHz PCM WAV, the exact Release flow
-  passed recording, local Whisper transcription, Qwen response, Speaking orb,
-  system playback, and a two-message transcript in 51 seconds. Evidence is in
-  `artifacts/design-system-reconciliation/current/android-physical/resumed-auto-setup/`,
-  especially `voice-turn/2026-08-11_0736-wav/` and the Ready/profile-turn
-  capture directories.
-- The Wi-Fi iPhone 15 Pro is paired but Xcode cannot mount its developer disk
-  image. The wired fallback iPhone 17 Pro Max accepted the isolated Release app
-  alongside production and produced current first-launch and full-overtime
-  screenshots under `artifacts/design-system-reconciliation/current/ios-physical/manual/`.
-  That build intentionally omitted extended-memory entitlements because the
-  available wildcard profile cannot sign them, so it is UI evidence only and
-  not a local-model result.
-- No paid provider or quota-consuming request was made.
+| Entry          | Design source                          | Native authority                                                                                                    | Current audit status                                                                        |
+| -------------- | -------------------------------------- | ------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
+| `AnchoredMenu` | `components/overlays/AnchoredMenu.jsx` | `src/components/conversationDrawer/ConversationActionMenu.tsx`, composed by `src/components/ConversationDrawer.tsx` | mapped; native name differs                                                                 |
+| `Modal`        | `components/overlays/Modal.jsx`        | `src/design-system/NativeControls.tsx`                                                                              | mapped                                                                                      |
+| `Toast`        | `components/overlays/Toast.jsx`        | `src/components/Toast.tsx`                                                                                          | pending-validation: current stripe-free component geometry; vendored prose conflict remains |
 
-## Initial environment facts — 2026-08-11
+### Settings primitives (6)
 
-- Checkout: `e5e6e18`, branch `main`, ten commits ahead of `origin/main` when
-  the goal started.
-- Android emulator: `emulator-5554`, Google arm64 AVD, Android 17, 1080×2400 at
-  420 dpi.
-- iOS simulator: iPhone 17 Pro, iOS 26.4,
-  `A57F05FB-C492-4E7A-9AA7-2B542FC9D289`.
-- Wi-Fi iPhone discovered as iPhone 15 Pro,
-  `D870BA3B-66F3-566D-9F12-A97DD4F0F0ED`; even after it became available and
-  paired, the developer image could not be mounted.
-- A second paired iPhone 17 Pro Max was visible over a wired CoreDevice
-  transport and already contained production and development 3.2.0 builds.
-- No physical Android transport appeared during initial discovery. The Pixel
-  4a later attached as `09081JEC210280`, accepted the isolated Release APK, and
-  became the physical Android target described above.
+| Entry              | Design source                                         | Native authority                                                 | Current audit status                           |
+| ------------------ | ----------------------------------------------------- | ---------------------------------------------------------------- | ---------------------------------------------- |
+| `IconAction`       | `components/settings-primitives/IconAction.jsx`       | `src/features/settings/settings-primitives/IconAction.tsx`       | pending-validation: icon-well geometry changed |
+| `PremiumBand`      | `components/settings-primitives/PremiumBand.jsx`      | `src/features/settings/settings-primitives/PremiumBand.tsx`      | pending-validation: badge geometry changed     |
+| `RouteOptionRow`   | `components/settings-primitives/RouteOptionRow.jsx`   | `src/features/settings/settings-primitives/RouteOptionRow.tsx`   | mapped                                         |
+| `RuntimeReadiness` | `components/settings-primitives/RuntimeReadiness.jsx` | `src/features/settings/settings-primitives/RuntimeReadiness.tsx` | mapped                                         |
+| `SettingsGroup`    | `components/settings-primitives/SettingsGroup.jsx`    | `src/features/settings/settings-primitives/SettingsGroup.tsx`    | mapped                                         |
+| `SettingsRow`      | `components/settings-primitives/SettingsRow.jsx`      | `src/features/settings/settings-primitives/SettingsRow.tsx`      | mapped                                         |
+
+### Workspace (12)
+
+| Entry                         | Design source                                          | Native authority                                                                                           | Current audit status                                     |
+| ----------------------------- | ------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------- | -------------------------------------------------------- |
+| `AppWordmark`                 | `components/workspace/AppWordmark.jsx`                 | `src/components/AppWordmark.tsx`                                                                           | mapped                                                   |
+| `BackgroundTaskBar`           | `components/workspace/BackgroundTaskBar.jsx`           | `src/design-system/BackgroundTaskBar.tsx`                                                                  | mapped; setup-job behavior remains pending               |
+| `Composer`                    | `components/workspace/Composer.jsx`                    | `src/screens/main/voiceTextInputPager/InputSurfacePages.tsx`; pager ownership in `VoiceTextInputPager.tsx` | pending-validation: current input-surface styles changed |
+| `ConversationSettingsSummary` | `components/workspace/ConversationSettingsSummary.jsx` | `src/design-system/ConversationSettingsSummary.tsx`                                                        | mapped                                                   |
+| `IntroBanner`                 | `components/workspace/IntroBanner.jsx`                 | `src/components/IntroBanner.tsx`                                                                           | pending-validation: play-well geometry changed           |
+| `OrbSatellite`                | `components/workspace/OrbSatellite.jsx`                | `src/design-system/OrbSatellite.tsx`; phase composition in `src/screens/main/MainScreenWorkspace.tsx`      | mapped; gentle transition unresolved                     |
+| `Picker`                      | `components/workspace/Picker.jsx`                      | `src/components/Picker.tsx`                                                                                | mapped                                                   |
+| `PremiumUpgradeModal`         | `components/workspace/PremiumUpgradeModal.jsx`         | `src/components/PremiumUpgradeModal.tsx`                                                                   | mapped                                                   |
+| `RouteByline`                 | `components/workspace/RouteByline.jsx`                 | `src/screens/main/MainScreenRouteByline.tsx`                                                               | mapped; native name differs                              |
+| `RoutePicker`                 | `components/workspace/RoutePicker.jsx`                 | `src/screens/main/RoutePickerSheet.tsx`                                                                    | mapped; ordering is blocked-owner                        |
+| `TranscriptHandle`            | `components/workspace/TranscriptHandle.jsx`            | `src/design-system/TranscriptHandle.tsx`                                                                   | mapped                                                   |
+| `VoiceOrb`                    | `components/workspace/VoiceOrb.jsx`                    | `src/design-system/VoiceOrb.tsx`; state/progress in `src/screens/main/useOrbTurnProgress.ts`               | pending-validation: anatomy and live clocks changed      |
+
+## Surface and state inventory
+
+| Surface                    | States that require fresh evidence                                                                                                                                                                                             | Current disposition                                                                                             |
+| -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------- |
+| Workspace                  | free/premium, usable/blocked route, portrait/landscape, intro banner, text/voice pages, idle and all seven active orb phases, ring boundaries/overtime, compose/transport/Drive satellites, transcript handle, background task | pending-validation; satellite transition unresolved; transport availability contract needs owner reconciliation |
+| Introduction               | first run/re-entry; welcome before/during/after playback and language switch; setup offer/scanning/proposal/installing/done/failed/manual; try idle/recording/running/success/replay/abort; step gates                         | pending-validation; copy, recordings, and stored-session timing blocked-owner                                   |
+| Chat, transcript, drawer   | empty/search, pinned/earlier/archived, fork/root, anchored actions/rename/delete, folded/open/latest rows, images, metadata cards, branch tags, reply failure and pipeline warnings/actions                                    | pending-validation; unread marker blocked-owner                                                                 |
+| Settings                   | free/premium overview, all seven pages, ready/unready/error routes, pickers, lifecycle actions, validation, backup/import, diagnostics, modal keyboard/orientation/accessibility                                               | mapped; requires complete fresh native matrix                                                                   |
+| On-device setup            | offer, scanning, proposal, installing, done, failed; cancel, retry, resume, honest ineligibility, persistent task bar, real device facts and benchmarks                                                                        | pending-validation; partial-fit and metered-retry policies blocked-owner                                        |
+| Overlays and announcements | modal/sheet focus and dismissal, anchored menu placement/click-away, toast info/success/danger/retry/replace/suspend/dismiss, no duplicate turn-level announcement                                                             | pending-validation; vendored Toast prose needs upstream correction                                              |
+
+## Retired and non-contract names
+
+The following names are absent from the 63-entry manifest. The retired source
+names also have no current reference under `src/`, `app/`, or `__tests__/`.
+
+| Name(s)                                                                        | Current disposition                                                                             |
+| ------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------- |
+| `ResponseModeToggle`, `PhaseAwareVoiceAction`                                  | retired; route byline and orb/satellites own their former jobs                                  |
+| `WorkspaceStatusLine`, `DriveSessionControls`                                  | retired; transcript handle and phase-owned satellites own their former jobs; no drawn countdown |
+| `ConversationActionSheet`                                                      | retired; `AnchoredMenu` maps to native `ConversationActionMenu`                                 |
+| `ConversationIntegrityModal`, `ConversationMemoryModal`                        | retired/parked; no current drawer or manifest contract                                          |
+| `IntroVoicePicker`                                                             | retired; the three-step flow owns its inline language picker                                    |
+| `IntroButton`, `IntroDivider`, `IntroPanel`, `IntroPanelDivider`, `IntroPoint` | retired and removed from the current native primitive file                                      |
+| historical `Ant*` component names                                              | not design contracts; retained native prefixes, where present, exist only for import stability  |
+| `brandFonts`                                                                   | manifest metadata, not one of the 63 component/export entries                                   |
+
+## Historical exact-SHA evidence
+
+| Exact SHA                                  | Historical evidence retained                                                                                              | Limitation                                                                        |
+| ------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------- |
+| `01cbb99695a0b20d613f80dea82403df0f467067` | Recorded clean detached `make fresh-checkout`: 193 suites and 1,783 tests passed, one suite/test skipped, coverage green. | Gate evidence for that SHA only; predates the current design import and worktree. |
+| `363a71d3cb6c30093c5297c266b282b647562d30` | Recorded freshly rebuilt iOS Release targeted eight-scene accessibility-large pass after the workspace layout fix.        | Targeted iOS evidence for that SHA only; not a current full matrix.               |
+
+The former 1,429-image and physical-device narratives are not carried forward
+as acceptance because the inspected artifact manifests do not identify their
+source SHA. They may remain useful historical artifacts, but they cannot prove
+this checkout.
+
+## Evidence still required for a current verdict
+
+1. Reproduce the green spend-free gate from a clean detached checkout; the
+   scoped implementation commit and manifest hash are already frozen above.
+2. Rebuild Android and iOS Release apps from that SHA and run applicable native
+   instrumentation/tests.
+3. Capture the complete surface/state inventory across appearances,
+   orientations, all locales including RTL, increased contrast, large text,
+   TalkBack, and VoiceOver; manually review every image.
+4. Run physical Android and iPhone microphone, local STT/LLM/TTS, playback and
+   paragraph seek, automatic-setup lifecycle, background, and cold-start flows.
+5. Record unavailable devices and all unresolved owner decisions as blockers;
+   issue only evidence-scoped `accepted@<sha>` verdicts.

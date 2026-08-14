@@ -1,89 +1,104 @@
-# Design-system and runtime reconciliation requirements
+# Design-system reconciliation requirements
 
-## Goal
+## Purpose
 
-Reconcile the shipped React Native application with the approved vendored
-`design-system/` and prove that the complete user experience works on Android
-and iOS. Visual similarity alone is not acceptance: every represented control,
-state, transition, navigation path, and native capability must remain usable.
+Reconcile the React Native product with the approved vendored design system
+without confusing source discovery, unit coverage, or an older device run with
+acceptance of the current checkout. The deliverable is a complete mapping of
+the current contract plus exact-SHA native evidence for every retained surface
+and state.
 
-## Authorities
+## Authority
 
-- `design-system/` is the source of truth for the approved visual intent. It is
-  a read-only web mirror and must not be imported by or hand-edited for the app.
-- The root and subtree `SPEC.md` / `DESIGN.md` files are the source of truth for
-  product behavior, state flow, privacy, persistence, and failure handling.
-- The current checkout and live native builds are the source of truth for what
-  is implemented. Static render tests or the web kit do not prove native
-  behavior.
-- `design-system/migration-goal.md` and
-  `docs/specs/design-system-migration/report.md` are the completed migration
-  baseline. This goal verifies and corrects that baseline rather than repeating
-  it.
+Read evidence in this order:
 
-## Visual acceptance
+1. `design-system/_ds_manifest.json` defines the approved export inventory;
+   its component source, `.d.ts`, prompt, foundations, content charter, and
+   surface documents define design intent. Contradictions inside the mirror are
+   recorded rather than silently resolved.
+2. Root and subtree `SPEC.md` / `DESIGN.md` files define product behavior,
+   state ownership, privacy, persistence, and native constraints.
+3. `src/` and `app/` define what the inspected checkout implements. A path
+   mapping is evidence of ownership, not a parity verdict.
+4. Tests, rebuilt native apps, accessibility trees, and reviewed screenshots
+   prove behavior only for the exact source SHA and build identity that
+   produced them.
 
-1. Map every component in `design-system/_ds_manifest.json` to its React Native
-   implementation or document why it is specimen-only.
-2. Reconcile the workspace, conversation drawer, introduction, all settings
-   pages, overlays, chat content, and on-device setup with their design-system
-   definitions.
-3. Check every affected surface in light and dark appearances, portrait and
-   landscape, one RTL locale, and accessibility-large text.
-4. Preserve the token values, type roles, spacing, radii, icon semantics,
-   minimum 44-point targets, semantic colours, contrast, and modal focus rules.
-5. Treat fixture screenshots as deterministic reference evidence, not as proof
-   that a real navigation or native capability works.
+`design-system/` remains a read-only web mirror. Nothing in it is imported into
+the shipped app or edited during reconciliation.
 
-## Functional acceptance
+## Current contract
 
-The following flows must work end to end where the target supports them:
+The current manifest contains **63 entries**:
 
-- seven-step introduction, swipe/header/stepper navigation, localized audio,
-  close/reopen, provider and Premium hand-offs, and return-to-origin behavior;
-- automatic on-device setup from both introduction and Settings, including real
-  readings, proposal-before-install, background continuation, progress,
-  cancellation, failure, resume without re-download, and final profile use;
-- stage-owned local-model catalogues, download, checksum verification,
-  benchmark, selection, test, removal, storage reporting, and device-specific
-  readiness;
-- Settings overview and all seven pages, Free/Premium gating, pickers, dialogs,
-  validation, backup/restore entry points, diagnostics, and persistence;
-- voice/text pager, route byline and picker, conversation settings, image,
-  Search and Model Council controls, conversation drawer, transcript sheet,
-  message actions, and portrait/landscape transitions;
-- voice orb idle/recording/transcribing/thinking-briefly/searching/thinking/
-  synthesizing/speaking states, press semantics, Drive Session countdown,
-  phase ring, estimated-turn ring, and overtime rendering;
-- a complete on-device voice turn through STT, local response generation, TTS,
-  playback controls, persistence, background/lifecycle transitions, and the
-  next-turn reset.
+| Boundary            | Entries |
+| ------------------- | ------: |
+| Brand               |       1 |
+| Chat                |      13 |
+| Core                |      10 |
+| Introduction        |       8 |
+| List                |       2 |
+| On-device setup     |       8 |
+| Overlays            |       3 |
+| Settings primitives |       6 |
+| Workspace           |      12 |
 
-Hosted-provider live calls are not part of this goal unless the user separately
-authorizes a new-version release. Deterministic fixtures may exercise provider
-presentation and routing UI without spending quota.
+The introduction has exactly three steps: `welcome`, `setup`, and `try`. The
+last step runs an ephemeral real pipeline turn; it does not create a stored
+conversation. Settings retains seven pages plus the edition-specific overview.
 
-## Device matrix
+The following former contracts are not manifest entries and must not be
+reintroduced as current mappings: `ResponseModeToggle`,
+`PhaseAwareVoiceAction`, `WorkspaceStatusLine`, `DriveSessionControls`,
+`ConversationActionSheet`, `ConversationIntegrityModal`,
+`ConversationMemoryModal`, `IntroVoicePicker`, `IntroButton`, `IntroDivider`,
+`IntroPanel`, `IntroPanelDivider`, and `IntroPoint`. Historical `Ant*` source
+names retained for import stability are implementation details, not approved
+design-system components.
 
-| Target | Required evidence |
-| --- | --- |
-| Android emulator | deterministic visual states, navigation, locale/theme/orientation/accessibility coverage, honest low-memory local-model failure, Android instrumentation |
-| Physical Android | successful eligible local-model install/benchmark, microphone/STT, local LLM, TTS/playback, background service, lifecycle, thermal/memory evidence |
-| iOS simulator | deterministic visual states, navigation, locale/theme/orientation/accessibility coverage, iOS native tests that support a simulator |
-| Physical iPhone | microphone/speech/audio session, eligible local-model install/benchmark, local LLM/TTS, background/lifecycle behavior, provisioning/entitlement evidence |
+## Acceptance
 
-An unavailable, locked, unpaired, or ineligible target is a recorded blocker,
-not a pass and not a reason to weaken the matrix.
+- Map every one of the 63 manifest entries to its native component,
+  composition, runtime data owner, or localized equivalent.
+- Reconcile the workspace, conversation drawer, transcript, three-step
+  introduction, seven-page settings hierarchy, on-device setup, chat metadata,
+  overlays, and announcements in every represented state.
+- Preserve design tokens, semantic Phosphor glyphs, regular icon weight,
+  minimum 44-point targets, modal focus isolation, hidden dismissal backdrops,
+  dynamic announcements, and light/dark contrast.
+- Validate portrait and landscape, light and dark appearance, RTL, increased
+  contrast, and accessibility-large text on rebuilt Android and iOS apps.
+- Exercise orb idle, recording, transcribing, brief thinking, searching,
+  thinking, synthesizing, speaking, ring boundaries, and overtime. The
+  satellite ring owns composition and transport controls; Drive Session adds
+  no dock or drawn countdown.
+- Exercise first-run and re-entry intro gating, localized dialogue/audio
+  pairing, automatic setup, cancellation, failure, retry/resume, and the
+  ephemeral test turn.
+- Exercise drawer actions, branches, transcript folding/actions, reply
+  failures, pipeline notices, toasts, pickers, dialogs, readiness, and
+  persistence through their real entry points.
+- Give every confirmed defect the closest reliable automated regression test.
 
-## Evidence and completion
+Hosted-provider calls remain outside this reconciliation unless a separate
+release request authorizes quota spend.
 
-- Keep sanitized screenshots, hierarchy dumps, logs, and manifests under the
-  ignored `artifacts/design-system-reconciliation/` tree.
-- Record the exact commit, build identity, device identifier/model/OS,
-  appearance, locale, orientation, text/accessibility settings, and test result.
-- Every confirmed defect receives the closest reliable automated regression
-  test before its fix.
-- Update affected living specs and the changelog with user-visible fixes.
-- Completion requires all non-blocked matrix cells to pass, manual review of
-  every captured image, and explicit unresolved blockers for any remaining
-  physical-device or external dependency.
+## Evidence rule
+
+The implementation audited here is frozen at
+`db1d59b4c8ff56fea3ee8ab66cb1ba57c2174ffa`. Its 63-entry manifest has SHA-256
+`b8f6f5f0c7013be81f5f8c544786f297c0f169d3dc3b4eda6e26923a0cf3174a`, and the
+complete spend-free `make pre-push` gate passed against that implementation.
+This establishes committed source and static/test evidence only. No current
+row is accepted without rebuilt exact-SHA apps, native tests, physical
+capability runs, accessibility evidence, and manual review of every captured
+image. An unavailable or ineligible target is a blocker, not a pass.
+
+The shared checkout still contains unrelated local files outside this audit's
+commits, so this record does not claim a clean-worktree or detached-checkout
+pass. Those files were excluded from both reconciliation commits.
+
+Each artifact manifest must record source SHA, build identity, target model and
+OS, locale, appearance, orientation, text/contrast settings, command, result,
+and review status. It must not retain credentials, prompts, transcripts,
+provider bodies, or model output.

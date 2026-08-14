@@ -135,19 +135,19 @@ history. This preserves the offline execution claim.
 
 ## Persistence Architecture
 
-| Data | Authority | Storage | Portable backup |
-| --- | --- | --- | --- |
-| Public settings | `Settings` minus `apiKeys` | AsyncStorage `@mrbroccoli/settings` | Yes |
-| Provider API keys | user-entered secret | SecureStore `mrbroccoli.provider_key.<provider>` | Never |
-| Conversation metadata | conversation hook | AsyncStorage `@mrbroccoli/conversations` | Rebuilt from records |
-| Conversation records | conversation hook | AsyncStorage `@mrbroccoli/conversation/<id>` | Yes |
-| Active conversation ID | conversation hook | AsyncStorage `@mrbroccoli/active_conversation` | Optional restore target |
-| Image attachments | conversation record plus app document | app documents, stored by stable attachment ID | Embedded in backup v2 |
-| Past-conversation index | derived cache | SQLite with FTS5 and local vectors | Never |
-| Runtime capability overrides | provider-confirmed device state | AsyncStorage | Never |
-| Local model installs and benchmarks | device-operational state | app/model storage plus local state | Never |
-| Premium cache | verified local entitlement | SecureStore | Never |
-| Debug captures | sanitized bounded diagnostics | temporary/app diagnostics files | Never |
+| Data                                | Authority                             | Storage                                          | Portable backup         |
+| ----------------------------------- | ------------------------------------- | ------------------------------------------------ | ----------------------- |
+| Public settings                     | `Settings` minus `apiKeys`            | AsyncStorage `@mrbroccoli/settings`              | Yes                     |
+| Provider API keys                   | user-entered secret                   | SecureStore `mrbroccoli.provider_key.<provider>` | Never                   |
+| Conversation metadata               | conversation hook                     | AsyncStorage `@mrbroccoli/conversations`         | Rebuilt from records    |
+| Conversation records                | conversation hook                     | AsyncStorage `@mrbroccoli/conversation/<id>`     | Yes                     |
+| Active conversation ID              | conversation hook                     | AsyncStorage `@mrbroccoli/active_conversation`   | Optional restore target |
+| Image attachments                   | conversation record plus app document | app documents, stored by stable attachment ID    | Embedded in backup v2   |
+| Past-conversation index             | derived cache                         | SQLite with FTS5 and local vectors               | Never                   |
+| Runtime capability overrides        | provider-confirmed device state       | AsyncStorage                                     | Never                   |
+| Local model installs and benchmarks | device-operational state              | app/model storage plus local state               | Never                   |
+| Premium cache                       | verified local entitlement            | SecureStore                                      | Never                   |
+| Debug captures                      | sanitized bounded diagnostics         | temporary/app diagnostics files                  | Never                   |
 
 Settings and conversation writes are serialized per storage key. This prevents
 an older asynchronous write from overwriting a newer user action. Loading waits
@@ -164,9 +164,8 @@ Conversation metadata is loaded first for fast drawers and search. Full records
 hydrate lazily. Each record owns messages, per-conversation overrides, summary,
 branch origin, privacy and archive state, usage events, and knowledge
 exclusions. Removing an individual message is a canonical record mutation: it
-also invalidates the compact summary and integrity-repair snapshot, removes
-app-owned attachments, rebuilds drawer metadata, and resynchronizes eligible
-derived knowledge.
+also invalidates the compact summary, removes app-owned attachments, rebuilds
+drawer metadata, and resynchronizes eligible derived knowledge.
 
 Branches copy messages only through a selected checkpoint, assign new message
 and attachment IDs, preserve applicable conversation settings and privacy, and
