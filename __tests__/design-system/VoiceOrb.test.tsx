@@ -67,13 +67,29 @@ describe("VoiceOrb", () => {
     expect(core.width).toBe(Math.floor(196 * 0.72));
   });
 
-  it("draws a plain halo at rest instead of two empty tracks", () => {
+  it("fades both rings at rest instead of drawing two empty tracks", () => {
     const screen = renderOrb();
     const circles = screen.UNSAFE_getAllByType(Circle);
 
-    // One uniform tint ring; no turn track, no progress arcs.
-    expect(circles).toHaveLength(1);
-    expect(circles[0].props.stroke).toBe("rgba(68, 160, 85, 0.16)");
+    // Both rings in faded phase colour; no turn track, no progress arcs.
+    expect(circles).toHaveLength(2);
+    for (const circle of circles) {
+      expect(circle.props.stroke).toBe("rgba(68, 160, 85, 0.16)");
+    }
+  });
+
+  it("combines both rings into one indicator while recording and speaking", () => {
+    // Recording says how much of the window is used, speaking how much of the
+    // response has been read — one thing each, not two competing clocks.
+    for (const phase of ["recording", "speaking"] as const) {
+      const screen = renderOrb({ phase, phaseProgress: 0.4, turnProgress: 0.9 });
+      const strokes = screen
+        .UNSAFE_getAllByType(Circle)
+        .map((circle) => circle.props.stroke);
+
+      expect(strokes).not.toContain(lightColors.turnInk);
+      screen.unmount();
+    }
   });
 
   it("draws both clocks during a turn", () => {

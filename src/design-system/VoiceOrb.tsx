@@ -299,6 +299,9 @@ export function VoiceOrb({
   const tint = tintOf(ink);
   const foreground = getAccessibleForeground(ink);
   const late = clamp01(overtime);
+  // Recording and speaking read as one indicator; the middle phases keep two
+  // clocks (whole turn against its estimate, current phase against itself).
+  const combined = phase === "recording" || phase === "speaking";
   const quiet =
     phase === "idle" &&
     !clamp01(turnProgress) &&
@@ -336,15 +339,54 @@ export function VoiceOrb({
         testID="voice-orb-rings"
       >
         {quiet ? (
-          // The plain halo: a uniform tint ring where the phase ring runs.
-          <Circle
-            cx={centre}
-            cy={centre}
-            r={phaseRadius}
-            stroke={tint}
-            strokeWidth={BAND}
-            fill="none"
-          />
+          // At rest both rings are faded phase colour: no clocks, and never
+          // two empty tracks. The gap between them stays a gap.
+          <>
+            <Circle
+              cx={centre}
+              cy={centre}
+              r={turnRadius}
+              stroke={tint}
+              strokeWidth={BAND}
+              fill="none"
+            />
+            <Circle
+              cx={centre}
+              cy={centre}
+              r={phaseRadius}
+              stroke={tint}
+              strokeWidth={BAND}
+              fill="none"
+            />
+          </>
+        ) : combined ? (
+          // Recording and speaking have one thing to say — how much of the
+          // window is used, how much of the response has been read — so both
+          // rings carry the same arc rather than two competing clocks.
+          <>
+            <ProgressRing
+              centre={centre}
+              radius={turnRadius}
+              trackColor={tint}
+              progressColor={ink}
+              progress={phaseProgress}
+              progressTiming={phaseProgressTiming}
+              tailColor={late > 0 || overtimeTiming ? colors.danger : undefined}
+              tail={late}
+              tailTiming={overtimeTiming}
+            />
+            <ProgressRing
+              centre={centre}
+              radius={phaseRadius}
+              trackColor={tint}
+              progressColor={ink}
+              progress={phaseProgress}
+              progressTiming={phaseProgressTiming}
+              tailColor={late > 0 || overtimeTiming ? colors.danger : undefined}
+              tail={late}
+              tailTiming={overtimeTiming}
+            />
+          </>
         ) : (
           <>
             <ProgressRing
@@ -372,21 +414,6 @@ export function VoiceOrb({
           </>
         )}
       </Svg>
-      {quiet ? (
-        // At rest the halo fills solid down to the core.
-        <View
-          style={[
-            styles.centre,
-            styles.quietFill,
-            {
-              width: innerHole,
-              height: innerHole,
-              borderRadius: innerHole / 2,
-              backgroundColor: tint,
-            },
-          ]}
-        />
-      ) : null}
       <View
         style={[
           styles.centre,
@@ -440,9 +467,6 @@ const styles = StyleSheet.create({
   centre: {
     alignItems: "center",
     justifyContent: "center",
-  },
-  quietFill: {
-    position: "absolute",
   },
   coreLabel: {
     fontVariant: ["tabular-nums"],

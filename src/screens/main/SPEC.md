@@ -34,10 +34,13 @@ receive already-derived state and callbacks.
 - The primary action is the voice orb, the workspace's one loud element. It
   always represents the current voice phase: idle, recording, transcribing,
   brief thinking, searching, thinking, synthesizing, or speaking. Two
-  concentric rings carry two clocks — the inner one the current phase against
-  itself, the outer one the whole turn against its speech-start estimate; past
-  the estimate both fill with red. At rest the orb draws a plain halo, not two
-  empty tracks. The orb is sized from the space the column actually leaves it,
+  concentric rings say one thing per phase: at rest both fade to the quiet
+  phase colour, recording and speaking combine them into one indicator (the
+  recording window, then the read position), and transcribing through
+  synthesizing keeps two clocks — the inner one the current phase against
+  itself, the outer one the whole turn against its speech-start estimate. Past
+  the estimate both fill with red. The gap between the rings is only ever a
+  gap: the screen reads through it in every phase. The orb is sized from the space the column actually leaves it,
   clamped between 96pt and its ceiling (196 portrait, 150 landscape), so the
   intro banner or a landscape split simply makes it smaller.
 - In portrait, left and right 44pt chevrons flank the measured orb. They make
