@@ -5,6 +5,7 @@ import {
   Animated,
   Easing,
   Modal as ReactNativeModal,
+  PanResponder,
   Pressable,
   StyleSheet,
   Text,
@@ -286,6 +287,30 @@ const SHEET_ANIMATION_DURATION = 220;
 // wins under normal conditions; this only fires if that callback is
 // suppressed (app backgrounded mid-animation, native driver interrupted).
 const SHEET_ANIMATION_FAILSAFE_DURATION = SHEET_ANIMATION_DURATION + 100;
+// Drags may begin anywhere in the sheet's top band — the grabber and the
+// header around it — so scrollable content below keeps its own gestures.
+const SHEET_DRAG_ZONE = 64;
+const SHEET_DRAG_SLOP = 6;
+const SHEET_DISMISS_DISTANCE = 96;
+const SHEET_DISMISS_VELOCITY = 0.8;
+
+/** A downward move that starts in the top band claims the sheet drag. */
+export function shouldClaimSheetDrag({
+  dx,
+  dy,
+  startY,
+}: {
+  dx: number;
+  dy: number;
+  startY: number;
+}) {
+  return startY <= SHEET_DRAG_ZONE && dy > SHEET_DRAG_SLOP && dy > Math.abs(dx);
+}
+
+/** Releasing far or fast enough closes; anything else springs back. */
+export function shouldDismissSheetDrag({ dy, vy }: { dy: number; vy: number }) {
+  return dy > SHEET_DISMISS_DISTANCE || vy > SHEET_DISMISS_VELOCITY;
+}
 
 interface DialogProps {
   cardStyle?: StyleProp<ViewStyle>;
@@ -333,6 +358,53 @@ export function Modal({
   const sheetProgress = React.useRef(
     new Animated.Value(visible ? 1 : 0),
   ).current;
+  // The grabber's promise is "pull down to close": a downward drag from the
+  // sheet's top band follows the finger and releases into a close or a
+  // spring back. Taps and the content's own scrolling are untouched — the
+  // responder only claims after slop, and only from the top band.
+  const sheetDragY = React.useRef(new Animated.Value(0)).current;
+  const onCloseRef = React.useRef(onClose);
+  onCloseRef.current = onClose;
+  const reduceMotionRef = React.useRef(reduceMotion);
+  reduceMotionRef.current = reduceMotion;
+  const settleSheetDrag = React.useCallback(() => {
+    if (reduceMotionRef.current) {
+      sheetDragY.setValue(0);
+      return;
+    }
+    Animated.spring(sheetDragY, {
+      bounciness: 4,
+      speed: 20,
+      toValue: 0,
+      useNativeDriver: true,
+    }).start();
+  }, [sheetDragY]);
+  const sheetPanResponder = React.useRef(
+    PanResponder.create({
+      onMoveShouldSetPanResponderCapture: (event, gesture) =>
+        shouldClaimSheetDrag({
+          dx: gesture.dx,
+          dy: gesture.dy,
+          // The card does not move until the drag is claimed, so the touch's
+          // current position minus its displacement is where it started.
+          startY: event.nativeEvent.locationY - gesture.dy,
+        }),
+      onPanResponderMove: (_event, gesture) => {
+        sheetDragY.setValue(Math.max(0, gesture.dy));
+      },
+      onPanResponderRelease: (_event, gesture) => {
+        if (shouldDismissSheetDrag({ dy: gesture.dy, vy: gesture.vy })) {
+          onCloseRef.current?.();
+          return;
+        }
+        settleSheetDrag();
+      },
+      onPanResponderTerminate: () => {
+        settleSheetDrag();
+      },
+      onPanResponderTerminationRequest: () => false,
+    }),
+  ).current;
 
   React.useEffect(() => {
     let active = true;
@@ -354,6 +426,9 @@ export function Modal({
 
     if (visible) {
       setSheetRendered(true);
+      // A prior drag-dismissal leaves its offset behind; a fresh open
+      // starts from the resting position.
+      sheetDragY.setValue(0);
     }
 
     // Reduce motion still has to settle the value, otherwise the deferred
@@ -396,7 +471,7 @@ export function Modal({
         clearTimeout(failsafeTimer);
       }
     };
-  }, [isSheet, reduceMotion, sheetProgress, visible]);
+  }, [isSheet, reduceMotion, sheetDragY, sheetProgress, visible]);
 
   return (
     <ReactNativeModal
@@ -432,6 +507,7 @@ export function Modal({
         ) : null}
         <Animated.View
           testID="native-dialog-card"
+          {...(isSheet ? sheetPanResponder.panHandlers : null)}
           style={[
             controlStyles.dialogCard,
             isSheet ? controlStyles.sheetCard : null,
@@ -446,10 +522,13 @@ export function Modal({
               ? {
                   transform: [
                     {
-                      translateY: sheetProgress.interpolate({
-                        inputRange: [0, 1],
-                        outputRange: [sheetMaxHeight, 0],
-                      }),
+                      translateY: Animated.add(
+                        sheetProgress.interpolate({
+                          inputRange: [0, 1],
+                          outputRange: [sheetMaxHeight, 0],
+                        }),
+                        sheetDragY,
+                      ),
                     },
                   ],
                 }

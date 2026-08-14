@@ -15,6 +15,10 @@ the complete Play Store translations are kept in a dedicated file under
   dialog-padded rectangle; only expanded turn metrics lift onto a surface.
 - The transcript's speaker thread line draws at its intended one-and-a-half
   point weight instead of a hairline that vanished against the canvas.
+- Bottom sheets can now actually be pulled closed: a downward drag from the
+  grabber band follows the finger and releases into a dismiss or a spring
+  back, on the transcript, route picker, image source, and Premium sheets
+  alike. Taps and the content's own scrolling are unaffected.
 - Fixed the session details, conversation settings, and voice picker scrims
   using a fixed light dimming color instead of the theme's overlay, so they
   now match every other modal in both light and dark appearance.
