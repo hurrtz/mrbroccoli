@@ -367,7 +367,7 @@ live in collapsible groups around the everyday Earlier list; active state is a
 row fill, never a branch rail. Each row shows only title, pin/privacy state,
 date, visible message count, and one provider mark per model. Forks retain a
 small link to their root session. Search stays docked at the bottom, and the
-row action sheet owns automatic naming, archive, privacy, memory, integrity,
+row action sheet owns automatic naming, archive, privacy, memory,
 share/copy, and destructive actions. Data & privacy may open the drawer with
 Archived already expanded; this is an explicit landing state, not a persisted
 change to the user's normal drawer layout.

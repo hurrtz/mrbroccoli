@@ -1,7 +1,6 @@
 import type { TranslationDictionary } from "../types";
 import { dataBackupTranslations } from "../dataBackupTranslations";
 import { conversationKnowledgeTranslations } from "../conversationKnowledgeTranslations";
-import { conversationIntegrityTranslations } from "../conversationIntegrityTranslations";
 import { conversationArtifactTranslations } from "../conversationArtifactTranslations";
 import { interruptionTranslations } from "../interruptionTranslations";
 import { ulraAuditTranslations } from "../ulraAuditTranslations";
@@ -21,7 +20,6 @@ export const pl = {
   ...ulraAuditTranslations.pl,
   ...dataBackupTranslations.pl,
   ...conversationKnowledgeTranslations.pl,
-  ...conversationIntegrityTranslations.pl,
   ...imagePromptTranslations.pl,
   ...memoryEditTranslations.pl,
   ...onDeviceTranslations.pl,

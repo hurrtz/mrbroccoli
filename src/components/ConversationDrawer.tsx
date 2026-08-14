@@ -12,7 +12,6 @@ import { APP_MODAL_ORIENTATIONS } from "../constants/layout";
 import { useLocalization } from "../i18n";
 import { useTheme } from "../theme/ThemeContext";
 import { ConversationActionSheet } from "./conversationDrawer/ConversationActionSheet";
-import { ConversationIntegrityModal } from "./conversationDrawer/ConversationIntegrityModal";
 import {
   ConversationDrawerHeader,
   ConversationDrawerSearch,
@@ -22,7 +21,6 @@ import { ConversationRenameModal } from "./conversationDrawer/ConversationRename
 import { styles } from "./conversationDrawer/styles";
 import { ConversationDrawerProps } from "./conversationDrawer/types";
 import { useConversationDrawerController } from "./conversationDrawer/useConversationDrawerController";
-import { useConversationIntegrityController } from "./conversationDrawer/useConversationIntegrityController";
 
 export const ConversationDrawer = React.memo(function ConversationDrawer({
   visible,
@@ -34,10 +32,6 @@ export const ConversationDrawer = React.memo(function ConversationDrawer({
   onCopyThread,
   onShareThread,
   onManageMemory,
-  onInspectIntegrity,
-  onRepairIntegrity,
-  onUndoIntegrityRepair,
-  onExportIntegrityOriginals,
   onRenameThread,
   onTogglePinned,
   onTogglePrivate,
@@ -62,24 +56,6 @@ export const ConversationDrawer = React.memo(function ConversationDrawer({
     onSearchConversations,
     onSelect,
   });
-  const integrityController = useConversationIntegrityController({
-    onInspect: onInspectIntegrity,
-    onRepair: onRepairIntegrity,
-    onUndo: onUndoIntegrityRepair,
-  });
-  const closeIntegrity = integrityController.close;
-  React.useEffect(() => {
-    if (!visible) {
-      closeIntegrity();
-    }
-  }, [closeIntegrity, visible]);
-  const handleReviewIntegrity = React.useCallback(
-    (conversation: (typeof conversations)[number]) => {
-      controller.closeActionModal();
-      integrityController.open(conversation);
-    },
-    [controller, integrityController],
-  );
   const handleDelete = React.useCallback(
     (conversationId: string) => {
       const conversation = conversations.find(
@@ -181,7 +157,6 @@ export const ConversationDrawer = React.memo(function ConversationDrawer({
           onCopyThread={onCopyThread}
           onDelete={handleDelete}
           onManageMemory={onManageMemory}
-          onReviewIntegrity={handleReviewIntegrity}
           onOpenRenameModal={controller.openRenameModal}
           onShareThread={onShareThread}
           onTogglePinned={onTogglePinned}
@@ -195,17 +170,6 @@ export const ConversationDrawer = React.memo(function ConversationDrawer({
           onChangeEditingTitle={controller.setEditingTitle}
           onClose={controller.closeRenameModal}
           onSubmit={controller.submitRename}
-        />
-        <ConversationIntegrityModal
-          busy={integrityController.busy}
-          conversation={integrityController.conversation}
-          failed={integrityController.failed}
-          inspection={integrityController.inspection}
-          loading={integrityController.loading}
-          onClose={integrityController.close}
-          onExportOriginals={onExportIntegrityOriginals}
-          onRepair={integrityController.repair}
-          onUndo={integrityController.undo}
         />
       </View>
     </Modal>

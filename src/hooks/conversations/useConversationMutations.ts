@@ -43,16 +43,6 @@ import {
   readImageAttachmentData,
   writeRestoredImageAttachment,
 } from "../../services/imageAttachmentFiles";
-import {
-  applyConversationIntegrityRepairs,
-  scanConversationIntegrity,
-  undoConversationIntegrityRepairs,
-} from "../../services/conversationIntegrity";
-import {
-  readConversationIntegrityRepairSnapshot,
-  removeConversationIntegrityRepairSnapshot,
-  saveConversationIntegrityRepairSnapshot,
-} from "../../services/conversationIntegrityStorage";
 
 async function cloneMessagesForBranch(messages: Message[]) {
   const attachmentsBySourceId = new Map<string, MessageImageAttachment>();
@@ -289,131 +279,6 @@ export function useConversationMutations(params: {
     [activeConversationRef],
   );
 
-  const inspectConversationIntegrity = useCallback(
-    async (id: string) => {
-      const conversation = await getConversationById(id);
-      if (!conversation) {
-        return null;
-      }
-
-      const [report, repairSnapshot] = await Promise.all([
-        Promise.resolve(scanConversationIntegrity(conversation)),
-        readConversationIntegrityRepairSnapshot(id),
-      ]);
-      return {
-        conversation,
-        repairSnapshot,
-        report,
-      };
-    },
-    [getConversationById],
-  );
-
-  const repairConversationIntegrity = useCallback(
-    async (id: string) => {
-      const currentConversation = await getConversationById(id);
-      if (!currentConversation) {
-        return null;
-      }
-
-      const repair = applyConversationIntegrityRepairs(currentConversation);
-      if (!repair.snapshot) {
-        return {
-          conversation: currentConversation,
-          repairedMessageIds: [],
-        };
-      }
-
-      const previousSnapshot =
-        await readConversationIntegrityRepairSnapshot(id);
-      const previousMessageIds = new Set(
-        previousSnapshot?.messages.map(({ messageId }) => messageId) ?? [],
-      );
-      const snapshot = previousSnapshot
-        ? {
-            ...repair.snapshot,
-            messages: [
-              ...previousSnapshot.messages,
-              ...repair.snapshot.messages.filter(
-                ({ messageId }) => !previousMessageIds.has(messageId),
-              ),
-            ],
-          }
-        : repair.snapshot;
-
-      await saveConversationIntegrityRepairSnapshot(snapshot);
-      await saveConversation(repair.conversation);
-      if (activeConversationRef.current?.id === id) {
-        setActiveConversationValue(repair.conversation);
-      }
-      setConversations((previous) =>
-        persistMetas(
-          previous.map((meta) =>
-            meta.id === id
-              ? { ...meta, updatedAt: repair.conversation.updatedAt }
-              : meta,
-          ),
-        ),
-      );
-
-      return {
-        conversation: repair.conversation,
-        repairedMessageIds: repair.repairedMessageIds,
-      };
-    },
-    [
-      activeConversationRef,
-      getConversationById,
-      persistMetas,
-      setActiveConversationValue,
-      setConversations,
-    ],
-  );
-
-  const undoConversationIntegrityRepair = useCallback(
-    async (id: string) => {
-      const [currentConversation, snapshot] = await Promise.all([
-        getConversationById(id),
-        readConversationIntegrityRepairSnapshot(id),
-      ]);
-      if (!currentConversation || !snapshot) {
-        return null;
-      }
-
-      const restoration = undoConversationIntegrityRepairs(
-        currentConversation,
-        snapshot,
-      );
-      if (!restoration) {
-        return null;
-      }
-
-      await saveConversation(restoration.conversation);
-      await removeConversationIntegrityRepairSnapshot(id);
-      if (activeConversationRef.current?.id === id) {
-        setActiveConversationValue(restoration.conversation);
-      }
-      setConversations((previous) =>
-        persistMetas(
-          previous.map((meta) =>
-            meta.id === id
-              ? { ...meta, updatedAt: restoration.conversation.updatedAt }
-              : meta,
-          ),
-        ),
-      );
-
-      return restoration.conversation;
-    },
-    [
-      activeConversationRef,
-      getConversationById,
-      persistMetas,
-      setActiveConversationValue,
-      setConversations,
-    ],
-  );
-
   const addMessage = useCallback(
     (messageInput: Omit<Message, "id" | "timestamp">) => {
       const currentConversation = activeConversationRef.current;
@@ -580,10 +445,7 @@ export function useConversationMutations(params: {
       delete updatedConversation.summarizedMessageCount;
 
       await saveConversation(updatedConversation);
-      await Promise.all([
-        deleteImageAttachments(removedMessage.attachments ?? []),
-        removeConversationIntegrityRepairSnapshot(currentConversation.id),
-      ]);
+      await deleteImageAttachments(removedMessage.attachments ?? []);
       setActiveConversationValue(updatedConversation);
       setConversations((previous) =>
         persistMetas(
@@ -953,7 +815,6 @@ export function useConversationMutations(params: {
         await Promise.all([
           removeConversation(id),
           removeConversationKnowledge(id),
-          removeConversationIntegrityRepairSnapshot(id),
           deleteImageAttachments(
             conversation?.messages.flatMap(
               (message) => message.attachments ?? [],
@@ -1347,15 +1208,12 @@ export function useConversationMutations(params: {
     branchConversationAtMessage,
     restoreConversationBackup,
     getConversationById,
-    inspectConversationIntegrity,
     renameConversation,
     removeMessage,
-    repairConversationIntegrity,
     selectConversation,
     toggleConversationPinned,
     toggleConversationPrivate,
     toggleConversationArchived,
-    undoConversationIntegrityRepair,
     updateMessage,
     updateConversationMemory,
     updateConversationContextSummary,

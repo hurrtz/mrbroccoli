@@ -1618,9 +1618,6 @@ describe("useConversations", () => {
       "file:///documents/message-images/removed-message-image.jpg",
       { idempotent: true },
     );
-    expect(AsyncStorage.removeItem).toHaveBeenCalledWith(
-      `@mrbroccoli/conversation-integrity-repair/${conversationId}`,
-    );
   });
 
   it("persists private status without removing in-session memory", async () => {
@@ -1858,76 +1855,4 @@ describe("useConversations", () => {
     await expect(readConversation(conversation.id)).resolves.toBeNull();
   });
 
-  it("previews, repairs, and safely undoes persisted internal-context leakage", async () => {
-    const stored = new Map<string, string>();
-    (AsyncStorage.getItem as jest.Mock).mockImplementation(
-      async (key: string) => stored.get(key) ?? null,
-    );
-    (AsyncStorage.setItem as jest.Mock).mockImplementation(
-      async (key: string, value: string) => {
-        stored.set(key, value);
-      },
-    );
-    (AsyncStorage.removeItem as jest.Mock).mockImplementation(
-      async (key: string) => {
-        stored.delete(key);
-      },
-    );
-    const leakedResponse = [
-      "Keep this useful answer.",
-      "",
-      "[Truncated: earlier conversation had 3 more turn(s)]",
-      "SOURCE 2 — Earlier conversation",
-      "User: internal prompt",
-    ].join("\n");
-    const { result } = renderHook(() => useConversations());
-
-    await waitFor(() => expect(result.current.loaded).toBe(true));
-    let conversationId = "";
-    act(() => {
-      conversationId = result.current.createConversation("Integrity test");
-      result.current.addMessage({
-        role: "assistant",
-        content: leakedResponse,
-        model: "gpt-test",
-        provider: "openai",
-      });
-    });
-
-    let preview: Awaited<
-      ReturnType<typeof result.current.inspectConversationIntegrity>
-    > = null;
-    await act(async () => {
-      preview =
-        await result.current.inspectConversationIntegrity(conversationId);
-    });
-    expect(preview?.report.automaticallyRepairableCount).toBe(1);
-    expect(preview?.repairSnapshot).toBeNull();
-
-    await act(async () => {
-      await result.current.repairConversationIntegrity(conversationId);
-    });
-    expect(result.current.activeConversation?.messages[0]?.content).toBe(
-      "Keep this useful answer.",
-    );
-    expect(
-      stored.has(`@mrbroccoli/conversation-integrity-repair/${conversationId}`),
-    ).toBe(true);
-
-    await act(async () => {
-      preview =
-        await result.current.inspectConversationIntegrity(conversationId);
-    });
-    expect(preview?.repairSnapshot).not.toBeNull();
-
-    await act(async () => {
-      await result.current.undoConversationIntegrityRepair(conversationId);
-    });
-    expect(result.current.activeConversation?.messages[0]?.content).toBe(
-      leakedResponse,
-    );
-    expect(
-      stored.has(`@mrbroccoli/conversation-integrity-repair/${conversationId}`),
-    ).toBe(false);
-  });
 });

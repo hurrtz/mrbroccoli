@@ -21,7 +21,6 @@ interface ConversationActionSheetProps {
   onDelete: (conversationId: string) => void;
   onManageMemory: (conversationId: string) => void;
   onOpenRoot?: (conversationId: string) => void;
-  onReviewIntegrity: (conversation: ConversationMeta) => void;
   onOpenRenameModal: (conversation: ConversationMeta) => void;
   onShareThread: (conversationId: string) => void;
   onTogglePinned: (conversationId: string) => void;
@@ -76,7 +75,6 @@ export function ConversationActionSheet({
   onDelete,
   onManageMemory,
   onOpenRoot,
-  onReviewIntegrity,
   onOpenRenameModal,
   onShareThread,
   onTogglePinned,
@@ -219,13 +217,6 @@ export function ConversationActionSheet({
               onClose();
             }}
             testID="conversation-action-toggle-archive"
-          />
-          <ActionRow
-            colors={colors}
-            icon="safety-certificate"
-            label={t("reviewConversationIntegrity")}
-            onPress={() => onReviewIntegrity(conversation)}
-            testID="conversation-action-review-integrity"
           />
           <ActionRow
             colors={colors}

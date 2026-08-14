@@ -5,7 +5,6 @@ import { fireEvent, waitFor } from "@testing-library/react-native";
 import { ConversationDrawer } from "../../src/components/ConversationDrawer";
 import { ConversationDrawerList } from "../../src/components/conversationDrawer/ConversationDrawerList";
 import { ConversationMeta } from "../../src/types";
-import type { ConversationIntegrityInspection } from "../../src/services/conversationIntegrity";
 import { renderWithProviders } from "../test-utils/renderWithProviders";
 
 const hiddenIconQuery = { includeHiddenElements: true } as const;
@@ -80,10 +79,6 @@ function renderConversationDrawer(
       onCopyThread={jest.fn()}
       onShareThread={jest.fn()}
       onManageMemory={jest.fn()}
-      onInspectIntegrity={jest.fn(async () => null)}
-      onRepairIntegrity={jest.fn(async () => null)}
-      onUndoIntegrityRepair={jest.fn(async () => null)}
-      onExportIntegrityOriginals={jest.fn()}
       onRenameThread={jest.fn()}
       onTogglePinned={jest.fn()}
       onTogglePrivate={jest.fn()}
@@ -175,7 +170,6 @@ describe("ConversationDrawer", () => {
         "Name automatically",
         "Archive",
         "Memory",
-        "Review conversation integrity",
         "Share",
         "Copy",
         "Delete",
@@ -467,91 +461,6 @@ describe("ConversationDrawer", () => {
     fireEvent.press(screen.getByTestId("conversation-drawer-menu-one"));
     fireEvent.press(await screen.findByTestId("conversation-action-auto-name"));
     expect(onAutoName).toHaveBeenCalledWith("one");
-  });
-
-  it("previews, exports, and repairs a damaged assistant response", async () => {
-    const originalContent = [
-      "Keep this answer.",
-      "",
-      "SOURCE 2 — Earlier conversation",
-      "User: hidden prompt",
-    ].join("\n");
-    const finding = {
-      kind: "assistant-internal-context" as const,
-      markerIds: ["source-header", "serialized-speaker"],
-      messageId: "assistant-1",
-      originalContent,
-      removedContent: "SOURCE 2 — Earlier conversation\nUser: hidden prompt",
-      suggestedContent: "Keep this answer.",
-    };
-    const issueInspection: ConversationIntegrityInspection = {
-      conversation: {
-        id: "one",
-        title: "Morning briefing",
-        createdAt: "2026-03-20T08:00:00.000Z",
-        updatedAt: "2026-03-20T08:15:00.000Z",
-        messages: [],
-      },
-      repairSnapshot: null,
-      report: {
-        automaticallyRepairableCount: 1,
-        conversationId: "one",
-        findings: [finding],
-      },
-    };
-    const repairedInspection: ConversationIntegrityInspection = {
-      ...issueInspection,
-      repairSnapshot: {
-        conversationId: "one",
-        repairedAt: "2026-03-20T08:16:00.000Z",
-        messages: [
-          {
-            messageId: "assistant-1",
-            originalContent,
-            repairedContent: "Keep this answer.",
-          },
-        ],
-      },
-      report: {
-        automaticallyRepairableCount: 0,
-        conversationId: "one",
-        findings: [],
-      },
-    };
-    const onInspectIntegrity = jest
-      .fn()
-      .mockResolvedValueOnce(issueInspection)
-      .mockResolvedValueOnce(repairedInspection);
-    const onRepairIntegrity = jest.fn(async () => ({ repaired: true }));
-    const onExportIntegrityOriginals = jest.fn();
-    const screen = renderConversationDrawer({
-      onInspectIntegrity,
-      onRepairIntegrity,
-      onExportIntegrityOriginals,
-    });
-
-    fireEvent.press(screen.getByTestId("conversation-drawer-menu-one"));
-    fireEvent.press(
-      await screen.findByTestId("conversation-action-review-integrity"),
-    );
-
-    expect(
-      await screen.findByText("1 potentially damaged response found."),
-    ).toBeTruthy();
-    expect(screen.getByText("Keep this answer.")).toBeTruthy();
-    fireEvent.press(screen.getByTestId("conversation-integrity-export"));
-    expect(onExportIntegrityOriginals).toHaveBeenCalledWith(originalContent);
-
-    fireEvent.press(screen.getByTestId("conversation-integrity-repair"));
-    await waitFor(() => {
-      expect(onRepairIntegrity).toHaveBeenCalledWith("one");
-      expect(
-        screen.getByText(
-          "Repair complete. The original is stored locally for export or undo.",
-        ),
-      ).toBeTruthy();
-    });
-    expect(screen.getByTestId("conversation-integrity-undo")).toBeTruthy();
   });
 
   it("starts a new session and closes the drawer", async () => {

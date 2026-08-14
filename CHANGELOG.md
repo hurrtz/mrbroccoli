@@ -22,6 +22,9 @@ the complete Play Store translations are kept in a dedicated file under
 - The conversations drawer's header controls keep the approved 14-point
   separation and the docked search keeps its 26-point bottom clearance on
   devices without a gesture bar.
+- The "Review conversation integrity" feature has been removed: the action
+  sheet entry, the inspection and repair flow, and its stored repair
+  snapshots are gone.
 - Fixed the session details, conversation settings, and voice picker scrims
   using a fixed light dimming color instead of the theme's overlay, so they
   now match every other modal in both light and dark appearance.
