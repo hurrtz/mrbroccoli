@@ -7,7 +7,7 @@ import { ProviderIcon } from "../brand/ProviderIcon";
  * Collapsed messages clamp to three lines; the fold chevron sits on the name line.
  * The meta line (when usage stats are on) is its own disclosure over the full metrics.
  */
-export function TranscriptMessage({ role, paragraphs = [], model, provider, council, time, expanded, onToggle, meta, metrics, metricsOpen, onToggleMetrics, actions, last = false, assetBase = "assets/providers" }) {
+export function TranscriptMessage({ role, paragraphs = [], model, provider, council, time, expanded, onToggle, meta, metrics, metricsOpen, onToggleMetrics, actions, assetBase = "assets/providers" }) {
   const [overflows, setOverflows] = React.useState(false);
   const clampRef = React.useRef(null);
   React.useEffect(() => { const el = clampRef.current; if (el) setOverflows(el.scrollHeight > el.clientHeight + 1); }, []);
@@ -22,7 +22,7 @@ export function TranscriptMessage({ role, paragraphs = [], model, provider, coun
         {isUser
           ? <span style={{ fontFamily: "var(--mb-font-display)", fontWeight: 600, fontSize: 9, letterSpacing: ".6px", color: "var(--mb-color-accent)" }}>YOU</span>
           : <ProviderIcon provider={provider} size="compact" color="var(--mb-color-text-secondary)" assetBase={assetBase} />}
-        <span style={{ width: 1.5, flex: 1, background: last ? "transparent" : "var(--mb-color-border)" }} />
+        <span style={{ width: 1.5, flex: 1, background: "var(--mb-color-border)" }} />
       </div>
       <div style={{ flex: 1, minWidth: 0 }}>
         <div role={canFold ? "button" : undefined} aria-expanded={canFold ? (expanded ? "true" : "false") : undefined} onClick={canFold ? onToggle : undefined} style={{ cursor: canFold ? "pointer" : "default" }}>

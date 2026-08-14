@@ -34,8 +34,6 @@ export interface TranscriptMessageProps {
   onToggleMetrics?: () => void;
   /** Shown only while expanded, as bare 44pt icon targets. */
   actions?: TranscriptMessageAction[];
-  /** Last row: the thread line stops. */
-  last?: boolean;
   assetBase?: string;
 }
 

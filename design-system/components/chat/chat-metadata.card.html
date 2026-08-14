@@ -1,4 +1,4 @@
-<!-- @dsCard group="Components" viewport="860x720" name="Chat · turn metadata" subtitle="Receipt, search, council, usage, notices, failure, branches, memory" -->
+<!-- @dsCard group="Components" viewport="860x820" name="Chat · turn metadata" subtitle="Turn reporting lives in TranscriptMessage's metrics; failure, notices, branches, memory stay standalone" -->
 <!DOCTYPE html><html data-theme="light"><head><meta charset="utf-8">
 <link rel="stylesheet" href="../../styles.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/regular/style.css">
@@ -6,39 +6,41 @@
 <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
 <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
 <script src="../../_ds_bundle.js"></script>
-<style>body{padding:16px;background:var(--mb-color-background)}.lbl{font-family:var(--mb-font-mono);font-size:10px;letter-spacing:.9px;text-transform:uppercase;color:var(--mb-color-text-muted);margin:0 0 6px}</style>
+<style>body{padding:16px;background:var(--mb-color-background)}.lbl{font-family:var(--mb-font-mono);font-size:10px;letter-spacing:.9px;text-transform:uppercase;color:var(--mb-color-text-muted);margin:0 0 6px}.note{font-family:var(--mb-text-supporting-family);font-size:12px;line-height:17px;color:var(--mb-color-text-secondary);margin:6px 0 12px}</style>
 </head><body><div id="root"></div>
 <script type="text/babel">
-const { ChatBubble, TurnReceiptCard, WebSearchReferences, UberModeAuditCard, UsageCard, PipelineNotices, ReplyFailureCard, MessageBranchIndicator, ConversationMemoryModal } = window.MrBroccoliDesignSystem_62d510;
+const { TranscriptMessage, ChatBubble, TurnReceiptCard, WebSearchReferences, UberModeAuditCard, UsageCard, PipelineNotices, ReplyFailureCard, MessageBranchIndicator, ConversationMemoryModal } = window.MrBroccoliDesignSystem_62d510;
 const base = "../../assets/providers";
+function MetricsSpecimen(){
+  const [open, setOpen] = React.useState(true);
+  return <TranscriptMessage role="assistant" provider="anthropic" model="Claude Sonnet 4.5" time="14:12" expanded onToggle={()=>{}}
+    paragraphs={["High water is at 15:40 on Saturday, and the tide turns roughly every six hours after that."]}
+    meta="3 sources · OpenRouter · 6.4 s" metricsOpen={open} onToggleMetrics={()=>setOpen(!open)}
+    metrics={[
+      { label: "Turn", value: "Anthropic · Claude Sonnet 4.5 · High" },
+      { label: "Timing", value: "stt 0.8 s · search 1.2 s · model 4.1 s · total 6.4 s" },
+      { label: "Tokens in", value: "1,214" }, { label: "Tokens out", value: "482" }, { label: "Tokens total", value: "1,696" },
+      { label: "Web search", value: "1 query · 3 sources kept" },
+      { label: "Council", value: "—" },
+    ]} assetBase={base} />;
+}
 ReactDOM.createRoot(document.getElementById("root")).render(
   <div style={{display:"grid",gridTemplateColumns:"1.1fr 1fr",gap:16,alignItems:"start"}}>
     <div>
-      <p className="lbl">Receipt · search · usage · branches, in place</p>
-      <ChatBubble role="assistant" provider="anthropic" model="Claude Sonnet 4.5" timestamp="09.08.26 · 14:12" assetBase={base}
-        text="High water is at 15:40 today. Six departures run on Saturday; two sources note weather cancellations.">
-        <MessageBranchIndicator branchesLabel="2 branches" onOpenBranches={() => {}} />
-        <WebSearchReferences countLabel="3 sources" defaultExpanded query="lisbon tide table saturday"
-          summary="Timetables agree on the turn at 15:40; the harbour feed confirms it."
-          sources={[{title:"tides.pt",url:"#1"},{title:"portodelisboa.pt",url:"#2"},{title:"windy.com",url:"#3"}]} />
-        <TurnReceiptCard summary="OpenRouter · 6.4 s" defaultExpanded
-          rows={[{label:"Requested",value:"Anthropic · Claude Sonnet 4.5 · High"},
-                 {label:"Actual",value:"OpenRouter → Anthropic · ×2"},
-                 {label:"Input",value:"Voice · On-device · Whisper small"},
-                 {label:"Voice",value:"Kokoro · Heart"},
-                 {label:"Timing",value:"stt 0.8 s · search 1.2 s · model 4.1 s · total 6.4 s",mono:true}]} />
-        <UsageCard text="~1.2k prompt · 480 completion · ~1.7k total" />
-      </ChatBubble>
-      <p className="lbl" style={{marginTop:12}}>Council audit · pipeline notice</p>
+      <p className="lbl">Turn reporting · the metrics disclosure</p>
+      <p className="note">In the transcript, route, timing, tokens, search and council reporting is the meta line under each answer, expanding to the full metrics — one <strong>TranscriptMessage</strong> prop, no sub-cards. Shown live in “Transcript in context”.</p>
+      <div style={{border:"1px solid var(--mb-color-border)",borderRadius:"var(--mb-radius-dialog)",background:"var(--mb-color-background)",padding:"2px 14px 6px"}}><MetricsSpecimen /></div>
+      <p className="lbl" style={{marginTop:14}}>Superseded in the transcript · kept for reference</p>
+      <p className="note">The upstream per-turn cards — receipt, search references, council audit, usage line — are replaced by the disclosure above. They remain compiled for the workspace's brief bubble and legacy mounts.</p>
       <ChatBubble role="assistant" provider="openai" model="Council of 3" timestamp="09.08.26 · 14:15" assetBase={base}
         text="All three models agree the schedule holds.">
-        <UberModeAuditCard summary="2 rounds · 7 calls · 0 failed" defaultExpanded
-          outcome="Convergence reached after round 2."
-          details={["7 successful · 0 failed · 0 retired","Reviews: 1 challenge · 4 converged · 1 unmarked","Synthesis kept 6 of 7 · ~9,400 tokens"]}
-          routes={["#1 · Anthropic · Claude Sonnet 4.5","#2 · OpenAI · GPT-5","#3 · Mistral · Mistral Large"]} />
-        <PipelineNotices notices={[{stageLabel:"Text to speech",level:"error",
-          message:"ElevenLabs rejected the request.",detail:"Voice quota exhausted",
-          actions:[{icon:"sound",label:"Retry speech"},{icon:"setting",label:"Speaking settings",tone:"quiet"}]}]} />
+        <TurnReceiptCard summary="OpenRouter · 6.4 s" rows={[{label:"Requested",value:"Anthropic · Claude Sonnet 4.5 · High"}]} />
+        <WebSearchReferences countLabel="3 sources" query="lisbon tide table saturday"
+          summary="Timetables agree on the turn at 15:40."
+          sources={[{title:"tides.pt",url:"#1"},{title:"portodelisboa.pt",url:"#2"},{title:"windy.com",url:"#3"}]} />
+        <UberModeAuditCard summary="2 rounds · 7 calls · 0 failed" outcome="Convergence reached after round 2."
+          details={["7 successful · 0 failed · 0 retired"]} routes={["#1 · Anthropic · Claude Sonnet 4.5","#2 · OpenAI · GPT-5","#3 · Mistral · Mistral Large"]} />
+        <UsageCard text="~1.2k prompt · 480 completion · ~1.7k total" />
       </ChatBubble>
     </div>
     <div>
@@ -47,8 +49,14 @@ ReactDOM.createRoot(document.getElementById("root")).render(
         <ReplyFailureCard message="Anthropic returned 529: overloaded."
           hint="Your message was kept. Retrying sends it again unchanged." onRetry={() => {}} />
       </ChatBubble>
+      <p className="lbl" style={{marginTop:12}}>Pipeline notice</p>
+      <PipelineNotices notices={[{stageLabel:"Text to speech",level:"error",
+        message:"ElevenLabs rejected the request.",detail:"Voice quota exhausted",
+        actions:[{icon:"sound",label:"Retry speech"},{icon:"setting",label:"Speaking settings",tone:"quiet"}]}]} />
+      <p className="lbl" style={{marginTop:12}}>Branch provenance chips</p>
+      <MessageBranchIndicator originLabel="Context kept from 'Naming the boat'" onOpenSource={() => {}} branchesLabel="2 branches" onOpenBranches={() => {}} />
       <p className="lbl" style={{marginTop:12}}>Conversation memory</p>
-      <div style={{position:"relative",height:430,border:"1px solid var(--mb-color-border)",borderRadius:"var(--mb-radius-dialog)",overflow:"hidden",background:"var(--mb-color-background)"}}>
+      <div style={{position:"relative",height:330,border:"1px solid var(--mb-color-border)",borderRadius:"var(--mb-radius-dialog)",overflow:"hidden",background:"var(--mb-color-background)"}}>
         <ConversationMemoryModal inline visible conversationTitle="Tide tables" countLabel="14 turns summarized"
           description="Older turns are folded into this summary and sent with every request."
           summary="Planning a Saturday sail from Lisbon. Prefers departures after 10:00. Tide turns 15:40; six ferries run; weather may cancel two." />

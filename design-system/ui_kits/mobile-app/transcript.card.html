@@ -17,7 +17,7 @@ body{margin:0;padding:24px;background:#8f8d86;display:flex;gap:24px;flex-wrap:wr
 <div><p class="cap">Swipe to remove · drops it from future context</p><div class="device" id="swipe" data-theme="light"></div></div>
 <div><p class="cap d">Dark · metrics disclosure open</p><div class="device" id="dark" data-theme="dark"></div></div>
 <script type="text/babel">
-const { IconButton, TranscriptMessage, PhosphorIcon } = window.MrBroccoliDesignSystem_62d510;
+const { TranscriptMessage, PhosphorIcon } = window.MrBroccoliDesignSystem_62d510;
 const base = "../../assets/providers";
 const noop = () => {};
 const ACTIONS = [{icon:"branch",label:"Branch here"},{icon:"copy",label:"Copy"},{icon:"share-alt",label:"Share"},{icon:"sound",label:"Speak again"}];
@@ -63,7 +63,7 @@ function Row({ m, i, ongoing, swipe, metricsOpenIndex }){
   const row = <TranscriptMessage role={m.role} paragraphs={m.paragraphs} model={m.model} provider={m.provider} council={m.council}
     time={m.time} expanded={open} onToggle={() => setOpen(!open)} meta={m.meta} metrics={m.metrics}
     metricsOpen={statsOpen} onToggleMetrics={() => setStatsOpen(!statsOpen)}
-    actions={ACTIONS} last={i === MSGS.length - 1} assetBase={base} />;
+    actions={ACTIONS} assetBase={base} />;
   if (!(swipe && m.swipeDemo)) return row;
   return <div style={{position:"relative",overflow:"hidden"}}>
     <div style={{position:"absolute",top:0,right:0,bottom:0,width:96,background:"var(--mb-color-danger)",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:4}}>
@@ -77,12 +77,8 @@ function Screen({ ongoing, swipe, metricsOpenIndex }){
   return <div style={{display:"flex",flexDirection:"column",height:"100%",background:"var(--mb-color-overlay)"}}>
     <div style={{height:56,flexShrink:0}}></div>
     <div style={{flex:1,minHeight:0,display:"flex",flexDirection:"column",background:"var(--mb-color-background)",borderRadius:"var(--mb-radius-sheet-top) var(--mb-radius-sheet-top) 0 0",border:"1px solid var(--mb-color-surface-raised-border)",borderBottom:"none",boxShadow:"var(--mb-shadow-sheet)"}}>
-      <div style={{flexShrink:0,padding:"10px 8px 8px 18px",borderBottom:"1px solid var(--mb-color-border)"}}>
-        <span style={{display:"block",width:38,height:4,borderRadius:2,margin:"0 auto 8px",background:"var(--mb-color-border-strong)"}}></span>
-        <div style={{display:"flex",alignItems:"center",gap:8}}>
-          <span style={{flex:1,minWidth:0,fontFamily:"var(--mb-font-headline)",fontSize:17,letterSpacing:"-0.2px",color:"var(--mb-color-text)",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>Tide tables</span>
-          <IconButton icon="close" accessibilityLabel="Hide transcript" />
-        </div>
+      <div role="button" aria-label="Pull down or tap the backdrop to close" style={{flexShrink:0,padding:"10px 0 8px",cursor:"grab"}}>
+        <span style={{display:"block",width:38,height:4,borderRadius:2,margin:"0 auto",background:"var(--mb-color-border-strong)"}}></span>
       </div>
       <div style={{flex:1,overflowY:"auto",padding:"6px 18px 24px"}}>
         {MSGS.map((m,i)=><Row key={i} m={m} i={i} ongoing={ongoing} swipe={swipe} metricsOpenIndex={metricsOpenIndex} />)}

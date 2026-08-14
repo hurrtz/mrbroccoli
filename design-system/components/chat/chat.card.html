@@ -1,4 +1,4 @@
-<!-- @dsCard group="Components" viewport="700x580" name="Chat" subtitle="Message rows, transcript empty state, drawer rows" -->
+<!-- @dsCard group="Components" viewport="700x600" name="Chat" subtitle="Workspace reply bubble and drawer rows — the transcript itself is TranscriptMessage" -->
 <!DOCTYPE html><html data-theme="light"><head><meta charset="utf-8">
 <link rel="stylesheet" href="../../styles.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/regular/style.css">
@@ -6,19 +6,21 @@
 <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
 <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
 <script src="../../_ds_bundle.js"></script>
-<style>body{padding:16px;background:var(--mb-color-background)}.lbl{font-family:var(--mb-font-mono);font-size:10px;letter-spacing:.9px;text-transform:uppercase;color:var(--mb-color-text-muted);margin:0 0 6px}</style>
+<style>body{padding:16px;background:var(--mb-color-background)}.lbl{font-family:var(--mb-font-mono);font-size:10px;letter-spacing:.9px;text-transform:uppercase;color:var(--mb-color-text-muted);margin:0 0 6px}.note{font-family:var(--mb-text-supporting-family);font-size:12px;line-height:17px;color:var(--mb-color-text-secondary);margin:6px 0 12px}</style>
 </head><body><div id="root"></div>
 <script type="text/babel">
 const { ChatBubble, ChatTranscript, ConversationDrawerItem } = window.MrBroccoliDesignSystem_62d510;
 const base = "../../assets/providers";
 ReactDOM.createRoot(document.getElementById("root")).render(
   <div style={{display:"grid",gridTemplateColumns:"1.1fr 1fr",gap:16,alignItems:"start"}}>
-    <div><p className="lbl">ChatBubble</p>
+    <div><p className="lbl">ChatBubble · the workspace's brief reply</p>
+      <p className="note">Used for the short exchange overlaid on the home screen. The conversation transcript does not use bubbles — its rows are <strong>TranscriptMessage</strong> (spoken script, margin speakers, 3-row fold); see “Transcript in context” in the Mr Broccoli app group.</p>
       <ChatBubble role="user" timestamp="09.08.26 · 14:11" text="When does the tide turn in Lisbon?" />
       <ChatBubble role="assistant" provider="anthropic" model="Claude Sonnet 4.5" timestamp="09.08.26 · 14:12" assetBase={base}
         text="High water is at 15:40 today, and the tide turns roughly every six hours after that."
         actions={[{icon:"copy",label:"Copy"},{icon:"redo",label:"Repeat"},{icon:"branch",label:"Branch"},{icon:"share-alt",label:"Share"}]} />
-      <p className="lbl" style={{marginTop:12}}>ChatTranscript · empty</p>
+      <p className="lbl" style={{marginTop:12}}>ChatTranscript · container + empty state</p>
+      <p className="note">Still the scrolling container the transcript rows mount into; only the empty state draws anything itself.</p>
       <div style={{border:"1px solid var(--mb-color-border)",borderRadius:"var(--mb-radius-dialog)",background:"var(--mb-color-surface)"}}>
         <ChatTranscript isEmpty emptyTitle="No messages yet" emptyDescription="Hold the microphone and ask something." />
       </div>

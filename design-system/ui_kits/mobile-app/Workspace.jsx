@@ -109,7 +109,7 @@ function TranscriptRow({ message, isLast }) {
   const [open, setOpen] = React.useState(isLast);
   return <TranscriptMessage role={message.role} paragraphs={message.paragraphs || [message.text]}
     model={message.model} provider={message.provider} council={message.council} time={message.timestamp}
-    expanded={open} onToggle={() => setOpen(!open)} meta={message.meta} last={isLast} assetBase={ASSETS}
+    expanded={open} onToggle={() => setOpen(!open)} meta={message.meta} assetBase={ASSETS}
     actions={message.role === "assistant" ? [{ icon: "branch", label: "Branch here" }, { icon: "copy", label: "Copy" }, { icon: "share-alt", label: "Share" }, { icon: "sound", label: "Speak again" }] : null} />;
 }
 
@@ -122,12 +122,8 @@ function TranscriptSheet({ visible, title, messages, onClose }) {
       <div style={{ position: "absolute", left: 0, right: 0, bottom: 0, height: "85%", display: "flex", flexDirection: "column",
         borderRadius: "var(--mb-radius-sheet-top) var(--mb-radius-sheet-top) 0 0", background: "var(--mb-color-background)",
         border: "1px solid var(--mb-color-surface-raised-border)", borderBottom: "none", boxShadow: "var(--mb-shadow-sheet)", overflow: "hidden" }}>
-        <div style={{ flexShrink: 0, padding: "10px 8px 8px 14px", borderBottom: "1px solid var(--mb-color-border)" }}>
-          <span style={{ display: "block", width: 38, height: 4, borderRadius: 2, margin: "0 auto 8px", background: "var(--mb-color-border-strong)" }} />
-          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-            <span style={{ flex: 1, minWidth: 0, fontFamily: "var(--mb-font-headline)", fontSize: 17, letterSpacing: "-0.2px", color: "var(--mb-color-text)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{title}</span>
-            <IconButton icon="close" accessibilityLabel="Hide transcript" onClick={onClose} />
-          </div>
+        <div role="button" aria-label="Pull down or tap the backdrop to close" onClick={onClose} style={{ flexShrink: 0, padding: "10px 0 8px", cursor: "grab" }}>
+          <span style={{ display: "block", width: 38, height: 4, borderRadius: 2, margin: "0 auto", background: "var(--mb-color-border-strong)" }} />
         </div>
         <div style={{ flex: 1, overflowY: "auto", padding: "6px 16px 20px" }}>
           {messages.map((message, index) => (

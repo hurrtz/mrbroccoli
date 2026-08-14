@@ -16,7 +16,7 @@ Row anatomy: a 34pt margin column carries the speaker — YOU in accent for the 
 
 **Swipe to remove.** Any message swipes away (danger action, “Remove”): removing an irrelevant turn drops it from the context sent with every future request, so tossing redundancy directly saves tokens.
 
-The sheet contract: the transcript opens over the workspace — grip, conversation name, close control (a deliberate departure from the upstream “Hide transcript” text link). The conversation settings sheet stays a home-screen surface opened from the settings sentence; the transcript does not duplicate it — auto-naming moved to the sessions drawer's actions sheet.
+The sheet contract: the transcript opens over the workspace as a plain drawer — grip only, no title, no close control (the conversation name already heads the workspace, and a drawer with a handle closes by pulling it down or tapping the backdrop; this supersedes both the upstream “Hide transcript” text link and this system's earlier grip + name + close header). The conversation settings sheet stays a home-screen surface opened from the settings sentence; the transcript does not duplicate it — auto-naming moved to the sessions drawer's actions sheet.
 
 Where the transcript appears:
 
