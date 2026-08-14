@@ -65,8 +65,6 @@ receive already-derived state and callbacks.
   an adjustable effort read `Normal`;
   when no route is usable it renders nothing rather than another credential or
   setup card.
-  `ResponseModeToggle` and `PhaseAwareVoiceAction` remain in the codebase,
-  correct anywhere a picker grid or a docked bar is wanted.
 - In portrait, the conversation's quick settings read as one muted
   tone-length-voice line under the byline, with a single control opening the
   conversation style sheet. Landscape floats that control over the stage's

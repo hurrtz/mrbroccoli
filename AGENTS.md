@@ -125,7 +125,7 @@ applies.
   were removed; the app opens directly into the workspace.
 - `src/features/settings/AntSettingsModal.tsx` is the configuration entry point. Its historical `Ant` prefix remains for import stability, but the app no longer depends on Ant Design. Navigation/frame concerns live in `AntSettingsFrame.tsx`; page routing lives in `AntSettingsPageContent.tsx`; reusable non-visual settings logic lives in `src/features/settings-core/`.
 - Shared buttons, inputs, lists, dialogs, and tags live in `src/design-system/NativeControls.tsx`; settings cards, fields, and pickers live under `src/features/settings/settings-primitives/`. Keep these React Native-owned controls dependency-light and accessible.
-- `src/screens/main/MainScreenRouteByline.tsx` is the home-screen route selector: one line stating who answers the next turn and at what effort, opening `RoutePickerSheet.tsx`. `src/components/ResponseModeToggle.tsx` (with its layouts under `src/components/responseModeToggle/`) is retained for surfaces that want the picker grid, but no longer mounts on the home screen.
+- `src/screens/main/MainScreenRouteByline.tsx` is the home-screen route selector: one line stating who answers the next turn and at what effort, opening `RoutePickerSheet.tsx`.
 - Direct provider switching has been removed from the home screen; the app routes through configurable response modes.
 - `src/constants/providers/runtimeManifest.ts` is the runtime source of truth for provider order, transports, model routes, API key hints, STT/TTS capabilities, and provider voice defaults. `src/constants/models.ts` exposes user-facing helpers on top of it.
 - `src/types.ts` is the source of truth for settings types and `DEFAULT_SETTINGS`.
@@ -172,8 +172,6 @@ applies.
   - `src/screens/main/RoutePickerSheet.tsx`
   - `src/features/settings/pages/ThinkingSettingsPage.tsx`
   - `src/screens/MainScreen.tsx`
-- `src/components/ResponseModeToggle.tsx` is retained but no longer mounts on
-  the home screen; the route byline and its picker sheet replaced it there.
 
 ## Provider And Model Maintenance
 
