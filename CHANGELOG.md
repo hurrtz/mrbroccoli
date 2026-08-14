@@ -55,6 +55,10 @@ the complete Play Store translations are kept in a dedicated file under
 - Mr Broccoli is "he" everywhere copy speaks about him — the walkthrough no
   longer slips into "it" in English or German — and the background install
   bar's action says it opens the automatic setup, not a retired page.
+- The transcript sheet is now the handle pulled up: its only chrome is the
+  grabber, which is the labeled close action — the status line already
+  carries the conversation's name. Message headers show the time alone;
+  the drawer row owns the date.
 - The voice orb steps down a size while the setup banner is on screen instead
   of squeezing the rest of the home screen.
 - The Settings overview's Connections summary names at most two providers and

@@ -150,7 +150,6 @@ function createWorkspaceProps(t: jest.Mock) {
       onDismiss: jest.fn(),
       onOpen: jest.fn(),
       showLabel: "Show transcript",
-      title: "Streaming test",
       visible: false,
     },
     visualPhase: "thinking" as const,
@@ -483,7 +482,7 @@ describe("MainScreenWorkspace streaming isolation", () => {
     expect(screen.getByTestId("satellite-web")).toBeTruthy();
   });
 
-  it("opens the portrait transcript with one title and an icon close action", () => {
+  it("opens the portrait transcript as a grabber-only sheet", () => {
     const t = jest.fn((key: string) => key);
     const workspaceProps = createWorkspaceProps(t);
     const onClose = jest.fn();
@@ -510,9 +509,13 @@ describe("MainScreenWorkspace streaming isolation", () => {
       />,
     );
 
-    expect(screen.getAllByText("Streaming test")).toHaveLength(1);
-    expect(screen.queryByText("Hide transcript")).toBeNull();
-    fireEvent.press(screen.getByTestId("transcript-sheet-close"));
+    // The status line owns the conversation name; the sheet is the handle
+    // pulled up — its only chrome is the grabber, which is the labeled
+    // close action.
+    expect(screen.queryByText("Streaming test")).toBeNull();
+    const grabber = screen.getByTestId("transcript-sheet-close");
+    expect(grabber.props.accessibilityRole).toBe("button");
+    fireEvent.press(grabber);
     expect(onClose).toHaveBeenCalledTimes(1);
   });
 });

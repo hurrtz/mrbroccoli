@@ -1,5 +1,5 @@
 import React from "react";
-import { StyleSheet, Text, useWindowDimensions, View } from "react-native";
+import { Pressable, StyleSheet, useWindowDimensions, View } from "react-native";
 
 import { IntroBanner } from "../../components/IntroBanner";
 import { BackgroundTaskBar } from "../../design-system/BackgroundTaskBar";
@@ -7,10 +7,8 @@ import { ConversationSettingsSummary } from "../../design-system/ConversationSet
 import { OrbSatellite } from "../../design-system/OrbSatellite";
 import { TranscriptHandle } from "../../design-system/TranscriptHandle";
 import { WorkspaceStatusLine } from "../../design-system/WorkspaceStatusLine";
-import { IconButton } from "../../design-system/IconButton";
 import { Modal } from "../../design-system/NativeControls";
 import type { Colors } from "../../theme/colors";
-import { fonts } from "../../theme/typography";
 import type { Message, VoiceVisualPhase } from "../../types";
 import { MainScreenRouteCard } from "./MainScreenRouteCard";
 import { MainScreenTopBar } from "./MainScreenTopBar";
@@ -187,7 +185,6 @@ interface MainScreenWorkspaceProps {
     onDismiss: () => void;
     onOpen: () => void;
     showLabel: string;
-    title: string;
     visible: boolean;
   };
   visualPhase: VoiceVisualPhase;
@@ -415,11 +412,15 @@ export function MainScreenWorkspace({
         onClose={transcriptSheet.onClose}
         onDismiss={transcriptSheet.onDismiss}
         title={
-          <View
-            style={[
-              workspaceStyles.transcriptSheetHeader,
-              { borderBottomColor: colors.border },
-            ]}
+          /* The status line already carries the conversation name; the
+             sheet is the transcript handle pulled up, so its only chrome
+             is the grabber, which doubles as the labeled close action. */
+          <Pressable
+            accessibilityLabel={transcriptSheet.hideLabel}
+            accessibilityRole="button"
+            onPress={transcriptSheet.onClose}
+            style={workspaceStyles.transcriptSheetHeader}
+            testID="transcript-sheet-close"
           >
             <View
               style={[
@@ -427,25 +428,7 @@ export function MainScreenWorkspace({
                 { backgroundColor: colors.borderStrong },
               ]}
             />
-            <View style={workspaceStyles.transcriptSheetTitleRow}>
-              <Text
-                accessibilityRole="header"
-                numberOfLines={1}
-                style={[
-                  workspaceStyles.transcriptSheetTitle,
-                  { color: colors.text },
-                ]}
-              >
-                {transcriptSheet.title}
-              </Text>
-              <IconButton
-                accessibilityLabel={transcriptSheet.hideLabel}
-                icon="close"
-                onPress={transcriptSheet.onClose}
-                testID="transcript-sheet-close"
-              />
-            </View>
-          </View>
+          </Pressable>
         }
         visible={transcriptSheet.visible}
       >
@@ -482,32 +465,17 @@ const workspaceStyles = StyleSheet.create({
   transcriptHandle: {
     marginHorizontal: 0,
   },
+  // A 44pt grab-and-close target around the 38x4 handle.
   transcriptSheetHeader: {
-    borderBottomWidth: StyleSheet.hairlineWidth,
     marginHorizontal: -20,
     marginTop: -10,
-    paddingBottom: 8,
-    paddingHorizontal: 8,
+    minHeight: 44,
+    justifyContent: "center",
   },
   transcriptSheetGrip: {
     alignSelf: "center",
     borderRadius: 2,
     height: 4,
-    marginBottom: 8,
     width: 38,
-  },
-  transcriptSheetTitleRow: {
-    alignItems: "center",
-    flexDirection: "row",
-    gap: 12,
-    paddingLeft: 6,
-  },
-  transcriptSheetTitle: {
-    flex: 1,
-    fontFamily: fonts.headline,
-    fontSize: 17,
-    letterSpacing: -0.2,
-    lineHeight: 22,
-    minWidth: 0,
   },
 });

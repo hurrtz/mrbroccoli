@@ -50,6 +50,8 @@ interface MetricRow {
 
 const messageTimestampFormatters = new Map<string, Intl.DateTimeFormat>();
 
+// The transcript's name line carries the time alone — the drawer row and
+// status line own the date and age of a conversation.
 function formatTimestamp(timestamp: string, locale: string) {
   const date = new Date(timestamp);
   if (Number.isNaN(date.getTime())) {
@@ -59,9 +61,6 @@ function formatTimestamp(timestamp: string, locale: string) {
   let formatter = messageTimestampFormatters.get(locale);
   if (!formatter) {
     formatter = new Intl.DateTimeFormat(locale, {
-      day: "2-digit",
-      month: "2-digit",
-      year: "2-digit",
       hour: "2-digit",
       minute: "2-digit",
       hour12: false,
@@ -69,7 +68,7 @@ function formatTimestamp(timestamp: string, locale: string) {
     messageTimestampFormatters.set(locale, formatter);
   }
 
-  return formatter.format(date).replace(/,\s*/, " · ");
+  return formatter.format(date);
 }
 
 function formatDuration(durationMs?: number) {

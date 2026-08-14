@@ -787,7 +787,6 @@ export function MainScreen() {
     pipelinePhase,
   );
   const {
-    activeConversationTitle,
     conversationStatusDetail,
     fallbackTtsStatusLabel,
     isActive,
@@ -1187,7 +1186,6 @@ export function MainScreen() {
           onDismiss: handleTranscriptDismiss,
           onOpen: openTranscriptSheet,
           showLabel: t("showTranscript"),
-          title: activeConversationTitle,
           visible: transcriptSheetVisible,
         },
         visualPhase,

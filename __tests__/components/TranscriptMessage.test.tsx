@@ -43,6 +43,14 @@ const baseMessage: Message = {
   timestamp: "2026-08-13T08:30:00.000Z",
 };
 
+// The name line carries the time alone — dates belong to the drawer row and
+// the status line, and the design system's transcript shows "14:12" style.
+const expectedTime = new Intl.DateTimeFormat("en", {
+  hour: "2-digit",
+  minute: "2-digit",
+  hour12: false,
+}).format(new Date(baseMessage.timestamp));
+
 function renderMessage(
   overrideProps: Partial<React.ComponentProps<typeof TranscriptMessage>> = {},
 ) {
@@ -64,6 +72,13 @@ function renderMessage(
 }
 
 describe("TranscriptMessage", () => {
+  it("shows the time alone on the name line, never a date", () => {
+    const screen = renderMessage();
+
+    expect(screen.getByText(expectedTime)).toBeTruthy();
+    expect(screen.queryByText(/\d{2}\/\d{2}\/\d{2}/)).toBeNull();
+  });
+
   it("renders an unboxed script row with a fixed speaker margin", () => {
     const screen = renderMessage({
       message: {
