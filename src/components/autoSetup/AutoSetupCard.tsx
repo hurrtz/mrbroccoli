@@ -28,11 +28,13 @@ function CardAction({
   icon,
   label,
   onPress,
+  testID,
   tone = "primary",
 }: {
   icon?: PhosphorIconName;
   label: string;
   onPress: () => void;
+  testID: string;
   tone?: "primary" | "secondary";
 }) {
   const { colors } = useTheme();
@@ -55,7 +57,7 @@ function CardAction({
         },
         pressed ? styles.pressed : null,
       ]}
-      testID={`auto-setup-action-${label}`}
+      testID={testID}
     >
       {icon ? <PhosphorIcon color={ink} name={icon} size="control" /> : null}
       <Text style={[styles.actionLabel, { color: ink }]}>{label}</Text>
@@ -65,10 +67,12 @@ function CardAction({
 
 function Verdict({
   body,
+  testID,
   tone,
   title,
 }: {
   body: string;
+  testID?: string;
   tone: "success" | "danger";
   title: string;
 }) {
@@ -76,7 +80,7 @@ function Verdict({
   const ink = tone === "danger" ? colors.danger : colors.success;
 
   return (
-    <View style={styles.verdict}>
+    <View style={styles.verdict} testID={testID}>
       <View style={[styles.verdictBadge, { borderColor: ink }]}>
         <PhosphorIcon
           color={ink}
@@ -228,6 +232,7 @@ export function AutoSetupCard({
             icon="thunderbolt"
             label={t("autoSetupStart")}
             onPress={job.start}
+            testID="auto-setup-start"
           />
         </>
       ) : null}
@@ -267,6 +272,7 @@ export function AutoSetupCard({
           <CardAction
             label={t("cancel")}
             onPress={job.cancel}
+            testID="auto-setup-cancel"
             tone="secondary"
           />
         </>
@@ -274,7 +280,10 @@ export function AutoSetupCard({
 
       {job.state === "proposal" ? (
         <>
-          <Text style={[styles.proposalLabel, { color: colors.textMuted }]}>
+          <Text
+            style={[styles.proposalLabel, { color: colors.textMuted }]}
+            testID="auto-setup-proposal"
+          >
             {t("autoSetupProposalLabel")}
           </Text>
           {planRows}
@@ -293,6 +302,7 @@ export function AutoSetupCard({
                 : t("autoSetupStart")
             }
             onPress={job.install}
+            testID="auto-setup-install"
           />
           {onManual ? (
             <Pressable
@@ -331,21 +341,27 @@ export function AutoSetupCard({
           <CardAction
             label={t("cancel")}
             onPress={job.cancel}
+            testID="auto-setup-cancel"
             tone="secondary"
           />
         </>
       ) : null}
 
       {job.state === "done" ? (
-        <>
+        <View
+          collapsable={false}
+          style={styles.stateGroup}
+          testID="auto-setup-done-state"
+        >
           <Verdict
             body={t("autoSetupDoneBody")}
+            testID="auto-setup-done"
             title={t("autoSetupDoneTitle")}
             tone="success"
           />
           {divider}
           {planRows}
-        </>
+        </View>
       ) : null}
 
       {job.state === "failed" ? (
@@ -361,6 +377,7 @@ export function AutoSetupCard({
                 ? t("autoSetupScanFailedTitle")
                 : t("autoSetupFailedTitle")
             }
+            testID="auto-setup-failed"
             tone="danger"
           />
           {job.errorKind === "scan" ? null : divider}
@@ -369,6 +386,7 @@ export function AutoSetupCard({
             icon="reload"
             label={t("autoSetupRetry")}
             onPress={job.retry}
+            testID="auto-setup-retry"
           />
           {onManual ? (
             <Pressable
@@ -469,6 +487,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
     flexDirection: "row",
     gap: 10,
+  },
+  stateGroup: {
+    gap: 14,
   },
   scanLabel: {
     flex: 1,

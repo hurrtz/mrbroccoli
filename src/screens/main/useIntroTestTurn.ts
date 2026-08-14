@@ -65,6 +65,7 @@ interface IntroTestTurnPlayer {
 interface IntroRecordingRequest {
   cancelled: boolean;
   start: Promise<boolean>;
+  stop: Promise<string | null> | null;
 }
 
 /**
@@ -82,19 +83,19 @@ export function useIntroTestTurn({
   player,
   t,
 }: {
-  /** The flow is open; leaving it aborts any in-flight test turn. */
+  /** The flow is open and its reasoning route is runnable. */
   active: boolean;
   getRouteParams: () => IntroTestRouteParams;
   player: IntroTestTurnPlayer;
   t: TranslateFn;
 }): IntroTestTurnState {
   const recorder = useAudioRecorder();
-  const [phase, setPhase] = React.useState<IntroTestTurnState["phase"]>(
-    "idle",
-  );
+  const [error, setError] = React.useState<string | null>(null);
+  const [phase, setPhase] = React.useState<IntroTestTurnState["phase"]>("idle");
   const [turn, setTurn] = React.useState<IntroTestTurnState["turn"]>(null);
   const [replaying, setReplaying] = React.useState(false);
 
+  const activeRef = React.useRef(active);
   const abortRef = React.useRef<AbortController | null>(null);
   const finalTranscriptRef = React.useRef("");
   const latestTranscriptRef = React.useRef("");
@@ -111,6 +112,7 @@ export function useIntroTestTurn({
   >(null);
   playerRef.current = player;
   recorderRef.current = recorder;
+  activeRef.current = active;
 
   const abortActiveRun = React.useCallback(() => {
     abortRef.current?.abort();
@@ -155,6 +157,20 @@ export function useIntroTestTurn({
     }
   }, []);
 
+  const stopRecordingRequest = React.useCallback(
+    (request: IntroRecordingRequest) => {
+      request.stop ??= request.start.then((started) =>
+        started ? recorderRef.current.stopRecording() : null,
+      );
+      recordingTeardownRef.current = request.stop.then(
+        () => undefined,
+        () => undefined,
+      );
+      return request.stop;
+    },
+    [],
+  );
+
   const stopIntroRecording = React.useCallback(() => {
     const request = recordingRequestRef.current;
     if (!request) {
@@ -163,17 +179,13 @@ export function useIntroTestTurn({
 
     recordingRequestRef.current = null;
     request.cancelled = true;
-    const teardown = request.start
-      .then(async (started) => {
-        if (!started) {
-          return;
-        }
-        const audioUri = await recorderRef.current.stopRecording();
+    const teardown = stopRecordingRequest(request)
+      .then(async (audioUri) => {
         await cleanupCapturedAudio(audioUri ?? undefined);
       })
       .catch(() => undefined);
     recordingTeardownRef.current = teardown;
-  }, []);
+  }, [stopRecordingRequest]);
 
   React.useEffect(() => {
     if (!active) {
@@ -183,6 +195,7 @@ export function useIntroTestTurn({
       setPhase("idle");
       setReplaying(false);
       setTurn(null);
+      setError(null);
       speechRef.current = null;
     }
   }, [abortActiveRun, active, stopIntroPlayback, stopIntroRecording]);
@@ -197,7 +210,7 @@ export function useIntroTestTurn({
   );
 
   const onPressIn = React.useCallback(() => {
-    if (phase !== "idle") {
+    if (!activeRef.current || phase !== "idle") {
       return;
     }
     abortActiveRun();
@@ -205,6 +218,8 @@ export function useIntroTestTurn({
     // Invalidate the replay's drain callback and release its disabled UI state
     // before recording begins.
     setReplaying(false);
+    speechRef.current = null;
+    setError(null);
     // stopPlayback dispatches native teardown synchronously; recording can
     // prepare immediately while that best-effort native promise settles.
     void stopIntroPlayback();
@@ -213,9 +228,10 @@ export function useIntroTestTurn({
     const request: IntroRecordingRequest = {
       cancelled: false,
       start: Promise.resolve(false),
+      stop: null,
     };
     request.start = recordingTeardownRef.current.then(async () => {
-      if (request.cancelled) {
+      if (request.cancelled || !activeRef.current) {
         return false;
       }
       await recorder.startRecording();
@@ -227,12 +243,18 @@ export function useIntroTestTurn({
         recordingRequestRef.current = null;
       }
       if (runRef.current === startRun) {
+        setError(t("introTestTurnFailed"));
         setPhase("idle");
       }
     });
-  }, [abortActiveRun, phase, recorder, stopIntroPlayback]);
+  }, [abortActiveRun, phase, recorder, stopIntroPlayback, t]);
 
   const onPressOut = React.useCallback(() => {
+    if (!activeRef.current) {
+      stopIntroRecording();
+      setPhase("idle");
+      return;
+    }
     if (phase !== "recording") {
       return;
     }
@@ -241,17 +263,11 @@ export function useIntroTestTurn({
     const controller = new AbortController();
     abortRef.current = controller;
     const recordingRequest = recordingRequestRef.current;
-    recordingRequestRef.current = null;
     setPhase("running");
 
-    const stopTask = (async () => {
-      const started = await recordingRequest?.start;
-      return started ? recorder.stopRecording() : null;
-    })();
-    recordingTeardownRef.current = stopTask.then(
-      () => undefined,
-      () => undefined,
-    );
+    const stopTask = recordingRequest
+      ? stopRecordingRequest(recordingRequest)
+      : Promise.resolve(null);
 
     void (async () => {
       let audioUri: string | null;
@@ -260,9 +276,13 @@ export function useIntroTestTurn({
       } catch {
         if (runRef.current === runId) {
           abortRef.current = null;
+          setError(t("introTestTurnFailed"));
           setPhase("idle");
         }
         return;
+      }
+      if (recordingRequestRef.current === recordingRequest) {
+        recordingRequestRef.current = null;
       }
       if (runRef.current !== runId) {
         await cleanupCapturedAudio(audioUri ?? undefined);
@@ -270,6 +290,7 @@ export function useIntroTestTurn({
       }
       if (!audioUri) {
         abortRef.current = null;
+        setError(t("introTestTurnFailed"));
         setPhase("idle");
         return;
       }
@@ -280,7 +301,6 @@ export function useIntroTestTurn({
       let answer = "";
       let failed = false;
       let latencyLabel: string | null = null;
-      let pipelineStarted = false;
       const audioUris: string[] = [];
 
       const finishIfDone = () => {
@@ -291,9 +311,10 @@ export function useIntroTestTurn({
           speechRef.current = { kind: "audio", uris: audioUris };
         }
         if (!failed) {
+          setError(null);
           setTurn(
             question && answer
-              ? { answer, latencyLabel, question }
+              ? { answer, latencyLabel, question, successful: true }
               : null,
           );
         }
@@ -301,12 +322,18 @@ export function useIntroTestTurn({
       };
 
       const markFailed = () => {
+        if (runRef.current !== runId || controller.signal.aborted) {
+          return;
+        }
         failed = true;
+        const message = t("introTestTurnFailed");
+        setError(message);
         if (question) {
           setTurn({
-            answer: t("introTestTurnFailed"),
+            answer: message,
             latencyLabel: null,
             question,
+            successful: false,
           });
         } else {
           setTurn(null);
@@ -324,10 +351,7 @@ export function useIntroTestTurn({
       };
 
       try {
-        const {
-          nativeSttRequiresOnDevice,
-          ...routeParams
-        } = getRouteParams();
+        const { nativeSttRequiresOnDevice, ...routeParams } = getRouteParams();
         let transcriptionOverride: string | undefined;
         if (routeParams.sttMode === "native") {
           const transcription = await transcribeRecordedFile({
@@ -349,8 +373,7 @@ export function useIntroTestTurn({
           transcriptionOverride = transcription;
         }
 
-        pipelineStarted = true;
-        await runVoicePipeline({
+        const pipelineTranscript = await runVoicePipeline({
           ...routeParams,
           abortSignal: controller.signal,
           messages: [],
@@ -363,7 +386,12 @@ export function useIntroTestTurn({
                 return null;
               }
               question = text;
-              setTurn({ answer: "", latencyLabel: null, question: text });
+              setTurn({
+                answer: "",
+                latencyLabel: null,
+                question: text,
+                successful: false,
+              });
               return null;
             },
             onChunk: () => {},
@@ -373,7 +401,12 @@ export function useIntroTestTurn({
               }
               answer = fullText;
               if (!failed) {
-                setTurn({ answer: fullText, latencyLabel, question });
+                setTurn({
+                  answer: fullText,
+                  latencyLabel,
+                  question,
+                  successful: false,
+                });
               }
             },
             onAudioReady: (uri) => {
@@ -403,22 +436,34 @@ export function useIntroTestTurn({
             },
           },
         });
+        if (!pipelineTranscript?.trim()) {
+          markFailed();
+        }
       } catch {
         if (runRef.current === runId && !controller.signal.aborted) {
           markFailed();
         }
       } finally {
-        if (!pipelineStarted) {
-          await cleanupCapturedAudio(audioUri);
-        }
+        // The normal conversation flow retains failed STT captures for Retry.
+        // Intro has no retry owner, so it must always release its ephemeral
+        // recording; the cleanup helper is idempotent after successful runs.
+        await cleanupCapturedAudio(audioUri);
         finishIfDone();
       }
     })();
-  }, [getRouteParams, phase, player, recorder, t, trackIntroPlayback]);
+  }, [
+    getRouteParams,
+    phase,
+    player,
+    stopIntroRecording,
+    stopRecordingRequest,
+    t,
+    trackIntroPlayback,
+  ]);
 
   const onReplay = React.useCallback(() => {
     const speech = speechRef.current;
-    if (!speech || replaying) {
+    if (!activeRef.current || !speech || replaying) {
       return;
     }
     const replayRun = (replayRunRef.current += 1);
@@ -450,7 +495,7 @@ export function useIntroTestTurn({
   }, [player, replaying, trackIntroPlayback]);
 
   return React.useMemo(
-    () => ({ onPressIn, onPressOut, onReplay, phase, replaying, turn }),
-    [onPressIn, onPressOut, onReplay, phase, replaying, turn],
+    () => ({ error, onPressIn, onPressOut, onReplay, phase, replaying, turn }),
+    [error, onPressIn, onPressOut, onReplay, phase, replaying, turn],
   );
 }

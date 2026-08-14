@@ -100,8 +100,7 @@ const COPY: Record<AppLanguage, StorePromoCopy> = {
     followUpReply:
       "Перенеси Музейний острів на ранок, пообідай неподалік і заверши день у затишній кавʼярні або на концерті. Маршрут залишиться коротким і переважно в приміщеннях.",
     branchTitle: "Варіант для сонячного дня",
-    branchPrompt:
-      "Зміни план для сонячної погоди й додай більше часу надворі.",
+    branchPrompt: "Зміни план для сонячної погоди й додай більше часу надворі.",
     branchReply:
       "Почни на Темпельгофер-Фельд, пройди вздовж каналу до Кройцберга й заверши день вечірнім пікніком у Тіргартені.",
     recentTitle: "Ідеї на вихідні",
@@ -322,8 +321,7 @@ const COPY: Record<AppLanguage, StorePromoCopy> = {
     followUpReply:
       "Navštiv Muzejní ostrov dopoledne, dej si oběd poblíž a den zakonči v klidné kavárně nebo na koncertě. Trasa zůstane krátká a převážně uvnitř.",
     branchTitle: "Varianta pro slunečný den",
-    branchPrompt:
-      "Uprav plán pro slunečné počasí a přidej více času venku.",
+    branchPrompt: "Uprav plán pro slunečné počasí a přidej více času venku.",
     branchReply:
       "Začni na Tempelhofer Feld, pokračuj podél kanálu ke Kreuzbergu a den zakonči večerním piknikem v Tiergartenu.",
     recentTitle: "Nápady na víkend",
@@ -428,8 +426,7 @@ function message(
 
 export function isStorePromoLanguage(value: unknown): value is AppLanguage {
   return (
-    typeof value === "string" &&
-    APP_LANGUAGES.includes(value as AppLanguage)
+    typeof value === "string" && APP_LANGUAGES.includes(value as AppLanguage)
   );
 }
 
@@ -481,50 +478,52 @@ export function buildStorePromoConversations(
         model: "gpt-5.6-sol",
         provider: "openai",
         usage: usage(296, 96),
-        metadata: includeUlraAudit ? {
-          ulraMode: {
-            convergenceReached: true,
-            contributions: [
-              {
-                modeId: "mode-1",
-                model: "gpt-5.6-sol",
-                participant: 1,
-                provider: "openai",
-                round: 0,
-                usage: usage(142, 61),
+        metadata: includeUlraAudit
+          ? {
+              ulraMode: {
+                convergenceReached: true,
+                contributions: [
+                  {
+                    modeId: "mode-1",
+                    model: "gpt-5.6-sol",
+                    participant: 1,
+                    provider: "openai",
+                    round: 0,
+                    usage: usage(142, 61),
+                  },
+                  {
+                    modeId: "mode-2",
+                    model: "claude-sonnet-5",
+                    participant: 2,
+                    provider: "anthropic",
+                    round: 1,
+                    reviewVerdict: "challenge",
+                    usage: usage(158, 54),
+                  },
+                  {
+                    modeId: "mode-3",
+                    model: "gemini-3.6-flash",
+                    participant: 3,
+                    provider: "gemini",
+                    round: 1,
+                    reviewVerdict: "converged",
+                    usage: usage(151, 49),
+                  },
+                ],
+                estimatedIntermediateTokens: 515,
+                failedCalls: 0,
+                failures: [],
+                retiredParticipants: 0,
+                roundsCompleted: 2,
+                roundsRequested: 2,
+                successfulCalls: 3,
+                synthesisContract: "evidence-ledger-v1",
+                synthesisContributions: 3,
+                synthesisEstimatedTokens: 515,
+                synthesisOmittedContributions: 0,
               },
-              {
-                modeId: "mode-2",
-                model: "claude-sonnet-5",
-                participant: 2,
-                provider: "anthropic",
-                round: 1,
-                reviewVerdict: "challenge",
-                usage: usage(158, 54),
-              },
-              {
-                modeId: "mode-3",
-                model: "gemini-3.6-flash",
-                participant: 3,
-                provider: "gemini",
-                round: 1,
-                reviewVerdict: "converged",
-                usage: usage(151, 49),
-              },
-            ],
-            estimatedIntermediateTokens: 515,
-            failedCalls: 0,
-            failures: [],
-            retiredParticipants: 0,
-            roundsCompleted: 2,
-            roundsRequested: 2,
-            successfulCalls: 3,
-            synthesisContract: "evidence-ledger-v1",
-            synthesisContributions: 3,
-            synthesisEstimatedTokens: 515,
-            synthesisOmittedContributions: 0,
-          },
-        } : undefined,
+            }
+          : undefined,
         timestampMs: nowMs - 4 * minute,
       }),
     ],
@@ -622,13 +621,14 @@ export async function seedStorePromoFixture(
     ? (JSON.parse(storedSettingsRaw) as Partial<Settings>)
     : {};
   const speechLanguage = getStorePromoSpeechLanguage(language);
+  const onboarding = scene === "onboarding";
   const nextSettings: Settings = {
     ...DEFAULT_SETTINGS,
     ...storedSettings,
     apiKeys: DEFAULT_SETTINGS.apiKeys,
     language,
     freeOnboardingLanguageInitialized: true,
-    freeOfflineSetupCompleted: true,
+    freeOfflineSetupCompleted: !onboarding,
     localLanguages: [speechLanguage],
     activeResponseMode: "mode-1",
     responseModes: [
@@ -645,7 +645,13 @@ export async function seedStorePromoFixture(
         route: { provider: "gemini", model: "gemini-3.6-flash" },
       },
     ],
-    introDismissed: true,
+    introDismissed: !onboarding,
+    ...(onboarding
+      ? {
+          introCompleted: false,
+          introOpened: false,
+        }
+      : {}),
     showDebugLogButton: false,
     spokenRepliesEnabled: false,
     sttLanguage: speechLanguage,
@@ -678,7 +684,10 @@ export async function seedStorePromoFixture(
     [STORE_PROMO_FIXTURE_MARKER_KEY, language],
     [STORE_PROMO_ORB_STORAGE_KEY, JSON.stringify(orb)],
     [STORE_PROMO_SCENE_STORAGE_KEY, scene],
-    [DEVELOPMENT_ENTITLEMENT_MODE_STORAGE_KEY, scene],
+    [
+      DEVELOPMENT_ENTITLEMENT_MODE_STORAGE_KEY,
+      scene === "premium" ? "premium" : "free",
+    ],
   ]);
   await replaceAllConversationRows(
     conversations.map((conversation) => ({
@@ -686,7 +695,9 @@ export async function seedStorePromoFixture(
       document: JSON.stringify(
         relativizeConversationImageAttachmentUris(conversation),
       ),
-      meta: metaById.get(conversation.id) ?? buildConversationMetaFromConversation(conversation),
+      meta:
+        metaById.get(conversation.id) ??
+        buildConversationMetaFromConversation(conversation),
     })),
   );
   await persistActiveConversationId("promo-root");

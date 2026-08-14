@@ -7,16 +7,26 @@ broader Maestro release QA gallery.
 ## Safety boundary
 
 The fixture route writes deterministic sample conversations and presentation
-state only when the installed application identifier ends in `.maestro`.
-Production, `.dev`, and other application identities fail closed. The fixture
-contains no credentials, provider requests, user data, or downloaded models.
+state only when the installed application identifier is exactly
+`com.tobiaswinkler.app.mrbroccoli.maestro`. Production, `.dev`, and every other
+application identity fail closed. The fixture contains no credentials,
+provider requests, user data, or downloaded models.
 All assistant replies, the non-idle CTA phase, and the Free/on-device device
-recommendation are fixed mocks. No model is called while capturing images.
+recommendation are fixed. The onboarding scene seeds a first-run Free state in
+the requested locale and selects its proposal from a checked-in device snapshot
+through the production profile selector. Its actions are no-ops; automatic
+setup, provider voice directories, and Intro's live catalogue readers are
+suspended before scene hydration and throughout capture, so no hardware or
+filesystem scan, download, benchmark, model, or provider call runs while
+capturing images.
 
 Like `.dev`, the `.maestro` identity exposes the App Settings control that
 simulates Free or Premium access without affecting store purchases. A clean
 `.maestro` install defaults to Premium so release automation remains
-deterministic; the store-promo flow also clears state before every locale.
+deterministic. The runner clears state once before a locale, then uses guarded
+scene reseeding to preserve that locale across its Premium, Free, and onboarding
+captures. It stops the app before every subsequent scene deep link so an open
+native Intro modal cannot survive into the next capture.
 
 ## Capture one locale
 
@@ -40,8 +50,13 @@ copy has been reviewed. The iOS runner creates or reuses a dedicated simulator;
 the Android runner requires exactly one connected emulator unless `UDID` is
 provided. Both build the isolated Release app with Expo dotenv loading disabled,
 scan it for configured local secrets, normalize the display, execute the flow,
-validate the PNG dimensions and alpha-channel contract, and write SHA-256 values
-to `screenshots.json`.
+fully decode every PNG, validate its dimensions and no-alpha contract, and write
+SHA-256 values to `screenshots.json`. The schema-2 manifest also records the
+hashed app artifact and embedded version, actual device/runtime, source commit,
+dirty-source fingerprint, and whether that artifact was freshly built or
+reused. A `--skip-build` capture deliberately leaves its artifact/source
+association unknown rather than attributing a stale binary to the current
+checkout.
 
 ## Supported native capture labels
 
@@ -89,6 +104,6 @@ omitting the Uber audit and Speaking screens that are reserved for iOS.
 8. Premium per-conversation Settings drawer
 
 Review every image in `review-gallery.html` before upload. Automation verifies
-structure and dimensions; it does not replace native-speaker review or a visual
-verdict for clipping, bidirectional text, misleading states, or marketing
-suitability.
+that each file decodes and has the approved structure, dimensions, and opacity;
+it does not replace native-speaker review or a visual verdict for clipping,
+bidirectional text, misleading states, or marketing suitability.

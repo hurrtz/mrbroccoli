@@ -25,6 +25,8 @@ tags:
 - stopApp
 - launchApp
 - assertVisible:
+    id: ^app-locale-${LOCALE}$
+- assertVisible:
     id: voice-stage-thinking
 - assertVisible:
     id: transcript-handle
@@ -38,9 +40,9 @@ tags:
     id: uber-audit-toggle-promo-assistant-2
 - takeScreenshot:
     path: 02-uber-mode-audit
+- stopApp
 
-# Free story: two complete exchanges at rest, followed by the deterministic
-# private on-device recommendation shown by the Free onboarding wizard.
+# Free story: two complete exchanges at rest.
 - openLink: "mrbroccoli://store-promos?locale=${LOCALE}&scene=free"
 - tapOn:
     text: Open
@@ -50,25 +52,46 @@ tags:
 - stopApp
 - launchApp
 - assertVisible:
-    id: free-edition-status
+    id: ^app-locale-${LOCALE}$
 - assertVisible:
     id: voice-stage-idle
 - assertVisible:
     id: transcript-handle
 - takeScreenshot:
     path: 03-free-conversation
+- stopApp
+
+# Reseed a genuine first-run intro in the same locale. The fixture projects a
+# fixed proposal from the checked-in device profile; it never starts a scan.
+- openLink: "mrbroccoli://store-promos?locale=${LOCALE}&scene=onboarding"
 - tapOn:
-    id: free-edition-status
+    text: Open
+    optional: true
+- assertVisible:
+    id: store-promo-fixture-ready-onboarding
+- stopApp
+- launchApp
+- assertVisible:
+    id: main-screen
+- assertVisible:
+    id: ^app-locale-${LOCALE}$
+- assertVisible:
+    id: intro-banner
+- tapOn:
+    id: intro-banner
 - assertVisible:
     id: intro-flow-content
 - tapOn:
-    id: intro-stepper-dot-2
+    id: intro-stepper-dot-1
+- assertVisible:
+    id: intro-setup-step
 - assertVisible:
     id: auto-setup-card
+- assertVisible:
+    id: auto-setup-proposal
 - takeScreenshot:
     path: 04-free-onboarding
-- tapOn:
-    id: intro-close
+- stopApp
 
 # Return to Premium for organization and configuration surfaces.
 - openLink: "mrbroccoli://store-promos?locale=${LOCALE}&scene=premium"
@@ -79,6 +102,8 @@ tags:
     id: store-promo-fixture-ready-premium
 - stopApp
 - launchApp
+- assertVisible:
+    id: ^app-locale-${LOCALE}$
 - assertVisible:
     id: voice-stage-thinking
 - tapOn:
@@ -93,7 +118,9 @@ tags:
     path: 05-conversation-branches
 - tapOn:
     id: conversation-drawer-close
-
+- waitForAnimationToEnd
+- assertNotVisible:
+    id: conversation-drawer-close
 - tapOn:
     id: main-settings-button
 - assertVisible:
@@ -141,6 +168,8 @@ tags:
 - assertVisible:
     id: settings-page-app
 - assertVisible:
+    id: ^app-settings-page-${LOCALE}$
+- assertVisible:
     id: automatic-setup-group
 - assertVisible:
     id: auto-setup-card
@@ -152,6 +181,9 @@ tags:
     path: 09-automatic-setup
 - tapOn:
     id: settings-close-button
+- waitForAnimationToEnd
+- assertNotVisible:
+    id: settings-modal-title
 
 - assertVisible:
     id: conversation-settings-summary-control

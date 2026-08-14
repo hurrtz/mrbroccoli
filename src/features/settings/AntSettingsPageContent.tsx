@@ -68,6 +68,10 @@ export function AntSettingsPageContent({
     providerVoiceDirectories,
     settings,
   } = props;
+  const handleOpenPremium = React.useCallback(
+    () => props.onOpenPremium(activePage),
+    [activePage, props],
+  );
   const localModels = useLocalModelSettings({
     active:
       props.visible &&
@@ -90,7 +94,7 @@ export function AntSettingsPageContent({
           getProviderHealthState={validation.getHealthState}
           isPremium={props.isPremium}
           onOpenPage={onOpenPage}
-          onOpenPremium={props.onOpenPremium}
+          onOpenPremium={handleOpenPremium}
           readiness={getSettingsReadiness(settings, {
             llmProviders: PROVIDER_ORDER.filter(
               (provider) => PROVIDER_LLM_SUPPORT[provider] === "provider",
@@ -115,7 +119,7 @@ export function AntSettingsPageContent({
             focusProvider={focusProvider}
             focusCatalogProviderId={focusCatalogProviderId}
             isPremium={props.isPremium}
-            onOpenPremium={props.onOpenPremium}
+            onOpenPremium={handleOpenPremium}
             getProviderHealthState={validation.getHealthState}
             getProviderCapabilityHealthState={
               validation.getCapabilityHealthState
@@ -157,7 +161,7 @@ export function AntSettingsPageContent({
             onUpdate={onUpdate}
             onUpdateResponseModeRoute={onUpdateResponseModeRoute}
             onAddResponseMode={onAddResponseMode}
-            onOpenPremium={props.onOpenPremium}
+            onOpenPremium={handleOpenPremium}
             onRemoveResponseMode={onRemoveResponseMode}
             onTextInputFocus={controller.handleTextInputFocus}
           />
@@ -172,7 +176,7 @@ export function AntSettingsPageContent({
             )}
             isPremium={props.isPremium}
             localModels={localModels}
-            onOpenPremium={props.onOpenPremium}
+            onOpenPremium={handleOpenPremium}
             settings={settings}
             selectableSttProviders={validation.selectableSttProviders}
             selectedSttProviderModelOptions={
@@ -193,7 +197,7 @@ export function AntSettingsPageContent({
             )}
             isPremium={props.isPremium}
             localModels={localModels}
-            onOpenPremium={props.onOpenPremium}
+            onOpenPremium={handleOpenPremium}
             settings={settings}
             selectableTtsProviders={validation.selectableTtsProviders}
             onUpdate={onUpdate}
@@ -213,7 +217,7 @@ export function AntSettingsPageContent({
           <SearchSettingsPage
             allSearchProviders={WEB_SEARCH_PROVIDER_IDS}
             isPremium={props.isPremium}
-            onOpenPremium={props.onOpenPremium}
+            onOpenPremium={handleOpenPremium}
             settings={settings}
             searchProviders={validation.selectableSearchProviders}
             onUpdate={onUpdate}
@@ -244,7 +248,7 @@ export function AntSettingsPageContent({
             localModels={localModels}
             settings={settings}
             onUpdate={onUpdate}
-            onOpenPremium={props.onOpenPremium}
+            onOpenPremium={handleOpenPremium}
             onOpenArchivedConversations={props.onOpenArchivedConversations}
             conversationArchive={props.conversationArchive}
             onCreateAppDataBackup={props.onCreateAppDataBackup}

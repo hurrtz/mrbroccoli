@@ -12,6 +12,8 @@ tags:
 - launchApp
 - setOrientation: PORTRAIT
 - assertVisible:
+    id: ^app-locale-${LOCALE}$
+- assertVisible:
     id: voice-stage-thinking
 - tapOn:
     id: main-conversations-button
@@ -25,7 +27,9 @@ tags:
     path: 04-conversation-branches
 - tapOn:
     id: conversation-drawer-close
-
+- waitForAnimationToEnd
+- assertNotVisible:
+    id: conversation-drawer-close
 - tapOn:
     id: main-settings-button
 - assertVisible:
@@ -57,6 +61,8 @@ tags:
 - assertVisible:
     id: settings-page-app
 - assertVisible:
+    id: ^app-settings-page-${LOCALE}$
+- assertVisible:
     id: automatic-setup-group
 - assertVisible:
     id: auto-setup-card
@@ -68,6 +74,9 @@ tags:
     path: 07-automatic-setup
 - tapOn:
     id: settings-close-button
+- waitForAnimationToEnd
+- assertNotVisible:
+    id: settings-modal-title
 
 - assertVisible:
     id: conversation-settings-summary-control

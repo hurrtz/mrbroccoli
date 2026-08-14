@@ -3,6 +3,7 @@ import path from "node:path";
 import { pathToFileURL } from "node:url";
 
 import ts from "typescript";
+import { parseAllDocuments } from "yaml";
 
 export const MAESTRO_MINIMUM_VERSION = "2.7.0";
 export const MAESTRO_LOCALIZED_FLOW =
@@ -22,6 +23,33 @@ export const MAESTRO_ANDROID_ELIGIBLE_AUTO_SETUP_FLOW =
   ".maestro/flows/runtime/android-eligible-auto-setup.yaml";
 
 export const RETIRED_MAESTRO_SELECTORS = Object.freeze([
+  "Playing — tap to stop",
+  "free-edition-status",
+  "intro-stepper-dot-3",
+  "intro-stepper-dot-4",
+  "intro-stepper-dot-5",
+  "intro-stepper-dot-6",
+  "intro-requirements-step",
+  "intro-back-face",
+  "intro-close-face",
+  "auto-setup-manual",
+  "intro-install-local",
+  "intro-connect-provider",
+  "intro-open-stt",
+  "intro-open-tts",
+  "intro-open-premium",
+  "intro-voice-",
+  "intro-02-requirements",
+  "intro-03-auto-setup",
+  "intro-04-thinking-route",
+  "intro-05-listening",
+  "intro-06-speaking",
+  "intro-07-premium",
+  "What you actually need",
+  "Pick something to think with",
+  "Let it hear you",
+  "Let it speak back",
+  "That is everything",
   "settings-overview-row-local",
   "on-device-settings-page",
   "on-device-llm-disclosure",
@@ -39,13 +67,57 @@ export function findRetiredMaestroSelectors(source) {
   );
 }
 
-function readCheckedInMaestroSource(cwd) {
+function readCheckedInMaestroFiles(cwd) {
   const root = path.join(cwd, ".maestro");
   return fs
     .readdirSync(root, { recursive: true })
     .filter((entry) => /\.ya?ml$/.test(String(entry)))
-    .map((entry) => fs.readFileSync(path.join(root, String(entry)), "utf8"))
+    .map((entry) => path.join(root, String(entry)));
+}
+
+function readCheckedInMaestroSource(cwd) {
+  return readCheckedInMaestroFiles(cwd)
+    .map((filePath) => fs.readFileSync(filePath, "utf8"))
     .join("\n");
+}
+
+export function findMaestroYamlErrors(source, fileName = "Maestro YAML") {
+  return parseAllDocuments(source, {
+    prettyErrors: false,
+    strict: true,
+    uniqueKeys: true,
+  }).flatMap((document, index) =>
+    document.errors.map(
+      (error) =>
+        `${fileName} document ${index + 1} is invalid YAML: ${error.message}`,
+    ),
+  );
+}
+
+export function findUnsettledNativeModalDismissals(
+  source,
+  fileName = "Maestro YAML",
+) {
+  const errors = [];
+  const dismissal =
+    /^- tapOn:\r?\n {4}id: (conversation-drawer-close|settings-close-button)\r?\n/gm;
+  for (const match of source.matchAll(dismissal)) {
+    const dismissedSelector = match[1];
+    const absentSelector =
+      dismissedSelector === "settings-close-button"
+        ? "settings-modal-title"
+        : dismissedSelector;
+    const boundary = new RegExp(
+      `^- waitForAnimationToEnd\\r?\\n- assertNotVisible:\\r?\\n {4}id: ${absentSelector}\\r?\\n`,
+    );
+    const remainder = source.slice((match.index ?? 0) + match[0].length);
+    if (!boundary.test(remainder)) {
+      errors.push(
+        `${fileName} must wait for ${dismissedSelector} to finish dismissing`,
+      );
+    }
+  }
+  return errors;
 }
 
 const REQUIRED_LOCALIZED_SELECTORS = [
@@ -120,7 +192,11 @@ export function readAppLocaleOptions(cwd = process.cwd()) {
         const definition = ts.isCallExpression(property.initializer)
           ? property.initializer.arguments[0]
           : null;
-        if (!value || !definition || !ts.isObjectLiteralExpression(definition)) {
+        if (
+          !value ||
+          !definition ||
+          !ts.isObjectLiteralExpression(definition)
+        ) {
           return [];
         }
 
@@ -221,6 +297,17 @@ export function validateMaestroSuite(cwd = process.cwd()) {
   const checkedInMaestroSource = readCheckedInMaestroSource(cwd);
   const maestroSource = [checkedInMaestroSource, orbRunner].join("\n");
 
+  for (const filePath of readCheckedInMaestroFiles(cwd)) {
+    const source = fs.readFileSync(filePath, "utf8");
+    errors.push(
+      ...findMaestroYamlErrors(source, path.relative(cwd, filePath)),
+      ...findUnsettledNativeModalDismissals(
+        source,
+        path.relative(cwd, filePath),
+      ),
+    );
+  }
+
   for (const selector of findRetiredMaestroSelectors(checkedInMaestroSource)) {
     errors.push(`Maestro flows still reference retired selector: ${selector}`);
   }
@@ -243,13 +330,22 @@ export function validateMaestroSuite(cwd = process.cwd()) {
     "landscape-right-pane",
   ]) {
     if (!layoutFlow.includes(selector)) {
-      errors.push(`Landscape Maestro coverage is missing selector: ${selector}`);
+      errors.push(
+        `Landscape Maestro coverage is missing selector: ${selector}`,
+      );
     }
   }
 
   for (const selector of [
+    "intro-stepper-dot-1",
+    "intro-setup-step",
+    "intro-auto-start",
+    "intro-banner-dismiss",
     "Recommended for this phone",
     "Download and install",
+    "auto-setup-install",
+    "auto-setup-done-state",
+    "auto-setup-done",
     "Installed and selected.",
     "thinking-slot-mode-1",
     "model-storage-group",
@@ -289,14 +385,21 @@ export function validateMaestroSuite(cwd = process.cwd()) {
   }
 
   if (countScreenshots(orbFlow) !== 1) {
-    errors.push("Parameterized orb Maestro flow must capture exactly one state");
+    errors.push(
+      "Parameterized orb Maestro flow must capture exactly one state",
+    );
   }
 
   for (const selector of [
+    "intro-stepper-dot-1",
+    "intro-setup-step",
+    "intro-auto-start",
     "auto-setup-card",
     "No suitable set for this phone",
     "Try again",
-    "auto-setup-manual",
+    "intro-manual-switch",
+    "intro-manual-catalogue",
+    "intro-manual-llm",
     "settings-page-thinking",
     "thinking-add-model",
   ]) {
@@ -307,10 +410,7 @@ export function validateMaestroSuite(cwd = process.cwd()) {
     }
   }
 
-  for (const selector of [
-    "intro-banner",
-    "main-screen",
-  ]) {
+  for (const selector of ["intro-banner", "main-screen"]) {
     if (!screenReaderFlow.includes(selector)) {
       errors.push(`Screen-reader preparation is missing selector: ${selector}`);
     }
@@ -318,16 +418,15 @@ export function validateMaestroSuite(cwd = process.cwd()) {
 
   for (const selector of [
     "intro-banner",
+    "intro-banner-dismiss",
     "intro-flow-content",
     "intro-welcome-play",
-    "intro-stepper-dot-3",
-    "intro-stepper-dot-4",
-    "intro-stepper-dot-5",
-    "intro-stepper-dot-6",
-    "auto-setup-card",
-    "intro-done",
-    "intro-back",
-    "intro-close",
+    "intro-welcome-stop",
+    "intro-stepper-dot-1",
+    "intro-setup-step",
+    "intro-auto-start",
+    "intro-manual-switch",
+    "intro-manual-catalogue",
     "main-screen",
     "settings-page-overview",
     "settings-page-app",

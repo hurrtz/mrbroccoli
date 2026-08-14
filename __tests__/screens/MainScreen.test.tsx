@@ -15,6 +15,11 @@ import { createAutoSetupJob } from "../test-utils/autoSetupJobFixture";
 import { LocalizationProvider } from "../../src/i18n";
 import { ThemeProvider } from "../../src/theme/ThemeContext";
 
+let mockIntroSurfaceVisible = false;
+let mockSettingsSurfaceVisible = false;
+let mockIntroDismiss: (() => void) | null = null;
+let mockSettingsDismiss: (() => void) | null = null;
+
 jest.mock("../../src/context/PremiumEntitlementContext", () => ({
   usePremiumEntitlement: jest.fn(() => ({
     busy: false,
@@ -107,8 +112,19 @@ jest.mock("../../src/hooks/useKokoroModel", () => ({
   })),
 }));
 
+jest.mock("../../src/services/localModelManager", () => ({
+  ...jest.requireActual("../../src/services/localModelManager"),
+  getLocalModelInstallStatus: jest.fn(),
+}));
+
+jest.mock("../../src/services/localDeviceCapabilities", () => ({
+  ...jest.requireActual("../../src/services/localDeviceCapabilities"),
+  getLocalModelBenchmarkResults: jest.fn(),
+  probeLocalDeviceCapabilities: jest.fn(),
+}));
+
 jest.mock("../../src/hooks/useStorePromoPresentation", () => ({
-  useStorePromoPresentation: () => ({ loaded: true, scene: null }),
+  useStorePromoPresentation: jest.fn(() => ({ loaded: true, scene: null })),
 }));
 
 jest.mock("../../src/context/SettingsContext", () => ({
@@ -373,16 +389,24 @@ jest.mock("../../src/screens/main/TranscriptPreviewCard", () => ({
 
 jest.mock("../../src/features/settings/AntSettingsModal", () => ({
   AntSettingsModal: ({
+    autoSetup,
     visible,
     suspended,
+    onClose,
+    onDismiss,
     onOpenPremium,
   }: {
+    autoSetup: { state: string };
     visible: boolean;
     suspended?: boolean;
+    onClose: () => void;
+    onDismiss: () => void;
     onOpenPremium: () => void;
   }) => {
     const React = require("react");
     const { Text, TouchableOpacity, View } = require("react-native");
+    mockSettingsSurfaceVisible = visible && !suspended;
+    mockSettingsDismiss = onDismiss;
     return React.createElement(
       View,
       null,
@@ -391,35 +415,72 @@ jest.mock("../../src/features/settings/AntSettingsModal", () => ({
         null,
         visible && !suspended ? "settings:open" : "settings:closed",
       ),
+      React.createElement(Text, null, `settings:auto:${autoSetup.state}`),
       visible && !suspended
         ? React.createElement(
-            TouchableOpacity,
-            { onPress: onOpenPremium },
-            React.createElement(Text, null, "settings-upgrade-premium"),
+            React.Fragment,
+            null,
+            React.createElement(
+              TouchableOpacity,
+              { onPress: onOpenPremium },
+              React.createElement(Text, null, "settings-upgrade-premium"),
+            ),
+            React.createElement(
+              TouchableOpacity,
+              { onPress: onClose, testID: "stub-settings-close" },
+              React.createElement(Text, null, "settings-close"),
+            ),
           )
         : null,
+      React.createElement(
+        TouchableOpacity,
+        { onPress: onDismiss, testID: "stub-settings-dismiss" },
+        React.createElement(Text, null, "settings-dismiss"),
+      ),
     );
   },
 }));
 
 jest.mock("../../src/components/introFlow/IntroFlowScreen", () => ({
   IntroFlowScreen: ({
+    autoSetup,
+    thinkingReady,
     visible,
     onConnectProvider,
+    onDismiss,
+    onInstallLocal,
   }: {
+    autoSetup: { state: string };
+    thinkingReady: boolean;
     visible: boolean;
     onConnectProvider: () => void;
+    onDismiss: () => void;
+    onInstallLocal: () => void;
   }) => {
     const React = require("react");
     const { Pressable, Text } = require("react-native");
+    mockIntroSurfaceVisible = visible;
+    mockIntroDismiss = onDismiss;
     return React.createElement(
       React.Fragment,
       null,
       React.createElement(Text, null, visible ? "intro:open" : "intro:closed"),
+      React.createElement(Text, null, `intro:auto:${autoSetup.state}`),
+      React.createElement(Text, null, `intro:thinking-ready:${thinkingReady}`),
       React.createElement(
         Pressable,
         { testID: "stub-intro-connect-provider", onPress: onConnectProvider },
         React.createElement(Text, null, "connect"),
+      ),
+      React.createElement(
+        Pressable,
+        { testID: "stub-intro-install-local", onPress: onInstallLocal },
+        React.createElement(Text, null, "install-local"),
+      ),
+      React.createElement(
+        Pressable,
+        { testID: "stub-intro-dismiss", onPress: onDismiss },
+        React.createElement(Text, null, "intro-dismissed"),
       ),
     );
   },
@@ -504,6 +565,37 @@ const { useNativeSpeechRecognizer } = jest.requireMock(
 ) as {
   useNativeSpeechRecognizer: jest.Mock;
 };
+const { useStorePromoPresentation } = jest.requireMock(
+  "../../src/hooks/useStorePromoPresentation",
+) as {
+  useStorePromoPresentation: jest.Mock;
+};
+const { getLocalModelInstallStatus } = jest.requireMock(
+  "../../src/services/localModelManager",
+) as {
+  getLocalModelInstallStatus: jest.Mock;
+};
+const { getLocalModelBenchmarkResults, probeLocalDeviceCapabilities } =
+  jest.requireMock("../../src/services/localDeviceCapabilities") as {
+    getLocalModelBenchmarkResults: jest.Mock;
+    probeLocalDeviceCapabilities: jest.Mock;
+  };
+
+const localDeviceSnapshot = {
+  activeProcessorCount: 6,
+  architecture: "arm64",
+  capturedAt: "2026-08-14T12:00:00.000Z",
+  freeStorageBytes: 20_000_000_000,
+  lowPowerMode: false,
+  memoryLow: false,
+  osVersion: "26.5",
+  physicalMemoryBytes: 8_000_000_000,
+  platform: "ios" as const,
+  processorCount: 6,
+  thermalState: "nominal" as const,
+  totalStorageBytes: 128_000_000_000,
+  version: 1,
+};
 
 function createSharedSettingsValue(settingsOverrides: Partial<Settings> = {}) {
   return {
@@ -526,6 +618,10 @@ function createSharedSettingsValue(settingsOverrides: Partial<Settings> = {}) {
 
 describe("MainScreen", () => {
   beforeEach(() => {
+    mockIntroSurfaceVisible = false;
+    mockSettingsSurfaceVisible = false;
+    mockIntroDismiss = null;
+    mockSettingsDismiss = null;
     mockUseWindowDimensions.mockReturnValue({
       fontScale: 1,
       height: 932,
@@ -533,6 +629,7 @@ describe("MainScreen", () => {
       width: 430,
     });
     useSharedSettings.mockReturnValue(createSharedSettingsValue());
+    useStorePromoPresentation.mockReturnValue({ loaded: true, scene: null });
     usePremiumEntitlement.mockReturnValue({
       busy: false,
       clearError: jest.fn(),
@@ -564,6 +661,13 @@ describe("MainScreen", () => {
       refresh: jest.fn(async () => undefined),
       remove: jest.fn(async () => true),
     });
+    getLocalModelInstallStatus.mockResolvedValue({
+      installed: false,
+      path: null,
+      verified: false,
+    });
+    getLocalModelBenchmarkResults.mockResolvedValue({});
+    probeLocalDeviceCapabilities.mockResolvedValue(localDeviceSnapshot);
   });
 
   it("renders the shell with the route card", () => {
@@ -608,6 +712,241 @@ describe("MainScreen", () => {
     } finally {
       autoSetupSpy.mockRestore();
     }
+  });
+
+  it("projects onboarding setup only into Intro and suspends the live job", () => {
+    const liveJob = createAutoSetupJob({ state: "offer" });
+    const autoSetupSpy = jest
+      .spyOn(autoSetupJobModule, "useAutoSetupJob")
+      .mockReturnValue(liveJob);
+    useStorePromoPresentation.mockReturnValue({
+      loaded: true,
+      orb: null,
+      scene: "onboarding",
+    });
+    usePremiumEntitlement.mockReturnValue({
+      busy: false,
+      clearError: jest.fn(),
+      displayPrice: null,
+      error: null,
+      isPremium: false,
+      purchasePremium: jest.fn(async () => undefined),
+      refreshPremium: jest.fn(async () => undefined),
+      restorePremium: jest.fn(async () => undefined),
+      status: "free",
+      storeConnected: true,
+      storeProduct: null,
+      storeProductLoading: false,
+    });
+
+    try {
+      const screen = renderWithProviders(<MainScreen />);
+
+      expect(autoSetupSpy).toHaveBeenCalledWith(
+        expect.objectContaining({ suspended: true }),
+      );
+      expect(screen.getByTestId("intro-banner")).toBeTruthy();
+      expect(screen.getByText("intro:auto:proposal")).toBeTruthy();
+      expect(screen.getByText("intro:thinking-ready:false")).toBeTruthy();
+      expect(screen.getByText("settings:auto:offer")).toBeTruthy();
+      expect(screen.queryByTestId("background-task-bar")).toBeNull();
+      expect(getLocalModelInstallStatus).not.toHaveBeenCalled();
+      expect(probeLocalDeviceCapabilities).not.toHaveBeenCalled();
+    } finally {
+      autoSetupSpy.mockRestore();
+    }
+  });
+
+  it("suspends live setup and Premium local probes in the Free promo scene", () => {
+    const autoSetupSpy = jest
+      .spyOn(autoSetupJobModule, "useAutoSetupJob")
+      .mockReturnValue(createAutoSetupJob({ state: "offer" }));
+    useStorePromoPresentation.mockReturnValue({
+      loaded: true,
+      orb: null,
+      scene: "free",
+    });
+    usePremiumEntitlement.mockReturnValue({
+      busy: false,
+      clearError: jest.fn(),
+      displayPrice: null,
+      error: null,
+      isPremium: false,
+      purchasePremium: jest.fn(async () => undefined),
+      refreshPremium: jest.fn(async () => undefined),
+      restorePremium: jest.fn(async () => undefined),
+      status: "free",
+      storeConnected: true,
+      storeProduct: null,
+      storeProductLoading: false,
+    });
+
+    try {
+      const screen = renderWithProviders(<MainScreen />);
+
+      expect(autoSetupSpy).toHaveBeenCalledWith(
+        expect.objectContaining({ suspended: true }),
+      );
+      expect(screen.getByText("intro:thinking-ready:true")).toBeTruthy();
+      expect(getLocalModelInstallStatus).not.toHaveBeenCalled();
+      expect(probeLocalDeviceCapabilities).not.toHaveBeenCalled();
+    } finally {
+      autoSetupSpy.mockRestore();
+    }
+  });
+
+  it("suspends fixture-sensitive work until store-promo identity resolves", () => {
+    const autoSetupSpy = jest
+      .spyOn(autoSetupJobModule, "useAutoSetupJob")
+      .mockReturnValue(createAutoSetupJob({ state: "offer" }));
+    useStorePromoPresentation.mockReturnValue({ loaded: false, scene: null });
+
+    try {
+      renderWithProviders(<MainScreen />);
+
+      expect(autoSetupSpy).toHaveBeenCalledWith(
+        expect.objectContaining({ suspended: true }),
+      );
+      expect(useProviderVoiceDirectory).toHaveBeenCalledWith(
+        expect.objectContaining({ enabled: false, provider: "xai" }),
+      );
+    } finally {
+      autoSetupSpy.mockRestore();
+    }
+  });
+
+  it("keeps first-run Try blocked while entitlement is still loading", () => {
+    usePremiumEntitlement.mockReturnValue({
+      busy: false,
+      clearError: jest.fn(),
+      displayPrice: null,
+      error: null,
+      isPremium: false,
+      purchasePremium: jest.fn(async () => undefined),
+      refreshPremium: jest.fn(async () => undefined),
+      restorePremium: jest.fn(async () => undefined),
+      status: "loading",
+      storeConnected: false,
+      storeProduct: null,
+      storeProductLoading: true,
+    });
+
+    const screen = renderWithProviders(<MainScreen />);
+
+    expect(screen.getByText("intro:thinking-ready:false")).toBeTruthy();
+  });
+
+  it("requires a configured local reasoning model to exist on this device", async () => {
+    useSharedSettings.mockReturnValue(
+      createSharedSettingsValue({
+        activeResponseMode: "mode-1",
+        responseModes: [
+          {
+            id: "mode-1",
+            route: {
+              localModelId: "qwen3-0.6b-q8",
+              model: "Qwen3 0.6B",
+              provider: "openai",
+              runtime: "local",
+            },
+          },
+        ],
+      }),
+    );
+    const screen = renderWithProviders(<MainScreen />);
+
+    await waitFor(() => {
+      expect(getLocalModelInstallStatus).toHaveBeenCalledWith("qwen3-0.6b-q8");
+    });
+    expect(screen.getByText("intro:thinking-ready:false")).toBeTruthy();
+
+    getLocalModelInstallStatus.mockResolvedValue({
+      installed: true,
+      path: "/models/qwen.gguf",
+      verified: true,
+    });
+    getLocalModelBenchmarkResults.mockResolvedValue({
+      "qwen3-0.6b-q8": {
+        catalogVersion: 3,
+        device: {
+          architecture: localDeviceSnapshot.architecture,
+          osVersion: localDeviceSnapshot.osVersion,
+          physicalMemoryBytes: localDeviceSnapshot.physicalMemoryBytes,
+          platform: localDeviceSnapshot.platform,
+        },
+        durationMs: 1_000,
+        loadMs: 500,
+        modelId: "qwen3-0.6b-q8",
+        status: "viable",
+        testedAt: "2026-08-14T12:00:00.000Z",
+        tokensPerSecond: 12,
+      },
+    });
+    useSharedSettings.mockReturnValue(
+      createSharedSettingsValue({
+        activeResponseMode: "mode-1",
+        responseModes: [
+          {
+            id: "mode-1",
+            route: {
+              localModelId: "qwen3-0.6b-q8",
+              model: "Qwen3 0.6B",
+              provider: "openai",
+              runtime: "local",
+            },
+          },
+        ],
+      }),
+    );
+    screen.rerender(
+      <ThemeProvider mode="light">
+        <LocalizationProvider language="en">
+          <MainScreen />
+        </LocalizationProvider>
+      </ThemeProvider>,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText("intro:thinking-ready:true")).toBeTruthy();
+    });
+  });
+
+  it("does not let a ready backup route unlock an unavailable active local route", async () => {
+    useSharedSettings.mockReturnValue(
+      createSharedSettingsValue({
+        activeResponseMode: "mode-1",
+        apiKeys: {
+          ...DEFAULT_SETTINGS.apiKeys,
+          openai: "test-key",
+        },
+        responseModes: [
+          {
+            id: "mode-1",
+            route: {
+              localModelId: "qwen3-0.6b-q8",
+              model: "Qwen3 0.6B",
+              provider: "openai",
+              runtime: "local",
+            },
+          },
+          {
+            id: "mode-2",
+            route: {
+              model: getDefaultModelForProvider("openai"),
+              provider: "openai",
+              runtime: "provider",
+            },
+          },
+        ],
+      }),
+    );
+
+    const screen = renderWithProviders(<MainScreen />);
+
+    await waitFor(() => {
+      expect(getLocalModelInstallStatus).toHaveBeenCalledWith("qwen3-0.6b-q8");
+    });
+    expect(screen.getByText("intro:thinking-ready:false")).toBeTruthy();
   });
 
   it("uses the effective profile language for local response generation", () => {
@@ -823,6 +1162,21 @@ describe("MainScreen", () => {
     expect(screen.getByText("drawer:open")).toBeTruthy();
   });
 
+  it("exposes the exact hydrated locale marker used by store captures", () => {
+    const screen = renderWithProviders(<MainScreen />, { language: "en" });
+
+    expect(screen.getByTestId("app-locale-en")).toBeTruthy();
+    screen.rerender(
+      <ThemeProvider mode="light">
+        <LocalizationProvider language="ar">
+          <MainScreen />
+        </LocalizationProvider>
+      </ThemeProvider>,
+    );
+    expect(screen.getByTestId("app-locale-ar")).toBeTruthy();
+    expect(screen.queryByTestId("app-locale-en")).toBeNull();
+  });
+
   it("does not duplicate conversation settings inside the transcript sheet", () => {
     const screen = renderWithProviders(<MainScreen />);
 
@@ -850,20 +1204,44 @@ describe("MainScreen", () => {
     expect(screen.getByText("settings:open")).toBeTruthy();
   });
 
-  it("returns to Settings after presenting the Premium purchase", () => {
+  it("returns to Settings after presenting the Premium purchase", async () => {
     const screen = renderWithProviders(<MainScreen />);
+    const getPremiumModal = () =>
+      screen
+        .UNSAFE_getAllByType(RNModal)
+        .find(
+          (modal) =>
+            modal.findAllByProps({ testID: "premium-upgrade-scroll" }).length >
+            0,
+        );
 
     fireEvent.press(screen.getByText("open-settings"));
-    fireEvent.press(screen.getByText("settings-upgrade-premium"));
+    await act(async () => {
+      fireEvent.press(screen.getByText("settings-upgrade-premium"));
+      await Promise.resolve();
+    });
 
-    expect(screen.getByText("settings:closed")).toBeTruthy();
-    expect(screen.getByText("Unlock Premium")).toBeTruthy();
+    await waitFor(() => {
+      expect(mockSettingsSurfaceVisible).toBe(false);
+    });
+    expect(getPremiumModal()?.props.visible).not.toBe(true);
+    act(() => {
+      mockSettingsDismiss?.();
+    });
+    await waitFor(() => {
+      expect(getPremiumModal()?.props.visible).toBe(true);
+    });
 
     fireEvent.press(screen.getByText("Done"));
-    expect(screen.getByText("settings:open")).toBeTruthy();
+    act(() => {
+      getPremiumModal()?.props.onDismiss();
+    });
+    await waitFor(() => {
+      expect(screen.getByText("settings:open")).toBeTruthy();
+    });
   });
 
-  it("opens the purchase sheet over the introduction without closing it", () => {
+  it("serializes the introduction and purchase modals, then resumes Intro", async () => {
     // Provider keys are Premium, so the provider route leads to the purchase.
     // Backing out of that purchase has to leave the reader where they were,
     // rather than costing them the introduction they were part-way through.
@@ -888,11 +1266,150 @@ describe("MainScreen", () => {
 
     fireEvent.press(screen.getByTestId("stub-intro-connect-provider"));
 
-    expect(screen.getByText("Unlock Premium")).toBeTruthy();
-    expect(screen.getByText("intro:open")).toBeTruthy();
+    expect(screen.queryByText("Unlock Premium")).toBeNull();
+    await waitFor(() => {
+      expect(screen.getByText("intro:closed")).toBeTruthy();
+    });
+    act(() => {
+      mockIntroDismiss?.();
+    });
+    await waitFor(() => {
+      expect(screen.getByText("Unlock Premium")).toBeTruthy();
+    });
+    expect(screen.getByText("intro:closed")).toBeTruthy();
 
     fireEvent.press(screen.getByText("Done"));
-    expect(screen.getByText("intro:open")).toBeTruthy();
+    const premiumModal = screen
+      .UNSAFE_getAllByType(RNModal)
+      .find(
+        (modal) =>
+          modal.findAllByProps({ testID: "premium-upgrade-scroll" }).length > 0,
+      );
+    act(() => {
+      premiumModal?.props.onDismiss();
+    });
+    await waitFor(() => {
+      expect(screen.getByText("intro:open")).toBeTruthy();
+    });
+  });
+
+  it("does not reopen Intro after purchasing through Intro and Settings", async () => {
+    const updateSettings = jest.fn();
+    const freeEntitlement = {
+      busy: false,
+      clearError: jest.fn(),
+      displayPrice: null,
+      error: null,
+      isPremium: false,
+      purchasePremium: jest.fn(async () => undefined),
+      refreshPremium: jest.fn(async () => undefined),
+      restorePremium: jest.fn(async () => undefined),
+      status: "free",
+      storeConnected: true,
+      storeProduct: null,
+      storeProductLoading: false,
+    } as const;
+    usePremiumEntitlement.mockReturnValue(freeEntitlement);
+    useSharedSettings.mockReturnValue({
+      ...createSharedSettingsValue(),
+      updateSettings,
+    });
+    const screen = renderWithProviders(<MainScreen />);
+
+    fireEvent.press(screen.getByTestId("intro-banner"));
+    fireEvent.press(screen.getByTestId("stub-intro-install-local"));
+    await waitFor(() => {
+      expect(screen.getByText("intro:closed")).toBeTruthy();
+    });
+    act(() => {
+      mockIntroDismiss?.();
+    });
+    await waitFor(() => {
+      expect(screen.getByText("settings:open")).toBeTruthy();
+    });
+    fireEvent.press(screen.getByText("settings-upgrade-premium"));
+    await waitFor(() => {
+      expect(screen.getByText("settings:closed")).toBeTruthy();
+    });
+    act(() => {
+      mockSettingsDismiss?.();
+    });
+    await waitFor(() => {
+      expect(screen.getByText("Unlock Premium")).toBeTruthy();
+    });
+
+    usePremiumEntitlement.mockReturnValue({
+      ...freeEntitlement,
+      isPremium: true,
+      status: "premium",
+    });
+    screen.rerender(
+      <ThemeProvider mode="light">
+        <LocalizationProvider language="en">
+          <MainScreen />
+        </LocalizationProvider>
+      </ThemeProvider>,
+    );
+
+    await waitFor(() => {
+      expect(updateSettings).toHaveBeenCalledWith({ introDismissed: true });
+    });
+    const premiumModal = screen
+      .UNSAFE_getAllByType(RNModal)
+      .find(
+        (modal) =>
+          modal.findAllByProps({ testID: "premium-upgrade-scroll" }).length > 0,
+      );
+    act(() => {
+      premiumModal?.props.onDismiss();
+    });
+    await waitFor(() => {
+      expect(screen.getByText("settings:open")).toBeTruthy();
+    });
+
+    fireEvent.press(screen.getByTestId("stub-settings-close"));
+    await waitFor(() => {
+      expect(screen.getByText("settings:closed")).toBeTruthy();
+    });
+    fireEvent.press(screen.getByTestId("stub-settings-dismiss"));
+    await waitFor(() => {
+      expect(screen.getByText("intro:closed")).toBeTruthy();
+    });
+  });
+
+  it("waits for Intro dismissal before Settings and resumes the same visit", async () => {
+    const screen = renderWithProviders(<MainScreen />);
+
+    fireEvent.press(screen.getByTestId("intro-banner"));
+    await act(async () => {
+      fireEvent.press(screen.getByTestId("stub-intro-install-local"));
+      await Promise.resolve();
+    });
+
+    await waitFor(() => {
+      expect(mockIntroSurfaceVisible).toBe(false);
+      expect(mockSettingsSurfaceVisible).toBe(false);
+    });
+
+    act(() => {
+      mockIntroDismiss?.();
+    });
+    await waitFor(() => {
+      expect(screen.getByText("settings:open")).toBeTruthy();
+    });
+
+    await act(async () => {
+      fireEvent.press(screen.getByTestId("stub-settings-close"));
+      await Promise.resolve();
+    });
+    expect(mockSettingsSurfaceVisible).toBe(false);
+    expect(mockIntroSurfaceVisible).toBe(false);
+    act(() => {
+      mockSettingsDismiss?.();
+    });
+    await waitFor(() => {
+      expect(mockIntroSurfaceVisible).toBe(true);
+    });
   });
 
   it("does not treat entitlement resolving at launch as a purchase", () => {
@@ -1064,9 +1581,7 @@ describe("MainScreen", () => {
     expect(leftPane.queryByText("toggle-debug-log")).toBeNull();
     expect(screen.queryByTestId("landscape-status-area")).toBeNull();
     // Landscape keeps the settings control, floated over the stage as an icon.
-    expect(
-      leftPane.getByTestId("conversation-settings-summary"),
-    ).toBeTruthy();
+    expect(leftPane.getByTestId("conversation-settings-summary")).toBeTruthy();
     expect(leftPane.queryByTestId("satellite-image")).toBeNull();
     expect(
       StyleSheet.flatten(

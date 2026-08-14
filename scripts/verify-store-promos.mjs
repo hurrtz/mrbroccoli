@@ -16,9 +16,62 @@ import {
 } from "./store-promo-config.mjs";
 
 export function readStorePromoScreenshotNames(flowText) {
-  return [...flowText.matchAll(/^\s+path:\s+([^\s]+)\s*$/gm)].map(
-    ([, name]) => name,
+  return [
+    ...flowText.matchAll(
+      /^\s*-\s+takeScreenshot:\s*\n\s+path:\s+([^\s]+)\s*$/gm,
+    ),
+  ].map(([, name]) => name);
+}
+
+function readTopLevelActions(flowText) {
+  return flowText
+    .split(/\r?\n/)
+    .map((line) => line.trimEnd())
+    .filter((line) => line.startsWith("- "));
+}
+
+export function findStorePromoDrawerBoundaryErrors(platform, flowTexts) {
+  const flow = flowTexts.find(
+    (source) =>
+      source.includes("conversation-drawer-close") &&
+      source.includes("main-settings-button"),
   );
+  if (!flow) {
+    return [
+      `${platform} store-promo flow is missing the drawer-to-Settings path`,
+    ];
+  }
+
+  const serializedBoundary =
+    /^- tapOn:\r?\n {4}id: conversation-drawer-close\r?\n- waitForAnimationToEnd\r?\n- assertNotVisible:\r?\n {4}id: conversation-drawer-close\r?\n- tapOn:\r?\n {4}id: main-settings-button$/m;
+  return serializedBoundary.test(flow)
+    ? []
+    : [
+        `${platform} store-promo flow must wait for the conversation drawer to dismiss before opening Settings`,
+      ];
+}
+
+export function findStorePromoSceneBoundaryErrors(platform, flowTexts) {
+  if (platform === "android") {
+    return flowTexts.slice(0, -1).flatMap((flow, index) => {
+      const actions = readTopLevelActions(flow);
+      return actions.at(-1) === "- stopApp"
+        ? []
+        : [`android store-promo flow ${index + 1} must stop before reseeding`];
+    });
+  }
+
+  const actions = readTopLevelActions(flowTexts.join("\n"));
+  const sceneSeeds = actions
+    .map((action, index) => (action.startsWith("- openLink:") ? index : -1))
+    .filter((index) => index >= 0);
+  return sceneSeeds
+    .slice(1)
+    .flatMap((seedIndex, index) =>
+      actions[seedIndex - 1] === "- stopApp"
+        ? []
+        : [`ios store-promo scene ${index + 2} must stop before reseeding`],
+    );
 }
 
 export function validateStorePromoSetup(cwd = process.cwd()) {
@@ -28,9 +81,10 @@ export function validateStorePromoSetup(cwd = process.cwd()) {
       flows.map((flow) => [platform, path.join(cwd, flow)]),
   );
   const routePath = path.join(cwd, "app/store-promos.tsx");
-  const fixturePath = path.join(
+  const fixturePath = path.join(cwd, "src/services/storePromoFixtures.ts");
+  const presentationPath = path.join(
     cwd,
-    "src/services/storePromoFixtures.ts",
+    "src/services/storePromoPresentation.ts",
   );
   const runnerPath = path.join(cwd, "scripts/run-store-promos.mjs");
 
@@ -38,6 +92,7 @@ export function validateStorePromoSetup(cwd = process.cwd()) {
     ...flowPaths.map(([, flowPath]) => flowPath),
     routePath,
     fixturePath,
+    presentationPath,
     runnerPath,
   ]) {
     if (!fs.existsSync(filePath)) {
@@ -50,6 +105,7 @@ export function validateStorePromoSetup(cwd = process.cwd()) {
 
   const route = fs.readFileSync(routePath, "utf8");
   const fixture = fs.readFileSync(fixturePath, "utf8");
+  const presentation = fs.readFileSync(presentationPath, "utf8");
   const runner = fs.readFileSync(runnerPath, "utf8");
   const languages = readAppLanguages(cwd);
   const screenshotNames = {};
@@ -61,6 +117,21 @@ export function validateStorePromoSetup(cwd = process.cwd()) {
       readStorePromoScreenshotNames(flow),
     );
     const combinedFlow = platformFlows.join("\n");
+    errors.push(...findStorePromoSceneBoundaryErrors(platform, platformFlows));
+    errors.push(...findStorePromoDrawerBoundaryErrors(platform, platformFlows));
+    const expectedScenes = STORE_PROMO_ANDROID_FLOW_SCENES;
+    const sceneReadiness = [
+      ...combinedFlow.matchAll(
+        /store-promo-fixture-ready-(premium|free|onboarding)/g,
+      ),
+    ];
+    const actualScenes = sceneReadiness.map((match) => match[1]);
+    const localeMarkers = [
+      ...combinedFlow.matchAll(/id:\s*\^app-locale-\$\{LOCALE\}\$/g),
+    ];
+    const clearStateOffsets = [
+      ...combinedFlow.matchAll(/clearState:\s*true/g),
+    ].map((match) => match.index);
     for (const selector of findRetiredMaestroSelectors(combinedFlow)) {
       errors.push(
         `${platform} store screenshot flow references retired selector: ${selector}`,
@@ -68,8 +139,7 @@ export function validateStorePromoSetup(cwd = process.cwd()) {
     }
     screenshotNames[platform] = platformScreenshotNames;
     if (
-      platformScreenshotNames.length !==
-      STORE_PROMO_SCREENSHOT_COUNTS[platform]
+      platformScreenshotNames.length !== STORE_PROMO_SCREENSHOT_COUNTS[platform]
     ) {
       errors.push(
         `Expected ${STORE_PROMO_SCREENSHOT_COUNTS[platform]} ${platform} store screenshots, found ${platformScreenshotNames.length}`,
@@ -83,12 +153,58 @@ export function validateStorePromoSetup(cwd = process.cwd()) {
         `${platform} store screenshot names or ordering differ from the contract`,
       );
     }
+    if (JSON.stringify(actualScenes) !== JSON.stringify(expectedScenes)) {
+      errors.push(
+        `${platform} store screenshot fixtures must load premium, free, onboarding, premium in order`,
+      );
+    }
+    const allowedInitialClearState =
+      platform === "ios" &&
+      clearStateOffsets.length === 1 &&
+      clearStateOffsets[0] < (sceneReadiness[0]?.index ?? 0);
+    if (
+      (platform === "ios" && !allowedInitialClearState) ||
+      (platform === "android" && clearStateOffsets.length > 0)
+    ) {
+      errors.push(
+        `${platform} store screenshot flows must not clear the seeded locale between scenes`,
+      );
+    }
+    if (localeMarkers.length !== expectedScenes.length) {
+      errors.push(
+        `${platform} store screenshot flow must prove the requested locale after all ${expectedScenes.length} scene relaunches`,
+      );
+    } else if (sceneReadiness.length === expectedScenes.length) {
+      sceneReadiness.forEach((ready, index) => {
+        const marker = localeMarkers[index];
+        const nextReady = sceneReadiness[index + 1];
+        const nextReadyOffset = nextReady?.index ?? combinedFlow.length;
+        const firstCapture = combinedFlow.indexOf(
+          "takeScreenshot:",
+          ready.index,
+        );
+        if (
+          marker.index <= ready.index ||
+          marker.index >= nextReadyOffset ||
+          firstCapture < 0 ||
+          firstCapture >= nextReadyOffset ||
+          marker.index >= firstCapture
+        ) {
+          errors.push(
+            `${platform} store screenshot scene ${index + 1} does not prove its locale before capture`,
+          );
+        }
+      });
+    }
     for (const selector of [
       "voice-stage-thinking",
       "voice-stage-idle",
-      "free-edition-status",
-      "intro-stepper-dot-2",
+      "intro-banner",
+      "intro-stepper-dot-1",
+      "intro-setup-step",
       "auto-setup-card",
+      "auto-setup-proposal",
+      "store-promo-fixture-ready-onboarding",
       "transcript-handle",
       "conversation-drawer-item-promo-branch",
       "settings-page-thinking",
@@ -111,11 +227,13 @@ export function validateStorePromoSetup(cwd = process.cwd()) {
         !combinedFlow.includes("uber-audit-toggle-promo-assistant-2") ||
         !combinedFlow.includes("settings-page-speaking"))
     ) {
-      errors.push("iOS store screenshot flow is missing its Premium-only surfaces");
-    }
-    if (platform === "ios" && !combinedFlow.includes("intro-close")) {
       errors.push(
-        "iOS store screenshot flow does not close onboarding before reseeding fixtures",
+        "iOS store screenshot flow is missing its Premium-only surfaces",
+      );
+    }
+    if (combinedFlow.includes("intro-close")) {
+      errors.push(
+        `${platform} store screenshot flow must reseed directly instead of closing onboarding`,
       );
     }
     if (
@@ -127,9 +245,9 @@ export function validateStorePromoSetup(cwd = process.cwd()) {
         "iOS store screenshot flow must open the transcript before using message actions",
       );
     }
-    if (!combinedFlow.includes("store-promo-fixture-ready")) {
+    if (!/id:\s*\^app-settings-page-\$\{LOCALE\}\$/.test(combinedFlow)) {
       errors.push(
-        `${platform} store screenshot flow does not wait for fixture persistence`,
+        `${platform} automatic-setup capture does not prove its localized Settings page`,
       );
     }
   }
@@ -145,8 +263,18 @@ export function validateStorePromoSetup(cwd = process.cwd()) {
   if (!fixture.includes("Record<AppLanguage, StorePromoCopy>")) {
     errors.push("Store screenshot fixture copy is not exhaustive by locale");
   }
-  if (!runner.includes("artifacts\", \"store-promos\", platform")) {
-    errors.push("Store screenshot runner does not use platform-specific output");
+  if (
+    !presentation.includes("applyStorePromoAutoSetupJob") ||
+    !presentation.includes('scene !== "onboarding"')
+  ) {
+    errors.push(
+      "Store screenshot presentation does not own a guarded onboarding proposal",
+    );
+  }
+  if (!runner.includes('artifacts", "store-promos", platform')) {
+    errors.push(
+      "Store screenshot runner does not use platform-specific output",
+    );
   }
   if (
     !runner.includes('"android.intent.action.VIEW"') ||
@@ -160,9 +288,11 @@ export function validateStorePromoSetup(cwd = process.cwd()) {
     STORE_PROMO_ANDROID_FLOW_SCENES.length !==
       STORE_PROMO_FLOWS.android.length ||
     JSON.stringify(STORE_PROMO_ANDROID_FLOW_SCENES) !==
-      JSON.stringify(["premium", "free", "premium"])
+      JSON.stringify(["premium", "free", "onboarding", "premium"])
   ) {
-    errors.push("Android store screenshot flows do not have deterministic scenes");
+    errors.push(
+      "Android store screenshot flows do not have deterministic scenes",
+    );
   }
   if (!Object.hasOwn(STORE_PROMO_IOS_DISPLAYS, "6.8")) {
     errors.push("Store screenshot display matrix is missing 6.8");

@@ -12,9 +12,11 @@ import { fonts } from "../theme/typography";
 export function PremiumUpgradeModal({
   visible,
   onClose,
+  onDismiss,
 }: {
   visible: boolean;
   onClose: () => void;
+  onDismiss?: () => void;
 }) {
   const { colors } = useTheme();
   const { t } = useLocalization();
@@ -66,6 +68,7 @@ export function PremiumUpgradeModal({
     <Modal
       visible={visible}
       onClose={onClose}
+      onDismiss={onDismiss}
       layout="sheet"
       maskClosable={!premium.busy}
       title={t("upgradeToPremium")}

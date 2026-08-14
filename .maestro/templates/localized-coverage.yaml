@@ -245,6 +245,9 @@ tags:
     id: settings-back-button
 - tapOn:
     id: settings-close-button
+- waitForAnimationToEnd
+- assertNotVisible:
+    id: settings-modal-title
 
 # Home, drawer, per-conversation controls, and landscape split layout.
 - assertVisible:
@@ -258,6 +261,9 @@ tags:
 - takeScreenshot:
     path: ${PLATFORM}/locales/${LOCALE}/conversation-drawer
 - tapOn:
+    id: conversation-drawer-close
+- waitForAnimationToEnd
+- assertNotVisible:
     id: conversation-drawer-close
 - setOrientation: LANDSCAPE_LEFT
 - assertVisible:

@@ -82,22 +82,24 @@ export function ArchiveSettingsSheet({
 }) {
   const { t } = useLocalization();
   const { colors } = useTheme();
-  const pendingOpenArchivedRef = React.useRef(false);
+  const pendingActionRef = React.useRef<"archived" | "premium" | null>(null);
   const archiveBusy =
     !conversationArchive.loaded || conversationArchive.syncing;
   const archiveError = conversationArchive.error
     ? t(getArchiveErrorKey(conversationArchive.error))
     : null;
   const handleDismiss = React.useCallback(() => {
-    if (!pendingOpenArchivedRef.current) {
-      return;
+    const pendingAction = pendingActionRef.current;
+    pendingActionRef.current = null;
+    if (pendingAction === "archived") {
+      onOpenArchivedConversations();
+    } else if (pendingAction === "premium") {
+      onOpenPremium();
     }
-    pendingOpenArchivedRef.current = false;
-    onOpenArchivedConversations();
-  }, [onOpenArchivedConversations]);
+  }, [onOpenArchivedConversations, onOpenPremium]);
 
   React.useEffect(() => {
-    if (visible || !pendingOpenArchivedRef.current) {
+    if (visible || !pendingActionRef.current) {
       return;
     }
     const timer = setTimeout(handleDismiss, 350);
@@ -120,7 +122,7 @@ export function ArchiveSettingsSheet({
           last
           value={String(archivedConversationCount)}
           onPress={() => {
-            pendingOpenArchivedRef.current = true;
+            pendingActionRef.current = "archived";
             onClose();
           }}
         />
@@ -195,8 +197,12 @@ export function ArchiveSettingsSheet({
             icon="lock"
             label={t("conversationArchive")}
             last
+            testID="unlock-conversation-archive"
             value={t("premium")}
-            onPress={onOpenPremium}
+            onPress={() => {
+              pendingActionRef.current = "premium";
+              onClose();
+            }}
           />
         )}
       </SettingsGroup>

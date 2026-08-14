@@ -1,0 +1,34 @@
+appId: ${APP_ID}
+name: Google Play deterministic onboarding recommendation screenshot
+tags:
+  - store-promos
+  - android
+---
+# The runner opens the identity-guarded onboarding fixture using a
+# package-targeted Android intent after the Free conversation flow stops.
+- assertVisible:
+    id: store-promo-fixture-ready-onboarding
+- stopApp
+- launchApp
+- setOrientation: PORTRAIT
+- assertVisible:
+    id: main-screen
+- assertVisible:
+    id: ^app-locale-${LOCALE}$
+- assertVisible:
+    id: intro-banner
+- tapOn:
+    id: intro-banner
+- assertVisible:
+    id: intro-flow-content
+- tapOn:
+    id: intro-stepper-dot-1
+- assertVisible:
+    id: intro-setup-step
+- assertVisible:
+    id: auto-setup-card
+- assertVisible:
+    id: auto-setup-proposal
+- takeScreenshot:
+    path: 03-free-onboarding
+- stopApp

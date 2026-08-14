@@ -23,6 +23,7 @@ export function getIntroTheme(colors: Colors, isDark: boolean) {
     text: colors.text,
     textSecondary: colors.textSecondary,
     textMuted: colors.textMuted,
+    danger: colors.danger,
 
     accent: colors.accent,
     accentSoft: colors.accentSoft,
@@ -46,7 +47,9 @@ export function getIntroTheme(colors: Colors, isDark: boolean) {
     onSand: isDark ? "#17140E" : "#FFFFFF",
 
     muted: colors.textMuted,
-    mutedSoft: isDark ? "rgba(139, 151, 168, 0.14)" : "rgba(93, 107, 122, 0.10)",
+    mutedSoft: isDark
+      ? "rgba(139, 151, 168, 0.14)"
+      : "rgba(93, 107, 122, 0.10)",
 
     premium: colors.premium,
     premiumSoft: colors.premiumSoft,

@@ -98,6 +98,14 @@ owned playback and clears replay state. Exit and unmount abort platform file
 recognition, serialize recorder teardown, and delete both active and late
 capture URIs; player cancellation is reset before each new test and replay.
 
+First-run reachability is based on the exact active response mode that the test
+snapshot will execute. Provider routes must be credential-ready; local routes
+must have a verified artifact and a viable benchmark matching the current
+device. Availability of another response mode cannot unlock Try for an
+unavailable active route. Losing that readiness deactivates the test controller,
+which aborts capture, generation, and owned playback before the pager returns a
+first run to Setup.
+
 `usePlaybackReel` records every audio or native-speech unit with its paragraph
 marker. Pipeline completion seals the reel, and only a later natural drain may
 publish a full reading arc. This separates final completion from a temporary
@@ -146,6 +154,12 @@ is selected: its nested archive sheet dismisses before invoking the
 Settings-to-drawer action, then Settings dismisses before the drawer opens with
 Archived initially expanded. Each stage consumes its pending callback once, so
 an iOS dismissal and the Android fallback cannot open the destination twice.
+Intro, Settings, and Premium use that same dismissal queue. The workspace stays
+focus-isolated behind a transition cover while a destination is pending;
+Settings closes any nested catalogue or archive sheet before its own dismissal,
+and only then presents Premium, the drawer, or the returning Intro visit. A
+cancelled purchase restores the originating Settings page or the same Intro
+Setup visit, while a completed purchase clears the whole Intro return chain.
 
 `ChatTranscript` owns one expanded message ID. A conversation-key change clears
 it so restored history opens folded; appending a new message to the same
@@ -169,6 +183,17 @@ The isolated `.maestro` screenshot identity may replace the visual phase and
 both ring fractions with validated deterministic values. That override enters
 at the presentation boundary after the live hook still runs, never mutates the
 pipeline, and is unavailable to production and development identities.
+
+Its dedicated onboarding scene follows a narrower boundary. The ordinary
+automatic-setup hook remains mounted but suspended, and a proposal selected
+from the checked-in device snapshot is passed only to Intro. Settings and the
+home task row continue to receive the same suspended job. The projected Free
+controller remains setup-incomplete, so the fixture can show the recommendation
+without unlocking Try or applying a route. Store-promo identity loading and all
+active scenes also suspend automatic setup and provider voice-directory work;
+onboarding suppresses Intro's live catalogue install and benchmark readers.
+The fixture therefore cannot scan hardware or files, start model work, or call
+a provider while producing its deterministic recommendation.
 
 The workspace owns the status label for the active input surface. The pager
 opens on voice and only a deliberate 44pt chevron press or horizontal gesture

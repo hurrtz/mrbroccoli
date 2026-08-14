@@ -251,9 +251,15 @@ test when it could contain user or provider data.
 `premiumEntitlement.ts` caches only an exact verified non-consumable ownership
 record. `developmentEntitlement.ts` permits simulation only under `.dev` and
 `.maestro` runtime identities. Store-promo fixtures are deterministic,
-localized, network-free, and independently restricted to `.maestro`. Their
+localized, network-free, and independently restricted to the exact
+`com.tobiaswinkler.app.mrbroccoli.maestro` identity. Their
 optional voice-orb presentation state is validated and stored separately from
 runtime voice state; production phase and progress remain pipeline-derived.
+The dedicated onboarding scene seeds an incomplete Free first run and derives
+its proposal from the fixed promotional device snapshot through the production
+offline-profile selector. Its controls are no-ops, and the live automatic-setup
+job is suspended, so the capture performs no device scan, model operation, or
+provider request.
 
 ## Failure Rules
 

@@ -1,6 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 
+import { introTranslations } from "../../src/i18n/introTranslations";
 import { translations } from "../../src/i18n/translations";
 import { getLocaleForLanguage, translate } from "../../src/i18n";
 import {
@@ -11,6 +12,70 @@ import {
   getLocalizedResource,
   isAppLanguage,
 } from "../../src/i18n/localeRegistry";
+
+const RETIRED_INTRO_KEYS = [
+  "introBannerSettingVisibleDescription",
+  "introBannerSettingHiddenDescription",
+  "introChooseModel",
+  "introWhatTitle",
+  "introWhatBody",
+  "introHowTitle",
+  "introHowProvider",
+  "introHowLocal",
+  "introHowSystem",
+  "introHearTitle",
+  "introHearBody",
+  "introHearPlay",
+  "introHearTranscript",
+  "introHearDisclaimer",
+  "introHearUnavailable",
+  "introStartTitle",
+  "introStartProvider",
+  "introStartProviderHint",
+  "introStartLocal",
+  "introStartLocalHint",
+  "introStartLater",
+  "introFinish",
+  "introOpenSpeaking",
+  "introWelcomePlay",
+  "introWelcomePlaying",
+  "introWelcomeBody",
+  "introNeedsTitle",
+  "introNeedsBody",
+  "introNeedsLlmTitle",
+  "introNeedsLlmBody",
+  "introNeedsSttTitle",
+  "introNeedsSttBody",
+  "introNeedsTtsTitle",
+  "introNeedsTtsBody",
+  "introLlmTitle",
+  "introLlmBody",
+  "introLlmLocalTitle",
+  "introLlmLocalBody",
+  "introLlmProviderTitle",
+  "introLlmProviderBody",
+  "introSttTitle",
+  "introSttBody",
+  "introSttWhyTitle",
+  "introSttWhyBody",
+  "introSttSkipTitle",
+  "introSttSkipBody",
+  "introTtsTitle",
+  "introTtsBody",
+  "introTtsListenLabel",
+  "introTtsSkipTitle",
+  "introTtsSkipBody",
+  "introWrapTitle",
+  "introWrapBody",
+  "introPremiumProvidersTitle",
+  "introPremiumProvidersBody",
+  "introPremiumToolsTitle",
+  "introPremiumToolsBody",
+  "introPremiumCouncilTitle",
+  "introPremiumCouncilBody",
+  "introPremiumOnceTitle",
+  "introPremiumOnceBody",
+] as const;
 
 describe("translations", () => {
   it("derives every public language collection from the locale registry", () => {
@@ -43,14 +108,36 @@ describe("translations", () => {
       );
 
       Object.entries(translations.en).forEach(([key, baseValue]) => {
-        const localizedValue =
-          dictionary[key as keyof typeof translations.en];
+        const localizedValue = dictionary[key as keyof typeof translations.en];
         expect(typeof localizedValue).toBe(typeof baseValue);
 
         if (typeof localizedValue === "string") {
           expect(localizedValue.trim().length).toBeGreaterThan(0);
         }
       });
+    });
+  });
+
+  it("keeps retired intro keys out of every aligned intro dictionary", () => {
+    const introDictionaries = Object.values(introTranslations);
+
+    expect(introDictionaries).toHaveLength(APP_LANGUAGES.length);
+    introDictionaries.forEach((dictionary) => {
+      expect(Object.keys(dictionary).sort()).toEqual(
+        Object.keys(introTranslations.en).sort(),
+      );
+      expect(
+        RETIRED_INTRO_KEYS.filter((key) =>
+          Object.prototype.hasOwnProperty.call(dictionary, key),
+        ),
+      ).toEqual([]);
+    });
+  });
+
+  it("keeps the Mr Broccoli brand token unchanged in every intro banner", () => {
+    Object.values(introTranslations).forEach(({ introBannerTitle }) => {
+      expect(introBannerTitle.match(/Mr Broccoli/g)).toHaveLength(1);
+      expect(introBannerTitle).not.toMatch(/Mr Broccoli['’\p{L}]/u);
     });
   });
 
@@ -292,7 +379,9 @@ describe("translations", () => {
       (lang) => {
         const value = translations[lang].homeStyleChipLabel;
         expect(typeof value).toBe("function");
-        const rendered = (value as (params: { tone: string; length: string }) => string)({
+        const rendered = (
+          value as (params: { tone: string; length: string }) => string
+        )({
           tone: "Casual",
           length: "Brief",
         });

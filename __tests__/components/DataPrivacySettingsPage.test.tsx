@@ -1,4 +1,5 @@
 import React from "react";
+import { Modal as NativeModal } from "react-native";
 import { act, fireEvent, render, waitFor } from "@testing-library/react-native";
 import * as DocumentPicker from "expo-document-picker";
 import * as FileSystem from "expo-file-system/legacy";
@@ -249,14 +250,26 @@ describe("DataPrivacySettingsPage", () => {
     expect(
       screen.getByLabelText("Use past conversation knowledge"),
     ).toBeTruthy();
-    expect(screen.queryByTestId("past-conversation-knowledge-switch")).toBeNull();
+    expect(
+      screen.queryByTestId("past-conversation-knowledge-switch"),
+    ).toBeNull();
     fireEvent.press(screen.getByLabelText("Use past conversation knowledge"));
 
     openArchiveSheet(screen);
     expect(
       screen.queryByTestId("choose-conversation-archive-folder"),
     ).toBeNull();
-    fireEvent.press(screen.getByLabelText("AI conversation archive"));
+    const archiveSheetModal = screen
+      .UNSAFE_getAllByType(NativeModal)
+      .find(
+        (modal) =>
+          modal.findAllByProps({ testID: "archive-settings-sheet" }).length > 0,
+      );
+    fireEvent.press(screen.getByTestId("unlock-conversation-archive"));
+    expect(onOpenPremium).toHaveBeenCalledTimes(1);
+    act(() => {
+      archiveSheetModal?.props.onDismiss();
+    });
     expect(onOpenPremium).toHaveBeenCalledTimes(2);
   });
 
@@ -326,12 +339,8 @@ describe("DataPrivacySettingsPage", () => {
 
     expect(screen.getByText("Qwen3 0.6B")).toBeTruthy();
     expect(screen.getByText("Whisper Tiny")).toBeTruthy();
-    fireEvent.press(
-      screen.getByTestId("model-storage-action-qwen3-0.6b-q8"),
-    );
-    fireEvent.press(
-      screen.getByTestId("model-storage-action-whisper-tiny"),
-    );
+    fireEvent.press(screen.getByTestId("model-storage-action-qwen3-0.6b-q8"));
+    fireEvent.press(screen.getByTestId("model-storage-action-whisper-tiny"));
 
     expect(removeModel).toHaveBeenCalledWith(
       expect.objectContaining({ id: "qwen3-0.6b-q8" }),
@@ -363,7 +372,10 @@ describe("DataPrivacySettingsPage", () => {
   it("retains a shared readable backup so deferred mail attachments remain readable", async () => {
     const backup = createBackup();
     const screen = renderPage({
-      onCreateAppDataBackup: jest.fn(async () => ({ backup, skippedConversationCount: 0 })),
+      onCreateAppDataBackup: jest.fn(async () => ({
+        backup,
+        skippedConversationCount: 0,
+      })),
     });
 
     openReadableExport(screen);
@@ -445,7 +457,10 @@ describe("DataPrivacySettingsPage", () => {
     const encryptBackup = jest
       .spyOn(AppDataBackupService, "encryptAppDataBackup")
       .mockResolvedValue(encryptedDocument);
-    const onCreateAppDataBackup = jest.fn(async () => ({ backup, skippedConversationCount: 0 }));
+    const onCreateAppDataBackup = jest.fn(async () => ({
+      backup,
+      skippedConversationCount: 0,
+    }));
     const screen = renderPage({ onCreateAppDataBackup });
 
     fireEvent.press(screen.getByTestId("export-encrypted-backup"));
@@ -519,7 +534,10 @@ describe("DataPrivacySettingsPage", () => {
           finishEncryption = resolve;
         }),
     );
-    const onCreateAppDataBackup = jest.fn(async () => ({ backup, skippedConversationCount: 0 }));
+    const onCreateAppDataBackup = jest.fn(async () => ({
+      backup,
+      skippedConversationCount: 0,
+    }));
     const screen = renderPage({ onCreateAppDataBackup });
 
     fireEvent.press(screen.getByTestId("export-encrypted-backup"));

@@ -26,6 +26,9 @@ tags:
     path: ${PLATFORM}/accessibility/conversation-drawer
 - tapOn:
     id: conversation-drawer-close
+- waitForAnimationToEnd
+- assertNotVisible:
+    id: conversation-drawer-close
 - tapOn:
     id: main-settings-button
 - assertVisible:
@@ -53,6 +56,9 @@ tags:
     id: settings-back-button
 - tapOn:
     id: settings-close-button
+- waitForAnimationToEnd
+- assertNotVisible:
+    id: settings-modal-title
 - setOrientation: LANDSCAPE_LEFT
 - assertVisible:
     id: landscape-left-pane

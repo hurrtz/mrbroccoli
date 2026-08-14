@@ -14,16 +14,19 @@ tags:
 - tapOn:
     id: intro-banner
 - tapOn:
-    id: intro-stepper-dot-2
+    id: intro-stepper-dot-1
+- assertVisible:
+    id: intro-setup-step
+- tapOn:
+    id: intro-auto-start
 - assertVisible:
     id: auto-setup-card
-- tapOn: "Check this phone"
 - extendedWaitUntil:
     visible: "No suitable set for this phone"
     timeout: 15000
 - assertVisible: "Try again"
 - assertVisible:
-    id: auto-setup-manual
+    id: intro-manual-switch
 - takeScreenshot:
     path: android/runtime/auto-setup-ineligible-first-scan
 - tapOn: "Try again"
@@ -33,7 +36,15 @@ tags:
 - takeScreenshot:
     path: android/runtime/auto-setup-ineligible-retry
 - tapOn:
-    id: auto-setup-manual
+    id: intro-manual-switch
+- assertVisible:
+    id: intro-manual-catalogue
+- scrollUntilVisible:
+    element:
+      id: intro-manual-llm
+    direction: DOWN
+- tapOn:
+    id: intro-manual-llm
 - assertVisible:
     id: settings-page-thinking
 - assertVisible:

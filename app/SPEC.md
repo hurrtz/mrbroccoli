@@ -28,7 +28,7 @@ conversation behavior, persistence, provider routing, or presentation policy.
   localization, Premium entitlement, theme, typography, and the router stack.
 - `index.tsx` is the production entry and renders `MainScreen`.
 - `store-promos.tsx` is the isolated deterministic screenshot entry used only
-  by the `.maestro` application identity.
+  by the exact `com.tobiaswinkler.app.mrbroccoli.maestro` application identity.
 
 **Decision:** Expo Router is the only JavaScript entry mechanism. Historical
 template `App.tsx` and bare `index.ts` stubs remain absent so there is one
@@ -49,6 +49,12 @@ production package and `.dev` package. Runtime identity verification in the
 fixture/presentation services is the authority; the existence of a route alone
 must never enable fixtures. Every orb fraction is validated within zero and one
 before it can replace the live presentation clock.
+
+The route owns three scene values: `premium`, `free`, and `onboarding`.
+`onboarding` seeds the requested locale, a Free entitlement, and an incomplete
+first-run introduction. It may present only a deterministic recommendation
+derived from the checked-in device snapshot; it must not probe the simulator,
+download or benchmark a model, or call a provider.
 
 Evidence:
 

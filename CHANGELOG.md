@@ -10,6 +10,8 @@ the complete Play Store translations are kept in a dedicated file under
 
 ## Unreleased
 
+- The first-run introduction no longer lets step dots or horizontal swipes
+  bypass the required Thinking setup before the live voice test.
 - The transcript sheet now uses one continuous canvas color and the approved
   18-point gutter instead of nesting the script inside a differently colored,
   dialog-padded rectangle; only expanded turn metrics lift onto a surface.
@@ -270,6 +272,14 @@ the complete Play Store translations are kept in a dedicated file under
 
 ### Fixed
 
+- Keep the first-run live test locked to the exact active reasoning route: a
+  configured backup no longer bypasses a missing or unbenchmarked local model,
+  Done requires a successful test, and failed or abandoned tests announce the
+  problem while deleting their temporary recording.
+- Sequence Intro, Settings, their nested sheets, and Premium through native
+  dismissal boundaries before presenting the next surface. Cancelling returns
+  to the same Intro visit or Settings page without overlapping modals or
+  briefly exposing an interactive workspace.
 - Keep compatible downloaded speech models visible when the system recognizer
   cannot report its own on-device eligibility, and show only the speech route
   the app will actually use in Free mode.

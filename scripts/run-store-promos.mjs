@@ -1,8 +1,11 @@
 import crypto from "node:crypto";
 import fs from "node:fs";
+import os from "node:os";
 import path from "node:path";
 import { spawnSync } from "node:child_process";
 import { pathToFileURL } from "node:url";
+
+import parsePng from "parse-png";
 
 import {
   STORE_PROMO_ANDROID_DISPLAYS,
@@ -13,9 +16,7 @@ import {
   STORE_PROMO_SCREENSHOT_COUNTS,
   STORE_PROMO_SCREENSHOT_NAMES,
 } from "./store-promo-config.mjs";
-import {
-  localeNeedsSafeScroll,
-} from "./run-maestro-suite.mjs";
+import { localeNeedsSafeScroll } from "./run-maestro-suite.mjs";
 import { readAppLocaleOptions } from "./verify-maestro-suite.mjs";
 
 function usage() {
@@ -58,7 +59,9 @@ export function parseStorePromoArguments(arguments_) {
     } else if (argument === "--help" || argument === "-h") {
       return { help: true, ...options };
     } else {
-      throw new Error(`Unknown or incomplete argument: ${argument}\n${usage()}`);
+      throw new Error(
+        `Unknown or incomplete argument: ${argument}\n${usage()}`,
+      );
     }
   }
 
@@ -107,6 +110,75 @@ function runCommand(command, args, options = {}) {
   return options.capture ? (result.stdout ?? "") : "";
 }
 
+export function createSourceProvenance({
+  commit,
+  diff,
+  skipBuild,
+  status,
+  untrackedFileHashes = [],
+}) {
+  const sourceStateSha256 = crypto
+    .createHash("sha256")
+    .update(commit)
+    .update("\0")
+    .update(status)
+    .update("\0")
+    .update(diff)
+    .update("\0")
+    .update(
+      [...untrackedFileHashes]
+        .sort(([left], [right]) => left.localeCompare(right))
+        .map(([file, hash]) => `${file}\0${hash}`)
+        .join("\0"),
+    )
+    .digest("hex");
+  return {
+    buildMode: skipBuild ? "reused" : "built",
+    commit,
+    sourceDirty: status.length > 0,
+    sourceStateSha256,
+    artifactSourceStateSha256: skipBuild ? null : sourceStateSha256,
+  };
+}
+
+function readSourceProvenance({ cwd, skipBuild }) {
+  const commit = runCommand("git", ["rev-parse", "HEAD"], {
+    capture: true,
+    cwd,
+  }).trim();
+  const status = runCommand(
+    "git",
+    ["status", "--porcelain=v1", "-z", "--untracked-files=all"],
+    { capture: true, cwd },
+  );
+  const diff = runCommand("git", ["diff", "--binary", "HEAD", "--"], {
+    capture: true,
+    cwd,
+  });
+  const untrackedFileHashes = status
+    .split("\0")
+    .filter((entry) => entry.startsWith("?? "))
+    .map((entry) => entry.slice(3))
+    .flatMap((relativePath) => {
+      const filePath = path.resolve(cwd, relativePath);
+      if (
+        !filePath.startsWith(`${path.resolve(cwd)}${path.sep}`) ||
+        !fs.existsSync(filePath) ||
+        !fs.statSync(filePath).isFile()
+      ) {
+        return [];
+      }
+      return [[relativePath, sha256(filePath)]];
+    });
+  return createSourceProvenance({
+    commit,
+    diff,
+    skipBuild,
+    status,
+    untrackedFileHashes,
+  });
+}
+
 export function quoteAndroidShellArgument(value) {
   return `'${value.replaceAll("'", `'\\''`)}'`;
 }
@@ -114,21 +186,25 @@ export function quoteAndroidShellArgument(value) {
 function compareRuntimeIdentifiers(left, right) {
   const version = (identifier) =>
     identifier
-      .match(/iOS-(\d+)-(\d+)/)?.slice(1)
+      .match(/iOS-(\d+)-(\d+)/)
+      ?.slice(1)
       .map(Number) ?? [0, 0];
   const [leftMajor, leftMinor] = version(left.identifier);
   const [rightMajor, rightMinor] = version(right.identifier);
   return rightMajor - leftMajor || rightMinor - leftMinor;
 }
 
-export function selectLatestIosRuntime(runtimeJson) {
+export function selectLatestIosRuntime(runtimeJson, maximumMajor) {
   const runtimes = JSON.parse(runtimeJson).runtimes ?? [];
   const available = runtimes
     .filter(
       (runtime) =>
         runtime?.isAvailable !== false &&
         typeof runtime?.identifier === "string" &&
-        runtime.identifier.includes("SimRuntime.iOS-"),
+        runtime.identifier.includes("SimRuntime.iOS-") &&
+        (maximumMajor === undefined ||
+          Number(runtime.identifier.match(/iOS-(\d+)/)?.[1] ?? 0) <=
+            maximumMajor),
     )
     .sort(compareRuntimeIdentifiers);
   const runtime = available[0];
@@ -157,43 +233,63 @@ function findSimulator(devicesJson, runtimeIdentifier, name, udid) {
   }
 
   return available.find(
-    (device) =>
-      device.runtime === runtimeIdentifier && device.name === name,
+    (device) => device.runtime === runtimeIdentifier && device.name === name,
   );
 }
 
 function ensureSimulator({ cwd, display, requestedUdid, run = runCommand }) {
-  const runtime = selectLatestIosRuntime(
-    run("xcrun", ["simctl", "list", "runtimes", "--json"], {
-      capture: true,
-      cwd,
-    }),
-  );
+  const target = STORE_PROMO_IOS_DISPLAYS[display];
+  const devicesJson = run("xcrun", ["simctl", "list", "devices", "--json"], {
+    capture: true,
+    cwd,
+  });
   const simulatorName = `Mr Broccoli Store Promos ${display}`;
-  let simulator = findSimulator(
-    run("xcrun", ["simctl", "list", "devices", "--json"], {
-      capture: true,
-      cwd,
-    }),
+  let simulator = requestedUdid
+    ? findSimulator(devicesJson, "", simulatorName, requestedUdid)
+    : null;
+  let runtime = simulator
+    ? { identifier: simulator.runtime }
+    : selectLatestIosRuntime(
+        run("xcrun", ["simctl", "list", "runtimes", "--json"], {
+          capture: true,
+          cwd,
+        }),
+        target.maximumRuntimeMajor,
+      );
+  simulator ??= findSimulator(
+    devicesJson,
     runtime.identifier,
     simulatorName,
-    requestedUdid,
+    null,
   );
-  const target = STORE_PROMO_IOS_DISPLAYS[display];
 
   if (!simulator) {
-    const udid = run(
-      "xcrun",
-      [
-        "simctl",
-        "create",
-        simulatorName,
-        target.deviceType,
-        runtime.identifier,
-      ],
-      { capture: true, cwd },
-    ).trim();
-    simulator = { name: simulatorName, runtime: runtime.identifier, state: "Shutdown", udid };
+    let udid;
+    try {
+      udid = run(
+        "xcrun",
+        [
+          "simctl",
+          "create",
+          simulatorName,
+          target.deviceType,
+          runtime.identifier,
+        ],
+        { capture: true, cwd },
+      ).trim();
+    } catch (error) {
+      const note = target.runtimeNote ? ` ${target.runtimeNote}` : "";
+      throw new Error(
+        `Unable to create the ${display} store-promo simulator on ${runtime.identifier}.${note}`,
+        { cause: error },
+      );
+    }
+    simulator = {
+      name: simulatorName,
+      runtime: runtime.identifier,
+      state: "Shutdown",
+      udid,
+    };
   }
 
   if (simulator.state !== "Booted") {
@@ -224,7 +320,7 @@ function ensureSimulator({ cwd, display, requestedUdid, run = runCommand }) {
     { allowFailure: true, cwd },
   );
 
-  return { ...simulator, runtime: runtime.identifier };
+  return simulator;
 }
 
 export function parseConnectedAndroidDevices(adbOutput) {
@@ -235,7 +331,9 @@ export function parseConnectedAndroidDevices(adbOutput) {
     .filter((line) => line && !line.startsWith("*"))
     .flatMap((line) => {
       const [udid, state] = line.split(/\s+/, 2);
-      return state === "device" ? [{ udid, isEmulator: udid.startsWith("emulator-") }] : [];
+      return state === "device"
+        ? [{ udid, isEmulator: udid.startsWith("emulator-") }]
+        : [];
     });
 }
 
@@ -266,29 +364,64 @@ function ensureAndroidEmulator({ cwd, requestedUdid, run = runCommand }) {
     allowFailure: true,
     cwd,
   });
+  run("adb", ["-s", selected.udid, "shell", "cmd", "uimode", "night", "no"], {
+    allowFailure: true,
+    cwd,
+  });
   run(
     "adb",
-    ["-s", selected.udid, "shell", "cmd", "uimode", "night", "no"],
+    [
+      "-s",
+      selected.udid,
+      "shell",
+      "settings",
+      "put",
+      "system",
+      "font_scale",
+      "1.0",
+    ],
     { allowFailure: true, cwd },
   );
   run(
     "adb",
-    ["-s", selected.udid, "shell", "settings", "put", "system", "font_scale", "1.0"],
+    [
+      "-s",
+      selected.udid,
+      "shell",
+      "settings",
+      "put",
+      "system",
+      "accelerometer_rotation",
+      "0",
+    ],
     { allowFailure: true, cwd },
   );
   run(
     "adb",
-    ["-s", selected.udid, "shell", "settings", "put", "system", "accelerometer_rotation", "0"],
+    [
+      "-s",
+      selected.udid,
+      "shell",
+      "settings",
+      "put",
+      "system",
+      "user_rotation",
+      "0",
+    ],
     { allowFailure: true, cwd },
   );
   run(
     "adb",
-    ["-s", selected.udid, "shell", "settings", "put", "system", "user_rotation", "0"],
-    { allowFailure: true, cwd },
-  );
-  run(
-    "adb",
-    ["-s", selected.udid, "shell", "settings", "put", "global", "sysui_demo_allowed", "1"],
+    [
+      "-s",
+      selected.udid,
+      "shell",
+      "settings",
+      "put",
+      "global",
+      "sysui_demo_allowed",
+      "1",
+    ],
     { allowFailure: true, cwd },
   );
   for (const extras of [
@@ -298,25 +431,39 @@ function ensureAndroidEmulator({ cwd, requestedUdid, run = runCommand }) {
     ["command", "network", "wifi", "show", "level", "4", "mobile", "hide"],
     ["command", "notifications", "visible", "false"],
   ]) {
-    const args = ["-s", selected.udid, "shell", "am", "broadcast", "-a", "com.android.systemui.demo"];
+    const args = [
+      "-s",
+      selected.udid,
+      "shell",
+      "am",
+      "broadcast",
+      "-a",
+      "com.android.systemui.demo",
+    ];
     for (let index = 0; index < extras.length; index += 2) {
       args.push("-e", extras[index], extras[index + 1]);
     }
     run("adb", args, { allowFailure: true, cwd });
   }
 
-  const sizeOutput = run(
-    "adb",
-    ["-s", selected.udid, "shell", "wm", "size"],
-    { capture: true, cwd },
-  );
+  const sizeOutput = run("adb", ["-s", selected.udid, "shell", "wm", "size"], {
+    capture: true,
+    cwd,
+  });
   const match = sizeOutput.match(/Physical size:\s*(\d+)x(\d+)/);
   if (!match) {
-    throw new Error(`Unable to read Android emulator dimensions: ${sizeOutput.trim()}`);
+    throw new Error(
+      `Unable to read Android emulator dimensions: ${sizeOutput.trim()}`,
+    );
   }
   return {
     ...selected,
     height: Number(match[2]),
+    name: run(
+      "adb",
+      ["-s", selected.udid, "shell", "getprop", "ro.product.model"],
+      { capture: true, cwd },
+    ).trim(),
     width: Number(match[1]),
   };
 }
@@ -363,23 +510,118 @@ function walkFiles(directory) {
   });
 }
 
-export function readPngMetadata(filePath) {
+export async function readPngMetadata(filePath) {
   const data = fs.readFileSync(filePath);
   const signature = data.subarray(0, 8).toString("hex");
-  if (signature !== "89504e470d0a1a0a" || data.length < 26) {
+  if (signature !== "89504e470d0a1a0a") {
     throw new Error(`Not a valid PNG: ${filePath}`);
   }
-  const colorType = data.readUInt8(25);
+  let offset = 8;
+  let colorType;
+  let height;
+  let width;
+  let sawIdat = false;
+  let sawIend = false;
+  let sawTransparency = false;
+  while (offset < data.length) {
+    if (offset + 12 > data.length) {
+      throw new Error(`Truncated PNG chunk: ${filePath}`);
+    }
+    const length = data.readUInt32BE(offset);
+    const typeStart = offset + 4;
+    const dataStart = typeStart + 4;
+    const crcOffset = dataStart + length;
+    const nextOffset = crcOffset + 4;
+    if (nextOffset > data.length) {
+      throw new Error(`Truncated PNG chunk: ${filePath}`);
+    }
+    const type = data.subarray(typeStart, dataStart).toString("ascii");
+    const expectedCrc = data.readUInt32BE(crcOffset);
+    if (pngCrc32(data.subarray(typeStart, crcOffset)) !== expectedCrc) {
+      throw new Error(`PNG chunk CRC mismatch: ${filePath}`);
+    }
+    if (offset === 8) {
+      if (type !== "IHDR" || length !== 13) {
+        throw new Error(`PNG does not start with IHDR: ${filePath}`);
+      }
+      width = data.readUInt32BE(dataStart);
+      height = data.readUInt32BE(dataStart + 4);
+      colorType = data.readUInt8(dataStart + 9);
+      if (width === 0 || height === 0) {
+        throw new Error(`PNG has invalid dimensions: ${filePath}`);
+      }
+    } else if (type === "IDAT") {
+      sawIdat = true;
+    } else if (type === "tRNS") {
+      sawTransparency = true;
+    } else if (type === "IEND") {
+      if (length !== 0 || nextOffset !== data.length) {
+        throw new Error(`PNG has an invalid IEND chunk: ${filePath}`);
+      }
+      sawIend = true;
+    }
+    offset = nextOffset;
+  }
+  if (
+    colorType === undefined ||
+    width === undefined ||
+    height === undefined ||
+    !sawIdat ||
+    !sawIend
+  ) {
+    throw new Error(`Incomplete PNG: ${filePath}`);
+  }
+  try {
+    await parsePng(data);
+  } catch (error) {
+    throw new Error(`PNG pixel data could not be decoded: ${filePath}`, {
+      cause: error,
+    });
+  }
   return {
     colorType,
-    hasAlphaChannel: colorType === 4 || colorType === 6,
-    height: data.readUInt32BE(20),
-    width: data.readUInt32BE(16),
+    hasAlphaChannel: colorType === 4 || colorType === 6 || sawTransparency,
+    height,
+    width,
   };
 }
 
+function pngCrc32(data) {
+  let crc = 0xffffffff;
+  for (const byte of data) {
+    crc ^= byte;
+    for (let bit = 0; bit < 8; bit += 1) {
+      crc = (crc >>> 1) ^ (crc & 1 ? 0xedb88320 : 0);
+    }
+  }
+  return (crc ^ 0xffffffff) >>> 0;
+}
+
 function sha256(filePath) {
-  return crypto.createHash("sha256").update(fs.readFileSync(filePath)).digest("hex");
+  return crypto
+    .createHash("sha256")
+    .update(fs.readFileSync(filePath))
+    .digest("hex");
+}
+
+function getArtifactMetadata(artifactPath) {
+  const stat = fs.statSync(artifactPath);
+  if (stat.isFile()) {
+    return { bytes: stat.size, sha256: sha256(artifactPath) };
+  }
+  const files = walkFiles(artifactPath).sort();
+  const hash = crypto.createHash("sha256");
+  let bytes = 0;
+  for (const filePath of files) {
+    const data = fs.readFileSync(filePath);
+    bytes += data.length;
+    hash
+      .update(path.relative(artifactPath, filePath))
+      .update("\0")
+      .update(data)
+      .update("\0");
+  }
+  return { bytes, sha256: hash.digest("hex") };
 }
 
 function captureMaestroFlow({ cwd, locale, outputDirectory, platform, udid }) {
@@ -469,7 +711,64 @@ function captureMaestroFlow({ cwd, locale, outputDirectory, platform, udid }) {
   }
 }
 
-function collectScreenshots({ cwd, display, locale, platform, rawOutput }) {
+export function resolveApkAnalyzerPath({
+  androidSdkRoot = process.env.ANDROID_SDK_ROOT ??
+    process.env.ANDROID_HOME ??
+    path.join(os.homedir(), "Library", "Android", "sdk"),
+  exists = fs.existsSync,
+} = {}) {
+  const candidates = [
+    path.join(androidSdkRoot, "cmdline-tools", "latest", "bin", "apkanalyzer"),
+    path.join(androidSdkRoot, "tools", "bin", "apkanalyzer"),
+  ];
+  const analyzer = candidates.find((candidate) => exists(candidate));
+  if (!analyzer) {
+    throw new Error(
+      `Android SDK apkanalyzer was not found under ${androidSdkRoot}`,
+    );
+  }
+  return analyzer;
+}
+
+export function readArtifactVersion({
+  apkAnalyzerPath = undefined,
+  artifactPath,
+  cwd,
+  platform,
+  run = runCommand,
+}) {
+  if (platform === "ios") {
+    return run(
+      "/usr/libexec/PlistBuddy",
+      [
+        "-c",
+        "Print :CFBundleShortVersionString",
+        path.join(artifactPath, "Info.plist"),
+      ],
+      { capture: true, cwd },
+    ).trim();
+  }
+  const analyzer = apkAnalyzerPath ?? resolveApkAnalyzerPath();
+  const version = run(analyzer, ["manifest", "version-name", artifactPath], {
+    capture: true,
+    cwd,
+  }).trim();
+  if (!version) {
+    throw new Error(`Android APK has no versionName: ${artifactPath}`);
+  }
+  return version;
+}
+
+async function collectScreenshots({
+  artifactPath,
+  cwd,
+  device,
+  display,
+  locale,
+  platform,
+  rawOutput,
+  sourceProvenance,
+}) {
   const outputRoot = path.join(cwd, "artifacts", "store-promos", platform);
   const destination = path.join(outputRoot, display, locale);
   const target =
@@ -499,11 +798,12 @@ function collectScreenshots({ cwd, display, locale, platform, rawOutput }) {
   }
 
   safeResetDirectory(destination, outputRoot);
-  const screenshots = screenshotNames.map((name) => {
+  const screenshots = [];
+  for (const name of screenshotNames) {
     const source = byName.get(name);
     const output = path.join(destination, `${name}.png`);
     fs.copyFileSync(source, output);
-    const metadata = readPngMetadata(output);
+    const metadata = await readPngMetadata(output);
     const accepted = target.acceptedPortraitDimensions.some(
       ([width, height]) =>
         width === metadata.width && height === metadata.height,
@@ -516,31 +816,39 @@ function collectScreenshots({ cwd, display, locale, platform, rawOutput }) {
     if (metadata.hasAlphaChannel) {
       throw new Error(`${name}.png contains an alpha channel`);
     }
-    return {
+    screenshots.push({
       file: `${name}.png`,
       bytes: fs.statSync(output).size,
       sha256: sha256(output),
       width: metadata.width,
       height: metadata.height,
-    };
-  });
-  const appJson = JSON.parse(fs.readFileSync(path.join(cwd, "app.json"), "utf8"));
-  const commit = runCommand("git", ["rev-parse", "HEAD"], {
-    capture: true,
-    cwd,
-  }).trim();
+    });
+  }
+  const artifact = getArtifactMetadata(artifactPath);
   const manifest = {
-    schemaVersion: 1,
+    schemaVersion: 2,
     platform,
     applicationId: STORE_PROMO_APP_ID,
-    version: appJson.expo.version,
-    commit,
+    version: readArtifactVersion({ artifactPath, cwd, platform }),
+    ...sourceProvenance,
+    artifact: {
+      bytes: artifact.bytes,
+      file: path.basename(artifactPath),
+      sha256: artifact.sha256,
+    },
     locale,
     outputDisplayLabel: display,
     ...(platform === "ios"
       ? { appleDisplayClass: target.appleDisplayClass }
       : {}),
-    simulatorDevice: target.deviceName,
+    captureDevice: {
+      name: device.name || target.deviceName,
+      udid: device.udid,
+      ...(device.runtime ? { runtime: device.runtime } : {}),
+      ...(device.width && device.height
+        ? { height: device.height, width: device.width }
+        : {}),
+    },
     screenshotCount: screenshots.length,
     screenshots,
   };
@@ -556,7 +864,7 @@ function collectScreenshots({ cwd, display, locale, platform, rawOutput }) {
     .join("\n");
   fs.writeFileSync(
     path.join(destination, "review-gallery.html"),
-    `<!doctype html><html><head><meta charset="utf-8"><title>Mr Broccoli ${locale} store promos</title><style>body{background:#eee;color:#222;font:14px -apple-system,sans-serif;margin:24px}main{display:grid;gap:24px;grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}figure{background:white;border-radius:16px;margin:0;padding:12px;box-shadow:0 2px 14px #0002}img{display:block;height:auto;width:100%}figcaption{line-height:1.5;padding-top:10px;word-break:break-all}</style></head><body><h1>Mr Broccoli · ${locale} · ${display}</h1><p>Review all ten images for localization, clipping, state accuracy and store suitability.</p><main>${cards}</main></body></html>`,
+    `<!doctype html><html><head><meta charset="utf-8"><title>Mr Broccoli ${locale} store promos</title><style>body{background:#eee;color:#222;font:14px -apple-system,sans-serif;margin:24px}main{display:grid;gap:24px;grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}figure{background:white;border-radius:16px;margin:0;padding:12px;box-shadow:0 2px 14px #0002}img{display:block;height:auto;width:100%}figcaption{line-height:1.5;padding-top:10px;word-break:break-all}</style></head><body><h1>Mr Broccoli · ${locale} · ${display}</h1><p>Review all ${screenshots.length} images for localization, clipping, state accuracy and store suitability.</p><main>${cards}</main></body></html>`,
   );
 
   fs.rmSync(rawOutput, { recursive: true, force: true });
@@ -634,14 +942,12 @@ function installAndroidApp({ cwd, target, udid }) {
     });
   }
   runCommand("adb", ["-s", udid, "install", target], { cwd });
-  runCommand(
-    "adb",
-    ["-s", udid, "shell", "pm", "path", STORE_PROMO_APP_ID],
-    { cwd },
-  );
+  runCommand("adb", ["-s", udid, "shell", "pm", "path", STORE_PROMO_APP_ID], {
+    cwd,
+  });
 }
 
-export function runStorePromos({
+export async function runStorePromos({
   argv = process.argv.slice(2),
   cwd = process.cwd(),
 } = {}) {
@@ -652,6 +958,10 @@ export function runStorePromos({
   }
   runCommand(process.execPath, ["scripts/verify-store-promos.mjs"], { cwd });
   runCommand("maestro", ["--version"], { cwd });
+  const sourceProvenance = readSourceProvenance({
+    cwd,
+    skipBuild: options.skipBuild,
+  });
 
   const configuredLocales = readAppLocaleOptions(cwd);
   const locales =
@@ -665,6 +975,7 @@ export function runStorePromos({
   }
 
   let device;
+  let artifactPath;
   let cleanup = () => {};
   if (options.platform === "ios") {
     const simulator = ensureSimulator({
@@ -712,6 +1023,7 @@ export function runStorePromos({
       { cwd },
     );
     device = simulator;
+    artifactPath = iosApp;
   } else {
     const emulator = ensureAndroidEmulator({
       cwd,
@@ -719,7 +1031,8 @@ export function runStorePromos({
     });
     const target = STORE_PROMO_ANDROID_DISPLAYS[options.display];
     const accepted = target.acceptedPortraitDimensions.some(
-      ([width, height]) => width === emulator.width && height === emulator.height,
+      ([width, height]) =>
+        width === emulator.width && height === emulator.height,
     );
     if (!accepted) {
       throw new Error(
@@ -743,6 +1056,7 @@ export function runStorePromos({
     }
     installAndroidApp({ cwd, target: androidApk, udid: emulator.udid });
     device = emulator;
+    artifactPath = androidApk;
     cleanup = () => exitAndroidDemoMode({ cwd, udid: emulator.udid });
   }
 
@@ -764,12 +1078,15 @@ export function runStorePromos({
         platform: options.platform,
         udid: device.udid,
       });
-      const result = collectScreenshots({
+      const result = await collectScreenshots({
+        artifactPath,
         cwd,
+        device,
         display: options.display,
         locale,
         platform: options.platform,
         rawOutput,
+        sourceProvenance,
       });
       process.stdout.write(
         `Store promos complete: ${result.destination} (${result.manifest.screenshotCount} screenshots).\n`,
@@ -787,7 +1104,7 @@ if (
   import.meta.url === pathToFileURL(process.argv[1]).href
 ) {
   try {
-    process.exitCode = runStorePromos();
+    process.exitCode = await runStorePromos();
   } catch (error) {
     process.stderr.write(
       `Store-promo capture failed: ${error instanceof Error ? error.message : String(error)}\n`,

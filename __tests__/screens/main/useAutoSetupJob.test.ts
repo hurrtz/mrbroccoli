@@ -39,9 +39,11 @@ const mockPrepare = jest.fn();
 const mockGetBenchmarks = jest.fn();
 const mockGetInstallStatuses = jest.fn();
 const mockEvaluateReadiness = jest.fn();
+const mockProbeLocalDeviceCapabilities = jest.fn();
 
 jest.mock("../../../src/services/localDeviceCapabilities", () => ({
-  probeLocalDeviceCapabilities: jest.fn(async () => snapshot),
+  probeLocalDeviceCapabilities: (...args: unknown[]) =>
+    mockProbeLocalDeviceCapabilities(...args),
   getLocalModelBenchmarkResults: (...args: unknown[]) =>
     mockGetBenchmarks(...args),
   localModelBenchmarkMatchesDevice: (
@@ -115,18 +117,30 @@ jest.mock("../../../src/screens/main/useFreeOfflineMode", () => ({
 const t = ((key: string, values?: Record<string, string | number>) =>
   values ? `${key}:${JSON.stringify(values)}` : key) as TranslateFn;
 
-function renderJob(settings = DEFAULT_SETTINGS) {
+function renderJob(settings = DEFAULT_SETTINGS, suspended = false) {
   const onOutcome = jest.fn();
   const updateSettings = jest.fn();
   const rendered = renderHook(
-    ({ currentSettings }: { currentSettings: Settings }) =>
+    ({
+      currentSettings,
+      currentSuspended,
+    }: {
+      currentSettings: Settings;
+      currentSuspended: boolean;
+    }) =>
       useAutoSetupJob({
         onOutcome,
         settings: currentSettings,
+        suspended: currentSuspended,
         t,
         updateSettings,
       }),
-    { initialProps: { currentSettings: settings } },
+    {
+      initialProps: {
+        currentSettings: settings,
+        currentSuspended: suspended,
+      },
+    },
   );
   return { onOutcome, rendered, updateSettings };
 }
@@ -142,6 +156,7 @@ describe("useAutoSetupJob", () => {
     mockGetBenchmarks.mockReset().mockResolvedValue({});
     mockGetInstallStatuses.mockReset().mockResolvedValue({});
     mockEvaluateReadiness.mockReset().mockReturnValue({ ready: false });
+    mockProbeLocalDeviceCapabilities.mockReset().mockResolvedValue(snapshot);
   });
 
   afterEach(() => {
@@ -154,6 +169,28 @@ describe("useAutoSetupJob", () => {
     expect(rendered.result.current.state).toBe("offer");
     act(() => rendered.result.current.install());
     expect(rendered.result.current.state).toBe("offer");
+    expect(mockPrepare).not.toHaveBeenCalled();
+  });
+
+  it("does not probe, restore, or start while suspended", async () => {
+    const { rendered } = renderJob(
+      {
+        ...DEFAULT_SETTINGS,
+        freeOfflineSetupCompleted: true,
+      },
+      true,
+    );
+
+    expect(rendered.result.current.state).toBe("offer");
+    act(() => rendered.result.current.start());
+    await act(async () => {
+      jest.advanceTimersByTime(5_000);
+      await Promise.resolve();
+    });
+
+    expect(rendered.result.current.state).toBe("offer");
+    expect(mockProbeLocalDeviceCapabilities).not.toHaveBeenCalled();
+    expect(mockGetInstallStatuses).not.toHaveBeenCalled();
     expect(mockPrepare).not.toHaveBeenCalled();
   });
 
@@ -339,10 +376,7 @@ describe("useAutoSetupJob", () => {
   it("cancels installation back to its proposal and can resume", async () => {
     let activeSignal: AbortSignal | undefined;
     mockPrepare.mockImplementationOnce(
-      async (
-        _profile: unknown,
-        options?: { abortSignal?: AbortSignal },
-      ) =>
+      async (_profile: unknown, options?: { abortSignal?: AbortSignal }) =>
         new Promise<void>((_resolve, reject) => {
           activeSignal = options?.abortSignal;
           const rejectCancellation = () => {
@@ -429,7 +463,10 @@ describe("useAutoSetupJob", () => {
         },
       ],
     };
-    rendered.rerender({ currentSettings: latestSettings });
+    rendered.rerender({
+      currentSettings: latestSettings,
+      currentSuspended: false,
+    });
 
     await act(async () => {
       finishInstall?.();

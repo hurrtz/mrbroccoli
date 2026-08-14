@@ -11,8 +11,11 @@ tags:
 - launchApp
 - setOrientation: PORTRAIT
 - assertVisible:
+    id: ^app-locale-${LOCALE}$
+- assertVisible:
     id: voice-stage-thinking
 - assertVisible:
     id: transcript-handle
 - takeScreenshot:
     path: 01-premium-active-conversation
+- stopApp

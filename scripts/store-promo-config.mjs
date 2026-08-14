@@ -1,10 +1,10 @@
-export const STORE_PROMO_APP_ID =
-  "com.tobiaswinkler.app.mrbroccoli.maestro";
+export const STORE_PROMO_APP_ID = "com.tobiaswinkler.app.mrbroccoli.maestro";
 export const STORE_PROMO_FLOW = ".maestro/flows/store-promos/ios.yaml";
 export const STORE_PROMO_FLOWS = Object.freeze({
   android: Object.freeze([
     ".maestro/flows/store-promos/android-premium-home.yaml",
     ".maestro/flows/store-promos/android-free.yaml",
+    ".maestro/flows/store-promos/android-onboarding.yaml",
     ".maestro/flows/store-promos/android-premium-surfaces.yaml",
   ]),
   ios: Object.freeze([STORE_PROMO_FLOW]),
@@ -12,6 +12,7 @@ export const STORE_PROMO_FLOWS = Object.freeze({
 export const STORE_PROMO_ANDROID_FLOW_SCENES = Object.freeze([
   "premium",
   "free",
+  "onboarding",
   "premium",
 ]);
 
@@ -46,7 +47,7 @@ export const STORE_PROMO_SCREENSHOT_COUNTS = Object.freeze({
 });
 
 export const STORE_PROMO_IOS_DISPLAYS = Object.freeze({
-  "6.8": {
+  6.8: {
     appleDisplayClass: "6.9",
     deviceName: "iPhone 17 Pro Max",
     deviceType: "com.apple.CoreSimulator.SimDeviceType.iPhone-17-Pro-Max",
@@ -56,7 +57,7 @@ export const STORE_PROMO_IOS_DISPLAYS = Object.freeze({
       [1320, 2868],
     ],
   },
-  "6.5": {
+  6.5: {
     appleDisplayClass: "6.5",
     deviceName: "iPhone 11 Pro Max",
     deviceType: "com.apple.CoreSimulator.SimDeviceType.iPhone-11-Pro-Max",
@@ -65,7 +66,7 @@ export const STORE_PROMO_IOS_DISPLAYS = Object.freeze({
       [1242, 2688],
     ],
   },
-  "6.3": {
+  6.3: {
     appleDisplayClass: "6.3",
     deviceName: "iPhone 17 Pro",
     deviceType: "com.apple.CoreSimulator.SimDeviceType.iPhone-17-Pro",
@@ -74,7 +75,7 @@ export const STORE_PROMO_IOS_DISPLAYS = Object.freeze({
       [1206, 2622],
     ],
   },
-  "6.1": {
+  6.1: {
     appleDisplayClass: "6.1",
     deviceName: "iPhone 13 Pro",
     deviceType: "com.apple.CoreSimulator.SimDeviceType.iPhone-13-Pro",
@@ -84,15 +85,16 @@ export const STORE_PROMO_IOS_DISPLAYS = Object.freeze({
       [1080, 2340],
     ],
   },
-  "5.5": {
+  5.5: {
     appleDisplayClass: "5.5",
     deviceName: "iPhone 8 Plus",
     deviceType: "com.apple.CoreSimulator.SimDeviceType.iPhone-8-Plus",
     acceptedPortraitDimensions: [[1242, 2208]],
+    maximumRuntimeMajor: 16,
     runtimeNote:
       "Requires a compatible iOS 16 simulator runtime and may need an older Xcode installation.",
   },
-  "4.7": {
+  4.7: {
     appleDisplayClass: "4.7",
     deviceName: "iPhone SE (3rd generation)",
     deviceType:

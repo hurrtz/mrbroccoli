@@ -62,6 +62,11 @@ The cross-platform Maestro suite starts from cleared app state and verifies
 the current first-run contract: the app opens directly into the workspace with
 the optional introduction banner. It must not wait for a retired blocking
 setup wizard before exercising settings, locales, layout, or accessibility.
+The smoke flow covers the Welcome audio control and the Setup offer/manual
+states, waits for the language-independent playing-control marker, then
+restarts and dismisses the introduction banner before continuing into
+Settings. It does not claim the Try step without a configured route and
+deterministic test turn.
 Flows that edit nested Settings sheets dismiss the software keyboard and, on
 platforms where that action leaves the modal open, the owning sheet before
 navigating the parent frame, so system input overlays cannot consume the next
@@ -70,14 +75,25 @@ The checked-in runtime flows also hold every voice-orb phase and ring boundary
 deterministically under the isolated fixture identity, and prove honest
 low-memory automatic-setup failure and retry on Android without downloading a
 model. A separate physical-device flow accepts a real proposal, waits through
-download, checksum verification, and benchmarks, then verifies the selected
-Thinking route and Data & privacy storage inventory; it is never part of an
-emulator or Git-hook run. Local-model catalogue flows follow the product's
+download, checksum verification, and benchmarks, then restarts out of the
+first-run flow and verifies the selected Thinking route and Data & privacy
+storage inventory; it is never part of an emulator or Git-hook run. Local-model
+catalogue flows follow the product's
 stage ownership: Thinking for response models, Listening for recognition, and
 Speaking for voices. Verified models expose a stable viable-state selector so
 device tests wait for the real benchmark result rather than translated copy.
-The verifier scans every checked-in Maestro YAML file and rejects selectors
-from the retired standalone Device page.
+The verifier parses every checked-in Maestro file as YAML before inspecting its
+actions, then rejects selectors from the retired standalone Device page, the
+removed playing caption, and step dots outside the current three-step
+introduction. It also rejects controls, screenshots, and titles owned by the
+retired seven-step walkthrough. Android automatic-setup runtime flows select
+the Setup dot and start the setup scan before waiting for its result card.
+Store-promo onboarding stops after the seeded Free conversation, reseeds the
+identity-guarded onboarding scene in the same locale, relaunches into its real
+first-run banner, and captures a deterministic proposal selected from the
+fixed device snapshot. Every later fixture scene stops the app before reseeding;
+the flow never clears the seeded locale, starts a live scan, or leaves the Intro
+modal open before the next fixture deep link.
 
 ## Living-Spec Review
 
@@ -112,6 +128,12 @@ the architectural answer for the author.
   and failure.
 - Generated evidence belongs under ignored `artifacts/`; checked-in source
   files remain the configuration authority.
+- Store-promo capture accepts a PNG only after chunk/CRC validation, full pixel
+  decoding, approved dimensions, and proof that no alpha channel or indexed
+  transparency is present. Its schema-2 manifest records the exact artifact
+  hash and version, actual device/runtime, source commit, dirty-source
+  fingerprint, and whether the artifact was built or reused. A reused artifact
+  is never attributed to the current source fingerprint without build evidence.
 - The espeak-free installer also applies the reviewed iOS archive-helper patch:
   it skips only empty, `.`, or `./` tar-root records, then permits only relative
   regular files or directories without traversal or links; direct validation

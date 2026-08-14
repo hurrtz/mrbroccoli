@@ -232,22 +232,31 @@ one setup screen with a single green path, and a live test where the user
 judges the result.
 
 **Decision:** The three steps replace the earlier seven-page wizard (design
-system, owner-resolved 2026-08). Premium appears nowhere in the flow — the
-first Premium surface a new user meets is the settings overview, after the
-app has proven itself. The welcome step shows a stored dialogue whose crisp
-final question is the question the bundled recording actually answers, in
-every language; switching the language swaps the on-screen dialogue and the
-audio together so the pairing holds. The manual catalogue behind the
-setup step's switch renders real route state and hands acquisition to the
-owning stage pages (Thinking, Listening, Speaking); the fully inline
-download-test-unlock lifecycle inside the flow remains an open follow-up.
+system, owner-resolved 2026-08). Premium is not a walkthrough step. Its only
+handoff inside the flow is the explicit provider path on Setup, because adding
+provider credentials requires Premium; otherwise the first Premium surface a
+new user meets is the settings overview after the app has proven itself. The
+welcome step shows a stored dialogue whose crisp final question is the question
+the bundled recording actually answers, in every language; switching the
+language swaps the on-screen dialogue and the audio together so the pairing
+holds. The manual catalogue behind the setup step's switch renders real route
+state and hands acquisition to the owning stage pages (Thinking, Listening,
+Speaking); the fully inline download-test-unlock lifecycle inside the flow
+remains an open follow-up.
 
 **Decision:** First-run integrity: until the introduction has been completed
 once (`introCompleted`), the flow offers no close control, step two's forward
-action stays disabled until a reasoning model is actually running, and step
-three's Done stays disabled until one ephemeral test turn has completed. A
-re-entry restores close on steps one and two and unlocks both gates; step
-three never shows close — Done is the exit.
+action stays disabled until the exact active reasoning route can run, every
+step-selection and paging path keeps the final test step unreachable until that
+same readiness condition holds, and step three's Done stays disabled until one
+ephemeral test turn succeeds. A provider route requires its credential; a local
+route requires a verified install plus a viable benchmark that matches the
+current device. A ready backup mode cannot unlock a different unavailable
+active route. If readiness is lost while the final step is open, a first run
+returns to Setup and aborts the ephemeral run. A re-entry restores close on
+steps one and two and permits navigation across all three, but the microphone
+still remains disabled without a runnable route; step three never shows close —
+Done is the exit.
 
 **Decision:** The test turn is ephemeral by construction: it runs one real
 voice-pipeline turn on the user's configured routes with an empty history and
@@ -274,23 +283,33 @@ states run offer → scanning → proposal → installing → done or failed; no
 downloads before the proposal has been seen; the staged ~2.5s measurement
 reveals only real device readings; a transfer failure keeps completed models
 and retry resumes the queue rather than starting over. A persisted completed
-  profile is rechecked against pinned installs and current-device benchmarks on
-  the next launch; a ready profile restores the card's Ready verdict, while a
-  stale benchmark proposes testing only. Completing the automatic install
-  persists that same completion marker, so this revalidation path also applies
-  after a later app launch. A zero-byte proposal uses neutral setup
-  wording rather than claiming it will download again. When a model instead
-  fails its device benchmark, retry re-runs selection so the durable result can
-  propose the next viable model without discarding verified downloads. The
-  outcome is announced by the card where the card is visible and by the home
-  `BackgroundTaskBar` otherwise — never both. The completed home row remains
-  available briefly so its destination is actionable; install failure remains
-  there until the user opens setup or retries. Setup progress and outcomes do
-  not use transient toasts. Scanning and installation each expose a labelled
-  Cancel action. Cancelling a scan returns to the offer; cancelling an install
-  returns to its proposal, retains completed artifacts, and can resume. The
-  abort signal reaches downloads and interruptible benchmarks, and a cancelled
-  run may neither publish an outcome nor apply settings after the fact.
+profile is rechecked against pinned installs and current-device benchmarks on
+the next launch; a ready profile restores the card's Ready verdict, while a
+stale benchmark proposes testing only. Completing the automatic install
+persists that same completion marker, so this revalidation path also applies
+after a later app launch. A zero-byte proposal uses neutral setup
+wording rather than claiming it will download again. When a model instead
+fails its device benchmark, retry re-runs selection so the durable result can
+propose the next viable model without discarding verified downloads. The
+outcome is announced by the card where the card is visible and by the home
+`BackgroundTaskBar` otherwise — never both. The completed home row remains
+available briefly so its destination is actionable; install failure remains
+there until the user opens setup or retries. Setup progress and outcomes do
+not use transient toasts. Scanning and installation each expose a labelled
+Cancel action. Cancelling a scan returns to the offer; cancelling an install
+returns to its proposal, retains completed artifacts, and can resume. The
+abort signal reaches downloads and interruptible benchmarks, and a cancelled
+run may neither publish an outcome nor apply settings after the fact.
+
+The identity-guarded `.maestro` onboarding scene is the only exception to the
+shared-job presentation rule: it suspends the live job and passes a fixed
+proposal only to the introduction. Settings and the home task row retain the
+same suspended job, while Free readiness stays false so the proposal cannot
+unlock Try or claim that setup completed. Every store-promo scene suspends
+background automatic setup and provider voice-directory loading before fixture
+identity hydration completes and for the scene's lifetime. Onboarding also
+suppresses Intro's catalogue install and benchmark readers, so the fixed
+proposal cannot trigger a hardware, filesystem, model, or provider probe.
 
 **Decision:** The introduction follows the app's light or dark theme. Only the
 workspace banner keeps a palette of its own -- violet, in both themes -- because
@@ -309,6 +328,9 @@ which becomes a labelled Done action on the last step. The final action stays
 where forward motion has lived throughout the flow; removing it left an empty
 gap that looked like a missing control rather than a deliberate ending.
 Header controls expose 44-point touch targets around 40-point visual faces.
+On a first run, the final step's dot exposes disabled accessibility state until
+the reasoning route is ready, and horizontal paging observes the same boundary;
+re-entry and backward navigation remain unrestricted.
 The welcome step's language picker isolates assistive focus and excludes its
 backdrop from the accessibility tree.
 
@@ -355,10 +377,12 @@ downloaded recognizer is selected. Completing an automatic profile must make
 its verified local recognizer immediately available on the home voice surface.
 
 **Decision:** The provider route leads to the purchase rather than to the
-provider page, because provider keys are a Premium capability. The purchase
-sheet opens over the introduction and leaving it without buying returns to the
-step it was opened from: backing out of a purchase should not also cost someone
-the introduction they were part-way through.
+provider page, because provider keys are a Premium capability. Intro dismisses
+its native modal before the purchase sheet opens; leaving without buying
+reopens the same Intro visit on Setup. The Settings handoff follows the same
+dismiss-then-present rule. Backing out of either destination should not cost
+someone the introduction they were part-way through, and sibling native modals
+must never overlap during that return.
 
 **Decision:** A model download holds a screen wake lock and runs under an
 Android `dataSync` foreground service for its whole duration, and can be

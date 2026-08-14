@@ -333,6 +333,20 @@ describe("SettingsModal", () => {
     expect(
       screen.getAllByTestId(/^local-model-download-/).length,
     ).toBeGreaterThan(0);
+
+    const addSheetModal = screen
+      .UNSAFE_getAllByType(NativeModal)
+      .find(
+        (modal) =>
+          modal.findAllByProps({ testID: "thinking-add-sheet" }).length > 0,
+      );
+    const addSheet = screen.getByTestId("thinking-add-sheet");
+    fireEvent.press(within(addSheet).getAllByLabelText("Unlock Premium")[0]);
+    expect(onOpenPremium).not.toHaveBeenCalled();
+    act(() => {
+      addSheetModal?.props.onDismiss();
+    });
+    expect(onOpenPremium).toHaveBeenCalledTimes(1);
   });
 
   it("keeps provider routes visible but locked in Free Connections", async () => {
@@ -465,6 +479,30 @@ describe("SettingsModal", () => {
 
     fireEvent.press(screen.getByTestId("disconnect-conversation-archive"));
     expect(disconnect).toHaveBeenCalledTimes(1);
+  });
+
+  it("dismisses the archive sheet before opening Premium", async () => {
+    const onOpenPremium = jest.fn();
+    const screen = renderSettingsModal({ isPremium: false, onOpenPremium });
+
+    fireEvent.press(screen.getByTestId("settings-overview-row-data"));
+    await waitFor(() => {
+      expect(screen.getByTestId("archived-conversations-row")).toBeTruthy();
+    });
+    fireEvent.press(screen.getByTestId("archived-conversations-row"));
+    const archiveSheetModal = screen
+      .UNSAFE_getAllByType(NativeModal)
+      .find(
+        (modal) =>
+          modal.findAllByProps({ testID: "archive-settings-sheet" }).length > 0,
+      );
+
+    fireEvent.press(screen.getByTestId("unlock-conversation-archive"));
+    expect(onOpenPremium).not.toHaveBeenCalled();
+    act(() => {
+      archiveSheetModal?.props.onDismiss();
+    });
+    expect(onOpenPremium).toHaveBeenCalledTimes(1);
   });
 
   it("opens localized data backup controls and explains the API-key exclusion", async () => {
@@ -808,18 +846,20 @@ describe("SettingsModal", () => {
     const addKeyboardListener = Keyboard.addListener.bind(Keyboard);
     const removeKeyboardListener = jest.fn();
     let keyboardDidHide: (() => void) | null = null;
-    jest.spyOn(Keyboard, "addListener").mockImplementation((event, listener) => {
-      const subscription = addKeyboardListener(event, listener);
-      if (event === "keyboardDidHide") {
-        keyboardDidHide = listener as () => void;
-        const removeSubscription = subscription.remove.bind(subscription);
-        subscription.remove = () => {
-          removeKeyboardListener();
-          removeSubscription();
-        };
-      }
-      return subscription;
-    });
+    jest
+      .spyOn(Keyboard, "addListener")
+      .mockImplementation((event, listener) => {
+        const subscription = addKeyboardListener(event, listener);
+        if (event === "keyboardDidHide") {
+          keyboardDidHide = listener as () => void;
+          const removeSubscription = subscription.remove.bind(subscription);
+          subscription.remove = () => {
+            removeKeyboardListener();
+            removeSubscription();
+          };
+        }
+        return subscription;
+      });
     const screen = renderSettingsModal({ focusProvider: "openai" });
 
     await waitFor(() => {
@@ -831,9 +871,7 @@ describe("SettingsModal", () => {
     fireEvent.press(screen.getByTestId("provider-connection-close-openai"));
 
     expect(dismissKeyboard).toHaveBeenCalledTimes(1);
-    expect(
-      screen.getByTestId("provider-connection-sheet-openai"),
-    ).toBeTruthy();
+    expect(screen.getByTestId("provider-connection-sheet-openai")).toBeTruthy();
     expect(keyboardDidHide).not.toBeNull();
 
     act(() => keyboardDidHide?.());

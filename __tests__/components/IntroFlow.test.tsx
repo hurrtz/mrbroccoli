@@ -1,6 +1,7 @@
 import React from "react";
 import { fireEvent, render } from "@testing-library/react-native";
-import { StyleSheet } from "react-native";
+import { AccessibilityInfo, ScrollView, StyleSheet } from "react-native";
+import { translations } from "../../src/i18n/localeRegistry";
 
 const mockPlayer = { pause: jest.fn(), play: jest.fn(), seekTo: jest.fn() };
 let mockPlaying = false;
@@ -23,15 +24,31 @@ jest.mock("expo-audio", () => ({
   })),
 }));
 
+jest.mock("../../src/services/localDeviceCapabilities", () => ({
+  getLocalModelBenchmarkResults: jest.fn(async () => ({})),
+}));
+
+jest.mock("../../src/services/offlineProfileManager", () => ({
+  getLocalCatalogInstallStatuses: jest.fn(async () => ({})),
+}));
+
 import { IntroBanner } from "../../src/components/IntroBanner";
 import { IntroFlowScreen } from "../../src/components/introFlow/IntroFlowScreen";
 import { INTRO_STEPS } from "../../src/components/introFlow/introSteps";
+import { getLocalModelBenchmarkResults } from "../../src/services/localDeviceCapabilities";
+import { getLocalCatalogInstallStatuses } from "../../src/services/offlineProfileManager";
 import { createAutoSetupJob } from "../test-utils/autoSetupJobFixture";
 
 const t = ((key: string) => key) as never;
 
 beforeEach(() => {
   jest.clearAllMocks();
+  jest
+    .mocked(getLocalCatalogInstallStatuses)
+    .mockImplementation(() => new Promise(() => undefined));
+  jest
+    .mocked(getLocalModelBenchmarkResults)
+    .mockImplementation(() => new Promise(() => undefined));
   mockPlaying = false;
   mockStatus = {};
 });
@@ -46,11 +63,14 @@ function renderScreen(
     onClose: jest.fn(),
     onComplete: jest.fn(),
     onConnectProvider: jest.fn(),
+    onDismiss: jest.fn(),
     onInstallLocal: jest.fn(),
     onOpenStt: jest.fn(),
     onOpenTts: jest.fn(),
+    sessionId: 0,
     t,
     testTurn: {
+      error: null,
       onPressIn: jest.fn(),
       onPressOut: jest.fn(),
       onReplay: jest.fn(),
@@ -185,6 +205,7 @@ describe("IntroFlowScreen", () => {
     > = {},
   ) {
     return {
+      error: null,
       onPressIn: jest.fn(),
       onPressOut: jest.fn(),
       onReplay: jest.fn(),
@@ -213,6 +234,27 @@ describe("IntroFlowScreen", () => {
     expect(getByTestId("intro-welcome-step")).toBeTruthy();
     expect(getByTestId("intro-welcome-play")).toBeTruthy();
     expect(getByTestId("intro-welcome-language")).toBeTruthy();
+  });
+
+  it("announces and draws the current welcome playback state", () => {
+    const idle = renderScreen();
+
+    expect(
+      idle.getByTestId("intro-welcome-play").props.accessibilityLabel,
+    ).toBe("introPlayAnswer");
+    expect(
+      idle.UNSAFE_getByProps({ testID: "phosphor-icon-play" }),
+    ).toBeTruthy();
+    idle.unmount();
+
+    mockPlaying = true;
+    const playing = renderScreen();
+    expect(
+      playing.getByTestId("intro-welcome-stop").props.accessibilityLabel,
+    ).toBe("introHearStop");
+    expect(
+      playing.UNSAFE_getByProps({ testID: "phosphor-icon-pause" }),
+    ).toBeTruthy();
   });
 
   it("blurs the earlier turns while announcing only the crisp query", () => {
@@ -244,7 +286,9 @@ describe("IntroFlowScreen", () => {
     // The decorative far turn is unreachable without opting into hidden
     // elements; the crisp query is announced normally.
     const { queryByText, getByText } = renderScreen();
-    expect(queryByText("Broccoli comes from the Italian broccolo", { exact: false })).toBeNull();
+    expect(
+      queryByText("Broccoli comes from the Italian broccolo", { exact: false }),
+    ).toBeNull();
     expect(getByText("How does this application work?")).toBeTruthy();
   });
 
@@ -267,6 +311,103 @@ describe("IntroFlowScreen", () => {
     ).toBeTruthy();
   });
 
+  it("mirrors RTL navigation and normalizes the pager to logical steps", () => {
+    const screen = renderScreen({ firstRun: false, language: "ar" });
+
+    expect(
+      StyleSheet.flatten(screen.getByTestId("intro-flow-root").props.style),
+    ).toEqual(expect.objectContaining({ direction: "rtl" }));
+    expect(
+      StyleSheet.flatten(screen.getByTestId("intro-flow-content").props.style),
+    ).toEqual(expect.objectContaining({ direction: "ltr" }));
+    expect(
+      screen.UNSAFE_getByProps({ testID: "phosphor-icon-arrow-right" }),
+    ).toBeTruthy();
+    expect(
+      screen.UNSAFE_getByProps({ testID: "phosphor-icon-left" }),
+    ).toBeTruthy();
+
+    const physicalPages = screen
+      .UNSAFE_getAllByType(ScrollView)
+      .map((page) => page.props.testID)
+      .filter(
+        (testID): testID is string =>
+          typeof testID === "string" && testID.startsWith("intro-page-"),
+      );
+    expect(physicalPages).toEqual([
+      "intro-page-try",
+      "intro-page-setup",
+      "intro-page-welcome",
+    ]);
+    const pageWidth = StyleSheet.flatten(
+      screen.getByTestId("intro-page-welcome").props.style,
+    ).width;
+    expect(
+      screen.getByTestId("intro-flow-content").props.contentOffset,
+    ).toEqual({ x: pageWidth * 2, y: 0 });
+
+    fireEvent(screen.getByTestId("intro-flow-content"), "momentumScrollEnd", {
+      nativeEvent: { contentOffset: { x: 0 } },
+    });
+    expect(
+      screen.getByTestId("intro-stepper-dot-2").props.accessibilityState
+        .selected,
+    ).toBe(true);
+  });
+
+  it("mirrors dialogue tails and follows the preview language direction", () => {
+    const screen = renderScreen({ language: "en" });
+
+    fireEvent.press(screen.getByTestId("intro-welcome-language"));
+    fireEvent.press(screen.getByTestId("intro-language-option-ar"));
+
+    const arabicQuery = screen.getByText(translations.ar.introWelcomeQuery);
+    expect(StyleSheet.flatten(arabicQuery.props.style)).toEqual(
+      expect.objectContaining({ textAlign: "right", writingDirection: "rtl" }),
+    );
+    expect(
+      StyleSheet.flatten(
+        screen.getByTestId("intro-dialogue-query-bubble").props.style,
+      ),
+    ).toEqual(
+      expect.objectContaining({
+        borderBottomLeftRadius: 5,
+        borderBottomRightRadius: 18,
+      }),
+    );
+  });
+
+  it("does not inspect live model state in the deterministic onboarding fixture", () => {
+    renderScreen({ modelStateReadsSuspended: true });
+
+    expect(getLocalCatalogInstallStatuses).not.toHaveBeenCalled();
+    expect(getLocalModelBenchmarkResults).not.toHaveBeenCalled();
+  });
+
+  it("preserves Setup across a serialized handoff but resets a new visit", () => {
+    const screen = renderScreen({ firstRun: false, sessionId: 4 });
+    fireEvent.press(screen.getByTestId("intro-next"));
+
+    screen.rerender(
+      <IntroFlowScreen {...screen.props} sessionId={4} visible={false} />,
+    );
+    screen.rerender(
+      <IntroFlowScreen {...screen.props} sessionId={4} visible />,
+    );
+    expect(
+      screen.getByTestId("intro-stepper-dot-1").props.accessibilityState
+        .selected,
+    ).toBe(true);
+
+    screen.rerender(
+      <IntroFlowScreen {...screen.props} sessionId={5} visible />,
+    );
+    expect(
+      screen.getByTestId("intro-stepper-dot-0").props.accessibilityState
+        .selected,
+    ).toBe(true);
+  });
+
   it("withholds every close control on a first run", () => {
     // On a first run the three steps are the way in; Done is the only exit,
     // and it stays disabled until a test turn has completed.
@@ -285,11 +426,65 @@ describe("IntroFlowScreen", () => {
 
     // Step one forward is free; step two's is the hard requirement.
     fireEvent.press(getByTestId("intro-next"));
-    expect(
-      getByTestId("intro-next").props.accessibilityState,
-    ).toEqual({ disabled: true });
+    expect(getByTestId("intro-next").props.accessibilityState).toEqual({
+      disabled: true,
+    });
     fireEvent.press(getByTestId("intro-next"));
     expect(props.onClose).not.toHaveBeenCalled();
+  });
+
+  it("keeps Try unreachable from the stepper and pager until setup is ready", () => {
+    const screen = renderScreen({
+      firstRun: true,
+      thinkingReady: false,
+    });
+
+    expect(
+      screen.getByTestId("intro-stepper-dot-2").props.accessibilityState,
+    ).toEqual(expect.objectContaining({ disabled: true, selected: false }));
+    expect(screen.queryByTestId("intro-try-step")).toBeNull();
+    fireEvent.press(screen.getByTestId("intro-stepper-dot-2"));
+    expect(
+      screen.getByTestId("intro-stepper-dot-0").props.accessibilityState
+        .selected,
+    ).toBe(true);
+
+    fireEvent(screen.getByTestId("intro-flow-content"), "momentumScrollEnd", {
+      nativeEvent: { contentOffset: { x: 9999 } },
+    });
+    expect(
+      screen.getByTestId("intro-stepper-dot-1").props.accessibilityState
+        .selected,
+    ).toBe(true);
+
+    screen.rerender(<IntroFlowScreen {...screen.props} thinkingReady />);
+    expect(
+      screen.getByTestId("intro-stepper-dot-2").props.accessibilityState,
+    ).toEqual(expect.objectContaining({ disabled: false, selected: false }));
+    expect(screen.getByTestId("intro-try-step")).toBeTruthy();
+    fireEvent.press(screen.getByTestId("intro-stepper-dot-2"));
+    expect(
+      screen.getByTestId("intro-stepper-dot-2").props.accessibilityState
+        .selected,
+    ).toBe(true);
+  });
+
+  it("returns a first run to Setup if reasoning readiness is lost", () => {
+    const screen = renderScreen({ firstRun: true, thinkingReady: true });
+
+    fireEvent.press(screen.getByTestId("intro-stepper-dot-2"));
+    expect(
+      screen.getByTestId("intro-stepper-dot-2").props.accessibilityState
+        .selected,
+    ).toBe(true);
+
+    screen.rerender(
+      <IntroFlowScreen {...screen.props} thinkingReady={false} />,
+    );
+    expect(
+      screen.getByTestId("intro-stepper-dot-1").props.accessibilityState
+        .selected,
+    ).toBe(true);
   });
 
   it("unlocks Done only after one completed test turn on a first run", () => {
@@ -302,6 +497,27 @@ describe("IntroFlowScreen", () => {
     fireEvent.press(withoutTurn.getByTestId("intro-done"));
     expect(withoutTurn.props.onComplete).not.toHaveBeenCalled();
 
+    const failedTurn = renderScreen({
+      firstRun: true,
+      testTurn: createTestTurn({
+        error: "introTestTurnFailed",
+        turn: {
+          answer: "introTestTurnFailed",
+          latencyLabel: null,
+          question: "Can you hear me?",
+          successful: false,
+        },
+      }),
+    });
+    fireEvent.press(failedTurn.getByTestId("intro-next"));
+    fireEvent.press(failedTurn.getByTestId("intro-next"));
+    expect(
+      failedTurn.getByTestId("intro-done").props.accessibilityState,
+    ).toEqual({ disabled: true });
+    expect(failedTurn.queryByTestId("intro-try-replay")).toBeNull();
+    fireEvent.press(failedTurn.getByTestId("intro-done"));
+    expect(failedTurn.props.onComplete).not.toHaveBeenCalled();
+
     const withTurn = renderScreen({
       firstRun: true,
       testTurn: createTestTurn({
@@ -309,6 +525,7 @@ describe("IntroFlowScreen", () => {
           answer: "About 23 days.",
           latencyLabel: "2.4 s",
           question: "How long to a million?",
+          successful: true,
         },
       }),
     });
@@ -364,15 +581,26 @@ describe("IntroFlowScreen", () => {
   });
 
   it("jumps to any step from the stepper", () => {
-    const { getByTestId } = renderScreen({ firstRun: false });
+    const { getByTestId, props } = renderScreen({
+      firstRun: false,
+      thinkingReady: false,
+    });
 
     expect(
       StyleSheet.flatten(getByTestId("intro-stepper-dot-0").props.style),
     ).toEqual(expect.objectContaining({ height: 44, minWidth: 44 }));
+    expect(
+      getByTestId("intro-stepper-dot-2").props.accessibilityState.disabled,
+    ).toBe(false);
     fireEvent.press(getByTestId("intro-stepper-dot-2"));
     expect(
       getByTestId("intro-stepper-dot-2").props.accessibilityState.selected,
     ).toBe(true);
+    expect(getByTestId("intro-try-mic").props.accessibilityState).toEqual({
+      disabled: true,
+    });
+    fireEvent(getByTestId("intro-try-mic"), "pressIn");
+    expect(props.testTurn.onPressIn).not.toHaveBeenCalled();
   });
 
   it("offers the single green path and hides the manual catalogue", () => {
@@ -446,6 +674,7 @@ describe("IntroFlowScreen", () => {
         answer: "About 23 days without sleeping.",
         latencyLabel: "2.4 s",
         question: "How long would it take me to count to a million?",
+        successful: true,
       },
     });
     const { getByTestId, getByText } = renderScreen({ testTurn });
@@ -455,7 +684,9 @@ describe("IntroFlowScreen", () => {
     ).toBeTruthy();
     expect(getByText("About 23 days without sleeping.")).toBeTruthy();
     expect(getByText(/2.4 s/)).toBeTruthy();
-    expect(StyleSheet.flatten(getByTestId("intro-try-mic").props.style)).toEqual(
+    expect(
+      StyleSheet.flatten(getByTestId("intro-try-mic").props.style),
+    ).toEqual(
       expect.objectContaining({ borderRadius: 12, height: 76, width: 76 }),
     );
     expect(
@@ -464,5 +695,63 @@ describe("IntroFlowScreen", () => {
 
     fireEvent.press(getByTestId("intro-try-replay"));
     expect(testTurn.onReplay).toHaveBeenCalledTimes(1);
+  });
+
+  it("announces semantic live-test phases and failures without streaming churn", () => {
+    const announce = jest
+      .spyOn(AccessibilityInfo, "announceForAccessibility")
+      .mockImplementation(() => undefined);
+    const screen = renderScreen({
+      firstRun: false,
+      testTurn: createTestTurn({ phase: "recording" }),
+    });
+
+    expect(screen.getByTestId("intro-test-status").props.children).toBe(
+      "listeningToYourVoice",
+    );
+
+    screen.rerender(
+      <IntroFlowScreen
+        {...screen.props}
+        firstRun={false}
+        testTurn={createTestTurn({ phase: "running" })}
+      />,
+    );
+    expect(screen.getByTestId("intro-test-status").props.children).toBe(
+      "pleaseWait",
+    );
+
+    screen.rerender(
+      <IntroFlowScreen
+        {...screen.props}
+        firstRun={false}
+        testTurn={createTestTurn({
+          error: "introTestTurnFailed",
+          turn: {
+            answer: "introTestTurnFailed",
+            latencyLabel: null,
+            question: "Can you hear me?",
+            successful: false,
+          },
+        })}
+      />,
+    );
+    expect(screen.getByTestId("intro-test-status").props.children).toBe(
+      "introHoldToTalk",
+    );
+    expect(announce).toHaveBeenCalledWith("introTestTurnFailed");
+    announce.mockRestore();
+  });
+
+  it("shows a transcriptless test failure without duplicating failed bubbles", () => {
+    const screen = renderScreen({
+      firstRun: false,
+      testTurn: createTestTurn({ error: "introTestTurnFailed" }),
+    });
+
+    expect(screen.getByTestId("intro-test-error").props.children).toBe(
+      "introTestTurnFailed",
+    );
+    expect(screen.queryByTestId("intro-try-replay")).toBeNull();
   });
 });

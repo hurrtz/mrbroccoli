@@ -1,5 +1,11 @@
 import React from "react";
-import { KeyboardAvoidingView, Platform } from "react-native";
+import {
+  ActivityIndicator,
+  KeyboardAvoidingView,
+  Platform,
+  StyleSheet,
+  View,
+} from "react-native";
 import { StatusBar } from "expo-status-bar";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -8,6 +14,7 @@ import { IntroFlowScreen } from "../../components/introFlow/IntroFlowScreen";
 import { PremiumUpgradeModal } from "../../components/PremiumUpgradeModal";
 import { Toast } from "../../components/Toast";
 import { AntSettingsModal } from "../../features/settings/AntSettingsModal";
+import type { AppLanguage } from "../../i18n/localeRegistry";
 import { Colors } from "../../theme/colors";
 import { MainScreenWorkspace } from "./MainScreenWorkspace";
 import { DisclosureDialog } from "./DisclosureDialog";
@@ -24,9 +31,11 @@ interface MainScreenPresentationProps {
   imageSource: React.ComponentProps<typeof ImageSourceSheet>;
   isDark: boolean;
   isLandscape: boolean;
+  language: AppLanguage;
   premiumUpgrade: React.ComponentProps<typeof PremiumUpgradeModal>;
   settingsModal: React.ComponentProps<typeof AntSettingsModal>;
   styleSheet: React.ComponentProps<typeof StyleSheetModal>;
+  surfaceTransition: { label: string; visible: boolean };
   toast: React.ComponentProps<typeof Toast>;
   workspace: React.ComponentProps<typeof MainScreenWorkspace>;
 }
@@ -40,9 +49,11 @@ export function MainScreenPresentation({
   imageSource,
   isDark,
   isLandscape,
+  language,
   premiumUpgrade,
   settingsModal,
   styleSheet,
+  surfaceTransition,
   toast,
   workspace,
 }: MainScreenPresentationProps) {
@@ -57,13 +68,26 @@ export function MainScreenPresentation({
       }
     >
       <StatusBar style={isDark ? "light" : "dark"} />
+      {/* Store screenshots relaunch between independently seeded scenes. This
+          stable native marker proves that each scene hydrated the requested
+          interface language before any capture, without adding spoken UI. */}
+      <View
+        collapsable={false}
+        pointerEvents="none"
+        style={StyleSheet.absoluteFill}
+        testID={`app-locale-${language}`}
+      />
       <Toast {...toast} />
 
       {/* Setup no longer takes the screen. A new user lands in the real
           workspace and is offered a path from the intro banner, or contextually
           when they try a turn with nothing configured. */}
       <KeyboardAvoidingView
+        accessibilityElementsHidden={surfaceTransition.visible}
         behavior={Platform.OS === "ios" ? "padding" : "height"}
+        importantForAccessibility={
+          surfaceTransition.visible ? "no-hide-descendants" : "auto"
+        }
         keyboardVerticalOffset={Platform.OS === "ios" ? 64 : 0}
         style={[
           styles.defaultLayout,
@@ -72,6 +96,21 @@ export function MainScreenPresentation({
       >
         <MainScreenWorkspace {...workspace} />
       </KeyboardAvoidingView>
+
+      {surfaceTransition.visible ? (
+        <View
+          accessibilityLabel={surfaceTransition.label}
+          accessibilityRole="progressbar"
+          accessibilityViewIsModal
+          style={[
+            presentationStyles.surfaceTransition,
+            { backgroundColor: colors.background },
+          ]}
+          testID="secondary-surface-transition"
+        >
+          <ActivityIndicator color={colors.accent} />
+        </View>
+      ) : null}
 
       <ImageSourceSheet {...imageSource} />
       <DisclosureDialog {...councilDisclosure} />
@@ -85,3 +124,16 @@ export function MainScreenPresentation({
     </SafeAreaView>
   );
 }
+
+const presentationStyles = StyleSheet.create({
+  surfaceTransition: {
+    bottom: 0,
+    left: 0,
+    position: "absolute",
+    right: 0,
+    top: 0,
+    alignItems: "center",
+    justifyContent: "center",
+    zIndex: 1,
+  },
+});

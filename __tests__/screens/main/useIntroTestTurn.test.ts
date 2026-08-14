@@ -31,9 +31,7 @@ const mockRunVoicePipeline = jest.mocked(runVoicePipeline);
 const mockCleanupCapturedAudio = jest.mocked(cleanupCapturedAudio);
 
 type IntroTestTurnParams = Parameters<typeof useIntroTestTurn>[0];
-type IntroTestRouteParams = ReturnType<
-  IntroTestTurnParams["getRouteParams"]
->;
+type IntroTestRouteParams = ReturnType<IntroTestTurnParams["getRouteParams"]>;
 type IntroTestTurnPlayer = IntroTestTurnParams["player"];
 
 const startRecording = jest.fn(async () => undefined);
@@ -142,6 +140,8 @@ async function recordTurn(
 describe("useIntroTestTurn", () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    startRecording.mockReset().mockResolvedValue(undefined);
+    stopRecording.mockReset().mockResolvedValue("file://intro-recording.m4a");
     mockUseAudioRecorder.mockReturnValue({
       startRecording,
       stopRecording,
@@ -153,6 +153,19 @@ describe("useIntroTestTurn", () => {
       params.callbacks.onResponseDone("It helps plants capture light.");
       return transcription;
     });
+  });
+
+  it("ignores capture gestures while the intro route is inactive", () => {
+    const { getRouteParams, result } = renderIntroTestTurn({ active: false });
+
+    act(() => {
+      result.current.onPressIn();
+      result.current.onPressOut();
+    });
+
+    expect(result.current.phase).toBe("idle");
+    expect(startRecording).not.toHaveBeenCalled();
+    expect(getRouteParams).not.toHaveBeenCalled();
   });
 
   it("transcribes native recordings before running the configured route", async () => {
@@ -192,7 +205,27 @@ describe("useIntroTestTurn", () => {
       answer: "It helps plants capture light.",
       latencyLabel: null,
       question: "What is chlorophyll?",
+      successful: true,
     });
+    expect(result.current.error).toBeNull();
+  });
+
+  it("surfaces a native recognition failure with no transcript", async () => {
+    mockTranscribeRecordedFile.mockResolvedValueOnce(null);
+    const routeParams = createRouteParams({
+      nativeSttRequiresOnDevice: true,
+      sttApiKey: "",
+      sttMode: "native",
+      sttModel: undefined,
+      sttProvider: null,
+    });
+    const { result } = renderIntroTestTurn({ routeParams });
+
+    await recordTurn(result);
+
+    expect(mockRunVoicePipeline).not.toHaveBeenCalled();
+    expect(result.current.turn).toBeNull();
+    expect(result.current.error).toBe("introTestTurnFailed");
   });
 
   it("resets a stopped shared player before a new test turn", async () => {
@@ -254,6 +287,9 @@ describe("useIntroTestTurn", () => {
 
     act(() => {
       result.current.onPressIn();
+    });
+    await waitFor(() => {
+      expect(startRecording).toHaveBeenCalledTimes(1);
     });
     act(() => {
       result.current.onPressOut();
@@ -317,6 +353,7 @@ describe("useIntroTestTurn", () => {
     await waitFor(() => {
       expect(result.current.phase).toBe("idle");
     });
+    expect(result.current.error).toBe("introTestTurnFailed");
     expect(mockRunVoicePipeline).not.toHaveBeenCalled();
   });
 
@@ -334,6 +371,25 @@ describe("useIntroTestTurn", () => {
     await waitFor(() => {
       expect(result.current.phase).toBe("idle");
     });
+    expect(result.current.error).toBe("introTestTurnFailed");
+    expect(mockRunVoicePipeline).not.toHaveBeenCalled();
+  });
+
+  it("surfaces an empty recorder result", async () => {
+    stopRecording.mockResolvedValueOnce(null);
+    const { result } = renderIntroTestTurn();
+
+    act(() => {
+      result.current.onPressIn();
+    });
+    act(() => {
+      result.current.onPressOut();
+    });
+
+    await waitFor(() => {
+      expect(result.current.phase).toBe("idle");
+    });
+    expect(result.current.error).toBe("introTestTurnFailed");
     expect(mockRunVoicePipeline).not.toHaveBeenCalled();
   });
 
@@ -344,6 +400,9 @@ describe("useIntroTestTurn", () => {
 
     act(() => {
       result.current.onPressIn();
+    });
+    await waitFor(() => {
+      expect(startRecording).toHaveBeenCalledTimes(1);
     });
     act(() => {
       result.current.onPressOut();
@@ -359,6 +418,65 @@ describe("useIntroTestTurn", () => {
     expect(mockCleanupCapturedAudio).toHaveBeenCalledWith(
       "file://stale-intro-recording.m4a",
     );
+    expect(mockRunVoicePipeline).not.toHaveBeenCalled();
+  });
+
+  it("does not start a queued recording after the flow exits", async () => {
+    const firstStop = deferred<string | null>();
+    stopRecording.mockReturnValueOnce(firstStop.promise);
+    const { rerender, result } = renderIntroTestTurn();
+
+    act(() => {
+      result.current.onPressIn();
+    });
+    await waitFor(() => {
+      expect(startRecording).toHaveBeenCalledTimes(1);
+    });
+    rerender({ isActive: false });
+    await waitFor(() => {
+      expect(stopRecording).toHaveBeenCalledTimes(1);
+    });
+
+    rerender({ isActive: true });
+    act(() => {
+      result.current.onPressIn();
+    });
+    rerender({ isActive: false });
+
+    await act(async () => {
+      firstStop.resolve("file://first-intro-recording.m4a");
+      await firstStop.promise;
+      await Promise.resolve();
+    });
+
+    expect(startRecording).toHaveBeenCalledTimes(1);
+    expect(mockRunVoicePipeline).not.toHaveBeenCalled();
+  });
+
+  it("stops and cleans a native recording whose start finishes after exit", async () => {
+    const start = deferred<void>();
+    startRecording.mockReturnValueOnce(start.promise);
+    const { rerender, result } = renderIntroTestTurn();
+
+    act(() => {
+      result.current.onPressIn();
+    });
+    await waitFor(() => {
+      expect(startRecording).toHaveBeenCalledTimes(1);
+    });
+
+    rerender({ isActive: false });
+    await act(async () => {
+      start.resolve();
+      await start.promise;
+    });
+
+    await waitFor(() => {
+      expect(stopRecording).toHaveBeenCalledTimes(1);
+      expect(mockCleanupCapturedAudio).toHaveBeenCalledWith(
+        "file://intro-recording.m4a",
+      );
+    });
     expect(mockRunVoicePipeline).not.toHaveBeenCalled();
   });
 
@@ -464,6 +582,36 @@ describe("useIntroTestTurn", () => {
     replayDrain.resolve();
   });
 
+  it("does not replay an earlier answer after a later test turn fails", async () => {
+    const player = createPlayer({
+      waitForDrain: jest.fn(async () => undefined),
+    });
+    mockRunVoicePipeline
+      .mockImplementationOnce(async (params) => {
+        params.callbacks.onTranscription("First question");
+        params.callbacks.onResponseDone("First answer");
+        params.callbacks.onAudioReady("file://first-answer.m4a");
+        return "First question";
+      })
+      .mockImplementationOnce(async (params) => {
+        params.callbacks.onTranscription("Second question");
+        await params.callbacks.onError(new Error("Second turn failed"));
+        return "Second question";
+      });
+    const { result } = renderIntroTestTurn({ player });
+
+    await recordTurn(result);
+    (player.enqueueAudio as jest.Mock).mockClear();
+    await recordTurn(result);
+    act(() => {
+      result.current.onReplay();
+    });
+
+    expect(result.current.turn?.successful).toBe(false);
+    expect(player.enqueueAudio).not.toHaveBeenCalled();
+    expect(player.speakText).not.toHaveBeenCalled();
+  });
+
   it("keeps a late TTS error from being finalized as success", async () => {
     mockRunVoicePipeline.mockImplementationOnce(async (params) => {
       params.callbacks.onTranscription("Will this be spoken?");
@@ -479,7 +627,33 @@ describe("useIntroTestTurn", () => {
       answer: "introTestTurnFailed",
       latencyLabel: null,
       question: "Will this be spoken?",
+      successful: false,
     });
+  });
+
+  it("deletes an Intro capture when provider transcription throws", async () => {
+    mockRunVoicePipeline.mockRejectedValueOnce(new Error("STT failed"));
+    const { result } = renderIntroTestTurn();
+
+    await recordTurn(result);
+
+    expect(result.current.error).toBe("introTestTurnFailed");
+    expect(mockCleanupCapturedAudio).toHaveBeenCalledWith(
+      "file://intro-recording.m4a",
+    );
+  });
+
+  it("deletes an Intro capture when the pipeline returns no transcript", async () => {
+    mockRunVoicePipeline.mockResolvedValueOnce("");
+    const { result } = renderIntroTestTurn();
+
+    await recordTurn(result);
+
+    expect(result.current.error).toBe("introTestTurnFailed");
+    expect(result.current.turn).toBeNull();
+    expect(mockCleanupCapturedAudio).toHaveBeenCalledWith(
+      "file://intro-recording.m4a",
+    );
   });
 
   it("stops owned intro playback on flow exit without stopping on initial inactive mount", async () => {

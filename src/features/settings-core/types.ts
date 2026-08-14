@@ -71,7 +71,8 @@ export interface SettingsModalProps {
     provider: Provider,
     capability: ProviderCapability,
   ) => Promise<void>;
-  onOpenPremium: () => void;
+  /** Opens purchase and returns to the page that originated the handoff. */
+  onOpenPremium: (returnPage?: SettingsPage) => void;
   archivedConversationCount: number;
   onOpenArchivedConversations: () => void;
   conversationArchive: ConversationArchiveController;

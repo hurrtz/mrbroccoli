@@ -1,5 +1,5 @@
 appId: ${APP_ID}
-name: Google Play Free conversation and onboarding screenshots
+name: Google Play Free conversation screenshot
 tags:
   - store-promos
   - android
@@ -11,20 +11,11 @@ tags:
 - launchApp
 - setOrientation: PORTRAIT
 - assertVisible:
-    id: free-edition-status
+    id: ^app-locale-${LOCALE}$
 - assertVisible:
     id: voice-stage-idle
 - assertVisible:
     id: transcript-handle
 - takeScreenshot:
     path: 02-free-conversation
-- tapOn:
-    id: free-edition-status
-- assertVisible:
-    id: intro-flow-content
-- tapOn:
-    id: intro-stepper-dot-2
-- assertVisible:
-    id: auto-setup-card
-- takeScreenshot:
-    path: 03-free-onboarding
+- stopApp

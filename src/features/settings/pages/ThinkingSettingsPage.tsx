@@ -352,6 +352,27 @@ export function ThinkingSettingsPage({
   const { language, t } = useLocalization();
   useRuntimeCapabilityOverrides();
   const [sheet, setSheet] = React.useState<ThinkingSheet>(null);
+  const pendingPremiumAfterSheetRef = React.useRef(false);
+  const handleSheetDismiss = React.useCallback(() => {
+    if (!pendingPremiumAfterSheetRef.current) {
+      return;
+    }
+    pendingPremiumAfterSheetRef.current = false;
+    onOpenPremium();
+  }, [onOpenPremium]);
+  const openPremiumAfterSheetDismiss = React.useCallback(() => {
+    pendingPremiumAfterSheetRef.current = true;
+    setSheet(null);
+  }, []);
+  React.useEffect(() => {
+    if (sheet !== null || !pendingPremiumAfterSheetRef.current) {
+      return;
+    }
+    // SettingsSheet.onDismiss is iOS-only in React Native. Android gets the
+    // same consumed-ref fallback before the parent Settings modal is closed.
+    const timer = setTimeout(handleSheetDismiss, 350);
+    return () => clearTimeout(timer);
+  }, [handleSheetDismiss, sheet]);
   const pendingProviderAdd = React.useRef<{
     ids: Set<ResponseMode>;
     route: ResponseModeRoute;
@@ -542,6 +563,7 @@ export function ThinkingSettingsPage({
       </SettingsGroup>
 
       <SettingsSheet
+        onDismiss={handleSheetDismiss}
         testID="thinking-slot-sheet"
         title={slotTitle}
         visible={sheet?.kind === "slot"}
@@ -625,7 +647,7 @@ export function ThinkingSettingsPage({
                 );
                 setSheet({ ...sheet, view: "slot" });
               }}
-              onOpenPremium={onOpenPremium}
+              onOpenPremium={openPremiumAfterSheetDismiss}
               selectableProviders={llmProviders}
               selectedProvider={
                 currentMode.route.runtime === "local"
@@ -681,6 +703,7 @@ export function ThinkingSettingsPage({
       </SettingsSheet>
 
       <SettingsSheet
+        onDismiss={handleSheetDismiss}
         testID="thinking-add-sheet"
         title={t("addResponseMode")}
         visible={sheet?.kind === "add"}
@@ -695,12 +718,13 @@ export function ThinkingSettingsPage({
           allProviders={allLlmProviders}
           isPremium={isPremium}
           onChoose={addProviderRoute}
-          onOpenPremium={onOpenPremium}
+          onOpenPremium={openPremiumAfterSheetDismiss}
           selectableProviders={llmProviders}
         />
       </SettingsSheet>
 
       <SettingsSheet
+        onDismiss={handleSheetDismiss}
         testID="thinking-council-sheet"
         title={t("ulraMode")}
         visible={sheet?.kind === "council"}
@@ -792,6 +816,7 @@ export function ThinkingSettingsPage({
       </SettingsSheet>
 
       <SettingsSheet
+        onDismiss={handleSheetDismiss}
         testID="thinking-system-prompt-sheet"
         title={t("systemPrompt")}
         visible={sheet?.kind === "prompt"}

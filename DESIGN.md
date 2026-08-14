@@ -292,7 +292,8 @@ edition-aware capabilities to presentation and settings surfaces.
 **Decision:** Production builds fail closed. Entitlement simulation is allowed
 only when the exact application ID ends in `.dev` or `.maestro`, determined by
 native runtime identity. Store-promo fixtures are additionally restricted to
-`.maestro`; neither facility can activate in the production package.
+the exact `com.tobiaswinkler.app.mrbroccoli.maestro` application ID; neither
+facility can activate in the production package.
 
 ## Native Boundaries
 

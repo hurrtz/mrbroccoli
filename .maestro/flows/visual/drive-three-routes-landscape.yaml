@@ -62,6 +62,9 @@ tags:
     id: settings-back-button
 - tapOn:
     id: settings-close-button
+- waitForAnimationToEnd
+- assertNotVisible:
+    id: settings-modal-title
 
 # The approved workspace exposes one active-route byline. Open its picker to
 # prove all three derived routes, then close it through the active route.

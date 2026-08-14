@@ -25,62 +25,37 @@ tags:
 - tapOn:
     id: intro-welcome-play
 - extendedWaitUntil:
-    visible: "Playing — tap to stop"
+    visible:
+      id: intro-welcome-stop
     timeout: 3000
 - takeScreenshot:
     path: ${PLATFORM}/smoke/intro-01-audio-playing
 - tapOn:
-    id: intro-welcome-play
-- swipe:
-    direction: LEFT
-- assertVisible: "What you actually need"
-- takeScreenshot:
-    path: ${PLATFORM}/smoke/intro-02-requirements
+    id: intro-welcome-stop
 - tapOn:
-    id: intro-next
+    id: intro-stepper-dot-1
 - assertVisible:
-    id: auto-setup-card
-- takeScreenshot:
-    path: ${PLATFORM}/smoke/intro-03-auto-setup
-- tapOn:
-    id: intro-stepper-dot-3
-- assertVisible: "Pick something to think with"
-- takeScreenshot:
-    path: ${PLATFORM}/smoke/intro-04-thinking-route
-- tapOn:
-    id: intro-stepper-dot-4
-- assertVisible: "Let it hear you"
-- takeScreenshot:
-    path: ${PLATFORM}/smoke/intro-05-listening
-- tapOn:
-    id: intro-stepper-dot-5
-- assertVisible: "Let it speak back"
-- takeScreenshot:
-    path: ${PLATFORM}/smoke/intro-06-speaking
-- tapOn:
-    id: intro-stepper-dot-6
-- assertVisible: "That is everything"
+    id: intro-setup-step
 - assertVisible:
-    id: intro-done
+    id: intro-auto-start
 - takeScreenshot:
-    path: ${PLATFORM}/smoke/intro-07-premium
+    path: ${PLATFORM}/smoke/intro-02-setup-offer
 - tapOn:
-    id: intro-back
-- assertVisible: "Let it speak back"
-- tapOn:
-    id: intro-stepper-dot-6
-- tapOn:
-    id: intro-done
+    id: intro-manual-switch
+- assertVisible:
+    id: intro-manual-catalogue
+- takeScreenshot:
+    path: ${PLATFORM}/smoke/intro-02-setup-manual
+- stopApp
+- launchApp
 - assertVisible:
     id: main-screen
-- tapOn:
+- assertVisible:
     id: intro-banner
-- assertVisible:
-    id: intro-welcome-play
 - tapOn:
-    id: intro-close
-- assertVisible:
-    id: main-screen
+    id: intro-banner-dismiss
+- assertNotVisible:
+    id: intro-banner
 - takeScreenshot:
     path: ${PLATFORM}/smoke/home-portrait
 - tapOn:
@@ -103,6 +78,9 @@ tags:
     id: settings-back-button
 - tapOn:
     id: settings-close-button
+- waitForAnimationToEnd
+- assertNotVisible:
+    id: settings-modal-title
 - setOrientation: LANDSCAPE_LEFT
 - assertVisible:
     id: landscape-left-pane

@@ -4,25 +4,31 @@ import {
   normalizeFreeSpeechLanguage,
   type SpeechLanguage,
 } from "../constants/speechLanguages";
+import type {
+  AutoSetupJobPlanItem,
+  AutoSetupJobState,
+} from "../components/autoSetup/types";
 import type { PipelinePhase } from "../hooks/useVoicePipeline";
+import type { TranslateFn } from "../screens/main/shared";
 import type { FreeOfflineModeController } from "../screens/main/useFreeOfflineMode";
 import type { Settings, VoiceVisualPhase } from "../types";
+import { formatBytes } from "../utils/formatBytes";
 import { getApplicationId } from "./developmentEntitlement";
 import type { LocalDeviceSnapshot } from "./localDeviceCapabilities";
 import {
   applyOfflineProfileToSettings,
+  getOfflineProfileModels,
   selectOfflineProfile,
 } from "./offlineProfile";
 import type { OfflineProfileReadiness } from "./offlineProfileManager";
 
 const GIB = 1024 ** 3;
-const MAESTRO_APPLICATION_ID_SUFFIX = ".maestro";
+const STORE_PROMO_APPLICATION_ID = "com.tobiaswinkler.app.mrbroccoli.maestro";
 
-export const STORE_PROMO_SCENE_STORAGE_KEY =
-  "@mrbroccoli/store-promo-scene";
+export const STORE_PROMO_SCENE_STORAGE_KEY = "@mrbroccoli/store-promo-scene";
 export const STORE_PROMO_ORB_STORAGE_KEY = "@mrbroccoli/store-promo-orb";
 
-export const STORE_PROMO_SCENES = ["premium", "free"] as const;
+export const STORE_PROMO_SCENES = ["premium", "free", "onboarding"] as const;
 export type StorePromoScene = (typeof STORE_PROMO_SCENES)[number];
 
 export interface StorePromoOrbPresentation {
@@ -44,7 +50,7 @@ const STORE_PROMO_ORB_PHASES: readonly VoiceVisualPhase[] = [
 ];
 
 export function isStorePromoApplicationId(applicationId: string | null) {
-  return applicationId?.endsWith(MAESTRO_APPLICATION_ID_SUFFIX) === true;
+  return applicationId === STORE_PROMO_APPLICATION_ID;
 }
 
 export function isStorePromoScene(value: unknown): value is StorePromoScene {
@@ -144,13 +150,91 @@ function getFreeSpeechLanguage(language: Settings["language"]): SpeechLanguage {
   return normalizeFreeSpeechLanguage(language) ?? "en";
 }
 
+const ignoreStorePromoAutoSetupAction = () => undefined;
+
+/**
+ * The fixed recommendation shown only by the identity-guarded onboarding
+ * store scene. It uses the same catalogue selector as real setup, but feeds it
+ * the checked-in device snapshot and exposes no action that can start a probe,
+ * download, benchmark, model, or provider request.
+ */
+export function applyStorePromoAutoSetupJob(
+  job: AutoSetupJobState,
+  language: Settings["language"],
+  scene: StorePromoScene | null,
+  platform: LocalDeviceSnapshot["platform"],
+  t: TranslateFn,
+): AutoSetupJobState {
+  if (scene !== "onboarding") {
+    return job;
+  }
+
+  const snapshot = buildStorePromoLocalDeviceSnapshot(platform);
+  const selection = selectOfflineProfile({
+    languages: [getFreeSpeechLanguage(language)],
+    snapshot,
+  });
+  if (selection.status !== "ready") {
+    return job;
+  }
+
+  const { profile } = selection;
+  const item = (
+    role: AutoSetupJobPlanItem["role"],
+    roleLabel: string,
+    model?: AutoSetupJobPlanItem["model"],
+    name?: string,
+  ): AutoSetupJobPlanItem => ({
+    role,
+    roleLabel,
+    model,
+    name,
+    active: false,
+    installed: false,
+    failed: false,
+  });
+
+  return {
+    state: "proposal",
+    downloadBytes: profile.downloadBytes,
+    fraction: 0,
+    scanned: 4,
+    facts: [],
+    plan: [
+      item("think", t("thinking"), profile.llm),
+      profile.stt
+        ? item("listen", t("listening"), profile.stt)
+        : item("listen", t("listening"), undefined, t("appNative")),
+      profile.tts
+        ? item("speak", t("speaking"), profile.tts)
+        : item("speak", t("speaking"), undefined, t("systemVoice")),
+    ],
+    benchmarks: {},
+    snapshot,
+    totalSizeLabel: formatBytes(
+      getOfflineProfileModels(profile).reduce(
+        (total, model) => total + model.downloadBytes,
+        0,
+      ),
+    ),
+    reading: null,
+    errorKind: null,
+    errorDetail: null,
+    running: false,
+    start: ignoreStorePromoAutoSetupAction,
+    install: ignoreStorePromoAutoSetupAction,
+    cancel: ignoreStorePromoAutoSetupAction,
+    retry: ignoreStorePromoAutoSetupAction,
+  };
+}
+
 export function applyStorePromoFreeOfflineController(
   controller: FreeOfflineModeController,
   settings: Settings,
   scene: StorePromoScene | null,
   platform: LocalDeviceSnapshot["platform"],
 ): FreeOfflineModeController {
-  if (scene !== "free") {
+  if (scene !== "free" && scene !== "onboarding") {
     return controller;
   }
 
@@ -173,20 +257,23 @@ export function applyStorePromoFreeOfflineController(
     },
     selection.profile,
   );
+  const ready = scene === "free" && !controller.setupVisible;
   const readiness: OfflineProfileReadiness = {
-    ready: !controller.setupVisible,
-    installed: !controller.setupVisible,
-    failedModelId: controller.setupVisible ? selection.profile.llm.id : null,
+    ready,
+    installed: ready,
+    failedModelId: scene === "free" && !ready ? selection.profile.llm.id : null,
     installs: {},
     benchmarks: {},
   };
-  const selectedLanguage =
-    normalizeFreeSpeechLanguage(speechLanguage) ?? "en";
+  const selectedLanguage = normalizeFreeSpeechLanguage(speechLanguage) ?? "en";
 
   return {
     ...controller,
-    effectiveSettings,
-    freeRuntimeReady: true,
+    // The onboarding scene owns only a recommendation. It must not project
+    // the selected route as already applied or unlock the live-test step.
+    effectiveSettings:
+      scene === "onboarding" ? controller.effectiveSettings : effectiveSettings,
+    freeRuntimeReady: ready,
     checking: false,
     evaluationStage: null,
     preparing: false,

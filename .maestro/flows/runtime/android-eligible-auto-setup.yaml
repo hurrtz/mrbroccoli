@@ -15,31 +15,49 @@ tags:
 - tapOn:
     id: intro-banner
 - tapOn:
-    id: intro-stepper-dot-2
+    id: intro-stepper-dot-1
+- assertVisible:
+    id: intro-setup-step
+- tapOn:
+    id: intro-auto-start
 - assertVisible:
     id: auto-setup-card
-- tapOn: "Check this phone"
-- extendedWaitUntil:
-    visible: "Download and install"
-    timeout: 30000
+- assertVisible:
+    id: auto-setup-proposal
 - assertVisible: "Recommended for this phone"
+- scrollUntilVisible:
+    element:
+      id: auto-setup-install
+    direction: DOWN
+- assertVisible: "Download and install"
 - takeScreenshot:
     path: android-physical/runtime/auto-setup-proposal
-- tapOn: "Download and install"
+- tapOn:
+    id: auto-setup-install
 - takeScreenshot:
     path: android-physical/runtime/auto-setup-installing
 - extendedWaitUntil:
-    visible: "Ready"
+    visible:
+      id: auto-setup-done-state
     timeout: 1200000
+- scrollUntilVisible:
+    element:
+      id: auto-setup-done
+    direction: UP
 - assertVisible: "Installed and selected."
 - assertVisible: "Replies, speech input and voice output now work with no network connection."
 - takeScreenshot:
     path: android-physical/runtime/auto-setup-ready
-- tapOn: "Done"
-- tapOn:
-    id: intro-close
+- stopApp
+- launchApp
 - assertVisible:
     id: main-screen
+- assertVisible:
+    id: intro-banner
+- tapOn:
+    id: intro-banner-dismiss
+- assertNotVisible:
+    id: intro-banner
 - tapOn:
     id: main-settings-button
 - assertVisible:

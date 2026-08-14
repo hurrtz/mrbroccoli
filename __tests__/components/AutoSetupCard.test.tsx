@@ -26,7 +26,7 @@ describe("AutoSetupCard", () => {
     const screen = renderCard({ job });
 
     expect(screen.getByText("autoSetupOfferNote")).toBeTruthy();
-    fireEvent.press(screen.getByText("autoSetupStart"));
+    fireEvent.press(screen.getByTestId("auto-setup-start"));
     expect(job.start).toHaveBeenCalledTimes(1);
     // Nothing on the offer can install.
     expect(screen.queryByText("autoSetupInstallAction")).toBeNull();
@@ -48,7 +48,7 @@ describe("AutoSetupCard", () => {
     expect(screen.getByText("40 GB")).toBeTruthy();
     expect(screen.queryByText("6")).toBeNull();
     expect(screen.queryByText("autoSetupInstallAction")).toBeNull();
-    fireEvent.press(screen.getByLabelText("cancel"));
+    fireEvent.press(screen.getByTestId("auto-setup-cancel"));
     expect(job.cancel).toHaveBeenCalledTimes(1);
   });
 
@@ -62,7 +62,7 @@ describe("AutoSetupCard", () => {
       const screen = renderCard({ job });
 
       expect(screen.getByText(label)).toBeTruthy();
-      fireEvent.press(screen.getByLabelText("cancel"));
+      fireEvent.press(screen.getByTestId("auto-setup-cancel"));
       expect(job.cancel).toHaveBeenCalledTimes(1);
     },
   );
@@ -86,11 +86,12 @@ describe("AutoSetupCard", () => {
     const onManual = jest.fn();
     const screen = renderCard({ job, onManual });
 
+    expect(screen.getByTestId("auto-setup-proposal")).toBeTruthy();
     expect(screen.getByText("Qwen3 0.6B")).toBeTruthy();
     expect(
       screen.getByText('autoSetupTotalSize:{"size":"1.2 GB"}'),
     ).toBeTruthy();
-    fireEvent.press(screen.getByText("autoSetupInstallAction"));
+    fireEvent.press(screen.getByTestId("auto-setup-install"));
     expect(job.install).toHaveBeenCalledTimes(1);
     fireEvent.press(screen.getByTestId("auto-setup-manual"));
     expect(onManual).toHaveBeenCalledTimes(1);
@@ -115,7 +116,7 @@ describe("AutoSetupCard", () => {
 
     expect(screen.getByText("autoSetupStart")).toBeTruthy();
     expect(screen.queryByText("autoSetupInstallAction")).toBeNull();
-    fireEvent.press(screen.getByText("autoSetupStart"));
+    fireEvent.press(screen.getByTestId("auto-setup-install"));
     expect(job.install).toHaveBeenCalledTimes(1);
   });
 
@@ -162,6 +163,18 @@ describe("AutoSetupCard", () => {
       "autoSetupQueuedNote",
     );
     expect(screen.getByText("autoSetupRetry")).toBeTruthy();
+    expect(screen.getByTestId("auto-setup-retry")).toBeTruthy();
+    expect(screen.getByTestId("auto-setup-failed")).toBeTruthy();
+  });
+
+  it("owns a stable done verdict for post-install device waits", () => {
+    const screen = renderCard({
+      job: createAutoSetupJob({ state: "done" }),
+    });
+
+    expect(screen.getByTestId("auto-setup-done")).toBeTruthy();
+    expect(screen.getByTestId("auto-setup-done-state")).toBeTruthy();
+    expect(screen.getByText("autoSetupDoneTitle")).toBeTruthy();
   });
 
   it("reports a model test failure instead of calling it an unfinished download", () => {

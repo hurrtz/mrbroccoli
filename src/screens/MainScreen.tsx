@@ -12,6 +12,7 @@ import { useKokoroModel } from "../hooks/useKokoroModel";
 import { getTtsFallbackRoutes } from "../constants/ttsFallback";
 import { getKokoroVoiceOptions } from "../constants/kokoro";
 import { getLocalModel } from "../constants/localModels";
+import type { LocalModelId } from "../constants/localModels";
 import { useLocalization } from "../i18n";
 import { useTheme } from "../theme/ThemeContext";
 import { MainScreenPresentation } from "./main/MainScreenPresentation";
@@ -50,7 +51,15 @@ import { useImagePromptSubmission } from "./main/useImagePromptSubmission";
 import { useFreeOfflineMode } from "./main/useFreeOfflineMode";
 import { hasProviderCredentialForCapability } from "../utils/providerCredentials";
 import { useStorePromoPresentation } from "../hooks/useStorePromoPresentation";
+import { getLocalModelInstallStatus } from "../services/localModelManager";
 import {
+  getLocalModelBenchmarkResults,
+  localModelBenchmarkMatchesDevice,
+  probeLocalDeviceCapabilities,
+} from "../services/localDeviceCapabilities";
+import type { SettingsPage } from "../features/settings-core/types";
+import {
+  applyStorePromoAutoSetupJob,
   applyStorePromoFreeOfflineController,
   getStorePromoPipelinePhase,
 } from "../services/storePromoPresentation";
@@ -77,10 +86,11 @@ export function MainScreen() {
   const storePromoPresentation = useStorePromoPresentation();
   const storePromoOrbPresentation = storePromoPresentation.orb;
   const storePromoScene = storePromoPresentation.scene;
+  const storePromoOnboardingActive = storePromoScene === "onboarding";
   const baseFreeOffline = useFreeOfflineMode({
     settings,
     settingsLoaded: loaded && storePromoPresentation.loaded,
-    suspended: storePromoScene === "free",
+    suspended: storePromoScene === "free" || storePromoOnboardingActive,
     updateSettings,
   });
   const freeOffline = React.useMemo(
@@ -99,14 +109,54 @@ export function MainScreen() {
   // A blocked turn points to the relevant settings page rather than hijacking
   // a voice or text action into the information flow.
   const [introVisible, setIntroVisible] = React.useState(false);
+  const [introSessionId, setIntroSessionId] = React.useState(0);
+  const [introHandoffPending, setIntroHandoffPending] = React.useState(false);
+  const [serializedSurfacePending, setSerializedSurfacePending] =
+    React.useState(false);
+  const pendingIntroDismissActionRef = React.useRef<null | (() => void)>(null);
+  const introReturnDestinationRef = React.useRef<"premium" | "settings" | null>(
+    null,
+  );
   const openIntro = React.useCallback(() => {
+    pendingIntroDismissActionRef.current = null;
+    introReturnDestinationRef.current = null;
+    setIntroHandoffPending(false);
+    setIntroSessionId((sessionId) => sessionId + 1);
     setIntroVisible(true);
     updateSettings({ introOpened: true });
   }, [updateSettings]);
   const closeIntro = React.useCallback(() => setIntroVisible(false), []);
+  const runAfterIntroDismiss = React.useCallback(
+    (destination: "premium" | "settings", action: () => void) => {
+      introReturnDestinationRef.current = destination;
+      pendingIntroDismissActionRef.current = action;
+      setIntroHandoffPending(true);
+      setIntroVisible(false);
+    },
+    [],
+  );
+  const handleIntroDismiss = React.useCallback(() => {
+    const pendingAction = pendingIntroDismissActionRef.current;
+    pendingIntroDismissActionRef.current = null;
+    if (!pendingAction) {
+      return;
+    }
+    setIntroHandoffPending(false);
+    pendingAction();
+  }, []);
+  React.useEffect(() => {
+    if (introVisible || !pendingIntroDismissActionRef.current) {
+      return;
+    }
+    const timer = setTimeout(handleIntroDismiss, 350);
+    return () => clearTimeout(timer);
+  }, [handleIntroDismiss, introVisible]);
   // Done on the last step is the completion that ends first-run integrity:
   // afterwards the flow regains its close control and drops both gates.
   const completeIntro = React.useCallback(() => {
+    pendingIntroDismissActionRef.current = null;
+    introReturnDestinationRef.current = null;
+    setIntroHandoffPending(false);
     setIntroVisible(false);
     updateSettings({ introCompleted: true });
   }, [updateSettings]);
@@ -114,6 +164,47 @@ export function MainScreen() {
     updateSettings({ introDismissed: true });
   }, [updateSettings]);
   const [premiumModalVisible, setPremiumModalVisible] = React.useState(false);
+  const [premiumSurfaceActive, setPremiumSurfaceActive] = React.useState(false);
+  const [resumeSettingsPageAfterPremium, setResumeSettingsPageAfterPremium] =
+    React.useState<SettingsPage | null>(null);
+  const premiumOriginRef = React.useRef<"intro" | "settings" | null>(null);
+  const premiumReturnSettingsPageRef = React.useRef<SettingsPage>("overview");
+  const openPremium = React.useCallback(
+    (origin: "intro" | "settings", returnPage: SettingsPage = "overview") => {
+      premiumOriginRef.current = origin;
+      premiumReturnSettingsPageRef.current = returnPage;
+      setPremiumSurfaceActive(true);
+      setPremiumModalVisible(true);
+    },
+    [],
+  );
+  const closePremium = React.useCallback(() => {
+    setPremiumModalVisible(false);
+  }, []);
+  const handlePremiumDismiss = React.useCallback(() => {
+    const origin = premiumOriginRef.current;
+    premiumOriginRef.current = null;
+    if (origin === "settings") {
+      // Keep the workspace suspended until the Settings destination becomes
+      // visible in the following effect.
+      setResumeSettingsPageAfterPremium(premiumReturnSettingsPageRef.current);
+      return;
+    }
+    setPremiumSurfaceActive(false);
+    if (origin === "intro" && introReturnDestinationRef.current === "premium") {
+      introReturnDestinationRef.current = null;
+      if (!settings.introCompleted) {
+        setIntroVisible(true);
+      }
+    }
+  }, [settings.introCompleted]);
+  React.useEffect(() => {
+    if (premiumModalVisible || !premiumSurfaceActive) {
+      return;
+    }
+    const timer = setTimeout(handlePremiumDismiss, 350);
+    return () => clearTimeout(timer);
+  }, [handlePremiumDismiss, premiumModalVisible, premiumSurfaceActive]);
   // A purchase is the one outcome that ends the introduction on its own: the
   // reader has decided, and the invitation has nothing left to invite. Closing
   // the purchase sheet without buying leaves them where they were.
@@ -126,6 +217,13 @@ export function MainScreen() {
     // premium during boot, and treating that as a purchase would dismiss the
     // banner on every launch for someone who already owns Premium.
     if (wasPremium === false && isPremiumNow && premiumModalVisible) {
+      // A purchase completes any Intro-originated journey, including the
+      // chained Intro -> Settings -> Premium route. Leaving this ref behind
+      // would reopen first-run Intro when Settings later closes.
+      introReturnDestinationRef.current = null;
+      if (premiumOriginRef.current === "intro") {
+        premiumOriginRef.current = null;
+      }
       setPremiumModalVisible(false);
       setIntroVisible(false);
       updateSettings({ introDismissed: true });
@@ -134,6 +232,7 @@ export function MainScreen() {
   const providerVoiceDirectories = useMainScreenVoiceDirectories({
     loaded,
     settings: runtimeSettings,
+    suspended: !storePromoPresentation.loaded || storePromoScene !== null,
     updateProviderTtsVoice,
   });
   const {
@@ -248,6 +347,32 @@ export function MainScreen() {
     runAfterDrawerDismiss,
     handleDrawerDismiss,
   } = useMainScreenUiState();
+  React.useEffect(() => {
+    if (!resumeSettingsPageAfterPremium) {
+      return;
+    }
+    openSettings(undefined, undefined, resumeSettingsPageAfterPremium);
+    setResumeSettingsPageAfterPremium(null);
+    setPremiumSurfaceActive(false);
+  }, [openSettings, resumeSettingsPageAfterPremium]);
+  const handleCloseSettings = React.useCallback(() => {
+    if (introReturnDestinationRef.current !== "settings") {
+      closeSettings();
+      return;
+    }
+
+    setSerializedSurfacePending(true);
+    runAfterSettingsDismiss(() => {
+      setSerializedSurfacePending(false);
+      if (introReturnDestinationRef.current !== "settings") {
+        return;
+      }
+      introReturnDestinationRef.current = null;
+      if (!settings.introCompleted) {
+        setIntroVisible(true);
+      }
+    });
+  }, [closeSettings, runAfterSettingsDismiss, settings.introCompleted]);
 
   const {
     activeResponseMode,
@@ -415,9 +540,134 @@ export function MainScreen() {
       }
     },
     settings,
+    suspended: !storePromoPresentation.loaded || storePromoScene !== null,
     t,
     updateSettings,
   });
+  const introAutoSetup = applyStorePromoAutoSetupJob(
+    autoSetup,
+    settings.language,
+    storePromoScene,
+    Platform.OS === "ios" ? "ios" : "android",
+    t,
+  );
+  const premiumLocalLlmModelIds = React.useMemo(
+    () =>
+      [
+        ...new Set(
+          runtimeSettings.responseModes.flatMap(({ route }) =>
+            route.runtime === "local" && route.localModelId
+              ? [route.localModelId]
+              : [],
+          ),
+        ),
+      ] as LocalModelId[],
+    [runtimeSettings.responseModes],
+  );
+  const premiumLocalLlmModelKey = premiumLocalLlmModelIds.join(":");
+  const [verifiedPremiumLocalLlmIds, setVerifiedPremiumLocalLlmIds] =
+    React.useState<ReadonlySet<LocalModelId>>(new Set());
+  const verifiedPremiumLocalLlmIdsRef = React.useRef<ReadonlySet<LocalModelId>>(
+    new Set(),
+  );
+  const replaceVerifiedPremiumLocalLlmIds = React.useCallback(
+    (next: ReadonlySet<LocalModelId>) => {
+      const current = verifiedPremiumLocalLlmIdsRef.current;
+      if (
+        current.size === next.size &&
+        [...next].every((modelId) => current.has(modelId))
+      ) {
+        return;
+      }
+      verifiedPremiumLocalLlmIdsRef.current = next;
+      setVerifiedPremiumLocalLlmIds(next);
+    },
+    [],
+  );
+  React.useEffect(() => {
+    let cancelled = false;
+    replaceVerifiedPremiumLocalLlmIds(new Set());
+    const modelIds = premiumLocalLlmModelKey
+      ? (premiumLocalLlmModelKey.split(":") as LocalModelId[])
+      : [];
+    if (freeOffline.entitlement.status !== "premium" || modelIds.length === 0) {
+      return () => {
+        cancelled = true;
+      };
+    }
+
+    void Promise.all([
+      Promise.all(
+        modelIds.map(
+          async (modelId) =>
+            [modelId, await getLocalModelInstallStatus(modelId)] as const,
+        ),
+      ),
+      getLocalModelBenchmarkResults(),
+      probeLocalDeviceCapabilities(),
+    ])
+      .then(([entries, benchmarks, snapshot]) => {
+        if (cancelled) {
+          return;
+        }
+        const verifiedIds = new Set(
+          entries
+            .filter(([modelId, status]) => {
+              const benchmark = benchmarks[modelId];
+              return (
+                status.verified &&
+                Boolean(status.path) &&
+                benchmark?.status === "viable" &&
+                localModelBenchmarkMatchesDevice(benchmark, snapshot)
+              );
+            })
+            .map(([modelId]) => modelId),
+        );
+        replaceVerifiedPremiumLocalLlmIds(verifiedIds);
+      })
+      .catch(() => {
+        if (!cancelled) {
+          replaceVerifiedPremiumLocalLlmIds(new Set());
+        }
+      });
+
+    return () => {
+      cancelled = true;
+    };
+    // Re-read after an automatic install or after returning from manual
+    // Settings: portable settings can name a model whose files are absent.
+  }, [
+    autoSetup.state,
+    freeOffline.entitlement.status,
+    premiumLocalLlmModelKey,
+    replaceVerifiedPremiumLocalLlmIds,
+    settingsVisible,
+  ]);
+  const premiumResponseModeSet = React.useMemo(
+    () => new Set(presentationAvailableResponseModes),
+    [presentationAvailableResponseModes],
+  );
+  const activePremiumReasoningRoute = React.useMemo(
+    () =>
+      runtimeSettings.responseModes.find(({ id }) => id === activeResponseMode)
+        ?.route ?? runtimeSettings.responseModes[0]?.route,
+    [activeResponseMode, runtimeSettings.responseModes],
+  );
+  const premiumReasoningReady = Boolean(
+    premiumResponseModeSet.has(activeResponseMode) &&
+    activePremiumReasoningRoute &&
+    (activePremiumReasoningRoute.runtime !== "local" ||
+      (activePremiumReasoningRoute.localModelId &&
+        verifiedPremiumLocalLlmIds.has(
+          activePremiumReasoningRoute.localModelId,
+        ))),
+  );
+  const introThinkingReady =
+    loaded &&
+    storePromoPresentation.loaded &&
+    (freeOffline.entitlement.status === "free"
+      ? freeOffline.freeRuntimeReady
+      : freeOffline.entitlement.status === "premium" && premiumReasoningReady);
   React.useEffect(() => {
     if (!autoSetupDoneBarVisible) {
       return;
@@ -510,7 +760,7 @@ export function MainScreen() {
   const isBusy = pipelinePhase !== "idle";
 
   const introTestTurn = useIntroTestTurn({
-    active: introVisible,
+    active: introVisible && introThinkingReady,
     getRouteParams: () => ({
       assistantInstructions,
       kokoroVoices: runtimeSettings.kokoroVoices,
@@ -572,6 +822,10 @@ export function MainScreen() {
     t,
     updateMessage,
   });
+  const secondarySurfaceTransitionVisible =
+    introHandoffPending ||
+    serializedSurfacePending ||
+    (premiumSurfaceActive && !premiumModalVisible);
   const mainSurfaceVisible = !(
     drawerVisible ||
     imageSourceVisible ||
@@ -583,7 +837,8 @@ export function MainScreen() {
     styleSheetVisible ||
     transcriptSheetVisible ||
     freeOffline.setupVisible ||
-    premiumModalVisible
+    premiumSurfaceActive ||
+    secondarySurfaceTransitionVisible
   );
   const promptSubmissionBlockMessage =
     kokoroPromptBlockMessage ?? imagePromptSubmission.imageInputBlockMessage;
@@ -967,6 +1222,7 @@ export function MainScreen() {
       }}
       isDark={isDark}
       isLandscape={isLandscape}
+      language={language}
       toast={{
         message: toast?.message || "",
         visible: Boolean(toast),
@@ -976,37 +1232,44 @@ export function MainScreen() {
         tone: toast?.tone,
       }}
       intro={{
-        autoSetup,
+        autoSetup: introAutoSetup,
         firstRun: !settings.introCompleted,
         language: settings.language,
+        modelStateReadsSuspended: storePromoOnboardingActive,
         onClose: closeIntro,
         onComplete: completeIntro,
         // Provider keys are Premium, so a Free reader is sent to the purchase
-        // sheet rather than to a page that would only tell them no. The sheet
-        // opens over the introduction; see onClose on premiumUpgrade.
+        // sheet rather than to a page that would only tell them no. Native
+        // sibling modals are serialized, then a cancellation resumes Setup.
         onConnectProvider: () => {
           if (!freeOffline.entitlement.isPremium) {
-            setPremiumModalVisible(true);
+            runAfterIntroDismiss("premium", () => openPremium("intro"));
             return;
           }
-          closeIntro();
-          openSettings(undefined, "providers", "connections");
+          runAfterIntroDismiss("settings", () =>
+            openSettings(undefined, "providers", "connections"),
+          );
         },
         onInstallLocal: () => {
-          closeIntro();
-          openSettings(undefined, undefined, "thinking");
+          runAfterIntroDismiss("settings", () =>
+            openSettings(undefined, undefined, "thinking"),
+          );
         },
+        onDismiss: handleIntroDismiss,
         onOpenStt: () => {
-          closeIntro();
-          openSettings(undefined, "stt", "listening");
+          runAfterIntroDismiss("settings", () =>
+            openSettings(undefined, "stt", "listening"),
+          );
         },
         onOpenTts: () => {
-          closeIntro();
-          openSettings(undefined, "tts", "speaking");
+          runAfterIntroDismiss("settings", () =>
+            openSettings(undefined, "tts", "speaking"),
+          );
         },
+        sessionId: introSessionId,
         t,
         testTurn: introTestTurn,
-        thinkingReady: loaded && !freeRuntimeBlocked && !providerRouteBlocked,
+        thinkingReady: introThinkingReady,
         visible: introVisible,
       }}
       imageSource={{
@@ -1067,9 +1330,13 @@ export function MainScreen() {
           onOpen: openIntro,
           showDismiss: runtimeSettings.introOpened,
           t,
-          // Hidden once dismissed, and never shown over a store-promo capture.
+          // Promo conversation scenes suppress this invitation. The isolated
+          // onboarding scene is the exception: its whole purpose is to capture
+          // the real first-run entry into the fixed recommendation.
           visible:
-            loaded && !runtimeSettings.introDismissed && !storePromoScene,
+            loaded &&
+            !runtimeSettings.introDismissed &&
+            (!storePromoScene || storePromoOnboardingActive),
         },
         isLandscape,
         topBar: {
@@ -1247,12 +1514,16 @@ export function MainScreen() {
         onTtsVoiceChange: updateTtsVoice,
         onClose: handleCloseConversationSettings,
       }}
+      surfaceTransition={{
+        label: t("pleaseWait"),
+        visible: secondarySurfaceTransitionVisible,
+      }}
       settingsModal={{
         archivedConversationCount,
         autoSetup,
         focusPage: settingsFocusPage,
         visible: settingsVisible,
-        suspended: premiumModalVisible,
+        suspended: premiumSurfaceActive,
         settings,
         kokoroModel,
         providerVoiceDirectories,
@@ -1275,20 +1546,25 @@ export function MainScreen() {
           freeOffline.entitlement.developmentEntitlementMode,
         onSetDevelopmentEntitlementMode:
           freeOffline.entitlement.setDevelopmentEntitlementMode,
-        onOpenPremium: () => {
-          setPremiumModalVisible(true);
+        onOpenPremium: (returnPage) => {
+          setSerializedSurfacePending(true);
+          runAfterSettingsDismiss(() => {
+            openPremium("settings", returnPage);
+            setSerializedSurfacePending(false);
+          });
         },
         onOpenArchivedConversations: handleOpenArchivedConversations,
         onCreateAppDataBackup: handleCreateAppDataBackup,
         onRestoreAppDataBackup: handleRestoreAppDataBackup,
         conversationArchive,
         storePromoLocalDevicePreview: premiumStorePromoActive,
-        onClose: closeSettings,
+        onClose: handleCloseSettings,
         onDismiss: handleSettingsDismiss,
       }}
       premiumUpgrade={{
         visible: premiumModalVisible,
-        onClose: () => setPremiumModalVisible(false),
+        onClose: closePremium,
+        onDismiss: handlePremiumDismiss,
       }}
       conversationDrawer={{
         archivedInitiallyExpanded: drawerArchivedOnOpen,

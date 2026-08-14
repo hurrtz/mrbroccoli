@@ -114,12 +114,15 @@ function formatRemaining(t: TranslateFn, seconds: number): string {
 export function useAutoSetupJob({
   onOutcome,
   settings,
+  suspended = false,
   t,
   updateSettings,
 }: {
   /** Fired once per finished install; the host decides whether to toast. */
   onOutcome: (outcome: "done" | "failed") => void;
   settings: Settings;
+  /** Prevents fixture or hidden surfaces from probing or changing the device. */
+  suspended?: boolean;
   t: TranslateFn;
   updateSettings: (settings: Partial<Settings>) => void;
 }): AutoSetupJobState {
@@ -163,10 +166,38 @@ export function useAutoSetupJob({
     };
   }, []);
 
-  useKeepAwakeWhile(phase === "installing", "mrbroccoli-auto-setup");
+  useKeepAwakeWhile(
+    !suspended && phase === "installing",
+    "mrbroccoli-auto-setup",
+  );
+
+  useEffect(() => {
+    if (!suspended) {
+      return;
+    }
+    abortRef.current?.abort();
+    abortRef.current = null;
+    revealTimersRef.current.forEach(clearTimeout);
+    revealTimersRef.current = [];
+    progressRef.current = null;
+    setPhase("offer");
+    setScanned(0);
+    setSnapshot(null);
+    setBenchmarks({});
+    setProfile(null);
+    setProgress(null);
+    setEtaSeconds(null);
+    setFailedModelId(null);
+    setErrorKind(null);
+    setErrorDetail(null);
+    setDoneModelIds(new Set());
+  }, [suspended]);
 
   const scan = useCallback(
     (restoreCompletedProfile = false) => {
+      if (suspended) {
+        return;
+      }
       abortRef.current?.abort();
       const abortController = new AbortController();
       abortRef.current = abortController;
@@ -266,7 +297,7 @@ export function useAutoSetupJob({
         }
       })();
     },
-    [settings.language],
+    [settings.language, suspended],
   );
 
   const start = useCallback(() => {
@@ -281,6 +312,7 @@ export function useAutoSetupJob({
   // that route is also sufficient to repair the persisted verdict once.
   useEffect(() => {
     if (
+      suspended ||
       (!settings.freeOfflineSetupCompleted && !hasStoredLocalRoute) ||
       restoredCompletedProfileRef.current ||
       phase !== "offer"
@@ -289,10 +321,16 @@ export function useAutoSetupJob({
     }
     restoredCompletedProfileRef.current = true;
     scan(true);
-  }, [hasStoredLocalRoute, phase, scan, settings.freeOfflineSetupCompleted]);
+  }, [
+    hasStoredLocalRoute,
+    phase,
+    scan,
+    settings.freeOfflineSetupCompleted,
+    suspended,
+  ]);
 
   const runInstall = useCallback(() => {
-    if (!profile) {
+    if (suspended || !profile) {
       return;
     }
     // Never install without the proposal step: this transition is the only
@@ -420,7 +458,7 @@ export function useAutoSetupJob({
         }
       }
     })();
-  }, [benchmarks, onOutcome, profile, snapshot, t, updateSettings]);
+  }, [benchmarks, onOutcome, profile, snapshot, suspended, t, updateSettings]);
 
   const install = useCallback(() => {
     if (phase !== "proposal") {

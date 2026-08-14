@@ -18,7 +18,7 @@ import { StatusBar } from "expo-status-bar";
 import { useTheme } from "../../theme/ThemeContext";
 
 import { PhosphorIcon } from "../../design-system/PhosphorIcon";
-import type { AppLanguage } from "../../i18n/localeRegistry";
+import { getAppLocale, type AppLanguage } from "../../i18n/localeRegistry";
 import type { TranslateFn } from "../../screens/main/shared";
 import { fonts } from "../../theme/typography";
 import { IntroStepper } from "./IntroStepper";
@@ -35,13 +35,19 @@ interface IntroFlowScreenProps {
   /** True until the introduction has been completed once on this install. */
   firstRun: boolean;
   language: AppLanguage;
+  /** Prevent native model inspection in the isolated store-promo fixture. */
+  modelStateReadsSuspended?: boolean;
   onClose: () => void;
   /** Done on the last step: closes the flow and records completion. */
   onComplete: () => void;
   onConnectProvider: () => void;
   onInstallLocal: () => void;
+  /** Native Modal teardown boundary for actions that open another modal. */
+  onDismiss: () => void;
   onOpenStt: () => void;
   onOpenTts: () => void;
+  /** Changes only when the banner starts a genuinely new walkthrough visit. */
+  sessionId: number;
   t: TranslateFn;
   testTurn: IntroTestTurnState;
   /** Whether a reasoning model is actually running — step two's gate. */
@@ -59,22 +65,25 @@ interface IntroFlowScreenProps {
  * remains part of the same product.
  *
  * First-run integrity: on a first run there is no close control -- the three
- * steps are the way in. Step two's forward action stays disabled until a
- * reasoning model is actually running, and step three ends in a Done that
- * stays disabled until one successful test turn. A re-entry restores the
- * close control on steps one and two and unlocks both gates; step three never
- * shows close -- Done is the exit.
+ * steps are the way in. Step three stays unreachable until a reasoning model
+ * is actually running, then ends in a Done that stays disabled until one
+ * successful test turn. A re-entry restores the close control on steps one
+ * and two and unlocks both gates; step three never shows close -- Done is the
+ * exit.
  */
 export function IntroFlowScreen({
   autoSetup,
   firstRun,
   language,
+  modelStateReadsSuspended = false,
   onClose,
   onComplete,
   onConnectProvider,
   onInstallLocal,
+  onDismiss,
   onOpenStt,
   onOpenTts,
+  sessionId,
   t,
   testTurn,
   thinkingReady,
@@ -83,42 +92,90 @@ export function IntroFlowScreen({
   const theme = useIntroTheme();
   const { isDark } = useTheme();
   const { width } = useWindowDimensions();
+  const direction = getAppLocale(language).direction;
+  const isRtl = direction === "rtl";
   const [index, setIndex] = React.useState(0);
   // Remounts the steps on each open so per-step state -- the manual switch,
   // the played flag, the preview language -- resets with the flow.
   const [openNonce, setOpenNonce] = React.useState(0);
   const pagerRef = React.useRef<ScrollView>(null);
+  const alignedPagerLayoutRef = React.useRef<string | null>(null);
+  const lastSessionIdRef = React.useRef<number | null>(null);
+  const finalIndex = INTRO_STEPS.length - 1;
+  const maxReachableIndex = firstRun && !thinkingReady ? 1 : finalIndex;
+
+  const getPagerOffset = React.useCallback(
+    (logicalIndex: number) =>
+      (isRtl ? maxReachableIndex - logicalIndex : logicalIndex) * width,
+    [isRtl, maxReachableIndex, width],
+  );
+  const pagerLayoutKey = `${visible ? "open" : "closed"}:${direction}:${maxReachableIndex}:${width}`;
 
   // A fresh open starts at the beginning; a reopened introduction should not
-  // resume wherever it was abandoned.
-  React.useEffect(() => {
-    if (visible) {
+  // resume wherever it was abandoned. A serialized Settings or purchase
+  // handoff keeps the same session ID and therefore preserves its Setup step.
+  React.useLayoutEffect(() => {
+    const opening = visible && lastSessionIdRef.current !== sessionId;
+
+    if (opening) {
+      lastSessionIdRef.current = sessionId;
       setIndex(0);
       setOpenNonce((nonce) => nonce + 1);
-      pagerRef.current?.scrollTo({ animated: false, x: 0 });
+      pagerRef.current?.scrollTo({ animated: false, x: getPagerOffset(0) });
+      alignedPagerLayoutRef.current = pagerLayoutKey;
+    } else if (!visible) {
+      alignedPagerLayoutRef.current = null;
     }
-  }, [visible]);
+  }, [getPagerOffset, pagerLayoutKey, sessionId, visible]);
+
+  const clampToReachableIndex = React.useCallback(
+    (next: number) => Math.max(0, Math.min(maxReachableIndex, next)),
+    [maxReachableIndex],
+  );
 
   const goTo = React.useCallback(
     (next: number) => {
-      const clamped = Math.max(0, Math.min(INTRO_STEPS.length - 1, next));
+      const clamped = clampToReachableIndex(next);
       setIndex(clamped);
-      pagerRef.current?.scrollTo({ animated: true, x: clamped * width });
+      pagerRef.current?.scrollTo({
+        animated: true,
+        x: getPagerOffset(clamped),
+      });
     },
-    [width],
+    [clampToReachableIndex, getPagerOffset],
   );
 
+  // Readiness can add or remove a page while the flow is open. RTL renders the
+  // physical pages in reverse order, so the same logical step has a different
+  // native offset when that boundary changes. Realign once per layout shape.
+  React.useLayoutEffect(() => {
+    if (!visible || alignedPagerLayoutRef.current === pagerLayoutKey) {
+      return;
+    }
+
+    alignedPagerLayoutRef.current = pagerLayoutKey;
+    const reachableIndex = clampToReachableIndex(index);
+    setIndex(reachableIndex);
+    pagerRef.current?.scrollTo({
+      animated: false,
+      x: getPagerOffset(reachableIndex),
+    });
+  }, [clampToReachableIndex, getPagerOffset, index, pagerLayoutKey, visible]);
+
   const isFirst = index === 0;
-  const isLast = index === INTRO_STEPS.length - 1;
+  const isLast = index === finalIndex;
   const showClose = !firstRun && !isLast;
   const forwardDisabled = index === 1 && firstRun && !thinkingReady;
-  const doneDisabled = firstRun && !testTurn.turn;
+  const doneDisabled =
+    firstRun && (!thinkingReady || testTurn.turn?.successful !== true);
 
   return (
     <Modal
       animationType="slide"
+      onDismiss={onDismiss}
       onRequestClose={firstRun ? undefined : onClose}
       presentationStyle="fullScreen"
+      testID="intro-flow-modal"
       visible={visible}
     >
       <StatusBar style={isDark ? "light" : "dark"} />
@@ -128,7 +185,10 @@ export function IntroFlowScreen({
           indicator. The flow carries its own provider so it measures the
           window it is actually presented in. */}
       <SafeAreaProvider initialMetrics={initialWindowMetrics}>
-        <View style={[styles.root, { backgroundColor: theme.canvas }]}>
+        <View
+          style={[styles.root, { backgroundColor: theme.canvas, direction }]}
+          testID="intro-flow-root"
+        >
           <SafeAreaView edges={["top", "bottom"]} style={styles.safeArea}>
             <View style={styles.header}>
               <Pressable
@@ -147,7 +207,7 @@ export function IntroFlowScreen({
                     carry no filled faces, and back is a full arrow. */}
                 <PhosphorIcon
                   color={theme.textSecondary}
-                  name="arrow-left"
+                  name={isRtl ? "arrow-right" : "arrow-left"}
                   size="navigation"
                 />
               </Pressable>
@@ -155,6 +215,7 @@ export function IntroFlowScreen({
               <IntroStepper
                 count={INTRO_STEPS.length}
                 index={index}
+                maxReachableIndex={maxReachableIndex}
                 onSelect={goTo}
                 t={t}
               />
@@ -183,20 +244,35 @@ export function IntroFlowScreen({
             </View>
 
             <ScrollView
+              contentOffset={{ x: getPagerOffset(0), y: 0 }}
+              contentContainerStyle={styles.pagerContent}
               horizontal
               onMomentumScrollEnd={(event) => {
-                setIndex(
-                  Math.round(
-                    event.nativeEvent.contentOffset.x / Math.max(1, width),
-                  ),
+                const physicalIndex = Math.round(
+                  event.nativeEvent.contentOffset.x / Math.max(1, width),
                 );
+                const requestedIndex = isRtl
+                  ? maxReachableIndex - physicalIndex
+                  : physicalIndex;
+                const reachableIndex = clampToReachableIndex(requestedIndex);
+                setIndex(reachableIndex);
+                if (reachableIndex !== requestedIndex) {
+                  pagerRef.current?.scrollTo({
+                    animated: true,
+                    x: getPagerOffset(reachableIndex),
+                  });
+                }
               }}
               pagingEnabled
               ref={pagerRef}
               showsHorizontalScrollIndicator={false}
+              style={styles.pager}
               testID="intro-flow-content"
             >
-              {INTRO_STEPS.map((step) => {
+              {(isRtl
+                ? [...INTRO_STEPS.slice(0, maxReachableIndex + 1)].reverse()
+                : INTRO_STEPS.slice(0, maxReachableIndex + 1)
+              ).map((step) => {
                 const StepContent = INTRO_STEP_CONTENT[step];
                 return (
                   <ScrollView
@@ -208,17 +284,20 @@ export function IntroFlowScreen({
                     ]}
                     key={`${step}-${openNonce}`}
                     showsVerticalScrollIndicator={false}
-                    style={{ width }}
+                    style={{ direction, width }}
+                    testID={`intro-page-${step}`}
                   >
                     <StepContent
                       autoSetup={autoSetup}
                       language={language}
+                      modelStateReadsSuspended={modelStateReadsSuspended}
                       onConnectProvider={onConnectProvider}
                       onInstallLocal={onInstallLocal}
                       onOpenStt={onOpenStt}
                       onOpenTts={onOpenTts}
                       t={t}
                       testTurn={testTurn}
+                      thinkingReady={thinkingReady}
                     />
                   </ScrollView>
                 );
@@ -266,7 +345,7 @@ export function IntroFlowScreen({
                 >
                   <PhosphorIcon
                     color={theme.onAccent}
-                    name="right"
+                    name={isRtl ? "left" : "right"}
                     size="navigation"
                   />
                 </Pressable>
@@ -327,6 +406,12 @@ const styles = StyleSheet.create({
   },
   pageFill: {
     flexGrow: 1,
+  },
+  pager: {
+    direction: "ltr",
+  },
+  pagerContent: {
+    direction: "ltr",
   },
   primary: {
     alignItems: "center",

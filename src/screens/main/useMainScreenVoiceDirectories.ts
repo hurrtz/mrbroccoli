@@ -10,28 +10,31 @@ import type { Provider, Settings } from "../../types";
 interface UseMainScreenVoiceDirectoriesParams {
   loaded: boolean;
   settings: Settings;
+  suspended?: boolean;
   updateProviderTtsVoice: (provider: Provider, voice: string) => void;
 }
 
 export function useMainScreenVoiceDirectories({
   loaded,
   settings,
+  suspended = false,
   updateProviderTtsVoice,
 }: UseMainScreenVoiceDirectoriesParams): ProviderVoiceDirectories {
+  const enabled = loaded && !suspended;
   const xai = useProviderVoiceDirectory({
     provider: "xai",
     apiKey: settings.apiKeys.xai,
-    enabled: loaded && Boolean(settings.apiKeys.xai.trim()),
+    enabled: enabled && Boolean(settings.apiKeys.xai.trim()),
   });
   const mistral = useProviderVoiceDirectory({
     provider: "mistral",
     apiKey: settings.apiKeys.mistral,
-    enabled: loaded && Boolean(settings.apiKeys.mistral.trim()),
+    enabled: enabled && Boolean(settings.apiKeys.mistral.trim()),
   });
   const elevenlabs = useProviderVoiceDirectory({
     provider: "elevenlabs",
     apiKey: settings.apiKeys.elevenlabs,
-    enabled: loaded && Boolean(settings.apiKeys.elevenlabs.trim()),
+    enabled: enabled && Boolean(settings.apiKeys.elevenlabs.trim()),
   });
   const directories = useMemo(
     () => ({
@@ -83,7 +86,7 @@ export function useMainScreenVoiceDirectories({
   );
 
   useEffect(() => {
-    if (!loaded) {
+    if (!enabled) {
       return;
     }
 
@@ -99,12 +102,7 @@ export function useMainScreenVoiceDirectories({
         updateProviderTtsVoice(provider, firstVoice);
       }
     }
-  }, [
-    directories,
-    loaded,
-    selectedProviderVoices,
-    updateProviderTtsVoice,
-  ]);
+  }, [directories, enabled, selectedProviderVoices, updateProviderTtsVoice]);
 
   return directories;
 }

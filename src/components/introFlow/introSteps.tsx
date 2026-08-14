@@ -1,5 +1,11 @@
 import React from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import {
+  AccessibilityInfo,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 
 import {
   LOCAL_MODEL_CATALOG,
@@ -20,7 +26,11 @@ import { formatBytes } from "../../utils/formatBytes";
 import { AutoSetupCard } from "../autoSetup/AutoSetupCard";
 import type { AutoSetupJobState } from "../autoSetup/types";
 import type { AppLanguage } from "../../i18n/localeRegistry";
-import { APP_LANGUAGE_OPTIONS, translations } from "../../i18n/localeRegistry";
+import {
+  APP_LANGUAGE_OPTIONS,
+  getAppLocale,
+  translations,
+} from "../../i18n/localeRegistry";
 import type { TranslateFn } from "../../screens/main/shared";
 import { fonts } from "../../theme/typography";
 import { getIntroClip } from "./introClips";
@@ -36,11 +46,15 @@ export type IntroStep = (typeof INTRO_STEPS)[number];
 
 /** The ephemeral test turn on the final step, owned by the screen above. */
 export interface IntroTestTurnState {
+  /** A terminal test failure, including failures before transcription. */
+  error: string | null;
   phase: "idle" | "recording" | "running";
   turn: {
     question: string;
     answer: string;
     latencyLabel: string | null;
+    /** Only a fully completed pipeline turn may complete first-run integrity. */
+    successful: boolean;
   } | null;
   replaying: boolean;
   onPressIn: () => void;
@@ -52,22 +66,32 @@ export interface IntroStepProps {
   /** The automatic setup job shared with settings and the home screen. */
   autoSetup: AutoSetupJobState;
   language: AppLanguage;
+  /** Deterministic capture fixtures must not inspect native model state. */
+  modelStateReadsSuspended?: boolean;
   onConnectProvider: () => void;
   onInstallLocal: () => void;
   onOpenStt: () => void;
   onOpenTts: () => void;
   t: TranslateFn;
   testTurn: IntroTestTurnState;
+  /** A runnable reasoning route exists for the live test. */
+  thinkingReady: boolean;
 }
 
 /** A stored-dialogue bubble in the app's messenger anatomy. */
 function Bubble({
   children,
+  contentDirection = "auto",
+  isRtl = false,
   mine,
+  testID,
   theme,
 }: {
   children: React.ReactNode;
+  contentDirection?: "auto" | "ltr" | "rtl";
+  isRtl?: boolean;
   mine?: boolean;
+  testID?: string;
   theme: IntroTheme;
 }) {
   return (
@@ -75,17 +99,39 @@ function Bubble({
       style={[
         styles.bubble,
         mine
-          ? [styles.bubbleMine, { backgroundColor: theme.accentSoft }]
+          ? [
+              styles.bubbleMine,
+              isRtl ? styles.bubbleMineRtl : null,
+              { backgroundColor: theme.accentSoft },
+            ]
           : [
               styles.bubbleTheirs,
+              isRtl ? styles.bubbleTheirsRtl : null,
               {
                 backgroundColor: theme.panelActive,
                 borderColor: theme.border,
               },
             ],
       ]}
+      testID={testID}
     >
-      <Text style={[styles.bubbleText, { color: theme.text }]}>{children}</Text>
+      <Text
+        style={[
+          styles.bubbleText,
+          {
+            color: theme.text,
+            textAlign:
+              contentDirection === "rtl"
+                ? "right"
+                : contentDirection === "ltr"
+                  ? "left"
+                  : "auto",
+            writingDirection: contentDirection,
+          },
+        ]}
+      >
+        {children}
+      </Text>
     </View>
   );
 }
@@ -107,6 +153,8 @@ function WelcomeStep({ language, t }: IntroStepProps) {
   const { playing, toggle } = useIntroPlayback(getIntroClip(previewLanguage));
 
   const preview = translations[previewLanguage];
+  const previewDirection = getAppLocale(previewLanguage).direction;
+  const previewIsRtl = previewDirection === "rtl";
   const activeLanguage = APP_LANGUAGE_OPTIONS.find(
     (option) => option.value === previewLanguage,
   );
@@ -119,26 +167,49 @@ function WelcomeStep({ language, t }: IntroStepProps) {
           play button. The blurred earlier turns are decoration and stay out
           of the accessibility tree; the crisp query is the question the play
           button answers, so it is announced. */}
-      <View style={styles.dialogueZone}>
+      <View style={[styles.dialogueZone, { direction: previewDirection }]}>
         <View
           accessible={false}
           importantForAccessibility="no-hide-descendants"
           style={styles.dialogueStack}
         >
           <View style={styles.dialogueFar} testID="intro-dialogue-far">
-            <Bubble theme={theme}>{preview.introDialogueFar}</Bubble>
+            <Bubble
+              contentDirection={previewDirection}
+              isRtl={previewIsRtl}
+              theme={theme}
+            >
+              {preview.introDialogueFar}
+            </Bubble>
           </View>
           <View style={styles.dialogueMid} testID="intro-dialogue-mid">
-            <Bubble mine theme={theme}>
+            <Bubble
+              contentDirection={previewDirection}
+              isRtl={previewIsRtl}
+              mine
+              theme={theme}
+            >
               {preview.introDialogueQuestion}
             </Bubble>
           </View>
           <View style={styles.dialogueNear} testID="intro-dialogue-near">
-            <Bubble theme={theme}>{preview.introDialogueNear}</Bubble>
+            <Bubble
+              contentDirection={previewDirection}
+              isRtl={previewIsRtl}
+              theme={theme}
+            >
+              {preview.introDialogueNear}
+            </Bubble>
           </View>
         </View>
         <View style={styles.dialogueQuery}>
-          <Bubble mine theme={theme}>
+          <Bubble
+            contentDirection={previewDirection}
+            isRtl={previewIsRtl}
+            mine
+            testID="intro-dialogue-query-bubble"
+            theme={theme}
+          >
             {preview.introWelcomeQuery}
           </Bubble>
         </View>
@@ -163,7 +234,7 @@ function WelcomeStep({ language, t }: IntroStepProps) {
               transform: [{ scale: pressed ? 0.97 : 1 }],
             },
           ]}
-          testID="intro-welcome-play"
+          testID={playing ? "intro-welcome-stop" : "intro-welcome-play"}
         >
           <PhosphorIcon
             color={playing ? theme.accent : theme.onAccent}
@@ -239,6 +310,7 @@ function WelcomeStep({ language, t }: IntroStepProps) {
                         }
                       : { borderColor: "transparent" },
                   ]}
+                  testID={`intro-language-option-${option.value}`}
                 >
                   <Text
                     style={[
@@ -270,6 +342,7 @@ function WelcomeStep({ language, t }: IntroStepProps) {
 
 /** One row of the manual catalogue: radio, label, meta, trailing affordance. */
 function ManualRow({
+  isRtl = false,
   label,
   last,
   locked,
@@ -279,6 +352,7 @@ function ManualRow({
   testID,
   theme,
 }: {
+  isRtl?: boolean;
   label: string;
   last?: boolean;
   locked?: boolean;
@@ -337,7 +411,11 @@ function ManualRow({
       {locked ? (
         <PhosphorIcon color={theme.textMuted} name="lock" size="compact" />
       ) : onPress ? (
-        <PhosphorIcon color={theme.textMuted} name="right" size="inline" />
+        <PhosphorIcon
+          color={theme.textMuted}
+          name={isRtl ? "left" : "right"}
+          size="inline"
+        />
       ) : null}
     </Pressable>
   );
@@ -409,9 +487,13 @@ interface IntroModelState {
  * judgeable at a glance. Reads only; the model lifecycle stays on the
  * owning settings pages.
  */
-function useIntroModelState(refreshKey: string) {
+function useIntroModelState(refreshKey: string, suspended = false) {
   const [state, setState] = React.useState<IntroModelState | null>(null);
   React.useEffect(() => {
+    if (suspended) {
+      setState(null);
+      return;
+    }
     let cancelled = false;
     void Promise.all([
       getLocalCatalogInstallStatuses(),
@@ -426,7 +508,7 @@ function useIntroModelState(refreshKey: string) {
     return () => {
       cancelled = true;
     };
-  }, [refreshKey]);
+  }, [refreshKey, suspended]);
   return state;
 }
 
@@ -480,6 +562,7 @@ function introModelMeta(
 function SetupStep({
   autoSetup,
   language,
+  modelStateReadsSuspended,
   onConnectProvider,
   onInstallLocal,
   onOpenStt,
@@ -488,9 +571,13 @@ function SetupStep({
 }: IntroStepProps) {
   const theme = useIntroTheme();
   const [manualOpen, setManualOpen] = React.useState(false);
+  const isRtl = getAppLocale(language).direction === "rtl";
   const speechLanguage = introSpeechLanguage(language);
   // Re-read after the auto job finishes: its installs change the rows.
-  const modelState = useIntroModelState(autoSetup.state);
+  const modelState = useIntroModelState(
+    autoSetup.state,
+    modelStateReadsSuspended,
+  );
 
   return (
     <View style={styles.stack} testID="intro-setup-step">
@@ -573,12 +660,14 @@ function SetupStep({
               provider path. "More models" is the only hand-off per group. */}
           <ManualGroup label={t("introGlyphListen")} t={t} theme={theme}>
             <ManualRow
+              isRtl={isRtl}
               label={t("introManualPhoneRoute")}
               selected
               theme={theme}
             />
             {recommendedIntroModels("stt", speechLanguage).map((model) => (
               <ManualRow
+                isRtl={isRtl}
                 key={model.id}
                 label={model.name}
                 meta={introModelMeta(model, modelState, t)}
@@ -588,6 +677,7 @@ function SetupStep({
               />
             ))}
             <ManualRow
+              isRtl={isRtl}
               label={t("introMoreModels")}
               last
               onPress={onOpenStt}
@@ -604,6 +694,7 @@ function SetupStep({
           >
             {recommendedIntroModels("llm", speechLanguage).map((model) => (
               <ManualRow
+                isRtl={isRtl}
                 key={model.id}
                 label={model.name}
                 meta={introModelMeta(model, modelState, t)}
@@ -613,12 +704,14 @@ function SetupStep({
               />
             ))}
             <ManualRow
+              isRtl={isRtl}
               label={t("introMoreModels")}
               onPress={onInstallLocal}
               testID="intro-manual-llm"
               theme={theme}
             />
             <ManualRow
+              isRtl={isRtl}
               label={t("introProviderLocked")}
               last
               locked
@@ -630,12 +723,14 @@ function SetupStep({
 
           <ManualGroup label={t("introGlyphAnswer")} t={t} theme={theme}>
             <ManualRow
+              isRtl={isRtl}
               label={t("introManualPhoneRoute")}
               selected
               theme={theme}
             />
             {recommendedIntroModels("tts", speechLanguage).map((model) => (
               <ManualRow
+                isRtl={isRtl}
                 key={model.id}
                 label={model.name}
                 meta={introModelMeta(model, modelState, t)}
@@ -645,6 +740,7 @@ function SetupStep({
               />
             ))}
             <ManualRow
+              isRtl={isRtl}
               label={t("introMoreModels")}
               last
               onPress={onOpenTts}
@@ -665,10 +761,26 @@ function SetupStep({
  * spoken and transcribed, with release-to-speech latency as the number that
  * improves when routes change. Nothing is saved.
  */
-function TryStep({ t, testTurn }: IntroStepProps) {
+function TryStep({ language, t, testTurn, thinkingReady }: IntroStepProps) {
   const theme = useIntroTheme();
+  const isRtl = getAppLocale(language).direction === "rtl";
   const recording = testTurn.phase === "recording";
   const running = testTurn.phase === "running";
+  const statusLabel = !thinkingReady
+    ? t("unavailable")
+    : recording
+      ? t("listeningToYourVoice")
+      : running
+        ? t("pleaseWait")
+        : t("introHoldToTalk");
+  const semanticAnnouncement =
+    testTurn.error ?? (recording || running ? statusLabel : null);
+
+  React.useEffect(() => {
+    if (semanticAnnouncement) {
+      AccessibilityInfo.announceForAccessibility(semanticAnnouncement);
+    }
+  }, [semanticAnnouncement]);
 
   return (
     <View style={[styles.stack, styles.tryStack]} testID="intro-try-step">
@@ -680,42 +792,47 @@ function TryStep({ t, testTurn }: IntroStepProps) {
         {testTurn.turn ? (
           <View style={styles.tryTurn}>
             <View style={styles.tryTurnMine}>
-              <Bubble mine theme={theme}>
+              <Bubble isRtl={isRtl} mine theme={theme}>
                 {testTurn.turn.question}
               </Bubble>
             </View>
             <View style={styles.tryTurnTheirs}>
-              <Bubble theme={theme}>{testTurn.turn.answer}</Bubble>
+              <Bubble isRtl={isRtl} theme={theme}>
+                {testTurn.turn.answer}
+              </Bubble>
             </View>
-            <View style={styles.tryMetaRow}>
-              {testTurn.turn.latencyLabel ? (
-                <>
-                  <Text style={[styles.tryMeta, { color: theme.textMuted }]}>
-                    {testTurn.turn.latencyLabel} {t("introToFirstWord")}
+            {testTurn.turn.successful ? (
+              <View style={styles.tryMetaRow}>
+                {testTurn.turn.latencyLabel ? (
+                  <>
+                    <Text style={[styles.tryMeta, { color: theme.textMuted }]}>
+                      {testTurn.turn.latencyLabel} {t("introToFirstWord")}
+                    </Text>
+                    <Text style={[styles.tryMeta, { color: theme.textMuted }]}>
+                      {"·"}
+                    </Text>
+                  </>
+                ) : null}
+                <Pressable
+                  accessibilityLabel={t("introReplay")}
+                  accessibilityRole="button"
+                  accessibilityState={{ disabled: testTurn.replaying }}
+                  disabled={testTurn.replaying}
+                  onPress={testTurn.onReplay}
+                  style={styles.tryReplay}
+                  testID="intro-try-replay"
+                >
+                  <PhosphorIcon
+                    color={theme.accent}
+                    name="sound"
+                    size="inline"
+                  />
+                  <Text style={[styles.tryMeta, { color: theme.accent }]}>
+                    {t("introReplay")}
                   </Text>
-                  <Text style={[styles.tryMeta, { color: theme.textMuted }]}>
-                    {"·"}
-                  </Text>
-                </>
-              ) : null}
-              <Pressable
-                accessibilityLabel={t("introReplay")}
-                accessibilityRole="button"
-                disabled={testTurn.replaying}
-                onPress={testTurn.onReplay}
-                style={styles.tryReplay}
-                testID="intro-try-replay"
-              >
-                <PhosphorIcon
-                  color={theme.accent}
-                  name="sound"
-                  size="inline"
-                />
-                <Text style={[styles.tryMeta, { color: theme.accent }]}>
-                  {t("introReplay")}
-                </Text>
-              </Pressable>
-            </View>
+                </Pressable>
+              </View>
+            ) : null}
           </View>
         ) : null}
 
@@ -723,8 +840,8 @@ function TryStep({ t, testTurn }: IntroStepProps) {
           <Pressable
             accessibilityLabel={t("introHoldToTalk")}
             accessibilityRole="button"
-            accessibilityState={{ disabled: running }}
-            disabled={running}
+            accessibilityState={{ disabled: running || !thinkingReady }}
+            disabled={running || !thinkingReady}
             onPressIn={testTurn.onPressIn}
             onPressOut={testTurn.onPressOut}
             style={[
@@ -732,7 +849,7 @@ function TryStep({ t, testTurn }: IntroStepProps) {
               {
                 backgroundColor: recording ? theme.panelActive : theme.accent,
                 borderColor: recording ? theme.accent : "transparent",
-                opacity: running ? 0.45 : 1,
+                opacity: running || !thinkingReady ? 0.45 : 1,
                 shadowColor: theme.accent,
               },
             ]}
@@ -744,9 +861,21 @@ function TryStep({ t, testTurn }: IntroStepProps) {
               size="feature"
             />
           </Pressable>
-          <Text style={[styles.tryMeta, { color: theme.textMuted }]}>
-            {running ? t("pleaseWait") : t("introHoldToTalk")}
+          <Text
+            style={[styles.tryMeta, { color: theme.textMuted }]}
+            testID="intro-test-status"
+          >
+            {statusLabel}
           </Text>
+          {testTurn.error && !testTurn.turn ? (
+            <Text
+              accessibilityRole="alert"
+              style={[styles.tryError, { color: theme.danger }]}
+              testID="intro-test-error"
+            >
+              {testTurn.error}
+            </Text>
+          ) : null}
         </View>
       </View>
     </View>
@@ -775,6 +904,10 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 18,
     borderTopRightRadius: 18,
   },
+  bubbleMineRtl: {
+    borderBottomLeftRadius: 5,
+    borderBottomRightRadius: 18,
+  },
   bubbleText: {
     fontFamily: fonts.body,
     fontSize: 14,
@@ -787,6 +920,10 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 18,
     borderTopRightRadius: 18,
     borderWidth: 1,
+  },
+  bubbleTheirsRtl: {
+    borderBottomLeftRadius: 18,
+    borderBottomRightRadius: 5,
   },
   // Earlier turns emerge from blur toward the crisp query. RN's filter blur
   // renders where the platform supports it; the opacity ladder carries the
@@ -1036,6 +1173,13 @@ const styles = StyleSheet.create({
     flex: 1,
     gap: 10,
     paddingTop: 8,
+  },
+  tryError: {
+    fontFamily: fonts.body,
+    fontSize: 13,
+    lineHeight: 18,
+    maxWidth: 280,
+    textAlign: "center",
   },
   tryMeta: {
     fontFamily: fonts.mono,

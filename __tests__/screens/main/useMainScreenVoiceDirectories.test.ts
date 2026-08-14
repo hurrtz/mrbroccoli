@@ -83,10 +83,7 @@ describe("useMainScreenVoiceDirectories", () => {
     });
     expect(result.current.xai?.voices[0]?.value).toBe("xai-voice-1");
     expect(updateProviderTtsVoice).toHaveBeenCalledTimes(1);
-    expect(updateProviderTtsVoice).toHaveBeenCalledWith(
-      "xai",
-      "xai-voice-1",
-    );
+    expect(updateProviderTtsVoice).toHaveBeenCalledWith("xai", "xai-voice-1");
   });
 
   it("replaces a stale voice after a different provider account is loaded", () => {
@@ -115,5 +112,35 @@ describe("useMainScreenVoiceDirectories", () => {
       "elevenlabs",
       "elevenlabs-voice-1",
     );
+  });
+
+  it("does not contact provider directories while a deterministic fixture is active", () => {
+    const updateProviderTtsVoice = jest.fn();
+    const settings = {
+      ...DEFAULT_SETTINGS,
+      apiKeys: {
+        ...DEFAULT_SETTINGS.apiKeys,
+        elevenlabs: "retained-elevenlabs-key",
+        mistral: "retained-mistral-key",
+        xai: "retained-xai-key",
+      },
+    };
+
+    renderHook(() =>
+      useMainScreenVoiceDirectories({
+        loaded: true,
+        settings,
+        suspended: true,
+        updateProviderTtsVoice,
+      }),
+    );
+
+    expect(mockUseProviderVoiceDirectory).toHaveBeenCalledTimes(3);
+    for (const provider of ["xai", "mistral", "elevenlabs"]) {
+      expect(mockUseProviderVoiceDirectory).toHaveBeenCalledWith(
+        expect.objectContaining({ enabled: false, provider }),
+      );
+    }
+    expect(updateProviderTtsVoice).not.toHaveBeenCalled();
   });
 });
