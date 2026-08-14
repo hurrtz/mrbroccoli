@@ -5,7 +5,6 @@ import { conversationArtifactTranslations } from "../conversationArtifactTransla
 import { interruptionTranslations } from "../interruptionTranslations";
 import { ulraAuditTranslations } from "../ulraAuditTranslations";
 import { imagePromptTranslations } from "../imagePromptTranslations";
-import { memoryEditTranslations } from "../memoryEditTranslations";
 import { onDeviceTranslations } from "../onDeviceTranslations";
 import { onboardingTranslations } from "../onboardingTranslations";
 import { introTranslations } from "../introTranslations";
@@ -21,7 +20,6 @@ export const fr = {
   ...dataBackupTranslations.fr,
   ...conversationKnowledgeTranslations.fr,
   ...imagePromptTranslations.fr,
-  ...memoryEditTranslations.fr,
   ...onDeviceTranslations.fr,
   ...onboardingTranslations.fr,
   ...introTranslations.fr,
@@ -719,7 +717,6 @@ export const fr = {
   deleteConversationConfirmationTitle: ({ title }) => `Supprimer « ${title} » ?`,
   deleteConversationConfirmationMessage:
     "Cela supprime définitivement la conversation et tous ses messages. Cette action ne peut pas être annulée.",
-  memory: "Mémoire",
   conversations: "Conversations",
   drawerSubtitle: "Passez d’un fil de discussion à l’autre ou démarrez une nouvelle salle.",
   newSession: "Nouvelle session",
@@ -815,19 +812,6 @@ export const fr = {
   noMatchingConversations: "Aucune conversation correspondante",
   noMatchingConversationsDescription:
     "Essayez un autre titre, une autre route, un autre modèle ou une autre phrase de la transcription.",
-  memoryModalTitle: "Mémoire de conversations",
-  memoryModalDescription:
-    "Il s'agit du résumé compact que Mr Broccoli conserve une fois qu'un fil devient suffisamment long pour compresser les tours plus anciens.",
-  memorySummary: "Résumé enregistré",
-  memorySummaryEmpty:
-    "Pas encore de mémoire compacte. Une fois que ce fil sera plus long, les tours plus anciens seront résumés ici.",
-  summarizedTurnsCount: ({ count }) =>
-    Number(count) === 1 ? "1 tour résumé" : `${count} tours résumés`,
-  copyMemory: "Copier la mémoire",
-  forgetMemory: "Oublier la mémoire",
-  memoryCopied: "Mémoire copiée.",
-  memoryCleared: "Mémoire de conversation effacée.",
-  noConversationToManageYet: "Aucune mémoire de conversation disponible pour l'instant.",
   noProviderYet: "Pas encore de fournisseur",
   noModelYet: "Pas de modèle pour l'instant",
   startedAt: "Commencé",

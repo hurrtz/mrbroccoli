@@ -5,7 +5,6 @@ import { conversationArtifactTranslations } from "../conversationArtifactTransla
 import { interruptionTranslations } from "../interruptionTranslations";
 import { ulraAuditTranslations } from "../ulraAuditTranslations";
 import { imagePromptTranslations } from "../imagePromptTranslations";
-import { memoryEditTranslations } from "../memoryEditTranslations";
 import { onDeviceTranslations } from "../onDeviceTranslations";
 import { onboardingTranslations } from "../onboardingTranslations";
 import { introTranslations } from "../introTranslations";
@@ -21,7 +20,6 @@ export const cs = {
   ...dataBackupTranslations.cs,
   ...conversationKnowledgeTranslations.cs,
   ...imagePromptTranslations.cs,
-  ...memoryEditTranslations.cs,
   ...onDeviceTranslations.cs,
   ...onboardingTranslations.cs,
   ...introTranslations.cs,
@@ -731,7 +729,6 @@ export const cs = {
   deleteConversationConfirmationTitle: ({ title }) => `Smazat „${title}“?`,
   deleteConversationConfirmationMessage:
     "Tím trvale smažete konverzaci a všechny její zprávy. Tuto akci nelze vrátit zpět.",
-  memory: "Paměť",
   conversations: "Konverzace",
   drawerSubtitle: "Přecházejte mezi živými vlákny nebo otevřete novou místnost.",
   newSession: "Nová relace",
@@ -831,23 +828,6 @@ export const cs = {
   noMatchingConversations: "Žádné odpovídající konverzace",
   noMatchingConversationsDescription:
     "Zkuste jiný název, trasu, model nebo frázi z přepisu.",
-  memoryModalTitle: "Paměť konverzace",
-  memoryModalDescription:
-    "Toto je kompaktní shrnutí, které si Mr Broccoli přenáší dál, jakmile je vlákno dost dlouhé na to, aby se starší tahy zkomprimovaly.",
-  memorySummary: "Uložené shrnutí",
-  memorySummaryEmpty:
-    "Zatím žádná kompaktní paměť. Jakmile bude toto vlákno delší, budou zde shrnuty starší tahy.",
-  summarizedTurnsCount: ({ count }) =>
-    Number(count) === 1
-      ? "1 shrnutý tah"
-      : Number(count) < 5
-        ? `${count} shrnuté tahy`
-        : `${count} shrnutých tahů`,
-  copyMemory: "Kopírovat paměť",
-  forgetMemory: "Zapomenout paměť",
-  memoryCopied: "Paměť zkopírována.",
-  memoryCleared: "Paměť konverzace byla vymazána.",
-  noConversationToManageYet: "Zatím není k dispozici žádná paměť konverzace.",
   noProviderYet: "Zatím žádný poskytovatel",
   noModelYet: "Zatím žádný model",
   startedAt: "Zahájeno",

@@ -5,7 +5,6 @@ import { conversationArtifactTranslations } from "../conversationArtifactTransla
 import { interruptionTranslations } from "../interruptionTranslations";
 import { ulraAuditTranslations } from "../ulraAuditTranslations";
 import { imagePromptTranslations } from "../imagePromptTranslations";
-import { memoryEditTranslations } from "../memoryEditTranslations";
 import { onDeviceTranslations } from "../onDeviceTranslations";
 import { onboardingTranslations } from "../onboardingTranslations";
 import { introTranslations } from "../introTranslations";
@@ -21,7 +20,6 @@ export const it = {
   ...dataBackupTranslations.it,
   ...conversationKnowledgeTranslations.it,
   ...imagePromptTranslations.it,
-  ...memoryEditTranslations.it,
   ...onDeviceTranslations.it,
   ...onboardingTranslations.it,
   ...introTranslations.it,
@@ -725,7 +723,6 @@ export const it = {
   deleteConversationConfirmationTitle: ({ title }) => `Eliminare "${title}"?`,
   deleteConversationConfirmationMessage:
     "Ciò eliminerà permanentemente la conversazione e tutti i suoi messaggi. Questa azione non può essere annullata.",
-  memory: "Memoria",
   conversations: "Conversazioni",
   drawerSubtitle:
     "Passa da una discussione attiva all'altra o avviane una nuova.",
@@ -822,20 +819,6 @@ export const it = {
   noMatchingConversations: "Nessuna conversazione corrispondente",
   noMatchingConversationsDescription:
     "Prova con un altro titolo, percorso o modello, oppure con una frase della trascrizione.",
-  memoryModalTitle: "Memoria di conversazione",
-  memoryModalDescription:
-    "Questo è il riepilogo compatto che Mr Broccoli porta avanti quando una discussione diventa abbastanza lunga da comprimere i turni più vecchi.",
-  memorySummary: "Riepilogo salvato",
-  memorySummaryEmpty:
-    "Ancora nessuna memoria compatta. Quando questa discussione diventerà più lunga, i turni più vecchi verranno riepilogati qui.",
-  summarizedTurnsCount: ({ count }) =>
-    Number(count) === 1 ? "1 turno riassunto" : `${count} turni riassunti`,
-  copyMemory: "Copia la memoria",
-  forgetMemory: "Dimentica la memoria",
-  memoryCopied: "Memoria copiata.",
-  memoryCleared: "La memoria di conversazione è stata cancellata.",
-  noConversationToManageYet:
-    "Ancora nessuna memoria di conversazione disponibile.",
   noProviderYet: "Ancora nessun provider",
   noModelYet: "Ancora nessun modello",
   startedAt: "Inizio",

@@ -27,8 +27,6 @@ interface MainScreenDiagnosticsState {
   inputMode: InputMode;
   isRecording: boolean;
   loaded: boolean;
-  memoryConversationId: string | null;
-  memoryVisible: boolean;
   messageCount: number;
   model: string;
   modelEffort?: string;
@@ -179,15 +177,5 @@ export function useMainScreenDiagnostics(state: MainScreenDiagnosticsState) {
       payload: { visible: state.statusDetailsVisible },
     });
   }, [state.statusDetailsVisible]);
-
-  useEffect(() => {
-    recordDebugLogEvent({
-      event: "memory-modal-visibility-changed",
-      payload: {
-        conversationId: state.memoryConversationId,
-        visible: state.memoryVisible,
-      },
-    });
-  }, [state.memoryConversationId, state.memoryVisible]);
 
 }

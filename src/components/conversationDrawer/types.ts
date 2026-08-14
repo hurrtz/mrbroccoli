@@ -9,7 +9,6 @@ export interface ConversationDrawerProps {
   onSelect: (id: string) => Promise<void> | void;
   onCopyThread: (id: string) => void;
   onShareThread: (id: string) => void;
-  onManageMemory: (id: string) => void;
   onRenameThread: (id: string, title: string) => void;
   onTogglePinned: (id: string) => void;
   onTogglePrivate: (id: string) => void;

@@ -5,7 +5,6 @@ import { conversationArtifactTranslations } from "../conversationArtifactTransla
 import { interruptionTranslations } from "../interruptionTranslations";
 import { ulraAuditTranslations } from "../ulraAuditTranslations";
 import { imagePromptTranslations } from "../imagePromptTranslations";
-import { memoryEditTranslations } from "../memoryEditTranslations";
 import { onDeviceTranslations } from "../onDeviceTranslations";
 import { onboardingTranslations } from "../onboardingTranslations";
 import { introTranslations } from "../introTranslations";
@@ -21,7 +20,6 @@ export const ru = {
   ...dataBackupTranslations.ru,
   ...conversationKnowledgeTranslations.ru,
   ...imagePromptTranslations.ru,
-  ...memoryEditTranslations.ru,
   ...onDeviceTranslations.ru,
   ...onboardingTranslations.ru,
   ...introTranslations.ru,
@@ -722,7 +720,6 @@ export const ru = {
   deleteConversationConfirmationTitle: ({ title }) => `Удалить «${title}»?`,
   deleteConversationConfirmationMessage:
     "Это безвозвратно удалит разговор и все его сообщения. Это действие невозможно отменить.",
-  memory: "Память",
   conversations: "Разговоры",
   drawerSubtitle:
     "Переключайтесь между активными обсуждениями или создайте новую комнату.",
@@ -820,19 +817,6 @@ export const ru = {
   noMatchingConversations: "Нет подходящих разговоров",
   noMatchingConversationsDescription:
     "Попробуйте использовать другое название, маршрут, модель или фразу из стенограммы.",
-  memoryModalTitle: "Память разговоров",
-  memoryModalDescription:
-    "Это компактная сводка, которую Mr Broccoli переносит дальше, когда ветка становится достаточно длинной, чтобы сжимать более ранние реплики.",
-  memorySummary: "Сохранённая сводка",
-  memorySummaryEmpty:
-    "Компактной памяти пока нет. Как только эта ветка станет длиннее, более ранние реплики будут сведены здесь в сводку.",
-  summarizedTurnsCount: ({ count }) =>
-    Number(count) === 1 ? "1 ход в сводке" : `Ходов в сводке: ${count}`,
-  copyMemory: "Копировать память",
-  forgetMemory: "Забыть память",
-  memoryCopied: "Память скопирована.",
-  memoryCleared: "Память разговоров очищена.",
-  noConversationToManageYet: "Памяти для разговоров пока нет.",
   noProviderYet: "Пока нет провайдера",
   noModelYet: "Модели еще нет",
   startedAt: "Началось",

@@ -748,62 +748,6 @@ export function useConversationMutations(params: {
     [activeConversationRef, setActiveConversationValue],
   );
 
-  const clearConversationMemory = useCallback(
-    async (id: string) => {
-      const currentConversation =
-        activeConversationRef.current?.id === id
-          ? activeConversationRef.current
-          : await getConversationById(id);
-
-      if (!currentConversation) {
-        return null;
-      }
-
-      const updatedConversation: Conversation = {
-        ...currentConversation,
-      };
-
-      delete updatedConversation.contextSummary;
-      delete updatedConversation.summarizedMessageCount;
-
-      saveConversation(updatedConversation);
-
-      if (activeConversationRef.current?.id === id) {
-        setActiveConversationValue(updatedConversation);
-      }
-
-      return updatedConversation;
-    },
-    [activeConversationRef, getConversationById, setActiveConversationValue],
-  );
-
-  const updateConversationMemory = useCallback(
-    async (id: string, summary: string) => {
-      const currentConversation =
-        activeConversationRef.current?.id === id
-          ? activeConversationRef.current
-          : await getConversationById(id);
-      const normalizedSummary = summary.trim();
-
-      if (!currentConversation || !normalizedSummary) {
-        return null;
-      }
-
-      const updatedConversation: Conversation = {
-        ...currentConversation,
-        contextSummary: normalizedSummary,
-      };
-
-      await saveConversation(updatedConversation);
-      if (activeConversationRef.current?.id === id) {
-        setActiveConversationValue(updatedConversation);
-      }
-
-      return updatedConversation;
-    },
-    [activeConversationRef, getConversationById, setActiveConversationValue],
-  );
-
   const deleteConversation = useCallback(
     (id: string) => {
       const activeConversation =
@@ -1201,7 +1145,6 @@ export function useConversationMutations(params: {
   return {
     addMessage,
     clearActiveConversation,
-    clearConversationMemory,
     createConversation,
     deleteConversation,
     editUserMessage,
@@ -1215,7 +1158,6 @@ export function useConversationMutations(params: {
     toggleConversationPrivate,
     toggleConversationArchived,
     updateMessage,
-    updateConversationMemory,
     updateConversationContextSummary,
     updateConversationSettings,
   };

@@ -5,7 +5,6 @@ import { conversationArtifactTranslations } from "../conversationArtifactTransla
 import { interruptionTranslations } from "../interruptionTranslations";
 import { ulraAuditTranslations } from "../ulraAuditTranslations";
 import { imagePromptTranslations } from "../imagePromptTranslations";
-import { memoryEditTranslations } from "../memoryEditTranslations";
 import { onDeviceTranslations } from "../onDeviceTranslations";
 import { onboardingTranslations } from "../onboardingTranslations";
 import { introTranslations } from "../introTranslations";
@@ -21,7 +20,6 @@ export const tr = {
   ...dataBackupTranslations.tr,
   ...conversationKnowledgeTranslations.tr,
   ...imagePromptTranslations.tr,
-  ...memoryEditTranslations.tr,
   ...onDeviceTranslations.tr,
   ...onboardingTranslations.tr,
   ...introTranslations.tr,
@@ -722,7 +720,6 @@ export const tr = {
   deleteConversationConfirmationTitle: ({ title }) => `“${title}” silinsin mi?`,
   deleteConversationConfirmationMessage:
     "Bu, görüşmeyi ve tüm mesajlarını kalıcı olarak siler. Bu eylem geri alınamaz.",
-  memory: "Bellek",
   conversations: "Konuşmalar",
   drawerSubtitle:
     "Canlı başlıklar arasında geçiş yapın veya yeni bir oda başlatın.",
@@ -823,19 +820,6 @@ export const tr = {
   noMatchingConversations: "Eşleşen görüşme yok",
   noMatchingConversationsDescription:
     "Transkriptten farklı bir başlık, rota, model veya ifade deneyin.",
-  memoryModalTitle: "Konuşma belleği",
-  memoryModalDescription:
-    "Bu, bir konu eski turları sıkıştıracak kadar uzadığında Mr Broccoli'nin ileriye taşıdığı kısa özettir.",
-  memorySummary: "Kaydedilen özet",
-  memorySummaryEmpty:
-    "Henüz kompakt bellek yok. Bu konu uzadıkça eski turlar burada özetlenecektir.",
-  summarizedTurnsCount: ({ count }) =>
-    Number(count) === 1 ? "1 özetlenmiş tur" : `${count} özetlenmiş tur`,
-  copyMemory: "Belleği kopyala",
-  forgetMemory: "Belleği unut",
-  memoryCopied: "Bellek kopyalandı.",
-  memoryCleared: "Konuşma belleği temizlendi.",
-  noConversationToManageYet: "Henüz konuşma belleği yok.",
   noProviderYet: "Henüz sağlayıcı yok",
   noModelYet: "Henüz model yok",
   startedAt: "Başlatıldı",

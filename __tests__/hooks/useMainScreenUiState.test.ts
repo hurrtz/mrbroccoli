@@ -249,28 +249,4 @@ describe("useMainScreenUiState", () => {
     }
   });
 
-  it("opens and clears the memory modal state", () => {
-    const { result } = renderHook(() => useMainScreenUiState());
-    const conversation = {
-      id: "conversation-1",
-      title: "Test conversation",
-      createdAt: "2026-03-22T10:00:00.000Z",
-      updatedAt: "2026-03-22T10:00:00.000Z",
-      messages: [],
-    };
-
-    act(() => {
-      result.current.openMemoryConversation(conversation);
-    });
-
-    expect(result.current.memoryVisible).toBe(true);
-    expect(result.current.memoryConversation).toEqual(conversation);
-
-    act(() => {
-      result.current.closeMemory();
-    });
-
-    expect(result.current.memoryVisible).toBe(false);
-    expect(result.current.memoryConversation).toBeNull();
-  });
 });

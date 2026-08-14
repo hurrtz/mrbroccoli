@@ -64,7 +64,6 @@ export function useConversations({
   const {
     addMessage,
     clearActiveConversation,
-    clearConversationMemory,
     createConversation,
     deleteConversation,
     editUserMessage,
@@ -78,7 +77,6 @@ export function useConversations({
     toggleConversationPrivate,
     toggleConversationArchived,
     updateMessage,
-    updateConversationMemory,
     updateConversationContextSummary,
     updateConversationSettings,
   } = useConversationMutations({
@@ -214,10 +212,8 @@ export function useConversations({
     getConversationById,
     addMessage,
     updateMessage,
-    updateConversationMemory,
     updateConversationContextSummary,
     updateConversationSettings,
-    clearConversationMemory,
     renameConversation,
     removeMessage,
     toggleConversationPinned,

@@ -144,10 +144,8 @@ export function MainScreen() {
     getConversationById,
     addMessage,
     updateMessage,
-    updateConversationMemory,
     updateConversationContextSummary,
     updateConversationSettings,
-    clearConversationMemory,
     renameConversation,
     removeMessage,
     toggleConversationPinned,
@@ -237,16 +235,11 @@ export function MainScreen() {
     routePickerVisible,
     statusDetailsVisible,
     transcriptSheetVisible,
-    memoryConversation,
-    memoryVisible,
     setDrawerVisible,
-    setMemoryConversation,
     openSettings,
     closeSettings,
     runAfterSettingsDismiss,
     handleSettingsDismiss,
-    openMemoryConversation,
-    closeMemory,
     openStatusDetails,
     closeStatusDetails,
     openRoutePicker,
@@ -582,7 +575,6 @@ export function MainScreen() {
     imageSourceVisible ||
     Boolean(imagePromptSubmission.consent) ||
     introVisible ||
-    memoryVisible ||
     Boolean(ulraMode.confirmation) ||
     routePickerVisible ||
     settingsVisible ||
@@ -711,26 +703,17 @@ export function MainScreen() {
     handleDeleteConversation,
     handleSelectConversation,
     handleStartNewSession,
-    openMemory,
-    handleCopyMemory,
-    handleClearMemory,
-    handleSaveMemory,
   } = useConversationActions({
     activeConversation,
-    memoryConversation,
     getConversationById,
     renameConversation,
     toggleConversationPinned,
     toggleConversationPrivate,
     toggleConversationArchived,
-    clearConversationMemory,
-    updateConversationMemory,
     deleteConversation,
     selectConversation,
     clearActiveConversation,
     resetVoiceSessionState,
-    openMemoryConversation,
-    setMemoryConversation,
     showToast,
     language,
     t,
@@ -815,12 +798,9 @@ export function MainScreen() {
   });
   const {
     handleAutoRenameConversation,
-    handleClearMemoryPress,
     handleCloseConversationSettings,
     handleCloseDrawer,
     handleCopyDrawerThread,
-    handleCopyMemoryPress,
-    handleManageDrawerMemory,
     handleOpenConversationSettings,
     handleOpenDrawer,
     handleOpenMainSettings,
@@ -830,13 +810,10 @@ export function MainScreen() {
     handleShareDrawerThread,
     handleToggleWebSearch,
   } = useMainScreenSurfaceActions({
-    handleClearMemory,
-    handleCopyMemory,
     handleCopyThread,
     handleGenerateTitle,
     handleRenameThread,
     handleShareThread,
-    openMemory,
     openSettings,
     runAfterDrawerDismiss,
     setDrawerVisible,
@@ -923,8 +900,6 @@ export function MainScreen() {
     inputMode: runtimeSettings.inputMode,
     isRecording,
     loaded,
-    memoryConversationId: memoryConversation?.id ?? null,
-    memoryVisible,
     messageCount: messages.length,
     model,
     modelEffort,
@@ -1345,16 +1320,6 @@ export function MainScreen() {
         visible: premiumModalVisible,
         onClose: () => setPremiumModalVisible(false),
       }}
-      conversationMemory={{
-        visible: memoryVisible,
-        title: memoryConversation?.title ?? t("freshSession"),
-        summary: memoryConversation?.contextSummary,
-        summarizedMessageCount: memoryConversation?.summarizedMessageCount,
-        onCopy: handleCopyMemoryPress,
-        onClear: handleClearMemoryPress,
-        onSave: handleSaveMemory,
-        onClose: closeMemory,
-      }}
       conversationDrawer={{
         archivedInitiallyExpanded: drawerArchivedOnOpen,
         visible: drawerVisible,
@@ -1364,7 +1329,6 @@ export function MainScreen() {
         onSelect: handleSelectConversation,
         onCopyThread: handleCopyDrawerThread,
         onShareThread: handleShareDrawerThread,
-        onManageMemory: handleManageDrawerMemory,
         onRenameThread: handleRenameDrawerThread,
         onTogglePinned: handleTogglePinned,
         onToggleArchived: handleToggleArchived,

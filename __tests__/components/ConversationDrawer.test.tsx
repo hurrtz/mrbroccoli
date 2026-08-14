@@ -78,7 +78,6 @@ function renderConversationDrawer(
       onSelect={jest.fn()}
       onCopyThread={jest.fn()}
       onShareThread={jest.fn()}
-      onManageMemory={jest.fn()}
       onRenameThread={jest.fn()}
       onTogglePinned={jest.fn()}
       onTogglePrivate={jest.fn()}
@@ -169,7 +168,6 @@ describe("ConversationDrawer", () => {
         "Rename",
         "Name automatically",
         "Archive",
-        "Memory",
         "Share",
         "Copy",
         "Delete",

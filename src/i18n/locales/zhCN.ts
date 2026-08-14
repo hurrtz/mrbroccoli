@@ -5,7 +5,6 @@ import { conversationArtifactTranslations } from "../conversationArtifactTransla
 import { interruptionTranslations } from "../interruptionTranslations";
 import { ulraAuditTranslations } from "../ulraAuditTranslations";
 import { imagePromptTranslations } from "../imagePromptTranslations";
-import { memoryEditTranslations } from "../memoryEditTranslations";
 import { onDeviceTranslations } from "../onDeviceTranslations";
 import { onboardingTranslations } from "../onboardingTranslations";
 import { introTranslations } from "../introTranslations";
@@ -21,7 +20,6 @@ export const zhCN = {
   ...dataBackupTranslations.zhCN,
   ...conversationKnowledgeTranslations.zhCN,
   ...imagePromptTranslations.zhCN,
-  ...memoryEditTranslations["zh-CN"],
   ...onDeviceTranslations["zh-CN"],
   ...onboardingTranslations["zh-CN"],
   ...introTranslations["zh-CN"],
@@ -717,7 +715,6 @@ export const zhCN = {
   deleteConversationConfirmationTitle: ({ title }) => `删除“${title}”？`,
   deleteConversationConfirmationMessage:
     "这将永久删除对话及其所有消息。此操作无法撤消。",
-  memory: "记忆",
   conversations: "对话",
   drawerSubtitle: "在进行中的对话之间切换，或开启新会话。",
   newSession: "新会话",
@@ -813,19 +810,6 @@ export const zhCN = {
   noMatchingConversations: "没有匹配的对话",
   noMatchingConversationsDescription:
     "换一个标题、路由、模型或文字记录中的其他词句试试。",
-  memoryModalTitle: "对话记忆",
-  memoryModalDescription:
-    "当对话长到需要压缩较早的回合时，Mr Broccoli 会携带这份精简摘要继续对话。",
-  memorySummary: "已保存摘要",
-  memorySummaryEmpty:
-    "还没有精简记忆。当此对话变长后，较早的回合会在这里被总结。",
-  summarizedTurnsCount: ({ count }) =>
-    Number(count) === 1 ? "已总结 1 个回合" : `已总结 ${count} 个回合`,
-  copyMemory: "复制记忆",
-  forgetMemory: "忘记记忆",
-  memoryCopied: "记忆已复制。",
-  memoryCleared: "对话记忆已清除。",
-  noConversationToManageYet: "尚无可用的对话记忆。",
   noProviderYet: "还没有提供商",
   noModelYet: "还没有模型",
   startedAt: "开始",

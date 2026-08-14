@@ -5,7 +5,6 @@ import { conversationArtifactTranslations } from "../conversationArtifactTransla
 import { interruptionTranslations } from "../interruptionTranslations";
 import { ulraAuditTranslations } from "../ulraAuditTranslations";
 import { imagePromptTranslations } from "../imagePromptTranslations";
-import { memoryEditTranslations } from "../memoryEditTranslations";
 import { onDeviceTranslations } from "../onDeviceTranslations";
 import { onboardingTranslations } from "../onboardingTranslations";
 import { introTranslations } from "../introTranslations";
@@ -21,7 +20,6 @@ export const uk = {
   ...dataBackupTranslations.uk,
   ...conversationKnowledgeTranslations.uk,
   ...imagePromptTranslations.uk,
-  ...memoryEditTranslations.uk,
   ...onDeviceTranslations.uk,
   ...onboardingTranslations.uk,
   ...introTranslations.uk,
@@ -742,7 +740,6 @@ export const uk = {
     `Видалити «${title}»?`,
   deleteConversationConfirmationMessage:
     "Розмову та всі її повідомлення буде видалено назавжди. Цю дію неможливо скасувати.",
-  memory: "Пам’ять",
   conversations: "Розмови",
   drawerSubtitle:
     "Переходьте між активними розмовами або починайте нову.",
@@ -844,18 +841,6 @@ export const uk = {
   noMatchingConversations: "Відповідних розмов не знайдено",
   noMatchingConversationsDescription:
     "Спробуйте іншу назву, маршрут, модель або фразу зі стенограми.",
-  memoryModalTitle: "Пам’ять розмови",
-  memoryModalDescription:
-    "Це стисле резюме, яке Mr Broccoli зберігає, коли розмова стає достатньо довгою для згортання старіших реплік.",
-  memorySummary: "Збережене резюме",
-  memorySummaryEmpty:
-    "Стислої пам’яті ще немає. Коли ця розмова стане довшою, старіші репліки буде підсумовано тут.",
-  summarizedTurnsCount: ({ count }) => `Підсумовано реплік: ${count}`,
-  copyMemory: "Копіювати пам’ять",
-  forgetMemory: "Очистити пам’ять",
-  memoryCopied: "Пам’ять скопійовано.",
-  memoryCleared: "Пам’ять розмови очищено.",
-  noConversationToManageYet: "Пам’ять розмови ще недоступна.",
   noProviderYet: "Провайдера ще немає",
   noModelYet: "Моделі ще немає",
   startedAt: "Початок",

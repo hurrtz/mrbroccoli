@@ -358,7 +358,7 @@ screen-reader-accessible state.
 
 ## Conversation-Level Controls
 
-Per-conversation instructions, style, speech behavior, privacy, title, memory,
+Per-conversation instructions, style, speech behavior, privacy, title,
 and route overrides belong to the active conversation. Global settings remain
 defaults for new conversations unless an explicit product rule says otherwise.
 
@@ -367,7 +367,7 @@ live in collapsible groups around the everyday Earlier list; active state is a
 row fill, never a branch rail. Each row shows only title, pin/privacy state,
 date, visible message count, and one provider mark per model. Forks retain a
 small link to their root session. Search stays docked at the bottom, and the
-row action sheet owns automatic naming, archive, privacy, memory,
+row action sheet owns automatic naming, archive, privacy,
 share/copy, and destructive actions. Data & privacy may open the drawer with
 Archived already expanded; this is an explicit landing state, not a persisted
 change to the user's normal drawer layout.

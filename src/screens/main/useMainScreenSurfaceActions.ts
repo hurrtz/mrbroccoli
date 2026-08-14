@@ -4,8 +4,6 @@ import type { SettingsTab } from "../../features/settings-core/types";
 import type { Provider, Settings } from "../../types";
 
 interface MainScreenSurfaceActionsParams {
-  handleClearMemory: () => Promise<void>;
-  handleCopyMemory: () => Promise<void>;
   handleCopyThread: (conversationId?: string) => Promise<void>;
   handleGenerateTitle: () => Promise<void>;
   handleRenameThread: (
@@ -13,7 +11,6 @@ interface MainScreenSurfaceActionsParams {
     nextTitle: string,
   ) => Promise<void>;
   handleShareThread: (conversationId?: string) => Promise<void>;
-  openMemory: (conversationId?: string) => Promise<void>;
   openSettings: (focusProvider?: Provider, focusTab?: SettingsTab) => void;
   runAfterDrawerDismiss: (action: () => void) => void;
   setDrawerVisible: (visible: boolean) => void;
@@ -23,13 +20,10 @@ interface MainScreenSurfaceActionsParams {
 }
 
 export function useMainScreenSurfaceActions({
-  handleClearMemory,
-  handleCopyMemory,
   handleCopyThread,
   handleGenerateTitle,
   handleRenameThread,
   handleShareThread,
-  openMemory,
   openSettings,
   runAfterDrawerDismiss,
   setDrawerVisible,
@@ -66,12 +60,6 @@ export function useMainScreenSurfaceActions({
   const handleAutoRenameConversation = useCallback(() => {
     void handleGenerateTitle();
   }, [handleGenerateTitle]);
-  const handleCopyMemoryPress = useCallback(() => {
-    void handleCopyMemory();
-  }, [handleCopyMemory]);
-  const handleClearMemoryPress = useCallback(() => {
-    void handleClearMemory();
-  }, [handleClearMemory]);
   const handleCopyDrawerThread = useCallback(
     (id: string) => {
       void handleCopyThread(id);
@@ -86,14 +74,6 @@ export function useMainScreenSurfaceActions({
     },
     [handleShareThread, runAfterDrawerDismiss],
   );
-  const handleManageDrawerMemory = useCallback(
-    (id: string) => {
-      runAfterDrawerDismiss(() => {
-        void openMemory(id);
-      });
-    },
-    [openMemory, runAfterDrawerDismiss],
-  );
   const handleRenameDrawerThread = useCallback(
     (id: string, title: string) => {
       void handleRenameThread(id, title);
@@ -103,12 +83,9 @@ export function useMainScreenSurfaceActions({
 
   return {
     handleAutoRenameConversation,
-    handleClearMemoryPress,
     handleCloseConversationSettings,
     handleCloseDrawer,
     handleCopyDrawerThread,
-    handleCopyMemoryPress,
-    handleManageDrawerMemory,
     handleOpenConversationSettings,
     handleOpenDrawer,
     handleOpenMainSettings,

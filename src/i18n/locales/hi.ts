@@ -5,7 +5,6 @@ import { conversationArtifactTranslations } from "../conversationArtifactTransla
 import { interruptionTranslations } from "../interruptionTranslations";
 import { ulraAuditTranslations } from "../ulraAuditTranslations";
 import { imagePromptTranslations } from "../imagePromptTranslations";
-import { memoryEditTranslations } from "../memoryEditTranslations";
 import { onDeviceTranslations } from "../onDeviceTranslations";
 import { onboardingTranslations } from "../onboardingTranslations";
 import { introTranslations } from "../introTranslations";
@@ -21,7 +20,6 @@ export const hi = {
   ...dataBackupTranslations.hi,
   ...conversationKnowledgeTranslations.hi,
   ...imagePromptTranslations.hi,
-  ...memoryEditTranslations.hi,
   ...onDeviceTranslations.hi,
   ...onboardingTranslations.hi,
   ...introTranslations.hi,
@@ -719,7 +717,6 @@ export const hi = {
   deleteConversationConfirmationTitle: ({ title }) => `"${title}" हटाएं?`,
   deleteConversationConfirmationMessage:
     "यह वार्तालाप और उसके सभी संदेशों को स्थायी रूप से हटा देता है। इस एक्शन को वापस नहीं किया जा सकता।",
-  memory: "स्मृति",
   conversations: "बातचीत",
   drawerSubtitle: "लाइव थ्रेड्स के बीच जाएँ या नई बातचीत शुरू करें।",
   newSession: "नया सत्र",
@@ -815,19 +812,6 @@ export const hi = {
   noMatchingConversations: "कोई मेल खाती बातचीत नहीं",
   noMatchingConversationsDescription:
     "प्रतिलेख से भिन्न शीर्षक, मार्ग, मॉडल या वाक्यांश आज़माएँ।",
-  memoryModalTitle: "वार्तालाप स्मृति",
-  memoryModalDescription:
-    "यह वह संक्षिप्त सारांश है जिसे Mr Broccoli आगे ले जाता है, जब थ्रेड इतना लंबा हो जाता है कि पुरानी बारियों को संक्षिप्त करना पड़े।",
-  memorySummary: "सहेजा गया सारांश",
-  memorySummaryEmpty:
-    "अभी कोई संक्षिप्त मेमोरी नहीं है। थ्रेड लंबा होने पर पुरानी बारियों का सारांश यहाँ बनेगा।",
-  summarizedTurnsCount: ({ count }) =>
-    Number(count) === 1 ? "1 सारांशित बारी" : `${count} सारांशित बारियाँ`,
-  copyMemory: "मेमोरी कॉपी करें",
-  forgetMemory: "स्मृति भूलें",
-  memoryCopied: "मेमोरी कॉपी की गई.",
-  memoryCleared: "वार्तालाप स्मृति साफ़ की गई.",
-  noConversationToManageYet: "अभी तक कोई वार्तालाप स्मृति उपलब्ध नहीं है.",
   noProviderYet: "अभी तक कोई प्रदाता नहीं",
   noModelYet: "अभी तक कोई मॉडल नहीं",
   startedAt: "प्रारंभ",

@@ -1232,30 +1232,6 @@ describe("useConversations", () => {
     });
   });
 
-  it("lets the user correct saved compact memory without changing its scope", async () => {
-    const { result } = renderHook(() => useConversations());
-
-    await act(async () => {
-      result.current.createConversation("Memory editing");
-      result.current.updateConversationContextSummary("Original summary", 4);
-    });
-    const conversationId = result.current.activeConversation?.id ?? "";
-
-    await act(async () => {
-      await result.current.updateConversationMemory(
-        conversationId,
-        "Corrected summary",
-      );
-    });
-
-    expect(result.current.activeConversation).toEqual(
-      expect.objectContaining({
-        contextSummary: "Corrected summary",
-        summarizedMessageCount: 4,
-      }),
-    );
-  });
-
   it("stores summary usage events alongside conversation memory", async () => {
     const { result } = renderHook(() => useConversations());
 
@@ -1291,36 +1267,6 @@ describe("useConversations", () => {
         }),
       }),
     );
-  });
-
-  it("clears stored conversation memory without removing the thread", async () => {
-    const { result } = renderHook(() => useConversations());
-
-    await act(async () => {
-      result.current.createConversation("Memory test");
-    });
-
-    await act(async () => {
-      result.current.updateConversationContextSummary(
-        "User wants a concise summary later.",
-        3,
-      );
-    });
-
-    let updatedConversation = null as Awaited<
-      ReturnType<typeof result.current.clearConversationMemory>
-    >;
-
-    await act(async () => {
-      updatedConversation = await result.current.clearConversationMemory(
-        result.current.conversations[0].id,
-      );
-    });
-
-    expect(updatedConversation?.contextSummary).toBeUndefined();
-    expect(updatedConversation?.summarizedMessageCount).toBeUndefined();
-    expect(result.current.activeConversation?.contextSummary).toBeUndefined();
-    expect(result.current.conversations).toHaveLength(1);
   });
 
   it("appends messages even when using a stale callback from before conversation creation", async () => {

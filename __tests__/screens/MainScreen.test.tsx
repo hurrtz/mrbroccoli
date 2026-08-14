@@ -133,7 +133,6 @@ jest.mock("../../src/hooks/useConversations", () => ({
     addMessage: jest.fn(),
     updateMessage: jest.fn(),
     updateConversationContextSummary: jest.fn(),
-    clearConversationMemory: jest.fn(),
     renameConversation: jest.fn(),
     toggleConversationPinned: jest.fn(),
     searchConversations: jest.fn(async () => []),
@@ -431,18 +430,6 @@ jest.mock("../../src/components/introFlow/IntroFlowScreen", () => ({
   },
 }));
 
-jest.mock("../../src/components/ConversationMemoryModal", () => ({
-  ConversationMemoryModal: ({ visible }: { visible: boolean }) => {
-    const React = require("react");
-    const { Text } = require("react-native");
-    return React.createElement(
-      Text,
-      null,
-      visible ? "memory:open" : "memory:closed",
-    );
-  },
-}));
-
 jest.mock("../../src/components/ConversationDrawer", () => ({
   ConversationDrawer: ({ visible }: { visible: boolean }) => {
     const React = require("react");
@@ -482,9 +469,6 @@ jest.mock("../../src/screens/main/useConversationActions", () => ({
     handleTogglePinned: jest.fn(),
     handleSelectConversation: jest.fn(),
     handleStartNewSession: jest.fn(),
-    openMemory: jest.fn(),
-    handleCopyMemory: jest.fn(),
-    handleClearMemory: jest.fn(),
   })),
 }));
 

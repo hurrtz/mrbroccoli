@@ -5,7 +5,6 @@ import { conversationArtifactTranslations } from "../conversationArtifactTransla
 import { interruptionTranslations } from "../interruptionTranslations";
 import { ulraAuditTranslations } from "../ulraAuditTranslations";
 import { imagePromptTranslations } from "../imagePromptTranslations";
-import { memoryEditTranslations } from "../memoryEditTranslations";
 import { onDeviceTranslations } from "../onDeviceTranslations";
 import { onboardingTranslations } from "../onboardingTranslations";
 import { introTranslations } from "../introTranslations";
@@ -21,7 +20,6 @@ export const ar = {
   ...dataBackupTranslations.ar,
   ...conversationKnowledgeTranslations.ar,
   ...imagePromptTranslations.ar,
-  ...memoryEditTranslations.ar,
   ...onDeviceTranslations.ar,
   ...onboardingTranslations.ar,
   ...introTranslations.ar,
@@ -721,7 +719,6 @@ export const ar = {
   deleteConversationConfirmationTitle: ({ title }) => `هل تريد حذف "${title}"؟`,
   deleteConversationConfirmationMessage:
     "يؤدي هذا إلى حذف المحادثة وجميع رسائلها نهائيًا. لا يمكن التراجع عن هذا الإجراء.",
-  memory: "ذاكرة",
   conversations: "المحادثات",
   drawerSubtitle: "انتقل بين المواضيع الحية أو ابدأ غرفة جديدة.",
   newSession: "جلسة جديدة",
@@ -817,19 +814,6 @@ export const ar = {
   noMatchingConversations: "لا توجد محادثات مطابقة",
   noMatchingConversationsDescription:
     "جرّب عنوانًا أو مسارًا أو نموذجًا أو عبارة مختلفة من النص.",
-  memoryModalTitle: "ذاكرة المحادثة",
-  memoryModalDescription:
-    "هذا هو الملخص المضغوط الذي يحمله Mr Broccoli معه بمجرد أن يصبح الموضوع طويلًا بما يكفي لضغط الأدوار القديمة.",
-  memorySummary: "الملخص المحفوظ",
-  memorySummaryEmpty:
-    "لا توجد ذاكرة مضغوطة حتى الآن. بمجرد أن يصبح هذا الموضوع أطول، سيتم تلخيص الأدوار القديمة هنا.",
-  summarizedTurnsCount: ({ count }) =>
-    Number(count) === 1 ? "دور واحد ملخّص" : `${count} أدوار ملخّصة`,
-  copyMemory: "نسخ الذاكرة",
-  forgetMemory: "نسيان الذاكرة",
-  memoryCopied: "تم نسخ الذاكرة.",
-  memoryCleared: "تم مسح ذاكرة المحادثة.",
-  noConversationToManageYet: "لا توجد ذاكرة محادثة متاحة بعد.",
   noProviderYet: "لا يوجد مزوّد حتى الآن",
   noModelYet: "لا يوجد نموذج بعد",
   startedAt: "بدأت",

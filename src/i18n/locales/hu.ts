@@ -5,7 +5,6 @@ import { conversationArtifactTranslations } from "../conversationArtifactTransla
 import { interruptionTranslations } from "../interruptionTranslations";
 import { ulraAuditTranslations } from "../ulraAuditTranslations";
 import { imagePromptTranslations } from "../imagePromptTranslations";
-import { memoryEditTranslations } from "../memoryEditTranslations";
 import { onDeviceTranslations } from "../onDeviceTranslations";
 import { onboardingTranslations } from "../onboardingTranslations";
 import { introTranslations } from "../introTranslations";
@@ -21,7 +20,6 @@ export const hu = {
   ...dataBackupTranslations.hu,
   ...conversationKnowledgeTranslations.hu,
   ...imagePromptTranslations.hu,
-  ...memoryEditTranslations.hu,
   ...onDeviceTranslations.hu,
   ...onboardingTranslations.hu,
   ...introTranslations.hu,
@@ -736,7 +734,6 @@ export const hu = {
     `Törli a „${title}” elemet?`,
   deleteConversationConfirmationMessage:
     "Ez véglegesen törli a beszélgetést és az összes üzenetét. Ez a művelet nem vonható vissza.",
-  memory: "Memória",
   conversations: "Beszélgetések",
   drawerSubtitle: "Ugorjon az élő szálak közé, vagy nyisson új szobát.",
   newSession: "Új munkamenet",
@@ -837,18 +834,6 @@ export const hu = {
   noMatchingConversations: "Nincsenek megfelelő beszélgetések",
   noMatchingConversationsDescription:
     "Próbáljon más címet, útvonalat, modellt vagy kifejezést az átiratból.",
-  memoryModalTitle: "Beszélgetési memória",
-  memoryModalDescription:
-    "Ez az a tömör összefoglaló, amelyet Mr Broccoli továbbvisz, amikor a beszélgetés már elég hosszú a régebbi fordulók tömörítéséhez.",
-  memorySummary: "Mentett összefoglaló",
-  memorySummaryEmpty:
-    "Még nincs kompakt memória. Amint ez a szál hosszabb lesz, itt összefoglaljuk a régebbi fordulókat.",
-  summarizedTurnsCount: ({ count }) => `${count} összefoglalt forduló`,
-  copyMemory: "Memória másolása",
-  forgetMemory: "Memória elfelejtése",
-  memoryCopied: "Memória másolva.",
-  memoryCleared: "A beszélgetési memória törölve.",
-  noConversationToManageYet: "Még nem áll rendelkezésre beszélgetési memória.",
   noProviderYet: "Még nincs szolgáltató",
   noModelYet: "Még nincs modell",
   startedAt: "Kezdés",

@@ -5,7 +5,6 @@ import { conversationArtifactTranslations } from "../conversationArtifactTransla
 import { interruptionTranslations } from "../interruptionTranslations";
 import { ulraAuditTranslations } from "../ulraAuditTranslations";
 import { imagePromptTranslations } from "../imagePromptTranslations";
-import { memoryEditTranslations } from "../memoryEditTranslations";
 import { onDeviceTranslations } from "../onDeviceTranslations";
 import { onboardingTranslations } from "../onboardingTranslations";
 import { introTranslations } from "../introTranslations";
@@ -21,7 +20,6 @@ export const ja = {
   ...dataBackupTranslations.ja,
   ...conversationKnowledgeTranslations.ja,
   ...imagePromptTranslations.ja,
-  ...memoryEditTranslations.ja,
   ...onDeviceTranslations.ja,
   ...onboardingTranslations.ja,
   ...introTranslations.ja,
@@ -722,7 +720,6 @@ export const ja = {
     `「${title}」を削除しますか？`,
   deleteConversationConfirmationMessage:
     "これにより、会話とそのすべてのメッセージが完全に削除されます。この操作は元に戻すことができません。",
-  memory: "メモリ",
   conversations: "会話",
   drawerSubtitle:
     "ライブスレッド間をジャンプするか、新しいルームを開始します。",
@@ -819,21 +816,6 @@ export const ja = {
   noMatchingConversations: "一致する会話はありません",
   noMatchingConversationsDescription:
     "トランスクリプトとは異なるタイトル、ルート、モデル、またはフレーズを試してください。",
-  memoryModalTitle: "会話メモリ",
-  memoryModalDescription:
-    "これは、スレッドが古いターンを圧縮するのに十分な長さになると、Mr Broccoliが引き継ぐコンパクトな要約です。",
-  memorySummary: "保存済みの要約",
-  memorySummaryEmpty:
-    "まだコンパクトなメモリがありません。このスレッドが長くなったら、古いターンはここにまとめられます。",
-  summarizedTurnsCount: ({ count }) =>
-    Number(count) === 1
-      ? "1 件のターンを要約済み"
-      : `${count} 件のターンを要約済み`,
-  copyMemory: "メモリをコピー",
-  forgetMemory: "メモリを削除",
-  memoryCopied: "メモリがコピーされました。",
-  memoryCleared: "会話メモリがクリアされました。",
-  noConversationToManageYet: "利用可能な会話メモリはまだありません。",
   noProviderYet: "まだプロバイダーがありません",
   noModelYet: "まだモデルがありません",
   startedAt: "開始",

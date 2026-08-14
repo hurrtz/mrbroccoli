@@ -25,6 +25,10 @@ the complete Play Store translations are kept in a dedicated file under
 - The "Review conversation integrity" feature has been removed: the action
   sheet entry, the inspection and repair flow, and its stored repair
   snapshots are gone.
+- The session Memory feature has been removed: the action-sheet entry and
+  the modal for viewing, editing, copying, or clearing a conversation's
+  compact summary are gone. The summary itself remains an internal detail
+  of how long threads stay within a model's context window.
 - Fixed the session details, conversation settings, and voice picker scrims
   using a fixed light dimming color instead of the theme's overlay, so they
   now match every other modal in both light and dark appearance.

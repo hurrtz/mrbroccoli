@@ -5,7 +5,6 @@ import { conversationArtifactTranslations } from "../conversationArtifactTransla
 import { interruptionTranslations } from "../interruptionTranslations";
 import { ulraAuditTranslations } from "../ulraAuditTranslations";
 import { imagePromptTranslations } from "../imagePromptTranslations";
-import { memoryEditTranslations } from "../memoryEditTranslations";
 import { onDeviceTranslations } from "../onDeviceTranslations";
 import { onboardingTranslations } from "../onboardingTranslations";
 import { introTranslations } from "../introTranslations";
@@ -21,7 +20,6 @@ export const ur = {
   ...dataBackupTranslations.ur,
   ...conversationKnowledgeTranslations.ur,
   ...imagePromptTranslations.ur,
-  ...memoryEditTranslations.ur,
   ...onDeviceTranslations.ur,
   ...onboardingTranslations.ur,
   ...introTranslations.ur,
@@ -717,7 +715,6 @@ export const ur = {
   deleteConversationConfirmationTitle: ({ title }) => `"${title}" کو حذف کریں؟`,
   deleteConversationConfirmationMessage:
     "یہ بات چیت اور اس کے تمام پیغامات کو مستقل طور پر حذف کر دیتا ہے۔ اس کارروائی کو کالعدم نہیں کیا جا سکتا۔",
-  memory: "یادداشت",
   conversations: "بات چیت",
   drawerSubtitle:
     "لائیو تھریڈز کے درمیان چھلانگ لگائیں یا ایک تازہ کمرہ شروع کریں۔",
@@ -816,19 +813,6 @@ export const ur = {
   noMatchingConversations: "کوئی مماثل گفتگو نہیں ہے۔",
   noMatchingConversationsDescription:
     "ٹرانسکرپٹ سے کوئی مختلف عنوان، راستہ، ماڈل یا جملہ آزمائیں۔",
-  memoryModalTitle: "گفتگو کی یادداشت",
-  memoryModalDescription:
-    "یہ وہ مختصر خلاصہ ہے جو Mr Broccoli آگے لے کر چلتا ہے جب کوئی تھریڈ اتنا لمبا ہو جائے کہ پرانی باریوں کو سکیڑنا پڑے۔",
-  memorySummary: "محفوظ کردہ خلاصہ",
-  memorySummaryEmpty:
-    "ابھی تک کوئی مختصر یادداشت نہیں ہے۔ جب یہ تھریڈ لمبا ہو جائے گا تو پرانی باریوں کا خلاصہ یہاں بنے گا۔",
-  summarizedTurnsCount: ({ count }) =>
-    Number(count) === 1 ? "1 خلاصہ شدہ باری" : `${count} خلاصہ شدہ باریاں`,
-  copyMemory: "میموری کاپی کریں۔",
-  forgetMemory: "یادداشت بھول جائیں",
-  memoryCopied: "میموری کاپی کر لی گئی۔",
-  memoryCleared: "گفتگو کی یادداشت صاف ہو گئی۔",
-  noConversationToManageYet: "ابھی تک بات چیت کی کوئی میموری دستیاب نہیں ہے۔",
   noProviderYet: "ابھی تک کوئی فراہم کنندہ نہیں ہے۔",
   noModelYet: "ابھی تک کوئی ماڈل نہیں۔",
   startedAt: "آغاز",

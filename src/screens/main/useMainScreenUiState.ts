@@ -6,7 +6,7 @@ import type {
   SettingsPage,
   SettingsTab,
 } from "../../features/settings-core/types";
-import { Conversation, Provider } from "../../types";
+import { Provider } from "../../types";
 
 export function useMainScreenUiState() {
   const [settingsVisible, setSettingsVisible] = useState(false);
@@ -22,9 +22,6 @@ export function useMainScreenUiState() {
   const [statusDetailsVisible, setStatusDetailsVisible] = useState(false);
   const [routePickerVisible, setRoutePickerVisible] = useState(false);
   const [transcriptSheetVisible, setTranscriptSheetVisible] = useState(false);
-  const [memoryConversation, setMemoryConversation] =
-    useState<Conversation | null>(null);
-  const [memoryVisible, setMemoryVisible] = useState(false);
   const pendingSettingsDismissActionRef = useRef<null | (() => void)>(null);
   const pendingDrawerDismissActionRef = useRef<null | (() => void)>(null);
   const pendingTranscriptDismissActionRef = useRef<null | (() => void)>(null);
@@ -84,16 +81,6 @@ export function useMainScreenUiState() {
     const pendingAction = pendingSettingsDismissActionRef.current;
     pendingSettingsDismissActionRef.current = null;
     pendingAction?.();
-  }, []);
-
-  const openMemoryConversation = useCallback((conversation: Conversation) => {
-    setMemoryConversation(conversation);
-    setMemoryVisible(true);
-  }, []);
-
-  const closeMemory = useCallback(() => {
-    setMemoryVisible(false);
-    setMemoryConversation(null);
   }, []);
 
   const openStatusDetails = useCallback(() => {
@@ -159,7 +146,7 @@ export function useMainScreenUiState() {
   }, []);
 
   // React Native delivers Modal onDismiss on iOS only, so the drawer's
-  // deferred actions (share thread, manage memory) would never run on
+  // deferred actions (share thread) would never run on
   // Android. This fallback drains the pending action once the drawer state
   // is hidden; the delay leaves room for the native modal teardown, and the
   // ref is consumed atomically so an earlier iOS onDismiss wins harmlessly.
@@ -202,17 +189,12 @@ export function useMainScreenUiState() {
     routePickerVisible,
     statusDetailsVisible,
     transcriptSheetVisible,
-    memoryConversation,
-    memoryVisible,
     setDrawerVisible,
-    setMemoryConversation,
     openSettings,
     openCatalogSettings,
     closeSettings,
     runAfterSettingsDismiss,
     handleSettingsDismiss,
-    openMemoryConversation,
-    closeMemory,
     openStatusDetails,
     closeStatusDetails,
     openRoutePicker,

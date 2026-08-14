@@ -31,7 +31,6 @@ export const ConversationDrawer = React.memo(function ConversationDrawer({
   onSelect,
   onCopyThread,
   onShareThread,
-  onManageMemory,
   onRenameThread,
   onTogglePinned,
   onTogglePrivate,
@@ -156,7 +155,6 @@ export const ConversationDrawer = React.memo(function ConversationDrawer({
           onOpenRoot={controller.handleSelectConversation}
           onCopyThread={onCopyThread}
           onDelete={handleDelete}
-          onManageMemory={onManageMemory}
           onOpenRenameModal={controller.openRenameModal}
           onShareThread={onShareThread}
           onTogglePinned={onTogglePinned}

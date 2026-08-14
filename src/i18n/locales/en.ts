@@ -5,7 +5,6 @@ import { conversationArtifactTranslations } from "../conversationArtifactTransla
 import { interruptionTranslations } from "../interruptionTranslations";
 import { ulraAuditTranslations } from "../ulraAuditTranslations";
 import { imagePromptTranslations } from "../imagePromptTranslations";
-import { memoryEditTranslations } from "../memoryEditTranslations";
 import { onDeviceTranslations } from "../onDeviceTranslations";
 import { onboardingTranslations } from "../onboardingTranslations";
 import { introTranslations } from "../introTranslations";
@@ -21,7 +20,6 @@ export const en = {
   ...dataBackupTranslations.en,
   ...conversationKnowledgeTranslations.en,
   ...imagePromptTranslations.en,
-  ...memoryEditTranslations.en,
   ...onDeviceTranslations.en,
   ...onboardingTranslations.en,
   ...introTranslations.en,
@@ -718,7 +716,6 @@ export const en = {
   deleteConversationConfirmationTitle: ({ title }) => `Delete “${title}”?`,
   deleteConversationConfirmationMessage:
     "This permanently deletes the conversation and all its messages. This action cannot be undone.",
-  memory: "Memory",
   conversations: "Conversations",
   drawerSubtitle: "Jump between live threads or start a fresh room.",
   newSession: "New Session",
@@ -814,19 +811,6 @@ export const en = {
   noMatchingConversations: "No matching conversations",
   noMatchingConversationsDescription:
     "Try a different title, route, model, or phrase from the transcript.",
-  memoryModalTitle: "Conversation memory",
-  memoryModalDescription:
-    "This is the compact summary Mr Broccoli carries forward once a thread gets long enough to compress older turns.",
-  memorySummary: "Saved summary",
-  memorySummaryEmpty:
-    "No compact memory yet. Once this thread gets longer, older turns will be summarized here.",
-  summarizedTurnsCount: ({ count }) =>
-    Number(count) === 1 ? "1 summarized turn" : `${count} summarized turns`,
-  copyMemory: "Copy memory",
-  forgetMemory: "Forget memory",
-  memoryCopied: "Memory copied.",
-  memoryCleared: "Conversation memory cleared.",
-  noConversationToManageYet: "No conversation memory available yet.",
   noProviderYet: "No provider yet",
   noModelYet: "No model yet",
   startedAt: "Started",

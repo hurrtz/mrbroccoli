@@ -5,7 +5,6 @@ import { conversationArtifactTranslations } from "../conversationArtifactTransla
 import { interruptionTranslations } from "../interruptionTranslations";
 import { ulraAuditTranslations } from "../ulraAuditTranslations";
 import { imagePromptTranslations } from "../imagePromptTranslations";
-import { memoryEditTranslations } from "../memoryEditTranslations";
 import { onDeviceTranslations } from "../onDeviceTranslations";
 import { onboardingTranslations } from "../onboardingTranslations";
 import { introTranslations } from "../introTranslations";
@@ -21,7 +20,6 @@ export const pt = {
   ...dataBackupTranslations.pt,
   ...conversationKnowledgeTranslations.pt,
   ...imagePromptTranslations.pt,
-  ...memoryEditTranslations.pt,
   ...onDeviceTranslations.pt,
   ...onboardingTranslations.pt,
   ...introTranslations.pt,
@@ -722,7 +720,6 @@ export const pt = {
   deleteConversationConfirmationTitle: ({ title }) => `Eliminar “${title}”?`,
   deleteConversationConfirmationMessage:
     "Isto elimina permanentemente a conversa e todas as suas mensagens. Esta ação não pode ser anulada.",
-  memory: "Memória",
   conversations: "Conversas",
   drawerSubtitle: "Salte entre tópicos ao vivo ou comece uma nova sala.",
   newSession: "Nova sessão",
@@ -818,19 +815,6 @@ export const pt = {
   noMatchingConversations: "Nenhuma conversa correspondente",
   noMatchingConversationsDescription:
     "Experimente um título, rota, modelo ou frase diferente da transcrição.",
-  memoryModalTitle: "Memória de conversa",
-  memoryModalDescription:
-    "Este é o resumo compacto que o Mr Broccoli transporta consigo quando um tópico fica suficientemente longo para comprimir os turnos mais antigos.",
-  memorySummary: "Resumo guardado",
-  memorySummaryEmpty:
-    "Ainda não há memória compacta. Quando este tópico se tornar mais longo, os turnos mais antigos serão resumidos aqui.",
-  summarizedTurnsCount: ({ count }) =>
-    Number(count) === 1 ? "1 turno resumido" : `${count} turnos resumidos`,
-  copyMemory: "Copiar memória",
-  forgetMemory: "Esquecer memória",
-  memoryCopied: "Memória copiada.",
-  memoryCleared: "Memória da conversa apagada.",
-  noConversationToManageYet: "Ainda não há memória da conversa disponível.",
   noProviderYet: "Nenhum fornecedor ainda",
   noModelYet: "Nenhum modelo ainda",
   startedAt: "Iniciado",

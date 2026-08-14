@@ -21,20 +21,15 @@ type ConversationsApi = ReturnType<typeof useConversations>;
 
 interface UseConversationActionsParams {
   activeConversation: Conversation | null;
-  memoryConversation: Conversation | null;
   getConversationById: ConversationsApi["getConversationById"];
   renameConversation: ConversationsApi["renameConversation"];
   toggleConversationPinned: ConversationsApi["toggleConversationPinned"];
   toggleConversationPrivate: ConversationsApi["toggleConversationPrivate"];
   toggleConversationArchived: ConversationsApi["toggleConversationArchived"];
-  clearConversationMemory: ConversationsApi["clearConversationMemory"];
-  updateConversationMemory: ConversationsApi["updateConversationMemory"];
   deleteConversation: ConversationsApi["deleteConversation"];
   selectConversation: ConversationsApi["selectConversation"];
   clearActiveConversation: ConversationsApi["clearActiveConversation"];
   resetVoiceSessionState: () => Promise<void>;
-  openMemoryConversation: (conversation: Conversation) => void;
-  setMemoryConversation: (conversation: Conversation | null) => void;
   showToast: ShowToastFn;
   language: AppLanguage;
   t: TranslateFn;
@@ -42,20 +37,15 @@ interface UseConversationActionsParams {
 
 export function useConversationActions({
   activeConversation,
-  memoryConversation,
   getConversationById,
   renameConversation,
   toggleConversationPinned,
   toggleConversationPrivate,
   toggleConversationArchived,
-  clearConversationMemory,
-  updateConversationMemory,
   deleteConversation,
   selectConversation,
   clearActiveConversation,
   resetVoiceSessionState,
-  openMemoryConversation,
-  setMemoryConversation,
   showToast,
   language,
   t,
@@ -266,77 +256,6 @@ export function useConversationActions({
     [activeConversation?.id, deleteConversation, resetVoiceSessionState],
   );
 
-  const openMemory = useCallback(
-    async (conversationId?: string) => {
-      const conversation = await resolveConversation(conversationId);
-
-      if (!conversation) {
-        showToast(t("noConversationToManageYet"));
-        return;
-      }
-
-      openMemoryConversation(conversation);
-    },
-    [openMemoryConversation, resolveConversation, showToast, t],
-  );
-
-  const handleCopyMemory = useCallback(async () => {
-    const summary = memoryConversation?.contextSummary?.trim() ?? "";
-
-    if (!summary) {
-      showToast(t("noConversationToManageYet"));
-      return;
-    }
-
-    await copyText(summary, t("memoryCopied"));
-  }, [copyText, memoryConversation, showToast, t]);
-
-  const handleClearMemory = useCallback(async () => {
-    if (!memoryConversation) {
-      return;
-    }
-
-    const updatedConversation = await clearConversationMemory(
-      memoryConversation.id,
-    );
-
-    setMemoryConversation(updatedConversation);
-    showToast(t("memoryCleared"), undefined, "success");
-  }, [
-    clearConversationMemory,
-    memoryConversation,
-    setMemoryConversation,
-    showToast,
-    t,
-  ]);
-
-  const handleSaveMemory = useCallback(
-    async (summary: string) => {
-      if (!memoryConversation) {
-        return false;
-      }
-
-      const updatedConversation = await updateConversationMemory(
-        memoryConversation.id,
-        summary,
-      );
-      if (!updatedConversation) {
-        return false;
-      }
-
-      setMemoryConversation(updatedConversation);
-      showToast(t("memorySaved"), undefined, "success");
-      return true;
-    },
-    [
-      memoryConversation,
-      setMemoryConversation,
-      showToast,
-      t,
-      updateConversationMemory,
-    ],
-  );
-
   return {
     copyText,
     handleCopyMessage,
@@ -351,9 +270,5 @@ export function useConversationActions({
     handleSelectConversation,
     handleStartNewSession,
     handleDeleteConversation,
-    openMemory,
-    handleCopyMemory,
-    handleClearMemory,
-    handleSaveMemory,
   };
 }

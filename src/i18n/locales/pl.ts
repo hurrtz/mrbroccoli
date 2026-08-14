@@ -5,7 +5,6 @@ import { conversationArtifactTranslations } from "../conversationArtifactTransla
 import { interruptionTranslations } from "../interruptionTranslations";
 import { ulraAuditTranslations } from "../ulraAuditTranslations";
 import { imagePromptTranslations } from "../imagePromptTranslations";
-import { memoryEditTranslations } from "../memoryEditTranslations";
 import { onDeviceTranslations } from "../onDeviceTranslations";
 import { onboardingTranslations } from "../onboardingTranslations";
 import { introTranslations } from "../introTranslations";
@@ -21,7 +20,6 @@ export const pl = {
   ...dataBackupTranslations.pl,
   ...conversationKnowledgeTranslations.pl,
   ...imagePromptTranslations.pl,
-  ...memoryEditTranslations.pl,
   ...onDeviceTranslations.pl,
   ...onboardingTranslations.pl,
   ...introTranslations.pl,
@@ -729,7 +727,6 @@ export const pl = {
   deleteConversationConfirmationTitle: ({ title }) => `Usunąć „${title}”?`,
   deleteConversationConfirmationMessage:
     "Spowoduje to trwałe usunięcie rozmowy i wszystkich zawartych w niej wiadomości. Tej akcji nie można cofnąć.",
-  memory: "Pamięć",
   conversations: "Rozmowy",
   drawerSubtitle: "Przeskakuj między aktywnymi wątkami lub otwórz nowy pokój.",
   newSession: "Nowa sesja",
@@ -827,19 +824,6 @@ export const pl = {
   noMatchingConversations: "Brak pasujących rozmów",
   noMatchingConversationsDescription:
     "Wypróbuj inny tytuł, trasę, model lub frazę z transkrypcji.",
-  memoryModalTitle: "Pamięć rozmów",
-  memoryModalDescription:
-    "To zwięzłe podsumowanie, które Mr Broccoli przenosi dalej, gdy wątek staje się na tyle długi, że starsze tury są kompresowane.",
-  memorySummary: "Zapisane podsumowanie",
-  memorySummaryEmpty:
-    "Nie ma jeszcze pamięci kompaktowej. Gdy ten wątek stanie się dłuższy, starsze tury zostaną tutaj podsumowane.",
-  summarizedTurnsCount: ({ count }) =>
-    Number(count) === 1 ? "1 podsumowana tura" : `Podsumowane tury: ${count}`,
-  copyMemory: "Skopiuj pamięć",
-  forgetMemory: "Wyczyść pamięć",
-  memoryCopied: "Pamięć skopiowana.",
-  memoryCleared: "Pamięć rozmów została wyczyszczona.",
-  noConversationToManageYet: "Nie ma jeszcze dostępnej pamięci rozmów.",
   noProviderYet: "Nie ma jeszcze dostawcy",
   noModelYet: "Jeszcze nie ma modelu",
   startedAt: "Rozpoczęto",

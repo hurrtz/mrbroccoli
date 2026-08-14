@@ -5,7 +5,6 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 import { ConversationDrawer } from "../../components/ConversationDrawer";
 import { IntroFlowScreen } from "../../components/introFlow/IntroFlowScreen";
-import { ConversationMemoryModal } from "../../components/ConversationMemoryModal";
 import { PremiumUpgradeModal } from "../../components/PremiumUpgradeModal";
 import { Toast } from "../../components/Toast";
 import { AntSettingsModal } from "../../features/settings/AntSettingsModal";
@@ -20,7 +19,6 @@ import { styles } from "./styles";
 interface MainScreenPresentationProps {
   colors: Colors;
   conversationDrawer: React.ComponentProps<typeof ConversationDrawer>;
-  conversationMemory: React.ComponentProps<typeof ConversationMemoryModal>;
   councilDisclosure: React.ComponentProps<typeof DisclosureDialog>;
   imageConsent: React.ComponentProps<typeof DisclosureDialog>;
   intro: React.ComponentProps<typeof IntroFlowScreen>;
@@ -38,7 +36,6 @@ interface MainScreenPresentationProps {
 export function MainScreenPresentation({
   colors,
   conversationDrawer,
-  conversationMemory,
   councilDisclosure,
   imageConsent,
   intro,
@@ -87,7 +84,6 @@ export function MainScreenPresentation({
       <StatusDetailsModal {...statusDetails} />
       <AntSettingsModal {...settingsModal} />
       <PremiumUpgradeModal {...premiumUpgrade} />
-      <ConversationMemoryModal {...conversationMemory} />
       <ConversationDrawer {...conversationDrawer} />
       <IntroFlowScreen {...intro} />
     </SafeAreaView>

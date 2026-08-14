@@ -5,7 +5,6 @@ import { conversationArtifactTranslations } from "../conversationArtifactTransla
 import { interruptionTranslations } from "../interruptionTranslations";
 import { ulraAuditTranslations } from "../ulraAuditTranslations";
 import { imagePromptTranslations } from "../imagePromptTranslations";
-import { memoryEditTranslations } from "../memoryEditTranslations";
 import { onDeviceTranslations } from "../onDeviceTranslations";
 import { onboardingTranslations } from "../onboardingTranslations";
 import { introTranslations } from "../introTranslations";
@@ -21,7 +20,6 @@ export const sv = {
   ...dataBackupTranslations.sv,
   ...conversationKnowledgeTranslations.sv,
   ...imagePromptTranslations.sv,
-  ...memoryEditTranslations.sv,
   ...onDeviceTranslations.sv,
   ...onboardingTranslations.sv,
   ...introTranslations.sv,
@@ -721,7 +719,6 @@ export const sv = {
   deleteConversationConfirmationTitle: ({ title }) => `Ta bort "${title}"?`,
   deleteConversationConfirmationMessage:
     "Detta tar permanent bort konversationen och alla dess meddelanden. Denna åtgärd kan inte ångras.",
-  memory: "Minne",
   conversations: "Konversationer",
   drawerSubtitle: "Hoppa mellan live-trådar eller starta ett nytt rum.",
   newSession: "Ny session",
@@ -820,19 +817,6 @@ export const sv = {
   noMatchingConversations: "Inga matchande konversationer",
   noMatchingConversationsDescription:
     "Prova en annan titel, rutt, modell eller fras från utskriften.",
-  memoryModalTitle: "Konversationsminne",
-  memoryModalDescription:
-    "Detta är den kompakta sammanfattning som Mr Broccoli för vidare när en tråd blir tillräckligt lång för att komprimera äldre turer.",
-  memorySummary: "Sparad sammanfattning",
-  memorySummaryEmpty:
-    "Inget kompakt minne ännu. När den här tråden blir längre kommer äldre turer att sammanfattas här.",
-  summarizedTurnsCount: ({ count }) =>
-    Number(count) === 1 ? "1 sammanfattad tur" : `${count} sammanfattade turer`,
-  copyMemory: "Kopiera minne",
-  forgetMemory: "Glöm minnet",
-  memoryCopied: "Minnet har kopierats.",
-  memoryCleared: "Konversationsminnet har rensats.",
-  noConversationToManageYet: "Inget konversationsminne tillgängligt ännu.",
   noProviderYet: "Ingen leverantör ännu",
   noModelYet: "Ingen modell än",
   startedAt: "Startade",

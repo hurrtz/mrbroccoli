@@ -19,7 +19,6 @@ interface ConversationActionSheetProps {
   onClose: () => void;
   onCopyThread: (conversationId: string) => void;
   onDelete: (conversationId: string) => void;
-  onManageMemory: (conversationId: string) => void;
   onOpenRoot?: (conversationId: string) => void;
   onOpenRenameModal: (conversation: ConversationMeta) => void;
   onShareThread: (conversationId: string) => void;
@@ -73,7 +72,6 @@ export function ConversationActionSheet({
   onClose,
   onCopyThread,
   onDelete,
-  onManageMemory,
   onOpenRoot,
   onOpenRenameModal,
   onShareThread,
@@ -217,15 +215,6 @@ export function ConversationActionSheet({
               onClose();
             }}
             testID="conversation-action-toggle-archive"
-          />
-          <ActionRow
-            colors={colors}
-            icon="brain"
-            label={t("memory")}
-            onPress={() => {
-              onManageMemory(conversation.id);
-              onClose();
-            }}
           />
           <ActionRow
             colors={colors}

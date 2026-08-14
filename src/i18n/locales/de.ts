@@ -5,7 +5,6 @@ import { conversationArtifactTranslations } from "../conversationArtifactTransla
 import { interruptionTranslations } from "../interruptionTranslations";
 import { ulraAuditTranslations } from "../ulraAuditTranslations";
 import { imagePromptTranslations } from "../imagePromptTranslations";
-import { memoryEditTranslations } from "../memoryEditTranslations";
 import { onDeviceTranslations } from "../onDeviceTranslations";
 import { onboardingTranslations } from "../onboardingTranslations";
 import { introTranslations } from "../introTranslations";
@@ -21,7 +20,6 @@ export const de = {
   ...dataBackupTranslations.de,
   ...conversationKnowledgeTranslations.de,
   ...imagePromptTranslations.de,
-  ...memoryEditTranslations.de,
   ...onDeviceTranslations.de,
   ...onboardingTranslations.de,
   ...introTranslations.de,
@@ -734,7 +732,6 @@ export const de = {
   deleteConversationConfirmationTitle: ({ title }) => `„${title}“ löschen?`,
   deleteConversationConfirmationMessage:
     "Dadurch werden das Gespräch und alle seine Nachrichten dauerhaft gelöscht. Diese Aktion kann nicht rückgängig gemacht werden.",
-  memory: "Speicher",
   conversations: "Gespräche",
   drawerSubtitle: "Wechsle zwischen Gesprächen oder beginne ein neues.",
   newSession: "Neues Gespräch",
@@ -833,21 +830,6 @@ export const de = {
   noMatchingConversations: "Keine passenden Gespräche",
   noMatchingConversationsDescription:
     "Versuch es mit einem anderen Titel, einer anderen Route, einem Modell oder einem Satz aus dem Transkript.",
-  memoryModalTitle: "Gesprächsspeicher",
-  memoryModalDescription:
-    "Das ist die kompakte Zusammenfassung, die Mr Broccoli weiterträgt, sobald ein Gespräch lang genug wird und ältere Beiträge zusammengefasst werden.",
-  memorySummary: "Gespeicherte Zusammenfassung",
-  memorySummaryEmpty:
-    "Noch kein kompakter Speicher. Sobald dieses Gespräch länger wird, werden ältere Beiträge hier zusammengefasst.",
-  summarizedTurnsCount: ({ count }) =>
-    Number(count) === 1
-      ? "1 zusammengefasster Beitrag"
-      : `${count} zusammengefasste Beiträge`,
-  copyMemory: "Speicher kopieren",
-  forgetMemory: "Speicher vergessen",
-  memoryCopied: "Speicher kopiert.",
-  memoryCleared: "Speicher gelöscht.",
-  noConversationToManageYet: "Noch kein Speicher verfügbar.",
   noProviderYet: "Noch kein Anbieter",
   noModelYet: "Noch kein Modell",
   startedAt: "Begonnen",
