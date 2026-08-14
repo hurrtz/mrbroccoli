@@ -595,7 +595,6 @@ export const hi = {
   clearSpeechReplayCache: "स्पीच कैश साफ़ करें",
   speechReplayCacheCleared: "कैश की गई स्पीच फ़ाइलें हटा दी गईं।",
   speechReplayCacheClearFailed: "स्पीच कैश साफ़ नहीं हो सका।",
-  currentSetup: "मौजूदा सेटअप",
   listeningToYourVoice: "आपकी आवाज़ सुन रहा हूँ",
   parsingYourVoiceInput: "आपकी आवाज़ को टेक्स्ट में बदला जा रहा है",
   preparingRequest: "आपका अनुरोध तैयार किया जा रहा है",
@@ -609,10 +608,6 @@ export const hi = {
   freshSession: "ताज़ा सत्र",
   messageCount: ({ count }) =>
     Number(count) === 1 ? "1 संदेश" : `${count} संदेश`,
-  speechInputRoute: ({ route }) => `भाषण: ${route}`,
-  replyModelRoute: ({ route }) => `उत्तर मॉडल: ${route}`,
-  voiceOutputRoute: ({ route }) => `वॉइस आउट: ${route}`,
-  fallbackVoiceOutputRoute: ({ route }) => `फ़ॉलबैक वॉइस आउट: ${route}`,
   conversation: "बातचीत",
   conversationActions: "वार्तालाप क्रियाएँ",
   statusDetails: "स्थिति विवरण",

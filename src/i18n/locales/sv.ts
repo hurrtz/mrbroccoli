@@ -595,7 +595,6 @@ export const sv = {
   clearSpeechReplayCache: "Rensa talcache",
   speechReplayCacheCleared: "De cachade talfilerna har tagits bort.",
   speechReplayCacheClearFailed: "Det gick inte att rensa talcachen.",
-  currentSetup: "Aktuell inställning",
   listeningToYourVoice: "Lyssnar på din röst",
   parsingYourVoiceInput: "Omvandlar din röst till text",
   preparingRequest: "Förbereder din förfrågan",
@@ -609,10 +608,6 @@ export const sv = {
   freshSession: "Ny session",
   messageCount: ({ count }) =>
     Number(count) === 1 ? "1 meddelande" : `${count} meddelanden`,
-  speechInputRoute: ({ route }) => `Tal in: ${route}`,
-  replyModelRoute: ({ route }) => `Svarsmodell: ${route}`,
-  voiceOutputRoute: ({ route }) => `Röst ut: ${route}`,
-  fallbackVoiceOutputRoute: ({ route }) => `Reservröst ut: ${route}`,
   conversation: "Konversation",
   conversationActions: "Konversationsåtgärder",
   statusDetails: "Statusinformation",

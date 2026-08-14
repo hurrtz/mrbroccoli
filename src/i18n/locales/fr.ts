@@ -594,7 +594,6 @@ export const fr = {
   clearSpeechReplayCache: "Vider le cache vocal",
   speechReplayCacheCleared: "Les fichiers vocaux en cache ont été supprimés.",
   speechReplayCacheClearFailed: "Impossible de vider le cache vocal.",
-  currentSetup: "Configuration actuelle",
   listeningToYourVoice: "Écoute de votre voix",
   parsingYourVoiceInput: "Transformer votre voix en texte",
   preparingRequest: "Préparer votre demande",
@@ -608,10 +607,6 @@ export const fr = {
   freshSession: "Nouvelle session",
   messageCount: ({ count }) =>
     Number(count) === 1 ? "1 message" : `${count} messages`,
-  speechInputRoute: ({ route }) => `Entrée vocale : ${route}`,
-  replyModelRoute: ({ route }) => `Modèle de réponse : ${route}`,
-  voiceOutputRoute: ({ route }) => `Voix : ${route}`,
-  fallbackVoiceOutputRoute: ({ route }) => `Voix de secours : ${route}`,
   conversation: "Conversation",
   conversationActions: "Actions de conversation",
   statusDetails: "Détails du statut",

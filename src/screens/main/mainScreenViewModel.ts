@@ -1,10 +1,5 @@
 import {
-  getProviderSttModelOptions,
-  getProviderTtsModelOptions,
   getProviderModelName,
-  getSttModelLabel,
-  getTtsModelLabel,
-  getTtsVoiceLabel,
   PROVIDER_LABELS,
 } from "../../constants/models";
 import { PipelinePhase } from "../../hooks/useVoicePipeline";
@@ -19,8 +14,6 @@ import {
 import { getStatusDisplayData } from "./statusSelectors";
 import { TranslateFn } from "./shared";
 import { getConversationUsageDisplayData } from "./usageSelectors";
-import { hasProviderCredentialForCapability } from "../../utils/providerCredentials";
-import { getTtsFallbackRoutes } from "../../constants/ttsFallback";
 import { getLocalModel } from "../../constants/localModels";
 import { getResponseModeRoute } from "../../utils/responseModes";
 
@@ -38,12 +31,8 @@ interface GetMainScreenViewModelParams {
   pipelinePhase: PipelinePhase;
   player: AudioSignalState;
   provider: Provider;
-  selectedSttModel: string;
-  selectedTtsModel: string;
-  selectedTtsVoice: string;
   settings: Settings;
   streamingText: string;
-  sttProvider: Provider | null;
   t: TranslateFn;
   ttsProvider: Provider | null;
   visualPhaseOverride?: VoiceVisualPhase | null;
@@ -119,12 +108,8 @@ export function getMainScreenViewModel({
   pipelinePhase,
   player,
   provider,
-  selectedSttModel,
-  selectedTtsModel,
-  selectedTtsVoice,
   settings,
   streamingText,
-  sttProvider,
   t,
   ttsProvider,
   visualPhaseOverride = null,
@@ -137,71 +122,6 @@ export function getMainScreenViewModel({
   const providerLabel = localLlmModel
     ? t("settingsOnDevice")
     : PROVIDER_LABELS[provider];
-  const modelLabel =
-    localLlmModel?.name ?? getProviderModelName(provider, model);
-  const routeModelLabel = localLlmModel
-    ? `${providerLabel} · ${modelLabel}`
-    : hasProviderCredentialForCapability(
-          provider,
-          settings.apiKeys[provider],
-          "llm",
-        )
-      ? `${providerLabel} · ${modelLabel}`
-      : t("noProviderYet");
-  const sttStatusLabel =
-    settings.sttMode === "native"
-      ? t("appNative")
-      : settings.sttMode === "local"
-        ? settings.localSttModelId
-          ? `${t("settingsOnDevice")} · ${getLocalModel(settings.localSttModelId).name}`
-          : t("noProviderYet")
-        : sttProvider
-          ? `${PROVIDER_LABELS[sttProvider]}${
-              getProviderSttModelOptions(sttProvider).length > 1 &&
-              selectedSttModel
-                ? ` · ${getSttModelLabel(sttProvider, selectedSttModel)}`
-                : ""
-            }`
-          : t("noProviderYet");
-
-  const ttsStatusLabel = !settings.spokenRepliesEnabled
-    ? t("spokenRepliesOff")
-    : settings.ttsMode === "native"
-      ? t("systemVoice")
-      : settings.ttsMode === "kokoro"
-        ? `Kokoro · ${settings.kokoroVoices.en}`
-        : settings.ttsMode === "local"
-          ? settings.localTtsModelId
-            ? `${t("settingsOnDevice")} · ${getLocalModel(settings.localTtsModelId).name}`
-            : t("noTtsProvider")
-          : ttsProvider
-            ? `${PROVIDER_LABELS[ttsProvider]}${
-                getProviderTtsModelOptions(ttsProvider).length > 1 &&
-                selectedTtsModel
-                  ? ` · ${getTtsModelLabel(ttsProvider, selectedTtsModel)}`
-                  : ""
-              } · ${getTtsVoiceLabel(ttsProvider, selectedTtsVoice, language)}`
-            : t("noTtsProvider");
-
-  const fallbackTtsRoutes = getTtsFallbackRoutes(
-    settings.ttsFallbackPolicy,
-    settings.ttsMode,
-  );
-  const fallbackTtsStatusLabel =
-    !settings.spokenRepliesEnabled || fallbackTtsRoutes.length === 0
-      ? null
-      : fallbackTtsRoutes
-          .map((route) =>
-            route === "kokoro"
-              ? "Kokoro"
-              : route === "provider"
-                ? ttsProvider
-                  ? PROVIDER_LABELS[ttsProvider]
-                  : t("provider")
-                : t("systemVoice"),
-          )
-          .join(" → ");
-
   const runtimeVisualPhase: VoiceVisualPhase = isRecording
     ? "recording"
     : pipelinePhase === "transcribing"
@@ -259,13 +179,6 @@ export function getMainScreenViewModel({
   const transcriptHandleMeta = [lastAssistantModel, lastAssistantAge]
     .filter(Boolean)
     .join(" · ");
-  const conversationAge = formatRelativeAge(
-    activeConversation?.updatedAt,
-    language,
-  );
-  const activeConversationTitle =
-    activeConversation?.title.trim() || t("untitledConversation");
-
   const statusDisplay = getStatusDisplayData({
     inputMode: settings.inputMode,
     messageCount: messages.length,
@@ -280,18 +193,10 @@ export function getMainScreenViewModel({
   });
 
   return {
-    activeConversationTitle,
-    conversationStatusDetail: conversationAge
-      ? `${activeConversationTitle} · ${conversationAge}`
-      : activeConversationTitle,
-    fallbackTtsStatusLabel,
     isActive,
     lastAssistantReply,
     messages,
-    routeModelLabel,
     statusDisplay,
-    sttStatusLabel,
-    ttsStatusLabel,
     transcriptHandleMeta: transcriptHandleMeta || null,
     usageDisplay: getConversationUsageDisplayData({
       conversation: activeConversation,

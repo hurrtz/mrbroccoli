@@ -364,18 +364,6 @@ jest.mock("../../src/screens/main/TranscriptPreviewCard", () => ({
   },
 }));
 
-jest.mock("../../src/screens/main/StatusDetailsModal", () => ({
-  StatusDetailsModal: ({ visible }: { visible: boolean }) => {
-    const React = require("react");
-    const { Text } = require("react-native");
-    return React.createElement(
-      Text,
-      null,
-      visible ? "status:open" : "status:closed",
-    );
-  },
-}));
-
 jest.mock("../../src/features/settings/AntSettingsModal", () => ({
   AntSettingsModal: ({
     visible,
@@ -587,7 +575,7 @@ describe("MainScreen", () => {
     // as a sheet over the workspace rather than living inline.
     expect(screen.getByTestId("transcript-handle")).toBeTruthy();
     expect(screen.queryByTestId("transcript-preview")).toBeNull();
-    expect(screen.getByTestId("workspace-status-line")).toBeTruthy();
+    expect(screen.queryByTestId("workspace-status-line")).toBeNull();
     expect(screen.getByText("settings:closed")).toBeTruthy();
     expect(screen.getByText("drawer:closed")).toBeTruthy();
     expect(screen.getByText("open-drawer")).toBeTruthy();

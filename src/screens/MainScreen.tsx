@@ -233,15 +233,12 @@ export function MainScreen() {
     settingsFocusPage,
     drawerVisible,
     routePickerVisible,
-    statusDetailsVisible,
     transcriptSheetVisible,
     setDrawerVisible,
     openSettings,
     closeSettings,
     runAfterSettingsDismiss,
     handleSettingsDismiss,
-    openStatusDetails,
-    closeStatusDetails,
     openRoutePicker,
     closeRoutePicker,
     openTranscriptSheet,
@@ -578,7 +575,6 @@ export function MainScreen() {
     Boolean(ulraMode.confirmation) ||
     routePickerVisible ||
     settingsVisible ||
-    statusDetailsVisible ||
     styleSheetVisible ||
     transcriptSheetVisible ||
     freeOffline.setupVisible ||
@@ -767,15 +763,10 @@ export function MainScreen() {
     pipelinePhase,
   );
   const {
-    conversationStatusDetail,
-    fallbackTtsStatusLabel,
     isActive,
     lastAssistantReply,
     messages,
-    routeModelLabel,
     statusDisplay,
-    sttStatusLabel,
-    ttsStatusLabel,
     transcriptHandleMeta,
     visualPhase,
   } = getMainScreenViewModel({
@@ -786,12 +777,8 @@ export function MainScreen() {
     pipelinePhase: presentationPipelinePhase,
     player,
     provider,
-    selectedSttModel,
-    selectedTtsModel,
-    selectedTtsVoice,
     settings: runtimeSettings,
     streamingText,
-    sttProvider,
     t,
     ttsProvider,
     visualPhaseOverride: storePromoOrbPresentation?.phase,
@@ -913,7 +900,6 @@ export function MainScreen() {
     settingsFocusCatalogProviderId: settingsFocusCatalogProviderId ?? null,
     settingsVisible,
     spokenRepliesEnabled: runtimeSettings.spokenRepliesEnabled,
-    statusDetailsVisible,
     sttMode: runtimeSettings.sttMode,
     sttProvider,
     ttsMode: runtimeSettings.ttsMode,
@@ -1140,15 +1126,6 @@ export function MainScreen() {
           onPress: handleOpenConversationSettings,
           summary: `${t(responseTone)} · ${t(responseLength)} · ${settingsSummaryVoice}`,
         },
-        statusLine: {
-          detailActive: statusDisplay.statusDetail,
-          detailIdle: conversationStatusDetail,
-          onInfo: openStatusDetails,
-          sessionDetailsLabel: t("workspaceSessionDetails"),
-          titleActive: statusDisplay.statusTitle,
-          titleIdleText: t("workspaceTypeAndSend"),
-          titleIdleVoice: statusDisplay.actionLabel,
-        },
         transcriptSheet: {
           countLabel: statusDisplay.messageCountLabel,
           emptyLabel: t("workspaceNoMessagesYet"),
@@ -1262,20 +1239,6 @@ export function MainScreen() {
         onTtsInstructionsChange: updateTtsInstructions,
         onTtsVoiceChange: updateTtsVoice,
         onClose: handleCloseConversationSettings,
-      }}
-      statusDetails={{
-        visible: statusDetailsVisible,
-        colors,
-        fallbackTtsStatusLabel,
-        isActive,
-        messageCountLabel: statusDisplay.messageCountLabel,
-        onClose: closeStatusDetails,
-        routeModelLabel,
-        statusDetail: statusDisplay.statusDetail,
-        statusTitle: statusDisplay.statusTitle,
-        sttStatusLabel,
-        t,
-        ttsStatusLabel,
       }}
       settingsModal={{
         archivedConversationCount,

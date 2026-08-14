@@ -19,7 +19,6 @@ export function useMainScreenUiState() {
     SettingsPage | undefined
   >();
   const [drawerVisible, setDrawerVisible] = useState(false);
-  const [statusDetailsVisible, setStatusDetailsVisible] = useState(false);
   const [routePickerVisible, setRoutePickerVisible] = useState(false);
   const [transcriptSheetVisible, setTranscriptSheetVisible] = useState(false);
   const pendingSettingsDismissActionRef = useRef<null | (() => void)>(null);
@@ -81,14 +80,6 @@ export function useMainScreenUiState() {
     const pendingAction = pendingSettingsDismissActionRef.current;
     pendingSettingsDismissActionRef.current = null;
     pendingAction?.();
-  }, []);
-
-  const openStatusDetails = useCallback(() => {
-    setStatusDetailsVisible(true);
-  }, []);
-
-  const closeStatusDetails = useCallback(() => {
-    setStatusDetailsVisible(false);
   }, []);
 
   const openRoutePicker = useCallback(() => {
@@ -187,7 +178,6 @@ export function useMainScreenUiState() {
     settingsFocusPage,
     drawerVisible,
     routePickerVisible,
-    statusDetailsVisible,
     transcriptSheetVisible,
     setDrawerVisible,
     openSettings,
@@ -195,8 +185,6 @@ export function useMainScreenUiState() {
     closeSettings,
     runAfterSettingsDismiss,
     handleSettingsDismiss,
-    openStatusDetails,
-    closeStatusDetails,
     openRoutePicker,
     closeRoutePicker,
     openTranscriptSheet,

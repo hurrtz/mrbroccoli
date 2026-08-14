@@ -596,7 +596,6 @@ export const ptBR = {
   clearSpeechReplayCache: "Limpar cache de voz",
   speechReplayCacheCleared: "Os arquivos de voz em cache foram removidos.",
   speechReplayCacheClearFailed: "Não foi possível limpar o cache de voz.",
-  currentSetup: "Configuração atual",
   listeningToYourVoice: "Ouvindo sua voz",
   parsingYourVoiceInput: "Transformando sua voz em texto",
   preparingRequest: "Preparando seu pedido",
@@ -610,10 +609,6 @@ export const ptBR = {
   freshSession: "Nova sessão",
   messageCount: ({ count }) =>
     Number(count) === 1 ? "1 mensagem" : `${count} mensagens`,
-  speechInputRoute: ({ route }) => `Entrada de fala: ${route}`,
-  replyModelRoute: ({ route }) => `Modelo de resposta: ${route}`,
-  voiceOutputRoute: ({ route }) => `Saída de voz: ${route}`,
-  fallbackVoiceOutputRoute: ({ route }) => `Saída de voz substituta: ${route}`,
   conversation: "Conversa",
   conversationActions: "Ações de conversa",
   statusDetails: "Detalhes do status",

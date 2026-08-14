@@ -593,7 +593,6 @@ export const ur = {
   clearSpeechReplayCache: "اسپیچ کیش صاف کریں",
   speechReplayCacheCleared: "کیش شدہ اسپیچ فائلیں حذف کر دی گئیں۔",
   speechReplayCacheClearFailed: "اسپیچ کیش صاف نہیں ہو سکا۔",
-  currentSetup: "موجودہ سیٹ اپ",
   listeningToYourVoice: "آپ کی آواز سننا",
   parsingYourVoiceInput: "آپ کی آواز کو متن میں بدلا جا رہا ہے",
   preparingRequest: "آپ کی درخواست کی تیاری",
@@ -607,10 +606,6 @@ export const ur = {
   freshSession: "تازہ سیشن",
   messageCount: ({ count }) =>
     Number(count) === 1 ? "1 پیغام" : `${count} پیغامات`,
-  speechInputRoute: ({ route }) => `تقریر اِن پٹ: ${route}`,
-  replyModelRoute: ({ route }) => `جوابی ماڈل: ${route}`,
-  voiceOutputRoute: ({ route }) => `آواز آؤٹ پٹ: ${route}`,
-  fallbackVoiceOutputRoute: ({ route }) => `فال بیک آواز آؤٹ پٹ: ${route}`,
   conversation: "بات چیت",
   conversationActions: "بات چیت کے اعمال",
   statusDetails: "حیثیت کی تفصیلات",

@@ -29,6 +29,11 @@ the complete Play Store translations are kept in a dedicated file under
   the modal for viewing, editing, copying, or clearing a conversation's
   compact summary are gone. The summary itself remains an internal detail
   of how long threads stay within a model's context window.
+- The home screen drops the status row between the shortcut buttons and the
+  transcript peek, along with the "Current setup" sheet its info control
+  opened: the orb already states the phase, the transcript handle names the
+  latest model and age, and Settings lists the routes. Screen readers still
+  hear every phase change announced.
 - The voice/text pager is now a full circle: swiping in either direction — or
   tapping either chevron — always moves to the other input surface, so a swipe
   is never a dead end.

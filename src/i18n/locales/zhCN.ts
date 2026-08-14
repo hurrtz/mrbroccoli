@@ -593,7 +593,6 @@ export const zhCN = {
   clearSpeechReplayCache: "清除语音缓存",
   speechReplayCacheCleared: "已删除缓存的语音文件。",
   speechReplayCacheClearFailed: "无法清除语音缓存。",
-  currentSetup: "当前设置",
   listeningToYourVoice: "正在聆听你的语音",
   parsingYourVoiceInput: "正在将你的语音转成文字",
   preparingRequest: "准备您的请求",
@@ -607,10 +606,6 @@ export const zhCN = {
   freshSession: "全新会话",
   messageCount: ({ count }) =>
     Number(count) === 1 ? "1 条消息" : `${count} 条消息`,
-  speechInputRoute: ({ route }) => `语音输入：${route}`,
-  replyModelRoute: ({ route }) => `回复模型：${route}`,
-  voiceOutputRoute: ({ route }) => `语音输出：${route}`,
-  fallbackVoiceOutputRoute: ({ route }) => `回退语音输出：${route}`,
   conversation: "对话",
   conversationActions: "对话动作",
   statusDetails: "状态详情",

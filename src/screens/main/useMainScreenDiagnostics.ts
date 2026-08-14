@@ -40,7 +40,6 @@ interface MainScreenDiagnosticsState {
   settingsFocusCatalogProviderId: string | null;
   settingsVisible: boolean;
   spokenRepliesEnabled: boolean;
-  statusDetailsVisible: boolean;
   sttMode: SttBackendMode;
   sttProvider: Provider | null;
   ttsMode: TtsBackendMode;
@@ -170,12 +169,5 @@ export function useMainScreenDiagnostics(state: MainScreenDiagnosticsState) {
       payload: { visible: state.drawerVisible },
     });
   }, [state.drawerVisible]);
-
-  useEffect(() => {
-    recordDebugLogEvent({
-      event: "status-details-visibility-changed",
-      payload: { visible: state.statusDetailsVisible },
-    });
-  }, [state.statusDetailsVisible]);
 
 }

@@ -609,7 +609,6 @@ export const de = {
   speechReplayCacheCleared: "Die gespeicherten Sprachdateien wurden gelöscht.",
   speechReplayCacheClearFailed:
     "Der Sprachcache konnte nicht geleert werden.",
-  currentSetup: "Aktuelles Setup",
   listeningToYourVoice: "Ich höre dir zu",
   parsingYourVoiceInput: "Wandle deine Stimme in Text um",
   preparingRequest: "Bereite deine Anfrage vor",
@@ -623,10 +622,6 @@ export const de = {
   freshSession: "Neues Gespräch",
   messageCount: ({ count }) =>
     Number(count) === 1 ? "1 Nachricht" : `${count} Nachrichten`,
-  speechInputRoute: ({ route }) => `Sprache rein: ${route}`,
-  replyModelRoute: ({ route }) => `Antwortmodell: ${route}`,
-  voiceOutputRoute: ({ route }) => `Stimme raus: ${route}`,
-  fallbackVoiceOutputRoute: ({ route }) => `Ersatzstimme raus: ${route}`,
   conversation: "Gespräch",
   conversationActions: "Gesprächsaktionen",
   statusDetails: "Statusdetails",

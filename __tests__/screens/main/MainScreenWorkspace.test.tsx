@@ -125,15 +125,6 @@ function createWorkspaceProps(t: jest.Mock) {
       onPress: jest.fn(),
       summary: "Balanced · Brief",
     },
-    statusLine: {
-      detailActive: "Working through the answer",
-      detailIdle: "Streaming test · 1 message",
-      onInfo: jest.fn(),
-      sessionDetailsLabel: "Session details",
-      titleActive: "Thinking",
-      titleIdleText: "Type and send",
-      titleIdleVoice: "Tap to speak",
-    },
     topBar: {
       brandName: "Mr Broccoli",
       drawerLabel: "Conversations",
@@ -241,7 +232,9 @@ describe("MainScreenWorkspace streaming isolation", () => {
         "workspaceImageLabel",
       ),
     ).toBeNull();
-    expect(screen.getByText("Tap to speak")).toBeTruthy();
+    // The status line is gone in both orientations; the orb carries the
+    // phase and the transcript handle carries the conversation.
+    expect(screen.queryByTestId("workspace-status-line")).toBeNull();
   });
 
   it("compacts the blocked-route notice in accessibility-large landscape", () => {
@@ -286,7 +279,7 @@ describe("MainScreenWorkspace streaming isolation", () => {
     expect(
       screen.getByTestId("voice-text-input-pager").props.accessibilityValue,
     ).toEqual({ text: "compact" });
-    expect(screen.getByTestId("workspace-status-line")).toBeTruthy();
+    expect(screen.queryByTestId("workspace-status-line")).toBeNull();
     expect(screen.getByTestId("landscape-right-pane")).toBeTruthy();
   });
 

@@ -12,7 +12,6 @@ import { Colors } from "../../theme/colors";
 import { MainScreenWorkspace } from "./MainScreenWorkspace";
 import { DisclosureDialog } from "./DisclosureDialog";
 import { ImageSourceSheet } from "./ImageSourceSheet";
-import { StatusDetailsModal } from "./StatusDetailsModal";
 import { StyleSheetModal } from "./StyleSheetModal";
 import { styles } from "./styles";
 
@@ -27,7 +26,6 @@ interface MainScreenPresentationProps {
   isLandscape: boolean;
   premiumUpgrade: React.ComponentProps<typeof PremiumUpgradeModal>;
   settingsModal: React.ComponentProps<typeof AntSettingsModal>;
-  statusDetails: React.ComponentProps<typeof StatusDetailsModal>;
   styleSheet: React.ComponentProps<typeof StyleSheetModal>;
   toast: React.ComponentProps<typeof Toast>;
   workspace: React.ComponentProps<typeof MainScreenWorkspace>;
@@ -44,7 +42,6 @@ export function MainScreenPresentation({
   isLandscape,
   premiumUpgrade,
   settingsModal,
-  statusDetails,
   styleSheet,
   toast,
   workspace,
@@ -81,7 +78,6 @@ export function MainScreenPresentation({
       <DisclosureDialog {...imageConsent} />
 
       <StyleSheetModal {...styleSheet} />
-      <StatusDetailsModal {...statusDetails} />
       <AntSettingsModal {...settingsModal} />
       <PremiumUpgradeModal {...premiumUpgrade} />
       <ConversationDrawer {...conversationDrawer} />

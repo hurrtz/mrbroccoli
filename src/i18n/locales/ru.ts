@@ -597,7 +597,6 @@ export const ru = {
   clearSpeechReplayCache: "Очистить кэш речи",
   speechReplayCacheCleared: "Сохранённые речевые файлы удалены.",
   speechReplayCacheClearFailed: "Не удалось очистить кэш речи.",
-  currentSetup: "Текущая настройка",
   listeningToYourVoice: "Слушаю вас",
   parsingYourVoiceInput: "Преобразую ваш голос в текст",
   preparingRequest: "Подготовка вашего запроса",
@@ -611,10 +610,6 @@ export const ru = {
   freshSession: "Новая сессия",
   messageCount: ({ count }) =>
     Number(count) === 1 ? "1 сообщение" : `Сообщений: ${count}`,
-  speechInputRoute: ({ route }) => `Речевой ввод: ${route}`,
-  replyModelRoute: ({ route }) => `Модель ответа: ${route}`,
-  voiceOutputRoute: ({ route }) => `Голосовой вывод: ${route}`,
-  fallbackVoiceOutputRoute: ({ route }) => `Резервный голосовой выход: ${route}`,
   conversation: "Разговор",
   conversationActions: "Действия в разговоре",
   statusDetails: "Детали статуса",

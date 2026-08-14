@@ -593,7 +593,6 @@ export const en = {
   clearSpeechReplayCache: "Clear speech cache",
   speechReplayCacheCleared: "The cached speech files were removed.",
   speechReplayCacheClearFailed: "The speech cache could not be cleared.",
-  currentSetup: "Current Setup",
   listeningToYourVoice: "Listening to your voice",
   parsingYourVoiceInput: "Turning your voice into text",
   preparingRequest: "Preparing your request",
@@ -607,10 +606,6 @@ export const en = {
   freshSession: "Fresh session",
   messageCount: ({ count }) =>
     Number(count) === 1 ? "1 message" : `${count} messages`,
-  speechInputRoute: ({ route }) => `Speech in: ${route}`,
-  replyModelRoute: ({ route }) => `Reply model: ${route}`,
-  voiceOutputRoute: ({ route }) => `Voice out: ${route}`,
-  fallbackVoiceOutputRoute: ({ route }) => `Fallback voice out: ${route}`,
   conversation: "Conversation",
   conversationActions: "Conversation actions",
   statusDetails: "Status details",

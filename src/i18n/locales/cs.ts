@@ -601,7 +601,6 @@ export const cs = {
   clearSpeechReplayCache: "Vymazat mezipaměť řeči",
   speechReplayCacheCleared: "Uložené zvukové soubory byly odstraněny.",
   speechReplayCacheClearFailed: "Mezipaměť řeči se nepodařilo vymazat.",
-  currentSetup: "Aktuální nastavení",
   listeningToYourVoice: "Poslouchám váš hlas",
   parsingYourVoiceInput: "Přeměna vašeho hlasu na text",
   preparingRequest: "Příprava vaší žádosti",
@@ -619,10 +618,6 @@ export const cs = {
       : Number(count) < 5
         ? `${count} zprávy`
         : `${count} zpráv`,
-  speechInputRoute: ({ route }) => `Vstup řeči: ${route}`,
-  replyModelRoute: ({ route }) => `Model odpovědi: ${route}`,
-  voiceOutputRoute: ({ route }) => `Hlasový výstup: ${route}`,
-  fallbackVoiceOutputRoute: ({ route }) => `Záložní hlasový výstup: ${route}`,
   conversation: "Konverzace",
   conversationActions: "Konverzační akce",
   statusDetails: "Podrobnosti o stavu",

@@ -17,7 +17,7 @@ function t(key: any, params?: Record<string, string | number | undefined>) {
 }
 
 describe("getMainScreenViewModel", () => {
-  it("builds provider and fallback route labels plus streaming transcript state", () => {
+  it("derives streaming transcript state and the active turn phase", () => {
     const settings: Settings = {
       ...DEFAULT_SETTINGS,
       activeResponseMode: "mode-1",
@@ -99,12 +99,6 @@ describe("getMainScreenViewModel", () => {
     expect(viewModel.isActive).toBe(true);
     expect(viewModel.messages).toHaveLength(2);
     expect(viewModel.lastAssistantReply).toBe("Stored reply");
-    expect(viewModel.sttStatusLabel).toContain("OpenAI");
-    expect(viewModel.ttsStatusLabel).toContain("OpenAI");
-    expect(viewModel.fallbackTtsStatusLabel).toBe("Kokoro → systemVoice");
-    expect(viewModel.routeModelLabel).toContain("GPT-5.4");
-    expect(viewModel.activeConversationTitle).toBe("Planning");
-    expect(viewModel.conversationStatusDetail).toContain("Planning · ");
     expect(viewModel.transcriptHandleMeta).toContain("GPT-5.4 · ");
   });
 
@@ -232,30 +226,4 @@ describe("getMainScreenViewModel", () => {
     expect(viewModel.statusDisplay.statusDetail).toBe("listeningToYourVoice");
   });
 
-  it("does not expose the default model route when no reply provider is configured", () => {
-    const viewModel = getMainScreenViewModel({
-      activeConversation: null,
-      isRecording: false,
-      language: "en",
-      model: DEFAULT_SETTINGS.responseModes[0].route.model,
-      pipelinePhase: "idle",
-      player: {
-        isActivelyPlaying: false,
-        isPlaybackPaused: false,
-        isPlaying: false,
-      },
-      provider: DEFAULT_SETTINGS.responseModes[0].route.provider,
-      selectedSttModel: "",
-      selectedTtsModel: "",
-      selectedTtsVoice: "",
-      settings: DEFAULT_SETTINGS,
-      streamingText: "",
-      sttProvider: null,
-      t,
-      ttsProvider: null,
-    });
-
-    expect(viewModel.routeModelLabel).toBe("noProviderYet");
-    expect(viewModel.routeModelLabel).not.toContain("Claude");
-  });
 });

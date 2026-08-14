@@ -6,7 +6,6 @@ import { BackgroundTaskBar } from "../../design-system/BackgroundTaskBar";
 import { ConversationSettingsSummary } from "../../design-system/ConversationSettingsSummary";
 import { OrbSatellite } from "../../design-system/OrbSatellite";
 import { TranscriptHandle } from "../../design-system/TranscriptHandle";
-import { WorkspaceStatusLine } from "../../design-system/WorkspaceStatusLine";
 import { Modal } from "../../design-system/NativeControls";
 import type { Colors } from "../../theme/colors";
 import type { Message, VoiceVisualPhase } from "../../types";
@@ -15,7 +14,6 @@ import { MainScreenTopBar } from "./MainScreenTopBar";
 import { MainScreenVoiceStage } from "./MainScreenVoiceStage";
 import { RoutePickerSheet } from "./RoutePickerSheet";
 import { TranscriptPreviewCard } from "./TranscriptPreviewCard";
-import type { InputSurface } from "./VoiceTextInputPager";
 import type { TranslateFn } from "./shared";
 import { styles } from "./styles";
 
@@ -162,15 +160,6 @@ interface MainScreenWorkspaceProps {
     onPress: () => void;
     summary: string;
   };
-  statusLine: {
-    detailIdle: string;
-    detailActive: string;
-    onInfo: () => void;
-    sessionDetailsLabel: string;
-    titleActive: string;
-    titleIdleText: string;
-    titleIdleVoice: string;
-  };
   topBar: Omit<React.ComponentProps<typeof MainScreenTopBar>, "colors">;
   transcript: Omit<
     React.ComponentProps<typeof TranscriptPreviewCard>,
@@ -213,7 +202,6 @@ export function MainScreenWorkspace({
   routePicker,
   satellites,
   settingsSummary,
-  statusLine,
   topBar,
   transcript,
   transcriptSheet,
@@ -223,19 +211,6 @@ export function MainScreenWorkspace({
   const { fontScale, height: windowHeight } = useWindowDimensions();
   const useAccessibilityCompactLayout =
     fontScale >= ACCESSIBILITY_COMPACT_FONT_SCALE;
-  const [surface, setSurface] = React.useState<InputSurface>(
-    voiceStage.initialInputSurface ?? "voice",
-  );
-  const onInputSurfaceChange = voiceStage.onInputSurfaceChange;
-  const handleSurfaceChange = React.useCallback(
-    (nextSurface: InputSurface) => {
-      setSurface(nextSurface);
-      onInputSurfaceChange?.(nextSurface);
-    },
-    [onInputSurfaceChange],
-  );
-
-  const isActive = visualPhase !== "idle";
   const speaking = visualPhase === "speaking";
   const lastAssistant = getLastAssistantMessage(transcript.messages);
   const messageCount = transcript.messages.length;
@@ -246,15 +221,6 @@ export function MainScreenWorkspace({
       ? transcriptSheet.countLabel
       : transcriptSheet.emptyLabel
   }`;
-
-  const statusTitle = isActive
-    ? statusLine.titleActive
-    : surface === "text"
-      ? statusLine.titleIdleText
-      : statusLine.titleIdleVoice;
-  const statusDetail = isActive
-    ? statusLine.detailActive
-    : statusLine.detailIdle;
 
   const {
     debugLogActive: _debugLogActive,
@@ -295,7 +261,6 @@ export function MainScreenWorkspace({
               // status line at any font scale, so landscape always takes the
               // single-row action variant.
               compactPromptNotice
-              onInputSurfaceChange={handleSurfaceChange}
             />
             <WorkspaceSatellites
               colors={colors}
@@ -305,16 +270,6 @@ export function MainScreenWorkspace({
             />
           </View>
 
-          <WorkspaceStatusLine
-            detail={statusDetail}
-            info={{
-              accessibilityLabel: statusLine.sessionDetailsLabel,
-              onPress: statusLine.onInfo,
-            }}
-            phase={visualPhase}
-            testID="workspace-status-line"
-            title={statusTitle}
-          />
         </View>
 
         <View
@@ -373,7 +328,6 @@ export function MainScreenWorkspace({
               // steps down rather than squeezing the caption or satellites.
               maxOrbSize={introBanner.visible ? 156 : 196}
               {...voiceStage}
-              onInputSurfaceChange={handleSurfaceChange}
             />
             <WorkspaceSatellites
               colors={colors}
@@ -383,16 +337,6 @@ export function MainScreenWorkspace({
             />
           </View>
 
-          <WorkspaceStatusLine
-            detail={statusDetail}
-            info={{
-              accessibilityLabel: statusLine.sessionDetailsLabel,
-              onPress: statusLine.onInfo,
-            }}
-            phase={visualPhase}
-            testID="workspace-status-line"
-            title={statusTitle}
-          />
         </View>
       </View>
 

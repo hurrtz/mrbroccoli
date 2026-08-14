@@ -29,7 +29,7 @@ framework or hiding platform behavior behind excessive abstraction.
   tags, switches, and related control primitives.
 - `IconButton.tsx` owns the standard icon-only interactive control.
 - `VoiceOrb.tsx`, `OrbSatellite.tsx`, `ConversationSettingsSummary.tsx`,
-  `WorkspaceStatusLine.tsx`, and `TranscriptHandle.tsx` own the orb-centred
+  and `TranscriptHandle.tsx` own the orb-centred
   workspace controls introduced by the approved design system. They are
   presentation-only: every string arrives translated from the caller, and the
   orb's diameter is passed in by the screen that measured its space.

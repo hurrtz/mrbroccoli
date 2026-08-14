@@ -596,7 +596,6 @@ export const ja = {
   clearSpeechReplayCache: "音声キャッシュを消去",
   speechReplayCacheCleared: "キャッシュされた音声ファイルを削除しました。",
   speechReplayCacheClearFailed: "音声キャッシュを消去できませんでした。",
-  currentSetup: "現在のセットアップ",
   listeningToYourVoice: "音声を聞き取っています",
   parsingYourVoiceInput: "音声をテキストに変換しています",
   preparingRequest: "リクエストを準備しています",
@@ -610,10 +609,6 @@ export const ja = {
   freshSession: "新しいセッション",
   messageCount: ({ count }) =>
     Number(count) === 1 ? "1 メッセージ" : `${count} メッセージ`,
-  speechInputRoute: ({ route }) => `音声入力: ${route}`,
-  replyModelRoute: ({ route }) => `返信モデル: ${route}`,
-  voiceOutputRoute: ({ route }) => `音声出力: ${route}`,
-  fallbackVoiceOutputRoute: ({ route }) => `フォールバック音声出力: ${route}`,
   conversation: "会話",
   conversationActions: "会話アクション",
   statusDetails: "ステータスの詳細",

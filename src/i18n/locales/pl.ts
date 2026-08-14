@@ -602,7 +602,6 @@ export const pl = {
   speechReplayCacheCleared: "Usunięto pliki z pamięci podręcznej mowy.",
   speechReplayCacheClearFailed:
     "Nie udało się wyczyścić pamięci podręcznej mowy.",
-  currentSetup: "Bieżąca konfiguracja",
   listeningToYourVoice: "Słuchanie Twojego głosu",
   parsingYourVoiceInput: "Zamiana głosu na tekst",
   preparingRequest: "Przygotowanie Twojej prośby",
@@ -616,11 +615,6 @@ export const pl = {
   freshSession: "Świeża sesja",
   messageCount: ({ count }) =>
     Number(count) === 1 ? "1 wiadomość" : `${count} wiadomości`,
-  speechInputRoute: ({ route }) => `Wejście mowy: ${route}`,
-  replyModelRoute: ({ route }) => `Model odpowiedzi: ${route}`,
-  voiceOutputRoute: ({ route }) => `Wyjście głosowe: ${route}`,
-  fallbackVoiceOutputRoute: ({ route }) =>
-    `Rezerwowe wyjście głosowe: ${route}`,
   conversation: "Rozmowa",
   conversationActions: "Działania konwersacyjne",
   statusDetails: "Szczegóły statusu",

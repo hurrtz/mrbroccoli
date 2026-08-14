@@ -75,11 +75,13 @@ receive already-derived state and callbacks.
   warning, status, and transcript affordance without overlap. Landscape keeps
   the same interactions and the warning's complete accessible name, but the
   constrained blocked-route card shows only its actionable label.
-- The status line under the orb pairs a phase dot with what is happening and
-  what the conversation is; while idle it names the conversation and its
-  localized relative age. Runtimes without relative-time formatting fall back
-  to a localized compact timestamp instead of failing the workspace. Its info
-  control opens the session details.
+- **Decision:** the workspace carries no status line and no session-details
+  sheet. The orb states the phase visually and announces every phase change to
+  assistive technology, the transcript handle names the latest model and age,
+  and Settings owns the route summary — a permanent row restating all of that
+  was chrome between the satellites and the transcript. Rejected alternative:
+  moving its info control onto the handle or the top bar, which would have kept
+  a surface whose content is available in two other places.
 - The transcript remains the durable record. Streaming text may be projected as
   a temporary assistant message, but only persisted messages become history.
   It reads as one continuous script with a fixed speaker margin, provider or

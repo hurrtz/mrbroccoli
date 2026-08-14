@@ -595,7 +595,6 @@ export const ar = {
   clearSpeechReplayCache: "مسح ذاكرة الكلام",
   speechReplayCacheCleared: "تم حذف ملفات الكلام المخزنة.",
   speechReplayCacheClearFailed: "تعذر مسح ذاكرة الكلام.",
-  currentSetup: "الإعداد الحالي",
   listeningToYourVoice: "الاستماع إلى صوتك",
   parsingYourVoiceInput: "تحويل صوتك إلى نص",
   preparingRequest: "جارٍ تحضير طلبك",
@@ -609,10 +608,6 @@ export const ar = {
   freshSession: "جلسة جديدة",
   messageCount: ({ count }) =>
     Number(count) === 1 ? "رسالة واحدة" : `${count} رسائل`,
-  speechInputRoute: ({ route }) => `إدخال الكلام: ${route}`,
-  replyModelRoute: ({ route }) => `نموذج الرد: ${route}`,
-  voiceOutputRoute: ({ route }) => `إخراج الصوت: ${route}`,
-  fallbackVoiceOutputRoute: ({ route }) => `الصوت الاحتياطي: ${route}`,
   conversation: "محادثة",
   conversationActions: "إجراءات المحادثة",
   statusDetails: "تفاصيل الحالة",

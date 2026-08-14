@@ -597,7 +597,6 @@ export const tr = {
   clearSpeechReplayCache: "Konuşma önbelleğini temizle",
   speechReplayCacheCleared: "Önbellekteki konuşma dosyaları silindi.",
   speechReplayCacheClearFailed: "Konuşma önbelleği temizlenemedi.",
-  currentSetup: "Mevcut Kurulum",
   listeningToYourVoice: "Sesiniz dinleniyor",
   parsingYourVoiceInput: "Sesiniz metne dönüştürülüyor",
   preparingRequest: "Talebiniz hazırlanıyor",
@@ -611,10 +610,6 @@ export const tr = {
   freshSession: "Yeni oturum",
   messageCount: ({ count }) =>
     Number(count) === 1 ? "1 mesaj" : `${count} mesaj`,
-  speechInputRoute: ({ route }) => `Konuşma girişi: ${route}`,
-  replyModelRoute: ({ route }) => `Yanıt modeli: ${route}`,
-  voiceOutputRoute: ({ route }) => `Ses çıkışı: ${route}`,
-  fallbackVoiceOutputRoute: ({ route }) => `Yedek ses çıkışı: ${route}`,
   conversation: "Konuşma",
   conversationActions: "Konuşma eylemleri",
   statusDetails: "Durum ayrıntıları",

@@ -608,7 +608,6 @@ export const hu = {
   speechReplayCacheCleared: "A gyorsítótárazott beszédfájlok törölve.",
   speechReplayCacheClearFailed:
     "A beszéd gyorsítótárát nem sikerült törölni.",
-  currentSetup: "Jelenlegi beállítás",
   listeningToYourVoice: "Hallgatja a hangját",
   parsingYourVoiceInput: "A hangját szöveggé alakítja",
   preparingRequest: "Kérése előkészítése",
@@ -623,10 +622,6 @@ export const hu = {
   freshSession: "Új munkamenet",
   messageCount: ({ count }) =>
     Number(count) === 1 ? "1 üzenet" : `${count} üzenet`,
-  speechInputRoute: ({ route }) => `Beszédbevitel: ${route}`,
-  replyModelRoute: ({ route }) => `Válaszmodell: ${route}`,
-  voiceOutputRoute: ({ route }) => `Hangkimenet: ${route}`,
-  fallbackVoiceOutputRoute: ({ route }) => `Tartalék hangkimenet: ${route}`,
   conversation: "Beszélgetés",
   conversationActions: "Beszélgetési műveletek",
   statusDetails: "Állapot részletei",
