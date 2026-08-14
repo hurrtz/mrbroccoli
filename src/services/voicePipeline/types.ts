@@ -54,12 +54,16 @@ export interface PipelineCallbacks {
   onAudioReady: (
     audioUri: string,
     diagnostics?: SpeechDiagnosticsContext,
+    /** What this clip says and whether it opens a paragraph, so playback can
+        move between paragraphs and size their share of the reading arc. */
+    chunk?: { text: string; startsParagraph: boolean },
   ) => void;
   onAudioPauseReady?: (audioUri: string) => void;
   onSpeechTextReady: (
     text: string,
     voice?: string,
     diagnostics?: SpeechDiagnosticsContext,
+    startsParagraph?: boolean,
   ) => void;
   onSpeechPauseReady?: (durationMs: number) => void;
   onTtsFallback?: (error: Error, route: TtsFallbackRoute) => void;

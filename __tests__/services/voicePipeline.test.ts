@@ -526,6 +526,7 @@ describe("runVoicePipeline", () => {
         requestId: expect.stringMatching(/^conversation-/),
         source: "conversation",
       }),
+      false,
     );
     expect(synthesizeSpeech).not.toHaveBeenCalled();
   });
@@ -916,6 +917,7 @@ describe("runVoicePipeline", () => {
         requestId: expect.stringMatching(/^conversation-/),
         source: "conversation",
       }),
+      false,
     );
     expect(streamChat).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -971,6 +973,7 @@ describe("runVoicePipeline", () => {
       "Recommendation. Choose Quick for routine turns. See the notes.",
       undefined,
       expect.any(Object),
+      false,
     );
   });
 
@@ -1024,6 +1027,7 @@ describe("runVoicePipeline", () => {
       "First line. Still first paragraph.",
       undefined,
       expect.any(Object),
+      false,
     );
     expect(callbacks.onSpeechPauseReady).toHaveBeenCalledTimes(1);
     expect(callbacks.onSpeechPauseReady).toHaveBeenCalledWith(250);
@@ -1156,6 +1160,7 @@ describe("runVoicePipeline", () => {
         language: "en",
         voice: "af_sol",
       }),
+      expect.objectContaining({ startsParagraph: false }),
     );
     expect(callbacks.onSpeechTextReady).not.toHaveBeenCalled();
   });
@@ -1232,6 +1237,20 @@ describe("runVoicePipeline", () => {
     );
     expect(callbacks.onTtsFallback).not.toHaveBeenCalled();
     expect(callbacks.onAudioReady).toHaveBeenCalledTimes(2);
+    // Each clip carries what it says and whether it opens a paragraph — the
+    // playback reel weights the reading arc and places its seeks with these.
+    expect(callbacks.onAudioReady).toHaveBeenNthCalledWith(
+      1,
+      "/tmp/provider-1.wav",
+      expect.any(Object),
+      { startsParagraph: false, text: "Paragraph one." },
+    );
+    expect(callbacks.onAudioReady).toHaveBeenNthCalledWith(
+      2,
+      "/tmp/provider-2.wav",
+      expect.any(Object),
+      { startsParagraph: true, text: "Paragraph two." },
+    );
     expect(callbacks.onAudioPauseReady).toHaveBeenCalledWith(
       "file:///tmp/paragraph-pause.wav",
     );
@@ -1893,6 +1912,7 @@ describe("runVoicePipeline", () => {
         requestId: expect.stringMatching(/^conversation-/),
         source: "conversation",
       }),
+      false,
     );
     expect(callbacks.onAudioReady).not.toHaveBeenCalled();
     expect(callbacks.onError).not.toHaveBeenCalled();
@@ -2044,6 +2064,7 @@ describe("runVoicePipeline", () => {
         language: "uk",
         mode: "native",
       }),
+      false,
     );
     expect(callbacks.onAudioReady).not.toHaveBeenCalled();
     expect(callbacks.onError).not.toHaveBeenCalled();
@@ -2107,11 +2128,13 @@ describe("runVoicePipeline", () => {
     expect(callbacks.onAudioReady).toHaveBeenCalledWith(
       "/tmp/english.wav",
       expect.objectContaining({ language: "en", mode: "provider" }),
+      expect.objectContaining({ startsParagraph: false }),
     );
     expect(callbacks.onSpeechTextReady).toHaveBeenCalledWith(
       "Це українська відповідь.",
       undefined,
       expect.objectContaining({ language: "uk", mode: "native" }),
+      true,
     );
     expect(callbacks.onTtsFallback).toHaveBeenCalledWith(
       expect.any(Error),
@@ -2223,6 +2246,7 @@ describe("runVoicePipeline", () => {
     expect(callbacks.onAudioReady).toHaveBeenCalledWith(
       "/tmp/kokoro.wav",
       expect.objectContaining({ mode: "kokoro" }),
+      expect.objectContaining({ startsParagraph: false }),
     );
     expect(callbacks.onSpeechTextReady).not.toHaveBeenCalled();
     expect(callbacks.onError).not.toHaveBeenCalled();
@@ -2285,6 +2309,7 @@ describe("runVoicePipeline", () => {
         mode: "provider",
         provider: "openai",
       }),
+      expect.objectContaining({ startsParagraph: false }),
     );
     expect(callbacks.onSpeechTextReady).not.toHaveBeenCalled();
     expect(callbacks.onError).not.toHaveBeenCalled();
@@ -2754,6 +2779,7 @@ describe("runVoicePipeline", () => {
       expect.objectContaining({
         source: "conversation",
       }),
+      false,
     );
     expect(callbacks.onResponseDone).toHaveBeenCalledWith(
       "Final answer",

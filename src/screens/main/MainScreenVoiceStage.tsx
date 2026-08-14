@@ -41,6 +41,7 @@ interface MainScreenVoiceStageProps {
   promptBlockedActionEnabled?: boolean;
   promptBlockedActionLabel?: string | null;
   promptBlockedMessage?: string | null;
+  readingProgress?: number | null;
   recordingMaxMs: number;
   recordingStartedAtMs?: number | null;
   speechStartProgress?: VoiceTimingProgress | null;
@@ -76,6 +77,7 @@ export const MainScreenVoiceStage = React.memo(function MainScreenVoiceStage({
   promptBlockedActionEnabled = false,
   promptBlockedActionLabel = null,
   promptBlockedMessage = null,
+  readingProgress = null,
   recordingMaxMs,
   recordingStartedAtMs = null,
   speechStartProgress = null,
@@ -127,6 +129,7 @@ export const MainScreenVoiceStage = React.memo(function MainScreenVoiceStage({
           promptBlockedActionEnabled={promptBlockedActionEnabled}
           promptBlockedActionLabel={promptBlockedActionLabel}
           promptBlockedMessage={promptBlockedMessage}
+          readingProgress={readingProgress}
           recordingMaxMs={recordingMaxMs}
           recordingStartedAtMs={recordingStartedAtMs}
           speechStartProgress={speechStartProgress}

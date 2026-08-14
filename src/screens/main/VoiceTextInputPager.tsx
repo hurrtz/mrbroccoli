@@ -33,6 +33,7 @@ export function VoiceTextInputPager({
   promptBlockedActionEnabled = false,
   promptBlockedActionLabel = null,
   promptBlockedMessage = null,
+  readingProgress = null,
   recordingMaxMs,
   recordingStartedAtMs,
   speechStartProgress,
@@ -65,6 +66,7 @@ export function VoiceTextInputPager({
     ),
   );
   const derivedProgress = useOrbTurnProgress({
+    readingProgress,
     recordingMaxMs,
     recordingStartedAtMs: recordingStartedAtMs ?? null,
     speechStartProgress: speechStartProgress ?? null,
@@ -154,11 +156,9 @@ export function VoiceTextInputPager({
               overtime={progress.overtime}
               overtimeTiming={progress.overtimeTiming}
               phase={visualPhase}
-              phaseProgress={
-                visualPhase === "speaking" && playbackPaused
-                  ? 0
-                  : progress.phaseProgress
-              }
+              // Pausing stops a clock, but where the reply has been read to is
+              // a position — it stays put until playback moves again.
+              phaseProgress={progress.phaseProgress}
               phaseProgressTiming={
                 visualPhase === "speaking" && playbackPaused
                   ? undefined

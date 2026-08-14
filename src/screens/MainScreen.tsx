@@ -1111,6 +1111,12 @@ export function MainScreen() {
           onDriveResume: handleContinueDriveSession,
           onDriveStop: handleStopDriveSession,
           onRestart: () => void handleRepeatLastReply(),
+          onSeekBack: player.canSeekParagraph()
+            ? () => void player.seekParagraph("back")
+            : undefined,
+          onSeekForward: player.canSeekParagraph()
+            ? () => void player.seekParagraph("forward")
+            : undefined,
           onStopPlayback: handleStopPlayback,
           onToggleCouncil: ulraMode.handleToggle,
           onToggleWeb: handleToggleWebSearch,
@@ -1170,6 +1176,7 @@ export function MainScreen() {
               ? t("setupGuideConnectProviderTitle")
               : kokoroPromptBlockActionLabel,
           promptBlockedMessage,
+          readingProgress: player.readingProgress,
           recordingMaxMs: maxRecordingMs,
           recordingStartedAtMs,
           speechStartProgress: phaseProgress?.speechStart ?? null,

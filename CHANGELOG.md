@@ -35,8 +35,12 @@ the complete Play Store translations are kept in a dedicated file under
   latest model and age, and Settings lists the routes. Screen readers still
   hear every phase change announced.
 - Restart is live while he speaks: it replays the answer from its first word.
-  Back and Forward stay unavailable until the audio queue can move between
-  paragraphs.
+- Back and Forward now move through the answer by paragraph while he speaks.
+  Back returns to the start of the paragraph being read, or to the previous one
+  when it has only just begun; Forward skips to the next. The orb's ring shows
+  how far through the answer you are and moves by what each paragraph actually
+  holds, so skipping a long paragraph moves it further than skipping a short
+  one.
 - The switch used across settings and the walkthrough is now one shared
   design-system control rather than a settings-owned one.
 - The orb's two rings now say one thing per phase: at rest both fade to the

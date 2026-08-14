@@ -19,6 +19,7 @@ import { useNativeAudioQueueSubscription } from "./audioPlayer/useNativeAudioQue
 import { useNativeSpeechPlayback } from "./audioPlayer/useNativeSpeechPlayback";
 import { usePendingPlaybackState } from "./audioPlayer/usePendingPlaybackState";
 import { usePlaybackLifecycle } from "./audioPlayer/usePlaybackLifecycle";
+import { usePlaybackReel } from "./audioPlayer/usePlaybackReel";
 import { usePlaybackSession } from "./audioPlayer/usePlaybackSession";
 import { useStopPlaybackController } from "./audioPlayer/useStopPlaybackController";
 import {
@@ -408,6 +409,21 @@ export function useAudioPlayer(
     usingNativeAudioQueue,
   ]);
 
+  // The reply's paragraphs, remembered so playback can move between them.
+  const {
+    canSeekParagraph,
+    readingProgress,
+    recordAudio,
+    recordSpeech,
+    seekParagraph,
+  } = usePlaybackReel({
+      enqueueAudio,
+      playbackGenerationRef,
+      resetCancellation,
+      speakText,
+      stopPlayback,
+    });
+
   return {
     isPlaying: hasPendingPlayback,
     isActivelyPlaying:
@@ -416,9 +432,12 @@ export function useAudioPlayer(
       (!usingNativeAudioQueue && status.playing),
     hasPendingPlayback,
     isPlaybackPaused,
-    enqueueAudio,
+    enqueueAudio: recordAudio,
     enqueueSpeechPause,
-    speakText,
+    speakText: recordSpeech,
+    canSeekParagraph,
+    readingProgress,
+    seekParagraph,
     pausePlayback,
     resumePlayback,
     stopPlayback,

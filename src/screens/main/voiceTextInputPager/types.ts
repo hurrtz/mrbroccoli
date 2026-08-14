@@ -44,6 +44,8 @@ export interface VoiceTextInputPagerProps {
   promptBlockedActionEnabled?: boolean;
   promptBlockedActionLabel?: string | null;
   promptBlockedMessage?: string | null;
+  /** 0–1 of the reply already read; drives the speaking arc. */
+  readingProgress?: number | null;
   recordingMaxMs: number;
   recordingStartedAtMs?: number | null;
   speechStartProgress?: VoiceTimingProgress | null;

@@ -133,6 +133,12 @@ native boundary. “Wait” playback emits synthesized results only after respon
 completion. Visual Markdown is deterministically rendered into listenable
 speech before sentence chunking.
 
+Every emitted clip carries what it says and whether it opens a paragraph. The
+player's reel needs both: the text is the weight behind the orb's reading arc,
+and the paragraph flag is where Back and Forward may land. The pipeline is the
+only place that still knows either, since a synthesized clip is a bare URI by
+the time playback sees it.
+
 Native recognizer stop, abort, and file transcription carry bounded watchdogs:
 a platform recognizer that drops its terminal event settles with the latest
 transcript and is forced down instead of wedging voice capture for the rest of

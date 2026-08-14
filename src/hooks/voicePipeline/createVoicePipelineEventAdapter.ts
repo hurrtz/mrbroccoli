@@ -444,7 +444,7 @@ export function createVoicePipelineEventAdapter({
       messageState.lastAssistantMessageIdRef.current =
         assistantMessage?.id ?? null;
     },
-    onAudioReady: (audioData, diagnostics) => {
+    onAudioReady: (audioData, diagnostics, chunk) => {
       if (!isActiveRun()) {
         return;
       }
@@ -487,6 +487,7 @@ export function createVoicePipelineEventAdapter({
         audioData,
         diagnostics,
         handleFirstPlaybackStartedForRun,
+        chunk,
       );
     },
     onAudioPauseReady: (audioData) => {
@@ -496,7 +497,7 @@ export function createVoicePipelineEventAdapter({
 
       player.enqueueAudio(audioData);
     },
-    onSpeechTextReady: (text, voice, diagnostics) => {
+    onSpeechTextReady: (text, voice, diagnostics, startsParagraph) => {
       if (!isActiveRun()) {
         return;
       }
@@ -529,6 +530,7 @@ export function createVoicePipelineEventAdapter({
           : {}),
         diagnostics,
         onPlaybackStarted: handleFirstPlaybackStartedForRun,
+        startsParagraph,
       });
     },
     onSpeechPauseReady: (durationMs) => {

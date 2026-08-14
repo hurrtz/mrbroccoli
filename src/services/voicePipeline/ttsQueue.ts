@@ -49,6 +49,7 @@ export function createVoicePipelineTtsQueue(
   );
   const queuedTasks: Promise<void>[] = [];
   const bufferedResults: {
+    startsParagraph: boolean;
     text: string;
     result: TtsSynthesisResult;
   }[] = [];
@@ -125,13 +126,25 @@ export function createVoicePipelineTtsQueue(
     callbacks.onAudioPauseReady?.(await getInterParagraphPauseAudioUri());
   };
 
-  const emitResult = (text: string, result: TtsSynthesisResult) => {
+  const emitResult = (
+    text: string,
+    result: TtsSynthesisResult,
+    startsParagraph = false,
+  ) => {
     if (result.kind === "native") {
-      callbacks.onSpeechTextReady(text, result.voice, result.diagnostics);
+      callbacks.onSpeechTextReady(
+        text,
+        result.voice,
+        result.diagnostics,
+        startsParagraph,
+      );
       return;
     }
 
-    callbacks.onAudioReady(result.audio, result.diagnostics);
+    callbacks.onAudioReady(result.audio, result.diagnostics, {
+      startsParagraph,
+      text,
+    });
   };
 
   const enqueueTtsChunk = (
@@ -157,11 +170,15 @@ export function createVoicePipelineTtsQueue(
       if (startsParagraph) {
         callbacks.onSpeechPauseReady?.(INTER_PARAGRAPH_PAUSE_MS);
       }
-      emitResult(trimmed, {
-        kind: "native",
-        route: "native",
-        diagnostics: diagnosticsForRoute("native", trimmed, speechLanguage),
-      });
+      emitResult(
+        trimmed,
+        {
+          kind: "native",
+          route: "native",
+          diagnostics: diagnosticsForRoute("native", trimmed, speechLanguage),
+        },
+        startsParagraph,
+      );
       return;
     }
 
@@ -182,14 +199,14 @@ export function createVoicePipelineTtsQueue(
       }
 
       if (bufferUntilComplete) {
-        bufferedResults.push({ text: trimmed, result });
+        bufferedResults.push({ startsParagraph, text: trimmed, result });
         return;
       }
 
       if (startsParagraph) {
         await emitParagraphPause(result);
       }
-      emitResult(trimmed, result);
+      emitResult(trimmed, result, startsParagraph);
     });
 
     outputChain = task.catch(async (error) => {
@@ -284,8 +301,8 @@ export function createVoicePipelineTtsQueue(
       return;
     }
 
-    bufferedResults.forEach(({ text, result }) => {
-      emitResult(text, result);
+    bufferedResults.forEach(({ startsParagraph, text, result }) => {
+      emitResult(text, result, startsParagraph);
     });
   };
 

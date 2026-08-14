@@ -87,12 +87,26 @@ receive already-derived state and callbacks.
   countdown is spoken, never drawn.
 - Restart replays the response from its first word through the same path as a
   transcript replay, and is live only while he speaks.
-- **Open question:** Back and Forward stay disabled until playback can move
-  between paragraphs. The native queue takes whole clips (`prepare`,
-  `enqueue`, `start`, `pause`, `resume`, `stop`) with no seek, but it is
-  chunk-based and reports the item it starts, so paragraph seek can be built
-  in JavaScript: track the playing index, then stop and re-enqueue the tail
-  from the chosen paragraph. Owner: workspace playback work.
+- Back and Forward move between the reply's paragraphs. Back means the start of
+  the paragraph being read, unless it began under two seconds ago, when it
+  means the paragraph before; Forward always means the next paragraph's start.
+  Both are live only once the reply holds more than one paragraph.
+- **Decision:** paragraph seek is built in JavaScript rather than in the native
+  queue. That queue takes whole clips (`prepare`, `enqueue`, `start`, `pause`,
+  `resume`, `stop`) and cannot seek inside one, but it is chunk-based and
+  reports the item it starts, so
+  [`usePlaybackReel`](../../hooks/audioPlayer/usePlaybackReel.ts) remembers the
+  reply's clips, tracks which is playing, and replays the tail from the chosen
+  paragraph. Rejected alternative: a native seek API, which would have needed
+  matching iOS and Android work for a control the queue already makes
+  expressible.
+- While he speaks, the orb's arc carries how much of the reply has been read,
+  weighted by what each paragraph says, so a seek moves the ring by the
+  paragraph it skips rather than by an even step. The arc advances at clip
+  boundaries and only runs backwards when the listener sends it back: neither
+  speech route reports a clip's duration, and a streamed reply grows while it
+  is spoken, so a per-second fill would be invented and an unguarded remeasure
+  would drag the ring back through content already read.
 - **Decision:** the workspace carries no status line and no session-details
   sheet. The orb states the phase visually and announces every phase change to
   assistive technology, the transcript handle names the latest model and age,

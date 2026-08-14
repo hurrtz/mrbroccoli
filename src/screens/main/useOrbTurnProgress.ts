@@ -34,14 +34,24 @@ function clamp01(value: number) {
  * their inner ring rests on the phase tint rather than faking a fraction.
  * The outer ring is the whole turn against the speech-start estimate; past
  * it, overtime rises and the orb fills with red. Speaking holds a full turn
- * ring — the estimate it tracked has been met.
+ * ring — the estimate it tracked has been met — and carries how much of the
+ * reply has been read, so Back and Forward move the arc by what the paragraph
+ * they skip actually holds.
+ *
+ * **Decision:** the speaking arc advances at spoken-clip boundaries rather
+ * than on a clock. Neither the native queue nor the speech engine reports a
+ * clip's duration, so a per-second fill would be an invented rate; the reel's
+ * character weights are a measurement.
  */
 export function useOrbTurnProgress({
+  readingProgress,
   recordingMaxMs,
   recordingStartedAtMs,
   speechStartProgress,
   visualPhase,
 }: {
+  /** 0–1 of the reply already read, weighted by what each paragraph says. */
+  readingProgress?: number | null;
   recordingMaxMs: number;
   recordingStartedAtMs: number | null;
   speechStartProgress: VoiceTimingProgress | null;
@@ -70,7 +80,11 @@ export function useOrbTurnProgress({
   }
 
   if (visualPhase === "speaking") {
-    return { phaseProgress: 0, turnProgress: 1, overtime: 0 };
+    return {
+      phaseProgress: clamp01(readingProgress ?? 0),
+      turnProgress: 1,
+      overtime: 0,
+    };
   }
 
   if (!speechStartProgress) {

@@ -110,9 +110,12 @@ function createPlayerBase() {
     hasPendingPlayback: false,
     isPlaybackPaused: false,
     isPlaying: false,
+    canSeekParagraph: jest.fn(() => false),
     enqueueSpeechPause: jest.fn(),
     pausePlayback: jest.fn(async () => true),
+    readingProgress: null,
     resumePlayback: jest.fn(async () => true),
+    seekParagraph: jest.fn(async () => undefined),
     stopPlayback: jest.fn(async () => undefined),
     resetCancellation: jest.fn(),
     waitForDrain: jest.fn(async () => undefined),
@@ -620,6 +623,9 @@ describe("useVoicePipeline", () => {
         source: "conversation",
       },
       expect.any(Function),
+      // Nothing said which paragraph this clip opens, so the reel is told so
+      // rather than being handed an invented one.
+      undefined,
     );
     expect(result.current.pipelinePhase).toBe("idle");
     expect(result.current.streamingText).toBe("");

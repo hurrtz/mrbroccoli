@@ -34,6 +34,9 @@ interface WorkspaceSatellitesProps {
   onDriveStop?: () => void;
   /** Replays the response from its first word; live only while he speaks. */
   onRestart?: () => void;
+  /** Moves a paragraph back or forward; live only while he speaks. */
+  onSeekBack?: () => void;
+  onSeekForward?: () => void;
   onStopPlayback: () => void;
   onToggleCouncil?: () => void;
   onToggleWeb?: () => void;
@@ -64,6 +67,8 @@ function WorkspaceSatellites({
   onDriveResume,
   onDriveStop,
   onRestart,
+  onSeekBack,
+  onSeekForward,
   disabled,
   imageAvailable,
   imageDisabled,
@@ -147,16 +152,18 @@ function WorkspaceSatellites({
           />
           <OrbSatellite
             compact={compact}
-            disabled
+            disabled={!speaking || !onSeekBack}
             icon="left"
             label={t("transportBack")}
+            onPress={onSeekBack}
             testID="satellite-back"
           />
           <OrbSatellite
             compact={compact}
-            disabled
+            disabled={!speaking || !onSeekForward}
             icon="right"
             label={t("transportForward")}
+            onPress={onSeekForward}
             testID="satellite-forward"
           />
           {driveSession && !driveRunning ? (
