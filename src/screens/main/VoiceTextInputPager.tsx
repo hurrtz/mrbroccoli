@@ -4,7 +4,6 @@ import { AccessibilityInfo, Text, TouchableOpacity, View } from "react-native";
 import { VoiceOrb } from "../../design-system/VoiceOrb";
 import { MessageImageAttachments } from "../../components/MessageImageAttachments";
 import { useOrbTurnProgress } from "./useOrbTurnProgress";
-import { DriveSessionControls } from "./voiceTextInputPager/DriveSessionControls";
 import { InputSurfacePages } from "./voiceTextInputPager/InputSurfacePages";
 import { voiceTextInputPagerStyles as styles } from "./voiceTextInputPager/styles";
 import { VoiceTextInputPagerProps } from "./voiceTextInputPager/types";
@@ -17,19 +16,12 @@ export function VoiceTextInputPager({
   colors,
   compactPromptNotice = false,
   disabled,
-  driveAutoContinueEnabled = false,
-  driveSilenceCountdownSeconds = null,
-  driveSessionCanRepeat = false,
-  driveVoiceActive = false,
   initialSurface = "voice",
   initialTextMessage = "",
   inputMode,
   isActive,
   onInputSurfaceChange,
   onRemoveImage,
-  onDriveContinue,
-  onDriveRepeat,
-  onDriveStop,
   onPress,
   onPressIn,
   onPressOut,
@@ -79,11 +71,6 @@ export function VoiceTextInputPager({
     visualPhase,
   });
   const progress = orbProgressOverride ?? derivedProgress;
-  const showDriveCountdown =
-    inputMode === "drive-session" &&
-    visualPhase === "recording" &&
-    !driveVoiceActive &&
-    driveSilenceCountdownSeconds !== null;
   const showCompactPromptAction =
     compactPromptNotice &&
     Boolean(onResolvePromptBlock) &&
@@ -160,18 +147,6 @@ export function VoiceTextInputPager({
             testID={`voice-stage-${visualPhase}-orb`}
           >
             <VoiceOrb
-              coreLabel={
-                showDriveCountdown
-                  ? String(driveSilenceCountdownSeconds)
-                  : undefined
-              }
-              coreLabelColor={
-                showDriveCountdown &&
-                driveSilenceCountdownSeconds !== null &&
-                driveSilenceCountdownSeconds <= 3
-                  ? colors.danger
-                  : undefined
-              }
               label={statusLabel}
               onPress={inputMode === "push-to-talk" ? undefined : onPress}
               onPressIn={inputMode === "push-to-talk" ? onPressIn : undefined}
@@ -274,19 +249,6 @@ export function VoiceTextInputPager({
         </TouchableOpacity>
       ) : null}
 
-      {inputMode === "drive-session" ? (
-        <DriveSessionControls
-          autoContinueEnabled={driveAutoContinueEnabled}
-          canRepeat={driveSessionCanRepeat}
-          colors={colors}
-          countdownSeconds={driveSilenceCountdownSeconds}
-          disabled={disabled || Boolean(promptBlockedMessage)}
-          onContinue={onDriveContinue}
-          onRepeat={onDriveRepeat}
-          onStop={onDriveStop}
-          t={t}
-        />
-      ) : null}
 
     </View>
   );

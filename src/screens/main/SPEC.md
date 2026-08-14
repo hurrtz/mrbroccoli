@@ -75,6 +75,16 @@ receive already-derived state and callbacks.
   warning, status, and transcript affordance without overlap. Landscape keeps
   the same interactions and the warning's complete accessible name, but the
   constrained blocked-route card shows only its actionable label.
+- **Decision:** the ring under the orb belongs to the phase. Idle carries the
+  composing controls (image, Council, Web); any running turn swaps them for the
+  transport verbs (Restart, Back, Forward, Stop) at the same geometry. A drive
+  session shows transport in every phase, idle included, because the loop must
+  be stoppable at rest, and its Stop becomes Resume. Transport verbs tint their
+  glyph and label only. Drive mode adds no controls of its own and its silence
+  countdown is spoken, never drawn.
+- **Open question:** Restart, Back and Forward stay disabled until the audio
+  queue can seek by paragraph — the player exposes only enqueue, pause, resume
+  and stop. Owner: workspace playback work.
 - **Decision:** the workspace carries no status line and no session-details
   sheet. The orb states the phase visually and announces every phase change to
   assistive technology, the transcript handle names the latest model and age,

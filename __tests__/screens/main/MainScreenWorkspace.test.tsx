@@ -111,8 +111,11 @@ function createWorkspaceProps(t: jest.Mock) {
       disabled: false,
       imageAvailable: true,
       imageDisabled: false,
+      driveRunning: true,
+      driveSession: false,
       onAddImage: jest.fn(),
-      onInterruptPlayback: jest.fn(),
+      onDriveResume: jest.fn(),
+      onDriveStop: jest.fn(),
       onStopPlayback: jest.fn(),
       onToggleCouncil: jest.fn(),
       onToggleWeb: jest.fn(),
@@ -170,6 +173,60 @@ function renderWorkspace(ui: React.ReactElement) {
 }
 
 describe("MainScreenWorkspace streaming isolation", () => {
+  it("gives the satellite ring to the phase and to a drive session", () => {
+    const t = jest.fn((key: string) => key);
+    const base = createWorkspaceProps(t);
+    const transcript = {
+      activeConversationId: null,
+      activeReplayMessageId: null,
+      messages: [],
+      onCopyMessage: jest.fn(async () => true),
+      onRetryMessage: jest.fn(),
+      replayPhase: "idle" as const,
+      scrollEnabled: true,
+      showUsageStats: false,
+      showWhenEmpty: true,
+      t,
+    };
+
+    // Idle composes.
+    const idle = renderWorkspace(
+      <MainScreenWorkspace {...base} transcript={transcript} visualPhase="idle" />,
+    );
+    expect(idle.getByTestId("satellite-council")).toBeTruthy();
+    expect(idle.queryByTestId("satellite-stop")).toBeNull();
+    idle.unmount();
+
+    // A running turn hands the ring to transport; only Stop is live.
+    const turn = renderWorkspace(
+      <MainScreenWorkspace {...base} transcript={transcript} visualPhase="speaking" />,
+    );
+    expect(turn.queryByTestId("satellite-council")).toBeNull();
+    expect(turn.getByTestId("satellite-stop")).toBeTruthy();
+    expect(
+      turn.getByTestId("satellite-restart").props.accessibilityState,
+    ).toEqual(expect.objectContaining({ disabled: true }));
+    turn.unmount();
+
+    // A paused drive session shows transport at idle, ending in Resume.
+    const onDriveResume = jest.fn();
+    const drive = renderWorkspace(
+      <MainScreenWorkspace
+        {...base}
+        satellites={{
+          ...base.satellites,
+          driveRunning: false,
+          driveSession: true,
+          onDriveResume,
+        }}
+        transcript={transcript}
+        visualPhase="idle"
+      />,
+    );
+    fireEvent.press(drive.getByTestId("satellite-resume"));
+    expect(onDriveResume).toHaveBeenCalledTimes(1);
+  });
+
   beforeEach(() => {
     mockRouteBylineRenderCount = 0;
     mockVoicePagerRenderCount = 0;

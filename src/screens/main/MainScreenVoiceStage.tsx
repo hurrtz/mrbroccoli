@@ -18,10 +18,6 @@ interface MainScreenVoiceStageProps {
   colors: Colors;
   compactPromptNotice?: boolean;
   disabled?: boolean;
-  driveAutoContinueEnabled?: boolean;
-  driveSilenceCountdownSeconds?: number | null;
-  driveSessionCanRepeat?: boolean;
-  driveVoiceActive?: boolean;
   initialInputSurface?: InputSurface;
   initialTextMessage?: string;
   attachments?: MessageImageAttachment[];
@@ -32,9 +28,6 @@ interface MainScreenVoiceStageProps {
   maxOrbSize: number;
   onInputSurfaceChange?: (surface: InputSurface) => void;
   onRemoveImage?: (attachmentId: string) => void;
-  onDriveContinue?: () => void | Promise<void>;
-  onDriveRepeat?: () => void | Promise<void>;
-  onDriveStop?: () => void | Promise<void>;
   onPress: () => void;
   onPressIn: () => void;
   onPressOut: () => void;
@@ -62,10 +55,6 @@ export const MainScreenVoiceStage = React.memo(function MainScreenVoiceStage({
   colors,
   compactPromptNotice = false,
   disabled = false,
-  driveAutoContinueEnabled = false,
-  driveSilenceCountdownSeconds = null,
-  driveSessionCanRepeat = false,
-  driveVoiceActive = false,
   initialInputSurface,
   initialTextMessage,
   inputMode,
@@ -74,9 +63,6 @@ export const MainScreenVoiceStage = React.memo(function MainScreenVoiceStage({
   maxOrbSize,
   onInputSurfaceChange,
   onRemoveImage,
-  onDriveContinue,
-  onDriveRepeat,
-  onDriveStop,
   onPress,
   onPressIn,
   onPressOut,
@@ -120,10 +106,6 @@ export const MainScreenVoiceStage = React.memo(function MainScreenVoiceStage({
           colors={colors}
           compactPromptNotice={compactPromptNotice}
           disabled={disabled}
-          driveAutoContinueEnabled={driveAutoContinueEnabled}
-          driveSilenceCountdownSeconds={driveSilenceCountdownSeconds}
-          driveSessionCanRepeat={driveSessionCanRepeat}
-          driveVoiceActive={driveVoiceActive}
           initialSurface={initialInputSurface}
           initialTextMessage={initialTextMessage}
           inputMode={inputMode}
@@ -132,9 +114,6 @@ export const MainScreenVoiceStage = React.memo(function MainScreenVoiceStage({
           maxOrbSize={maxOrbSize}
           onInputSurfaceChange={onInputSurfaceChange}
           onRemoveImage={onRemoveImage}
-          onDriveContinue={onDriveContinue}
-          onDriveRepeat={onDriveRepeat}
-          onDriveStop={onDriveStop}
           onPress={onPress}
           onPressIn={onPressIn}
           onPressOut={onPressOut}

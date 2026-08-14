@@ -30,6 +30,7 @@ export function OrbSatellite({
   active = false,
   compact = false,
   disabled = false,
+  tone = "neutral",
   onPress,
   style,
   testID,
@@ -47,13 +48,21 @@ export function OrbSatellite({
   compact?: boolean;
   /** Briefly unavailable, such as during an active turn. Absent when never usable. */
   disabled?: boolean;
+  /** Transport verbs tint their glyph and label only — never a fill or border. */
+  tone?: "neutral" | "danger" | "success";
   onPress?: () => void;
   style?: StyleProp<ViewStyle>;
   testID?: string;
 }) {
   const { colors } = useTheme();
   const toggle = kind === "toggle";
-  const tint = active ? colors.accent : colors.textSecondary;
+  const toneInk =
+    tone === "danger"
+      ? colors.danger
+      : tone === "success"
+        ? colors.success
+        : null;
+  const tint = toneInk ?? (active ? colors.accent : colors.textSecondary);
 
   return (
     <View style={[compact ? null : styles.column, style]}>
@@ -83,7 +92,7 @@ export function OrbSatellite({
       {compact ? null : (
         <Text
           numberOfLines={1}
-          style={[styles.label, { color: colors.textSecondary }]}
+          style={[styles.label, { color: toneInk ?? colors.textSecondary }]}
         >
           {label}
         </Text>
@@ -117,6 +126,6 @@ const styles = StyleSheet.create({
     textTransform: "uppercase",
   },
   disabled: {
-    opacity: 0.45,
+    opacity: 0.38,
   },
 });

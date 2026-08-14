@@ -34,6 +34,11 @@ the complete Play Store translations are kept in a dedicated file under
   opened: the orb already states the phase, the transcript handle names the
   latest model and age, and Settings lists the routes. Screen readers still
   hear every phase change announced.
+- Drive Session no longer adds its own row of controls: the ring under the orb
+  carries the session's Stop and Resume at every moment, including at rest, and
+  the silence countdown is spoken rather than drawn. The ring itself now
+  belongs to the phase — image, Council and Web while composing; Restart, Back,
+  Forward and Stop once a turn is running.
 - The voice/text pager is now a full circle: swiping in either direction — or
   tapping either chevron — always moves to the other input surface, so a swipe
   is never a dead end.

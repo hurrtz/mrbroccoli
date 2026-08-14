@@ -27,37 +27,48 @@ interface WorkspaceSatellitesProps {
   disabled: boolean;
   imageAvailable: boolean;
   imageDisabled: boolean;
+  driveRunning: boolean;
+  driveSession: boolean;
   onAddImage?: () => void;
-  onInterruptPlayback?: () => void;
+  onDriveResume?: () => void;
+  onDriveStop?: () => void;
   onStopPlayback: () => void;
   onToggleCouncil?: () => void;
   onToggleWeb?: () => void;
-  speaking: boolean;
   t: TranslateFn;
+  turnActive: boolean;
   webActive: boolean;
   webAvailable: boolean;
 }
 
 /**
- * The row of small labelled controls under the orb: attach an image, and the
- * two per-question switches. During speech it also carries the stop and
- * barge-in actions the docked bar used to own, because the orb has one press.
+ * The ring belongs to the phase. At idle it carries the composing controls —
+ * image, council, web — the only moment they mean anything. Once a turn runs
+ * they give way to the transport verbs, and a drive session shows transport in
+ * every phase, idle included, because the loop must be stoppable at rest.
+ *
+ * **Open question:** Restart, Back and Forward stay disabled in every phase
+ * until the audio queue can seek by paragraph; the player exposes only
+ * enqueue, pause, resume and stop today. Owner: workspace playback work.
  */
 function WorkspaceSatellites({
   colors,
   compact = false,
   councilActive,
   councilAvailable,
+  driveRunning,
+  driveSession,
+  onDriveResume,
+  onDriveStop,
   disabled,
   imageAvailable,
   imageDisabled,
   onAddImage,
-  onInterruptPlayback,
   onStopPlayback,
   onToggleCouncil,
   onToggleWeb,
-  speaking,
   t,
+  turnActive,
   webActive,
   webAvailable,
 }: WorkspaceSatellitesProps) {
@@ -70,6 +81,8 @@ function WorkspaceSatellites({
     />
   );
 
+  const composing = !turnActive && !driveSession;
+
   return (
     <View
       style={[
@@ -78,65 +91,93 @@ function WorkspaceSatellites({
       ]}
       testID="workspace-satellites"
     >
-      {!compact ? (
+      {composing ? (
         <>
-          <OrbSatellite
-            accessibilityLabel={t("addImage")}
-            compact={compact}
-            disabled={imageDisabled || !imageAvailable}
-            icon="image"
-            label={t("workspaceImageLabel")}
-            onPress={imageAvailable ? onAddImage : undefined}
-            testID="satellite-image"
-          />
-          {divider}
-        </>
-      ) : null}
-      <OrbSatellite
-        accessibilityLabel={t("ulraMode")}
-        active={councilActive}
-        compact={compact}
-        disabled={disabled || !councilAvailable}
-        icon="council"
-        kind="toggle"
-        label={t("workspaceCouncilLabel")}
-        onPress={councilAvailable ? onToggleCouncil : undefined}
-        testID="satellite-council"
-      />
-      <OrbSatellite
-        accessibilityLabel={t("webSearch")}
-        active={webActive}
-        compact={compact}
-        disabled={disabled || !webAvailable}
-        icon="search"
-        kind="toggle"
-        label={t("workspaceWebLabel")}
-        onPress={webAvailable ? onToggleWeb : undefined}
-        testID="satellite-web"
-      />
-      {speaking ? (
-        <>
-          {divider}
-          <OrbSatellite
-            accessibilityLabel={t("stop")}
-            compact={compact}
-            icon="stop"
-            label={t("stop")}
-            onPress={onStopPlayback}
-            testID="satellite-stop"
-          />
-          {onInterruptPlayback ? (
-            <OrbSatellite
-              accessibilityLabel={t("tapToSpeak")}
-              compact={compact}
-              icon="mic"
-              label={t("tapToSpeak")}
-              onPress={onInterruptPlayback}
-              testID="satellite-interrupt"
-            />
+          {!compact ? (
+            <>
+              <OrbSatellite
+                accessibilityLabel={t("addImage")}
+                compact={compact}
+                disabled={imageDisabled || !imageAvailable}
+                icon="image"
+                label={t("workspaceImageLabel")}
+                onPress={imageAvailable ? onAddImage : undefined}
+                testID="satellite-image"
+              />
+              {divider}
+            </>
           ) : null}
+          <OrbSatellite
+            accessibilityLabel={t("ulraMode")}
+            active={councilActive}
+            compact={compact}
+            disabled={disabled || !councilAvailable}
+            icon="council"
+            kind="toggle"
+            label={t("workspaceCouncilLabel")}
+            onPress={councilAvailable ? onToggleCouncil : undefined}
+            testID="satellite-council"
+          />
+          <OrbSatellite
+            accessibilityLabel={t("webSearch")}
+            active={webActive}
+            compact={compact}
+            disabled={disabled || !webAvailable}
+            icon="search"
+            kind="toggle"
+            label={t("workspaceWebLabel")}
+            onPress={webAvailable ? onToggleWeb : undefined}
+            testID="satellite-web"
+          />
         </>
-      ) : null}
+      ) : (
+        <>
+          <OrbSatellite
+            compact={compact}
+            disabled
+            icon="reload"
+            label={t("transportRestart")}
+            testID="satellite-restart"
+          />
+          <OrbSatellite
+            compact={compact}
+            disabled
+            icon="left"
+            label={t("transportBack")}
+            testID="satellite-back"
+          />
+          <OrbSatellite
+            compact={compact}
+            disabled
+            icon="right"
+            label={t("transportForward")}
+            testID="satellite-forward"
+          />
+          {driveSession && !driveRunning ? (
+            <OrbSatellite
+              accessibilityLabel={t("continueDriveSession")}
+              compact={compact}
+              icon="play"
+              label={t("transportResume")}
+              onPress={onDriveResume}
+              testID="satellite-resume"
+              tone="success"
+            />
+          ) : (
+            <OrbSatellite
+              accessibilityLabel={
+                driveSession ? t("stopDriveSession") : t("stop")
+              }
+              compact={compact}
+              icon="stop"
+              label={t("stop")}
+              onPress={driveSession ? onDriveStop : onStopPlayback}
+              testID="satellite-stop"
+              tone="danger"
+            />
+          )}
+        </>
+      )}
     </View>
   );
 }
@@ -154,7 +195,10 @@ interface MainScreenWorkspaceProps {
     t: TranslateFn;
   };
   routePicker: Omit<React.ComponentProps<typeof RoutePickerSheet>, "t">;
-  satellites: Omit<WorkspaceSatellitesProps, "colors" | "compact" | "speaking">;
+  satellites: Omit<
+    WorkspaceSatellitesProps,
+    "colors" | "compact" | "turnActive"
+  >;
   settingsSummary: {
     accessibilityLabel: string;
     onPress: () => void;
@@ -211,7 +255,6 @@ export function MainScreenWorkspace({
   const { fontScale, height: windowHeight } = useWindowDimensions();
   const useAccessibilityCompactLayout =
     fontScale >= ACCESSIBILITY_COMPACT_FONT_SCALE;
-  const speaking = visualPhase === "speaking";
   const lastAssistant = getLastAssistantMessage(transcript.messages);
   const messageCount = transcript.messages.length;
   // The accessible name always states the real count, from the same list
@@ -265,7 +308,7 @@ export function MainScreenWorkspace({
             <WorkspaceSatellites
               colors={colors}
               compact
-              speaking={speaking}
+              turnActive={visualPhase !== "idle"}
               {...satellites}
             />
           </View>
@@ -332,7 +375,7 @@ export function MainScreenWorkspace({
             <WorkspaceSatellites
               colors={colors}
               compact={useAccessibilityCompactLayout}
-              speaking={speaking}
+              turnActive={visualPhase !== "idle"}
               {...satellites}
             />
           </View>
