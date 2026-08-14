@@ -123,20 +123,23 @@ describe("NativeControls", () => {
     expect(onDone).toHaveBeenCalledTimes(1);
   });
 
-  it("lets a downward drag from the sheet's top band pull it closed", () => {
-    // The grabber promises "pull down to close". Only drags that start in
-    // the top band claim the gesture, so taps and the content's own
-    // scrolling stay untouched; release far or fast enough dismisses.
-    expect(shouldClaimSheetDrag({ dx: 2, dy: 20, startY: 30 })).toBe(true);
-    expect(shouldClaimSheetDrag({ dx: 2, dy: 20, startY: 200 })).toBe(false);
-    expect(shouldClaimSheetDrag({ dx: 2, dy: -20, startY: 30 })).toBe(false);
-    expect(shouldClaimSheetDrag({ dx: 40, dy: 20, startY: 30 })).toBe(false);
-    expect(shouldClaimSheetDrag({ dx: 0, dy: 4, startY: 30 })).toBe(false);
+  it("lets a downward drag on the sheet's handle pull it closed", () => {
+    // The grabber promises "pull down to close"; a decisive downward move on
+    // it claims the gesture, and release far or fast enough dismisses.
+    expect(shouldClaimSheetDrag({ dx: 2, dy: 20 })).toBe(true);
+    expect(shouldClaimSheetDrag({ dx: 2, dy: -20 })).toBe(false);
+    expect(shouldClaimSheetDrag({ dx: 40, dy: 20 })).toBe(false);
+    expect(shouldClaimSheetDrag({ dx: 0, dy: 4 })).toBe(false);
 
     expect(shouldDismissSheetDrag({ dy: 140, vy: 0 })).toBe(true);
     expect(shouldDismissSheetDrag({ dy: 30, vy: 1.2 })).toBe(true);
     expect(shouldDismissSheetDrag({ dy: 30, vy: 0.2 })).toBe(false);
+  });
 
+  it("keeps the pull-to-close gesture off the card the content scrolls in", () => {
+    // A downward drag inside a scrolling transcript is how the reader goes
+    // back through it. The card must not answer that motion, or reading
+    // upwards quickly throws the sheet closed.
     const sheet = renderControl(
       <Modal visible layout="sheet" onClose={jest.fn()} title="Transcript">
         Content
@@ -145,6 +148,10 @@ describe("NativeControls", () => {
     expect(
       sheet.getByTestId("native-dialog-card").props
         .onMoveShouldSetResponderCapture,
+    ).toBeUndefined();
+    expect(
+      sheet.getByTestId("native-sheet-handle").props
+        .onMoveShouldSetResponderCapture,
     ).toBeDefined();
 
     const dialog = renderControl(
@@ -152,10 +159,7 @@ describe("NativeControls", () => {
         Content
       </Modal>,
     );
-    expect(
-      dialog.getByTestId("native-dialog-card").props
-        .onMoveShouldSetResponderCapture,
-    ).toBeUndefined();
+    expect(dialog.queryByTestId("native-sheet-handle")).toBeNull();
   });
 
   it("forwards native dismissal so sibling modal transitions can be sequenced", () => {

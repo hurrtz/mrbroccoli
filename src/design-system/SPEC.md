@@ -85,10 +85,17 @@ framework or hiding platform behavior behind excessive abstraction.
   edge, its bottom padding adds the bottom safe-area inset on top of the
   dialog's flat `20`, so footer actions never land inside the home-indicator
   gesture band. The centred dialog keeps flat `20` padding on every edge.
-  A downward drag that starts in the sheet's top 64-point band follows the
-  finger and closes past 96 points or a fast flick, springing back
-  otherwise; the gesture claims only after slop and only from that band, so
-  taps and the content's own scrolling are untouched. Dialogs never drag.
+  A downward drag on the sheet's handle follows the finger and closes past 96
+  points or a fast flick, springing back otherwise; the gesture claims only
+  after slop, so a tap on the handle still closes the sheet outright.
+  **Decision:** the handle owns pull-to-close and the card does not. A sheet
+  may hold a scroll view, where a downward drag is how the reader goes back
+  through what is already there — the same motion that closes the sheet, and
+  nothing in the touch separates the two intentions. Rejected alternative: a
+  top band of the card, which cannot tell a drag beginning over the first row
+  of a scrolling list from one on the chrome above it. A sheet therefore
+  carries a title or grabber to be draggable at all; one without either keeps
+  its backdrop and its own actions. Dialogs never drag.
 - `Modal.cardStyle` is the narrow escape hatch for an approved feature canvas
   whose sheet deliberately does not use the generic elevated dialog surface or
   padding. The caller still owns safe-area clearance and must keep the default

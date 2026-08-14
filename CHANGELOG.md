@@ -20,10 +20,11 @@ the complete Play Store translations are kept in a dedicated file under
   dialog-padded rectangle; only expanded turn metrics lift onto a surface.
 - The transcript's speaker thread line draws at its intended one-and-a-half
   point weight instead of a hairline that vanished against the canvas.
-- Bottom sheets can now actually be pulled closed: a downward drag from the
-  grabber band follows the finger and releases into a dismiss or a spring
+- Bottom sheets can now actually be pulled closed: a downward drag on the
+  grabber follows the finger and releases into a dismiss or a spring
   back, on the transcript, route picker, image source, and Premium sheets
-  alike. Taps and the content's own scrolling are unaffected.
+  alike. Taps still close outright, and reading back through an open
+  transcript no longer throws the sheet shut — only the grabber closes it.
 - The conversations drawer's header controls keep the approved 14-point
   separation and the docked search keeps its 26-point bottom clearance on
   devices without a gesture bar.
@@ -79,7 +80,8 @@ the complete Play Store translations are kept in a dedicated file under
   Forward and Stop once a turn is running.
 - The voice/text pager is now a full circle: swiping in either direction — or
   tapping either chevron — always moves to the other input surface, so a swipe
-  is never a dead end.
+  is never a dead end. Both directions follow the finger, and the surface
+  you are pulling toward comes in from the side you pull from.
 - Automatic naming's success and failure messages now appear inside the
   conversations drawer where the action was taken; they were previously
   held behind the drawer until it closed, which made a failed naming —

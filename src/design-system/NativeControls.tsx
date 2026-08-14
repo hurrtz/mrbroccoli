@@ -287,24 +287,22 @@ const SHEET_ANIMATION_DURATION = 220;
 // wins under normal conditions; this only fires if that callback is
 // suppressed (app backgrounded mid-animation, native driver interrupted).
 const SHEET_ANIMATION_FAILSAFE_DURATION = SHEET_ANIMATION_DURATION + 100;
-// Drags may begin anywhere in the sheet's top band — the grabber and the
-// header around it — so scrollable content below keeps its own gestures.
-const SHEET_DRAG_ZONE = 64;
 const SHEET_DRAG_SLOP = 6;
 const SHEET_DISMISS_DISTANCE = 96;
 const SHEET_DISMISS_VELOCITY = 0.8;
 
-/** A downward move that starts in the top band claims the sheet drag. */
-export function shouldClaimSheetDrag({
-  dx,
-  dy,
-  startY,
-}: {
-  dx: number;
-  dy: number;
-  startY: number;
-}) {
-  return startY <= SHEET_DRAG_ZONE && dy > SHEET_DRAG_SLOP && dy > Math.abs(dx);
+/**
+ * A downward move on the sheet's handle claims the drag.
+ *
+ * **Decision:** the handle owns the gesture; the card does not. A sheet may
+ * hold a scroll view, and in a scrolling list a downward drag is how the
+ * reader goes back through what was already said — the same motion that
+ * closes the sheet. Nothing about the touch distinguishes the two intentions,
+ * so the surface has to: pulling the thing the user grabs to open it is what
+ * closes it again.
+ */
+export function shouldClaimSheetDrag({ dx, dy }: { dx: number; dy: number }) {
+  return dy > SHEET_DRAG_SLOP && dy > Math.abs(dx);
 }
 
 /** Releasing far or fast enough closes; anything else springs back. */
@@ -358,10 +356,10 @@ export function Modal({
   const sheetProgress = React.useRef(
     new Animated.Value(visible ? 1 : 0),
   ).current;
-  // The grabber's promise is "pull down to close": a downward drag from the
-  // sheet's top band follows the finger and releases into a close or a
-  // spring back. Taps and the content's own scrolling are untouched — the
-  // responder only claims after slop, and only from the top band.
+  // The grabber's promise is "pull down to close": a downward drag on the
+  // handle follows the finger and releases into a close or a spring back.
+  // Taps and the content's own scrolling are untouched — the responder lives
+  // on the handle alone and only claims after slop.
   const sheetDragY = React.useRef(new Animated.Value(0)).current;
   const onCloseRef = React.useRef(onClose);
   onCloseRef.current = onClose;
@@ -381,14 +379,8 @@ export function Modal({
   }, [sheetDragY]);
   const sheetPanResponder = React.useRef(
     PanResponder.create({
-      onMoveShouldSetPanResponderCapture: (event, gesture) =>
-        shouldClaimSheetDrag({
-          dx: gesture.dx,
-          dy: gesture.dy,
-          // The card does not move until the drag is claimed, so the touch's
-          // current position minus its displacement is where it started.
-          startY: event.nativeEvent.locationY - gesture.dy,
-        }),
+      onMoveShouldSetPanResponderCapture: (_event, gesture) =>
+        shouldClaimSheetDrag({ dx: gesture.dx, dy: gesture.dy }),
       onPanResponderMove: (_event, gesture) => {
         sheetDragY.setValue(Math.max(0, gesture.dy));
       },
@@ -510,7 +502,6 @@ export function Modal({
         ) : null}
         <Animated.View
           testID="native-dialog-card"
-          {...(isSheet ? sheetPanResponder.panHandlers : null)}
           style={[
             controlStyles.dialogCard,
             isSheet ? controlStyles.sheetCard : null,
@@ -545,20 +536,25 @@ export function Modal({
           ]}
         >
           {title ? (
-            typeof title === "string" ? (
-              <Text
-                accessibilityRole="header"
-                style={[
-                  controlStyles.dialogTitle,
-                  { color: colors.text },
-                  styles?.header,
-                ]}
-              >
-                {title}
-              </Text>
-            ) : (
-              title
-            )
+            <View
+              testID={isSheet ? "native-sheet-handle" : undefined}
+              {...(isSheet ? sheetPanResponder.panHandlers : null)}
+            >
+              {typeof title === "string" ? (
+                <Text
+                  accessibilityRole="header"
+                  style={[
+                    controlStyles.dialogTitle,
+                    { color: colors.text },
+                    styles?.header,
+                  ]}
+                >
+                  {title}
+                </Text>
+              ) : (
+                title
+              )}
+            </View>
           ) : null}
           <View testID="native-dialog-body" style={controlStyles.dialogBody}>
             {children}
