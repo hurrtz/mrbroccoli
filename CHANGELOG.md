@@ -34,6 +34,9 @@ the complete Play Store translations are kept in a dedicated file under
   opened: the orb already states the phase, the transcript handle names the
   latest model and age, and Settings lists the routes. Screen readers still
   hear every phase change announced.
+- Restart is live while he speaks: it replays the answer from its first word.
+  Back and Forward stay unavailable until the audio queue can move between
+  paragraphs.
 - The switch used across settings and the walkthrough is now one shared
   design-system control rather than a settings-owned one.
 - The orb's two rings now say one thing per phase: at rest both fade to the

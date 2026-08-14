@@ -32,9 +32,12 @@ interface WorkspaceSatellitesProps {
   onAddImage?: () => void;
   onDriveResume?: () => void;
   onDriveStop?: () => void;
+  /** Replays the response from its first word; live only while he speaks. */
+  onRestart?: () => void;
   onStopPlayback: () => void;
   onToggleCouncil?: () => void;
   onToggleWeb?: () => void;
+  speaking: boolean;
   t: TranslateFn;
   turnActive: boolean;
   webActive: boolean;
@@ -60,6 +63,7 @@ function WorkspaceSatellites({
   driveSession,
   onDriveResume,
   onDriveStop,
+  onRestart,
   disabled,
   imageAvailable,
   imageDisabled,
@@ -67,6 +71,7 @@ function WorkspaceSatellites({
   onStopPlayback,
   onToggleCouncil,
   onToggleWeb,
+  speaking,
   t,
   turnActive,
   webActive,
@@ -134,9 +139,10 @@ function WorkspaceSatellites({
         <>
           <OrbSatellite
             compact={compact}
-            disabled
+            disabled={!speaking || !onRestart}
             icon="reload"
             label={t("transportRestart")}
+            onPress={onRestart}
             testID="satellite-restart"
           />
           <OrbSatellite
@@ -197,7 +203,7 @@ interface MainScreenWorkspaceProps {
   routePicker: Omit<React.ComponentProps<typeof RoutePickerSheet>, "t">;
   satellites: Omit<
     WorkspaceSatellitesProps,
-    "colors" | "compact" | "turnActive"
+    "colors" | "compact" | "speaking" | "turnActive"
   >;
   settingsSummary: {
     accessibilityLabel: string;
@@ -319,6 +325,7 @@ export function MainScreenWorkspace({
             <WorkspaceSatellites
               colors={colors}
               compact
+              speaking={visualPhase === "speaking"}
               turnActive={visualPhase !== "idle"}
               {...satellites}
             />
@@ -386,6 +393,7 @@ export function MainScreenWorkspace({
             <WorkspaceSatellites
               colors={colors}
               compact={useAccessibilityCompactLayout}
+              speaking={visualPhase === "speaking"}
               turnActive={visualPhase !== "idle"}
               {...satellites}
             />

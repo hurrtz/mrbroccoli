@@ -113,6 +113,7 @@ function createWorkspaceProps(t: jest.Mock) {
       imageDisabled: false,
       driveRunning: true,
       driveSession: false,
+      onRestart: jest.fn(),
       onAddImage: jest.fn(),
       onDriveResume: jest.fn(),
       onDriveStop: jest.fn(),
@@ -203,8 +204,13 @@ describe("MainScreenWorkspace streaming isolation", () => {
     );
     expect(turn.queryByTestId("satellite-council")).toBeNull();
     expect(turn.getByTestId("satellite-stop")).toBeTruthy();
+    // Restart replays the answer from its first word, live while speaking;
+    // Back and Forward wait on paragraph seek.
     expect(
       turn.getByTestId("satellite-restart").props.accessibilityState,
+    ).toEqual(expect.objectContaining({ disabled: false }));
+    expect(
+      turn.getByTestId("satellite-back").props.accessibilityState,
     ).toEqual(expect.objectContaining({ disabled: true }));
     turn.unmount();
 

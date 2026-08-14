@@ -85,9 +85,14 @@ receive already-derived state and callbacks.
   be stoppable at rest, and its Stop becomes Resume. Transport verbs tint their
   glyph and label only. Drive mode adds no controls of its own and its silence
   countdown is spoken, never drawn.
-- **Open question:** Restart, Back and Forward stay disabled until the audio
-  queue can seek by paragraph — the player exposes only enqueue, pause, resume
-  and stop. Owner: workspace playback work.
+- Restart replays the response from its first word through the same path as a
+  transcript replay, and is live only while he speaks.
+- **Open question:** Back and Forward stay disabled until playback can move
+  between paragraphs. The native queue takes whole clips (`prepare`,
+  `enqueue`, `start`, `pause`, `resume`, `stop`) with no seek, but it is
+  chunk-based and reports the item it starts, so paragraph seek can be built
+  in JavaScript: track the playing index, then stop and re-enqueue the tail
+  from the chosen paragraph. Owner: workspace playback work.
 - **Decision:** the workspace carries no status line and no session-details
   sheet. The orb states the phase visually and announces every phase change to
   assistive technology, the transcript handle names the latest model and age,

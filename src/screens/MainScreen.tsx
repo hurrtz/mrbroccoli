@@ -1110,6 +1110,7 @@ export function MainScreen() {
           onAddImage: imagePromptSubmission.handleAddImage,
           onDriveResume: handleContinueDriveSession,
           onDriveStop: handleStopDriveSession,
+          onRestart: () => void handleRepeatLastReply(),
           onStopPlayback: handleStopPlayback,
           onToggleCouncil: ulraMode.handleToggle,
           onToggleWeb: handleToggleWebSearch,
