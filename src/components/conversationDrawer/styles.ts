@@ -273,6 +273,7 @@ export const styles = StyleSheet.create({
   header: {
     flexDirection: "row",
     alignItems: "center",
+    gap: 14,
     paddingHorizontal: 18,
     paddingBottom: 14,
     borderBottomWidth: 1,

@@ -149,7 +149,18 @@ describe("ConversationDrawer", () => {
         screen.getByTestId("conversation-drawer-new-session").props.style,
       ),
     ).toEqual(expect.objectContaining({ height: 44, borderRadius: 22 }));
-    expect(screen.getByTestId("conversation-drawer-search-dock")).toBeTruthy();
+    // Header controls sit 14pt apart and the docked search keeps the kit's
+    // 26pt clearance even without a bottom safe-area inset.
+    expect(
+      StyleSheet.flatten(
+        screen.getByTestId("conversation-drawer-header").props.style,
+      ),
+    ).toEqual(expect.objectContaining({ gap: 14 }));
+    expect(
+      StyleSheet.flatten(
+        screen.getByTestId("conversation-drawer-search-dock").props.style,
+      ),
+    ).toEqual(expect.objectContaining({ paddingBottom: 26 }));
   });
 
   it("exposes every conversation action as a labeled button", async () => {

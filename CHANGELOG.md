@@ -19,6 +19,9 @@ the complete Play Store translations are kept in a dedicated file under
   grabber band follows the finger and releases into a dismiss or a spring
   back, on the transcript, route picker, image source, and Premium sheets
   alike. Taps and the content's own scrolling are unaffected.
+- The conversations drawer's header controls keep the approved 14-point
+  separation and the docked search keeps its 26-point bottom clearance on
+  devices without a gesture bar.
 - Fixed the session details, conversation settings, and voice picker scrims
   using a fixed light dimming color instead of the theme's overlay, so they
   now match every other modal in both light and dark appearance.

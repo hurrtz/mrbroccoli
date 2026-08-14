@@ -23,6 +23,7 @@ export function ConversationDrawerHeader({
 
   return (
     <View
+      testID="conversation-drawer-header"
       style={[
         styles.header,
         {
@@ -102,7 +103,7 @@ export function ConversationDrawerSearch({
         {
           backgroundColor: colors.background,
           borderTopColor: colors.border,
-          paddingBottom: Math.max(insets.bottom, 16),
+          paddingBottom: Math.max(insets.bottom, 26),
         },
       ]}
     >
