@@ -151,6 +151,8 @@ export function TranscriptPreviewCard({
 
   const usesCanvasPresentation =
     layout === "landscape" || presentation === "canvas";
+  const usesPortraitSheetPresentation =
+    layout === "portrait" && presentation === "canvas";
   return (
     <View
       testID="transcript-preview-card"
@@ -182,7 +184,12 @@ export function TranscriptPreviewCard({
           messages={visibleMessages}
           emptyTitle={t("noTranscriptYet")}
           emptyDescription={t("previewTranscriptEmptyDescription")}
-          contentContainerStyle={styles.previewTranscriptContent}
+          contentContainerStyle={[
+            styles.previewTranscriptContent,
+            usesPortraitSheetPresentation
+              ? styles.portraitSheetTranscriptContent
+              : null,
+          ]}
           messageSelectionEnabled
           scrollEnabled={scrollEnabled}
           showUsageStats={showUsageStats}

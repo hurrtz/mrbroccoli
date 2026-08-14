@@ -83,10 +83,12 @@ receive already-derived state and callbacks.
   when usage details are enabled. Swiping a row exposes explicit removal.
   In portrait the transcript demotes to a peeking handle at the bottom edge
   whose metadata names the latest model and localized age, with the same safe
-  timestamp fallback on runtimes without relative-time formatting. It opens as
-  a sheet over the workspace with one grip, conversation title, and labelled
-  close action; it does not repeat image or conversation-setting controls and
-  has no footer close action. In landscape it stays inline in the right pane.
+  timestamp fallback on runtimes without relative-time formatting. It opens
+  over the workspace as one continuous canvas with an 18-point horizontal
+  gutter. Its only chrome is the grip, which is also the labelled close action;
+  it has no repeated conversation title, image or conversation-setting
+  controls, or footer close action. Expanded turn metrics are the only raised
+  surface inside the script. In landscape it stays inline in the right pane.
   Actions inside the portrait sheet that open Speaking settings dismiss the
   transcript completely before presenting the sibling modal. The same
   sequencing applies in reverse: Data & privacy closes

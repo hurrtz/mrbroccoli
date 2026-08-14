@@ -182,11 +182,13 @@ The portrait transcript handle derives the latest assistant model and
 localized relative age in `mainScreenViewModel.ts`. The formatter feature-tests
 `Intl.RelativeTimeFormat` because some Hermes Release runtimes omit it; those
 runtimes receive a compact localized time or date from `Intl.DateTimeFormat`
-instead, with an ISO timestamp as the last non-throwing fallback. Its sheet
-owns the only conversation title and close action; `TranscriptPreviewCard`
-owns only the scrolling script and message actions, so it cannot duplicate
-image, style, or sheet-dismiss controls. Landscape mounts that same headerless
-transcript content directly in the right pane.
+instead, with an ISO timestamp as the last non-throwing fallback. The portrait
+sheet replaces the generic elevated-card fill and dialog spacing with the
+transcript canvas: an 18-point outer gutter, a compact 6-point list inset, and
+the 44-point labelled grip as its only chrome. `TranscriptPreviewCard` owns only
+the scrolling script and message actions, so it cannot duplicate image, style,
+or sheet-dismiss controls. Landscape mounts that same headerless transcript
+content directly in the right pane.
 
 ## Evidence
 

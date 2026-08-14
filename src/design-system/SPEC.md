@@ -80,6 +80,10 @@ framework or hiding platform behavior behind excessive abstraction.
   edge, its bottom padding adds the bottom safe-area inset on top of the
   dialog's flat `20`, so footer actions never land inside the home-indicator
   gesture band. The centred dialog keeps flat `20` padding on every edge.
+- `Modal.cardStyle` is the narrow escape hatch for an approved feature canvas
+  whose sheet deliberately does not use the generic elevated dialog surface or
+  padding. The caller still owns safe-area clearance and must keep the default
+  modal behavior unchanged for every other surface.
 - `Modal` calls `useSafeAreaInsets()` unconditionally for every layout, not
   only `"sheet"`. Every dialog therefore depends on a `SafeAreaProvider`
   ancestor; in this app that is supplied by Expo Router's `ExpoRoot`. Do not

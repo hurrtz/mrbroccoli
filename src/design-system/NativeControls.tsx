@@ -288,6 +288,7 @@ const SHEET_ANIMATION_DURATION = 220;
 const SHEET_ANIMATION_FAILSAFE_DURATION = SHEET_ANIMATION_DURATION + 100;
 
 interface DialogProps {
+  cardStyle?: StyleProp<ViewStyle>;
   children?: React.ReactNode;
   footer?: DialogAction[];
   layout?: "dialog" | "sheet";
@@ -305,6 +306,7 @@ interface DialogProps {
 }
 
 export function Modal({
+  cardStyle,
   children,
   footer = [],
   layout = "dialog",
@@ -457,6 +459,7 @@ export function Modal({
               borderColor: colors.border,
               shadowColor: colors.glow,
             },
+            cardStyle,
           ]}
         >
           {title ? (

@@ -1,7 +1,7 @@
 import React from "react";
 
 import { fireEvent, render, waitFor } from "@testing-library/react-native";
-import { StyleSheet } from "react-native";
+import { StyleSheet, type StyleProp, type ViewStyle } from "react-native";
 
 import { TranscriptPreviewCard } from "../../../src/screens/main/TranscriptPreviewCard";
 import { lightColors } from "../../../src/theme/colors";
@@ -16,6 +16,7 @@ jest.mock("../../../src/components/ChatTranscript", () => ({
     onShareMessage,
     scrollToLatestRequest,
     branchChildrenByMessageId,
+    contentContainerStyle,
     onOpenBranches,
   }: {
     messages: {
@@ -47,6 +48,7 @@ jest.mock("../../../src/components/ChatTranscript", () => ({
     onShareMessage?: () => void;
     scrollToLatestRequest?: number;
     branchChildrenByMessageId?: ReadonlyMap<string, unknown[]>;
+    contentContainerStyle?: StyleProp<ViewStyle>;
     onOpenBranches?: (branches: unknown[]) => void;
   }) => {
     const React = require("react");
@@ -64,6 +66,10 @@ jest.mock("../../../src/components/ChatTranscript", () => ({
         null,
         `messages:${messages.map(({ id }) => id).join(",")}`,
       ),
+      React.createElement(View, {
+        style: contentContainerStyle,
+        testID: "mock-transcript-content",
+      }),
       onEditMessage && messages[0]
         ? React.createElement(
             Pressable,
@@ -143,6 +149,17 @@ describe("TranscriptPreviewCard", () => {
     expect(screen.queryByTestId("transcript-preview-header")).toBeNull();
     expect(screen.queryByTestId("attach-image-control")).toBeNull();
     expect(screen.queryByTestId("conversation-style-control")).toBeNull();
+    expect(
+      StyleSheet.flatten(
+        screen.getByTestId("mock-transcript-content").props.style,
+      ),
+    ).toEqual(
+      expect.objectContaining({
+        paddingBottom: 24,
+        paddingHorizontal: 0,
+        paddingTop: 6,
+      }),
+    );
   });
 
   it("applies a preferred height as the flex basis so the sheet cannot collapse it", () => {

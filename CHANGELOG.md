@@ -10,6 +10,9 @@ the complete Play Store translations are kept in a dedicated file under
 
 ## Unreleased
 
+- The transcript sheet now uses one continuous canvas color and the approved
+  18-point gutter instead of nesting the script inside a differently colored,
+  dialog-padded rectangle; only expanded turn metrics lift onto a surface.
 - Fixed the session details, conversation settings, and voice picker scrims
   using a fixed light dimming color instead of the theme's overlay, so they
   now match every other modal in both light and dark appearance.
@@ -17,8 +20,8 @@ the complete Play Store translations are kept in a dedicated file under
   system instead of near-black, and the text field grows to 116 points before
   scrolling.
 - The empty transcript now shows the conversation glyph in a quiet circle with
-  the design system's type sizes, the transcript sheet title uses the headline
-  face and opens taller, and turn metrics align to the standard label column.
+  the design system's type sizes, and turn metrics align to the standard label
+  column.
 - The home screen's setup notice no longer draws a red border around its
   invitation; the warning glyph alone carries the tone. Settings rows dim while
   pressed, the sessions search field matches the standard input shape, the

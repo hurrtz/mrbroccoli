@@ -185,6 +185,11 @@ export const styles = StyleSheet.create({
     paddingHorizontal: 4,
     paddingBottom: 18,
   },
+  portraitSheetTranscriptContent: {
+    paddingTop: 6,
+    paddingHorizontal: 0,
+    paddingBottom: 24,
+  },
   voiceDock: {
     flex: 1,
     minHeight: 0,

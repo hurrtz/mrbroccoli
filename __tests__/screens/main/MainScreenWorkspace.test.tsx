@@ -515,6 +515,25 @@ describe("MainScreenWorkspace streaming isolation", () => {
     expect(screen.queryByText("Streaming test")).toBeNull();
     const grabber = screen.getByTestId("transcript-sheet-close");
     expect(grabber.props.accessibilityRole).toBe("button");
+    expect(
+      StyleSheet.flatten(
+        screen.getByTestId("native-dialog-card").props.style,
+      ),
+    ).toEqual(
+      expect.objectContaining({
+        backgroundColor: lightColors.background,
+        gap: 0,
+        paddingHorizontal: 18,
+        paddingTop: 0,
+      }),
+    );
+    expect(StyleSheet.flatten(grabber.props.style)).toEqual(
+      expect.objectContaining({
+        marginHorizontal: -18,
+        marginTop: 0,
+        minHeight: 44,
+      }),
+    );
     fireEvent.press(grabber);
     expect(onClose).toHaveBeenCalledTimes(1);
   });

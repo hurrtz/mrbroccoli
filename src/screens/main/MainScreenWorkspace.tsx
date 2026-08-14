@@ -408,6 +408,10 @@ export function MainScreenWorkspace({
       />
 
       <Modal
+        cardStyle={[
+          workspaceStyles.transcriptSheetCard,
+          { backgroundColor: colors.background },
+        ]}
         layout="sheet"
         onClose={transcriptSheet.onClose}
         onDismiss={transcriptSheet.onDismiss}
@@ -466,9 +470,14 @@ const workspaceStyles = StyleSheet.create({
     marginHorizontal: 0,
   },
   // A 44pt grab-and-close target around the 38x4 handle.
+  transcriptSheetCard: {
+    gap: 0,
+    paddingHorizontal: 18,
+    paddingTop: 0,
+  },
   transcriptSheetHeader: {
-    marginHorizontal: -20,
-    marginTop: -10,
+    marginHorizontal: -18,
+    marginTop: 0,
     minHeight: 44,
     justifyContent: "center",
   },
