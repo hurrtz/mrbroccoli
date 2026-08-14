@@ -179,7 +179,11 @@ receive already-derived state and callbacks.
   are only briefly unavailable, such as during an active turn, also stay
   visible and disabled.
 - The satellites — image attach, Model Council, and Web Search — sit in a row
-  under the portrait orb. They change how the next turn is answered, so they
+  under the portrait orb. The orb or composer and that row form one vertically
+  centered stage cluster with the design-system's 18-point separation; surplus
+  height surrounds the cluster instead of opening a device-dependent gap or
+  pushing the controls down against the transcript handle. They change how the
+  next turn is answered, so they
   read as notes on that action rather than settings to pass through on the way in.
   Toggles carry a squircle well that tints when on; momentary actions stay
   borderless. During speech the row also carries the stop and barge-in

@@ -4,6 +4,7 @@ import {
   VoiceTimingProgress,
   VoiceVisualPhase,
 } from "../../../types";
+import type { ReactNode } from "react";
 import { Colors } from "../../../theme/colors";
 import { TranslateFn } from "../shared";
 import type { OrbTurnProgress } from "../useOrbTurnProgress";
@@ -19,6 +20,8 @@ export interface VoiceTextInputPagerProps {
   driveSilenceCountdownSeconds?: number | null;
   driveSessionCanRepeat?: boolean;
   driveVoiceActive?: boolean;
+  /** Portrait controls that stay attached to the measured orb/composer slot. */
+  footer?: ReactNode;
   initialSurface?: InputSurface;
   initialTextMessage?: string;
   inputMode: InputMode;

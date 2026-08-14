@@ -284,6 +284,80 @@ export function MainScreenWorkspace({
     ...landscapeTopBar
   } = topBar;
   const { t: routePickerTranslate, ...routeCardProps } = routeCard;
+  const {
+    councilActive,
+    councilAvailable,
+    disabled: satellitesDisabled,
+    driveRunning,
+    driveSession,
+    imageAvailable,
+    imageDisabled,
+    onAddImage,
+    onDriveResume,
+    onDriveStop,
+    onRestart,
+    onSeekBack,
+    onSeekForward,
+    onStopPlayback,
+    onToggleCouncil,
+    onToggleWeb,
+    t: translateSatellite,
+    webActive,
+    webAvailable,
+  } = satellites;
+  const portraitSatellites = React.useMemo(
+    () => (
+      <WorkspaceSatellites
+        colors={colors}
+        compact={useAccessibilityCompactLayout}
+        councilActive={councilActive}
+        councilAvailable={councilAvailable}
+        disabled={satellitesDisabled}
+        driveRunning={driveRunning}
+        driveSession={driveSession}
+        imageAvailable={imageAvailable}
+        imageDisabled={imageDisabled}
+        onAddImage={onAddImage}
+        onDriveResume={onDriveResume}
+        onDriveStop={onDriveStop}
+        onRestart={onRestart}
+        onSeekBack={onSeekBack}
+        onSeekForward={onSeekForward}
+        onStopPlayback={onStopPlayback}
+        onToggleCouncil={onToggleCouncil}
+        onToggleWeb={onToggleWeb}
+        speaking={visualPhase === "speaking"}
+        t={translateSatellite}
+        turnActive={visualPhase !== "idle"}
+        webActive={webActive}
+        webAvailable={webAvailable}
+      />
+    ),
+    [
+      colors,
+      councilActive,
+      councilAvailable,
+      driveRunning,
+      driveSession,
+      imageAvailable,
+      imageDisabled,
+      onAddImage,
+      onDriveResume,
+      onDriveStop,
+      onRestart,
+      onSeekBack,
+      onSeekForward,
+      onStopPlayback,
+      onToggleCouncil,
+      onToggleWeb,
+      satellitesDisabled,
+      translateSatellite,
+      useAccessibilityCompactLayout,
+      visualPhase,
+      webActive,
+      webAvailable,
+    ],
+  );
 
   if (isLandscape) {
     return (
@@ -336,7 +410,6 @@ export function MainScreenWorkspace({
               {...satellites}
             />
           </View>
-
         </View>
 
         <View
@@ -391,20 +464,13 @@ export function MainScreenWorkspace({
           >
             <MainScreenVoiceStage
               colors={colors}
+              footer={portraitSatellites}
               // The banner row borrows vertical room from the stage; the orb
               // steps down rather than squeezing the caption or satellites.
               maxOrbSize={introBanner.visible ? 156 : 196}
               {...voiceStage}
             />
-            <WorkspaceSatellites
-              colors={colors}
-              compact={useAccessibilityCompactLayout}
-              speaking={visualPhase === "speaking"}
-              turnActive={visualPhase !== "idle"}
-              {...satellites}
-            />
           </View>
-
         </View>
       </View>
 

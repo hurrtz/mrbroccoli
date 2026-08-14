@@ -60,7 +60,6 @@ export const styles = StyleSheet.create({
   portraitInputSection: {
     flex: 1,
     minHeight: 0,
-    gap: 16,
   },
   landscapeShell: {
     flex: 1,

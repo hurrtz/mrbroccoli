@@ -1,6 +1,6 @@
 import React from "react";
 import { act, fireEvent, render } from "@testing-library/react-native";
-import { AccessibilityInfo, Keyboard, StyleSheet } from "react-native";
+import { AccessibilityInfo, Keyboard, StyleSheet, View } from "react-native";
 
 import { Circle } from "react-native-svg";
 
@@ -171,6 +171,38 @@ function createProps(overrides: Record<string, unknown> = {}) {
 }
 
 describe("MainScreenVoiceStage composer", () => {
+  it("centres portrait controls with a bounded orb slot", () => {
+    const screen = renderStage(
+      <MainScreenVoiceStage
+        {...createProps({
+          footer: <View testID="portrait-stage-controls" />,
+        })}
+      />,
+    );
+
+    expect(
+      StyleSheet.flatten(
+        screen.getByTestId("voice-text-input-stage").props.style,
+      ),
+    ).toMatchObject({ justifyContent: "center" });
+    expect(
+      StyleSheet.flatten(
+        screen.getByTestId("voice-text-input-viewport").props.style,
+      ),
+    ).toMatchObject({
+      flexBasis: 196,
+      flexGrow: 0,
+      flexShrink: 1,
+      maxHeight: 196,
+    });
+    expect(
+      StyleSheet.flatten(
+        screen.getByTestId("voice-text-input-footer").props.style,
+      ),
+    ).toMatchObject({ marginTop: 16 });
+    expect(screen.getByTestId("portrait-stage-controls")).toBeTruthy();
+  });
+
   it("previews prompt images without owning the add control", () => {
     const onRemoveImage = jest.fn();
     const screen = renderStage(
@@ -368,9 +400,7 @@ describe("MainScreenVoiceStage composer", () => {
   it("fills the enabled send control with the accent and caps the field at 116", () => {
     // Design-system composer contract: 46pt circular send in the accent with
     // on-active-control ink, and the text field capped at 116pt.
-    const screen = renderStage(
-      <MainScreenVoiceStage {...createProps({})} />,
-    );
+    const screen = renderStage(<MainScreenVoiceStage {...createProps({})} />);
 
     fireEvent.press(screen.getByTestId("pager-chevron-right"));
     const input = screen.getByPlaceholderText("Type a message");
@@ -611,9 +641,7 @@ describe("MainScreenVoiceStage composer", () => {
       .mockImplementation(() => 0);
     const onInputSurfaceChange = jest.fn();
     const screen = renderStage(
-      <MainScreenVoiceStage
-        {...createProps({ onInputSurfaceChange })}
-      />,
+      <MainScreenVoiceStage {...createProps({ onInputSurfaceChange })} />,
     );
     fireEvent(screen.getByTestId("voice-text-input-viewport"), "layout", {
       nativeEvent: { layout: { width: 320 } },

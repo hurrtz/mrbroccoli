@@ -10,6 +10,9 @@ export const voiceTextInputPagerStyles = StyleSheet.create({
     width: "100%",
     gap: 2,
   },
+  rootWithFooter: {
+    justifyContent: "center",
+  },
   viewport: {
     width: "100%",
     minHeight: 68,
@@ -22,6 +25,10 @@ export const voiceTextInputPagerStyles = StyleSheet.create({
     overflow: "hidden",
     position: "relative",
     width: "100%",
+  },
+  viewportWithFooter: {
+    flexGrow: 0,
+    flexShrink: 1,
   },
   track: {
     flexDirection: "row",
@@ -128,5 +135,10 @@ export const voiceTextInputPagerStyles = StyleSheet.create({
   },
   promptBlockedAction: {
     ...textStyles.compactAction,
+  },
+  footer: {
+    flexShrink: 0,
+    marginTop: 16,
+    width: "100%",
   },
 });

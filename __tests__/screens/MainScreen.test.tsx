@@ -296,6 +296,7 @@ jest.mock("../../src/screens/main/MainScreenVoiceStage", () => ({
   },
   MainScreenVoiceStage: ({
     disabled,
+    footer,
     initialInputSurface,
     onAddImage,
     onResolvePromptBlock,
@@ -304,6 +305,7 @@ jest.mock("../../src/screens/main/MainScreenVoiceStage", () => ({
     promptBlockedMessage,
   }: {
     disabled?: boolean;
+    footer?: React.ReactNode;
     initialInputSurface?: string;
     onAddImage?: () => void;
     onResolvePromptBlock?: () => void;
@@ -349,6 +351,7 @@ jest.mock("../../src/screens/main/MainScreenVoiceStage", () => ({
             `prompt-blocked-action:${promptBlockedActionLabel}`,
           )
         : null,
+      footer,
     );
   },
 }));

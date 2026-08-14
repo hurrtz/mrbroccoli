@@ -10,6 +10,9 @@ the complete Play Store translations are kept in a dedicated file under
 
 ## Unreleased
 
+- The Image, Council, and Web row now stays directly beneath the orb as one
+  centered action cluster instead of drifting toward the transcript on tall
+  phones.
 - The first-run introduction no longer lets step dots or horizontal swipes
   bypass the required Thinking setup before the live voice test.
 - The transcript sheet now uses one continuous canvas color and the approved

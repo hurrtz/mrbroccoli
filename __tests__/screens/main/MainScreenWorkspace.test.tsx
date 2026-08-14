@@ -46,16 +46,18 @@ jest.mock("../../../src/screens/main/MainScreenRouteByline", () => ({
 jest.mock("../../../src/screens/main/VoiceTextInputPager", () => ({
   VoiceTextInputPager: ({
     compactPromptNotice = false,
+    footer,
     maxOrbSize,
   }: {
     compactPromptNotice?: boolean;
+    footer?: React.ReactNode;
     maxOrbSize?: number;
   }) => {
     const React = require("react");
-    const { Text } = require("react-native");
+    const { Text, View } = require("react-native");
     mockVoicePagerRenderCount += 1;
     return React.createElement(
-      Text,
+      View,
       {
         accessibilityHint: String(maxOrbSize),
         accessibilityValue: {
@@ -63,7 +65,8 @@ jest.mock("../../../src/screens/main/VoiceTextInputPager", () => ({
         },
         testID: "voice-text-input-pager",
       },
-      "voice-text-input-pager",
+      React.createElement(Text, null, "voice-text-input-pager"),
+      footer,
     );
   },
 }));
@@ -194,7 +197,11 @@ describe("MainScreenWorkspace streaming isolation", () => {
 
     // Idle composes.
     const idle = renderWorkspace(
-      <MainScreenWorkspace {...base} transcript={transcript} visualPhase="idle" />,
+      <MainScreenWorkspace
+        {...base}
+        transcript={transcript}
+        visualPhase="idle"
+      />,
     );
     expect(idle.getByTestId("satellite-council")).toBeTruthy();
     expect(idle.queryByTestId("satellite-stop")).toBeNull();
@@ -202,7 +209,11 @@ describe("MainScreenWorkspace streaming isolation", () => {
 
     // A running turn hands the ring to transport; only Stop is live.
     const turn = renderWorkspace(
-      <MainScreenWorkspace {...base} transcript={transcript} visualPhase="speaking" />,
+      <MainScreenWorkspace
+        {...base}
+        transcript={transcript}
+        visualPhase="speaking"
+      />,
     );
     expect(turn.queryByTestId("satellite-council")).toBeNull();
     expect(turn.getByTestId("satellite-stop")).toBeTruthy();
@@ -474,9 +485,11 @@ describe("MainScreenWorkspace streaming isolation", () => {
 
     expect(mockRouteBylineRenderCount).toBe(1);
     expect(mockVoicePagerRenderCount).toBe(1);
-    // The satellites sit with the input they modify, under the orb.
+    // The satellites belong to the measured voice-stage cluster. Keeping them
+    // inside it prevents tall screens from donating all spare height between
+    // the orb and the row while the row drifts toward the transcript handle.
     expect(
-      within(screen.getByTestId("portrait-input-section")).getByTestId(
+      within(screen.getByTestId("voice-stage-thinking")).getByTestId(
         "workspace-satellites",
       ),
     ).toBeTruthy();
@@ -484,6 +497,7 @@ describe("MainScreenWorkspace streaming isolation", () => {
     screen.rerender(
       <MainScreenWorkspace
         {...workspaceProps}
+        satellites={{ ...workspaceProps.satellites }}
         transcript={{
           ...transcriptBase,
           messages: [storedMessage, streamingMessage],
@@ -581,9 +595,7 @@ describe("MainScreenWorkspace streaming isolation", () => {
     const grabber = screen.getByTestId("transcript-sheet-close");
     expect(grabber.props.accessibilityRole).toBe("button");
     expect(
-      StyleSheet.flatten(
-        screen.getByTestId("native-dialog-card").props.style,
-      ),
+      StyleSheet.flatten(screen.getByTestId("native-dialog-card").props.style),
     ).toEqual(
       expect.objectContaining({
         backgroundColor: lightColors.background,

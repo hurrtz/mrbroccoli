@@ -204,13 +204,19 @@ transition. A horizontal swipe changes only the visible page, preserving focus
 and keyboard state so the workspace does not jump vertically at gesture end.
 The portrait pager measures one central stage and derives the largest orb that
 fits its height and the width between the two 44pt chevrons, clamped from 96pt
-to the portrait ceiling. The text composer replaces the orb rather than adding
-a second competing call to action. Chevron selection and swipe settling use a
-220ms timing transition; no workspace pager motion springs or bounces. The
-three portrait satellite slots remain mounted below it and receive their
-enabled state independently, keeping the stage stable as route capabilities
-change. Landscape uses the same measurement under its lower ceiling, retains
-only Council and Web below the orb, and omits the portrait settings sentence.
+to the portrait ceiling. Its viewport is bounded by that ceiling and the three
+satellite slots mount as the pager's footer, so flexbox centers the complete
+orb-or-composer plus controls cluster instead of assigning tall-screen surplus
+between those two parts. The footer's 16pt margin combines with the pager's 2pt
+child gap to preserve the design-system's 18pt separation when no blocking
+notice intervenes; a route notice stays between the primary action and those
+next-turn controls. The text composer replaces the orb rather than adding a
+second competing call to action. Chevron selection and swipe settling use a
+220ms timing transition; no workspace pager motion springs or bounces.
+Satellite enabled state remains independent, keeping the stage stable as route
+capabilities change. Landscape uses the same measurement under its lower
+ceiling, retains only Council and Web below the orb, and omits the portrait
+settings sentence.
 
 When the native font scale reaches the accessibility-large range, the portrait
 composition switches optional chrome to its existing compact forms: the

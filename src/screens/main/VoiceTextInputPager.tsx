@@ -16,10 +16,12 @@ export function VoiceTextInputPager({
   colors,
   compactPromptNotice = false,
   disabled,
+  footer,
   initialSurface = "voice",
   initialTextMessage = "",
   inputMode,
   isActive,
+  layout,
   onInputSurfaceChange,
   onRemoveImage,
   onPress,
@@ -104,7 +106,10 @@ export function VoiceTextInputPager({
   };
 
   return (
-    <View style={styles.root}>
+    <View
+      style={[styles.root, footer ? styles.rootWithFooter : null]}
+      testID="voice-text-input-stage"
+    >
       <MessageImageAttachments
         attachments={attachments}
         colors={colors}
@@ -115,7 +120,15 @@ export function VoiceTextInputPager({
       <View
         testID="voice-text-input-viewport"
         onLayout={handleViewportLayout}
-        style={styles.viewportFlexible}
+        style={[
+          styles.viewportFlexible,
+          footer && layout === "portrait"
+            ? [
+                styles.viewportWithFooter,
+                { flexBasis: maxOrbSize, maxHeight: maxOrbSize },
+              ]
+            : null,
+        ]}
       >
         <InputSurfacePages
           activeSurface={pager.activeSurface}
@@ -251,7 +264,11 @@ export function VoiceTextInputPager({
         </TouchableOpacity>
       ) : null}
 
-
+      {footer ? (
+        <View style={styles.footer} testID="voice-text-input-footer">
+          {footer}
+        </View>
+      ) : null}
     </View>
   );
 }

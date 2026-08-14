@@ -18,6 +18,8 @@ interface MainScreenVoiceStageProps {
   colors: Colors;
   compactPromptNotice?: boolean;
   disabled?: boolean;
+  /** Portrait controls centred with the orb/composer as one measured cluster. */
+  footer?: React.ReactNode;
   initialInputSurface?: InputSurface;
   initialTextMessage?: string;
   attachments?: MessageImageAttachment[];
@@ -57,6 +59,7 @@ export const MainScreenVoiceStage = React.memo(function MainScreenVoiceStage({
   colors,
   compactPromptNotice = false,
   disabled = false,
+  footer,
   initialInputSurface,
   initialTextMessage,
   inputMode,
@@ -110,6 +113,7 @@ export const MainScreenVoiceStage = React.memo(function MainScreenVoiceStage({
           colors={colors}
           compactPromptNotice={compactPromptNotice}
           disabled={disabled}
+          footer={footer}
           initialSurface={initialInputSurface}
           initialTextMessage={initialTextMessage}
           inputMode={inputMode}
