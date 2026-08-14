@@ -182,7 +182,7 @@ jest.mock("../../src/hooks/useNativeSpeechRecognizer", () => ({
 
 jest.mock("../../src/hooks/useAudioPlayer", () => ({
   useAudioPlayer: jest.fn(() => ({
-    canSeekParagraph: jest.fn(() => false),
+    canSeekParagraph: false,
     isPlaybackPaused: false,
     isPlaying: false,
     pausePlayback: jest.fn(async () => true),

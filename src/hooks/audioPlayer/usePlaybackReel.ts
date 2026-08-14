@@ -75,6 +75,10 @@ export function usePlaybackReel({
   const startedAtRef = useRef(0);
   const floorRef = useRef(0);
   const [readingProgress, setReadingProgress] = useState<number | null>(null);
+  // State, not a ref read: Back and Forward have to come alive the moment the
+  // reply holds a second paragraph, and nothing else is guaranteed to
+  // re-render the workspace at that moment.
+  const [paragraphCount, setParagraphCount] = useState(0);
 
   /**
    * How much of the response has been read, in spoken weight.
@@ -119,6 +123,7 @@ export function usePlaybackReel({
       playingIndexRef.current = -1;
       floorRef.current = 0;
       setReadingProgress(null);
+      setParagraphCount(0);
     }
   }, [playbackGenerationRef]);
 
@@ -166,6 +171,7 @@ export function usePlaybackReel({
     (unit: PlaybackUnit) => {
       unitsRef.current = [...unitsRef.current, unit];
       play(unit, unitsRef.current.length - 1);
+      setParagraphCount(unit.paragraph + 1);
       // A late paragraph changes what the response weighs, so the arc is
       // remeasured against the reel as it now stands.
       publishProgress();
@@ -211,11 +217,6 @@ export function usePlaybackReel({
   const paragraphOrder = useCallback(
     () => [...new Set(unitsRef.current.map((unit) => unit.paragraph))],
     [],
-  );
-
-  const canSeekParagraph = useCallback(
-    () => paragraphOrder().length > 1,
-    [paragraphOrder],
   );
 
   const seekParagraph = useCallback(
@@ -274,7 +275,7 @@ export function usePlaybackReel({
   );
 
   return {
-    canSeekParagraph,
+    canSeekParagraph: paragraphCount > 1,
     readingProgress,
     recordAudio,
     recordSpeech,

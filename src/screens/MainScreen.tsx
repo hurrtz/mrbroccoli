@@ -1111,10 +1111,10 @@ export function MainScreen() {
           onDriveResume: handleContinueDriveSession,
           onDriveStop: handleStopDriveSession,
           onRestart: () => void handleRepeatLastReply(),
-          onSeekBack: player.canSeekParagraph()
+          onSeekBack: player.canSeekParagraph
             ? () => void player.seekParagraph("back")
             : undefined,
-          onSeekForward: player.canSeekParagraph()
+          onSeekForward: player.canSeekParagraph
             ? () => void player.seekParagraph("forward")
             : undefined,
           onStopPlayback: handleStopPlayback,

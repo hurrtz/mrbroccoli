@@ -177,7 +177,7 @@ describe("playback reel", () => {
 
     // All four paragraphs still stand, numbered as one continuous reply. A
     // forgotten reel would hold only the fourth and have nowhere to go.
-    expect(view.result.current.canSeekParagraph()).toBe(true);
+    expect(view.result.current.canSeekParagraph).toBe(true);
     expect(enqueueAudio.mock.calls.map(([uri]) => uri)).toEqual([
       "file://two.m4a",
       "file://three.m4a",
@@ -185,10 +185,32 @@ describe("playback reel", () => {
     ]);
   });
 
+  it("opens seeking the moment a second paragraph exists", () => {
+    // Back and Forward are drawn from this, so it has to be state the
+    // workspace re-renders on, not a value read out of a ref mid-render.
+    const { view } = setup();
+
+    act(() => {
+      view.result.current.recordAudio("file://one.m4a", undefined, undefined, {
+        startsParagraph: true,
+        text: "Only paragraph.",
+      });
+    });
+    expect(view.result.current.canSeekParagraph).toBe(false);
+
+    act(() => {
+      view.result.current.recordAudio("file://two.m4a", undefined, undefined, {
+        startsParagraph: true,
+        text: "A second paragraph.",
+      });
+    });
+    expect(view.result.current.canSeekParagraph).toBe(true);
+  });
+
   it("forgets the paragraphs when the next answer supersedes them", () => {
     const { enqueueThree, playbackGenerationRef, view } = setup();
     enqueueThree();
-    expect(view.result.current.canSeekParagraph()).toBe(true);
+    expect(view.result.current.canSeekParagraph).toBe(true);
 
     playbackGenerationRef.current = 2;
     act(() => {
@@ -198,7 +220,7 @@ describe("playback reel", () => {
       });
     });
 
-    expect(view.result.current.canSeekParagraph()).toBe(false);
+    expect(view.result.current.canSeekParagraph).toBe(false);
   });
 
   it("places the reading arc by paragraph length, not by paragraph count", () => {
