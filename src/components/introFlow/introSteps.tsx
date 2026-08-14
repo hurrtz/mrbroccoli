@@ -11,7 +11,7 @@ import {
   type SpeechLanguage,
 } from "../../constants/speechLanguages";
 import { PhosphorIcon } from "../../design-system/PhosphorIcon";
-import { SettingsSwitch } from "../../features/settings/settings-primitives/SettingsSwitch";
+import { Switch } from "../../design-system/Switch";
 import type { LocalModelBenchmarkResult } from "../../services/localDeviceCapabilities";
 import { getLocalModelBenchmarkResults } from "../../services/localDeviceCapabilities";
 import type { LocalModelInstallStatus } from "../../services/localModelManager";
@@ -554,7 +554,7 @@ function SetupStep({
         <Text style={[styles.manualSwitchLabel, { color: theme.text }]}>
           {t("introManualSwitch")}
         </Text>
-        <SettingsSwitch
+        <Switch
           label={t("introManualSwitch")}
           onChange={setManualOpen}
           testID="intro-manual-switch"

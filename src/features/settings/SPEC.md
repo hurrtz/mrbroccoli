@@ -46,7 +46,7 @@ shared design system and settings primitives.
   inset-row vocabulary used by the approved native Settings design:
   `SettingsGroup`, `SettingsRow`, `SettingsChoiceRow`,
   `SettingsMultiChoiceRow`, `RouteOptionRow`, `LocalModelRouteGroup`,
-  `VoicePickerSheet`, `SettingsSheet`, `SettingsSwitch`,
+  `VoicePickerSheet`, `SettingsSheet`,
   `SettingsPillAction`, `IconAction`, and `PremiumBand`.
 - `settings-core/` owns reusable non-visual normalization, readiness,
   validation, voice-preview, local-model lifecycle, and controller behavior.

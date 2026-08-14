@@ -1,9 +1,9 @@
 import React from "react";
 import { Pressable, StyleSheet, View } from "react-native";
 
-import { useTheme } from "../../../theme/ThemeContext";
+import { useTheme } from "../theme/ThemeContext";
 
-export function SettingsSwitch({
+export function Switch({
   disabled = false,
   label,
   onChange,

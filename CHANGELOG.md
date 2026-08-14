@@ -34,6 +34,8 @@ the complete Play Store translations are kept in a dedicated file under
   opened: the orb already states the phase, the transcript handle names the
   latest model and age, and Settings lists the routes. Screen readers still
   hear every phase change announced.
+- The switch used across settings and the walkthrough is now one shared
+  design-system control rather than a settings-owned one.
 - The orb's two rings now say one thing per phase: at rest both fade to the
   quiet phase colour with the gap between them reading through, recording and
   speaking combine them into a single indicator — how much of the window is

@@ -28,6 +28,9 @@ framework or hiding platform behavior behind excessive abstraction.
 - `NativeControls.tsx` owns shared buttons, text inputs, list rows, dialogs,
   tags, switches, and related control primitives.
 - `IconButton.tsx` owns the standard icon-only interactive control.
+- `Switch.tsx` is the product's one switch: a 46x28 track inside a 44pt
+  target. It was promoted here from settings once the introduction needed it
+  too — a control used by two features is no longer feature-specific.
 - `VoiceOrb.tsx`, `OrbSatellite.tsx`, `ConversationSettingsSummary.tsx`,
   and `TranscriptHandle.tsx` own the orb-centred
   workspace controls introduced by the approved design system. They are

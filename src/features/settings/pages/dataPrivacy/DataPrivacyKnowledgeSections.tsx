@@ -9,7 +9,7 @@ import { styles } from "../../styles";
 import { SettingsGroup } from "../../settings-primitives/SettingsGroup";
 import { SettingsRow } from "../../settings-primitives/SettingsRow";
 import { SettingsSheet } from "../../settings-primitives/SettingsSheet";
-import { SettingsSwitch } from "../../settings-primitives/SettingsSwitch";
+import { Switch } from "../../../../design-system/Switch";
 
 function getArchiveErrorKey(error: ConversationArchiveController["error"]) {
   if (error === "access-lost") {
@@ -48,7 +48,7 @@ export function ConversationKnowledgeGroup({
         onPress={isPremium ? undefined : onOpenPremium}
         control={
           isPremium ? (
-            <SettingsSwitch
+            <Switch
               testID="past-conversation-knowledge-switch"
               label={t("usePastConversationKnowledge")}
               value={settings.pastConversationKnowledgeEnabled}

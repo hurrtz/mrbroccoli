@@ -43,7 +43,7 @@ import { RouteOptionRow } from "../settings-primitives/RouteOptionRow";
 import { SettingsGroup } from "../settings-primitives/SettingsGroup";
 import { SettingsRow } from "../settings-primitives/SettingsRow";
 import { SettingsSheet } from "../settings-primitives/SettingsSheet";
-import { SettingsSwitch } from "../settings-primitives/SettingsSwitch";
+import { Switch } from "../../../design-system/Switch";
 import { styles } from "../styles";
 
 type SlotSheetView = "slot" | "provider" | "model";
@@ -712,7 +712,7 @@ export function ThinkingSettingsPage({
         <SettingsGroup>
           <SettingsRow
             control={
-              <SettingsSwitch
+              <Switch
                 label={t("ulraModeHomeLabel")}
                 value={settings.ulraModeEnabled}
                 onChange={(value) =>

@@ -25,7 +25,7 @@ import { SettingsChoiceRow } from "../settings-primitives/SettingsChoiceRow";
 import { SettingsGroup } from "../settings-primitives/SettingsGroup";
 import { SettingsRow } from "../settings-primitives/SettingsRow";
 import { SettingsSheet } from "../settings-primitives/SettingsSheet";
-import { SettingsSwitch } from "../settings-primitives/SettingsSwitch";
+import { Switch } from "../../../design-system/Switch";
 
 function getSpeechRouteLabel(
   route: SpeechDiagnosticRoute | null,
@@ -232,7 +232,7 @@ export function AppSettingsPage({
           icon="info-circle"
           label={t("introBannerSetting")}
           control={
-            <SettingsSwitch
+            <Switch
               testID="settings-intro-banner"
               label={t("introBannerSetting")}
               value={!settings.introDismissed}
@@ -245,7 +245,7 @@ export function AppSettingsPage({
           label={t("usageStatsInTranscripts")}
           last
           control={
-            <SettingsSwitch
+            <Switch
               testID="settings-usage-stats"
               label={t("usageStatsInTranscripts")}
               value={settings.showUsageStats}
@@ -267,7 +267,7 @@ export function AppSettingsPage({
           icon="bug"
           label={t("debugLogButton")}
           control={
-            <SettingsSwitch
+            <Switch
               testID="settings-debug-log-button"
               label={t("debugLogButton")}
               value={settings.showDebugLogButton}
