@@ -2,7 +2,7 @@
 
 Mr Broccoli is a voice-first AI chat app for iOS and Android, for people who care more about the quality of an answer than how quickly it arrives. You pick the provider, model and reasoning effort per conversation; answers are spoken back paragraph by paragraph. Provider credentials stay in the device keychain, conversations stay local, speech in and out can run on the device. Nineteen interface languages including right-to-left; version 3.2.0.
 
-One product: the **Mr Broccoli mobile app** (Expo / React Native, iOS and Android from one codebase).
+One product: the **Mr Broccoli mobile app** (Expo / React Native, iOS and Android from one codebase), phone-only today. This system also carries a settled **iPad direction** (`guidelines/surfaces/ipad.md`, `ui_kits/ipad-app/`) — not yet built into the app, which is phone-only today.
 
 ## Where things live
 
@@ -10,7 +10,7 @@ One product: the **Mr Broccoli mobile app** (Expo / React Native, iOS and Androi
 | --- | --- |
 | `guidelines/foundations.md` | Color, type, shape, motion, layout, accessibility, iconography |
 | `guidelines/content.md` | Voice and copy rules |
-| `guidelines/surfaces/` | **The normative spec, one document per screen**: `workspace.md`, `settings.md`, `intro.md`, `on-device.md`, `chat.md`, plus `announcements.md` for cross-screen interruption rules |
+| `guidelines/surfaces/` | **The normative spec, one document per screen**: `workspace.md`, `settings.md`, `intro.md`, `on-device.md`, `chat.md`, `ipad.md`, plus `announcements.md` for cross-screen interruption rules |
 | `guidelines/*.card.html` | Foundation specimen cards |
 | `styles.css` | The entry point consumers link. Imports only. |
 | `tokens/` | `fonts`, `colors`, `typography`, `spacing`, `shape`, `motion`, `base` |
@@ -19,6 +19,7 @@ One product: the **Mr Broccoli mobile app** (Expo / React Native, iOS and Androi
 | `ui_kits/mobile-app/` | Click-through recreation of the workspace |
 | `ui_kits/settings/` | The seven-page settings modal — same structure in both editions |
 | `ui_kits/intro/` | The three-step introduction: welcome, setup, ephemeral test |
+| `ui_kits/ipad-app/` | iPad direction: persistent sidebar, landscape tri-pane, compact collapse, settings master-detail |
 | `assets/` | Fonts (Unica One, Outfit), 47 provider SVGs, app icons |
 | `SKILL.md` | Agent-skill entry point |
 | `github.md` | Source-repository association |
