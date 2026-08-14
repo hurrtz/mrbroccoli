@@ -52,9 +52,14 @@ receive already-derived state and callbacks.
   gesture is ever a dead end. With two pages that circle is a toggle, which is
   why both chevrons on a page carry the same destination and neither is
   permanently disabled; each chevron's accessible name states its destination
-  rather than its direction. The track itself stays clamped between the two
-  pages so a wrapping swipe never drags empty canvas into view. Both chevrons
-  still disable together while a turn is active. Image attach, Model Council,
+  rather than its direction. Both directions follow the finger and land the
+  incoming surface on the side the swipe came from: the page that would
+  otherwise sit off the far edge is drawn one whole cycle around, so a
+  wrapping swipe shows the other surface rather than empty canvas. Rejected
+  alternative: clamping the track between the two pages, which answered a
+  wrapping drag with nothing moving and made a circle that existed only in the
+  release handler. Both chevrons still disable together while a turn is
+  active. Image attach, Model Council,
   and Web Search stay in the satellite
   row below the stage and show their unavailable state instead of changing the
   workspace geometry.

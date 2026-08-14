@@ -18,8 +18,7 @@ const SURFACE_INDEX: Record<InputSurface, number> = {
  * The pager is a closed circle: any decisive swipe leaves the current
  * surface, so neither direction is ever a dead end. With two pages a circle
  * is a toggle, which is why the direction of the swipe does not matter — only
- * that it was decisive. The track itself stays clamped between the two pages,
- * so a wrapping swipe never drags empty canvas into view.
+ * that it was decisive.
  */
 export function resolveSwipeSurface({
   activeSurface,
@@ -35,6 +34,31 @@ export function resolveSwipeSurface({
     return activeSurface;
   }
   return activeSurface === "voice" ? "text" : "voice";
+}
+
+/**
+ * Where the track lands once the swipe is resolved. Both directions reach the
+ * same other surface, so the travel direction is the only thing that says
+ * which side that surface should arrive from — landing always on the canonical
+ * side would drag the page back under the finger that just pulled it forward.
+ */
+export function resolveSwipeTarget({
+  activeSurface,
+  nextSurface,
+  pageStride,
+  projectedTranslation,
+}: {
+  activeSurface: InputSurface;
+  nextSurface: InputSurface;
+  pageStride: number;
+  projectedTranslation: number;
+}): number {
+  "worklet";
+  const base = -SURFACE_INDEX[activeSurface] * pageStride;
+  if (nextSurface === activeSurface) {
+    return base;
+  }
+  return base + (projectedTranslation > 0 ? pageStride : -pageStride);
 }
 
 interface UseInputSurfaceGestureParams {
@@ -102,20 +126,32 @@ export function useInputSurfaceGesture({
           gestureStartX.value = trackTranslateX.value;
         })
         .onUpdate((event) => {
+          // One page of travel either way from where this page sits. The
+          // wrapping side is not clamped away: the finger has to be answered
+          // in both directions or the circle is one only in principle.
+          const base = -activeSurfaceIndex.value * pageStrideShared.value;
           const nextX = gestureStartX.value + event.translationX;
           trackTranslateX.value = Math.max(
-            -pageStrideShared.value,
-            Math.min(0, nextX),
+            base - pageStrideShared.value,
+            Math.min(base + pageStrideShared.value, nextX),
           );
         })
         .onEnd((event) => {
+          const activeSurfaceNow =
+            activeSurfaceIndex.value === 0 ? "voice" : "text";
+          const projectedTranslation =
+            event.translationX + event.velocityX * 0.12;
           const nextSurface = resolveSwipeSurface({
-            activeSurface: activeSurfaceIndex.value === 0 ? "voice" : "text",
+            activeSurface: activeSurfaceNow,
             pageStride: pageStrideShared.value,
-            projectedTranslation:
-              event.translationX + event.velocityX * 0.12,
+            projectedTranslation,
           });
-          const targetX = -SURFACE_INDEX[nextSurface] * pageStrideShared.value;
+          const targetX = resolveSwipeTarget({
+            activeSurface: activeSurfaceNow,
+            nextSurface,
+            pageStride: pageStrideShared.value,
+            projectedTranslation,
+          });
 
           if (reducedMotion) {
             trackTranslateX.value = targetX;
@@ -159,10 +195,36 @@ export function useInputSurfaceGesture({
     transform: [{ translateX: trackTranslateX.value }],
   }));
 
+  // Closing the circle without a third copy of either page: whichever page
+  // would sit off the far edge is drawn one whole cycle around, so the surface
+  // the finger pulls toward is the one that comes into view. Both offsets read
+  // the same track value the card does, so they swap in the same frame and the
+  // wrap is never visible.
+  const voicePageStyle = useAnimatedStyle(() => ({
+    transform: [
+      {
+        translateX:
+          trackTranslateX.value < -pageStrideShared.value
+            ? pageStrideShared.value * 2
+            : 0,
+      },
+    ],
+  }));
+  const textPageStyle = useAnimatedStyle(() => ({
+    transform: [
+      {
+        translateX:
+          trackTranslateX.value > 0 ? -pageStrideShared.value * 2 : 0,
+      },
+    ],
+  }));
+
   return {
     panGesture,
     selectSurface,
     textInputGesture,
+    textPageStyle,
     trackAnimatedStyle,
+    voicePageStyle,
   };
 }

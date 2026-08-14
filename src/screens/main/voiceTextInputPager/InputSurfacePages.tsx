@@ -36,10 +36,12 @@ interface InputSurfacePagesProps {
   textInputGesture: GestureType;
   textInputRef: React.RefObject<TextInput | null>;
   textMessage: string;
+  textPageStyle: ReturnType<typeof useInputSurfaceGesture>["textPageStyle"];
   textSubmitDisabled: boolean;
   trackAnimatedStyle: ReturnType<
     typeof useInputSurfaceGesture
   >["trackAnimatedStyle"];
+  voicePageStyle: ReturnType<typeof useInputSurfaceGesture>["voicePageStyle"];
 }
 
 function SurfaceChevron({
@@ -238,7 +240,9 @@ export function InputSurfacePages(props: InputSurfacePagesProps) {
     onSelectSurface,
     pageWidth,
     panGesture,
+    textPageStyle,
     trackAnimatedStyle,
+    voicePageStyle,
   } = props;
 
   return (
@@ -255,12 +259,12 @@ export function InputSurfacePages(props: InputSurfacePagesProps) {
           isActive ? styles.trackCovered : null,
         ]}
       >
-        <View
+        <Animated.View
           accessibilityElementsHidden={activeSurface !== "voice"}
           importantForAccessibility={
             activeSurface === "voice" ? "yes" : "no-hide-descendants"
           }
-          style={[styles.page, { width: pageWidth }]}
+          style={[styles.page, { width: pageWidth }, voicePageStyle]}
         >
           <View style={styles.inputSwitchRow}>
             <SurfaceChevron
@@ -283,14 +287,14 @@ export function InputSurfacePages(props: InputSurfacePagesProps) {
               target="text"
             />
           </View>
-        </View>
+        </Animated.View>
 
-        <View
+        <Animated.View
           accessibilityElementsHidden={activeSurface !== "text"}
           importantForAccessibility={
             activeSurface === "text" ? "yes" : "no-hide-descendants"
           }
-          style={[styles.page, { width: pageWidth }]}
+          style={[styles.page, { width: pageWidth }, textPageStyle]}
         >
           <View style={styles.inputSwitchRow}>
             <SurfaceChevron
@@ -313,7 +317,7 @@ export function InputSurfacePages(props: InputSurfacePagesProps) {
               target="voice"
             />
           </View>
-        </View>
+        </Animated.View>
       </Animated.View>
     </GestureDetector>
   );

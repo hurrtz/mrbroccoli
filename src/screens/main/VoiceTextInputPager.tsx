@@ -154,9 +154,11 @@ export function VoiceTextInputPager({
           textInputGesture={pager.textInputGesture}
           textInputRef={pager.textInputRef}
           textMessage={pager.textMessage}
+          textPageStyle={pager.textPageStyle}
           textSubmitDisabled={pager.textSubmitDisabled}
           trackAnimatedStyle={pager.trackAnimatedStyle}
           voiceInputUnavailableMessage={voiceInputUnavailableMessage}
+          voicePageStyle={pager.voicePageStyle}
         />
         {isActive ? (
           <View

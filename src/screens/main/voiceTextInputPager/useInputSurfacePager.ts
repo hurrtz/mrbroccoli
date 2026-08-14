@@ -71,12 +71,18 @@ export function useInputSurfacePager({
     [onTextMessageChange],
   );
 
-  const { panGesture, selectSurface, textInputGesture, trackAnimatedStyle } =
-    useInputSurfaceGesture({
-      activeSurface,
-      applySurface,
-      pageStride,
-    });
+  const {
+    panGesture,
+    selectSurface,
+    textInputGesture,
+    textPageStyle,
+    trackAnimatedStyle,
+    voicePageStyle,
+  } = useInputSurfaceGesture({
+    activeSurface,
+    applySurface,
+    pageStride,
+  });
 
   React.useEffect(() => {
     if (isActive) {
@@ -120,7 +126,9 @@ export function useInputSurfacePager({
     textInputGesture,
     textInputRef,
     textMessage,
+    textPageStyle,
     textSubmitDisabled,
     trackAnimatedStyle,
+    voicePageStyle,
   };
 }
