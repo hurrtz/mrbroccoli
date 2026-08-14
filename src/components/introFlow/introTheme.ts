@@ -19,6 +19,7 @@ export function getIntroTheme(colors: Colors, isDark: boolean) {
     panelActive: colors.surfaceAlt,
     border: colors.border,
     borderStrong: colors.borderStrong,
+    shadow: colors.glow,
 
     text: colors.text,
     textSecondary: colors.textSecondary,

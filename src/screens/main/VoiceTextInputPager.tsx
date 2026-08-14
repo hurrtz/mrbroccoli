@@ -18,6 +18,7 @@ export function VoiceTextInputPager({
   disabled,
   footer,
   initialSurface = "voice",
+  initialTextInputFocused = false,
   initialTextMessage = "",
   inputMode,
   isActive,
@@ -29,6 +30,7 @@ export function VoiceTextInputPager({
   onPressOut,
   onResolvePromptBlock,
   onSubmitTextMessage,
+  onTextInputFocusChange,
   onTextMessageChange,
   orbProgressOverride = null,
   playbackPaused,
@@ -50,10 +52,12 @@ export function VoiceTextInputPager({
   const pager = useInputSurfacePager({
     disabled,
     initialSurface,
+    initialTextInputFocused,
     initialTextMessage,
     isActive,
     onInputSurfaceChange,
     onSubmitTextMessage,
+    onTextInputFocusChange,
     onTextMessageChange,
     submissionDisabled: Boolean(promptBlockedMessage),
   });
@@ -141,7 +145,7 @@ export function VoiceTextInputPager({
           onPressOut={onPressOut}
           onSelectSurface={pager.selectSurface}
           onSubmitTextMessage={pager.handleSubmitTextMessage}
-          onTextFocusChange={pager.setTextFocused}
+          onTextFocusChange={pager.handleTextFocusChange}
           onTextMessageChange={pager.handleTextMessageChange}
           pageWidth={pager.pageWidth}
           panGesture={pager.panGesture}

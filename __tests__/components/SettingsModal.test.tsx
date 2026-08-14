@@ -6,6 +6,7 @@ import {
   Modal as NativeModal,
   Platform,
   StyleSheet,
+  useWindowDimensions,
 } from "react-native";
 import {
   act,
@@ -43,6 +44,26 @@ import { getLocalModelBenchmarkResults } from "../../src/services/localDeviceCap
 
 const NativeDialogType = NativeDialog as unknown as React.ComponentType<any>;
 const hiddenIconQuery = { includeHiddenElements: true } as const;
+
+jest.mock("react-native", () => {
+  const actual = jest.requireActual("react-native");
+  const mockedUseWindowDimensions = jest.fn(() => ({
+    fontScale: 1,
+    height: 932,
+    scale: 3,
+    width: 430,
+  }));
+
+  return new Proxy(actual, {
+    get(target, property, receiver) {
+      return property === "useWindowDimensions"
+        ? mockedUseWindowDimensions
+        : Reflect.get(target, property, receiver);
+    },
+  });
+});
+
+const mockUseWindowDimensions = jest.mocked(useWindowDimensions);
 
 jest.mock("react-native-safe-area-context", () => ({
   initialWindowMetrics: null,
@@ -132,7 +153,16 @@ jest.mock("../../src/components/ProviderIcon", () => ({
   },
 }));
 
-function renderSettingsModal(
+function setViewport(width: number, height: number) {
+  mockUseWindowDimensions.mockReturnValue({
+    fontScale: 1,
+    height,
+    scale: 2,
+    width,
+  });
+}
+
+function createSettingsModalElement(
   overrideProps: Partial<React.ComponentProps<typeof SettingsModal>> = {},
   language: AppLanguage = "en",
 ) {
@@ -148,7 +178,7 @@ function renderSettingsModal(
     remove: jest.fn(async () => true),
   } as const;
 
-  return render(
+  return (
     <ThemeProvider mode="light">
       <LocalizationProvider language={language}>
         <SettingsModal
@@ -196,11 +226,27 @@ function renderSettingsModal(
           {...overrideProps}
         />
       </LocalizationProvider>
-    </ThemeProvider>,
+    </ThemeProvider>
   );
 }
 
+function renderSettingsModal(
+  overrideProps: Partial<React.ComponentProps<typeof SettingsModal>> = {},
+  language: AppLanguage = "en",
+) {
+  return render(createSettingsModalElement(overrideProps, language));
+}
+
 describe("SettingsModal", () => {
+  beforeEach(() => {
+    Object.defineProperty(Platform, "isPad", {
+      configurable: true,
+      value: false,
+      writable: true,
+    });
+    setViewport(430, 932);
+  });
+
   afterEach(async () => {
     await AsyncStorage.removeItem(RUNTIME_CAPABILITY_OVERRIDES_STORAGE_KEY);
     resetRuntimeCapabilityOverridesForTests();
@@ -208,6 +254,254 @@ describe("SettingsModal", () => {
     jest.mocked(getLocalCatalogInstallStatuses).mockResolvedValue({});
     jest.mocked(getLocalModelBenchmarkResults).mockResolvedValue({});
     jest.restoreAllMocks();
+  });
+
+  it("uses full-window master-detail Settings on a regular-width iPad", async () => {
+    Object.defineProperty(Platform, "isPad", {
+      configurable: true,
+      value: true,
+      writable: true,
+    });
+    setViewport(1180, 820);
+
+    const screen = renderSettingsModal();
+
+    await waitFor(() => {
+      expect(screen.getByTestId("connections-settings-page")).toBeTruthy();
+    });
+
+    const expectedCategories = [
+      { icon: "key", page: "connections" },
+      { icon: "robot", page: "thinking" },
+      { icon: "search", page: "search" },
+      { icon: "audio", page: "listening" },
+      { icon: "sound", page: "speaking" },
+      { icon: "safety-certificate", page: "data" },
+      { icon: "sliders", page: "app" },
+    ];
+    const nav = screen.getByTestId("settings-ipad-category-nav");
+    const categoryRows = within(nav).getAllByTestId(
+      /^settings-ipad-category-row-/,
+    );
+
+    expect(categoryRows.map((row) => row.props.testID)).toEqual(
+      expectedCategories.map(
+        ({ page }) => `settings-ipad-category-row-${page}`,
+      ),
+    );
+    expect(StyleSheet.flatten(nav.props.style)).toEqual(
+      expect.objectContaining({ width: 300 }),
+    );
+    for (const [index, row] of categoryRows.entries()) {
+      expect(StyleSheet.flatten(row.props.style)).toEqual(
+        expect.objectContaining({ minHeight: 48 }),
+      );
+      expect(
+        within(row).getByTestId(
+          `phosphor-icon-${expectedCategories[index].icon}`,
+          hiddenIconQuery,
+        ),
+      ).toBeTruthy();
+      expect(within(row).queryByTestId("phosphor-icon-right")).toBeNull();
+      expect(within(row).queryByTestId("phosphor-icon-left")).toBeNull();
+    }
+    expect(
+      screen.getByTestId("settings-ipad-category-row-connections").props
+        .accessibilityState,
+    ).toEqual({ selected: true });
+    expect(
+      StyleSheet.flatten(
+        screen.getByTestId("settings-ipad-category-row-connections").props
+          .style,
+      ),
+    ).toEqual(
+      expect.objectContaining({ backgroundColor: lightColors.accentSoft }),
+    );
+    expect(screen.getByTestId("settings-modal-title").props.children).toBe(
+      "Connections",
+    );
+    expect(screen.getByTestId("settings-close-button")).toBeTruthy();
+    expect(screen.getByTestId("settings-ipad-detail-pane")).toBeTruthy();
+    expect(screen.queryByTestId("settings-page-overview")).toBeNull();
+    expect(screen.queryByTestId("settings-back-button")).toBeNull();
+    expect(screen.queryByTestId("settings-modal-backdrop")).toBeNull();
+    expect(
+      StyleSheet.flatten(
+        screen.getByTestId("settings-modal-panel").props.style,
+      ),
+    ).toEqual(
+      expect.objectContaining({
+        borderRadius: 0,
+        borderWidth: 0,
+        maxWidth: "100%",
+        shadowOpacity: 0,
+      }),
+    );
+    expect(
+      StyleSheet.flatten(
+        screen.getByTestId("settings-scroll-view").props.contentContainerStyle,
+      ),
+    ).toEqual(expect.objectContaining({ maxWidth: 760 }));
+  });
+
+  it("preserves a regular-iPad deep link and switches only the active detail", async () => {
+    Object.defineProperty(Platform, "isPad", {
+      configurable: true,
+      value: true,
+      writable: true,
+    });
+    setViewport(1180, 820);
+
+    const screen = renderSettingsModal({ focusPage: "speaking" });
+
+    await waitFor(() => {
+      expect(screen.getByTestId("speaking-settings-page")).toBeTruthy();
+    });
+    expect(
+      screen.getByTestId("settings-ipad-category-row-speaking").props
+        .accessibilityState,
+    ).toEqual({ selected: true });
+    expect(screen.queryByTestId("settings-page-overview")).toBeNull();
+    expect(screen.queryByTestId("settings-back-button")).toBeNull();
+
+    fireEvent.press(screen.getByTestId("settings-ipad-category-row-data"));
+
+    await waitFor(() => {
+      expect(screen.getByTestId("settings-page-data")).toBeTruthy();
+      expect(screen.queryByTestId("speaking-settings-page")).toBeNull();
+    });
+    expect(
+      screen.getByTestId("settings-ipad-category-row-speaking").props
+        .accessibilityState,
+    ).toEqual({ selected: false });
+    expect(
+      screen.getByTestId("settings-ipad-category-row-data").props
+        .accessibilityState,
+    ).toEqual({ selected: true });
+    expect(screen.getByTestId("settings-modal-title").props.children).toBe(
+      "Data & privacy",
+    );
+  });
+
+  it("uses Yoga direction and logical borders for regular-width RTL iPad", async () => {
+    Object.defineProperty(Platform, "isPad", {
+      configurable: true,
+      value: true,
+      writable: true,
+    });
+    setViewport(1180, 820);
+
+    const screen = renderSettingsModal(
+      {
+        focusPage: "thinking",
+        settings: { ...DEFAULT_SETTINGS, language: "ar" },
+      },
+      "ar",
+    );
+
+    await waitFor(() => {
+      expect(screen.getByTestId("thinking-settings-page")).toBeTruthy();
+    });
+    const panelStyle = StyleSheet.flatten(
+      screen.getByTestId("settings-modal-panel").props.style,
+    );
+    const navStyle = StyleSheet.flatten(
+      screen.getByTestId("settings-ipad-category-nav").props.style,
+    );
+    const rowStyle = StyleSheet.flatten(
+      screen.getByTestId("settings-ipad-category-row-thinking").props.style,
+    );
+
+    expect(panelStyle).toEqual(
+      expect.objectContaining({ flexDirection: "row" }),
+    );
+    expect(navStyle).toEqual(
+      expect.objectContaining({
+        borderEndColor: lightColors.border,
+        borderEndWidth: 1,
+      }),
+    );
+    expect(navStyle.borderLeftWidth).toBeUndefined();
+    expect(navStyle.borderRightWidth).toBeUndefined();
+    expect(rowStyle).toEqual(expect.objectContaining({ flexDirection: "row" }));
+  });
+
+  it("preserves the selected detail across compact and regular iPad resizing", async () => {
+    Object.defineProperty(Platform, "isPad", {
+      configurable: true,
+      value: true,
+      writable: true,
+    });
+    const overrideProps = { focusPage: "speaking" as const };
+    setViewport(600, 820);
+
+    const screen = renderSettingsModal(overrideProps);
+
+    await waitFor(() => {
+      expect(screen.getByTestId("speaking-settings-page")).toBeTruthy();
+      expect(screen.getByTestId("settings-back-button")).toBeTruthy();
+    });
+    expect(screen.queryByTestId("settings-ipad-category-nav")).toBeNull();
+
+    setViewport(1180, 820);
+    screen.rerender(createSettingsModalElement(overrideProps));
+
+    await waitFor(() => {
+      expect(screen.getByTestId("speaking-settings-page")).toBeTruthy();
+      expect(
+        screen.getByTestId("settings-ipad-category-row-speaking").props
+          .accessibilityState,
+      ).toEqual({ selected: true });
+    });
+    expect(screen.queryByTestId("settings-back-button")).toBeNull();
+
+    fireEvent.press(screen.getByTestId("settings-ipad-category-row-data"));
+
+    await waitFor(() => {
+      expect(screen.getByTestId("settings-page-data")).toBeTruthy();
+    });
+
+    setViewport(600, 820);
+    screen.rerender(createSettingsModalElement(overrideProps));
+
+    await waitFor(() => {
+      expect(screen.getByTestId("settings-page-data")).toBeTruthy();
+      expect(screen.getByTestId("settings-back-button")).toBeTruthy();
+    });
+    expect(screen.queryByTestId("settings-ipad-category-nav")).toBeNull();
+
+    fireEvent.press(screen.getByTestId("settings-back-button"));
+
+    await waitFor(() => {
+      expect(screen.getByTestId("settings-page-overview")).toBeTruthy();
+    });
+  });
+
+  it("keeps compact iPad Settings on the overview-to-push flow", async () => {
+    Object.defineProperty(Platform, "isPad", {
+      configurable: true,
+      value: true,
+      writable: true,
+    });
+    setViewport(600, 820);
+
+    const screen = renderSettingsModal();
+
+    await waitFor(() => {
+      expect(screen.getByTestId("settings-page-overview")).toBeTruthy();
+    });
+    expect(screen.getByTestId("settings-modal-title").props.children).toBe(
+      "Settings",
+    );
+    expect(screen.queryByTestId("settings-ipad-category-nav")).toBeNull();
+    expect(screen.getByTestId("settings-modal-backdrop")).toBeTruthy();
+
+    fireEvent.press(screen.getByTestId("settings-overview-row-connections"));
+
+    await waitFor(() => {
+      expect(screen.getByTestId("connections-settings-page")).toBeTruthy();
+      expect(screen.getByTestId("settings-back-button")).toBeTruthy();
+    });
   });
 
   it("renders readiness overview and drills into Connections", async () => {

@@ -29,11 +29,10 @@ import {
 import { SettingsGroup } from "./settings-primitives/SettingsGroup";
 import { SettingsRow } from "./settings-primitives/SettingsRow";
 
-type DrillInSettingsPage = Exclude<SettingsPage, "overview">;
-type OverviewPage = DrillInSettingsPage;
+export type SettingsDetailPage = Exclude<SettingsPage, "overview">;
 
-type OverviewRow = {
-  page: OverviewPage;
+export type SettingsOverviewRow = {
+  page: SettingsDetailPage;
   titleKey:
     | "settingsConnections"
     | "settingsThinking"
@@ -45,7 +44,10 @@ type OverviewRow = {
   icon: PhosphorIconName;
 };
 
-const overviewRows: Record<OverviewPage, OverviewRow> = {
+export const SETTINGS_OVERVIEW_ROWS: Record<
+  SettingsDetailPage,
+  SettingsOverviewRow
+> = {
   connections: {
     page: "connections",
     titleKey: "settingsConnections",
@@ -83,7 +85,7 @@ const overviewRows: Record<OverviewPage, OverviewRow> = {
   },
 };
 
-const overviewGroups = [
+export const SETTINGS_OVERVIEW_GROUPS = [
   {
     titleKey: "settingsGroupConversation" as const,
     pages: ["connections", "thinking", "search"] as const,
@@ -99,7 +101,7 @@ const overviewGroups = [
 ];
 
 /** Each capability opens the page that configures it. */
-const READINESS_PAGE: Record<ReadinessStep, OverviewPage> = {
+const READINESS_PAGE: Record<ReadinessStep, SettingsDetailPage> = {
   think: "thinking",
   listen: "listening",
   speak: "speaking",
@@ -156,9 +158,7 @@ function getThemeLabel(
  * first letter comes up. Opaque provider ids pass through unchanged.
  */
 function displayVoiceName(voice: string | undefined) {
-  return voice
-    ? voice.charAt(0).toLocaleUpperCase() + voice.slice(1)
-    : voice;
+  return voice ? voice.charAt(0).toLocaleUpperCase() + voice.slice(1) : voice;
 }
 
 function getResponseModeLabel(settings: Settings, isPremium: boolean) {
@@ -229,7 +229,7 @@ function getOverviewState({
     provider: keyof Settings["apiKeys"],
   ) => ProviderHealthState;
   isPremium: boolean;
-  page: OverviewPage;
+  page: SettingsDetailPage;
   settings: Settings;
   t: ReturnType<typeof useLocalization>["t"];
 }) {
@@ -308,7 +308,7 @@ export function AntSettingsOverview({
     provider: keyof Settings["apiKeys"],
   ) => ProviderHealthState;
   isPremium: boolean;
-  onOpenPage: (page: OverviewPage) => void;
+  onOpenPage: (page: SettingsDetailPage) => void;
   onOpenPremium: () => void;
   readiness: SettingsReadiness;
   settings: Settings;
@@ -361,10 +361,10 @@ export function AntSettingsOverview({
         readiness={readiness}
       />
 
-      {overviewGroups.map((group) => (
+      {SETTINGS_OVERVIEW_GROUPS.map((group) => (
         <SettingsGroup key={group.titleKey} title={t(group.titleKey)}>
           {group.pages.map((page, index) => {
-            const row = overviewRows[page];
+            const row = SETTINGS_OVERVIEW_ROWS[page];
             return (
               <SettingsRow
                 key={page}

@@ -51,6 +51,22 @@ shared design system and settings primitives.
 - `settings-core/` owns reusable non-visual normalization, readiness,
   validation, voice-preview, local-model lifecycle, and controller behavior.
 
+## Adaptive Presentation
+
+Phones and compact iPad windows use the existing full-window overview followed
+by a pushed detail page. Regular iPad remains a full-window replacement but
+uses a 300pt persistent category rail and one detail pane. The rail reuses the
+overview's exact seven pages, icons, and Conversation / Voice / Privacy & app
+groups, marks one row selected, and has no chevrons or back action because
+nothing is pushed. A plain regular open selects Connections; a deep link
+selects its requested page directly. The detail body remains capped at 760pt.
+
+Resizing preserves the selected detail. Entering regular width from the compact
+overview selects Connections; returning to compact keeps the current detail
+and restores its normal back-to-overview control. RTL places the rail on the
+leading right edge and mirrors each row's leading/trailing arrangement without
+changing page ownership.
+
 ## Edition Boundary
 
 Free and Premium users see the same seven-page overview and the same structure
@@ -148,6 +164,8 @@ capability healthy. The UI shows the capability that was actually tested.
 - Modal content isolates screen-reader focus and always provides a labelled
   close action. Backdrop-only dismissal layers remain outside the
   accessibility tree.
+- Regular-iPad Settings has no backdrop: its full-window master-detail frame is
+  the isolated secondary surface and retains the same labelled close action.
 - Dynamic validation, download, and preview state is announced only on
   meaningful changes.
 - A local-model download, removal, or benchmark failure remains on the owning

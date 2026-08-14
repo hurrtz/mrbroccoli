@@ -7,6 +7,11 @@ import { IconButton } from "../../design-system/IconButton";
 import { useLocalization } from "../../i18n";
 import { useTheme } from "../../theme/ThemeContext";
 import type { SettingsPage } from "../settings-core/types";
+import {
+  SETTINGS_OVERVIEW_GROUPS,
+  SETTINGS_OVERVIEW_ROWS,
+  type SettingsDetailPage,
+} from "./AntSettingsOverview";
 import { styles } from "./styles";
 
 interface AntSettingsFrameProps {
@@ -16,13 +21,122 @@ interface AntSettingsFrameProps {
   entrance: Animated.Value;
   insets: EdgeInsets;
   isLandscape: boolean;
+  isRegularIpad: boolean;
   keyboardInset: number;
   modalMaxWidth: number;
   onBack: () => void;
   onClose: () => void;
   onDismissValidationToast: () => void;
+  onSelectPage: (page: SettingsDetailPage) => void;
   title: string;
   validationToastMessage: string | null;
+}
+
+function IpadSettingsCategoryNav({
+  activePage,
+  insets,
+  isRtl,
+  onSelectPage,
+}: {
+  activePage: SettingsDetailPage;
+  insets: EdgeInsets;
+  isRtl: boolean;
+  onSelectPage: (page: SettingsDetailPage) => void;
+}) {
+  const { colors } = useTheme();
+  const { t } = useLocalization();
+
+  return (
+    <View
+      testID="settings-ipad-category-nav"
+      style={[
+        styles.ipadCategoryNav,
+        {
+          backgroundColor: colors.surface,
+          borderEndColor: colors.border,
+          borderEndWidth: 1,
+        },
+      ]}
+    >
+      <Text
+        accessibilityRole="header"
+        style={[
+          styles.ipadCategoryTitle,
+          {
+            color: colors.text,
+            paddingTop: insets.top + 22,
+            textAlign: isRtl ? "right" : "left",
+          },
+        ]}
+      >
+        {t("settings")}
+      </Text>
+      <ScrollView
+        contentContainerStyle={[
+          styles.ipadCategoryContent,
+          { paddingBottom: insets.bottom + 14 },
+        ]}
+        showsVerticalScrollIndicator={false}
+      >
+        {SETTINGS_OVERVIEW_GROUPS.map((group) => (
+          <View key={group.titleKey} style={styles.ipadCategoryGroup}>
+            <Text
+              style={[
+                styles.ipadCategoryGroupTitle,
+                {
+                  color: colors.textMuted,
+                  textAlign: isRtl ? "right" : "left",
+                },
+              ]}
+            >
+              {t(group.titleKey)}
+            </Text>
+            {group.pages.map((page) => {
+              const row = SETTINGS_OVERVIEW_ROWS[page];
+              const selected = page === activePage;
+
+              return (
+                <Pressable
+                  accessibilityLabel={t(row.titleKey)}
+                  accessibilityRole="button"
+                  accessibilityState={{ selected }}
+                  key={page}
+                  onPress={() => onSelectPage(page)}
+                  style={({ pressed }) => [
+                    styles.ipadCategoryRow,
+                    {
+                      backgroundColor: selected
+                        ? colors.accentSoft
+                        : "transparent",
+                    },
+                    pressed ? styles.pressedControl : null,
+                  ]}
+                  testID={`settings-ipad-category-row-${page}`}
+                >
+                  <PhosphorIcon
+                    color={selected ? colors.accent : colors.text}
+                    name={row.icon}
+                    size="control"
+                  />
+                  <Text
+                    style={[
+                      styles.ipadCategoryRowLabel,
+                      {
+                        color: selected ? colors.accent : colors.text,
+                        textAlign: isRtl ? "right" : "left",
+                      },
+                    ]}
+                  >
+                    {t(row.titleKey)}
+                  </Text>
+                </Pressable>
+              );
+            })}
+          </View>
+        ))}
+      </ScrollView>
+    </View>
+  );
 }
 
 export function AntSettingsFrame({
@@ -32,17 +146,21 @@ export function AntSettingsFrame({
   entrance,
   insets,
   isLandscape,
+  isRegularIpad,
   keyboardInset,
   modalMaxWidth,
   onBack,
   onClose,
   onDismissValidationToast,
+  onSelectPage,
   title,
   validationToastMessage,
 }: AntSettingsFrameProps) {
   const { colors } = useTheme();
   const { isRtl, t } = useLocalization();
-  const showsBackButton = activePage !== "overview";
+  const showsBackButton = !isRegularIpad && activePage !== "overview";
+  const detailPage: SettingsDetailPage =
+    activePage === "overview" ? "connections" : activePage;
   const animatedModalStyle = {
     opacity: entrance,
     transform: [
@@ -61,113 +179,152 @@ export function AntSettingsFrame({
       accessibilityViewIsModal
       style={[
         styles.overlay,
-        {
-          paddingTop: isLandscape ? Math.max(insets.top + 8, 16) : 0,
-          paddingBottom: isLandscape ? Math.max(insets.bottom + 8, 16) : 0,
-          paddingHorizontal: isLandscape ? 12 : 0,
-        },
+        isRegularIpad
+          ? styles.ipadOverlay
+          : {
+              paddingTop: isLandscape ? Math.max(insets.top + 8, 16) : 0,
+              paddingBottom: isLandscape ? Math.max(insets.bottom + 8, 16) : 0,
+              paddingHorizontal: isLandscape ? 12 : 0,
+            },
       ]}
     >
+      {!isRegularIpad ? (
+        <>
+          <Animated.View
+            pointerEvents="none"
+            style={[
+              styles.backdrop,
+              {
+                backgroundColor: colors.overlay,
+                opacity: entrance,
+              },
+            ]}
+            testID="settings-modal-backdrop"
+          />
+          <Pressable
+            accessibilityElementsHidden
+            accessible={false}
+            importantForAccessibility="no"
+            onPress={onClose}
+            style={styles.backdrop}
+          />
+        </>
+      ) : null}
       <Animated.View
-        pointerEvents="none"
-        style={[
-          styles.backdrop,
-          {
-            backgroundColor: colors.overlay,
-            opacity: entrance,
-          },
-        ]}
-      />
-      <Pressable
-        accessibilityElementsHidden
-        accessible={false}
-        importantForAccessibility="no"
-        onPress={onClose}
-        style={styles.backdrop}
-      />
-      <Animated.View
+        testID="settings-modal-panel"
         style={[
           styles.modal,
-          isLandscape ? styles.modalLandscape : null,
-          {
-            backgroundColor: colors.surface,
-            borderColor: colors.border,
-            borderRadius: isLandscape ? 22 : 0,
-            borderWidth: isLandscape ? 1 : 0,
-            maxWidth: modalMaxWidth,
-            shadowColor: colors.glow,
-          },
+          isRegularIpad
+            ? styles.ipadMasterDetail
+            : isLandscape
+              ? styles.modalLandscape
+              : null,
+          isRegularIpad
+            ? {
+                backgroundColor: colors.surface,
+                borderRadius: 0,
+                borderWidth: 0,
+                maxWidth: "100%",
+                shadowOpacity: 0,
+              }
+            : {
+                backgroundColor: colors.surface,
+                borderColor: colors.border,
+                borderRadius: isLandscape ? 22 : 0,
+                borderWidth: isLandscape ? 1 : 0,
+                maxWidth: modalMaxWidth,
+                shadowColor: colors.glow,
+              },
           animatedModalStyle,
         ]}
       >
+        {isRegularIpad ? (
+          <IpadSettingsCategoryNav
+            activePage={detailPage}
+            insets={insets}
+            isRtl={isRtl}
+            onSelectPage={onSelectPage}
+          />
+        ) : null}
         <View
-          style={[
-            styles.header,
-            {
-              backgroundColor: colors.surface,
-              borderBottomColor: colors.border,
-              paddingTop: isLandscape ? 14 : insets.top + 12,
-            },
-          ]}
+          style={
+            isRegularIpad ? styles.ipadDetailPane : styles.compactDetailPane
+          }
+          testID={isRegularIpad ? "settings-ipad-detail-pane" : undefined}
         >
-          {showsBackButton ? (
+          <View
+            style={[
+              styles.header,
+              {
+                backgroundColor: colors.surface,
+                borderBottomColor: colors.border,
+                paddingTop: isRegularIpad
+                  ? insets.top + 14
+                  : isLandscape
+                    ? 14
+                    : insets.top + 12,
+              },
+            ]}
+          >
+            {showsBackButton ? (
+              <IconButton
+                iconNode={
+                  <PhosphorIcon
+                    name={isRtl ? "arrow-right" : "arrow-left"}
+                    size="navigation"
+                    color={colors.textSecondary}
+                  />
+                }
+                style={styles.headerControl}
+                onPress={onBack}
+                accessibilityLabel={t("settingsBackToOverview")}
+                testID="settings-back-button"
+              />
+            ) : (
+              <View style={styles.headerControl} />
+            )}
+            <View style={styles.headerTitleWrap}>
+              <Text
+                testID="settings-modal-title"
+                accessibilityRole="header"
+                style={[styles.headerTitle, { color: colors.text }]}
+              >
+                {title}
+              </Text>
+            </View>
             <IconButton
               iconNode={
                 <PhosphorIcon
-                  name={isRtl ? "arrow-right" : "arrow-left"}
+                  name="close"
                   size="navigation"
                   color={colors.textSecondary}
                 />
               }
               style={styles.headerControl}
-              onPress={onBack}
-              accessibilityLabel={t("settingsBackToOverview")}
-              testID="settings-back-button"
+              onPress={onClose}
+              accessibilityLabel={t("dismiss")}
+              testID="settings-close-button"
             />
-          ) : (
-            <View style={styles.headerControl} />
-          )}
-          <View style={styles.headerTitleWrap}>
-            <Text
-              testID="settings-modal-title"
-              accessibilityRole="header"
-              style={[styles.headerTitle, { color: colors.text }]}
-            >
-              {title}
-            </Text>
           </View>
-          <IconButton
-            iconNode={
-              <PhosphorIcon
-                name="close"
-                size="navigation"
-                color={colors.textSecondary}
-              />
-            }
-            style={styles.headerControl}
-            onPress={onClose}
-            accessibilityLabel={t("dismiss")}
-            testID="settings-close-button"
-          />
-        </View>
 
-        <ScrollView
-          testID="settings-scroll-view"
-          ref={contentScrollRef}
-          style={styles.scroll}
-          contentContainerStyle={[
-            styles.content,
-            {
-              paddingBottom: Math.max(insets.bottom + 20, keyboardInset + 20),
-            },
-          ]}
-          showsVerticalScrollIndicator={false}
-          keyboardShouldPersistTaps="always"
-          keyboardDismissMode="interactive"
-          nestedScrollEnabled
-        >
-          {children}
-        </ScrollView>
+          <ScrollView
+            testID="settings-scroll-view"
+            ref={contentScrollRef}
+            style={styles.scroll}
+            contentContainerStyle={[
+              styles.content,
+              {
+                paddingBottom: Math.max(insets.bottom + 20, keyboardInset + 20),
+              },
+            ]}
+            showsVerticalScrollIndicator={false}
+            keyboardShouldPersistTaps="always"
+            keyboardDismissMode="interactive"
+            nestedScrollEnabled
+          >
+            {children}
+          </ScrollView>
+        </View>
       </Animated.View>
       <Toast
         message={validationToastMessage ?? ""}

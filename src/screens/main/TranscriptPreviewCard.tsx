@@ -28,6 +28,7 @@ interface TranscriptPreviewCardProps {
   activeConversationBranch?: ConversationBranchOrigin;
   conversationBranches?: ConversationMeta[];
   colors: Colors;
+  contentMaxWidth?: number;
   layout?: "portrait" | "landscape";
   messages: Message[];
   activeReplayMessageId?: string | null;
@@ -56,6 +57,7 @@ export function TranscriptPreviewCard({
   activeConversationBranch,
   conversationBranches = [],
   colors,
+  contentMaxWidth,
   layout = "portrait",
   messages,
   activeReplayMessageId = null,
@@ -178,7 +180,18 @@ export function TranscriptPreviewCard({
         },
       ]}
     >
-      <View style={styles.transcriptBody}>
+      <View
+        style={[
+          styles.transcriptBody,
+          contentMaxWidth
+            ? {
+                alignSelf: "center",
+                maxWidth: contentMaxWidth,
+                width: "100%",
+              }
+            : null,
+        ]}
+      >
         <ChatTranscript
           conversationId={activeConversationId}
           messages={visibleMessages}

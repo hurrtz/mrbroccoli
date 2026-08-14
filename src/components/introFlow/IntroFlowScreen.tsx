@@ -1,6 +1,8 @@
 import React from "react";
 import {
+  type LayoutChangeEvent,
   Modal,
+  Platform,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -21,6 +23,7 @@ import { PhosphorIcon } from "../../design-system/PhosphorIcon";
 import { getAppLocale, type AppLanguage } from "../../i18n/localeRegistry";
 import type { TranslateFn } from "../../screens/main/shared";
 import { fonts } from "../../theme/typography";
+import { resolveIpadLayout } from "../../utils/ipadLayout";
 import { IntroStepper } from "./IntroStepper";
 import type { AutoSetupJobState } from "../autoSetup/types";
 import {
@@ -56,7 +59,9 @@ interface IntroFlowScreenProps {
 }
 
 /**
- * The introduction, as a full screen rather than a sheet.
+ * The introduction, as a focused full-screen surface rather than a sheet.
+ * Regular iPad constrains its unchanged flow to a centred card inside that
+ * surface; phones and compact iPad windows use the complete viewport.
  *
  * Three steps: a welcome that demonstrates instead of describing, one setup
  * screen with a single green path, and a live test where the user judges the
@@ -91,25 +96,58 @@ export function IntroFlowScreen({
 }: IntroFlowScreenProps) {
   const theme = useIntroTheme();
   const { isDark } = useTheme();
-  const { width } = useWindowDimensions();
+  const { height, width } = useWindowDimensions();
   const direction = getAppLocale(language).direction;
   const isRtl = direction === "rtl";
+  const ipadLayout = resolveIpadLayout({
+    height,
+    isPad: Platform.OS === "ios" && Platform.isPad,
+    platform: Platform.OS,
+    width,
+  });
+  const usesIpadCard = ipadLayout.isRegularWidth;
+  const pagerViewportLayoutKey = `${usesIpadCard ? "card" : "screen"}:${width}:${height}`;
+  const fallbackPagerViewportWidth = usesIpadCard
+    ? Math.min(640, Math.max(1, width - 52))
+    : width;
   const [index, setIndex] = React.useState(0);
   // Remounts the steps on each open so per-step state -- the manual switch,
   // the played flag, the preview language -- resets with the flow.
   const [openNonce, setOpenNonce] = React.useState(0);
+  const [pagerViewportMeasurement, setPagerViewportMeasurement] =
+    React.useState<{ layoutKey: string; width: number } | null>(null);
   const pagerRef = React.useRef<ScrollView>(null);
   const alignedPagerLayoutRef = React.useRef<string | null>(null);
   const lastSessionIdRef = React.useRef<number | null>(null);
   const finalIndex = INTRO_STEPS.length - 1;
   const maxReachableIndex = firstRun && !thinkingReady ? 1 : finalIndex;
+  const pagerViewportWidth =
+    pagerViewportMeasurement?.layoutKey === pagerViewportLayoutKey
+      ? pagerViewportMeasurement.width
+      : fallbackPagerViewportWidth;
+  const handlePagerViewportLayout = React.useCallback(
+    (event: LayoutChangeEvent) => {
+      const measuredWidth = event.nativeEvent.layout.width;
+      if (!Number.isFinite(measuredWidth) || measuredWidth <= 0) {
+        return;
+      }
+      setPagerViewportMeasurement((current) =>
+        current?.layoutKey === pagerViewportLayoutKey &&
+        current.width === measuredWidth
+          ? current
+          : { layoutKey: pagerViewportLayoutKey, width: measuredWidth },
+      );
+    },
+    [pagerViewportLayoutKey],
+  );
 
   const getPagerOffset = React.useCallback(
     (logicalIndex: number) =>
-      (isRtl ? maxReachableIndex - logicalIndex : logicalIndex) * width,
-    [isRtl, maxReachableIndex, width],
+      (isRtl ? maxReachableIndex - logicalIndex : logicalIndex) *
+      pagerViewportWidth,
+    [isRtl, maxReachableIndex, pagerViewportWidth],
   );
-  const pagerLayoutKey = `${visible ? "open" : "closed"}:${direction}:${maxReachableIndex}:${width}`;
+  const pagerLayoutKey = `${visible ? "open" : "closed"}:${direction}:${maxReachableIndex}:${pagerViewportWidth}`;
 
   // A fresh open starts at the beginning; a reopened introduction should not
   // resume wherever it was abandoned. A serialized Settings or purchase
@@ -189,169 +227,211 @@ export function IntroFlowScreen({
           style={[styles.root, { backgroundColor: theme.canvas, direction }]}
           testID="intro-flow-root"
         >
-          <SafeAreaView edges={["top", "bottom"]} style={styles.safeArea}>
-            <View style={styles.header}>
-              <Pressable
-                accessibilityLabel={t("introBack")}
-                accessibilityRole="button"
-                accessibilityState={{ disabled: isFirst }}
-                disabled={isFirst}
-                onPress={() => goTo(index - 1)}
-                style={[
-                  styles.headerButton,
-                  isFirst ? styles.headerHidden : null,
-                ]}
-                testID="intro-back"
-              >
-                {/* Bare glyph on the 44pt target: the intro's nav controls
-                    carry no filled faces, and back is a full arrow. */}
-                <PhosphorIcon
-                  color={theme.textSecondary}
-                  name={isRtl ? "arrow-right" : "arrow-left"}
-                  size="navigation"
-                />
-              </Pressable>
-
-              <IntroStepper
-                count={INTRO_STEPS.length}
-                index={index}
-                maxReachableIndex={maxReachableIndex}
-                onSelect={goTo}
-                t={t}
-              />
-
-              {showClose ? (
-                <Pressable
-                  accessibilityLabel={t("introBannerDismiss")}
-                  accessibilityRole="button"
-                  onPress={onClose}
-                  style={styles.headerButton}
-                  testID="intro-close"
-                >
-                  <PhosphorIcon
-                    color={theme.textSecondary}
-                    name="close"
-                    size="navigation"
-                  />
-                </Pressable>
-              ) : (
-                <View
-                  accessibilityElementsHidden
-                  importantForAccessibility="no"
-                  style={styles.headerButton}
-                />
-              )}
-            </View>
-
-            <ScrollView
-              contentOffset={{ x: getPagerOffset(0), y: 0 }}
-              contentContainerStyle={styles.pagerContent}
-              horizontal
-              onMomentumScrollEnd={(event) => {
-                const physicalIndex = Math.round(
-                  event.nativeEvent.contentOffset.x / Math.max(1, width),
-                );
-                const requestedIndex = isRtl
-                  ? maxReachableIndex - physicalIndex
-                  : physicalIndex;
-                const reachableIndex = clampToReachableIndex(requestedIndex);
-                setIndex(reachableIndex);
-                if (reachableIndex !== requestedIndex) {
-                  pagerRef.current?.scrollTo({
-                    animated: true,
-                    x: getPagerOffset(reachableIndex),
-                  });
-                }
-              }}
-              pagingEnabled
-              ref={pagerRef}
-              showsHorizontalScrollIndicator={false}
-              style={styles.pager}
-              testID="intro-flow-content"
+          <View
+            style={[styles.flowFrame, usesIpadCard ? styles.ipadInset : null]}
+            testID="intro-flow-frame"
+          >
+            <View
+              style={[
+                styles.cardFrame,
+                usesIpadCard
+                  ? [styles.ipadCardShadow, { shadowColor: theme.shadow }]
+                  : null,
+              ]}
+              testID="intro-flow-card"
             >
-              {(isRtl
-                ? [...INTRO_STEPS.slice(0, maxReachableIndex + 1)].reverse()
-                : INTRO_STEPS.slice(0, maxReachableIndex + 1)
-              ).map((step) => {
-                const StepContent = INTRO_STEP_CONTENT[step];
-                return (
-                  <ScrollView
-                    contentContainerStyle={[
-                      styles.page,
-                      step === "welcome" || step === "try"
-                        ? styles.pageFill
-                        : null,
-                    ]}
-                    key={`${step}-${openNonce}`}
-                    showsVerticalScrollIndicator={false}
-                    style={{ direction, width }}
-                    testID={`intro-page-${step}`}
-                  >
-                    <StepContent
-                      autoSetup={autoSetup}
-                      language={language}
-                      modelStateReadsSuspended={modelStateReadsSuspended}
-                      onConnectProvider={onConnectProvider}
-                      onInstallLocal={onInstallLocal}
-                      onOpenStt={onOpenStt}
-                      onOpenTts={onOpenTts}
-                      t={t}
-                      testTurn={testTurn}
-                      thinkingReady={thinkingReady}
-                    />
-                  </ScrollView>
-                );
-              })}
-            </ScrollView>
+              <View
+                style={[
+                  styles.cardSurface,
+                  usesIpadCard
+                    ? [
+                        styles.ipadCardSurface,
+                        {
+                          backgroundColor: theme.canvas,
+                          borderColor: theme.border,
+                        },
+                      ]
+                    : null,
+                ]}
+                testID="intro-flow-card-surface"
+              >
+                <SafeAreaView
+                  edges={["top", "bottom"]}
+                  onLayout={handlePagerViewportLayout}
+                  style={styles.safeArea}
+                  testID="intro-flow-viewport"
+                >
+                  <View style={styles.header}>
+                    <Pressable
+                      accessibilityLabel={t("introBack")}
+                      accessibilityRole="button"
+                      accessibilityState={{ disabled: isFirst }}
+                      disabled={isFirst}
+                      onPress={() => goTo(index - 1)}
+                      style={[
+                        styles.headerButton,
+                        isFirst ? styles.headerHidden : null,
+                      ]}
+                      testID="intro-back"
+                    >
+                      {/* Bare glyph on the 44pt target: the intro's nav controls
+                    carry no filled faces, and back is a full arrow. */}
+                      <PhosphorIcon
+                        color={theme.textSecondary}
+                        name={isRtl ? "arrow-right" : "arrow-left"}
+                        size="navigation"
+                      />
+                    </Pressable>
 
-            {isLast ? (
-              <View style={styles.doneFooter}>
-                <Pressable
-                  accessibilityLabel={t("done")}
-                  accessibilityRole="button"
-                  accessibilityState={{ disabled: doneDisabled }}
-                  disabled={doneDisabled}
-                  onPress={onComplete}
-                  style={({ pressed }) => [
-                    styles.done,
-                    {
-                      backgroundColor: theme.accent,
-                      opacity: doneDisabled ? 0.4 : pressed ? 0.85 : 1,
-                    },
-                  ]}
-                  testID="intro-done"
-                >
-                  <Text style={[styles.doneLabel, { color: theme.onAccent }]}>
-                    {t("done")}
-                  </Text>
-                </Pressable>
+                    <IntroStepper
+                      count={INTRO_STEPS.length}
+                      index={index}
+                      maxReachableIndex={maxReachableIndex}
+                      onSelect={goTo}
+                      t={t}
+                    />
+
+                    {showClose ? (
+                      <Pressable
+                        accessibilityLabel={t("introBannerDismiss")}
+                        accessibilityRole="button"
+                        onPress={onClose}
+                        style={styles.headerButton}
+                        testID="intro-close"
+                      >
+                        <PhosphorIcon
+                          color={theme.textSecondary}
+                          name="close"
+                          size="navigation"
+                        />
+                      </Pressable>
+                    ) : (
+                      <View
+                        accessibilityElementsHidden
+                        importantForAccessibility="no"
+                        style={styles.headerButton}
+                      />
+                    )}
+                  </View>
+
+                  <ScrollView
+                    contentOffset={{ x: getPagerOffset(0), y: 0 }}
+                    contentContainerStyle={styles.pagerContent}
+                    horizontal
+                    onMomentumScrollEnd={(event) => {
+                      const physicalIndex = Math.round(
+                        event.nativeEvent.contentOffset.x /
+                          Math.max(1, pagerViewportWidth),
+                      );
+                      const requestedIndex = isRtl
+                        ? maxReachableIndex - physicalIndex
+                        : physicalIndex;
+                      const reachableIndex =
+                        clampToReachableIndex(requestedIndex);
+                      setIndex(reachableIndex);
+                      if (reachableIndex !== requestedIndex) {
+                        pagerRef.current?.scrollTo({
+                          animated: true,
+                          x: getPagerOffset(reachableIndex),
+                        });
+                      }
+                    }}
+                    pagingEnabled
+                    ref={pagerRef}
+                    showsHorizontalScrollIndicator={false}
+                    style={styles.pager}
+                    testID="intro-flow-content"
+                  >
+                    {(isRtl
+                      ? [
+                          ...INTRO_STEPS.slice(0, maxReachableIndex + 1),
+                        ].reverse()
+                      : INTRO_STEPS.slice(0, maxReachableIndex + 1)
+                    ).map((step) => {
+                      const StepContent = INTRO_STEP_CONTENT[step];
+                      return (
+                        <ScrollView
+                          contentContainerStyle={[
+                            styles.page,
+                            step === "welcome" || step === "try"
+                              ? styles.pageFill
+                              : null,
+                          ]}
+                          key={`${step}-${openNonce}`}
+                          showsVerticalScrollIndicator={false}
+                          style={{ direction, width: pagerViewportWidth }}
+                          testID={`intro-page-${step}`}
+                        >
+                          <StepContent
+                            autoSetup={autoSetup}
+                            language={language}
+                            modelStateReadsSuspended={modelStateReadsSuspended}
+                            onConnectProvider={onConnectProvider}
+                            onInstallLocal={onInstallLocal}
+                            onOpenStt={onOpenStt}
+                            onOpenTts={onOpenTts}
+                            t={t}
+                            testTurn={testTurn}
+                            thinkingReady={thinkingReady}
+                          />
+                        </ScrollView>
+                      );
+                    })}
+                  </ScrollView>
+
+                  {isLast ? (
+                    <View style={styles.doneFooter}>
+                      <Pressable
+                        accessibilityLabel={t("done")}
+                        accessibilityRole="button"
+                        accessibilityState={{ disabled: doneDisabled }}
+                        disabled={doneDisabled}
+                        onPress={onComplete}
+                        style={({ pressed }) => [
+                          styles.done,
+                          {
+                            backgroundColor: theme.accent,
+                            opacity: doneDisabled ? 0.4 : pressed ? 0.85 : 1,
+                          },
+                        ]}
+                        testID="intro-done"
+                      >
+                        <Text
+                          style={[styles.doneLabel, { color: theme.onAccent }]}
+                        >
+                          {t("done")}
+                        </Text>
+                      </Pressable>
+                    </View>
+                  ) : (
+                    <View style={styles.footer}>
+                      <Pressable
+                        accessibilityLabel={t("introNext")}
+                        accessibilityRole="button"
+                        accessibilityState={{ disabled: forwardDisabled }}
+                        disabled={forwardDisabled}
+                        onPress={() => goTo(index + 1)}
+                        style={({ pressed }) => [
+                          styles.primary,
+                          {
+                            backgroundColor: theme.accent,
+                            opacity: forwardDisabled ? 0.4 : pressed ? 0.85 : 1,
+                          },
+                        ]}
+                        testID="intro-next"
+                      >
+                        <PhosphorIcon
+                          color={theme.onAccent}
+                          name={isRtl ? "left" : "right"}
+                          size="navigation"
+                        />
+                      </Pressable>
+                    </View>
+                  )}
+                </SafeAreaView>
               </View>
-            ) : (
-              <View style={styles.footer}>
-                <Pressable
-                  accessibilityLabel={t("introNext")}
-                  accessibilityRole="button"
-                  accessibilityState={{ disabled: forwardDisabled }}
-                  disabled={forwardDisabled}
-                  onPress={() => goTo(index + 1)}
-                  style={({ pressed }) => [
-                    styles.primary,
-                    {
-                      backgroundColor: theme.accent,
-                      opacity: forwardDisabled ? 0.4 : pressed ? 0.85 : 1,
-                    },
-                  ]}
-                  testID="intro-next"
-                >
-                  <PhosphorIcon
-                    color={theme.onAccent}
-                    name={isRtl ? "left" : "right"}
-                    size="navigation"
-                  />
-                </Pressable>
-              </View>
-            )}
-          </SafeAreaView>
+            </View>
+          </View>
         </View>
       </SafeAreaProvider>
     </Modal>
@@ -359,6 +439,13 @@ export function IntroFlowScreen({
 }
 
 const styles = StyleSheet.create({
+  cardFrame: {
+    flex: 1,
+    width: "100%",
+  },
+  cardSurface: {
+    flex: 1,
+  },
   done: {
     alignItems: "center",
     borderRadius: introRadius.control,
@@ -380,6 +467,9 @@ const styles = StyleSheet.create({
     paddingBottom: 10,
     paddingTop: 10,
   },
+  flowFrame: {
+    flex: 1,
+  },
   header: {
     alignItems: "center",
     flexDirection: "row",
@@ -397,6 +487,23 @@ const styles = StyleSheet.create({
   },
   headerHidden: {
     opacity: 0,
+  },
+  ipadCardShadow: {
+    borderRadius: 20,
+    maxWidth: 640,
+    shadowOffset: { height: 20, width: 0 },
+    shadowOpacity: 0.16,
+    shadowRadius: 25,
+  },
+  ipadCardSurface: {
+    borderRadius: 20,
+    borderWidth: 1,
+    overflow: "hidden",
+  },
+  ipadInset: {
+    alignItems: "center",
+    justifyContent: "center",
+    padding: 26,
   },
   page: {
     gap: 16,

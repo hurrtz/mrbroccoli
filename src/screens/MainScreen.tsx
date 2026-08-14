@@ -15,6 +15,7 @@ import { getLocalModel } from "../constants/localModels";
 import type { LocalModelId } from "../constants/localModels";
 import { useLocalization } from "../i18n";
 import { useTheme } from "../theme/ThemeContext";
+import { resolveIpadLayout } from "../utils/ipadLayout";
 import { MainScreenPresentation } from "./main/MainScreenPresentation";
 import { getMainScreenViewModel } from "./main/mainScreenViewModel";
 import {
@@ -66,7 +67,7 @@ import {
 
 export function MainScreen() {
   const { colors, isDark } = useTheme();
-  const { t, language } = useLocalization();
+  const { language, t } = useLocalization();
   const { height, width } = useWindowDimensions();
   const {
     settings,
@@ -318,11 +319,15 @@ export function MainScreen() {
 
   const [styleSheetVisible, setStyleSheetVisible] = React.useState(false);
   const [imageSourceVisible, setImageSourceVisible] = React.useState(false);
-  const [drawerArchivedOnOpen, setDrawerArchivedOnOpen] = React.useState(false);
+  const [drawerArchivedRevealRequestId, setDrawerArchivedRevealRequestId] =
+    React.useState<number | null>(null);
+  const drawerArchivedRevealSequenceRef = React.useRef(0);
   const {
     handleInputSurfaceChange,
+    handleTextInputFocusChange,
     handleTextMessageChange,
     inputSurfaceRef,
+    textInputFocusedRef,
     textMessageDraftRef,
   } = useMainScreenComposerDraft();
   const {
@@ -405,7 +410,37 @@ export function MainScreen() {
   const presentationAvailableResponseModes = premiumStorePromoActive
     ? runtimeSettings.responseModes.map(({ id }) => id)
     : availableResponseModes;
-  const isLandscape = width > height;
+  const ipadLayout = React.useMemo(
+    () =>
+      resolveIpadLayout({
+        height,
+        isPad: Platform.OS === "ios" && Platform.isPad,
+        platform: Platform.OS,
+        width,
+      }),
+    [height, width],
+  );
+  const { isLandscape } = ipadLayout;
+  const ipadLayoutRef = React.useRef(ipadLayout);
+  ipadLayoutRef.current = ipadLayout;
+  const drawerModalAvailable = !ipadLayout.isRegularWidth;
+  const drawerModalVisible = drawerModalAvailable && drawerVisible;
+  const transcriptModalAvailable =
+    !ipadLayout.transcriptDocked && (ipadLayout.isRegularWidth || !isLandscape);
+  const transcriptModalVisible =
+    transcriptModalAvailable && transcriptSheetVisible;
+
+  React.useEffect(() => {
+    if (!drawerModalAvailable && drawerVisible) {
+      setDrawerVisible(false);
+    }
+  }, [drawerModalAvailable, drawerVisible, setDrawerVisible]);
+
+  React.useEffect(() => {
+    if (!transcriptModalAvailable && transcriptSheetVisible) {
+      closeTranscriptSheet();
+    }
+  }, [closeTranscriptSheet, transcriptModalAvailable, transcriptSheetVisible]);
   const ulraMode = useUlraModeControl({
     availableModelCount: presentationAvailableResponseModes.length,
     settings: runtimeSettings,
@@ -827,7 +862,7 @@ export function MainScreen() {
     serializedSurfacePending ||
     (premiumSurfaceActive && !premiumModalVisible);
   const mainSurfaceVisible = !(
-    drawerVisible ||
+    drawerModalVisible ||
     imageSourceVisible ||
     Boolean(imagePromptSubmission.consent) ||
     introVisible ||
@@ -835,7 +870,7 @@ export function MainScreen() {
     routePickerVisible ||
     settingsVisible ||
     styleSheetVisible ||
-    transcriptSheetVisible ||
+    transcriptModalVisible ||
     freeOffline.setupVisible ||
     premiumSurfaceActive ||
     secondarySurfaceTransitionVisible
@@ -1069,16 +1104,24 @@ export function MainScreen() {
   }, [handleOpenSpeakingSettings, runAfterTranscriptDismiss]);
   const handleOpenArchivedConversations = React.useCallback(() => {
     runAfterSettingsDismiss(() => {
-      setDrawerArchivedOnOpen(true);
-      setDrawerVisible(true);
+      drawerArchivedRevealSequenceRef.current += 1;
+      setDrawerArchivedRevealRequestId(drawerArchivedRevealSequenceRef.current);
+      if (!ipadLayoutRef.current.isRegularWidth) {
+        setDrawerVisible(true);
+      }
     });
   }, [runAfterSettingsDismiss, setDrawerVisible]);
+  const handleArchivedRevealHandled = React.useCallback((requestId: number) => {
+    setDrawerArchivedRevealRequestId((currentRequestId) =>
+      currentRequestId === requestId ? null : currentRequestId,
+    );
+  }, []);
   const handleCloseConversationDrawer = React.useCallback(() => {
-    setDrawerArchivedOnOpen(false);
+    setDrawerArchivedRevealRequestId(null);
     handleCloseDrawer();
   }, [handleCloseDrawer]);
   const handleConversationDrawerDismiss = React.useCallback(() => {
-    setDrawerArchivedOnOpen(false);
+    setDrawerArchivedRevealRequestId(null);
     handleDrawerDismiss();
   }, [handleDrawerDismiss]);
 
@@ -1139,7 +1182,7 @@ export function MainScreen() {
     activeReplayMessageId,
     activeResponseMode,
     conversationCount: conversations.length,
-    drawerVisible,
+    drawerVisible: drawerModalVisible,
     inputMode: runtimeSettings.inputMode,
     isRecording,
     loaded,
@@ -1221,6 +1264,7 @@ export function MainScreen() {
         visible: Boolean(imagePromptSubmission.consent),
       }}
       isDark={isDark}
+      ipadLayout={ipadLayout}
       isLandscape={isLandscape}
       language={language}
       toast={{
@@ -1339,6 +1383,7 @@ export function MainScreen() {
             (!storePromoScene || storePromoOnboardingActive),
         },
         isLandscape,
+        ipadLayout,
         topBar: {
           brandName: t("appName"),
           debugLogActive: debugLogCaptureState.active,
@@ -1413,13 +1458,14 @@ export function MainScreen() {
           onDismiss: handleTranscriptDismiss,
           onOpen: openTranscriptSheet,
           showLabel: t("showTranscript"),
-          visible: transcriptSheetVisible,
+          visible: transcriptModalVisible,
         },
         visualPhase,
         voiceStage: {
           attachments: pendingImages.attachments,
           disabled: voiceStageDisabled,
           initialInputSurface: inputSurfaceRef.current,
+          initialTextInputFocused: textInputFocusedRef.current,
           initialTextMessage: textMessageDraftRef.current,
           inputMode: runtimeSettings.inputMode,
           isActive: voiceStageActive,
@@ -1436,6 +1482,7 @@ export function MainScreen() {
               ? handleOpenProviderSettings
               : handleOpenSpeakingSettings,
           onSubmitTextMessage: handleSubmitTextMessage,
+          onTextInputFocusChange: handleTextInputFocusChange,
           onTextMessageChange: handleTextMessageChange,
           orbProgressOverride: storePromoOrbPresentation,
           playbackPaused: player.isPlaybackPaused,
@@ -1567,12 +1614,12 @@ export function MainScreen() {
         onDismiss: handlePremiumDismiss,
       }}
       conversationDrawer={{
-        archivedInitiallyExpanded: drawerArchivedOnOpen,
+        archivedRevealRequestId: drawerArchivedRevealRequestId,
         // Feedback for drawer-born actions (auto-naming) renders inside the
         // drawer modal; the workspace toast layer sits underneath it.
         toast,
         onDismissToast: dismissToast,
-        visible: drawerVisible,
+        visible: drawerModalVisible,
         conversations,
         activeId: activeConversation?.id || null,
         onSearchConversations: searchConversations,
@@ -1591,6 +1638,7 @@ export function MainScreen() {
           void handleTogglePrivate(id);
         },
         onDelete: handleDeleteConversation,
+        onArchivedRevealHandled: handleArchivedRevealHandled,
         onClose: handleCloseConversationDrawer,
         onDismiss: handleConversationDrawerDismiss,
       }}

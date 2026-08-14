@@ -1,8 +1,16 @@
 import { ConversationMeta, ToastTone } from "../../types";
 
+export type ConversationDrawerPresentation = "modal" | "sidebar";
+
 export interface ConversationDrawerProps {
   visible: boolean;
-  archivedInitiallyExpanded?: boolean;
+  /** Inline sidebars stay mounted independently of the modal visibility flag. */
+  presentation?: ConversationDrawerPresentation;
+  sidebarWidth?: number;
+  /** Monotonic one-shot request used by Settings to reveal Archived again. */
+  archivedRevealRequestId?: number | null;
+  /** Acknowledges a consumed reveal so it cannot leak into a later mount. */
+  onArchivedRevealHandled?: (requestId: number) => void;
   conversations: ConversationMeta[];
   activeId: string | null;
   onSearchConversations: (query: string) => Promise<ConversationMeta[]>;
@@ -17,6 +25,8 @@ export interface ConversationDrawerProps {
   onNewSession: () => Promise<void> | void;
   onDelete: (id: string) => void;
   onClose: () => void;
+  /** Global app Settings action shown only by the persistent sidebar header. */
+  onOpenSettings?: () => void;
   onDismiss?: () => void;
   /** Feedback for actions begun in the drawer (auto-naming) surfaces here —
       the workspace toast layer sits under this modal and cannot. */

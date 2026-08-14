@@ -701,9 +701,13 @@ describe("MainScreenVoiceStage composer", () => {
     ).toBe("Show voice input");
   });
 
-  it("restores the selected surface and draft after a layout remount", () => {
+  it("restores a focused text composer after a layout remount", () => {
+    const requestFrame = jest
+      .spyOn(global, "requestAnimationFrame")
+      .mockImplementation(() => 0);
     let rememberedSurface: "voice" | "text" = "voice";
     let rememberedDraft = "";
+    let rememberedFocus = false;
     const firstScreen = renderStage(
       <MainScreenVoiceStage
         {...createProps({
@@ -713,20 +717,25 @@ describe("MainScreenVoiceStage composer", () => {
           onTextMessageChange: (text: string) => {
             rememberedDraft = text;
           },
+          onTextInputFocusChange: (focused: boolean) => {
+            rememberedFocus = focused;
+          },
         })}
       />,
     );
     fireEvent.press(firstScreen.getByTestId("pager-chevron-right"));
-    fireEvent.changeText(
-      firstScreen.getByPlaceholderText("Type a message"),
-      "Survive rotation",
-    );
+    const firstInput = firstScreen.getByPlaceholderText("Type a message");
+    fireEvent.changeText(firstInput, "Survive rotation");
+    fireEvent(firstInput, "focus");
+    expect(rememberedFocus).toBe(true);
     firstScreen.unmount();
+    requestFrame.mockClear();
 
     const secondScreen = renderStage(
       <MainScreenVoiceStage
         {...createProps({
           initialInputSurface: rememberedSurface,
+          initialTextInputFocused: rememberedFocus,
           initialTextMessage: rememberedDraft,
         })}
       />,
@@ -739,6 +748,21 @@ describe("MainScreenVoiceStage composer", () => {
     expect(
       secondScreen.getByPlaceholderText("Type a message").props.value,
     ).toBe("Survive rotation");
+    expect(requestFrame).toHaveBeenCalledTimes(1);
+
+    secondScreen.unmount();
+    requestFrame.mockClear();
+    renderStage(
+      <MainScreenVoiceStage
+        {...createProps({
+          initialInputSurface: "text",
+          initialTextInputFocused: false,
+          initialTextMessage: rememberedDraft,
+        })}
+      />,
+    );
+    expect(requestFrame).not.toHaveBeenCalled();
+    requestFrame.mockRestore();
   });
 
   it("keeps the orb slot while active and shows recording on its rings", () => {

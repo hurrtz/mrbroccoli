@@ -26,7 +26,9 @@ import { useConversationDrawerController } from "./conversationDrawer/useConvers
 
 export const ConversationDrawer = React.memo(function ConversationDrawer({
   visible,
-  archivedInitiallyExpanded = false,
+  presentation = "modal",
+  sidebarWidth,
+  archivedRevealRequestId,
   conversations,
   activeId,
   onSearchConversations,
@@ -41,6 +43,8 @@ export const ConversationDrawer = React.memo(function ConversationDrawer({
   onNewSession,
   onDelete,
   onClose,
+  onOpenSettings,
+  onArchivedRevealHandled,
   onDismiss,
   toast,
   onDismissToast,
@@ -50,9 +54,11 @@ export const ConversationDrawer = React.memo(function ConversationDrawer({
   const { height, width } = useWindowDimensions();
   const insets = useSafeAreaInsets();
   const isLandscape = width > height;
+  const isSidebar = presentation === "sidebar";
   const drawerMaxWidth = isLandscape ? Math.min(width * 0.44, 520) : width;
   const controller = useConversationDrawerController({
-    visible,
+    visible: isSidebar || visible,
+    dismissAfterAction: !isSidebar,
     conversations,
     onClose,
     onNewSession,
@@ -91,8 +97,125 @@ export const ConversationDrawer = React.memo(function ConversationDrawer({
     [conversations, onDelete, t],
   );
 
-  if (!visible) {
+  if (!visible && !isSidebar) {
     return null;
+  }
+
+  const drawerSurface = (
+    <KeyboardAvoidingView
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      testID={isSidebar ? "conversation-sidebar-surface" : undefined}
+      style={
+        isSidebar
+          ? [
+              styles.drawer,
+              {
+                borderEndWidth: 1,
+                maxWidth: "100%",
+              },
+              {
+                backgroundColor: colors.surface,
+                borderEndColor: colors.border,
+              },
+            ]
+          : [
+              styles.drawer,
+              {
+                maxWidth: drawerMaxWidth,
+                width: isLandscape ? "44%" : "100%",
+                borderRightWidth: isLandscape ? 1 : 0,
+              },
+              {
+                backgroundColor: colors.background,
+                borderRightColor: colors.border,
+              },
+            ]
+      }
+    >
+      <ConversationDrawerHeader
+        onClose={onClose}
+        onNewSession={controller.handleNewSession}
+        onOpenSettings={onOpenSettings}
+        presentation={presentation}
+      />
+      <ConversationDrawerList
+        activeId={activeId}
+        allConversations={conversations}
+        archivedRevealRequestId={archivedRevealRequestId}
+        compact={isLandscape && !isSidebar}
+        conversations={controller.visibleConversations}
+        presentation={presentation}
+        searchQuery={controller.searchQuery}
+        onDeleteConversation={handleDelete}
+        onArchivedRevealHandled={onArchivedRevealHandled}
+        onOpenActionConversation={controller.openActionConversation}
+        onSelectConversation={controller.handleSelectConversation}
+      />
+      <ConversationDrawerSearch
+        inline={isSidebar}
+        searchQuery={controller.searchQuery}
+        onChangeSearchQuery={controller.setSearchQuery}
+        onClearSearch={controller.clearSearch}
+      />
+    </KeyboardAvoidingView>
+  );
+
+  const drawerOverlays = (
+    <>
+      <ConversationActionMenu
+        anchorY={
+          isSidebar
+            ? Math.max(0, controller.actionAnchorY - insets.top)
+            : controller.actionAnchorY
+        }
+        availableHeight={
+          isSidebar ? Math.max(0, height - insets.top - insets.bottom) : height
+        }
+        conversation={controller.actionConversation}
+        onClose={controller.closeActionModal}
+        onCopyThread={onCopyThread}
+        onDelete={handleDelete}
+        onOpenRenameModal={controller.openRenameModal}
+        onShareThread={onShareThread}
+        onTogglePinned={onTogglePinned}
+        onTogglePrivate={onTogglePrivate}
+        onToggleArchived={onToggleArchived}
+        onAutoName={onAutoName}
+      />
+      <ConversationRenameModal
+        visible={controller.editingConversationId !== null}
+        editingTitle={controller.editingTitle}
+        onChangeEditingTitle={controller.setEditingTitle}
+        onClose={controller.closeRenameModal}
+        onSubmit={controller.submitRename}
+      />
+      {!isSidebar && onDismissToast ? (
+        <View
+          pointerEvents="box-none"
+          style={[styles.toastHost, { top: isSidebar ? 0 : insets.top }]}
+        >
+          <Toast
+            message={toast?.message || ""}
+            visible={Boolean(toast)}
+            onDismiss={onDismissToast}
+            onRetry={toast?.onRetry}
+            tone={toast?.tone}
+          />
+        </View>
+      ) : null}
+    </>
+  );
+
+  if (isSidebar) {
+    return (
+      <View
+        style={[styles.sidebarRoot, { width: sidebarWidth ?? "100%" }]}
+        testID="conversation-drawer-sidebar"
+      >
+        {drawerSurface}
+        {drawerOverlays}
+      </View>
+    );
   }
 
   return (
@@ -106,42 +229,7 @@ export const ConversationDrawer = React.memo(function ConversationDrawer({
     >
       <View accessibilityViewIsModal style={styles.modalRoot}>
         <View style={styles.container}>
-          <KeyboardAvoidingView
-            behavior={Platform.OS === "ios" ? "padding" : "height"}
-            style={[
-              styles.drawer,
-              {
-                maxWidth: drawerMaxWidth,
-                width: isLandscape ? "44%" : "100%",
-                borderRightWidth: isLandscape ? 1 : 0,
-              },
-              {
-                backgroundColor: colors.background,
-                borderRightColor: colors.border,
-              },
-            ]}
-          >
-            <ConversationDrawerHeader
-              onClose={onClose}
-              onNewSession={controller.handleNewSession}
-            />
-            <ConversationDrawerList
-              activeId={activeId}
-              allConversations={conversations}
-              archivedInitiallyExpanded={archivedInitiallyExpanded}
-              compact={isLandscape}
-              conversations={controller.visibleConversations}
-              searchQuery={controller.searchQuery}
-              onDeleteConversation={handleDelete}
-              onOpenActionConversation={controller.openActionConversation}
-              onSelectConversation={controller.handleSelectConversation}
-            />
-            <ConversationDrawerSearch
-              searchQuery={controller.searchQuery}
-              onChangeSearchQuery={controller.setSearchQuery}
-              onClearSearch={controller.clearSearch}
-            />
-          </KeyboardAvoidingView>
+          {drawerSurface}
           {isLandscape ? (
             <TouchableOpacity
               style={[styles.backdrop, { backgroundColor: colors.overlay }]}
@@ -153,42 +241,7 @@ export const ConversationDrawer = React.memo(function ConversationDrawer({
             />
           ) : null}
         </View>
-
-        <ConversationActionMenu
-          anchorY={controller.actionAnchorY}
-          availableHeight={height}
-          conversation={controller.actionConversation}
-          onClose={controller.closeActionModal}
-          onCopyThread={onCopyThread}
-          onDelete={handleDelete}
-          onOpenRenameModal={controller.openRenameModal}
-          onShareThread={onShareThread}
-          onTogglePinned={onTogglePinned}
-          onTogglePrivate={onTogglePrivate}
-          onToggleArchived={onToggleArchived}
-          onAutoName={onAutoName}
-        />
-        <ConversationRenameModal
-          visible={controller.editingConversationId !== null}
-          editingTitle={controller.editingTitle}
-          onChangeEditingTitle={controller.setEditingTitle}
-          onClose={controller.closeRenameModal}
-          onSubmit={controller.submitRename}
-        />
-        {onDismissToast ? (
-          <View
-            pointerEvents="box-none"
-            style={[styles.toastHost, { top: insets.top }]}
-          >
-            <Toast
-              message={toast?.message || ""}
-              visible={Boolean(toast)}
-              onDismiss={onDismissToast}
-              onRetry={toast?.onRetry}
-              tone={toast?.tone}
-            />
-          </View>
-        ) : null}
+        {drawerOverlays}
       </View>
     </Modal>
   );

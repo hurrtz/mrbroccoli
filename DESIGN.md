@@ -69,6 +69,21 @@ settings, history, setup, receipts, and diagnostics are secondary surfaces so
 the default experience remains voice-first even though expert controls remain
 available.
 
+The iOS presentation remains one component tree across iPhone and iPad.
+`resolveIpadLayout` maps the live window and native iPad identity into compact
+or regular presentation state. Compact windows take the unchanged phone tree;
+regular windows retain the same controllers while `MainScreenPresentation`
+adds the persistent conversations sidebar, `MainScreenWorkspace` selects the
+regular workspace geometry, Settings changes to master-detail, and Intro
+constrains its own pager to a centred card.
+
+**Decision:** React Native does not expose UIKit's live horizontal size class
+to this shared tree, so 680pt is the centralized regular-width approximation.
+Transcript docking has a separate 1024pt viability threshold: a 296pt sidebar
+plus a roughly 400pt transcript at every regular landscape width would leave
+no useful centre workspace. Narrower regular windows keep the transcript
+handle and sheet until all three panes fit.
+
 Native secondary surfaces never present a sibling modal during teardown. A
 cross-surface action queues its destination, dismisses any nested sheet and its
 parent in order, then drains the queue from the native dismissal callback; a
@@ -309,6 +324,11 @@ the operating system or lifecycle requires them:
 
 Native changes require platform tests and a fresh native build. Expo Go cannot
 validate these boundaries.
+
+The iOS app, test bundle, and Live Activity extension target device families 1
+and 2. `supportsTablet: true`, `UIRequiresFullScreen: false`, and all four
+orientations make the same binary resize across iPhone, iPad, Split View, and
+Stage Manager rather than introducing an iPad-specific entry point.
 
 The installed Sherpa runtime is the licence-safe libphonemize variant. Its
 model validation accepts the curated pack-only `espeak-ng-data` directory, and

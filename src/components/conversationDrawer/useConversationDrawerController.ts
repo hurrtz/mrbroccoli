@@ -4,6 +4,7 @@ import { ConversationMeta } from "../../types";
 
 interface UseConversationDrawerControllerParams {
   visible: boolean;
+  dismissAfterAction?: boolean;
   conversations: ConversationMeta[];
   onSearchConversations: (query: string) => Promise<ConversationMeta[]>;
   onRenameThread: (id: string, title: string) => void;
@@ -14,6 +15,7 @@ interface UseConversationDrawerControllerParams {
 
 export function useConversationDrawerController({
   visible,
+  dismissAfterAction = true,
   conversations,
   onSearchConversations,
   onRenameThread,
@@ -29,9 +31,8 @@ export function useConversationDrawerController({
   >(null);
   const [editingTitle, setEditingTitle] = React.useState("");
   const [searchQuery, setSearchQuery] = React.useState("");
-  const [filteredConversations, setFilteredConversations] = React.useState<
-    ConversationMeta[]
-  >(conversations);
+  const [filteredConversations, setFilteredConversations] =
+    React.useState<ConversationMeta[]>(conversations);
 
   const visibleConversations = searchQuery.trim()
     ? filteredConversations
@@ -39,8 +40,9 @@ export function useConversationDrawerController({
   const actionConversation = React.useMemo(
     () =>
       actionConversationId
-        ? conversations.find((conversation) => conversation.id === actionConversationId) ??
-          null
+        ? (conversations.find(
+            (conversation) => conversation.id === actionConversationId,
+          ) ?? null)
         : null,
     [actionConversationId, conversations],
   );
@@ -89,16 +91,22 @@ export function useConversationDrawerController({
   }, []);
 
   const [actionAnchorY, setActionAnchorY] = React.useState(0);
-  const openActionConversation = React.useCallback((conversationId: string, anchorY = 0) => {
-    setActionAnchorY(anchorY);
-    setActionConversationId(conversationId);
-  }, []);
+  const openActionConversation = React.useCallback(
+    (conversationId: string, anchorY = 0) => {
+      setActionAnchorY(anchorY);
+      setActionConversationId(conversationId);
+    },
+    [],
+  );
 
-  const openRenameModal = React.useCallback((conversation: ConversationMeta) => {
-    setEditingConversationId(conversation.id);
-    setEditingTitle(conversation.title);
-    setActionConversationId(null);
-  }, []);
+  const openRenameModal = React.useCallback(
+    (conversation: ConversationMeta) => {
+      setEditingConversationId(conversation.id);
+      setEditingTitle(conversation.title);
+      setActionConversationId(null);
+    },
+    [],
+  );
 
   const submitRename = React.useCallback(() => {
     if (!editingConversationId || !editingTitle.trim()) {
@@ -113,18 +121,22 @@ export function useConversationDrawerController({
     (conversationId: string) => {
       void (async () => {
         await onSelect(conversationId);
-        onClose();
+        if (dismissAfterAction) {
+          onClose();
+        }
       })();
     },
-    [onClose, onSelect],
+    [dismissAfterAction, onClose, onSelect],
   );
 
   const handleNewSession = React.useCallback(() => {
     void (async () => {
       await onNewSession();
-      onClose();
+      if (dismissAfterAction) {
+        onClose();
+      }
     })();
-  }, [onClose, onNewSession]);
+  }, [dismissAfterAction, onClose, onNewSession]);
 
   return {
     actionAnchorY,

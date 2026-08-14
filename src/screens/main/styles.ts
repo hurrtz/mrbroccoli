@@ -32,6 +32,17 @@ export const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingBottom: 8,
   },
+  ipadShell: {
+    flex: 1,
+    flexDirection: "row",
+    minHeight: 0,
+  },
+  ipadWorkspaceLayout: {
+    flex: 1,
+    minWidth: 0,
+    paddingBottom: 0,
+    paddingHorizontal: 0,
+  },
   defaultScroll: {
     flex: 1,
   },

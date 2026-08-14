@@ -42,9 +42,10 @@ receive already-derived state and callbacks.
   the estimate both fill with red. The gap between the core disc and the inner
   ring is only ever a gap: the screen reads through it in every phase, while
   the inner and outer rings meet flush. The orb is sized from the space the
-  column actually leaves it, clamped between 96pt and its ceiling (196
-  portrait, 150 landscape), so the intro banner or a landscape split simply
-  makes it smaller.
+  column actually leaves it, clamped between 96pt and its surface ceiling (196
+  phone portrait, 150 phone landscape; 168-224 across regular-iPad states), so
+  the intro banner, transcript dock, or a landscape split simply makes it
+  smaller.
 - In portrait, left and right 44pt chevrons flank the measured orb. They make
   the voice/text pager discoverable without competing with the voice action.
   **Decision:** the pager is a closed circle — every decisive swipe and every
@@ -197,6 +198,26 @@ receive already-derived state and callbacks.
   the portrait quick-settings sentence. The portrait Image satellite owns the
   attachment entry point; the composer owns only the pending-attachment preview
   and its remove action.
+- **Decision:** compact iPad windows are the phone workspace wholesale. At
+  regular width the conversations surface is a permanent leading sidebar —
+  300pt in portrait, 336pt in undocked landscape, and 296pt in the wide
+  three-pane layout — with the same rows, search, archive state, actions, and
+  New control as the phone drawer. It has no backdrop, close action, or menu
+  button; selection and New keep it mounted. Its header also retains the global
+  Settings entry.
+- Regular iPad keeps the route byline centred, the conversation-settings
+  control at the trailing edge, and the voice/composer stage in the remaining
+  content pane. Portrait and narrower regular landscape keep the transcript
+  handle and sheet, whose body is capped at 720pt. Wide regular landscape docks
+  one transcript at the trailing edge and removes every open/close affordance.
+  **Decision:** docking begins at 1024pt of window width, not at every regular
+  landscape orientation, because the approved sidebar and transcript widths
+  otherwise consume the whole 680pt regular boundary.
+- Crossing compact, regular, and docked boundaries preserves the active turn,
+  composer surface and draft. A text input that actually held focus restores
+  that focus after reparenting; a swipe that merely selected the text page does
+  not open the keyboard. Drawer or transcript modal state that becomes
+  inapplicable is retired instead of reopening after a later resize.
 - Conversation, settings, status, receipt, setup, and diagnostics surfaces do
   not replace the primary workspace or mutate one another implicitly.
 
@@ -236,9 +257,11 @@ routes; the Free runtime ignores them and they return untouched with Premium.
 
 There is no blocking setup surface. A new install opens directly into the
 workspace, with a dismissible intro banner above it that opens a three-step
-full-screen introduction: a welcome that demonstrates instead of describing,
-one setup screen with a single green path, and a live test where the user
-judges the result.
+introduction: a welcome that demonstrates instead of describing, one setup
+screen with a single green path, and a live test where the user judges the
+result. It is full-screen on phones and compact iPad windows; regular iPad
+centres the same flow in a card capped at 640pt, and pager offsets derive from
+that measured card rather than the whole window.
 
 **Decision:** The three steps replace the earlier seven-page wizard (design
 system, owner-resolved 2026-08). Premium is not a walkthrough step. Its only
@@ -357,9 +380,11 @@ them: the phone's own recognizer and voice. The welcome step carries the
 language picker over the bundled examples, because letting someone hear the
 app in their own language argues for setting it up better than a claim does.
 
-In landscape, the workspace invitation contracts to the approved 48-point,
-title-only banner so the voice stage remains stable. Portrait keeps the full
-title, explanation, action, and eligible dismiss control.
+On phones and compact iPad windows, landscape contracts the workspace
+invitation to the approved 48-point, title-only banner so the voice stage
+remains stable. Regular iPad keeps the full title, explanation, action, and
+eligible dismiss control in both orientations; its content-pane pattern does
+not change merely because the window became wider than tall.
 
 Transient toasts belong to the main workspace layer. If a sheet, introduction,
 or full-screen secondary surface is open, one pending toast waits without
@@ -368,7 +393,8 @@ that surface closes. Newer notices still replace older ones. **Decision:** the
 sessions drawer is the one exception — feedback for actions begun there
 (automatic naming's success and failure) renders inside the drawer modal
 itself, because deferring it hid the outcome behind the surface the user was
-still looking at.
+still looking at. The persistent iPad sidebar is inline, so it uses the single
+workspace toast and must not mount a second live-region copy.
 
 The introduction is opened from its banner, never as a side effect of attempting
 a turn. The manual catalogue shows every route at a glance — the system route,
@@ -466,9 +492,11 @@ date, visible message count, and one provider mark per model. Forks retain a
 small link to their root session. Search stays docked at the bottom, and the
 row's quick verbs open as a menu anchored at that row's own control —
 no dim — grouping organize, identity and out actions with delete last and
-alone. Bottom sheets stay reserved for configuration surfaces. Data & privacy may open the drawer with
-Archived already expanded; this is an explicit landing state, not a persisted
-change to the user's normal drawer layout.
+alone. Bottom sheets stay reserved for configuration surfaces. Data & privacy
+may open the drawer with Archived already expanded; this is an explicit landing
+state, not a persisted change to the user's normal drawer layout. On regular
+iPad that landing state updates the already-mounted sidebar; it does not depend
+on remounting a modal drawer.
 
 Branching creates a new conversation through the conversation hook; the screen
 must not splice or overwrite the current transcript. Deleting or restoring a
@@ -505,5 +533,5 @@ When changing the workspace:
    controls consistent;
 4. verify both Free effective settings and Premium persisted settings;
 5. add a regression test at the state-machine, hook, or presentation boundary;
-   and
-6. update [`DESIGN.md`](./DESIGN.md) when orchestration or ownership changes.
+6. verify compact and regular iPad resizing when layout ownership changes; and
+7. update [`DESIGN.md`](./DESIGN.md) when orchestration or ownership changes.

@@ -4,6 +4,7 @@ type InputSurface = "voice" | "text";
 
 export function useMainScreenComposerDraft() {
   const inputSurfaceRef = useRef<InputSurface>("voice");
+  const textInputFocusedRef = useRef(false);
   const textMessageDraftRef = useRef("");
 
   const handleInputSurfaceChange = useCallback((surface: InputSurface) => {
@@ -14,10 +15,16 @@ export function useMainScreenComposerDraft() {
     textMessageDraftRef.current = text;
   }, []);
 
+  const handleTextInputFocusChange = useCallback((focused: boolean) => {
+    textInputFocusedRef.current = focused;
+  }, []);
+
   return {
     handleInputSurfaceChange,
+    handleTextInputFocusChange,
     handleTextMessageChange,
     inputSurfaceRef,
+    textInputFocusedRef,
     textMessageDraftRef,
   };
 }

@@ -10,6 +10,11 @@ the complete Play Store translations are kept in a dedicated file under
 
 ## Unreleased
 
+- Mr Broccoli now runs as a universal iPhone and iPad app. Compact iPad windows
+  keep the phone interface; regular layouts add a persistent conversations
+  sidebar, a docked transcript when all three panes fit, master-detail Settings,
+  and a centred first-run card that remains correct through rotation and
+  resizing.
 - The Image, Council, and Web row now stays directly beneath the orb as one
   centered action cluster instead of drifting toward the transcript on tall
   phones.

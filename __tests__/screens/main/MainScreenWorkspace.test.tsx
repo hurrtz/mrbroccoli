@@ -5,6 +5,7 @@ import { StyleSheet, useWindowDimensions } from "react-native";
 import { MainScreenWorkspace } from "../../../src/screens/main/MainScreenWorkspace";
 import { ThemeProvider } from "../../../src/theme/ThemeContext";
 import { lightColors } from "../../../src/theme/colors";
+import { resolveIpadLayout } from "../../../src/utils/ipadLayout";
 import {
   DEFAULT_SETTINGS,
   type Message,
@@ -72,10 +73,26 @@ jest.mock("../../../src/screens/main/VoiceTextInputPager", () => ({
 }));
 
 jest.mock("../../../src/screens/main/TranscriptPreviewCard", () => ({
-  TranscriptPreviewCard: () => {
+  TranscriptPreviewCard: ({
+    contentMaxWidth,
+    layout,
+  }: {
+    contentMaxWidth?: number;
+    layout?: string;
+  }) => {
     const React = require("react");
     const { Text } = require("react-native");
-    return React.createElement(Text, null, "transcript-preview");
+    return React.createElement(
+      Text,
+      {
+        accessibilityHint: contentMaxWidth
+          ? String(contentMaxWidth)
+          : undefined,
+        testID:
+          layout === "landscape" ? "mock-docked-transcript" : "mock-transcript",
+      },
+      "transcript-preview",
+    );
   },
 }));
 
@@ -92,6 +109,12 @@ function createWorkspaceProps(t: jest.Mock) {
       t: ((key: string) => key) as never,
       visible: false,
     },
+    ipadLayout: resolveIpadLayout({
+      height: 932,
+      isPad: false,
+      platform: "ios",
+      width: 430,
+    }),
     isLandscape: false,
     routeCard: {
       activeResponseMode,
@@ -559,6 +582,161 @@ describe("MainScreenWorkspace streaming isolation", () => {
     expect(screen.queryByTestId("satellite-image")).toBeNull();
     expect(screen.getByTestId("satellite-council")).toBeTruthy();
     expect(screen.getByTestId("satellite-web")).toBeTruthy();
+  });
+
+  it("uses the regular portrait iPad shell with a persistent-handle content pane", () => {
+    mockUseWindowDimensions.mockReturnValue({
+      fontScale: 1,
+      height: 1180,
+      scale: 2,
+      width: 820,
+    });
+    const t = jest.fn((key: string) => key);
+    const workspaceProps = createWorkspaceProps(t);
+    const screen = renderWorkspace(
+      <MainScreenWorkspace
+        {...workspaceProps}
+        ipadLayout={resolveIpadLayout({
+          height: 1180,
+          isPad: true,
+          platform: "ios",
+          width: 820,
+        })}
+        transcript={{
+          activeConversationId: null,
+          activeReplayMessageId: null,
+          messages: [],
+          onCopyMessage: jest.fn(async () => true),
+          onRetryMessage: jest.fn(),
+          replayPhase: "idle",
+          scrollEnabled: true,
+          showUsageStats: false,
+          showWhenEmpty: true,
+          t,
+        }}
+        transcriptSheet={{
+          ...workspaceProps.transcriptSheet,
+          visible: true,
+        }}
+        visualPhase="idle"
+      />,
+    );
+
+    expect(screen.getByTestId("ipad-workspace")).toBeTruthy();
+    expect(screen.getByTestId("ipad-content-pane")).toBeTruthy();
+    expect(screen.getByTestId("transcript-handle")).toBeTruthy();
+    expect(screen.queryByTestId("ipad-transcript-pane")).toBeNull();
+    expect(screen.getByTestId("mock-transcript").props.accessibilityHint).toBe(
+      "720",
+    );
+    expect(
+      screen.getByTestId("voice-text-input-pager").props.accessibilityHint,
+    ).toBe("208");
+  });
+
+  it("keeps the full introduction invitation across regular iPad orientations", () => {
+    const t = jest.fn((key: string) => key);
+    const workspaceProps = createWorkspaceProps(t);
+    const transcript = {
+      activeConversationId: null,
+      activeReplayMessageId: null,
+      messages: [],
+      onCopyMessage: jest.fn(async () => true),
+      onRetryMessage: jest.fn(),
+      replayPhase: "idle" as const,
+      scrollEnabled: true,
+      showUsageStats: false,
+      showWhenEmpty: true,
+      t,
+    };
+    const renderRegularWorkspace = (width: number, height: number) => (
+      <MainScreenWorkspace
+        {...workspaceProps}
+        introBanner={{ ...workspaceProps.introBanner, visible: true }}
+        ipadLayout={resolveIpadLayout({
+          height,
+          isPad: true,
+          platform: "ios",
+          width,
+        })}
+        isLandscape={width > height}
+        transcript={transcript}
+        visualPhase="idle"
+      />
+    );
+
+    mockUseWindowDimensions.mockReturnValue({
+      fontScale: 1,
+      height: 1180,
+      scale: 2,
+      width: 820,
+    });
+    const screen = renderWorkspace(renderRegularWorkspace(820, 1180));
+
+    expect(screen.getByTestId("intro-banner-play-ring")).toBeTruthy();
+
+    mockUseWindowDimensions.mockReturnValue({
+      fontScale: 1,
+      height: 820,
+      scale: 2,
+      width: 1180,
+    });
+    screen.rerender(renderRegularWorkspace(1180, 820));
+
+    expect(screen.getByTestId("intro-banner-play-ring")).toBeTruthy();
+  });
+
+  it("docks exactly one transcript and removes the handle in wide iPad landscape", () => {
+    mockUseWindowDimensions.mockReturnValue({
+      fontScale: 1,
+      height: 820,
+      scale: 2,
+      width: 1180,
+    });
+    const t = jest.fn((key: string) => key);
+    const workspaceProps = createWorkspaceProps(t);
+    const screen = renderWorkspace(
+      <MainScreenWorkspace
+        {...workspaceProps}
+        ipadLayout={resolveIpadLayout({
+          height: 820,
+          isPad: true,
+          platform: "ios",
+          width: 1180,
+        })}
+        isLandscape
+        transcript={{
+          activeConversationId: null,
+          activeReplayMessageId: null,
+          messages: [],
+          onCopyMessage: jest.fn(async () => true),
+          onRetryMessage: jest.fn(),
+          replayPhase: "idle",
+          scrollEnabled: true,
+          showUsageStats: false,
+          showWhenEmpty: true,
+          t,
+        }}
+        visualPhase="idle"
+      />,
+    );
+
+    expect(screen.getByTestId("ipad-transcript-pane")).toBeTruthy();
+    expect(
+      StyleSheet.flatten(screen.getByTestId("ipad-workspace").props.style),
+    ).toEqual(expect.objectContaining({ flexDirection: "row" }));
+    expect(
+      StyleSheet.flatten(
+        screen.getByTestId("ipad-workspace-header").props.style,
+      ),
+    ).toEqual(expect.objectContaining({ flexDirection: "row" }));
+    expect(screen.getByTestId("mock-docked-transcript")).toBeTruthy();
+    expect(screen.queryByTestId("transcript-handle")).toBeNull();
+    expect(screen.queryByTestId("transcript-sheet-close")).toBeNull();
+    expect(screen.queryByTestId("landscape-left-pane")).toBeNull();
+    expect(
+      screen.getByTestId("voice-text-input-pager").props.accessibilityHint,
+    ).toBe("204");
   });
 
   it("opens the portrait transcript as a grabber-only sheet", () => {

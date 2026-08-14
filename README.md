@@ -15,6 +15,9 @@ before changing code, and update the affected spec chain with the implementation
 ## Highlights
 
 - Voice-first interaction with live recording and playback states
+- Adaptive iPhone and iPad interface: compact windows reuse the phone layout,
+  while regular iPad adds persistent conversations, optional transcript
+  docking, master-detail Settings, and a focused Intro card
 - Guided on-device catalogue with device checks, verified downloads, benchmarks,
   and local Qwen, Whisper, Kokoro, and Piper routes
 - User-managed API keys stored securely on device with `expo-secure-store`

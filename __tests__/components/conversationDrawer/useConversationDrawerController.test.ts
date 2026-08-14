@@ -127,4 +127,33 @@ describe("useConversationDrawerController", () => {
     expect(onNewSession).toHaveBeenCalledTimes(1);
     expect(onClose).toHaveBeenCalledTimes(1);
   });
+
+  it("keeps a persistent surface open after selection and new session", async () => {
+    const onClose = jest.fn();
+    const onNewSession = jest.fn(async () => undefined);
+    const onSelect = jest.fn(async () => undefined);
+
+    const { result } = renderHook(() =>
+      useConversationDrawerController({
+        visible: true,
+        dismissAfterAction: false,
+        conversations,
+        onSearchConversations: jest.fn(async () => conversations),
+        onRenameThread: jest.fn(),
+        onSelect,
+        onNewSession,
+        onClose,
+      }),
+    );
+
+    await act(async () => {
+      result.current.handleSelectConversation("two");
+      result.current.handleNewSession();
+      await Promise.resolve();
+    });
+
+    expect(onSelect).toHaveBeenCalledWith("two");
+    expect(onNewSession).toHaveBeenCalledTimes(1);
+    expect(onClose).not.toHaveBeenCalled();
+  });
 });

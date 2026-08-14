@@ -12,10 +12,12 @@ import { useInputSurfaceGesture } from "./useInputSurfaceGesture";
 interface UseInputSurfacePagerParams {
   disabled: boolean;
   initialSurface: InputSurface;
+  initialTextInputFocused: boolean;
   initialTextMessage: string;
   isActive: boolean;
   onInputSurfaceChange?: (surface: InputSurface) => void;
   onSubmitTextMessage: (text: string) => void;
+  onTextInputFocusChange?: (focused: boolean) => void;
   onTextMessageChange?: (text: string) => void;
   submissionDisabled?: boolean;
 }
@@ -23,10 +25,12 @@ interface UseInputSurfacePagerParams {
 export function useInputSurfacePager({
   disabled,
   initialSurface,
+  initialTextInputFocused,
   initialTextMessage,
   isActive,
   onInputSurfaceChange,
   onSubmitTextMessage,
+  onTextInputFocusChange,
   onTextMessageChange,
   submissionDisabled = false,
 }: UseInputSurfacePagerParams) {
@@ -49,6 +53,30 @@ export function useInputSurfacePager({
   const focusTextInput = React.useCallback(() => {
     requestAnimationFrame(() => textInputRef.current?.focus());
   }, []);
+
+  const handleTextFocusChange = React.useCallback(
+    (focused: boolean) => {
+      setTextFocused(focused);
+      onTextInputFocusChange?.(focused);
+    },
+    [onTextInputFocusChange],
+  );
+
+  const restoreTextFocusOnMount = React.useRef(
+    initialSurface === "text" && initialTextInputFocused,
+  );
+  React.useEffect(() => {
+    if (!restoreTextFocusOnMount.current) {
+      return;
+    }
+    restoreTextFocusOnMount.current = false;
+    // Responsive shells remount the stage at their breakpoint. Restore only
+    // focus captured from that prior stage; selecting text by swipe must stay
+    // non-focusing.
+    if (!disabled && !isActive) {
+      focusTextInput();
+    }
+  }, [disabled, focusTextInput, isActive]);
 
   const applySurface = React.useCallback(
     (surface: InputSurface, focusText: boolean) => {
@@ -117,11 +145,11 @@ export function useInputSurfacePager({
     activeSurface,
     handleLayout,
     handleSubmitTextMessage,
+    handleTextFocusChange,
     handleTextMessageChange,
     pageWidth,
     panGesture,
     selectSurface,
-    setTextFocused,
     textFocused,
     textInputGesture,
     textInputRef,

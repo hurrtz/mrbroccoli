@@ -23,11 +23,18 @@ describe("main screen focused controllers", () => {
 
     act(() => {
       result.current.handleInputSurfaceChange("text");
+      result.current.handleTextInputFocusChange(true);
       result.current.handleTextMessageChange("A retained draft");
     });
 
     expect(result.current.inputSurfaceRef.current).toBe("text");
+    expect(result.current.textInputFocusedRef.current).toBe(true);
     expect(result.current.textMessageDraftRef.current).toBe("A retained draft");
+
+    act(() => {
+      result.current.handleTextInputFocusChange(false);
+    });
+    expect(result.current.textInputFocusedRef.current).toBe(false);
   });
 
   it("runs toast cleanup on replacement, dismissal, and unmount", () => {

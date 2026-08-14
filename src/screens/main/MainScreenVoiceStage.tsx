@@ -21,12 +21,13 @@ interface MainScreenVoiceStageProps {
   /** Portrait controls centred with the orb/composer as one measured cluster. */
   footer?: React.ReactNode;
   initialInputSurface?: InputSurface;
+  initialTextInputFocused?: boolean;
   initialTextMessage?: string;
   attachments?: MessageImageAttachment[];
   inputMode: InputMode;
   isActive: boolean;
   layout?: "portrait" | "landscape";
-  /** The orb's ceiling: 196 in portrait (156 under the intro banner), 150 in landscape. */
+  /** Surface-specific orb ceiling; the measured pager still shrinks below it. */
   maxOrbSize: number;
   onInputSurfaceChange?: (surface: InputSurface) => void;
   onRemoveImage?: (attachmentId: string) => void;
@@ -37,6 +38,7 @@ interface MainScreenVoiceStageProps {
   onStopPlayback: () => void;
   onResolvePromptBlock?: () => void;
   onSubmitTextMessage: (text: string) => void;
+  onTextInputFocusChange?: (focused: boolean) => void;
   onTextMessageChange?: (text: string) => void;
   orbProgressOverride?: OrbTurnProgress | null;
   playbackPaused?: boolean;
@@ -61,6 +63,7 @@ export const MainScreenVoiceStage = React.memo(function MainScreenVoiceStage({
   disabled = false,
   footer,
   initialInputSurface,
+  initialTextInputFocused,
   initialTextMessage,
   inputMode,
   isActive,
@@ -75,6 +78,7 @@ export const MainScreenVoiceStage = React.memo(function MainScreenVoiceStage({
   onStopPlayback,
   onResolvePromptBlock,
   onSubmitTextMessage,
+  onTextInputFocusChange,
   onTextMessageChange,
   orbProgressOverride = null,
   playbackPaused = false,
@@ -115,6 +119,7 @@ export const MainScreenVoiceStage = React.memo(function MainScreenVoiceStage({
           disabled={disabled}
           footer={footer}
           initialSurface={initialInputSurface}
+          initialTextInputFocused={initialTextInputFocused}
           initialTextMessage={initialTextMessage}
           inputMode={inputMode}
           isActive={isActive}
@@ -129,6 +134,7 @@ export const MainScreenVoiceStage = React.memo(function MainScreenVoiceStage({
           onStopPlayback={onStopPlayback}
           onResolvePromptBlock={onResolvePromptBlock}
           onSubmitTextMessage={onSubmitTextMessage}
+          onTextInputFocusChange={onTextInputFocusChange}
           onTextMessageChange={onTextMessageChange}
           orbProgressOverride={orbProgressOverride}
           playbackPaused={playbackPaused}

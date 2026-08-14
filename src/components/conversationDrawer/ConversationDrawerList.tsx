@@ -9,15 +9,19 @@ import type { ConversationMeta } from "../../types";
 import { formatConversationDateTime } from "./formatConversationDateTime";
 import { ConversationDrawerItem } from "./ConversationDrawerItem";
 import { styles } from "./styles";
+import type { ConversationDrawerPresentation } from "./types";
 
 interface ConversationDrawerListProps {
   activeId: string | null;
   allConversations?: ConversationMeta[];
-  archivedInitiallyExpanded?: boolean;
+  /** Each distinct value reopens Archived without making it permanently open. */
+  archivedRevealRequestId?: number | null;
   compact?: boolean;
   conversations: ConversationMeta[];
+  presentation?: ConversationDrawerPresentation;
   searchQuery: string;
   onDeleteConversation: (conversationId: string) => void;
+  onArchivedRevealHandled?: (requestId: number) => void;
   onOpenActionConversation: (conversationId: string, anchorY: number) => void;
   onSelectConversation: (conversationId: string) => void;
 }
@@ -117,11 +121,13 @@ export function buildConversationDrawerEntries(params: {
 
 export function ConversationDrawerList({
   activeId,
-  archivedInitiallyExpanded = false,
+  archivedRevealRequestId,
   compact = false,
   conversations,
   allConversations = conversations,
+  presentation = "modal",
   searchQuery,
+  onArchivedRevealHandled,
   onDeleteConversation,
   onOpenActionConversation,
   onSelectConversation,
@@ -129,8 +135,21 @@ export function ConversationDrawerList({
   const { colors } = useTheme();
   const { locale, t } = useLocalization();
   const [archivedOpen, setArchivedOpen] = React.useState(
-    archivedInitiallyExpanded,
+    archivedRevealRequestId != null,
   );
+  const handledArchivedRevealRequestRef = React.useRef<number | null>(null);
+  React.useEffect(() => {
+    if (
+      archivedRevealRequestId == null ||
+      handledArchivedRevealRequestRef.current === archivedRevealRequestId
+    ) {
+      return;
+    }
+
+    handledArchivedRevealRequestRef.current = archivedRevealRequestId;
+    setArchivedOpen(true);
+    onArchivedRevealHandled?.(archivedRevealRequestId);
+  }, [archivedRevealRequestId, onArchivedRevealHandled]);
   const activeIsArchived = conversations.some(
     ({ archived, id }) => id === activeId && archived,
   );
@@ -253,6 +272,7 @@ export function ConversationDrawerList({
             conversation={item.conversation}
             rootTitle={item.rootTitle}
             active={item.conversation.id === activeId}
+            presentation={presentation}
             formatDate={(iso) => formatConversationDateTime(iso, locale)}
             onDelete={onDeleteConversation}
             onOpenActionConversation={onOpenActionConversation}

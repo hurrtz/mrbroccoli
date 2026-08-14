@@ -1,16 +1,18 @@
 import React from "react";
-import { Alert, FlatList, Modal, StyleSheet } from "react-native";
+import { Alert, FlatList, Modal, Pressable, StyleSheet } from "react-native";
 import { fireEvent, waitFor, within } from "@testing-library/react-native";
 
 import { ConversationDrawer } from "../../src/components/ConversationDrawer";
 import { ConversationDrawerList } from "../../src/components/conversationDrawer/ConversationDrawerList";
+import { darkColors, lightColors } from "../../src/theme/colors";
 import { ConversationMeta } from "../../src/types";
 import { renderWithProviders } from "../test-utils/renderWithProviders";
 
 const hiddenIconQuery = { includeHiddenElements: true } as const;
+let mockSafeAreaInsets = { top: 0, bottom: 0, left: 0, right: 0 };
 
 jest.mock("react-native-safe-area-context", () => ({
-  useSafeAreaInsets: () => ({ top: 0, bottom: 0, left: 0, right: 0 }),
+  useSafeAreaInsets: () => mockSafeAreaInsets,
 }));
 
 jest.mock("react-native-gesture-handler", () => ({
@@ -64,6 +66,8 @@ const conversations: ConversationMeta[] = [
 
 function renderConversationDrawer(
   overrideProps: Partial<React.ComponentProps<typeof ConversationDrawer>> = {},
+  language: "en" | "ar" = "en",
+  themeMode: "light" | "dark" = "light",
 ) {
   return renderWithProviders(
     <ConversationDrawer
@@ -88,10 +92,15 @@ function renderConversationDrawer(
       onClose={jest.fn()}
       {...overrideProps}
     />,
+    { language, themeMode },
   );
 }
 
 describe("ConversationDrawer", () => {
+  beforeEach(() => {
+    mockSafeAreaInsets = { top: 0, bottom: 0, left: 0, right: 0 };
+  });
+
   afterEach(() => {
     jest.restoreAllMocks();
   });
@@ -112,6 +121,160 @@ describe("ConversationDrawer", () => {
     const screen = renderConversationDrawer({ visible: false });
 
     expect(screen.UNSAFE_queryByType(Modal)).toBeNull();
+  });
+
+  it("renders the persistent sidebar inline while modal visibility is false", () => {
+    const onOpenSettings = jest.fn();
+    mockSafeAreaInsets = { top: 24, bottom: 34, left: 0, right: 0 };
+    const screen = renderConversationDrawer({
+      onOpenSettings,
+      presentation: "sidebar",
+      sidebarWidth: 336,
+      visible: false,
+    });
+
+    expect(screen.UNSAFE_queryByType(Modal)).toBeNull();
+    expect(
+      StyleSheet.flatten(
+        screen.getByTestId("conversation-drawer-sidebar").props.style,
+      ),
+    ).toEqual(expect.objectContaining({ width: 336 }));
+    expect(
+      screen.getByTestId("conversation-sidebar-wordmark"),
+    ).toHaveTextContent("Mr Broccoli");
+    expect(screen.queryByTestId("conversation-drawer-close")).toBeNull();
+    expect(screen.UNSAFE_getByType(FlatList)).toBeTruthy();
+    expect(
+      StyleSheet.flatten(
+        screen.getByTestId("conversation-sidebar-surface").props.style,
+      ),
+    ).toEqual(
+      expect.objectContaining({
+        backgroundColor: lightColors.surface,
+        borderEndColor: lightColors.border,
+        borderEndWidth: 1,
+      }),
+    );
+    expect(
+      StyleSheet.flatten(
+        screen.getByTestId("conversation-drawer-search-dock").props.style,
+      ),
+    ).toEqual(
+      expect.objectContaining({
+        backgroundColor: lightColors.surface,
+        paddingBottom: 14,
+        paddingHorizontal: 14,
+      }),
+    );
+
+    fireEvent.press(screen.getByLabelText("Settings"));
+    expect(onOpenSettings).toHaveBeenCalledTimes(1);
+  });
+
+  it.each([
+    ["light", lightColors],
+    ["dark", darkColors],
+  ] as const)(
+    "keeps inactive %s sidebar rows transparent without changing modal rows",
+    (themeMode, colors) => {
+      const sidebar = renderConversationDrawer(
+        { presentation: "sidebar", visible: false },
+        "en",
+        themeMode,
+      );
+
+      expect(
+        StyleSheet.flatten(
+          sidebar.getByTestId("conversation-sidebar-surface").props.style,
+        ),
+      ).toEqual(expect.objectContaining({ backgroundColor: colors.surface }));
+      expect(
+        StyleSheet.flatten(
+          sidebar.getByTestId("conversation-drawer-item-frame-two").props.style,
+        ),
+      ).toEqual(expect.objectContaining({ backgroundColor: "transparent" }));
+      expect(
+        StyleSheet.flatten(
+          sidebar.getByTestId("conversation-drawer-item-frame-one").props.style,
+        ),
+      ).toEqual(
+        expect.objectContaining({ backgroundColor: colors.surfaceAlt }),
+      );
+
+      sidebar.unmount();
+
+      const modal = renderConversationDrawer({}, "en", themeMode);
+      expect(
+        StyleSheet.flatten(
+          modal.getByTestId("conversation-drawer-item-frame-two").props.style,
+        ),
+      ).toEqual(
+        expect.objectContaining({ backgroundColor: colors.background }),
+      );
+    },
+  );
+
+  it("uses logical sidebar geometry without manually reversing RTL rows", () => {
+    const screen = renderConversationDrawer(
+      { presentation: "sidebar", visible: false },
+      "ar",
+    );
+
+    expect(
+      StyleSheet.flatten(
+        screen.getByTestId("conversation-sidebar-surface").props.style,
+      ),
+    ).toEqual(expect.objectContaining({ borderEndWidth: 1 }));
+    expect(
+      StyleSheet.flatten(
+        screen.getByTestId("conversation-drawer-header").props.style,
+      ),
+    ).toEqual(expect.objectContaining({ flexDirection: "row" }));
+  });
+
+  it("keeps the sidebar open after selecting or creating a conversation", async () => {
+    const onClose = jest.fn();
+    const onNewSession = jest.fn(async () => undefined);
+    const onSelect = jest.fn(async () => undefined);
+    const screen = renderConversationDrawer({
+      onClose,
+      onNewSession,
+      onSelect,
+      presentation: "sidebar",
+      visible: false,
+    });
+
+    fireEvent.press(screen.getByLabelText("Travel planning"));
+    fireEvent.press(screen.getByTestId("conversation-drawer-new-session"));
+
+    await waitFor(() => {
+      expect(onSelect).toHaveBeenCalledWith("two");
+      expect(onNewSession).toHaveBeenCalledTimes(1);
+    });
+    expect(onClose).not.toHaveBeenCalled();
+  });
+
+  it("keeps sidebar actions inline but leaves feedback to the workspace", async () => {
+    const onDismissToast = jest.fn();
+    const onRenameThread = jest.fn();
+    const screen = renderConversationDrawer({
+      onDismissToast,
+      onRenameThread,
+      presentation: "sidebar",
+      toast: { message: "Conversation renamed.", tone: "success" },
+      visible: false,
+    });
+
+    expect(screen.queryByText("Conversation renamed.")).toBeNull();
+    fireEvent.press(screen.getByTestId("conversation-drawer-menu-one"));
+    fireEvent.press(await screen.findByTestId("conversation-action-rename"));
+    fireEvent.changeText(
+      screen.getByTestId("conversation-rename-input"),
+      "Sidebar briefing",
+    );
+    fireEvent.press(screen.getByTestId("conversation-rename-save"));
+
+    expect(onRenameThread).toHaveBeenCalledWith("one", "Sidebar briefing");
   });
 
   it("renders the drawer shell and existing conversations", () => {
@@ -311,7 +474,7 @@ describe("ConversationDrawer", () => {
     const screen = renderWithProviders(
       <ConversationDrawerList
         activeId="one"
-        archivedInitiallyExpanded
+        archivedRevealRequestId={1}
         conversations={[conversations[0], archived]}
         searchQuery=""
         onDeleteConversation={jest.fn()}
@@ -330,6 +493,60 @@ describe("ConversationDrawer", () => {
       ),
     ).toEqual(expect.objectContaining({ minHeight: 44 }));
     expect(screen.getByText("Old research")).toBeTruthy();
+  });
+
+  it("reopens archived sessions for each persistent-sidebar reveal request", () => {
+    const archived: ConversationMeta = {
+      ...conversations[0],
+      id: "archived",
+      title: "Old research",
+      archived: true,
+    };
+    function PersistentSidebarHarness() {
+      const [archivedRevealRequestId, setArchivedRevealRequestId] =
+        React.useState<number | null>(null);
+
+      return (
+        <>
+          <Pressable
+            onPress={() =>
+              setArchivedRevealRequestId((requestId) => (requestId ?? 0) + 1)
+            }
+            testID="open-archived-route"
+          />
+          <ConversationDrawerList
+            activeId="one"
+            archivedRevealRequestId={archivedRevealRequestId}
+            conversations={[conversations[0], archived]}
+            searchQuery=""
+            onDeleteConversation={jest.fn()}
+            onOpenActionConversation={jest.fn()}
+            onSelectConversation={jest.fn()}
+          />
+        </>
+      );
+    }
+    const screen = renderWithProviders(<PersistentSidebarHarness />);
+
+    expect(screen.queryByText("Old research")).toBeNull();
+
+    fireEvent.press(screen.getByTestId("open-archived-route"));
+
+    expect(screen.getByText("Old research")).toBeTruthy();
+    expect(
+      screen.getByTestId("conversation-section-archived").props
+        .accessibilityState,
+    ).toMatchObject({ expanded: true });
+
+    fireEvent.press(screen.getByTestId("conversation-section-archived"));
+    expect(screen.queryByText("Old research")).toBeNull();
+
+    fireEvent.press(screen.getByTestId("open-archived-route"));
+    expect(screen.getByText("Old research")).toBeTruthy();
+    expect(
+      screen.getByTestId("conversation-section-archived").props
+        .accessibilityState,
+    ).toMatchObject({ expanded: true });
   });
 
   it("tightens the empty state for a landscape drawer", () => {
@@ -458,6 +675,19 @@ describe("ConversationDrawer", () => {
 
     await waitFor(() => {
       expect(onNewSession).toHaveBeenCalledTimes(1);
+      expect(onClose).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  it("selects a conversation and closes the modal drawer", async () => {
+    const onClose = jest.fn();
+    const onSelect = jest.fn(async () => undefined);
+    const screen = renderConversationDrawer({ onClose, onSelect });
+
+    fireEvent.press(screen.getByLabelText("Travel planning"));
+
+    await waitFor(() => {
+      expect(onSelect).toHaveBeenCalledWith("two");
       expect(onClose).toHaveBeenCalledTimes(1);
     });
   });

@@ -1,11 +1,46 @@
 import React from "react";
 import { fireEvent, render } from "@testing-library/react-native";
-import { AccessibilityInfo, ScrollView, StyleSheet } from "react-native";
+import {
+  AccessibilityInfo,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  useWindowDimensions,
+} from "react-native";
 import { translations } from "../../src/i18n/localeRegistry";
+import { darkColors } from "../../src/theme/colors";
 
 const mockPlayer = { pause: jest.fn(), play: jest.fn(), seekTo: jest.fn() };
 let mockPlaying = false;
 let mockStatus: Record<string, unknown> = {};
+
+jest.mock("react-native", () => {
+  const actual = jest.requireActual("react-native");
+  const mockedUseWindowDimensions = jest.fn(() => ({
+    fontScale: 1,
+    height: 844,
+    scale: 3,
+    width: 390,
+  }));
+  const mockedPlatform = Object.create(actual.Platform);
+  Object.defineProperties(mockedPlatform, {
+    OS: { configurable: true, value: "ios", writable: true },
+    isPad: { configurable: true, value: false, writable: true },
+  });
+
+  return new Proxy(actual, {
+    get(target, property, receiver) {
+      if (property === "Platform") {
+        return mockedPlatform;
+      }
+      return property === "useWindowDimensions"
+        ? mockedUseWindowDimensions
+        : Reflect.get(target, property, receiver);
+    },
+  });
+});
+
+const mockUseWindowDimensions = jest.mocked(useWindowDimensions);
 
 jest.mock("expo-status-bar", () => ({
   StatusBar: () => null,
@@ -43,6 +78,17 @@ const t = ((key: string) => key) as never;
 
 beforeEach(() => {
   jest.clearAllMocks();
+  Object.defineProperty(Platform, "isPad", {
+    configurable: true,
+    value: false,
+    writable: true,
+  });
+  mockUseWindowDimensions.mockReturnValue({
+    fontScale: 1,
+    height: 844,
+    scale: 3,
+    width: 390,
+  });
   jest
     .mocked(getLocalCatalogInstallStatuses)
     .mockImplementation(() => new Promise(() => undefined));
@@ -353,6 +399,138 @@ describe("IntroFlowScreen", () => {
       screen.getByTestId("intro-stepper-dot-2").props.accessibilityState
         .selected,
     ).toBe(true);
+  });
+
+  it("uses the regular iPad card viewport for every pager coordinate", () => {
+    Object.defineProperty(Platform, "isPad", {
+      configurable: true,
+      value: true,
+      writable: true,
+    });
+    mockUseWindowDimensions.mockReturnValue({
+      fontScale: 1,
+      height: 760,
+      scale: 2,
+      width: 900,
+    });
+    const scrollTo = jest.spyOn(ScrollView.prototype, "scrollTo");
+
+    try {
+      const screen = renderScreen({ firstRun: false, language: "ar" });
+      expect(
+        StyleSheet.flatten(screen.getByTestId("intro-flow-card").props.style),
+      ).toEqual(
+        expect.objectContaining({
+          borderRadius: 20,
+          flex: 1,
+          maxWidth: 640,
+          shadowColor: darkColors.glow,
+          shadowOffset: { height: 20, width: 0 },
+          shadowOpacity: 0.16,
+          shadowRadius: 25,
+          width: "100%",
+        }),
+      );
+      expect(
+        StyleSheet.flatten(
+          screen.getByTestId("intro-flow-card-surface").props.style,
+        ),
+      ).toEqual(
+        expect.objectContaining({
+          borderRadius: 20,
+          borderWidth: 1,
+          overflow: "hidden",
+        }),
+      );
+      expect(
+        StyleSheet.flatten(screen.getByTestId("intro-flow-frame").props.style),
+      ).toEqual(expect.objectContaining({ padding: 26 }));
+      expect(
+        StyleSheet.flatten(screen.getByTestId("intro-page-welcome").props.style)
+          .width,
+      ).toBe(640);
+      expect(
+        screen.getByTestId("intro-flow-content").props.contentOffset,
+      ).toEqual({ x: 1280, y: 0 });
+
+      fireEvent.press(screen.getByTestId("intro-next"));
+      expect(scrollTo).toHaveBeenLastCalledWith({ animated: true, x: 640 });
+
+      mockUseWindowDimensions.mockReturnValue({
+        fontScale: 1,
+        height: 900,
+        scale: 2,
+        width: 680,
+      });
+      screen.rerender(<IntroFlowScreen {...screen.props} />);
+      expect(
+        StyleSheet.flatten(screen.getByTestId("intro-page-welcome").props.style)
+          .width,
+      ).toBe(628);
+      expect(scrollTo).toHaveBeenLastCalledWith({ animated: false, x: 628 });
+
+      fireEvent(screen.getByTestId("intro-flow-content"), "momentumScrollEnd", {
+        nativeEvent: { contentOffset: { x: 0 } },
+      });
+      expect(
+        screen.getByTestId("intro-stepper-dot-2").props.accessibilityState
+          .selected,
+      ).toBe(true);
+    } finally {
+      scrollTo.mockRestore();
+    }
+  });
+
+  it("keeps compact iPad and iPhone introductions full screen", () => {
+    Object.defineProperty(Platform, "isPad", {
+      configurable: true,
+      value: true,
+      writable: true,
+    });
+    mockUseWindowDimensions.mockReturnValue({
+      fontScale: 1,
+      height: 760,
+      scale: 2,
+      width: 600,
+    });
+    const compactIpad = renderScreen();
+    const compactCardStyle = StyleSheet.flatten(
+      compactIpad.getByTestId("intro-flow-card").props.style,
+    );
+    const compactSurfaceStyle = StyleSheet.flatten(
+      compactIpad.getByTestId("intro-flow-card-surface").props.style,
+    );
+
+    expect(compactCardStyle).toEqual({ flex: 1, width: "100%" });
+    expect(compactSurfaceStyle).toEqual({ flex: 1 });
+    expect(
+      StyleSheet.flatten(
+        compactIpad.getByTestId("intro-page-welcome").props.style,
+      ).width,
+    ).toBe(600);
+    compactIpad.unmount();
+
+    Object.defineProperty(Platform, "isPad", {
+      configurable: true,
+      value: false,
+      writable: true,
+    });
+    mockUseWindowDimensions.mockReturnValue({
+      fontScale: 1,
+      height: 760,
+      scale: 2,
+      width: 900,
+    });
+    const wideIphone = renderScreen();
+
+    expect(
+      StyleSheet.flatten(wideIphone.getByTestId("intro-flow-card").props.style),
+    ).toEqual({ flex: 1, width: "100%" });
+    expect(
+      StyleSheet.flatten(
+        wideIphone.getByTestId("intro-page-welcome").props.style,
+      ).width,
+    ).toBe(900);
   });
 
   it("mirrors dialogue tails and follows the preview language direction", () => {

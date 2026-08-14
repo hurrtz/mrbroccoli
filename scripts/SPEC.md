@@ -118,7 +118,9 @@ the architectural answer for the author.
 - Checks are deterministic and testable with fixture repositories or injected
   command runners.
 - Native configuration parity includes Release-only R8/JNI invariants whose
-  absence cannot be exercised by the Debug instrumentation build.
+  absence cannot be exercised by the Debug instrumentation build. On iOS it
+  also locks Expo tablet support, dynamic resizing, all four orientations, and
+  the six app/test/Live-Activity target-family settings to universal `1,2`.
 - Non-zero exit means the requested evidence was not produced. Missing tools,
   devices, credentials, symbols, mappings, or reports are failures when the
   target promises them.

@@ -16,6 +16,7 @@ import { Toast } from "../../components/Toast";
 import { AntSettingsModal } from "../../features/settings/AntSettingsModal";
 import type { AppLanguage } from "../../i18n/localeRegistry";
 import { Colors } from "../../theme/colors";
+import type { IpadLayout } from "../../utils/ipadLayout";
 import { MainScreenWorkspace } from "./MainScreenWorkspace";
 import { DisclosureDialog } from "./DisclosureDialog";
 import { ImageSourceSheet } from "./ImageSourceSheet";
@@ -30,6 +31,7 @@ interface MainScreenPresentationProps {
   intro: React.ComponentProps<typeof IntroFlowScreen>;
   imageSource: React.ComponentProps<typeof ImageSourceSheet>;
   isDark: boolean;
+  ipadLayout: IpadLayout;
   isLandscape: boolean;
   language: AppLanguage;
   premiumUpgrade: React.ComponentProps<typeof PremiumUpgradeModal>;
@@ -48,6 +50,7 @@ export function MainScreenPresentation({
   intro,
   imageSource,
   isDark,
+  ipadLayout,
   isLandscape,
   language,
   premiumUpgrade,
@@ -57,14 +60,36 @@ export function MainScreenPresentation({
   toast,
   workspace,
 }: MainScreenPresentationProps) {
+  const workspaceSurface = (
+    <KeyboardAvoidingView
+      accessibilityElementsHidden={surfaceTransition.visible}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      importantForAccessibility={
+        surfaceTransition.visible ? "no-hide-descendants" : "auto"
+      }
+      keyboardVerticalOffset={Platform.OS === "ios" ? 64 : 0}
+      style={[
+        styles.defaultLayout,
+        isLandscape && !ipadLayout.isRegularWidth
+          ? styles.defaultLayoutLandscape
+          : null,
+        ipadLayout.isRegularWidth ? styles.ipadWorkspaceLayout : null,
+      ]}
+    >
+      <MainScreenWorkspace {...workspace} />
+    </KeyboardAvoidingView>
+  );
+
   return (
     <SafeAreaView
       testID="main-screen"
       style={[styles.container, { backgroundColor: colors.background }]}
       edges={
-        Platform.OS === "ios" && isLandscape
-          ? ["top"]
-          : ["top", "left", "right"]
+        ipadLayout.isRegularWidth
+          ? ["top", "bottom", "left", "right"]
+          : Platform.OS === "ios" && isLandscape
+            ? ["top"]
+            : ["top", "left", "right"]
       }
     >
       <StatusBar style={isDark ? "light" : "dark"} />
@@ -82,20 +107,19 @@ export function MainScreenPresentation({
       {/* Setup no longer takes the screen. A new user lands in the real
           workspace and is offered a path from the intro banner, or contextually
           when they try a turn with nothing configured. */}
-      <KeyboardAvoidingView
-        accessibilityElementsHidden={surfaceTransition.visible}
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
-        importantForAccessibility={
-          surfaceTransition.visible ? "no-hide-descendants" : "auto"
-        }
-        keyboardVerticalOffset={Platform.OS === "ios" ? 64 : 0}
-        style={[
-          styles.defaultLayout,
-          isLandscape ? styles.defaultLayoutLandscape : null,
-        ]}
-      >
-        <MainScreenWorkspace {...workspace} />
-      </KeyboardAvoidingView>
+      {ipadLayout.isRegularWidth ? (
+        <View style={styles.ipadShell} testID="ipad-regular-shell">
+          <ConversationDrawer
+            {...conversationDrawer}
+            onOpenSettings={workspace.topBar.onOpenSettings}
+            presentation="sidebar"
+            sidebarWidth={ipadLayout.sidebarWidth ?? 300}
+          />
+          {workspaceSurface}
+        </View>
+      ) : (
+        workspaceSurface
+      )}
 
       {surfaceTransition.visible ? (
         <View
@@ -119,7 +143,9 @@ export function MainScreenPresentation({
       <StyleSheetModal {...styleSheet} />
       <AntSettingsModal {...settingsModal} />
       <PremiumUpgradeModal {...premiumUpgrade} />
-      <ConversationDrawer {...conversationDrawer} />
+      {!ipadLayout.isRegularWidth ? (
+        <ConversationDrawer {...conversationDrawer} />
+      ) : null}
       <IntroFlowScreen {...intro} />
     </SafeAreaView>
   );

@@ -76,6 +76,9 @@ be reasoned about and tested independently of the full render tree.
   storage, logs, clipboard, provider requests, or export.
 - Platform-specific behavior belongs behind a service boundary and must be
   validated against both native projects.
+- Resize-sensitive presentation policy belongs in a pure shared resolver under
+  `utils/`; screens consume that result instead of inventing independent iPad
+  breakpoints or copying runtime state into form-factor-specific trees.
 
 ## Deep Specs
 

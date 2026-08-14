@@ -9,11 +9,13 @@ import type { ConversationMeta, Provider } from "../../types";
 import { ProviderIcon } from "../ProviderIcon";
 
 import { styles } from "./styles";
+import type { ConversationDrawerPresentation } from "./types";
 
 interface ConversationDrawerItemProps {
   conversation: ConversationMeta;
   rootTitle?: string;
   active: boolean;
+  presentation?: ConversationDrawerPresentation;
   formatDate: (iso: string) => string;
   onDelete: (conversationId: string) => void;
   onOpenActionConversation: (conversationId: string, anchorY: number) => void;
@@ -46,6 +48,7 @@ export function ConversationDrawerItem({
   conversation,
   rootTitle,
   active,
+  presentation = "modal",
   formatDate,
   onDelete,
   onOpenActionConversation,
@@ -75,10 +78,15 @@ export function ConversationDrawerItem({
   return (
     <Swipeable renderRightActions={renderRightActions}>
       <View
+        testID={`conversation-drawer-item-frame-${conversation.id}`}
         style={[
           styles.itemFrame,
           {
-            backgroundColor: active ? colors.surfaceAlt : colors.background,
+            backgroundColor: active
+              ? colors.surfaceAlt
+              : presentation === "sidebar"
+                ? "transparent"
+                : colors.background,
             borderBottomColor: colors.border,
           },
         ]}
@@ -192,9 +200,11 @@ export function ConversationDrawerItem({
               // that opened it, and a measurement that never arrives must not
               // swallow the tap.
               onOpenActionConversation(conversation.id, 0);
-              menuButtonRef.current?.measureInWindow((_x, y, _width, height) => {
-                onOpenActionConversation(conversation.id, y + height + 4);
-              });
+              menuButtonRef.current?.measureInWindow(
+                (_x, y, _width, height) => {
+                  onOpenActionConversation(conversation.id, y + height + 4);
+                },
+              );
             }}
             activeOpacity={0.88}
             accessibilityRole="button"

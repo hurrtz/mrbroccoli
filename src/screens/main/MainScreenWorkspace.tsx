@@ -4,11 +4,13 @@ import { Pressable, StyleSheet, useWindowDimensions, View } from "react-native";
 import { IntroBanner } from "../../components/IntroBanner";
 import { BackgroundTaskBar } from "../../design-system/BackgroundTaskBar";
 import { ConversationSettingsSummary } from "../../design-system/ConversationSettingsSummary";
+import { IconButton } from "../../design-system/IconButton";
 import { OrbSatellite } from "../../design-system/OrbSatellite";
 import { TranscriptHandle } from "../../design-system/TranscriptHandle";
 import { Modal } from "../../design-system/NativeControls";
 import type { Colors } from "../../theme/colors";
 import type { Message, VoiceVisualPhase } from "../../types";
+import type { IpadLayout } from "../../utils/ipadLayout";
 import { MainScreenRouteCard } from "./MainScreenRouteCard";
 import { MainScreenTopBar } from "./MainScreenTopBar";
 import { MainScreenVoiceStage } from "./MainScreenVoiceStage";
@@ -202,6 +204,7 @@ interface MainScreenWorkspaceProps {
   > | null;
   colors: Colors;
   introBanner: React.ComponentProps<typeof IntroBanner>;
+  ipadLayout: IpadLayout;
   isLandscape: boolean;
   routeCard: Omit<React.ComponentProps<typeof MainScreenRouteCard>, "style"> & {
     t: TranslateFn;
@@ -253,6 +256,7 @@ export function MainScreenWorkspace({
   backgroundTask,
   colors,
   introBanner,
+  ipadLayout,
   isLandscape,
   routeCard,
   routePicker,
@@ -358,6 +362,138 @@ export function MainScreenWorkspace({
       webAvailable,
     ],
   );
+
+  if (ipadLayout.isRegularWidth) {
+    const regularOrbCeiling = introBanner.visible
+      ? 168
+      : ipadLayout.transcriptDocked
+        ? 204
+        : isLandscape
+          ? 224
+          : 208;
+
+    return (
+      <View style={workspaceStyles.ipadShell} testID="ipad-workspace">
+        <View
+          style={workspaceStyles.ipadContentPane}
+          testID="ipad-content-pane"
+        >
+          <View
+            style={workspaceStyles.ipadHeader}
+            testID="ipad-workspace-header"
+          >
+            <View style={workspaceStyles.ipadHeaderControl}>
+              {topBar.onToggleDebugLog ? (
+                <IconButton
+                  active={topBar.debugLogActive}
+                  accessibilityLabel={topBar.debugLogLabel ?? "Debug log"}
+                  icon="bug"
+                  onPress={topBar.onToggleDebugLog}
+                  testID="main-debug-log-button"
+                />
+              ) : null}
+            </View>
+            <View style={workspaceStyles.ipadRouteSlot}>
+              <MainScreenRouteCard {...routeCardProps} />
+            </View>
+            <ConversationSettingsSummary
+              accessibilityLabel={settingsSummary.accessibilityLabel}
+              compact
+              onPress={settingsSummary.onPress}
+              summary={settingsSummary.summary}
+              testID="conversation-settings-summary"
+            />
+          </View>
+
+          <View style={workspaceStyles.ipadBody}>
+            <IntroBanner {...introBanner} compact={introBanner.compact} />
+            {backgroundTask ? <BackgroundTaskBar {...backgroundTask} /> : null}
+            <View style={workspaceStyles.ipadStageArea}>
+              <MainScreenVoiceStage
+                colors={colors}
+                footer={portraitSatellites}
+                layout="portrait"
+                maxOrbSize={regularOrbCeiling}
+                {...voiceStage}
+              />
+            </View>
+            {!ipadLayout.transcriptDocked ? (
+              <TranscriptHandle
+                accessibilityLabel={handleAccessibilityLabel}
+                emptyLabel={transcriptSheet.emptyLabel}
+                messageCount={messageCount}
+                meta={transcriptSheet.meta ?? undefined}
+                onPress={transcriptSheet.onOpen}
+                preview={lastAssistant?.content.trim()}
+                style={workspaceStyles.ipadTranscriptHandle}
+                testID="transcript-handle"
+              />
+            ) : null}
+          </View>
+
+          {!ipadLayout.transcriptDocked ? (
+            <Modal
+              cardStyle={[
+                workspaceStyles.transcriptSheetCard,
+                { backgroundColor: colors.background },
+              ]}
+              layout="sheet"
+              onClose={transcriptSheet.onClose}
+              onDismiss={transcriptSheet.onDismiss}
+              title={
+                <Pressable
+                  accessibilityLabel={transcriptSheet.hideLabel}
+                  accessibilityRole="button"
+                  onPress={transcriptSheet.onClose}
+                  style={workspaceStyles.transcriptSheetHeader}
+                  testID="transcript-sheet-close"
+                >
+                  <View
+                    style={[
+                      workspaceStyles.transcriptSheetGrip,
+                      { backgroundColor: colors.borderStrong },
+                    ]}
+                  />
+                </Pressable>
+              }
+              visible={transcriptSheet.visible}
+            >
+              <TranscriptPreviewCard
+                colors={colors}
+                contentMaxWidth={720}
+                preferredHeight={Math.round(windowHeight * 0.85)}
+                presentation="canvas"
+                {...transcript}
+              />
+            </Modal>
+          ) : null}
+        </View>
+
+        {ipadLayout.transcriptDocked ? (
+          <View
+            style={[
+              workspaceStyles.ipadTranscriptPane,
+              {
+                backgroundColor: colors.surface,
+                borderStartColor: colors.border,
+                width: ipadLayout.transcriptWidth ?? 400,
+              },
+            ]}
+            testID="ipad-transcript-pane"
+          >
+            <TranscriptPreviewCard
+              colors={colors}
+              layout="landscape"
+              style={styles.landscapeTranscriptCard}
+              {...transcript}
+            />
+          </View>
+        ) : null}
+
+        <RoutePickerSheet t={routePickerTranslate} {...routePicker} />
+      </View>
+    );
+  }
 
   if (isLandscape) {
     return (
@@ -528,6 +664,59 @@ export function MainScreenWorkspace({
 }
 
 const workspaceStyles = StyleSheet.create({
+  ipadShell: {
+    alignItems: "stretch",
+    flex: 1,
+    flexDirection: "row",
+    minHeight: 0,
+    minWidth: 0,
+  },
+  ipadContentPane: {
+    flex: 1,
+    minHeight: 0,
+    minWidth: 0,
+  },
+  ipadHeader: {
+    alignItems: "center",
+    flexDirection: "row",
+    gap: 10,
+    minHeight: 66,
+    paddingBottom: 6,
+    paddingHorizontal: 20,
+    paddingTop: 16,
+  },
+  ipadHeaderControl: {
+    alignItems: "center",
+    height: 44,
+    justifyContent: "center",
+    width: 44,
+  },
+  ipadRouteSlot: {
+    alignItems: "center",
+    flex: 1,
+    minWidth: 0,
+  },
+  ipadBody: {
+    flex: 1,
+    gap: 6,
+    minHeight: 0,
+    paddingHorizontal: 20,
+    paddingBottom: 20,
+  },
+  ipadStageArea: {
+    flex: 1,
+    minHeight: 0,
+  },
+  ipadTranscriptHandle: {
+    marginHorizontal: 0,
+  },
+  ipadTranscriptPane: {
+    borderStartWidth: StyleSheet.hairlineWidth,
+    flexShrink: 0,
+    minHeight: 0,
+    paddingHorizontal: 18,
+    paddingVertical: 12,
+  },
   satellites: {
     alignItems: "flex-start",
     flexDirection: "row",

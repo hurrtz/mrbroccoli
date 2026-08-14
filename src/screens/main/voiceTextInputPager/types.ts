@@ -23,6 +23,7 @@ export interface VoiceTextInputPagerProps {
   /** Portrait controls that stay attached to the measured orb/composer slot. */
   footer?: ReactNode;
   initialSurface?: InputSurface;
+  initialTextInputFocused?: boolean;
   initialTextMessage?: string;
   inputMode: InputMode;
   isActive: boolean;
@@ -40,6 +41,7 @@ export interface VoiceTextInputPagerProps {
   onStopPlayback: () => void;
   onResolvePromptBlock?: () => void;
   onSubmitTextMessage: (text: string) => void;
+  onTextInputFocusChange?: (focused: boolean) => void;
   onTextMessageChange?: (text: string) => void;
   /** Deterministic isolated-fixture values; production derives these live. */
   orbProgressOverride?: OrbTurnProgress | null;

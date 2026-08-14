@@ -49,7 +49,7 @@ The app owns:
   conversation archives;
 - a permanent Free/Premium edition boundary; and
 - release-grade accessibility, localization, diagnostics, and native lifecycle
-  behavior on iOS and Android.
+  behavior on Android and universal iOS across iPhone and iPad.
 
 The core product has no Mr Broccoli application backend, account system,
 provider proxy, or server-side conversation store. Provider calls go from the
@@ -212,6 +212,11 @@ boundary.
 - Interactive controls have at least a 44-by-44-point target, modals isolate
   screen-reader focus, and dynamic announcements are rate-limited to meaningful
   state changes.
+- **Decision:** iPad is an adaptive form factor of the same iOS product, not a
+  separate app. Compact iPad windows reuse the phone interface exactly; regular
+  windows expose persistent navigation and wider information layouts while
+  preserving the active conversation and configured routes through rotation,
+  Split View, and Stage Manager resizing.
 - The same production identifiers remain
   `com.tobiaswinkler.app.mrbroccoli`; `.dev` and `.maestro` identities are
   isolated test installations and must not weaken production entitlement or

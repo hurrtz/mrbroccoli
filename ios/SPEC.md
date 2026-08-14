@@ -33,6 +33,11 @@ TypeScript owns product policy; native modules expose focused capabilities.
   supplied only by the checked-in standalone and Maestro scripts.
 - Entitlements, privacy manifest, URL types, background modes, deployment
   target, build number, and Expo config are verified for parity.
+- The production app, native test bundle, and Live Activity extension are
+  universal targets (`TARGETED_DEVICE_FAMILY = 1,2`). Expo declares tablet
+  support, native configuration does not require full screen, and the shared
+  four-orientation list applies to iPhone and iPad. Split View and Stage Manager
+  therefore resize the same app rather than launching a tablet-specific target.
 - `MrBroccoli-StoreKit` uses the checked-in StoreKit configuration for local
   purchase testing; it is not evidence of App Store product availability.
 
@@ -110,6 +115,11 @@ or deliver them.
   tooling.
 - Maestro Release validation covers every registered interface locale, known
   landscape layout, accessibility display modes, and VoiceOver hierarchy.
+- Spend-free source validation covers compact/regular iPad layout policy and
+  universal native configuration. A real iPad simulator pass, resize review,
+  VoiceOver review, and localized 13-inch store screenshots remain explicit
+  distribution evidence; the existing phone Maestro gallery does not prove
+  them.
 - Store-promo automation builds the `.maestro` identity and captures
   deterministic localized states without provider calls.
 - Xcode signing and App Store processing remain external distribution evidence;

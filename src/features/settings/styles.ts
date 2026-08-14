@@ -14,6 +14,9 @@ export const styles = StyleSheet.create({
     justifyContent: "center",
     zIndex: 1000,
   },
+  ipadOverlay: {
+    padding: 0,
+  },
   backdrop: {
     ...StyleSheet.absoluteFill,
   },
@@ -24,6 +27,64 @@ export const styles = StyleSheet.create({
   },
   modalLandscape: {
     maxHeight: "100%",
+  },
+  ipadMasterDetail: {
+    flexDirection: "row",
+    maxHeight: "100%",
+  },
+  compactDetailPane: {
+    flex: 1,
+    minWidth: 0,
+  },
+  ipadDetailPane: {
+    flex: 1,
+    minWidth: 0,
+    overflow: "hidden",
+  },
+  ipadCategoryNav: {
+    flexShrink: 0,
+    height: "100%",
+    overflow: "hidden",
+    width: 300,
+  },
+  ipadCategoryTitle: {
+    fontFamily: fonts.headline,
+    fontSize: 22,
+    letterSpacing: -0.2,
+    paddingBottom: 10,
+    paddingHorizontal: 20,
+  },
+  ipadCategoryContent: {
+    paddingBottom: 14,
+  },
+  ipadCategoryGroup: {
+    marginBottom: 6,
+  },
+  ipadCategoryGroupTitle: {
+    fontFamily: fonts.mono,
+    fontSize: 11,
+    letterSpacing: 0.9,
+    lineHeight: 15,
+    paddingBottom: 4,
+    paddingHorizontal: 20,
+    paddingTop: 10,
+    textTransform: "uppercase",
+  },
+  ipadCategoryRow: {
+    alignItems: "center",
+    borderRadius: 10,
+    flexDirection: "row",
+    gap: 12,
+    marginHorizontal: 10,
+    marginVertical: 1,
+    minHeight: 48,
+    paddingHorizontal: 10,
+  },
+  ipadCategoryRowLabel: {
+    flex: 1,
+    fontFamily: fonts.bodyMedium,
+    fontSize: 15,
+    lineHeight: 20,
   },
   header: {
     minHeight: 68,

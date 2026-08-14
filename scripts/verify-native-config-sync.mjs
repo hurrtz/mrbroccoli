@@ -160,6 +160,13 @@ const iosProjectVersions = [
 const iosBundleIdentifiers = [
   ...iosProject.matchAll(/PRODUCT_BUNDLE_IDENTIFIER = ([^;]+);/g),
 ].map((match) => match[1].replace(/^"(.*)"$/, "$1"));
+const iosSupportedInterfaceOrientations = [
+  ...(
+    iosInfo.match(
+      /<key>UISupportedInterfaceOrientations<\/key>\s*<array>([\s\S]*?)<\/array>/,
+    )?.[1] ?? ""
+  ).matchAll(/<string>([^<]+)<\/string>/g),
+].map((match) => match[1]);
 
 assertIncludes(
   "iOS camera permission",
@@ -219,6 +226,14 @@ assertExcludes(
 const iosDeploymentTargets = [
   ...iosProject.matchAll(/IPHONEOS_DEPLOYMENT_TARGET = ([^;]+);/g),
 ].map((match) => match[1]);
+const iosTargetedDeviceFamilies = [
+  ...iosProject.matchAll(/TARGETED_DEVICE_FAMILY = "?([^";]+)"?;/g),
+].map((match) =>
+  match[1]
+    .split(",")
+    .map((family) => family.trim())
+    .join(","),
+);
 const sqlitePlugin = appConfig.plugins.find(
   (plugin) => Array.isArray(plugin) && plugin[0] === "expo-sqlite",
 );
@@ -245,6 +260,37 @@ assertEqual(
   "supported platforms",
   JSON.stringify(appConfig.platforms),
   JSON.stringify(["ios", "android"]),
+);
+assertEqual("Expo iOS tablet support", appConfig.ios?.supportsTablet, true);
+assertEqual(
+  "Expo iOS full-screen requirement",
+  appConfig.ios?.requireFullScreen,
+  false,
+);
+assertIncludes(
+  "iOS dynamic resizing",
+  iosInfo,
+  "<key>UIRequiresFullScreen</key>\n\t<false/>",
+);
+assertEqual(
+  "iOS supported interface orientations",
+  JSON.stringify(iosSupportedInterfaceOrientations),
+  JSON.stringify([
+    "UIInterfaceOrientationPortrait",
+    "UIInterfaceOrientationPortraitUpsideDown",
+    "UIInterfaceOrientationLandscapeLeft",
+    "UIInterfaceOrientationLandscapeRight",
+  ]),
+);
+assertEqual(
+  "iOS targeted device family setting count",
+  iosTargetedDeviceFamilies.length,
+  6,
+);
+assertAllEqual(
+  "iOS targeted device families",
+  iosTargetedDeviceFamilies,
+  "1,2",
 );
 assertEqual(
   "Expo SQLite FTS plugin",

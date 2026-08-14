@@ -4,12 +4,18 @@ import { fonts } from "../../theme/typography";
 
 export const styles = StyleSheet.create({
   modalRoot: { flex: 1 },
+  sidebarRoot: {
+    flexShrink: 0,
+    height: "100%",
+    minHeight: 0,
+    overflow: "hidden",
+    position: "relative",
+  },
   container: { flex: 1, flexDirection: "row" },
   drawer: {
     width: "100%",
     maxWidth: 520,
     height: "100%",
-    borderRightWidth: 1,
   },
   backdrop: { flex: 1 },
   menuLayer: {
@@ -125,6 +131,20 @@ export const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
+  sidebarHeader: {
+    justifyContent: "space-between",
+    paddingHorizontal: 16,
+  },
+  sidebarHeaderActions: {
+    alignItems: "center",
+    flexDirection: "row",
+    gap: 4,
+  },
+  sidebarWordmark: {
+    flex: 1,
+    minWidth: 0,
+    overflow: "hidden",
+  },
   headerIconButton: {
     width: 44,
     height: 44,
@@ -160,6 +180,9 @@ export const styles = StyleSheet.create({
     borderTopWidth: 1,
     paddingTop: 10,
     paddingHorizontal: 18,
+  },
+  searchDockInline: {
+    paddingHorizontal: 14,
   },
   searchShell: {
     minHeight: 46,

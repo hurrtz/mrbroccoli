@@ -19,6 +19,9 @@ let mockIntroSurfaceVisible = false;
 let mockSettingsSurfaceVisible = false;
 let mockIntroDismiss: (() => void) | null = null;
 let mockSettingsDismiss: (() => void) | null = null;
+let mockDrawerArchivedRevealRequests: number[] = [];
+let mockIsPad = false;
+let mockPipelinePhase: "idle" | "thinking" = "idle";
 
 jest.mock("../../src/context/PremiumEntitlementContext", () => ({
   usePremiumEntitlement: jest.fn(() => ({
@@ -45,12 +48,23 @@ jest.mock("react-native", () => {
     scale: 3,
     width: 430,
   }));
+  const mockedPlatform = new Proxy(actual.Platform, {
+    get(target, property, receiver) {
+      return property === "isPad"
+        ? mockIsPad
+        : Reflect.get(target, property, receiver);
+    },
+  });
 
   return new Proxy(actual, {
     get(target, property, receiver) {
-      return property === "useWindowDimensions"
-        ? mockedUseWindowDimensions
-        : Reflect.get(target, property, receiver);
+      if (property === "useWindowDimensions") {
+        return mockedUseWindowDimensions;
+      }
+      if (property === "Platform") {
+        return mockedPlatform;
+      }
+      return Reflect.get(target, property, receiver);
     },
   });
 });
@@ -215,7 +229,7 @@ jest.mock("../../src/hooks/useAudioPlayer", () => ({
 
 jest.mock("../../src/hooks/useVoicePipeline", () => ({
   useVoicePipeline: jest.fn(() => ({
-    pipelinePhase: "idle",
+    pipelinePhase: mockPipelinePhase,
     setPipelinePhase: jest.fn(),
     streamingText: "",
     setStreamingText: jest.fn(),
@@ -298,6 +312,7 @@ jest.mock("../../src/screens/main/MainScreenVoiceStage", () => ({
     disabled,
     footer,
     initialInputSurface,
+    isActive,
     onAddImage,
     onResolvePromptBlock,
     promptBlockedActionEnabled,
@@ -307,6 +322,7 @@ jest.mock("../../src/screens/main/MainScreenVoiceStage", () => ({
     disabled?: boolean;
     footer?: React.ReactNode;
     initialInputSurface?: string;
+    isActive?: boolean;
     onAddImage?: () => void;
     onResolvePromptBlock?: () => void;
     promptBlockedActionEnabled?: boolean;
@@ -322,6 +338,11 @@ jest.mock("../../src/screens/main/MainScreenVoiceStage", () => ({
         Text,
         null,
         disabled ? "voice-stage:disabled" : "voice-stage:enabled",
+      ),
+      React.createElement(
+        Text,
+        null,
+        isActive ? "voice-stage:active" : "voice-stage:inactive",
       ),
       React.createElement(
         Text,
@@ -397,6 +418,7 @@ jest.mock("../../src/features/settings/AntSettingsModal", () => ({
     suspended,
     onClose,
     onDismiss,
+    onOpenArchivedConversations,
     onOpenPremium,
   }: {
     autoSetup: { state: string };
@@ -404,6 +426,7 @@ jest.mock("../../src/features/settings/AntSettingsModal", () => ({
     suspended?: boolean;
     onClose: () => void;
     onDismiss: () => void;
+    onOpenArchivedConversations: () => void;
     onOpenPremium: () => void;
   }) => {
     const React = require("react");
@@ -427,6 +450,14 @@ jest.mock("../../src/features/settings/AntSettingsModal", () => ({
               TouchableOpacity,
               { onPress: onOpenPremium },
               React.createElement(Text, null, "settings-upgrade-premium"),
+            ),
+            React.createElement(
+              TouchableOpacity,
+              {
+                onPress: onOpenArchivedConversations,
+                testID: "stub-settings-open-archived",
+              },
+              React.createElement(Text, null, "settings-open-archived"),
             ),
             React.createElement(
               TouchableOpacity,
@@ -490,13 +521,47 @@ jest.mock("../../src/components/introFlow/IntroFlowScreen", () => ({
 }));
 
 jest.mock("../../src/components/ConversationDrawer", () => ({
-  ConversationDrawer: ({ visible }: { visible: boolean }) => {
+  ConversationDrawer: ({
+    archivedRevealRequestId,
+    onArchivedRevealHandled,
+    onOpenSettings,
+    presentation = "modal",
+    visible,
+  }: {
+    archivedRevealRequestId?: number | null;
+    onArchivedRevealHandled?: (requestId: number) => void;
+    onOpenSettings?: () => void;
+    presentation?: "modal" | "sidebar";
+    visible: boolean;
+  }) => {
     const React = require("react");
-    const { Text } = require("react-native");
+    const { Text, TouchableOpacity } = require("react-native");
+    React.useEffect(() => {
+      if (archivedRevealRequestId == null) {
+        return;
+      }
+      mockDrawerArchivedRevealRequests.push(archivedRevealRequestId);
+      onArchivedRevealHandled?.(archivedRevealRequestId);
+    }, [archivedRevealRequestId, onArchivedRevealHandled]);
     return React.createElement(
-      Text,
+      React.Fragment,
       null,
-      visible ? "drawer:open" : "drawer:closed",
+      React.createElement(
+        Text,
+        { testID: `drawer-${presentation}` },
+        presentation === "sidebar"
+          ? "drawer:sidebar"
+          : visible
+            ? "drawer:open"
+            : "drawer:closed",
+      ),
+      presentation === "sidebar" && onOpenSettings
+        ? React.createElement(
+            TouchableOpacity,
+            { onPress: onOpenSettings, testID: "stub-sidebar-open-settings" },
+            React.createElement(Text, null, "sidebar-open-settings"),
+          )
+        : null,
     );
   },
 }));
@@ -625,6 +690,9 @@ describe("MainScreen", () => {
     mockSettingsSurfaceVisible = false;
     mockIntroDismiss = null;
     mockSettingsDismiss = null;
+    mockDrawerArchivedRevealRequests = [];
+    mockIsPad = false;
+    mockPipelinePhase = "idle";
     mockUseWindowDimensions.mockReturnValue({
       fontScale: 1,
       height: 932,
@@ -1593,5 +1661,189 @@ describe("MainScreen", () => {
     ).toEqual(expect.objectContaining({ minHeight: 48 }));
     expect(rightPane.getByTestId("transcript-preview")).toBeTruthy();
     expect(rightPane.queryByText("transcript-style-control")).toBeNull();
+  });
+
+  it("composes a persistent sidebar and docked transcript on a wide iPad", () => {
+    const provider = DEFAULT_SETTINGS.responseModes[0].route.provider;
+    const route = {
+      provider,
+      model: getDefaultModelForProvider(provider),
+    };
+    mockIsPad = true;
+    mockUseWindowDimensions.mockReturnValue({
+      fontScale: 1,
+      height: 820,
+      scale: 2,
+      width: 1180,
+    });
+    useSharedSettings.mockReturnValue(
+      createSharedSettingsValue({
+        responseModes: [{ id: "mode-1", route }],
+        apiKeys: {
+          ...DEFAULT_SETTINGS.apiKeys,
+          [provider]: "provider-key",
+        },
+      }),
+    );
+
+    const screen = renderWithProviders(<MainScreen />, { language: "ar" });
+
+    expect(screen.getByTestId("ipad-regular-shell")).toBeTruthy();
+    expect(
+      StyleSheet.flatten(screen.getByTestId("ipad-regular-shell").props.style),
+    ).toEqual(expect.objectContaining({ flexDirection: "row" }));
+    expect(screen.getByText("drawer:sidebar")).toBeTruthy();
+    expect(screen.queryByTestId("drawer-modal")).toBeNull();
+    expect(screen.queryByText("open-drawer")).toBeNull();
+    expect(screen.getByTestId("ipad-transcript-pane")).toBeTruthy();
+    expect(screen.queryByTestId("transcript-handle")).toBeNull();
+    expect(screen.getByTestId("main-safe-area").props.edges).toEqual([
+      "top",
+      "bottom",
+      "left",
+      "right",
+    ]);
+  });
+
+  it("sends a fresh archived reveal request for every regular-iPad Settings route", async () => {
+    mockIsPad = true;
+    mockUseWindowDimensions.mockReturnValue({
+      fontScale: 1,
+      height: 900,
+      scale: 2,
+      width: 820,
+    });
+    const screen = renderWithProviders(<MainScreen />);
+
+    fireEvent.press(screen.getByTestId("stub-sidebar-open-settings"));
+    fireEvent.press(screen.getByTestId("stub-settings-open-archived"));
+    fireEvent.press(screen.getByTestId("stub-settings-dismiss"));
+
+    await waitFor(() => {
+      expect(mockDrawerArchivedRevealRequests).toEqual([1]);
+    });
+
+    fireEvent.press(screen.getByTestId("stub-sidebar-open-settings"));
+    fireEvent.press(screen.getByTestId("stub-settings-open-archived"));
+    fireEvent.press(screen.getByTestId("stub-settings-dismiss"));
+
+    await waitFor(() => {
+      expect(mockDrawerArchivedRevealRequests).toEqual([1, 2]);
+    });
+    expect(screen.getByText("drawer:sidebar")).toBeTruthy();
+  });
+
+  it("retires an open compact drawer when resizing into and back out of regular iPad", async () => {
+    mockIsPad = true;
+    mockPipelinePhase = "thinking";
+    mockUseWindowDimensions.mockReturnValue({
+      fontScale: 1,
+      height: 900,
+      scale: 2,
+      width: 600,
+    });
+    const screen = renderWithProviders(<MainScreen />);
+
+    fireEvent.press(screen.getByText("open-drawer"));
+    expect(screen.getByText("drawer:open")).toBeTruthy();
+
+    mockUseWindowDimensions.mockReturnValue({
+      fontScale: 1,
+      height: 900,
+      scale: 2,
+      width: 820,
+    });
+    screen.rerender(
+      <ThemeProvider mode="light">
+        <LocalizationProvider language="en">
+          <MainScreen />
+        </LocalizationProvider>
+      </ThemeProvider>,
+    );
+    await waitFor(() => {
+      expect(screen.getByText("drawer:sidebar")).toBeTruthy();
+      expect(screen.getByText("voice-stage:active")).toBeTruthy();
+    });
+
+    mockUseWindowDimensions.mockReturnValue({
+      fontScale: 1,
+      height: 900,
+      scale: 2,
+      width: 600,
+    });
+    screen.rerender(
+      <ThemeProvider mode="light">
+        <LocalizationProvider language="en">
+          <MainScreen />
+        </LocalizationProvider>
+      </ThemeProvider>,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText("drawer:closed")).toBeTruthy();
+      expect(screen.getByText("voice-stage:active")).toBeTruthy();
+    });
+  });
+
+  it("retires an open transcript sheet after docking so it does not reopen on shrink", async () => {
+    mockIsPad = true;
+    mockPipelinePhase = "thinking";
+    mockUseWindowDimensions.mockReturnValue({
+      fontScale: 1,
+      height: 1180,
+      scale: 2,
+      width: 820,
+    });
+    const screen = renderWithProviders(<MainScreen />);
+    const getTranscriptModal = () =>
+      screen
+        .UNSAFE_getAllByType(RNModal)
+        .find(
+          (modal) =>
+            modal.findAllByProps({ testID: "transcript-sheet-close" }).length >
+            0,
+        );
+
+    fireEvent.press(screen.getByTestId("transcript-handle"));
+    await waitFor(() => {
+      expect(getTranscriptModal()?.props.visible).toBe(true);
+    });
+
+    mockUseWindowDimensions.mockReturnValue({
+      fontScale: 1,
+      height: 820,
+      scale: 2,
+      width: 1180,
+    });
+    screen.rerender(
+      <ThemeProvider mode="light">
+        <LocalizationProvider language="en">
+          <MainScreen />
+        </LocalizationProvider>
+      </ThemeProvider>,
+    );
+    await waitFor(() => {
+      expect(screen.getByTestId("ipad-transcript-pane")).toBeTruthy();
+      expect(screen.getByText("voice-stage:active")).toBeTruthy();
+    });
+
+    mockUseWindowDimensions.mockReturnValue({
+      fontScale: 1,
+      height: 1180,
+      scale: 2,
+      width: 820,
+    });
+    screen.rerender(
+      <ThemeProvider mode="light">
+        <LocalizationProvider language="en">
+          <MainScreen />
+        </LocalizationProvider>
+      </ThemeProvider>,
+    );
+
+    await waitFor(() => {
+      expect(getTranscriptModal()).toBeUndefined();
+      expect(screen.getByText("voice-stage:active")).toBeTruthy();
+    });
   });
 });

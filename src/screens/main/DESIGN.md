@@ -136,6 +136,42 @@ answers a different question: whether the mode permits continuation, whether
 the user currently authorizes it, and whether exactly one future capture has
 been requested.
 
+## Adaptive iPad Composition
+
+`MainScreen` resolves one resize-aware `IpadLayout` from the current window,
+platform, and native iPad identity. Controllers, conversation data, input
+drafts, composer-focus intent, and pipeline state remain above that decision.
+Only presentation ownership changes:
+
+- compact iPad and all phones render the existing phone workspace and modal
+  conversations drawer;
+- regular iPad moves that same drawer content into a persistent leading
+  sidebar and renders the workspace beside it;
+- regular portrait and narrower landscape retain the transcript handle and
+  sheet; and
+- landscape windows at least 1024pt wide dock the transcript as a third pane.
+
+**Decision:** the 680pt regular boundary is the shared-tree approximation of
+UIKit's size class, because React Native does not expose the live class during
+Split View or Stage Manager resizing. Transcript docking is an independent
+viability decision rather than an orientation synonym. This preserves a usable
+centre stage when the approved sidebar and transcript widths cannot coexist.
+
+The regular workspace still mounts `MainScreenVoiceStage`, route picker,
+satellites, transcript content, and secondary-surface callbacks from the phone
+composition. Changing width therefore changes geometry without creating a
+second conversation runtime. Intro measures its 640pt card and uses that
+viewport for LTR/RTL paging and rotation realignment. Settings owns its own
+regular master-detail frame but consumes the same controller and page content.
+
+Crossing the regular boundary reparents the voice stage. The composer
+controller therefore remembers whether the native text input actually had
+focus and restores it once after that remount. Merely swiping to the text page
+does not set that intent or open the keyboard. Drawer and transcript visibility
+are likewise scoped to their modal presentations: entering persistent-sidebar
+or docked-transcript layout retires the obsolete modal flag so a later shrink
+cannot reopen a stale surface or suspend an active turn.
+
 ## Surface State
 
 Secondary surfaces are coordinated centrally so modal focus, dismissal, and
@@ -168,6 +204,9 @@ script-row presentation and local metrics disclosure, while canonical removal
 flows back through `useConversations`. The sessions drawer projects persisted
 metadata into flat Pinned, Earlier, and Archived sections; branch provenance is
 kept as a root-session link rather than encoded as visual tree rails.
+The regular-iPad sidebar keeps that drawer controller mounted. A later Data &
+privacy handoff therefore expands Archived reactively rather than assuming
+drawer construction is the navigation boundary.
 
 `useOrbTurnProgress` takes one clock snapshot whenever semantic voice state
 changes, then supplies the remaining linear durations to `VoiceOrb`. The orb

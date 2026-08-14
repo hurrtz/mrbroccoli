@@ -13,11 +13,11 @@ import {
   ProviderCapability,
   ProviderValidationResult,
 } from "../../types";
+import { resolveIpadLayout } from "../../utils/ipadLayout";
 
 import { AntSettingsPageContent } from "./AntSettingsPageContent";
 import { AntSettingsFrame } from "./AntSettingsFrame";
-
-type DrillInSettingsPage = Exclude<SettingsPage, "overview">;
+import type { SettingsDetailPage } from "./AntSettingsOverview";
 
 function getInitialSettingsPage({
   focusPage,
@@ -52,6 +52,13 @@ function getInitialSettingsPage({
   return "overview";
 }
 
+function getPresentedSettingsPage(
+  page: SettingsPage,
+  isRegularIpad: boolean,
+): SettingsPage {
+  return isRegularIpad && page === "overview" ? "connections" : page;
+}
+
 export const AntSettingsModal = React.memo(function AntSettingsModal(
   props: SettingsModalProps,
 ) {
@@ -74,15 +81,30 @@ export const AntSettingsModal = React.memo(function AntSettingsModal(
   const { height, width } = useWindowDimensions();
   const isLandscape = width > height;
   const modalMaxWidth = isLandscape ? Math.min(width - 24, 980) : width;
+  const ipadLayout = React.useMemo(
+    () =>
+      resolveIpadLayout({
+        height,
+        isPad: Platform.OS === "ios" && Platform.isPad,
+        platform: Platform.OS,
+        width,
+      }),
+    [height, width],
+  );
+  const isRegularIpad = ipadLayout.isRegularWidth;
+  const isRegularIpadRef = React.useRef(isRegularIpad);
+  isRegularIpadRef.current = isRegularIpad;
   const entrance = React.useRef(new Animated.Value(0)).current;
-  const [activePage, setActivePage] = React.useState<SettingsPage>(() =>
-    getInitialSettingsPage({
+  const [activePage, setActivePage] = React.useState<SettingsPage>(() => {
+    const initialPage = getInitialSettingsPage({
       focusPage,
       focusProvider,
       focusCatalogProviderId,
       focusTab,
-    }),
-  );
+    });
+    return getPresentedSettingsPage(initialPage, isRegularIpad);
+  });
+  const presentedPage = getPresentedSettingsPage(activePage, isRegularIpad);
   const [validationToastMessage, setValidationToastMessage] = React.useState<
     string | null
   >(null);
@@ -161,12 +183,15 @@ export const AntSettingsModal = React.memo(function AntSettingsModal(
     }
 
     setActivePage(
-      getInitialSettingsPage({
-        focusPage,
-        focusProvider,
-        focusCatalogProviderId,
-        focusTab,
-      }),
+      getPresentedSettingsPage(
+        getInitialSettingsPage({
+          focusPage,
+          focusProvider,
+          focusCatalogProviderId,
+          focusTab,
+        }),
+        isRegularIpadRef.current,
+      ),
     );
     Animated.timing(entrance, {
       toValue: 1,
@@ -183,6 +208,14 @@ export const AntSettingsModal = React.memo(function AntSettingsModal(
   ]);
 
   React.useEffect(() => {
+    if (!visible || !isRegularIpad) {
+      return;
+    }
+
+    setActivePage((page) => (page === "overview" ? "connections" : page));
+  }, [isRegularIpad, visible]);
+
+  React.useEffect(() => {
     if (visible) {
       requestAnimationFrame(() => {
         controller.contentScrollRef.current?.scrollTo({
@@ -191,19 +224,19 @@ export const AntSettingsModal = React.memo(function AntSettingsModal(
         });
       });
     }
-  }, [activePage, controller.contentScrollRef, visible]);
+  }, [controller.contentScrollRef, presentedPage, visible]);
 
   React.useEffect(() => {
     if (visible) {
       recordDebugLogEvent({
         event: "settings-page-presented",
-        payload: { page: activePage },
+        payload: { page: presentedPage },
       });
     }
-  }, [activePage, visible]);
+  }, [presentedPage, visible]);
 
   const getPageTitle = React.useCallback(
-    (page: DrillInSettingsPage) => {
+    (page: SettingsDetailPage) => {
       switch (page) {
         case "connections":
           return t("settingsConnections");
@@ -224,17 +257,22 @@ export const AntSettingsModal = React.memo(function AntSettingsModal(
     [t],
   );
 
+  const handleOpenPage = React.useCallback(
+    (page: SettingsPage) => {
+      recordDebugLogEvent({
+        event: "settings-page-open-requested",
+        payload: { from: presentedPage, to: page },
+      });
+      setActivePage(page);
+    },
+    [presentedPage],
+  );
+
   const activeContent = (
     <AntSettingsPageContent
-      activePage={activePage}
+      activePage={presentedPage}
       controller={controller}
-      onOpenPage={(page) => {
-        recordDebugLogEvent({
-          event: "settings-page-open-requested",
-          payload: { from: activePage, to: page },
-        });
-        setActivePage(page);
-      }}
+      onOpenPage={handleOpenPage}
       onValidationStart={() => setValidationToastMessage(null)}
       props={diagnosticProps}
       validation={validation}
@@ -242,7 +280,7 @@ export const AntSettingsModal = React.memo(function AntSettingsModal(
   );
 
   const title =
-    activePage === "overview" ? t("settings") : getPageTitle(activePage);
+    presentedPage === "overview" ? t("settings") : getPageTitle(presentedPage);
 
   const handleBack = React.useCallback(() => {
     recordDebugLogEvent({
@@ -262,16 +300,18 @@ export const AntSettingsModal = React.memo(function AntSettingsModal(
 
   const frame = (
     <AntSettingsFrame
-      activePage={activePage}
+      activePage={presentedPage}
       contentScrollRef={controller.contentScrollRef}
       entrance={entrance}
       insets={insets}
       isLandscape={isLandscape}
+      isRegularIpad={isRegularIpad}
       keyboardInset={controller.keyboardInset}
       modalMaxWidth={modalMaxWidth}
       onBack={handleBack}
       onClose={onClose}
       onDismissValidationToast={() => setValidationToastMessage(null)}
+      onSelectPage={handleOpenPage}
       title={title}
       validationToastMessage={validationToastMessage}
     >
