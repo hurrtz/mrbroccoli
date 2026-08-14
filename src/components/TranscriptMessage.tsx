@@ -593,8 +593,10 @@ const styles = StyleSheet.create({
     letterSpacing: 0.6,
     textTransform: "uppercase",
   },
+  // The design system draws the thread at 1.5pt; a hairline all but
+  // disappears against the canvas.
   threadLine: {
-    width: StyleSheet.hairlineWidth,
+    width: 1.5,
     flex: 1,
   },
   messageContent: {

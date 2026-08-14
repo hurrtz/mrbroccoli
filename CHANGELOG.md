@@ -13,6 +13,8 @@ the complete Play Store translations are kept in a dedicated file under
 - The transcript sheet now uses one continuous canvas color and the approved
   18-point gutter instead of nesting the script inside a differently colored,
   dialog-padded rectangle; only expanded turn metrics lift onto a surface.
+- The transcript's speaker thread line draws at its intended one-and-a-half
+  point weight instead of a hairline that vanished against the canvas.
 - Fixed the session details, conversation settings, and voice picker scrims
   using a fixed light dimming color instead of the theme's overlay, so they
   now match every other modal in both light and dark appearance.

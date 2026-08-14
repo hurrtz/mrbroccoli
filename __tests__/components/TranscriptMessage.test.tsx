@@ -105,6 +105,15 @@ describe("TranscriptMessage", () => {
     expect(rowStyle).not.toHaveProperty("borderWidth");
     expect(rowStyle).not.toHaveProperty("borderRadius");
     expect(speakerStyle.width).toBe(34);
+    // The thread line is 1.5pt like the design system's — a hairline all
+    // but disappears against the canvas.
+    const speaker = screen.getByTestId("transcript-speaker-user-1");
+    const threadLine = speaker.children[speaker.children.length - 1];
+    expect(
+      StyleSheet.flatten(
+        (threadLine as { props: { style: unknown } }).props.style,
+      ),
+    ).toEqual(expect.objectContaining({ width: 1.5 }));
     expect(StyleSheet.flatten(body.props.style)).toEqual(
       expect.objectContaining({ fontStyle: "italic" }),
     );
