@@ -10,7 +10,6 @@ import { useTheme } from "../../theme/ThemeContext";
 import { fonts } from "../../theme/typography";
 import type { ResponseModeConfig } from "../../types";
 import {
-  getModelEffortOptionLabel,
   getModelEffortOptions,
   getResponseModeRouteEffortLabel,
 } from "../../utils/modelEffort";
@@ -21,8 +20,8 @@ import {
  * Deliberately not a button — no fill, no border, no card — so it cannot be
  * mistaken for the voice stage below it. The provider mark carries the
  * prominence; the closing hairline says the whole row is the target, not just
- * the caret. The dots are that model's own effort scale, so the count varies;
- * a model with no effort control reads its label with no dots.
+ * the caret. Effort is named, not plotted: the word alone carries it, and a
+ * model with no effort control reads "Normal".
  */
 export function MainScreenRouteByline({
   mode,
@@ -47,11 +46,6 @@ export function MainScreenRouteByline({
     : getModelEffortOptions(route.provider, route.model);
   const displayedEffortLabel =
     effortOptions.length === 0 ? t("normal") : (effortLabel ?? t("normal"));
-  const effortLabels = effortOptions.map((option) =>
-    getModelEffortOptionLabel(option, language),
-  );
-  const effortIndex = effortLabel ? effortLabels.indexOf(effortLabel) : -1;
-  const showDots = effortLabels.length > 1 && effortIndex >= 0;
 
   return (
     <Pressable
@@ -88,29 +82,6 @@ export function MainScreenRouteByline({
         >
           {displayedEffortLabel}
         </Text>
-        {showDots ? (
-          <View
-            accessibilityElementsHidden
-            importantForAccessibility="no-hide-descendants"
-            style={styles.dots}
-            testID="route-byline-effort-dots"
-          >
-            {effortLabels.map((level, position) => (
-              <View
-                key={level}
-                style={[
-                  styles.dot,
-                  {
-                    backgroundColor:
-                      position <= effortIndex
-                        ? colors.accent
-                        : colors.borderStrong,
-                  },
-                ]}
-              />
-            ))}
-          </View>
-        ) : null}
         {switchable ? (
           <View style={styles.caret}>
             <PhosphorIcon color={colors.textMuted} name="down" size="compact" />
@@ -148,16 +119,6 @@ const styles = StyleSheet.create({
     fontFamily: fonts.mono,
     fontSize: 11,
     lineHeight: 16,
-  },
-  dots: {
-    alignItems: "center",
-    flexDirection: "row",
-    gap: 4,
-  },
-  dot: {
-    borderRadius: 3,
-    height: 5,
-    width: 5,
   },
   caret: {
     alignItems: "center",

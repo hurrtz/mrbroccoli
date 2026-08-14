@@ -61,7 +61,8 @@ receive already-derived state and callbacks.
 - The route byline above the stage states who answers the next turn and at
   what effort — one line at every model count, with the model list in a sheet
   opened from it. With a single configured model it becomes a credit line;
-  routes without an adjustable effort read `Normal` without effort dots;
+  effort is named, not plotted — the word alone carries it and routes without
+  an adjustable effort read `Normal`;
   when no route is usable it renders nothing rather than another credential or
   setup card.
   `ResponseModeToggle` and `PhaseAwareVoiceAction` remain in the codebase,

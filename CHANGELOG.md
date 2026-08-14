@@ -34,6 +34,8 @@ the complete Play Store translations are kept in a dedicated file under
   opened: the orb already states the phase, the transcript handle names the
   latest model and age, and Settings lists the routes. Screen readers still
   hear every phase change announced.
+- The route line names the effort instead of plotting it: the dot ladder beside
+  the model is gone, since the word already says it.
 - Controls take one shape across the app: the composer's send, the new-session
   button, the toast dismiss and the Council and Web toggles are squircles like
   every other control, leaving the voice orb and the walkthrough's play button

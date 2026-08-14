@@ -24,6 +24,21 @@ const responseModes = [
 ];
 
 describe("MainScreenRouteCard", () => {
+  it("names the effort instead of plotting it", () => {
+    // The dot ladder is retired: the word already says the effort.
+    const screen = renderWithProviders(
+      <MainScreenRouteCard
+        activeResponseMode="mode-1"
+        availableResponseModes={["mode-1", "mode-2"]}
+        onOpenRoutePicker={jest.fn()}
+        responseModes={responseModes}
+      />,
+    );
+
+    expect(screen.getByTestId("route-byline-effort")).toBeTruthy();
+    expect(screen.queryByTestId("route-byline-effort-dots")).toBeNull();
+  });
+
   it("renders the route byline when routes are available", () => {
     const onOpenRoutePicker = jest.fn();
     const screen = renderWithProviders(
