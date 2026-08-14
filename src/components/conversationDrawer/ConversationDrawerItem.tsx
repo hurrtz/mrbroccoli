@@ -16,7 +16,7 @@ interface ConversationDrawerItemProps {
   active: boolean;
   formatDate: (iso: string) => string;
   onDelete: (conversationId: string) => void;
-  onOpenActionConversation: (conversationId: string) => void;
+  onOpenActionConversation: (conversationId: string, anchorY: number) => void;
   onOpenRoot?: (conversationId: string) => void;
   onSelectConversation: (conversationId: string) => void;
 }
@@ -54,6 +54,7 @@ export function ConversationDrawerItem({
 }: ConversationDrawerItemProps) {
   const { colors } = useTheme();
   const { t } = useLocalization();
+  const menuButtonRef = React.useRef<View>(null);
   const providerMarks = getProviderMarks(conversation);
 
   const renderRightActions = () => (
@@ -183,9 +184,18 @@ export function ConversationDrawerItem({
             ) : null}
           </View>
           <TouchableOpacity
+            ref={menuButtonRef}
             testID={`conversation-drawer-menu-${conversation.id}`}
             style={styles.itemMenuButton}
-            onPress={() => onOpenActionConversation(conversation.id)}
+            onPress={() => {
+              // Open first, then refine: the menu anchors under the control
+              // that opened it, and a measurement that never arrives must not
+              // swallow the tap.
+              onOpenActionConversation(conversation.id, 0);
+              menuButtonRef.current?.measureInWindow((_x, y, _width, height) => {
+                onOpenActionConversation(conversation.id, y + height + 4);
+              });
+            }}
             activeOpacity={0.88}
             accessibilityRole="button"
             accessibilityLabel={t("conversationActions")}

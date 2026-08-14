@@ -13,7 +13,7 @@ import { APP_MODAL_ORIENTATIONS } from "../constants/layout";
 import { useLocalization } from "../i18n";
 import { useTheme } from "../theme/ThemeContext";
 import { Toast } from "./Toast";
-import { ConversationActionSheet } from "./conversationDrawer/ConversationActionSheet";
+import { ConversationActionMenu } from "./conversationDrawer/ConversationActionMenu";
 import {
   ConversationDrawerHeader,
   ConversationDrawerSearch,
@@ -154,10 +154,11 @@ export const ConversationDrawer = React.memo(function ConversationDrawer({
           ) : null}
         </View>
 
-        <ConversationActionSheet
+        <ConversationActionMenu
+          anchorY={controller.actionAnchorY}
+          availableHeight={height}
           conversation={controller.actionConversation}
           onClose={controller.closeActionModal}
-          onOpenRoot={controller.handleSelectConversation}
           onCopyThread={onCopyThread}
           onDelete={handleDelete}
           onOpenRenameModal={controller.openRenameModal}

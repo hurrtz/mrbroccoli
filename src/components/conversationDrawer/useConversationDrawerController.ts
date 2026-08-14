@@ -88,7 +88,9 @@ export function useConversationDrawerController({
     setActionConversationId(null);
   }, []);
 
-  const openActionConversation = React.useCallback((conversationId: string) => {
+  const [actionAnchorY, setActionAnchorY] = React.useState(0);
+  const openActionConversation = React.useCallback((conversationId: string, anchorY = 0) => {
+    setActionAnchorY(anchorY);
     setActionConversationId(conversationId);
   }, []);
 
@@ -125,6 +127,7 @@ export function useConversationDrawerController({
   }, [onClose, onNewSession]);
 
   return {
+    actionAnchorY,
     actionConversation,
     clearSearch,
     closeActionModal,

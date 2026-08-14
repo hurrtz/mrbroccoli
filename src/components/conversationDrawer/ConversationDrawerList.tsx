@@ -18,7 +18,7 @@ interface ConversationDrawerListProps {
   conversations: ConversationMeta[];
   searchQuery: string;
   onDeleteConversation: (conversationId: string) => void;
-  onOpenActionConversation: (conversationId: string) => void;
+  onOpenActionConversation: (conversationId: string, anchorY: number) => void;
   onSelectConversation: (conversationId: string) => void;
 }
 

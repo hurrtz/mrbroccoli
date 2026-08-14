@@ -12,72 +12,49 @@ export const styles = StyleSheet.create({
     borderRightWidth: 1,
   },
   backdrop: { flex: 1 },
+  menuLayer: {
+    ...StyleSheet.absoluteFill,
+    zIndex: 10,
+  },
+  menuPanel: {
+    position: "absolute",
+    right: 12,
+    width: 252,
+    borderRadius: 14,
+    borderWidth: 1,
+    overflow: "hidden",
+    shadowOffset: { width: 0, height: 12 },
+    shadowOpacity: 0.28,
+    shadowRadius: 34,
+    elevation: 12,
+  },
+  menuBand: {
+    height: 6,
+    opacity: 0.55,
+  },
+  menuRow: {
+    minHeight: 44,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+    paddingHorizontal: 14,
+  },
+  menuRowDivider: {
+    borderTopWidth: StyleSheet.hairlineWidth,
+  },
+  menuRowPressed: {
+    opacity: 0.72,
+  },
+  menuRowLabel: {
+    flex: 1,
+    fontSize: 15,
+    fontFamily: fonts.body,
+  },
   toastHost: {
     position: "absolute",
     left: 0,
     right: 0,
     zIndex: 20,
-  },
-  inlineActionOverlay: {
-    ...StyleSheet.absoluteFill,
-    justifyContent: "flex-end",
-    zIndex: 10,
-  },
-  inlineActionBackdrop: {
-    ...StyleSheet.absoluteFill,
-  },
-  actionSheet: {
-    maxHeight: "85%",
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    borderWidth: 1,
-    borderBottomWidth: 0,
-    shadowOffset: { width: 0, height: -8 },
-    shadowOpacity: 0.12,
-    shadowRadius: 24,
-    elevation: 10,
-  },
-  actionSheetContent: {
-    padding: 20,
-    gap: 8,
-  },
-  actionSheetTitle: {
-    fontSize: 18,
-    lineHeight: 24,
-    fontFamily: fonts.display,
-  },
-  actionSheetHeader: {
-    alignItems: "center",
-    flexDirection: "row",
-    gap: 12,
-  },
-  actionSheetHeaderCopy: {
-    flex: 1,
-    minWidth: 0,
-  },
-  actionSheetMeta: {
-    fontSize: 11,
-    lineHeight: 16,
-    fontFamily: fonts.mono,
-  },
-  actionSheetGroup: {
-    borderRadius: 12,
-    borderWidth: 1,
-    overflow: "hidden",
-  },
-  actionSheetRow: {
-    minHeight: 48,
-    paddingHorizontal: 14,
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 12,
-  },
-  actionSheetRowDivider: {
-    borderBottomWidth: StyleSheet.hairlineWidth,
-  },
-  actionSheetRowText: {
-    fontSize: 15,
-    fontFamily: fonts.bodyMedium,
   },
   inlineRenameOverlay: {
     ...StyleSheet.absoluteFill,

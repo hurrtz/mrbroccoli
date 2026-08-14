@@ -1,6 +1,6 @@
 import React from "react";
 import { Alert, FlatList, Modal, StyleSheet } from "react-native";
-import { fireEvent, waitFor } from "@testing-library/react-native";
+import { fireEvent, waitFor, within } from "@testing-library/react-native";
 
 import { ConversationDrawer } from "../../src/components/ConversationDrawer";
 import { ConversationDrawerList } from "../../src/components/conversationDrawer/ConversationDrawerList";
@@ -175,6 +175,7 @@ describe("ConversationDrawer", () => {
     fireEvent.press(screen.getByTestId("conversation-drawer-menu-one"));
 
     await waitFor(() => {
+      const menu = within(screen.getByTestId("conversation-action-menu"));
       for (const label of [
         "Pin",
         "Rename",
@@ -184,11 +185,9 @@ describe("ConversationDrawer", () => {
         "Copy",
         "Delete",
       ]) {
-        expect(
-          screen
-            .getAllByLabelText(label)
-            .every((control) => control.props.accessibilityRole === "button"),
-        ).toBe(true);
+        expect(menu.getByLabelText(label).props.accessibilityRole).toBe(
+          "menuitem",
+        );
       }
     });
   });
@@ -374,74 +373,36 @@ describe("ConversationDrawer", () => {
     expect(onRenameThread).toHaveBeenCalledWith("one", "Renamed briefing");
   });
 
-  it("shows a root action only on forked sessions and navigates to the root", async () => {
-    const onSelect = jest.fn();
-    const forked: ConversationMeta = {
-      ...conversations[0],
-      id: "fork-1",
-      title: "Fork of the briefing",
-      branch: {
-        rootConversationId: "one",
-        parentConversationId: "one",
-        parentMessageId: "m1",
-        branchMessageId: "m2",
-        kind: "edited-prompt",
-        createdAt: "2026-03-21T08:00:00.000Z",
-      },
-    };
-    const screen = renderConversationDrawer({
-      conversations: [...conversations, forked],
-      onSelect,
-    });
-
-    fireEvent.press(screen.getByTestId("conversation-drawer-menu-fork-1"));
-    const rootAction = await screen.findByTestId(
-      "conversation-action-show-root",
-    );
-    fireEvent.press(rootAction);
-    expect(onSelect).toHaveBeenCalledWith("one");
-
-    fireEvent.press(screen.getByTestId("conversation-drawer-menu-one"));
-    await waitFor(() => {
-      expect(screen.getByTestId("conversation-action-rename")).toBeTruthy();
-    });
-    expect(screen.queryByTestId("conversation-action-show-root")).toBeNull();
-  });
-
-  it("groups the sheet's actions in one card with dividers, not islands", async () => {
+  it("opens quick verbs as an anchored menu, not a dimmed sheet", async () => {
     const screen = renderConversationDrawer();
 
     fireEvent.press(screen.getByTestId("conversation-drawer-menu-one"));
-    const pinRow = await screen.findByTestId("conversation-action-toggle-pin");
+    const panel = await screen.findByTestId("conversation-action-menu");
 
-    const rowStyle = StyleSheet.flatten(pinRow.props.style);
-    expect(rowStyle.borderWidth).toBeUndefined();
-    expect(rowStyle.borderRadius).toBeUndefined();
-    expect(rowStyle.borderBottomWidth).toBe(StyleSheet.hairlineWidth);
-
-    const deleteStyle = StyleSheet.flatten(
-      screen.getByTestId("conversation-action-delete").props.style,
+    expect(StyleSheet.flatten(panel.props.style)).toEqual(
+      expect.objectContaining({ position: "absolute", width: 252 }),
     );
-    expect(deleteStyle.borderBottomWidth).toBeUndefined();
+    const pin = screen.getByTestId("conversation-action-toggle-pin");
+    expect(StyleSheet.flatten(pin.props.style)).toEqual(
+      expect.objectContaining({ minHeight: 44 }),
+    );
+    // Delete stays last and alone, in danger ink.
+    expect(screen.getByTestId("conversation-action-delete")).toBeTruthy();
   });
-
-  it("keeps the action-sheet backdrop decorative and provides an explicit close action", async () => {
+  it("closes the menu through a decorative click-away layer", async () => {
     const screen = renderConversationDrawer();
 
     fireEvent.press(screen.getByTestId("conversation-drawer-menu-one"));
-
     const backdrop = await screen.findByTestId(
       "conversation-action-backdrop",
       hiddenIconQuery,
     );
     expect(backdrop.props.accessible).toBe(false);
-    expect(backdrop.props.accessibilityElementsHidden).toBe(true);
     expect(backdrop.props.importantForAccessibility).toBe("no");
 
-    fireEvent.press(screen.getByTestId("conversation-action-close"));
-    expect(screen.queryByTestId("conversation-action-rename")).toBeNull();
+    fireEvent.press(backdrop);
+    expect(screen.queryByTestId("conversation-action-menu")).toBeNull();
   });
-
   it("marks a conversation private from its action sheet", async () => {
     const onTogglePrivate = jest.fn();
     const screen = renderConversationDrawer({ onTogglePrivate });

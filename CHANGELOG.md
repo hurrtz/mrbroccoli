@@ -34,6 +34,10 @@ the complete Play Store translations are kept in a dedicated file under
   opened: the orb already states the phase, the transcript handle names the
   latest model and age, and Settings lists the routes. Screen readers still
   hear every phase change announced.
+- Session actions now open as a compact menu anchored at the row's own button
+  instead of a dimmed bottom sheet: pin, archive and privacy together, then
+  rename and automatic naming, then share and copy, with delete last and alone.
+  The fork tag on the row remains the way to its root conversation.
 - Drive Session no longer adds its own row of controls: the ring under the orb
   carries the session's Stop and Resume at every moment, including at rest, and
   the silence countdown is spoken rather than drawn. The ring itself now
