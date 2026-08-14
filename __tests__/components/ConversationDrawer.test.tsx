@@ -96,6 +96,18 @@ describe("ConversationDrawer", () => {
     jest.restoreAllMocks();
   });
 
+  it("shows action feedback inside the drawer instead of behind it", () => {
+    // Auto-naming completes while the drawer modal is still open; deferring
+    // its toast to the workspace layer hid both success and failure.
+    const onDismissToast = jest.fn();
+    const screen = renderConversationDrawer({
+      toast: { message: "Conversation renamed.", tone: "success" },
+      onDismissToast,
+    });
+
+    expect(screen.getByText("Conversation renamed.")).toBeTruthy();
+  });
+
   it("does not mount the native modal while the drawer is hidden", () => {
     const screen = renderConversationDrawer({ visible: false });
 

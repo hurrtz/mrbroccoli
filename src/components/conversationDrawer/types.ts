@@ -1,4 +1,4 @@
-import { ConversationMeta } from "../../types";
+import { ConversationMeta, ToastTone } from "../../types";
 
 export interface ConversationDrawerProps {
   visible: boolean;
@@ -18,4 +18,8 @@ export interface ConversationDrawerProps {
   onDelete: (id: string) => void;
   onClose: () => void;
   onDismiss?: () => void;
+  /** Feedback for actions begun in the drawer (auto-naming) surfaces here —
+      the workspace toast layer sits under this modal and cannot. */
+  toast?: { message: string; onRetry?: () => void; tone?: ToastTone } | null;
+  onDismissToast?: () => void;
 }

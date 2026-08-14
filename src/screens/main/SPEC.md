@@ -270,10 +270,14 @@ In landscape, the workspace invitation contracts to the approved 48-point,
 title-only banner so the voice stage remains stable. Portrait keeps the full
 title, explanation, action, and eligible dismiss control.
 
-Transient toasts belong only to the main workspace layer. If a sheet, drawer,
-introduction, or full-screen secondary surface is open, one pending toast waits
-without consuming its display interval and starts its four-second clock only
-after that surface closes. Newer notices still replace older ones.
+Transient toasts belong to the main workspace layer. If a sheet, introduction,
+or full-screen secondary surface is open, one pending toast waits without
+consuming its display interval and starts its four-second clock only after
+that surface closes. Newer notices still replace older ones. **Decision:** the
+sessions drawer is the one exception — feedback for actions begun there
+(automatic naming's success and failure) renders inside the drawer modal
+itself, because deferring it hid the outcome behind the surface the user was
+still looking at.
 
 The introduction is opened from its banner, never as a side effect of attempting
 a turn. The manual catalogue shows every route at a glance — the system route,

@@ -1322,6 +1322,10 @@ export function MainScreen() {
       }}
       conversationDrawer={{
         archivedInitiallyExpanded: drawerArchivedOnOpen,
+        // Feedback for drawer-born actions (auto-naming) renders inside the
+        // drawer modal; the workspace toast layer sits underneath it.
+        toast,
+        onDismissToast: dismissToast,
         visible: drawerVisible,
         conversations,
         activeId: activeConversation?.id || null,

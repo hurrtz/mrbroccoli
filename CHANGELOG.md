@@ -29,6 +29,10 @@ the complete Play Store translations are kept in a dedicated file under
   the modal for viewing, editing, copying, or clearing a conversation's
   compact summary are gone. The summary itself remains an internal detail
   of how long threads stay within a model's context window.
+- Automatic naming's success and failure messages now appear inside the
+  conversations drawer where the action was taken; they were previously
+  held behind the drawer until it closed, which made a failed naming —
+  for example on a route out of credits — look like nothing happened.
 - Fixed the session details, conversation settings, and voice picker scrims
   using a fixed light dimming color instead of the theme's overlay, so they
   now match every other modal in both light and dark appearance.

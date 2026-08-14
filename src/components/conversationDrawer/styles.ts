@@ -12,6 +12,12 @@ export const styles = StyleSheet.create({
     borderRightWidth: 1,
   },
   backdrop: { flex: 1 },
+  toastHost: {
+    position: "absolute",
+    left: 0,
+    right: 0,
+    zIndex: 20,
+  },
   inlineActionOverlay: {
     ...StyleSheet.absoluteFill,
     justifyContent: "flex-end",

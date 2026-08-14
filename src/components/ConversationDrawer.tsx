@@ -8,9 +8,11 @@ import {
   View,
   useWindowDimensions,
 } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { APP_MODAL_ORIENTATIONS } from "../constants/layout";
 import { useLocalization } from "../i18n";
 import { useTheme } from "../theme/ThemeContext";
+import { Toast } from "./Toast";
 import { ConversationActionSheet } from "./conversationDrawer/ConversationActionSheet";
 import {
   ConversationDrawerHeader,
@@ -40,10 +42,13 @@ export const ConversationDrawer = React.memo(function ConversationDrawer({
   onDelete,
   onClose,
   onDismiss,
+  toast,
+  onDismissToast,
 }: ConversationDrawerProps) {
   const { colors } = useTheme();
   const { t } = useLocalization();
   const { height, width } = useWindowDimensions();
+  const insets = useSafeAreaInsets();
   const isLandscape = width > height;
   const drawerMaxWidth = isLandscape ? Math.min(width * 0.44, 520) : width;
   const controller = useConversationDrawerController({
@@ -169,6 +174,20 @@ export const ConversationDrawer = React.memo(function ConversationDrawer({
           onClose={controller.closeRenameModal}
           onSubmit={controller.submitRename}
         />
+        {onDismissToast ? (
+          <View
+            pointerEvents="box-none"
+            style={[styles.toastHost, { top: insets.top }]}
+          >
+            <Toast
+              message={toast?.message || ""}
+              visible={Boolean(toast)}
+              onDismiss={onDismissToast}
+              onRetry={toast?.onRetry}
+              tone={toast?.tone}
+            />
+          </View>
+        ) : null}
       </View>
     </Modal>
   );
