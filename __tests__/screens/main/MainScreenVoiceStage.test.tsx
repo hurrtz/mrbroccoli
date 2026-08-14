@@ -218,14 +218,19 @@ describe("MainScreenVoiceStage composer", () => {
       StyleSheet.flatten(screen.getByTestId("voice-orb-core").props.style)
         .backgroundColor,
     ).toBe(lightColors.accent);
+    // The pager is a closed circle: both 44pt carets lead to the other
+    // surface, so neither direction is a dead end.
     expect(
-      screen.getByLabelText("Show voice input").props.accessibilityState,
-    ).toEqual({ disabled: true });
+      screen.getByTestId("pager-chevron-left").props.accessibilityState,
+    ).toEqual({ disabled: false });
     expect(
-      StyleSheet.flatten(screen.getByLabelText("Show voice input").props.style),
+      screen.getByTestId("pager-chevron-left").props.accessibilityLabel,
+    ).toBe("Show text input");
+    expect(
+      StyleSheet.flatten(screen.getByTestId("pager-chevron-left").props.style),
     ).toEqual(expect.objectContaining({ height: 44, width: 44 }));
     expect(
-      StyleSheet.flatten(screen.getByLabelText("Show text input").props.style),
+      StyleSheet.flatten(screen.getByTestId("pager-chevron-right").props.style),
     ).toEqual(expect.objectContaining({ height: 44, width: 44 }));
 
     fireEvent.press(orb);
@@ -274,7 +279,7 @@ describe("MainScreenVoiceStage composer", () => {
     fireEvent.press(screen.getByTestId("prompt-blocked-notice"));
     expect(onResolvePromptBlock).toHaveBeenCalledTimes(1);
 
-    fireEvent.press(screen.getByLabelText("Show text input"));
+    fireEvent.press(screen.getByTestId("pager-chevron-right"));
     const input = screen.getByPlaceholderText("Type a message");
     expect(input.props.editable).toBe(true);
     fireEvent.changeText(input, "Draft while blocked");
@@ -334,7 +339,7 @@ describe("MainScreenVoiceStage composer", () => {
 
     // The message tells the user to type, so the composer must still work --
     // this is what separates it from a prompt block, which stops both routes.
-    fireEvent.press(screen.getByLabelText("Show text input"));
+    fireEvent.press(screen.getByTestId("pager-chevron-right"));
     const input = screen.getByPlaceholderText("Type a message");
     expect(input.props.editable).toBe(true);
     fireEvent.changeText(input, "Typed instead of spoken");
@@ -352,7 +357,7 @@ describe("MainScreenVoiceStage composer", () => {
     // left it looking like the lesser half.
     const screen = renderStage(<MainScreenVoiceStage {...createProps({})} />);
 
-    fireEvent.press(screen.getByLabelText("Show text input"));
+    fireEvent.press(screen.getByTestId("pager-chevron-right"));
     const surface = StyleSheet.flatten(
       screen.getByTestId("text-input-surface").props.style,
     );
@@ -367,7 +372,7 @@ describe("MainScreenVoiceStage composer", () => {
       <MainScreenVoiceStage {...createProps({})} />,
     );
 
-    fireEvent.press(screen.getByLabelText("Show text input"));
+    fireEvent.press(screen.getByTestId("pager-chevron-right"));
     const input = screen.getByPlaceholderText("Type a message");
     expect(StyleSheet.flatten(input.props.style).maxHeight).toBe(116);
 
@@ -405,7 +410,7 @@ describe("MainScreenVoiceStage composer", () => {
     fireEvent.press(screen.getByTestId("voice-orb-idle"));
     expect(onPress).not.toHaveBeenCalled();
 
-    fireEvent.press(screen.getByLabelText("Show text input"));
+    fireEvent.press(screen.getByTestId("pager-chevron-right"));
     expect(
       screen.getByTestId("voice-text-primary-action").props.accessibilityState,
     ).toEqual({ disabled: true });
@@ -439,7 +444,7 @@ describe("MainScreenVoiceStage composer", () => {
     expect(onResolvePromptBlock).not.toHaveBeenCalled();
     expect(onPress).not.toHaveBeenCalled();
 
-    fireEvent.press(screen.getByLabelText("Show text input"));
+    fireEvent.press(screen.getByTestId("pager-chevron-right"));
     fireEvent.changeText(
       screen.getByPlaceholderText("Type a message"),
       "Draft while setup is required",
@@ -476,7 +481,7 @@ describe("MainScreenVoiceStage composer", () => {
       nativeEvent: { layout: { width: 320 } },
     });
 
-    fireEvent.press(screen.getByLabelText("Show text input"));
+    fireEvent.press(screen.getByTestId("pager-chevron-right"));
 
     expect(
       StyleSheet.flatten(
@@ -484,9 +489,13 @@ describe("MainScreenVoiceStage composer", () => {
       ),
     ).toEqual(expect.objectContaining({ gap: 32, width: 672 }));
 
+    // On the text page the circle points back: both carets return to voice.
     expect(
-      screen.getByLabelText("Show text input").props.accessibilityState,
-    ).toEqual({ disabled: true });
+      screen.getByTestId("pager-chevron-right").props.accessibilityState,
+    ).toEqual({ disabled: false });
+    expect(
+      screen.getByTestId("pager-chevron-right").props.accessibilityLabel,
+    ).toBe("Show voice input");
     expect(
       StyleSheet.flatten(screen.getByTestId("text-input-surface").props.style),
     ).toEqual(
@@ -518,7 +527,7 @@ describe("MainScreenVoiceStage composer", () => {
       <MainScreenVoiceStage {...createProps({ onSubmitTextMessage })} />,
     );
 
-    fireEvent.press(screen.getByLabelText("Show text input"));
+    fireEvent.press(screen.getByTestId("pager-chevron-right"));
     const input = screen.getByPlaceholderText("Type a message");
     expect(StyleSheet.flatten(input.props.style)).toEqual(
       expect.objectContaining({
@@ -739,8 +748,8 @@ describe("MainScreenVoiceStage composer", () => {
     );
 
     expect(screen.getByTestId("drive-session-controls")).toBeTruthy();
-    expect(screen.getByTestId("show-voice-input")).toBeTruthy();
-    expect(screen.getByTestId("show-text-input")).toBeTruthy();
+    expect(screen.getByTestId("pager-chevron-left")).toBeTruthy();
+    expect(screen.getByTestId("pager-chevron-right")).toBeTruthy();
   });
 
   it("shows an increasingly urgent Drive silence countdown in the CTA", () => {
@@ -774,7 +783,7 @@ describe("MainScreenVoiceStage composer", () => {
   it("preserves an unfinished text draft while the pipeline is active", () => {
     const props = createProps();
     const screen = renderStage(<MainScreenVoiceStage {...props} />);
-    fireEvent.press(screen.getByLabelText("Show text input"));
+    fireEvent.press(screen.getByTestId("pager-chevron-right"));
     fireEvent.changeText(
       screen.getByPlaceholderText("Type a message"),
       "Keep this draft",
@@ -794,9 +803,13 @@ describe("MainScreenVoiceStage composer", () => {
     expect(screen.getByPlaceholderText("Type a message").props.value).toBe(
       "Keep this draft",
     );
+    // On the text page the circle points back: both carets return to voice.
     expect(
-      screen.getByLabelText("Show text input").props.accessibilityState,
-    ).toEqual({ disabled: true });
+      screen.getByTestId("pager-chevron-right").props.accessibilityState,
+    ).toEqual({ disabled: false });
+    expect(
+      screen.getByTestId("pager-chevron-right").props.accessibilityLabel,
+    ).toBe("Show voice input");
   });
 
   it("restores the selected surface and draft after a layout remount", () => {
@@ -814,7 +827,7 @@ describe("MainScreenVoiceStage composer", () => {
         })}
       />,
     );
-    fireEvent.press(firstScreen.getByLabelText("Show text input"));
+    fireEvent.press(firstScreen.getByTestId("pager-chevron-right"));
     fireEvent.changeText(
       firstScreen.getByPlaceholderText("Type a message"),
       "Survive rotation",
@@ -830,9 +843,10 @@ describe("MainScreenVoiceStage composer", () => {
       />,
     );
 
+    // Restored onto the text page: from here the circle leads back to voice.
     expect(
-      secondScreen.getByLabelText("Show text input").props.accessibilityState,
-    ).toEqual({ disabled: true });
+      secondScreen.getByTestId("pager-chevron-right").props.accessibilityLabel,
+    ).toBe("Show voice input");
     expect(
       secondScreen.getByPlaceholderText("Type a message").props.value,
     ).toBe("Survive rotation");
@@ -863,7 +877,7 @@ describe("MainScreenVoiceStage composer", () => {
     ).toBeTruthy();
     expect(screen.queryByTestId("active-waveform")).toBeNull();
     expect(
-      screen.getAllByTestId("show-voice-input", hiddenIconQuery)[0].props
+      screen.getAllByTestId("pager-chevron-left", hiddenIconQuery)[0].props
         .accessibilityState,
     ).toEqual({ disabled: true });
   });

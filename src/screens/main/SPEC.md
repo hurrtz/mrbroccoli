@@ -41,9 +41,16 @@ receive already-derived state and callbacks.
   clamped between 96pt and its ceiling (196 portrait, 150 landscape), so the
   intro banner or a landscape split simply makes it smaller.
 - In portrait, left and right 44pt chevrons flank the measured orb. They make
-  the voice/text pager discoverable without competing with the voice action;
-  the inactive direction is visually quiet and unavailable directions remain
-  disabled. Image attach, Model Council, and Web Search stay in the satellite
+  the voice/text pager discoverable without competing with the voice action.
+  **Decision:** the pager is a closed circle — every decisive swipe and every
+  chevron leaves the current surface, in either direction, so no navigation
+  gesture is ever a dead end. With two pages that circle is a toggle, which is
+  why both chevrons on a page carry the same destination and neither is
+  permanently disabled; each chevron's accessible name states its destination
+  rather than its direction. The track itself stays clamped between the two
+  pages so a wrapping swipe never drags empty canvas into view. Both chevrons
+  still disable together while a turn is active. Image attach, Model Council,
+  and Web Search stay in the satellite
   row below the stage and show their unavailable state instead of changing the
   workspace geometry.
 - The orb remains in its measured slot even when a route is blocked or

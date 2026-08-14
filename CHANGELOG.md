@@ -29,6 +29,9 @@ the complete Play Store translations are kept in a dedicated file under
   the modal for viewing, editing, copying, or clearing a conversation's
   compact summary are gone. The summary itself remains an internal detail
   of how long threads stay within a model's context window.
+- The voice/text pager is now a full circle: swiping in either direction — or
+  tapping either chevron — always moves to the other input surface, so a swipe
+  is never a dead end.
 - Automatic naming's success and failure messages now appear inside the
   conversations drawer where the action was taken; they were previously
   held behind the drawer until it closed, which made a failed naming —

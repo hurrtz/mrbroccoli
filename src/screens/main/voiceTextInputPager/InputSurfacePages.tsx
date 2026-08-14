@@ -48,19 +48,24 @@ function SurfaceChevron({
   disabled,
   onPress,
   t,
+  target,
 }: {
   colors: Colors;
   direction: "left" | "right";
   disabled: boolean;
   onPress: () => void;
   t: TranslateFn;
+  /** Where this caret leads. On a circular pager both carets on a page lead
+      to the same other surface, so the label follows the target, not the
+      glyph's direction. */
+  target: InputSurface;
 }) {
-  const showVoice = direction === "left";
-
   return (
     <TouchableOpacity
-      testID={showVoice ? "show-voice-input" : "show-text-input"}
-      accessibilityLabel={t(showVoice ? "showVoiceInput" : "showTextInput")}
+      testID={`pager-chevron-${direction}`}
+      accessibilityLabel={t(
+        target === "voice" ? "showVoiceInput" : "showTextInput",
+      )}
       accessibilityRole="button"
       accessibilityState={{ disabled }}
       activeOpacity={0.7}
@@ -261,9 +266,10 @@ export function InputSurfacePages(props: InputSurfacePagesProps) {
             <SurfaceChevron
               direction="left"
               colors={props.colors}
-              disabled
-              onPress={() => onSelectSurface("voice")}
+              disabled={isActive || props.disabled}
+              onPress={() => onSelectSurface("text")}
               t={props.t}
+              target="text"
             />
             <View style={styles.inputSwitchSurface}>
               <VoiceInputSurface {...props} />
@@ -274,6 +280,7 @@ export function InputSurfacePages(props: InputSurfacePagesProps) {
               disabled={isActive || props.disabled}
               onPress={() => onSelectSurface("text")}
               t={props.t}
+              target="text"
             />
           </View>
         </View>
@@ -292,6 +299,7 @@ export function InputSurfacePages(props: InputSurfacePagesProps) {
               disabled={isActive || props.disabled}
               onPress={() => onSelectSurface("voice")}
               t={props.t}
+              target="voice"
             />
             <View style={styles.inputSwitchSurface}>
               <TextInputSurface {...props} />
@@ -299,9 +307,10 @@ export function InputSurfacePages(props: InputSurfacePagesProps) {
             <SurfaceChevron
               direction="right"
               colors={props.colors}
-              disabled
-              onPress={() => onSelectSurface("text")}
+              disabled={isActive || props.disabled}
+              onPress={() => onSelectSurface("voice")}
               t={props.t}
+              target="voice"
             />
           </View>
         </View>

@@ -14,6 +14,29 @@ const SURFACE_INDEX: Record<InputSurface, number> = {
   text: 1,
 };
 
+/**
+ * The pager is a closed circle: any decisive swipe leaves the current
+ * surface, so neither direction is ever a dead end. With two pages a circle
+ * is a toggle, which is why the direction of the swipe does not matter — only
+ * that it was decisive. The track itself stays clamped between the two pages,
+ * so a wrapping swipe never drags empty canvas into view.
+ */
+export function resolveSwipeSurface({
+  activeSurface,
+  pageStride,
+  projectedTranslation,
+}: {
+  activeSurface: InputSurface;
+  pageStride: number;
+  projectedTranslation: number;
+}): InputSurface {
+  "worklet";
+  if (Math.abs(projectedTranslation) < pageStride / 2) {
+    return activeSurface;
+  }
+  return activeSurface === "voice" ? "text" : "voice";
+}
+
 interface UseInputSurfaceGestureParams {
   activeSurface: InputSurface;
   applySurface: (surface: InputSurface, focusText: boolean) => void;
@@ -86,9 +109,12 @@ export function useInputSurfaceGesture({
           );
         })
         .onEnd((event) => {
-          const projectedX = trackTranslateX.value + event.velocityX * 0.12;
-          const nextSurface: InputSurface =
-            projectedX <= -pageStrideShared.value / 2 ? "text" : "voice";
+          const nextSurface = resolveSwipeSurface({
+            activeSurface: activeSurfaceIndex.value === 0 ? "voice" : "text",
+            pageStride: pageStrideShared.value,
+            projectedTranslation:
+              event.translationX + event.velocityX * 0.12,
+          });
           const targetX = -SURFACE_INDEX[nextSurface] * pageStrideShared.value;
 
           if (reducedMotion) {
