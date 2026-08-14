@@ -10,6 +10,7 @@ module.exports = {
   transformIgnorePatterns: [
     "node_modules/(?!(jest-)?react-native|@react-native(-community)?|@react-native-async-storage|react-native-uuid|@testing-library|@ant-design|@bang88|@expo-google-fonts|rc-util)",
   ],
+  modulePathIgnorePatterns: ["<rootDir>/.design-sync/"],
   moduleNameMapper: {
     "\\.svg$": "<rootDir>/__mocks__/svgMock.js",
     "\\.(m4a|mp3|wav)$": "<rootDir>/__mocks__/audioAssetMock.js",
