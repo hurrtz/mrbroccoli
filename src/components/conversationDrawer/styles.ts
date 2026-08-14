@@ -96,14 +96,12 @@ export const styles = StyleSheet.create({
     fontFamily: fonts.body,
   },
   renameActions: {
-    flexDirection: "row",
-    justifyContent: "flex-end",
     gap: 10,
     marginTop: 16,
   },
   renameAction: {
-    minWidth: 92,
-    minHeight: 44,
+    width: "100%",
+    minHeight: 48,
     borderRadius: 10,
     borderWidth: 1,
     alignItems: "center",
@@ -200,7 +198,7 @@ export const styles = StyleSheet.create({
     flexGrow: 1,
   },
   sectionBand: {
-    minHeight: 36,
+    minHeight: 44,
     paddingVertical: 9,
     paddingLeft: 18,
     paddingRight: 8,
@@ -244,7 +242,7 @@ export const styles = StyleSheet.create({
   emptyIcon: {
     width: 46,
     height: 46,
-    borderRadius: 23,
+    borderRadius: 12,
     alignItems: "center",
     justifyContent: "center",
     borderWidth: 1,
@@ -252,7 +250,7 @@ export const styles = StyleSheet.create({
   emptyIconCompact: {
     width: 38,
     height: 38,
-    borderRadius: 19,
+    borderRadius: 12,
   },
   emptyTitle: {
     fontSize: 18,

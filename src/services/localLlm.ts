@@ -52,6 +52,18 @@ const STOP_WORDS = [
   "<|endoftext|>",
 ];
 
+function createLocalLlmAbortError() {
+  const error = new Error("Local model benchmark was cancelled.");
+  error.name = "AbortError";
+  return error;
+}
+
+function throwIfLocalLlmAborted(signal?: AbortSignal) {
+  if (signal?.aborted) {
+    throw createLocalLlmAbortError();
+  }
+}
+
 const LOCAL_TARGET_LANGUAGE_INSTRUCTIONS: Partial<Record<AppLanguage, string>> =
   {
     en: "Answer exclusively in English. Start directly with the answer without repeating the topic or request as a heading. Do not add a title or introductory label. Only use another language when the user explicitly asks for a translation or a reply in that language. Keep private reasoning internal and return only the final answer.",
@@ -435,31 +447,49 @@ export async function streamLocalChat(params: {
 
 export async function benchmarkLocalLlm(
   modelId: LocalLlmModelId,
+  options?: { abortSignal?: AbortSignal },
 ): Promise<LocalModelBenchmarkResult> {
   const model = getLocalModel(modelId) as LocalLlmModelDefinition;
+  throwIfLocalLlmAborted(options?.abortSignal);
   const device = await probeLocalDeviceCapabilities();
+  throwIfLocalLlmAborted(options?.abortSignal);
   const startedAt = Date.now();
   let loadMs = 0;
 
   try {
     await releaseLocalLlmResources();
+    throwIfLocalLlmAborted(options?.abortSignal);
     const loadStartedAt = Date.now();
     const context = await getContext(model);
     loadMs = Date.now() - loadStartedAt;
+    throwIfLocalLlmAborted(options?.abortSignal);
     const generationStartedAt = Date.now();
-    const result = await context.completion({
-      messages: [
-        { role: "system", content: "Answer briefly and plainly." },
-        {
-          role: "user",
-          content: "Reply with one sentence about green plants.",
-        },
-      ],
-      n_predict: enablesThinking(model) ? 96 : 32,
-      stop: STOP_WORDS,
-      temperature: 0,
-      enable_thinking: enablesThinking(model),
+    const stopCompletion = () => {
+      void context.stopCompletion().catch(() => undefined);
+    };
+    options?.abortSignal?.addEventListener("abort", stopCompletion, {
+      once: true,
     });
+    let result: Awaited<ReturnType<typeof context.completion>>;
+    try {
+      throwIfLocalLlmAborted(options?.abortSignal);
+      result = await context.completion({
+        messages: [
+          { role: "system", content: "Answer briefly and plainly." },
+          {
+            role: "user",
+            content: "Reply with one sentence about green plants.",
+          },
+        ],
+        n_predict: enablesThinking(model) ? 96 : 32,
+        stop: STOP_WORDS,
+        temperature: 0,
+        enable_thinking: enablesThinking(model),
+      });
+    } finally {
+      options?.abortSignal?.removeEventListener("abort", stopCompletion);
+    }
+    throwIfLocalLlmAborted(options?.abortSignal);
     const durationMs = Date.now() - generationStartedAt;
     const tokensPerSecond =
       result.timings.predicted_per_second ||
@@ -480,9 +510,13 @@ export async function benchmarkLocalLlm(
       measuredUnderPressure: hasLocalDeviceRuntimePressure(device),
       device,
     };
+    throwIfLocalLlmAborted(options?.abortSignal);
     await saveLocalModelBenchmarkResult(benchmark);
     return benchmark;
   } catch (error) {
+    if (options?.abortSignal?.aborted || (error as Error)?.name === "AbortError") {
+      throw createLocalLlmAbortError();
+    }
     const benchmark: LocalModelBenchmarkResult = {
       modelId,
       catalogVersion: LOCAL_MODEL_CATALOG_VERSION,

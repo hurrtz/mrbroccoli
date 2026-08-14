@@ -98,7 +98,7 @@ describe("IntroBanner", () => {
   });
 
   it("draws the spoken-walkthrough affordance instead of an action pill", () => {
-    // The walkthrough is spoken, so a play glyph in a hairline circle carries
+    // The walkthrough is spoken, so a play glyph in a hairline squircle carries
     // the invitation; the row ends in a quiet chevron, never a second CTA.
     const { getByTestId, queryByText } = render(
       <IntroBanner
@@ -119,6 +119,7 @@ describe("IntroBanner", () => {
         height: 40,
         borderWidth: 1,
         borderColor: "rgba(255, 255, 255, 0.5)",
+        borderRadius: 12,
       }),
     );
   });
@@ -327,6 +328,9 @@ describe("IntroFlowScreen", () => {
     expect(getByTestId("intro-close")).toBeTruthy();
     fireEvent.press(getByTestId("intro-next"));
     expect(queryByTestId("intro-close")).toBeNull();
+    expect(StyleSheet.flatten(getByTestId("intro-done").props.style)).toEqual(
+      expect.objectContaining({ borderRadius: 10, minHeight: 48 }),
+    );
     // Done is the exit, and a re-entry has no gate on it.
     fireEvent.press(getByTestId("intro-done"));
     expect(props.onComplete).toHaveBeenCalledTimes(1);
@@ -335,6 +339,9 @@ describe("IntroFlowScreen", () => {
   it("walks forward and back through the steps", () => {
     const { getByTestId } = renderScreen({ firstRun: false });
 
+    expect(StyleSheet.flatten(getByTestId("intro-next").props.style)).toEqual(
+      expect.objectContaining({ borderRadius: 12, height: 58, width: 58 }),
+    );
     fireEvent.press(getByTestId("intro-next"));
     fireEvent.press(getByTestId("intro-next"));
     expect(
@@ -359,6 +366,9 @@ describe("IntroFlowScreen", () => {
   it("jumps to any step from the stepper", () => {
     const { getByTestId } = renderScreen({ firstRun: false });
 
+    expect(
+      StyleSheet.flatten(getByTestId("intro-stepper-dot-0").props.style),
+    ).toEqual(expect.objectContaining({ height: 44, minWidth: 44 }));
     fireEvent.press(getByTestId("intro-stepper-dot-2"));
     expect(
       getByTestId("intro-stepper-dot-2").props.accessibilityState.selected,
@@ -445,6 +455,12 @@ describe("IntroFlowScreen", () => {
     ).toBeTruthy();
     expect(getByText("About 23 days without sleeping.")).toBeTruthy();
     expect(getByText(/2.4 s/)).toBeTruthy();
+    expect(StyleSheet.flatten(getByTestId("intro-try-mic").props.style)).toEqual(
+      expect.objectContaining({ borderRadius: 12, height: 76, width: 76 }),
+    );
+    expect(
+      StyleSheet.flatten(getByTestId("intro-try-replay").props.style),
+    ).toEqual(expect.objectContaining({ minHeight: 44 }));
 
     fireEvent.press(getByTestId("intro-try-replay"));
     expect(testTurn.onReplay).toHaveBeenCalledTimes(1);

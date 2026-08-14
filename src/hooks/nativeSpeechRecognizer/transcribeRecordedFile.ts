@@ -8,6 +8,7 @@ import {
 import type { SttLanguage } from "../../types";
 
 interface TranscribeRecordedFileParams {
+  abortSignal?: AbortSignal;
   fileUri: string;
   finalTranscriptRef: React.MutableRefObject<string>;
   latestTranscriptRef: React.MutableRefObject<string>;
@@ -20,6 +21,7 @@ interface TranscribeRecordedFileParams {
 }
 
 export function transcribeRecordedFile({
+  abortSignal,
   fileUri,
   finalTranscriptRef,
   latestTranscriptRef,
@@ -28,12 +30,67 @@ export function transcribeRecordedFile({
   t,
 }: TranscribeRecordedFileParams) {
   return new Promise<string | null>((resolve, reject) => {
+    if (abortSignal?.aborted) {
+      resolve(null);
+      return;
+    }
+
     latestTranscriptRef.current = "";
     finalTranscriptRef.current = "";
 
+    let settled = false;
+    let watchdog: ReturnType<typeof setTimeout> | null = null;
+    let resultSubscription: { remove: () => void } | null = null;
+    let errorSubscription: { remove: () => void } | null = null;
+    let endSubscription: { remove: () => void } | null = null;
+
+    const cleanup = () => {
+      if (watchdog) {
+        clearTimeout(watchdog);
+        watchdog = null;
+      }
+      resultSubscription?.remove();
+      errorSubscription?.remove();
+      endSubscription?.remove();
+      resultSubscription = null;
+      errorSubscription = null;
+      endSubscription = null;
+      abortSignal?.removeEventListener("abort", abortRecognition);
+    };
+
+    const finish = (value: string | null) => {
+      if (settled) {
+        return;
+      }
+      settled = true;
+      cleanup();
+      resolve(value);
+    };
+
+    const fail = (error: Error) => {
+      if (settled) {
+        return;
+      }
+      settled = true;
+      cleanup();
+      reject(error);
+    };
+
+    function abortRecognition() {
+      if (settled) {
+        return;
+      }
+      finish(null);
+      try {
+        ExpoSpeechRecognitionModule.abort();
+      } catch {
+        // The recognizer may already be gone; listeners are removed.
+      }
+    }
+
     // A dropped end/error event must not hang file transcription forever;
     // settle with whatever transcript arrived and release the recognizer.
-    const watchdog = setTimeout(() => {
+    watchdog = setTimeout(() => {
       const transcript =
         finalTranscriptRef.current.trim() ||
         latestTranscriptRef.current.trim() ||
@@ -46,24 +103,7 @@ export function transcribeRecordedFile({
       }
     }, RECOGNIZED_FILE_TIMEOUT_MS);
 
-    const cleanup = () => {
-      clearTimeout(watchdog);
-      resultSubscription.remove();
-      errorSubscription.remove();
-      endSubscription.remove();
-    };
-
-    const finish = (value: string | null) => {
-      cleanup();
-      resolve(value);
-    };
-
-    const fail = (error: Error) => {
-      cleanup();
-      reject(error);
-    };
-
-    const resultSubscription = ExpoSpeechRecognitionModule.addListener(
+    resultSubscription = ExpoSpeechRecognitionModule.addListener(
       "result",
       (event) => {
         const transcript = event.results[0]?.transcript?.trim() ?? "";
@@ -78,7 +118,7 @@ export function transcribeRecordedFile({
       },
     );
 
-    const errorSubscription = ExpoSpeechRecognitionModule.addListener(
+    errorSubscription = ExpoSpeechRecognitionModule.addListener(
       "error",
       (event) => {
         if (event.error === "aborted" || event.error === "no-speech") {
@@ -90,7 +130,7 @@ export function transcribeRecordedFile({
       },
     );
 
-    const endSubscription = ExpoSpeechRecognitionModule.addListener(
+    endSubscription = ExpoSpeechRecognitionModule.addListener(
       "end",
       () => {
         const transcript =
@@ -100,6 +140,12 @@ export function transcribeRecordedFile({
         finish(transcript);
       },
     );
+
+    abortSignal?.addEventListener("abort", abortRecognition, { once: true });
+    if (abortSignal?.aborted) {
+      abortRecognition();
+      return;
+    }
 
     try {
       ExpoSpeechRecognitionModule.start({

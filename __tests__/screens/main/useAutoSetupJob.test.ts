@@ -118,13 +118,15 @@ const t = ((key: string, values?: Record<string, string | number>) =>
 function renderJob(settings = DEFAULT_SETTINGS) {
   const onOutcome = jest.fn();
   const updateSettings = jest.fn();
-  const rendered = renderHook(() =>
-    useAutoSetupJob({
-      onOutcome,
-      settings,
-      t,
-      updateSettings,
-    }),
+  const rendered = renderHook(
+    ({ currentSettings }: { currentSettings: Settings }) =>
+      useAutoSetupJob({
+        onOutcome,
+        settings: currentSettings,
+        t,
+        updateSettings,
+      }),
+    { initialProps: { currentSettings: settings } },
   );
   return { onOutcome, rendered, updateSettings };
 }
@@ -250,6 +252,25 @@ describe("useAutoSetupJob", () => {
     expect(mockPrepare).not.toHaveBeenCalled();
   });
 
+  it("cancels an active measurement without publishing a late outcome", async () => {
+    const { onOutcome, rendered } = renderJob();
+
+    act(() => rendered.result.current.start());
+    expect(rendered.result.current.state).toBe("scanning");
+
+    act(() => rendered.result.current.cancel());
+    expect(rendered.result.current.state).toBe("offer");
+
+    await act(async () => {
+      jest.advanceTimersByTime(5_000);
+      await Promise.resolve();
+    });
+
+    expect(rendered.result.current.state).toBe("offer");
+    expect(onOutcome).not.toHaveBeenCalled();
+    expect(mockPrepare).not.toHaveBeenCalled();
+  });
+
   it("routes a jobless capability to the device's own voice", async () => {
     mockSelect.mockReturnValue({
       status: "ready",
@@ -313,6 +334,113 @@ describe("useAutoSetupJob", () => {
           mode.route.runtime !== "local",
       ).length,
     ).toBe(DEFAULT_SETTINGS.responseModes.length);
+  });
+
+  it("cancels installation back to its proposal and can resume", async () => {
+    let activeSignal: AbortSignal | undefined;
+    mockPrepare.mockImplementationOnce(
+      async (
+        _profile: unknown,
+        options?: { abortSignal?: AbortSignal },
+      ) =>
+        new Promise<void>((_resolve, reject) => {
+          activeSignal = options?.abortSignal;
+          const rejectCancellation = () => {
+            const error = new Error("Setup was cancelled.");
+            error.name = "AbortError";
+            reject(error);
+          };
+          if (activeSignal?.aborted) {
+            rejectCancellation();
+          } else {
+            activeSignal?.addEventListener("abort", rejectCancellation, {
+              once: true,
+            });
+          }
+        }),
+    );
+    const { onOutcome, rendered, updateSettings } = renderJob();
+
+    act(() => rendered.result.current.start());
+    await act(async () => {
+      jest.advanceTimersByTime(1_000);
+    });
+    await act(async () => {
+      jest.advanceTimersByTime(4_000);
+    });
+
+    await act(async () => {
+      rendered.result.current.install();
+      await Promise.resolve();
+      await Promise.resolve();
+    });
+    expect(rendered.result.current.state).toBe("installing");
+    expect(activeSignal?.aborted).toBe(false);
+
+    await act(async () => {
+      rendered.result.current.cancel();
+      await Promise.resolve();
+      await Promise.resolve();
+    });
+
+    expect(activeSignal?.aborted).toBe(true);
+    expect(rendered.result.current.state).toBe("proposal");
+    expect(onOutcome).not.toHaveBeenCalled();
+    expect(updateSettings).not.toHaveBeenCalled();
+
+    await act(async () => {
+      rendered.result.current.install();
+      await Promise.resolve();
+      await Promise.resolve();
+    });
+    expect(mockPrepare).toHaveBeenCalledTimes(2);
+    expect(rendered.result.current.state).toBe("done");
+  });
+
+  it("applies a completed profile against settings changed during installation", async () => {
+    let finishInstall: (() => void) | undefined;
+    mockPrepare.mockImplementationOnce(
+      () =>
+        new Promise<void>((resolve) => {
+          finishInstall = resolve;
+        }),
+    );
+    const { rendered, updateSettings } = renderJob();
+
+    act(() => rendered.result.current.start());
+    await act(async () => {
+      jest.advanceTimersByTime(1_000);
+    });
+    await act(async () => {
+      jest.advanceTimersByTime(4_000);
+    });
+    await act(async () => {
+      rendered.result.current.install();
+      await Promise.resolve();
+    });
+    expect(rendered.result.current.state).toBe("installing");
+
+    const latestSettings: Settings = {
+      ...DEFAULT_SETTINGS,
+      responseModes: [
+        {
+          id: "latest-provider-mode",
+          route: { provider: "openai", model: "gpt-5.1" },
+        },
+      ],
+    };
+    rendered.rerender({ currentSettings: latestSettings });
+
+    await act(async () => {
+      finishInstall?.();
+      await Promise.resolve();
+      await Promise.resolve();
+    });
+
+    expect(updateSettings).toHaveBeenCalledTimes(1);
+    expect(updateSettings.mock.calls[0][0].responseModes).toContainEqual(
+      latestSettings.responseModes[0],
+    );
   });
 
   it("keeps what finished on a failure and resumes on retry", async () => {

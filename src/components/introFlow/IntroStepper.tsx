@@ -86,7 +86,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     height: 44,
     justifyContent: "center",
-    minWidth: 20,
+    minWidth: 44,
     paddingHorizontal: 3,
   },
 });

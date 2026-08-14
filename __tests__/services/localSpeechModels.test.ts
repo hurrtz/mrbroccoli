@@ -8,6 +8,30 @@ const mockCreateStt = jest.fn().mockResolvedValue({
   transcribeFile: mockTranscribeFile,
   transcribeSamples: mockTranscribeSamples,
 });
+const mockDestroyTts = jest.fn().mockResolvedValue(undefined);
+const mockCancelSpeechStream = jest.fn().mockResolvedValue(undefined);
+const mockSaveAudioToFile = jest.fn().mockResolvedValue(undefined);
+type StreamHandlers = {
+  onChunk?: (chunk: { samples: number[]; sampleRate: number }) => void;
+  onEnd?: (event: { cancelled: boolean }) => void;
+  onError?: (event: { message: string }) => void;
+};
+const generateSpeechStream = async (
+  _text: string,
+  _options: unknown,
+  handlers: StreamHandlers,
+) => {
+  handlers.onChunk?.({ samples: [0, 0.25], sampleRate: 24_000 });
+  handlers.onChunk?.({ samples: [-0.25], sampleRate: 24_000 });
+  handlers.onEnd?.({ cancelled: false });
+  return { cancel: jest.fn(), unsubscribe: jest.fn() };
+};
+const mockGenerateSpeechStream = jest.fn(generateSpeechStream);
+const mockCreateStreamingTts = jest.fn().mockResolvedValue({
+  cancelSpeechStream: mockCancelSpeechStream,
+  destroy: mockDestroyTts,
+  generateSpeechStream: mockGenerateSpeechStream,
+});
 
 jest.mock("react-native-sherpa-onnx", () => ({
   fileModelPath: (path: string) => ({ type: "file", path }),
@@ -15,6 +39,11 @@ jest.mock("react-native-sherpa-onnx", () => ({
 
 jest.mock("react-native-sherpa-onnx/stt", () => ({
   createSTT: mockCreateStt,
+}));
+
+jest.mock("react-native-sherpa-onnx/tts", () => ({
+  createStreamingTTS: mockCreateStreamingTts,
+  saveAudioToFile: mockSaveAudioToFile,
 }));
 
 jest.mock("../../src/services/localModelManager", () => ({
@@ -51,12 +80,14 @@ import { saveLocalModelBenchmarkResult } from "../../src/services/localDeviceCap
 import {
   benchmarkLocalStt,
   getLocalTtsBenchmarkText,
+  synthesizeLocalSpeech,
   transcribeLocalAudio,
 } from "../../src/services/localSpeechModels";
 
 describe("local speech model checks", () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    mockGenerateSpeechStream.mockImplementation(generateSpeechStream);
   });
 
   it("benchmarks real audio through the file-transcription route and cleans up", async () => {
@@ -153,5 +184,105 @@ describe("local speech model checks", () => {
     expect(getLocalTtsBenchmarkText("pt")).toBe("Olá, aqui é o Mr Broccoli.");
     expect(getLocalTtsBenchmarkText("it")).toBe("Ciao da Mr Broccoli.");
     expect(getLocalTtsBenchmarkText("ru")).toBe("Привет от Mr Broccoli.");
+  });
+
+  it("runs Piper synthesis through the non-blocking streaming engine", async () => {
+    const result = await synthesizeLocalSpeech({
+      text: "Hello from the phone.",
+      modelId: "piper-en-us-kristin",
+      speechLanguage: "en",
+    });
+
+    expect(mockCreateStreamingTts).toHaveBeenCalledWith({
+      modelPath: { type: "file", path: "/models/whisper-tiny" },
+      modelType: "vits",
+      numThreads: 2,
+      provider: "cpu",
+      maxNumSentences: 1,
+      silenceScale: 0.2,
+    });
+    expect(mockGenerateSpeechStream).toHaveBeenCalledWith(
+      "Hello from the phone.",
+      { sid: 0, silenceScale: 0.2, speed: 1 },
+      expect.objectContaining({
+        onChunk: expect.any(Function),
+        onEnd: expect.any(Function),
+        onError: expect.any(Function),
+      }),
+    );
+    expect(mockSaveAudioToFile).toHaveBeenCalledWith(
+      { samples: [0, 0.25, -0.25], sampleRate: 24_000 },
+      expect.stringMatching(/^\/cache\/local-tts-\d+-[a-z0-9]+\.wav$/),
+    );
+    expect(result).toEqual({
+      fileUri: expect.stringMatching(
+        /^file:\/\/\/cache\/local-tts-\d+-[a-z0-9]+\.wav$/,
+      ),
+      audioDurationSeconds: 3 / 24_000,
+      loadMs: expect.any(Number),
+    });
+    expect(mockDestroyTts).toHaveBeenCalledTimes(1);
+  });
+
+  it("accumulates a native-sized Piper chunk without spreading it onto the stack", async () => {
+    const samples = new Array(200_000).fill(0);
+    samples[0] = -0.5;
+    samples[samples.length - 1] = 0.5;
+    mockGenerateSpeechStream.mockImplementationOnce(
+      async (_text, _options, handlers) => {
+        handlers.onChunk?.({ samples, sampleRate: 24_000 });
+        handlers.onEnd?.({ cancelled: false });
+        return { cancel: jest.fn(), unsubscribe: jest.fn() };
+      },
+    );
+
+    await synthesizeLocalSpeech({
+      text: "A longer local reply.",
+      modelId: "piper-en-us-kristin",
+      speechLanguage: "en",
+    });
+
+    const generatedAudio = mockSaveAudioToFile.mock.calls.at(-1)?.[0];
+    expect(generatedAudio).toEqual({
+      samples: expect.any(Array),
+      sampleRate: 24_000,
+    });
+    expect(generatedAudio.samples).toHaveLength(200_000);
+    expect(generatedAudio.samples[0]).toBe(-0.5);
+    expect(generatedAudio.samples.at(-1)).toBe(0.5);
+  });
+
+  it("cancels active Piper streaming when its signal aborts", async () => {
+    let handlers: StreamHandlers | undefined;
+    let markStarted!: () => void;
+    const started = new Promise<void>((resolve) => {
+      markStarted = resolve;
+    });
+    mockGenerateSpeechStream.mockImplementationOnce(
+      async (_text, _options, nextHandlers) => {
+        handlers = nextHandlers;
+        markStarted();
+        return { cancel: jest.fn(), unsubscribe: jest.fn() };
+      },
+    );
+    const controller = new AbortController();
+    const synthesis = synthesizeLocalSpeech({
+      text: "Please stop.",
+      modelId: "piper-en-us-kristin",
+      speechLanguage: "en",
+      abortSignal: controller.signal,
+    });
+    const outcome = expect(synthesis).rejects.toMatchObject({
+      name: "AbortError",
+    });
+    await started;
+
+    controller.abort();
+    handlers?.onEnd?.({ cancelled: true });
+
+    await outcome;
+    expect(mockCancelSpeechStream).toHaveBeenCalledTimes(1);
+    expect(mockSaveAudioToFile).not.toHaveBeenCalled();
+    expect(mockDestroyTts).toHaveBeenCalledTimes(1);
   });
 });

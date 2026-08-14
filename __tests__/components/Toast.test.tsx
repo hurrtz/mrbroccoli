@@ -52,6 +52,29 @@ describe("Toast", () => {
     expect(
       StyleSheet.flatten(screen.getByLabelText("Dismiss").props.style),
     ).toEqual(expect.objectContaining({ height: 44, width: 44 }));
+
+    const toast = StyleSheet.flatten(screen.getByTestId("toast").props.style);
+    expect(toast).toMatchObject({
+      borderRadius: 14,
+      gap: 12,
+      padding: 14,
+    });
+    expect(toast.paddingLeft).toBeUndefined();
+    expect(
+      StyleSheet.flatten(screen.getByTestId("toast-icon").props.style),
+    ).toMatchObject({
+      borderRadius: 17,
+      height: 34,
+      width: 34,
+    });
+    expect(
+      StyleSheet.flatten(screen.getByTestId("toast-icon").props.style)
+        .marginRight,
+    ).toBeUndefined();
+    expect(
+      StyleSheet.flatten(screen.getByTestId("toast-actions").props.style)
+        .marginLeft,
+    ).toBeUndefined();
   });
 
   it("waits behind a focused sheet before starting its dismissal clock", () => {

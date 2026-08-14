@@ -400,4 +400,36 @@ describe("Kokoro TTS service", () => {
       { idempotent: true },
     );
   });
+
+  it("cancels active native synthesis when its signal aborts", async () => {
+    let markStreamStarted!: () => void;
+    const streamStarted = new Promise<void>((resolve) => {
+      markStreamStarted = resolve;
+    });
+    let streamHandlers:
+      | {
+          onEnd?: (event: { cancelled: boolean }) => void;
+        }
+      | undefined;
+    mockGenerateSpeechStream.mockImplementationOnce(
+      async (_text, _options, handlers) => {
+        streamHandlers = handlers;
+        markStreamStarted();
+        return { stop: jest.fn() };
+      },
+    );
+    const controller = new AbortController();
+    const synthesis = synthesizeKokoroSpeech({
+      text: "Cancel this benchmark.",
+      listenLanguages: ["en"],
+      abortSignal: controller.signal,
+    });
+    await streamStarted;
+
+    controller.abort();
+    streamHandlers?.onEnd?.({ cancelled: true });
+
+    await expect(synthesis).rejects.toMatchObject({ name: "AbortError" });
+    expect(mockCancelSpeechStream).toHaveBeenCalledTimes(1);
+  });
 });

@@ -128,6 +128,34 @@ describe("ChatBubble", () => {
       />,
     );
 
+    const sourceTarget = StyleSheet.flatten(
+      screen.getByTestId("message-branch-source-branch-message").props.style,
+    );
+    expect(sourceTarget).toMatchObject({
+      marginVertical: -7,
+      paddingVertical: 7,
+    });
+    const sourceChip = StyleSheet.flatten(
+      screen.getByTestId("message-branch-source-branch-message-chip").props
+        .style,
+    );
+    expect(sourceChip).toMatchObject({
+      backgroundColor: lightColors.accentSoft,
+      borderColor: lightColors.borderStrong,
+      borderRadius: 8,
+      minHeight: 30,
+    });
+    const childrenChip = StyleSheet.flatten(
+      screen.getByTestId("message-branch-children-branch-message-chip").props
+        .style,
+    );
+    expect(childrenChip).toMatchObject({
+      backgroundColor: lightColors.accentSoft,
+      borderColor: lightColors.borderStrong,
+      borderRadius: 8,
+      minHeight: 30,
+    });
+
     fireEvent.press(
       screen.getByLabelText(
         "Context from “Parent conversation” is included up to this fork. Tap to return to the fork point.",
@@ -765,7 +793,7 @@ describe("ChatBubble", () => {
   });
 
   it("renders durable pipeline notices without requiring message content", () => {
-    const { getByText, queryByText } = renderWithProviders(
+    const { getByTestId, getByText, queryByText } = renderWithProviders(
       <ChatBubble
         message={{
           id: "assistant-3",
@@ -782,6 +810,11 @@ describe("ChatBubble", () => {
                 message: "OpenAI speech transcription took too long.",
                 detail: "The request hit the provider timeout window.",
               },
+              {
+                stage: "web-search",
+                level: "warning",
+                message: "Web search was unavailable for this reply.",
+              },
             ],
           },
         }}
@@ -795,7 +828,41 @@ describe("ChatBubble", () => {
     expect(
       getByText("The request hit the provider timeout window."),
     ).toBeTruthy();
+    expect(getByText("Web Search")).toBeTruthy();
     expect(queryByText("Just a normal answer.")).toBeNull();
+
+    const noticeList = StyleSheet.flatten(
+      getByTestId("pipeline-notice-list-assistant-3").props.style,
+    );
+    expect(noticeList).toMatchObject({ marginHorizontal: -12, marginTop: 12 });
+
+    const errorNotice = StyleSheet.flatten(
+      getByTestId("pipeline-notice-assistant-3-0").props.style,
+    );
+    expect(errorNotice).toMatchObject({
+      borderTopColor: lightColors.danger,
+      borderTopWidth: StyleSheet.hairlineWidth,
+      paddingHorizontal: 12,
+      paddingVertical: 10,
+    });
+    expect(errorNotice.backgroundColor).toBeUndefined();
+    expect(errorNotice.borderRadius).toBeUndefined();
+    expect(errorNotice.borderWidth).toBeUndefined();
+
+    const warningNotice = StyleSheet.flatten(
+      getByTestId("pipeline-notice-assistant-3-1").props.style,
+    );
+    expect(warningNotice.borderTopColor).toBe(lightColors.border);
+    expect(
+      StyleSheet.flatten(getByText("Web Search").props.style).color,
+    ).toBe(lightColors.text);
+
+    const noticeIcon = StyleSheet.flatten(
+      getByTestId("pipeline-notice-icon-assistant-3-0").props.style,
+    );
+    expect(noticeIcon.backgroundColor).toBeUndefined();
+    expect(noticeIcon.borderRadius).toBeUndefined();
+    expect(noticeIcon.borderWidth).toBeUndefined();
   });
 
   it("keeps a failed reply recoverable on the submitted user message", () => {
@@ -813,12 +880,38 @@ describe("ChatBubble", () => {
         },
       },
     };
-    const { getByLabelText, getByText } = renderWithProviders(
+    const { getByLabelText, getByTestId, getByText } = renderWithProviders(
       <ChatBubble message={message} onRetry={onRetry} />,
     );
 
     expect(getByText("Reply failed")).toBeTruthy();
     expect(getByText("The provider rejected the credentials.")).toBeTruthy();
+
+    const failureRail = StyleSheet.flatten(
+      getByTestId("reply-failure-card-user-failed-reply").props.style,
+    );
+    expect(failureRail).toMatchObject({
+      borderTopColor: lightColors.danger,
+      borderTopWidth: StyleSheet.hairlineWidth,
+      marginHorizontal: -12,
+      marginTop: 12,
+      paddingBottom: 12,
+      paddingHorizontal: 12,
+      paddingTop: 10,
+    });
+    expect(failureRail.backgroundColor).toBeUndefined();
+    expect(failureRail.borderRadius).toBeUndefined();
+    expect(failureRail.borderWidth).toBeUndefined();
+
+    const retry = StyleSheet.flatten(
+      getByTestId("reply-failure-retry-user-failed-reply").props.style,
+    );
+    expect(retry).toMatchObject({
+      backgroundColor: lightColors.accentSoft,
+      borderColor: lightColors.borderStrong,
+      borderRadius: 10,
+      minHeight: 44,
+    });
     fireEvent.press(getByLabelText("Retry reply"));
 
     expect(onRetry).toHaveBeenCalledWith(message);
@@ -845,7 +938,7 @@ describe("ChatBubble", () => {
         ],
       },
     };
-    const { getByLabelText, getByText } = renderWithProviders(
+    const { getByLabelText, getByTestId, getByText } = renderWithProviders(
       <ChatBubble
         message={message}
         onRepeat={onRepeat}
@@ -857,6 +950,31 @@ describe("ChatBubble", () => {
     expect(
       getByText("The reply was saved, but it could not be spoken."),
     ).toBeTruthy();
+
+    expect(
+      StyleSheet.flatten(
+        getByTestId(
+          "pipeline-notice-retry-speech-assistant-failed-speech-0",
+        ).props.style,
+      ),
+    ).toMatchObject({
+      backgroundColor: lightColors.accentSoft,
+      borderColor: lightColors.accent,
+      borderRadius: 10,
+      minHeight: 44,
+    });
+    expect(
+      StyleSheet.flatten(
+        getByTestId(
+          "pipeline-notice-speaking-settings-assistant-failed-speech-0",
+        ).props.style,
+      ),
+    ).toMatchObject({
+      backgroundColor: lightColors.surface,
+      borderColor: lightColors.border,
+      borderRadius: 10,
+      minHeight: 44,
+    });
 
     fireEvent.press(getByLabelText("Retry speech"));
     fireEvent.press(getByLabelText("Speaking settings"));

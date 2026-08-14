@@ -170,6 +170,7 @@ export function ConversationDrawerList({
               compact ? styles.emptyIconCompact : null,
               { borderColor: colors.border },
             ]}
+            testID="conversation-drawer-empty-icon"
           >
             <PhosphorIcon
               name="inbox"

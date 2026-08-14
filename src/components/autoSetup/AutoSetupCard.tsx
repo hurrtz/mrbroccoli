@@ -264,6 +264,11 @@ export function AutoSetupCard({
           <Text style={[styles.note, { color: colors.textMuted }]}>
             {t("autoSetupScanNote")}
           </Text>
+          <CardAction
+            label={t("cancel")}
+            onPress={job.cancel}
+            tone="secondary"
+          />
         </>
       ) : null}
 
@@ -323,6 +328,11 @@ export function AutoSetupCard({
           <Text style={[styles.note, { color: colors.textMuted }]}>
             {t("autoSetupInstallingNote")}
           </Text>
+          <CardAction
+            label={t("cancel")}
+            onPress={job.cancel}
+            tone="secondary"
+          />
         </>
       ) : null}
 

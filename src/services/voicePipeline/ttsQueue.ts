@@ -282,7 +282,7 @@ export function createVoicePipelineTtsQueue(
       if (paragraphBuffer.trim()) {
         enqueueParagraph(paragraphBuffer);
       }
-    } else if (diagnosticsSource === "repeat") {
+    } else {
       const { completeParagraphs, remainder } = extractCompleteParagraphs(
         `${fullText.trim()}\n\n`,
       );
@@ -290,8 +290,6 @@ export function createVoicePipelineTtsQueue(
       if (remainder.trim()) {
         enqueueParagraph(remainder);
       }
-    } else {
-      enqueueTts(fullText);
     }
 
     await Promise.all(queuedTasks);

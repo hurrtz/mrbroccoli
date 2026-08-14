@@ -282,9 +282,9 @@ export function IntroFlowScreen({
 const styles = StyleSheet.create({
   done: {
     alignItems: "center",
-    borderRadius: introRadius.control + 2,
+    borderRadius: introRadius.control,
     justifyContent: "center",
-    minHeight: 50,
+    minHeight: 48,
     width: "100%",
   },
   doneFooter: {
@@ -330,7 +330,7 @@ const styles = StyleSheet.create({
   },
   primary: {
     alignItems: "center",
-    borderRadius: introRadius.pill,
+    borderRadius: introRadius.iconButton,
     height: 58,
     justifyContent: "center",
     width: 58,

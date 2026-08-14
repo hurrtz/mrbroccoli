@@ -132,7 +132,9 @@ The TTS queue separates synthesis scheduling from ordered output:
 
 Repeat playback uses one synthesis slot to avoid overlapping a replay request.
 Native speech skips audio synthesis but retains the same paragraph and language
-selection semantics.
+selection semantics. Wait-mode completion and repeat both split the complete
+answer through the paragraph queue before synthesis, so provider audio and
+native speech callbacks carry identical seek metadata.
 
 ## Abort and Cleanup
 

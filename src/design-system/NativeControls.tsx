@@ -409,7 +409,8 @@ export function Modal({
   React.useEffect(() => {
     let active = true;
     void AccessibilityInfo.isReduceMotionEnabled().then((enabled) => {
-      if (active) {
+      if (active && enabled !== reduceMotionRef.current) {
+        reduceMotionRef.current = enabled;
         setReduceMotion(enabled);
       }
     });
@@ -420,7 +421,9 @@ export function Modal({
 
   React.useEffect(() => {
     if (!isSheet) {
-      setSheetRendered(visible);
+      // Non-sheet dialogs render directly from `visible`; synchronizing the
+      // sheet-only mount state here creates an unnecessary post-render update
+      // (and can briefly outlive a dialog that unmounts immediately).
       return;
     }
 
@@ -654,7 +657,7 @@ const controlStyles = StyleSheet.create({
     borderRadius: 10,
     borderWidth: 1,
     justifyContent: "center",
-    minHeight: 44,
+    minHeight: 48,
     paddingHorizontal: 16,
     paddingVertical: 10,
   },
@@ -760,7 +763,7 @@ const controlStyles = StyleSheet.create({
   tag: {
     borderRadius: 8,
     borderWidth: StyleSheet.hairlineWidth,
-    minHeight: 36,
+    minHeight: 44,
     paddingHorizontal: 12,
     paddingVertical: 8,
   },

@@ -1,5 +1,5 @@
 import React from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Pressable, StyleSheet, Text } from "react-native";
 
 import { useTheme } from "../../../theme/ThemeContext";
 import { fonts } from "../../../theme/typography";
@@ -33,13 +33,12 @@ export function SettingsPillAction({
       }}
       style={({ pressed }) => [
         styles.target,
+        { borderColor: ink },
         pressed ? styles.pressed : null,
         disabled ? styles.disabled : null,
       ]}
     >
-      <View style={[styles.pill, { borderColor: ink }]}>
-        <Text style={[styles.label, { color: ink }]}>{label}</Text>
-      </View>
+      <Text style={[styles.label, { color: ink }]}>{label}</Text>
     </Pressable>
   );
 }
@@ -49,18 +48,12 @@ const styles = StyleSheet.create({
     minHeight: 44,
     marginVertical: -6,
     marginRight: -6,
-    paddingHorizontal: 6,
-    alignItems: "center",
-    justifyContent: "center",
-    flexShrink: 0,
-  },
-  pill: {
-    minHeight: 34,
     paddingHorizontal: 13,
-    borderRadius: 17,
+    borderRadius: 10,
     borderWidth: 1,
     alignItems: "center",
     justifyContent: "center",
+    flexShrink: 0,
   },
   label: {
     fontFamily: fonts.bodyMedium,

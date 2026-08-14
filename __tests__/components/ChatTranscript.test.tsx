@@ -64,7 +64,7 @@ describe("ChatTranscript follow-tail scrolling", () => {
     );
 
     // Design-system empty state: the message glyph sits in a quiet 46pt
-    // circle well on the surface color.
+    // icon-button squircle on the surface color.
     expect(
       StyleSheet.flatten(
         screen.getByTestId("empty-transcript-well", hiddenIconQuery).props
@@ -74,7 +74,7 @@ describe("ChatTranscript follow-tail scrolling", () => {
       expect.objectContaining({
         width: 46,
         height: 46,
-        borderRadius: 23,
+        borderRadius: 12,
         borderWidth: 1,
         backgroundColor: lightColors.surface,
       }),

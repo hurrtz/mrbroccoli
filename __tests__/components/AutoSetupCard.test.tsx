@@ -33,23 +33,39 @@ describe("AutoSetupCard", () => {
   });
 
   it("reveals only the measured facts while scanning", () => {
-    const screen = renderCard({
-      job: createAutoSetupJob({
-        state: "scanning",
-        scanned: 2,
-        facts: [
-          { label: "MEMORY", value: "8 GB" },
-          { label: "STORAGE", value: "40 GB" },
-          { label: "PROCESSORS", value: "6" },
-        ],
-      }),
+    const job = createAutoSetupJob({
+      state: "scanning",
+      scanned: 2,
+      facts: [
+        { label: "MEMORY", value: "8 GB" },
+        { label: "STORAGE", value: "40 GB" },
+        { label: "PROCESSORS", value: "6" },
+      ],
     });
+    const screen = renderCard({ job });
 
     expect(screen.getByText("8 GB")).toBeTruthy();
     expect(screen.getByText("40 GB")).toBeTruthy();
     expect(screen.queryByText("6")).toBeNull();
     expect(screen.queryByText("autoSetupInstallAction")).toBeNull();
+    fireEvent.press(screen.getByLabelText("cancel"));
+    expect(job.cancel).toHaveBeenCalledTimes(1);
   });
+
+  it.each(["Downloading", "Verifying", "Benchmarking"])(
+    "keeps a labelled cancel action visible while %s",
+    (label) => {
+      const job = createAutoSetupJob({
+        state: "installing",
+        reading: { label },
+      });
+      const screen = renderCard({ job });
+
+      expect(screen.getByText(label)).toBeTruthy();
+      fireEvent.press(screen.getByLabelText("cancel"));
+      expect(job.cancel).toHaveBeenCalledTimes(1);
+    },
+  );
 
   it("installs only from a seen proposal, with the manual route beside it", () => {
     const job = createAutoSetupJob({

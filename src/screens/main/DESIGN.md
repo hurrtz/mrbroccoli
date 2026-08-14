@@ -88,6 +88,25 @@ workspace therefore combines:
 **Decision:** Cancellation is an outcome, not an error to retry. Late results
 may be ignored but must not append messages or re-arm listening.
 
+The introduction's live test records through the shared recorder. Provider or
+downloaded STT enters the normal pipeline directly; native STT first uses the
+platform file recognizer and passes its result as a transcription override.
+The intro owns no conversation state, but it does track the playback it
+enqueues so exit and unmount stop that audio without touching playback that was
+already active before the flow opened. Starting another test stops the same
+owned playback and clears replay state. Exit and unmount abort platform file
+recognition, serialize recorder teardown, and delete both active and late
+capture URIs; player cancellation is reset before each new test and replay.
+
+`usePlaybackReel` records every audio or native-speech unit with its paragraph
+marker. Pipeline completion seals the reel, and only a later natural drain may
+publish a full reading arc. This separates final completion from a temporary
+stream gap. Seeking stops native playback, adopts the resulting generation
+marker, then re-reads the live unit list so a chunk that arrived during the
+asynchronous stop is retained. A shared seek-intent guard prevents that stop's
+empty-queue finalizer from masquerading as a natural drain, while capture and
+replay identity checks prevent stale sessions from sealing a newer reel.
+
 ## Drive Session State
 
 ```mermaid
@@ -138,13 +157,13 @@ kept as a root-session link rather than encoded as visual tree rails.
 
 `useOrbTurnProgress` takes one clock snapshot whenever semantic voice state
 changes, then supplies the remaining linear durations to `VoiceOrb`. The orb
-uses Reanimated UI-thread clocks for recording, whole-turn estimate, and late
-tail progress, so both rings stay smooth while streamed text updates compete on
-the JS thread. Recording fills the inner ring against the capture cap, the
-speech-start estimate drives the outer ring, and the estimated deadline swaps
-completed ink for the approved track plus red tail without a JS timer.
-Processing phases carry no per-phase estimate, so their inner ring deliberately
-rests on the phase tint rather than faking a fraction.
+uses Reanimated UI-thread clocks for recording, whole-turn estimate, each
+processing phase, and late-tail progress, so both rings stay smooth while
+streamed text updates compete on the JS thread. Recording fills the inner ring
+against the capture cap, the learned route-specific speech-start estimate
+drives the outer ring, and each learned phase estimate drives the inner ring
+from transcription through synthesis. The estimated deadline swaps completed
+ink for the approved track plus red tail without a JS timer.
 
 The isolated `.maestro` screenshot identity may replace the visual phase and
 both ring fractions with validated deterministic values. That override enters

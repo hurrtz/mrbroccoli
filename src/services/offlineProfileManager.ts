@@ -197,27 +197,45 @@ async function downloadProfileModel(
 async function benchmarkProfileModel(
   profile: OfflineProfile,
   modelId: LocalModelId,
+  abortSignal?: AbortSignal,
 ) {
   if (modelId === profile.llm.id || modelId === profile.thoroughLlm?.id) {
-    return benchmarkLocalLlm(modelId as typeof profile.llm.id);
+    return benchmarkLocalLlm(modelId as typeof profile.llm.id, {
+      abortSignal,
+    });
   }
   if (modelId === profile.stt?.id) {
     const language: SttLanguage =
       profile.languages.length === 1 ? profile.languages[0] : "auto";
-    return benchmarkLocalStt(profile.stt.id, language);
+    return benchmarkLocalStt(profile.stt.id, language, { abortSignal });
   }
   if (modelId === "kokoro-multilingual") {
     return benchmarkKokoroModel(
       profile.languages.includes("zh-CN") ? "zh" : "en",
+      { abortSignal },
     );
   }
-  return benchmarkLocalTts(modelId as LocalTtsModelId, profile.languages[0]);
+  return benchmarkLocalTts(
+    modelId as LocalTtsModelId,
+    profile.languages[0],
+    { abortSignal },
+  );
 }
 
 function createAbortError() {
   const error = new Error("Setup was cancelled.");
   error.name = "AbortError";
   return error;
+}
+
+function throwIfAborted(signal?: AbortSignal) {
+  if (signal?.aborted) {
+    throw createAbortError();
+  }
+}
+
+function isAbortError(error: unknown) {
+  return error instanceof Error && error.name === "AbortError";
 }
 
 export async function prepareOfflineProfile(
@@ -228,37 +246,43 @@ export async function prepareOfflineProfile(
   },
 ) {
   const models = getOfflineProfileModels(profile);
-  const [installEntries, benchmarks, snapshot] = await Promise.all([
-    Promise.all(
-      models.map(
-        async (model) =>
-          [model.id, await getInstallStatus(model.id, profile.languages)] as const,
-      ),
-    ),
-    getLocalModelBenchmarkResults(),
-    probeLocalDeviceCapabilities(),
-  ]);
-  const steps = getOfflinePreparationSteps(
-    profile,
-    Object.fromEntries(installEntries),
-    benchmarks,
-    snapshot,
-  );
-
-  recordDebugLogEvent({
-    event: "offline-profile-preparation-started",
-    payload: {
-      modelIds: models.map((model) => model.id),
-      stepCount: steps.length,
-      thermalState: snapshot.thermalState,
-    },
-  });
+  let stepCount = 0;
 
   try {
+    throwIfAborted(options?.abortSignal);
+    const [installEntries, benchmarks, snapshot] = await Promise.all([
+      Promise.all(
+        models.map(
+          async (model) =>
+            [
+              model.id,
+              await getInstallStatus(model.id, profile.languages),
+            ] as const,
+        ),
+      ),
+      getLocalModelBenchmarkResults(),
+      probeLocalDeviceCapabilities(),
+    ]);
+    throwIfAborted(options?.abortSignal);
+    const steps = getOfflinePreparationSteps(
+      profile,
+      Object.fromEntries(installEntries),
+      benchmarks,
+      snapshot,
+    );
+    stepCount = steps.length;
+
+    recordDebugLogEvent({
+      event: "offline-profile-preparation-started",
+      payload: {
+        modelIds: models.map((model) => model.id),
+        stepCount,
+        thermalState: snapshot.thermalState,
+      },
+    });
+
     for (const [stepIndex, step] of steps.entries()) {
-      if (options?.abortSignal?.aborted) {
-        throw createAbortError();
-      }
+      throwIfAborted(options?.abortSignal);
       const model = models.find((candidate) => candidate.id === step.modelId);
       if (!model) {
         throw new Error(`Unknown setup model: ${step.modelId}`);
@@ -289,12 +313,20 @@ export async function prepareOfflineProfile(
       if (step.action === "downloading") {
         await downloadProfileModel(model.id, {
           abortSignal: options?.abortSignal,
-          onProgress: (download) =>
-            options?.onProgress?.(progress(download.progress, download)),
+          onProgress: (download) => {
+            if (!options?.abortSignal?.aborted) {
+              options?.onProgress?.(progress(download.progress, download));
+            }
+          },
           phonemeLanguages: profile.languages,
         });
       } else {
-        const benchmark = await benchmarkProfileModel(profile, model.id);
+        const benchmark = await benchmarkProfileModel(
+          profile,
+          model.id,
+          options?.abortSignal,
+        );
+        throwIfAborted(options?.abortSignal);
         if (benchmark.status !== "viable") {
           throw new Error(
             benchmark.measuredUnderPressure
@@ -304,6 +336,7 @@ export async function prepareOfflineProfile(
           );
         }
       }
+      throwIfAborted(options?.abortSignal);
       options?.onProgress?.(progress(1));
       recordDebugLogEvent({
         event: "offline-profile-preparation-step-completed",
@@ -315,19 +348,20 @@ export async function prepareOfflineProfile(
         },
       });
     }
+    throwIfAborted(options?.abortSignal);
     recordDebugLogEvent({
       event: "offline-profile-preparation-completed",
-      payload: { modelCount: models.length, stepCount: steps.length },
+      payload: { modelCount: models.length, stepCount },
     });
   } catch (error) {
+    const cancelled = options?.abortSignal?.aborted || isAbortError(error);
     recordDebugLogEvent({
-      event: "offline-profile-preparation-failed",
-      level:
-        error instanceof Error && error.name === "AbortError"
-          ? "info"
-          : "error",
-      payload: { error, stepCount: steps.length },
+      event: cancelled
+        ? "offline-profile-preparation-cancelled"
+        : "offline-profile-preparation-failed",
+      level: cancelled ? "info" : "error",
+      payload: cancelled ? { stepCount } : { error, stepCount },
     });
-    throw error;
+    throw cancelled ? createAbortError() : error;
   }
 }

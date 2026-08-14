@@ -53,9 +53,8 @@ interface WorkspaceSatellitesProps {
  * they give way to the transport verbs, and a drive session shows transport in
  * every phase, idle included, because the loop must be stoppable at rest.
  *
- * **Open question:** Restart, Back and Forward stay disabled in every phase
- * until the audio queue can seek by paragraph; the player exposes only
- * enqueue, pause, resume and stop today. Owner: workspace playback work.
+ * Restart, Back and Forward stay disabled until speaking begins; Back and
+ * Forward additionally require a reply with more than one paragraph.
  */
 function WorkspaceSatellites({
   colors,

@@ -1053,7 +1053,7 @@ const styles = StyleSheet.create({
   },
   tryMic: {
     alignItems: "center",
-    borderRadius: introRadius.pill,
+    borderRadius: introRadius.iconButton,
     borderWidth: 2,
     elevation: 10,
     height: 76,
@@ -1074,7 +1074,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     flexDirection: "row",
     gap: 4,
-    minHeight: 32,
+    minHeight: 44,
     paddingHorizontal: 4,
   },
   tryStack: {

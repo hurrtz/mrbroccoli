@@ -98,6 +98,8 @@ export function useAudioPlayer(
     usingNativeAudioQueue,
   });
   const finalizeDrainedStateRef = useRef<() => void>(() => undefined);
+  const playbackReelDrainedRef = useRef<() => void>(() => undefined);
+  const playbackReelSeekIntentRef = useRef(false);
 
   const ensureAudioQueuePlaybackSession = useCallback(async () => {
     if (!usingNativeAudioQueue) {
@@ -144,6 +146,9 @@ export function useAudioPlayer(
     });
 
   const finalizeDrainedState = useCallback(() => {
+    if (!cancelledRef.current && !playbackReelSeekIntentRef.current) {
+      playbackReelDrainedRef.current();
+    }
     playbackPausedRef.current = false;
     setPlaybackPaused(false);
     markPlaybackEnded();
@@ -412,17 +417,36 @@ export function useAudioPlayer(
   // The reply's paragraphs, remembered so playback can move between them.
   const {
     canSeekParagraph,
+    markDrained: markPlaybackReelDrained,
     readingProgress,
     recordAudio,
     recordSpeech,
+    seal: sealPlaybackReelState,
     seekParagraph,
   } = usePlaybackReel({
       enqueueAudio,
       playbackGenerationRef,
       resetCancellation,
+      seekIntentRef: playbackReelSeekIntentRef,
       speakText,
       stopPlayback,
     });
+  playbackReelDrainedRef.current = markPlaybackReelDrained;
+
+  const sealPlaybackReel = useCallback(() => {
+    sealPlaybackReelState();
+    if (
+      !hasPendingPlaybackNow() &&
+      !cancelledRef.current &&
+      !playbackReelSeekIntentRef.current
+    ) {
+      markPlaybackReelDrained();
+    }
+  }, [
+    hasPendingPlaybackNow,
+    markPlaybackReelDrained,
+    sealPlaybackReelState,
+  ]);
 
   return {
     isPlaying: hasPendingPlayback,
@@ -437,6 +461,7 @@ export function useAudioPlayer(
     speakText: recordSpeech,
     canSeekParagraph,
     readingProgress,
+    sealPlaybackReel,
     seekParagraph,
     pausePlayback,
     resumePlayback,

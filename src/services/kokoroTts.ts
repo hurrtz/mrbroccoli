@@ -492,10 +492,17 @@ export async function synthesizeKokoroSpeech(params: {
   const voice = getKokoroVoiceConfig(language, selectedVoice);
   const task = synthesisTask.then(async () => {
     let fileUri: string | null = null;
+    let abortHandler: (() => void) | null = null;
 
     try {
       assertNotAborted(params.abortSignal);
       const session = await getKokoroSession(language);
+      abortHandler = () => {
+        void session.engine.cancelSpeechStream().catch(() => undefined);
+      };
+      params.abortSignal?.addEventListener("abort", abortHandler, {
+        once: true,
+      });
       assertNotAborted(params.abortSignal);
       const audio = await new Promise<{
         samples: number[];
@@ -521,7 +528,11 @@ export async function synthesizeKokoroSpeech(params: {
               },
               onEnd: (event) => {
                 if (event.cancelled) {
-                  reject(new Error("Kokoro synthesis was cancelled."));
+                  reject(
+                    params.abortSignal?.aborted
+                      ? createAbortError()
+                      : new Error("Kokoro synthesis was cancelled."),
+                  );
                   return;
                 }
 
@@ -564,7 +575,14 @@ export async function synthesizeKokoroSpeech(params: {
         }).catch(() => undefined);
       }
 
+      if (params.abortSignal?.aborted) {
+        throw createAbortError();
+      }
       throw error;
+    } finally {
+      if (abortHandler) {
+        params.abortSignal?.removeEventListener("abort", abortHandler);
+      }
     }
   });
 
@@ -600,9 +618,12 @@ export async function verifyKokoroModel(params?: { language?: KokoroLanguage }) 
 
 export async function benchmarkKokoroModel(
   language: KokoroLanguage,
+  options?: { abortSignal?: AbortSignal },
 ): Promise<LocalModelBenchmarkResult> {
   const model = getLocalModel("kokoro-multilingual");
+  assertNotAborted(options?.abortSignal);
   const device = await probeLocalDeviceCapabilities();
+  assertNotAborted(options?.abortSignal);
   const startedAt = Date.now();
   let generatedFileUri: string | null = null;
 
@@ -615,7 +636,9 @@ export async function benchmarkKokoroModel(
           : "Hello from Mr Broccoli.",
       listenLanguages: [language === "zh" ? "zh-CN" : "en"],
       voices: DEFAULT_KOKORO_VOICES,
+      abortSignal: options?.abortSignal,
     });
+    assertNotAborted(options?.abortSignal);
     generatedFileUri = result.fileUri;
     const durationMs = Date.now() - startedAt;
     const realtimeFactor =
@@ -636,9 +659,13 @@ export async function benchmarkKokoroModel(
       measuredUnderPressure: hasLocalDeviceRuntimePressure(device),
       device,
     };
+    assertNotAborted(options?.abortSignal);
     await saveLocalModelBenchmarkResult(benchmark);
     return benchmark;
   } catch (error) {
+    if (options?.abortSignal?.aborted || (error as Error)?.name === "AbortError") {
+      throw createAbortError();
+    }
     const durationMs = Date.now() - startedAt;
     const benchmark: LocalModelBenchmarkResult = {
       modelId: model.id,

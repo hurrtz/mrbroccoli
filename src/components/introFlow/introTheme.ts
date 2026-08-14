@@ -96,5 +96,6 @@ export const introBannerTheme = {
 export const introRadius = {
   panel: 14,
   control: 10,
+  iconButton: 12,
   pill: 999,
 } as const;

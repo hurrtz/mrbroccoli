@@ -655,7 +655,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   metaDisclosure: {
-    minHeight: 28,
+    minHeight: 44,
     marginTop: 5,
     flexDirection: "row",
     alignItems: "center",

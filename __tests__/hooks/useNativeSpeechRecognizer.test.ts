@@ -3,6 +3,7 @@ import { act, renderHook } from "@testing-library/react-native";
 
 import { LocalizationProvider } from "../../src/i18n";
 import { useNativeSpeechRecognizer } from "../../src/hooks/useNativeSpeechRecognizer";
+import { transcribeRecordedFile } from "../../src/hooks/nativeSpeechRecognizer/transcribeRecordedFile";
 import {
   cancelNativeWaveformRecording,
   isNativeWaveformAvailable,
@@ -208,6 +209,44 @@ describe("useNativeSpeechRecognizer", () => {
       }),
     );
     expect(result.current.isRecording).toBe(false);
+  });
+
+  it("aborts recorded-file recognition and removes its listeners and watchdog", async () => {
+    jest.useFakeTimers({ doNotFake: ["Date"] });
+    try {
+      const controller = new AbortController();
+      const transcription = transcribeRecordedFile({
+        abortSignal: controller.signal,
+        fileUri: "file://intro-recording.m4a",
+        finalTranscriptRef: { current: "" },
+        latestTranscriptRef: { current: "" },
+        requiresOnDeviceRecognition: true,
+        sttLanguage: "en",
+        t: ((key: string) => key) as any,
+      });
+
+      expect(ExpoSpeechRecognitionModule.start).toHaveBeenCalledTimes(1);
+      expect([
+        speechListeners.get("result")?.size,
+        speechListeners.get("error")?.size,
+        speechListeners.get("end")?.size,
+      ]).toEqual([1, 1, 1]);
+
+      controller.abort();
+
+      await expect(transcription).resolves.toBeNull();
+      expect(ExpoSpeechRecognitionModule.abort).toHaveBeenCalledTimes(1);
+      expect([
+        speechListeners.get("result")?.size,
+        speechListeners.get("error")?.size,
+        speechListeners.get("end")?.size,
+      ]).toEqual([0, 0, 0]);
+
+      jest.advanceTimersByTime(120_000);
+      expect(ExpoSpeechRecognitionModule.abort).toHaveBeenCalledTimes(1);
+    } finally {
+      jest.useRealTimers();
+    }
   });
 
   it("surfaces native waveform recorder errors and resets recording state", async () => {

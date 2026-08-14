@@ -506,6 +506,69 @@ describe("useAudioPlayer", () => {
     expect(result.current.isPlaybackPaused).toBe(false);
   });
 
+  it("does not publish a sealed drain when sealing during paragraph seek teardown", async () => {
+    let finishNativeStop!: () => void;
+    (Speech.stop as jest.Mock).mockImplementationOnce(
+      () =>
+        new Promise<void>((resolve) => {
+          finishNativeStop = resolve;
+        }),
+    );
+    const { result, rerender } = renderHook(() => useAudioPlayer());
+
+    await act(async () => {
+      result.current.enqueueAudio("one.mp3", undefined, undefined, {
+        startsParagraph: true,
+        text: "x".repeat(10),
+      });
+      result.current.enqueueAudio("two.mp3", undefined, undefined, {
+        startsParagraph: true,
+        text: "x".repeat(30),
+      });
+      result.current.enqueueAudio("three.mp3", undefined, undefined, {
+        startsParagraph: true,
+        text: "x".repeat(60),
+      });
+      await Promise.resolve();
+    });
+    await act(async () => {
+      mockStatus = {
+        ...mockStatus,
+        playing: true,
+        playbackState: "playing",
+        timeControlStatus: "playing",
+      };
+      rerender(undefined);
+      await Promise.resolve();
+    });
+    expect(result.current.readingProgress).toBe(0);
+
+    let seekPromise!: Promise<void>;
+    act(() => {
+      seekPromise = result.current.seekParagraph("forward");
+    });
+    await act(async () => {
+      await Promise.resolve();
+      result.current.sealPlaybackReel();
+      mockStatus = {
+        ...mockStatus,
+        playing: false,
+        playbackState: "idle",
+        timeControlStatus: "paused",
+      };
+      rerender(undefined);
+      await Promise.resolve();
+    });
+
+    expect(result.current.readingProgress).not.toBe(1);
+
+    await act(async () => {
+      finishNativeStop();
+      await seekPromise;
+    });
+    expect(result.current.readingProgress).toBeCloseTo(0.1);
+  });
+
   it("tracks pause and resume commands issued by lock-screen controls", async () => {
     const { result, rerender } = renderHook(() => useAudioPlayer());
 

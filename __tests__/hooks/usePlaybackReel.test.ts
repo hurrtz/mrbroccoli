@@ -2,6 +2,14 @@ import { act, renderHook } from "@testing-library/react-native";
 
 import { usePlaybackReel } from "../../src/hooks/audioPlayer/usePlaybackReel";
 
+function createDeferredVoid() {
+  let resolve!: () => void;
+  const promise = new Promise<void>((nextResolve) => {
+    resolve = nextResolve;
+  });
+  return { promise, resolve };
+}
+
 function setup() {
   const enqueueAudio =
     jest.fn<void, [string, unknown?, (() => void)?]>();
@@ -9,12 +17,14 @@ function setup() {
   const stopPlayback = jest.fn(async () => undefined);
   const resetCancellation = jest.fn();
   const playbackGenerationRef = { current: 1 };
+  const seekIntentRef = { current: false };
 
   const view = renderHook(() =>
     usePlaybackReel({
       enqueueAudio,
       playbackGenerationRef,
       resetCancellation,
+      seekIntentRef,
       speakText,
       stopPlayback,
     }),
@@ -185,6 +195,56 @@ describe("playback reel", () => {
     ]);
   });
 
+  it("retains a paragraph streamed while native seek teardown is pending", async () => {
+    const pendingStop = createDeferredVoid();
+    const {
+      enqueueAudio,
+      enqueueThree,
+      playbackGenerationRef,
+      startChunk,
+      stopPlayback,
+      view,
+    } = setup();
+    enqueueThree();
+    startChunk(1);
+    stopPlayback.mockImplementation(async () => {
+      playbackGenerationRef.current += 1;
+      await pendingStop.promise;
+    });
+    enqueueAudio.mockClear();
+
+    let seek!: Promise<void>;
+    act(() => {
+      seek = view.result.current.seekParagraph("forward");
+    });
+    act(() => {
+      view.result.current.recordAudio("file://four.m4a", undefined, undefined, {
+        startsParagraph: true,
+        text: "x".repeat(100),
+      });
+    });
+    await act(async () => {
+      pendingStop.resolve();
+      await seek;
+    });
+
+    const replayed = enqueueAudio.mock.calls.slice(-2);
+    expect(replayed.map(([uri]) => uri)).toEqual([
+      "file://three.m4a",
+      "file://four.m4a",
+    ]);
+    act(() => {
+      replayed[0][2]?.();
+    });
+    enqueueAudio.mockClear();
+    await act(async () => {
+      await view.result.current.seekParagraph("forward");
+    });
+    expect(enqueueAudio.mock.calls.map(([uri]) => uri)).toEqual([
+      "file://four.m4a",
+    ]);
+  });
+
   it("opens seeking the moment a second paragraph exists", () => {
     // Back and Forward are drawn from this, so it has to be state the
     // workspace re-renders on, not a value read out of a ref mid-render.
@@ -238,6 +298,23 @@ describe("playback reel", () => {
 
     startChunk(2);
     expect(view.result.current.readingProgress).toBeCloseTo(0.4);
+  });
+
+  it("completes the reading arc only after a sealed response drains", () => {
+    const { enqueueThree, startChunk, view } = setup();
+    enqueueThree();
+    startChunk(2);
+
+    act(() => {
+      view.result.current.markDrained();
+    });
+    expect(view.result.current.readingProgress).toBeCloseTo(0.4);
+
+    act(() => {
+      view.result.current.seal();
+      view.result.current.markDrained();
+    });
+    expect(view.result.current.readingProgress).toBe(1);
   });
 
   it("moves the arc back by what the skipped paragraph holds", async () => {

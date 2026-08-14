@@ -180,7 +180,11 @@ describe("TranscriptMessage", () => {
       },
     });
 
-    expect(screen.getByTestId("transcript-meta-assistant-1")).toBeTruthy();
+    expect(
+      StyleSheet.flatten(
+        screen.getByTestId("transcript-meta-assistant-1").props.style,
+      ),
+    ).toEqual(expect.objectContaining({ minHeight: 44 }));
     expect(screen.queryByTestId("transcript-metrics-assistant-1")).toBeNull();
 
     fireEvent.press(screen.getByTestId("transcript-meta-assistant-1"));

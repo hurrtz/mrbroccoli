@@ -48,6 +48,7 @@ export interface VoiceTextInputPagerProps {
   readingProgress?: number | null;
   recordingMaxMs: number;
   recordingStartedAtMs?: number | null;
+  phaseTimingProgress?: VoiceTimingProgress | null;
   speechStartProgress?: VoiceTimingProgress | null;
   /**
    * The orb slot — 196 in portrait, 150 in landscape. Portrait follows the

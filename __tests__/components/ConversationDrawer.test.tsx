@@ -324,6 +324,11 @@ describe("ConversationDrawer", () => {
       screen.getByTestId("conversation-section-archived").props
         .accessibilityState,
     ).toMatchObject({ expanded: true });
+    expect(
+      StyleSheet.flatten(
+        screen.getByTestId("conversation-section-archived").props.style,
+      ),
+    ).toEqual(expect.objectContaining({ minHeight: 44 }));
     expect(screen.getByText("Old research")).toBeTruthy();
   });
 
@@ -351,6 +356,11 @@ describe("ConversationDrawer", () => {
         paddingVertical: 12,
       }),
     );
+    expect(
+      StyleSheet.flatten(
+        screen.getByTestId("conversation-drawer-empty-icon").props.style,
+      ),
+    ).toEqual(expect.objectContaining({ borderRadius: 12 }));
   });
 
   it("opens the rename modal from the action sheet and saves the new title", async () => {
@@ -368,6 +378,11 @@ describe("ConversationDrawer", () => {
       screen.getByTestId("conversation-rename-input"),
       "Renamed briefing",
     );
+    expect(
+      StyleSheet.flatten(
+        screen.getByTestId("conversation-rename-save").props.style,
+      ),
+    ).toEqual(expect.objectContaining({ minHeight: 48, width: "100%" }));
     fireEvent.press(screen.getByTestId("conversation-rename-save"));
 
     expect(onRenameThread).toHaveBeenCalledWith("one", "Renamed briefing");

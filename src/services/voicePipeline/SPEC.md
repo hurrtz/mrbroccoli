@@ -137,7 +137,9 @@ Every emitted clip carries what it says and whether it opens a paragraph. The
 player's reel needs both: the text is the weight behind the orb's reading arc,
 and the paragraph flag is where Back and Forward may land. The pipeline is the
 only place that still knows either, since a synthesized clip is a bare URI by
-the time playback sees it.
+the time playback sees it. Streaming paragraphs, a completed wait-mode answer,
+and transcript Restart all pass through this same paragraph queue; none may
+collapse a multi-paragraph reply into paragraph zero.
 
 Native recognizer stop, abort, and file transcription carry bounded watchdogs:
 a platform recognizer that drops its terminal event settles with the latest

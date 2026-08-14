@@ -20,6 +20,7 @@ export function createAutoSetupJob(
     running: false,
     start: jest.fn(),
     install: jest.fn(),
+    cancel: jest.fn(),
     retry: jest.fn(),
     ...overrides,
   };

@@ -49,6 +49,42 @@ export type {
 const FACT_REVEAL_MS = [400, 950, 1500, 2050];
 const SCAN_SETTLE_MS = 2500;
 
+function createSetupAbortError() {
+  const error = new Error("Setup was cancelled.");
+  error.name = "AbortError";
+  return error;
+}
+
+function throwIfSetupAborted(signal: AbortSignal) {
+  if (signal.aborted) {
+    throw createSetupAbortError();
+  }
+}
+
+function isAbortError(error: unknown) {
+  return error instanceof Error && error.name === "AbortError";
+}
+
+function waitForScanSettle(signal: AbortSignal) {
+  return new Promise<void>((resolve, reject) => {
+    if (signal.aborted) {
+      reject(createSetupAbortError());
+      return;
+    }
+
+    const onAbort = () => {
+      clearTimeout(timer);
+      signal.removeEventListener("abort", onAbort);
+      reject(createSetupAbortError());
+    };
+    const timer = setTimeout(() => {
+      signal.removeEventListener("abort", onAbort);
+      resolve();
+    }, SCAN_SETTLE_MS);
+    signal.addEventListener("abort", onAbort, { once: true });
+  });
+}
+
 function formatRemaining(t: TranslateFn, seconds: number): string {
   if (seconds <= 5) {
     return t("autoSetupAlmostDone");
@@ -105,6 +141,8 @@ export function useAutoSetupJob({
     () => new Set(),
   );
   const abortRef = useRef<AbortController | null>(null);
+  const settingsRef = useRef(settings);
+  settingsRef.current = settings;
   const progressRef = useRef<OfflinePreparationProgress | null>(null);
   const revealTimersRef = useRef<ReturnType<typeof setTimeout>[]>([]);
   const mountedRef = useRef(true);
@@ -129,6 +167,9 @@ export function useAutoSetupJob({
 
   const scan = useCallback(
     (restoreCompletedProfile = false) => {
+      abortRef.current?.abort();
+      const abortController = new AbortController();
+      abortRef.current = abortController;
       setPhase("scanning");
       setScanned(0);
       setFailedModelId(null);
@@ -139,7 +180,7 @@ export function useAutoSetupJob({
       revealTimersRef.current.forEach(clearTimeout);
       revealTimersRef.current = FACT_REVEAL_MS.map((ms, index) =>
         setTimeout(() => {
-          if (mountedRef.current) {
+          if (mountedRef.current && !abortController.signal.aborted) {
             setScanned(index + 1);
           }
         }, ms),
@@ -153,6 +194,7 @@ export function useAutoSetupJob({
           // The snapshot lands first, so the readings the reveal shows are on
           // screen while the rest of the check still runs.
           const nextSnapshot = await probeLocalDeviceCapabilities();
+          throwIfSetupAborted(abortController.signal);
           if (!mountedRef.current) {
             return;
           }
@@ -161,11 +203,13 @@ export function useAutoSetupJob({
             getLocalCatalogInstallStatuses(),
             getLocalModelBenchmarkResults(),
           ]);
+          throwIfSetupAborted(abortController.signal);
           const [nativeSpeech] = await Promise.all([
             probeNativeSpeechCapabilities(language),
             // The verdict must not land before the user has finished reading.
-            new Promise((resolve) => setTimeout(resolve, SCAN_SETTLE_MS)),
+            waitForScanSettle(abortController.signal),
           ]);
+          throwIfSetupAborted(abortController.signal);
           if (!mountedRef.current) {
             return;
           }
@@ -206,10 +250,18 @@ export function useAutoSetupJob({
             setErrorKind("scan");
             setPhase("failed");
           }
-        } catch {
-          if (mountedRef.current) {
+        } catch (error) {
+          if (
+            mountedRef.current &&
+            !abortController.signal.aborted &&
+            !isAbortError(error)
+          ) {
             setErrorKind("scan");
             setPhase("failed");
+          }
+        } finally {
+          if (abortRef.current === abortController) {
+            abortRef.current = null;
           }
         }
       })();
@@ -249,14 +301,17 @@ export function useAutoSetupJob({
     setPhase("installing");
     setFailedModelId(null);
     setProgress(null);
+    setErrorKind(null);
     setErrorDetail(null);
     progressRef.current = null;
+    abortRef.current?.abort();
     const abortController = new AbortController();
     abortRef.current = abortController;
 
     void (async () => {
       try {
         const installs = await getLocalCatalogInstallStatuses();
+        throwIfSetupAborted(abortController.signal);
         const estimated = estimatePreparationSeconds(
           profile,
           installs,
@@ -269,6 +324,9 @@ export function useAutoSetupJob({
         await prepareOfflineProfile(profile, {
           abortSignal: abortController.signal,
           onProgress: (nextProgress) => {
+            if (abortController.signal.aborted) {
+              return;
+            }
             progressRef.current = nextProgress;
             if (!mountedRef.current) {
               return;
@@ -303,11 +361,16 @@ export function useAutoSetupJob({
             );
           },
         });
+        throwIfSetupAborted(abortController.signal);
         if (!mountedRef.current) {
           return;
         }
         updateSettings({
-          ...getAppliedOfflineProfileSettingsUpdate(settings, profile, {}),
+          ...getAppliedOfflineProfileSettingsUpdate(
+            settingsRef.current,
+            profile,
+            {},
+          ),
           freeOfflineProfileOverrides: {},
         });
         setDoneModelIds(
@@ -319,7 +382,7 @@ export function useAutoSetupJob({
         if (!mountedRef.current) {
           return;
         }
-        if ((error as Error | null)?.name === "AbortError") {
+        if (abortController.signal.aborted || isAbortError(error)) {
           return;
         }
         const [latestInstalls, latestBenchmarks] = await Promise.all([
@@ -351,9 +414,13 @@ export function useAutoSetupJob({
         setErrorKind("install");
         setPhase("failed");
         onOutcome("failed");
+      } finally {
+        if (abortRef.current === abortController) {
+          abortRef.current = null;
+        }
       }
     })();
-  }, [benchmarks, onOutcome, profile, settings, snapshot, t, updateSettings]);
+  }, [benchmarks, onOutcome, profile, snapshot, t, updateSettings]);
 
   const install = useCallback(() => {
     if (phase !== "proposal") {
@@ -361,6 +428,28 @@ export function useAutoSetupJob({
     }
     runInstall();
   }, [phase, runInstall]);
+
+  const cancel = useCallback(() => {
+    if (phase !== "scanning" && phase !== "installing") {
+      return;
+    }
+
+    abortRef.current?.abort();
+    revealTimersRef.current.forEach(clearTimeout);
+    revealTimersRef.current = [];
+    setEtaSeconds(null);
+    setProgress(null);
+    progressRef.current = null;
+    setFailedModelId(null);
+    setErrorKind(null);
+    setErrorDetail(null);
+    if (phase === "scanning") {
+      setScanned(0);
+      setPhase("offer");
+      return;
+    }
+    setPhase("proposal");
+  }, [phase]);
 
   const retry = useCallback(() => {
     if (phase !== "failed") {
@@ -518,6 +607,7 @@ export function useAutoSetupJob({
     running: phase === "installing",
     start,
     install,
+    cancel,
     retry,
   };
 }

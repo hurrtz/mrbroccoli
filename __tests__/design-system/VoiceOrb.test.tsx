@@ -52,7 +52,7 @@ describe("VoiceOrb", () => {
   });
 
   it("clamps the core to the ring holding it below the crossover", () => {
-    // Below ~107pt the 72% proportion overtakes the inner ring's hole
+    // Below the crossover the 79% proportion overtakes the inner ring's hole
     // (size - 30); an unclamped core would go oval against it.
     const screen = renderOrb({ size: 100 });
     const core = flatten(screen.getByTestId("voice-orb-core").props.style);
@@ -60,11 +60,23 @@ describe("VoiceOrb", () => {
     expect(core.width).toBe(100 - 30);
   });
 
-  it("keeps the 72% proportion above the crossover", () => {
+  it("keeps the approved 79% core proportion above the crossover", () => {
     const screen = renderOrb({ size: 196 });
     const core = flatten(screen.getByTestId("voice-orb-core").props.style);
 
-    expect(core.width).toBe(Math.floor(196 * 0.72));
+    expect(core.width).toBe(Math.floor(196 * 0.79));
+  });
+
+  it("keeps only the screen-colour gap between the core and flush rings", () => {
+    const screen = renderOrb({ phase: "thinking", size: 196 });
+    const gap = flatten(screen.getByTestId("voice-orb-core-gap").props.style);
+    const core = flatten(screen.getByTestId("voice-orb-core").props.style);
+    const circles = screen.UNSAFE_getAllByType(Circle);
+
+    expect(gap.backgroundColor).toBe(lightColors.background);
+    expect(gap.width).toBe(196 - 6 * 4);
+    expect(core.width).toBe(Math.floor(196 * 0.79));
+    expect(circles[0].props.r - circles[1].props.r).toBe(6);
   });
 
   it("fades both rings at rest instead of drawing two empty tracks", () => {

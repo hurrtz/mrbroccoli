@@ -98,6 +98,7 @@ export function PremiumBand({
       <LinearGradient
         colors={[colors.premiumGradientStart, colors.premiumGradientEnd]}
         style={[styles.badge, { shadowColor: colors.premiumGradientEnd }]}
+        testID={testID ? `${testID}-badge` : undefined}
       >
         <PhosphorIcon
           name="thunderbolt"
@@ -157,8 +158,8 @@ const styles = StyleSheet.create({
   },
   badge: {
     width: 36,
-    minHeight: 44,
-    borderRadius: 10,
+    height: 36,
+    borderRadius: 18,
     flexShrink: 0,
     alignItems: "center",
     justifyContent: "center",

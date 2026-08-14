@@ -331,6 +331,9 @@ export function useVoiceCaptureHandler({
           abortSignal: abortController.signal,
           callbacks: eventAdapter.callbacks,
         });
+        if (isActiveRun()) {
+          player.sealPlaybackReel?.();
+        }
 
         if (!transcription && isActiveRun()) {
           errorHandlers.handleNoTranscription();

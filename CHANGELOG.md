@@ -40,14 +40,17 @@ the complete Play Store translations are kept in a dedicated file under
   when it has only just begun; Forward skips to the next. The orb's ring shows
   how far through the answer you are and moves by what each paragraph actually
   holds, so skipping a long paragraph moves it further than skipping a short
-  one.
+  one. Paragraphs now stay seekable for normal wait-mode replies and restarted
+  replies too, streamed chunks cannot disappear during a seek, and a naturally
+  completed reply fills the reading ring to its end.
 - The switch used across settings and the walkthrough is now one shared
   design-system control rather than a settings-owned one.
 - The orb's two rings now say one thing per phase: at rest both fade to the
-  quiet phase colour with the gap between them reading through, recording and
-  speaking combine them into a single indicator — how much of the window is
-  used, how much of the answer has been read — and only the phases in between
-  keep two separate clocks.
+  quiet phase colour, recording and speaking combine them into a single
+  indicator — how much of the window is used, how much of the answer has been
+  read — and only the phases in between keep two separate clocks. Those inner
+  phase clocks now advance from learned timings instead of staying empty, and
+  the approved screen-coloured core gap leads into two flush ring bands.
 - Landscape keeps the conversation-settings control after all: it floats over
   the stage's top-right corner as an icon, so the orb owns the whole column
   between the route line and the controls beneath it.
@@ -91,12 +94,9 @@ the complete Play Store translations are kept in a dedicated file under
   background install row tints its border and finished states from its tone,
   and toast tints follow the design system's strengths in both appearances.
 - The introduction banner is now the approved violet gradient row: a play
-  glyph in a hairline circle announces the spoken walkthrough, setup-focused
+  glyph in a hairline squircle announces the spoken walkthrough, setup-focused
   copy replaces "New here?", a quiet chevron replaces the white action pill,
   and the slow sheen it shares with the Premium band invites without shouting.
-- Drive Session's three-button row is now Repeat plus one fixed-position
-  Pause/Resume toggle whose green fill means the loop is live, and the silence
-  countdown appears on screen as a "Sends in N…" chip above it.
 
 - Settings route pickers now set prose about a route in the reading face and
   keep the mono face for machine facts, the "Nobody" web-search route
@@ -104,7 +104,7 @@ the complete Play Store translations are kept in a dedicated file under
   short copy about their own sections, and provider health chips use the
   design system's flat rectangular shape.
 - In landscape, a setup notice no longer paints its full paragraph over the
-  status line and shortcut ring; the left pane always shows the compact
+  voice stage and satellite ring; the left pane always shows the compact
   single-row action, with the complete message kept for screen readers.
 - Conversation forks now use a splitting-paths glyph everywhere instead of
   the developer-flavored git-branch symbol.
@@ -122,8 +122,8 @@ the complete Play Store translations are kept in a dedicated file under
   longer slips into "it" in English or German — and the background install
   bar's action says it opens the automatic setup, not a retired page.
 - The transcript sheet is now the handle pulled up: its only chrome is the
-  grabber, which is the labeled close action — the status line already
-  carries the conversation's name. Message headers show the time alone;
+  grabber, which is the labeled close action — the conversations drawer
+  already carries the session's name. Message headers show the time alone;
   the drawer row owns the date.
 - The Premium purchase sheet now states the whole honesty rule: models and
   voices run on your own keys, billed by your providers, and none are
@@ -132,9 +132,6 @@ the complete Play Store translations are kept in a dedicated file under
   of squeezing the rest of the home screen.
 - The Settings overview's Connections summary names at most two providers and
   counts the rest ("+2") instead of truncating a third name mid-word.
-- The session actions sheet is now one grouped card with hairline dividers
-  instead of an outlined card per action, and forked sessions gain a
-  "Show root conversation" action that jumps to the original session.
 - Copy no longer references the retired "On-device AI" page: the setup note
   points at Settings, and on-device model rows drop the "· On-device AI"
   suffix since their meta line already says where they run. The system
@@ -151,7 +148,17 @@ the complete Play Store translations are kept in a dedicated file under
   and a live hold-to-talk test of your own setup whose reply is spoken back
   with its response time — nothing from the test is saved. On a first run the
   walkthrough completes before it can be closed; reopening it later is
-  unrestricted.
+  unrestricted. The live test now works with the phone's native recognizer,
+  follows the configured speech fallback order, preserves a late speech error,
+  and stops its own reply audio before another test or when the walkthrough
+  closes. Leaving also aborts file recognition and cleans an active or late
+  recording instead of letting native work continue behind the workspace.
+- Downloaded Piper voices now synthesize on Sherpa's background streaming path
+  instead of freezing the interface in the one-shot native call, and Cancel
+  stops an active local voice test.
+- Reply failures and pipeline notices now use the approved flat ruled layout,
+  branch markers use compact tags inside full touch targets, and toasts use
+  uniform spacing without the retired accent stripe.
 - Fixed successful local transcription crashing the iOS Release app when its
   JavaScript runtime does not provide relative-time formatting.
 - Fixed provider connection sheets occasionally freezing while returning to
@@ -166,7 +173,10 @@ the complete Play Store translations are kept in a dedicated file under
   and downloads only after you have seen the list. The install keeps running
   if you leave the screen, a quiet row on the home screen leads back to it,
   and a failure keeps everything that finished so retrying resumes instead of
-  starting over. The introduction gains this as its own step.
+  starting over. Scanning and installation can be cancelled without publishing
+  a late result or overwriting settings changed while the job ran, and an
+  interrupted install can resume from its proposal. The introduction gains
+  this as its own step.
 - The Premium settings overview shows at a glance whether the app can think,
   listen, speak, and search: four dots with their state, each opening the
   setting behind it.
@@ -191,8 +201,8 @@ the complete Play Store translations are kept in a dedicated file under
 
 - Sessions now use a flat, recency-first drawer with collapsible Pinned,
   Earlier, and Archived groups, a bottom search field, compact provider marks,
-  root-session links for forks, and one action sheet for naming, pinning,
-  privacy, memory, integrity, sharing, archiving, and deletion. The transcript
+  root-session links for forks, and one anchored menu for naming, pinning,
+  privacy, sharing, archiving, and deletion. The transcript
   now reads as a continuous script instead of stacked cards: saved messages
   open folded, a newly arriving message opens in place, details and actions
   expand on demand, and a swipe can remove an individual message.
@@ -204,7 +214,7 @@ the complete Play Store translations are kept in a dedicated file under
   one control; image, Model Council, and Web Search sit as small labelled
   controls under the orb; and the transcript peeks above the bottom edge,
   opening as a sheet over the workspace with a single compact header. Model
-  and conversation ages now stay visible in the quiet status areas, and the
+  and conversation ages stay visible on the transcript handle, and the
   conversation line includes its voice. In landscape the transcript stays
   beside the orb while portrait-only image and conversation controls stay out
   of the constrained pane.

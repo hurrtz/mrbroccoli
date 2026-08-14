@@ -235,7 +235,7 @@ const styles = StyleSheet.create({
   compactPlayRing: {
     alignItems: "center",
     borderColor: introBannerTheme.playRing,
-    borderRadius: introRadius.pill,
+    borderRadius: introRadius.control,
     borderWidth: 1,
     flexShrink: 0,
     height: 30,
@@ -268,7 +268,7 @@ const styles = StyleSheet.create({
   playRing: {
     alignItems: "center",
     borderColor: introBannerTheme.playRing,
-    borderRadius: introRadius.pill,
+    borderRadius: introRadius.iconButton,
     borderWidth: 1,
     height: 40,
     justifyContent: "center",

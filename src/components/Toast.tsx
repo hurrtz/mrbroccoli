@@ -120,8 +120,8 @@ export function Toast({
         { opacity, transform: [{ translateY }] },
       ]}
     >
-      <View style={[styles.accentStripe, { backgroundColor: toneColor }]} />
       <View
+        testID="toast-icon"
         style={[
           styles.iconWrap,
           { backgroundColor: toneBackground, borderColor: toneColor },
@@ -140,7 +140,7 @@ export function Toast({
       >
         {message}
       </Text>
-      <View style={styles.actions}>
+      <View testID="toast-actions" style={styles.actions}>
         {onRetry && (
           <TouchableOpacity
             style={[
@@ -186,23 +186,17 @@ const styles = StyleSheet.create({
     left: 16,
     right: 16,
     padding: 14,
-    paddingLeft: 0,
     borderRadius: 14,
     borderWidth: 1,
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "space-between",
+    gap: 12,
     zIndex: 1000,
     overflow: "hidden",
     shadowOffset: { width: 0, height: 18 },
     shadowOpacity: 0.1,
     shadowRadius: 18,
     elevation: 5,
-  },
-  accentStripe: {
-    alignSelf: "stretch",
-    width: 5,
-    marginRight: 12,
   },
   iconWrap: {
     width: 34,
@@ -211,7 +205,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     borderWidth: 1,
-    marginRight: 12,
   },
   message: {
     fontSize: 14,
@@ -223,7 +216,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 8,
-    marginLeft: 12,
   },
   retryButton: {
     minHeight: 44,

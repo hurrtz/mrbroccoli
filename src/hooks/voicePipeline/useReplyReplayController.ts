@@ -1,9 +1,7 @@
 import { useCallback, useRef, useState } from "react";
 
-import { createSpeechRequestId } from "../../services/speech/diagnostics";
 import { createVoicePipelineTtsQueue } from "../../services/voicePipeline/ttsQueue";
 import type { AudioPlayer, ReplayPhase, UseVoicePipelineParams } from "./types";
-import { resolveTtsListenLanguage } from "../../utils/ttsRouting";
 import { getSpeechLanguageDefinition } from "../../constants/speechLanguages";
 import { PROVIDER_LABELS } from "../../constants/models";
 import { getProviderFailureKind } from "../../services/providerResilience";
@@ -93,45 +91,19 @@ export function useReplyReplayController({
         }
 
         player.resetCancellation();
-        const speechDiagnostics = {
-          requestId: createSpeechRequestId("repeat"),
-          source: "repeat" as const,
-          provider: ttsProvider ?? null,
-          providerModel: selectedTtsModel || null,
-        };
-
-        if (ttsMode === "native") {
-          if (replaySessionRef.current !== replaySession) {
-            return;
-          }
-
-          setReplayPhase("speaking");
-          const speechLanguage = resolveTtsListenLanguage({
-            text: trimmed,
-            preferredLanguages: ttsListenLanguages,
-            appLanguage: language,
-          });
-          player.speakText(trimmed, {
-            language: getSpeechLanguageDefinition(speechLanguage).nativeLocale,
-            diagnostics: speechDiagnostics,
-          });
-          await player.waitForDrain();
-          return;
-        }
-
         const replayQueue = createVoicePipelineTtsQueue({
           abortSignal: replayAbortController.signal,
           callbacks: {
             onTranscription: () => undefined,
             onChunk: () => undefined,
             onResponseDone: () => undefined,
-            onAudioReady: (audioUri, diagnostics) => {
+            onAudioReady: (audioUri, diagnostics, chunk) => {
               if (replaySessionRef.current !== replaySession) {
                 return;
               }
 
               setReplayPhase("speaking");
-              player.enqueueAudio(audioUri, diagnostics);
+              player.enqueueAudio(audioUri, diagnostics, undefined, chunk);
             },
             onAudioPauseReady: (audioUri) => {
               if (replaySessionRef.current !== replaySession) {
@@ -140,7 +112,12 @@ export function useReplyReplayController({
 
               player.enqueueAudio(audioUri);
             },
-            onSpeechTextReady: (segmentText, voice, diagnostics) => {
+            onSpeechTextReady: (
+              segmentText,
+              voice,
+              diagnostics,
+              startsParagraph,
+            ) => {
               if (replaySessionRef.current !== replaySession) {
                 return;
               }
@@ -156,6 +133,7 @@ export function useReplyReplayController({
                     }
                   : {}),
                 diagnostics,
+                startsParagraph,
               });
             },
             onSpeechPauseReady: (durationMs) => {
@@ -210,10 +188,13 @@ export function useReplyReplayController({
         });
 
         await replayQueue.handleResponseDone(trimmed);
-
-        if (replaySessionRef.current !== replaySession) {
+        if (
+          replaySessionRef.current !== replaySession ||
+          replayAbortController.signal.aborted
+        ) {
           return;
         }
+        player.sealPlaybackReel?.();
 
         if (player.hasPendingPlaybackNow() || player.isPlaying) {
           setReplayPhase("speaking");

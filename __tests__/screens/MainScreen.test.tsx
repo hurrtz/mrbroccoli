@@ -75,6 +75,10 @@ jest.mock("expo-status-bar", () => ({
   StatusBar: () => null,
 }));
 
+jest.mock("expo-speech-recognition", () => ({
+  ExpoSpeechRecognitionModule: {},
+}));
+
 jest.mock("expo-clipboard", () => ({
   setStringAsync: jest.fn(async () => undefined),
 }));

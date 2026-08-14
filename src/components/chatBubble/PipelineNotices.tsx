@@ -1,5 +1,5 @@
 import React from "react";
-import { Text, TouchableOpacity, View } from "react-native";
+import { Pressable, Text, View } from "react-native";
 
 import { PhosphorIcon } from "../../design-system/PhosphorIcon";
 
@@ -23,31 +23,25 @@ export function PipelineNotices({
   }
 
   return (
-    <View style={styles.noticeList}>
+    <View
+      testID={`pipeline-notice-list-${message.id}`}
+      style={styles.noticeList}
+    >
       {notices.map((notice, index) => (
         <View
           key={`${notice.stage}:${notice.message}:${notice.detail ?? ""}:${index}`}
+          testID={`pipeline-notice-${message.id}-${index}`}
           style={[
             styles.noticeCard,
             {
-              backgroundColor: colors.surfaceAlt,
-              borderColor:
+              borderTopColor:
                 notice.level === "error" ? colors.danger : colors.border,
             },
           ]}
         >
           <View
-            style={[
-              styles.noticeIcon,
-              {
-                backgroundColor:
-                  notice.level === "error" ? colors.surface : colors.accentSoft,
-                borderColor:
-                  notice.level === "error"
-                    ? colors.danger
-                    : colors.borderStrong,
-              },
-            ]}
+            testID={`pipeline-notice-icon-${message.id}-${index}`}
+            style={styles.noticeIcon}
           >
             <PhosphorIcon
               name={notice.level === "error" ? "warning" : "info-circle"}
@@ -85,16 +79,17 @@ export function PipelineNotices({
             {notice.stage === "tts" && notice.level === "error" ? (
               <View style={styles.noticeActions}>
                 {onRepeat ? (
-                  <TouchableOpacity
-                    style={[
+                  <Pressable
+                    testID={`pipeline-notice-retry-speech-${message.id}-${index}`}
+                    style={({ pressed }) => [
                       styles.noticeAction,
                       {
                         backgroundColor: colors.accentSoft,
                         borderColor: colors.accent,
                       },
+                      pressed ? styles.subCardActionPressed : null,
                     ]}
                     onPress={() => onRepeat(message)}
-                    activeOpacity={0.86}
                     accessibilityRole="button"
                     accessibilityLabel={t("retrySpeech")}
                   >
@@ -111,19 +106,20 @@ export function PipelineNotices({
                     >
                       {t("retrySpeech")}
                     </Text>
-                  </TouchableOpacity>
+                  </Pressable>
                 ) : null}
                 {onOpenSpeakingSettings ? (
-                  <TouchableOpacity
-                    style={[
+                  <Pressable
+                    testID={`pipeline-notice-speaking-settings-${message.id}-${index}`}
+                    style={({ pressed }) => [
                       styles.noticeAction,
                       {
                         backgroundColor: colors.surface,
                         borderColor: colors.border,
                       },
+                      pressed ? styles.subCardActionPressed : null,
                     ]}
                     onPress={onOpenSpeakingSettings}
-                    activeOpacity={0.86}
                     accessibilityRole="button"
                     accessibilityLabel={t("openSpeakingSettings")}
                   >
@@ -140,7 +136,7 @@ export function PipelineNotices({
                     >
                       {t("openSpeakingSettings")}
                     </Text>
-                  </TouchableOpacity>
+                  </Pressable>
                 ) : null}
               </View>
             ) : null}

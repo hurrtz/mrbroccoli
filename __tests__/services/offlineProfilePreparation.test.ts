@@ -60,6 +60,7 @@ import {
   benchmarkLocalStt,
   benchmarkLocalTts,
 } from "../../src/services/localSpeechModels";
+import { recordDebugLogEvent } from "../../src/services/debugLogCapture";
 
 const mockBenchmarkLocalLlm = jest.mocked(benchmarkLocalLlm);
 const mockBenchmarkLocalStt = jest.mocked(benchmarkLocalStt);
@@ -70,6 +71,7 @@ const mockGetLocalModelBenchmarkResults = jest.mocked(
 const mockProbeLocalDeviceCapabilities = jest.mocked(
   probeLocalDeviceCapabilities,
 );
+const mockRecordDebugLogEvent = jest.mocked(recordDebugLogEvent);
 
 const GIB = 1024 ** 3;
 const snapshot: LocalDeviceSnapshot = {
@@ -202,6 +204,33 @@ describe("offline profile preparation", () => {
 
     await expect(prepareOfflineProfile(profile)).rejects.toThrow(
       /not fast enough/,
+    );
+  });
+
+  it("propagates cancellation into benchmarking and stops later models", async () => {
+    mockGetLocalModelBenchmarkResults.mockResolvedValue({});
+    const controller = new AbortController();
+    mockBenchmarkLocalLlm.mockImplementationOnce(
+      async (_modelId, options) => {
+        expect(options?.abortSignal).toBe(controller.signal);
+        controller.abort();
+        const error = new Error("Benchmark cancelled");
+        error.name = "AbortError";
+        throw error;
+      },
+    );
+
+    await expect(
+      prepareOfflineProfile(profile, { abortSignal: controller.signal }),
+    ).rejects.toMatchObject({ name: "AbortError" });
+
+    expect(mockBenchmarkLocalStt).not.toHaveBeenCalled();
+    expect(mockBenchmarkLocalTts).not.toHaveBeenCalled();
+    expect(mockRecordDebugLogEvent).toHaveBeenCalledWith(
+      expect.objectContaining({
+        event: "offline-profile-preparation-cancelled",
+        level: "info",
+      }),
     );
   });
 });

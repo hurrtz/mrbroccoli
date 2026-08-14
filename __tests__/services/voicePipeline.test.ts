@@ -1257,6 +1257,63 @@ describe("runVoicePipeline", () => {
     expect(callbacks.onSpeechTextReady).not.toHaveBeenCalled();
   });
 
+  it("preserves paragraph metadata for ordinary wait-mode replies", async () => {
+    (streamChat as jest.Mock).mockImplementation(
+      async ({
+        onDone,
+      }: {
+        onDone: (text: string) => Promise<void>;
+      }) => {
+        await onDone("Paragraph one.\n\nParagraph two.");
+      },
+    );
+    (synthesizeSpeech as jest.Mock)
+      .mockResolvedValueOnce("/tmp/provider-1.wav")
+      .mockResolvedValueOnce("/tmp/provider-2.wav");
+    const callbacks = {
+      onTranscription: jest.fn(),
+      onChunk: jest.fn(),
+      onResponseDone: jest.fn(),
+      onAudioReady: jest.fn(),
+      onSpeechTextReady: jest.fn(),
+      onError: jest.fn(),
+    };
+
+    await runVoicePipeline({
+      transcriptionOverride: "Explain glass.",
+      messages: [],
+      model: "gpt-5.4",
+      provider: "openai",
+      providerApiKey: "sk-test",
+      sttMode: "native",
+      ttsMode: "provider",
+      ttsProvider: "openai",
+      ttsApiKey: "sk-test",
+      ttsVoice: "alloy",
+      replyPlayback: "wait",
+      assistantInstructions: "You are a voice assistant.",
+      responseLength: "normal",
+      responseTone: "professional",
+      language: "en",
+      callbacks,
+    });
+
+    expect(callbacks.onAudioReady).toHaveBeenCalledTimes(2);
+    expect(callbacks.onAudioReady).toHaveBeenNthCalledWith(
+      1,
+      "/tmp/provider-1.wav",
+      expect.any(Object),
+      { startsParagraph: false, text: "Paragraph one." },
+    );
+    expect(callbacks.onAudioReady).toHaveBeenNthCalledWith(
+      2,
+      "/tmp/provider-2.wav",
+      expect.any(Object),
+      { startsParagraph: true, text: "Paragraph two." },
+    );
+    expect(callbacks.onSpeechTextReady).not.toHaveBeenCalled();
+  });
+
   it("starts synthesizing each completed follow-up paragraph before the reply ends", async () => {
     (synthesizeSpeech as jest.Mock).mockResolvedValue("/tmp/tts.wav");
     (streamChat as jest.Mock).mockImplementation(

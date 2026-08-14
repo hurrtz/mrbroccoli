@@ -209,7 +209,7 @@ describe("MainScreenVoiceStage composer", () => {
     const orb = screen.getByTestId("voice-orb-idle");
     expect(orb.props.accessibilityLabel).toBe("Tap to speak");
     expect(screen.queryByText("Tap to speak")).toBeNull();
-    // The idle orb draws its plain halo, not the docked bar's waveform chip.
+    // The idle orb draws its quiet bands, not the docked bar's waveform chip.
     expect(
       screen.getByTestId("phosphor-icon-mic", hiddenIconQuery),
     ).toBeTruthy();

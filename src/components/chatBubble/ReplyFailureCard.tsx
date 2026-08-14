@@ -1,5 +1,5 @@
 import React from "react";
-import { Text, TouchableOpacity, View } from "react-native";
+import { Pressable, Text, View } from "react-native";
 
 import { PhosphorIcon } from "../../design-system/PhosphorIcon";
 
@@ -22,12 +22,10 @@ export function ReplyFailureCard({
 
   return (
     <View
+      testID={`reply-failure-card-${message.id}`}
       style={[
         styles.replyFailureCard,
-        {
-          backgroundColor: colors.surface,
-          borderColor: colors.danger,
-        },
+        { borderTopColor: colors.danger },
       ]}
     >
       <View style={styles.replyFailureHeader}>
@@ -49,16 +47,17 @@ export function ReplyFailureCard({
         {t("replyFailedHint")}
       </Text>
       {onRetry ? (
-        <TouchableOpacity
-          style={[
+        <Pressable
+          testID={`reply-failure-retry-${message.id}`}
+          style={({ pressed }) => [
             styles.replyFailureAction,
             {
               backgroundColor: colors.accentSoft,
               borderColor: colors.borderStrong,
             },
+            pressed ? styles.subCardActionPressed : null,
           ]}
           onPress={() => onRetry(message)}
-          activeOpacity={0.86}
           accessibilityRole="button"
           accessibilityLabel={t("retryReply")}
         >
@@ -68,7 +67,7 @@ export function ReplyFailureCard({
           >
             {t("retry")}
           </Text>
-        </TouchableOpacity>
+        </Pressable>
       ) : null}
     </View>
   );

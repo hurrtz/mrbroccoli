@@ -57,5 +57,6 @@ export interface AutoSetupJobState {
   running: boolean;
   start: () => void;
   install: () => void;
+  cancel: () => void;
   retry: () => void;
 }

@@ -67,6 +67,7 @@ export function MessageImageAttachments({
                   styles.removeIcon,
                   { backgroundColor: colors.overlay },
                 ]}
+                testID={`message-image-remove-well-${attachment.id}`}
               >
                 <PhosphorIcon
                   color={colors.surface}
@@ -112,7 +113,7 @@ const styles = StyleSheet.create({
   removeIcon: {
     width: 28,
     height: 28,
-    borderRadius: 14,
+    borderRadius: 10,
     alignItems: "center",
     justifyContent: "center",
   },

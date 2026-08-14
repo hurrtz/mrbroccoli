@@ -54,7 +54,9 @@ framework or hiding platform behavior behind excessive abstraction.
   counter-clockwise tail after the estimate. Interpolation belongs on the
   Reanimated UI thread so streamed-content renders cannot reduce ring frame
   rate; callers provide semantic values and remaining durations, never a JS
-  animation interval.
+  animation interval. Its approved anatomy is core disc, screen-coloured gap,
+  inner phase ring, then the outer whole-turn ring flush against it; no tinted
+  halo may occupy the gap.
 - Every interactive target is at least 44 by 44 points, including icon-only
   buttons. A smaller decorative glyph may sit inside that target.
 - Pressed, disabled, selected, destructive, loading, error, and focus states

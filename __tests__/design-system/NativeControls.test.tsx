@@ -41,6 +41,7 @@ jest.mock("react-native", () => {
 import {
   Button,
   Modal,
+  Tag,
   shouldClaimSheetDrag,
   shouldDismissSheetDrag,
 } from "../../src/design-system/NativeControls";
@@ -81,6 +82,9 @@ describe("NativeControls", () => {
     );
 
     const button = screen.getByRole("button");
+    expect(StyleSheet.flatten(button.props.style)).toMatchObject({
+      minHeight: 48,
+    });
     expect(button.props.accessibilityState).toMatchObject({
       busy: true,
       disabled: true,
@@ -88,6 +92,18 @@ describe("NativeControls", () => {
     expect(screen.getByTestId("native-control-loading")).toBeTruthy();
     fireEvent.press(button);
     expect(onPress).not.toHaveBeenCalled();
+  });
+
+  it("keeps selectable tags on the 44pt target floor", () => {
+    const screen = renderControl(
+      <Tag selected={false} onChange={jest.fn()}>
+        Filter
+      </Tag>,
+    );
+
+    expect(
+      StyleSheet.flatten(screen.getByRole("button").props.style),
+    ).toMatchObject({ minHeight: 44 });
   });
 
   it("renders dialog actions and dispatches the selected action", () => {

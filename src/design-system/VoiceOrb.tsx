@@ -67,9 +67,8 @@ function getPhaseIcon(phase: VoiceVisualPhase): PhosphorIconName {
 }
 
 const BAND = 6;
-const GAP = 3;
+const CORE_GAP = 3;
 const TINT_ALPHA = 0.16;
-const HALO_RING = 8;
 const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 
 /** A UI-thread clock that continues between semantic pipeline updates. */
@@ -241,7 +240,8 @@ function useRingVisibility(hidden: boolean, delayMs: number | undefined) {
  * red as they run, so a late turn is legible without reading anything.
  *
  * At rest there is no turn and no phase, so neither ring means anything —
- * the idle orb draws a plain halo rather than two empty tracks.
+ * the idle orb draws both bands in the same quiet tint rather than two empty
+ * tracks.
  */
 export function VoiceOrb({
   phase = "idle",
@@ -308,13 +308,15 @@ export function VoiceOrb({
     !clamp01(phaseProgress) &&
     !late;
 
-  // The rings shrink by fixed bands while the core shrinks by proportion, so
-  // below ~107pt the proportion would overtake the ring holding it. The core
-  // is clamped to its parent ring and no ring ever shrinks.
-  const hole = size - BAND * 2;
-  const inner = hole - GAP * 2;
+  // The two ring bands are flush. Their shared hole keeps the screen-colour
+  // gap around the proportional core; below the crossover the core is
+  // clamped so that gap survives and the orb remains circular.
+  const inner = size - BAND * 2;
   const innerHole = inner - BAND * 2;
-  const disc = Math.min(innerHole, Math.floor(size * 0.72));
+  const disc = Math.min(
+    innerHole - CORE_GAP * 2,
+    Math.floor(size * 0.79),
+  );
   const iconSide = Math.round(size * 0.3);
   const centre = size / 2;
   const turnRadius = (size - BAND) / 2;
@@ -340,7 +342,7 @@ export function VoiceOrb({
       >
         {quiet ? (
           // At rest both rings are faded phase colour: no clocks, and never
-          // two empty tracks. The gap between them stays a gap.
+          // two empty tracks. The screen-colour core gap stays unpainted.
           <>
             <Circle
               cx={centre}
@@ -418,12 +420,13 @@ export function VoiceOrb({
         style={[
           styles.centre,
           {
-            width: disc + HALO_RING * 2,
-            height: disc + HALO_RING * 2,
-            borderRadius: (disc + HALO_RING * 2) / 2,
-            backgroundColor: tint,
+            width: innerHole,
+            height: innerHole,
+            borderRadius: innerHole / 2,
+            backgroundColor: colors.background,
           },
         ]}
+        testID="voice-orb-core-gap"
       >
         <View
           style={[

@@ -44,6 +44,7 @@ interface MainScreenVoiceStageProps {
   readingProgress?: number | null;
   recordingMaxMs: number;
   recordingStartedAtMs?: number | null;
+  phaseTimingProgress?: VoiceTimingProgress | null;
   speechStartProgress?: VoiceTimingProgress | null;
   statusTitle: string;
   t: TranslateFn;
@@ -80,6 +81,7 @@ export const MainScreenVoiceStage = React.memo(function MainScreenVoiceStage({
   readingProgress = null,
   recordingMaxMs,
   recordingStartedAtMs = null,
+  phaseTimingProgress = null,
   speechStartProgress = null,
   statusTitle,
   t,
@@ -132,6 +134,7 @@ export const MainScreenVoiceStage = React.memo(function MainScreenVoiceStage({
           readingProgress={readingProgress}
           recordingMaxMs={recordingMaxMs}
           recordingStartedAtMs={recordingStartedAtMs}
+          phaseTimingProgress={phaseTimingProgress}
           speechStartProgress={speechStartProgress}
           statusLabel={statusTitle}
           t={t}

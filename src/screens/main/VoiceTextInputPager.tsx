@@ -36,6 +36,7 @@ export function VoiceTextInputPager({
   readingProgress = null,
   recordingMaxMs,
   recordingStartedAtMs,
+  phaseTimingProgress,
   speechStartProgress,
   maxOrbSize,
   statusLabel,
@@ -66,6 +67,7 @@ export function VoiceTextInputPager({
     ),
   );
   const derivedProgress = useOrbTurnProgress({
+    phaseTimingProgress: phaseTimingProgress ?? null,
     readingProgress,
     recordingMaxMs,
     recordingStartedAtMs: recordingStartedAtMs ?? null,

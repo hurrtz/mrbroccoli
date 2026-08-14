@@ -10,6 +10,7 @@ describe("useOrbTurnProgress", () => {
   it("rests at zero while idle", () => {
     const { result } = renderHook(() =>
       useOrbTurnProgress({
+        phaseTimingProgress: null,
         recordingMaxMs: 10_000,
         recordingStartedAtMs: null,
         speechStartProgress: null,
@@ -29,6 +30,7 @@ describe("useOrbTurnProgress", () => {
 
     const { result } = renderHook(() =>
       useOrbTurnProgress({
+        phaseTimingProgress: null,
         recordingMaxMs: 10_000,
         recordingStartedAtMs: 15_000,
         speechStartProgress: null,
@@ -47,6 +49,15 @@ describe("useOrbTurnProgress", () => {
 
     const { result } = renderHook(() =>
       useOrbTurnProgress({
+        phaseTimingProgress: {
+          elapsedMs: 2_000,
+          estimatedMs: 4_000,
+          learned: true,
+          overEstimate: false,
+          progress: 0.5,
+          sampleCount: 4,
+          startedAt: 13_000,
+        },
         recordingMaxMs: 10_000,
         recordingStartedAtMs: null,
         speechStartProgress: {
@@ -64,9 +75,8 @@ describe("useOrbTurnProgress", () => {
 
     expect(result.current.turnProgress).toBeCloseTo(0.5);
     expect(result.current.overtime).toBe(0);
-    // No per-phase estimate exists for processing phases, so the inner ring
-    // rests on the phase tint rather than faking a fraction.
-    expect(result.current.phaseProgress).toBe(0);
+    expect(result.current.phaseProgress).toBeCloseTo(0.5);
+    expect(result.current.phaseProgressTiming).toEqual({ durationMs: 2_000 });
     expect(result.current.turnProgressTiming).toEqual({ durationMs: 5_000 });
     expect(result.current.overtimeTiming).toEqual({
       delayMs: 5_000,
@@ -79,6 +89,7 @@ describe("useOrbTurnProgress", () => {
 
     const { result } = renderHook(() =>
       useOrbTurnProgress({
+        phaseTimingProgress: null,
         recordingMaxMs: 10_000,
         recordingStartedAtMs: null,
         speechStartProgress: {
@@ -102,6 +113,7 @@ describe("useOrbTurnProgress", () => {
   it("holds a full turn ring while speaking", () => {
     const { result } = renderHook(() =>
       useOrbTurnProgress({
+        phaseTimingProgress: null,
         recordingMaxMs: 10_000,
         recordingStartedAtMs: null,
         speechStartProgress: null,
@@ -117,6 +129,7 @@ describe("useOrbTurnProgress", () => {
     const { rerender, result } = renderHook(
       (readingProgress: number | null) =>
         useOrbTurnProgress({
+          phaseTimingProgress: null,
           readingProgress,
           recordingMaxMs: 10_000,
           recordingStartedAtMs: null,

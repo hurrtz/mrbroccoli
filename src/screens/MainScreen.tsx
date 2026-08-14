@@ -520,6 +520,7 @@ export function MainScreen() {
       localTtsModelId: runtimeSettings.localTtsModelId,
       model,
       modelEffort,
+      nativeSttRequiresOnDevice: runtimeSettings.nativeSttRequiresOnDevice,
       provider,
       providerApiKey,
       replyPlayback: runtimeSettings.replyPlayback,
@@ -534,6 +535,10 @@ export function MainScreen() {
       ttsApiKey,
       ttsInstructions: effectiveTtsInstructions,
       ttsListenLanguages: runtimeSettings.ttsListenLanguages,
+      ttsFallbackRoutes: getTtsFallbackRoutes(
+        runtimeSettings.ttsFallbackPolicy,
+        runtimeSettings.ttsMode,
+      ),
       ttsMode: runtimeSettings.ttsMode,
       ttsModel: selectedTtsModel,
       ttsProvider,
@@ -1179,6 +1184,8 @@ export function MainScreen() {
           readingProgress: player.readingProgress,
           recordingMaxMs: maxRecordingMs,
           recordingStartedAtMs,
+          phaseTimingProgress:
+            phaseProgress?.phase === visualPhase ? phaseProgress : null,
           speechStartProgress: phaseProgress?.speechStart ?? null,
           statusTitle: statusDisplay.actionLabel,
           t,

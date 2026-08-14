@@ -118,6 +118,7 @@ function createPlayerBase() {
     seekParagraph: jest.fn(async () => undefined),
     stopPlayback: jest.fn(async () => undefined),
     resetCancellation: jest.fn(),
+    sealPlaybackReel: jest.fn(),
     waitForDrain: jest.fn(async () => undefined),
     enqueueAudio: jest.fn(),
     speakText: jest.fn(),
@@ -397,6 +398,60 @@ describe("useVoicePipeline", () => {
         text: "Paragraph two.",
       }),
     );
+    expect(params.player.enqueueAudio).toHaveBeenNthCalledWith(
+      1,
+      "file://reply-1.wav",
+      expect.any(Object),
+      undefined,
+      { startsParagraph: false, text: "Paragraph one." },
+    );
+    expect(params.player.enqueueAudio).toHaveBeenNthCalledWith(
+      2,
+      "file://reply-2.wav",
+      expect.any(Object),
+      undefined,
+      { startsParagraph: true, text: "Paragraph two." },
+    );
+  });
+
+  it("preserves paragraph boundaries when replaying with native speech", async () => {
+    const params = createParams({
+      ttsMode: "native",
+      ttsProvider: null,
+      player: createPlayer(),
+    });
+    const { result } = renderHook(() => useVoicePipeline(params));
+
+    await act(async () => {
+      await result.current.playReplyText(
+        "Paragraph one.\n\nParagraph two.",
+        "message-1",
+      );
+    });
+
+    expect(params.player.speakText).toHaveBeenCalledTimes(2);
+    expect(params.player.speakText).toHaveBeenNthCalledWith(
+      1,
+      "Paragraph one.",
+      expect.objectContaining({
+        startsParagraph: false,
+        diagnostics: expect.objectContaining({
+          mode: "native",
+          source: "repeat",
+        }),
+      }),
+    );
+    expect(params.player.speakText).toHaveBeenNthCalledWith(
+      2,
+      "Paragraph two.",
+      expect.objectContaining({
+        startsParagraph: true,
+        diagnostics: expect.objectContaining({
+          mode: "native",
+          source: "repeat",
+        }),
+      }),
+    );
   });
 
   it("keeps replay stream text together when the full reply is already available", async () => {
@@ -441,6 +496,11 @@ describe("useVoicePipeline", () => {
         requestId: "speech-request-1",
         source: "repeat",
       }),
+      undefined,
+      {
+        startsParagraph: false,
+        text: "Sentence one. Sentence two.",
+      },
     );
     expect(synthesizeSpeechSequence).not.toHaveBeenCalled();
   });
@@ -498,6 +558,36 @@ describe("useVoicePipeline", () => {
     expect(params.showToast).not.toHaveBeenCalled();
     expect(result.current.replayPhase).toBe("idle");
     expect(result.current.activeReplayMessageId).toBeNull();
+  });
+
+  it("does not let a cancelled replay seal a newer playback reel", async () => {
+    let finishSynthesis!: (audioUri: string) => void;
+    const pendingSynthesis = new Promise<string>((resolve) => {
+      finishSynthesis = resolve;
+    });
+    (synthesizeSpeech as jest.Mock).mockReturnValueOnce(pendingSynthesis);
+    const player = createPlayer();
+    const params = createParams({ player });
+    const { result } = renderHook(() => useVoicePipeline(params));
+    let replayPromise!: Promise<void>;
+
+    act(() => {
+      replayPromise = result.current.playReplyText("Replay this", "message-1");
+    });
+    await waitFor(() => {
+      expect(synthesizeSpeech).toHaveBeenCalledTimes(1);
+    });
+
+    await act(async () => {
+      await result.current.stopReplay();
+    });
+    await act(async () => {
+      finishSynthesis("file://cancelled-replay.wav");
+      await replayPromise;
+    });
+
+    expect(player.sealPlaybackReel).not.toHaveBeenCalled();
+    expect(player.enqueueAudio).not.toHaveBeenCalled();
   });
 
   it("stops replay playback without relying on rendered playback state", async () => {
@@ -627,6 +717,7 @@ describe("useVoicePipeline", () => {
       // rather than being handed an invented one.
       undefined,
     );
+    expect(params.player.sealPlaybackReel).toHaveBeenCalledTimes(1);
     expect(result.current.pipelinePhase).toBe("idle");
     expect(result.current.streamingText).toBe("");
     expect(result.current.lastCompletedReplyRef.current).toBe(
@@ -1735,6 +1826,49 @@ describe("useVoicePipeline", () => {
       }),
     );
     expect(result.current.pipelinePhase).toBe("idle");
+  });
+
+  it("does not let a superseded capture run seal the active run's reel", async () => {
+    type PendingRun = {
+      resolve: (value: string | null) => void;
+    };
+    const runs: PendingRun[] = [];
+    const player = createPlayer();
+    const params = createParams({ player, spokenRepliesEnabled: false });
+    (runVoicePipeline as jest.Mock).mockImplementation(
+      () =>
+        new Promise<string | null>((resolve) => {
+          runs.push({ resolve });
+        }),
+    );
+    const { result } = renderHook(() => useVoicePipeline(params));
+    let firstTurn!: Promise<void>;
+    let secondTurn!: Promise<void>;
+
+    await act(async () => {
+      firstTurn = result.current.handleVoiceCaptureDone({
+        transcriptionOverride: "First turn",
+      });
+      await Promise.resolve();
+    });
+    await act(async () => {
+      secondTurn = result.current.handleVoiceCaptureDone({
+        transcriptionOverride: "Second turn",
+      });
+      await Promise.resolve();
+    });
+
+    await act(async () => {
+      runs[0].resolve("First turn");
+      await firstTurn;
+    });
+    expect(player.sealPlaybackReel).not.toHaveBeenCalled();
+
+    await act(async () => {
+      runs[1].resolve("Second turn");
+      await secondTurn;
+    });
+    expect(player.sealPlaybackReel).toHaveBeenCalledTimes(1);
   });
 
   it("coalesces rapid stream chunks into one visual frame without losing text", async () => {

@@ -53,7 +53,13 @@ export interface VoiceCaptureRequest {
   turnId?: string;
 }
 
-export type AudioPlayer = ReturnType<typeof useAudioPlayer>;
+export type AudioPlayer = Omit<
+  ReturnType<typeof useAudioPlayer>,
+  "sealPlaybackReel"
+> & {
+  /** Present on the production player; optional for focused controller fakes. */
+  sealPlaybackReel?: () => void;
+};
 
 export interface UseVoicePipelineParams {
   activeConversation: Conversation | null;

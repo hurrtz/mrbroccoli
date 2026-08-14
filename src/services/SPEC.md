@@ -103,11 +103,19 @@ abort ART during local speech generation.
 **Decision:** One-tap Android setup does not select Kokoro automatically. A
 compact Piper voice is used when the language has one, otherwise setup keeps
 the phone's language-aware system voice. Kokoro remains an explicit advanced
-choice on Android and the quality-first automatic choice on iOS. Physical
-Android validation showed that synthesis could continue inside the native
-runtime long after the benchmark deadline, and that work has no safe abort
-boundary; timing out only the JavaScript promise would leave the app competing
-with an orphaned native inference job.
+choice on Android and the quality-first automatic choice on iOS. This is a
+platform selection policy, not a runtime prohibition: explicit Kokoro remains
+supported on Android.
+
+Kokoro and Piper/VITS synthesis use Sherpa's streaming engine even though the
+service still returns one completed WAV. Sherpa's one-shot entry point runs
+neural generation on the calling thread; the streaming entry point dispatches
+the same work on both native platforms, keeps React responsive, and provides a
+real cancellation boundary. Abort signals cancel an active TTS stream and no
+cancelled benchmark may persist a verdict. Sherpa file STT has no matching
+native cancel API, so its abort contract is cooperative before and after the
+single file-transcription call; orchestration discards the result and stops
+before any later model step.
 
 Installed models and benchmark state are device-local, excluded from backup,
 and invalidated by catalogue, artifact, runtime, OS, app, or relevant device
@@ -144,10 +152,9 @@ JSON and passphrase-encrypted AES-256-GCM with bounded input size and a minimum
 passphrase length.
 
 Portable settings exclude `apiKeys` and provider-validation diagnostics.
-Backups exclude downloaded models, audio, derived knowledge/index data,
-integrity snapshots, debug logs, and caches. Restore validates the complete
-shape before mutation and delegates non-destructive conversation merging to the
-conversation hook.
+Backups exclude downloaded models, audio, derived knowledge/index data, debug
+logs, and caches. Restore validates the complete shape before mutation and
+delegates non-destructive conversation merging to the conversation hook.
 
 ### Phonemization runtime
 

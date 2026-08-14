@@ -5,6 +5,7 @@ import { fireEvent, render } from "@testing-library/react-native";
 import { IconAction } from "../../src/features/settings/settings-primitives/IconAction";
 import { LocalModelRouteGroup } from "../../src/features/settings/settings-primitives/LocalModelRouteGroup";
 import { PremiumBand } from "../../src/features/settings/settings-primitives/PremiumBand";
+import { SettingsPillAction } from "../../src/features/settings/settings-primitives/SettingsPillAction";
 import { RouteOptionRow } from "../../src/features/settings/settings-primitives/RouteOptionRow";
 import { SettingsGroup } from "../../src/features/settings/settings-primitives/SettingsGroup";
 import { SettingsRow } from "../../src/features/settings/settings-primitives/SettingsRow";
@@ -174,7 +175,7 @@ describe("settings design primitives", () => {
     });
     expect(
       StyleSheet.flatten(screen.getByTestId("test-model-well").props.style),
-    ).toMatchObject({ height: 36, width: 36 });
+    ).toMatchObject({ borderRadius: 12, height: 36, width: 36 });
     fireEvent.press(screen.getByTestId("test-model"));
     expect(onPress).toHaveBeenCalledTimes(1);
   });
@@ -273,7 +274,26 @@ describe("settings design primitives", () => {
       lightColors.premiumGradientSoftMiddle,
       lightColors.premiumGradientSoftEnd,
     ]);
+    expect(
+      StyleSheet.flatten(
+        screen.getByTestId("premium-band-badge").props.style,
+      ),
+    ).toMatchObject({ borderRadius: 18, height: 36, width: 36 });
     fireEvent.press(screen.getByLabelText("Upgrade"));
     expect(onPress).toHaveBeenCalledTimes(1);
+  });
+
+  it("renders compact settings actions as controls rather than pills", () => {
+    const screen = wrap(
+      <SettingsPillAction
+        label="Remove"
+        onPress={jest.fn()}
+        testID="settings-action"
+      />,
+    );
+
+    expect(
+      StyleSheet.flatten(screen.getByTestId("settings-action").props.style),
+    ).toMatchObject({ borderRadius: 10, minHeight: 44 });
   });
 });

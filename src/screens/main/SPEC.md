@@ -39,10 +39,12 @@ receive already-derived state and callbacks.
   recording window, then the read position), and transcribing through
   synthesizing keeps two clocks — the inner one the current phase against
   itself, the outer one the whole turn against its speech-start estimate. Past
-  the estimate both fill with red. The gap between the rings is only ever a
-  gap: the screen reads through it in every phase. The orb is sized from the space the column actually leaves it,
-  clamped between 96pt and its ceiling (196 portrait, 150 landscape), so the
-  intro banner or a landscape split simply makes it smaller.
+  the estimate both fill with red. The gap between the core disc and the inner
+  ring is only ever a gap: the screen reads through it in every phase, while
+  the inner and outer rings meet flush. The orb is sized from the space the
+  column actually leaves it, clamped between 96pt and its ceiling (196
+  portrait, 150 landscape), so the intro banner or a landscape split simply
+  makes it smaller.
 - In portrait, left and right 44pt chevrons flank the measured orb. They make
   the voice/text pager discoverable without competing with the voice action.
   **Decision:** the pager is a closed circle — every decisive swipe and every
@@ -106,7 +108,12 @@ receive already-derived state and callbacks.
   boundaries and only runs backwards when the listener sends it back: neither
   speech route reports a clip's duration, and a streamed reply grows while it
   is spoken, so a per-second fill would be invented and an unguarded remeasure
-  would drag the ring back through content already read.
+  would drag the ring back through content already read. Streaming, wait-mode,
+  native, provider, and Restart playback all preserve the same paragraph
+  markers. Once the response is sealed, a natural queue drain completes the
+  arc; a temporary gap while more streamed clips can still arrive does not.
+  Native teardown for Stop or paragraph seek is not a natural drain, and a
+  superseded capture or replay session cannot seal the active response's reel.
 - **Decision:** the workspace carries no status line and no session-details
   sheet. The orb states the phase visually and announces every phase change to
   assistive technology, the transcript handle names the latest model and age,
@@ -174,7 +181,7 @@ receive already-derived state and callbacks.
 - The satellites — image attach, Model Council, and Web Search — sit in a row
   under the portrait orb. They change how the next turn is answered, so they
   read as notes on that action rather than settings to pass through on the way in.
-  Toggles carry a round well that tints when on; momentary actions stay
+  Toggles carry a squircle well that tints when on; momentary actions stay
   borderless. During speech the row also carries the stop and barge-in
   actions, because the orb has one press.
 - Landscape retains the Council and Web toggles but omits image attachment and
@@ -246,7 +253,15 @@ three never shows close — Done is the exit.
 voice-pipeline turn on the user's configured routes with an empty history and
 callbacks that hold only local state, so nothing reaches the conversation
 store. The number shown is release-to-speech latency — the figure that
-improves when routes change.
+improves when routes change. A native STT route first transcribes the captured
+file through the platform recognizer, then supplies that transcript to the
+shared pipeline because provider transcription deliberately rejects `native`.
+The turn retains the configured TTS fallback order, treats a late speech error
+as a failed test, and stops only playback that the introduction itself started
+when the flow closes, unmounts, or another test starts. Shared player
+cancellation is reset before a new test or replay. Exit and unmount also abort
+recorded-file recognition, stop and delete an active capture, and delete a
+capture URI that arrives after the run became stale.
 
 The automatic setup step carries the shared `AutoSetupCard` with its header
 hidden — the step title and body already say what it is. The job behind it
@@ -257,8 +272,8 @@ views of one state, so leaving the introduction mid-install keeps the download
 running and reachable. Its six
 states run offer → scanning → proposal → installing → done or failed; nothing
 downloads before the proposal has been seen; the staged ~2.5s measurement
-  reveals only real device readings; a transfer failure keeps completed models
-  and retry resumes the queue rather than starting over. A persisted completed
+reveals only real device readings; a transfer failure keeps completed models
+and retry resumes the queue rather than starting over. A persisted completed
   profile is rechecked against pinned installs and current-device benchmarks on
   the next launch; a ready profile restores the card's Ready verdict, while a
   stale benchmark proposes testing only. Completing the automatic install
@@ -271,7 +286,11 @@ downloads before the proposal has been seen; the staged ~2.5s measurement
   `BackgroundTaskBar` otherwise — never both. The completed home row remains
   available briefly so its destination is actionable; install failure remains
   there until the user opens setup or retries. Setup progress and outcomes do
-  not use transient toasts.
+  not use transient toasts. Scanning and installation each expose a labelled
+  Cancel action. Cancelling a scan returns to the offer; cancelling an install
+  returns to its proposal, retains completed artifacts, and can resume. The
+  abort signal reaches downloads and interruptible benchmarks, and a cancelled
+  run may neither publish an outcome nor apply settings after the fact.
 
 **Decision:** The introduction follows the app's light or dark theme. Only the
 workspace banner keeps a palette of its own -- violet, in both themes -- because

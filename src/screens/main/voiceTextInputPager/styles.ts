@@ -1,5 +1,5 @@
 import { StyleSheet } from "react-native";
-import { fonts, textStyles } from "../../../theme/typography";
+import { textStyles } from "../../../theme/typography";
 
 export const PAGE_GAP = 32;
 
@@ -128,46 +128,5 @@ export const voiceTextInputPagerStyles = StyleSheet.create({
   },
   promptBlockedAction: {
     ...textStyles.compactAction,
-  },
-  driveControls: {
-    flexDirection: "column",
-    gap: 6,
-    paddingTop: 6,
-  },
-  driveControlRow: {
-    flexDirection: "row",
-    gap: 8,
-  },
-  driveControl: {
-    flex: 1,
-    minHeight: 48,
-    borderRadius: 12,
-    borderWidth: 1,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 8,
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-  },
-  driveControlLabel: {
-    fontFamily: fonts.bodyMedium,
-    fontSize: 14,
-    lineHeight: 18,
-    textAlign: "center",
-  },
-  driveCountdownChip: {
-    alignSelf: "flex-end",
-    borderRadius: 99,
-    minHeight: 24,
-    justifyContent: "center",
-    paddingHorizontal: 11,
-    paddingVertical: 4,
-  },
-  driveCountdownLabel: {
-    fontFamily: fonts.mono,
-    fontSize: 11,
-    letterSpacing: 0.4,
-    lineHeight: 15,
   },
 });

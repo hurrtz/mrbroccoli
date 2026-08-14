@@ -41,6 +41,8 @@ interface UsePlaybackReelParams {
   /** Bumped by the player whenever a new response supersedes the last. */
   playbackGenerationRef: { current: number };
   resetCancellation: () => void;
+  /** True while player teardown belongs to a paragraph seek, not a drain. */
+  seekIntentRef: { current: boolean };
   stopPlayback: () => Promise<void> | void;
 }
 
@@ -67,6 +69,7 @@ export function usePlaybackReel({
   speakText,
   playbackGenerationRef,
   resetCancellation,
+  seekIntentRef,
   stopPlayback,
 }: UsePlaybackReelParams) {
   const unitsRef = useRef<PlaybackUnit[]>([]);
@@ -74,6 +77,7 @@ export function usePlaybackReel({
   const playingIndexRef = useRef(-1);
   const startedAtRef = useRef(0);
   const floorRef = useRef(0);
+  const sealedRef = useRef(false);
   const [readingProgress, setReadingProgress] = useState<number | null>(null);
   // State, not a ref read: Back and Forward have to come alive the moment the
   // reply holds a second paragraph, and nothing else is guaranteed to
@@ -119,13 +123,20 @@ export function usePlaybackReel({
   const syncGeneration = useCallback(() => {
     if (generationRef.current !== playbackGenerationRef.current) {
       generationRef.current = playbackGenerationRef.current;
+      // stopPlayback/resetCancellation bump generation during a seek. A
+      // streamed unit arriving while that teardown is pending still belongs
+      // to this response, so adopt the marker without discarding the reel.
+      if (seekIntentRef.current) {
+        return;
+      }
       unitsRef.current = [];
       playingIndexRef.current = -1;
       floorRef.current = 0;
+      sealedRef.current = false;
       setReadingProgress(null);
       setParagraphCount(0);
     }
-  }, [playbackGenerationRef]);
+  }, [playbackGenerationRef, seekIntentRef]);
 
   /** Reports the absolute unit, so a seeked reel still counts from zero. */
   const markStarted = useCallback(
@@ -219,8 +230,25 @@ export function usePlaybackReel({
     [],
   );
 
+  /** No more units can arrive for this response. */
+  const seal = useCallback(() => {
+    sealedRef.current = true;
+  }, []);
+
+  /** Natural drain completes a sealed response, never a temporary stream gap. */
+  const markDrained = useCallback(() => {
+    if (!sealedRef.current || unitsRef.current.length === 0) {
+      return;
+    }
+    floorRef.current = 1;
+    setReadingProgress(1);
+  }, []);
+
   const seekParagraph = useCallback(
     async (direction: "back" | "forward") => {
+      if (seekIntentRef.current) {
+        return;
+      }
       const units = unitsRef.current;
       const playing = playingIndexRef.current;
       if (units.length === 0 || playing < 0) {
@@ -252,17 +280,32 @@ export function usePlaybackReel({
         return;
       }
 
-      await stopPlayback();
-      resetCancellation();
-      // Both of those bump the player's generation. That marker means "a new
-      // answer supersedes this one", and a seek is the opposite — the same
-      // answer, from further back — so the reel adopts the new number instead
-      // of forgetting the reply it is still reading.
-      generationRef.current = playbackGenerationRef.current;
-      playingIndexRef.current = target;
-      // The listener asked to move back, so the arc is allowed to follow.
-      publishProgress(direction === "back");
-      units.slice(target).forEach((unit, offset) => play(unit, target + offset));
+      seekIntentRef.current = true;
+      try {
+        await stopPlayback();
+        resetCancellation();
+        // Both of those bump the player's generation. That marker means "a new
+        // answer supersedes this one", and a seek is the opposite — the same
+        // answer, from further back — so the reel adopts the new number instead
+        // of forgetting the reply it is still reading. Units streamed while
+        // native teardown was pending stay on the live reel and are replayed.
+        generationRef.current = playbackGenerationRef.current;
+        const liveUnits = unitsRef.current;
+        const liveTarget = liveUnits.findIndex(
+          (unit) => unit.paragraph === targetParagraph,
+        );
+        if (liveTarget < 0) {
+          return;
+        }
+        playingIndexRef.current = liveTarget;
+        // The listener asked to move back, so the arc is allowed to follow.
+        publishProgress(direction === "back");
+        liveUnits
+          .slice(liveTarget)
+          .forEach((unit, offset) => play(unit, liveTarget + offset));
+      } finally {
+        seekIntentRef.current = false;
+      }
     },
     [
       paragraphOrder,
@@ -270,15 +313,18 @@ export function usePlaybackReel({
       playbackGenerationRef,
       publishProgress,
       resetCancellation,
+      seekIntentRef,
       stopPlayback,
     ],
   );
 
   return {
     canSeekParagraph: paragraphCount > 1,
+    markDrained,
     readingProgress,
     recordAudio,
     recordSpeech,
+    seal,
     seekParagraph,
   };
 }

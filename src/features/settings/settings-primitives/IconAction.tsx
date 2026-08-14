@@ -118,7 +118,7 @@ const styles = StyleSheet.create({
   well: {
     width: 36,
     height: 36,
-    borderRadius: 11,
+    borderRadius: 12,
     borderWidth: 1,
     alignItems: "center",
     justifyContent: "center",
