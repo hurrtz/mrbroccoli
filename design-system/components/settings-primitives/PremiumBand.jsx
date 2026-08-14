@@ -14,7 +14,7 @@ export function PremiumBand({ copy, actionLabel = "Upgrade", onPress }) {
         <span style={{ display: "block", fontFamily: "var(--mb-font-display)", fontWeight: 600, fontSize: 14, letterSpacing: ".2px", color: "var(--mb-color-premium, #A07C1F)" }}>Premium</span>
         <span style={{ display: "block", fontFamily: "var(--mb-text-supporting-family)", fontSize: 12, lineHeight: "17px", color: "var(--mb-color-text-secondary)" }}>{copy}</span>
       </span>
-      <span role="button" onClick={onPress} style={{ minHeight: 36, padding: "7px 15px", borderRadius: 99, cursor: "pointer", display: "inline-flex", alignItems: "center", flexShrink: 0, fontFamily: "var(--mb-font-display)", fontWeight: 600, fontSize: 13, background: "linear-gradient(150deg, #E3B84C, #A07C1F)", color: "#FFF9E8", boxShadow: "0 2px 10px rgba(160,124,31,.45)" }}>{actionLabel}</span>
+      <span role="button" onClick={onPress} style={{ minHeight: 44, padding: "7px 15px", borderRadius: "var(--mb-radius-control)", cursor: "pointer", display: "inline-flex", alignItems: "center", flexShrink: 0, fontFamily: "var(--mb-font-display)", fontWeight: 600, fontSize: 13, background: "linear-gradient(150deg, #E3B84C, #A07C1F)", color: "#FFF9E8", boxShadow: "0 2px 10px rgba(160,124,31,.45)" }}>{actionLabel}</span>
     </div>
   );
 }

@@ -38,7 +38,7 @@ export function Modal({ visible, title, children, footer = [], layout = "dialog"
         ) : null}
         <div style={{ flexShrink: 1, minHeight: 0, overflow: "auto", display: "flex", flexDirection: "column", gap: 12, color: "var(--mb-color-text)" }}>{children}</div>
         {footer.length ? (
-          <div style={{ display: "flex", flexWrap: "wrap", gap: 8, justifyContent: "flex-end" }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
             {footer.map((action, index) => (
               <button
                 key={action.text + index}
@@ -46,9 +46,10 @@ export function Modal({ visible, title, children, footer = [], layout = "dialog"
                 disabled={action.disabled || action.loading}
                 onClick={action.onPress}
                 style={{
-                  display: "flex", alignItems: "center", gap: 8, minHeight: 44, padding: "11px 14px",
-                  borderRadius: "var(--mb-radius-tag)", border: "none", cursor: "pointer",
+                  display: "flex", alignItems: "center", justifyContent: "center", gap: 8, minHeight: 48, padding: "11px 16px",
+                  borderRadius: "var(--mb-radius-control)", cursor: "pointer",
                   background: action.tone === "success" ? "var(--mb-color-success)" : "transparent",
+                  border: "1px solid " + (action.tone === "success" ? "var(--mb-color-success)" : "var(--mb-color-border)"),
                   color: action.tone === "success" ? "var(--mb-color-on-active-control)" : "var(--mb-color-accent)",
                   fontFamily: "var(--mb-font-body-medium)", fontWeight: 500, fontSize: 15,
                   opacity: action.disabled || action.loading ? "var(--mb-disabled-opacity)" : 1,

@@ -1,4 +1,4 @@
-<!-- @dsCard group="Components" viewport="700x700" name="Settings primitives" subtitle="Cards, rows, pickers and radio sections" -->
+<!-- @dsCard group="Components" viewport="760x560" name="Settings primitives" subtitle="Groups, rows, route options, lifecycle actions, readiness and the premium band" -->
 <!DOCTYPE html><html data-theme="light"><head><meta charset="utf-8">
 <link rel="stylesheet" href="../../styles.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/regular/style.css">
@@ -6,48 +6,37 @@
 <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
 <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
 <script src="../../_ds_bundle.js"></script>
-<style>body{padding:16px;background:var(--mb-color-background)}</style>
+<style>body{padding:16px;background:var(--mb-color-background)}.lbl{font-family:var(--mb-font-mono);font-size:10px;letter-spacing:.9px;text-transform:uppercase;color:var(--mb-color-text-muted);margin:0 0 6px}</style>
 </head><body><div id="root"></div>
 <script type="text/babel">
-const { AntSectionIntro, AntSettingsCard, AntDisclosureCard, AntSwitchRow, AntNumberInputRow,
-        AntRadioSection, AntPickerSection, AntPickerRow, AntTextArea, AntButtonLabel,
-        Button, IconButton, Input, PhosphorIcon, RuntimeReadiness } = window.MrBroccoliDesignSystem_62d510;
+const { SettingsGroup, SettingsRow, RouteOptionRow, IconAction, PremiumBand, RuntimeReadiness, Switch, PhosphorIcon } = window.MrBroccoliDesignSystem_62d510;
 function Demo(){
-  const [speak,setSpeak]=React.useState(true);
-  const [rounds,setRounds]=React.useState(2);
-  const [theme,setTheme]=React.useState("system");
-  const [route,setRoute]=React.useState("device");
-  const [open,setOpen]=React.useState(true);
+  const [search, setSearch] = React.useState(true);
+  const [stats, setStats] = React.useState(false);
   return <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:16,alignItems:"start"}}>
     <div style={{display:"flex",flexDirection:"column",gap:12}}>
-      <AntSectionIntro title="Speaking" description="Spoken replies, playback, voices, and previews." />
-      <AntSettingsCard title="Voice replies" headerExtra={<IconButton icon="info-circle" accessibilityLabel="About voice replies" />}
-        footer={<Button size="small"><AntButtonLabel color="var(--mb-color-accent)" icon="sound" label="Preview" /></Button>}>
-        <AntSwitchRow label="Speak answers" description="Replies are read aloud paragraph by paragraph." value={speak} onChange={setSpeak} />
-        <AntNumberInputRow label="Review rounds" value={rounds} onChange={setRounds} />
-      </AntSettingsCard>
-      <AntDisclosureCard expanded={open} onToggle={()=>setOpen(!open)} toggleAccessibilityLabel="Show OpenAI settings"
-        header={<span style={{display:"flex",alignItems:"center",gap:12}}>
-          <PhosphorIcon name="key" size="control" color="var(--mb-color-accent)" />
-          <span style={{fontFamily:"var(--mb-font-display)",fontWeight:600,fontSize:16}}>OpenAI</span>
-        </span>}>
-        <Input type="password" value="sk-live-8f2c" onChange={()=>{}} allowClear />
-      </AntDisclosureCard>
+      <div><p className="lbl">RuntimeReadiness</p>
+        <RuntimeReadiness readiness={{think:"ready",listen:"attention",speak:"broken",search:"off"}} onSelect={()=>{}} /></div>
+      <SettingsGroup title="Conversation" footer="Helper prose lives in footers, never inside a row." style={{padding:0}}>
+        <SettingsRow icon="sliders" label="Response style" value="Balanced" />
+        <SettingsRow icon="global" label="Web search" control={<Switch value={search} onChange={setSearch} accessibilityLabel="Web search" />} />
+        <SettingsRow icon="line-chart" label="Usage stats" control={<Switch value={stats} onChange={setStats} accessibilityLabel="Usage stats" />} />
+        <SettingsRow icon="delete" label="Clear speech cache" danger control={null} last />
+      </SettingsGroup>
     </div>
     <div style={{display:"flex",flexDirection:"column",gap:12}}>
-      <AntRadioSection label="Theme" value={theme} onChange={setTheme}
-        options={[{value:"light",label:"Light"},{value:"dark",label:"Dark"},{value:"system",label:"System"}]} />
-      <AntPickerSection title="Speech to text" helperText="Recognition runs on the device unless a provider is chosen.">
-        <AntPickerRow label="Route" value={route} onChange={setRoute}
-          options={[{value:"device",label:"On device"},{value:"provider",label:"Provider"}]} />
-        <AntPickerRow label="Recognition language" value="auto" onChange={()=>{}}
-          options={[{value:"auto",label:"Automatic"},{value:"en",label:"English"},{value:"de",label:"German"}]} />
-      </AntPickerSection>
-      <AntSettingsCard title="System prompt">
-        <AntTextArea value="Answer plainly. Written to be read aloud." placeholder="Answer plainly." onChange={()=>{}} />
-      </AntSettingsCard>
-      <div>
-        <RuntimeReadiness readiness={{think:"ready",listen:"attention",speak:"broken",search:"off"}} onSelect={()=>{}} />
+      <SettingsGroup title="Who listens" footer="A radio unlocks only after a viable test — testing is the egg, and it cracks when a model fails." style={{padding:0}}>
+        <RouteOptionRow selected label="Your phone" meta="No download, no cost" />
+        <RouteOptionRow disabled label="Whisper Small" meta="Not installed · 466 MB"
+          action={<IconAction icon="download" label="Download Whisper Small" />} />
+        <RouteOptionRow disabled label="Whisper Large v3" meta="Downloading · 62%"
+          action={<IconAction icon="close" label="Cancel download" danger />} />
+        <RouteOptionRow label="Kokoro 82M" meta="Test failed · retry"
+          action={<IconAction icon="egg-cracked" label="Test again" danger />} />
+        <RouteOptionRow locked label="Deepgram" meta="Via provider · your key" last />
+      </SettingsGroup>
+      <div style={{borderRadius:"var(--mb-radius-card)",border:"1px solid var(--mb-color-premium-border)",overflow:"hidden"}}>
+        <PremiumBand copy="Every provider, web search, Model Council, premium voices." />
       </div>
     </div>
   </div>;

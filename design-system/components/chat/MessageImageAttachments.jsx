@@ -16,7 +16,7 @@ export function MessageImageAttachments({ attachments = [], onRemove, compact = 
           {onRemove ? (
             <button type="button" aria-label={"Remove image " + (index + 1)} onClick={() => onRemove(attachment.id)}
               style={{ position: "absolute", right: 0, top: 0, width: 44, height: 44, background: "none", border: "none", cursor: "pointer", display: "flex", alignItems: "flex-start", justifyContent: "flex-end", padding: 0 }}>
-              <span style={{ width: 28, height: 28, borderRadius: 14, background: "var(--mb-color-overlay)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+              <span style={{ width: 28, height: 28, borderRadius: "var(--mb-radius-control)", background: "var(--mb-color-overlay)", display: "flex", alignItems: "center", justifyContent: "center" }}>
                 <PhosphorIcon name="close" size="compact" color="var(--mb-color-surface)" />
               </span>
             </button>

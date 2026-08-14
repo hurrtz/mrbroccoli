@@ -4,7 +4,7 @@ The normative description of the home screen. The living demo is `ui_kits/mobile
 
 ## Composition
 
-One column in portrait: top bar, introduction banner (until opened once), route byline, settings sentence, orb with satellites, status line, transcript handle. In landscape, two panes with a hairline divider: controls left, transcript right.
+One column in portrait: top bar, introduction banner (until opened once), route byline, settings sentence, orb with satellites, transcript handle. In landscape, two panes with a hairline divider: controls left, transcript right.
 
 - Top bar is 62pt, the wordmark absolutely centred, menu and settings icon buttons pinned to the edges so a long localised title never pushes them around.
 - The top third stays quiet: wordmark, one-line byline, one line of settings. The orb is the screen's single loud element — never more than one loud thing per view.
@@ -16,9 +16,9 @@ One column in portrait: top bar, introduction banner (until opened once), route 
 Who answers the next turn, at what effort, one line above the stage.
 
 - It is **not** a button: no fill, no border, no card. A contained control here reads as a second CTA directly above the voice stage. The provider mark supplies the prominence; the closing hairline says the whole row is the target.
-- The effort dots are that model's **own** ladder, so the count varies — four steps on GPT-5, three on Sonnet. A model with no effort control reads "Normal" with no dots; one dot would carry no information.
+- Effort is named, not plotted: the mono effort word alone. The dot ladder is retired (owner call, 2026-08) — the name already says it, and a model with no effort control reads "Normal". No information.
 - `switchable={false}` for a single configured model: caret and press target both go, and the row becomes a credit line. On-device routes take the `cpu` glyph, never a provider mark or letter fallback.
-- It replaces `ResponseModeToggle` on this screen only. The app's switcher renders four different layouts for one, two, three and four-plus models; the byline is one treatment at every count, one line tall in both orientations. `ResponseModeToggle` stays in the system unchanged for anywhere else.
+- It replaces the app's model switcher, which renders four different layouts for one, two, three and four-plus models. The byline is one treatment at every count, one line tall in both orientations. `ResponseModeToggle` stays in the system unchanged for anywhere else.
 
 ## Route picker (`RoutePicker`)
 
@@ -33,19 +33,20 @@ The conversation's settings as one line of muted text ("Balanced · Brief · Hea
 The central voice control. Two concentric rings around a filled core carrying the phase glyph.
 
 - **The glyph says what tapping does**, not what the machine is doing: `stop` while recording, `pause` while speaking, `mic` at rest. The disc takes the phase colour; the icon takes whichever of near-black or white measures higher contrast against it.
-- **Two rings, two clocks.** The outer ring is the whole turn against its estimate, drawn in a neutral so it reads as time. The inner ring is the current phase against itself, in the phase's own colour. Past the estimate, `overtime` rises and both rings fill red as it runs — a full lap late is a fully red orb.
-- **Idle draws a plain halo.** At rest there is no turn and no phase, so neither ring means anything — never two empty tracks.
-- **Sizing.** 196 in portrait, 150 in landscape, stepped down to 156 while the introduction banner is up. Below about 120 the rings stop being legible — use `PhaseAwareVoiceAction` instead. The orb is sized to the space actually available: measure the container's **content box**, derive the diameter, clamp to a min and max. Never hardcode a size per layout; that constant was itself a bug.
+- **Ring anatomy, inside out:** the disc; a small gap that is only ever a gap — the screen reads through it, no fill, no interaction, identical in every phase; the inner ring; the outer ring flush against it, nothing between the two rings.
+- **What the rings mean per phase.** Idle: both rings faded green — no clocks, never two empty tracks. Recording: both combine into one indicator — how much of the recording window is used before what was said auto-submits. Transcribing through synthesizing: two clocks — the outer ring is the whole turn against its estimate in a neutral (time, not phase); the inner ring is the current phase against itself in the phase’s own colour. Speaking: both combine again — how much of the response has been read; Back jumps to the start of the current paragraph (or the preceding one inside the first two seconds), Forward to the next, every jump moves the arc, and at the last word the orb falls back to idle. Past the estimate the rings fill red as the turn runs late.
+- **Sizing.** 196 in portrait, 150 in landscape, stepped down to 156 while the introduction banner is up. Below about 120 the rings stop being legible, and there is no smaller variant — give the orb its room. The orb is sized to the space actually available: measure the container's **content box**, derive the diameter, clamp to a min and max. Never hardcode a size per layout; that constant was itself a bug.
 - **Two implementation traps, both real bugs once:** (1) the core disc is a proportion of the whole orb but the rings shrink by fixed bands — below roughly 107pt the proportion overtakes the ring containing it and the orb goes oval; clamp the core to its parent ring and never let a ring shrink. (2) The orb must be measurably circular at min, default and max sizes.
 
 ## Satellites (`OrbSatellite`)
 
-A row of 44pt controls with mono labels beneath the orb. Two species, deliberately drawn apart: **Image is momentary** — a bare glyph, an action; **Council and Web are state** — round toggles that fill with `accent-soft` and take an accent border when on. Council takes `users-three` (`robot` already means the thinking phase). In landscape the labels go and the name moves onto the control (`aria-label`); the column has no room for captions.
+**The ring belongs to the phase.** At idle it carries the composing controls — image, council, web — the only moment they mean anything. When a turn starts they give way (gently, no reflow) to four transport verbs: Restart · Back · Forward · Stop. Through transcribing, searching, thinking and synthesising the three seek verbs are disabled and only **Stop** is live — it abandons the turn and returns to idle. In the speaking phase all four come alive; at the last word, or on Stop, the orb returns to idle and the composing three come back. Back returns to the start of the current paragraph (or the preceding one inside the first two seconds), Forward goes to the next, and both move the orb’s reading arc with the playhead; the orb tap remains pause/resume and keeps position.
 
-## Status line (`WorkspaceStatusLine`)
+Tone: the transport verbs tint their **glyph and label only** — Stop in danger, Resume in success, no fill and no border; everything else stays neutral. A row of 44pt controls with mono labels beneath the orb. Two species, deliberately drawn apart: **Image is momentary** — a bare glyph, an action; **Council and Web are state** — toggles that fill with `accent-soft` and take an accent border when on. Council takes `users-three` (`robot` already means the thinking phase). In landscape the labels go and the name moves onto the control (`aria-label`); the column has no room for captions.
 
-Phase dot, what is happening, what the conversation is. It carries the conversation name and age in every transcript-handle treatment, so the handle never has to.
+## Status line — removed
 
+The upstream status line (phase dot · activity · conversation meta under the orb) is removed from the product (owner call, 2026-08): it read as alien and duplicated what the orb’s phase states, the settings sentence and the transcript handle already carry. Phase feedback lives in the orb; the transcript handle’s meta line owns conversation name and age.
 ## Composer and pager
 
 Voice and text input are two pager pages.
@@ -62,14 +63,13 @@ What it opens is a **sheet over the workspace**, not a new screen: the route and
 
 ## Landscape
 
-Landscape sheds what it does not need: no swipe pager, no attach control, no settings sentence — and because the right pane has room, the transcript stops hiding. The orb sits centred in its column at 150pt with the icon controls pinned to the column's right edge. The left column is roughly 300pt after gutters; everything in it must hold at that width, one line tall.
+Landscape keeps the phase-owned ring — icon-only, no labels, but the same swap and the same rules, so a drive session can be stopped there too. The settings control floats over the stage's top-right corner rather than taking a row of its own (`iconOnly`): the words cost the orb height the narrow column cannot spare, and the orb then owns everything between the byline's hairline and the control row, centred in it. Beyond that it sheds what it does not need: no swipe pager, no attach control, no settings sentence — and because the right pane has room, the transcript stops hiding. The orb sits centred in its column at 150pt with the icon controls pinned to the column's right edge. The left column is roughly 300pt after gutters; everything in it must hold at that width, one line tall.
 
-## Kept unchanged
+## Retired with this design
 
-`ResponseModeToggle` and `PhaseAwareVoiceAction` remain in the system and the codebase. They are still correct anywhere the voice action sits in a bar rather than owning the screen. The orb composition is a replacement on this one screen, not a deletion.
-
+`ResponseModeToggle` (the four-layout model switcher) and `PhaseAwareVoiceAction` (the phase-coloured voice bar) were **deleted** from the system in 2026-08. The orb plus the route byline replace both, at every model count and every phase; there is no small-orb variant to fall back to — give the orb its room. `WorkspaceStatusLine` and `DriveSessionControls` are gone for the same reason: their jobs moved into the orb and its satellite ring.
 ## Drive mode
 
-The third input mode ("Drive Session", premium): hands-free voice activity detection against an ambient acoustic profile, a 10-second silence window with spoken countdown cues, auto-submit, auto-continue. While active, `DriveSessionControls` sits directly above the composer: **Repeat last** plus one fixed-position **Pause/Resume toggle** whose accent fill means the loop is live; the silence countdown appears as a "Sends in N…" chip over the toggle (and is spoken, as upstream). Headset/car remote buttons map to the same two actions; the orb keeps working as the manual press.
+The third input mode ("Drive Session", premium): hands-free voice activity detection against an ambient acoustic profile, a silence window with spoken countdown cues, auto-submit, auto-continue. It adds **no controls of its own** — the satellite ring already carries everything. In a drive session the ring shows transport in every phase, idle included: a driver must be able to end the loop at rest, not only mid-turn. Stop ends the loop and becomes **Resume**, which starts it again; the three seek verbs follow the usual rule (live only while he speaks). The composing controls (image, council, web) are unavailable for the duration — hands-free is the point, and they are reachable again the moment the session ends. Headset and car-remote buttons map to the same two actions, and the orb keeps working as the manual press.
 
-**Deliberate departure from upstream:** `DriveSessionControls.tsx` ships three equal buttons (Pause auto · Repeat last · Resume auto) with pause/resume as a pair, one always disabled. The system replaces the pair with the single fixed-position toggle — positions never swap, the fill state reads at arm's length, the freed width pays for 14px labels, and the countdown (which upstream surfaces to the pager but never draws) gets an on-screen home.
+**Deliberate departures from upstream:** upstream’s `DriveSessionControls.tsx` ships a dock row of three equal buttons (Pause auto · Repeat last · Resume auto) with pause/resume as a pair, one always disabled. The system retires that row entirely (owner call, 2026-08): pause/resume collapse into the ring's Stop/Resume, and "Repeat last" is dropped because Restart already replays the response from its first word. One ring, one Stop, whatever the mode — nothing on screen competes for the same verb.

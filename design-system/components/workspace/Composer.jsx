@@ -20,7 +20,7 @@ export function Composer({ value = "", onChange, onSend, height, placeholder = "
           fontFamily: "var(--mb-font-body)", fontSize: 15, lineHeight: "21px", color: "var(--mb-color-text)", padding: 0 }} />
       <div style={{ display: "flex", justifyContent: "flex-end" }}>
         <span role="button" aria-label="Send" aria-disabled={!canSend} onClick={canSend ? onSend : undefined}
-          style={{ width: 46, height: 46, borderRadius: 23, flexShrink: 0, cursor: canSend ? "pointer" : "default",
+          style={{ width: 46, height: 46, borderRadius: "var(--mb-radius-icon-button)", flexShrink: 0, cursor: canSend ? "pointer" : "default",
             display: "flex", alignItems: "center", justifyContent: "center",
             background: canSend ? "var(--mb-color-accent)" : "var(--mb-color-surface-alt)" }}>
           <PhosphorIcon name="arrow-up" size="control" color={canSend ? "var(--mb-color-on-active-control)" : "var(--mb-color-text-muted)"} />

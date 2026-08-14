@@ -1,4 +1,4 @@
-<!-- @dsCard group="Components" viewport="1260x760" name="Drawer overlays" subtitle="Actions sheet (with Archive), rename dialog, integrity states" -->
+<!-- @dsCard group="Components" viewport="820x560" name="Drawer overlays" subtitle="The session actions menu and the rename dialog" -->
 <!DOCTYPE html><html data-theme="light"><head><meta charset="utf-8"><title>Mr Broccoli — drawer overlays</title>
 <link rel="stylesheet" href="../../styles.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/regular/style.css">
@@ -10,28 +10,25 @@
 body{margin:0;padding:24px;background:#8f8d86;display:flex;gap:22px;flex-wrap:wrap;align-items:flex-start;justify-content:center;font-family:var(--mb-font-body)}
 .cap{font-family:var(--mb-font-mono);font-size:10px;letter-spacing:.9px;text-transform:uppercase;color:#2a2b2e;margin:0 0 8px 4px}
 .cap.d{color:#e6e4dd}
-.frame{width:372px;height:620px;border-radius:24px;overflow:hidden;position:relative;transform:translateZ(0);background:var(--mb-color-background);box-shadow:0 14px 36px rgba(0,0,0,.3);border:1px solid rgba(0,0,0,.25)}
-.frame.short{height:340px}
+.frame{width:372px;height:470px;border-radius:24px;overflow:hidden;position:relative;transform:translateZ(0);background:var(--mb-color-background);box-shadow:0 14px 36px rgba(0,0,0,.3);border:1px solid rgba(0,0,0,.25)}
 </style>
 </head><body>
-<div><p class="cap">Actions sheet · archive is the system addition</p><div class="frame" id="sheet"></div></div>
-<div><p class="cap d">Rename</p><div class="frame short" data-theme="dark" id="rename"></div></div>
-<div><p class="cap">Integrity · findings</p><div class="frame short" id="integrity-findings"></div></div>
-<div><p class="cap d">Integrity · clean</p><div class="frame short" data-theme="dark" id="integrity-clean"></div></div>
+<div><p class="cap">Session actions · anchored menu, no backdrop dim</p><div class="frame" id="menu"></div></div>
+<div><p class="cap d">Rename</p><div class="frame" data-theme="dark" id="rename"></div></div>
 <script type="text/babel">
-const { ConversationActionSheet, ConversationRenameModal, ConversationIntegrityModal } = window.MrBroccoliDesignSystem_62d510;
-const c = { id: "c7", title: "Naming the boat", messageCount: 41, pinned: false, isPrivate: false, archived: false };
+const { AnchoredMenu, ConversationRenameModal } = window.MrBroccoliDesignSystem_62d510;
 const noop = () => {};
-ReactDOM.createRoot(document.getElementById("sheet")).render(
-  <ConversationActionSheet inline conversation={c} onClose={noop} onTogglePinned={noop} onTogglePrivate={noop} onRename={noop} onToggleArchived={noop} onReviewIntegrity={noop} onManageMemory={noop} onShare={noop} onCopy={noop} onDelete={noop} />);
+ReactDOM.createRoot(document.getElementById("menu")).render(
+  <AnchoredMenu inline onClose={noop} style={{top:18,right:12}} groups={[
+    [{icon:"pushpin",label:"Pin"},{icon:"inbox",label:"Archive"},{icon:"lock",label:"Mark private"}],
+    [{icon:"edit",label:"Rename"},{icon:"thunderbolt",label:"Name automatically"}],
+    [{icon:"share-alt",label:"Share"},{icon:"copy",label:"Copy"}],
+    [{icon:"delete",label:"Delete",danger:true}],
+  ]} />);
 function RenameDemo(){
   const [v, setV] = React.useState("Naming the boat");
   return <ConversationRenameModal inline visible title="Naming the boat" value={v} onChange={setV} onSubmit={noop} onClose={noop} />;
 }
 ReactDOM.createRoot(document.getElementById("rename")).render(<RenameDemo />);
-ReactDOM.createRoot(document.getElementById("integrity-findings")).render(
-  <ConversationIntegrityModal inline conversation={c} state="findings" findingsCount={3} repairableCount={2} onRepair={noop} onExportOriginals={noop} onClose={noop} />);
-ReactDOM.createRoot(document.getElementById("integrity-clean")).render(
-  <ConversationIntegrityModal inline conversation={c} state="clean" onClose={noop} />);
 </script>
 </body></html>

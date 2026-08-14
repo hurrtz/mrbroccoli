@@ -5,6 +5,7 @@ import { IntroBody } from "./IntroBody";
 import { IntroStepper } from "./IntroStepper";
 import { AutoSetupCard } from "../on-device/AutoSetupCard";
 import { RouteOptionRow } from "../settings-primitives/RouteOptionRow";
+import { Switch } from "../core/Switch";
 import { IconAction } from "../settings-primitives/IconAction";
 
 export const INTRO_STEPS = ["welcome", "setup", "try"];
@@ -98,7 +99,7 @@ function WelcomeStep({ copy, played, onPlay, language, onChangeLanguage }) {
             style={{ width: 128, height: 128, borderRadius: 999, border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", background: "var(--mb-color-accent)", boxShadow: "0 8px 24px var(--mb-color-glow-strong)" }}>
             <PhosphorIcon name="play" size="hero" color="var(--mb-color-on-accent)" />
           </button>
-          <button type="button" onClick={onChangeLanguage} style={{ display: "inline-flex", alignItems: "center", gap: 5, minHeight: 32, padding: "5px 10px", borderRadius: 99, border: "none", background: "none", cursor: "pointer" }}>
+          <button type="button" onClick={onChangeLanguage} style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 5, minHeight: 44, padding: "5px 12px", borderRadius: "var(--mb-radius-control)", border: "none", background: "none", cursor: "pointer" }}>
             <span style={{ ...metaText, fontSize: 11 }}>{language}</span>
             <PhosphorIcon name="down" size="inline" color="var(--mb-color-text-muted)" />
           </button>
@@ -118,10 +119,7 @@ function FlowSwitch({ on, onToggle, label }) {
   return (
     <div style={{ display: "flex", alignItems: "center", justifyContent: "flex-end", gap: 11, minHeight: 44, padding: "0 2px" }}>
       <span style={bodyText}>{label}</span>
-      <button type="button" role="switch" aria-checked={on ? "true" : "false"} aria-label={label} onClick={onToggle}
-        style={{ width: 46, height: 28, borderRadius: 14, flexShrink: 0, position: "relative", cursor: "pointer", border: "none", padding: 0, background: on ? "var(--mb-color-accent)" : "var(--mb-color-border-strong)", transition: "background .15s" }}>
-        <span style={{ position: "absolute", top: 2, left: on ? 20 : 2, width: 24, height: 24, borderRadius: 12, background: "#fff", boxShadow: "0 1px 3px rgba(0,0,0,.25)", transition: "left .15s" }} />
-      </button>
+      <Switch value={on} onChange={onToggle} accessibilityLabel={label} />
     </div>
   );
 }
@@ -155,7 +153,7 @@ function SetupStep({ copy, autoSetup, manualOpen, onToggleManual, groups, onSele
           <AutoSetupCard {...auto} showHeader={false} />
         ) : (
           <button type="button" onClick={auto.onStart}
-            style={{ minHeight: 48, borderRadius: "var(--mb-radius-card)", border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", background: "var(--mb-color-accent)" }}>
+            style={{ minHeight: 48, borderRadius: "var(--mb-radius-control)", border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", background: "var(--mb-color-accent)" }}>
             <span style={{ fontFamily: "var(--mb-font-display)", fontWeight: 600, fontSize: 15, color: "var(--mb-color-on-accent)" }}>{copy.autoAction}</span>
           </button>
         )}
@@ -168,7 +166,7 @@ function SetupStep({ copy, autoSetup, manualOpen, onToggleManual, groups, onSele
             <div key={group.label}>
               <p style={{ margin: "0 0 6px 2px", display: "flex", alignItems: "center", gap: 8, justifyContent: "space-between" }}>
                 <span style={{ fontFamily: "var(--mb-font-body-medium)", fontWeight: 500, fontSize: 12, letterSpacing: ".8px", textTransform: "uppercase", color: "var(--mb-color-text)" }}>{group.label}</span>
-                <span style={{ padding: "2px 9px", borderRadius: 99, fontFamily: "var(--mb-font-body-medium)", fontWeight: 500, fontSize: 10, letterSpacing: ".5px", textTransform: "uppercase", border: "1px solid " + (group.required ? "var(--mb-color-accent)" : "var(--mb-color-border)"), background: group.required ? "var(--mb-color-accent-soft)" : "var(--mb-color-surface-raised)", color: group.required ? "var(--mb-color-text)" : "var(--mb-color-text-muted)" }}>{group.required ? copy.tagRequired : copy.tagOptional}</span>
+                <span style={{ padding: "2px 9px", borderRadius: "var(--mb-radius-pill)", fontFamily: "var(--mb-font-body-medium)", fontWeight: 500, fontSize: 10, letterSpacing: ".5px", textTransform: "uppercase", border: "1px solid " + (group.required ? "var(--mb-color-accent)" : "var(--mb-color-border)"), background: group.required ? "var(--mb-color-accent-soft)" : "var(--mb-color-surface-raised)", color: group.required ? "var(--mb-color-text)" : "var(--mb-color-text-muted)" }}>{group.required ? copy.tagRequired : copy.tagOptional}</span>
               </p>
               <div style={{ borderRadius: "var(--mb-radius-card)", border: "1px solid var(--mb-color-border)", background: "var(--mb-color-surface)", overflow: "hidden" }}>
                 {group.rows.map((row, index) => (
@@ -215,7 +213,7 @@ function TryStep({ copy, turn, onPressMic }) {
       </div>
       <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 8, paddingTop: 6 }}>
         <button type="button" aria-label={copy.holdToTalk} onClick={onPressMic}
-          style={{ width: 76, height: 76, borderRadius: 999, border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", background: "var(--mb-color-accent)", boxShadow: "0 8px 24px var(--mb-color-glow-strong)" }}>
+          style={{ width: 76, height: 76, borderRadius: "var(--mb-radius-icon-button)", border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", background: "var(--mb-color-accent)", boxShadow: "0 8px 24px var(--mb-color-glow-strong)" }}>
           <PhosphorIcon name="mic" size="feature" color="var(--mb-color-on-accent)" />
         </button>
         <span style={metaText}>{copy.holdToTalk}</span>
@@ -299,14 +297,14 @@ export function IntroFlow({
       {isLast ? (
         <div style={{ padding: "6px 22px 14px" }}>
           <button type="button" aria-disabled={doneDisabled ? "true" : "false"} onClick={doneDisabled ? undefined : onClose}
-            style={{ minHeight: 50, width: "100%", boxSizing: "border-box", borderRadius: "var(--mb-radius-card)", border: "none", display: "flex", alignItems: "center", justifyContent: "center", cursor: doneDisabled ? "default" : "pointer", background: "var(--mb-color-accent)", opacity: doneDisabled ? .4 : 1 }}>
+            style={{ minHeight: 48, width: "100%", boxSizing: "border-box", borderRadius: "var(--mb-radius-control)", border: "none", display: "flex", alignItems: "center", justifyContent: "center", cursor: doneDisabled ? "default" : "pointer", background: "var(--mb-color-accent)", opacity: doneDisabled ? .4 : 1 }}>
             <span style={{ fontFamily: "var(--mb-font-display)", fontWeight: 600, fontSize: 15, color: "var(--mb-color-on-accent)" }}>{copy.done}</span>
           </button>
         </div>
       ) : (
         <div style={{ display: "flex", justifyContent: "center", padding: "10px 0" }}>
           <button type="button" aria-label={copy.next} aria-disabled={forwardDisabled ? "true" : "false"} onClick={forwardDisabled ? undefined : () => goTo(index + 1)}
-            style={{ width: 58, height: 58, borderRadius: 999, border: "none", cursor: forwardDisabled ? "default" : "pointer", display: "flex", alignItems: "center", justifyContent: "center", background: "var(--mb-color-accent)", opacity: forwardDisabled ? .4 : 1 }}>
+            style={{ width: 58, height: 58, borderRadius: "var(--mb-radius-icon-button)", border: "none", cursor: forwardDisabled ? "default" : "pointer", display: "flex", alignItems: "center", justifyContent: "center", background: "var(--mb-color-accent)", opacity: forwardDisabled ? .4 : 1 }}>
             <PhosphorIcon name="right" size="navigation" color="var(--mb-color-on-accent)" />
           </button>
         </div>

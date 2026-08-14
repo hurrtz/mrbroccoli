@@ -2,7 +2,7 @@ Who is answering the next turn, and at what effort — one line above the transc
 
 ```jsx
 <RouteByline provider="anthropic" providerLabel="Anthropic" modelName="Claude Sonnet 4.5"
-  effort="Medium" effortLevels={["Low","Medium","High"]} onPress={openRoutePicker} />
+  effort="Medium" onPress={openRoutePicker} />
 ```
 
 It is **not** a button: no fill, no border, no card. That is deliberate — a contained control here reads as a second CTA directly above the voice stage. The provider mark supplies the prominence and the closing hairline says the whole row is the target, not just the caret.

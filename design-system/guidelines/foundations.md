@@ -31,7 +31,7 @@ Fonts are the real shipping binaries — Unica One 400, Outfit 400/500/600/700 �
 
 ## Shape
 
-Modest, never pill-shaped and never sharp. Messages 6, tags 8, controls and rows 10, cards and icon buttons 12, panels 14, dialogs 16, the voice stage 17, picker modals 18, sheets 20 on the top corners only, the style sheet 24. The few genuinely round shapes are round because the shape *is* the control: the 42pt phase-icon well, the 34pt caret well in `Picker`, the 22pt readiness circles. Pills (999) appear only on three small badges — the compact wordmark, the live pill, the "free edition" badge.
+Modest and never sharp. Messages 6, tags 8, controls and rows 10, cards and icon buttons 12, panels 14, dialogs 16, picker modals 18, sheets 20 on the top corners only, the style sheet 24. The few genuinely round shapes are round because the shape *is* the control: the 42pt phase-icon well, the 34pt caret well in `Picker`, the 22pt readiness circles. Pills (999) appear only on three small badges — the compact wordmark, the live pill, the "free edition" badge.
 
 ## Borders, elevation and shadow
 
@@ -70,3 +70,13 @@ On the web this system loads the same family from the official CDN:
 **Implementers vendor this stylesheet before shipping** — install `@phosphor-icons/web`, copy `src/regular/style.css` and its font binaries into `assets/phosphor/`, change the one `<link>`. The app itself uses `phosphor-react-native`, already bundled.
 
 **Provider brand marks are the one exception.** 47 official SVGs in `assets/providers/`; `ProviderIcon` masks them to the surface foreground so they inherit the theme. A provider with no mark falls back to two letters — never a drawn substitute.
+
+## Control shape and size (owner calls, 2026-08)
+
+**Squircles, not circles.** Every control in the product is a squircle on the radius scale. Two exceptions, both about the voice: the workspace **orb** and the introduction's **step-1 play CTA**. Nothing else is round — not the composer send, not the drawer's plus, not toast dismiss, not the satellite toggles (state reads from their border and fill, not their shape). Decorative medallions and switch knobs are not controls and keep their circles.
+
+**Pills** (`--mb-radius-pill`) are for things that are not buttons: status tags, selection chips, the fork tag, stepper dots, the wordmark badge. Every button — including compact inline ones like PremiumBand’s Upgrade, the storage Remove action and the introduction’s language switch — takes `--mb-radius-control`.
+
+**One commit button.** The full-width primary action is 48pt tall on `--mb-radius-control`, wherever it appears: `Button`, the introduction's auto-setup and Done, `AutoSetupCard`, and `Modal`'s footer — whose actions now stack full-width instead of sitting right-aligned in a row.
+
+**44 is the floor, always.** No control is shorter than `--mb-touch-target`, including `Button size="small"`, every chip and pill, `Switch` (a 46×28 track inside a 44 target) and the transcript drawer’s grab handle. Where the drawn size must stay smaller, the visual sits inside a 44 target (precedent: `IconAction`, the fork tag).

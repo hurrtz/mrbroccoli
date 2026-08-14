@@ -1,4 +1,4 @@
-The workspace dropdown — heavier than `AntPickerRow`, used where a choice is the point of the surface (voice, language, model).
+The workspace dropdown — heavier than a settings row, used where a choice is the point of the surface (voice, language, model).
 
 ```jsx
 <Picker label="Voice" value={voice} options={voices} onChange={setVoice} dropdownLabel="Selection" />

@@ -24,7 +24,7 @@ export function Button({ children, type = "ghost", size, loading = false, disabl
       onPointerLeave={() => setPressed(false)}
       style={{
         display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
-        minHeight: small ? 40 : "var(--mb-touch-target)",
+        minHeight: small ? "var(--mb-touch-target)" : 48,
         padding: small ? "8px 12px" : "10px 16px",
         borderRadius: "var(--mb-radius-control)",
         border: "1px solid " + borderColor,

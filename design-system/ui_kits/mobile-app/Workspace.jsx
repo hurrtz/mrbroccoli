@@ -1,7 +1,7 @@
 const { AppWordmark, IconButton, PhosphorIcon, RouteByline, VoiceOrb, OrbSatellite,
-        ConversationSettingsSummary, WorkspaceStatusLine, TranscriptHandle,
+        ConversationSettingsSummary, TranscriptHandle,
         ChatBubble, ChatTranscript, TranscriptMessage, Toast, Modal, ProviderIcon, BackgroundTaskBar,
-        IntroBanner, IntroFlow, RoutePicker, Composer, DriveSessionControls } = window.MrBroccoliDesignSystem_62d510;
+        IntroBanner, IntroFlow, RoutePicker, Composer } = window.MrBroccoliDesignSystem_62d510;
 
 const ASSETS = "../../assets/providers";
 const ORB = 196;
@@ -69,6 +69,7 @@ function useTurnScript(onCommit) {
     phaseProgress: running ? progress : 0,
     turnProgress: running ? previousTurn + (current.turn - previousTurn) * progress : 0,
     start: () => setStep(running ? (step === 0 ? 1 : -1) : 0),
+    stop: () => setStep(-1),
   };
 }
 
@@ -99,7 +100,7 @@ function Byline({ conversation }) {
   const { active } = conversation;
   return (
     <RouteByline provider={active.provider} providerLabel={active.providerLabel} modelName={active.modelLabel}
-      effort={active.effortLabel} effortLevels={active.effortLevels} local={active.local}
+      effort={active.effortLabel} local={active.local}
       switchable={window.MB_DATA.modes.length > 1} onPress={() => conversation.setPicking(true)} assetBase={ASSETS} />
   );
 }
@@ -122,7 +123,7 @@ function TranscriptSheet({ visible, title, messages, onClose }) {
       <div style={{ position: "absolute", left: 0, right: 0, bottom: 0, height: "85%", display: "flex", flexDirection: "column",
         borderRadius: "var(--mb-radius-sheet-top) var(--mb-radius-sheet-top) 0 0", background: "var(--mb-color-background)",
         border: "1px solid var(--mb-color-surface-raised-border)", borderBottom: "none", boxShadow: "var(--mb-shadow-sheet)", overflow: "hidden" }}>
-        <div role="button" aria-label="Pull down or tap the backdrop to close" onClick={onClose} style={{ flexShrink: 0, padding: "10px 0 8px", cursor: "grab" }}>
+        <div role="button" aria-label="Pull down or tap the backdrop to close" onClick={onClose} style={{ flexShrink: 0, minHeight: "var(--mb-touch-target)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "grab" }}>
           <span style={{ display: "block", width: 38, height: 4, borderRadius: 2, margin: "0 auto", background: "var(--mb-color-border-strong)" }} />
         </div>
         <div style={{ flex: 1, overflowY: "auto", padding: "6px 16px 20px" }}>
@@ -167,6 +168,7 @@ function Workspace({ onOpenDrawer, onOpenSettings, onOpenLocalModels, conversati
   const setIntro = onIntroVisible || setLocalIntro;
   const [introOpened, setIntroOpened] = React.useState(false);
   const [driveAuto, setDriveAuto] = React.useState(true);
+  const speaking = !!turn.current && turn.current.phase === "speaking";
 
   const [stageRef, orbSize] = useFitSize(ORB, 96, 96);
 
@@ -203,23 +205,30 @@ function Workspace({ onOpenDrawer, onOpenSettings, onOpenLocalModels, conversati
             <SwipeArrow direction="right" enabled={surface === "voice"} label="Show text input" onPress={() => setSurface("text")} />
           </div>
 
-          <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "center", gap: 8 }}>
-            <OrbSatellite icon="image" label="Image" accessibilityLabel="Add image" />
-            <span style={{ width: 1, height: 44, background: "var(--mb-color-border)", margin: "0 6px" }} />
-            <OrbSatellite icon="council" label="Council" kind="toggle" active={council}
-              accessibilityLabel="Model Council" onPress={() => setCouncil((on) => !on)} />
-            <OrbSatellite icon="search" label="Web" kind="toggle" active={web}
-              accessibilityLabel="Web search" onPress={() => setWeb((on) => !on)} />
-          </div>
+          {/* The ring belongs to the phase: composing controls at idle, transport
+              once a turn runs. In drive mode Stop ends the loop and becomes Resume. */}
+          {(turn.current ? turn.current.phase : "idle") === "idle" && !driveMode ? (
+            <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "center", gap: 8 }}>
+              <OrbSatellite icon="image" label="Image" accessibilityLabel="Add image" />
+              <span style={{ width: 1, height: 44, background: "var(--mb-color-border)", margin: "0 6px" }} />
+              <OrbSatellite icon="council" label="Council" kind="toggle" active={council}
+                accessibilityLabel="Model Council" onPress={() => setCouncil((on) => !on)} />
+              <OrbSatellite icon="search" label="Web" kind="toggle" active={web}
+                accessibilityLabel="Web search" onPress={() => setWeb((on) => !on)} />
+            </div>
+          ) : (
+            <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "center", gap: 18 }}>
+              <OrbSatellite icon="reload" label="Restart" disabled={!speaking} />
+              <OrbSatellite icon="left" label="Back" disabled={!speaking} />
+              <OrbSatellite icon="right" label="Forward" disabled={!speaking} />
+              {driveMode && !driveAuto
+                ? <OrbSatellite icon="play" label="Resume" tone="success" accessibilityLabel="Resume drive session" onPress={() => setDriveAuto(true)} />
+                : <OrbSatellite icon="stop" label="Stop" tone="danger" accessibilityLabel={driveMode ? "Stop the drive session" : "Stop this turn"}
+                    onPress={() => { turn.stop(); if (driveMode) setDriveAuto(false); }} />}
+            </div>
+          )}
         </div>
 
-        {driveMode && DriveSessionControls ? <div style={{ padding: "0 16px 2px" }}>
-          <DriveSessionControls running={driveAuto} canRepeat onToggle={() => setDriveAuto(!driveAuto)} onRepeat={() => {}} />
-        </div> : null}
-        <WorkspaceStatusLine phase={turn.current ? turn.current.phase : "idle"}
-          title={turn.current ? turn.current.title : surface === "text" ? "Type and send" : "Tap to speak"}
-          detail={turn.current ? turn.current.detail : conversationTitle + " · " + conversation.messages.length + " messages"}
-          onInfo={() => {}} />
       </div>
 
       <TranscriptHandle messageCount={conversation.messages.length}
@@ -246,11 +255,13 @@ function Workspace({ onOpenDrawer, onOpenSettings, onOpenLocalModels, conversati
 }
 
 /** Icon-only in landscape: the column has no room for labels. */
-function LandscapeControl({ icon, label, toggle, active, onPress }) {
-  const tint = active ? "var(--mb-color-accent)" : "var(--mb-color-text-secondary)";
+function LandscapeControl({ icon, label, toggle, active, disabled, tone, onPress }) {
+  const toneInk = tone === "danger" ? "var(--mb-color-danger)" : tone === "success" ? "var(--mb-color-success)" : null;
+  const tint = toneInk || (active ? "var(--mb-color-accent)" : "var(--mb-color-text-secondary)");
   return (
-    <span role={toggle ? "switch" : "button"} aria-checked={toggle ? !!active : undefined} aria-label={label} onClick={onPress}
-      style={{ width: 44, height: 44, cursor: "pointer", borderRadius: toggle ? 22 : "var(--mb-radius-icon-button)",
+    <span role={toggle ? "switch" : "button"} aria-checked={toggle ? !!active : undefined} aria-disabled={disabled ? "true" : undefined}
+      aria-label={label} onClick={disabled ? undefined : onPress}
+      style={{ width: 44, height: 44, cursor: disabled ? "default" : "pointer", opacity: disabled ? .38 : 1, borderRadius: "var(--mb-radius-icon-button)",
         display: "flex", alignItems: "center", justifyContent: "center",
         border: "1px solid " + (toggle ? (active ? "var(--mb-color-accent)" : "var(--mb-color-border)") : "transparent"),
         background: toggle && active ? "var(--mb-color-accent-soft)" : "transparent" }}>
@@ -270,17 +281,19 @@ function LandscapeControl({ icon, label, toggle, active, onPress }) {
  * occupy. The right pane is wider, and on a fresh session the transcript beneath
  * it is empty anyway.
  */
-function LandscapeWorkspace({ onOpenDrawer, onOpenSettings, onOpenLocalModels, conversationTitle, auto }) {
+function LandscapeWorkspace({ onOpenDrawer, onOpenSettings, onOpenLocalModels, conversationTitle, auto, driveMode = false }) {
   const conversation = useConversation();
   const turn = useTurnScript(conversation.commit);
   const [council, setCouncil] = React.useState(false);
   const [web, setWeb] = React.useState(true);
+  const [driveAuto, setDriveAuto] = React.useState(true);
   const [banner, setBanner] = React.useState(true);
   const [intro, setIntro] = React.useState(false);
   const [introOpened, setIntroOpened] = React.useState(false);
   // The stage holds the orb and the control row beneath it, so 54pt of its
   // height (44 control + 10 gap) is spoken for before the orb gets any.
   const [landscapeStageRef, landscapeOrb] = useFitSize(150, 84, 0, 54);
+  const landscapeSpeaking = !!turn.current && turn.current.phase === "speaking";
   return (
     <div style={{ position: "relative", display: "flex", height: "100%", padding: "0 12px 8px", background: "var(--mb-color-background)" }}>
       <div style={{ flex: "0.9 1 0", minWidth: 0, paddingRight: 12, display: "flex", flexDirection: "column" }}>
@@ -291,22 +304,36 @@ function LandscapeWorkspace({ onOpenDrawer, onOpenSettings, onOpenLocalModels, c
         </div>
         <AutoSetupIndicator auto={auto} onOpen={onOpenLocalModels} />
         <Byline conversation={conversation} />
-        <ConversationSettingsSummary summary="Balanced · Brief · Heart" onPress={onOpenSettings} />
-        <div ref={landscapeStageRef} style={{ flex: 1, minHeight: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 10, paddingTop: 4 }}>
+        {/* The settings control floats over the stage's top-right corner instead of
+            taking a row, so the orb owns everything between the byline hairline
+            and the control row and centres in it. */}
+        <div ref={landscapeStageRef} style={{ position: "relative", flex: 1, minHeight: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 10 }}>
+          <div style={{ position: "absolute", top: 0, right: 0, zIndex: 1 }}>
+            <ConversationSettingsSummary iconOnly summary="Balanced · Brief · Heart" onPress={onOpenSettings} />
+          </div>
           <div style={{ flexShrink: 0 }}>
             <VoiceOrb size={landscapeOrb} phase={turn.current ? turn.current.phase : "idle"}
               phaseProgress={turn.phaseProgress} turnProgress={turn.turnProgress} onPress={turn.start} />
           </div>
-          <div style={{ display: "flex", alignItems: "center", gap: 8, flexShrink: 0 }}>
-            <LandscapeControl icon="image" label="Add image" onPress={() => {}} />
-            <div style={{ width: 1, alignSelf: "stretch", background: "var(--mb-color-border)" }} />
-            <LandscapeControl icon="council" label="Model Council" toggle active={council} onPress={() => setCouncil((on) => !on)} />
-            <LandscapeControl icon="search" label="Web search" toggle active={web} onPress={() => setWeb((on) => !on)} />
-          </div>
+          {(turn.current ? turn.current.phase : "idle") === "idle" && !driveMode ? (
+            <div style={{ display: "flex", alignItems: "center", gap: 8, flexShrink: 0 }}>
+              <LandscapeControl icon="image" label="Add image" onPress={() => {}} />
+              <div style={{ width: 1, alignSelf: "stretch", background: "var(--mb-color-border)" }} />
+              <LandscapeControl icon="council" label="Model Council" toggle active={council} onPress={() => setCouncil((on) => !on)} />
+              <LandscapeControl icon="search" label="Web search" toggle active={web} onPress={() => setWeb((on) => !on)} />
+            </div>
+          ) : (
+            <div style={{ display: "flex", alignItems: "center", gap: 8, flexShrink: 0 }}>
+              <LandscapeControl icon="reload" label="Restart" disabled={!landscapeSpeaking} onPress={() => {}} />
+              <LandscapeControl icon="left" label="Back" disabled={!landscapeSpeaking} onPress={() => {}} />
+              <LandscapeControl icon="right" label="Forward" disabled={!landscapeSpeaking} onPress={() => {}} />
+              {driveMode && !driveAuto
+                ? <LandscapeControl icon="play" tone="success" label="Resume drive session" onPress={() => setDriveAuto(true)} />
+                : <LandscapeControl icon="stop" tone="danger" label={driveMode ? "Stop the drive session" : "Stop this turn"}
+                    onPress={() => { turn.stop(); if (driveMode) setDriveAuto(false); }} />}
+            </div>
+          )}
         </div>
-        <WorkspaceStatusLine phase={turn.current ? turn.current.phase : "idle"}
-          title={turn.current ? turn.current.title : "Tap to speak"}
-          detail={turn.current ? turn.current.detail : conversationTitle + " · " + conversation.messages.length + " messages"} />
       </div>
       <div style={{ width: 1, alignSelf: "stretch", background: "var(--mb-color-border)" }} />
       <div style={{ flex: 1, minWidth: 0, paddingLeft: 12, paddingTop: 10, display: "flex", flexDirection: "column", minHeight: 0 }}>

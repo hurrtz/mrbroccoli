@@ -1,4 +1,4 @@
-<!-- @dsCard group="Components" viewport="700x470" name="Core controls" subtitle="Button, IconButton, Input, TextArea, Tag, PhosphorIcon" -->
+<!-- @dsCard group="Components" viewport="700x470" name="Core controls" subtitle="Button, IconButton, Input, TextArea, Tag, Switch, PhosphorIcon" -->
 <!DOCTYPE html><html data-theme="light"><head><meta charset="utf-8">
 <link rel="stylesheet" href="../../styles.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/regular/style.css">
@@ -9,18 +9,25 @@
 <style>body{padding:16px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}.row{display:flex;flex-wrap:wrap;align-items:center;gap:8px}.lbl{font-family:var(--mb-font-mono);font-size:10px;letter-spacing:.9px;text-transform:uppercase;color:var(--mb-color-text-muted);margin-bottom:6px}</style>
 </head><body><div id="root"></div>
 <script type="text/babel">
-const { Button, IconButton, Input, TextArea, Tag, PhosphorIcon, AntButtonLabel } = window.MrBroccoliDesignSystem_62d510;
+const { Button, IconButton, Input, TextArea, Tag, PhosphorIcon, Switch } = window.MrBroccoliDesignSystem_62d510;
+/** Button styles nothing itself: an icon and a label span go inside it. */
+function Label({ color, icon, children }){
+  return <span style={{display:"inline-flex",alignItems:"center",justifyContent:"center",gap:6}}>
+    {icon ? <PhosphorIcon name={icon} size="compact" color={color} /> : null}
+    <span style={{fontFamily:"var(--mb-font-body-medium)",fontWeight:500,fontSize:15,color}}>{children}</span>
+  </span>;
+}
 function Demo(){
   const [key,setKey]=React.useState("sk-live-8f2c");
   const [tag,setTag]=React.useState("stt");
   return <div style={{display:"flex",flexDirection:"column",gap:16}}>
     <div><div className="lbl">Button</div><div className="row">
-      <Button type="primary"><AntButtonLabel color="var(--mb-color-on-active-control)" icon="sound" label="Preview voice" /></Button>
-      <Button><AntButtonLabel color="var(--mb-color-accent)" icon="reload" label="Validate" /></Button>
-      <Button type="warning"><AntButtonLabel color="var(--mb-color-on-danger)" icon="delete" label="Delete" /></Button>
-      <Button size="small"><AntButtonLabel color="var(--mb-color-accent)" icon="plus" label="Add model" /></Button>
-      <Button loading type="primary"><AntButtonLabel color="var(--mb-color-on-active-control)" label="Saving" /></Button>
-      <Button disabled><AntButtonLabel color="var(--mb-color-accent)" label="Disabled" /></Button>
+      <Button type="primary"><Label color="var(--mb-color-on-active-control)" icon="sound">Preview voice</Label></Button>
+      <Button><Label color="var(--mb-color-accent)" icon="reload">Validate</Label></Button>
+      <Button type="warning"><Label color="var(--mb-color-on-danger)" icon="delete">Delete</Label></Button>
+      <Button size="small"><Label color="var(--mb-color-accent)" icon="plus">Add model</Label></Button>
+      <Button loading type="primary"><Label color="var(--mb-color-on-active-control)">Saving</Label></Button>
+      <Button disabled><Label color="var(--mb-color-accent)">Disabled</Label></Button>
     </div></div>
     <div className="grid">
       <div><div className="lbl">IconButton</div><div className="row">
@@ -29,8 +36,9 @@ function Demo(){
         <IconButton icon="bug" active accessibilityLabel="Debug log" />
         <IconButton icon="close" disabled accessibilityLabel="Close" />
       </div></div>
-      <div><div className="lbl">Tag</div><div className="row">
+      <div><div className="lbl">Tag · Switch</div><div className="row">
         {["all","stt","tts","ui"].map(v=><Tag key={v} selected={tag===v} onChange={()=>setTag(v)}>{v.toUpperCase()}</Tag>)}
+        <Switch value onChange={()=>{}} accessibilityLabel="Example switch" />
       </div></div>
     </div>
     <div className="grid">

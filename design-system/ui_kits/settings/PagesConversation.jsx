@@ -30,7 +30,7 @@ function ConnectionsPage({ onBack, onClose, isPremium = true }) {
                 <span style={{ display: "block", fontFamily: "var(--mb-font-body-medium)", fontWeight: 500, fontSize: 15, color: "var(--mb-color-text)" }}>{provider.label}</span>
                 <span style={{ display: "block", marginTop: 2, fontFamily: "var(--mb-font-mono)", fontSize: 10, letterSpacing: ".4px", color: "var(--mb-color-text-muted)" }}>{provider.capabilities}</span>
               </span>
-              <span style={{ flexShrink: 0, padding: "4px 10px", borderRadius: 99, fontFamily: "var(--mb-font-body-medium)", fontWeight: 500, fontSize: 12, color, background: bg }}>{label}</span>
+              <span style={{ flexShrink: 0, padding: "4px 10px", borderRadius: "var(--mb-radius-pill)", fontFamily: "var(--mb-font-body-medium)", fontWeight: 500, fontSize: 12, color, background: bg }}>{label}</span>
               <PhosphorIcon name="right" size="inline" color="var(--mb-color-text-muted)" />
             </div>
           );
@@ -72,7 +72,7 @@ function ThinkingPage({ onBack, onClose }) {
 
 /** The slot sheet: configure one answering model — provider, model, the model's own effort ladder, remove. */
 function SlotSheet({ slot, onClose }) {
-  const chip = (label, on) => <span key={label} role="button" aria-pressed={on ? "true" : "false"} style={{ minHeight: 34, padding: "6px 13px", borderRadius: 99, cursor: "pointer", display: "inline-flex", alignItems: "center", fontFamily: "var(--mb-font-body-medium)", fontWeight: 500, fontSize: 13, border: "1px solid " + (on ? "var(--mb-color-accent)" : "var(--mb-color-border)"), background: on ? "var(--mb-color-accent-soft)" : "var(--mb-color-surface)", color: on ? "var(--mb-color-text)" : "var(--mb-color-text-secondary)" }}>{label}</span>;
+  const chip = (label, on) => <span key={label} role="button" aria-pressed={on ? "true" : "false"} style={{ minHeight: 44, padding: "6px 13px", borderRadius: "var(--mb-radius-pill)", cursor: "pointer", display: "inline-flex", alignItems: "center", fontFamily: "var(--mb-font-body-medium)", fontWeight: 500, fontSize: 13, border: "1px solid " + (on ? "var(--mb-color-accent)" : "var(--mb-color-border)"), background: on ? "var(--mb-color-accent-soft)" : "var(--mb-color-surface)", color: on ? "var(--mb-color-text)" : "var(--mb-color-text-secondary)" }}>{label}</span>;
   const value = (label, val) => (
     <div role="button" style={{ display: "flex", alignItems: "center", gap: 10, minHeight: 44, cursor: "pointer" }}>
       <span style={{ fontFamily: "var(--mb-text-body-family)", fontSize: 14, color: "var(--mb-color-text-secondary)" }}>{label}</span><span style={{ flex: 1 }} />

@@ -24,7 +24,7 @@ export function IntroStepper({ count, index = 0, onSelect, style }) {
               display: "flex", alignItems: "center", justifyContent: "center",
             }}>
             <span style={{
-              height: 8, width: current ? 26 : 8, borderRadius: 999,
+              height: 8, width: current ? 26 : 8, borderRadius: "var(--mb-radius-pill)",
               background: current ? "var(--mb-color-accent)"
                 : visited ? "var(--mb-color-border-strong)" : "var(--mb-color-border)",
             }} />

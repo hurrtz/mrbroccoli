@@ -15,7 +15,7 @@
 <div id="dark"></div>
 </div>
 <script type="text/babel">
-const { VoiceOrb, OrbSatellite, WorkspaceStatusLine, TranscriptHandle, ConversationSettingsSummary } = window.MrBroccoliDesignSystem_62d510;
+const { VoiceOrb, OrbSatellite, TranscriptHandle, ConversationSettingsSummary } = window.MrBroccoliDesignSystem_62d510;
 
 function VoiceOrbSpecimen(){
   return <>
@@ -33,7 +33,6 @@ function VoiceOrbSpecimen(){
       <OrbSatellite icon="search" label="Web" kind="toggle" active accessibilityLabel="Web search" />
     </div>
     <ConversationSettingsSummary summary="Balanced · Brief · Heart" />
-    <WorkspaceStatusLine title="Tap to speak" detail="Tide tables · 12 messages · 2 min ago" onInfo={()=>{}} />
     <TranscriptHandle messageCount={12} meta="GPT-5 · 2 min ago"
       preview="High water is at 15:40 today, and the tide turns roughly every six hours after that." />
   </>;

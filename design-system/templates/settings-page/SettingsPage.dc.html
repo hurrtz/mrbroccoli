@@ -23,16 +23,15 @@
 </div>
 <div style="flex:1;min-height:0;overflow:auto;padding:16px 16px 24px;display:flex;flex-direction:column;gap:16px">
 <x-import component-from-global-scope="MrBroccoliDesignSystem_62d510.RuntimeReadiness" readiness="{{ readiness }}" hint-size="100%,44px"></x-import>
-<span style="font-family:var(--mb-font-mono);font-size:11px;letter-spacing:0.75px;text-transform:uppercase;color:var(--mb-color-text-muted)">Conversation &amp; tools</span>
-<x-import component-from-global-scope="MrBroccoliDesignSystem_62d510.AntSettingsCard" hint-size="100%,180px">
-<x-import component-from-global-scope="MrBroccoliDesignSystem_62d510.AntPickerRow" label="Response style" value="Balanced" options="{{ styleOptions }}" onChange="{{ noop }}" standalone="{{ true }}" hint-size="100%,60px"></x-import>
-<x-import component-from-global-scope="MrBroccoliDesignSystem_62d510.AntPickerRow" label="Reply length" value="Brief" options="{{ lengthOptions }}" onChange="{{ noop }}" standalone="{{ true }}" hint-size="100%,60px"></x-import>
-<x-import component-from-global-scope="MrBroccoliDesignSystem_62d510.AntSwitchRow" label="Web search" description="Let the model look things up before it answers." value="{{ searchOn }}" onChange="{{ noop }}" hint-size="100%,64px"></x-import>
+<x-import component-from-global-scope="MrBroccoliDesignSystem_62d510.SettingsGroup" title="Conversation" hint-size="100%,180px">
+<x-import component-from-global-scope="MrBroccoliDesignSystem_62d510.SettingsRow" icon="sliders" label="Response style" value="Balanced" hint-size="100%,52px"></x-import>
+<x-import component-from-global-scope="MrBroccoliDesignSystem_62d510.SettingsRow" icon="file-text" label="Reply length" value="Brief" hint-size="100%,52px"></x-import>
+<x-import component-from-global-scope="MrBroccoliDesignSystem_62d510.SettingsRow" icon="global" label="Web search" control="{{ searchSwitch }}" last="{{ true }}" hint-size="100%,52px"></x-import>
 </x-import>
-<span style="font-family:var(--mb-font-mono);font-size:11px;letter-spacing:0.75px;text-transform:uppercase;color:var(--mb-color-text-muted)">Speech</span>
-<x-import component-from-global-scope="MrBroccoliDesignSystem_62d510.AntSettingsCard" title="Listening" hint-size="100%,150px">
-<x-import component-from-global-scope="MrBroccoliDesignSystem_62d510.AntPickerRow" label="Transcription" value="On device" options="{{ transcriptionOptions }}" onChange="{{ noop }}" standalone="{{ true }}" hint-size="100%,60px"></x-import>
-<x-import component-from-global-scope="MrBroccoliDesignSystem_62d510.AntSwitchRow" label="Send on silence" description="Stop recording after a pause and send." value="{{ autoSend }}" onChange="{{ noop }}" hint-size="100%,64px"></x-import>
+<x-import component-from-global-scope="MrBroccoliDesignSystem_62d510.SettingsGroup" title="Speech" footer="One choice across every runtime; on-device downloads happen on the route pages." hint-size="100%,150px">
+<x-import component-from-global-scope="MrBroccoliDesignSystem_62d510.SettingsRow" icon="mic" label="Who listens" value="Your phone" hint-size="100%,52px"></x-import>
+<x-import component-from-global-scope="MrBroccoliDesignSystem_62d510.SettingsRow" icon="sound" label="Who speaks" value="Kokoro · Heart" hint-size="100%,52px"></x-import>
+<x-import component-from-global-scope="MrBroccoliDesignSystem_62d510.SettingsRow" icon="check-circle" label="Send on silence" control="{{ autoSendSwitch }}" last="{{ true }}" hint-size="100%,52px"></x-import>
 </x-import>
 </div>
 </div>
@@ -46,21 +45,12 @@ class Component extends DCLogic {
       appearance: this.props.appearance ?? "light",
       searchOn: this.props.searchOn ?? true,
       autoSend: this.props.autoSend ?? false,
-      styleOptions: [
-        { value: "Balanced", label: "Balanced" },
-        { value: "Nerdy", label: "Nerdy" },
-        { value: "Warm", label: "Warm" },
-      ],
-      lengthOptions: [
-        { value: "Brief", label: "Brief" },
-        { value: "Normal", label: "Normal" },
-        { value: "Thorough", label: "Thorough" },
-      ],
-      transcriptionOptions: [
-        { value: "On device", label: "On device" },
-        { value: "Deepgram", label: "Deepgram" },
-        { value: "OpenAI", label: "OpenAI" },
-      ],
+      searchSwitch: React.createElement(window.MrBroccoliDesignSystem_62d510.Switch, {
+        value: this.props.searchOn ?? true, onChange: () => {}, accessibilityLabel: "Web search",
+      }),
+      autoSendSwitch: React.createElement(window.MrBroccoliDesignSystem_62d510.Switch, {
+        value: this.props.autoSend ?? false, onChange: () => {}, accessibilityLabel: "Send on silence",
+      }),
       noop: () => {},
       readiness: {
         think: this.props.thinkReady === false ? "attention" : "ready",

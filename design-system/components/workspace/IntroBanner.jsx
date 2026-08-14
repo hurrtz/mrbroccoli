@@ -31,7 +31,7 @@ export function IntroBanner({
       <div role="button" onClick={onOpen}
         style={{ position: "relative", overflow: "hidden", cursor: "pointer", minHeight: 48, background: gradient, borderRadius: "var(--mb-radius-control)", padding: showDismiss ? "0 6px 0 14px" : "0 14px", marginBottom: 8, display: "flex", alignItems: "center", gap: 10, boxShadow: "0 4px 14px var(--mb-color-intro-banner-shadow)" }}>
         {sheen}
-        <span aria-hidden="true" style={{ width: 30, height: 30, borderRadius: 999, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", border: "1px solid rgba(255,255,255,.5)" }}>
+        <span aria-hidden="true" style={{ width: 30, height: 30, borderRadius: "var(--mb-radius-control)", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", border: "1px solid rgba(255,255,255,.5)" }}>
           <PhosphorIcon name="play" size="inline" color="var(--mb-color-intro-banner-text)" />
         </span>
         <span style={{ flex: 1, minWidth: 0, fontFamily: "var(--mb-font-body-medium)", fontWeight: 500, fontSize: 14, lineHeight: "19px", color: "var(--mb-color-intro-banner-text)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{title}</span>
@@ -44,7 +44,7 @@ export function IntroBanner({
       style={{ position: "relative", overflow: "hidden", cursor: "pointer", background: gradient, borderRadius: "var(--mb-radius-panel)", padding: "13px 15px", marginBottom: 12, display: "flex", alignItems: "center", gap: 13, boxShadow: "0 6px 20px var(--mb-color-intro-banner-shadow)" }}>
       {sheen}
       <span aria-hidden="true" style={{ width: 44, height: 44, margin: -2, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>
-        <span style={{ width: 40, height: 40, borderRadius: 999, display: "flex", alignItems: "center", justifyContent: "center", border: "1px solid rgba(255,255,255,.5)" }}>
+        <span style={{ width: 40, height: 40, borderRadius: "var(--mb-radius-icon-button)", display: "flex", alignItems: "center", justifyContent: "center", border: "1px solid rgba(255,255,255,.5)" }}>
           <PhosphorIcon name="play" size="control" color="var(--mb-color-intro-banner-text)" />
         </span>
       </span>

@@ -62,21 +62,39 @@ How to use: each unchecked box is one work item with its acceptance criterion. *
 
 ## G. Drive mode
 
-- [ ] Replace the three-button row (Pause auto · Repeat last · Resume auto, one always disabled) with the DS `DriveSessionControls`: **Repeat last** (quiet) + ONE fixed-position **Pause/Resume toggle** whose accent fill means the loop is live (filled + pause glyph while running; quiet + play glyph when paused). Positions never swap.
-- [ ] The silence countdown gets an on-screen home: "Sends in N…" chip (accent-soft, mono, `role="status"`) above the toggle while the window runs — today it is only spoken.
-- [ ] 48pt targets, 14px labels; `disabled` (pipeline busy) dims both buttons, never removes them.
-- [ ] Headset / car-remote buttons map to the same two actions.
-- DS: `components/workspace/DriveSessionControls.jsx`, `guidelines/surfaces/workspace.md` → Drive mode.
+- [ ] Delete the drive dock row entirely (`DriveSessionControls.tsx`: Pause auto · Repeat last · Resume auto). Drive mode adds no controls of its own — the satellite ring carries everything.
+- [ ] Ring behaviour in drive mode: the ring shows transport in **every** phase, idle included (the loop must be stoppable at rest). **Stop** ends the hands-free loop and becomes **Resume**, which starts it again; seek verbs stay live only while speaking. The composing controls are unavailable for the session’s duration.
+- [ ] Drop "Repeat last": Restart already replays the response from its first word.
+- [ ] The silence countdown stays spoken only — no on-screen chip (the earlier chip proposal is retired with the row).
+- [ ] Headset / car-remote buttons map to the ring's Stop/Resume.
+- DS: `guidelines/surfaces/workspace.md` → Drive mode; `components/workspace/OrbSatellite.jsx`.
+
+## H2. Satellite ring — phase-owned
+
+- [ ] The ring under the orb belongs to the phase. Idle: the composing controls (image, council, web). Any turn phase: four transport verbs — Restart · Back · Forward · Stop — swapped in gently, no reflow (same 44pt geometry, same gaps).
+- [ ] Through transcribing → synthesizing the three seek verbs are `disabled` (0.38, inert); only **Stop** is live, abandoning the turn and returning to idle. In the speaking phase all four come alive; at the last word or on Stop the orb returns to idle and the composing three come back.
+- [ ] Back = start of the current paragraph, or the preceding paragraph inside the first two seconds. Forward = next paragraph. Restart = first word of the response. Every jump moves the orb's reading arc with the playhead; the orb tap stays pause/resume and keeps position.
+- DS: `components/workspace/OrbSatellite.jsx` (`disabled` prop), `guidelines/surfaces/workspace.md` → Satellites.
+
+## H3. The orb's rings
+
+- [ ] Ring anatomy, inside out: disc → a small gap that is only ever a gap (the screen reads through it, identical in every phase) → inner ring → outer ring flush against it, nothing between the two.
+- [ ] Per phase: **idle** both rings faded green, no clocks; **recording** both combine into one indicator — how much of the window is used before auto-submit; **transcribing → synthesizing** two clocks (outer = whole turn against estimate, neutral; inner = current phase, phase colour); **speaking** both combine as the reading indicator over the whole response. Past the estimate both fill red.
+- DS: `components/workspace/VoiceOrb.jsx`, `guidelines/surfaces/workspace.md` → The orb.
+
+## H4. Status line — removed
+
+- [ ] Remove the status line under the orb entirely (phase dot · activity · conversation meta). Phase feedback lives in the orb; the transcript handle's meta line owns conversation name and age. `WorkspaceStatusLine` is retired from the design system.
 
 ## H. Conversations drawer
 
 - [ ] Trailing **"Archived"** section in the list itself, collapsed by default (keep the Data & privacy entry as the second route).
 - [ ] [verify] Pinned/Earlier headers with clear separation between the last pinned row and the "Earlier" header once pins exist (capture shows only EARLIER).
 - [ ] [verify] Forks are flat, first-class rows: no nesting, no fork lines; forked sessions carry a tappable root tag **on its own row** — root name + "›", 44pt target, no "Fork of" prefix, no quotes. Tapping jumps to the root.
-- [ ] Session actions sheet gains **"Show root conversation"** on forked sessions.
+- [ ] Session actions: replace the bottom sheet with the DS `AnchoredMenu` — anchored at the row’s kebab, no dim, groups Organize (pin, archive, private) / Identity (rename, name automatically) / Out (share, copy) / Delete (danger, alone). No “Show root conversation” item: the root tag on the row is the fork affordance.
 - [ ] [verify] Provider icons in the meta row repeat per model — two models of one provider = that icon twice.
 - [ ] [verify] Swipe-to-delete on rows (kebab exists; swipe is the staple).
-- [ ] Actions sheet style: one grouped card with hairline dividers, not one outlined card per action.
+- [ ] Park integrity review + conversation memory: remove both from the session actions surface (features parked, owner 2026-08; revisit later).
 - ✓ Search bar docked at the bottom (no fade above it), prominent green + in the header, row meta "date · N messages · icons", close at top-left.
 
 ## I. Transcript

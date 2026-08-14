@@ -21,7 +21,7 @@ function DataPrivacyPage({ onBack, onClose }) {
               <span style={{ display: "block", fontFamily: "var(--mb-font-body-medium)", fontWeight: 500, fontSize: 14, color: "var(--mb-color-text)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{model.name}</span>
               <span style={{ display: "block", marginTop: 2, fontFamily: "var(--mb-font-mono)", fontSize: 10, letterSpacing: ".4px", color: "var(--mb-color-text-muted)" }}>{model.cap} · {model.size}</span>
             </span>
-            <span role="button" style={{ minHeight: 34, padding: "6px 13px", borderRadius: 99, cursor: "pointer", display: "inline-flex", alignItems: "center", flexShrink: 0, fontFamily: "var(--mb-font-body-medium)", fontWeight: 500, fontSize: 13, border: "1px solid var(--mb-color-danger)", color: "var(--mb-color-danger)" }}>{model.state === "downloading" ? "Cancel" : "Remove"}</span>
+            <span role="button" style={{ minHeight: 44, padding: "6px 13px", borderRadius: "var(--mb-radius-control)", cursor: "pointer", display: "inline-flex", alignItems: "center", flexShrink: 0, fontFamily: "var(--mb-font-body-medium)", fontWeight: 500, fontSize: 13, border: "1px solid var(--mb-color-danger)", color: "var(--mb-color-danger)" }}>{model.state === "downloading" ? "Cancel" : "Remove"}</span>
           </div>
         ))}
       </SettingsGroup>

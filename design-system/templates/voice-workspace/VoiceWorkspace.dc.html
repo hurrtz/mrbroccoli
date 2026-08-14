@@ -20,7 +20,7 @@
 <x-import component-from-global-scope="MrBroccoliDesignSystem_62d510.AppWordmark" hint-size="140px,28px"></x-import>
 <x-import component-from-global-scope="MrBroccoliDesignSystem_62d510.IconButton" icon="setting" accessibility-label="Settings" hint-size="44px,44px"></x-import>
 </div>
-<x-import component-from-global-scope="MrBroccoliDesignSystem_62d510.RouteByline" provider="openai" provider-label="OpenAI" model-name="GPT-5" effort="Extra high" effort-levels="{{ effortLevels }}" asset-base="../../assets/providers" hint-size="100%,44px"></x-import>
+<x-import component-from-global-scope="MrBroccoliDesignSystem_62d510.RouteByline" provider="openai" provider-label="OpenAI" model-name="GPT-5" effort="Extra high" asset-base="../../assets/providers" hint-size="100%,44px"></x-import>
 <x-import component-from-global-scope="MrBroccoliDesignSystem_62d510.ConversationSettingsSummary" summary="Balanced · Brief · Heart · Web search on" hint-size="100%,44px"></x-import>
 <div style="flex:1;min-height:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;padding:12px 0">
 <x-import component-from-global-scope="MrBroccoliDesignSystem_62d510.VoiceOrb" phase="idle" size="{{ orbSize }}" hint-size="196px,196px"></x-import>
@@ -30,7 +30,6 @@
 <x-import component-from-global-scope="MrBroccoliDesignSystem_62d510.OrbSatellite" icon="search" label="Search" kind="toggle" active="{{ searchOn }}" accessibility-label="Web search" hint-size="64px,66px"></x-import>
 </div>
 </div>
-<x-import component-from-global-scope="MrBroccoliDesignSystem_62d510.WorkspaceStatusLine" title="Tap to speak" detail="Tide notes · 2 min ago" hint-size="100%,44px"></x-import>
 <x-import component-from-global-scope="MrBroccoliDesignSystem_62d510.TranscriptHandle" message-count="{{ messageCount }}" meta="GPT-5 · 2 min ago" preview="High water is at 15:40 today, and the tide turns roughly every six hours." hint-size="100%,74px"></x-import>
 </div>
 </div>
@@ -44,7 +43,6 @@ class Component extends DCLogic {
       orbSize: this.props.orbSize ?? 196,
       messageCount: this.props.messageCount ?? 12,
       searchOn: this.props.searchOn ?? true,
-      effortLevels: ["Minimal", "Low", "Medium", "High", "Extra high"],
     };
   }
 }

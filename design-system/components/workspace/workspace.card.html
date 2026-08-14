@@ -1,4 +1,4 @@
-<!-- @dsCard group="Components" viewport="700x610" name="Workspace" subtitle="Wordmark, route byline, model cards and the phase-coloured voice stage" -->
+<!-- @dsCard group="Components" viewport="700x330" name="Workspace header" subtitle="Wordmark, route byline and the settings sentence" -->
 <!DOCTYPE html><html data-theme="light"><head><meta charset="utf-8">
 <link rel="stylesheet" href="../../styles.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/regular/style.css">
@@ -9,34 +9,23 @@
 <style>body{padding:16px;background:var(--mb-color-background)}.lbl{font-family:var(--mb-font-mono);font-size:10px;letter-spacing:.9px;text-transform:uppercase;color:var(--mb-color-text-muted);margin:0 0 6px}</style>
 </head><body><div id="root"></div>
 <script type="text/babel">
-const { AppWordmark, ResponseModeToggle, PhaseAwareVoiceAction, RouteByline, IconButton } = window.MrBroccoliDesignSystem_62d510;
+const { AppWordmark, RouteByline, ConversationSettingsSummary, IconButton } = window.MrBroccoliDesignSystem_62d510;
 const base = "../../assets/providers";
-const modes = [
-  { id:"a", provider:"openai", providerLabel:"OpenAI", modelLabel:"GPT-5", effortLabel:"Medium" },
-  { id:"b", provider:"anthropic", providerLabel:"Anthropic", modelLabel:"Claude Sonnet 4.5", effortLabel:"High" },
-  { id:"c", local:true, modelLabel:"On device", effortLabel:"Fixed" },
-];
-function Demo(){
-  const [mode,setMode]=React.useState("b");
-  return <div style={{display:"flex",flexDirection:"column",gap:16}}>
+ReactDOM.createRoot(document.getElementById("root")).render(
+  <div style={{display:"flex",flexDirection:"column",gap:16}}>
     <div style={{display:"flex",alignItems:"center",justifyContent:"space-between"}}>
       <IconButton icon="menu" accessibilityLabel="Conversations" />
       <AppWordmark />
       <IconButton icon="setting" accessibilityLabel="Settings" />
     </div>
-    <div><p className="lbl">RouteByline</p><div style={{display:"flex",flexDirection:"column",gap:14}}>
-      <RouteByline provider="anthropic" providerLabel="Anthropic" modelName="Claude Sonnet 4.5" effort="Medium" effortLevels={["Low","Medium","High"]} assetBase={base} />
-      <RouteByline provider="openai" providerLabel="OpenAI" modelName="GPT-5" effort="High" effortLevels={["Minimal","Low","Medium","High"]} assetBase={base} />
+    <div><p className="lbl">RouteByline · effort is named, never plotted</p><div style={{display:"flex",flexDirection:"column",gap:14}}>
+      <RouteByline provider="anthropic" providerLabel="Anthropic" modelName="Claude Sonnet 4.5" effort="Medium" assetBase={base} />
+      <RouteByline provider="openai" providerLabel="OpenAI" modelName="GPT-5" effort="High" assetBase={base} />
       <RouteByline local modelName="On device · Qwen 2.5 1.5B" effort="Normal" switchable={false} />
     </div></div>
-    <div><p className="lbl">ResponseModeToggle</p>
-      <ResponseModeToggle modes={modes} selected={mode} onSelect={setMode} assetBase={base} /></div>
-    <div><p className="lbl">PhaseAwareVoiceAction</p><div style={{display:"flex",flexDirection:"column",gap:8}}>
-      <PhaseAwareVoiceAction visualPhase="recording" prompt="Your turn." title="Tap to talk" detail="Tap when done." recordingProgress={0.42} />
-      <PhaseAwareVoiceAction visualPhase="searching" prompt="Please wait." title="Searching" />
-      <PhaseAwareVoiceAction visualPhase="speaking" prompt="Please wait." title="Speaking" />
-    </div></div>
-  </div>;
-}
-ReactDOM.createRoot(document.getElementById("root")).render(<Demo />);
+    <div><p className="lbl">ConversationSettingsSummary · sentence, and landscape's icon-only form</p>
+      <ConversationSettingsSummary summary="Balanced · Brief · Heart · Web search on" />
+      <ConversationSettingsSummary iconOnly summary="Balanced · Brief · Heart · Web search on" /></div>
+  </div>
+);
 </script></body></html>

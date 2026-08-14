@@ -24,7 +24,7 @@ export function ConversationDrawerItem({ title, models = [], messageCount, updat
           {forkOf ? (
             <span role="button" aria-label={"Go to root session: " + forkOf} onClick={(e) => { e.stopPropagation(); if (onOpenRoot) onOpenRoot(); }}
               style={{ display: "inline-flex", alignItems: "center", alignSelf: "flex-start", maxWidth: "100%", minWidth: 0, minHeight: 44, margin: "-4px 0", padding: "6px 0", cursor: "pointer" }}>
-              <span style={{ display: "inline-flex", alignItems: "center", gap: 6, minWidth: 0, minHeight: 32, padding: "5px 10px 5px 13px", borderRadius: 99, border: "1px solid var(--mb-color-border-strong)", background: "var(--mb-color-surface-raised)" }}>
+              <span style={{ display: "inline-flex", alignItems: "center", gap: 6, minWidth: 0, minHeight: 32, padding: "5px 10px 5px 13px", borderRadius: "var(--mb-radius-pill)", border: "1px solid var(--mb-color-border-strong)", background: "var(--mb-color-surface-raised)" }}>
                 <span style={{ fontSize: 13, lineHeight: "16px", fontWeight: 500, color: "var(--mb-color-text-secondary)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{forkOf}</span>
                 <PhosphorIcon name="right" size="inline" color="var(--mb-color-text-secondary)" />
               </span>

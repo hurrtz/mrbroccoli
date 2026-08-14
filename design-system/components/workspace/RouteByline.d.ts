@@ -8,8 +8,6 @@ export interface RouteBylineProps {
   modelName: string;
   /** Current effort. "Normal" for a model that exposes no effort control. */
   effort?: string;
-  /** This model's own effort scale, low to high. Fewer than two values hides the dots. */
-  effortLevels?: string[];
   /** An on-device route: shows the cpu glyph instead of a provider mark. */
   local?: boolean;
   /** false when only one model is configured — drops the caret and the press target. */

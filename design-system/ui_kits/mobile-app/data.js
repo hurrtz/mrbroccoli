@@ -1,8 +1,8 @@
 window.MB_DATA = {
   modes: [
-    { id: "fast", provider: "openai", providerLabel: "OpenAI", modelLabel: "GPT-5 mini", effortLabel: "Low", effortLevels: ["Minimal", "Low", "Medium", "High"] },
-    { id: "deep", provider: "anthropic", providerLabel: "Anthropic", modelLabel: "Claude Sonnet 4.5", effortLabel: "Medium", effortLevels: ["Low", "Medium", "High"] },
-    { id: "local", local: true, providerLabel: "On device", modelLabel: "On device · Qwen 2.5 1.5B", effortLabel: "Normal", effortLevels: [] },
+    { id: "fast", provider: "openai", providerLabel: "OpenAI", modelLabel: "GPT-5 mini", effortLabel: "Low" },
+    { id: "deep", provider: "anthropic", providerLabel: "Anthropic", modelLabel: "Claude Sonnet 4.5", effortLabel: "Medium" },
+    { id: "local", local: true, providerLabel: "On device", modelLabel: "On device · Qwen 2.5 1.5B", effortLabel: "Normal" },
   ],
   conversations: [
     { id: "c1", title: "Tide tables", models: [{ provider: "anthropic" }], messageCount: 12, updatedAt: "09.08.26", pinned: true },

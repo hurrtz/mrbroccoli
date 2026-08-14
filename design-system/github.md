@@ -33,7 +33,7 @@ date: 2026-08-10
 | `components/list/**` | `src/design-system/NativeControls.tsx` |
 | `components/overlays/**` | `src/design-system/NativeControls.tsx`, `src/components/Toast.tsx` |
 | `components/settings-primitives/**` | `src/features/settings/settings-primitives/**` |
-| `components/workspace/**` | `src/components/AppWordmark.tsx`, `Picker.tsx`, `ResponseModeToggle.tsx`, `IntroBanner.tsx`, `PremiumUpgradeModal.tsx`, `src/screens/main/PhaseAwareVoiceAction.tsx` |
+| `components/workspace/**` | `src/components/AppWordmark.tsx`, `Picker.tsx`, `IntroBanner.tsx`, `PremiumUpgradeModal.tsx`, `src/screens/main/**` (orb, satellites, composer) |
 | `components/chat/**` | `src/components/ChatBubble.tsx`, `ChatTranscript.tsx`, `MessageImageAttachments.tsx`, `conversationDrawer/ConversationDrawerItem.tsx` |
 | `components/brand/ProviderIcon.jsx` | `src/components/ProviderIcon.tsx`, `assets/providers/` |
 | `components/on-device/LocalModelPerformanceSummary.jsx` | `src/components/LocalModelPerformanceSummary.tsx` |

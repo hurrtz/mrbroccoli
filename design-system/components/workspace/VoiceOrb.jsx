@@ -1,6 +1,15 @@
 import React from "react";
 import { PhosphorIcon } from "../core/PhosphorIcon";
-import { getAccessibleForeground } from "./PhaseAwareVoiceAction";
+/** Near-black or white, whichever measures higher contrast against the phase colour. */
+function getAccessibleForeground(background) {
+  const hex = String(background || "").trim();
+  const parsed = /^#?([0-9a-f]{6})$/i.exec(hex.replace("#", "#"));
+  if (!parsed) return "#FFFFFF";
+  const value = parseInt(parsed[1], 16);
+  const channel = (c) => { const s = c / 255; return s <= 0.03928 ? s / 12.92 : Math.pow((s + 0.055) / 1.055, 2.4); };
+  const luminance = 0.2126 * channel((value >> 16) & 255) + 0.7152 * channel((value >> 8) & 255) + 0.0722 * channel(value & 255);
+  return (luminance + 0.05) / 0.05 > 1.05 / (luminance + 0.05) ? "#16181D" : "#FFFFFF";
+}
 
 /** Phase to the colour token that phase owns. Recording reads the track, not the wash. */
 const PHASE_TOKEN = {
@@ -27,13 +36,19 @@ const PHASE_LABEL = {
 };
 
 const BAND = 6;
-const GAP = 3;
 
 /**
- * The workspace's one loud element. Two concentric rings carry two different
- * clocks: the outer one is the whole turn against its estimate, the inner one is
- * the current phase against itself. Past the estimate both rings fill with red
- * as they run, so a late turn is legible without reading anything.
+ * The workspace's one loud element. Anatomy inside out: the disc; a small gap
+ * that is only ever a gap — no fill, no meaning, identical in every phase; the
+ * inner ring; the outer ring flush against it, no separation between the two.
+ *
+ * What the rings mean per phase — idle: both faded green, no clocks.
+ * Recording: both combine into ONE indicator, how much of the recording window
+ * is used before auto-submit. Transcribing through synthesizing: outer = the
+ * whole turn against its estimate (neutral, reads as time), inner = the
+ * current phase against itself (phase colour). Speaking: both combine again —
+ * how much of the response has been read; paragraph jumps move the arc. Past
+ * the estimate both rings fill red as the turn runs late.
  */
 export function VoiceOrb({
   phase = "idle",
@@ -60,30 +75,24 @@ export function VoiceOrb({
   const remaining = Math.round((1 - late) * 360);
   const tint = "color-mix(in srgb, " + ink + " 16%, transparent)";
   const foreground = getAccessibleForeground(ink);
-  /* At rest there is no turn and no phase, so neither ring means anything.
-     Both fall back to the plain halo rather than drawing empty tracks. */
-  const quiet = phase === "idle" && !clamp(turnProgress) && !clamp(phaseProgress) && !late;
+  const combined = phase === "recording" || phase === "speaking";
+  const idle = phase === "idle";
 
-  const turnRing = quiet
-    ? "var(--mb-color-background)"
-    : late > 0
-    ? "conic-gradient(var(--mb-color-turn-track) 0deg " + remaining + "deg, var(--mb-color-danger) " + remaining + "deg 360deg)"
-    : "conic-gradient(var(--mb-color-turn-ink) 0deg " + Math.round(clamp(turnProgress) * 360) + "deg, var(--mb-color-turn-track) " + Math.round(clamp(turnProgress) * 360) + "deg 360deg)";
-
-  const phaseRing = quiet
-    ? "linear-gradient(" + tint + ", " + tint + ")"
-    : late > 0
-    ? "conic-gradient(" + tint + " 0deg " + remaining + "deg, var(--mb-color-danger) " + remaining + "deg 360deg)"
-    : "conic-gradient(" + ink + " 0deg " + Math.round(clamp(phaseProgress) * 360) + "deg, " + tint + " " + Math.round(clamp(phaseProgress) * 360) + "deg 360deg)";
+  const arc = (progress, arcInk, track) => late > 0
+    ? "conic-gradient(" + track + " 0deg " + remaining + "deg, var(--mb-color-danger) " + remaining + "deg 360deg)"
+    : "conic-gradient(" + arcInk + " 0deg " + Math.round(clamp(progress) * 360) + "deg, " + track + " " + Math.round(clamp(progress) * 360) + "deg 360deg)";
+  const flat = "linear-gradient(" + tint + ", " + tint + ")";
+  const phaseArc = arc(phaseProgress, ink, tint);
+  /* Combined phases paint the SAME conic on both ring layers; concentric
+     conics share a centre, so the two bands read as one 12pt indicator. */
+  const outerPaint = idle ? flat : combined ? phaseArc : arc(turnProgress, "var(--mb-color-turn-ink)", "var(--mb-color-turn-track)");
+  const innerPaint = idle ? flat : phaseArc;
 
   const centre = { display: "flex", alignItems: "center", justifyContent: "center", borderRadius: "50%", flexShrink: 0 };
-  const hole = size - BAND * 2;
-  const inner = hole - GAP * 2;
-  const innerHole = inner - BAND * 2;
-  // The core is a proportion of the whole orb, but it can never exceed the ring
-  // holding it: the rings shrink by fixed bands while the proportion shrinks
-  // linearly, so below ~107pt the proportion overtakes the ring it sits in.
-  const disc = Math.min(innerHole, Math.floor(size * 0.72));
+  const ringHole = size - BAND * 4;
+  // The disc is a proportion of the whole orb, capped so the gap survives at
+  // small sizes — the gap is part of the anatomy, never squeezed out.
+  const disc = Math.min(Math.floor(size * 0.79), ringHole - 6);
 
   return (
     <div
@@ -92,15 +101,14 @@ export function VoiceOrb({
       tabIndex={0}
       aria-label={label || PHASE_LABEL[phase] || PHASE_LABEL.idle}
       onClick={onPress}
-      style={{ ...centre, width: size, height: size, cursor: "pointer", background: turnRing, ...style }}
+      style={{ ...centre, width: size, height: size, cursor: "pointer", background: outerPaint, ...style }}
     >
-      <div style={{ ...centre, width: hole, height: hole, background: "var(--mb-color-background)" }}>
-        <div style={{ ...centre, width: inner, height: inner, backgroundColor: "var(--mb-color-background)", backgroundImage: phaseRing }}>
-          <div style={{ ...centre, width: innerHole, height: innerHole, background: quiet ? tint : "var(--mb-color-background)" }}>
-            <div style={{ ...centre, width: disc, height: disc, background: ink, boxShadow: "0 0 0 8px " + tint }}>
-              <PhosphorIcon name={PHASE_ICON[phase] || PHASE_ICON.idle} size="hero" color={foreground}
-                style={{ fontSize: Math.round(size * 0.3), width: Math.round(size * 0.3), height: Math.round(size * 0.3) }} />
-            </div>
+      <div style={{ ...centre, width: size - BAND * 2, height: size - BAND * 2, backgroundColor: "var(--mb-color-background)", backgroundImage: innerPaint }}>
+        {/* The gap: drawn in the screen colour so the workspace reads through. It never changes, whatever the phase. */}
+        <div style={{ ...centre, width: ringHole, height: ringHole, background: "var(--mb-color-background)" }}>
+          <div style={{ ...centre, width: disc, height: disc, background: ink }}>
+            <PhosphorIcon name={PHASE_ICON[phase] || PHASE_ICON.idle} size="hero" color={foreground}
+              style={{ fontSize: Math.round(size * 0.3), width: Math.round(size * 0.3), height: Math.round(size * 0.3) }} />
           </div>
         </div>
       </div>

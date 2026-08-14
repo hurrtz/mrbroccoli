@@ -136,7 +136,7 @@ function Action({ label, icon, tone = "primary", onPress }) {
   return (
     <button type="button" onClick={onPress} style={{
       display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
-      minHeight: 52, padding: "0 20px", cursor: "pointer", width: "100%",
+      minHeight: 48, padding: "0 20px", cursor: "pointer", width: "100%",
       borderRadius: "var(--mb-radius-control)",
       border: "1px solid " + (filled ? "transparent" : "var(--mb-color-border-strong)"),
       background: filled ? "var(--mb-color-accent)" : "transparent", color: ink,

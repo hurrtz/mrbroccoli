@@ -30,4 +30,4 @@ The route into the walkthrough from the home screen. Violet, fixed in both appea
 
 ## Superseded
 
-The seven-step wizard (welcome / requirements / auto / llm / stt / tts / premium), its `IntroPanel`/`IntroPoint`/`IntroDivider`/`IntroButton` step layouts, and `IntroVoicePicker` are superseded by this design. The primitives remain compiled for specimen cards and ad-hoc use until the app migration retires them. Upstream `IntroFlowScreen.tsx` swipe-paging maps to three pages now.
+The seven-step wizard (welcome / requirements / auto / llm / stt / tts / premium) and its step-layout parts — `IntroPanel`, `IntroPanelDivider`, `IntroPoint`, `IntroDivider`, `IntroButton`, `IntroVoicePicker` — are retired: all of them were **deleted** from the system in 2026-08 (removed 2026-08) are superseded by this design. The primitives remain compiled for specimen cards and ad-hoc use until the app migration retires them. Upstream `IntroFlowScreen.tsx` swipe-paging maps to three pages now.

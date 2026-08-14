@@ -1,12 +1,15 @@
-const { SettingsGroup, SettingsRow, RouteOptionRow, IconAction, PremiumBand, PhosphorIcon } = window.MrBroccoliDesignSystem_62d510;
+const { SettingsGroup, SettingsRow, RouteOptionRow, IconAction, PremiumBand, PhosphorIcon, Switch } = window.MrBroccoliDesignSystem_62d510;
 
-/** Kit-local switch (visual only). */
+/** Kit wrapper: local state around the system Switch, with the raw track as fallback. */
 function KitSwitch({ on }) {
   const [state, setState] = React.useState(!!on);
+  if (Switch) return <Switch value={state} onChange={setState} />;
   return (
     <span role="switch" aria-checked={state ? "true" : "false"} onClick={(e) => { e.stopPropagation(); setState(!state); }}
-      style={{ width: 46, height: 28, borderRadius: 14, flexShrink: 0, position: "relative", cursor: "pointer", background: state ? "var(--mb-color-accent)" : "var(--mb-color-border-strong)", transition: "background .15s" }}>
-      <span style={{ position: "absolute", top: 2, left: state ? 20 : 2, width: 24, height: 24, borderRadius: 12, background: "#fff", boxShadow: "0 1px 3px rgba(0,0,0,.25)", transition: "left .15s" }} />
+      style={{ width: 46, minHeight: 44, flexShrink: 0, cursor: "pointer", display: "inline-flex", alignItems: "center", justifyContent: "center" }}>
+      <span aria-hidden="true" style={{ width: 46, height: 28, borderRadius: 14, position: "relative", display: "block", background: state ? "var(--mb-color-accent)" : "var(--mb-color-border-strong)", transition: "background .15s" }}>
+        <span style={{ position: "absolute", top: 2, left: state ? 20 : 2, width: 24, height: 24, borderRadius: 12, background: "#fff", boxShadow: "0 1px 3px rgba(0,0,0,.25)", transition: "left .15s" }} />
+      </span>
     </span>
   );
 }
@@ -24,7 +27,7 @@ function VoiceSheet({ onClose }) {
             <span style={{ flex: 1, fontFamily: "var(--mb-font-headline)", fontSize: 17, letterSpacing: "-0.2px", color: "var(--mb-color-text)" }}>Voice · Kokoro</span>
             <span style={{ fontFamily: "var(--mb-font-mono)", fontSize: 10, letterSpacing: ".4px", color: "var(--mb-color-text-muted)" }}>54 voices</span>
           </div>
-          <div style={{ display: "flex", alignItems: "center", gap: 9, minHeight: 44, marginTop: 8, padding: "0 13px", borderRadius: 99, border: "1px solid var(--mb-color-border)", background: "var(--mb-color-surface)" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 9, minHeight: 44, marginTop: 8, padding: "0 13px", borderRadius: "var(--mb-radius-control)", border: "1px solid var(--mb-color-border)", background: "var(--mb-color-surface)" }}>
             <PhosphorIcon name="search" size="compact" color="var(--mb-color-text-muted)" />
             <span style={{ fontFamily: "var(--mb-text-body-family)", fontSize: 14, color: "var(--mb-color-text-muted)" }}>Search voices</span>
           </div>

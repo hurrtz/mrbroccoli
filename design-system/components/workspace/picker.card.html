@@ -9,15 +9,8 @@
 <style>body{padding:16px;background:var(--mb-color-background)}.lbl{font-family:var(--mb-font-mono);font-size:10px;letter-spacing:.9px;text-transform:uppercase;color:var(--mb-color-text-muted);margin:0 0 6px}</style>
 </head><body><div id="root"></div>
 <script type="text/babel">
-const { AppWordmark, ResponseModeToggle, PhaseAwareVoiceAction, Picker, IntroBanner, IconButton } = window.MrBroccoliDesignSystem_62d510;
-const base = "../../assets/providers";
-const modes = [
-  { id:"a", provider:"openai", providerLabel:"OpenAI", modelLabel:"GPT-5", effortLabel:"Medium" },
-  { id:"b", provider:"anthropic", providerLabel:"Anthropic", modelLabel:"Claude Sonnet 4.5", effortLabel:"High" },
-  { id:"c", local:true, modelLabel:"On device", effortLabel:"Fixed" },
-];
+const { Picker, IntroBanner } = window.MrBroccoliDesignSystem_62d510;
 function Demo(){
-  const [mode,setMode]=React.useState("b");
   return <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:16,alignItems:"start"}}>
     <div><p className="lbl">Picker</p>
       <Picker label="Voice" value="heart" dropdownLabel="Selection" onChange={()=>{}}

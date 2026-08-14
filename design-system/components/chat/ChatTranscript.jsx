@@ -6,7 +6,7 @@ export function ChatTranscript({ children, emptyTitle, emptyDescription, isEmpty
   if (isEmpty) {
     return (
       <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 12, padding: "26px 20px", textAlign: "center", ...style }}>
-        <span style={{ width: 46, height: 46, borderRadius: 23, display: "flex", alignItems: "center", justifyContent: "center", border: "1px solid var(--mb-color-border)", background: "var(--mb-color-surface)" }}>
+        <span style={{ width: 46, height: 46, borderRadius: "var(--mb-radius-icon-button)", display: "flex", alignItems: "center", justifyContent: "center", border: "1px solid var(--mb-color-border)", background: "var(--mb-color-surface)" }}>
           <PhosphorIcon name="message" size="navigation" color="var(--mb-color-text-secondary)" />
         </span>
         <span style={{ fontFamily: "var(--mb-font-display)", fontWeight: 600, fontSize: 18, color: "var(--mb-color-text)" }}>{emptyTitle}</span>

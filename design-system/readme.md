@@ -32,14 +32,14 @@ One product: the **Mr Broccoli mobile app** (Expo / React Native, iOS and Androi
 
 ## Component index
 
-**Core** — `Button`, `IconButton`, `Input`, `TextArea`, `Tag`, `PhosphorIcon`.
+**Core** — `Button`, `IconButton`, `Input`, `Switch`, `TextArea`, `Tag`, `PhosphorIcon`.
 **List** — `List`, `ListItem` (with `ListItem.Brief`).
-**Overlays** — `Modal`, `Toast`.
-**Settings primitives** — `SettingsGroup`, `SettingsRow`, `RouteOptionRow`, `IconAction`, `PremiumBand`, `RuntimeReadiness`; superseded Ant recreation retained where still mounted: `AntSettingsCard`, `AntDisclosureCard`, `AntButtonLabel`, `AntSectionIntro`, `AntRadioSection`, `AntSwitchRow`, `AntNumberInputRow`, `AntTextArea`, `AntPickerRow`, `AntPickerRows`, `AntPickerSection`.
-**Workspace** — `AppWordmark`, `RouteByline`, `RoutePicker`, `Composer`, `Picker`, `ResponseModeToggle`, `PhaseAwareVoiceAction`, `IntroBanner`, `PremiumUpgradeModal`, `DriveSessionControls`, `VoiceOrb`, `OrbSatellite`, `ConversationSettingsSummary`, `WorkspaceStatusLine`, `TranscriptHandle`, `BackgroundTaskBar`.
-**Chat** — `ChatBubble`, `ChatTranscript`, `TranscriptMessage`, `ConversationDrawerItem`, `ConversationActionSheet`, `ConversationRenameModal`, `ConversationIntegrityModal`, `MessageImageAttachments`, `TurnReceiptCard`, `WebSearchReferences`, `UsageCard`, `UberModeAuditCard`, `ReplyFailureCard`, `PipelineNotices`, `MessageBranchIndicator`, `ConversationMemoryModal`.
+**Overlays** — `Modal`, `Toast`, `AnchoredMenu`.
+**Settings primitives** — `SettingsGroup`, `SettingsRow`, `RouteOptionRow`, `IconAction`, `PremiumBand`, `RuntimeReadiness`.
+**Workspace** — `AppWordmark`, `RouteByline`, `RoutePicker`, `Composer`, `Picker`, `IntroBanner`, `PremiumUpgradeModal`, `VoiceOrb`, `OrbSatellite`, `ConversationSettingsSummary`, `TranscriptHandle`, `BackgroundTaskBar`.
+**Chat** — `ChatBubble`, `ChatTranscript`, `TranscriptMessage`, `ConversationDrawerItem`, `AnchoredMenu` (session actions menu), `ConversationRenameModal`, `MessageImageAttachments`, `TurnReceiptCard`, `WebSearchReferences`, `UsageCard`, `UberModeAuditCard`, `ReplyFailureCard`, `PipelineNotices`, `MessageBranchIndicator`.
 **Brand** — `ProviderIcon`.
-**Introduction** — `IntroFlow`, `IntroStepper`, `IntroPanel`, `IntroPoint`, `IntroButton`, `IntroTitle`, `IntroBody`, `IntroDivider`, `IntroVoicePicker`.
+**Introduction** — `IntroFlow`, `IntroStepper`, `IntroTitle`, `IntroBody`.
 **On-device** — `LocalModelPerformanceSummary`, `AutoSetupCard`, `AutoSetupPlanRow`, `InstallProgress`.
 
 The inventory comes from the codebase plus the approved additions recorded in the surface docs (`RouteByline`, the orb composition, auto-setup). Which components are additions, which are replacements-on-one-screen, and which upstream pieces are deliberately not packaged is stated per surface in `guidelines/surfaces/`.

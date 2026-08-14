@@ -15,9 +15,9 @@ export type VoicePhase =
 export interface VoiceOrbProps {
   /** Which pipeline phase the orb is showing. Defaults to idle. */
   phase?: VoicePhase;
-  /** 0–1 through the current phase. Drives the inner ring. */
+  /** 0–1 progress. Recording: how much of the recording window is used before auto-submit (both rings, one indicator). Transcribing→synthesizing: the current phase against itself (inner ring). Speaking: how much of the whole response was read (both rings) — paragraph jumps move it. */
   phaseProgress?: number;
-  /** 0–1 through the whole turn against its estimate. Drives the outer ring. */
+  /** 0–1 through the whole turn against its estimate. Drives the outer ring during the middle phases (transcribing → synthesizing); ignored while idle, recording or speaking. */
   turnProgress?: number;
   /** 0–1 past the estimate. Above 0 both rings fill with red as the turn runs. */
   overtime?: number;
