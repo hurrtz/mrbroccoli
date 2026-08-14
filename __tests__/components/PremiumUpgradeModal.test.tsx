@@ -97,7 +97,7 @@ describe("PremiumUpgradeModal", () => {
 
     expect(
       screen.getByText(
-        "One-time purchase. No subscription and no token markup; provider usage is billed by your providers.",
+        "One-time purchase. No subscription and no token markup; models and voices run on your own keys, billed by your providers — none are included.",
       ),
     ).toBeTruthy();
     expect(

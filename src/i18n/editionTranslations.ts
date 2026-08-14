@@ -3,7 +3,7 @@ import type { TranslationParams } from "./types";
 const en = {
   freeEdition: "Private Offline · Free",
   premiumPurchaseValue:
-    "One-time purchase. No subscription and no token markup; provider usage is billed by your providers.",
+    "One-time purchase. No subscription and no token markup; models and voices run on your own keys, billed by your providers — none are included.",
   premiumFreeKeepsWorking:
     "Free remains usable: offline conversations, history, backups, and manual export stay available.",
   premiumBenefitProviders:
@@ -66,7 +66,7 @@ export const editionTranslations = {
   de: define({
     freeEdition: "Privat & offline · Kostenlos",
     premiumPurchaseValue:
-      "Einmaliger Kauf. Kein Abo und kein Token-Aufschlag; die Nutzung wird direkt von deinen Anbietern abgerechnet.",
+      "Einmaliger Kauf. Kein Abo und kein Token-Aufschlag; Modelle und Stimmen laufen über deine eigenen Schlüssel und werden direkt von deinen Anbietern abgerechnet — enthalten ist keines davon.",
     premiumFreeKeepsWorking:
       "Kostenlos bleibt nutzbar: Offline-Gespräche, Verlauf, Backups und manueller Export bleiben verfügbar.",
     premiumBenefitProviders:
@@ -125,7 +125,7 @@ export const editionTranslations = {
   uk: define({
     freeEdition: "Приватно й офлайн · Безкоштовно",
     premiumPurchaseValue:
-      "Одноразова покупка. Без підписки й націнки на токени; за використання ви платите безпосередньо своїм провайдерам.",
+      "Одноразова покупка. Без підписки й націнки на токени; моделі й голоси працюють через ваші власні ключі, і за використання ви платите безпосередньо своїм провайдерам — нічого з цього не входить у ціну.",
     premiumFreeKeepsWorking:
       "Безкоштовна версія залишається корисною: офлайн-розмови, історія, резервні копії та ручний експорт доступні.",
     premiumBenefitProviders:
@@ -182,7 +182,7 @@ export const editionTranslations = {
   hi: define({
     freeEdition: "निजी ऑफ़लाइन · मुफ़्त",
     premiumPurchaseValue:
-      "एक बार की खरीद। कोई सदस्यता या टोकन पर अतिरिक्त शुल्क नहीं; प्रदाता उपयोग का बिल आपके प्रदाता देते हैं।",
+      "एक बार की खरीद। कोई सदस्यता या टोकन पर अतिरिक्त शुल्क नहीं; मॉडल और आवाज़ें आपकी अपनी कुंजियों पर चलती हैं और उनका बिल आपके प्रदाता देते हैं — इनमें से कुछ भी शामिल नहीं है।",
     premiumFreeKeepsWorking:
       "मुफ़्त संस्करण उपयोगी रहता है: ऑफ़लाइन बातचीत, इतिहास, बैकअप और मैन्युअल निर्यात उपलब्ध रहते हैं।",
     premiumBenefitProviders:
@@ -239,7 +239,7 @@ export const editionTranslations = {
   es: define({
     freeEdition: "Privado sin conexión · Gratis",
     premiumPurchaseValue:
-      "Compra única. Sin suscripción ni recargo por tokens; tus proveedores facturan su uso directamente.",
+      "Compra única. Sin suscripción ni recargo por tokens; los modelos y las voces funcionan con tus propias claves y los facturan tus proveedores directamente — ninguno está incluido.",
     premiumFreeKeepsWorking:
       "La versión gratuita sigue siendo útil: conserva conversaciones sin conexión, historial, copias de seguridad y exportación manual.",
     premiumBenefitProviders:
@@ -298,7 +298,7 @@ export const editionTranslations = {
   fr: define({
     freeEdition: "Privé hors ligne · Gratuit",
     premiumPurchaseValue:
-      "Achat unique. Sans abonnement ni marge sur les jetons ; l’usage est facturé directement par vos fournisseurs.",
+      "Achat unique. Sans abonnement ni marge sur les jetons ; les modèles et les voix utilisent vos propres clés et sont facturés directement par vos fournisseurs — aucun n’est inclus.",
     premiumFreeKeepsWorking:
       "La version gratuite reste utile : conversations hors ligne, historique, sauvegardes et export manuel restent disponibles.",
     premiumBenefitProviders:
@@ -357,7 +357,7 @@ export const editionTranslations = {
   it: define({
     freeEdition: "Privato offline · Gratis",
     premiumPurchaseValue:
-      "Acquisto una tantum. Nessun abbonamento o ricarico sui token; l’uso è fatturato direttamente dai tuoi provider.",
+      "Acquisto una tantum. Nessun abbonamento o ricarico sui token; modelli e voci usano le tue chiavi e sono fatturati direttamente dai tuoi provider — nessuno è incluso.",
     premiumFreeKeepsWorking:
       "La versione gratuita resta utilizzabile: conversazioni offline, cronologia, backup ed esportazione manuale rimangono disponibili.",
     premiumBenefitProviders:
@@ -415,7 +415,7 @@ export const editionTranslations = {
   pt: define({
     freeEdition: "Privado offline · Grátis",
     premiumPurchaseValue:
-      "Compra única. Sem subscrição nem margem sobre tokens; a utilização é faturada diretamente pelos seus fornecedores.",
+      "Compra única. Sem subscrição nem margem sobre tokens; os modelos e as vozes usam as suas próprias chaves e são faturados diretamente pelos seus fornecedores — nenhum está incluído.",
     premiumFreeKeepsWorking:
       "A versão gratuita continua útil: conversas offline, histórico, cópias de segurança e exportação manual permanecem disponíveis.",
     premiumBenefitProviders:
@@ -473,7 +473,7 @@ export const editionTranslations = {
   ptBR: define({
     freeEdition: "Privado offline · Grátis",
     premiumPurchaseValue:
-      "Compra única. Sem assinatura nem acréscimo sobre tokens; o uso é cobrado diretamente pelos seus provedores.",
+      "Compra única. Sem assinatura nem acréscimo sobre tokens; os modelos e as vozes usam as suas próprias chaves e são cobrados diretamente pelos seus provedores — nenhum está incluído.",
     premiumFreeKeepsWorking:
       "A versão grátis continua útil: conversas offline, histórico, backups e exportação manual permanecem disponíveis.",
     premiumBenefitProviders:
@@ -531,7 +531,7 @@ export const editionTranslations = {
   ru: define({
     freeEdition: "Приватно и офлайн · Бесплатно",
     premiumPurchaseValue:
-      "Разовая покупка. Без подписки и наценки на токены; использование оплачивается напрямую вашим провайдерам.",
+      "Разовая покупка. Без подписки и наценки на токены; модели и голоса работают через ваши собственные ключи и оплачиваются напрямую вашим провайдерам — ничего из этого не входит в цену.",
     premiumFreeKeepsWorking:
       "Бесплатная версия остаётся полезной: офлайн-разговоры, история, резервные копии и ручной экспорт доступны.",
     premiumBenefitProviders:
@@ -590,7 +590,7 @@ export const editionTranslations = {
   "zh-CN": define({
     freeEdition: "私密离线 · 免费",
     premiumPurchaseValue:
-      "一次购买，无订阅、无 Token 加价；提供商用量由提供商直接计费。",
+      "一次购买，无订阅、无 Token 加价；模型和语音使用你自己的密钥，由提供商直接计费——均不包含在内。",
     premiumFreeKeepsWorking:
       "免费版仍可完整使用：离线对话、历史记录、备份和手动导出均会保留。",
     premiumBenefitProviders: "使用你的云端提供商及其更高质量的模型",
@@ -643,7 +643,7 @@ export const editionTranslations = {
   ar: define({
     freeEdition: "خاص بلا اتصال · مجاني",
     premiumPurchaseValue:
-      "شراء لمرة واحدة. بلا اشتراك أو هامش على الرموز؛ يحاسبك مزودوك مباشرة على الاستخدام.",
+      "شراء لمرة واحدة. بلا اشتراك أو هامش على الرموز؛ تعمل النماذج والأصوات بمفاتيحك الخاصة ويحاسبك مزودوك عليها مباشرة — لا شيء منها مضمّن.",
     premiumFreeKeepsWorking:
       "يبقى الإصدار المجاني مفيدًا: تظل المحادثات بلا اتصال والسجل والنسخ الاحتياطية والتصدير اليدوي متاحة.",
     premiumBenefitProviders: "استخدم مزودي السحابة لديك ونماذجهم الأعلى جودة",
@@ -700,7 +700,7 @@ export const editionTranslations = {
   ja: define({
     freeEdition: "プライベート・オフライン · 無料",
     premiumPurchaseValue:
-      "買い切りです。サブスクリプションやトークンへの上乗せはなく、利用料は各プロバイダーから直接請求されます。",
+      "買い切りです。サブスクリプションやトークンへの上乗せはありません。モデルと音声はご自身のキーで動作し、利用料は各プロバイダーから直接請求されます — いずれも購入には含まれません。",
     premiumFreeKeepsWorking:
       "無料版も使い続けられます。オフライン会話、履歴、バックアップ、手動エクスポートは利用可能です。",
     premiumBenefitProviders: "お使いのクラウドプロバイダーと高品質モデルを利用",
@@ -757,7 +757,7 @@ export const editionTranslations = {
   hu: define({
     freeEdition: "Privát offline · Ingyenes",
     premiumPurchaseValue:
-      "Egyszeri vásárlás. Nincs előfizetés vagy tokenfelár; a használatot közvetlenül az Ön szolgáltatói számlázzák.",
+      "Egyszeri vásárlás. Nincs előfizetés vagy tokenfelár; a modellek és hangok az Ön saját kulcsaival futnak, és közvetlenül a szolgáltatói számlázzák őket — egyik sincs benne az árban.",
     premiumFreeKeepsWorking:
       "Az ingyenes változat használható marad: az offline beszélgetések, előzmények, mentések és kézi export elérhetők.",
     premiumBenefitProviders:
@@ -816,7 +816,7 @@ export const editionTranslations = {
   cs: define({
     freeEdition: "Soukromě offline · Zdarma",
     premiumPurchaseValue:
-      "Jednorázový nákup. Bez předplatného a přirážky za tokeny; využití účtují přímo vaši poskytovatelé.",
+      "Jednorázový nákup. Bez předplatného a přirážky za tokeny; modely a hlasy běží na vašich vlastních klíčích a účtují je přímo vaši poskytovatelé — žádné nejsou v ceně.",
     premiumFreeKeepsWorking:
       "Bezplatná verze zůstává užitečná: offline konverzace, historie, zálohy a ruční export zůstávají dostupné.",
     premiumBenefitProviders:
@@ -874,7 +874,7 @@ export const editionTranslations = {
   pl: define({
     freeEdition: "Prywatnie offline · Bezpłatnie",
     premiumPurchaseValue:
-      "Jednorazowy zakup. Bez subskrypcji i narzutu na tokeny; użycie rozliczają bezpośrednio Twoi dostawcy.",
+      "Jednorazowy zakup. Bez subskrypcji i narzutu na tokeny; modele i głosy działają na Twoich własnych kluczach i rozliczają je bezpośrednio Twoi dostawcy — żaden nie jest wliczony.",
     premiumFreeKeepsWorking:
       "Wersja bezpłatna pozostaje użyteczna: rozmowy offline, historia, kopie zapasowe i ręczny eksport są nadal dostępne.",
     premiumBenefitProviders:
@@ -932,7 +932,7 @@ export const editionTranslations = {
   tr: define({
     freeEdition: "Özel çevrimdışı · Ücretsiz",
     premiumPurchaseValue:
-      "Tek seferlik satın alma. Abonelik veya token fiyatına ek ücret yoktur; kullanım doğrudan sağlayıcılarınızca faturalandırılır.",
+      "Tek seferlik satın alma. Abonelik veya token fiyatına ek ücret yoktur; modeller ve sesler kendi anahtarlarınızla çalışır ve doğrudan sağlayıcılarınızca faturalandırılır — hiçbiri dahil değildir.",
     premiumFreeKeepsWorking:
       "Ücretsiz sürüm kullanılabilir kalır: çevrimdışı konuşmalar, geçmiş, yedekler ve elle dışa aktarma sunulur.",
     premiumBenefitProviders:
@@ -991,7 +991,7 @@ export const editionTranslations = {
   sv: define({
     freeEdition: "Privat offline · Gratis",
     premiumPurchaseValue:
-      "Engångsköp. Ingen prenumeration eller tokenpåslag; användningen faktureras direkt av dina leverantörer.",
+      "Engångsköp. Ingen prenumeration eller tokenpåslag; modeller och röster körs med dina egna nycklar och faktureras direkt av dina leverantörer — inget ingår.",
     premiumFreeKeepsWorking:
       "Gratisversionen förblir användbar: offline-samtal, historik, säkerhetskopior och manuell export finns kvar.",
     premiumBenefitProviders:
@@ -1049,7 +1049,7 @@ export const editionTranslations = {
   ur: define({
     freeEdition: "نجی آف لائن · مفت",
     premiumPurchaseValue:
-      "ایک بار کی خریداری۔ کوئی سبسکرپشن یا ٹوکن پر اضافی قیمت نہیں؛ استعمال کی قیمت آپ کے فراہم کنندگان براہ راست وصول کرتے ہیں۔",
+      "ایک بار کی خریداری۔ کوئی سبسکرپشن یا ٹوکن پر اضافی قیمت نہیں؛ ماڈل اور آوازیں آپ کی اپنی کلیدوں پر چلتی ہیں اور ان کی قیمت آپ کے فراہم کنندگان براہ راست وصول کرتے ہیں — ان میں سے کچھ بھی شامل نہیں۔",
     premiumFreeKeepsWorking:
       "مفت ورژن کارآمد رہتا ہے: آف لائن گفتگو، تاریخ، بیک اپ اور دستی برآمد دستیاب رہتے ہیں۔",
     premiumBenefitProviders:

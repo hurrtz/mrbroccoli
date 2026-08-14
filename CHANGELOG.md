@@ -59,6 +59,9 @@ the complete Play Store translations are kept in a dedicated file under
   grabber, which is the labeled close action — the status line already
   carries the conversation's name. Message headers show the time alone;
   the drawer row owns the date.
+- The Premium purchase sheet now states the whole honesty rule: models and
+  voices run on your own keys, billed by your providers, and none are
+  included in the purchase.
 - The voice orb steps down a size while the setup banner is on screen instead
   of squeezing the rest of the home screen.
 - The Settings overview's Connections summary names at most two providers and
