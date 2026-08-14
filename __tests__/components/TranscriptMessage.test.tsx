@@ -111,7 +111,7 @@ describe("TranscriptMessage", () => {
     const threadLine = speaker.children[speaker.children.length - 1];
     expect(
       StyleSheet.flatten(
-        (threadLine as { props: { style: unknown } }).props.style,
+        (threadLine as unknown as { props: { style: unknown } }).props.style,
       ),
     ).toEqual(expect.objectContaining({ width: 1.5 }));
     expect(StyleSheet.flatten(body.props.style)).toEqual(

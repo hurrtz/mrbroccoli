@@ -37,7 +37,7 @@ describe("OrbSatellite", () => {
     );
   });
 
-  it("gives toggles a round well that carries the state", () => {
+  it("gives toggles a squircle well that carries the state", () => {
     const screen = renderSatellite({
       icon: "council",
       label: "Council",
@@ -51,7 +51,9 @@ describe("OrbSatellite", () => {
     expect(well.props.accessibilityState).toEqual(
       expect.objectContaining({ checked: true, disabled: false }),
     );
-    expect(flat.borderRadius).toBe(22);
+    // Squircle like every other control: the state reads from the
+    // border and fill, never from the shape.
+    expect(flat.borderRadius).toBe(12);
     expect(flat.borderColor).toBe(lightColors.accent);
     expect(flat.backgroundColor).toBe(lightColors.accentSoft);
   });

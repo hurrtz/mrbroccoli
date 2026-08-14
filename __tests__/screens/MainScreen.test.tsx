@@ -1056,7 +1056,10 @@ describe("MainScreen", () => {
     expect(leftPane.queryByText("status-strip")).toBeNull();
     expect(leftPane.queryByText("toggle-debug-log")).toBeNull();
     expect(screen.queryByTestId("landscape-status-area")).toBeNull();
-    expect(leftPane.queryByTestId("conversation-settings-summary")).toBeNull();
+    // Landscape keeps the settings control, floated over the stage as an icon.
+    expect(
+      leftPane.getByTestId("conversation-settings-summary"),
+    ).toBeTruthy();
     expect(leftPane.queryByTestId("satellite-image")).toBeNull();
     expect(
       StyleSheet.flatten(
