@@ -528,6 +528,15 @@ export function MainScreenWorkspace({
             />
             <MainScreenVoiceStage
               colors={colors}
+              footer={
+                <WorkspaceSatellites
+                  colors={colors}
+                  compact
+                  speaking={visualPhase === "speaking"}
+                  turnActive={visualPhase !== "idle"}
+                  {...satellites}
+                />
+              }
               layout="landscape"
               maxOrbSize={150}
               {...voiceStage}
@@ -535,13 +544,6 @@ export function MainScreenWorkspace({
               // status line at any font scale, so landscape always takes the
               // single-row action variant.
               compactPromptNotice
-            />
-            <WorkspaceSatellites
-              colors={colors}
-              compact
-              speaking={visualPhase === "speaking"}
-              turnActive={visualPhase !== "idle"}
-              {...satellites}
             />
           </View>
         </View>

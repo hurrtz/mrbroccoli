@@ -44,7 +44,8 @@ the complete Play Store translations are kept in a dedicated file under
   conflicting technical style.
 - Drive Session now counts every microphone level sample, including consecutive
   samples with the same measured loudness, so it reliably detects both the
-  start of speech and the ten-second end-of-speech countdown.
+  start of speech and the ten-second end-of-speech countdown. Its transport
+  controls also remain on-screen after rotating into landscape.
 - Mr Broccoli now runs as a universal iPhone and iPad app. Compact iPad windows
   keep the phone interface; regular layouts add a persistent conversations
   sidebar, a docked transcript when all three panes fit, master-detail Settings,

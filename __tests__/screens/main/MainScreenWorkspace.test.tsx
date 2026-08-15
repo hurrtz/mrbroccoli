@@ -543,6 +543,10 @@ describe("MainScreenWorkspace streaming isolation", () => {
       <MainScreenWorkspace
         {...workspaceProps}
         isLandscape
+        satellites={{
+          ...workspaceProps.satellites,
+          driveSession: true,
+        }}
         transcript={{
           activeConversationId: null,
           activeReplayMessageId: null,
@@ -580,9 +584,12 @@ describe("MainScreenWorkspace streaming isolation", () => {
       expect.objectContaining({ position: "absolute", right: 0, top: 0 }),
     );
     expect(screen.queryByText("Balanced · Brief")).toBeNull();
-    expect(screen.queryByTestId("satellite-image")).toBeNull();
-    expect(screen.getByTestId("satellite-council")).toBeTruthy();
-    expect(screen.getByTestId("satellite-web")).toBeTruthy();
+    expect(screen.queryByTestId("satellite-council")).toBeNull();
+    expect(
+      within(screen.getByTestId("voice-stage-idle")).getByTestId(
+        "satellite-stop",
+      ),
+    ).toBeTruthy();
   });
 
   it("uses the regular portrait iPad shell with a persistent-handle content pane", () => {
