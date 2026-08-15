@@ -62,6 +62,12 @@ The cross-platform Maestro suite starts from cleared app state and verifies
 the current first-run contract: the app opens directly into the workspace with
 the optional introduction banner. It must not wait for a retired blocking
 setup wizard before exercising settings, locales, layout, or accessibility.
+The screen-reader hierarchy gate follows the current home-screen contract: it
+checks the setup banner, blocked voice orb, circular voice/text pager controls,
+conversation controls, transcript peek, and all three satellite actions by
+stable IDs and exact English accessible names before accepting TalkBack or
+VoiceOver evidence. Removed design-system controls must be dropped from that
+contract in the same change that removes them from the workspace.
 The smoke flow covers the Welcome audio control and the Setup offer/manual
 states, waits for the language-independent playing-control marker, then
 restarts and dismisses the introduction banner before continuing into

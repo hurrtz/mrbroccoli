@@ -10,16 +10,22 @@ import { launchSimulatorApp } from "./screen-reader/ios.mjs";
 const requiredControls = [
   ["main-conversations-button", "Conversations"],
   ["main-settings-button", "Settings"],
-  ["intro-banner", "New here?"],
+  ["intro-banner", "Set up Mr Broccoli"],
   [
     "prompt-blocked-notice",
     "Add credentials in Settings before starting a voice session. Configure credentials",
   ],
   ["transcript-handle", "Show transcript. No messages yet"],
   ["conversation-settings-summary-control", "Open conversation settings"],
-  ["workspace-status-info", "Session details"],
-  ["show-voice-input", "Show voice input"],
-  ["show-text-input", "Show text input"],
+  [
+    "voice-orb-idle",
+    "Add credentials in Settings before starting a voice session.",
+  ],
+  ["pager-chevron-left", "Show text input"],
+  ["pager-chevron-right", "Show text input"],
+  ["satellite-image", "Add image"],
+  ["satellite-council", "Model Council"],
+  ["satellite-web", "Web Search"],
 ];
 
 function hierarchyWithControls(overrides = []) {
@@ -75,7 +81,7 @@ test("rejects missing labels, non-interactive controls, and exposed icons", () =
     (node) => node.attributes["resource-id"] === "main-settings-button",
   ).attributes.accessibilityText = "";
   hierarchy.children.find(
-    (node) => node.attributes["resource-id"] === "show-text-input",
+    (node) => node.attributes["resource-id"] === "pager-chevron-right",
   ).attributes.clickable = "false";
 
   const result = validateScreenReaderHierarchy(hierarchy);
@@ -85,7 +91,7 @@ test("rejects missing labels, non-interactive controls, and exposed icons", () =
     true,
   );
   assert.equal(
-    result.errors.some((error) => error.includes("show-text-input")),
+    result.errors.some((error) => error.includes("pager-chevron-right")),
     true,
   );
   assert.equal(

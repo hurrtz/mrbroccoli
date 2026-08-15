@@ -1,7 +1,7 @@
 const REQUIRED_HOME_CONTROLS = [
   { id: "main-conversations-button", label: "Conversations" },
   { id: "main-settings-button", label: "Settings" },
-  { id: "intro-banner", label: "New here?" },
+  { id: "intro-banner", label: "Set up Mr Broccoli" },
   {
     id: "prompt-blocked-notice",
     label:
@@ -12,9 +12,15 @@ const REQUIRED_HOME_CONTROLS = [
     id: "conversation-settings-summary-control",
     label: "Open conversation settings",
   },
-  { id: "workspace-status-info", label: "Session details" },
-  { id: "show-voice-input", label: "Show voice input" },
-  { id: "show-text-input", label: "Show text input" },
+  {
+    id: "voice-orb-idle",
+    label: "Add credentials in Settings before starting a voice session.",
+  },
+  { id: "pager-chevron-left", label: "Show text input" },
+  { id: "pager-chevron-right", label: "Show text input" },
+  { id: "satellite-image", label: "Add image" },
+  { id: "satellite-council", label: "Model Council" },
+  { id: "satellite-web", label: "Web Search" },
 ];
 
 export function flattenHierarchy(root) {
