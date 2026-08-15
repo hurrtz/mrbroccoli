@@ -36,14 +36,13 @@ the complete Play Store translations are kept in a dedicated file under
 - The first-run introduction no longer lets step dots or horizontal swipes
   bypass the required Thinking setup before the live voice test.
 - The welcome introduction now carries a complete five-exchange conversation
-  through a native headline blur and canvas fade, ending with a natural hand-off
-  to the spoken answer. Welcome remains fixed while Setup and Try scroll behind
-  their fixed bottom actions, keeping expanded manual configuration reachable.
-  Missing native blur views now fall back instead of crashing an older Android
-  development install, and the iOS material is thinner and confined to the
-  headline. Every intermediate bottom action is the same full-width 48-point
-  Proceed button as the final step's Done action, and Try uses a circular voice
-  action matching the home orb silhouette.
+  through a stretchable, canvas-tinted headline fade, ending with a natural
+  hand-off to the spoken answer. The same native-independent image treatment
+  works across Android, iPhone, and iPad in both colour schemes. Welcome remains
+  fixed while Setup and Try scroll behind their fixed bottom actions, keeping
+  expanded manual configuration reachable. Every intermediate bottom action is
+  the same full-width 48-point Proceed button as the final step's Done action,
+  and Try uses a circular voice action matching the home orb silhouette.
 - The transcript sheet now uses one continuous canvas color and the approved
   18-point gutter instead of nesting the script inside a differently colored,
   dialog-padded rectangle; only expanded turn metrics lift onto a surface.

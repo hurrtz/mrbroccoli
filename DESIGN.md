@@ -74,13 +74,12 @@ renders a fixed five-exchange localized conversation from oldest and most
 obscured to a crisp final prompt and response, then plays the bundled answer in
 the selected interface language. Welcome is a fixed View and never scrolls;
 Setup and Try use vertical page scrollers so expanded setup choices and live
-test results remain reachable. A capability-guarded native blur view and a
-canvas-colored gradient sit over the welcome conversation and below the
-headline. Android falls back to its supported view filter when a newer
-JavaScript bundle is running in an older native development install. The fixed
-bottom action shares one geometry across pages; only the last page changes its
-label and completion gate. The Try voice action is circular to echo the home
-voice orb.
+test results remain reachable. One bundled white alpha-gradient image stretches
+over the welcome conversation and is tinted to the active canvas below the
+headline. This keeps the veil native-independent and visually consistent on
+Android, iPhone, and iPad in light and dark themes. The fixed bottom action
+shares one geometry across pages; only the last page changes its label and
+completion gate. The Try voice action is circular to echo the home voice orb.
 
 The iOS presentation remains one component tree across iPhone and iPad.
 `resolveIpadLayout` maps the live window and native iPad identity into compact

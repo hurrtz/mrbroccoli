@@ -1,13 +1,10 @@
 import React from "react";
-import { BlurTargetView, BlurView } from "expo-blur";
-import { LinearGradient } from "expo-linear-gradient";
 import {
   AccessibilityInfo,
-  Platform,
+  Image,
   Pressable,
   StyleSheet,
   Text,
-  UIManager,
   View,
 } from "react-native";
 
@@ -36,7 +33,6 @@ import {
   translations,
 } from "../../i18n/localeRegistry";
 import type { TranslateFn } from "../../screens/main/shared";
-import { withAlpha } from "../../theme/colors";
 import { fonts } from "../../theme/typography";
 import { getIntroClip } from "./introClips";
 import { IntroBody, IntroTitle } from "./IntroPrimitives";
@@ -83,26 +79,7 @@ export interface IntroStepProps {
   thinkingReady: boolean;
 }
 
-const EXPO_BLUR_VIEW_MANAGER = "ViewManagerAdapter_ExpoBlur_ExpoBlurView";
-const EXPO_BLUR_TARGET_MANAGER =
-  "ViewManagerAdapter_ExpoBlur_ExpoBlurTargetView";
-
-/**
- * An updated JavaScript bundle can reach a development install before a newly
- * added native view has been linked into that binary. Rendering an unavailable
- * Expo view is fatal on Android, so the introduction treats blur as a runtime
- * capability and keeps an already-shipped visual fallback.
- */
-function supportsNativeIntroBlur(): boolean {
-  try {
-    const hasBlurView = UIManager.hasViewManagerConfig(EXPO_BLUR_VIEW_MANAGER);
-    return Platform.OS === "android"
-      ? hasBlurView && UIManager.hasViewManagerConfig(EXPO_BLUR_TARGET_MANAGER)
-      : hasBlurView;
-  } catch {
-    return false;
-  }
-}
+const dialogueHeadlineFade = require("../../../assets/intro/dialogue-headline-fade.png");
 
 /** A stored-dialogue bubble in the app's messenger anatomy. */
 function Bubble({
@@ -177,10 +154,6 @@ function WelcomeStep({ language, t }: IntroStepProps) {
     React.useState<AppLanguage>(language);
   const [played, setPlayed] = React.useState(false);
   const [pickerOpen, setPickerOpen] = React.useState(false);
-  const blurTargetRef = React.useRef<View | null>(null);
-  const nativeBlurAvailable = supportsNativeIntroBlur();
-  const useAndroidFilterFallback =
-    Platform.OS === "android" && !nativeBlurAvailable;
   const { playing, toggle } = useIntroPlayback(getIntroClip(previewLanguage));
 
   const preview = translations[previewLanguage];
@@ -196,13 +169,7 @@ function WelcomeStep({ language, t }: IntroStepProps) {
         importantForAccessibility="no-hide-descendants"
         style={styles.dialogueHistory}
       >
-        <View
-          style={[
-            styles.dialogueFar,
-            useAndroidFilterFallback ? styles.dialogueFarFilterFallback : null,
-          ]}
-          testID="intro-dialogue-far"
-        >
+        <View style={styles.dialogueFar} testID="intro-dialogue-far">
           <Bubble
             contentDirection={previewDirection}
             isRtl={previewIsRtl}
@@ -221,13 +188,7 @@ function WelcomeStep({ language, t }: IntroStepProps) {
             {preview.introDialogueFar}
           </Bubble>
         </View>
-        <View
-          style={[
-            styles.dialogueMid,
-            useAndroidFilterFallback ? styles.dialogueMidFilterFallback : null,
-          ]}
-          testID="intro-dialogue-mid"
-        >
+        <View style={styles.dialogueMid} testID="intro-dialogue-mid">
           <Bubble
             contentDirection={previewDirection}
             isRtl={previewIsRtl}
@@ -314,66 +275,31 @@ function WelcomeStep({ language, t }: IntroStepProps) {
       </View>
 
       {/* The dialogue hugs the bottom of its zone so it ends just above the
-          play button. Its length carries the earliest exchange into the blur
-          beneath the heading even on tall displays. The blurred history stays
+          play button. Its length carries the earliest exchange into the fade
+          beneath the heading even on tall displays. The veiled history stays
           out of the accessibility tree; the crisp final exchange explains the
           play action and is announced. */}
       <View style={[styles.dialogueZone, { direction: previewDirection }]}>
-        {nativeBlurAvailable ? (
-          <BlurTargetView
-            ref={blurTargetRef}
-            style={styles.dialogueConversation}
-            testID="intro-dialogue-conversation"
-          >
-            {dialogue}
-          </BlurTargetView>
-        ) : (
-          <View
-            style={styles.dialogueConversation}
-            testID="intro-dialogue-conversation"
-          >
-            {dialogue}
-          </View>
-        )}
+        <View
+          style={styles.dialogueConversation}
+          testID="intro-dialogue-conversation"
+        >
+          {dialogue}
+        </View>
       </View>
 
-      {nativeBlurAvailable ? (
-        <BlurView
-          blurMethod="dimezisBlurViewSdk31Plus"
-          blurReductionFactor={4}
-          blurTarget={blurTargetRef}
-          intensity={42}
-          pointerEvents="none"
-          style={styles.dialogueHeadlineEffect}
-          testID="intro-dialogue-headline-blur"
-          tint={theme.blurTint}
-        >
-          <LinearGradient
-            colors={[
-              withAlpha(theme.canvas, 0.16),
-              withAlpha(theme.canvas, 0.08),
-              withAlpha(theme.canvas, 0),
-              withAlpha(theme.canvas, 0),
-            ]}
-            locations={[0, 0.34, 0.72, 1]}
-            style={StyleSheet.absoluteFill}
-            testID="intro-dialogue-headline-fade"
-          />
-        </BlurView>
-      ) : (
-        <LinearGradient
-          colors={[
-            withAlpha(theme.canvas, 0.34),
-            withAlpha(theme.canvas, 0.18),
-            withAlpha(theme.canvas, 0),
-            withAlpha(theme.canvas, 0),
-          ]}
-          locations={[0, 0.34, 0.72, 1]}
-          pointerEvents="none"
-          style={styles.dialogueHeadlineEffect}
-          testID="intro-dialogue-headline-fade"
+      <View
+        pointerEvents="none"
+        style={styles.dialogueHeadlineEffect}
+        testID="intro-dialogue-headline-fade"
+      >
+        <Image
+          resizeMode="stretch"
+          source={dialogueHeadlineFade}
+          style={[StyleSheet.absoluteFill, { tintColor: theme.canvas }]}
+          testID="intro-dialogue-headline-fade-image"
         />
-      )}
+      </View>
 
       <View style={styles.welcomeCentre}>
         <Pressable
@@ -1085,16 +1011,12 @@ const styles = StyleSheet.create({
     borderBottomLeftRadius: 18,
     borderBottomRightRadius: 5,
   },
-  // Earlier turns become more legible toward the crisp query. A native blur
-  // surface above this stack owns the effect when linked; Android can use its
-  // already-supported view filter while an updated JavaScript bundle is still
-  // running inside an older native development install.
+  // Earlier turns become more legible toward the crisp query. A stretchable
+  // alpha mask above this stack veils the oldest content with the active
+  // canvas colour on every supported native runtime and screen size.
   dialogueFar: {
     gap: 8,
     opacity: 0.38,
-  },
-  dialogueFarFilterFallback: {
-    filter: [{ blur: 4 }],
   },
   dialogueConversation: {
     bottom: 0,
@@ -1105,9 +1027,6 @@ const styles = StyleSheet.create({
   dialogueMid: {
     gap: 8,
     opacity: 0.56,
-  },
-  dialogueMidFilterFallback: {
-    filter: [{ blur: 2.4 }],
   },
   dialogueNear: {
     gap: 8,

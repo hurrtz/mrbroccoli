@@ -5,11 +5,11 @@ import {
   Platform,
   ScrollView,
   StyleSheet,
-  UIManager,
   useWindowDimensions,
 } from "react-native";
 import { translations } from "../../src/i18n/localeRegistry";
-import { darkColors } from "../../src/theme/colors";
+import { darkColors, lightColors } from "../../src/theme/colors";
+import { ThemeProvider } from "../../src/theme/ThemeContext";
 
 const mockPlayer = { pause: jest.fn(), play: jest.fn(), seekTo: jest.fn() };
 let mockPlaying = false;
@@ -76,7 +76,6 @@ import { getLocalCatalogInstallStatuses } from "../../src/services/offlineProfil
 import { createAutoSetupJob } from "../test-utils/autoSetupJobFixture";
 
 const t = ((key: string) => key) as never;
-const mockHasViewManagerConfig = jest.spyOn(UIManager, "hasViewManagerConfig");
 
 beforeEach(() => {
   jest.clearAllMocks();
@@ -104,7 +103,6 @@ beforeEach(() => {
     .mockImplementation(() => new Promise(() => undefined));
   mockPlaying = false;
   mockStatus = {};
-  mockHasViewManagerConfig.mockReturnValue(true);
 });
 
 function renderScreen(
@@ -283,7 +281,8 @@ describe("IntroFlowScreen", () => {
   });
 
   it("opens on the stored dialogue with its play control", () => {
-    const { getByTestId } = renderScreen();
+    const screen = renderScreen();
+    const { getByTestId } = screen;
 
     expect(getByTestId("intro-welcome-step")).toBeTruthy();
     expect(getByTestId("intro-welcome-play")).toBeTruthy();
@@ -311,11 +310,12 @@ describe("IntroFlowScreen", () => {
     ).toBeTruthy();
   });
 
-  it("uses a native headline blur over five fixed exchanges", () => {
+  it("uses one stretchable headline fade over five fixed exchanges", () => {
     // Four faded exchanges are decoration: hidden from assistive tech and
-    // stepped through the blur/opacity ladder. The final prompt and response
+    // stepped through the fade/opacity ladder. The final prompt and response
     // explain the play action and stay announced.
-    const { getByTestId } = renderScreen();
+    const screen = renderScreen();
+    const { getByTestId } = screen;
     const hidden = { includeHiddenElements: true } as const;
 
     const far = StyleSheet.flatten(
@@ -336,15 +336,9 @@ describe("IntroFlowScreen", () => {
     expect(soft).toEqual(expect.objectContaining({ opacity: 0.86 }));
     expect(far.filter).toBeUndefined();
 
-    const headlineBlur = getByTestId("intro-dialogue-headline-blur");
-    expect(headlineBlur.props.blurMethod).toBe("dimezisBlurViewSdk31Plus");
-    expect(headlineBlur.props.blurReductionFactor).toBe(4);
-    expect(headlineBlur.props.intensity).toBe(42);
-    expect(headlineBlur.props.pointerEvents).toBe("none");
-    expect(headlineBlur.props.tint).toMatch(
-      /^systemUltraThinMaterial(?:Light|Dark)$/,
-    );
-    expect(StyleSheet.flatten(headlineBlur.props.style)).toEqual(
+    const headlineFade = getByTestId("intro-dialogue-headline-fade");
+    expect(headlineFade.props.pointerEvents).toBe("none");
+    expect(StyleSheet.flatten(headlineFade.props.style)).toEqual(
       expect.objectContaining({
         height: 132,
         position: "absolute",
@@ -352,8 +346,11 @@ describe("IntroFlowScreen", () => {
         zIndex: 1,
       }),
     );
-    expect(getByTestId("intro-dialogue-headline-fade").props.locations).toEqual(
-      [0, 0.34, 0.72, 1],
+    const headlineFadeImage = getByTestId("intro-dialogue-headline-fade-image");
+    expect(headlineFadeImage.props.resizeMode).toBe("stretch");
+    expect(headlineFadeImage.props.source).toBeTruthy();
+    expect(StyleSheet.flatten(headlineFadeImage.props.style)).toEqual(
+      expect.objectContaining({ tintColor: darkColors.background }),
     );
     expect(
       StyleSheet.flatten(
@@ -370,6 +367,18 @@ describe("IntroFlowScreen", () => {
     expect(
       StyleSheet.flatten(getByTestId("intro-welcome-title").props.style),
     ).toEqual(expect.objectContaining({ zIndex: 2 }));
+
+    const light = render(
+      <ThemeProvider mode="light">
+        <IntroFlowScreen {...screen.props} />
+      </ThemeProvider>,
+    );
+    expect(
+      StyleSheet.flatten(
+        light.getByTestId("intro-dialogue-headline-fade-image").props.style,
+      ),
+    ).toEqual(expect.objectContaining({ tintColor: lightColors.background }));
+    light.unmount();
 
     for (let exchange = 1; exchange <= 5; exchange += 1) {
       const promptTestId =
@@ -396,29 +405,32 @@ describe("IntroFlowScreen", () => {
     ).toBeTruthy();
   });
 
-  it("falls back without mounting unavailable Android blur managers", () => {
+  it("uses the same native-independent fade on Android", () => {
     Object.defineProperty(Platform, "OS", {
       configurable: true,
       value: "android",
       writable: true,
     });
-    mockHasViewManagerConfig.mockReturnValue(false);
 
     const screen = renderScreen();
     const hidden = { includeHiddenElements: true } as const;
 
     expect(screen.queryByTestId("intro-dialogue-headline-blur")).toBeNull();
-    expect(screen.getByTestId("intro-dialogue-headline-fade")).toBeTruthy();
+    expect(
+      StyleSheet.flatten(
+        screen.getByTestId("intro-dialogue-headline-fade-image").props.style,
+      ),
+    ).toEqual(expect.objectContaining({ tintColor: darkColors.background }));
     expect(
       StyleSheet.flatten(
         screen.getByTestId("intro-dialogue-far", hidden).props.style,
       ),
-    ).toEqual(expect.objectContaining({ filter: [{ blur: 4 }] }));
+    ).toEqual(expect.objectContaining({ opacity: 0.38 }));
     expect(
       StyleSheet.flatten(
         screen.getByTestId("intro-dialogue-mid", hidden).props.style,
       ),
-    ).toEqual(expect.objectContaining({ filter: [{ blur: 2.4 }] }));
+    ).toEqual(expect.objectContaining({ opacity: 0.56 }));
   });
 
   it("keeps bare borderless nav glyphs on 44 point targets", () => {
