@@ -303,10 +303,10 @@ describe("IntroFlowScreen", () => {
     ).toBeTruthy();
   });
 
-  it("blurs the earlier turns while announcing only the crisp query", () => {
-    // The three faded turns are decoration: hidden from assistive tech and
-    // stepped through the blur/opacity ladder. The crisp query is the
-    // question the play button answers, so it stays announced.
+  it("shows five complete exchanges while announcing only the crisp hand-off", () => {
+    // Four faded exchanges are decoration: hidden from assistive tech and
+    // stepped through the blur/opacity ladder. The final prompt and response
+    // explain the play action and stay announced.
     const { getByTestId } = renderScreen();
     const hidden = { includeHiddenElements: true } as const;
 
@@ -319,6 +319,9 @@ describe("IntroFlowScreen", () => {
     const near = StyleSheet.flatten(
       getByTestId("intro-dialogue-near", hidden).props.style,
     );
+    const soft = StyleSheet.flatten(
+      getByTestId("intro-dialogue-soft", hidden).props.style,
+    );
     expect(far).toEqual(
       expect.objectContaining({ filter: [{ blur: 4 }], opacity: 0.5 }),
     );
@@ -328,14 +331,48 @@ describe("IntroFlowScreen", () => {
     expect(near).toEqual(
       expect.objectContaining({ filter: [{ blur: 1.1 }], opacity: 0.85 }),
     );
+    expect(soft).toEqual(
+      expect.objectContaining({ filter: [{ blur: 0.45 }], opacity: 0.94 }),
+    );
+    expect(
+      StyleSheet.flatten(
+        getByTestId("intro-dialogue-conversation").props.style,
+      ),
+    ).toEqual(
+      expect.objectContaining({
+        bottom: 0,
+        left: 0,
+        position: "absolute",
+        right: 0,
+      }),
+    );
+    expect(
+      StyleSheet.flatten(getByTestId("intro-welcome-title").props.style),
+    ).toEqual(expect.objectContaining({ zIndex: 1 }));
+
+    for (let exchange = 1; exchange <= 5; exchange += 1) {
+      const promptTestId =
+        exchange === 5
+          ? "intro-dialogue-query-bubble"
+          : `intro-dialogue-prompt-${exchange}`;
+      const responseTestId =
+        exchange === 5
+          ? "intro-dialogue-play-response-bubble"
+          : `intro-dialogue-response-${exchange}`;
+      expect(getByTestId(promptTestId, hidden)).toBeTruthy();
+      expect(getByTestId(responseTestId, hidden)).toBeTruthy();
+    }
 
     // The decorative far turn is unreachable without opting into hidden
-    // elements; the crisp query is announced normally.
+    // elements; the crisp final exchange is announced normally.
     const { queryByText, getByText } = renderScreen();
-    expect(
-      queryByText("Broccoli comes from the Italian broccolo", { exact: false }),
-    ).toBeNull();
+    expect(queryByText("What are you actually for?")).toBeNull();
     expect(getByText("How does this application work?")).toBeTruthy();
+    expect(
+      getByText(
+        "That answer makes more sense out loud. Tap play and let Mr Broccoli explain it himself.",
+      ),
+    ).toBeTruthy();
   });
 
   it("keeps bare borderless nav glyphs on 44 point targets", () => {
@@ -369,9 +406,7 @@ describe("IntroFlowScreen", () => {
     expect(
       screen.UNSAFE_getByProps({ testID: "phosphor-icon-arrow-right" }),
     ).toBeTruthy();
-    expect(
-      screen.UNSAFE_getByProps({ testID: "phosphor-icon-left" }),
-    ).toBeTruthy();
+    expect(screen.getByText("introNext")).toBeTruthy();
 
     const physicalPages = screen
       .UNSAFE_getAllByType(ScrollView)
@@ -732,13 +767,30 @@ describe("IntroFlowScreen", () => {
   });
 
   it("walks forward and back through the steps", () => {
-    const { getByTestId } = renderScreen({ firstRun: false });
+    const { getByTestId, getByText } = renderScreen({ firstRun: false });
 
-    expect(StyleSheet.flatten(getByTestId("intro-next").props.style)).toEqual(
-      expect.objectContaining({ borderRadius: 12, height: 58, width: 58 }),
+    const proceedStyle = StyleSheet.flatten(
+      getByTestId("intro-next").props.style,
     );
+    expect(proceedStyle).toEqual(
+      expect.objectContaining({
+        borderRadius: 10,
+        minHeight: 48,
+        width: "100%",
+      }),
+    );
+    expect(translations.en.introNext).toBe("Proceed");
+    expect(getByText("introNext")).toBeTruthy();
     fireEvent.press(getByTestId("intro-next"));
     fireEvent.press(getByTestId("intro-next"));
+    const doneStyle = StyleSheet.flatten(getByTestId("intro-done").props.style);
+    expect(doneStyle).toEqual(
+      expect.objectContaining({
+        borderRadius: proceedStyle.borderRadius,
+        minHeight: proceedStyle.minHeight,
+        width: proceedStyle.width,
+      }),
+    );
     expect(
       getByTestId("intro-stepper-dot-2").props.accessibilityState.selected,
     ).toBe(true);

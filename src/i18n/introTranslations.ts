@@ -23,12 +23,21 @@ const rawIntroTranslations = {
     introBannerDismiss: "Dismiss introduction",
     introTestTurnFailed:
       "The test turn did not finish. Step back, check the setup, and try again.",
+    introDialogueOpeningPrompt: "What are you actually for?",
     introDialogueFar:
-      "Broccoli comes from the Italian broccolo — the flowering crest of a cabbage.",
-    introDialogueQuestion: "And you can hear me and talk back?",
+      "For conversations worth thinking through — spoken naturally, without hiding which AI answers.",
+    introDialogueQuestion: "So I can just talk to you?",
     introDialogueNear:
-      "I listen, think and speak — with whatever engines you give me.",
+      "Yes. I turn your voice into text, keep the thread together, and speak the reply back.",
+    introDialoguePromptThree: "Who does the thinking?",
+    introDialogueResponseThree:
+      "Whichever model you choose: one on this phone, or a provider you already use.",
+    introDialoguePromptFour: "Do my conversations leave this phone?",
+    introDialogueResponseFour:
+      "They stay on this device. With a hosted model, the context needed to answer goes directly to that provider.",
     introWelcomeQuery: "How does this application work?",
+    introDialoguePlayResponse:
+      "That answer makes more sense out loud. Tap play and let Mr Broccoli explain it himself.",
     introPlayAnswer: "Play the answer",
     introVoiceNote:
       "Pre-recorded with a partner voice. On this phone, his voice depends on the routes you choose.",
@@ -57,7 +66,7 @@ const rawIntroTranslations = {
     introStepOfTotal: ({ step, total }: TranslationParams) =>
       `Step ${step} of ${total}`,
     introHearStop: "Stop",
-    introNext: "Next",
+    introNext: "Proceed",
     introBack: "Back",
     introOptional: "Optional",
     introVoicePickerTitle: "Choose a language",
@@ -75,11 +84,21 @@ const rawIntroTranslations = {
     introBannerDismiss: "إغلاق المقدمة",
     introTestTurnFailed:
       "لم تكتمل تجربة المحادثة. ارجع خطوة وتحقق من الإعداد وحاول مجددًا.",
+    introDialogueOpeningPrompt: "ما الذي صُممت من أجله فعلًا؟",
     introDialogueFar:
-      "كلمة بروكلي تأتي من الإيطالية broccolo — القمة المزهرة للكرنب.",
-    introDialogueQuestion: "وهل يمكنك سماعي والرد عليّ؟",
-    introDialogueNear: "أستمع وأفكر وأتحدث — بأي محركات تمنحها لي.",
+      "للمحادثات التي تستحق التفكير — بصوت طبيعي ومن دون إخفاء أي ذكاء اصطناعي يجيب.",
+    introDialogueQuestion: "إذًا يمكنني أن أتحدث معك فحسب؟",
+    introDialogueNear:
+      "نعم. أحوّل صوتك إلى نص، وأحافظ على سياق الحديث، ثم أنطق الرد.",
+    introDialoguePromptThree: "ومن الذي يفكّر؟",
+    introDialogueResponseThree:
+      "النموذج الذي تختاره: نموذج على هذا الهاتف أو مزوّد تستخدمه بالفعل.",
+    introDialoguePromptFour: "وهل تغادر محادثاتي هاتفي؟",
+    introDialogueResponseFour:
+      "تبقى على هذا الجهاز. وإذا اخترت نموذجًا مستضافًا، ينتقل سياق المحادثة اللازم للإجابة مباشرةً إلى ذلك المزوّد.",
     introWelcomeQuery: "كيف يعمل هذا التطبيق فعليًا؟",
+    introDialoguePlayResponse:
+      "هذه الإجابة أوضح حين تُسمع. اضغط تشغيل ودع Mr Broccoli يشرحها بنفسه.",
     introPlayAnswer: "تشغيل الإجابة",
     introVoiceNote:
       "مسجَّل مسبقًا بصوت شريك. على هذا الهاتف يعتمد صوته على المسارات التي تختارها.",
@@ -125,12 +144,21 @@ const rawIntroTranslations = {
     introBannerDismiss: "Zavřít úvod",
     introTestTurnFailed:
       "Zkušební otázka se nedokončila. Vraťte se, zkontrolujte nastavení a zkuste to znovu.",
+    introDialogueOpeningPrompt: "K čemu tu vlastně jsi?",
     introDialogueFar:
-      "Brokolice pochází z italského broccolo — kvetoucí vrcholek zelí.",
-    introDialogueQuestion: "A ty mě slyšíš a umíš odpovědět nahlas?",
+      "K rozhovorům, které stojí za promyšlení — přirozeně nahlas a bez skrývání, která AI odpovídá.",
+    introDialogueQuestion: "Takže na tebe můžu prostě mluvit?",
     introDialogueNear:
-      "Poslouchám, přemýšlím a mluvím — s motory, které mi dáte.",
+      "Ano. Převedu hlas na text, udržím souvislosti a odpověď zase přečtu nahlas.",
+    introDialoguePromptThree: "Kdo o odpovědi přemýšlí?",
+    introDialogueResponseThree:
+      "Model, který si vybereš: buď v tomto telefonu, nebo od poskytovatele, kterého už používáš.",
+    introDialoguePromptFour: "A opustí moje rozhovory telefon?",
+    introDialogueResponseFour:
+      "Zůstávají v tomto zařízení. Když zvolíš hostovaný model, potřebný kontext jde přímo danému poskytovateli.",
     introWelcomeQuery: "Jak vlastně tahle aplikace funguje?",
+    introDialoguePlayResponse:
+      "Tahle odpověď dává větší smysl nahlas. Klepni na přehrát a nech Mr Broccoliho, ať to vysvětlí sám.",
     introPlayAnswer: "Přehrát odpověď",
     introVoiceNote:
       "Předem nahráno partnerským hlasem. Na tomto telefonu jeho hlas závisí na trasách, které zvolíte.",
@@ -177,12 +205,21 @@ const rawIntroTranslations = {
     introBannerDismiss: "Einführung schließen",
     introTestTurnFailed:
       "Der Testdurchlauf wurde nicht fertig. Geh zurück, prüfe die Einrichtung und versuch es erneut.",
+    introDialogueOpeningPrompt: "Wofür bist du eigentlich da?",
     introDialogueFar:
-      "Brokkoli kommt vom italienischen broccolo — dem blühenden Spross eines Kohls.",
-    introDialogueQuestion: "Und du kannst mich hören und antworten?",
+      "Für Gespräche, die echtes Nachdenken verdienen – natürlich gesprochen und ohne zu verstecken, welche KI antwortet.",
+    introDialogueQuestion: "Ich kann also einfach mit dir sprechen?",
     introDialogueNear:
-      "Ich höre, denke und spreche — mit den Antrieben, die du mir gibst.",
+      "Ja. Ich mache aus deiner Stimme Text, behalte den Gesprächsfaden und spreche die Antwort wieder aus.",
+    introDialoguePromptThree: "Wer übernimmt das Denken?",
+    introDialogueResponseThree:
+      "Das Modell, das du auswählst: eines auf diesem Gerät oder ein Anbieter, den du bereits nutzt.",
+    introDialoguePromptFour: "Und verlassen meine Gespräche das Handy?",
+    introDialogueResponseFour:
+      "Sie bleiben auf diesem Gerät. Bei einem gehosteten Modell geht der nötige Gesprächskontext direkt an diesen Anbieter.",
     introWelcomeQuery: "Wie funktioniert diese App eigentlich?",
+    introDialoguePlayResponse:
+      "Diese Antwort ergibt gesprochen mehr Sinn. Tippe auf Play und lass Mr Broccoli das selbst erklären.",
     introPlayAnswer: "Antwort abspielen",
     introVoiceNote:
       "Vorab mit einer Partnerstimme aufgenommen. Auf diesem Telefon hängt seine Stimme von den gewählten Routen ab.",
@@ -229,12 +266,21 @@ const rawIntroTranslations = {
     introBannerDismiss: "Cerrar la introducción",
     introTestTurnFailed:
       "La prueba no terminó. Retrocede, revisa la configuración e inténtalo de nuevo.",
+    introDialogueOpeningPrompt: "¿Para qué sirves realmente?",
     introDialogueFar:
-      "Brócoli viene del italiano broccolo: el brote florido de una col.",
-    introDialogueQuestion: "¿Y puedes oírme y responderme?",
+      "Para conversaciones que merecen pensarse bien, habladas con naturalidad y sin ocultar qué IA responde.",
+    introDialogueQuestion: "¿Entonces solo tengo que hablarte?",
     introDialogueNear:
-      "Escucho, pienso y hablo, con los motores que tú me des.",
+      "Sí. Convierto tu voz en texto, mantengo el hilo y leo la respuesta en voz alta.",
+    introDialoguePromptThree: "¿Quién se encarga de pensar?",
+    introDialogueResponseThree:
+      "El modelo que elijas: uno en este teléfono o un proveedor que ya utilices.",
+    introDialoguePromptFour: "¿Y mis conversaciones salen del teléfono?",
+    introDialogueResponseFour:
+      "Se quedan en este dispositivo. Si eliges un modelo alojado, el contexto necesario va directamente a ese proveedor.",
     introWelcomeQuery: "¿Cómo funciona esta aplicación?",
+    introDialoguePlayResponse:
+      "Esta respuesta se entiende mejor en voz alta. Pulsa reproducir y deja que Mr Broccoli la explique él mismo.",
     introPlayAnswer: "Reproducir la respuesta",
     introVoiceNote:
       "Pregrabado con una voz asociada. En este teléfono, su voz depende de las rutas que elijas.",
@@ -281,12 +327,22 @@ const rawIntroTranslations = {
     introBannerDismiss: "Fermer l'introduction",
     introTestTurnFailed:
       "Le tour d'essai ne s'est pas terminé. Revenez en arrière, vérifiez la configuration et réessayez.",
+    introDialogueOpeningPrompt: "À quoi servez-vous, au juste ?",
     introDialogueFar:
-      "Brocoli vient de l'italien broccolo — la pousse fleurie d'un chou.",
-    introDialogueQuestion: "Et vous pouvez m'entendre et me répondre ?",
+      "Aux conversations qui méritent réflexion — à l’oral, naturellement, sans cacher quelle IA répond.",
+    introDialogueQuestion: "Je peux donc simplement vous parler ?",
     introDialogueNear:
-      "J'écoute, je réfléchis et je parle — avec les moteurs que vous me donnez.",
+      "Oui. Je transforme votre voix en texte, je garde le fil et je lis la réponse à voix haute.",
+    introDialoguePromptThree: "Qui se charge de réfléchir ?",
+    introDialogueResponseThree:
+      "Le modèle que vous choisissez : un modèle sur ce téléphone ou un fournisseur que vous utilisez déjà.",
+    introDialoguePromptFour:
+      "Et mes conversations quittent-elles le téléphone ?",
+    introDialogueResponseFour:
+      "Elles restent sur cet appareil. Avec un modèle hébergé, le contexte nécessaire va directement à ce fournisseur.",
     introWelcomeQuery: "Comment fonctionne cette application ?",
+    introDialoguePlayResponse:
+      "Cette réponse est plus claire à l’oral. Appuyez sur lecture et laissez Mr Broccoli l’expliquer lui-même.",
     introPlayAnswer: "Écouter la réponse",
     introVoiceNote:
       "Préenregistré avec une voix partenaire. Sur ce téléphone, sa voix dépend des routes que vous choisissez.",
@@ -333,12 +389,21 @@ const rawIntroTranslations = {
     introBannerDismiss: "परिचय बंद करें",
     introTestTurnFailed:
       "परीक्षण पूरा नहीं हुआ। पीछे जाएँ, सेटअप जाँचें और फिर आज़माएँ।",
+    introDialogueOpeningPrompt: "असल में तुम्हारा काम क्या है?",
     introDialogueFar:
-      "ब्रोकली इतालवी शब्द broccolo से आया है — गोभी की फूलदार कोंपल।",
-    introDialogueQuestion: "और तुम मुझे सुन सकते हो और जवाब दे सकते हो?",
+      "ऐसी बातचीत के लिए जिस पर सोचने की ज़रूरत हो—स्वाभाविक ढंग से बोलकर, और यह छिपाए बिना कि कौन-सा AI जवाब दे रहा है।",
+    introDialogueQuestion: "तो मैं बस तुमसे बोल सकता हूँ?",
     introDialogueNear:
-      "मैं सुनता हूँ, सोचता हूँ और बोलता हूँ — उन इंजनों से जो आप मुझे देते हैं।",
+      "हाँ। मैं तुम्हारी आवाज़ को टेक्स्ट में बदलता हूँ, बातचीत का संदर्भ बनाए रखता हूँ और जवाब बोलकर सुनाता हूँ।",
+    introDialoguePromptThree: "सोचता कौन है?",
+    introDialogueResponseThree:
+      "वह मॉडल जिसे तुम चुनते हो: इस फ़ोन पर चलने वाला या तुम्हारा पहले से इस्तेमाल किया हुआ प्रदाता।",
+    introDialoguePromptFour: "और क्या मेरी बातचीत फ़ोन से बाहर जाती है?",
+    introDialogueResponseFour:
+      "वह इसी डिवाइस पर रहती है। होस्ट किया गया मॉडल चुनने पर जवाब के लिए ज़रूरी संदर्भ सीधे उसी प्रदाता को जाता है।",
     introWelcomeQuery: "यह ऐप असल में काम कैसे करता है?",
+    introDialoguePlayResponse:
+      "यह जवाब सुनने पर ज़्यादा साफ़ होगा। प्ले दबाओ और Mr Broccoli को खुद समझाने दो।",
     introPlayAnswer: "जवाब सुनें",
     introVoiceNote:
       "एक साझेदार आवाज़ में पहले से रिकॉर्ड किया गया। इस फ़ोन पर उसकी आवाज़ आपके चुने रास्तों पर निर्भर करती है।",
@@ -385,12 +450,21 @@ const rawIntroTranslations = {
     introBannerDismiss: "Bevezető bezárása",
     introTestTurnFailed:
       "A próbakör nem fejeződött be. Lépj vissza, ellenőrizd a beállítást, és próbáld újra.",
+    introDialogueOpeningPrompt: "Tulajdonképpen mire vagy való?",
     introDialogueFar:
-      "A brokkoli az olasz broccolo szóból ered — a káposzta virágzó hajtása.",
-    introDialogueQuestion: "És hallasz engem, és tudsz válaszolni?",
+      "Olyan beszélgetésekre, amelyeket érdemes végiggondolni — természetes szóban, anélkül hogy elrejteném, melyik MI válaszol.",
+    introDialogueQuestion: "Tehát egyszerűen beszélhetek hozzád?",
     introDialogueNear:
-      "Hallgatok, gondolkodom és beszélek — azokkal a motorokkal, amiket adsz nekem.",
+      "Igen. A hangodat szöveggé alakítom, követem a beszélgetést, majd felolvasom a választ.",
+    introDialoguePromptThree: "Ki végzi a gondolkodást?",
+    introDialogueResponseThree:
+      "Az általad választott modell: egy ezen a telefonon futó modell vagy egy már használt szolgáltató.",
+    introDialoguePromptFour: "És a beszélgetéseim elhagyják a telefont?",
+    introDialogueResponseFour:
+      "Ezen az eszközön maradnak. Hosztolt modellnél a válaszhoz szükséges kontextus közvetlenül ahhoz a szolgáltatóhoz kerül.",
     introWelcomeQuery: "Hogyan működik ez az alkalmazás?",
+    introDialoguePlayResponse:
+      "Ez a válasz hangosan érthetőbb. Nyomd meg a lejátszást, és hagyd, hogy Mr Broccoli maga magyarázza el.",
     introPlayAnswer: "Válasz lejátszása",
     introVoiceNote:
       "Előre felvéve egy partnerhanggal. Ezen a telefonon a hangja a választott útvonalaktól függ.",
@@ -437,11 +511,21 @@ const rawIntroTranslations = {
     introBannerDismiss: "Chiudi l'introduzione",
     introTestTurnFailed:
       "La prova non è terminata. Torna indietro, controlla la configurazione e riprova.",
+    introDialogueOpeningPrompt: "A cosa servi, davvero?",
     introDialogueFar:
-      "Broccoli viene da broccolo: la cima fiorita di un cavolo.",
-    introDialogueQuestion: "E puoi sentirmi e rispondermi?",
-    introDialogueNear: "Ascolto, penso e parlo, con i motori che mi dai tu.",
+      "A conversazioni che meritano di essere ragionate, parlate con naturalezza e senza nascondere quale IA risponde.",
+    introDialogueQuestion: "Quindi posso semplicemente parlarti?",
+    introDialogueNear:
+      "Sì. Trasformo la tua voce in testo, tengo il filo e leggo la risposta ad alta voce.",
+    introDialoguePromptThree: "Chi si occupa di pensare?",
+    introDialogueResponseThree:
+      "Il modello che scegli: uno su questo telefono o un provider che usi già.",
+    introDialoguePromptFour: "E le mie conversazioni lasciano il telefono?",
+    introDialogueResponseFour:
+      "Restano su questo dispositivo. Se scegli un modello ospitato, il contesto necessario va direttamente a quel provider.",
     introWelcomeQuery: "Come funziona questa app?",
+    introDialoguePlayResponse:
+      "Questa risposta è più chiara a voce. Tocca Play e lascia che Mr Broccoli la spieghi da sé.",
     introPlayAnswer: "Riproduci la risposta",
     introVoiceNote:
       "Preregistrato con una voce partner. Su questo telefono la sua voce dipende dalle rotte che scegli.",
@@ -488,12 +572,21 @@ const rawIntroTranslations = {
     introBannerDismiss: "紹介を閉じる",
     introTestTurnFailed:
       "テストが完了しませんでした。前に戻り、設定を確認してからもう一度お試しください。",
+    introDialogueOpeningPrompt: "そもそも、何のためのアプリなの？",
     introDialogueFar:
-      "ブロッコリーはイタリア語の broccolo に由来します。キャベツの花芽のことです。",
-    introDialogueQuestion: "私の声が聞こえて、返事もできるの？",
+      "じっくり考える価値のある会話のためです。自然に話せて、どのAIが答えたかも隠しません。",
+    introDialogueQuestion: "じゃあ、普通に話しかければいい？",
     introDialogueNear:
-      "聞いて、考えて、話します。エンジンはあなたが選んだものを使います。",
+      "はい。声を文字にし、会話の流れを保ち、答えを音声で返します。",
+    introDialoguePromptThree: "考えるのは誰？",
+    introDialogueResponseThree:
+      "あなたが選んだモデルです。この端末上のモデルでも、普段使っているプロバイダーでもかまいません。",
+    introDialoguePromptFour: "会話は端末の外に出る？",
+    introDialogueResponseFour:
+      "会話はこの端末に残ります。ホスト型モデルを選んだ場合だけ、回答に必要な文脈がそのプロバイダーへ直接送られます。",
     introWelcomeQuery: "このアプリは実際どうやって動いているの？",
+    introDialoguePlayResponse:
+      "その答えは、声で聞くほうが分かりやすいです。再生をタップして、Mr Broccoli自身の説明を聞いてください。",
     introPlayAnswer: "答えを再生",
     introVoiceNote:
       "パートナーの音声で事前録音されています。この電話での声は、選んだルートによって変わります。",
@@ -540,11 +633,21 @@ const rawIntroTranslations = {
     introBannerDismiss: "Zamknij wprowadzenie",
     introTestTurnFailed:
       "Próba nie została ukończona. Cofnij się, sprawdź konfigurację i spróbuj ponownie.",
+    introDialogueOpeningPrompt: "Do czego właściwie służysz?",
     introDialogueFar:
-      "Brokuł pochodzi od włoskiego broccolo — kwitnącego pędu kapusty.",
-    introDialogueQuestion: "I słyszysz mnie, i umiesz odpowiedzieć?",
-    introDialogueNear: "Słucham, myślę i mówię — silnikami, które mi dasz.",
+      "Do rozmów, które warto dobrze przemyśleć — prowadzonych naturalnie i bez ukrywania, która AI odpowiada.",
+    introDialogueQuestion: "Czyli mogę po prostu do ciebie mówić?",
+    introDialogueNear:
+      "Tak. Zamieniam głos na tekst, pilnuję wątku rozmowy i odczytuję odpowiedź.",
+    introDialoguePromptThree: "Kto odpowiada za myślenie?",
+    introDialogueResponseThree:
+      "Wybrany przez ciebie model: działający na tym telefonie albo od dostawcy, z którego już korzystasz.",
+    introDialoguePromptFour: "A czy moje rozmowy opuszczają telefon?",
+    introDialogueResponseFour:
+      "Zostają na tym urządzeniu. Gdy wybierzesz model hostowany, potrzebny kontekst trafia bezpośrednio do jego dostawcy.",
     introWelcomeQuery: "Jak właściwie działa ta aplikacja?",
+    introDialoguePlayResponse:
+      "Tę odpowiedź łatwiej zrozumieć na głos. Naciśnij odtwarzanie i pozwól Mr Broccoli wyjaśnić ją samemu.",
     introPlayAnswer: "Odtwórz odpowiedź",
     introVoiceNote:
       "Nagrane wcześniej głosem partnera. Na tym telefonie jego głos zależy od wybranych tras.",
@@ -591,11 +694,21 @@ const rawIntroTranslations = {
     introBannerDismiss: "Fechar a introdução",
     introTestTurnFailed:
       "O teste não terminou. Volte atrás, verifique a configuração e tente novamente.",
+    introDialogueOpeningPrompt: "Afinal, para que serves?",
     introDialogueFar:
-      "Brócolo vem do italiano broccolo — o rebento florido de uma couve.",
-    introDialogueQuestion: "E consegues ouvir-me e responder?",
-    introDialogueNear: "Ouço, penso e falo — com os motores que me deres.",
+      "Para conversas que merecem ser bem pensadas, faladas com naturalidade e sem esconder qual IA responde.",
+    introDialogueQuestion: "Então posso simplesmente falar contigo?",
+    introDialogueNear:
+      "Sim. Transformo a tua voz em texto, mantenho o fio da conversa e leio a resposta em voz alta.",
+    introDialoguePromptThree: "Quem trata de pensar?",
+    introDialogueResponseThree:
+      "O modelo que escolheres: um neste telemóvel ou um fornecedor que já uses.",
+    introDialoguePromptFour: "E as minhas conversas saem do telemóvel?",
+    introDialogueResponseFour:
+      "Ficam neste dispositivo. Se escolheres um modelo alojado, o contexto necessário segue diretamente para esse fornecedor.",
     introWelcomeQuery: "Como funciona esta aplicação?",
+    introDialoguePlayResponse:
+      "Esta resposta percebe-se melhor em voz alta. Toca em reproduzir e deixa o Mr Broccoli explicá-la por si.",
     introPlayAnswer: "Reproduzir a resposta",
     introVoiceNote:
       "Pré-gravado com uma voz parceira. Neste telemóvel, a voz dele depende das rotas que escolher.",
@@ -642,12 +755,21 @@ const rawIntroTranslations = {
     introBannerDismiss: "Fechar a introdução",
     introTestTurnFailed:
       "O teste não terminou. Volte, verifique a configuração e tente de novo.",
+    introDialogueOpeningPrompt: "Afinal, para que você serve?",
     introDialogueFar:
-      "Brócolis vem do italiano broccolo — o broto florido de um repolho.",
-    introDialogueQuestion: "E você consegue me ouvir e responder?",
+      "Para conversas que merecem ser bem pensadas, faladas com naturalidade e sem esconder qual IA responde.",
+    introDialogueQuestion: "Então eu posso simplesmente falar com você?",
     introDialogueNear:
-      "Eu ouço, penso e falo — com os motores que você me der.",
+      "Sim. Transformo sua voz em texto, mantenho o fio da conversa e leio a resposta em voz alta.",
+    introDialoguePromptThree: "Quem faz a parte de pensar?",
+    introDialogueResponseThree:
+      "O modelo que você escolher: um neste celular ou um provedor que você já usa.",
+    introDialoguePromptFour: "E as minhas conversas saem do celular?",
+    introDialogueResponseFour:
+      "Elas ficam neste dispositivo. Se você escolher um modelo hospedado, o contexto necessário vai direto para esse provedor.",
     introWelcomeQuery: "Como funciona esse aplicativo?",
+    introDialoguePlayResponse:
+      "Essa resposta fica mais clara em voz alta. Toque em reproduzir e deixe o Mr Broccoli explicar por conta própria.",
     introPlayAnswer: "Reproduzir a resposta",
     introVoiceNote:
       "Pré-gravado com uma voz parceira. Neste telefone, a voz dele depende das rotas que você escolher.",
@@ -694,12 +816,21 @@ const rawIntroTranslations = {
     introBannerDismiss: "Закрыть знакомство",
     introTestTurnFailed:
       "Пробный ход не завершился. Вернитесь, проверьте настройку и попробуйте снова.",
+    introDialogueOpeningPrompt: "Для чего ты вообще нужен?",
     introDialogueFar:
-      "Слово брокколи происходит от итальянского broccolo — цветущий побег капусты.",
-    introDialogueQuestion: "И ты можешь меня слышать и отвечать?",
+      "Для разговоров, которые стоит обдумать, — естественных и без попыток скрыть, какой ИИ отвечает.",
+    introDialogueQuestion: "То есть я могу просто говорить с тобой?",
     introDialogueNear:
-      "Я слушаю, думаю и говорю — теми движками, которые вы мне дадите.",
+      "Да. Я превращаю голос в текст, сохраняю нить разговора и озвучиваю ответ.",
+    introDialoguePromptThree: "А кто думает над ответом?",
+    introDialogueResponseThree:
+      "Выбранная тобой модель: на этом телефоне или у провайдера, которым ты уже пользуешься.",
+    introDialoguePromptFour: "Мои разговоры покидают телефон?",
+    introDialogueResponseFour:
+      "Они остаются на этом устройстве. Если выбрана облачная модель, нужный контекст идёт прямо её провайдеру.",
     introWelcomeQuery: "Как вообще работает это приложение?",
+    introDialoguePlayResponse:
+      "Этот ответ понятнее на слух. Нажми воспроизведение, и Mr Broccoli всё объяснит сам.",
     introPlayAnswer: "Воспроизвести ответ",
     introVoiceNote:
       "Записано заранее партнёрским голосом. На этом телефоне его голос зависит от выбранных маршрутов.",
@@ -746,12 +877,21 @@ const rawIntroTranslations = {
     introBannerDismiss: "Stäng introduktionen",
     introTestTurnFailed:
       "Testet slutfördes inte. Gå tillbaka, kontrollera installationen och försök igen.",
+    introDialogueOpeningPrompt: "Vad är du egentligen till för?",
     introDialogueFar:
-      "Broccoli kommer från italienskans broccolo — kålens blommande skott.",
-    introDialogueQuestion: "Och du kan höra mig och svara?",
+      "För samtal som är värda att tänka igenom — naturligt talade, utan att dölja vilken AI som svarar.",
+    introDialogueQuestion: "Så jag kan bara prata med dig?",
     introDialogueNear:
-      "Jag lyssnar, tänker och talar — med de motorer du ger mig.",
+      "Ja. Jag gör om din röst till text, håller ihop tråden och läser upp svaret.",
+    introDialoguePromptThree: "Vem står för tänkandet?",
+    introDialogueResponseThree:
+      "Modellen du väljer: en på den här telefonen eller en leverantör du redan använder.",
+    introDialoguePromptFour: "Och lämnar mina samtal telefonen?",
+    introDialogueResponseFour:
+      "De stannar på den här enheten. Med en värdbaserad modell går sammanhanget som behövs direkt till den leverantören.",
     introWelcomeQuery: "Hur fungerar den här appen egentligen?",
+    introDialoguePlayResponse:
+      "Det svaret är lättare att förstå när du hör det. Tryck på spela och låt Mr Broccoli förklara själv.",
     introPlayAnswer: "Spela upp svaret",
     introVoiceNote:
       "Förinspelat med en partnerröst. På den här telefonen beror hans röst på de vägar du väljer.",
@@ -798,12 +938,21 @@ const rawIntroTranslations = {
     introBannerDismiss: "Tanıtımı kapat",
     introTestTurnFailed:
       "Deneme turu tamamlanmadı. Geri dön, kurulumu kontrol et ve yeniden dene.",
+    introDialogueOpeningPrompt: "Aslında ne işe yarıyorsun?",
     introDialogueFar:
-      "Brokoli, İtalyanca broccolo sözcüğünden gelir — lahananın çiçekli filizi.",
-    introDialogueQuestion: "Peki beni duyup cevap verebiliyor musun?",
+      "Üzerine düşünmeye değer sohbetler için — doğal biçimde konuşarak ve hangi yapay zekânın yanıtladığını gizlemeden.",
+    introDialogueQuestion: "Yani seninle sadece konuşmam yeterli mi?",
     introDialogueNear:
-      "Dinlerim, düşünürüm ve konuşurum — bana verdiğin motorlarla.",
+      "Evet. Sesini metne çevirir, sohbetin bağlamını korur ve yanıtı sesli okurum.",
+    introDialoguePromptThree: "Düşünme işini kim yapıyor?",
+    introDialogueResponseThree:
+      "Senin seçtiğin model: bu telefondaki bir model ya da zaten kullandığın bir sağlayıcı.",
+    introDialoguePromptFour: "Peki sohbetlerim telefondan çıkıyor mu?",
+    introDialogueResponseFour:
+      "Bu cihazda kalırlar. Barındırılan bir model seçersen yanıt için gereken bağlam doğrudan o sağlayıcıya gider.",
     introWelcomeQuery: "Bu uygulama aslında nasıl çalışıyor?",
+    introDialoguePlayResponse:
+      "Bu yanıt sesli duyulunca daha anlamlı. Oynata dokun ve Mr Broccoli'nin kendini anlatmasına izin ver.",
     introPlayAnswer: "Yanıtı çal",
     introVoiceNote:
       "Bir iş ortağı sesiyle önceden kaydedildi. Bu telefonda sesi, seçtiğin yollara bağlıdır.",
@@ -850,12 +999,21 @@ const rawIntroTranslations = {
     introBannerDismiss: "Закрити знайомство",
     introTestTurnFailed:
       "Пробний хід не завершився. Поверніться, перевірте налаштування і спробуйте ще раз.",
+    introDialogueOpeningPrompt: "Для чого ти взагалі потрібен?",
     introDialogueFar:
-      "Слово броколі походить від італійського broccolo — квітучий пагін капусти.",
-    introDialogueQuestion: "І ти можеш мене чути й відповідати?",
+      "Для розмов, які варто обдумати, — природних і без приховування того, який ШІ відповідає.",
+    introDialogueQuestion: "Тобто я можу просто говорити з тобою?",
     introDialogueNear:
-      "Я слухаю, думаю й говорю — тими рушіями, які ви мені дасте.",
+      "Так. Я перетворюю голос на текст, зберігаю хід розмови й озвучую відповідь.",
+    introDialoguePromptThree: "А хто думає над відповіддю?",
+    introDialogueResponseThree:
+      "Обрана тобою модель: на цьому телефоні або від провайдера, яким ти вже користуєшся.",
+    introDialoguePromptFour: "Мої розмови залишають телефон?",
+    introDialogueResponseFour:
+      "Вони зберігаються на цьому пристрої. Якщо обрати хмарну модель, потрібний контекст надходить прямо її провайдеру.",
     introWelcomeQuery: "Як узагалі працює цей застосунок?",
+    introDialoguePlayResponse:
+      "Цю відповідь краще почути. Натисни відтворення, і Mr Broccoli пояснить усе сам.",
     introPlayAnswer: "Відтворити відповідь",
     introVoiceNote:
       "Записано заздалегідь партнерським голосом. На цьому телефоні його голос залежить від обраних маршрутів.",
@@ -902,12 +1060,21 @@ const rawIntroTranslations = {
     introBannerDismiss: "تعارف بند کریں",
     introTestTurnFailed:
       "آزمائشی سوال مکمل نہیں ہوا۔ پیچھے جائیں، سیٹ اپ جانچیں اور دوبارہ کوشش کریں۔",
+    introDialogueOpeningPrompt: "اصل میں تم کس کام کے لیے ہو؟",
     introDialogueFar:
-      "بروکلی اطالوی لفظ broccolo سے آیا ہے — گوبھی کی پھولدار کونپل۔",
-    introDialogueQuestion: "اور تم مجھے سن کر جواب دے سکتے ہو؟",
+      "ایسی گفتگو کے لیے جس پر غور کرنا بنتا ہو—قدرتی انداز میں، اور یہ چھپائے بغیر کہ کون سی AI جواب دے رہی ہے۔",
+    introDialogueQuestion: "تو میں بس تم سے بات کر سکتا ہوں؟",
     introDialogueNear:
-      "میں سنتا ہوں، سوچتا ہوں اور بولتا ہوں — ان انجنوں سے جو آپ مجھے دیں۔",
+      "ہاں۔ میں تمہاری آواز کو متن میں بدلتا ہوں، گفتگو کا سلسلہ قائم رکھتا ہوں اور جواب بول کر سناتا ہوں۔",
+    introDialoguePromptThree: "سوچنے کا کام کون کرتا ہے؟",
+    introDialogueResponseThree:
+      "تمہارا منتخب کیا ہوا ماڈل: اس فون پر موجود یا کوئی فراہم کنندہ جسے تم پہلے سے استعمال کرتے ہو۔",
+    introDialoguePromptFour: "اور کیا میری گفتگو فون سے باہر جاتی ہے؟",
+    introDialogueResponseFour:
+      "وہ اسی ڈیوائس پر رہتی ہے۔ ہوسٹڈ ماڈل چننے پر جواب کے لیے ضروری سیاق براہِ راست اسی فراہم کنندہ کو جاتا ہے۔",
     introWelcomeQuery: "یہ ایپ اصل میں کام کیسے کرتی ہے؟",
+    introDialoguePlayResponse:
+      "یہ جواب سن کر زیادہ واضح ہوگا۔ پلے دباؤ اور Mr Broccoli کو خود سمجھانے دو۔",
     introPlayAnswer: "جواب سنیں",
     introVoiceNote:
       "ایک ساتھی آواز میں پہلے سے ریکارڈ شدہ۔ اس فون پر اس کی آواز آپ کے چنے ہوئے راستوں پر منحصر ہے۔",
@@ -951,10 +1118,21 @@ const rawIntroTranslations = {
     introBannerBody: "一分钟设置，他就能思考、听懂你并开口回答。",
     introBannerDismiss: "关闭介绍",
     introTestTurnFailed: "测试没有完成。请退回上一步，检查设置后再试一次。",
-    introDialogueFar: "西兰花一词源自意大利语 broccolo——卷心菜开花的嫩芽。",
-    introDialogueQuestion: "那你能听到我说话并回答我吗？",
-    introDialogueNear: "我能听、能想、能说——用你为我选择的引擎。",
+    introDialogueOpeningPrompt: "你到底是用来做什么的？",
+    introDialogueFar:
+      "用来进行值得认真思考的对话——自然地说出来，也不隐藏究竟是哪一个 AI 在回答。",
+    introDialogueQuestion: "所以我直接和你说话就行？",
+    introDialogueNear:
+      "对。我把你的语音转成文字，延续对话上下文，再把回答读给你听。",
+    introDialoguePromptThree: "真正负责思考的是谁？",
+    introDialogueResponseThree:
+      "由你选择的模型：可以是这台手机上的模型，也可以是你已经在用的服务商。",
+    introDialoguePromptFour: "那我的对话会离开手机吗？",
+    introDialogueResponseFour:
+      "对话保存在这台设备上。如果选择托管模型，回答所需的上下文会直接发送给该服务商。",
     introWelcomeQuery: "这个应用到底是怎么运作的？",
+    introDialoguePlayResponse:
+      "这个问题用声音回答更容易理解。点按播放，让 Mr Broccoli 亲自解释。",
     introPlayAnswer: "播放回答",
     introVoiceNote:
       "由合作伙伴的声音预先录制。在这部手机上，他的声音取决于你选择的路线。",

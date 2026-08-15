@@ -139,8 +139,9 @@ function Bubble({
 /**
  * Step one: the stored session the recording answers.
  *
- * Three earlier turns emerge from a fade above the crisp question the play
- * button answers with the localized recording. Switching the language swaps
+ * Five short exchanges rise behind the heading: four progressively clearer
+ * pieces of product context, then the crisp question and hand-off that explain
+ * why the localized recording is waiting below. Switching the language swaps
  * the on-screen dialogue with the audio so the pairing holds. It never
  * autoplays -- a voice starting by itself is startling.
  */
@@ -161,57 +162,121 @@ function WelcomeStep({ language, t }: IntroStepProps) {
 
   return (
     <View style={styles.welcome} testID="intro-welcome-step">
-      <IntroTitle>{t("introWelcomeTitle")}</IntroTitle>
+      <View style={styles.welcomeTitle} testID="intro-welcome-title">
+        <IntroTitle>{t("introWelcomeTitle")}</IntroTitle>
+      </View>
 
       {/* The dialogue hugs the bottom of its zone so it ends just above the
-          play button. The blurred earlier turns are decoration and stay out
-          of the accessibility tree; the crisp query is the question the play
-          button answers, so it is announced. */}
+          play button. Its length carries the earliest exchange into the blur
+          beneath the heading even on tall displays. The blurred history stays
+          out of the accessibility tree; the crisp final exchange explains the
+          play action and is announced. */}
       <View style={[styles.dialogueZone, { direction: previewDirection }]}>
         <View
-          accessible={false}
-          importantForAccessibility="no-hide-descendants"
-          style={styles.dialogueStack}
+          style={styles.dialogueConversation}
+          testID="intro-dialogue-conversation"
         >
-          <View style={styles.dialogueFar} testID="intro-dialogue-far">
-            <Bubble
-              contentDirection={previewDirection}
-              isRtl={previewIsRtl}
-              theme={theme}
-            >
-              {preview.introDialogueFar}
-            </Bubble>
+          <View
+            accessible={false}
+            importantForAccessibility="no-hide-descendants"
+            style={styles.dialogueHistory}
+          >
+            <View style={styles.dialogueFar} testID="intro-dialogue-far">
+              <Bubble
+                contentDirection={previewDirection}
+                isRtl={previewIsRtl}
+                mine
+                testID="intro-dialogue-prompt-1"
+                theme={theme}
+              >
+                {preview.introDialogueOpeningPrompt}
+              </Bubble>
+              <Bubble
+                contentDirection={previewDirection}
+                isRtl={previewIsRtl}
+                testID="intro-dialogue-response-1"
+                theme={theme}
+              >
+                {preview.introDialogueFar}
+              </Bubble>
+            </View>
+            <View style={styles.dialogueMid} testID="intro-dialogue-mid">
+              <Bubble
+                contentDirection={previewDirection}
+                isRtl={previewIsRtl}
+                mine
+                testID="intro-dialogue-prompt-2"
+                theme={theme}
+              >
+                {preview.introDialogueQuestion}
+              </Bubble>
+              <Bubble
+                contentDirection={previewDirection}
+                isRtl={previewIsRtl}
+                testID="intro-dialogue-response-2"
+                theme={theme}
+              >
+                {preview.introDialogueNear}
+              </Bubble>
+            </View>
+            <View style={styles.dialogueNear} testID="intro-dialogue-near">
+              <Bubble
+                contentDirection={previewDirection}
+                isRtl={previewIsRtl}
+                mine
+                testID="intro-dialogue-prompt-3"
+                theme={theme}
+              >
+                {preview.introDialoguePromptThree}
+              </Bubble>
+              <Bubble
+                contentDirection={previewDirection}
+                isRtl={previewIsRtl}
+                testID="intro-dialogue-response-3"
+                theme={theme}
+              >
+                {preview.introDialogueResponseThree}
+              </Bubble>
+            </View>
+            <View style={styles.dialogueSoft} testID="intro-dialogue-soft">
+              <Bubble
+                contentDirection={previewDirection}
+                isRtl={previewIsRtl}
+                mine
+                testID="intro-dialogue-prompt-4"
+                theme={theme}
+              >
+                {preview.introDialoguePromptFour}
+              </Bubble>
+              <Bubble
+                contentDirection={previewDirection}
+                isRtl={previewIsRtl}
+                testID="intro-dialogue-response-4"
+                theme={theme}
+              >
+                {preview.introDialogueResponseFour}
+              </Bubble>
+            </View>
           </View>
-          <View style={styles.dialogueMid} testID="intro-dialogue-mid">
+          <View style={styles.dialogueFinal}>
             <Bubble
               contentDirection={previewDirection}
               isRtl={previewIsRtl}
               mine
+              testID="intro-dialogue-query-bubble"
               theme={theme}
             >
-              {preview.introDialogueQuestion}
+              {preview.introWelcomeQuery}
             </Bubble>
-          </View>
-          <View style={styles.dialogueNear} testID="intro-dialogue-near">
             <Bubble
               contentDirection={previewDirection}
               isRtl={previewIsRtl}
+              testID="intro-dialogue-play-response-bubble"
               theme={theme}
             >
-              {preview.introDialogueNear}
+              {preview.introDialoguePlayResponse}
             </Bubble>
           </View>
-        </View>
-        <View style={styles.dialogueQuery}>
-          <Bubble
-            contentDirection={previewDirection}
-            isRtl={previewIsRtl}
-            mine
-            testID="intro-dialogue-query-bubble"
-            theme={theme}
-          >
-            {preview.introWelcomeQuery}
-          </Bubble>
         </View>
       </View>
 
@@ -929,26 +994,42 @@ const styles = StyleSheet.create({
   // renders where the platform supports it; the opacity ladder carries the
   // same depth cue everywhere else.
   dialogueFar: {
+    gap: 8,
     filter: [{ blur: 4 }],
     opacity: 0.5,
   },
+  dialogueConversation: {
+    bottom: 0,
+    left: 0,
+    position: "absolute",
+    right: 0,
+  },
   dialogueMid: {
+    gap: 8,
     filter: [{ blur: 2.4 }],
     opacity: 0.65,
   },
   dialogueNear: {
+    gap: 8,
     filter: [{ blur: 1.1 }],
     opacity: 0.85,
   },
-  dialogueQuery: {
+  dialogueSoft: {
+    gap: 8,
+    filter: [{ blur: 0.45 }],
+    opacity: 0.94,
+  },
+  dialogueFinal: {
+    gap: 8,
     marginTop: 9,
   },
-  dialogueStack: {
+  dialogueHistory: {
     gap: 9,
   },
   dialogueZone: {
     flex: 1,
     justifyContent: "flex-end",
+    position: "relative",
   },
   divider: {
     height: 1,
@@ -1243,6 +1324,9 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     paddingBottom: 10,
     paddingTop: 18,
+  },
+  welcomeTitle: {
+    zIndex: 1,
   },
   voiceNote: {
     fontFamily: fonts.body,

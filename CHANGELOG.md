@@ -35,6 +35,10 @@ the complete Play Store translations are kept in a dedicated file under
   phones.
 - The first-run introduction no longer lets step dots or horizontal swipes
   bypass the required Thinking setup before the live voice test.
+- The welcome introduction now carries a complete five-exchange conversation
+  into its headline blur, ending with a natural hand-off to the spoken answer.
+  Every intermediate bottom action is the same full-width 48-point Proceed
+  button as the final step's Done action.
 - The transcript sheet now uses one continuous canvas color and the approved
   18-point gutter instead of nesting the script inside a differently colored,
   dialog-padded rectangle; only expanded turn metrics lift onto a surface.

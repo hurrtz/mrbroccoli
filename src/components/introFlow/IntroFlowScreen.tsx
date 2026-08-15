@@ -380,7 +380,7 @@ export function IntroFlowScreen({
                   </ScrollView>
 
                   {isLast ? (
-                    <View style={styles.doneFooter}>
+                    <View style={styles.actionFooter}>
                       <Pressable
                         accessibilityLabel={t("done")}
                         accessibilityRole="button"
@@ -388,7 +388,7 @@ export function IntroFlowScreen({
                         disabled={doneDisabled}
                         onPress={onComplete}
                         style={({ pressed }) => [
-                          styles.done,
+                          styles.primaryAction,
                           {
                             backgroundColor: theme.accent,
                             opacity: doneDisabled ? 0.4 : pressed ? 0.85 : 1,
@@ -397,14 +397,17 @@ export function IntroFlowScreen({
                         testID="intro-done"
                       >
                         <Text
-                          style={[styles.doneLabel, { color: theme.onAccent }]}
+                          style={[
+                            styles.primaryActionLabel,
+                            { color: theme.onAccent },
+                          ]}
                         >
                           {t("done")}
                         </Text>
                       </Pressable>
                     </View>
                   ) : (
-                    <View style={styles.footer}>
+                    <View style={styles.actionFooter}>
                       <Pressable
                         accessibilityLabel={t("introNext")}
                         accessibilityRole="button"
@@ -412,7 +415,7 @@ export function IntroFlowScreen({
                         disabled={forwardDisabled}
                         onPress={() => goTo(index + 1)}
                         style={({ pressed }) => [
-                          styles.primary,
+                          styles.primaryAction,
                           {
                             backgroundColor: theme.accent,
                             opacity: forwardDisabled ? 0.4 : pressed ? 0.85 : 1,
@@ -420,11 +423,14 @@ export function IntroFlowScreen({
                         ]}
                         testID="intro-next"
                       >
-                        <PhosphorIcon
-                          color={theme.onAccent}
-                          name={isRtl ? "left" : "right"}
-                          size="navigation"
-                        />
+                        <Text
+                          style={[
+                            styles.primaryActionLabel,
+                            { color: theme.onAccent },
+                          ]}
+                        >
+                          {t("introNext")}
+                        </Text>
                       </Pressable>
                     </View>
                   )}
@@ -439,6 +445,11 @@ export function IntroFlowScreen({
 }
 
 const styles = StyleSheet.create({
+  actionFooter: {
+    paddingBottom: 14,
+    paddingHorizontal: 22,
+    paddingTop: 6,
+  },
   cardFrame: {
     flex: 1,
     width: "100%",
@@ -446,26 +457,16 @@ const styles = StyleSheet.create({
   cardSurface: {
     flex: 1,
   },
-  done: {
+  primaryAction: {
     alignItems: "center",
     borderRadius: introRadius.control,
     justifyContent: "center",
     minHeight: 48,
     width: "100%",
   },
-  doneFooter: {
-    paddingBottom: 14,
-    paddingHorizontal: 22,
-    paddingTop: 6,
-  },
-  doneLabel: {
+  primaryActionLabel: {
     fontFamily: fonts.display,
     fontSize: 15,
-  },
-  footer: {
-    alignItems: "center",
-    paddingBottom: 10,
-    paddingTop: 10,
   },
   flowFrame: {
     flex: 1,
@@ -519,13 +520,6 @@ const styles = StyleSheet.create({
   },
   pagerContent: {
     direction: "ltr",
-  },
-  primary: {
-    alignItems: "center",
-    borderRadius: introRadius.iconButton,
-    height: 58,
-    justifyContent: "center",
-    width: 58,
   },
   root: {
     flex: 1,

@@ -69,6 +69,12 @@ settings, history, setup, receipts, and diagnostics are secondary surfaces so
 the default experience remains voice-first even though expert controls remain
 available.
 
+The first-run introduction is a three-page horizontal pager. Its welcome page
+renders a fixed five-exchange localized conversation from oldest and most
+blurred to a crisp final prompt and response, then plays the bundled answer in
+the selected interface language. The fixed bottom action shares one geometry
+across pages; only the last page changes its label and completion gate.
+
 The iOS presentation remains one component tree across iPhone and iPad.
 `resolveIpadLayout` maps the live window and native iPad identity into compact
 or regular presentation state. Compact windows take the unchanged phone tree;

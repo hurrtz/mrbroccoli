@@ -215,6 +215,10 @@ boundary.
 - Interactive controls have at least a 44-by-44-point target, modals isolate
   screen-reader focus, and dynamic announcements are rate-limited to meaningful
   state changes.
+- The three-step introduction uses one full-width 48-point bottom action on
+  every page. Its welcome preview is five prompt-and-response exchanges whose
+  final localized prompt matches the bundled spoken answer; earlier exchanges
+  fade behind the heading and the final response explains the play hand-off.
 - **Decision:** iPad is an adaptive form factor of the same iOS product, not a
   separate app. Compact iPad windows reuse the phone interface exactly; regular
   windows expose persistent navigation and wider information layouts while
