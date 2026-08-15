@@ -179,7 +179,7 @@ describe("DataPrivacySettingsPage", () => {
       screen.getByText(/Retrieved excerpts are sent to the model provider/),
     ).toBeTruthy();
     expect(
-      screen.getByText(/Private conversations are never indexed/),
+      screen.getByText(/Turning this off deletes the derived index/),
     ).toBeTruthy();
 
     fireEvent.press(toggle);

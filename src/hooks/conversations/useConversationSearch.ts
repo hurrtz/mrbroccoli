@@ -41,6 +41,10 @@ export function useConversationSearch(params: {
             return conversationMeta;
           }
 
+          if (conversationMeta.isLocked) {
+            return null;
+          }
+
           const conversation = await getConversationById(conversationMeta.id);
 
           if (!conversation) {

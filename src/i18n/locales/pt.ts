@@ -12,6 +12,7 @@ import { premiumTranslations } from "../premiumTranslations";
 import { transcriptEditTranslations } from "../transcriptEditTranslations";
 import { autoSetupTranslations } from "../autoSetupTranslations";
 import { workspaceTranslations } from "../workspaceTranslations";
+import { sessionLockTranslations } from "../sessionLockTranslations";
 
 export const pt = {
   ...conversationArtifactTranslations.pt,
@@ -26,6 +27,7 @@ export const pt = {
   ...premiumTranslations.pt,
   ...transcriptEditTranslations.pt,
   ...workspaceTranslations.pt,
+  ...sessionLockTranslations.pt,
   ...autoSetupTranslations.pt,
   appName: "Sr. Brócolo",
   retry: "Tentar novamente",

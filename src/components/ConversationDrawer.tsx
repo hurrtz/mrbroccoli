@@ -20,6 +20,10 @@ import {
 } from "./conversationDrawer/ConversationDrawerHeader";
 import { ConversationDrawerList } from "./conversationDrawer/ConversationDrawerList";
 import { ConversationRenameModal } from "./conversationDrawer/ConversationRenameModal";
+import {
+  SessionLockModal,
+  type SessionLockModalMode,
+} from "./conversationDrawer/SessionLockModal";
 import { styles } from "./conversationDrawer/styles";
 import { ConversationDrawerProps } from "./conversationDrawer/types";
 import { useConversationDrawerController } from "./conversationDrawer/useConversationDrawerController";
@@ -33,11 +37,14 @@ export const ConversationDrawer = React.memo(function ConversationDrawer({
   activeId,
   onSearchConversations,
   onSelect,
+  onCanUseSessionDeviceAuth,
+  onLockSession,
+  onUnlockSession,
+  onRemoveSessionLock,
   onCopyThread,
   onShareThread,
   onRenameThread,
   onTogglePinned,
-  onTogglePrivate,
   onToggleArchived,
   onAutoName,
   onNewSession,
@@ -55,6 +62,47 @@ export const ConversationDrawer = React.memo(function ConversationDrawer({
   const insets = useSafeAreaInsets();
   const isLandscape = width > height;
   const isSidebar = presentation === "sidebar";
+  const [lockDialog, setLockDialog] = React.useState<{
+    conversationId: string;
+    deviceAuthAvailable: boolean;
+    mode: SessionLockModalMode;
+  } | null>(null);
+  const openLockDialog = React.useCallback(
+    (conversationId: string, mode: SessionLockModalMode) => {
+      setLockDialog({
+        conversationId,
+        deviceAuthAvailable: false,
+        mode,
+      });
+      if (mode === "lock") {
+        return;
+      }
+      void onCanUseSessionDeviceAuth(conversationId)
+        .then((available) => {
+          setLockDialog((current) =>
+            current?.conversationId === conversationId && current.mode === mode
+              ? { ...current, deviceAuthAvailable: available }
+              : current,
+          );
+        })
+        .catch(() => undefined);
+    },
+    [onCanUseSessionDeviceAuth],
+  );
+  const handleSelectRequest = React.useCallback(
+    async (conversationId: string) => {
+      const conversation = conversations.find(
+        (entry) => entry.id === conversationId,
+      );
+      if (conversation?.isLocked) {
+        openLockDialog(conversationId, "unlock");
+        return false;
+      }
+      await onSelect(conversationId);
+      return true;
+    },
+    [conversations, onSelect, openLockDialog],
+  );
   const drawerMaxWidth = isLandscape ? Math.min(width * 0.44, 520) : width;
   const controller = useConversationDrawerController({
     visible: isSidebar || visible,
@@ -64,8 +112,76 @@ export const ConversationDrawer = React.memo(function ConversationDrawer({
     onNewSession,
     onRenameThread,
     onSearchConversations,
-    onSelect,
+    onSelect: handleSelectRequest,
   });
+  const submitLockPassword = React.useCallback(
+    async (password: string) => {
+      if (!lockDialog) {
+        return false;
+      }
+      let succeeded = false;
+      if (lockDialog.mode === "lock") {
+        succeeded = await onLockSession(lockDialog.conversationId, password);
+      } else if (lockDialog.mode === "remove") {
+        succeeded = await onRemoveSessionLock(
+          lockDialog.conversationId,
+          "password",
+          password,
+        );
+      } else {
+        succeeded = await onUnlockSession(
+          lockDialog.conversationId,
+          "password",
+          password,
+        );
+        if (succeeded) {
+          await onSelect(lockDialog.conversationId);
+          if (!isSidebar) {
+            onClose();
+          }
+        }
+      }
+      if (!succeeded) {
+        setLockDialog(null);
+      }
+      return succeeded;
+    },
+    [
+      isSidebar,
+      lockDialog,
+      onClose,
+      onLockSession,
+      onRemoveSessionLock,
+      onSelect,
+      onUnlockSession,
+    ],
+  );
+  const submitLockDeviceAuth = React.useCallback(async () => {
+    if (!lockDialog || lockDialog.mode === "lock") {
+      return false;
+    }
+    const succeeded =
+      lockDialog.mode === "remove"
+        ? await onRemoveSessionLock(lockDialog.conversationId, "device")
+        : await onUnlockSession(lockDialog.conversationId, "device");
+    if (succeeded && lockDialog.mode === "unlock") {
+      await onSelect(lockDialog.conversationId);
+      if (!isSidebar) {
+        onClose();
+      }
+    }
+    if (!succeeded) {
+      setLockDialog(null);
+    }
+    return succeeded;
+  }, [
+    isSidebar,
+    lockDialog,
+    onClose,
+    onRemoveSessionLock,
+    onSelect,
+    onUnlockSession,
+  ]);
   const handleDelete = React.useCallback(
     (conversationId: string) => {
       const conversation = conversations.find(
@@ -178,8 +294,13 @@ export const ConversationDrawer = React.memo(function ConversationDrawer({
         onOpenRenameModal={controller.openRenameModal}
         onShareThread={onShareThread}
         onTogglePinned={onTogglePinned}
-        onTogglePrivate={onTogglePrivate}
         onToggleArchived={onToggleArchived}
+        onToggleLocked={(conversation) =>
+          openLockDialog(
+            conversation.id,
+            conversation.isLocked ? "remove" : "lock",
+          )
+        }
         onAutoName={onAutoName}
       />
       <ConversationRenameModal
@@ -188,6 +309,14 @@ export const ConversationDrawer = React.memo(function ConversationDrawer({
         onChangeEditingTitle={controller.setEditingTitle}
         onClose={controller.closeRenameModal}
         onSubmit={controller.submitRename}
+      />
+      <SessionLockModal
+        deviceAuthAvailable={lockDialog?.deviceAuthAvailable ?? false}
+        mode={lockDialog?.mode ?? "unlock"}
+        onClose={() => setLockDialog(null)}
+        onDeviceAuth={submitLockDeviceAuth}
+        onSubmitPassword={submitLockPassword}
+        visible={lockDialog !== null}
       />
       {!isSidebar && onDismissToast ? (
         <View

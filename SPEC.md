@@ -151,6 +151,7 @@ boundary.
   retired from all user-facing copy before store submission; other locales
   keep their established localized names (for example “Übermodus,”
   “Superrežim”).
+
 - Optional past-conversation knowledge retrieves small, source-linked excerpts
   from other eligible conversations on device.
 
@@ -162,15 +163,21 @@ boundary.
   They must never enter AsyncStorage, backups, diagnostics, fixture data, or a
   distributable bundle.
 - Canonical conversations and public settings stay on the device.
-- A conversation marked Private is never added to or retrieved from the
-  cross-session index. Its own in-session summary remains available.
+- A locked session requires its password or enrolled device authentication
+  before its full record can enter the active workspace. Authorization lasts
+  only for the current foreground visit; launch and app backgrounding clear it.
+  Locked sessions are also excluded from full-text search and cross-session
+  knowledge. The lock is local access control, not conversation-database
+  encryption, and the UI must say so.
 - Retrieved historical text, web results, image content, and other external
   context are untrusted data, never instructions.
 - Debug output must exclude credentials and user-authored prompts,
   transcripts, titles, searches, summaries, instructions, and message content.
 - Backups may contain portable public settings and complete conversations, but
   never API keys, validation diagnostics, debug logs, downloaded models, audio,
-  derived indexes, or caches.
+  derived indexes, lock credentials, or caches. A locked conversation requires
+  foreground authorization before export and is restored without its
+  device-local lock.
 
 ### Transparency and control
 
@@ -248,7 +255,8 @@ boundary.
 - **Conversation summary** — a compact, editable representation of older turns
   used only inside its conversation.
 - **Past-conversation knowledge** — an optional derived on-device index used to
-  retrieve source-linked excerpts from other non-private conversations.
+  retrieve source-linked excerpts from other eligible conversations. Locked
+  sessions and the active branch family remain ineligible.
 - **Conversation branch** — a copied checkpoint with new message IDs and an
   explicit root/parent origin, allowing alternative continuations without
   mutating the original path.
@@ -301,7 +309,7 @@ boundary.
 - [`src/services/llm/SPEC.md`](./src/services/llm/SPEC.md) — LLM routing and prompt
   safety.
 - [`src/services/conversationKnowledge/SPEC.md`](./src/services/conversationKnowledge/SPEC.md)
-  — private, local cross-session retrieval.
+  — local cross-session retrieval and source eligibility.
 - [`src/i18n/SPEC.md`](./src/i18n/SPEC.md) — locale and translation contract.
 - [`src/design-system/SPEC.md`](./src/design-system/SPEC.md) — native control and
   icon rules.

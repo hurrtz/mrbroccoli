@@ -22,6 +22,18 @@ let mockSettingsDismiss: (() => void) | null = null;
 let mockDrawerArchivedRevealRequests: number[] = [];
 let mockIsPad = false;
 let mockPipelinePhase: "idle" | "thinking" = "idle";
+const mockVerifySessionPassword = jest.fn(
+  async (_conversationId: string, _password: string) => false,
+);
+
+jest.mock("../../src/services/sessionLock", () => ({
+  canUnlockSessionWithDeviceAuth: jest.fn(async () => false),
+  clearSessionLock: jest.fn(async () => undefined),
+  createSessionLock: jest.fn(async () => ({ deviceAuthEnabled: false })),
+  unlockSessionWithDeviceAuth: jest.fn(async () => false),
+  verifySessionPassword: (conversationId: string, password: string) =>
+    mockVerifySessionPassword(conversationId, password),
+}));
 
 jest.mock("../../src/context/PremiumEntitlementContext", () => ({
   usePremiumEntitlement: jest.fn(() => ({
@@ -161,6 +173,8 @@ jest.mock("../../src/hooks/useConversations", () => ({
   useConversations: jest.fn(() => ({
     conversations: [],
     activeConversation: null,
+    grantConversationAccess: jest.fn(),
+    updateConversationLocked: jest.fn(async () => true),
     createConversation: jest.fn(),
     selectConversation: jest.fn(),
     getConversationById: jest.fn(),
@@ -526,13 +540,21 @@ jest.mock("../../src/components/ConversationDrawer", () => ({
     archivedRevealRequestId,
     onArchivedRevealHandled,
     onOpenSettings,
+    onUnlockSession,
     presentation = "modal",
+    toast,
     visible,
   }: {
     archivedRevealRequestId?: number | null;
     onArchivedRevealHandled?: (requestId: number) => void;
     onOpenSettings?: () => void;
+    onUnlockSession?: (
+      id: string,
+      method: "password",
+      password: string,
+    ) => Promise<boolean>;
     presentation?: "modal" | "sidebar";
+    toast?: { message: string } | null;
     visible: boolean;
   }) => {
     const React = require("react");
@@ -562,6 +584,20 @@ jest.mock("../../src/components/ConversationDrawer", () => ({
             { onPress: onOpenSettings, testID: "stub-sidebar-open-settings" },
             React.createElement(Text, null, "sidebar-open-settings"),
           )
+        : null,
+      onUnlockSession
+        ? React.createElement(
+            TouchableOpacity,
+            {
+              onPress: () =>
+                void onUnlockSession("locked", "password", "wrong"),
+              testID: "stub-unlock-locked-session",
+            },
+            React.createElement(Text, null, "unlock-locked-session"),
+          )
+        : null,
+      toast?.message
+        ? React.createElement(Text, { testID: "drawer-toast" }, toast.message)
         : null,
     );
   },
@@ -694,6 +730,8 @@ describe("MainScreen", () => {
     mockDrawerArchivedRevealRequests = [];
     mockIsPad = false;
     mockPipelinePhase = "idle";
+    mockVerifySessionPassword.mockReset();
+    mockVerifySessionPassword.mockResolvedValue(false);
     mockUseWindowDimensions.mockReturnValue({
       fontScale: 1,
       height: 932,
@@ -1232,6 +1270,19 @@ describe("MainScreen", () => {
     expect(screen.getByText("settings:open")).toBeTruthy();
     expect(screen.queryByText("guided-setup-shortcut")).toBeNull();
     expect(screen.getByText("drawer:open")).toBeTruthy();
+  });
+
+  it("reports that failed session authentication did not load the session", async () => {
+    const screen = renderWithProviders(<MainScreen />);
+
+    fireEvent.press(screen.getByTestId("stub-unlock-locked-session"));
+
+    await waitFor(() => {
+      expect(mockVerifySessionPassword).toHaveBeenCalledWith("locked", "wrong");
+      expect(screen.getByTestId("drawer-toast").props.children).toBe(
+        "The session was not unlocked, so it was not loaded.",
+      );
+    });
   });
 
   it("exposes the exact hydrated locale marker used by store captures", () => {

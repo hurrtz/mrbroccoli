@@ -104,7 +104,6 @@ export interface RunVoicePipelineParams {
   summarizedMessageCount?: number;
   currentConversationId?: string | null;
   conversationKnowledgeExcludedIds?: string[];
-  privateConversationIds?: string[];
   pastConversationKnowledgeEnabled?: boolean;
   assistantInstructions: string;
   responseLength: AssistantResponseLength;

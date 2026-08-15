@@ -12,6 +12,7 @@ import { premiumTranslations } from "../premiumTranslations";
 import { transcriptEditTranslations } from "../transcriptEditTranslations";
 import { autoSetupTranslations } from "../autoSetupTranslations";
 import { workspaceTranslations } from "../workspaceTranslations";
+import { sessionLockTranslations } from "../sessionLockTranslations";
 
 export const zhCN = {
   ...conversationArtifactTranslations["zh-CN"],
@@ -26,6 +27,7 @@ export const zhCN = {
   ...premiumTranslations["zh-CN"],
   ...transcriptEditTranslations["zh-CN"],
   ...workspaceTranslations["zh-CN"],
+  ...sessionLockTranslations.zhCN,
   ...autoSetupTranslations["zh-CN"],
   appName: "西兰花先生",
   retry: "重试",

@@ -28,33 +28,222 @@ const STRONG_MATCH_SCORE = 0.62;
 const NEAR_DUPLICATE_VECTOR_SCORE = 0.94;
 const LOW_INFORMATION_QUERY_TOKENS = new Set([
   // English
-  "a", "an", "and", "are", "as", "at", "be", "been", "but", "by",
-  "can", "could", "did", "do", "does", "for", "from", "had", "has",
-  "have", "how", "i", "if", "in", "into", "is", "it", "me", "my",
-  "of", "on", "or", "our", "should", "that", "the", "their", "then",
-  "there", "these", "they", "this", "to", "was", "we", "were", "what",
-  "when", "where", "which", "who", "why", "will", "with", "would", "you",
+  "a",
+  "an",
+  "and",
+  "are",
+  "as",
+  "at",
+  "be",
+  "been",
+  "but",
+  "by",
+  "can",
+  "could",
+  "did",
+  "do",
+  "does",
+  "for",
+  "from",
+  "had",
+  "has",
+  "have",
+  "how",
+  "i",
+  "if",
+  "in",
+  "into",
+  "is",
+  "it",
+  "me",
+  "my",
+  "of",
+  "on",
+  "or",
+  "our",
+  "should",
+  "that",
+  "the",
+  "their",
+  "then",
+  "there",
+  "these",
+  "they",
+  "this",
+  "to",
+  "was",
+  "we",
+  "were",
+  "what",
+  "when",
+  "where",
+  "which",
+  "who",
+  "why",
+  "will",
+  "with",
+  "would",
+  "you",
   "your",
   // German
-  "aber", "als", "am", "an", "auf", "aus", "bei", "das", "dein", "deine",
-  "dem", "den", "der", "des", "die", "du", "ein", "eine", "einem", "einen",
-  "einer", "er", "es", "für", "ich", "ihr", "im", "ist", "kann", "könnte",
-  "mein", "meine", "mit", "oder", "sein", "sind", "sie", "sollte", "und",
-  "unser", "von", "war", "waren", "was", "welche", "welcher", "welches",
-  "wie", "wir", "wo", "warum", "zu", "zum", "zur",
+  "aber",
+  "als",
+  "am",
+  "an",
+  "auf",
+  "aus",
+  "bei",
+  "das",
+  "dein",
+  "deine",
+  "dem",
+  "den",
+  "der",
+  "des",
+  "die",
+  "du",
+  "ein",
+  "eine",
+  "einem",
+  "einen",
+  "einer",
+  "er",
+  "es",
+  "für",
+  "ich",
+  "ihr",
+  "im",
+  "ist",
+  "kann",
+  "könnte",
+  "mein",
+  "meine",
+  "mit",
+  "oder",
+  "sein",
+  "sind",
+  "sie",
+  "sollte",
+  "und",
+  "unser",
+  "von",
+  "war",
+  "waren",
+  "was",
+  "welche",
+  "welcher",
+  "welches",
+  "wie",
+  "wir",
+  "wo",
+  "warum",
+  "zu",
+  "zum",
+  "zur",
   // Spanish, French, Italian, and Portuguese
-  "al", "alla", "anche", "avec", "comme", "con", "da", "dans", "de", "del",
-  "della", "des", "di", "du", "e", "el", "en", "et", "eu", "gli", "il",
-  "in", "la", "le", "les", "lo", "ma", "mais", "me", "mi", "mon", "na",
-  "nel", "no", "nos", "nous", "o", "ou", "para", "par", "per", "por",
-  "pour", "que", "qui", "se", "si", "son", "su", "sur", "tu", "un", "una",
-  "une", "vous", "y",
+  "al",
+  "alla",
+  "anche",
+  "avec",
+  "comme",
+  "con",
+  "da",
+  "dans",
+  "de",
+  "del",
+  "della",
+  "des",
+  "di",
+  "du",
+  "e",
+  "el",
+  "en",
+  "et",
+  "eu",
+  "gli",
+  "il",
+  "in",
+  "la",
+  "le",
+  "les",
+  "lo",
+  "ma",
+  "mais",
+  "me",
+  "mi",
+  "mon",
+  "na",
+  "nel",
+  "no",
+  "nos",
+  "nous",
+  "o",
+  "ou",
+  "para",
+  "par",
+  "per",
+  "por",
+  "pour",
+  "que",
+  "qui",
+  "se",
+  "si",
+  "son",
+  "su",
+  "sur",
+  "tu",
+  "un",
+  "una",
+  "une",
+  "vous",
+  "y",
   // Russian
-  "а", "без", "бы", "был", "была", "были", "быть", "в", "вы", "где", "да",
-  "для", "до", "его", "ее", "если", "есть", "же", "за", "и", "из", "или",
-  "как", "когда", "кто", "ли", "мне", "мы", "на", "не", "но", "о", "он",
-  "она", "они", "от", "по", "почему", "с", "со", "так", "то", "у", "что",
-  "это", "я",
+  "а",
+  "без",
+  "бы",
+  "был",
+  "была",
+  "были",
+  "быть",
+  "в",
+  "вы",
+  "где",
+  "да",
+  "для",
+  "до",
+  "его",
+  "ее",
+  "если",
+  "есть",
+  "же",
+  "за",
+  "и",
+  "из",
+  "или",
+  "как",
+  "когда",
+  "кто",
+  "ли",
+  "мне",
+  "мы",
+  "на",
+  "не",
+  "но",
+  "о",
+  "он",
+  "она",
+  "они",
+  "от",
+  "по",
+  "почему",
+  "с",
+  "со",
+  "так",
+  "то",
+  "у",
+  "что",
+  "это",
+  "я",
 ]);
 
 interface StoredKnowledgeRow {
@@ -84,7 +273,7 @@ export interface ConversationKnowledgeRetrieval {
 
 let databasePromise: Promise<SQLite.SQLiteDatabase> | null = null;
 const conversationMutationQueues = new Map<string, Promise<void>>();
-const privateConversationIds = new Set<string>();
+const ineligibleConversationIds = new Set<string>();
 let databaseMutationQueue: Promise<void> = Promise.resolve();
 
 function getDatabase() {
@@ -149,9 +338,7 @@ function reportKnowledgeFailure(operation: string, error: unknown) {
 }
 
 function enqueueDatabaseMutation(operation: () => Promise<void>) {
-  const result = databaseMutationQueue
-    .catch(() => undefined)
-    .then(operation);
+  const result = databaseMutationQueue.catch(() => undefined).then(operation);
   databaseMutationQueue = result.catch(() => undefined);
   return result;
 }
@@ -160,8 +347,8 @@ function enqueueConversationMutation(
   conversationId: string,
   operation: () => Promise<void>,
 ) {
-  const previous = conversationMutationQueues.get(conversationId) ??
-    Promise.resolve();
+  const previous =
+    conversationMutationQueues.get(conversationId) ?? Promise.resolve();
   const queued = previous
     .catch(() => undefined)
     .then(() => enqueueDatabaseMutation(operation))
@@ -198,16 +385,16 @@ export function removeConversationKnowledge(conversationId: string) {
   });
 }
 
-export function setConversationKnowledgePrivate(
+export function setConversationKnowledgeExcluded(
   conversationId: string,
-  isPrivate: boolean,
+  excluded: boolean,
 ) {
-  if (isPrivate) {
-    privateConversationIds.add(conversationId);
+  if (excluded) {
+    ineligibleConversationIds.add(conversationId);
     return removeConversationKnowledge(conversationId);
   }
 
-  privateConversationIds.delete(conversationId);
+  ineligibleConversationIds.delete(conversationId);
   return Promise.resolve();
 }
 
@@ -215,16 +402,16 @@ export function syncConversationKnowledge(
   conversation: Conversation,
   enabled: boolean,
 ) {
-  if (!enabled || conversation.isPrivate) {
-    if (conversation.isPrivate) {
-      privateConversationIds.add(conversation.id);
+  if (!enabled || conversation.isLocked) {
+    if (conversation.isLocked) {
+      ineligibleConversationIds.add(conversation.id);
     }
     return removeConversationKnowledge(conversation.id);
   }
 
-  privateConversationIds.delete(conversation.id);
+  ineligibleConversationIds.delete(conversation.id);
   return enqueueConversationMutation(conversation.id, async () => {
-    if (privateConversationIds.has(conversation.id)) {
+    if (ineligibleConversationIds.has(conversation.id)) {
       return;
     }
 
@@ -242,7 +429,7 @@ export function syncConversationKnowledge(
 
     await database.withTransactionAsync(async () => {
       const transaction = database;
-      if (privateConversationIds.has(conversation.id)) {
+      if (ineligibleConversationIds.has(conversation.id)) {
         await deleteConversationRows(transaction, conversation.id);
         return;
       }
@@ -421,9 +608,10 @@ function getLexicalEvidence(query: string, row: StoredKnowledgeRow) {
   const preferredTokens = queryTokens.filter(
     (token) => token.length >= 4 || /^\d+$/.test(token),
   );
-  const evidenceTokens = preferredTokens.length > 0
-    ? preferredTokens
-    : queryTokens.filter((token) => token.length >= 2);
+  const evidenceTokens =
+    preferredTokens.length > 0
+      ? preferredTokens
+      : queryTokens.filter((token) => token.length >= 2);
   const rowTokens = new Set(
     tokenizeKnowledgeText(`${row.title}\n${row.content}`),
   );
@@ -475,11 +663,7 @@ function mergeRankedSeeds(
         vectorScore >= MIN_HYBRID_VECTOR_SCORE;
       const hasStrongVectorEvidence = vectorScore >= MIN_VECTOR_ONLY_SCORE;
 
-      if (
-        !hasExactEvidence &&
-        !hasHybridEvidence &&
-        !hasStrongVectorEvidence
-      ) {
+      if (!hasExactEvidence && !hasHybridEvidence && !hasStrongVectorEvidence) {
         return [];
       }
 
@@ -538,7 +722,10 @@ async function expandSeedContext(
   database: SQLite.SQLiteDatabase,
   seed: RankedKnowledgeRow,
 ) {
-  const neighbors = await database.getAllAsync<{ content: string; ordinal: number }>(
+  const neighbors = await database.getAllAsync<{
+    content: string;
+    ordinal: number;
+  }>(
     `SELECT content, ordinal
      FROM knowledge_chunks
      WHERE id = ? OR id IN (
@@ -556,7 +743,6 @@ async function expandSeedContext(
 export async function retrieveConversationKnowledge(params: {
   currentConversationId?: string | null;
   excludedConversationIds?: string[];
-  privateConversationIds?: string[];
   query: string;
   sourceLimit?: number;
   contextCharacterBudget?: number;
@@ -569,8 +755,7 @@ export async function retrieveConversationKnowledge(params: {
     const excludedIds = Array.from(
       new Set([
         ...(params.excludedConversationIds ?? []),
-        ...(params.privateConversationIds ?? []),
-        ...privateConversationIds,
+        ...ineligibleConversationIds,
         ...(params.currentConversationId ? [params.currentConversationId] : []),
       ]),
     );
@@ -595,9 +780,7 @@ export async function retrieveConversationKnowledge(params: {
         continue;
       }
       if (
-        sourceRows.some((selectedRow) =>
-          areNearDuplicateRows(row, selectedRow),
-        )
+        sourceRows.some((selectedRow) => areNearDuplicateRows(row, selectedRow))
       ) {
         continue;
       }
@@ -612,8 +795,8 @@ export async function retrieveConversationKnowledge(params: {
       return null;
     }
 
-    const contextBudget = params.contextCharacterBudget ??
-      DEFAULT_CONTEXT_CHARACTER_BUDGET;
+    const contextBudget =
+      params.contextCharacterBudget ?? DEFAULT_CONTEXT_CHARACTER_BUDGET;
     const contexts: string[] = [];
     const sources: MessageConversationKnowledgeMetadata["sources"] = [];
     let usedCharacters = 0;
@@ -660,6 +843,6 @@ export async function retrieveConversationKnowledge(params: {
 export function resetConversationKnowledgeForTests() {
   databasePromise = null;
   conversationMutationQueues.clear();
-  privateConversationIds.clear();
+  ineligibleConversationIds.clear();
   databaseMutationQueue = Promise.resolve();
 }

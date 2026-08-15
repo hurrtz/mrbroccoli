@@ -506,7 +506,7 @@ detector's deadline.
 
 ## Conversation-Level Controls
 
-Per-conversation instructions, style, speech behavior, privacy, title,
+Per-conversation instructions, style, speech behavior, title,
 and route overrides belong to the active conversation. Global settings remain
 defaults for new conversations and existing conversations without an override
 unless an explicit product rule says otherwise. The home sheet exposes only
@@ -516,7 +516,7 @@ length and tone.
 
 The sessions drawer is flat and recency-first. Pinned and Archived sessions
 live in collapsible groups around the everyday Earlier list; active state is a
-row fill, never a branch rail. Each row shows only title, pin/privacy state,
+row fill, never a branch rail. Each row shows only title, pin/lock state,
 date, visible message count, and one provider mark per model. Forks retain a
 small link to their root session. Search stays docked at the bottom, and the
 row's quick verbs open as a menu anchored at that row's own control —
@@ -526,6 +526,26 @@ may open the drawer with Archived already expanded; this is an explicit landing
 state, not a persisted change to the user's normal drawer layout. On regular
 iPad that landing state updates the already-mounted sidebar; it does not depend
 on remounting a modal drawer.
+
+A locked row remains visible in that overview with a lock mark, but selecting
+it opens app-owned authentication before conversation selection. Password is
+always available; Face ID or fingerprint is offered only when its authenticated
+SecureStore marker exists. Failed or cancelled authentication keeps the
+overview in place, does not load the conversation, and shows the localized
+equivalent of “The session was not unlocked, so it was not loaded.” Locking an
+active conversation first resets recording, generation, Drive state, and
+playback, then clears it from the workspace. The setup copy explicitly states
+that this access control does not encrypt the conversation database. Until the
+session is unlocked, its quick menu exposes only authentication/removal and
+destructive deletion; content-dependent organization and export actions remain
+unavailable.
+
+The lock setup dialog keeps its complete card and footer above the iOS keyboard
+so Set lock remains reachable on compact iPhones. Once either password field
+takes focus on iOS, the already-read explanatory copy collapses so both fields
+and the footer fit without overlapping. Password and confirmation text use the
+standard 12-point horizontal control inset for both placeholders and entered
+values.
 
 Branching creates a new conversation through the conversation hook; the screen
 must not splice or overwrite the current transcript. Deleting or restoring a

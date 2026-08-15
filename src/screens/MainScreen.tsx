@@ -54,6 +54,13 @@ import { hasProviderCredentialForCapability } from "../utils/providerCredentials
 import { useStorePromoPresentation } from "../hooks/useStorePromoPresentation";
 import { getLocalModelInstallStatus } from "../services/localModelManager";
 import {
+  canUnlockSessionWithDeviceAuth,
+  clearSessionLock,
+  createSessionLock,
+  unlockSessionWithDeviceAuth,
+  verifySessionPassword,
+} from "../services/sessionLock";
+import {
   getLocalModelBenchmarkResults,
   localModelBenchmarkMatchesDevice,
   probeLocalDeviceCapabilities,
@@ -87,7 +94,8 @@ export function MainScreen() {
   const storePromoPresentation = useStorePromoPresentation();
   const storePromoOrbPresentation = storePromoPresentation.orb;
   const storePromoScene = storePromoPresentation.scene;
-  const storePromoOnboardingActive = storePromoScene === "onboarding";
+  const storePromoOnboardingActive =
+    storePromoScene === "onboarding" || storePromoScene === "onboarding-ready";
   const baseFreeOffline = useFreeOfflineMode({
     settings,
     settingsLoaded: loaded && storePromoPresentation.loaded,
@@ -241,6 +249,7 @@ export function MainScreen() {
     activeConversation,
     createConversation,
     selectConversation,
+    grantConversationAccess,
     getConversationById,
     addMessage,
     updateMessage,
@@ -250,8 +259,8 @@ export function MainScreen() {
     renameConversation,
     removeMessage,
     toggleConversationPinned,
-    toggleConversationPrivate,
     toggleConversationArchived,
+    updateConversationLocked,
     searchConversations,
     deleteConversation,
     editUserMessage,
@@ -263,10 +272,10 @@ export function MainScreen() {
     pastConversationKnowledgeEnabled:
       runtimeSettings.pastConversationKnowledgeEnabled,
   });
-  const privateConversationIds = React.useMemo(
+  const lockedConversationIds = React.useMemo(
     () =>
       conversations
-        .filter((conversation) => conversation.isPrivate)
+        .filter((conversation) => conversation.isLocked)
         .map((conversation) => conversation.id),
     [conversations],
   );
@@ -569,6 +578,58 @@ export function MainScreen() {
     [isRecording],
   );
   const { dismissToast, showToast, toast } = useMainScreenToastController();
+  const authenticateLockedSession = React.useCallback(
+    async (
+      conversationId: string,
+      method: "device" | "password",
+      password?: string,
+    ) => {
+      try {
+        const authenticated =
+          method === "device"
+            ? await unlockSessionWithDeviceAuth(
+                conversationId,
+                t("sessionDeviceAuthPrompt"),
+              )
+            : await verifySessionPassword(conversationId, password ?? "");
+        if (!authenticated) {
+          showToast(t("sessionUnlockFailedNotLoaded"), undefined, "danger");
+          return false;
+        }
+        grantConversationAccess(conversationId);
+        return true;
+      } catch {
+        showToast(t("sessionUnlockFailedNotLoaded"), undefined, "danger");
+        return false;
+      }
+    },
+    [grantConversationAccess, showToast, t],
+  );
+  const handleRemoveSessionLock = React.useCallback(
+    async (
+      conversationId: string,
+      method: "device" | "password",
+      password?: string,
+    ) => {
+      if (
+        !(await authenticateLockedSession(conversationId, method, password))
+      ) {
+        return false;
+      }
+      try {
+        if (!(await updateConversationLocked(conversationId, false))) {
+          throw new Error("lock-state-update-failed");
+        }
+        await clearSessionLock(conversationId, t("sessionDeviceAuthPrompt"));
+        showToast(t("sessionLockRemoved"), undefined, "success");
+        return true;
+      } catch {
+        showToast(t("sessionUnlockFailedNotLoaded"), undefined, "danger");
+        return false;
+      }
+    },
+    [authenticateLockedSession, showToast, t, updateConversationLocked],
+  );
   usePersistenceFailureAlert(showToast, t);
   // Where the outcome is announced depends on where the user is: the card
   // states it in full in the introduction and Settings, while the workspace
@@ -752,7 +813,7 @@ export function MainScreen() {
     handleVoiceCaptureDone: runVoiceCapture,
   } = useVoicePipeline({
     activeConversation,
-    privateConversationIds,
+    lockedConversationIds,
     pastConversationKnowledgeEnabled:
       runtimeSettings.pastConversationKnowledgeEnabled,
     addMessage,
@@ -998,7 +1059,6 @@ export function MainScreen() {
     handleReportMessage,
     handleRenameThread,
     handleTogglePinned,
-    handleTogglePrivate,
     handleToggleArchived,
     handleDeleteConversation,
     handleSelectConversation,
@@ -1008,7 +1068,6 @@ export function MainScreen() {
     getConversationById,
     renameConversation,
     toggleConversationPinned,
-    toggleConversationPrivate,
     toggleConversationArchived,
     deleteConversation,
     selectConversation,
@@ -1018,6 +1077,38 @@ export function MainScreen() {
     language,
     t,
   });
+
+  const activeConversationId = activeConversation?.id;
+  const handleLockSession = React.useCallback(
+    async (conversationId: string, password: string) => {
+      try {
+        await createSessionLock(
+          conversationId,
+          password,
+          t("sessionDeviceAuthPrompt"),
+        );
+        if (activeConversationId === conversationId) {
+          await resetVoiceSessionState();
+        }
+        if (!(await updateConversationLocked(conversationId, true))) {
+          await clearSessionLock(conversationId);
+          throw new Error("lock-state-update-failed");
+        }
+        showToast(t("sessionLocked"), undefined, "success");
+        return true;
+      } catch {
+        showToast(t("sessionLockCouldNotBeSet"), undefined, "danger");
+        return false;
+      }
+    },
+    [
+      activeConversationId,
+      resetVoiceSessionState,
+      showToast,
+      t,
+      updateConversationLocked,
+    ],
+  );
 
   const {
     canGenerateTitle,
@@ -1530,7 +1621,11 @@ export function MainScreen() {
             ? undefined
             : (message, content) => editUserMessage(message.id, content),
           onBranchMessage: isBusy ? undefined : handleBranchMessage,
-          onSelectBranchConversation: isBusy ? undefined : selectConversation,
+          onSelectBranchConversation: isBusy
+            ? undefined
+            : async (conversationId) => {
+                await selectConversation(conversationId);
+              },
           onOpenSpeakingSettings: handleOpenTranscriptSpeakingSettings,
           onRepeatMessage: (message) => {
             void handleRepeatMessage(message);
@@ -1638,6 +1733,16 @@ export function MainScreen() {
         activeId: activeConversation?.id || null,
         onSearchConversations: searchConversations,
         onSelect: handleSelectConversation,
+        onCanUseSessionDeviceAuth: async (id) => {
+          try {
+            return await canUnlockSessionWithDeviceAuth(id);
+          } catch {
+            return false;
+          }
+        },
+        onLockSession: handleLockSession,
+        onUnlockSession: authenticateLockedSession,
+        onRemoveSessionLock: handleRemoveSessionLock,
         onCopyThread: handleCopyDrawerThread,
         onShareThread: handleShareDrawerThread,
         onRenameThread: handleRenameDrawerThread,
@@ -1647,9 +1752,6 @@ export function MainScreen() {
         onNewSession: () => {
           pendingImages.clearAttachments();
           void handleStartNewSession();
-        },
-        onTogglePrivate: (id) => {
-          void handleTogglePrivate(id);
         },
         onDelete: handleDeleteConversation,
         onArchivedRevealHandled: handleArchivedRevealHandled,

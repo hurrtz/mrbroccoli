@@ -12,6 +12,7 @@ import { premiumTranslations } from "../premiumTranslations";
 import { transcriptEditTranslations } from "../transcriptEditTranslations";
 import { autoSetupTranslations } from "../autoSetupTranslations";
 import { workspaceTranslations } from "../workspaceTranslations";
+import { sessionLockTranslations } from "../sessionLockTranslations";
 
 export const uk = {
   ...conversationArtifactTranslations.uk,
@@ -26,6 +27,7 @@ export const uk = {
   ...premiumTranslations.uk,
   ...transcriptEditTranslations.uk,
   ...workspaceTranslations.uk,
+  ...sessionLockTranslations.uk,
   ...autoSetupTranslations.uk,
   appName: "Пан Броколі",
   retry: "Повторити",

@@ -12,6 +12,7 @@ import { premiumTranslations } from "../premiumTranslations";
 import { transcriptEditTranslations } from "../transcriptEditTranslations";
 import { autoSetupTranslations } from "../autoSetupTranslations";
 import { workspaceTranslations } from "../workspaceTranslations";
+import { sessionLockTranslations } from "../sessionLockTranslations";
 
 export const tr = {
   ...conversationArtifactTranslations.tr,
@@ -26,6 +27,7 @@ export const tr = {
   ...premiumTranslations.tr,
   ...transcriptEditTranslations.tr,
   ...workspaceTranslations.tr,
+  ...sessionLockTranslations.tr,
   ...autoSetupTranslations.tr,
   appName: "Bay Brokoli",
   retry: "Yeniden dene",

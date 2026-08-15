@@ -51,6 +51,11 @@ One row per conversation:
 `app_state` is a key/value table holding the active conversation ID and the
 migration marker.
 
+The conversation document and metadata may carry `isLocked`, but this database
+is not encrypted by that flag. Password verifiers and device-authentication
+markers live separately in SecureStore under the session-lock service. Callers
+must enforce authentication before reading a locked document into app state.
+
 **Decision:** Messages are not a separate table. They are always read and
 written as part of a whole conversation, nothing queries an individual message,
 and full-text retrieval is already served by the knowledge index. Normalizing

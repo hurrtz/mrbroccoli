@@ -15,11 +15,22 @@ export interface ConversationDrawerProps {
   activeId: string | null;
   onSearchConversations: (query: string) => Promise<ConversationMeta[]>;
   onSelect: (id: string) => Promise<void> | void;
+  onCanUseSessionDeviceAuth: (id: string) => Promise<boolean>;
+  onLockSession: (id: string, password: string) => Promise<boolean>;
+  onUnlockSession: (
+    id: string,
+    method: "device" | "password",
+    password?: string,
+  ) => Promise<boolean>;
+  onRemoveSessionLock: (
+    id: string,
+    method: "device" | "password",
+    password?: string,
+  ) => Promise<boolean>;
   onCopyThread: (id: string) => void;
   onShareThread: (id: string) => void;
   onRenameThread: (id: string, title: string) => void;
   onTogglePinned: (id: string) => void;
-  onTogglePrivate: (id: string) => void;
   onToggleArchived: (id: string) => void;
   onAutoName: (id: string) => void;
   onNewSession: () => Promise<void> | void;

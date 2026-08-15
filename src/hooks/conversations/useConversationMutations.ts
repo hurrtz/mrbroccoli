@@ -35,7 +35,7 @@ import {
 } from "./storage";
 import {
   removeConversationKnowledge,
-  setConversationKnowledgePrivate,
+  setConversationKnowledgeExcluded,
   syncConversationKnowledge,
 } from "../../services/conversationKnowledge";
 import {
@@ -194,6 +194,7 @@ async function materializeBackupConversation(
 
 export function useConversationMutations(params: {
   activeConversationRef: MutableRefObject<Conversation | null>;
+  canAccessConversation: (id: string) => boolean;
   conversationMetas: ConversationMeta[];
   persistMetas: (metas: ConversationMeta[]) => ConversationMeta[];
   setActiveConversationValue: (conversation: Conversation | null) => void;
@@ -202,6 +203,7 @@ export function useConversationMutations(params: {
 }) {
   const {
     activeConversationRef,
+    canAccessConversation,
     conversationMetas,
     persistMetas,
     setActiveConversationValue,
@@ -243,7 +245,7 @@ export function useConversationMutations(params: {
         lastModel: initialModel,
         lastProvider: initialProvider,
         pinned: false,
-        isPrivate: false,
+        isLocked: false,
         archived: false,
       };
 
@@ -257,6 +259,9 @@ export function useConversationMutations(params: {
 
   const selectConversation = useCallback(
     async (id: string) => {
+      if (!canAccessConversation(id)) {
+        return;
+      }
       const requestId = selectionRequestRef.current + 1;
       selectionRequestRef.current = requestId;
       const conversation = await readConversation(id);
@@ -265,18 +270,21 @@ export function useConversationMutations(params: {
         setActiveConversationValue(conversation);
       }
     },
-    [setActiveConversationValue],
+    [canAccessConversation, setActiveConversationValue],
   );
 
   const getConversationById = useCallback(
     async (id: string) => {
+      if (!canAccessConversation(id)) {
+        return null;
+      }
       if (activeConversationRef.current?.id === id) {
         return activeConversationRef.current;
       }
 
       return readConversation(id);
     },
-    [activeConversationRef],
+    [activeConversationRef, canAccessConversation],
   );
 
   const addMessage = useCallback(
@@ -313,7 +321,7 @@ export function useConversationMutations(params: {
       if (
         messageInput.role === "user" &&
         pastConversationKnowledgeEnabled &&
-        !updatedConversation.isPrivate
+        !updatedConversation.isLocked
       ) {
         void syncConversationKnowledge(updatedConversation, true);
       }
@@ -465,7 +473,7 @@ export function useConversationMutations(params: {
         ),
       );
 
-      if (pastConversationKnowledgeEnabled && !updatedConversation.isPrivate) {
+      if (pastConversationKnowledgeEnabled && !updatedConversation.isLocked) {
         await syncConversationKnowledge(updatedConversation, true);
       }
 
@@ -523,7 +531,7 @@ export function useConversationMutations(params: {
         ),
       );
 
-      if (pastConversationKnowledgeEnabled && !updatedConversation.isPrivate) {
+      if (pastConversationKnowledgeEnabled && !updatedConversation.isLocked) {
         await syncConversationKnowledge(updatedConversation, true);
       }
 
@@ -628,7 +636,6 @@ export function useConversationMutations(params: {
               },
             }
           : {}),
-        ...(currentConversation.isPrivate ? { isPrivate: true } : {}),
       };
       const meta = buildConversationMetaFromConversation(conversation);
 
@@ -664,7 +671,7 @@ export function useConversationMutations(params: {
       setConversations((previous) => persistMetas([meta, ...previous]));
       setActiveConversationValue(conversation);
 
-      if (pastConversationKnowledgeEnabled && !conversation.isPrivate) {
+      if (pastConversationKnowledgeEnabled && !conversation.isLocked) {
         void syncConversationKnowledge(conversation, true);
       }
 
@@ -851,8 +858,12 @@ export function useConversationMutations(params: {
         }
         usedIds.add(restoredId);
 
+        const materializedConversation =
+          await materializeBackupConversation(record);
+        const { isLocked: _isLocked, ...unlockedConversation } =
+          materializedConversation;
         const restoredConversation = {
-          ...(await materializeBackupConversation(record)),
+          ...unlockedConversation,
           id: restoredId,
         };
         restoredByOriginalId.set(originalId, restoredConversation);
@@ -915,9 +926,7 @@ export function useConversationMutations(params: {
 
       if (pastConversationKnowledgeEnabled) {
         for (const restoredConversation of restoredConversations) {
-          if (!restoredConversation.isPrivate) {
-            void syncConversationKnowledge(restoredConversation, true);
-          }
+          void syncConversationKnowledge(restoredConversation, true);
         }
       }
 
@@ -971,7 +980,7 @@ export function useConversationMutations(params: {
       };
 
       saveConversation(updatedConversation);
-      if (pastConversationKnowledgeEnabled && !updatedConversation.isPrivate) {
+      if (pastConversationKnowledgeEnabled && !updatedConversation.isLocked) {
         void syncConversationKnowledge(updatedConversation, true);
       }
 
@@ -1055,57 +1064,6 @@ export function useConversationMutations(params: {
     ],
   );
 
-  const toggleConversationPrivate = useCallback(
-    async (id: string) => {
-      const currentConversation =
-        activeConversationRef.current?.id === id
-          ? activeConversationRef.current
-          : await getConversationById(id);
-
-      if (!currentConversation) {
-        return null;
-      }
-
-      const isPrivate = !currentConversation.isPrivate;
-      const updatedConversation: Conversation = {
-        ...currentConversation,
-        isPrivate,
-      };
-
-      const privacyUpdate = setConversationKnowledgePrivate(id, isPrivate);
-      await saveConversation(updatedConversation);
-
-      if (activeConversationRef.current?.id === id) {
-        setActiveConversationValue(updatedConversation);
-      }
-
-      setConversations((previous) =>
-        persistMetas(
-          previous.map((conversation) =>
-            conversation.id === id
-              ? { ...conversation, isPrivate }
-              : conversation,
-          ),
-        ),
-      );
-
-      await privacyUpdate;
-      if (!isPrivate && pastConversationKnowledgeEnabled) {
-        await syncConversationKnowledge(updatedConversation, true);
-      }
-
-      return isPrivate;
-    },
-    [
-      activeConversationRef,
-      getConversationById,
-      pastConversationKnowledgeEnabled,
-      persistMetas,
-      setActiveConversationValue,
-      setConversations,
-    ],
-  );
-
   const toggleConversationArchived = useCallback(
     async (id: string) => {
       const currentConversation =
@@ -1154,6 +1112,54 @@ export function useConversationMutations(params: {
     ],
   );
 
+  const updateConversationLocked = useCallback(
+    async (id: string, isLocked: boolean) => {
+      const currentConversation =
+        activeConversationRef.current?.id === id
+          ? activeConversationRef.current
+          : await readConversation(id);
+      if (!currentConversation) {
+        return false;
+      }
+
+      const updatedConversation: Conversation = {
+        ...currentConversation,
+        isLocked,
+      };
+      await saveConversation(updatedConversation);
+      await setConversationKnowledgeExcluded(id, isLocked);
+      setConversations((previous) =>
+        persistMetas(
+          previous.map((conversation) =>
+            conversation.id === id
+              ? { ...conversation, isLocked }
+              : conversation,
+          ),
+        ),
+      );
+
+      if (activeConversationRef.current?.id === id) {
+        if (isLocked) {
+          selectionRequestRef.current += 1;
+          setActiveConversationValue(null);
+        } else {
+          setActiveConversationValue(updatedConversation);
+        }
+      }
+      if (!isLocked && pastConversationKnowledgeEnabled) {
+        await syncConversationKnowledge(updatedConversation, true);
+      }
+      return true;
+    },
+    [
+      activeConversationRef,
+      pastConversationKnowledgeEnabled,
+      persistMetas,
+      setActiveConversationValue,
+      setConversations,
+    ],
+  );
+
   const clearActiveConversation = useCallback(() => {
     selectionRequestRef.current += 1;
     setActiveConversationValue(null);
@@ -1172,8 +1178,8 @@ export function useConversationMutations(params: {
     removeMessage,
     selectConversation,
     toggleConversationPinned,
-    toggleConversationPrivate,
     toggleConversationArchived,
+    updateConversationLocked,
     updateMessage,
     updateConversationContextSummary,
     updateConversationSettings,

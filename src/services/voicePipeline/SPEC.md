@@ -90,8 +90,8 @@ request and break the offline contract. They may use an existing summary and
 local past-conversation retrieval.
 
 Historical knowledge excludes the current conversation, explicit family IDs,
-and private conversations. It is kept separate from the current-session
-summary.
+locked sessions, and other caller-ineligible sources. It is kept separate from
+the current-session summary.
 
 ## Optional Web Search
 

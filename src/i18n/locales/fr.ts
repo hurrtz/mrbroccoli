@@ -12,6 +12,7 @@ import { premiumTranslations } from "../premiumTranslations";
 import { transcriptEditTranslations } from "../transcriptEditTranslations";
 import { autoSetupTranslations } from "../autoSetupTranslations";
 import { workspaceTranslations } from "../workspaceTranslations";
+import { sessionLockTranslations } from "../sessionLockTranslations";
 
 export const fr = {
   ...conversationArtifactTranslations.fr,
@@ -26,6 +27,7 @@ export const fr = {
   ...premiumTranslations.fr,
   ...transcriptEditTranslations.fr,
   ...workspaceTranslations.fr,
+  ...sessionLockTranslations.fr,
   ...autoSetupTranslations.fr,
   appName: "M. Brocoli",
   retry: "Réessayer",

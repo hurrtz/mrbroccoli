@@ -63,7 +63,7 @@ export type AudioPlayer = Omit<
 
 export interface UseVoicePipelineParams {
   activeConversation: Conversation | null;
-  privateConversationIds?: string[];
+  lockedConversationIds?: string[];
   pastConversationKnowledgeEnabled?: boolean;
   addMessage: (msg: Omit<Message, "id" | "timestamp">) => Message | null;
   createConversation: (

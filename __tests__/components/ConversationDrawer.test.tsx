@@ -1,5 +1,13 @@
 import React from "react";
-import { Alert, FlatList, Modal, Pressable, StyleSheet } from "react-native";
+import {
+  Alert,
+  FlatList,
+  KeyboardAvoidingView,
+  Modal,
+  Platform,
+  Pressable,
+  StyleSheet,
+} from "react-native";
 import { fireEvent, waitFor, within } from "@testing-library/react-native";
 
 import { ConversationDrawer } from "../../src/components/ConversationDrawer";
@@ -80,11 +88,14 @@ function renderConversationDrawer(
         ),
       )}
       onSelect={jest.fn()}
+      onCanUseSessionDeviceAuth={jest.fn(async () => false)}
+      onLockSession={jest.fn(async () => true)}
+      onUnlockSession={jest.fn(async () => true)}
+      onRemoveSessionLock={jest.fn(async () => true)}
       onCopyThread={jest.fn()}
       onShareThread={jest.fn()}
       onRenameThread={jest.fn()}
       onTogglePinned={jest.fn()}
-      onTogglePrivate={jest.fn()}
       onToggleArchived={jest.fn()}
       onAutoName={jest.fn()}
       onNewSession={jest.fn(async () => undefined)}
@@ -635,16 +646,16 @@ describe("ConversationDrawer", () => {
     fireEvent.press(backdrop);
     expect(screen.queryByTestId("conversation-action-menu")).toBeNull();
   });
-  it("marks a conversation private from its action sheet", async () => {
-    const onTogglePrivate = jest.fn();
-    const screen = renderConversationDrawer({ onTogglePrivate });
+  it("does not expose the retired private-session action", async () => {
+    const screen = renderConversationDrawer();
 
     fireEvent.press(screen.getByTestId("conversation-drawer-menu-one"));
-    fireEvent.press(
-      await screen.findByTestId("conversation-action-toggle-private"),
-    );
+    await screen.findByTestId("conversation-action-menu");
 
-    expect(onTogglePrivate).toHaveBeenCalledWith("one");
+    expect(
+      screen.queryByTestId("conversation-action-toggle-private"),
+    ).toBeNull();
+    expect(screen.queryByText("Mark as private")).toBeNull();
   });
 
   it("archives and automatically names a conversation from its action sheet", async () => {
@@ -689,6 +700,129 @@ describe("ConversationDrawer", () => {
     await waitFor(() => {
       expect(onSelect).toHaveBeenCalledWith("two");
       expect(onClose).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  it("keeps the overview open and does not load a locked session after failed authentication", async () => {
+    const onClose = jest.fn();
+    const onSelect = jest.fn(async () => undefined);
+    const onUnlockSession = jest.fn(async () => false);
+    const screen = renderConversationDrawer({
+      conversations: [
+        conversations[0],
+        { ...conversations[1], isLocked: true },
+      ],
+      onClose,
+      onSelect,
+      onUnlockSession,
+    });
+
+    fireEvent.press(screen.getByTestId("conversation-drawer-item-two"));
+    expect(await screen.findByText("Unlock session")).toBeTruthy();
+    fireEvent.changeText(screen.getByLabelText("Password"), "wrong-password");
+    fireEvent.press(screen.getByRole("button", { name: "Unlock" }));
+
+    await waitFor(() => {
+      expect(onUnlockSession).toHaveBeenCalledWith(
+        "two",
+        "password",
+        "wrong-password",
+      );
+      expect(onSelect).not.toHaveBeenCalled();
+      expect(onClose).not.toHaveBeenCalled();
+      expect(screen.queryByText("Unlock session")).toBeNull();
+      expect(screen.getByTestId("conversation-drawer-item-two")).toBeTruthy();
+    });
+  });
+
+  it("withholds content-dependent actions from a locked session", async () => {
+    const screen = renderConversationDrawer({
+      conversations: [
+        conversations[0],
+        { ...conversations[1], isLocked: true },
+      ],
+    });
+
+    fireEvent.press(screen.getByTestId("conversation-drawer-menu-two"));
+
+    expect(
+      await screen.findByTestId("conversation-action-toggle-lock"),
+    ).toBeTruthy();
+    expect(screen.queryByTestId("conversation-action-toggle-pin")).toBeNull();
+    expect(
+      screen.queryByTestId("conversation-action-toggle-archive"),
+    ).toBeNull();
+    expect(screen.queryByTestId("conversation-action-rename")).toBeNull();
+    expect(screen.queryByTestId("conversation-action-auto-name")).toBeNull();
+    expect(screen.getByTestId("conversation-action-delete")).toBeTruthy();
+  });
+
+  it("loads and closes only after a locked session is authenticated", async () => {
+    const onClose = jest.fn();
+    const onSelect = jest.fn(async () => undefined);
+    const onUnlockSession = jest.fn(async () => true);
+    const screen = renderConversationDrawer({
+      conversations: [
+        conversations[0],
+        { ...conversations[1], isLocked: true },
+      ],
+      onClose,
+      onSelect,
+      onUnlockSession,
+    });
+
+    fireEvent.press(screen.getByTestId("conversation-drawer-item-two"));
+    fireEvent.changeText(await screen.findByLabelText("Password"), "secret12");
+    fireEvent.press(screen.getByRole("button", { name: "Unlock" }));
+
+    await waitFor(() => {
+      expect(onUnlockSession).toHaveBeenCalledWith(
+        "two",
+        "password",
+        "secret12",
+      );
+      expect(onSelect).toHaveBeenCalledWith("two");
+      expect(onClose).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  it("sets a password lock from the conversation action menu", async () => {
+    jest.replaceProperty(Platform, "OS", "ios");
+    const onLockSession = jest.fn(async () => true);
+    const screen = renderConversationDrawer({ onLockSession });
+
+    fireEvent.press(screen.getByTestId("conversation-drawer-menu-one"));
+    fireEvent.press(
+      await screen.findByTestId("conversation-action-toggle-lock"),
+    );
+    const password = screen.getByLabelText("Password");
+    const confirmation = screen.getByLabelText("Confirm password");
+    const keyboardAvoiding = screen
+      .UNSAFE_getAllByType(KeyboardAvoidingView)
+      .find(
+        (view) => view.props.testID === "native-dialog-keyboard-avoiding-view",
+      );
+    expect(keyboardAvoiding).toBeDefined();
+    expect(keyboardAvoiding!.props.behavior).toBe("padding");
+    expect(keyboardAvoiding!.props.enabled).toBe(true);
+    expect(StyleSheet.flatten(password.props.style)).toMatchObject({
+      paddingHorizontal: 12,
+    });
+    expect(StyleSheet.flatten(confirmation.props.style)).toMatchObject({
+      paddingHorizontal: 12,
+    });
+    const lockDescription =
+      "Set a password for this session. Face ID or fingerprint unlock is added when this phone supports it. This prevents opening the session in Mr Broccoli; it does not encrypt the conversation database.";
+    expect(screen.getByText(lockDescription)).toBeTruthy();
+    fireEvent(password, "focus");
+    expect(screen.queryByText(lockDescription)).toBeNull();
+    expect(screen.getByRole("button", { name: "Set lock" })).toBeTruthy();
+    fireEvent.changeText(password, "secret12");
+    fireEvent.changeText(confirmation, "secret12");
+    fireEvent.press(screen.getByRole("button", { name: "Set lock" }));
+
+    await waitFor(() => {
+      expect(onLockSession).toHaveBeenCalledWith("one", "secret12");
     });
   });
 

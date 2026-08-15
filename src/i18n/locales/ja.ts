@@ -12,6 +12,7 @@ import { premiumTranslations } from "../premiumTranslations";
 import { transcriptEditTranslations } from "../transcriptEditTranslations";
 import { autoSetupTranslations } from "../autoSetupTranslations";
 import { workspaceTranslations } from "../workspaceTranslations";
+import { sessionLockTranslations } from "../sessionLockTranslations";
 
 export const ja = {
   ...conversationArtifactTranslations.ja,
@@ -26,6 +27,7 @@ export const ja = {
   ...premiumTranslations.ja,
   ...transcriptEditTranslations.ja,
   ...workspaceTranslations.ja,
+  ...sessionLockTranslations.ja,
   ...autoSetupTranslations.ja,
   appName: "ミスター・ブロッコリー",
   retry: "再試行",

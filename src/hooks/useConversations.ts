@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from "react";
+import { AppState } from "react-native";
 import { Conversation, ConversationMeta } from "../types";
 import {
   persistActiveConversationId,
@@ -10,9 +11,10 @@ import { useConversationMutations } from "./conversations/useConversationMutatio
 import { useConversationSearch } from "./conversations/useConversationSearch";
 import {
   clearConversationKnowledgeIndex,
-  setConversationKnowledgePrivate,
+  setConversationKnowledgeExcluded,
   syncConversationKnowledge,
 } from "../services/conversationKnowledge";
+import { clearSessionLock } from "../services/sessionLock";
 
 export function useConversations({
   pastConversationKnowledgeEnabled = false,
@@ -24,6 +26,7 @@ export function useConversations({
     useState<Conversation | null>(null);
   const [loaded, setLoaded] = useState(false);
   const activeConversationRef = useRef<Conversation | null>(null);
+  const authorizedConversationIdsRef = useRef(new Set<string>());
   const setActiveConversationValue = useCallback(
     (conversation: Conversation | null) => {
       activeConversationRef.current = conversation;
@@ -38,6 +41,13 @@ export function useConversations({
   const handleHydrated = useCallback(() => {
     setLoaded(true);
   }, []);
+  const canAccessConversation = useCallback(
+    (id: string) => {
+      const meta = conversations.find((conversation) => conversation.id === id);
+      return !meta?.isLocked || authorizedConversationIdsRef.current.has(id);
+    },
+    [conversations],
+  );
 
   useConversationHydration({
     activeConversationRef,
@@ -74,20 +84,62 @@ export function useConversations({
     removeMessage,
     selectConversation,
     toggleConversationPinned,
-    toggleConversationPrivate,
     toggleConversationArchived,
+    updateConversationLocked: updateConversationLockedValue,
     updateMessage,
     updateConversationContextSummary,
     updateConversationSettings,
     clearConversationSettings,
   } = useConversationMutations({
     activeConversationRef,
+    canAccessConversation,
     conversationMetas: conversations,
     persistMetas,
     setActiveConversationValue,
     setConversations,
     pastConversationKnowledgeEnabled,
   });
+  const grantConversationAccess = useCallback((id: string) => {
+    authorizedConversationIdsRef.current.add(id);
+  }, []);
+  const updateConversationLocked = useCallback(
+    async (id: string, isLocked: boolean) => {
+      const updated = await updateConversationLockedValue(id, isLocked);
+      if (updated && isLocked) {
+        authorizedConversationIdsRef.current.delete(id);
+      }
+      return updated;
+    },
+    [updateConversationLockedValue],
+  );
+  const deleteConversationWithCredentials = useCallback(
+    (id: string) => {
+      authorizedConversationIdsRef.current.delete(id);
+      void clearSessionLock(id);
+      deleteConversation(id);
+    },
+    [deleteConversation],
+  );
+
+  useEffect(() => {
+    const subscription = AppState.addEventListener("change", (nextState) => {
+      if (nextState === "active") {
+        return;
+      }
+      authorizedConversationIdsRef.current.clear();
+      const activeId = activeConversationRef.current?.id;
+      if (
+        activeId &&
+        conversations.some(
+          (conversation) =>
+            conversation.id === activeId && conversation.isLocked,
+        )
+      ) {
+        setActiveConversationValue(null);
+      }
+    });
+    return () => subscription.remove();
+  }, [conversations, setActiveConversationValue]);
   const branchExclusionReconciliationRef = useRef<string | null>(null);
   const branchFamilySignature = conversations
     .map(
@@ -160,7 +212,7 @@ export function useConversations({
   ]);
   const knowledgeReconciliationRef = useRef<string | null>(null);
   const knowledgeConversationSignature = conversations
-    .map(({ id, isPrivate, title }) => `${id}:${isPrivate ? 1 : 0}:${title}`)
+    .map(({ id, isLocked, title }) => `${id}:${isLocked ? 1 : 0}:${title}`)
     .join("|");
 
   useEffect(() => {
@@ -183,8 +235,9 @@ export function useConversations({
 
     void Promise.all(
       conversations.map(async (meta) => {
-        await setConversationKnowledgePrivate(meta.id, Boolean(meta.isPrivate));
-        if (meta.isPrivate) {
+        const excluded = Boolean(meta.isLocked);
+        await setConversationKnowledgeExcluded(meta.id, excluded);
+        if (excluded) {
           return;
         }
         const conversation = await getConversationById(meta.id);
@@ -210,6 +263,7 @@ export function useConversations({
     loaded,
     createConversation,
     selectConversation,
+    grantConversationAccess,
     getConversationById,
     addMessage,
     updateMessage,
@@ -219,10 +273,10 @@ export function useConversations({
     renameConversation,
     removeMessage,
     toggleConversationPinned,
-    toggleConversationPrivate,
     toggleConversationArchived,
+    updateConversationLocked,
     searchConversations,
-    deleteConversation,
+    deleteConversation: deleteConversationWithCredentials,
     editUserMessage,
     branchConversationAtMessage,
     restoreConversationBackup,

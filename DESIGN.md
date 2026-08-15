@@ -145,7 +145,7 @@ Context enters a model request in explicit layers:
 1. product and response-style instructions;
 2. optional compact summary of older messages from the active conversation;
 3. a bounded verbatim window of recent active-conversation messages;
-4. optional source-labelled excerpts from other non-private conversations;
+4. optional source-labelled excerpts from other eligible conversations;
 5. optional web-search context;
 6. optional private Model Council synthesis context; and
 7. the current user turn and its approved image attachments.
@@ -162,23 +162,24 @@ history. This preserves the offline execution claim.
 
 ## Persistence Architecture
 
-| Data                                | Authority                             | Storage                                          | Portable backup         |
-| ----------------------------------- | ------------------------------------- | ------------------------------------------------ | ----------------------- |
-| Public settings                     | `Settings` minus `apiKeys`            | AsyncStorage `@mrbroccoli/settings`              | Yes                     |
-| Provider API keys                   | user-entered secret                   | SecureStore `mrbroccoli.provider_key.<provider>` | Never                   |
-| Conversation metadata               | conversation hook                     | AsyncStorage `@mrbroccoli/conversations`         | Rebuilt from records    |
-| Conversation records                | conversation hook                     | AsyncStorage `@mrbroccoli/conversation/<id>`     | Yes                     |
-| Active conversation ID              | conversation hook                     | AsyncStorage `@mrbroccoli/active_conversation`   | Optional restore target |
-| Image attachments                   | conversation record plus app document | app documents, stored by stable attachment ID    | Embedded in backup v2   |
-| Past-conversation index             | derived cache                         | SQLite with FTS5 and local vectors               | Never                   |
-| Runtime capability overrides        | provider-confirmed device state       | AsyncStorage                                     | Never                   |
-| Local model installs and benchmarks | device-operational state              | app/model storage plus local state               | Never                   |
-| Premium cache                       | verified local entitlement            | SecureStore                                      | Never                   |
-| Debug captures                      | sanitized bounded diagnostics         | temporary/app diagnostics files                  | Never                   |
+| Data                                | Authority                             | Storage                                           | Portable backup         |
+| ----------------------------------- | ------------------------------------- | ------------------------------------------------- | ----------------------- |
+| Public settings                     | `Settings` minus `apiKeys`            | AsyncStorage `@mrbroccoli/settings`               | Yes                     |
+| Provider API keys                   | user-entered secret                   | SecureStore `mrbroccoli.provider_key.<provider>`  | Never                   |
+| Conversation metadata               | conversation hook                     | SQLite `mr-broccoli-conversations.db`             | Rebuilt from records    |
+| Conversation records                | conversation hook                     | SQLite `mr-broccoli-conversations.db`             | Yes                     |
+| Active conversation ID              | conversation hook                     | SQLite `app_state`                                | Optional restore target |
+| Session-lock credentials            | session-lock service                  | SecureStore, one verifier/auth marker per session | Never                   |
+| Image attachments                   | conversation record plus app document | app documents, stored by stable attachment ID     | Embedded in backup v2   |
+| Past-conversation index             | derived cache                         | SQLite with FTS5 and local vectors                | Never                   |
+| Runtime capability overrides        | provider-confirmed device state       | AsyncStorage                                      | Never                   |
+| Local model installs and benchmarks | device-operational state              | app/model storage plus local state                | Never                   |
+| Premium cache                       | verified local entitlement            | SecureStore                                       | Never                   |
+| Debug captures                      | sanitized bounded diagnostics         | temporary/app diagnostics files                   | Never                   |
 
-Settings and conversation writes are serialized per storage key. This prevents
-an older asynchronous write from overwriting a newer user action. Loading waits
-for pending writes before reading the same key.
+Settings writes are serialized per storage key. Conversation writes run through
+one queued SQLite transaction boundary, and reads wait for pending writes. This
+prevents an older asynchronous write from overwriting a newer user action.
 
 **Decision:** Settings normalization is write-forward. Legacy, removed, or
 invalid fields are migrated into the current shape at load time and the
@@ -189,7 +190,7 @@ boundary avoids scattering compatibility defaults through UI and service code.
 
 Conversation metadata is loaded first for fast drawers and search. Full records
 hydrate lazily. Each record owns messages, per-conversation overrides, summary,
-branch origin, privacy and archive state, usage events, and knowledge
+branch origin, lock and archive state, usage events, and knowledge
 exclusions. Removing an individual message is a canonical record mutation: it
 also invalidates the compact summary, removes app-owned attachments, rebuilds
 drawer metadata, and resynchronizes eligible derived knowledge.
@@ -199,9 +200,17 @@ explicit overrides; clearing them removes the session settings object instead
 of copying the current defaults, so later default changes continue to flow to
 that session.
 
+Session-lock passwords are reduced to salted PBKDF2 verifiers in SecureStore;
+an authenticated SecureStore marker provides Face ID or fingerprint access
+where the device supports it. The conversation and metadata carry only the
+canonical `isLocked` flag. Locked records are not hydrated, content-searched,
+or indexed until the user authenticates, and foreground grants are discarded
+on launch or app backgrounding. This is an app access boundary rather than
+database encryption.
+
 Branches copy messages only through a selected checkpoint, assign new message
-and attachment IDs, preserve applicable conversation settings and privacy, and
-record root/parent/checkpoint provenance. Members of one branch family exclude
+and attachment IDs, preserve applicable conversation settings, and record
+root/parent/checkpoint provenance. Members of one branch family exclude
 one another from cross-session knowledge so the same shared history is not
 retrieved as multiple independent sources.
 

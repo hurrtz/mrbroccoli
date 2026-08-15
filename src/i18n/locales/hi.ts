@@ -12,6 +12,7 @@ import { premiumTranslations } from "../premiumTranslations";
 import { transcriptEditTranslations } from "../transcriptEditTranslations";
 import { autoSetupTranslations } from "../autoSetupTranslations";
 import { workspaceTranslations } from "../workspaceTranslations";
+import { sessionLockTranslations } from "../sessionLockTranslations";
 
 export const hi = {
   ...conversationArtifactTranslations.hi,
@@ -26,6 +27,7 @@ export const hi = {
   ...premiumTranslations.hi,
   ...transcriptEditTranslations.hi,
   ...workspaceTranslations.hi,
+  ...sessionLockTranslations.hi,
   ...autoSetupTranslations.hi,
   appName: "मिस्टर ब्रोकली",
   retry: "पुन: प्रयास करें",

@@ -12,6 +12,7 @@ import { premiumTranslations } from "../premiumTranslations";
 import { transcriptEditTranslations } from "../transcriptEditTranslations";
 import { autoSetupTranslations } from "../autoSetupTranslations";
 import { workspaceTranslations } from "../workspaceTranslations";
+import { sessionLockTranslations } from "../sessionLockTranslations";
 
 export const sv = {
   ...conversationArtifactTranslations.sv,
@@ -26,6 +27,7 @@ export const sv = {
   ...premiumTranslations.sv,
   ...transcriptEditTranslations.sv,
   ...workspaceTranslations.sv,
+  ...sessionLockTranslations.sv,
   ...autoSetupTranslations.sv,
   appName: "Herr Broccoli",
   retry: "Försök igen",

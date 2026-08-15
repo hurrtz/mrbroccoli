@@ -109,10 +109,9 @@ import * as FileSystem from "expo-file-system/legacy";
 
 const conversation: Conversation = {
   id: "conversation-1",
-  title: "Private notes",
+  title: "Project notes",
   createdAt: "2026-07-31T08:00:00.000Z",
   updatedAt: "2026-07-31T08:01:00.000Z",
-  isPrivate: true,
   knowledgeExcludedConversationIds: ["source-conversation"],
   branch: {
     rootConversationId: "source-conversation",
@@ -126,7 +125,7 @@ const conversation: Conversation = {
     {
       id: "message-1",
       role: "user",
-      content: "A private thought",
+      content: "A project thought",
       editedAt: "2026-07-31T08:00:30.000Z",
       model: null,
       provider: null,
@@ -205,10 +204,58 @@ describe("appDataBackup", () => {
       "providerValidationResults",
     );
     expect(backup.data.settings.ulraModeActive).toBe(false);
-    expect(backup.data.conversations[0]?.conversation.isPrivate).toBe(true);
     expect(serialized).not.toContain("secret-openai-key");
     expect(serialized).not.toContain("private account detail");
     expect(parseAppDataBackup(serialized)).toEqual(backup);
+  });
+
+  it("drops retired private markers while parsing a legacy backup", async () => {
+    const legacyBackup = await createBackup();
+    (
+      legacyBackup.data.conversations[0]!.conversation as Conversation & {
+        isPrivate?: boolean;
+      }
+    ).isPrivate = true;
+
+    expect(
+      parseAppDataBackup(JSON.stringify(legacyBackup)).data.conversations[0]
+        ?.conversation,
+    ).not.toHaveProperty("isPrivate");
+  });
+
+  it("exports an authenticated locked conversation as an unlocked portable copy", async () => {
+    const lockedConversation: Conversation = {
+      ...conversation,
+      isLocked: true,
+    };
+    const { backup } = await createAppDataBackup({
+      activeConversationId: lockedConversation.id,
+      appVersion: "3.2.0",
+      conversationMetas: [
+        {
+          id: lockedConversation.id,
+          title: lockedConversation.title,
+          createdAt: lockedConversation.createdAt,
+          updatedAt: lockedConversation.updatedAt,
+          messageCount: 1,
+          providers: [],
+          providerModels: {},
+          lastModel: null,
+          lastProvider: null,
+          pinned: false,
+          isLocked: true,
+        },
+      ],
+      getConversationById: async () => lockedConversation,
+      settings: DEFAULT_SETTINGS,
+    });
+
+    expect(backup.data.conversations[0]?.conversation).not.toHaveProperty(
+      "isLocked",
+    );
+    expect(backup.data.conversations[0]?.conversation.messages).toEqual(
+      lockedConversation.messages,
+    );
   });
 
   it("reports conversations whose bodies could not be read instead of dropping them silently", async () => {

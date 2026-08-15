@@ -1,12 +1,15 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as FileSystem from "expo-file-system/legacy";
 import * as SQLite from "expo-sqlite";
+import { AppState } from "react-native";
 import { renderHook, act, waitFor } from "@testing-library/react-native";
 import { useConversations } from "../../src/hooks/useConversations";
 import { getConversationDatabase } from "../../src/services/conversationStore";
 import {
+  readActiveConversationId,
   readConversation,
   readStoredConversationMetas,
+  persistActiveConversationId,
   removeConversation,
   resetConversationStorageForTests,
   saveConversation,
@@ -19,6 +22,13 @@ jest.mock("@react-native-async-storage/async-storage", () => ({
   getItem: jest.fn(() => Promise.resolve(null)),
   setItem: jest.fn(() => Promise.resolve()),
   removeItem: jest.fn(() => Promise.resolve()),
+}));
+
+jest.mock("expo-secure-store", () => ({
+  canUseBiometricAuthentication: jest.fn(() => false),
+  deleteItemAsync: jest.fn(async () => undefined),
+  getItemAsync: jest.fn(async () => null),
+  setItemAsync: jest.fn(async () => undefined),
 }));
 
 jest.mock("react-native-uuid", () => ({
@@ -42,6 +52,10 @@ describe("useConversations", () => {
     (AsyncStorage.removeItem as jest.Mock).mockImplementation(() =>
       Promise.resolve(),
     );
+  });
+
+  afterEach(() => {
+    jest.restoreAllMocks();
   });
 
   it("starts with empty conversation list", async () => {
@@ -100,6 +114,11 @@ describe("useConversations", () => {
     (AsyncStorage.setItem as jest.Mock).mockImplementation(
       async (key: string, value: string) => {
         stored.set(key, value);
+      },
+    );
+    (AsyncStorage.removeItem as jest.Mock).mockImplementation(
+      async (key: string) => {
+        stored.delete(key);
       },
     );
 
@@ -162,6 +181,11 @@ describe("useConversations", () => {
     (AsyncStorage.setItem as jest.Mock).mockImplementation(
       async (key: string, value: string) => {
         stored.set(key, value);
+      },
+    );
+    (AsyncStorage.removeItem as jest.Mock).mockImplementation(
+      async (key: string) => {
+        stored.delete(key);
       },
     );
 
@@ -268,6 +292,11 @@ describe("useConversations", () => {
     (AsyncStorage.setItem as jest.Mock).mockImplementation(
       async (key: string, value: string) => {
         stored.set(key, value);
+      },
+    );
+    (AsyncStorage.removeItem as jest.Mock).mockImplementation(
+      async (key: string) => {
+        stored.delete(key);
       },
     );
 
@@ -1573,8 +1602,132 @@ describe("useConversations", () => {
     );
   });
 
-  it("persists private status without removing in-session memory", async () => {
-    const stored = new Map<string, string>();
+  it("migrates retired private markers into ordinary sessions", async () => {
+    const legacyConversation: Conversation & { isPrivate: boolean } = {
+      id: "legacy-private-session",
+      title: "Legacy design notes",
+      createdAt: "2026-08-01T08:00:00.000Z",
+      updatedAt: "2026-08-01T08:01:00.000Z",
+      messages: [],
+      isPrivate: true,
+    };
+    await saveConversation(legacyConversation);
+    await persistActiveConversationId(legacyConversation.id);
+
+    const { result } = renderHook(() => useConversations());
+
+    await waitFor(() =>
+      expect(result.current.activeConversation?.id).toBe(legacyConversation.id),
+    );
+    expect(result.current.activeConversation).not.toHaveProperty("isPrivate");
+    expect(result.current.conversations[0]).not.toHaveProperty("isPrivate");
+    await waitFor(async () => {
+      const storedConversation = await readConversation(legacyConversation.id);
+      expect(storedConversation).not.toHaveProperty("isPrivate");
+    });
+  });
+
+  it("keeps locked conversation bodies unavailable until foreground authentication", async () => {
+    let appStateListener: ((state: string) => void) | null = null;
+    jest.spyOn(AppState, "addEventListener").mockImplementation(((
+      _type: string,
+      listener: (state: string) => void,
+    ) => {
+      appStateListener = listener;
+      return { remove: jest.fn() };
+    }) as typeof AppState.addEventListener);
+    const { result } = renderHook(() => useConversations());
+
+    await waitFor(() => expect(result.current.loaded).toBe(true));
+    act(() => {
+      result.current.createConversation("Locked project");
+      result.current.addMessage({
+        role: "user",
+        content: "The private phrase is quartz glacier.",
+        model: null,
+        provider: null,
+      });
+    });
+    const conversationId = result.current.activeConversation!.id;
+
+    await act(async () => {
+      await result.current.updateConversationLocked(conversationId, true);
+    });
+
+    expect(result.current.activeConversation).toBeNull();
+    expect(result.current.conversations[0]).toEqual(
+      expect.objectContaining({ id: conversationId, isLocked: true }),
+    );
+    await expect(
+      result.current.getConversationById(conversationId),
+    ).resolves.toBeNull();
+    await expect(
+      result.current.searchConversations("quartz glacier"),
+    ).resolves.toEqual([]);
+
+    await act(async () => {
+      await result.current.selectConversation(conversationId);
+    });
+    expect(result.current.activeConversation).toBeNull();
+
+    act(() => result.current.grantConversationAccess(conversationId));
+    await act(async () => {
+      await result.current.selectConversation(conversationId);
+    });
+    expect(result.current.activeConversation).toEqual(
+      expect.objectContaining({ id: conversationId, isLocked: true }),
+    );
+
+    act(() => appStateListener?.("background"));
+    expect(result.current.activeConversation).toBeNull();
+    await expect(
+      result.current.getConversationById(conversationId),
+    ).resolves.toBeNull();
+  });
+
+  it("does not restore a locked active conversation after app launch", async () => {
+    const lockedConversation: Conversation = {
+      id: "locked-active-thread",
+      title: "Locked notes",
+      createdAt: "2026-08-14T08:00:00.000Z",
+      updatedAt: "2026-08-14T08:01:00.000Z",
+      isLocked: true,
+      messages: [
+        {
+          id: "locked-message",
+          role: "user",
+          content: "Never hydrate this into the active workspace on launch.",
+          model: null,
+          provider: null,
+          timestamp: "2026-08-14T08:01:00.000Z",
+        },
+      ],
+    };
+    const stored = new Map<string, string>([
+      ["@mrbroccoli/active_conversation", lockedConversation.id],
+      [
+        `@mrbroccoli/conversation/${lockedConversation.id}`,
+        JSON.stringify(lockedConversation),
+      ],
+      [
+        "@mrbroccoli/conversations",
+        JSON.stringify([
+          {
+            id: lockedConversation.id,
+            title: lockedConversation.title,
+            createdAt: lockedConversation.createdAt,
+            updatedAt: lockedConversation.updatedAt,
+            messageCount: 1,
+            providers: [],
+            providerModels: {},
+            lastModel: null,
+            lastProvider: null,
+            pinned: false,
+            isLocked: true,
+          },
+        ]),
+      ],
+    ]);
     (AsyncStorage.getItem as jest.Mock).mockImplementation(
       async (key: string) => stored.get(key) ?? null,
     );
@@ -1583,38 +1736,20 @@ describe("useConversations", () => {
         stored.set(key, value);
       },
     );
-    const { result } = renderHook(() =>
-      useConversations({
-        pastConversationKnowledgeEnabled: true,
-      }),
+    (AsyncStorage.removeItem as jest.Mock).mockImplementation(
+      async (key: string) => {
+        stored.delete(key);
+      },
     );
+
+    const { result } = renderHook(() => useConversations());
 
     await waitFor(() => expect(result.current.loaded).toBe(true));
-    await act(async () => {
-      result.current.createConversation("Private design notes");
-      result.current.updateConversationContextSummary("Keep this locally", 2);
-    });
-    const conversationId = result.current.activeConversation?.id;
-
-    await act(async () => {
-      await result.current.toggleConversationPrivate(conversationId!);
-    });
-
-    expect(result.current.activeConversation).toEqual(
-      expect.objectContaining({
-        id: conversationId,
-        isPrivate: true,
-        contextSummary: "Keep this locally",
-      }),
-    );
+    expect(result.current.activeConversation).toBeNull();
     expect(result.current.conversations[0]).toEqual(
-      expect.objectContaining({ id: conversationId, isPrivate: true }),
+      expect.objectContaining({ id: lockedConversation.id, isLocked: true }),
     );
-    await waitFor(async () => {
-      await expect(readConversation(conversationId!)).resolves.toEqual(
-        expect.objectContaining({ isPrivate: true }),
-      );
-    });
+    await expect(readActiveConversationId()).resolves.toBeNull();
   });
 
   it("searches saved conversations by transcript content", async () => {
@@ -1807,5 +1942,4 @@ describe("useConversations", () => {
 
     await expect(readConversation(conversation.id)).resolves.toBeNull();
   });
-
 });

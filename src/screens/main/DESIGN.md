@@ -222,6 +222,20 @@ The regular-iPad sidebar keeps that drawer controller mounted. A later Data &
 privacy handoff therefore expands Archived reactively rather than assuming
 drawer construction is the navigation boundary.
 
+Locked-session selection is intercepted inside the drawer before its normal
+select-and-close controller runs. The password/device-auth dialog delegates
+verification to `MainScreen`, which grants the conversation ID in the
+conversation hook only after success; only then does the usual conversation
+switch reset the voice runtime and read the record. Failure closes only the
+authentication dialog, leaves the drawer/sidebar overview mounted, and routes
+the not-loaded explanation through the drawer-visible toast layer.
+The lock form opts the shared dialog into whole-card keyboard avoidance on iOS,
+so the title, fields, and footer move together instead of allowing the keyboard
+to cover Set lock on compact phones. Focusing either password field also
+collapses the explanatory paragraph for the remainder of that dialog opening;
+the compact form then fits its fields and footer without the body's overflow
+crossing the action area.
+
 `useOrbTurnProgress` takes one clock snapshot whenever semantic voice state
 changes, then supplies the remaining linear durations to `VoiceOrb`. The orb
 uses Reanimated UI-thread clocks for recording, whole-turn estimate, each

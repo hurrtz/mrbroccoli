@@ -24,7 +24,8 @@ import {
   sortConversationMeta,
 } from "./meta";
 
-type StorageScope = "conversation" | "metadata" | "active-conversation" | "migration";
+type StorageScope =
+  "conversation" | "metadata" | "active-conversation" | "migration";
 
 function reportStorageFailure(
   storageScope: StorageScope,
@@ -41,7 +42,10 @@ function reportStorageFailure(
       storageScope,
     },
   });
-  console.error(`[conversation-storage] ${operation} failed (${storageScope})`, error);
+  console.error(
+    `[conversation-storage] ${operation} failed (${storageScope})`,
+    error,
+  );
   reportPersistenceAlert("conversations", operation);
 }
 
@@ -76,7 +80,20 @@ export async function readConversation(id: string) {
       return null;
     }
 
-    return resolveConversationImageAttachmentUris(row.conversation);
+    const resolvedConversation = resolveConversationImageAttachmentUris(
+      row.conversation,
+    ) as Conversation & { isPrivate?: unknown };
+    const { isPrivate: legacyIsPrivate, ...conversation } =
+      resolvedConversation;
+
+    if (legacyIsPrivate !== undefined) {
+      // Retired private markers become ordinary sessions. Persist the current
+      // shape after the read so old installs do not carry a hidden state that
+      // no longer has a control or product meaning.
+      void saveConversation(conversation);
+    }
+
+    return conversation;
   } catch (error) {
     reportStorageFailure("conversation", "read", error);
     return null;
@@ -99,7 +116,11 @@ export async function readActiveConversationId() {
     const storedId = await readAppStateValue(ACTIVE_CONVERSATION_STATE_KEY);
     return storedId?.trim() || null;
   } catch (error) {
-    reportStorageFailure("active-conversation", "read active conversation", error);
+    reportStorageFailure(
+      "active-conversation",
+      "read active conversation",
+      error,
+    );
     return null;
   }
 }
@@ -133,7 +154,9 @@ export async function saveConversation(conversation: Conversation) {
  * set. Saving them one at a time would leave a family half-updated, or an
  * import half-applied, if the app died midway.
  */
-export async function saveConversationsAtomically(conversations: Conversation[]) {
+export async function saveConversationsAtomically(
+  conversations: Conversation[],
+) {
   if (conversations.length === 0) {
     return;
   }
@@ -188,7 +211,9 @@ export async function persistActiveConversationId(id: string | null) {
  * must stay synchronous.
  */
 export function persistConversationMeta(metas: ConversationMeta[]) {
-  const sortedMetas = sortConversationMeta(metas.map(normalizeConversationMeta));
+  const sortedMetas = sortConversationMeta(
+    metas.map(normalizeConversationMeta),
+  );
 
   void (async () => {
     try {

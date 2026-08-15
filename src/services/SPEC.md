@@ -127,11 +127,15 @@ so a previous artifact can never retain a benchmark verdict after replacement.
 - `conversationContext.ts` owns rolling-summary thresholds and the bounded
   recent-message window.
 - `conversationKnowledge/` owns optional derived cross-session retrieval.
+- `sessionLock.ts` owns salted password verification and the optional
+  authenticated SecureStore marker for Face ID or fingerprint session access.
 - `turnReceipt.ts` records route, context, search, speech, and timing decisions.
 - `messageProvenance.ts` makes actual response origin part of retained context.
 
 The active conversation is canonical. Summary and knowledge layers are bounded
 context aids and must never silently replace or mutate the source transcript.
+Locked conversations remain ineligible for the knowledge layer even after the
+user authenticates to view them.
 
 ### Images
 
@@ -153,8 +157,10 @@ passphrase length.
 
 Portable settings exclude `apiKeys` and provider-validation diagnostics.
 Backups exclude downloaded models, audio, derived knowledge/index data, debug
-logs, and caches. Restore validates the complete shape before mutation and
-delegates non-destructive conversation merging to the conversation hook.
+logs, session-lock credentials, and caches. An authorized locked conversation
+is serialized without its device-local lock, and restore always materializes it
+unlocked. Restore validates the complete shape before mutation and delegates
+non-destructive conversation merging to the conversation hook.
 
 ### Phonemization runtime
 

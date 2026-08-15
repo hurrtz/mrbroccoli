@@ -608,7 +608,8 @@ export interface Conversation {
   summarizedMessageCount?: number;
   knowledgeExcludedConversationIds?: string[];
   branch?: ConversationBranchOrigin;
-  isPrivate?: boolean;
+  /** Local access control; credentials live separately in SecureStore. */
+  isLocked?: boolean;
   archived?: boolean;
 }
 
@@ -631,6 +632,6 @@ export interface ConversationMeta {
   pinned: boolean;
   branch?: ConversationBranchOrigin;
   branchSchemaVersion?: 2;
-  isPrivate?: boolean;
+  isLocked?: boolean;
   archived?: boolean;
 }

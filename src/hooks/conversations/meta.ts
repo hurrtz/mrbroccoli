@@ -187,9 +187,16 @@ export function sortConversationMeta(conversations: ConversationMeta[]) {
   return [...conversations].sort(compareConversationMeta);
 }
 
-export function normalizeConversationMeta(meta: Partial<ConversationMeta>) {
+type LegacyConversationMeta = Partial<ConversationMeta> & {
+  isPrivate?: unknown;
+};
+
+export function normalizeConversationMeta(meta: LegacyConversationMeta) {
+  // Destructuring the retired `isPrivate` field makes metadata migration
+  // write-forward instead of preserving it through the broad object spread.
+  const { isPrivate: _legacyIsPrivate, ...currentMeta } = meta;
   return {
-    ...meta,
+    ...currentMeta,
     id: meta.id ?? "",
     title: meta.title ?? "",
     createdAt: meta.createdAt ?? meta.updatedAt ?? new Date(0).toISOString(),
@@ -201,7 +208,7 @@ export function normalizeConversationMeta(meta: Partial<ConversationMeta>) {
     lastProvider: meta.lastProvider ?? null,
     pinned: meta.pinned ?? false,
     branchSchemaVersion: 2 as const,
-    isPrivate: meta.isPrivate ?? false,
+    isLocked: meta.isLocked ?? false,
     archived: meta.archived ?? false,
   };
 }
@@ -216,7 +223,7 @@ export function conversationMetaNeedsHydration(
     typeof meta.providerModels !== "object" ||
     meta.providerModels === null ||
     meta.branchSchemaVersion !== 2 ||
-    typeof meta.isPrivate !== "boolean" ||
+    typeof meta.isLocked !== "boolean" ||
     typeof meta.archived !== "boolean"
   );
 }
@@ -257,7 +264,7 @@ export function buildConversationMetaFromConversation(
     pinned: existingMeta?.pinned ?? false,
     branch: conversation.branch,
     branchSchemaVersion: 2,
-    isPrivate: conversation.isPrivate ?? existingMeta?.isPrivate ?? false,
+    isLocked: conversation.isLocked ?? existingMeta?.isLocked ?? false,
     archived: conversation.archived ?? existingMeta?.archived ?? false,
   });
 }

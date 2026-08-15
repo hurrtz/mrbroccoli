@@ -303,7 +303,6 @@ function isValidConversation(value: unknown): value is Conversation {
               artifact.sourceMessageId === message.id,
           ),
         ))) &&
-    (value.isPrivate === undefined || typeof value.isPrivate === "boolean") &&
     (value.knowledgeExcludedConversationIds === undefined ||
       (Array.isArray(value.knowledgeExcludedConversationIds) &&
         value.knowledgeExcludedConversationIds.every(
@@ -414,7 +413,18 @@ function parsePlainBackupDocument(value: unknown): AppDataBackup {
     throw new AppDataBackupError("invalid");
   }
 
-  return value as unknown as AppDataBackup;
+  const backup = value as unknown as AppDataBackup;
+  return {
+    ...backup,
+    data: {
+      ...backup.data,
+      conversations: backup.data.conversations.map((record) => {
+        const { isPrivate: _legacyIsPrivate, ...conversation } =
+          record.conversation as Conversation & { isPrivate?: unknown };
+        return { ...record, conversation };
+      }),
+    },
+  };
 }
 
 function parseEncryptedBackupDocument(value: unknown): EncryptedAppDataBackup {
@@ -512,8 +522,9 @@ export async function createAppDataBackup(params: {
           })),
         ),
       );
+      const { isLocked: _isLocked, ...portableConversationData } = conversation;
       const portableConversation: Conversation = {
-        ...conversation,
+        ...portableConversationData,
         messages: conversation.messages.map((message) => ({
           ...message,
           ...(message.attachments?.length

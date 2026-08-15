@@ -12,6 +12,7 @@ import { premiumTranslations } from "../premiumTranslations";
 import { transcriptEditTranslations } from "../transcriptEditTranslations";
 import { autoSetupTranslations } from "../autoSetupTranslations";
 import { workspaceTranslations } from "../workspaceTranslations";
+import { sessionLockTranslations } from "../sessionLockTranslations";
 
 export const pl = {
   ...conversationArtifactTranslations.pl,
@@ -26,6 +27,7 @@ export const pl = {
   ...premiumTranslations.pl,
   ...transcriptEditTranslations.pl,
   ...workspaceTranslations.pl,
+  ...sessionLockTranslations.pl,
   ...autoSetupTranslations.pl,
   appName: "Pan Brokuł",
   retry: "Spróbuj ponownie",

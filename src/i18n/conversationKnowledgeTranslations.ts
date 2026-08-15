@@ -6,12 +6,6 @@ type ConversationKnowledgeTranslation = {
   usePastConversationKnowledge: string;
   usePastConversationKnowledgeDescription: string;
   pastConversationKnowledgeDisclosure: string;
-  privateConversation: string;
-  markConversationPrivate: string;
-  includeConversationInKnowledge: string;
-  privateConversationDescription: string;
-  conversationMarkedPrivate: string;
-  conversationIncludedInKnowledge: string;
   knowledgeReferences: string;
   knowledgeSourceCount: (params: TranslationParams) => string;
   knowledgeUserAuthoredOnly: string;
@@ -32,22 +26,17 @@ export const conversationKnowledgeTranslations = {
     usePastConversationKnowledgeDescription:
       "Builds a derived local index and retrieves a few relevant excerpts for each request.",
     pastConversationKnowledgeDisclosure:
-      "Indexing and retrieval stay on this device. Retrieved excerpts are sent to the model provider with your request. Turning this off deletes the derived index. Private conversations are never indexed.",
-    privateConversation: "Private conversation",
-    markConversationPrivate: "Mark as private",
-    includeConversationInKnowledge: "Allow in past knowledge",
-    privateConversationDescription:
-      "Private conversations keep their own in-session memory but never contribute to past conversation knowledge.",
-    conversationMarkedPrivate: "Conversation marked private",
-    conversationIncludedInKnowledge: "Conversation can contribute to past knowledge",
+      "Indexing and retrieval stay on this device. Retrieved excerpts are sent to the model provider with your request. Turning this off deletes the derived index.",
     knowledgeReferences: "Past conversations",
-    knowledgeSourceCount: ({ count }) => `${count} ${count === 1 ? "source" : "sources"}`,
+    knowledgeSourceCount: ({ count }) =>
+      `${count} ${count === 1 ? "source" : "sources"}`,
     knowledgeUserAuthoredOnly: "User messages only",
     knowledgeMatchStrong: "Strong match",
     knowledgeMatchRelated: "Related match",
     expandKnowledgeDetails: "Show recalled conversation sources",
     collapseKnowledgeDetails: "Hide recalled conversation sources",
-    turnReceiptPastKnowledge: ({ count }) => `past knowledge · ${count} sources`,
+    turnReceiptPastKnowledge: ({ count }) =>
+      `past knowledge · ${count} sources`,
     turnReceiptTimingKnowledge: "memory",
   },
   de: {
@@ -58,22 +47,17 @@ export const conversationKnowledgeTranslations = {
     usePastConversationKnowledgeDescription:
       "Erstellt einen abgeleiteten lokalen Index und ruft pro Anfrage wenige relevante Auszüge ab.",
     pastConversationKnowledgeDisclosure:
-      "Indexierung und Suche bleiben auf diesem Gerät. Abgerufene Auszüge werden mit deiner Anfrage an den Modellanbieter gesendet. Beim Ausschalten wird der abgeleitete Index gelöscht. Private Gespräche werden nie indexiert.",
-    privateConversation: "Privates Gespräch",
-    markConversationPrivate: "Als privat markieren",
-    includeConversationInKnowledge: "Für früheres Wissen zulassen",
-    privateConversationDescription:
-      "Private Gespräche behalten ihren eigenen Gesprächsspeicher, tragen aber nie zum Wissen aus früheren Gesprächen bei.",
-    conversationMarkedPrivate: "Gespräch als privat markiert",
-    conversationIncludedInKnowledge: "Gespräch kann zu früherem Wissen beitragen",
+      "Indexierung und Suche bleiben auf diesem Gerät. Abgerufene Auszüge werden mit deiner Anfrage an den Modellanbieter gesendet. Beim Ausschalten wird der abgeleitete Index gelöscht.",
     knowledgeReferences: "Frühere Gespräche",
-    knowledgeSourceCount: ({ count }) => `${count} ${count === 1 ? "Quelle" : "Quellen"}`,
+    knowledgeSourceCount: ({ count }) =>
+      `${count} ${count === 1 ? "Quelle" : "Quellen"}`,
     knowledgeUserAuthoredOnly: "Nur Nachrichten des Nutzers",
     knowledgeMatchStrong: "Starke Übereinstimmung",
     knowledgeMatchRelated: "Ähnliche Übereinstimmung",
     expandKnowledgeDetails: "Abgerufene Gesprächsquellen anzeigen",
     collapseKnowledgeDetails: "Abgerufene Gesprächsquellen ausblenden",
-    turnReceiptPastKnowledge: ({ count }) => `früheres Wissen · ${count} Quellen`,
+    turnReceiptPastKnowledge: ({ count }) =>
+      `früheres Wissen · ${count} Quellen`,
     turnReceiptTimingKnowledge: "Gedächtnis",
   },
   uk: {
@@ -84,14 +68,7 @@ export const conversationKnowledgeTranslations = {
     usePastConversationKnowledgeDescription:
       "Створює похідний локальний індекс і знаходить кілька доречних уривків для кожного запиту.",
     pastConversationKnowledgeDisclosure:
-      "Індексування та пошук відбуваються на цьому пристрої. Знайдені уривки надсилаються провайдеру моделі разом із запитом. Вимкнення видаляє похідний індекс. Приватні розмови ніколи не індексуються.",
-    privateConversation: "Приватна розмова",
-    markConversationPrivate: "Позначити приватною",
-    includeConversationInKnowledge: "Дозволити в попередніх знаннях",
-    privateConversationDescription:
-      "Приватні розмови зберігають пам’ять поточної сесії, але ніколи не додаються до попередніх знань.",
-    conversationMarkedPrivate: "Розмову позначено приватною",
-    conversationIncludedInKnowledge: "Розмова може додаватися до попередніх знань",
+      "Індексування та пошук відбуваються на цьому пристрої. Знайдені уривки надсилаються провайдеру моделі разом із запитом. Вимкнення видаляє похідний індекс.",
     knowledgeReferences: "Попередні розмови",
     knowledgeSourceCount: ({ count }) => `Джерел: ${count}`,
     knowledgeUserAuthoredOnly: "Лише повідомлення користувача",
@@ -99,7 +76,8 @@ export const conversationKnowledgeTranslations = {
     knowledgeMatchRelated: "Пов’язана відповідність",
     expandKnowledgeDetails: "Показати джерела з попередніх розмов",
     collapseKnowledgeDetails: "Сховати джерела з попередніх розмов",
-    turnReceiptPastKnowledge: ({ count }) => `попередні знання · джерел: ${count}`,
+    turnReceiptPastKnowledge: ({ count }) =>
+      `попередні знання · джерел: ${count}`,
     turnReceiptTimingKnowledge: "пам’ять",
   },
   hi: {
@@ -110,14 +88,7 @@ export const conversationKnowledgeTranslations = {
     usePastConversationKnowledgeDescription:
       "स्थानीय सूचकांक बनाता है और हर अनुरोध के लिए कुछ प्रासंगिक अंश खोजता है।",
     pastConversationKnowledgeDisclosure:
-      "सूचकांक और खोज इसी डिवाइस पर रहते हैं। मिले अंश आपके अनुरोध के साथ मॉडल प्रदाता को भेजे जाते हैं। इसे बंद करने पर सूचकांक मिट जाता है। निजी बातचीत कभी सूचकांकित नहीं होती।",
-    privateConversation: "निजी बातचीत",
-    markConversationPrivate: "निजी चिह्नित करें",
-    includeConversationInKnowledge: "पिछले ज्ञान में शामिल करें",
-    privateConversationDescription:
-      "निजी बातचीत अपनी सत्र स्मृति रखती है, पर पिछले ज्ञान में कभी योगदान नहीं देती।",
-    conversationMarkedPrivate: "बातचीत निजी चिह्नित हुई",
-    conversationIncludedInKnowledge: "बातचीत पिछले ज्ञान में योगदान दे सकती है",
+      "सूचकांक और खोज इसी डिवाइस पर रहते हैं। मिले अंश आपके अनुरोध के साथ मॉडल प्रदाता को भेजे जाते हैं। इसे बंद करने पर सूचकांक मिट जाता है।",
     knowledgeReferences: "पिछली बातचीत",
     knowledgeSourceCount: ({ count }) => `${count} स्रोत`,
     knowledgeUserAuthoredOnly: "केवल उपयोगकर्ता संदेश",
@@ -136,22 +107,17 @@ export const conversationKnowledgeTranslations = {
     usePastConversationKnowledgeDescription:
       "Crea un índice local derivado y recupera algunos fragmentos relevantes por solicitud.",
     pastConversationKnowledgeDisclosure:
-      "La indexación y la búsqueda permanecen en este dispositivo. Los fragmentos recuperados se envían al proveedor del modelo con tu solicitud. Al desactivarlo se elimina el índice. Las conversaciones privadas nunca se indexan.",
-    privateConversation: "Conversación privada",
-    markConversationPrivate: "Marcar como privada",
-    includeConversationInKnowledge: "Permitir en conocimiento anterior",
-    privateConversationDescription:
-      "Las conversaciones privadas conservan su memoria de sesión, pero nunca contribuyen al conocimiento anterior.",
-    conversationMarkedPrivate: "Conversación marcada como privada",
-    conversationIncludedInKnowledge: "La conversación puede contribuir al conocimiento anterior",
+      "La indexación y la búsqueda permanecen en este dispositivo. Los fragmentos recuperados se envían al proveedor del modelo con tu solicitud. Al desactivarlo se elimina el índice.",
     knowledgeReferences: "Conversaciones anteriores",
-    knowledgeSourceCount: ({ count }) => `${count} ${count === 1 ? "fuente" : "fuentes"}`,
+    knowledgeSourceCount: ({ count }) =>
+      `${count} ${count === 1 ? "fuente" : "fuentes"}`,
     knowledgeUserAuthoredOnly: "Solo mensajes del usuario",
     knowledgeMatchStrong: "Coincidencia alta",
     knowledgeMatchRelated: "Coincidencia relacionada",
     expandKnowledgeDetails: "Mostrar fuentes recordadas",
     collapseKnowledgeDetails: "Ocultar fuentes recordadas",
-    turnReceiptPastKnowledge: ({ count }) => `conocimiento anterior · ${count} fuentes`,
+    turnReceiptPastKnowledge: ({ count }) =>
+      `conocimiento anterior · ${count} fuentes`,
     turnReceiptTimingKnowledge: "memoria",
   },
   fr: {
@@ -162,22 +128,17 @@ export const conversationKnowledgeTranslations = {
     usePastConversationKnowledgeDescription:
       "Crée un index local dérivé et récupère quelques extraits pertinents par requête.",
     pastConversationKnowledgeDisclosure:
-      "L’indexation et la recherche restent sur cet appareil. Les extraits récupérés sont envoyés au fournisseur du modèle avec votre requête. La désactivation supprime l’index. Les conversations privées ne sont jamais indexées.",
-    privateConversation: "Conversation privée",
-    markConversationPrivate: "Marquer comme privée",
-    includeConversationInKnowledge: "Autoriser dans les connaissances passées",
-    privateConversationDescription:
-      "Les conversations privées gardent leur mémoire de session, mais ne contribuent jamais aux connaissances passées.",
-    conversationMarkedPrivate: "Conversation marquée comme privée",
-    conversationIncludedInKnowledge: "La conversation peut contribuer aux connaissances passées",
+      "L’indexation et la recherche restent sur cet appareil. Les extraits récupérés sont envoyés au fournisseur du modèle avec votre requête. La désactivation supprime l’index.",
     knowledgeReferences: "Conversations passées",
-    knowledgeSourceCount: ({ count }) => `${count} ${count === 1 ? "source" : "sources"}`,
+    knowledgeSourceCount: ({ count }) =>
+      `${count} ${count === 1 ? "source" : "sources"}`,
     knowledgeUserAuthoredOnly: "Messages utilisateur uniquement",
     knowledgeMatchStrong: "Correspondance forte",
     knowledgeMatchRelated: "Correspondance liée",
     expandKnowledgeDetails: "Afficher les sources rappelées",
     collapseKnowledgeDetails: "Masquer les sources rappelées",
-    turnReceiptPastKnowledge: ({ count }) => `connaissances passées · ${count} sources`,
+    turnReceiptPastKnowledge: ({ count }) =>
+      `connaissances passées · ${count} sources`,
     turnReceiptTimingKnowledge: "mémoire",
   },
   it: {
@@ -188,22 +149,17 @@ export const conversationKnowledgeTranslations = {
     usePastConversationKnowledgeDescription:
       "Crea un indice locale derivato e recupera alcuni estratti pertinenti per ogni richiesta.",
     pastConversationKnowledgeDisclosure:
-      "Indicizzazione e ricerca restano su questo dispositivo. Gli estratti recuperati vengono inviati al provider del modello con la richiesta. Disattivando la funzione l’indice viene eliminato. Le conversazioni private non vengono mai indicizzate.",
-    privateConversation: "Conversazione privata",
-    markConversationPrivate: "Segna come privata",
-    includeConversationInKnowledge: "Consenti nella conoscenza passata",
-    privateConversationDescription:
-      "Le conversazioni private mantengono la propria memoria di sessione, ma non contribuiscono mai alla conoscenza passata.",
-    conversationMarkedPrivate: "Conversazione segnata come privata",
-    conversationIncludedInKnowledge: "La conversazione può contribuire alla conoscenza passata",
+      "Indicizzazione e ricerca restano su questo dispositivo. Gli estratti recuperati vengono inviati al provider del modello con la richiesta. Disattivando la funzione l’indice viene eliminato.",
     knowledgeReferences: "Conversazioni passate",
-    knowledgeSourceCount: ({ count }) => `${count} ${count === 1 ? "fonte" : "fonti"}`,
+    knowledgeSourceCount: ({ count }) =>
+      `${count} ${count === 1 ? "fonte" : "fonti"}`,
     knowledgeUserAuthoredOnly: "Solo messaggi dell’utente",
     knowledgeMatchStrong: "Corrispondenza forte",
     knowledgeMatchRelated: "Corrispondenza correlata",
     expandKnowledgeDetails: "Mostra le fonti ricordate",
     collapseKnowledgeDetails: "Nascondi le fonti ricordate",
-    turnReceiptPastKnowledge: ({ count }) => `conoscenza passata · ${count} fonti`,
+    turnReceiptPastKnowledge: ({ count }) =>
+      `conoscenza passata · ${count} fonti`,
     turnReceiptTimingKnowledge: "memoria",
   },
   pt: {
@@ -214,22 +170,17 @@ export const conversationKnowledgeTranslations = {
     usePastConversationKnowledgeDescription:
       "Cria um índice local derivado e recupera alguns excertos relevantes por pedido.",
     pastConversationKnowledgeDisclosure:
-      "A indexação e a pesquisa ficam neste dispositivo. Os excertos recuperados são enviados ao fornecedor do modelo com o pedido. Desativar elimina o índice. Conversas privadas nunca são indexadas.",
-    privateConversation: "Conversa privada",
-    markConversationPrivate: "Marcar como privada",
-    includeConversationInKnowledge: "Permitir no conhecimento anterior",
-    privateConversationDescription:
-      "Conversas privadas mantêm a memória da sessão, mas nunca contribuem para o conhecimento anterior.",
-    conversationMarkedPrivate: "Conversa marcada como privada",
-    conversationIncludedInKnowledge: "A conversa pode contribuir para o conhecimento anterior",
+      "A indexação e a pesquisa ficam neste dispositivo. Os excertos recuperados são enviados ao fornecedor do modelo com o pedido. Desativar elimina o índice.",
     knowledgeReferences: "Conversas anteriores",
-    knowledgeSourceCount: ({ count }) => `${count} ${count === 1 ? "fonte" : "fontes"}`,
+    knowledgeSourceCount: ({ count }) =>
+      `${count} ${count === 1 ? "fonte" : "fontes"}`,
     knowledgeUserAuthoredOnly: "Apenas mensagens do utilizador",
     knowledgeMatchStrong: "Correspondência forte",
     knowledgeMatchRelated: "Correspondência relacionada",
     expandKnowledgeDetails: "Mostrar fontes recordadas",
     collapseKnowledgeDetails: "Ocultar fontes recordadas",
-    turnReceiptPastKnowledge: ({ count }) => `conhecimento anterior · ${count} fontes`,
+    turnReceiptPastKnowledge: ({ count }) =>
+      `conhecimento anterior · ${count} fontes`,
     turnReceiptTimingKnowledge: "memória",
   },
   ptBR: {
@@ -240,22 +191,17 @@ export const conversationKnowledgeTranslations = {
     usePastConversationKnowledgeDescription:
       "Cria um índice local derivado e recupera alguns trechos relevantes por solicitação.",
     pastConversationKnowledgeDisclosure:
-      "A indexação e a busca ficam neste dispositivo. Os trechos recuperados são enviados ao provedor do modelo com a solicitação. Desativar exclui o índice. Conversas privadas nunca são indexadas.",
-    privateConversation: "Conversa privada",
-    markConversationPrivate: "Marcar como privada",
-    includeConversationInKnowledge: "Permitir no conhecimento anterior",
-    privateConversationDescription:
-      "Conversas privadas mantêm a memória da sessão, mas nunca contribuem para o conhecimento anterior.",
-    conversationMarkedPrivate: "Conversa marcada como privada",
-    conversationIncludedInKnowledge: "A conversa pode contribuir para o conhecimento anterior",
+      "A indexação e a busca ficam neste dispositivo. Os trechos recuperados são enviados ao provedor do modelo com a solicitação. Desativar exclui o índice.",
     knowledgeReferences: "Conversas anteriores",
-    knowledgeSourceCount: ({ count }) => `${count} ${count === 1 ? "fonte" : "fontes"}`,
+    knowledgeSourceCount: ({ count }) =>
+      `${count} ${count === 1 ? "fonte" : "fontes"}`,
     knowledgeUserAuthoredOnly: "Somente mensagens do usuário",
     knowledgeMatchStrong: "Correspondência forte",
     knowledgeMatchRelated: "Correspondência relacionada",
     expandKnowledgeDetails: "Mostrar fontes lembradas",
     collapseKnowledgeDetails: "Ocultar fontes lembradas",
-    turnReceiptPastKnowledge: ({ count }) => `conhecimento anterior · ${count} fontes`,
+    turnReceiptPastKnowledge: ({ count }) =>
+      `conhecimento anterior · ${count} fontes`,
     turnReceiptTimingKnowledge: "memória",
   },
   ru: {
@@ -266,14 +212,7 @@ export const conversationKnowledgeTranslations = {
     usePastConversationKnowledgeDescription:
       "Создаёт производный локальный индекс и находит несколько подходящих фрагментов для каждого запроса.",
     pastConversationKnowledgeDisclosure:
-      "Индексация и поиск выполняются на этом устройстве. Найденные фрагменты отправляются поставщику модели вместе с запросом. Отключение удаляет индекс. Приватные разговоры никогда не индексируются.",
-    privateConversation: "Приватный разговор",
-    markConversationPrivate: "Отметить как приватный",
-    includeConversationInKnowledge: "Разрешить в прошлых знаниях",
-    privateConversationDescription:
-      "Приватные разговоры сохраняют память текущего сеанса, но никогда не попадают в прошлые знания.",
-    conversationMarkedPrivate: "Разговор отмечен как приватный",
-    conversationIncludedInKnowledge: "Разговор может пополнять прошлые знания",
+      "Индексация и поиск выполняются на этом устройстве. Найденные фрагменты отправляются поставщику модели вместе с запросом. Отключение удаляет индекс.",
     knowledgeReferences: "Прошлые разговоры",
     knowledgeSourceCount: ({ count }) =>
       count === 1 ? "1 источник" : `Источников: ${count}`,
@@ -290,15 +229,10 @@ export const conversationKnowledgeTranslations = {
     pastConversationKnowledge: "过往对话知识",
     pastConversationKnowledgeDescription: "让新对话参考以往会话中的相关内容。",
     usePastConversationKnowledge: "使用过往对话知识",
-    usePastConversationKnowledgeDescription: "建立本地派生索引，并为每次请求检索少量相关片段。",
+    usePastConversationKnowledgeDescription:
+      "建立本地派生索引，并为每次请求检索少量相关片段。",
     pastConversationKnowledgeDisclosure:
-      "索引和检索均在此设备上进行。检索到的片段会随请求发送给模型提供商。关闭后将删除派生索引。私密对话永远不会被索引。",
-    privateConversation: "私密对话",
-    markConversationPrivate: "标记为私密",
-    includeConversationInKnowledge: "允许用于过往知识",
-    privateConversationDescription: "私密对话保留本会话记忆，但绝不会用于过往对话知识。",
-    conversationMarkedPrivate: "对话已标记为私密",
-    conversationIncludedInKnowledge: "对话可用于过往知识",
+      "索引和检索均在此设备上进行。检索到的片段会随请求发送给模型提供商。关闭后将删除派生索引。",
     knowledgeReferences: "过往对话",
     knowledgeSourceCount: ({ count }) => `${count} 个来源`,
     knowledgeUserAuthoredOnly: "仅用户消息",
@@ -311,17 +245,13 @@ export const conversationKnowledgeTranslations = {
   },
   ar: {
     pastConversationKnowledge: "معرفة المحادثات السابقة",
-    pastConversationKnowledgeDescription: "تتيح للمحادثات الجديدة تذكّر الأجزاء ذات الصلة من الجلسات السابقة.",
+    pastConversationKnowledgeDescription:
+      "تتيح للمحادثات الجديدة تذكّر الأجزاء ذات الصلة من الجلسات السابقة.",
     usePastConversationKnowledge: "استخدام المحادثات السابقة",
-    usePastConversationKnowledgeDescription: "ينشئ فهرسًا محليًا مشتقًا ويسترجع بعض المقاطع ذات الصلة لكل طلب.",
+    usePastConversationKnowledgeDescription:
+      "ينشئ فهرسًا محليًا مشتقًا ويسترجع بعض المقاطع ذات الصلة لكل طلب.",
     pastConversationKnowledgeDisclosure:
-      "تبقى الفهرسة والبحث على هذا الجهاز. تُرسل المقاطع المسترجعة إلى مزود النموذج مع طلبك. يؤدي التعطيل إلى حذف الفهرس. لا تُفهرس المحادثات الخاصة أبدًا.",
-    privateConversation: "محادثة خاصة",
-    markConversationPrivate: "وضع علامة خاصة",
-    includeConversationInKnowledge: "السماح بها في المعرفة السابقة",
-    privateConversationDescription: "تحتفظ المحادثات الخاصة بذاكرة جلستها، لكنها لا تساهم أبدًا في المعرفة السابقة.",
-    conversationMarkedPrivate: "تم وضع علامة خاصة على المحادثة",
-    conversationIncludedInKnowledge: "يمكن للمحادثة المساهمة في المعرفة السابقة",
+      "تبقى الفهرسة والبحث على هذا الجهاز. تُرسل المقاطع المسترجعة إلى مزود النموذج مع طلبك. يؤدي التعطيل إلى حذف الفهرس.",
     knowledgeReferences: "المحادثات السابقة",
     knowledgeSourceCount: ({ count }) =>
       `${count} ${count === 1 ? "مصدر" : "مصادر"}`,
@@ -335,17 +265,13 @@ export const conversationKnowledgeTranslations = {
   },
   ja: {
     pastConversationKnowledge: "過去の会話の知識",
-    pastConversationKnowledgeDescription: "新しい会話で以前のセッションの関連部分を参照します。",
+    pastConversationKnowledgeDescription:
+      "新しい会話で以前のセッションの関連部分を参照します。",
     usePastConversationKnowledge: "過去の会話を使用",
-    usePastConversationKnowledgeDescription: "端末内に派生インデックスを作成し、リクエストごとに関連する抜粋を取得します。",
+    usePastConversationKnowledgeDescription:
+      "端末内に派生インデックスを作成し、リクエストごとに関連する抜粋を取得します。",
     pastConversationKnowledgeDisclosure:
-      "インデックス作成と検索はこの端末内で行われます。取得した抜粋はリクエストとともにモデル提供者へ送信されます。無効にすると派生インデックスは削除されます。非公開の会話はインデックス化されません。",
-    privateConversation: "非公開の会話",
-    markConversationPrivate: "非公開にする",
-    includeConversationInKnowledge: "過去の知識での使用を許可",
-    privateConversationDescription: "非公開の会話はセッション内の記憶を保ちますが、過去の知識には使われません。",
-    conversationMarkedPrivate: "会話を非公開にしました",
-    conversationIncludedInKnowledge: "会話を過去の知識に使用できます",
+      "インデックス作成と検索はこの端末内で行われます。取得した抜粋はリクエストとともにモデル提供者へ送信されます。無効にすると派生インデックスは削除されます。",
     knowledgeReferences: "過去の会話",
     knowledgeSourceCount: ({ count }) => `${count}件のソース`,
     knowledgeUserAuthoredOnly: "ユーザーのメッセージのみ",
@@ -358,17 +284,13 @@ export const conversationKnowledgeTranslations = {
   },
   hu: {
     pastConversationKnowledge: "Korábbi beszélgetések tudása",
-    pastConversationKnowledgeDescription: "Az új beszélgetések felidézhetik a korábbi munkamenetek fontos részeit.",
+    pastConversationKnowledgeDescription:
+      "Az új beszélgetések felidézhetik a korábbi munkamenetek fontos részeit.",
     usePastConversationKnowledge: "Korábbi beszélgetések használata",
-    usePastConversationKnowledgeDescription: "Helyi származtatott indexet készít, és kérésenként néhány releváns részletet keres.",
+    usePastConversationKnowledgeDescription:
+      "Helyi származtatott indexet készít, és kérésenként néhány releváns részletet keres.",
     pastConversationKnowledgeDisclosure:
-      "Az indexelés és a keresés ezen az eszközön marad. A megtalált részletek a kéréssel együtt a modellszolgáltatóhoz kerülnek. Kikapcsoláskor az index törlődik. A privát beszélgetések soha nem kerülnek bele.",
-    privateConversation: "Privát beszélgetés",
-    markConversationPrivate: "Megjelölés privátként",
-    includeConversationInKnowledge: "Engedélyezés a korábbi tudásban",
-    privateConversationDescription: "A privát beszélgetések megtartják saját munkamenet-memóriájukat, de nem járulnak hozzá a korábbi tudáshoz.",
-    conversationMarkedPrivate: "A beszélgetés privát lett",
-    conversationIncludedInKnowledge: "A beszélgetés hozzájárulhat a korábbi tudáshoz",
+      "Az indexelés és a keresés ezen az eszközön marad. A megtalált részletek a kéréssel együtt a modellszolgáltatóhoz kerülnek. Kikapcsoláskor az index törlődik.",
     knowledgeReferences: "Korábbi beszélgetések",
     knowledgeSourceCount: ({ count }) => `${count} forrás`,
     knowledgeUserAuthoredOnly: "Csak felhasználói üzenetek",
@@ -381,40 +303,34 @@ export const conversationKnowledgeTranslations = {
   },
   cs: {
     pastConversationKnowledge: "Znalosti z minulých konverzací",
-    pastConversationKnowledgeDescription: "Nové konverzace mohou využít relevantní části dřívějších relací.",
+    pastConversationKnowledgeDescription:
+      "Nové konverzace mohou využít relevantní části dřívějších relací.",
     usePastConversationKnowledge: "Používat minulé konverzace",
-    usePastConversationKnowledgeDescription: "Vytvoří odvozený místní index a pro každý požadavek vyhledá několik relevantních úryvků.",
+    usePastConversationKnowledgeDescription:
+      "Vytvoří odvozený místní index a pro každý požadavek vyhledá několik relevantních úryvků.",
     pastConversationKnowledgeDisclosure:
-      "Indexování a vyhledávání probíhá na tomto zařízení. Nalezené úryvky jsou s požadavkem odeslány poskytovateli modelu. Vypnutí index odstraní. Soukromé konverzace se nikdy neindexují.",
-    privateConversation: "Soukromá konverzace",
-    markConversationPrivate: "Označit jako soukromou",
-    includeConversationInKnowledge: "Povolit v minulých znalostech",
-    privateConversationDescription: "Soukromé konverzace si ponechají paměť relace, ale nikdy nepřispívají do minulých znalostí.",
-    conversationMarkedPrivate: "Konverzace označena jako soukromá",
-    conversationIncludedInKnowledge: "Konverzace může přispívat do minulých znalostí",
+      "Indexování a vyhledávání probíhá na tomto zařízení. Nalezené úryvky jsou s požadavkem odeslány poskytovateli modelu. Vypnutí index odstraní.",
     knowledgeReferences: "Minulé konverzace",
-    knowledgeSourceCount: ({ count }) => `${count} ${Number(count) === 1 ? "zdroj" : Number(count) < 5 ? "zdroje" : "zdrojů"}`,
+    knowledgeSourceCount: ({ count }) =>
+      `${count} ${Number(count) === 1 ? "zdroj" : Number(count) < 5 ? "zdroje" : "zdrojů"}`,
     knowledgeUserAuthoredOnly: "Pouze zprávy uživatele",
     knowledgeMatchStrong: "Silná shoda",
     knowledgeMatchRelated: "Související shoda",
     expandKnowledgeDetails: "Zobrazit vyvolané zdroje",
     collapseKnowledgeDetails: "Skrýt vyvolané zdroje",
-    turnReceiptPastKnowledge: ({ count }) => `minulé znalosti · ${count} zdrojů`,
+    turnReceiptPastKnowledge: ({ count }) =>
+      `minulé znalosti · ${count} zdrojů`,
     turnReceiptTimingKnowledge: "paměť",
   },
   pl: {
     pastConversationKnowledge: "Wiedza z poprzednich rozmów",
-    pastConversationKnowledgeDescription: "Nowe rozmowy mogą uwzględniać istotne części wcześniejszych sesji.",
+    pastConversationKnowledgeDescription:
+      "Nowe rozmowy mogą uwzględniać istotne części wcześniejszych sesji.",
     usePastConversationKnowledge: "Używaj poprzednich rozmów",
-    usePastConversationKnowledgeDescription: "Tworzy lokalny indeks pochodny i pobiera kilka trafnych fragmentów dla każdego żądania.",
+    usePastConversationKnowledgeDescription:
+      "Tworzy lokalny indeks pochodny i pobiera kilka trafnych fragmentów dla każdego żądania.",
     pastConversationKnowledgeDisclosure:
-      "Indeksowanie i wyszukiwanie odbywa się na tym urządzeniu. Pobrane fragmenty są wysyłane do dostawcy modelu z żądaniem. Wyłączenie usuwa indeks. Prywatne rozmowy nigdy nie są indeksowane.",
-    privateConversation: "Prywatna rozmowa",
-    markConversationPrivate: "Oznacz jako prywatną",
-    includeConversationInKnowledge: "Uwzględniaj w wiedzy z poprzednich rozmów",
-    privateConversationDescription: "Prywatne rozmowy zachowują pamięć sesji, ale nigdy nie zasilają wiedzy z poprzednich rozmów.",
-    conversationMarkedPrivate: "Rozmowa oznaczona jako prywatna",
-    conversationIncludedInKnowledge: "Rozmowa może zasilać wiedzę z poprzednich rozmów",
+      "Indeksowanie i wyszukiwanie odbywa się na tym urządzeniu. Pobrane fragmenty są wysyłane do dostawcy modelu z żądaniem. Wyłączenie usuwa indeks.",
     knowledgeReferences: "Poprzednie rozmowy",
     knowledgeSourceCount: ({ count }) =>
       Number(count) === 1 ? "1 źródło" : `Źródła: ${count}`,
@@ -429,40 +345,34 @@ export const conversationKnowledgeTranslations = {
   },
   sv: {
     pastConversationKnowledge: "Kunskap från tidigare samtal",
-    pastConversationKnowledgeDescription: "Låt nya samtal använda relevanta delar av tidigare sessioner.",
+    pastConversationKnowledgeDescription:
+      "Låt nya samtal använda relevanta delar av tidigare sessioner.",
     usePastConversationKnowledge: "Använd tidigare samtal",
-    usePastConversationKnowledgeDescription: "Skapar ett lokalt härlett index och hämtar några relevanta utdrag per begäran.",
+    usePastConversationKnowledgeDescription:
+      "Skapar ett lokalt härlett index och hämtar några relevanta utdrag per begäran.",
     pastConversationKnowledgeDisclosure:
-      "Indexering och sökning stannar på enheten. Hämtade utdrag skickas till modelleverantören med din begäran. Avstängning raderar indexet. Privata samtal indexeras aldrig.",
-    privateConversation: "Privat samtal",
-    markConversationPrivate: "Markera som privat",
-    includeConversationInKnowledge: "Tillåt i tidigare kunskap",
-    privateConversationDescription: "Privata samtal behåller sitt sessionsminne men bidrar aldrig till tidigare kunskap.",
-    conversationMarkedPrivate: "Samtalet har markerats som privat",
-    conversationIncludedInKnowledge: "Samtalet kan bidra till tidigare kunskap",
+      "Indexering och sökning stannar på enheten. Hämtade utdrag skickas till modelleverantören med din begäran. Avstängning raderar indexet.",
     knowledgeReferences: "Tidigare samtal",
-    knowledgeSourceCount: ({ count }) => `${count} ${count === 1 ? "källa" : "källor"}`,
+    knowledgeSourceCount: ({ count }) =>
+      `${count} ${count === 1 ? "källa" : "källor"}`,
     knowledgeUserAuthoredOnly: "Endast användarmeddelanden",
     knowledgeMatchStrong: "Stark träff",
     knowledgeMatchRelated: "Relaterad träff",
     expandKnowledgeDetails: "Visa hämtade samtalskällor",
     collapseKnowledgeDetails: "Dölj hämtade samtalskällor",
-    turnReceiptPastKnowledge: ({ count }) => `tidigare kunskap · ${count} källor`,
+    turnReceiptPastKnowledge: ({ count }) =>
+      `tidigare kunskap · ${count} källor`,
     turnReceiptTimingKnowledge: "minne",
   },
   tr: {
     pastConversationKnowledge: "Geçmiş konuşma bilgisi",
-    pastConversationKnowledgeDescription: "Yeni konuşmalar önceki oturumların ilgili bölümlerini kullanabilir.",
+    pastConversationKnowledgeDescription:
+      "Yeni konuşmalar önceki oturumların ilgili bölümlerini kullanabilir.",
     usePastConversationKnowledge: "Geçmiş konuşmaları kullan",
-    usePastConversationKnowledgeDescription: "Yerel türetilmiş bir dizin oluşturur ve her istek için birkaç ilgili alıntı getirir.",
+    usePastConversationKnowledgeDescription:
+      "Yerel türetilmiş bir dizin oluşturur ve her istek için birkaç ilgili alıntı getirir.",
     pastConversationKnowledgeDisclosure:
-      "Dizinleme ve arama bu cihazda kalır. Getirilen alıntılar isteğinizle birlikte model sağlayıcısına gönderilir. Kapatmak dizini siler. Özel konuşmalar asla dizinlenmez.",
-    privateConversation: "Özel konuşma",
-    markConversationPrivate: "Özel olarak işaretle",
-    includeConversationInKnowledge: "Geçmiş bilgide kullanıma izin ver",
-    privateConversationDescription: "Özel konuşmalar kendi oturum belleğini korur, ancak geçmiş bilgiye asla katkıda bulunmaz.",
-    conversationMarkedPrivate: "Konuşma özel olarak işaretlendi",
-    conversationIncludedInKnowledge: "Konuşma geçmiş bilgiye katkıda bulunabilir",
+      "Dizinleme ve arama bu cihazda kalır. Getirilen alıntılar isteğinizle birlikte model sağlayıcısına gönderilir. Kapatmak dizini siler.",
     knowledgeReferences: "Geçmiş konuşmalar",
     knowledgeSourceCount: ({ count }) => `${count} kaynak`,
     knowledgeUserAuthoredOnly: "Yalnızca kullanıcı mesajları",
@@ -475,17 +385,13 @@ export const conversationKnowledgeTranslations = {
   },
   ur: {
     pastConversationKnowledge: "گزشتہ گفتگو کا علم",
-    pastConversationKnowledgeDescription: "نئی گفتگو میں پچھلے سیشن کے متعلقہ حصے استعمال کریں۔",
+    pastConversationKnowledgeDescription:
+      "نئی گفتگو میں پچھلے سیشن کے متعلقہ حصے استعمال کریں۔",
     usePastConversationKnowledge: "گزشتہ گفتگو کا علم استعمال کریں",
-    usePastConversationKnowledgeDescription: "مقامی اخذ شدہ اشاریہ بناتا ہے اور ہر درخواست کے لیے چند متعلقہ اقتباسات تلاش کرتا ہے۔",
+    usePastConversationKnowledgeDescription:
+      "مقامی اخذ شدہ اشاریہ بناتا ہے اور ہر درخواست کے لیے چند متعلقہ اقتباسات تلاش کرتا ہے۔",
     pastConversationKnowledgeDisclosure:
-      "اشاریہ بندی اور تلاش اسی ڈیوائس پر رہتی ہے۔ ملنے والے اقتباسات درخواست کے ساتھ ماڈل فراہم کنندہ کو بھیجے جاتے ہیں۔ بند کرنے سے اشاریہ حذف ہو جاتا ہے۔ نجی گفتگو کی کبھی اشاریہ بندی نہیں کی جاتی۔",
-    privateConversation: "نجی گفتگو",
-    markConversationPrivate: "نجی نشان لگائیں",
-    includeConversationInKnowledge: "گزشتہ علم میں اجازت دیں",
-    privateConversationDescription: "نجی گفتگو اپنی سیشن یادداشت رکھتی ہے مگر گزشتہ علم میں کبھی شامل نہیں ہوتی۔",
-    conversationMarkedPrivate: "گفتگو نجی نشان زد ہو گئی",
-    conversationIncludedInKnowledge: "گفتگو گزشتہ علم میں شامل ہو سکتی ہے",
+      "اشاریہ بندی اور تلاش اسی ڈیوائس پر رہتی ہے۔ ملنے والے اقتباسات درخواست کے ساتھ ماڈل فراہم کنندہ کو بھیجے جاتے ہیں۔ بند کرنے سے اشاریہ حذف ہو جاتا ہے۔",
     knowledgeReferences: "گزشتہ گفتگو",
     knowledgeSourceCount: ({ count }) => `${count} ذرائع`,
     knowledgeUserAuthoredOnly: "صرف صارف کے پیغامات",

@@ -12,6 +12,7 @@ import { premiumTranslations } from "../premiumTranslations";
 import { transcriptEditTranslations } from "../transcriptEditTranslations";
 import { autoSetupTranslations } from "../autoSetupTranslations";
 import { workspaceTranslations } from "../workspaceTranslations";
+import { sessionLockTranslations } from "../sessionLockTranslations";
 
 export const ar = {
   ...conversationArtifactTranslations.ar,
@@ -26,6 +27,7 @@ export const ar = {
   ...premiumTranslations.ar,
   ...transcriptEditTranslations.ar,
   ...workspaceTranslations.ar,
+  ...sessionLockTranslations.ar,
   ...autoSetupTranslations.ar,
   appName: "السيد بروكلي",
   retry: "أعد المحاولة",

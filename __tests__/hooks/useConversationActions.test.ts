@@ -36,7 +36,6 @@ describe("useConversationActions", () => {
         getConversationById: jest.fn(),
         renameConversation: jest.fn(),
         toggleConversationPinned: jest.fn(),
-        toggleConversationPrivate: jest.fn(),
         toggleConversationArchived: jest.fn(),
         deleteConversation: jest.fn(),
         selectConversation: jest.fn(),
@@ -72,7 +71,6 @@ describe("useConversationActions", () => {
         getConversationById: jest.fn(),
         renameConversation: jest.fn(),
         toggleConversationPinned: jest.fn(),
-        toggleConversationPrivate: jest.fn(),
         toggleConversationArchived: jest.fn(),
         deleteConversation: jest.fn(),
         selectConversation,
@@ -113,7 +111,6 @@ describe("useConversationActions", () => {
         getConversationById: jest.fn(),
         renameConversation: jest.fn(),
         toggleConversationPinned: jest.fn(),
-        toggleConversationPrivate: jest.fn(),
         toggleConversationArchived: jest.fn(),
         deleteConversation,
         selectConversation: jest.fn(),
@@ -165,7 +162,6 @@ describe("useConversationActions", () => {
         getConversationById: jest.fn(),
         renameConversation: jest.fn(),
         toggleConversationPinned: jest.fn(),
-        toggleConversationPrivate: jest.fn(),
         toggleConversationArchived: jest.fn(),
         deleteConversation: jest.fn(),
         selectConversation: jest.fn(),
@@ -219,7 +215,6 @@ describe("useConversationActions", () => {
         getConversationById: jest.fn(),
         renameConversation: jest.fn(),
         toggleConversationPinned: jest.fn(),
-        toggleConversationPrivate: jest.fn(),
         toggleConversationArchived: jest.fn(),
         deleteConversation: jest.fn(),
         selectConversation: jest.fn(),
@@ -244,5 +239,4 @@ describe("useConversationActions", () => {
       { dialogTitle: "Trip planning" },
     );
   });
-
 });

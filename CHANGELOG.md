@@ -25,11 +25,21 @@ the complete Play Store translations are kept in a dedicated file under
 - The transcript handle now shows one stable label instead of repeating model,
   age, or reply content; opened sheets and docked iPad transcripts carry the
   same visible heading.
+- Individual sessions can now be locked with a password and, when the phone
+  supports it, Face ID or fingerprint. A failed unlock leaves the sessions
+  overview open without loading the conversation; locked content stays out of
+  transcript search, past-conversation knowledge, and device-portable lock
+  credentials. On iPhone the complete lock dialog now moves above the keyboard,
+  compacts while editing to keep Set lock reachable, and gives both password
+  fields a readable inset.
+- The separate Mark as private action and stored state have been removed.
+  Legacy private markers become ordinary unlocked sessions; session locks
+  remain the explicit way to restrict in-app access and knowledge indexing.
+- iPhone Settings detail pages now support the standard edge swipe back in
+  both left-to-right and right-to-left interfaces.
 - Conversation styles such as Explain like I’m five now remain the final,
   binding response instruction even when a broader assistant prompt asks for a
   conflicting technical style.
-- iPhone Settings detail pages now support the standard edge swipe back in
-  both left-to-right and right-to-left interfaces.
 - Drive Session now counts every microphone level sample, including consecutive
   samples with the same measured loudness, so it reliably detects both the
   start of speech and the ten-second end-of-speech countdown.
@@ -108,7 +118,7 @@ the complete Play Store translations are kept in a dedicated file under
   any more. Dialog actions stack full width at the standard 48-point height
   instead of crowding into a right-aligned row.
 - Session actions now open as a compact menu anchored at the row's own button
-  instead of a dimmed bottom sheet: pin, archive and privacy together, then
+  instead of a dimmed bottom sheet: pin and archive together, then
   rename and automatic naming, then share and copy, with delete last and alone.
   The fork tag on the row remains the way to its root conversation.
 - Drive Session no longer adds its own row of controls: the ring under the orb

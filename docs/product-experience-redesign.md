@@ -22,12 +22,12 @@ This map deliberately describes what a person can accomplish without using the c
 
 - Start a fresh conversation and return to the current one.
 - Search saved conversations by title, provider, model, or message content.
-- Pin, rename, copy, share, delete, or mark a conversation private so it never
-  contributes to cross-session knowledge.
+- Pin, archive, lock, rename, copy, share, or delete a conversation.
 - See which providers and models contributed to a conversation, its message count, and its time span.
 - Inspect, copy, or clear the compact memory summary used for long conversations.
-- Optionally retrieve relevant, source-labelled excerpts from earlier
-  non-private conversations using an on-device derived index.
+- Optionally retrieve relevant, source-labelled excerpts from eligible earlier
+  conversations using an on-device derived index. Locked sessions remain
+  excluded.
 
 ### Configure intelligence and services
 

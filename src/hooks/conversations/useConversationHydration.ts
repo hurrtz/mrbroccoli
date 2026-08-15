@@ -25,6 +25,9 @@ import {
 async function hydrateConversationMetas(metas: ConversationMeta[]) {
   return Promise.all(
     metas.map(async (meta) => {
+      if (meta.isLocked) {
+        return meta;
+      }
       const shouldHydrate =
         !meta.createdAt ||
         meta.messageCount === 0 ||
@@ -112,7 +115,10 @@ export function useConversationHydration(params: {
               normalizedMeta.title.endsWith("...") &&
               normalizedMeta.title.length <= 43;
 
-            if (!needsHydration && !mayHaveLegacyTitle) {
+            if (
+              normalizedMeta.isLocked ||
+              (!needsHydration && !mayHaveLegacyTitle)
+            ) {
               return normalizedMeta;
             }
 
@@ -171,10 +177,16 @@ export function useConversationHydration(params: {
           return;
         }
 
-        const activeConversationStillExists = sortedStoredMetas.some(
+        const activeConversationMeta = sortedStoredMetas.find(
           (conversation) => conversation.id === storedActiveConversationId,
         );
-        const storedActiveConversation = activeConversationStillExists
+        // Authentication grants never survive launch. Keep a locked session in
+        // the overview, but do not even read its body into React state.
+        if (activeConversationMeta?.isLocked) {
+          setActiveConversationValue(null);
+          return;
+        }
+        const storedActiveConversation = activeConversationMeta
           ? await readConversation(storedActiveConversationId)
           : null;
         const restoredActiveConversation = storedActiveConversation
@@ -217,14 +229,17 @@ export function useConversationHydration(params: {
       conversations.length === 0 ||
       !conversations.some(
         (conversation) =>
-          conversation.messageCount === 0 || conversation.providers.length === 0,
+          !conversation.isLocked &&
+          (conversation.messageCount === 0 ||
+            conversation.providers.length === 0),
       )
     ) {
       return;
     }
 
     void (async () => {
-      const hydratedMetas = await hydrateConversationMetasCallback(conversations);
+      const hydratedMetas =
+        await hydrateConversationMetasCallback(conversations);
 
       if (cancelled) {
         return;

@@ -5,7 +5,7 @@ import {
   removeConversationKnowledge,
   resetConversationKnowledgeForTests,
   retrieveConversationKnowledge,
-  setConversationKnowledgePrivate,
+  setConversationKnowledgeExcluded,
   syncConversationKnowledge,
 } from "../../src/services/conversationKnowledge";
 import {
@@ -51,14 +51,12 @@ function createConversation(
   title: string,
   userText: string,
   assistantText: string,
-  isPrivate = false,
 ): Conversation {
   return {
     id,
     title,
     createdAt: "2026-08-01T08:00:00.000Z",
     updatedAt: "2026-08-01T08:10:00.000Z",
-    isPrivate,
     messages: [
       {
         id: `${id}-user`,
@@ -332,7 +330,9 @@ describe("conversation knowledge", () => {
       "User: Which earlier decisions should I revisit?",
       "Assistant: Session E established the confidential launch assumption.",
     ]);
-    expect(chunks.some(({ content }) => content.includes("Legacy"))).toBe(false);
+    expect(chunks.some(({ content }) => content.includes("Legacy"))).toBe(
+      false,
+    );
   });
 
   it("retrieves an assistant message as a past-conversation source", async () => {
@@ -356,19 +356,18 @@ describe("conversation knowledge", () => {
     );
   });
 
-  it("retrieves local sources while excluding the current and private conversations", async () => {
+  it("retrieves local sources while excluding current and caller-ineligible conversations", async () => {
     const garden = createConversation(
       "garden",
       "Berlin balcony garden",
       "How often should I water the tomatoes?",
       "Water the tomatoes in the morning.",
     );
-    const privatePlan = createConversation(
-      "private-plan",
-      "Private plan",
+    const excludedPlan = createConversation(
+      "excluded-plan",
+      "Excluded plan",
       "The secret tomato supplier is Acme.",
       "Keep that confidential.",
-      true,
     );
     const current = createConversation(
       "current",
@@ -406,11 +405,11 @@ describe("conversation knowledge", () => {
       "User: What should I check next?",
       "Assistant: Check the neighboring soil before watering again.",
     ]);
-    await syncConversationKnowledge(privatePlan, true);
+    await syncConversationKnowledge(excludedPlan, true);
     await syncConversationKnowledge(current, true);
     const result = await retrieveConversationKnowledge({
       currentConversationId: current.id,
-      privateConversationIds: [privatePlan.id],
+      excludedConversationIds: [excludedPlan.id],
       query: "When should I water my Berlin tomatoes?",
     });
 
@@ -470,7 +469,7 @@ describe("conversation knowledge", () => {
     expect(result?.metadata.sources[0]?.conversationId).toBe("roadmap-copy");
   });
 
-  it("deletes indexed rows when a conversation becomes private or knowledge is disabled", async () => {
+  it("deletes indexed rows when a conversation becomes ineligible or knowledge is disabled", async () => {
     const garden = createConversation(
       "garden",
       "Garden",
@@ -480,17 +479,36 @@ describe("conversation knowledge", () => {
     await syncConversationKnowledge(garden, true);
     expect(chunks).toHaveLength(2);
 
-    await setConversationKnowledgePrivate(garden.id, true);
+    await setConversationKnowledgeExcluded(garden.id, true);
     expect(chunks).toHaveLength(0);
     await expect(
       retrieveConversationKnowledge({ query: "tomato schedule" }),
     ).resolves.toBeNull();
 
-    await setConversationKnowledgePrivate(garden.id, false);
+    await setConversationKnowledgeExcluded(garden.id, false);
     await syncConversationKnowledge(garden, true);
     expect(chunks).toHaveLength(2);
     await clearConversationKnowledgeIndex();
     expect(chunks).toHaveLength(0);
     await removeConversationKnowledge(garden.id);
+  });
+
+  it("never indexes a locked conversation", async () => {
+    const locked = {
+      ...createConversation(
+        "locked",
+        "Locked",
+        "The private phrase is quartz glacier",
+        "Understood",
+      ),
+      isLocked: true,
+    };
+
+    await syncConversationKnowledge(locked, true);
+
+    expect(chunks).toHaveLength(0);
+    await expect(
+      retrieveConversationKnowledge({ query: "quartz glacier" }),
+    ).resolves.toBeNull();
   });
 });

@@ -8,7 +8,7 @@ interface UseConversationDrawerControllerParams {
   conversations: ConversationMeta[];
   onSearchConversations: (query: string) => Promise<ConversationMeta[]>;
   onRenameThread: (id: string, title: string) => void;
-  onSelect: (id: string) => Promise<void> | void;
+  onSelect: (id: string) => Promise<boolean | void> | boolean | void;
   onNewSession: () => Promise<void> | void;
   onClose: () => void;
 }
@@ -120,8 +120,8 @@ export function useConversationDrawerController({
   const handleSelectConversation = React.useCallback(
     (conversationId: string) => {
       void (async () => {
-        await onSelect(conversationId);
-        if (dismissAfterAction) {
+        const selected = await onSelect(conversationId);
+        if (dismissAfterAction && selected !== false) {
           onClose();
         }
       })();

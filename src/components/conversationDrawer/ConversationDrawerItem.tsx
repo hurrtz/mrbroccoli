@@ -99,7 +99,7 @@ export function ConversationDrawerItem({
           accessibilityRole="button"
           accessibilityLabel={[
             conversation.title,
-            conversation.isPrivate ? t("privateConversation") : null,
+            conversation.isLocked ? t("lockedSession") : null,
             rootTitle ? t("branchOfConversation", { title: rootTitle }) : null,
           ]
             .filter(Boolean)
@@ -115,12 +115,8 @@ export function ConversationDrawerItem({
                   color={colors.accent}
                 />
               ) : null}
-              {conversation.isPrivate ? (
-                <PhosphorIcon
-                  name="lock"
-                  size="inline"
-                  color={colors.textSecondary}
-                />
+              {conversation.isLocked ? (
+                <PhosphorIcon name="lock" size="inline" color={colors.accent} />
               ) : null}
               <Text
                 style={[styles.itemTitle, { color: colors.text }]}

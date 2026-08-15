@@ -88,7 +88,7 @@ authoritative documents.
 3. [`src/hooks/conversations/SPEC.md`](./src/hooks/conversations/SPEC.md)
 4. [`src/services/SPEC.md`](./src/services/SPEC.md) for backup/archive behavior.
 5. [`src/services/conversationKnowledge/SPEC.md`](./src/services/conversationKnowledge/SPEC.md)
-   for cross-session retrieval or privacy.
+   for cross-session retrieval or source eligibility.
 
 ### Changing a hosted provider or model
 

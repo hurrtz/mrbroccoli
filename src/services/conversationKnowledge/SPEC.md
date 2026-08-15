@@ -25,12 +25,13 @@ without uploading or replaying the complete conversation library.
 The SQLite database is derived cache state. Conversations remain authoritative
 and must survive index deletion, schema changes, or retrieval failure.
 
-## Privacy Contract
+## Eligibility Contract
 
 - The feature is globally opt-in.
 - The current conversation is always excluded from retrieval.
-- Conversations marked Private are immediately tombstoned and removed from the
-  index; they are never retrieved.
+- Locked conversations follow the same tombstone and removal rule even during
+  an authenticated foreground visit. Unlocking for display never makes their
+  content eligible for cross-session retrieval.
 - Branch-family exclusions prevent shared copied history from appearing as
   multiple independent sources.
 - Disabling the feature clears derived rows.
@@ -39,8 +40,10 @@ and must survive index deletion, schema changes, or retrieval failure.
 - Only selected source-labelled excerpts are passed to the current response
   route; the user can inspect the source conversation metadata on the reply.
 
-**Decision:** Private affects cross-session indexing only. It does not delete
-the conversation or its own in-session compact summary.
+**Decision:** A session lock is both an app access boundary and a permanent
+cross-session-knowledge exclusion while it remains set. The canonical
+conversation remains intact, while its content cannot become a source for
+another session.
 
 ## Index Shape
 

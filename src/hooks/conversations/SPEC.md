@@ -21,8 +21,8 @@ last_validated_sha: 7db5c94
 ## Ownership
 
 `useConversations` is the public owner of conversation hydration, selection,
-search, mutations, branches, privacy, and backup restore. This directory owns
-the hook-facing store API and metadata derivation.
+search, mutations, branches, session-lock authorization, and backup
+restore. This directory owns the hook-facing store API and metadata derivation.
 
 ## Storage Shape
 
@@ -68,8 +68,11 @@ boundary steady kept the store swap out of a 1,200-line mutation surface.
   future defaults again.
 - Deleting a conversation also deletes its derived knowledge rows and
   app-owned image files.
-- Private state is canonical conversation data and immediately controls derived
-  knowledge indexing.
+- Lock state is canonical conversation data mirrored into metadata. A locked
+  record cannot be selected, read by ID, content-searched, hydrated as active,
+  or indexed until its ID receives a foreground-only authorization grant.
+  Launch and every non-active app state clear grants; if the active session is
+  locked, it is removed from the workspace at the same boundary.
 - Archive state is canonical conversation data. Archiving removes a session
   from the everyday pinned section; pinning an archived session restores it to
   the active groups before applying the pin.
@@ -84,7 +87,7 @@ truncating the original.
   another.
 - The branch records root conversation, parent conversation, source checkpoint,
   cloned checkpoint, branch kind, and creation time.
-- Existing per-conversation settings and privacy are copied.
+- Existing per-conversation settings are copied.
 - Summary state is not copied because the new path may diverge.
 - Every member of a branch family excludes its siblings from
   past-conversation retrieval, avoiding duplicated shared history as apparently
@@ -98,11 +101,18 @@ checkpoint navigation remains in the transcript.
 
 ## Search and Knowledge Synchronization
 
-Conversation search scans metadata and, when needed, full records. When
-past-conversation knowledge is enabled, eligible non-private conversations are
+Conversation search scans metadata and, when needed, full records. Locked
+metadata may match its visible title or route fields, but locked transcript,
+summary, and artifact content is never read for search. When past-conversation
+knowledge is enabled, eligible unlocked conversations are
 synchronized to the derived SQLite index after meaningful changes. Disabling
 the feature clears that index. The active conversation and all explicit family,
-private, and caller exclusions remain ineligible at query time.
+locked, and caller exclusions remain ineligible at query time.
+
+The retired `isPrivate` document and metadata fields are removed during reads
+and backup parsing, then the current shape is written forward. A legacy private
+marker therefore becomes an ordinary unlocked session rather than a hidden
+state with no product control.
 
 **Decision:** Canonical data never depends on the derived index. Indexing may
 fail or be rebuilt without losing conversations.
@@ -117,6 +127,10 @@ Backup restore is non-destructive:
 - branch root/parent references and knowledge exclusions are remapped across
   copied IDs; and
 - existing conversations, provider keys, and unrelated settings remain.
+
+Session-lock credentials and lock state are device-local access controls, not
+portable data. An authorized locked record is exported without `isLocked`, and
+every restored conversation is unlocked.
 
 ## Evidence
 

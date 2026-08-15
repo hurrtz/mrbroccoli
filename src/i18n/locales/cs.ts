@@ -12,6 +12,7 @@ import { premiumTranslations } from "../premiumTranslations";
 import { transcriptEditTranslations } from "../transcriptEditTranslations";
 import { autoSetupTranslations } from "../autoSetupTranslations";
 import { workspaceTranslations } from "../workspaceTranslations";
+import { sessionLockTranslations } from "../sessionLockTranslations";
 
 export const cs = {
   ...conversationArtifactTranslations.cs,
@@ -26,6 +27,7 @@ export const cs = {
   ...premiumTranslations.cs,
   ...transcriptEditTranslations.cs,
   ...workspaceTranslations.cs,
+  ...sessionLockTranslations.cs,
   ...autoSetupTranslations.cs,
   appName: "Pan Brokolice",
   retry: "Zkuste to znovu",

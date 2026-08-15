@@ -12,6 +12,7 @@ import { premiumTranslations } from "../premiumTranslations";
 import { transcriptEditTranslations } from "../transcriptEditTranslations";
 import { autoSetupTranslations } from "../autoSetupTranslations";
 import { workspaceTranslations } from "../workspaceTranslations";
+import { sessionLockTranslations } from "../sessionLockTranslations";
 
 export const ptBR = {
   ...conversationArtifactTranslations.ptBR,
@@ -26,6 +27,7 @@ export const ptBR = {
   ...premiumTranslations.ptBR,
   ...transcriptEditTranslations.ptBR,
   ...workspaceTranslations.ptBR,
+  ...sessionLockTranslations.ptBR,
   ...autoSetupTranslations.ptBR,
   appName: "Sr. Brócolis",
   retry: "Tentar novamente",

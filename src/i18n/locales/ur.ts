@@ -12,6 +12,7 @@ import { premiumTranslations } from "../premiumTranslations";
 import { transcriptEditTranslations } from "../transcriptEditTranslations";
 import { autoSetupTranslations } from "../autoSetupTranslations";
 import { workspaceTranslations } from "../workspaceTranslations";
+import { sessionLockTranslations } from "../sessionLockTranslations";
 
 export const ur = {
   ...conversationArtifactTranslations.ur,
@@ -26,6 +27,7 @@ export const ur = {
   ...premiumTranslations.ur,
   ...transcriptEditTranslations.ur,
   ...workspaceTranslations.ur,
+  ...sessionLockTranslations.ur,
   ...autoSetupTranslations.ur,
   appName: "مسٹر بروکلی",
   retry: "دوبارہ کوشش کریں۔",

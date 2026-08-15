@@ -196,8 +196,7 @@ describe("runVoicePipeline", () => {
       transcriptionOverride: "What did we decide about the index?",
       messages: [],
       currentConversationId: "current",
-      conversationKnowledgeExcludedIds: ["fork-source"],
-      privateConversationIds: ["private"],
+      conversationKnowledgeExcludedIds: ["fork-source", "locked"],
       pastConversationKnowledgeEnabled: true,
       model: "gpt-5.4",
       provider: "openai",
@@ -216,8 +215,7 @@ describe("runVoicePipeline", () => {
 
     expect(retrieveConversationKnowledge).toHaveBeenCalledWith({
       currentConversationId: "current",
-      excludedConversationIds: ["fork-source"],
-      privateConversationIds: ["private"],
+      excludedConversationIds: ["fork-source", "locked"],
       query: "What did we decide about the index?",
     });
     expect(streamChat).toHaveBeenCalledWith(
@@ -267,7 +265,6 @@ describe("runVoicePipeline", () => {
       transcriptionOverride: "Start a new conversation about device heat.",
       messages: [],
       currentConversationId: null,
-      privateConversationIds: [],
       pastConversationKnowledgeEnabled: true,
       model: "gpt-5.4",
       provider: "openai",
@@ -345,7 +342,6 @@ describe("runVoicePipeline", () => {
       transcriptionOverride: "Assess the hardware check.",
       messages: [],
       currentConversationId: "current",
-      privateConversationIds: [],
       pastConversationKnowledgeEnabled: true,
       model: "claude-fable-5",
       provider: "anthropic",
@@ -423,7 +419,7 @@ describe("runVoicePipeline", () => {
       transcriptionOverride: "What did we decide?",
       messages: [],
       currentConversationId: "current",
-      privateConversationIds: ["private"],
+      conversationKnowledgeExcludedIds: ["locked"],
       pastConversationKnowledgeEnabled: true,
       model: "qwen3-0.6b-q8",
       localLlmModelId: "qwen3-0.6b-q8",
@@ -1259,11 +1255,7 @@ describe("runVoicePipeline", () => {
 
   it("preserves paragraph metadata for ordinary wait-mode replies", async () => {
     (streamChat as jest.Mock).mockImplementation(
-      async ({
-        onDone,
-      }: {
-        onDone: (text: string) => Promise<void>;
-      }) => {
+      async ({ onDone }: { onDone: (text: string) => Promise<void> }) => {
         await onDone("Paragraph one.\n\nParagraph two.");
       },
     );

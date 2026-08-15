@@ -30,8 +30,8 @@ interface ConversationActionMenuProps {
   onOpenRenameModal: (conversation: ConversationMeta) => void;
   onShareThread: (conversationId: string) => void;
   onTogglePinned: (conversationId: string) => void;
-  onTogglePrivate: (conversationId: string) => void;
   onToggleArchived: (conversationId: string) => void;
+  onToggleLocked: (conversation: ConversationMeta) => void;
   onAutoName: (conversationId: string) => void;
 }
 
@@ -54,8 +54,8 @@ export function ConversationActionMenu({
   onOpenRenameModal,
   onShareThread,
   onTogglePinned,
-  onTogglePrivate,
   onToggleArchived,
+  onToggleLocked,
   onAutoName,
 }: ConversationActionMenuProps) {
   const { colors } = useTheme();
@@ -65,57 +65,69 @@ export function ConversationActionMenu({
     return null;
   }
 
+  const unlockedGroups: MenuItem[][] = conversation.isLocked
+    ? []
+    : [
+        [
+          {
+            icon: "edit",
+            label: t("rename"),
+            onPress: () => onOpenRenameModal(conversation),
+            testID: "conversation-action-rename",
+          },
+          {
+            icon: "thunderbolt",
+            label: t("nameConversationAutomatically"),
+            onPress: () => onAutoName(conversation.id),
+            testID: "conversation-action-auto-name",
+          },
+        ],
+        [
+          {
+            icon: "share-alt",
+            label: t("share"),
+            onPress: () => onShareThread(conversation.id),
+          },
+          {
+            icon: "copy",
+            label: t("copy"),
+            onPress: () => onCopyThread(conversation.id),
+          },
+        ],
+      ];
+  const organizeGroups: MenuItem[][] = conversation.isLocked
+    ? []
+    : [
+        [
+          {
+            icon: "pushpin",
+            label: conversation.pinned ? t("unpin") : t("pin"),
+            onPress: () => onTogglePinned(conversation.id),
+            testID: "conversation-action-toggle-pin",
+          },
+          {
+            icon: "inbox",
+            label: conversation.archived
+              ? t("unarchiveSession")
+              : t("archiveSession"),
+            onPress: () => onToggleArchived(conversation.id),
+            testID: "conversation-action-toggle-archive",
+          },
+        ],
+      ];
   const groups: MenuItem[][] = [
+    ...organizeGroups,
     [
       {
-        icon: "pushpin",
-        label: conversation.pinned ? t("unpin") : t("pin"),
-        onPress: () => onTogglePinned(conversation.id),
-        testID: "conversation-action-toggle-pin",
-      },
-      {
-        icon: "inbox",
-        label: conversation.archived
-          ? t("unarchiveSession")
-          : t("archiveSession"),
-        onPress: () => onToggleArchived(conversation.id),
-        testID: "conversation-action-toggle-archive",
-      },
-      {
-        icon: conversation.isPrivate ? "global" : "lock",
-        label: conversation.isPrivate
-          ? t("includeConversationInKnowledge")
-          : t("markConversationPrivate"),
-        onPress: () => onTogglePrivate(conversation.id),
-        testID: "conversation-action-toggle-private",
+        icon: "lock",
+        label: conversation.isLocked
+          ? t("removeSessionLock")
+          : t("lockSession"),
+        onPress: () => onToggleLocked(conversation),
+        testID: "conversation-action-toggle-lock",
       },
     ],
-    [
-      {
-        icon: "edit",
-        label: t("rename"),
-        onPress: () => onOpenRenameModal(conversation),
-        testID: "conversation-action-rename",
-      },
-      {
-        icon: "thunderbolt",
-        label: t("nameConversationAutomatically"),
-        onPress: () => onAutoName(conversation.id),
-        testID: "conversation-action-auto-name",
-      },
-    ],
-    [
-      {
-        icon: "share-alt",
-        label: t("share"),
-        onPress: () => onShareThread(conversation.id),
-      },
-      {
-        icon: "copy",
-        label: t("copy"),
-        onPress: () => onCopyThread(conversation.id),
-      },
-    ],
+    ...unlockedGroups,
     [
       {
         danger: true,
@@ -177,10 +189,7 @@ export function ConversationActionMenu({
                 style={({ pressed }) => [
                   styles.menuRow,
                   itemIndex
-                    ? [
-                        styles.menuRowDivider,
-                        { borderTopColor: colors.border },
-                      ]
+                    ? [styles.menuRowDivider, { borderTopColor: colors.border }]
                     : null,
                   pressed ? styles.menuRowPressed : null,
                 ]}
